@@ -104,8 +104,16 @@
 #define GWS_GrCubeZ               2041
 #define GWS_GrRectangle           2042
 #define GWS_AsyncCommand          2222
+
+// Put a message into the client's queue.
+#define GWS_PutClientMessage    2223
+// Get a message from the client's queue.
+#define GWS_GetClientMessage    2224
+
+
 #define GWS_DrainInput            8080
 // ...
+
 
 
 

@@ -310,8 +310,6 @@ gwmProcedure (
 
     switch (msg){
 
-
-
         case MSG_KEYDOWN:
             switch(long1){
                 case VK_TAB:  update(fd);  break;
@@ -527,7 +525,7 @@ int fullscreen_client (int fd, struct wm_client_d *c)
     
     if ( (void *) c != NULL )
     {
-        if(c->used == 1)
+        if (c->used == 1)
         {
             gws_change_window_position(fd,c->window, 0, 0);  // x,y
             gws_resize_window(fd,c->window, w, h);           // w,h
@@ -1272,15 +1270,12 @@ _more:
 
 
 
-// Testing new main.
 int main ( int argc, char *argv[] ){
-
 
     struct gws_display_d *Display;
     int client_fd = -1;
 
 
-    
     // IN: hostname:number.screen_number
     Display = (struct gws_display_d *) gws_open_display("display:name.0");
 
@@ -1291,7 +1286,7 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
-    client_fd = Display->fd;
+    client_fd = (int) Display->fd;
     
     if ( client_fd <= 0 )
     {
@@ -1313,13 +1308,12 @@ int main ( int argc, char *argv[] ){
         wmClientList[i] = 0;
     };
 
-    //
-    // Draw
-    //
+
+//
+// Draw
+//
 
     printf ("gwm: DRAW\n");
-
-
 
     //
     // Create clients.
@@ -1346,20 +1340,23 @@ int main ( int argc, char *argv[] ){
     gws_send_wm_magic(client_fd,pid);
     */
 
-    //
-    // == Loop ==============================
-    //
+
+//
+// == Loop ==============================
+//
+
+    //struct gws_event_d *Event;
 
     //=================================
-    //get current thread
-    //set foreground thread
+    // Set current thread as foreground thread.
 
-    //int cThread = (int) sc82 (10010,0,0,0);
-    //sc82 (10011,cThread,cThread,cThread);
 
     rtl_focus_on_this_thread();
 
     while (1){
+
+        //Event = (struct gws_event_d *) gws_next_event();
+
         if ( rtl_get_event() == TRUE ){  
             gwmProcedure ( 
                 client_fd,
@@ -1374,15 +1371,6 @@ int main ( int argc, char *argv[] ){
 
     // #debug
     // while(1){}
-
-
-
-    // #importante
-    // Se não usarmos o loop acima, então podemos pegar
-    // as mensagens do sistema....
-    // O ws pode mandar mensagens de sistema para o
-    // wm registrado.
-
 
     /*
     struct gws_event_d *Event;

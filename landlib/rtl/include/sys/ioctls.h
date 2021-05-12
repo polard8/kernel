@@ -1,4 +1,10 @@
-// Credits: linux.
+// Credits: linux-like.
+
+// See: 
+// https://man7.org/linux/man-pages/man4/tty_ioctl.4.html
+// ...
+
+
 
 #ifndef __ASM_GENERIC_IOCTLS_H
 #define __ASM_GENERIC_IOCTLS_H
@@ -34,7 +40,12 @@
 #define TIOCSCTTY	0x540E
 #define TIOCGPGRP	0x540F
 #define TIOCSPGRP	0x5410
-#define TIOCOUTQ	0x5411
+
+
+// Get the number of bytes in the output buffer.
+#define TIOCOUTQ    0x5411
+
+
 #define TIOCSTI		0x5412
 #define TIOCGWINSZ	0x5413
 #define TIOCSWINSZ	0x5414
@@ -44,8 +55,11 @@
 #define TIOCMSET	0x5418
 #define TIOCGSOFTCAR	0x5419
 #define TIOCSSOFTCAR	0x541A
-#define FIONREAD	0x541B
-#define TIOCINQ		FIONREAD
+
+// Get the number of bytes in the input buffer.
+#define FIONREAD  0x541B
+#define TIOCINQ   FIONREAD
+
 #define TIOCLINUX	0x541C
 #define TIOCCONS	0x541D
 #define TIOCGSERIAL	0x541E

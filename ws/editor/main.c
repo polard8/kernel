@@ -852,8 +852,8 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
-    client_fd = Display->fd;
-    
+    client_fd = (int) Display->fd;
+
     if ( client_fd <= 0 )
     {
         debug_print ("editor: bad fd\n");
@@ -862,7 +862,6 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    
     // #todo:
     // check validation od w h
     debug_print ("------------------------\n"); 
@@ -1029,9 +1028,10 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    //
-    // main window
-    //
+
+//
+// main window
+//
 
     main_window = gws_create_window (client_fd,
         WT_OVERLAPPED, 1, 1, "Editor", 

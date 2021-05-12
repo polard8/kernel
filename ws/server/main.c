@@ -996,6 +996,19 @@ gwsProcedure (
         NoReply = TRUE;
         break;
 
+
+    case GWS_PutClientMessage:
+        gwssrv_debug_print ("gwssrv: [GWS_PutClientMessage]\n");
+        servicePutClientMessage();
+        NoReply = TRUE;
+        break;
+
+    case GWS_GetClientMessage:
+        gwssrv_debug_print ("gwssrv: [GWS_GetClientMessage]\n");
+        serviceGetClientMessage();
+        NoReply = FALSE;
+        break;
+
     // Se o cliente enviar essa mensagem, significa
     // que ele quer que drenemos o input que o
     // ws recebe via mensagens tradicionais e passemos
@@ -1598,7 +1611,11 @@ void gwssrv_init_client_support (void)
         connections[i] = 0;
     };
  
-    // The current client
+ 
+//
+// The current client
+//
+
     currentClient = (struct gws_client_d *) 0;
     
     
@@ -1655,7 +1672,7 @@ void init_client_struct ( struct gws_client_d *c )
     c->used  = TRUE;
     c->magic = 1234;
     c->is_connected = FALSE;
-    c->fd = -1;
+    c->fd  = -1;
     c->pid = -1;
     c->gid = -1;
  
@@ -1714,6 +1731,7 @@ int serviceClientEvent(void)
     return -1;
 }
 
+
 // When a client get the next event from it's own queue.
 int serviceNextEvent (void)
 {
@@ -1731,6 +1749,8 @@ int serviceNextEvent (void)
     //struct gws_event_d  *event;
     //...
 
+
+    //printf ("serviceNextEvent: \n");
 
     window  = message_address[0]; 
     msg     = message_address[1]; 
@@ -1765,6 +1785,150 @@ void serviceExitGWS(void)
     printf ("[TODO] Close all the clients\n");
     exit(0);
 }
+
+
+
+int servicePutClientMessage(void)
+{
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    
+    
+    int           window = 0;
+    int           msg    = 0;  // msg = Put message
+    unsigned long long1  = 0;  // client id
+    unsigned long long2  = 0;
+    // ...
+
+
+    struct gws_client_d *client;
+    int client_id = -1;
+    //
+    // parameters
+    //
+
+    window = (int)           message_address[0];
+    msg    = (int)           message_address[1];
+    long1  = (unsigned long) message_address[2]; 
+    long2  = (unsigned long) message_address[3];
+    //...
+
+
+    // Check the message code.
+    if ( msg != GWS_PutClientMessage )
+    {
+        return -1;
+    }
+
+    // Get the client id.
+
+    client_id = (int) long1;
+
+    if (client_id<0 || client_id >= CLIENT_COUNT_MAX)
+    {
+        return -1;
+    }
+
+    client = (struct gws_client_d *) connections[client_id];
+    
+    if ( (void*) client == NULL )
+        return -1;
+    
+    if ( client->used != NULL || client->magic != 1234 )
+    {
+        return -1;
+    }
+    
+    client->tail_pos++;
+    if ( client->tail_pos >= 32 )
+    {
+        client->tail_pos = 0;
+    }
+    
+    int Slot = (int) client->tail_pos;
+    
+    client->window_list[Slot] = (int) window;
+    client->msg_list[Slot]    = (int) msg;
+    client->long1_list[Slot]  = (unsigned long) long1;
+    client->long2_list[Slot]  = (unsigned long) long2;
+    // ...
+    
+    message_address[0] = 0;
+    message_address[1] = 0;
+    message_address[2] = 0;
+    message_address[3] = 0;
+    
+    return 0;
+}
+
+
+
+int serviceGetClientMessage(void)
+{
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    
+    
+    int           window = 0;
+    int           msg    = 0;  // msg = Put message
+    unsigned long long1  = 0;  // client id
+    unsigned long long2  = 0;
+    // ...
+
+
+    struct gws_client_d *client;
+    int client_id = -1;
+    //
+    // parameters
+    //
+
+    window = (int)           message_address[0];
+    msg    = (int)           message_address[1];
+    long1  = (unsigned long) message_address[2]; 
+    long2  = (unsigned long) message_address[3];
+    //...
+
+    // Check the message code.
+    if ( msg != GWS_GetClientMessage )
+    {
+        return -1;
+    }
+
+    // Get the client id.
+
+    client_id = (int) long1;
+
+    if (client_id<0 || client_id >= CLIENT_COUNT_MAX)
+    {
+        return -1;
+    }
+
+    client = (struct gws_client_d *) connections[client_id];
+    
+    if ( (void*) client == NULL )
+        return -1;
+    
+    if ( client->used != NULL || client->magic != 1234 )
+    {
+        return -1;
+    }
+    
+    client->head_pos++;
+    if ( client->head_pos >= 32 )
+    {
+        client->head_pos = 0;
+    }
+
+    int Slot = (int) client->tail_pos;
+    
+    message_address[0] = client->window_list[Slot];
+    message_address[1] = client->msg_list[Slot];
+    message_address[2] = client->long1_list[Slot];
+    message_address[3] = client->long2_list[Slot];
+    // ...
+    
+    return 0;
+}
+
+
 
 
 // No response.

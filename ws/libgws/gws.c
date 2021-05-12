@@ -39,13 +39,6 @@
 
 
 
-
-// #test
-// #todo
-// Default display used by the library.
-// struct gws_display_d *__gwsCurrentDisplay;
-
-
 // #todo
 // + draw line
 // ...
@@ -57,6 +50,11 @@ char *title_when_no_title = "Window";
 
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
+// #??
+// Podemos ter um buffer de request dentro da estrutura de display.
+// Isso é melhor que um buffer global solto,
+// Dessa forma cada display pode ter seus próprios buffers.
+
 char __gws_message_buffer[512];
 
 
@@ -3643,6 +3641,8 @@ struct gws_display_d *gws_open_display(char *display_name)
     };
 
     Display->connected = TRUE;
+    
+    gws_set_current_display(Display);
 
     return (struct gws_display_d *) Display;
 }
@@ -3666,6 +3666,20 @@ void gws_close_display( struct gws_display_d *display)
     display = NULL;
 }
 
+int gws_set_current_display ( struct gws_display_d *display )
+{
+    if ( (void*) display == NULL )
+        return -1;
+
+    if ( display->used != TRUE || display->magic != 1234 )
+        return -1;
+
+    // Change the current display for this library.
+    
+    libgwsCurrentDisplay = (struct gws_display_d *) display;
+    
+    return 0;
+}
 
 
 /*

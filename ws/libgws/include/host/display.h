@@ -9,6 +9,11 @@
 #define __LIBGWS_DISPLAY_H    1
 
 
+// #??
+// Podemos ter um buffer de request dentro da estrutura de display.
+// Isso é melhor que um buffer global solto,
+// Dessa forma cada display pode ter seus próprios buffers.
+
 struct gws_display_d
 {
     int id;
@@ -34,12 +39,26 @@ struct gws_display_d
     //only one screen for now.
     //struct gws_screen_d *screen;
 
-    //...
+    // ...
+
+    //char *request_buffer;
+    //char *reply_buffer;
 
     struct gws_display_d *next;
 };
 
+
+//
+// The current display
+//
+
+struct gws_display_d *libgwsCurrentDisplay;
+
+int gws_set_current_display ( struct gws_display_d *display );
+
+
 #endif    
+
 
 
 

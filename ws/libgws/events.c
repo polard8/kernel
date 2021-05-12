@@ -31,7 +31,7 @@ struct gws_event_d *gws_next_event(int fd)
     //
     
     gws_debug_print ("gws_next_event: [TODO]\n"); 
-    
+
     return (struct gws_event_d *) 0;
 }
 
