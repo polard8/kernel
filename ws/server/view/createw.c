@@ -205,27 +205,59 @@ void *xxxCreateWindow (
     struct gws_window_d *Parent;
 
 	//struct desktop_d *Desktop;  //suspenso.
-	
-    struct gws_rect_d *clientRect;  //rect
 
 
-	// #improvisando uma largura de borda.
-	// @todo: isso deve ir para outro lugar.
+//
+// The client rectangle.
+//
+
+    struct gws_rect_d *clientRect;
+
+//
+// Border
+//
+
+    // #
+    // Improvisando uma largura de borda.
+    // Talvez devamos receber isso via parâmetros.
+
     unsigned long border_size = 0;
     unsigned long border_color = COLOR_BORDER;
 
     // ??
     unsigned long __tmp_color=0;
 
+//
+// Position and dimension.
+//
 
-    // Position and dimension.
     unsigned long WindowX      = x;
     unsigned long WindowY      = y;
     unsigned long WindowWidth  = width;
     unsigned long WindowHeight = height;
+    // #todo: right and bottom.
+
+//
+// Position and dimension for fullscreen mode.
+//
+
+    // Initial configuration.
+    // It will change.
+
+    // #bugbug
+    // left and top needs to be '0'?
+
+    unsigned long fullWindowX      = WindowX + border_size;
+    unsigned long fullWindowY      = WindowY + border_size;
+    unsigned long fullWindowWidth  = WindowWidth;
+    unsigned long fullWindowHeight = WindowHeight;
+    // #todo: right and bottom.
 
 
-    // Button suport
+//
+// Button suport
+//
+
     int buttonFocus=0;
     int buttonSelected=0;
     unsigned long buttonBorderColor1=0;
@@ -277,9 +309,7 @@ void *xxxCreateWindow (
 	};
     */
     
-    //provisório
-    Parent = (void *) pWindow;
-	
+
 	// Devemos checar se a janela está no mesmo desktop 
 	// que a ajnela mãe.
 	// No caso aqui, criarmos uma janela no mesmo desktop que a 
@@ -340,174 +370,234 @@ void *xxxCreateWindow (
 
 //CreateStruct:
 
-	//Alocando memória para a estrutura da janela.
+
+    //Alocando memória para a estrutura da janela.
+   // #todo: 
+   // Onde o Kernel colocará essa mensagem de erro ?
+   // Por enquanto no backbuffer.
 
     window = (void *) malloc( sizeof(struct gws_window_d) );
 
     if ( (void *) window == NULL )
     {
-        // #todo: 
-        // Onde o Kernel colocará essa mensagem de erro ?
-        // Por enquanto no backbuffer.
 
-        // Erro.
-        debug_print ("xxxCreateWindow: window struct \n");
-        printf ("xxxCreateWindow: window struct \n");
+        // #fixme
+
+        debug_print ("xxxCreateWindow: [ERROR] window\n");
+        printf      ("xxxCreateWindow: [ERROR] window\n");
+
+        // #debug
         gwssrv_show_backbuffer ();
-    
-       // Using the kgws. The window server inside the kernel.
-       //gde_message_box ( 3,
-         //  "xxxCreateWindow:",
-          // "window struct fail!" );
-       printf("xxxCreateWindow: window struct fail!\n");
-       while(1){}
- 
-       //return NULL; 
-
-    }else{
-
-		// Obs: 
-		// Conseguimos alocar memória para a estrutura da janela. 
-		// Agora vamos inicializar os elementos da estrutura de acordo 
-		// com os parâmetros passados via argumento.
-
-		// Object support.
-		//window->objectType  = ObjectTypeWindow;
-		//window->objectClass = ObjectClassGuiObjects;
-
-		// #importante
-		// Id. A janela recebe um id somente na hora de registrar.
-		// window->id = ??.
-
-        window->used  = TRUE;
-        window->magic = 1234;
-        window->name  = windowname;
-
-		// Window type.
-		// Tipo é unsigned long pois poderá ser um conjunto de flags.
-        window->type = (unsigned long) type;
-
-
-        window->parent = Parent;
-
-		//@todo: Criar instância.
-
-		//@todo: é importante definir o procedimento de janela desde já.
-		//senão dá problemas quando chamá-lo e ele naõ estiver pronto.
-
-		//Procedure support.
-		//@todo: Devemos receber esses parâmetros e configurar aqui.
-		//window->procedure = (unsigned long) &system_procedure;
-		//window->wProcedure = NULL;  //Estrutura.
-		
-		
-		//Modo de exibição:
-		window->view = (int) view;
-		
-		// Se não estivermos no modo gráfico, não há o que pintar.
-		//if ( g_useGUI == 0 )
-		//{ 
-		 //   window->view = (int) VIEW_MINIMIZED;
-            //#bugbug: Abortar.
-		//};
-
-        //Se não foi oferecido um modo de exibição, então temos um problema.
-        //?? Talvez devamos retornar um erro. 
-		//if( (int) view == VIEW_NULL ){ return NULL; };
-		
-		//??Qual é o status da janela, se ela é a janela ativa ou não.
-		//?? Devemos definir quais são os status possíveis da janela.
-		//
-
-        window->status = status;
-         
-        // Active 
-        if ( status == WINDOW_STATUS_ACTIVE )
-        { 
-            active_window = (int) window->id;  
-            //set_active_window(window); 
-            //window->active = WINDOW_STATUS_ACTIVE;
-            //window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
-            window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
-            
-            //#todo
-            //window->z = 0;  //z_order_get_free_slot()
-            //...
-        }
-
-        // Inactive
-        if ( status == WINDOW_STATUS_INACTIVE )
-        { 
-            //window->active = WINDOW_STATUS_INACTIVE;
-            //window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
-            window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
-            
-            //todo
-            //window->z = 0; //z_order_get_free_slot()
-            //...
-        }
-
-        // Initialize focus flag.
-        window->focus = FALSE; 
-
-		// @todo:
-		// Se for uma janela filha o posicionamento deve ser somado às margens 
-		// da área de cliente da janela que será a janela mãe.
-
-		// #bugbug @todo 
-		// Esses valores de dimensões recebidos via argumento na verdade 
-		// devem ser os valores para a janela, sem contar o frame, que 
-		// inclui as bordas e a barra de títulos.
-
-        // Dimensões.
-        window->width  = WindowWidth;
-        window->height = WindowHeight;
-
-        // Deslocamento em relação a janela mãe.
-        window->x = WindowX;
-        window->y = WindowY;
-
-        //++
-        // Margens.
-        // Deslocamento em relação a tela. (Screen)
-        if ( window->parent != NULL ){
-            window->left = (window->parent->left + window->x); //x; 
-            window->top  = (window->parent->top  + window->y); //y;
-            
-        // No caso da primeira janela de todas.
-        }else{
-            window->left = window->x;
-            window->top  = window->y; 
-        };
-        window->right  = (unsigned long) ( window->left + window->width );
-        window->bottom = (unsigned long) ( window->top  + window->height ); 
-        //--
-
-
-		// ?? saving.
-		//saveLeft = window->left;
-		//saveTop  = window->top;
-
-        // Color
-        window->bg_color            = (unsigned long) color;
-        window->clientrect_bg_color = (unsigned long) clientcolor;
-
-        //input pointer
-        window->ip_on = 0;   // desligado
-        window->ip_device = IP_DEVICE_NULL;
-        window->ip_x = 0;    // in chars
-        window->ip_y = 0;    // in chars
-        window->ip_color = COLOR_BLACK;
-        window->ip_type = 0;   // #bugbug #todo
+        while(1){}
         
-        // in pixel for mouse pointer ip device.
-        window->ip_pixel_x = 0;
-        window->ip_pixel_y = 0;
+        // #todo
+        // We need to return.
+        //return NULL; 
+    }
 
-		// ??
-		// O retângulo da janela.
-		//window->rcWindow = NULL;
-		
+
+    // We have a valid pointer.
+    // Let's set up the elements using the parameters.
+
+    // #todo
+    // Object support.
+    //window->objectType  = ObjectTypeWindow;
+    //window->objectClass = ObjectClassGuiObjects;
+
+    // #todo
+    // #importante
+    // Id. 
+    // A janela recebe um id somente na hora de registrar.
+    // window->id = ?.
+
+
+    // Validating the structure.
+
+    window->used  = TRUE;
+    window->magic = 1234;
+
+//
+// The window name
+//
+
+    // #test
+    if ( (void*) windowname == NULL ){
+        debug_print ("xxxCreateWindow: [ERROR] Invalid windowname\n");
+    }
+
+    // #test
+    if ( *windowname == 0 ){
+        debug_print ("xxxCreateWindow: [ERROR] Invalid *windowname\n");
+    }
+
+    window->name  = (char *) windowname;
+
+//
+// Window type
+//
+
+    // Tipo é unsigned long pois poderá ser um conjunto de flags.
+
+    window->type = (unsigned long) type;
+
+
+//
+// Parent window
+//
+
+    // #test
+    if ( (void*) pWindow == NULL ){
+        debug_print ("xxxCreateWindow: [ERROR] Invalid parent window\n");
+    }
+
+    Parent = (void *) pWindow;
+    
+    window->parent = Parent;
+
+
+    //#todo: 
+    // é importante definir o procedimento de janela desde já.
+    //senão dá problemas quando chamá-lo e ele naõ estiver pronto.
+    //Procedure support.
+    //#todo: Devemos receber esses parâmetros e configurar aqui.
+    //#bugbug: Talvez isso será configurado na estrutura
+    // de window class. Se é que termos uma.
+    //window->procedure = (unsigned long) &system_procedure;
+    //window->wProcedure = NULL;  //Estrutura.
+
+//
+// View
+//
+
+    // Modo de exibição:
+    window->view = (int) view;
+
+    //Se não foi oferecido um modo de exibição, então temos um problema.
+    //?? Talvez devamos retornar um erro. 
+    //if( (int) view == VIEW_NULL ){ return NULL; };
+
+
+//
+// == Status ============================
+//
+
+    // Qual é o status da janela, se ela é a janela ativa ou não.
+    //?? Devemos definir quais são os status possíveis da janela.
+
+    window->status = status;
+
+    // Active 
+    if ( status == WINDOW_STATUS_ACTIVE )
+    { 
+        active_window = (int) window->id;  
+        //set_active_window(window); 
+        //window->active = WINDOW_STATUS_ACTIVE;
+        //window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
+        window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
+    
+        //#todo
+        //window->z = 0;  //z_order_get_free_slot()
+        //...
+    }
+
+    // Inactive
+    if ( status == WINDOW_STATUS_INACTIVE )
+    { 
+        //window->active = WINDOW_STATUS_INACTIVE;
+        //window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
+        window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
+   
+        //todo
+        //window->z = 0; //z_order_get_free_slot()
+        //...
+    }
+
+
+//
+// Focus
+//
+
+    // Initialize focus flag.
+    window->focus = FALSE; 
+
+
+//
+// == Margins and dimensions ======================
+//
+
+	// @todo:
+	// Se for uma janela filha o posicionamento deve ser somado às margens 
+	// da área de cliente da janela que será a janela mãe.
+
+	// #bugbug @todo 
+	// Esses valores de dimensões recebidos via argumento na verdade 
+	// devem ser os valores para a janela, sem contar o frame, que 
+	// inclui as bordas e a barra de títulos.
+
+    // Dimensões.
+    window->width  = WindowWidth;
+    window->height = WindowHeight;
+
+    // Deslocamento em relação a janela mãe.
+    window->x = WindowX;
+    window->y = WindowY;
+
+    //++
+    // Margens.
+    // Deslocamento em relação a tela. (Screen)
+    if ( window->parent != NULL ){
+        window->left = (window->parent->left + window->x); //x; 
+        window->top  = (window->parent->top  + window->y); //y;
+        
+    // No caso da primeira janela de todas.
+    }else{
+        window->left = window->x;
+        window->top  = window->y; 
+    };
+    window->right  = (unsigned long) ( window->left + window->width );
+    window->bottom = (unsigned long) ( window->top  + window->height ); 
+    //--
+
+
+//
+// == Margins and dimensions for fullscreen mode ==================
+//
+
+    // #bugbug
+    // This is valid only for some types of window.
+
+    // #bugbug
+    // left and top needs to be '0'?
+
+    window->full_left   = fullWindowX;
+    window->full_top    = fullWindowY;
+    window->full_right  = fullWindowX + fullWindowWidth;
+    window->full_bottom = fullWindowY + fullWindowHeight;
+    window->full_width  = fullWindowWidth;
+    window->full_height = fullWindowHeight;
+
+
+//
+// Background
+//
+
+    window->bg_color            = (unsigned long) color;
+    window->clientrect_bg_color = (unsigned long) clientcolor;
+
+//
+// Input pointer
+//
+
+    window->ip_on = FALSE;  // desligado
+    window->ip_device = IP_DEVICE_NULL;
+    window->ip_x = 0;       // in chars
+    window->ip_y = 0;       // in chars
+    window->ip_color = COLOR_BLACK;
+    window->ip_type = 0;    // #bugbug #todo
+
+    // In pixel, for mouse pointer ip device.
+    window->ip_pixel_x = 0;
+    window->ip_pixel_y = 0;
 
 
 		
@@ -552,82 +642,116 @@ void *xxxCreateWindow (
 
 		//suspensa !!!
 
-		//window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
-        window->DedicatedBuffer = NULL;
+	//window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
+    window->DedicatedBuffer = NULL;
 
 		// backbuffer and front buffer.
 		//window->BackBuffer = (void *) g_backbuffer_va;
 		//window->FrontBuffer = (void *) g_frontbuffer_pa;
 		
 		
-		//Child window linked list.
-        window->childListHead = NULL;
-		
-		// (#importante)
-		// Client window support.
-		// Obs: A área de cliente será um retângulo e não uma janela.
-		// Mas nda impede da estrutra gerenciar uma janela que fique 
-		// em cima da área de cliente.
-        window->client_window = NULL;  //window. 
-        window->rcClient = NULL;       //rect. (#importante)
-		
-		// #importante
-		// Terminal support.
-		// Suporte não tradicional à terminais.
-		// manipulando variáveis ao invés de uma estrutura.
-        window->terminal_used  = (int) 0;
-        window->terminal_magic = (int) 0;
-        window->terminal_tab   = (int) 0;
+	//Child window linked list.
+    window->childListHead = NULL;
 
-		//window->terminal_left = (unsigned long) 0;
-		//window->terminal_top = (unsigned long) 0;
-		//window->terminal_width = (unsigned long) 0;
-		//window->terminal_height = (unsigned long) 0;
-		
-		//Desktop support.
-		//window->desktop = (void*) Desktop; //configurado anteriormente.
-		//window->desktop_id = Desktop->id;  //@todo: verificar elemento.
 
-        // Menu support
-        window->menu_window  = NULL;
-        window->sysMenu      = NULL;
-        window->barMenu      = NULL;
-        window->defaultMenu  = NULL;
-        
-        // What is that?
-        window->isMenu    = 0;
-        window->isButton  = 0;
-        window->isEditBox = 0;
-        
-        window->selected = 0;  //Caso a janela seja um ítem de menu.
-        
-        //window->text = NULL; //Texto, caso a janela seja um ítem de menu
+//
+// Client window 
+//
 
-        // Draw support.
-        window->draw   = 0;      //@todo: Cuidado com isso.
-        window->redraw = 0;
-        window->show   = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
-	    //Continua ...
+    // (#importante)
+    // Client window support.
+    // Obs: A área de cliente será um retângulo e não uma janela.
+    // Mas nda impede da estrutra gerenciar uma janela que fique 
+    // em cima da área de cliente.
+
+    window->client_window = NULL;  // window. 
+    window->rcClient      = NULL;  // rect. (#importante)
+
+
+//
+// Terminal window
+//
+
+    // #importante
+    // Terminal support.
+    // Suporte não tradicional à terminais.
+    // manipulando variáveis ao invés de uma estrutura.
+
+    window->terminal_used  = (int) 0;
+    window->terminal_magic = (int) 0;
+    window->terminal_tab   = (int) 0;
+
+    //window->terminal_left = (unsigned long) 0;
+    //window->terminal_top = (unsigned long) 0;
+    //window->terminal_width = (unsigned long) 0;
+    //window->terminal_height = (unsigned long) 0;
+
+
+//
+// Desktop support
+//
+
+    //window->desktop = (void*) Desktop; //configurado anteriormente.
+    //window->desktop_id = Desktop->id;  //@todo: verificar elemento.
+
+//
+// Menu support
+//
+
+    window->menu_window  = NULL;
+    window->sysMenu      = NULL;
+    window->barMenu      = NULL;
+    window->defaultMenu  = NULL;
+
+    // What is that?
+    window->isMenu    = 0;
+    window->isButton  = 0;
+    window->isEditBox = 0;
+
+
+//
+// Selected menu item.
+//
+
+    //Caso a janela seja um ítem de menu.
+    window->selected = FALSE; 
+
+    // Texto, caso a janela seja um ítem de menu
+    // window->text = NULL; 
+
+    // Draw support.
+    window->draw   = 0;      //@todo: Cuidado com isso.
+    window->redraw = 0;
+    window->show   = 1; //Inicialmente presumimos que precisamos mostrar essa janela.
+    // Continua ...
 
         //Abaixo, elementos referenciados com menor frequência.
 	    
 		//window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
 		//window->process = NULL; //@todo: Definir à qual processo a janela perence.
-		
-		//Trava.
-        window->locked = 0;
 
-		//#debug
-		//printf("config1 %s %d %d %d %d \n",
-		//    window->name, window->left, window->top, window->width, window->height );
+//
+// Locked
+//
 
-		//Linked list.
-		//window->linkedlist = NULL;
+    window->locked = FALSE;
 
-        // Prev e next.
-        window->prev = (void *) Parent;
-        window->next = NULL;
-    };
+
+    // Linked list.
+    //window->linkedlist = NULL;
+
+
+//
+// Navigation
+//
+
+    // Prev e next.
+    window->prev = (void *) Parent;
+    window->next = NULL;
+
+
+    //==========
+
 
     //Exemplos de tipos de janelas, segundo MS.	
     //Overlapped Windows
@@ -658,27 +782,28 @@ void *xxxCreateWindow (
 	// @todo: Salvar as flags para os elementos presentes
 	// na estrutura da janela.
 
-    //
-    // flag
-    //
+
+//
+// Flags
+//
 
     // Initializing the flag for all the elements.
     // not used by default.
 
-    window->shadowUsed     = FALSE;  // 1
-    window->backgroundUsed = FALSE;  // 2
-    window->titlebarUsed   = FALSE;  // 3
-    window->controlsUsed   = FALSE;  // 4
-    window->borderUsed     = FALSE;  // 5  
-    window->menubarUsed    = FALSE;  // 6 
-    window->toolbarUsed    = FALSE;  // 7
-    window->clientAreaUsed = FALSE;  // 8
-    window->scrollbarUsed  = FALSE;  // 9
+    window->shadowUsed     = FALSE;  //  1
+    window->backgroundUsed = FALSE;  //  2
+    window->titlebarUsed   = FALSE;  //  3
+    window->controlsUsed   = FALSE;  //  4
+    window->borderUsed     = FALSE;  //  5  
+    window->menubarUsed    = FALSE;  //  6 
+    window->toolbarUsed    = FALSE;  //  7
+    window->clientAreaUsed = FALSE;  //  8
+    window->scrollbarUsed  = FALSE;  //  9
     window->statusbarUsed  = FALSE;  // 10
 
-    //
-    // element style
-    //
+//
+// Element style
+//
 
     // Initialize style indicators.
 
@@ -693,10 +818,15 @@ void *xxxCreateWindow (
     window->scrollbar_style  = 0;
     window->statusbar_style  = 0;
 
+//
+// Elements
+//
+
+    // Selecting the elements given the type.
     // Each type has it's own elements.
 
-    switch (type)
-    {
+    switch (type){
+
         // Simple window. (Sem barra de títulos).
         case WT_SIMPLE:
             Background = TRUE;
@@ -784,6 +914,11 @@ void *xxxCreateWindow (
         // botões de radio 
         // ...
 
+
+        // #todo
+        // #bugbug
+        // We need to work on this case.
+ 
         default:
             debug_print("xxxCreateWindow: [DEBUG] default\n");
                  printf("xxxCreateWindow: [DEBUG] default\n");
@@ -796,14 +931,16 @@ void *xxxCreateWindow (
     // while(1){}
 
 
+//
+// == Draw ========
+//
 
-	//
-	// ==== Draw ====
-	//
-	
+
 	// Hora de pintar. 
-	// Os elementos serão incluídos se foram selecionados anteriormente.
-	
+	// Os elementos serão incluídos se foram 
+	// selecionados anteriormente.
+
+
 //drawBegin:
 
 	// Obs: 
@@ -1018,7 +1155,7 @@ void *xxxCreateWindow (
                 rectBackbufferDrawRectangle ( 
                     (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, 1 ); 
+                    __tmp_color, TRUE ); 
             }
 
             if ( (void*) Parent != NULL ){
@@ -1026,8 +1163,10 @@ void *xxxCreateWindow (
                 rectBackbufferDrawRectangle ( 
                     (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, 1 ); 
+                    __tmp_color, TRUE ); 
             }
+            
+            window->shadow_color = __tmp_color;
         }
 
         // E os outros tipos, não tem sombra ??
@@ -1062,6 +1201,7 @@ void *xxxCreateWindow (
                 window->bg_color = color;
                 break;
             default:
+                //#fixme
                 window->bg_color = COLOR_PINK;  //BLACK?
                 //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
                 break;
@@ -1071,27 +1211,28 @@ void *xxxCreateWindow (
 
         //#bugbug
         //Remember: The first window do not have a parent.
+
         if ( (void*) Parent == NULL ){ 
             gwssrv_debug_print ("xxxCreateWindow: [Background] Parent\n"); 
             //exit(1); 
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
                 window->width, window->height, 
-                window->bg_color, 1 );
+                window->bg_color, TRUE );
         }  
         
         if ( (void*) Parent != NULL ){
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
                 window->width, window->height, 
-                window->bg_color, 1 );
+                window->bg_color, TRUE );
         }
-        //?? More ...
     }
 
-    //
-    // == Button =============================================
-    //
+
+//
+// == Button ====================
+//
 
     // Termina de desenhar o botão, mas não é frame
     // é só o botão...
@@ -1172,29 +1313,29 @@ void *xxxCreateWindow (
             rectBackbufferDrawRectangle ( 
                 window->left+1, window->top,
                 window->width-2, 1, 
-                COLOR_BLACK, 1 );
+                COLOR_BLACK, TRUE );
             rectBackbufferDrawRectangle ( 
                 window->left+1, window->top+1,
                 window->width-2, 1, 
-                buttonBorderColor1, 1 );
+                buttonBorderColor1, TRUE );
             rectBackbufferDrawRectangle ( 
                 window->left+1+1, window->top+1+1,
                 window->width-4, 1, 
-                buttonBorderColor1, 1 );
+                buttonBorderColor1, TRUE );
                
             //esq
             rectBackbufferDrawRectangle ( 
                 window->left, window->top+1, 
                 1, window->height-2,
-                COLOR_BLACK, 1 );
+                COLOR_BLACK, TRUE );
             rectBackbufferDrawRectangle ( 
                 window->left+1, window->top+1, 
                 1, window->height-2,
-                buttonBorderColor1, 1 );
+                buttonBorderColor1, TRUE );
             rectBackbufferDrawRectangle ( 
                 window->left+1+1, window->top+1+1, 
                 1, window->height-4,
-                buttonBorderColor1, 1 );
+                buttonBorderColor1, TRUE );
 
             //  
             //  ____|
@@ -1206,29 +1347,29 @@ void *xxxCreateWindow (
             rectBackbufferDrawRectangle ( 
                  ((window->left) + (window->width) -1 -1 -1), window->top+1+1, 
                  1, window->height-4, 
-                 buttonBorderColor2_light, 1 );
+                 buttonBorderColor2_light, TRUE );
             rectBackbufferDrawRectangle ( 
                  ((window->left) + (window->width) -1 -1), window->top+1, 
                  1, window->height-2, 
-                 buttonBorderColor2, 1 );
+                 buttonBorderColor2, TRUE );
             rectBackbufferDrawRectangle ( 
                  ((window->left) + (window->width) -1), window->top+1, 
                  1, window->height-2, 
-                 COLOR_BLACK, 1 );
+                 COLOR_BLACK, TRUE );
 
             //baixo
             rectBackbufferDrawRectangle ( 
                  window->left+1+1, ( (window->top) + (window->height) -1 -1 -1),  
                  window->width-4, 1, 
-                 buttonBorderColor2_light, 1 );
+                 buttonBorderColor2_light, TRUE );
             rectBackbufferDrawRectangle ( 
                  window->left+1, ( (window->top) + (window->height) -1 -1),  
                  window->width-2, 1, 
-                 buttonBorderColor2, 1 );
+                 buttonBorderColor2, TRUE );
             rectBackbufferDrawRectangle ( 
                  window->left+1, ( (window->top) + (window->height) -1 ),  
                  window->width-2, 1, 
-                 COLOR_BLACK, 1 );
+                 COLOR_BLACK, TRUE );
 
 
             // Button label
@@ -1237,14 +1378,14 @@ void *xxxCreateWindow (
                 dtextDrawString ( 
                     (window->left) +offset, 
                     (window->top)  +8, 
-                    COLOR_WHITE, windowname );
+                    COLOR_WHITE, window->name );
             }
 
             if (buttonSelected == FALSE){
                 dtextDrawString ( 
                     (window->left) +offset,  
                     (window->top)  +8,  
-                    COLOR_BLACK, windowname );
+                    COLOR_BLACK, window->name );
             }
         }
 

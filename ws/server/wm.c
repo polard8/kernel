@@ -82,6 +82,8 @@ void __update_fps(void)
  * 
  */
 
+// Called by createwCreateWindow in createw.c
+
 // #importante:
 // Essa rotina será chamada depois que criarmos uma janela básica,
 // mas só para alguns tipos de janelas, pois nem todos os tipos 
@@ -132,9 +134,10 @@ wmDrawFrame (
     unsigned long border_color = 0;
 
 
-    //unsigned long TitleBarColor = 0x00000E80;     // Dark blue
-    //unsigned long TitleBarColor = COLOR_BLUE1;    // Light blue (Um pouco fosco) inactive?
-    unsigned long TitleBarColor = 0x001473E6;       // Claro.  active?
+    unsigned long TitleBarColor = COLOR_BLUE1;   // Light blue (Um pouco fosco) 
+    //unsigned long TitleBarColor = 0x001473E6;  // Claro.  
+    //unsigned long TitleBarColor = 0x00000E80;  // Dark blue
+    // ...
 
 
     gwssrv_debug_print ("wmDrawFrame:\n");
@@ -234,23 +237,23 @@ wmDrawFrame (
         rectBackbufferDrawRectangle( 
             window->left, window->top, 
             window->width, window->border_size, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         rectBackbufferDrawRectangle( 
             window->left, window->top, 
             window->border_size, window->height, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         // board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
             (window->left + window->width - border_size), window->top,  
             window->border_size, window->height, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         rectBackbufferDrawRectangle ( 
             window->left, (window->top + window->height - window->border_size), 
             window->width, window->border_size, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         // ok
         return 0;
@@ -296,30 +299,29 @@ wmDrawFrame (
         }
 
 
-        // Quatro bordas.
+        // Quatro bordas de uma janela overlapped.
          
         // board1, borda de cima e esquerda.
         rectBackbufferDrawRectangle( 
             parent->left + window->left, parent->top + window->top, 
             window->width, window->border_size, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         rectBackbufferDrawRectangle( 
             parent->left + window->left, parent->top + window->top, 
             window->border_size, window->height, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         //board2, borda direita e baixo.
         rectBackbufferDrawRectangle( 
             (parent->left + window->left + window->width - window->border_size), (parent->top + window->top), 
             window->border_size, window->height, 
-            window->border_color, 1 );
+            window->border_color, TRUE );
 
         rectBackbufferDrawRectangle ( 
             (parent->left + window->left), (parent->top + window->top + window->height - window->border_size), 
             window->width, window->border_size, 
-            window->border_color, 1 );
-
+            window->border_color, TRUE );
 
         //
         // Title bar.
@@ -344,10 +346,11 @@ wmDrawFrame (
         // e muito largo em uma resolução muito baixa.
         
         window->titlebar_height = 32;
+        window->titlebar_color = TitleBarColor;
 
         // Title bar
         tbWindow = (void *) xxxCreateWindow ( 
-                                WT_SIMPLE, 1, 1, "TITLE", 
+                                WT_SIMPLE, 1, 1, "Titlebar", 
                                 border_size, border_size, 
                                 (window->width - border_size - border_size), window->titlebar_height, 
                                 (struct gws_window_d *) window, 
@@ -369,12 +372,13 @@ wmDrawFrame (
         // e como separador entre a barra de títulos e a segunda
         // área da janela de aplicativo.
         // Usado somente por overlapped window.
+        
+        window->titlebar_ornament_color = COLOR_BLACK;
 
         rectBackbufferDrawRectangle ( 
             tbWindow->left, ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
             tbWindow->width, METRICS_TITLEBAR_ORNAMENT_SIZE, 
-            COLOR_BLACK, 1 );
-
+            COLOR_BLACK, TRUE );
 
         //
         // Icon
@@ -401,6 +405,8 @@ wmDrawFrame (
         //
         // string
         //
+        
+        window->titlebar_text_color = COLOR_WHITE;
         
         // #todo
         // Temos que gerenciar o posicionamento da string.

@@ -12,20 +12,16 @@
 #include <gws.h>
 
 
-
+// IN: left, right, top, bottom.
 void
 DrawBorder( 
     unsigned long l, unsigned long r, unsigned long t, unsigned long b,
     int solid )
 {
-
-    //loop
     register int i=0;
-    
-    // #bugbug
     int CharSize = 8;
 
-    
+
     if (solid) {
 
       //PlotScreenU8(CH_DBL_TL+attr,l-1,t-1);
@@ -77,7 +73,7 @@ DrawBorder(
 
           charBackbufferDrawcharTransparent( i*CharSize, t-CharSize, COLOR_BLUE, CH_SINGLE_HORZ );
           charBackbufferDrawcharTransparent( i*CharSize, b+CharSize, COLOR_BLUE, CH_SINGLE_HORZ );
-      }
+      };
       
       for (i=t; i<=(b/CharSize); i++) {
           
@@ -86,7 +82,7 @@ DrawBorder(
           
           charBackbufferDrawcharTransparent( l-CharSize, i*CharSize, COLOR_BLUE, CH_SINGLE_VERT );
           charBackbufferDrawcharTransparent( r+CharSize, i*CharSize, COLOR_BLUE, CH_SINGLE_VERT );
-      }
+      };
       
     };
 }
@@ -121,8 +117,7 @@ int serviceDrawChar (void){
 
 
     // Get
-    
-    
+
     window_id = message_address[4];
     x         = message_address[5];
     y         = message_address[6]; 
@@ -161,9 +156,7 @@ int serviceDrawChar (void){
     //printf ("[debug] window pointer = %x *hang\n",window);
     //while(1){}
     
-    
-    
-    
+
     if ( (void *) window == NULL ){
         gwssrv_debug_print ("gwssrv: serviceDrawChar window\n");
         return -1;
@@ -171,7 +164,7 @@ int serviceDrawChar (void){
 
     //gwssrv_debug_print ("serviceDrawChar: pointer not null\n");
     
-    if ( window->used != 1 || window->magic != 1234 ){
+    if ( window->used != TRUE || window->magic != 1234 ){
         gwssrv_debug_print ("gwssrv: serviceDrawChar validation\n");
         return -1;
     }
@@ -179,13 +172,14 @@ int serviceDrawChar (void){
     //
     // Draw
     //
-    
-    gwssrv_debug_print ("serviceDrawChar: Draw !!!\n");
+
+    gwssrv_debug_print ("serviceDrawChar: Draw!\n");
     
     // Ok it is working
-    dtextDrawText ( (struct gws_window_d *) window,
+    dtextDrawText ( 
+        (struct gws_window_d *) window,
         x, y, color, (unsigned char *) &_string[0] );
-    
+
     //#test
     //It is working
     // Usando a janela screen por enquanto.
@@ -218,10 +212,6 @@ int serviceDrawChar (void){
 }
 
 
-
-
-
-
 int gwssrv_init_char(void)
 {
 
@@ -245,7 +235,6 @@ charBackbufferCharBlt (
 {
     charBackbufferDrawcharTransparent ( x, y, color, c );
 }
-
 
 
 void charSetCharWidth ( int width )
@@ -273,7 +262,7 @@ int charGetCharHeight (void)
 
 
 /*
- ******************************************************
+ *****************************************
  * charBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
@@ -388,12 +377,16 @@ charBackbufferDrawcharTransparent (
         {
 
            // Put pixel. 
-            if ( ( *work_char & bit_mask ) ){ 
+            if ( ( *work_char & bit_mask ) )
+            {
+                // #todo
+                // Some flag here for modifications? 
+                 
                 pixelBackBufferPutpixel ( color, x + x2, y );  
             }
 
             // Rotate bitmask.
-            bit_mask = (bit_mask >> 1);  
+            bit_mask = (bit_mask >> 1); 
         };
 
         // Próxima linha da 8 linhas do caractere.
@@ -404,7 +397,7 @@ charBackbufferDrawcharTransparent (
 
 
 /*
- *****************************************************
+ *************************************************
  * charBackbufferDrawchar:
  *     Constrói um caractere no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
@@ -513,10 +506,16 @@ charBackbufferDrawchar (
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
 
-			// Put pixel.
-			// A cor varia de acordo com a mascara de bit.
-            pixelBackBufferPutpixel ( *work_char & bit_mask ? fgcolor: bgcolor, 
-                x + x2, y );
+            // #todo
+            // Some flag for modification here?
+
+            // Put pixel.
+            // A cor varia de acordo com a mascara de bit.
+
+            pixelBackBufferPutpixel ( 
+                *work_char & bit_mask ? fgcolor: bgcolor, 
+                (x + x2), 
+                y );
 
             bit_mask = (bit_mask >> 1); 
         };

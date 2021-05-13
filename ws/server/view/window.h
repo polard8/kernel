@@ -323,10 +323,11 @@ struct gws_window_d
     int used;
     int magic;
 
+    char *name;
 
-    char *name;          //Window name.
+    // tipo? ... (editbox, normal, ...)  style???
 
-    unsigned long type;  //tipo ... (editbox, normal, ...)  style???
+    unsigned long type;
 
 
     // Hierarquia. 
@@ -338,6 +339,7 @@ struct gws_window_d
     // The window belongs to this client.
     // Talvez a tid da control thread do cliente 
     // pode ficar nessa estrutura.
+
     struct gws_client_d  *client;
 
     // #todo
@@ -354,15 +356,23 @@ struct gws_window_d
     int client_pid;
     int client_tid;
 
-	// Características dessa janela..
+//
+// Características dessa janela..
+//
 
-
-	// Estado: (Full,Maximized,Minimized...)
+    // Estado: (Full,Maximized,Minimized...)
     int view; 
     
+    // ?
     int status;
     
+    // ?? validation
     int dirty;
+
+
+//
+// Margins and dimensions.
+//
 
     // Margins. (position)
     // Deslocamento em relação à tela. (screen)
@@ -376,15 +386,28 @@ struct gws_window_d
     unsigned long height;      //altura   
 
 
+//
+// Margins and dimensions when this window is in fullscreen mode.
+// #todo: Maybe we can use a sctructure for that.
+//
+
+    unsigned long full_left;
+    unsigned long full_top;
+    unsigned long full_right; 
+    unsigned long full_bottom;
+    unsigned long full_width;
+    unsigned long full_height;
+
+
+//
+// cursor ?
+// 
+
     // Offset inside the window.
     // Can be used by the rectangles.
     // Deslocamento em relação a janela mãe.
     unsigned long x;
     unsigned long y; 
-
-
-    // Windows's bg.
-    unsigned long bg_color; 
     
     
     // #todo    
@@ -446,6 +469,7 @@ struct gws_window_d
     // 1
     // Shadow
 
+    unsigned long shadow_color; 
     int shadow_style;
     int shadowUsed;
 
@@ -453,6 +477,7 @@ struct gws_window_d
     // 2
     // Background
 
+    unsigned long bg_color; 
     int background_style;
     int backgroundUsed;
 
@@ -469,6 +494,9 @@ struct gws_window_d
     int isClose;
     unsigned long titlebar_height;
     int titlebarHasIcon;     // If the title bar uses or not an icon.
+    unsigned long titlebar_color;
+    unsigned long titlebar_ornament_color;
+    unsigned long titlebar_text_color;
     int titlebar_style;
     int titlebarUsed;
 

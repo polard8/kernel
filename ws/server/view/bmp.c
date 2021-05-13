@@ -1,5 +1,5 @@
 /*
- * File: gwssrv/server/bmp.c
+ * File: view/bmp.c
  *
  * Description:
  *     BMP support.
@@ -968,11 +968,9 @@ bmpDisplayBMP (
         };
 
         // Vamos para a linha anterior.
-
-        bottom = (bottom-1);
-
         // Reiniciamos o x.
 
+        bottom = (bottom-1);
         left = x;
     };
 

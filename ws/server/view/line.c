@@ -132,13 +132,17 @@ void test_draw_line2(void)
 {
     register int g=0;
     
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
     unsigned long vertex1[2];
     unsigned long vertex2[2]; 
 
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+
+    // #todo
+    // Check the w h validation.
+
     // horizontal
-    for( g=0; g<h; g=g+10 )
+    for ( g=0; g<h; g=g+10 )
     {
             vertex1[0]=0;  //x1
             vertex1[1]=g;  //y1
@@ -152,9 +156,8 @@ void test_draw_line2(void)
                 COLOR_YELLOW );
      };
 
-
     // horizontal
-    for( g=0; g<h; g=g+10 )
+    for ( g=0; g<h; g=g+10 )
     {
             vertex1[0]=g;  //x1
             vertex1[1]=g;  //y1
@@ -212,5 +215,14 @@ lineBackbufferDrawHorizontalLine (
         x1++;  
     };
 }
+
+
+//
+// End.
+//
+
+
+
+
 
 
