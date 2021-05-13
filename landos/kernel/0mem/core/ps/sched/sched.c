@@ -249,10 +249,13 @@ void sched_double_shot(void)
 
 int scheduler (void){
 
+    int FirstTID = -1;
+
     // loop
     register int i=0;
 
-    struct thread_d *TmpThread;
+
+    struct thread_d  *TmpThread;
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -260,12 +263,65 @@ int scheduler (void){
 #endif
 
 
-    // tmpConductor and it's next. 
-    tmpConductor       = (void *) rootConductor;
-    tmpConductor->next = (void *) ____IDLE;
+//
+// rootConductor: 
+// The ring0 idle thread.
+//
 
-    // The global conductor.
-    Conductor = (void *) tmpConductor->next;
+    rootConductor = (void *) ____IDLE;
+
+    // Check
+    if ( (void*) rootConductor == NULL )
+        panic ("scheduler: rootConductor\n");
+
+    if (rootConductor->used != TRUE || rootConductor->magic != 1234)
+        panic ("scheduler: rootConductor validation\n");
+
+    FirstTID = (int) rootConductor->tid;
+
+    if ( FirstTID < 0 || FirstTID >= THREAD_COUNT_MAX )
+        panic ("scheduler: FirstTID\n");
+
+//
+// rootConductor->next: 
+// The control thread of the ring3 init process.
+//
+
+    if ( (void*) InitProcess == NULL )
+        panic ("scheduler: InitProcess\n");
+
+    if ( (void*) InitProcess->control == NULL )
+        panic ("scheduler: InitProcess->control\n");
+
+    rootConductor->next = (void*) InitProcess->control;
+
+    // Check
+    if ( (void*) rootConductor->next == NULL )
+        panic ("scheduler: rootConductor->next\n");
+
+//
+// Conductor
+//
+
+    Conductor = (void *) rootConductor;
+
+//
+// Conductor->next
+//
+
+    Conductor->next = (void *) rootConductor;
+
+//
+// tmpConductor
+//
+
+    tmpConductor = (void *) rootConductor;
+
+//
+// tmpConductor->next
+//
+
+    tmpConductor->next = (void *) rootConductor;
 
 
 //
@@ -289,20 +345,6 @@ int scheduler (void){
                 tmpConductor       = (void *) tmpConductor->next; 
                 tmpConductor->next = (void *) TmpThread;
             }
-
-            // Double shot
-            // for special threads. Just like the window server.
-            if ( TmpThread->DoubleShot == TRUE )
-            {
-                if ( TmpThread->used  == TRUE && 
-                     TmpThread->magic == 1234 && 
-                     TmpThread->state == READY )
-                {
-                    // The tmpConductor and it's next.
-                    tmpConductor       = (void *) tmpConductor->next; 
-                    tmpConductor->next = (void *) TmpThread;
-                }
-            }
         }
     };
 
@@ -316,9 +358,11 @@ int scheduler (void){
     tmpConductor->next = NULL;
 
 
-    return (int) rootConductor->tid;
-    //return (int) tmpConductor->tid;
-    //return (int) Conductor->tid;
+// done:
+
+    // Start with the idle thread.
+
+    return (int) FirstTID;
 }
 
 

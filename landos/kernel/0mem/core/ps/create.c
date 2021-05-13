@@ -9,7 +9,7 @@
 
 /*
  ******************************************************
- * KiCreateRing0Idle:
+ * create_CreateEarlyRing0IdleThread:
  *    Criando manualmente uma thread em ring 0.
  *    Para o processador ficar em hlt quando não tiver outra 
  * thread rodando.
@@ -305,7 +305,7 @@ void *create_CreateEarlyRing0IdleThread(void)
 
 /*
  *******************************************************************
- * createCreateInitThread:
+ * create_CreateRing3InitThread:
  * 
  *     Criando init-thread manualmente.
  *     Essa eh a thread do processo init. (init.bin)
@@ -347,6 +347,11 @@ void *create_CreateRing3InitThread (void)
     if ( (void *) t == NULL ){
         panic ("create_CreateRing3InitThread: t\n");
     } else {
+
+        // #todo
+        // Isso jah foi feito logo acima.
+        // Remover.
+        
         if ( (void *) InitProcess == NULL ){
             panic ("create_CreateRing3InitThread: InitProcess\n");
         }else{
@@ -476,8 +481,8 @@ void *create_CreateRing3InitThread (void)
     // Temporizadores.
 
     // Jiffies
-    InitThread->step = 0; 
-        
+    t->step = 0; 
+
     //t->quantum  = QUANTUM_BASE;
     t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
 
