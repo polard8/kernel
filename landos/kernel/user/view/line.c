@@ -39,13 +39,14 @@ my_buffer_horizontal_line (
     unsigned long color )
 {
 
-    //if (x1>x2)
-        //return;
+    if (x1 > x2){
+        return;
+    }
 
     while (x1 < x2)
     {
         backbuffer_putpixel ( color, x1, y, 0 );
-        x1++;  
+        x1++;
     };
 }
 

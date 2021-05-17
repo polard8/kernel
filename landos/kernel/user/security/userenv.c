@@ -161,6 +161,7 @@ void *CreateUser ( char *name, int type ){
 
         New->used  = TRUE;
         New->magic = 1234;
+        New->userType = type; 
 
         New->path = NULL;
         
@@ -179,7 +180,7 @@ void *CreateUser ( char *name, int type ){
         }
  
 
-        New->userType = type;  
+
 
         //Session.
         //room. Window Station. (Desktop pool).

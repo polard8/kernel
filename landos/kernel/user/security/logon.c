@@ -371,6 +371,13 @@ int ExitLogon (void)
 // Mudar o nome de 'screen window' para 'root window'
 // pis confunde com a entidade 'screen' usada em outros ambiente.
 
+// #todo
+// Essa provavelmente deve ser a clipping window mais inportante.
+// Crie um ponteiro global para ela chamado backbuffer_window ou
+// backbuffer_clipping_window.
+// Talvez o retângulo dessa janela deva ser uma surface compartilhada
+// com outros ambientes.
+
 void logon_create_screen_window (void){
 
     struct window_d *hWindow;
@@ -380,9 +387,13 @@ void logon_create_screen_window (void){
     unsigned long Width  = (unsigned long) screenGetWidth();
     unsigned long Height = (unsigned long) screenGetHeight();
 
-
+    // #??
+    // Se ainda estamos criando a root window,
+    // então provavelmente o printf da função panic nem funcione ainda.
+    
     if ( Width == 0 || Height == 0 ){
-        panic("logon_create_screen_window: w h\n");
+        debug_print("logon_create_screen_window: w h\n");
+        panic      ("logon_create_screen_window: w h\n");
     }
 
 	// Screen

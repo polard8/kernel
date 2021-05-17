@@ -186,26 +186,71 @@ drawDataRectangle (
     unsigned long color )
 {
 
+    // #todo
+    // Get the clipping window/rectangle.
+
+    struct rect_d  Rect;
+    struct rect_d  ClippingRect;
+
+    int UseClipping = TRUE;
+
+
+    // dc: Clippint
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+
+
     //loop
     register unsigned long internal_height = height;
 
 
-    struct rect_d rect;
+    // Clipping support.
+    
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("drawDataRectangle: [PANIC] w h\n");
+        panic       ("drawDataRectangle: [PANIC] w h\n");
+    }
 
-    rect.bg_color = color;
+//
+// Clipping rectangle
+//
 
-    //Dimensions.
-	rect.x = 0;
-    rect.y = 0;
-    rect.width  = width;
-    rect.height = height;
+    // #todo
+    // It need to be a blobal thing.
+    // We need to handle the surfaces used by 
+    // this embedded window server and the loadable one.
 
+    ClippingRect.left   = 0;
+    ClippingRect.top    = 0;
+    ClippingRect.width  = deviceWidth;
+    ClippingRect.height = deviceHeight;
+
+    ClippingRect.right  = deviceWidth;
+    ClippingRect.bottom = deviceHeight;
+
+//
+// Target rectangle
+//
+
+    Rect.bg_color = color;
+
+    // Dimensions.
+    Rect.x = 0;
+    Rect.y = 0;
+    Rect.width  = width;
+    Rect.height = height;
 
     //Margins.
-    rect.left   = x; 
-    rect.top    = y;
-    rect.right  = rect.left + rect.width;
-    rect.bottom = rect.top + rect.height; 
+    Rect.left   = x; 
+    Rect.top    = y;
+    Rect.right  = (Rect.left + Rect.width);
+    Rect.bottom = (Rect.top  + Rect.height); 
+
+
+//
+// Clipping
+//
 
 	// Limits.
 	
@@ -216,22 +261,48 @@ drawDataRectangle (
 	// Ou seja: O dedicated buffer de uma janela deve ser menor que
 	// o backbuffer.
 
-    if ( rect.right  > SavedX ){  rect.right  = SavedX;  }
-    if ( rect.bottom > SavedY ){  rect.bottom = SavedY;  }
+    //if ( Rect.right  > SavedX ){  Rect.right  = SavedX;  }
+    //if ( Rect.bottom > SavedY ){  Rect.bottom = SavedY;  }
 
+
+    if ( Rect.left   < ClippingRect.left   ){  Rect.left   = ClippingRect.left;   }
+    if ( Rect.top    < ClippingRect.top    ){  Rect.top    = ClippingRect.top;    }
+    if ( Rect.right  > ClippingRect.right  ){  Rect.right  = ClippingRect.right;  }
+    if ( Rect.bottom > ClippingRect.bottom ){  Rect.bottom = ClippingRect.bottom; }
+
+
+//
+// Draw
+//
 
     // Draw lines on backbuffer.
 
     while (internal_height--)
     {
         my_buffer_horizontal_line ( 
-            rect.left, y, rect.right, rect.bg_color );
+            Rect.left, y, Rect.right, Rect.bg_color );
  
         y++;
+        
+        // #??
+        // Porque podemos desejar escrever no backbuffer
+        // um retângulo que ultrapasse a área do frontbuffer.
+        
+        if ( UseClipping == TRUE ){
+            if ( y > ClippingRect.bottom ){ break; };
+        }
     };
 }
 
 
+/*
+//#todo
+void refresh_rectangle3( struct rect_d *rectangle );
+void refresh_rectangle3( struct rect_d *rectangle )
+{
+    refresh_rectangle(....)
+}
+*/
 
 
 /*
@@ -291,13 +362,21 @@ refresh_rectangle (
     int bytes_count=0;
 
 
+    int FirstLine = (int) y;
+
+    //int UseVSync = FALSE;
+    int UseClipping = TRUE;
+
 
     // dc
-    unsigned long Width  = (unsigned long) screenGetWidth();
-    //unsigned long Height = (unsigned long) screenGetHeight();
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
 
-    if ( Width == 0 ){
-        panic ("refresh_rectangle: Width\n");
+
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("refresh_rectangle: w h\n");
+        panic       ("refresh_rectangle: w h\n");
     }
 
     line_size = (unsigned int) width; 
@@ -314,9 +393,11 @@ refresh_rectangle (
             break;
     };
 
-
-    // screen line size in pixels * bytes per pixel.
-    pitch = (unsigned int) (bytes_count * Width);
+//
+// Pitch
+//
+    // Screen line size in pixels plus bytes per pixel.
+    pitch = (unsigned int) (bytes_count * deviceWidth);
 
     // rectangle line size in pixels * bytes per pixel.
     internal_pitch = (unsigned int) (bytes_count * line_size);
@@ -337,9 +418,9 @@ refresh_rectangle (
 	// Isso pode nos dar problemas.
 	// ?? Isso ainda é necessário nos dias de hoje ??
 
-
-    //vsync();
-
+    //if ( UseVSync == TRUE){
+        //vsync();
+    //}
 
 
 	//(line_size * bytes_count) é o número de bytes por linha. 
@@ -352,23 +433,41 @@ refresh_rectangle (
     // Copia uma linha ou um pouco mais caso não seja divisível por 4.
     if ( (internal_pitch % 4) == 0 )
     {
-        count = ( internal_pitch / 4); 
+        // 'strength reduction'
+        // count = ( internal_pitch / 4 ); 
+        count = ( internal_pitch >> 2 );  //#todo: Use this one.
 
-        for ( i=0; i < lines; i++ ){
+        // Copy lines
+        for ( i=0; i < lines; i++ )
+        {
+            // Não copiamos a parte que está fora da janela do dispositivo.
+            if ( UseClipping == TRUE ){
+                if ( (FirstLine + i) > deviceHeight ){ break; }
+            }
+
             memcpy32 ( (void *) dest, (const void *) src, count );
             dest += pitch;
             src  += pitch;
         };
+        return;
     }
 
     // Se não for divisível por 4.
     if ( (internal_pitch % 4) != 0 )
     {
-        for ( i=0; i < lines; i++ ){
+        // Copy lines
+        for ( i=0; i < lines; i++ )
+        {
+            // Não copiamos a parte que está fora da janela do dispositivo.
+            if ( UseClipping == TRUE ){
+                if ( (FirstLine + i) > deviceHeight ){ break; }
+            }
+            
             memcpy ( (void *) dest, (const void *) src, internal_pitch );
             dest += pitch; 
             src  += pitch; 
         };
+        return;
     }
 }
 
@@ -410,7 +509,6 @@ refresh_rectangle2 (
 
 	unsigned long Width = (unsigned long) screenGetWidth();
 	unsigned long Height = (unsigned long) screenGetHeight();	
-
 
 
 	line_size = (unsigned int) width; 
@@ -494,25 +592,29 @@ int initialize_saved_rect (void){
 
     } else {
      
+     
+        // #bugbug
+        // Size of this allocation. Too much space??
+     
         // 800x600x3 (resolução máxima) 351+ páginas.
-		//com isso poderemos salvar uma tela nessa resolução.
-		SavedRect->buffer_address = (void *) allocPages (360);
-	
-	    if ( (void *) SavedRect->buffer_address == NULL )
-	    {
-		    panic ("initialize_saved_rect: buffer fail");
-	    }
+        //com isso poderemos salvar uma tela nessa resolução.
+        SavedRect->buffer_address = (void *) allocPages (360);
+
+        if ( (void *) SavedRect->buffer_address == NULL )
+        {
+            panic ("initialize_saved_rect: buffer fail\n");
+        }
 
         SavedRect->x = 0; 
         SavedRect->y = 0;
         SavedRect->width = 0;
         SavedRect->height = 0;
 
-		SavedRect->pixels = 0;
-		SavedRect->bytes = 0;
-		SavedRect->bpp = 0;
-		
-		SavedRect->full = 0;   //empty
+        SavedRect->pixels = 0;
+        SavedRect->bytes = 0;
+        SavedRect->bpp = 0;
+
+        SavedRect->full = 0;   //empty
 		
 		
 		//#todo: limpar o buffer ???
@@ -549,11 +651,9 @@ save_rect (
         //while(1){}
 
 
-    if ( (void *) SavedRect ==  NULL )
-    {
+    if ( (void *) SavedRect ==  NULL ){
         printf ("save_rect: SavedRect\n");
         return (int) 1;
-
     }else{
 
         if ( (void *) SavedRect->buffer_address == NULL )
@@ -582,7 +682,7 @@ save_rect (
     unsigned int offset1;  
     unsigned int offset2;  
 
-    unsigned long Width = (unsigned long) screenGetWidth ();
+    unsigned long Width  = (unsigned long) screenGetWidth ();
     unsigned long Height = (unsigned long) screenGetHeight ();
 
     int count; 
@@ -603,135 +703,12 @@ save_rect (
     // #test
     // Salvando 
     
-    refresh_rectangle2 ( x, y, width, height, 
+    refresh_rectangle2 ( 
+        x, y, width, height, 
         (unsigned long) SavedRect->buffer_address, 
         (unsigned long) BACKBUFFER_ADDRESS );
-    return 0;
 
-
-    //
-    //   --------- CUT HERE ------------
-    //
-
-
-
-
-
-    line_size = (unsigned int) width;    //passado por argumento
-    lines = (unsigned int) height;       //passado por argumento
-
-
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-
-		default:
-		    printf ("save_rect: default\n");
-		    return 1;
-	};
-
-
-
-
-
-	//atualizando o offset do backbuffer
-    //offset1 = 0;
-	//offset1 = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
-    offset1 = (unsigned int) ( (bytes_count*SavedX*(y)) + (bytes_count*(x)) );
-
-	//configurando o offset do buffer de salvamento.
-	offset2 = 0;
-
-
-	p = (void *) (p + offset2);
-	q = (const void *) (q + offset1);
-
-
-    /*
-    //#debug
-    //O off1 apresentou um valor alto.
-    //pois é o valor do offset do backbuffer que será copiado para o
-    //buffer de salvamento.
-    //printf ("off1=%d off2=%d ",offset1, offset2);
-    //refresh_screen();
-    //while(1){}
-    */
-
-	//não precisa de sincronização pois não estamos enviando para o LFB.
-	//vsync ();
-
-
-	//(line_size * 3) é o número de bytes por linha. 
-	//#todo: usar bytes_count
-
-
-	//se for divisível por 4.
-	if ( ((line_size * 3) % 4) == 0 )
-	{
-        count = ((line_size * 3) / 4); 
-
-	    for ( i=0; i < lines; i++ )
-	    {
-		    //copia uma linha ou um pouco mais caso não seja divisível por 
-		    memcpy32 ( p, q, count );
-		    
-			q += (Width * 3);
-	 	    p += (Width * 3);
-	    };
-	    
-	    return 0;
-	}
-
-
-	//se não for divisível por 4.
-	if ( ((line_size * 3) % 4) != 0 )
-	{
-
-        //count = (line_size * 3); 
-	
-	    for ( i=0; i < lines; i++ )
-	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
-		    
-		    q += (Width * 3);
-		    p += (Width * 3);
-	    };
-	    
-	    return 0;
-	} 
-
-
-	/*
-	for ( i=0; i < lines; i++ )
-	{
-		memcpy( p, q, (line_size * 3) );
-		q += (Width * 3);
-		p += (Width * 3);
-	};	 
-    */
-
-
-
-    /*
-    //#debug
-    //printf ("save_rect: done\n");
-    printf ("Show buffer: \n");
-    unsigned char *__p = (unsigned char *) SavedRect->buffer_address;
-    int z;
-    for (z=0; z<100; z++)
-    {
-        printf ("%x ",__p[z]);
-    }
-    refresh_screen();
-    while(1){}
-    */
-
+// done:
 
     return 0;
 }
@@ -747,12 +724,12 @@ save_rect (
  */
 
 int 
-show_saved_rect ( unsigned long x, 
-                  unsigned long y, 
-                  unsigned long width, 
-                  unsigned long height )
+show_saved_rect ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
 {
-
 
 	// Checando a estrutura que tem informações 
 	// sobre o retângulo salvo.
@@ -927,30 +904,40 @@ void scroll_screen_rect (void){
     int count = 0; 
 
 
+    // #debug
+    //debug_print ("scroll_screen_rect:\n");
+
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("scroll_screen_rect: [PANIC] w h\n");
+        panic       ("scroll_screen_rect: [PANIC] w h\n");
+    }
 
     // #debug
     //if(cHeight == 8)
-        //debug_print(">>8\n");
+        //debug_print("8\n");
 
     // #debug
     //if(cHeight == 16)
-        //debug_print(">>16\n");
+        //debug_print("16\n");
 
 
     line_size = (unsigned int) deviceWidth; 
     lines     = (unsigned int) deviceHeight;
 
-    switch (SavedBPP)
-    {
+    switch (SavedBPP){
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
-        //...
-
+        // ...
         default:
             panic("scroll_screen_rect: SavedBPP");
             break;
     };
 
+
+//
+// Pointers
+//
 
     // Destination and Source.
     // Destination is the first line.
@@ -973,7 +960,9 @@ void scroll_screen_rect (void){
         
     if ( ((line_size * bytes_count) % 4) == 0 )
     {
+        // #todo: Create a variable for 'pitch' and use streigh reduction
         count = ((line_size * bytes_count) / 4); 
+        // count = (internal_pitch>>2);  // #todo: Use this one.
 
         for ( i=0; i < lines; i++ )
         {
