@@ -195,15 +195,16 @@ drawDataRectangle (
     rect.bg_color = color;
 
     //Dimensions.
-	rect.x = 0;        
-    rect.y = 0;         
-    rect.width = width;   
-    rect.height = height;    
+	rect.x = 0;
+    rect.y = 0;
+    rect.width  = width;
+    rect.height = height;
+
 
     //Margins.
-    rect.left = x;    
-    rect.top = y;
-    rect.right = rect.left + rect.width;
+    rect.left   = x; 
+    rect.top    = y;
+    rect.right  = rect.left + rect.width;
     rect.bottom = rect.top + rect.height; 
 
 	// Limits.
@@ -214,16 +215,9 @@ drawDataRectangle (
 	// mas não poderá ser maior que as dimensões do backbuffer.
 	// Ou seja: O dedicated buffer de uma janela deve ser menor que
 	// o backbuffer.
-	
-    if ( rect.right > SavedX )
-	{
-        rect.right = SavedX;
-	}	
 
-    if ( rect.bottom > SavedY )
-	{
-        rect.bottom = SavedY;
-	}
+    if ( rect.right  > SavedX ){  rect.right  = SavedX;  }
+    if ( rect.bottom > SavedY ){  rect.bottom = SavedY;  }
 
 
     // Draw lines on backbuffer.
@@ -232,57 +226,9 @@ drawDataRectangle (
     {
         my_buffer_horizontal_line ( 
             rect.left, y, rect.right, rect.bg_color );
-
+ 
         y++;
     };
-}
-
-
-/*
- * getClientAreaRect:
- *     Obtém o ponteiro da estrutura do retângulo  
- *     da área de cliente da janela ativa.
- *     @todo: oferecer esse serviço para a api.
- */  
-
-void *getClientAreaRect (void){
-	
-	
-	// #bugbug
-	// Essa variável global está estranha.
-	// ?? Isso é o que ? um ponteiro de estruttura ?
-	
-    return (void *) rectClientArea;	
-}
-
-
-/*
- * setClientAreaRect:
- *     Inicializa a estrutura do retângulo da área de cliente 
- * da janela ativa.
- */
-
-void 
-setClientAreaRect ( unsigned long x, 
-                    unsigned long y, 
-                    unsigned long cx, 
-                    unsigned long cy )
-{
-    struct rect_d *r;
-
-    if ( (void *) rectClientArea == NULL )
-	{
-	    return;
-
-	}else{
-
-        r->x = x;
-        r->y = y;
-        r->cx = cx;
-        r->cy = cy;
-
-        rectClientArea = (void *) r;
-	};
 }
 
 

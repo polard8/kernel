@@ -3049,38 +3049,9 @@ fail:
  *     @todo windowmanagerInit()
  */
 
-int init_window_manager (void){
-
+int init_window_manager (void)
+{
     debug_print ("init_window_manager: deprecated\n");
-
-    // Aloca memória para a estrutura do procedimento 
-    // de janela da thread atual.
-
-    // #bugbug 
-    // Não sei se estamos realmente usando isso.	
-
-    WindowProcedure = NULL;
-
-    /*
-    WindowProcedure = (void *) kmalloc ( sizeof( struct window_procedure_d ) );
-
-    if ( (void *) WindowProcedure == NULL ){
-        panic ("init_window_manager: WindowProcedure\n");
-	}else{
-		
- 	    // Configura a janela ativa. 
-	    // Configura a janela com o foco de entrada. 
-	    // Se a janela com o foco de entrada for uma 
-		// janela filha,então a janela mãe será a 
-		// janela ativa.
-	    	
-	    WindowProcedure->active_window     = (int) 0;
-	    WindowProcedure->window_with_focus = (int) 0;
-		//...
-    };
-    */
-
-
     return 0;
 }
 
@@ -3093,13 +3064,13 @@ int init_window_manager (void){
  */
  
 int init_windows (void){
-		
+
 	// #debug
 	// Inicializa a lista de janelas.
 	// printf("init_windows:\n");  	
-	
-	int Offset = 0;
-	int k = 0;
+
+    int Offset = 0;
+    int k = 0;
 
 
     debug_print("init_windows:\n");
@@ -3111,37 +3082,19 @@ int init_windows (void){
 
 
 	windows_count = 0;
-	
-	// Set current.
-	set_current_window(NULL);
-	
-	//
-	// ## Client Area ##
-	// Inicializando a estrutura do retângulo da área de cliente.
-	//
-	
-	rectClientArea = (void *) kmalloc ( sizeof(struct rect_d) );
-    
-    if ( (void *) rectClientArea == NULL ){
-        panic ("init_windows: rectClientArea\n");
 
-    } else {
-        setClientAreaRect( 0, 0, 0, 0);
-    };
+    // Set current.
+    set_current_window(NULL);
 
 
-	
-	//
+
 	// # cursor #
 	// Desabilitar o cursor de textos.
 	// Cada aplicativo habilita quando for usar.
-	//
-		
-	//gwsDisableTextCursor ();
-	//timerShowTextCursor = 0; 
-    timerDisableTextCursor ();	
-	
-	
+
+    timerDisableTextCursor();
+
+
 	//
     // Set fonts. @todo: Criar uma estrutura para 
 	// características do char.
@@ -3171,43 +3124,27 @@ int init_windows (void){
 
 
 	//...	
-	
-	//
-	// @todo:
-	// Pega o video mode passado pelo Boot Loader e 
-	// registra na global e na estrutura.
-	//
-	
-	/*
-	
-	//video mode
-	if( kArg1 > 0)
-	{
-	    printf("init_windows: Configurando modo de video.");
-	    SetVideoMode(kArg1);
-	};
-	
-	//LFB
-	if( kArg2 != LFB_BASE)
-    {
-        printf("init_windows: LFB error");
-		//@todo hang
-    };	
-	
-	*/
-	
-	//Inicializando variáveis.
-	current_room = 0;
-	current_desktop = 0;
-	
-	current_window = 0;
-	current_menu = 0;
-	
-	//Contagens 
+
+//
+// == Global variables =========================
+//
+
+
+    //  Security
+    
+    current_usersession = 0;
+    current_room        = 0;
+    current_desktop     = 0;
+
+    // usession_count = 0;  //??
     rooms_count = 0; 
     desktops_count = 0;
-	windows_count = 0;
-	
+
+
+    current_window = 0;
+    windows_count = 0;
+
+
 	fullscreen_window = 0;
 	active_window = 0;
 	window_with_focus = 0;
@@ -3218,7 +3155,15 @@ int init_windows (void){
 	terminal_window = 0;
     //Continua...		
 
-	
+
+    // Menu
+    current_menu = 0;
+
+
+//
+// == Color scheme =======================
+//
+
 	//inicializando os esquemas de cores.
 	//@todo: Isso poderia ter um argumento, selecionado entre o 
 	//tipo 1 e 2, humility e pride.

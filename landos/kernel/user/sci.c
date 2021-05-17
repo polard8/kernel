@@ -2327,23 +2327,18 @@ void *sci0 (
             break;
 
 
-		// 144
-		// Pega o ponteiro da client area.
-		// #bugbug: pegamos o ponteiro mas n�o temos permiss�o 
-		// para acessar a estrutura.
+        // 144
         case SYS_GETCLIENTAREARECT:
-            return (void *) getClientAreaRect ();
+            //return (void *) getClientAreaRect ();
+            panic ("SYS_GETCLIENTAREARECT: deprecated\n");
+            //return NULL;
             break;
 
-
         // 145
-        // configura a client area	
-        // @todo: 
-        // O ponteiro para estrutura de ret�ngulo � passado 
-        // via argumento.
         case SYS_SETCLIENTAREARECT:
-            setClientAreaRect ( arg2, arg3, arg4, 0);
-            return NULL;
+            //setClientAreaRect ( arg2, arg3, arg4, 0);
+            panic ("SYS_SETCLIENTAREARECT: deprecated\n");
+            //return NULL;
             break;
 
         // 146

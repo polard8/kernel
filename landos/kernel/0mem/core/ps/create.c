@@ -229,7 +229,7 @@ void *create_CreateEarlyRing0IdleThread(void)
     kThread->esp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
     kThread->eflags = 0x0200;    // # Atenção !!  
     kThread->cs     = 8 | 0; 
-    kThread->eip    = (unsigned long) early_ring0_IdleThread;  //See: main.c
+    kThread->eip    = (unsigned long) early_ring0_IdleThread;  //See: head.asm
 
     kThread->ds = 0x10 | 0;
     kThread->es = 0x10 | 0;

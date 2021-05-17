@@ -1426,10 +1426,6 @@ void *CreateWindow (
             window->rcClient->used  = TRUE;
             window->rcClient->magic = 1234;
 
-			// janela.
-			// O retângulo pertence à essa janela.
-
-            window->rcClient->window = (void *) window; 
 
 			// #importante
 			// ( Posicionamento e dimencionamento. )

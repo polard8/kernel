@@ -571,40 +571,6 @@ struct menubar_d *MenuBar;    //*Importante: Sem Ponteiro.
  
 
 /*
- * window_procedure_d:
- *     Estrutura para procedimento de janela.
- */ 
-
-struct window_procedure_d
-{
-
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-    //4 argumentos do procedimento
-	struct window_d *window;  //à qual janela pertence o procedimento.
-    int msg;	
-	unsigned long long1;
-	unsigned long long2;
-	
-	//Parametros extras.
-	
-	struct d_process *process; //à qual processo pertence o procedimento.
-	struct d_thread  *thread;  //à qual thread pertence o procedimento.
-	
-	int msgStatus;
-	int active_window;      //Id da janela ativa.
-	int window_with_focus;  //Id da janela com o foco de entrada.
-
-	//...
-};
-struct window_procedure_d *CurrentProcedure;
-struct window_procedure_d *WindowProcedure;
-//... 
- 
-
-
-/*
  **************************************************
  * rect_d:
  *     Estrutura para gerenciamento de retângulos.
@@ -616,54 +582,64 @@ struct window_procedure_d *WindowProcedure;
 
 struct rect_d 
 {
-	object_type_t objectType;
-	object_class_t objectClass;
+    object_type_t  objectType;
+    object_class_t objectClass;
 
     int used;
-	int magic;
-	
-	int flag;
-	
-	//estilo de design
-	int style;
-	
-	//int validated;
-	//int focus;
-	
-	//int dirty;
-	
+    int magic;
+
+    int flag;
+
+    // Estilo de design
+    int style;
+
+
+    //int focus;
+
+    //int dirty;
+
     unsigned long x;
     unsigned long y;
     unsigned long cx;
     unsigned long cy;
 
+    unsigned long left;
+    unsigned long top;
     unsigned long width;
     unsigned long height;
 
-	unsigned long left;
-	unsigned long top;
-	unsigned long right;
-	unsigned long bottom;
-	
-	unsigned long bg_color; //color_bg;
-	
-	//Essa é  ajanela à qual o retângulo pertence.
-	struct window_d *window;
-	
-	struct rect_d *next;
+    unsigned long right;
+    unsigned long bottom;
+
+    unsigned long bg_color; 
+
+    struct rect_d *next;
 };
-struct rect_d *rect;
-//Retângulo da área de cliente da janela ativa.
-struct rect_d *rectClientArea;   
-//...
+
+
+// Isso pode ser útil principalmente
+// para passar um retângulo de um ambiente para outro.
+// É muito mais didático que a figura do retângulo como objeto.
+struct surface_d
+{
+    int used;
+    int magic;
+    int dirty;
+    struct rect_d *rect;
+    
+    struct surface_d *next;
+};
+
+// #todo
+// struct surface_d *backbuffer_surface;
 
 
 /* rgba */
 struct tagRGBA
 {
-	object_type_t objectType;
-	object_class_t objectClass;	
-	
+    object_type_t  objectType;
+    object_class_t objectClass;
+
    char red;
    char green;
    char blue;
@@ -680,9 +656,9 @@ struct tagRGBA *RGBA;
 // Enumerando classe de janela 
 typedef enum {
     WindowClassNull,
-	WindowClassClient,    // 1 cliente
-	WindowClassKernel,    // 2 kernel
-	WindowClassServer,    // 3 servidor
+    WindowClassClient,    // 1 cliente
+    WindowClassKernel,    // 2 kernel
+    WindowClassServer,    // 3 servidor
 }wc_t;
 
 
@@ -697,21 +673,21 @@ typedef enum {
 //??bugbug: tá errado.
 //classes de janelas controladas exclusivamente pelo kernel.
 typedef enum {
-	WindowClassKernelWindow,    //janelas criadas pelo kernel ... coma a "tela azul da morte"
+    WindowClassKernelWindow,    //janelas criadas pelo kernel ... coma a "tela azul da morte"
     WindowClassTerminal,  //janela de terminal usada pelos aplicativos que não criam janela e gerenciada pelo kernel	
     WindowClassButton,
-	WindowClassComboBox,
-	WindowClassEditBox,
-	WindowClassListBox,
-	WindowClassScrollBar,
-	WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
-	WindowClassMenu,
-	WindowClassDesktopWindow,
-	WindowClassDialogBox,
-	WindowClassMessageBox,
-	WindowClassTaskSwitchWindow,
-	WindowClassIcons,
-	WindowClassControl,   //??
+    WindowClassComboBox,
+    WindowClassEditBox,
+    WindowClassListBox,
+    WindowClassScrollBar,
+    WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
+    WindowClassMenu,
+    WindowClassDesktopWindow,
+    WindowClassDialogBox,
+    WindowClassMessageBox,
+    WindowClassTaskSwitchWindow,
+    WindowClassIcons,
+    WindowClassControl,   //??
     WindowClassDialog,
     WindowClassInfo,
     //...	
@@ -752,7 +728,8 @@ struct window_class_d
 };
 
 
-// usada nas filas de mensagens que existem nas estruturas de thread.
+
+// Single message struct model.
 struct msg_d 
 {
     int used;
@@ -2075,19 +2052,6 @@ void *guiGetShellWindowWindow (void);
 
 void *guiGetShellClientWindowWindow (void);
 
-
-//
-// Client Area.
-//
-
-void *getClientAreaRect (void);
-
-void 
-setClientAreaRect ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long cx, 
-    unsigned long cy );
 
 
 // Background support.
