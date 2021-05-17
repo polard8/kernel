@@ -44,7 +44,7 @@ This repository has the source code for:
 ```
 ## How to Build?
 
-See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/BUILD.MD)
+See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/docs/build.md)
 
 ## Testing
 
@@ -58,11 +58,12 @@ Please, give us some feedback.
 
 ## Documentation
 
+See the [docs](https://github.com/frednora/gramado/tree/master/docs/)
 See the [DOCS](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/)
 
 ## More information
 
-Gramado is a Free and Open Source operating system created by Fred Nora.
+Gramado is a Free and Open Source operating system.
 The source code uses the BSD license.
 
 # Quotes:
