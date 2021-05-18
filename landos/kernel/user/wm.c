@@ -2049,7 +2049,7 @@ int redraw_screen (void){
 
                 // durty.
                 // se ela foi marcada como suja e precisa ser repintada.
-                //if ( __window->invalidated == 1 )
+                //if ( __window->dirty == 1 )
                 //{
                     //Repinta uma janela.
                     RedrawStatus = (int) redraw_window (__window, 1);

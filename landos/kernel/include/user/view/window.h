@@ -764,9 +764,10 @@ struct msg_d
  *
  */
 
-
-// Deve estar em conformidade com a estrutura em user mode.
-//=========================================================
+// #todo
+// Cada janela deve especificar qual é o tipo de
+// ponteiro de mouse que ela quer usar. Então esse deve ser
+// o ponteiro usado enquanto o mouse estiver sobre essa janela.
 
 struct window_d
 {
@@ -800,6 +801,9 @@ struct window_d
 	//Estado: (Full,Maximized,Minimized...)
     int view; 
 
+    // Background color.
+    unsigned long bg_color; 
+
 
 	//dimensões e margens.
 	
@@ -829,11 +833,10 @@ struct window_d
     //indica que precisamos repintar essa quando
     //chamarmos a rotina redraw_windows ou redraw_screen
     //See wm.c
-    int invalidated;               
+    // #todo: Deveríamos usar a flag 'dirty' ao invés dessa.
+    
+    int dirty;
 
-    // Background color.
-    // Em user mode estamos usando color_bg.
-    unsigned long bg_color;  
 
 //==================================================
 
@@ -881,36 +884,33 @@ struct window_d
     struct window_procedure_d *wProcedure; //procedure struct
 
 //==================================================
-    int active;    //FAST FLAG. Essa será a flag de ativa ou não. (decidindo isso)
-    int focus;     //Se tem o foco de entrada ou não.
-
-	// Parent support
-    unsigned long parentid;       //(Número da janela mãe).
-    struct window_d *parent;      //Parent window.
 
 
-	// Child support.
-    struct window_d *childListHead;  //Lista encadeada de janelas filhas.
-    int childCount;                  //Tamanho da lista.
+//
+// Active?
+// 
+
+    // #bugbug: See the flag 'status'
+    //unsigned long status;              //ATIVA OU NÃO.
+
+    //FAST FLAG. Essa será a flag de ativa ou não. (decidindo isso)
+    int active; 
+
+
+//
+// Focus
+//
+
+    // Se tem o foco de entrada ou não.
+
+    int focus; 
+
 
 //==================================================
 
-
-	// Client window support.
-
-	// É a janela propriamente dita, 
-	// excluindo a moldura e a barra de rolagem.
-	// Tudo o que há dentro da janela menos o frame.
-	// É a parte que é exibida quando a janela está em full screen.
-
-    struct window_d  *client_window; 
-    struct rect_d    *rcClient; 
-
-
-	//cor do retângulo da área do cliente.
-    unsigned long clientrect_bg_color; 
-
-//==================================================
+//
+// Cursor
+//
 
     // Cursor
     // #remember: 
@@ -930,7 +930,23 @@ struct window_d
     //unsigned long CursorIconAddress;
     // ...
 
-//==================================================
+//
+// Mouse pointer
+//
+
+    // #todo
+    // The mouse pointer type.
+    // The address of the pointer.
+    // The position inside the window.
+    // Cursor and pointer are not the same thing.
+
+    // unsigned long mouse_pointer_icon_address;
+    //unsigned long mouse_pointer_x_pixel;
+    //unsigned long mouse_pointer_y_pixel;
+
+
+
+//===============================================
 
 	// Bars support.
 	// Cada tipo de janela tem seus itens específicos.
@@ -964,56 +980,105 @@ struct window_d
     void *BackBuffer;       // Qual backbuffer a janela usa.
     void *FrontBuffer;      // Qual frontbuffer a janela usa. (LFB).
 
-//==================================================
-
-	// Desktop support.
-	// A que desktop a janela pertence??
-
-    int desktop_id;
-    struct desktop_d *desktop; 
 
 //==================================================
+    // Window Class
+    struct window_class_d *window_class;
+//==================================================
 
-	// Relação entre janelas.
-    struct window_d *owner;
-    struct window_d *child; 
+
+//==================================================
+
+//
+// Desktop
+//
+
+    struct desktop_d  *desktop;
+
+//==================================================
+
+//
+// == Windows ========
+//
+
+
+//
+// Parent
+//
+
+    struct window_d  *parent;
+
+//
+// Childs
+//
+
+    // Se cada janela apontar para uma child, então temos uma lista.
+    // Child support.
+    struct window_d *childListHead;  //Lista encadeada de janelas filhas.
+    int childCount;                  //Tamanho da lista.
+
+    struct window_d *child;
 
     //Configuramos isso quando efetuamos um raise_window
     //colocando a janela acima das outras.
     struct window_d *child_with_focus; 
 
 //==================================================
-    struct window_d *statusbar;
-    struct window_d *toolbar;
+
+//
+// Client window and client rectangle.
+//
+    // Client window support.
+    // É a janela propriamente dita, 
+    // excluindo a moldura e a barra de rolagem.
+    // Tudo o que há dentro da janela menos o frame.
+    // É a parte que é exibida quando a janela está em full screen.
+
+    struct window_d  *client_window; 
+    struct rect_d    *rcClient; 
+
+    // Cor do retângulo da área do cliente.
+    unsigned long clientrect_bg_color; 
+
+
+
+//==================================================
+
+
+    // We don't need menubar in this environment.
+    //struct window_d  *menubar;
+
+//
+// Tool bar
+//
+
+    // Main toolbar.
+    // That one below menubar.
+    // How many toolbars a widnow can have in kgws?
+
+    struct window_d  *toolbar;
+
+//
+// Status bar
+//
+
+    struct window_d  *statusbar;
 
 
 //==================================================
 
-    // Buffer para mensagens pequenas.
-    // Será usado pelo produtor e pelo consumidor.
-    // char read_buf[WINDOW_MSG_BUFFER_SIZE];
+//
+// Terminal
+//
 
-
-//==================================================
-
-	// Window Class
-    struct window_class_d *window_class;
-    
-//==================================================
-
-    //unsigned long scancodeList[32];
-
-//==================================================
-
-	// ID da tty usada.
+    // #todo
+    // Estrutura tty deve ser uma coisa associada ao uso de terminal.
+    // ID da tty usada.
+ 
     int tty_id;
 
-//==================================================
 
-	//
-	// TERMINAL SUPPORT
-	//
-
+    // TERMINAL SUPPORT
     // Obs: 
     // Essas variáveis só serão inicializadas se o 
     // aplicativo decidir que conterá um terminal em sua janela.
@@ -1054,15 +1119,13 @@ struct window_d
 
 	//...
 
-	//@todo: isso deve pertencer a uma janela.
-	//se uma janela tiver o foco de entrada e for um terminal 
-	//a disciplica de linhas poderá usar essas carcterística do terminal.
-    struct terminal_d *wTerminal; //dd\uitm\terminal.h
- 
-//==================================================
- 
-    // ??
-    int tab;
+    // #todo: isso deve pertencer a uma janela.
+    // se uma janela tiver o foco de entrada e for um terminal 
+    // a disciplica de linhas poderá usar essas carcterística do terminal.
+    // See: terminal.h
+
+    struct terminal_d  *wTerminal;
+
 
 //==================================================
 
@@ -1074,15 +1137,9 @@ struct window_d
 	//window style:
 	//WINDOW_STYLE_FLOATING (flutuante) 
 	//WINDOW_STYLE_DOCKING   (atracada em algum canto)
-    int style;   
 
-//==================================================
+    int style;
 
-    //unsigned long Background;
-
-//==================================================
-
-    //int instance; 
 
 //==================================================
 
@@ -1094,8 +1151,6 @@ struct window_d
 	//enquanto outra janela é a janela ativa e ainda outra tenha o foco de entrada.
 	//uma janela em modo full screen pode conter barras de rolagem.
 	//*embedded mode = dentro de uma janela ou de um navegador. 
-
-    //unsigned long status;              //ATIVA OU NÃO.
 
 //==================================================    
 

@@ -160,17 +160,17 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr -
 // #view presentation output.
-#include "user/rawgr/view/display.h"
-#include "user/rawgr/view/screen.h"
-#include "user/rawgr/view/video.h"
+#include "user/view/display.h"
+#include "user/view/screen.h"
+#include "user/view/video.h"
 
 // Render
 #include "user/render/r_render.h"
 
 
 // #model. data model.
-#include "user/rawgr/model/fonts.h"
-#include "user/rawgr/model/ascii.h" 
+#include "user/model/fonts.h"
+#include "user/model/ascii.h" 
 
 
 // fs
@@ -184,13 +184,11 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/fs/vfs.h"
 
 
-// rawgr - 
 // view - input and presentation
-#include "user/rawgr/view/prompt.h"
+#include "user/view/prompt.h"
 
 // view - showing the data.
-#include "user/rawgr/view/bmp2.h"
-
+#include "user/view/bmp2.h"
 
 // hal
 #include "hal/portsx86.h"
@@ -236,14 +234,14 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr - window server
 // inputs
-#include "user/rawgr/view/xproc.h"
-#include "user/rawgr/view/keyboard.h"
-#include "user/rawgr/view/mouse.h"
-#include "user/rawgr/view/vk.h"
-#include "user/rawgr/view/kbdabnt2.h"
+#include "user/view/xproc.h"
+#include "user/view/keyboard.h"
+#include "user/view/mouse.h"
+#include "user/view/vk.h"
+#include "user/view/kbdabnt2.h"
 
 // #view. drawing routines.
-#include "user/rawgr/view/ldisc.h"
+#include "user/view/ldisc.h"
 
 //storage (^)
 #include "hal/dev/blkdev/ide.h"
@@ -292,15 +290,15 @@ extern unsigned long stack0_krn_ptr;
 #include "user/ws.h"
 
 // #view - designers
-#include "user/rawgr/view/window.h"
-#include "user/rawgr/view/menu.h"
-#include "user/rawgr/view/pbar.h"
-#include "user/rawgr/view/bmp.h"
-#include "user/rawgr/view/line.h"
+#include "user/view/window.h"
+#include "user/view/menu.h"
+#include "user/view/pbar.h"
+#include "user/view/bmp.h"
+#include "user/view/line.h"
 
 // #view. presentation
 #include "user/terminal.h"
-#include "user/rawgr/view/guiconf.h"
+#include "user/view/guiconf.h"
 
 
 //
@@ -334,11 +332,10 @@ extern unsigned long stack0_krn_ptr;
 
 // =============================
 // rawgr - i8042 ps2 controller.
-#include "user/rawgr/view/i8042/i8042.h"
-#include "user/rawgr/view/i8042/ps2mouse.h"
-#include "user/rawgr/view/i8042/ps2kbd.h"
-#include "user/rawgr/view/i8042/ps2.h"
-
+#include "user/view/i8042/i8042.h"
+#include "user/view/i8042/ps2mouse.h"
+#include "user/view/i8042/ps2kbd.h"
+#include "user/view/i8042/ps2.h"
 
 //
 //  ==== NETWORK ====
@@ -406,7 +403,7 @@ extern unsigned long stack0_krn_ptr;
 
 // rawgr - 
 // view. input support.
-#include "user/rawgr/view/cursor.h"
+#include "user/view/cursor.h"
 
 
 #include "land/messages.h"
