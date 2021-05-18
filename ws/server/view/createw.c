@@ -1212,22 +1212,25 @@ void *xxxCreateWindow (
         //#bugbug
         //Remember: The first window do not have a parent.
 
-        if ( (void*) Parent == NULL ){ 
+        if ( (void*) Parent == NULL )
+        { 
             gwssrv_debug_print ("xxxCreateWindow: [Background] Parent\n"); 
-            //exit(1); 
+
             rectBackbufferDrawRectangle ( 
-                window->left, window->top, 
-                window->width, window->height, 
-                window->bg_color, TRUE );
+                    window->left, window->top, 
+                    window->width, window->height, 
+                    window->bg_color, TRUE );
         }  
-        
-        if ( (void*) Parent != NULL ){
+
+        if ( (void*) Parent != NULL )
+        {
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
                 window->width, window->height, 
                 window->bg_color, TRUE );
         }
     }
+
 
 
 //

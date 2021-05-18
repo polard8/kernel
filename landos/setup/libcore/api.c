@@ -1484,8 +1484,6 @@ gde_resize_window (
  * gde_redraw_window:
  */
 
-//deprecated
-
 void 
 gde_redraw_window ( 
     struct window_d *window, 

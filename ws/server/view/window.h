@@ -1093,6 +1093,31 @@ void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
 
 int gwssrv_refresh_this_rect( struct gws_rect_d *rect );
 
+
+//======================================
+// Calling kgws in ring0.
+// Using the kgws to draw the rectangle.
+void 
+xxx_gws_draw_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long color );
+
+
+//======================================
+// Calling kgws in ring0.
+// Using the kgws to refresh the rectangle.
+void 
+xxx_gws_refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
+
+
+
 void 
 gws_refresh_rectangle ( 
     unsigned long x, 

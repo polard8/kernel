@@ -363,6 +363,62 @@ int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
 }
 
 
+//======================================
+// Calling kgws in ring0.
+// Using the kgws to draw the rectangle.
+void 
+xxx_gws_draw_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long color )
+{
+    unsigned long Buffer[6];
+    
+    Buffer[0] = (unsigned long) x;
+    Buffer[1] = (unsigned long) y;
+    Buffer[2] = (unsigned long) width;
+    Buffer[3] = (unsigned long) height;
+    Buffer[4] = (unsigned long) color;
+    
+    gramado_system_call ( 
+        9, 
+        (unsigned long) &Buffer[0], 
+        0, 
+        0 );
+}
+
+
+//======================================
+// Calling kgws in ring0.
+// Using the kgws to refresh the rectangle.
+void 
+xxx_gws_refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
+{
+    unsigned long Buffer[5];
+    
+    Buffer[0] = (unsigned long) x;
+    Buffer[1] = (unsigned long) y;
+    Buffer[2] = (unsigned long) width;
+    Buffer[3] = (unsigned long) height;
+
+    gramado_system_call ( 
+        10, 
+        (unsigned long) &Buffer[0], 
+        0, 
+        0 );
+}
+
+
+
+
+
+
 /*
  *************************************************** 
  * gws_refresh_rectangle:
@@ -376,6 +432,8 @@ gws_refresh_rectangle (
     unsigned long width, 
     unsigned long height )
 {
+
+    int RefreshRectangleUsingKGWS = TRUE;
 
     void       *dest = (void *)      ____FRONTBUFFER_VA;
     const void *src  = (const void*) ____BACKBUFFER_VA;
@@ -391,8 +449,6 @@ gws_refresh_rectangle (
     // rectangle line size in pixels * bytes per pixel.
     register unsigned int rectangle_pitch=0;  //loop
 
-
-
     unsigned int offset=0;
     
     // = 3; 24bpp
@@ -402,6 +458,18 @@ gws_refresh_rectangle (
     // Device info.
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
     //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+
+
+//
+// Refresh in ring0 using the kgws.
+//
+
+    if ( RefreshRectangleUsingKGWS == TRUE )
+    {
+        xxx_gws_refresh_rectangle(x,y,width,height);
+        return;
+    }
+
 
     if ( ScreenWidth == 0 ){
         printf ("gws_refresh_rectangle: [ERROR] ScreenWidth\n");  
@@ -512,6 +580,8 @@ rectBackbufferDrawRectangle (
     int fill )
 {
 
+    int DrawRectangleUsingKGWS = TRUE;
+    
     struct gws_rect_d rect;
     
     unsigned long w_max = gws_get_device_width();
@@ -522,6 +592,8 @@ rectBackbufferDrawRectangle (
     rect.top  = y;
     rect.width  = width;  
     rect.height = height;  
+
+    rect.bg_color = color;
 
 
     if ( rect.width > (w_max - rect.left) )
@@ -538,7 +610,6 @@ rectBackbufferDrawRectangle (
     rect.right  = (rect.left + rect.width);
     rect.bottom = (rect.top  + rect.height); 
 
-    rect.bg_color = color;
 
 
     //
@@ -599,8 +670,36 @@ rectBackbufferDrawRectangle (
         rect.is_empty = FALSE;
     }
 
-    // Draw lines on backbuffer.
 
+//
+// Draw
+//
+
+
+    
+//
+// Drawing in ring0 using kgws.
+//
+
+    // Draw lines on backbuffer.
+    if ( DrawRectangleUsingKGWS == TRUE )
+    {
+         xxx_gws_draw_rectangle (
+             rect.left,
+             rect.top,
+             rect.width,
+             rect.height,
+             rect.bg_color );
+ 
+         return;
+    }
+
+
+//
+// Drawing in ring3.
+//
+
+    // Draw lines on backbuffer.
     while (rect.height--){
         lineBackbufferDrawHorizontalLine ( 
             rect.left, rect.top, 

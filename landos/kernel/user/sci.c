@@ -1471,19 +1471,31 @@ void *sci0 (
             return NULL;
             break;
 
-        // 9 @todo: BugBug, aqui precisamos de 5 par�metros.
-        case SYS_BUFFER_DRAWRECT:
+        
+        // 9 - Draw rectangle.
+        // #todo: #BugBug, aqui precisamos de 5 par�metros.
+        // passe o buffer como parametro
+        //case SYS_BUFFER_DRAWRECT:
+        case 9:
             drawDataRectangle ( 
-                0, 
-                (unsigned long) a2, 
-                (unsigned long) a3, 
-                (unsigned long) a4, 
-                COLOR_WHITE );  
+                (unsigned long) message_address[0],    //x 
+                (unsigned long) message_address[1],    //y
+                (unsigned long) message_address[2],    //width
+                (unsigned long) message_address[3],    //height
+                (unsigned long) message_address[4] );  //color
             return NULL;
             break;
 
 
-        // 10 - livre.
+        // 10 - Refresh rectangle.
+        case 10:
+            refresh_rectangle ( 
+                (unsigned long) message_address[0],    //x 
+                (unsigned long) message_address[1],    //y
+                (unsigned long) message_address[2],    //width
+                (unsigned long) message_address[3] );  //height 
+            return NULL;
+            break;
 
         //11, Coloca o conte�do do backbuffer no LFB.
         case SYS_REFRESHSCREEN: 
