@@ -727,6 +727,38 @@ void refresh_valid_screen(void)
 }
 
 
+/*
+// Copiamos o lfb no backbuffer.
+void 
+copy_backbuffer ( 
+    void *lfb,             // lfb
+    void *target_buffer,   // target buffer
+    int ofs,               // offset to walk
+    int count);             // how much
+void 
+copy_backbuffer ( 
+    void *lfb,             // lfb
+    void *target_buffer,   // target buffer
+    int ofs,               // offset to walk
+    int count)             // how much
+{
+
+    void *front_buffer  = (void *) lfb;
+    void *buffer        = (void *) target_buffer;
+
+    if (front_buffer == NULL)
+        return;
+ 
+    if (buffer == NULL)
+        return;
+
+    memcpy ( 
+        buffer       + ofs, 
+        front_buffer + ofs, 
+        count );
+}
+*/
+
 
 /*
  * serverInit
