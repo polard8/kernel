@@ -316,6 +316,11 @@ typedef enum {
  *     The window structure.
  */
 
+// #todo
+// Se uma janela tiver o id da thread ao qual ela pertence
+// então podemos colocar ela em foreground quando a janela
+// receber o foco usando o teclado ou mouse.
+
 struct gws_window_d 
 {
 
@@ -351,9 +356,24 @@ struct gws_window_d
 
     int client_fd;
 
+    // #todo
+    // Podemos mandar mensagens para o pid
+    // com o objetivo de alcançarmos a thread de controle.
+
+    int client_pid;
+
+
+//
+// TID
+//
+
     // #test
     // tid da control thread do cliente.
-    int client_pid;
+    // #todo
+    // Se uma janela tiver o id da thread ao qual ela pertence
+    // então podemos colocar ela em foreground quando a janela
+    // receber o foco usando o teclado ou mouse.
+
     int client_tid;
 
 //

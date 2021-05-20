@@ -2339,10 +2339,10 @@ int main ( int argc, char *argv[] )
 
 
     // main window
-    unsigned long mwLeft   = 8;
-    unsigned long mwTop    = 8;
-    unsigned long mwWidth  = (w/2);
-    unsigned long mwHeight = (h/2);  //h-16;
+    unsigned long mwLeft   = 0;
+    unsigned long mwTop    = 0;
+    unsigned long mwWidth  = (w >> 1);
+    unsigned long mwHeight = h;
 
     // client window ?
     unsigned long wLeft   = 2;

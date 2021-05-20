@@ -915,14 +915,14 @@ int create_taskbar_client(int fd)
     //
     // hack
     //
-    
-    if ( w == 320 || w == 640 ){
+
+    if ( w <= 320 ){
         ButtonAreaWidth = w-100;
         ButtonMaxWidth = ButtonAreaWidth/3;
         ButtonMaxNumber=3;
     }
 
-    if ( w > 640 ){
+    if ( w > 320 ){
         ButtonAreaWidth = w-100;
         ButtonMaxWidth = ButtonAreaWidth/4;
         ButtonMaxNumber=4;
@@ -936,7 +936,7 @@ int create_taskbar_client(int fd)
     // Taskbar
     gws_debug_print ("gwm: Create c_taskbar client\n");
     c_taskbar = (struct wm_client_d *) malloc ( sizeof(struct wm_client_d) );
-    if( (void *)c_taskbar == NULL ){
+    if ( (void *) c_taskbar == NULL ){
         printf ("gwm: c_taskbar fail\n");
         exit(1); 
     }else{
@@ -971,7 +971,8 @@ int create_taskbar_client(int fd)
         // button0
         button0_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"Start",
-                              2, 2, 80, 28,
+                              2, 2, 
+                              80, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
 
@@ -981,8 +982,8 @@ int create_taskbar_client(int fd)
         // ================================
         // button1
         button1_window = gws_create_window (fd,
-                              WT_BUTTON,1,1,"App2",
-                              2 +ButtonMaxWidth+2 , 2, 
+                              WT_BUTTON,1,1,"App1",
+                              2 +80 +2, 2, 
                               ButtonMaxWidth, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
@@ -993,8 +994,8 @@ int create_taskbar_client(int fd)
         // button2
         button2_window = gws_create_window (fd,
                               WT_BUTTON,1,1,"App2",
-                              2 +ButtonMaxWidth+2 +ButtonMaxWidth+2, 
-                              2, ButtonMaxWidth, 28,
+                              2 +80+2 +ButtonMaxWidth+2, 2, 
+                              ButtonMaxWidth, 28,
                               c_taskbar->window, 0,COLOR_GRAY, COLOR_GRAY);
 
         taskbarList[2] = button2_window;
@@ -1353,10 +1354,7 @@ int main ( int argc, char *argv[] ){
 
     rtl_focus_on_this_thread();
 
-    while (1){
-
-        //Event = (struct gws_event_d *) gws_next_event();
-
+    while (TRUE){
         if ( rtl_get_event() == TRUE ){  
             gwmProcedure ( 
                 client_fd,

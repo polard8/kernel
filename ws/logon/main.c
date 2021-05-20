@@ -110,12 +110,18 @@ void gameTestASCIITable(int fd,unsigned long w, unsigned long h)
 // initialize
 //
 
-int logonInitialize(int fd,unsigned long w, unsigned long h)
+int 
+logonInitialize( 
+    int fd,
+    unsigned long w, 
+    unsigned long h )
 {
+
     player_x = 0;
     player_y = 0;
 
     // Test
+    // #bugbug
     // O refresh da tela faz à cada letra, 
     // faz as letras aparecerem lentamente.
 
@@ -131,25 +137,21 @@ int logonInitialize(int fd,unsigned long w, unsigned long h)
         fd, status_window,
         (w/30)  * 6, 8, COLOR_YELLOW, "LOGON:  F1=UI | F2=Reboot");
 
-    /*
-    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
-    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
-    gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'M' );
-    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
-    gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
-    */
-
-    //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
-    
     //...
-    
+
     return 0;
 }
 
-void updateStatusBar(int fd,unsigned long w, unsigned long h, int first_number, int second_number)
+
+void 
+SB_Update ( 
+    int fd, 
+    unsigned long w, 
+    unsigned long h, 
+    int first_number, 
+    int second_number )
 {
+
     gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
     
@@ -238,7 +240,7 @@ int gws(void)
 int 
 logonProcedure ( 
     int fd,
-    void *window, 
+    int window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -257,7 +259,7 @@ logonProcedure (
                     player_y = (player_y - 8);
                     if( player_y <= 0){ player_y = 0; }
                     gws_draw_char ( fd, logon_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'U');
+                    SB_Update(fd,savedW,savedH,0, 'U');
                     goto done; 
                     break;
                 case 0x4B: 
@@ -265,7 +267,7 @@ logonProcedure (
                     player_x = (player_x - 8);
                     if ( player_x <= 0){ player_x = 0;}
                     gws_draw_char ( fd, logon_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'L');
+                    SB_Update(fd,savedW,savedH,0, 'L');
                     goto done; 
                     break;
                 case 0x4D: 
@@ -273,7 +275,7 @@ logonProcedure (
                     player_x = (player_x + 8);
                     if ( player_x >= game_width){ player_x = (game_width - 8);}
                     gws_draw_char ( fd, logon_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'R');
+                    SB_Update(fd,savedW,savedH,0, 'R');
                     goto done; 
                     break;
                 case 0x50: 
@@ -281,7 +283,7 @@ logonProcedure (
                     player_y = (player_y + 8);
                     if( player_y >= game_height){ player_y = (game_height-8); }
                     gws_draw_char ( fd, logon_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'D');
+                    SB_Update(fd,savedW,savedH,0, 'D');
                     goto done; 
                     break;
  
@@ -302,7 +304,7 @@ logonProcedure (
             switch (long1){
 
                 // 1~4
-                
+
                 // UI
                 case VK_F1: 
                     gws_clone_and_execute("gwm.bin");
@@ -372,8 +374,8 @@ logonProcedure (
     // consumiu o evento passado à ele.
 
 done:
-    //return TRUE;
     return (int) gws_default_procedure(fd,0,msg,long1,long2);
+    //return 0;
 }
 
 
@@ -468,6 +470,9 @@ int main ( int argc, char *argv[] )
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
+    unsigned long SB_Width=0;
+    unsigned long SB_Height=0;
+
     if ( w == 0 || h == 0 ){
         printf ("gws.bin: w h \n");
         exit(1);
@@ -484,21 +489,23 @@ int main ( int argc, char *argv[] )
     //}
 
 
-    //
-    // Window
-    //
+//
+// Windows
+//
 
-    //===============================
+    // ===============================
+    // Main window: Background
     gws_debug_print ("logon.bin: Creating main window \n");
     //printf          ("gws.bin: Creating main window \n");
 
-    main_window = gws_create_window (client_fd,
+    main_window = gws_create_window (
+                      client_fd,
                       WT_SIMPLE, 1, 1, "gws-main",
                       0, 0, w, h,
                       0, 0, 
                       __BG_COLOR, __BG_COLOR);
 
-    if (main_window<0){
+    if (main_window < 0){
         printf ("gws.bin: main_window\n");
         exit(1);
     }
@@ -506,14 +513,22 @@ int main ( int argc, char *argv[] )
     //========================
 
 
-    //===============================
+    // ===============================
+    // Status bar:
     gws_debug_print ("logon.bin: Creating status window \n");
     //printf          ("gws.bin: Creating main window \n");
+    SB_Width = w;
+    if (h  < 200){ SB_Height = h >> 1; }
+    if (h >= 200){ SB_Height = h >> 2; }
+    if (h >= 600){ SB_Height = h >> 3; }
+
     int tmp1;
-    tmp1 = gws_create_window (client_fd,
-                      WT_SIMPLE, 1, 1, "gws-status",
-                      0, h-40, w, 40,
-                      0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
+    tmp1 = gws_create_window (
+               client_fd,
+               WT_SIMPLE, 1, 1, "SB",
+               0, h-SB_Height, 
+               SB_Width, SB_Height,
+               0, 0, xCOLOR_GRAY2, xCOLOR_GRAY2 );
 
     if (tmp1<0){
         printf ("logon.bin: tmp1\n");
@@ -524,7 +539,7 @@ int main ( int argc, char *argv[] )
 
 
 
-    // Drawing a char just for fun,not for profit.
+    // Drawing a char just for fun, not for profit.
 
     //===================
     gws_debug_print ("logon.bin: 2 Drawing a char \n");
@@ -723,7 +738,12 @@ int main ( int argc, char *argv[] )
         gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
     }
     */
-   
+
+
+//
+// Loop
+//
+
     gws_debug_print("LOOP:\n");
     //printf ("LOOP:\n");
 
@@ -849,22 +869,21 @@ int main ( int argc, char *argv[] )
 
     //=================================
 
-    while (1){
-
-        if ( rtl_get_event() == TRUE )
-        {  
             // Podemos chamar mais de um diálogo
             // Retorna TRUE quando o diálogo chamado 
             // consumiu o evento passado à ele.
             // Nesse caso chamados 'continue;'
             // Caso contrário podemos chamar outros diálogos.
 
+    while (1){
+        if ( rtl_get_event() == TRUE )
+        {  
             logonProcedure ( 
                 client_fd,
-                (void*) RTLEventBuffer[0], 
-                RTLEventBuffer[1], 
-                RTLEventBuffer[2], 
-                RTLEventBuffer[3] );
+                (int) RTLEventBuffer[0], 
+                (int) RTLEventBuffer[1], 
+                (unsigned long) RTLEventBuffer[2], 
+                (unsigned long) RTLEventBuffer[3] );
         }
     };
     //=================================

@@ -631,24 +631,24 @@ void _hello(int fd)
 }
 
 
-// Testing new main.
+//
+// Main
+//
+
 int main ( int argc, char *argv[] ){
 
     int client_fd = -1;
 
     // Porta para o Window Server 'ws' em gramado_ports[]
     struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
 
     // Connecting to the window server in this machine.
-    addr_in.sin_port   = PORTS_WS;   
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port   = PORTS_WS; 
     addr_in.sin_addr.s_addr = IP(127,0,0,1); 
-
-
 
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
 
 
     debug_print ("---------------------------\n");    
@@ -660,10 +660,9 @@ int main ( int argc, char *argv[] ){
     //printf ("The current mode is %d\n",current_mode);
     //exit(0);
 
-
-    //
-    // socket
-    // 
+//
+// socket
+// 
 
     // #debug
     printf ("fileman: Creating socket\n");
@@ -678,10 +677,9 @@ int main ( int argc, char *argv[] ){
        exit(1);
     }
 
-
-    //
-    // connect
-    // 
+//
+// connect
+// 
 
     // Nessa hora colocamos no accept um fd.
     // então o servidor escreverá em nosso arquivo.
@@ -690,13 +688,10 @@ int main ( int argc, char *argv[] ){
     printf ("fileman: Connecting to ws via inet  ...\n");   
 
     while (1){
-
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){
- 
-            gws_debug_print("fileman: Connection Failed \n");
+             gws_debug_print("fileman: Connection Failed \n");
             printf("fileman: Connection Failed \n"); 
             //return -1;
-            
         // try again 
         }else{ break; }; 
     };
@@ -747,22 +742,21 @@ int main ( int argc, char *argv[] ){
     // #hackhack
     unsigned long titlebarHeight = 32;
 
-    unsigned long wLeft   = 8;
-    unsigned long wTop    = 8;
-    unsigned long wWidth  = (w-32);
-    unsigned long wHeight = (h-32);
-
+    unsigned long wLeft   = 0;
+    unsigned long wTop    = 0;
+    unsigned long wWidth  = (w >> 1);
+    unsigned long wHeight = h;
 
     if (current_mode == GRAMADO_JAIL ){
         wLeft=0;  wTop=0;  wWidth=w;  wHeight=h;
     }
 
-
     // main window
-    main_window = gws_create_window ( client_fd,
-        WT_OVERLAPPED, 1, 1, "Fileman",
-        wLeft, wTop, wWidth, wHeight,
-        0, 0, COLOR_GRAY, COLOR_GRAY );
+    main_window = gws_create_window ( 
+                      client_fd,
+                      WT_OVERLAPPED, 1, 1, "Fileman",
+                      wLeft, wTop, wWidth, wHeight,
+                      0, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( main_window < 0 ){
         debug_print("fileman: main_window fail\n");
@@ -771,20 +765,21 @@ int main ( int argc, char *argv[] ){
     }
 
 
-    //
-    // == Address bar =========================================
-    //
+//
+// == Address bar =========================
+//
 
     // #bugbug
     // The window server needs to fix the client area.
     // So 0,0 needs to mean the top/left of the client area.
 
     // address bar
-    addressbar_window = gws_create_window (client_fd,
-        WT_EDITBOX,1,1,"address-bar",
-        4, titlebarHeight +4, 
-        (wWidth-40), 32,
-        main_window, 0, COLOR_WHITE, COLOR_WHITE );
+    addressbar_window = gws_create_window ( 
+                            client_fd,
+                            WT_EDITBOX, 1, 1,"AddressBar",
+                            4, titlebarHeight +4, 
+                            (wWidth-40), 32,
+                            main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
     if ( addressbar_window < 0 ){
         debug_print("fileman: addressbar_window fail\n"); 
@@ -808,11 +803,11 @@ int main ( int argc, char *argv[] ){
 
     // [>]
     // button
-    button = gws_create_window (client_fd,
-        WT_BUTTON, BS_DEFAULT, 1, ">",
-        (wWidth-32-4), titlebarHeight +4, 
-        32, 32,
-        main_window,0,COLOR_GRAY, COLOR_GRAY);
+    button = gws_create_window ( 
+                 client_fd,
+                 WT_BUTTON, BS_DEFAULT, 1, ">",
+                 (wWidth-32-4), titlebarHeight +4, 32, 32,
+                 main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( button < 0 ){
         debug_print("fileman: button fail\n"); 
@@ -820,9 +815,9 @@ int main ( int argc, char *argv[] ){
         exit(1);
     }
 
-    //
-    // == Client window =========================================
-    //
+//
+// == Client window =====================================
+//
 
     unsigned long cwLeft   = 4;
     unsigned long cwTop    = titlebarHeight + 40;
@@ -830,26 +825,35 @@ int main ( int argc, char *argv[] ){
     unsigned long cwHeight = (wHeight - cwTop -4);
 
     // client window (White)
-    client_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"client",
-        cwLeft, cwTop, cwWidth, cwHeight,
-        main_window,0,COLOR_WHITE, COLOR_WHITE);
+    client_window = gws_create_window ( 
+                        client_fd,
+                        WT_SIMPLE, 1, 1, "Client",
+                        cwLeft, cwTop, cwWidth, cwHeight,
+                        main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( client_window < 0 )
+    if ( client_window < 0 ){
         debug_print("fileman: client_window fail\n"); 
+    }
 
-    // [/]
-    // button
-    // Current directory
-    button_current_directory = gws_create_window (client_fd,
-        WT_BUTTON, BS_DEFAULT, 1, "/",
-        8, 8, 50, 24,
-        client_window, 0, COLOR_WHITE, COLOR_WHITE);
+    // [/] button
+    
+    if ( client_window > 0 ){
+    button_current_directory = gws_create_window ( 
+                                   client_fd,
+                                   WT_BUTTON, BS_DEFAULT, 1, "/",
+                                   8, 8, 50, 24,
+                                   client_window, 
+                                   0, 
+                                   COLOR_WHITE, COLOR_WHITE );
+    }
 
-    if ( button_current_directory < 0 )             
+    if ( button_current_directory < 0 ){
         debug_print("fileman: button_current_directory fail\n"); 
+    }
 
-     // dir entries
+    //==================================
+
+// dir entries
 
     int e=0;
     int max=22;
