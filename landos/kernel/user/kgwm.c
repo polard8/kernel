@@ -458,29 +458,15 @@ void gui_create_mainwindow (void){
     };
 
 
+    //  Desktop Window:
 
-	//  Desktop Window:
-	//      Criar a janela gui->desktop.
-	//      Na verdade a janela do desktop
-	//      é a janela da área de trabalho.
-	// @todo:
-	// #bugbug: Confunde-se com a estrutura de desktop_d.
+    gui->root_window = (void *) gui->main;
 
-
-    /*
-	gui->desktop = (void*) CreateWindow( 1, 0, VIEW_MINIMIZED, "Desktop Window", 
-	                                0, 16, 800, 600-16-16, 
-							        gui->screen, 0, 0, COLOR_WHITE ); 
-	*/
-
-
-	gui->desktop = (void *) gui->main;
-
-    if ( (void *) gui->desktop == NULL)
+    if ( (void *) gui->root_window == NULL)
     {
-        gui->desktop = (void *) gui->screen;
+        gui->root_window = (void *) gui->screen;
 
-        if ( (void *) gui->desktop == NULL )
+        if ( (void *) gui->root_window == NULL )
         { 
             kgwmSetFocus (hWindow);
             return; 
@@ -540,28 +526,11 @@ void gui_create_messagebox (void){
     };
 }
 
-
-/*
- ******************
- * cria uma janela para debug do kernel. será um progama em kernel mode.
- * @todo: Cria buffer dedicado.
- */
-
-void gui_create_debug (void){
- 
-    if ( (void *) gui == NULL ){
-        debug_print ("gui_create_debug: gui\n");
-        return;
-    }else{
-        gui->debug = NULL;
-    };
-
-	// #todo: 
-	// Efetuará ou não algum tipo de debug de inicialização ou
-	// dos elementos básicos do sistema. Essa tela de debug
-	// pode se mostrar uma opção importante para o desenvolvedor.
-	// Mostraria um log de acertos e problemas durante o processo 
-	// de inicialização do sistema operacional.
+// #deprecated
+void gui_create_debug (void)
+{
+    panic("gui_create_debug: deprecated\n");
+    return NULL;
 }
 
 
@@ -609,25 +578,15 @@ void *guiGetScreenWindow (void){
 }
 
 
-
-//developer screen
-
-void *guiGetDeveloperScreenWindow (void){
-
-    if ( (void *) gui == NULL )
-    {
-        //message
-        return NULL;
-    }
-
-
-    return (void *) gui->DEVELOPERSCREEN;
+// #deprecated
+void *guiGetDeveloperScreenWindow (void)
+{
+    panic("guiGetDeveloperScreenWindow: deprecated\n");
+    return NULL;
 }
 
 
-
 //background
-
 void *guiGetBackgroundWindow (void){
 
     if ( (void *) gui == NULL )
@@ -635,7 +594,6 @@ void *guiGetBackgroundWindow (void){
         //message
         return NULL;
     }
-
 
     return (void *) gui->background;
 }
@@ -662,7 +620,7 @@ void *guiGetDesktopWindow (void){
         return NULL;
     }
 
-    return (void *) gui->desktop;
+    return (void *) gui->root_window;
 }
 
 
@@ -694,16 +652,11 @@ void *guiGetMainWindow (void){
 }
 
 
-//status bar window (do kernel base)
-
-void *guiGetStatusbarWindow (void){
-
-    if ( (void *) gui == NULL )
-    {
-        return NULL;
-    }
-
-    return (void *) gui->statusbar;
+// #deprecated.
+void *guiGetStatusbarWindow (void)
+{
+    panic("guiGetStatusbarWindow: deprecated\n");
+    return NULL;
 }
 
 
@@ -786,16 +739,11 @@ void *guiGetDialogboxWindow (void){
 }
 
 
-//janela de debug usada pelo kernel base.
-
-void *guiGetDebugWindow (void){
-
-    if ( (void *) gui == NULL )
-    {
-        return NULL;
-    }
-
-    return (void *) gui->debug;
+// #deprecated
+void *guiGetDebugWindow (void)
+{
+    panic("guiGetDebugWindow: deprecated\n");
+    return NULL;
 }
 
 
@@ -842,26 +790,18 @@ void *guiGetNavigationbarWindow (void){
 // janela do shell do kernel base.
 // naõ é um processo.
 
-void *guiGetShellWindowWindow (void){
-
-    if ( (void *) gui == NULL )
-    {
-        return NULL;
-    }
-
-    return (void *) gui->shellWindow;
+void *guiGetShellWindowWindow (void)
+{
+    panic("guiGetShellWindowWindow: deprecated\n");
+    return NULL;
 }
 
 
 //uma janela filha do shell do kernel base.
-void *guiGetShellClientWindowWindow (void){
-
-    if ( (void *) gui == NULL )
-    {
-        return NULL;
-    }
-
-    return (void *) gui->shellClientWindow;
+void *guiGetShellClientWindowWindow (void)
+{
+    panic("guiGetShellClientWindowWindow: deprecated\n");
+    return NULL;
 }
 
 
@@ -1209,7 +1149,7 @@ int register_wm_process ( pid_t pid ){
     // The system already has a wm.
 
     if ( __gpidWindowManager != 0 ){
-        debug_print("register_wm_process: [FAIL] The system already has a wm\n");
+        debug_print("register_wm_process: [FAIL] __gpidWindowManager\n");
         return -1;
     }
 

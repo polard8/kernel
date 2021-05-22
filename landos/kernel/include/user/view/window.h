@@ -1665,86 +1665,27 @@ struct gui_d
 	 */
 
 
-    // Screen: 
-    // A tela. Tem as dimensões do monitor usado.
-    // Root window.   
+
+    // #bugbug
+    // All this are pointing to the root window.
 
     struct window_d  *screen; 
-
-
-	//
-	// Grupo 0: 
-	// Background, Logo, Desktop, Taskbar.
-	//
-
-	// A única janela em primeiro plano e com o foco de entrada. 
-	// Será usada pelo desenvolvedor durante a construção dos 
-	// elementos gráficos, até que o sistema gráfico fique mais robusto
-	// e permita ficar trocando a janela com o foco de entrada.
-	// Isso é para evitar confusão de output nesa fase.
-
-    // #deprecated
- 
-    struct window_d  *DEVELOPERSCREEN;    
-
-
-    // Background: 
-    // Uma janela popup com as dimensões da tela.
-
+    struct window_d  *root_window; 
     struct window_d  *background; 
 
-
-    // Logo: 
-    // A imagem de pano de fundo.
-
-    struct window_d  *logo;
+    // The logo used in the initialization.
+    struct window_d *logo;
 
 
-	/*
-	 * Desktop:
-	 *    A Área de trabalho.    
-	 *    Uma área de tamanho variável,
-	 *    dependendo da presensa ou não da barra de tarefas.
-	 *    É a área onde ficam os ícones e as janelas dos
-	 *    programas.
-	 */
-
-    // #obs
-    // Essa é uma janela e não uma estrtura de desktop.
-
-    struct window_d  *desktop; 
-
-
-    // Task Bar: (top bar) 
-    // A barra de tarefas.
-
-    struct window_d *taskbar;
-
-
-    //
-    // Grupo 1: Main (Full Screen), Status Bar. 
-    //
-
-
-    // Main:
-    // A área de trabalho.
-
-    struct window_d *main;
-
-	/*
-	 * Status Bar:  
-	 *     A barra de status.
-	 *     Usada em qualquer condição.
-	 *     Fica posicionada dentro de uma janela mãe.
-	 */
-
-    struct window_d *statusbar;
+    // Dividing the screen in parts:
+    struct window_d *main;      // Área de trabalho.
+    struct window_d *taskbar;   // Barra de tarefas.
 
  
 	//
 	// Grupo 2: Grid. 
 	//
-	
+
 	
 	/*
 	 *Grid:
@@ -1772,50 +1713,22 @@ struct gui_d
 
     struct window_d *menu; 
 
+    struct window_d  *notification;
 
-	//
-	// Grupo 4: Info Box, ToolTip.
-	//
-	
-    /*
-    * Infobox:
-    *     Janela usada para o sistema enviar mensagens de informações.   
-    * seria notification window ??	 
-    */
-
-    struct window_d  *infobox; 
-
-
-	//
-	// Pequena janela de notificações, que desaparece depois de um tempo..
-	//
-	//struct window_d *notification;   	
-
-
-	/*
-	 * ToolTip:
-	 *     Janelinha que aparece quando repousa o mouse sobre elemento gráfico.
-	 *      POPUP. A janela se adapta ao tamanho da string.
-	 */
-
-    struct window_d *tooltip;  
-
-
-    // Grupo 5: 
-    // MessageBox e DialogBox.
-    // Isso e' um test.
+    struct window_d  *infobox;
+    struct window_d  *tooltip;
 
     struct window_d  *messagebox;
     struct window_d  *dialogbox;
 
-	
+
 	//
 	// Grupo 6: Outras.
 	//
 	
 	
 	//Debug: Janela usada pelo Kernel para mensagens de erro.
-	struct window_d *debug;   
+    // struct window_d *debug;   
 
     //Menu bar.
 	struct window_d *mbhWindow;       //Janela principal da menu bar.
@@ -1852,37 +1765,16 @@ struct gui_d
 	//Current Menu.
 	//Aponta para a estrutura do menu atual.
 	//Seja ele de qual tipo for.
-	struct menu_d *currentMenu;       //Current. Para outros ambiente.
-	
-	
-	//
-	// #taskman server.#
-	//
-	
-	//janela usada pelo servidor taskman para 
-	//se comunicar com o kernel.
-	struct window_d *taskmanWindow;     //server 
-	struct window_d *taskmanClientWindow; //client
-	
-	//
-	// Shell.
-	//
-	
-	//
-	// Janelas para o shell.
-    // Obs: A janela do Shell será a janela do navegador.
-	// Pois cada página de Internet será considerada um processo
-	// e será exibida dentro da janela de cliente do shell.
-	// Assim como as aplicações e janelas de diálogo do sistema, 
-	// poderão ser exibidas dentro e fora da janela de cliente do shell.
-	//
-	struct window_d *shellWindow;      //server 
-	struct window_d *shellClientWindow; //client
-	
-	
-	//Informações sobre a tela.
-	struct screen_d *ScreenInfo;
-	
+    struct menu_d *currentMenu;       //Current. Para outros ambiente.
+
+
+    // #todo
+    // Check this structure.
+    // Where is it defined?
+
+    //Informações sobre a tela.
+    struct screen_d *ScreenInfo;
+
 	// Backbuffer support. (espelho da memória de video)
 	struct backbufferinfo_d  *backbufferInfo;  
 	

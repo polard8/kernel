@@ -1020,6 +1020,40 @@ unsigned long zList[ZORDER_MAX];
 
 
 
+// #test
+// Uma janela criada pelo kgws em ring0 será representada 
+// aqui na forma de surface, e o servidor 
+// poderá solicitar ao kgws operações sobre essa surface.
+
+struct gws_surface_d
+{
+    int used;
+    int magic;
+    
+    // Pointer to the window
+    // Redirection?
+    void *kgws_window;
+    
+    unsigned long left;
+    unsigned long top;
+    unsigned long width;
+    unsigned long height;
+
+    // Só depois de inicializada os valores da janela são validos.
+    int initialized;
+
+    int dirty;
+    
+    int locked;
+    
+    // ...
+    
+    struct gws_surface_d *next;
+};
+struct gws_surface_d *rootSurface;
+
+
+
 //
 // == prototypes =====================================================
 //

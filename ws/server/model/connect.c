@@ -1,16 +1,17 @@
 // connect.c
-
-
+// Register the window server in the system.
 
 #include <gws.h>
-
 
 
 // Registered ?
 int __ws_registered = -1;
 
 // Destop structure.
-struct desktop_d *__ws_desktop;
+// Essa estrutura é válida??
+// Talvez a gente nem tenha isso para o servidor.
+//struct desktop_d *__ws_desktop;
+void *__ws_desktop;
 
 // Our PID.
 int __ws_pid;
@@ -39,38 +40,45 @@ int register_ws (void){
     // Register window server as the current server for this
     // desktop.
 
-
-    //
-    // == Desktop =================================================
-    //
+//
+// == Desktop ==================
+//
 
     // Desktop 
     // Getting the current desktop structure pointer.
-    __ws_desktop = (struct desktop_d *) gramado_system_call (519,0,0,0);
-    
+
+    __ws_desktop = (void *) gramado_system_call (519,0,0,0);
     if ( (void *) __ws_desktop == NULL ){
-        gwssrv_debug_print ("register_ws: __ws_desktop fail\n");
+        gwssrv_debug_print ("register_ws: [FAIL] __ws_desktop fail\n");
         return (int) (-1);
     }
 
-    //
-    // == Register =================================================
-    //
+//
+// == Register =====================
+//
 
     // PID
+    // Get the PID of the server.
     __ws_pid = (int) getpid();
-
     if ( __ws_pid < 0 ){
-        gwssrv_debug_print ("register_ws: __ws_pid fail \n");
+        gwssrv_debug_print ("register_ws: [FAIL] __ws_pid fail \n");
         return (int) (-1);
     }
 
-    // Register this pid as ws.
-    gramado_system_call ( 513, __ws_desktop, __ws_pid, __ws_pid );
+    // Register this PID of the current window server.
+    // #todo
+    // We need to check the return value.
+    // int Status = -1;
+    
+    gramado_system_call ( 
+        513, 
+        __ws_desktop, 
+        __ws_pid, 
+        __ws_pid );
 
     // flag.
-    __ws_registered = 1;
-    
+    __ws_registered = TRUE;
+
     // O = OK.
     return 0;
 }

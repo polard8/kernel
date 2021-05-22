@@ -272,10 +272,8 @@ void systemSetupVersion (void){
         //pois existem aplicações que dependem da versão do sistema 
         //para funcionarem corretamente.. 
 
-    if ( (void *) VersionInfo == NULL )
-    {
-        panic ("systemSetupVersion: VersionInfo");
-
+    if ( (void *) VersionInfo == NULL ){
+        panic ("systemSetupVersion: VersionInfo\n");
     }else{
 
         // #todo
@@ -330,7 +328,7 @@ int SystemMenu (void){
 
 	// Tentativa de utilizar control menu não estando no modo gráafico.
 
-    if ( VideoBlock.useGui != 1 )
+    if ( VideoBlock.useGui != TRUE )
     {
         // #todo: 
         // Notificar erro via modo texto.
@@ -339,35 +337,26 @@ int SystemMenu (void){
     }
 
 
-	//
 	// Usar a estrutura da Client Area.
 	// A área da tela menos a área da barra de tarefas, ou barra de menu.
-	//
 
-
-	//
-	// ?? desktop ?? 
-	// Uma estrutura de janela , dentro da estrutura gui.
-	//
-
-    if ( (void *) gui->desktop == NULL )
+    if ( (void *) gui->root_window == NULL )
     {
-        gui->desktop = (void *) gui->screen;
+        gui->root_window = (void *) gui->screen;
 
 		//No Screen.
-        if ( (void *) gui->desktop == NULL )
+        if ( (void *) gui->root_window == NULL )
         {
 			//erro.
             return (int) 1;    
         }
     }
 
-
 	//Set current.
 
-    if ( (void *) gui->desktop != NULL )
+    if ( (void *) gui->root_window != NULL )
     {
-        Current = (void *) gui->desktop;
+        Current = (void *) gui->root_window;
     }
 
 

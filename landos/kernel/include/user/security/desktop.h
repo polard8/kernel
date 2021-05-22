@@ -50,9 +50,10 @@ struct desktop_d
 
     // The window server and the window manager for this desktop.
     
-    int ws;   // window server
-    int wm;   // window manager
-    int ns;   // network server
+    pid_t ws;   // window server
+    pid_t wm;   // window manager
+    pid_t ns;   // network server
+    //pid_t fs;   // file system
     // ...
 
 

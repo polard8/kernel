@@ -25,6 +25,7 @@
 #define PORTS_WS 4040
 #define PORTS_NS 4041
 #define PORTS_FS 4042
+#define PORTS_WM 4043
 // ...
 
 
@@ -46,6 +47,7 @@
 
 // ...
 #define GRAMADO_WS_PORT  11  // window server.
+#define GRAMADO_WM_PORT  12  // window manager.
 #define GRAMADO_NS_PORT  14  // network server.
 #define GRAMADO_FS_PORT  16  // file system
 // ...

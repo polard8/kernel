@@ -1261,15 +1261,18 @@ kgws_send_to_foreground_thread (
 }
 
 
-int register_ws_process ( pid_t pid ){
+// Registrando o processo do window server.
+int register_ws_process ( pid_t pid )
+{
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX ){
-        debug_print("register_ws_process: pid fail\n");
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX )
+    {
+        debug_print("register_ws_process: [FAIL] pid\n");
         return -1;
     }
 
     if ( __gpidWindowServer != 0 ){
-        debug_print("register_ws_process:\n");
+        debug_print("register_ws_process: [FAIL] __gpidWindowServer\n");
         return -1;
     }
 

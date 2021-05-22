@@ -91,6 +91,12 @@ int window_with_focus;
 unsigned long windowList[WINDOW_COUNT_MAX];
 
 
+// ===============================
+// register window manager
+int register_wm (void);
+// ===============================
+
+
 //
 // == Prototypes ==========================
 //

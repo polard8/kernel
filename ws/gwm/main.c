@@ -192,6 +192,54 @@ gwmProcedure (
 // ====================================================
 //
 
+//
+// Register window manager.
+//
+// Registered ?
+int __wm_registered = -1;
+// Destop structure.
+// Essa estrutura é válida?
+// Talvez a gente nem tenha isso para os clientes.
+//struct desktop_d *__wm_desktop;
+void *__wm_desktop;
+// Our PID.
+int __wm_pid;
+
+int register_wm (void){
+
+    //get the desktop
+    __wm_desktop = (void *) gramado_system_call (519,0,0,0);
+    if ( (void *) __wm_desktop == NULL ){
+        //gwssrv_debug_print ("register_ws: [FAIL] __wm_desktop fail\n");
+        return (int) (-1);
+    }
+
+    // PID
+    // Get the PID of the wm.
+    __wm_pid = (int) getpid();
+    if ( __wm_pid < 0 ){
+        //gwssrv_debug_print ("register_ws: [FAIL] __wm_pid fail \n");
+        return (int) (-1);
+    }
+
+    gramado_system_call ( 
+        515, 
+        __wm_desktop, 
+        __wm_pid, 
+        __wm_pid );
+
+    // flag.
+    __wm_registered = TRUE;
+
+    return 0;
+}
+
+
+
+
+//
+// ====================================================
+//
 
 // #test
 // Create a enu given a window
@@ -1275,6 +1323,14 @@ int main ( int argc, char *argv[] ){
 
     struct gws_display_d *Display;
     int client_fd = -1;
+
+
+
+    // #test
+    // Register the window manager.
+    debug_print ("gwm: [TEST] Register the window manager\n");
+    int Status=0;
+    Status = register_wm();
 
 
     // IN: hostname:number.screen_number

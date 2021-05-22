@@ -529,6 +529,10 @@ void *CreateWindow (
         Parent = (void *) pWindow;
     };
 
+    // #todo
+    // A janela que estamos criando deve entrar numa lista de filhas,
+    // provavelmente usando lista encadeada.
+
 
     // Make sure that we have a desktop.
     // If not, so maybe we can use this window as root window
@@ -901,7 +905,10 @@ void *CreateWindow (
 
 
         // Child window linked list.
-
+        // Essa janela ainda não tem uma lista de filhas,
+        // pois acabou se ser criada.
+        // Mas essa janela deve entrar na lista da sua janela mãe.
+        
         window->childListHead = NULL;
 
 
@@ -973,21 +980,29 @@ void *CreateWindow (
 
         //Abaixo, elementos referenciados com menor frequência.
 
-
-        window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
+        //@todo: Definir à qual desktop a janela perence.
+        window->desktop = NULL;   //desktopList[current_desktop];
         
         // process and thread
         // #todo: We need these for jog control.
-        window->process = NULL;
-        window->control = NULL;
+        window->process = NULL;  // processList[current_process];
+        window->control = NULL;  // threadList[current_thread];
 
         window->locked = FALSE;
 
         //Linked list.
+        // #bugbug: What is this?
         //window->linkedlist = NULL;
 
         // navigation
-        window->prev = (void *) Parent;
+        
+        // #bugbug: 
+        // It is wrong.
+        // It is not defined yet what will be next or prev.
+        // This kind of navigation is not defined yet.
+
+        window->prev = (void *) Parent;  //#bugbug
+        
         window->next = NULL;
     };
 

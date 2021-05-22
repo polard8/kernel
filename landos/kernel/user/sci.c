@@ -382,6 +382,7 @@ void *gde_extra_services (
     // 512 - get ws PID for a given desktop
     if ( number == SYS_GET_WS_PID )
     {
+       debug_print("SYS_GET_WS_PID\n");
         // pega o wm de um dado desktop.
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
@@ -404,16 +405,19 @@ void *gde_extra_services (
     // Called by the window server.
     // arg2 = desktop structure pointer.
     // arg3 = The window server PID.
+    // #todo: We need a helper function for this.
 
     if ( number == SYS_SET_WS_PID )
     {
+       debug_print("SYS_SET_WS_PID\n");
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed == 1 && 
+            if ( __desktop->desktopUsed  == TRUE && 
                  __desktop->desktopMagic == 1234 )
             {
-                __desktop->ws = (int) arg3;
+                //register_ws_process(arg3);
+                __desktop->ws = (pid_t) arg3;
                 
                 // What is the process listen to the port 11.
                 // use this one: socket_set_gramado_port(...)
@@ -448,21 +452,22 @@ void *gde_extra_services (
                 
                 // returning ok.
                 // But, we could return the port number.
-                return (void *) 1;  //ok 
+                return (void *) TRUE;  //ok 
             }
         }
         return NULL; //fail
     }    
-    
+
     // 514 - get wm PID for a given desktop
     // IN: desktop
     if ( number == SYS_GET_WM_PID )
     {
+       debug_print("SYS_GET_WM_PID\n");
         // pega o wm de um dado desktop.
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed == 1 && 
+            if ( __desktop->desktopUsed  == 1 && 
                  __desktop->desktopMagic == 1234 )
             {
                 return (void *) __desktop->wm; 
@@ -473,21 +478,27 @@ void *gde_extra_services (
 
 
     // 515 - set wm PID for a given desktop
+    // Register a ring3 wm.
     // IN: desktop, pid
     if ( number == SYS_SET_WM_PID )
     {
+       debug_print("SYS_SET_WM_PID\n");
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed == 1 && 
+            if ( __desktop->desktopUsed  == TRUE && 
                  __desktop->desktopMagic == 1234 )
             {
-                 __desktop->wm = (int) arg3;
-                return (void *) 1;  //ok 
+                //register_wm_process(arg3);
+                 __desktop->wm = (pid_t) arg3;
+                gramado_ports[GRAMADO_WM_PORT] = (int) current_process;
+                return (void *) TRUE;  //ok 
             }
         }
         return NULL; //fail
     }
+
+
 
     // 516 - show x server info
     // ws para o desktop atual
