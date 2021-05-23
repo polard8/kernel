@@ -1403,6 +1403,48 @@ done:
 
 
 /*
+// helper structure
+struct xxxPS2MouseEvent_d
+{
+    int buttom_1;
+    int buttom_2;
+    int buttom_3;
+
+    int old_buttom_1;
+    int old_buttom_2;
+    int old_buttom_3;
+
+    unsigned long saved_x;
+    unsigned long saved_y;
+    unsigned long x;
+    unsigned long y;
+
+    int moving;
+    int drag_status;
+    int pressed;
+
+    // Se houve ou não alguma ação envolvendo botões.
+    int button_action;
+
+    // Salvaremos aqui o último total ticks pra pegarmos um delta, 
+    // se o delta for menor que o limite então temos um duploclick.
+
+    unsigned long current_totalticks;
+    unsigned long last_totalticks;
+    unsigned long delta_totalticks;
+};
+
+// #todo: Rever isso.
+//int flagRefreshMouseOver;
+
+// Declaration.
+// Used in kgwm_mouse_scan_windows.
+
+struct xxxPS2MouseEvent_d xxxPS2MouseEvent;
+*/
+
+
+/*
  ********************************************************
  * mouseHandler:
  *     Handler de mouse. 
@@ -1464,6 +1506,84 @@ void DeviceInterface_PS2Mouse(void)
     //}
 
 
+//
+// Window manager support.
+//
+
+    // Tesmos supporte ao window manager em ring3?
+    // Se percebermos que o window manage esta inicializados e
+    // que temos o ponteiro para sua thread de controle,
+    // etão mudamos essa flag e enviamos os dados do mouse para 
+    //fila em sua thread.
+    
+    int UseRing3WindowManager = FALSE;
+
+
+    pid_t wmPID = -1;
+    struct process_d *wmProcess;
+    wmProcess = NULL;
+    struct thread_d  *wmThread;
+    wmThread = NULL;
+
+    // get wm pid.
+    wmPID = (pid_t) gramado_ports[GRAMADO_WM_PORT];
+
+    if ( wmPID < 0 || wmPID >= PROCESS_COUNT_MAX )
+    {
+        UseRing3WindowManager = FALSE;
+        
+        // No window manager
+        if ( UseRing3WindowManager == TRUE ){
+            return;
+        }
+    }
+
+    if ( wmPID > 0 && wmPID < PROCESS_COUNT_MAX )
+    {
+
+        //#debug
+        //printf ("pid=%d\n",wmPID); refresh_screen();
+        
+        // Validando.
+        // Desvalida se alguma estrutura for invalida
+        UseRing3WindowManager = TRUE;
+        
+        wmProcess = (struct process_d *) processList[wmPID];
+        
+        if ( (void*) wmProcess == NULL )
+        {
+            panic ("[debug] wmProcess");
+            UseRing3WindowManager = FALSE;
+        }
+        
+        if ( wmProcess->used != TRUE || wmProcess->magic != 1234 )
+        {
+            panic ("[debug] wmProcess validation");
+            UseRing3WindowManager = FALSE;
+        }
+        
+        // control thread
+        wmThread = (struct thread_d *) wmProcess->control;
+
+        if ( (void *) wmThread == NULL ){ 
+            panic ("[debug] wmThread");
+            UseRing3WindowManager = FALSE;
+        }
+       
+        if ( wmThread->used != TRUE || wmThread->magic != 1234 ){ 
+            panic ("[debug] wmThread validation");
+            UseRing3WindowManager = FALSE;
+        }
+        
+        // pronto, ja tempos o ponteiro da thread que usaremos 
+        // para mandar as informações de mouse ao wm.
+        // Então vamos mudar a flag.
+        // Mudando a flag, o kernel não vai mais scanear as janelas
+        // como fazia antes. Que por sinal ja não faz mais sentido mesmo.
+        // mas estavamos usado pra visualizar o ponteiro.
+    }
+
+
 	//Char para o cursor provisório.
 	//#todo: Isso foi subtituido por uma bmp. Podemos deletar.
     //static char mouse_char[] = "T";
@@ -1493,12 +1613,12 @@ void DeviceInterface_PS2Mouse(void)
     // #define RESEND              0xFE
 
     if ( *_byte == 0xFA ){
-        printf ("mouseHandler: [test.first_byte] ack\n");
+        printf ("DeviceInterface_PS2Mouse: [test.first_byte] ack\n");
         refresh_screen();
     }
 
     if ( *_byte == 0xFE ){
-        printf ("mouseHandler: [test.first_byte] resend\n");
+        printf ("DeviceInterface_PS2Mouse: [test.first_byte] resend\n");
         refresh_screen();
     }
 
@@ -1562,6 +1682,7 @@ void DeviceInterface_PS2Mouse(void)
                 // na forma de mensagens.
                 // Tambem nao precisamos escanear janelas ... o ws fara isso.
                 // essa função esta nesse documento.
+               
                 ps2mouse_parse_data_packet();
 
                 // #bugbug
@@ -1574,10 +1695,70 @@ void DeviceInterface_PS2Mouse(void)
 
                 // user/kgwm.c
 
-                kgwm_mouse_scan_windows();
+                //#todo:
+                // não usaremos mais isso, pois não vamos escanear
+                //janelas dentro do kernel, ao inves disso, mandaremos
+                // os dados para o window manager que esta em ring3.
+                // Podemos colocar um 'if' aqui.
+
+                // #todo
+                // Talvez poderiamos exibir o mouse aqui em ring 0 
+                // e mandarmos somente as informações para o wm,
+                // mas possivelmente o melhor a fazer é somente mandar os informações
+                // para o window manager e deixar ele exibir,
+                // mesmo que ele use o kernel para isso, o que me parece uma boa ideia.
+                
+                //#todo: deprecate
+                // Não temos um wm em ring3, usamos o de ring0.
+                // mesmos sem scanearmos o kernel vai exibir o ponteiro
+                if ( UseRing3WindowManager != TRUE ){
+                    //#debug
+                    //printf ("Scanning\n"); refresh_screen();
+                    //kgwm_mouse_scan_windows();
+                }
+                
+                
+                //#todo
+                //pegar as informações que mandaremos para o
+                //window manager,
+                
+                // send this data to the window manager.
+                //buffer_mouse[0]
+                //buffer_mouse[1]
+                //buffer_mouse[2]
+               
+                // control thread do window manager.
+                // então vamos usar o window manager que esta em ring3.
+                // Essas mensagens podem sobrecarregar a fila.
+                // precisamso de uma solução elegante pra isso,
+                // normalmente checa-se a mensagem anterior e 
+                // muda um contador.
+                if ( UseRing3WindowManager == TRUE ){
+                
+                    //#debug
+                    //printf ("Sending message\n"); refresh_screen();
+                    
+                    // paranoia: check again
+                    if ( (void *) wmThread == NULL )                     { panic("DeviceInterface_PS2Mouse: 2 wmThread\n"); }
+                    if ( wmThread->used != 1 || wmThread->magic != 1234 ){ panic("DeviceInterface_PS2Mouse: 2 wmThread validation\n"); }
+                    
+                    //send the message to the widnow manager.
+                    wmThread->window_list[ wmThread->tail_pos ] = NULL;
+                    wmThread->msg_list[    wmThread->tail_pos ] = 44216;
+                    wmThread->long1_list[  wmThread->tail_pos ] = buffer_mouse[0];
+                    wmThread->long2_list[  wmThread->tail_pos ] = buffer_mouse[1];
+                    wmThread->long3_list[  wmThread->tail_pos ] = buffer_mouse[2];
+
+                    // Circulando
+                    wmThread->tail_pos++;
+                    if ( wmThread->tail_pos >= 31 ){
+                        wmThread->tail_pos = 0;
+                    }
+                    
+                }
             }
 
-            
+
             // O driver precisa do old pra configurar a variável de ação.
             // #todo Talvez precise de outras
             

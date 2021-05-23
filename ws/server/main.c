@@ -2360,14 +2360,15 @@ int main (int argc, char **argv)
         if ( window_server->launch_first_client == TRUE )
         {
             // #todo: Get the status.
-            gwssrv_clone_and_execute ("logon.bin");
+            gwssrv_clone_and_execute ("gwm.bin");
+            //gwssrv_clone_and_execute ("logon.bin");
         }
 
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
-        
-        for (i=0; i<22; i++)
-        {
+
+        // #bugbug: too much?
+        for (i=0; i<22; i++){
             gwssrv_yield();
         };
 
@@ -2426,7 +2427,7 @@ int main (int argc, char **argv)
         frames_count = 0;
         fps = 0;
  
-        while (running == 1)
+        while (running == TRUE)
         {
             // Se tem ou não retângulos sujos.
             // #bugbug: Talvez isso seja trabalho do window manager.

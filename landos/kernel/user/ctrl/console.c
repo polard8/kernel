@@ -1880,7 +1880,6 @@ int VirtualConsole_initialize(void)
 // See: keyboard.c and serial.c
 // Called by DeviceInterface_PS2Keyboard() in ps2kbd.c
 
-
 void 
 console_interrupt(
     int target_thread, 

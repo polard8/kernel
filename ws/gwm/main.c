@@ -358,6 +358,13 @@ gwmProcedure (
 
     switch (msg){
 
+        // Enviada pelo kernel para eentos de mouse,
+        // receberemos o pacote com 3 longs.
+        case 44216:
+            //printf ("gwm: mouse event\n");
+            return 0;
+            break;
+
         case MSG_KEYDOWN:
             switch(long1){
                 case VK_TAB:  update(fd);  break;

@@ -380,20 +380,20 @@ all-c:
 # == user ======== 
 #
 
-	$(CC) -c user/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
-	$(CC) -c user/sci.c       $(KINCLUDE) $(CFLAGS) -o sci.o
+#
+# Controller
+#
+
+	# System call interface and user call interface.
+	$(CC) -c user/ctrl/sci.c       $(KINCLUDE) $(CFLAGS) -o sci.o
+	$(CC) -c user/ctrl/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
+
 	$(CC) -c user/terminal.c  $(KINCLUDE) $(CFLAGS) -o terminal.o
 	$(CC) -c user/vt.c        $(KINCLUDE) $(CFLAGS) -o vt.o
 	$(CC) -c user/dialog.c    $(KINCLUDE) $(CFLAGS) -o dialog.o
-
-	# Draw - kgws
-	# Window Manager.
-	# Window system ring 0 support.
-	# model business logic
-
-	$(CC) -c user/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
-	$(CC) -c user/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
-	$(CC) -c user/wm.c    $(KINCLUDE) $(CFLAGS) -o wm.o
+	$(CC) -c user/kgwm.c      $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c user/kgws.c      $(KINCLUDE) $(CFLAGS) -o kgws.o
+	$(CC) -c user/wm.c        $(KINCLUDE) $(CFLAGS) -o wm.o
 
 	# data model
 
