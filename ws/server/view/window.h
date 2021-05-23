@@ -1030,9 +1030,9 @@ struct gws_surface_d
     int used;
     int magic;
     
-    // Pointer to the window
+    // Pointer to the window in kgws.
     // Redirection?
-    void *kgws_window;
+    void *window_object;
     
     unsigned long left;
     unsigned long top;
@@ -1058,6 +1058,12 @@ struct gws_surface_d *rootSurface;
 // == prototypes =====================================================
 //
 
+struct gws_surface_d *xxxCreateSurface( 
+    unsigned long left,
+    unsigned long top,
+    unsigned long width,
+    unsigned long height,
+    unsigned long color );
 
 
 void wm_process_windows(void);
@@ -1227,6 +1233,22 @@ copy_offset_rect (
 int gws_show_window_rect (struct gws_window_d *window);
 
 
+void *xxxCreateSurfaceWindow( 
+    unsigned long type,        // 1, Tipo de janela (popup,normal,...)
+    unsigned long status,      // 2, Estado da janela (ativa ou nao)
+    unsigned long view,        // 3, (min, max ...)
+    char *windowname,          // 4, Título. 
+    unsigned long x,           // 5, Deslocamento em relação às margens do Desktop. 
+    unsigned long y,           // 6, Deslocamento em relação às margens do Desktop.
+    unsigned long width,       // 7, Largura da janela.
+    unsigned long height,      // 8, Altura da janela.
+    void *pSurfaceWindow,      // 9, Endereço da estrutura da janela mãe.
+    unsigned long desktop_id,  //10, Desktop id.
+    unsigned long clientcolor, //11, Cor da área de cliente
+    unsigned long color );      //12, Color (bg) (para janela simples).
+
+
+
 void demoTerry(void);
 
 struct gws_window_d *createwCreateRootWindow(void);
@@ -1262,8 +1284,6 @@ void *xxxCreateWindow (
     int desktopid, 
     unsigned long clientcolor, 
     unsigned long color ) ;
-
-
 
 
 // Essa será a função que atenderá a interrupção

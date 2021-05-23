@@ -1200,7 +1200,7 @@ void *gde_create_window (
     unsigned long color )      //12, Color (bg) (para janela simples).
 { 
 
-    struct window_d *Window;
+    struct window_d  *wObjectPointer;
 
 	// Enviando tudo via argumento.
 	// Esse método dá a possibilidade de enviarmos ainda 
@@ -1231,14 +1231,14 @@ void *gde_create_window (
     // #bugbug
     // Maybe we need to use sc82()
 
-    Window = (void *) system_call ( 
+    wObjectPointer = (void *) system_call ( 
                           118 , 
                           (unsigned long) &message_buffer[0], 
                           (unsigned long) &message_buffer[0], 
                           (unsigned long) &message_buffer[0] );
 
-    if ( (void *) Window == NULL ){
-        gde_debug_print ("gde_create_window: [FAIL] Window\n");
+    if ( (void *) wObjectPointer == NULL ){
+        gde_debug_print ("gde_create_window: [FAIL] wObjectPointer\n");
         return NULL;  
     }
 
@@ -1247,7 +1247,7 @@ void *gde_create_window (
     // Vamos enviar a mensagem MSG_CREATE para o procedimento de janela.
     // Assim ele pode terminar de pintar nessa mesma janela.
 
-    return (void *) Window;    
+    return (void *) wObjectPointer;    
 }
 
 

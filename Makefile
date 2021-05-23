@@ -2,10 +2,10 @@
 # Product configuration
 # See: 0config/version.h
 PRODUCT_NAME  = Gramado
-EDITION_NAME  = Land
+EDITION_NAME  = ?
 VERSION_MAJOR = 1
-VERSION_MINOR = 0
-VERSION_BUILD = 239
+VERSION_MINOR = 1
+VERSION_BUILD = 240
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Documentation
@@ -188,13 +188,6 @@ land-setup:
 	$(Q) $(MAKE) -C landos/setup/
 
 	sudo cp landos/setup/bin/GDESHELL.BIN  base/
-	sudo cp landos/setup/bin/LAUNCHER.BIN  base/
-	sudo cp landos/setup/bin/SYSMON.BIN    base/
-	sudo cp landos/setup/bin/GRAMCODE.BIN  base/
-
-	-sudo cp landos/setup/bin/GFE.BIN      base/
-	-sudo cp landos/setup/bin/REBOOT2.BIN  base/
-	-sudo cp landos/setup/bin/REBOOT3.BIN  base/
 
 	#sudo cp landos/setup/bin/C4.BIN       base/
 	#sudo cp landos/setup/bin/GRAMC.BIN    base/

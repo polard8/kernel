@@ -3554,9 +3554,9 @@ done:
         
         // Top of the screen ?
         printf("\f");
-        printf("GRAMADO OS 1.0");
+        printf("GRAMADO OS 1.1");
         printf("\n");
-        
+
         printf("______________");
         printf("\n");
         

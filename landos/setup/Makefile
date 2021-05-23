@@ -1,31 +1,20 @@
 
+# history:
+# Deleting all the apps the creates windows using the
+# kgws resources.
 
 all: 
 
+	# the library.
 	make -C libcore
 
-	# launcher
-	# The redpill makes the system initializes here.
-	make -C launcher
-
-	# launcher's itens
+	# These apps do not create windows.
 	make -C gdeshell
-	make -C gramcode
-	make -C sysmon
-	# ...
-
-
-	# compilers and interpreter
 	make -C c4
 	make -C gramc
 	make -C gramc4
 	make -C gramcnf
-	
-	# extra
-	make -C gfe
-	make -C reboot2
-	make -C reboot3
-	
+
 	# Clean libcore
 	-rm -rf libcore/obj/*.o
 	
