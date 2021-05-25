@@ -8,18 +8,11 @@ all:
 	make -C client    
 
 # clients
-
-
-# main clients.
-	make -C logon
 	make -C gwm
-
-# Well tested clients
+	make -C logon
 	make -C editor
 	make -C fileman
 	make -C terminal  
-
-# Extra clients
 	make -C browser
 
 

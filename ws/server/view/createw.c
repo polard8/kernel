@@ -35,9 +35,55 @@
 #include <gws.h>
 
 
+// habilitando/desabilitando globalmente 
+// alguns componentes da janela
+
+int gUseShadow = TRUE;
+int gUseFrame = TRUE;
+//int gUseShadow = TRUE;
+// ...
+
+// #todo
+// Essas rotina serão chamada pelo request assincrono sem resposta.
 
 /*
- *******************************************************************
+void useShadow( int value );
+void useShadow( int value )
+{
+    // Ativando.
+    if ( value == TRUE ){
+        gUseShadow = TRUE;
+        return;
+    }
+
+    gUseShadow = FALSE;
+}
+*/
+
+/*
+void useFrame( int value );
+void useFrame( int value )
+{
+    // Ativando.
+    if ( value == TRUE ){
+        gUseFrame = TRUE;
+        return;
+    }
+
+    // No frames.
+    // It means that the loadable window manager 
+    // will create some kind of frames for all the windows, or not.
+    
+    gUseFrame = FALSE;
+}
+*/
+
+
+
+
+
+/*
+ *************************************************************
  * xxxCreateSurfaceWindow: 
  * 
  *     Cria uma janela com base em uma struct.

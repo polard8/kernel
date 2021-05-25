@@ -3731,12 +3731,16 @@ gws_default_procedure (
 {
 
     gws_debug_print ("gws_default_procedure:\n");
-    
-    if (fd<0)
-        return -1;
 
-    if (msg<0)
-        return -1;
+
+    if (fd<0){
+        return (int) (-1);
+    }
+
+
+    if (msg<0){
+        return 0;
+    }
 
     //
     // Messages
@@ -3746,13 +3750,54 @@ gws_default_procedure (
     // mensagens que interessam ao window manager 
     // dentro do window server.
     
+    // #todo
+    // Algumas chamadas de sistema podem ficar aqui,
+    // como client shutdown e coisas do tipo.
+    // Some menu stuff?
+    // Changes in the title bar... new text... redraw the bar.
+    // + close window.
+    // + F1: caso o aplicativo n~ao interceptou f1, mostraremos ajuda.
+    // foco na janela ou ativar.
+    // window position, window size.
+    // Set cursor. (that text cursor.)
+    // show window. (refresh)
+    // sysmenu, control menu
+    // copy global data.
+    // Change UI state.
+    
     switch (msg){
+
+    // ...
+
+    // Close process
+    case MSG_CLOSE:
+        // Para que o diálogo default feche o aplicativo,
+        // esse parâmetro não pode ser '0'.
+        // Se o kernel quiser fechar a aplicação, então tem que
+        // colocar algum valor aqui.
+        if (long1 != 0){
+            exit(0);
+        }
+        return 0;
+        break;
+
+
+    // #bugbug
+    // Nesse caso podemos ter duplicidade de tratamento,
+    // com o aplicativo fazendo um tratamento antes desse.
 
     case MSG_SYSKEYDOWN:
         switch (long1){
+
+            case VK_F1:
+                //printf("gsw_default_procedure: #todo Help\n");
+                return 0;
+                break;
+
             case VK_F12:
-                printf("gsw_default_procedure: VK_F12\n");
-                gws_async_command(fd,8,1,1);
+                //printf("gsw_default_procedure: VK_F12\n");
+                //gws_async_command(fd,8,1,1);
+                return 0;
                 break;
         };
         break;

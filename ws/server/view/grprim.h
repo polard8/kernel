@@ -291,6 +291,14 @@ grPlot0 (
     int y, 
     unsigned long color );
 
+int 
+grPlot1 ( 
+    struct gws_window_d *clipping_window,   
+    int x, 
+    int y, 
+    int z, 
+    unsigned long color,
+    unsigned long flags );
 
 int serviceGrPlot0(void);
 
@@ -323,6 +331,8 @@ plotQuadBezierSeg (
 // == rectangle =======================================
 //
 
+
+
 void
 rectangle (
     int left, int top, 
@@ -336,8 +346,8 @@ rectangleZ (
     unsigned long color,
     int z );
 
-
 void rectangleZZ( struct gr_rectangle_d *rect );
+int grRectangle( struct gr_rectangle_d *rect );
 
 void
 ras_rectangleZ (
@@ -351,13 +361,13 @@ int serviceGrRectangle(void);
 
 
 
-
 //
 // == triangle =====================================================
 //
 
 int xxxTriangleZ ( struct gr_triandle_d *triangle );
 
+int grTriangle( struct gr_triandle_d *triangle);
 
 //
 // == polygon =====================================================

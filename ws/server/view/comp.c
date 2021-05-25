@@ -4,7 +4,10 @@
 // window server routines.
 #include <gws.h>
 
-
+// #todo
+// Create some configuration globals here
+// int gUseSomething = TRUE;
+// ...
 
 /*
  * compositor:

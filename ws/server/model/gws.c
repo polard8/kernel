@@ -490,6 +490,7 @@ int gwsInit(void)
         
         DeviceScreen->pitch = ( SavedX * (SavedBPP/8) );
 
+        // #todo: Cuidado, não queremos divisão por zero.
         DeviceScreen->font_size   = 0;    //todo
         DeviceScreen->char_width  = 0;    //todo
         DeviceScreen->char_height = 0;    //todo
@@ -526,8 +527,7 @@ int gwsInit(void)
         // The device screen will be the valid screen for now.
         // Save the device screen in the diplay structure.
 
-        if ( (void *) CurrentDisplay != NULL )
-        {
+        if ( (void *) CurrentDisplay != NULL ){
             CurrentDisplay->device_screen = DeviceScreen;
             CurrentDisplay->valid_screen  = DeviceScreen;
         }
@@ -621,6 +621,7 @@ int gwsInit(void)
     
     gwssrv_show_backbuffer();
     
+    // Validate the frame.
     validate();
     
     return 0;

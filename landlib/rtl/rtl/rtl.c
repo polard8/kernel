@@ -171,9 +171,10 @@ int xxxScanApplicationQueue(void)
     // Clean
     RTLEventBuffer[0] = 0;
     RTLEventBuffer[1] = 0;
-    RTLEventBuffer[2] = 0;
-    RTLEventBuffer[3] = 0;
-
+    RTLEventBuffer[2] = 0;  //long1
+    RTLEventBuffer[3] = 0;  //long2
+    RTLEventBuffer[4] = 0;  //long3
+ 
     // Get event from the thread's event queue.
     rtl_enter_critical_section(); 
     gramado_system_call ( 111,
@@ -196,8 +197,9 @@ int xxxScanApplicationQueue(void)
 
         RTLEventBuffer[0] = 0;
         RTLEventBuffer[1] = 0;
-        RTLEventBuffer[2] = 0;
-        RTLEventBuffer[3] = 0;
+        RTLEventBuffer[2] = 0;  //long1
+        RTLEventBuffer[3] = 0;  //long2
+        RTLEventBuffer[4] = 0;  //long3
 
         return FALSE;
     }

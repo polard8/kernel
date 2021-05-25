@@ -212,23 +212,20 @@ gramado-ws:
 	@echo "Compiling Gramado WS and some clients"
 	$(Q) $(MAKE) -C ws/
 
-	# ws and some clients
-
-# server and main client.
-	-sudo cp ws/bin/GWS.BIN       base/ 
+# Server and main client.
 	-sudo cp ws/bin/GWSSRV.BIN    base/
+	-sudo cp ws/bin/GWS.BIN       base/ 
 
-# Main clients
-	-sudo cp ws/bin/LOGON.BIN     base/
+# Clients
 	-sudo cp ws/bin/GWM.BIN       base/
-
-# well teste clients
+	-sudo cp ws/bin/LOGON.BIN     base/
 	-sudo cp ws/bin/EDITOR.BIN    base/
 	-sudo cp ws/bin/TERMINAL.BIN  base/
 	-sudo cp ws/bin/FILEMAN.BIN   base/
+	-sudo cp ws/bin/BROWSER.BIN   base/
 
-# extra clients
-	-sudo cp ws/bin/*.BIN        base/PROGRAMS/
+# Copy the clients in another folder.
+	-sudo cp ws/bin/*.BIN    base/PROGRAMS/
 
 
 gramado-services:
@@ -237,8 +234,8 @@ gramado-services:
 	@echo "Compiling hard..."
 	$(Q) $(MAKE) -C services/gnssrv/ 
 	# gns
-	-sudo cp services/gnssrv/bin/GNS.BIN     base/
 	-sudo cp services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp services/gnssrv/bin/GNS.BIN     base/
 
 #========================================
 

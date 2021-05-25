@@ -184,7 +184,8 @@ gwmProcedure (
     int window, 
     int msg, 
     unsigned long long1, 
-    unsigned long long2 );
+    unsigned long long2,
+    unsigned long long3 );
 
 
 
@@ -349,7 +350,8 @@ gwmProcedure (
     int window, 
     int msg, 
     unsigned long long1, 
-    unsigned long long2 )
+    unsigned long long2,
+    unsigned long long3 )
 {
     //printf ("gwmProcedure:\n");
 
@@ -361,7 +363,9 @@ gwmProcedure (
         // Enviada pelo kernel para eentos de mouse,
         // receberemos o pacote com 3 longs.
         case 44216:
-            //printf ("gwm: mouse event\n");
+            //printf ("gwm: mouse event %d %d %d\n", long1, long2, long3);
+            //parse_data_packet(
+            //    fd, (char) long1, (char) long2, (char) long3 );
             return 0;
             break;
 
@@ -550,7 +554,7 @@ void parse_data_packet (int fd, char data, char x, char y)
     // == Update mouse position ====================
     //
     
-    update_mouse (); 
+    update_mouse(); 
     
     // Agora vamos manipular os valores obtidos através da 
     // função de atualização dos valores.
@@ -561,14 +565,19 @@ void parse_data_packet (int fd, char data, char x, char y)
 
 
 
-    if ( MOUSE_WINDOW > 0 ){
+    // #bugbug #todo
+    // Provavelmente algo esta errado com o id da janela.
 
-        gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
+    //if ( MOUSE_WINDOW > 0 ){
+
+        //gws_change_window_position(fd,MOUSE_WINDOW, mouse_x, mouse_y);
         //gws_change_window_position(fd,c_tester->title_window, i*10, i*10);
 
-        gws_redraw_window(fd,MOUSE_WINDOW,1); 
+        //gws_redraw_window(fd,MOUSE_WINDOW,TRUE); 
         //gws_redraw_window(fd,c_tester->title_window,1); 
-    }
+    
+         printf ("x=%d y=%d\n",mouse_x,mouse_y);
+    //}
 }
 
 
@@ -807,7 +816,7 @@ int create_bg_client(int fd)
     unsigned long h = gws_get_system_metrics(2);
 
     int hasMouseWindow = FALSE;
-
+    //int hasMouseWindow = TRUE;
 
     savedW = w;
     savedH = h;
@@ -816,9 +825,9 @@ int create_bg_client(int fd)
         //return -1;
 
 
-    //Setup hot spot.
-    hot_spot.x = (w/2);
-    hot_spot.y = (h/2);
+    // Setup hotspot
+    hot_spot.x = (w>>1);
+    hot_spot.y = (h>>1);
 
 
     //
@@ -845,7 +854,7 @@ int create_bg_client(int fd)
         c_bg->window = gws_create_window (fd,
             WT_SIMPLE,1,1,"Background",
             0, 0, w, h,
-            0,0, COLOR_BACKGROUND, COLOR_BACKGROUND); 
+            0, 0, COLOR_BACKGROUND, COLOR_BACKGROUND ); 
         
         if (c_bg->window < 0){
             printf ("gwm: c_bg->window fail\n");
@@ -857,24 +866,26 @@ int create_bg_client(int fd)
         wmClientList[0] = (unsigned long) c_bg;
     };
 
-    //
-    // == Mouse window ==================
-    //
 
-    if (hasMouseWindow==TRUE){
+//
+// == Mouse window ==================
+//
 
-    // Window.
-    MOUSE_WINDOW = gws_create_window (
-                       fd,
-                       WT_SIMPLE,1,1,"Mouse",
-                       hot_spot.x, hot_spot.y, 4, 4,
-                       0, 0, COLOR_BLACK, COLOR_BLACK );
+    if (hasMouseWindow==TRUE)
+    {
+        // Window
+        MOUSE_WINDOW = gws_create_window (
+                           fd,
+                           WT_SIMPLE, 1, 1, "Mouse",
+                           hot_spot.x, hot_spot.y, 4, 4,
+                           0, 0, COLOR_BLACK, COLOR_BLACK );
 
-    if ( MOUSE_WINDOW < 0){
-        printf ("gwm: MOUSE_WINDOW fail\n");
-        exit(1);
+        if ( MOUSE_WINDOW < 0){
+            printf ("gwm: MOUSE_WINDOW fail\n");
+            exit(1);
+        }
     }
-    }
+
 
     return 0;
 }
@@ -1423,8 +1434,9 @@ int main ( int argc, char *argv[] ){
                 client_fd,
                 RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
-                RTLEventBuffer[2], 
-                RTLEventBuffer[3] );
+                RTLEventBuffer[2],     //long1 
+                RTLEventBuffer[3],     //long2
+                RTLEventBuffer[4] );   //long3
         }
     };
     //=================================

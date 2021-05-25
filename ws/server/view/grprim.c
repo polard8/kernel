@@ -19,6 +19,14 @@
 // ...
 
 
+// #todo
+// Create some configuration globals here
+// int gUseSomething = TRUE;
+// int gUseRaytracing = TRUE;
+// ...
+
+
+
 // ====
 /*
  * Transformations: 
@@ -110,21 +118,26 @@ static unsigned long HotSpotY=0;
 
 int grInit (void)
 {
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
+
+    unsigned long deviceWidth  = gws_get_device_width();
+    unsigned long deviceHeight = gws_get_device_height();
 
 
     gwssrv_debug_print ("grInit:\n");
 
-    if ( w == 0 || h == 0 ){
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         printf ("grInit: [FAIL] w h\n");
         exit(1);
     }
 
-    //HotSpotX = (w/2);
-    //HotSpotY = (h/2);
-    HotSpotX = (w>>1);
-    HotSpotY = (h>>1);
+    // center of the screen.
+    // #todo: 
+    // We need the option to put the hotspot 
+    // at the center of the window.
+    
+    HotSpotX = (deviceWidth>>1);
+    HotSpotY = (deviceHeight>>1);
+
 
 //
 // == Camera ==========
@@ -165,11 +178,11 @@ int grInit (void)
 
 int camera_initialize(void)
 {
+
     CurrentCamera = (void *) malloc ( sizeof( struct gr_camera_d ) );
-    
-    if ( (void*) CurrentCamera == NULL )
-    {
-        printf("camera_initialize fail\n");
+
+    if ( (void*) CurrentCamera == NULL ){
+        printf("camera_initialize: fail\n");
         exit(1);
     }
     
@@ -311,7 +324,9 @@ gr_clamp(
  ******************************* 
  * grPlot0:
  *      plot pixel.
+ *      Low level routine.
  *      Plot into a normalized screen. kinda.
+ *      #new: Plotting into a clipping window.
  */
 
 // low level plot.
@@ -327,7 +342,6 @@ gr_clamp(
 // O limite máximo será modular.
 
 // 3D fullscreen, origin in center.
-
 
 int 
 grPlot0 ( 
@@ -397,7 +411,7 @@ grPlot0 (
 
 
 //
-// The clippping window.
+// The clipping window.
 //
 
     struct gws_window_d *w;
@@ -540,18 +554,16 @@ grPlot0 (
         goto draw;
     }
 
-    //
-    // fail
-    //
-    
-    Draw = FALSE;
-    
-    return -1;
+    // Fail
 
-    //
-    // draw
-    //
-    
+    Draw = FALSE;
+
+    return (-1);
+
+//
+// Draw
+//
+
 draw:
     
     //
@@ -594,10 +606,10 @@ draw:
             if ( UseClipping == TRUE ){
                 if ( X >= w->left  &&
                      X <= w->right &&
-                     Y >= w->top  &&
+                     Y >= w->top   &&
                      Y <= w->bottom )
                  {
-                     pixelBackBufferPutpixel ( color, X, Y ); 
+                     pixelBackBufferPutpixel(color,X,Y); 
                  }
             }
             
@@ -613,12 +625,71 @@ draw:
         }
         return -1;
     }
-    
-    // fail 
-    
-    return -1;
+
+// Fail 
+
+    return (-1);
 }
 
+
+// plot with graphics effects. use flags.
+int 
+grPlot1 ( 
+    struct gws_window_d *clipping_window,   
+    int x, 
+    int y, 
+    int z, 
+    unsigned long color,
+    unsigned long flags )
+{
+
+    //#todo
+    //Describe the flags.
+
+    int xValue = 0;
+    int yValue = 0;
+    int zValue = 0;
+    unsigned long colorValue = 0;
+
+
+    int fBlack=FALSE;  // black pixel
+    int fNoZBuffer = FALSE;
+    // ...
+
+    // No graphics effects;
+    if ( flags == 0 )
+    {
+        xValue = x;
+        yValue = y;
+        zValue = z;
+        colorValue = color;
+        goto PlotPixel;
+    }
+
+    // #todo #test
+    // plot pixel using the caes in fx.
+    
+    if ( flags & 0x00000001 )
+    {
+        fBlack = TRUE;
+        colorValue = (unsigned long) 0x00000000;
+    }
+
+    if ( flags & 0x00000020 )
+    {
+        fNoZBuffer = TRUE;
+        zValue = 0;
+    }
+
+    // ...
+
+PlotPixel:
+
+    return (int) grPlot0 ( 
+                     clipping_window, 
+                     zValue, xValue, yValue, 
+                     colorValue );
+}
 
 // #todo
 // See: gwsProcedure(), service 2040 in main.c
@@ -757,17 +828,16 @@ plotLine3d2 (
     x1 = (dm >> 1);
     y1 = x1;
     z1 = x1;
-    
 
     // nothing for now;
     // interpolation flag.
     flag=0;
 
 
-    //
-    // Loop 
-    //
-       
+//
+// Loop 
+//
+
     for (;;) {  
 
         grPlot0 ( NULL, z0, x0, y0, color1 );
@@ -777,7 +847,7 @@ plotLine3d2 (
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
         y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
         z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
-    }
+    };
 }
 
 
@@ -790,6 +860,10 @@ rectangle (
     int right, int bottom,
     unsigned long color )
 {
+
+    // #todo
+    // Check validation
+    // if (left<0 ...
 
     // cima
     plotLine3d ( left, top, 0, right, top, 0, color );
@@ -810,6 +884,10 @@ rectangleZ (
     unsigned long color,
     int z )
 {
+    // #todo
+    // Check validation
+    // if (left<0 ...
+    
     // cima
     plotLine3d ( left, top,  z, right, top, z, color );
     // baixo
@@ -823,8 +901,13 @@ rectangleZ (
 
 void rectangleZZ ( struct gr_rectangle_d *rect )
 {
-    if ( (void*) rect == NULL )
-        return -1;
+    if ( (void*) rect == NULL ){
+        return;
+    }
+
+
+    // #todo
+    // Check the validation of the values in the structure.
 
 
       // points
@@ -854,7 +937,11 @@ void rectangleZZ ( struct gr_rectangle_d *rect )
                    rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 0 );
 }
 
-
+int grRectangle( struct gr_rectangle_d *rect )
+{
+    rectangleZZ(rect);
+    return 0;
+}
 
 // Rectangle rasterization using lines.
 // It applies only on few cases.
@@ -889,11 +976,14 @@ ras_rectangleZ (
 
 
 // Scaling: Inflate cube.
-int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
+int 
+xxxInflateCubeZ ( 
+    struct gr_cube_d *cube, 
+    int value )
 {
 
     if ( (void*) cube == NULL ){
-        return -1;
+        return (-1);
     }
 
     //int value = z;
@@ -932,12 +1022,15 @@ int xxxInflateCubeZ ( struct gr_cube_d *cube, int value )
     cube->p[7].x = (cube->p[7].x - value);
     cube->p[7].y = (cube->p[7].y - value);
     cube->p[7].z = (cube->p[7].z + value);
-        
+
     return 0;
 }
 
 // Scaling: Deflate cube.
-int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value )
+int 
+xxxDeflateCubeZ ( 
+    struct gr_cube_d *cube, 
+    int value )
 {
     if ( (void*) cube == NULL ){
         return -1;
@@ -1010,6 +1103,19 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
 
     return 0;
 }
+
+int grTriangle( struct gr_triandle_d *triangle)
+{
+    int Status=0;
+    
+    // #todo
+    // something
+  
+    Status = (int) xxxTriangleZ(triangle);
+    
+    return Status;
+}
+
 
 
 // Polyline
@@ -1137,6 +1243,7 @@ fail:
 
 int xxxCubeZ ( struct gr_cube_d *cube )
 {
+    // #todo: Comment these variables.
     int h=0;
     int d=0;
     int i=0;
@@ -1273,10 +1380,13 @@ int xxxCubeZ ( struct gr_cube_d *cube )
     // p0 = left top 
     // p2 = right bottom
     if (UseRasterization == TRUE){
-    ras_rectangleZ (  
-        cube->p[0].x, cube->p[0].y, cube->p[0].z, 
-        cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[0].color );
+        ras_rectangleZ (  
+            cube->p[0].x, cube->p[0].y, cube->p[0].z, 
+            cube->p[2].x, cube->p[2].y, cube->p[2].z, cube->p[0].color );
     }
+    
+    // ok
+    return 0;
 }
 
 
@@ -1292,10 +1402,10 @@ int serviceGrCubeZ(void)
 
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     
+    struct gr_cube_d cube;
+
     
     gwssrv_debug_print("serviceGrCubeZ: [2041]\n");
-
-    struct gr_cube_d cube;
 
     // Circular, sentido horário.
 
@@ -1360,10 +1470,9 @@ int serviceGrRectangle(void)
 
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     
-    
-    gwssrv_debug_print("serviceGrRectangle: [2042]\n");
-    
     struct gr_rectangle_d rect;
+
+    gwssrv_debug_print("serviceGrRectangle: [2042]\n");
    
     //south     
     rect.p[0].x = message_address[10];
@@ -1655,7 +1764,7 @@ void noraDrawingStuff(void)
         {
             if ( x != 0 ){
                 if ( (y % x) == 0 ){
-                    pixelBackBufferPutpixel ( COLOR_BLACK, x, y ); 
+                    pixelBackBufferPutpixel(COLOR_BLACK,x,y); 
                 }
             }
         };
@@ -1663,6 +1772,7 @@ void noraDrawingStuff(void)
         if ( x >= SavedY ) { break; }
     };
 }
+
 
 /*
  ********************************************************
@@ -1677,12 +1787,8 @@ void noraDrawingStuff3 (int x, int y, int z)
     register int _y=0;
     register int _z = z;
 
-    //int limitX = SavedX/2;
-    //int limitY = SavedY/2;
-
     int limitX = (SavedX >> 1);
     int limitY = (SavedY >> 1);
-
 
     // colunas.
     for (_x=x; _x<limitX; _x++)    
@@ -1974,6 +2080,8 @@ plotCharBackbufferDrawcharTransparent (
 // Talvez devamos pegá-las antes e não 
 // referenciá-las diretamente.
 
+// root surface?
+
 void 
 plotCharBackbufferDrawcharTransparentZ ( 
     unsigned long x, 
@@ -2015,7 +2123,7 @@ plotCharBackbufferDrawcharTransparentZ (
 		
 		// #debug
 		// Estamos parando para testes.
-		
+
         printf ("gws_drawchar_transparent : Initialization fail\n");
         while(1){}
     }
@@ -2119,23 +2227,25 @@ void grDCMono (
 
     printf ("grDCMono:\n");
 
-    // Device context
-    if ( (void *) dc == NULL )
-    {
+
+//
+// Device context
+//
+
+    if ( (void *) dc == NULL ){
         printf ("dc\n");
         return;
-     }
+    }
 
-    if (dc->used != 1 || dc->magic != 1234 )
+    if (dc->used != TRUE || dc->magic != 1234 )
     {
         printf ("dc validation\n");
         return;
-     }
+    }
 
-
-    //
-    // Device screen
-    //
+//
+// Device screen
+//
 
     Screen = dc->device_screen;
 
@@ -2144,10 +2254,11 @@ void grDCMono (
         return;
     }
 
-    if (Screen->used != 1 || Screen->magic != 1234 ){
+    if (Screen->used != TRUE || Screen->magic != 1234 ){
         printf ("Screen validation\n");
         return;
     }
+
 
     // 3 BPP
     if (Screen->bpp == 24) {
@@ -2166,6 +2277,11 @@ void grDCMono (
                 *dst++ = subpixel_false_color;
             };
         };
+    }
+
+    //??
+    if (Screen->bpp != 24) {
+        printf ("not 24bpp\n");
     }
 }
 
@@ -2225,10 +2341,9 @@ void grDCColorChg (
 }
 
 
-
-
-//Bézier curve
-//This program example plots a quadratic Bézier curve limited to gradients without sign change.
+// Bézier curve
+// This program example plots a quadratic Bézier curve 
+// limited to gradients without sign change.
 
 void 
 plotQuadBezierSeg ( 
@@ -2309,6 +2424,24 @@ plotQuadBezierSeg (
         x2,y2,z2, 
         color ); 
 }
+
+
+/*
+ #todo
+ substitui uma cor por outra dentro de uma janela.
+void 
+xxxFindReplaceColor( 
+    struct gws_window_d *window, 
+    unsigned long color1, 
+    unsigned long color2);
+void 
+xxxFindReplaceColor( 
+    struct gws_window_d *window, 
+    unsigned long color1, 
+    unsigned long color2)
+{
+}
+*/
 
 
 

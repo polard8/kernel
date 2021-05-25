@@ -6522,17 +6522,13 @@ int openGramado(void)
 
     case GDE_GRAMADO_JAIL:
     case GDE_GRAMADO_P1:
-        Status = (int) gde_clone_and_execute("gwssrv.bin");
-        break;
-
     case GDE_GRAMADO_HOME:
     case GDE_GRAMADO_P2:
     case GDE_GRAMADO_CASTLE:
+        Status = (int) gde_clone_and_execute("gwssrv.bin");
     case GDE_GRAMADO_CALIFORNIA:
-        Status = (int) gde_clone_and_execute("launcher.bin");
-        break;
-
     default:
+        printf("openGramado: Oh boy!\n");
         return -1;
         break;
     };

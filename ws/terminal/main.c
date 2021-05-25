@@ -2162,11 +2162,12 @@ void _draw(int fd, int c)
                 //terminal_drawchar_response((int) fd);
 }
 
+
 // local
 int 
 terminalProcedure ( 
     int fd,
-    void *window, 
+    int window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -2217,9 +2218,14 @@ terminalProcedure (
         }
     }
 
-    return 0;
-}
 
+    return (int) gws_default_procedure ( 
+                     fd, 
+                     (int) window, 
+                     msg, 
+                     long1, 
+                     long2 );
+}
 
 
 //

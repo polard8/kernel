@@ -1282,7 +1282,24 @@ int register_ws_process ( pid_t pid )
 }
 
 
+/*
+// #todo New wrapper for KGWS_initialize
+int user_initialize(void);
+int user_initialize(void)
+{
+    int Status = -1;
+
+    // #todo
+    // Maybe we can use some parametes here.
+    Status = KGWS_initialize();
+
+    return Status;
+}
+*/
+
 // called by x86/x86init.c
+// #todo
+// Maybe we can use some parametes here.
 int KGWS_initialize(void)
 {
     // Logon. 

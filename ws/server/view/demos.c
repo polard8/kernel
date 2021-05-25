@@ -4,6 +4,9 @@
 #include <gws.h>
 
 
+int gUseDemos = TRUE;
+
+
 void demoClear(void)
 {
     // #todo
