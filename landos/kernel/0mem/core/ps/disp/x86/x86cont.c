@@ -1,5 +1,5 @@
 /*
- * File: ps/disp/x86cont.c
+ * File: ps/disp/x86/x86cont.c
  *
  * Context switching:
  * Saving and restoring the x86 cpu context.
@@ -7,7 +7,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     //...
  */
 
 
@@ -92,7 +91,7 @@ unsigned long contextEBP;
 
 void save_current_context (void){
 
-    struct thread_d *t;
+    struct thread_d  *t;
 
     // Context.
 	unsigned long *contextss  = (unsigned long *) &contextSS;
@@ -119,25 +118,22 @@ void save_current_context (void){
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         printk ("save_current_context: TID=%d\n", current_thread );
-        die ();
+        goto fail0;
     }
 
     t = (void *) threadList[current_thread];
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         printf ("save_current_context: [ERROR] Struct Thread={%d}\n",
             current_thread );
-        show_process_information ();    
-        die ();
+        goto fail1;
     }
 
     if ( t->used != TRUE || t->magic != 1234 )
     {
         printf ("save_current_context: [ERROR] Validation Thread={%d}\n",
             current_thread );
-        show_process_information ();    
-        die();
+        goto fail1;
     }
 
     // Fill the structure.
@@ -164,8 +160,14 @@ void save_current_context (void){
     t->ebp = (unsigned long) contextebp[0];
 
     // ...
-}
 
+//done:
+    return;
+fail1:
+    show_process_information();
+fail0:
+    die();
+}
 
 
 /*
@@ -207,29 +209,26 @@ void restore_current_context (void){
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
         printk ("restore_current_context: TID=%d\n", current_thread );
-        die ();
+        goto fail0;
     }
 
     t = (void *) threadList[current_thread]; 
 
-    if ( (void *) t == NULL )
-    {
+    if ( (void *) t == NULL ){
         printf("restore_current_context error: t\n");
-        show_process_information ();    
-        die();
+        goto fail1;
     }
 
     // Validation
     if ( t->used != TRUE || t->magic != 1234 )
     {
         printf("restore_current_context error: t validation\n");
-        show_process_information ();    
-        die();
+        goto fail1;
     }
 
-    //
-    // Restore
-    //
+//
+// Restore
+//
 
     // Stack frame
     contextss[0]     = (unsigned long) t->ss & 0xffff;  // usermode
@@ -254,17 +253,19 @@ void restore_current_context (void){
     // Continua...
 
 
-    // Restore CR3
+    // Restore CR3 and flush TLB.
 
     ckSetCr3 ( (unsigned long) t->DirectoryPA );
-
-    // Flush TLB
-
     asm ("movl %cr3, %eax");
-    // asm ("nop");
-    // asm ("nop");
-    // asm ("nop");
     asm ("movl %eax, %cr3");
+
+//done:
+    return;
+fail1:
+    show_process_information(); 
+fail0:
+    die();
+    //return;
 }
 
 
@@ -288,71 +289,54 @@ int contextCheckThreadRing3Context (int tid){
 
     struct thread_d *t; 
  
-	//Error. (default).
-    int Status = 1;    
-
-
     //...
-	
+
 	// Limits.
 	// Erro. Status.
-	
-	if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-	{
-	    return (int) 1;    
-	}
-	
-	//Structure.
-	
-	t = (void *) threadList[tid]; 
-    
-	if ( (void *) t == NULL )
-	{
-	    //Erro. Status.
-		return (int) 1; 
-	
-	}else{
-		
-	    // validation.
-	    		
-	    if ( t->used != 1 || t->magic != 1234 )
-		{
-	        printf ("contextCheckThreadRing3Context: validation\n");
-		    return (int) 1;
-	    }  
-	
-	    //se � ring 3.
-		
-	    if ( t->iopl != 3 )
-		{
-	        printf("contextCheckThreadRing3Context: iopl\n");
-		    return (int) 1;
-	    };
-		
-		
-	    //Checa se os segmentos tem os valores v�lidos para ring 3.
-	    //0x1B para c�digo e 0x23 para dados.
-		
-	    if ( t->cs != 0x1B || 
-	         t->ds != 0x23 || 
-	         t->es != 0x23 ||
-	         t->fs != 0x23 ||
-	         t->gs != 0x23 ||
-	         t->ss != 0x23 ) 
-	    {
-	        printf ("contextCheckThreadRing3Context: segments fail t={%d}\n", 
-				tid );
-	        return (int) 1; 
-	    }
 
-    	//@todo: Continua checagem ...	
-	};
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
+        return FALSE;
+    }
 
+    t = (void *) threadList[tid]; 
 
-	// Ok o contexto foi aprovado para ring 3. 
-	// Retorna 0.
+    if ( (void *) t == NULL )
+    {
+        return FALSE;
+    }
 
-	return (int) 0;
+    if ( t->used != TRUE || t->magic != 1234 )
+    {
+        debug_print("contextCheckThreadRing3Context: validation\n");
+        return FALSE;
+    }
+
+    // iopl
+
+    if ( t->iopl != 3 )
+    {
+        debug_print("contextCheckThreadRing3Context: iopl\n");
+        return FALSE;
+    }
+
+    // Segments
+
+    if ( t->cs != 0x1B || 
+         t->ds != 0x23 || 
+         t->es != 0x23 ||
+         t->fs != 0x23 ||
+         t->gs != 0x23 ||
+         t->ss != 0x23 ) 
+    {
+        debug_print("contextCheckThreadRing3Context: segments fail\n" );
+        return FALSE; 
+    }
+
+    // ...
+
+    // OK: This is a valid thread for ring3.
+    return TRUE;
 }
 
 

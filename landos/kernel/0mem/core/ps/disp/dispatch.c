@@ -217,9 +217,9 @@ dispatchCurrent:
     goto do_dispatch;
 
 
-    //
-    //    ####  DO DISPATCH ####
-    //
+//
+//  ##  DO DISPATCH ##
+//
 
 //----------------------------------------
 // Do Dispatch: Dispatch 'current_thread'.
@@ -227,8 +227,14 @@ dispatchCurrent:
 
 do_dispatch:
 
+    // slot
 
-	// Checa estrutura.
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        panic("dispatcher-do_dispatch: [FAIL] current_thread\n");
+    }
+
+    // Struct
 
     dispatch_Pointer = (void *) threadList[current_thread];
 
@@ -236,17 +242,17 @@ do_dispatch:
         panic ("dispatch-dispatcher: struct\n");
     }
 
-	// Checa o 'state'.
+    // State
 
     if ( dispatch_Pointer->state != READY ){
-        panic ("dispatch-dispatcher: State ERROR\n");
+        panic ("dispatch-dispatcher: [ERROR] State\n");
     }
 
 
-	// #importante
-	// * MOVEMENT 4 (Ready --> Running).
-	// A thread passa para o estado RUNNING.
-	// Reinicia a contagem.
+    // #importante
+    // >> MOVEMENT 4 (Ready --> Running).
+    // A thread passa para o estado RUNNING.
+    // Reinicia a contagem.
 
 
     if ( dispatch_Pointer->state == READY )
@@ -259,21 +265,19 @@ do_dispatch:
     }
 
 
-	//
-	// ## RESTORE CONTEXT ##
-	//
+//
+// ## RESTORE CONTEXT ##
+//
 
-	// #importante
-	// Flag sinalizando que o contexto não está mais salvo.
-	// Esse flag é acionada quando o contexto é salvo no início 
-	// da task switch.
+    // Flag sinalizando que o contexto não está mais salvo.
+    // Esse flag é acionada quando o contexto é salvo no início 
+    // da task switch.
 
-    dispatch_Pointer->saved = 0;
+    dispatch_Pointer->saved = FALSE;
 
-	// #importante
-	// Chama a rotina que colocará as informações da estrutura de thread 
-	// nas variáveis usadas pelo assembly para configurar os registradores 
-	// antes do iretd.
+    // Chama a rotina que colocará as informações da estrutura de thread 
+    // nas variáveis usadas pelo assembly para configurar 
+    // os registradores antes do iretd.
 
     restore_current_context();
 
@@ -538,9 +542,7 @@ int systemDispatcher (void)
 
 int idleDispatcher (void)
 { 
-    //current_idle_thread
-
-    return 0; 
+    return -1;
 }
 
 
@@ -555,9 +557,7 @@ int idleDispatcher (void)
 
 int periodicDispatcher (void)
 { 
-    // struct thread_d *New;
-   
-    return 0; 
+    return -1; 
 }
 
 
@@ -572,56 +572,13 @@ int periodicDispatcher (void)
 
 int rrDispatcher (void)
 { 
-    return 0; 
+    return -1; 
 }
 
 
-/*
- * realtimeDispatcher:
- *     ## bugbug, na verdade ainda estou aprendendo sobre isso. :) sorry.
- *     Real time dispatcher.
- *     Pega uma tarefa na fila de tarefas com prioridade e tipo realtime.
- *
- * * IMPORTANTE:
- *   Normalmente essas tarefas ficam confinadas em um processador, destinado 
- * pra tarefas de tempo real.
- * Obs:
- *     Na verdade não é tão real time assim.
- *     Obs: Esse tipo de dispacher ainda não foi habilitado.
- */
-
-// #todo
-// It's not implemented.
-
 int realtimeDispatcher (void)
 {
-	
-/*
- 	
-    struct thread_d *New;
-	  
-    //Real time status ~ Round robin.     
-    if(realtimeStatus == 1)
-    { 
-        New = (void*) queue_get_data( queue, QUEUE_REALTIME);
-	    if( (void*) New != NULL && 
-	                New->used == 1 && 
-				    New->magic == 1234 && 
-				    New->type == TYPE_REALTIME &&
-				    New->priority == PRIORITY_MAX )
-	    {   
-	        return (int) New->tid;
-	    };  
-    }; 
-	
-//
-// Fail, use tID 0.
-//
-
-*/
-
-fail:
-    return 0; //idle.
+    return -1;
 }
 
 
@@ -637,10 +594,14 @@ int dispatch_Default (void){
 
     struct thread_d *New;
     struct thread_d *Current;
+
+    New = NULL;
+    Current = NULL;
+
     int qNext=0;
 
-	Current = NULL;
-	
+
+
 	
 	/*
 	 * Fase1 - Tenta tarefa de quantum vencido.
@@ -819,52 +780,83 @@ void dispatch_thread2 (void){
 void dispatch_thread (struct thread_d *thread){
 
     int Status = 0;
+    int State = -1;
 
-	//
-	// Structure.
-	//
+
+//
+// #bugbug
+//
+
+    // Corrigindo um bag nessa rotina.
+    // Esse dispatch não estava dispachando a thread
+    // indicada pelo parâmetro, mas sim a current thread
+    // indicada por variável global.
+    // Vamos corrigir isso e ver se não teremos problemas.
+    // 25 de maio, 2021.
+
 
     if ( (void *) thread == NULL )
     {
-        printf ("dispatch-dispatch_thread: thread tid={%d}", current_thread ); 
-        die ();
+        //printf("dispatch_thread: thread tid={%d}", current_thread ); 
+        printf("dispatch_thread: [FAIL] thread->tid=%d\n", thread->tid ); 
+        die();
+    }
 
-    }else{
 
-	    // Context.
-		// #bugbug: Não estamos mais usando esse filtro
-        // que seleciona apenas threads em ring 3.		
-	    //Status = contextCheckThreadRing3Context(thread->tid);
-	    //if(Status == 1){
-	    //    printf("pc-dispatch-dispatch_task: contextCheckThreadRing3Context\n");
-		//    die();
-	    //};
-	    //...
-	};
-
-	
-	/*
-	 * State:
-	 *     Dispacha de acordo com o status.
-	 *     +Spawn no caso de INITIALIZED.
-	 */
- 
-    switch (thread->state)
+    if ( thread->used != TRUE || thread->magic != 1234 )
     {
+        printf("dispatch_thread: thread validation\n");
+        die();
+    }
+
+
+    if ( thread->tid < 0 || thread->tid >= THREAD_COUNT_MAX )
+    {
+        printf("dispatch_thread: tid validation\n");
+        die();
+    } 
+
+
+    // Context for ring3.
+    // #bugbug: 
+    // Não estamos mais usando esse filtro
+    // que seleciona apenas threads em ring 3.
+
+    /*
+    Status = contextCheckThreadRing3Context(thread->tid);
+    if (Status != TRUE)
+    {
+        printf("dispatch_task: contextCheckThreadRing3Context\n");
+        die();
+    }
+    */
+
+
+// State:
+// Dispacha de acordo com o status.
+// Spawn no caso de INITIALIZED.
+
+    State = (int) thread->state;
+
+    switch (State){
+
         // Se vai rodar pela primeira vez
         case INITIALIZED:
-            thread->saved = 0;
-            KiSpawnThread(current_thread);
+            thread->saved = FALSE;  // Not saved.
+            //KiSpawnThread(current_thread);
+            KiSpawnThread(thread->tid);
             break;
+
         // ...
 
         default:
-            printf("dispatch_thread fail: State!\n");
+            printf("dispatch_thread: [FAIL] State\n");
+            //goto fail;
             break;
     };
 
 fail:
-    panic ("dispatch-dispatch_thread: fail");
+    panic ("dispatch_thread: Fail\n");
 }
 
 
@@ -903,6 +895,9 @@ int init_dispatcher (void){
 
     int i=0;
 
+
+    debug_print ("init_dispatcher: [TEST] Initializing variables\n");
+
     // Lock task switch. (dispatcher)
     // ts is part of dispatcher
     set_task_status(LOCKED);
@@ -917,55 +912,26 @@ int init_dispatcher (void){
 	//Index
     dispatcherQueueIndex = (int) 0;
 
-	//Seleciona o tipo de dispatcher.
+    //Seleciona o tipo de dispatcher.
     dispatcherType = DISPATCHER_SYSTEM;
 
-	//inicializa a fila do dispacher.
+    //inicializa a fila do dispacher.
 
     for ( i=0; i <= PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) 0;
     };
 
-	//Init
-	dispatcherReadyList[0] = (unsigned long) InitThread;
 
-
-	//
-	// (Desliga realtime dispatcher.) ??
-	//
-	
-	
-	//
-	// Para um dispatcher na forma de Linked List.
-	//
-
-//dispatcher_linked_list:
-
-    //
-    // == Conductor =============================
-    //
-    
     // Inicializa o indice de condutores.
     conductorIndex = 0;
 
-    rootConductor = (void *) kmalloc( sizeof(struct thread_d) );
+    // #bugbug
+    // Isso é so um ponteiro.
 
-    if ( (void *) rootConductor == NULL ){
-        panic ("init_dispatcher: rootConductor");
-    }
-
-	// #bugbug 
-	// Deveríamos iniciar com a idle thread e não com a thread 0.
-	// Inicia a lista.
-	// Usado para task switch.
-
-    //#test
-    rootConductor = (void *) InitThread;
-
-    Conductor = (void *) rootConductor;
-    
-    tmpConductor       = (void *) rootConductor;
-    tmpConductor->next = (void *) threadList[0]; 
+    // Invalidando tudo
+    rootConductor = NULL;
+    Conductor     = NULL;
+    tmpConductor  = NULL;
 
     // #bugbug
     // Check the threads validation.
@@ -988,28 +954,27 @@ int init_dispatcher (void){
 
 	// #todo
 	// Create error messages.
+	// Isse é chamado várias vezes, é melhor não ter mensagem de debug.
 
 void IncrementDispatcherCount ( int type ){
 
-	// Testing struct.
 
-    if ( (void *) DispatchCountBlock == NULL )
-    {
+    if (type < 0){
+        debug_print("IncrementDispatcherCount: [FAIL] type\n");
         return;
     }
 
-	// Limits.
 
-    if (type < 0 || type > 10)
-    {
-        return;
+    // See:
+    // landos/kernel/include/land/ps/dispatch.h
+
+    if ( (void *) DispatchCountBlock == NULL ){
+        panic ("IncrementDispatcherCount:\n");
     }
-
 
 	// Activating the selected type.
 
-    switch (type)
-    {
+    switch (type){
         case SELECT_IDLE_COUNT:
             DispatchCountBlock->SelectIdleCount++;
             break;
@@ -1043,13 +1008,11 @@ void IncrementDispatcherCount ( int type ){
        // Nothing.
        // Aqui poderia ter um contador de indefinições.
        default:
+           debug_print("IncrementDispatcherCount: [FIXME] default\n");
            break;
     };
 
-	// Nothing.
-	//     #bugbug
-	//     Obs: @todo: O laço acima pode não selecionar nada.
-
+    // ??
 }
 
 
