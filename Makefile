@@ -90,7 +90,7 @@ generate
 	chmod 755 ./run
 
 # Product info:
-	@echo "$(PRODUCT_NAME) $(KERNELVERSION)"
+	@echo "$(PRODUCT_NAME) $(EDITION_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
 
 
@@ -107,7 +107,6 @@ land-lib \
 land-os \
 land-cmd \
 land-setup    
-
 
 
 /usr/local/gramado-build:
@@ -316,7 +315,6 @@ clean:
 	-rm -rf landlib/lib/libgns/obj/*.o
 	-rm -rf landlib/lib/libio01/obj/*.o
 
-	
 	@echo "Success?"
 # clean ISO and VHD.
 clean2:
