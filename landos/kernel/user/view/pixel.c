@@ -204,12 +204,10 @@ useDedicatedBuffer:
 /*
  *********************************
  * backbuffer_putpixel:
- *
  *     Ok. 
  *     O servidor kgws pode acessar um backbuffer. Mas não tem acesso
  * ao frontbuffer. Para isso ele precisa usasr o diálogo do driver 
  * de vídeo.
- *      
  * IN: 
  *     color, x, y, 0
  */
@@ -249,7 +247,7 @@ backbuffer_putpixel (
 
     // bgra
 
-    b = (color & 0xFF);	
+    b = (color & 0xFF);
     g = (color & 0xFF00) >> 8;
     r = (color & 0xFF0000) >> 16;
     a = (color >> 24) + 1;

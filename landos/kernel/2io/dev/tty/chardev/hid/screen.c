@@ -68,7 +68,7 @@ unsigned long screenGetWidth (void)
 //Get height. 
 unsigned long screenGetHeight (void)
 {
-	return (unsigned long) screen_height;	
+	return (unsigned long) screen_height;
 }
 
 
@@ -77,12 +77,12 @@ unsigned long screenGetHeight (void)
  *     Configura as dimensões da tela.
  *     Tamanho do monitor.
  */
+
 void screenSetSize( unsigned long width, unsigned long height )
 {
-    screen_width = (unsigned long) width; 
+    screen_width  = (unsigned long) width; 
     screen_height = (unsigned long) height;
-    //return;
-};
+}
 
 
 /*
@@ -103,16 +103,24 @@ void refresh_screen (void){
 
     int i=0;
 
+
+    // #bugbug
+    // #danger
+    // Dependendo do tamanho da tela, 
+    // essa rotina pode acabar copiando conteúdo 
+    // para alguma parte não mapeada no lfb.
+    // Precisamos de limites. Obedecendo a quantidade mapeada.
+
     unsigned long *backbuffer  = (unsigned long *) BACKBUFFER_VA;
     unsigned long *frontbuffer = (unsigned long *) FRONTBUFFER_VA;
 
 
     vsync();
 
-	//#test velocidade?
-	for ( i=0; i< SavedX*SavedY; i++ )
-		frontbuffer[i] = backbuffer[i];	
-	
+    // #test velocidade?
+    for ( i=0; i< SavedX*SavedY; i++ )
+        frontbuffer[i] = backbuffer[i];
+
     //antigo.
 	//isso funciona.
 	//screenRefresh();

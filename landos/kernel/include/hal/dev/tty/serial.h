@@ -171,7 +171,7 @@ void serial_print (unsigned int port, char *data );
 
 
 // Method to init an serial port (for debugging)
-int serial_init_port ( uint16_t port );	
+int serial_init_port ( uint16_t port );
 
 int serial_init (void);
 

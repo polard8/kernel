@@ -79,40 +79,41 @@
  */
 
 struct segment_descriptor_d {
-	
-	// LIMIT LOW
-	unsigned sd_lolimit:16;		//segment extent (lsb) 
-	
-	// BASE LOW
-	unsigned sd_lobase:24;		//segment base address (lsb) 
-	
-	unsigned sd_type:5;		    //segment type
-	
-	unsigned sd_dpl:2;		    //segment descriptor priority level 
-	
-	unsigned sd_p:1;		    //segment descriptor present 
-	
-	// LIMIT HIGH
-	unsigned sd_hilimit:4;		//segment extent (msb) 
-	
-	unsigned sd_xx:2;		    //unused 
-	
-	unsigned sd_def32:1;		//default 32 vs 16 bit size 
-	
-	unsigned sd_gran:1;		    //limit granularity (byte/page) 
-	
-	// BASE HIGH
-	unsigned sd_hibase:8;    	//segment base address (msb) 
-	
+
+    // LIMIT LOW
+    unsigned sd_lolimit :16;  //segment extent (lsb) 
+
+    // BASE LOW
+    unsigned sd_lobase :24;  //segment base address (lsb) 
+
+    unsigned sd_type :5;  //segment type
+    unsigned sd_dpl  :2;  //segment descriptor priority level 
+    unsigned sd_p    :1;  //segment descriptor present 
+
+    // LIMIT HIGH
+    unsigned sd_hilimit :4;  //segment extent (msb) 
+
+    unsigned sd_xx    :2;  //unused 
+    unsigned sd_def32 :1;  //default 32 vs 16 bit size 
+    unsigned sd_gran  :1;  //limit granularity (byte/page) 
+
+   // BASE HIGH
+    unsigned sd_hibase :8;  //segment base address (msb) 
+
 } __attribute__((packed));
 
 
-/* Special pointer which includes the limit: The max bytes
-*  taken up by the GDT, minus 1. Again, this NEEDS to be packed */
+
+/* 
+ * Special pointer which includes the limit: The max bytes
+ *  taken up by the GDT, minus 1. Again, this NEEDS to be packed. 
+ */
+
 struct gdt_ptr_d
 {
     unsigned short limit;
-    unsigned int base;
+    unsigned int   base;
+
 } __attribute__((packed));
 
 
@@ -123,20 +124,20 @@ struct gdt_ptr_d
  */
 
 struct gate_descriptor_d {
-	
-	// OFFSET LOW
-	unsigned gd_looffset:16;	//gate offset (lsb) 
-	
-	unsigned gd_selector:16;	//gate segment selector 
-	unsigned gd_stkcpy:5;		//number of stack wds to cpy 
-	unsigned gd_xx:3;		    //unused 
-	unsigned gd_type:5;		    //segment type 
-	unsigned gd_dpl:2;		    //segment descriptor priority level 
-	unsigned gd_p:1;		    //segment descriptor present 
-	
-	// OFFSET HIGH
-	unsigned gd_hioffset:16;	//gate offset (msb) 
-	
+
+    // OFFSET LOW
+    unsigned gd_looffset :16;  //gate offset (lsb) 
+    unsigned gd_selector :16;  //gate segment selector 
+
+    unsigned gd_stkcpy :5;  //number of stack wds to cpy 
+    unsigned gd_xx     :3;  //unused 
+    unsigned gd_type   :5;  //segment type 
+    unsigned gd_dpl    :2;  //segment descriptor priority level 
+    unsigned gd_p      :1;  //segment descriptor present 
+
+    // OFFSET HIGH
+    unsigned gd_hioffset  :16;  //gate offset (msb) 
+
 } __attribute__((packed));
 
 
@@ -152,24 +153,27 @@ struct ldt_descriptor_d {
  * Generic descriptor
  */
 
-
 union descriptor_d {
-	struct segment_descriptor_d sd;
-	struct gate_descriptor_d gd;
-	struct ldt_descriptor_d ld;
-	uint32_t raw[2];
-	//uint64_t raw64;
+
+    struct segment_descriptor_d  sd;
+    struct gate_descriptor_d     gd;
+    struct ldt_descriptor_d      ld;
+    uint32_t raw[2];
+    //uint64_t raw64;
 } __attribute__((packed));
 
 
 
 /*
- * region descriptors, used to load gdt/idt tables before segments yet exist.
+ * region descriptors, 
+ * used to load gdt/idt tables before segments yet exist.
  */
 
-struct region_descriptor_d {
-	unsigned rd_limit:16;		//segment extent 
-	unsigned rd_base:32;		//base address  
+struct region_descriptor_d 
+{
+    unsigned rd_limit :16;    // segment extent 
+    unsigned rd_base  :32;    // base address  
+
 } __attribute__((packed));
 
 

@@ -228,14 +228,14 @@ setgate (
     int sel )
 {
 
-    gd->gd_looffset = (int)func;
+    gd->gd_looffset = (int) func;
     gd->gd_selector = sel;
-    gd->gd_stkcpy = args;
+    gd->gd_stkcpy   = args;
     gd->gd_xx = 0;
     gd->gd_type = type;
     gd->gd_dpl = dpl;
     gd->gd_p = 1;
-    gd->gd_hioffset = (int)func >> 16;
+    gd->gd_hioffset = (int) func >> 16;
 }
 
 
@@ -267,7 +267,7 @@ setregion (
     size_t limit )
 {
     rd->rd_limit = (int) limit;
-    rd->rd_base = (int) base;
+    rd->rd_base  = (int) base;
 }
 
 
@@ -286,16 +286,25 @@ setsegment (
     int def32, 
     int gran )
 {
-    sd->sd_lolimit = (int) limit;
-    sd->sd_lobase = (int) base;
-    sd->sd_type = type;
-    sd->sd_dpl = dpl;
-    sd->sd_p = 1;
-    sd->sd_hilimit = (int) limit >> 16;
-    sd->sd_xx = 0;
-    sd->sd_def32 = def32;
-    sd->sd_gran = gran;
-    sd->sd_hibase = (int) base >> 24;
+
+    // low limit
+    sd->sd_lolimit = (int) limit;  // segment extent (lsb) (16)
+
+    // base low
+    sd->sd_lobase  = (int) base;   // segment base address (lsb) (16) 
+
+    sd->sd_type  = type;  //segment type (5)
+    sd->sd_dpl   = dpl;   //segment descriptor priority level (2) 
+    sd->sd_p     = 1;     //segment descriptor present  (1)
+    
+    sd->sd_hilimit = (int) limit >> 16;  //segment extent (msb) (4)
+    
+    sd->sd_xx    = 0;      //unused (2)
+    sd->sd_def32 = def32;  //default 32 vs 16 bit size (1)
+    sd->sd_gran  = gran;   //limit granularity (byte/page) (1) 
+
+    // base high
+    sd->sd_hibase = (int) base >> 24;  //segment base address (msb) (8)
 }
 
 
@@ -314,8 +323,14 @@ setsegmentNR (
     int gran )
 {
 
-    setsegment ( (struct segment_descriptor_d *) &xxx_gdt[number], 
-        base, limit, type, dpl, def32, gran );
+    setsegment ( 
+        (struct segment_descriptor_d *) &xxx_gdt[number], 
+        base, 
+        limit, 
+        type, 
+        dpl, 
+        def32, 
+        gran );
 }
 
 
@@ -329,7 +344,7 @@ setsegmentNR (
 
 int x86_init_gdt (void)
 {
-    struct i386tss_d *tss;
+    struct i386tss_d  *tss;
 
 
     debug_print ("[x86] x86_init_gdt: Danger!\n");
@@ -342,7 +357,6 @@ int x86_init_gdt (void)
     if ( (void *) tss == NULL ){
         debug_print ("[x86] x86_init_gdt: \n");
               panic ("[x86] x86_init_gdt: \n");
-
     }else{
  
         // Init TSS. 

@@ -82,19 +82,18 @@ typedef  short      pid_t;    //process id
 //typedef	u_short	mode_t;			/* permissions */
 typedef ulong    mode_t;
 
-typedef u_long    fixpt_t;		/* fixed point number */
-
+typedef u_long    fixpt_t;    /* fixed point number */
 
 
 
 #ifndef _POSIX_SOURCE
 typedef  struct _uquad  { u_long val[2]; } u_quad;
 typedef  struct _quad   {   long val[2]; } quad;
-typedef  long   *qaddr_t;	/* should be typedef quad * qaddr_t; */
+typedef  long   *qaddr_t;    /* should be typedef quad * qaddr_t; */
 
-#define	major(x)	((int)(((u_int)(x) >> 8)&0xff))	/* major number */
-#define	minor(x)	((int)((x)&0xff))		/* minor number */
-#define	makedev(x,y)	((dev_t)(((x)<<8) | (y)))	/* create dev_t */
+#define	major(x)      ((int)(((u_int)(x) >> 8)&0xff))  /* major number */
+#define	minor(x)      ((int)((x)&0xff))                /* minor number */
+#define	makedev(x,y)  ((dev_t)(((x)<<8) | (y)))        /* create dev_t */
 #endif
 
 

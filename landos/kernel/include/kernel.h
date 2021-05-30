@@ -104,7 +104,6 @@ extern unsigned long stack0_krn_ptr;
 
 // =========================================================
 
-
 // (NT)
 // Land OS headers.
 
@@ -205,8 +204,6 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/cpuamd.h"
 #include "hal/dmi.h"
 #include "hal/detect.h"
-
-
 #include "hal/dev/tty/serial.h"
 
 

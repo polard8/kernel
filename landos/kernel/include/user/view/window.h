@@ -34,7 +34,7 @@ int top_at ( int x, int y );
 // 
  
  
- //id da janela que o mouse está em cima.
+//id da janela que o mouse está em cima.
 int window_mouse_over; 
  
 //

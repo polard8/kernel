@@ -4,7 +4,7 @@
 
 
 #ifndef ____GVA_H
-#define ____GVA_H 1
+#define ____GVA_H    1
 
 
 
@@ -161,7 +161,6 @@
 // LFB
 //
 
-
 //Endereço virtual padrão para o Linear Frame Buffer. (LFB).
 #define DEFAULT_LFB_VIRTUALADDRESS  0xC0400000 
 #define FRONTBUFFER_ADDRESS         0xC0400000
@@ -182,9 +181,8 @@
 
 
 //
-// backbuffer
+// Backbuffer
 //
-
 
 //Endereço virtual padrão para o BackBuffer. (buffer1)
 #define DEFAULT_BACKBUFFER_VIRTUALADDRESS  0xC0800000
