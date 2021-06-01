@@ -232,7 +232,6 @@ void preinit_Serial(void)
 // #todo: Talvez isso precise retornar int.
 void preinit_OutputSupport(void)
 {
-
     // Virtual Console.
     // See: user/console.c
     debug_print ("[Kernel] kernel_main: Initializing virtual consoles ...\n");
@@ -414,6 +413,11 @@ int kernel_main (int arch_type)
     // In hid/video.c
     Video_initialize();
 
+
+//
+// Runtime
+//
+
     PROGRESS("Kernel:0:4\n");
     // Runtime
 
@@ -433,7 +437,9 @@ int kernel_main (int arch_type)
 
     debug_print ("[Kernel] kernel_main: Initializing runtime\n");
     Runtime_initialize();
-    //printf("2\n");
+
+
+    // =========================
     
     PROGRESS("Kernel:0:5\n");
     // Clear the screen.

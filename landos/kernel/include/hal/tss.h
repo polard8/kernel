@@ -85,16 +85,20 @@ struct i386tss_d *current_tss;
  * I/O bitmap offset beyond TSS's segment limit means no bitmaps.
  * (i.e. any I/O attempt generates an exception.)
  */
-#define	IOMAP_INVALOFF	0xffffu
+
+#define IOMAP_INVALOFF  0xffffu
 
 /*
  * If we have an I/O bitmap, there is only one valid offset.
  */
-#define	IOMAP_VALIDOFF	sizeof(struct i386tss_d)
+#define IOMAP_VALIDOFF  sizeof(struct i386tss_d)
 
 
 static void
-tss_init ( struct i386tss_d *tss, void *stack, void *func );
+tss_init ( 
+    struct i386tss_d *tss, 
+    void *stack, 
+    void *func );
 
 
 #endif /* #ifndef _I386_TSS_H_ */

@@ -12,16 +12,12 @@
 #ifndef __THREAD_H
 #define __THREAD_H    1
 
-
 #define THREAD_MAGIC  1234
-
-
 
 //O primeiro índice na contagem das threads do sistema e o
 //primeiro índice na contagem das threads dos usuários.
 #define SYSTEM_BASE_TID  0  
 #define USER_BASE_TID    100  
-
 
 //
 // Preempt support.
@@ -35,6 +31,7 @@
 // ??
 // #bugbug: rever isso!
 // Identificadores de thread.
+// thread 0 não significa idle thread.
 #define IDLE_ID        0 
 #define IDLE           IDLE_ID 
 #define THREAD_IDLE    IDLE_ID  
@@ -66,13 +63,11 @@
 	// 3 - esperando um objeto. (BLOCKED)(espera genérica)
 	// ...
 
-
 // #importante
 // isso será usado na estrutura de thread em wait_reason[]
 // Com limite de 10 por enquanto.
 
 typedef enum {
-
 	WAIT_REASON_NULL,
 	WAIT_REASON_LOOP,           
 	WAIT_REASON_EXIT,
@@ -82,8 +77,7 @@ typedef enum {
 	WAIT_REASON_WAIT4PID,       // Esperando o processo filho morrer.
 	WAIT_REASON_WAIT4TID,       // Esperando uma thread morrer.
 	WAIT_REASON_TEST            // # Usada pelo desenvolvedor para testes.
-
-	//continua... @todo
+	// ...
 }thread_wait_reason_t;
 
 
@@ -91,14 +85,10 @@ typedef enum {
 
 /*
  * thread_type_t:
- * 
  *     Enumerando os tipos de threads:
- * 
-
  */
 
 typedef enum {
-
     THREAD_TYPE_NULL,
     THREAD_TYPE_SYSTEM,     // first-come-first-served.
     THREAD_TYPE_IDLE,       // 
@@ -108,19 +98,8 @@ typedef enum {
     THREAD_TYPE_UI, 
     THREAD_TYPE_IO, 
     // ...
-
 }thread_type_t;
 
-
-
-/*
-    THREAD_INPUTMODEL_NULL,      // Not defined.
-    THREAD_INPUTMODEL_KERNEL,    // Kernel thread running in ring0.
-    THREAD_INPUTMODEL_COMMAND,   // Command running on console or terminal.
-    THREAD_INPUTMODEL_KGWS,      // Running on Setup environment and using kgws.
-    THREAD_INPUTMODEL_LOADABLEWINDOWSERVER   // Using the current loadable window server.
-    // ...
-*/
 
 
 /*
@@ -135,14 +114,12 @@ so i will send the input to an event queue in the raw input thread.
 */
 
 typedef enum {
-
     THREAD_INPUTMODEL_NULL,      // Not defined.
     THREAD_INPUTMODEL_KERNEL,    // Kernel thread running in ring0.
     THREAD_INPUTMODEL_COMMAND,   // Command running on console or terminal.
     THREAD_INPUTMODEL_UNIXLIKE,  // Send the input to a file.
     THREAD_INPUTMODEL_KGWS,      // Running on Setup environment and using kgws.
     THREAD_INPUTMODEL_LOADABLEWINDOWSERVER   // Using the current loadable window server.
-
 }thread_inputmodel_t;
 
 
@@ -158,8 +135,8 @@ typedef enum {
  *  INITIALIZED,    //Earth, Criado o contexto e parâmetros.
  *  STANDBY,        //Earth, Pronta para rodar pela primeira vez. Ir para o 'espaço'.
  *  ZOMBIE,         //Earth, Terminou a execução. Voltou para a 'terra'.
- *  DEAD,	        //Earth, Deleted.	
- 
+ *  DEAD,           //Earth, Deleted.
+ * 
  *  READY,          //Space, Thread is ready to run again.
  *  RUNNING,        //Space, Thread is currently running.
  *  WAITING,        //Space, Thread is waiting.	
@@ -173,7 +150,6 @@ typedef enum {
  */
  
 typedef enum {
-
 	INITIALIZED,    //0 Earth, Criado o contexto e parâmetros.
 	STANDBY,        //1 Earth, Pronta para rodar pela primeira vez. Ir para o 'espaço'.
 	ZOMBIE,         //2 Earth, Terminou a execução. Voltou para a 'terra'.
@@ -182,14 +158,12 @@ typedef enum {
 	RUNNING,        //5 Space, Thread is currently running.
 	WAITING,        //6 Space, Thread is waiting.
 	BLOCKED,        //7 Space, Thread is blocked by an event.
-
 }thread_state_t;
 
 
 /*
  ***********************************************************
  * thread_d: 
- *
  *    TCB - Thread Control Block.
  *    In the end of the struct we find the elements 
  *    not frequently used.
@@ -923,15 +897,11 @@ void show_slot(int tid);
 // Show the register of the context.
 void show_reg (int tid);
 
-
-
 void show_thread_information (void); 
 
 int init_threads (void);
 
 int GetCurrentThreadId (void);
-
-
 
 void spawn_thread (int tid);
 
@@ -942,36 +912,26 @@ void spawn_thread (int tid);
 // Liberar uma thread que estava bloqueada ou esperando.
 void release ( int tid );
 
-
-
 // Torna zumbi uma thread.
 void exit_thread ( int tid );       
-
 
 // exit current thread.
 void exit_current_thread(void);
 
-
-
 //Destrói uma thread.
 void kill_thread (int tid);       
 
-
 void dead_thread_collector (void);
-
 
 void kill_all_threads (void);
 
-
 int thread_getchar (void);
-
 
 // se a flag estiver habilitada, então devemos acorar a
 // thread do dead thread collector.
 void check_for_dead_thread_collector (void);
 
 int thread_profiler( int service );
-
 
 // pegar a porcentagem de vezes que a thread rodou durante um determinado
 //período.

@@ -1,12 +1,8 @@
-
 // socket.h
 // suporte a socket dentro do kernel.
 
-
 #ifndef ____SOCKET_H
-#define ____SOCKET_H
-
-
+#define ____SOCKET_H    1
 
 
 // Socket state.
@@ -16,11 +12,7 @@
 #define SS_CONNECTED      3
 #define SS_DISCONNECTING  4
 
-
-
-//
 // == ports ====================================
-//
 
 #define PORTS_WS 4040
 #define PORTS_NS 4041
@@ -28,12 +20,9 @@
 #define PORTS_WM 4043
 // ...
 
-
 //
 // == gramado ports ===============================
 //
-
-
 
 
 //=====================================================
@@ -65,15 +54,16 @@ int gramado_ports[GRAMADO_PORT_MAX];
 int current_socket;
 
 
+//=============================================
 
+//  alguns prototipos: 
+// #todo Mudar isso mais para baixo.
 
 // Create an empty structure.
 struct socket_d *create_socket_object (void);
 
-
 unsigned long getSocketIP ( struct socket_d *socket );
 unsigned long getSocketPort ( struct socket_d *socket );
-
 
 int 
 update_socket ( 
@@ -81,6 +71,7 @@ update_socket (
     unsigned long ip, 
     unsigned short port );
 
+//=============================================
 
 
 /*
@@ -96,7 +87,6 @@ typedef __socklen_t	socklen_t;
 #define socklen_t	__socklen_t
 #endif
 */
-
 
 /*
 #ifdef	_BSD_SIZE_T_
@@ -114,9 +104,8 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 
 
 
-
 /* 
- *  ** Sock types  ** 
+ * Sock types
  */
 
 // bsd-like and linux-like ?
@@ -191,17 +180,13 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 
 /*
  * Definitions for network related sysctl, CTL_NET.
- *
  * Second level is protocol family.
  * Third level is protocol number.
- *
  * Further levels are defined by the individual families below.
  */
-#define NET_MAXID	AF_MAX
+#define NET_MAXID    AF_MAX
 
-
-#define MAXHOSTNAMELEN	256
-
+#define MAXHOSTNAMELEN    256
 
 /* Protocol families, same as address families. */
 #define PF_UNSPEC	AF_UNSPEC
@@ -245,9 +230,15 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define SOMAXCONN    32
 
 
-/* Flags we can use with send/ and recv. 
-   Added those for 1003.1g not all are supported yet */
+/* 
+ * Flags we can use with send/ and recv. 
+ * Added those for 1003.1g not all are supported yet 
+ */
  
+// #bugbug:
+// Isso se coonfunde com as 'message codes' 
+// Usadas pelo Gramado.
+
 #define MSG_OOB        1
 #define MSG_PEEK       2
 #define MSG_DONTROUTE  4
@@ -374,9 +365,6 @@ struct mmsghdr {
 #define	SO_PROTOCOL	0x1025		/* get socket protocol */
 
 
-
-
-
 /*
  * Types of socket shutdown(2).
  */
@@ -395,9 +383,7 @@ struct sockpeercred {
 
 
 
-
-
-typedef unsigned socklen_t;
+typedef unsigned  socklen_t;
 
 
 
@@ -621,7 +607,7 @@ unsigned long socketList[SOCKET_COUNT_MAX];
 
 
 //
-// prototipes;
+// prototipes ===============================
 //
 
 int socket_init(void);
@@ -641,20 +627,17 @@ socket_unix (
     int type, 
     int protocol );
 
-
 int 
-socket_inet ( struct socket_d *sock, 
-              int family, 
-              int type, 
-              int protocol );
-
-
+socket_inet ( 
+    struct socket_d *sock, 
+    int family, 
+    int type, 
+    int protocol );
 
 int sys_socket ( int family, int type, int protocol );
 
 // libc shutdown() function.
 int sys_socket_shutdown (int socket, int how);
-
 
 
 struct socket_d *get_socket_from_fd (int fd);
@@ -678,7 +661,6 @@ socket_dialog (
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
-
 
 
 int 
@@ -718,10 +700,7 @@ sys_getsockname (
     socklen_t *addrlen );
 
 
-
-int sys_listen (int sockfd, int backlog);          
-
-               
+int sys_listen (int sockfd, int backlog); 
 
 int socket_read (unsigned int fd, char *buf, int count);
 int socket_write (unsigned int fd,char *buf,int count);
@@ -733,10 +712,7 @@ int socket_write (unsigned int fd,char *buf,int count);
 // em o processo
 int sys_accept_sender(int n);
 
-
-
 int socket_set_gramado_port(int port, int pid);
-
 
 void show_socket_for_a_process(int pid);
 
@@ -744,7 +720,6 @@ void show_socket_for_a_process(int pid);
 int is_socket (file *f);
 int is_virtual_console (file *f);
 //...
-
 
 #endif   
 

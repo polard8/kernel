@@ -132,7 +132,6 @@ int KiInitRuntime (void)
 // called by main.c
 int Runtime_initialize(void)
 {
-
     debug_print ("Runtime_initialize:\n");
     
     int Status = (int) init_runtime();

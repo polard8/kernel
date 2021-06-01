@@ -699,7 +699,7 @@ void console_outbyte (int c, int console_number)
     // mas como todos os bits do char na fonte estão desligados, 
     // então não pinta coisa alguma.
 
-    if( Ch == 0x20 )  
+    if ( Ch == 0x20 )  
     {
         CONSOLE_TTYS[console_number].cursor_x++;
         prev = Ch;

@@ -491,9 +491,9 @@ void videoSetupVGAStartAddress( unsigned long address)
 //#todo
 //isso pode ser incluido em 'get system parameters' system call.
 
-unsigned long videoGetMode (void){
-	
-	return (unsigned long) g_current_video_mode;
+unsigned long videoGetMode (void)
+{
+    return (unsigned long) g_current_video_mode;
 }
 
 
@@ -501,12 +501,17 @@ unsigned long videoGetMode (void){
  * videoSetMode:
  *     Configura o modo de video atual.
  */
-void videoSetMode (unsigned long mode){
+void videoSetMode (unsigned long mode)
+{
 	
     unsigned long VideoMode;
     unsigned long Width;
 	unsigned long Height;
 	//continua...(outros parametros)
+
+
+    debug_print ("videoSetMode: [BUGBUG] This routine is wrong\n");
+
 
 	
 	VideoMode = (unsigned long) mode;
@@ -780,7 +785,7 @@ int videoInit (void){
 	//Na verdade video.c não tem acesso a essa variável,
 	//é preciso chamar o servidor através de um método para configurá-la.
 
-    gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );		
+    gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );
  
     // #todo: 
     // Usar a função que configura essas variáveis.

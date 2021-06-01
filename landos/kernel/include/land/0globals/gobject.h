@@ -1,15 +1,12 @@
-
 /*
  * gobject.h
  * 
  *     It's used for the file structure.
- *
  *     2018 - Created by Fred Nora.
  */
 
-
 #ifndef ____GOBJECT_H
-#define ____GOBJECT_H 1
+#define ____GOBJECT_H  1
 
 
 

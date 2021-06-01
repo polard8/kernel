@@ -129,23 +129,26 @@ struct request_d
 };
 struct request_d REQUEST;
 
+
 //
-// Protótipos.
+// Prototypes ===============
 //
 
 
 int request (void);
 
 int 
-create_request ( unsigned long number, 
-                 int status, 
-                 int timeout,
-				 int target_pid,
-				 int target_tid,
-                 struct window_d *window, 
-                 int msg, 
-                 unsigned long long1, 
-                 unsigned long long2 );
+create_request ( 
+    unsigned long number, 
+    int status, 
+    int timeout,
+    int target_pid,
+    int target_tid,
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
 
 void clear_request (void);
 

@@ -170,7 +170,7 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
 }						
 */
 
- 
+
 /* 
  *************************************
  * drawDataRectangle:
@@ -588,10 +588,8 @@ int initialize_saved_rect (void){
     SavedRect = (void *) kmalloc ( sizeof(struct saved_rect_d) );   
 
     if ( (void *) SavedRect ==  NULL ){
-        panic ("initialize_saved_rect: struct");
-
+        panic ("initialize_saved_rect: struct\n");
     } else {
-     
      
         // #bugbug
         // Size of this allocation. Too much space??

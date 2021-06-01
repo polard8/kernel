@@ -86,13 +86,11 @@ struct sockaddr_in {
 };	  
 */
 
-
 //#test
-#define HOST_DEFAULTNAME       "gramado" 
+#define HOST_DEFAULTNAME    "gramadox" 
 #define HOST_NAME_MAX  64
 
 //static char hostname_buffer[HOSTNAME_BUFFER_SIZE];
-
 
 /*
  * host_info_d:

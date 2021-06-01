@@ -9,6 +9,8 @@
  *     //... 
  */
 
+// #todo
+// ifndef ...
 
 
 /*
@@ -74,11 +76,10 @@ struct object_d
 
 // ??
 // Repensar isso.
+// #bugbug: Muito espaço. (#todo: deprecated this)
 struct object_d objects_km[256+1];  //objetos em kernel mode.
 struct object_d objects_um[256+1];  //objetos em user mode. 
 struct object_d objects_gui[256+1]; //objetos gráficos. 
-
-
 
 
 

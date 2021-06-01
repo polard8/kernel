@@ -1,6 +1,5 @@
-
-    // path.h
-    // path support.
+// path.h
+// path support.
 
 #ifndef __PATH_H
 #define __PATH_H    1

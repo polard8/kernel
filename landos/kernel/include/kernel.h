@@ -207,7 +207,8 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/dev/tty/serial.h"
 
 
-//todo: podemos mover isso de lugar para perto de net/
+//todo: 
+// podemos mover isso de lugar para perto de net/
 #include "rtl/net/mac.h"
 
 
@@ -408,12 +409,13 @@ extern unsigned long stack0_krn_ptr;
 #include "land/object.h"
 #include "land/ss.h"
 
-
 // profiler
 #include "land/pints.h"
 
 
+
 #include "rtl/runtime.h"
+
 
 
 // kernel
@@ -442,6 +444,9 @@ extern unsigned long stack0_krn_ptr;
 
 
 // ==============================
+
+
+
 
 //keyboard suppport 
 //abnt2 flag.

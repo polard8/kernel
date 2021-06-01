@@ -1,17 +1,13 @@
-
+// arp.h
 
 #ifndef ____ARP_H
-#define ____ARP_H
-
-
+#define ____ARP_H    1
 
 #define ARP_OPC_REQUEST  0x01
 #define ARP_OPC_REPLY    0x02
 
-
 // ARP header length
 #define ARP_HEADER_LENGHT 28      
-
 
 // arp struct
 // ARP header.

@@ -40,7 +40,8 @@ draw_text (
 }
 
 
-/* draw_string:
+/* 
+ * draw_string:
  *     Draw a string on the screen. 
  */
 

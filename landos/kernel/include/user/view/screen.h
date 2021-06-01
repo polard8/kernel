@@ -22,24 +22,20 @@
 
 
 #ifndef ____SCREEN_H
-#define ____SCREEN_H
+#define ____SCREEN_H    1
 
 
 #define COLUMNS  80
 #define ROWS     25
-
 #define SCREEN_WIDTH   COLUMNS
 #define SCREEN_HEIGHT  ROWS
-
-
 #define SCREEN_DEFAULT_LEFT  0
 #define SCREEN_DEFAULT_TOP   0
+
 
 //#define SCREEN_START 0x000B8000   //Físico.
 #define SCREEN_START 0x800000       //Virtual.(remapeado pelo Boot Loader.)    
 #define ScreenStart SCREEN_START
-
-
 
 #define SCREEN_CGA_START 0x800000  //FISICO= B8000.
 //#define SCREEN_VGA_START (0x800000 + ??)  //FISICO= A0000.

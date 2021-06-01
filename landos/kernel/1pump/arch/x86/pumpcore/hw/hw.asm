@@ -794,7 +794,8 @@ unhandled_irq:
 extern _faults
 
 ;
-; Obs: Enquanto tratamos uma excessão ou flaul, não desejamos
+; Obs: 
+; Enquanto tratamos uma excessão ou fault, não desejamos
 ; que uma interrupção de timer atrapalhe, então vamos desabilitar
 ; as interrupções.
 ;
@@ -1110,20 +1111,20 @@ all_faults:
     ;;
     
     ; Chama a rotina em C.
-    ;Passa o argumento via pilha.
+    ; Passa o argumento via pilha.
     push dword [save_fault_number]
 
-    ;Chama código em C. (faults.c)
+    ; Chama código em C. (faults.c)
     call _faults 
-
+;.Lhang
 .hang:
     cli
     hlt
     jmp .hang
 
 
-	; @todo: 
-	;     Existe ERROR NUMBER em algumas exceções ?
+; @todo: 
+;     Existe ERROR NUMBER em algumas exceções ?
 
 ;Salva aqui o número da fault.	
 save_fault_number: 

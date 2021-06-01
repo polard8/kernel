@@ -9,6 +9,7 @@
  *     2016 - Created by Fred Nora.
  */
 
+// #todo: ifndef
 
 /*
  * Kernel Heap support.
@@ -26,6 +27,7 @@ unsigned long g_available_heap;     // Available.
 
 
 /*
+ ***********************************
  * heap_d:
  *     Estrutura para heap.
  *     Cada processo tem seu heap.
@@ -129,8 +131,9 @@ unsigned long heapList[HEAP_COUNT_MAX];
 int init_heap (void);
 
 
-struct heap_d *memory_create_new_head ( unsigned long start_va, 
-                                        unsigned long size );
+struct heap_d *memory_create_new_head ( 
+    unsigned long start_va, 
+    unsigned long size );
 
 
 // Destrói um heap se as flags permitirem.

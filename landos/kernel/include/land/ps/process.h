@@ -32,29 +32,26 @@
  * medir quantidade de opera��es de leitura e sa�da.
  * +name, pathname e cmd(command line).
  *
- *
  * History:
  *     2015 - Created by Fred Nora.
  *     2016 ~ 2020 New routines.
  */
 
-
 #ifndef __PROCESS_H
 #define __PROCESS_H    1
 
 
+#define PROCESS_MAGIC  1234
 
+
+// #alternative
 // Position.
 // Position in cell.
 // Main classes for the processes and threads.
 
-
 #define KING           1
 #define SPECIAL_GUEST  2
 #define BETA           3
-
-
-#define PROCESS_MAGIC  1234
 
 
 
@@ -62,8 +59,11 @@
 //#define Get_PDE_Index(va) (((unsigned long)(va)) >> 22)
 //#define Get_PTE_Index(va) ((((unsigned long)(va)) << 10) >> 22)
 
-
+//#bugbug
+//#todo
+//Isso deve ir para uma posição abaixo da estrutura.
 struct process_d *xxxClonedProcess;
+
 
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.
@@ -113,10 +113,9 @@ struct process_d *xxxClonedProcess;
 #define UPROCESS_DEFAULT_STACK_BASE ( UPROCESS_PROCESS_LIMIT - UPROCESS_DEFAULT_STACK_OFFSET )  
 //Tamanho da pilha do processo.   
 #define UPROCESS_DEFAULT_STACK_SIZE 0x2000    
- 
- 
 
- 
+
+
 //
 // Bases para a contagem de processos, do sistema e de usu�rios.
 // 
@@ -126,7 +125,7 @@ struct process_d *xxxClonedProcess;
 //Primeiro �ndice na contagem das processos dos usu�rios.  
 #define USER_BASE_PID 100    
  
- 
+
 //
 // == Priorities ==================================================
 //
@@ -204,8 +203,8 @@ struct process_d *xxxClonedProcess;
  
  
 //Lista de status na cria��o de um processo.     
-#define ERRO_SLOT_OCUPADO  0xfffff    //Slot ocupado.      
-#define ERRO_DEFAULT       0xffffe
+//#define ERRO_SLOT_OCUPADO  0xfffff    //Slot ocupado.      
+//#define ERRO_DEFAULT       0xffffe
 //...
 
 
@@ -213,15 +212,12 @@ struct process_d *xxxClonedProcess;
 //??? Deve ser o limite m�ximo para a pilha de um processo.
 #define MAXSTACK 128    //dwords.
  
-//N�mero total de slots para cria��o de processo.
-//@todo: deletar, definido em threads. ??? 
-#define NUMERO_TOTAL_DE_SLOTS 256   
 
- 
 /*
  * Globais.
  *
- * @todo: Talvez o certo � n�o ter globais aqui, e
+ * @todo: 
+ * Talvez o certo � n�o ter globais aqui, e
  *        as estruturas e vari�veis relativas ao gerenciamento
  *        de processos fique dentro do arquivo process.c.
  *        Encapsulamento.?? 
@@ -1053,14 +1049,10 @@ struct process_info_d
 };
 
 
-
-/* 
- * Linux style. 
- */
-
+// Invalidate page directory.
+// Linux style. 
 #define invalidate() \
-    asm ("movl %%eax,%%cr3"::"a" (0))
-
+    asm ("movl %%eax, %%cr3"::"a" (0))
 
 
 
@@ -1071,14 +1063,9 @@ struct process_info_d
 
 void power_pid (int pid, int power);
 
-
 unsigned long __GetProcessStats ( int pid, int index );
 
 int getprocessname ( int pid, char *buffer );
-
-
-
-
 
 //cria uma estrutura do tipo processo, mas n�o inicializada.
 struct process_d *processObject (void);
@@ -1091,7 +1078,6 @@ struct process_d *processObject (void);
  */
 
 pid_t getNewPID (void);
-
 
 
 // Signal.
@@ -1205,11 +1191,8 @@ __execute_new_process (
     char *argv[], 
     char *envp[] );
 
-
-
 // Pega o n�mero da tty de um processo, dado o pid.
 int process_get_tty ( int pid );
-
 
 
 int 
@@ -1219,9 +1202,7 @@ process_execve (
     const char *arg3 );
 
 
-
 #endif    
-
 
 
 //

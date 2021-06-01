@@ -12,8 +12,6 @@
 #define ____CONNECT_H
 
 
-
-
 #define CONNECTION_MAX 32
 
 

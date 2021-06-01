@@ -1,15 +1,12 @@
-
-//  hw interrupt breaker.
-
+// breaker.h
+// hw interrupt breaker.
 
 #ifndef ____BREAKER_H
-#define ____BREAKER_H
-
+#define ____BREAKER_H    1
 
 // See:
 // x86 - entry/head/hw.asm
 // ...
-
 
 // timer interrupt
 // kdrivers/timer.c

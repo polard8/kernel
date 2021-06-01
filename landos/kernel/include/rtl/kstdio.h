@@ -20,10 +20,10 @@
 int g_inputmode;
  
  
-#define REVERSE_ATTRIB 0x70
+#define REVERSE_ATTRIB  0x70
+#define PAD_RIGHT  1
+#define PAD_ZERO   2
 
-#define PAD_RIGHT 1
-#define PAD_ZERO 2
 
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 12
@@ -66,7 +66,7 @@ int g_inputmode;
 #define	BUFSIZ	1024	// size of buffer used by setbuf
 #define	EOF	(-1)
 */
-#define EOF (-1)    //Ok.
+#define EOF  (-1)    //Ok.
 
 
 //#define SEEK_SET   0
@@ -119,22 +119,18 @@ int g_inputmode;
 #define _IOLBF  1		// setvbuf should set line buffered 
 #define _IONBF  2		// setvbuf should set unbuffered 
 
-
 //#define  BUFSIZ  512 
 #define  BUFSIZ  1024 
-
 
 /* It moves file pointer position to the beginning of the file. */
 #ifndef SEEK_SET
 #define SEEK_SET  0
 #endif
 
-
 /* It moves file pointer position to given location. */
 #ifndef SEEK_CUR
 #define SEEK_CUR  1
 #endif
-
 
 /*  It moves file pointer position to the end of file. */
 #ifndef SEEK_END
@@ -142,12 +138,10 @@ int g_inputmode;
 #endif
 
 
-
 // #define  TMP_MAX    32767
 // #define  L_tmpnam    1024    /* XXX must be == PATH_MAX */
 // #define  P_tmpdir    "/tmp/"
 // #define  L_ctermid   1024    /* size for ctermid(); PATH_MAX */
-
 
 
 //
@@ -167,11 +161,9 @@ unsigned long prompt_status;
 // =======================================
 
 
-//
 // Print char flags. (_outbyte)
 // usada para rotinas de pintura da libC.
 // ou seja, dentro do terminal. 
-//
 
 //
 //#importante: 
@@ -197,8 +189,7 @@ int stdio_verbosemode_flag;
 
 
 
-
-/*      
+/* 
  * This is fairly grotesque, but pure ANSI code must not inspect the
  * innards of an fpos_t anyway.  The library internally uses off_t,
  * which we assume is exactly as big as eight chars.
@@ -215,18 +206,17 @@ typedef struct __sfpos {
 */
 
 // Vamos usar esse por enquanto.
-typedef __off_t fpos_t;
+typedef __off_t  fpos_t;
 
 
-
-//#define	_FSTDIO			/* Define for new stdio with functions. */
+//#define _FSTDIO    /* Define for new stdio with functions. */
 
 /*
- * NB: to fit things in six character monocase externals, the stdio
+ * NB: 
+ * to fit things in six character monocase externals, the stdio
  * code uses the prefix `__s' for stdio objects, typically followed
  * by a three-character attempt at a mnemonic.
  */
-
 
 // stdio buffers
 struct __sbuf 
@@ -241,22 +231,20 @@ struct __sbuf
 #define ACTION_REPLY      2000
 #define ACTION_EVENT      3000
 #define ACTION_ERROR      4000
-
-#define SYNC_REQUEST_SET_ACTION 1
-#define SYNC_REQUEST_GET_ACTION 2
+// ...
+#define SYNC_REQUEST_SET_ACTION  1
+#define SYNC_REQUEST_GET_ACTION  2
 // ...
 
 struct kstdio_sync_d
 {
     pid_t sender;
     pid_t receiver;
-    
-    
+
     // REQUEST, REPLY, EVENT, ERROR
     // See: defines above.
     int action;
-    
-    
+
     // for files, ttys, sockets ...
     int can_read;
     int can_write;
@@ -636,19 +624,21 @@ int kputs ( const char *str );
 void printchar (char **str, int c);
 
 int 
-prints ( char **out, 
-         const char *string, 
-         int width, 
-         int pad );
+prints ( 
+    char **out, 
+    const char *string, 
+    int width, 
+    int pad );
 
 int 
-printi ( char **out, 
-         int i, 
-         int b, 
-         int sg, 
-         int width, 
-         int pad, 
-         int letbase );
+printi ( 
+    char **out, 
+    int i, 
+    int b, 
+    int sg, 
+    int width, 
+    int pad, 
+    int letbase );
 
 int print (char **out, int *varg);
 

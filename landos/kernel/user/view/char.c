@@ -169,6 +169,11 @@ d_drawchar_transparent (
 
     // Checking the font size.
 
+    // #bugbug
+    // Não precisamos configurar a fonte
+    // toda vez que formos desenhar um char.
+
+
     switch (gfontSize){
 
         case FONT8X8:

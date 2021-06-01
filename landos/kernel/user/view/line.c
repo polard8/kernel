@@ -71,19 +71,21 @@ refresh_horizontal_line (
 
     switch (SavedBPP)
     {
-		case 32:  bytes_count = 4;  break;
-		case 24:  bytes_count = 3;  break;
+        case 32:  bytes_count = 4;  break;
+        case 24:  bytes_count = 3;  break;
 
 		//#todo 
 		//#bugbug	
 		
-		default:
-			break;
+        default:
+            // #bugbug
+            // Return!
+            break;
     };
 
     void *s = (void *) (BACKBUFFER_ADDRESS)  + (y * bytes_count * width) + (x1 * bytes_count);
     void *d = (void *) (FRONTBUFFER_ADDRESS) + (y * bytes_count * width) + (x2 * bytes_count);
-	
+
 	// ??
 	// Não pode ser isso. 
 	// Tem que ser uma string de tamanho definido.
@@ -91,7 +93,7 @@ refresh_horizontal_line (
 	
 	//#bugbug
 	//Essa '3' precisa ser uma variável
-	
+
     unsigned long size = (unsigned long) ( (x2-x1) * bytes_count );
 	//unsigned long size = (unsigned long) ( (x2-x1) * 3 ); 
 
