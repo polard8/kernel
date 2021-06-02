@@ -17,10 +17,8 @@
 //#define toupper(c)  ((int)((c) | 0x20))
 
 
-/* 
- * strcmp:
- *     Compara duas strings. 
- */
+// strcmp:
+//     COmpare two strings. 
 
 int strcmp (char * s1, char * s2){
 
@@ -35,10 +33,8 @@ int strcmp (char * s1, char * s2){
 }
 
 
-/* 
- * strncmp:
- *     Compara duas strings. 
- */
+// strncmp:
+//    Compare n bytes of two strings. 
 
 int strncmp ( char *s1, char *s2, int len ){
 
@@ -52,18 +48,15 @@ int strncmp ( char *s1, char *s2, int len ){
 
 		//#bugbug:
 		//Esse incremento está errado.
-		
-		*s1++;
-		*s2++;
-		
+
+        *s1++;
+        *s2++;
+
 		//#bugbug:
 		//Testar sem o asterísco, tanto em user mode(libc) quanto em kernel mode.
 		//s1++;
 		//s2++;
-		
-		
-	};		
-
+    };
 
     if (*s1 != '\0' || *s2 != '\0' )
     {
@@ -74,14 +67,13 @@ int strncmp ( char *s1, char *s2, int len ){
 }
 
 
-/*
- * str_cmp:
- *     Compara strings.
- */
+
+// str_cmp:
+//     Compare two strings.
 
 int str_cmp(unsigned char *str1, unsigned char *str2)
 {
-    
+
     while ( *str1 == *str2 && 
             *str1 != 0     && 
             *str2 != 0) 
@@ -89,17 +81,18 @@ int str_cmp(unsigned char *str1, unsigned char *str2)
         str1++;  str2++; 
     };
 
+    // mesma quantidade de chars iguais
+    if (*str1 == *str2){
+        return 0;
+    }
 
-	// mesma quantidade de chars iguais
-    if (*str1 == *str2) 
-	    return 0;
-	
-	if (*str1 > *str2) 
-	    return 1;
-		
-	if (*str1 < *str2) 
-	    return -1;
+    if (*str1 > *str2){
+        return 1;
+    }
 
+    if (*str1 < *str2){
+        return -1;
+    }
 
     return -1;
 }
@@ -129,17 +122,17 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
 }
 
 
-void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c ){
-	
+void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
+{
 	//const char *src = v_src;
 	//char *dst = v_dst;
 
-	long *src = (long *) v_src;
-	long *dst = (long *) v_dst;
+    long *src = (long *) v_src;
+    long *dst = (long *) v_dst;
 
     register unsigned long Copy=c;
     
-	/* Simple, byte oriented memcpy. */
+    /* Simple, byte oriented memcpy. */
     //danger
     
     while (Copy--)
@@ -151,9 +144,9 @@ void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c ){
 }
 
 
-/*
- * strcpy - copia uma string 
- */
+
+// strcpy:  
+//     Copy a string
 
 char *strcpy ( char *to, const char *from ){
 
@@ -186,9 +179,9 @@ char *strncpy (char *s1, const char *s2, size_t n){
     return (char *) s1;
 }
 
-/*
- * strcat - acrescenta uma string ao fim de outra. 
- */
+
+// strcat: 
+//     Concatenate strings.
 
 char *strcat (char *to, const char *from)
 {
@@ -205,7 +198,7 @@ char *strcat (char *to, const char *from)
 }
 
 
- /* strcat */
+/* strcat */
 /* 
  char *(strcat)(char *restrict s1, const char *restrict s2);
  char *(strcat)(char *restrict s1, const char *restrict s2)
@@ -222,7 +215,8 @@ char *strcat (char *to, const char *from)
 
 
 /*
- *  bcopy: */
+ *  bcopy: 
+ */
 
 void bcopy (char *from, char *to, int len)
 {
@@ -258,10 +252,9 @@ void bzero (char *cp, int len)
 }
 
 
-/*
- * strlen:
- *     Calcula o tamanho de uma string. 
- */
+
+// strlen:
+//    Give the string lenght in bytes.
 
 size_t strlen (const char *s){
 
@@ -270,12 +263,9 @@ size_t strlen (const char *s){
     //#todo
     //if ( (void *) s == NULL ){ return -1; }
 
-    for ( i=0; s[i] != '\0'; ++i )
-    {
-        ;
-    };
+    for ( i=0; s[i] != '\0'; ++i ){  };
 
-    return ( (size_t) i );
+    return (size_t) i;
 }
 
 
@@ -491,7 +481,7 @@ void *memset ( void *ptr, int value, int size ){
         {
             *temp++ = (unsigned char) value;
         };
-    };
+    }
 
     return (void *) ptr;
 }
@@ -501,7 +491,6 @@ void *memset ( void *ptr, int value, int size ){
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
 size_t strcspn(const char* str, const char* reject)
 {
-
     register int i=0;
 
     //bool matches = 0;
@@ -526,10 +515,10 @@ size_t strcspn(const char* str, const char* reject)
 
         for ( i=0; i < reject_length; i++ )
         {
-			if ( str[result] != reject[i] )
-				continue;
-			matches = 1;
-			break;
+            if ( str[result] != reject[i] ){ continue; }
+
+            matches = 1;
+            break;
         };
 
         if ( matches ){  return (size_t) result;  }
@@ -541,7 +530,6 @@ size_t strcspn(const char* str, const char* reject)
 // ?? is it working?
 size_t strspn (const char* str, const char* accept)
 {
-
     int matches = 0;
     int i=0;
 
@@ -558,8 +546,9 @@ size_t strspn (const char* str, const char* accept)
     for ( result = 0; result = 1; result++ )
     {
         char c = str[result];
-        if ( !c )
+        if ( !c ){
             return (size_t) result;
+        }
 
 		//for ( size_t i = 0; i < accept_length; i++ )
         for( i=0; i<accept_length; i++ )
@@ -570,13 +559,14 @@ size_t strspn (const char* str, const char* accept)
             break;
         };
 
-        if ( !matches )
+        if ( !matches ){
             return (size_t) result;
+        }
     };
 }
 
 
-/*apple open source*/
+/* Apple open source */
 char *k_strtok_r (
     char *s, 
     const char *delim, 
@@ -664,7 +654,6 @@ char *strdup (const char *str){
     char *copy;
     size_t len=0;
 
-
     // #todo
     //if ( (void*) str == NULL )
         //return NULL;
@@ -672,7 +661,6 @@ char *strdup (const char *str){
     // #todo
     //if ( *str == 0 )
         //return NULL;
-
 
     len = strlen(str) + 1;
 
@@ -683,9 +671,17 @@ char *strdup (const char *str){
         return (NULL);
     }
 
+// Copy
+
     memcpy (copy, str, len);
  
     return (char *) copy;
 }
+
+
+//
+// End.
+//
+
 
 

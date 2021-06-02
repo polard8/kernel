@@ -3,36 +3,26 @@
  * Header para o gerenciado de fluxo de caractere.
  */
 
-
 // #important
 // The TTY driver is in the charge of the job control.
 // This is why it can send the input to the forground process.
 
-
 // See:
 // http://www.linusakesson.net/programming/tty/index.php
-
 
 #ifndef ____TTY_H
 #define ____TTY_H  1
 
-
-
 #define TTYCHARS_COUNT_MAX 25    //80 
 #define TTYLINES_COUNT_MAX 25    //25 
-
 
 //#define DEVELOPER_TTYCHARS_MAX 25    //80
 //#define DEVELOPER_TTYLINES_MAX 25    //25 
 //... 
 
-
-
 /* tty magic number */
 //#define TTY_MAGIC		0x5401
 #define TTY_MAGIC		1234
-
-
 
 //TTY_DRIVER_TYPE_SYSTEM
 //TTY_DRIVER_TYPE_CONSOLE
@@ -74,11 +64,11 @@
 #define TTY_FLUSHPENDING     20	/* Queued buffer flush pending */
 
 
- 
-//Contador de linhas usados na hora da criação de linhas.
+
+// Contador de linhas usados na hora da criação de linhas.
 int ttyLineCounter;
 
-//Cursor.
+// Cursor.
 int ttyCurrentX;
 int ttyCurrentY;
 
@@ -100,7 +90,6 @@ struct ttybuffer_d
 struct ttybuffer_d *CurrentTTYBUFFER;
 
 
-
 struct tty_line_d
 {
     //int index;
@@ -120,7 +109,6 @@ struct tty_line_d
 /*
  *************************************** 
  * tty_d:
- * 
  *     The tty structure need to have a pointer to
  * a buffer and a pointer to a thread. These is the where
  * we're gonna send the data.
@@ -156,7 +144,6 @@ struct tty_d
     
     // The buffer. The box.
 
-    
     //
     // Buffers.
     //
@@ -184,14 +171,12 @@ struct tty_d
     file *_obuffer;
 
 
-    //
-    // == (2) synchronization ========
-    //
-
+//
+// == (2) synchronization ========
+//
 
     // flag para sincronizaçao de leitura e escrita de eventos.
     int new_event;
-
 
     // Synch and job control.
     // This way the TTY driver can send the input to the forground process.
@@ -211,9 +196,9 @@ struct tty_d
     struct thread_d *control;
 
 
-    //
-    // == (3) transmition ========
-    //
+//
+// == (3) transmition ========
+//
     
     // The pipe fd, the socket fd, the read write operation.
 
@@ -223,9 +208,9 @@ struct tty_d
 
     // ===============================
 
-    //
-    // == Device info ==================
-    //
+//
+// == Device info ==================
+//
     
     // Device.
     struct device_d *device;
@@ -241,9 +226,9 @@ struct tty_d
     struct termios termios;
 
 
-    //
-    // == Security ============================================
-    //
+//
+// == Security ============================================
+//
 
     // What is the user logged in this terminal?
     struct user_info_d *user_info;
@@ -267,12 +252,11 @@ struct tty_d
     int pid_count;
 
     //=========================
-    
 
-    //
-    // ==  properties ========================
-    //
-    
+//
+// ==  properties ========================
+//
+
     // Qual eh o modo de operacao do terminal virtual.
     // graphics, text ...
     //int vt_mode;
@@ -287,12 +271,10 @@ struct tty_d
     
     unsigned long flags;        // tty flags.   
 
-    //
-    // == Actions ==============
-    //
 
-
-
+//
+// == Actions ==============
+//
 
     // Qual terminal virtual esta usando essa tty.
     int virtual_terminal_pid;

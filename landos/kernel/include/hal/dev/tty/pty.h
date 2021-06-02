@@ -5,7 +5,6 @@
 
 // See: ptmx.
 
-
 #ifndef ____PTY_H
 #define ____PTY_H  1
 
@@ -72,7 +71,7 @@ The role of the terminal emulator process is:
 */
 
 
-//credits: linux
+// credits: linux
 // pty subtypes;
 // lembrando que pty usa a mesma estrutura do tty.
 

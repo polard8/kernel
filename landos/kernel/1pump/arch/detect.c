@@ -197,7 +197,6 @@ int hal_probe_processor_type (void){
     unsigned long ecx=0;
     unsigned long edx=0;
 
-
     unsigned long name[32];
 
     int MASK_LSB_8 = 0xFF;  

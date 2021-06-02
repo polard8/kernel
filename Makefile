@@ -2,7 +2,7 @@
 # Product configuration
 # See: 0config/version.h
 PRODUCT_NAME  = Gramado
-EDITION_NAME  = ?
+EDITION_NAME  = V
 VERSION_MAJOR = 1
 VERSION_MINOR = 1
 VERSION_BUILD = 241

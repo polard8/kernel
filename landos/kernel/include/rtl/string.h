@@ -1,15 +1,11 @@
 /*
  * File: string.h
  *
- * Descrição:
- *     Operações com strings. Padrão C.
+ *     Ring 0, string operations.
  */
 
 #ifndef __STRING_H
 #define __STRING_H    1
-
-
-
 
 void *memset ( void *ptr, int value, int size );
 
@@ -32,11 +28,9 @@ char *strcat(char *to, const char *from);
 void bcopy(char *from, char *to, int len);
 void  bzero(char *cp, int len);
 
-
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
 size_t strcspn(const char* str, const char* reject);
 size_t strspn(const char* str, const char* accept);
-
 
 
 //
@@ -44,13 +38,14 @@ size_t strspn(const char* str, const char* accept);
 //
 
 // #test
-// We're gonna need these routines to split the
-// pathname in the fs module.
+// Tokenizer.
+// We're gonna need these routines to split the pathnames 
+// in the fs module.
 
 #define LSH_TOK_DELIM   " \t\r\n\a" 
 #define LSH_TOK_DELIM2  " \t\r\n\a+!:=/.<>;|&" 
 #define SPACE " "
-#define TOKENLIST_MAX_DEFAULT 80
+#define TOKENLIST_MAX_DEFAULT  80
 
 /*apple open source*/
 // See: string.c
