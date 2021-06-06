@@ -466,8 +466,9 @@ int fsCheckELFFile ( unsigned long address )
 {
     unsigned char *buffer = (unsigned char *) address;
 
-    if ( (void*) buffer == NULL )
+    if ( (void *) buffer == NULL ){
         return -1;
+    }
 
     if ( buffer[0] != 0x7F ||
          buffer[1] != 0x45 || buffer[2] != 0x4C || buffer[3] != 0x46 )

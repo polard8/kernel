@@ -36,12 +36,10 @@ void gwsSetCurrentFontCharHeight (int height)
     set_char_height (height);
 }
 
-
 int gwsGetCurrentFontCharWidth (void)
 {
     return (int) get_char_width ();
 }
-
 
 int gwsGetCurrentFontCharHeight (void)
 {

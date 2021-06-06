@@ -73,7 +73,7 @@ void ata_delay (void)
     int i=0;
 
     // Waste some time.
-    for (i = 0; i < 5; i++)
+    for (i=0; i < 5; i++)
     {
         __x86_io_delay();
     };
@@ -236,7 +236,6 @@ int ide_identify_device ( uint8_t nport )
     unsigned char lba2 = 0;
 
     char name_buffer[32];
-
     unsigned char status=0;
 
 

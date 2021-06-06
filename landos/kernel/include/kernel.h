@@ -124,8 +124,8 @@ extern unsigned long stack0_krn_ptr;
 #include "land/0globals/gdevice.h"
 #include "land/0globals/gobject.h"
 #include "land/0globals/gspin.h"
-#include "land/0globals/ginput.h"   // input manager support.
-#include "land/0globals/gwd.h"   //whatch dogs
+#include "land/0globals/ginput.h"  // input manager support.
+#include "land/0globals/gwd.h"     // whatch dogs
 
 
 // rtl 

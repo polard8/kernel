@@ -29,12 +29,10 @@
  *     2016 ~ 2018 Revision.
  */
 
- 
- 
-#ifndef ____REQUEST_H 
-#define ____REQUEST_H
 
- 
+#ifndef ____REQUEST_H 
+#define ____REQUEST_H    1
+
 // #importante:
 // Devemos incluir aqui mais eventos importantes,
 // principalmente os eventos referentes a espera bloqueante.
@@ -75,7 +73,6 @@
 #define KERNEL_REQUEST_MAX 1024
 
 
-
 unsigned long kernel_request;
 
 
@@ -90,7 +87,6 @@ unsigned long kernel_request;
 struct request_d
 {
 	// Número do request.
-	
     unsigned long kernel_request;
 	
 	// 0 = No request.
@@ -148,7 +144,6 @@ create_request (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-
 
 void clear_request (void);
 

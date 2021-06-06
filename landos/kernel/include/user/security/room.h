@@ -21,10 +21,8 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #ifndef ____ROOM_H
-#define ____ROOM_H
-
+#define ____ROOM_H    1
 
  
 /*

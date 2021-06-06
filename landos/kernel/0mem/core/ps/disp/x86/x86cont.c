@@ -31,35 +31,39 @@ static inline uint32_t ckGetCr3()
 }
 */
 
+// ===============================================
+
 
 // Context:
-//     Vari�veis para salvar o contexto.
-//     Essas vari�veis devem permanecer encapsuladas
-//     nesse arquivo d� m�dulo. Somente esse
-//     arquivo ter� acesso � essas vari�veis.
-//     
-//     *IMPORTANTE:
-//         Obviamente a rotina _irq0, que � o handler
-//         do timer est� acessando essas vari�veis
-//         fazendo uso d 'extern'. 
-
+// Variáveis para salvar o contexto para x86.
+// Essas variáveis devem permanecer encapsuladas nesse arquivo 
+// do módulo. 
+// Somente esse arquivo terá acesso direto à essas informações.
+// #importante
+// Algumas poucas rotinas vão importar essas variáveis.
 
 unsigned long contextSS;        // User mode.
 unsigned long contextESP;       // User mode.
 unsigned long contextEFLAGS; 
 unsigned long contextCS;
 unsigned long contextEIP;
+
 unsigned long contextDS;
 unsigned long contextES;
 unsigned long contextFS;
 unsigned long contextGS;
+
 unsigned long contextEAX;
 unsigned long contextEBX;
 unsigned long contextECX;
 unsigned long contextEDX;
+
 unsigned long contextESI;
 unsigned long contextEDI;
+
 unsigned long contextEBP;
+
+// ===============================================
 
 //
 // #todo: 

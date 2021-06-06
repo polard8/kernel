@@ -1,10 +1,9 @@
 /*
  * File: stdlib.c
- *
- * Descrição:
- *     Stdlib. Parte da lib C do kernel.
- *
- * 2015.
+ * 
+ *     stdlib
+ * 
+ * 2015
  */
 
  
@@ -21,7 +20,7 @@ static int randseed = 1234;
 
 
 /* rand: 
- * Gera um número inteiro randômico. 
+ * Gera um número inteiro semi-randômico. 
  */
 
 int rand (void)

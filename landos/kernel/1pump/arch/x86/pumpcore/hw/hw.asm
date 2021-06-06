@@ -262,6 +262,7 @@ _irq1:
     cli
 
     ;; Acumulator.
+    ; #todo: push eax
     push dword eax
 
     pushad
@@ -391,7 +392,6 @@ _irq4:
 
 
 
-
 ;===================================================
 ;IRQ 7 parallel port 1. 
 ; It is used for printers 
@@ -405,8 +405,6 @@ _irq4:
 ;; If it is a real IRQ then it is treated the same as any other real 
 ;; IRQ. If it is a spurious IRQ then you ignore it 
 ;; (and do not send the EOI). 
-
-
 
 global _irq7
 _irq7:
@@ -512,7 +510,7 @@ _irq9:
 
 
 ;========================================================
-; IRQ 10 – The Interrupt is left open for the use 
+; IRQ 10  The Interrupt is left open for the use 
 ; of peripherals (open interrupt/available, SCSI or NIC)
 ; nvidia
 
@@ -668,14 +666,12 @@ _irq13:
     iretd
 
 
-;=================================================	
+;============================================
 ; _irq14:
 ;     Tratador de interrupções para unidade master.
 ;     IRQ 14 - primary ATA channel 
 ;     ( ATA interface usually serves hard disk drives and CD drives ) 
 ;     O timer precisa ser desbilitado. ??
-;
-
 
 global _irq14
 _irq14:
@@ -708,7 +704,6 @@ _irq14:
 ;     Tratador de interrupções para unidade slave.
 ;     IRQ 15 - secondary ATA channel
 ;     O timer precisa ser desbilitado. ??
-;
 
 ;; The correct way to handle an IRQ 15 is similar, but a little trickier 
 ;; due to the interaction between the slave PIC and the master PIC. 
@@ -718,8 +713,6 @@ _irq14:
 ;; EOI to the slave PIC; however you will still need to send the EOI 
 ;; to the master PIC because the master PIC itself won't know that it 
 ;; was a spurious IRQ from the slave. 
-
-
 
 global _irq15
 _irq15:

@@ -16,13 +16,11 @@
  * 
  *  2015 - Created by Fred Nora.
  */
- 
 
- 
-#ifndef ____SECURITY_H
-#define ____SECURITY_H
 
- 
+#ifndef ____DESKTOP_H
+#define ____DESKTOP_H    1
+
 
 /*
  * desktop_d:

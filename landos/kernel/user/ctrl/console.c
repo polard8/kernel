@@ -113,6 +113,8 @@ void __respond (int console_number)
 	//copy_to_cooked(tty);
 }
 
+
+
 static int saved_x=0;
 static int saved_y=0;
 
@@ -1884,7 +1886,7 @@ void
 console_interrupt(
     int target_thread, 
     int device_type, 
-    int data)
+    int data )
 {
 
     //int TargetThread = foreground_thread;

@@ -325,12 +325,9 @@ struct process_info_d
 
 struct process_d 
 {
-    
-    // Controle do objeto do tipo processo.
-    
+    // Object control
     object_type_t  objectType;
     object_class_t objectClass;
-    
     struct object_d *object;
 
     int used;
@@ -373,7 +370,6 @@ struct process_d
     gid_t  rgid;
     gid_t  sgid;
 
-    
 	// State.
 	// flag ?
     process_state_t state; 
@@ -383,6 +379,11 @@ struct process_d
 
 	// error.
 	//unsigned long error; 
+
+
+//
+// Name
+//
 
 	// @todo:
 	// +name     (Nome=EXEMPLO.BIN)
@@ -399,9 +400,9 @@ struct process_d
     char __processname[64];    // HOSTNAME_BUFFER_SIZE
     size_t processName_len;    // len 
 
-    //
-    // Standard input.
-    //
+//
+// Input
+//
     
     // #importante
     // De onde vem o o input do processo. (stdin)
@@ -411,22 +412,21 @@ struct process_d
     // disciplina de linhas.
     // ex: #todo INPUTTYPE_TTY INPUTTYPE_RAW ...
     int input_type;
-    
-	//
-	// tty support
-	//
+
+//
+// tty 
+//
     
     // Essa � a tty do processo.
     // Ela ser� master se o processo for um shell e
     // Ser� slave se o processo for um terminal.
     // O terminal(slave) encontrar� o shell(master) em tty->link.
     struct tty_d *tty;
-    
+
     // Um buffer no app en ring3
     // onde o driver de rede pode colocar conte�do e depois
     // avisar o processo via mensagem.
     char *net_buffer;
-
  
     // Qual � apersonalidade do processo.
     // Ele deve agir como unix-like, gramado-like, etc ?
@@ -442,10 +442,16 @@ struct process_d
 
     appmode_t appMode;
 
-	//
-	//    ****  Banco de dados ****
-	//
 
+
+
+//
+//  Banco de dados
+//
+
+    // #??
+    // This is a work in progress.
+    // Memory management.
 
 	// Obs: 
 	// Um processo � um cliente de banco de dados.
@@ -465,10 +471,9 @@ struct process_d
 	//Lista de acessos � bancos de contas pessoais.
     struct bank_d *ldbListHead;
 
-
-	//
-	// CONTAS
-	//
+//
+// CONTAS
+//
 
 	//Lista de contas conjuntas que o processo tem.
     struct aspace_d *aspaceSharedListHead;
@@ -481,6 +486,10 @@ struct process_d
 
 	//Lista de contas pessoais que o processo tem.
     struct dspace_d *dspacePersonalListHead;
+
+//
+// Frame pool
+//
 
 	//Testing...
 	//Process Page Table. (PPT)
@@ -517,7 +526,7 @@ struct process_d
 	//Quantidade de mem�ria usada por um processo em determinado espa�o de tempo.
 	// workset = (private + shared);
     unsigned long workingset_size;
-    unsigned long workingset_peak_size;	
+    unsigned long workingset_peak_size;
 
 
 	//Qualquer pagefault deve ser registrada na estrutura do processo corrente.
@@ -545,9 +554,9 @@ struct process_d
 	//unsigned long ContextSwitchesDelta;  
 
 
-	//
-	// ## MEMORY SUPPORT ##
-	//
+//
+// MEMORY SUPPORT
+//
 
 	// image = Imagem do programa principal do processo.
 	// heap  = Heap do processo.
@@ -563,7 +572,7 @@ struct process_d
 	// ORDEM: 
 	// O que segue � referenciado durante o processo de task switch.
 
-	
+
 	// Page directory information:
 	// ==========================
 	//     Todo processo deve ter seu pr�prio diret�rio.
@@ -574,15 +583,14 @@ struct process_d
     unsigned long DirectoryVA;                  
     unsigned long DirectoryPA;
 
-
     // Ponteiro para a estrutura do diret�rio de p�ginas do processo.
     struct page_directory_d *page_directory;  
 
 
-	//
-	// Image support.
-	//
-	
+//
+// Image support.
+//
+
 	// #IMPORTANTE
 	// Com base na origem da imagem e no seu tamanho podemos
 	// determinar a quantidade de p�ginas que o programa principal do processo
@@ -594,15 +602,15 @@ struct process_d
 	// #importante: esssa estrutura tem que ser simples. Com poucos elementos.
 	// Poderemos usar essas informa��es para clonar o processo.
 
-
 	// Base da imagem do processo.
 	// Tamanho da imagem do processo.
 	// Quantas p�ginas foram usadas por essa imagem. ImageSize/PageSize
-	 
-    unsigned long Image; 
-    unsigned long ImagePA; 
-
-    unsigned long ImageSize;      
+ 
+    unsigned long Image;        // VA?
+    unsigned long ImagePA;      // PA
+    unsigned long ImageSize;    // ?? in bytes ??
+    //unsigned long ImageSizeInBytes;
+    //unsigned long ImageSizeInKB;
     unsigned long PagesPerImage; 
 
 
@@ -621,7 +629,9 @@ struct process_d
 	//struct page_control_t *page_list_head;
 
 
-	// ## Heap ##     
+//
+// Heap
+//
 
 	//#importante 
 	unsigned long Heap;            //Endere�o do in�cio do Heap do processo.
@@ -634,14 +644,17 @@ struct process_d
 	unsigned long HeapLastSize;    //�ltimo tamanho alocado..	
 	//struct heap_d *processHeap;  //@todo: Usar essa estrutura.
 
-
-	//  ## Stack ##
+//
+// Stack
+//
 
 	unsigned long Stack;          //Endere�o do in�cio da Stack do processo.
 	unsigned long StackEnd;
 	unsigned long StackSize;      //Tamanho da pilha.	
 	unsigned long StackOffset;    //Deslocamento da pilha em rela��o ao in�cio do kernel.	
 	//struct stack_d *processStack;  //@todo: Criar essa estrutura.
+
+
 
 	// Teste: 
 	// Blocos de memoria usados pelo processo.
@@ -661,9 +674,10 @@ struct process_d
 	//IOPL of the task. (ring).
     unsigned long iopl; 
 
-    //
-    // == Priorities ==================================================
-    //
+//
+// == Priorities ============
+//
+
     // Priority levels.
     // Used by processes and threads.
     // Classes:
@@ -678,7 +692,6 @@ struct process_d
     // the priority level.
     // The priority can't be changed to a level below the base priority.
     // The base priority is static and the current priority is dinamic.
-    //
 
     unsigned long base_priority;  // static 
     unsigned long priority;       // dinamic
@@ -687,17 +700,16 @@ struct process_d
 	//Que tipo de scheduler o processo utiliza. (rr, realtime ...).
 	//int scheduler_type;    
 
-
-    //
     // syscalls counter.
-    //
 
     unsigned long syscalls_counter;
 
-	//
-	// Temporiza��o da tarefa. 
-	//
-	
+
+//
+// Timer
+//
+
+	// Temporização da tarefa. 
 	unsigned long step;               //Quantas vezes a tarefa usou o processador. 
 	unsigned long quantum;            //thread quantum
 	unsigned long timeout;            //Tempo em modo de espera. 
@@ -718,23 +730,28 @@ struct process_d
 	 *     'ProcessingTime' � atribu�do pelo processo. � o quanto
 	 *     ele precisa. o quanto ele deseja.
 	 */
-	 
-	//
-	// Working set support.
-	// 
-	 
+ 
+//
+// Working set support.
+//
+
 	//unsigned long ws_number_of_frames; 
 	//...
-	
+
+
+//
+// profiler
+//
+
 	//quanto por cento do tempo o processo ficou rodando.
 	//� a soma do quanto ficou rodando todas as suas threads.
 	unsigned long profiler_percentage_running;
 	unsigned long profiler_ticks_running;
 	unsigned long profiler_last_ticks;
 
-	//
-	// == Thread =================================
-	//
+//
+// == Thread =================================
+//
 
 	// Tipo de thread
 	// 0 = cpu-bound
@@ -770,7 +787,6 @@ struct process_d
     // quando criarmos novos processos ou clonarmos.
     struct thread_d *extra;  
 
-
     // Lista com ponteiros de estrutura das threads do processo.
     // O indice dessa lista serve para enumeralas. 
     // @todo: Usar array de estruturas din�mico. (Alocar).
@@ -788,13 +804,13 @@ struct process_d
 	/*
 	 * event: 
 	 *    Tipo de evento que fazem a tarefa entrar em modo de espera. 
-	 */	
+	 */
 	//event_type_t event;
 
 
-    //
-    // == Security ============================
-    //
+//
+// == Security ============================
+//
 
     // User session, room (window station), desktop.
 
@@ -803,22 +819,20 @@ struct process_d
     struct desktop_d   *desktop;   //Desktop do processo.        
 
 
-	//
 	// ORDEM: 
 	// O que segue eh referenciado com pouca frequencia.
-	//
 
 	//lista de arquivos ??
 	//fluxo padr�o. stdio, stdout, stderr
 	//unsigned long iob[8];
 
 	//ponteiros para as streams do fluxo padr�o.
-	unsigned long standard_streams[3];
+    unsigned long standard_streams[3];
 
 
-    //
-    // == fs ===========================================
-    //
+//
+// == fs ===============
+//
     
     // #important
     // This is gonna help us to navigate in the levels of the pathname.
@@ -921,9 +935,9 @@ struct process_d
 	unsigned long dialog_address;
 	
 
-    //
-    // == Socket ================================== 
-    //
+//
+// == Socket ================================== 
+//
 
     // list of sockets to accept connection.
     //int accept[5];

@@ -487,9 +487,6 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // memory:
 //
 
-
- 
- 
  
  
 //
@@ -557,12 +554,11 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //Um framepool tem 4MB de tamanho.
 #define MEMORY_PARTITION_SIZE (4 * MB)
 
-//
+
 // Obs: Criamos apenas algumas entradas no diret�rio de p�ginas
 // do kernel, mas algumas dessas entradas ser�o iguais para todos 
 // os processos. Ent�o os diret�rios de da p�ginas dos processos
 // ser�o configurados de forma semelhante.
-//
 
 //
 // Page frames da imagem do kernel:
@@ -819,7 +815,7 @@ unsigned long mmblockList[MMBLOCK_COUNT_MAX];
 
 /*
  ****************************************************************
- * page_frames_d:
+ * page_d:
  *     Guarda informa��es sobre um 'page frame' na mem�ria f�sica.
  *     @todo: Incluir todas as informa��es necess�rias.
  */
@@ -1148,7 +1144,6 @@ unsigned long mm_used_heappool;     // start = 0x01000000 size = 4MB
 // por isso receber�o heaps especiais.
 
 
-
 // Extra heaps.
 
 //unsigned long mm_used_gramadocore_init_heap;     // start = (0x01000000 + 0x400000) size = 4MB
@@ -1167,7 +1162,6 @@ unsigned long mm_used_frame_table;
 // #bugbug
 // Só pra lembrar que temos estruturas de bancos de memória.
 // eles deverão ser usados no futuro.
-
 
 // #importante
 // Como é uma tabela de bytes,
@@ -1312,13 +1306,10 @@ void memoryShowMemoryInfo (void);
 
 int mmInit (void); 
 
-
 int init_stack (void);
-
 
 // Configura paginação usada pelo kernel
 int mmSetUpPaging (void);    
-
 
 // #todo
 // Coloca o endere�o do diret�rio de p�ginas de um processo
@@ -1326,7 +1317,6 @@ int mmSetUpPaging (void);
 void x86_SetCR3 (unsigned long pa);
 unsigned long mm_get_current_directory_pa (void);
 void mm_switch_directory ( unsigned long dir);
-
 
 //mapeando o nic principal.
 //considerando que tenhamos mais de uma placa de rede, 

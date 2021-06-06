@@ -57,7 +57,8 @@ _kernel_begin:
 ; Precismos carregar a gdt o mais rápido possível.
 
     JMP START
-
+    nop
+    DB 'GRAMADO'
 align 4
 
 

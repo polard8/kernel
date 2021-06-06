@@ -22,9 +22,8 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #ifndef ____USER_H
-#define ____USER_H
+#define ____USER_H    1
 
 
 /*
@@ -85,9 +84,8 @@ typedef enum {
 
 
 //
-// ======== js-like events. ==============
+// == js-like events. ==============
 //
-
 
 // window events
 // #todo: move to another place.
@@ -113,7 +111,7 @@ typedef enum {
 }window_events_t; 
 
 
-//form eventes 
+// form events 
 // #todo: move to another place.
 typedef enum { 
     FORM_EVENTS_NULL,
@@ -130,8 +128,8 @@ typedef enum {
     FORM_EVENTS_ONSUBMIT
     //...
 }form_events_t;  
- 
- 
+
+
 // keybaord events. 
 // #todo: move to another place.
 typedef enum {
@@ -202,8 +200,6 @@ typedef enum {
 
 
 
- 
-
 /*
  * ?? Se há um usuário configurado conforme registrado em arquivo de configuração.
  */ 
@@ -211,9 +207,6 @@ int userconfig_Status;
  
  
 
- 
- 
- 
 //
 // @todo: 
 // Revendo: para cada grupo pode ter 2 tipos, major e minor.
@@ -287,12 +280,11 @@ typedef enum {
     //...	
 }hal_token_t;
  */
- 
- 
- 
- 
+
+
+
 /*
- *******************************************************************
+ ***************************************************
  * user_info_d:
  *     Estrutura para perfil de usuário do computador.
  */ 
@@ -306,10 +298,7 @@ struct user_info_d
     object_type_t  objectType;
     object_class_t objectClass;
 
-
-    //Id. 
     int userId;
-
     int used;
     int magic;
 
@@ -328,8 +317,6 @@ struct user_info_d
     int desktopId;
     // ===================================================
 
-
-
     //??
     char *path;             // '/root/user/(name)'
     
@@ -342,9 +329,8 @@ struct user_info_d
     // See: globals/gobject.h
     int permissions[128];
 
-
 	//
-	// *** Bancos de Dados ***
+	// Bancos de Dados 
 	//
 
 	struct bank_d *kdb;         //O banco de dados do processo kernel.	
@@ -359,8 +345,6 @@ struct user_info_d
 	//end time.
     //unsigned long EndTime;
 
-
-
     
     // em qual console virtual iniciamos a sessão.
     int virtualconsoleId;
@@ -371,8 +355,6 @@ struct user_info_d
 	struct virtual_console_d *virtual_console;
  
     //=========================
-    
-    
 
 	//user type.
     user_type_t userType;	
@@ -406,6 +388,8 @@ struct user_info_d *CurrentUser;    // Current user
 // user list:
 // root user is the user '0'.
 unsigned long userList[USER_COUNT_MAX];
+
+
 
  
 //

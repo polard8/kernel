@@ -325,19 +325,17 @@ struct tty_d
 
 
 //
-// == consoles =================================================
+// == consoles ==================
 //
 
 // Consoles virtuais
 // Consoles virtuais em full screen.
 // Criados a unha pelo kernel.
 
-
 #define CONSOLETTYS_COUNT_MAX    4
 
-// Index.
+// Index
 extern int fg_console;
-
 
 // Virtual consoles.
 static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];

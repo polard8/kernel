@@ -1,11 +1,10 @@
 
-//gpa.h 
-//Endereços físicos usados pelo kernel base.
+// gpa.h 
+// Endereços físicos usados pelo kernel base.
 
 
 #ifndef ____GPA_H
-#define ____GPA_H 1
-
+#define ____GPA_H  1
 
 
 // Primeiros 4 MB.
@@ -75,7 +74,6 @@
 // #todo
 // Tem espaço sobrando aqui ??
 
-
 // #todo
 // Deveria ter uma área de memória de onde pegaríamos 
 // as pagetables que precisamos, em ordem,
@@ -100,11 +98,8 @@
 // Já as outras pagetables ficarão concatenadas 
 // numa lista grande em um outro lugar de fácil acesso. 
 
-
-
 // #importante 
 // Essas pagetable possuem endereço físico e lógico iguais.
-
 
 // Page tables.
 // ?? estao sendo usadas no momento ou nao?

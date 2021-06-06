@@ -174,7 +174,6 @@ fs_save_rootdir (
     int roff=0;
     int rlbaoff=0;
 
-
     unsigned long RootAddress = 0;
     unsigned long RootLBA     = 0;
     size_t        RootSize    = 0;
@@ -195,7 +194,6 @@ fs_save_rootdir (
     debug_print ("fs_save_rootdir:\n");
     printf ("Saving root..\n");
     refresh_screen ();
-
 
 
 	// #bugbug: 
@@ -259,10 +257,10 @@ fs_save_fat (
     int off=0;
     int lbaoff=0;
 
-
     unsigned long __fatAddress = 0;
     unsigned long __fatLBA     = 0;
     size_t        __fatSize    = 0;
+
 
     __fatAddress = fat_address;
     __fatLBA     = fat_lba;

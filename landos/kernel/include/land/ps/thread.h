@@ -171,21 +171,16 @@ typedef enum {
 
 struct thread_d 
 {
-    // Object control.
 
+    // Object control.
     object_type_t   objectType;
     object_class_t  objectClass;
-
     struct object_d *object;
 
     int used;
     int magic;
-    
-    
-    
-    
-    int position;
 
+    int position;
 
     // #todo
     // Other process can't take some actions on this thread
@@ -194,17 +189,15 @@ struct thread_d
     int _protected;
 
 
-    //
-    // Identifiers
-    //
-
+//
+// Identifiers
+//
     // Thread id and owner process id.
     int tid;
 
     // Owner process.
     struct process_d  *process; 
     int ownerPID;
-
 
     // type: 
     // Tipo de tarefa.
@@ -216,7 +209,6 @@ struct thread_d
     //flag, Estado atual da tarefa. ( RUNNING, DEAD ... ).
     thread_state_t state;    
 
-
     // #todo
     // Identifica uma thread como sendo uma thread que 
     // pertence à um servidor. Então as threads desse tipo 
@@ -224,12 +216,10 @@ struct thread_d
 
     // int isServerThread;
 
-
 	// flag. 
 	// 1 = Sinaliza que a thread está dando a preferência
 	// e que deve sair quando for seguro fazer isso.
     int _yield;
-
 
 	// error. @todo:
 	//unsigned long error;
@@ -239,9 +229,9 @@ struct thread_d
     //plano de execução.
     int plane;
 
-	//
-	// Names
-	//
+//
+// Names
+//
 
     //char *name;  //@todo: Usar isso.
     unsigned long name_address;
@@ -255,10 +245,9 @@ struct thread_d
     char __threadname[64];    // HOSTNAME_BUFFER_SIZE
     size_t threadName_len;    // len 
 
-
-    //
-    // == CPU =========================================
-    //
+//
+// == CPU =========================================
+//
 
     // What processor the thread is running.
     int cpu;
@@ -271,37 +260,30 @@ struct thread_d
     // See: https://en.wikipedia.org/wiki/Processor_affinity
     int affinity;
 
-
-	//
 	// ORDEM: 
 	// O que segue é referenciado durante a interrupção de timer.
-	//
 
-	
 	//...
-	
-	//
+
 	// ORDEM: 
 	// O que segue é referenciado durante o processo de task switch.
-	//
-	
 
-	//
-	// == Directory =======================================
-	//
+//
+// == Directory =======================================
+//
 
     // COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA, 
     // ISSO AJUDA NA HORA DO TASKSWITCH.
 
     unsigned long DirectoryPA;
 
-    // ring.
+    // ring
     unsigned long iopl;
     unsigned long PreviousMode;
 
-    //
-    // == Context ======================= 
-    //
+//
+// == Context ======================= 
+//
 
 	// #todo: 
 	// Usars uma estrutura.
@@ -338,19 +320,22 @@ struct thread_d
 	//O endereço incial, para controle.
     unsigned long initial_eip;
 
+//
+//  tss
+//
+
 	//#todo
 	//isso é muito necessário.
     struct i386tss_d *tss;
 
-	//
+
 	// ORDEM: 
 	// O que segue é referenciado durante o processo de scheduler.
-	//
 
+//
+// == Priorities ===================
+//
 
-    //
-    // == Priorities ==================================================
-    //
     // Priority levels.
     // Used by processes and threads.
     // Classes:
@@ -365,11 +350,9 @@ struct thread_d
     // the priority level.
     // The priority can't be changed to a level below the base priority.
     // The base priority is static and the current priority is dynamic.
-    //
 
     unsigned long base_priority;  // static 
     unsigned long priority;       // dynamic
-
 
     // preempted:
     // flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
@@ -380,15 +363,13 @@ struct thread_d
 
     unsigned long preempted;
 
-
-    // #test: escalonado duas vezes consecutivas.
+    // #test: 
+    // Escalonado duas vezes.
     int DoubleShot;
 
-	//
+
 	// ORDEM: 
 	// O que segue é referenciado durante o processo de dispatch.
-	//
-
 
     // Sinaliza que a tarefa teve o seu contexto salvo.
     // #todo: use 'int'
@@ -401,7 +382,6 @@ struct thread_d
 
     unsigned long Heap;
     unsigned long HeapSize;
-
     unsigned long Stack;
     unsigned long StackSize;
 
@@ -410,9 +390,9 @@ struct thread_d
 	// que a thread pode usar.
 	// unsigned long ServiceTable;
 
-    //
-    // == Time ===================================
-    //
+//
+// == Time =============================
+//
 
     // Podemos criar a estrutura 'thread_time_d' t->time.step
 
@@ -487,9 +467,9 @@ struct thread_d
     unsigned long ticks_remaining;
 
 
-    //
-    // == Profiler ==================================
-    //
+//
+// == Profiler ==================================
+//
 
     //quanto por cento do tempo o processo ficou rodando.
     //é a soma do quanto ficou rodando todas as suas threads.
@@ -503,10 +483,8 @@ struct thread_d
     //unsigned long alarm; 
 
 
-	//
 	// ORDEM: 
 	// O que segue é referenciado com pouca frequencia.
-	//
 	
 	//lista de arquivos ??
 	//fluxo padrão. stdio, stdout, stderr
@@ -532,15 +510,20 @@ struct thread_d
 	
 	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
 	//struct wait_d WaitBlock;
-	
-	
-	//
-	// tty support
-	//
+
+
+//
+// == tty ==========================
+//
 
     // ID da tty usada.
     int tty_id;
 
+
+
+//
+// Security
+//
 
     // #importante
     // Isso é usado para gerência de memória e ... 
@@ -549,6 +532,8 @@ struct thread_d
     struct room_d     *room;        // (Window Station) da thread.
     struct desktop_d  *desktop;     // Desktop da thread.
 
+
+    // ??
 
     // ?? procedimento de janela.
     unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
@@ -560,9 +545,9 @@ struct thread_d
 	// utilização de canais e IPC.
 
 
-    //
-    // LIS - Local Input State
-    //
+//
+// LIS - Local Input State
+//
     
     // #important
     // Here we have some elements to handle the input events
@@ -593,14 +578,13 @@ struct thread_d
     // assigned to the window that currently has input focus.
     
 
-    //
-    // == kernel event ====================================
-    //
+//
+// == kernel event ====================================
+//
 
     // #test
     // Sending a message to the kernel.
     // no queue.
-
     // Flag avisando que tem nova mensagem.
     // O kernel deve checar essa flag. Se ela estiver acionada,
     // significa que o kernel deve processar essa mensagem.
@@ -610,14 +594,13 @@ struct thread_d
     int               ke_msg;
     unsigned long     ke_long1;
     unsigned long     ke_long2;
-
     int               ke_newmessageFlag; 
     //--
 
 
-    //
-    // == Event queue ===========================================
-    //
+//
+// == Event queue ===========================================
+//
 
     // This is the event queue.
     // It is used by the ring 3 processes.
@@ -651,14 +634,13 @@ struct thread_d
     // ====================================================
 
 
-    //
-    // Message Queue
-    //
+//
+// Message Queue
+//
 
     // Coloca-se em tail, quande chegar ao fim do buffer, recomeça.
     // Se o tail encontrar o head é porque o processo não está 
     // respondendo.
-    
     // #bugbug
     // isso ao esta sendo usado no momento.
     
@@ -671,7 +653,6 @@ struct thread_d
     // determinado processo. Ou de qualquer um.
     // Ex: ANY=-1, PID ...
     // pid_t receive_from_pid;
-
 
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
@@ -687,9 +668,9 @@ struct thread_d
     // int mouse_is_captured;
 
 
-    //
-    // == Wait ======================================
-    //
+//
+// == Wait ======================================
+//
 
 	//#importante
 	//razões para esperar
@@ -715,8 +696,11 @@ struct thread_d
     object_type_t   woType;   //obType;   //woType
     object_class_t  woClass;  //obClass;  //woClass
 
+    // ====================================
 
-    // Signal support
+//
+// Signal support
+//
 
     unsigned long signal;
     unsigned long umask;

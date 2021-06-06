@@ -43,6 +43,12 @@ struct vt_d
 unsigned long vtList[32];
 
 
+
+//
+// == prototypes ==================
+//
+
+
 int 
 vt_ioctl ( 
     int fd, 
@@ -52,8 +58,6 @@ vt_ioctl (
 void _vt_outbyte ( int c, struct tty_d *tty );
 void vt_outbyte ( int c, struct tty_d *tty );
 void vt_scroll (struct tty_d *tty);
-
-
 
 // Create a terminal for a window.
 // The father is creating a terminal in one of its windows.

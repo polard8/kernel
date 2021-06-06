@@ -13,10 +13,10 @@
 
 
 
-#ifndef ____VIDEO_H
-#define ____VIDEO_H
+#ifndef ____HALVID_H
+#define ____HALVID_H    1
 
- 
+
 /*
   bytes.
   A whole screeen is either 2000 bytes (40*25*2) or 4000 bytes (80*25*2).
@@ -56,8 +56,6 @@ unsigned long g_video_mode;
 //unsigned long gScreenHeight;
 
 
-
-
 //
 // Graphic mode support.
 //
@@ -66,31 +64,30 @@ typedef struct tagGraphics Graphics_t;
 struct tagGraphics
 {
     unsigned long LFB;
-	//...
+    //unsigned long Backbuffer;
+    //...
 };
 Graphics_t *Graphics;
 
 
 
 //
-// Video support.
+// Video support
 //
 
 /*
  * video_d:
  *     Estrutura para informações sobre parâmetros de vídeo.
- *
  */
-typedef struct video_d VideoBlock_t;
 
+typedef struct video_d VideoBlock_t;
 typedef struct video_d video_t;
+
 struct video_d
 {
+    object_type_t   objectType;
+    object_class_t  objectClass;
 
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	
 	//call back ;d
 	
 	int useGui;   //c, se estamos ou não usando gui. text mode, video mode.
@@ -112,16 +109,19 @@ struct video_d
     //unsigned long Display[32];    //Ponteiros para as telas.
 	
 };
-video_t VideoBlock;
+struct video_d  VideoBlock;
+//video_t VideoBlock;
 //...
 
 
+//
+// Prototypes ======================================
+//
+
+
 /*
- * Prototypes.
- */
- 
-/*
- * Sincroniza o retraço vertical. para directdraw usando lfb.
+ * Sincroniza o retraço vertical. 
+ * para directdraw usando lfb.
  * @todo: 
  *     Essa função pode ser arte do hal, 
  * ficando aqui apenas uma interface.
@@ -129,7 +129,6 @@ video_t VideoBlock;
  */
 
 void vsync (void);  
- 
  
 //video.c 
 void videoSetupCGAStartAddress(unsigned long address);

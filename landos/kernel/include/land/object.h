@@ -82,10 +82,7 @@ struct object_d objects_um[256+1];  //objetos em user mode.
 struct object_d objects_gui[256+1]; //objetos gráficos. 
 
 
-
-/*
- * Se o gerenciador de recursos foi inicializado.
- */
+// Se o gerenciador de recursos foi inicializado.
 int g_object_manager_status;
 
 //id do objeto atual
@@ -96,6 +93,9 @@ int g_current_object;
 int g_current_list;
 
 
+//
+// prototypes ==========
+//
 
 
   

@@ -423,8 +423,8 @@ all-c:
 	# user/security
 	$(CC) -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
 	$(CC) -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
 	$(CC) -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
 	$(CC) -c user/security/logoff.c    $(KINCLUDE) $(CFLAGS) -o logoff.o
 	$(CC) -c user/security/logon.c     $(KINCLUDE) $(CFLAGS) -o logon.o
 

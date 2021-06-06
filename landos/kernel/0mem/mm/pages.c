@@ -1053,8 +1053,10 @@ int mmSetUpPaging (void)
     
     
     debug_print("mmSetUpPaging:\n");
-    
-    
+
+
+
+
 
 	//
 	// SYSTEM MEMORY * PAGED POOLS 
@@ -1635,10 +1637,9 @@ int mmSetUpPaging (void)
     };
 
 
-    //
-    // Memory size.
-    //
-
+//
+// Memory size
+//
 
     // #Importante
     // Agora vamos calcular a quantidade de mem�ria f�sica usada 
@@ -1654,8 +1655,6 @@ int mmSetUpPaging (void)
     // Tem a quest�o do dma a se considerar tamb�m.
     // Tem dma abaixo da marca de 16mb.
     // Tem dma que usa mem�ria virtual.
-
-
 
     // Used.
     memorysizeUsed = (unsigned long) ( mm_used_kernel_area + 
@@ -1917,14 +1916,9 @@ int mmSetUpPaging (void)
 
 	// More ?
 
-// Done.
-	
-//#ifdef MK_VERBOSE
-//    printf ("Done\n");
-//#endif
 
+//done:
     debug_print("mmSetUpPaging: done\n");
-
     return 0;
 }
 
@@ -1932,6 +1926,7 @@ int mmSetUpPaging (void)
 
 
 // Checar se a estrutura de p'agina � nula
+// This is very ugly
 int pEmpty (struct page_d *p)
 {
     return p == NULL ? 1 : 0;
@@ -1980,10 +1975,10 @@ virtual_to_physical (
 {
 
     if (dir_va == 0){
-        panic ("virtual_to_physical: invalid dir va");
+        panic ("virtual_to_physical: invalid dir_va\b");
     }
 
-    // Directory.
+    // Directory
     unsigned long *dir = (unsigned long *) dir_va;
 
     unsigned long tmp=0;
@@ -1995,19 +1990,16 @@ virtual_to_physical (
 
 
 
-	// Temos o endere�o da pt junto com as flags.
+    // Temos o endereço da pt junto com as flags.
     tmp = (unsigned long) dir[d];
-
 
     // Page table.
     unsigned long *pt = (unsigned long *) (tmp & 0xFFFFF000);
 
-
-	// Encontramos o endereço base do page frame.
+    // Encontramos o endereço base do page frame.
     tmp = (unsigned long) pt[t];
 
     address = (tmp & 0xFFFFF000);
-
 
     return (unsigned long) (address + o);
 }

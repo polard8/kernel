@@ -279,8 +279,8 @@ int kernel_main (int arch_type)
     // name:level:sublevel
     //
 
-    PROGRESS("----------------\n");
-    PROGRESS("  GRAMADO LAND  \n");
+    PROGRESS("---------------------\n");
+    PROGRESS(" Initializing landos \n");
     // Now we have serial port output.
 
     // =================================================
@@ -312,6 +312,8 @@ int kernel_main (int arch_type)
     */
 
 
+
+    // ====================================
     // The mode.
     debug_print ("mode: ");
 
@@ -339,6 +341,7 @@ int kernel_main (int arch_type)
     };
 
 
+    // ====================================
     // The architecture.
     debug_print ("arch: ");
     
@@ -362,7 +365,7 @@ int kernel_main (int arch_type)
             break; 
     };
 
-
+    // ====================================
     PROGRESS("Kernel:0:3\n");
     // Video support
 
@@ -414,6 +417,8 @@ int kernel_main (int arch_type)
     Video_initialize();
 
 
+// ====================================
+
 //
 // Runtime
 //
@@ -439,7 +444,7 @@ int kernel_main (int arch_type)
     Runtime_initialize();
 
 
-    // =========================
+// =========================
     
     PROGRESS("Kernel:0:5\n");
     // Clear the screen.
@@ -489,6 +494,9 @@ int kernel_main (int arch_type)
     // while(1){}
 
 
+
+//=============================
+
     PROGRESS("Kernel:0:6\n"); 
     // Initialize current archtecture.
 
@@ -528,6 +536,9 @@ int kernel_main (int arch_type)
             break;
     };
 
+
+//=============================
+
     // Something is wrong
     PROGRESS("Kernel:0:7\n"); 
     debug_print ("kernel_main: Something is wrong\n");
@@ -540,7 +551,7 @@ int kernel_main (int arch_type)
 // Rule 22:
 // " When in doubt, know your way out. "
 
-// Console support.
+// Full console support.
 fail2:
     printf ("kernel_main: Fail. *HANG\n");
     refresh_screen();

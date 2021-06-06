@@ -28,31 +28,21 @@
 #include <kernel.h>
 
 
-//User Environment Manager (UEM)
-
-//
+// User Environment Manager (UEM)
 // Segue uma lista de operações que poderão ser realizadas para configuração
 // do ambiente gráfico do usuário. Obs: Nesse módulo, apenas chamaremos
 // algumas funções primitivas. Todo o trabalho maior deve ficar para os
 // servidores em user mode.
-//
 
 #define UEM_NULL 0
 #define UEM_CHANGE_BACKGROUND 1
 #define UEM_CHANGE_LOGO       2
 #define UEM_CHANGE_COLORS     3
-//...
+// ...
 
 
-//Variáveis internas.
-//int userenvironmentStatus;
-//int userenvironmentError;
-//...
-
-
-//Internal.
+// Internal.
 void config_user (void);
-
 
 
 /*
@@ -221,7 +211,6 @@ void *CreateUser ( char *name, int type ){
         Index++;
     };
 
-
 //Fail: 
 //Fim do loop. 
 //Não encontramos uma entrada livre.
@@ -255,18 +244,18 @@ void SetCurrentUserId (int user_id)
 
 int GetCurrentUserId (void)
 {
-   return (int) current_user;
+    return (int) current_user;
 }
 
 
 void SetCurrentGroupId (int group_id){
-	
-	if ( group_id < 0 || group_id >= GROUP_COUNT_MAX )
-	{
-		printf("SetCurrentGroupId:\n");
-		return;
-	}
-	
+
+    if ( group_id < 0 || group_id >= GROUP_COUNT_MAX )
+    {
+        printf("SetCurrentGroupId:\n");
+        return;
+    }
+
     current_group = (int) group_id;
 }
 

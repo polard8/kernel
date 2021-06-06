@@ -10,7 +10,6 @@
 // usará o objeto tty para configurar suas características.
 
 
-
 #include <kernel.h>
 
 
@@ -482,8 +481,7 @@ vt_create (
          //terminal->id = ?;
          terminal->used  = TRUE;
          terminal->magic = 1234;
-         
-         
+
          terminal->father_pid = father_pid;
          terminal->child_pid  = -1;
 

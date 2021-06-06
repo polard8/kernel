@@ -456,6 +456,7 @@ int x86main (void)
     UPProcessorBlock.threads_counter = 0;
 
 
+//================================
     PROGRESS("Kernel:1:1\n"); 
     // sse support.
 
@@ -528,7 +529,7 @@ int x86main (void)
         
     //set_up_cursor (0,1);
 
-
+//================================
     PROGRESS("Kernel:1:2\n"); 
     // Calling 'init' kernel module. 
 
@@ -584,6 +585,7 @@ int x86main (void)
     KeInitPhase = 3; 
 
 
+//================================
     PROGRESS("Kernel:1:3\n"); 
     // Initialize all the kernel graphics support.
 
@@ -603,7 +605,7 @@ int x86main (void)
     //while(1){}
 
 
-
+//================================
     PROGRESS("Kernel:1:4\n"); 
     // Initialize window server manager.
 
@@ -632,10 +634,10 @@ int x86main (void)
     //while(1){}
 
 //
-//=======================================================================================================
+// ===================================================================
 //
 
-
+//================================
     PROGRESS("Kernel:1:5\n"); 
     // Setup GDT again.
     // We already made this at kernel startup.
@@ -669,6 +671,7 @@ int x86main (void)
     printf      ("[x86] x86main: processes and threads\n");
 
 
+//================================
     PROGRESS("Kernel:1:6\n"); 
     // Creating kernel process.
 
@@ -703,7 +706,7 @@ int x86main (void)
         //...
     };
 
-
+//================================
     PROGRESS("Kernel:1:7\n"); 
     // Creating a ring 0 thread for the kernel.
 
@@ -774,6 +777,8 @@ int x86main (void)
 
     //============================================================
 
+
+//================================
     PROGRESS("Kernel:1:8\n"); 
     // Cria e inicializa apenas o INIT.BIN
 
@@ -790,6 +795,7 @@ int x86main (void)
     //while(1){}
 
 
+//================================
     PROGRESS("Kernel:1:9\n"); 
     // Check some initialization flags.
 
@@ -819,6 +825,7 @@ int x86main (void)
     timer_cursor_status = 0;
 
 
+//================================
     PROGRESS("Kernel:1:10\n"); 
     // Early ps/2 initialization.
 
@@ -844,7 +851,7 @@ int x86main (void)
     PS2_early_initialization();
 
 
-
+//================================
     PROGRESS("Kernel:1:11\n"); 
     // Loading some system files.
     // icons, bmps, etc ...
@@ -875,6 +882,7 @@ int x86main (void)
     //while(1){}
 
 
+//================================
     PROGRESS("Kernel:1:12\n"); 
     // font support.
 
@@ -929,6 +937,7 @@ int x86main (void)
 
 
 
+//================================
     PROGRESS("Kernel:1:13\n"); 
     // Testing some rectangle support.
 
@@ -976,6 +985,7 @@ int x86main (void)
 	// done !
 done:
 
+//================================
     PROGRESS("Kernel:1:14\n"); 
     // Start first thread ever.
 
@@ -1023,7 +1033,7 @@ done:
 	// em ring 0, isso depois de criadas as threads em user mode.
 
 fail:
-    
+//================================
     PROGRESS("Kernel:1:00\n"); 
     
     debug_print ("[x86] x86main: fail\n");

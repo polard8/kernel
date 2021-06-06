@@ -21,16 +21,13 @@
  *     ...
  */
 
-
 #ifndef ____USESSION_H
-#define ____USESSION_H
+#define ____USESSION_H    1
 
- 
- 
+
 //user session start
 //No caso de termos apenas uma user session, esse será o endereço dela.
 unsigned long usersession_start; 
-
 
 
 // The persistent window server.
@@ -38,17 +35,15 @@ unsigned long usersession_start;
 // It is used for the setup/installation environment and
 // for some raw environment.
 // kgws
-
 struct raw_graphics_d
 {
     // We can't use some routines if this window server is unavailable.
     int blocked;
-    
     char name[32];
-
     // ...
 };
 struct raw_graphics_d    *RawGraphics;
+
 
 
 // The loadable window server.
@@ -57,15 +52,10 @@ struct window_server_d
 {
     int used;
     int magic;
-     
     int id;
-    
     int pid;
-
     int blocked;
-
     char name[32];
-
     // ...
 };
 struct window_server_d *WindowServer;
@@ -77,15 +67,10 @@ struct window_manager_d
 {
     int used;
     int magic;
-     
     int id;
-
     int pid;
-
     int blocked;
-
     char name[32];
-
     // ...
 };
 struct window_manager_d *WindowManager;
@@ -97,11 +82,8 @@ struct desktop_environment_d
 {
     int used;
     int magic;
-     
     int id;
-
     int blocked;
-
     char name[32];
 
     // Maybe the current desktop environment has
@@ -120,6 +102,7 @@ struct desktop_environment_d
 struct desktop_environment_d *DesktopEnvironment;
 
 
+
 /*
  * **********************************************
  * usession_d:
@@ -127,13 +110,11 @@ struct desktop_environment_d *DesktopEnvironment;
  *     (u.session)
  */ 
 
-
 struct usession_d
 {
 
     object_type_t   objectType;
     object_class_t  objectClass;
-
     struct object_d  *object;
 
     int used;
@@ -153,16 +134,13 @@ struct usession_d
     // The leader has some privileges in its session.
     pid_t leader_pid;
 
-
     // #todo
     // All the process in this group will be killed when the
     // session ends.
     
     // gid_t gid;
 
-
     int initialized;
-
 
     // ??
     // What is the virtual terminal used by this session?
@@ -171,21 +149,17 @@ struct usession_d
     
     //int tty;
 
-    
     //
     //  main info
     //
 
-
     // =========================================================
-
     // Raw graphics system.
     // Persistent graphics system.
     // It belong to the base kernel.
     // This is all we have when the system has no
     // loadable window server installed on it.
     struct raw_graphics_d  *raw_graphics;
-
 
     // =========================================================
 
@@ -202,7 +176,6 @@ struct usession_d
 
     // =========================================================
 
-
     unsigned long BeginTime;
     unsigned long EndTime;
 
@@ -216,24 +189,19 @@ struct usession_d
 	unsigned long *opHead;     //Object Pools.
 	unsigned long *pdpHead;    //Page Directory Pools. (page directory lists) 
 
-
     struct usession_d *next;	
 };
 
 struct usession_d *usession0;
 struct usession_d *CurrentUserSession;
 
-
-//
 // Um mesmo usuário pode usar sessoes diferentes para atividades diferentes.
 // -Qual é a user session do usuário logado? Sabendo a user session que o usuário está
 // podemos determinar quais os pools que que estão disponíveis para ele, como pools de desktop
 // pools de pagedirectory, pool de objetos...
-//
-
-
 
 unsigned long usessionList[USER_SESSION_COUNT_MAX];
+
 
 
 

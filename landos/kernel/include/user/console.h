@@ -18,7 +18,6 @@
 // Final        - (one character)
 // See: https://vt100.net/emu/ctrlseq_dec.html
 
-
 struct virtual_console_login_d
 {
     int id;
@@ -58,16 +57,13 @@ void _console_outbyte (int c, int console_number);
 void console_outbyte (int c, int console_number);
 void console_putchar ( int c, int console_number );
 
-
 // Não tem escape sequence
 // Funciona na máquina real
 ssize_t 
 __console_write (int console_number, const void *buf, size_t count);
 
-
 ssize_t 
 console_read (int console_number, const void *buf, size_t count);  
-
 
 // Tem escape sequence
 ssize_t 
@@ -90,7 +86,6 @@ int console_get_current_virtual_console (void);
 void console_init_virtual_console (int n);
 
 void jobcontrol_switch_console(int n);
-
 
 void consoleBlinkTextCursor(void);
 
