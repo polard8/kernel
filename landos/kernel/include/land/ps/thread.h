@@ -308,6 +308,11 @@ struct thread_d
 
 	//O endereço incial, para controle.
     unsigned long initial_rip;
+    
+    // #todo
+    // 512 bytes, alinhados em 16.
+    // unsigned char fxsave[512]__atribute_aligned(...);
+
 
 //
 //  tss
@@ -783,6 +788,31 @@ void early_ring0_IdleThread (void);
 // #See: create.c
 void *create_CreateEarlyRing0IdleThread(void);
 void *create_CreateRing3InitThread (void);
+
+void thread_show_profiler_info (void);
+
+unsigned long 
+thread_get_profiler_percentage (struct thread_d *thread);
+
+void show_thread_information (void);
+
+int thread_profiler( int service );
+
+struct thread_d *create_thread ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long init_rip, 
+    unsigned long init_stack, 
+    int pid, 
+    char *name );
+
+void exit_thread (int tid);
+void exit_current_thread(void);
+
+struct thread_d *threadCopyThread ( struct thread_d *thread );
+
+int thread_getchar (void);
 
 #endif    
 
