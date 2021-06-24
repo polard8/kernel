@@ -14,9 +14,7 @@
 #ifndef __QUEUE_H
 #define __QUEUE_H    1
 
-
 // Ordenação das listas de filas.
-
 #define QUEUE_NULL     0
 #define QUEUE_STANDBY  1
 #define QUEUE_RUNNING  2
@@ -33,31 +31,34 @@
 #define QUEUE_REALTIME     13 
 #define QUEUE_DEFAULT      14
 //...
-
 // ??
 // Níveis de prioridade.
 #define QUEUE_LEVEL_MIN 15
 #define QUEUE_LEVEL_MED 16
 #define QUEUE_LEVEL_MAX 17
 
-
-#define MAX_QUEUES 3
-
-
-// Essa é a organização padrão de uma lista de ponteiros de lista encadeada.
+// ---------
+// Essa é a organização padrão de uma 
+// lista de ponteiros de lista encadeada.
 // 0 = DRIVERS
 // 1 = SERVERS
 // 2 = USER APPS
-// 3 = NULL 
-
+#define MAX_QUEUES  3
 unsigned long QUEUES[3];
- 
- 
+
+
 /*
  **********************************************************
  * queue_d:
- *     Estrutura para organizar várias listas de ponteiros de lista encadeada.
+ *     Estrutura para organizar 
+ * várias listas de ponteiros de lista encadeada.
  */
+
+// #bugbug
+// Isso pode estar errado.
+// Os arrays nessa estrutura usam o valor '3'
+// a a rotina pode estar colocando valores fora do limite desse
+// array, usando o limite de 17, portanto overflow!
 
 struct queue_d
 {
@@ -208,7 +209,6 @@ struct queue_d *queue;
 
 
 /*
- ****************************************************
  * wait_queue_d:
  *     Lista encadeada que pode ser usada para threads que estão esperando 
  * por algum evento.

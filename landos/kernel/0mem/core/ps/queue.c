@@ -1,3 +1,9 @@
+
+// #bugbug
+// Esse módulo não está bom. 
+// precisa ser repensado e refeito.
+// Possivelmente temos problemas de overflow.
+
 /*
  * File: ps/queue.c
  *
@@ -393,13 +399,8 @@ defaultInsertData:
 //Done.
 done:
 	return (int) 0;
-};
+}
 
-
-/*
- * queue_insert_head:
- *     ?
- */
 
 int 
 queue_insert_head ( 
@@ -536,13 +537,9 @@ done:
     return 0;
 }
 
-
-/*
- ********************************************
- * queue_get_data:
- *    Pegando o head de uma das listas de ponteiros.
- *    Isso consome o elemento da lista.
- */
+// queue_get_data:
+//    Pegando o head de uma das listas de ponteiros.
+//    Isso consome o elemento da lista.
 
 struct thread_d *queue_get_data ( struct queue_d *q, int type )
 {
@@ -704,12 +701,9 @@ done:
 }
 
 
-/*
- *********************************************
- * show_queue_information:
- *      Mostra informações sobre a queue.
- *      #todo: put this in a info file.
- */
+// show_queue_information:
+//      Mostra informações sobre a queue.
+//      #todo: put this in a info file.
 
 void show_queue_information(struct queue_d *q)
 {
@@ -738,11 +732,10 @@ void show_queue_information(struct queue_d *q)
 }
 
 
-/*
- * ScanReadyQueue:
- *     Procura na fila de threads ready por threads com timeout vencido.
- *     e põe na frente da fila.
- */
+// ScanReadyQueue:
+//     Procura na fila de threads ready por threads com timeout vencido.
+//     e põe na frente da fila.
+
 void ScanReadyQueue(struct queue_d *q)
 {
     // loop
