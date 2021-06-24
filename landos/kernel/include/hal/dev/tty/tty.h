@@ -137,6 +137,12 @@ struct tty_d
     // tty name
     char name[64];      // 
     size_t Name_len;    // len 
+    
+    
+    // #todo
+    // Usar essa variável assim como fizemos no gramado x.
+    //int initialized;
+    
 
 //
 // == (1) storage ========
@@ -339,6 +345,15 @@ extern int fg_console;
 
 // Virtual consoles.
 static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
+
+// #importante:
+// #todo
+// #bugbug
+// No Gramado X, funcionou sem 'static' e não funcionou com 'static'.
+// Talvez devamos usar sem o 'static', assim como fazemos em outros
+// modulos do kernel base.
+//struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
+
 // ==============================================================
 
 

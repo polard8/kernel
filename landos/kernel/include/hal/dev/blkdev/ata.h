@@ -21,7 +21,6 @@
 //
 
 
-
 // Bus.
 #define ATA_PRIMARY   0x00
 #define ATA_SECONDARY 0x01
@@ -31,8 +30,6 @@
 #define ATA_SLAVE     1 
 #define ATA_MASTER_DEV 0x00
 #define ATA_SLAVE_DEV  0x01
-
-
 
 // ATA type.
 #define ATA_DEVICE_TYPE   0x00
@@ -46,7 +43,6 @@
 
 
 #define FORCEPIO 1234
-
 
 
 //#bugbug 
@@ -201,7 +197,7 @@
 // ===========================================================
 
 //
-// Variables.
+// Variables
 //
 
 int ATAFlag;
@@ -290,7 +286,6 @@ struct dev_nport
 struct dev_nport dev_nport;
 
 
-
 // História:
 //     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
 //     ICH5 integraçao do SATA e suporte total ACPI 2.0.
@@ -321,8 +316,7 @@ struct ata_d
 };
 
 // Not a pointer.
-
-struct ata_d ata;
+struct ata_d  ata;
 
 
 
@@ -384,7 +378,6 @@ int ata_get_boottime_ide_channel(void);
 int ata_get_boottime_ide_device(void);
 void ata_set_boottime_ide_channel(int channel);
 void ata_set_boottime_ide_device(int device);
-
 
 
 int nport_ajuste(char nport);
@@ -471,7 +464,6 @@ uint32_t diskPCIScanDevice ( int class );
 int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
 
 
-
 void DeviceInterface_PrimaryIDE(void);
 void DeviceInterface_SecondaryIDE(void);
 
@@ -515,6 +507,9 @@ ata_ioctl (
 
 //======================================================
 
+
+//#todo
+// mover essas definições para cima, junto com as outras.
 
 //incluindo coisas que estavam em disk1.c
 
@@ -566,7 +561,6 @@ struct {
     uint32_t len;
 
 }ide_dma_prdt[4];
-
 
 
 // pci support

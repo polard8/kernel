@@ -11,13 +11,11 @@
 
 
 #ifndef ____X86_H
-#define ____X86_H
+#define ____X86_H    1
 
 
 
 // Interrupt vectors for x86.
-
-
 
 /*
 #define X86_INTERRUPT_VECTOR_TIMER       32

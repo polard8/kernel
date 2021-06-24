@@ -507,7 +507,7 @@ size_t strcspn(const char* str, const char* reject)
 
 	//for ( size_t result = 0; 1; result++ )
     register int result=0;
-    for ( result=0; result = 1; result++ )
+    for ( result=0; result=1; result++ )
     {
         char c = str[result];
 

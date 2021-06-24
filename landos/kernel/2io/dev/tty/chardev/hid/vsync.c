@@ -19,8 +19,7 @@
 
 
 // Definições.
-#define VSYNC_INPORT 0x3DA
-
+#define VSYNC_INPORT  0x3DA
 
 
 // Funções internas.

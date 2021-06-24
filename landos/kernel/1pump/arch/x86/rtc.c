@@ -81,7 +81,6 @@ void DeviceInterface_RTC(void){
     // Contando as interrupções desse tipo.
     g_profiler_ints_irq8++;
 
-
     g_ticks++;
 
 	//_BLINK; ??
@@ -126,7 +125,6 @@ unsigned char bcd_to_binary(unsigned char bcd)
 
 
 /* 
- **************************************************
  * read_cmos_bcd:
  *     Lê da CMOS um determinado registro. 
  */
@@ -149,7 +147,6 @@ unsigned long read_cmos_bcd ( unsigned reg ){
 
 
 /*
- *************************************************************** 
  * get_time:
  * Pega o horário armazenado na CMOS.
  * Formato: Cada unidade representa 1 segundo. 
@@ -174,7 +171,6 @@ unsigned long get_time (void){
 
 
 /*
- ***************************************************
  * get_date: 
  * Pega a data armazenada na CMOS. 
  * Formato(bytes): YYMD 
@@ -194,8 +190,7 @@ unsigned long get_date (void){
 }
 
 
-/* 
- ************************************************************
+/*
  * rtcGetExtendedMemory:
  *     Get total memory info via CMOS. 
  *
@@ -219,8 +214,8 @@ unsigned long get_date (void){
  *				200h = 512k
  *				400h = 1024k
  *				600h-3C00h = 1536-15,360k
- *				
- *	Limite de uma 'word' ??			
+ *	
+ *	Limite de uma 'word' ??
  */
 
 unsigned short rtcGetExtendedMemory (void){
@@ -247,7 +242,6 @@ unsigned short rtcGetExtendedMemory (void){
 
 
 /* 
- ****************************************************
  * rtcGetBaseMemory:
  *     Get base memory info via CMOS. 
  *
@@ -327,19 +321,23 @@ void *get_cmos_info (void){
 
     }else{
 
-        //time
-        Rtc->Seconds = read_cmos_bcd (0);  // Seconds.
-        Rtc->Minutes = read_cmos_bcd (2);  // Minutes.
-        Rtc->Hours   = read_cmos_bcd (4);  // Hours.
+        // time
+        Rtc->Seconds = read_cmos_bcd (0);
+        Rtc->Minutes = read_cmos_bcd (2);
+        Rtc->Hours   = read_cmos_bcd (4);
 
-        //date.
+        // date
         Rtc->Year = read_cmos_bcd(9);    
         Rtc->Year = (2000 + Rtc->Year);
         Rtc->Month = read_cmos_bcd(8);    
         Rtc->DayOfMonth = read_cmos_bcd(7);    
     };
 
-    //struct
+
+//
+// Hardware structure
+//
+
     if ( (void *) Hardware == NULL ){
         printf("get_cmos_info: Hardware\n");
         refresh_screen();
@@ -352,12 +350,11 @@ void *get_cmos_info (void){
 
 
 //show_message:
-	
-#ifdef KERNEL_VERBOSE	
+
+#ifdef KERNEL_VERBOSE
 	printf("Time=%d:%d:%d\n", Rtc->Hours, Rtc->Minutes, Rtc->Seconds );
 	printf("Date=%d/%d/%d\n", Rtc->DayOfMonth, Rtc->Month, Rtc->Year );
-#endif	
-
+#endif
 
     return (void *) Rtc;
 }
@@ -399,13 +396,11 @@ int init_clock (void){
 
     get_cmos_info();
 
-    g_driver_rtc_initialized = (int) 1;
 
+//done:
+    g_driver_rtc_initialized  = TRUE;
+    __breaker_rtc_initialized = TRUE;
     printf("Done!\n");
-
-    __breaker_rtc_initialized = 1;
-
-
     return 0;
 }
 

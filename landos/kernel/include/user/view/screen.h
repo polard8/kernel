@@ -77,10 +77,6 @@ struct paint_d PAINT;
 
 
 
-
-
-
-
 /*
  * struct screen_d:
  *     Estrutura para informações sobre o monitor.
@@ -111,9 +107,9 @@ struct screen_d
     //Navigation.
     struct screen_d *next; 
 };
-struct screen_d *Screen;
-struct screen_d *ScreenInfo;
-struct screen_d *CurrentScreen;
+struct screen_d  *Screen;
+struct screen_d  *ScreenInfo;
+struct screen_d  *CurrentScreen;
 //...
   
 //int screenCount;    //Numero de monitores.
@@ -171,7 +167,13 @@ terminal screen buffer: (um buffer grande onde se coloca o conteudo)
  terminal's input buffer.
  
 */
-  
+
+
+
+//
+// == prototypes =========================
+//
+
 
 //screen.c 
 

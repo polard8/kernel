@@ -112,8 +112,6 @@ void serial4_handler (void)
 }
 
 //=====================================
-
-
 unsigned int serial_in(unsigned int base, int offset)
 {
     return (unsigned int) in8 (base + offset);
@@ -155,7 +153,10 @@ void serial_write_char (unsigned int port, char data)
 void serial_print (unsigned int port, char *data )
 {
     register int i=0;
-    
+
+    // #todo
+    // Check the port validation.
+
     for ( i=0; data[i] != '\0'; i++ )
     {
         serial_write_char ( port ,data[i] );
@@ -322,8 +323,6 @@ int serial_init (void){
 }
 
 
-
-
 // #todo
 // We need a ioctl for serial devices.
 int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
@@ -331,7 +330,6 @@ int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
     debug_print("serial_ioctl: [TODO]\n");
     return -1;
 }
-
 
 
 

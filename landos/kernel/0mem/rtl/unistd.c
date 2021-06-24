@@ -22,8 +22,8 @@ long pathconf (const char *pathname, int name)
 } 
 
 
-//#todo:
-//OUT: ??
+// #todo:
+// OUT: ??
 off_t sys_lseek (int fd, off_t offset, int whence)
 {
     file *f;    
@@ -65,10 +65,10 @@ off_t sys_lseek (int fd, off_t offset, int whence)
 }
 
 
-
-//pegando host name
-//faremos igual fizemos com usuário.
-//suporte a rotina da libc.
+// Host info
+// pegando host name
+// faremos igual fizemos com usuário.
+// suporte a rotina da libc.
 int __gethostname (char *buffer){
 
     char *hostname_buffer = (char *) buffer;
@@ -94,10 +94,11 @@ int __gethostname (char *buffer){
 }
 
 
-//#todo
+// Host name
+// #todo
 // configurando o hostname.
-//do mesmo jeito que configuramos o username,
-//só que em estruturas diferentes
+// do mesmo jeito que configuramos o username,
+// só que em estruturas diferentes
 int __sethostname (const char *new_hostname){
 
     //

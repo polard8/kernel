@@ -107,7 +107,7 @@ int KiRequest (void)
     if ( kernel_request < 0 || kernel_request > KERNEL_REQUEST_MAX )
     {
         debug_print("KiRequest: [PANIC] kernel_request\n");
-        printf ("KiRequest: %d", kernel_request );
+        printf     ("KiRequest: [PANIC] %d", kernel_request );
         die();
     }
 
@@ -147,16 +147,15 @@ int request (void){
     unsigned long t=0;    //Tipo de thread. (sistema, periódica...).
 
 
-	// targets.
+	// targets
 
     PID = (int) REQUEST.target_pid;
     TID = (int) REQUEST.target_tid;
 
 
-
-	//
-	// ## timeout ##
-	//
+//
+// Timeout
+//
 
     if ( REQUEST.timeout > 0 )
     {
@@ -165,10 +164,9 @@ int request (void){
         //return -1; // use this one if it is possible.
     }
 
-
-	//
-	// Filtro.
-	//
+//
+// Filter
+//
 
     if ( PID < 0 || PID > PROCESS_COUNT_MAX ){
         Process = NULL;
@@ -184,9 +182,9 @@ int request (void){
     };
 
 
-	//
-	// Number
-	//
+//
+// Number
+//
 
     r = kernel_request;
 
@@ -196,8 +194,8 @@ int request (void){
     }
 
 
-    switch (r) 
-    {
+    switch (r){
+
         //0 - request sem motivo, (a variável foi negligenciada).
         // Ou ainda estamos checando se tem um resquest,
         // se não tem apenas retornamos.

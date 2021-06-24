@@ -141,32 +141,27 @@ void x86_disable_interrupts (void)
     asm ("cli"); 
 }
 
-
 // x86 enable interrupts.
 void x86_enable_interrupts (void)
 {
     asm ("sti");
 }
 
-
 void x86_iret (void)
 {
     asm ("iret");
 }
-
 
 void x86_lret (void)
 {
     asm ("lret");
 }
 
-
 void x86_cli_hlt(void)
 {
     asm (" cli \n \t "); 
     asm (" hlt \n \t ");
 }
-
 
 void x86_stop_cpu (void)
 {
@@ -533,7 +528,7 @@ void tss_set_kernel_stack (unsigned long stack_address )
 
 
 /*
- *********************************************************************
+ ***************************************************
  * get_cpu_intel_parameters:
  *     Pega os parâmetros da cpu x86 através da instrução cpuid.
  *

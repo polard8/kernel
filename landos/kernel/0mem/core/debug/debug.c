@@ -89,9 +89,8 @@ int debug_check_inicialization (void){
     return (int) Status;
 
 fail:
-    die (); 
+    die();
 }
-
 
 
 /*
@@ -143,12 +142,9 @@ int debug_check_drivers (void)
 }
 
 
-/*
- ********************************************
- * debug_breakpoint:
- *     Para a execução do sistema.
- *     @todo: isso pode ir para o arquivo debug.c.
- */
+// debug_breakpoint:
+//     Para a execução do sistema.
+//     @todo: isso pode ir para o arquivo debug.c.
 
 void debug_breakpoint (void)
 {
@@ -157,19 +153,13 @@ void debug_breakpoint (void)
 }
 
 
-
-/*
- * debug_compute_checksum: 
- * 
- * 
- */
- 
+// debug_compute_checksum: 
 // retorna um checksum dado um buffer e um tamanho.
 
 unsigned long 
 debug_compute_checksum ( 
     unsigned char *Buffer, 
-     unsigned long Lenght )
+    unsigned long Lenght )
 {
     unsigned long CheckSum = 0;
 
@@ -181,7 +171,6 @@ debug_compute_checksum (
 
     return (unsigned long) CheckSum;
 }
-
 
 
 /*
@@ -217,7 +206,7 @@ int debug (void){
     // Check drivers status. 
     // ( Ver se os principais drivers estão inicializados )
 
-    debug_check_drivers ();
+    debug_check_drivers();
 
 
 	/*
@@ -278,19 +267,20 @@ debugDumpMemory(
 
 
 /*
- **********************************
  * debug_print:
  *     Serial debug support.
- * 
  */
 
 void debug_print ( char *data )
 {
     register int i=0;
-    
+
+    //if ( (void *) data == NULL ){ return; }
+    //if (*data == 0)             { return; }
+
     for ( i=0; data[i] != '\0'; i++ )
     {
-        serial_write_char ( COM1_PORT ,data[i] );
+        serial_write_char ( COM1_PORT, data[i] );
     };
 }
 
@@ -301,11 +291,11 @@ void debug_print ( char *data )
 
 void PROGRESS( char *string )
 {
-    if( (void*) string == NULL ){
+    if ( (void *) string == NULL ){
         return;
     }
 
-    if(*string == 0){
+    if (*string == 0){
         return;
     }
 

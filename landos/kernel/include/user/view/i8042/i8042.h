@@ -1,9 +1,8 @@
 
-//i8042.h 
-
+// i8042.h 
 
 #ifndef ____I8042_H
-#define ____I8042_H
+#define ____I8042_H    1
 
 
 //Initialising the PS/2 Controller (OSDev Wiki)
@@ -32,8 +31,6 @@
 #define I8042_WHICH_BUFFER 0x20
 
 
-
-
 #define I8042_DATAPORT          0x60	//Read/Write
 #define I8042_STATUSREGISTER    0x64	//Read
 #define I8042_COMMANDREGISTER   0x64	//Write
@@ -50,18 +47,13 @@
 #define I8042_ENABLE_FIRST_PORT    0xAE  // Enable first PS/2 port
 //...
 
-
-
-
 // i8042 responses.
 #define I8042_ACKNOWLEDGE         0xFA        
 #define I8042_RESEND              0xFE
 
-
 #define I8042_TESTCONTROLLER  0xAA	       // Test PS/2 Controller
 #define I8042_TESTCONTROLLER_PASSED  0x55  // test passed
 #define I8042_TESTCONTROLLER_FAILED  0xFC  // test failed
-
 
  
 //TESTING FIRST PORT.
@@ -71,17 +63,12 @@
 #define I8042_TEST_FIRST_PORT_DATA_LOW    0x03  //data line stuck low
 #define I8042_TEST_FIRST_PORT_DATA_HIGH   0x04  //data line stuck high
 
-
-
 //TESTING SECOND PORT.
 #define I8042_TEST_SECOND_PORT_PASSED      0x00  //test passed
 #define I8042_TEST_SECOND_PORT_CLOCK_LOW   0x01  //clock line stuck low
 #define I8042_TEST_SECOND_PORT_CLOCK_HIGH  0x02  //clock line stuck high
 #define I8042_TEST_SECOND_PORT_DATA_LOW    0x03  //data line stuck low
 #define I8042_TEST_SECOND_PORT_DATA_HIGH   0x04  //data line stuck high
-
-
-
 
 
 // Configuration Byte
@@ -94,7 +81,6 @@
 //5	   Second PS/2 port clock (1 = disabled, 0 = enabled, only if 2 PS/2 ports supported)
 //6	   First PS/2 port translation (1 = enabled, 0 = disabled)
 //7	   Must be zero
-
 
 //Detecting PS/2 Device Types
 //Send the "disable scanning" command 0xF5 to the device
@@ -111,10 +97,12 @@
 //0xAB, 0x41 or 0xAB, 0xC1	MF2 keyboard with translation enabled in the PS/Controller (not possible for the second PS/2 port)
 //0xAB, 0x83	MF2 keyboard
 
+//
+// == prototypes ==================
+//
 
 
 void I8042Controller_do_drain(void);
-
 
 void prepare_for_input (void);
 void prepare_for_output (void);

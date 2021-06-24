@@ -187,7 +187,6 @@ set_up_text_color (
 }
 
 
-
 // used?
 void *systemNull (void)
 {
@@ -216,20 +215,18 @@ void *systemLinkDriver (
 
 
 /*
- * ************************************************************
  * systemShowDevicesInfo:
  * 
  *     Mostrar informações sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.
- *
  *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
  *     A Apresentação da sondágem pode ser feita em outra ordem,
  *     melhor que seja a ordem alfabética.
+ *     See: devmgr.c
  */
 
 void systemShowDevicesInfo (void)
 {
-    // See: devmgr.c
     devmgr_show_device_list();
 }
 
@@ -530,8 +527,9 @@ void systemReboot (void){
 
     asm ("cli");
 
-	//No graphics.
-    if ( VideoBlock.useGui != 1 )
+// No graphics
+
+    if ( VideoBlock.useGui != TRUE )
     {
         hal_reboot ();
     }
@@ -544,7 +542,7 @@ void systemReboot (void){
 	//que inicialise essa rotina deixando par ao kernel apenas 
 	//a parte de baixo nível.
 
-    hal_reboot ();
+    hal_reboot();
 
 
 /*
@@ -772,7 +770,7 @@ void systemReboot (void){
 
 done:
 
-    refresh_screen ();
+    refresh_screen();
 
 	//?
     sleep (8*8000);
@@ -780,8 +778,8 @@ done:
     printf ("systemReboot: Rebooting ...");
     refresh_screen ();
 
-    sys_reboot ();
-    die ();
+    sys_reboot();
+    die();
 }
 
 
@@ -791,10 +789,10 @@ done:
  *     Interface para shutdown.
  */ 
 
-void systemShutdown (void){
-	 
-	//@todo ...
+// #todo
 
+void systemShutdown (void)
+{
     printf ("systemShutdown: It's safe to turnoff your computer");
 
     refresh_screen ();
@@ -935,10 +933,9 @@ void die (void){
         refresh_screen ();
     }
 
-
     while (1){ 
         asm ("cli");
-        //asm ("mwait");   
+        //asm ("mwait");
         asm ("hlt");
     };
 }
@@ -948,6 +945,7 @@ void die (void){
  * system_get_pid:
  * 
  */
+
 // Usada para obter o pid de alguns drivers e servidores
 // do sistema. Aqueles servidores que só podem ter um do tipo 
 // rodando ao mesmo tempo.

@@ -13,13 +13,7 @@
 
 
 //
-// Definições internas.
-//
-
- 
-
-//
-// BAR Support.
+// BAR Support
 //
 
 //Primeiro bit do BAR. (bit 0)
@@ -79,15 +73,12 @@
 
 //...
 
-
 //
-// Variáveis internas.
+// Variáveis internas
 //
 
 int pci_supported;
 int pciListOffset;
-//int pciStatus;
-//int pciError;
 //...
 
 
@@ -864,7 +855,6 @@ pciConfigReadDWord (
 
 
 /*
- ************************************************
  * pciCheckVendor:
  *     Check vendor, offset 0. 
  */
@@ -882,7 +872,6 @@ pciCheckVendor (unsigned char bus, unsigned char slot)
 
 
 /*
- *****************************************
  * pciCheckDevice:
  *     Check device, offset 2. 
  */
@@ -916,13 +905,12 @@ pciGetClassCode (unsigned char bus, unsigned char slot)
 
 
 /*
- *****************************************
  * pciGetSubClass:
  *     Get subclass code. Offset 0x0A.
  */
 
-	// #todo: 
-	// Nesse momento não há nenhume busca por fuction.
+// #todo: 
+// Nesse momento não há nenhume busca por fuction.
 
 unsigned char 
 pciGetSubClass (unsigned char bus, unsigned char slot)
@@ -933,7 +921,6 @@ pciGetSubClass (unsigned char bus, unsigned char slot)
 
 
 /*
- **********************************
  * pciGetHeaderType:
  * 
  */
@@ -1067,7 +1054,6 @@ done:
 
 
 /*
- *******************************************
  * pciGetInterruptLine:
  *     Get Interrupt Line, offset 0x3C.
  *     (Read an write register).
@@ -1085,7 +1071,6 @@ pciGetInterruptLine (
 
 
 /*
- *************************************
  * pciGetInterruptPin:
  *     Get interrupt pin offser 3d (Read only).
  */

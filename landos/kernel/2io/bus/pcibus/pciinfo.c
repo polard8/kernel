@@ -74,10 +74,7 @@ int pciShowDeviceInfo (int number){
 }
 
 
-
-
 /*
- ****************************************************************
  * pciInfo:
  *     Mostra as informações salvas nas estruturas da 
  * lista de dispositivos. 

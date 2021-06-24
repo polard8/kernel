@@ -1,5 +1,5 @@
 /*
- * File: timer.h
+ * File: pit.h
  *
  * Descrição:
  *     Header para o módulo timer. irq0.
@@ -10,18 +10,15 @@
 
 
 #ifndef ____PIT_H
-#define ____PIT_H
+#define ____PIT_H    1
 
 
 //
-// Count support variables.
+// Counting variables support.
 //
-
-
 
 
 #define  HZ  100
-
 
 // total ticks
 unsigned long jiffies;
@@ -38,9 +35,8 @@ unsigned long sys_time_hz;
 
 
 
-
 //
-// Working set support.
+// Profiler set support.
 // 
 
 // Isso será usado pelo profiler para
@@ -62,34 +58,21 @@ unsigned long profiler_ticks_count;
 //quando chegar aqui, então devemos calcular 
 //a porcentagem para todas as threads e processos.
 unsigned long profiler_ticks_limit;
- 
- 
- 
+
 unsigned long profiler_percentage_all_normal_threads;
  
 unsigned long profiler_percentage_idle_thread;
- 
 
 
-
- 
-
-
-
-//Usado no Linux. 
-//#define CT_TO_SECS(x)	((x) / HZ)
-//#define CT_TO_USECS(x)	(((x) % HZ) * 1000000/HZ) 
+// Usado no Linux. 
+//#define CT_TO_SECS(x)   ((x) / HZ)
+//#define CT_TO_USECS(x)  (((x) % HZ) * 1000000/HZ) 
 //... 
-
 
 
 // Em que tempo estávamos quando iniciamos a contagem;
 //#define TIMER_PROFILE_TICKS_DEADLINE 1000
 //unsigned long timer_profile_ticks;
-
-
-
-
 
 
 //Counting how much ticks the kernel is running.
@@ -101,11 +84,10 @@ unsigned long profiler_percentage_idle_thread;
 	
 int extra; 
 
- 
- 
-//PIT. 
-#define TIMER_DRIVER_PATHNAME "root:/volume2/drivers/timer.bin"  
- 
+
+// timer pathname.
+// #define TIMER_DRIVER_PATHNAME  "Embedded"  
+
  
 /*
     040-05F = 8253 or 8254 Programmable Interval Timer (PIT, see ~8253~)
@@ -115,16 +97,17 @@ int extra;
 	043     = 8253 mode control  (see 8253)
 	044     = 8254 PS/2 extended timer
 	047     = 8254 Channel 3 control byte
-*/	
- 
+*/
+
 /*
  * Como o linux define um Quantum (time slice) para tasks RR.
  */
+
 /*
  * default timeslice is 100 msecs (used only for SCHED_RR tasks).
  * Timeslices get refilled after they expire.
  */
-//#define RR_TIMESLICE            (100 * HZ / 1000)
+// #define RR_TIMESLICE    (100 * HZ / 1000)
 
 //a flag indica se o cursor está habilitado ou não.
 int timer_cursor_used;
@@ -139,13 +122,10 @@ unsigned long timer_handler_address;    //global _irq0:
 
 
 /*
- *******************************************************
  * timer_d:
  * Estrutura do objeto timer que será usado pelos aplicativos.
- * 
  * Precisamos identificar quem está usando para podermos enviar 
  * mensagem para quem possui o timer.
- *
  */
 
 struct timer_d 
@@ -155,13 +135,11 @@ struct timer_d
 
     int used;
     int magic;
-
     int id;
 
 	//1 = one shot 
 	//2 = intermitent
     int type;
-
 
     // Owner
     struct process_d  *process;
@@ -184,7 +162,6 @@ struct timer_d
     int status;
 
     unsigned long flag;
-
     unsigned long error;
 
     //Navigation
@@ -193,7 +170,6 @@ struct timer_d
 };
 
 // struct timer_d *XXXXXXTimer;
-
 
 // lista de timers.
 unsigned long timerList[32];
@@ -204,7 +180,7 @@ unsigned long timerList[32];
 //
 
 
-//Global para inicialização do módulo interno.
+// Global para inicialização do módulo interno.
 
 int early_timer_init (void);
 int timerInit (void);

@@ -25,7 +25,6 @@ unsigned long g_available_heap;     // Available.
 
 
 
-
 /*
  ***********************************
  * heap_d:
@@ -50,23 +49,22 @@ struct heap_d
     unsigned long HeapPointer; 
     unsigned long AvailableHeap; 
 
-
-
     // Ponteiro para a lista de blocos de um heap.
     // Lista encadeada de blocos que formam o heap.
     // A estrutura para um bloco é: mmblock_d e está definida em mm.h
-    //
     // Obs: 
-	// Foram alocados vários blocos de memória dentro de um heap. Portanto 
-	// podemos colocar os ponteiros para as estruturas desses blocos dentro 
-	// de uma lista encadeada e o ponteiro para a lista colocaremos aqui.
-	//
-	// Cada bloco desse começa com um 'header', definido na estrutura de bloco.
-	struct mmblock_d *mmblockListHead;  
-	
+    // Foram alocados vários blocos de memória dentro de um heap. Portanto 
+    // podemos colocar os ponteiros para as estruturas desses blocos dentro 
+    // de uma lista encadeada e o ponteiro para a lista colocaremos aqui.
+    // Cada bloco desse começa com um 'header', 
+    // definido na estrutura de bloco.
+    // See: x86mm.h
+
+    struct mmblock_d  *mmblockListHead;  
+
 	//se esses arrays ocuparem muito espaço, então faremos com listas encadeads.
 	//struct mmblock_d *mmblockUsedBlocks;  
-	//struct mmblock_d *mmblockFreeBlocks;  	
+	//struct mmblock_d *mmblockFreeBlocks; 
 	//struct mmblock_d *mmblockAllBlocks;  
 	
 	
@@ -77,9 +75,8 @@ struct heap_d
 	// Uma lista com todos os blocos.
 	//unsigned long usedBlocks[32];
 	//unsigned long freeBlocks[32];
-	//unsigned long Blocks[64];		
-	
-	
+	//unsigned long Blocks[64];
+
 	//Um heap pertence à um desktop.
     struct desktop_d *desktop;
 	
@@ -116,7 +113,6 @@ struct heap_d
 };
 
 
-
 #define HEAP_COUNT_MAX  8
 
 unsigned long heapList[HEAP_COUNT_MAX];  
@@ -124,21 +120,18 @@ unsigned long heapList[HEAP_COUNT_MAX];
 
 
 //
-// Prototypes.
+// Prototypes ==========================
 //
 
 
 int init_heap (void);
 
-
 struct heap_d *memory_create_new_head ( 
     unsigned long start_va, 
     unsigned long size );
 
-
 // Destrói um heap se as flags permitirem.
 void memory_destroy_heap (struct heap_d *heap );
-
 
 // Pega o endereço do início do header da próxima alocação.
 unsigned long get_process_heap_pointer (int pid);

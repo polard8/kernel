@@ -8,25 +8,14 @@
  *
  * Histórico:
  *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Revisão.
- *     ...
  */
-
 
 #ifndef __PCI_H__
 #define __PCI_H__
 
 
-
-
-#define PCI_PORT_ADDR 0xCF8
-#define PCI_PORT_DATA 0xCFC
-
-
 //-----------------
 
-
-//pci.h 
 
 /*
  * PCI Configuration Space Header:
@@ -252,27 +241,27 @@ Class Description
 */
  
 
-
-//Ports.
-#define PCI_ADDRESS_PORT      0x0CF8
-#define PCI_DATA_PORT         0x0CFC
-
+// Ports
+#define PCI_PORT_ADDR     0xCF8
+#define PCI_PORT_DATA     0xCFC
+#define PCI_ADDRESS_PORT  0x0CF8
+#define PCI_DATA_PORT     0x0CFC
 
 // Header Type
-#define PCI_TYPE_MULTIFUNC              0x80
-#define PCI_TYPE_GENERIC                0x00
-#define PCI_TYPE_PCI_BRIDGE             0x01
-#define PCI_TYPE_CARDBUS_BRIDGE         0x02
+#define PCI_TYPE_MULTIFUNC         0x80
+#define PCI_TYPE_GENERIC           0x00
+#define PCI_TYPE_PCI_BRIDGE        0x01
+#define PCI_TYPE_CARDBUS_BRIDGE    0x02
 
-//BDF.
-#define PCI_MAX_BUSES         0xFF  
-#define PCI_MAX_DEVICES       32    
-#define PCI_MAX_FUNCTIONS     8    
+// BDF
+#define PCI_MAX_BUSES        0xFF
+#define PCI_MAX_DEVICES      32
+#define PCI_MAX_FUNCTIONS    8
 
 #define PCI_INVALID_VENDORID  0xFFFF
 
 //
-// PCI Offset.
+// PCI Offsets
 //
 
 // Deslocamento dentro da tabela de configuração, dado em hexa.
@@ -292,12 +281,10 @@ Class Description
 #define PCI_OFFSET_HEADERTYPE     0x0E    //char HTYPE
 #define PCI_OFFSET_BIST           0x0F    //char
 
-/*
- * Base addresses specify locations in memory or I/O space.
- * Decoded size can be determined by writing a value of
- * 0xffffffff to the register, and reading it back.  Only
- * 1 bits are decoded.
- */
+// Base addresses specify locations in memory or I/O space.
+// Decoded size can be determined by writing a value of
+// 0xffffffff to the register, and reading it back.  
+// Only 1 bits are decoded.
 
 #define PCI_OFFSET_BASEADDRESS0   0x10  //unsigned long
 #define PCI_OFFSET_BASEADDRESS1   0x14  //unsigned long [htype 0,1 only]
@@ -318,30 +305,26 @@ Class Description
 #define  PCI_BASE_ADDRESS_MEM_MASK	(~(pciaddr_t)0x0f)
 #define  PCI_BASE_ADDRESS_IO_MASK	(~(pciaddr_t)0x03)
 // bit 1 is reserved if address_space = 1 
-
 */
 
 
+#define PCI_OFFSET_CISP    0x28  //unsigned long (Cardbus CIS Pointer)
 
-#define PCI_OFFSET_CISP           0x28  //unsigned long (Cardbus CIS Pointer)
-
-#define PCI_OFFSET_SUBSYSTEMVENDORID        0x2C //short sub system identifiers SS
-#define PCI_OFFSET_SUBSYSTEMID              0x2E //short
+#define PCI_OFFSET_SUBSYSTEMVENDORID    0x2C //short sub system identifiers SS
+#define PCI_OFFSET_SUBSYSTEMID          0x2E //short
 
 #define PCI_OFFSET_EXPANSIONROMBASEADDRESS  0x30  //unsigned long
 
-#define PCI_OFFSET_CAPABILITIES_POINTER 0x34    //char Capabilities Pointer. CAP
+#define PCI_OFFSET_CAPABILITIES_POINTER  0x34    //char Capabilities Pointer. CAP
 //#define PCI_OFFSET_RESERVEDZZ         0x35    //3 bytes.
 
 //#define PCI_OFFSET_RESERVEDZZZ 0x38  //unsigned long  
 
-#define PCI_OFFSET_INTERRUPTLINE            0x3C //char (Read and wright). Interrupt Information INTR
-#define PCI_OFFSET_INTERRUPTPIN             0x3D //char (Read only).
-#define PCI_OFFSET_MIN_GRANT                0x3E //char  Minimum Grant MGNT
-#define PCI_OFFSET_MAX_LATENCY              0x3F //char  Maximum Latency MLAT
+#define PCI_OFFSET_INTERRUPTLINE    0x3C //char (Read and wright). Interrupt Information INTR
+#define PCI_OFFSET_INTERRUPTPIN     0x3D //char (Read only).
+#define PCI_OFFSET_MIN_GRANT        0x3E //char  Minimum Grant MGNT
+#define PCI_OFFSET_MAX_LATENCY      0x3F //char  Maximum Latency MLAT
 
-
- 
 
 //Intel sata host controller support:
 //40h 2 ?Primary Timing (PTIM)?Offset 40h? on page 153 0000h
@@ -372,8 +355,6 @@ Class Description
 //E4h 4 ?BIST FIS Transmit Data 1 (BFTD1)?Offset E4h? on page 170 00000000h
 //E8h 4 ?BIST FIS Transmit Data 2 (BFTD2)?Offset E8h? on page 170 00000000h
 //F8h 4 ?Manufacturing ID (MFID)?Offset F8h? on page 171 08000FB1h
-//
-
 
 //Interrupt Pin (IPIN): This register tells which interrupt pin the device function uses. A
 //value of 1 corresponds to INTA#. A value of 2 corresponds to INTB#. A value of 3
@@ -408,7 +389,6 @@ Class Code	Description
 0xFF	Device does not fit any defined class.
 */
 
-
 //BAR for sata, intel host controller
 //10h-?Primary Command Block Base Address (PCMDBA)?Offset 10h? 
 //14h- ?Primary Control Block Base Address (PCTLBA)?Offset 14h? 
@@ -416,20 +396,15 @@ Class Code	Description
 //1ch-?Secondary Control Block Base Address (SCTLBA)?Offset 1Ch? 
 //20h-?Legacy IDE Base Address / AHCI Index Data Pair Base Address (LBAR)?Offset 20h? 
 //24h-?AHCI Base Address/Serial ATA Index Data Pair Base Address (ABAR)?Offset 24h?
-//
 
 //vendor 0x8086 device 0x7000 
 //Intel Corporation 82371SB PIIX3 ISA [Natoma/Triton II] 
 //0x10de:0x0422:NVIDIA Corporation:G86 [GeForce 8400 GS]
 //0x2668	82801FB (ICH6) High Definition Audio Controller	0x8086	Intel Corporation
-//
-
-
-
 
 
 // 
-// Class Codes. 
+// Class Codes
 //
 
 #define PCI_CLASSCODE_LEGACY                    0
@@ -453,12 +428,12 @@ Class Code	Description
 //12h~feh - Reserved.
 //#define PCI_CLASSCODE_MISC   0xFF //Device does not fit any of the defined class codes.
 
-//Class Code Register:
+// Class Code Register:
 //Class Code	            Sub-Class Code	        Prog. I/F
 //23..................16	15..................8	7..................0
 
 //
-// Device subclasses.
+// Device subclasses
 //
 
 //0
@@ -608,13 +583,12 @@ Class Code	Description
 
 //...
 
-
 //char pcideviceString[] = "PCI Device";
 //char pcidString[] = "PCI"; 
- 
- 
+
+
 //
-// Vendor list:
+// Vendor list
 //
 
 //asus 0x0AC8
@@ -639,9 +613,7 @@ Class Code	Description
 #define PCI_VENDOR_ID_VIA                 0x1106
 //...
 
-
 //------------------
-			   
 
 //
 // Variáveis internas.
@@ -670,17 +642,13 @@ pci_class_t *PciClass;
  
 struct pci_device_d 
 {
-	object_type_t objectType;
-	object_class_t objectClass;		
+    object_type_t  objectType;
+    object_class_t objectClass;
 
-	//callback 
-	
-	//Identificação.
-	int id;
-    
-	int used;   
-	int magic;   
-    
+    int id;
+    int used;
+    int magic;
+
 	char *name;         
 
 	//unsigned long flag;   
@@ -720,9 +688,6 @@ struct pci_device_d
 	unsigned char latency_timer;	
 	unsigned char cache_line_size;
 
-
-
-	
 	//Address.
 	unsigned long BAR0;
 	unsigned long BAR1;
@@ -762,18 +727,15 @@ struct pci_device_d *current_pci_device;    //Current.
 // PCI structure.
 // Estrutura para gerenciar a interface pci.
 // apenas uma instância dessa estrutura deve existir.
-// 
-//
-// 
 
 struct pci_d
-{	
-	int devicesFound;    //Número de dispositivos encontrados.
-	
-	int	max;
-	struct pci_device_d * deviceList;	
+{
+
+    int devicesFound;    //Número de dispositivos encontrados.
+    int max;
+    struct pci_device_d * deviceList;	
 };
-struct pci_d *Pci;
+struct pci_d  *Pci;   // #todo: Use PCI
 
 
 
@@ -789,15 +751,14 @@ unsigned long pcideviceList[32];    //@todo tamanho provisorio.
 
 /*
  * pci_driver_d:
- *     Estrutura para drivers de dispositivos pci.     
- *
+ *     Estrutura para drivers de dispositivos pci. 
  */
+
 typedef struct pci_driver_d pci_driver_t;
 struct pci_driver_d
 {
-	object_type_t objectType;
-	object_class_t objectClass;	
-	
+    object_type_t  objectType;
+    object_class_t objectClass;
 	
 	int id;    //id do driver de dispositivo pci.
 	int used;
@@ -846,10 +807,6 @@ pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
 //Lista de drivers de dispositivos pci.
 //unsigned long pcidriversList[32];
 
-
-
-
-
 /*
  * The PCI interface treats multi-function devices as independent
  * devices.  The slot/function address of each device is encoded
@@ -870,14 +827,9 @@ pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
 //#define PCI_BUS_NUM(x) (((x) >> 8) & 0xff)
 
 
-
-
-
-
 //
-// Protótipos de funções.
+// == prototypes ==============================================
 //
-
 
 
 //
@@ -889,9 +841,9 @@ unsigned short pciConfigReadWord( unsigned char bus, unsigned char slot, unsigne
 unsigned long pciConfigReadDWord( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
 
 //
-// Offsets.
+// Offsets
 //
-					  
+
 unsigned short pciCheckVendor(unsigned char bus, unsigned char slot);    //Offset 0.	
 unsigned short pciCheckDevice(unsigned char bus, unsigned char slot);    //Offset 2.
 unsigned char pciGetSubClass(unsigned char bus, unsigned char slot);     //Offset 0x0A. 
@@ -903,10 +855,6 @@ unsigned long pciGetBAR(unsigned char bus, unsigned char slot, int number);    /
 unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot);    //Offset 0x3C.
 unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot);     //Interrut pin
 //...
-
-
-
-
 
 //mostra informações sobre um dispositivo pci da lista.
 

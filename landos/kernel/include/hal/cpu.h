@@ -12,11 +12,9 @@
  *
  * 2015 - Created by Fred Nora.
  */
- 
- 
 
 #ifndef ____CPU_H
-#define ____CPU_H
+#define ____CPU_H    1
  
 
 // Supported brands.

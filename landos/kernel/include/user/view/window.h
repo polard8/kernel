@@ -27,7 +27,9 @@ unsigned long Windows[KGWS_ZORDER_MAX];
 // pega a janela que está mais ao topo da zorder e que
 // corresponda às cordenadas do mouse.
 // retorna window id
-int top_at ( int x, int y );
+// #todo: Coloque isso mais pra baixo na área de protótipoes.
+int top_at( int x, int y );
+
 
 //
 // =========
@@ -55,6 +57,11 @@ void *shared_buffer_cursor_icon;
 // ... 
 
 
+
+//
+// prototypes ================================
+//
+
 void *ui_get_system_icon( int n );
 
 //testando ... devemos chamar isso
@@ -70,8 +77,6 @@ int window_getch (void);
 
 
 
-
-//
 // #importante:
 // Tipos de mensagem de comunicação nos diálogos 
 // e procesimento de janelas:
@@ -81,12 +86,10 @@ int window_getch (void);
 // STREAMMSG_    Streams. O argumento é um ponteiro para uma stream.
 // BUFFER_MSG_   Buffer. O argumento é um ponteiro para um buffer.
 // CAT_MSG_      Concatenate. Os argumentos long1 e long devem ser concatenados.
-//
  
-//
+
 // Window handle status
 // Se uma janela está aberta ou não. 
-//
 #define HANDLE_STATUS_CLOSE 0
 #define HANDLE_STATUS_OPEN 1
  
@@ -102,14 +105,11 @@ int window_getch (void);
 #define WINDOW_MAGIC     1234 
 #define WINDOW_CLOSED    4321
 //... 
- 
- 
+
+
 //desktop window. (Área de trabalho) 
 //#define MAINWINDOW_DEFAULTX  ?
 //#define MAINWINDOW_DEFAULTY  ?
- 
-
- 
 
  
 // Número máximo de janelas.
@@ -129,7 +129,6 @@ int window_getch (void);
  * Obs: Isso refere-se principalmente à janelas.
  */
 
- 
  //??tipos de mensagens ??
 #define MSG_NULL          0 
 #define SIGNAL_NULL       0 
@@ -401,7 +400,7 @@ int window_getch (void);
 
 
 //
-// ******** ESSA VARIÁVEL BLOQUEIA O FOCO NA JANELA DO DESENVOLVEDOR   *****
+// ESSA VARIÁVEL BLOQUEIA O FOCO NA JANELA DO DESENVOLVEDOR 
 //
 int _lockfocus;
 
@@ -648,9 +647,9 @@ struct tagRGBA
 struct tagRGBA *RGBA;
 
 
-	//
-	// Window Class support.
-	//
+//
+// Window Class support.
+//
 
 // ?? rever. 
 // Enumerando classe de janela 
@@ -660,7 +659,6 @@ typedef enum {
     WindowClassKernel,    // 2 kernel
     WindowClassServer,    // 3 servidor
 }wc_t;
-
 
 
 //classes de janelas controladas pelos aplicativos.
@@ -795,8 +793,9 @@ struct window_d
 
     int tid;
 
-
-	// Características dessa janela..
+//
+// Características dessa janela..
+//
 
 	//Estado: (Full,Maximized,Minimized...)
     int view; 
@@ -847,14 +846,12 @@ struct window_d
     int sendOffset;
     int receiveOffset;
 
-
 	//Filas para uma janela receber mensagens.
 	//São os quatro argumentos de um procedimento de janela padrão.
 
-
-	//
-	// CURRENT MESSAGE !!!
-	// 
+//
+// CURRENT MESSAGE !!!
+// 
 
 	//shared by producer and consumer 
     struct window_d *msg_window;  //arg1.
@@ -868,8 +865,9 @@ struct window_d
     //'1' indica que temos uma nova mensagem.
     int newmessageFlag;
 
-
-    // MESSAGE QUEUE !!!
+//
+// MESSAGE QUEUE !!!
+//
     //shared by producer and consumer
     unsigned long hwndList[32];
     unsigned long msgList[32];
@@ -885,11 +883,9 @@ struct window_d
 
 //==================================================
 
-
 //
 // Active?
 // 
-
     // #bugbug: See the flag 'status'
     //unsigned long status;              //ATIVA OU NÃO.
 
@@ -900,9 +896,7 @@ struct window_d
 //
 // Focus
 //
-
     // Se tem o foco de entrada ou não.
-
     int focus; 
 
 
@@ -945,12 +939,11 @@ struct window_d
     //unsigned long mouse_pointer_y_pixel;
 
 
-
 //===============================================
 
-	// Bars support.
-	// Cada tipo de janela tem seus itens específicos.
-	// Esses são os status dos ítens. Se eles estão presentes ou não.
+// Bars support.
+// Cada tipo de janela tem seus itens específicos.
+// Esses são os status dos ítens. Se eles estão presentes ou não.
 
     int backgroundUsed;
     int shadowUsed;
@@ -992,7 +985,6 @@ struct window_d
 //
 // Desktop
 //
-
     struct desktop_d  *desktop;
 
 //==================================================
@@ -1000,7 +992,6 @@ struct window_d
 //
 // == Windows ========
 //
-
 
 //
 // Parent
@@ -1041,9 +1032,7 @@ struct window_d
     unsigned long clientrect_bg_color; 
 
 
-
 //==================================================
-
 
     // We don't need menubar in this environment.
     //struct window_d  *menubar;
@@ -1051,7 +1040,6 @@ struct window_d
 //
 // Tool bar
 //
-
     // Main toolbar.
     // That one below menubar.
     // How many toolbars a widnow can have in kgws?
@@ -1061,7 +1049,6 @@ struct window_d
 //
 // Status bar
 //
-
     struct window_d  *statusbar;
 
 
@@ -1070,7 +1057,6 @@ struct window_d
 //
 // Terminal
 //
-
     // #todo
     // Estrutura tty deve ser uma coisa associada ao uso de terminal.
     // ID da tty usada.
@@ -1143,7 +1129,6 @@ struct window_d
 
 //==================================================
 
-
 	//*full screen mode = modo tela cheia. 
 	//( utiliza a resolução atual do dispositivo )
 	// deve ser a janela em primeiro plano. acima de todas as outras.
@@ -1185,9 +1170,9 @@ struct window_d
 
 //==================================================    
 
-	//
-	// CLists
-	//
+//
+// CLists
+//
 
 	// Um ponteiro para um array de ponteiros de estruturas de linhas
 	// Explicando: 
@@ -1376,12 +1361,12 @@ quando um aplicativo chamar serviços do kernel para criar elementos na aba.*/
 //gui->screen ... lenbrando que não queremos que a janela gui->screen tenha 
 //os valores de sua estrutura alterados ... pois refletem as características do dispositivo.
 //Importante: Estragar essa estrutura pode causar muitos problemas.
-struct window_d *FULLSCREEN_TABWINDOW;   
+struct window_d  *FULLSCREEN_TABWINDOW;   
 
 
 
 //
-// z order support
+// == z order support =========================
 //
 
 //#define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
@@ -1449,8 +1434,6 @@ struct zorderInfo
 */
 
 
-
-
 /*
  * zorderList[] support.
  *     Sobreposição de janelas.    
@@ -1464,8 +1447,6 @@ struct zorderInfo
  *  >> repintaremos começando do zero.
  */ 
 //unsigned long zorderList[ZORDER_COUNT_MAX];
-
-
 
 
 
@@ -1537,7 +1518,6 @@ struct frontbufferinfo_d *FrontBufferInfo;
  * ...
  */
 
-
 // #bugbug
 // Muita coisa nessa estrutura precis ser revista.
 // Tendo em vista que ela apenas contempla o kgws
@@ -1545,16 +1525,12 @@ struct frontbufferinfo_d *FrontBufferInfo;
 // Dessa forma essa estrutura só faz sentido no ambiente 
 // de setup, que usa o kgws.
 
-
 struct gui_d
 {
-
-    // Se a gui está ou não inicializada.
     int initialised;
 
     // Procedimento da janela ativa.
     unsigned long procedure;  
-
 
     // #bugbug
     // precisamos de estrutura de device context,
@@ -1614,7 +1590,6 @@ struct gui_d
 
     int redraw;
 
-
     // refresh
     // Flag para enviar do backbuffer para a memória de video.
     // Seguindo uma lista linkada, copiaremos o conteúdo do buffer
@@ -1623,7 +1598,6 @@ struct gui_d
     // Head da lista.
 
     int refresh;
-
 
     // status das janelas usadas pelo sistema.
 	int screenStatus;
@@ -1641,9 +1615,10 @@ struct gui_d
 
 
 	/*
-	 *    ****    Windows    ****
+	 * Windows
 	 *
-	 * Obs: Ponteiros para as janelas principais usadas na interfáce
+	 * Obs: 
+	 * Ponteiros para as janelas principais usadas na interfáce
 	 * gráfica. Essas janelas não dependem dos processos e sim os
 	 * processos dependem delas. Os processos do sistema poderão recriar
 	 * essas janelas e registrar seus ponteiros aqui. Por exemplo, o control
@@ -1663,8 +1638,6 @@ struct gui_d
 	 * Grupo 5: ??
 	 * Grupo 6: Outras.
 	 */
-
-
 
     // #bugbug
     // All this are pointing to the root window.
@@ -1781,32 +1754,23 @@ struct gui_d
 	// Frontbuffer support. (memória de vídeo)
 	struct frontbufferinfo_d *frontbufferInfo; 
 
-
 //
-// Security.
+// Security
 //
-
-
     struct usession_d  *CurrentUserSession;
     struct room_d      *CurrentRoom;
     struct desktop_d   *CurrentDesktop;
 
-
-
 //
 // User info.
 //
-
     struct user_info_d *User; 
-
     //...
 };
-
 
 // #importante
 // Estrutura global. 
 // (Usada para passar estutura entre funções)
-// Primeira e única. 
 
 struct gui_d  *gui; 
 

@@ -3905,7 +3905,7 @@ kvprintf (
 				
 				if (ch < '0' || ch > '9') { break; }
 			};
-			
+
 			if (dot)
 				dwidth = n;
 			else
@@ -5119,7 +5119,7 @@ static char *number (
 }
 
 
-// It was taken from linux 0.01. gpl
+// It was taken from linux 0.01. (GPL)
 // It works yet.
 // Just for fun. :^) 
 

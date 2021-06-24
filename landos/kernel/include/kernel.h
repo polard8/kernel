@@ -10,7 +10,7 @@
 
 
 //
-// == gramado modes =================================================
+// == gramado modes =========================
 //
 
 // See: 'current_mode'.
@@ -37,7 +37,6 @@
 struct io_control_d
 {
     int initialized;
-
     int useTTY;
     int useEventQueue;
 };
@@ -207,7 +206,7 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/dev/tty/serial.h"
 
 
-//todo: 
+// todo: 
 // podemos mover isso de lugar para perto de net/
 #include "rtl/net/mac.h"
 
@@ -282,8 +281,7 @@ extern unsigned long stack0_krn_ptr;
 #include "land/ps/mk.h"
 
 
-// rawgr - 
-// model business logic
+
 #include "user/kgwm.h"
 #include "user/ws.h"
 
@@ -329,14 +327,14 @@ extern unsigned long stack0_krn_ptr;
 
 
 // =============================
-// rawgr - i8042 ps2 controller.
+// i8042 ps2 controller.
 #include "user/view/i8042/i8042.h"
 #include "user/view/i8042/ps2mouse.h"
 #include "user/view/i8042/ps2kbd.h"
 #include "user/view/i8042/ps2.h"
 
 //
-//  ==== NETWORK ====
+// == NETWORK ====
 //
 
 #include "rtl/net/connect.h" 
@@ -347,7 +345,6 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/net/tcp.h"
 
 
-// 
 // intel nic - network interface controller.
 #include "hal/dev/tty/net/nicintel.h"    
 
@@ -369,7 +366,7 @@ extern unsigned long stack0_krn_ptr;
 
 
 //
-// ==== DEVICES ====
+// == DEVICES ====
 //
 
 
@@ -380,9 +377,9 @@ extern unsigned long stack0_krn_ptr;
 #include "hal/io.h"               //io.
 
 
-#include "land/modules.h"     //module manager.
+#include "land/modules.h"  // module manager
 #include "land/debug.h"
-#include "land/system.h"    //system manager.
+#include "land/system.h"   // system manager
 #include "land/init.h"
 #include "land/execve.h"  
 // mm
@@ -398,8 +395,6 @@ extern unsigned long stack0_krn_ptr;
 #include "land/mm/x86mm.h"     // mm, memory manager support.
 
 
-
-// rawgr - 
 // view. input support.
 #include "user/view/cursor.h"
 
@@ -412,10 +407,7 @@ extern unsigned long stack0_krn_ptr;
 // profiler
 #include "land/pints.h"
 
-
-
 #include "rtl/runtime.h"
-
 
 
 // kernel

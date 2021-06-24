@@ -99,6 +99,7 @@ void screenSetSize( unsigned long width, unsigned long height )
 // Copying long by long. 
 // Total size is wrong.
 // Esse é mais rápido.
+
 void refresh_screen (void){
 
     int i=0;
@@ -118,8 +119,9 @@ void refresh_screen (void){
     vsync();
 
     // #test velocidade?
-    for ( i=0; i< SavedX*SavedY; i++ )
+    for ( i=0; i< SavedX*SavedY; i++ ){
         frontbuffer[i] = backbuffer[i];
+    };
 
     //antigo.
 	//isso funciona.
@@ -238,8 +240,6 @@ int screenInit (void){
         CurrentScreen = (void *) Screen;
         //...
     };
-
-
 
 	// More?!
 	

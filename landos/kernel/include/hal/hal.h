@@ -4,23 +4,20 @@
  *  HAL header file.
  */
 
-
 #ifndef ____HAL_H
-#define ____HAL_H
+#define ____HAL_H    1
 
 
- 
- 
-#define PARTITION_BOOT_FLAG 0x80
+//#todo: This is a fs thing.
+#define PARTITION_BOOT_FLAG  0x80
 //#define PARTITION_ 
-
 
 //#define BOOT_RECORD_SIGNATURE          (0xaa55)
 
 
-
 /*
- * Microcontrollers support. @todo: Criar arquivo para isso.
+ * Microcontrollers support. 
+ * #todo: Criar arquivo para isso.
  */
 
  
@@ -42,11 +39,8 @@ unsigned long g_machine_type;
 //
 
 
-//
 //  VECTORS 
 //  (isr and irq address)
-//
-
 
 // Endereços das rotinas básicas chamadas pelos vetores de interrupções.
 // Essas rotinas devem chamar seus handlers específicos.
@@ -197,8 +191,9 @@ struct motherboard_d
 
 
 
-  
-//...
+//
+// == prototypes =======================================
+//
 
 
 //

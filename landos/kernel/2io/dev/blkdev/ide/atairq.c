@@ -11,7 +11,7 @@
 
 static unsigned long ata_irq_invoked = 0; 
 
-
+//local
 int disk_get_ata_irq_invoked (void);
 void disk_reset_ata_irq_invoked (void);
 
@@ -70,14 +70,13 @@ irq15_SECONDARY_IDE (void)
 
 
 
-
-
+//local
 int disk_get_ata_irq_invoked (void)
 {
     return (int) ata_irq_invoked;
 }
 
-
+//local
 void disk_reset_ata_irq_invoked (void)
 {
     ata_irq_invoked = 0;

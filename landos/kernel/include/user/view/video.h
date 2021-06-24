@@ -1,16 +1,12 @@
 
-//video.h 
+// video.h 
 
 #ifndef ____X_VIDEO_H
-#define ____X_VIDEO_H
-
-
+#define ____X_VIDEO_H    1
 
 // See:
 // http://www.brokenthorn.com/Resources/OSDevVid2.html
 
- 
- 
 /*
     3C0-3CF  EGA/VGA
 	3C0 VGA attribute and sequencer register
@@ -48,14 +44,12 @@
 	3DB Clear light pen latch (any write)
 	3DC Preset Light pen latch
 	3DF CRT/CPU page register (PCjr only)
-	
 */ 
+
  
 /*
-
 MDA	B0000 to B0FFF	3B0 to 3BB
 CGA	B8000 to BBFFF	3D0 to 3DF
-
 Mono text	B0000 to B7FFF	3B0 to 3BB, 3C0 to 3CF
 Mono graphics	A0000 to AFFFF	3B0 to 3BB, 3C0 to 3CF
 Colour text	B8000 to BFFFF	3C0 to 3CF, 3D0 to 3DF
@@ -84,11 +78,17 @@ typedef struct _vbeInfoBlock {
 */
 
 
+//
+// == prototypes ===============================
+//
+
+// ??
+// Where are the prototypes for video.c ?
+// Move them to this document.
 
 int Video_initialize(void);
 
 
-#endif   
-
+#endif    
 
 

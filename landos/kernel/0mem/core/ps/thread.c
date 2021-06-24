@@ -135,10 +135,10 @@ void exit_current_thread(void)
 }
 
 
-// Thread stats.
+// Thread stats
 unsigned long __GetThreadStats ( int tid, int index ){
 
-    struct thread_d *t;
+    struct thread_d  *t;
 
     //#todo:
     //checar validade dos argumentos.
@@ -250,10 +250,9 @@ unsigned long __GetThreadStats ( int tid, int index ){
 // Get thread name.
 int getthreadname ( int tid, char *buffer )
 {
-    struct thread_d *t;
+    struct thread_d  *t;
 
     char *name_buffer = (char *) buffer;
-
 
     //#todo
     //checar validade dos argumentos.
@@ -273,7 +272,7 @@ int getthreadname ( int tid, char *buffer )
 
     }else{
     
-        if ( t->used != 1 || t->magic != 1234 ){
+        if ( t->used != TRUE || t->magic != 1234 ){
             //msg
             return -1;
         }
@@ -1302,12 +1301,8 @@ void *GetCurrentThread (void){
 
 void *FindReadyThread (void)
 {
-
-    // loop
     register int i=0;
-    
     struct thread_d *Thread;
-
 
     for ( i=0; i<THREAD_COUNT_MAX; ++i )
     {
@@ -1315,7 +1310,7 @@ void *FindReadyThread (void)
 
         if ( (void *) Thread != NULL )
         {
-            if ( Thread->used == 1 && 
+            if ( Thread->used  == TRUE && 
                  Thread->magic == 1234 && 
                  Thread->state == READY )
             {
@@ -1381,7 +1376,8 @@ void SelectForExecution ( struct thread_d *Thread ){
 }
 
 
-//Get State. (Zero � tipo NULL?).
+// Get State 
+// (Zero e' tipo NULL?).
 int GetThreadState (struct thread_d *Thread){
 
     if ( (void *) Thread == NULL ){
@@ -1389,12 +1385,12 @@ int GetThreadState (struct thread_d *Thread){
         return 0;   //#bugbug: This is a valid state.
     }
 
-
     return (int) Thread->state;
 }
 
 
-//Get Type. (Zero � tipo NULL?).
+// Get Type
+// (Zero e' tipo NULL?).
 int GetThreadType (struct thread_d *Thread){
 
     if ( (void *) Thread == NULL ){
@@ -1531,13 +1527,11 @@ int init_threads (void){
     while ( i < THREAD_COUNT_MAX ){
         threadList[i] = (unsigned long) 0; 
         i++;
-    }
-
+    };
 
 	//
 	// @todo: Nada mais?
 	//
-
 
     return 0;
 }

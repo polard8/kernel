@@ -1,13 +1,13 @@
 /*
  * File: tasks.h
- *     ??
- *     #bugbug: There is a lot of deprecated things here.
+ *
  */
 
+// #bugbug: 
+// There is a lot of deprecated things here.
 
 #ifndef __TASKS_H
 #define __TASKS_H    1
-
 
 
 //Status do mecanismo de task switch. 

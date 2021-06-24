@@ -357,9 +357,7 @@ int getprocessname ( int pid, char *buffer ){
 
 
 /*
- *******************************
  * processObject:
- * 
  *     Cria uma estrutura do tipo processo, mas não inicializada.
  *     #todo: Criar a mesma rotina para threads e janelas.
  */
@@ -1717,9 +1715,7 @@ fail:
 }
 
 
- 
 /*
- ************************************************
  * CloseAllProcesses:
  *     Bloqueia todos os processos da lista de processos.
  *     Menos o processo '0'.
@@ -1812,7 +1808,6 @@ void show_currentprocess_info (void){
 
 		//...
     };
-
 
     refresh_screen();
 }

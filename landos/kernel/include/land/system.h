@@ -15,23 +15,19 @@
  *     arquivos principais dos módulos hal microkernel e executive
  *     e começam com 'sys_'.
  *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- *     Versão 1.0, 2016 - Aprimoramento geral das rotinas básicas.
- *     //...
+ * History:
+ *     2015 - Created by Fred Nora.
  */
 
 
 int current_taskman_server; 
 
 
-//
 // getpid_t:
 //     Índices usados pela função gde_get_pid(x)
 //     Usada para obter o pid de alguns drivers e servidores
 // do sistema. Aqueles servidores que só podem ter um do tipo 
 // rodando ao mesmo tempo.
-//
 
 typedef enum {
 
@@ -50,7 +46,7 @@ typedef enum {
 int system_disk;
 int system_volume; 
 
- 
+
 //======================================== 
 //Esses são os principais arquivos usandos na 
 //inicialização do sistema. 
@@ -71,8 +67,6 @@ int system_volume;
 int g_system_mode;  //terminal ou edibox. 
 
 
-
-//
 // Identificação do processo que está efetuando logon e 
 // identificação do processo que está efetuando logoff.
 // Precisamos registrar o processo que efetuou logon.
@@ -89,22 +83,15 @@ int g_system_mode;  //terminal ou edibox.
 // Caso semelhante é o logoff. O processo deverá 
 // enviar uma flag de segurança e ter atributos válidos 
 // para efetuar o logoff.
-//
-//
 
 int gLogonPID;
 int gLogoffPID;
  
  
-
-
-
 /*
  * Abaixo temos uma lista de variaveis de ambiente usadas
  * pelo sistema, começadas com SYSTEM_.
- *
  */ 
-
 
 /*
  * Disks
@@ -136,7 +123,7 @@ int gLogoffPID;
 #define SYSTEM_ROOT      "root:/"
 #define SYSTEM_ROOTDIR   SYSTEM_ROOT      
 
- 
+
 /*
  * /disk0
  *     Esse será sempre o disco principal.
@@ -204,15 +191,15 @@ int gLogoffPID;
 
 
 //
-// @todo: Continuar criando variáveis de ambiente.
+// #todo: 
+// Continuar criando variáveis de ambiente.
 //
 
 //...
 
 
-
 //
-//    ****    SYSTEM METRICS INDEX **** 
+// SYSTEM METRICS INDEX 
 //
 
 
@@ -281,26 +268,21 @@ typedef enum {
 // e conterá 8 bancos de memória de 32Mb mais uma user session de tamnaho variado.
 int systemSize;
 
-
 //Flag para habilitar as opções para o desenvolvedor.
 int gDeveloperOptions;
-
 
 // ??
 int gSystemEdition;
 
-
 int gSystemStatus; //?? Usado pelo construtor.
 
-
 //
-//  **** Shutdown support   ****
+// Shutdown support 
 //
 
 //Salvar aqui o endereço da rotina do BM que desliga a máquina via APM.
 //O endereço e a rotina são de 32bit.
 unsigned long shutdown_address;
-
 
 static char *default_user_name = DEFAULT_USERNAME;
 
@@ -348,7 +330,6 @@ struct version_info_d
 
 struct version_info_d *VersionInfo;
 
- 
 
 /*
  * system_d:
@@ -385,7 +366,6 @@ struct system_d
 };
 
 struct system_d *System;
-
 
 
 //
@@ -506,7 +486,6 @@ void *systemGetSystemMetric(int number);
 
 //Pega informações de status de elementos do systema.
 void *systemGetSystemStatus(int number);
-
 
 
 int init_executive (void);

@@ -102,6 +102,9 @@ void bg_load_image (void)
 void backgroundDraw (unsigned long color)
 {
 
+    //#todo: TAlvez devamos usar isso. 
+    //drawDataRectangle( 20, 20, 40, 40, COLOR_RED );
+
     //loop
     register unsigned long i=0;
 

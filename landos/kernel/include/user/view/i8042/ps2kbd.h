@@ -74,8 +74,6 @@
 #define  KEYBOARD_RESET          0xFF    // Reset.
 
 
-
-
 // keyboard responses.
 #define  KEYBOARD_COMPLETE_SUCCESS  0xAA
 #define  KEYBOARD_COMPLETE_FAILURE  0xFC
@@ -83,9 +81,6 @@
 //#define  KEYBOARD_DEBUG_HOTKEY_ENH  0x37 
 //#define  KEYBOARD_DEBUG_HOTKEY_AT   0x54 
 //...
-
-
-
 
 
 /*
@@ -138,9 +133,6 @@ uint8_t kybrd_ctrl_read_status () {
 */
 
 
-
-
-//
 // Sobre charmaps:
 // ?? quem deve possuir o char map ??
 // Obviamente o kernel base precis de algum controle sobre isso.
@@ -148,11 +140,6 @@ uint8_t kybrd_ctrl_read_status () {
 // Se a intenção é que o driver de teclado passe para a line discipline 
 // somente o scancode, então não há a necessidade de o driver de teclado 
 // ter um char map, ele apenas passa o scancode.
-//
-
-
-
-
 
 
 // Enumerando os tipos de teclados.
@@ -164,8 +151,6 @@ typedef enum {
     // ...
 
 }keyboard_type_t;
-
-
 
 
 // keyboardMessage
@@ -256,15 +241,12 @@ void xxx_keyboard_write (uint8_t data);
 uint8_t xxx_keyboard_read (void);
 
 
-
-
 int ps2kbd_globals_initialize (void);
 void ps2kbd_initialize_device (void);
 
 void ldisc_init_modifier_keys (void);
 
 void ldisc_init_lock_keys (void);
-
 
 
 //Enable and disable keyboard.

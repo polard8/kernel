@@ -11,8 +11,8 @@
 
 
 
-void mmShowPDE (int index, unsigned long pd_va){
-
+void mmShowPDE (int index, unsigned long pd_va)
+{
 	//#todo: filtros.
 
 	if (pd_va == 0)
@@ -23,20 +23,24 @@ void mmShowPDE (int index, unsigned long pd_va){
 	
 	//#todo: filtros.
 	
-	if (index < 0)
-		return;
+    if (index < 0)
+        return;
 
-	unsigned long value = dir[index];
-	
+    // dir
+
+    unsigned long value = dir[index];
+
 	printf (" DirVA = %x ", (unsigned long) pd_va );
 	printf (" DirEntry %d = %x ", index, (unsigned long) value );
 	
-	
+
+    // pt
+
 	//12 bit de flags     1000 0000 0000
 	unsigned long pt_address = (unsigned long) (value & 0xFFFFF800);
-	unsigned long *pt = (unsigned long *) pt_address;	
+	unsigned long *pt = (unsigned long *) pt_address;
 	
-	printf (" PT_Address = %x ", (unsigned long) pt_address );		
+	printf (" PT_Address = %x ", (unsigned long) pt_address );
 	
 	//primeira entrada da pt.
 	printf (" PT_Entry_0 = %x \n", (unsigned long) pt[0] );	
@@ -45,27 +49,31 @@ void mmShowPDE (int index, unsigned long pd_va){
 
 void mmShowPDEForAllProcesses (int entry_number){
 
-    struct process_d *p;
-	int i=0;
+    struct process_d  *p;
+    int i=0;
+
+    printf ("mmShowPDEForAllProcesses:\n");
+
+    // #todo
+    if (entry_number < 0 || entry_number >= 1024 )
+        return;
 
 
-	printf ("mmShowPDEForAllProcesses:\n");
-	
-	for ( i=0; i<111; i++)
-	{
-		p = (struct process_d *) processList[i];
-		
-		if ( (void *) p != NULL )
-		{
+    for ( i=0; i<111; i++)
+    {
+        p = (struct process_d *) processList[i];
+
+        if ( (void *) p != NULL )
+        {
 
             // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
-		    if ( p->DirectoryVA != 0 ){
-		        printf ("Process %d: ", i);
-			    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
-		    }
-		}
-	};
-
+            if ( p->DirectoryVA != 0 )
+            {
+                printf ("Process %d: ", i);
+                mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
+            }
+        }
+    };
 
     refresh_screen();
 }
@@ -284,7 +292,8 @@ void memoryShowMemoryInfo (void){
 /*
  ********************************************************
  * show_memory_structs:
- *     *IMPORTANTE.
+ * 
+ *     IMPORTANTE.
  *     Mostra as informações das estruturas de memória. 
  *     Essas são as estruturas usadas pelo kmalloc.
  * @todo: 
@@ -432,7 +441,7 @@ fail:
 
 void showFreepagedMemory ( int max ){
 
-    struct page_d *p;
+    struct page_d  *p;
     int i=0;
 
 
@@ -457,6 +466,7 @@ void showFreepagedMemory ( int max ){
 
     refresh_screen ();
 }
+
 
 
 //

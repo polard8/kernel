@@ -10,8 +10,6 @@
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Small changes.
- *     //...
  */
 
 
@@ -221,22 +219,18 @@ void spawn_thread (int tid)
 
 
 	// #bugbug
-	// Os carinhas do gcc 9.1.0 resolveram sacanear.
-	// N�o posso usar mais isso porque eles tiveram um ataque de pelanca.
+	// Os carinhas do gcc 9.1.0 resolveram isso ..
 	// Warning:
 	// "Listening the stack pointer register in a clobber list is deprecated."  
 
-
-    // Stack frame.
-    // Pilha para iret.
+    // Stack frame
     // ss, esp, eip, cs, eip;
 
-    //Pilha para iret.
-    asm ("pushl %0" :: "r" ((unsigned long) Target->ss     & 0xffff ) );  //ss.
-    asm ("pushl %0" :: "r" ((unsigned long) Target->esp             ) );  //esp.
-    asm ("pushl %0" :: "r" ((unsigned long) Target->eflags          ) );  //eflags.
-    asm ("pushl %0" :: "r" ((unsigned long) Target->cs     & 0xffff ) );  //cs.
-    asm ("pushl %0" :: "r" ((unsigned long) Target->eip             ) );  //eip.
+    asm ("pushl %0" :: "r" ((unsigned long) Target->ss     & 0xffff ) );  // ss
+    asm ("pushl %0" :: "r" ((unsigned long) Target->esp             ) );  // esp
+    asm ("pushl %0" :: "r" ((unsigned long) Target->eflags          ) );  // eflags
+    asm ("pushl %0" :: "r" ((unsigned long) Target->cs     & 0xffff ) );  // cs
+    asm ("pushl %0" :: "r" ((unsigned long) Target->eip             ) );  // eip
     
 
     // #bugbug

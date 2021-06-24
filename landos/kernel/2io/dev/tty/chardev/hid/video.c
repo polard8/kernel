@@ -10,10 +10,8 @@
  *     2017 - Revision and small changes.
  */
 
-
 // See:
 // https://wiki.osdev.org/Accelerated_Graphic_Cards
-
 
 // # importante
 // Essa deve ser a única maneira em que o sistema acessa
@@ -59,18 +57,17 @@ See:
  */
 
 
+// ================================
 
 
 #include <kernel.h>
 
 
-//Definições internas.
 
 //@todo: Criar um arquivo para gerenciar fontes.
 #define VIDEO_BIOS_FONT8X8_ADDRESS    0x000FFA6E
 //#define VIDEO_BIOS_FONT8X16_ADDRESS (0x000FFA6E+??)
 //...
-
 #define VIDEO_BIOS_FONT8X8_WIDTH   8
 #define VIDEO_BIOS_FONT8X8_HEIGHT  8
 //...
@@ -98,7 +95,6 @@ extern unsigned long SavedBPP;          //Bits per pixel.
 int videoStatus;
 int videoError;
 //...
-
 
 // LFB - Esse é o endereço usado pelo driver de vídeo em /x
 // para acessar o LFB, ou seja o frontbuffer.
@@ -465,8 +461,8 @@ __video_refresh_rectangle ( unsigned long x,
  *     fis=b8000  vir=0x800000 
  */
 
-void videoSetupCGAStartAddress (unsigned long address){
-	
+void videoSetupCGAStartAddress (unsigned long address)
+{
     g_current_vm = (unsigned long) address;
 	//g_current_cga_address
 }
@@ -484,7 +480,7 @@ void videoSetupVGAStartAddress( unsigned long address)
 
 
 /*
- * get_video_mode: 
+ * videoGetMode: 
  *     Obtem o modo de video atual.
  */
 
@@ -503,18 +499,17 @@ unsigned long videoGetMode (void)
  */
 void videoSetMode (unsigned long mode)
 {
-	
+
     unsigned long VideoMode;
     unsigned long Width;
-	unsigned long Height;
+    unsigned long Height;
 	//continua...(outros parametros)
 
 
     debug_print ("videoSetMode: [BUGBUG] This routine is wrong\n");
 
 
-	
-	VideoMode = (unsigned long) mode;
+    VideoMode = (unsigned long) mode;
 	
     //
 	// todo: Check limits.
@@ -530,15 +525,16 @@ void videoSetMode (unsigned long mode)
         g_video_mode = (unsigned long) VideoMode;
 		VideoBlock.vesaMode = (unsigned long) VideoMode; 
 		//...
-	};
-	
-	
-	//
+	}
+
+
 	// @todo:
 	// Organizar isso. Os valores atuais devem ser obtidos em real mode 
 	// usando os recursos do VESA BIOS.
-	//
-	
+
+    // #bugbug
+    // Isso depende da placa de video.
+
     switch (VideoMode){
 		
 	    case 0x110: 
@@ -686,41 +682,36 @@ write_vga_reg (
  *     Inicia variáveis de video de acordo com o modo gráfico utilizado.
  */ 
  
-int videoInit (void){
-
+int videoInit (void)
+{
     int Status=0;
-
 
     // Se o modo de video nao esta habilitado
     if ( VideoBlock.useGui != 1 ){
         panic("videoInit:");
     }
 
-
     g_useGUI          = TRUE;
     VideoBlock.useGui = TRUE;
 
+//
+// LFB
+//
 
-    //
-    // LFB
-    //
+    // frontbuffer
+    __frontbuffer_pa = (unsigned long) SavedLFB;
+    __frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
+    g_frontbuffer_pa = (unsigned long) __frontbuffer_pa; 
+    g_frontbuffer_va = (unsigned long) __frontbuffer_va;
 
-	// Esses valores vieram do bootloader.
-	// Mas eles precisar ser enviados para esse driver
-	// quando o kernel estiver iniciando o driver.
-    __frontbuffer_va = (unsigned long) SavedLFB;
-    __frontbuffer_pa = (unsigned long) FRONTBUFFER_VA;  
+//
+// Backbuffer
+//
+
+    // backbuffer
+    g_backbuffer_va  = (unsigned long) BACKBUFFER_VA;
 
 
-	
-	// global usada pelo kernel.
-	// #todo: não devemos configurar essa global.
-	// O kernel deve solicitar esse endereço. 
-	//endereço físico do frontbuffer.
-    g_frontbuffer_pa = (unsigned long) SavedLFB;  
-
-	//endereço virtual do backbuffer.
-    g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
 
 
 
@@ -749,12 +740,12 @@ int videoInit (void){
 	//alocar memória antes, por isso só faremos isso depois de 
 	//inicializarmos o módulo runtime. /rt.
 	
-	//Isso pode n~ao funcionar pois nao temos
+	//Isso pode nao funcionar pois nao temos
 	//os endereços corretos ainda.
 	
 	//Background.
 	
-	//#bugbug #hackhack	
+	//#bugbug #hackhack
 	//vamos suprimir essa mensagem para testar
 	//o kernel na maquina real gigabyte/intel
 	//#importante: nuca mais usaremos essa rotina de bg aqui.
@@ -804,7 +795,7 @@ int videoInit (void){
     {
         panic("videoInit: fg_console\n");
     }
-    
+
     // cursor dimentions in pixel.
     // #bugbug: determinado
     
@@ -813,7 +804,7 @@ int videoInit (void){
     
     CONSOLE_TTYS[fg_console].cursor_width_in_pixels  = 8;
     CONSOLE_TTYS[fg_console].cursor_height_in_pixels = 8;
-       
+
     CONSOLE_TTYS[fg_console].cursor_color = COLOR_WHITE;
 
     // Cursor margin
@@ -888,6 +879,8 @@ int videoVideo (void)
 // called by main.c
 int Video_initialize(void)
 {
+    //g_driver_video_initialized = FALSE;
+
     videoVideo();
     videoInit();
     // ...

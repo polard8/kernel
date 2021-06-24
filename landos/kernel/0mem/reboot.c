@@ -92,8 +92,10 @@ void reboot (void){
 
     // Rotina de alto nível que irá desalocar recursos
     // antes de reiniciar.
-    systemReboot ();   
-    die ();
+    
+    systemReboot();   
+    
+    die();
 }
 
 //

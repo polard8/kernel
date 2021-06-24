@@ -55,7 +55,6 @@
 #define  FAT16_CLUSTER_LAST         0xffff
 
 
-
 #define FAT_DIRECTORY_ENTRY_FREE        0xE5
 #define FAT_DIRECTORY_ENTRY_LAST        0x00
 

@@ -81,7 +81,7 @@ ifeq ($(ARCH),x86)
 
 	ENTRY_OBJECTS := head_32.o main.o x86init.o 
 
-	EXECVE_OBJECTS := socket.o ctype.o  kstdio.o stdlib.o string.o unistd.o \
+	EXECVE_OBJECTS := socket.o ctype.o kstdio.o stdlib.o string.o unistd.o \
 	devmgr.o \
 	sci.o \
 	debug.o storage.o install.o object.o runtime.o \
@@ -208,11 +208,10 @@ all-c:
 	# ob
 	$(CC) -c 0mem/core/ob/object.c    $(KINCLUDE) $(CFLAGS) -o object.o
 
-
 	# ps
+	$(CC) -c  0mem/core/ps/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
 	$(CC) -c  0mem/core/ps/pheap.c     $(KINCLUDE)  $(CFLAGS) -o pheap.o
 	$(CC) -c  0mem/core/ps/process.c   $(KINCLUDE)  $(CFLAGS) -o process.o
-	$(CC) -c  0mem/core/ps/clone.c     $(KINCLUDE)  $(CFLAGS) -o clone.o
 	$(CC) -c  0mem/core/ps/queue.c     $(KINCLUDE)  $(CFLAGS) -o queue.o
 	$(CC) -c  0mem/core/ps/tasks.c     $(KINCLUDE)  $(CFLAGS) -o tasks.o
 	$(CC) -c  0mem/core/ps/theap.c     $(KINCLUDE)  $(CFLAGS) -o theap.o
@@ -380,9 +379,8 @@ all-c:
 # == user ======== 
 #
 
-#
-# Controller
-#
+    
+    # Controller
 
 	# System call interface and user call interface.
 	$(CC) -c user/ctrl/sci.c       $(KINCLUDE) $(CFLAGS) -o sci.o
@@ -399,6 +397,15 @@ all-c:
 
 	# user/model
 	$(CC) -c user/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
+
+
+	# user/security
+	$(CC) -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c user/security/logoff.c    $(KINCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c user/security/logon.c     $(KINCLUDE) $(CFLAGS) -o logon.o
 
 	# kernel gramado window system.
 
@@ -420,13 +427,6 @@ all-c:
 	$(CC) -c user/view/input.c    $(KINCLUDE) $(CFLAGS) -o input.o
 	$(CC) -c user/view/output.c   $(KINCLUDE) $(CFLAGS) -o output.o
 
-	# user/security
-	$(CC) -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
-	$(CC) -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
-	$(CC) -c user/security/logoff.c    $(KINCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c user/security/logon.c     $(KINCLUDE) $(CFLAGS) -o logon.o
 
 
 ## Step2 link-kernel-image  - Linking the kernel image.

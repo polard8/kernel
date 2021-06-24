@@ -4,20 +4,7 @@
  * Descrição:
  *     Header para o device manager.
  *     Para gerenciar e listar dispositivos.
- *
  *     Usado para dispositivos que não sejam pci
- * 
- *
- * Obs: Introduzindo aqui o conceito de 'Light' e 'Dark'.
- * O termo Light pode ser usado para descrever os dispositivos
- * mais rápidos, principalmente os que ficam mais pertos do processador,
- * tais como CPU, RAM, VIDEO MEMORY, PLACA DE REDE. Os outros disposisitivos
- * seriam classificados como Dark. Apesar de ser extremamente importante
- * que o disco do sistema seja rápido, ele ficaria sendo classificado como Dark
- * por estar longe do processador. Não há problema se no grupo dos dispositivos Dark
- * pararece algum que apresente bom desempenho, pois é apenas uma forma de se eleger
- * prioridades.
- *
  *     ... 
  */
 
@@ -30,7 +17,6 @@ struct device_class_d
 {
     //object_type_t  objectType;
     //object_class_t objectClass;
-    
 
     int device_class;
     int device_subclass;    
@@ -40,10 +26,6 @@ struct device_class_d
 // Device structure.
 struct device_d 
 {
-    //
-    // == Identification =============
-    //
-
     object_type_t  objectType;
     object_class_t objectClass;
 
@@ -212,7 +194,6 @@ struct ttydrv_d *PS2MouseDeviceTTYDriver;
 int devmgr_init_device_list(void);
 
 struct device_d *devmgr_device_object (void);
-
 
 int 
 devmgr_register_device ( 

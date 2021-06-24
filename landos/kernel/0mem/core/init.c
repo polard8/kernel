@@ -112,8 +112,8 @@ void init_globals (void){
     // Maybe we can print the banner.
 
 
-    debug_print("init_globals: WE HAVE MESSAGES NOW!\n");
-    printf     ("init_globals: WE HAVE MESSAGES NOW!\n");
+    debug_print("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
+    printf     ("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
 
 
     // ===================
@@ -134,7 +134,6 @@ void init_globals (void){
 
 // See: 
 // include/kernel/profiler/pints.h
-
 
     // Legacy hardware interrupts (irqs) (legacy pic)
     g_profiler_ints_irq0  = 0;
@@ -158,7 +157,6 @@ void init_globals (void){
     // Interrupção para serviços do sistema.
     g_profiler_ints_gde_services = 0;
 
-
 //
 // == User ===========================================
 //
@@ -171,7 +169,6 @@ void init_globals (void){
     current_user  = 0;
     current_group = 0;
 
-
     // =========================================
     // Security layers.
     // user session, room(window station), desktop.
@@ -179,11 +176,9 @@ void init_globals (void){
     current_room        = (int) 0;
     current_desktop     = (int) 0;
 
-
 //
-// == ps ===================================================
+// == ps ==============================================
 //
-
     // =========================================
     // Process, Thread.
     // See: kernel.h
@@ -198,7 +193,6 @@ void init_globals (void){
 //
 // == Network ===================================
 //
-
     // =========================================
     // Initialize the ports table used by the socket infrastruture.
     // todo: Create socket_init_gramado_ports();
@@ -334,23 +328,21 @@ int init (void){
     debug_print ("core-init: Globals\n");
     init_globals();
 
+#ifdef EXECVE_VERBOSE
+    printk ("core-init: init_globals ok\n");     
+#endif  
+
     // ==============================================================
     // #importante
     // À partir daqui podemos exibir strings na tela.
-    // Ou usarmos a barra de progresso. Depende do runlevel.
     // ==============================================================
-
 
 
     PROGRESS("Kernel:2:2\n"); 
     // Create the progress bar.
 
 
-#ifdef EXECVE_VERBOSE
-    printk ("core-init: init_globals ok\n");     
-#endif  
-
-
+// =================================
     PROGRESS("Kernel:2:3\n"); 
     // io manager
 
@@ -377,6 +369,7 @@ int init (void){
     ioInit ();
 
 
+// =================================
     PROGRESS("Kernel:2:4\n"); 
     // device manager.
 
@@ -387,7 +380,7 @@ int init (void){
     init_device_manager ();
 
 
-
+// =================================
     PROGRESS("Kernel:2:5\n"); 
     // storage manager
 
@@ -452,17 +445,18 @@ int init (void){
     debug_print ("core-init: [FIXME] Initialize mounted list in fs.c\n");
 
 
+//======================
     PROGRESS("Kernel:2:6\n"); 
     // network
 
-	//
-	// Network
-	//
-
+//
+// Network
+//
     debug_print ("core-init: network\n");
     networkInit ();
 
 
+//======================
     PROGRESS("Kernel:2:7\n"); 
     // Initialize Platform structure.
 
@@ -531,7 +525,6 @@ int init (void){
 // ====================================================================
 //
 
-
     // #important
     // We need to be in the phase 0.
     
@@ -540,9 +533,9 @@ int init (void){
     }
 
 
+//==================================
     PROGRESS("Kernel:2:8\n"); 
     // hal
-
 
 	// #bugbug
 	// Se é HAL é dependente da arquitetura.
@@ -564,6 +557,7 @@ int init (void){
     }
 
 
+//=================================
     PROGRESS("Kernel:2:9\n"); 
     // microkernel components:
     // mm, ipc, ps ...
@@ -588,6 +582,7 @@ int init (void){
     }
 
 
+//=========================================
     PROGRESS("Kernel:2:10\n"); 
     // Executive components
 
@@ -603,16 +598,17 @@ int init (void){
         panic ("init_architecture_independent: init_executive\n"); 
     }
 
+
+//=========================================
+    PROGRESS("Kernel:2:11\n"); 
+    // some gui components.
+    // #todo: rever 
+
     // =====================
     // Gramado:
 #ifdef EXECVE_VERBOSE
     printk ("init_architecture_independent: Initializing Gramado..\n");
 #endif
-
-
-    PROGRESS("Kernel:2:11\n"); 
-    // some gui components.
-    // #todo: rever 
 
     // #bugbug
     // Deprecated?
@@ -625,6 +621,7 @@ int init (void){
     }
 
 
+//=========================================
     PROGRESS("Kernel:2:12\n"); 
     // window manager
 
@@ -731,17 +728,15 @@ int init (void){
 
     //printf("init_architecture_dependent: #Debug");
     //refresh_screen();
-    //while(1){};		
-	
+    //while(1){};
 
-
+//===========================================================
     PROGRESS("Kernel:2:13\n"); 
     // processor structure.
 
-
-    //
-    // == Processor ===================================
-    //
+//
+// == Processor ===================================
+//
 
     // The 'processor' structure.
     // ?? Is it 'up' or 'smp' ?
@@ -752,12 +747,10 @@ int init (void){
         panic("init: processor\n");
     }
 
-
     // #todo
     // Check if cpuid instruction is available.
     // See: _x86_test_cpuid_support on bootmx/headlib.asm
     // #todo: extern int x86_test_cpuid_support(void);
-
 
 
     // Sonda pra ver qual é a marca do processador.
@@ -791,11 +784,9 @@ int init (void){
             break;
     };
 
-
-    //
-    // qemu
-    //
-
+//
+// qemu
+//
     // Check if we are running on qemu.
     // and set flag.
 
@@ -805,6 +796,7 @@ int init (void){
         printf ("Running on QEMU\n");
     }
 
+//=========================================
 
     PROGRESS("Kernel:2:14\n"); 
     // process manager.
@@ -829,9 +821,12 @@ int init (void){
 // ====================================================================
 //
 
+
+//===============================
     PROGRESS("Kernel:2:15\n"); 
     // Load root dir.
-    // #todo: We can move this above to the 'storage' section.
+    // #todo: 
+    // We can move this above to the 'storage' section.
 
     // #importante
     // Só podemos carregar o diretório raiz depois que 
@@ -858,12 +853,13 @@ int init (void){
     //set_task_status(LOCKED); 
     //scheduler_lock();
 
-
+//==========================================
     PROGRESS("Kernel:2:16\n"); 
     // keyboard stuff.
 
     // #todo
     // Talvez devamos antecipar isso, pois faz parte do teclado.
+    // Isso pode ir pra outro lugar?
     
     ldisc_init_modifier_keys ();
     ldisc_init_lock_keys ();
@@ -909,8 +905,13 @@ int init (void){
     //refresh_screen();
     //while(1){}
 
-    return 0;  
+    return 0;
+
+//fail0:
+    //debug_print ("==== init: fail\n");
+    //return (-1);
 }
+
 
 
 //

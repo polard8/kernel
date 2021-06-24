@@ -220,16 +220,16 @@ void KiShowTasksParameters (void)
  *     Show info about all threads.
  */
 
+// #todo: parameters type. 
+// void show_slots(void){
+
 void show_slots(){
 
     struct process_d *p;
     struct thread_d  *t;
     int i=0;
 
-
-
     printf ("\nThread info:\n");
-
 
     // Loop.
     // Mostra as tarefas válidas, mesmo que estejam com problemas.
@@ -239,7 +239,7 @@ void show_slots(){
         t = (void *) threadList[i];
 
         if ( (void *) t != NULL && 
-             t->used == 1 && 
+             t->used  == 1 && 
              t->magic == 1234 )
         {
             show_slot (t->tid);
@@ -292,10 +292,8 @@ void show_slot (int tid){
 
     goto done;
 
-
 fail:
     printf ("Fail\n");
-
 done:
     return; 
 }
@@ -351,7 +349,7 @@ void show_reg (int tid){
  * set_thread_priority: 
  *
  */
- 
+
 // Muda a prioridade e o quantum de acordo com a prioridade.
 
 void 
@@ -519,7 +517,6 @@ void show_tasks_parameters (void)
  * ou bloqueada por algum motivo.
  * Obs: Aqui não devemos julgar se ela pode ou não ser
  * liberada, apenas alteramos se estado.
- *
  */
  
 void release ( int tid ){

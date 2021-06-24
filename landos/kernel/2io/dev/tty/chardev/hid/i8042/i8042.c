@@ -7,8 +7,6 @@
  * 2018 - Created by Fred Nora.
  */
 
-
- 
 // When the keyboard and mouse are USB devices, the BIOS uses SMM code 
 // to emulate PS/2 devices. 
 // I see mentioned that the USB devices should halt ps/2 emulation 
@@ -16,7 +14,6 @@
 
 
 #include <kernel.h>
-
 
 
 void I8042Controller_do_drain(void)
@@ -255,7 +252,6 @@ void ps2(void)
     int keyboard_available = FALSE;
     int mouse_available    = FALSE;
 
-
     unsigned char configuration=0;
     int is_dual_channel=0;
 
@@ -375,7 +371,6 @@ void ps2(void)
         mouse_available = (wait_then_read(I8042_BUFFER) == 0);
     }
 
-
 //#define STAT_OUTFULL         (1<<0)
 //#define STAT_INFULL         (1<<1)
 //#define STAT_SYSTEM_FLAG      (1<<2)
@@ -482,8 +477,6 @@ void ps2(void)
 /*
  ************************************************************
  * early_ps2_init:
- * 
- * 
  */
 
 // Inicialização preliminar. Sem mouse.
@@ -499,11 +492,11 @@ void ps2(void)
 // Ao fim dessa rotina, reabilitamos apenas a porta de teclado.
 // A porta de mouse permaneçe fechada.
 
-void early_ps2_init (void)
-{
     // mas simples...
     // apenas teclado.
 
+void early_ps2_init (void)
+{
 	// #debug
 	printf ("early_ps2_init: Initializing..\n");
 	refresh_screen();
@@ -515,7 +508,6 @@ void early_ps2_init (void)
     PS2.keyboard_initialized = FALSE;
     PS2.mouse_initialized    = FALSE;
     PS2.pooling = FALSE;
-
 
     // Zerando estruturas que precisam serem reinicializadas.
     
@@ -594,9 +586,6 @@ int PS2_early_initialization(void)
 }
 
 
-
-// See:
-// ps2.h
 int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
     debug_print("ps2_ioctl: [TODO]\n");

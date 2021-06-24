@@ -2,14 +2,12 @@
  * Gramado HAL - The main file for the hal module in the kernel base. 
  * (c) Copyright Fred Nora.
  *
- *  File: hal/hal.c 
+ *  File: hal.c 
  *
  *      HAL - Hardware Abstraction Layer
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     2016 - Revision.
- *     //...
  */
  
  
@@ -20,7 +18,7 @@
 //unsigned char  HalName[] = "HAL LAYER";
 
 //
-// inport.
+// import
 //
 
 extern unsigned long gdt;
@@ -274,8 +272,9 @@ void hal_init_vectors_table (void)
  
 /*
  * Beep support
- * #bugbug: Não quero comprometer a programação do PIT.
-*/
+ * #bugbug: 
+ * Não quero comprometer a programação do PIT. 
+ */
 
 /*
 void ____Beep_tone (int freq){
@@ -294,8 +293,8 @@ void ____Beep_tone (int freq){
     }
 }
 */ 
- 
- 
+
+
 // Speaker ON. 
 // OUT 
 // Play sound using built in speaker
@@ -580,7 +579,8 @@ hal_idt_register_interrupt (
 // Monitor vertical sync.
 void hal_vsync (void)
 {
-    vsync ();
+    // See: vsync.c
+    vsync();
 }
 
 
@@ -658,10 +658,14 @@ void hal_shutdown (void){
  *     Archtecture independent inicialization ...
  */
 
+// Called by ?
+
 int init_hal (void){
 
     int Status = 0;
 
+
+    //Initialization.hal = FALSE;
 
 #ifdef KERNEL_VERBOSE	
     printf("HAL:\n");
@@ -704,8 +708,8 @@ int init_hal (void){
 
 //Done:
 
-    Initialization.hal = 1;	
-	
+    Initialization.hal = TRUE;
+
 #ifdef HAL_VERBOSE
 	printf("Done\n");
 #endif

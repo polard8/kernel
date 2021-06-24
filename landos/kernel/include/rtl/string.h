@@ -7,6 +7,12 @@
 #ifndef __STRING_H
 #define __STRING_H    1
 
+
+//
+// prototyes ==============================
+//
+
+
 void *memset ( void *ptr, int value, int size );
 
 //@todo: void *memcpy(void *dst, const void *src, size_t c);  

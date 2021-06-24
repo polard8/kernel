@@ -641,7 +641,6 @@ int ide_identify_device ( uint8_t nport )
 }
 
 
-
 // #atenção.
 extern st_dev_t *current_dev;
 
@@ -1190,8 +1189,6 @@ extern st_dev_t *current_dev;
 extern uint8_t *dma_addr;
 
 
-
-
 /*
  * atapi_pio_read:
  * 
@@ -1530,13 +1527,11 @@ int ata_get_current_ide_device(void)
     return (int) g_current_ide_device;
 }
 
-
 // primary or secondary
 void ata_set_current_ide_channel(int channel)
 {
     g_current_ide_channel = channel;
 }
-
 
 // master or slave
 void ata_set_current_ide_device(int device)

@@ -70,7 +70,6 @@ int g_currentvolume_fatbits;
 
 
 /*
- *****************************************************
  * volume_type_t:
  *     Enumerando os tipos de volume.
  */

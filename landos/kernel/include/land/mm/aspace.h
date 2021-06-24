@@ -1,5 +1,5 @@
 /*
- * File: mm\aspace.h 
+ * File: mm/aspace.h 
  *
  * Address Space.
  * 
@@ -10,8 +10,10 @@
  
 
 typedef enum {
-	aspacetypeShared,
-	aspacetypePersonal,
+
+    aspacetypeShared,
+    aspacetypePersonal,
+
 }aspace_type_t;
 
 

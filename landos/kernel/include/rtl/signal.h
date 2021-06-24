@@ -26,26 +26,23 @@
  * Obs: signal.h é um arquivo cabeçalho da biblioteca padrão da linguagem de programação C??
  * Obs:  PODEM SER IMPLMENTADOS POUCOS SINAIS, SEPARADOS EM CATEGORIAS.
  *
- * Histórico:
- *      Versão: 1.0, 2016 - Created.
- *      ...
+ * History:
+ *      2016 - Created by Fred Nora.
  */
 
- /*
+
+/*
 The C standard defines only 6 signals. 
 They are all defined in signal.h header (csignal header in C++):[1]
-
 SIGABRT - "abort", abnormal termination.
 SIGFPE  - floating point exception.
 SIGILL  - "illegal", invalid instruction.
 SIGINT  - "interrupt", interactive attention request sent to the program.
 SIGSEGV - "segmentation violation, invalid memory access.
 SIGTERM - "terminate", termination request sent to the program. 
- 
- */
+*/
  
 /*
-
 Constante	Significado	Disponibilidade
 SIGHUP	Desconexão	POSIX	
 SIGINT	Interrupção	ANSI
@@ -71,8 +68,7 @@ SIGPWR	Reinício por falha de energia	System V
 SIGXCPU	Excedeu o tempo de CPU	POSIX
 SIGSTOP	Pausar execução	POSIX
 SIGCONT	Continuar execução	POSIX
-
- */ 
+*/ 
  
 /*
 POSIX signals[edit]
@@ -206,7 +202,8 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 
 
 //
-// @todo: Criar estrutura e objeto do tipo signal
+// #todo: 
+// Criar estrutura e objeto do tipo signal
 //
 
 
@@ -271,8 +268,8 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 //...
 
 
-//Criando primeiro sinal para teste.
-#define SIGNULL 0;
+// Criando primeiro sinal para teste.
+#define SIGNULL  0
 
 
 /*
@@ -332,13 +329,15 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 //#define	SIG_DFL	(int (*)())0
 //#define	SIG_IGN	(int (*)())1
 
-//#bugbug
+
+// #bugbug
+// where is thing was defined?
 #define SIG_DFL ((__sighandler_t)0)
 #define SIG_ERR ((__sighandler_t)-1)
 #define SIG_IGN ((__sighandler_t)1)
 
 
-//se precisar!!
+// Se precisar!!
 /*
 typedef void (*__sighandler_t)(int);
 typedef __sighandler_t sighandler_t;
@@ -351,14 +350,14 @@ typedef uint32_t sig_atomic_t;
 
 //#test
 //coloquei aqui pra compilar o lua.
-typedef int sig_atomic_t;
+typedef int  sig_atomic_t;
 
 /* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
 //#ifndef __CYGWIN__
 //typedef unsigned long sigset_t;
 //#endif
 
-typedef unsigned int sigset_t;
+typedef unsigned int  sigset_t;
 
 /* Type of a signal handler.  */
 typedef void (*sighandler_t)(int);

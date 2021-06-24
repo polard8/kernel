@@ -66,7 +66,6 @@ typedef enum {
 
 
 
-
 // Initialize the list.
 int devmgr_init_device_list(void)
 {
@@ -185,18 +184,15 @@ struct device_d *devmgr_device_object (void){
 
 
 
-//==============
+// ==============
 // registrando um dispositivo dado o ponteiro para o arquivo
 // que representa seu objeto.
 // #todo: 
 // Tem vários argumentos.
 // Possivelmente ampliaremos o número de argumentos no futuro.
-
-//
 // This is called by pciHandleDevice() in pci.c to register
 // every found device and for the ps2 devices initialization.
 // The pcidevice argument is null in this case.
-//
 
 int 
 devmgr_register_device ( 
@@ -273,9 +269,9 @@ devmgr_register_device (
     
     f->deviceId = d->index; 
 
-    d->__file = (file *) f;
+    d->__file  = (file *) f;
     d->__class = class;
-    d->type = type;
+    d->type    = type;
 
     // #test 
     //Todo: create the file.

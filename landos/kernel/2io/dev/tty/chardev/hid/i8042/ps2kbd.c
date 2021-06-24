@@ -1466,7 +1466,7 @@ sc_again:
     // #define KBIT    0x80  /* bit used to ack characters to keyboard */
 
 //
-// Get the raw byte for the key struck.
+// Get the rawbyte for the key struck.
 //
 
     __raw = in8(0x60);

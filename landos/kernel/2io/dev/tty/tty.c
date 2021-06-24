@@ -1008,7 +1008,8 @@ tty_read (
 }
 
 
-// IN: fd = indice na lista de arquivos abertos pelo processo.
+// IN: 
+// fd = indice na lista de arquivos abertos pelo processo.
 int 
 tty_write ( 
     int fd, 

@@ -8,10 +8,8 @@
  *
  */
 
-
 #ifndef ____PS2_H
 #define ____PS2_H
-
 
 /*
  Wikipedia
@@ -74,7 +72,6 @@ struct ps2_d
     
     // ...
 };
-
 
 // #important:
 // use ps2_ioctl to setup this structure.

@@ -306,12 +306,6 @@ void refresh_rectangle3( struct rect_d *rectangle )
 
 
 /*
- * #todo 
- * kgws não pode acessar o lfb, devemos chamar o diálogo em x/video.c
- * 
- */
- 
-/*
  ***********************************************************
  * refresh_rectangle:
  *     Copiar um retângulo do backbuffer para o frontbuffer. 
@@ -324,7 +318,10 @@ void refresh_rectangle3( struct rect_d *rectangle )
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
- */	
+ */
+
+// #todo 
+//kgws não pode acessar o lfb, devemos chamar o diálogo em x/video.c
 
 
 //#importante
@@ -508,7 +505,7 @@ refresh_rectangle2 (
     int bytes_count;
 
 	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();	
+	unsigned long Height = (unsigned long) screenGetHeight();
 
 
 	line_size = (unsigned int) width; 
@@ -555,7 +552,7 @@ refresh_rectangle2 (
     if ( ((line_size * 3) % 4) != 0 )
     {
 
-        //count = (line_size * 3);  		
+        //count = (line_size * 3); 
 	
 	    for ( i=0; i < lines; i++ )
 	    {

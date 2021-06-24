@@ -1,17 +1,14 @@
 /*
- * File: mm\bank.h 
+ * File: mm/bank.h 
  *
  * Descrição:
  *     Gerente de banco de dados em memória e em disco.
  */
 
-  
- 
-//Número máximo de bancos no sistema. 
-#define BANKS_COUNT_MAX 8
- 
- 
- 
+
+// Número máximo de bancos no sistema. 
+#define BANKS_COUNT_MAX  8
+
 //contando a quantidade de bancos no sistema. 
 //A quantidade de bancos depende do tamanho do sistema.
 //A quantidade mínima de bancos é 1.
@@ -25,14 +22,14 @@ int banksCount;
 //caso o sistema tenha apenas um banco, então a user session ficará no fim do banco.
 int lastBank;
 
-       
- 
- 
+
 typedef enum {
+
     banktypeLDB,    // LDB - Local Data Base.   (private)
     banktypeGDB,    // GDB - Global Data Base.  (shareable)
     banktypeKDB,    // KDB - Kernel Data Base.  (kernel only)
-	banktypeFDB,    // FDB - Free Data Base.    (free memory)
+    banktypeFDB,    // FDB - Free Data Base.    (free memory)
+
 }bank_type_t;
 
 

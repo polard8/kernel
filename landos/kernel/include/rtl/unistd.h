@@ -18,26 +18,22 @@
  
  Credits: Wikipedia
  */
- 
- 
+
 #ifndef ____UNISTD_H 
 #define ____UNISTD_H    1
- 
- 
-/* FreeBSD stuff */
-#define  STDIN_FILENO   0	/* standard input file descriptor */
-#define  STDOUT_FILENO  1	/* standard output file descriptor */
-#define  STDERR_FILENO  2	/* standard error file descriptor */
+
+// FreeBSD stuff
+#define  STDIN_FILENO   0  /* standard input file descriptor */
+#define  STDOUT_FILENO  1  /* standard output file descriptor */
+#define  STDERR_FILENO  2  /* standard error file descriptor */
 
 
-
-/* 
- Process IDentifier 
- posix.  
- */
+// Process IDentifier. (posix)
 typedef int    pid_t;
 
-
+//
+// prototypes ======================
+//
 
 //See: threadi.c
 int kfork (void);

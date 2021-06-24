@@ -12,15 +12,15 @@
  
  
 #ifndef ____PIC_H
-#define ____PIC_H
- 
+#define ____PIC_H    1
 
-//Estrutura para gerenciar as irqs do PIC.
+
+// Estrutura para gerenciar as irqs do PIC.
 struct irq_d
 {
 	//object_type_t objectType;
 	//object_class_t objectClass;
-	
+
     int id;
     int used;
     int magic;
@@ -31,7 +31,7 @@ struct irq_d
 
     char *name; //description.
 
-    struct irq_d *next;
+    struct irq_d  *next;
 };
 
 

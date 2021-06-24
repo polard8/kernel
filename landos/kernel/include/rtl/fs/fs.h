@@ -229,8 +229,8 @@ struct target_dir_d
 };
 
 struct target_dir_d current_target_dir;
- 
- 
+
+
 // links para arquivos ou diretórios 
 // dentro do mesmo sistema de arquivos. 
 
@@ -374,11 +374,6 @@ struct filesystem_d *root;
 // ...
 
 
-
-
-/*
-file_access_d
-*/
 
 //
 // == file context ===========================================

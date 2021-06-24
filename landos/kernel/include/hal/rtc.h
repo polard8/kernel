@@ -8,22 +8,19 @@
  * 2015 - Created by Fred Nora.
  */ 
 
-
 #ifndef ____RTC_H
 #define ____RTC_H
 
 
-
 #define  RTC_IRQ   8 
- 
- 
-//ports 
-#define RTC_ADDRESS_PORT 0x70 
-#define RTC_DATA_PORT    0x71
 
+// Ports 
+#define RTC_ADDRESS_PORT  0x70 
+#define RTC_DATA_PORT     0x71
+
+// #todo
+//  Mover isso para baixo, junto com os outros prot[otipos.
 unsigned short rtcGetBaseMemory (void);
-
-
 
 
 //Time
@@ -58,67 +55,53 @@ unsigned short rtcGetBaseMemory (void);
 
 
 
-
 //
-// Globals.
+// Globals
 //
 
 static volatile unsigned long g_ticks;
 
- 
 //
-// RTC Structure.
+// RTC Structure
 //
  
 typedef struct rtc_d rtc_t;
 struct rtc_d
 {
+    object_type_t  objectType;
+    object_class_t objectClass;
 
-	object_type_t objectType;
-	object_class_t objectClass;
-	
-	//unsigned long callback; //d
-	
+    //unsigned long ticks;
 
-	//unsigned long ticks; //c
-	unsigned long Seconds; //b
-	unsigned long Minutes; //a
-	unsigned long Hours;   //g
+    unsigned long Seconds;
+    unsigned long Minutes;
+    unsigned long Hours;
 
-	unsigned long flag; //f
-	unsigned long error; //e Error
-	
-	//ext ...
-    unsigned long time;         //ext1
-	unsigned long date;         //ext2
-	unsigned long DayOfMonth;   //ext3
-	unsigned long Month;        //ext4
-	unsigned long Year;         //ext5 (cowboy).
-	
-	
-	//unsigned long rtc_handler_address;
-	
-	//Monsters ...
-	//...
+    unsigned long flag;
+
+    unsigned long error;
+
+    unsigned long time;
+
+    unsigned long date;
+
+    unsigned long DayOfMonth;
+    unsigned long Month;
+    unsigned long Year;
 };
 
-struct rtc_d *Rtc;
-struct rtc_d *rtc;	
-
-//rtc_t *Rtc;
-//rtc_t *rtc;
+struct rtc_d  *Rtc;
+struct rtc_d  *rtc;
 
 
 //
-// IRQ8.
+// == prototypes =======================
 //
+
+
+// IRQ8
 
 void DeviceInterface_RTC(void);
-
-
-//
-// Prototypes.
-//
 
 int init_clock (void);
 
@@ -129,7 +112,6 @@ unsigned long get_time (void);
 unsigned long get_date (void);
 
 void *get_cmos_info (void); 
-
 
 unsigned short rtcGetExtendedMemory (void);
 unsigned short rtcGetMaseMemory (void);

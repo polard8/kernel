@@ -823,10 +823,9 @@ void console_putchar ( int c, int console_number ){
         cWidth, 
         cHeight );
 
-    // flag off.
+    // flag off
     stdio_terminalmode_flag = FALSE; 
 }
-
 
 
 // No escape sequence support.

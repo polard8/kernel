@@ -84,8 +84,6 @@
  
 //Variáveis internas. 
 
-//int mmStatus;
-
 // Heap support.
 // #todo: Precisamos melhorar esses nomes. nada neles indica que
 // estamos lidando com heap.
@@ -819,6 +817,10 @@ int init_heap (void){
 
     int i=0;
 
+    // #bugbug
+    // não usar printf
+    // printf ainda não funciona nesse momento.
+
     //
     // Globals
     //
@@ -891,6 +893,8 @@ int init_heap (void){
 // Done.
 
 #ifdef PS_VERBOSE
+    // #bugbug
+    // printf ainda não funciona nesse momento.
     printf ("Done\n");
 #endif
 
@@ -911,7 +915,10 @@ fail:
     while(1){}
     */
 
+    // #bugbug
+    // printf ainda não funciona nesse momento.
     printf ("init_heap: Fail\n");
+    
     refresh_screen ();
 
     return (int) 1;
@@ -1101,7 +1108,7 @@ fail:
 
 // #todo
 // review and improve this function. 
- 
+
 int kernel_gc (void){
 
 

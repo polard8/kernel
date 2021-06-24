@@ -251,7 +251,8 @@ int initialize_frame_table (void){
 }
 
 
-
+// #todo
+// Describe this thing.
 unsigned long get_new_frame (void){
 
     int i=0;
@@ -1059,7 +1060,7 @@ int mmSetUpPaging (void)
 
 
 	//
-	// SYSTEM MEMORY * PAGED POOLS 
+	// SYSTEM MEMORY - PAGED POOLS 
 	//
 
 
@@ -1657,6 +1658,7 @@ int mmSetUpPaging (void)
     // Tem dma que usa mem�ria virtual.
 
     // Used.
+    // #todo: mm_used_lfb ??
     memorysizeUsed = (unsigned long) ( mm_used_kernel_area + 
         mm_used_user_area + 
         mm_used_backbuffer + 

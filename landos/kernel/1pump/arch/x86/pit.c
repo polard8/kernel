@@ -15,11 +15,11 @@
  * elas devem ter um contador que enviará mensagens para o 
  * aplicativo sempre que se esgota a contagem.
  *
- * Histórico:
- *     Versão: 1.0, 2013 - Esse arquivo foi criado por Fred Nora.
+ * History:
+ *     2013 - Created by Fred Nora.
  */
 
- 
+
 /*
 I/O port     Usage
 0x40         Channel 0 data port (read/write)
@@ -49,9 +49,7 @@ Bits         Usage
                  1 1 1 = Mode 3 (square wave generator, same as 011b)
  0            BCD/Binary mode: 0 = 16-bit binary, 1 = four-digit BCD
 */ 
- 
- 
- 
+
 /*
  PIT info:
  ========
@@ -65,10 +63,6 @@ Bits         Usage
 #include <kernel.h>
 
 
-
-//
-// Variáveis internas.
-//
 
 //Status do módulo.
 int timerStatus;
@@ -92,9 +86,7 @@ int timerLock;
 int timerError;
 
 
-//
 // Text cursor
-//
 
 int timerShowTextCursor;  
 
@@ -103,8 +95,6 @@ int timerShowTextCursor;
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
 //...
-
-
 
 
 
@@ -119,24 +109,24 @@ int timerShowTextCursor;
  *     (tick tick tick)
  */
 
-void DeviceInterface_PIT (void){
-
+void DeviceInterface_PIT (void)
+{
     // Timers.
     int i = 0;
 
     struct timer_d  *Timer;
-
     struct thread_d *Thread;
 
 
     // Se o timer não estiver inicializado !
-    if ( __breaker_timer_initialized == 0 )
+    if ( __breaker_timer_initialized == 0 ){
         return;
+    }
 
 
-	//
-	// Profiler
-	//
+//
+// Profiler
+//
 
 	// Contando as interrupções desse tipo.
     g_profiler_ints_irq0++;
@@ -170,8 +160,6 @@ void DeviceInterface_PIT (void){
     jiffies++;
 
 
-
-    
     if (sys_time_hz != 0 )
     {
         // por quantos segundos o sistema esta rodando
@@ -209,18 +197,17 @@ void DeviceInterface_PIT (void){
 	//Working set and profiler support.
 	
 	//apenas incremente.
-	thread_profiler (1);
-	    
+    thread_profiler (1);
+
     if ( jiffies % profiler_ticks_limit == 0 )
-	{   
+    {   
 	    //quantidade de frames num determinado período de tempo.
 	    // mm_profiler (); 
 	    
 	    //calcule.
-	    thread_profiler (2);
+        thread_profiler (2);
 	    //process_profiler (?);    
-	}
-
+    }
 
     // Whatch dogs
     if ( jiffies % 100 == 0 )
@@ -270,8 +257,7 @@ void DeviceInterface_PIT (void){
     // #todo
     // Podemos fazer isso com menos frequência.
 
-    if ( jiffies % 100 == 0 ){ extra = 1; }
-
+    if ( jiffies % 100 == 0 ){ extra = TRUE; }
 
 
     //
@@ -365,7 +351,6 @@ void DeviceInterface_PIT (void){
         }
     };
 
-
 done:
     return;
 //fail:
@@ -380,7 +365,10 @@ done:
  *     Chama o handler do kernel que está no kernel base.
  * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
- 
+
+// Called by:
+// _irq0 in hw.asm
+
 __VOID_IRQ 
 irq0_TIMER (void)
 {
@@ -388,12 +376,10 @@ irq0_TIMER (void)
 }
 
 
-
 void timerEnableTextCursor (void)
 {
     timerShowTextCursor = TRUE;
 }
-
 
 void timerDisableTextCursor (void)
 {
@@ -401,23 +387,22 @@ void timerDisableTextCursor (void)
 }
 
 
-int new_timer_id (void){
-
+int new_timer_id (void)
+{
     int i=0;
     unsigned long new=0;
 
 
     for ( i=0; i<32; i++ )
     {
-		new = (unsigned long) timerList[i];
-		
-        if ( new == 0 ){ return (int) i; }
-	};
-	
-	//fail
-	return (int) -1;
-}
+        new = (unsigned long) timerList[i];
 
+        if ( new == 0 ){ return (int) i; }
+    };
+
+	// fail
+    return (int) -1;
+}
 
 
 /*
@@ -516,7 +501,6 @@ struct timer_d *create_timer (
 
             Timer->used  = TRUE;
             Timer->magic = 1234;
-
             Timer->id = ID;
             
             // ms/(ms por tick)
@@ -548,12 +532,9 @@ struct timer_d *create_timer (
     return (struct timer_d *) Timer;
 
 fail:
-
     debug_print("create_timer: [FAIL]\n");
     printf     ("create_timer: [FAIL]\n");
-
     refresh_screen ();
-
     return NULL;
 }
 
@@ -577,10 +558,10 @@ fail:
 //Essa rotina poderá ser chamada de user mode,
 //talvez precisaremos de mais argumentos. 
  
-void timerInit8253 ( unsigned long hz ){
-	
-	//#todo:
-	//podemos fazer filtros.
+void timerInit8253 ( unsigned long hz )
+{
+	// #todo:
+	// podemos fazer filtros.
 
     unsigned short clocks_per_sec = (unsigned short) hz;
 
@@ -630,7 +611,6 @@ void set_current_quantum (unsigned long q)
 {
     current_quantum = (unsigned long) q;
 }
-
 
 // get_current_quantum:
 unsigned long get_current_quantum (void)
@@ -698,32 +678,20 @@ unsigned long get_jiffies (void)
  * 
  */
 
-unsigned long get_systime_info (int n){
-
     // #todo 
     // Criar um enum para isso.
     // Comentar uma descrição em cada item.
 
+unsigned long get_systime_info (int n){
+
     switch (n){
-
-    case 1:
-    return (unsigned long) get_systime_hz();
-    break;
-
-    case 2:
-    return (unsigned long) get_systime_ms();
-    break;
-
-    case 3:
-    return (unsigned long) get_systime_totalticks();
-    break;
-
+    case 1: return (unsigned long) get_systime_hz();          break;
+    case 2: return (unsigned long) get_systime_ms();          break;
+    case 3: return (unsigned long) get_systime_totalticks();  break;
     // ...
-
-    default:
-    return (unsigned long) 0;
-    break;
-    
+    default:  
+        return (unsigned long) 0;  
+        break;
     };
 
     // fail.
@@ -783,12 +751,11 @@ unsigned long get_timeout (void)
  *     Inciaialização de variáveis do módulo.
  */
 
-int timerTimer (void){
-
-
+int timerTimer (void)
+{
     // total ticks
     jiffies = 0;
-    
+
     // por quantos segundos o sistema esta rodando
     // jiffies/sys_time_hz
     seconds = 0; 
@@ -800,13 +767,12 @@ int timerTimer (void){
     sys_time_hz = 0;
 
 
-    //
-    // Profiler
-    //
-    
+//
+// Profiler
+//
     profiler_ticks_count = 0;
     profiler_ticks_limit = PROFILER_TICKS_DEFAULT_LIMIT;
-    
+
     // ...
 
     return 0;
@@ -822,21 +788,19 @@ int timerTimer (void){
  * (unsigned long CallBackExemplo); 
  */
 
-int timerInit (void){
-
+int timerInit (void)
+{
     int i=0;
 
-    //
-    // Breaker
-    //
+    // g_driver_timer_initialized = FALSE;
 
+//
+// Breaker
+//
     __breaker_timer_initialized = FALSE;
 
 
-
-	//Constructor.
     timerTimer();
-
 
     for ( i=0; i<32; i++ ){
         timerList[i] = (unsigned long) 0;
@@ -907,22 +871,20 @@ int timerInit (void){
 
 
 
-    //
-    // breaker
-    //
-
+//
+// breaker
+//
     __breaker_timer_initialized = TRUE;
 
 
-    // Done
+// Done
     g_driver_timer_initialized = TRUE;
-
     return 0;
 }
 
 
-
 /*
+ ***********************************
  * early_timer_init:
  *     Inicialização prévia do módulo timer.
  *     Uma outra inicialização mais aourada poderá ser feita
@@ -932,20 +894,18 @@ int timerInit (void){
  * 
  */
 
-int early_timer_init (void){
-
+int early_timer_init (void)
+{
     int i=0;
 
-    //
-    // Breaker
-    //
+    //g_driver_timer_initialized = FALSE;
 
+//
+// Breaker
+//
     __breaker_timer_initialized = FALSE;
 
-
-	//Constructor.
     timerTimer();
-
 
     for ( i=0; i<32; i++ ){
         timerList[i] = (unsigned long) 0;
@@ -1015,12 +975,10 @@ int early_timer_init (void){
     __breaker_timer_initialized = TRUE;
 
 
-    // Done
+// Done
     g_driver_timer_initialized = TRUE;
-
     return 0;
 }
-
 
 
 

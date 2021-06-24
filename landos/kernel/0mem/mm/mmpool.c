@@ -73,7 +73,6 @@ void initializeFramesAlloc (void){
 /*
  ***********************************************
  * page:
- *
  *     Cria uma estrutura de página.
  *     Procura um slot vazio para registrar ela.
  *     Inicializa a estrutura.
@@ -255,7 +254,6 @@ void *newPage (void){
         };
     };
 
-
 fail:
     // message?
     return NULL;
@@ -294,7 +292,6 @@ int firstSlotForAList ( int size ){
     int Count = 0;
     void *slot;
 
-
 tryAgain:
 
     for ( Index=Base; Index < 1024; Index++ )
@@ -313,7 +310,6 @@ tryAgain:
 
         if (Count >= size){ return (int) Base; }
     };
-
 
     return (int) -1;
 }

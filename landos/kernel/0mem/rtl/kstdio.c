@@ -10,7 +10,6 @@
  *
  * History:
  *     2015 - Create by Fred Nora.
- *     2019 - Revision.
  */
 
 
@@ -147,8 +146,6 @@ file *k_fopen ( const char *filename, const char *mode )
 
 
     debug_print ("k_fopen:\n");
-
-
 
     //
     // filename
@@ -451,11 +448,11 @@ fail:
 
 
 /*
- *===========================================================================
+ *======================================================================
  *  ==== Segue aqui o suporte a função 'printf' ====
  *
  * #obs:
- * Em user mode temos uma modelo mais tradiciona de printf,
+ * Em user mode temos uma modelo mais tradicional de printf,
  * talvez seja bom implementa-lo aqui também.
  */
 
@@ -749,8 +746,6 @@ int printk ( const char *format, ... )
 
 
 
-
-
 // print() is a helper function for this one.
 /*
 int vsprintf(char *string, const char *format, va_list ap);
@@ -777,10 +772,9 @@ int kputs ( const char *str )
         //
     //}
 
-    return (int) printf ("%s",str);
+    //return (int) printf ("%s",str);
+    return (int) printk ("%s",str);
 }
-
-
 
 
 /*
@@ -887,7 +881,6 @@ int k_fputs ( const char *str, file *f )
         return 0;
     };
 
-
     return (int) (-1);
 }
 
@@ -937,15 +930,13 @@ int k_fileno ( file *f )
 
 /*
  *********************************
- * fgetc:
+ * k_fgetc:
  *     #precisamos exportar isso como serviço. (#136)
  */
 
-int k_fgetc(file *f)
+int k_fgetc (file *f)
 {
-
     int ch = 0;
-
 
     if ( (void *) f == NULL )
     {
@@ -1009,8 +1000,7 @@ int k_fgetc(file *f)
         return (int) ch;
     };
 
-		//fail
-
+    //fail
 
 fail:
 
@@ -1032,14 +1022,13 @@ fail:
 
 int k_feof ( file *f )
 {
-    int ch = 0;
-
+    int ch=0;
  
     if ( (void *) f == NULL ){
         return (int) (-1);
     } else {
 
-        ch = k_fgetc (f);
+        ch = k_fgetc(f);
 
         if ( ch == EOF ){
              return (int) 1;
@@ -1056,13 +1045,11 @@ int k_feof ( file *f )
 
 
 /*
- *********************************
  * k_ferror:
- *
  */
 
-int k_ferror ( file *f ){
-
+int k_ferror ( file *f )
+{
     if ( (void *) f == NULL ){ return EOF; }
 
     return (int) ( ( f->_flags & _IOERR ) );
@@ -1173,7 +1160,7 @@ int __swbuf (int c, file *fp)
 
 /*
  *****************************************
- * fputc:
+ * k_fputc:
  */
 
 int k_fputc ( int ch, file *f )
@@ -1353,7 +1340,6 @@ void printchar (char **str, int c)
 
 int putchar (int ch)
 { 
-
     // Para virtual consoles.
     // Em tty/console.c
 
@@ -1453,7 +1439,7 @@ void stdio_ClearToStartOfLine()
 
 
 /*
- ******************************************************************
+ *********************************************************
  * input:
  *     Coloca os caracteres digitados em um buffer, (string). 
  * Para depois comparar a string com outra string, que é um comando.
@@ -1462,7 +1448,6 @@ void stdio_ClearToStartOfLine()
  *
  * History:
  *     2015 - Created by Fred Nora.
- *     ...
  */
 
 // #bugbug
@@ -1519,22 +1504,22 @@ unsigned long input ( unsigned long ch )
 		//+se for modo comando devemos finalizar com zero.
 		//+se for modo texto, devemos apenas incluir os caracteres \r \n.
 		//case 0x1C:
-		case VK_RETURN:
+        case VK_RETURN:
             //modo linha 
-			if(g_inputmode == INPUT_MODE_LINE )
-			{
-			    prompt[prompt_pos] = (char )'\0'; //end of line.
+            if (g_inputmode == INPUT_MODE_LINE )
+            {
+                prompt[prompt_pos] = (char )'\0'; //end of line.
 			    //@todo: ?? ldiscCompare();
 				//o compare está no aplicativo.
-	            for(i=0; i<PROMPT_MAX_DEFAULT;i++)
-	            {
-		            prompt[i]     = (char) '\0';
-		            prompt_out[i] = (char) '\0';
-		            prompt_err[i] = (char) '\0';
-	            };
+                for(i=0; i<PROMPT_MAX_DEFAULT;i++)
+                {
+                    prompt[i]     = (char) '\0';
+                    prompt_out[i] = (char) '\0';
+                    prompt_err[i] = (char) '\0';
+                };
                 prompt_pos = 0;
-				goto input_done;
-			}
+                goto input_done;
+            }
             //modo multiplas linhas 
             if (g_inputmode == INPUT_MODE_MULTIPLE_LINES )
             {
@@ -1543,22 +1528,22 @@ unsigned long input ( unsigned long ch )
             }
             break;
 
-	    //Backspace.
-		case 0x0E:
-		
+        // Backspace
+        case 0x0E:
+
             if ( prompt_pos <= 0 )
             {
-			    prompt_pos = 0;
-				prompt[prompt_pos] = (char ) '\0';
-				break; 
-			}
-		    
-			//Apaga o anterior (no buffer).
-			prompt_pos--;
-			prompt[prompt_pos] = (char ) '\0';
-			break;
+                prompt_pos = 0;
+                prompt[prompt_pos] = (char ) '\0';
+                break; 
+            }
 
-		//...
+            // Apaga o anterior (no buffer).
+            prompt_pos--;
+            prompt[prompt_pos] = (char ) '\0';
+            break;
+
+        // ...
 
         // Para qualquer caractere que não sejam os especiais tratados acima.
         default:
@@ -1566,8 +1551,6 @@ unsigned long input ( unsigned long ch )
             prompt_pos++;
             break;
     };
-
-
 
 input_more:
     return 0;
@@ -1605,7 +1588,6 @@ fail:
 
 int stdioInitialize (void)
 {
-    
     kstdio_standard_streams_initialized =  FALSE;
 
     int Status = 0;
@@ -1624,7 +1606,10 @@ int stdioInitialize (void)
     if ( cWidth == 0 || cHeight == 0 ){
         panic ("kstdio-stdioInitialize: [FAIL] Char info\n");
     }
-    
+
+    // #todo
+    //debug_print ("");
+
 
     // Ùltimo erro registrado.
     errno = 0;
@@ -1846,11 +1831,9 @@ int stdioInitialize (void)
 
 
 
-
 	// Flag para o tipo de input.
 	// # Multiplas linhas.
 
-	
     g_inputmode = INPUT_MODE_MULTIPLE_LINES;
 
 
@@ -1898,8 +1881,6 @@ fail:
 
 void k_setbuf (file *f, char *buf)
 {
-
-
     if ( (void *) f == NULL ){
         debug_print("k_setbuf: f\n");
         return;
@@ -1948,10 +1929,8 @@ void k_setbuf (file *f, char *buf)
 
 void k_setbuffer (file *f, char *buf, size_t size)
 {
-
   // #todo
   // Check parameters.
-
 
     /*
     if ( (void *) f == NULL ){
@@ -2002,7 +1981,7 @@ void k_setbuffer (file *f, char *buf, size_t size)
  * k_setlinebuf:
  * 
  */
- 
+
 void k_setlinebuf (file *f)
 {
     debug_print ("k_setlinebuf: [TODO] \n");
@@ -2017,8 +1996,6 @@ void k_setlinebuf (file *f)
 
 /*
  * k_setvbuf: 
- * 
- * 
  */
 
 int k_setvbuf (file *f, char *buf, int mode, size_t size)

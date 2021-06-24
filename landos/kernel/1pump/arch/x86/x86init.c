@@ -441,15 +441,14 @@ int x86main (void)
     int Status=0;
 
 
+    debug_print ("==============\n");
+    debug_print ("[x86] x86main:\n");
+
     if (current_arch != CURRENT_ARCH_X86)
     {
         debug_print ("[x86] x86main: current_arch fail\n");
         panic       ("[x86] x86main: current_arch fail\n"); 
     }
-
-
-    debug_print ("==============\n");
-    debug_print ("[x86] x86main:\n");
 
     // x86 global thing.
     // Threads counter.
@@ -461,7 +460,6 @@ int x86main (void)
     // sse support.
 
     x86_sse_init();
-
 
 
 //
@@ -493,9 +491,9 @@ int x86main (void)
     g_is_qemu = FALSE;
 
 
-    debug_print ("====\n");
-    debug_print ("x86main:\n");
-    printf      ("x86main:\n");
+    //debug_print ("====\n");
+    //debug_print ("x86main:\n");
+    //printf      ("x86main:\n");
 
 //
 // ====================================================================
@@ -533,9 +531,10 @@ int x86main (void)
     PROGRESS("Kernel:1:2\n"); 
     // Calling 'init' kernel module. 
 
+    debug_print ("x86main: Calling init()\n");
+ 
     // See: 
     // core/init.c
-
     Status = (int) init(); 
  
     if ( Status != 0 )
@@ -550,7 +549,6 @@ int x86main (void)
     //refresh_screen();
     //while(1){}
 
-
 // Done: 
 //     Completas as 3 fases de inicialização do sistema.
 //     @todo: Na verdade serão mais fases..
@@ -559,7 +557,7 @@ int x86main (void)
     printf ("x86main: done\n");
 
 //
-//=======================================================================================================
+// ====================================================================
 //
 
 	//#debug 
@@ -589,15 +587,12 @@ int x86main (void)
     PROGRESS("Kernel:1:3\n"); 
     // Initialize all the kernel graphics support.
 
-
-
     // Initialize all the kernel graphics support.
     // some extra things like virtual terminal and tty.
     // #todo: rever essa inicializaçao.
     // See: users/kgws.c
 
     KGWS_initialize();
-
 
     // debug
     //printf("~kgws\n");
@@ -612,12 +607,10 @@ int x86main (void)
     //ws.c
     ws_init();
 
-
     // debug
     //printf("~ws\n");
     //refresh_screen();
     //while(1){}
-
 
     // #debug:  
     // Esperamos alcaçarmos esse alvo.
@@ -641,7 +634,6 @@ int x86main (void)
     PROGRESS("Kernel:1:5\n"); 
     // Setup GDT again.
     // We already made this at kernel startup.
-
 
     // # Caution.
     // Lets create a TSS and setup a GDT.
@@ -784,12 +776,6 @@ int x86main (void)
 
     __x86StartInit();
 
-    // debug
-    //printf("~I\n");
-    //refresh_screen();
-    //while(1){}
-
-
     //printf("*breakpoint\n");
     //refresh_screen();
     //while(1){}
@@ -814,10 +800,8 @@ int x86main (void)
 #endif
 
 
-
 	// ======== # TESTS # ========
 	// begin - We can make some tests here.
-
 
     //Inicializando as variáveis do cursor piscante do terminal.
     //isso é um teste.
@@ -829,16 +813,12 @@ int x86main (void)
     PROGRESS("Kernel:1:10\n"); 
     // Early ps/2 initialization.
 
-
 	// Initializing ps/2 controller.
-
 	//#DEBUG
 	//printf ("testing ps2\n");
 	//refresh_screen(); 
 
-    debug_print ("[x86] x86main: ps2\n");    
-    
-    
+    debug_print ("[x86] x86main: ps2\n");      
     
     // #todo: 
     // Essa inicialização deve ser adiada.
@@ -856,8 +836,7 @@ int x86main (void)
     // Loading some system files.
     // icons, bmps, etc ...
 
-	// Loading file tests.
-
+    // Loading file tests.
     // #test:
     // Background support.
     // Used to test load_path()
@@ -867,7 +846,6 @@ int x86main (void)
     //refresh_screen();
     //while(1){}
 
-
 	// #Aviso:
 	// Isso funcionou, não mudar de lugar.
 	// Mas isso faz parte da interface gráfica,
@@ -875,7 +853,6 @@ int x86main (void)
 	// suficientes para essa rotina funcionar.
 
     windowLoadGramadoIcons();
-
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -992,18 +969,14 @@ done:
     debug_print ("[x86] x86main: done\n");
     debug_print ("==============\n");
 
-
-
     // debug
     //printf("T\n");
     //refresh_screen();
     //while(1){}
 
-
-    //
-    // Starting idle thread.
-    //
-
+//
+// Starting idle thread.
+//
 
     if ( KernelStatus == KERNEL_INITIALIZED )
     {
@@ -1023,14 +996,13 @@ done:
         panic("x86mainStartFirstThread: Couldn't spawn the first thread!\n");
     }
 
+// ===============================
 
-    // ===============================
-
-    // fail
-	// #todo
-	// Uma opção aqui é usarmos a tipagem void para essa função
-	// e ao invés de retornarmos, apenas entrarmos na thread idle
-	// em ring 0, isso depois de criadas as threads em user mode.
+// fail
+// #todo
+// Uma opção aqui é usarmos a tipagem void para essa função
+// e ao invés de retornarmos, apenas entrarmos na thread idle
+// em ring 0, isso depois de criadas as threads em user mode.
 
 fail:
 //================================
