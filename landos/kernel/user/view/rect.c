@@ -1,174 +1,8 @@
-/*
- * File: rect.c
- *
- *     Draw rectangles.
- *  
- * History:
- *    2015 - Created by Fred Nora.
- */
+
+
 
 
 #include <kernel.h>
-
-
-
-//Herdadas do Boot Loader.
-// De onde vem isso ?? head.s
-// @todo: Devemos chamar o mÛdulo hal para obtermos esses valores.
-//depois salvamos em vari·veis internas usadas pela gui.
-
-extern unsigned long SavedBootBlock;
-extern unsigned long SavedLFB;
-extern unsigned long SavedX;
-extern unsigned long SavedY;
-extern unsigned long SavedBPP; 
-
-
-// ??
-// Copiando ...
-// Destination is an Null pointer? 
-// Source is an Null pointer? 
-// Zero-sized copy? 
-// Destination is Source?
-
-void *rectStrCopyMemory32 ( 
-    unsigned long *dest, 
-    unsigned long *src, 
-    int count ) 
-{
-
-    register int i=0;
-
-    // Yes
-    if ( (dest == NULL)  || 
-         (src == NULL)   || 
-         (count == 0)    || 
-         (src == dest) ) 
-    {
-        return dest;
-    }
-
-    // GCC should optimize this for us :)
-    // I'm lying.
-    for ( i=0; i < count; i++ ) 
-    {
-        dest[i] = src[i];
-    };
-
-    return dest;
-}
-
-
-//
-//===============================================================
-// refresh rect - Fred. P.
-//
-// @todo:
-// Nessa macro podemos usar vari·veis globais e inicializar
-// essas vari·vel. E considerarmos valores como g_bpp, g_screen_width. 
-//
-
-
-//#define RGB_PIXEL_OFFSET(x,y) \
-//( (3*800*(y)) + (3*(x)) )
-
-//
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( (3*screenGetWidth()*(y)) + (3*(x)) )
-//
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( ( screenGetBPP() * screenGetWidth()*(y)) + ( screenGetBPP() *(x)) )
-
-// #define RGB_PIXEL_OFFSET(x,y) \
-// ( ( g_bpp * g_screen_width *(y)) + ( g_bpp *(x)) )
-
-//================================================
-
-
-//Usada no refresh rectangle.
-//#todo: precisamos de uma vari·vel para a lergura 
-//da tela e para bytes per pixel.
-//#todo: isso deve virar uma funÁ„o.
-//#define BUFFER_PIXEL_OFFSET(x,y) \
-//( (3*800*(y)) + (3*(x)) )
-
-/*
- 
- ### Usar isso ###
- 
-unsigned long function_BUFFER_PIXEL_OFFSET ( unsigned long x, unsigned long y );
-unsigned long function_BUFFER_PIXEL_OFFSET ( unsigned long x, unsigned long y )
-{
-    //( (3*800*(y)) + (3*(x)) )
-	
-    return (unsigned long) ( ( bytes_per_pixel * pixels_per_line *(y)) + ( bytes_per_pixel *(x)) );    	
-};
-*/
-
-//
-// @todo: Criar uma estrutura para o elemento gr·fico. entre os elementos da estrutura
-// pode ter os buffer para o char. backbuffer, frontbuffer, dedicatedbuffer.
-//
-//
-
-
-/*
- * rectDrawRectangleWindowBuffer:
- *     Pinta um ret‚ngulo no buffer da janela.
- *     Serve para pintar janelas que ir„o direto do seu buffer para o LFB da 
- * memÛria de vÌdeo, sem passar pelo back buffer. (OVERLAPPED)
- *
- */
-/*
-void rectDrawRectangleWindowBuffer(struct window_d *window, 
-                                   unsigned long x, 
-                                   unsigned long y, 
-						           unsigned long width, 
-						           unsigned long height, 
-						           unsigned long color ); 
-void rectDrawRectangleWindowBuffer(struct window_d *window, 
-                                   unsigned long x, 
-                                   unsigned long y, 
-						           unsigned long width, 
-						           unsigned long height, 
-						           unsigned long color )
-{
-    return;	
-}
-*/
-
-
-/* 
-void rectDrawRectangle( struct window_d *window, struct rect_d *rect);
-void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
-{
-	struct window_d *hwndDesktop;
-	
-    hwndDesktop = guiGetMainWindow();
-	
-	// Criaremos o ret‚ngulo na janela principal caso o ponteiro 
-	//passado seja inv·lido.
-	
-    if( (void*) window == NULL ){
-        window = hwndDesktop;
-    };
-
-    unsigned long x; 
-    unsigned long y; 
-	unsigned long width; 
-	unsigned long height; 
-	unsigned long color;
-
-    x      = window->left + rect->x;	
-	y      = window->top + rect->y;
-	width  = rect->width;
-	height = rect->height;
-	color = rect->bg_color;
-	
-    drawDataRectangle( x, y, width, height, color );
-	
-}						
-*/
 
 
 /* 
@@ -177,13 +11,18 @@ void rectDrawRectangle( struct window_d *window, struct rect_d *rect)
  *     Draw a rectangle on backbuffer. 
  */
 
+// #bugbug
+// Agora precisamos considerar o limite de apenas 2mb
+// de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
+// Pois nao queremos escrever em area nao mapeada.
+
 void 
 drawDataRectangle ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
     unsigned long height, 
-    unsigned long color )
+    unsigned int color )
 {
 
     // #todo
@@ -209,7 +48,8 @@ drawDataRectangle (
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         debug_print ("drawDataRectangle: [PANIC] w h\n");
-        panic       ("drawDataRectangle: [PANIC] w h\n");
+        //panic       ("drawDataRectangle: [PANIC] w h\n");
+        return;
     }
 
 //
@@ -256,8 +96,8 @@ drawDataRectangle (
 	
 	// #todo: 
 	// Repensar os limites para uma janela.
-	// Uma janela poder· ser maior que as dimensıes de um dispositivo.
-	// mas n„o poder· ser maior que as dimensıes do backbuffer.
+	// Uma janela poder√° ser maior que as dimens√µes de um dispositivo.
+	// mas n√£o poder√° ser maior que as dimens√µes do backbuffer.
 	// Ou seja: O dedicated buffer de uma janela deve ser menor que
 	// o backbuffer.
 
@@ -286,7 +126,7 @@ drawDataRectangle (
         
         // #??
         // Porque podemos desejar escrever no backbuffer
-        // um ret‚ngulo que ultrapasse a ·rea do frontbuffer.
+        // um ret√¢ngulo que ultrapasse a √°rea do frontbuffer.
         
         if ( UseClipping == TRUE ){
             if ( y > ClippingRect.bottom ){ break; };
@@ -294,39 +134,33 @@ drawDataRectangle (
     };
 }
 
-
-/*
-//#todo
-void refresh_rectangle3( struct rect_d *rectangle );
-void refresh_rectangle3( struct rect_d *rectangle )
-{
-    refresh_rectangle(....)
-}
-*/
-
-
 /*
  ***********************************************************
  * refresh_rectangle:
- *     Copiar um ret‚ngulo do backbuffer para o frontbuffer. 
+ *     Copiar um ret√¢ngulo do backbuffer para o frontbuffer. 
  * 
  *     @todo: Rotina parecida com essa pode ser criada e usada para manipular 
- * regiıes da tela, como ·rea de cliente efetuar scroll de buffer em p·ginas 
- * de navegador ou menus .. mas para isso, a cÛpia seria dentro do prÛprio 
+ * regi√µes da tela, como √°rea de cliente efetuar scroll de buffer em p√°ginas 
+ * de navegador ou menus .. mas para isso, a c√≥pia seria dentro do pr√≥prio 
  * backbuffer ou de um terceiro buffer para o backbuffer. 
  *
- * HistÛrico:
+ * Hist√≥rico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
  */
 
 // #todo 
-//kgws n„o pode acessar o lfb, devemos chamar o di·logo em x/video.c
+//kgws n√£o pode acessar o lfb, devemos chamar o di√°logo em x/video.c
 
 
 //#importante
-//… bem mais r·pido com m˙ltiplos de 4.
- 
+//√â bem mais r√°pido com m√∫ltiplos de 4.
+
+// #bugbug
+// Agora precisamos considerar o limite de apenas 2mb
+// de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
+// Pois nao queremos escrever em area nao mapeada.
+
 void 
 refresh_rectangle ( 
     unsigned long x, 
@@ -386,7 +220,7 @@ refresh_rectangle (
         // ... #todo
         
         default:
-            panic ("refresh_rectangle: SavedBPP");
+            panic ("refresh_rectangle: SavedBPP\n");
             break;
     };
 
@@ -401,7 +235,7 @@ refresh_rectangle (
 
 
 
-	// #atenÁ„o.
+	// #aten√ß√£o.
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
     offset = (unsigned int) ( (y*pitch) + (bytes_count*x) );
@@ -413,21 +247,21 @@ refresh_rectangle (
 
 	// #bugbug
 	// Isso pode nos dar problemas.
-	// ?? Isso ainda È necess·rio nos dias de hoje ??
+	// ?? Isso ainda √© necess√°rio nos dias de hoje ??
 
     //if ( UseVSync == TRUE){
         //vsync();
     //}
 
 
-	//(line_size * bytes_count) È o n˙mero de bytes por linha. 
+	//(line_size * bytes_count) √© o n√∫mero de bytes por linha. 
 
 	//#importante
-	//… bem mais r·pido com m˙ltiplos de 4.	
+	//√â bem mais r√°pido com m√∫ltiplos de 4.	
 
 
-    // Se for divisÌvel por 4.
-    // Copia uma linha ou um pouco mais caso n„o seja divisÌvel por 4.
+    // Se for divis√≠vel por 4.
+    // Copia uma linha ou um pouco mais caso n√£o seja divis√≠vel por 4.
     if ( (internal_pitch % 4) == 0 )
     {
         // 'strength reduction'
@@ -437,11 +271,12 @@ refresh_rectangle (
         // Copy lines
         for ( i=0; i < lines; i++ )
         {
-            // N„o copiamos a parte que est· fora da janela do dispositivo.
+            // N√£o copiamos a parte que est√° fora da janela do dispositivo.
             if ( UseClipping == TRUE ){
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
 
+            // 4 bytes
             memcpy32 ( (void *) dest, (const void *) src, count );
             dest += pitch;
             src  += pitch;
@@ -449,17 +284,18 @@ refresh_rectangle (
         return;
     }
 
-    // Se n„o for divisÌvel por 4.
+    // Se n√£o for divis√≠vel por 4.
     if ( (internal_pitch % 4) != 0 )
     {
         // Copy lines
         for ( i=0; i < lines; i++ )
         {
-            // N„o copiamos a parte que est· fora da janela do dispositivo.
+            // N√£o copiamos a parte que est√° fora da janela do dispositivo.
             if ( UseClipping == TRUE ){
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
             
+            // 1 byte
             memcpy ( (void *) dest, (const void *) src, internal_pitch );
             dest += pitch; 
             src  += pitch; 
@@ -468,9 +304,8 @@ refresh_rectangle (
     }
 }
 
-
 // ??
-// A ideia aqui È efetuar o refresh de um ret‚ngulo 
+// A ideia aqui √© efetuar o refresh de um ret√¢ngulo 
 // que esteja em um dado buffer.
 // ?? Not tested yet
 
@@ -487,7 +322,7 @@ refresh_rectangle2 (
 
 
 	// #todo
-	// Fazer a mesma otimizaÁao que fizemos na outra rotina de refresh rectangle.
+	// Fazer a mesma otimiza√ßao que fizemos na outra rotina de refresh rectangle.
 
 
     void *p       = (void *)       buffer1;  // destino.
@@ -531,16 +366,16 @@ refresh_rectangle2 (
     //vsync ();
 
 	
-	//(line_size * 3) È o n˙mero de bytes por linha. 
+	//(line_size * 3) √© o n√∫mero de bytes por linha. 
 	
-	//se for divisÌvel por 4.
+	//se for divis√≠vel por 4.
     if ( ((line_size * 3) % 4) == 0 )
     {
         count = ((line_size * 3) / 4);  	
 
 	    for ( i=0; i < lines; i++ )
 	    {
-		    //copia uma linha ou um pouco mais caso n„o seja divisÌvel por 
+		    //copia uma linha ou um pouco mais caso n√£o seja divis√≠vel por 
 		    memcpy32 ( p, q, count );
 		    
 			q += (Width * 3);
@@ -548,7 +383,7 @@ refresh_rectangle2 (
 	    };
     }
 
-	//se n„o for divisÌvel por 4.
+	//se n√£o for divis√≠vel por 4.
     if ( ((line_size * 3) % 4) != 0 )
     {
 
@@ -572,298 +407,6 @@ refresh_rectangle2 (
 	};	
 	*/
 }
-
-
-// Inicializando a estrutura de gerenciamento de ret‚ngulo salvo.
-
-int initialize_saved_rect (void){
-
-	printf ("initialize_saved_rect:\n");
-	
-	// Alocando memÛria para a estrutura de gerenciamento do ret‚ngulo.
-
-    SavedRect = (void *) kmalloc ( sizeof(struct saved_rect_d) );   
-
-    if ( (void *) SavedRect ==  NULL ){
-        panic ("initialize_saved_rect: struct\n");
-    } else {
-     
-        // #bugbug
-        // Size of this allocation. Too much space??
-     
-        // 800x600x3 (resoluÁ„o m·xima) 351+ p·ginas.
-        //com isso poderemos salvar uma tela nessa resoluÁ„o.
-        SavedRect->buffer_address = (void *) allocPages (360);
-
-        if ( (void *) SavedRect->buffer_address == NULL )
-        {
-            panic ("initialize_saved_rect: buffer fail\n");
-        }
-
-        SavedRect->x = 0; 
-        SavedRect->y = 0;
-        SavedRect->width = 0;
-        SavedRect->height = 0;
-
-        SavedRect->pixels = 0;
-        SavedRect->bytes = 0;
-        SavedRect->bpp = 0;
-
-        SavedRect->full = 0;   //empty
-		
-		
-		//#todo: limpar o buffer ???
-		
-	    //...
-	};		
-
-	//#debug
-	printf ("initialize_saved_rect: done\n");
-	//refresh_screen();
-
-	//while (1){ asm ("hlt"); }
-	
-    return 0;
-}
-
-
-//#testando ...
-//salvar um ret‚ngulo no buffer ser· semelhante ao mÈtodo de 
-//salvar um bmp em um arquivo.
-
-int 
-save_rect ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height )
-{
-
-        //#debug
-        //Ok. est· pegando os valores certos.
-        //printf ("l=%d t=%d w=%d h=%d \n", x, y, width, height );
-        //refresh_screen();
-        //while(1){}
-
-
-    if ( (void *) SavedRect ==  NULL ){
-        printf ("save_rect: SavedRect\n");
-        return (int) 1;
-    }else{
-
-        if ( (void *) SavedRect->buffer_address == NULL )
-        {
-            panic ("save_rect: buffer fail");
-        }
-    };
-
-
-    // ## transferindo ... ##
-    //======================
-    //do backbuffer para o buffer de salvamento.
-
-
-    void *p = (void *) SavedRect->buffer_address;    //(buffer para salvar)
-    const void *q = (const void *) BACKBUFFER_ADDRESS;
-
-	//register unsigned int i;
-    unsigned int i;
-
-    unsigned int line_size, lines;
-
-	// = 3; //24bpp
-    int bytes_count;
-
-    unsigned int offset1;  
-    unsigned int offset2;  
-
-    unsigned long Width  = (unsigned long) screenGetWidth ();
-    unsigned long Height = (unsigned long) screenGetHeight ();
-
-    int count; 
-
-
-   
-        
-    /*
-    //#isso funcionou usando o buffer de salvamento.
-    refresh_rectangle2 ( 0, 0, 400, 400, SavedRect->buffer_address, BACKBUFFER_ADDRESS );
-    refresh_rectangle2 ( 0, 0, 800, 600, BACKBUFFER_ADDRESS, SavedRect->buffer_address);
-    //move do backbuffer para o lfb
-    refresh_rectangle ( 0, 0, 800, 600); 
-    while(1){}
-    */
-    
-    
-    // #test
-    // Salvando 
-    
-    refresh_rectangle2 ( 
-        x, y, width, height, 
-        (unsigned long) SavedRect->buffer_address, 
-        (unsigned long) BACKBUFFER_ADDRESS );
-
-// done:
-
-    return 0;
-}
-
-
-/*
- * show_saved_rect:
- *      Pintar no backbuffer o ret‚ngulo salvo.
- *      Semelhante ao processo de decodificar um bmp, copiando 
- * do arquivo para o backbuffer.
- * Esses argumentos representam o posicionamento desejado do 
- * ret‚ngulo no backbuffer. 
- */
-
-int 
-show_saved_rect ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height )
-{
-
-	// Checando a estrutura que tem informaÁıes 
-	// sobre o ret‚ngulo salvo.
-	
-	if ( (void *) SavedRect ==  NULL )
-    {
-        printf ("show_saved_rect: SavedRect\n");
-	    return (int) 1;
-		
-	} else {
-
-	    if ( (void *) SavedRect->buffer_address == NULL )
-	    {
-		    panic ("show_saved_rect: buffer");
-	    }
-    };
-    
-    
-    
-    //#test
-    //copiando do buffer de salvamento para o backbuffer.
-    refresh_rectangle2 ( x, y, width, height, 
-        (unsigned long) BACKBUFFER_ADDRESS, 
-        (unsigned long) SavedRect->buffer_address);    
-    return 0;
-    
-    
-    //
-    //  ----- CUT HERE -------------
-    //
-
-	
-    //
-    // ## Transferindo ... ##
-    //
-	
-	void *p = (void *) BACKBUFFER_ADDRESS;
-	const void *q = (const void *) SavedRect->buffer_address;
-
-	//register unsigned int i;
-	unsigned int i;
-	
-	int count; 
-	
-	// = 3; //24bpp
-	int bytes_count;  
-	
-	unsigned int offset1;  //offset dentro do buffer de salvamento.
-	unsigned int offset2;  //offset dentro do backbuffer
-	
-	unsigned long Width = (unsigned long) screenGetWidth();
-	unsigned long Height = (unsigned long) screenGetHeight();
-
-	unsigned int line_size, lines;
-	
-	line_size = (unsigned int) width; //passado por argumento
-	lines = (unsigned int) height;    //passado por argumento
-	
-	
-	switch (SavedBPP)
-	{
-		case 32:
-		    bytes_count = 4;
-		    break;
-		
-		case 24:
-		    bytes_count = 3;
-			break;
-	};
-
-
-
-   //p backbuffer
-	offset1 = (unsigned int) ( ( bytes_count * SavedX * (y) ) + ( bytes_count * (x) ) );
-
-
-    //q buffer de salvamento.
-    //o conte˙do salvo est· no inÌcio do buffer de salvamento
-	offset2 = 0;
-
-
-    p = (void *) (p + offset1);          //backbuffer.
-    q = (const void *) (q + offset2);    //buffer de salvamento
-
-
-    /*
-    //#debug
-    //copiando todo o buffer de salvamento no backbuffer,
-    //e mostrando o backbuffer.
-    //memcpy32 ( (void *) BACKBUFFER_ADDRESS, (const void *) SavedRect->buffer_address, 
-    //    (Width * 3)*400);
-    //refresh_screen();
-    //while(1){}
-    */
- 
-    // #importante:
-	// N„o precisa de sincronizaÁ„o pois n„o estamos enviando para o LFB.
-	// vsync ();
-	
-	//(line_size * 3) È o n˙mero de bytes por linha. 
-	
-	//se for divisÌvel por 4.
-	if ( ((line_size * 3) % 4) == 0 )
-	{
-        count = ((line_size * 3) / 4);
-
-	    for ( i=0; i < lines; i++ )
-	    {
-		    //copia uma linha ou um pouco mais caso n„o seja divisÌvel por 
-		    memcpy32 ( p, q, count );
-		    
-			q += (Width * 3);
-	 	    p += (Width * 3);
-	    };
-	}
-
-	//se n„o for divisÌvel por 4.
-	if ( ((line_size * 3) % 4) != 0 )
-	{
-
-        //count = (line_size * 3);
-
-	    for ( i=0; i < lines; i++ )
-	    {
-		    memcpy ( (void *) p, (const void *) q, (line_size * 3) );
-		    
-		    q += (Width * 3);
-		    p += (Width * 3);
-	    };
-	}
-
-
-    //#debug
-    //printf ("show_saved_rect: done\n");
-
-    return 0;
-}
-
-
 
 /*
  ************************* 
@@ -947,10 +490,10 @@ void scroll_screen_rect (void){
     //
 
 	//#importante
-	//… bem mais r·pido com m˙ltiplos de 4.	
+	//√â bem mais r√°pido com m√∫ltiplos de 4.	
 
 
-    // Se for divisÌvel por 4.
+    // Se for divis√≠vel por 4.
     // Copia uma linha, quatro bytes de cada vez.  
         
     if ( ((line_size * bytes_count) % 4) == 0 )
@@ -969,7 +512,7 @@ void scroll_screen_rect (void){
         return;
     }
 
-    // Se n„o for divisÌvel por 4.
+    // Se n√£o for divis√≠vel por 4.
     // Copia a linha, um bytes por vez.
     // #todo: Podemos suprimir esse if e deixarmos ssomente o for.
     
@@ -988,8 +531,67 @@ void scroll_screen_rect (void){
     }
 }
 
+// ??
+// Copiando ...
+// Destination is an Null pointer? 
+// Source is an Null pointer? 
+// Zero-sized copy? 
+// Destination is Source?
+
+void *rectStrCopyMemory32 ( 
+    unsigned long *dest, 
+    unsigned long *src, 
+    int count ) 
+{
+
+    register int i=0;
+
+    // Yes
+    if ( (dest == NULL)  || 
+         (src == NULL)   || 
+         (count == 0)    || 
+         (src == dest) ) 
+    {
+        return dest;
+    }
+
+    // GCC should optimize this for us :)
+    // I'm lying.
+    for ( i=0; i < count; i++ ) 
+    {
+        dest[i] = src[i];
+    };
+
+    return dest;
+}    
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

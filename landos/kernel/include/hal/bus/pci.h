@@ -1,18 +1,7 @@
-/*
- * File: pci.h
- *
- * Descrição:
- *     Peripheral Component Interconnect - (PCI).
- *     Header do driver de PCI do kernel base.
- *     Referência site: https://pci-ids.ucw.cz/read/PD
- *
- * Histórico:
- *     Versão 1.0, 2015 - Esse arquivo foi criado por Fred Nora.
- */
+// pci.h
 
-#ifndef __PCI_H__
-#define __PCI_H__
-
+#ifndef __PCI_H
+#define __PCI_H    1
 
 //-----------------
 
@@ -264,7 +253,7 @@ Class Description
 // PCI Offsets
 //
 
-// Deslocamento dentro da tabela de configuração, dado em hexa.
+// Deslocamento dentro da tabela de configuraÃ§Ã£o, dado em hexa.
 #define PCI_OFFSET_VENDORID       0       //short
 #define PCI_OFFSET_DEVICEID       0x02    //short
 
@@ -307,7 +296,6 @@ Class Description
 // bit 1 is reserved if address_space = 1 
 */
 
-
 #define PCI_OFFSET_CISP    0x28  //unsigned long (Cardbus CIS Pointer)
 
 #define PCI_OFFSET_SUBSYSTEMVENDORID    0x2C //short sub system identifiers SS
@@ -324,7 +312,6 @@ Class Description
 #define PCI_OFFSET_INTERRUPTPIN     0x3D //char (Read only).
 #define PCI_OFFSET_MIN_GRANT        0x3E //char  Minimum Grant MGNT
 #define PCI_OFFSET_MAX_LATENCY      0x3F //char  Maximum Latency MLAT
-
 
 //Intel sata host controller support:
 //40h 2 ?Primary Timing (PTIM)?Offset 40h? on page 153 0000h
@@ -356,13 +343,13 @@ Class Description
 //E8h 4 ?BIST FIS Transmit Data 2 (BFTD2)?Offset E8h? on page 170 00000000h
 //F8h 4 ?Manufacturing ID (MFID)?Offset F8h? on page 171 08000FB1h
 
+
 //Interrupt Pin (IPIN): This register tells which interrupt pin the device function uses. A
 //value of 1 corresponds to INTA#. A value of 2 corresponds to INTB#. A value of 3
 //corresponds to INTC#. A value of 4 corresponds to INTD#.
 
 //Interrupt Line (ILINE): Software written value to indicate which interrupt line
 //(vector) the interrupt is connected to. No hardware action is taken on this register.
-
 
 /*
  OSDEV.ORG
@@ -585,8 +572,7 @@ Class Code	Description
 
 //char pcideviceString[] = "PCI Device";
 //char pcidString[] = "PCI"; 
-
-
+ 
 //
 // Vendor list
 //
@@ -600,7 +586,7 @@ Class Code	Description
 //0x101E	American Megatrends Inc.
 //Oracle Corporation - InnoTek Systemberatung GmbH 0x80EE
 
-//Em ordem alfabética.
+//Em ordem alfabÃ©tica.
 #define PCI_VENDOR_ID_AMD                 0x1022
 #define PCI_VENDOR_ID_APPLE               0x106B  //0x05ac
 #define PCI_VENDOR_ID_ATI                 0x1002
@@ -613,10 +599,11 @@ Class Code	Description
 #define PCI_VENDOR_ID_VIA                 0x1106
 //...
 
+
 //------------------
 
 //
-// Variáveis internas.
+// VariÃ¡veis internas.
 //
 
 unsigned long pci_handler_address;
@@ -646,10 +633,10 @@ struct pci_device_d
     object_class_t objectClass;
 
     int id;
-    int used;
-    int magic;
+    int used;   
+    int magic;   
 
-	char *name;         
+    char *name;
 
 	//unsigned long flag;   
     //unsigned long error;  
@@ -660,16 +647,17 @@ struct pci_device_d
 	
 	//
 	// @todo: Completar com os elementos que faltam.
-	//        Seguindo a ordem padrão.
+	//        Seguindo a ordem padrÃ£o.
 	
 	
-	//Salvar também qual bus o device pertence.	
-	//Localização do dispositivo.
-	unsigned char bus;
-	unsigned char dev;   
+	//Salvar tambÃ©m qual bus o device pertence.	
+	//LocalizaÃ§Ã£o do dispositivo.
+
+    unsigned char bus;
+    unsigned char dev;   
     unsigned char func;
-	
-	
+
+
 	//Primeiros.
 	unsigned short Device;	
 	unsigned short Vendor;
@@ -688,52 +676,50 @@ struct pci_device_d
 	unsigned char latency_timer;	
 	unsigned char cache_line_size;
 
-	//Address.
-	unsigned long BAR0;
-	unsigned long BAR1;
-	unsigned long BAR2;
-	unsigned long BAR3;
-	unsigned long BAR4;
-	unsigned long BAR5;
-	
-	
+    // Addresses. 32bit
+    unsigned int BAR0;
+    unsigned int BAR1;
+    unsigned int BAR2;
+    unsigned int BAR3;
+    unsigned int BAR4;
+    unsigned int BAR5;
+
+
 	//Sub-system vendor id
 	//sub-system device id	
 	unsigned short subsystem_Vendor;
 	unsigned short subsystem_Device;
 
-	//Últimos.
+	//Ãšltimos.
 
 	unsigned char max_latency;
 	unsigned char min_grant;
 	unsigned char irq_pin;     //??
-    unsigned char irq_line;    //Qual IRQ será usada pelo PIC.	
+    unsigned char irq_line;    //Qual IRQ serÃ¡ usada pelo PIC.	
 	
     //continua ...
-	
-	
-	//estrutura para o driver do dispositivo.
-	struct pci_driver_d *driver;
+
+    //estrutura para o driver do dispositivo.
+    struct pci_driver_d *driver;
     
-	struct pci_device_d* next;	
+    struct pci_device_d *next;
 };
 
-struct pci_device_d *pci_device;
-struct pci_device_d *current_pci_device;    //Current.
+struct pci_device_d  *pci_device;
+struct pci_device_d  *current_pci_device;    //Current.
 //...
 
 
 //
 // PCI structure.
 // Estrutura para gerenciar a interface pci.
-// apenas uma instância dessa estrutura deve existir.
+// apenas uma instÃ¢ncia dessa estrutura deve existir.
 
 struct pci_d
 {
-
-    int devicesFound;    //Número de dispositivos encontrados.
+    int devicesFound;    //NÃºmero de dispositivos encontrados.
     int max;
-    struct pci_device_d * deviceList;	
+    struct pci_device_d  *deviceList;
 };
 struct pci_d  *Pci;   // #todo: Use PCI
 
@@ -751,19 +737,20 @@ unsigned long pcideviceList[32];    //@todo tamanho provisorio.
 
 /*
  * pci_driver_d:
- *     Estrutura para drivers de dispositivos pci. 
+ *     Estrutura para drivers de dispositivos pci.     
+ *
  */
-
 typedef struct pci_driver_d pci_driver_t;
 struct pci_driver_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-	
-	int id;    //id do driver de dispositivo pci.
-	int used;
-	int magic;
-	
+
+    int id;    //id do driver de dispositivo pci.
+    int used;
+    int magic;
+
+
 	//status do driver de dispositivo.
 	//Initialized, ... @todo: Criar enum. pci_device_status_t;
 	//int status;
@@ -776,7 +763,7 @@ struct pci_driver_d
 	
 	//unsigned long driver_version;
 	
-	//Endereço da rotina de tratamento de interrupção.
+	//EndereÃ§o da rotina de tratamento de interrupÃ§Ã£o.
 	//unsigned long irq_handler;
 	
 	//
@@ -784,8 +771,8 @@ struct pci_driver_d
 	//
 	
 	//
-	// Os endereços de memória encontrados na configuração
-	// de PCI poderão ser salvos aqui.
+	// Os endereÃ§os de memÃ³ria encontrados na configuraÃ§Ã£o
+	// de PCI poderÃ£o ser salvos aqui.
 	//
 	
 	//unsigned long io_buffer_address1;
@@ -800,7 +787,10 @@ struct pci_driver_d
 
     //struct pci_driver_d *next;
 };
-pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
+
+// List?
+struct pci_driver_d  *PciDrivers;
+//pci_driver_t *PciDrivers;
 //...
 
 
@@ -827,81 +817,104 @@ pci_driver_t *PciDrivers;    //@todo: Lista.Igual menuitens.
 //#define PCI_BUS_NUM(x) (((x) >> 8) & 0xff)
 
 
-//
-// == prototypes ==============================================
-//
-
 
 //
-// Read.
+// == prototypes ===========================
 //
 
-unsigned char pciConfigReadByte( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
-unsigned short pciConfigReadWord( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
-unsigned long pciConfigReadDWord( unsigned char bus, unsigned char slot, unsigned char func, unsigned char offset);
-
-//
-// Offsets
-//
-
-unsigned short pciCheckVendor(unsigned char bus, unsigned char slot);    //Offset 0.	
-unsigned short pciCheckDevice(unsigned char bus, unsigned char slot);    //Offset 2.
-unsigned char pciGetSubClass(unsigned char bus, unsigned char slot);     //Offset 0x0A. 
-unsigned char pciGetClassCode(unsigned char bus, unsigned char slot);    //Offset 0x0B.
-
-unsigned char pciGetHeaderType(unsigned char bus, unsigned char slot);
-
-unsigned long pciGetBAR(unsigned char bus, unsigned char slot, int number);    //get BARs (vários offsets.)
-unsigned char pciGetInterruptLine(unsigned char bus, unsigned char slot);    //Offset 0x3C.
-unsigned char pciGetInterruptPin(unsigned char bus, unsigned char slot);     //Interrut pin
-//...
-
-//mostra informações sobre um dispositivo pci da lista.
-
-int pciShowDeviceInfo(int number);
-
-int pciInfo (void);
-
-
-int 
-pciHandleDevice ( 
+// read 8 bits.
+unsigned char 
+pciConfigReadByte ( 
     unsigned char bus, 
-    unsigned char dev, 
-    unsigned char fun );
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset );
 
 
-//procurar na lista de dispositivos por um dispositivo de 
-//determinados vendor e device.
+// read 16 bits.
+unsigned short 
+pciConfigReadWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset );
+
+// read 32 bits.
+unsigned int 
+pciConfigReadDWord ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    unsigned char func, 
+    unsigned char offset );
+
+// ==========
+
+unsigned int 
+pciGetBAR ( 
+    unsigned char bus, 
+    unsigned char slot, 
+    int number );
+
+
+unsigned char 
+pciGetClassCode (unsigned char bus, unsigned char slot);
+
+unsigned char 
+pciGetHeaderType (unsigned char bus, unsigned char slot);
+
+unsigned char 
+pciGetInterruptLine ( 
+    unsigned char bus, 
+    unsigned char slot );
+
+
+unsigned char 
+pciGetInterruptPin ( 
+    unsigned char bus, 
+    unsigned char slot );
+
+unsigned char 
+pciGetSubClass (unsigned char bus, unsigned char slot);
+
+unsigned short 
+pciCheckDevice (unsigned char bus, unsigned char slot);
+
+unsigned short 
+pciCheckVendor (unsigned char bus, unsigned char slot);
+
+int init_pci (void);
+
+// ====
+
+int pci_setup_devices (void);
 
 struct pci_device_d *scan_pci_device_list ( 
     unsigned short vendor, 
     unsigned short device );
 
-//procurar na lista de dispositivos por um dispositivo de 
-//determinada classe e subclasse.
 struct pci_device_d *scan_pci_device_list2 ( 
     unsigned char class, 
     unsigned char subclass );
 
+//====
 
-//sonda por dispositivos.
-int pci_setup_devices (void);
+int pciInfo (void);
+int pciShowDeviceInfo (int number);
 
-
-void DeviceInterface_SharedPCIDevice0(void);
-void DeviceInterface_SharedPCIDevice1(void);
-void DeviceInterface_SharedPCIDevice2(void);
-void DeviceInterface_SharedPCIDevice3(void);
+#endif    
 
 
-//Inicia o pci.
-
-int init_pci (void);
 
 
-#endif 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
 

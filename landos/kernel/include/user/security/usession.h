@@ -1,34 +1,9 @@
-/*
- * File: usession.h
- *
- * DescriÁ„o:
- *     Header do gerenciador de user sections.
- *     
- *     WINDOW -> DESKTOP -> ROOM           -> USER SECTION.
- *     WINDOW -> DESKTOP -> WINDOW STATION -> USER SECTION.
- *
- * Obs: Uma estrutura de user session pode armazenas ponteiros para
- *      +Desktop Pool. (Window Station). 
- *      +Object Pool.
- *      +Page Directory Pool. 
- *
- *
- *  Tipos de usu·rios: 
- *     Interactive e non_interactive.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     ...
- */
-
 #ifndef ____USESSION_H
 #define ____USESSION_H    1
 
-
 //user session start
-//No caso de termos apenas uma user session, esse ser· o endereÁo dela.
+//No caso de termos apenas uma user session, esse ser√° o endere√ßo dela.
 unsigned long usersession_start; 
-
 
 // The persistent window server.
 // This is a window server embedded into the base kernel.
@@ -45,7 +20,6 @@ struct raw_graphics_d
 struct raw_graphics_d    *RawGraphics;
 
 
-
 // The loadable window server.
 // It is a ring 3 application.
 struct window_server_d
@@ -60,7 +34,6 @@ struct window_server_d
 };
 struct window_server_d *WindowServer;
 
-
 // The loadable window manager.
 // It is a ring 3 application.
 struct window_manager_d
@@ -74,6 +47,7 @@ struct window_manager_d
     // ...
 };
 struct window_manager_d *WindowManager;
+
 
 
 // This is a set of application used as
@@ -100,6 +74,7 @@ struct desktop_environment_d
     // ...
 };
 struct desktop_environment_d *DesktopEnvironment;
+
 
 
 
@@ -184,7 +159,7 @@ struct usession_d
 	//ou vetores de ponteiros para pools.
 	//
 	
-	//InÌcio da lista encadeada de ponteiros para pools.
+	//In√≠cio da lista encadeada de ponteiros para pools.
 	unsigned long *dpHead;     //Desktop Pools.(wstations).
 	unsigned long *opHead;     //Object Pools.
 	unsigned long *pdpHead;    //Page Directory Pools. (page directory lists) 
@@ -195,46 +170,17 @@ struct usession_d
 struct usession_d *usession0;
 struct usession_d *CurrentUserSession;
 
-// Um mesmo usu·rio pode usar sessoes diferentes para atividades diferentes.
-// -Qual È a user session do usu·rio logado? Sabendo a user session que o usu·rio est·
-// podemos determinar quais os pools que que est„o disponÌveis para ele, como pools de desktop
+// Um mesmo usu√°rio pode usar sessoes diferentes para atividades diferentes.
+// -Qual √© a user session do usu√°rio logado? Sabendo a user session que o usu√°rio est√°
+// podemos determinar quais os pools que que est√£o dispon√≠veis para ele, como pools de desktop
 // pools de pagedirectory, pool de objetos...
 
-unsigned long usessionList[USER_SESSION_COUNT_MAX];
+// unsigned long usessionList[USER_SESSION_COUNT_MAX];
 
 
 
 
-//
-// == prototypes =======================================
-//
+#endif    
 
-//
-// #todo
-// Change the name of all these functions.
-// Use the prefix 'us_'.
-//
-
-void init_user_session (void); 
-
-void *CreateUserSession(int user_id); 
-
-void *get_current_user_session (void);
-
-void 
-set_current_user_session ( 
-    struct usession_d *usession );
-
-void open_user_session (void);
-
-void close_user_session (void);
-
-
-#endif   
-
-
-//
-// End.
-//
 
 

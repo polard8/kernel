@@ -18,16 +18,16 @@
 #include <kernel.h>
 
 
-// Definições.
 #define VSYNC_INPORT  0x3DA
 
 
 // Funções internas.
 char vsync_inb (int port);
 
- 
+// Called by hal_vsync
 void vsync (void)
-{	
+{
+
 	// Método 1
 	//================================
 	
@@ -39,9 +39,9 @@ void vsync (void)
 	//================================
 	
 	// Checar se vsync foi gerado.
-    
-	unsigned long MaxDelay;
-	
+
+    unsigned long MaxDelay=0;
+
     out8 ( 0x3c4, 0 );
 
     if (  vsync_inb( 0x3c5 ) & 0x2 ) 
@@ -53,7 +53,6 @@ void vsync (void)
         while ( ( ( vsync_inb (0x3DA) & 8 ) == 0  ) && MaxDelay-- );
     }
 }
-
 
 
 /*
@@ -73,7 +72,6 @@ char vsync_inb (int port){
     asm (" nop \n");
 
 	//#todo: io_delay();
-
 
     return (char) Value;    
 }

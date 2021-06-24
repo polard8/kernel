@@ -1,0 +1,8 @@
+
+
+    Aqui será construído a imagem do kernel de 64bit.
+
+    Começaremos apenas pelo conteúdo da pasta pumpcore,
+    que é a parte de mais baixo nível, feita em assembly.
+
+

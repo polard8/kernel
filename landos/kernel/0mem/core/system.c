@@ -1,227 +1,128 @@
+
+
+#include <kernel.h>    
+
+
+void a_soft_place_to_fall(void)
+{
+    while (TRUE)
+    { 
+        asm ("cli");
+        //asm ("mwait");   
+        asm ("hlt");
+    };
+}
+
+// The kernel hangs.
+void die (void){
+
+    // Bullet.
+    printf ("die: * System Halted\n");
+
+    if ( VideoBlock.useGui == TRUE ){
+        refresh_screen ();
+    }
+
+    a_soft_place_to_fall();
+    die();
+}
+
 /*
- * File: core/system.c
+ * system_get_pid:
  * 
- * sm - System Management - 
- * Seu objetivo principal é receber os comandos de gerenciamento,
- * enviados por usuários atráves de dispositivos de interface humana. 
- *
- * ******* #importante: Essas classes são 'system dialogs' **********
- *
- * Note duas coisas importantes aqui: 
- * É a interface de administração do sistema, e é ele é 
- * acessado através de um emulador de terminais utilizando-se drivers TTY.
- *
- * File: system.c
- *
- * Obs: CADA CLASSE PODE TER UMA BIBLIOTECA EM USER MODE.
- *      UM UMA INTERRUPÇÃO PRÓPRIA EX: system1(....).
- *
- * Sugestões para nomes de bibliotecas em user mode:
- * ================================================
- * ramlib.o  - Classe Ram. 
- * iocpulib.o - Classe Io.Cpu
- * iodmalib.o - Classe Io.Dma
- * dunblocked.o - Classe Devices.Unblocked
- * dblocked.o - Classe Devices.Blocked
- * things.o - Classe .Things.
- *
- * Ambiente:
- *     Kernel base. Ring0.
- *
- * Descrição:
- *     Arquivo principal do módulo de gerenciamento do sistema.
- *     Esse módulo está em kernel mode, no kernel base.
- *     Rotinas de gerenciamento do sistema.
- *
- * Obs: Pode-se aprender muito com a comunidade opensource(linux), principalmente
- *      nas questões que apresentam maior dificuldade, dadas as obstruções
- *      impostas pela indústria mainstream, como gerenciamento de energia
- *      protocolos e barramentos.
- *
- * Obs:
- *     Sobre a sondagem de dispositivos nos barramentos do sistema:
- *     Sondar os dispositivos seguindo a ordem de velocidade, so mais veloz
- *     para o menos veloz, exemplo: CPU, Memória, PCIE, South Bridge, Super IO ...
- *
- * @todo:
- *     Criar um serviço, (servidor), em user mode que configure o sistema. As 
- * aplicações e utilitários em user mode poderão usar esse serviço. Obs: O servidor
- * em user mode poderá chamar serviços oferecidos por esse módulo aqui.
- * 
- * @todo: AS ROTINAS DE CLASSES NO COMEÇO DESSE MÓDULO DEVEM EXECUTAR SOMENTE
- *        DEPOIS DE UMA CHECAGEM DE PERMISSÕES. PERMISSÕES DE NÍVEL. UM PROCESSO
- *        DEVE TER A MESMA PERMISSÃO DE NÍVEL DO SERVIÇO QUE ELE DESEJA. (K0~K5).
- *
- * In this file:
- *     +Strings padronizadas e definitivas. Para uso interno.
- *     +systemShowDevicesInfo
- *     +systemCreateSystemMenuBar
- *     +systemStartUp - Rotinas de inicialização do sistema.  
- *     +systemSetupVersion
- *     +system_dispatch_to_procedure - Chama o procedimento atual.
- *     +SystemMenu
- *     +SystemMenuProcedure
- *     +systemReboot
- *     +systemShutdown
- *
- * History:
- *     2015 - Created by Fred Nora.
  */
 
- 
-#include <kernel.h>
+// Usada para obter o pid de alguns drivers e servidores
+// do sistema. Aqueles servidores que sÃ³ podem ter um do tipo 
+// rodando ao mesmo tempo.
+// Ã‰ o serviÃ§o 9999.
+// See: kernel.h, system.h
+
+int system_get_pid (int index){
+
+    if ( index < 0 ){
+        return -1;
+    }
 
 
-// from boot loader.
-extern unsigned long SavedBootBlock;
-extern unsigned long SavedLFB;
-extern unsigned long SavedX;
-extern unsigned long SavedY;
-extern unsigned long SavedBPP; 
+    switch (index)
+    {
+        case GETPID_NULL:
+            return -1;
+            break;
 
+        case GETPID_WS:
+            //return (int) g_ws_pid;
+            break;
 
-// #bugbug
-// Temos que rever as deviniçoes abaixo.
- 
+        case GETPID_WM:
+           // return (int) g_wm_pid;
+            break;
 
+        default:
+            return -1;
+            break;
+    };
 
-
-/*
-    Sobre os diretórios e arquivos do sistema:
-    Os nomes dos diretórios e arquivos do sistema ficarão aqui
-    como forma de registro oficial. os módulos poderão reproduzir
-    o nome presente aqui ou poderão solicitar um ponteiro para o nome.
-    #todo: 
-    Funções aqui nesse arquivo retornarão o ponteiro para o 
-    nome de arquivo desejado.
-	...
- */
- 
- 
-/*
- *     **** Diretórios do sistema. ****  obs:(8.3)
- *
- * * Obs: O esquema de diretórios ainda esta em fase de planejamento.
- */
-
-//Geral para todas as versoes do sistema operacional 
-static char *systemPathNameRoot      = "/root";               //Raiz.
-static char *systemPathNameSDK       = "/root/sdk";           //*SDK. 
-static char *systemPathNameBoot      = "/root/boot";          //Boot. 
-static char *systemPathNameDevices   = "/root/devices";       //Devices. 
-static char *systemPathNameUsers     = "/root/users";         //Usuários.
-static char *systemPathNameApps      = "/root/apps";          //Aplicações.
-static char *systemPathNameTemp      = "/root/temp";          //Arquivos temporários.
-static char *systemPathNameDownloads = "/root/dl";            //Arquivos temporários.
-static char *systemPathNameTrash     = "/root/trash";         //Lixeira. 
-//...
-
-//OSs: versoes. 
-static char *systemPathNameOS1 = "/root/os";   //OS1. Principal (atual)
-static char *systemPathNameOS2 = "/root/os1";  //OS2.
-static char *systemPathNameOS3 = "/root/os2";  //OS3.
-static char *systemPathNameOS4 = "/root/os3";  //OS4.
-//...
- 
-//Diretórios do sistema principal. 
-static char *systemPathNameOS1Boot           = "/root/os/boot";            //boot.
-static char *systemPathNameOS1BootFont       = "/root/os/boot/font";       //boot font.
-static char *systemPathNameOS1System         = "/root/os/system";          //* Diretório do sistema.
-static char *systemPathNameOS1SystemFont     = "/root/os/system/font";            //fontes do sistema.
-static char *systemPathNameOS1SystemDrivers  = "/root/os/system/drivers";  //Drivers do sistema.
-static char *systemPathNameOS1SystemSecurity = "/root/os/system/security";    //Fontes sistema.
-//...
-
-
-/*
- * Arquivos do sistema:
- *     os principais arquivos do sistema, padronizados e nunca mudarão.
- *
- */
-
-//alguns são provisórios nessa fase de desenvolvimento. 
-static char *systemInitFilePathName = "/root/INIT.TXT";  //"/root/init.txt";
-static char *systemLogFilePathName  = "/root/log.txt";
-//static char *systemInitFilePathName = "/root/log.txt";
-//static char *systemInitFilePathName = "/root/log.txt";
-//static char *systemInitFilePathName = "/root/log.txt";
-//static char *systemInitFilePathName = "/root/log.txt";
-static char *systemSwapFilePathName      = "/root/swap";  //'Arquivo' de paginação.
-
-
-
-
-
-/*
- *******************************************************
- * set_up_system_color: 
- *     Configura cor padrão para o sistema.
- *     @todo: Isso pode ir para outro lugar.   
- */
-
-// #todo: Maybe move this to user/
-
-void set_up_color ( unsigned long color )
-{
-    g_system_color = (unsigned long) color;
+    return (int) -1;
 }
 
-
-/* 
- *********************************************************************
- * set_up_text_color:
- *     Atribui o primeiro plano e o fundo que nós usaremos. 
- *     Top 4 bytes are the background,  bottom 4 bytes
- *     are the foreground color.
- *     @todo: Isso pode ir para outro lugar.
+/*
+ * systemShutdownViaAPM:
+ *     Desliga a mÃ¡quina via APM.
+ *     (Deve chamar uma rotina herdada do BM).
  */
 
-// #todo: Maybe move this to user/
+void systemShutdownViaAPM (void){
 
-void 
-set_up_text_color ( 
-    unsigned char forecolor, 
-    unsigned char backcolor )
-{
-    g_char_attrib = (backcolor << 4) | (forecolor & 0x0F);
+    // Obs: @todo:
+	//     Existe uma rotina no BM que desliga a mÃ¡quina via APM usando 
+	// recursos do BIOS. A rotina comeÃ§a em 32bit, assim podemos tentar herdar 
+	// o ponteiro para a funÃ§Ã£o.
+	
+    //Chamar a funÃ§Ã£o de 32 bit herdado do BM.
+    //todo: usar iret.
+	
+	// Check limits.
+	// O ponteiro herdado tem que ser um valor dentro do endereÃ§o onde 
+	// roda o BM, que comeÃ§a em 0x8000.
+	// if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
+		
+	//Pilha para iret.
+    //asm("pushl %0" :: "r" ((unsigned long) 8)     : "%esp");    //cs.
+    //asm("pushl %0" :: "r" ((unsigned long) shutdown_address)    : "%esp");  //eip.
+	//asm("iret \n");    //Fly!	
+		
+	//};
+
+
+    panic ("systemShutdownViaAPM:\n");
 }
-
-
-// used?
-void *systemNull (void)
-{
-    return NULL;
-}
-
 
 /*
- * systemLinkDriver:
- *     Ligando um driver ao sistema operacional.
- */
+ ****************************************
+ * systemShutdown:
+ *     Interface para shutdown.
+ */ 
 
-    // #todo: 
-    // Ainda não implementada.
+// #todo
 
-void *systemLinkDriver ( 
-    unsigned long arg1, 
-    unsigned long arg2, 
-    unsigned long arg3 )
+void systemShutdown (void)
 {
+    printf ("systemShutdown: It's safe to turnoff your computer");
 
-    printf ("systemLinkDriver: [TODO]\n");
-    refresh_screen();
-    return NULL; 
+    refresh_screen ();
+    die ();
 }
-
 
 /*
  * systemShowDevicesInfo:
  * 
- *     Mostrar informações sobre o sistema, seguindo a ordem de
+ *     Mostrar informaÃ§Ãµes sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.
- *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
- *     A Apresentação da sondágem pode ser feita em outra ordem,
- *     melhor que seja a ordem alfabética.
+ *     Ex: CPU, MemÃ³ria, PCIE (video), South Bridge, Super Io ...
+ *     A ApresentaÃ§Ã£o da sondÃ¡gem pode ser feita em outra ordem,
+ *     melhor que seja a ordem alfabÃ©tica.
  *     See: devmgr.c
  */
 
@@ -249,7 +150,7 @@ void systemSetupVersion (void){
 
     // #todo:
     // Isso deve ser considerado um erro fatal,
-    // pois existem aplicações que dependem da versão do sistema 
+    // pois existem aplicaÃ§Ãµes que dependem da versÃ£o do sistema 
     // para funcionarem corretamente.. 
 
     if ( (void *) Version == NULL ){
@@ -266,7 +167,7 @@ void systemSetupVersion (void){
 
         //#todo:
         //Isso deve ser considerado um erro fatal,
-        //pois existem aplicações que dependem da versão do sistema 
+        //pois existem aplicaÃ§Ãµes que dependem da versÃ£o do sistema 
         //para funcionarem corretamente.. 
 
     if ( (void *) VersionInfo == NULL ){
@@ -293,7 +194,7 @@ void systemSetupVersion (void){
     }
 
 	//
-	// Colocando na estrutura System se ela for válida.
+	// Colocando na estrutura System se ela for vÃ¡lida.
 	//
 
 
@@ -311,201 +212,20 @@ void systemSetupVersion (void){
 	// More ?!
 }
 
-
-/*
- * SystemMenu:
- * Cria o system menu para manipular a janela ativa. Control Menu.
- */
-
-int SystemMenu (void){
-
-    struct window_d *Current;    //Parent window.
-    struct window_d *hWindow;    //Menu window.
-
-
-	// Tentativa de utilizar control menu não estando no modo gráafico.
-
-    if ( VideoBlock.useGui != TRUE )
-    {
-        // #todo: 
-        // Notificar erro via modo texto.
-
-        return (int) 1;   
-    }
-
-
-	// Usar a estrutura da Client Area.
-	// A área da tela menos a área da barra de tarefas, ou barra de menu.
-
-    if ( (void *) gui->root_window == NULL )
-    {
-        gui->root_window = (void *) gui->screen;
-
-		//No Screen.
-        if ( (void *) gui->root_window == NULL )
-        {
-			//erro.
-            return (int) 1;    
-        }
-    }
-
-	//Set current.
-
-    if ( (void *) gui->root_window != NULL )
-    {
-        Current = (void *) gui->root_window;
-    }
-
-
-	// No Current.
-	// #bugbug: 
-	// Reavaliar isso. 
-	// Estamos checando um ponteiro não inicializado.
-	// Mas de qualquer forma não podemos avançar com esse ponteiro nulo.
-
-    if ( (void *) Current == NULL )
-    {
-        return (int) 1;    //erro.
-    }
-
-	//
-	// Cria o System Menu.
-	// Envia uma parent window via argumento.
-	// Retorna a janela criada para o menu.
-	//
-
-    hWindow = (void *) create_menu ( Current, 4, 0, 0, 0 );
-
-	// Se houve falha na criação da janela.
-
-    if ( (void *) hWindow == NULL ){
-        panic ("system-SystemMenu: hWindow\n");
-    }
-
-	// Se houve falha na criação do menu.
-    if ( (void *) hWindow->defaultMenu == NULL ){
-
-        return (int) 1;
-
-    }else{
-
-		//Inicializa o array de menuítens.
-        initmenuArray ( hWindow->defaultMenu, 4 );
-
-        //Cria os ítens.
-        create_menu_item ( hWindow->defaultMenu, "System menu item 1", 0 );
-        create_menu_item ( hWindow->defaultMenu, "System menu item 2", 0 );
-        create_menu_item ( hWindow->defaultMenu, "System menu item 3", 0 );
-        create_menu_item ( hWindow->defaultMenu, "System menu item 4", 1 );
-		//...
-    };
-
-    return 0;
-}
-
-
-/*
- **************************************************
- * SystemMenuProcedure:
- *     O procedimento do control menu principal.
- *     menu do sistema, manipula a janela ativa.
- */
-
-// # dialog !!!
-
-unsigned long 
-SystemMenuProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 ) 
-{
-
-
-    switch (msg)
-    {
-        case MSG_KEYDOWN:
-            switch (long1)
-            {
-                case VK_ESCAPE:  
-                    break;
-                    
-                default:
-                    break; 
-            };
-        break;
-
-
-        case MSG_SYSKEYDOWN:
-            switch (long1)
-            { 
-				//Restaturar janela	
-				case VK_F1:
-				    //#bugbug: Aqui não devemos criar a 
-					//status bar apenas atualizar as strings.
-					//StatusBar( gui->screen, "Status Bar", "F1");
-                    break;
-					
-				//Minimizar janela
-                case VK_F2:
-				    //#bugbug: Aqui não devemos criar a 
-					//status bar apenas atualizar as strings.
-				    //StatusBar( gui->screen, "Status Bar", "F2");
-                    break;
-					
-				//Maximizar janela
-                //case VK_F3:
-                //    break;
-
-				//fechar janela
-                //case VK_F4:
-                //    break;
-					
-			    //...
-				
-				default:
-                    //Nothing.
-				    break;
-		    };           
-        break;
-
-        case MSG_SYSKEYUP:
-            //Nothing.
-            break;
-
-
-        default:
-            //Nothing.
-            break;
-    };
-
-
-done:
-
-    if (VideoBlock.useGui == 1)
-    {
-        refresh_screen();
-    }
-
-    return (unsigned long) 0;
-}
-
-
-
 /*
  *******************************************************
  * systemReboot:
- *     Interface de inicialização da parte de sistema para o 
+ *     Interface de inicializaÃ§Ã£o da parte de sistema para o 
  * processo de reboot.
  *     realiza rotinas de desligamento de sistema antes de chamar 
  * o reiniciamento de hardware.
  *     *IMPORTANTE: Um processo em user mode deve realizar as rotinas 
  * de desligamento.
  *     passar para o kernel somente depois de fechar todos os processos.
- *     Quando essa rotina checar os processos verá que não há mais nada 
+ *     Quando essa rotina checar os processos verÃ¡ que nÃ£o hÃ¡ mais nada 
  * pra fechar.
- *     se ainda tiver algum processo pra fechar, então essa rotina 
- * fecha, senão termina a rotina. 
+ *     se ainda tiver algum processo pra fechar, entÃ£o essa rotina 
+ * fecha, senÃ£o termina a rotina. 
  */
 
 void systemReboot (void){
@@ -537,10 +257,10 @@ void systemReboot (void){
 
 	//#importante:
 	//suspendendo a rotina de reboot,
-	//até que todas funcionalidades gráficas estejam em ordem.
+	//atÃ© que todas funcionalidades grÃ¡ficas estejam em ordem.
 	//Na verdade deveria existir um aplicativo chamado reboot 
 	//que inicialise essa rotina deixando par ao kernel apenas 
-	//a parte de baixo nível.
+	//a parte de baixo nÃ­vel.
 
     hal_reboot();
 
@@ -564,7 +284,7 @@ void systemReboot (void){
 		//...
 	};
 	
-	// @todo: Usar esquema de cores padrão.
+	// @todo: Usar esquema de cores padrÃ£o.
 	
 	if ( VideoBlock.useGui == 1 )
 	{
@@ -588,18 +308,18 @@ void systemReboot (void){
 		
 		
 		// Auterando as margens.
-		// Essas margens são usadas pela função printf.
-		// Obs: As medidas são feitas em números de caracteres.
-		// Obs: @todo: Devemos usar aqui o retângulo da área de cliente,
-		// e não as margens da janela.
-		// A estrutura de janela deve nos oferecer os valores para a métrica do 
-		// retângulo da área de cliente.
-		// Obs: @todo:Acho que essa não é a forma correta de configurar isso. Uma 
-		//rotina deveria perceber as dimensões da janela de do caractere e determinar
+		// Essas margens sÃ£o usadas pela funÃ§Ã£o printf.
+		// Obs: As medidas sÃ£o feitas em nÃºmeros de caracteres.
+		// Obs: @todo: Devemos usar aqui o retÃ¢ngulo da Ã¡rea de cliente,
+		// e nÃ£o as margens da janela.
+		// A estrutura de janela deve nos oferecer os valores para a mÃ©trica do 
+		// retÃ¢ngulo da Ã¡rea de cliente.
+		// Obs: @todo:Acho que essa nÃ£o Ã© a forma correta de configurar isso. Uma 
+		//rotina deveria perceber as dimensÃµes da janela de do caractere e determinar
 		//as margens.
 		
 		g_cursor_left = (hWindow->left/8);
-		g_cursor_top = (hWindow->top/8) + 4;   //Queremos o início da área de clente.
+		g_cursor_top = (hWindow->top/8) + 4;   //Queremos o inÃ­cio da Ã¡rea de clente.
 		
 		g_cursor_right = g_cursor_left + (width/8);
 		g_cursor_bottom = g_cursor_top  + (height/8);
@@ -609,11 +329,11 @@ void systemReboot (void){
 		g_cursor_y = g_cursor_top; 
         
 	    //
-	    //@todo: Criar a interface. realizando configurações de sistema
+	    //@todo: Criar a interface. realizando configuraÃ§Ãµes de sistema
 	    // antes de chamar o hal.
-	    // É apropriado deixar aqui as rotinas de desligamento do sistema
+	    // Ã‰ apropriado deixar aqui as rotinas de desligamento do sistema
 	    // ficando para hal a parte de hardware.
-	    // +salvar arquivos de configuração.
+	    // +salvar arquivos de configuraÃ§Ã£o.
 	    // +salvar discos virtuais.
 	    // ...
 	    //
@@ -621,7 +341,7 @@ void systemReboot (void){
      	//...
 	
         //
-        // Coloca uma tela preta pra começar.
+        // Coloca uma tela preta pra comeÃ§ar.
         //
 	
         //Cls and Message.
@@ -649,8 +369,8 @@ void systemReboot (void){
 	    // Video.
 	    //
 	
-        set_up_cursor(0,4);	            //O cursor deveria ficar na área do cliente.	
-        set_up_text_color(0x0f, 0x09);  //isso é para modo texto. eu acho??
+        set_up_cursor(0,4);	            //O cursor deveria ficar na Ã¡rea do cliente.	
+        set_up_text_color(0x0f, 0x09);  //isso Ã© para modo texto. eu acho??
 	    
 		//init message.
 		sleep(8000);
@@ -672,9 +392,9 @@ void systemReboot (void){
 	    //
 	
 	    //
-	    // Fechando processos que não foram fechados pelo shutdown em user mode.
+	    // Fechando processos que nÃ£o foram fechados pelo shutdown em user mode.
 	    // Obs: Todos os processos nesse momento ja deveriam estar terminados
-	    // através de rotinas em user mode. Então checamos se falta algum e 
+	    // atravÃ©s de rotinas em user mode. EntÃ£o checamos se falta algum e 
 	    // caso haja, terminamos o processo.
 	    // Obs: A rotina de fechar processo deve fechar as threads na ordem da lista encadeada.
 	    //
@@ -691,7 +411,7 @@ void systemReboot (void){
 		
 //blockingAllThreads:		
 		//antes de terminarmos todos processos vamos boquear todas as threads.
-	    //Começa do 1 para não fechar o kernel.
+	    //ComeÃ§a do 1 para nÃ£o fechar o kernel.
 	    i = 1;
 	
 	    while(i < THREAD_COUNT_MAX)
@@ -714,7 +434,7 @@ void systemReboot (void){
 	    };
 
 //exitingAllProcesses:	
-	    //Começa do 1 para não fechar o kernel.
+	    //ComeÃ§a do 1 para nÃ£o fechar o kernel.
 	    i = 1;
 	
 	    while(i < PROCESS_COUNT_MAX)
@@ -743,7 +463,7 @@ void systemReboot (void){
 	
 		
 		//voltando a margem normal a margem
-		//?? isso não é necessário??
+		//?? isso nÃ£o Ã© necessÃ¡rio??
 		g_cursor_left = (left/8);    //0;
 		g_cursor_top = (top/8);        //0;
 		
@@ -755,18 +475,14 @@ void systemReboot (void){
 		g_cursor_y = g_cursor_top;
         //set_up_cursor(g_cursor_left,g_cursor_top); 		
 
-        //#bugbug: Aqui não devemos criar uma status bar 
+        //#bugbug: Aqui nÃ£o devemos criar uma status bar 
         //apenas atualizar as strings 		
 		//StatusBar(hWindow,"Esc=EXIT","Enter=?");		
 		//Nothing.
 	};
  */
 
-
-
-	//Nothing.
-
-
+    // Nothing
 
 done:
 
@@ -778,823 +494,35 @@ done:
     printf ("systemReboot: Rebooting ...");
     refresh_screen ();
 
-    sys_reboot();
+    //sys_reboot();
+    hal_reboot();
     die();
 }
 
-
-/*
- ****************************************
- * systemShutdown:
- *     Interface para shutdown.
- */ 
-
-// #todo
-
-void systemShutdown (void)
+// used?
+void *systemNull (void)
 {
-    printf ("systemShutdown: It's safe to turnoff your computer");
-
-    refresh_screen ();
-    die ();
-}
-
-
-/*
- * systemShutdownViaAPM:
- *     Desliga a máquina via APM.
- *     (Deve chamar uma rotina herdada do BM).
- */
-
-void systemShutdownViaAPM (void){
-
-    // Obs: @todo:
-	//     Existe uma rotina no BM que desliga a máquina via APM usando 
-	// recursos do BIOS. A rotina começa em 32bit, assim podemos tentar herdar 
-	// o ponteiro para a função.
-	
-    //Chamar a função de 32 bit herdado do BM.
-    //todo: usar iret.
-	
-	// Check limits.
-	// O ponteiro herdado tem que ser um valor dentro do endereço onde 
-	// roda o BM, que começa em 0x8000.
-	// if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
-		
-	//Pilha para iret.
-    //asm("pushl %0" :: "r" ((unsigned long) 8)     : "%esp");    //cs.
-    //asm("pushl %0" :: "r" ((unsigned long) shutdown_address)    : "%esp");  //eip.
-	//asm("iret \n");    //Fly!	
-		
-	//};
-
-
-    panic ("systemShutdownViaAPM:\n");
-}
-
-
-/*
- * systemGetSystemMetric:
- *     Retorna um valor de medida de algum elemento do sistema.
- * usado pelas rotinas de criação e análise.
- * O argumento seleciona a variável global que será retornada.
- * Obs: Temos muitas variáveis globais com valores de demensões
- * de recurso do sistema. Essa rotina é um modo organizado de 
- * pegar os valores das variaveis globais relativas à medidas.
- * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
- * Pois é a parte mais importante do módulo System Manegement".
- */
-
-void *systemGetSystemMetric (int number){
-
-    if ( number <= 0 ){
-        return NULL;
-    }
-
-
-    switch ( number ){
-
-
-		//case SM_NULL:
-		//    return NULL;
-		//	break;
-			
-		case SM_SCREENWIDTH:
-            //pegar uma global
-			break;
-		
-        case SM_SCREENHEIGHT:
-            //pegar uma global
-			break;
-		    
-			
-            //Continuar ... 
-
-        default:
-            return NULL;
-    };
-}
-
-
-/*
- **************************************************
- * systemGetSystemstatus:
- *     Retorna o valor de alguma variável global relativa 
- * apenas a status de algum elemento do sistema.
- * Obs: É muito apropriado essa função ficar no arquivo \sm\sys\system.c
- * Pois é a parte mais importante do módulo System Manegement".
- */
-
-void *systemGetSystemStatus (int number){
-
-    if ( number <= 0 ){
-        return NULL;
-    }
-
-
-    switch ( number ){
-
-
-		//case SS_NULL:
-		//    return NULL;
-		//	break;
-			
-		case SS_LOGGED:
-            return (void *) g_logged;
-			break;
-		
-        case SS_USING_GUI:
-            return (void *) g_useGUI;
-			break;
-        //Continuar ... 
-
-        default:
-            return NULL;
-    };
-}
-
-
-/*
- ***************************************
- * die:
- *     Função sem retorno. Aqui termina tudo.
- *      O sistema trava e não tem volta.
- * Final message!
- * Refresh.
- * HALT.
- */
-
-void die (void){
-
-    // Bullet.
-    printf ("die: * System Halted\n");
-
-    if ( VideoBlock.useGui == 1 ){
-        refresh_screen ();
-    }
-
-    while (1){ 
-        asm ("cli");
-        //asm ("mwait");
-        asm ("hlt");
-    };
-}
-
-
-/*
- * system_get_pid:
- * 
- */
-
-// Usada para obter o pid de alguns drivers e servidores
-// do sistema. Aqueles servidores que só podem ter um do tipo 
-// rodando ao mesmo tempo.
-// É o serviço 9999.
-// See: kernel.h, system.h
-
-int system_get_pid (int index){
-
-    if ( index < 0 ){
-        return -1;
-    }
-
-
-    switch (index)
-    {
-        case GETPID_NULL:
-            return -1;
-            break;
-
-        case GETPID_WS:
-            //return (int) g_ws_pid;
-            break;
-
-        case GETPID_WM:
-           // return (int) g_wm_pid;
-            break;
-
-        default:
-            return -1;
-            break;
-    };
-
-
-    return (int) -1;
-}
-
-
-/*
- ***************************************
- * systemGetSystemMetrics:
- *     Retorna informações sobre o sistema.
- * 
- *     #todo: 
- *     Criam um enum para essa função, aqui mesmo nesse arquivo.
- */
-
-unsigned long systemGetSystemMetrics ( int index )
-{
-
-
-    // #bugbug
-    // We have a HUGE problem here.
-    // We can't properly get the data inside the structures. 
-    // The value is not the same when we enter inside the kernel via
-    // keyboard interrupt or via system interrupt.
-    // #todo: Maybe we need to use global variables for now
-    // and review all the moment when the ring3 app tryes to
-    // get data from a ring0 struct.
-
-    // # The solution.
-    // We are trying to have more system calls. sc80 sc81 sc82.
-    // These system calls uses different set of selectors.
-
-	//print ("#debug: systemGetSystemMetrics: i={%d} \n",index)
-
-    if ( index <= 0 ){
-        return (unsigned long) 0;
-    }
-
-    switch ( index ){
-
-        //screen width.
-        case 1:
-            return (unsigned long) screenGetWidth();
-            break;
-
-        //screen height.	
-        case 2:
-            return (unsigned long) screenGetHeight();
-            break;
-
-
-        //cursor width in pixels.
-        case 3:
-            return (unsigned long) CONSOLE_TTYS[fg_console].cursor_width_in_pixels;
-            break;
-
-        //cursor height in pixels.
-        case 4:
-            return (unsigned long) CONSOLE_TTYS[fg_console].cursor_height_in_pixels;
-            break;
-
-
-        // mouse pointer width.
-        case 5:
-            return (unsigned long) g_mousepointer_width;
-            break;
-         
-        // mouse pointer height. 
-        case 6:
-            return (unsigned long) g_mousepointer_height;
-            break;
-
-		//char width.
-        case 7:
-		    return (unsigned long) get_char_width();
-            break;
-
-		//char height.
-        case 8:
-		    return (unsigned long) get_char_height();
-            break;
-            
-            
-        case 9:
-            return (unsigned long) SavedBPP;
-            break;    
-            
-      
-        //
-        // screen buffers
-        //
-
-        // lfb pa
-        case 10:
-		    return (unsigned long) g_frontbuffer_pa;
-            break;        
-
-            
-        // lfb va
-        case 11:
-		    return (unsigned long) g_frontbuffer_va;
-            break;        
-
-        // main backbuffer va
-        case 12:
-		    return (unsigned long) g_backbuffer_va;
-            break;                   
-     
-                      
-        //20   
-        // mouse x    
-        case SM_GETMOUSEX:
-            //#bugbug: Pegando informações com o driver de mouse.
-            return (unsigned long) ps2_mouse_get_info (3); 
-            break;
-        
-        //21
-        //mouse y
-        case SM_GETMOUSEY:
-           //#bugbug: Pegando informações com o driver de mouse.
-            return (unsigned long) ps2_mouse_get_info (4); 
-            break;
-            
-        //
-        // Ram support
-        //
-      
-        // base memory
-        case 30:
-            return (unsigned long) memorysizeBaseMemory;
-            break;
-            
-        // extended - base
-        case 31:
-            return (unsigned long) memorysizeOtherMemory;
-            break;
-            
-            
-        // extended memory
-        case 32:
-            return (unsigned long) memorysizeExtendedMemory;
-            break;
-            
-        // total = base + other + extended 
-        case 33:
-            return (unsigned long) memorysizeTotal;
-            break;                    
-
-        // used
-        case 34:
-            return (unsigned long) memorysizeUsed;
-            break;  
-        
-        // free   
-        case 35:
-            return (unsigned long) memorysizeFree;
-            break;  
-            
-         //
-         // Kernel Heap support.
-         //   
-
-        case 40:
-            return (unsigned long) kernel_heap_start;
-            break;  
-            
-        case 41:
-            return (unsigned long) kernel_heap_end;
-            break;  
-            
-        case 42:
-            return (unsigned long) g_available_heap;
-            break; 
-            
-         //
-         // Kernel Stack support.
-         //   
-            
-        case 50:
-            return (unsigned long) kernel_stack_start;
-            break; 
-
-        case 51:
-            return (unsigned long) kernel_stack_end;
-            break; 
-            
-        case 52:
-            return (unsigned long) kernel_stack_start_pa;
-            break; 
-
-
-            
-        //
-        // used memory support
-        //
-
-        case 60:
-            return (unsigned long) mm_used_kernel_area;
-            break;   
-            
-
-        case 61:
-            return (unsigned long) mm_used_user_area;
-            break;   
-
-
-        case 62:
-            return (unsigned long) mm_used_backbuffer;
-            break;   
-
-
-
-        case 63:
-            return (unsigned long) mm_used_pagedpool;
-            break;   
-
-
-
-        case 64:
-            return (unsigned long) mm_used_heappool;
-            break;   
-
-
-        case 65:
-            return (unsigned long) mm_used_extraheap1;
-            break;   
-            
-        case 66:
-            return (unsigned long) mm_used_extraheap2 ;
-            break;   
-            
-        case 67:
-            return (unsigned long) mm_used_extraheap3;
-            break; 
-            
-
-        //
-        // Dispatch critéria.
-        //
-        
-        case 70:
-            return (unsigned long) DispatchCountBlock->SelectIdleCount;
-            break;               
-
-        case 71:
-            return (unsigned long) DispatchCountBlock->SelectInitializedCount;
-            break;   
-            
-        case 72:
-            return (unsigned long) DispatchCountBlock->SelectNextCount;
-            break;                         
-
-        case 73:
-            return (unsigned long) DispatchCountBlock->SelectCurrentCount;
-            break;   
-            
-        case 74:
-            return (unsigned long) DispatchCountBlock->SelectAnyCount;
-            break;   
-            
-        case 75:
-            return (unsigned long) DispatchCountBlock->SelectIdealCount;
-            break;   
-            
-        case 76:
-            return (unsigned long) DispatchCountBlock->SelectDispatcherQueueCount;
-            break;               
-   
-
-
-        // system type. by memory size;
-        case 90:
-            return (unsigned long) g_mm_system_type;
-            break;  
-            
-        //
-        // Profiler ... (reservar vários números.)
-        //
-        
-                      
-        case 100:
-            return (unsigned long) g_profiler_ints_irq0;
-            break;              
-
-        case 101:
-            return (unsigned long) g_profiler_ints_irq1;
-            break;              
-            
-        case 102:
-            return (unsigned long) g_profiler_ints_irq2;
-            break; 
-
-        case 103:
-            return (unsigned long) g_profiler_ints_irq3;
-            break;
-
-        case 104:
-            return (unsigned long) g_profiler_ints_irq4;
-            break;              
-
-        case 105:
-            return (unsigned long) g_profiler_ints_irq5;
-            break;              
-            
-        case 106:
-            return (unsigned long) g_profiler_ints_irq6;
-            break;              
-            
-            
-        case 107:
-            return (unsigned long) g_profiler_ints_irq7;
-            break;              
-
-        case 108:
-            return (unsigned long) g_profiler_ints_irq8;
-            break;              
-
-        case 109:
-            return (unsigned long) g_profiler_ints_irq9;
-            break;              
-            
-        case 110:
-            return (unsigned long) g_profiler_ints_irq10;
-            break;              
-            
-            
-        case 111:
-            return (unsigned long) g_profiler_ints_irq11;
-            break; 
-
-        case 112:
-            return (unsigned long) g_profiler_ints_irq12;
-            break; 
-
-        case 113:
-            return (unsigned long) g_profiler_ints_irq13;
-            break; 
-            
-        case 114:
-            return (unsigned long) g_profiler_ints_irq14;
-            break; 
-            
-            
-        case 115:
-            return (unsigned long) g_profiler_ints_irq15;
-            break; 
-            
-          
-        // Interrupção de serviços do sistema.
-        case 117:
-            return (unsigned long) g_profiler_ints_gde_services;
-            break; 
-
-       // PIT
-       // See: hal/pit.h
-       
-       // jiffies.
-       // total ticks
-       case 118:  return (unsigned long) jiffies;  break;
-
-       // seconds
-       // por quantos segundos o sistema esta rodando
-       // jiffies/sys_time_hz
-       case 119:  return (unsigned long) seconds;      break;
-       
-       // Por quantos ms o sistema esta rodando.
-       case 120:  return (unsigned long) sys_time_ms;  break;
-
-       // pit frequency
-       case 121:  return (unsigned long) sys_time_hz;  break;
-
-        // ...
-
-       // gramado mode, gamemode.
-       case 130:  return (unsigned long) current_mode;  break;
-
-       // When a thread is running to call this service,
-       // so, this thread is the current thread.
-       // But, current for what processor?
-       case 140:  return (unsigned long) current_process;  break;
-       case 141:  return (unsigned long) current_thread;   break;
-
-       //case 150:  break;
-       //case 151:  break;
-
-        // 200 ~ 2xx window server info.
-        // See: ws.h
-
-        // #bugbug
-        // Quando estamos dentro do kernel por entrarmos via interrupçao de teclado,
-        // esses valores estao certos,
-        // mas quando estamos dentro do kernel, por entrarmos via interrupçao de sistema,
-        // esses valores estao errados.
-        // #porque
-        // ?? seria algum problema de selecao de diretorio de paginas,
-        // ou de configuraçao de registrador de segmento.
-        // podemos checar se a configuraçao dos segmentos de dados esta
-        // certa na hora da entrada da interrupçao de sistema.
-        // o problema eh que mudarmos o registrador de segmento, entao
-        // o kernel nao podera mais pegar as informaçoes que estao em ring3. certo??
-        // See:
-        // sw.asm
-        
-        case 200:
-           //printf ("#type: %d\n",WindowServer_type);
-           //refresh_screen();
-           return (unsigned long) WindowServer_type;
-           break;
-
-        case 201:
-           //printf ("#pid: %d\n",WindowServer_pid);
-           //refresh_screen();
-           return (unsigned long) WindowServer_pid; 
-           break;
-
-        case 202:
-           //printf ("#virtual_console: %d\n",WindowServer_virtual_console);
-           //refresh_screen();
-           return (unsigned long) WindowServer_virtual_console; 
-           break;
-
-        case 203:
-           //printf ("#initialized: %d\n",WindowServer_initialized);
-           //refresh_screen();
-           return (unsigned long) WindowServer_initialized; 
-           break;
-        
-        // is quemu
-        case 300:
-            return (unsigned long) g_is_qemu;
-            break;
-           
-
-        // ...
-                
-        default:
-            goto done;
-            break;
-    };
-
-done:
-    return (unsigned long) 0;
-}
-
-
-
-//
-//========================================================
-//
-
-//tentando mover funções de misc.c para cá.
-
-
-
-/*
- * newLinkedlist:
- *     Cria uma nova linked list.
- */
-
-void *newLinkedlist (void){
-
-    struct linkedlist_d *new_list; 
-
-    new_list = (void *) kmalloc ( sizeof(struct linkedlist_d) );
-
-    if ( (void *) new_list == NULL )
-    {
-        return NULL;
-    }
-
-    /* put in the data  */
-    //new_node->data  = new_data;
-    
-    new_list->head = NULL;
-    new_list->tail = NULL;
-
-
-    return (void *) new_list;
-}
-
-
-
-/*
- * newNode:
- *     Cria um novo nodo.
- */
-
-void *newNode (void){
-
-    struct node_d *new_node; 
-
-    new_node = (void *) kmalloc ( sizeof(struct node_d) );
-
-    if ( (void *) new_node == NULL )
-    {
-        return NULL;
-    }
- 
-    /* put in the data  */
-    //new_node->data  = new_data;
-
-    new_node->flink = NULL;
- 
-    return (void *) new_node;
-}
-
-
-void Removing_from_the_beginning (struct linkedlist_d *list){
-
-    struct node_d *old_head;
-    struct node_d *new_head;
-
-    if ( (void*) list == NULL)
-    {
-        return;
-    }
-
-
-    old_head = list->head;
-    new_head = old_head->flink;
-
-    list->head = new_head; 
-
-
-done:
-    return;
-}
-
-
-
-void Removing_from_the_middle (struct linkedlist_d *list)
-{
-  //todo identificaçao do node que esta no meio,
-}
-
-
-void Removing_from_the_end (struct linkedlist_d *list){
-
-    struct node_d *old_tail;
-    struct node_d *new_tail;
-
-    if ( (void *) list == NULL)
-    {
-        return;
-    }
-
-    old_tail = list->tail;
-    new_tail = old_tail->blink;
-
-    list->tail = new_tail; 
-}
-
-
-
-/*
- *******************************
- * init_executive:
- *
- *     Initialize the kernel executive.
- *     Archtecture (independent) inicialization. 
- */
- 
-int init_executive (void){
-
-    int Status = 0;
-
-
-#ifdef KERNEL_VERBOSE
-    printf ("EXECUTIVE:\n");
-#endif
-
-
-    debug_print ("init_executive:\n");
-
-
-    // PCI - Pega informações da PCI.
-    // As informaçoes serao salvas em uma lista e usadas depois.
-    // por isso temos que sondar agora.
-    init_pci ();
-
-
-	// CLOCK - Pega informações de Hora e Data.
-    init_clock ();
-    get_cmos_info ();
-
-	//...
-
-
-	// #importante: 
-	// Só depois de inicializarmos o ata 'e que podemos carregar 
-	// alguma coisa.
-
-    debug_print ("init_executive: ataDialog\n");
-    ataDialog ( 1, FORCEPIO, FORCEPIO );
-
-	// ??
-	// configura a tabela do kernel de funções exportadas
-	// e tabela de ponteiros para tabelas dos outros programas em 
-	// kernel mode.
-    // Status = (int) executive_config_exported_functions();
-
-	//Continua ...
-    
-	// #todo: 
-	// Checar a validade de 'Initialization' ??
-
-	//#debug
-	//printf("Done!\n");
-
-    Initialization.executive = 1;
-
-    return (int) Status;
+    return NULL;
 }
 
 
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

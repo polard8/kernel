@@ -1,20 +1,7 @@
-/*
- * File: storage/volume.h
- *
- * DescriÁ„o:
- *     Gerenciador de volumes.
- *     Header para o Volume Manager.
- *     GerÍncia de volumes.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     2018 - Some new structures.
- */
 
 
 #ifndef  __VOLUME_H
 #define  __VOLUME_H    1
-
 
 #define VOLUME_COUNT_MAX 1024
 
@@ -64,10 +51,8 @@ int g_currentvolume_filesystem_type;   //use this one.
 
 
 // volume atual do tipo fat???
-// Se È fat32, 16, 12.
+// Se √© fat32, 16, 12.
 int g_currentvolume_fatbits;
-
-
 
 /*
  * volume_type_t:
@@ -79,22 +64,22 @@ typedef enum {
 
     VOLUME_TYPE_NULL, 
 
-    // PartiÁ„o em disco fÌsico.
+    // Parti√ß√£o em disco f√≠sico.
     VOLUME_TYPE_DISK_PARTITION,  
 
-    // PartiÁ„o em disco virtual.
+    // Parti√ß√£o em disco virtual.
     VOLUME_TYPE_VIRTUAL_DISK_PARTITION,  
 
     // Arquivo.
-    // Um arquivo qualquer. Sem formataÁ„o.
+    // Um arquivo qualquer. Sem formata√ß√£o.
     VOLUME_TYPE_RAW,           
 
     // Buffer.
-    // Um arquivo qualquer. Sem formataÁ„o.
+    // Um arquivo qualquer. Sem formata√ß√£o.
     // Usado por banco de dados.
     VOLUME_TYPE_BUFFER,
 
-    // PartiÁ„o de swap.
+    // Parti√ß√£o de swap.
     VOLUME_TYPE_SWAP
 
     //...
@@ -120,16 +105,15 @@ typedef enum {
 
 struct vbr_d
 {
-	//copiar mbr, È parecido;
+	//copiar mbr, √© parecido;
 }; 
 struct vbr_d *vbr; 
  
 
-
-
 /*
+ **************************************************
  * volume_d:
- *     Estrutura para acesso r·pido a volumes.
+ *     Estrutura para acesso r√°pido a volumes.
  *     Deve ser simples e com poucos elementos.
  */
 
@@ -154,7 +138,7 @@ struct volume_d
     char *cmd;
 
     //string usada no path para identificar o disco.
-    //isso n„o existe.
+    //isso n√£o existe.
     char path_string[32];  
 
     
@@ -163,7 +147,7 @@ struct volume_d
     struct thread_d *waiting;  //this thread is waiting.
 
     // This is the process that call the read/write operation on this volume.
-    // Qual processo est· usando.
+    // Qual processo est√° usando.
     pid_t pid;
     gid_t gid;
 
@@ -198,17 +182,17 @@ struct volume_d
 
 
     //#todo
-    // se est· funcionando ... se est· inicializado ...
+    // se est√° funcionando ... se est√° inicializado ...
     //int status;
     
     //#todo
-    // que tipo de operaÁ„o esta sendo realizada. ou nenhuma.
-    // se ele est· ocupoado o escretor ter· que esperar.
+    // que tipo de opera√ß√£o esta sendo realizada. ou nenhuma.
+    // se ele est√° ocupoado o escretor ter√° que esperar.
     //int state;
 
 
-    // Se È um volume virtual e precisa ser salvo
-    // pois houve uma modificaÁ„o.
+    // Se √© um volume virtual e precisa ser salvo
+    // pois houve uma modifica√ß√£o.
     int need_to_save;
 
     // #todo
@@ -228,9 +212,9 @@ struct volume_d
 };
 
 // #importante:
-// Esses s„o os trÍs volumes b·sicos do sistema 
-// mesmo que o disco sÛ tenha um volume, essas 
-// estruturas v„o existir.
+// Esses s√£o os tr√™s volumes b√°sicos do sistema 
+// mesmo que o disco s√≥ tenha um volume, essas 
+// estruturas v√£o existir.
 
 struct volume_d  *volume_vfs;             // volume 0
 struct volume_d  *volume_bootpartition;   // volume 1
@@ -242,29 +226,12 @@ struct volume_d  *volume_systempartition; // volume 2
 unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
-
 //
 // == prototypes ==========================================
 //
 
-//show info for all volumes in the list.
-void volume_show_info (void);
-
-void volumeShowCurrentVolumeInfo (void);
-
-void *volume_get_volume_handle( int number );
-
-void *volume_get_current_volume_info (void);
-
-int volumeShowVolumeInfo( int descriptor );
-
-int volume_init (void);
 
 
 #endif    
 
-
-//
-// End.
-//
 

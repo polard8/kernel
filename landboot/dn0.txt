@@ -1,0 +1,17 @@
+
+	bm.bin é feito em 16/32bit assembly.
+	bm.bin carrega bl.bin quando ainda esta em 16bit depois muda 
+	para 32bit e passa o comando para bl.bin.
+
+	bl.bin é feito em 32bit e ainda em 32bit ele deve carregar
+        o kernel que é um programa de 64bit. 
+        Ao fim de sua rotina em C 32bit ele faz as configurações
+        necessarias para entrar em 64bit. Poderá usar rotinas
+        em assembly 64bit. 
+        E por fim salta para o kernel de 64bit.
+
+        o bootloader esta carregando uma imagem fake de kernel
+        usando as rotinas de 32bit e depois mudara para longmode 
+       antes de saltar para o kernel
+
+	o kernel é um programa de 64bit puro

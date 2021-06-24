@@ -29,13 +29,28 @@ int rand (void)
 }
 
 
+// Supporting the services 808 e 809.
+int __ptsname (int fd, char *buf, size_t buflen)
+{
+     char *ptsname_buffer = (char *) buf;
+
+     char test_str[50] = "klibc-stdlib-__ptsname:";
+
+    // 64 bytes limit
+    strcpy ( ptsname_buffer, (const char *) test_str );
+    
+    // Lá na lib em ring3 a rotina retorna para o app o 
+    // ponteiro para o buffer
+    return 0;  //ok
+}
+
+
 /*
  // See: https://en.wikipedia.org/wiki/Slab_allocation
 void *slab_alloc (size_t size);
 void *slab_alloc (size_t size)
 {}
 */
-
 
 /* 
  *****************************************
@@ -63,7 +78,7 @@ void *kmalloc (size_t size){
     // Alocar memória no heap do kernel.
     // ps/x86/memory.c
     
-    h = (void *) heapAllocateMemory(s);
+    h = (void *) heapAllocateMemory (s);
 
     if ( (void *) h == NULL ){
         debug_print ("kmalloc: h\n");
@@ -73,7 +88,6 @@ void *kmalloc (size_t size){
     // Ok.
     return (void *) h; 
 }
-
 
 /*
  ************************************
@@ -106,8 +120,7 @@ void kfree (void *ptr){
     
     // ps/x86/memory.c
     FreeHeap (ptr);
-}
-
+}    
 
 /*
  * kcalloc: alloca e preenche com zero.
@@ -129,23 +142,11 @@ void *kcalloc (size_t count, size_t size)
 */
 
 
-// Supporting the services 808 e 809.
-int __ptsname (int fd, char *buf, size_t buflen)
-{
-     char *ptsname_buffer = (char *) buf;
-
-     char test_str[50] = "klibc-stdlib-__ptsname:";
-
-    // 64 bytes limit
-    strcpy ( ptsname_buffer, (const char *) test_str );
-    
-    // Lá na lib em ring3 a rotina retorna para o app o 
-    // ponteiro para o buffer
-    return 0;  //ok
-}
 
 
 
-//
-// End.
-//
+
+
+
+
+

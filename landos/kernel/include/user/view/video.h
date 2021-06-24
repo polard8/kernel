@@ -1,8 +1,4 @@
-
-// video.h 
-
-#ifndef ____X_VIDEO_H
-#define ____X_VIDEO_H    1
+// video.h
 
 // See:
 // http://www.brokenthorn.com/Resources/OSDevVid2.html
@@ -45,7 +41,6 @@
 	3DC Preset Light pen latch
 	3DF CRT/CPU page register (PCjr only)
 */ 
-
  
 /*
 MDA	B0000 to B0FFF	3B0 to 3BB
@@ -78,16 +73,18 @@ typedef struct _vbeInfoBlock {
 */
 
 
-//
-// == prototypes ===============================
-//
+#ifndef __VIDEO_H
+#define __VIDEO_H    1
 
-// ??
-// Where are the prototypes for video.c ?
-// Move them to this document.
 
+int videoInit (void);
+int videoVideo(void);
 int Video_initialize(void);
 
+unsigned long videoGetMode (void);
+void videoSetMode (unsigned long mode);
+
+void videoSetupCGAStartAddress (unsigned long address);
 
 #endif    
 

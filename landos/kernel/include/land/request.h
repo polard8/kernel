@@ -1,34 +1,3 @@
-/*
- * File: kernel/request.h 
- *
- * Descrição:
- *     ( Deferred Kernel Service )
- *     A execução de alguns serviços podem ser adiadas por um tempo
- * e depois atendidas por essa rotina.
- *
- *     Request manager.
- *     Header para a central de requests do kernel.
- *     Um request é uma forma de sinal, mas exclusivo para o kernel base.
- * Desse modo o kernel base pode notificado de eventos, assim como poderá
- * agendar ações.
- *     Um request pode ser enviado para o kernel base por ele mesmo ou 
- * por um processo. Porém ele não é atendido imediatamente, o kernel base
- * tem um momento ideal parafazer o tratamento de requests recebidos. Esse      
- * momento ideal é logo após a thread atual utilizar o processador durante 
- * todo o seu quantum.
- *
- * #importante:
- * Do mesmo modo isso pode ser usado para tratamento de eventos.
- * Ou seja, pouco antes de retornar de uma interrupção de tempo,
- * o kernel irá tratar os eventos(requests) pendentes.
- * + Que evento ocorreu ?
- * + Quem está esperando por esse tipo de evento ?
- *
- * History
- *     2015 - Created by Fred Nora.
- *     2016 ~ 2018 Revision.
- */
-
 
 #ifndef ____REQUEST_H 
 #define ____REQUEST_H    1
@@ -69,12 +38,9 @@
 
 // ...
 
-
 #define KERNEL_REQUEST_MAX 1024
 
-
 unsigned long kernel_request;
-
 
 /*
  *****************************************************
@@ -103,27 +69,26 @@ struct request_d
 	
 	int timeout;
 	
-	int target_pid;
-	int target_tid;
-	
-	
-	//
-	// Action support
-	//
-	
+    int target_pid;
+    int target_tid;
+
+//
+// Action support
+//
+
 	// basic
-	struct window_d *window;
+	//struct window_d *window;  //#todo
 	int msg;
 	unsigned long long1;
 	unsigned long long2;
-		
+
 	// extra	
 	unsigned long long3;
 	unsigned long long4;
 	unsigned long long5;
 	unsigned long long6;
 };
-struct request_d REQUEST;
+struct request_d  REQUEST;
 
 
 //
@@ -131,27 +96,7 @@ struct request_d REQUEST;
 //
 
 
-int request (void);
-
-int 
-create_request ( 
-    unsigned long number, 
-    int status, 
-    int timeout,
-    int target_pid,
-    int target_tid,
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-void clear_request (void);
-
-
 #endif    
 
 
-//
-// End.
-//
 

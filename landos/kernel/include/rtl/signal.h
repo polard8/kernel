@@ -1,35 +1,7 @@
-/*
- * File: signal.h
- * 
- * Descrição:
- *     C library signal support.
- *     Obs: @todo: O suporte à outros tipos de sinais além do padrão C devem
- * ir para outro arquivo.
- *
- *     Header para o Signal Manager.
- *     Um sinal é uma forma limitada de comunicação entre processos e entre 
- * threads.
- *     A característica mais importante de um sinal é que ele não envolve a
- * transferência de mensagem na forma de dados, apenas o sinal propriamente
- * dito.
- *     Um sinal pode interromper a ação de um processo ou thread.
- *     A execução pode ser interrompida em qualquer operação que não seja atômica. 
- *     Um processo pode registrar uma rotina de tratamento de sinal 
- * (signal handler em inglês) para tratar um determinado sinal, se não for 
- * desejado que a rotina padrão para este sinal seja executada.
- * Rotinas de tratamento de sinais podem ser instaladas através de 
- * chamada de sistema.
- * Se uma rotina de tratamento não é instalada para um determinado sinal, 
- * a rotina padrão é utilizada. Obs: Isso está me parecendo interrupções
- * de software.
- *
- * Obs: signal.h é um arquivo cabeçalho da biblioteca padrão da linguagem de programação C??
- * Obs:  PODEM SER IMPLMENTADOS POUCOS SINAIS, SEPARADOS EM CATEGORIAS.
- *
- * History:
- *      2016 - Created by Fred Nora.
- */
 
+
+#ifndef  __SIGNAL_H
+#define  __SIGNAL_H    1
 
 /*
 The C standard defines only 6 signals. 
@@ -41,7 +13,7 @@ SIGINT  - "interrupt", interactive attention request sent to the program.
 SIGSEGV - "segmentation violation, invalid memory access.
 SIGTERM - "terminate", termination request sent to the program. 
 */
- 
+
 /*
 Constante	Significado	Disponibilidade
 SIGHUP	Desconexão	POSIX	
@@ -69,7 +41,7 @@ SIGXCPU	Excedeu o tempo de CPU	POSIX
 SIGSTOP	Pausar execução	POSIX
 SIGCONT	Continuar execução	POSIX
 */ 
- 
+
 /*
 POSIX signals[edit]
 The list below documents the signals specified in the Single Unix Specification. All signals are defined as macro constants in <signal.h> header file. The name of the macro constant consists of a "SIG" prefix followed by a mnemonic name for the signal.
@@ -141,7 +113,6 @@ SIG_IGN	Ignore Signal: The signal is ignored.
 SIG_ERR	Special return value indicating failure.
 */
 
-
 /*
 #define SIGTERM //implementation defined
 #define SIGSEGV //implementation defined
@@ -164,7 +135,6 @@ C89/C90 standard (ISO/IEC 9899:1990):
 4.7 SIGNAL HANDLING <signal.h>
 */
 
-
 /*
 SIGABRT Encerramento anormal
 SIGFPE Erro de ponto flutuante
@@ -173,7 +143,6 @@ SIGINT Sinal de CTRL+C
 SIGSEGV Acesso ilegal ao armazenamento
 SIGTERM Solicitação de finalização
 */
-
 
 /*
 Comentários (microsoft)
@@ -195,78 +164,6 @@ Solicitação de término enviada ao programa. A ação padrão encerra o progra
 SIG_ERR
 Um tipo de retorno de um sinal que indica um erro ocorreu
 */
-
-//
-// Definições. padrão C.
-//
-
-
-//
-// #todo: 
-// Criar estrutura e objeto do tipo signal
-//
-
-
-//tipo.
-//sig_atomic_t
-
-
-//
-// Prototypes. padrão C.
-//
-
-//Set function to handle signal
-//sig Valor do sinal.
-//func Função a ser executada. O primeiro parâmetro é um valor de sinal e o 
-//segundo parâmetro é um subcódigo que pode ser usado quando o primeiro parâmetro é SIGFPE.
-//Valor Retornado
-//signal retorna o valor anterior func que está associado ao sinal especificado. 
-//Por exemplo, se o valor anterior de func era SIG_IGN, o valor de retorno também é SIG_IGN. 
-//Um valor de retorno de SIG_ERR indica um erro; nesse caso, errno é definido como EINVAL.
-
-
-//void (*signal(int sig, void (*func)(int)))(int);
-
-
-//Generates a signal
-//int raise(int sig);
-
-
-
-//=====================================================
-// Possíveis categorias de sinais para esse sistema:
-// Process/Thread
-// Nesse caso essas 3 estruturas teriam a o elemento 'signal;'
-//
-//	unsigned long signal;
-//	unsigned long signalMask;
-//
-// que receberiam sinais de todos os tipos.
-// Nesse caso não estamos falando de enfileiramento de sinais.
-// Obs: Os sinais do sistema gramado começariam em 1000 ... 1001 1002 ... 
-// Os outros sinais seriam os sinais padrão da linguagem C, posix e outros.
-//======================================================
-
-//
-//sinais para o sistema gramado.
-//
-
-//Sinais para a categoria Process.
-// GSIGP0 1000
-// GSIGP1 1001
-// GSIGP2 1002
-// GSIGP3 1003
-// GSIGP4 1004
-//...
-
-//Sinais para a categoria Thread.
-// GSIGT0 2000
-// GSIGT1 2001
-// GSIGT2 2002
-// GSIGT3 2003
-// GSIGT4 2004
-//...
-
 
 // Criando primeiro sinal para teste.
 #define SIGNULL  0
@@ -322,20 +219,11 @@ Um tipo de retorno de um sinal que indica um erro ocorreu
 #define NSIG       32
 
 
-//
-//==================================
-//
-//int	(*signal())();
-//#define	SIG_DFL	(int (*)())0
-//#define	SIG_IGN	(int (*)())1
-
-
 // #bugbug
 // where is thing was defined?
-#define SIG_DFL ((__sighandler_t)0)
-#define SIG_ERR ((__sighandler_t)-1)
-#define SIG_IGN ((__sighandler_t)1)
-
+//#define SIG_DFL ((__sighandler_t)0)
+//#define SIG_ERR ((__sighandler_t)-1)
+//#define SIG_IGN ((__sighandler_t)1)
 
 // Se precisar!!
 /*
@@ -345,8 +233,6 @@ typedef uint32_t sigset_t;
 typedef void siginfo_t;
 typedef uint32_t sig_atomic_t;
 */
-
-
 
 //#test
 //coloquei aqui pra compilar o lua.
@@ -360,16 +246,15 @@ typedef int  sig_atomic_t;
 typedef unsigned int  sigset_t;
 
 /* Type of a signal handler.  */
-typedef void (*sighandler_t)(int);
+//typedef void (*sighandler_t)(int);
 
-typedef sighandler_t __sighandler_t;
-typedef sighandler_t sig_t;
+//typedef sighandler_t __sighandler_t;
+//typedef sighandler_t sig_t;
 //...
 
 //
 //==============================
 //
-
 //============
 /* Type for data associated with a signal.  */
 /* Data passed with notification */
@@ -381,83 +266,8 @@ typedef union sigval {
 typedef sigval_t __sigval_t;
 //...
 
-//
-//==============================
-//
 
-struct sigevent 
-{
-    int          sigev_notify; /* Notification method */
-    int          sigev_signo;  /* Notification signal */
-
-    union sigval sigev_value;  /* Data passed with
-                                         notification */
-    void       (*sigev_notify_function) (union sigval);
-                            /* Function used for thread
-                               notification (SIGEV_THREAD) */
-    void        *sigev_notify_attributes;
-                            /* Attributes for notification thread
-                               (SIGEV_THREAD) */
-    pid_t        sigev_notify_thread_id;
-                           /* ID of thread to signal (SIGEV_THREAD_ID) */
-};
-
-
-//
-//==============================
-//
-
-
-typedef struct siginfo {
-    int      si_signo;     /* Signal number */
-    int      si_errno;     /* An errno value */
-    int      si_code;      /* Signal code */
-    int      si_trapno;    /* Trap number that caused hardware-generated signal (unused on most architectures) */
-    pid_t    si_pid;       /* Sending process ID */
-    uid_t    si_uid;       /* Real user ID of sending process */
-    int      si_status;    /* Exit value or signal */
-    clock_t  si_utime;     /* User time consumed */
-    clock_t  si_stime;     /* System time consumed */
-    sigval_t si_value;     /* Signal value */
-    int      si_int;       /* POSIX.1b signal */
-    void    *si_ptr;       /* POSIX.1b signal */
-    int      si_overrun;   /* Timer overrun count;
-                                         POSIX.1b timers */
-    int      si_timerid;   /* Timer ID; POSIX.1b timers */
-    void    *si_addr;      /* Memory location which caused fault */
-    long     si_band;      /* Band event (was int in
-                                         glibc 2.3.2 and earlier) */
-    int      si_fd;        /* File descriptor */
-    short    si_addr_lsb;  /* Least significant bit of address
-                                         (since Linux 2.6.32) */
-    void    *si_lower;     /* Lower bound when address violation
-                                         occurred (since Linux 3.19) */
-    void    *si_upper;     /* Upper bound when address violation
-                                         occurred (since Linux 3.19) */
-    int      si_pkey;      /* Protection key on PTE that caused
-                                         fault (since Linux 4.6) */
-    void    *si_call_addr; /* Address of system call instruction
-                                         (since Linux 3.5) */
-    int      si_syscall;   /* Number of attempted system call
-                                         (since Linux 3.5) */
-    unsigned int si_arch;  /* Architecture of attempted system call
-                                         (since Linux 3.5) */
-}siginfo_t ;
-
-
-//
-//==============================
-//
-
-typedef struct sigaction {
-
-    void  (*sa_handler)(int);
-    void  (*sa_sigaction)(int, siginfo_t *, void *);
-    sigset_t  sa_mask;
-    int  sa_flags;
-    void  (*sa_restorer)(void);
-
-}sigaction_t;
+// ...
 
 //
 //==============================
@@ -482,7 +292,6 @@ typedef struct sigaction {
 #define SA_NOMASK SA_NODEFER
 #define SA_ONESHOT SA_RESETHAND
 */
-
 
 /*
  * Flags for sigprocmask:
@@ -570,9 +379,23 @@ struct	sigcontext {
 
 
 
-//
-// End.
-//
+#endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

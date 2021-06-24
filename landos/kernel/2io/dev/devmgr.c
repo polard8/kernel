@@ -1,69 +1,6 @@
-/*
- * File: dev/devmgr.c 
- * 
- * Descrição: 
- *     Arquivo principal do device manager. 
- *     Device manager do kernel. 
- *
- * In shutdown process all devices need to be turnedoff.
- *
- * 2015 - Created by Fred Nora.
- */
 
 
-// #importante
-// Usado para gerenciar a tabela de montagem.
-// O nome do dispositivo é um pathname usado pelo
-// sistema de arquivos.
-// See: Olhar a estrutura de dispositivo 
-// e o elemento 'name'.
- 
- 
-#include <kernel.h>
-
-
-/*
-    As classes poderiam ter nomes amigáveis e 
-	respeitarem o nível de experiência do usuário:
-
-Iniciante:
-   +identificação do computador
-   +identificação do processador
-   +identificação da placa de video
-  
-Intermediário:
-   +identificação do computador
-   +identificação do processador
-   +identificação da placa de video
-   +identificação dos discos
-   
-Avançado:
-   +identificação do computador
-   +identificação do processador
-   +identificação da placa de video
-   +identificação dos discos
-   +identificação de componentes do sistema
-   +Outros (Todo o resto sistemicamente não importante)
-
-*/
-
-/*
-typedef enum {
-	device_class_null,
-	device_class_motherboard,
-	device_class_processors,
-	device_class_videocards,
-	device_class_disks,
-	device_class_systemcomponents,
-	device_class_others,
-}device_class_t;
-*/
-
-//Variáveis internas
-//int devicemanagerStatus;
-//int devicemanagerError;
-//...
-
+#include <kernel.h>  
 
 
 // Initialize the list.
@@ -75,7 +12,7 @@ int devmgr_init_device_list(void)
 
     for (i=0; i<DEVICE_LIST_MAX; i++)
     {
-        deviceList[i] = 0; 
+        deviceList[i] = 0;
     };
 
     //...
@@ -83,40 +20,57 @@ int devmgr_init_device_list(void)
     return 0;
 }
 
+// Show device list.
+void devmgr_show_device_list(void)
+{
+    struct device_d  *d;
+    register int i=0;
+
+
+    printf ("\n devmgr_show_device_list: \n");
+
+    for (i=0; i<DEVICE_LIST_MAX; ++i)
+    {
+        // Get the device structure.
+
+        d = ( struct device_d *) deviceList[i];
+
+        if ( (void *) d != NULL )
+        {
+            //dispositivo válido.
+            if ( d->used  == TRUE && 
+                 d->magic == 1234 )
+            {
+                //#todo: more ...
+                printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
+                    d->index, 
+                    d->__class, 
+                    d->type, 
+                    d->name,
+                    d->mount_point );  //#todo
+            }
+            
+            //printf (".");
+        }
+    };
+
+    printf ("Done\n");
+    refresh_screen();
+}
 
 /*
-// Mount a device into the deviceList[].
-// IN: Device id.
-struct device_d *do_mount (int dev);
-struct device_d *do_mount (int dev)
+ ********************************
+ * init_device_manager:
+ * 
+ */
+
+void init_device_manager (void)
 {
-    struct device_d *d;
-    
-    d = (struct device_d *) devmgr_device_object();
-    
-    if ( (void*) == NULL )
-       return (struct device_d *) 0;
-
-
-    //d->? = dev;
-    
-    return (struct device_d *) d;
+    debug_print ("init_device_manager:\n");
+ 
+    devmgr_init_device_list();
+    //...
 }
-*/
-
-
-
-
-/*
-// Mount root device.
-int mount_root (void);
-int mount_root (void)
-{
-   return -1;
-}
-*/
-
-
 
 // OUT: 
 // A pointer to a void mounted device.
@@ -155,10 +109,9 @@ struct device_d *devmgr_device_object (void){
                  panic ("devmgr_device_object: [ERROR] d\n"); 
              }
 
-             d->index = i;
-
              d->used  = TRUE;
              d->magic = 1234;
+             d->index = i;
 
              //#todo
              //d->name 
@@ -181,8 +134,6 @@ struct device_d *devmgr_device_object (void){
     panic ("devmgr_device_object: [FAIL] Overflow!\n");
     //return NULL;
 }
-
-
 
 // ==============
 // registrando um dispositivo dado o ponteiro para o arquivo
@@ -318,62 +269,15 @@ devmgr_register_device (
 }
 
 
-// Show device list.
-void devmgr_show_device_list(void)
-{
-    struct device_d *d;
-    register int i=0;
-
-
-    printf ("\n devmgr_show_device_list: \n");
-
-    for (i=0; i<DEVICE_LIST_MAX; ++i)
-    {
-        // Get the device structure.
-
-        d = ( struct device_d *) deviceList[i];
-
-        if ( (void *) d != NULL )
-        {
-            //dispositivo válido.
-            if ( d->used  == TRUE && 
-                 d->magic == 1234 )
-            {
-                //#todo: more ...
-                printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
-                    d->index, 
-                    d->__class, 
-                    d->type, 
-                    d->name,
-                    d->mount_point );  //#todo
-            }
-            
-            //printf (".");
-        }
-    };
-
-    printf ("Done\n");
-    refresh_screen();
-}
-
-
-/*
- ********************************
- * init_device_manager:
- * 
- */
-
-void init_device_manager (void)
-{
-    debug_print ("init_device_manager:\n");
- 
-    devmgr_init_device_list();
-    //...
-}
 
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
 

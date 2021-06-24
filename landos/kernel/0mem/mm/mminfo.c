@@ -6,14 +6,36 @@
  * Testes para mostrar informações.
  */
 
+#include <kernel.h>  
 
-#include <kernel.h>
-
-
-
-void mmShowPDE (int index, unsigned long pd_va)
+void mmShow_PML4Entry (int index, unsigned long pml4_va)
 {
+
+    // #fixme:
+    // 9 9 9 9 12
+    // Agora as tabelas possuem 512 entradas,
+    // pois é isso o que dá pra ter com apenas 9 bits.
+
+
+    // pd address.
+    unsigned long pd_va=0;
+
+
 	//#todo: filtros.
+
+
+    // #todo
+    debug_print("mmShow_PML4Entry: [TODO]\n");
+    return;
+
+	if (pml4_va == 0)
+		return;
+
+
+//
+// pd
+//
+
 
 	if (pd_va == 0)
 		return;
@@ -26,7 +48,6 @@ void mmShowPDE (int index, unsigned long pd_va)
     if (index < 0)
         return;
 
-    // dir
 
     unsigned long value = dir[index];
 
@@ -34,7 +55,9 @@ void mmShowPDE (int index, unsigned long pd_va)
 	printf (" DirEntry %d = %x ", index, (unsigned long) value );
 	
 
-    // pt
+//
+// pt
+//
 
 	//12 bit de flags     1000 0000 0000
 	unsigned long pt_address = (unsigned long) (value & 0xFFFFF800);
@@ -45,39 +68,6 @@ void mmShowPDE (int index, unsigned long pd_va)
 	//primeira entrada da pt.
 	printf (" PT_Entry_0 = %x \n", (unsigned long) pt[0] );	
 }
-
-
-void mmShowPDEForAllProcesses (int entry_number){
-
-    struct process_d  *p;
-    int i=0;
-
-    printf ("mmShowPDEForAllProcesses:\n");
-
-    // #todo
-    if (entry_number < 0 || entry_number >= 1024 )
-        return;
-
-
-    for ( i=0; i<111; i++)
-    {
-        p = (struct process_d *) processList[i];
-
-        if ( (void *) p != NULL )
-        {
-
-            // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
-            if ( p->DirectoryVA != 0 )
-            {
-                printf ("Process %d: ", i);
-                mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
-            }
-        }
-    };
-
-    refresh_screen();
-}
-
 
 /*
  ************************************
@@ -288,6 +278,68 @@ void memoryShowMemoryInfo (void){
 	//...
 }
 
+void mmShowPML4EntryForAllProcesses (int entry_number){
+
+    struct process_d  *p;
+    int i=0;
+
+    printf ("mmShowPML4EntryForAllProcesses:\n");
+
+    if (entry_number < 0 || entry_number >= 512 )
+        return;
+
+    for ( i=0; i<111; i++)
+    {
+        p = (struct process_d *) processList[i];
+
+        if ( (void *) p != NULL )
+        {
+
+            // #fixme
+
+            // Mostra a entrada 1, que se refere ao endereço lógico 0x400000
+            //if ( p->DirectoryVA != 0 )
+            //{
+            //    printf ("Process %d: ", i);
+            //    mmShowPDE ( entry_number, (unsigned long) p->DirectoryVA );
+            //}
+        }
+    };
+
+    refresh_screen();
+}  
+
+// Mostra as estruturas de pagina 
+// usadas para paginação no pagedpool.
+
+void showFreepagedMemory ( int max ){
+
+    struct page_d  *p;
+    int i=0;
+
+
+    if (max < 0 || max >= 512 )
+        return;
+
+
+    for ( i=0; i < max; i++ )
+    {  
+        p = (void *) pageAllocList[i]; 
+
+		//if ( (void *) p == NULL )
+		//{
+		//    printf("null\n");	 
+		//}
+
+        if ( (void *) p != NULL ){
+            printf ("id=%d free=%d frameno=%d ref=%d \n", 
+                p->id, p->free, p->frame_number, p->ref_count );
+        }
+    };
+
+    refresh_screen();
+}  
+
 
 /*
  ********************************************************
@@ -309,9 +361,9 @@ void memoryShowMemoryInfo (void){
   *refresh screen
  */
 
-void show_memory_structs (void){
-
-    struct mmblock_d *B;
+void show_memory_structs (void)
+{
+    struct mmblock_d  *B;
     int i = 0;
 
 
@@ -329,7 +381,7 @@ void show_memory_structs (void){
         {
             if ( B->Used == 1 && B->Magic == 1234 )
             {
-                kprintf ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
+                printf ("Id={%d} Header={%x} userA={%x} Footer{%x}\n",
                     B->Id, B->Header, B->userArea, B->Footer );
             }
             //Nothing.
@@ -345,133 +397,23 @@ void show_memory_structs (void){
 	// engessada.
 	
 	//More?!
-}
+}  
 
 
-/*
- * testingPageAlloc:
- *     Rotina de teste. 
- */ 
-
-void testingPageAlloc (void){
-
-    int Index=0;
-    struct page_d *p;
-
-    void *RetAddress;
-    unsigned long fileret=0;
-
-
-	//#bugbug .;;;: mais que 100 dá erro ...
-	//@todo: melhorar o código de alocação de páginas.
-	//printf("testingPageAlloc: #100\n");
-    printf ("testingPageAlloc:\n");
-
-
-	//
-	// =============================================
-	//
-	
-	// #test:
-	// Funcionou com 500.
-    //Ret = (void*) allocPages(500);  
-	
-	//8KB. Para imagem pequena.
-	unsigned long tmp_size = (2*4096);
-	RetAddress = (void *) allocPages (2); 
-
-    if ( (void *) RetAddress == NULL ){
-        printf ("RetAddress fail\n");
-        goto fail;
-    }
-
-	//printf ("BaseOfList={%x} Showing #32 \n", RetAddress );
-    
-	// show info.
-
-    for ( Index=0; Index < 32; Index++ ) 
-    {  
-        p = (void *) pageAllocList[Index]; 
-		
-		if ( (void *) p == NULL ){ printf("null\n"); }
-
-		if ( (void *) p != NULL ){
-		    printf ("id={%d} used={%d} magic={%d} free={%d} handle={%x} next={%x}\n", 
-				p->id, p->used, p->magic, p->free, p, p->next ); 	
-		}
-    };
-
-
-    //===================================
-
-    fileret = fsLoadFile (  
-                  VOLUME1_FAT_ADDRESS, 
-                  VOLUME1_ROOTDIR_ADDRESS, 
-                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries. 
-                  "BMP1    BMP", 
-                  (unsigned long) RetAddress,
-                  tmp_size ); 
-
-    if (fileret != 0){
-		printf ("BMP1    BMP FAIL\n");
-		//escrevendo string na janela
-	    //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "DENNIS  BMP FAIL");
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "FERRIS  BMP FAIL");
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GOONIES BMP FAIL");	
-        //draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "GRAMADO BMP FAIL");
-		//draw_text( gui->main, 10, 500, COLOR_WINDOWTEXT, "BMP1    BMP FAIL");
-    }else{
-        bmpDisplayBMP ( (char *) RetAddress, 20, 20 );	
-        refresh_rectangle ( 20, 20, 16, 16 );
-    };
-    //===================================	
-
-    panic ("mminfo-testingPageAlloc: *hang\n");
-
-done:
-  // Nothing for now.
-fail:
-    refresh_screen ();
-    return;
-}
-
-
-// Mostra as estruturas de pagina 
-// usadas para paginação no pagedpool.
-
-void showFreepagedMemory ( int max ){
-
-    struct page_d  *p;
-    int i=0;
-
-
-    if (max < 0 || max >= 1024 )
-        return;
-
-
-    for ( i=0; i < max; i++ )
-    {  
-        p = (void *) pageAllocList[i]; 
-
-		//if ( (void *) p == NULL )
-		//{
-		//    printf("null\n");	 
-		//}
-
-        if ( (void *) p != NULL ){
-            printf ("id=%d free=%d frameno=%d ref=%d \n", 
-                p->id, p->free, p->frame_number, p->ref_count );
-        }
-    };
-
-    refresh_screen ();
-}
+void testingPageAlloc (void)
+{
+    // #todo
+}     
 
 
 
 //
 // End.
 //
+
+
+
+
 
 
 

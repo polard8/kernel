@@ -1,43 +1,6 @@
-/*
- * File: dtext.c
- *
- * Descrição:
- *     Escreve um texto dentro de uma janela.
- *     Faz parte do módulo Window Manager do tipo MB.
- *
- * 2015 - Created by Fred Nora.
- */
-
 
 #include <kernel.h>
 
-
-/* 
- * draw_text:
- *     Draw text on a window.
- *
- * #test: 
- *     Como opção, se nenhuma janela for especificada, 
- *     então pintaremos na janela principal.
- */
-
-void 
-draw_text ( 
-    struct window_d *window,
-    unsigned long x,
-    unsigned long y,
-    unsigned long color,
-    unsigned char *string )
-{ 
-
-    if ( (void *) window == NULL ){
-        draw_string ( gui->main->left +x, gui->main->top +y, color, string );
-        return;
-        
-    }else{
-        draw_string ( window->left +x, window->top +y, color, string );
-    };
-}
 
 
 /* 
@@ -49,22 +12,42 @@ void
 draw_string ( 
     unsigned long x,
     unsigned long y,
-    unsigned long color,
+    unsigned int color,
     unsigned char *string )
 {
 
     // loop
     register int Index=0;
 
+   //int cWidth = 8;
     int cWidth = get_char_width ();
     //int cHeight = get_char_height ();
 
 
+
     //if ( cWidth == 0 || cHeight == 0 )
     if ( cWidth == 0 ){
-        panic ("dtext-draw_string: cWidth");
+        debug_print("dtext-draw_string: cWidth\n");
+        //panic ("dtext-draw_string: cWidth\n");
+        //panic ("dtext-draw_string: cWidth\n");
+        return;
     }
-    
+
+    /*
+    if ( (void *) string == NULL ){
+        debug_print("dtext-draw_string: string\n");
+        //panic ("dtext-draw_string: string\n");
+        //panic ("dtext-draw_string: string\n");
+        return;
+    }
+    if ( *string == 0  ){
+        debug_print("dtext-draw_string: *string\n");
+        //panic ("dtext-draw_string: *string\n");
+        //panic ("dtext-draw_string: *string\n");
+        return;
+    }
+    */
+
     // #bugbug
     // There is something not good with this routine.
     
@@ -76,8 +59,44 @@ draw_string (
     };
 }
 
+void x_panic( char *string )
+{
+    drawDataRectangle( 0, 0, 200, 28, COLOR_RED );
+    my_buffer_horizontal_line( 0, 28, 200, COLOR_YELLOW );
 
-//
-// End.
-//
+    // string 1
+    draw_string(8,8,COLOR_WHITE,"x_panic: ");
+
+    // string2
+    if( (void*) string != NULL ){
+        draw_string(80,8,COLOR_WHITE,string);
+    }
+
+//done:
+    refresh_screen();
+    while(1){ asm("cli"); asm("hlt"); };
+}
+
+
+void xxxDrawString( char *string )
+{
+/*
+    drawDataRectangle( 0, 0, 200, 28, COLOR_RED );
+    my_buffer_horizontal_line( 0, 28, 200, COLOR_YELLOW );
+
+    // string 1
+    draw_string(8,8,COLOR_WHITE,"string: ");
+
+    // string2
+    if( (void*) string != NULL ){
+        draw_string(80,8,COLOR_WHITE,string);
+    }
+
+//done:
+    refresh_screen();
+    //while(1){ asm("cli"); asm("hlt"); };
+*/
+}
+
+
 

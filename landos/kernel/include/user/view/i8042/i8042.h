@@ -4,7 +4,6 @@
 #ifndef ____I8042_H
 #define ____I8042_H    1
 
-
 //Initialising the PS/2 Controller (OSDev Wiki)
 //Step 1: Initialise USB Controllers
 //Step 2: Determine if the PS/2 Controller Exists
@@ -70,7 +69,6 @@
 #define I8042_TEST_SECOND_PORT_DATA_LOW    0x03  //data line stuck low
 #define I8042_TEST_SECOND_PORT_DATA_HIGH   0x04  //data line stuck high
 
-
 // Configuration Byte
 //Bit  Meaning
 //0	   First PS/2 port interrupt (1 = enabled, 0 = disabled)
@@ -101,7 +99,6 @@
 // == prototypes ==================
 //
 
-
 void I8042Controller_do_drain(void);
 
 void prepare_for_input (void);
@@ -111,12 +108,22 @@ unsigned char wait_then_read (int port);
 void wait_then_write ( int port, int data );
 
 
-#endif   
+#endif    
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

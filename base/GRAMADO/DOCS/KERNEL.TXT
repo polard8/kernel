@@ -1,7 +1,0 @@
-	Where the kernel starts?
-
-    x86:
-        1) kernel/1pump/arch/x86/pumpcore/head_32.asm
-        2) kernel/0mem/main.c
-        3) kernel/1pump/arch/x86/x86init.c
-

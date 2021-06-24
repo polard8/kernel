@@ -1,5 +1,0 @@
-
-Initializing a client application.
-
-Now, in a client application, the connection is done simply calling the function gws_open_display(), just like XOpenDisplay() in x window system.
-The function will create a socket, connect with the window server and return a display structure with all the information we need about the connection.

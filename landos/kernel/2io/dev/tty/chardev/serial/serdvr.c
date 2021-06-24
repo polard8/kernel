@@ -1,3 +1,0 @@
-
-// #todo
-// serial device driver.

@@ -1,32 +1,16 @@
-/*
- * File: system.h (System Management)
- *
- * DescriÁ„o:
- *     Header para rotinas de gerenciamento do sistema dentro do mÛdulo 
- * executive do kernel.
- *     O subsistema recebe as chamadas dos programas que est„o em use mode. 
- * … a porta de entrada para o kernel.
- *
- * Obs:
- *     Lembrando que o sistema compreende o Boot, Kernel e User.
- *
- * @todo:
- *     todos os serviÁos oferecidos est„o nos 
- *     arquivos principais dos mÛdulos hal microkernel e executive
- *     e comeÁam com 'sys_'.
- *
- * History:
- *     2015 - Created by Fred Nora.
- */
+
+
+#ifndef __SYSTEM_H
+#define __SYSTEM_H    1
+
 
 
 int current_taskman_server; 
 
-
 // getpid_t:
-//     Õndices usados pela funÁ„o gde_get_pid(x)
+//     √çndices usados pela fun√ß√£o gde_get_pid(x)
 //     Usada para obter o pid de alguns drivers e servidores
-// do sistema. Aqueles servidores que sÛ podem ter um do tipo 
+// do sistema. Aqueles servidores que s√≥ podem ter um do tipo 
 // rodando ao mesmo tempo.
 
 typedef enum {
@@ -38,7 +22,6 @@ typedef enum {
 
 }getpid_t;
 
-
 //
 // ## sys storage support ##
 //
@@ -46,11 +29,10 @@ typedef enum {
 int system_disk;
 int system_volume; 
 
-
 //======================================== 
-//Esses s„o os principais arquivos usandos na 
-//inicializaÁ„o do sistema. 
-//Obs: No fat16 eles se apresentam em mai˙sculas.
+//Esses s√£o os principais arquivos usandos na 
+//inicializa√ß√£o do sistema. 
+//Obs: No fat16 eles se apresentam em mai√∫sculas.
 //#define INITTXT_PATH  "/root/init.txt"
 //#define BM_PATH       "/root/bm.bin"
 //#define BL_PATH       "/root/bl.bin"
@@ -66,36 +48,38 @@ int system_volume;
 #define SYSTEMMODE_TERMINAL 1
 int g_system_mode;  //terminal ou edibox. 
 
-
-// IdentificaÁ„o do processo que est· efetuando logon e 
-// identificaÁ„o do processo que est· efetuando logoff.
+// Identifica√ß√£o do processo que est√° efetuando logon e 
+// identifica√ß√£o do processo que est√° efetuando logoff.
 // Precisamos registrar o processo que efetuou logon.
-// ?? Porque eu ainda n„o sei.
+// ?? Porque eu ainda n√£o sei.
 // Uma rotina de registro de processo de logon 
-// ser· oferecida para processos em user mode,
-// È necessario enviar uma flag de seguranÁa,
+// ser√° oferecida para processos em user mode,
+// √© necessario enviar uma flag de seguran√ßa,
 // pode ser um magic number ...
-// ent„o esse proecesso ter· direito de efetuar o logon 
-// se tiver privilÈgios v·lidos em sua estrutura.
+// ent√£o esse proecesso ter√° direito de efetuar o logon 
+// se tiver privil√©gios v√°lidos em sua estrutura.
 // logo em seguida registraremos qual foi o processo 
-// que efetuou logon. Outro processo n„o poder· 
-// efetuar logon durante aquela sess„o.
-// Caso semelhante È o logoff. O processo dever· 
-// enviar uma flag de seguranÁa e ter atributos v·lidos 
+// que efetuou logon. Outro processo n√£o poder√° 
+// efetuar logon durante aquela sess√£o.
+// Caso semelhante √© o logoff. O processo dever√° 
+// enviar uma flag de seguran√ßa e ter atributos v√°lidos 
 // para efetuar o logoff.
 
+// #todo
+// Isso pode ir pra outro arquivo,
+// tem um s√≥ pra pids.
 int gLogonPID;
 int gLogoffPID;
- 
- 
+
+
 /*
  * Abaixo temos uma lista de variaveis de ambiente usadas
- * pelo sistema, comeÁadas com SYSTEM_.
+ * pelo sistema, come√ßadas com SYSTEM_.
  */ 
 
 /*
  * Disks
- *    Discos fÌsicos   
+ *    Discos f√≠sicos   
  */
 #define SYSTEM_DISK0  "/disk0" 
 #define SYSTEM_DISK1  "/disk1"
@@ -106,12 +90,12 @@ int gLogoffPID;
 
 /*
  * Volumes
- *    Cada partiÁ„o È um volume.
+ *    Cada parti√ß√£o √© um volume.
  *    Um volume pode ocupar mais de um disco. 
  */
 #define SYSTEM_VOLUME0  "/volume0"   //vfs
-#define SYSTEM_VOLUME1  "/volume1"   //partiÁ„o de boot
-#define SYSTEM_VOLUME2  "/volume2"   //partiÁ„o do sistema.
+#define SYSTEM_VOLUME1  "/volume1"   //parti√ß√£o de boot
+#define SYSTEM_VOLUME2  "/volume2"   //parti√ß√£o do sistema.
 #define SYSTEM_VOLUME3  "/volume3"   //??indefinido.
 
 #define VHS_VOLUME    SYSTEM_VOLUME0
@@ -123,27 +107,26 @@ int gLogoffPID;
 #define SYSTEM_ROOT      "root:/"
 #define SYSTEM_ROOTDIR   SYSTEM_ROOT      
 
-
 /*
  * /disk0
- *     Esse ser· sempre o disco principal.
- *     Lista de diretÛrios dentro do disco principal.
+ *     Esse ser√° sempre o disco principal.
+ *     Lista de diret√≥rios dentro do disco principal.
  */
  
 //
-// Obs: Isso s„o opÁıes ainda n„o definidas.
+// Obs: Isso s√£o op√ß√µes ainda n√£o definidas.
 // 
  
 //principais.  
-#define SYSTEM_GUSERS    "/user"    // (os perfis de usu·rio ficar„o aqui.)
-#define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMAR√O OS PROGRAMAS QUE EST√O AQUI.
-#define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPOR¡RIOS
+#define SYSTEM_GUSERS    "/user"    // (os perfis de usu√°rio ficar√£o aqui.)
+#define SYSTEM_GCMD      "/cmd"      //COMANDO USADOS PELO SHELL CHAMAR√ÉO OS PROGRAMAS QUE EST√ÉO AQUI.
+#define SYSTEM_GTMP      "/tmp"      //ARQUIVOS TEMPOR√ÅRIOS
 #define SYSTEM_GDOWNLOAD "/download"  //DOWNLOADS
 
-//secund·rios.
+//secund√°rios.
 #define SYSTEM_GBUILD    "/gbuild"   //Build
 #define SYSTEM_GDOCS     "/gdocs"    //Docs
-#define SYSTEM_GRAMADO   "/gramado"  //System (aqui ficar„o os bin·rios dos programas, em pastas)
+#define SYSTEM_GRAMADO   "/gramado"  //System (aqui ficar√£o os bin√°rios dos programas, em pastas)
 #define SYSTEM_GSDK      "/gsdk"     //SDK 
 #define SYSTEM_GSRC      "/gsrc"     //Source 
 
@@ -157,8 +140,8 @@ int gLogoffPID;
 #define SYSTEM_IDLE     "/IDLE.BIN"
 #define SYSTEM_TASKMAN  "/TASKMAN.BIN"
 #define SYSTEM_SHELL    "/SHELL.BIN"
-#define SYSTEM_INIT     "/INIT.TXT"   // CONFIGURA«’ES DE INICIALIZA«√O.
-#define SYSTEM_SWAP     "/SWAP.BIN"   // (ARQUIVO DE PAGINA«√O)
+#define SYSTEM_INIT     "/INIT.TXT"   // CONFIGURA√á√ïES DE INICIALIZA√á√ÉO.
+#define SYSTEM_SWAP     "/SWAP.BIN"   // (ARQUIVO DE PAGINA√á√ÉO)
 //...
 
  
@@ -175,7 +158,7 @@ int gLogoffPID;
 
 //Media.
 #define SYSTEM_MEDIADISK    "MEDIA=/disk(0000)"
-#define SYSTEM_MEDIAVOLUME  "MEDIA=/volume(0000)"    //PartiÁ„o.
+#define SYSTEM_MEDIAVOLUME  "MEDIA=/volume(0000)"    //Parti√ß√£o.
 //...
  
 //
@@ -192,7 +175,7 @@ int gLogoffPID;
 
 //
 // #todo: 
-// Continuar criando vari·veis de ambiente.
+// Continuar criando vari√°veis de ambiente.
 //
 
 //...
@@ -232,7 +215,7 @@ int gLogoffPID;
 
 #define SS_NULL          0  
 #define SS_LOGGED        1  //estamos logados.?
-#define SS_USING_GUI     2  // estamos no modo gr·fico?
+#define SS_USING_GUI     2  // estamos no modo gr√°fico?
 #define SS_KERNELSTATUS  3  //
 //Continua ...
 //@todo.
@@ -261,14 +244,13 @@ typedef enum {
     systemsizeFull,  //     O sistema tem pelo menos 288 MB	
 }system_size_t;
 
-
-//?? rever esse coment·rio.
-// Aqui salvaremos o n˙mero que identifica o tipo de sistema dado o tamanho.
-// Se o sistema tiver 288 MB ou mais ent„o ele ser· do tipo Full
-// e conter· 8 bancos de memÛria de 32Mb mais uma user session de tamnaho variado.
+//?? rever esse coment√°rio.
+// Aqui salvaremos o n√∫mero que identifica o tipo de sistema dado o tamanho.
+// Se o sistema tiver 288 MB ou mais ent√£o ele ser√° do tipo Full
+// e conter√° 8 bancos de mem√≥ria de 32Mb mais uma user session de tamnaho variado.
 int systemSize;
 
-//Flag para habilitar as opÁıes para o desenvolvedor.
+//Flag para habilitar as op√ß√µes para o desenvolvedor.
 int gDeveloperOptions;
 
 // ??
@@ -280,28 +262,26 @@ int gSystemStatus; //?? Usado pelo construtor.
 // Shutdown support 
 //
 
-//Salvar aqui o endereÁo da rotina do BM que desliga a m·quina via APM.
-//O endereÁo e a rotina s„o de 32bit.
+//Salvar aqui o endere√ßo da rotina do BM que desliga a m√°quina via APM.
+//O endere√ßo e a rotina s√£o de 32bit.
 unsigned long shutdown_address;
 
 static char *default_user_name = DEFAULT_USERNAME;
 
-
-
 /*
  * version_d:
- *     Estrutura para vers„o do sistema.    
- *     O que determina a vers„o do sistema È a vers„o do Kernel.
+ *     Estrutura para vers√£o do sistema.    
+ *     O que determina a vers√£o do sistema √© a vers√£o do Kernel.
  *
  * @todo: 
  *     Usar apenas esses 4 elementos.
- *     Dados complementares sobre a vers„o devem ficar 
+ *     Dados complementares sobre a vers√£o devem ficar 
  *     na estrutura versioninfo.
  *
  * Obs: Talvez usar um header. version.h.
  * #bugbug: 
- * J· tem version_t tefinida em algum lugar.
- *         Aparentemente n„o deu mais problema. 
+ * J√° tem version_t tefinida em algum lugar.
+ *         Aparentemente n√£o deu mais problema. 
  */
 
 struct version_d
@@ -313,17 +293,16 @@ struct version_d
 struct version_d *Version;
 //...
 
-
 /*
  * version_info_d:
- *     Dados complemetares sobre a vers„o.
+ *     Dados complemetares sobre a vers√£o.
  */
 
 struct version_info_d
 {
     struct version_d *version;
 
-    char *string;             //String para o nome da vers„o "VERSION..."
+    char *string;             //String para o nome da vers√£o "VERSION..."
     char *copyright_string;   //"ex: (c) Copyright Nora Code"
     // ...
 };
@@ -334,9 +313,9 @@ struct version_info_d *VersionInfo;
 /*
  * system_d:
  *     System information structure:
- *     Essa estrutura guarda as informaÁıes gerais sobre o sistema.
+ *     Essa estrutura guarda as informa√ß√µes gerais sobre o sistema.
  *     Guarda ponteiros para as principais estruturas do sistema, 
- * desde informaÁıes de boot, atÈ informaÁıes seÁıes de usu·rios.
+ * desde informa√ß√µes de boot, at√© informa√ß√µes se√ß√µes de usu√°rios.
  * 
  */
 
@@ -359,8 +338,8 @@ struct system_d
     int NumberOfProcessors;
     int PageSize;
 
-
-    struct devices_d *deviceList;
+    // #todo
+    //struct devices_d *deviceList;
 
     //...
 };
@@ -373,124 +352,29 @@ struct system_d *System;
 //
 
 
-void servicesPutChar(int c);
-
-unsigned long serviceCreateWindow ( char * message_buffer );
- 
-
-
-/*
- * SendMessage:
- *     Envia mensagem para um procedimento de janela.
- */
- 
-unsigned long 
-SendMessage ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-
-
-// System Server support.
-int init_systemserver (void);
-
-
-//Metodo nulo.
-//Pode ser usado em di·logos.
-void *systemNull (void);  
-
-	
-/*
- *******************************************************
- * systemLinkDriver:
- *     Linkando um driver ao sistema operacional
- */
- 
-void *systemLinkDriver ( 
-    unsigned long arg1, 
-    unsigned long arg2, 
-    unsigned long arg3 );
- 
- 
-/*
- **********************************************************
- * systemShowDevicesInfo:
- *     Mostrar informaÁıes sobre o sistema, seguindo a ordem de
- *     velocidade dos dispositivos e barramentos.
- *     Ex: CPU, MemÛria, PCIE (video), South Bridge, Super Io ...
- *     Apresentar em ordem alfabÈtica.
- */
- 
-void systemShowDevicesInfo (void);
-
-
-
-void systemSetupVersion (void); 
-
-
-
-/*
- * SystemMenu: 
- * System Menu para manipular a janela ativa.
- * Interface que chama o control menu da janlea ativa.
- */
-
-int SystemMenu (void);
-
-
-
-/*
- ************************************* 
- * system_get_pid: 
- *     A api solicita o pid de alguns servidores e drivers.
- * 
- */ 
 int system_get_pid (int index);
+void systemShutdownViaAPM (void);
+void systemShutdown (void);
+void systemShowDevicesInfo (void);
+void systemSetupVersion (void);
+void systemReboot (void);
+void *systemNull (void);
+
+#endif    
 
 
-/*
- ************************************* 
- * systemGetSystemMetrics: 
- *     A api solicita algumas informaÁıes de mÈtrica de sistema.
- * 
- */ 
-unsigned long systemGetSystemMetrics ( int index );
- 
-
-/*
- * SystemMenuProcedure:
- *     O procedimento do Control Menu principal.
- *     Menu do sistema, manipula a janela ativa.
- */
- 
-unsigned long 
-SystemMenuProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-   
-
-void systemReboot (void);    //systemReboot: Reboot stuff.
-
-void systemShutdown (void);      //systemShutdown: Shut down stuff.
-
-//Chamar a funÁ„o de 32 bit herdado do BM.
-void systemShutdownViaAPM (void); 
 
 
-//Pega informaÁıes de medida de elementos do sistema.
-void *systemGetSystemMetric(int number);
-
-//Pega informaÁıes de status de elementos do systema.
-void *systemGetSystemStatus(int number);
 
 
-int init_executive (void);
 
 
-//
-// End
-//
+
+
+
+
+
+
+
+
+

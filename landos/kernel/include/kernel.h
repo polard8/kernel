@@ -1,12 +1,5 @@
-/*
- * File: kernel.h
- * 
- *     This is the main header for the bse kernel.
- * 
- * History:
- *     2013 - Created by Fred Nora.
- *     2014~2018 - Resision.
- */
+// kernel.h
+// proting from Gramado.
 
 
 //
@@ -82,23 +75,14 @@ struct io_control_d  IOControl;
 // ...
 
 
+// Importados de bl64.
+// See: main.c
+unsigned long SavedLFB;
+unsigned long SavedX;
+unsigned long SavedY;
+unsigned long SavedBPP;
 
 
-//
-// Externs.
-//
-
-//Stack for fome threads in kernel mode. 
-extern unsigned long task0_stack;
-extern unsigned long task1_stack;
-extern unsigned long task2_stack;
-extern unsigned long task3_stack;
-extern unsigned long stack0_krn_ptr;
-// ...
-
-
-//#test 
-//typedef int (*fn_ptr)();
 
 
 // =========================================================
@@ -124,8 +108,11 @@ extern unsigned long stack0_krn_ptr;
 #include "land/0globals/gobject.h"
 #include "land/0globals/gspin.h"
 #include "land/0globals/ginput.h"  // input manager support.
-#include "land/0globals/gwd.h"     // whatch dogs
+#include "land/0globals/gwd.h"     // whatch dogs.
 
+
+//#test
+#include "rtl/stdarg.h"
 
 // rtl 
 // Inside the base kernel
@@ -148,28 +135,17 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/termios.h"
 #include "rtl/ttydef.h"
 
-
-
 // memory management support.
 #include "land/mm/mm.h"
 #include "land/mm/memmap.h" 
 #include "land/mm/intelmm.h"
 
 
-// rawgr -
-// #view presentation output.
-#include "user/view/display.h"
+
 #include "user/view/screen.h"
-#include "user/view/video.h"
 
-// Render
-#include "user/render/r_render.h"
-
-
-// #model. data model.
 #include "user/model/fonts.h"
 #include "user/model/ascii.h" 
-
 
 // fs
 #include "rtl/fs/path.h"       // path.
@@ -177,31 +153,13 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/fs/fat_lfn.h"    // fat16 lfn.
 #include "rtl/fs/inode.h"
 #include "rtl/fs/exec_elf.h"
-#include "rtl/fs/pipe.h" 
 #include "rtl/fs/fs.h"
-#include "rtl/fs/vfs.h"
-
-
-// view - input and presentation
-#include "user/view/prompt.h"
-
-// view - showing the data.
-#include "user/view/bmp2.h"
 
 // hal
-#include "hal/portsx86.h"
+#include "hal/ports64.h"
 #include "hal/halvid.h"
-#include "hal/halmm.h"
 #include "hal/cpu.h"
-#include "hal/pte.h"
-#include "hal/tss.h" 
-#include "hal/cputypes.h"
-#include "hal/x86pte.h"
-#include "hal/x86.h"
-#include "hal/x86iv.h"
-#include "hal/x86gdt.h"
-#include "hal/cpuamd.h"
-#include "hal/dmi.h"
+#include "hal/x64.h"
 #include "hal/detect.h"
 #include "hal/dev/tty/serial.h"
 
@@ -211,90 +169,50 @@ extern unsigned long stack0_krn_ptr;
 #include "rtl/net/mac.h"
 
 
-
 // hal/dev/blkdev
-#include "hal/dev/blkdev/floppy.h"
 #include "hal/dev/blkdev/ata.h"
 #include "hal/dev/blkdev/super.h"
 #include "hal/dev/blkdev/volume.h"
 #include "hal/dev/blkdev/disk.h"  
-#include "hal/dev/blkdev/storage.h" 
+
 
 // hal
 #include "hal/pit.h"
 #include "hal/pic.h"
-#include "hal/apic.h"
 #include "hal/cpuid.h"
 #include "hal/rtc.h"
 
 
+#include "user/view/i8042/keyboard.h"
+#include "user/view/i8042/mouse.h"
 
-// rawgr - window server
-// inputs
-#include "user/view/xproc.h"
-#include "user/view/keyboard.h"
-#include "user/view/mouse.h"
-#include "user/view/vk.h"
-#include "user/view/kbdabnt2.h"
-
-// #view. drawing routines.
-#include "user/view/ldisc.h"
-
-//storage (^)
-#include "hal/dev/blkdev/ide.h"
-
-
-//pci
-//#include "hal/bus/isa.h"   //#todo
 #include "hal/bus/pci.h"
-
-//storage (^)
-#include "hal/dev/blkdev/ahci.h"
-#include "hal/dev/blkdev/sata.h"
-
-#include "hal/bus/usb.h"
 
 
 #include "hal/up.h"
-#include "hal/mp.h"
 #include "hal/breaker.h"
 #include "hal/hal.h"
 
 
 // ps
-#include "land/ps/x86cont.h"
+#include "land/ps/x64cont.h"
 #include "land/ps/ts.h"
 #include "land/ps/tasks.h"
-#include "land/ps/image.h"
-#include "land/ps/clone.h"
 #include "land/ps/process.h"
 #include "land/ps/thread.h"
-#include "land/ps/sched.h"
-#include "land/ps/ipc.h"
-#include "land/ps/ipccore.h"
-#include "land/ps/sem.h"
 #include "land/ps/queue.h"
-#include "land/ps/realtime.h"
-#include "land/ps/dispatch.h"
-#include "land/ps/event.h"
-#include "land/ps/ps.h"
 #include "land/ps/mk.h"
 
 
 
-#include "user/kgwm.h"
 #include "user/ws.h"
 
-// #view - designers
-#include "user/view/window.h"
-#include "user/view/menu.h"
-#include "user/view/pbar.h"
-#include "user/view/bmp.h"
-#include "user/view/line.h"
 
-// #view. presentation
-#include "user/terminal.h"
-#include "user/view/guiconf.h"
+// #view - designers
+#include "user/view/vk.h"
+#include "user/view/kbdabnt2.h"
+#include "user/view/window.h"
+// ...
 
 
 //
@@ -307,20 +225,11 @@ extern unsigned long stack0_krn_ptr;
 #include "user/security/user.h"
 #include "user/security/security.h"
 
-
-// rawgr - window server, and beyond
-
-#include "user/logon.h"
-#include "user/logoff.h"
-#include "user/kgws.h"
-
-
 // tty
 #include "hal/dev/tty/ttyldisc.h"
 #include "hal/dev/tty/ttydrv.h"
 #include "hal/dev/tty/tty.h"
 #include "hal/dev/tty/pty.h"
-
 
 #include "user/vt.h"
 #include "user/console.h"
@@ -333,106 +242,52 @@ extern unsigned long stack0_krn_ptr;
 #include "user/view/i8042/ps2kbd.h"
 #include "user/view/i8042/ps2.h"
 
+
+
+
 //
 // == NETWORK ====
 //
 
-#include "rtl/net/connect.h" 
+//#include "rtl/net/connect.h" 
 #include "rtl/net/host.h"
 #include "rtl/net/ethernet.h"
 #include "rtl/net/arp.h"
 #include "rtl/net/udp.h"
 #include "rtl/net/tcp.h"
 
-
-// intel nic - network interface controller.
-#include "hal/dev/tty/net/nicintel.h"    
-
-
 #include "rtl/net/in.h"
 #include "rtl/net/un.h"
 #include "rtl/net/nports.h"     //(network) Network Ports  (sw)
-#include "rtl/net/ip.h"         //(network) IP info.      (sw)
-#include "rtl/net/ipv4.h" 
-//#include "rtl/net/ipv6.h" 
-#include "rtl/net/ipv4mac.h" 
 #include "rtl/net/icmp.h" 
-#include "rtl/net/packet.h"      // network packets.
-#include "rtl/net/channel.h"     //(network) Channel       (sw)
-#include "rtl/net/client.h"      //(network) Client process support. 
-#include "rtl/net/ns.h"          //(network) Network Server.
-#include "rtl/net/network.h"     //(network) Gerenciamento de rede.  
 #include "rtl/net/socket.h"      //last always
 
 
-//
-// == DEVICES ====
-//
-
-
 // devices
-#include "hal/dev/devices.h"
 #include "hal/dev/devmgr.h"      
- 
-#include "hal/io.h"               //io.
 
 
-#include "land/modules.h"  // module manager
+#include "land/init.h"
 #include "land/debug.h"
 #include "land/system.h"   // system manager
-#include "land/init.h"
-#include "land/execve.h"  
+
 // mm
 #include "land/mm/mmglobal.h"  // Deve ficar mais acima.
 #include "land/mm/heap.h"      // Heap pointer support.
 #include "land/mm/aspace.h"    // Address Space, (data base account).
 
-// dspace
-#include "hal/dev/blkdev/dspace.h"    // Disk Space, (data base account). storage stuff
-
-// mm
 #include "land/mm/bank.h"      // Bank. database
-#include "land/mm/x86mm.h"     // mm, memory manager support.
 
+#include "land/mm/x64mm.h"     // mm, memory manager support.
 
-// view. input support.
-#include "user/view/cursor.h"
-
-
-#include "land/messages.h"
-#include "land/events.h"
 #include "land/object.h"
-#include "land/ss.h"
 
 // profiler
 #include "land/pints.h"
 
 #include "rtl/runtime.h"
 
-
-// kernel
-#include "land/ke.h"
-#include "land/ki.h"
-#include "land/info.h"
 #include "land/request.h"
-#include "land/reboot.h"
-#include "land/sub.h"       // gramado sub systems
-#include "land/utsname.h"
-#include "land/gpid.h"      // Globals. PIDs support.
-
-
-// sci - system call interface
-// All the functions in this folder can be called
-// by the ring3 apps via system call.
-// This is the last #include. :^)
-
-#include "rtl/sci/syscall.h"        
-#include "rtl/sci/sys.h"
-
-// si - services interfce
-#include "rtl/si/sifs.h"
-#include "rtl/si/sins.h"
-#include "rtl/si/siws.h"
 
 
 // ==============================
@@ -460,6 +315,7 @@ typedef enum {
 int g_product_type; 
 
 
+
 // Platform type.
 typedef enum {
    PFT_16BIT,       //16bit processor.
@@ -477,7 +333,6 @@ typedef enum {
     SYSTEM_TYPE_MULTIPROCESSOR
 
 } SystemType_t;
-
 
 
 
@@ -523,9 +378,6 @@ int foreground_thread;
 int current_process;   // Currently having the processing time.
 int current_thread;    // Currently having the processing time.
 
-
-
-
 int criticalsection_pid;
 
 // [Focus]
@@ -560,6 +412,7 @@ int current_terminal;
 //...
 
 // ==== ====
+
 
 
 //size of processor word.
@@ -616,7 +469,6 @@ int g_driver_rtc_initialized;
 int g_driver_timer_initialized;
 //...
 
-
 //internal modules support.
 int g_module_shell_initialized;
 int g_module_debug_initialized;
@@ -641,7 +493,6 @@ unsigned long KeInitPhase;
 unsigned long KernelStatus;
 //...
 
-
 //
 // symbol table
 //
@@ -660,19 +511,6 @@ unsigned long kernel_switch;
 //error support.
 unsigned long errno;
 
-
-//
-// fs support.
-//
-
-//directory entries support.
-//char buffer_dir_entry[512];
-
-//log buffer
-//char KernelLogBuffer[512];
-
-
-
 //
 // Plataform support.
 //
@@ -684,8 +522,6 @@ unsigned long errno;
 #define SYSTEM_PATH    "/Platform/System"
 //#define USERS_PATH     "/Platform/Users"
 //...
-
-
 
 //node od a linked list.
 struct node_d
@@ -741,136 +577,24 @@ struct kernel_classes_d
 struct kernel_classes_d KernelClasses;
 //...
 
-
-
-/*
-//Kernel Manager.
-struct kernel_d
-{
-    //
-    // Kernel info.
-    //
-
-    char *name;
-    unsigned long address;
-
-    //Kernel information block.
-    //struct kernel_block_d *KernelBlock;
-
-    //struct process_d *process;
-
-    //
-    // Structs.
-    //
-
-    //struct bootmanager_d     *BootManagerBlock;  //Boot Manager.
-    //struct bootloader_d      *BootLoaderBlock;   //Boot Loader.
-	
-    //struct system_d          *SystemBlock;       //System.
-    //struct ProcessorBlock_d  *ProcessorBlock;    //Processor info.
-    //...
-
-    //
-    // CPUs.
-    //
-
-    //int processorCount;
-    //struct processor_d *processor;
-    
-	
-    //kernel_args_t
-    //kernel_classes_t
-
-    //...
-};
-struct kernel_d *KernelInfo; 
-*/
-//...
-
-
-
-/*
- **********************************************************
- * plataform_d:
- *     Basic machine components. Hardware and Software. */
-
-struct platform_d
-{
-    char *name;
-    
-    // UP or MP;
-    SystemType_t system_type;
-
-    struct hardware_d *Hardware;    // hal/hal.h
-    struct firmware_d *Firmware;    // hal/hal.h
-    struct system_d   *System;      // execve/sm/system.h
-
-    //kernel struct ...
-    //struct kernel_d *Kernel;
-
-
-    // #test #todo
-    // unsigned long vesa_lfb_pa;
-    
-    // void *kernel_entrypoint; 
-
-    // Entry point for application processors.
-    // 32 bit part.
-    // void *ap_entrypoint;
-
-    // ...
-};
-struct platform_d *Platform; 
-
-
-
-
 #define CURRENT_ARCH_X86      1000
 #define CURRENT_ARCH_X86_64   1001
 // ...
 
-//#define CURRENT_ARCH_ARM      2000
-//...
 
+
+//
+// == prototypes ==========================================
+//
 
 
 // inicialização do kernel, independente da arquitetura.
 // See: kernel/main.c
 int kernel_main (int arch_type);
 
-//inicialização da arquitetura x86.
-int x86main (void);
-//...
-
-
-
-//Save args in the structure.
-void save_kernel_args (void);    
-
-
-// Linked list support.
-
-void* newLinkedlist (void);
-void* newNode (void);
-
-void Removing_from_the_beginning(struct linkedlist_d *list);
-void Removing_from_the_middle(struct linkedlist_d *list);
-void Removing_from_the_end(struct linkedlist_d *list);
-
-
-//
-// Count support.
-//
-
-//?? somente o protótipo. deletar.
-//unsigned long get_tick_count ();
-
-
-//
-// Delay support.
-//
-
-void sleep (unsigned long ms);
+// Inicialização da arquitetura x86.
+// See: x64init.c
+int x64main (void);
 
 
 //
@@ -881,28 +605,19 @@ void faults (unsigned long number);
 
 
 
-//
-// Error support
-// 
-
-// panic without clean
-void panic ( const char *format, ... );   //panic.c
-
-// clean and panic.
-void panic2 ( const char *format, ... );   //panic.c
-
-void abort (void);    //abort.c
-void die (void);      //system.c
-
-
-
-//
-// End.
-//
+// #debug
+// usado durante a construçao dos handlers das irqs.
+// See: main.c hw.asm headlib.asm
+void xxxxIRQ0_DEBUG_MESSAGE(void);
+void xxxxIRQ1_DEBUG_MESSAGE(void);
+// See: main.c Sw.asm headlib.asm
+void xxxxINT128_DEBUG_MESSAGE(void);
 
 
 
 
-
+void panic ( const char *format, ... );
+void die (void);
+void a_soft_place_to_fall(void);
 
 

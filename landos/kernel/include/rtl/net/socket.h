@@ -46,7 +46,6 @@ int gramado_ports[GRAMADO_PORT_MAX];
 //--
 //=====================================================
 
-
 //=====================================================
 
 // #atenção. 
@@ -54,25 +53,7 @@ int gramado_ports[GRAMADO_PORT_MAX];
 int current_socket;
 
 
-//=============================================
-
-//  alguns prototipos: 
-// #todo Mudar isso mais para baixo.
-
-// Create an empty structure.
-struct socket_d *create_socket_object (void);
-
-unsigned long getSocketIP ( struct socket_d *socket );
-unsigned long getSocketPort ( struct socket_d *socket );
-
-int 
-update_socket ( 
-    struct socket_d *socket, 
-    unsigned long ip, 
-    unsigned short port );
-
-//=============================================
-
+// ...
 
 /*
 #ifndef sa_family_t
@@ -138,7 +119,6 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define SOCK_GRAMADO_MSG    8000    /* window, msg, long1, long2 */
 #define SOCK_MAX            (SOCK_GRAMADO_MSG+1)
 
-
 //=========
 /* Supported address families. */
 
@@ -177,6 +157,7 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define AF_RS232      35            /* Serial socket (NEW!) */
 #define AF_GRAMADO    8000
 #define AF_MAX        AF_GRAMADO  //#todo
+
 
 /*
  * Definitions for network related sysctl, CTL_NET.
@@ -224,7 +205,6 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define PF_RS232	AF_RS232
 #define PF_MAX		AF_MAX
 
-
 /* Maximum queue length specifiable by listen().  */
 //#define SOMAXCONN	128
 #define SOMAXCONN    32
@@ -265,8 +245,6 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define MSG_CMSG_COMPAT	0		/* We never have 32 bit fixups */
 #endif
 
-
-
 //bsd
 /*
  * Message header for recvmsg and sendmsg calls.
@@ -290,7 +268,6 @@ struct mmsghdr {
 	unsigned int msg_len;
 };
 */
-
 
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
@@ -320,6 +297,7 @@ struct mmsghdr {
 #define SOL_NETLINK	270
 #define SOL_TIPC	271
 #define SOL_RXRPC	272
+
 
 /* IPX options */
 #define IPX_TYPE	1
@@ -364,7 +342,6 @@ struct mmsghdr {
 #define	SO_DOMAIN	0x1024		/* get socket domain */
 #define	SO_PROTOCOL	0x1025		/* get socket protocol */
 
-
 /*
  * Types of socket shutdown(2).
  */
@@ -373,7 +350,6 @@ struct mmsghdr {
 #define  SHUT_WR      1    /* Disallow further sends. */
 #define  SHUT_RDWR    2    /* Disallow further sends/receives. */
 
-
 /* Read using getsockopt() with SOL_SOCKET, SO_PEERCRED */
 struct sockpeercred {
 	uid_t		uid;		/* effective user id */
@@ -381,10 +357,7 @@ struct sockpeercred {
 	pid_t		pid;
 };
 
-
-
 typedef unsigned  socklen_t;
-
 
 
 //bsd
@@ -396,7 +369,6 @@ struct	linger
     int	l_onoff;		/* option on/off */
     int	l_linger;		/* linger time in seconds */
 };
-
 
 
 //bsd
@@ -412,7 +384,6 @@ struct	accept_filter_arg {
  * Level number for (get/set)sockopt() to apply to socket itself.
  */
 //#define	SOL_SOCKET	0xffff		/* options for socket level */
-
 
 
 // See:
@@ -482,7 +453,6 @@ typedef struct {
 //=========
 
 
-
 /*
 #ifndef pid_t
 typedef __pid_t		pid_t;		// process id 
@@ -503,7 +473,6 @@ typedef	__uid_t		uid_t;		// user id
 #define	uid_t		__uid_t
 #endif
 */
-
 
 //bsd
 /*
@@ -606,128 +575,30 @@ struct socket_d *LocalHostHTTPSocket;
 unsigned long socketList[SOCKET_COUNT_MAX];
 
 
-//
-// prototipes ===============================
-//
 
-int socket_init(void);
-
-int 
-socket_gramado ( 
-    struct socket_d *sock,
-    int family, 
-    int type, 
-    int protocol );
-
-
-int 
-socket_unix ( 
-    struct socket_d *sock, 
-    int family, 
-    int type, 
-    int protocol );
-
-int 
-socket_inet ( 
-    struct socket_d *sock, 
-    int family, 
-    int type, 
-    int protocol );
-
-int sys_socket ( int family, int type, int protocol );
-
-// libc shutdown() function.
-int sys_socket_shutdown (int socket, int how);
-
-
-struct socket_d *get_socket_from_fd (int fd);
-
-
-int
-sock_socketpair ( 
-    int family, 
-    int type, 
-    int protocol, 
-    int usockvec[2] );
-
-
-int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
-
-// Essa rotina sera' chamada se os serviços 
-// forem superios a 7000 ou inferiores a 8000
-unsigned long 
-socket_dialog ( 
-    unsigned long number, 
-    unsigned long arg2, 
-    unsigned long arg3, 
-    unsigned long arg4 );
-
-
-int 
-sys_connect ( 
-    int sockfd, 
-    const struct sockaddr *addr,
-    socklen_t addrlen );
+#endif    
 
 
 
-// Alternative way.
-// It returns the fd of the server and write() will copy the data.  
-int 
-sys_accept2 (
-    int sockfd, 
-    struct sockaddr *addr, 
-    socklen_t *addrlen); 
-
-// #todo
-// standard unix-like way
-int 
-sys_accept (
-    int sockfd, 
-    struct sockaddr *addr, 
-    socklen_t *addrlen );
-
-int 
-sys_bind ( 
-    int sockfd, 
-    const struct sockaddr *addr,
-    socklen_t addrlen );
-
-int 
-sys_getsockname ( 
-    int sockfd, 
-    struct sockaddr *addr, 
-    socklen_t *addrlen );
-
-
-int sys_listen (int sockfd, int backlog); 
-
-int socket_read (unsigned int fd, char *buf, int count);
-int socket_write (unsigned int fd,char *buf,int count);
-
-
-// #test
-// vamos pegar um descritor que aponta para
-// um arquivo do tipo soquete que deseja se concetar 
-// em o processo
-int sys_accept_sender(int n);
-
-int socket_set_gramado_port(int port, int pid);
-
-void show_socket_for_a_process(int pid);
-
-
-int is_socket (file *f);
-int is_virtual_console (file *f);
-//...
-
-#endif   
 
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

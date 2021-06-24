@@ -1,14 +1,4 @@
-/*
- * File: tty.h 
- * Header para o gerenciado de fluxo de caractere.
- */
-
-// #important
-// The TTY driver is in the charge of the job control.
-// This is why it can send the input to the forground process.
-
-// See:
-// http://www.linusakesson.net/programming/tty/index.php
+// tty.h
 
 #ifndef ____TTY_H
 #define ____TTY_H  1
@@ -42,7 +32,6 @@
 #define TTY_SUBTYPE_PTY_SLAVE    200
 // ...
 
-
 //These bits are used in the flags field of the tty structure.
 #define TTY_THROTTLED         0	/* Call unthrottle() at threshold min */
 #define TTY_IO_ERROR          1	/* Cause an I/O error (may be no ldisc too) */
@@ -64,15 +53,12 @@
 #define TTY_FLUSHPENDING     20	/* Queued buffer flush pending */
 
 
-
 // Contador de linhas usados na hora da criação de linhas.
 int ttyLineCounter;
 
 // Cursor.
 int ttyCurrentX;
 int ttyCurrentY;
-
-
 
 struct ttybuffer_d
 {
@@ -89,7 +75,6 @@ struct ttybuffer_d
 };
 struct ttybuffer_d *CurrentTTYBUFFER;
 
-
 struct tty_line_d
 {
     //int index;
@@ -104,7 +89,6 @@ struct tty_line_d
     //Posição do cursor dentro da linha.
     int pos;
 };
-
 
 /*
  *************************************** 
@@ -137,12 +121,9 @@ struct tty_d
     // tty name
     char name[64];      // 
     size_t Name_len;    // len 
-    
-    
-    // #todo
-    // Usar essa variável assim como fizemos no gramado x.
-    //int initialized;
-    
+
+
+    int initialized;
 
 //
 // == (1) storage ========
@@ -176,7 +157,6 @@ struct tty_d
     // Output buffer.
     file *_obuffer;
 
-
 //
 // == (2) synchronization ========
 //
@@ -201,7 +181,6 @@ struct tty_d
     // Control thread;
     struct thread_d *control;
 
-
 //
 // == (3) transmition ========
 //
@@ -213,24 +192,20 @@ struct tty_d
     struct tty_d *link;
 
     // ===============================
-
 //
 // == Device info ==================
 //
     
     // Device.
-    struct device_d *device;
+    //struct device_d *device;
     struct ttydrv_d *driver;
 
     // i don't like this
     // line discipline
     struct ttyldisc_d *ldisc;
 
-
-
     // termios
     struct termios termios;
-
 
 //
 // == Security ============================================
@@ -245,7 +220,6 @@ struct tty_d
     struct room_d      *room;
     struct desktop_d   *desktop;
     // ===================================================
-
 
     // process group.
     // Usando quanto tiver uma interrupção de tty.
@@ -277,7 +251,6 @@ struct tty_d
     
     unsigned long flags;        // tty flags.   
 
-
 //
 // == Actions ==============
 //
@@ -287,7 +260,7 @@ struct tty_d
 
     // Window.
     // When we are using the kgws.
-    struct window_d  *window;
+    //struct window_d  *window;
 
     //
     // system metrics.
@@ -315,7 +288,6 @@ struct tty_d
     unsigned long cursor_right;    // margem direita dada em linhas
     unsigned long cursor_bottom;   // margem inferior dada em linhas
 
-
     //
     // == Connection ===========================
     //
@@ -323,121 +295,38 @@ struct tty_d
     // pty associa a tty 'to' com a tty 'from'
     // master/slave.
 
-
     // navigation
     // ?? estamos pensando nisso.
     // struct tty_d *next;
 };
 
-
 //
 // == consoles ==================
 //
+
+// Index
+extern int fg_console;
 
 // Consoles virtuais
 // Consoles virtuais em full screen.
 // Criados a unha pelo kernel.
 
 #define CONSOLETTYS_COUNT_MAX    4
+//#define CONSOLETTYS_COUNT_MAX    8
 
-// Index
-extern int fg_console;
-
-// Virtual consoles.
-static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
 
 // #importante:
 // #todo
 // #bugbug
-// No Gramado X, funcionou sem 'static' e não funcionou com 'static'.
+// Aqui no Gramado X, funcionou sem 'static' e não funcionou com 'static'.
 // Talvez devamos usar sem o 'static', assim como fazemos em outros
 // modulos do kernel base.
-//struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
 
-// ==============================================================
-
-
+//static struct tty_d CONSOLE_TTYS[8];
+struct tty_d CONSOLE_TTYS[8];
 
 
-//=============================================================
-// #todo
-
-struct vc_d
-{
-    //#todo
-    //vamos pegar um dos endereços de &CONSOLE_TTYS[i]
-    //OU OUTRO QUALQUER,
-    struct tty_d *tty;  //&CONSOLE_TTYS[i]
-    
-    //struct vc_info_d *vc_info;
-};
-
-// #define CONSOLE_COUNT_MAX    4
-
-//static struct vc_d vc_cons[CONSOLE_COUNT_MAX];
-
-//=============================================================
-
-
-//
-// == prototyes =================================================
-//
-
-
-// Get the tty pointer.
-//OUT: tty pointer.
-struct tty_d *file_tty (file *f);
-
-
-struct ttyldisc_d *ttyldisc_create (void);  
-int ttyldisc_delete ( struct ttyldisc_d *tty_ldisc );
-
-struct ttydrv_d *ttydrv_create (void); 
-int ttydrv_delete ( struct ttydrv_d *tty_driver );
-
-
-struct tty_d *tty_create (void); 
-int tty_delete ( struct tty_d *tty );
-
-
-/*
-int pty_write(struct tty_d *tty, const char *buf, int c);
-int pty_write(struct tty_d *tty, const char *buf, int c)
-{}
-*/
-
-
-void tty_stop (struct tty_d *tty);
-void tty_start (struct tty_d *tty);
-
-
-int 
-tty_gets ( 
-    struct tty_d *tty, 
-    struct termios *termiosp );
-
-int 
-tty_sets ( 
-    struct tty_d *tty, 
-    int options, 
-    struct termios *termiosp );
-
-
-// Channel is a fd in the open file list of a process.
-int 
-tty_read ( 
-   int fd, 
-   char *buffer, 
-   int n );
-
-
-// Channel is a fd in the open file list of a process.
-int 
-tty_write ( 
-    int fd, 
-    char *buffer, 
-    int n );
-
+// == prototypes ===============================================
 
 
 int 
@@ -452,50 +341,39 @@ __tty_write (
     char *buffer, 
     int nr );
 
-
-// flush the output buffer to the current virtual console.
-void tty_flush( struct tty_d *tty );
-
-
-void tty_reset_termios ( struct tty_d *tty );
-
-int tty_ioctl ( int fd, unsigned long request,  unsigned long arg );
-
-
-// Escreve na tty de um processo alvo e envia uma mensagem pra
-// ele saber o que fazer com o que ele ler no buffer.
-// Talvez seja possível fazer o mesmo
-// em outros modulos, esses mesmos argumentos mais outros.
-// Essa rotina dentro do kernel copia os dados que estão num buffer 
-// para dentro do buffer da tty e em seguida envia um alerta para um 
-// processo alvo, dizendo que ele tem dados no buffer de sua tty. 
-// Os últimos argumentos são enviados para o processo na hora do alerta 
-// pra dizer pra ele que tipo de dados tem no buffer e o que deve 
-// fazer com eles.
-// ---
-// Da pra enviar todo tipo de coisa, pois o buffer é do tamanho que 
-// você quizer. Inclusive da pra enviar protocolos de rede.
+int 
+tty_read ( 
+    int fd, 
+    char *buffer, 
+    int n );
 
 int 
-tty_send_message ( 
-    int target_pid, 
+tty_write ( 
+    int fd, 
     char *buffer, 
-    int nr,
-    int msg,
-    unsigned long long1,
-    unsigned long long2 ); 
-
-
-int tty_init_module (void);
-
+    int n );
 
 #endif    
 
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,13 +1,6 @@
-/*
- * File: mm/aspace.h 
- *
- * Address Space.
- * 
- * DescriÁ„o:
- *     Address Space Manager.
- *
- */
- 
+// aspace.h
+
+
 
 typedef enum {
 
@@ -17,25 +10,25 @@ typedef enum {
 }aspace_type_t;
 
 
+
 typedef struct aspace_d aspace_t;
 struct aspace_d
 {
-    //Obs: Essa estrutura È para qualquer regi„o da
-	//memÛria fÌsica. A outra estrutura mm_block È
-	//apenas para gerenciar ·reas de memÛria alocadas 
+    //Obs: Essa estrutura √© para qualquer regi√£o da
+	//mem√≥ria f√≠sica. A outra estrutura mm_block √©
+	//apenas para gerenciar √°reas de mem√≥ria alocadas 
 	//dentro do heap do kernel.
-	
-	//Object.
-	object_type_t objectType;
+
+	object_type_t  objectType;
 	object_class_t objectClass;
-	
+
 	int used;
 	int magic;
 
 	aspace_type_t type;
 	
-	char *name;  //Qual È o nome desse Address Apace.
-	file *_file;   //Qual arquivo È referente ‡ esse espaÁo.
+	char *name;  //Qual √© o nome desse Address Apace.
+	//file *_file;   //Qual arquivo √© referente √† esse espa√ßo.
 	//metafile??
 
 	unsigned long virtual_address;
@@ -46,35 +39,35 @@ struct aspace_d
 	
 	
 	//
-	// @todo: InformaÁıes sobre os processos que est„o utilizando
-	//        essa ·rea de memÛria.
+	// @todo: Informa√ß√µes sobre os processos que est√£o utilizando
+	//        essa √°rea de mem√≥ria.
 	//
 	
 	//Lista de processos utilizando esse objeto.
 	struct process_d *processListHead;
 	//int processCount;
 	
-	// propriedades da regi„o.
-	// permissıes de leitura e escrita.
-	//informaÁıes sobre todos os arquivos associados com a regi„o.
+	// propriedades da regi√£o.
+	// permiss√µes de leitura e escrita.
+	//informa√ß√µes sobre todos os arquivos associados com a regi√£o.
 	
 	//
-	// Deve-se encadear as regiÁıes de memÛria em um ·rvore,
+	// Deve-se encadear as regi√ß√µes de mem√≥ria em um √°rvore,
 	// de forma a facilitar o acesso.
 	// Obs: Acho que a estrutura de contas em bancos
     // cumpre esse papel.	
 	//
 	
-	//?? @questionamento: Uma conta poderia pertencer ‡ mais de um banco
-	// ou devemos indicar aqui ‡ que banco essa conta pertence.
+	//?? @questionamento: Uma conta poderia pertencer √† mais de um banco
+	// ou devemos indicar aqui √† que banco essa conta pertence.
 	//struct bank_d *bank;
 	
 	
-	
-	
-	//navegaÁ„o.
-	struct aspace_d *next;
+
+	//navega√ß√£o.
+    struct aspace_d *next;
 };
-aspace_t *ASpace;
+struct aspace_d *ASpace;
+//aspace_t *ASpace;
 //...
 

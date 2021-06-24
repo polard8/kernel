@@ -14,8 +14,6 @@
 #define LARGESYSTEM_ORIGIN_ADDRESS   SYSTEM_ORIGIN
 
 
-
-
 // ===================================================
 
 // #importante: PERIGO !!!
@@ -36,6 +34,7 @@
 // See: mm/pages.c
 
 #define  ____DANGER_TABLE_POINTER_HEAP_BASE    0x1000
+
 
 //#todo
 // Define min and max
@@ -112,7 +111,6 @@
 // AHCI 1
 #define PAGETABLE_AHCI1  0x00083000   
 
-
 // Extra heaps.
 #define PAGETABLE_EXTRAHEAP3  0x00084000
 #define PAGETABLE_EXTRAHEAP2  0x00085000
@@ -153,11 +151,19 @@
 // ring0. 1:1
 #define PAGETABLE_KERNELAREA 0x0008F000
 
-
 // Endereço do diretorio de paginas do kernel.
 // O endereço físico e virtual são iguais.
 // size ? 4KB ? 1024*4 ?
-#define XXXKERNEL_PAGEDIRECTORY 0x0009C000
+//#define XXXKERNEL_PAGEDIRECTORY 0x0009C000
+
+
+// #test
+// pml4, pdpt, pd for kernel process.
+
+#define KERNEL_PD_PA   0x000000000009A000
+#define KERNEL_PDPT_PA 0x000000000009B000
+#define KERNEL_PML4_PA 0x000000000009C000
+
 
 // #bugbug
 // Temos uma pilha aqui ??
@@ -184,7 +190,6 @@
 #define MEDIUMSYSTEM_CGA  CGA_PA
 #define LARGESYSTEM_CGA   CGA_PA
 
-
 //
 // == 1 MB ==================================================
 //
@@ -197,7 +202,6 @@
 #define SMALLSYSTEM_KERNELBASE   KERNEL_BASE
 #define MEDIUMSYSTEM_KERNELBASE  KERNEL_BASE
 #define LARGESYSTEM_KERNELBASE   KERNEL_BASE
-
 
 // O kernel base ocupa as seguintes posições:
 // 0x00100000 + 0          - Início da imagem.
@@ -240,7 +244,6 @@
 // A ideia é aproveitar todos os 4MB mapeados para 
 // o kernel base. Por enquanto o quarto mega esta desperdiçado.
 
-
 //
 // == 8 MB =========================================================
 //
@@ -260,7 +263,6 @@
 #define SMALLSYSTEM_PAGEDPOLL_START   PAGEDPOOL
 #define MEDIUMSYSTEM_PAGEDPOLL_START  PAGEDPOOL
 #define LARGESYSTEM_PAGEDPOLL_START   PAGEDPOOL
-
 
 //
 // == 16 MB =========================================================
@@ -306,6 +308,7 @@
 #define LARGESYSTEM_USERBASE     USER_BASE 
 
 
+
 //
 // == 64 MB =========================================================
 //
@@ -320,8 +323,6 @@
 
 // 0x08000000
 // #available
-
-
 
 //
 // == 256 MB =========================================================
@@ -395,6 +396,24 @@
 
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

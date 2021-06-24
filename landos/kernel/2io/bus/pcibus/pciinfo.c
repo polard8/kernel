@@ -1,11 +1,6 @@
-/*
- * File: pcibus/pciinfo.c 
- * 
- * Created by Fred Nora.
- */
 
 
-#include <kernel.h>
+#include <kernel.h>  
 
 
 //
@@ -38,41 +33,6 @@ static const char* pci_class_strings[] = {
 	//Daqui pra frente está reservado.
 	//0xff (Device does not fit in any defined classes)
 };
-
-
-/*
- * pciShowDeviceInfo:
- *     Mostra informações sobre um dispositivo PCI da lista.
- *     Apenas um dispositivo.
- */
-
-int pciShowDeviceInfo (int number){
-
-    struct pci_device_d  *D;
-
-    // Limits
-    // Pega um ponteiro de estrutura na lista.
-
-    if (number < 0 || number >= 32){
-        debug_print("pciShowDeviceInfo: number\n");
-        return -1;
-    }else{
-
-        D = (void *) pcideviceList[number];
-
-        if ( (void *) D != NULL )
-        {
-            if ( D->used == TRUE && D->magic == 1234 )
-            {
-                printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x} \n",
-                    D->Vendor, D->Device, D->classCode, D->irq_line );
-            }
-        }
-    };
-
-    return 0;
-}
-
 
 /*
  * pciInfo:
@@ -120,9 +80,46 @@ int pciInfo (void){
     return 0; 
 }
 
+
+/*
+ * pciShowDeviceInfo:
+ *     Mostra informações sobre um dispositivo PCI da lista.
+ *     Apenas um dispositivo.
+ */
+
+int pciShowDeviceInfo (int number){
+
+    struct pci_device_d  *D;
+
+    // Limits
+    // Pega um ponteiro de estrutura na lista.
+
+    if (number < 0 || number >= 32){
+        debug_print("pciShowDeviceInfo: number\n");
+        return -1;
+    }else{
+
+        D = (void *) pcideviceList[number];
+
+        if ( (void *) D != NULL )
+        {
+            if ( D->used == TRUE && D->magic == 1234 )
+            {
+                printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x} \n",
+                    D->Vendor, D->Device, D->classCode, D->irq_line );
+            }
+        }
+    };
+
+    return 0;
+}
+
+
 //
 // End.
 //
+
+
 
 
 

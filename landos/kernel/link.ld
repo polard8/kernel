@@ -12,27 +12,30 @@
  */
 
 
-OUTPUT_FORMAT("elf32-i386")
-OUTPUT_ARCH(i386)
-ENTRY(_kernel_begin)
+/*OUTPUT_FORMAT("elf32-i386")*/
+/*OUTPUT_ARCH(i386)*/
 
+OUTPUT_FORMAT("elf64-x86-64")
+ENTRY(_kernel_begin)
 
 SECTIONS 
 {
  
     /* >> This is the base */
     /* 0xc0000000: The ELF header starts at this address */
-     . = 0xC0000000;
+     /*. = 0xC0000000;*/
+     . = 0x30000000;
 
     /* _kernel_begin  = .; it belong to .head_x86 segment */
     /* See: head_32.asm */
 
     /* >> This is the entry point */
     /* kernel text segment. Executable code of the program */
-    .text 0xC0001000:
+    /*.text 0xC0001000:*/
+    .text 0x30001000:
     {
         _code_begin = .;
-        *(.head_x86)  *(.text)
+        *(.head_x86_64)  *(.text)
         _code_end = .; 
         . = ALIGN(4096);
     }

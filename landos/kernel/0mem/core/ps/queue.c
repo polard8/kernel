@@ -4,34 +4,12 @@
 // precisa ser repensado e refeito.
 // Possivelmente temos problemas de overflow.
 
-/*
- * File: ps/queue.c
- *
- *     Rotinas de queue para o kernel.
- *     Obs: As rotinas de queue aqui usam uma abordagem não convencional
- * e pouco eficiente. 
- *
- * 2015 - Created by Fred Nora.
- */
 
-// #todo
-// podemos colocar filas nas estruturas dos objetos.
-// As threads esperam nessas filas.
-
-// #bugbug
-// A estrutura de fila usada nessa rotinas esta fora do padrao.
-// Tem um monte de vetores na estrutura de fila.
-// nao eh isso que queremos.
+#include <kernel.h>  
 
 
-#include <kernel.h>
-
-
-/*
- **********************************
- * init_queue:
- *     Inicializa uma estrutura de fila.
- */
+// init_queue:
+//     Inicializa uma estrutura de fila.
 
 int init_queue (struct queue_d *q)
 {
@@ -208,14 +186,11 @@ int init_queue (struct queue_d *q)
 
 done:
     return 0;
-}
+} 
 
 
-
-/*
- * queue_insert_data:
- *     Coloca um dado no fim da fila. (FIFO)
- */
+// queue_insert_data:
+//     Coloca um dado no fim da fila. (FIFO)
 
 int queue_insert_data (struct queue_d *q, unsigned long data, int type)
 {
@@ -396,143 +371,6 @@ defaultInsertData:
 	    q->defaultTail = q->defaultHead;
 	}
     goto done;
-//Done.
-done:
-	return (int) 0;
-}
-
-
-int 
-queue_insert_head ( 
-    struct queue_d *q, 
-    unsigned long data, 
-    int type )
-{
-
-    if ( (void *) q == NULL )
-    {
-        panic ("queue_insert_head:"); 
-    }
-
-    switch (type)
-    {
-        case QUEUE_STANDBY:
-		    goto standbyInsertData; 
-            break;		
-
-        case QUEUE_RUNNING:
-		    goto runningInsertData; 
-            break;		
-			
-	    //tipo ready
-	    case QUEUE_READY:
-		    goto readyInsertData; 
-		    break;
-		
-		//tipo waiting
-		case QUEUE_WAITING:
-		    goto waitingInsertData; 
-		    break;		        
-		
-        case QUEUE_BLOCKED:
-		    goto blockedInsertData; 
-            break;			
-		
-        case QUEUE_ZOMBIE:
-		    goto zombieInsertData; 
-            break;	
-			
-        case QUEUE_DEAD:
-		    goto deadInsertData;  
-            break;
-			
-        case QUEUE_INITIALIZED:
-		    goto initializedInsertData; 
-            break;	
-			
-        case QUEUE_SYSCOOP:
-		    goto syscoopInsertData;
-            break;	
-			
-        case QUEUE_USERCOOP: 
-		    goto usercoopInsertData;
-            break;
-			
-        case QUEUE_SYSCONC:
-		    goto sysconcInsertData;
-            break;
-			
-        case QUEUE_USERCONC:
-		    goto userconcInsertData;
-            break;		
-			
-	    //tipo ready
-	    case QUEUE_REALTIME:
-		    goto realtimeInsertData;
-		    break;
-		
-		//qualquer tipo.
-		default:
-		    goto defaultInsertData;
-		    break;
-	};
-	
-standbyInsertData:
-    q->standbyList[q->standbyHead] = (unsigned long) data;
-    goto done;
-
-runningInsertData:
-    q->runningList[q->runningHead] = (unsigned long) data;
-    goto done;
-	
-readyInsertData:
-    q->readyList[q->readyHead] = (unsigned long) data;
-    goto done;	
-	
-waitingInsertData:
-    q->waitingList[q->waitingHead] = (unsigned long) data;
-    goto done;	
-	
-blockedInsertData:
-    q->blockedList[q->blockedHead] = (unsigned long) data;
-    goto done;	
-	
-zombieInsertData:
-    q->zombieList[q->zombieHead] = (unsigned long) data;
-    goto done;	
-	
-deadInsertData:
-    q->deadList[q->deadHead] = (unsigned long) data;
-    goto done;	
-
-initializedInsertData:
-    q->initializedList[q->initializedHead] = (unsigned long) data;
-    goto done;	
-	
-syscoopInsertData: 
-    q->syscoopList[q->syscoopHead] = (unsigned long) data;
-    goto done;
-
-usercoopInsertData:
-    q->usercoopList[q->usercoopHead] = (unsigned long) data;
-    goto done;
-
-sysconcInsertData:
-    q->sysconcList[q->sysconcHead] = (unsigned long) data;
-    goto done;
-
-userconcInsertData:
-    q->userconcList[q->userconcHead] = (unsigned long) data;
-    goto done;
-
-realtimeInsertData:
-    q->realtimeList[q->realtimeHead] = (unsigned long) data;
-    goto done;
-	
-defaultInsertData:
-    q->defaultList[q->defaultHead] = (unsigned long) data;
-    goto done;
-
 done:
     return 0;
 }
@@ -701,36 +539,140 @@ done:
 }
 
 
-// show_queue_information:
-//      Mostra informações sobre a queue.
-//      #todo: put this in a info file.
-
-void show_queue_information(struct queue_d *q)
+int 
+queue_insert_head ( 
+    struct queue_d *q, 
+    unsigned long data, 
+    int type )
 {
-    register int i=0;
 
-    if ((void*) q == NULL)
+    if ( (void *) q == NULL )
     {
-        printf("show_queue_information error: Struct\n");
-        return;
+        panic ("queue_insert_head:"); 
     }
 
-    printf("Ready queue Information:\n");	
-    printf("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
-
-    while (i < q->readyMax)
+    switch (type)
     {
-        q = (void *) q->readyList[i];
-        if ( (void *) q != NULL ){
-            printf("Index={%d} Struct={%x}\n", i, (void*) q );
-        } 
-        
-        ++i;
-    };
+        case QUEUE_STANDBY:
+		    goto standbyInsertData; 
+            break;		
 
-	//@todo: Informações de outras filas.
+        case QUEUE_RUNNING:
+		    goto runningInsertData; 
+            break;		
+			
+	    //tipo ready
+	    case QUEUE_READY:
+		    goto readyInsertData; 
+		    break;
+		
+		//tipo waiting
+		case QUEUE_WAITING:
+		    goto waitingInsertData; 
+		    break;		        
+		
+        case QUEUE_BLOCKED:
+		    goto blockedInsertData; 
+            break;			
+		
+        case QUEUE_ZOMBIE:
+		    goto zombieInsertData; 
+            break;	
+			
+        case QUEUE_DEAD:
+		    goto deadInsertData;  
+            break;
+			
+        case QUEUE_INITIALIZED:
+		    goto initializedInsertData; 
+            break;	
+			
+        case QUEUE_SYSCOOP:
+		    goto syscoopInsertData;
+            break;	
+			
+        case QUEUE_USERCOOP: 
+		    goto usercoopInsertData;
+            break;
+			
+        case QUEUE_SYSCONC:
+		    goto sysconcInsertData;
+            break;
+			
+        case QUEUE_USERCONC:
+		    goto userconcInsertData;
+            break;		
+			
+	    //tipo ready
+	    case QUEUE_REALTIME:
+		    goto realtimeInsertData;
+		    break;
+		
+		//qualquer tipo.
+		default:
+		    goto defaultInsertData;
+		    break;
+	};
+	
+standbyInsertData:
+    q->standbyList[q->standbyHead] = (unsigned long) data;
+    goto done;
+
+runningInsertData:
+    q->runningList[q->runningHead] = (unsigned long) data;
+    goto done;
+	
+readyInsertData:
+    q->readyList[q->readyHead] = (unsigned long) data;
+    goto done;	
+	
+waitingInsertData:
+    q->waitingList[q->waitingHead] = (unsigned long) data;
+    goto done;	
+	
+blockedInsertData:
+    q->blockedList[q->blockedHead] = (unsigned long) data;
+    goto done;	
+	
+zombieInsertData:
+    q->zombieList[q->zombieHead] = (unsigned long) data;
+    goto done;	
+	
+deadInsertData:
+    q->deadList[q->deadHead] = (unsigned long) data;
+    goto done;	
+
+initializedInsertData:
+    q->initializedList[q->initializedHead] = (unsigned long) data;
+    goto done;	
+	
+syscoopInsertData: 
+    q->syscoopList[q->syscoopHead] = (unsigned long) data;
+    goto done;
+
+usercoopInsertData:
+    q->usercoopList[q->usercoopHead] = (unsigned long) data;
+    goto done;
+
+sysconcInsertData:
+    q->sysconcList[q->sysconcHead] = (unsigned long) data;
+    goto done;
+
+userconcInsertData:
+    q->userconcList[q->userconcHead] = (unsigned long) data;
+    goto done;
+
+realtimeInsertData:
+    q->realtimeList[q->realtimeHead] = (unsigned long) data;
+    goto done;
+	
+defaultInsertData:
+    q->defaultList[q->defaultHead] = (unsigned long) data;
+    goto done;
+
+done:
+    return 0;
 }
-
 
 // ScanReadyQueue:
 //     Procura na fila de threads ready por threads com timeout vencido.
@@ -876,8 +818,56 @@ done:
 }
 
 
+// show_queue_information:
+//      Mostra informações sobre a queue.
+//      #todo: put this in a info file.
+
+void show_queue_information(struct queue_d *q)
+{
+    register int i=0;
+
+    if ((void*) q == NULL)
+    {
+        printf("show_queue_information error: Struct\n");
+        return;
+    }
+
+    printf("Ready queue Information:\n");	
+    printf("Head={%d} Tail={%d}\n", q->readyHead, q->readyTail);
+
+    while (i < q->readyMax)
+    {
+        q = (void *) q->readyList[i];
+        if ( (void *) q != NULL ){
+            printf("Index={%d} Struct={%x}\n", i, (void*) q );
+        } 
+        
+        ++i;
+    };
+
+	//@todo: Informações de outras filas.
+}
+
+
 //
 // End.
 //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
 
 

@@ -45,8 +45,8 @@ struct utsname
 //uname() returns system information in the structure pointed to by
 //buf.  The utsname struct is defined in <sys/utsname.h>:
 
-
-int sys_uname (struct utsname *ubuf);
+//#todo
+// int sys_uname (struct utsname *ubuf);
 
 
 #endif    

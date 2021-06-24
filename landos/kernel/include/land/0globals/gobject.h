@@ -9,33 +9,6 @@
 #define ____GOBJECT_H  1
 
 
-
-//
-// Enumerando os tipos de objetos.
-// Obs: Deve ser o mesmo que as definições acima.
-// As estruturas indicam o tipo de objeto que se pode criar.
-// o primeiro ítem de uma estrutura deve ser a indicação do tipo
-// de objeto que ela representa.
-// @todo: A ORDEM AQUI SEGUIRÁ A ORDEM DAS CLASSES DO SISTEMA.
-//        COMEÇANDO DA CLASSE RAM.
-//
-// Precisa ser uma definição global. pois todas estruturas vão usar.
-//
-// Obs: Essa lista deve estar sincronizada com alista de fefinições em object.h
-//
-
-//
-//Obs: Esses poderiam ser os principais, e imutáveis
-// deichando os vindouros como subsequentes à esses.
-//
-
-//#importante: Isso faz parte do módulo de segurança
-//e deve estar associado ao sistema de arquivos ...
-//Pois estamos lidando com concessões de permissões 
-//de acessoa objetos ... que pode ser 'arquivos' ou 
-// dispositivos. 
-//talvez isso devesse ir para object.h
-
 typedef enum {
 
     //Precisamos de um pouco de ordem nisso.
@@ -161,13 +134,6 @@ typedef enum {
 }object_type_t;
 
 
-
-
-//
-// Enumerando classes de objetos. (categorias)
-//
-
-//talvez isso devesse ir para object.h
 typedef enum {
 	
 	ObjectClassKernelObjects,  // Kernel Objects.
@@ -182,6 +148,19 @@ typedef enum {
 
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,19 +1,6 @@
-/*
- * File: i8042/i8042.c
- *     i8042 controller initialization.
- *     initialize ps2 controller.
- * env:
- *     Ring 0. Kernel base persistent code.
- * 2018 - Created by Fred Nora.
- */
-
-// When the keyboard and mouse are USB devices, the BIOS uses SMM code 
-// to emulate PS/2 devices. 
-// I see mentioned that the USB devices should halt ps/2 emulation 
-// once they've been initialized (or at least their host hub?)
 
 
-#include <kernel.h>
+#include <kernel.h>  
 
 
 void I8042Controller_do_drain(void)
@@ -29,25 +16,27 @@ void I8042Controller_do_drain(void)
         if (!(status & 0x01)){ return;}  //empty
         in8(0x60);
     }
-}
-
+}  
 
 /*
  *********************
  * kbdc_wait:
- *     Espera por flag de autorização para ler ou escrever.
+ *     Espera por flag de autorizaÃ§Ã£o para ler ou escrever.
  */
 
+// #??
+// is this the besto option fo x86_64?
 #define __local_out_any_b(p)  asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
 
 // Espera para ler ou para escrever!
 
-#define __I8042_BUFFER_FULL 0x01
+#define __I8042_BUFFER_FULL  0x01
 
 void kbdc_wait (unsigned char type)
 {
     unsigned char Status=0;
-
+    //unsigned char Type=0;   //#todo
+    
     // 0 = READ
     if (type==0)
     {
@@ -82,8 +71,7 @@ void kbdc_wait (unsigned char type)
             // wait_ns (400);
         };
     };
-}
-
+}  
 
 
 // =======================
@@ -102,110 +90,6 @@ void prepare_for_output(void)
 }
 
 //====================================================================
-
-
-/*
-void I8042Controller_prepare_for_input(unsigned char device);
-void I8042Controller_prepare_for_input(unsigned char device)
-{
-    // #define I8042_KEYBOARD_BUFFER 0x00
-    // #define I8042_MOUSE_BUFFER 0x20
-    // #define I8042_WHICH_BUFFER 0x20
-    
-    // 1 = KEYBOARD
-    // 2 = MOUSE
-
-    unsigned char status=0;
-    unsigned char buffer_type = 0; 
-
-    //ASSERT(m_lock.is_locked());
-    
-        
-    switch (device)
-    {
-        // keyboard.
-        case 1:
-            buffer_type = I8042_KEYBOARD_BUFFER;
-            break;
-
-        // mouse.
-        case 2:
-            buffer_type = I8042_MOUSE_BUFFER;
-            break;
-
-        // invilid device.
-        default:
-            return;
-            break; 
-    };
-
-
-    for (;;) {
-        
-        status = in8(I8042_STATUS);
-        
-        if (   (status & I8042_BUFFER_FULL) && 
-             ( (status & I8042_WHICH_BUFFER) == buffer_type ) )
-        {
-            return;
-        }
-    };
-}
-*/
-
-
-/*
-void I8042Controller_prepare_for_output(void);
-void I8042Controller_prepare_for_output(void)
-{
-    //ASSERT(m_lock.is_locked());
-    
-    for (;;) {
-        if (!(in8(I8042_STATUS) & 2))
-            return;
-    };
-}
-*/
-
-
-
-//====================================================================
-
-/*
-u8 I8042Controller::do_write_to_device(Device device, u8 data)
-{
-    ASSERT(device != Device::None);
-    ASSERT(m_lock.is_locked());
-
-    ASSERT(!Processor::current().in_irq());
-
-    int attempts = 0;
-    u8 response;
-    do {
-        if (device != Device::Keyboard) {
-            prepare_for_output();
-            IO::out8(I8042_STATUS, 0xd4);
-        }
-        prepare_for_output();
-        IO::out8(I8042_BUFFER, data);
-
-        response = do_wait_then_read(I8042_BUFFER);
-    } while (response == I8042_RESEND && ++attempts < 3);
-    if (attempts >= 3)
-        dbg() << "Failed to write byte to device, gave up";
-    return response;
-}
-*/
-
-/*
-u8 I8042Controller::do_read_from_device(Device device)
-{
-    ASSERT(device != Device::None);
-
-    prepare_for_input(device);
-    return IO::in8(I8042_BUFFER);
-}
-*/
 
 //====================================================================
 
@@ -226,24 +110,48 @@ void wait_then_write ( int port, int data )
 }
 
 
+// This is called by gdeshell.
+int PS2_initialize(void)
+{
+    debug_print ("PS2_initialize: [TODO]\n");
+	//ps2();
+    return 0;
+}
+
+
+// this is called during the kernel initialization.
+// Called by x64main in x64init.c
+int PS2_early_initialization(void)
+{
+    debug_print ("PS2_early_initialization: [TODO]\n");
+	//early_ps2_init();
+    return 0;
+}
+
+int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
+    debug_print("ps2_ioctl: [TODO]\n");
+    return -1;
+}
+
 
 /*
  ***************
  * ps2:
  *     Inicializa o controlador ps2.
  * 
- *     Essa rotina de inicialização do controlador 
- * poderá ter seu próprio módulo.
+ *     Essa rotina de inicializaÃ§Ã£o do controlador 
+ * poderÃ¡ ter seu prÃ³prio mÃ³dulo.
  * 
  *     Inicializa a porta do teclado no controlador.
  *     Inicializa a porta do mouse no controlador.
  *     Obs: *importante: A ordem precisa ser respeitada.
- *     As vezes os dois não funcionam ao mesmo tempo se a 
- *     inicialização não for feita desse jeito. 
+ *     As vezes os dois nÃ£o funcionam ao mesmo tempo se a 
+ *     inicializaÃ§Ã£o nÃ£o for feita desse jeito. 
  */
 
 
-// Essa é uma inicializaçao completa.
+// Essa Ã© uma inicializaÃ§ao completa.
 // See:
 // https://wiki.osdev.org/%228042%22_PS/2_Controller
 
@@ -287,7 +195,6 @@ void ps2(void)
     // See the steps in:
     // https://wiki.osdev.org/%228042%22_PS/2_Controller
 
-
     // ======================================
     // Disable devices
     // Deactivate ports!
@@ -304,7 +211,7 @@ void ps2(void)
 
     // # todo
     // # Essa rotina desabilita as irqs
-    // precisamos reabilita-las ao fim da inicializaçao
+    // precisamos reabilita-las ao fim da inicializaÃ§ao
     wait_then_write (0x64,I8042_READ);    // I8042_READ = 0x20    
     configuration = wait_then_read(0x60);
     //wait_then_write (0x64,I8042_WRITE);   // I8042_WRITE = 0x60
@@ -319,8 +226,8 @@ void ps2(void)
     // (because the second PS/2 port should be disabled). 
 
     is_dual_channel = (configuration & (1 << 5)) != 0;
-    if (is_dual_channel == 1){ printk("Dual\n");   }
-    if (is_dual_channel == 0){ printk("Single\n"); }
+    if (is_dual_channel == 1){ printf("Dual\n");   }
+    if (is_dual_channel == 0){ printf("Single\n"); }
 
 
     // #define SELF_TEST_SUCCESS 0x55
@@ -332,7 +239,7 @@ void ps2(void)
     wait_then_write(I8042_STATUS, 0xAA);
     
     if (wait_then_read(I8042_BUFFER) == 0x55){
-        printk( "I8042: Self test OK\n");
+        printf( "I8042: Self test OK\n");
         // Restore configuration in case the controller reset
         // At the very least, the Controller Configuration Byte 
         // should be restored for compatibility with such hardware.
@@ -353,8 +260,8 @@ void ps2(void)
     // Then (if it's a "dual channel" controller) use command 0xA9 
     // to test the second PS/2 port, then check the result. 
 
-    // Nesse momento podemos desistir se a porta que queremos não
-    // está disponível. Ou prosseguirmos apenas com o que temos.
+    // Nesse momento podemos desistir se a porta que queremos nÃ£o
+    // estÃ¡ disponÃ­vel. Ou prosseguirmos apenas com o que temos.
 
     // ==============================
     // Test ports and enable them if available
@@ -370,6 +277,7 @@ void ps2(void)
         wait_then_write(I8042_STATUS, 0xa9); // test
         mouse_available = (wait_then_read(I8042_BUFFER) == 0);
     }
+
 
 //#define STAT_OUTFULL         (1<<0)
 //#define STAT_INFULL         (1<<1)
@@ -390,7 +298,6 @@ void ps2(void)
 //#define CONFIG_ZERO2         (1<<7)
 
 
-
     //
     // Step 9: Enable Devices 
     //
@@ -398,26 +305,31 @@ void ps2(void)
     // imprimir o resultado da disponibilidade.
     
     if (keyboard_available == 1){
-        printk("----\n");
-        printk("~ Keyboard available\n");
+        printf("----\n");
+        printf("~ Keyboard available\n");
         ps2kbd_initialize_device();
         PS2.keyboard_initialized = TRUE;
         wait_then_write(I8042_STATUS, 0xae);  // enable keyboard port
         
-        //ignoramos isso se é single channel
+        //ignoramos isso se Ã© single channel
         // configuration |= 1;
         // configuration &= ~(1 << 4);
         // wait_then_write(I8042_STATUS, 0x60);
         // wait_then_write(I8042_BUFFER, configuration);
     }
 
+
     // If it is dual channel,
     // send a command 0xA8 to enable the second PS/2 port and 
     // read the Controller Configuration Byte again
     if (mouse_available == 1 ){
-        printk("----\n");
-        printk("~ Mouse available\n");
+        printf("----\n");
+        printf("~ Mouse available\n");
+        
+        // #todo
         ps2mouse_initialize_device();
+        
+        
         PS2.mouse_initialized = TRUE;
         wait_then_write(I8042_STATUS, 0xa8);  // enable mouse port
 
@@ -441,7 +353,6 @@ void ps2(void)
         wait_then_write (0x64,0xA7);  // Disable mouse port. ignored if it doesn't exist
     }
     // ==============================
-
 
    //#todo
    // Enable IRQs for the ports that are usable
@@ -473,33 +384,31 @@ void ps2(void)
 }
 
 
-
 /*
  ************************************************************
  * early_ps2_init:
  */
 
-// Inicialização preliminar. Sem mouse.
-// Ela existe porque a emulação de ps2 na máquina real 
+// InicializaÃ§Ã£o preliminar. Sem mouse.
+// Ela existe porque a emulaÃ§Ã£o de ps2 na mÃ¡quina real 
 // apresenta falhas.
 // No gdeshell.bin incluiremos os comando "ps2-init"
-// para obtermos a inicialização completa.
+// para obtermos a inicializaÃ§Ã£o completa.
 
 // #importante
-// Nao chamamos a rotina de inicializaçao do mouse.
+// Nao chamamos a rotina de inicializaÃ§ao do mouse.
 // mas poderiamos. O importante eh deixar a porta desabilitada
 // ao final da rotina.
 // Ao fim dessa rotina, reabilitamos apenas a porta de teclado.
-// A porta de mouse permaneçe fechada.
+// A porta de mouse permaneÃ§e fechada.
 
-    // mas simples...
-    // apenas teclado.
+//#todo
 
 void early_ps2_init (void)
 {
 	// #debug
-	printf ("early_ps2_init: Initializing..\n");
-	refresh_screen();
+    printf ("early_ps2_init: Initializing..\n");
+    refresh_screen();
 
     // The main structure fisrt of all.
     // #todo: create ps_initialize_main_structure();
@@ -529,14 +438,16 @@ void early_ps2_init (void)
     wait_then_write (0x64,0xAD);  //Disable keyboard port.
     wait_then_write (0x64,0xA7);  //Disable mouse port.
 
-
     // Keyboard.
     
     // #debug: slow
     printf ("early_ps2_init: Initializing keyboard ..\n");
     refresh_screen();
     
+    // #todo
+    
     ps2kbd_initialize_device();
+    
     PS2.keyboard_initialized = TRUE;
 
     // Mouse.
@@ -544,7 +455,6 @@ void early_ps2_init (void)
     //refresh_screen();
     //ps2mouse_initialize_device ();
     PS2.mouse_initialized = FALSE;
-
 
     // ======================================
     // Reactivate ports!
@@ -571,29 +481,23 @@ void early_ps2_init (void)
 
 
 
-// This is called by gdeshell.
-int PS2_initialize(void)
-{
-	ps2();
-	return 0;
-}
-
-// this is called during the kernel initialization.
-int PS2_early_initialization(void)
-{
-	early_ps2_init();
-	return 0;
-}
 
 
-int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
-{
-    debug_print("ps2_ioctl: [TODO]\n");
-    return -1;
-}
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

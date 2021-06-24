@@ -1,17 +1,8 @@
-/*
- * File: pit.h
- *
- * Descrição:
- *     Header para o módulo timer. irq0.
- *     @todo: strucs ... definições de frequências ...
- *
- * 2015 - Created by Fred Nora.
- */
+// pit.h
 
 
 #ifndef ____PIT_H
 #define ____PIT_H    1
-
 
 //
 // Counting variables support.
@@ -32,7 +23,6 @@ unsigned long sys_time_ms;
 
 // pit frequency
 unsigned long sys_time_hz;
-
 
 
 //
@@ -62,8 +52,7 @@ unsigned long profiler_ticks_limit;
 unsigned long profiler_percentage_all_normal_threads;
  
 unsigned long profiler_percentage_idle_thread;
-
-
+ 
 // Usado no Linux. 
 //#define CT_TO_SECS(x)   ((x) / HZ)
 //#define CT_TO_USECS(x)  (((x) % HZ) * 1000000/HZ) 
@@ -81,9 +70,8 @@ unsigned long profiler_percentage_idle_thread;
 // #extra
 // Aciona uma flag para que o ts.c realize atividades extras,
 // como gc, dead thread collector, request.
-	
-int extra; 
 
+int extra; 
 
 // timer pathname.
 // #define TIMER_DRIVER_PATHNAME  "Embedded"  
@@ -97,7 +85,8 @@ int extra;
 	043     = 8253 mode control  (see 8253)
 	044     = 8254 PS/2 extended timer
 	047     = 8254 Channel 3 control byte
-*/
+*/	
+
 
 /*
  * Como o linux define um Quantum (time slice) para tasks RR.
@@ -118,8 +107,6 @@ int timer_cursor_status;
 unsigned long time_out;
 
 unsigned long timer_handler_address;    //global _irq0:
-
-
 
 /*
  * timer_d:
@@ -165,7 +152,6 @@ struct timer_d
     unsigned long error;
 
     //Navigation
-
     struct timer_d  *next;
 };
 
@@ -179,52 +165,73 @@ unsigned long timerList[32];
 // == prototypes ===========================
 //
 
+void DeviceInterface_PIT(void); 
 
-// Global para inicialização do módulo interno.
 
-int early_timer_init (void);
-int timerInit (void);
+// ====
+
 int timerTimer (void);
-void timerInit8253 ( unsigned long hz ); 
+void timerInit8253 ( unsigned long hz );
 
-//...
-
-//Global para acesso ao tempo imediatamente agora.
-unsigned long now (void);
-
+void set_timeout ( unsigned long ticks );
 unsigned long get_timeout (void);
-void set_timeout(unsigned long ticks);
 
+void set_quantum ( unsigned long q);
+unsigned long get_quantum (void);
+
+void set_current_quantum (unsigned long q);
+unsigned long get_current_quantum (void);
+
+void set_next_quantum (unsigned long q);
+unsigned long get_next_quantum (void);
 
 void set_systime_hz ( unsigned long hz );
 unsigned long get_systime_hz (void);
 
 unsigned long get_systime_ms (void);
+
 unsigned long get_systime_totalticks (void);
+
+unsigned long get_systime_info (int n);
+
+int new_timer_id (void);
 
 void timerEnableTextCursor (void);
 void timerDisableTextCursor (void);
 
-unsigned long get_systime_info (int n);
+unsigned long now (void);
+
+void sleep (unsigned long ms);
+
+int timerInit (void);
+int early_timer_init (void);
 
 
-// IN: pid, ms, type
 struct timer_d *create_timer ( 
     pid_t pid, 
     unsigned long ms, 
-    int type  );
+    int type );
 
-//#todo destroy timer.
-
-int new_timer_id (void);
-
-void DeviceInterface_PIT(void); 
-
-#endif   
+#endif    
 
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

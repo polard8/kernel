@@ -1,25 +1,15 @@
-/*
- * File: object.h
- *
- *    Object manager.
- *    See: ob/object.h
- * 
- * History:
- *     2016 - Created by Fred Nora.
- *     //... 
- */
 
-// #todo
-// ifndef ...
 
+#ifndef __OBJECT_H
+#define __OBJECT_H    1
 
 /*
  ***********************************************
  * struct object_d:
  *     Object controle ...
  *     Estrutura para controle de objetos.
- *     Isso deve ficar no inÌcio de cada estrutura 
- *     para controlar a utilizaÁ„o do objeto por parte 
+ *     Isso deve ficar no in√≠cio de cada estrutura 
+ *     para controlar a utiliza√ß√£o do objeto por parte 
  * dos processos e threads.
  * 
  */
@@ -49,19 +39,17 @@ struct object_d
     int currentPID;
    
  
-    //endereÁos
+    //endere√ßos
     unsigned long obj_address;
     unsigned long obj_procedure;
-   
-    //
-	// Status do objeto.
-	//   
-	 
+
+    // Status do objeto.
+
     int token; //algum processo 'pegou' o objeto e esta usando.
 
     int task_id; //id da tarefa que pegou o processo.
 
-    
+
 	//int signaled;
 	//struct process_d *waitListHead;
 	
@@ -73,13 +61,12 @@ struct object_d
 	//continua...
 };
 
-
 // ??
 // Repensar isso.
-// #bugbug: Muito espaÁo. (#todo: deprecated this)
-struct object_d objects_km[256+1];  //objetos em kernel mode.
-struct object_d objects_um[256+1];  //objetos em user mode. 
-struct object_d objects_gui[256+1]; //objetos gr·ficos. 
+// #bugbug: Muito espa√ßo. (#todo: deprecated this)
+//struct object_d objects_km[256+1];  //objetos em kernel mode.
+//struct object_d objects_um[256+1];  //objetos em user mode. 
+//struct object_d objects_gui[256+1]; //objetos gr√°ficos. 
 
 
 // Se o gerenciador de recursos foi inicializado.
@@ -98,11 +85,8 @@ int g_current_list;
 //
 
 
-  
-int init_object_manager (void);
+
+#endif    
 
 
-//
-// End.
-//
 

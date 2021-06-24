@@ -1,47 +1,73 @@
-/*
- * File: debug.c
- *
- * Modulo Debug.
- * MB - Módulos incluídos no Kernel Base.
- *	
- * Descrição:
- *     Kernel Debugger.
- *     Arquivo princial do módulo debug do executive do kernel.
- *     Checar se há falhas no sistema. 
- *     Como um dr watson.
- * 
- * Obs:
- *     As funções aqui são usadas pelo kernel.
- *     Mas pode haver um aplicativo que utilizem essas funções.
- *
- * Obs:
- *     @todo: Começar a análise pela estrutura 'platform' e todo
- * o que está dentro dela.
- *
- *
- * 2015 - Created by Fred Nora.
- *
- */
 
- 
+
+
 #include <kernel.h>
 
 
-// Variáveis internas.
-//int debugStatus;
-//int debugError;
-//...
+// debug_compute_checksum: 
+// retorna um checksum dado um buffer e um tamanho.
+
+unsigned long 
+debug_compute_checksum ( 
+    unsigned char *buffer, 
+    unsigned long lenght )
+{
+    unsigned long CheckSum = 0;
 
 
+    while (lenght > 0){
+        CheckSum = ( CheckSum + (unsigned long) *buffer++ );
+        lenght--;
+    };
+
+    return (unsigned long) CheckSum;
+}
 
 
-/*
- * debug_check_inicialization:
- *
- *     Checar se o kernel e os módulos foram inicializados.
- *     Checa o valor das flags.
- *     checar todos contextos de tarefas válidas.
- */
+void debug_print ( char *data )
+{
+    register int i=0;
+
+    if ( (void *) data == NULL ){ return; }
+    if (*data == 0)             { return; }
+
+    for ( i=0; data[i] != '\0'; i++ )
+    {
+        serial_write_char ( COM1_PORT, data[i] );
+    };
+}
+
+
+// We will use this function to track 
+// the main kernel initialization progress.
+// It will print into the serial port for now.
+
+void PROGRESS( char *string )
+{
+    if( (void*) string == NULL ){
+        return;
+    }
+
+    if(*string == 0){
+        return;
+    }
+
+    // #todo
+    // Select the available method.
+    // switch(...
+
+    debug_print("\n");
+    debug_print(string);
+}
+
+
+// debug_check_inicialization:
+//     Checar se o kernel e os mÃ³dulos foram inicializados.
+//     Checa o valor das flags.
+//     Checar todos contextos de tarefas vÃ¡lidas.
+
+// #todo
+// Rever esses nomes e etapas.
 
 int debug_check_inicialization (void){
 
@@ -55,8 +81,6 @@ int debug_check_inicialization (void){
            KeInitPhase );
        goto fail;
     }
-
-
 
 
     // Executive.
@@ -82,20 +106,17 @@ int debug_check_inicialization (void){
         goto fail;
     }
 
-
     // More?!
 
 //done:
     return (int) Status;
-
 fail:
-    die();
+    die(); 
 }
-
 
 /*
  * debug_check_drivers:
- *    Checar se os drivers estão inicializados.
+ *    Checar se os drivers estÃ£o inicializados.
  */
  
 int debug_check_drivers (void)
@@ -142,60 +163,28 @@ int debug_check_drivers (void)
 }
 
 
-// debug_breakpoint:
-//     Para a execução do sistema.
-//     @todo: isso pode ir para o arquivo debug.c.
-
-void debug_breakpoint (void)
-{
-    printf ("debug_breakpoint:\n");
-    die();
-}
-
-
-// debug_compute_checksum: 
-// retorna um checksum dado um buffer e um tamanho.
-
-unsigned long 
-debug_compute_checksum ( 
-    unsigned char *Buffer, 
-    unsigned long Lenght )
-{
-    unsigned long CheckSum = 0;
-
-
-    while (Lenght > 0){
-        CheckSum = ( CheckSum + (unsigned long) *Buffer++ );
-        Lenght--;
-    };
-
-    return (unsigned long) CheckSum;
-}
-
-
 /*
  ****************************************
  * debug:
  *     Checa por falhas depois de cumpridas as 
- *     três fases de inicialização.
+ *     trÃªs fases de inicializaÃ§Ã£o.
  */
 
 // #bugbug
-// Será que o output está realmente disponível nesse momento ?!
+// SerÃ¡ que o output estÃ¡ realmente disponÃ­vel nesse momento ?!
 
 int debug (void){
 
     int Status = -1; 
 
-    // Checa inicialização. 
-    // Fases, variáveis e estruturas.
+    // Checa inicializaÃ§Ã£o. 
+    // Fases, variÃ¡veis e estruturas.
 
     Status = (int) debug_check_inicialization();
 
     if (Status == 1){
         panic ("debug: debug_check_inicialization fail\n");
     }
-
 
     // 'processor' struct.
 
@@ -204,15 +193,14 @@ int debug (void){
     }
 
     // Check drivers status. 
-    // ( Ver se os principais drivers estão inicializados )
+    // ( Ver se os principais drivers estÃ£o inicializados )
 
     debug_check_drivers();
-
 
 	/*
 	 * @todo: 
 	 *     Checar se existe componentes do sistema como mbr, root, fat 
-	 * e arquivos e programas básicos do sistema.
+	 * e arquivos e programas bÃ¡sicos do sistema.
 	 */
 	 
 	 
@@ -227,8 +215,6 @@ int debug (void){
 	 *     Checar por falhas nas estruturas de tarefas.
 	 */
 
-
-
 	//...
 
 
@@ -237,78 +223,28 @@ int debug (void){
     return 0; 
 }
 
+// debug_breakpoint:
+//     Para a execuÃ§Ã£o do sistema.
+//     @todo: isso pode ir para o arquivo debug.c.
 
-/*
-void
-debugDumpMemory(
-    void *Start,
-    unsigned long Length);
-void
-debugDumpMemory(
-    void *Start,
-    unsigned long Length)
+void debug_breakpoint (void)
 {
-    unsigned long cnt=0;
-
-    kprintf (" %x:\n", (unsigned long) Start );
-
-    for (cnt=0; cnt<Length; cnt++) 
-    {
-        //kprintf( "%x ", *((unsigned short *)(Start)+cnt) );
-        kprintf( "%x ", *((unsigned char *)(Start)+cnt) );
-
-        if (((cnt+1)%16)==0) { kprintf ("\n"); }
-    };
-    
-    refresh_screen();
-}
-*/
-
-
-
-/*
- * debug_print:
- *     Serial debug support.
- */
-
-void debug_print ( char *data )
-{
-    register int i=0;
-
-    //if ( (void *) data == NULL ){ return; }
-    //if (*data == 0)             { return; }
-
-    for ( i=0; data[i] != '\0'; i++ )
-    {
-        serial_write_char ( COM1_PORT, data[i] );
-    };
+    printf ("debug_breakpoint:\n");
+    die();
 }
 
 
-// We will use this function to track 
-// the main kernel initialization progress.
-// It will print into the serial port for now.
-
-void PROGRESS( char *string )
-{
-    if ( (void *) string == NULL ){
-        return;
-    }
-
-    if (*string == 0){
-        return;
-    }
-
-    // #todo
-    // Select the available method.
-    // switch(...
-
-    debug_print("\n");
-    debug_print(string);
-}
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
 

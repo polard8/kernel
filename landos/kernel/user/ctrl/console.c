@@ -1,43 +1,10 @@
-/*
- * File: console.c 
- *
- *     Console interface.
- * 
- *     This is a generic interface for a frame buffer based 
- * graphical consoles.
- * 
- *     The system have only '4' virtual consoles. 
- * Define in the struct list CONSOLE[].
- *     #bugbug: It uses the TTY structure. But the configuration
- * is kinda buggy and there is no buffers for now.
- *     
- *     We are using these console only to print chars 
- * in the screen in graphics mode.
- *     The scroll only works on full screen for now.
- * 
- *     This is a kind of emergency console, used by the developer
- * to test the system and to fix some critical condition.
- * 
- *     See: chardev/tty/ in 2io/
- */
-
-// notes:
-// Esse console é full screen e não precisa de muitos recursos gráficos.
-// Somete o super user poderá usá-lo.
-// Só existem quatro consoles virtuais. Um deles será usado para
-// registrar o servidor gráfico.
-// Para pseudo terminais veja: vt.c
-
-
-// #todo:
-// Control Sequence Introducer (CSI) 
-// See:
-// https://docs.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences
-// ...
 
 
 #include <kernel.h>
 
+
+//#test
+//static struct tty_d CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
 
 extern unsigned long SavedX;
 extern unsigned long SavedY;
@@ -64,7 +31,6 @@ void __local_ri (void)
 {
     //#todo
 }
-
 
 // goto xy
 void 
@@ -94,27 +60,6 @@ __local_gotoxy (
 
 
 
-// #bugbug
-// Isso tá errado.
-
-#define __RESPONSE "\033[?1;2c"
-
-void __respond (int console_number)
-{
-    char * p = __RESPONSE;
-
-    while (*p) {
-        
-        //PUTCH(*p,tty->read_q);
-        console_putchar ( (int) *p, console_number );
-        p++;
-    }
-
-	//copy_to_cooked(tty);
-}
-
-
-
 static int saved_x=0;
 static int saved_y=0;
 
@@ -128,52 +73,6 @@ void __local_restore_cur (int console_number)
 {
     CONSOLE_TTYS[console_number].cursor_x = saved_x;
     CONSOLE_TTYS[console_number].cursor_y = saved_y;
-}
-
-
-// See:
-// https://en.wikipedia.org/wiki/Control_character
-// https://en.wikipedia.org/wiki/C0_and_C1_control_codes#Device_control
-
-void __local_insert_char ( int console_number )
-{
-
-    if(console_number<0){
-        return;
-    }
-
-	//int i=x;
-	//unsigned short tmp,old=0x0720;
-	//unsigned short * p = (unsigned short *) pos;
-
-/*
-	while (i++ < columns) {
-
-		// Salvo o char da posição atual.
-		tmp = *p;
-
-        // coloco o char de controle na posição atual
-        // ou o caractere salvo anteriomente.
-		*p=old;
-
-        // coloco o caractere salvo para uso futuro.
-		old=tmp;
-
-        //avança até o fim da linha.
-		p++;
-	}
-*/
-
-    //int i = CONSOLE[console_number].cursor_x;
-    //int tmp;
-    //int old = 0x20;
-    
-    // #bugbug
-    // Não é possível fazer essa rotina pois não temos um buffer e chars.
-
-    //while (i++ < CONSOLE[console_number].cursor_height ) {};
-    
-    console_putchar (0x20, console_number);
 }
 
 
@@ -204,35 +103,6 @@ void __local_insert_line (int console_number)
     CONSOLE_TTYS[console_number].cursor_bottom = oldbottom;
 }
 
-
-void __local_delete_char(int console_number)
-{
-
-    if(console_number<0){
-        return;
-    }
-
-    console_putchar ( ' ', console_number);
-
-/*
-	int i;
-	unsigned short * p = (unsigned short *) pos;
-
-	if (x >= columns)
-		return;
-
-	i = x;
-	while (++i < columns) 
-	{
-		*p = *(p+1);
-		p++;
-	}
-	*p=0x0720;
-*/
-
-}
-
-
 void __local_delete_line(int console_number)
 {
     int oldtop    = 0;
@@ -258,8 +128,6 @@ void __local_delete_line(int console_number)
     CONSOLE_TTYS[console_number].cursor_top    = oldtop;
     CONSOLE_TTYS[console_number].cursor_bottom = oldbottom;
 }
-
-
 
 void csi_J (int par)
 {
@@ -329,7 +197,6 @@ void csi_K(int par)
    */
 }
 
-
 // Fim da escape sequence.
 // isso eh chamado quando encontramos um 'm'.
 // O 'm' eh um marcador de fim de escape sequence.
@@ -382,7 +249,6 @@ void csi_M ( int nr, int console_number )
     */
 }
 
-
 // move to
 void csi_L (int nr, int console_number)
 {
@@ -397,141 +263,412 @@ void csi_L (int nr, int console_number)
 }
 
 
-void csi_P (int nr, int console_number)
+
+//============================================
+// input:
+// called by devices that are not block devices.
+// probably keyboard and serial devices.
+// See: keyboard.c and serial.c
+// Called by DeviceInterface_PS2Keyboard() in ps2kbd.c
+
+void 
+console_interrupt(
+    int target_thread, 
+    int device_type, 
+    int data )
 {
 
-    if (console_number<0){
+    //int TargetThread = foreground_thread;
+    int TargetThread = target_thread;
+    int DeviceType   = device_type;
+    int Data         = data;
+
+
+    // #todo
+    // E se não tivermos uma foreground thread ?
+    // foreground representa a thred com 'foco de entrada'
+    // >> então, se não tivermos uma thread com foco de entrada,
+    // podemos mandar a mensagem para outra thread ?
+
+    // #todo: Check overflow
+
+    if ( TargetThread < 0 )
+    {
+        debug_print ("console_interrupt: [FAIL] TargetThread\n");
+        
+        // #todo
+        // Maybe we can set the idle thread if it fail.
+
         return;
     }
 
-    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
-    {
-        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
-    } else {
-        
-        if (!nr)
-        {
-            nr = 1;
-        }
-    };
 
-    if (nr<0)
-        return;
+    switch (DeviceType){
 
-    while (nr--){
-        __local_delete_char(console_number);
+        // keyboard
+        // data =  raw byte.
+        // See: vt/draw/model/kgws.c
+        case CONSOLE_DEVICE_KEYBOARD:
+            debug_print("console_interrupt: input from keyboard device\n");
+            
+            // #todo
+            // UserInput_SendKeyboardMessage (TargetThread, Data);
+            
+            break;
+
+        // COM port
+        case CONSOLE_DEVICE_SERIAL:
+            debug_print("console_interrupt: input from serial device\n");
+            break;
+ 
+        //network device.
+        case CONSOLE_DEVICE_NETWORK:
+            debug_print("console_interrupt: input from network device\n");
+            break;
+
+        // ...
+
+        default:
+            debug_print("console_interrupt: [FAIL] Default input device\n");
+            break;
     };
 }
 
 
-void csi_at (int nr, int console_number)
+void console_init_virtual_console (int n)
 {
+    int ConsoleIndex = -1;
 
-    if( console_number<0){
+
+    debug_print ("console_init_virtual_console:\n");
+
+
+//
+// Limits
+//
+
+    ConsoleIndex = n;
+
+    if ( ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
+    {
+        debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
+        x_panic     ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
+    }
+
+//
+// Data
+//
+
+    CONSOLE_TTYS[ConsoleIndex].initialized = FALSE;
+
+    // Todo virtual console eh uma tty. Os 4.
+    CONSOLE_TTYS[ConsoleIndex].objectType  = ObjectTypeTTY;
+    CONSOLE_TTYS[ConsoleIndex].objectClass = ObjectClassKernelObjects;
+    CONSOLE_TTYS[ConsoleIndex].used  = TRUE;
+    CONSOLE_TTYS[ConsoleIndex].magic = (int) 1234;
+
+    // No thread for now.
+    CONSOLE_TTYS[ConsoleIndex].control = NULL;
+
+    // tty is a terminal, so the user logs on a terminal.
+    // No user logged yet.
+    CONSOLE_TTYS[ConsoleIndex].user_info = NULL;
+
+    // Security stuff.
+    // Nao sei se essas estruturas estao prontas para isso nesse momento
+    // ou se esses ponteiros sao nulos.
+    CONSOLE_TTYS[ConsoleIndex].user_session = NULL;  //CurrentUserSession;
+    CONSOLE_TTYS[ConsoleIndex].room         = NULL;  // CurrentRoom;
+    CONSOLE_TTYS[ConsoleIndex].desktop      = NULL;  // CurrentDesktop;
+
+    // file pointer
+    // this file handles this tty object
+    // CONSOLE[ConsoleIndex]._fp
+    
+    // tty name
+    //CONSOLE_TTYS[ConsoleIndex].name[?] 
+    CONSOLE_TTYS[ConsoleIndex].Name_len = 0;  //initialized
+
+    //#todo: Indice do dispositivo.
+    // CONSOLE_TTYS[ConsoleIndex].device = 0;   // initialized.
+
+    CONSOLE_TTYS[ConsoleIndex].driver = NULL;  //driver struct
+    CONSOLE_TTYS[ConsoleIndex].ldisc  = NULL;  //line discipline struct
+
+    //CONSOLE_TTYS[ConsoleIndex].termios??       //termios struct (not a pointer)
+
+    // process group.
+    CONSOLE_TTYS[ConsoleIndex].gid = current_group;
+
+    // ??
+    // Quantos processos estao usando essa tty.
+    CONSOLE_TTYS[ConsoleIndex].pid_count=0;
+
+    CONSOLE_TTYS[ConsoleIndex].type = 0;
+    CONSOLE_TTYS[ConsoleIndex].subtype = 0;
+        
+    CONSOLE_TTYS[ConsoleIndex].flags = 0;
+
+    // not stopped
+    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
+
+    // process
+    //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;
+    
+    // thread
+    //CONSOLE_TTYS[ConsoleIndex].thread  = ?
+
+    // Qual terminal virtual esta usando essa tty.
+    CONSOLE_TTYS[ConsoleIndex].virtual_terminal_pid = 0;
+
+    // Window.
+    // When we are using the kgws.
+    // CONSOLE_TTYS[ConsoleIndex].window = NULL;
+
+
+    //
+    // == buffers ===========================
+    //
+
+    // #bugbug
+    // No buffers fo rthe virtual consoles.
+    // remember: 
+    // The virtual console is used only in the 'stdout' of a process.
+    CONSOLE_TTYS[ConsoleIndex].nobuffers = TRUE;   // No buffers.
+    CONSOLE_TTYS[ConsoleIndex]._rbuffer = (file *) 0; 
+    CONSOLE_TTYS[ConsoleIndex]._cbuffer = (file *) 0;
+    CONSOLE_TTYS[ConsoleIndex]._obuffer = (file *) 0;
+
+
+    // cursor dimentions in pixel.
+    // #bugbug: determinado
+    CONSOLE_TTYS[ConsoleIndex].cursor_width_in_pixels = 8; 
+    CONSOLE_TTYS[ConsoleIndex].cursor_height_in_pixels = 8;
+
+    //cursor position in chars.
+    CONSOLE_TTYS[ConsoleIndex].cursor_x = 0;
+    CONSOLE_TTYS[ConsoleIndex].cursor_y = 0;
+
+    // cursor margin
+    CONSOLE_TTYS[ConsoleIndex].cursor_left = 0;
+    CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
+    
+    // cursor limits
+    //CONSOLE_TTYS[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
+    //CONSOLE_TTYS[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
+
+    CONSOLE_TTYS[ConsoleIndex].cursor_right  = (SavedX/8);
+    CONSOLE_TTYS[ConsoleIndex].cursor_bottom = (SavedY/8);  
+  
+    
+    //everyone.
+    CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
+
+
+    if ( ConsoleIndex == 0){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
+    }
+
+    if ( ConsoleIndex == 1){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_RED; 
+    }
+
+    if ( ConsoleIndex == 2){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_GREEN; 
+    }
+
+    if ( ConsoleIndex == 3){
+        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_BLUE; 
+    }
+
+
+    //#todo
+    // Buffers !!!
+    //CONSOLE_TTYS[ConsoleIndex]._rbuffer ...
+    //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
+
+
+    //#todo
+    // Local mode flags.
+    CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
+
+
+    //CONSOLE_TTYS[ConsoleIndex].vc_mode = 0;
+
+    // #bugbug
+    // A estrutura tem mais elementos que podem ser inicializados.
+    // Tivemos problemas ao tentar inicializa-los.
+
+    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE;
+    
+    //if ( CONSOLE_TTYS[ConsoleIndex].initialized != TRUE )
+        //x_panic("FUCK");
+    
+}
+
+
+void console_set_current_virtual_console (int n)
+{
+    if ( n < 0 || n >= 4 ){
+        debug_print ("console_set_current_virtual_console: Limits\n");
         return;
     }
 
-    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
+    fg_console = n;
+}
+
+
+int console_get_current_virtual_console (void)
+{
+    return (int) fg_console;
+}
+
+
+// Called by: 
+// __local_ps2kbd_procedure in ps2kbd.c
+
+void jobcontrol_switch_console(int n)
+{
+    // #todo:
+    // maybe we can do somo other configuration here.
+ 
+    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX )
     {
-        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
-    }else {
-        
-        if (!nr){
-            nr=1;
-        }
-    };
-
-    if (nr<0)
+        debug_print("jobcontrol_switch_console: Limits\n");
         return;
+    }
 
-    while (nr--){
-        __local_insert_char(console_number);
-    };
+    console_set_current_virtual_console(n);
+}
+
+/*
+ * set_up_cursor:
+ *     Setup cursor for the current virtual console.
+ */
+
+// #todo
+// Maybe change to console_set_up_cursor();
+
+// We need a routine to change the cursor inside a wigen window.
+// The console has a window ? No ? ... but it has a dimension.
+// See the tty structure at hal/dev/tty/tty.h
+
+// We need to know that there is a difference between 
+// printing at a given console and printing at a given window.
+// The tty has a window, but we are not using it, we are using
+// the margins for the console.
+
+// #todo
+// Quando estivermos colocando o cursor em uma janela e
+// a janela não for válida, então colocamos o cursor na posição 0,0.
+
+// #todo
+// Podemos criar uma rotina que mude o cursor de um dado console.
+//void set_up_cursor2 ( int console, unsigned long x, unsigned long y );
+//void set_up_cursor2 ( int console, unsigned long x, unsigned long y ){}
+
+void set_up_cursor ( unsigned long x, unsigned long y )
+{
+    if (fg_console<0){ return; }
+
+    CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
+    CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
 }
 
 
 /*
- ***************************************
- * _console_outbyte:
- * 
- *    Outputs a char on the console device;
- *    Low level function to draw the char into the screen.
- *    it calls the embedded window server.
+ * get_cursor_x:
+ *     Pega o valor de x.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_x (void)
+{
+    // #bugbug: index validation
+    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_x;
+}
+
+/*
+ * get_cursor_y:
+ *     Pega o valor de y.
+ *     @todo: Isso pode ir para outro lugar.
+ */
+unsigned long get_cursor_y (void)
+{
+    // #bugbug: index validation
+    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
+}
+
+
+void console_scroll (int console_number)
+{
+    debug_print ("console_scroll: #todo\n");
+}
+
+
+/*
+ *************************************** 
+ * console_putchar:
+ *     Put a char into the screen of a virtual console.
  */
 
-	// #test
-	// Tentando pegar as dimensões do char.
-	// #importante: 
-	// Não pode ser 0, pois poderíamos ter divisão por zero.
+// #importante
+// Colocamos um caractere na tela de um console virtual.
 
-// Called by console_outbyte.
+// #bugbug: 
+// Como essa rotina escreve na memória de vídeo,
+// então precisamos, antes de uma string efetuar a
+// sincronização do retraço vertical e não a cada char.
 
-void _console_outbyte (int c, int console_number)
+/*
+ 
+// #todo
+// We have a dependence here.
+// The function refresh_rectangle()
+
+void console_putchar ( int c, int console_number );
+void console_putchar ( int c, int console_number )
 {
+    // Getting char info.
     int cWidth  = get_char_width();
     int cHeight = get_char_height();
 
-    // #todo: Check verflow
-    if (console_number < 0){
-        return;
-    }
 
     if ( cWidth == 0 || cHeight == 0 )
     {
-        debug_print ("_console_outbyte: char w h\n");
-        panic       ("_console_outbyte: fail w h");
+        x_panic ("console_putchar: char\n");
     }
 
+    // flag on.
+    stdio_terminalmode_flag = TRUE;
 
-    // #bugbug
-    // Caso estejamos em modo texto.
-    // Isso ainda não é suportado.
+    // #todo
+    // Check these limits.
 
-    if ( VideoBlock.useGui == FALSE )
+    //  Console limits
+    // CONSOLETTYS_COUNT_MAX
+    // See: tty.h
+
+    if ( console_number < 0 || console_number > 3 )
     {
-        debug_print ("_console_outbyte: kernel in text mode\n");
-        panic       ("_console_outbyte: kernel in text mode\n");
+        x_panic ("console_putchar: console_number\n");
     }
 
+    // Draw and copy
+    // Draw the char into the backbuffer and
+    // copy a small rectangle to the frontboffer.
 
-    // #Importante: 
-    // Essa rotina não sabe nada sobre janela, ela escreve na tela como 
-    // um todo. Só está considerando as dimensões do 'char'.
-    // Caso estivermos em modo gráfico.
-    // #importante: 
-    // Essa rotina de pintura deveria ser exclusiva 
-    // para dentro do terminal.
-    // Então essa flag não faz sentido.
-    // See: windows/char.c
+    console_outbyte( (int) c, console_number );
 
-    if ( VideoBlock.useGui == TRUE )
-    {
+    refresh_rectangle ( 
+        (CONSOLE_TTYS[console_number].cursor_x * cWidth), 
+        (CONSOLE_TTYS[console_number].cursor_y * cHeight), 
+        cWidth, 
+        cHeight );
 
-        // ## NÃO TRANPARENTE ##
-        // Se estamos no modo terminal então usaremos as cores 
-        // configuradas na estrutura do terminal atual.
-        // Branco no preto é um padrão para terminal.
-        if ( stdio_terminalmode_flag == 1 ){
-            d_draw_char ( 
-                 (cWidth * CONSOLE_TTYS[console_number].cursor_x), 
-                (cHeight * CONSOLE_TTYS[console_number].cursor_y), 
-                c, COLOR_WHITE, 0x303030 );
-
-
-        // ## TRANSPARENTE ##
-        // Se não estamos no modo terminal então usaremos
-        // char transparente.
-        // Não sabemos o fundo. Vamos selecionar o foreground. 
-        }else{
-            d_drawchar_transparent ( 
-                (cWidth  * CONSOLE_TTYS[console_number].cursor_x), 
-                (cHeight * CONSOLE_TTYS[console_number].cursor_y), 
-                CONSOLE_TTYS[console_number].cursor_color, 
-                c );
-        };
-        // Nothing.
-    }
+    // flag off.
+    stdio_terminalmode_flag = FALSE; 
 }
+*/
 
 
 /*
@@ -547,6 +684,7 @@ void _console_outbyte (int c, int console_number)
 // This functions calls _console_outbyte to draw
 // the char into the screen.
 
+
 void console_outbyte (int c, int console_number)
 {
     // Copy.
@@ -557,16 +695,44 @@ void console_outbyte (int c, int console_number)
     unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
+    // #debug
+    // debug_print ("console_outbyte:\n");
+
 
     // #todo: Check overflow.
-    if (console_number<0){
-        return;
+    //if (console_number<0)
+    //{
+    //    debug_print ("console_outbyte: console_number\n");
+    //    return;
+    //}
+
+    if ( console_number < 0 || console_number >= CONSOLETTYS_COUNT_MAX  )
+    {
+        debug_print ("console_outbyte: [FAIL] console_number\n");
+        x_panic     ("console_outbyte: [FAIL] console_number\n");
     }
+
+
+
 
     if ( __cWidth == 0 || __cHeight == 0 )
     {
-        panic ("console_outbyte: [FAIL] char size\n");
+        x_panic ("console_outbyte: [FAIL] char size\n");
     }
+
+
+    // #test
+    // tem momento da inicialização em que esse array de estruturas
+    // não funciona, e perdemos a configuração feita
+
+    if ( CONSOLE_TTYS[console_number].initialized != TRUE )
+    {
+        //x_panic ("console_outbyte: CONSOLE_TTYS");
+        debug_print ("console_outbyte: [BUGBUG] CONSOLE_TTYS not initialized\n");
+        return;
+    }
+
+
 
 
     // Obs:
@@ -599,7 +765,7 @@ void console_outbyte (int c, int console_number)
         // Melhorar esse limite.
         if ( CONSOLE_TTYS[console_number].cursor_y > (CONSOLE_TTYS[console_number].cursor_bottom) )
         {
-            //debug_print ("console_outbyte: scroll 1\n"); 
+            debug_print ("console_outbyte: scroll 1\n"); 
             console_scroll (console_number);
 
             CONSOLE_TTYS[console_number].cursor_y = (CONSOLE_TTYS[console_number].cursor_bottom);
@@ -622,7 +788,7 @@ void console_outbyte (int c, int console_number)
         if ( CONSOLE_TTYS[console_number].cursor_y > (CONSOLE_TTYS[console_number].cursor_bottom) )
         {
 
-            //debug_print ("console_outbyte: scroll 2\n"); 
+            debug_print ("console_outbyte: scroll 2\n"); 
             console_scroll (console_number);
             
             CONSOLE_TTYS[console_number].cursor_y = (CONSOLE_TTYS[console_number].cursor_bottom);
@@ -720,9 +886,9 @@ void console_outbyte (int c, int console_number)
     }
 
 
-    //
-    // == Limits =======================================
-    //
+//
+// == Limits =======================================
+//
 
     // Nao eh um escape sequense ...
     // mas chegamos no fim da linha ou na ultima linha.
@@ -749,7 +915,7 @@ void console_outbyte (int c, int console_number)
 	// Número máximo de linhas. (n pixels por linha.)
     if ( CONSOLE_TTYS[console_number].cursor_y > CONSOLE_TTYS[console_number].cursor_bottom )  
     { 
-        //debug_print ("console_outbyte: scroll 3\n"); 
+        debug_print ("console_outbyte: scroll 3\n"); 
         console_scroll (console_number);
 
         CONSOLE_TTYS[console_number].cursor_x = CONSOLE_TTYS[console_number].cursor_left;
@@ -767,6 +933,105 @@ draw:
 }
 
 
+
+
+/*
+ ***************************************
+ * _console_outbyte:
+ * 
+ *    Outputs a char on the console device;
+ *    Low level function to draw the char into the screen.
+ *    it calls the embedded window server.
+ */
+
+	// #test
+	// Tentando pegar as dimensões do char.
+	// #importante: 
+	// Não pode ser 0, pois poderíamos ter divisão por zero.
+
+// Called by console_outbyte.
+
+void _console_outbyte (int c, int console_number)
+{
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
+
+
+    // #debug
+    // debug_print ("_console_outbyte:\n");
+
+
+    // #todo: Check verflow
+    //if (console_number < 0)
+    //{
+    //    debug_print ("console_outbyte: console_number\n");
+    //    return;
+    //}
+
+    if ( console_number < 0 || console_number >= CONSOLETTYS_COUNT_MAX  )
+    {
+        debug_print ("_console_outbyte: [FAIL] console_number\n");
+        x_panic     ("_console_outbyte: [FAIL] console_number\n");
+    }
+
+
+
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        debug_print ("_console_outbyte: char w h\n");
+        x_panic     ("_console_outbyte: fail w h");
+    }
+
+
+    // #bugbug
+    // Caso estejamos em modo texto.
+    // Isso ainda não é suportado.
+
+    if ( VideoBlock.useGui == FALSE )
+    {
+        debug_print ("_console_outbyte: kernel in text mode\n");
+        x_panic     ("_console_outbyte: kernel in text mode\n");
+    }
+
+
+    // #Importante: 
+    // Essa rotina não sabe nada sobre janela, ela escreve na tela como 
+    // um todo. Só está considerando as dimensões do 'char'.
+    // Caso estivermos em modo gráfico.
+    // #importante: 
+    // Essa rotina de pintura deveria ser exclusiva 
+    // para dentro do terminal.
+    // Então essa flag não faz sentido.
+    // See: char.c
+
+    if ( VideoBlock.useGui == TRUE )
+    {
+
+        // ## NÃO TRANPARENTE ##
+        // Se estamos no modo terminal então usaremos as cores 
+        // configuradas na estrutura do terminal atual.
+        // Branco no preto é um padrão para terminal.
+        if ( stdio_terminalmode_flag == 1 ){
+            d_draw_char ( 
+                 (cWidth * CONSOLE_TTYS[console_number].cursor_x), 
+                (cHeight * CONSOLE_TTYS[console_number].cursor_y), 
+                c, COLOR_WHITE, 0x303030 );
+
+
+        // ## TRANSPARENTE ##
+        // Se não estamos no modo terminal então usaremos
+        // char transparente.
+        // Não sabemos o fundo. Vamos selecionar o foreground. 
+        }else{
+            d_drawchar_transparent ( 
+                (cWidth  * CONSOLE_TTYS[console_number].cursor_x), 
+                (cHeight * CONSOLE_TTYS[console_number].cursor_y), 
+                CONSOLE_TTYS[console_number].cursor_color, 
+                c );
+        };
+        // Nothing.
+    }
+}
 
 /*
  *************************************** 
@@ -844,17 +1109,17 @@ __console_write (
 
     if ( console_number < 0 || console_number > 3 )
     {
-       kprintf ("__console_write: console_number\n");
+       printf ("__console_write: console_number\n");
        goto fail;
     }
 
     if ( (void *) buf == NULL ){
-        kprintf ("__console_write: buf\n");
+        printf ("__console_write: buf\n");
         goto fail;
     }
 
     if (!count){
-        kprintf ("__console_write: count\n");
+        printf ("__console_write: count\n");
         goto fail;
     }
 
@@ -877,7 +1142,6 @@ fail:
 }
 
 
-
 // #todo
 // Isso é importante.
 // Pegar input na estrutura de console do kernel.
@@ -891,6 +1155,10 @@ console_read (
     debug_print ("console_read: [TODO]\n");
     return -1;  //todo
 }
+
+
+
+
 
 
 
@@ -1275,572 +1543,162 @@ fail:
 
 
 
-/*
- ********************************************
- * console_scroll:
- *     Isso pode ser útil em full screen e na inicialização do kernel.
- *
- * *Importante: 
- * Um (retângulo) num terminal deve ser o lugar onde o buffer 
- * de linhas deve ser pintado. Obs: Esse retãngulo pode ser 
- * configurado através de uma função.
- *     Scroll the screen in text mode.
- *     Scroll the screen in graphical mode.
- *     @todo Poderiam ser duas funções: ex: gui_scroll(). 
- *    
- * * IMPORTANTE
- *   O que devemos fazer é reordenar as linhas nos buffers de linhas
- *     para mensagens de texto em algum terminal.
- * 
- * @todo: Ele não será feito dessa forma, termos uma disciplica de linhas
- * num array de linhas que pertence à uma janela.
- *
- * #todo: 
- * Fazer o scroll somente no stream stdin e 
- * depois mostrar ele pronto.
- */
-
-// Called by __local_insert_line() and  console_outbyte().
-
-void console_scroll (int console_number){
-
-    // Salvar cursor.
-    unsigned long OldX=0;
-    unsigned long OldY=0;
-
-    register int i=0;
-
-
-    if ( VideoBlock.useGui != TRUE )
-    {
-        debug_print ("console_scroll: no GUI\n");
-        panic       ("console_scroll: no GUI\n");
-    }
-
-    // #todo: check overflow
-    if ( console_number < 0 ){
-        panic ("console_scroll: [FAIL] console_number\n");
-    }
-
-
-    // Scroll the screen rectangle.
-    // See: windows/rect.c
-
-    scroll_screen_rect();
-
-    // Clena the last line.
-  
-	// Salva cursor
-    OldX = CONSOLE_TTYS[console_number].cursor_x; 
-    OldY = CONSOLE_TTYS[console_number].cursor_y; 
-
-    // Cursor na ultima linha.
-    CONSOLE_TTYS[console_number].cursor_x =   CONSOLE_TTYS[console_number].cursor_left; 
-    CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom); 
-
-
-   // Limpa a últime linha.
-   for ( i = CONSOLE_TTYS[console_number].cursor_x; 
-         i < CONSOLE_TTYS[console_number].cursor_right; 
-         i++ )
-   {
-        _console_outbyte (' ',console_number); 
-   };
-
-
-    // Reposiciona o cursor na última linha.
-    CONSOLE_TTYS[console_number].cursor_x = CONSOLE_TTYS[console_number].cursor_left; 
-    CONSOLE_TTYS[console_number].cursor_y = OldY;  //( CONSOLE[console_number].cursor_bottom -1); 
-
-    refresh_screen();
-}
-
-
-/*
- ********************************
- * kclear:
- *     Limpa a tela em text mode.
- */
-
-int kclear (int color, int console_number)
-{
-    int Status = -1;
-
-
-    if ( VideoBlock.useGui == 1 )
-    {
-        backgroundDraw ( COLOR_BLUE );
-        
-        CONSOLE_TTYS[console_number].cursor_x = 0; 
-        CONSOLE_TTYS[console_number].cursor_y = 0; 
-        Status = 0;
-        
-    }else{ Status = -1; };
-
-    return (int) Status;
-}
-
-
- 
-// kclearClientArea: 
-// Limpa a tela em text mode.
-// deprecated
-int kclearClientArea (int color)
-{
-    debug_print("kclearClientArea: deprecated\n");
-
-    return (int) kclear (color, fg_console);
-}
-
-
-
-/*
- *************************************
- * insert_line:
- * 
- */
-
-// Incluir uma linha no buffer de linhas da estrutura do tty atual.
-// vamos copiar esse esquema do edito de textos em ring3.
-
-int insert_line ( char *string, int line )
-{
-    debug_print ("insert_line: [TODO]\n");
-    return (int) -1; 
-}
-
-
-
-/*
- *******************************************
- * REFRESH_STREAM:
- * 
- *     #IMPORTANTE
- *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
- */
-
-// #todo
-// Change this name. 
-// Do not use stream in the base kernel.
-
-void REFRESH_STREAM ( file *f )
-{
-    // loop
-    int i=0;
-    int j=0;
-
-    char *ptr;
-
-    int cWidth  = get_char_width();
-    int cHeight = get_char_height();
-
-
-
-    debug_print("console.c-REFRESH_STREAM: [FIXME] It is wrong!\n");
-
-    if ( cWidth == 0 || cHeight == 0 )
-    {
-        panic ("REFRESH_STREAM: [FAIL] char w h\n");
-    }
-
-
-    j = (80*25);
-
-    //
-    // File
-    //
-
-    // #bugbug
-    // Tem que checar a validade da estrutura e do ponteiro base.
-    if ( (void *) f == NULL )
-    { 
-        panic ("REFRESH_STREAM: [FAIL] f\n");
-    }
-
-
-    // Pointer
-
-    ptr = f->_base;
-
-    // #bugbug
-    // Tem que checar a validade da estrutura e do ponteiro base.
-    //if ( (void *) c == NULL ){ ? }
-
-    // Seleciona o modo terminal.
-
-    //++
-    stdio_terminalmode_flag = TRUE; 
-    for ( i=0; i<j; i++ )
-    {
-        printf ("%c", *ptr );
-
-        // #bugbug
-        // It is very wrong!
-        
-        refresh_rectangle ( 
-            (CONSOLE_TTYS[fg_console].cursor_x * cWidth), 
-            (CONSOLE_TTYS[fg_console].cursor_y * cHeight),  
-            cWidth, 
-            cHeight );
-
-        ptr++;
-    };
-    stdio_terminalmode_flag = FALSE; 
-    //--
-}
-
-
-void console_set_current_virtual_console (int n)
-{
-    if ( n < 0 || n >= 4 ){
-        debug_print ("console_set_current_virtual_console: Limits\n");
-        return;
-    }
-
-    fg_console = n;
-}
-
-
-int console_get_current_virtual_console (void)
-{
-    return (int) fg_console;
-}
-
-
-// Called by: 
-// __local_ps2kbd_procedure in ps2kbd.c
-
-void jobcontrol_switch_console(int n)
-{
-    // #todo:
-    // maybe we can do somo other configuration here.
- 
-    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX )
-    {
-        debug_print("jobcontrol_switch_console: Limits\n");
-        return;
-    }
-
-    console_set_current_virtual_console(n);
-}
-
-
-/*
- *********************************************
- * console_init_virtual_console:
- *
- *     Initializes a virtual console.
- */
-
 // #bugbug
-// #IMPORTANTE
-// Essa função apresenta problemas de compilação
-// quando incluímos mais código.
+// Isso tá errado.
 
-// #test
-// We are including a pointer to the RIT. raw input thread.
-// This is the control thread of the window with focus on kgws.
+#define __RESPONSE "\033[?1;2c"
 
-// See: console.h and tty.h
-
-void console_init_virtual_console (int n)
+void __respond (int console_number)
 {
-    int ConsoleIndex = -1;
+    char * p = __RESPONSE;
 
-
-    debug_print ("console_init_virtual_console:\n");
-
-    ConsoleIndex = n;
-
-    if ( ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
-    {
-        debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
-        panic       ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
-    }
-
-    // Todo virtual console eh uma tty. Os 4.
-    CONSOLE_TTYS[ConsoleIndex].objectType  = ObjectTypeTTY;
-    CONSOLE_TTYS[ConsoleIndex].objectClass = ObjectClassKernelObjects;
-    CONSOLE_TTYS[ConsoleIndex].used  = TRUE;
-    CONSOLE_TTYS[ConsoleIndex].magic = 1234;
-
-    // No thread for now.
-    CONSOLE_TTYS[ConsoleIndex].control = NULL;
-
-    // tty is a terminal, so the user logs on a terminal.
-    // No user logged yet.
-    CONSOLE_TTYS[ConsoleIndex].user_info = NULL;
-
-    // Security stuff.
-    // Nao sei se essas estruturas estao prontas para isso nesse momento
-    // ou se esses ponteiros sao nulos.
-    CONSOLE_TTYS[ConsoleIndex].user_session = NULL;  //CurrentUserSession;
-    CONSOLE_TTYS[ConsoleIndex].room         = NULL;  // CurrentRoom;
-    CONSOLE_TTYS[ConsoleIndex].desktop      = NULL;  // CurrentDesktop;
-
-    // file pointer
-    // this file handles this tty object
-    // CONSOLE[ConsoleIndex]._fp
-    
-    // tty name
-    //CONSOLE_TTYS[ConsoleIndex].name[?] 
-    CONSOLE_TTYS[ConsoleIndex].Name_len = 0;  //initialized
-
-    //#todo: Indice do dispositivo.
-    // CONSOLE_TTYS[ConsoleIndex].device = 0;   // initialized.
-
-    CONSOLE_TTYS[ConsoleIndex].driver = NULL;  //driver struct
-    CONSOLE_TTYS[ConsoleIndex].ldisc  = NULL;  //line discipline struct
-
-    //CONSOLE_TTYS[ConsoleIndex].termios??       //termios struct (not a pointer)
-
-    // process group.
-    CONSOLE_TTYS[ConsoleIndex].gid = current_group;
-
-    // ??
-    // Quantos processos estao usando essa tty.
-    CONSOLE_TTYS[ConsoleIndex].pid_count=0;
-
-
-    CONSOLE_TTYS[ConsoleIndex].type = 0;
-    CONSOLE_TTYS[ConsoleIndex].subtype = 0;
+    while (*p) {
         
-    CONSOLE_TTYS[ConsoleIndex].flags = 0;
-
-    // not stopped
-    CONSOLE_TTYS[ConsoleIndex].stopped = FALSE;
-
-    // process
-    //CONSOLE_TTYS[ConsoleIndex].process = KernelProcess;
-    
-    // thread
-    //CONSOLE_TTYS[ConsoleIndex].thread  = ?
-
-    // Qual terminal virtual esta usando essa tty.
-    CONSOLE_TTYS[ConsoleIndex].virtual_terminal_pid = 0;
-
-    // Window.
-    // When we are using the kgws.
-    // CONSOLE_TTYS[ConsoleIndex].window = NULL;
-
-
-    //
-    // == buffers ===========================
-    //
-
-    // #bugbug
-    // No buffers fo rthe virtual consoles.
-    // remember: 
-    // The virtual console is used only in the 'stdout' of a process.
-    CONSOLE_TTYS[ConsoleIndex].nobuffers = TRUE;   // No buffers.
-    CONSOLE_TTYS[ConsoleIndex]._rbuffer = (file *) 0; 
-    CONSOLE_TTYS[ConsoleIndex]._cbuffer = (file *) 0;
-    CONSOLE_TTYS[ConsoleIndex]._obuffer = (file *) 0;
-
-
-    // cursor dimentions in pixel.
-    // #bugbug: determinado
-    CONSOLE_TTYS[ConsoleIndex].cursor_width_in_pixels = 8; 
-    CONSOLE_TTYS[ConsoleIndex].cursor_height_in_pixels = 8;
-
-    //cursor position in chars.
-    CONSOLE_TTYS[ConsoleIndex].cursor_x = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_y = 0;
-
-    // cursor margin
-    CONSOLE_TTYS[ConsoleIndex].cursor_left = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
-    
-    // cursor limits
-    CONSOLE_TTYS[ConsoleIndex].cursor_right  = 0+(SavedX/8) -1;  // (screen width / char width)
-    CONSOLE_TTYS[ConsoleIndex].cursor_bottom = 0+(SavedY/8) -1;  // (screen height/ char height)
-    
-    //everyone.
-    CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
-
-
-    if ( ConsoleIndex == 0){
-        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_WHITE; 
+        //PUTCH(*p,tty->read_q);
+        console_putchar ( (int) *p, console_number );
+        p++;
     }
 
-    if ( ConsoleIndex == 1){
-        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_RED; 
-    }
-
-    if ( ConsoleIndex == 2){
-        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_GREEN; 
-    }
-
-    if ( ConsoleIndex == 3){
-        CONSOLE_TTYS[ConsoleIndex].cursor_color = COLOR_BLUE; 
-    }
-
-
-    //#todo
-    // Buffers !!!
-    //CONSOLE_TTYS[ConsoleIndex]._rbuffer ...
-    //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
-
-
-    //#todo
-    // Local mode flags.
-    CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
-
-
-    //CONSOLE_TTYS[ConsoleIndex].vc_mode = 0;
-
-    // #bugbug
-    // A estrutura tem mais elementos que podem ser inicializados.
-    // Tivemos problemas ao tentar inicializa-los.
+	//copy_to_cooked(tty);
 }
 
+// See:
+// https://en.wikipedia.org/wiki/Control_character
+// https://en.wikipedia.org/wiki/C0_and_C1_control_codes#Device_control
 
-//
-// ============================================
-//
-
-// Ok. It is owrking on qemu
-// Used by pitTimer() in pit.c
-void consoleBlinkTextCursor(void)
+void __local_insert_char ( int console_number )
 {
 
-    unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
-    unsigned long __cHeight = gwsGetCurrentFontCharHeight();
-
-
-    // ------------------------------------
-
-    if ( __cWidth == 0  ||  __cHeight == 0 ){
-        panic ("pitBlinkTextCursor: char size\n");
-    }
-
-    // fail
-    if ( fg_console < 0 )
+    if(console_number<0){
         return;
-
-
-    // fail
-    if ( (void*) shared_buffer_cursor_icon == NULL )
-        return;
-
-
-    // Apaga.
-    // Apaga mostrando o conteúdo do backbuffer.
-         
-    if ( consoleTextCursorStatus != TRUE )
-    { 
-        refresh_rectangle ( 
-                    (CONSOLE_TTYS[fg_console].cursor_x + 1)  * __cWidth, 
-                    CONSOLE_TTYS[fg_console].cursor_y        * __cHeight, 
-                    32, 
-                    32 );
-
-        consoleTextCursorStatus = TRUE;
-        goto done;
     }
 
-    // Acende.
-    // Acende mostrando um BMP diretamente no lfb.
-
-    if ( consoleTextCursorStatus == TRUE )
-    {
-        bmpDisplayCursorBMP ( 
-                    shared_buffer_cursor_icon, 
-                    (CONSOLE_TTYS[fg_console].cursor_x + 1) * __cWidth, 
-                    CONSOLE_TTYS[fg_console].cursor_y       * __cHeight );
-         
-        consoleTextCursorStatus = FALSE;
-        goto done;
-    }
-
-done:
-    return;
-}
+	//int i=x;
+	//unsigned short tmp,old=0x0720;
+	//unsigned short * p = (unsigned short *) pos;
 
 /*
- ********************************************** 
- * console_ioctl:
- * 
- */
+	while (i++ < columns) {
 
-// Podemos mudar as características de um console.
+		// Salvo o char da posição atual.
+		tmp = *p;
 
-int 
-console_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg )
-{
-    debug_print ("console_ioctl: TODO\n");
+        // coloco o char de controle na posição atual
+        // ou o caractere salvo anteriomente.
+		*p=old;
 
-    // #todo: Check overflow
-    if (fd<0){
-        debug_print ("console_ioctl: [ERROR] fd\n");
-        return -1;
-    }
+        // coloco o caractere salvo para uso futuro.
+		old=tmp;
 
-    // #todo: Check overflow
-    if (fg_console<0){
-        debug_print ("console_ioctl: [ERROR] fg_console\n");
-        return -1;
-    }
+        //avança até o fim da linha.
+		p++;
+	}
+*/
 
-
-    switch (request){
-
-    // #test
-    // Change the color of the char for the current virtual console.
-    // ok. it is working.
-    case 1000:
-        CONSOLE_TTYS[fg_console].cursor_color = (unsigned long) arg;
-        return 0;  //ok
-        break;
-
-    // cursor x position
-    // #bugbug #todo  limits
-    case 1001:
-        CONSOLE_TTYS[fg_console].cursor_x = 0;  return 0;
-        break;
-
-    // cursor y position
-    // #bugbug #todo  limits
-    case 1002:
-        CONSOLE_TTYS[fg_console].cursor_y = 0;  return 0;
-        break;
-
-    // switching the current virtual console.
-    // We have onlu 4 virtual consoles.
-    case 1003:
-        if ( arg >= 0 && arg < CONSOLETTYS_COUNT_MAX )
-        { 
-            fg_console = arg;
-            return 0; 
-        }
-        return -1;
-        break; 
-
-    // #todo:
-    // There is no fflush here in ring0.
-    // The ring3 libc is doing this job using write.
-    case TCIFLUSH:
-        debug_print ("console_ioctl: [TEST] flush\n");
-        break;
-        
-    // #todo: Yes, we can return data from the console tty termios. 
-    // case TCGETS:
-    // ...
+    //int i = CONSOLE[console_number].cursor_x;
+    //int tmp;
+    //int old = 0x20;
     
-    default:
-        debug_print ("console_ioctl: [TODO] request\n");
-        break;
+    // #bugbug
+    // Não é possível fazer essa rotina pois não temos um buffer e chars.
+
+    //while (i++ < CONSOLE[console_number].cursor_height ) {};
+    
+    console_putchar (0x20, console_number);
+}
+
+
+
+void __local_delete_char(int console_number)
+{
+
+    if(console_number<0){
+        return;
+    }
+
+    console_putchar ( ' ', console_number);
+
+/*
+	int i;
+	unsigned short * p = (unsigned short *) pos;
+
+	if (x >= columns)
+		return;
+
+	i = x;
+	while (++i < columns) 
+	{
+		*p = *(p+1);
+		p++;
+	}
+	*p=0x0720;
+*/
+
+}
+
+
+void csi_P (int nr, int console_number)
+{
+
+    if (console_number<0){
+        return;
+    }
+
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
+    {
+        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
+    } else {
+        
+        if (!nr)
+        {
+            nr = 1;
+        }
     };
 
-    return -1;
+    if (nr<0)
+        return;
+
+    while (nr--){
+        __local_delete_char(console_number);
+    };
 }
+
+
+void csi_at (int nr, int console_number)
+{
+
+    if( console_number<0){
+        return;
+    }
+
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
+    {
+        nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
+    }else {
+        
+        if (!nr){
+            nr=1;
+        }
+    };
+
+    if (nr<0)
+        return;
+
+    while (nr--){
+        __local_insert_char(console_number);
+    };
+}
+
+
+
+
+
+
 
 
 // main routine.
 // called by main.c
+
 int VirtualConsole_initialize(void)
 {
     // Virtual Console:
@@ -1856,6 +1714,20 @@ int VirtualConsole_initialize(void)
     jobcontrol_switch_console(0);
 
 
+    /*
+    int i=0;
+    for (i=0; i<4; i++){
+        CONSOLE_TTYS[i].cursor_x = 0;
+        CONSOLE_TTYS[i].cursor_y = 0;
+        CONSOLE_TTYS[i].cursor_left   = 0;
+        CONSOLE_TTYS[i].cursor_top    = 0;
+        CONSOLE_TTYS[i].cursor_right  = (SavedX/8);
+        CONSOLE_TTYS[i].cursor_bottom = (SavedY/8);
+        CONSOLE_TTYS[i].cursor_color = COLOR_WHITE;
+    };
+    */
+
+
 		// Obs: 
 		// O video já foi inicializado em main.c.
 		// Isso atualiza a estrutura de console do console atual.
@@ -1863,137 +1735,23 @@ int VirtualConsole_initialize(void)
     // BANNER !
     // Welcome message. (Poderia ser um banner.) ??
 
-
     // Cursor:
     // See: 0mem/core/system.c
     
     set_up_cursor(0,0);
+
+    // #hackhack
+    // Esse trabalho não nos pertence, pertence ao stdio,
+    // mas funciona.
+
+    stdio_terminalmode_flag = TRUE;
+    stdio_verbosemode_flag = TRUE;
 
     return 0;
 }
 
 
 
-//============================================
-// input:
-// called by devices that are not block devices.
-// probably keyboard and serial devices.
-// See: keyboard.c and serial.c
-// Called by DeviceInterface_PS2Keyboard() in ps2kbd.c
 
-void 
-console_interrupt(
-    int target_thread, 
-    int device_type, 
-    int data )
-{
-
-    //int TargetThread = foreground_thread;
-    int TargetThread = target_thread;
-    int DeviceType   = device_type;
-    int Data         = data;
-
-
-    // #todo
-    // E se não tivermos uma foreground thread ?
-    // foreground representa a thred com 'foco de entrada'
-    // >> então, se não tivermos uma thread com foco de entrada,
-    // podemos mandar a mensagem para outra thread ?
-
-    // #todo: Check overflow
-
-    if ( TargetThread < 0 )
-    {
-        debug_print ("console_interrupt: [FAIL] TargetThread\n");
-        
-        // #todo
-        // Maybe we can set the idle thread if it fail.
-
-        return;
-    }
-
-
-    switch (DeviceType){
-
-        // keyboard
-        // data =  raw byte.
-        // See: vt/draw/model/kgws.c
-        case CONSOLE_DEVICE_KEYBOARD:
-            debug_print("console_interrupt: input from keyboard device\n");
-            UserInput_SendKeyboardMessage (TargetThread, Data);
-            break;
-
-        // COM port
-        case CONSOLE_DEVICE_SERIAL:
-            debug_print("console_interrupt: input from serial device\n");
-            break;
- 
-        //network device.
-        case CONSOLE_DEVICE_NETWORK:
-            debug_print("console_interrupt: input from network device\n");
-            break;
-
-        // ...
-
-        default:
-            debug_print("console_interrupt: [FAIL] Default input device\n");
-            break;
-    };
-}
-
-
-/*
- * set_up_cursor:
- *     Setup cursor for the current virtual console.
- */
-
-// #todo
-// Maybe change to console_set_up_cursor();
-
-// We need a routine to change the cursor inside a wigen window.
-// The console has a window ? No ? ... but it has a dimension.
-// See the tty structure at hal/dev/tty/tty.h
-
-// We need to know that there is a difference between 
-// printing at a given console and printing at a given window.
-// The tty has a window, but we are not using it, we are using
-// the margins for the console.
-
-// #todo
-// Quando estivermos colocando o cursor em uma janela e
-// a janela não for válida, então colocamos o cursor na posição 0,0.
-
-void set_up_cursor ( unsigned long x, unsigned long y )
-{
-    if (fg_console<0){ return; }
-
-    CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
-    CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
-}
-
-
-/*
- * get_cursor_x:
- *     Pega o valor de x.
- *     @todo: Isso pode ir para outro lugar.
- */
-unsigned long get_cursor_x (void)
-{
-    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_x;
-}
-
-/*
- * get_cursor_y:
- *     Pega o valor de y.
- *     @todo: Isso pode ir para outro lugar.
- */
-unsigned long get_cursor_y (void)
-{
-    return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
-}
-
-//
-// End.
-//
 
 

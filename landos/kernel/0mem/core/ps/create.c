@@ -1,10 +1,6 @@
-/*
- * File: ps/create.c
- *
- *   cria a thread idle do processo init;
- */
 
-#include <kernel.h>
+
+#include <kernel.h>  
 
 
 /*
@@ -84,7 +80,9 @@ void *create_CreateEarlyRing0IdleThread(void)
         kThread->type  = THREAD_TYPE_SYSTEM; 
         kThread->state = INITIALIZED; 
 
+        // #todo
         // Execution plane.
+        
         kThread->plane = BACKGROUND;    
 
         // ...
@@ -110,12 +108,17 @@ void *create_CreateEarlyRing0IdleThread(void)
     // Clear stack
 
     // Page Directory
+    //kThread->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
+    //if ( kThread->DirectoryPA == 0 ){
+    //    panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
+    //}
 
-    kThread->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
-
-    if ( kThread->DirectoryPA == 0 ){
-        panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
+    // pml4 physical address
+    kThread->pml4_PA = (unsigned long ) KernelProcess->pml4_PA;
+    if ( kThread->pml4_PA == 0 ){
+        panic("create_CreateEarlyRing0IdleThread: kThread->pml4_PA\n");
     }
+
 
     // loop
     // Clean the 'wait reason'.
@@ -125,7 +128,8 @@ void *create_CreateEarlyRing0IdleThread(void)
     // The system window procedure used by this thread.
     // This is a dialog inside the base kernel.
 
-    kThread->procedure = (unsigned long) &system_procedure;
+    // #suspended  Gramado X will not use this for now.
+    // kThread->procedure = (unsigned long) &system_procedure;
 
     //
     // == message support =============
@@ -226,28 +230,37 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     // Stack frame.
     kThread->ss     = 0x10 | 0; 
-    kThread->esp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
-    kThread->eflags = 0x0200;    // # Atenção !!  
+    kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
+    kThread->rflags = 0x0200;    // # Atenção !!  
     kThread->cs     = 8 | 0; 
-    kThread->eip    = (unsigned long) early_ring0_IdleThread;  //See: head.asm
+    kThread->rip    = (unsigned long) early_ring0_IdleThread;  //See: head.asm
 
     kThread->ds = 0x10 | 0;
     kThread->es = 0x10 | 0;
     kThread->fs = 0x10 | 0;
     kThread->gs = 0x10 | 0;
     
-    kThread->eax = 0;
-    kThread->ebx = 0;
-    kThread->ecx = 0;
-    kThread->edx = 0;
+    kThread->rax = 0;
+    kThread->rbx = 0;
+    kThread->rcx = 0;
+    kThread->rdx = 0;
 
-    kThread->esi = 0;
-    kThread->edi = 0;
-    kThread->ebp = 0;
+    kThread->rsi = 0;
+    kThread->rdi = 0;
+    kThread->rbp = 0;
     // ...
 
+    kThread->r8 = 0;
+    kThread->r9 = 0;
+    kThread->r10 = 0;
+    kThread->r11 = 0;
+    kThread->r12 = 0;
+    kThread->r13 = 0;
+    kThread->r14 = 0;
+    kThread->r15 = 0;
+
     // O endereço incial, para controle.
-    kThread->initial_eip = (unsigned long) kThread->eip; 
+    kThread->initial_rip = (unsigned long) kThread->rip; 
 
 
 	//#bugbug
@@ -300,8 +313,6 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     return (void *) kThread;
 }
-
-
 
 /*
  *******************************************************************
@@ -363,9 +374,7 @@ void *create_CreateRing3InitThread (void)
             
             t->used  = TRUE;
             t->magic = 1234;
-
             t->position = SPECIAL_GUEST;
-
             t->tid = TID;
 
             // #bugbug: 
@@ -420,13 +429,19 @@ void *create_CreateRing3InitThread (void)
         panic ("create_CreateRing3InitThread: __initStack\n");
     }
 
-    // Page Directory
 
-    t->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
-    
-    if ( t->DirectoryPA == 0 ){
-        panic("create_CreateRing3InitThread: t->DirectoryPA\n");
+    // Page Directory
+    //t->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
+    //if ( t->DirectoryPA == 0 ){
+    //    panic("create_CreateRing3InitThread: t->DirectoryPA\n");
+    //}
+
+    // pml4 physical address
+    t->pml4_PA = (unsigned long ) InitProcess->pml4_PA;
+    if ( t->pml4_PA == 0 ){
+        panic("create_CreateRing3InitThread: t->pml4_PA\n");
     }
+
 
     // loop
     // Clean the 'wait reason'.
@@ -436,7 +451,7 @@ void *create_CreateRing3InitThread (void)
     // The system window procedure used by this thread.
     // This is a dialog inside the base kernel.
 
-    t->procedure = (unsigned long) &system_procedure;
+    //t->procedure = (unsigned long) &system_procedure;
 
 
     // Single kernel event.
@@ -535,28 +550,38 @@ void *create_CreateRing3InitThread (void)
     // Stack frame.
 
     t->ss     = 0x23; 
-    t->esp    = (unsigned long) CONTROLTHREAD_STACK; 
-    t->eflags = 0x3200;    // #atenção!
+    t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
+    t->rflags = 0x3200;    // #atenção!
     t->cs     = 0x1B;  
-    t->eip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
+    t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 
     t->ds = 0x23;
     t->es = 0x23;
     t->fs = 0x23;
     t->gs = 0x23;
 
-    t->eax = 0;
-    t->ebx = 0;
-    t->ecx = 0;
-    t->edx = 0;
+    t->rax = 0;
+    t->rbx = 0;
+    t->rcx = 0;
+    t->rdx = 0;
 
-    t->esi = 0;
-    t->edi = 0;
-    t->ebp = 0;
+    t->rsi = 0;
+    t->rdi = 0;
+    t->rbp = 0;
     // ...
 
+    t->r8 = 0;
+    t->r9 = 0;
+    t->r10 = 0;
+    t->r11 = 0;
+    t->r12 = 0;
+    t->r13 = 0;
+    t->r14 = 0;
+    t->r15 = 0;
+
+
     // O endereço incial, para controle.
-    t->initial_eip = (unsigned long) t->eip; 
+    t->initial_rip = (unsigned long) t->rip; 
 
 
 	//#bugbug
@@ -636,4 +661,8 @@ void *create_CreateRing3InitThread (void)
 //
 // End.
 //
+
+
+
+
 

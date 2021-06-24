@@ -1,7 +1,4 @@
-/*
- * File: mk.h
- *
- */
+
 
 #ifndef  __MK_H
 #define __MK_H    1
@@ -27,27 +24,5 @@
 #define BACKGROUND 100 
 #define FOREGROUND 200
 
-
-int microkernelStatus; 
- 
- 
-//
-// == prototypes =================================================
-//
-
-int jobcontrol ( int type, int id, int plane );
-int jobcheck ( int type, int id );
-
-void microkernelTestLimit (void);
- 
-// Inicializa o microkernel do kernel.
-int init_microkernel (void);
-
-
-#endif    
-
-
-//
-// End.
-//
+#endif   
 

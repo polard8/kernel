@@ -1,24 +1,7 @@
-/*
- * File: ata.h
- *
- * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
- * para suporte à IDE/AHCI.
- * Suporte a disco, usado no kernel base.
- *
- * History: 
- *     2018 - Created by Nelson Cole.
- *     2019 - Revision by Fred Nora.
- *     ...
- */
 
 
-#ifndef __ATA_H__
-#define __ATA_H__
-
-
-//
-// Defines.
-//
+#ifndef __ATA_H
+#define __ATA_H    1
 
 
 // Bus.
@@ -43,7 +26,6 @@
 
 
 #define FORCEPIO 1234
-
 
 //#bugbug 
 //Precisamos encontrar endereços válidos.
@@ -75,8 +57,6 @@
 #define ATA_IDE_BAR3  0x376  // Secondary Control Block Base Address.
 #define ATA_IDE_BAR4  0      // Bus Master Base Address.
 #define ATA_IDE_BAR5  0      // Usado pelo AHCI.
-
-
 
 
 // ATA/ATAPI Command Set.
@@ -120,7 +100,6 @@
 */
 
 
-
 // ATAPI descrito no SCSI.
 #define ATAPI_CMD_READ  0xA8
 #define ATAPI_CMD_EJECT 0x1B
@@ -150,7 +129,6 @@
 #define ATA_ER_ABRT  0x04    //
 #define ATA_ER_TK0NF 0x02    //
 #define ATA_ER_AMNF  0x01    //
-
 
 
 //
@@ -224,8 +202,6 @@ int g_current_ide_device;   //master or slave
 int g_boottime_ide_channel;  //primary or secondary.
 int g_boottime_ide_device;   //master or slave
 
-
-
 /*
  **************************************************************
  * PCIDeviceATA:
@@ -240,7 +216,6 @@ int g_boottime_ide_device;   //master or slave
 struct pci_device_d *PCIDeviceATA;
 // struct pci_device_d *PCIDeviceATA2;
 // ...
-
 
 /*
  **********************************
@@ -319,7 +294,6 @@ struct ata_d
 struct ata_d  ata;
 
 
-
 /*
  ******************************************************************
  * st_dev:
@@ -362,154 +336,8 @@ typedef struct st_dev st_dev_t;
 
 
 
-//
-// == Prototypes ==============================================
-//
-
-
-// current channel and device.
-int ata_get_current_ide_channel(void);
-int ata_get_current_ide_device(void);
-void ata_set_current_ide_channel(int channel);
-void ata_set_current_ide_device(int device);
-
-// current channel and device during the boottime.
-int ata_get_boottime_ide_channel(void);
-int ata_get_boottime_ide_device(void);
-void ata_set_boottime_ide_channel(int channel);
-void ata_set_boottime_ide_device(int device);
-
-
-int nport_ajuste(char nport);
-
-void ide_mass_storage_initialize (void);
-
-int ide_dev_init(char port);
-
-void set_ata_addr(int channel);
-
-int ide_identify_device(uint8_t nport);
-
-void ata_wait(int val);
-
-void ata_delay (void);
-
-unsigned char ata_wait_not_busy (void);
-
-unsigned char ata_wait_busy (void);
-
-unsigned char ata_wait_no_drq (void);
-
-unsigned char ata_wait_drq (void);
-
-unsigned char ata_wait_irq (void);
-
-unsigned char ata_status_read (void);
-
-void ata_cmd_write(int cmd_val);
-
-unsigned char ata_assert_dever(char nport);
-
-void ata_pio_read ( void *buffer, int bytes);
-void ata_pio_write ( void *buffer, int bytes);
-
-
-void 
-ide_dma_data ( 
-    void *addr, 
-    uint16_t byte_count, 
-    uint8_t flg, 
-    uint8_t nport );
-
-
-void ide_dma_start (void);
-
-void ide_dma_stop (void);
-
-int ide_dma_read_status (void);
-
-
-//ahci.c
-//deletar.
-//void ahci_mass_storage_init ();
-
-
-
-//
-// PCI support for disks.
-//
-
-
-// PCI READ.
-uint32_t 
-diskReadPCIConfigAddr ( 
-    int bus, 
-    int dev,
-    int fun, 
-    int offset );
-
-
-// PCI WRITE.   
-void 
-diskWritePCIConfigAddr ( 
-    int bus, 
-    int dev,
-    int fun, 
-    int offset, 
-    int data );
-
-
-uint32_t diskPCIScanDevice ( int class );
-
-int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
-
-
-void DeviceInterface_PrimaryIDE(void);
-void DeviceInterface_SecondaryIDE(void);
-
-
-/*
- *******************************************************
- * ata_initialize:
- *     Inicializa o IDE e mostra informações sobre o disco.
- */
-
-int ata_initialize ( int ataflag );
-
-
-
-/*
- *******************************************
- * ataDialog:
- *     Rotina de diálogo com o driver ATA.
- */
-
-int 
-ataDialog ( 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
-
-int disk_ata_wait_irq (void);
-
-
-void show_ide_info (void);
-
-
-int 
-ata_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
-
-
-
 //======================================================
 
-
-//#todo
-// mover essas definições para cima, junto com as outras.
 
 //incluindo coisas que estavam em disk1.c
 
@@ -562,7 +390,6 @@ struct {
 
 }ide_dma_prdt[4];
 
-
 // pci support
 // #todo: Podemos mudar isso para pic.h, mas precisamos ver 
 // se aceitará a tipagem.
@@ -576,6 +403,64 @@ struct {
 
 
 
-#endif
+//
+// == Prototypes ==============================================
+//
+
+
+void DeviceInterface_PrimaryIDE(void);
+void DeviceInterface_SecondaryIDE(void);
+
+
+void ata_soft_reset (void);
+unsigned char ata_status_read (void);
+void ata_cmd_write (int cmd_val);
+unsigned char ata_wait_drq (void);
+unsigned char ata_wait_no_drq (void);
+
+unsigned char ata_wait_busy (void);
+unsigned char ata_wait_not_busy (void);
+
+
+void ata_wait (int val);
+void ata_delay (void);
+
+
+void set_ata_addr (int channel);
+unsigned char ata_assert_dever (char nport);
+
+void ata_pio_read ( void *buffer, int bytes );
+void ata_pio_write ( void *buffer, int bytes );
+
+static inline void atapi_pio_read ( void *buffer, uint32_t bytes );
+
+int ata_get_current_ide_channel(void);
+int ata_get_current_ide_device(void);
+void ata_set_current_ide_channel(int channel);
+void ata_set_current_ide_device(int device);
+
+
+int ata_get_boottime_ide_channel(void);
+int ata_get_boottime_ide_device(void);
+void ata_set_boottime_ide_channel(int channel);
+void ata_set_boottime_ide_device(int device);
+
+int 
+ata_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+    
+
+int ata_initialize ( int ataflag );
+    
+#endif    
+
+
+
+
+
+
+
 
 

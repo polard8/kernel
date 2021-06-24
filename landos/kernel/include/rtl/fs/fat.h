@@ -1,8 +1,3 @@
-/*
- * File: fat.h 
- * 
- *     2015 - Created by Fred Nora.
- */
 
 
 #ifndef  __FAT_H
@@ -29,7 +24,6 @@
 #define FAT_FILE_FLAG_DEVICE            0x40   
 #define FAT_FILE_FLAG_RESERVED          0x80
 
-
 //
 // FAT definitions.
 //
@@ -53,6 +47,7 @@
 #define  FAT16_CLUSTER_RESERVED     0xfff0
 #define  FAT16_CLUSTER_BAD          0xfff7
 #define  FAT16_CLUSTER_LAST         0xffff
+
 
 
 #define FAT_DIRECTORY_ENTRY_FREE        0xE5
@@ -102,8 +97,6 @@
 #define FILE_ATTRIBUTE_UNUSED1       0x40
 #define FILE_ATTRIBUTE_UNUSED2       0x80
 
-
-
 //
 // FAT16 directory entry
 //
@@ -142,32 +135,40 @@ struct fat16_directory_entry_d
     unsigned short  LastWriteDate;  
     unsigned short  StartingCluster; 
 
-    unsigned long   FileSize; 
+    unsigned int   FileSize; 
 };  
-
 
 // 
 // == prototypes ==========================================
 //
 
 void 
-to_FAT_name (
-    char *src,
-    char *dst );
-    
-void 
 from_FAT_name (
     char *src, 
     char *dst );
 
-
-int fat16Init (void);
+void 
+to_FAT_name (
+    char *src,
+    char *dst );
 
 
 #endif    
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

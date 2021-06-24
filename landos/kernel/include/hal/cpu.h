@@ -1,17 +1,3 @@
-/*
- * File: cpu.h 
- *
- * Descrição:
- *     Header para gerenciamento de cpus.
- *
- *     CPUs em Desktops:
- *         Intel, AMD, ARM etc ...
- *
- * #todo: boa parte do que está aqui pode ir 
- * para /hardware/intel.h e hardware/amd.h
- *
- * 2015 - Created by Fred Nora.
- */
 
 #ifndef ____CPU_H
 #define ____CPU_H    1
@@ -37,12 +23,12 @@
 #define SI_SM 3    // SMM.
 
 
-#define IA32_APIC_BASE_MSR          0x1B
-#define IA32_APIC_BASE_MSR_BSP      0x100  // Processor is a BSP
-#define IA32_APIC_BASE_MSR_ENABLE   0x800
+//#define IA32_APIC_BASE_MSR          0x1B
+//#define IA32_APIC_BASE_MSR_BSP      0x100  // Processor is a BSP
+//#define IA32_APIC_BASE_MSR_ENABLE   0x800
 
 
-  
+
 /*
  * Structures.
  */  
@@ -66,7 +52,7 @@ struct processor_d
 	// Processor State ???
 	
 	
-	//@todo: Reservar espaço ???
+	//@todo: Reservar espaÃ§o ???
 	//ULONG   KernelReserved[16];         // For use by the kernel
     //ULONG   HalReserved[16];            // For use by Hal
 	
@@ -80,7 +66,7 @@ struct processor_d
 
     // 0x0.
     // cpuid vars.
-    unsigned long Vendor[4];
+    unsigned int Vendor[4];
 
     //0x1(eax)
     int Stepping_ID;           // 4 bit stepping
@@ -119,7 +105,7 @@ struct processor_d
 	//6 PAE Physical Address Extensions
 	//7 MCE Machine Check Exception
 	//8 CX8 CMPXCHG8B Inst.
-    unsigned long isApic;    //O processador suporta APIC.	
+    unsigned int isApic;    //O processador suporta APIC.	
 	//10 n/a Reserved
 	//11 SEP SYSENTER and SYSEXIT
 	//12 MTRR Memory Type Range Registers
@@ -146,34 +132,34 @@ struct processor_d
 
 
     // hypervisor level 4000_0000h
-    unsigned long hvName[4];
+    unsigned int hvName[4];
 
 
 	//0x80000000 (eax) (Max feature id.).
 	//Maximum meaningful value of InfoType for extended function CPUID information.
-    unsigned long MaxFeatureId;
+    unsigned int MaxFeatureId;
 	
     //0x80000002,0x80000003,0x80000004 (Brand name)	
-    unsigned long BrandName[4*3];
+    unsigned int BrandName[4*3];
 	
 	//0x80000006(ecx) (L2 cache information (Intel)).
-    unsigned long L2LineSize;
-    unsigned long L2Associativity;
-    unsigned long L2Cachesize;
+    unsigned int L2LineSize;
+    unsigned int L2Associativity;
+    unsigned int L2Cachesize;
 
-    unsigned long L1LineSize;
-    unsigned long L3LineSize;
+    unsigned int L1LineSize;
+    unsigned int L3LineSize;
 
-    unsigned long L1Associativity;
-    unsigned long L3Associativity;
+    unsigned int L1Associativity;
+    unsigned int L3Associativity;
 
-    unsigned long L1Cachesize;
-    unsigned long L3Cachesize;
+    unsigned int L1Cachesize;
+    unsigned int L3Cachesize;
 
 	
 	//0x80000008(eax??) (Virtual and physical memory sizes.)
-    unsigned long Physical_Address_Size;
-    unsigned long Virtual_Address_Size;
+    unsigned int Physical_Address_Size;
+    unsigned int Virtual_Address_Size;
 	//...
 	
 	
@@ -195,7 +181,6 @@ struct processor_d
     struct processor_d  *next;
 };
 struct processor_d *processor;
-
 
 /*
  ******************************************************
@@ -287,30 +272,15 @@ unsigned long processorsList[PROCESSORS_MAX_COUNT];
 // == prototypes ===========================================
 //
 
+//#todo: move it to detext.h
 int detect_IsQEMU(void);
 
 int cpuHasMSR (void);
 void cpuGetMSR(unsigned long msr, unsigned long *lo, unsigned long *hi);
 void cpuSetMSR(unsigned long msr, unsigned long lo, unsigned long hi);
- 
-void show_cpu_info(void);
-
-int cpu_get_parameters (void);
-
-unsigned long get_processor_feature(int i);
-
-// #bugbug
-// Esse nome não é apropriado.
-// #todo: 
-// Isso deve isr para include/ke.h.
-int KeTestCPU (void);   
-
-void init_cpu (void);
-
-#endif   
 
 
-//
-// End.
-//
+#endif    
+
+
 

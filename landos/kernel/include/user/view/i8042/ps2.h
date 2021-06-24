@@ -1,44 +1,34 @@
-/*
- * File: ps2.h
- *
- * Descrição:
- *     Header para gerenciamento da porta ps/2.
- *     
- * Obs: Encontramos mais informações nos headers de teclado e de mouse.
- *
- */
+
 
 #ifndef ____PS2_H
-#define ____PS2_H
+#define ____PS2_H    1
 
 /*
  Wikipedia
- O conector PS/2 é um conector mini-DIN de 6 pinos usado para conectar alguns 
- teclados e mouses a um sistema de computador compatível com PC. 
- Seu nome vem da série de computadores pessoais IBM Personal System/2, 
+ O conector PS/2 Ã© um conector mini-DIN de 6 pinos usado para conectar alguns 
+ teclados e mouses a um sistema de computador compatÃ­vel com PC. 
+ Seu nome vem da sÃ©rie de computadores pessoais IBM Personal System/2, 
  com o qual ele foi introduzido em 1987. O conector de mouse PS/2 geralmente 
  substitui antigos conectores de "mouses seriais" DE-9 RS-232, 
- enquanto o conector de teclado PS/2 substituiu o conector DIN mais largo de 5 pinos/180º 
+ enquanto o conector de teclado PS/2 substituiu o conector DIN mais largo de 5 pinos/180Âº 
  usado no desenho do IBM PC/AT. Os desenhos PS/2 nas interfaces de teclados e 
- mouses são eletricamente similares e empregam o mesmo protocolo de comunicação. 
- Entretanto, a porta de teclado ou mouse de um determinado sistema pode não ser 
- intercambiável uma vez que os dois dispositivos usam um conjunto de comandos diferentes.
+ mouses sÃ£o eletricamente similares e empregam o mesmo protocolo de comunicaÃ§Ã£o. 
+ Entretanto, a porta de teclado ou mouse de um determinado sistema pode nÃ£o ser 
+ intercambiÃ¡vel uma vez que os dois dispositivos usam um conjunto de comandos diferentes.
  
-A comunicação é serial, síncrona e bidirecional.[1] 
-O dispositivo conectado gera o sinal de relógio. O hospedeiro controla a comunicação usando a 
-linha de relógio. Quando o hospedeiro puxa o relógio para baixo, a comunicação do dispositivo é inibida.
+A comunicaÃ§Ã£o Ã© serial, sÃ­ncrona e bidirecional.[1] 
+O dispositivo conectado gera o sinal de relÃ³gio. O hospedeiro controla a comunicaÃ§Ã£o usando a 
+linha de relÃ³gio. Quando o hospedeiro puxa o relÃ³gio para baixo, a comunicaÃ§Ã£o do dispositivo Ã© inibida.
 */
 
 //
-// Definições.
+// DefiniÃ§Ãµes.
 //
 
 #define  PS2_PORT    0x60
 #define  PS2_CTRL    0x64
 #define  PS2_ACK     0xFA 
 //...
-
-
 
 // ================================
 
@@ -77,7 +67,7 @@ struct ps2_d
 // use ps2_ioctl to setup this structure.
 // The app needs to open the file /PS2, something like that.
 
-struct ps2_d PS2;
+struct ps2_d  PS2;
 // ================================
 
 
@@ -85,25 +75,19 @@ struct ps2_d PS2;
 // == prototypes ===========================================
 //
 
- 
-void ps2 (void);
+
+//#todo
+void ps2(void);
+//#todo
 void early_ps2_init (void);
 
 int PS2_initialize(void);
 int PS2_early_initialization(void);
 
 
-// See:
-// i8042.c
-
 int ps2_ioctl ( int fd, unsigned long request, unsigned long arg );
 
+#endif    
 
 
-#endif  
-
-
-//
-// End.
-//
 

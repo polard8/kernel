@@ -1,26 +1,17 @@
-/*
- * File: rtc.h
- *
- * Descrição:
- *     Header file for rtc controller.
- *     Ring 0.
- *
- * 2015 - Created by Fred Nora.
- */ 
+
+// rtc.h
 
 #ifndef ____RTC_H
-#define ____RTC_H
+#define ____RTC_H    1
 
 
+// #todo:
+// Podemos criar uma lista para todos os dispositivos em pic.h
 #define  RTC_IRQ   8 
 
 // Ports 
 #define RTC_ADDRESS_PORT  0x70 
 #define RTC_DATA_PORT     0x71
-
-// #todo
-//  Mover isso para baixo, junto com os outros prot[otipos.
-unsigned short rtcGetBaseMemory (void);
 
 
 //Time
@@ -60,12 +51,15 @@ unsigned short rtcGetBaseMemory (void);
 //
 
 static volatile unsigned long g_ticks;
+// ...
+
+
+
 
 //
-// RTC Structure
+// RTC Structure.
 //
  
-typedef struct rtc_d rtc_t;
 struct rtc_d
 {
     object_type_t  objectType;
@@ -73,17 +67,17 @@ struct rtc_d
 
     //unsigned long ticks;
 
+    unsigned long flag;
+    
+    unsigned long error;
+    
+    unsigned long time;
+    
+    unsigned long date;
+
     unsigned long Seconds;
     unsigned long Minutes;
     unsigned long Hours;
-
-    unsigned long flag;
-
-    unsigned long error;
-
-    unsigned long time;
-
-    unsigned long date;
 
     unsigned long DayOfMonth;
     unsigned long Month;
@@ -98,29 +92,17 @@ struct rtc_d  *rtc;
 // == prototypes =======================
 //
 
-
-// IRQ8
-
 void DeviceInterface_RTC(void);
 
-int init_clock (void);
-
-unsigned long read_cmos_bcd(unsigned reg);
-
-unsigned long get_time (void);
+unsigned long read_cmos_bcd ( unsigned reg );
 
 unsigned long get_date (void);
+unsigned long get_time (void);
 
-void *get_cmos_info (void); 
-
+unsigned short rtcGetBaseMemory (void);
 unsigned short rtcGetExtendedMemory (void);
-unsigned short rtcGetMaseMemory (void);
+
+#endif    
 
 
-#endif   
-
-
-//
-// End.
-//
 

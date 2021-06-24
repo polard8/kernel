@@ -1,6 +1,5 @@
 
 
-
 /* intel page size */
 #define INTEL_PAGE_SIZE 4096
 #define PAGE_SIZE    INTEL_PAGE_SIZE
@@ -46,4 +45,5 @@ struct intel_pte_d
     unsigned long Available3      :1;
     unsigned long PageBaseAddress :20;
 }; 
+
 

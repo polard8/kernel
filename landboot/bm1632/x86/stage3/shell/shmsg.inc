@@ -145,7 +145,7 @@ seleciona_p3  db  'p3', 0    ;Seleciona particao 3.
 
 version_msg:
 shellmsg_splash: 
-    db 'Gramado Boot Manager ',
+    db 'Gramado X Boot Manager ',
     db 'version ', BOOTMANAGER_VER, 13, 10, 0  
 
 

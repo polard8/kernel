@@ -1,16 +1,8 @@
-/*
- * File: devmgr.h  
- *
- * Descrição:
- *     Header para o device manager.
- *     Para gerenciar e listar dispositivos.
- *     Usado para dispositivos que não sejam pci
- *     ... 
- */
+
+// devmgr.h
 
 #ifndef ____DEVMGR_H
-#define ____DEVMGR_H
-
+#define ____DEVMGR_H    1
 
 // struct more complete, with a lot of information.
 struct device_class_d 
@@ -60,9 +52,7 @@ struct device_d
     // do mesmo tipo usado no sistema de arquivos.
     // /dev/tty0
     char *mount_point;
-    
 
-    
     // Se o tipo for pci.
     struct pci_device_d *pci_device;
     
@@ -93,22 +83,20 @@ struct device_d
     // mas está bom assim.
     struct ttydrv_d *ttydrv;
     
-    //
-    // == (1) storage ========
-    //
-
-    
+//
+// == (1) storage ========
+//
     struct tty_d *tty;
 
-    //
-    // == (2) synchronization ========
-    //
+//
+// == (2) synchronization ========
+//
 
     //int stopped;
 
-    //
-    // == (3) transmition ========
-    //
+//
+// == (3) transmition ========
+//
 
 	//
 	// Continua ...
@@ -125,8 +113,8 @@ struct device_d *devices;  //?? What
 
 // List of legacy devices.
 // 'file->device'
-struct device_d *PS2KeyboardDevice;
-struct device_d *PS2MouseDevice;
+struct device_d  *PS2KeyboardDevice;
+struct device_d  *PS2MouseDevice;
 // ...
 
 
@@ -140,14 +128,15 @@ struct device_d *PS2MouseDevice;
 // Se o arquivo for um dispositivo então teremos
 // um ponteiro na lista deviceList.
 
+
 //
-// The list.
+// The list
 //
 
-#define DEVICE_LIST_MAX 512   //NUMBER_OF_FILES
+// NUMBER_OF_FILES
+#define DEVICE_LIST_MAX    512
 
 unsigned long deviceList[DEVICE_LIST_MAX];    
-
 
 
 //
@@ -185,35 +174,26 @@ struct ttydrv_d *PS2KeyboardDeviceTTYDriver;
 struct ttydrv_d *PS2MouseDeviceTTYDriver;
 // ...
 
-
 //
 // == prototypes ========================================
 //
 
-
 int devmgr_init_device_list(void);
-
+void devmgr_show_device_list(void);
+void init_device_manager (void);
 struct device_d *devmgr_device_object (void);
 
 int 
 devmgr_register_device ( 
     file *f, 
     char *name,
-    int class,     // #bugbug Mudar esse nome de argumento.
+    int class, 
     int type,
     struct pci_device_d *pci_device,
     struct ttydrv_d *tty_driver );
 
 
-void devmgr_show_device_list(void);
-
-void init_device_manager (void);
-
-
 #endif    
 
 
-//
-// End.
-//
 

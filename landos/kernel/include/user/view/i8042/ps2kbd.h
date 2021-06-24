@@ -1,5 +1,4 @@
 
-//ps2kbd.h 
 
 
 #ifndef ____PS2KBD_H
@@ -95,51 +94,7 @@ enum KYBRD_CTRL_STATS_MASK {
 	KYBRD_CTRL_STATS_MASK_TIMEOUT	=	0x40,		//01000000
 	KYBRD_CTRL_STATS_MASK_PARITY	=	0x80		//10000000
 };
-
-//! sets leds
-void keyboard_set_leds( int num, int caps, int scroll) 
-{ 
-	char data = 0;
- 
-	//! set or clear the bit
-	data = (char) (scroll) ? (data | 1) : (data & 1);
-	data = (char) (num)    ? (num | 2)  : (num & 2);
-	data = (char) (caps)   ? (num | 4)  : (num & 4);
- 
-	//! send the command -- update keyboard Light Emetting Diods (LEDs)
-	kybrd_enc_send_cmd (KYBRD_ENC_CMD_SET_LED);
-	kybrd_enc_send_cmd (data);
-	
-done:
-    return;
-};
-
-//! send command byte to keyboard encoder
-void kybrd_enc_send_cmd (uint8_t cmd) {
- 
-	//! wait for kkybrd controller input buffer to be clear
-	while (1)
-		if ( (kybrd_ctrl_read_status () & KYBRD_CTRL_STATS_MASK_IN_BUF) == 0)
-			break;
- 
-	//! send command byte to kybrd encoder
-	outportb (KYBRD_ENC_CMD_REG, cmd);
-}
-//! read status from keyboard controller
-uint8_t kybrd_ctrl_read_status () {
- 
-	return inportb (KYBRD_CTRL_STATS_REG);
-}
 */
-
-
-// Sobre charmaps:
-// ?? quem deve possuir o char map ??
-// Obviamente o kernel base precis de algum controle sobre isso.
-// sujerindo alterações conforme a conveniência do usuário.
-// Se a intenção é que o driver de teclado passe para a line discipline 
-// somente o scancode, então não há a necessidade de o driver de teclado 
-// ter um char map, ele apenas passa o scancode.
 
 
 // Enumerando os tipos de teclados.
@@ -151,7 +106,6 @@ typedef enum {
     // ...
 
 }keyboard_type_t;
-
 
 // keyboardMessage
 //     Estrutura interna para mensagens.
@@ -187,7 +141,6 @@ struct ps2_keyboard_d
     // int input_fd;
     // pid_t pid;
 };
-
 
 
 //
@@ -234,62 +187,15 @@ unsigned long keyboard_handler_address;
 
 
 //
-// == prototypes =============================================
+// == prototypes ===========================
 //
-
-void xxx_keyboard_write (uint8_t data);
-uint8_t xxx_keyboard_read (void);
-
-
-int ps2kbd_globals_initialize (void);
-void ps2kbd_initialize_device (void);
-
-void ldisc_init_modifier_keys (void);
-
-void ldisc_init_lock_keys (void);
-
-
-//Enable and disable keyboard.
-
-void keyboardEnable (void);
-void keyboardDisable (void);
-
-//Set flags.
-void keyboard_set_leds(char flag); 
-
-
-/*
- * Get window procedure parameters.
- */
-void *KdGetWindowPointer(int tid); 
-int KbGetMessage(int tid);
-unsigned long KbGetLongParam1(int tid);
-unsigned long KbGetLongParam2(int tid);
-
-
-//get status 
-int get_alt_status (void);
-int get_ctrl_status (void);
-int get_shift_status (void);
-//...
 
 void kbdc_wait (unsigned char type);
 
 
-//Pega o status das teclas de modificação.
-unsigned long keyboardGetKeyState (unsigned char key);
+void ps2kbd_initialize_device (void);
 
+#endif    
 
-
-// Service
-// Chamado por gde_serv.c
-void *__do_35 ( unsigned long buffer );
-
-// Service
-// Chamado por gde_serv.c
-void *__do_111 ( unsigned long buffer );
-
-
-#endif   
 
 

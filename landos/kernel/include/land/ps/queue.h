@@ -1,44 +1,37 @@
-/*
- * File: queue.h
- *
- * Descrição:
- *     Header para queue.
- *     No fim da fila a prioridade é maior.
- *    
- * History:
- *     2015 - Created by Fred Nora.
- *     2018 - Revision.
- */
 
+// queue.h
 
 #ifndef __QUEUE_H
 #define __QUEUE_H    1
 
-// Ordenação das listas de filas.
+
+
+// OrdenaÃ§Ã£o das listas de filas.
 #define QUEUE_NULL     0
 #define QUEUE_STANDBY  1
 #define QUEUE_RUNNING  2
 #define QUEUE_READY    3
-#define QUEUE_WAITING  4  //Fila das threads que estão esperando.
+#define QUEUE_WAITING  4  //Fila das threads que estÃ£o esperando.
 #define QUEUE_BLOCKED  5
 #define QUEUE_ZOMBIE   6
 #define QUEUE_DEAD     7
 #define QUEUE_INITIALIZED   8
-#define QUEUE_SYSCOOP       9  // Sistema, cooperação.   
-#define QUEUE_USERCOOP     10  // Usuário, cooperação.   
-#define QUEUE_SYSCONC      11  // Sistema, concorrência. 
-#define QUEUE_USERCONC     12  // Usuário, concorrencia.  
+#define QUEUE_SYSCOOP       9  // Sistema, cooperaÃ§Ã£o.   
+#define QUEUE_USERCOOP     10  // UsuÃ¡rio, cooperaÃ§Ã£o.   
+#define QUEUE_SYSCONC      11  // Sistema, concorrÃªncia. 
+#define QUEUE_USERCONC     12  // UsuÃ¡rio, concorrencia.  
 #define QUEUE_REALTIME     13 
 #define QUEUE_DEFAULT      14
 //...
+
 // ??
-// Níveis de prioridade.
+// NÃ­veis de prioridade.
 #define QUEUE_LEVEL_MIN 15
 #define QUEUE_LEVEL_MED 16
 #define QUEUE_LEVEL_MAX 17
 
 // ---------
-// Essa é a organização padrão de uma 
+// Essa Ã© a organizaÃ§Ã£o padrÃ£o de uma 
 // lista de ponteiros de lista encadeada.
 // 0 = DRIVERS
 // 1 = SERVERS
@@ -46,12 +39,11 @@
 #define MAX_QUEUES  3
 unsigned long QUEUES[3];
 
-
 /*
  **********************************************************
  * queue_d:
  *     Estrutura para organizar 
- * várias listas de ponteiros de lista encadeada.
+ * vÃ¡rias listas de ponteiros de lista encadeada.
  */
 
 // #bugbug
@@ -63,8 +55,8 @@ unsigned long QUEUES[3];
 struct queue_d
 {
 	// #importante
-	// MAX_QUEUES é o número máximo de filas que pode haver na lista.
-	// A lista contém o potneiro head de uma lista encadeada.
+	// MAX_QUEUES Ã© o nÃºmero mÃ¡ximo de filas que pode haver na lista.
+	// A lista contÃ©m o potneiro head de uma lista encadeada.
 	//
    	
 	//Movimento 1, initialized --> standby. 
@@ -92,7 +84,7 @@ struct queue_d
 	 
 	 
 	//Movimento 5, ready --> waiting.
-    //Esperando para retomar a execução.	
+    //Esperando para retomar a execuÃ§Ã£o.	
     int waitingHead;
     int waitingTail;
     int waitingMax;
@@ -129,34 +121,34 @@ struct queue_d
 	/*
      * RACE: 
 	 *    Filas do loop do sistema. 
-	 *    Cooperação e Concorrência.
+	 *    CooperaÃ§Ã£o e ConcorrÃªncia.
      */ 
 	  
 	  
-    //Cooperação, sistema.
+    //CooperaÃ§Ã£o, sistema.
     int syscoopHead; 
     int syscoopTail;
     int syscoopMax;
     unsigned long syscoopList[MAX_QUEUES+1];   
 
-	//Concorrência, sistema.
+	//ConcorrÃªncia, sistema.
     int sysconcHead; 
     int sysconcTail;
     int sysconcMax;
     unsigned long sysconcList[MAX_QUEUES+1];
 
 	/*
-     * RACE: Filas do loop do usuário. Cooperação e Concorrência.
+     * RACE: Filas do loop do usuÃ¡rio. CooperaÃ§Ã£o e ConcorrÃªncia.
      */ 
 
 	
-	//Cooperação, usuário.
+	//CooperaÃ§Ã£o, usuÃ¡rio.
     int usercoopHead; 
     int usercoopTail;
     int usercoopMax;
     unsigned long usercoopList[MAX_QUEUES+1];  	
 
-	//Concorrência, usuário.
+	//ConcorrÃªncia, usuÃ¡rio.
     int userconcHead; 
     int userconcTail;
     int userconcMax;
@@ -185,19 +177,19 @@ struct queue_d
     // Listas para filas de threads que se encaixam emdeterminadas faixas de prioridade.
 	
 	
-	//Mínimo = 'level <= PRIORITY_LOW'
+	//MÃ­nimo = 'level <= PRIORITY_LOW'
     int minHead; 
     int minTail;
     int minMax;
     unsigned long minList[MAX_QUEUES+1];
 	
-	//Médio == 'PRIORITY_LOW > level <= PRIORITY_NORMAL'
+	//MÃ©dio == 'PRIORITY_LOW > level <= PRIORITY_NORMAL'
     int medHead; 
     int medTail;
     int medMax;
     unsigned long medList[MAX_QUEUES+1];
     
-	//Màximo = ' level > PRIORITY_NORMAL '
+	//MÃ ximo = ' level > PRIORITY_NORMAL '
 	int maxHead; 
     int maxTail;
     int maxMax;
@@ -210,7 +202,7 @@ struct queue_d *queue;
 
 /*
  * wait_queue_d:
- *     Lista encadeada que pode ser usada para threads que estão esperando 
+ *     Lista encadeada que pode ser usada para threads que estÃ£o esperando 
  * por algum evento.
  */
 
@@ -230,38 +222,26 @@ struct wait_queue_d *wait_queue;
 // ======== Prototypes ========
 //
 
-int init_queue(struct queue_d *q);
 
-//queue_insert_head: Coloca um dado no fim da fila. (LIFO)
+int init_queue (struct queue_d *q);
+
+int queue_insert_data (struct queue_d *q, unsigned long data, int type);
+struct thread_d *queue_get_data ( struct queue_d *q, int type );
+
+
 int 
 queue_insert_head ( 
     struct queue_d *q, 
     unsigned long data, 
-     int type );
-
-int 
-queue_insert_data( 
-    struct queue_d *q, 
-    unsigned long data, 
     int type );
 
-
-struct thread_d *queue_get_data ( struct queue_d *q, int type );
-
-  
-void show_queue_information(struct queue_d *q);
 void ScanReadyQueue(struct queue_d *q);
+void feed_ready_queue (struct queue_d *q, int type);
 
-void 
-feed_ready_queue( 
-    struct queue_d *q, 
-    int type );
-
+void show_queue_information(struct queue_d *q);
 
 #endif    
 
 
-//
-// End.
-//
+
 

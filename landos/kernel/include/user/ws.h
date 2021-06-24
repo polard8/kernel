@@ -1,33 +1,6 @@
-/*
- * File ws/ws.h
- *
- *     KGWS - kernel Gramado Window Server
- *
- * Esse é o principal header do gws, preferenciamente
- * devem ficar aqui as globais usadas no servidor.
- *
- * #importante:
- *     Os dados serão emcapsulados nesse servidor  
- * e serão acessíveis através de métodos.
- *     Ficarão aqui as principais globais de controle
- * dos recursos gráficos.
- *
- * Obs: Um processo vai operar como grenciador de janelas
- * em ring e vai dialogar com o servidor para obter recursos.
- * Provavelmente esse gerenciador de janelas se chamará GWM
- * Gramado Window Manager. Porém podemos ter vários gerenciadores 
- * de janela em user mode.
- *
- *
- * History:
- *     2018 - Created by Fred Nora.
- */
-
 
 #ifndef __WS_H
 #define __WS_H    1
-
-
 
 // Counters.
 #define USER_SESSION_COUNT_MAX  16
@@ -188,8 +161,8 @@ struct color_scheme_d
     // É preciso ainda definir esse tipo de objeto.
     // definir em gdef.h
 
-    object_type_t  objectType;
-    object_class_t objectClass;
+    //object_type_t  objectType;
+    //object_class_t objectClass;
 
     //#todo Not initilized yet.
     int id;
@@ -413,29 +386,8 @@ typedef enum {
 //
 
 
-// This is called at the kernel initialization to initialize
-// the window server struct with the embedded window server info.
-int ws_init(void);
-
-
-void ws_show_info(void);
-
-// Let's setup the window server.
-// See:
-// 2io/ws.c
-int 
-ws_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
-
 
 #endif    
 
 
-
-
-//
-// End
-//
 

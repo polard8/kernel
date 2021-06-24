@@ -1,20 +1,6 @@
-/*
- * File: string.c
- *
- * Descrição:
- *     Operações com strings.
- *     Parte da biblioteca da linguagem C.
- *
- * 2015 - Created by Fred Nora.
- */
-
 
 #include <kernel.h>
 
-
-//test.
-//#define tolower(c)  ((int)((c) & ~0x20))
-//#define toupper(c)  ((int)((c) | 0x20))
 
 
 // strcmp:
@@ -31,7 +17,6 @@ int strcmp (char * s1, char * s2){
 
     return ((int) (s1[i] - s2[i]));
 }
-
 
 // strncmp:
 //    Compare n bytes of two strings. 
@@ -67,7 +52,6 @@ int strncmp ( char *s1, char *s2, int len ){
 }
 
 
-
 // str_cmp:
 //     Compare two strings.
 
@@ -97,8 +81,7 @@ int str_cmp(unsigned char *str1, unsigned char *str2)
     return -1;
 }
 
- 
- 
+
 /*
  * memcpy: 
  */
@@ -121,8 +104,7 @@ void *memcpy ( void *v_dst, const void *v_src, unsigned long c ){
     return v_dst;
 }
 
-
-void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
+void *memcpy64 ( void *v_dst, const void *v_src, unsigned long c )
 {
 	//const char *src = v_src;
 	//char *dst = v_dst;
@@ -143,7 +125,26 @@ void *memcpy32 ( void *v_dst, const void *v_src, unsigned long c )
     return v_dst;
 }
 
+void *memcpy32 ( void *v_dst, const void *v_src, unsigned int c )
+{
+	//const char *src = v_src;
+	//char *dst = v_dst;
 
+    int *src = (int *) v_src;
+    int *dst = (int *) v_dst;
+
+    register unsigned int Copy=c;
+    
+    /* Simple, byte oriented memcpy. */
+    //danger
+    
+    while (Copy--)
+    {
+        *dst++ = *src++;
+    };
+
+    return v_dst;
+}
 
 // strcpy:  
 //     Copy a string
@@ -197,7 +198,6 @@ char *strcat (char *to, const char *from)
     return (ret);
 }
 
-
 /* strcat */
 /* 
  char *(strcat)(char *restrict s1, const char *restrict s2);
@@ -214,13 +214,9 @@ char *strcat (char *to, const char *from)
 */
 
 
-/*
- *  bcopy: 
- */
-
+// bcopy: 
 void bcopy (char *from, char *to, int len)
 {
-
     //if (len < 0)
         //return;
 
@@ -232,14 +228,10 @@ void bcopy (char *from, char *to, int len)
 }
 
 
-/*
- *  bzero:
- *      Preenche com zeros. 
- */
-
+// bzero:
+//     Fill with 0s. 
 void bzero (char *cp, int len)
 {
-
     //if (len < 0)
         //return;
 
@@ -250,8 +242,6 @@ void bzero (char *cp, int len)
         *(cp + len) = 0;
     };
 }
-
-
 
 // strlen:
 //    Give the string lenght in bytes.
@@ -293,8 +283,6 @@ done:
 	return((int) i);
 };
 */
-
-
 
 /*
 // Compares two strings. 
@@ -465,11 +453,12 @@ int strcmp(const char *a, const char *b)
 
 
 
+
 //#bugbug:
 //Isso ainda não foi testado.
 
-void *memset ( void *ptr, int value, int size ){
-
+void *memset ( void *ptr, int value, int size )
+{
     register int i=0;
         
     if ( ptr != NULL && size > 0 )
@@ -485,7 +474,6 @@ void *memset ( void *ptr, int value, int size ){
 
     return (void *) ptr;
 }
-
 
 
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
@@ -507,7 +495,7 @@ size_t strcspn(const char* str, const char* reject)
 
 	//for ( size_t result = 0; 1; result++ )
     register int result=0;
-    for ( result=0; result=1; result++ )
+    for ( result=0; result = 1; result++ )
     {
         char c = str[result];
 
@@ -524,7 +512,6 @@ size_t strcspn(const char* str, const char* reject)
         if ( matches ){  return (size_t) result;  }
     };
 }
-
 
 /* Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen. */
 // ?? is it working?
@@ -565,7 +552,6 @@ size_t strspn (const char* str, const char* accept)
     };
 }
 
-
 /* Apple open source */
 char *k_strtok_r (
     char *s, 
@@ -585,10 +571,8 @@ char *k_strtok_r (
         return NULL;
     }
 
-    //
     // Skip (span) leading delimiters 
     // (s += strspn(s, delim), sort of).
-    //
 
 cont:
 
@@ -639,7 +623,7 @@ cont:
 }
 
 
-/*apple open source*/
+/* Apple open source */
 char *k_strtok (char *s, const char *delim)
 {
     static char *last;
@@ -648,7 +632,9 @@ char *k_strtok (char *s, const char *delim)
 }
 
 
+
 // Duplicate a string.
+
 char *strdup (const char *str){
 
     char *copy;
@@ -668,7 +654,7 @@ char *strdup (const char *str){
     //  simplify this thing.
     if ( !(copy = (char *) kmalloc( ( size_t ) len ) ) )
     {
-        return (NULL);
+        return NULL;
     }
 
 // Copy

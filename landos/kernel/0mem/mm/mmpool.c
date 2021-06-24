@@ -1,73 +1,6 @@
-/*
- * File: mmpool.c 
- *
- * g_pagedpool_va é o endereço virtual de uma área de memória 
- * pré alocada de onde tiraremos páginas para o alocador.
- */
 
 
-// #importante
-// As rotinas nesse documento manipulam o pool pageAllocList[].
-
-// #todo
-// Criar rotinas que manipulem as entradas no pool
-// Que deletem entradas
-// Que as tornem free. 
-// ...
-
-
-
-#include <kernel.h>
-
-
-// Internal
-void *page (void); 
-
-
-/*
- * initializeFramesAlloc:
- *     Inicializa o framepool. 
- */
-
-void initializeFramesAlloc (void){
-
-    struct page_d *p;
-
-    int __slot = 0;
-
-
-	// Inicializando a lista de pages.
-
-    for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
-    {
-        pageAllocList[__slot] = (unsigned long) 0;
-    };
-
-
-	//
-	// Criando o primeiro para testes.
-	//
-
-    // #bugbug
-    // Talvez seja desnecessário criar essa entrada.
-
-    p = (void *) kmalloc ( sizeof( struct page_d ) );
-
-    if ( p == NULL ){
-        panic ("mmpool-initializeFramesAlloc:\n");
-
-    }else{
-        p->id = 0;
-        p->used = 1;
-        p->magic = 1234;
-        p->free = 1;  //free
-        p->next = NULL; 
-        // ...
-
-        pageAllocList[0] = ( unsigned long ) p; 
-    };
-}
-
+#include <kernel.h>   
 
 
 /*
@@ -113,7 +46,7 @@ void *page (void){
             }
 
             New->id = __slot;
-            New->used = 1;
+            New->used  = TRUE;
             New->magic = 1234;
 
             New->free = 0;        // Not free!
@@ -141,7 +74,6 @@ fail:
     return NULL; 
 }
 
-
 /*
  ***************************************************
  * newPage:
@@ -159,6 +91,9 @@ fail:
 
 // OUT:
 // Retorna o endereço virtual da página alocada.
+
+// #todo
+// #fixme
 
 void *newPage (void){
 
@@ -202,6 +137,10 @@ void *newPage (void){
 				
 				// Pegando o endereço virtual.
                 va = (unsigned long) ( base + (New->id * 4096) );
+
+                // #todo
+                // #fixme
+                // Use pml4 address
 
                 // Pegando o endereço físico.
                 pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
@@ -259,23 +198,26 @@ fail:
     return NULL;
 }
 
-
 // Allocate single page.
 void *mm_alloc_single_page (void)
 {
-    return (void *) newPage();
     //return (void *) allocPages (1);
+    return (void *) newPage();
 }
 
 // Allocate n contiguous pages.
 void *mm_alloc_contig_pages (size_t size)
 {
+
+    debug_print("mm_alloc_contig_pages: [TODO] [FIXME]\n");
+
     if (size<=0)
        panic("mm_alloc_contig_pages: [FIXME] invalid size");
-       
-    return (void *) allocPages(size);
+      
+    //#todo
+    //return (void *) allocPages(size);
+    return NULL; 
 }
-
 
 
 /*
@@ -313,7 +255,6 @@ tryAgain:
 
     return (int) -1;
 }
-
 
 /*
  ***********************************************
@@ -353,6 +294,9 @@ void *allocPages (int size){
     int Count=0;
 
     int __first_free_slot = -1;
+
+
+    debug_print ("mmpool-allocPages: [TODO] [FIXME] \n");
 
 	//
 	// Checando limites.
@@ -427,9 +371,9 @@ void *allocPages (int size){
 
 			//printf("#");
 			p->id = __slot;
-			p->used = 1;
+			p->used  = TRUE;
 			p->magic = 1234;
-			
+
 			//not free
 			p->free = 0;  
 
@@ -438,7 +382,11 @@ void *allocPages (int size){
 			p->locked = 0;
 			
 			//contador de referências
-			p->ref_count = 1;	
+			p->ref_count = 1;
+			
+	
+			// #fixme
+			// Precisamos usar pml4
 			
 			//pegando o endereço virtual.
 			va = (unsigned long) ( base + (p->id * 4096) );    
@@ -481,7 +429,6 @@ void *allocPages (int size){
         };
     };
 
-
 fail:
     debug_print ("mmpool-allocPages: fail \n");
     printf      ("mmpool-allocPages: fail \n");
@@ -489,9 +436,13 @@ fail:
 }
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
 
 
 

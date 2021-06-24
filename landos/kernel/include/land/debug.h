@@ -1,27 +1,21 @@
-/*
- * File: debug.h
- *
- *     Header do debug interno do kernel.
- */
+// debug.h
 
+#ifndef __DEBUG_H 
+#define __DEBUG_H    1
 
-int debug (void);
-int debug_check_inicialization (void);
-int debug_check_drivers (void);
-void debug_breakpoint (void);
-
-//retorna um checksum dado um buffer e um tamanho.
 unsigned long 
-debug_compute_checksum( 
-    unsigned char *Buffer, 
-    unsigned long Lenght );
+debug_compute_checksum ( 
+    unsigned char *buffer, 
+    unsigned long lenght );
 
-// Escreve na porta serial.
 void debug_print ( char *data );
-
 void PROGRESS( char *string );
 
-//
-// End.
-//
+int debug_check_inicialization (void);
+int debug_check_drivers (void);
+int debug (void);
+
+void debug_breakpoint (void);
+
+#endif    
 

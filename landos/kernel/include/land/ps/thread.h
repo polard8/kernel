@@ -1,21 +1,12 @@
-/*
- * File: thread.h
- *
- *    Thread support.
- *
- * History:
- *     2015 - Created by Fred Nora.
- *     2018 - Revision.
- */
-
+// thread.h
 
 #ifndef __THREAD_H
 #define __THREAD_H    1
 
 #define THREAD_MAGIC  1234
 
-//O primeiro Ìndice na contagem das threads do sistema e o
-//primeiro Ìndice na contagem das threads dos usu·rios.
+//O primeiro √≠ndice na contagem das threads do sistema e o
+//primeiro √≠ndice na contagem das threads dos usu√°rios.
 #define SYSTEM_BASE_TID  0  
 #define USER_BASE_TID    100  
 
@@ -23,48 +14,35 @@
 // Preempt support.
 //
 
-//?? Se pode ou n„o entrar em preempÁ„o. 
+//?? Se pode ou n√£o entrar em preemp√ß√£o. 
 #define PREEMPTABLE    1    //PODE ENTRAR
-#define UNPREEMPTABLE  0    //NAO PODE ENTRAR EM PREEMP«√O
+#define UNPREEMPTABLE  0    //NAO PODE ENTRAR EM PREEMP√á√ÉO
 
 
 // ??
 // #bugbug: rever isso!
 // Identificadores de thread.
-// thread 0 n„o significa idle thread.
+// thread 0 n√£o significa idle thread.
 #define IDLE_ID        0 
 #define IDLE           IDLE_ID 
 #define THREAD_IDLE    IDLE_ID  
 // ... 
 
-
- 
-/*
- * Globais.
- */ 
- 
- 
- 
-/*
- * Estruturas para threads.
- */
-
-
 	//#importante
-	//razıes para esperar
+	//raz√µes para esperar
 	//#todo: isso precisa ser inicializado.
-	//@todo: tem que fazer um enum para enumerar as razıes.
-	//o Ìndice È o selecionador da raz„o pela 
-	//qual a thread est· esperando.
-	//existem umas 20 razıes pra esperar.
+	//@todo: tem que fazer um enum para enumerar as raz√µes.
+	//o √≠ndice √© o selecionador da raz√£o pela 
+	//qual a thread est√° esperando.
+	//existem umas 20 raz√µes pra esperar.
 	// 0 - esperando por mensagem.(presa num loop)
 	// 1 - esperando outra thread finalizar. wait4tid
 	// 2 - esperando um processo finalizar. wait4pid
-	// 3 - esperando um objeto. (BLOCKED)(espera genÈrica)
+	// 3 - esperando um objeto. (BLOCKED)(espera gen√©rica)
 	// ...
 
 // #importante
-// isso ser· usado na estrutura de thread em wait_reason[]
+// isso ser√° usado na estrutura de thread em wait_reason[]
 // Com limite de 10 por enquanto.
 
 typedef enum {
@@ -72,14 +50,13 @@ typedef enum {
 	WAIT_REASON_LOOP,           
 	WAIT_REASON_EXIT,
 	WAIT_REASON_BLOCKED,
-	WAIT_REASON_PREMMPTED,      // ?? Esperando a preempÁ„o de thread de menor prio.
-	WAIT_REASON_SEMAPHORE,      // ?? Sem·foro.
+	WAIT_REASON_PREMMPTED,      // ?? Esperando a preemp√ß√£o de thread de menor prio.
+	WAIT_REASON_SEMAPHORE,      // ?? Sem√°foro.
 	WAIT_REASON_WAIT4PID,       // Esperando o processo filho morrer.
 	WAIT_REASON_WAIT4TID,       // Esperando uma thread morrer.
 	WAIT_REASON_TEST            // # Usada pelo desenvolvedor para testes.
 	// ...
 }thread_wait_reason_t;
-
 
 
 
@@ -99,8 +76,6 @@ typedef enum {
     THREAD_TYPE_IO, 
     // ...
 }thread_type_t;
-
-
 
 /*
 This part is about input redirection ...
@@ -123,18 +98,21 @@ typedef enum {
 }thread_inputmodel_t;
 
 
+
+
+
 /*
  * thread_state_t:
  *    Enumeram os estados de uma threads, (8 estados).
  *    Existem 2 grupos, 'Earth' e 'Space'.
- *    Obs: Rodam no 'espaÁo'.
+ *    Obs: Rodam no 'espa√ßo'.
  *
  * Earth: (INITIALIZED, STANDBY, ZOMBIE, DEAD).
  * Space: (READY, RUNNING, WAITING, BLOCKED).
  *
- *  INITIALIZED,    //Earth, Criado o contexto e par‚metros.
- *  STANDBY,        //Earth, Pronta para rodar pela primeira vez. Ir para o 'espaÁo'.
- *  ZOMBIE,         //Earth, Terminou a execuÁ„o. Voltou para a 'terra'.
+ *  INITIALIZED,    //Earth, Criado o contexto e par√¢metros.
+ *  STANDBY,        //Earth, Pronta para rodar pela primeira vez. Ir para o 'espa√ßo'.
+ *  ZOMBIE,         //Earth, Terminou a execu√ß√£o. Voltou para a 'terra'.
  *  DEAD,           //Earth, Deleted.
  * 
  *  READY,          //Space, Thread is ready to run again.
@@ -143,16 +121,16 @@ typedef enum {
  *  BLOCKED,        //Space, Thread is blocked by an event.
  *
  * Obs: 
- *     Na pr·tica, a troca de status est· seguindo um organograma de 
+ *     Na pr√°tica, a troca de status est√° seguindo um organograma de 
  * movimentos. 
- *     @todo: Descrever esses movimentos na documentaÁ„o. Incluir a 
- * visualizaÁ„o atravÈs do gr·fico.
+ *     @todo: Descrever esses movimentos na documenta√ß√£o. Incluir a 
+ * visualiza√ß√£o atrav√©s do gr√°fico.
  */
  
 typedef enum {
-	INITIALIZED,    //0 Earth, Criado o contexto e par‚metros.
-	STANDBY,        //1 Earth, Pronta para rodar pela primeira vez. Ir para o 'espaÁo'.
-	ZOMBIE,         //2 Earth, Terminou a execuÁ„o. Voltou para a 'terra'.
+	INITIALIZED,    //0 Earth, Criado o contexto e par√¢metros.
+	STANDBY,        //1 Earth, Pronta para rodar pela primeira vez. Ir para o 'espa√ßo'.
+	ZOMBIE,         //2 Earth, Terminou a execu√ß√£o. Voltou para a 'terra'.
 	DEAD,           //3 Earth, Deleted.
 	READY,          //4 Space, Thread is ready to run again.
 	RUNNING,        //5 Space, Thread is currently running.
@@ -161,21 +139,13 @@ typedef enum {
 }thread_state_t;
 
 
-/*
- ***********************************************************
- * thread_d: 
- *    TCB - Thread Control Block.
- *    In the end of the struct we find the elements 
- *    not frequently used.
- */
 
+// #todo
 struct thread_d 
 {
-
     // Object control.
     object_type_t   objectType;
     object_class_t  objectClass;
-    struct object_d *object;
 
     int used;
     int magic;
@@ -211,13 +181,13 @@ struct thread_d
 
     // #todo
     // Identifica uma thread como sendo uma thread que 
-    // pertence ‡ um servidor. Ent„o as threads desse tipo 
+    // pertence √† um servidor. Ent√£o as threads desse tipo 
     // ganham mais prioridade e mais tempo de processamento.
 
     // int isServerThread;
 
 	// flag. 
-	// 1 = Sinaliza que a thread est· dando a preferÍncia
+	// 1 = Sinaliza que a thread est√° dando a prefer√™ncia
 	// e que deve sair quando for seguro fazer isso.
     int _yield;
 
@@ -226,7 +196,7 @@ struct thread_d
 	
 	//ext.
 
-    //plano de execuÁ„o.
+    //plano de execu√ß√£o.
     int plane;
 
 //
@@ -241,7 +211,7 @@ struct thread_d
     
     // #test
     // estamos usando esse aqui.
-    // Assim fica mais f·cil enviar para o aplicativo.
+    // Assim fica mais f√°cil enviar para o aplicativo.
     char __threadname[64];    // HOSTNAME_BUFFER_SIZE
     size_t threadName_len;    // len 
 
@@ -261,21 +231,30 @@ struct thread_d
     int affinity;
 
 	// ORDEM: 
-	// O que segue È referenciado durante a interrupÁ„o de timer.
+	// O que segue √© referenciado durante a interrup√ß√£o de timer.
 
 	//...
 
 	// ORDEM: 
-	// O que segue È referenciado durante o processo de task switch.
+	// O que segue √© referenciado durante o processo de task switch.
 
 //
-// == Directory =======================================
+// == pml4 =======================================
 //
 
-    // COLOCAR O DIRET”RIO DE P¡GINAS QUE A THREAD USA, 
+    // COLOCAR O DIRET√ìRIO DE P√ÅGINAS QUE A THREAD USA, 
     // ISSO AJUDA NA HORA DO TASKSWITCH.
 
-    unsigned long DirectoryPA;
+    // #bugbug
+    // Not used in x86_64. Try pml4.
+
+    //unsigned long DirectoryPA;
+
+
+    unsigned long pml4_VA;
+    unsigned long pml4_PA;
+
+
 
     // ring
     unsigned long iopl;
@@ -294,47 +273,53 @@ struct thread_d
 
 	//stack frame;
     unsigned short ss;
-    unsigned long  esp;
-    unsigned long  eflags;
+    unsigned long  rsp;
+    unsigned long  rflags;
     unsigned short cs;
-    unsigned long  eip;    //usado com o pd do processo
+    unsigned long  rip;    //usado com o pd do processo
 
 	// para o kernel saltar para o novo processo.
-    unsigned long ring0_eip;  //usado com o pd do kernel
-    unsigned long eipPA;
+    unsigned long ring0_rip;  //usado com o pd do kernel
+    unsigned long ripPA;
 
     unsigned short ds;
     unsigned short es;
     unsigned short fs;
     unsigned short gs;
 
-    unsigned long eax;
-    unsigned long ebx;
-    unsigned long ecx;
-    unsigned long edx;
-    unsigned long esi;
-    unsigned long edi;
-    unsigned long ebp;
+    unsigned long rax;
+    unsigned long rbx;
+    unsigned long rcx;
+    unsigned long rdx;
+    unsigned long rsi;
+    unsigned long rdi;
+    unsigned long rbp;
+    
+    unsigned long r8;
+    unsigned long r9;
+    unsigned long r10;
+    unsigned long r11;
+    unsigned long r12;
+    unsigned long r13;
+    unsigned long r14;
+    unsigned long r15;
+
 	//continua o contexto ...
 
-	//O endereÁo incial, para controle.
-    unsigned long initial_eip;
+	//O endere√ßo incial, para controle.
+    unsigned long initial_rip;
 
 //
 //  tss
 //
 
 	//#todo
-	//isso È muito necess·rio.
-    struct i386tss_d *tss;
-
+	//isso √© muito necess√°rio.
+    // #todo: Create the structure.
+    //struct x64tss_d *tss;
 
 	// ORDEM: 
-	// O que segue È referenciado durante o processo de scheduler.
-
-//
-// == Priorities ===================
-//
+	// O que segue √© referenciado durante o processo de scheduler.
 
     // Priority levels.
     // Used by processes and threads.
@@ -355,10 +340,10 @@ struct thread_d
     unsigned long priority;       // dynamic
 
     // preempted:
-    // flag ~ Sinaliza que uma tarefa pode ou n„o sofrer preempÁ„o.
+    // flag ~ Sinaliza que uma tarefa pode ou n√£o sofrer preemp√ß√£o.
     // Uma tarefa de menor prioridade pode deixar o estado running 
     // para assumir o estado ready em favor de uma tarefa de maior prioridade
-    // que assumir· o estado running.
+    // que assumir√° o estado running.
     // todo: isso pode ser int, bool ou char.
 
     unsigned long preempted;
@@ -367,9 +352,8 @@ struct thread_d
     // Escalonado duas vezes.
     int DoubleShot;
 
-
 	// ORDEM: 
-	// O que segue È referenciado durante o processo de dispatch.
+	// O que segue √© referenciado durante o processo de dispatch.
 
     // Sinaliza que a tarefa teve o seu contexto salvo.
     // #todo: use 'int'
@@ -385,8 +369,7 @@ struct thread_d
     unsigned long Stack;
     unsigned long StackSize;
 
-
-	// EndereÁo de um array contendo ponteiros para variso serviÁos
+	// Endere√ßo de um array contendo ponteiros para variso servi√ßos
 	// que a thread pode usar.
 	// unsigned long ServiceTable;
 
@@ -396,13 +379,13 @@ struct thread_d
 
     // Podemos criar a estrutura 'thread_time_d' t->time.step
 
-    // Quanto tempo passou, mesmo quando a tarefa n„o esteve rodando.
+    // Quanto tempo passou, mesmo quando a tarefa n√£o esteve rodando.
     // unsigned long jiffies_alive;
 
 
     // step: 
     // How many jiffies. total_jiffies.
-    // Quantas vezes ela j· rodou no total.
+    // Quantas vezes ela j√° rodou no total.
     unsigned long step; 
 
     // Quando ela foi criada.
@@ -424,20 +407,20 @@ struct thread_d
     // pronta para rodar.
     unsigned long standbyCount;
 
-    // Quantos jiffies ela est· rodando antes de parar.
+    // Quantos jiffies ela est√° rodando antes de parar.
     unsigned long runningCount; 
 
-    // Quantos milisegundos ela est· rodando antes de parar.
+    // Quantos milisegundos ela est√° rodando antes de parar.
     unsigned long runningCount_ms; 
 
     // obs: 
     // ??
-    // A soma das 3 esperas È a soma do tempo de espera
+    // A soma das 3 esperas √© a soma do tempo de espera
     // depois que ela rodou pela primeira vez.
 
     // Contando o tempo nos estados de espera.
 
-    // Tempo de espera para retomar a execuÁ„o.
+    // Tempo de espera para retomar a execu√ß√£o.
     // Limite esperando para rodar novamente.
     // Talvez essa contagem nao precise agora. 
     unsigned long readyCount;
@@ -455,7 +438,7 @@ struct thread_d
 
     // #todo: 
     // Deadline.
-    // Quando tempo a tarefa tem para que ela complete a sua execuÁ„o.
+    // Quando tempo a tarefa tem para que ela complete a sua execu√ß√£o.
 
     // unsigned long DeadLine.
     // unsigned long RemainingTime; 
@@ -466,32 +449,30 @@ struct thread_d
     // Isso eh usado por threads 'real-time'
     unsigned long ticks_remaining;
 
-
 //
 // == Profiler ==================================
 //
 
     //quanto por cento do tempo o processo ficou rodando.
-    //È a soma do quanto ficou rodando todas as suas threads.
+    //√© a soma do quanto ficou rodando todas as suas threads.
     unsigned long profiler_percentage_running;
     unsigned long profiler_percentage_running_res;
     unsigned long profiler_percentage_running_mod;
     unsigned long profiler_ticks_running;
     unsigned long profiler_last_ticks;
 
-    //Tempo para o prÛximo alarme, dado em ticks.
+    //Tempo para o pr√≥ximo alarme, dado em ticks.
     //unsigned long alarm; 
 
-
 	// ORDEM: 
-	// O que segue È referenciado com pouca frequencia.
+	// O que segue √© referenciado com pouca frequencia.
 	
 	//lista de arquivos ??
-	//fluxo padr„o. stdio, stdout, stderr
+	//fluxo padr√£o. stdio, stdout, stderr
 	//unsigned long iob[8];
     
-	//#bugbug: o vetor Stream[] conter· essas stream tambÈm.
-	//ponteiros para as streams do fluxo padr„o.
+	//#bugbug: o vetor Stream[] conter√° essas stream tamb√©m.
+	//ponteiros para as streams do fluxo padr√£o.
 	//O processo tem streams ... Stream[] ...
 	//cada tread pode ter suas stream ... mesmo que herde streams 
 	//de processo ...
@@ -500,8 +481,8 @@ struct thread_d
 	//unsigned long standard_streams[3];
 	//unsigned long Streams[8];
 
-	//Obs: Cada processo est· atuando em um diretÛrio,
-	// mas ser· cada thread precisa atuar em um diretÛrio diferente??
+	//Obs: Cada processo est√° atuando em um diret√≥rio,
+	// mas ser√° cada thread precisa atuar em um diret√≥rio diferente??
 	//
 	//struct _iobuf *root;  // 4 root directory
     //struct _iobuf *pwd;     // 5 (print working directory) 
@@ -511,7 +492,6 @@ struct thread_d
 	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
 	//struct wait_d WaitBlock;
 
-
 //
 // == tty ==========================
 //
@@ -519,31 +499,27 @@ struct thread_d
     // ID da tty usada.
     int tty_id;
 
-
-
 //
 // Security
 //
 
     // #importante
-    // Isso È usado para gerÍncia de memÛria e ... 
+    // Isso √© usado para ger√™ncia de mem√≥ria e ... 
     
     //struct usession_d *usession;  //#todo
     struct room_d     *room;        // (Window Station) da thread.
     struct desktop_d  *desktop;     // Desktop da thread.
 
-
     // ??
 
     // ?? procedimento de janela.
-    unsigned long procedure; //EndereÁo do procedimento de janela da tarefa. 
+    unsigned long procedure; //Endere√ßo do procedimento de janela da tarefa. 
 	//unsigned long control_menu_procedure; //procedimento do control menu.
 
 
 	// #ORDEM: 
-	// O que segue È referenciado durante as trocas de mensagens.
-	// utilizaÁ„o de canais e IPC.
-
+	// O que segue √© referenciado durante as trocas de mensagens.
+	// utiliza√ß√£o de canais e IPC.
 
 //
 // LIS - Local Input State
@@ -576,11 +552,6 @@ struct thread_d
     // When the thread calls GetMessage(), 
     // the keyboard event is removed from the queue and 
     // assigned to the window that currently has input focus.
-    
-
-//
-// == kernel event ====================================
-//
 
     // #test
     // Sending a message to the kernel.
@@ -596,7 +567,6 @@ struct thread_d
     unsigned long     ke_long2;
     int               ke_newmessageFlag; 
     //--
-
 
 //
 // == Event queue ===========================================
@@ -625,7 +595,6 @@ struct thread_d
     unsigned long      long2_list[32];
     unsigned long      long3_list[32];
     unsigned long      long4_list[32];
-    
     // offsets
     int tail_pos;
     int head_pos;
@@ -633,13 +602,12 @@ struct thread_d
 
     // ====================================================
 
-
 //
 // Message Queue
 //
 
-    // Coloca-se em tail, quande chegar ao fim do buffer, recomeÁa.
-    // Se o tail encontrar o head È porque o processo n„o est· 
+    // Coloca-se em tail, quande chegar ao fim do buffer, recome√ßa.
+    // Se o tail encontrar o head √© porque o processo n√£o est√° 
     // respondendo.
     // #bugbug
     // isso ao esta sendo usado no momento.
@@ -648,15 +616,14 @@ struct thread_d
     int MsgQueueHead;  //retira. 
     int MsgQueueTail;  //coloca.
 
-
-    // Quando um processo sÛ pode receber mensagens de um 
+    // Quando um processo s√≥ pode receber mensagens de um 
     // determinado processo. Ou de qualquer um.
     // Ex: ANY=-1, PID ...
     // pid_t receive_from_pid;
 
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
-	//struct thread_d *nextSender;  //prÛxima thread a enviar mensagem.
+	//struct thread_d *nextSender;  //pr√≥xima thread a enviar mensagem.
 	
 
 
@@ -667,31 +634,30 @@ struct thread_d
     // Is this valid for a thread or for a window?
     // int mouse_is_captured;
 
-
 //
 // == Wait ======================================
 //
 
 	//#importante
-	//razıes para esperar
+	//raz√µes para esperar
 	//#todo: isso precisa ser inicializado.
-	//@todo: tem que fazer um enum para enumerar as razıes.
-	//o Ìndice È o selecionador da raz„o pela 
-	//qual a thread est· esperando.
-	//existem umas 20 razıes pra esperar.
+	//@todo: tem que fazer um enum para enumerar as raz√µes.
+	//o √≠ndice √© o selecionador da raz√£o pela 
+	//qual a thread est√° esperando.
+	//existem umas 20 raz√µes pra esperar.
 	// 0 - esperando por mensagem.(presa num loop)
 	// 1 - esperando outra thread finalizar. wait4tid
 	// 2 - esperando um processo finalizar. wait4pid
-	// 3 - esperando um objeto. (espera genÈrica)
+	// 3 - esperando um objeto. (espera gen√©rica)
 	// ...
 
     int wait_reason[10]; 
 
-    int wait4pid;   //id do processo que a thread est· esperando morrer.
-    int wait4tid;   //id da thread que a thread est· esperando morrer.
+    int wait4pid;   //id do processo que a thread est√° esperando morrer.
+    int wait4tid;   //id da thread que a thread est√° esperando morrer.
 
-	// Objeto pelo qual a thread est· esperando.
-	// #todo: mudar esses nomes, pode confundir com o header no inÌcio da 
+	// Objeto pelo qual a thread est√° esperando.
+	// #todo: mudar esses nomes, pode confundir com o header no in√≠cio da 
 	// estrutura. (waiting_object_type ...  woType woClass )
     object_type_t   woType;   //obType;   //woType
     object_class_t  woClass;  //obClass;  //woClass
@@ -716,33 +682,37 @@ struct thread_d
     struct thread_d  *next;
 };
 
+//
+// Thread list
+//
+
 
 // Ponteiro para a idle thread atual
 // Sempre que mudar a idle thread devemos usar esse ponteiro
-// para mostrar qual ser· a nova idle thread.
-// Cada idle thread pode prestar um serviÁo diferente, como o
+// para mostrar qual ser√° a nova idle thread.
+// Cada idle thread pode prestar um servi√ßo diferente, como o
 // gerenciamento de energia.
 struct thread_d *____IDLE;
 
 
-// Essa È a criada para o processo kernel.
-// Ela roda em ring0 e ser· usada como idle.
+// Essa √© a criada para o processo kernel.
+// Ela roda em ring0 e ser√° usada como idle.
 // RING0 IDLE Thread. TID=3
 
     // #bugbug
-    // O problema È que se essa thread comeÁa afuncionar
-    // antes mesmo do processo init habilitar as interrupÁıes,
-    // ent„o o sistema vai falhar.
+    // O problema √© que se essa thread come√ßa afuncionar
+    // antes mesmo do processo init habilitar as interrup√ß√µes,
+    // ent√£o o sistema vai falhar.
     // #todo
     // Como essa thread funciona sendo apenas uma rotina sti/hlt,
-    // podemos deixar ela como idle thread somente nos est·gios 
-    // iniciais, sendo substituida por outra quando fot possÌvel.
+    // podemos deixar ela como idle thread somente nos est√°gios 
+    // iniciais, sendo substituida por outra quando fot poss√≠vel.
 
 struct thread_d *EarlyRING0IDLEThread;    
 
 
-// Essa È a thread de controle do processo init2.bin
-// … o primeiro processo em ring3.
+// Essa √© a thread de controle do processo init2.bin
+// √â o primeiro processo em ring3.
 // Idle Thread. TID=0    
 struct thread_d *InitThread;         
 
@@ -765,177 +735,73 @@ struct thread_d *rootConductor;
 int conductorIndex;
 
 
-
-// #todo
-// Podemos planejar o uso de listas nesse formato.
-// Mas estamos trabalhando em filas de tamanho fixo no formato de array.
-//struct thread_d *blocked_list_head;
-//struct thread_d *waiting_list_head;
-//struct thread_d *ready_list_head;
-
-
-//
-// Thread list.
-//
-
-// #AtenÁ„o
-// Esse È a lista principal. ContÈm todas as threads.
+// #Aten√ß√£o
+// Esse √© a lista principal. Cont√©m todas as threads.
  
-// N˙mero m·ximo de threads.
-#define THREAD_COUNT_MAX 1024  
-
+// N√∫mero m√°ximo de threads.
+#define THREAD_COUNT_MAX  1024 
 unsigned long threadList[THREAD_COUNT_MAX];
 
 
 
-struct thread_list_d 
-{
-    struct thread_d *Threads;    //List.
-    unsigned long priority;      //Prioridade.
-    // ...
-};
-
-//struct thread_list_d *DispatcherList[10]; //list
-//struct thread_list_d *DispathcerPriorityQueue[10];
-//unsigned long DispatcherList[10];
-//DispatcherList[2].Threads[4].tid
-
-
 //
-// ==  prototypes ============================================
+// == prototypes ===========================
 //
 
-
-// Early ring0 idle thread.
-void early_ring0_IdleThread (void);
-void *create_CreateEarlyRing0IdleThread (void);
-
-// Control thread for ring 3 init process.
-void *create_CreateRing3InitThread (void);
-
-
-// Clona uma thread e retorna o ponteira da clone.
-struct thread_d *threadCopyThread ( struct thread_d *thread );
-
-
-/* 
- ******************************
- * create_thread: 
- *    Create thread.
- */ 
-
-struct thread_d *create_thread ( 
-    struct room_d *room,
-    struct desktop_d *desktop,
-    struct window_d *window,
-    unsigned long init_eip, 
-    unsigned long init_stack, 
-    int pid, 
-    char *name );
-
-
+// From thread.c
+unsigned long __GetThreadStats ( int tid, int index );
+int getthreadname ( int tid, char *buffer );
+void *FindReadyThread (void);
+int GetThreadState (struct thread_d *thread);
+int GetThreadType (struct thread_d *thread);
+int GetCurrentThreadId (void);
 void *GetCurrentThread (void);
 
-void *FindReadyThread (void);
 
-int GetThreadState (struct thread_d *Thread);
-int GetThreadType (struct thread_d *Thread);
-void dispatch_thread (struct thread_d *thread);
-void set_thread_priority (struct thread_d *t, unsigned long priority);
+// From threadi.c
+void show_slot (int tid);
+void show_slots(void);
+void show_reg (int tid);
 
-
-// muda a prioridade para alem dos limites.
-// teste.
+void 
+set_thread_priority ( 
+    struct thread_d *t, 
+    unsigned long priority );
+    
 void threadi_power(
     struct thread_d *t, 
     unsigned long priority );
 
-
-// ## Page directory support ## 
-
-// Pega o endereÁo do diretÛrio de p·ginas usado pela thread.
-unsigned long GetThreadDirectory( struct thread_d *thread );
-
-// Altera o endereÁo do diretÛrio de p·ginas de uma thread.
-void SetThreadDirectory ( struct thread_d *thread, unsigned long Address );
-
-/* Thread heap support. */
-unsigned long GetThreadHeapStart (struct thread_d *thread);
-//...
-
-/*
- * Thread Stack support.
- */
-unsigned long GetThreadStackStart(struct thread_d *thread);
-//...
-
-void SelectForExecution (struct thread_d *Thread);
-
-
-// Show info about all threads.
-void show_slots (void);
-
-// Show info about a thread.
-void show_slot(int tid);
-
-// Show the register of the context.
-void show_reg (int tid);
-
-void show_thread_information (void); 
-
-int init_threads (void);
-
-int GetCurrentThreadId (void);
-
-void spawn_thread (int tid);
-
-
-// ## FinalizaÁıes ##
-
-
-// Liberar uma thread que estava bloqueada ou esperando.
 void release ( int tid );
 
-// Torna zumbi uma thread.
-void exit_thread ( int tid );       
+void SelectForExecution ( struct thread_d *Thread );
 
-// exit current thread.
-void exit_current_thread(void);
-
-//DestrÛi uma thread.
-void kill_thread (int tid);       
-
-void dead_thread_collector (void);
-
-void kill_all_threads (void);
-
-int thread_getchar (void);
-
-// se a flag estiver habilitada, ent„o devemos acorar a
-// thread do dead thread collector.
-void check_for_dead_thread_collector (void);
-
-int thread_profiler( int service );
-
-// pegar a porcentagem de vezes que a thread rodou durante um determinado
-//perÌodo.
-unsigned long 
-thread_get_profiler_percentage ( struct thread_d *thread );
-
-void thread_show_profiler_info (void);
+//See: main.c
+void early_ring0_IdleThread (void);
 
 
-int getthreadname ( int tid, char *buffer );
-
-
-unsigned long __GetThreadStats ( int tid, int index );
-
+// #See: create.c
+void *create_CreateEarlyRing0IdleThread(void);
+void *create_CreateRing3InitThread (void);
 
 #endif    
 
 
-//
-// End.
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

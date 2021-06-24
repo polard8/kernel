@@ -9,9 +9,14 @@
 //...
 
 
-#ifndef ____GENTRY_H
-#define ____GENTRY_H 1
+// #bugbug
+// #todo
+// Atenção: 
+// Para x86_64 teremos outros números para esses mesmos nomes.
 
+
+#ifndef ____GENTRY_H
+#define ____GENTRY_H  1
 
 
 //

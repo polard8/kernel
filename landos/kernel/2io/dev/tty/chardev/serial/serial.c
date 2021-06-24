@@ -1,115 +1,29 @@
-/*
- * File: dd/nhid/serial/serial.c
- *
- * Credits: 
- *     Chicago OS. (Ítalo Lima Marconato Matias). 
- *   
- *     2019 - Document created by Fred Nora.
- */
 
 
-// See:
-// https://wiki.osdev.org/Serial_Ports
-// ...
-
-
-//COM Port IO Port
-//COM1     0x3F8
-//COM2     0x2F8
-//COM3     0x3E8
-//COM4     0x2E8 
-
-
-// #remember:
-// We can connect some server to a serial port.
 
 #include <kernel.h>
 
 
-
-
 void serial1_handler (void)
 {
-
-    // Se a porta não estiver inicializado !
-    if ( __breaker_com1_initialized == 0 )
-        return;
-
-
-    // #test
-    // IN: device type and data.
-    // 1=keyboard
-    // 2=COM port
-    console_interrupt(
-        foreground_thread,
-        CONSOLE_DEVICE_SERIAL,
-        0 );
-    
-    //
-    // profiler
-    //
-    
-	// Contando as interrupções desse tipo.
-    g_profiler_ints_irq4++;
+    debug_print("serial1_handler:\n");
 }
-
 
 void serial2_handler (void)
 {
-	// Se a porta não estiver inicializado !
-    if ( __breaker_com2_initialized == 0 )
-        return;
-
-
-    // #test
-    // IN: device type and data.
-    // 1=keyboard
-    // 2=COM port
-    console_interrupt(
-        foreground_thread,
-        CONSOLE_DEVICE_SERIAL,
-        0 );
-
-    //
-    // profiler
-    //
-    
-	// Contando as interrupções desse tipo.
-    g_profiler_ints_irq3++;	
+    debug_print("serial2_handler:\n");
 }
 
-
-//#todo
 void serial3_handler (void)
 {
-	// Se a porta não estiver inicializado !
-    if ( __breaker_com3_initialized == 0 )
-        return;
-
-    // #test
-    // IN: device type and data.
-    // 1=keyboard
-    // 2=COM port
-    console_interrupt(
-        foreground_thread,
-        CONSOLE_DEVICE_SERIAL,
-        0);
+    debug_print("serial3_handler:\n");
 }
 
-
-//#todo
 void serial4_handler (void)
 {
-	// Se a porta não estiver inicializado !
-    if ( __breaker_com4_initialized == 0 )
-        return;
-
-    // #test
-    // IN: device type and data.
-    // 1=keyboard
-    // 2=COM port
-    console_interrupt(foreground_thread,CONSOLE_DEVICE_SERIAL,0);
+    debug_print("serial4_handler:\n");
 }
+
 
 //=====================================
 unsigned int serial_in(unsigned int base, int offset)
@@ -124,80 +38,12 @@ void serial_out(unsigned int base, int offset, int value)
 //====================================
 
 
-/*
- * serial_write_char:
- *     NOT tested yet.
- */
 
-char serial_read_char (unsigned int port) 
+
+
+// # We don't have debug messages in this routine.
+int serial_init_port ( uint16_t port )
 {
-    while (( in8(port + 5) & 1 ) == 0);
-
-    return (char) in8 (port);
-}
-
-
-/*
- * serial_write_char:
- * 
- */
-
-void serial_write_char (unsigned int port, char data) 
-{
-    while (( in8(port + 5) & 0x20 ) == 0);
-
-    out8 (port, data);
-}
-
-
-void serial_print (unsigned int port, char *data )
-{
-    register int i=0;
-
-    // #todo
-    // Check the port validation.
-
-    for ( i=0; data[i] != '\0'; i++ )
-    {
-        serial_write_char ( port ,data[i] );
-    };
-}
-
-
-
-/*
-// Write something from tty to a serial port.
-void serial_write ( struct tty_d * tty, int port );
-void serial_write ( struct tty_d * tty, int port )
-{
-    char data;
-    
-    //#todo: Get char from tty.
-    //data = tty->
-    
-    serial_write_char ( (int) port, (char) data ); 
-}
-*/
-
-
-
-/*
- ******************************
- * serial_init_port:
- * 
- */
-
-// #bugbug
-// #IMPORTANTE
-// Essa função apresenta problemas de compilação
-// quando incluímos mais código.
-
-// See:
-// See the type for the argument in the function out8.
-// gramado/kernel/bottom/hal/arch/x86/portsx86.c
-
-int serial_init_port ( uint16_t port ){
-
     int PortBase=0;
     
     PortBase = (int) port;
@@ -213,8 +59,9 @@ int serial_init_port ( uint16_t port ){
         // #bugbug
         // E se falhar aqui ???
         // We can't use panic yet.
+        // We have no serial debug.
         
-        return -1;
+        return (int) (-1);
     }
 
 
@@ -274,8 +121,6 @@ int serial_init_port ( uint16_t port ){
     return 0;
 }
 
-
-
 /*
  ******************
  * serial_init:
@@ -289,14 +134,16 @@ int serial_init_port ( uint16_t port ){
 // We can't use serial debug. It's because the serial port support
 // is not working yet. :)
 
+// # We don't have debug messages in this routine.
+
 int serial_init (void){
 
     int Status = -1;
     
-    __breaker_com1_initialized = 0;
-    __breaker_com2_initialized = 0;
-    __breaker_com3_initialized = 0;
-    __breaker_com4_initialized = 0;
+    //__breaker_com1_initialized = 0;
+    //__breaker_com2_initialized = 0;
+    //__breaker_com3_initialized = 0;
+    //__breaker_com4_initialized = 0;
 
     Status = serial_init_port (COM1_PORT);
     if (Status != 0)
@@ -314,14 +161,70 @@ int serial_init (void){
     if (Status != 0)
         return -1;
 
-    __breaker_com1_initialized = 1;
-    __breaker_com2_initialized = 1;
-    __breaker_com3_initialized = 1;
-    __breaker_com4_initialized = 1;
+    //__breaker_com1_initialized = 1;
+    //__breaker_com2_initialized = 1;
+    //__breaker_com3_initialized = 1;
+    //__breaker_com4_initialized = 1;
 
     return 0;
 }
 
+
+/*
+ * serial_write_char:
+ *     NOT tested yet.
+ */
+
+char serial_read_char (unsigned int port) 
+{
+
+    // #todo
+    // Check the port validation.
+
+    while (( in8(port + 5) & 1 ) == 0);
+
+    return (char) in8 (port);
+}
+
+
+/*
+ * serial_write_char:
+ * 
+ */
+
+void serial_write_char (unsigned int port, char data) 
+{
+    // #todo
+    // Check the port validation.
+
+    while (( in8(port + 5) & 0x20 ) == 0);
+
+    out8 (port, data);
+}
+
+void serial_print (unsigned int port, char *data )
+{
+    register int i=0;
+
+    // #todo
+    // Check the port validation.
+    
+    for ( i=0; data[i] != '\0'; i++ )
+    {
+        serial_write_char ( port ,data[i] );
+    };
+}
+
+
+void debug_print_string ( char *data )
+{
+    register int i=0;
+    
+    for ( i=0; data[i] != '\0'; i++ )
+    {
+        serial_write_char ( COM1_PORT ,data[i] );
+    };
+}
 
 // #todo
 // We need a ioctl for serial devices.
@@ -333,26 +236,12 @@ int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
 
 
 
-/*
-//credits: osdev
-//Initialization
-#define PORT 0x3f8  //COM1
-void init_serial() {
-   outb(PORT + 1, 0x00);    // Disable all interrupts
-   outb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-   outb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-   outb(PORT + 1, 0x00);    //                  (hi byte)
-   outb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
-   outb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-   outb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
-}
-*/
 
 
 
-//
-// End.
-//
+
+
+
 
 
 

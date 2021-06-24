@@ -1,4 +1,0 @@
-todo:
-
-use serial.c as a handler and
-create serdvr.c as device driver.

@@ -1,6 +1,0 @@
-	#todo:
-
-	Test optimization flags in gcc.
-	And fix the source code to support these flags.
-
-	-O -O0 -O1 -O2 -O3 -Os -Ofast -Og

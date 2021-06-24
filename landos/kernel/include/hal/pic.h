@@ -14,7 +14,6 @@
 #ifndef ____PIC_H
 #define ____PIC_H    1
 
-
 // Estrutura para gerenciar as irqs do PIC.
 struct irq_d
 {
@@ -34,7 +33,6 @@ struct irq_d
     struct irq_d  *next;
 };
 
-
 struct pic_d
 {
 	object_type_t objectType;
@@ -45,9 +43,6 @@ struct pic_d
     // 8 entries for pic controller.
 };
 struct pic_d *Pic;
-
-
-
 
 
 
@@ -71,8 +66,8 @@ irq8_RTC (void);
 
 
 // See: e1000.c
-__VOID_IRQ 
-irq_E1000 (void);
+//__VOID_IRQ 
+//irq_E1000 (void);
 
 
 // See: mouse.c
@@ -97,12 +92,7 @@ __VOID_IRQ
 irq15_SECONDARY_IDE (void);
 
 
-
-#endif   
-
+#endif    
 
 
-//
-// End.
-//
 

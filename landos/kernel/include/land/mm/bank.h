@@ -1,27 +1,20 @@
-/*
- * File: mm/bank.h 
- *
- * Descrição:
- *     Gerente de banco de dados em memória e em disco.
- */
 
 
-// Número máximo de bancos no sistema. 
+// NÃºmero mÃ¡ximo de bancos no sistema. 
 #define BANKS_COUNT_MAX  8
 
 //contando a quantidade de bancos no sistema. 
 //A quantidade de bancos depende do tamanho do sistema.
-//A quantidade mínima de bancos é 1.
-//Se tivermos apenas um banco, a user session deverá ficar dentro desse banco.
-//se tivermos 2 bancos a user session ficará no último banco.
-//Se tivermos até oito banco de memória a user session ficará no último banco.
+//A quantidade mÃ­nima de bancos Ã© 1.
+//Se tivermos apenas um banco, a user session deverÃ¡ ficar dentro desse banco.
+//se tivermos 2 bancos a user session ficarÃ¡ no Ãºltimo banco.
+//Se tivermos atÃ© oito banco de memÃ³ria a user session ficarÃ¡ no Ãºltimo banco.
 int banksCount;
 
 
-//*Importante: A user session ficará no último banco.
-//caso o sistema tenha apenas um banco, então a user session ficará no fim do banco.
+//*Importante: A user session ficarÃ¡ no Ãºltimo banco.
+//caso o sistema tenha apenas um banco, entÃ£o a user session ficarÃ¡ no fim do banco.
 int lastBank;
-
 
 typedef enum {
 
@@ -36,8 +29,8 @@ typedef enum {
 typedef struct bank_d bank_t;
 struct bank_d
 {
-	//Object.
-	object_type_t objectType;
+
+	object_type_t  objectType;
 	object_class_t objectClass;
 
 	int used;
@@ -46,16 +39,16 @@ struct bank_d
 	bank_type_t type;
 	//...
 
-	struct user_info_d *user;    // Que usuário é dono desse banco.
+	struct user_info_d *user;    // Que usuÃ¡rio Ã© dono desse banco.
 
 	//
 	// * Listas de contas nesse banco.
 	// Obs: 
-	//     As listas serão colocadas em um banco de acordo com o tipo 
+	//     As listas serÃ£o colocadas em um banco de acordo com o tipo 
 	// de banco e tipo de conta.
 	//
-	struct aspace_d *aspaceListHead;
-	struct dspace_d *dspaceListHead;	
+	//struct aspace_d *aspaceListHead;
+	//struct dspace_d *dspaceListHead;	
 
 
 	// Lista de processos utilizando esse objeto.
@@ -65,10 +58,17 @@ struct bank_d
 
     //...	
 	
-	//Navegação.
-	struct bank_d *Next;  
+	//NavegaÃ§Ã£o.
+    struct bank_d *Next;  
 };
-bank_t *Bank;
+
+struct bank_d *Bank;
+//bank_t *Bank;
 //bank_t *KernelBank;
 //...
+
+
+
+
+
 

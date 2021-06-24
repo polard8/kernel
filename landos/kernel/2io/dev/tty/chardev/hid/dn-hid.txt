@@ -1,6 +1,0 @@
-todo:
-
-	Create fb.c
-	We can create the framebuffer device driver.
-	So, this way we can open a device to setup the 
-	properties of the current framebuffer.(lfb)

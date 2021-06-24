@@ -1,25 +1,13 @@
-/*
- * File: kstdio.h
- *
- *    i/o functions for base kernel.
- *    ring 0.
- *  
- * History:
- *     2015 - Created by Fred Nora.
- */
-
+// kstdio.h
 
 #ifndef __KSTDIO_H
 #define __KSTDIO_H    1
-
-
 
 // input() function support?
 #define INPUT_MODE_LINE                0
 #define INPUT_MODE_MULTIPLE_LINES      1
 int g_inputmode;
- 
- 
+
 #define REVERSE_ATTRIB  0x70
 #define PAD_RIGHT  1
 #define PAD_ZERO   2
@@ -27,7 +15,6 @@ int g_inputmode;
 
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 12
-
 
 //
 // bsd style.
@@ -95,7 +82,6 @@ int g_inputmode;
 #define FILENAME_MAX    (260)
 #endif
 
-
 //The macro yields the maximum number of files that the target 
 //environment permits to be simultaneously open (including stderr, stdin, and stdout).
 #define FOPEN_MAX        (32)
@@ -137,12 +123,10 @@ int g_inputmode;
 #define SEEK_END  2
 #endif
 
-
 // #define  TMP_MAX    32767
 // #define  L_tmpnam    1024    /* XXX must be == PATH_MAX */
 // #define  P_tmpdir    "/tmp/"
 // #define  L_ctermid   1024    /* size for ctermid(); PATH_MAX */
-
 
 //
 // == prompt =============================
@@ -159,7 +143,6 @@ unsigned long prompt_pos;
 unsigned long prompt_status;
 
 // =======================================
-
 
 // Print char flags. (_outbyte)
 // usada para rotinas de pintura da libC.
@@ -207,7 +190,6 @@ typedef struct __sfpos {
 
 // Vamos usar esse por enquanto.
 typedef __off_t  fpos_t;
-
 
 //#define _FSTDIO    /* Define for new stdio with functions. */
 
@@ -281,6 +263,10 @@ struct kstdio_sync_d
 };
 
 
+//
+// =============================
+//
+
 /*
  **********************************************
  * FILE:
@@ -296,7 +282,7 @@ struct file_d
     //
 
     // Indica qual tipo de objeto esse arquivo representa.
-    // See: globals/gobject.h
+    // See: 0globals/gobject.h
     object_type_t ____object;
 
     //index int the global file table??
@@ -415,12 +401,11 @@ struct file_d
 	// UNIX System file descriptor
     short _file;
 
-    // inode structure
-    struct inode_d *inode;
+
+    struct inode_d   *inode;
+    struct socket_d  *socket;
 
 
-    struct socket_d *socket;
-    
     //pipe ??
     
     // A estrutura de arquivos aponta para tabela global de 
@@ -441,38 +426,40 @@ struct file_d
     uid_t uid;  // User 
     gid_t gid;  // Group
 
+//
+// tty
+//
 
     // If the file is a tty, we need a tty structure.
-    struct tty_d *tty;
-
+    struct tty_d  *tty;
 
     int iopl;
 
-
-
     // dead line discipline    
     // #todo: delete?
-    int (*_close) __P((void *));
-    int (*_read)  __P((void *, char *, int));
-    fpos_t (*_seek)  __P((void *, fpos_t, int));
-    int (*_write) __P((void *, const char *, int));
+    // não é usado ...
 
+    //int (*_close) __P((void *));
+    //int (*_read)  __P((void *, char *, int));
+    //fpos_t (*_seek)  __P((void *, fpos_t, int));
+    //int (*_write) __P((void *, const char *, int));
 
+//
+// == device ============
+//
 
-    //
-    // == device ============
-    //
-
-    struct device_d *device;
-        
     // 1= is a device; 0= is a file.
     // Se � um dispositivo ou n�o.
     // Se for um dispositivo ent�o o dispositivo ter�
     // na lista deviceList[] 
 
     int isDevice;
+
+    // indice na lista deviceList[]
+
+    int deviceId;  
     
-    int deviceId;  //�ndice na lista deviceList[]
+    struct device_d  *device;
 };
 
 typedef struct file_d file; 
@@ -490,6 +477,7 @@ file *volume2_rootdir;  // 5 - system volume root dir.
 unsigned long file_table[NUMBER_OF_FILES]; 
 
 
+
 int kstdio_standard_streams_initialized;
 
 
@@ -500,8 +488,6 @@ int kstdio_standard_streams_initialized;
 //#define stdin     (&_io_table[0])
 //#define stdout    (&_io_table[1])
 //#define stderr    (&_io_table[2])
-
-
 
 //
 // == Pipes ======================================
@@ -522,7 +508,6 @@ file *pipe_execve;
 unsigned long Pipes[NUMBER_OF_PIPES];
 
 // ========================================================
-
 
 
 /* bsd */
@@ -593,35 +578,18 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 //unsigned long Search[9]; 
 
 
-
 //
-// == prototypes ===============================================
-//
-
-//See: sys.c
-void sys_set_file_sync(int fd, int request, int data);
-//See: sys.c
-int sys_get_file_sync(int fd, int request);
-
-
-//
-// == printk ===============================================
+// == prototypes ============================
 //
 
-//https://en.wikipedia.org/wiki/Printk
-
-#define  printf printk
-#define kprintf printk
-
-int printk (const char *format, ...);
-
-int sprintf (char *str, const char *format, ...);
-int fprintf (file *f, const char *format, ...);
-int putchar ( int ch );
-
-int kputs ( const char *str );
-
+unsigned long input ( unsigned long ch );
 void printchar (char **str, int c);
+int putchar (int ch);
+
+
+//
+// == printf support ===================
+//
 
 int 
 prints ( 
@@ -631,7 +599,7 @@ prints (
     int pad );
 
 int 
-printi ( 
+printi (
     char **out, 
     int i, 
     int b, 
@@ -640,53 +608,78 @@ printi (
     int pad, 
     int letbase );
 
-int print (char **out, int *varg);
-
-//=======================================
+int print ( char **out, int *varg );
 
 
+//
+// == printk ===============================================
+//
 
-int k_openat (int dirfd, const char *pathname, int flags);
-file *k_fopen ( const char *filename, const char *mode ); 
-int k_fclose (file *f); 
+//https://en.wikipedia.org/wiki/Printk
+
+//#define  printf printk
+//#define kprintf printk
+
+#define  printf  kinguio_printf
+#define  printk  kinguio_printf
+#define  sprintf mysprintf
+
+// #suspensa
+// Essa implementação foi feita para 32bit e não funciona
+// por inteiro em long mode.
+// Usaremos kinguio_printf por enquanto.
+int printk_old ( const char *format, ... );
+
+// ===================================
+
+int kputs ( const char *str );
+
+// #suspensa
+// Essa implementação foi feita para 32bit e não funciona
+// por inteiro em long mode.
+int sprintf_old ( char *str, const char *format, ... );
+int mysprintf(char *buf, const char *fmt, ...);
+
+
+// ===================================
+void kinguio_i2hex(unsigned int val, char* dest, int len);
+char *kinguio_itoa (int val, char *str);
+static char *_vsputs_r(char *dest, char *src);
+int kinguio_vsprintf(char * str,const char * fmt, va_list ap);
+void kinguio_puts(const char* str);
+int kinguio_printf(const char *fmt, ...);
+
+// ===================================
+
 int k_ungetc ( int c, file *f );
-int k_fgetc ( file *f );
-int k_fputc ( int ch, file *f );
-int k_fputs ( const char *str, file *f );
+long k_ftell (file *f);
 int k_fileno ( file *f );
+int k_fgetc (file *f);
 int k_feof ( file *f );
 int k_ferror ( file *f );
 int k_fseek ( file *f, long offset, int whence );
-long k_ftell (file *f);
+int k_fputc ( int ch, file *f );
 int k_fscanf (file *f, const char *format, ... );
 void k_rewind ( file *f );
-
-
-// see: https://linux.die.net/man/3/setvbuf
+int k_fclose (file *f);
+int k_fputs ( const char *str, file *f );
 void k_setbuf (file *f, char *buf);
 void k_setbuffer (file *f, char *buf, size_t size);
 void k_setlinebuf (file *f);
 int k_setvbuf (file *f, char *buf, int mode, size_t size);
 
-
-// Maybe we can do some operations in a regular file using ioctl.
 int 
 regularfile_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg );
 
-
-//inicializa os buffers do fluxo padr�o em stdio.c
+//=====================
 int stdioInitialize (void);
 
 
+
 #endif    
-
-
-//
-// End.
-//
 
 
 

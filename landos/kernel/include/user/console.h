@@ -1,16 +1,11 @@
-// console.h
-// Created by Fred Nora.
 
 
-#ifndef ____CONSOLE_H
-#define ____CONSOLE_H  1
-
+#ifndef  __CONSOLE_H
+#define __CONSOLE_H    1
 
 #define CONSOLE_DEVICE_KEYBOARD  1
 #define CONSOLE_DEVICE_SERIAL    2
 #define CONSOLE_DEVICE_NETWORK   3
-
-
 
 // Control sequence introducer 
 // Parameter    - (zero or more characters)
@@ -43,63 +38,99 @@ struct virtual_console_login_d
 
 
 
-//
-// == prototypes ================================================
-//
 
 
 //
-// output on the console device;
+// == prototypes =================
 //
 
-//see: tty/console.c
-void _console_outbyte (int c, int console_number);
-void console_outbyte (int c, int console_number);
-void console_putchar ( int c, int console_number );
+void 
+console_interrupt(
+    int target_thread, 
+    int device_type, 
+    int data );
 
-// Não tem escape sequence
-// Funciona na máquina real
-ssize_t 
-__console_write (int console_number, const void *buf, size_t count);
 
-ssize_t 
-console_read (int console_number, const void *buf, size_t count);  
+void console_init_virtual_console (int n);
 
-// Tem escape sequence
-ssize_t 
-console_write (int console_number, const void *buf, size_t count);
+void console_set_current_virtual_console (int n);
+int console_get_current_virtual_console (void);
+void jobcontrol_switch_console(int n);
 
+
+void set_up_cursor ( unsigned long x, unsigned long y );
+unsigned long get_cursor_x (void);
+unsigned long get_cursor_y (void);
 
 void console_scroll (int console_number);
 
-int kclear (int color, int console_number);
+void console_outbyte (int c, int console_number);
+void _console_outbyte (int c, int console_number);
 
-int kclearClientArea (int color);
+void console_putchar ( int c, int console_number );
 
-int insert_line ( char *string, int line );
+void csi_P (int nr, int console_number);
+void csi_at (int nr, int console_number);
 
-void REFRESH_STREAM ( file *f );
 
-// Virtual console support.
-void console_set_current_virtual_console ( int n );
-int console_get_current_virtual_console (void);
-void console_init_virtual_console (int n);
+// Eram locais, mas não são mais.
 
-void jobcontrol_switch_console(int n);
+ssize_t 
+__console_write ( 
+    int console_number, 
+    const void *buf, 
+    size_t count );
 
-void consoleBlinkTextCursor(void);
+void __local_delete_char(int console_number);
+void __local_delete_line(int console_number);
 
-int 
-console_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg );
+
+void 
+__local_gotoxy ( 
+    int new_x, 
+    int new_y, 
+    int console_number );
+    
+void __local_insert_char ( int console_number );
+void __local_insert_line (int console_number);
+void __local_save_cur (int console_number);
+void __local_restore_cur (int console_number);
+void __respond (int console_number);
+
+
+
+ssize_t 
+console_read ( 
+    int console_number, 
+    const void *buf, 
+    size_t count );
+
+
+ssize_t 
+console_write ( 
+    int console_number, 
+    const void *buf, 
+    size_t count );
+
 
 int VirtualConsole_initialize(void);
 
-void console_interrupt(int target_thread, int device_type, int data);
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
