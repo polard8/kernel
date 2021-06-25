@@ -11,20 +11,17 @@ void ps2kbd_initialize_device (void)
 }  
 
 
+/*
 // called by irq1_KEYBOARD in keyboard.c
 void DeviceInterface_PS2Keyboard_OLD(void)
 {
     debug_print ("DeviceInterface_PS2Keyboard: [TODO]\n");
 
-
     unsigned char __raw = 0;
-
-
 
 //
 // Get the rawbyte for the key struck.
 //
-
     __raw = in8(0x60);
 
 
@@ -33,8 +30,10 @@ void DeviceInterface_PS2Keyboard_OLD(void)
         debug_print ("DeviceInterface_PS2Keyboard: [test] calling reboot\n");
         hal_reboot();
     }
-     
 }
+*/
+
+
 
 /*
  * *******************************************************
@@ -111,9 +110,7 @@ sc_again:
 //
 // Get the rawbyte for the key struck.
 //
-
     __raw = in8(0x60);
-
 
     //===========================================
     
@@ -238,8 +235,21 @@ sc_again:
         AsciiChar = map_abnt2[ScanCode];
 
         // Rotinas de teste
-        if ( AsciiChar == VK_F5 ){ hal_reboot(); }
-        if ( AsciiChar == VK_F6 ){ hal_reboot(); }
+        if ( AsciiChar == VK_F5 ){ hal_reboot(); }  // reboot.
+        if ( AsciiChar == VK_F6 )
+        { 
+            Background_initialize();  // ok
+            // hal_reboot();          // ok
+            // create_thread ( NULL, NULL, NULL, 0, 0, current_process, "nothing" );  //fail  
+            // create_CreateEarlyRing0IdleThread(); //fail
+            // init_threads(); //ok
+            //show_process_information();
+            //show_thread_information();
+            //stdioInitialize();
+            //screenInit();
+            
+            
+        }
         if ( AsciiChar == VK_F7 ){ hal_reboot(); }
         if ( AsciiChar == VK_F8 ){ hal_reboot(); }
         
@@ -269,6 +279,234 @@ sc_again:
 done:
     return;
 }
+
+void ldisc_init_modifier_keys (void)
+{
+	// Modifier keys.
+	
+	shift_status = 0;
+	ctrl_status = 0;
+	winkey_status = 0;
+    
+	// Alternate.
+    alt_status = 0;
+
+	// Alternate Graphic.
+    //altgr_status = 0; //@todo
+    
+	// Function.
+	//fn_status = 0;  //@todo
+	
+	//...
+}
+
+void ldisc_init_lock_keys (void)
+{
+    // Capital Lock.	
+	capslock_status = 0;
+	
+	// Scrolling Lock.
+	scrolllock_status = 0;
+	
+	// Number Lock.
+	numlock_status = 0;	
+}
+
+
+// keyboardDisable:
+// Disable keyboard.
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting disable command.
+    
+void keyboardDisable (void)
+{
+    while ( ( in8 (0x64) & 2) != 0 )
+    { 
+         // Nothing.
+    };
+
+    out8 (0x60,0xF5);
+    //sleep(100);
+}
+
+// keyboardEnable:
+//     Enable keyboard.
+
+void keyboardEnable (void)
+{
+    // #bugbug
+    // Dizem que isso pode travar o sistema.
+
+	// Wait for bit 1 of status reg to be zero.
+    while ( ( in8 (0x64) & 2) != 0 )
+    {
+		//Nothing.
+    };
+
+	//Send code for setting Enable command.
+    out8 (0x60,0xF4);
+    //sleep(100);
+}
+
+/*
+ * keyboard_set_leds:
+ *     Set keyboard flags.
+ *     ED = Set led.
+ */
+
+void keyboard_set_leds (char flag)
+{
+    //#todo: Filtro.
+
+    // Wait for bit 1 of status reg to be zero.
+    while ( ( in8 (0x64) & 2) != 0 )
+    {
+        // Nothing.
+    };
+    // Send code for setting the flag.
+    out8 (0x60,0xED); 
+    sleep (100);
+
+
+    // Wait for bit 1 of status reg to be zero.
+    while ( ( in8 (0x64) & 2) != 0 )
+    {
+        // Nothing.
+    };
+    // Send flag. 
+    out8 (0x60,flag);
+    sleep (100);
+
+    // #todo: Mudar o status.
+    // switch(flag){}
+}
+
+/*
+ ************************ 
+ * keyboardGetKeyState: 
+ * 
+ */
+
+// Pega o status das teclas de modificação.
+
+unsigned long keyboardGetKeyState ( unsigned char key ){
+	
+	unsigned long State = 0;
+	
+	switch (key){
+		
+		case VK_LSHIFT: 
+		    State = shift_status; 
+			break;
+
+	    case VK_LCONTROL:
+		    State = ctrl_status;
+		    break;
+
+	    case VK_LWIN:
+		    State = winkey_status;
+		    break;
+
+	    case VK_LMENU:
+		    State = alt_status;
+		    break;
+
+	    case VK_RWIN:
+		    State = winkey_status;
+		    break;
+
+	    case VK_RCONTROL:
+		    State = ctrl_status;
+		    break;
+			
+	    case VK_RSHIFT:
+		    State = shift_status;
+		    break;
+
+	    case VK_CAPITAL:
+		    State = capslock_status;
+		    break;
+
+	    case VK_NUMLOCK:
+		    State = numlock_status;
+		    break;
+			
+		case VK_SCROLL:
+            State = scrolllock_status;
+            break;			
+			
+		//...
+	};
+
+
+    return (unsigned long) State;
+}
+
+// Get alt Status.
+int get_alt_status (void)
+{
+    return (int) alt_status;
+}
+
+// Get control status.
+int get_ctrl_status (void)
+{
+    return (int) ctrl_status;
+}
+
+// Get shift status.
+int get_shift_status (void)
+{
+    return (int) shift_status;
+}
+
+
+/*
+ *************************************** 
+ * xxx_keyboard_read: 
+ * 
+ */
+
+// Esta função será usada para ler dados do teclado na 
+// porta 0x60, fora do IRQ1.
+
+uint8_t xxx_keyboard_read (void)
+{
+    kbdc_wait (0);
+
+    uint8_t val = in8(0x60);
+    
+    wait_ns(400);
+    
+    return (uint8_t) val;
+}
+
+/*
+ *************************************** 
+ * xxx_keyboard_write: 
+ * 
+ */
+
+// Esta função será usada para escrever dados do teclado 
+// na porta 0x60, fora do IRQ1.
+
+void xxx_keyboard_write (uint8_t data)
+{
+    kbdc_wait(1);
+
+    out8 ( 0x60, data );
+
+    wait_ns(400);
+}
+
+
+
+
+
+
+
+
+
 
 
 

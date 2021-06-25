@@ -41,7 +41,7 @@ pixel.o bg.o char.o dtext.o line.o rect.o \
 desktop.o room.o userenv.o usession.o \
 vt.o \
 x64cont.o x64fault.o \
-ts.o process.o thread.o threadi.o create.o queue.o \
+ts.o process.o thread.o threadi.o create.o queue.o mk.o \
 memory.o mminfo.o mmpool.o pages.o \
 panic.o reboot.o request.o    
 
@@ -95,7 +95,7 @@ all-c:
 	gcc -c 0mem/core/ps/create.c   $(KINCLUDE) $(CFLAGS) -o create.o
 	gcc -c 0mem/core/ps/x86_64/x64fault.c      $(KINCLUDE) $(CFLAGS) -o x64fault.o
 	gcc -c 0mem/core/ps/queue.c  $(KINCLUDE) $(CFLAGS) -o queue.o
-
+	gcc -c 0mem/core/ps/mk.c  $(KINCLUDE) $(CFLAGS) -o mk.o
 
 	# ps/disp
 	gcc -c 0mem/core/ps/disp/ts.c   $(KINCLUDE)  $(CFLAGS) -o ts.o  

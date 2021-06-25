@@ -77,16 +77,16 @@ struct request_d
 //
 
 	// basic
-	//struct window_d *window;  //#todo
-	int msg;
-	unsigned long long1;
-	unsigned long long2;
+    struct window_d *window;  //#todo
+    int msg;
+    unsigned long long1;
+    unsigned long long2;
 
 	// extra	
-	unsigned long long3;
-	unsigned long long4;
-	unsigned long long5;
-	unsigned long long6;
+    unsigned long long3;
+    unsigned long long4;
+    unsigned long long5;
+    unsigned long long6;
 };
 struct request_d  REQUEST;
 
@@ -95,8 +95,41 @@ struct request_d  REQUEST;
 // Prototypes ===============
 //
 
+void clear_request (void);
+
+int 
+create_request ( 
+    unsigned long number, 
+    int status, 
+    int timeout,
+    int target_pid,
+    int target_tid,
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+int request (void);
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

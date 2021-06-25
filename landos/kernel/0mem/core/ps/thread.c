@@ -227,7 +227,7 @@ int GetThreadType (struct thread_d *thread)
 
 int init_threads (void){
 
-    int i=0;
+    register int i=0;
 
 
     debug_print("init_threads:\n");
@@ -404,11 +404,9 @@ void show_thread_information (void){
 
     printf ("show_thread_information:\n");
 
-
-    //
-    // Current thread.
-    //
-
+//
+// Current thread
+//
 
 	//Limits.
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
@@ -419,13 +417,12 @@ void show_thread_information (void){
     Current = (void *) threadList[current_thread];
 
     if( (void *) Current == NULL ){
-        printf ("show_thread_information: [FAIL]\n");
+        printf ("show_thread_information: [FAIL] Current\n");
         refresh_screen ();
         return;
-
     } else {
-		printf ("currentTID=%d\n", current_thread );
-		//...
+        printf ("currentTID=%d\n", current_thread );
+        // ...
     };
 
 	//
@@ -452,7 +449,7 @@ void show_thread_information (void){
 	//Mostra Slots. 
 	//threadi.c
 
-    show_slots();    
+    show_slots(); 
 	
 	/*
 	 * @todo: 

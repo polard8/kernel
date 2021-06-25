@@ -202,7 +202,7 @@ unsigned long SavedBPP;
 #include "land/ps/thread.h"
 #include "land/ps/queue.h"
 #include "land/ps/mk.h"
-
+#include "land/ps/dispatch.h"
 
 
 #include "user/ws.h"

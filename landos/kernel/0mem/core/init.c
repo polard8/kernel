@@ -34,7 +34,7 @@ void init_globals (void)
     // Screen
     // Now we can print strings in the screen.
 
-    //screenInit();
+    screenInit();
 
 //
 // == First message ====================================
@@ -140,7 +140,7 @@ void init_globals (void)
     // The kernel request
     // See: request.c
 
-    //clear_request();
+    clear_request();
 
 //
 // == kgws ===========================================
@@ -183,8 +183,8 @@ void init_globals (void)
     // type 1, fat16.
     
     // #todo
-    //g_currentvolume_filesystem_type = FS_TYPE_FAT16;    
-    //g_currentvolume_fatbits = (int) 16;
+    g_currentvolume_filesystem_type = FS_TYPE_FAT16;    
+    g_currentvolume_fatbits = (int) 16;
 
 
 	//===================
@@ -207,16 +207,13 @@ void init_globals (void)
     //refresh_screen(); 
     //while(1){}
 
-	//
-	// Keyboard support.
-	//
-	
-	//ldisc_init_modifier_keys();
-	//ldisc_init_lock_keys();	
+//
+// Keyboard support
+//
+    ldisc_init_modifier_keys();
+    ldisc_init_lock_keys();
 
-
-    //Continua ...
-
+    // Continua ...
 }
 
 
@@ -403,12 +400,11 @@ int init (void)
 
     // Isso tambem eh dependente, pode ir para a outra rotina, 
     // nesse mesmo documento.
-    //Status = init_microkernel();
+    Status = init_microkernel();
 
-    //if (Status != 0){
-        //panic ("init_architecture_independent: init_microkernel fail\n");
-    //}
-
+    if (Status != 0){
+        panic ("init_architecture_independent: init_microkernel fail\n");
+    }
 
 //=========================================
     PROGRESS("Kernel:2:10\n"); 

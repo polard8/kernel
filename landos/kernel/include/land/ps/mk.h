@@ -24,5 +24,14 @@
 #define BACKGROUND 100 
 #define FOREGROUND 200
 
+//
+// == prototypes =========================
+//
+
+int init_microkernel (void);
+
+int jobcheck ( int type, int id );
+int jobcontrol ( int type, int id, int plane );
+
 #endif   
 

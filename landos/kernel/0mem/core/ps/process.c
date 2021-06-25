@@ -282,7 +282,7 @@ int processSendSignal (struct process_d *p, unsigned long signal){
 
 void init_processes (void){
 
-    int i=0;
+    register int i=0;
 
     debug_print("init_processes:\n");
 
@@ -309,7 +309,6 @@ void init_processes (void){
         processList[i] = (unsigned long) 0;
         i++;
     };
-
 
     // More ?
 }
@@ -428,7 +427,7 @@ void show_process_information (void)
     int i=0;
     struct process_d *p;
 
-    printf ("\n\n show_process_information: \n\n");
+    printf ("show_process_information: \n");
 
 
     for ( i=0; i<PROCESS_COUNT_MAX; i++ )

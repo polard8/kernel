@@ -192,10 +192,30 @@ unsigned long keyboard_handler_address;
 
 void kbdc_wait (unsigned char type);
 
-
 void ps2kbd_initialize_device (void);
 
+// ==
+
+void ldisc_init_modifier_keys (void);
+void ldisc_init_lock_keys (void);
+
+void keyboardDisable (void);
+void keyboardEnable (void);
+
+void keyboard_set_leds (char flag);
+
+unsigned long keyboardGetKeyState ( unsigned char key );
+
+int get_alt_status (void);
+int get_ctrl_status (void);
+int get_shift_status (void);
+
+uint8_t xxx_keyboard_read (void);
+void xxx_keyboard_write (uint8_t data);
+
 #endif    
+
+
 
 
 
