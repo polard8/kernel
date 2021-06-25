@@ -814,6 +814,22 @@ struct thread_d *threadCopyThread ( struct thread_d *thread );
 
 int thread_getchar (void);
 
+
+// ===
+
+void 
+SetThread_PML4PA ( 
+    struct thread_d *thread, 
+    unsigned long pa );
+
+void check_for_dead_thread_collector (void);
+void dead_thread_collector (void);
+
+void kill_thread (int tid);
+void kill_all_threads (void);
+
+
+
 #endif    
 
 
