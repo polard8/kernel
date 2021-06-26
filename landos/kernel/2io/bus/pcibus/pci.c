@@ -548,7 +548,7 @@ int init_pci (void){
 
     register int i=0;
     int Status = 0;
-    int Max = 32;   //@todo.
+    int Max = PCI_DEVICE_LIST_SIZE; 
     unsigned long data=0;
 
 
@@ -894,9 +894,16 @@ pciHandleDevice (
 		// #bugbug: limite determinado ... 
 		// precisa de variável.
 
-        if ( pciListOffset < 0 || pciListOffset >= 32 )
+        if ( pciListOffset < 0 || pciListOffset >= PCI_DEVICE_LIST_SIZE )
         { 
+            
+            // #bugbug
+            // Suspendendo isso porque esta sujaando muito a tela
+            // na maquina real.
             printf ("pciHandleDevice: [FAIL] No more slots!\n");
+            
+            //debug_print ("pciHandleDevice: [FAIL] No more slots!\n");
+            
             return (int) (-1);
         }
 

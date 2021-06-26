@@ -494,7 +494,7 @@ int kernel_main(int arch_type)
     // --
 
     //#test
-    x64_info();
+    // x64_info();
 
     /*
     // #testing scroll
@@ -510,10 +510,12 @@ int kernel_main(int arch_type)
 
     // #debug
     //console_putchar('F',fg_console);
-    refresh_screen();
+    //refresh_screen();
     //a_soft_place_to_fall();
     //die();
- 
+
+    printf("kernel_main: *breakpoint :)\n");
+    refresh_screen();
 
 //=============================
 
@@ -544,7 +546,15 @@ int kernel_main(int arch_type)
 // panic
 //
 
-    while(1){}
+    //a_soft_place_to_fall();
+    //die();
+
+    while(1)
+    {
+        asm ("sti");
+        asm ("hlt");
+    };
+
 
     // Breakpoint for tests!
     // x_panic("kernel_main: :)");

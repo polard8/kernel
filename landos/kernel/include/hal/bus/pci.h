@@ -729,7 +729,10 @@ struct pci_d  *Pci;   // #todo: Use PCI
 // Lista as estruturas de dispositivos pci.
 //
 
-unsigned long pcideviceList[32];    //@todo tamanho provisorio. 
+//#define PCI_DEVICE_LIST_SIZE    32
+#define PCI_DEVICE_LIST_SIZE    128
+
+unsigned long pcideviceList[PCI_DEVICE_LIST_SIZE];   
 
 //
 // DRIVER.

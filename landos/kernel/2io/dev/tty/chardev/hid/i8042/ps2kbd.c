@@ -235,7 +235,9 @@ sc_again:
         AsciiChar = map_abnt2[ScanCode];
 
         // Rotinas de teste
-        if ( AsciiChar == VK_F5 ){ hal_reboot(); }  // reboot.
+        if ( AsciiChar == VK_F5 ){ 
+            hal_reboot(); 
+        }  
         if ( AsciiChar == VK_F6 )
         { 
             Background_initialize();  // ok
@@ -248,13 +250,22 @@ sc_again:
             //stdioInitialize();
             //screenInit();
             //init_pci(); //We already called this one in the initialization.
-            pciInfo();
-            
+            //pciInfo();
+            //refresh_screen();
+        }
+        if ( AsciiChar == VK_F7 ){ 
+            Background_initialize();  // ok
+            //hal_reboot(); 
+            x64_info();
             refresh_screen();
         }
-        if ( AsciiChar == VK_F7 ){ hal_reboot(); }
-        if ( AsciiChar == VK_F8 ){ hal_reboot(); }
-        
+        if ( AsciiChar == VK_F8 ){ 
+            Background_initialize();  // ok
+            //hal_reboot(); 
+            pciInfo();
+            refresh_screen();
+        }
+
         //
         // Fast
         //

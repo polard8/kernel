@@ -96,7 +96,7 @@ struct pci_device_d *scan_pci_device_list (
 	// #bugbug
 	// Nossa lista só tem 32 slots por enquanto.
 
-    for ( i=0; i<32; i++ )
+    for ( i=0; i<PCI_DEVICE_LIST_SIZE; i++ )
     {
         D = (void *) pcideviceList[i];
 
@@ -132,7 +132,7 @@ struct pci_device_d *scan_pci_device_list2 (
 	// #bugbug
 	// Nossa lista só tem 32 slots por enquanto.
 
-    for ( i=0; i<32; i++ )
+    for ( i=0; i<PCI_DEVICE_LIST_SIZE; i++ )
     {
         D = (void *) pcideviceList[i];
 

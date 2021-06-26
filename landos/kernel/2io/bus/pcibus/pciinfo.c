@@ -52,7 +52,7 @@ int pciInfo (void){
 
     struct pci_device_d *D;
     int i=0;
-    int Max = 32;
+    int Max = PCI_DEVICE_LIST_SIZE;
 
 
     printf ("pciInfo: \n");
@@ -94,7 +94,7 @@ int pciShowDeviceInfo (int number){
     // Limits
     // Pega um ponteiro de estrutura na lista.
 
-    if (number < 0 || number >= 32){
+    if (number < 0 || number >= PCI_DEVICE_LIST_SIZE){
         debug_print("pciShowDeviceInfo: number\n");
         return -1;
     }else{
