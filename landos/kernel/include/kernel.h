@@ -207,6 +207,8 @@ unsigned long SavedBPP;
 
 #include "user/ws.h"
 
+#include "user/kgws.h"
+
 
 // #view - designers
 #include "user/view/vk.h"
@@ -241,7 +243,6 @@ unsigned long SavedBPP;
 #include "user/view/i8042/ps2mouse.h"
 #include "user/view/i8042/ps2kbd.h"
 #include "user/view/i8042/ps2.h"
-
 
 
 

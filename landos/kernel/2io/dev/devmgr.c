@@ -6,7 +6,7 @@
 // Initialize the list.
 int devmgr_init_device_list(void)
 {
-    int i=0;
+    register int i=0;
 
     debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
 
@@ -23,8 +23,8 @@ int devmgr_init_device_list(void)
 // Show device list.
 void devmgr_show_device_list(void)
 {
-    struct device_d  *d;
     register int i=0;
+    struct device_d  *d;
 
 
     printf ("\n devmgr_show_device_list: \n");
@@ -64,12 +64,14 @@ void devmgr_show_device_list(void)
  * 
  */
 
+// Called by init() in init.c.
 void init_device_manager (void)
 {
     debug_print ("init_device_manager:\n");
  
     devmgr_init_device_list();
-    //...
+
+    // ...
 }
 
 // OUT: 

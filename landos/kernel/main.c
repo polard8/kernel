@@ -496,6 +496,18 @@ int kernel_main(int arch_type)
     //#test
     x64_info();
 
+    /*
+    // #testing scroll
+    printf("1 Testing scroll\n");
+    printf("2 \n");
+    printf("3 \n");
+    printf("4 \n");
+    printf("5 \n");
+    printf("6 \n");
+    printf("7 \n");
+    printf("8 done\n");
+    */
+
     // #debug
     //console_putchar('F',fg_console);
     refresh_screen();

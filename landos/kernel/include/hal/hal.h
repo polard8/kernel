@@ -65,8 +65,6 @@ void hal_set_machine_type ( unsigned long type );
 unsigned long hal_get_machine_type (void);
 
 
-
-
 void hal_reboot (void);
 void hal_shutdown (void);
 
@@ -86,6 +84,9 @@ void hal_speaker_off (void);
 void hal_test_speaker (void);
 
 int init_hal (void);
+
+int hal_hardware_detect (void);
+void init_cpu (void);
 
 #endif    
 

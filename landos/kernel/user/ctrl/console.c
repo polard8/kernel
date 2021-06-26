@@ -601,7 +601,56 @@ unsigned long get_cursor_y (void)
 
 void console_scroll (int console_number)
 {
-    debug_print ("console_scroll: #todo\n");
+    // Salvar cursor.
+    unsigned long OldX=0;
+    unsigned long OldY=0;
+
+    register int i=0;
+
+
+    debug_print ("console_scroll: #todo #fixme\n");
+
+    if ( VideoBlock.useGui != TRUE )
+    {
+        debug_print ("console_scroll: no GUI\n");
+        panic       ("console_scroll: no GUI\n");
+    }
+
+    // #todo: check overflow
+    if ( console_number < 0 ){
+        panic ("console_scroll: [FAIL] console_number\n");
+    }
+
+
+    // Scroll the screen rectangle.
+    // See: rect.c
+
+    scroll_screen_rect();
+
+    // Clena the last line.
+  
+	// Salva cursor
+    OldX = CONSOLE_TTYS[console_number].cursor_x; 
+    OldY = CONSOLE_TTYS[console_number].cursor_y; 
+
+    // Cursor na ultima linha.
+    CONSOLE_TTYS[console_number].cursor_x =   CONSOLE_TTYS[console_number].cursor_left; 
+    CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom); 
+
+
+   // Limpa a últime linha.
+   for ( i = CONSOLE_TTYS[console_number].cursor_x; 
+         i < CONSOLE_TTYS[console_number].cursor_right; 
+         i++ )
+   {
+        _console_outbyte (' ',console_number); 
+   };
+
+    // Reposiciona o cursor na última linha.
+    CONSOLE_TTYS[console_number].cursor_x = CONSOLE_TTYS[console_number].cursor_left; 
+    CONSOLE_TTYS[console_number].cursor_y = OldY;  //( CONSOLE[console_number].cursor_bottom -1); 
+
+    refresh_screen();
 }
 
 

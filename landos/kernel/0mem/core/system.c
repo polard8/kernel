@@ -506,6 +506,70 @@ void *systemNull (void)
 }
 
 
+/*
+ *******************************
+ * init_executive:
+ *
+ *     Initialize the kernel executive.
+ *     Archtecture (independent) inicialization. 
+ */
+
+// called by init()
+
+int init_executive (void){
+
+    int Status = 0;
+
+
+    Initialization.executive = FALSE;
+
+#ifdef KERNEL_VERBOSE
+    printf ("EXECUTIVE:\n");
+#endif
+
+
+    debug_print ("init_executive:\n");
+
+
+    // PCI - Pega informações da PCI.
+    // As informaçoes serao salvas em uma lista e usadas depois.
+    // por isso temos que sondar agora.
+    //init_pci ();
+
+
+	// CLOCK - Pega informações de Hora e Data.
+    //init_clock ();
+    //get_cmos_info ();
+
+	//...
+
+
+	// #importante: 
+	// Só depois de inicializarmos o ata 'e que podemos carregar 
+	// alguma coisa.
+
+    debug_print ("init_executive: ataDialog\n");
+    //ataDialog ( 1, FORCEPIO, FORCEPIO );
+
+	// ??
+	// configura a tabela do kernel de funções exportadas
+	// e tabela de ponteiros para tabelas dos outros programas em 
+	// kernel mode.
+    // Status = (int) executive_config_exported_functions();
+
+	//Continua ...
+    
+	// #todo: 
+	// Checar a validade de 'Initialization' ??
+
+	//#debug
+	//printf("Done!\n");
+
+    Initialization.executive = TRUE;
+
+    return (int) Status;
+}
+
 
 
 

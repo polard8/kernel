@@ -39,7 +39,7 @@ font.o \
 fs.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
 desktop.o room.o userenv.o usession.o \
-vt.o \
+kgwm.o vt.o \
 x64cont.o x64fault.o \
 ts.o process.o thread.o threadi.o create.o queue.o mk.o \
 memory.o mminfo.o mmpool.o pages.o \
@@ -172,6 +172,8 @@ all-c:
 #
 # == user ======== 
 #
+
+	gcc -c user/kgwm.c   $(KINCLUDE) $(CFLAGS) -o kgwm.o
 
 	gcc -c user/vt.c   $(KINCLUDE) $(CFLAGS) -o vt.o
 

@@ -43,9 +43,9 @@ int x64main (void)
         x_panic     ("[x64] x64main: current_arch fail\n"); 
     }
 
-    // global thing.
     // Threads counter.
-    // UPProcessorBlock.threads_counter = 0;
+
+    UPProcessorBlock.threads_counter = 0;
 
 
 //================================
@@ -97,13 +97,9 @@ int x64main (void)
 
     // Essa rotina só pode ser chamada 
     // durante essa fase da inicialização.
-    if ( KeInitPhase != 0 )
-    {
-        // #todo
-        // KiAbort();
+    if ( KeInitPhase != 0 ){
         x_panic ("x64main: KeInitPhase");
     }
-
 
 //================================
     PROGRESS("Kernel:1:2\n"); 

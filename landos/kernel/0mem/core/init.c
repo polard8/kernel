@@ -217,6 +217,8 @@ void init_globals (void)
 }
 
 
+// Called by x64main in x64init.c
+
 int init (void)
 {
     int Status = 0;
@@ -255,7 +257,7 @@ int init (void)
 
     PROGRESS("Kernel:2:2\n"); 
     // Create the progress bar.
-
+    // No bar for now.
 
 //===============================
     PROGRESS("Kernel:2:3\n"); 
@@ -283,7 +285,6 @@ int init (void)
     debug_print ("core-init: io manager\n");
     //ioInit ();
 
-
 //===============================
     PROGRESS("Kernel:2:4\n"); 
     // device manager.
@@ -291,8 +292,8 @@ int init (void)
     // Inicializa o gerenciamento de dispositivos.
     // Inicializa a lista de dispositivos.
     debug_print ("core-init: device manager\n");
-    
-    //init_device_manager();
+
+    init_device_manager();
 
 
 //===============================
@@ -339,8 +340,6 @@ int init (void)
 
 
     // ...
-    
-
 
 
 //
@@ -351,7 +350,7 @@ int init (void)
     // We need to be in the phase 0.
     
     if (KeInitPhase != 0){
-        x_panic ("init: KeInitPhase\n");
+        x_panic ("core-init: KeInitPhase\n");
     }
 
 
@@ -372,14 +371,14 @@ int init (void)
 //#endif
 
     // #bugbug
-    // Isso eh dependente, pode mudar para a outra rotina desse documento.
+    // Isso eh dependente, 
+    // pode mudar para a outra rotina desse documento.
 
-    //Status = init_hal();
+    Status = init_hal();
 
-    //if (Status != 0){
-        //x_panic ("init: init_hal fail\n");
-    //}
-
+    if (Status != 0){
+        x_panic ("core-init: init_hal fail\n");
+    }
 
 
 //==========================
@@ -403,7 +402,7 @@ int init (void)
     Status = init_microkernel();
 
     if (Status != 0){
-        panic ("init_architecture_independent: init_microkernel fail\n");
+        panic ("core-init: init_microkernel fail\n");
     }
 
 //=========================================
@@ -416,11 +415,11 @@ int init (void)
     //printk ("init_architecture_independent: Initializing Executive..\n");
 //#endif
 
-    //Status = init_executive();
+    Status = init_executive();
 
-    //if (Status != 0){
-        //panic ("init_architecture_independent: init_executive\n"); 
-    //}
+    if (Status != 0){
+        panic ("core-init: init_executive\n"); 
+    }
 
 //=========================================
     PROGRESS("Kernel:2:11\n"); 
@@ -430,18 +429,18 @@ int init (void)
     // =====================
     // Gramado:
 //#ifdef EXECVE_VERBOSE
-    //printk ("init_architecture_independent: Initializing Gramado..\n");
+    //printk ("core-init: Initializing Gramado..\n");
 //#endif
 
     // #bugbug
     // Deprecated?
     // onde?
 
-    //Status = init_gramado();
+    Status = init_gramado();
 
-    //if (Status != 0){
-        //panic ("init_architecture_independent: init_gramado fail\n"); 
-    //}
+    if (Status != 0){
+        panic ("core-init: init_gramado fail\n"); 
+    }
 
 
 //=========================================
@@ -501,9 +500,9 @@ int init (void)
     //printf("core-init: end of phase 0\n");
     
 
-    //
-    // == phase 1 ? ================================================
-    //
+//
+// == phase 1 ? ================================================
+//
 
     KeInitPhase = 1;
 
@@ -517,7 +516,8 @@ int init (void)
     // Inicia a parte de arquitetura especifica da máquina atual.
     // Ou seja, considera a marca do processador.
     
-    //Status = (int) init_architecture_dependent ();
+    // #deprecated
+    //Status = (int) init_architecture_dependent();
     //if (Status != 0){
     //    panic ("core-init: init_architecture_dependent fail\n"); 
     //}
@@ -535,25 +535,6 @@ int init (void)
     if ( KeInitPhase != 1 ){
         x_panic ("init: KeInitPhase\n");
     }
-
-
-	// #### IMPORTANTE ####
-	//
-	// VAMOS ANTECIPAR ESSA INICIALIZAÇÃO NA TENTATIVA DE
-	// ANTECIPARMOS O USO DE MENSAGENS.
-    // >>> mas essa rotina precisa do kmalloc ,,,
-	//então tem que ser depois da inicialização do stdio.
-	
-	
-	// Os parâmetros de tela dependem das propriedades de hardware
-	// como monitor e placa de vídeo.
-	
-	//screenInit();
-
-    //printf("init_architecture_dependent: #Debug");
-    //refresh_screen();
-    //while(1){};
-
 
 
 //=========================================
@@ -598,6 +579,9 @@ int init (void)
     ProcessorType = (int) hal_probe_processor_type();
 
     // Error
+    // Vamos suspender isso por enquanto ...
+    // precisamos apurar essa rotina de identificação da cpu.
+
     //if (ProcessorType <= 0){
     //    x_panic("init: [ERROR] ProcessorType\n");
     //}
@@ -608,11 +592,11 @@ int init (void)
     case Processor_INTEL:  
     case Processor_AMD:
         x64_init_intel();   
-        //init_amd();         
+        //init_amd(); 
         break;
     // ...
     default:
-        x_panic ("init: [ERROR] default Type");
+        x_panic ("core-init: [ERROR] default Type");
         break;
     };
 
@@ -627,7 +611,7 @@ int init (void)
     int isQEMU=FALSE;
     isQEMU = detect_IsQEMU();
     if( isQEMU == TRUE ){
-        debug_print("init: Running on QEMU\n");
+        debug_print("core-init: Running on QEMU\n");
         //printf ("Running on QEMU\n");
     }
 
@@ -676,21 +660,14 @@ int init (void)
 //=========================================
     PROGRESS("Kernel:2:16\n"); 
     // keyboard stuff.
-
-    // #todo
-    // Talvez devamos antecipar isso, pois faz parte do teclado.
-    // Isso pode ir pra outro lugar?
-    
-    //ldisc_init_modifier_keys ();
-    //ldisc_init_lock_keys ();
-
+    // Nothing for now.
 
     //printf("=========================\n");
     //printf("core-init: end of phase 1\n");
 
-    //
-    // == phase 2 ? ================================================
-    //
+//
+// == phase 2 ? ================================================
+//
 
     KeInitPhase = 2;
 
@@ -723,11 +700,14 @@ int init (void)
     //refresh_screen();
     //while(1){}
 
+//ok
     return 0;
 
-//fail0:
-    //debug_print ("==== init: fail\n");
-    //return (-1);
+//fail1:
+    // If we already have printf verbose.
+fail0:
+    debug_print ("==== init: fail\n");
+    return (-1);
 }
 
 

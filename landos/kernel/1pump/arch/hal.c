@@ -2,6 +2,16 @@
 
 #include <kernel.h>    
 
+
+//
+// import
+//
+
+//extern unsigned long gdt;
+//extern unsigned long idt;
+//extern unsigned long tss;
+
+
 extern void asm_reboot (void);
 
 
@@ -177,33 +187,79 @@ void hal_test_speaker (void){
  *     Archtecture independent inicialization ...
  */
 
-// Called by ?
+// Called by init() in init.c
 
 int init_hal (void)
 {
     int Status = 0;
 
-    //Initialization.hal = FALSE;
+    Initialization.hal = FALSE;
 
+    // nothing
+    init_cpu();
 
-    //init_cpu();
-
-    
     // #todo:
     // Chamaremos essa inicialização básica nesse momento.
     // A inicialização completa será chamada pelo processo init.
     
-    //early_timer_init ();
+    early_timer_init();
     
     
 	// Detecta fabricantes específicos suportados pelo núcleo.  
 
-    //hal_hardware_detect();
+    // nothing
+    hal_hardware_detect();
 
-    //Initialization.hal = TRUE;
+    Initialization.hal = TRUE;
 
     return 0;
 }
+
+/*
+ * hal_hardware_detect:
+ *     Detecta fabricantes específicos suportados pelo núcleo.
+ *
+ * 8086, 1237  //PCI & Memory.
+ * 8086, 7000  //PIIX3 PCI-to-ISA Bridge (Triton II).
+ * 1022, 2000  //Advanced Micro Devices, PCnet LANCE PCI Ethernet Controller.
+ * 8086, 7113  //PIIX4/4E/4M Power Management Controller.
+ * 8086, 2829  //Intel(R) ICH8M SATA AHCI Controller.
+ * //...
+ *
+ */
+
+// Consumer Chipsets (Z87, H87, H81) Haswell LGA1150. 
+// Business Chipsets (Q87, Q85, B85) Haswell LGA1150.
+
+int hal_hardware_detect (void)
+{
+    debug_print ("hal_hardware_detect: [TODO]\n");
+    return 0;    //#todo
+}
+
+/*
+ * init_cpu:
+ *     Inicializa a estrutura do processador e as coisas associadas a ele.
+ *     Inicializa apenas o que for independente da arquitetura.
+ *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
+ */
+
+// #todo 
+// O retorno deve ser int, para refletir o status.
+    
+void init_cpu (void)
+{
+    debug_print("init_cpu: deprecated\n");
+    // See:
+    // init() on init.c
+    // hal_probe_processor_type() on detect.c
+}
+
+
+
+
+
+
 
 
 
