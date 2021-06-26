@@ -247,23 +247,30 @@ sc_again:
             //show_thread_information();
             //stdioInitialize();
             //screenInit();
+            //init_pci(); //We already called this one in the initialization.
+            pciInfo();
             
-            
+            refresh_screen();
         }
         if ( AsciiChar == VK_F7 ){ hal_reboot(); }
         if ( AsciiChar == VK_F8 ){ hal_reboot(); }
         
+        //
+        // Fast
+        //
+        
+        // pinta no backbuffer e faz refresh apenas do retangulo do char..
+        console_putchar(AsciiChar,fg_console);
+        
+        //
+        // Slow
+        //
+
         // imprime
         // provisorio
-        console_outbyte(AsciiChar,fg_console);
+        //console_outbyte(AsciiChar,fg_console);
         //printf("%c",AsciiChar);
-        
-        //
-        // #bugbug :   ISSO E' LENTO !!!
-        //
-        
-        //provisorio
-        refresh_screen();
+        //refresh_screen();
     }
     
     // ======================================================

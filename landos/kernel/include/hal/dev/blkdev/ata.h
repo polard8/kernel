@@ -452,6 +452,21 @@ ata_ioctl (
     unsigned long arg );
     
 
+uint32_t 
+diskReadPCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset );
+
+void 
+diskWritePCIConfigAddr ( 
+    int bus, 
+    int dev,
+    int fun, 
+    int offset, 
+    int data );
+
 int ata_initialize ( int ataflag );
     
 #endif    

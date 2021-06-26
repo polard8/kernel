@@ -1086,6 +1086,7 @@ void _console_outbyte (int c, int console_number)
  *************************************** 
  * console_putchar:
  *     Put a char into the screen of a virtual console.
+ *     pinta no backbuffer e faz refresh apenas do retangulo do char..
  */
 
 // #importante

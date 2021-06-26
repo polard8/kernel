@@ -901,6 +901,15 @@ struct pci_device_d *scan_pci_device_list2 (
 int pciInfo (void);
 int pciShowDeviceInfo (int number);
 
+
+// ==
+
+int 
+pciHandleDevice ( 
+    unsigned char bus, 
+    unsigned char dev, 
+    unsigned char fun );
+
 #endif    
 
 

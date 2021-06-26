@@ -33,7 +33,7 @@ debug.o init.o \
 ports64.o pit.o rtc.o x64.o x64info.o hal.o detect.o \
 pci.o pciinfo.o pciscan.o devmgr.o\
 console.o tty.o video.o vsync.o screen.o serial.o \
-ata.o atairq.o \
+ata.o atairq.o atapci.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 font.o \
 fs.o \
@@ -151,6 +151,8 @@ all-c:
 	# 2io/dev/blkdev/ide
 	gcc -c 2io/dev/blkdev/ide/ata.c     $(KINCLUDE) $(CFLAGS) -o ata.o 
 	gcc -c 2io/dev/blkdev/ide/atairq.c  $(KINCLUDE) $(CFLAGS) -o atairq.o 
+	gcc -c 2io/dev/blkdev/ide/atapci.c  $(KINCLUDE) $(CFLAGS) -o atapci.o 
+
 
 	# 2io/dev/tty/
 	gcc -c 2io/dev/tty/tty.c  $(KINCLUDE) $(CFLAGS) -o tty.o

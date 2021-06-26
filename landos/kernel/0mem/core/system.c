@@ -530,12 +530,20 @@ int init_executive (void){
 
     debug_print ("init_executive:\n");
 
+//
+// PCI
+//
 
     // PCI - Pega informações da PCI.
     // As informaçoes serao salvas em uma lista e usadas depois.
     // por isso temos que sondar agora.
-    //init_pci ();
+    
+    init_pci();
 
+
+//
+// CMOS
+//
 
 	// CLOCK - Pega informações de Hora e Data.
     //init_clock ();
