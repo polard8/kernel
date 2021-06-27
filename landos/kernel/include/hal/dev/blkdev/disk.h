@@ -268,8 +268,36 @@ unsigned long diskList[DISK_COUNT_MAX];
 // == Prototypes ==================================
 //
 
+int disk_init (void);
+int diskShowDiskInfo ( int descriptor );
+void diskShowCurrentDiskInfo (void);
+void disk_show_info (void);
+void *disk_get_disk_handle ( int number );
+
+
+int volume_init (void);
+int volumeShowVolumeInfo ( int descriptor );
+void volume_show_info (void);
+void *volume_get_volume_handle( int number );
+void *volume_get_current_volume_info (void);
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

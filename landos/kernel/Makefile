@@ -29,11 +29,11 @@ KINCLUDE = -I include/
 
 OBJECTS := head_64.o main.o x64init.o \
 ctype.o kstdio.o stdlib.o string.o unistd.o runtime.o system.o signal.o \
-debug.o init.o \
+init.o debug.o info.o \
 ports64.o pit.o rtc.o x64.o x64info.o hal.o detect.o \
 pci.o pciinfo.o pciscan.o devmgr.o\
 console.o tty.o video.o vsync.o screen.o serial.o \
-ata.o atairq.o atapci.o \
+storage.o ata.o atairq.o atapci.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 font.o \
 fs.o \
@@ -81,6 +81,7 @@ all-c:
 	# == Gramado Core ====
 	# Architecture independent layer.
 
+	gcc -c 0mem/core/info.c     $(KINCLUDE) $(CFLAGS) -o info.o
 	gcc -c 0mem/core/init.c     $(KINCLUDE) $(CFLAGS) -o init.o
 	gcc -c 0mem/core/runtime.c  $(KINCLUDE) $(CFLAGS) -o runtime.o
 	gcc -c 0mem/core/system.c   $(KINCLUDE) $(CFLAGS) -o system.o
@@ -145,30 +146,34 @@ all-c:
 	gcc -c 2io/bus/pcibus/pciinfo.c $(KINCLUDE) $(CFLAGS) -o pciinfo.o
 	gcc -c 2io/bus/pcibus/pciscan.c $(KINCLUDE) $(CFLAGS) -o pciscan.o
 
+
+
 	# 2io/dev/
 	gcc -c 2io/dev/devmgr.c  $(KINCLUDE) $(CFLAGS) -o devmgr.o 
+	gcc -c 2io/dev/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+
+	# 2io/dev/blkdev
+	gcc -c 2io/dev/blkdev/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o 
 
 	# 2io/dev/blkdev/ide
 	gcc -c 2io/dev/blkdev/ide/ata.c     $(KINCLUDE) $(CFLAGS) -o ata.o 
 	gcc -c 2io/dev/blkdev/ide/atairq.c  $(KINCLUDE) $(CFLAGS) -o atairq.o 
 	gcc -c 2io/dev/blkdev/ide/atapci.c  $(KINCLUDE) $(CFLAGS) -o atapci.o 
 
-
 	# 2io/dev/tty/
 	gcc -c 2io/dev/tty/tty.c  $(KINCLUDE) $(CFLAGS) -o tty.o
 
-	# 2io/dev/tty/chardev
-	gcc -c 2io/dev/tty/chardev/hid/vsync.c   $(KINCLUDE) $(CFLAGS) -o vsync.o
-	gcc -c 2io/dev/tty/chardev/hid/screen.c  $(KINCLUDE) $(CFLAGS) -o screen.o
-	gcc -c 2io/dev/tty/chardev/hid/video.c   $(KINCLUDE) $(CFLAGS) -o video.o
+	# 2io/dev/graphics
+	gcc -c 2io/dev/graphics/video.c   $(KINCLUDE) $(CFLAGS) -o video.o
+	gcc -c 2io/dev/graphics/vsync.c   $(KINCLUDE) $(CFLAGS) -o vsync.o
+	gcc -c 2io/dev/graphics/screen.c  $(KINCLUDE) $(CFLAGS) -o screen.o
 
-	gcc -c 2io/dev/tty/chardev/hid/i8042/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
-	gcc -c 2io/dev/tty/chardev/hid/i8042/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
-	gcc -c 2io/dev/tty/chardev/hid/i8042/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
-	gcc -c 2io/dev/tty/chardev/hid/i8042/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
-	gcc -c 2io/dev/tty/chardev/hid/i8042/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
-
-	gcc -c 2io/dev/tty/chardev/serial/serial.c  $(KINCLUDE) $(CFLAGS) -o serial.o
+	# 2io/dev/hid
+	gcc -c 2io/dev/hid/i8042.c     $(KINCLUDE) $(CFLAGS) -o i8042.o
+	gcc -c 2io/dev/hid/ps2kbd.c    $(KINCLUDE) $(CFLAGS) -o ps2kbd.o
+	gcc -c 2io/dev/hid/ps2mouse.c  $(KINCLUDE) $(CFLAGS) -o ps2mouse.o
+	gcc -c 2io/dev/hid/keyboard.c  $(KINCLUDE) $(CFLAGS) -o keyboard.o
+	gcc -c 2io/dev/hid/mouse.c     $(KINCLUDE) $(CFLAGS) -o mouse.o
 
 
 #

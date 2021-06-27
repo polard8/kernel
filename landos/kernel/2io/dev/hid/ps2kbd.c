@@ -251,7 +251,11 @@ sc_again:
             //screenInit();
             //init_pci(); //We already called this one in the initialization.
             //pciInfo();
-            //refresh_screen();
+            //disk_init();
+            disk_show_info();
+            //volume_init();
+            volume_show_info();
+            refresh_screen();
         }
         if ( AsciiChar == VK_F7 ){ 
             Background_initialize();  // ok

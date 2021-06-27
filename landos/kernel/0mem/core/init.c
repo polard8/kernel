@@ -327,10 +327,10 @@ int init (void)
 
 
     debug_print ("core-init: disk [TODO]\n");
-    //disk_init ();
+    disk_init ();
 
     debug_print ("core-init: volume [TODO]\n");
-    //volume_init ();
+    volume_init ();
 
     debug_print ("core-init: vfs [TODO]\n");
     //vfsInit ();
