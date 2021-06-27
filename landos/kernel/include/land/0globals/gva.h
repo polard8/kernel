@@ -4,6 +4,35 @@
 #define ____GVA_H    1
 
 
+    // #todo
+    // Tem um monte de endereços usados no início da 
+    // memoria virtual do kernel. Mas acontece que esses
+    // endereços são os mesmos para físico e virtual.
+    // então precisamos estar concordância com os endereços
+    // encontrados em gpa.h 
+
+
+// mbr
+#define MBR_ADDRESS_VA    0x00020000  
+
+// vbr
+//Podemos alocar memória para isso, liberando esse espaço?
+#define VOLUME1_VBR_ADDRESS_VA   (0x00020000 + 0x200) 
+#define VOLUME2_VBR_ADDRESS_VA   (0x00020000 + 0x200) 
+
+// fat
+//Podemos alocar memória para isso, liberando esse espaço?
+#define VOLUME1_FAT_ADDRESS_VA   0x00030000 
+#define VOLUME2_FAT_ADDRESS_VA   0x00030000
+
+// rootdir
+//Podemos alocar memória para isso, liberando esse espaço?
+#define VOLUME1_ROOTDIR_ADDRESS_VA  0x00070000 
+#define VOLUME2_ROOTDIR_ADDRESS_VA  0x00070000 
+
+
+
+
 //
 // process support.
 //

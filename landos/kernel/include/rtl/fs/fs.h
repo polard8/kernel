@@ -443,7 +443,144 @@ int fat16Init (void);
 void fs_init_structures (void);
 void fs_init_fat (void);
 
+// ==
+
+void file_close (file *_file);
+size_t file_get_len(file *_file);
+struct inode_d *file_inode (file *f);
+int file_truncate ( file *_file, size_t len);
+int fsCheckELFFile ( unsigned long address );
+
+void 
+fsFAT16ListFiles ( 
+    const char     *dir_name, 
+    unsigned short *dir_address, 
+    int            number_of_entries );
+    
+int init_directory_facilities(void);
+void fsInitializeWorkingDiretoryString (void);
+void fsInitTargetDir (unsigned long dir_address, char *name);
+int fsList ( const char *dir_name );
+
+void 
+fsListFiles ( 
+    int disk_id, 
+    int volume_id, 
+    int directory_id );
+    
+// ===
+
+
+int
+__load_sequential_sectors ( 
+    unsigned long address, 
+    unsigned long lba, 
+    unsigned long sectors );
+
+unsigned long 
+fatClustToSect ( 
+    unsigned short cluster, 
+    unsigned long spc, 
+    unsigned long first_data_sector );
+
+void read_lba ( unsigned long address, unsigned long lba );
+
+void 
+fatLoadCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc );
+    
+void fs_load_fat(unsigned long fat_address, unsigned long fat_lba, size_t fat_size);
+
+void 
+fs_load_metafile (
+    unsigned long buffer, 
+    unsigned long first_lba, 
+    unsigned long size );
+    
+void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t root_size);
+
+// ====
+
+void write_lba ( unsigned long address, unsigned long lba );
+
+void 
+fatWriteCluster ( 
+    unsigned long sector, 
+    unsigned long address, 
+    unsigned long spc );
+
+int 
+fs_save_fat ( 
+    unsigned long fat_address, 
+    unsigned long fat_lba, 
+    size_t fat_size );
+
+int 
+fs_save_rootdir ( 
+    unsigned long root_address, 
+    unsigned long root_lba, 
+    size_t root_size );
+    
+// ===
+
+unsigned long fsRootDirGetFileSize ( unsigned char *file_name );
+
+unsigned long 
+fsLoadFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    int dir_entries,
+    const char *file_name, 
+    unsigned long buffer,
+    unsigned long buffer_limit );
+
+unsigned long 
+fsLoadFile2 ( 
+    struct file_context_d *fc, 
+    unsigned char *file_name );
+
+
+int fsLoadFileFromCurrentTargetDir (void);
+void fsUpdateWorkingDiretoryString ( char *string );
+void fs_fat16_cache_not_saved(void);
+void fs_fntos ( char *name );
+int fs_get_free_fd_from_pid (int pid);
+int fs_initialize_process_cwd ( int pid, char *string );
+
+int 
+fs_load_path ( 
+    const char *path, 
+    unsigned long address, 
+    unsigned long buffer_size );
+    
+void fs_pathname_backup ( int pid, int n );
+int fs_print_process_cwd (int pid);
+void fs_show_file_info (file *f);
+void fs_show_file_table(void);
+void fs_show_inode_info (struct inode_d *i);
+void fs_show_inode_table(void);
+void fs_show_root_fs_info(void);
+void sys_pwd (void);
+
+//...
+
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
