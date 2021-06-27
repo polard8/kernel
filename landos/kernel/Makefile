@@ -33,7 +33,8 @@ init.o debug.o info.o \
 ports64.o pit.o rtc.o x64.o x64info.o hal.o detect.o \
 pci.o pciinfo.o pciscan.o devmgr.o\
 console.o tty.o video.o vsync.o screen.o serial.o \
-storage.o ata.o atairq.o atapci.o \
+storage.o \
+ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 font.o \
 fs.o \
@@ -156,9 +157,12 @@ all-c:
 	gcc -c 2io/dev/blkdev/storage.c  $(KINCLUDE) $(CFLAGS) -o storage.o 
 
 	# 2io/dev/blkdev/ide
-	gcc -c 2io/dev/blkdev/ide/ata.c     $(KINCLUDE) $(CFLAGS) -o ata.o 
-	gcc -c 2io/dev/blkdev/ide/atairq.c  $(KINCLUDE) $(CFLAGS) -o atairq.o 
-	gcc -c 2io/dev/blkdev/ide/atapci.c  $(KINCLUDE) $(CFLAGS) -o atapci.o 
+	gcc -c 2io/dev/blkdev/ide/ata.c      $(KINCLUDE) $(CFLAGS) -o ata.o 
+	gcc -c 2io/dev/blkdev/ide/atadma.c   $(KINCLUDE) $(CFLAGS) -o atadma.o 
+	gcc -c 2io/dev/blkdev/ide/atahdd.c   $(KINCLUDE) $(CFLAGS) -o atahdd.o 
+	gcc -c 2io/dev/blkdev/ide/atainit.c  $(KINCLUDE) $(CFLAGS) -o atainit.o 
+	gcc -c 2io/dev/blkdev/ide/atairq.c   $(KINCLUDE) $(CFLAGS) -o atairq.o 
+	gcc -c 2io/dev/blkdev/ide/atapci.c   $(KINCLUDE) $(CFLAGS) -o atapci.o 
 
 	# 2io/dev/tty/
 	gcc -c 2io/dev/tty/tty.c  $(KINCLUDE) $(CFLAGS) -o tty.o

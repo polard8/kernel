@@ -468,7 +468,61 @@ diskWritePCIConfigAddr (
     int data );
 
 int ata_initialize ( int ataflag );
+
+
+
+// ===
+uint8_t hdd_ata_status_read (int p);
+int hdd_ata_wait_not_busy (int p);
+void hdd_ata_cmd_write ( int port, int cmd_val );
+int hdd_ata_wait_no_drq (int p);
+static void hdd_ata_pio_read ( int p, void *buffer, int bytes );
+void hdd_ata_pio_write ( int p, void *buffer, int bytes );
+
+int 
+pio_rw_sector ( 
+    unsigned long buffer, 
+    unsigned long lba, 
+    int rw, 
+    int port,
+    int slave );
+
+void 
+my_read_hd_sector ( 
+    unsigned long ax, 
+    unsigned long bx, 
+    unsigned long cx, 
+    unsigned long dx );
+
+void 
+my_write_hd_sector ( 
+    unsigned long ax,
+    unsigned long bx,
+    unsigned long cx,
+    unsigned long dx );
+
+int init_hdd (void);
+
+// ===
+void ide_dma_start (void);
+void ide_dma_stop (void);
+int ide_dma_read_status (void);
+
+void 
+ide_dma_data ( 
+    void *addr, 
+    uint16_t byte_count,
+    uint8_t flg,
+    uint8_t nport );
     
+// ===
+
+int 
+ataDialog ( 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
 #endif    
 
 

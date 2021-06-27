@@ -169,6 +169,7 @@ unsigned long SavedBPP;
 
 // hal/dev/blkdev
 #include "hal/dev/blkdev/ata.h"
+#include "hal/dev/blkdev/ide.h"
 #include "hal/dev/blkdev/super.h"
 #include "hal/dev/blkdev/volume.h"
 #include "hal/dev/blkdev/disk.h"  
