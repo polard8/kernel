@@ -1,8 +1,12 @@
 ## Gramado OS build instructions
 
 ## Fred's host machine
-
-    Ubuntu 18.04.4 LTS
+```
+    Linux 5.4.0-77-generic x86_64
+    gcc (Ubuntu) 7.5.0
+    GNU ld (GNU Binutils for Ubuntu) 2.30
+    NASM version 2.13.02
+```
 
 ## Build on Linux
 
