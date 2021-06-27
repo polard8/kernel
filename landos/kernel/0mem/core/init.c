@@ -117,7 +117,6 @@ void init_globals (void)
     
     foreground_process = (int) 0;
     foreground_thread  = (int) 0;
-    
     current_process    = (int) 0;
     current_thread     = (int) 0;
 
@@ -159,6 +158,8 @@ void init_globals (void)
     window_with_focus = (int) 0;  // Window with focus.
     current_menu      = (int) 0;  // Current Menu.
     // Continua ...
+
+    // #todo
 
     // windows
     //init_windows();
@@ -241,9 +242,8 @@ int init (void)
     PROGRESS("Kernel:2:1\n"); 
     // Globals.
 
-    // #IMPORTANT
-    // Globals.
     debug_print ("core-init: Globals\n");
+
     init_globals();
 
 //#ifdef EXECVE_VERBOSE
@@ -274,6 +274,8 @@ int init (void)
     //printk ("core-init: init_object_manager\n");
 //#endif
 
+    // #todo
+
     debug_print ("core-init: Object manager\n");
     //init_object_manager ();
 
@@ -281,6 +283,8 @@ int init (void)
 //#ifdef EXECVE_VERBOSE
     //printk ("core-init: ioInit\n");
 //#endif
+
+    // #todo
 
     debug_print ("core-init: io manager\n");
     //ioInit ();
@@ -300,7 +304,9 @@ int init (void)
     PROGRESS("Kernel:2:5\n"); 
     // storage manager
 
-    // == STORAGE ===========================
+//
+// == storage ===========================
+//
 
     // #ordem:
     // +storage
@@ -313,6 +319,25 @@ int init (void)
 	//É nela que as outras partes devem se basear.
     debug_print ("core-init: storage structure\n");
     
+    storage = (void *) kmalloc ( sizeof(struct storage_d) );
+
+    if ( (void *) storage == NULL ){
+       panic ("core-init: storage\n");
+    }
+
+
+    debug_print ("core-init: disk [TODO]\n");
+    //disk_init ();
+
+    debug_print ("core-init: volume [TODO]\n");
+    //volume_init ();
+
+    debug_print ("core-init: vfs [TODO]\n");
+    //vfsInit ();
+
+    debug_print ("core-init: fs [TODO]\n");
+    fsInit ();
+
     // ...
  
 //==========================
@@ -334,9 +359,74 @@ int init (void)
     //printk ("core-init: Platform\n");
 //#endif
 
+
+//
+// Platform
+//
+
     // #important
     // This is the Root struct. :)
     debug_print ("core-init: Platform struct\n");
+    
+    
+    //#todo
+    
+//++
+// ====================================================================
+    /*
+    Platform = (void *) kmalloc ( sizeof(struct platform_d) );
+
+    if ( (void *) Platform ==  NULL ){
+        panic ("core-init: Platform\n");
+    }else{
+
+        // UP or MP.
+        Platform->system_type = SYSTEM_TYPE_NULL;
+
+        // Hardware
+        Hardware = (void *) kmalloc ( sizeof(struct hardware_d) );
+
+        if ( (void *) Hardware ==  NULL ){
+            panic ("core-init: Hardware\n");
+        }else{
+            Platform->Hardware = (void *) Hardware;
+            //printf(".");
+        };
+
+		//Firmware
+        Firmware = (void *) kmalloc ( sizeof(struct firmware_d) );
+
+        if ((void *) Firmware ==  NULL ){
+            panic ("core-init: Firmware\n");
+        }else{
+            Platform->Firmware = (void *) Firmware;
+            //printf("."); 
+        };
+
+
+		//System (software)
+
+		// #IMPORTATE: 
+		// Aqui estamos inicializando a estrutura do systema.
+
+        System = (void *) kmalloc ( sizeof(struct system_d) );
+
+        if ( (void *) System ==  NULL ){
+            panic ("core-init: System\n");
+        }else{
+            System->used  = TRUE;  // Sinaliza que a estrutura esta em uso.
+            System->magic = 1234;  // Sinaliza que a estrutura não esta corrompida.
+            
+            Platform->System = (void *) System;
+            //printf(".");
+        };
+
+		//printf(" Done!\n");	
+		//...
+    };
+    */
+// ====================================================================
+//--
 
 
     // ...
@@ -357,48 +447,18 @@ int init (void)
 //==========================
     PROGRESS("Kernel:2:8\n"); 
     // hal
-
     debug_print ("core-init: hal\n");
 
-	// #bugbug
-	// Se é HAL é dependente da arquitetura.
-	// Isso deveria ficar na outra rotina.
-	// Não mudaremos por enquanto.
-
-//#todo: Mudar o nome EXECVE_VERBOSE
-//#ifdef EXECVE_VERBOSE
-    //printk ("init: Initializing HAL..\n");
-//#endif
-
-    // #bugbug
-    // Isso eh dependente, 
-    // pode mudar para a outra rotina desse documento.
-
     Status = init_hal();
-
     if (Status != 0){
         x_panic ("core-init: init_hal fail\n");
     }
-
 
 //==========================
     PROGRESS("Kernel:2:9\n"); 
     // microkernel components:
     // mm, ipc, ps ...
 
-    // ================
-    // Microkernel:
-//#ifdef EXECVE_VERBOSE
-	// Obs: O Microkernel lida com informações dependentes da arquitetura,
-	// porém inicializa a gerencia de processos e threads e de comunicação
-	//entre processos.
-	//#bugbug @todo: Se é microkernel é processo é registrador ... 
-	// acho que leva em consideração a arquitetura.
-    //printk ("init_architecture_independent: Initializing Microkernel..\n");
-//#endif
-
-    // Isso tambem eh dependente, pode ir para a outra rotina, 
-    // nesse mesmo documento.
     Status = init_microkernel();
 
     if (Status != 0){
@@ -408,12 +468,6 @@ int init (void)
 //=========================================
     PROGRESS("Kernel:2:10\n"); 
     // Executive components
-
-    // =====================
-    // Executive:
-//#ifdef EXECVE_VERBOSE
-    //printk ("init_architecture_independent: Initializing Executive..\n");
-//#endif
 
     Status = init_executive();
 
@@ -425,16 +479,6 @@ int init (void)
     PROGRESS("Kernel:2:11\n"); 
     // some gui components.
     // #todo: rever 
-
-    // =====================
-    // Gramado:
-//#ifdef EXECVE_VERBOSE
-    //printk ("core-init: Initializing Gramado..\n");
-//#endif
-
-    // #bugbug
-    // Deprecated?
-    // onde?
 
     Status = init_gramado();
 
@@ -470,6 +514,11 @@ int init (void)
     //printf("W\n");
     //refresh_screen();
     //while(1){}
+    
+    
+    
+    // #todo
+    
     
     //init_window_manager();
 
@@ -619,6 +668,12 @@ int init (void)
 //=========================================
     PROGRESS("Kernel:2:14\n"); 
     // process manager.
+
+
+    // #obs: O contexto é depedente.
+    // Inicializando o Process manager.
+
+    // init_process_manager();
 
 
 //

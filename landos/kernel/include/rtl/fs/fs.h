@@ -1,4 +1,5 @@
 
+// fs.h
 
 #ifndef ____FS_H
 #define ____FS_H    1
@@ -248,7 +249,7 @@ struct fat_d
 	//...
 };
 
-struct fat_d *fat;
+struct fat_d  *fat;
 
  
 /*
@@ -261,10 +262,9 @@ struct fat_d *fat;
 
 struct dir_d
 {
-    int id;
-
     int used;
     int magic;
+    int id;
 
     // #todo: 
     // Precisaremos dessas coisas.
@@ -300,8 +300,6 @@ struct dir_d
 
     struct dir_d *next;
 };
-
-
 
 
 
@@ -357,7 +355,7 @@ struct filesystem_d
     // struct filesystem_d *next;
 };
 
-struct filesystem_d *root;
+struct filesystem_d  *root;
 // ...
 
 
@@ -438,6 +436,12 @@ unsigned long fs_count_path_levels (unsigned char *path);
 // manipulando a lista de arquivos do kernel.
 void *get_file(int Index);
 void set_file( void *file, int Index);
+
+
+int fsInit (void);
+int fat16Init (void);
+void fs_init_structures (void);
+void fs_init_fat (void);
 
 #endif    
 

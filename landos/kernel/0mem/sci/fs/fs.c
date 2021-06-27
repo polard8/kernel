@@ -277,6 +277,216 @@ void set_file ( void *file, int Index )
 }    
 
 
+// Called by init() in init.c
+int fsInit (void)
+{
+    //#todo
+
+    int slot = -1;
+
+
+    debug_print ("fsInit: [TODO]\n");
+    
+    // Undefined fs!
+    set_filesystem_type(FS_TYPE_NULL);
+
+
+    //
+    // Initialize fat16 support for the system's volume.
+    //
+
+    // #todo: 
+    // Devemos checar o tipo da partiçao de boot. 
+    // Se nao aqui, depois!
+
+    // #todo
+    fat16Init();
+
+
+    return 0;
+}
+
+
+// Called by fsInit.
+int fat16Init (void)
+{
+    debug_print ("fat16Init: [TODO]\n");
+
+    fat_cache_loaded = CACHE_NOT_LOADED;
+    fat_cache_saved  = CACHE_NOT_SAVED;
+
+    set_filesystem_type (FS_TYPE_FAT16);
+
+    // Structures and fat.
+
+    // #todo
+    fs_init_structures();
+    fs_init_fat();
+
+// done
+    debug_print ("fat16Init: done\n");
+    return 0;
+}
+
+void fs_init_structures (void)
+{
+    int Type=0;
+
+    debug_print ("fs_init_structures: [TODO]\n");
+
+//
+// The root file system.
+//
+    
+    // "/"
+    debug_print ("fs_init_structures: root\n");
+
+    root = (void *) kmalloc ( sizeof(struct filesystem_d) );
+
+    if ( (void *) root == NULL ){
+        panic ("fs_init_structures: Couldn't create the root structure.\n");
+    }else{
+        root->objectType  = ObjectTypeFileSystem;
+        root->objectClass = ObjectClassKernelObjects;
+        root->used  = TRUE;
+        root->magic = 1234;
+
+        // pointer
+        
+        root->name = (char *) ____root_name;
+        
+        
+        //
+        // #todo #bugbug   volume_vfs  ??
+        //
+        
+        // Se o volume do vfs ainda não foi criado 
+        // então não podemos prosseguir.
+        //if ( (void *) volume_vfs == NULL )
+        //{
+        //    debug_print("fs_init_structures: [FAIL] volume_vfs not initialized");
+        //    panic      ("fs_init_structures: [FAIL] volume_vfs not initialized");
+        //}
+        //volume_vfs->fs = root;
+        
+        
+        storage->fs = root;
+        //...
+    };
+
+
+//
+// Type
+// 
+    // #bugbug: 
+    // Em qual disco e volume pegamos o tipo de sistema de arquivos?
+    debug_print ("fs_init_structures: Type\n");
+
+
+    Type = (int) get_filesystem_type();
+
+    if ( Type <= 0 ){
+        panic ("fs_init_structures: [PANIC] Type");
+    }else{
+        root->type = (int) Type;
+    };
+
+    switch (Type){
+
+        case FS_TYPE_FAT16:
+
+            // Disk stuff.
+            // spc - Sectors per cluster.
+            root->spc = (int) VOLUME1_SPC;
+            //root->spc = (int) get_spc(); 
+            
+
+            // Rootdir, Fat and data area.
+            // #bugbug: Specific for fat16.
+            root->rootdir_address = VOLUME1_ROOTDIR_ADDRESS;
+            root->rootdir_lba     = VOLUME1_ROOTDIR_LBA;
+            root->fat_address     = VOLUME1_FAT_ADDRESS;
+            root->fat_lba         = VOLUME1_FAT_LBA;
+            root->dataarea_lba    = VOLUME1_DATAAREA_LBA;
+            //filesystem->dataarea_address = ??;
+ 
+            // Root dir.
+            
+            // Number of entries in the root dir.
+            // #bugbug: Specific for fat16.
+            root->dir_entries = FAT16_ROOT_ENTRIES;
+            
+            // Size of the entry in bytes.
+            // #bugbug: Specific for fat16.
+            root->entry_size = FAT16_ENTRY_SIZE;
+       
+            // ...
+            break;
+
+        // Nothing for now.
+        case FS_TYPE_EXT2:
+            panic ("fs_init_structures: [PANIC] FS_TYPE_EXT2 not supported");
+            break;
+
+        //...
+
+        // Nothing for now.
+        default:
+            panic ("fs_init_structures: [PANIC] default Type");
+            break;
+    };
+    
+    // Done.
+}
+
+void fs_init_fat (void)
+{
+    debug_print ("fs_init_fat: [TODO]\n");
+
+    // The root file system structure.
+    // "/"
+
+    if ( (void *) root == NULL ){
+        panic ("fs_init_fat: No root file system!\n");
+    }
+
+
+//
+// fat
+//
+    
+    fat = (void *) kmalloc ( sizeof(struct fat_d) );
+
+    if ( (void *) fat == NULL ){
+        panic ("fs_init_fat: No fat struture \n");
+    }else{
+
+        // Info.
+        fat->address = root->fat_address; 
+        fat->type    = root->type;
+
+        // Continua ...
+
+        // #todo
+        // Check this values.
+
+        if ( fat->address == 0 )
+            panic ("fs_init_fat: fat address \n");
+
+        // is it int ?
+        if ( fat->type <= 0 )
+            panic ("fs_init_fat: fat type \n");
+    };
+
+
+	// #bugbug
+	// N�o fizemos nada com a estrutura 'fat'
+	// tem que passar esse ponteiro para algum lugar.
+
+	// Continua a inicializa��o da fat.
+
+}
+
 
 
 

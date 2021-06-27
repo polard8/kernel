@@ -174,7 +174,7 @@ unsigned long SavedBPP;
 #include "hal/dev/blkdev/super.h"
 #include "hal/dev/blkdev/volume.h"
 #include "hal/dev/blkdev/disk.h"  
-
+#include "hal/dev/blkdev/storage.h" 
 
 // hal
 #include "hal/pit.h"
