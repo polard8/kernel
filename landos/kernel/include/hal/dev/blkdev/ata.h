@@ -479,13 +479,16 @@ int hdd_ata_wait_no_drq (int p);
 static void hdd_ata_pio_read ( int p, void *buffer, int bytes );
 void hdd_ata_pio_write ( int p, void *buffer, int bytes );
 
+
+// # Changing the lba type to 'unsigned int' 32 bit.
 int 
 pio_rw_sector ( 
     unsigned long buffer, 
-    unsigned long lba, 
+    unsigned int lba, 
     int rw, 
     int port,
     int slave );
+
 
 void 
 my_read_hd_sector ( 

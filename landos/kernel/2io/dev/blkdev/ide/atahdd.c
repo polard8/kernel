@@ -54,6 +54,7 @@ int hdd_ata_wait_no_drq (int p)
 }
 
 
+// #todo: buffer address 64bit
 static void hdd_ata_pio_read ( int p, void *buffer, int bytes )
 {
     //#todo
@@ -66,7 +67,7 @@ static void hdd_ata_pio_read ( int p, void *buffer, int bytes )
                 "c" (bytes/2));
 }
 
-
+// #todo: buffer address 64bit
 void hdd_ata_pio_write ( int p, void *buffer, int bytes )
 {
     //#todo
@@ -84,7 +85,7 @@ void hdd_ata_pio_write ( int p, void *buffer, int bytes )
  * pio_rw_sector:
  * 
  * IN:
- *   buffer - Buffer address
+ *   buffer - Buffer address. ??? virtual address ??
  *   lba - LBA number 
  *   rw - Flag read or write.
  *
@@ -93,18 +94,18 @@ void hdd_ata_pio_write ( int p, void *buffer, int bytes )
  *   (IDE PIO)
  */
 
+// # Changing the lba type to 'unsigned int' 32 bit.
+
 int 
 pio_rw_sector ( 
     unsigned long buffer, 
-    unsigned long lba, 
+    unsigned int lba, 
     int rw, 
     int port,
     int slave )
 {
-
     unsigned char c=0;
- 
-    unsigned long tmplba = (unsigned long) lba;
+    unsigned int tmplba = (unsigned int) lba;
 
     // msg?
     if ( port < 0 || port >= 4 )
@@ -245,12 +246,14 @@ again:
     {
 
         // read
+        // #todo: buffer address 64bit
         case 0x20:
             hdd_ata_pio_read ( (int) port, (void *) buffer, (int) 512 );
             break;
 
 
         // write
+        // #todo: buffer address 64bit
         case 0x30:
             hdd_ata_pio_write ( (int) port, (void *) buffer, (int) 512 );
 

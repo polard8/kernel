@@ -225,6 +225,8 @@ sc_again:
     // provisorio
     unsigned char ScanCode  = 0;
     unsigned char AsciiChar = 0;
+    
+    void *buffer;
 
     // pressionada
     // Vamos imprimir somente a tecla pressionada.
@@ -254,9 +256,19 @@ sc_again:
             //disk_init();
             //disk_show_info();
             //volume_init();
-            //volume_show_info();
+            volume_show_info();
             //ata_initialize(FORCEPIO);
-            //refresh_screen();
+            //show_ide_info();
+            buffer = kmalloc(1024);
+            if( (void*) buffer != NULL )
+            {
+                //pio_rw_sector(buffer,0,0x20,0,0);
+                //pio_rw_sector(buffer,0,0x20,0,0);
+                //pio_rw_sector(buffer,0,0x20,0,0);
+                pio_rw_sector(buffer,559,0x20,0,0);
+                printf("Buffer: %s\n",buffer);
+            }
+            refresh_screen();
         }
         if ( AsciiChar == VK_F7 ){ 
             Background_initialize();  // ok
