@@ -557,7 +557,7 @@ int init_executive (void){
 	// alguma coisa.
 
     debug_print ("init_executive: ataDialog\n");
-    //ataDialog ( 1, FORCEPIO, FORCEPIO );
+    ataDialog ( 1, FORCEPIO, FORCEPIO );
 
 	// ??
 	// configura a tabela do kernel de funções exportadas

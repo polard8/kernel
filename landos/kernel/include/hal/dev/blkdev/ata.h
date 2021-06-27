@@ -523,6 +523,33 @@ ataDialog (
     unsigned long long1, 
     unsigned long long2 );
 
+
+// ===
+
+uint32_t diskPCIScanDevice ( int class );
+int diskATAPCIConfigurationSpace ( struct pci_device_d *D );
+
+
+// ==
+
+unsigned char ata_wait_irq (void);
+int disk_ata_wait_irq (void);
+
+// ===
+
+int ide_identify_device ( uint8_t nport );
+int ide_dev_init (char port);
+void ide_mass_storage_initialize (void);
+
+
+// ==
+
+static inline void dev_switch (void);
+static inline int getnport_dev (void);
+static inline int getpid_dev (void);
+int nport_ajuste ( char nport );
+void show_ide_info (void);
+
 #endif    
 
 

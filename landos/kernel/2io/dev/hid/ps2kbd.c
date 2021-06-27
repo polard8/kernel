@@ -252,10 +252,11 @@ sc_again:
             //init_pci(); //We already called this one in the initialization.
             //pciInfo();
             //disk_init();
-            disk_show_info();
+            //disk_show_info();
             //volume_init();
-            volume_show_info();
-            refresh_screen();
+            //volume_show_info();
+            //ata_initialize(FORCEPIO);
+            //refresh_screen();
         }
         if ( AsciiChar == VK_F7 ){ 
             Background_initialize();  // ok
