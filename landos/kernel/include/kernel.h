@@ -151,7 +151,9 @@ unsigned long SavedBPP;
 #include "rtl/fs/fat_lfn.h"    // fat16 lfn.
 #include "rtl/fs/inode.h"
 #include "rtl/fs/exec_elf.h"
+#include "rtl/fs/pipe.h"
 #include "rtl/fs/fs.h"
+
 
 // hal
 #include "hal/ports64.h"

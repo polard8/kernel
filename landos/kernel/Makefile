@@ -37,7 +37,7 @@ storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 font.o \
-fs.o search.o \
+fs.o pipe.o search.o \
 disk_r.o disk_w.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
 desktop.o room.o userenv.o usession.o \
@@ -121,6 +121,7 @@ all-c:
 
 	# 0mem/sci/fs
 	gcc -c 0mem/sci/fs/fs.c      $(KINCLUDE) $(CFLAGS) -o fs.o
+	gcc -c 0mem/sci/fs/pipe.c    $(KINCLUDE) $(CFLAGS) -o pipe.o
 	gcc -c 0mem/sci/fs/search.c  $(KINCLUDE) $(CFLAGS) -o search.o
 
 	gcc -c 0mem/sci/fs/sdi/disk_r.c  $(KINCLUDE) $(CFLAGS) -o disk_r.o
