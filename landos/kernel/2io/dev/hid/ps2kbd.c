@@ -259,13 +259,24 @@ sc_again:
             volume_show_info();
             //ata_initialize(FORCEPIO);
             //show_ide_info();
-            buffer = kmalloc(1024);
+            buffer = kmalloc(1024*8);
             if( (void*) buffer != NULL )
             {
                 //pio_rw_sector(buffer,0,0x20,0,0);
                 //pio_rw_sector(buffer,0,0x20,0,0);
                 //pio_rw_sector(buffer,0,0x20,0,0);
-                pio_rw_sector(buffer,559,0x20,0,0);
+                //pio_rw_sector(buffer,559,0x20,0,0);
+                
+                fsLoadFile ( 
+                    VOLUME1_FAT_ADDRESS, 
+                    VOLUME1_ROOTDIR_ADDRESS, 
+                    FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
+                    "INIT    INI", 
+                    (unsigned long) buffer,
+                    (unsigned long) (1024*8) );
+                
+                printf("\n");
+                printf("\n");
                 printf("Buffer: %s\n",buffer);
             }
             refresh_screen();

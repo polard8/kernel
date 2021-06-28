@@ -564,7 +564,59 @@ void fs_show_inode_table(void);
 void fs_show_root_fs_info(void);
 void sys_pwd (void);
 
-//...
+
+// ======
+
+int 
+search_in_dir ( 
+    const char *file_name, 
+    unsigned long dir_address );
+
+int search_in_root ( const char *file_name );
+unsigned short fs_find_n_empty_entries ( int n );
+
+int 
+findEmptyDirectoryEntry ( 
+    unsigned long dir_address, 
+    int number_of_entries );
+
+int fsSearchFile (const char *file_name);
+unsigned short fs_find_empty_entry ( char *fat_address );
+int search_path_in_the_inode_table( const char *path );
+
+// =====
+
+int
+fsSaveFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    int dir_entries,
+    const char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag );
+
+int
+sys_write_file_to_disk ( 
+    char *file_name, 
+    unsigned long file_size,
+    unsigned long size_in_bytes,
+    char *file_address,
+    char flag );
+
+int 
+sys_read_file_from_disk ( 
+    char *file_name, 
+    int flags, 
+    mode_t mode );
+
+
+int sys_create_empty_file ( char *file_name );
+int sys_create_empty_directory ( char *dir_name );
+void set_global_open_file ( void *file, int Index );
+void *get_global_open_file (int Index);
+void sys_cd_command ( const char *string );
 
 #endif    
 
