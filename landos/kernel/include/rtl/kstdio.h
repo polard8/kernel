@@ -677,6 +677,8 @@ regularfile_ioctl (
 //=====================
 int stdioInitialize (void);
 
+// ===
+
 
 
 #endif    

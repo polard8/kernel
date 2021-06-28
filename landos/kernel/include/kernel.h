@@ -295,6 +295,7 @@ unsigned long SavedBPP;
 
 // ==============================
 
+#include "rtl/sci/sys.h"
 
 
 
