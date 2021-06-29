@@ -823,7 +823,7 @@ struct process_d
     // See: rtl/net/gdef.h
     // See: rtl/net/socket.h
 
-    //unsigned long socket_pending_list[SOCKET_MAX_PENDING_CONNECTIONS];
+    unsigned long socket_pending_list[SOCKET_MAX_PENDING_CONNECTIONS];
 
     int socket_pending_list_head;
     int socket_pending_list_tail;

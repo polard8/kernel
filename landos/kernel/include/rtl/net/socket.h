@@ -575,26 +575,100 @@ struct socket_d *LocalHostHTTPSocket;
 unsigned long socketList[SOCKET_COUNT_MAX];
 
 
+//
+// == prototypes =========================
+//
+
+struct socket_d *create_socket_object (void);
+unsigned long getSocketIP ( struct socket_d *socket );
+unsigned long getSocketPort ( struct socket_d *socket );
+struct socket_d *get_socket_from_fd (int fd);
+int is_socket (file *f);
+int is_virtual_console (file *f);
+void show_socket_for_a_process (int pid);
+
+int 
+socket_gramado ( 
+    struct socket_d *sock, 
+    int family, 
+    int type, 
+    int protocol );
+
+int 
+socket_inet ( 
+    struct socket_d *sock, 
+    int family,
+    int type, 
+    int protocol );
+
+int socket_init (void);
+int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
+
+
+int socket_read ( unsigned int fd, char *buf, int count );
+int socket_write ( unsigned int fd, char *buf, int count );
+int socket_set_gramado_port (int port, int pid);
+
+
+int 
+socket_unix ( 
+    struct socket_d *sock, 
+    int family, 
+    int type, 
+    int protocol );
+
+int 
+sys_accept (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
+
+int 
+sys_bind ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
+    
+int 
+sys_connect ( 
+    int sockfd, 
+    const struct sockaddr *addr,
+    socklen_t addrlen );
+
+int 
+sys_getsockname ( 
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen );
+
+int sys_listen (int sockfd, int backlog);
+
+int sys_socket_shutdown (int socket, int how);
+
+int 
+update_socket ( 
+    struct socket_d *socket, 
+    unsigned long ip, 
+    unsigned short port );
+
+
+int sys_socket ( int family, int type, int protocol );
+
+int
+sock_socketpair ( 
+    int family, 
+    int type, 
+    int protocol, 
+    int usockvec[2] );
+
+unsigned long 
+socket_dialog ( 
+    unsigned long number, 
+    unsigned long arg2, 
+    unsigned long arg3, 
+    unsigned long arg4 );
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

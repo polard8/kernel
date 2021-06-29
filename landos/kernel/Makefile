@@ -37,7 +37,7 @@ storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 font.o \
-fs.o pipe.o search.o \
+fs.o socket.o pipe.o search.o \
 disk_r.o disk_w.o \
 sys.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
@@ -111,6 +111,8 @@ all-c:
 	gcc -c 0mem/mm/mmpool.c  $(KINCLUDE) $(CFLAGS) -o mmpool.o
 	gcc -c 0mem/mm/pages.c   $(KINCLUDE) $(CFLAGS) -o pages.o
 
+
+	gcc -c 0mem/sci/net/socket/socket.c  $(KINCLUDE) $(CFLAGS) -o socket.o
 
 	# 0mem/rtl
 	gcc -c 0mem/rtl/ctype.c   $(KINCLUDE) $(CFLAGS) -o ctype.o
