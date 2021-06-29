@@ -100,3 +100,88 @@ void psTaskSwitch (void){
     // Retornando para _irq0 em x86/hw.inc.
 }
 
+/*
+ * get_task_status:
+ *     Obtem o status do mecanismo de taskswitch.
+ * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
+ */
+
+//#bugbug: Mudar para int.
+
+unsigned long get_task_status (void)
+{
+    return (unsigned long) task_switch_status;
+}
+
+/*
+ * set_task_status:
+ *    Configura o status do mecanismo de task switch.
+ *    Se o mecanismo de taskswitch estiver desligado 
+ * não ocorrerá a mudança.
+ *
+ * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
+ */ 
+
+// #bugbug: Mudar para int.
+
+void set_task_status( unsigned long status )
+{
+    task_switch_status = (unsigned long) status;
+}
+
+
+void taskswitch_lock (void){
+    task_switch_status = (unsigned long) LOCKED;
+}
+
+void taskswitch_unlock (void){
+    task_switch_status = (unsigned long) UNLOCKED;
+}
+
+// Internal
+// Call extra routines scheduled to this moment.
+// called by task_switch.
+// #importante:
+// Checaremos por atividades extras que foram agendadas pelo 
+// mecanismo de request. Isso depois do contexto ter sido 
+// salvo e antes de selecionarmos a próxima thread.
+
+void tsCallExtraRoutines(void)
+{
+
+    debug_print ("tsCallExtraRoutines: [FIXME] \n");
+
+    // Kernel requests.
+    //KiRequest();
+
+    // Unix signals.
+    //KiSignal();
+
+    // ...
+
+    // #todo: 
+    // Talvez possamos incluir mais atividades extras.
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -41,10 +41,11 @@ fs.o socket.o pipe.o search.o \
 disk_r.o disk_w.o \
 sys.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
-desktop.o room.o userenv.o usession.o \
 kgwm.o vt.o \
-x64cont.o x64fault.o \
-ts.o process.o thread.o threadi.o create.o queue.o mk.o \
+desktop.o room.o userenv.o usession.o \
+ts.o dispatch.o spawn.o x64cont.o x64fault.o \
+sched.o schedi.o \
+process.o thread.o threadi.o create.o queue.o mk.o \
 memory.o mminfo.o mmpool.o pages.o \
 panic.o reboot.o request.o    
 
@@ -103,7 +104,14 @@ all-c:
 
 	# ps/disp
 	gcc -c 0mem/core/ps/disp/ts.c   $(KINCLUDE)  $(CFLAGS) -o ts.o  
+	gcc -c 0mem/core/ps/disp/dispatch.c  $(KINCLUDE)  $(CFLAGS) -o dispatch.o  
+	gcc -c 0mem/core/ps/disp/spawn.c     $(KINCLUDE)  $(CFLAGS) -o spawn.o  
+
 	gcc -c 0mem/core/ps/disp/x86_64/x64cont.c   $(KINCLUDE)  $(CFLAGS) -o x64cont.o  
+
+	gcc -c 0mem/core/ps/sched/sched.c   $(KINCLUDE)  $(CFLAGS) -o sched.o  
+	gcc -c 0mem/core/ps/sched/schedi.c  $(KINCLUDE)  $(CFLAGS) -o schedi.o  
+
 
 	# 0mem/mm
 	gcc -c 0mem/mm/memory.c  $(KINCLUDE) $(CFLAGS) -o memory.o

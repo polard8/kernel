@@ -50,32 +50,30 @@ int dispatcherQueueIndex;
 //typedef struct dispatch_count_d dispatch_count_t;
 struct dispatch_count_d
 {
-	//Quando selecionamos a idle.
-	unsigned long SelectIdleCount;
-	
-	//Quando selecionamos uma thread no momento de sua inicialização.
-	unsigned long SelectInitializedCount;
-	
-	//Quando selecionamos a próxima indicada na estrutura da thead.
-    unsigned long SelectNextCount;
-	
-	unsigned long SelectCurrentCount;
+    // Quando selecionamos a idle.
+    unsigned long SelectIdleCount;
 
-    //Quando selecionamos uma procurando por ela.	
+    // Quando selecionamos uma thread no momento de sua inicialização.
+    unsigned long SelectInitializedCount;
+
+    // Quando selecionamos a próxima indicada na estrutura da thead.
+    unsigned long SelectNextCount;
+
+    unsigned long SelectCurrentCount;
+
+    // Quando selecionamos uma procurando por ela.	
     unsigned long SelectAnyCount;
 
-	//selecionamos a melhor possivel.
+    // Selecionamos a melhor possivel.
     unsigned long SelectIdealCount;	
 
-	//Quando selecionamos a proxima na fila do dispatcher.
-	unsigned long SelectDispatcherQueueCount;
-	
-	//...
+    // Quando selecionamos a proxima na fila do dispatcher.
+    unsigned long SelectDispatcherQueueCount;
+
+    // ...
 };
 
 struct dispatch_count_d  *DispatchCountBlock;
-//dispatch_count_t *DispatchCountBlock;
-
 
 
 // exemplo:
@@ -119,7 +117,9 @@ unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 // == prototypes ===============================
 //
 
+void IncrementDispatcherCount ( int type );
 
+void dispatcher ( int type );
 
 #endif    
 
@@ -127,4 +127,20 @@ unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 //
 // End.
 //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

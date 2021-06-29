@@ -9,6 +9,15 @@
 // functions to 'save' and 'restore' context.
 
 
+//
+// == prototypes ==============
+//
+
+void save_current_context (void);
+void restore_current_context (void);
+
+int contextCheckThreadRing3Context (int tid);
+
 #endif    
 
 

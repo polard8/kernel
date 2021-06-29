@@ -12,6 +12,14 @@ void task_switch (void);
 void psTaskSwitch (void);
 
 
+unsigned long get_task_status (void);
+void set_task_status( unsigned long status );
+
+void taskswitch_lock (void);
+void taskswitch_unlock (void);
+
+void tsCallExtraRoutines(void);
+
 #endif    
 
 

@@ -829,8 +829,15 @@ void kill_thread (int tid);
 void kill_all_threads (void);
 
 
+// ==
+
+void spawn_thread (int tid);
+void KiSpawnThread (int tid);
 
 #endif    
+
+
+
 
 
 
