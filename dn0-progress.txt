@@ -1,0 +1,12 @@
+
+
+    Para a rotina de progress podemos usar a seguinte contagem,
+
+    PROGRESS("KERNEL:1:0) ... indicando phase 1 step 0.
+    PROGRESS("KERNEL:3:0) ... indicando phase 3 step 1.
+
+    poderemos corrigir isso no gramado de 64bit e no gramado de 32bit.
+    faremos isso somente depois de portarmos o sistema inteiro para 64bit..
+    pois a aintiga contagem esta servindo de guia.
+
+

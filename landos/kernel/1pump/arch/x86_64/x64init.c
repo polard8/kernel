@@ -3,9 +3,24 @@
 #include <kernel.h>
 
 
-//
-// MAIN
-//
+
+// Função local.
+// Inicializa só o init.bin
+
+void __x64StartInit (void)
+{
+    //#todo
+    debug_print ("__x64StartInit: [TODO]\n");
+    panic ("__x64StartInit: [TODO]\n");
+}
+
+// local
+void x64mainStartFirstThread (void)
+{
+    //#todo
+    debug_print ("x64mainStartFirstThread: [TODO]\n");
+    panic ("x64mainStartFirstThread: [TODO]\n");
+}
 
 
 /*
@@ -40,7 +55,7 @@ int x64main (void)
     if (current_arch != CURRENT_ARCH_X86_64)
     {
         debug_print ("[x64] x64main: current_arch fail\n");
-        x_panic     ("[x64] x64main: current_arch fail\n"); 
+        x_panic     ("[x64] x64main: current_arch fail\n");
     }
 
     // Threads counter.
@@ -52,12 +67,12 @@ int x64main (void)
     PROGRESS("Kernel:1:1\n"); 
     // sse support.
 
+    debug_print ("[x64] x64main: [TODO] SSE support\n");
     // x86_sse_init();
 
 //
-// =================================================================
+// ======================================================
 //
-
     //
     // == phase 0 ========================================
     //
@@ -74,18 +89,16 @@ int x64main (void)
     // ?? #todo: this is not a x86 thing.
     gSystemEdition = 0;
 
-
-    //
-    // hypervisor
-    //
-
+//
+// Hypervisor
+//
     // Initializing the variable.
     // #todo: this is not a x86 thing.
 
     g_is_qemu = FALSE;
 
 //
-// ====================================================================
+// ===============================================================
 //
 
 	// Antes de tudo: 
@@ -97,6 +110,7 @@ int x64main (void)
 
     // Essa rotina só pode ser chamada 
     // durante essa fase da inicialização.
+
     if ( KeInitPhase != 0 ){
         x_panic ("x64main: KeInitPhase");
     }
@@ -105,10 +119,10 @@ int x64main (void)
     PROGRESS("Kernel:1:2\n"); 
     // Calling 'init' kernel module. 
 
-    debug_print ("x64main: Calling init()\n");
-
     // See: 
     // core/init.c
+
+    debug_print ("x64main: Calling init()\n");
 
     Status = (int) init(); 
  
@@ -119,19 +133,14 @@ int x64main (void)
     }
 
     // ...
-    
-    // #bugbug
+
     // Testando o funcionamento das estruturas de console. tty.
     //set_up_cursor(0,1);
     //console_outbyte('f',fg_console);
-    //refresh_screen();
-    //while(1){}
-
 
     //printf("*breakpoint\n");
     //refresh_screen();
     //while(1){}
-
 
 
 // Done: 
@@ -163,9 +172,7 @@ int x64main (void)
 //
 // == phase 3 ? ================================================
 //
-    
-    KeInitPhase = 3; 
-
+    KeInitPhase = 3;
 
 //================================
     PROGRESS("Kernel:1:3\n"); 
@@ -174,9 +181,11 @@ int x64main (void)
     // Initialize all the kernel graphics support.
     // some extra things like virtual terminal and tty.
     // #todo: rever essa inicializaçao.
-    // See: users/kgws.c
+    
+    // See: 
+    // users/kgws.c
 
-    //KGWS_initialize();
+    KGWS_initialize();
 
     // debug
     //printf("~kgws\n");
@@ -382,6 +391,7 @@ int x64main (void)
     return 0;
 
 // ===============================
+
 // ===============================
 
 // fail
@@ -393,11 +403,11 @@ int x64main (void)
 fail:
 //================================
     PROGRESS("Kernel:1:00\n"); 
-    
     debug_print ("[x64] x64main: fail\n");
     refresh_screen (); 
     return -1;
 }
+
 
 
 

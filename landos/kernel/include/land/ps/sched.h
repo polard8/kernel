@@ -74,6 +74,8 @@ int wakeup_scan_thread_reason ( int reason );
 void wakeup_thread (int tid);
 void yield (int tid);
 
+void check_for_standby (void);
+
 #endif    
 
 

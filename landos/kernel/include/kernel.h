@@ -278,9 +278,7 @@ unsigned long SavedBPP;
 #include "land/mm/mmglobal.h"  // Deve ficar mais acima.
 #include "land/mm/heap.h"      // Heap pointer support.
 #include "land/mm/aspace.h"    // Address Space, (data base account).
-
 #include "land/mm/bank.h"      // Bank. database
-
 #include "land/mm/x64mm.h"     // mm, memory manager support.
 
 #include "land/object.h"
@@ -289,10 +287,10 @@ unsigned long SavedBPP;
 #include "land/pints.h"
 
 #include "rtl/runtime.h"
-
 #include "land/request.h"
+#include "land/gpid.h"      // Globals. PIDs support.
+#include "land/info.h"      // last one?
 
-#include "land/info.h"  
 
 // ==============================
 

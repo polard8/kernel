@@ -690,6 +690,84 @@ void yield (int tid){
     }
 }
 
+/*
+ * check_for_standby:
+ *
+ * Check for a thread in standby.
+ * In this case, this routine will not return.
+ * 
+ * Procura na lista de threads no estado StandyBy.
+ * Se tiver uma thread nessa lista, ela se torna 
+ * a current. Para rodar pela primeira vez, atravéz de Spawn.
+ * Não retorna se encontrar uma threa na lista.
+ */
+
+// Called by task_switch().
+
+void check_for_standby (void){
+
+    // loop
+    register int i = 0;
+    register int Max = 32;  // max what?
+    int newId=0;
+    struct thread_d  *New;
+
+
+#ifdef SERIAL_DEBUG_VERBOSE
+    debug_print (" check_for_standby ");
+#endif
+
+    do {
+
+        New = (void *) queue->standbyList[i];
+
+        if ( (void *) New != NULL )
+        {
+            if ( New->used  == TRUE && 
+                 New->magic == 1234 && 
+                 New->state == STANDBY ) 
+            {
+                current_thread = (int) New->tid;
+                goto do_spawn;
+            }
+        }
+
+        i++;
+
+    } while (i < Max);  
+
+// Done: 
+// Nenhuma tarefa precisa ser inicializada.
+// Podemos apenas retornar para o taskswitch.
+
+#ifdef SERIAL_DEBUG_VERBOSE
+    debug_print (" Nothing ");
+#endif
+
+    return;
+
+//
+// == SPAWN ===============
+//
+    // spawn.c
+
+do_spawn:
+
+#ifdef SERIAL_DEBUG_VERBOSE
+    debug_print(" SPAWN \n");
+#endif
+
+    // #todo
+    // if ( current_thread < 0 ...
+
+    // See: spawn.c
+    KiSpawnThread ( current_thread );
+
+    // Not reached.
+    panic ("check_for_standby: ERROR\n");
+}
+
+
 //
 // End.
 //

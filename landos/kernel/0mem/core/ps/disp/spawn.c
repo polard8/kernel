@@ -11,21 +11,18 @@ void spawn_thread (int tid)
 // KiSpawnTask:
 // Interface to spawn a thread.
 
-void KiSpawnThread (int tid){
-
+void KiSpawnThread (int tid)
+{
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         printf ("KiSpawnThread: TID=%d\n", tid );
-        die ();
+        die();
     }
 
     spawn_thread (tid);
 
     panic ("KiSpawnThread\n");
 }
-
-
-
 
 
 

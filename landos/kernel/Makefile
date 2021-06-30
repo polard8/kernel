@@ -41,7 +41,7 @@ fs.o socket.o pipe.o search.o \
 disk_r.o disk_w.o \
 sys.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
-kgwm.o vt.o \
+kgws.o kgwm.o vt.o \
 desktop.o room.o userenv.o usession.o \
 ts.o dispatch.o spawn.o x64cont.o x64fault.o \
 sched.o schedi.o \
@@ -204,7 +204,8 @@ all-c:
 # == user ======== 
 #
 
-	gcc -c user/kgwm.c   $(KINCLUDE) $(CFLAGS) -o kgwm.o
+	gcc -c user/kgws.c  $(KINCLUDE) $(CFLAGS) -o kgws.o
+	gcc -c user/kgwm.c  $(KINCLUDE) $(CFLAGS) -o kgwm.o
 
 	gcc -c user/vt.c   $(KINCLUDE) $(CFLAGS) -o vt.o
 
