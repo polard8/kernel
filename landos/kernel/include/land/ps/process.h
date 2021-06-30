@@ -887,7 +887,18 @@ void CloseAllProcesses (void);
 void show_currentprocess_info (void);
 void show_process_information (void);
 
+// ===
 
+struct process_d *create_process ( 
+    struct room_d    *room,
+    struct desktop_d *desktop,
+    struct window_d  *window,
+    unsigned long base_address, 
+    unsigned long priority, 
+    int ppid, 
+    char *name, 
+    unsigned long iopl,
+    unsigned long pml4_va );
 
 #endif    
 

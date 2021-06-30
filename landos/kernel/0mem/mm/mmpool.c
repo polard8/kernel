@@ -143,7 +143,7 @@ void *newPage (void){
                 // Use pml4 address
 
                 // Pegando o endereço físico.
-                pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
+                pa = (unsigned long) virtual_to_physical ( va, gKernelPML4Address ); 
 
                 //
                 // Calculando o número do pageframe.
@@ -375,23 +375,21 @@ void *allocPages (int size){
 			p->magic = 1234;
 
 			//not free
-			p->free = 0;  
+			p->free = 0;
 
 			//----
-			
+
 			p->locked = 0;
-			
+
 			//contador de referências
 			p->ref_count = 1;
-			
-	
+
 			// #fixme
 			// Precisamos usar pml4
-			
-			//pegando o endereço virtual.
-			va = (unsigned long) ( base + (p->id * 4096) );    
-			pa = (unsigned long) virtual_to_physical ( va, gKernelPageDirectoryAddress ); 
-			
+
+            // Pegando o endereço virtual.
+            va = (unsigned long) ( base + (p->id * 4096) ); 
+            pa = (unsigned long) virtual_to_physical ( va, gKernelPML4Address ); 
 
             if ( ( pa % PAGE_SIZE) != 0 ) 
             {

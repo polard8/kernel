@@ -197,8 +197,8 @@ int x64main (void)
     PROGRESS("Kernel:1:4\n"); 
     // Initialize window server manager.
 
-    //ws.c
-    //ws_init();
+    // 2io/ws.c
+    ws_init();
 
     // debug
     //printf("~ws\n");
@@ -343,6 +343,18 @@ int x64main (void)
 //================================
     PROGRESS("Kernel:1:12\n"); 
     // font support.
+
+    //
+    // Fonts.
+    //
+    
+    // #bugbug
+    // Font is independent from the x86 archtechture.
+    // We can do this in some other place. Maybe :)
+ 
+    // See: config/config.h
+    //gfontSize = DEFAULT_FONT_SIZE;
+
 
 
 //================================

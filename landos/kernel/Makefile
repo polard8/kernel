@@ -40,6 +40,7 @@ font.o \
 fs.o socket.o pipe.o search.o \
 disk_r.o disk_w.o \
 sys.o \
+ws.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
 kgws.o kgwm.o vt.o \
 desktop.o room.o userenv.o usession.o \
@@ -161,6 +162,8 @@ all-c:
 #
 # == 2io ======== 
 #
+
+	gcc -c 2io/ws.c  $(KINCLUDE) $(CFLAGS) -o ws.o
 
 	# 2io/bus/pcibus/
 	gcc -c 2io/bus/pcibus/pci.c     $(KINCLUDE) $(CFLAGS) -o pci.o

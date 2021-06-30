@@ -21,9 +21,9 @@
 #define PAGETABLE_COUNT_MAX 1024 
 
 
-
-unsigned long gKernelPageDirectoryAddress; 
-
+//#deprecated, use pml4 instead.
+//unsigned long gKernelPageDirectoryAddress; 
+unsigned long gKernelPML4Address; 
 
 //
 // == zones ==================================================

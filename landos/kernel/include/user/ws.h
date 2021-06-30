@@ -385,9 +385,30 @@ typedef enum {
 // == prototypes ==============================================
 //
 
+int ws_init (void);
 
+int 
+ws_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
+void ws_show_info(void);
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -148,7 +148,7 @@ virtual_to_physical (
     unsigned long pml4_va ) 
 {
 
-    panic ("virtual_to_physical: todo\b");
+    panic ("virtual_to_physical: [TODO] \n");
     return 0;
 }
 
@@ -275,9 +275,6 @@ int mmSetUpPaging (void)
     //
 
     // 0x0009C000 = Kernel page directory
-    // See:
-    gKernelPageDirectoryAddress = KERNEL_PD_PA;    
-
 
 
     // 9 9 9 9 12
