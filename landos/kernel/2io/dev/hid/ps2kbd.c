@@ -227,6 +227,7 @@ sc_again:
     unsigned char AsciiChar = 0;
     
     void *buffer;
+    unsigned long tmp=0;
 
     // pressionada
     // Vamos imprimir somente a tecla pressionada.
@@ -284,7 +285,9 @@ sc_again:
         if ( AsciiChar == VK_F7 ){ 
             Background_initialize();  // ok
             //hal_reboot(); 
-            x64_info();
+            //x64_info();
+            tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
+            printf ("Phys: %x\n",tmp);
             refresh_screen();
         }
         if ( AsciiChar == VK_F8 ){ 

@@ -42,6 +42,11 @@
 #define CONTROLTHREAD_ENTRYPOINT  0x00401000  // entry point
 #define CONTROLTHREAD_STACK       0x005FFFF0  // stack
 
+// Isso porque endereços físicos e virtuais são igual para
+// baixo de 1 mb.
+#define KERNEL_PML4_VA 0x000000000009C000
+
+
 
 #define KERNEL_IMAGE_BASE  0x30000000  
 

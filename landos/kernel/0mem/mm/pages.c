@@ -141,16 +141,73 @@ void notfreePage (struct page_d *p)
 }
 
 
-//#todo
+// #todo
 unsigned long 
 virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va ) 
 {
-
     panic ("virtual_to_physical: [TODO] \n");
-    return 0;
+    return (unsigned long) virtual_to_physical2 (virtual_address,pml4_va);
 }
+
+
+//#test
+unsigned long 
+virtual_to_physical2 ( 
+    unsigned long virtual_address, 
+    unsigned long pml4_va ) 
+{
+
+    debug_print ("virtual_to_physical2: [NOT TESTED] \n");
+
+    unsigned int a = (unsigned int) virtual_address >> 39 & 0x1FF;   //  9 bits de pml4
+    unsigned int b = (unsigned int) virtual_address >> 30 & 0x1FF;   //  9 bits de pdpt
+    unsigned int d = (unsigned int) virtual_address >> 21 & 0x1FF;   //  9 bits de page directory
+    unsigned int t = (unsigned int) virtual_address >> 12 & 0x1FF;   //  9 bits de page table. 
+    unsigned int o = (unsigned int) (virtual_address      & 0xFFF ); // 12 bits de offset
+
+    unsigned long tmp=0;
+    unsigned long address=0;
+
+
+    if (pml4_va == 0){
+        panic ("virtual_to_physical: [FAIL] Invalid pml4_va\n");
+    }
+
+// ==============================
+// pml4
+    unsigned long *pml4VA = (unsigned long *) pml4_va;
+
+    // Temos o pdpt junto com suas flags.
+    tmp = (unsigned long) pml4VA[a];
+
+// ==============================
+// page directory pointer table.
+    unsigned long *ptpt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
+
+    // Temos o pd junto com suas flags.
+    tmp = (unsigned long) ptpt[b];
+
+// ==============================
+// page diretory
+    unsigned long *dir = (unsigned long *) (tmp & 0xFFFFFFFFF000);
+
+    // Temos o endereço da pt junto com as flags.
+    tmp = (unsigned long) dir[d];
+
+    // Page table.
+    unsigned long *pt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
+
+    // Encontramos o endereço base do page frame.
+    tmp = (unsigned long) pt[t];
+
+    address = (tmp & 0xFFFFFFFFF000);
+
+    // Physical address.
+    return (unsigned long) (address + o);
+}
+
 
 
 // #todo
@@ -296,6 +353,8 @@ int mmSetUpPaging (void)
 // PD   - Page Directory
 // PT   - Page Table
 
+    // isso porque endereço físico e virtual são igual abaixo de 1 mb.
+    gKernelPML4Address = KERNEL_PML4_VA;
 
     // level 4
     unsigned long *kernel_pml4 = (unsigned long *) KERNEL_PML4_PA;

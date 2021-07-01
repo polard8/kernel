@@ -1126,11 +1126,21 @@ int pEmpty (struct page_d *p);
 void freePage (struct page_d *p);
 void notfreePage (struct page_d *p);
 
+
+
 //#todo
 unsigned long 
 virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va );
+
+//#test
+unsigned long 
+virtual_to_physical2 ( 
+    unsigned long virtual_address, 
+    unsigned long pml4_va );
+
+
 
 
 // #todo
