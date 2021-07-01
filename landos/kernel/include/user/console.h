@@ -123,6 +123,11 @@ console_ioctl (
     unsigned long arg );
 
 
+void REFRESH_STREAM ( file *f );
+
+int kclear (int color, int console_number);
+int kclearClientArea (int color);
+
 #endif    
 
 

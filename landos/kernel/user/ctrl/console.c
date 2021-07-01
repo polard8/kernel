@@ -655,72 +655,6 @@ void console_scroll (int console_number)
 
 
 /*
- *************************************** 
- * console_putchar:
- *     Put a char into the screen of a virtual console.
- */
-
-// #importante
-// Colocamos um caractere na tela de um console virtual.
-
-// #bugbug: 
-// Como essa rotina escreve na memória de vídeo,
-// então precisamos, antes de uma string efetuar a
-// sincronização do retraço vertical e não a cada char.
-
-/*
- 
-// #todo
-// We have a dependence here.
-// The function refresh_rectangle()
-
-void console_putchar ( int c, int console_number );
-void console_putchar ( int c, int console_number )
-{
-    // Getting char info.
-    int cWidth  = get_char_width();
-    int cHeight = get_char_height();
-
-
-    if ( cWidth == 0 || cHeight == 0 )
-    {
-        x_panic ("console_putchar: char\n");
-    }
-
-    // flag on.
-    stdio_terminalmode_flag = TRUE;
-
-    // #todo
-    // Check these limits.
-
-    //  Console limits
-    // CONSOLETTYS_COUNT_MAX
-    // See: tty.h
-
-    if ( console_number < 0 || console_number > 3 )
-    {
-        x_panic ("console_putchar: console_number\n");
-    }
-
-    // Draw and copy
-    // Draw the char into the backbuffer and
-    // copy a small rectangle to the frontboffer.
-
-    console_outbyte( (int) c, console_number );
-
-    refresh_rectangle ( 
-        (CONSOLE_TTYS[console_number].cursor_x * cWidth), 
-        (CONSOLE_TTYS[console_number].cursor_y * cHeight), 
-        cWidth, 
-        cHeight );
-
-    // flag off.
-    stdio_terminalmode_flag = FALSE; 
-}
-*/
-
-
-/*
  *********************************************
  * console_outbyte:
  *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
@@ -1880,6 +1814,122 @@ console_ioctl (
 
     return -1;
 }
+
+/*
+ *******************************************
+ * REFRESH_STREAM:
+ * 
+ *     #IMPORTANTE
+ *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
+ */
+
+// #todo
+// Change this name. 
+// Do not use stream in the base kernel.
+
+void REFRESH_STREAM ( file *f )
+{
+    // loop
+    int i=0;
+    int j=0;
+
+    char *ptr;
+
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
+
+
+    debug_print("console.c-REFRESH_STREAM: [FIXME] It is wrong!\n");
+
+    if ( cWidth == 0 || cHeight == 0 )
+    {
+        panic ("REFRESH_STREAM: [FAIL] char w h\n");
+    }
+
+
+    j = (80*25);
+
+    //
+    // File
+    //
+
+    // #bugbug
+    // Tem que checar a validade da estrutura e do ponteiro base.
+    if ( (void *) f == NULL )
+    { 
+        panic ("REFRESH_STREAM: [FAIL] f\n");
+    }
+
+
+    // Pointer
+
+    ptr = f->_base;
+
+    // #bugbug
+    // Tem que checar a validade da estrutura e do ponteiro base.
+    //if ( (void *) c == NULL ){ ? }
+
+    // Seleciona o modo terminal.
+
+    //++
+    stdio_terminalmode_flag = TRUE; 
+    for ( i=0; i<j; i++ )
+    {
+        printf ("%c", *ptr );
+
+        // #bugbug
+        // It is very wrong!
+        
+        refresh_rectangle ( 
+            (CONSOLE_TTYS[fg_console].cursor_x * cWidth), 
+            (CONSOLE_TTYS[fg_console].cursor_y * cHeight),  
+            cWidth, 
+            cHeight );
+
+        ptr++;
+    };
+    stdio_terminalmode_flag = FALSE; 
+    //--
+}
+
+/*
+ * kclear:
+ *     Limpa a tela
+ */
+
+int kclear (int color, int console_number)
+{
+    int Status = -1;
+
+
+    if ( VideoBlock.useGui == 1 )
+    {
+        backgroundDraw ( COLOR_BLUE );
+        
+        CONSOLE_TTYS[console_number].cursor_x = 0; 
+        CONSOLE_TTYS[console_number].cursor_y = 0; 
+        Status = 0;
+        
+    }else{ Status = -1; };
+
+    return (int) Status;
+}
+
+int kclearClientArea (int color)
+{
+    debug_print("kclearClientArea: deprecated\n");
+
+    return (int) kclear (color, fg_console);
+}
+
+
+
+
+
+
+
+
+
 
 
 
