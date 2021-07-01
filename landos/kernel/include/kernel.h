@@ -270,6 +270,7 @@ unsigned long SavedBPP;
 // devices
 #include "hal/dev/devmgr.h"      
 
+#include "hal/io.h"               //io.
 
 #include "land/init.h"
 #include "land/debug.h"

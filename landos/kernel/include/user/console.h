@@ -116,6 +116,13 @@ console_write (
 int VirtualConsole_initialize(void);
 
 
+int 
+console_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
+
 #endif    
 
 

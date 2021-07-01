@@ -1800,6 +1800,91 @@ int VirtualConsole_initialize(void)
     return 0;
 }
 
+/*
+ ********************************************** 
+ * console_ioctl:
+ * 
+ */
+
+// Podemos mudar as características de um console.
+
+int 
+console_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print ("console_ioctl: TODO\n");
+
+    // #todo: Check overflow
+    if (fd<0){
+        debug_print ("console_ioctl: [ERROR] fd\n");
+        return -1;
+    }
+
+    // #todo: Check overflow
+    if (fg_console<0){
+        debug_print ("console_ioctl: [ERROR] fg_console\n");
+        return -1;
+    }
+
+
+    switch (request){
+
+    // #test
+    // Change the color of the char for the current virtual console.
+    // ok. it is working.
+    case 1000:
+        CONSOLE_TTYS[fg_console].cursor_color = (unsigned long) arg;
+        return 0;  //ok
+        break;
+
+    // cursor x position
+    // #bugbug #todo  limits
+    case 1001:
+        CONSOLE_TTYS[fg_console].cursor_x = 0;  return 0;
+        break;
+
+    // cursor y position
+    // #bugbug #todo  limits
+    case 1002:
+        CONSOLE_TTYS[fg_console].cursor_y = 0;  return 0;
+        break;
+
+    // switching the current virtual console.
+    // We have onlu 4 virtual consoles.
+    case 1003:
+        if ( arg >= 0 && arg < CONSOLETTYS_COUNT_MAX )
+        { 
+            fg_console = arg;
+            return 0; 
+        }
+        return -1;
+        break; 
+
+    // #todo:
+    // There is no fflush here in ring0.
+    // The ring3 libc is doing this job using write.
+    case TCIFLUSH:
+        debug_print ("console_ioctl: [TEST] flush\n");
+        break;
+        
+    // #todo: Yes, we can return data from the console tty termios. 
+    // case TCGETS:
+    // ...
+    
+    default:
+        debug_print ("console_ioctl: [TODO] request\n");
+        break;
+    };
+
+    return -1;
+}
+
+
+
+
+
 
 
 
