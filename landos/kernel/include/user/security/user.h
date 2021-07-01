@@ -256,9 +256,11 @@ struct user_info_d
  
     //=========================
 
-	//user type.
-    //user_type_t userType;	
-	
+
+    // user type.
+    user_type_t userType;
+
+
 	//#importante:
 	//Olhe as explicações logo acima.
 	//user_display_mode_t display_mode;
@@ -291,14 +293,20 @@ unsigned long userList[USER_COUNT_MAX];
 
 
 
+//
+// == prototypes ====================
+//
 
-
-
-
-
-
-
+int GetCurrentGroupId (void);
+int GetCurrentUserId (void);
+void SetCurrentUserId (int user_id);
+int is_superuser(void);
+int __getusername (char *buffer);
+int __setusername ( const char *new_username );
+void *CreateUser ( char *name, int type );
 
 #endif    
+
+
 
 

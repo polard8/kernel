@@ -353,6 +353,39 @@ tty_write (
     char *buffer, 
     int n );
 
+
+void tty_reset_termios ( struct tty_d *tty );
+struct tty_d *tty_create(void);
+
+
+struct tty_d *file_tty (file *f);
+int tty_delete ( struct tty_d *tty );
+void tty_flush( struct tty_d *tty );
+void tty_start (struct tty_d *tty);
+void tty_stop (struct tty_d *tty);
+
+int 
+tty_gets ( 
+    struct tty_d *tty, 
+    struct termios *termiosp );
+
+int 
+tty_sets ( 
+    struct tty_d *tty, 
+    int options, 
+    struct termios *termiosp );
+
+int tty_init_module (void);
+
+
+int 
+tty_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg );
+
+
+
 #endif    
 
 

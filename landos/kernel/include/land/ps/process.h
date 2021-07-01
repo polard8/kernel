@@ -31,30 +31,34 @@
 //  e ser� carregado no endere�o virtual 0x400000, logicamente
 //  cada processo ser� carregado em um endere�o f�sico diferente."
 
-//#define UPROCESS_IMAGE_BASE 0x400000 
+// old, used in gramado 32bit
+//#define UPROCESS_IMAGE_BASE  0x400000
+// new, used in gramado 64bit
+#define UPROCESS_IMAGE_BASE  0x200000 
+
 
 //Process Limit. (User process) 
 //(O limite � o in�cio do kernel).
 //#define UPROCESS_PROCESS_LIMIT 0xC0000000    
-
+#define UPROCESS_PROCESS_LIMIT 0x30000000    
 
 // Heap.
 // Base default do heap do processo.
 // "Endere�o virtual de onde come�a o heap de um processo,
 //  evidentemente, cada processo ter� seu heap em um 
 //  endere�o f�sico diferente".
-//
-//#define UPROCESS_DEFAULT_HEAP_BASE  0x80000000 
+
+#define UPROCESS_DEFAULT_HEAP_BASE  0x80000000 
 //Tamanho default do heap do processo.  
-//#define UPROCESS_DEFAULT_HEAP_SIZE  0x2000     
+#define UPROCESS_DEFAULT_HEAP_SIZE  0x2000     
 
 //Stack.
 //Deslocamento default do in�cio da pilha em rela��o ao in�cio do kernel. #bugbug
-//#define UPROCESS_DEFAULT_STACK_OFFSET 0x2000   
+#define UPROCESS_DEFAULT_STACK_OFFSET 0x2000   
 //Base default da pilha do processo.
-//#define UPROCESS_DEFAULT_STACK_BASE ( UPROCESS_PROCESS_LIMIT - UPROCESS_DEFAULT_STACK_OFFSET )  
+#define UPROCESS_DEFAULT_STACK_BASE ( UPROCESS_PROCESS_LIMIT - UPROCESS_DEFAULT_STACK_OFFSET )  
 //Tamanho da pilha do processo.   
-//#define UPROCESS_DEFAULT_STACK_SIZE 0x2000    
+#define UPROCESS_DEFAULT_STACK_SIZE 0x2000    
 
 
 
@@ -382,7 +386,9 @@ struct process_d
 	// deve ser atribu�do a ele, mesmo antes de mapear os frames desse 
 	// framepool em alguma pagetable do page directory do processo.
 
-    //struct frame_pool_d *framepoolListHead;
+    // See: mm/x64mm.h
+
+    struct frame_pool_d *framepoolListHead;
 
 	//Quantidade de mem�ria f�sica usada pelo processo que n�o pode ser compartilhada
 	//com outros processos. (em KB).
@@ -495,10 +501,12 @@ struct process_d
     unsigned long childStackPA; 
 
 
-	//#todo: estrutura com informa��es sobre a imagem do processo.
-	//see: pc/image.h
-    //struct image_info_d *image_info;
-	
+    //#todo: estrutura com informa��es sobre a imagem do processo.
+    //see: image.h
+
+    struct image_info_d *image_info;
+
+
 	//#test
 	//struct page_control_t *page_list_head;
 
@@ -711,13 +719,11 @@ struct process_d
     // Colocando um pouco de simetria nos simbolos.
 
     // absolute pathname and relative pathname. 
-    
-    //file *file_root;
-    //file *file_cwd;
 
-    //struct inode_d *inode_root;
-    //struct inode_d *inode_cwd;
-
+    file *file_root;
+    file *file_cwd;
+    struct inode_d *inode_root;
+    struct inode_d *inode_cwd;
 
 	// #todo #bugbug
 	// Size ?? 

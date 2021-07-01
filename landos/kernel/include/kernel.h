@@ -196,6 +196,7 @@ unsigned long SavedBPP;
 
 
 // ps
+#include "land/ps/image.h"
 #include "land/ps/x64cont.h"
 #include "land/ps/ts.h"
 #include "land/ps/tasks.h"

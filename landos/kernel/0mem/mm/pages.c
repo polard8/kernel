@@ -593,7 +593,7 @@ Entry_0:
 
 // =======================================
 // Uma área em user mode.
-// 0x00200000vir - Começa na marca de 32mb.
+// 0x00200000vir - Começa na marca de 32mb fis.
 Entry_1:
 
     // user_address = 0x02000000
