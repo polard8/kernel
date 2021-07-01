@@ -906,7 +906,47 @@ struct process_d *create_process (
     unsigned long iopl,
     unsigned long pml4_va );
 
+// ===
+
+unsigned long GetProcessPML4_PA ( struct process_d *process );
+unsigned long GetProcessPML4_VA ( struct process_d *process );
+
+unsigned long GetProcessHeapStart ( pid_t pid );
+
+
+void 
+SetProcessPML4_VA ( 
+    struct process_d *process, 
+    unsigned long va );
+
+void 
+SetProcessPML4_PA ( 
+    struct process_d *process, 
+    unsigned long pa );
+
+
+int get_caller_process_id (void);
+void set_caller_process_id (int pid);
+
+int init_process_manager (void);
+
+int processCopyMemory ( struct process_d *process );
+
+
+// Critical section
+#define __GATE_CLOSED    0
+#define __GATE_OPEN      1
+void process_close_gate(int pid);   //227 close
+void process_open_gate(int pid);    //228 open
+
+file *process_get_file_from_pid ( pid_t pid, int fd );
+file *process_get_file ( int fd );
+
+
+int process_get_tty (int pid);
+
 #endif    
+
 
 
 

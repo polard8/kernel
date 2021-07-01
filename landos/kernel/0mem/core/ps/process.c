@@ -291,10 +291,7 @@ void init_processes (void){
 
     debug_print("init_processes:\n");
 
-
-	//
-	// Iniciando vari�veis globais.
-	//
+    // Globals
 
 	kernel_request = 0;    // O que fazer com a tarefa atual.
 	
@@ -307,7 +304,6 @@ void init_processes (void){
 
     current_process = 0;
 
-
     // Clear process list.
     i=0;
     while (i < PROCESS_COUNT_MAX){
@@ -317,6 +313,7 @@ void init_processes (void){
 
     // More ?
 }
+
 
 /*
  * CloseAllProcesses:
@@ -1089,6 +1086,495 @@ fail:
     refresh_screen();
     return NULL;
 }
+
+
+unsigned long GetProcessPML4_PA ( struct process_d *process )
+{
+    if( (void *) process != NULL )
+    {
+        //@todo: checar used e magic.
+        return (unsigned long) process->pml4_PA;
+    }
+
+    // fail
+    return (unsigned long) 0;
+}
+
+unsigned long GetProcessPML4_VA ( struct process_d *process )
+{
+    if( (void *) process != NULL )
+    {
+        //@todo: checar used e magic.
+        return (unsigned long) process->pml4_VA;
+    }
+
+    // fail
+    return (unsigned long) 0;
+}
+
+
+// VA, I guess.
+unsigned long GetProcessHeapStart ( pid_t pid )
+{
+    struct process_d  *process;
+
+    // Limits
+
+    if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
+    {
+        goto fail; 
+    }
+
+
+    process = (struct process_d *) processList[pid];
+    
+    if ( (void *) process == NULL ){
+        goto fail;
+    }else{
+
+        if ( process->used != 1 || process->magic != 1234 )
+        {
+            goto fail;
+        }
+
+        // Ok.
+        return (unsigned long) process->Heap;
+    };
+
+fail:
+    return (unsigned long) 0;
+}
+
+void 
+SetProcessPML4_VA ( 
+    struct process_d *process, 
+    unsigned long va )
+{
+    if ( (void *) process != NULL ){
+        process->pml4_VA = (unsigned long) va;  
+    }
+}
+
+void 
+SetProcessPML4_PA ( 
+    struct process_d *process, 
+    unsigned long pa )
+{
+    if ( (void *) process != NULL ){
+        process->pml4_PA = (unsigned long) pa;  
+    }
+}
+
+int get_caller_process_id (void)
+{
+    return (int) caller_process_id;
+}
+
+void set_caller_process_id (int pid)
+{
+    caller_process_id = (int) pid;
+}
+
+/*
+ *************************************************
+ * init_process_manager:
+ *     Initialize process manager.
+ *     processInitializeProcessManager();
+ */
+
+int init_process_manager (void)
+{
+    caller_process_id = (int) 0;
+    processNewPID = (int) USER_BASE_PID;
+
+	//...
+
+    return 0;
+}
+
+
+
+/*
+ ****************************
+ * processCopyMemory:
+ * 
+ *     Copia a imagem de um processo.
+ *     Isso é usado na implementação de fork() e
+ * na implementação da rotina de clonagem.
+ *     Isso é usado por clone_and_execute_process()
+ */
+
+// O que copiar?
+// >> code, data, bss, heap and stack.
+// For now, all the processes has 4MB,
+// and the stack begins at CONTROLTHREAD_STACK.
+// We just use the control thread.
+
+// #bugbug
+// Imagem com limite de 200KB. (fail)
+// heap ?? Depois              (fail)
+// Stack de 32KB.              (ok)
+// 
+
+// Explicando:
+// Copia a imagem do processo atual e salva o endereço
+// da copia num elemento da estrutura passada como argumento.
+
+// OUT:
+// 
+
+int processCopyMemory ( struct process_d *process )
+{
+    unsigned long __new_base=0;    // base
+    unsigned long __new_stack=0;   // stack
+
+
+    if ( (void *) process == NULL )
+    {
+        printf ("processCopyMemory: [FAIL] process \n");
+        refresh_screen();
+        return (int) (-1);
+    }
+
+
+    //
+    // Image base.
+    //
+
+    // #bugbug
+    // Precisamos de memória física para a imagem e para a pilha.
+    // 4mb de memória física nos permite criarmos um processo
+    // com sua pilha no topo dos 4mb.
+    // Por isso que precisamos de um alocador de frames,
+    // que considere a memória ram inteira.
+    // E precisamos de uma rotina que mapeie esses frames individualmente,
+    // mesmos que eles sejam pegos esparçamente.
+
+    // #bugbug
+    // Esse alocador abaixo está limitado à uma região de 4MB,
+    // previamente mapeado.
+
+    // #obs:
+    // A não ser que a pilha possa ficar em endereço
+    // virtual aleatório.
+    // Me parece que endereço virtual aleatório é
+    // usado por questão de segurança.
+    // Podemos tentar usar pilha com endereço virtual aleatório.
+
+    // 200 KB.   200kb/4096 =  quantidade de páginas.
+    // Allocating memory for the process's image.
+    // #todo: We need this size.
+    // 1024*200 = 200k
+    // 50 páginas.
+    
+    // Retorna um endereço virtual.
+    // Mas usaremos apenas o endereço físico extraído desse endereço.
+    __new_base = (unsigned long) allocPages ( (1024*200)/4096 ); 
+
+    if ( __new_base == 0 ){
+        printf ("processCopyMemory: __new_base fail\n");
+        refresh_screen();
+        return (int) (-1);
+    }
+
+
+    //
+    // Image stack
+    //
+
+    // 32 KB.
+    // Allocating memory for the process's stack.
+    // #todo: We need this size.
+
+    // Retorna um endereço virtual.
+    // Mas usaremos apenas o endereço físico extraído desse endereço.
+    
+    __new_stack = (unsigned long) allocPages( (1024*32)/4096 ); 
+
+    if ( __new_stack == 0 )
+    {
+        printf ("processCopyMemory: __new_stack fail\n");
+        refresh_screen();
+        return (int) (-1);
+    }
+
+
+    //
+    // == Copying memory ======================================
+    //
+
+    // Copying base and stack.
+    // Copiando do processo atual para o buffer que alocamos
+    // logo acima.
+
+
+    // Copia do início da imagem. 200KB.
+    memcpy ( 
+        (void *) __new_base,  
+        (const void *) CONTROLTHREAD_ENTRYPOINT, 
+        ( 1024 * 200 ) );
+
+
+    // Copia do fim da stack. 32KB.
+    memcpy ( 
+        (void *) __new_stack, 
+        (const void *) ( CONTROLTHREAD_STACK-( 1024*32 ) ), 
+        ( 1024 * 32 ) );
+
+    // #bugbug
+    // Review, simplify ...
+
+    // Getting the physical addresses.
+    // Obtendo o edereço físico da base da imagem e da pilha.
+    unsigned long new_base_PA  = (unsigned long) virtual_to_physical ( __new_base, gKernelPML4Address ); 
+    unsigned long new_stack_PA = (unsigned long) virtual_to_physical ( __new_base, gKernelPML4Address ); 
+
+
+    // #todo
+    // check validation.
+
+    if ( new_base_PA == 0 )
+        panic("processCopyMemory: new_base_PA\n");
+
+    if ( new_stack_PA == 0 )
+        panic("processCopyMemory: new_stack_PA\n");
+
+
+    // #todo
+    // Agora temos que fazer esses endereços físicos serem
+    // mapeados em 0x400000 do diretório de páginas do processo filho.
+    // Lembrando que o diretório de páginas do processo filho
+    // será uma cópia do diretório do processo pai.
+    // Como a cópia do diretórios anda não foi feita,
+    // vamos salvar esses endereços para mapearmos depois.
+
+    // virtual
+    // Esse endereço virtual não nos server mais.
+    // precisamos substituir pelo endereço virtual padrão 
+    // para aplicativos. Faremos isso em clone.c quando retornarmos.
+    process->childImage  = (unsigned long) __new_base;
+    process->childStack  = (unsigned long) __new_stack;
+
+    // físico.    
+    process->childImage_PA = (unsigned long) new_base_PA;
+    process->childStackPA  = (unsigned long) new_stack_PA;
+
+    //#debug
+    //printf ("new_base_PA=%x  \n", new_base_PA );
+    //printf ("new_stack_PA=%x  \n", new_stack_PA );
+
+// Done.
+	
+	//#debug
+	//printf ("processCopyMemory: ok\n");
+	//refresh_screen ();
+
+    return 0;
+}
+
+// Service 227
+// Entering critical section.
+// Close gate. Turn it FALSE.
+void process_close_gate(int pid)
+{
+    struct process_d  *p;
+
+    if (pid<0)
+        panic ("process_close_gate: pid \n");
+
+    // Process.
+ 
+    p = (void *) processList[pid];
+
+    if ( (void *) p == NULL ){
+        panic ("process_close_gate: p \n");
+
+    } else {
+
+        // todo: validation
+        
+        __spinlock_ipc = __GATE_CLOSED; //0;
+        criticalsection_pid = (pid_t) 0;
+        p->_critical = FALSE;  //0;
+    };
+}
+
+// Service 228
+// Exiting critical section
+// Open gate. Turn it TRUE.
+void process_open_gate (int pid)
+{
+    struct process_d  *p;
+
+    if (pid<0)
+        panic ("process_open_gate: pid \n");
+
+    // Process.
+
+    p = (void *) processList[pid];
+
+    if ( (void *) p == NULL ){
+        panic ("process_open_gate: p \n");
+    } else {
+
+        // todo: validation
+        
+        __spinlock_ipc = __GATE_OPEN; //1;
+        criticalsection_pid = (pid_t) pid;
+        p->_critical = TRUE; //1;
+    };
+}
+
+//=============
+
+// Pega uma stream na lista de arquivos dado o fd.
+
+file *process_get_file_from_pid ( pid_t pid, int fd )
+{
+    struct process_d *p;
+    file *fp;
+
+    if ( pid < 0){
+        return NULL;
+    }
+
+    // Get process pointer.
+    p = (struct process_d *) processList[ pid ];
+
+    if (fd<0){
+        return NULL;
+    }
+
+    // Get fp from list of open files.
+    // #bugbug: Overflow.
+    
+    return ( file * ) p->Objects[fd];  
+}
+
+// Return the file pointer from a given fd.
+// the fd represents a index in the object list of the
+// current process.
+
+file *process_get_file ( int fd )
+{
+    if( fd<0){
+        return NULL;
+    }
+
+    return (file *) process_get_file_from_pid (current_process, fd );
+}
+
+// Get tty id.
+// Pega o número da tty de um processo, dado o pid.
+// Serviço: 266.
+
+int process_get_tty (int pid)
+{
+    // Usada para debug.
+  
+    struct process_d *p;
+    struct tty_d *tty;
+
+    //#debug
+    //printf ("process_get_tty: pid %d \n", pid);
+    //refresh_screen();
+
+
+    // #todo
+    // Overflow ?
+    
+    if ( pid < 0 )
+    {
+        debug_print ("process_get_tty: pid \n");
+        //printf ("pid fail\n");
+        //refresh_screen();
+        return -1;
+    }
+
+
+    p = (struct process_d *) processList[pid];
+
+    if ( (void *) p == NULL )
+    {
+        debug_print ("process_get_tty: p \n");
+        //printf ("p fail\n");
+        //refresh_screen();
+        return -1;
+    }
+
+    // Get the private tty.
+    
+    tty = p->tty;    
+
+    if ( (void *) tty == NULL )
+    {
+        debug_print ("process_get_tty: tty fail\n");
+        //printf ("tty fail\n");
+        //refresh_screen();
+        return -1;
+    }
+
+
+    //printf ("tty %d belongs to %d\n", tty->index, p->pid );
+    //refresh_screen ();
+
+    // #bugbug
+    // Isso precisa ser o fd na lista de arquivos abertos 
+    // pelo processo.
+    //file *f;
+    
+    //f = ()
+
+    return (int) tty->index;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
