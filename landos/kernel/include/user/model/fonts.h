@@ -28,9 +28,17 @@ typedef enum {
 //
 
 int gwsGetCurrentFontCharWidth (void);
+void gwsSetCurrentFontCharWidth (int width);
+
 int gwsGetCurrentFontCharHeight (void);
+void gwsSetCurrentFontCharHeight (int height);
 
+// ====
 
+unsigned long gwsGetCurrentFontAddress (void);
+void gwsSetCurrentFontAddress ( unsigned long address );
+
+int gwsInstallFont ( char *file_name );
 
 #endif    
 
