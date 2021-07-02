@@ -148,7 +148,7 @@ virtual_to_physical (
     unsigned long pml4_va ) 
 {
 
-    debug_print("virtual_to_physical: [TESTING] \n");
+    //debug_print("virtual_to_physical: [TESTING] \n");
 
     //panic ("virtual_to_physical: [TODO] \n");
     return (unsigned long) virtual_to_physical2 (virtual_address,pml4_va);
@@ -162,7 +162,7 @@ virtual_to_physical2 (
     unsigned long pml4_va ) 
 {
 
-    debug_print ("virtual_to_physical2: [TESTING] \n");
+    //debug_print ("virtual_to_physical2: [TESTING] \n");
 
     //#debug
     //printf("virtual_address = %x \n",virtual_address);
@@ -224,7 +224,7 @@ virtual_to_physical2 (
 
 // ==============================
 // pml4
-    debug_print ("virtual_to_physical2: [pml4]\n");
+    //debug_print ("virtual_to_physical2: [pml4]\n");
     unsigned long *pml4VA = (unsigned long *) pml4_va;
 
     //printf (">> pml4VA[a] %x\n", pml4VA[a]);
@@ -236,7 +236,7 @@ virtual_to_physical2 (
 
 // ==============================
 // page directory pointer table.
-    debug_print ("virtual_to_physical2: [ptpt]\n");
+    //debug_print ("virtual_to_physical2: [ptpt]\n");
     unsigned long *ptpt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     //printf (">> ptpt[d] %x\n", ptpt[b]);
@@ -247,7 +247,7 @@ virtual_to_physical2 (
 
 // ==============================
 // page diretory
-    debug_print ("virtual_to_physical2: [dir]\n");
+    //debug_print ("virtual_to_physical2: [dir]\n");
     unsigned long *dir = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     //printf ("dir[d] %x\n", dir[d]);
@@ -257,7 +257,7 @@ virtual_to_physical2 (
     tmp = (unsigned long) dir[d];
 
     // Page table.
-    debug_print ("virtual_to_physical2: [pt]\n");
+    //debug_print ("virtual_to_physical2: [pt]\n");
     unsigned long *pt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     // Encontramos o endereço base do page frame.
@@ -265,7 +265,7 @@ virtual_to_physical2 (
 
     address = (tmp & 0xFFFFFFFFF000);
 
-    debug_print ("virtual_to_physical2: done\n");
+    //debug_print ("virtual_to_physical2: done\n");
     // Physical address.
     return (unsigned long) (address + o);
 }

@@ -22,7 +22,7 @@ void *page (void){
     int __slot = 0;
 
 
-    debug_print ("page:\n");
+    //debug_print ("page:\n");
 
 //
 // Vamos procurar um slot vazio.
@@ -61,7 +61,7 @@ void *page (void){
 
             pageAllocList[__slot] = ( unsigned long ) New; 
 
-            debug_print ("page: ok\n");
+            //debug_print ("page: ok\n");
 
             return (void *) New;
         };
@@ -72,7 +72,7 @@ void *page (void){
 fail:
     // Message?
 
-    debug_print ("page: fail\n");
+    //debug_print ("page: fail\n");
 
     return NULL; 
 }
@@ -212,14 +212,14 @@ void *newPage (void){
                     New->frame_number = -1;
 
                     debug_print ("newPage: [ERROR] pa == 0\n");
-                    panic ("mmpool-newPage: FIXME, frame number\n");
+                          panic ("newPage: FIXME, frame number\n");
                 }
 
                 // #importante:
                 // Retorna o endereço virtual.
                 // A base, mas o deslocamento dado em páginas.
 
-                debug_print ("newPage: ok\n");
+                //debug_print ("newPage: ok\n");
 
                 return (void *) ( base + (New->id * 4096) );
              }
@@ -334,7 +334,7 @@ void *allocPages (int size){
     int __first_free_slot = -1;
 
 
-    debug_print ("mmpool-allocPages: [TODO] [FIXME] \n");
+    debug_print ("allocPages: [TESTING]\n");
 
 	//
 	// Checando limites.
@@ -399,9 +399,9 @@ void *allocPages (int size){
 		{
 			//#bugbug
 			//Isso pode esgotar o heap do kernel
-			
-			p = (void *) kmalloc ( sizeof( struct page_d ) );
-			
+
+             p = (void *) kmalloc ( sizeof( struct page_d ) );
+
             if ( p == NULL ){
                 printf ("allocPages: fail 2\n");
                 goto fail;
@@ -503,8 +503,7 @@ void initializeFramesAlloc (void)
     p = (void *) kmalloc ( sizeof( struct page_d ) );
 
     if ( p == NULL ){
-        panic ("mmpool-initializeFramesAlloc:\n");
-
+        panic ("initializeFramesAlloc:\n");
     }else{
         p->id = 0;
         p->used = 1;

@@ -401,7 +401,7 @@ unsigned long heapAllocateMemory ( unsigned long size )
         // Aqui poderia parar o sistema e mostrar essa mensagem.
 
         debug_print ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
-        //printf ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
+        printf ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
         goto fail;
     }
 
@@ -418,7 +418,7 @@ unsigned long heapAllocateMemory ( unsigned long size )
     {
         //size = 1;
         debug_print("heapAllocateMemory: [FAIL] size={0}\n");
-        //printf("heapAllocateMemory: [FAIL] size={0}\n");
+        printf("heapAllocateMemory: [FAIL] size={0}\n");
         refresh_screen();
         
         //?? NULL seria o retorno para esse caso ??
@@ -437,7 +437,7 @@ unsigned long heapAllocateMemory ( unsigned long size )
         //try_grow_heap() ...
 
         debug_print ("heapAllocateMemory error: size >= g_available_heap\n");
-        //printf ("heapAllocateMemory error: size >= g_available_heap\n");
+        printf ("heapAllocateMemory error: size >= g_available_heap\n");
         goto fail;
     }
 
@@ -665,7 +665,7 @@ try_again:
     // Se o ponteiro da estrutura de mmblock for inválido.
     }else{
         debug_print ("heapAllocateMemory: [FAIL] struct\n");
-        //printf ("heapAllocateMemory: [FAIL] struct\n");
+        printf ("heapAllocateMemory: [FAIL] struct\n");
         goto fail;
     };
 
