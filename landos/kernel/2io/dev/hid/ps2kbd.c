@@ -239,10 +239,10 @@ sc_again:
 
         // Rotinas de teste
         if ( AsciiChar == VK_F5 ){ 
-            Background_initialize();
-            //hal_reboot(); 
-            pages_calc_mem();
-            refresh_screen();
+            //Background_initialize();
+            hal_reboot(); 
+            //pages_calc_mem();
+            //refresh_screen();
         }  
         if ( AsciiChar == VK_F6 )
         { 
@@ -288,32 +288,34 @@ sc_again:
         if ( AsciiChar == VK_F7 ){ 
             Background_initialize();  // ok
             //hal_reboot(); 
-            //x64_info();
+            x64_info();
             
-            tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
-            printf ("Phys: %x\n",tmp);
+            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
+            //printf ("Phys: %x\n",tmp);
 
-            tmp = (unsigned long) virtual_to_physical2( 0x0000000030200000, gKernelPML4Address );
-            printf ("Phys: %x\n",tmp);
+            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030200000, gKernelPML4Address );
+            //printf ("Phys: %x\n",tmp);
 
-            tmp = (unsigned long) virtual_to_physical2( 0x0000000030400000, gKernelPML4Address );
-            printf ("Phys: %x\n",tmp);
+            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030400000, gKernelPML4Address );
+            //printf ("Phys: %x\n",tmp);
 
-            tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
-            printf ("Phys: %x\n",tmp);
+            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
+            //printf ("Phys: %x\n",tmp);
 
-            tmp = (unsigned long) virtual_to_physical2( 0x0000000030001000, gKernelPML4Address );
-            printf ("Phys: %x\n",tmp);
+            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030001000, gKernelPML4Address );
+            //printf ("Phys: %x\n",tmp);
 
             refresh_screen();
+            return;
         }
         if ( AsciiChar == VK_F8 ){ 
             Background_initialize();  // ok
             //hal_reboot(); 
             //pciInfo();
-            buffer = (void*) newPage();
+            //buffer = (void*) newPage();   // single page
+            buffer = (void*) allocPages(200);  // multiple pages
             if( (void*) buffer == NULL )
-                printf("Fail\n");
+                printf("Buffer: Fail\n");
             if( (void*) buffer != NULL ){
                 //printf("Buffer: %x | %s\n",buffer,buffer);
                 printf("Buffer: %x \n",buffer);

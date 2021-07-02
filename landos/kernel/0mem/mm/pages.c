@@ -165,9 +165,9 @@ virtual_to_physical2 (
     debug_print ("virtual_to_physical2: [TESTING] \n");
 
     //#debug
-    printf("virtual_address = %x \n",virtual_address);
-    printf("pml4_va = %x \n",pml4_va);
-    refresh_screen();
+    //printf("virtual_address = %x \n",virtual_address);
+    //printf("pml4_va = %x \n",pml4_va);
+    //refresh_screen();
     //while(1){}
 
 
@@ -185,8 +185,8 @@ virtual_to_physical2 (
     unsigned long address=0;
 
 
-    printf ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
-    refresh_screen();
+    //printf ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
+    //refresh_screen();
     //while(1){}
 
     //#debug
@@ -197,18 +197,24 @@ virtual_to_physical2 (
         while(1){}
     }
     
+    // #todo
+    // Por enquanto estamos usando apenas as entradas '0'
+    // de pml4 e pdpt ... mas depois vamos usar todas.
+    
     // #hackhack
     if ( a != 0 ){
-        printf ("virtual_to_physical2: a != 0 \n");
+        printf ("virtual_to_physical2: [TODO] a != 0 \n");
         refresh_screen();
-        return;
+        while(1){}
+        //return;
     }
 
     // #hackhack
     if ( b != 0 ){
-        printf ("virtual_to_physical2: b != 0 \n");
+        printf ("virtual_to_physical2: [TODO] b != 0 \n");
         refresh_screen();
-        return;
+        while(1){}
+        //return;
     }
 
     if (pml4_va == 0){
@@ -221,8 +227,8 @@ virtual_to_physical2 (
     debug_print ("virtual_to_physical2: [pml4]\n");
     unsigned long *pml4VA = (unsigned long *) pml4_va;
 
-    printf (">> pml4VA[a] %x\n", pml4VA[a]);
-    refresh_screen();
+    //printf (">> pml4VA[a] %x\n", pml4VA[a]);
+    //refresh_screen();
 
     // Temos o pdpt junto com suas flags.
     tmp = (unsigned long) pml4VA[a];

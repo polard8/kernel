@@ -152,8 +152,8 @@ void *newPage (void){
                 //precisamos pegar o endereço físico e dividir pelo tamanho da página.
 
                 // #debug  #bugbug: Wrong value for 'base'.
-                printf ("newPage: base=%x id=%d \n",base,New->id);
-                refresh_screen();
+                //printf ("newPage: base=%x id=%d \n",base,New->id);
+                //refresh_screen();
                 //while(1){}
                 
                 // #debug
@@ -277,10 +277,10 @@ tryAgain:
 
         if ( (void *) slot != NULL )
         {
-			Base = Base+Count;
-			Base++;
-			Count = 0;
-			goto tryAgain;
+            Base = (Base + Count);
+            Base++;
+            Count = 0;
+            goto tryAgain;
         }
 
         Count++; 
@@ -288,8 +288,11 @@ tryAgain:
         if (Count >= size){ return (int) Base; }
     };
 
+    // Fail: NO empty slot.
     return (int) -1;
 }
+
+
 
 /*
  ***********************************************
@@ -360,8 +363,8 @@ void *allocPages (int size){
     if ( size > PAGE_COUNT_MAX )
     {
 		//if debug
-		printf ("allocPages: size limits\n");
-		goto fail;
+        printf ("allocPages: [FAIL] size limits\n");
+        goto fail;
     }
 
 
@@ -378,8 +381,8 @@ void *allocPages (int size){
 
     if ( __first_free_slot == -1 )
     {
-        debug_print ("mmpool-allocPages: No more free slots\n");
-        panic       ("mmpool-allocPages: No more free slots\n");
+        debug_print ("allocPages: [FAIL] No more free slots\n");
+        panic       ("allocPages: [FAIL] No more free slots\n");
     }
 
 
