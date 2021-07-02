@@ -293,7 +293,15 @@ sc_again:
         if ( AsciiChar == VK_F8 ){ 
             Background_initialize();  // ok
             //hal_reboot(); 
-            pciInfo();
+            //pciInfo();
+            buffer = (void*) newPage();
+            if( (void*) buffer == NULL )
+                printf("Fail\n");
+            if( (void*) buffer != NULL ){
+                //printf("Buffer: %x | %s\n",buffer,buffer);
+                printf("Buffer: %x \n",buffer);
+            }
+            
             refresh_screen();
         }
 

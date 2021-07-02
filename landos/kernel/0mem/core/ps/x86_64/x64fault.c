@@ -17,7 +17,10 @@ void faults ( unsigned long number )
     // o assembly vai inpurtar essa variável.
     // number = xxx_fault_number;
 
-
+     // #bugbug
+     // ??
+     // Quando podemos usar panic() ??
+     // x_panic pode ser usado antes de panic() ?
 
     // provisório
     switch ( number ){

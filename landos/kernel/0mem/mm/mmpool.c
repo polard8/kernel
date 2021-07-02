@@ -22,13 +22,14 @@ void *page (void){
     int __slot = 0;
 
 
-    //
-    // Vamos procurar um slot vazio.
-    // 
+    debug_print ("page:\n");
+
+//
+// Vamos procurar um slot vazio.
+// 
 
     for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
     {
-   
         New = (void *) pageAllocList[__slot];
 
         if ( New == NULL )
@@ -60,19 +61,22 @@ void *page (void){
 
             pageAllocList[__slot] = ( unsigned long ) New; 
 
+            debug_print ("page: ok\n");
+
             return (void *) New;
         };
     };
-    
-    // Overflow.
-    
-    //#debug ??
-    
 
+    // Overflow.
+    //#debug ??
 fail:
     // Message?
+
+    debug_print ("page: fail\n");
+
     return NULL; 
 }
+
 
 /*
  ***************************************************
@@ -108,34 +112,59 @@ void *newPage (void){
     unsigned long pa=0;
 
 
+    debug_print ("newPage:\n");
+
+
+    if ( base == 0 ){
+        debug_print ("newPage: [FAIL] base\n");
+        return NULL;
+    }
+
+
 	// Cria e registra uma estrutura de página.
 
     New = (void *) page();
 
     if ( New == NULL ){
-        //printf ("mmpool-newPage: New\n");
         debug_print ("mmpool-newPage: New\n");
+        //printf ("mmpool-newPage: New\n");
         goto fail;
-
     }else{
-
-        if ( New->used == 1 && New->magic == 1234 )
+        if ( New->used == TRUE && New->magic == 1234 )
         {
-			// Pega o id 
-			// Checa o limite de slots.
+            // Pega o id 
+            // Checa o limite de slots.
 
-            if ( New->id > 0 && New->id < PAGE_COUNT_MAX )
+            //if ( New->id <= 0 ){
+            //    debug_print ("newPage: New->id <= 0\n");
+            //}
+            
+            //if ( New->id > 0 && New->id < PAGE_COUNT_MAX )
+            if ( New->id >= 0 && New->id < PAGE_COUNT_MAX )
             {
-				//trava ou não??
+                // trava ou não??
                 New->locked = 0;
 
-				//contador de referências.
-                New->ref_count = 1;	
+                // contador de referências.
+                New->ref_count = 1;
 
-			    //#importante
-			    //precisamos pegar o endereço físico e dividir pelo tamanho da página.
-				
-				// Pegando o endereço virtual.
+                //#importante
+                //precisamos pegar o endereço físico e dividir pelo tamanho da página.
+
+                // #debug  #bugbug: Wrong value for 'base'.
+                printf ("newPage: base=%x id=%d \n",base,New->id);
+                refresh_screen();
+                //while(1){}
+                
+                // #debug
+                //if ( New->id > 10 ){
+                //    printf ("newPage: New->id > 10\n");
+                //    refresh_screen();
+                //    while(1){}
+                //}
+
+                // Pegando o endereço virtual.
+
                 va = (unsigned long) ( base + (New->id * 4096) );
 
                 // #todo
@@ -181,12 +210,16 @@ void *newPage (void){
                 {
                     //New->frame_number = 0;
                     New->frame_number = -1;
-                    panic ("mmpool-newPage: FIXME, frame number.");
+
+                    debug_print ("newPage: [ERROR] pa == 0\n");
+                    panic ("mmpool-newPage: FIXME, frame number\n");
                 }
 
-				// #importante:
-				// Retorna o endereço virtual.
+                // #importante:
+                // Retorna o endereço virtual.
                 // A base, mas o deslocamento dado em páginas.
+
+                debug_print ("newPage: ok\n");
 
                 return (void *) ( base + (New->id * 4096) );
              }
@@ -194,9 +227,11 @@ void *newPage (void){
     };
 
 fail:
-    // message?
+    debug_print ("newPage: fail\n");
     return NULL;
 }
+
+
 
 // Allocate single page.
 void *mm_alloc_single_page (void)

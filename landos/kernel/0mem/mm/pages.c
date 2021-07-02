@@ -147,7 +147,10 @@ virtual_to_physical (
     unsigned long virtual_address, 
     unsigned long pml4_va ) 
 {
-    panic ("virtual_to_physical: [TODO] \n");
+
+    debug_print("virtual_to_physical: [TESTING] \n");
+
+    //panic ("virtual_to_physical: [TODO] \n");
     return (unsigned long) virtual_to_physical2 (virtual_address,pml4_va);
 }
 
@@ -159,7 +162,18 @@ virtual_to_physical2 (
     unsigned long pml4_va ) 
 {
 
-    debug_print ("virtual_to_physical2: [NOT TESTED] \n");
+    debug_print ("virtual_to_physical2: [TESTING] \n");
+
+    //#debug
+    printf("virtual_address = %x \n",virtual_address);
+    printf("pml4_va = %x \n",pml4_va);
+    refresh_screen();
+    //while(1){}
+
+
+    if ( virtual_address == 0 ){
+        debug_print ("virtual_to_physical2: [?] virtual_address == 0 \n");
+    }
 
     unsigned int a = (unsigned int) virtual_address >> 39 & 0x1FF;   //  9 bits de pml4
     unsigned int b = (unsigned int) virtual_address >> 30 & 0x1FF;   //  9 bits de pdpt
@@ -171,19 +185,35 @@ virtual_to_physical2 (
     unsigned long address=0;
 
 
+    printf ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
+    refresh_screen();
+    //while(1){}
+
+    //#debug
+    if ( a >= 512 || b >= 512 || d >= 512 || t >= 512 || o >= 512  )
+    {
+        printf ("virtual_to_physical2: entry limits \n");
+        refresh_screen();
+        while(1){}
+    }
+
     if (pml4_va == 0){
+        debug_print ("virtual_to_physical2: [?] pml4_va == 0 \n");
         panic ("virtual_to_physical: [FAIL] Invalid pml4_va\n");
     }
 
 // ==============================
 // pml4
+    debug_print ("virtual_to_physical2: [pml4]\n");
     unsigned long *pml4VA = (unsigned long *) pml4_va;
 
     // Temos o pdpt junto com suas flags.
     tmp = (unsigned long) pml4VA[a];
 
+
 // ==============================
 // page directory pointer table.
+    debug_print ("virtual_to_physical2: [ptpt]\n");
     unsigned long *ptpt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     // Temos o pd junto com suas flags.
@@ -191,12 +221,14 @@ virtual_to_physical2 (
 
 // ==============================
 // page diretory
+    debug_print ("virtual_to_physical2: [dir]\n");
     unsigned long *dir = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     // Temos o endereço da pt junto com as flags.
     tmp = (unsigned long) dir[d];
 
     // Page table.
+    debug_print ("virtual_to_physical2: [pt]\n");
     unsigned long *pt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
     // Encontramos o endereço base do page frame.
@@ -204,6 +236,7 @@ virtual_to_physical2 (
 
     address = (tmp & 0xFFFFFFFFF000);
 
+    debug_print ("virtual_to_physical2: done\n");
     // Physical address.
     return (unsigned long) (address + o);
 }
@@ -698,6 +731,29 @@ Entry_386:
     };
     kernel_pd0[386] = (unsigned long) &backbuffer_page_table[0];
     kernel_pd0[386] = (unsigned long) kernel_pd0[386] | 7;
+
+
+
+//++
+// ====================================================================
+// #test #todo : Paged pool area.
+Entry_387:
+
+    //g_pagedpool_va = (unsigned long) XXXPAGEDPOOL_VA;  
+    g_pagedpool_va = (unsigned long) 0x30600000;  // 2mb `a mais que o backbuffer
+
+    mm_used_pagedpool = (1024 * 2);  //2mb 
+
+    for ( i=0; i < 512; i++ )
+    {
+        pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_pa | 7;
+        SMALL_pagedpool_pa      = (unsigned long) SMALL_pagedpool_pa + 4096;
+    };
+    kernel_pd0[387] = (unsigned long) &pagedpool_page_table[0];
+    kernel_pd0[387] = (unsigned long) kernel_pd0[387] | 7;
+// ====================================================================
+//--
+
 
 
 
