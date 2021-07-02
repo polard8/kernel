@@ -1,4 +1,5 @@
 
+// system.c
 
 #include <kernel.h>    
 
@@ -523,12 +524,12 @@ int init_executive (void){
 
     Initialization.executive = FALSE;
 
+    debug_print ("init_executive:\n");
+
 #ifdef KERNEL_VERBOSE
     printf ("EXECUTIVE:\n");
 #endif
 
-
-    debug_print ("init_executive:\n");
 
 //
 // PCI
@@ -544,10 +545,8 @@ int init_executive (void){
 //
 // CMOS
 //
-
-	// CLOCK - Pega informações de Hora e Data.
-    //init_clock ();
-    //get_cmos_info ();
+    // CLOCK - Pega informações de Hora e Data.
+    init_clock();
 
 	//...
 

@@ -57,6 +57,67 @@ unsigned long HANDLERS[256+8];
 
 
 
+// Estrutura para informações sobre a placa mãe.  
+struct motherboard_d
+{
+	int mobodummy;
+    //...	
+};  
+
+
+//Estrutura de disco. @todo: Colocar em outro arquivo.  
+struct drive_context_d 
+{
+    unsigned long Drive;
+
+    unsigned long Cylinders;
+    unsigned long Heads;
+    unsigned long Sectors;
+};
+struct drive_context_d *DriveContext;  
+
+//Firmware:
+//Estrutura para todos os componentes de firmware presentes.
+struct firmware_d
+{
+	int dummy;
+	//bios
+	//...	
+};  
+struct firmware_d *Firmware;
+
+
+
+// Hardware:
+// Estrutura para todos os componentes de hardware presentes.
+
+struct hardware_d
+{
+    //#todo
+
+
+	// MainBoard info.
+	struct motherboard_d *MotherBoard;
+
+	// Processor info.
+	//struct processor_d *Processor;   //@todo: mudar para processo_d
+	int ProcessorArchitecture;
+	int NumberOfProcessors;
+	
+	// ...
+
+	// RTC CMOS info.
+
+	struct rtc_d *Rtc;
+
+    // ...
+
+};
+
+struct hardware_d  *Hardware;  
+
+
+
 //
 // == prototypes =================
 //

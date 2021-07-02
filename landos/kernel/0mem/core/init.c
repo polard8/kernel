@@ -347,7 +347,14 @@ int init (void)
 //
 // Network
 //
-    debug_print ("core-init: network\n");
+
+    // See: network.c
+
+    debug_print ("core-init: network [FIXME]\n");
+
+    // #bugbug
+    // Something is failing here.
+    
     //networkInit();
 
 

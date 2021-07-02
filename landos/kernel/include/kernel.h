@@ -264,6 +264,7 @@ unsigned long SavedBPP;
 #include "rtl/net/un.h"
 #include "rtl/net/nports.h"     //(network) Network Ports  (sw)
 #include "rtl/net/icmp.h" 
+#include "rtl/net/network.h"     //(network) Gerenciamento de rede.  
 #include "rtl/net/socket.h"      //last always
 
 

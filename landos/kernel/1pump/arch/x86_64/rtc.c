@@ -200,6 +200,127 @@ unsigned short rtcGetExtendedMemory (void){
 
 
 
+/*
+ ****************************************************
+ * init_clock: 
+ *     Inicia a data e a hora do controlador.
+ *
+ * @todo: 
+ *     Essa função não deveria mostrar informações na tela.
+ * tem que criar função pra isso.
+ * essa aqui so deveria pegar as informações e colocar em estrutura.
+ */
+
+// Called by init_executive in system.c
+
+int init_clock (void){
+
+    __breaker_rtc_initialized = 0;
+
+	/*
+	 * @todo: criar uma estrutura para RTC.
+	 */
+	 
+	 /*
+	  *@todo:
+	  * alocar memoria para a estrutura rtc.
+	  * inicializar algumas variaveis da estrutura rtc.
+	  */
+	
+	//unsigned long Time, Date; 
+	
+	//Time = get_time();
+	//Date = get_date();
+		  
+	//printf("CLOCK INFORMATION:\n");
+	//printf("Time=%d Date=%d\n", Time, Date);
+
+    get_cmos_info();
+
+//done:
+    g_driver_rtc_initialized  = TRUE;
+    __breaker_rtc_initialized = TRUE;
+    printf("Done!\n");
+    return 0;
+}
+
+
+
+/*
+ * get_cmos_info:
+ *     Obs: Essa função deve ser chamada apenas uma vez na inicialização
+ * do módulo. @todo: Criar métodos que pegam esses valores salvos na 
+ * estrutura.
+ */
+
+// #bugbug
+// Alocando memória toda vez que chama a função.
+// Issa alocação deveria ser feita apenas uma vez
+// na inicialização, depois somente atualizados os valores.
+
+void *get_cmos_info (void){
+
+    //Global struct
+    
+    Rtc = (void *) kmalloc ( sizeof(struct rtc_d) );
+
+
+    if ( (void *) Rtc == NULL){
+        printf ("get_cmos_info fail: Struct\n");
+        refresh_screen();
+        //free(Rtc);
+        return NULL;
+
+    }else{
+
+        // time
+        Rtc->Seconds = read_cmos_bcd (0);
+        Rtc->Minutes = read_cmos_bcd (2);
+        Rtc->Hours   = read_cmos_bcd (4);
+
+        // date
+        Rtc->Year = read_cmos_bcd(9);    
+        Rtc->Year = (2000 + Rtc->Year);
+        Rtc->Month = read_cmos_bcd(8);    
+        Rtc->DayOfMonth = read_cmos_bcd(7);    
+    };
+
+
+//
+// Hardware structure
+//
+
+    if ( (void *) Hardware == NULL ){
+        printf("get_cmos_info: Hardware\n");
+        refresh_screen();
+        //free(Rtc);
+        return NULL;
+
+    }else{
+        Hardware->Rtc = Rtc;    //Save.
+    };
+
+
+//show_message:
+
+#ifdef KERNEL_VERBOSE
+	printf("Time=%d:%d:%d\n", Rtc->Hours, Rtc->Minutes, Rtc->Seconds );
+	printf("Date=%d/%d/%d\n", Rtc->DayOfMonth, Rtc->Month, Rtc->Year );
+#endif
+
+    return (void *) Rtc;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

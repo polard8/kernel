@@ -22,7 +22,7 @@ int __gethostname (char *buffer){
  
     }else{
 
-                 //64 bytes
+        //64 bytes
         strcpy ( hostname_buffer, (const char *) HostInfo->__hostname );
         
         return (int) HostInfo->hostName_len;
