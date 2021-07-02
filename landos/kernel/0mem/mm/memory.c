@@ -333,7 +333,7 @@ int mmInit(void)
 
     // Inicializando o framepool (paged pool).
 
-    //initializeFramesAlloc();
+    initializeFramesAlloc();
 
 	// Continua...
 

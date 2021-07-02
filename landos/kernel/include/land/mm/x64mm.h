@@ -1161,6 +1161,8 @@ int firstSlotForAList ( int size );
 
 void *allocPages (int size);
 
+void initializeFramesAlloc (void);
+
 #endif    
 
 

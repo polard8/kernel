@@ -471,6 +471,56 @@ fail:
     return NULL;
 }
 
+/*
+ * initializeFramesAlloc:
+ *     Inicializa o framepool. 
+ */
+
+void initializeFramesAlloc (void)
+{
+    struct page_d  *p;
+
+    int __slot = 0;
+
+
+    debug_print("initializeFramesAlloc: \n");
+
+	// Inicializando a lista de pages.
+
+    for ( __slot=0; __slot < PAGE_COUNT_MAX; __slot++ )
+    {
+        pageAllocList[__slot] = (unsigned long) 0;
+    };
+
+
+	//
+	// Criando o primeiro para testes.
+	//
+
+    // #bugbug
+    // Talvez seja desnecessário criar essa entrada.
+
+    p = (void *) kmalloc ( sizeof( struct page_d ) );
+
+    if ( p == NULL ){
+        panic ("mmpool-initializeFramesAlloc:\n");
+
+    }else{
+        p->id = 0;
+        p->used = 1;
+        p->magic = 1234;
+        p->free = 1;  //free
+        p->next = NULL; 
+        // ...
+
+        pageAllocList[0] = ( unsigned long ) p; 
+    };
+}
+
+
+
+
+
 
 
 

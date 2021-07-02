@@ -1,0 +1,9 @@
+
+
+
+     A rotina de alocação de multiplas páginas está bem lenta
+     na máquina real ... muito lenta.
+
+     newPage() e allocPages() 
+
+     Precisamos melhorar.
