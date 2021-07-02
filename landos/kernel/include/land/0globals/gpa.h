@@ -159,10 +159,11 @@
 
 // #test
 // pml4, pdpt, pd for kernel process.
+// Lembrando que a parte das flags precisa ser '000'
 
-#define KERNEL_PD_PA   0x000000000009A000
-#define KERNEL_PDPT_PA 0x000000000009B000
-#define KERNEL_PML4_PA 0x000000000009C000
+#define KERNEL_PD_PA    0x000000000009A000
+#define KERNEL_PDPT_PA  0x000000000009B000
+#define KERNEL_PML4_PA  0x000000000009C000
 
 
 // #bugbug

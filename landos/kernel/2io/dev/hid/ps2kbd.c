@@ -239,7 +239,10 @@ sc_again:
 
         // Rotinas de teste
         if ( AsciiChar == VK_F5 ){ 
-            hal_reboot(); 
+            Background_initialize();
+            //hal_reboot(); 
+            pages_calc_mem();
+            refresh_screen();
         }  
         if ( AsciiChar == VK_F6 )
         { 
@@ -286,8 +289,22 @@ sc_again:
             Background_initialize();  // ok
             //hal_reboot(); 
             //x64_info();
+            
             tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
             printf ("Phys: %x\n",tmp);
+
+            tmp = (unsigned long) virtual_to_physical2( 0x0000000030200000, gKernelPML4Address );
+            printf ("Phys: %x\n",tmp);
+
+            tmp = (unsigned long) virtual_to_physical2( 0x0000000030400000, gKernelPML4Address );
+            printf ("Phys: %x\n",tmp);
+
+            tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
+            printf ("Phys: %x\n",tmp);
+
+            tmp = (unsigned long) virtual_to_physical2( 0x0000000030001000, gKernelPML4Address );
+            printf ("Phys: %x\n",tmp);
+
             refresh_screen();
         }
         if ( AsciiChar == VK_F8 ){ 
@@ -303,6 +320,7 @@ sc_again:
             }
             
             refresh_screen();
+            return;
         }
 
         //

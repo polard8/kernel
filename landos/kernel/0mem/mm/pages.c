@@ -175,11 +175,11 @@ virtual_to_physical2 (
         debug_print ("virtual_to_physical2: [?] virtual_address == 0 \n");
     }
 
-    unsigned int a = (unsigned int) virtual_address >> 39 & 0x1FF;   //  9 bits de pml4
-    unsigned int b = (unsigned int) virtual_address >> 30 & 0x1FF;   //  9 bits de pdpt
-    unsigned int d = (unsigned int) virtual_address >> 21 & 0x1FF;   //  9 bits de page directory
-    unsigned int t = (unsigned int) virtual_address >> 12 & 0x1FF;   //  9 bits de page table. 
-    unsigned int o = (unsigned int) (virtual_address      & 0xFFF ); // 12 bits de offset
+    unsigned int a = (unsigned int) ((virtual_address >> 39) & 0x1FF);   //  9 bits de pml4
+    unsigned int b = (unsigned int) ((virtual_address >> 30) & 0x1FF);   //  9 bits de pdpt
+    unsigned int d = (unsigned int) ((virtual_address >> 21) & 0x1FF);   //  9 bits de page directory
+    unsigned int t = (unsigned int) ((virtual_address >> 12) & 0x1FF);   //  9 bits de page table. 
+    unsigned int o = (unsigned int) (virtual_address      & 0xFFF );     // 12 bits de offset
 
     unsigned long tmp=0;
     unsigned long address=0;
@@ -196,6 +196,20 @@ virtual_to_physical2 (
         refresh_screen();
         while(1){}
     }
+    
+    // #hackhack
+    if ( a != 0 ){
+        printf ("virtual_to_physical2: a != 0 \n");
+        refresh_screen();
+        return;
+    }
+
+    // #hackhack
+    if ( b != 0 ){
+        printf ("virtual_to_physical2: b != 0 \n");
+        refresh_screen();
+        return;
+    }
 
     if (pml4_va == 0){
         debug_print ("virtual_to_physical2: [?] pml4_va == 0 \n");
@@ -207,6 +221,9 @@ virtual_to_physical2 (
     debug_print ("virtual_to_physical2: [pml4]\n");
     unsigned long *pml4VA = (unsigned long *) pml4_va;
 
+    printf (">> pml4VA[a] %x\n", pml4VA[a]);
+    refresh_screen();
+
     // Temos o pdpt junto com suas flags.
     tmp = (unsigned long) pml4VA[a];
 
@@ -216,6 +233,9 @@ virtual_to_physical2 (
     debug_print ("virtual_to_physical2: [ptpt]\n");
     unsigned long *ptpt = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
+    //printf (">> ptpt[d] %x\n", ptpt[b]);
+    //refresh_screen();
+
     // Temos o pd junto com suas flags.
     tmp = (unsigned long) ptpt[b];
 
@@ -224,6 +244,9 @@ virtual_to_physical2 (
     debug_print ("virtual_to_physical2: [dir]\n");
     unsigned long *dir = (unsigned long *) (tmp & 0xFFFFFFFFF000);
 
+    //printf ("dir[d] %x\n", dir[d]);
+    //refresh_screen();
+    
     // Temos o endereço da pt junto com as flags.
     tmp = (unsigned long) dir[d];
 
@@ -246,8 +269,57 @@ virtual_to_physical2 (
 // #todo
 void pages_calc_mem (void)
 {
-	//#todo
+    int a=0;
+    int b=0;
+    int i=0;
+    int j=0;
+    int k=0;
+    int free=0;
+
+    unsigned long *pml4 = (unsigned long *) gKernelPML4Address;
+    unsigned long *pdpt;
+    unsigned long *pg_dir;
+    unsigned long *pg_tbl;
+
+    printf ("\n\n");
+
+    //for(i=0 ; i<PAGING_PAGES ; i++)
+    //    if (!mem_map[i]) free++;
+    //printf("%d pages free (of %d)\n\r",free,PAGING_PAGES);
+
+
+    for (a=0; a<512; a++)
+    {
+        if ( pml4[a] & 1 )
+        {
+            pdpt = (unsigned long *) (0xFFFFFFFFF000 & pml4[a]);
+            for (b=0; b<512; b++)
+            {
+                if ( pdpt[b] & 1 )
+                {
+                    pg_dir = (unsigned long *) (0xFFFFFFFFF000 & pdpt[b]);
+                    for (i=0; i<512; i++)
+                    {
+                        if ( pg_dir[i] & 1 )    //if (1 & pg_dir[i])
+                        {
+                            pg_tbl = (unsigned long *) (0xFFFFFFFFF000 & pg_dir[i]);
+
+                            // ugly
+                            for ( j=k=0; j<512; j++ )
+                            {
+                                if (pg_tbl[j] & 1){ k++; }
+                            };
+                            printf ("%d|%d:  dir[%d]  uses  %d  pages\n",a,b,i,k);
+                        }
+                    };
+                }
+            };
+        }
+    };
+
+    refresh_screen();
 }
+
 
 
 // 64bit ?
@@ -557,19 +629,23 @@ int mmSetUpPaging (void)
 // ============================
 //
 
+    // #bugbug
+    // Estaríamos dizendo que todas as entradas do primeiro diretorio
+    // esntão em ring0, e que todas as entradas do primeiro pdpt
+    // também estão?
+ 
     // pd >> pdpt
     // Pointing the 'page directory' address 
     // at the first entry in the 'page directory pointer table'.
 
     kernel_pdpt[0] = (unsigned long) &kernel_pd0[0];
-    kernel_pdpt[0] = (unsigned long) kernel_pdpt[0] | 3;
+    kernel_pdpt[0] = (unsigned long) kernel_pdpt[0] | 3; //7;
 
     // pdpt >> pml4
     // Pointing the 'page directory pointer table' address 
     // at the first entry in the kernel_pml4.
     kernel_pml4[0] = (unsigned long) &kernel_pdpt[0];
-    kernel_pml4[0] = (unsigned long) kernel_pml4[0] | 3;
-
+    kernel_pml4[0] = (unsigned long) kernel_pml4[0] | 3; //7;
 
 //
 // ============================
