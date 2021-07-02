@@ -3,7 +3,7 @@
 Status: 
 Porting Gramado to 64bit.
 This is a work in progress.
-> See the old [32bit version](https://github.com/fn125/g241/)
+Here, you can see the old [32bit version](https://github.com/fn125/g241/).
 
 
 
