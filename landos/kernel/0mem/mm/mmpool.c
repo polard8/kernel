@@ -328,9 +328,7 @@ void *allocPages (int size){
 
     unsigned long va=0;
     unsigned long pa=0;
-
     int Count=0;
-
     int __first_free_slot = -1;
 
 
@@ -349,10 +347,9 @@ void *allocPages (int size){
     if (size <= 0)
     {
 		//if debug
-		printf ("allocPages: size 0\n");
-		return NULL;
+        printf ("allocPages: size 0\n");
+        return NULL;
     }
-	
 
     // Se é pra alocar apenas uma página.
     if (size == 1){
@@ -379,6 +376,7 @@ void *allocPages (int size){
 
     __first_free_slot = (int) firstSlotForAList(size);
 
+    //if ( __first_free_slot < 0 )
     if ( __first_free_slot == -1 )
     {
         debug_print ("allocPages: [FAIL] No more free slots\n");
@@ -389,18 +387,21 @@ void *allocPages (int size){
     // Procurar slot vazio.
     // Começamos a contar do frame logo após o condutor.
 
-
-    for ( __slot = __first_free_slot; __slot < (__first_free_slot+size+1); __slot++ )
+    for ( 
+        __slot = __first_free_slot; 
+        __slot < (__first_free_slot+size+1);
+        __slot++ )
     {
+
         p = (void *) pageAllocList[__slot];
 
-		//Slot livre
-		if ( p == NULL )
-		{
-			//#bugbug
-			//Isso pode esgotar o heap do kernel
+        // Slot livre
+        if ( p == NULL )
+        {
+            // #bugbug
+            // Isso pode esgotar o heap do kernel
 
-             p = (void *) kmalloc ( sizeof( struct page_d ) );
+            p = (void *) kmalloc ( sizeof( struct page_d ) );
 
             if ( p == NULL ){
                 printf ("allocPages: fail 2\n");
@@ -408,19 +409,15 @@ void *allocPages (int size){
             }
 
 			//printf("#");
-			p->id = __slot;
-			p->used  = TRUE;
-			p->magic = 1234;
+            
+            p->id = __slot;
+            p->used  = TRUE;
+            p->magic = 1234;
+            p->free = FALSE;
+            p->locked = FALSE;
 
-			//not free
-			p->free = 0;
-
-			//----
-
-			p->locked = 0;
-
-			//contador de referências
-			p->ref_count = 1;
+            // Contador de referências
+            p->ref_count = 1;
 
 			// #fixme
 			// Precisamos usar pml4
@@ -429,7 +426,7 @@ void *allocPages (int size){
             va = (unsigned long) ( base + (p->id * 4096) ); 
             pa = (unsigned long) virtual_to_physical ( va, gKernelPML4Address ); 
 
-            if ( ( pa % PAGE_SIZE) != 0 ) 
+            if ( ( pa % PAGE_SIZE ) != 0 ) 
             {
                 pa = pa - ( pa % PAGE_SIZE);
             }
@@ -441,9 +438,9 @@ void *allocPages (int size){
             }
 
 			//---
-			
+
 			pageAllocList[__slot] = ( unsigned long ) p; 
-			
+
 			Conductor->next = (void *) p;
 			Conductor = (void *) Conductor->next;
 
@@ -479,7 +476,6 @@ fail:
 void initializeFramesAlloc (void)
 {
     struct page_d  *p;
-
     int __slot = 0;
 
 
@@ -515,10 +511,6 @@ void initializeFramesAlloc (void)
         pageAllocList[0] = ( unsigned long ) p; 
     };
 }
-
-
-
-
 
 
 

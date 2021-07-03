@@ -654,15 +654,15 @@ struct thread_d *create_thread (
     // #todo
     // Filtrar o processo ao qual a thread pertencer�.
 
+    // #bugbug:
+    // Não sabemos a condição do processo atual para 
+    // permitirmos que ele seja o dono da thread.
+
     ProcessID = (int) pid;
 
     if( ProcessID < 0 || 
         ProcessID >= PROCESS_COUNT_MAX )
     {
-		// #bugbug:
-		// N�o sabemos a condi��o do processo atual para 
-		// permitirmos que ele seja o dono da thread.
-		
         ProcessID = current_process;
     }
 
@@ -744,14 +744,14 @@ get_next:
         Thread->ownerPID = (int) pid;
 
         // Not a protected thread!
-        Thread->_protected = 0;
+        Thread->_protected = FALSE;
 
         // name.
-        Thread->name_address = (unsigned long) name; 
+        Thread->name_address = (unsigned long) name;
         //#todo: Usar Thread->name. 
         //#todo: Thread->cmd.
         //#test 64 bytes max.
-        strcpy ( Thread->__threadname, (const char *) name); 
+        strcpy ( Thread->__threadname, (const char *) name );
 
         // #todo
         // Thread->process = (void*) Process;
@@ -761,9 +761,9 @@ get_next:
         // Procedimento de janela.
         //Thread->procedure = (unsigned long) &system_procedure;
 
-        //
-        // message support.
-        //
+//
+// Message support
+//
 
         // Single kernel event.
 
@@ -813,8 +813,8 @@ get_next:
 		//IOPL.
 		//Se ela vai rodar em kernel mode ou user mode.
 		//@todo: herdar o mesmo do processo.
-		Thread->iopl = RING3;             // Process->iopl;  		
-		Thread->saved = 0;                // Saved flag.	
+		Thread->iopl = RING3;             // Process->iopl;
+		Thread->saved = 0;                // Saved flag.
 		Thread->preempted = PREEMPTABLE;  // Se pode ou n�o sofrer preemp��o.
 		
 		//Heap and Stack.

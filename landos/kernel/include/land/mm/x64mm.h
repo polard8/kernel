@@ -13,12 +13,6 @@
 #define PTE_PER_PAGE    512
 
 
-//Quantidade de diret�rios que podem ser criados.
-#define PAGEDIRECTORY_COUNT_MAX 1024  
-
-
-//Quantidade de page tables criadas...
-#define PAGETABLE_COUNT_MAX 1024 
 
 
 //#deprecated, use pml4 instead.
@@ -99,10 +93,8 @@ unsigned long windowzoneSize;
 //typedef struct page_directory_d page_directory_t;
 struct page_directory_d
 {
-
     object_type_t  objectType;
     object_class_t objectClass;
-
 
 	//identificadores.
     int id;
@@ -141,9 +133,11 @@ struct page_directory_d *pagedirectoryShared;           // Shared.
 // Lista de diret�rios. (Pois cada processo tem um diret�rio).
 //
 
+// Quantidade de diretórios que podem ser criados na lista.
+#define PAGEDIRECTORY_COUNT_MAX 1024  
+
 //Lista de estruturas para diret�rios de p�ginas.
 unsigned long pagedirectoryList[PAGEDIRECTORY_COUNT_MAX]; 
-
 
 
 // ------------
@@ -188,10 +182,13 @@ struct page_table_d
 struct page_table_d *pagetableCurrent;
 //...
 
-
 //
 // Lista de pagetables.
 //
+
+// Quantidade de page tables criadas na lista.
+#define PAGETABLE_COUNT_MAX  1024 
+
 
 unsigned long pagetableList[PAGETABLE_COUNT_MAX]; 
 
@@ -276,19 +273,6 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //Isso � usdo pelo heap.
 #define MMBLOCK_HEADER_SIZE 64 
 
-
-
-
-// Quantidade m�xima de pageframes.
-// @todo: 
-// #bugbug. 
-// Isso t� errado. 
-// Essa � a quantidade de pageframes de apenas uma page table. 
-// Isso equiva � apenas um pagepool. en�o n�o poder� ser usado
-// em outro lugar en�o no contexto de um pagepool.
-//
-
-#define PAGE_COUNT_MAX 1024    //??
 
 
 
@@ -631,28 +615,33 @@ struct page_d
 	
 	// Identificador de frame.
 	// (pa/4096)
+
     int frame_number;
-	
-	//N�o pode ser descarregado para o disco.
-	//N�o pode ser alterado.
-    int locked;             
-	
-	//A p�gina est� livrea para uso pelos processos.
-    int free;    
-	
-	//Contador de refer�ncias.
+
+    // Locked:
+    // Não pode ser descarregado para o disco.
+    // Não pode ser alterado.
+    int locked;
+
+    // A página está livrea para uso pelos processos.
+    int free;
+
+    // Contador de referências.
     int ref_count;
 
     // Navigation
     struct page_d *next;
 };
- 
 
 // #importante
-// Pool de mem�ria pagin�vel usado para aloca��o.
+// Pool de memória paginável usado para alocação.
 // Aqui ficam os ponteiros para estrutura do tipo page.
 
+#define PAGE_COUNT_MAX   1024    //??
+
 unsigned long pageAllocList[PAGE_COUNT_MAX];
+
+
 
 
 /*

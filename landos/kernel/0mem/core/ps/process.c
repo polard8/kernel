@@ -820,39 +820,36 @@ struct process_d *create_process (
 // == Heap and Stack ===========
 //
 
+    // #obs: 
+    // O 'endereço virtual' do heap e da stack dos processos serão 
+    // os mesmos para todos os processos, assim como o 'endereço virtual' 
+    // de carregamento da imagem.
 
-		// @todo: #BugBug 
-		// O Heap e a Stack devem estar dentro da �rea de mem�ria do processo.
-		// Uma pagetable do diret�rio � para o heap e outra para a stack.
-        // Cada pagetable no diret�rio do processo � pra uma coisa.
-        //
-		// Obs: O endere�o virtual do heap e da stack dos processos ser�o 
-		// os mesmos para todos os processos, assim como o endere�o virtual 
-		// de carregamento da imagem.
-		
-		// Heap and Stack. 
-		// #importante: (Endere�os virtuais).
-		// Por isso pode ser o mesmo para todos os processos.
-		
-		
-		// #### HEAP ####
-		
-		// directory va, index, region pa
-		//CreatePageTable ( Process->DirectoryVA, 512, 0 );
-		
-		//Process->Heap = (unsigned long) 0x00400000; //funciona
-		//Process->Heap = (unsigned long) 0xC0C00000; //funciona
-		
-		// g_heappool_va
-		// endere�o virtual do pool de heaps.
-		// os heaps nessa �rea ser�o dados para os processos.
-		// base + (n*size)
+    // #todo:
+    // #bugbug: 
+    // O Heap e a Stack devem estar dentro da 
+    // área de memória do processo.
+    // #wrong: Uma pagetable do diretório é para o heap e outra para a stack.
+    // #wrong: Cada pagetable no diretório do processo é pra uma coisa.
 
+    // ## HEAP ##
+
+    // directory va, index, region pa
+    //CreatePageTable ( Process->DirectoryVA, 512, 0 );
+
+    //Process->Heap = (unsigned long) 0x00400000; //funciona
+    //Process->Heap = (unsigned long) 0xC0C00000; //funciona
+
+    // g_heappool_va
+    // endere�o virtual do pool de heaps.
+    // os heaps nessa �rea ser�o dados para os processos.
+    // base + (n*size)
 
     if ( g_heap_count < 0 || 
          g_heap_count >= g_heap_count_max )
     {
-        panic ("create_process: [FAIL] g_heap_count limits\n");
+        debug_print ("create_process: [FIXME] g_heap_count limits\n");
+        //panic ("create_process: [FAIL] g_heap_count limits\n");
     }
 
     // #atenção
@@ -865,7 +862,8 @@ struct process_d *create_process (
     // poderia ficar no fim de seu heap ???
 
     if (g_heappool_va == 0){
-        panic ("clone_and_execute_process: g_heappool_va");
+        debug_print ("clone_and_execute_process: g_heappool_va\n");
+        //panic ("clone_and_execute_process: g_heappool_va\n");
     }
 
     // Ignoraremos esse pois vai falhar na criacao do primeiro heap.
@@ -873,7 +871,8 @@ struct process_d *create_process (
         //panic("clone_and_execute_process: g_heap_count");
 
     if (g_heap_size == 0){
-        panic ("clone_and_execute_process: g_heap_size");
+        debug_print ("clone_and_execute_process: g_heap_size\n");
+        //panic ("clone_and_execute_process: g_heap_size\n");
     }
 
     // #bugbug
@@ -1076,6 +1075,9 @@ struct process_d *create_process (
     // #todo
     // last_created = PID;
     
+    // #debug
+    printf ("create_process: done\n");
+
     // ok
     return (void *) Process;
 

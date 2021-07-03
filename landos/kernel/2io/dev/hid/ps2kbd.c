@@ -321,6 +321,23 @@ sc_again:
             //    printf("Buffer: %x \n",buffer);
             //}
             
+            // #test:
+            //create_process (
+            //    NULL, NULL, NULL,
+            //    (unsigned long) 0x00400000, //wrong #todo
+            //    PRIORITY_HIGH,
+            //     (int) 0, 
+            //     "RING0-PROCESS", 
+            //     RING0,   
+            //     (unsigned long ) gKernelPML4Address );
+ 
+            // #todo: Precisamos de um processo válido pra criarmos uma thread.
+            //create_thread ( 
+            //    NULL, NULL, NULL, 
+            //    0x00400000, 0x005F0000,  //wrong #todo
+            //    current_process, "test-thread" );
+ 
+ 
             refresh_screen();
             return;
         }
