@@ -47,7 +47,7 @@ int dispatcherQueueIndex;
 //
 // Contador de dispatch por categoria de dispatch.
 //
-//typedef struct dispatch_count_d dispatch_count_t;
+
 struct dispatch_count_d
 {
     // Quando selecionamos a idle.
@@ -118,7 +118,6 @@ unsigned long dispatcherReadyList[PRIORITY_MAX +1];
 //
 
 void IncrementDispatcherCount ( int type );
-
 void dispatcher ( int type );
 
 #endif    

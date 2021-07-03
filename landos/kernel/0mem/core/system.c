@@ -68,37 +68,14 @@ int system_get_pid (int index){
     return (int) -1;
 }
 
-/*
- * systemShutdownViaAPM:
- *     Desliga a máquina via APM.
- *     (Deve chamar uma rotina herdada do BM).
- */
 
-void systemShutdownViaAPM (void){
-
-    // Obs: @todo:
-	//     Existe uma rotina no BM que desliga a máquina via APM usando 
-	// recursos do BIOS. A rotina começa em 32bit, assim podemos tentar herdar 
-	// o ponteiro para a função.
-	
-    //Chamar a função de 32 bit herdado do BM.
-    //todo: usar iret.
-	
-	// Check limits.
-	// O ponteiro herdado tem que ser um valor dentro do endereço onde 
-	// roda o BM, que começa em 0x8000.
-	// if(shutdown_address > 0x8000 && shutdown_address < 0x20000 ){
-		
-	//Pilha para iret.
-    //asm("pushl %0" :: "r" ((unsigned long) 8)     : "%esp");    //cs.
-    //asm("pushl %0" :: "r" ((unsigned long) shutdown_address)    : "%esp");  //eip.
-	//asm("iret \n");    //Fly!	
-		
-	//};
-
-
-    panic ("systemShutdownViaAPM:\n");
+// ??
+// APM is a 16bit real mode thing.
+void systemShutdownViaAPM (void)
+{
+    panic ("systemShutdownViaAPM: [FAIL]\n");
 }
+
 
 /*
  ****************************************
@@ -110,7 +87,7 @@ void systemShutdownViaAPM (void){
 
 void systemShutdown (void)
 {
-    printf ("systemShutdown: It's safe to turnoff your computer");
+    printf ("systemShutdown: It's safe to turnoff your computer\n");
 
     refresh_screen ();
     die ();
@@ -145,7 +122,12 @@ void systemShowDevicesInfo (void)
 // config/u.h
 // system.h
 
-void systemSetupVersion (void){
+void systemSetupVersion (void)
+{
+
+//
+// Global structure
+//
 
     Version = (void *) kmalloc( sizeof(struct version_d) );
 
@@ -156,48 +138,40 @@ void systemSetupVersion (void){
 
     if ( (void *) Version == NULL ){
         panic("systemSetupVersion: Version");
-    } else {
-        Version->Major = VERSION_MAJOR;
-        Version->Minor = VERSION_MINOR;
-        Version->Build = VERSION_BUILD;
-    };
+    }
 
 
-    // VersionInfo.
+    Version->Major = VERSION_MAJOR;
+    Version->Minor = VERSION_MINOR;
+    Version->Build = VERSION_BUILD;
+
+//
+// Global structure
+//
+
     VersionInfo = (void *) kmalloc ( sizeof(struct version_info_d) );
 
-        //#todo:
-        //Isso deve ser considerado um erro fatal,
-        //pois existem aplicações que dependem da versão do sistema 
-        //para funcionarem corretamente.. 
+    // #todo:
+    // Isso deve ser considerado um erro fatal,
+    // pois existem aplicações que dependem da versão do sistema 
+    // para funcionarem corretamente.. 
 
     if ( (void *) VersionInfo == NULL ){
         panic ("systemSetupVersion: VersionInfo\n");
-    }else{
-
-        // #todo
-        if ( (void *) Version != NULL  )
-        {
-
-            //VersionInfo->version = (void *) Version;
-            //...VersionInfo->string = (char*) ...;
-            //... 			
-        };
-		//...
-    };
-
-    //
-    // System
-    //
-
-    if ( (void *) System == NULL ){
-        panic ("systemSetupVersion: System");
     }
 
-	//
-	// Colocando na estrutura System se ela for válida.
-	//
 
+//
+// Global structure
+//
+
+    if ( (void *) System == NULL ){
+        panic ("systemSetupVersion: System\n");
+    }
+
+//
+// Colocando na estrutura System se ela for válida.
+//
 
     if ( (void *) System != NULL )
     {

@@ -227,8 +227,11 @@ unsigned long SavedBPP;
 #include "user/security/usession.h"
 #include "user/security/room.h"
 #include "user/security/desktop.h"
+#include "user/security/logon.h"
+#include "user/security/logoff.h"
 #include "user/security/user.h"
 #include "user/security/security.h"
+
 
 // tty
 #include "hal/dev/tty/ttyldisc.h"

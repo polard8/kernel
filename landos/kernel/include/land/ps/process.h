@@ -931,6 +931,8 @@ void set_caller_process_id (int pid);
 int init_process_manager (void);
 
 int processCopyMemory ( struct process_d *process );
+int processCopyProcess ( pid_t p1, pid_t p2 );
+
 
 
 // Critical section

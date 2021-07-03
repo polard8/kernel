@@ -7,8 +7,8 @@
 
 //O primeiro índice na contagem das threads do sistema e o
 //primeiro índice na contagem das threads dos usuários.
-#define SYSTEM_BASE_TID  0  
-#define USER_BASE_TID    100  
+#define SYSTEM_BASE_TID  0
+#define USER_BASE_TID    100
 
 //
 // Preempt support.
@@ -245,16 +245,9 @@ struct thread_d
     // COLOCAR O DIRETÓRIO DE PÁGINAS QUE A THREAD USA, 
     // ISSO AJUDA NA HORA DO TASKSWITCH.
 
-    // #bugbug
-    // Not used in x86_64. Try pml4.
-
-    //unsigned long DirectoryPA;
-
 
     unsigned long pml4_VA;
     unsigned long pml4_PA;
-
-
 
     // ring
     unsigned long iopl;

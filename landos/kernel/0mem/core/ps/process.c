@@ -191,9 +191,8 @@ struct process_d *processObject (void){
  
 pid_t getNewPID (void){
 
-    struct process_d *p;
-
     int i = USER_BASE_PID;
+    struct process_d  *p;
 
     while ( i < PROCESS_COUNT_MAX ){
 
@@ -209,6 +208,7 @@ pid_t getNewPID (void){
     return (pid_t) (-1);
 }
 
+
 /*
  * processTesting:
  *     Testando se o processo � v�lido. Se for v�lido retorna 1234.
@@ -218,20 +218,20 @@ pid_t getNewPID (void){
 
 int processTesting (int pid){
 
-    struct process_d *P;
+    struct process_d  *P;
 
-    // Process.
     P = (void *) processList[pid];
 
     if ( (void *) P == NULL ){
         return 0;
-
     }else{
         if ( P->used == 1 && P->magic == 1234 ){ return (int) 1234; }
     };
 
     return 0;
 }
+
+
 
 /*
  * processSendSignal:
@@ -249,31 +249,31 @@ int processSendSignal (struct process_d *p, unsigned long signal){
     //if(signal >= 32){
 	//	return 1;
 	//}
-	
-	if (signal == 0)
-	{
-		return 1;
-	}
-	
+
+    if (signal == 0)
+    {
+        return 1;
+    }
+
 	//struct fail
 	//if( (void*) p == NULL ){
 	//	return 1;
 	//}		
 	
 //ok:	
-	//Ok
-	if ( (void*) p != NULL )
-	{	
-		p->signal = (unsigned long) signal;
-		return 0; //(int) signalSend(p,signal);
-	}
-	
+    //Ok
+    if ( (void*) p != NULL )
+    {
+        p->signal = (unsigned long) signal;
+        return 0; //(int) signalSend(p,signal);
+    }
+
 	//...
 	
 //fail:
-	
-	return 1;
+    return 1;
 }
+
 
 /*
  ***********************************************************
@@ -324,10 +324,8 @@ void init_processes (void){
 
 void CloseAllProcesses (void)
 {
-    //loop
     int i=0;
-    
-    struct process_d *P;
+    struct process_d  *P;
 
 	// #importante:
 	// Menos o 0, pois � o kernel. 
@@ -364,7 +362,7 @@ void CloseAllProcesses (void)
 // usado pelo comando "current-process" no shell
 void show_currentprocess_info (void){
 
-    struct process_d *Current;
+    struct process_d  *Current;
 
 
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
@@ -377,11 +375,9 @@ void show_currentprocess_info (void){
 	//Struct.
     Current = (void *) processList[current_process];
 
-    if ( (void *) Current == NULL )
-    {
-        printf ("show_currentprocess_info: struct \n");
-        return; 
-
+    if ( (void *) Current == NULL ){
+        printf ("show_currentprocess_info: [FAIL] Current \n");
+        return;
     } else {
 
 		//Index.
@@ -1376,6 +1372,390 @@ int processCopyMemory ( struct process_d *process )
     return 0;
 }
 
+
+
+/*
+ ****************************************
+ * processCopyProcess
+ * 
+ *     + Copia os elementos da estrutura de processo.
+ *     + Cria um diret�rio de p�ginas e salva os endere�os 
+ *       virtual e f�sico dele na estrutura de processo.
+ *
+ *     Isso � chamado por do_fork_process.
+ */
+
+// Called by clone_and_execute_process at clone.c
+
+// #
+// It will also copy the control thread.
+
+// IN:
+// p1 = atual.
+// p2 = clone. 
+
+// OUT:
+// 0 = ok
+// 1 = fail
+
+int processCopyProcess ( pid_t p1, pid_t p2 ){
+
+    struct process_d  *Process1;
+    struct process_d  *Process2;
+    int Status=0;
+    int i=0;
+    unsigned long BasePriority=0;
+    unsigned long Priority=0;
+
+
+    // Balancing the priority.
+    // Please, don't inherit base priority!
+
+    BasePriority = (unsigned long) PRIORITY_NORMAL; 
+    Priority     = (unsigned long) PRIORITY_NORMAL;
+
+
+    if ( p1 == p2 ){
+        printf ("processCopyProcess: [FAIL] same PID\n");  goto fail;
+    }
+
+    if ( p1 < 0 ){
+        printf ("processCopyProcess: [FAIL] p1 limits\n"); goto fail;
+    }
+
+    if ( p2 < 0 ){
+        printf ("processCopyProcess: [FAIL] p2 limits\n"); goto fail;
+    }
+
+
+
+    // ===========================
+    // Check process 1.
+    Process1 = (struct process_d *) processList[p1];
+
+    // Check Process1
+    if ( (void *) Process1 == NULL ){
+        printf ("processCopyProcess: Process1\n"); goto fail;
+    }else{
+        if ( Process1->used != 1 || Process1->magic != 1234 )
+        {
+           printf ("processCopyProcess: Process1 validation \n");
+           goto fail;
+        }
+    };
+
+    // ===========================
+    // Check process 2.
+    Process2 = (struct process_d *) processList[p2];
+
+    if ( (void *) Process2 == NULL ){
+        printf ("processCopyProcess: Process1\n"); goto fail; 
+    }else{
+        if ( Process2->used != 1 || Process2->magic != 1234 )
+        {
+           printf ("processCopyProcess: Process2 validation \n");
+           goto fail;
+        }
+    };
+
+
+//
+// Copy
+//
+
+    // Object.
+    Process2->objectType  = Process1->objectType;
+    Process2->objectClass = Process1->objectClass;
+
+    // O clone não inicializa na seção crítica, pois senão teríamos
+    // dois processos na sessão crítica.
+    Process2->_critical = 0;
+
+    // Identificadores.
+    Process2->pid  = (pid_t) p2;               // PID.  O pid do clone.
+    Process2->ppid = (pid_t) Process1->pid;    // PPID. O parent do clone é o pid do pai. 
+    Process2->uid  = (uid_t) Process1->uid;   // UID. 
+    Process2->euid = (uid_t) Process1->euid;  // EUID. 
+    Process2->ruid = (uid_t) Process1->ruid;  // RUID. 
+    Process2->suid = (uid_t) Process1->suid;  // SUID. 
+    Process2->gid  = (gid_t) Process1->gid;   // GID. 
+    Process2->egid = (gid_t) Process1->egid;  // EGID. 
+    Process2->rgid = (gid_t) Process1->rgid;  // RGID. 
+    Process2->sgid = (gid_t) Process1->sgid;  // SGID. 
+    Process2->pgrp = Process1->pgrp;
+
+    // validation.
+    Process2->used  = Process1->used;
+    Process2->magic = Process1->magic;
+
+    // State of process
+    Process2->state = Process1->state;  
+
+    // Plano de execução.
+    Process2->plane = Process1->plane;
+
+	//Process->name_address = NULL;
+
+    Process2->framepoolListHead = Process1->framepoolListHead;
+
+//
+// pml4
+//
+
+	// #bugbug
+	// Precisamos clonar o diret�rio de p�ginas
+	// sen�o alguma altera��o feita na pagetable da imagem pode
+	// corromper o processo que est� sendo clonado.
+
+    // #importante:
+    // Deve retornar o endere�o do diret�rio de p�ginas criado,
+    // que � um clone do diret�rio de p�ginas do kernel.
+    // Retornaremos o endere�o virtual, para que a fun��o create_process 
+    // possa usar tanto o endere�o virtual quanto o f�sico.
+
+	// #bugbug
+	// Na verdade precisamos clonar o diret�rio do processo e n�o o 
+	// diret�rio do kernel.
+
+	// #importante
+	// Isso clona o diret�rio de p�ginas do kernel. Isso facilita as coisas.
+	// Retorna o endere�o virtual do novo diret�rio de p�ginas.
+
+	// #importante:
+	// Vamos converter porque precisamos de endere�o f�sico para colocarmos no cr3.
+	// Mas o taskswitch faz isso pegando o endere�o que estiver na thread, ent�o
+	// esse endere�o precisa ir pra thread.
+
+    Process2->pml4_VA = (unsigned long) CloneKernelPML4();
+
+    if ( (void *) Process2->pml4_VA == NULL ){
+        panic ("processCopyProcess: [FAIL] pml4_VA\n");
+    }
+
+    Process2->pml4_PA = (unsigned long) virtual_to_physical ( 
+                                              Process2->pml4_VA, 
+                                              gKernelPML4Address ); 
+
+    // #bugbug
+    // Lembrando que na rotina de fork() nos obtemos
+    // os endereços físicos da imagem do clone e de sua pilha.
+    // precisamos mapear esses endereços em 0x400000, caso contrário
+    // o processo filho apontará para a imagem do processo pai,
+    // como estava antes de copiarmos o diretório de páginas do kernel.
+
+
+	// ??
+	// #bugbug
+	// Se o endere�o for virtual, ok fazer isso. 
+	// Usaremos o mesmo endere�o virtual da imagem.
+	// #importante: se bem que esse endere�o virtual de imagem
+	// pode ser diferente para o kernel. Pois no momento
+	// que ele alocar mem�ria para a imagem ele ter� o
+	// endere�o l�gico retornado pelo alocador.
+
+    // #bugbug
+    // Conseguimos o endere�o da imagem copiada,
+    // mas teremos que refazer isso mais a frente quando
+    // carregarmos, (isso no caso da rotina de clonagem)
+    // Isso � v�lido s� para o fork.
+
+    // Atenção
+    // O processo pai armazenava o  novo endereço da imagem do processo
+    // filho. Isso foi criado durante a alocação de memória
+    // para o processo filho.
+    // porém esse endereço virtual não aponta para o 
+    // entry point da imagem do processo filho, e sim para
+    // o endereço virtual obtido na alocação.
+
+
+    Process2->Image   = (unsigned long) Process1->childImage; // #bugbug: Esse endereço não é 0x400000
+    Process2->ImagePA = (unsigned long) Process1->childImage_PA;
+    Process2->childImage    = 0;
+    Process2->childImage_PA = 0;
+
+
+    // #bugbug
+    // We simply can't do this!
+    // Every process need your own heap!
+    // The function that called up is gonna fix this later. :)
+    // Simply initialize for now!
+
+    //heap
+    Process2->Heap     = (unsigned long) 0; //Process1->Heap;    
+    Process2->HeapEnd  = (unsigned long) 0; // Process1->HeapEnd; 
+    Process2->HeapSize = (unsigned long) 0; // Process1->HeapSize;
+
+    //stack
+    Process2->Stack       = (unsigned long) 0; // Process1->Stack;   
+    Process2->StackEnd    = (unsigned long) 0; // Process1->StackEnd; 
+    Process2->StackSize   = (unsigned long) 0; // Process1->StackSize;
+    Process2->StackOffset = (unsigned long) 0; // Process1->StackOffset;
+
+
+    Process2->iopl = Process1->iopl;
+
+
+    // Priority.
+
+    Process2->base_priority = (unsigned long) BasePriority;
+    Process2->priority      = (unsigned long) Process1->priority;
+
+    // == Security ====================================
+
+    Process2->usession = Process1->usession;
+    Process2->room     = Process1->room;
+    Process2->desktop  = Process1->desktop;
+
+    // absolute pathname and relative pathname. 
+
+    Process2->file_root  = Process1->file_root;
+    Process2->file_cwd   = Process1->file_cwd;
+
+    Process2->inode_root = Process1->inode_root;
+    Process2->inode_cwd  = Process1->inode_cwd;
+
+    // =============
+    // #IMPORTANTE
+    // Herdar todos arquivos.
+    // #bugbug: 
+    // Lembrando que o fd 1 tem sido usado como dispositivo 
+    // console virtual.
+    
+    // #bugbug
+    // Imagine um processo que fechou um dos três arquivos e agora
+    // vamos clonar sem o fluxo padrão em ordem.
+    file *__f;
+
+    for (i=0; i<32; i++)
+    {
+        // Copy
+        Process2->Objects[i] = Process1->Objects[i];
+        
+        // Updating the referency counter.
+        // ??limits
+        __f = (void*) Process2->Objects[i];
+        if ((void*)__f!= NULL)
+        {
+            // Quantos descritores de arquivo apontam para essa mesma estrutura.
+            __f->fd_counter++;
+        }
+    };
+
+
+    // O fluxo padrão foi criando antes em klib/kstdio.c
+    // #todo: Checar as características desses arquivos.
+    Process2->Objects[0] = (unsigned long) stdin;
+    Process2->Objects[1] = (unsigned long) stdout;
+    Process2->Objects[2] = (unsigned long) stderr;
+
+//
+// ========================
+// Thread de controle
+//
+
+
+	// Vamos clonar a thread de controle do processo pai.
+	
+	// obs:
+	// Me parece que a fun��o que clona apenas a thread de controle 
+	// chama-se fork1. #todo
+	
+	// #todo: Precisamos copiar todas as threads
+	// vamos come�ar pela thread de controle.
+	// teoriacamente elas precisam ter o mesmo endere�o virtual ...
+	// mas est�o em endere�os f�sicos diferentes.
+	// #bugbug precisamos clonar a thread.
+	
+	// ############### #IMPORTANTE #################
+	// #bugbug
+	// Ainda n�o temos um salvamento de contexto apropriado para essa system call.
+	// S� o timer tem esse tipo de salvamento.
+	// Precisamos salvar o contexto antes de chamarmos o servi�o fork()
+	// Pois se n�o iremos retomar a thread clone em um ponto antes de 
+	// chamarmos o fork, que � onde est� o �ltimo ponto de salvamento.
+
+
+//
+// == Clone the control thread =================================
+//
+
+    // Clonando a thread de controle.
+    // obs: Isso precisa funcionar direito. Não podemos ficar sem isso.
+    // See: thread.c
+    
+    Process2->control = (struct thread_d *) threadCopyThread( Process1->control );
+
+    if ( (void *) Process2->control == NULL ){
+        panic ("processCopyProcess: [FAIL] threadCopyThread \n");
+    }
+
+//
+// Page Directory
+//
+
+	// #importante
+	// Um diret�rio de p�ginas para a thread de controle.
+	// O diret�rio de p�ginas da thread de controle ser� o mesmo
+	// do processo.
+	// � importante deixarmos esse endere�o na estrutura da thread, pois
+	// � a� que o taskswitch espera encontra-lo.
+
+    Process2->control->pml4_PA = Process2->pml4_PA;
+
+//
+// Owner PID
+//
+
+    Process2->control->ownerPID = Process2->pid;
+
+
+    //#todo: review
+    
+    //?? herda a lista de threads ??
+    Process2->threadListHead = Process1->threadListHead;
+    Process2->zombieChildListHead = Process1->zombieChildListHead;
+    Process2->dialog_address = Process1->dialog_address;
+
+
+//
+// == TTY ======================
+//
+
+    // Vamos criar uma tty para o processo clone.
+    // Ela será uma tty privada, mas precisa ter um
+    // uma estrutura de arquivo que aponte para ela
+    // e um fd na lista de objetos abertos pelo processo.
+  
+    //++
+    Process2->tty = ( struct tty_d *) tty_create();
+
+    if ( (void *) Process2->tty == NULL ){
+         panic ("processCopyProcess: Couldn't create TTY\n");
+    }
+    tty_start (Process2->tty);
+    //--
+
+    // panic()
+    debug_print ("processCopyProcess: [FIXME] No slot for tty\n");
+ 
+__OK:
+    Process2->exit_code = Process1->exit_code;
+    Process2->prev = Process1->prev; 
+    Process2->next = Process1->next; 
+    //Status = 0;
+    return (int) 0;
+
+// Fail
+
+fail:
+    Status = 1;  //-1 ??
+    printf ("processCopyProcess: Fail\n");
+    return (int) Status;
+}
+
+
+
+
 // Service 227
 // Entering critical section.
 // Close gate. Turn it FALSE.
@@ -1383,25 +1763,26 @@ void process_close_gate(int pid)
 {
     struct process_d  *p;
 
-    if (pid<0)
+    if (pid<0){
         panic ("process_close_gate: pid \n");
+    }
 
-    // Process.
- 
+// Process
+
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
         panic ("process_close_gate: p \n");
-
     } else {
 
         // todo: validation
         
-        __spinlock_ipc = __GATE_CLOSED; //0;
+        __spinlock_ipc = __GATE_CLOSED;  //0;
         criticalsection_pid = (pid_t) 0;
         p->_critical = FALSE;  //0;
     };
 }
+
 
 // Service 228
 // Exiting critical section

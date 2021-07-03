@@ -43,7 +43,7 @@ sys.o \
 io.o ws.o \
 pixel.o bg.o char.o dtext.o line.o rect.o \
 kgws.o kgwm.o vt.o \
-desktop.o room.o userenv.o usession.o \
+desktop.o room.o usession.o logon.o logoff.o userenv.o \
 ts.o dispatch.o spawn.o x64cont.o x64fault.o \
 sched.o schedi.o \
 process.o thread.o threadi.o create.o queue.o mk.o \
@@ -220,11 +220,15 @@ all-c:
 	# user/model
 	gcc -c user/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
 
+
 	# user/security
 	gcc -c user/security/desktop.c   $(KINCLUDE) $(CFLAGS) -o desktop.o
 	gcc -c user/security/room.c      $(KINCLUDE) $(CFLAGS) -o room.o
 	gcc -c user/security/usession.c  $(KINCLUDE) $(CFLAGS) -o usession.o
+	gcc -c user/security/logoff.c    $(KINCLUDE) $(CFLAGS) -o logoff.o
+	gcc -c user/security/logon.c     $(KINCLUDE) $(CFLAGS) -o logon.o
 	gcc -c user/security/userenv.c   $(KINCLUDE) $(CFLAGS) -o userenv.o
+
 
 	# user/view
 	gcc -c user/view/bg.c     $(KINCLUDE) $(CFLAGS) -o bg.o
