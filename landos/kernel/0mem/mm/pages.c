@@ -79,6 +79,9 @@ unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
 
 unsigned long get_table_pointer (void)
 {
+
+    debug_print ("get_table_pointer:\n");
+
     table_pointer_heap_base = (table_pointer_heap_base + 0x1000);
 
     // #todo
@@ -99,9 +102,158 @@ unsigned long get_table_pointer (void)
         panic ("pages-get_table_pointer: [FIXME] Limits\n");
     }
 
-
     return (unsigned long) table_pointer_heap_base;
 }
+
+/*
+ * CloneKernelPML4:
+ *
+ *    Clone the kernel pml4.
+ *    OUT: The virtual address of the new directory.
+ */
+
+// #todo
+// CloneKernelPML4
+
+void *CloneKernelPML4(void)
+{
+    register int i=0;
+    unsigned long destAddressVA=0; 
+
+
+    //destAddressVA = (unsigned long) newPage (); 
+    destAddressVA = (unsigned long) get_table_pointer(); 
+
+    if ( destAddressVA == 0 ){
+        panic ("CloneKernelPML4: destAddressVA\n");
+    }
+
+
+    // The virtual address of the kernel page directory and
+    // the virtual address of the new page directory.
+    // #bugbug: What directory we are using right now? kernel?
+
+    unsigned long *src = (unsigned long *) gKernelPML4Address;  
+    unsigned long *dst = (unsigned long *) destAddressVA;  
+
+    // Copy
+
+    for ( i=0; i < 512; ++i ){
+        dst[i] = (unsigned long) src[i];
+    };
+
+    // Done.
+    // The virtual address of the new pml4. 
+
+    return (void *) destAddressVA;
+}
+
+/*
+ * clone_pml4:
+ *     Clone a given page directory.
+ * 
+ */
+
+// Clona um pml4 dado seu endereço.
+// Queremos clonar o diretório atual,
+// para que o processo filho tenha o mesmo diretório do processo pai. 
+
+// #??
+// Esse endereço virtual eh valido?
+// Pertence ao diretorio que estamos usando no momento?
+
+// #todo
+// clone_pml4
+
+void *clone_pml4 ( unsigned long pml4_va )
+{
+    register int i=0;
+    unsigned long destAddressVA=0; 
+
+
+    // #test
+    // no directory in the address '0'
+
+    if ( pml4_va == 0 )
+        panic("clone_pml4: pml4_va\n");
+
+
+    // Get a target address for the directory.
+    
+    // #bugbug:
+    // We are using that routine to get a poiter for a table.
+    // Is that a virtual address ?
+    // What about the size?
+
+    destAddressVA = (unsigned long) get_table_pointer(); 
+    
+    if ( destAddressVA == 0 ){
+        panic ("CreatePageDirectory: destAddressVA\n");
+    }
+
+    // Initialization
+
+    unsigned long *src = (unsigned long *) pml4_va;
+    unsigned long *dst = (unsigned long *) destAddressVA;
+
+    // Copy
+
+    for ( i=0; i < 512; ++i ){
+        dst[i] = (unsigned long) src[i]; 
+    };
+
+    // The address of the new pml4.
+
+    return (void *) destAddressVA;
+}
+
+
+/*
+ ***********************************************************
+ * initialize_frame_table:
+ *     Frame table to handle a pool of page frames.
+ */
+
+int initialize_frame_table (void)
+{
+    int i=0;
+
+
+    debug_print("initialize_frame_table:\n");
+
+    FT.total_frames = (FT.frame_table_size_in_bytes/4096);
+
+    // Número de páginas necessárias para termos uma tabela.
+    // Cada página pode conter 4096 entradas de i byte
+    FT.n_pages = (FT.total_frames/4096); 
+
+    FT.frame_table = (unsigned char *) allocPages(FT.n_pages);
+
+    if ((void *) FT.frame_table ==NULL){
+        panic("initialize_frame_table: invalid FT.frame_table"); 
+    }
+
+    //#todo: limits
+    if ( FT.frame_table_size_in_bytes == 0 ){
+        panic("initialize_frame_table: frame_table_size_in_bytes");
+    }
+
+    // Clear frame table.
+    for (i=0; i < FT.total_frames; i++){
+        FT.frame_table[i] = 0;
+    }
+
+    //#debug
+    printf ("Table size in pages %d\n",FT.n_pages);
+    printf ("Total frames %d\n",FT.total_frames);
+    refresh_screen();
+
+    FT.frame_table_status = 1;
+
+    //ok
+    return 0;
+}
+
 
 
 

@@ -313,13 +313,13 @@ sc_again:
             //hal_reboot(); 
             //pciInfo();
             //buffer = (void*) newPage();   // single page
-            buffer = (void*) allocPages(200);  // multiple pages
-            if( (void*) buffer == NULL )
-                printf("Buffer: Fail\n");
-            if( (void*) buffer != NULL ){
+            //buffer = (void*) allocPages(200);  // multiple pages
+            //if( (void*) buffer == NULL )
+            //    printf("Buffer: Fail\n");
+            //if( (void*) buffer != NULL ){
                 //printf("Buffer: %x | %s\n",buffer,buffer);
-                printf("Buffer: %x \n",buffer);
-            }
+            //    printf("Buffer: %x \n",buffer);
+            //}
             
             refresh_screen();
             return;

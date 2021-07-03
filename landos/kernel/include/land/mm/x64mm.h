@@ -1122,6 +1122,11 @@ unsigned long get_new_frame (void);
 unsigned long get_table_pointer (void);
 
 
+void *CloneKernelPML4 (void);
+void *clone_pml4 ( unsigned long pml4_va );
+
+int initialize_frame_table (void);
+
 int pEmpty (struct page_d *p);
 void freePage (struct page_d *p);
 void notfreePage (struct page_d *p);

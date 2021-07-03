@@ -468,6 +468,8 @@ void show_process_information (void)
     refresh_screen();
 }
 
+
+
 // Create process
 struct process_d *create_process ( 
     struct room_d    *room,
@@ -1038,7 +1040,10 @@ struct process_d *create_process (
     // loop
     // pending connections;
     
-    for (sIndex=0; sIndex<SOCKET_MAX_PENDING_CONNECTIONS; ++sIndex)
+    for ( 
+        sIndex = 0; 
+        sIndex < SOCKET_MAX_PENDING_CONNECTIONS; 
+        ++sIndex )
     {
         Process->socket_pending_list[sIndex] = 0; 
     };
@@ -1063,7 +1068,6 @@ struct process_d *create_process (
 //
 // Navigation
 //
-
     Process->prev = NULL; 
     Process->next = NULL; 
 
