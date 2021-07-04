@@ -12,7 +12,119 @@ void __x64StartInit (void)
     //#todo
     debug_print ("__x64StartInit: [TODO]\n");
     panic ("__x64StartInit: [TODO]\n");
+
+
+    int fileret = -1;
+
+    debug_print ("__x64StartInit:\n");
+
+//
+// Load image INIT.BIN.
+//
+
+    // #importante
+    // Carregado do diretório raiz
+ 
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
+
+
+    // loading image.
+    // #bugbug
+    // Loading from root dir. 512 entries limit.
+
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS, 
+                                  VOLUME1_ROOTDIR_ADDRESS, 
+                                  FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
+                                  "INIT    BIN", 
+                                  (unsigned long) 0x00400000,
+                                  BUGBUG_IMAGE_SIZE_LIMIT );
+
+    // Coldn't load init.bin
+    if ( fileret != 0 ){
+        panic ("__x64StartInit: Coldn't load init.bin \n");
+    }
+
+	// Creating init process.
+	// > Cria um diretório que é clone do diretório do kernel base 
+	// Retornaremos o endereço virtual, para que a função create_process possa usar 
+	// tanto o endereço virtual quanto o físico.
+	// > UPROCESS_IMAGE_BASE;
+	// #todo
+	// temos que checar a validade do endereço do dir criado
+	// antes de passarmos..
+
+    InitProcess = (void *) create_process ( 
+                               NULL, NULL, NULL, 
+                               (unsigned long) 0x00400000,  // ?? #check 
+                               PRIORITY_HIGH, 
+                               (int) KernelProcess->pid, 
+                               "INIT-PROCESS", 
+                               RING3, 
+                               (unsigned long ) CloneKernelPML4() );
+
+    if ( (void *) InitProcess == NULL ){
+        panic ("__x64StartInit: InitProcess\n");
+    }else{
+        InitProcess->position = SPECIAL_GUEST;
+        fs_initialize_process_cwd ( InitProcess->pid, "/" );
+    };
+
+//====================================================
+// Create thread
+
+    // #
+    // Criamos um thread em ring3.
+    // O valor de eflags é 0x3200.
+
+    InitThread = (void *) create_CreateRing3InitThread();
+
+    if ( (void *) InitThread == NULL ){
+        panic ("__x86StartInit: InitThread\n");
+    }else{
+
+        InitThread->position = SPECIAL_GUEST;
+
+        //IdleThread->ownerPID = (int) InitProcess->pid;
+
+        // #todo #bugbug
+        //InitThread->tss = current_tss;
+        
+        
+        // [Processing time]
+        current_process = InitProcess->pid;
+        current_thread  = InitThread->tid;
+        
+        // [Focus]
+        active_process = current_process;
+        active_thread  = current_thread;
+        
+        // foreground thread ?
+        
+        // [Scheduler stuff]
+        next_thread = InitThread->tid;
+    };
+
+    // #todo #bugbug
+    // InitProcess->Heap = (unsigned long) g_extraheap1_va;
+
+
+    // #importante
+    // A thread de controle do processo init2.bin.
+    InitProcess->control = InitThread;
+
+
+    // #todo #bugbug
+    //registra um dos servidores do gramado core.
+    //server_index, process, thread
+
+    //ipccore_register ( 
+        //(int) 0, 
+        //(struct process_d *) InitProcess, 
+        //(struct thread_d *) InitThread );   
+
 }
+
 
 // local
 void x64mainStartFirstThread (void)
@@ -257,10 +369,64 @@ int x64main (void)
     PROGRESS("Kernel:1:6\n"); 
     // Creating kernel process.
 
+    // IN: 
+    // Room, Desktop, Window
+    // base address, priority, ppid, name, iopl, page directory address.
+    // See: ps/action/process.c
+    
+    KernelProcess = (void *) create_process ( 
+                                 NULL, NULL, NULL, 
+                                 (unsigned long) 0x30000000, 
+                                 PRIORITY_HIGH, 
+                                 (int) 0, 
+                                 "KERNEL-PROCESS", 
+                                 RING0,   
+                                 (unsigned long ) gKernelPML4Address );
+
+    if ( (void *) KernelProcess == NULL ){
+        panic ("x64main: KernelProcess\n");
+    }else{
+        KernelProcess->position = KING;
+        fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
+        //...
+    };
+
+
 
 //================================
     PROGRESS("Kernel:1:7\n"); 
     // Creating a ring 0 thread for the kernel.
+
+    EarlyRING0IDLEThread = (void *) create_CreateEarlyRing0IdleThread();
+
+    if ( (void *) EarlyRING0IDLEThread == NULL ){
+        panic ("x64main: EarlyRING0IDLEThread\n");
+    }else{
+
+        // Idle thread
+        // #todo
+        // We can use a method in the scheduler for this.
+        // Or in the dispatcher?
+
+        ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
+
+        EarlyRING0IDLEThread->position = KING;
+
+        // #bugbug #todo
+        // EarlyRING0IDLEThread->tss = current_tss;
+
+        set_thread_priority ( 
+            (struct thread_d *) EarlyRING0IDLEThread,
+            PRIORITY_MIN );
+
+		// #importante
+		// Sinalizando que ainda não podemos usar as rotinas que dependam
+		// de que o dead thread collector esteja funcionando.
+		// Esse status só muda quando a thread rodar.
+
+        dead_thread_collector_status = FALSE;
+
+    };
 
 
 //================================
