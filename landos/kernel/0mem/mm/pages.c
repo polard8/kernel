@@ -481,6 +481,7 @@ void pages_calc_mem (void)
 
 
 // 64bit ?
+// local
 void load_pml4_table(void *phy_addr)
 {
     asm volatile ("movq %0,%%cr3"::"r"(phy_addr));

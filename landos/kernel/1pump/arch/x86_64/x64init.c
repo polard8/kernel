@@ -2,6 +2,18 @@
 
 #include <kernel.h>
 
+// Task switching support.
+extern void turn_task_switch_on (void);
+
+extern void x64_clear_nt_flag (void);
+
+
+// local
+void x64init_load_pml4_table(void *phy_addr)
+{
+    asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
+}
+
 
 
 // Função local.
@@ -131,7 +143,207 @@ void x64mainStartFirstThread (void)
 {
     //#todo
     debug_print ("x64mainStartFirstThread: [TODO]\n");
-    panic ("x64mainStartFirstThread: [TODO]\n");
+    panic       ("x64mainStartFirstThread: [TODO]\n");
+    
+    struct thread_d  *Thread;
+    int i=0;
+
+    // The first thread to run will the control thread 
+    // of the init process. It is called InitThread.
+
+    Thread = InitThread; 
+
+
+    if ( (void *) Thread == NULL ){
+        panic("x64mainStartFirstThread: Thread\n");
+    }
+
+    if ( Thread->used != TRUE || Thread->magic != 1234 )
+    {
+        printf ("x64mainStartFirstThread: tid={%d} magic \n", 
+            Thread->tid);
+         die();
+    }
+
+    // It its context is already saved, so this is not the fist time.
+    
+    if ( Thread->saved != FALSE ){
+        panic("x64mainStartFirstThread: saved\n");
+    }
+
+    if ( Thread->tid < 0 ){
+        panic("x64mainStartFirstThread: tid\n");
+    }
+
+    // Set the current thread.
+    set_current( Thread->tid ); 
+    
+    // ...
+
+    // State
+    // The thread needs to be in Standby state.
+
+    if ( Thread->state != STANDBY )
+    {
+        printf ("x64mainStartFirstThread: state tid={%d}\n", 
+            Thread->tid);
+        die();
+    }
+
+    // * MOVEMENT 2 ( Standby --> Running)
+    if ( Thread->state == STANDBY )
+    {
+        Thread->state = RUNNING;
+        
+        queue_insert_data( 
+            queue, 
+            (unsigned long) Thread, 
+            QUEUE_RUNNING );
+    }
+
+    // Current process.
+
+    current_process = Thread->process->pid;
+
+//
+// List
+//
+
+    for ( i=0; i < PRIORITY_MAX; i++ )
+    {
+        dispatcherReadyList[i] = (unsigned long) Thread;
+    };
+
+    IncrementDispatcherCount (SELECT_IDLE_COUNT);
+
+
+//
+// # check this
+//
+
+	// turn_task_switch_on:
+	//  + Creates a vector for timer irq, IRQ0.
+	//  + Enable taskswitch. 
+
+    turn_task_switch_on();
+
+
+    // #todo
+    // Isso deve ser liberado pelo processo init
+    // depois que ele habilitar as interrupções.
+    
+    taskswitch_lock();
+    scheduler_lock();
+
+
+    // timerInit8253 ( HZ );
+    // timerInit8253 ( 800 );
+    // timerInit8253 ( 900 );
+
+    // local
+    x64init_load_pml4_table( Thread->pml4_PA );
+
+    // #bugbug: rever isso.
+    asm ("movq %cr3, %rax");
+    asm ("movq %rax, %cr3");
+
+//
+// # check this
+//
+    // See: headlib.asm
+
+    x64_clear_nt_flag();   
+
+
+	//vamos iniciar antes para que
+	//possamos usar a current_tss quando criarmos as threads
+	//x86_init_gdt ();
+
+    // ??
+    asm ("clts \n");
+
+	// #importante
+	// Mudamos para a última fase da inicialização.
+	// Com isso alguns recursos somente para as fases anteriores
+	// deverão ficar indisponíveis.
+
+    KeInitPhase = 4;
+
+	// # go!
+	// Nos configuramos a idle thread em user mode e agora vamos saltar 
+	// para ela via iret.
+
+	// #todo:
+	// #importante:
+	// Podemos usr os endereços que estão salvos na estrutura.
+
+	//#bugbug:
+	//temos a questão da tss:
+	//será que a tss está configurada apenas para a thread idle do INIT ??
+	//temos que conferir isso.
+
+	//base dos arquivos.
+
+    // #todo
+    // Rever se estamos usando a base certa.
+
+    // Image buffer
+    unsigned char *buff1 = (unsigned char *) 0x00400000;
+
+
+    // init.bin (ELF)
+
+
+    if ( buff1[0] != 0x7F ||
+         buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
+    {
+        panic ("x64mainStartFirstThread: init .ELF signature");
+    }
+
+    // #debug
+    debug_print("[x64] Go to user mode!  IRETQ\n");
+    printf     ("[x64] Go to user mode!  IRETQ\n");
+    refresh_screen ();
+
+
+    PROGRESS("-- Fly -----------------------------------\n");
+
+    // #important:
+    // This is an special scenario,
+    // Where we're gonna fly with the eflags = 0x3000,
+    // it means that the interrupts are disabled,
+    // and the init process will make a software interrupt
+    // to reenable the interrupts. 
+    // Softwre interrupts are not affecte by this flag, I guess.
+
+    // #bugbug
+    // This routine is very ugly and very gcc dependent.
+    // We deserve a better thing.
+
+    // Fly!
+    // We need to have the same stack in the TSS.
+    // ss, rsp, rflags, cs, rip;
+
+//
+// #todo
+//
+
+    //asm volatile ( 
+    //    " movq $0x003FFFF0, %rsp \n"
+    //    " movq $0x23,       %ds:0x10(%rsp)  \n"
+    //    " movq $0x0044FFF0, %ds:0x0C(%rsp)  \n"
+    //    " movq $0x3000,     %ds:0x08(%rsp)  \n"
+    //    " movq $0x1B,       %ds:0x04(%rsp)  \n"
+    //    " movq $0x00401000, %ds:0x00(%rsp)  \n"
+    //    " movq $0x23, %eax  \n"
+    //    " mov %ax, %ds      \n"
+    //    " mov %ax, %es      \n"
+    //    " mov %ax, %fs      \n"
+    //    " mov %ax, %gs      \n"
+    //    " iretq              \n" );
+
+    // Paranoia
+    panic ("x64mainStartFirstThread: [FIXME] *breakpoint\n");
 }
 
 

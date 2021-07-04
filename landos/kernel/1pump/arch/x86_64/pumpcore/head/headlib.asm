@@ -1,7 +1,39 @@
 
-
+;;#delete
 headlib_something:
 	ret
+
+
+;; ==================================
+;; Limpar a flag nt em rflags
+;; e dar refresh na pipeline. #todo
+
+global _x64_clear_nt_flag
+_x64_clear_nt_flag:
+    
+    ; Salvando o que vamos usar.
+    push rax
+    push rbx
+    
+    ; pegando as flags.
+    pushfq
+    pop rax
+    
+    mov rbx, 0x0000000000004000
+    not rbx
+    and rax, rbx
+    
+    push rax
+    popfq
+    
+    pop rbx
+    pop rax
+    
+    ret
+
+
+
+
 
 
 
@@ -144,8 +176,8 @@ d_offset_63_32: dd 0
 ;    O endereço do ISR e o número do vetor são passados via argumento.
 ;
 ; IN:
-;    eax = endereço. (callback)(endereço do handler)
-;    ebx = número do vetor (0x80).(número da interrupção.)
+;    rax = endereço. (callback)(endereço do handler)
+;    rbx = número do vetor (0x80).(número da interrupção.)
 ;
 
 global _setup_system_interrupt
