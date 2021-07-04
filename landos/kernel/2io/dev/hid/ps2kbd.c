@@ -77,6 +77,9 @@ void DeviceInterface_PS2Keyboard_OLD(void)
 
 void DeviceInterface_PS2Keyboard(void){
 
+    // Usado nos testes
+    struct process_d *p;
+
     static int __has_e0_prefix = 0;
     static int __has_e1_prefix = 0;
 
@@ -322,22 +325,35 @@ sc_again:
             //}
             
             // #test:
-            //create_process (
-            //    NULL, NULL, NULL,
-            //    (unsigned long) 0x00400000, //wrong #todo
-            //    PRIORITY_HIGH,
-            //     (int) 0, 
-            //     "RING0-PROCESS", 
-            //     RING0,   
-            //     (unsigned long ) gKernelPML4Address );
+            p = (struct process_d *) create_process (
+                NULL, NULL, NULL,
+                (unsigned long) 0x00400000, //wrong #todo
+                PRIORITY_HIGH,
+                 (int) 0, 
+                 "RING0-PROCESS", 
+                 RING0,   
+                 (unsigned long ) gKernelPML4Address );
  
-            // #todo: Precisamos de um processo válido pra criarmos uma thread.
-            //create_thread ( 
-            //    NULL, NULL, NULL, 
-            //    0x00400000, 0x005F0000,  //wrong #todo
-            //    current_process, "test-thread" );
+            // #todo: 
+            // Precisamos de um processo válido pra criarmos uma thread.
+            current_process = p->pid;
+            
+            create_thread ( 
+                NULL, NULL, NULL, 
+                0x00400000, 0x005F0000,  //wrong #todo
+                current_process, "test-thread" );
  
- 
+            // Criando uma thread em ring0 que pertence ao processo kernel.
+            printf ("Create thread for kernel\n");
+            KernelProcess = p;
+            create_CreateEarlyRing0IdleThread();
+
+            // Criando uma thread em ring0 que pertence ao processo kernel.
+            printf ("Create thread for init process\n");
+            InitProcess = p;
+            create_CreateRing3InitThread();
+            
+            printf ("Test done\n");
             refresh_screen();
             return;
         }

@@ -13,23 +13,22 @@
 
 void *create_CreateEarlyRing0IdleThread(void)
 {
-    
     struct thread_d  *kThread;
     
     int TID = 0;
-
 
     // loops
     register int r=0;    // Wait reason.
     register int i=0;    // Message queue.
     register int q=0;    // Message queue.
 
-
     char *ThreadName = "EarlyRing0IdleThread";
 
     // Stack pointer.
     void *earlyRing0IdleStack; 
 
+
+    debug_print ("create_CreateEarlyRing0IdleThread:\n");
 
     // The kernel process.
 
@@ -48,14 +47,11 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     if ( (void *) kThread == NULL ){
         panic ("create_CreateEarlyRing0IdleThread: kThread \n");
-    }else{  
-
+    }else{
         kThread->objectType  = ObjectTypeThread;
         kThread->objectClass = ObjectClassKernelObjects;
         kThread->used  = TRUE;
         kThread->magic = 1234;
-
-
         kThread->type = THREAD_TYPE_SYSTEM; 
 
         // #todo
@@ -289,18 +285,17 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     UPProcessorBlock.threads_counter++;
 
-    //
-    // == Queue =====================================
-    //
-
+//
+// == Queue =========================
+//
     queue_insert_data ( 
         queue, 
         (unsigned long) kThread, 
         QUEUE_INITIALIZED );
 
-    //
-    // == Execution ===============================
-    //
+//
+// == Select for execution ================
+//
 
     // #todo
     // This method really need a prefix.
@@ -311,8 +306,13 @@ void *create_CreateEarlyRing0IdleThread(void)
     // * MOVEMENT 1 (Initialized --> Standby).
     SelectForExecution(kThread); 
 
+// Done
+    debug_print ("create_CreateEarlyRing0IdleThread: done\n");
+
     return (void *) kThread;
 }
+
+
 
 /*
  *******************************************************************
@@ -341,6 +341,10 @@ void *create_CreateRing3InitThread (void)
 
     // Stack pointer.
     void *__initStack;   
+
+
+    debug_print ("create_CreateRing3InitThread:\n");
+
 
     // The init process.
 
@@ -653,6 +657,10 @@ void *create_CreateRing3InitThread (void)
     // * MOVEMENT 1 ( Initialized ---> Standby ).
     
     SelectForExecution(t);    
+
+
+// Done
+    debug_print ("create_CreateRing3InitThread: done\n");
 
     return (void *) t;
 }

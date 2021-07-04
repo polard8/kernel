@@ -497,7 +497,9 @@ struct process_d *create_process (
     unsigned long Priority=0;
 
 
-    debug_print ("create_process: [FIXME] It's a work in progress!\n");
+
+    debug_print ("create_process: #todo\n");
+    printf      ("create_process: #todo\n");
 
 
     //=================================
@@ -1051,7 +1053,7 @@ struct process_d *create_process (
 // tty support
 //
 
-    printf ("create_process: calling tty_create[DEBUG]\n");
+    //printf ("create_process: calling tty_create[DEBUG]\n");
 
     Process->tty = ( struct tty_d *) tty_create(); 
 
@@ -1076,6 +1078,7 @@ struct process_d *create_process (
     // last_created = PID;
     
     // #debug
+    debug_print ("create_process: done\n");
     printf ("create_process: done\n");
 
     // ok

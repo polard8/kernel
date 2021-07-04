@@ -232,11 +232,11 @@ int init_threads (void){
 
     debug_print("init_threads:\n");
 
-	//Globais.
+	// Globais
 	current_thread = 0;  //Atual. 
-	
-	//ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.	
-	UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.	
+
+	//ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
+	UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
 	
     old = 0;                                   //?
     forkid = 0;                                //
@@ -323,15 +323,13 @@ void *GetCurrentThread (void){
 
 void SelectForExecution ( struct thread_d *Thread ){
 
-
     if ( (void *) Thread == NULL){
         debug_print ("SelectForExecution: Thread fail\n");
         return;
-    } 
-    
+    }
+
     // #todo
     // Validation ??
-    
 
 	// @todo: if initialized ---> Standby.
 	// @todo: if zombie ---> Standby.
@@ -341,16 +339,19 @@ void SelectForExecution ( struct thread_d *Thread ){
 	// >> Uma thread no estado initialized pode entrar no estado standby 
 	// >> Uma thread no estado zombie pode entrar no estado standby.
 	// >> @todo: se uma thread estiver em qualquer um dos outros estados ela 
-	// n�o pode entrar em stadby.
-
+	// não pode entrar em standby.
 
 //setState:
-    
-	//*MOVIMENTO 1, (Initialized --> Standby).
-    
+
+
+//
+// MOVIMENT 1, (Initialized --> Standby).
+//
+
     Thread->state = (int) STANDBY;
     queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
 }
+
 
 void thread_show_profiler_info (void){
 
@@ -366,36 +367,32 @@ void thread_show_profiler_info (void){
 
         if ( (void *) thread != NULL )
         {
-			if ( thread->used == TRUE && thread->magic == 1234 )
-			{
-		        printf ("tid=%d totalp=%d last_ticks=%d ( %d percent ) name={%s} \n", 
-		            thread->tid,
-		            profiler_ticks_limit,
-		            thread->profiler_last_ticks,
-		            thread->profiler_percentage_running,
-		            thread->name_address );
-			}
+            if ( thread->used == TRUE && thread->magic == 1234 )
+            {
+                printf ("tid=%d totalp=%d last_ticks=%d ( %d percent ) name={%s} \n", 
+                    thread->tid,
+                    profiler_ticks_limit,
+                    thread->profiler_last_ticks,
+                    thread->profiler_percentage_running,
+                    thread->name_address );
+            }
         }
     };
 
     refresh_screen();
 }
 
+
 unsigned long 
 thread_get_profiler_percentage (struct thread_d *thread)
 {
     if ( (void *) thread == NULL ){
-        panic ("thread_get_profiler_percentage: thread");
+        panic ("thread_get_profiler_percentage: thread\n");
     }
  
     return ( unsigned long ) thread->profiler_percentage_running;
 }
 
-/*
- ********************************************
- * show_thread_information:
- *     Mostra informa��es sobre as threads.
- */
 
 void show_thread_information (void){
 
@@ -425,45 +422,39 @@ void show_thread_information (void){
         // ...
     };
 
-	//
-	// Check idle
-	//
+//
+// Check idle
+//
 
     if ( (void *) ____IDLE == NULL ){
-        panic ("dead_thread_collector: ____IDLE fail");
+        panic ("dead_thread_collector: ____IDLE fail\n");
     }else{
-
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
         {
-		    panic ("dead_thread_collector: ____IDLE validation");
-	    }
+            panic ("dead_thread_collector: ____IDLE validation\n");
+        }
 
 	   printf ("Idle thread = %d\n", ____IDLE->tid );
     };
 
 
-	//
-	// Slots.
-	//
+//
+// Slots
+//
 
-	//Mostra Slots. 
-	//threadi.c
+    // threadi.c
 
     show_slots(); 
-	
-	/*
-	 * @todo: 
-	 *     Mostra filas: Ready, Waiting ...
-	 *     checar estruturas de filas no debug.
-	 *     Erro: Mostrar filas n�o deve fazer parte dessa rotina.
-	 */
-	//show_queue_information(queue);
-	
-	//Nothing for now!
+
+    // ??
+    // show_queue_information(queue);
+
+    // Nothing for now.
 
     printf("Done\n");
     refresh_screen ();
 }
+
 
 // ??
 // Chamada pelo timer.c
@@ -471,7 +462,6 @@ int thread_profiler( int service ){
 
     struct thread_d  *__current;
     struct thread_d  *__tmp;
-
     int i=0;
     unsigned long __total = 0; //todas inclusive idle.
     
@@ -479,65 +469,62 @@ int thread_profiler( int service ){
     // safety
     if ( service < 0 )
     {
+       // msg?
        return -1;
     }
-    
-    
-    
+
+    //if ( current_thread < 0 )
+        //return -1;
+
     __current = (struct thread_d *) threadList[current_thread];
     
     if ( (void *) __current == NULL )
     {
         panic ("thread_profiler: __current");
     }
-    
-    
+
     //unsigned long __total_ticks;
     //__total_ticks = (unsigned long) get_systime_totalticks();
   
     switch (service)
     {
-		// Incrementa.
-		case 1:
-		    __current->profiler_ticks_running++;
-		    return 0;
-		    break;
-		
-		// finaliza
-		case 2:
-		  
-		  for (i=0; i<THREAD_COUNT_MAX; i++)
-		  {
-		    __tmp = (struct thread_d *) threadList[i];
-		    
-		    if ( (void *) __tmp != NULL )
-		    {
-				if ( __tmp->used == 1 && __tmp->magic == 1234 )
-				{
-					//salva a contagem dessa thread para consulta futura.
-					__tmp->profiler_last_ticks = __tmp->profiler_ticks_running;
-				    //zera a contagem dessa thread,
-				    __tmp->profiler_ticks_running = 0;
-				    
-				    __tmp->profiler_percentage_running_res = (__tmp->profiler_last_ticks / profiler_ticks_limit );
-				    __tmp->profiler_percentage_running_mod = (__tmp->profiler_last_ticks % profiler_ticks_limit );    
-				    __tmp->profiler_percentage_running =  (__tmp->profiler_percentage_running_mod / (profiler_ticks_limit/100) );
-				}
-			}  
-		  };
-		  
+        // Increment
+        case 1:
+            __current->profiler_ticks_running++;
+            return 0;
+            break;
 
-			profiler_percentage_all_normal_threads = (100 - ____IDLE->profiler_percentage_running );
-			profiler_percentage_idle_thread = ____IDLE->profiler_percentage_running ;
-		    
-		    return 0;
-		    break;
-		    
+        // Finalize
+        case 2:
+            for (i=0; i<THREAD_COUNT_MAX; i++)
+            {
+                __tmp = (struct thread_d *) threadList[i];
+                if ( (void *) __tmp != NULL )
+                {
+                    if ( __tmp->used == 1 && __tmp->magic == 1234 )
+                    {
+                        // Salva a contagem dessa thread para consulta futura.
+                        __tmp->profiler_last_ticks = __tmp->profiler_ticks_running;
+                        // Sera a contagem dessa thread,
+                        __tmp->profiler_ticks_running = 0;
+                        __tmp->profiler_percentage_running_res = (__tmp->profiler_last_ticks / profiler_ticks_limit );
+                        __tmp->profiler_percentage_running_mod = (__tmp->profiler_last_ticks % profiler_ticks_limit );    
+                        __tmp->profiler_percentage_running =  (__tmp->profiler_percentage_running_mod / (profiler_ticks_limit/100) );
+                    }
+                }  
+            };
+
+            profiler_percentage_all_normal_threads = (100 - ____IDLE->profiler_percentage_running );
+            profiler_percentage_idle_thread = ____IDLE->profiler_percentage_running ;
+            return 0;
+
+            break;
+
 		//...
     };
-    
-		// salva a contagem de vezes que a thread rodou
-		// durante o per�odo.
+
+    // Salva a contagem de vezes que 
+    // a thread rodou durante o período.
 
     return -1;
 }
@@ -590,6 +577,9 @@ struct thread_d *create_thread (
     register int q=0;  //loop
     register int w=0;  //loop
 
+
+    debug_print ("create_thread: #todo\n");
+    printf      ("create_thread: #todo\n");
 
 //======================================
 // check parameters.
@@ -1032,6 +1022,9 @@ get_next:
 
 //done:
 
+    debug_print ("create_thread: done\n");
+    printf ("create_thread: done\n");
+    
     //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
     return (void *) Thread;
 }
@@ -1045,7 +1038,7 @@ get_next:
  
 void exit_thread (int tid){
 
-    struct thread_d *Thread;
+    struct thread_d  *Thread;
 
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
@@ -1060,12 +1053,12 @@ void exit_thread (int tid){
     }else{
         if ( ____IDLE->used != TRUE || ____IDLE->magic != 1234 )
         {
-            panic ("exit_thread: ____IDLE validation");
+            panic ("exit_thread: ____IDLE validation\n");
         }
 
         // We can't exit the idle thread.
         if ( tid == ____IDLE->tid ){
-            panic ("exit_thread: Sorry, we can't kill the idle thread!");
+            panic ("exit_thread: Sorry, we can't kill the idle thread!\n");
         }
 
         // ...
@@ -1088,14 +1081,11 @@ void exit_thread (int tid){
             //return;
         }
 
-        //
-        // Zombie!
-        //
-        
+        // Zombie
         // Lembrando que se deixarmos no estado ZOMBIE o 
         // deadthread collector vai destruir a estrutura.
 
-        Thread->state = ZOMBIE; 
+        Thread->state = ZOMBIE;
         
         // #bugbug: Not used for now !!!
         
