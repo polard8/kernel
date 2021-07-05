@@ -361,7 +361,6 @@ int x64main (void)
 {
     int Status=0;
 
-
     // Obs: 
     // O video já foi inicializado em main.c.
     // Isso atualiza a estrutura de console do console atual.

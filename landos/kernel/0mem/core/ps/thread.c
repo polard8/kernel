@@ -394,6 +394,7 @@ thread_get_profiler_percentage (struct thread_d *thread)
 }
 
 
+// Show current thread information.
 void show_thread_information (void){
 
     struct thread_d *Current;

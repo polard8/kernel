@@ -1,14 +1,12 @@
 
 
- // fake main.c
- // We need a fake KERNEL.BIN ELF file that will be used my the
- // boot loader.
- // The boot loader will load the fake kernel image before
- // setting up the long mode and the paging.
-
+// fake main.c
+// We need a fake KERNEL.BIN ELF file that will be used my the
+// boot loader.
+// The boot loader will load the fake kernel image before
+// setting up the long mode and the paging.
 
 #include <kernel.h>
-
 
 unsigned long magic;
 
@@ -19,10 +17,14 @@ unsigned long magic;
 #define bbOffsetBPP       3
 // ...
 
+// See:
+// xxxhead.asm
+extern void x84_64_initialize_machine(void);
 
+// Local boot structure.
 struct x_boot_block_d
 {
-    unsigned long lfb_pa;        // O endereço físico de lfb, usado pelo kernel para paginarmos o lfb.
+    unsigned long lfb_pa;
     unsigned long deviceWidth;   // in pixels
     unsigned long deviceHeight;  // in pixels
     unsigned long bpp;           // bytes per pixel
@@ -31,16 +33,11 @@ struct x_boot_block_d
 struct x_boot_block_d  xBootBlock;
 
 
-// See:
-// xxxhead.asm
-extern void x84_64_initialize_machine(void);
-
-
-
+// #todo
 void preinit_Globals(int arch_type)
 {
     asm ("cli");
-    
+
     // ...
 }
 
@@ -49,7 +46,7 @@ void preinit_Serial(void)
     serial_init();
     debug_print("\n");
     debug_print("\n");
-    debug_print("== X ========================\n");
+    debug_print("== X ========\n");
     debug_print("preinit_Serial: Serial debug initialized!\n");
 }
 
@@ -83,8 +80,8 @@ void preinit_OutputSupport(void)
 
 int kernel_main(int arch_type)
 {
-
     int Status = (-1);
+    int i=0;
 
     // Magic
     unsigned long bootMagic = (unsigned long) (magic & 0x00000000FFFFFFFF); 
@@ -93,22 +90,23 @@ int kernel_main(int arch_type)
     // Each entry has 8 bytes.
     unsigned long *xxxxBootBlock = (unsigned long*) BootBlockVA; 
 
+//
+// lfb
+//
 
     // #test
     // isso não é possivel porque a paginação feita pelo bootloader
     // ainda não esta pronta.
     // #todo:
     // Talvez possamos refazer a paginação usada pelo kernel.
+
     unsigned long *fb = (unsigned long *) FRONTBUFFER_VA; 
     fb[0] = 0x00FFFFFF;
-    
-    int i=0;
 
 
 //
 // magic
 //
-
 
     // Paint a white screen if magic is ok.
     if ( bootMagic == 1234 )
@@ -165,19 +163,18 @@ int kernel_main(int arch_type)
     }
 
 
-
+// =================================================
     // Globals
     // We do not have output yet
-
     //preinit_Globals(arch_type);
     preinit_Globals(0);
-    
+
+// =================================================
     // Serial
     // We do not have output yet
-
     preinit_Serial();
 
-    // =================================================
+
     
     //
     // #progress
@@ -269,7 +266,6 @@ int kernel_main(int arch_type)
 
 
 // =========================
-    
     PROGRESS("Kernel:0:5\n");
     // Clear the screen.
     // print some basic info.
@@ -284,7 +280,6 @@ int kernel_main(int arch_type)
     set_char_width(8);
     set_char_height(8);
     gfontSize = FONT8X8;
-    
 
     //
     // Background
@@ -385,7 +380,7 @@ int kernel_main(int arch_type)
         // See: x64init.c
         case CURRENT_ARCH_X86_64:
             debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
-            //printf("kernel_main: [FAIL] x86_64 is not supported!\n");
+            //printf      ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             Status = (int) x64main();
             if (Status < 0){
                 x_panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
@@ -508,12 +503,41 @@ int kernel_main(int arch_type)
     printf("8 done\n");
     */
 
+
+    // #debug
+    // Show current process info.
+    printf("\n");
+    printf("\n");
+    current_process = KernelProcess->pid;
+    show_currentprocess_info();
+
+    // #fail
+    //printf("\n");
+    //printf("\n");
+    //current_process = InitProcess->pid;
+    //show_currentprocess_info();
+
+    // #debug
+    // Show current thread info.
+    printf("\n");
+    printf("\n");
+    current_thread = EarlyRING0IDLEThread->tid;
+    show_thread_information();
+    
+    // #fail
+    //printf("\n");
+    //printf("\n");
+    //current_thread = InitThread->tid;
+    //show_thread_information();
+
+
     // #debug
     //console_putchar('F',fg_console);
     //refresh_screen();
     //a_soft_place_to_fall();
     //die();
 
+    printf("\n");
     printf("kernel_main: *breakpoint :)\n");
     refresh_screen();
 
@@ -529,6 +553,10 @@ int kernel_main(int arch_type)
     // vai funcionar se as rotinas de inicializações de vetores
     // estiverem prontas e tivermos alguma forma de 
     // imprimir a string na tela.
+
+    // #test
+    // Actually, the init process will use a syscall to
+    // enable the interrupts and start the taskswitching stuff.
 
     //debug_print ("TEST: sti\n");
     asm ("sti");
@@ -549,12 +577,10 @@ int kernel_main(int arch_type)
     //a_soft_place_to_fall();
     //die();
 
-    while(1)
-    {
+    while(1){
         asm ("sti");
         asm ("hlt");
     };
-
 
     // Breakpoint for tests!
     // x_panic("kernel_main: :)");
@@ -562,17 +588,14 @@ int kernel_main(int arch_type)
 //--
 //=====================================================
 
-
-
 //=======================================
     // Something is wrong
     PROGRESS("Kernel:0:7\n"); 
     debug_print ("kernel_main: Something is wrong\n");
 
 //
-// Breakpoint!
+// Breakpoint
 //
-
   // x_panic("kernel_main: :)");
 
 
@@ -600,8 +623,8 @@ fail0:
 }
 
 
-
-//#See: kernel.h and hw.asm
+// #see: 
+// kernel.h and hw.asm
 void xxxxIRQ0_DEBUG_MESSAGE(void)
 {
     debug_print ("xxxxIRQ0_DEBUG_MESSAGE:\n");
@@ -645,6 +668,13 @@ Loop:
     asm ("hlt");
     goto Loop;
 }
+
+//
+// End.
+//
+
+
+
 
 
 
