@@ -23,7 +23,7 @@ void __x64StartInit (void)
 {
     //#todo
     debug_print ("__x64StartInit: [TODO]\n");
-    panic ("__x64StartInit: [TODO]\n");
+    //panic ("__x64StartInit: [TODO]\n");
 
 
     int fileret = -1;
@@ -49,7 +49,7 @@ void __x64StartInit (void)
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
                                   "INIT    BIN", 
-                                  (unsigned long) 0x00400000,
+                                  (unsigned long) 0x00200000,
                                   BUGBUG_IMAGE_SIZE_LIMIT );
 
     // Coldn't load init.bin
@@ -68,7 +68,7 @@ void __x64StartInit (void)
 
     InitProcess = (void *) create_process ( 
                                NULL, NULL, NULL, 
-                               (unsigned long) 0x00400000,  // ?? #check 
+                               (unsigned long) 0x00200000,  // ?? #check 
                                PRIORITY_HIGH, 
                                (int) KernelProcess->pid, 
                                "INIT-PROCESS", 
@@ -143,7 +143,7 @@ void x64mainStartFirstThread (void)
 {
     //#todo
     debug_print ("x64mainStartFirstThread: [TODO]\n");
-    panic       ("x64mainStartFirstThread: [TODO]\n");
+    //panic       ("x64mainStartFirstThread: [TODO]\n");
     
     struct thread_d  *Thread;
     int i=0;
@@ -155,14 +155,16 @@ void x64mainStartFirstThread (void)
 
 
     if ( (void *) Thread == NULL ){
+        debug_print ("x64mainStartFirstThread: Thread\n");
         panic("x64mainStartFirstThread: Thread\n");
     }
 
     if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
-        printf ("x64mainStartFirstThread: tid={%d} magic \n", 
-            Thread->tid);
-         die();
+        debug_print ("x64mainStartFirstThread: Thread validation\n");
+        //printf ("x64mainStartFirstThread: tid={%d} magic \n", 
+        //    Thread->tid);
+        die();
     }
 
     // It its context is already saved, so this is not the fist time.
@@ -287,12 +289,11 @@ void x64mainStartFirstThread (void)
     // #todo
     // Rever se estamos usando a base certa.
 
-    // Image buffer
-    unsigned char *buff1 = (unsigned char *) 0x00400000;
-
-
     // init.bin (ELF)
-
+ 
+    // Image base.
+    // 0x00200000
+    unsigned char *buff1 = (unsigned char *) CONTROLTHREAD_BASE;
 
     if ( buff1[0] != 0x7F ||
          buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
@@ -302,8 +303,8 @@ void x64mainStartFirstThread (void)
 
     // #debug
     debug_print("[x64] Go to user mode!  IRETQ\n");
-    printf     ("[x64] Go to user mode!  IRETQ\n");
-    refresh_screen ();
+    //printf     ("[x64] Go to user mode!  IRETQ\n");
+    //refresh_screen ();
 
 
     PROGRESS("-- Fly -----------------------------------\n");
@@ -341,6 +342,34 @@ void x64mainStartFirstThread (void)
     //    " mov %ax, %fs      \n"
     //    " mov %ax, %gs      \n"
     //    " iretq              \n" );
+
+    // See:
+    // gva.h
+    // CONTROLTHREAD_STACK = 0x003FFFF0
+
+    //asm volatile ( "int $3 \n" );
+
+
+    // A pilha usada pelo kernel no momento
+    // Ela está ao fim da área em ring0 no inpicio da memória ram.
+    asm volatile ( "movq $0x001FFFF0, %rsp \n" );   
+
+    //asm volatile ( "movq $0x23,       %ds:0x20(%rsp) \n" );  // ss
+    //asm volatile ( "movq $0x003FFFF0, %ds:0x18(%rsp) \n" );  // rsp
+    //asm volatile ( "movq $0x3000,     %ds:0x10(%rsp) \n" );  // rflags
+    
+    //asm volatile ( "movq $0x1B,       %ds:0x08(%rsp) \n" );  // cs
+    //asm volatile ( "movq $0x00201000, %ds:0x00(%rsp) \n" );  // rip
+
+    asm volatile ( "pushq $0x23 \n" ); 
+    asm volatile ( "pushq $0x003FFFF0 \n" ); 
+    asm volatile ( "pushq $0x3002 \n" );      // rflags
+    asm volatile ( "pushq $0x1B \n" );        // cs
+    asm volatile ( "pushq $0x00201000 \n" );  // rip
+    asm volatile ( "iretq \n" );
+
+
+    PROGRESS("-- iretq fail -----------------\n");
 
     // Paranoia
     panic ("x64mainStartFirstThread: [FIXME] *breakpoint\n");
@@ -644,7 +673,7 @@ int x64main (void)
     PROGRESS("Kernel:1:8\n"); 
     // Cria e inicializa apenas o INIT.BIN
 
-    //__x86StartInit();
+    __x64StartInit();
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -769,14 +798,32 @@ int x64main (void)
         // No return!
         //
 
-        x86mainStartFirstThread(); 
+        x64mainStartFirstThread(); 
 
         panic("x86mainStartFirstThread: Couldn't spawn the first thread!\n");
     }
     */
 
+
+
+
+
+//
+// #todo
+//
+
+    // Estamos trabalhando nessa rotina, pois é ela que faz o salto
+    // para ring3. O salto esta falhando.
+    
+    //debug_print ("x64main: Calling x64mainStartFirstThread()\n");
+    //x64mainStartFirstThread();
+
+
+
+
     // #test
-    // Estamos usando esse retorno at'e fazermos achamada logo acima.
+    // Estamos usando esse retorno ate fazermos achamada logo acima.
+
     return 0;
 
 // ===============================

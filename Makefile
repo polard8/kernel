@@ -17,15 +17,9 @@ CC      = gcc
 AR      = ar
 MAKE    = make
 NASM    = nasm
-OBJCOPY = objcopy
-OBJDUMP = objdump
-LEX     = flex
-YACC    = bison
-PERL    = perl
 PYTHON  = python
 PYTHON2 = python2
 PYTHON3 = python3
-RUBY    = ruby
 
 # Verbose.
 
@@ -147,6 +141,9 @@ vhd-copy-files:
 	@echo "========================="
 	@echo "(Step 4) Copying files into the mounted VHD ..."
 
+	#Copy INIT.BIN to base/
+	sudo cp landos/init/INIT.BIN  base/
+	
 	# Copy base
 	# sends everything from base to root.
 	sudo cp -r base/*  /mnt/gramadoxvhd

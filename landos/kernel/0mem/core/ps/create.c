@@ -427,18 +427,19 @@ void *create_CreateRing3InitThread (void)
     // Não estamos usando isso.
     // 8KB.
 
+    // #bugbug
+    // Essa stack está em ring0.
+    // Se o processo precisa de uma stack em ring 0 então usaremos essa.
+
     __initStack = (void *) kmalloc (8*1024);
 
     if ( (void *) __initStack == NULL ){
         panic ("create_CreateRing3InitThread: __initStack\n");
     }
 
-
-    // Page Directory
-    //t->DirectoryPA = (unsigned long ) InitProcess->DirectoryPA;
-    //if ( t->DirectoryPA == 0 ){
-    //    panic("create_CreateRing3InitThread: t->DirectoryPA\n");
-    //}
+//
+// pml4
+//
 
     // pml4 physical address
     t->pml4_PA = (unsigned long ) InitProcess->pml4_PA;
@@ -446,8 +447,6 @@ void *create_CreateRing3InitThread (void)
         panic("create_CreateRing3InitThread: t->pml4_PA\n");
     }
 
-
-    // loop
     // Clean the 'wait reason'.
     for ( r=0; r<8; ++r ){ t->wait_reason[r] = (int) 0; };
 
@@ -457,6 +456,10 @@ void *create_CreateRing3InitThread (void)
 
     //t->procedure = (unsigned long) &system_procedure;
 
+
+//
+// == Message =========
+//
 
     // Single kernel event.
 
@@ -540,8 +543,10 @@ void *create_CreateRing3InitThread (void)
     //
 
 
-    // Context.
-    
+//
+// == Context ===================
+//
+
     // #todo: 
     // Isso deve ser uma estrutura de contexto.
 
@@ -552,6 +557,8 @@ void *create_CreateRing3InitThread (void)
     // See: x86init.c
 
     // Stack frame.
+    // See: gva.h
+    //
 
     t->ss     = 0x23; 
     t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 

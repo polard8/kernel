@@ -62,15 +62,14 @@ LIBC    =  ../../landlib/rtl/include/
 LIBCOBJ =  ../../landlib/rtl/obj
 
 
-#
-# Objects
-#
+	#
+	# Objects
+	#
 
-# myObjects = crt0.o main.o \
-# ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
-# termios.o ioctl.o fcntl.o rtl.o    
+myObjects = crt0.o main.o \
+ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
+termios.o ioctl.o fcntl.o rtl.o    
 
-myObjects = main.o    
 
 
 
@@ -86,32 +85,32 @@ crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
 
 main.o:
-	$(CC)  -c  ohboy.c -I $(LIBC) $(CFLAGS) -o main.o
+	$(CC)  -c  main.c -I $(LIBC) $(CFLAGS) -o main.o
 
 all-c:
 
 # We need some api and libc objects.
 
 #obs: estamos usando um crt0.o compilado aqui mesmo.
-	#cp $(LIBCOBJ)/crt0.o .
-	#cp $(LIBCOBJ)/rtl.o .
+	cp $(LIBCOBJ)/crt0.o .
+	cp $(LIBCOBJ)/rtl.o .
 	
-	#cp $(LIBCOBJ)/ctype.o .
-	#cp $(LIBCOBJ)/stdio.o .
-	#cp $(LIBCOBJ)/stdlib.o .
-	#cp $(LIBCOBJ)/string.o .
-	#cp $(LIBCOBJ)/conio.o .
-	#cp $(LIBCOBJ)/unistd.o .
+	cp $(LIBCOBJ)/ctype.o .
+	cp $(LIBCOBJ)/stdio.o .
+	cp $(LIBCOBJ)/stdlib.o .
+	cp $(LIBCOBJ)/string.o .
+	cp $(LIBCOBJ)/conio.o .
+	cp $(LIBCOBJ)/unistd.o .
 
-	#cp $(LIBCOBJ)/termios.o .
-	#cp $(LIBCOBJ)/ioctl.o .
-	#cp $(LIBCOBJ)/fcntl.o .
+	cp $(LIBCOBJ)/termios.o .
+	cp $(LIBCOBJ)/ioctl.o .
+	cp $(LIBCOBJ)/fcntl.o .
 	
 	#cp $(APIOBJ)/api.o .
 
 
 shell-link:
-	$(LD) -T ../applink.ld -o INIT.BIN $(myObjects)    
+	$(LD) -m elf_i386 -T ../applink.ld -o INIT.BIN $(myObjects)    
 
 finalize:
 #	cp INIT.BIN ../../bin/
@@ -120,5 +119,5 @@ finalize:
 clean:
 	-rm *.o
 #	-rm INIT.BIN 
-
+	
 

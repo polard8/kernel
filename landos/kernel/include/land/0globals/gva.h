@@ -37,10 +37,17 @@
 // process support.
 //
 
-// #test #bugbug
-#define CONTROLTHREAD_BASE        0x00400000  // base
-#define CONTROLTHREAD_ENTRYPOINT  0x00401000  // entry point
-#define CONTROLTHREAD_STACK       0x005FFFF0  // stack
+
+
+// #test 
+// Isso será usado por todos os processos em ring3
+// no ambiente do sistema principal.
+#define CONTROLTHREAD_BASE        0x00200000  // base
+#define CONTROLTHREAD_ENTRYPOINT  0x00201000  // entry point
+// Stack do processo em ring3.
+// Lembre-se que o processo vai precisa de um heap.
+#define CONTROLTHREAD_STACK       0x003FFFF0  // stack 
+
 
 // Isso porque endereços físicos e virtuais são igual para
 // baixo de 1 mb.

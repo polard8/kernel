@@ -1807,8 +1807,8 @@ fsLoadFile (
     //printf ("Antes: FileSize %d BufferLimit %d\n",
     //        FileSize, BufferLimit );
 
-    //if ( FileSize > BufferLimit )
-    if ( FileSize > 4000 )
+    //if ( FileSize > 4000 )
+    if ( FileSize > BufferLimit )
     {
         debug_print ("fsLoadFile: [FAIL] Buffer Overflow\n");
              printf ("fsLoadFile: [FAIL] FileSize %d BufferLimit %d\n",

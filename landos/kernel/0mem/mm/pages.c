@@ -590,12 +590,10 @@ int mmSetUpPaging (void)
     LARGE_extraheap3_pa  = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;
 
 
-
-    //
-    // Directory.
-    //
-
-    // 0x0009C000 = Kernel page directory
+//
+// pml4
+//
+    // 0x0009C000 = Kernel pml4
 
 
     // 9 9 9 9 12
@@ -617,7 +615,8 @@ int mmSetUpPaging (void)
 // PD   - Page Directory
 // PT   - Page Table
 
-    // isso porque endereço físico e virtual são igual abaixo de 1 mb.
+    // Isso porque endereço físico e virtual são igual abaixo de 1 mb.
+    // 0x0009C000va = 0x0009C000pa
     gKernelPML4Address = KERNEL_PML4_VA;
 
     // level 4
@@ -722,7 +721,12 @@ int mmSetUpPaging (void)
 
     // See:
     // gpa.h
-
+    
+    // #todo
+    // Como esses são endereços físicos,
+    // podemos usar nomes que indiquem que esses são endereços físicos.
+    // Como por exemplo, nomes terminados em _PA.
+ 
     // Início da memória RAM.
     unsigned long kernel_address = SYSTEM_ORIGIN;
 
@@ -825,7 +829,7 @@ int mmSetUpPaging (void)
     // 386 = backbuffer, começa na área de 16MB da memória física.
 
 // =======================================
-// Primeiros 2MB.
+// Primeiros 2MB.  0 ~ 0x1FFFFF
 // 0virt
 Entry_0:
 
@@ -860,7 +864,7 @@ Entry_0:
 
 
 // =======================================
-// Uma área em user mode.
+// Uma área em user mode. 0x00200000 ~ 0x003FFFFF
 // 0x00200000vir - Começa na marca de 32mb fis.
 Entry_1:
 
@@ -886,7 +890,7 @@ Entry_1:
 
 
 // =====================================
-// A imagem do kernel.
+// A imagem do kernel.  0x30000000 ~ 0x301FFFFF
 // 0x30000000virt
 Entry_384:
 
@@ -913,7 +917,7 @@ Entry_384:
 
 
 //===========================================
-// frontbuffer - LFB
+// frontbuffer - LFB  0x30200000 ~ 0x303FFFFF 
 // 0x30200000virt
 Entry_385:
 
@@ -946,7 +950,7 @@ Entry_385:
 
 
 // ===================================================
-// backbuffer
+// backbuffer    0x30400000 ~ 0x305FFFFF
 // 0x30400000virt
 Entry_386:
 
@@ -971,7 +975,8 @@ Entry_386:
 
 //++
 // ====================================================================
-// #test #todo : Paged pool area.
+// #test #todo : Paged pool area. 0x30600000 ~ 0x307FFFFF
+// 0x30600000
 Entry_387:
 
     //g_pagedpool_va = (unsigned long) XXXPAGEDPOOL_VA;  
@@ -988,8 +993,6 @@ Entry_387:
     kernel_pd0[387] = (unsigned long) kernel_pd0[387] | 7;
 // ====================================================================
 //--
-
-
 
 
 //
