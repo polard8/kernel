@@ -70,7 +70,7 @@ LIBCOBJ =  ../../landlib/rtl/obj
 # ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
 # termios.o ioctl.o fcntl.o rtl.o    
 
-myObjects = main.o    
+myObjects = marginal.o main.o    
 
 
 
@@ -84,6 +84,7 @@ head.o:
 
 crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
+	nasm marginal.asm -f elf64 -o marginal.o
 
 main.o:
 	$(CC)  -c  ohboy.c -I $(LIBC) $(CFLAGS) -o main.o

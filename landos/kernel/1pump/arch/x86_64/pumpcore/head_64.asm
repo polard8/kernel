@@ -366,23 +366,26 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
 
+
+
 ; #test
 .Ring3Code: equ $ - GDT64         ; The code descriptor.
     dw 0                         ; Limit (low).
     dw 0                         ; Base (low).
     db 0                         ; Base (middle)
-    db 11111000b                 ; Access (exec/read).
-    db 00100000b                 ; Granularity, 64 bits flag, limit19:16.
+    db 11111010b                 ; Access (exec/read).
+    db 10101111b                 ; Granularity, 64 bits flag, limit19:16.
     db 0                         ; Base (high).
 
 ; #test
-.Ring3Data: equ $ - GDT64         ; The data descriptor.
+.Ring3Data: equ $ - GDT64        ; The data descriptor.
     dw 0                         ; Limit (low).
     dw 0                         ; Base (low).
     db 0                         ; Base (middle)
-    db 10010000b                 ; Access (read/write).
+    db 11110010b                 ; Access (read/write).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
+
 
 
 .Pointer:                    ; The GDT-pointer.

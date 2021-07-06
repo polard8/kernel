@@ -74,7 +74,7 @@ void __x64StartInit (void)
                                (int) KernelProcess->pid, 
                                "INIT-PROCESS", 
                                RING3, 
-                               (unsigned long ) CloneKernelPML4() );
+                               (unsigned long ) CloneKernelPML4() ); //gKernelPML4Address
 
     if ( (void *) InitProcess == NULL ){
         panic ("__x64StartInit: InitProcess\n");
@@ -331,46 +331,28 @@ void x64initStartFirstThread (void)
 // #todo
 //
 
-    //asm volatile ( 
-    //    " movq $0x003FFFF0, %rsp \n"
-    //    " movq $0x23,       %ds:0x10(%rsp)  \n"
-    //    " movq $0x0044FFF0, %ds:0x0C(%rsp)  \n"
-    //    " movq $0x3000,     %ds:0x08(%rsp)  \n"
-    //    " movq $0x1B,       %ds:0x04(%rsp)  \n"
-    //    " movq $0x00401000, %ds:0x00(%rsp)  \n"
-    //    " movq $0x23, %rax  \n"
-    //    " mov %ax, %ds      \n"
-    //    " mov %ax, %es      \n"
-    //    " mov %ax, %fs      \n"
-    //    " mov %ax, %gs      \n"
-    //    " iretq              \n" );
-
     // See:
     // gva.h
-    // CONTROLTHREAD_STACK = 0x003FFFF0
 
-    //asm volatile ( "int $3 \n" );
-
-
+    // ok, funciona
+    unsigned long entry = 0x201000;
+    unsigned long rsp3  = 0x00000000002FFFF0;
     asm volatile ( 
-        " movq $0, %rax                  \n" 
-        " mov %ax, %ss                   \n" 
-        " movq $0x00000000002FFFF0, %rsp \n" 
-        " pushq $0x23                    \n"  
-        " pushq $0x00000000002FFFF0      \n" 
-        " pushq $0x3002                  \n" 
-        " pushq $0x1B                    \n" 
-        " pushq $0x0000000000201000      \n" 
-        " movq $0, %rax                  \n" 
-        " mov %ax, %ds                   \n" 
-        " mov %ax, %es                   \n" 
-        " mov %ax, %fs                   \n" 
-        " mov %ax, %gs                   \n" 
-        " iretq                          \n" );
-
-
-
-
+        " movq $0, %%rax    \n" 
+        " mov %%ax, %%ds    \n" 
+        " mov %%ax, %%es    \n" 
+        " mov %%ax, %%fs    \n" 
+        " mov %%ax, %%gs    \n" 
+        " movq %0, %%rax    \n" 
+        " movq %1, %%rsp    \n" 
+        " movq $0, %%rbp    \n" 
+        " pushq $0x23       \n"  
+        " pushq %%rsp       \n" 
+        " pushq $0x3002     \n" 
+        " pushq $0x1B       \n" 
+        " pushq %%rax       \n" 
+        " iretq             \n" :: "D"(entry), "S"(rsp3) );
+  
     PROGRESS("-- iretq fail -----------------\n");
 
     // Paranoia
