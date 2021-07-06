@@ -802,13 +802,13 @@ int mmSetUpPaging (void)
     // at the first entry in the 'page directory pointer table'.
 
     kernel_pdpt[0] = (unsigned long) &kernel_pd0[0];
-    kernel_pdpt[0] = (unsigned long) kernel_pdpt[0] | 3; //7;
+    kernel_pdpt[0] = (unsigned long) kernel_pdpt[0] | 7; //3;
 
     // pdpt >> pml4
     // Pointing the 'page directory pointer table' address 
     // at the first entry in the kernel_pml4.
     kernel_pml4[0] = (unsigned long) &kernel_pdpt[0];
-    kernel_pml4[0] = (unsigned long) kernel_pml4[0] | 3; //7;
+    kernel_pml4[0] = (unsigned long) kernel_pml4[0] | 7; //3;
 
 //
 // ============================

@@ -27,7 +27,17 @@ void faults ( unsigned long number )
         case 0: x_panic("faults() 0"); break;
         case 1: x_panic("faults() 1"); break;
         case 2: x_panic("faults() 2"); break;
-        case 3: x_panic("faults() 3"); break;
+        
+        case 3: 
+            printf ("== 3 ==\n");  
+            show_slots();
+            refresh_screen();
+            // Esse tipo funciona mesmo antes do console
+            // ter sido inicializado.
+            x_panic("faults() 3"); 
+            break;
+        
+        
         case 4: x_panic("faults() 4"); break;
         case 5: x_panic("faults() 5"); break;
         case 6: x_panic("faults() 6"); break;
@@ -37,7 +47,17 @@ void faults ( unsigned long number )
         case 10: x_panic("faults() 10"); break;
         case 11: x_panic("faults() 11"); break;
         case 12: x_panic("faults() 12"); break;
-        case 13: x_panic("faults() 13"); break;
+
+
+        case 13: 
+            printf ("== PF ==\n");  
+            show_slots();
+            refresh_screen();
+            // Esse tipo funciona mesmo antes do console
+            // ter sido inicializado.
+            x_panic("faults() 13"); 
+            break;
+        
         case 14: x_panic("faults() 14"); break;
         case 15: x_panic("faults() 15"); break;
         case 16: x_panic("faults() 16"); break;

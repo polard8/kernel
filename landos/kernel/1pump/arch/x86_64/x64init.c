@@ -23,7 +23,8 @@ void __x64StartInit (void)
 {
     //#todo
     debug_print ("__x64StartInit: [TODO]\n");
-    //panic ("__x64StartInit: [TODO]\n");
+    printf      ("__x64StartInit: [TODO]\n");
+    refresh_screen();
 
 
     int fileret = -1;
@@ -33,29 +34,29 @@ void __x64StartInit (void)
 //
 // Load image INIT.BIN.
 //
-
     // #importante
     // Carregado do diretório raiz
- 
-    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
-
-
     // loading image.
     // #bugbug
     // Loading from root dir. 512 entries limit.
+
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
     fileret = (unsigned long) fsLoadFile ( 
                                   VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
                                   "INIT    BIN", 
-                                  (unsigned long) 0x00200000,
+                                  (unsigned long) CONTROLTHREAD_BASE, //0x00200000
                                   BUGBUG_IMAGE_SIZE_LIMIT );
 
     // Coldn't load init.bin
     if ( fileret != 0 ){
-        panic ("__x64StartInit: Coldn't load init.bin \n");
+        debug_print("__x64StartInit: Coldn't load init.bin \n");
+        panic      ("__x64StartInit: Coldn't load init.bin \n");
     }
+
+
 
 	// Creating init process.
 	// > Cria um diretório que é clone do diretório do kernel base 
@@ -68,7 +69,7 @@ void __x64StartInit (void)
 
     InitProcess = (void *) create_process ( 
                                NULL, NULL, NULL, 
-                               (unsigned long) 0x00200000,  // ?? #check 
+                               (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
                                PRIORITY_HIGH, 
                                (int) KernelProcess->pid, 
                                "INIT-PROCESS", 
@@ -139,11 +140,13 @@ void __x64StartInit (void)
 
 
 // local
-void x64mainStartFirstThread (void)
+void x64initStartFirstThread (void)
 {
     //#todo
-    debug_print ("x64mainStartFirstThread: [TODO]\n");
-    //panic       ("x64mainStartFirstThread: [TODO]\n");
+    debug_print ("x64initStartFirstThread: [TODO]\n");
+    printf      ("x64initStartFirstThread: [TODO]\n");
+    refresh_screen();
+    
     
     struct thread_d  *Thread;
     int i=0;
@@ -155,14 +158,14 @@ void x64mainStartFirstThread (void)
 
 
     if ( (void *) Thread == NULL ){
-        debug_print ("x64mainStartFirstThread: Thread\n");
-        panic("x64mainStartFirstThread: Thread\n");
+        debug_print ("x64initStartFirstThread: Thread\n");
+        panic       ("x64initStartFirstThread: Thread\n");
     }
 
     if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
-        debug_print ("x64mainStartFirstThread: Thread validation\n");
-        //printf ("x64mainStartFirstThread: tid={%d} magic \n", 
+        debug_print ("x64initStartFirstThread: Thread validation\n");
+        //printf ("x64initStartFirstThread: tid={%d} magic \n", 
         //    Thread->tid);
         die();
     }
@@ -170,11 +173,11 @@ void x64mainStartFirstThread (void)
     // It its context is already saved, so this is not the fist time.
     
     if ( Thread->saved != FALSE ){
-        panic("x64mainStartFirstThread: saved\n");
+        panic("x64initStartFirstThread: saved\n");
     }
 
     if ( Thread->tid < 0 ){
-        panic("x64mainStartFirstThread: tid\n");
+        panic("x64initStartFirstThread: tid\n");
     }
 
     // Set the current thread.
@@ -187,7 +190,7 @@ void x64mainStartFirstThread (void)
 
     if ( Thread->state != STANDBY )
     {
-        printf ("x64mainStartFirstThread: state tid={%d}\n", 
+        printf ("x64initStartFirstThread: state tid={%d}\n", 
             Thread->tid);
         die();
     }
@@ -210,12 +213,9 @@ void x64mainStartFirstThread (void)
 //
 // List
 //
-
-    for ( i=0; i < PRIORITY_MAX; i++ )
-    {
+    for ( i=0; i < PRIORITY_MAX; i++ ){
         dispatcherReadyList[i] = (unsigned long) Thread;
     };
-
     IncrementDispatcherCount (SELECT_IDLE_COUNT);
 
 
@@ -253,6 +253,7 @@ void x64mainStartFirstThread (void)
 // # check this
 //
     // See: headlib.asm
+    // Se nao limpar, um iret causa taskswitch
 
     x64_clear_nt_flag();   
 
@@ -298,13 +299,14 @@ void x64mainStartFirstThread (void)
     if ( buff1[0] != 0x7F ||
          buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
     {
-        panic ("x64mainStartFirstThread: init .ELF signature");
+        debug_print ("x64initStartFirstThread: init .ELF signature\n");
+        panic       ("x64initStartFirstThread: init .ELF signature");
     }
 
     // #debug
     debug_print("[x64] Go to user mode!  IRETQ\n");
-    //printf     ("[x64] Go to user mode!  IRETQ\n");
-    //refresh_screen ();
+    printf     ("[x64] Go to user mode!  IRETQ\n");
+    refresh_screen();
 
 
     PROGRESS("-- Fly -----------------------------------\n");
@@ -336,7 +338,7 @@ void x64mainStartFirstThread (void)
     //    " movq $0x3000,     %ds:0x08(%rsp)  \n"
     //    " movq $0x1B,       %ds:0x04(%rsp)  \n"
     //    " movq $0x00401000, %ds:0x00(%rsp)  \n"
-    //    " movq $0x23, %eax  \n"
+    //    " movq $0x23, %rax  \n"
     //    " mov %ax, %ds      \n"
     //    " mov %ax, %es      \n"
     //    " mov %ax, %fs      \n"
@@ -350,29 +352,44 @@ void x64mainStartFirstThread (void)
     //asm volatile ( "int $3 \n" );
 
 
-    // A pilha usada pelo kernel no momento
-    // Ela está ao fim da área em ring0 no inpicio da memória ram.
-    asm volatile ( "movq $0x001FFFF0, %rsp \n" );   
 
-    //asm volatile ( "movq $0x23,       %ds:0x20(%rsp) \n" );  // ss
-    //asm volatile ( "movq $0x003FFFF0, %ds:0x18(%rsp) \n" );  // rsp
-    //asm volatile ( "movq $0x3000,     %ds:0x10(%rsp) \n" );  // rflags
-    
-    //asm volatile ( "movq $0x1B,       %ds:0x08(%rsp) \n" );  // cs
-    //asm volatile ( "movq $0x00201000, %ds:0x00(%rsp) \n" );  // rip
 
-    asm volatile ( "pushq $0x23 \n" ); 
-    asm volatile ( "pushq $0x003FFFF0 \n" ); 
-    asm volatile ( "pushq $0x3002 \n" );      // rflags
-    asm volatile ( "pushq $0x1B \n" );        // cs
-    asm volatile ( "pushq $0x00201000 \n" );  // rip
-    asm volatile ( "iretq \n" );
+
+
+
+    asm volatile ( " movq $0, %rax                  \n" );
+    asm volatile ( " mov %ax, %ss                   \n" );
+    asm volatile ( " movq $0x00000000002FFFF0, %rsp \n" );
+
+    // Stack frame
+    asm volatile ( "pushq $0x23                     \n" );  // ss 
+    asm volatile ( "pushq $0x00000000002FFFF0       \n" );  // rsp
+    asm volatile ( "pushq $0x3002                   \n" );  // rflags
+    asm volatile ( "pushq $0x1B                     \n" );  // cs
+    asm volatile ( "pushq $0x0000000000201000       \n" );  // rip
+
+    asm volatile ( " movq $0, %rax                  \n" );
+    asm volatile ( " mov %ax, %ds                   \n" );
+    asm volatile ( " mov %ax, %es                   \n" );
+    asm volatile ( " mov %ax, %fs                   \n" );
+    asm volatile ( " mov %ax, %gs                   \n" );
+
+    asm volatile ( "iretq                           \n" );
+
+
+
+
+
+
+
+
+
 
 
     PROGRESS("-- iretq fail -----------------\n");
 
     // Paranoia
-    panic ("x64mainStartFirstThread: [FIXME] *breakpoint\n");
+    panic ("x64initStartFirstThread: [FIXME] *breakpoint\n");
 }
 
 
@@ -402,7 +419,7 @@ int x64main (void)
  
     debug_print ("x64main: [TODO]\n");
     printf      ("x86main: [TODO]\n");
-
+    refresh_screen();
 
     if (current_arch != CURRENT_ARCH_X86_64)
     {
@@ -815,10 +832,11 @@ int x64main (void)
     // Estamos trabalhando nessa rotina, pois é ela que faz o salto
     // para ring3. O salto esta falhando.
     
-    //debug_print ("x64main: Calling x64mainStartFirstThread()\n");
-    //x64mainStartFirstThread();
-
-
+    // #todo
+    // pegar o retorno dessa funçao e retornar para quem nos chamou.
+    
+    debug_print ("x64main: Calling x64initStartFirstThread()\n");
+    x64initStartFirstThread();
 
 
     // #test

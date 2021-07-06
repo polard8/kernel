@@ -3,7 +3,6 @@
 #include <kernel.h>
 
 /*
- *****************************************************
  * show_slot:
  *     Show info about a thread.
  */
@@ -24,14 +23,13 @@ void show_slot (int tid){
     if ( (void *) t == NULL ){
         printf ("show_slot: t\n");
         goto fail;
-
     }else{
 
         // Show one slot.
         printf ("\n");
-        printf ("TID   PID   pdPA  Prio  State Quan *Jiffies initial_eip eflags   tName \n");
+        printf ("TID   PID   pdPA  Prio  State Quan *Jiffies initial_rip rflags   tName \n");
         printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  ===== \n");
-        printf ("%d    %d    %x   %d    %d    %d   %d      %x          %x      %s \n", 
+        printf ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s \n", 
             t->tid, 
             t->ownerPID,
             t->pml4_PA,

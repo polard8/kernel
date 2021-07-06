@@ -79,12 +79,10 @@ START:
     ; Magic
 
     mov dword [_magic], edx
-    
 
 ;
 ; GDT
 ;
-
     ; Load our own 64-bit global descriptor table.
 
     lgdt [GDT64.Pointer]        
@@ -344,6 +342,7 @@ align 8
 
 ;; See:
 ;; https://wiki.osdev.org/Setting_Up_Long_Mode
+;; Entry size ?
 GDT64:                           ; Global Descriptor Table (64-bit).
 .Null: equ $ - GDT64         ; The null descriptor.
     dw 0xFFFF                    ; Limit (low).
@@ -366,6 +365,26 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     db 10010010b                 ; Access (read/write).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
+
+; #test
+.Ring3Code: equ $ - GDT64         ; The code descriptor.
+    dw 0                         ; Limit (low).
+    dw 0                         ; Base (low).
+    db 0                         ; Base (middle)
+    db 11111000b                 ; Access (exec/read).
+    db 00100000b                 ; Granularity, 64 bits flag, limit19:16.
+    db 0                         ; Base (high).
+
+; #test
+.Ring3Data: equ $ - GDT64         ; The data descriptor.
+    dw 0                         ; Limit (low).
+    dw 0                         ; Base (low).
+    db 0                         ; Base (middle)
+    db 10010000b                 ; Access (read/write).
+    db 00000000b                 ; Granularity.
+    db 0                         ; Base (high).
+
+
 .Pointer:                    ; The GDT-pointer.
     dw $ - GDT64 - 1             ; Limit.
     dq GDT64                     ; Base.

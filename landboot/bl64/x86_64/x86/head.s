@@ -286,7 +286,6 @@ _go_to_kernel:
     ; The paging was NOT enabled in pages.c
 
     mov ebx, cr0
-    ;or ebx,0x80000000 
     or ebx,0x80000001 
     mov cr0, ebx 
 
@@ -319,10 +318,7 @@ _go_to_kernel:
     ;xor ecx, ecx
     mov edx, dword 1234
 
-;
-; Jump to the 64bit code in KERNEL.BIN.
-;
-
+    ; Jump to the 64bit code in KERNEL.BIN.
     ; It will change the game and we will enter in 64bit long mode.
 
     jmp GDT64.Code:0x30001000

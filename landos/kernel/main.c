@@ -281,9 +281,11 @@ int kernel_main(int arch_type)
     set_char_height(8);
     gfontSize = FONT8X8;
 
-    //
-    // Background
-    //
+
+
+//
+// == Background ===================================================
+//
 
     // Initializing background 
     // for the very first time.
@@ -295,6 +297,51 @@ int kernel_main(int arch_type)
     // See: user/draw/view/bg.c
     
     Background_initialize();
+
+
+    // ++
+    // ======================================
+    // Screen size
+    
+    unsigned long bytes_per_pixel = 0;
+    unsigned long pitch = 0;
+    unsigned long sz_in_kb = 0;
+
+    refresh_screen_flag = FALSE;
+    screen_size_in_kb = 0;
+
+    if ( xBootBlock.bpp == 24 || xBootBlock.bpp == 32 )
+    {
+        bytes_per_pixel = (xBootBlock.bpp / 8); 
+        pitch = (xBootBlock.deviceWidth * bytes_per_pixel);
+    }  
+
+    if ( pitch == 0){
+        refresh_screen_flag = FALSE;
+        printf ("Screen size fail. pitch\n");
+    }
+
+    if ( pitch != 0){
+        
+        sz_in_kb = (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
+        screen_size_in_kb = sz_in_kb;
+        
+        printf ("Screen size: %d KB\n", sz_in_kb);
+        
+        // fail.
+        if ( sz_in_kb >= 2048 ){
+            refresh_screen_flag = FALSE;
+            printf ("Screen size fail sz_in_k\n");
+        }
+    
+        // ok
+        if ( sz_in_kb < 2048 ){
+            refresh_screen_flag = TRUE;  
+        }
+    }
+    // ======================================
+    // --
+
 
 
     // BANNER !
@@ -444,6 +491,10 @@ int kernel_main(int arch_type)
     printf ("BPP    = %d \n",xBootBlock.bpp );
 
 
+
+
+    /*
+    // Antecipado
     // ++
     // ======================================
     // Screen size
@@ -484,9 +535,12 @@ int kernel_main(int arch_type)
             refresh_screen_flag = TRUE;  
         }
     }
-
     // ======================================
     // --
+    */
+
+
+
 
     //#test
     // x64_info();
