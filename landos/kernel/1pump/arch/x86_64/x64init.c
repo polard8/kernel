@@ -352,36 +352,21 @@ void x64initStartFirstThread (void)
     //asm volatile ( "int $3 \n" );
 
 
-
-
-
-
-
-    asm volatile ( " movq $0, %rax                  \n" );
-    asm volatile ( " mov %ax, %ss                   \n" );
-    asm volatile ( " movq $0x00000000002FFFF0, %rsp \n" );
-
-    // Stack frame
-    asm volatile ( "pushq $0x23                     \n" );  // ss 
-    asm volatile ( "pushq $0x00000000002FFFF0       \n" );  // rsp
-    asm volatile ( "pushq $0x3002                   \n" );  // rflags
-    asm volatile ( "pushq $0x1B                     \n" );  // cs
-    asm volatile ( "pushq $0x0000000000201000       \n" );  // rip
-
-    asm volatile ( " movq $0, %rax                  \n" );
-    asm volatile ( " mov %ax, %ds                   \n" );
-    asm volatile ( " mov %ax, %es                   \n" );
-    asm volatile ( " mov %ax, %fs                   \n" );
-    asm volatile ( " mov %ax, %gs                   \n" );
-
-    asm volatile ( "iretq                           \n" );
-
-
-
-
-
-
-
+    asm volatile ( 
+        " movq $0, %rax                  \n" 
+        " mov %ax, %ss                   \n" 
+        " movq $0x00000000002FFFF0, %rsp \n" 
+        " pushq $0x23                    \n"  
+        " pushq $0x00000000002FFFF0      \n" 
+        " pushq $0x3002                  \n" 
+        " pushq $0x1B                    \n" 
+        " pushq $0x0000000000201000      \n" 
+        " movq $0, %rax                  \n" 
+        " mov %ax, %ds                   \n" 
+        " mov %ax, %es                   \n" 
+        " mov %ax, %fs                   \n" 
+        " mov %ax, %gs                   \n" 
+        " iretq                          \n" );
 
 
 
