@@ -253,7 +253,17 @@ tss_init (
 
     //ring 0 stack
     tss->rsp0 = stack_address;  // va ?? 
+    
+    
+    //#debug
+    //printf ("Stack %x\n", stack_address);
+    //refresh_screen();
+    //while(1){}
 }
+
+
+
+
 
 // # not tested yet
 void x64_load_ltr (int tr)
