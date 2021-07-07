@@ -3,6 +3,15 @@
 #include <kernel.h>    
 
 
+// # not tested yet
+void x64_load_ltr (int tr)
+{
+    asm volatile ( \
+        " movw %w0, %%ax; \
+          ltrw %%ax;     "\
+        :: "a"(tr) );
+}
+
 
 /*
  ***************************************************

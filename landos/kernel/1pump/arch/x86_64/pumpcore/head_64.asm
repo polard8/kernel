@@ -169,6 +169,19 @@ START:
 ;
 ; == TR (tss) ======================================
 ;
+ 
+    ;mov rax, qword tss0
+
+    ;mov [GDT64.tssData + 2], ax
+    ;shr rax, 16
+    ;mov [GDT64.tssData + 4],  al
+    ;mov [GDT64.tssData + 7],  ah
+
+    ; Load TR.
+    ; 0x2B = (0x28+3).
+
+    ;mov ax, word 0x2B
+    ;ltr ax
 
 
 ;
@@ -366,8 +379,6 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
 
-
-
 ; #test
 .Ring3Code: equ $ - GDT64         ; The code descriptor.
     dw 0                         ; Limit (low).
@@ -386,7 +397,14 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     db 00000000b                 ; Granularity.
     db 0                         ; Base (high).
 
-
+; #test
+;.tssData: equ $ - GDT64          ; The data descriptor.
+;    dw 0                         ; Limit (low).
+;    dw 0                         ; Base (low).
+;    db 0                         ; Base (middle)
+;    db 0x89                      ; Access (read/write).
+;    db 0x10                      ; Granularity.
+;    db 0                         ; Base (high).
 
 .Pointer:                    ; The GDT-pointer.
     dw $ - GDT64 - 1             ; Limit.

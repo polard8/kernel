@@ -92,12 +92,15 @@ land-os:
 	@echo "=================="
 	@echo "(Step 1) Creating the kernel image ..."
 
-	$(Q) $(MAKE) -C landos/kernel
-
 	# O BL.BIN procura o kernel no diretorio GRAMADO/
 	# See: fs/loader.c
 
+	$(Q) $(MAKE) -C landos/kernel
 	sudo cp landos/kernel/KERNEL.BIN  base/GRAMADO
+
+	$(Q) $(MAKE) -C landos/init
+	sudo cp landos/init/INIT.BIN  base/
+
 
 land-cmd:
 	# todo: Port ring3 commands.
@@ -142,7 +145,7 @@ vhd-copy-files:
 	@echo "(Step 4) Copying files into the mounted VHD ..."
 
 	#Copy INIT.BIN to base/
-	sudo cp landos/init/INIT.BIN  base/
+	#sudo cp landos/init/INIT.BIN  base/
 	
 	# Copy base
 	# sends everything from base to root.
@@ -191,6 +194,7 @@ clean-system-files:
 	@echo "Cleaning all system binaries ..."
 
 	-rm -rf landos/kernel/KERNEL.BIN
+	-rm -rf landos/init/INIT.BIN
 
 
 

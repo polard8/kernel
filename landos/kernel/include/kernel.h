@@ -159,6 +159,8 @@ unsigned long SavedBPP;
 #include "hal/ports64.h"
 #include "hal/halvid.h"
 #include "hal/cpu.h"
+#include "hal/tss.h"
+#include "hal/x64gdt.h"
 #include "hal/x64.h"
 #include "hal/detect.h"
 #include "hal/dev/tty/serial.h"
