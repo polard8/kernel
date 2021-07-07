@@ -13,15 +13,24 @@
 //#define MAXGDTSIZ 65536
 //??
 
+// ========================
+
 //índices na gdt
 #define GNULL_SEL	0	/* Null descriptor */
 #define GCODE_SEL	1	/* Kernel code descriptor */
 #define GDATA_SEL	2	/* Kernel data descriptor */
 #define GUCODE_SEL	3	/* User code descriptor */
 #define GUDATA_SEL	4	/* User data descriptor */
-#define GTSS_SEL	5   //tss
-#define GLDT_SEL	6   /* Default LDT descriptor */
 
+#define GTSS_SEL       5   //tss
+#define GTSS_CONT_SEL  6   //tss continuação.
+
+#define GLDT_SEL       7   /* Default LDT descriptor */
+#define GLDT_CONT_SEL       8   /* Default LDT descriptor */
+
+
+
+// ========================
 
 #define SEL_KPL  0	/* kernel privilege level */
 #define SEL_UPL  3	/* user privilege level */
@@ -210,6 +219,7 @@ setsegment (
     struct segment_descriptor_d *sd, 
     const void *base, 
     size_t limit,
+    int present,
     int type, 
     int dpl, 
     int l,
@@ -222,6 +232,7 @@ setsegmentNR (
     int number, 
     const void *base, 
     size_t limit,
+    int present,
     int type, 
     int dpl, 
     int l,

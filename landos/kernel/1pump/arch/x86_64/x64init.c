@@ -577,10 +577,6 @@ int x64main (void)
         
     x64_init_gdt();
 
-    // #bugbug: falha na hora de carregar o tr
-    //x64_load_ltr(0x2B);
-
-
 
     // #todo
     // Depois de renovarmos a GDT precisamos

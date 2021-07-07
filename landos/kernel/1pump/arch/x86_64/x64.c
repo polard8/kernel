@@ -61,7 +61,7 @@ int x64_init_gdt (void)
 
     // NULL
     setsegment ( &xxx_gdt[GNULL_SEL], 
-        0, 0xfffff, 0, 0, 1, 0, 1 );
+        0, 0xfffff, 1, 0, 0, 1, 0, 1 );
 
 
     // ring 0
@@ -69,9 +69,9 @@ int x64_init_gdt (void)
     // SDT_MEMRWA = 19 = 0x13
     // SEL_KPL = 0
     setsegment ( &xxx_gdt[GCODE_SEL], 
-        0, 0, SDT_MEMERA, SEL_KPL, 1, 0, 1);
+        0, 0, 1, SDT_MEMERA, SEL_KPL, 1, 0, 1);
     setsegment ( &xxx_gdt[GDATA_SEL], 
-        0, 0, SDT_MEMRWA, SEL_KPL, 1, 0, 0);
+        0, 0, 1, SDT_MEMRWA, SEL_KPL, 1, 0, 0);
 
 
     // ring 3
@@ -79,32 +79,44 @@ int x64_init_gdt (void)
     // SDT_MEMRWA = 19 = 0x13
     // SEL_UPL = 3
     setsegment ( &xxx_gdt[GUCODE_SEL], 
-        0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 0, 1);
+        0, 0xfffff, 1, SDT_MEMERA, SEL_UPL, 1, 0, 1);
     setsegment ( &xxx_gdt[GUDATA_SEL], 
-        0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 0, 0);
+        0, 0xfffff, 1, SDT_MEMRWA, SEL_UPL, 1, 0, 0);
 
+
+//
+// TSS
+//
+
+    // TSS usa duas entradas.
 
     // #bugbug
     // Essa entrada precis ser um tss para x86_64
-    // Tamb'em precismaos lembrar de carregar o tr, usando ltr.
+    // Tambem precismaos lembrar de carregar o tr, usando ltr.
 
     // TSS selector.
     // (SDT_SYS386TSS=9=not busy) 
     // (11 = busy)
     setsegment ( &xxx_gdt[GTSS_SEL], 
-        &tss, sizeof( struct tss_d ) - 1, 
-        SDT_SYS386TSS,  SEL_KPL, 1, 0, 0);
-
-    //setsegment ( &xxx_gdt[GTSS_SEL], 
-    //    &tss, sizeof ( struct i386tss_d ) - 1, 11,  SEL_KPL, 0, 0);
+        &tss, sizeof( struct tss_d ) - 1, 1, SDT_SYS386TSS,  SEL_KPL, 1, 0, 0);
+    setsegment ( &xxx_gdt[GTSS_CONT_SEL], 
+        0, 0, 0, 0,  0, 0, 0, 0);
 
 
+//
+// LDT
+//
 
+    // LDT também precisa de duas partes.
+    
     // LDT selector.
     // #bugbug: 
     // #todo LDT size;
-    setsegment ( &xxx_gdt[GLDT_SEL], 
-        0, 0xff, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
+    //setsegment ( &xxx_gdt[GLDT_SEL], 
+        //0, 0xff, 1, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
+
+    //setsegment ( &xxx_gdt[GLDT_CONT_SEL], 
+        //0, 0xff, 1, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
 
 	//...
 
@@ -131,7 +143,7 @@ int x64_init_gdt (void)
     // #bugbug
     // Falha quando carregamos isso.
 
-    // x64_load_ltr(0x2B);
+    x64_load_ltr(0x2B);
 
 
 // Done
@@ -154,6 +166,7 @@ setsegment (
     struct segment_descriptor_d *sd, 
     const void *base, 
     size_t limit,
+    int present,
     int type, 
     int dpl, 
     int l,
@@ -169,8 +182,8 @@ setsegment (
 
     sd->sd_type  = type;  //segment type (5)
     sd->sd_dpl   = dpl;   //segment descriptor priority level (2) 
-    sd->sd_p     = 1;     //segment descriptor present  (1)
-    
+    sd->sd_p     = present;  //1;     //segment descriptor present  (1)
+ 
     sd->sd_hilimit = (int) limit >> 16;  //segment extent (msb) (4)
     
 
@@ -194,6 +207,7 @@ setsegmentNR (
     int number, 
     const void *base, 
     size_t limit,
+    int present,
     int type, 
     int dpl, 
     int l,
@@ -211,6 +225,7 @@ setsegmentNR (
         (struct segment_descriptor_d *) &xxx_gdt[number], 
         base, 
         limit, 
+        present,
         type, 
         dpl, 
         l,
