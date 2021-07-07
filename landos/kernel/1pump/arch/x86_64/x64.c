@@ -3,6 +3,95 @@
 #include <kernel.h>    
 
 
+// Set segment.
+// Probably stolen from minix or netbsd.
+// See: x64gdt.h
+
+void
+setsegment ( 
+    struct segment_descriptor_d *sd, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran )
+{
+
+    // low limit
+    sd->sd_lolimit = (int) limit;  // segment extent (lsb) (16)
+
+    // base low
+    sd->sd_lobase  = (int) base;   // segment base address (lsb) (16) 
+
+    sd->sd_type  = type;  //segment type (5)
+    sd->sd_dpl   = dpl;   //segment descriptor priority level (2) 
+    sd->sd_p     = 1;     //segment descriptor present  (1)
+    
+    sd->sd_hilimit = (int) limit >> 16;  //segment extent (msb) (4)
+    
+    sd->sd_xx    = 0;      //unused (2)
+    sd->sd_def32 = def32;  //default 32 vs 16 bit size (1)
+    sd->sd_gran  = gran;   //limit granularity (byte/page) (1) 
+
+    // base high
+    sd->sd_hibase = (int) base >> 24;  //segment base address (msb) (8)
+}
+
+
+// Set segment nr.
+// Probably stolen from minix or netbsd.
+// See: x86gdt.h
+
+void
+setsegmentNR ( 
+    int number, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran )
+{
+
+    // #bugbug
+    if (number < 0 || number >= 16){
+        debug_print ("setsegmentNR: [FAIL] number\n");
+        panic       ("setsegmentNR: [FAIL] number\n");
+    }
+
+    setsegment ( 
+        (struct segment_descriptor_d *) &xxx_gdt[number], 
+        base, 
+        limit, 
+        type, 
+        dpl, 
+        def32, 
+        gran );
+}
+
+
+// ======================
+
+
+static void
+tss_init ( 
+    struct tss_d *tss, 
+    void *stack_address )
+{
+
+    if ( (void *) tss == NULL ){
+        debug_print ("[x64] tss_init:\n");
+        panic       ("[x64] tss_init:\n");
+    }
+
+    // Clean.
+    memset ( tss, 0, sizeof *tss );
+
+    //ring 0 stack
+    tss->rsp0 = stack_address;  // va ?? 
+}
+
 // # not tested yet
 void x64_load_ltr (int tr)
 {
@@ -11,6 +100,9 @@ void x64_load_ltr (int tr)
           ltrw %%ax;     "\
         :: "a"(tr) );
 }
+
+// ==========================
+
 
 
 /*

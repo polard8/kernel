@@ -33,11 +33,33 @@ typedef struct tss_d {
 
 }__attribute__((packed)) tagTSS;
 
+struct tss_d  *CurrentTSS;
+
+
+/*
+ * I/O bitmap offset beyond TSS's segment limit means no bitmaps.
+ * (i.e. any I/O attempt generates an exception.)
+ */
+
+#define IOMAP_INVALOFF  0xffffu
+
+/*
+ * If we have an I/O bitmap, there is only one valid offset.
+ */
+#define IOMAP_VALIDOFF  sizeof(struct tss_d)
 
 
 //
 // == prototypes ===========================
 //
+
+static void
+tss_init ( 
+    struct tss_d *tss, 
+    void *stack_address );
+
+
+void x64_load_ltr (int tr);
 
 #endif    
 

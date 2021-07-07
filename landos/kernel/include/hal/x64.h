@@ -74,8 +74,7 @@
 //
 
 
-// # not tested yet
-void x64_load_ltr (int tr);
+
 
 void x64_init_fpu (void);
 void x64_disable_interrupts (void);

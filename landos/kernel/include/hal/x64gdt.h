@@ -80,8 +80,8 @@
 // https://wiki.osdev.org/Global_Descriptor_Table
 
 // gdt structure.
-struct segment_descriptor_d {
-
+struct segment_descriptor_d 
+{
     // LIMIT LOW
     unsigned sd_lolimit :16;  //segment extent (lsb) 
 
@@ -103,6 +103,17 @@ struct segment_descriptor_d {
     unsigned sd_hibase :8;  //segment base address (msb) 
 
 } __attribute__((packed));
+
+
+// Isso é uma gdt com 32 entradas.
+static struct segment_descriptor_d xxx_gdt[16];
+
+
+// Isso é o registro da gdt
+static struct gdt_ptr_d xxx_gdt_ptr;
+
+
+// ======================
 
 
 
@@ -182,17 +193,55 @@ struct region_descriptor_d
 */
 
 
-//struct segment_descriptor_d xxx_gdt[32];
-//struct gdt_ptr_d xxx_gdt_ptr;
 
 
 //
 // == prototypes ==============
 //
 
+void
+setsegment ( 
+    struct segment_descriptor_d *sd, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran );
+
+
+void
+setsegmentNR ( 
+    int number, 
+    const void *base, 
+    size_t limit,
+    int type, 
+    int dpl, 
+    int def32, 
+    int gran );
+
 
 
 #endif    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
