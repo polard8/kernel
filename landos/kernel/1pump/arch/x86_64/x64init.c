@@ -257,10 +257,10 @@ void x64initStartFirstThread (void)
 
     x64_clear_nt_flag();   
 
-
+    // #maybe
 	//vamos iniciar antes para que
 	//possamos usar a current_tss quando criarmos as threads
-	//x86_init_gdt ();
+	//x64_init_gdt ();
 
     // ??
     asm ("clts \n");
@@ -567,10 +567,20 @@ int x64main (void)
     // This function creates a TSS and sets up a GDT.
     // See: hal/arch/x86/x86.c
 
-    debug_print ("[x64] x64main: Initializing GDT\n");
+    debug_print ("[x64] x64main: [DANGER] Initializing GDT\n");
     //printf      ("[x86] x86main: Initializing GDT\n");
+
+
+//
+// DANGER !!!
+//
         
-    //x86_init_gdt();
+    x64_init_gdt();
+
+    // #bugbug: falha na hora de carregar o tr
+    //x64_load_ltr(0x2B);
+
+
 
     // #todo
     // Depois de renovarmos a GDT precisamos

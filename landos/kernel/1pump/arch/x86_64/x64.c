@@ -3,6 +3,148 @@
 #include <kernel.h>    
 
 
+/*
+ ***********************************
+ * x64_init_gdt:
+ *     It creates a TSS and sets up some entries in the GDT.
+ *     See: x86gdt.h
+ */
+
+// See: head_64.asm
+extern void rsp0Stack(void);
+
+int x64_init_gdt (void)
+{
+    struct tss_d  *tss;
+
+
+    debug_print ("[x64] x64_init_gdt: [DANGER] \n");
+
+
+    // Creating a TSS and initializing it.
+
+    tss = (void *) kmalloc ( sizeof(struct tss_d) );
+
+    if ( (void *) tss == NULL ){
+        debug_print ("[x86] x86_init_gdt: \n");
+              panic ("[x86] x86_init_gdt: \n");
+    }else{
+ 
+        // Init TSS. 
+        tss_init ( 
+            (struct tss_d *) tss,  // tss 
+            (void *) &rsp0Stack    // ring 0 stack address
+            );
+
+
+         // Setup current.
+         // ps: All threads are using the same tss.
+
+         CurrentTSS = tss;
+         
+         // #bugbug
+         // #todo: Validation
+         
+         //if ( (void *) CurrentTSS == NULL )
+             //panic( ...
+    };
+
+
+//
+// Initializing the GDT.
+//
+
+    // #todo
+    // See the early gdt in  head_64.asm.
+    // We need the same bits.
+
+
+    // NULL
+    setsegment ( &xxx_gdt[GNULL_SEL], 
+        0, 0xfffff, 0, 0, 1, 0, 1 );
+
+
+    // ring 0
+    // SDT_MEMERA = 27 = 0x1B
+    // SDT_MEMRWA = 19 = 0x13
+    // SEL_KPL = 0
+    setsegment ( &xxx_gdt[GCODE_SEL], 
+        0, 0, SDT_MEMERA, SEL_KPL, 1, 0, 1);
+    setsegment ( &xxx_gdt[GDATA_SEL], 
+        0, 0, SDT_MEMRWA, SEL_KPL, 1, 0, 0);
+
+
+    // ring 3
+    // SDT_MEMERA = 27 = 0x1B
+    // SDT_MEMRWA = 19 = 0x13
+    // SEL_UPL = 3
+    setsegment ( &xxx_gdt[GUCODE_SEL], 
+        0, 0xfffff, SDT_MEMERA, SEL_UPL, 1, 0, 1);
+    setsegment ( &xxx_gdt[GUDATA_SEL], 
+        0, 0xfffff, SDT_MEMRWA, SEL_UPL, 1, 0, 0);
+
+
+    // #bugbug
+    // Essa entrada precis ser um tss para x86_64
+    // Tamb'em precismaos lembrar de carregar o tr, usando ltr.
+
+    // TSS selector.
+    // (SDT_SYS386TSS=9=not busy) 
+    // (11 = busy)
+    setsegment ( &xxx_gdt[GTSS_SEL], 
+        &tss, sizeof( struct tss_d ) - 1, 
+        SDT_SYS386TSS,  SEL_KPL, 1, 0, 0);
+
+    //setsegment ( &xxx_gdt[GTSS_SEL], 
+    //    &tss, sizeof ( struct i386tss_d ) - 1, 11,  SEL_KPL, 0, 0);
+
+
+
+    // LDT selector.
+    // #bugbug: 
+    // #todo LDT size;
+    setsegment ( &xxx_gdt[GLDT_SEL], 
+        0, 0xff, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
+
+	//...
+
+//
+// Load GDT.
+//
+
+    // Limit and base.
+    xxx_gdt_ptr.limit = (unsigned short) ((16 * sizeof(struct segment_descriptor_d) ) -1);
+    xxx_gdt_ptr.base  = (unsigned long) &xxx_gdt[GNULL_SEL];
+
+    // register.
+    // See: x64gdt.h
+    load_gdt (&xxx_gdt_ptr);
+    
+    
+//
+// Load tr   [DANGER]
+//
+
+    // Load TR.
+    // 0x2B = (0x28+3).
+
+    // #bugbug
+    // Falha quando carregamos isso.
+
+    // x64_load_ltr(0x2B);
+
+
+// Done
+    return 0;
+}
+
+
+// ===================
+
+
+
+
+
 // Set segment.
 // Probably stolen from minix or netbsd.
 // See: x64gdt.h
@@ -14,7 +156,8 @@ setsegment (
     size_t limit,
     int type, 
     int dpl, 
-    int def32, 
+    int l,
+    int size, 
     int gran )
 {
 
@@ -30,9 +173,12 @@ setsegment (
     
     sd->sd_hilimit = (int) limit >> 16;  //segment extent (msb) (4)
     
-    sd->sd_xx    = 0;      //unused (2)
-    sd->sd_def32 = def32;  //default 32 vs 16 bit size (1)
-    sd->sd_gran  = gran;   //limit granularity (byte/page) (1) 
+
+    sd->sd_reserved  = 0;      //unused 
+    sd->sd_l         = l;      //l
+    sd->sd_size      = size;   //default 32 vs 16 bit size (1), 0 para x86_64
+    sd->sd_gran      = gran;   //limit granularity (byte/page) (1) 
+
 
     // base high
     sd->sd_hibase = (int) base >> 24;  //segment base address (msb) (8)
@@ -50,7 +196,8 @@ setsegmentNR (
     size_t limit,
     int type, 
     int dpl, 
-    int def32, 
+    int l,
+    int size, 
     int gran )
 {
 
@@ -66,7 +213,8 @@ setsegmentNR (
         limit, 
         type, 
         dpl, 
-        def32, 
+        l,
+        size, 
         gran );
 }
 

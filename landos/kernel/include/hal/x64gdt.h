@@ -95,9 +95,15 @@ struct segment_descriptor_d
     // LIMIT HIGH
     unsigned sd_hilimit :4;  //segment extent (msb) 
 
-    unsigned sd_xx    :2;  //unused 
-    unsigned sd_def32 :1;  //default 32 vs 16 bit size 
-    unsigned sd_gran  :1;  //limit granularity (byte/page) 
+
+    // Remember:
+    // For x86_64, l=1 and size=0.
+
+    //unsigned sd_xx    :2;  //unused 
+    unsigned sd_reserved :1;
+    unsigned sd_l        :1;  // Para x86_64, l tem que ser 1 e size tem que ser 0.
+    unsigned sd_size     :1;  //default 32 vs 16 bit size     // Sz
+    unsigned sd_gran     :1;  //limit granularity (byte/page) // Gr
 
    // BASE HIGH
     unsigned sd_hibase :8;  //segment base address (msb) 
@@ -206,7 +212,8 @@ setsegment (
     size_t limit,
     int type, 
     int dpl, 
-    int def32, 
+    int l,
+    int size, 
     int gran );
 
 
@@ -217,10 +224,32 @@ setsegmentNR (
     size_t limit,
     int type, 
     int dpl, 
-    int def32, 
+    int l,
+    int size, 
     int gran );
 
 
+
+
+//
+// credits: Linux.
+//
+
+static inline void native_load_gdt ( struct gdt_ptr_d *dtr)
+{
+	asm volatile ("lgdt %0"::"m" (*dtr));
+}
+
+static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
+{
+	asm volatile ("sgdt %0":"=m" (*dtr));
+}
+
+#define load_gdt(dtr)   native_load_gdt(dtr)
+#define store_gdt(dtr)  native_store_gdt(dtr)
+
+
+int x64_init_gdt (void);
 
 #endif    
 

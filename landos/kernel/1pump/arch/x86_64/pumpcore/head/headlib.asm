@@ -1,10 +1,12 @@
 
 
+;; See:
+;; head_64.asm for the stack.
 
 align 8
 tss0:
     dd 0 ;reserved
-    dq _xxxStack ;rsp0        #todo
+    dq _rsp0Stack ;rsp0        #todo
     dq 0 ;rsp1
     dq 0 ;rsp2
     dd 0 ;reserved
@@ -26,7 +28,7 @@ tss0_end:
 align 8
 tss1:
     dd 0 ;reserved
-    dq _xxxStack ;rsp0        #todo
+    dq _rsp0Stack ;rsp0        #todo
     dq 0 ;rsp1
     dq 0 ;rsp2
     dd 0 ;reserved
