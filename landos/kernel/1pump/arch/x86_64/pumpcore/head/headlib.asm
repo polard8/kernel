@@ -585,9 +585,9 @@ setup_vectors:
     mov rbx,  qword 47
     call _setup_system_interrupt
 
-    ;;
-    ;; == System calls ===========================
-    ;;
+;
+; == System calls ===========================
+;
 
     ; System interrupts
     ; 128 - 0x80

@@ -12,14 +12,20 @@ main:
     ; test
     ; Testando se a configuração de tss funcionou.
     
-    int 3
+    ;int 3
     
     
     ;;mov rax, 0
     ;;mov rbx, 0
     ;;div rbx
     
-    ;int 0x80
+    int 0x80
+    int 0x80
+    int 0x80
+    int 0x80
+
+    int 3
+
     
     jmp $
     
