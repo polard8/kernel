@@ -12,6 +12,7 @@
 
 // See: head_64.asm
 extern void rsp0Stack(void);
+extern void gdt_flush(unsigned long gdtr_address);
 
 int x64_init_gdt (void)
 {
@@ -21,13 +22,19 @@ int x64_init_gdt (void)
     debug_print ("[x64] x64_init_gdt: [DANGER] \n");
 
 
+    memset(
+        &xxx_gdt[GNULL_SEL],
+        0,
+        sizeof(struct segment_descriptor_d)*32 );
+
+
     // Creating a TSS and initializing it.
 
     tss = (void *) kmalloc ( sizeof(struct tss_d) );
 
     if ( (void *) tss == NULL ){
-        debug_print ("[x86] x86_init_gdt: \n");
-              panic ("[x86] x86_init_gdt: \n");
+        debug_print ("[x64] x64_init_gdt: \n");
+              panic ("[x64] x64_init_gdt: \n");
     }else{
  
         // Init TSS. 
@@ -35,6 +42,11 @@ int x64_init_gdt (void)
             (struct tss_d *) tss,  // tss 
             (void *) &rsp0Stack    // ring 0 stack address
             );
+
+        //tss_init ( 
+        //    (struct tss_d *) tss,  // tss 
+        //    (void *) 0x8000    // ring 0 stack address
+        //    );
 
 
          // Setup current.
@@ -54,83 +66,44 @@ int x64_init_gdt (void)
 // Initializing the GDT.
 //
 
-    // #todo
-    // See the early gdt in  head_64.asm.
-    // We need the same bits.
+    // IN: 
+    // (n, limit, base, type, s, dpl, p, avl, l, db, g)
 
-
-    // NULL
-    setsegment ( &xxx_gdt[GNULL_SEL], 
-        0, 0xfffff, 1, 0, 0, 1, 0, 1 );
-
+    // null
+    set_gdt_entry ( &xxx_gdt[GNULL_SEL], 
+        0,0,0,0,0,0,0,0,0,0);
 
     // ring 0
-    // SDT_MEMERA = 27 = 0x1B
-    // SDT_MEMRWA = 19 = 0x13
-    // SEL_KPL = 0
-    setsegment ( &xxx_gdt[GCODE_SEL], 
-        0, 0, 1, SDT_MEMERA, SEL_KPL, 1, 0, 1);
-    setsegment ( &xxx_gdt[GDATA_SEL], 
-        0, 0, 1, SDT_MEMRWA, SEL_KPL, 1, 0, 0);
-
+    set_gdt_entry ( &xxx_gdt[GCODE_SEL], 
+        0,0x0,0xA,1,0,1,0,1,0,0); //dpl 0
+    set_gdt_entry ( &xxx_gdt[GDATA_SEL], 
+        0,0x0,0x2,1,0,1,0,1,0,0); //dpl 0
 
     // ring 3
-    // SDT_MEMERA = 27 = 0x1B
-    // SDT_MEMRWA = 19 = 0x13
-    // SEL_UPL = 3
-    setsegment ( &xxx_gdt[GUCODE_SEL], 
-        0, 0xfffff, 1, SDT_MEMERA, SEL_UPL, 1, 0, 1);
-    setsegment ( &xxx_gdt[GUDATA_SEL], 
-        0, 0xfffff, 1, SDT_MEMRWA, SEL_UPL, 1, 0, 0);
+    set_gdt_entry ( &xxx_gdt[GUCODE_SEL], 
+        0,0x0,0xA,1,3,1,0,1,0,0); //dpl 3
+    set_gdt_entry ( &xxx_gdt[GUDATA_SEL], 
+        0,0x0,0x2,1,3,1,0,1,0,0); //dpl 3
 
-
-//
-// TSS
-//
-
-    // TSS usa duas entradas.
-
-    // #bugbug
-    // Essa entrada precis ser um tss para x86_64
-    // Tambem precismaos lembrar de carregar o tr, usando ltr.
-
-    // TSS selector.
-    // (SDT_SYS386TSS=9=not busy) 
-    // (11 = busy)
-    setsegment ( &xxx_gdt[GTSS_SEL], 
-        &tss, sizeof( struct tss_d ) - 1, 1, SDT_SYS386TSS,  SEL_KPL, 1, 0, 0);
-    setsegment ( &xxx_gdt[GTSS_CONT_SEL], 
-        0, 0, 0, 0,  0, 0, 0, 0);
-
-
-//
-// LDT
-//
-
-    // LDT também precisa de duas partes.
-    
-    // LDT selector.
-    // #bugbug: 
-    // #todo LDT size;
-    //setsegment ( &xxx_gdt[GLDT_SEL], 
-        //0, 0xff, 1, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
-
-    //setsegment ( &xxx_gdt[GLDT_CONT_SEL], 
-        //0, 0xff, 1, SDT_SYSLDT,  SEL_KPL, 1, 0, 0);
-
-	//...
+    // tss
+    set_gdt_entry ( &xxx_gdt[GTSS_SEL], 
+        sizeof( struct tss_d ) - 1, (unsigned long) tss,0x9,0,3,1,0,0,0,1); //tss dpl 3
+    set_gdt_entry ( &xxx_gdt[GTSS_CONT_SEL], 
+        (unsigned long) tss >> 32, (unsigned long) tss >> 48,0,0,0,0,0,0,0,0);
 
 //
 // Load GDT.
 //
 
     // Limit and base.
-    xxx_gdt_ptr.limit = (unsigned short) ((16 * sizeof(struct segment_descriptor_d) ) -1);
+    xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
     xxx_gdt_ptr.base  = (unsigned long) &xxx_gdt[GNULL_SEL];
 
     // register.
+    gdt_flush((unsigned long) &xxx_gdt_ptr);
+
     // See: x64gdt.h
-    load_gdt (&xxx_gdt_ptr);
+    //load_gdt (&xxx_gdt_ptr);
     
     
 //
@@ -162,76 +135,42 @@ int x64_init_gdt (void)
 // See: x64gdt.h
 
 void
-setsegment ( 
+set_gdt_entry ( 
     struct segment_descriptor_d *sd, 
-    const void *base, 
-    size_t limit,
-    int present,
-    int type, 
-    int dpl, 
-    int l,
-    int size, 
-    int gran )
+    unsigned int limit,
+    unsigned int base,
+    unsigned char type,
+    unsigned char s, 
+    unsigned char dpl, 
+    unsigned char p, 
+    unsigned char avl,
+    unsigned char l,
+    unsigned char db,   //Sz 
+    unsigned char g )
 {
-
     // low limit
-    sd->sd_lolimit = (int) limit;  // segment extent (lsb) (16)
+    sd->limit_15_0 = (limit & 0xFFFF); // (16) segment extent (lsb) 
 
     // base low
-    sd->sd_lobase  = (int) base;   // segment base address (lsb) (16) 
+    sd->base_15_0   = (base & 0xFFFF);        // (16)
+    sd->base_23_16  = ((base >> 16) & 0xFF);  // (8)
 
-    sd->sd_type  = type;  //segment type (5)
-    sd->sd_dpl   = dpl;   //segment descriptor priority level (2) 
-    sd->sd_p     = present;  //1;     //segment descriptor present  (1)
- 
-    sd->sd_hilimit = (int) limit >> 16;  //segment extent (msb) (4)
-    
+    sd->type  = ( type & 0xF );  // (4)
+    sd->s     = ( s    & 0x1 );  // (1)
+    sd->dpl   = ( dpl  & 0x3 );  // (2)
+    sd->p     = ( p    & 0x1 );  // (1)
 
-    sd->sd_reserved  = 0;      //unused 
-    sd->sd_l         = l;      //l
-    sd->sd_size      = size;   //default 32 vs 16 bit size (1), 0 para x86_64
-    sd->sd_gran      = gran;   //limit granularity (byte/page) (1) 
+    sd->limit_19_16 = ((limit >>16) & 0xF);  //(4)
 
+    sd->avl  = (avl & 1);  // (1)  
+    sd->l    = (l   & 1);  // (1)
+    sd->db   = (db  & 1);  // (1)
+    sd->g    = (g   & 1);  // (1)
 
     // base high
-    sd->sd_hibase = (int) base >> 24;  //segment base address (msb) (8)
+    sd->base_31_24  = ((base  >> 24) & 0xFF);  // (8)
 }
 
-
-// Set segment nr.
-// Probably stolen from minix or netbsd.
-// See: x86gdt.h
-
-void
-setsegmentNR ( 
-    int number, 
-    const void *base, 
-    size_t limit,
-    int present,
-    int type, 
-    int dpl, 
-    int l,
-    int size, 
-    int gran )
-{
-
-    // #bugbug
-    if (number < 0 || number >= 16){
-        debug_print ("setsegmentNR: [FAIL] number\n");
-        panic       ("setsegmentNR: [FAIL] number\n");
-    }
-
-    setsegment ( 
-        (struct segment_descriptor_d *) &xxx_gdt[number], 
-        base, 
-        limit, 
-        present,
-        type, 
-        dpl, 
-        l,
-        size, 
-        gran );
-}
 
 
 // ======================

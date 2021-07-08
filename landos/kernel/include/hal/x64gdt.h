@@ -37,23 +37,22 @@
 
 
 /* system segments and gate types */
-#define SDT_SYSNULL	 0	/* system null */
-#define SDT_SYS286TSS	 1	/* system 286 TSS available */
-#define SDT_SYSLDT	 2	/* system local descriptor table */
-#define SDT_SYS286BSY	 3	/* system 286 TSS busy */
-#define SDT_SYS286CGT	 4	/* system 286 call gate */
-#define SDT_SYSTASKGT	 5	/* system task gate */
-#define SDT_SYS286IGT	 6	/* system 286 interrupt gate */
-#define SDT_SYS286TGT	 7	/* system 286 trap gate */
-#define SDT_SYSNULL2	 8	/* system null again */
-#define SDT_SYS386TSS	 9	/* system 386 TSS available */
-#define SDT_SYSNULL3	10	/* system null again */
-#define SDT_SYS386BSY	11	/* system 386 TSS busy */
-#define SDT_SYS386CGT	12	/* system 386 call gate */
-#define SDT_SYSNULL4	13	/* system null again */
-#define SDT_SYS386IGT	14	/* system 386 interrupt gate */
-#define SDT_SYS386TGT	15	/* system 386 trap gate */
-
+#define SDT_SYSNULL      0	/* system null */
+#define SDT_SYS286TSS    1	/* system 286 TSS available */
+#define SDT_SYSLDT       2	/* system local descriptor table */
+#define SDT_SYS286BSY    3	/* system 286 TSS busy */
+#define SDT_SYS286CGT    4	/* system 286 call gate */
+#define SDT_SYSTASKGT    5	/* system task gate */
+#define SDT_SYS286IGT    6	/* system 286 interrupt gate */
+#define SDT_SYS286TGT    7	/* system 286 trap gate */
+#define SDT_SYSNULL2     8	/* system null again */
+#define SDT_SYS386TSS    9	/* system 386 TSS available */
+#define SDT_SYSNULL3    10	/* system null again */
+#define SDT_SYS386BSY   11	/* system 386 TSS busy */
+#define SDT_SYS386CGT   12	/* system 386 call gate */
+#define SDT_SYSNULL4    13	/* system null again */
+#define SDT_SYS386IGT   14	/* system 386 interrupt gate */
+#define SDT_SYS386TGT   15	/* system 386 trap gate */
 
 /* memory segment types */
 #define SDT_MEMRO	16	/* memory read only */
@@ -91,37 +90,30 @@
 // gdt structure.
 struct segment_descriptor_d 
 {
-    // LIMIT LOW
-    unsigned sd_lolimit :16;  //segment extent (lsb) 
+    unsigned long limit_15_0 :16;
 
-    // BASE LOW
-    unsigned sd_lobase :24;  //segment base address (lsb) 
+    unsigned long base_15_0  :16;
+    unsigned long base_23_16 :8;
 
-    unsigned sd_type :5;  //segment type
-    unsigned sd_dpl  :2;  //segment descriptor priority level 
-    unsigned sd_p    :1;  //segment descriptor present 
+    unsigned long type    :4;  //segment type
+    unsigned long s       :1;  //s
+    unsigned long dpl     :2;  //segment descriptor priority level 
+    unsigned long p       :1;  //segment descriptor present 
 
-    // LIMIT HIGH
-    unsigned sd_hilimit :4;  //segment extent (msb) 
+    unsigned long limit_19_16 :4;
 
+    unsigned long avl    :1;
+    unsigned long l      :1;
+    unsigned long db     :1;
+    unsigned long g      :1;
 
-    // Remember:
-    // For x86_64, l=1 and size=0.
-
-    //unsigned sd_xx    :2;  //unused 
-    unsigned sd_reserved :1;
-    unsigned sd_l        :1;  // Para x86_64, l tem que ser 1 e size tem que ser 0.
-    unsigned sd_size     :1;  //default 32 vs 16 bit size     // Sz
-    unsigned sd_gran     :1;  //limit granularity (byte/page) // Gr
-
-   // BASE HIGH
-    unsigned sd_hibase :8;  //segment base address (msb) 
+    unsigned long long base_31_24 :8;
 
 } __attribute__((packed));
 
 
 // Isso é uma gdt com 32 entradas.
-static struct segment_descriptor_d xxx_gdt[16];
+static struct segment_descriptor_d xxx_gdt[32];
 
 
 // Isso é o registro da gdt
@@ -215,30 +207,18 @@ struct region_descriptor_d
 //
 
 void
-setsegment ( 
+set_gdt_entry ( 
     struct segment_descriptor_d *sd, 
-    const void *base, 
-    size_t limit,
-    int present,
-    int type, 
-    int dpl, 
-    int l,
-    int size, 
-    int gran );
-
-
-void
-setsegmentNR ( 
-    int number, 
-    const void *base, 
-    size_t limit,
-    int present,
-    int type, 
-    int dpl, 
-    int l,
-    int size, 
-    int gran );
-
+    unsigned int limit,
+    unsigned int base,
+    unsigned char type,
+    unsigned char s, 
+    unsigned char dpl, 
+    unsigned char p, 
+    unsigned char avl,
+    unsigned char l,
+    unsigned char db,   //Sz 
+    unsigned char g );
 
 
 

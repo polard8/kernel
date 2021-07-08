@@ -81,8 +81,21 @@ _x64_clear_nt_flag:
     ret
 
 
+global _gdt_flush
+_gdt_flush:
 
+    mov rax, rdi
 
+    lgdt [rax]
+
+    mov rax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+
+    ret
 
 
 
