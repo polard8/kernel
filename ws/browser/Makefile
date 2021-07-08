@@ -1,12 +1,9 @@
-# terminal
 
 #history:
 #2019 - Created by Fred Nora.
-
 #todo:
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
-
 
 
 VERSION = 0
@@ -18,7 +15,7 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

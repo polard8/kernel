@@ -1,8 +1,7 @@
 /*
  * File: crts/crt0.c
  *
- * Usado para inicializar a rt na libc03 do atacama.
- * tentando criar um crt0 padrão
+ * Usado para inicializar a rt na libc for 64bit.
  */
 
 #include <types.h>
@@ -100,7 +99,10 @@ int crt0 (void){
     // #define BACKBUFFER_VA     0xC0800000
     // So. We are using the top of the front buffer
     // as a shared memory. No problem for now.
- 
+
+    // #todo
+    // Change this address. We need a valid one.
+
     char *shared_info = (char *) (0xC0800000 -0x100);
 
     // Environment.
@@ -185,9 +187,9 @@ int crt0 (void){
 */
 
 
-    //
-    // Initialize the library.
-    //
+//
+// Initialize the library.
+//
 
     // See: stdlib/stdlib.c
     libcInitRT();

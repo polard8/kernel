@@ -9,7 +9,7 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = uname
 
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

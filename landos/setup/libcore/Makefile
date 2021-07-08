@@ -1,5 +1,3 @@
-#api01
-
 
 VERSION = 0
 PATCHLEVEL = 0
@@ -25,7 +23,7 @@ EXTRAVERSION =
 #	-s
 
 
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

@@ -13,7 +13,7 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	--std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

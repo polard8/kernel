@@ -2,20 +2,16 @@
 # Client-side library for gws window server.
 # 2020 - Created by Fred Nora.
 
-
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = libgws - Client-side library for gws window server.
 
-
 #todo:
 #We need to simplify these flags
 
-
-
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -29,7 +25,6 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
 
 
 LIBS  = -I. -I ../../landlib/rtl/include/

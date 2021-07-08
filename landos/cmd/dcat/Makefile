@@ -9,8 +9,7 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = dcat
 
-
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

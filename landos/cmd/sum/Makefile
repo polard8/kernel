@@ -1,4 +1,3 @@
-# cat for gde
 
 #history:
 #2019 - Created by Fred Nora.
@@ -13,9 +12,7 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
-
-
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

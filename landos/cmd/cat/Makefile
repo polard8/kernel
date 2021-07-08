@@ -1,8 +1,6 @@
 # cat for gde
-
 #history:
 #2019 - Created by Fred Nora.
-
 
 VERSION = 0
 PATCHLEVEL = 0
@@ -13,10 +11,7 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
-
-
-
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -30,7 +25,6 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
 
 
 LIBC    = ../../../landlib/rtl/include/

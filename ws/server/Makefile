@@ -2,13 +2,9 @@
 # gws - Gramado Window Server.
 # 2020 - Created by Fred Nora.
 
-
-
-
 # todo:
 # Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
 # É desejável que isso mude.
-
 
 VERSION = 0
 PATCHLEVEL = 1
@@ -34,9 +30,8 @@ PYTHON3	= python3
 RUBY	= ruby
 
 
-
 # usermode cross compiler flags.
-user_ccflags = -m32 \
+user_ccflags = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

@@ -1,13 +1,9 @@
-
 # gns - Gramado Network Server.
 # 2020 - Created by Fred Nora.
-
-
 
 # todo:
 # Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
 # É desejável que isso mude.
-
 
 VERSION = 0
 PATCHLEVEL = 1
@@ -15,8 +11,7 @@ SUBLEVEL = 0
 EXTRAVERSION = 
 #NAME = GWS
 
-
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \

@@ -8,15 +8,17 @@
  */
 
 
-OUTPUT_FORMAT("elf32-i386")
+OUTPUT_FORMAT("elf64-x86-64")
+
 ENTRY(__user_app__)
 
-/* 0x00400000 = image base */
-/* 0x00401000 = The entry point */
+/* 0x00200000 = image base */
+/* 0x00201000 = The entry point */
+
 
 SECTIONS
 {
-    .text 0x00401000: 
+    .text 0x00201000: 
     {
         code = .; 
         _code = .; 

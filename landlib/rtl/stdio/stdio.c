@@ -5856,7 +5856,7 @@ void stdioInitialize(void)
     stdout->_lbfsize = BUFSIZ;
     stdout->_p = stdout->_base;
     stdout->_cnt = BUFSIZ-1; 
-    stdout->_w = 0;    
+    stdout->_w = 0;
     stdout->_r = 0;
     stdout->_file = 1;
         
@@ -5870,25 +5870,23 @@ void stdioInitialize(void)
     stderr->_lbfsize = BUFSIZ;    
     stderr->_p = stderr->_base;
     stderr->_cnt = BUFSIZ-1;    
-    stderr->_w = 0;    
+    stderr->_w = 0; 
     stderr->_r = 0;
     stderr->_file = 2;
 
 
+//
+// # libc mode #
+//
 
-	//
-	// # libc mode #
-	//
-	
 	// #bugbug:
 	// Vamos usar o modo draw até implementarmos o modo normal.
 	
 	//Os caracteres são colocados em stdout.
     //__libc_output_mode = LIBC_NORMAL_MODE;
-	
-	//Os caracteres são pintados na tela.
-	__libc_output_mode = LIBC_DRAW_MODE;
 
+    // Os caracteres são pintados na tela.
+    __libc_output_mode = LIBC_DRAW_MODE;
 
       // #importante:
       // Vamos conectar o processo filho ao processo pai

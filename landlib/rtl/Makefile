@@ -1,5 +1,5 @@
 # rtl
-# libc version 0.3 for GDE project
+# libc for Gramado 64bit ring3 part.
 # 2019 - Created by Fred Nora.
 
 VERSION = 0
@@ -19,7 +19,7 @@ TARGETOS ?= gramado
 # Gramado!
 ifeq ($(TARGETOS),gramado)
 
-CFLAGS = -m32 \
+CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
