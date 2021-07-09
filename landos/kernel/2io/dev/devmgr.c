@@ -134,7 +134,7 @@ struct device_d *devmgr_device_object (void){
 
     // fail
     panic ("devmgr_device_object: [FAIL] Overflow!\n");
-    //return NULL;
+    return NULL;
 }
 
 // ==============

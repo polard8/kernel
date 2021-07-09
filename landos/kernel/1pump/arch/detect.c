@@ -91,7 +91,7 @@ int hal_probe_cpu (void)
 
     x_panic ("hal_probe_cpu: [FAIL] Processor not supported\n");
 
-    //return (int) (-1);
+    return (int) (-1);
 }
 
 

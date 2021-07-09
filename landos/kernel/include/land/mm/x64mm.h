@@ -1083,6 +1083,9 @@ unsigned long memorysizeAvailableVirtualMemory;
 // == prototypes =================================================
 //
 
+
+int mmSetUpPaging (void);
+
 int init_heap (void);
 int init_stack (void);
 
@@ -1110,6 +1113,8 @@ unsigned long get_new_frame (void);
 // #danger
 unsigned long get_table_pointer (void);
 
+
+void load_pml4_table(void *phy_addr);
 
 void *CloneKernelPML4 (void);
 void *clone_pml4 ( unsigned long pml4_va );

@@ -112,6 +112,7 @@ int debug_check_inicialization (void){
     return (int) Status;
 fail:
     die(); 
+    return -1;
 }
 
 /*
@@ -121,7 +122,6 @@ fail:
  
 int debug_check_drivers (void)
 {
-
     int Status = 0;
 
 

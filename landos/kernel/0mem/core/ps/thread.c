@@ -349,7 +349,17 @@ void SelectForExecution ( struct thread_d *Thread ){
 //
 
     Thread->state = (int) STANDBY;
-    queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
+
+//
+// #bugbug      OVERFLOW !!!!!
+//
+
+// This function is wrong .... 
+// Maybe it is putting values outside the vector.
+
+    debug_print ("SelectForExecution: [FIXME] Overflow in queue_insert_data() \n");
+    
+    //queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
 }
 
 

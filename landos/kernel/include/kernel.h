@@ -135,10 +135,15 @@ unsigned long SavedBPP;
 #include "rtl/ttydef.h"
 
 
+
 // memory management support.
 #include "land/mm/mm.h"
 #include "land/mm/memmap.h" 
 #include "land/mm/intelmm.h"
+#include "land/mm/x64mm.h"     // mm, memory manager support.
+
+//#test
+#include "user/view/video.h"
 
 #include "user/view/screen.h"
 

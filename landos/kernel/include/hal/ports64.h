@@ -18,6 +18,8 @@ void out32 ( unsigned int port, unsigned int data );
 
 void __x86_io_delay (void);
 
+void wait_ns(int count);
+
 //
 // para acesso via user mode.
 //

@@ -746,6 +746,8 @@ unsigned long threadList[THREAD_COUNT_MAX];
 // == prototypes ===========================
 //
 
+int init_threads (void);
+
 // From thread.c
 unsigned long __GetThreadStats ( int tid, int index );
 int getthreadname ( int tid, char *buffer );

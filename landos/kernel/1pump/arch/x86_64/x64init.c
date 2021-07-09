@@ -202,10 +202,16 @@ void x64initStartFirstThread (void)
     {
         Thread->state = RUNNING;
         
-        queue_insert_data( 
-            queue, 
-            (unsigned long) Thread, 
-            QUEUE_RUNNING );
+        //
+        // #bugbug
+        //
+        
+        debug_print("x64initStartFirstThread: [FIXME] Overflow\n");
+        
+        //queue_insert_data( 
+        //    queue, 
+        //    (unsigned long) Thread, 
+        //    QUEUE_RUNNING );
     }
 
     // Current process.

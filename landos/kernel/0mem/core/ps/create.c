@@ -30,9 +30,11 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     debug_print ("create_CreateEarlyRing0IdleThread:\n");
 
-    // The kernel process.
 
+    debug_print ("[1]\n");
+    // The kernel process.
     if ( (void *) KernelProcess == NULL ){
+        debug_print ("create_CreateEarlyRing0IdleThread: KernelProcess\n");
         panic ("create_CreateEarlyRing0IdleThread: KernelProcess\n");
     }
 
@@ -43,9 +45,12 @@ void *create_CreateEarlyRing0IdleThread(void)
     // Struct.
     // Começamos a inicializaçao da estrtutura.
 
+    debug_print ("[2]\n");
+
     kThread = (void *) kmalloc ( sizeof(struct thread_d) );
 
     if ( (void *) kThread == NULL ){
+        debug_print ("create_CreateEarlyRing0IdleThread: kThread\n");
         panic ("create_CreateEarlyRing0IdleThread: kThread \n");
     }else{
         kThread->objectType  = ObjectTypeThread;
@@ -92,11 +97,14 @@ void *create_CreateEarlyRing0IdleThread(void)
     // nesse caso serve para a thread idle em ring 0.
     // 8KB
 
+    debug_print ("[3]\n");
+
     int StackSize = (8*1024);
 
     earlyRing0IdleStack = (void *) kmalloc (StackSize);
 
     if ( (void *) earlyRing0IdleStack == NULL ){
+        debug_print ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
         panic ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
     }
 
@@ -109,9 +117,12 @@ void *create_CreateEarlyRing0IdleThread(void)
     //    panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
     //}
 
+    debug_print ("[4]\n");
+
     // pml4 physical address
     kThread->pml4_PA = (unsigned long ) KernelProcess->pml4_PA;
     if ( kThread->pml4_PA == 0 ){
+        debug_print ("create_CreateEarlyRing0IdleThread: pml4_PA\n");
         panic("create_CreateEarlyRing0IdleThread: kThread->pml4_PA\n");
     }
 
@@ -285,17 +296,33 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     UPProcessorBlock.threads_counter++;
 
+
+
 //
 // == Queue =========================
 //
-    queue_insert_data ( 
-        queue, 
-        (unsigned long) kThread, 
-        QUEUE_INITIALIZED );
+
+
+//
+// #bugbug      OVERFLOW !!!!!
+//
+
+// This function is wrong .... 
+// Maybe it is putting values outside the vector.
+
+    debug_print ("create_CreateEarlyRing0IdleThread: [FIXME] Overflow in queue_insert_data() \n");
+    
+    //queue_insert_data ( 
+    //    queue, 
+    //    (unsigned long) kThread, 
+    //    QUEUE_INITIALIZED );
+
 
 //
 // == Select for execution ================
 //
+
+    debug_print ("[5]\n");
 
     // #todo
     // This method really need a prefix.
@@ -650,12 +677,18 @@ void *create_CreateRing3InitThread (void)
     //
  
  
+//
+// #bugbug; Overflow
+//
+
+    debug_print ("create_CreateRing3InitThread: [FIXME] Overflow\n");
+ 
     // #bugbug
 	// N�o h� a necessidade de colocar na fila de inicializadas
 	// se logo em seguida estamos selecionando para execu��o 
 	// colocando no estado standby.
     
-    queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
+    //queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
 
 
     // == Execution ===============================

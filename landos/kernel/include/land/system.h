@@ -360,6 +360,9 @@ void systemSetupVersion (void);
 void systemReboot (void);
 void *systemNull (void);
 
+
+int init_executive (void);
+
 #endif    
 
 

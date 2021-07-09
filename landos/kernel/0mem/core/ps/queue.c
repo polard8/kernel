@@ -194,6 +194,16 @@ done:
 
 int queue_insert_data (struct queue_d *q, unsigned long data, int type)
 {
+
+//
+// #bugbug Overflow!
+//
+
+// Estamos escrevendo fora do vetor?!
+
+    panic ("queue_insert_data: [FIXME] *hang\n"); 
+
+
     if ((void*) q == NULL)
     {
         panic ("queue_insert_data:"); 

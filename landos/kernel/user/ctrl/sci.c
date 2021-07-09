@@ -7,7 +7,6 @@
 // Isso faz o sistema falhar ... temos que resolver as flags do gcc;
 
 
-/*
 void *sci0 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -15,14 +14,16 @@ void *sci0 (
     unsigned long arg4 )
 {
 	//nothing
+	return NULL;
 }
-*/
 
 
-// void nothing3(void){}
+//void nothing3(void){}
+// int zzcgftgrtgrt;
 
 
-int zzcgftgrtgrt;
+
+
 
 
 
