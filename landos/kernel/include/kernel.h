@@ -302,8 +302,16 @@ unsigned long SavedBPP;
 
 // ==============================
 
+// sci - system call interface
+// All the functions in this folder can be called
+// by the ring3 apps via system call.
+// This is the last #include. :^)
+
+#include "rtl/sci/syscall.h"        
 #include "rtl/sci/sys.h"
 
+
+// ==============================
 
 
 //keyboard suppport 

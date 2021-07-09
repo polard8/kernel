@@ -345,7 +345,7 @@ int fsInit (void)
     if (slot<0 || slot >= NUMBER_OF_FILES){
         panic("fsInit: slot");
     }
-    volume1_rootdir = file_table[slot];
+    volume1_rootdir = (file *) file_table[slot];
     volume1_rootdir->filetable_index = slot;
 
     if ( (void *) volume1_rootdir == NULL ){
@@ -372,7 +372,7 @@ int fsInit (void)
         if (slot<0 || slot >=32){
             panic("fsInit: volume1_rootdir inode slot");
         }
-        volume1_rootdir->inode = inode_table[slot];
+        volume1_rootdir->inode = (struct inode_d *) inode_table[slot];
         volume1_rootdir->inodetable_index = slot;
         if ( (void*) volume1_rootdir->inode == NULL ){
             panic("fsInit: volume1_rootdir inode struct");
@@ -398,7 +398,7 @@ int fsInit (void)
     if (slot<0 || slot >= NUMBER_OF_FILES){
         panic("fsInit: slot");
     }
-    volume2_rootdir = file_table[slot];
+    volume2_rootdir = (file *) file_table[slot];
     volume2_rootdir->filetable_index = slot;
 
     if ( (void *) volume2_rootdir == NULL ){
@@ -422,7 +422,7 @@ int fsInit (void)
         if (slot<0 || slot >= 32){
             panic("fsInit: volume2_rootdir inode slot");
         }
-        volume2_rootdir->inode = inode_table[slot];
+        volume2_rootdir->inode = (struct inode_d *) inode_table[slot];
         volume2_rootdir->inodetable_index = slot;
         if ( (void*) volume2_rootdir->inode == NULL ){
             panic("fsInit: volume2_rootdir inode struct");

@@ -8,7 +8,7 @@
 
 
 #ifndef ____CPUID_H
-#define ____CPUID_H
+#define ____CPUID_H    1
 
 
 

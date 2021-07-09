@@ -2816,12 +2816,11 @@ _data_start:
 
 
 ;; Stack usada pelo kernel
-global _xxxStackEnd
-_xxxStackEnd:
-    ;; times 4096 db 0
-    times (1024*64) db 0
-global _xxxStack
-_xxxStack:
+;global _xxxStackEnd
+;_xxxStackEnd:
+;    times (1024*64) db 0
+;global _xxxStack
+;_xxxStack:
 
 
 ;; Stack usada pelo aplicativo quando entra em ring 0
@@ -2829,12 +2828,11 @@ _xxxStack:
 ;; Talvez isso possa ficar no bss.
 ;; See:
 ;; headlib.asm and tss.c
-global _rsp0StackEnd
-_rsp0StackEnd:
-    ;; times 4096 db 0
-    times (1024*64) db 0
-global _rsp0Stack
-_rsp0Stack:
+;global _rsp0StackEnd
+;_rsp0StackEnd:
+;    times (1024*64) db 0
+;global _rsp0Stack
+;_rsp0Stack:
 
 
 
@@ -2850,6 +2848,23 @@ global _bss_start
 _bss_start:
     ;db 0x55
     ;db 0xAA
+
+
+;; Stack usada pelo kernel
+global _xxxStackEnd
+_xxxStackEnd:
+    ;times (1024*64) db 0
+    resb (1024*64)
+global _xxxStack
+_xxxStack:
+
+;;
+global _rsp0StackEnd
+_rsp0StackEnd:
+    ;times (1024*64) db 0
+    resb (1024*64)
+global _rsp0Stack
+_rsp0Stack:
 
 
 

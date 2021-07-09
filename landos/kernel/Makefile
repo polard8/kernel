@@ -5,7 +5,33 @@
 # in the folder kernel/1pump/arch/x86_64/pumpcore/
 # Evething starts in the file head_64.asm
 
-CFLAGS = -m64 \
+# See:
+# https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
+
+#original: gramado 32bit
+#CFLAGS := -m64 \
+#	-std=gnu89 \
+#	-nodefaultlibs \
+#	-nostdinc \
+#	-nostdlib \
+#	-static \
+#	-fgnu89-inline \
+#	-ffreestanding \
+#	-fno-builtin \
+#	-fno-pie \
+#	-fleading-underscore \
+#	-fno-stack-protector \
+#	-s \
+#	-Werror=strict-prototypes    
+
+#nelson
+#CFLAGS := -Wall \
+#-m64 -std=gnu89 \
+#-ffreestanding -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -nostdlib -nostdinc    
+
+
+#test: gramado 64bit
+CFLAGS := -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -21,7 +47,9 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
-KINCLUDE = -I include/
+
+KINCLUDE := -I include/
+LDFLAGS := -m elf_x86_64
 
 
 # ========================
@@ -48,7 +76,8 @@ ts.o dispatch.o spawn.o x64cont.o x64fault.o \
 sched.o schedi.o \
 process.o thread.o threadi.o create.o queue.o mk.o \
 memory.o mminfo.o mmpool.o pages.o \
-panic.o reboot.o request.o    
+panic.o reboot.o request.o \
+sci.o     
 
 
 
@@ -215,7 +244,8 @@ all-c:
 	gcc -c user/vt.c   $(KINCLUDE) $(CFLAGS) -o vt.o
 
 	# ctrl
-	gcc -c user/ctrl/console.c   $(KINCLUDE) $(CFLAGS) -o console.o
+	gcc -c user/ctrl/console.c  $(KINCLUDE) $(CFLAGS) -o console.o
+	gcc -c user/ctrl/sci.c      $(KINCLUDE) $(CFLAGS) -o sci.o
 
 	# user/model
 	gcc -c user/model/font.c  $(KINCLUDE) $(CFLAGS) -o font.o
@@ -244,7 +274,8 @@ link-kernel:
 	@echo "================================="
 	@echo "(Step 2) Linking the kernel image ..."
 
-	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)    
+	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)  
 
 clean:
 	rm -rf *.o   
+

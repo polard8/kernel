@@ -1512,7 +1512,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: file slot");
     }
-    stdin = file_table[slot];
+    stdin = (file *) file_table[slot];
     stdin->filetable_index = slot;
     // Configurando a estrutura de stdin. 
     stdin->_file = 0;  //fd
@@ -1543,7 +1543,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: [FAIL] stdin inode slot\n");
     }
-    stdin->inode = inode_table[slot];
+    stdin->inode = (struct inode_d *) inode_table[slot];
     stdin->inodetable_index = slot;
     if( (void*) stdin->inode == NULL ){
         x_panic("kstdio-stdioInitialize: [FAIL] stdin inode struct\n");
@@ -1560,7 +1560,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: slot\n");
     }
-    stdout = file_table[slot];
+    stdout = (file *) file_table[slot];
     stdout->filetable_index = slot;
     // Configurando a estrutura de stdout.
     // This is a virtual console device. Used to output
@@ -1593,7 +1593,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: stdout inode slot\n");
     }
-    stdout->inode = inode_table[slot];
+    stdout->inode = (struct inode_d *) inode_table[slot];
     stdout->inodetable_index = slot;
     if( (void*) stdout->inode == NULL ){
         x_panic("kstdio-stdioInitialize: stdout inode struct\n");
@@ -1613,7 +1613,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: slot");
     }
-    stderr = file_table[slot];
+    stderr = (file *) file_table[slot];
     stderr->filetable_index = slot;
     // Configurando a estrutura de stderr.
     stderr->_file = 2;
@@ -1644,7 +1644,7 @@ int stdioInitialize (void)
     if(slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("kstdio-stdioInitialize: stderr inode slot\n");
     }
-    stderr->inode = inode_table[slot];
+    stderr->inode = (struct inode_d *) inode_table[slot];
     stderr->inodetable_index = slot;
     if( (void*) stderr->inode == NULL ){
         x_panic("kstdio-stdioInitialize: stderr inode struct\n");

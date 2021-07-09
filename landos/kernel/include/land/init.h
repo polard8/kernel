@@ -7,6 +7,8 @@
  *     2015 - Created by Fred Nora.
  */
 
+#ifndef  __INIT_H
+#define __INIT_H    1
 
 // Initialization support.
 struct initialization_d
@@ -35,6 +37,8 @@ struct initialization_d Initialization;
 
 void init_globals (void);
 int init (void);
+
+#endif    
 
 
 //

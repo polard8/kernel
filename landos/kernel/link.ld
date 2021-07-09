@@ -1,19 +1,15 @@
 /* 
  * File: link.ld
  * 
- * Linker script for i386 kernel image.
+ * Linker script for kernel image.
  *
  * Base:
- *     0xc0000000
+ *     0x30000000
  *
  * Entry point: 
- *     0xc0001000
+ *     0x30001000
  *     Kernel entry point in 1pump/arch/x86/boot.asm. 
  */
-
-
-/*OUTPUT_FORMAT("elf32-i386")*/
-/*OUTPUT_ARCH(i386)*/
 
 OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(_kernel_begin)
@@ -22,22 +18,26 @@ SECTIONS
 {
  
     /* >> This is the base */
-    /* 0xc0000000: The ELF header starts at this address */
-     /*. = 0xC0000000;*/
-     . = 0x30000000;
+    /* 0x30000000: The ELF header starts at this address */
+     /*. = 0x30000000;*/
+     /*. = 0x30000000;*/
+
+    . = 0x30001000;
+
+    _kernel_begin = .;
 
     /* _kernel_begin  = .; it belong to .head_x86 segment */
     /* See: head_32.asm */
 
     /* >> This is the entry point */
     /* kernel text segment. Executable code of the program */
-    /*.text 0xC0001000:*/
+    /*.text 0x30001000:*/
     .text 0x30001000:
     {
         _code_begin = .;
         *(.head_x86_64)  *(.text)
-        _code_end = .; 
         . = ALIGN(4096);
+        _code_end = .; 
     }
 
 
@@ -46,8 +46,8 @@ SECTIONS
     {
         _rodata_begin = .;
         *(.rdata)  *(.rodata) 
-        _rodata_end = .;
         . = ALIGN(4096);
+        _rodata_end = .;
     }
 
     /* >> kernel data segment*/
@@ -57,8 +57,8 @@ SECTIONS
     { 
         _data_begin = .; 
         *(.data)
-        _data_end = .; 
         . = ALIGN(4096);
+        _data_end = .; 
     }
 
 
@@ -69,12 +69,14 @@ SECTIONS
     { 
         _bss_begin = .; 
         *(COMMON)  *(.bss)
-        _bss_end = .; 
         . = ALIGN(4096);
+        _bss_end = .; 
     }
 
 
     /* EOF - Fim do kernel */
     _kernel_end = .; 
 }
+
+
 

@@ -191,9 +191,8 @@ tss_init (
     memset ( tss, 0, sizeof *tss );
 
     //ring 0 stack
-    tss->rsp0 = stack_address;  // va ?? 
-    
-    
+    tss->rsp0 = (unsigned long) stack_address;  // va ?? 
+
     //#debug
     //printf ("Stack %x\n", stack_address);
     //refresh_screen();

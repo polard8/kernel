@@ -1252,7 +1252,7 @@ sys_accept (
             //Salvando no slot prealocado na inicializacao
             cFile = cSocket->private_file;
             //sProcess->Objects[ sProcess->_client_sock_fd ] = cFile;
-            sProcess->Objects[ 31 ] = cFile;  //last
+            sProcess->Objects[ 31 ] = (unsigned long) cFile;  //last
             cFile->_file = 31;
             
             // Certificar que eh um socket de cliente ja conectado.
@@ -1878,8 +1878,8 @@ __OK_new_slot:
     // O arquivo de socket do cliente agora tem um fd
     // no processo servidor.
         
-    sProcess->Objects[__slot] = (file *) f;  // no que encontramos
-    sProcess->Objects[31]     = (file *) f;  // no 31.
+    sProcess->Objects[__slot] = (unsigned long) f;  // no que encontramos
+    sProcess->Objects[31]     = (unsigned long) f;  // no 31.
 
     //
     // == Connecting! ======================================
