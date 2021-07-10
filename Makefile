@@ -54,6 +54,34 @@ clean-system-files \
 	@echo "$(PRODUCT_NAME) $(EDITION_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
 
+
+#----------
+# install
+PHONY := install
+install: do_install
+do_install: \
+build-landos-files \
+build-gramado-files \
+
+#----------
+# image
+PHONY := image
+image: do_image
+do_image: \
+/mnt/gramadoxvhd    \
+vhd-mount          \
+vhd-copy-files     \
+vhd-unmount        \
+
+#----------
+# run
+PHONY := run
+run: do_run
+do_run:
+	sh ./run
+	
+
+
 #===================================================
 #::0
 # ~ Step 0: landos files.
@@ -125,7 +153,6 @@ build-gramado-files: \
 	@echo "========================="
 	@echo "(Step 2) Creating the directory to mount the VHD ..."
 	sudo mkdir /mnt/gramadoxvhd
-
 
 #===================================================
 #::3
