@@ -57,6 +57,7 @@ clean-system-files \
 
 #----------
 # install
+# Build the images and put them all into base/ folder.
 PHONY := install
 install: do_install
 do_install: \
@@ -65,6 +66,7 @@ build-gramado-files \
 
 #----------
 # image
+# Copy all the files from base/ to the VHD.
 PHONY := image
 image: do_image
 do_image: \
@@ -75,11 +77,11 @@ vhd-unmount        \
 
 #----------
 # run
+# run the system on qemu.
 PHONY := run
 run: do_run
 do_run:
 	sh ./run
-	
 
 
 #===================================================
