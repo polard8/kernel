@@ -270,7 +270,6 @@ _irq1:
     
     ;push ds
     ;push es
-    
     push fs
     push gs
     push rsp
@@ -315,9 +314,6 @@ _irq1:
     pop rsp
     pop gs
     pop fs
-
-    ;pop gs
-    ;pop fs
     ;pop es
     ;pop ds
 
