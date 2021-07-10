@@ -26,29 +26,40 @@
 #	-Werror=strict-prototypes    
 
 
-
 # test: gramado 64bit
-# for user: Just type 'make'
-#USER_CFLAGS
-CFLAGS := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
-	-fno-strict-aliasing -fshort-wchar -fno-PIE \
-	-Werror=implicit-function-declaration -Werror=implicit-int \
-	-Werror=return-type -Wno-format-security \
-	-std=gnu89 \
+# See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
+CFLAGS := \
+	-Wall \
+	-Wundef \
 	-Wmissing-prototypes \
-	 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-strict-aliasing  \
+	-Wno-uninitialized \
+	-Wno-format-security \
+	-Wno-trigraphs \
+	-Werror=strict-prototypes \
+	-Werror=implicit-function-declaration \
+	-Werror=implicit-int \
+	-Werror=return-type \
+	-std=gnu89 \
 	-m64 \
+	-s \
+	-static \
+	-fcommon \
+	-fgnu89-inline \
+	-finline-functions \
+	-fshort-wchar \
+	-ffreestanding \
+	-fleading-underscore \
+	-fstrict-overflow \
+	-nostdlib \
 	-nodefaultlibs \
 	-nostdinc \
-	-nostdlib \
-	-static \
-	-fgnu89-inline \
-	-ffreestanding \
 	-fno-builtin \
-	-fno-pie \
-	-fleading-underscore \
 	-fno-stack-protector \
-	-s    
+	-fno-strict-aliasing \
+	-fno-PIE \
+	-fno-pie \
+	-fno-omit-frame-pointer \
+	-fno-optimize-sibling-calls    
 
 
 
@@ -62,13 +73,28 @@ KERNEL_INCLUDE := -I include/ $(USER_INCLUDE)
 
 
 
-LDFLAGS := -m elf_x86_64
+LDFLAGS := -m elf_x86_64 -static
 
 
 # ========================
-# Objects
+# Config
 
-OBJECTS := head_64.o main.o x64init.o \
+#test
+CONFIG_MAIN=y
+# ...
+
+# ========================
+# Objects (This is a test)
+# We need classes: head | always | optional
+
+# head
+objects-y := head_64.o 
+
+# always
+objects-$(CONFIG_MAIN) += main.o 
+
+# optional
+objects-y += x64init.o \
 ctype.o kstdio.o stdlib.o string.o unistd.o runtime.o system.o signal.o \
 init.o debug.o info.o \
 ports64.o pit.o rtc.o x64.o x64info.o hal.o detect.o \
@@ -287,7 +313,7 @@ link-kernel:
 	@echo "================================="
 	@echo "(Step 2) Linking the kernel image ..."
 
-	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(OBJECTS)  
+	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(objects-y)  
 
 clean:
 	rm -rf *.o   

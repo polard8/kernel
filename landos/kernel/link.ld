@@ -11,72 +11,54 @@
  *     Kernel entry point in 1pump/arch/x86/boot.asm. 
  */
 
+/* See: https://wiki.osdev.org/Linker_Scripts */
+
+/* 64-bit ELF format for the x86-64 architecture. */
+
 OUTPUT_FORMAT("elf64-x86-64")
 ENTRY(_kernel_begin)
 
 SECTIONS 
 {
- 
-    /* >> This is the base */
-    /* 0x30000000: The ELF header starts at this address */
-     /*. = 0x30000000;*/
-     /*. = 0x30000000;*/
-
-    . = 0x30001000;
-
     _kernel_begin = .;
 
-    /* _kernel_begin  = .; it belong to .head_x86 segment */
-    /* See: head_32.asm */
-
-    /* >> This is the entry point */
-    /* kernel text segment. Executable code of the program */
-    /*.text 0x30001000:*/
+    . = 0x30001000;
     .text 0x30001000:
     {
         _code_begin = .;
-        *(.head_x86_64)  *(.text)
-        . = ALIGN(4096);
+        *(.head_x86_64)  *(.text) 
         _code_end = .; 
     }
-
-
-    /* >> kernel read-only data. */
+    
+    . = ALIGN(4096);
     .rodata :
     {
         _rodata_begin = .;
         *(.rdata)  *(.rodata) 
-        . = ALIGN(4096);
         _rodata_end = .;
     }
-
-    /* >> kernel data segment*/
-    /* Read-write data (initialized) */
-    /* data = Contains initialized global variables which are not constants */
+    
+    . = ALIGN(4096);
     .data :  
     { 
         _data_begin = .; 
-        *(.data)
-        . = ALIGN(4096);
+        *(.data) 
         _data_end = .; 
     }
-
-
-    /* >> kernel bss segment, contains all the static uninitalized data */  
-    /* Read-write data (uninitialized) and stack */
-    /*COMMON ?? Contains the un-initialized global variables (not static). ??*/
+    
+    . = ALIGN(4096);
     .bss : 
     { 
         _bss_begin = .; 
         *(COMMON)  *(.bss)
-        . = ALIGN(4096);
         _bss_end = .; 
     }
 
 
-    /* EOF - Fim do kernel */
     _kernel_end = .; 
 }
+
+
 
 
 
