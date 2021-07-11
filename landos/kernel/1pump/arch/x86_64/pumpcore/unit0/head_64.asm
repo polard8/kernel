@@ -29,10 +29,15 @@ extern _magic
 ;     makes the jump.
 ;
 
+;
+; + The Stack Register (rsp) will be loaded with the 
+;   ring 0 base kernel stack pointer.
+; +
+;
+
 ; IN:
 ; The boot loader delivers a magic value in edx and
 ; a boot block in 0x90000.
-
 
 ; unit 0: Kernel begin.
 global _kernel_begin 
@@ -58,71 +63,38 @@ align 4
 
 START:
 
-    ; We do not have segmentation,
-    ; So, let's clear the legacy segment registers.
-
-    ;xor rax, rax
-    ;mov ds, ax
-    ;mov es, ax
-    ;mov ss, ax
-    ;mov fs, ax
-    ;mov gs, ax
-
-
     ; #todo
-    ; The stack ?
+    ; We can save some values just for debug purpose.
 
-    ; No interrupts
+    mov dword [_magic], edx
+    ; ...
+
+; Clear interrupts.
+; Clear some registers.
+; Load our own 64-bit gdt.
+; Setup data registers and base kernel stack.
+; Load a NULL ldt.
+
     cli
 
-    ; Magic
-    mov dword [_magic], edx
-
-;
-; GDT
-;
-
-    ; Load our own 64-bit global descriptor table.
-    lgdt [GDT64.Pointer]
-
-    ; #todo
-    ; We need to check if we really are in long mode
-    ; Please check the bits in CS.
-
-;
-; flush ?
-;
-
-    ;jmp GDT64.Code:flush64
-;[bits 64]
-;global _flush64
-;flush64:
-
-
-;
-; Registers.
-;
-
-    ; It depends on the mode we are.
-
-    ; general purpose
     xor rax, rax
     xor rbx, rbx
     xor rcx, rcx
     xor rdx, rdx
 
-    ; #bugbug
-    ; Well ds, es and ss are valid only in compatibility mode.
-    
-    ; Data
+    lgdt [GDT64.Pointer]
+
     mov ax, GDT64.Data
     mov ds, ax
     mov es, ax
- 
-    ; Stack
+
     mov ss, ax
     mov rsp, _xxxStack
- 
+
+    xor rax, rax
+    lldt ax
+
+; Clear registers
     xor rax, rax
     mov rbp, rax
     mov rsi, rax
@@ -155,16 +127,6 @@ START:
     lidt [_IDT_register] 
 
 ;
-; == LDT ================================================
-;
-
-; Clear LDT
-
-    xor rax, rax
-    lldt ax
-
-
-;
 ; == TR (tss) ======================================
 ;
  
@@ -181,21 +143,15 @@ START:
     ;mov ax, word 0x2B
     ;ltr ax
 
-
 ;
-; == PIC ========================================
-;
-
 ; Early PIC initialization.
+;
 
-picEarlyInitialization:
-
-    ;; ??
-    ;; PIC MODE
-    ;; Selecting the 'Processor Interrup Mode'.
-    ;; All the APIC components are ignored here, and
-    ;; the system will operate in the single-thread mode
-    ;; using LINT0.
+; ??
+; PIC MODE
+; Selecting the 'Processor Interrup Mode'.
+; All the APIC components are ignored here, and
+; the system will operate in the single-thread mode using LINT0.
 
     cli
 
@@ -225,7 +181,9 @@ picEarlyInitialization:
     out 0xA1, al
     IODELAY
 
-    ; Mask all interrupts.
+;
+; Mask all interrupts.
+;
 
     cli
 
@@ -235,23 +193,16 @@ picEarlyInitialization:
     out  0x21,  al
     IODELAY
 
-
-
 ;
-; == PIT ========================================
-;
-
 ; Early PIT initialization.
+;
 
-pitEarlyInitialization:
-
-    ;; Setup system timers.
-
-    ;; ??
-    ;; Some frequencies to remember.
-    ;; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
-    ;; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
-    ;; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ.
+; ??
+; Setup system timers.
+; Some frequencies to remember.
+; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
+; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
+; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ.
 
     xor rax, rax
     mov al, byte 0x36
@@ -267,17 +218,13 @@ pitEarlyInitialization:
     IODELAY
 
 
+;
+; #todo: RTC
+;
 
 ;
-; == RTC ========================================
+; Unmask all maskable interrupts.
 ;
-
-
-;;
-;; int
-;;
-
-; Unmask all interrupts.
 
     mov al, 0
     out 0xA1, al
@@ -285,13 +232,11 @@ pitEarlyInitialization:
     out 0x21, al
     IODELAY
 
-; No interrupts.
+;
+; No interrupts
+;
 
     cli
-
-
-
-
 
 ;
 ; == Set up registers ==================================
@@ -322,7 +267,10 @@ pitEarlyInitialization:
     ; See: main.c
 
     xor rax, rax
-    mov rdi, rax ;#todo: arch type
+    mov rdi, rax          ; #todo: arch type (2) ??
+    ;mov rsi, Loop        ; #todo: emergency ring 0 idle thread.
+    ;mov rdx, _xxxStack   ; #todo: base kernel stack
+    ;mov rcx, _rsp0Stack  ; #todo: ring 0 stack used by the apps in tss.
 
     call _kernel_main
 
@@ -334,6 +282,9 @@ Loop:
     hlt
     jmp Loop
 
+; =======================================================
+
+align 8
 
 ;
 ; =======================================================
@@ -345,11 +296,6 @@ Loop:
 global _x84_64_initialize_machine
 _x84_64_initialize_machine:
     ret
-
-;Loop:
-;    cli
-;    hlt
-;    jmp Loop
 
 
 align 8

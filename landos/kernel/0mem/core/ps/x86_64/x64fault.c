@@ -24,7 +24,15 @@ void faults ( unsigned long number )
 
     // provisório
     switch ( number ){
-        case 0: x_panic("faults() 0"); break;
+
+        // Divisão por zero, ou resultado muito longo?
+        // Se a falta ocoreu em ring 0, então precisamos
+        // encerrar o sistema, mas se a falta aconteceu em ring3,
+        // podemos simplesmente fechar o aplicativo.
+        case 0: 
+            x_panic("faults() 0"); 
+            break;
+        
         case 1: x_panic("faults() 1"); break;
         case 2: x_panic("faults() 2"); break;
         
