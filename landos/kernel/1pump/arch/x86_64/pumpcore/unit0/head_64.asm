@@ -33,6 +33,8 @@ extern _magic
 ; The boot loader delivers a magic value in edx and
 ; a boot block in 0x90000.
 
+
+; unit 0: Kernel begin.
 global _kernel_begin 
 _kernel_begin:
 
@@ -51,7 +53,7 @@ _kernel_begin:
     DB 'GRAMADO X'
 
 align 4
-    %include "head/header.inc"
+    %include "header.inc"
 align 4
 
 START:
@@ -70,22 +72,18 @@ START:
     ; #todo
     ; The stack ?
 
-;
-; No interrupts
-;
+    ; No interrupts
     cli
 
-
     ; Magic
-
     mov dword [_magic], edx
 
 ;
 ; GDT
 ;
-    ; Load our own 64-bit global descriptor table.
 
-    lgdt [GDT64.Pointer]        
+    ; Load our own 64-bit global descriptor table.
+    lgdt [GDT64.Pointer]
 
     ; #todo
     ; We need to check if we really are in long mode
@@ -318,6 +316,14 @@ pitEarlyInitialization:
     ;mov dr7, eax
     ;; ...
 
+
+    ; Use the calling convention for this compiler.
+    ; rdi
+    ; See: main.c
+
+    xor rax, rax
+    mov rdi, rax ;#todo: arch type
+
     call _kernel_main
 
     ;push qword 0x200
@@ -332,7 +338,7 @@ Loop:
 ;
 ; =======================================================
 ; _x64_64_initialize_machine
-;    CAlled by main() to make the early initialization.
+;    Called by main() to make the early initialization.
 ;
 
 
@@ -2786,21 +2792,25 @@ align 8
 ; Esses includes são padronizados. Não acrescentar outros.
 
 
-; Inicialização.
-; Funções de apoio à inicialização do Kernel 32bit.
+    ; unit 0
+    ; Inicialização.
+    ; Funções de apoio à inicialização do Kernel 32bit.
+    %include "unit0lib.asm" 
 
-    %include "head/head.asm" 
-    %include "head/headlib.asm" 
+    ; Interrupções de hardware (irqs) e faults.
+    ; Interrupções de software.
 
-; Interrupções de hardware (irqs) e faults.
+    ; unit 1
+    %include "../unit1/unit1hw.asm"
+    %include "../unit1/unit1sw.asm"
 
-    %include "hw/hw.asm"
-    %include "hw/hwlib.asm"
+    ; unit 2 in C.
 
-; Interrupções de software.
+    ; unit 3
+    %include "../unit3/unit3hw.asm"
+    %include "../unit3/unit3sw.asm"
 
-    %include "sw/sw.asm"
-    %include "sw/swlib.asm"
+    %include "../unit4/unit4lib.asm" 
 
 
 ;=================================================================

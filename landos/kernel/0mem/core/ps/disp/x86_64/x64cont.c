@@ -63,6 +63,9 @@ unsigned long contextR15;
  *     Mudar nome para contextSaveCurrent();.
  */
 
+
+// unit 1: Capture context.
+// Intake
 void save_current_context (void)
 {
     struct thread_d  *t;
@@ -149,6 +152,16 @@ void save_current_context (void)
     t->r14 = (unsigned long) contextr14[0];
     t->r15 = (unsigned long) contextr15[0];
 
+
+    //
+    // #todo
+    // Vamos analisar o que acabamos de capturar e
+    // configurar seu destino daqui pra frente.
+    //
+    
+    // xxxxx()
+
+
 //done:
     return;
 fail1:
@@ -169,6 +182,8 @@ fail0:
  *     Mudar nome para contextRestoreCurrent();.
  */
 
+// unit 3: Release the context.
+// Burgundy ?
 void restore_current_context (void)
 {
     struct thread_d  *t;

@@ -127,10 +127,14 @@ kernel-head:
 # The x86 head of the monster.
 
 # provisorio
-	nasm 1pump/arch/x86_64/pumpcore/head_64.asm \
+	nasm 1pump/arch/x86_64/pumpcore/unit0/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I 1pump/arch/x86_64/pumpcore/ \
+	-I 1pump/arch/x86_64/pumpcore/unit0/ \
+	-I 1pump/arch/x86_64/pumpcore/unit1/ \
+	-I 1pump/arch/x86_64/pumpcore/unit3/ \
+	-I 1pump/arch/x86_64/pumpcore/unit4/ \
 	-f elf64 -o head_64.o
+
 
 
 all-c:
@@ -283,8 +287,10 @@ all-c:
 	gcc -c user/vt.c   $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
 
 	# ctrl
-	gcc -c user/ctrl/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o
-	gcc -c user/ctrl/sci.c      $(KERNEL_INCLUDE) $(CFLAGS) -o sci.o
+	gcc -c user/ctrl/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+
+	# ctrl/unit2
+	gcc -c user/ctrl/unit2/sci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sci.o
 
 	# user/model
 	gcc -c user/model/font.c  $(KERNEL_INCLUDE) $(CFLAGS) -o font.o

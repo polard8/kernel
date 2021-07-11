@@ -60,6 +60,7 @@ extern _contextR15
 
 extern _xxxxIRQ0_DEBUG_MESSAGE
 
+; Capture context
 global _irq0
 _irq0:
 
@@ -242,7 +243,7 @@ hw_reboot:
 extern _xxxxIRQ1_DEBUG_MESSAGE
 extern _irq1_KEYBOARD
 
-
+; Capture context
 global _irq1  
 _irq1:
 
@@ -295,21 +296,11 @@ _irq1:
     ;#test
     ;; See: keyboard.c
     call _irq1_KEYBOARD
-
-    ;#test
-    ;in al, 0x60    ; Get the rawbyte from the keyboard.
     
-    ; escape
-    ;cmp al, 0x01
-    ;je keyboard_escape
-    
-    ;jmp keyboard_done
+    ;jmp ps2Keyboard_done
 
-;keyboard_escape:
-    ;jmp hw_reboot
-    ;int 3
-
-;keyboard_done:
+; unit3: ps2 keyboard release.
+;ps2Keyboard_done:
     popfq
     pop rsp
     pop gs
@@ -364,6 +355,7 @@ _irq1:
 ;extern _serial2_handler
 ;extern _serial4_handler
 
+; Capture context
 global _irq3
 _irq3:
 
@@ -442,6 +434,7 @@ _irq3:
 ;extern _serial1_handler
 ;extern _serial3_handler
 
+; Capture context
 global _irq4
 _irq4:
 
@@ -536,6 +529,7 @@ _irq4:
 ;; IRQ. If it is a spurious IRQ then you ignore it 
 ;; (and do not send the EOI). 
 
+; Capture context
 global _irq7
 _irq7:
 
@@ -628,6 +622,7 @@ __RETURN_Spurious:
 ;     IRQ 8 - real-time clock (RTC)
 ;
 
+; Capture context
 global _irq8
 _irq8:
 
@@ -702,6 +697,7 @@ _irq8:
 
 ;extern _xxxe1000handler
 
+; Capture context
 global _irq9
 _irq9:
     
@@ -785,6 +781,7 @@ _irq9:
 ; of peripherals (open interrupt/available, SCSI or NIC)
 ; nvidia
 
+; Capture context
 global _irq10
 _irq10:
 
@@ -861,6 +858,7 @@ _irq10:
 ;;===============================================
 ;;  interrupção 41. irq 9;
 
+; Capture context
 global _nic_handler
 _nic_handler:
     
@@ -932,6 +930,8 @@ _nic_handler:
 ; IRQ 11 - The Interrupt is left open for 
 ; the use of peripherals (open interrupt/available, SCSI or NIC)
 ; audio.
+
+; Capture context
 global _irq11
 _irq11:
 
@@ -1012,6 +1012,7 @@ _irq11:
 ; 2io/dev/tty/chardev/hid/i8042/mouse.c
 ;
 
+; Capture context
 global _irq12
 _irq12:
 
@@ -1104,6 +1105,7 @@ _irq12:
 ; or  inter-processor interrupt (use depends on OS)
 ;
 
+; Capture context
 global _irq13
 _irq13:
 
@@ -1187,6 +1189,7 @@ _irq13:
 ;     ( ATA interface usually serves hard disk drives and CD drives ) 
 ;     O timer precisa ser desbilitado. ??
 
+; Capture context
 global _irq14
 _irq14:
    
@@ -1276,6 +1279,7 @@ _irq14:
 ;; to the master PIC because the master PIC itself won't know that it 
 ;; was a spurious IRQ from the slave. 
 
+; Capture context
 global _irq15
 _irq15:
 

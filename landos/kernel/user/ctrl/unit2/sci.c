@@ -214,7 +214,7 @@ void *gde_extra_services (
 
 
 
-
+// unit2: Do the job.
 void *sci0 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -256,6 +256,14 @@ void *sci0 (
 
     // Counting ...
     p->syscalls_counter++;
+    
+    
+    // #debug
+    if (number == 4321){
+        printf ("4321: arg2 %x | arg3 %x | arg4 %x \n",arg2,arg3,arg4);
+        refresh_screen();
+        return NULL;
+    }
 
 
     // ================================
@@ -1000,7 +1008,7 @@ done:
 }
 
 
-
+// unit2: Do the job.
 void *sci1 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -1026,6 +1034,8 @@ void *sci1 (
     return NULL;
 }
 
+
+// unit2: Do the job.
 void *sci2 ( 
     unsigned long number, 
     unsigned long arg2, 

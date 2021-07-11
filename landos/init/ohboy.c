@@ -58,6 +58,10 @@ void main(void)
 
     // refresh screen
     ohboy_system_call(11,0,0,0);
+    
+    // ok, a calling conventions funcionou,
+    // os parametros estao em ordem.
+    //ohboy_system_call(4321,0xa,0xb,0xc);
 }
 
 
