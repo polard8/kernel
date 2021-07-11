@@ -590,6 +590,8 @@ void *sci2 (
     unsigned long arg3, 
     unsigned long arg4 );
 
+void servicesPutChar ( int c );
+
 void nothing4(void);
 void nothing5(void);
 void nothing6(void);

@@ -47,6 +47,15 @@ void main(void)
     //char *s="fred";
     //ohboy_system_call(289,s,s,s);
 
+    // Exit
+    //ohboy_system_call(70,0,0,0);
+    //while(1){
+    //    ohboy_system_call(289,s,s,s);
+    //}
+
+    // List files.
+    //ohboy_system_call(173,0,0,0);
+
     // refresh screen
     ohboy_system_call(11,0,0,0);
 }
