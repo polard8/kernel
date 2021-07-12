@@ -69,8 +69,14 @@ void refresh_screen (void)
     // Como temos apenas 2MB de lfb mapeados, 
     // então vamos copiar menos dados pra evitar ultrapassar o limite
     // e causar PF.
+
+    // slow way
     unsigned char *backbuffer  = (unsigned char *) BACKBUFFER_VA;
     unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_VA;
+
+    // fast way
+    unsigned long *backbuffer_long  = (unsigned long *) BACKBUFFER_VA;
+    unsigned long *frontbuffer_long = (unsigned long *) FRONTBUFFER_VA;
 
 
     debug_print_string("refresh_screen:\n");
@@ -112,11 +118,28 @@ void refresh_screen (void)
         return;
     }
 
-    for ( i=0; i< Total; i++ )
+    // Fast way ?
+    // Divisible by 8. So use the fast way.
+    int FastTotal=0;
+    if ( (Total % 8) == 0 )
     {
+        FastTotal = (Total >> 3);
+        for ( i=0; i<FastTotal; i++ ){
+            frontbuffer_long[i] = backbuffer_long[i];
+        };
+        return;
+    }
+
+    // Slow way.
+    for ( i=0; i<Total; i++ ){
         frontbuffer[i] = backbuffer[i];
     };
+
+    return;
 }   
+
+
+
 
 /*
  **********************************************
