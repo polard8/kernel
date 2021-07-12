@@ -168,10 +168,8 @@ refresh_rectangle (
     unsigned long width, 
     unsigned long height )
 {
-
     void *dest       = (void *)      FRONTBUFFER_ADDRESS;
     const void *src  = (const void*) BACKBUFFER_ADDRESS;
-
 
     // loop
     register unsigned int i=0;
@@ -181,11 +179,15 @@ refresh_rectangle (
 
 
 
+    // Screen pitch.
     // screen line size in pixels * bytes per pixel.
-    unsigned int pitch=0;  
-
+    unsigned int screen_pitch=0;  
+    // Rectangle pitch
     // rectangle line size in pixels * bytes per pixel.
-    unsigned int internal_pitch=0;  
+    unsigned int rectangle_pitch=0;  
+
+
+
 
     unsigned int offset=0;
 
@@ -227,18 +229,20 @@ refresh_rectangle (
 //
 // Pitch
 //
+
+    // Screen pitch.
     // Screen line size in pixels plus bytes per pixel.
-    pitch = (unsigned int) (bytes_count * deviceWidth);
-
+    screen_pitch    = (unsigned int) (bytes_count * deviceWidth);
+    // Rectangle pitch.
     // rectangle line size in pixels * bytes per pixel.
-    internal_pitch = (unsigned int) (bytes_count * line_size);
-
+	//(line_size * bytes_count) é o número de bytes por linha. 
+    rectangle_pitch = (unsigned int) (bytes_count * line_size);
 
 
 	// #atenção.
 	//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
-    offset = (unsigned int) ( (y*pitch) + (bytes_count*x) );
+    offset = (unsigned int) ( (y*screen_pitch) + (bytes_count*x) );
 
 
     dest = (void *)       (dest + offset); 
@@ -254,19 +258,38 @@ refresh_rectangle (
     //}
 
 
-	//(line_size * bytes_count) é o número de bytes por linha. 
+    // #test
+    // Se for divisível por 8.
+    if ( (rectangle_pitch % 8) == 0 )
+    {
+        // 'strength reduction'
+        // count = ( internal_pitch / 8 ); 
+        count = ( rectangle_pitch >> 3 );   // dividido por 8.
+        
+        // Copy lines
+        for ( i=0; i < lines; i++ )
+        {
+            // Não copiamos a parte que está fora da janela do dispositivo.
+            if ( UseClipping == TRUE ){
+                if ( (FirstLine + i) > deviceHeight ){ break; }
+            }
 
-	//#importante
-	//É bem mais rápido com múltiplos de 4.	
+            // 8 bytes
+            memcpy64 ( (void *) dest, (const void *) src, count );
+            dest += screen_pitch;
+            src  += screen_pitch;
+        };
+        return;
+    }
 
 
     // Se for divisível por 4.
-    // Copia uma linha ou um pouco mais caso não seja divisível por 4.
-    if ( (internal_pitch % 4) == 0 )
+
+    if ( (rectangle_pitch % 4) == 0 )
     {
         // 'strength reduction'
         // count = ( internal_pitch / 4 ); 
-        count = ( internal_pitch >> 2 );  //#todo: Use this one.
+        count = ( rectangle_pitch >> 2 );  //#todo: Use this one.
 
         // Copy lines
         for ( i=0; i < lines; i++ )
@@ -278,14 +301,14 @@ refresh_rectangle (
 
             // 4 bytes
             memcpy32 ( (void *) dest, (const void *) src, count );
-            dest += pitch;
-            src  += pitch;
+            dest += screen_pitch;
+            src  += screen_pitch;
         };
         return;
     }
 
     // Se não for divisível por 4.
-    if ( (internal_pitch % 4) != 0 )
+    if ( (rectangle_pitch % 4) != 0 )
     {
         // Copy lines
         for ( i=0; i < lines; i++ )
@@ -296,9 +319,9 @@ refresh_rectangle (
             }
             
             // 1 byte
-            memcpy ( (void *) dest, (const void *) src, internal_pitch );
-            dest += pitch; 
-            src  += pitch; 
+            memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
+            dest += screen_pitch; 
+            src  += screen_pitch; 
         };
         return;
     }
@@ -317,9 +340,7 @@ refresh_rectangle2 (
     unsigned long height,
     unsigned long buffer1,
     unsigned long buffer2 )
-{  
-	
-
+{
 
 	// #todo
 	// Fazer a mesma otimizaçao que fizemos na outra rotina de refresh rectangle.
