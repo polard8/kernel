@@ -82,8 +82,8 @@ all-c:
 # test
 # entry point para a biblioteca compartilhada. .so
 
-	gcc  -c  socrt0.c -fno-stack-protector -fpic -mno-red-zone  -DEFI_FUNCTION_WRAPPER  $(CFLAGS) -I. -I include/ -o socrt0.o	
-	gcc  -c  somain.c -fno-stack-protector -fpic -mno-red-zone  -DEFI_FUNCTION_WRAPPER  $(CFLAGS) -I. -I include/ -o somain.o	
+	#gcc  -c  socrt0.c -fno-stack-protector -fpic -mno-red-zone  -DEFI_FUNCTION_WRAPPER  $(CFLAGS) -I. -I include/ -o socrt0.o	
+	#gcc  -c  somain.c -fno-stack-protector -fpic -mno-red-zone  -DEFI_FUNCTION_WRAPPER  $(CFLAGS) -I. -I include/ -o somain.o	
 
 
 #ifeq ($(TARGETOS),gramado)
@@ -107,8 +107,8 @@ libc-link:
 finalize:
 	-mkdir        obj/
 	-cp *.o       obj/
-	-cp LIBC03.A  obj/
-	-cp LIBC03.SO obj/
+	#-cp LIBC03.A  obj/
+	#-cp LIBC03.SO obj/
 
 clean:
 	-rm *.o

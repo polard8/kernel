@@ -1,4 +1,46 @@
 
+//#define	NULL	((void *)0)
+
+
+#include <types.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
+
+static char *ohboy_argv[] = { 
+    "-flag1", 
+    "-flag2", 
+    "-flag3", 
+    "-flag4", 
+    NULL 
+};
+
+static char *ohboy_environ[] = { 
+
+    "DISPLAY=kgws-or-gwssrv",  //#todo
+    "EDITOR=gramcode",
+    "HOME=/HOME",
+    "HOSTNAME=gramado",
+    "LANG=en-us",
+    "LANG2=pt-br",
+    "LANGX=en-br",
+    "OSTYPE=gramado",   //#todo
+    "PATH=/:/PROGRAMS:/GRAMADO",
+    "PS1=~$",
+    "PS2=:>",
+    "PWD=/",             //#bugbug: This is the working directory.
+    "SHELL=gdeshell",
+    "TERM=noraterm",     //#bugbug
+    "TMP=/TMP",
+    "UID=no-id",         //#todo
+    "USER=anon",  
+    NULL 
+};
+
+
 // system call.
 void *ohboy_system_call ( 
     unsigned long a, 
@@ -29,13 +71,27 @@ void main(void)
     //ohboy_system_call(0,0,0,0);
     //ohboy_system_call(0,0,0,0);
     
+    
+    // Get pid
     int pid = (int) ohboy_system_call(85,0,0,0);
 
+    //get Heap address given the pid.
+    void *heap;
+    //heap = (void*)ohboy_system_call(184,0,0,0);
+    heap = (void*)gramado_system_call(184,pid,pid,pid);  //#test: Tentando usar a libc
+
+    // Heap not valid.
+    if ( (void*) heap == NULL )
+        ohboy_system_call(65,'N',0,0);
+
+    // Valid heap.
+    if ( (void*) heap != NULL )
+        ohboy_system_call(65,'Y',0,0);
 
     //ohboy_system_call(49,0,0,0);
 
     // console put char
-    ohboy_system_call(65,'x',0,0);
+    // ohboy_system_call(65,'x',0,0);
 
     //asm("int $3");
     //while(1){}
@@ -55,14 +111,88 @@ void main(void)
 
     // List files.
     //ohboy_system_call(173,0,0,0);
+  
+  
+  
+// =================================================
+
+
+//
+// Initializing the ring3 libc.
+//
+
+    // Environment.
+    environ = ohboy_environ;
+
+
+//
+// #todo
+//
+
+
+    // ok
+    // See: stdlib/stdlib.c
+    ohboy_system_call(65,'1',0,0);
+    libcInitRT();
+
+    // fail !
+    // See: stdio/stdio.c
+    ohboy_system_call(65,'2',0,0);
+    stdioInitialize();
+
+    //#fail
+    //debug_print("Fred\n");
+
+    //#fail
+    //while(1)
+        //printf("Fred\n");
+
+    //#fail
+    //putchar('z');
+    //fflush(stdout);
+
+    //gramado_system_call (82,0,0,0);
+    
+    ohboy_system_call(65,'z',0,0);
+    
+    // ok
+    //rtl_reboot();
+
+// tests:
+
+    debug_print("-- init: tests ------------------\n");
+
+    if ( (void*) stdin == NULL )
+        debug_print("init.bin: stdin fail\n");
+
+    if ( (void*) stdout == NULL )
+        debug_print("init.bin: stdout fail\n");
+
+    if ( (void*) stderr == NULL )
+        debug_print("init.bin: stderr fail\n");
+
+    
+    //char *s = "Fred";
+    //putc('v',stdout);
+    //write ( fileno(stdout), s, 4 );
+    //fflush(stdout);
+    //while(1){}
+    
+// =================================================
 
     // refresh screen
     ohboy_system_call(11,0,0,0);
+
+    //#debug
+    //while(1){}
     
     // ok, a calling conventions funcionou,
     // os parametros estao em ordem.
     //ohboy_system_call(4321,0xa,0xb,0xc);
+
+// Return to marginal.asm
 }
+
 
 
 

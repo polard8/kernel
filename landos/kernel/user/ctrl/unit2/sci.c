@@ -239,8 +239,8 @@ void *sci0 (
 
     // #debug
     debug_print("sc0:\n");
-    printf("sc0:\n");
-    refresh_screen();
+    //printf("sc0:\n");
+    //refresh_screen();
 
     g_profiler_ints_gde_services++;
 
@@ -923,8 +923,10 @@ void *sci0 (
 
 
         // 184
-        // pega o endere�o do heap do processo dado seu id.
+        // Pega o endereço do heap do processo dado seu id.
+        // See: process.c
         case SYS_GETPROCESSHEAPPOINTER:
+            debug_print("sci0: [184]\n");
             return (void *) GetProcessHeapStart ( (int) arg2 );
             break;
 

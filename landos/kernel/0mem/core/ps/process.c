@@ -1123,22 +1123,32 @@ unsigned long GetProcessHeapStart ( pid_t pid )
 {
     struct process_d  *process;
 
+
+    debug_print ("GetProcessHeapStart:\n");
+
+    // #debug
+    printf ("GetProcessHeapStart: [DEBUG] pid %d\n", pid);
+    refresh_screen();
+
     // Limits
 
     if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
     {
+        debug_print ("pid\n");
         goto fail; 
     }
 
-
     process = (struct process_d *) processList[pid];
     
-    if ( (void *) process == NULL ){
+    if ( (void *) process == NULL )
+    {
+        debug_print ("process\n");
         goto fail;
     }else{
 
         if ( process->used != 1 || process->magic != 1234 )
         {
+            debug_print ("process validation\n");
             goto fail;
         }
 
@@ -1147,8 +1157,11 @@ unsigned long GetProcessHeapStart ( pid_t pid )
     };
 
 fail:
+    debug_print ("GetProcessHeapStart: fail\n");
+    panic       ("GetProcessHeapStart: fail\n");
     return (unsigned long) 0;
 }
+
 
 void 
 SetProcessPML4_VA ( 

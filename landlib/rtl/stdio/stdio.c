@@ -5789,12 +5789,14 @@ void stdioInitialize(void)
     //unsigned char buffer2_data[BUFSIZ];
 
     // #debug
+    debug_print ("\n");
+    debug_print ("--------------------------\n");
     debug_print ("stdioInitialize:\n");  
 
-    //
-    // Pointers.
-    //    
-    
+//
+// Pointers
+//    
+
     //stdin  = (FILE *) &buffer0[0];
     //stdout = (FILE *) &buffer1[0];
     //stderr = (FILE *) &buffer2[0];
@@ -5803,6 +5805,7 @@ void stdioInitialize(void)
     // Se essa inicializaçao falhar, nao temos como mostrar
     // mensagens de erro.
 
+    debug_print ("stdioInitialize: [1] stdin\n");  
     stdin = (FILE *) malloc( sizeof(FILE) );
     if( (void*) stdin == NULL )
     {
@@ -5810,7 +5813,8 @@ void stdioInitialize(void)
         //printf      ("stdioInitialize: stdin fail\n");
         exit(1);
     }
-    
+
+    debug_print ("stdioInitialize: [2] stdout\n");  
     stdout = (FILE *) malloc( sizeof(FILE) );
     if( (void*) stdout == NULL )
     {
@@ -5819,6 +5823,7 @@ void stdioInitialize(void)
         exit(1);
     }
 
+    debug_print ("stdioInitialize: [3] stderr\n");  
     stderr = (FILE *) malloc( sizeof(FILE) );
     if( (void*) stderr == NULL )
     {
@@ -5924,6 +5929,7 @@ void stdioInitialize(void)
 
     // #debug
     debug_print ("stdioInitialize: done\n");  
+    debug_print ("--------------------------\n");
 }
 
 

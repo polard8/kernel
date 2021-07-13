@@ -70,8 +70,9 @@ LIBCOBJ =  ../../landlib/rtl/obj
 # ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
 # termios.o ioctl.o fcntl.o rtl.o    
 
-myObjects = marginal.o main.o    
-
+myObjects = marginal.o main.o \
+ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
+termios.o ioctl.o fcntl.o rtl.o    
 
 
 .PHONY: all all-c shell-link finalize clean
@@ -84,30 +85,30 @@ head.o:
 
 crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
-	nasm marginal.asm -f elf64 -o marginal.o
+	nasm marginal.asm -f elf64 -o marginal.o 
 
 main.o:
 	$(CC)  -c  ohboy.c -I $(LIBC) $(CFLAGS) -o main.o
+#	$(CC)  -c  ohboy2.c -I $(LIBC) $(CFLAGS) -o main.o
 
 all-c:
 
 # We need some api and libc objects.
 
-#obs: estamos usando um crt0.o compilado aqui mesmo.
-	#cp $(LIBCOBJ)/crt0.o .
-	#cp $(LIBCOBJ)/rtl.o .
-	
-	#cp $(LIBCOBJ)/ctype.o .
-	#cp $(LIBCOBJ)/stdio.o .
-	#cp $(LIBCOBJ)/stdlib.o .
-	#cp $(LIBCOBJ)/string.o .
-	#cp $(LIBCOBJ)/conio.o .
-	#cp $(LIBCOBJ)/unistd.o .
+	cp $(LIBCOBJ)/crt0.o .
+	cp $(LIBCOBJ)/rtl.o .
 
-	#cp $(LIBCOBJ)/termios.o .
-	#cp $(LIBCOBJ)/ioctl.o .
-	#cp $(LIBCOBJ)/fcntl.o .
-	
+	cp $(LIBCOBJ)/ctype.o .
+	cp $(LIBCOBJ)/stdio.o .
+	cp $(LIBCOBJ)/stdlib.o .
+	cp $(LIBCOBJ)/string.o .
+	cp $(LIBCOBJ)/conio.o .
+	cp $(LIBCOBJ)/unistd.o .
+
+	cp $(LIBCOBJ)/termios.o .
+	cp $(LIBCOBJ)/ioctl.o .
+	cp $(LIBCOBJ)/fcntl.o .
+
 	#cp $(APIOBJ)/api.o .
 
 

@@ -9,8 +9,12 @@
 // MM BLOCK.
 // 
 
-#define MMBLOCK_HEADER_SIZE   64    //Tamanho do header do bloco.
-#define MMBLOCK_COUNT_MAX    256    //Contagem de mmblock. 
+//Tamanho do header do bloco.
+//#define MMBLOCK_HEADER_SIZE   64
+#define MMBLOCK_HEADER_SIZE   128
+
+//Contagem de mmblock. 
+#define MMBLOCK_COUNT_MAX    256 
 
 
 //
@@ -38,7 +42,7 @@ unsigned long mmblockCount;         //Conta os blocos de memória dentro de um he
 typedef struct mmblock_d mmblock_descriptor_t;
 struct mmblock_d 
 {
-    // Identificadores.	
+    // Identificadores.
 	unsigned long Header;      // Endereço onde começa o header do heap.
 	unsigned long headerSize;  // Tamanho do header em bytes.
 	unsigned long Id;          // Id do header.
@@ -78,11 +82,11 @@ struct mmblock_d
 	
 	struct mmblock_d *Next;
 	struct mmblock_d *Prev;
-	
-	//Continua...
-	
 };
-mmblock_descriptor_t *current_mmblock;
+
+struct mmblock_d  *current_mmblock;
+
+//mmblock_descriptor_t *current_mmblock;
 //mmblock_descriptor_t *SystemCache_mmblock;
 //mmblock_descriptor_t *ProcessCache_mmblock;
 //...

@@ -125,6 +125,12 @@ void __x64StartInit (void)
     // The init process has a bigger heap than 
     // the other ring3 processes.
 
+    //if ( g_extraheap1_va != EXTRAHEAP1_VA )
+    //{
+    //    debug_print("__x86StartInit: [ERROR] g_extraheap1_va != EXTRAHEAP1_VA\n");
+    //    while(1){}
+    //}
+
     // #todo #bugbug
     InitProcess->Heap = (unsigned long) g_extraheap1_va;
 

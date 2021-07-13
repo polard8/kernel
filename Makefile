@@ -118,6 +118,10 @@ land-boot:
 
 land-lib:
 	# todo: Port ring3 libraries.
+	@echo "=================="
+	@echo "Creating the ring3 rtl ..."
+	$(Q) $(MAKE) -C landlib/rtl
+
 land-os:
 	@echo "=================="
 	@echo "(Step 1) Creating the kernel image ..."
@@ -210,6 +214,10 @@ clean:
 	@echo "==================="
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
+	-rm -rf landlib/rtl/obj/*.o
+	-rm -rf landlib/lib/libgns/obj/*.o
+	-rm -rf landlib/lib/libio01/obj/*.o
+
 clean2:
 	-rm *.ISO
 	-rm *.VHD
