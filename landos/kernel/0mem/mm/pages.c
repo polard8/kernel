@@ -532,7 +532,6 @@ int mmSetUpPaging (void)
     mm_used_extraheap3 = 0; 
     mm_used_frame_table = 0;
     memorysizeFree = 0;
-    memorysizeTotal= 0; 
     memorysizeUsed= 0;
 
     // ============
@@ -995,16 +994,128 @@ Entry_387:
 //--
 
 
+//++
+// ====================================================================
+// pool of heaps.
+Entry_388:
+
+    g_heappool_va    = (unsigned long) 0x30800000;
+    g_heap_count     = 0;
+    g_heap_count_max = G_DEFAULT_PROCESSHEAP_COUNTMAX;
+    g_heap_size      = G_DEFAULT_PROCESSHEAP_SIZE;  //#bugbug
+
+    // >> (user mode).
+    // Heaps support.
+    // Preparando uma �rea de mem�ria grande o bastante para conter 
+    // o heap de todos os processos.
+    // ex: 
+    // Podemos dar 128 KB para cada processo inicialmente.
+
+    // 2048 KB = (2 MB).
+    mm_used_heappool = (1024 * 2);  
+
+    // #importante:
+    // Os endereços físico e virtual são iguais para essa tabela.
+
+    for ( i=0; i < 512; i++ )
+    {
+        heappool_page_table[i] = (unsigned long) SMALL_heappool_pa | 7;
+        SMALL_heappool_pa      = (unsigned long) SMALL_heappool_pa + 4096;
+    };
+    kernel_pd0[388] = (unsigned long) &heappool_page_table[0];
+    kernel_pd0[388] = (unsigned long) kernel_pd0[388] | 7;
+// ====================================================================
+//--
+
+
+    // No extra heaps for now.
+    // I was not used in the old gramado.
+    mm_used_extraheap1 = 0;
+    mm_used_extraheap2 = 0;
+    mm_used_extraheap3 = 0;
+
 //
 // ================================================
 //
 
 
     //breakpoint
-    debug_print ("SetUpPaging: tables done\n");
+    debug_print ("mmSetUpPaging: tables done\n");
     //printf ("SetUpPaging: tables done\n");
-    //refresh_screen();
+
+
+    if ( memorysizeTotal == 0 ){
+        debug_print ("mmSetUpPaging: [FIXME] We need the memorysizeTotal\n");
+        //while(1){}
+    }
+    debug_print ("mmSetUpPaging: [DEBUG] memorysizeTotal is not zero\n");
     //while(1){}
+
+
+//
+// == Frame table =============================================
+//
+
+    // Vamos configurar a frame table de acordo com o
+    // total de memória ram.    
+
+    // Size in KB.
+    // Se for maior que 1 GB.
+    // Se for maior que 1024 MB. 
+    // (1024*1024) KB
+    if ( memorysizeTotal > (1024*1024)  )
+    {
+        FT.frame_table_start = FRAME_TABLE_START_PA;  // 64 MB mark. 
+        FT.frame_table_end   = (0x40000000 - 1);      // 1GB -1 mark.
+        FT.frame_table_size_in_bytes  = (FT.frame_table_end - FT.frame_table_start);
+        //memória utilizada para isso.dado em kb.
+        mm_used_frame_table = (FT.frame_table_size_in_bytes/1024); 
+
+
+    // Size in KB.
+    // Se for maior que 512 MB.
+    // (512*1024)KB
+    } else if ( memorysizeTotal > (512*1024) ){
+
+        FT.frame_table_start = FRAME_TABLE_START_PA;  // 64 MB mark. 
+        FT.frame_table_end   = (0x20000000 - 1);      // 512 MB -1 mark.
+        FT.frame_table_size_in_bytes  = (FT.frame_table_end - FT.frame_table_start);
+        //memória utilizada para isso.dado em kb.
+        mm_used_frame_table = (FT.frame_table_size_in_bytes/1024); 
+
+    // Size in KB.
+    // Se for maior que 256 MB.
+    // (256*1024)KB
+    } else if ( memorysizeTotal > (256*1024) ){
+
+        FT.frame_table_start = FRAME_TABLE_START_PA;  // 64 MB mark. 
+        FT.frame_table_end   = (0x10000000 - 1);      // 256 MB -1 mark.
+        FT.frame_table_size_in_bytes  = (FT.frame_table_end - FT.frame_table_start);
+        //memória utilizada para isso.dado em kb.
+        mm_used_frame_table = (FT.frame_table_size_in_bytes/1024); 
+
+    // Size in KB.
+    // Se for maior que 128 MB.
+    // (128*1024) KB
+    } else if ( memorysizeTotal > (128*1024) ){
+
+        FT.frame_table_start = FRAME_TABLE_START_PA;  // 64 MB mark. 
+        FT.frame_table_end   = (0x08000000 - 1);      // 128 MB -1 mark.
+        FT.frame_table_size_in_bytes  = (FT.frame_table_end - FT.frame_table_start);
+        //memória utilizada para isso.dado em kb.
+        mm_used_frame_table = (FT.frame_table_size_in_bytes/1024); 
+
+
+    // #ERROR
+    // A memória tem menos de 128 MB ou igual,
+    // Então não conseguiremos criar uma frame_table 
+    // que começe na marca de 64 MB.
+
+    }else{
+        debug_print ("mmSetUpPaging: [PANIC] We need at least 256 MB of RAM\n");
+        while(1){}
+    };
+
 
 
 // ================================================================

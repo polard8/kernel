@@ -10,12 +10,15 @@
 
 unsigned long magic;
 
+// virtual = physical.
 #define BootBlockVA    0x0000000000090000
-#define bbOffsetLFB_PA    0
-#define bbOffsetX         1
-#define bbOffsetY         2
-#define bbOffsetBPP       3
+#define bbOffsetLFB_PA  0  // offset 0
+#define bbOffsetX       1  // offset 8
+#define bbOffsetY       2  // offset 16
+#define bbOffsetBPP     3  // offset 24
+#define bbLastValidPA   4  // offset 32  // Last valid physical address.
 // ...
+
 
 // See:
 // xxxhead.asm
@@ -25,9 +28,10 @@ extern void x84_64_initialize_machine(void);
 struct x_boot_block_d
 {
     unsigned long lfb_pa;
-    unsigned long deviceWidth;   // in pixels
-    unsigned long deviceHeight;  // in pixels
-    unsigned long bpp;           // bytes per pixel
+    unsigned long deviceWidth;    // in pixels
+    unsigned long deviceHeight;   // in pixels
+    unsigned long bpp;            // bytes per pixel
+    unsigned long last_valid_pa;  // Last valid physical address.
     // ...
 };
 struct x_boot_block_d  xBootBlock;
@@ -88,6 +92,7 @@ int kernel_main(int arch_type)
 
     // The boot block address.
     // Each entry has 8 bytes.
+    // virtual = physical.
     unsigned long *xxxxBootBlock = (unsigned long*) BootBlockVA; 
 
 //
@@ -136,18 +141,33 @@ int kernel_main(int arch_type)
     // Structure in this document.
     // We will have a global one in gdef.h
     
-    xBootBlock.lfb_pa       = (unsigned long) xxxxBootBlock[bbOffsetLFB_PA];
-    xBootBlock.deviceWidth  = (unsigned long) xxxxBootBlock[bbOffsetX];
-    xBootBlock.deviceHeight = (unsigned long) xxxxBootBlock[bbOffsetY];
-    xBootBlock.bpp          = (unsigned long) xxxxBootBlock[bbOffsetBPP];
+    xBootBlock.lfb_pa         = (unsigned long) xxxxBootBlock[bbOffsetLFB_PA];
+    xBootBlock.deviceWidth    = (unsigned long) xxxxBootBlock[bbOffsetX];
+    xBootBlock.deviceHeight   = (unsigned long) xxxxBootBlock[bbOffsetY];
+    xBootBlock.bpp            = (unsigned long) xxxxBootBlock[bbOffsetBPP];
+    xBootBlock.last_valid_pa  = (unsigned long) xxxxBootBlock[bbLastValidPA];
     // ...
-
 
     // See: kernel.h
     SavedLFB = (unsigned long) xBootBlock.lfb_pa;
     SavedX   = (unsigned long) xBootBlock.deviceWidth;
     SavedY   = (unsigned long) xBootBlock.deviceHeight;
     SavedBPP = (unsigned long) xBootBlock.bpp;
+
+    // Last valid physical address
+    // Used to get the available physical memory.
+    blSavedLastValidAddress = (unsigned long) xBootBlock.last_valid_pa; 
+
+    // Memory size in KB.
+    blSavedPhysicalMemoryInKB = (blSavedLastValidAddress / 1024);
+
+
+//
+// #todo
+//
+
+    // Setup the real boot block structure at gdef.h
+    // BootBlock
 
     screenSetSize (SavedX,SavedY);
 
@@ -401,7 +421,25 @@ int kernel_main(int arch_type)
     //console_outbyte('\n',fg_console);
     //console_outbyte('a',fg_console);
 
-    //refresh_screen();
+
+    printf ("#test\n");
+    printf ("LFB PA = %x \n",xBootBlock.lfb_pa );
+    printf ("Width  = %d \n",xBootBlock.deviceWidth );
+    printf ("Height = %d \n",xBootBlock.deviceHeight );
+    printf ("BPP    = %d \n",xBootBlock.bpp );
+    printf ("last valid pa = %x \n", xBootBlock.last_valid_pa);
+
+    // See: mmInit() in memory.c
+    printf ("memorysizeBaseMemory %d\n",memorysizeBaseMemory);
+    printf ("memorysizeOtherMemory %d\n",memorysizeOtherMemory);
+    printf ("memorysizeExtendedMemory %d\n",memorysizeExtendedMemory);
+    printf ("memorysizeTotal %d\n",memorysizeTotal);
+
+    // See: pages.c
+    printf ("memorysizeUsed %d\n",memorysizeUsed);
+    printf ("memorysizeFree %d\n",memorysizeFree);
+    
+    refresh_screen();
     //while(1){}
 
 
@@ -485,12 +523,14 @@ int kernel_main(int arch_type)
     //sprintf(b,"Testing string2: %x\n",x);
     //printf("kernel_main:  %s\n",b);
 
-    printf ("LFB PA = %x \n",xBootBlock.lfb_pa );
-    printf ("Width  = %d \n",xBootBlock.deviceWidth );
-    printf ("Height = %d \n",xBootBlock.deviceHeight );
-    printf ("BPP    = %d \n",xBootBlock.bpp );
+    //printf ("LFB PA = %x \n",xBootBlock.lfb_pa );
+    //printf ("Width  = %d \n",xBootBlock.deviceWidth );
+    //printf ("Height = %d \n",xBootBlock.deviceHeight );
+    //printf ("BPP    = %d \n",xBootBlock.bpp );
+    //printf ("last valid pa = %d \n",xBootBlock.last_valid_pa);
 
-
+    //refresh_screen();
+    //while(1){}
 
 
     /*
@@ -631,7 +671,7 @@ int kernel_main(int arch_type)
     //a_soft_place_to_fall();
     //die();
 
-    while(1){
+    while (1){
         asm ("sti");
         asm ("hlt");
     };

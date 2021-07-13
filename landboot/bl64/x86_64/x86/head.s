@@ -132,10 +132,9 @@ ____START:
 
 
 
-    ;;
-    ;; == Boot Block ========================================
-    ;;
-
+;
+; == Boot Block ========================================
+;
 
     ; BootBlock pointer.
     ; Ponteiro para o bootblock passado pelo boot manager.
@@ -145,35 +144,54 @@ ____START:
     
     mov dword [_SavedBootBlock], edx 
 
+;++
+; ===============================================
 
+    ; Boot block starts at 0x00090000
 
-    ;LFB, X, Y, BPP
+    ; LFB_VA:      0x00090000 + 0
+    ; WIDTH:       0x00090000 + 8
+    ; HEIGHT:      0x00090000 + 16
+    ; BPP:         0x00090000 + 24
+    ; LAST_VALID:  0x00090000 + 32
+    ; ...
 
-    ; Endereço físico de lfb?
+;
+; LFB_PA, X, Y, BPP
+;
+
+    ; 0x00090000 + 0
     xor eax, eax
     mov eax, dword [edx +0] 
     mov dword [_SavedLFB], eax
     mov dword [0x90000], eax
     mov dword [0x90000 + 4], 0
-    
+
+    ; 0x00090000 + 8
     xor eax, eax
     mov ax, word [edx +4] 
     mov dword [_SavedX], eax
     mov dword [0x90000 + 8], eax
     mov dword [0x90000 + 12], 0
-    
+
+    ; 0x00090000 + 16
     xor eax, eax
     mov ax, word [edx +8] 
     mov dword [_SavedY], eax
     mov dword [0x90000 + 16], eax
     mov dword [0x90000 + 20], 0
-    
+
+    ; 0x00090000 + 24
     xor eax, eax
     mov al, byte [edx +12] 
     mov dword [_SavedBPP], eax
     mov dword [0x90000 + 24], eax
     mov dword [0x90000 + 28], 0
-    
+
+; ===============================================
+;--
+
+
 	; #todo: 
 	; Pode-se zerar os registradores nesse momento ?
 

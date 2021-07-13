@@ -287,21 +287,23 @@ int mmInit(void)
 	// base, other, extended.
 	// RTC só consegue perceber 64MB de memória.
 
-    //memorysizeBaseMemory  = (unsigned long) rtcGetBaseMemory();  
-    //memorysizeOtherMemory = (unsigned long) (1024 - memorysizeBaseMemory);
+    memorysizeBaseMemory  = (unsigned long) rtcGetBaseMemory();  
+    memorysizeOtherMemory = (unsigned long) (1024 - memorysizeBaseMemory);
 
 
     // #todo
     // New we have a new value from boot.
     // We're gonna use this new value instead the one from cmos.
 
-    //unsigned long __total_memory_in_kb = (blSavedLastValidAddress/0x400);
+    unsigned long __total_memory_in_kb = (blSavedLastValidAddress/0x400);
 
     // extended memory from cmos.
     //memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory(); 
-    //memorysizeExtendedMemory =  (__total_memory_in_kb - memorysizeBaseMemory - memorysizeOtherMemory);
+    memorysizeExtendedMemory =  (__total_memory_in_kb - memorysizeBaseMemory - memorysizeOtherMemory);
 
-    //memorysizeTotal = (unsigned long) ( memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory );
+    // Size in KB.
+    memorysizeTotal = (unsigned long) ( memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory );
+
 
     // #IMPORTANTE 
     // Determinar o tipo de sistema de memória.
@@ -312,25 +314,33 @@ int mmInit(void)
     // 0MB
     // #atenção 
     // Nesse caso devemos prosseguir e testar as outras opções.
-    //if ( memorysizeTotal >= (0) ){
-    //    g_mm_system_type = stNull;
-    //}
+    if ( memorysizeTotal >= (0) ){
+        g_mm_system_type = stNull;
+        debug_print ("mmInit: stNull\n");
+    }
 
     // 32MB
-    //if ( memorysizeTotal >= SMALLSYSTEM_SIZE_KB ){
-    //    g_mm_system_type = stSmallSystem;
-    //}
+    if ( memorysizeTotal >= SMALLSYSTEM_SIZE_KB ){
+        g_mm_system_type = stSmallSystem;
+        debug_print ("mmInit: stSmallSystem\n");
+    }
 
     // 64MB
-    //if ( memorysizeTotal >= MEDIUMSYSTEM_SIZE_KB ){
-    //    g_mm_system_type = stMediumSystem;
-    //}
+    if ( memorysizeTotal >= MEDIUMSYSTEM_SIZE_KB ){
+        g_mm_system_type = stMediumSystem;
+        debug_print ("mmInit: stMediumSystem\n");
+    }
 
     // 128MB
-    //if ( memorysizeTotal >= LARGESYSTEM_SIZE_KB ){
-    //    g_mm_system_type = stLargeSystem;
-    //}
+    if ( memorysizeTotal >= LARGESYSTEM_SIZE_KB ){
+        g_mm_system_type = stLargeSystem;
+        debug_print ("mmInit: stLargeSystem\n");
+    }
 
+    // #debug
+    //while(1){}
+    
+    
     // Inicializando o framepool (paged pool).
 
     initializeFramesAlloc();
@@ -339,11 +349,16 @@ int mmInit(void)
 
     debug_print("mmInit: done\n");
 
+    //refresh_screen();
+    //while(1){}
+
     return 0;
     //return (int) Status;
 
 fail:
-    refresh_screen();
+    debug_print("mmInit: fail\n");
+    //refresh_screen();
+    //while(1){}
     return 1;
 }    
 

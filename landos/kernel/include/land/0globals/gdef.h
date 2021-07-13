@@ -141,7 +141,10 @@ int g_is_qemu;
 
 // Salvando o último endereço válido de memória ram.
 // usado em head.asm
+
 unsigned long blSavedLastValidAddress;
+unsigned long blSavedPhysicalMemoryInKB;
+
 unsigned long blSavedMetafileAddress;
 unsigned long blSavedDiskNumber;
 unsigned long blSavedHeads;
@@ -188,7 +191,10 @@ struct boot_block_d
     unsigned long x;
     unsigned long y;
     unsigned long bpp;
+    
     unsigned long last_valid_address;
+    unsigned long physical_memory_in_kb;
+
     unsigned long metafile_address;
     unsigned long disk_number;
     unsigned long heads; 

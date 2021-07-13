@@ -472,11 +472,9 @@ unsigned long FreeHeap ( unsigned long size )
 
 int heapInit(void)
 {
-
-	//Internas.
     int i = 0;
 
-    //Globals.	
+    //Globals.
     //...@todo:
 
     unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
@@ -492,7 +490,7 @@ int heapInit(void)
 	
 	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
 	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
-	
+
     int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
     unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
 

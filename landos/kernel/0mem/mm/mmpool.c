@@ -499,6 +499,7 @@ void initializeFramesAlloc (void)
     p = (void *) kmalloc ( sizeof( struct page_d ) );
 
     if ( p == NULL ){
+        debug_print ("initializeFramesAlloc:\n");
         panic ("initializeFramesAlloc:\n");
     }else{
         p->id = 0;

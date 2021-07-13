@@ -185,9 +185,8 @@ void BlMain (void){
     }
 
 
-//
+//++
 // == Memory size ===============================
-//
 
     // #test
     // Sondando quanta mem�ria f�sica tem instalada.
@@ -196,7 +195,6 @@ void BlMain (void){
     // #todo:
     // Temos v�rias quest�es � se considerar, como o fato de sujarmos
     // a IVT no in�cio da mem�ria.
-
 
     unsigned long __address = 0;
 
@@ -210,15 +208,35 @@ void BlMain (void){
     //__address = (unsigned long) init_testing_memory_size (1024);   
 
     //para testar na m�quina real com 2048 mb instalado.
-    __address = (unsigned long) init_testing_memory_size (2048);   
-        
-    printf ("init: address = %x \n", __address);
+    __address = (unsigned long) init_testing_memory_size(2048);   
+    
+    // #todo
+    // Temos que passar esses valores para o kernel,
+    // juntamente com os valores que passsamos durante a inicialização
+    // em assembly, através do boot buffer em 0x0000000000090000. 
+    // See: head.s
+
+    // LFB_VA:      0x00090000 + 0
+    // WIDTH:       0x00090000 + 8
+    // HEIGHT:      0x00090000 + 16
+    // BPP:         0x00090000 + 24
+    // LAST_VALID:  0x00090000 + 32
+    // LAST_VALID:  0x00090000 + 40 (complement)
+    // ...
+
+    unsigned long *LastValid           = (unsigned long*) (0x00090000 + 32); 
+    unsigned long *LastValidComplement = (unsigned long*) (0x00090000 + 36); 
+
+    LastValid[0]           = (unsigned long) __address;
+    LastValidComplement[0] = (unsigned long) 0;
+
+    printf ("BlMain: Las valid PA = %x \n", __address);
     refresh_screen();
     //while(1){}
 
-//
-// ========= memory ===============================
-//
+// =======================================
+//--
+
 
 
     // #todo
@@ -395,7 +413,6 @@ void BlMain (void){
     printf ("\n");
     printf ("\n");
     printf ("Gramado X-BL.BIN: [main.c-BlMain()] \n");
-    printf ("#todo:\n");
     printf ("The 64bit kernel image is \n");
     printf ("already loaded. So now we will \n");
     printf ("setup the long mode, the paging and\n");

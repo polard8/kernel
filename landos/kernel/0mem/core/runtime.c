@@ -48,6 +48,7 @@ int init_runtime (void)
             debug_print ("[x86_64] init_runtime: [TODO] Initializing mm ...\n");
             mmInit();
             
+            //See: pages.c
             debug_print ("[x86_64] init_runtime: [DANGER] Initializing paging ...\n");
             mmSetUpPaging();
             
