@@ -1028,11 +1028,45 @@ Entry_388:
 //--
 
 
-    // No extra heaps for now.
-    // I was not used in the old gramado.
+//
+// #important
+//
+
+    // The INitProcess uses one of these extra heaps,
+    // and just a small heap from the heap pool
+    // as the other ring3 process do.
+    // See: x64init.c When we setup the Heap pointer.
+    // InitProcess->Heap = (unsigned long) g_extraheap1_va; :)
+
     mm_used_extraheap1 = 0;
     mm_used_extraheap2 = 0;
     mm_used_extraheap3 = 0;
+
+
+//++
+// ====================================================================
+// Extra heap used by the ring 3 init process.
+// See: x64init.c When we setup the Heap pointer.
+// InitProcess->Heap = (unsigned long) g_extraheap1_va; :)
+
+Entry_389:
+
+    g_extraheap1_va = (unsigned long) 0x30A00000;   //#todo check this !!
+    // 2048 KB = (2 MB).
+    g_extraheap1_size = (1024 * 2);  
+    
+
+    for ( i=0; i < 512; i++ )
+    {
+        extraheap1_page_table[i] = (unsigned long) SMALL_extraheap1_pa | 7;
+        SMALL_extraheap1_pa      = (unsigned long) SMALL_extraheap1_pa + 4096;
+    };
+    kernel_pd0[389] = (unsigned long) &extraheap1_page_table[0];
+    kernel_pd0[389] = (unsigned long) kernel_pd0[389] | 7;
+    
+// ====================================================================
+//--
+
 
 //
 // ================================================

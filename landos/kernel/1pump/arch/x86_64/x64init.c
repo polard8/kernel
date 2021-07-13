@@ -120,9 +120,13 @@ void __x64StartInit (void)
         next_thread = InitThread->tid;
     };
 
-    // #todo #bugbug
-    // InitProcess->Heap = (unsigned long) g_extraheap1_va;
 
+    // This is a very good idea !
+    // The init process has a bigger heap than 
+    // the other ring3 processes.
+
+    // #todo #bugbug
+    InitProcess->Heap = (unsigned long) g_extraheap1_va;
 
     // #importante
     // A thread de controle do processo init2.bin.
