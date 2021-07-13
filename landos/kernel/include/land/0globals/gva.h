@@ -54,7 +54,30 @@
 #define KERNEL_PML4_VA 0x000000000009C000
 
 
-#define KERNEL_IMAGE_BASE  0x30000000  
+// ==============================================================
+
+
+//
+// Main regions
+//
+
+// See: pages.c
+#define RING0AREA_VA    0
+#define RING3AREA_VA    0x0000000000200000
+#define KERNELIMAGE_VA  0x0000000030000000  
+#define FRONTBUFFER_VA  0x0000000030200000
+#define BACKBUFFER_VA   0x0000000030400000
+#define PAGEDPOOL_VA    0x0000000030600000
+#define HEAPPOOL_VA     0x0000000030800000
+#define EXTRAHEAP1_VA   0x0000000030A00000
+#define EXTRAHEAP2_VA   0x0000000030C00000
+#define EXTRAHEAP3_VA   0x0000000030E00000
+
+
+
+
+#define KERNEL_IMAGE_BASE  KERNELIMAGE_VA  
+
 
 //
 // heap and stack  (va)
@@ -74,26 +97,18 @@
 #define KERNEL_STACK_SIZE   (KERNEL_STACK_START-KERNEL_STACK_END)
 
 
-//
-// LFB
-//
-
-//Endereço virtual padrão para o Linear Frame Buffer. (LFB).
-#define FRONTBUFFER_VA              0x0000000030200000
+// Frontbuffer
+// Endereço virtual padrão para o Linear Frame Buffer. (LFB).
 #define DEFAULT_LFB_VIRTUALADDRESS  FRONTBUFFER_VA 
 #define FRONTBUFFER_ADDRESS         FRONTBUFFER_VA
 
-
-
-//
 // Backbuffer
-//
-
 //Endereço virtual padrão para o BackBuffer. (buffer1)
-#define BACKBUFFER_VA                      0x0000000030400000
 #define DEFAULT_BACKBUFFER_VIRTUALADDRESS  BACKBUFFER_VA
 #define BACKBUFFER_ADDRESS                 BACKBUFFER_VA
 
+
+// ==============================================================
 
 
 #endif    

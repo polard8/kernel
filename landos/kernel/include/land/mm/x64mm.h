@@ -922,37 +922,27 @@ unsigned long memorysizeUsed;
 unsigned long memorysizeFree;
 
 
-//
-// ## Used Memory support ##
-//
+//========================================================
 
-unsigned long mm_used_kernel_area;  // start = 0 size = 4MB
-unsigned long mm_used_user_area;    // start = 0x400000 size = 4MB
-unsigned long mm_used_backbuffer;   // start = 0x800000 size = 4MB
-unsigned long mm_used_pagedpool;    // start = 0xC00000 size = 4MB  
+// Used memory:
+// Estamos medindo o uso de memória física.
+// Lembrando que a mesma região de memória física
+// pode ser mapeada mais de uma vez.
 
-//area de mem�ria onde ficar�o heaps para os processos.
-unsigned long mm_used_heappool;     // start = 0x01000000 size = 4MB   
-	
-// #importante
-// os processos init, shell e taskman do gramado core s�o especiais
-// por isso receber�o heaps especiais.
-
-
-
-// Extra heaps.
-
-//unsigned long mm_used_gramadocore_init_heap;     // start = (0x01000000 + 0x400000) size = 4MB
-//unsigned long mm_used_gramadocore_shell_heap;    // start = (0x01000000 + 0x800000) size = 4MB
-//unsigned long mm_used_gramadocore_taskman_heap;  // start = (0x01000000 + 0xC00000) size = 4MB
-
+// #todo #bugbug
+// Precisamos checar corretamente qual é o endereço físico
+// de cada uma dessas regiões e suas sobreposições.
+unsigned long mm_used_ring0_area;  // start = 0 size = 4MB
+unsigned long mm_used_ring3_area;  // start = 0x400000 size = 4MB
+unsigned long mm_used_kernelimage;
+unsigned long mm_used_backbuffer;  // start = 0x800000 size = 4MB
+unsigned long mm_used_pagedpool;   // start = 0xC00000 size = 4MB  
+unsigned long mm_used_heappool;    // start = 0x01000000 size = 4MB   
 unsigned long mm_used_extraheap1;  // start = (0x01000000 + 0x400000) size = 4MB
 unsigned long mm_used_extraheap2;  // start = (0x01000000 + 0x800000) size = 4MB
 unsigned long mm_used_extraheap3;  // start = (0x01000000 + 0xC00000) size = 4MB
-
-
-// 0x02000000 - 32mb mark. 
 unsigned long mm_used_frame_table;
+
 
 // #bugbug
 // Só pra lembrar que temos estruturas de bancos de memória.
@@ -1083,6 +1073,12 @@ unsigned long memorysizeAvailableVirtualMemory;
 // == prototypes =================================================
 //
 
+int mm_fill_page_table( 
+    unsigned long directory_va, 
+    int           directory_entry,
+    unsigned long pd_va,
+    unsigned long region_2mb_pa,
+    unsigned long flags );
 
 int mmSetUpPaging (void);
 

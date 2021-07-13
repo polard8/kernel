@@ -19,6 +19,22 @@
 #define ____GENTRY_H  1
 
 
+// Número das entradas no diretório principal.
+// Usado para mapear as regiões principais de memória virtual.
+// See: pages.c
+#define PD_ENTRY_RING0AREA    0
+#define PD_ENTRY_RING3AREA    1
+#define PD_ENTRY_KERNELIMAGE  384
+#define PD_ENTRY_FRONTBUFFER  385
+#define PD_ENTRY_BACKBUFFER   386
+#define PD_ENTRY_PAGEDPOOL    387
+#define PD_ENTRY_HEAPPOOL     388
+#define PD_ENTRY_EXTRAHEAP1   389
+#define PD_ENTRY_EXTRAHEAP2   390
+#define PD_ENTRY_EXTRAHEAP3   391
+
+
+
 //
 //  ## User Area ##
 //

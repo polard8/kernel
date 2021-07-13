@@ -91,8 +91,11 @@ void memoryShowMemoryInfo (void){
     printf ("TotalUsed      (%d KB)\n", memorysizeUsed );
     printf ("TotalFree      (%d KB)\n", memorysizeFree );
     printf ("\n");
-    printf ("kernel area    (%d KB)\n", mm_used_kernel_area );
-    printf ("user area      (%d KB)\n", mm_used_user_area );
+    
+    printf ("ring0 area     (%d KB)\n", mm_used_ring0_area );
+    printf ("ring3 area     (%d KB)\n", mm_used_ring3_area );
+    printf ("kernel image area      (%d KB)\n", mm_used_kernelimage );
+    
     printf ("backbuffer     (%d KB)\n", mm_used_backbuffer );
     printf ("paged pool     (%d KB)\n", mm_used_pagedpool );
     printf ("heap pool      (%d KB)\n", mm_used_heappool );
