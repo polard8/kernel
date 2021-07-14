@@ -24,7 +24,7 @@ void *gramado_system_call (
     unsigned long c, 
     unsigned long d )
 {
-    int __Ret = 0;
+    unsigned long __Ret = 0;
 
     // System interrupt.
 
@@ -43,7 +43,7 @@ void *sc80 (
     unsigned long c, 
     unsigned long d )
 {
-    int __Ret = 0;
+    unsigned long __Ret = 0;
 
     // System interrupt.
 
@@ -60,7 +60,7 @@ void *sc81 (
     unsigned long c, 
     unsigned long d )
 {
-    int __Ret = 0;
+    unsigned long __Ret = 0;
 
     // System interrupt.
 
@@ -77,7 +77,7 @@ void *sc82 (
     unsigned long c, 
     unsigned long d )
 {
-    int __Ret = 0;
+    unsigned long __Ret = 0;
 
     // System interrupt.
 

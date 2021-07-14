@@ -172,9 +172,9 @@ void main(void)
         debug_print("init.bin: stderr fail\n");
 
     
-    //char *s = "Fred";
+    char *s = "Fred";
     //putc('v',stdout);
-    //write ( fileno(stdout), s, 4 );
+    write ( fileno(stdout), s, 4 );
     //fflush(stdout);
     //while(1){}
     

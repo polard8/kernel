@@ -444,22 +444,19 @@ void *sci0 (
         // 18 - read() 
         // See: sys.c
         case SYS_READ:
-            return NULL;
-            //return (void *) sys_read ( 
-            //                    (unsigned int) arg2, 
-            //                    (char *)       arg3, 
-            //                    (int)          arg4 );  
+            return (void *) sys_read ( 
+                                (unsigned int) arg2, 
+                                (char *)       arg3, 
+                                (int)          arg4 );  
             break;
-
 
         // 19 - write()
         // See: sys.c
         case SYS_WRITE:
-            return NULL;
-            //return (void *) sys_write ( 
-            //                    (unsigned int) arg2, 
-            //                    (char *)       arg3, 
-            //                    (int)          arg4 );  
+            return (void *) sys_write ( 
+                                (unsigned int) arg2, 
+                                (char *)       arg3, 
+                                (int)          arg4 );  
             break;
 
         // BUFFERS  20 21 22 23 
@@ -1049,13 +1046,14 @@ void *sci2 (
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
 
-
     struct process_d *p;
 
-    //debug_print("sci2: [TODO]\n");
+
+    debug_print("sci2: [TODO]\n");
 
     // Profiling in the process structure.
 
+    // #todo: limite superior
     if (current_process<0){
         panic("sci2: current_process\n");
     }
@@ -1070,11 +1068,12 @@ void *sci2 (
         panic("sci2: p validation\n");
     }
 
-
-    // Counting ...
+    // Counting syscalls ...
     p->syscalls_counter++;
 
-
+//
+// switch
+//
 
     //set magic
     // #todo: This operation needs permition?
@@ -1088,11 +1087,38 @@ void *sci2 (
         return (void*) CONSOLE_TTYS[fg_console].magic;
     }
 
-    // ...
+    if ( number == 3 ){
+        debug_print("sci2: [3] metrics\n");
+        //return (void*) systemGetSystemMetrics(arg2);
+    }
+        
+    if ( number == 4 ){
+        debug_print("sci2: [4] ioctl\n");
+        //return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
+    }
+
     
     if ( number == 5 ){
-        debug_print("sc2: [5] fcntl\n");
+        debug_print("sci2: [5] fcntl\n");
         return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
+    }
+
+    // sys_read
+    if ( number == 18 ){
+        debug_print("sci2: [18] read\n");
+        return (void *) sys_read ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
+    }
+
+    // sys_write
+    if ( number == 19 ){
+        debug_print("sci2: [19] write\n");
+        return (void *) sys_write ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
     }
 
     // ...
@@ -1108,7 +1134,7 @@ void *sci2 (
     // fcntl()
     // See: sci/sys/sys.c    
     if ( number == 8001 ){
-        debug_print("sc2: [8001] fcntl\n");
+        debug_print("sci2: [8001] fcntl\n");
         return (void *) sys_fcntl (
                             (int) arg2, 
                             (int) arg3, 
@@ -1122,7 +1148,7 @@ void *sci2 (
     // See: sys.c
     if ( number == 10000 )
     {
-        debug_print("sc2: [10000] sys_set_file_sync\n");
+        debug_print("sci2: [10000] sys_set_file_sync\n");
         // IN: fd, request, data
         sys_set_file_sync( (int) arg2, (int) arg3, (int) arg4 );
         return NULL;
@@ -1135,7 +1161,7 @@ void *sci2 (
     // See: sys.c
     if ( number == 10001 )
     {
-        debug_print("sc2: [10000] sys_get_file_sync\n");
+        debug_print("sci2: [10000] sys_get_file_sync\n");
         // IN: fd, request
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
@@ -1143,7 +1169,7 @@ void *sci2 (
     // get the tid of the current thread.
     if ( number == 10010 )
     {
-        debug_print("sc2: [10010] GetCurrentThreadId\n");
+        debug_print("sci2: [10010] GetCurrentThreadId\n");
         return (void*) GetCurrentThreadId();
     }
     
@@ -1151,7 +1177,7 @@ void *sci2 (
     // #todo: We need a method for that.
     if ( number == 10011 )
     {
-        debug_print("sc2: [10011] set foreground thread tid\n");
+        debug_print("sci2: [10011] set foreground thread tid\n");
         foreground_thread = (int) arg2;
         return NULL;
     }

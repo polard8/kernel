@@ -254,9 +254,11 @@ ssize_t write (int fd, const void *buf, size_t count)
     // Nothing to write.
     if ( count <= 0 )
     {
-        printf ("write: [FAIL] count\n");
+        debug_print ("write: [FAIL] count\n");
+        printf      ("write: [FAIL] count\n");
         return -1;
     }
+
 
     // #todo
     // Maybe we need to call another layer, not the kernel service.
@@ -268,13 +270,16 @@ ssize_t write (int fd, const void *buf, size_t count)
 
     //rtl_enter_critical_section();
     //rtl_exit_critical_section();
+
+    debug_print ("write: Calling sc82\n");
         
-    return (ssize_t) sc82 ( 19, 
-              (unsigned long) fd,
-              (unsigned long) buf, 
-              (unsigned long) count );
-               
+    return (ssize_t) sc82 ( 
+        19, 
+        (unsigned long) fd,
+        (unsigned long) buf, 
+        (unsigned long) count ); 
 }
+
 
 
 ssize_t pread (int fd, void *buf, size_t count, off_t offset)

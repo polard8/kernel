@@ -1,8 +1,12 @@
 
+// sys.h
 
 #ifndef ____SYS_H
 #define ____SYS_H  1
 
+
+int sys_read (unsigned int fd, char *ubuf, int count);
+int sys_write (unsigned int fd, char *ubuf, int count);
 
 int file_read_buffer ( file *f, char *buffer, int len );
 int file_write_buffer ( file *f, char *string, int len );

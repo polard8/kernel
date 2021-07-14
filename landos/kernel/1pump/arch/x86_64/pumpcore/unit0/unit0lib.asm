@@ -543,44 +543,37 @@ setup_vectors:
     push rax
     push rbx 
 
-
-
-
-    ; 32 - Timer.
+; 32 - Timer.
     ; Iniciamos um timer provisório, depois o main() inicia o definitivo.
     mov rax,  qword unhandled_irq
     ;mov rax,  qword  _irq0 
     mov rbx,  qword 32
     call _setup_system_interrupt
 
-
-    ; 33 - Keyboard.
+; 33 - Keyboard.
     ; #todo: The ps2 is not initialized yet.
     ;mov rax,  qword unhandled_irq 
     mov rax,  qword _irq1
     mov rbx,  qword 33
     call _setup_system_interrupt
     
-    
-    
-    
 
-    ; 40 - Clock, rtc.
+; 40 - Clock, rtc.
     mov rax,  qword unhandled_irq ; _irq8
     mov rbx,  qword 40
     call _setup_system_interrupt
 
-    ; 44 - Mouse.
+; 44 - Mouse.
     mov rax,  qword unhandled_irq ; _irq12
     mov rbx,  qword 44
     call _setup_system_interrupt
 
-    ; 46 - ide
+; 46 - ide
     mov rax,  qword unhandled_irq ; _irq14 
     mov rbx,  qword 46
     call _setup_system_interrupt
 
-    ; 47 - ide
+; 47 - ide
     mov rax,  qword unhandled_irq ; _irq15 
     mov rbx,  qword 47
     call _setup_system_interrupt
@@ -595,24 +588,24 @@ setup_vectors:
     ; 130 - 0x82
     ; ...
 
-    ;; 0x80
-    mov eax,  dword _int128
-    mov ebx,  dword 128
+; 0x80
+    mov rax,  qword _int128
+    mov rbx,  qword 128
     call _setup_system_interrupt  
 
-    ;; 0x81
-    ;mov eax,  dword _int129
-    ;mov ebx,  dword 129
-    ;call _setup_system_interrupt  
+; 0x81
+    mov rax,  qword _int129
+    mov rbx,  qword 129
+    call _setup_system_interrupt  
 
-    ;; 0x82
-    ;mov eax,  dword _int130
-    ;mov ebx,  dword 130
-    ;call _setup_system_interrupt  
+; 0x82
+    mov rax,  qword _int130
+    mov rbx,  qword 130
+    call _setup_system_interrupt  
 
     ;; ...
 
-    ;; =====================
+;; =====================
     
     ;; #test
     ;; Uma interrupção para habilitar as interrupções mascaráveis.

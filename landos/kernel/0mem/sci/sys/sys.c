@@ -1,7 +1,74 @@
 
-
+// sys.c
 
 #include <kernel.h> 
+
+
+
+
+/*
+ ************************************
+ * sys_read;
+ *     implementation os read() libc function.
+ */
+
+// Service 18.
+// #todo: There's a lot to do with synchronization.
+
+// #todo
+// We need to call one subfunctions for
+// each different kind of file intead of implementing
+// an internal sub-routine.
+
+// #todo
+// Isso deveria ser apenas um wrapper,
+// chamando as rotinas apropriadas para cada tipo 
+// de arquivo.
+
+// OUT:
+// 0 = Couldn't read.
+// -1 = Error.
+
+int sys_read (unsigned int fd, char *ubuf, int count)
+{
+    debug_print("sys_read: [TODO]\n");
+    return -1;
+}
+
+/*
+ ****************************
+ * sys_write:
+ *     Implemantation of write() for libc.
+ */
+
+// service 19.
+// Copiar um buffer para um arquivo dado o descritor.
+// Aqui devemos selecionar o dispositivo à escrever.
+// See:
+// https://github.com/zavg/linux-0.01/blob/master/fs/read_write.c
+// https://linux.die.net/man/2/write
+// ...
+// #todo
+// We need to call one subfunction for each different kind of file 
+// intead of implementing an internal sub-routine.
+
+// #todo
+// Isso deveria ser apenas um wrapper,
+// chamando as rotinas apropriadas para cada tipo 
+// de arquivo.
+
+// OUT:
+// 0 = Couldn't read.
+// -1 = Error.
+
+int sys_write (unsigned int fd, char *ubuf, int count)
+{
+    debug_print("sys_write: [TODO]\n");
+    return -1;
+}
+
+
+
 
 
 // File read.
@@ -9,8 +76,8 @@
 // Copia à partir do início do arquivo.
 int file_read_buffer ( file *f, char *buffer, int len )
 {
-
     char *p;
+
 
     p = buffer;
 

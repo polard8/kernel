@@ -87,6 +87,14 @@ _int129:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
+    ;#test
+    xor rax, rax
+    mov ax, word 0x10 ;KERNEL_DS 
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
     ;call _xxxxINT129_DEBUG_MESSAGE
     call _sci1
 
@@ -134,6 +142,14 @@ _int130:
     push rdx      ; Saving arg4
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
+
+    ;#test
+    xor rax, rax
+    mov ax, word 0x10 ;KERNEL_DS 
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
     ;call _xxxxINT130_DEBUG_MESSAGE
     call _sci2
