@@ -2049,12 +2049,249 @@ int print ( char **out, int *varg ){
  
 // Padrão não tradicional, mas funciona. 
 
+/*
 int printf3 ( const char *format, ... )
 {
     register int *varg = (int *)(&format);
 
     return (int) print ( 0, varg );
 }
+*/
+
+
+
+
+//=============================================================
+// kinguio printf
+
+void kinguio_i2hex(unsigned int val, char* dest, int len)
+{
+	char* cp;
+	int i, x;
+	unsigned n;
+	
+	if(val == 0) {
+		cp = &dest[0];
+		*cp++ = '0';
+		*cp = '\0';
+		return;
+	}
+	
+
+	n = val;
+	cp = &dest[len];
+	while (cp > dest)
+	{
+		x = n & 0xF;
+		n >>= 4;
+		*--cp = x + ((x > (HEX_LEN+1)) ? 'A' - 10 : '0');
+	}
+    
+	dest[len]='\0';
+
+	cp = &dest[0];
+	for(i=0; i < len;i++) {
+	
+		if(*cp == '0') {
+			cp++;
+		}
+		else {
+			strcpy(dest,cp);
+			 break;
+		}
+			
+	}
+
+	cp = &dest[0];
+	n = strlen(cp);
+	memset(dest + n,0,8-n);
+}
+
+
+char *kinguio_itoa (int val, char *str) 
+{
+
+	char* valuestring = (char*) str;
+	int value = val;
+
+	int min_flag;
+  	char swap, *p;
+ 	min_flag = 0;
+
+  	if (0 > value)
+  	{
+    		*valuestring++ = '-';
+    		value = -____INT_MAX> value ? min_flag = ____INT_MAX : -value;
+  	}
+
+  	p = valuestring;
+
+  	do
+  	{
+    		*p++ = (char)(value % 10) + '0';
+    		value /= 10;
+  	} while (value);
+
+  	if (min_flag != 0)
+  	{
+    		++*valuestring;
+  	}
+  	*p-- = '\0';
+
+  	while (p > valuestring)
+  	{
+    		swap = *valuestring;
+    		*valuestring++ = *p;
+    		*p-- = swap;
+  	}
+
+	return str;
+}
+
+// printf
+// Credits: Nelson Cole. Project Sirius/Kinguio.
+int kinguio_printf(const char *fmt, ...)
+{
+    int ret=0;
+
+    char buf[256];
+    memset(buf,0,256); 
+
+    va_list ap;
+    va_start (ap, fmt);
+
+    ret = kinguio_vsprintf(buf, fmt, ap);
+
+    va_end (ap);
+
+    // Print
+    kinguio_puts(buf);
+
+    return (int) ret;
+}
+
+int printf(const char *fmt, ...)
+{
+    int ret=0;
+
+    char buf[256];
+    memset(buf,0,256); 
+
+    va_list ap;
+    va_start (ap, fmt);
+
+    ret = kinguio_vsprintf(buf, fmt, ap);
+
+    va_end (ap);
+
+    // Print
+    kinguio_puts(buf);
+
+    return (int) ret;
+}
+
+void kinguio_puts(const char* str)
+{
+    int i=0;
+
+    if (!str)
+        return;
+
+    for (i=0; i <strlen(str); i++) 
+        putchar(str[i]);
+}
+
+static char *_vsputs_r(char *dest, char *src)
+{
+    unsigned char *usrc  = (unsigned char *) src;
+    unsigned char *udest = (unsigned char *) dest;
+
+    while ( *usrc ) 
+    { 
+        *udest++ = *usrc++; 
+    };
+
+    return (char * ) udest;
+}
+
+
+int kinguio_vsprintf(char * str,const char * fmt, va_list ap)
+{
+
+	char *str_tmp = str;
+
+	char _c_r[] = "\0\0";
+
+	int index = 0;
+	unsigned char u;	
+	int d;
+	char c, *s;
+	char buffer[256];
+
+	while (fmt[index])
+	{
+		switch (fmt[index])
+		{
+		case '%':
+			++index;
+			switch (fmt[index])
+			{
+			
+			case 'c':
+				*_c_r = c = (char) va_arg (ap, int);
+				str_tmp  = _vsputs_r(str_tmp,_c_r);
+				break;
+
+			case 's':
+				s = va_arg (ap, char*);
+				str_tmp  = _vsputs_r(str_tmp,s);
+				break;
+
+			case 'd':
+			case 'i':
+				d = va_arg (ap, int);
+				kinguio_itoa (d,buffer);
+				str_tmp  = _vsputs_r(str_tmp,buffer);
+				break;
+
+			case 'u':
+				u = va_arg (ap, unsigned int);
+				kinguio_itoa  (u,buffer);
+				str_tmp  = _vsputs_r(str_tmp,buffer);
+				break;
+
+			case 'X':
+			case 'x':
+				d = va_arg (ap, int);
+				kinguio_i2hex(d, buffer,8);
+				str_tmp  = _vsputs_r(str_tmp,buffer);
+				break;
+			
+			default:
+				str_tmp  = _vsputs_r(str_tmp,"%%");
+				break;
+				
+				
+			}
+			break;
+
+		default:
+			*_c_r = fmt[index]; //
+			str_tmp  = _vsputs_r(str_tmp,_c_r);
+			break;
+		}
+		++index;
+	}
+	
+    return ((long)str_tmp - (long)str);
+}
+
+
+//=============================================================
+
+
+
+
 
 
 //
@@ -2140,7 +2377,9 @@ void printf_i2hex (uint32_t val, char *dest, int len){
 // padrão tradicional, incompleta, não funciona ainda,
 // estamo implementando
 
-int printf2 ( const char *format, ... ){
+/*
+int printf2 ( const char *format, ... )
+{
 
     char *ap;
     va_start (ap,format);
@@ -2219,7 +2458,7 @@ int printf2 ( const char *format, ... ){
 
     return 0;
 }
-
+*/
 
 
 //
@@ -2690,9 +2929,11 @@ int fprintf ( FILE *stream, const char *format, ... )
     //#bugbug Talvez sem isso
     //unsigned arg = va_arg(ap,unsigned long);
 
+    // #todo
+
     //#test.
     //vfprintf ( stream, format, arg );
-    vfprintf ( stream, format, ap );
+    //vfprintf ( stream, format, ap );
 
     va_end(ap);
     //--
@@ -4211,6 +4452,7 @@ static void xxxputchar ( int c, void *arg )
     // #todo
     // Talvez usar semáforo aqui.
 
+/*
 int printf ( const char *fmt, ... ){
 
     va_list ap;
@@ -4235,6 +4477,7 @@ int printf ( const char *fmt, ... ){
 //=============================================================
 // printf end
 //=============================================================
+*/
 
 
 /*
@@ -4311,6 +4554,7 @@ extern __inline int vprintf (const char *__fmt, __gnuc_va_list __arg)
 // Estamos em ring3, não devemos acessar os elementos da estrutura de stream.
 
 
+/*
 int 
 vfprintf ( 
     FILE *stream, 
@@ -4362,10 +4606,12 @@ vfprintf (
 
     return (int) (-1);
 } 
+*/
+
 
 
 /* #bsd style */
-
+/*
 int vprintf (const char *fmt, va_list ap)
 {
     if ( (void *) stdout == NULL )
@@ -4376,8 +4622,10 @@ int vprintf (const char *fmt, va_list ap)
 
     return (int) vfprintf (stdout, fmt, ap);
 }
+*/
 
 
+/*
 //printf que escreve no stdout. 
 //#bugbug: não devemos usar stream em ring3.
 int stdout_printf (const char *format, ...)
@@ -4397,8 +4645,10 @@ int stdout_printf (const char *format, ...)
 
     return done;
 }
+*/
 
 
+/*
 // printf que escreve no stderr. 
 int stderr_printf (const char *format, ... )
 {
@@ -4420,6 +4670,7 @@ int stderr_printf (const char *format, ... )
 
     return done;
 }
+*/
 
 
 
@@ -5008,20 +5259,22 @@ char *fileread (FILE *fp){
 }
 
 
-
+/*
 int dprintf (int fd, const char *format, ...)
 { 
     debug_print ("dprintf: [TODO]\n");
 	return -1; 
 }
+*/
 
-
-
+/*
 int vdprintf (int fd, const char *format, va_list ap)
 { 
     debug_print ("vdprintf: [TODO]\n");
 	return -1; 
 }
+*/
+
 
 //
 //==================================================================
@@ -5123,13 +5376,13 @@ static char *number (
 // It works yet.
 // Just for fun. :^) 
 
+/*
 int 
 Wirzenius_Torvalds_vsprintf (
     char *buf, 
     const char *fmt, 
     va_list args )
 {
-
     int len=0;
     int i=0;
 
@@ -5137,20 +5390,18 @@ Wirzenius_Torvalds_vsprintf (
     char *s;
     int *ip;
 
-
-    /* flags to number() */
+    //flags to number()
     int flags;
 
-	
-    /* width of output field */
+    // width of output field 
     int field_width;	
 	
     // min. # of digits for integers; 
     // max number of chars for from string.
-    int precision;		
-				   
-    /* 'h', 'l', or 'L' for integer fields */
-    int qualifier;		
+    int precision;
+   
+    //'h', 'l', or 'L' for integer fields 
+    int qualifier;
 
 
 	for (str=buf ; *fmt ; ++fmt)
@@ -5161,11 +5412,10 @@ Wirzenius_Torvalds_vsprintf (
 			continue;
 		}
 
-	
-		/* process flags */
+		//process flags
 		flags = 0;
 		repeat:
-			++fmt;		/* this also skips first '%' */
+			++fmt;  //this also skips first '%' 
 			switch (*fmt) {
 				case '-': flags |= LEFT; goto repeat;
 				case '+': flags |= PLUS; goto repeat;
@@ -5174,12 +5424,12 @@ Wirzenius_Torvalds_vsprintf (
 				case '0': flags |= ZEROPAD; goto repeat;
 				}
 		
-		/* get field width */
+		//get field width 
 		field_width = -1;
 		if (__is_digit(*fmt))
 			field_width = skip_atoi(&fmt);
 		else if (*fmt == '*') {
-			/* it's the next argument */
+			//it's the next argument 
 			field_width = va_arg(args, int);
 			if (field_width < 0) {
 				field_width = -field_width;
@@ -5187,21 +5437,21 @@ Wirzenius_Torvalds_vsprintf (
 			}
 		}
 
-		/* get the precision */
+		//get the precision 
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;	
 			if (__is_digit(*fmt))
 				precision = skip_atoi(&fmt);
 			else if (*fmt == '*') {
-				/* it's the next argument */
+				//it's the next argument 
 				precision = va_arg(args, int);
 			}
 			if (precision < 0)
 				precision = 0;
 		}
 
-		/* get the conversion qualifier */
+		//get the conversion qualifier 
 		qualifier = -1;
 		if (*fmt == 'h' || *fmt == 'l' || *fmt == 'L') {
 			qualifier = *fmt;
@@ -5286,16 +5536,19 @@ Wirzenius_Torvalds_vsprintf (
 
     return (int) (str-buf);
 }
+*/
+
 
 
 // It's used by printf ?
-static char __printbuf[1024];
+//static char __printbuf[1024];
 
 
 // It was taken from linux 0.01. gpl
 // It works yet.
 // Just for fun. :^) 
 
+/*
 int Torvalds_printf (const char *fmt, ...)
 {
 
@@ -5333,15 +5586,14 @@ int Torvalds_printf (const char *fmt, ...)
  
     return (int) i;
 }
-
-
-
+*/
 
 
 //
 //==================================================================
 //
 
+/*
 int 
 vsnprintf ( 
     char *str, 
@@ -5352,15 +5604,19 @@ vsnprintf (
     debug_print ("vsnprintf: [TODO]\n");
     return -1; 
 }
+*/
 
 
+/*
 int vscanf (const char *format, va_list ap)
 { 
     debug_print ("vscanf: [TODO]\n");
     return -1; 
 }
+*/
 
 
+/*
 int 
 vsscanf ( 
     const char *str, 
@@ -5370,8 +5626,10 @@ vsscanf (
     debug_print ("vsscanf: [TODO]\n");
     return -1; 
 }
+*/
 
 
+/*
 int 
 vfscanf (
     FILE *stream, 
@@ -5388,6 +5646,7 @@ vfscanf (
 
     return -1; 
 }
+*/
 
 
 FILE *tmpfile (void)

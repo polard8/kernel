@@ -354,23 +354,19 @@ int g_using_gui;
 //===========================================
 
 //
-// Prompt support.
+// Prompt support
 //
 
 #define  PROMPT_MAX_DEFAULT  BUFSIZ
-
-// BUffer.
 char prompt[PROMPT_MAX_DEFAULT]; 
 char prompt_out[PROMPT_MAX_DEFAULT]; 
 char prompt_err[PROMPT_MAX_DEFAULT]; 
-
 int prompt_pos;
 int prompt_max;
-
 int prompt_status;
-
 //char prompt_text[] = "$ ";
 //...
+
 
 
 //
@@ -526,24 +522,31 @@ char *tempnam (const char *dir, const char *pfx);
 char *tmpnam_r (char *s);
 char *tmpnam (char *s);
 
-int vfscanf (FILE *stream, const char *format, va_list ap);
-int vsscanf (const char *str, const char *format, va_list ap);
-int vscanf (const char *format, va_list ap);
 
-int vsnprintf (char *str, size_t size, const char *format, va_list ap);
+
+//int vfscanf (FILE *stream, const char *format, va_list ap);
+//int vsscanf (const char *str, const char *format, va_list ap);
+//int vscanf (const char *format, va_list ap);
+//int vsnprintf (char *str, size_t size, const char *format, va_list ap);
 
 
 //
 //  vsprintf and print
 //
 
+
 // Just for fun :^) 
-int Wirzenius_Torvalds_vsprintf (char *buf, const char *fmt, va_list args);
-int Torvalds_printf (const char *fmt, ...);
+//int Wirzenius_Torvalds_vsprintf (char *buf, const char *fmt, va_list args);
+//int Torvalds_printf (const char *fmt, ...);
 
 
-int vdprintf (int fd, const char *format, va_list ap); 
-int dprintf (int fd, const char *format, ...);
+
+
+//int vdprintf (int fd, const char *format, va_list ap); 
+
+//int dprintf (int fd, const char *format, ...);
+
+
 
 unsigned int filesize (FILE * fp);
 char * fileread (FILE * fp);
@@ -603,11 +606,13 @@ void _outbyte (int c);
 
 int sprintf (char *out, const char *format, ...); 
 int fprintf (FILE *stream, const char *format, ...); 
-int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr );
+
+//int vfprintf ( FILE *stream, const char *format, stdio_va_list argptr );
+
 void perror (const char *str);
 
-int stdout_printf (const char *format, ...);
-int stderr_printf (const char *format, ...);
+//int stdout_printf (const char *format, ...);
+//int stderr_printf (const char *format, ...);
 
 
 
@@ -626,13 +631,36 @@ int stderr_printf (const char *format, ...);
 */
 
 // Non traditional. It is working very well.
-int printf(const char *format, ...); 
+//int printf(const char *format, ...); 
 
 // Traditional. Not tested.
-int printf2 (const char *format, ...); 
+//int printf2 (const char *format, ...); 
 
 // Another implementation. (I don't remember).
-int printf3 (const char *fmt, ...);
+//int printf3 (const char *fmt, ...);
+
+
+// ===================================
+
+//
+// kinguio printf
+//
+
+#define HEX_LEN  8
+#define ____INT_MAX  2147483647
+
+void kinguio_i2hex(unsigned int val, char* dest, int len);
+char *kinguio_itoa (int val, char *str);
+int kinguio_printf(const char *fmt, ...);
+int printf(const char *fmt, ...);
+void kinguio_puts(const char* str);
+static char *_vsputs_r(char *dest, char *src);
+int kinguio_vsprintf(char * str,const char * fmt, va_list ap);
+
+//#define printf  kinguio_printf
+
+// ===================================
+
 
 
 
@@ -748,7 +776,7 @@ int drawBar (int color);
 //#todo
 int snprintf (char *str,size_t count,const char *fmt,...);
 
-int vprintf (const char *fmt, va_list ap);
+//int vprintf (const char *fmt, va_list ap);
 
 //#test
 //ainda não foi testada

@@ -1,0 +1,2 @@
+	Trabalhar em stdarg 
+	Usar aquelas macros embutidas igual fizemos em ring0.

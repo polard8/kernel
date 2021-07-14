@@ -171,13 +171,49 @@ void main(void)
     if ( (void*) stderr == NULL )
         debug_print("init.bin: stderr fail\n");
 
+
+
+//
+// printf()
+//
+
+    long value=1234;
+    printf ("\n");
+    printf ("init.bin: Testing printf()\n");
     
+    // #bugbug
+    // Wrong value !!
+    printf ("init.bin: Value=%d\n",value);
+
+
+//
+// write
+//
+
+    printf ("\n");
+    printf ("init.bin: Testing write()\n");
+
     char *s = "Fred";
     //putc('v',stdout);
+    //write ( fileno(stdin), s, 4 );
     write ( fileno(stdout), s, 4 );
+    //write ( fileno(stderr), s, 4 );
     //fflush(stdout);
     //while(1){}
-    
+
+
+//
+// read
+//
+    printf ("\n");
+    printf ("init.bin: Testing read()\n");
+
+    char ReadBuffer[32];
+    read( fileno(stdin), ReadBuffer, 4 );
+    //read( fileno(stdout), ReadBuffer, 4 );
+    //read( fileno(stderr), ReadBuffer, 4 );
+
+
 // =================================================
 
     // refresh screen
@@ -189,6 +225,8 @@ void main(void)
     // ok, a calling conventions funcionou,
     // os parametros estao em ordem.
     //ohboy_system_call(4321,0xa,0xb,0xc);
+
+    printf ("init.bin: done\n");
 
 // Return to marginal.asm
 }

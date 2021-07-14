@@ -505,7 +505,6 @@ int vsprintf(char *string, const char *format, va_list ap)
 
 // ===================================
 
-
 #define HEX_LEN 8
 
 void kinguio_i2hex(unsigned int val, char* dest, int len)
@@ -555,7 +554,6 @@ void kinguio_i2hex(unsigned int val, char* dest, int len)
 #define ____INT_MAX  2147483647
 char *kinguio_itoa (int val, char *str) 
 {
-  	
 
 	char* valuestring = (char*) str;
 	int value = val;
@@ -693,9 +691,7 @@ void kinguio_puts(const char* str)
         putchar(str[i]);
 }
 
-
-
-//  printf
+// printf
 // Credits: Nelson Cole. Project Sirius/Kinguio.
 int kinguio_printf(const char *fmt, ...)
 {
