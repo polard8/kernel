@@ -715,42 +715,32 @@ int mmSetUpPaging (void)
 	// 0x0008A000 Tabela para mapear o backbuffer, o come�o � em (0x01000000 - 0x400000) no small system.
 	// 0x00089000 Tabela de p�ginas para o pagedpool.
 
-
     // kernel mode. (Endere�os). 0x0008F000
-    unsigned long *km_page_table = (unsigned long *) PAGETABLE_KERNELAREA; 
-
     // kernel mode. (O kernel). 0x0008E000
-    unsigned long *km2_page_table = (unsigned long *) PAGETABLE_KERNELBASE; 
-
     // user mode. 0x0008D000
-    unsigned long *um_page_table = (unsigned long *) PAGETABLE_USERBASE;
-
     // user mode. (vga). 0x0008C000
-    unsigned long *cga_page_table = (unsigned long *) PAGETABLE_CGA;
-
     // user mode. (LFB). 0x0008B000
-    unsigned long *frontbuffer_page_table = (unsigned long *) PAGETABLE_FRONTBUFFER;
-
     // user mode. (buffer). backbuffer 0x0008A000
-    unsigned long *backbuffer_page_table = (unsigned long *) PAGETABLE_BACKBUFFER;
-
     // pagetable para o pagedpool 0x00089000
-    unsigned long *pagedpool_page_table = (unsigned long *) PAGETABLE_PAGEDPOOL;
-
     // um endere�o f�sico para a pagetable que mapear� os buffers.
-    unsigned long *heappool_page_table = (unsigned long *) PAGETABLE_HEAPPOOL; 
 
 
-    // #todo
-    // Extra heaps. Rever!
 
-    unsigned long *extraheap1_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP1;
-    unsigned long *extraheap2_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP2;
-    unsigned long *extraheap3_page_table = (unsigned long *) PAGETABLE_EXTRAHEAP3;
-
+    unsigned long *pt_ring0area    = (unsigned long *) PAGETABLE_RING0AREA; 
+    unsigned long *pt_ring3area    = (unsigned long *) PAGETABLE_RING3AREA;
+    unsigned long *pt_kernelimage  = (unsigned long *) PAGETABLE_KERNELIMAGE; 
+    unsigned long *pt_frontbuffer  = (unsigned long *) PAGETABLE_FRONTBUFFER;
+    unsigned long *pt_backbuffer   = (unsigned long *) PAGETABLE_BACKBUFFER;
+    unsigned long *pt_pagedpool    = (unsigned long *) PAGETABLE_PAGEDPOOL;
+    unsigned long *pt_heappool     = (unsigned long *) PAGETABLE_HEAPPOOL; 
+    unsigned long *pt_extraheap1   = (unsigned long *) PAGETABLE_EXTRAHEAP1;
+    unsigned long *pt_extraheap2   = (unsigned long *) PAGETABLE_EXTRAHEAP2;
+    unsigned long *pt_extraheap3   = (unsigned long *) PAGETABLE_EXTRAHEAP3;
     // ...
-    
-    
+
+
+
+
     debug_print("mmSetUpPaging:\n");
     
 
@@ -900,26 +890,16 @@ Entry_0:
     // usada por essa área.
     // (2 MB).
 
-
-
     // Criamos a pagetable.
     // Criando a primeira entrada do diretório.
     // Isso mapeia os primeiros 2MB da memória RAM.
     // SMALL_origin_pa = kernel_address;
 
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    km_page_table[i] = (unsigned long) kernel_address | 3;
-    //    kernel_address   = (unsigned long) kernel_address + 4096;
-    //};
-    //kernel_pd0[0] = (unsigned long) &km_page_table[0];
-    //kernel_pd0[0] = (unsigned long) kernel_pd0[0] | 3;
-
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_RING0AREA, 
-        (unsigned long) &km_page_table[0], (unsigned long) kernel_address, 
+        (unsigned long) &pt_ring0area[0], (unsigned long) kernel_address, 
         (unsigned long) 3 ); 
 
 
@@ -944,20 +924,11 @@ Entry_1:
     // SMALL_user_pa = user_address
 
 
-    //for (i=0; i < 512; i++)
-    //{
-    //    um_page_table[i] = (unsigned long) user_address | 7;
-    //    user_address     = (unsigned long) user_address + 4096;
-    //};
-    //kernel_pd0[1] = (unsigned long) &um_page_table[0];
-    //kernel_pd0[1] = (unsigned long) kernel_pd0[1] | 7;
-
-
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_RING3AREA, 
-        (unsigned long) &um_page_table[0], (unsigned long) user_address, 
+        (unsigned long) &pt_ring3area[0], (unsigned long) user_address, 
         (unsigned long) 7 ); 
 
 
@@ -974,27 +945,19 @@ Entry_384:
     // Configurando a área de memória onde ficará a imagem do kernel.
     // Isso mapeia 2MB começando do primeiro mega. 
     // (kernel mode).
-    // Preenchendo a tabela km_page_table.
+    // Preenchendo a tabela pt_ring0area.
     // 'kernel_base' é o endereço físico da imagem do kernel.
 
     // Criamos a pagetable.
     // Criamos a entrada 384 apontando para a pagetable.
     // SMALL_kernel_base_pa = kernel_base;
 
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    km2_page_table[i] = (unsigned long) kernel_base | 3;
-    //    kernel_base       = (unsigned long) kernel_base + 4096;
-    //};
-    //kernel_pd0[384] = (unsigned long) &km2_page_table[0];
-    //kernel_pd0[384] = (unsigned long) kernel_pd0[384] | 3;
-
 
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_KERNELIMAGE, 
-        (unsigned long) &km2_page_table[0], (unsigned long) kernel_base, 
+        (unsigned long) &pt_kernelimage[0], (unsigned long) kernel_base, 
         (unsigned long) 3 ); 
 
 //===========================================
@@ -1022,19 +985,12 @@ Entry_385:
     // Criamos uma pagetable.
     // Apontamos a pagetable para a entrada 385 do diretório.
     // lfb_address = Endereço físico do lfb.
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    frontbuffer_page_table[i] = (unsigned long) lfb_address | 7;
-    //    lfb_address               = (unsigned long) lfb_address + 4096; 
-    //};
-    //kernel_pd0[385] = (unsigned long) &frontbuffer_page_table[0];
-    //kernel_pd0[385] = (unsigned long) kernel_pd0[385] | 7;
 
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_FRONTBUFFER,
-        (unsigned long) &frontbuffer_page_table[0], (unsigned long) lfb_address, 
+        (unsigned long) &pt_frontbuffer[0], (unsigned long) lfb_address, 
         (unsigned long) 7 ); 
 
 // ===================================================
@@ -1052,19 +1008,11 @@ Entry_386:
     // Criamos a pagetable.
     // Apontamos a pagetable para a entrada 386 do diretório.
 
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    backbuffer_page_table[i] = (unsigned long) buff_address | 7;
-    //    buff_address             = (unsigned long) buff_address + 4096;
-    //};
-    //kernel_pd0[386] = (unsigned long) &backbuffer_page_table[0];
-    //kernel_pd0[386] = (unsigned long) kernel_pd0[386] | 7;
-
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_BACKBUFFER, 
-        (unsigned long) &backbuffer_page_table[0], (unsigned long) buff_address, 
+        (unsigned long) &pt_backbuffer[0], (unsigned long) buff_address, 
         (unsigned long) 7 ); 
 
 
@@ -1080,20 +1028,11 @@ Entry_387:
     g_pagedpool_va = (unsigned long) PAGEDPOOL_VA; //0x30600000;  // 2mb `a mais que o backbuffer
 
 
-
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    pagedpool_page_table[i] = (unsigned long) SMALL_pagedpool_pa | 7;
-    //    SMALL_pagedpool_pa      = (unsigned long) SMALL_pagedpool_pa + 4096;
-    //};
-    //kernel_pd0[387] = (unsigned long) &pagedpool_page_table[0];
-    //kernel_pd0[387] = (unsigned long) kernel_pd0[387] | 7;
-
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_PAGEDPOOL, 
-        (unsigned long) &pagedpool_page_table[0], (unsigned long) SMALL_pagedpool_pa, 
+        (unsigned long) &pt_pagedpool[0], (unsigned long) SMALL_pagedpool_pa, 
         (unsigned long) 7 ); 
 
 // ====================================================================
@@ -1121,23 +1060,14 @@ Entry_388:
 
     // 2048 KB = (2 MB).
 
-
     // #importante:
     // Os endereços físico e virtual são iguais para essa tabela.
-
-    //for ( i=0; i < 512; i++ )
-    //{
-    //    heappool_page_table[i] = (unsigned long) SMALL_heappool_pa | 7;
-    //    SMALL_heappool_pa      = (unsigned long) SMALL_heappool_pa + 4096;
-    //};
-    //kernel_pd0[388] = (unsigned long) &heappool_page_table[0];
-    //kernel_pd0[388] = (unsigned long) kernel_pd0[388] | 7;
 
     // #test
     // Tentando usar o worker para esse trabalho repetitivo.
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_HEAPPOOL, 
-        (unsigned long) &heappool_page_table[0], (unsigned long) SMALL_heappool_pa, 
+        (unsigned long) &pt_heappool[0], (unsigned long) SMALL_heappool_pa, 
         (unsigned long) 7 ); 
 
 // ====================================================================
@@ -1170,7 +1100,7 @@ Entry_389:
     g_extraheap1_size = (1024 * 2); 
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_EXTRAHEAP1, 
-        (unsigned long) &extraheap1_page_table[0], (unsigned long) SMALL_extraheap1_pa, 
+        (unsigned long) &pt_extraheap1[0], (unsigned long) SMALL_extraheap1_pa, 
         (unsigned long) 7 ); 
 
 // EXTRAHEAP2_VA
@@ -1180,7 +1110,7 @@ Entry_390:
     g_extraheap2_size = (1024 * 2);  
     mm_fill_page_table( 
       (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_EXTRAHEAP2,
-      (unsigned long) &extraheap2_page_table[0], (unsigned long) SMALL_extraheap2_pa,
+      (unsigned long) &pt_extraheap2[0], (unsigned long) SMALL_extraheap2_pa,
       (unsigned long) 7 );
 
 // EXTRAHEAP3_VA
@@ -1190,7 +1120,7 @@ Entry_391:
     g_extraheap3_size = (1024 * 2);  
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_EXTRAHEAP3,
-        (unsigned long) &extraheap3_page_table[0], (unsigned long) SMALL_extraheap3_pa,
+        (unsigned long) &pt_extraheap3[0], (unsigned long) SMALL_extraheap3_pa,
         (unsigned long) 7 );
 
 // ====================================================================

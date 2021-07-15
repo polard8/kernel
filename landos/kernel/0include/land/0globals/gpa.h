@@ -96,9 +96,8 @@
 
 
 //
-// == ? KB ==================================================
+// == 512 KB ==================================================
 //
-
 
 // #todo
 // Tem espaço sobrando aqui ??
@@ -126,61 +125,47 @@
 // por isso ficarão aqui isoladas.
 // Já as outras pagetables ficarão concatenadas 
 // numa lista grande em um outro lugar de fácil acesso. 
-
 // #importante 
 // Essas pagetable possuem endereço físico e lógico iguais.
-
 // Page tables.
 // ?? estao sendo usadas no momento ou nao?
-//#define PAGETABLE_RES7  0x00080000
-#define PAGETABLE_RES6    0x00081000
-#define PAGETABLE_RES5    0x00082000
-
-
-// Tentando mapear alguma coisa para ahci.
-// AHCI 1
-#define PAGETABLE_AHCI1  0x00083000   
-
+//0x00083000 - AHCI 1 - Tentando mapear alguma coisa para ahci.
 // Extra heaps.
-#define PAGETABLE_EXTRAHEAP3  0x00084000
-#define PAGETABLE_EXTRAHEAP2  0x00085000
-#define PAGETABLE_EXTRAHEAP1  0x00086000
-
-
-// pagetable para mapear um pool de heaps.
-#define PAGETABLE_HEAPPOOL     0x00087000 
-
-// Page table para mapear um NIC.
-#define PAGETABLE_NIC1  0x00088000
-
-
-// Pagetable para mapear um pool.
+//0x00087000 - pagetable para mapear um pool de heaps.
+//0x00088000 - Page table para mapear um NIC.
+// 0x00089000 - Pagetable para mapear um pool.
 // Possivelmente usado por um alocador de memoria compartilhada.
-#define PAGETABLE_PAGEDPOOL  0x00089000
-
-// Pagetable para o backbuffer.
+// 0x0008A000 - Pagetable para o backbuffer.
 // Esse eh o backbuffer que copiamos para o lfb.
-#define PAGETABLE_BACKBUFFER  0x0008A000
-
-// pagetable para o lfb.
-#define PAGETABLE_FRONTBUFFER  0x0008B000
-
-// Pagetable para o CGA em user mode.
+// 0x0008B000 - pagetable para o lfb.
+// 0x0008C000 - Pagetable para o CGA em user mode.
 // Aquele memoria de modo texto colorido.
-#define PAGETABLE_CGA  0x0008C000
-
-// Pagetable para mapear uma area de memoria 
+// 0x0008D000 - Pagetable para mapear uma area de memoria 
 // que sera usada pelos aplicativos em user mode.
-#define PAGETABLE_USERBASE  0x0008D000
-
-// Pagetable para mapear o endereço onde a imagem do kernel
+// 0x0008E000 - Pagetable para mapear o endereço onde a imagem do kernel
 // sera carregada na memoria fisica.
-#define PAGETABLE_KERNELBASE  0x0008E000
-
-// Pagetable para mapear os primeiros 4MB de memoria fisica.
+// 0x0008F000 - Pagetable para mapear os primeiros 4MB de memoria fisica.
 // ring0. 1:1
-#define PAGETABLE_KERNELAREA 0x0008F000
 
+
+// Pagetables.
+// Static 
+//#define PAGETABLE_RES7       0x00080000
+#define PAGETABLE_RES6         0x00081000
+#define PAGETABLE_RES5         0x00082000
+#define PAGETABLE_AHCI1        0x00083000   
+#define PAGETABLE_EXTRAHEAP3   0x00084000
+#define PAGETABLE_EXTRAHEAP2   0x00085000
+#define PAGETABLE_EXTRAHEAP1   0x00086000
+#define PAGETABLE_HEAPPOOL     0x00087000 
+#define PAGETABLE_NIC1         0x00088000
+#define PAGETABLE_PAGEDPOOL    0x00089000
+#define PAGETABLE_BACKBUFFER   0x0008A000
+#define PAGETABLE_FRONTBUFFER  0x0008B000
+#define PAGETABLE_CGA          0x0008C000
+#define PAGETABLE_RING3AREA    0x0008D000
+#define PAGETABLE_KERNELIMAGE  0x0008E000
+#define PAGETABLE_RING0AREA    0x0008F000
 
 
 //
