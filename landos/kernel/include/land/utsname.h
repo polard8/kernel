@@ -24,8 +24,7 @@ struct utsname
     
     /* Name of the hardware type the system is running on.  */
     char machine[_UTSNAME_LENGTH]; 
-    
-    
+
     /* Name of the domain of this node on the network.  */       
     /* NIS or YP domain name */
     
@@ -34,21 +33,11 @@ struct utsname
     //#endif
 };
 
-
-
-
 //The length of the arrays in a struct utsname is unspecified (see
 //NOTES); the fields are terminated by a null byte ('\0').
-
-
 
 //uname() returns system information in the structure pointed to by
 //buf.  The utsname struct is defined in <sys/utsname.h>:
 
-//#todo
-// int sys_uname (struct utsname *ubuf);
-
-
 #endif    
-
 

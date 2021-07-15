@@ -4,11 +4,10 @@
  */
 
 
-#include <sys/types.h>   //for pid_t
-//#include <unistd.h>      //for pid_t
+#include <sys/types.h>    //for pid_t
+//#include <unistd.h>     //for pid_t
 #include <sys/wait.h>   
 #include <rtl/gramado.h>  
-
 
 
 /*
@@ -23,9 +22,8 @@ pid_t wait ( int *status )
 }
 
 
-
 /*
- *********************************************
+ ************************************
  * waitpid:
  *
  */
@@ -36,18 +34,19 @@ pid_t wait ( int *status )
 //0	meaning wait for any child process whose process group ID is equal to that of the calling process.
 //> 0	meaning wait for the child whose process ID is equal to the value of pid.
 
-pid_t waitpid (pid_t pid, int *status, int options){
-	// #todo: 
-	// Criar o identificador da system call 43
-    //SYSTEMCALL_WAIT4PID 
-	
+pid_t waitpid (pid_t pid, int *status, int options)
+{
+    // #todo: 
+     // Criar o identificador da system call 43
+    // SYSTEMCALL_WAIT4PID 
+
 	// #importante
 	// >>se o retorno indicar que já havia um processo filho no estado zombie 
 	// e retornou seu pid, então apenas retornamos o pid para o aplicativo que 
 	// chamou wait.
 	// >>se o retorno indicar que não há um processo filho terminado
 	// então devemos esperar até que algum processo filho termine.
-	
+
     pid_t __pid;
 
 again:
@@ -57,14 +56,13 @@ again:
                          (unsigned long) status, 
                          (unsigned long) options );
 
-    if ( __pid > 0 )
-    {
+    if ( __pid > 0 ){
         return (pid_t) __pid;
     }
 
-	//
-	// ## wait ##
-	//
+//
+// # wait #
+//
 
 	//#todo:
 	//devemos esperar até que um processo filho seja terminado,
@@ -77,15 +75,14 @@ again:
 	//#bugbug
 	//estamos retornando para não entrarmos no loop,
 	//depois que criarmos a rotina sleep, deletaremos esse retorno.
-	
+
     return (pid_t) __pid;
 
     goto again;
-	
-//done:
-	
+
+// done:
+
     return (pid_t) __pid;
 }
-
 
 

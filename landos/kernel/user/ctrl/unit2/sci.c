@@ -1,8 +1,10 @@
 
+// sci.c
+// Handlers for the system interrupts.
 
 #include <kernel.h>  
 
-#define SERVICE_NUMBER_MAX  255
+//#define SERVICE_NUMBER_MAX  255
 
 
 // prototype
@@ -221,9 +223,7 @@ void *sci0 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-
-    struct process_d *p;
-
+    struct process_d  *p;
     unsigned long *message_address = (unsigned long *) arg2;
 
     unsigned long *a2 = (unsigned long*) arg2;
@@ -1041,13 +1041,12 @@ void *sci2 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
+    struct process_d  *p;
+
     // Array de longs.
     unsigned long *a2 = (unsigned long*) arg2;
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
-
-    struct process_d *p;
-
 
     debug_print("sci2: [TODO]\n");
 

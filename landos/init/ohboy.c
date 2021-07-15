@@ -226,6 +226,12 @@ void main(void)
     // os parametros estao em ordem.
     //ohboy_system_call(4321,0xa,0xb,0xc);
 
+    printf ("Testing fflush()");
+    fflush(stdout);
+    //while(1){}
+    
+    //close(0); close(1); close(2);
+
     printf ("init.bin: done\n");
 
 // Return to marginal.asm

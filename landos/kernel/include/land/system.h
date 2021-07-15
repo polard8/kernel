@@ -348,8 +348,10 @@ struct system_d *System;
 
 
 //
-// == Prototypes ===============================================
+// == Prototypes =====================
 //
+
+unsigned long systemGetSystemMetrics ( int index );
 
 
 int system_get_pid (int index);
@@ -364,20 +366,6 @@ void *systemNull (void);
 int init_executive (void);
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

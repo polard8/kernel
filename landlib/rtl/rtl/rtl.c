@@ -4,14 +4,12 @@
  * 
  */
 
-
 #include <stdio.h>
 #include <types.h> 
 #include <stdarg.h> 
 #include <stddef.h>
 #include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
-
 #include <pthread.h>
 
 
@@ -26,16 +24,12 @@ void *gramado_system_call (
 {
     unsigned long __Ret = 0;
 
-    // System interrupt.
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x80), "a"(a), "b"(b), "c"(c), "d"(d) );
 
     return (void *) __Ret; 
 }
-
-
 
 void *sc80 ( 
     unsigned long a, 
@@ -44,8 +38,6 @@ void *sc80 (
     unsigned long d )
 {
     unsigned long __Ret = 0;
-
-    // System interrupt.
 
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
@@ -62,8 +54,6 @@ void *sc81 (
 {
     unsigned long __Ret = 0;
 
-    // System interrupt.
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x81), "a"(a), "b"(b), "c"(c), "d"(d) );
@@ -79,8 +69,6 @@ void *sc82 (
 {
     unsigned long __Ret = 0;
 
-    // System interrupt.
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x82), "a"(a), "b"(b), "c"(c), "d"(d) );
@@ -88,14 +76,12 @@ void *sc82 (
     return (void *) __Ret; 
 }
 
-// ...
-
-
 // =============================================================
+
 
 int rtl_get_input_mode(void)
 {
-    gramado_system_call(911,0,0,0);
+    return (int) gramado_system_call(911,0,0,0);
 }
 
 void rtl_set_input_mode(int mode)
@@ -104,15 +90,15 @@ void rtl_set_input_mode(int mode)
 }
 
 
-
-
 //
 // sync
 //
 
 // Configurando sincronização de leitura e escrita em arquivo.
 // principalmente socket.
-// A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
+// A estrutura de arquivo contém uma estrutura de sincronização 
+// de leitura e escrita.
+
 void rtl_set_file_sync(int fd, int request, int data)
 {
     debug_print ("rtl_set_file_sync:\n");
@@ -121,18 +107,16 @@ void rtl_set_file_sync(int fd, int request, int data)
 
 // Pegando informação sobre sincronização de leitura e escrita de arquivos.
 // principalmente para socket.
-// A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
+// A estrutura de arquivo contém uma estrutura de sincronização 
+// de leitura e escrita.
+
 int rtl_get_file_sync(int fd, int request)
 {
     debug_print ("rtl_get_file_sync:\n");
     return (int) sc82 (10001,fd,request,0);
 }
 
-
-
-
 //=====================================
-
 
 unsigned char rtl_to_uchar (char ch)
 {
@@ -164,9 +148,9 @@ unsigned long rtl_to_ulong (long ch)
 int xxxScanApplicationQueue(void)
 {
 
-        // #todo
-        // Talvez limpar todo o buffer.
-        // 32 slots.
+    // #todo
+    // Talvez limpar todo o buffer.
+    // 32 slots.
 
     // Clean
     RTLEventBuffer[0] = 0;
@@ -257,10 +241,9 @@ struct rtl_event_d *rtl_next_event (void)
     // Yield and clear.
     // Clean
 
-    if ( rtlEvent.msg == 0 ){
-
+    if ( rtlEvent.msg == 0 )
+    {
         sc82 (265,0,0,0);
-
         rtlEvent.window = NULL;
         rtlEvent.msg    = 0;
         rtlEvent.long1  = 0;
@@ -269,7 +252,6 @@ struct rtl_event_d *rtl_next_event (void)
         rtlEvent.long4  = 0;
         rtlEvent.long5  = 0;
         rtlEvent.long6  = 0;
-
         return NULL; 
     }
 
@@ -1409,16 +1391,13 @@ int rtl_vector_count (char **vector)
 
 void rtl_test_pipe (void)
 {
-
     int pipefd[2];
-    
     int res=0;
-
     char buf[512];
     int nwrite=0;
     int nread=0;
 
-    
+
     printf ("rtl_test_pipe:\n");
 
     //0 if no error.
@@ -1452,8 +1431,7 @@ void rtl_test_pipe (void)
     // finalize the string.  
     buf[nread] = '\0';
 
-
-    // Close both pipes.
+    // Close
     close (pipefd[0]);
     close (pipefd[1]);
 
@@ -1464,7 +1442,6 @@ void rtl_test_pipe (void)
 }
 
 
-
 // =========================
 // path count
 // Credits: Sirius OS.
@@ -1473,7 +1450,6 @@ void rtl_test_pipe (void)
 size_t rtl_path_count (unsigned char *path)
 {
     size_t Value = 0;
-
     int i=0;
     int max = (80*25);
 
@@ -1574,7 +1550,7 @@ int rtl_focus_on_this_thread(void)
 
     sc82 (10011,cThread,cThread,cThread);
 
-    return cThread;
+    return (int) cThread;
 }
 
 
@@ -1674,6 +1650,5 @@ uint32_t uipow (uint32_t base, uint32_t exp)
     return (uint32_t) Result;
 }
 */
-
 
 

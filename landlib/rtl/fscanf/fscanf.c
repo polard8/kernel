@@ -1,9 +1,8 @@
 /*
- *  scan formatted input
+ * fscanf.c
+ * scan formatted input
  * credits: minix 3
  */
-
-
 
 #include  <stdio.h>
 #include  <stdlib.h>
@@ -11,12 +10,10 @@
 #include  <stdarg.h>
 
 
-
 //==================
-//#include	"loc_incl.h"
+//#include  "loc_incl.h"
 
 #define	io_testflag(p,x)  ((p)->_flags & (x))
-
 
 //#ifdef _ANSI
 //int _doprnt(const char *format, va_list ap, FILE *stream);
@@ -36,19 +33,19 @@ int _doscan (FILE * stream, const char *format, va_list ap);
 
 //#endif
 
-#define	FL_LJUST	0x0001		/* left-justify field */
-#define	FL_SIGN		0x0002		/* sign in signed conversions */
-#define	FL_SPACE	0x0004		/* space in signed conversions */
-#define	FL_ALT		0x0008		/* alternate form */
-#define	FL_ZEROFILL	0x0010		/* fill with zero's */
-#define	FL_SHORT	0x0020		/* optional h */
-#define	FL_LONG		0x0040		/* optional l */
-#define	FL_LONGDOUBLE	0x0080		/* optional L */
-#define	FL_WIDTHSPEC	0x0100		/* field width is specified */
-#define	FL_PRECSPEC	0x0200		/* precision is specified */
-#define FL_SIGNEDCONV	0x0400		/* may contain a sign */
-#define	FL_NOASSIGN	0x0800		/* do not assign (in scanf) */
-#define	FL_NOMORE	0x1000		/* all flags collected */
+#define	FL_LJUST       0x0001  /* left-justify field */
+#define	FL_SIGN        0x0002  /* sign in signed conversions */
+#define	FL_SPACE       0x0004  /* space in signed conversions */
+#define	FL_ALT         0x0008  /* alternate form */
+#define	FL_ZEROFILL    0x0010  /* fill with zero's */
+#define	FL_SHORT       0x0020  /* optional h */
+#define	FL_LONG        0x0040  /* optional l */
+#define	FL_LONGDOUBLE  0x0080  /* optional L */
+#define	FL_WIDTHSPEC   0x0100  /* field width is specified */
+#define	FL_PRECSPEC    0x0200  /* precision is specified */
+#define FL_SIGNEDCONV  0x0400  /* may contain a sign */
+#define	FL_NOASSIGN    0x0800  /* do not assign (in scanf) */
+#define	FL_NOMORE      0x1000  /* all flags collected */
 
 
 //===================
@@ -61,24 +58,29 @@ int _doscan (FILE * stream, const char *format, va_list ap);
 #define set_pointer(flags)		/* compilation might continue */
 #endif
 
-#define	NUMLEN	512
-#define	NR_CHARS	256
+#define NUMLEN      512
+#define NR_CHARS    256
 
-static char	Xtable[NR_CHARS];
-static char	inp_buf[NUMLEN];
+static char Xtable[NR_CHARS];
+static char inp_buf[NUMLEN];
 
-/* Collect a number of characters which constitite an ordinal number.
+/* 
+ * Collect a number of characters which constitite an ordinal number.
  * When the type is 'i', the base can be 8, 10, or 16, depending on the
  * first 1 or 2 characters. This means that the base must be adjusted
  * according to the format of the number. At the end of the function, base
  * is then set to 0, so strtol() will get the right argument.
  */
-static char *
-o_collect(register int c, register FILE *stream, char type,
-			unsigned int width, int *basep)
+
+static char *o_collect( 
+    register int c, 
+    register FILE *stream, 
+    char type,
+    unsigned int width, 
+    int *basep )
 {
-	register char *bufp = inp_buf;
-	register int base;
+    register char *bufp = inp_buf;
+    register int base;
 
 	switch (type) {
 	case 'i':	/* i means octal, decimal or hexadecimal */
@@ -140,11 +142,14 @@ o_collect(register int c, register FILE *stream, char type,
  * not necessary, although the use of the width field can cause incomplete
  * numbers to be passed to strtod(). (e.g. 1.3e+)
  */
-static char *
-f_collect(register int c, register FILE *stream, register unsigned int width)
+
+static char *f_collect( 
+    register int c, 
+    register FILE *stream, 
+    register unsigned int width )
 {
-	register char *bufp = inp_buf;
-	int digit_seen = 0;
+    register char *bufp = inp_buf;
+    int digit_seen = 0;
 
 	if (c == '-' || c == '+') {
 		*bufp++ = c;
@@ -158,6 +163,7 @@ f_collect(register int c, register FILE *stream, register unsigned int width)
 		if (--width)
 			c = getc(stream);
 	}
+
 	if (width && c == '.') {
 		*bufp++ = c;
 		if(--width)
@@ -208,12 +214,16 @@ f_collect(register int c, register FILE *stream, register unsigned int width)
  * the routine that does the scanning 
  */
 
-int _doscan (register FILE *stream, const char *format, va_list ap){
-
-	int		done = 0;	/* number of items done */
-	int		nrchars = 0;	/* number of characters read */
-	int		conv = 0;	/* # of conversions */
-	int		base;		/* conversion base */
+int 
+_doscan ( 
+    register FILE *stream, 
+    const char *format, 
+    va_list ap )
+{
+    int done = 0;     /* number of items done */
+    int nrchars = 0;  /* number of characters read */
+	int conv = 0;     /* # of conversions */
+	int base;         /* conversion base */
 	unsigned long	val;		/* an integer value */
 	register char	*str;		/* temporary pointer */
 	char		*tmp_string;	/* ditto */
@@ -492,10 +502,10 @@ int _doscan (register FILE *stream, const char *format, va_list ap){
 }
 
 
-//#test
-//ainda não foi testada
-int fscanf (FILE *stream, const char *format, ...){
-
+// #test
+// ainda não foi testada
+int fscanf (FILE *stream, const char *format, ...)
+{
     int retval=0;
 
     va_list ap;
@@ -506,6 +516,4 @@ int fscanf (FILE *stream, const char *format, ...){
     va_end(ap);
     return retval;
 }
-
-
 

@@ -5,10 +5,78 @@
 
 
 
+// 250
+unsigned long sys_get_system_metrics ( int n )
+{
+    return (unsigned long) systemGetSystemMetrics ( (int) n );
+}
+
+void *sys_create_process ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long res1,          //nothing
+    unsigned long priority, 
+    int ppid, 
+    char *name,
+    unsigned long iopl ) 
+{
+    debug_print("sys_create_process: [TODO]\n");
+    return NULL;
+}
+
+/*
+ *********************************************************
+ * sys_create_thread:
+ *     Create thread system interface.
+ */
+
+// 72 - Create thread.
+// #todo: 
+// Enviar os argumentos via buffer.
+
+void *sys_create_thread ( 
+    struct room_d     *room,
+    struct desktop_d  *desktop,
+    struct window_d   *window,
+    unsigned long init_rip, 
+    unsigned long priority, 
+    int ppid, 
+    char *name )
+{
+    struct thread_d  *Thread;
+
+    debug_print ("sys_create_thread:\n");
+
+    // #todo:
+    // Filtros, para ponteiros NULL.
+    
+    if ( init_rip == 0 ){
+        debug_print ("sys_create_thread: [FAIL] init_rip\n");
+        return NULL;
+    }
+
+    // Create thread.
+    
+    Thread = (struct thread_d *) create_thread ( 
+                                     room, desktop, window, 
+                                     init_rip, priority, ppid, name ); 
+
+    if ( (void *) Thread == NULL ){
+        debug_print ("sys_create_thread: [FAIL] Thread\n");
+        return NULL;
+    }
+
+    SelectForExecution ( (struct thread_d *) Thread );
+
+    return (struct thread_d *) Thread;
+}
+
+
 
 /*
  ************************************
- * sys_read;
+ * sys_read:
  *     implementation os read() libc function.
  */
 
@@ -1388,6 +1456,13 @@ void sys_exit_thread (int tid)
     exit_thread (tid);
 }
 
+int sys_fork (void)
+{
+    debug_print ("sys_fork: \n");
+    return -1;
+}
+
+
 // #todo: 
 // Rever esses argumentos.
 // SVr4, 4.3BSD, POSIX.1-2001. and more.
@@ -1656,9 +1731,7 @@ int sys_initialize_component (int n)
         //case 4:
             //break;
 
-
         // ...
-        
 
         default:
             return -1;
@@ -1667,6 +1740,31 @@ int sys_initialize_component (int n)
     
     return (int) 0;
 }
+
+
+int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
+
+    debug_print ("sys_ioctl: [FIXME] \n");
+
+    // fd.
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_ioctl: fd\n");
+        printf     ("sys_ioctl: fd\n");
+        return (int) (-EINVAL);
+    }
+
+    // Enquanto sys_ioctl eh chamada pelos applicativos,
+    // io_ioctl eh chamada pelas rotinas dentro do kernel.
+    // See: io.c
+    
+    return -1;
+    //return (int) io_ioctl (fd,request,arg);
+}
+
+
+
 
 //#??? isso não pertence à fcntl.c ?
 //SVr4,  4.3BSD,  POSIX.1-2001. 
@@ -1694,7 +1792,6 @@ sys_open (
     // creat chama open.
     // open tenta ler num arquivo que nao existe?
 
-
     debug_print ("sys_open: $ \n");
 
     // See: sci/fs/fs.c
@@ -1705,7 +1802,7 @@ sys_open (
                      flags, 
                      mode );
 
-    if ( _ret<0){
+    if (_ret<0){
         printf ("sys_open: fail\n");
         return -1;
     }
@@ -1744,10 +1841,9 @@ void sys_reboot (void)
     debug_print("sys_reboot: Saving FAT cache\n");
     fs_save_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
 
-
-    //
-    // Reboot!
-    //
+//
+// Reboot
+//
 
     debug_print("sys_reboot: Rebooting...\n");
     hal_reboot();
@@ -1849,6 +1945,19 @@ void sys_set_file_sync(int fd, int request, int data)
     // ...
 }
 
+/*
+ **********************************
+ * sys_shutdown:
+ *     Chama uma rotina interna para desligar a máquina.
+ */
+
+void sys_shutdown (void)
+{
+    debug_print("sys_shutdown: [TODO]\n");
+    //hal_shutdown();
+}
+
+
 // Usada por vários serviços de debug.
 // Usada para debug.
 
@@ -1891,6 +2000,121 @@ void sys_show_system_info ( int n ){
     refresh_screen();
 }
 
+
+// IN: fd
+// OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+int sys_sleep_if_socket_is_empty ( int fd )
+{
+
+    struct process_d *p;
+    file *object;
+
+    if (fd<0)
+        return -1;
+
+    if ( fd < 0 || fd >= NUMBER_OF_FILES )
+    {
+        debug_print("sys_sleep_if_socket_is_empty: fd\n");
+        return (int) (-1);
+    }
+
+    if ( current_process < 0 ){
+        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
+        return (int) (-1);
+    }
+
+    // process
+    
+    p = (void *) processList[current_process];
+
+    if ( (void *) p == NULL ){
+        debug_print("sys_sleep_if_socket_is_empty: p\n");
+        return (int) (-1);
+    }else{
+        
+        object = (file *) p->Objects[fd];
+        
+        // validation
+        if ( (void *) object == NULL ){
+            debug_print("sys_sleep_if_socket_is_empty: object\n");
+            return (int) (-1);
+        }else{
+            
+            //validation
+            if (object->used != 1 || object->magic != 1234 ){
+                debug_print("sys_sleep_if_socket_is_empty: calidation\n");
+                return -1;
+            }
+            
+            if ( object->____object != ObjectTypeSocket )
+            {
+                debug_print ("sys_sleep_if_socket_is_empty: [ERROR] only for sockets\n");
+                return -1;
+            }
+            
+            // TRUE or FALSE
+            //return (int) object->socket_buffer_full;   
+        
+           // sim esta vazio, nao pode ler;  retorna FALSE
+           if( object->socket_buffer_full == FALSE )
+           {
+               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can not read. sleeping\n");
+               object->_flags |= __SWR;                  // pode escrever
+               //todo: falg que nege a leitura.
+               object->tid_waiting = current_thread;     // thread atual dorme   
+               do_thread_waiting (current_thread);
+               return FALSE;  // nao pode ler
+           }
+           
+           // O buffer esta cheio, pode ler. retorna TRUE
+           if( object->socket_buffer_full == TRUE )
+           {
+               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can read\n");
+               object->_flags |= __SRD;
+               return TRUE;
+           }
+        };
+    };  
+    
+    debug_print ("sys_sleep_if_socket_is_empty: [FAIL] Unexpected error \n");
+    return -1;
+}
+
+// service 377.
+int sys_uname (struct utsname *ubuf)
+{
+
+    if ( (void *) ubuf == NULL ){
+        //#todo: message.
+        return -1;
+    }
+
+    memcpy ( (void *)  ubuf->sysname, 
+        (const void *) OS_NAME, 
+        sizeof(OS_NAME) );    
+
+    memcpy ( (void *)  ubuf->nodename, 
+        (const void *) NODE_NAME, 
+        sizeof(NODE_NAME) );    
+        
+    memcpy ( (void *)  ubuf->release, 
+        (const void *) RELEASE_NAME, 
+        sizeof(RELEASE_NAME) );    
+        
+    memcpy ( (void *)  ubuf->version, 
+        (const void *) VERSION_NAME, 
+        sizeof(VERSION_NAME) );    
+
+    memcpy ( (void *)  ubuf->machine, 
+        (const void *) MACHINE_NAME, 
+        sizeof(MACHINE_NAME) );    
+
+    return 0;
+}
+
+
+
+
 /*
  * sys_vsync:
  *     Sincroniza o retraço vertical do monitor.
@@ -1900,6 +2124,9 @@ void sys_vsync(void)
 {
     hal_vsync();
 }
+
+
+
 
 
 

@@ -1,9 +1,8 @@
 
+// ioctl.c
 
 #include <sys/ioctl.h>
 #include <stdarg.h>
-
-
 
 
 /*
@@ -18,7 +17,6 @@
 /*
  *************************************************
  * ioctl:
- *     #importante.
  */
 
 //See: http://man7.org/linux/man-pages/man2/ioctl.2.html
@@ -29,21 +27,18 @@
     EINVAL request or argp is not valid.
     ENOTTY fd is not associated with a character special device.
     ENOTTY The specified request does not apply to the kind of object
-              that the file descriptor fd references.
+           that the file descriptor fd references.
 */
-
 
 int ioctl (int fd, unsigned long request, ...)
 {
-
     int __ret = -1;
-    
+
     if (fd<0) {
         debug_print("ioctl: fd\n");
         return -1;
     }
 
-    
     //++
     va_list ap;
     va_start(ap, request);
@@ -56,16 +51,16 @@ int ioctl (int fd, unsigned long request, ...)
     //                  (unsigned long) arg );
     
     // # Using this syscall to have full access to the ring0 data.
-    __ret = (int) sc82 ( 8000,
+
+    __ret = (int) sc82 ( 
+                      8000,
                       (unsigned long) fd,
                       (unsigned long) request,
                       (unsigned long) arg );
-                      
+
     va_end (ap);
     //--
-    
 
- 
     // #todo Error.
     if (__ret < 0)
     {
@@ -73,14 +68,6 @@ int ioctl (int fd, unsigned long request, ...)
         return (-1);
     }
 
-
     return (int) (__ret);
 }
 
-
-
-
-
- 
- 
- 

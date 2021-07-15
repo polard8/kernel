@@ -16,16 +16,15 @@
 #include <unistd.h>
 */
 
-   // gen/glob.c
-   
-   //criando o arquivo baseado na libc do netbsd e do minix.
-   
+    // gen/glob.c
+
+    //criando o arquivo baseado na libc do netbsd e do minix.
+
 #define	GLOB_LIMIT_STRING	524288	/* number of readdirs */
 #define	GLOB_LIMIT_STAT		128	/* number of stat system calls */
-#define	GLOB_LIMIT_READDIR	65536	/* total buffer size of path strings */
+#define	GLOB_LIMIT_READDIR  65536	/* total buffer size of path strings */
 #define	GLOB_LIMIT_PATH		1024	/* number of path elements */
 #define GLOB_LIMIT_BRACE	128	/* Number of brace calls */
-
 
 struct glob_limit {
 	size_t l_string;

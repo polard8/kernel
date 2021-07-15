@@ -8,7 +8,6 @@ double pow (double __x, double __y)
     return 0;
 }
 
-
 // returns square root of x
 double sqrt (double __x)
 {

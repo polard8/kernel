@@ -6,17 +6,16 @@
 // A segunda definição é para ficar igual ao netBSD.
 
 
-//NULL.
 #define	SYSTEMCALL_NULL  0
 #define	SYS_syscall SYSTEMCALL_NULL
 
-//Disk.
+// Disk
 #define	SYSTEMCALL_READ_LBA    1
 #define	SYSTEMCALL_WRITE_LBA   2
 #define	SYSTEMCALL_READ_FILE   3
 #define	SYSTEMCALL_WRITE_FILE  4
 
-//Gráfico.
+// Graphics
 #define	SYSTEMCALL_VSYNC                5
 #define	SYSTEMCALL_BUFFER_PUTPIXEL      6
 #define	SYSTEMCALL_BUFFER_DRAWCHAR      7
@@ -25,7 +24,7 @@
 #define	SYSTEMCALL_BUFFER_CREATEWINDOW  10
 #define	SYSTEMCALL_REFRESHSCREEN        11
 
-//Rede.
+// Network (reserved)
 #define	SYSTEMCALL_REDE_RES1  12
 #define	SYSTEMCALL_REDE_RES2  13
 #define	SYSTEMCALL_REDE_RES3  14
@@ -126,8 +125,6 @@
 //Destroy window. (Destrói a estrutura e a classe).
 #define	SYSTEMCALL_DESTROYWINDOW   59
 
-
-
 //Active window support.
 #define	SYSTEMCALL_SETACTIVEWINDOW  60
 #define	SYSTEMCALL_GETACTIVEWINDOW  61
@@ -151,7 +148,7 @@
 #define	SYS_exit SYSTEMCALL_EXIT
 
 //fork support.
-#define	SYSTEMCALL_FORK             71  
+#define	SYSTEMCALL_FORK             71
 #define	SYS_fork  SYSTEMCALL_FORK
 
 //Create thread.
@@ -363,7 +360,6 @@
 #define	SYSTEMCALL_SETTERMINALRECT         218
 #define	SYSTEMCALL_DESTROYTERMINAL         219
 
-//Reboot.
 #define	SYSTEMCALL_REBOOT2  220
 
 //program support.
@@ -427,6 +423,8 @@
 #define	SYSTEMCALL_SHOWKERNELINFO    255
 
 //#define	SYS_MAXSYSCALL	256
+
+
 
 
 

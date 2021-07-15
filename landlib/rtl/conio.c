@@ -8,7 +8,7 @@
 #include <conio.h>
 
 
-//putch - Writes a character directly to the console.
+// putch - Writes a character directly to the console.
 int putch (int c)
 {
     printf ( "%c", (char) c );
@@ -16,7 +16,7 @@ int putch (int c)
 }
 
 
-//cputs - Writes a string directly to the console.
+// cputs - Writes a string directly to the console.
 int cputs (const char *str)
 {
     printf ("%s", str);
@@ -31,9 +31,8 @@ static char getchEcho (int echo)
 {
     char ch=0;
 
-
-	switch (echo)
-	{			
+    switch (echo)
+    {
 		//sem echo
 		//case 0:
 		//@todo:    
@@ -43,13 +42,13 @@ static char getchEcho (int echo)
 		//case 1:	
 		//@todo:
 		//    break;
-			
-		//negligenciado por enquanto.	
-		default:
-		    ch = (char) getchar ();
-            break;		
-	};
-	
+
+		// negligenciado por enquanto.
+        default:
+            ch = (char) getchar();
+            break;
+    };
+
     return (char) ch;
 }
 

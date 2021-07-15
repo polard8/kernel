@@ -1,12 +1,11 @@
-//Credits: serenity os
 
-
+// assert.c
+// Credits: serenity os
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
 
 
 #ifdef DEBUG
@@ -27,7 +26,6 @@ __assertion_failed (
     // fprintf (stderr, "ASSERTION FAILED: %s\n%s:%u in %s\n", msg, file, line, func);
     //abort ();
     //for (;;)
-        
 }
 #endif
 
@@ -82,11 +80,10 @@ __assert(const char *file, int line, const char *failedexpr)
 */
 
 
-
 enum {
-	DIAGASSERT_ABORT   =  1<<0,
-	DIAGASSERT_STDERR  =  1<<1,
-	DIAGASSERT_SYSLOG  =  1<<2
+    DIAGASSERT_ABORT   =  1<<0,
+    DIAGASSERT_STDERR  =  1<<1,
+    DIAGASSERT_SYSLOG  =  1<<2
 };
 
 
@@ -116,19 +113,6 @@ __diagassert(const char *file, int line, const char *failedexpr)
 	__diagassert13(file, line, NULL, failedexpr);
 }
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

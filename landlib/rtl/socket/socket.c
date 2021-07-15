@@ -6,11 +6,9 @@
 // See: 
 // http://man7.org/linux/man-pages/man2/socket.2.html
 
-
-#include <sys/types.h>  
+#include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-
 
 
 //sortix style;
@@ -19,7 +17,6 @@
 #define TYPE_MASK (~FLAGS_MASK)
 #define FLAGS(x) ((x) & FLAGS_MASK)
 #define TYPE(x) ((x) & TYPE_MASK)
-
 */
 
 
@@ -43,11 +40,10 @@
 
 int socket ( int domain, int type, int protocol )
 {
-
     int __fd = -1;
 
-
-    __fd = (int) gramado_system_call ( 7000, 
+    __fd = (int) gramado_system_call ( 
+                     7000, 
                      (unsigned long) domain, 
                      (unsigned long) type, 
                      (unsigned long) protocol );
@@ -64,7 +60,8 @@ int socket ( int domain, int type, int protocol )
 //int __socket_pipe ( int pipefd[2] );
 int __socket_pipe ( int pipefd[2] )
 {
-    return (int) gramado_system_call ( 247, 
+    return (int) gramado_system_call ( 
+                     247, 
                      (unsigned long) pipefd, 
                      (unsigned long) pipefd, 
                      (unsigned long) pipefd );
@@ -80,9 +77,8 @@ int __socket_pipe ( int pipefd[2] )
 
 int socketpair (int domain, int type, int protocol, int sv[2])
 {
-    int fd = -1; 
+    int fd = -1;
     int pipefd[2];
-
 
     if ( domain == AF_UNSPEC || domain == AF_UNIX )
     {
@@ -98,7 +94,6 @@ int socketpair (int domain, int type, int protocol, int sv[2])
         if ( fd  == -1 ) { 
             printf ("socketpair: fail\n");
             return (int) (-1);
-
         }else{
             sv[0] = pipefd[1];
             sv[1] = pipefd[1];
@@ -401,6 +396,9 @@ sendto (
     socklen_t addrlen )
 {
 
+    //if (sockfd<0)
+        //return -1;
+
     return (ssize_t) write ( sockfd, (const void *) buf, len );
 }
 
@@ -429,12 +427,14 @@ recv (
     int flags )
 {
 
+    //if (sockfd<0)
+        //return -1;
+
     // #todo: Usar esse.
     //return (ssize_t) recvfrom ( (int) sockfd, 
         //(void *) buf, (size_t) len, (int) flags,
         //(struct sockaddr *) src_addr, (socklen_t *) addrlen );
 
- 
    return (ssize_t) read ( sockfd, (const void *) buf, len );
 }
 
@@ -448,6 +448,9 @@ recvfrom (
     struct sockaddr *src_addr, 
     socklen_t *addrlen )
 {
+
+    //if (sockfd<0)
+        //return -1;
 
      return (ssize_t) read ( sockfd, (const void *) buf, len );
 }
@@ -481,7 +484,6 @@ getsockname (
     socklen_t *addrlen )
 {
     int __status = -1;
-
 
     __status = (int) gramado_system_call ( 7007, 
                          (unsigned long) sockfd, 

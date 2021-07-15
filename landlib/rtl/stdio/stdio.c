@@ -16,10 +16,8 @@
  *     2020 - New functions.
  */
 
-
 // See:
 // http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_7.html 
-
 
 
 #include <limits.h>
@@ -33,9 +31,8 @@
 #include <errno.h>
 #include <rtl/gramado.h> 
 
-
-
-// Usada por uma função nesse documento. 
+// The main environment.
+// crt0.c will setup this.
 char **environ;
 
 
@@ -56,9 +53,8 @@ static int terminal___PID;
 // Why ?
 #define  VK_RETURN      0x1C 
 #define  VK_BACKSPACE   0x0E 
-#define  VK_BACK        0x0E  
+#define  VK_BACK        0x0E 
 #define  VK_TAB         0x0F 
-
 
 
 //
@@ -94,9 +90,6 @@ char *out_char(char *dst,char ch)
 */
 
 
-
-
-
 // stdio_atoi:
 // Talvez isso possa ir para o topo do 
 // arquivo para servir mais funções.
@@ -104,25 +97,19 @@ char *out_char(char *dst,char ch)
 int stdio_atoi (char *s){
 
     int rv=0; 
-    char sign = 0;
-
+    char sign=0;
 
     // Skip till we find either a digit or '+' or '-'.
   
     while (*s){
-
         if (*s <= '9' && *s >= '0'){  break;  }
-
         if (*s == '-' || *s == '+'){  break;  }
-
         s++;
     };
-
 
     if (*s == '-'){
         sign=1;
     }
-
 
     //     sign = (*s == '-');
     if (*s == '-' || *s == '+')
@@ -158,15 +145,12 @@ void stdio_fntos (char *name){
 
     int i=0;
     int ns=0;
-
     char ext[4];
 
-
-    ext[0] = 0;
-    ext[1] = 0;
-    ext[2] = 0;
+    ext[0] = 0; 
+    ext[1] = 0; 
+    ext[2] = 0; 
     ext[3] = 0;
-
 
     //const char ext[4];
 
@@ -224,11 +208,9 @@ void stdio_fntos (char *name){
         *name++ = ext[i];
     };
 
-
     *name = '\0';
     //*name = 0;
 }
-
 
 
 /*
@@ -392,12 +374,13 @@ _strout (
 // See:
 // for sync(), see unistd.c
 
+// IN:
+// NULL is ok.
+// NULL will flush all the streams in the table[].
+// #todo: We need a talbe here in the lib.
+
 int fflush (FILE *stream)
 {
-    // NULL is ok.
-    // NULL will flush all the streams in the table[].
-    // #todo: We need a talbe here in the lib.
-    
     return (int) __fflush(stream);
 }
 
@@ -410,11 +393,11 @@ int __fflush (FILE *stream)
     ssize_t nwrite = -1;
     size_t Count = 0;
 
-     //debug_print( "__fflush:\n");
-	
+    //debug_print( "__fflush:\n");
+
     // FIXME: fflush(NULL) should flush all open output streams.
     //ASSERT(stream);
-    
+
     if ( (void *) stream == NULL ){
         debug_print( "__fflush: [FAIL] stream\n");
         return (int) (-1);
@@ -488,7 +471,6 @@ int __fflush (FILE *stream)
 //    nwrite = __write ( fileno(stream), stream->_base, Count );
 //#endif
 
- 
     if (nwrite <= 0)
     {
         printf ("__fflush: [FAIL] nwrite\n");
@@ -531,7 +513,7 @@ int __fflush (FILE *stream)
 
 
 //
-// ============= Root 1 =================
+// == Root 1 =================
 //
 
 

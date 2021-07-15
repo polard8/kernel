@@ -3,15 +3,12 @@
  *
  */
 
-
 #include <types.h>
 #include <sys/types.h>
 #include <stddef.h>
 #include <errno.h>
 #include <signal.h>
 #include <rtl/gramado.h> 
-
-
 
 const char *sys_siglist[NSIG] = {
 
@@ -64,23 +61,21 @@ sighandler_t signal (int signum, sighandler_t handler)
 {
     struct sigaction new_act;
     struct sigaction old_act;
-    
-    
-    debug_print ("signal: [TODO] \n");    
-    
+
+    debug_print ("signal: [TODO] \n");
+
     new_act.sa_handler = handler;
     new_act.sa_flags = 0;
     new_act.sa_mask = 0;
-    
+
     int rc = sigaction(signum, &new_act, &old_act);
-    
     if (rc < 0){
         debug_print("signal: rc\n");
         return SIG_ERR;
     }
-    
+
     // ?? #bugbug: Qual é esse valor ??
-    
+
     return old_act.sa_handler;
 }
 
@@ -121,22 +116,22 @@ int kill (pid_t pid, int sig)
 	
 	return (ret);
 	*/
-	
-	return -1;
+
+    return (int) (-1);
 }
 
 
+// ??
 int raise (int sig)
 {
     // FIXME: Support multi-threaded programs.
-    return kill ( getpid(), sig);
+    return (int) kill ( getpid(), sig);
 }
 
 
 
 int sigismember (const sigset_t* set, int signum)
 {
-
     if (signum < 1 || signum > 32) 
     {
         errno = EINVAL;
@@ -155,7 +150,7 @@ int sigismember (const sigset_t* set, int signum)
 int killpg (int pgrp, int sig)
 {
     debug_print ("killpg: [TODO] \n");
-	return -1;
+    return -1;
 }
 
 

@@ -5,16 +5,12 @@
  *
  * History:
  *     2018 - Created by Fred Nora.
- *     2018 - Linux stuff 
  */
- 
 
-#include <types.h> 
+#include <types.h>
 #include <ctype.h>
 
-
-
-//Linux;
+// Linux-like
 const unsigned char _ctype[] = {
 _C, _C, _C, _C, _C, _C, _C, _C,                   /* 0-7 */
 _C, _C|_S, _C|_S, _C|_S, _C|_S, _C|_S, _C, _C,    /* 8-15 */
@@ -44,3 +40,4 @@ _L,_L,_L,_L,_L,_L,_L,_P,_L,_L,_L,_L,_L,_L,_L,_L };    /* 240-255 */
 //
 // End.
 //
+

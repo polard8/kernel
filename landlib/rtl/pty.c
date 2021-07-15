@@ -9,7 +9,6 @@
 #include <pty.h>
 
 
-
 //See: http://man7.org/linux/man-pages/man7/pty.7.html
 
 /*
@@ -73,7 +72,6 @@ forkpty (
     gde_debug_print ("forkpty: [TODO]\n");
     return -1;
 }
-
 
 //
 // End.

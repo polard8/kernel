@@ -4,7 +4,6 @@
  * 2020 - Created by Fred Nora.
  */
 
-
 #include <sys/ioctl.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -14,13 +13,6 @@
 #include <fcntl.h>
 #include <sys/file.h>
 
-
-
-/*
- ******************************
- * fcntl:
- *
- */
 
 int fcntl ( int fd, int cmd, ... )
 {
@@ -43,14 +35,16 @@ int fcntl ( int fd, int cmd, ... )
 
     // # This way we're gonna have full access 
     // to the ring 0 data structures.
-    __ret = (int) sc82 ( 8001,
+
+    __ret = (int) sc82 ( 
+                      8001,
                       (unsigned long) fd,
                       (unsigned long) cmd,
                       (unsigned long) arg );
 
     va_end(ap);
     //--    
-  
+
     // #todo Error.
     if (__ret < 0)
     {
@@ -58,17 +52,15 @@ int fcntl ( int fd, int cmd, ... )
         return (-1);
     }
 
-
     return (int) (__ret);
 }
 
-
 // openat - open a file relative to a directory file descriptor 
 // See: https://linux.die.net/man/2/openat
-int openat (int dirfd, const char *pathname, int flags){
 
+int openat (int dirfd, const char *pathname, int flags)
+{
     int __ret = -1;
-
 
     // The directory
     if ( dirfd < 0 ){ 
@@ -84,17 +76,18 @@ int openat (int dirfd, const char *pathname, int flags){
     }
     
     // Carrega um arquivo dado o nome e um modo.
-   __ret = (int) gramado_system_call ( 246, 
-                     (unsigned long) dirfd, 
-                     (unsigned long) pathname,  
-                     (unsigned long) flags ); 
+
+    __ret = (int) gramado_system_call ( 
+                      246, 
+                      (unsigned long) dirfd, 
+                      (unsigned long) pathname, 
+                      (unsigned long) flags ); 
 
     if ( __ret < 0 ){ 
         debug_print("openat: [FAIL]\n");
         //errno = EFAULT;
         return -1; 
     }
-
 
     return (int) __ret;
 }
@@ -110,11 +103,10 @@ int openat (int dirfd, const char *pathname, int flags){
 // Isso precisa abrir um arquivo, colocar o ponteiro na 
 // lista de arquivos abertos e retornar o índice. 
 
-int open (const char *pathname, int flags, mode_t mode){
-
+int open (const char *pathname, int flags, mode_t mode)
+{
     int fd = -1;
     char tmp_path[64];
-
 
     // #importante
     // adaptando para fat16.
@@ -124,10 +116,10 @@ int open (const char *pathname, int flags, mode_t mode){
     stdio_fntos( (char *) pathname );
     sprintf(tmp_path,pathname);
 
-    //
-    // size
-    //
-    
+//
+// Size
+//
+
     // Get file size.
     // Limits: 1MB.
     
@@ -155,7 +147,7 @@ int open (const char *pathname, int flags, mode_t mode){
     fd = (int) gramado_system_call ( 
                    16,  
                    (unsigned long) tmp_path, 
-                   (unsigned long) flags,  
+                   (unsigned long) flags, 
                    (unsigned long) mode );
 
     if (fd < 0){
@@ -236,13 +228,7 @@ int flock (int fd, int operation)
 }
 
 
-
 //
 // End.
 //
-
-
-
-
-
 

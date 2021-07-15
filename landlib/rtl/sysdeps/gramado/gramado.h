@@ -15,7 +15,7 @@
 #define PRIORITY_LOW3      2  //3
 #define PRIORITY_LOW2      3  //2
 #define PRIORITY_LOW1      4  //1 
-#define PRIORITY_NORMAL    5  //*0 (Normal).
+#define PRIORITY_NORMAL    5  // 0 (Normal).
 #define PRIORITY_HIGH1     6  //1
 #define PRIORITY_HIGH2     7  //2
 #define PRIORITY_HIGH3     8  //3
@@ -24,13 +24,9 @@
 #define PRIORITY_LOW        PRIORITY_LOW1
 #define PRIORITY_SUPERLOW   PRIORITY_LOW4
 #define PRIORITY_MIN        PRIORITY_SUPERLOW
-#define PRIORITY_HIGH       PRIORITY_HIGH1 
+#define PRIORITY_HIGH       PRIORITY_HIGH1
 #define PRIORITY_SUPERHIGH  PRIORITY_HIGH4
-#define PRIORITY_MAX        PRIORITY_SUPERHIGH    
+#define PRIORITY_MAX        PRIORITY_SUPERHIGH
 //Definição especial.
 #define PRIORITY_REALTIME  10    
-
-
-
-
 

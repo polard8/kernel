@@ -302,6 +302,7 @@ unsigned long SavedBPP;
 #include "rtl/runtime.h"
 #include "land/request.h"
 #include "land/gpid.h"      // Globals. PIDs support.
+#include "land/utsname.h"
 #include "land/info.h"      // last one?
 
 
