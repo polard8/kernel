@@ -48,9 +48,7 @@ user_ccflags = -m64 \
 
 
 # usermode linker flags.
-user_ldflags = -m elf_i386 -T ../link.ld
-
-
+user_ldflags = -m elf_x86_64 -T ../link.ld
 
 
 #todo

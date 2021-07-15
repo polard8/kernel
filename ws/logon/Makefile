@@ -81,7 +81,7 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o LOGON.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o LOGON.BIN $(myObjects)    
 
 finalize:
 	cp LOGON.BIN  ../bin

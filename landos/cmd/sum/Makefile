@@ -69,9 +69,7 @@ all-c:
 
 	
 cat-link:
-	ld -m elf_i386 -T ../link.ld -o SUM.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o SUM.BIN $(myObjects)    
 
 finalize:
 	cp SUM.BIN  ../bin

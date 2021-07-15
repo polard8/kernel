@@ -47,9 +47,6 @@ ioctl.o socket.o \
 gws.o connect.o events.o rw.o    
 
 
-
-
-
 .PHONY: all all-c hello-link finalize clean
 
 all: main.o all-c hello-link finalize clean
@@ -82,9 +79,7 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o EDITOR.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o EDITOR.BIN $(myObjects)    
 
 finalize:
 	cp EDITOR.BIN  ../bin

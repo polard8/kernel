@@ -81,9 +81,7 @@ all-c:
 	
 	
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o GWM.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o GWM.BIN $(myObjects)    
 
 finalize:
 	cp GWM.BIN  ../bin

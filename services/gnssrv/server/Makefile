@@ -90,10 +90,8 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o .
 
 
-
 gws-link:
-	ld -m elf_i386 -T ../link.ld -o GNSSRV.BIN $(myObjects)    
-
+	ld -m elf_x86_64 -T ../link.ld -o GNSSRV.BIN $(myObjects)    
 
 finalize:
 	cp GNSSRV.BIN ../bin

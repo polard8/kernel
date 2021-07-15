@@ -73,10 +73,7 @@ all-c:
 
 
 cat-link:
-	ld -m elf_i386 -T ../link.ld -o REPLACE.BIN $(myObjects)    
-
-
-
+	ld -m elf_x86_64 -T ../link.ld -o REPLACE.BIN $(myObjects)    
 
 finalize:
 	cp REPLACE.BIN  ../bin

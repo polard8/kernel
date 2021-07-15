@@ -57,9 +57,11 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o  .
 
 cat-link:
-	ld -m elf_i386 -T ../link.ld -o UNAME.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o UNAME.BIN $(myObjects)    
+
 finalize:
 	cp UNAME.BIN  ../bin
+
 clean:
 	-rm *.o
 	-rm UNAME.BIN 

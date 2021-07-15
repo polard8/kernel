@@ -117,10 +117,16 @@ land-boot:
 	sudo cp landboot/bin/BL.BIN  base/
 
 land-lib:
-	# todo: Port ring3 libraries.
-	@echo "=================="
-	@echo "Creating the ring3 rtl ..."
-	$(Q) $(MAKE) -C landlib/rtl
+	#::rtl
+	@echo "==================="
+	@echo "Compiling rtl ..."
+	$(Q) $(MAKE) -C landlib/rtl/
+
+	#::lib
+	@echo "==================="
+	@echo "Compiling  lib ..."
+	$(Q) $(MAKE) -C landlib/lib/
+
 
 land-os:
 	@echo "=================="
@@ -135,11 +141,27 @@ land-os:
 	$(Q) $(MAKE) -C landos/init
 	sudo cp landos/init/INIT.BIN  base/
 
-
 land-cmd:
-	# todo: Port ring3 commands.
+	#::cmd
+	$(Q) $(MAKE) -C landos/cmd/
+	-sudo cp landos/cmd/bin/CAT.BIN        base/
+#	-sudo cp landos/cmd/bin/FALSE.BIN      base/
+	-sudo cp landos/cmd/bin/REBOOT.BIN     base/
+	-sudo cp landos/cmd/bin/SHUTDOWN.BIN     base/
+#	-sudo cp landos/cmd/bin/TRUE.BIN       base/
+#	-sudo cp landos/cmd/bin/SHOWFUN.BIN    base/
+#	-sudo cp landos/cmd/bin/UNAME.BIN      base/
+
 land-setup:
-	# todo: Port ring3 setup application.
+	#::setup
+	$(Q) $(MAKE) -C landos/setup/
+	sudo cp landos/setup/bin/GDESHELL.BIN  base/
+	#sudo cp landos/setup/bin/C4.BIN       base/
+	#sudo cp landos/setup/bin/GRAMC.BIN    base/
+	#sudo cp landos/setup/bin/GRAMC4.BIN   base/
+	#sudo cp landos/setup/bin/GRAMCNF.BIN  base/
+
+
 
 #===================================================
 #::1
@@ -147,10 +169,46 @@ land-setup:
 
 PHONY := build-gramado-files 
 build-gramado-files: \
-#gramado-ws \
-#gramado-services \
-#desert    
+gramado-ws \
+gramado-services \
+desert    
 
+gramado-ws:
+
+	#:: Gramado WS
+	@echo "==================="
+	@echo "Compiling Gramado WS and some clients"
+	$(Q) $(MAKE) -C ws/
+
+# Server and main client.
+	-sudo cp ws/bin/GWSSRV.BIN    base/
+	-sudo cp ws/bin/GWS.BIN       base/ 
+
+# Clients
+	-sudo cp ws/bin/GWM.BIN       base/
+	-sudo cp ws/bin/LOGON.BIN     base/
+	-sudo cp ws/bin/EDITOR.BIN    base/
+	-sudo cp ws/bin/TERMINAL.BIN  base/
+	-sudo cp ws/bin/FILEMAN.BIN   base/
+	-sudo cp ws/bin/BROWSER.BIN   base/
+
+# Suspended
+# Copy the clients in another folder.
+#	-sudo cp ws/bin/*.BIN    base/PROGRAMS/
+
+gramado-services:
+	#::hard Services
+	@echo "==================="
+	@echo "Compiling hard..."
+	$(Q) $(MAKE) -C services/gnssrv/ 
+	# gns
+	-sudo cp services/gnssrv/bin/GNSSRV.BIN  base/
+	-sudo cp services/gnssrv/bin/GNS.BIN     base/
+
+#========================================
+# Installing stuff from another project.
+desert:
+	# Nothing for now!
 
 #===================================================
 #::2
@@ -217,21 +275,35 @@ clean:
 	-rm -rf landlib/rtl/obj/*.o
 	-rm -rf landlib/lib/libgns/obj/*.o
 	-rm -rf landlib/lib/libio01/obj/*.o
-
+	@echo "Success?"
 clean2:
-	-rm *.ISO
 	-rm *.VHD
+	-rm *.ISO
 clean3:
-	# todo
+	-rm landos/setup/bin/*.BIN
+	-rm landos/cmd/bin/*.BIN
+	-rm ws/bin/*.BIN
+# clean base
 clean4:
 	-rm -rf base/*.BIN 
 	-rm -rf base/GRAMADO/*.BIN 
+	-rm -rf base/PROGRAMS/*.BIN 
+	-rm -rf base/UBASE/BOOT/*.BIN 
+	-rm -rf base/UBASE/BIN/*.BIN 
+	-rm -rf base/UBASE/SBIN/*.BIN
 clean-system-files:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
-
+	-rm -rf landboot/bin/*.BIN
+	-rm -rf landlib/fonts/bin/*.FON
 	-rm -rf landos/kernel/KERNEL.BIN
-	-rm -rf landos/init/INIT.BIN
+	-rm -rf landos/init/*.BIN
+	-rm -rf landos/cmd/bin/*.BIN
+	-rm -rf landos/setup/bin/*.BIN
+	-rm -rf ws/bin/*.BIN
+	-rm -rf services/gnssrv/bin/*.BIN
+# ...
+
 
 
 

@@ -57,7 +57,6 @@ all-c:
 	cp $(LIBCOBJ)/crt0.o   .
 	cp $(LIBCOBJ)/rtl.o  .
 
-
 	cp $(LIBIOOBJ)/libio.o  .
 
 	cp $(LIBCOBJ)/ctype.o   .
@@ -70,7 +69,7 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o  .
 
 jackpot-link:
-	ld -m elf_i386 -T ../link.ld -o REBOOT.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o REBOOT.BIN $(myObjects)    
 
 finalize:
 	cp REBOOT.BIN  ../bin

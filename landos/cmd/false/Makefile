@@ -66,11 +66,9 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 
-	
+
 false-link:
-	ld -m elf_i386 -T ../link.ld -o FALSE.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o FALSE.BIN $(myObjects)    
 
 finalize:
 	cp FALSE.BIN  ../bin

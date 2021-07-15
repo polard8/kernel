@@ -80,11 +80,9 @@ all-c:
 	cp $(LIBGWSOBJ)/gws.o .
 	cp $(LIBGWSOBJ)/rw.o .
 	
-	
+
 hello-link:
-	ld -m elf_i386 -T ../link.ld -o FILEMAN.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o FILEMAN.BIN $(myObjects)    
 
 finalize:
 	cp FILEMAN.BIN  ../bin
