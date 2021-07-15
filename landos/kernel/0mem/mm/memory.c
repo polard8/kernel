@@ -311,6 +311,8 @@ int mmInit(void)
     // medium  pelo menos 64mb
     // large   pelo menos 128mb
 
+
+
     // 0MB
     // #atenção 
     // Nesse caso devemos prosseguir e testar as outras opções.
@@ -319,19 +321,31 @@ int mmInit(void)
         debug_print ("mmInit: stNull\n");
     }
 
-    // 32MB
+//
+// Small
+//
+
+    // 32 MB
     if ( memorysizeTotal >= SMALLSYSTEM_SIZE_KB ){
         g_mm_system_type = stSmallSystem;
         debug_print ("mmInit: stSmallSystem\n");
     }
 
-    // 64MB
+//
+// Medium
+//
+
+    // 64 MB
     if ( memorysizeTotal >= MEDIUMSYSTEM_SIZE_KB ){
         g_mm_system_type = stMediumSystem;
         debug_print ("mmInit: stMediumSystem\n");
     }
 
-    // 128MB
+//
+// Large
+//
+
+    // 128 MB
     if ( memorysizeTotal >= LARGESYSTEM_SIZE_KB ){
         g_mm_system_type = stLargeSystem;
         debug_print ("mmInit: stLargeSystem\n");

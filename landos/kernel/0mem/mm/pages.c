@@ -574,6 +574,53 @@ int mmSetUpPaging (void)
     // ============
 
 
+// =========================================================
+
+//
+// pml4
+//
+    // 0x0009C000 = Kernel pml4
+
+
+    // 9 9 9 9 12
+    // Agora as tabelas possuem 512 entradas,
+    // pois é isso o que dá pra ter com apenas 9 bits.
+
+    // #todo
+    // Precisamos encontra espaço na memória para kernel_pml4 e kernel_pdpt.
+    // Precisamos criar 'worker functions' para essas rotinas repetitivas.
+
+    // See:
+    // gpa.h for some physical addresses.
+
+
+// =====================================
+// PML4, PDPT, PD, PT
+// PML4 - Page Map Level 4
+// PDPT - Page Directory Pointer Table
+// PD   - Page Directory
+// PT   - Page Table
+
+    // Isso porque endereço físico e virtual são igual abaixo de 1 mb.
+    // 0x0009C000va = 0x0009C000pa
+    gKernelPML4Address = KERNEL_PML4_VA;
+
+    // level 4
+    unsigned long *kernel_pml4 = (unsigned long *) KERNEL_PML4_PA;
+    // level 3
+    unsigned long *kernel_pdpt = (unsigned long *) KERNEL_PDPT_PA;
+    // level 2
+    unsigned long *kernel_pd0  = (unsigned long *) KERNEL_PD_PA;
+    // level 1
+    // a lot of page tables in the level 1.
+
+
+// =============================================================
+// Regions
+// =============================================================
+// See:
+// gpa.h
+
 	// #importante
 	// Inicializando as vari�veis que vamos usr aqui.
 	// S�o endere�os de mem�ria f�sica.
@@ -626,45 +673,11 @@ int mmSetUpPaging (void)
     LARGE_extraheap3_pa  = (unsigned long) LARGESYSTEM_EXTRAHEAP3_START;
 
 
-//
-// pml4
-//
-    // 0x0009C000 = Kernel pml4
-
-
-    // 9 9 9 9 12
-    // Agora as tabelas possuem 512 entradas,
-    // pois é isso o que dá pra ter com apenas 9 bits.
-
-    // #todo
-    // Precisamos encontra espaço na memória para kernel_pml4 e kernel_pdpt.
-    // Precisamos criar 'worker functions' para essas rotinas repetitivas.
-
-    // See:
-    // gpa.h for some physical addresses.
-
-
-// =====================================
-// PML4, PDPT, PD, PT
-// PML4 - Page Map Level 4
-// PDPT - Page Directory Pointer Table
-// PD   - Page Directory
-// PT   - Page Table
-
-    // Isso porque endereço físico e virtual são igual abaixo de 1 mb.
-    // 0x0009C000va = 0x0009C000pa
-    gKernelPML4Address = KERNEL_PML4_VA;
-
-    // level 4
-    unsigned long *kernel_pml4 = (unsigned long *) KERNEL_PML4_PA;
-    // level 3
-    unsigned long *kernel_pdpt = (unsigned long *) KERNEL_PDPT_PA;
-    // level 2
-    unsigned long *kernel_pd0  = (unsigned long *) KERNEL_PD_PA;
-    // level 1
-    // a lot of page tables in the level 1.
-
-
+// =============================================================
+// Page tables
+// =============================================================
+// See:
+// gpa.h
 
 
 	// O que temos logo abaixo s�o pequenas parti��es de mem�ria f�sica.

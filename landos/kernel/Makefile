@@ -65,12 +65,13 @@ CFLAGS := \
 
 # Exported files. Kernel api;
 # Used by the kernel modules and user space applications.
-USER_INCLUDE   := -I include/uapi/
+#USER_INCLUDE   := -I include/uapi/
+USER_INCLUDE   := -I 0include/uapi/
 
 # Internal files
 # Used to build the kernel.
-KERNEL_INCLUDE := -I include/ $(USER_INCLUDE)  
-
+#KERNEL_INCLUDE := -I include/ $(USER_INCLUDE)  
+KERNEL_INCLUDE := -I 0include/ $(USER_INCLUDE)  
 
 
 LDFLAGS := -m elf_x86_64 -static
