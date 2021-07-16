@@ -31,8 +31,8 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-LIBC      = ../../landlib/rtl/include/
-LIBCOBJ   = ../../landlib/rtl/obj
+LIBC      = ../../lib/rtl/include/
+LIBCOBJ   = ../../lib/rtl/obj
 LIBGWS    = ../libgws/include/
 LIBGWSOBJ = ../libgws/obj
 

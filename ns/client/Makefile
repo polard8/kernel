@@ -29,12 +29,10 @@ CFLAGS = -m64 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
+
 
 LIBC      = ../../lib/rtl/include/
 LIBCOBJ   = ../../lib/rtl/obj
-LIBGWS    = ../libgws/include/
-LIBGWSOBJ = ../libgws/obj
 
 	##
 	## Objects
@@ -42,8 +40,8 @@ LIBGWSOBJ = ../libgws/obj
 
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o \
-unistd.o termios.o ioctl.o socket.o \
-connect.o events.o rw.o gws.o    
+unistd.o termios.o ioctl.o socket.o    
+
 
 
 
@@ -53,7 +51,8 @@ all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I include/ -o main.o
+
 
 all-c:
 
@@ -71,21 +70,18 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-	# libgws
-	cp $(LIBGWSOBJ)/connect.o .
-	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/rw.o .
-	cp $(LIBGWSOBJ)/gws.o .
-
-
+	
+	
 hello-link:
-	ld -m elf_x86_64 -T ../link.ld -o TERMINAL.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o GNS.BIN $(myObjects)    
+
+
 
 finalize:
-	cp TERMINAL.BIN  ../bin
+	cp GNS.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm TERMINAL.BIN 
-	
+	-rm GNS.BIN 
+
 	

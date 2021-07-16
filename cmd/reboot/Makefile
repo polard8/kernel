@@ -1,16 +1,16 @@
-
+#reboot command for gde
 #history:
 #2019 - Created by Fred Nora.
-
 #todo:
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
+
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = 
+#NAME = reboot
 
 #todo:
 #We need to simplify these flags
@@ -29,63 +29,52 @@ CFLAGS = -m64 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
-	
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
-LIBGWS    = ../libgws/include/
-LIBGWSOBJ = ../libgws/obj
 
-	##
-	## Objects
-	##
+LIBC     = ../../lib/rtl/include/
+LIBCOBJ  = ../../lib/rtl/obj
+LIBIO    = ../../lib/lib/libio01/include/
+LIBIOOBJ = ../../lib/lib/libio01/obj
 
+
+#Objects
 myObjects = crt0.o main.o rtl.o \
-ctype.o stdio.o fcntl.o stdlib.o string.o \
-unistd.o termios.o ioctl.o socket.o \
-connect.o events.o rw.o gws.o    
+ctype.o stdio.o stdlib.o string.o \
+unistd.o termios.o ioctl.o fcntl.o libio.o    
 
 
 
-.PHONY: all all-c hello-link finalize clean
+.PHONY: all all-c jackpot-link finalize clean
 
-all: main.o all-c hello-link finalize clean
+all: main.o all-c jackpot-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBIO) -o main.o
 
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
 	cp $(LIBCOBJ)/rtl.o  .
 
+	cp $(LIBIOOBJ)/libio.o  .
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
-	cp $(LIBCOBJ)/fcntl.o .
 	cp $(LIBCOBJ)/stdlib.o .
 	cp $(LIBCOBJ)/string.o .
 	cp $(LIBCOBJ)/unistd.o  .
-
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-	cp $(LIBCOBJ)/socket.o  .
+	cp $(LIBCOBJ)/fcntl.o  .
 
-	# libgws
-	cp $(LIBGWSOBJ)/connect.o .
-	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/rw.o .
-	cp $(LIBGWSOBJ)/gws.o .
-
-
-hello-link:
-	ld -m elf_x86_64 -T ../link.ld -o TERMINAL.BIN $(myObjects)    
+jackpot-link:
+	ld -m elf_x86_64 -T ../link.ld -o REBOOT.BIN $(myObjects)    
 
 finalize:
-	cp TERMINAL.BIN  ../bin
+	cp REBOOT.BIN  ../bin
 
 clean:
 	-rm *.o
-	-rm TERMINAL.BIN 
-	
+	-rm REBOOT.BIN 
 	

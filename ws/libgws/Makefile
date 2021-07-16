@@ -27,8 +27,7 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
-LIBS  = -I. -I ../../landlib/rtl/include/
-
+LIBS  = -I. -I ../../lib/rtl/include/
 
 
 .PHONY: all all-c finalize clean

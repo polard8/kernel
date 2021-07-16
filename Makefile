@@ -35,16 +35,15 @@ endif
 
 PHONY := all
 
-# All the steps.
+# build: User command.
 all:  \
-build-landos-files \
 build-gramado-files \
 /mnt/gramadoxvhd    \
 vhd-mount          \
 vhd-copy-files     \
 vhd-unmount        \
 clean              \
-clean-system-files \
+clean4 \
 #generate
 
 # Giving permitions to run ./run
@@ -56,15 +55,17 @@ clean-system-files \
 
 
 #----------
+# build: Developer comand 1.
 # install
 # Build the images and put them all into base/ folder.
 PHONY := install
 install: do_install
 do_install: \
-build-landos-files \
-build-gramado-files \
+build-gramado-files  
+
 
 #----------
+# build: Developer comand 2.
 # image
 # Copy all the files from base/ to the VHD.
 PHONY := image
@@ -76,6 +77,7 @@ vhd-copy-files     \
 vhd-unmount        \
 
 #----------
+# build: Developer comand 3.
 # run
 # run the system on qemu.
 PHONY := run
@@ -86,93 +88,72 @@ do_run:
 
 #===================================================
 #::0
-# ~ Step 0: landos files.
+# ~ Step 0: gramado files.
 
-PHONY := build-landos-files
-build-landos-files: \
-/usr/local/gramadox-build \
-land-boot \
-land-lib \
-land-os \
-land-cmd \
-land-setup    
+PHONY := build-gramado-files
+build-gramado-files: \
+gramado-kernel \
+gramado-lib \
+gramado-init \
+gramado-cmd \
+gramado-setup \
+gramado-ws \
+gramado-ns \
+gramado-boot \
+desert    
 
+#1
+# the kernel image
+# O BL.BIN procura o kernel no diretorio GRAMADO/
+# See: fs/loader.c
+gramado-kernel:
+	@echo "=================="
+	@echo "(Step 1) Creating the kernel image ..."
 
-/usr/local/gramadox-build:
-	-sudo mkdir /usr/local/gramadox-build
-land-boot:
-	@echo "==================="
-	@echo "Compiling landboot/ ... "
+	$(Q) $(MAKE) -C kernel/
+	sudo cp kernel/KERNEL.BIN  base/GRAMADO
 
-	$(Q) $(NASM)  landboot/vd/fat/main.asm -I landboot/vd/fat/ -o GRAMADO.VHD 
-	$(Q) $(MAKE) -C landboot/bm1632/x86/ 
-	$(Q) $(MAKE) -C landboot/bl64/x86_64/ 
-
-	# O mbr só consegue ler o root dir para pegar o BM.BIN
-	# See: stage1.asm
-	# O BM.BIN só consegue ler o root dir pra pegar o BL.BIN
-	# See: main.asm
-
-	sudo cp landboot/bin/BM.BIN  base/
-	sudo cp landboot/bin/BL.BIN  base/
-
-land-lib:
+#2
+gramado-lib:
 	#::rtl
 	@echo "==================="
 	@echo "Compiling rtl ..."
-	$(Q) $(MAKE) -C landlib/rtl/
+	$(Q) $(MAKE) -C lib/rtl/
 
 	#::lib
 	@echo "==================="
 	@echo "Compiling  lib ..."
-	$(Q) $(MAKE) -C landlib/lib/
+	$(Q) $(MAKE) -C lib/lib/
 
+#3
+gramado-init:
+	$(Q) $(MAKE) -C init/
+	sudo cp init/INIT.BIN  base/
 
-land-os:
-	@echo "=================="
-	@echo "(Step 1) Creating the kernel image ..."
-
-	# O BL.BIN procura o kernel no diretorio GRAMADO/
-	# See: fs/loader.c
-
-	$(Q) $(MAKE) -C landos/kernel
-	sudo cp landos/kernel/KERNEL.BIN  base/GRAMADO
-
-	$(Q) $(MAKE) -C landos/init
-	sudo cp landos/init/INIT.BIN  base/
-
-land-cmd:
+#4
+gramado-cmd:
 	#::cmd
-	$(Q) $(MAKE) -C landos/cmd/
-	-sudo cp landos/cmd/bin/CAT.BIN        base/
-#	-sudo cp landos/cmd/bin/FALSE.BIN      base/
-	-sudo cp landos/cmd/bin/REBOOT.BIN     base/
-	-sudo cp landos/cmd/bin/SHUTDOWN.BIN     base/
-#	-sudo cp landos/cmd/bin/TRUE.BIN       base/
-#	-sudo cp landos/cmd/bin/SHOWFUN.BIN    base/
-#	-sudo cp landos/cmd/bin/UNAME.BIN      base/
+	$(Q) $(MAKE) -C cmd/
+	-sudo cp cmd/bin/CAT.BIN        base/
+#	-sudo cp cmd/bin/FALSE.BIN      base/
+	-sudo cp cmd/bin/REBOOT.BIN     base/
+	-sudo cp cmd/bin/SHUTDOWN.BIN     base/
+#	-sudo cp cmd/bin/TRUE.BIN       base/
+#	-sudo cp cmd/bin/SHOWFUN.BIN    base/
+#	-sudo cp cmd/bin/UNAME.BIN      base/
 
-land-setup:
+#5
+gramado-setup:
 	#::setup
-	$(Q) $(MAKE) -C landos/setup/
-	sudo cp landos/setup/bin/GDESHELL.BIN  base/
-	#sudo cp landos/setup/bin/C4.BIN       base/
-	#sudo cp landos/setup/bin/GRAMC.BIN    base/
-	#sudo cp landos/setup/bin/GRAMC4.BIN   base/
-	#sudo cp landos/setup/bin/GRAMCNF.BIN  base/
+	$(Q) $(MAKE) -C setup/
+	sudo cp setup/bin/GDESHELL.BIN  base/
+	#sudo cp setup/bin/C4.BIN       base/
+	#sudo cp setup/bin/GRAMC.BIN    base/
+	#sudo cp setup/bin/GRAMC4.BIN   base/
+	#sudo cp setup/bin/GRAMCNF.BIN  base/
 
-
-
-#===================================================
-#::1
-# ~ Step 1 - Gramado Window System files.
-
-PHONY := build-gramado-files 
-build-gramado-files: \
-gramado-ws \
-gramado-services \
-desert    
-
+#6
+# Gramado Window System files.
 gramado-ws:
 
 	#:: Gramado WS
@@ -196,15 +177,37 @@ gramado-ws:
 # Copy the clients in another folder.
 #	-sudo cp ws/bin/*.BIN    base/PROGRAMS/
 
-gramado-services:
+#7
+gramado-ns:
 	#::hard Services
 	@echo "==================="
 	@echo "Compiling hard..."
-	$(Q) $(MAKE) -C services/gnssrv/ 
+	$(Q) $(MAKE) -C ns/ 
 	# gns
-	-sudo cp services/gnssrv/bin/GNSSRV.BIN  base/
-	-sudo cp services/gnssrv/bin/GNS.BIN     base/
+	-sudo cp ns/bin/GNSSRV.BIN  base/
+	-sudo cp ns/bin/GNS.BIN     base/
 
+#8
+gramado-boot:
+	@echo "==================="
+	@echo "Compiling tools/ and boot ... "
+
+	$(Q) $(NASM) tools/vd/fat/main.asm \
+	-I tools/vd/fat/ \
+	-o GRAMADO.VHD 
+
+	$(Q) $(MAKE) -C arch/x86/boot/bm/ 
+	$(Q) $(MAKE) -C arch/x86/boot/bl/ 
+
+	# O mbr só consegue ler o root dir para pegar o BM.BIN
+	# See: stage1.asm
+	# O BM.BIN só consegue ler o root dir pra pegar o BL.BIN
+	# See: main.asm
+
+	sudo cp arch/x86/boot/bin/BM.BIN  base/
+	sudo cp arch/x86/boot/bin/BL.BIN  base/
+
+#9
 #========================================
 # Installing stuff from another project.
 desert:
@@ -265,43 +268,45 @@ danger-hdd-clone-vhd:
 #
 
 clean-all: \
-clean clean2 clean3 clean4 clean-system-files 
+clean clean2 clean3 clean4 clean5  
 	@echo "==================="
 	@echo "ok ?"
 clean:
 	@echo "==================="
 	@echo "(Step 6) Deleting the object files ..."
 	-rm *.o
-	-rm -rf landlib/rtl/obj/*.o
-	-rm -rf landlib/lib/libgns/obj/*.o
-	-rm -rf landlib/lib/libio01/obj/*.o
+	-rm -rf lib/rtl/obj/*.o
+	-rm -rf lib/lib/libgns/obj/*.o
+	-rm -rf lib/lib/libio01/obj/*.o
 	@echo "Success?"
+clean1: clean
 clean2:
 	-rm *.VHD
 	-rm *.ISO
 clean3:
-	-rm landos/setup/bin/*.BIN
-	-rm landos/cmd/bin/*.BIN
+	-rm cmd/bin/*.BIN
+	-rm setup/bin/*.BIN
 	-rm ws/bin/*.BIN
 # clean base
 clean4:
+	@echo "==================="
+	@echo "Cleaning all system binaries ..."
+	-rm -rf kernel/KERNEL.BIN
+	-rm -rf arch/x86/boot/bin/*.BIN
+	-rm -rf init/*.BIN
+	-rm -rf cmd/bin/*.BIN
+	-rm -rf setup/bin/*.BIN
+	-rm -rf ws/bin/*.BIN
+	-rm -rf ns/bin/*.BIN
+	-rm -rf lib/fonts/bin/*.FON
+clean5:
 	-rm -rf base/*.BIN 
 	-rm -rf base/GRAMADO/*.BIN 
 	-rm -rf base/PROGRAMS/*.BIN 
 	-rm -rf base/UBASE/BOOT/*.BIN 
 	-rm -rf base/UBASE/BIN/*.BIN 
 	-rm -rf base/UBASE/SBIN/*.BIN
-clean-system-files:
-	@echo "==================="
-	@echo "Cleaning all system binaries ..."
-	-rm -rf landboot/bin/*.BIN
-	-rm -rf landlib/fonts/bin/*.FON
-	-rm -rf landos/kernel/KERNEL.BIN
-	-rm -rf landos/init/*.BIN
-	-rm -rf landos/cmd/bin/*.BIN
-	-rm -rf landos/setup/bin/*.BIN
-	-rm -rf ws/bin/*.BIN
-	-rm -rf services/gnssrv/bin/*.BIN
+	
 # ...
 
 
