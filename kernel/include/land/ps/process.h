@@ -874,13 +874,16 @@ unsigned long processList[PROCESS_COUNT_MAX];
 
 // Invalidate pml4.
 // Linux style. 
+
 #define invalidate() \
-    asm ("movl %%eax, %%cr3"::"a" (0))
+    asm ("movq %%rax, %%cr3"::"a" (0))
+
 
 //
 // == Prototypes =====================================================
 //
 
+pid_t clone_and_execute_process ( const char *filename );
 
 unsigned long __GetProcessStats ( int pid, int index );
 int getprocessname ( int pid, char *buffer );

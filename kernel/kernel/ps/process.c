@@ -7,6 +7,523 @@ int caller_process_id;
 int processNewPID;
 
 
+pid_t clone_and_execute_process ( const char *filename )
+{
+    // #todo
+    // Estamos portando essa rotina do gramado de 32bit.
+    // Tem muitas dependências para resolver.
+    
+    debug_print ("clone_and_execute_process: [TODO] Porting from 32bit to 64bit\n");
+    return -1;
+
+    // #bugbug (fs)
+    // We need to get the fs directory size to allocate a buffer
+    // to this fs directory.
+    
+
+    struct process_d *Current;
+    struct process_d *Clone;
+
+    // loop
+    // Socket support.
+    // indice usado na inicializaçao da lista de 
+    // conexoes pendentes do processo servidor.
+    register int sIndex=0;
+
+    int Status = -1;
+    int PID = -1;
+
+    // # What is this?
+    // The directory virtual address of the current process. ??
+    unsigned long *pml4;
+
+
+
+    // #bugbug
+    // Only for the rootdir.
+    // Maybe we need to receive this values 
+    // from parameters.
+    
+    // File support.
+    unsigned long dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    unsigned long dir_entries = FAT16_ROOT_ENTRIES;
+
+
+    char *path;
+    char *name;
+
+    // page table.
+    void *__pt;
+
+
+    // #debug
+    debug_print ("clone_and_execute_process: [TODO] \n");
+    //printf      ("clone_and_execute_process:\n");
+
+    if ( (void*) filename == NULL ){
+        panic ("clone_and_execute_process: [ERROR] filename\n");
+    }
+
+    if ( *filename == 0 ){
+        panic ("clone_and_execute_process: [ERROR] *filename\n");
+    }
+
+    path = filename;
+    name = filename;
+
+    // #todo
+    // Essas rotinas de procura e garregamento podem ir para outro lugar.
+    // #bugbug
+    // O maior problema aqui eh o tamanho do diretorio, pois estamos pre-alocando
+    // memoria para conter o diretorio.
+
+    // from cwd?
+    if (path[0] == '.' && path[1] == '/')
+    {
+        debug_print ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
+        printf      ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
+        goto fail;
+    }
+
+
+    // Shotcuts to execute programs.
+    
+    // Principais diretórios para execução de programas.
+    // no disco do sistema.
+    // Os dois pontos significa que o pathname é simplificado.
+    // e contém quatro caracteres que selecionam um 
+    // dos subdiretórios do diretório raiz, que podem muito bem
+    // terem seus endereços na memória pre-definidos para facilitar.
+    // gramado-like
+    // ::p/ = "/PORTALS/"   (system apps)
+
+
+    // para 32 entradas.
+    unsigned long BUGBUG_OVERFLOW = ( 32*128 );
+
+
+
+//
+// Loop
+//
+
+    // Search
+    // Convertendo o formato do nome do arquivo.
+    // >>> "12345678XYZ"
+    // Procura o nome no diretorio carregado anteriormente.
+    // Que eh o diretorio raiz
+
+__search:
+
+    fs_fntos ( (char *) name );
+
+    Status = (int) search_in_dir ( name, dir_address );
+    if (Status == 1)
+    { 
+        goto __found; 
+    }
+
+    //
+    // == Fail =====================================
+    //
+    
+    // Falhou a busca em todos os diretorios procurados.
+    
+    debug_print ("clone_and_execute_process: [FAIL] File not found!\n");
+    printf      ("clone_and_execute_process: [FAIL] File not found!\n");
+    goto fail;
+
+//
+// == go ====================================
+//
+
+__found:
+
+	//unsigned long old_image_pa; //usado para salvamento.
+
+	//#debug message.
+    //printf ("do_clone_execute_processs: clona o pai e executa o filho..\n");
+
+
+    //
+    // == Current ===========================================
+    //
+
+	// ## Current ##
+	// Checando a validade do processo atual.
+
+	//if ( current_process < 0 )
+	//    return 0;
+
+    Current = (struct process_d *) processList[current_process];
+
+    if ( (void *) Current == NULL ){
+        printf ("clone_and_execute_process: Current struct \n");
+        goto fail;
+    }else{
+        if ( Current->used != TRUE || Current->magic != 1234 ){ 
+            printf ("clone_and_execute_process: Current validation \n");
+            goto fail;
+        }
+
+        // #test
+       //pml4 = (unsigned long *) Current->pml4_VA;
+
+       if( (void*) Current->pml4_VA == NULL )
+            panic("clone_and_execute_process: Current->pml4_VA\n");
+
+        
+
+        // Salvando o endereço fisico da imagem 
+        // que existe no processo.
+        // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
+
+        //#debug
+        //printf(">>> check current process: %d %d \n", current_process, Current->pid );
+        
+        goto do_clone;
+        // ...
+    };
+
+//
+// == Clone =========================================
+//
+
+    // Cria uma estrutura do tipo processo, mas não inicializada.
+
+do_clone:
+
+    Clone = (struct process_d *) processObject();
+
+    if ( (void *) Clone == NULL )
+    {
+        debug_print ("clone_and_execute_process: [FAIL] Clone\n");
+        printf      ("clone_and_execute_process: [FAIL] Clone\n");
+        goto fail;
+    }
+
+    //
+    // Get PID.
+    // 
+
+    // Obtêm um índice para um slot vazio na lista de processos.
+    // Precisa estar dentro do range válido para processos
+    // em ring3.
+
+    Clone->pid = -1;  //fail
+
+    PID = (int) getNewPID();
+
+    if ( PID <= 0 || PID < USER_BASE_PID )
+    {
+        debug_print ("clone_and_execute_process: [FAIL] getNewPID\n");
+        printf      ("clone_and_execute_process: [FAIL] getNewPID %d \n", 
+            PID );
+        goto fail;
+    }
+
+    Clone->pid = (pid_t) PID;
+    Clone->uid = (uid_t) current_user;
+    Clone->gid = (gid_t) current_group;
+    Clone->used  = TRUE;
+    Clone->magic = 1234;
+
+    // Register.
+    // Saving the new process in the list.
+
+    processList[PID] = (unsigned long) Clone;
+
+
+    // Copiando a memória e o processo.
+    // Copy memory:
+    // >> Copia a memória usada pela imagem do processo.
+    // #bugbug: Esse é um momento crítico.
+    // #todo: Precisamos do suporte a imagens ELF.
+    // >> Clone the process: 
+    // Lets create the page directory for the Clone.
+    // Now we need to map the physical addresses we got 
+    // in the allocation routine.
+    // #obs: 
+    // Na hora de copiar o processo, a estrutura do clone 
+    // receberá os valores da estrutura do processo atual,
+    // até mesmo o endereço do diretório de páginas.
+    // See: process.c
+
+    // Explicando:
+    // Copia a imagem do processo atual e salva o endereço
+    // da copia num elemento da estrutura passada como argumento.
+
+    // #bugbug
+    // Estamos usando o ponteiro Current, 
+    // sem antes ao menos checarmos a validade.
+
+    Status = processCopyMemory(Current);
+    if ( Status != 0 ){
+        panic ("clone_and_execute_process: [FAIL] processCopyMemory\n");
+    }
+
+    // #important: It will also copy the control thread.
+    Status = processCopyProcess( Current->pid, Clone->pid );
+    if ( Status != 0 ){
+        panic ("clone_and_execute_process: [FAIL] processCopyProcess\n");
+    }
+
+//
+// Load image.
+//
+    
+    // Loading from rootdir?
+
+    // >> Load file:
+    // #importante: 
+    // Carregando a imagem do processo filho.
+    // Se o carregamento falhar, temos que abortar a clonagem,
+    // caso contrário, executa a cópia da imagem do pai. ??
+    // #bugbug: Essa rotina começou a falhar aqui. Convertendo 
+    // num formato errado.
+    // Movemos essa conversão para o início dessa função,
+    // onde checaremos se o arquivo está no diretório.
+    // #bugbug
+    // Se isso não está funcionando direito e uma thread 
+    // defeituosa fica remanescente quando digitamos um 
+    // comando errado então vamos matar a thread e o processo.
+
+    // #todo
+    // Num ambiente 'mp' precisaremos de um lock aqui.
+
+    //#debug
+    //printf ("do_clone_execute_process: %s\n",filename);
+
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
+
+
+    if ( dir_address == 0 ){
+        panic("clone_and_execute_process: dir_address\n");
+    }
+
+    if ( (void *) Clone->Image == NULL ){
+        panic("clone_and_execute_process: Clone->Image\n");
+    }
+
+    Status = (int) fsLoadFile ( 
+                       VOLUME1_FAT_ADDRESS, 
+                       (unsigned long) dir_address,  //#bugbug: This is only for the root dir.
+                       (unsigned long) dir_entries,  //#bugbug: Number of entries. 
+                       name, 
+                       (unsigned long) Clone->Image,
+                       BUGBUG_IMAGE_SIZE_LIMIT );
+
+    if ( Status != 0 )
+    {
+        // #todo
+        // We need a helper function for that.
+        
+        
+        // #??
+        // Is this a valid thread at this moment?
+
+        // Kill control thread
+        Clone->control->used  = FALSE;
+        Clone->control->magic = 0;
+        Clone->control->state = DEAD;
+        Clone->control == NULL;
+        Clone->used  = FALSE;
+        Clone->magic = 0;
+        Clone = NULL;
+
+        //#todo
+        //check number of entries in the routine above 
+
+        debug_print ("clone_and_execute_process: [FAIL] Couldn't load the file\n");
+        printf      ("clone_and_execute_process: [FAIL] Couldn't load the file %s\n", 
+            filename );
+            
+        goto fail;
+   }
+
+
+    // Check ELF signature.
+    // OK. O comando existe e o arquivo foi carregado, mas 
+    // precisamos saber se a assinatura de ELF é válida.
+    // Assinatura ELF inválida. 
+    // Vamos matar a thread e o processo.
+
+    Status = (int) fsCheckELFFile ( (unsigned long) Clone->Image );
+    
+    if ( Status < 0 )
+    {
+        Clone->control->used  = FALSE;
+        Clone->control->magic = 0;
+        Clone->control == NULL;
+        Clone->used  = FALSE;
+        Clone->magic = 0; 
+        Clone = NULL;
+        debug_print ("clone_and_execute_process: [FAIL] ELF fail \n");
+        printf      ("clone_and_execute_process: [FAIL] ELF fail \n");
+        goto fail;
+    }
+
+    // >> Page table:
+    // Remapeando a imagem, mas agora no diretório de páginas
+    // do processo filho.
+    // Lembrando que já criamos o diretório de páginas para o clone.
+    // ENTRY_USERMODE_PAGES, esse número de entrada é para o 
+    // endereço virtual padrão para aplicativos em ring3, 0x400000.
+
+    // #todo
+    // Retornaremos o endereço virtual da pagetable.
+    // See: core/ps/x86/pages.c
+
+    if( (void*) Clone->pml4_VA == NULL ){
+        panic("clone_and_execute_process: Clone->pml4VA\n");
+    }
+
+    if( (void*) Clone->ImagePA == NULL ){
+        panic("clone_and_execute_process: Clone->ImagePA\n");
+    }
+
+    // page table.
+
+    panic ("clone_and_execute_process: [TODO] CreatePageTable \n");
+
+    /*
+
+    __pt = (void *) CreatePageTable ( 
+                        (unsigned long) Clone->pml4VA, 
+                        ENTRY_USERMODE_PAGES, 
+                        (unsigned long) Clone->ImagePA );
+
+    if ( (void*) __pt == NULL ){
+        panic ("clone_and_execute_process: __pt\n");
+    }
+    */
+
+
+    // Configurando o endereço virtual padrão para aplicativos.
+    // Novo endereço virtual da imagem. Conseguimos isso 
+    // por causa da criação da pagetable, logo acima.
+    // # Caution
+    // Entry point and stack.
+    // We are clonning only the control thread.
+    // The entry point in the start of the image. 0x401000.
+    // And the stack ??
+
+    Clone->Image        = (unsigned long) CONTROLTHREAD_BASE;        // 0x200000 
+    Clone->control->rip = (unsigned long) CONTROLTHREAD_ENTRYPOINT;  // 0x201000
+
+        // #bugbug
+        // #todo
+        // Ok mesma coisa precisa ser feito para o endereço
+        // virtual da pilha.
+
+        // #Cuidado
+        // Heap for Clone.
+        // Essa é a rotina usada na criação de processo 
+        // pra gerar um heap para ele.
+        // Vamos tentar usar isso na rotina de clonagem.
+
+
+    if (g_heappool_va == 0){
+        panic("clone_and_execute_process: g_heappool_va\n");
+    }
+
+    if (g_heap_count == 0){
+        panic("clone_and_execute_process: g_heap_count\n");
+    }
+
+    if (g_heap_size == 0){
+        panic("clone_and_execute_process: g_heap_size\n");
+    }
+
+    // #bugbug
+    // There is a limit here. End we will have a huge problem 
+    // when reach it.
+
+    // Heap.
+
+    Clone->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
+    Clone->HeapSize = (unsigned long) g_heap_size;
+    Clone->HeapEnd  = (unsigned long) (Clone->Heap + Clone->HeapSize); 
+    g_heap_count++;
+
+    // Stack
+
+    // Stack for the clone. 
+    Clone->control->rsp = CONTROLTHREAD_STACK;  //0x007FFFF0 
+    Clone->Stack        = CONTROLTHREAD_STACK;  //0x007FFFF0
+    Clone->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
+    Clone->StackEnd = ( Clone->Stack - Clone->StackSize );
+
+
+//
+// Process name.
+//
+
+    // name.
+    strcpy ( Clone->__processname, (const char *) filename );   
+    //Clone->processName_len = (size_t) strlen ( (const char *) filename );
+    Clone->processName_len = (size_t) sizeof(Clone->__processname);
+
+    //
+    // Socket ============
+    //
+
+    for (sIndex=0; sIndex<32; ++sIndex){
+        Clone->socket_pending_list[sIndex] = 0; 
+    };
+
+    Clone->socket_pending_list_head = 0;
+    Clone->socket_pending_list_tail = 0;
+    Clone->socket_pending_list_max  = 0; //atualizado pelo listen();
+
+
+    //
+    // syscall counter
+    // 
+
+    Clone->syscalls_counter = 0;
+
+
+    //
+    // # HACK HACK
+    //
+
+
+    // [pai]
+    Current->control->state = READY;
+
+    // [filho]
+    Clone->control->saved = 0;
+    
+    // Change the state to standby.
+    // This thread is gonna run in the next taskswitch.
+    // Or maybe in this moment.
+    
+    SelectForExecution (Clone->control);
+
+
+    refresh_screen();
+
+	//pai
+    current_process = Current->pid;
+    current_thread  = Current->control->tid;
+
+    // paranoia.    
+    if ( current_process < 0 || current_thread < 0 )
+    {
+        panic("clone_and_execute_process: current_process or current_thread\n");
+    }
+
+    // Return child's PID.
+
+    return (pid_t) Clone->pid;
+
+fail:
+    refresh_screen();
+    return (pid_t) (-1);
+}
+
+
 unsigned long __GetProcessStats ( int pid, int index ){
 
     struct process_d *p;

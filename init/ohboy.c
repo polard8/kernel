@@ -232,7 +232,11 @@ void main(void)
     
     //close(0); close(1); close(2);
 
+    rtl_clone_and_execute("gdeshell.bin");
+
     printf ("init.bin: done\n");
+
+
 
 // Return to marginal.asm
 }

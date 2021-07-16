@@ -148,8 +148,7 @@ all-c:
 #
 
 	#$(CC) -c main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
-	gcc -c main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
-
+	gcc -c init/main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
 
 
 #

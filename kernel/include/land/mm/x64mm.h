@@ -13,8 +13,6 @@
 #define PTE_PER_PAGE    512
 
 
-
-
 //#deprecated, use pml4 instead.
 //unsigned long gKernelPageDirectoryAddress; 
 unsigned long gKernelPML4Address; 

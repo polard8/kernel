@@ -1129,6 +1129,19 @@ void *sci2 (
         return NULL; 
     }
 
+	// 900
+	// Clona e executa o filho dado o nome do filho.
+	// O filho inicia sua execução do início da imagem.
+	// #bugbug: Isso às vezes falha na máquina real.
+	// #todo: Use more arguments.
+	// See: See: ps/action/clone.c
+	// See: process.c
+
+    // IN: name, dir address.
+    if ( number == 900 ){
+        debug_print("sci2: [900] clone and execute\n");
+        return (void *) clone_and_execute_process( (const char *) arg2 );
+    }
 
     // fcntl()
     // See: sci/sys/sys.c    
