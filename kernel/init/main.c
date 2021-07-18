@@ -462,7 +462,7 @@ int kernel_main(int arch_type)
         //case CURRENT_ARCH_X86:
         //    break;
 
-        // See: x64init.c
+        // See: x64init.c in kernel/arch/x86_64/
         case CURRENT_ARCH_X86_64:
             debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             //printf      ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");

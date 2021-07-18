@@ -11,7 +11,6 @@ extern void x64_clear_nt_flag (void);
 // local
 //void x64init_load_pml4_table(void *phy_addr)
 void x64init_load_pml4_table(unsigned long phy_addr)
-
 {
     asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
 }
@@ -20,6 +19,7 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 
 // Função local.
 // Inicializa só o init.bin
+// #todo: Change to CreateInit
 
 void __x64StartInit (void)
 {
@@ -673,7 +673,6 @@ int x64main (void)
 		// Esse status só muda quando a thread rodar.
 
         dead_thread_collector_status = FALSE;
-
     };
 
 

@@ -595,7 +595,8 @@ int mmSetUpPaging (void)
 
 
 // =====================================
-// PML4, PDPT, PD, PT
+// Levels: PML4, PDPT, PD, PT
+//
 // PML4 - Page Map Level 4
 // PDPT - Page Directory Pointer Table
 // PD   - Page Directory
