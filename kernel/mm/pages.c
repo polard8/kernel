@@ -15,6 +15,174 @@ extern unsigned long SavedLFB;               // #todo: precisamos que o bl passe
 //extern unsigned long SavedBPP;
 // ...
 
+// Vamos criar uma pagetable com 512 entradas
+// para mapearmos uma região da memória física.
+// Em seguida instalar da tabelas passadas via argumento.
+// Os endereços virtuas das tabela passados via parâmetro
+// pertencem ao pml4 do kernel e nos permite acessar essas tabelas
+// para configurarmos elas.
+// #todo: This is a work in progress.
+// #bugbug: è uma rotina muito ruim, se possível substituir por algo melhor.
+
+void *CreateAndIntallPageTable (
+    unsigned long pml4_va,   // page map level 4
+    unsigned long pml4_index,
+    unsigned long pdpt_va,   // page directory pointer table
+    unsigned long pdpt_index,
+    unsigned long pd_va,     // page directory 
+    int pd_index,            // Install the pagetable into this entry of the page directory. 
+    unsigned long region_pa )
+{
+    int i=0;
+    
+    // #todo
+    // Vamos criar uma pagetable com 512 entradas
+    // para mapearmos uma região da memória física.
+
+    debug_print("CreateAndIntallPageTable: [TODO] NOT TESTED YET\n");
+
+
+// =========================
+    if ( pml4_va == 0 ){
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pml4_va\n");
+        return NULL;
+    }
+
+    if ( pml4_index <0 || pml4_index >= 512 )
+    {
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pml4_index\n");
+        return NULL;
+    }
+
+// ============================
+    if ( pdpt_va == 0 ){
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pdpt_va\n");
+        return NULL;
+    }
+
+    if ( pdpt_index <0 || pdpt_index >= 512 )
+    {
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pdpt_index\n");
+        return NULL;
+    }
+
+// ============================
+    if ( pd_va == 0 ){
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pd_va\n");
+        return NULL;
+    }
+
+    if ( pd_index <0 || pd_index >= 512 )
+    {
+        debug_print("CreateAndIntallPageTable: [FAIL] Invalid pd_index\n");
+        return NULL;
+    }
+
+
+// ============================
+
+    // Não queremos mapear o início da memória física.
+    if ( region_pa == 0 ){
+        panic ("CreateAndIntallPageTable: [FAIL] region_pa\n");
+    }
+
+
+//
+// Page table
+//
+
+    unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
+
+    if ( ptVA == 0 ){
+        panic ("CreateAndIntallPageTable: [FAIL] ptVA\n");
+    }
+
+    // Vamos mapear uma região de memória 
+    // preenchendo a nossa page table recem criada.
+
+    // Essa rotina preenche uma pagetable, mapeando
+    // a região indicada.
+
+    mm_fill_page_table( 
+        (unsigned long) pd_va,      // directory va. 
+        (int) pd_index,             // directory entry.
+        (unsigned long) ptVA,       // page table va.
+        (unsigned long) region_pa,  // Region 2mb pa.
+        (unsigned long) 7 );        // flags.
+
+
+//
+// Install
+//
+
+// Vamos instalar a pagetable no diretorio de páginas.
+// Antes vamos pegar o endereço físico da page table.
+// Pois precisamos desse endereço pra colocar no diretório de páginas.
+
+    // Nessa conversão precisamos usar o pml4 do kernel.
+//
+// Installing
+//
+
+
+    unsigned long *PageTable                 = (unsigned long *) ptVA;
+    unsigned long *PageDirectory             = (unsigned long *) pd_va;
+    unsigned long *PageDirectoryPointerTable = (unsigned long *) pdpt_va;
+    unsigned long *PML4                      = (unsigned long *) pml4_va;
+
+
+    unsigned long __ptPA = (unsigned long) virtual_to_physical ( 
+                                             PageTable, 
+                                             gKernelPML4Address ); 
+
+
+    unsigned long __pdPA = (unsigned long) virtual_to_physical ( 
+                                             PageDirectory, 
+                                             gKernelPML4Address ); 
+                                             
+
+    unsigned long __pdptPA = (unsigned long) virtual_to_physical ( 
+                                             PageDirectoryPointerTable, 
+                                             gKernelPML4Address ); 
+
+ 
+    if ( __ptPA == 0 ){
+        panic ("CreateAndIntallPageTable: __ptPA\n");
+    }
+
+    if ( __pdPA == 0 ){
+        panic ("CreateAndIntallPageTable: __pdPA\n");
+    }
+
+    if ( __pdptPA == 0 ){
+        panic ("CreateAndIntallPageTable: __pdptPA\n");
+    }
+
+    //============================
+    // Page Directory
+    // Instalando o ponteiro para a pagetable entrada do diretório.
+    PageDirectory[pd_index] = (unsigned long) __ptPA;
+    PageDirectory[pd_index] = (unsigned long) PageDirectory[pd_index] | 7; 
+
+
+    //============================
+    // Page Directory Pointer Table
+    PageDirectoryPointerTable[pdpt_index] = (unsigned long) __pdPA;
+    PageDirectoryPointerTable[pdpt_index] = (unsigned long) PageDirectoryPointerTable[pdpt_index] | 7; 
+
+
+    //============================
+    // PML4
+    PML4[pml4_index] = (unsigned long) __pdptPA;
+    PML4[pml4_index] = (unsigned long) PML4[pml4_index] | 7; 
+
+    panic ("CreateAndIntallPageTable: [TODO] This is a work in progress.\n");
+
+
+    // #todo retorno.
+    
+    return NULL;
+}
 
 
 // #todo
@@ -515,14 +683,14 @@ void page_enable(void)
 int mm_fill_page_table( 
     unsigned long directory_va, 
     int           directory_entry,
-    unsigned long pd_va,
+    unsigned long pt_va,
     unsigned long region_2mb_pa,
     unsigned long flags )
 {
-    
+
     register int i=0;
     unsigned long *dir = (unsigned long *) directory_va;
-    unsigned long *pt  = (unsigned long *) pd_va;
+    unsigned long *pt  = (unsigned long *) pt_va;
     unsigned long pa   = (unsigned long) region_2mb_pa;
 
     if ( directory_entry < 0 || directory_entry >= 512 ){ return -1; }

@@ -1071,10 +1071,23 @@ unsigned long memorysizeAvailableVirtualMemory;
 // == prototypes =================================================
 //
 
-int mm_fill_page_table( 
+
+
+void *CreateAndIntallPageTable (
+    unsigned long pml4_va,   // page map level 4
+    unsigned long pml4_index,
+    unsigned long pdpt_va,   // page directory pointer table
+    unsigned long pdpt_index,
+    unsigned long pd_va,     // page directory 
+    int pd_index,            // Install the pagetable into this entry of the page directory. 
+    unsigned long region_pa );
+
+
+int 
+mm_fill_page_table( 
     unsigned long directory_va, 
     int           directory_entry,
-    unsigned long pd_va,
+    unsigned long pt_va,
     unsigned long region_2mb_pa,
     unsigned long flags );
 

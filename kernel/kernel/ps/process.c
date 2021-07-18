@@ -441,13 +441,15 @@ do_clone:
     // PT   - Page Table
 
     /*
-     // Cria uma pagetable em um dado diretório de páginas.
-     // Mas temos que refazer essa rotina pois estamos o pml4 como argumento.
-
-    __pt = (void *) CreatePageTable ( 
-                        (unsigned long) Clone->pml4VA, 
-                        ENTRY_USERMODE_PAGES,    // See: gentry.h
-                        (unsigned long) Clone->ImagePA );
+    // See: pages.c
+    __pt = CreateAndIntallPageTable (
+               (unsigned long) Clone->pml4VA,     // page map level 4
+               (unsigned long) ?, 
+               (unsigned long) ?,                 // page directory pointer table
+               (unsigned long) ?, 
+               (unsigned long) ?,                 // page directory 
+               (int) ENTRY_USERMODE_PAGES,        // Install the pagetable into this entry of the page directory. See: gentry.h
+               (unsigned long) Clone->ImagePA );  // region pa
 
     if ( (void*) __pt == NULL ){
         panic ("clone_and_execute_process: __pt\n");
@@ -568,6 +570,14 @@ do_clone:
     {
         panic("clone_and_execute_process: current_process or current_thread\n");
     }
+
+
+// #todo
+// Antes de retornarmos, vamos exibir todas as informações
+// sobre esse processo e essa thread.
+// Isso ajudará a reorganizarmos essa rotina.
+
+    
 
     // [4] done.
     debug_print ("clone_and_execute_process: [5] Done\n");
