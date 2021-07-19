@@ -45,11 +45,6 @@ _int128:
     ;call _xxxxINT128_DEBUG_MESSAGE
     call _sci0
 
-    ;jmp unit3_int128_release
-; ---
-; int 128 release.
-;unit3_int128_release:
-
     mov qword [.int128Ret], rax 
 
     popfq
@@ -142,11 +137,6 @@ _int129:
     ;call _xxxxINT129_DEBUG_MESSAGE
     call _sci1
 
-    ;jmp unit3_int129_release
-; ---
-; int 129 release.
-;unit3_int129_release:
-
     mov qword [.int129Ret], rax 
 
     popfq
@@ -235,12 +225,6 @@ _int130:
 
     ;call _xxxxINT130_DEBUG_MESSAGE
     call _sci2
-
-    ;jmp unit3_int130_release
-; ---
-; unit 3: 
-; int 130 release.
-;unit3_int130_release:
 
     mov qword [.int130Ret], rax 
 
