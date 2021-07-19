@@ -249,6 +249,15 @@ struct thread_d
     unsigned long pml4_VA;
     unsigned long pml4_PA;
 
+    // The first pdpt
+    unsigned long pdpt0_VA;
+    unsigned long pdpt0_PA;
+
+    // The first pd
+    unsigned long pd0_VA;
+    unsigned long pd0_PA;
+
+
     // ring
     unsigned long iopl;
     unsigned long PreviousMode;

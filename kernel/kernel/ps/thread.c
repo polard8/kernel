@@ -566,6 +566,10 @@ int thread_profiler( int service ){
  * 2021 - 64bit version
  */
 
+// #todo
+// Incluir o 'ring' como parâmetro.
+// Isso vai ajudar a função decidir quais seletores de segmento usar.
+
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
@@ -811,10 +815,15 @@ get_next:
         Thread->priority      = (unsigned long) PRIORITY_NORMAL;  //dynamic
 
 
-		//IOPL.
-		//Se ela vai rodar em kernel mode ou user mode.
-		//@todo: herdar o mesmo do processo.
-		Thread->iopl = RING3;             // Process->iopl;
+		// IOPL.
+		// Se ela vai rodar em kernel mode ou user mode.
+		// @todo: herdar o mesmo do processo.
+
+        // #todo
+        // Isso pode ser passado via parâmetro de função.
+
+        Thread->iopl = RING3;             // Process->iopl;
+
 		Thread->saved = 0;                // Saved flag.
 		Thread->preempted = PREEMPTABLE;  // Se pode ou n�o sofrer preemp��o.
 		
@@ -954,14 +963,19 @@ get_next:
 		// @todo: 
         // O processo dono da thread precisa ter um diret�rio 
 		// de p�ginas v�lido.
-		
+
 		// #bugbug
 		// Page Directory. (#CR3).
 		// Estamos usando o page directory do processo.
 		// Page directory do processo ao qual a thread pertence.
 
-        //Thread->DirectoryPA = (unsigned long ) Process->DirectoryPA;
-        Thread->pml4_PA = (unsigned long ) Process->pml4_PA; 
+        Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;  //#todo
+        Thread->pml4_PA  = (unsigned long ) Process->pml4_PA; 
+        Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
+        Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
+        Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
+        Thread->pd0_PA   = (unsigned long ) Process->pd0_PA; 
+        
 
         //ServiceTable ..
         //Ticks ...

@@ -186,13 +186,14 @@ __found:
         // #test
         //pml4 = (unsigned long *) Current->pml4_VA;
 
-        // Testing if we have a non null pml4 virtual address.
+        // Testing if the current process has a 
+        // null pml4 virtual address.
 
         if( (void*) Current->pml4_VA == NULL ){
             printf ("clone_and_execute_process: [FAIL] Current->pml4_VA\n");
             goto fail;
         }
-        
+
         // Salvando o endereço fisico da imagem 
         // que existe no processo.
         // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
@@ -423,14 +424,18 @@ do_clone:
         panic("clone_and_execute_process: Clone->ImagePA\n");
     }
 
+
+
+
 //
-// #### PANIC ####  page table.
+// Breakpoint.
 //
 
-    debug_print ("*hang, This is a work in progress\n");
-         printf ("*hang, This is a work in progress\n");
 
-    panic ("clone_and_execute_process: [TODO] CreatePageTable \n");
+    debug_print ("clone_and_execute_process: [Breakpoint] This is a work in progress\n");
+         printf ("clone_and_execute_process: [Breakpoint] This is a work in progress\n");
+    debug_print ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
+    panic       ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
 
     // =====================================
     // Levels: PML4, PDPT, PD, PT
@@ -438,23 +443,24 @@ do_clone:
     // PML4 - Page Map Level 4
     // PDPT - Page Directory Pointer Table
     // PD   - Page Directory
-    // PT   - Page Table
+    // PT   - Page Table    
 
     /*
     // See: pages.c
     __pt = CreateAndIntallPageTable (
-               (unsigned long) Clone->pml4VA,     // page map level 4
-               (unsigned long) ?, 
-               (unsigned long) ?,                 // page directory pointer table
-               (unsigned long) ?, 
-               (unsigned long) ?,                 // page directory 
-               (int) ENTRY_USERMODE_PAGES,        // Install the pagetable into this entry of the page directory. See: gentry.h
-               (unsigned long) Clone->ImagePA );  // region pa
+               (unsigned long) Clone->pml4_VA,   // page map level 4
+               (unsigned long) 0,                // index  
+               (unsigned long) Clone->pdpt0_VA,  // page directory pointer table
+               (unsigned long) 0, 
+               (unsigned long) Clone->pd0_VA,         // page directory 
+               (int)           ENTRY_USERMODE_PAGES,  // Install the pagetable into this entry of the page directory. See: gentry.h
+               (unsigned long) Clone->ImagePA );      // region pa
 
     if ( (void*) __pt == NULL ){
         panic ("clone_and_execute_process: __pt\n");
     }
     */
+    
 
     // Configurando o endereço virtual padrão para aplicativos.
     // Novo endereço virtual da imagem. 

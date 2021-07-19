@@ -232,8 +232,9 @@ void main(void)
     
     //close(0); close(1); close(2);
 
-
-    
+    // #todo: 
+    // Trabalhando na implementação dessa rotina em ring0.
+    // See: x64init.c, pages.c, process.c ...
     //rtl_clone_and_execute("gdeshell.bin");
 
     printf ("init.bin: done\n");

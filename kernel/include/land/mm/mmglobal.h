@@ -7,7 +7,12 @@
  *
  */
 
+#ifndef __MMGLOBAL_H
+#define __MMGLOBAL_H    1
 
+
+
+// #rever
 // Macros para conversão de endereços.
 #define PAGE_GET_DIR(addr)   ((unsigned)(addr) >> 22)
 #define PAGE_GET_TAB(addr)  (((unsigned)(addr) >> 12) & 0x3FF)
@@ -44,6 +49,10 @@ struct lfb_d
 	unsigned long address; 
 };
 */
+
+
+#endif   
+
 
 
 //

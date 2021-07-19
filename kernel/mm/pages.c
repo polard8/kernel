@@ -273,6 +273,7 @@ unsigned long get_table_pointer (void)
     return (unsigned long) table_pointer_heap_base;
 }
 
+
 /*
  * CloneKernelPML4:
  *
@@ -280,9 +281,7 @@ unsigned long get_table_pointer (void)
  *    OUT: The virtual address of the new directory.
  */
 
-// #todo
-// CloneKernelPML4
-
+// OUT: va
 void *CloneKernelPML4(void)
 {
     register int i=0;
@@ -755,7 +754,7 @@ int mmSetUpPaging (void)
     // pois é isso o que dá pra ter com apenas 9 bits.
 
     // #todo
-    // Precisamos encontra espaço na memória para kernel_pml4 e kernel_pdpt.
+    // Precisamos encontra espaço na memória para kernel_pml4 e kernel_pdpt0.
     // Precisamos criar 'worker functions' para essas rotinas repetitivas.
 
     // See:
@@ -772,16 +771,57 @@ int mmSetUpPaging (void)
 
     // Isso porque endereço físico e virtual são igual abaixo de 1 mb.
     // 0x0009C000va = 0x0009C000pa
+
     gKernelPML4Address = KERNEL_PML4_VA;
 
     // level 4
-    unsigned long *kernel_pml4 = (unsigned long *) KERNEL_PML4_PA;
+    unsigned long *kernel_pml4  = (unsigned long *) KERNEL_PML4_PA;
     // level 3
-    unsigned long *kernel_pdpt = (unsigned long *) KERNEL_PDPT_PA;
+    unsigned long *kernel_pdpt0 = (unsigned long *) KERNEL_PDPT_PA;
     // level 2
-    unsigned long *kernel_pd0  = (unsigned long *) KERNEL_PD_PA;
+    unsigned long *kernel_pd0   = (unsigned long *) KERNEL_PD_PA;
     // level 1
     // a lot of page tables in the level 1.
+
+
+//
+// Saving the data
+//
+
+// Saving some info used by the kernel to handle 
+// the memory he needs.
+
+// See:
+// x64mmm.h
+
+    // pml4
+    kernel_mm_data.pml4_va = (unsigned long) kernel_pml4;
+    kernel_mm_data.pml4_pa = (unsigned long) KERNEL_PML4_PA;
+
+    // pdpt0
+    kernel_mm_data.pdpt0_va = (unsigned long) kernel_pdpt0;
+    kernel_mm_data.pdpt0_pa = (unsigned long) KERNEL_PDPT_PA;
+
+    // pd0
+    kernel_mm_data.pd0_va = (unsigned long) kernel_pd0;
+    kernel_mm_data.pd0_pa = (unsigned long) KERNEL_PD_PA;
+
+    kernel_mm_data.used   = TRUE;
+    kernel_mm_data.magic  = 1234; 
+
+
+// Check
+
+    if ( kernel_mm_data.pml4_va  == 0 || 
+         kernel_mm_data.pml4_pa  == 0 ||
+         kernel_mm_data.pdpt0_va == 0 || 
+         kernel_mm_data.pdpt0_pa == 0 ||
+         kernel_mm_data.pd0_va   == 0 || 
+         kernel_mm_data.pd0_pa   == 0 )
+    {
+        debug_print ("mmSetUpPaging: [FAIL] Invalid kernel_mm_data \n");
+        panic       ("mmSetUpPaging: [FAIL] Invalid kernel_mm_data \n");
+    }
 
 
 // =============================================================
@@ -987,7 +1027,7 @@ int mmSetUpPaging (void)
 
     // Clear level 3
     for ( i=0; i < 512; i++ ){
-       kernel_pdpt[i] = (unsigned long) 0 | 2;
+       kernel_pdpt0[i] = (unsigned long) 0 | 2;
     };
 
     // Clear level 2
@@ -1009,13 +1049,13 @@ int mmSetUpPaging (void)
     // Pointing the 'page directory' address 
     // at the first entry in the 'page directory pointer table'.
 
-    kernel_pdpt[0] = (unsigned long) &kernel_pd0[0];
-    kernel_pdpt[0] = (unsigned long) kernel_pdpt[0] | 7; //3;
+    kernel_pdpt0[0] = (unsigned long) &kernel_pd0[0];
+    kernel_pdpt0[0] = (unsigned long) kernel_pdpt0[0] | 7; //3;
 
     // pdpt >> pml4
     // Pointing the 'page directory pointer table' address 
     // at the first entry in the kernel_pml4.
-    kernel_pml4[0] = (unsigned long) &kernel_pdpt[0];
+    kernel_pml4[0] = (unsigned long) &kernel_pdpt0[0];
     kernel_pml4[0] = (unsigned long) kernel_pml4[0] | 7; //3;
 
 //

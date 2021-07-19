@@ -593,7 +593,7 @@ void *create_CreateRing3InitThread (void)
     t->cs     = 0x1B;  
     t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 
-    t->ds = 0x23;
+    t->ds = 0x23;  
     t->es = 0x23;
     t->fs = 0x23;
     t->gs = 0x23;

@@ -13,9 +13,45 @@
 #define PTE_PER_PAGE    512
 
 
-//#deprecated, use pml4 instead.
-//unsigned long gKernelPageDirectoryAddress; 
+
+
+
+
+// The virtual address of the kernel pml4 table.
 unsigned long gKernelPML4Address; 
+
+// Some useful data for memory management.
+
+struct mm_data_d
+{
+    int used;
+    int magic;
+
+    unsigned long pml4_va; 
+    unsigned long pml4_pa; 
+
+    // We just need one table to handle a basic initialization.
+
+    // Saving the pointer for the first table.
+    unsigned long pdpt0_va; 
+    unsigned long pdpt0_pa; 
+
+    // We just need one table to handle a basic initialization.
+
+    // Saving the pointer for the first table.
+    unsigned long pd0_va; 
+    unsigned long pd0_pa; 
+};
+
+// Kernel process.
+struct mm_data_d kernel_mm_data;
+// Init process.
+struct mm_data_d init_mm_data;
+// ...
+
+
+
+
 
 //
 // == zones ==================================================

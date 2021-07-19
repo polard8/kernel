@@ -69,6 +69,26 @@ void __x64StartInit (void)
 	// temos que checar a validade do endereço do dir criado
 	// antes de passarmos..
 
+    void *init_pml4_va = (void *) CloneKernelPML4();
+
+    if ( init_pml4_va == 0 ){
+        panic ("__x64StartInit: init_pml4_va\n");
+    }
+
+    init_mm_data.pml4_va = init_pml4_va;
+    init_mm_data.pml4_pa = (unsigned long) virtual_to_physical ( 
+                                               init_pml4_va, 
+                                               gKernelPML4Address );
+
+    if ( init_mm_data.pml4_pa == 0 ){
+        panic ("__x64StartInit: init_mm_data.pml4_pa\n");
+    }
+
+    // ...
+
+    init_mm_data.used  = TRUE;
+    init_mm_data.magic = 1234;
+
     InitProcess = (void *) create_process ( 
                                NULL, NULL, NULL, 
                                (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
@@ -76,11 +96,30 @@ void __x64StartInit (void)
                                (int) KernelProcess->pid, 
                                "INIT-PROCESS", 
                                RING3, 
-                               (unsigned long ) CloneKernelPML4() ); //gKernelPML4Address
+                               (unsigned long ) init_pml4_va );
 
     if ( (void *) InitProcess == NULL ){
         panic ("__x64StartInit: InitProcess\n");
     }else{
+
+        
+        if ( init_mm_data.used != TRUE || init_mm_data.magic != 1234 )
+        {
+            panic ("x64main: kernel_mm_data validation\n");
+        }
+
+        // Esse foi configurado agora.
+        InitProcess->pml4_VA = init_mm_data.pml4_va;
+        InitProcess->pml4_PA = init_mm_data.pml4_pa; 
+
+        // Herdado do kernel
+        InitProcess->pdpt0_VA = kernel_mm_data.pdpt0_va;
+        InitProcess->pdpt0_PA = kernel_mm_data.pdpt0_pa; 
+
+        // Herdado do kernel
+        InitProcess->pd0_VA = kernel_mm_data.pd0_va;
+        InitProcess->pd0_PA = kernel_mm_data.pd0_pa; 
+
         InitProcess->position = SPECIAL_GUEST;
         fs_initialize_process_cwd ( InitProcess->pid, "/" );
     };
@@ -97,6 +136,15 @@ void __x64StartInit (void)
     if ( (void *) InitThread == NULL ){
         panic ("__x86StartInit: InitThread\n");
     }else{
+
+        // Herdando do processo configurado logo antes.
+        InitThread->pml4_VA  = InitProcess->pml4_VA;
+        InitThread->pml4_PA  = InitProcess->pml4_PA;
+        InitThread->pdpt0_VA = InitProcess->pdpt0_VA;
+        InitThread->pdpt0_PA = InitProcess->pdpt0_PA;
+        InitThread->pd0_VA   = InitProcess->pd0_VA;
+        InitThread->pd0_PA   = InitProcess->pd0_PA;
+
 
         InitThread->position = SPECIAL_GUEST;
 
@@ -146,8 +194,7 @@ void __x64StartInit (void)
     //ipccore_register ( 
         //(int) 0, 
         //(struct process_d *) InitProcess, 
-        //(struct thread_d *) InitThread );   
-
+        //(struct thread_d *) InitThread ); 
 }
 
 
@@ -634,6 +681,21 @@ int x64main (void)
     if ( (void *) KernelProcess == NULL ){
         panic ("x64main: KernelProcess\n");
     }else{
+
+        if ( kernel_mm_data.used != TRUE || kernel_mm_data.magic != 1234 )
+        {
+            panic ("x64main: kernel_mm_data validation\n");
+        }
+
+        KernelProcess->pml4_VA = kernel_mm_data.pml4_va;
+        KernelProcess->pml4_PA = kernel_mm_data.pml4_pa; 
+
+        KernelProcess->pdpt0_VA = kernel_mm_data.pdpt0_va;
+        KernelProcess->pdpt0_PA = kernel_mm_data.pdpt0_pa; 
+
+        KernelProcess->pd0_VA = kernel_mm_data.pd0_va;
+        KernelProcess->pd0_PA = kernel_mm_data.pd0_pa; 
+
         KernelProcess->position = KING;
         fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
         //...
@@ -650,6 +712,13 @@ int x64main (void)
     if ( (void *) EarlyRING0IDLEThread == NULL ){
         panic ("x64main: EarlyRING0IDLEThread\n");
     }else{
+
+        EarlyRING0IDLEThread->pml4_VA  = KernelProcess->pml4_VA;
+        EarlyRING0IDLEThread->pml4_PA  = KernelProcess->pml4_PA;
+        EarlyRING0IDLEThread->pdpt0_VA = KernelProcess->pdpt0_VA;
+        EarlyRING0IDLEThread->pdpt0_PA = KernelProcess->pdpt0_PA;
+        EarlyRING0IDLEThread->pd0_VA   = KernelProcess->pd0_VA;
+        EarlyRING0IDLEThread->pd0_PA   = KernelProcess->pd0_PA;
 
         // Idle thread
         // #todo
