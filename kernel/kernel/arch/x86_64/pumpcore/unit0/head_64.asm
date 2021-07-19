@@ -2738,28 +2738,34 @@ align 8
 ; Esses includes são padronizados. Não acrescentar outros.
 
 
+;---------------------
     ; unit 0
     ; Inicialização.
     ; Funções de apoio à inicialização do Kernel 32bit.
     %include "unit0lib.asm" 
 
-    ; Interrupções de hardware (irqs) e faults.
-    ; Interrupções de software.
-
+;---------------------
     ; unit 1
+    ; Interrupções de hardware (irqs) e faults.
     %include "../unit1/unit1hw.asm"
-    %include "../unit1/unit1sw.asm"
 
     ; unit 2 in C.
 
     ; unit 3
     %include "../unit3/unit3hw.asm"
-    %include "../unit3/unit3sw.asm"
 
+;---------------------
+    ; unit 4
     %include "../unit4/unit4lib.asm" 
 
+;---------------------
+    ; visitor
+    ; Interrupções de software.
+    %include "../visitor/sw.asm"
+    %include "../visitor/swlib.asm"
 
-;=================================================================
+
+;===================================================
 ; DATA: 
 ;     Início do Segmento de dados.
 ;     Coloca uma assinatura no todo.

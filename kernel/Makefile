@@ -5,9 +5,27 @@
 # in the folder kernel/1pump/arch/x86_64/pumpcore/
 # Evething starts in the file head_64.asm
 
+
+# Make variables (CC, etc...)
+AS	= as
+LD	= ld
+CC	= gcc
+AR	= ar
+MAKE	= make
+NASM	= nasm
+OBJCOPY	= objcopy
+OBJDUMP	= objdump
+LEX	= flex
+YACC	= bison
+PERL	= perl
+PYTHON	= python
+PYTHON2	= python2
+PYTHON3	= python3
+RUBY	= ruby
+
+
 # See:
 # https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
-
 
 #original: gramado 32bit
 #CFLAGS := -m64 \
@@ -125,31 +143,37 @@ sci.o
 
 
 PHONY := all
-all: kernel-head all-c link-kernel clean
+all: kernel-header kernel-content kernel-footer \
+link-kernel \
+clean    
 
-kernel-head:
 
 # The x86 head of the monster.
+kernel-header:
 
-# provisorio
-	nasm kernel/arch/x86_64/pumpcore/unit0/head_64.asm \
+	# unit 0, unit 1, unit 3, unit 4, visitor
+	$(NASM) kernel/arch/x86_64/pumpcore/unit0/head_64.asm \
 	$(KERNEL_INCLUDE) \
 	-I kernel/arch/x86_64/pumpcore/unit0/ \
 	-I kernel/arch/x86_64/pumpcore/unit1/ \
 	-I kernel/arch/x86_64/pumpcore/unit3/ \
 	-I kernel/arch/x86_64/pumpcore/unit4/ \
+	-I kernel/arch/x86_64/pumpcore/visitor/ \
 	-f elf64 -o head_64.o
 
+	# unit 2
+	$(CC) -c kernel/arch/x86_64/pumpcore/unit2/sci.c \
+	$(KERNEL_INCLUDE) \
+	$(CFLAGS) \
+	-o sci.o    
 
-all-c:
+
+kernel-content:
 
 #
 # == main ======== 
 #
-
-	#$(CC) -c main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
-	gcc -c init/main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
-
+	$(CC) -c init/main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
 
 #
 # == kernel/ ======== 
@@ -291,9 +315,6 @@ all-c:
 	# ctrl
 	gcc -c user/ctrl/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 
-	# ctrl/unit2
-	gcc -c user/ctrl/unit2/sci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sci.o
-
 	# user/model
 	gcc -c user/model/font.c  $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
 
@@ -316,6 +337,8 @@ all-c:
 	gcc -c user/view/rect.c   $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
     # ...
 
+kernel-footer:
+	# Nothing for now.
 
 link-kernel:
 	@echo "================================="

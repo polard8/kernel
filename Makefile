@@ -115,12 +115,13 @@ gramado-kernel:
 
 #2
 gramado-lib:
-	#::rtl
+
+	#::rtl (The libc)
 	@echo "==================="
 	@echo "Compiling rtl ..."
 	$(Q) $(MAKE) -C lib/rtl/
 
-	#::lib
+	#::lib (The frameworks)
 	@echo "==================="
 	@echo "Compiling  lib ..."
 	$(Q) $(MAKE) -C lib/lib/

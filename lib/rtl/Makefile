@@ -38,13 +38,24 @@ endif
 
 
 
-.PHONY: all all-c libc-link finalize clean
+.PHONY: all libc-header libc-content libc-footer link install clean
 
-all: all-c libc-link finalize clean
+all: libc-header libc-content libc-footer \
+link install clean    
+
 	@echo "Ok?"
 
-all-c:
-	gcc  -c  crts/crt0.c        $(CFLAGS) -I. -I include/ -o crt0.o
+libc-header:
+
+	# unit 3: First release.
+	gcc  -c  unit3/crt0.c  $(CFLAGS) -I. -I include/ -o crt0.o
+
+	# visitor
+	gcc -c visitor/rtl.c  $(CFLAGS) -I. -I include/ -o rtl.o
+
+
+libc-content:
+
 	gcc  -c  ctype/ctype.c      $(CFLAGS) -I. -I include/ -o ctype.o
 	gcc  -c  fcntl/fcntl.c      $(CFLAGS) -I. -I include/ -o fcntl.o
 	gcc  -c  mmap/mmap.c        $(CFLAGS) -I. -I include/ -o mmap.o
@@ -54,7 +65,7 @@ all-c:
 	gcc  -c  socket/socket.c    $(CFLAGS) -I. -I include/ -o socket.o
 	gcc  -c  stdio/stdio.c      $(CFLAGS) -I. -I include/ -o stdio.o
 	gcc  -c  stdlib/stdlib.c    $(CFLAGS) -I. -I include/ -o stdlib.o
-	gcc  -c  rtl/rtl.c          $(CFLAGS) -I. -I include/ -o rtl.o
+
 	gcc  -c  unistd/unistd.c    $(CFLAGS) -I. -I include/ -o unistd.o
 	gcc  -c  termios/termios.c  $(CFLAGS) -I. -I include/ -o termios.o
 	gcc  -c  conio.c     $(CFLAGS) -I. -I include/ -o conio.o
@@ -95,16 +106,17 @@ all-c:
 #endif
 
 
+libc-footer:
+	# Nothing for now!
+
 # create 'ar'
 # #todo: 
 # We need a new ld file.
-libc-link:
-
+link:
 #	ar rc LIBC03.A $(OBJECTS)
 #	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
 
-
-finalize:
+install:
 	-mkdir        obj/
 	-cp *.o       obj/
 	#-cp LIBC03.A  obj/

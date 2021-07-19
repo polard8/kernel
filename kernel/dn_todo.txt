@@ -1,8 +1,8 @@
 
 
-    Aqui será construído a imagem do kernel de 64bit.
+	mm = 0mem
+	kernel = 1pump
+	fs = 2io
 
-    Começaremos apenas pelo conteúdo da pasta pumpcore,
-    que é a parte de mais baixo nível, feita em assembly.
 
 
