@@ -141,86 +141,25 @@ _irq0:
     
     call _xxxxIRQ0_DEBUG_MESSAGE
     ;call _xxxxIRQ0_DEBUG_MESSAGE
-    
- 
+
     ;; Timer support. No task switch.
     ;call _irq0_TIMER
 
     ;; Task switching.
     ;call _psTaskSwitch
 
+; Essa é a única interrupção que tem seu retorno
+; na unit 3.
 
-    ;Flush TLB.
-    ;jmp dummy_flush
-    ;; NOP
-;dummy_flush:
+    jmp unit3Irq0Release
 
-    ; 64bit
-    ; This is a 64bit pointer to the pml4 table.
-
-    mov RAX, CR3  
-    IODELAY 
-    nop
-    nop
-    nop
-    nop
-    mov CR3, RAX  
-
-;
-; == Restore context ====================
-;
-
-    ; Segments
-    xor rax, rax
-    mov ax, word [_contextDS]
-    mov ds, ax
-    mov ax, word [_contextES]
-    mov es, ax
-    mov ax, word [_contextFS]
-    mov fs, ax
-    mov ax, word [_contextGS]
-    mov gs, ax
-
-    mov rsi, qword [_contextRSI] 
-    mov rdi, qword [_contextRDI] 
-    
-    mov rbp, qword [_contextRBP] 
-    
-    mov rax, qword [_contextRAX] 
-    mov rbx, qword [_contextRBX] 
-    mov rcx, qword [_contextRCX] 
-    mov rdx, qword [_contextRDX] 
+; --------------------------------------
 
 
-    ;; Stack frame. (all double)
-    push qword [_contextSS]      ; ss
-    push qword [_contextRSP]     ; rsp
-    push qword [_contextRFLAGS]  ; rflags
-    push qword [_contextCS]      ; cs
-    push qword [_contextRIP]     ; rip
-
-    ; EOI - Only the first PIC.
-    mov al, 20h
-    out 20h, al  
-    IODELAY  
-
-    ;; variável usada pelo dispatcher.
-    ;mov dword [_irq0PendingEOI], 0
 
 
-    ; Acumulator.
-    mov rax, qword [_contextRAX]
-
-    ;; #bugbug
-    ;; We do NOT need the 'sti'. 
-    ;; The flags in the 'eflags' will reenable it.
-    
-    sti
-    iretq
-
-;==================================
-
-; -----------------------------------------------------------------------------
+; #todo: Move to unit 2
+; ---------------------------------------------------------------------
 ; reboot -- Reboot the computer
 hw_reboot:
 	in al, 0x64
@@ -229,7 +168,7 @@ hw_reboot:
 	mov al, 0xFE
 	out 0x64, al			; Send the reboot call to the keyboard controller
 	jmp hw_reboot
-; -----------------------------------------------------------------------------
+; ----------------------------------------------------------------------
 
 
 ;========================================
@@ -296,11 +235,7 @@ _irq1:
     ;#test
     ;; See: keyboard.c
     call _irq1_KEYBOARD
-    
-    ;jmp ps2Keyboard_done
 
-; unit3: ps2 keyboard release.
-;ps2Keyboard_done:
     popfq
     pop rsp
     pop gs
@@ -347,6 +282,16 @@ _irq1:
 ;;===========================
 
 
+
+
+
+
+
+
+
+
+
+
 ;=======================================================
 ; IRQ 3 - serial port controller for serial port 2 
 ; (shared with serial port 4, if present)
@@ -382,7 +327,6 @@ _irq3:
     ;push es
     push fs
     push gs
-
 
 
     ;call _serial2_handler
@@ -426,6 +370,10 @@ _irq3:
 
 
 
+
+
+
+
 ;====================================================
 ; IRQ 4 - serial port controller for serial port 1 
 ;(shared with serial port 3, if present)
@@ -465,6 +413,7 @@ _irq4:
     ;call _serial1_handler
     ;call _serial3_handler
 
+
     ;; EOI - Only the first PIC.
     mov al, 0x20
     out 0x20, al
@@ -499,6 +448,10 @@ _irq4:
     sti
     iretq
 ;================================
+
+
+
+
 
 
 ;--------------
@@ -557,8 +510,6 @@ _irq7:
     push gs
 
 
-    ;call _first_parallel_port_Handler
-
     ;; ++
     ;; ================================================
     ;; #test
@@ -568,24 +519,28 @@ _irq7:
     mov  al, 03h                ; PIC.OCW3 set function to read ISR (In Service Register)
     out  23h, al                ; write to PIC.OCW3 master
     in   al, 20h                ; read ISR master.
-    test al, 80h                ; if the in-service register does not have IR7 bit set
-    jz short __RETURN_Spurious  ; this would be a spurious interrupt.
-    
+    test al, 80h                           ; if the in-service register does not have IR7 bit set
+    jz short _NotParallelPort  ; this would be a spurious interrupt.
+
     ;; ================================================
     ;; --
 
 ;; Not spurious
+;; So this is a norma parallel por interrupt.
 
-    ;; EOI. Master.
-    ;; for irq7
+    ;call _first_parallel_port_Handler
+
+; EOI. Master. for parallel port
+_eoiForParallelPort:
+
+    ;xor rax, rax
     mov al, 0x20
     out 0x20, al   
     IODELAY  
-    
-__RETURN_Spurious:
 
-    ;; No eoi for irq 7 spurious
-    
+; No eoi for irq 7 spurious
+_NotParallelPort:
+  
     ;popad
     pop gs
     pop fs
@@ -614,6 +569,10 @@ __RETURN_Spurious:
 
     sti
     iretq
+    
+    
+    
+
 
 
 ;================================================
@@ -1452,6 +1411,7 @@ _fault_N5:
      mov qword [_save_fault_number], qword 5
     jmp all_faults
 
+; #todo: Change this name.
 ; int 6 - Instrução inválida.
 global _fault_INTRUCAO_INVALIDA
 _fault_INTRUCAO_INVALIDA:
@@ -1661,10 +1621,12 @@ all_faults:
     
     call _faults 
 
-.Lhang:
+_AllFaultsHang:
     cli
     hlt
-    jmp .Lhang
+    jmp _AllFaultsHang
+
+
 
 ; Salva aqui o número da fault.	
 global _save_fault_number
@@ -1672,29 +1634,6 @@ _save_fault_number:
     dq 0
     
 align 8
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
