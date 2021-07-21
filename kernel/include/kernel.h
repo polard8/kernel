@@ -88,27 +88,27 @@ unsigned long SavedBPP;
 // =========================================================
 
 // (NT)
-// Land OS headers.
+// gramado OS headers.
 
 // oh boy
-#include "land/0boy/0boy.h"
+#include "gramado/0boy/0boy.h"
 
 // config
-#include "land/0config/version.h"    // Product. 
-#include "land/0config/u.h"          // User
-#include "land/0config/config.h"     // Compiling.
+#include "gramado/0config/version.h"    // Product. 
+#include "gramado/0config/u.h"          // User
+#include "gramado/0config/config.h"     // Compiling.
 
 // globals
-#include "land/0globals/limits.h"
-#include "land/0globals/gpa.h"
-#include "land/0globals/gva.h"
-#include "land/0globals/gentry.h"
-#include "land/0globals/gdef.h"
-#include "land/0globals/gdevice.h"
-#include "land/0globals/gobject.h"
-#include "land/0globals/gspin.h"
-#include "land/0globals/ginput.h"  // input manager support.
-#include "land/0globals/gwd.h"     // whatch dogs.
+#include "gramado/0globals/limits.h"
+#include "gramado/0globals/gpa.h"
+#include "gramado/0globals/gva.h"
+#include "gramado/0globals/gentry.h"
+#include "gramado/0globals/gdef.h"
+#include "gramado/0globals/gdevice.h"
+#include "gramado/0globals/gobject.h"
+#include "gramado/0globals/gspin.h"
+#include "gramado/0globals/ginput.h"  // input manager support.
+#include "gramado/0globals/gwd.h"     // whatch dogs.
 
 //#test
 #include "rtl/stdarg.h"
@@ -137,10 +137,10 @@ unsigned long SavedBPP;
 
 
 // memory management support.
-#include "land/mm/mm.h"
-#include "land/mm/memmap.h" 
-#include "land/mm/intelmm.h"
-#include "land/mm/x64mm.h"     // mm, memory manager support.
+#include "mm/mm.h"
+#include "mm/memmap.h" 
+#include "mm/intelmm.h"
+#include "mm/x64mm.h"     // mm, memory manager support.
 
 //#test
 #include "user/view/video.h"
@@ -151,13 +151,13 @@ unsigned long SavedBPP;
 #include "user/model/ascii.h" 
 
 // fs
-#include "rtl/fs/path.h"       // path.
-#include "rtl/fs/fat.h"        // fat16.
-#include "rtl/fs/fat_lfn.h"    // fat16 lfn.
-#include "rtl/fs/inode.h"
-#include "rtl/fs/exec_elf.h"
-#include "rtl/fs/pipe.h"
-#include "rtl/fs/fs.h"
+#include "fs/path.h"       // path.
+#include "fs/fat.h"        // fat16.
+#include "fs/fat_lfn.h"    // fat16 lfn.
+#include "fs/inode.h"
+#include "fs/exec_elf.h"
+#include "fs/pipe.h"
+#include "fs/fs.h"
 
 
 // hal
@@ -203,16 +203,16 @@ unsigned long SavedBPP;
 
 
 // ps
-#include "land/ps/image.h"
-#include "land/ps/x64cont.h"
-#include "land/ps/ts.h"
-#include "land/ps/tasks.h"
-#include "land/ps/process.h"
-#include "land/ps/thread.h"
-#include "land/ps/sched.h"
-#include "land/ps/queue.h"
-#include "land/ps/mk.h"
-#include "land/ps/dispatch.h"
+#include "ps/image.h"
+#include "ps/x64cont.h"
+#include "ps/ts.h"
+#include "ps/tasks.h"
+#include "ps/process.h"
+#include "ps/thread.h"
+#include "ps/sched.h"
+#include "ps/queue.h"
+#include "ps/mk.h"
+#include "ps/dispatch.h"
 
 
 #include "user/ws.h"
@@ -283,27 +283,27 @@ unsigned long SavedBPP;
 
 #include "hal/io.h"               //io.
 
-#include "land/init.h"
-#include "land/debug.h"
-#include "land/system.h"   // system manager
+#include "gramado/init.h"
+#include "gramado/debug.h"
+#include "gramado/system.h"   // system manager
 
 // mm
-#include "land/mm/mmglobal.h"  // Deve ficar mais acima.
-#include "land/mm/heap.h"      // Heap pointer support.
-#include "land/mm/aspace.h"    // Address Space, (data base account).
-#include "land/mm/bank.h"      // Bank. database
-#include "land/mm/x64mm.h"     // mm, memory manager support.
+#include "mm/mmglobal.h"  // Deve ficar mais acima.
+#include "mm/heap.h"      // Heap pointer support.
+#include "mm/aspace.h"    // Address Space, (data base account).
+#include "mm/bank.h"      // Bank. database
+#include "mm/x64mm.h"     // mm, memory manager support.
 
-#include "land/object.h"
+#include "gramado/object.h"
 
 // profiler
-#include "land/pints.h"
+#include "gramado/pints.h"
 
 #include "rtl/runtime.h"
-#include "land/request.h"
-#include "land/gpid.h"      // Globals. PIDs support.
-#include "land/utsname.h"
-#include "land/info.h"      // last one?
+#include "gramado/request.h"
+#include "gramado/gpid.h"      // Globals. PIDs support.
+#include "gramado/utsname.h"
+#include "gramado/info.h"      // last one?
 
 
 // ==============================

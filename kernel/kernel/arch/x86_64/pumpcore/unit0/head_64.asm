@@ -1,9 +1,9 @@
 
 
 ; See: 
-; kernel/include/land/
+; kernel/include/gramado/
 
-%include "land/head.inc"
+%include "gramado/head.inc"
 
 
 ; segment .head_x86_64
