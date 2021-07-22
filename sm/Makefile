@@ -113,13 +113,15 @@ all-c:
 
 
 shell-link:
-	$(LD) -s -x -T applink.ld -o INIT.BIN $(myObjects)    
+	$(LD) -s -x -T applink.ld -o SM.BIN $(myObjects)    
 
 finalize:
-#	cp INIT.BIN ../../bin/
+#	cp SM.BIN ../../bin/
 
 clean:
 	-rm *.o
-#	-rm INIT.BIN 
+#	-rm SM.BIN
+
+ 
 
 

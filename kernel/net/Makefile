@@ -70,49 +70,23 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 
-OBJS = mminit.o mminfo.o mmpool.o pages.o \
-info.o \
-sysinit.o \
-runtime.o \
-system.o \
-debug.o \
-ctype.o string.o stdlib.o kstdio.o signal.o unistd.o \
-sys.o    
+OBJS = network.o socket.o    
 
 
 
 all:
 
-	$(CC) -c mminit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminit.o
-	$(CC) -c mminfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminfo.o
-	$(CC) -c mmpool.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmpool.o
-	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o
-
-	$(CC) -c core/info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c core/sysinit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sysinit.o
-	$(CC) -c core/runtime.c  $(KERNEL_INCLUDE) $(CFLAGS) -o runtime.o
-	$(CC) -c core/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
-
-	$(CC) -c core/debug/debug.c  $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
-
-
-	$(CC) -c rtl/ctype.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c rtl/string.c  $(KERNEL_INCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c rtl/stdlib.c  $(KERNEL_INCLUDE) $(CFLAGS) -o stdlib.o
-	$(CC) -c rtl/kstdio.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c rtl/signal.c  $(KERNEL_INCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c rtl/unistd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o unistd.o
-
-	$(CC) -c sci/sys/sys.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
+	$(CC) -c network/network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
+	$(CC) -c socket/socket.c    $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
 
 
 #link
-	$(LD) -r -o archive_mm.o $(OBJS)
+	$(LD) -r -o archive_net.o $(OBJS)
 
 
 # todo: vamos ligar tudo e enviar somente a biblioteca.
 	#cp *.o ../
-	cp archive_mm.o ../
+	cp archive_net.o ../
 	rm *.o
 	
 	

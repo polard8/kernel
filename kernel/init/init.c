@@ -22,6 +22,34 @@ unsigned long InitializationPhase;
 #define RELEASE_TYPE_BETA  2
 
 
+
+// ==========================
+
+//
+// Import from linker
+//
+
+// Não queremos um tamanho de imagem que
+// exceda o tamanho da região de memória mapeada para ela.
+// No futuro poderemos usar as informações que estão dentro
+// do header ELF.
+// See: link.ld
+int ImportDataFromLinker = TRUE;
+extern unsigned long kernel_begin(void);
+extern unsigned long kernel_end(void);
+extern unsigned long code_begin(void);
+extern unsigned long code_end(void);
+extern unsigned long rodata_begin(void);
+extern unsigned long rodata_end(void);
+extern unsigned long data_begin(void);
+extern unsigned long data_end(void);
+extern unsigned long bss_begin(void);
+extern unsigned long bss_end(void);
+
+// ==========================
+
+
+
 //char InitialUserProcessName[32] = "INIT.BIN"
 
 unsigned long magic;
@@ -101,7 +129,11 @@ void preinit_OutputSupport(void)
 int kernel_main(int arch_type)
 {
     int Status = (-1);
+    //int Options=0;
+    //int SafeMode = FALSE;
+    //unsigned long MemorySyze=0;
     int i=0;
+
 
     // Magic
     unsigned long bootMagic = (unsigned long) (magic & 0x00000000FFFFFFFF); 
@@ -379,8 +411,10 @@ int kernel_main(int arch_type)
     // --
 
 
+//
+// BANNER!
+//
 
-    // BANNER !
     // Welcome message. (Poderia ser um banner.) 
 
     //
@@ -392,8 +426,41 @@ int kernel_main(int arch_type)
     debug_print ("kernel_main: First message\n");
     printf      ("kernel_main: First message \n");
 
-
     // ================================================
+
+    // #test
+    // Não queremos um tamanho de imagem que
+    // exceda o tamanho da região de memória mapeada para ela.
+    unsigned long KernelImage_BSS_Size=0;
+    unsigned long KernelImage_DATA_Size=0;
+    unsigned long KernelImage_RODATA_Size=0;
+    unsigned long KernelImage_CODE_Size=0;
+    unsigned long KernelImage_Size=0;
+
+    if ( ImportDataFromLinker == TRUE )
+    {
+        printf("\n");
+ 
+        // #bugbug
+        // Something is wrong here.
+        KernelImage_Size = (kernel_end - kernel_begin);
+        printf ("Image Size %d KB [BUGBUG] \n",KernelImage_Size/1024);
+
+        KernelImage_CODE_Size = (code_end - code_begin);
+        printf ("CODE Size %d KB \n",KernelImage_CODE_Size/1024);
+
+        KernelImage_RODATA_Size = (rodata_end - rodata_begin);
+        printf ("RODATA Size %d KB \n",KernelImage_RODATA_Size/1024);
+
+        KernelImage_DATA_Size = (data_end - data_begin);
+        printf ("DATA Size %d KB \n",KernelImage_DATA_Size/1024);
+
+        KernelImage_BSS_Size = (bss_end - bss_begin);
+        printf ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
+
+        //refresh_screen();
+        //while(1){}
+    }
 
 
 //
@@ -480,12 +547,24 @@ int kernel_main(int arch_type)
 
         // See: x64init.c in kernel/arch/x86_64/
         case CURRENT_ARCH_X86_64:
+            
             debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             //printf      ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             Status = (int) x64main();
-            if (Status < 0){
+            
+            if (Status < 0)
+            {
                 x_panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
             }
+            
+            // #test
+            if (Status == 1234)
+            {
+                // No return.
+                debug_print ("kernel_main: Calling x64ExecuteInitialProcess()\n");
+                x64ExecuteInitialProcess();
+            }
+            
             //goto fail2;
             break;
 

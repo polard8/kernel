@@ -5,7 +5,7 @@
 
 
 extern unsigned long InitializationPhase;
-
+int InitialProcessInitialized = FALSE;
 
 
 // Task switching support.
@@ -22,31 +22,43 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 }
 
 
+// Local routine.
+// + Carrega a imagem do primeiro processo que vai rodar em user mode.
+// + Configura sua estrutura de processo.
+// + Configura sua estrutura de thraed.
+// Não passa o comando para o processo.
 
-// Função local.
-// Inicializa só o init.bin
-// #todo: Change to CreateInit
-
-void __x64StartInit (void)
+void __x64CreateInitialProcess (void)
 {
     //#todo
-    debug_print ("__x64StartInit: [TODO]\n");
-    printf      ("__x64StartInit: [TODO]\n");
+    debug_print ("__x64CreateInitialProcess: [TODO]\n");
+    printf      ("__x64CreateInitialProcess: [TODO]\n");
     refresh_screen();
 
 
     int fileret = -1;
 
-    debug_print ("__x64StartInit:\n");
+    debug_print ("__x64CreateInitialProcess:\n");
 
 //
-// Load image INIT.BIN.
+// Load imag SM.BIN.
 //
+
+    // Session manager
+
+    // This is the first user mode process running
+    // after the kernel base.
+
     // #importante
     // Carregado do diretório raiz
     // loading image.
     // #bugbug
     // Loading from root dir. 512 entries limit.
+    
+    // #todo
+    // O propósito é termos a possibilidade de selecionar qual será
+    // a imagem desse processo incial
+    // e configurarmos isso no modulo init/ do kernel base.
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
@@ -54,14 +66,14 @@ void __x64StartInit (void)
                                   VOLUME1_FAT_ADDRESS, 
                                   VOLUME1_ROOTDIR_ADDRESS, 
                                   FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
-                                  "INIT    BIN", 
+                                  "SM      BIN", 
                                   (unsigned long) CONTROLTHREAD_BASE, //0x00200000
                                   BUGBUG_IMAGE_SIZE_LIMIT );
 
     // Coldn't load init.bin
     if ( fileret != 0 ){
-        debug_print("__x64StartInit: Coldn't load init.bin \n");
-        panic      ("__x64StartInit: Coldn't load init.bin \n");
+        debug_print("__x64CreateInitialProcess: Coldn't load init.bin \n");
+        panic      ("__x64CreateInitialProcess: Coldn't load init.bin \n");
     }
 
 
@@ -78,7 +90,7 @@ void __x64StartInit (void)
     void *init_pml4_va = (void *) CloneKernelPML4();
 
     if ( init_pml4_va == 0 ){
-        panic ("__x64StartInit: init_pml4_va\n");
+        panic ("__x64CreateInitialProcess: init_pml4_va\n");
     }
 
     init_mm_data.pml4_va = init_pml4_va;
@@ -87,7 +99,7 @@ void __x64StartInit (void)
                                                gKernelPML4Address );
 
     if ( init_mm_data.pml4_pa == 0 ){
-        panic ("__x64StartInit: init_mm_data.pml4_pa\n");
+        panic ("__x64CreateInitialProcess: init_mm_data.pml4_pa\n");
     }
 
     // ...
@@ -100,18 +112,18 @@ void __x64StartInit (void)
                                (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
                                PRIORITY_HIGH, 
                                (int) KernelProcess->pid, 
-                               "INIT-PROCESS", 
+                               "SM-PROCESS", 
                                RING3, 
                                (unsigned long ) init_pml4_va );
 
     if ( (void *) InitProcess == NULL ){
-        panic ("__x64StartInit: InitProcess\n");
+        panic ("__x64CreateInitialProcess: InitProcess\n");
     }else{
 
         
         if ( init_mm_data.used != TRUE || init_mm_data.magic != 1234 )
         {
-            panic ("x64main: kernel_mm_data validation\n");
+            panic ("__x64CreateInitialProcess: init_mm_data validation\n");
         }
 
         // Esse foi configurado agora.
@@ -140,7 +152,7 @@ void __x64StartInit (void)
     InitThread = (void *) create_CreateRing3InitThread();
 
     if ( (void *) InitThread == NULL ){
-        panic ("__x86StartInit: InitThread\n");
+        panic ("__x64CreateInitialProcess: InitThread\n");
     }else{
 
         // Herdando do processo configurado logo antes.
@@ -201,20 +213,39 @@ void __x64StartInit (void)
         //(int) 0, 
         //(struct process_d *) InitProcess, 
         //(struct thread_d *) InitThread ); 
+    
+    
+    // Agora ja temos um processo em user mode devidamente 
+    // configurado. Então a rotina de inicialização em init/
+    // poderá pasasr o comando para ele quando quizer.
+
+    InitialProcessInitialized = TRUE;
 }
 
 
-// local
-void x64initStartFirstThread (void)
+
+// Passa o comando para o primeiro processo em user mode.
+// Esse processo ja foi previamente configurado.
+
+void x64ExecuteInitialProcess (void)
 {
     //#todo
-    debug_print ("x64initStartFirstThread: [TODO]\n");
-    printf      ("x64initStartFirstThread: [TODO]\n");
+    debug_print ("x64ExecuteInitialProcess: [TODO]\n");
+    printf      ("x64ExecuteInitialProcess: [TODO]\n");
     refresh_screen();
-    
+   
     
     struct thread_d  *Thread;
     int i=0;
+
+
+    // Se essa rotina foi chamada antes mesmo
+    // do processo ter sido devidamente configurado.
+
+    if ( InitialProcessInitialized != TRUE ){
+        debug_print ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        panic       ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+    }
 
     // The first thread to run will the control thread 
     // of the init process. It is called InitThread.
@@ -223,14 +254,14 @@ void x64initStartFirstThread (void)
 
 
     if ( (void *) Thread == NULL ){
-        debug_print ("x64initStartFirstThread: Thread\n");
-        panic       ("x64initStartFirstThread: Thread\n");
+        debug_print ("x64ExecuteInitialProcess: Thread\n");
+        panic       ("x64ExecuteInitialProcess: Thread\n");
     }
 
     if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
-        debug_print ("x64initStartFirstThread: Thread validation\n");
-        //printf ("x64initStartFirstThread: tid={%d} magic \n", 
+        debug_print ("x64ExecuteInitialProcess: Thread validation\n");
+        //printf ("x64ExecuteInitialProcess: tid={%d} magic \n", 
         //    Thread->tid);
         die();
     }
@@ -238,11 +269,11 @@ void x64initStartFirstThread (void)
     // It its context is already saved, so this is not the fist time.
     
     if ( Thread->saved != FALSE ){
-        panic("x64initStartFirstThread: saved\n");
+        panic("x64ExecuteInitialProcess: saved\n");
     }
 
     if ( Thread->tid < 0 ){
-        panic("x64initStartFirstThread: tid\n");
+        panic("x64ExecuteInitialProcess: tid\n");
     }
 
     // Set the current thread.
@@ -255,7 +286,7 @@ void x64initStartFirstThread (void)
 
     if ( Thread->state != STANDBY )
     {
-        printf ("x64initStartFirstThread: state tid={%d}\n", 
+        printf ("x64ExecuteInitialProcess: state tid={%d}\n", 
             Thread->tid);
         die();
     }
@@ -269,7 +300,7 @@ void x64initStartFirstThread (void)
         // #bugbug
         //
         
-        debug_print("x64initStartFirstThread: [FIXME] Overflow\n");
+        debug_print("x64ExecuteInitialProcess: [FIXME] Overflow\n");
         
         //queue_insert_data( 
         //    queue, 
@@ -370,13 +401,13 @@ void x64initStartFirstThread (void)
     if ( buff1[0] != 0x7F ||
          buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
     {
-        debug_print ("x64initStartFirstThread: init .ELF signature\n");
-        panic       ("x64initStartFirstThread: init .ELF signature");
+        debug_print ("x64ExecuteInitialProcess: init .ELF signature\n");
+        panic       ("x64ExecuteInitialProcess: init .ELF signature");
     }
 
     // #debug
-    debug_print("[x64] Go to user mode!  IRETQ\n");
-    printf     ("[x64] Go to user mode!  IRETQ\n");
+    debug_print("x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
+    printf     ("x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
     refresh_screen();
 
 
@@ -427,7 +458,7 @@ void x64initStartFirstThread (void)
     PROGRESS("-- iretq fail -----------------\n");
 
     // Paranoia
-    panic ("x64initStartFirstThread: [FIXME] *breakpoint\n");
+    panic ("x64ExecuteInitialProcess: [FIXME] *breakpoint\n");
 }
 
 
@@ -444,6 +475,11 @@ void x64initStartFirstThread (void)
 int x64main (void)
 {
     int Status=0;
+    
+    // Ainda não configuramos qual será o primeiro processo
+    // a rodar em user mode.
+
+    InitialProcessInitialized = FALSE;
 
     // Obs: 
     // O video já foi inicializado em main.c.
@@ -753,9 +789,16 @@ int x64main (void)
 
 //================================
     PROGRESS("Kernel:1:8\n"); 
-    // Cria e inicializa apenas o INIT.BIN
+    // Session Manager.
+    // Cria e inicializa apenas o SM.BIN
 
-    __x64StartInit();
+// Local routine.
+// + Carrega a imagem do primeiro processo que vai rodar em user mode.
+// + Configura sua estrutura de processo.
+// + Configura sua estrutura de thraed.
+// Não passa o comando para o processo.
+
+    __x64CreateInitialProcess();
 
     //printf("*breakpoint\n");
     //refresh_screen();
@@ -900,14 +943,20 @@ int x64main (void)
     // #todo
     // pegar o retorno dessa funçao e retornar para quem nos chamou.
     
-    debug_print ("x64main: Calling x64initStartFirstThread()\n");
-    x64initStartFirstThread();
+    // This will be called by the init.c in init/
+    //debug_print ("x64main: Calling x64ExecuteInitialProcess()\n");
+    //x64ExecuteInitialProcess();
 
+    // Expected return value.
+
+    return (int) 1234;
 
     // #test
     // Estamos usando esse retorno ate fazermos achamada logo acima.
 
-    return 0;
+    //return 0;
+
+   
 
 // ===============================
 

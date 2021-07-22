@@ -126,12 +126,12 @@ all:
 
 
 #link
-	$(LD) -r -o archive_kernel.o $(OBJS)
+	$(LD) -r -o archive_ke.o $(OBJS)
 
 
 # todo: vamos ligar tudo e enviar somente a biblioteca.
 	#cp *.o ../
-	cp archive_kernel.o ../
+	cp archive_ke.o ../
 	rm *.o
 
 

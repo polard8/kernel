@@ -113,8 +113,8 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # head
 objects-y := head_64.o init.o sci.o  
 
-objects-y += archive_kernel.o archive_mm.o archive_fs.o \
-archive_user.o    
+objects-y += archive_ke.o archive_mm.o archive_fs.o \
+archive_net.o archive_user.o    
 
 # test
 #objects-$(CONFIG_MAIN1) += archive_something.o   
@@ -135,17 +135,17 @@ clean
 kernel-header:
 
 	# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) kernel/arch/x86_64/pumpcore/unit0/head_64.asm \
+	$(NASM) ke/arch/x86_64/pumpcore/unit0/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I kernel/arch/x86_64/pumpcore/unit0/ \
-	-I kernel/arch/x86_64/pumpcore/unit1/ \
-	-I kernel/arch/x86_64/pumpcore/unit3/ \
-	-I kernel/arch/x86_64/pumpcore/unit4/ \
-	-I kernel/arch/x86_64/pumpcore/visitor/ \
+	-I ke/arch/x86_64/pumpcore/unit0/ \
+	-I ke/arch/x86_64/pumpcore/unit1/ \
+	-I ke/arch/x86_64/pumpcore/unit3/ \
+	-I ke/arch/x86_64/pumpcore/unit4/ \
+	-I ke/arch/x86_64/pumpcore/visitor/ \
 	-f elf64 -o head_64.o
 
 	# unit 2
-	$(CC) -c kernel/arch/x86_64/pumpcore/unit2/sci.c \
+	$(CC) -c ke/arch/x86_64/pumpcore/unit2/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    
@@ -156,11 +156,12 @@ kernel-header:
 
 kernel-content:
 
-	$(Q) $(MAKE) -C kernel/
+	$(Q) $(MAKE) -C ke/
 	$(Q) $(MAKE) -C mm/
 	$(Q) $(MAKE) -C fs/
 
 kernel-footer:
+	$(Q) $(MAKE) -C net/
 	$(Q) $(MAKE) -C user/
 	# ...
 

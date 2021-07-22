@@ -1,0 +1,11 @@
+
+	sm/ folder:
+
+	Session Manager:
+	This is where we find the first user mode process called by
+	the kernel base.
+
+	We  can have more than one option here for testing purpose
+	or different kind of initialization.
+
+

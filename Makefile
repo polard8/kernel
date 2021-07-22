@@ -94,7 +94,7 @@ PHONY := build-gramado-files
 build-gramado-files: \
 gramado-kernel \
 gramado-lib \
-gramado-init \
+gramado-sm \
 gramado-cmd \
 gramado-setup \
 gramado-ws \
@@ -127,9 +127,10 @@ gramado-lib:
 	$(Q) $(MAKE) -C lib/lib/
 
 #3
-gramado-init:
-	$(Q) $(MAKE) -C init/
-	sudo cp init/INIT.BIN  base/
+# Session Manager
+gramado-sm:
+	$(Q) $(MAKE) -C sm/
+	sudo cp sm/SM.BIN  base/
 
 #4
 gramado-cmd:
@@ -239,8 +240,8 @@ vhd-copy-files:
 	@echo "========================="
 	@echo "(Step 4) Copying files into the mounted VHD ..."
 
-	#Copy INIT.BIN to base/
-	#sudo cp landos/init/INIT.BIN  base/
+	#Copy SM.BIN to base/
+	#sudo cp sm/SM.BIN  base/
 	
 	# Copy base
 	# sends everything from base to root.
@@ -294,7 +295,7 @@ clean4:
 	@echo "Cleaning all system binaries ..."
 	-rm -rf kernel/KERNEL.BIN
 	-rm -rf arch/x86/boot/bin/*.BIN
-	-rm -rf init/*.BIN
+	-rm -rf sm/*.BIN
 	-rm -rf cmd/bin/*.BIN
 	-rm -rf setup/bin/*.BIN
 	-rm -rf ws/bin/*.BIN

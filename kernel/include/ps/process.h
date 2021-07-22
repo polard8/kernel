@@ -892,6 +892,9 @@ unsigned long processList[PROCESS_COUNT_MAX];
 // == Prototypes =====================================================
 //
 
+void __x64CreateInitialProcess (void);
+void x64ExecuteInitialProcess (void);
+
 pid_t clone_and_execute_process ( const char *filename );
 
 unsigned long __GetProcessStats ( int pid, int index );
