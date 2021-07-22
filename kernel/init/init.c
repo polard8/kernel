@@ -444,7 +444,7 @@ int kernel_main(int arch_type)
         // #bugbug
         // Something is wrong here.
         KernelImage_Size = (kernel_end - kernel_begin);
-        printf ("Image Size %d KB [BUGBUG] \n",KernelImage_Size/1024);
+        printf ("Image Size %d KB \n",KernelImage_Size/1024);
 
         KernelImage_CODE_Size = (code_end - code_begin);
         printf ("CODE Size %d KB \n",KernelImage_CODE_Size/1024);
@@ -458,8 +458,9 @@ int kernel_main(int arch_type)
         KernelImage_BSS_Size = (bss_end - bss_begin);
         printf ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
 
-        //refresh_screen();
-        //while(1){}
+        // #debug
+        // refresh_screen();
+        // while(1){}
     }
 
 
@@ -522,6 +523,8 @@ int kernel_main(int arch_type)
     printf ("memorysizeUsed %d\n",memorysizeUsed);
     printf ("memorysizeFree %d\n",memorysizeFree);
     
+    
+    // #debug
     refresh_screen();
     //while(1){}
 

@@ -20,11 +20,11 @@ ENTRY(_kernel_begin)
 
 SECTIONS 
 {
-    _kernel_begin = .;
-
     . = 0x30001000;
     .text 0x30001000:
     {
+        _kernel_begin = .;
+    
         _code_begin = .;
         *(.head_x86_64)  *(.text) 
         _code_end = .; 
@@ -52,11 +52,12 @@ SECTIONS
         _bss_begin = .; 
         *(COMMON)  *(.bss)
         _bss_end = .; 
+    
+        _kernel_end = .; 
     }
-
-
-    _kernel_end = .; 
 }
+
+
 
 
 
