@@ -919,7 +919,9 @@ struct process_d *create_process (
     int ppid, 
     char *name, 
     unsigned long iopl,
-    unsigned long pml4_va );
+    unsigned long pml4_va,
+    unsigned long pdpt0_va,
+    unsigned long pd0_va );
 
 // ===
 

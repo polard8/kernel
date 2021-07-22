@@ -176,13 +176,16 @@ void *CreateAndIntallPageTable (
     PML4[pml4_index] = (unsigned long) __pdptPA;
     PML4[pml4_index] = (unsigned long) PML4[pml4_index] | 7; 
 
-    panic ("CreateAndIntallPageTable: [TODO] This is a work in progress.\n");
 
-
-    // #todo retorno.
     
-    return NULL;
+    // Retornando o endereço virtual da pt criada.
+    return (void*) ptVA;
+
+    //panic ("CreateAndIntallPageTable: [TODO] This is a work in progress.\n");
+    // #todo retorno.
+    //return NULL;
 }
+
 
 
 // #todo

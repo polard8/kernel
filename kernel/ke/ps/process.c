@@ -194,6 +194,16 @@ __found:
             goto fail;
         }
 
+        if( (void*) Current->pdpt0_VA == NULL ){
+            printf ("clone_and_execute_process: [FAIL] Current->pdpt0_VA\n");
+            goto fail;
+        }
+
+        if( (void*) Current->pd0_VA == NULL ){
+            printf ("clone_and_execute_process: [FAIL] Current->pd0_VA\n");
+            goto fail;
+        }
+
         // Salvando o endereço fisico da imagem 
         // que existe no processo.
         // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
@@ -417,8 +427,18 @@ do_clone:
     // See: core/ps/x86/pages.c
 
     if( (void*) Clone->pml4_VA == NULL ){
-        panic("clone_and_execute_process: Clone->pml4VA\n");
+        panic("clone_and_execute_process: [2nd time] Clone->pml4_VA\n");
     }
+
+    if( (void*) Clone->pdpt0_VA == NULL ){
+        panic("clone_and_execute_process: [2nd time] Clone->pdpt0_VA\n");
+    }
+
+    if( (void*) Clone->pd0_VA == NULL ){
+        panic("clone_and_execute_process: [2nd time] Clone->pd0_VA\n");
+    }
+
+// ======
 
     if( (void*) Clone->ImagePA == NULL ){
         panic("clone_and_execute_process: Clone->ImagePA\n");
@@ -432,10 +452,11 @@ do_clone:
 //
 
 
-    debug_print ("clone_and_execute_process: [Breakpoint] This is a work in progress\n");
-         printf ("clone_and_execute_process: [Breakpoint] This is a work in progress\n");
-    debug_print ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
-    panic       ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
+    //debug_print ("clone_and_execute_process:  This is a work in progress\n");
+    //     printf ("clone_and_execute_process:  This is a work in progress\n");
+    debug_print ("clone_and_execute_process: Calling CreateAndIntallPageTable \n");
+    printf      ("clone_and_execute_process: Calling CreateAndIntallPageTable :) \n");
+    //panic       ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
 
     // =====================================
     // Levels: PML4, PDPT, PD, PT
@@ -445,7 +466,7 @@ do_clone:
     // PD   - Page Directory
     // PT   - Page Table    
 
-    /*
+
     // See: pages.c
     __pt = CreateAndIntallPageTable (
                (unsigned long) Clone->pml4_VA,   // page map level 4
@@ -459,7 +480,7 @@ do_clone:
     if ( (void*) __pt == NULL ){
         panic ("clone_and_execute_process: __pt\n");
     }
-    */
+    
     
 
     // Configurando o endereço virtual padrão para aplicativos.
@@ -588,6 +609,36 @@ do_clone:
     // [4] done.
     debug_print ("clone_and_execute_process: [5] Done\n");
     debug_print ("---------------------------------------------\n");
+
+
+//
+// Debug
+//
+
+    /*
+    printf ("\n");
+    printf ("--[ Debug ]---------------------------------\n");
+
+    printf ("\n");
+    current_process = Clone->pid;
+    show_currentprocess_info();
+
+    printf ("\n");
+    current_thread = Clone->control->tid;
+    show_reg(current_thread);
+    
+    printf ("--------------------------------------------\n");
+    printf ("\n");
+
+    //SelectForExecution(Clone->control);
+    //KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
+    */
+
+    // #debug
+    // refresh_screen();
+    // while(1){}
+   
+
 
     // Return child's PID.
 
@@ -1072,7 +1123,9 @@ struct process_d *create_process (
     int ppid, 
     char *name, 
     unsigned long iopl,
-    unsigned long pml4_va )
+    unsigned long pml4_va,
+    unsigned long pdpt0_va,
+    unsigned long pd0_va )
 {
 
     struct process_d  *Process;
@@ -1131,8 +1184,18 @@ struct process_d *create_process (
         panic ("create_process: [ERROR] *name\n");
     }
 
+//===============================
+
     if( pml4_va == 0 ){
         panic ("create_process: [ERROR] pml4_va\n");
+    }
+
+    if( pdpt0_va == 0 ){
+        panic ("create_process: [ERROR] pdpt0_va\n");
+    }
+
+    if( pd0_va == 0 ){
+        panic ("create_process: [ERROR] pd0_va\n");
     }
 
     // ...
@@ -1331,10 +1394,27 @@ struct process_d *create_process (
         //return NULL;
     }
 
+
+// pml4
     Process->pml4_VA = (unsigned long) pml4_va;
     Process->pml4_PA = (unsigned long) virtual_to_physical ( 
                                                pml4_va, 
                                                gKernelPML4Address );
+
+
+// pdpt0
+    Process->pdpt0_VA = (unsigned long) pdpt0_va;
+    Process->pdpt0_PA = (unsigned long) virtual_to_physical ( 
+                                               pdpt0_va, 
+                                               gKernelPML4Address );
+
+//pd0
+    Process->pd0_VA = (unsigned long) pd0_va;
+    Process->pd0_PA = (unsigned long) virtual_to_physical ( 
+                                               pd0_va, 
+                                               gKernelPML4Address );
+
+
 
 		// cancelados. 
 		// Process->mmBlocks[32]
@@ -2154,6 +2234,9 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 	// Mas o taskswitch faz isso pegando o endere�o que estiver na thread, ent�o
 	// esse endere�o precisa ir pra thread.
 
+
+// ========
+// pml4
     Process2->pml4_VA = (unsigned long) CloneKernelPML4();
 
     if ( (void *) Process2->pml4_VA == NULL ){
@@ -2163,6 +2246,18 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->pml4_PA = (unsigned long) virtual_to_physical ( 
                                               Process2->pml4_VA, 
                                               gKernelPML4Address ); 
+
+// ========
+//pdpt0
+    Process2->pdpt0_VA = Process1->pdpt0_VA;
+    Process2->pdpt0_PA = Process1->pdpt0_PA;
+
+// ========
+// pd0
+    Process2->pd0_VA = Process1->pd0_VA;
+    Process2->pd0_PA = Process1->pd0_PA;
+
+
 
     // #bugbug
     // Lembrando que na rotina de fork() nos obtemos

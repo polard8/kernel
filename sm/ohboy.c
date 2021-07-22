@@ -232,8 +232,8 @@ void main(void)
     // os parametros estao em ordem.
     //ohboy_system_call(4321,0xa,0xb,0xc);
 
-    printf ("Testing fflush()");
-    fflush(stdout);
+    //printf ("Testing fflush()");
+    //fflush(stdout);
     //while(1){}
     
     //close(0); close(1); close(2);
@@ -242,6 +242,8 @@ void main(void)
     // Trabalhando na implementação dessa rotina em ring0.
     // See: x64init.c, pages.c, process.c ...
     //rtl_clone_and_execute("gdeshell.bin");
+    //rtl_clone_and_execute("reboot.bin"); 
+
 
     //char thread_stack[1024];
    

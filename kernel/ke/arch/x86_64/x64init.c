@@ -114,7 +114,9 @@ void __x64CreateInitialProcess (void)
                                (int) KernelProcess->pid, 
                                "SM-PROCESS", 
                                RING3, 
-                               (unsigned long ) init_pml4_va );
+                               (unsigned long ) init_pml4_va,
+                               (unsigned long ) kernel_mm_data.pdpt0_va,
+                               (unsigned long ) kernel_mm_data.pd0_va );
 
     if ( (void *) InitProcess == NULL ){
         panic ("__x64CreateInitialProcess: InitProcess\n");
@@ -718,7 +720,9 @@ int x64main (void)
                                  (int) 0, 
                                  "KERNEL-PROCESS", 
                                  RING0,   
-                                 (unsigned long ) gKernelPML4Address );
+                                 (unsigned long ) gKernelPML4Address,
+                                 (unsigned long ) kernel_mm_data.pdpt0_va,
+                                 (unsigned long ) kernel_mm_data.pd0_va );
 
     if ( (void *) KernelProcess == NULL ){
         panic ("x64main: KernelProcess\n");
