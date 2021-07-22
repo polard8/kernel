@@ -4,18 +4,6 @@
 #define __X64MM_H    1
 
 
-// Quantas entradas de diretório de páginas cabem em uma página.
-// Cada entrada tem 16 bytes em x86_64
-#define PDE_PER_PAGE    512
-
-// Quantas entradas de tabela de páginas cabem em uma página.
-// Cada entrada tem 16 bytes em x86_64
-#define PTE_PER_PAGE    512
-
-
-
-
-
 
 // The virtual address of the kernel pml4 table.
 unsigned long gKernelPML4Address; 

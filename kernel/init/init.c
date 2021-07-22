@@ -1,4 +1,10 @@
 
+// main.c
+
+// This file and theis folder will be the control panel
+// for the initialization routine.
+// Please put here data we need.
+
 
 // fake main.c
 // We need a fake KERNEL.BIN ELF file that will be used my the
@@ -7,6 +13,16 @@
 // setting up the long mode and the paging.
 
 #include <kernel.h>
+
+
+unsigned long InitializationPhase;
+
+#define RELEASE_TYPE_NULL  0
+#define RELEASE_TYPE_RC    1
+#define RELEASE_TYPE_BETA  2
+
+
+//char InitialUserProcessName[32] = "INIT.BIN"
 
 unsigned long magic;
 

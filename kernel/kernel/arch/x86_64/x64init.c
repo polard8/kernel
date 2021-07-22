@@ -1,6 +1,12 @@
 
+// x64init.c
 
 #include <kernel.h>
+
+
+extern unsigned long InitializationPhase;
+
+
 
 // Task switching support.
 extern void turn_task_switch_on (void);
@@ -335,7 +341,7 @@ void x64initStartFirstThread (void)
 	// Com isso alguns recursos somente para as fases anteriores
 	// deverão ficar indisponíveis.
 
-    KeInitPhase = 4;
+    InitializationPhase = 4;
 
 	// # go!
 	// Nos configuramos a idle thread em user mode e agora vamos saltar 
@@ -483,7 +489,7 @@ int x64main (void)
     // Status Flag.
     // edition flag.
     
-    KeInitPhase = 0;
+    InitializationPhase = 0;
 
     gSystemStatus = 1;
     
@@ -512,8 +518,8 @@ int x64main (void)
     // Essa rotina só pode ser chamada 
     // durante essa fase da inicialização.
 
-    if ( KeInitPhase != 0 ){
-        x_panic ("x64main: KeInitPhase");
+    if ( InitializationPhase != 0 ){
+        x_panic ("x64main: InitializationPhase\n");
     }
 
 //================================
@@ -573,7 +579,7 @@ int x64main (void)
 //
 // == phase 3 ? ================================================
 //
-    KeInitPhase = 3;
+    InitializationPhase = 3;
 
 //================================
     PROGRESS("Kernel:1:3\n"); 

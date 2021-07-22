@@ -1,0 +1,13 @@
+
+	The file main.c in init/ needs to call the initialization routine
+	of each kernel component. The routines name starts with the
+	prefix and is followed by the word Initialization:
+	#bugbug: For now we simply cant do that cause the initialization
+	starts in another file. x64init.c for x86_64 and core/init.c.
+
+	Ex: 
+	kernelInit()  ?
+	mmInit()  See: mm/mminit.c 
+	fsInit()  See: fs/fs.c
+	userInit()    ?
+

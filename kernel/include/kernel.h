@@ -509,14 +509,16 @@ int g_module_runtime_initialized;
 int g_module_uem_initialized;             //user environment manager.
 //...
 
+
 // Kernel information variables.
 unsigned long KernelSize;
 unsigned long KernelHeapSize;
 unsigned long KernelStackSize;
 unsigned long KernelPages;
-unsigned long KeInitPhase;
 unsigned long KernelStatus;
 //...
+
+
 
 //
 // symbol table

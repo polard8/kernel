@@ -111,7 +111,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # We need classes: head | always | optional
 
 # head
-objects-y := head_64.o main.o sci.o  
+objects-y := head_64.o init.o sci.o  
 
 objects-y += archive_kernel.o archive_mm.o archive_fs.o \
 archive_user.o    
@@ -151,7 +151,7 @@ kernel-header:
 	-o sci.o    
 
 
-	$(CC) -c init/main.c  $(KERNEL_INCLUDE) $(CFLAGS) -o main.o
+	$(CC) -c init/init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
 
 
 kernel-content:

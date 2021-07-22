@@ -1,7 +1,10 @@
 
-
+// debug.c
 
 #include <kernel.h>
+
+
+extern unsigned long InitializationPhase;
 
 
 // debug_compute_checksum: 
@@ -75,10 +78,10 @@ int debug_check_inicialization (void){
 
     // Check phase.
 
-    if ( KeInitPhase != 3 ){
+    if ( InitializationPhase != 3 ){
        Status = 1;
-       printf ("debug_check_inicialization: KeInitPhase phase={%d}\n",
-           KeInitPhase );
+       printf ("debug_check_inicialization: InitializationPhase = {%d}\n",
+           InitializationPhase );
        goto fail;
     }
 

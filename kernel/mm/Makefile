@@ -70,10 +70,9 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 
-
-OBJS = memory.o mminfo.o mmpool.o pages.o \
+OBJS = mminit.o mminfo.o mmpool.o pages.o \
 info.o \
-init.o \
+sysinit.o \
 runtime.o \
 system.o \
 debug.o \
@@ -86,13 +85,13 @@ sys.o
 
 all:
 
-	$(CC) -c memory.c  $(KERNEL_INCLUDE) $(CFLAGS) -o memory.o
+	$(CC) -c mminit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminit.o
 	$(CC) -c mminfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminfo.o
 	$(CC) -c mmpool.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmpool.o
 	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o
 
 	$(CC) -c core/info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
-	$(CC) -c core/init.c     $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c core/sysinit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sysinit.o
 	$(CC) -c core/runtime.c  $(KERNEL_INCLUDE) $(CFLAGS) -o runtime.o
 	$(CC) -c core/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
 

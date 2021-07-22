@@ -1,6 +1,10 @@
 
+// init.c
+
 #include <kernel.h>
 
+
+extern unsigned long InitializationPhase;
 
 //Onde ficam os códigos e arquivos de configuração usados na inicialização.
 //A ideia é que se a inicialização precisar de algum arquivo, deve procurá-lo
@@ -232,10 +236,10 @@ int init (void)
 
     // Check kernel phase.
 
-    if ( KeInitPhase != 0 )
+    if ( InitializationPhase != 0 )
     {
-        debug_print ("core-init: KeInitPhase fail\n");
-        x_panic     ("core-init: KeInitPhase fail\n");
+        debug_print ("core-init: InitializationPhase fail\n");
+        x_panic     ("core-init: InitializationPhase fail\n");
     }
 
 // ===============================
@@ -446,8 +450,8 @@ int init (void)
     // #important
     // We need to be in the phase 0.
     
-    if (KeInitPhase != 0){
-        x_panic ("core-init: KeInitPhase\n");
+    if (InitializationPhase != 0){
+        x_panic ("core-init: InitializationPhase\n");
     }
 
 
@@ -560,7 +564,7 @@ int init (void)
 // == phase 1 ? ================================================
 //
 
-    KeInitPhase = 1;
+    InitializationPhase = 1;
 
 
 //
@@ -588,8 +592,8 @@ int init (void)
     // de inicialização.)
     //
 
-    if ( KeInitPhase != 1 ){
-        x_panic ("init: KeInitPhase\n");
+    if ( InitializationPhase != 1 ){
+        x_panic ("init: InitializationPhase\n");
     }
 
 
@@ -731,7 +735,7 @@ int init (void)
 // == phase 2 ? ================================================
 //
 
-    KeInitPhase = 2;
+    InitializationPhase = 2;
 
 
     //#debug
