@@ -458,6 +458,11 @@ int kernel_main(int arch_type)
         KernelImage_BSS_Size = (bss_end - bss_begin);
         printf ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
 
+        // Limit 1 MB
+        if ( KernelImage_Size/1024 > 1024 ){
+            panic ("kernel_main: The kernel image is too long\n");
+        }
+        
         // #debug
         // refresh_screen();
         // while(1){}
