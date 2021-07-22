@@ -308,14 +308,14 @@ void rtl_exit_critical_section (void)
  */
 
 void *rtl_create_thread ( 
-    unsigned long init_eip, 
+    unsigned long init_rip, 
     unsigned long init_stack, 
     char *name )
 {
     //#define	SYSTEMCALL_CREATETHREAD     72
     debug_print ("rtl_create_thread:\n");
     return (void *) gramado_system_call ( 72, //SYSTEMCALL_CREATETHREAD, 
-                        init_eip, 
+                        init_rip, 
                         init_stack, 
                         (unsigned long) name );
 }

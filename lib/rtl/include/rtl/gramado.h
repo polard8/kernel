@@ -167,7 +167,7 @@ void rtl_exit_critical_section (void);
 //
 
 void *rtl_create_thread ( 
-    unsigned long init_eip, 
+    unsigned long init_rip, 
     unsigned long init_stack, 
     char *name );
 

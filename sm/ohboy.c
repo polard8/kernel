@@ -60,6 +60,12 @@ void *ohboy_system_call (
 }
 
 
+void testThread(void)
+{
+	debug_print("THREAD\n");
+	while(1){}
+}
+
 void main(void)
 {
     
@@ -166,10 +172,10 @@ void main(void)
         debug_print("init.bin: stdin fail\n");
 
     if ( (void*) stdout == NULL )
-        debug_print("init.bin: stdout fail\n");
+        debug_print("sm.bin: stdout fail\n");
 
     if ( (void*) stderr == NULL )
-        debug_print("init.bin: stderr fail\n");
+        debug_print("sm.bin: stderr fail\n");
 
 
 
@@ -177,13 +183,13 @@ void main(void)
 // printf()
 //
 
-    long value=1234;
-    printf ("\n");
-    printf ("init.bin: Testing printf()\n");
+    //long value=1234;
+    //printf ("\n");
+    //printf ("init.bin: Testing printf()\n");
     
     // #bugbug
     // Wrong value !!
-    printf ("init.bin: Value=%d\n",value);
+    //printf ("init.bin: Value=%d\n",value);
 
 
 //
@@ -191,7 +197,7 @@ void main(void)
 //
 
     printf ("\n");
-    printf ("init.bin: Testing write()\n");
+    printf ("sm.bin: Testing write()\n");
 
     char *s = "Fred";
     //putc('v',stdout);
@@ -206,7 +212,7 @@ void main(void)
 // read
 //
     printf ("\n");
-    printf ("init.bin: Testing read()\n");
+    printf ("sm.bin: Testing read()\n");
 
     char ReadBuffer[32];
     read( fileno(stdin), ReadBuffer, 4 );
@@ -237,11 +243,35 @@ void main(void)
     // See: x64init.c, pages.c, process.c ...
     //rtl_clone_and_execute("gdeshell.bin");
 
-    printf ("init.bin: done\n");
+    //char thread_stack[1024];
+   
+    //void *t1;
+    //#todo: IN: address, stack, name.
+    //t1 = (void *) rtl_create_thread(
+    //    &testThread,
+    //    &thread_stack[1023], 
+    //    "Ring3Thread" );
+
+    //#todo: Ainda não é possível, pois não temos timer.
+    //rtl_start_thread(t1);
+
+    printf ("sm.bin: done\n");
+
+
+// interna
+// Uma interrupção para habilitar as interrupções mascaráveis.
+// So depois disso a interrupção de timer vai funcionar.
+// This is Intel processors.
+// [32~255]
+
+    // ok, funciona. Podemos usar o teclado.
+    //asm ("int $199 \n");
+
+    // #test
+    //while(1){}
 
 // Return to marginal.asm
 }
-
 
 
 

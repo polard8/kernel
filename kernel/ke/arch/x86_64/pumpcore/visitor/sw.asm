@@ -260,4 +260,27 @@ _int130:
 ;--    
 
 
+global _int199
+_int199:
+
+    pop qword [frameRIP]
+    pop qword [frameCS]
+    pop qword [frameRFLAGS]
+   
+    mov qword [frameRFLAGS], 0x0000000000003200
+
+    push qword [frameRFLAGS]
+    push qword [frameCS]
+    push qword [frameRIP]
+    iretq
+
+frameRIP:     dq 0
+frameCS:      dq 0
+frameRFLAGS:  dq 0
+
+
+
+
+
+
 

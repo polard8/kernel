@@ -586,6 +586,58 @@ void *sci0 (
                 (unsigned long) arg3 );  // long2
             return NULL;
             break;
+   
+
+        // 72
+        // See: sci/sys/sys.c
+        // Cria uma thread e coloca ela pra rodar.
+        case SYS_CREATETHREAD:
+            debug_print("sci0: [FIXME] SYS_CREATETHREAD\n");
+            return (void *) sys_create_thread ( NULL,  NULL, NULL, 
+                                arg2,             // init eip
+                                arg3,             // init stack
+                                current_process,  // pid
+                                (char *) a4 );    // name
+            break; 
+
+
+
+        // 73
+        // See: sci/sys/sys.c
+        // Cria um processo e coloca a thread primária pra rodar.
+        // #bugbug: 
+        // Na inicializacao do kernel, nos criamos um processo
+        // usando create_process. Mas nesse momento estavamos usando
+        // o diretorio de paginas do kernel e os registradores de segmento
+        // pertenciam ao kernel.
+        // Nessa tentativa de criarmos um processo usando create_process
+        // as coisas estao um pouco diferentes ... provavelmente
+        // estamos usando o diretorio de paginas do processo e os
+        // registradores de segmento podem estar em ring3.
+        // ?? Talvez poderiamos criar um request, da mesma maneira 
+        // que fazemos com a criaçao de threads e o spawn.
+
+        // #todo
+        // Aqui no kernel, precisamos criar mais rotinas de suporte
+        // a criacao de processos.
+        // Temos poucas opçoes e tudo esta meio fora de ordem ainda.
+
+        // syscall: 
+        // arg2 = name
+        // arg3 = process priority
+        // arg4 = nothing
+        
+        case SYS_CREATEPROCESS:
+            debug_print("sci0: [FIXME] SYS_CREATEPROCESS\n");
+            return (void *) sys_create_process ( 
+                                NULL, NULL, NULL, 
+                                0, arg3,        //res, priority
+                                0, (char *) a2, //ppid, name
+                                RING3 ); 
+            break;
+
+
+
 
 		//80 Show current process info.
 		//#todo: Mostrar em uma janela pr�pria.
@@ -1120,8 +1172,7 @@ void *sci2 (
                             (int)          arg4 );
     }
 
-    // ...
-    
+    // ...    
 
     if (number == 265){
         //debug_print("sci2: [FIXME] Service 265 suspended!\n");   

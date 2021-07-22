@@ -611,10 +611,11 @@ setup_vectors:
     ;; Uma interrupção para habilitar as interrupções mascaráveis.
     ;; quem usará isso será a thread primária do processo init.
     ;; apenas uma vez.
+    ;; See: sw.asm
     
-    ;mov eax,  dword _int199
-    ;mov ebx,  dword 199
-    ;call _setup_system_interrupt  
+    mov rax,  qword _int199
+    mov rbx,  qword 199
+    call _setup_system_interrupt  
 
     ;; ...
 
