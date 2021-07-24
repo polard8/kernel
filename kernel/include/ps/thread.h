@@ -802,6 +802,23 @@ void show_thread_information (void);
 
 int thread_profiler( int service );
 
+//
+// Creation
+//
+
+// worker for create_thread.
+void 
+__ps_setup_x64_context ( 
+    struct thread_d *t, 
+    int iopl,
+    unsigned long init_stack,
+    unsigned long init_rip );
+
+// worker for create_thread.
+void
+__ps_initialize_thread_common_elements(
+    struct thread_d *t );
+
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
@@ -810,6 +827,12 @@ struct thread_d *create_thread (
     unsigned long init_stack, 
     int pid, 
     char *name );
+
+// =====
+
+//
+// Exit
+//
 
 void exit_thread (int tid);
 void exit_current_thread(void);

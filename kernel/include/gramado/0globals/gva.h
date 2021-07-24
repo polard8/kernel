@@ -75,8 +75,13 @@
 
 
 
-
+// The start of the kernel image virtual address.
 #define KERNEL_IMAGE_BASE  KERNELIMAGE_VA  
+#define KERNBASE           KERNELIMAGE_VA
+
+// Entry point
+// Start of kernel text.
+#define KERNTEXTOFF  (KERNBASE + 0x1000)
 
 
 //

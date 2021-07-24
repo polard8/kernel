@@ -15,6 +15,30 @@
 extern void asm_reboot (void);
 
 
+/*
+// Called by the idle handler for up.
+void hal_up_idle(void);
+void hal_up_idle(void)
+{
+    asm ("sti");
+    asm ("hlt");
+    return;
+}
+*/
+
+
+/*
+// Called by the idle handler for mp.
+void hal_mp_idle(void);
+void hal_mp_idle(void)
+{
+    asm ("sti");
+    return;
+}
+*/
+
+
+
 
 void hal_set_machine_type ( unsigned long type )
 {

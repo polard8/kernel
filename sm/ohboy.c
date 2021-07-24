@@ -244,18 +244,22 @@ void main(void)
     //rtl_clone_and_execute("gdeshell.bin");
     //rtl_clone_and_execute("sm.bin"); 
 
+    //rtl_clone_and_execute("gdeshell.bin");   //fail
+    //rtl_clone_and_execute(".bin"); 
+
 
 //
 //
 //
 
     // It is working ... but the crt0 in rtl just have an 'int 3'
+    // #todo #bugbug 
+    // Actually, int ring 0, is spawning the target thread.
+    // That is not what we want ... 
+    // We do not have the taskswching enabled yet.
     rtl_clone_and_execute("reboot.bin"); 
     
     
-    
-    //rtl_clone_and_execute("gdeshell.bin");   //fail
-    //rtl_clone_and_execute(".bin"); 
 
 
     //char thread_stack[1024];
