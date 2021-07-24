@@ -770,9 +770,10 @@ unsigned long __GetProcessStats ( int pid, int index ){
 
 // Systemcall 882.
 // Pega o nome do processo.
+// OUT: string len.
 int getprocessname ( int pid, char *buffer ){
 
-    struct process_d *p;
+    struct process_d  *p;
 
     char *name_buffer = (char *) buffer;
 
@@ -781,7 +782,7 @@ int getprocessname ( int pid, char *buffer ){
 
     if (pid<0){
         debug_print ("getprocessname: [FAIL] pid\n");
-        return -1;
+        goto fail;
     }
 
     //#todo
@@ -791,22 +792,30 @@ int getprocessname ( int pid, char *buffer ){
 
     if ( (void *) p == NULL ){
         debug_print ("getprocessname: [FAIL] p\n");
-        return -1;
-    }else{
-        if ( p->used != TRUE || p->magic != 1234 ){
-            debug_print ("getprocessname: [FAIL] VALIDATION\n");
-            return -1;
-        }
-        
-        // 64 bytes
-        strcpy ( name_buffer, (const char *) p->__processname );  
-        
-        //#bugbug: Provavelmente isso ainda nem foi calculado.
-        return (int) p->processName_len;
-    };
+        goto fail;
+    }
 
-    return -1;
+    if ( p->used != TRUE || p->magic != 1234 )
+    {
+        debug_print ("getprocessname: [FAIL] Validation\n");
+        goto fail;
+    }
+
+    // 64 bytes
+    strcpy ( name_buffer, (const char *) p->__processname );  
+
+//done:
+
+    // #bugbug: 
+    // Provavelmente isso ainda nem foi calculado.
+
+    // Return the len.
+    return (int) p->processName_len;
+
+fail:
+    return (int) (-1);
 }
+
 
 /*
  * processObject:
@@ -814,18 +823,24 @@ int getprocessname ( int pid, char *buffer ){
  *     #todo: Criar a mesma rotina para threads e janelas.
  */
 
+// OUT:
+// Pointer to a new structure.
+// NULL if it fails.
+
 struct process_d *processObject (void){
 
-    struct process_d *tmp;
+    struct process_d  *Tmp;
 
-    tmp = (void *) kmalloc ( sizeof(struct process_d) );
-
-    if ( (void *) tmp == NULL ){
-        panic ("ps-processObject: tmp");
+    Tmp = (void *) kmalloc( sizeof(struct process_d) );
+    if ( (void *) Tmp == NULL ){
+        return NULL;
     }
-
-    return (struct process_d *) tmp;
+    // #todo
+    // Maybe we can clean up the structure
+    // or initialize some basic elements.
+    return (struct process_d *) Tmp;
 }
+
 
 /*
  * getNewPID:
@@ -1113,6 +1128,135 @@ void show_process_information (void)
 }
 
 
+// Worker for create_process.
+// Do not check parameters validation.
+void
+__ps_initialize_process_common_elements(
+    struct process_d *p )
+{
+    register int i=0;
+
+
+    p->objectType  = ObjectTypeProcess;
+    p->objectClass = ObjectClassKernelObjects;
+
+    // Signal
+    p->signal = 0;
+    p->umask = 0;
+
+    p->uid  = (int) GetCurrentUserId(); 
+    p->gid  = (int) GetCurrentGroupId(); 
+
+    p->syscalls_counter = 0;
+
+
+//
+// Threads
+//
+
+    // The control thread.
+    p->control = NULL;
+    
+    // List of threads.
+    p->threadListHead = NULL;
+
+
+    // Absolute pathname and relative pathname. 
+
+    p->file_root = (file *) 0;
+    p->file_cwd  = (file *) 0;
+    p->inode_root = (struct inode_d *) 0;
+    p->inode_cwd  = (struct inode_d *) 0;
+
+    // wait4pid: 
+    // O processo esta esperando um processo filho fechar.
+    // Esse � o PID do processo que ele est� esperando fechar.
+
+    p->wait4pid = (pid_t) 0;
+        
+    // Número de processos filhos.
+    p->nchildren = 0;
+
+    p->zombieChildListHead = NULL;
+    p->exit_code = 0;
+
+
+
+// ==========
+
+    // Standard stream.
+    // See: kstdio.c for the streams initialization.
+    // #todo: We need a flag.
+    
+    // #todo
+    // Melhorar esse nome.
+    
+    if (kstdio_standard_streams_initialized != TRUE )
+    {
+        panic ("__ps_initialize_process_common_elements: [ERROR] Standard stream is not initialized\n");
+    }
+    
+    for ( i=0; i<32; ++i ){ p->Objects[i] = 0; }
+
+    if ( (void *) stdin == NULL ){
+        panic ("__ps_initialize_process_common_elements: [TEST] stdin");
+    }
+
+    if ( (void *) stdout == NULL ){
+        panic ("__ps_initialize_process_common_elements: [TEST] stdout");
+    }
+
+    if ( (void *) stderr == NULL ){
+        panic ("__ps_initialize_process_common_elements: [TEST] stderr");
+    }
+
+    p->Objects[0] = (unsigned long) stdin;
+    p->Objects[1] = (unsigned long) stdout;
+    p->Objects[2] = (unsigned long) stderr;
+
+// ==============
+
+//
+// == Socket ===================================
+//
+
+    // loop
+    // pending connections;
+    // Lista de conexoes pendentes do processo servidor.
+
+    for ( 
+        i=0; 
+        i < SOCKET_MAX_PENDING_CONNECTIONS; 
+        ++i )
+    {
+        p->socket_pending_list[i] = 0; 
+    };
+
+    p->socket_pending_list_head = 0;
+    p->socket_pending_list_tail = 0;
+    p->socket_pending_list_max  = 0;  // atualizado pelo listen();
+
+//
+// tty support
+//
+
+    //printf ("create_process: calling tty_create[DEBUG]\n");
+
+    p->tty = ( struct tty_d *) tty_create(); 
+
+    if ( (void *) p->tty == NULL ){
+        panic ("create_process: Couldn't create tty\n");
+    }
+    tty_start(p->tty);
+
+
+
+    // ...
+
+    return;
+}
+
+
 
 // Create process
 struct process_d *create_process ( 
@@ -1134,14 +1278,7 @@ struct process_d *create_process (
 
     // Para a entrada vazia no array de processos.
     struct process_d *EmptyEntry; 
-    
-    // loop
-    register int i=0;
 
-    // loop
-    // indice usado na inicializaçao da lista de 
-    // conexoes pendentes do processo servidor.
-    register int sIndex=0;
 
     unsigned long BasePriority=0;
     unsigned long Priority=0;
@@ -1255,10 +1392,18 @@ struct process_d *create_process (
  
 // ====================
 
-    Process->objectType  = ObjectTypeProcess;
-    Process->objectClass = ObjectClassKernelObjects;
-    Process->used  = TRUE;
-    Process->magic = PROCESS_MAGIC;
+// Worker
+// Initializing the elements common for 
+// all types of processes.
+
+    __ps_initialize_process_common_elements( (struct process_d *) Process );
+
+    //Process->objectType  = ObjectTypeProcess;
+    //Process->objectClass = ObjectClassKernelObjects;
+
+    // foi para o fim.
+    //Process->used  = TRUE;
+    //Process->magic = PROCESS_MAGIC;
 
     // Undefined
     Process->position = 0;
@@ -1274,21 +1419,25 @@ struct process_d *create_process (
     // PID. PPID. UID. GID.
     Process->pid  = (int) PID; 
     Process->ppid = (int) ppid; 
-    Process->uid  = (int) GetCurrentUserId(); 
-    Process->gid  = (int) GetCurrentGroupId(); 
-    // ...
+
 
     // sessão crítica.
     Process->_critical = 0;
 
+    //foi para o fim.
     //State of process
-    Process->state = INITIALIZED;  
+    //Process->state = INITIALIZED;  
 
     //@TODO: ISSO DEVERIA VIR POR ARGUMENTO
      Process->plane = FOREGROUND;
 
     //Error.
     //Process->error = 0;
+
+
+//
+// Name
+//
 
     //Name.
     Process->name = (char *) name; //@todo: usar esse.
@@ -1300,34 +1449,6 @@ struct process_d *create_process (
     strcpy ( Process->__processname, (const char *) name); 
 
     Process->processName_len = sizeof(Process->__processname);
-
-
-    // Standard stream.
-    // See: kstdio.c for the streams initialization.
-    // #todo: We need a flag.
-    
-    if (kstdio_standard_streams_initialized != TRUE )
-    {
-        panic ("create_process: [ERROR] Standard stream is not initialized\n");
-    }
-    
-    for ( i=0; i<32; ++i ){ Process->Objects[i] = 0; }
-
-    if ( (void *) stdin == NULL ){
-        panic ("create_process: [TEST] stdin");
-    }
-
-    if ( (void *) stdout == NULL ){
-        panic ("create_process: [TEST] stdout");
-    }
-
-    if ( (void *) stderr == NULL ){
-        panic ("create_process: [TEST] stderr");
-    }
-
-    Process->Objects[0] = (unsigned long) stdin;
-    Process->Objects[1] = (unsigned long) stdout;
-    Process->Objects[2] = (unsigned long) stderr;
 
 
     //Process->terminal =
@@ -1621,8 +1742,6 @@ struct process_d *create_process (
     //Que tipo de scheduler o processo utiliza. (rr, realtime ...).
     //Process->scheduler_type = ; 
     
-    // Syscalls counter.
-    Process->syscalls_counter = 0;
 
     // #todo
     // Counters
@@ -1634,16 +1753,6 @@ struct process_d *create_process (
 
     //As threads do processo iniciam com esse quantum.
     //Process->ThreadQuantum   
-
-//
-// == Thread =====================
-//
-
-    //Process->threadCount = 0;    //N�mero de threads do processo.
-    //Process->tList[32] 
-
-    Process->threadListHead = NULL;
-    Process->control = NULL;
 
     //Process->event
 
@@ -1665,80 +1774,6 @@ struct process_d *create_process (
     Process->desktop  = desktop;             // Passado via argumento.
 
 
-    // absolute pathname and relative pathname. 
-
-    Process->file_root = (file *) 0;
-    Process->file_cwd  = (file *) 0;
-    Process->inode_root = (struct inode_d *) 0;
-    Process->inode_cwd  = (struct inode_d *) 0;
-
-    // wait4pid: 
-    // O processo esta esperando um processo filho fechar.
-    // Esse � o PID do processo que ele est� esperando fechar.
-
-    Process->wait4pid = (pid_t) 0;
-        
-    // Número de processos filhos.
-    Process->nchildren = 0;
-
-    Process->zombieChildListHead = NULL;
-    Process->exit_code = 0;
-
-    // ?? 
-    // Procedimento eem ring 0 por enquanto.
-    //Process->dialog_address = (unsigned long) &system_procedure;
-
-    // Signal
-    Process->signal = 0;
-    Process->umask = 0;
-
-//
-// Msg
-//
-
-    //#bugbug
-    //deleta isso.
-		//Msg support.
-		//Argumentos do procedimento de janela.
-		//@todo: Isso pode ser um ponteiro de estrutura,
-		//a fila de mensgens pode ser uma fila de ponteiros.
-        //Process->window = NULL;    //arg1. 
-        //Process->msg = 0;          //arg2.
-        //Process->long1 = 0;        //arg3.
-        //Process->long2 = 0;        //arg4.
-
-//
-// == Socket ===================================
-//
-
-    // loop
-    // pending connections;
-    
-    for ( 
-        sIndex = 0; 
-        sIndex < SOCKET_MAX_PENDING_CONNECTIONS; 
-        ++sIndex )
-    {
-        Process->socket_pending_list[sIndex] = 0; 
-    };
-
-    Process->socket_pending_list_head = 0;
-    Process->socket_pending_list_tail = 0;
-    Process->socket_pending_list_max  = 0;  // atualizado pelo listen();
-
-//
-// tty support
-//
-
-    //printf ("create_process: calling tty_create[DEBUG]\n");
-
-    Process->tty = ( struct tty_d *) tty_create(); 
-
-    if ( (void *) Process->tty == NULL ){
-        panic ("create_process: Couldn't create tty\n");
-    }
-    tty_start(Process->tty);
-
 //
 // Navigation
 //
@@ -1754,9 +1789,15 @@ struct process_d *create_process (
     // #todo
     // last_created = PID;
     
+    Process->state = INITIALIZED;
+
+    // Validation.
+    Process->used  = TRUE;
+    Process->magic = PROCESS_MAGIC;
+
     // #debug
     debug_print ("create_process: done\n");
-    printf ("create_process: done\n");
+    printf      ("create_process: done\n");
 
     // ok
     return (void *) Process;

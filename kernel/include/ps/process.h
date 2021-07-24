@@ -910,6 +910,11 @@ void show_process_information (void);
 
 // ===
 
+// Worker for create_process.
+void
+__ps_initialize_process_common_elements(
+    struct process_d *p );
+    
 struct process_d *create_process ( 
     struct room_d    *room,
     struct desktop_d *desktop,

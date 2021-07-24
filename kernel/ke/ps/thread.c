@@ -749,13 +749,10 @@ struct thread_d *create_thread (
     struct thread_d   *Thread;   // Thread
     struct thread_d   *Empty;    // Empty slot
 
-    // Identificadores.
     int ProcessID = -1;
 
-    // Counters.
+    // Counter
     int i = USER_BASE_TID;
-    //register int q=0;  //loop
-    //register int w=0;  //loop
 
 
     debug_print ("create_thread: #todo\n");
