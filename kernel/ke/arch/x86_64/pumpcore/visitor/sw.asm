@@ -1,5 +1,24 @@
 
 ; sw.asm
+; This file handles syscall for x86_64 processors.
+; 0x80, 0x81, 0x82
+
+
+;;-----
+; _int128
+; 
+;     System Call number 0x80
+;
+;     + It is never called from kernel mode.
+;     + It calls a system service without changing the segment registers.
+;
+;     It has four parameters:
+;     rax - Argument 1
+;     rbx - Argument 2
+;     rcx - Argument 3
+;     rdx - Argument 4
+;
+;;-----
 
 extern _xxxxINT128_DEBUG_MESSAGE
 extern _sci0
@@ -83,7 +102,21 @@ _int128:
 
 
 
-
+;;-----
+; _int129
+; 
+;     System Call number 0x81
+;
+;     + It is never called from kernel mode.
+;     + It chamges the segment registers before calling the system service.
+;
+;     It has four parameters:
+;     rax - Argument 1
+;     rbx - Argument 2
+;     rcx - Argument 3
+;     rdx - Argument 4
+;
+;;-----
 
 ;extern _xxxxINT129_DEBUG_MESSAGE
 extern _sci1
@@ -173,6 +206,21 @@ _int129:
 
 
 
+;;-----
+; _int128
+; 
+;     System Call number 0x82
+;
+;     + It is never called from kernel mode.
+;     + It chamges the segment registers before calling the system service.
+;
+;     It has four parameters:
+;     rax - Argument 1
+;     rbx - Argument 2
+;     rcx - Argument 3
+;     rdx - Argument 4
+;
+;;-----
 
 ;extern _xxxxINT130_DEBUG_MESSAGE
 extern _sci2

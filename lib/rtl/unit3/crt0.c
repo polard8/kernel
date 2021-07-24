@@ -103,8 +103,12 @@ int crt0 (void){
     // #todo
     // Change this address. We need a valid one.
 
-    char *shared_info = (char *) (0xC0800000 -0x100);
 
+    // #todo
+    //char *shared_info = (char *) (0xC0800000 -0x100);
+
+    char *shared_info = "nothing nothing";
+    
     // Environment.
     environ = my_environ;
 
@@ -191,11 +195,21 @@ int crt0 (void){
 // Initialize the library.
 //
 
+    int rt_status = -1;
+    
     // See: stdlib/stdlib.c
-    libcInitRT();
+    gramado_system_call(65,'1',0,0);
+    rt_status = libcInitRT();
 
+    if (rt_status != 0)
+        gramado_system_call(65,'e',0,0);
+
+
+    // return void
     // See: stdio/stdio.c
+    gramado_system_call(65,'2',0,0);
     stdioInitialize();
+
 
 
     // #todo

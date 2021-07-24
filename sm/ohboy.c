@@ -242,7 +242,20 @@ void main(void)
     // Trabalhando na implementação dessa rotina em ring0.
     // See: x64init.c, pages.c, process.c ...
     //rtl_clone_and_execute("gdeshell.bin");
-    //rtl_clone_and_execute("reboot.bin"); 
+    //rtl_clone_and_execute("sm.bin"); 
+
+
+//
+//
+//
+
+    // It is working ... but the crt0 in rtl just have an 'int 3'
+    rtl_clone_and_execute("reboot.bin"); 
+    
+    
+    
+    //rtl_clone_and_execute("gdeshell.bin");   //fail
+    //rtl_clone_and_execute(".bin"); 
 
 
     //char thread_stack[1024];
@@ -258,6 +271,8 @@ void main(void)
     //rtl_start_thread(t1);
 
     printf ("sm.bin: done\n");
+    
+    
 
 
 // interna
@@ -270,7 +285,7 @@ void main(void)
     //asm ("int $199 \n");
 
     // #test
-    //while(1){}
+    while(1){}
 
 // Return to marginal.asm
 }

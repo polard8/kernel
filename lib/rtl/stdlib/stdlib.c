@@ -517,10 +517,12 @@ int heapInit(void)
     // #todo
     // Temos que usar uma chamada que pegue o tamanho do heap do processo.
     // Pois somente o processo init tem 2mb de heap, usando o extra heap 1.
+    // Os outros processo possuem apenas 128 KB de heap.
 
     HEAP_START = (unsigned long) &heaptest[0];  //0x0000000030A00000 para init process
     HEAP_END   = (unsigned long) (HEAP_START + (1024*1024*2) ); //(HEAP_START + (1024*128) );  //128KB 
     HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
+
 
     heap_start  = (unsigned long) HEAP_START;
     heap_end    = (unsigned long) HEAP_END;
@@ -539,10 +541,10 @@ int heapInit(void)
     debug_print ("heapInit: testing heaps permission \n");    
     
     //Endereço valido somente para processo init
-    if ( heap_start != 0x0000000030A00000 ){
-        debug_print ("heapInit: [ERROR] wrong address  \n");
-        while(1){}
-    }
+    //if ( heap_start != 0x0000000030A00000 ){
+    //    debug_print ("heapInit: [ERROR] wrong address  \n");
+    //    while(1){}
+    //}
 
 // ================================
 
@@ -659,7 +661,7 @@ int stdlibInitMM (void){
 
     if ( Status != 0 ){
         debug_print ("stdlibInitMM: [FAIL] heapInit\n");
-        //printf ("stdlibInitMM: [FAIL] heapInit\n");
+        //printf      ("stdlibInitMM: [FAIL] heapInit\n");
         return (int) 1;
     }
 
@@ -688,6 +690,7 @@ int stdlibInitMM (void){
 
     //#debug
     debug_print ("stdlibInitMM: done\n");
+    //printf      ("stdlibInitMM: done\n");
 
     return (int) Status;
 }

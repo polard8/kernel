@@ -615,7 +615,7 @@ do_clone:
 // Debug
 //
 
-    /*
+    
     printf ("\n");
     printf ("--[ Debug ]---------------------------------\n");
 
@@ -630,13 +630,14 @@ do_clone:
     printf ("--------------------------------------------\n");
     printf ("\n");
 
-    //SelectForExecution(Clone->control);
-    //KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
-    */
+    // See: thread.c and spawn.c
+    SelectForExecution(Clone->control);
+    KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
+    
 
     // #debug
-    // refresh_screen();
-    // while(1){}
+     refresh_screen();
+     while(1){}
    
 
 
@@ -1541,7 +1542,7 @@ struct process_d *create_process (
 
     if (g_heappool_va == 0){
         debug_print ("clone_and_execute_process: g_heappool_va\n");
-        //panic ("clone_and_execute_process: g_heappool_va\n");
+        panic ("clone_and_execute_process: g_heappool_va\n");
     }
 
     // Ignoraremos esse pois vai falhar na criacao do primeiro heap.
@@ -1550,7 +1551,7 @@ struct process_d *create_process (
 
     if (g_heap_size == 0){
         debug_print ("clone_and_execute_process: g_heap_size\n");
-        //panic ("clone_and_execute_process: g_heap_size\n");
+        panic ("clone_and_execute_process: g_heap_size\n");
     }
 
     // #bugbug

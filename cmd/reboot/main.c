@@ -34,6 +34,10 @@ int main ( int argc, char *argv[] ){
     unsigned char good=0;
 
 
+    gramado_system_call(65,'3',0,0);
+    printf ("R E B O O T\n");
+    asm("int $3");
+
 
    /*
    //=================
@@ -107,6 +111,10 @@ int main ( int argc, char *argv[] ){
     puts        ("\n");
     printf      ("REBOOT.BIN: Rebooting ...\n");
     debug_print ("REBOOT.BIN: Rebooting ...\n");
+    
+    // #test
+    // using the stadard method.
+    goto via_rtl;
 
 
     // get info from crt0.o

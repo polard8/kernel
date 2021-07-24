@@ -1,4 +1,8 @@
 
+; unit1hw.asm
+; This file handles the traps for the x86_64 processors.
+;
+
 
 ;;=====================================================
 ;;  ## TIMER ##
@@ -1461,6 +1465,9 @@ _fault_GP:
     jmp all_faults
 
 ; int 14 - Page Fault (PF).
+; #todo:
+; The hardware pushes a stack frame with the context and generate
+; an error code describing the error.
 global _fault_N14
 _fault_N14:
     mov qword [_save_fault_number], qword 14
