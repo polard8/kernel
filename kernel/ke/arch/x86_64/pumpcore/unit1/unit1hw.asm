@@ -63,20 +63,22 @@ extern _contextR15
 ;================================
 
 extern _xxxxIRQ0_DEBUG_MESSAGE
+extern _irq0_TIMER
+extern _psTaskSwitch
 
 ; Capture context
 global _irq0
 _irq0:
 
     cli
-    
+
     ; No caso do dispatcher lançar uma nova thread,
     ; então ele deve acionar enviar um EIO.
     ; mov dword [_irq0PendingEOI], 1
 
     ;; == Save context ====================
     
-    ;; Stack frame. (all double)
+    ; Stack frame. (all double)
     pop qword [_contextRIP]     ; rip
     pop qword [_contextCS]      ; cs
     pop qword [_contextRFLAGS]  ; rflags
@@ -98,7 +100,7 @@ _irq0:
 ;
 
     xor rax, rax
-    
+
     ; Is it used?
     mov ax, gs
     mov word [_contextGS], ax
@@ -143,14 +145,16 @@ _irq0:
     ;; No parameters
     ;; dirty stack
     
-    call _xxxxIRQ0_DEBUG_MESSAGE
+    ;call _xxxxIRQ0_DEBUG_MESSAGE
     ;call _xxxxIRQ0_DEBUG_MESSAGE
 
-    ;; Timer support. No task switch.
-    ;call _irq0_TIMER
+    ; Timer support. No task switch.
+    ; See: pit.c
+    call _irq0_TIMER    ; Tick
 
-    ;; Task switching.
-    ;call _psTaskSwitch
+    ; Task switching.
+    ; See: ts.c
+    ;call _psTaskSwitch   ; Task switching
 
 ; Essa é a única interrupção que tem seu retorno
 ; na unit 3.

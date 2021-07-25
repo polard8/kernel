@@ -240,7 +240,7 @@ sixth..     ide5, usually PCI, probed
 
 // Permite que várias mensagens secundárias 
 // sejam enviadas para a porta serial.
-// #define SERIAL_DEBUG_VERBOSE 1
+#define SERIAL_DEBUG_VERBOSE 1
 
 
 //

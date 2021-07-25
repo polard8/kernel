@@ -252,14 +252,34 @@ void main(void)
 //
 //
 
+    asm ("int $199 \n");
+
+//
+// Unlock the taskswitching support.
+//
+
+    gramado_system_call (641,0,0,0);  // unlock taskswitch
+
+//
+// Unlock the scheduler embedded into the base kernel.
+//
+
+    gramado_system_call (643,0,0,0);  // unlock scheduler
+
+
     // It is working ... but the crt0 in rtl just have an 'int 3'
     // #todo #bugbug 
     // Actually, int ring 0, is spawning the target thread.
     // That is not what we want ... 
     // We do not have the taskswching enabled yet.
-    rtl_clone_and_execute("reboot.bin"); 
     
+    // #bugbug
+    // O problema é que precisamos configurar corretamente a
+    // thread que vamos rodar.
+    // quando deixamos o task switching efetuar o spawn,
+    // não estamos indo para ela pela primeira vez corretamente 
     
+    //rtl_clone_and_execute("reboot.bin"); 
 
 
     //char thread_stack[1024];
@@ -274,9 +294,8 @@ void main(void)
     //#todo: Ainda não é possível, pois não temos timer.
     //rtl_start_thread(t1);
 
-    printf ("sm.bin: done\n");
-    
-    
+    printf ("sm.bin: done *breakpoint\n");
+        
 
 
 // interna

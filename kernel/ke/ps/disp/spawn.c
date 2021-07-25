@@ -18,6 +18,10 @@ void spawn_thread (int tid)
 
     debug_print ("spawn_thread:\n");
 
+    // #debug
+    printf ("spawn_thread: SPAWN !\n");
+    refresh_screen();
+
 
     // The next will be the current thread.
     Next = (void *) threadList[current_thread];
@@ -171,7 +175,7 @@ void spawn_thread (int tid)
         " movq $0, %%rbp    \n" 
         " pushq $0x23       \n"  
         " pushq %%rsp       \n" 
-        " pushq $0x3002     \n" 
+        " pushq $0x3202     \n"  // Interrupts enabled thread that are not the first.
         " pushq $0x1B       \n" 
         " pushq %%rax       \n" 
         " iretq             \n" :: "D"(entry), "S"(rsp3) );

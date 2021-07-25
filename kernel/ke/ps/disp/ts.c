@@ -130,6 +130,7 @@ The remainder ??
 
     if ( task_switch_status == LOCKED ){
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
+        debug_print ("task_switch: Locked\n");
         return; 
     }
 
@@ -170,6 +171,7 @@ The remainder ??
             }
 
             IncrementDispatcherCount (SELECT_CURRENT_COUNT);
+            debug_print ("task_switch: The same again\n");
             return; 
 
 		// #importante
@@ -201,15 +203,15 @@ The remainder ??
                 if ( Current->preempted == PREEMPTABLE )
                 {
                     //debug_print (" preempt_q1 ");
-                    queue_insert_head ( 
-                        queue, (unsigned long) Current, QUEUE_READY );
+                    //queue_insert_head ( 
+                        //queue, (unsigned long) Current, QUEUE_READY );
                 }
 
                 if ( Current->preempted == UNPREEMPTABLE )
                 {
                     //debug_print (" preempt_q2 ");
-                    queue_insert_data ( 
-                        queue, (unsigned long) Current, QUEUE_READY );
+                    //queue_insert_data ( 
+                        //queue, (unsigned long) Current, QUEUE_READY );
                 }
             }
 
@@ -410,7 +412,7 @@ go_ahead:
 
 dispatch_current:
 
-#ifdef SERIAL_DEBUG_VERBOSE	
+#ifdef SERIAL_DEBUG_VERBOSE
     debug_print (" DISPATCH_CURRENT \n");
 #endif
 
@@ -555,7 +557,9 @@ dispatch_current:
 // Called by:
 // _irq0 in hw.asm
 
-void psTaskSwitch (void){
+void psTaskSwitch (void)
+{
+     debug_print ("TS ");
 
     // Check current process limits.
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
@@ -573,7 +577,7 @@ void psTaskSwitch (void){
 
 #ifdef SERIAL_DEBUG_VERBOSE
     //debug_print (".");
-     debug_print ("ts ");
+     //debug_print ("ts ");
 #endif
 
 //
@@ -590,7 +594,10 @@ void psTaskSwitch (void){
  
     // #importante:   
     // Retornando para _irq0 em x86/hw.inc.
+
+     debug_print ("TS_DONE \n");
 }
+
 
 /*
  * get_task_status:

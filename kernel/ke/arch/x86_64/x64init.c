@@ -326,9 +326,9 @@ void x64ExecuteInitialProcess (void)
 // # check this
 //
 
-	// turn_task_switch_on:
-	//  + Creates a vector for timer irq, IRQ0.
-	//  + Enable taskswitch. 
+    // turn_task_switch_on:
+    //  + Creates a vector for timer irq, IRQ0.
+    //  + Enable taskswitch. 
 
     turn_task_switch_on();
 
@@ -451,7 +451,7 @@ void x64ExecuteInitialProcess (void)
         " movq $0, %%rbp    \n" 
         " pushq $0x23       \n"  
         " pushq %%rsp       \n" 
-        " pushq $0x3002     \n" 
+        " pushq $0x3002     \n"  // Interrupts disabled for the first thread.
         " pushq $0x1B       \n" 
         " pushq %%rax       \n" 
         " iretq             \n" :: "D"(entry), "S"(rsp3) );

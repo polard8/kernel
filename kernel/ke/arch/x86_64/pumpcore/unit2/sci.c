@@ -123,6 +123,30 @@ void *gde_extra_services (
     }
 
 
+    if (number == 640){
+        taskswitch_lock();
+        return NULL;
+    }
+
+    if (number == 641){
+        taskswitch_unlock();
+        return NULL;
+    }
+
+
+    if (number == 642){
+        scheduler_lock();
+        return NULL;
+    }
+
+
+    if (number == 643){
+        scheduler_unlock();
+        return NULL;
+    }
+
+
+
     //7000 ~ 7020 for network sockets
 
     // socket() 

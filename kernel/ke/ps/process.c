@@ -610,36 +610,32 @@ do_clone:
     debug_print ("clone_and_execute_process: [5] Done\n");
     debug_print ("---------------------------------------------\n");
 
-
 //
 // Debug
 //
-
     
-    printf ("\n");
-    printf ("--[ Debug ]---------------------------------\n");
+    //printf ("\n");
+    //printf ("--[ Debug ]---------------------------------\n");
 
-    printf ("\n");
-    current_process = Clone->pid;
-    show_currentprocess_info();
+    //printf ("\n");
+    //current_process = Clone->pid;
+    //show_currentprocess_info();
 
-    printf ("\n");
-    current_thread = Clone->control->tid;
-    show_reg(current_thread);
+    //printf ("\n");
+    //current_thread = Clone->control->tid;
+    //show_reg(current_thread);
     
-    printf ("--------------------------------------------\n");
-    printf ("\n");
+    //printf ("--------------------------------------------\n");
+    //printf ("\n");
 
     // See: thread.c and spawn.c
-    SelectForExecution(Clone->control);
-    KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
+    //SelectForExecution(Clone->control);
+    //KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
     
 
     // #debug
-     refresh_screen();
-     while(1){}
-   
-
+    //refresh_screen();
+    //while(1){}
 
     // Return child's PID.
 

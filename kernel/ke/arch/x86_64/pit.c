@@ -125,6 +125,8 @@ irq0_TIMER (void)
 void DeviceInterface_PIT(void)
 {
 	//#todo
+    debug_print ("-- :) ---------\n");
+    debug_print ("Tick\n");
 }
 
 

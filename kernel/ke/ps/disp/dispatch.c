@@ -286,8 +286,8 @@ do_dispatch:
         dispatch_Pointer->state = RUNNING;
         dispatch_Pointer->runningCount = 0;
 
-        queue_insert_data ( queue, 
-            (unsigned long) dispatch_Pointer, QUEUE_RUNNING );
+        //queue_insert_data ( queue, 
+            //(unsigned long) dispatch_Pointer, QUEUE_RUNNING );
     }
 
 
