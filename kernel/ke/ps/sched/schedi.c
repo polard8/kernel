@@ -35,24 +35,21 @@ int KiScheduler (void){
 
 
     if (g_scheduler_status == LOCKED){
+        debug_print ("schedi: Locked $\n");
         return 0;
     }
 
-    
-	//
-	// Check idle
-	//
-	
+//
+// Check idle
+//
+
     if ( (void *) ____IDLE == NULL ){
         panic ("KiScheduler: ____IDLE fail");
-
     }else{
-
         if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 ){
             panic ("KiScheduler: ____IDLE validation");
         }
-
-	    // ...
+        // ...
     };
 
 	// Retornaremos se tivermos apenas um thread rodando.
@@ -62,15 +59,23 @@ int KiScheduler (void){
     //if ( ProcessorBlock.threads_counter == 1 )
     if ( UPProcessorBlock.threads_counter == 1 )
     { 
+        // #bugbug
+        // Isso não é uma coisa boa, pois quem chamou a
+        // gente está esperando por um novo Conductor.
+        
+        //#test
+        Conductor = ____IDLE;
+        
         current_thread = ____IDLE->tid;
+        debug_print("schedi: ____IDLE $\n");
         return (int) current_thread;
     }
-
 
     //Chama o Scheduler.
 
     return (int) scheduler();
 }
+
 
 /*
  ************************************************************
@@ -706,21 +711,36 @@ void yield (int tid){
 
 void check_for_standby (void){
 
+
+
     // loop
     register int i = 0;
-    register int Max = 32;  // max what?
+    //register int Max = 32;  // max what?
+    register int Max = THREAD_COUNT_MAX;  // max what?
+
+
+
+
     int newId=0;
+ 
     struct thread_d  *New;
 
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    debug_print (" check_for_standby ");
+    //debug_print (" check_for_standby ");
+    debug_print (" Check ");
 #endif
 
     do {
 
-        New = (void *) queue->standbyList[i];
-
+        // #todo: 
+        // As filas ainda não funcionam.
+        // Vamos usar a lista global.
+        
+        //New = (void *) queue->standbyList[i];
+        
+        New = (void *) threadList[i];
+        
         if ( (void *) New != NULL )
         {
             if ( New->used  == TRUE && 
@@ -734,7 +754,8 @@ void check_for_standby (void){
 
         i++;
 
-    } while (i < Max);  
+    // Todas as threads da lista global.
+    } while (i < Max); 
 
 // Done: 
 // Nenhuma tarefa precisa ser inicializada.
@@ -754,9 +775,8 @@ void check_for_standby (void){
 do_spawn:
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    debug_print(" SPAWN \n");
+    debug_print(" Spawn $ \n");
 #endif
-
 
     // #todo
     // if ( current_thread < 0 ...

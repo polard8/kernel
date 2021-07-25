@@ -154,7 +154,8 @@ _irq0:
 
     ; Task switching.
     ; See: ts.c
-    ;call _psTaskSwitch   ; Task switching
+    call _psTaskSwitch   ; Task switching
+
 
 ; Essa é a única interrupção que tem seu retorno
 ; na unit 3.

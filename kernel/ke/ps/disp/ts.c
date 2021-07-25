@@ -28,13 +28,13 @@ void task_switch (void)
     // Check current thread limits.
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
-        panic ("ts-task_switch: current_thread\n");
+        panic ("ts: current_thread\n");
     }
 
     Current = (void *) threadList[current_thread]; 
 
     if ( (void *) Current == NULL ){
-        panic ("ts-task_switch: Current\n");
+        panic ("ts: Current\n");
     }
     
     // #todo
@@ -48,19 +48,19 @@ void task_switch (void)
 
     // #todo: Check overflow too.
     if (pid<0){
-        panic ("ts-task_switch: pid\n");
+        panic ("ts: pid\n");
     }
 
     P = (void *) processList[pid];
 
     if ( (void *) P == NULL ){
-        panic ("ts-task_switch: P\n");
+        panic ("ts: P\n");
     }
 
     // validation
     if ( P->used != TRUE && P->magic != 1234 )
     {
-        panic ("ts-task_switch: P validation\n");
+        panic ("ts: P validation\n");
     }
 
    // Update the global variable.
@@ -130,7 +130,7 @@ The remainder ??
 
     if ( task_switch_status == LOCKED ){
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-        debug_print ("task_switch: Locked\n");
+        debug_print ("ts: Locked $\n");
         return; 
     }
 
@@ -162,16 +162,24 @@ The remainder ??
         if ( Current->runningCount < Current->quantum )
         {
             // Yield support.
+            // Atendendo o pedido para tirar a thread do estado de rodando
+            // e colocar ela no estado de pronta.
             // Coloca no estado de pronto e limpa a flag.
-            if ( Current->state == RUNNING && Current->_yield == 1 )
+            // Em seguida vamos procurar outra.
+            if ( Current->state == RUNNING && Current->_yield == TRUE )
             {
                 Current->state  = READY;
-                Current->_yield = 0;
+                Current->_yield = FALSE;
                 goto try_next;
             }
 
+            // A mesma thread vai rodar novamente,
+            // Não precisa restaurar o contexto.
+            // O seu contexto está salvo, mas o handler em assembly
+            // vai usar o contexto que ele já possui.
             IncrementDispatcherCount (SELECT_CURRENT_COUNT);
-            debug_print ("task_switch: The same again\n");
+            //debug_print (" The same again $\n");
+            //debug_print ("s");  // the same again
             return; 
 
 		// #importante
@@ -180,24 +188,29 @@ The remainder ??
 		// para rodar de acordo com a ordem estabelecida 
 		// pelo escalonador.
 
+        // Fim do quantum.
         }else{
 
 //
 // ## PREEMPT ##
 //
+
+            // Preempt
             // >> MOVEMENT 3 (Running --> Ready).
+
+            // sofrendo preempção por tempo.
+            // #todo: Mas isso só poderia acontecer se a flag
+            // ->preempted permitisse. 
+            // talvez o certo seja ->preenptable.
 
             if ( Current->state == RUNNING )
             {
-				// Preempt.
-				// MOVEMENT 3 (running >> ready)  
-				
-				// sofrendo preempção por tempo.
-				// #todo: Mas isso só poderia acontecer se a flag
-				// ->preempted permitisse. 
-				// talvez o certo seja ->preenptable.
+                debug_print (" P ");
+                
+                Current->state = READY;
 
-                Current->state = READY;    
+                // #bugbug
+                // As rotinas de fila estão suspensas.
 
                 // Se pode sofrer preenpção vai para fila de prontos.
                 if ( Current->preempted == PREEMPTABLE )
@@ -222,7 +235,13 @@ The remainder ??
 //
             // Call extra routines scheduled to this moment.
 
+            // #hackhack
+            // Vamos validar isso, pois isso é trabalho de uma rotina
+            // do timer qua ainda não esta pronta.
+            //extra = TRUE;
+            extra = FALSE;
             if (extra == TRUE){
+                debug_print (" X "); 
                 tsCallExtraRoutines();
                 extra = FALSE;
             }
@@ -241,6 +260,8 @@ The remainder ??
 
             if (dead_thread_collector_status == TRUE)
             {
+                debug_print (" C "); 
+
                 // #bugbug
                 // #todo: This is a work in progress!
                 check_for_dead_thread_collector();
@@ -268,7 +289,7 @@ The remainder ??
 	// Não deveríamos estar aqui.
 	// Podemos abortar ou selecionar a próxima provisóriamente.
 
-	//panic ("ts.c: crazy fail");
+    //panic ("ts.c: crazy fail");
 
     goto dispatch_current; 
 
@@ -327,7 +348,11 @@ try_next:
 #endif
 
         //printf ("ts: scheduler 1\n");
-        KiScheduler();
+        
+        // Essa rotina reescalona e entrega um novo current_thread.
+        // e conductor.
+        // KiScheduler();
+        current_thread = KiScheduler();
         goto go_ahead;
     }
 
@@ -339,12 +364,17 @@ try_next:
 
     if ( (void *) Conductor->next != NULL )
     {
+
+#ifdef SERIAL_DEBUG_VERBOSE
+        debug_print(" Q ");
+#endif
+
         Conductor = (void *) Conductor->next;
         goto go_ahead;
     }
 
     // #bugbug
-    panic ("ts-task_switch: Unspected");
+    panic ("ts: Unspected");
 
 //
 // == Go ahead ========================================
@@ -365,27 +395,34 @@ go_ahead:
 //                                //
 //################################//
 
+    // Esse foi o ponteiro configurado pelo scheduler.
+
     Current = (void *) Conductor;
+
+    // Vamos checar sua validade.
 
     if( (void *) Current == NULL )
     { 
-        debug_print ("task_switch: Struct \n");
-        KiScheduler();
+        debug_print ("ts: Struct ");
+        //KiScheduler();
+        current_thread = KiScheduler();
         goto try_next;
 
     }else{
 
         if ( Current->used != TRUE || Current->magic != 1234 )
         {
-            debug_print ("task_switch: val \n");
-            KiScheduler ();
+            debug_print ("ts: val ");
+            //KiScheduler ();
+            current_thread = KiScheduler();
             goto try_next;
         }
 
         if ( Current->state != READY )
         {
-            debug_print ("task_switch: state \n");
-            KiScheduler ();
+            debug_print ("ts: state ");
+            //KiScheduler ();
+            current_thread = KiScheduler();
             goto try_next;
         }
 
@@ -413,7 +450,7 @@ go_ahead:
 dispatch_current:
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    debug_print (" DISPATCH_CURRENT \n");
+    debug_print (" ts-dispatch_current: ");
 #endif
 
     // Validation
@@ -421,13 +458,13 @@ dispatch_current:
 
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
     {
-        panic ("ts-task_switch: [Dispatch current] current_thread\n");
+        panic ("ts: [Dispatch current] current_thread\n");
     }
 
     Current = (void *) threadList[current_thread];
 
     if ( (void *) Current == NULL ){
-        panic ("ts-task_switch.dispatch_current: Struct\n");
+        panic ("ts-dispatch_current: Struct\n");
     }
 
     // Validation
@@ -436,7 +473,7 @@ dispatch_current:
          Current->magic != 1234 || 
          Current->state != READY )
     {
-        panic ("task_switch.dispatch_current: validation\n");
+        panic ("ts-dispatch_current: validation\n");
     }
 
     Current->runningCount = 0;
@@ -466,7 +503,7 @@ dispatch_current:
     if ( Current->ownerPID < 0 || 
          Current->ownerPID >= THREAD_COUNT_MAX )
     {
-       printf ("ts-task_switch: ownerPID ERROR \n", 
+       printf ("ts: ownerPID ERROR \n", 
             Current->ownerPID );
        die();
     }
@@ -477,16 +514,15 @@ dispatch_current:
     P = (void *) processList[Current->ownerPID];
 
     if ( (void *) P == NULL ){
-        printf ("ts-task_switch: Process %s struct fail \n", P->name );
+        printf ("ts: Process %s struct fail \n", P->name );
         die();
     }
 
     if ( (void *) P != NULL )
     {
         if ( P->used != 1 || P->magic != 1234 ){
-            printf ("ts-task_switch: Process %s corrompido \n", 
-                P->name );
-            die ();
+            printf ("ts: Process %s validation \n", P->name );
+            die();
         }
 
         if ( P->used == 1 && P->magic == 1234 )
@@ -495,8 +531,7 @@ dispatch_current:
 
             if ( (unsigned long) P->pml4_PA == 0 )
             {
-                printf ("ts-task_switch: Process %s pml4 fail\n", 
-                    P->name );
+                printf ("ts: Process %s pml4 fail\n", P->name );
                 die();
             }
 
@@ -509,11 +544,13 @@ dispatch_current:
             // current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
             // ?? = (unsigned long) P->pml4_PA;
             
+            debug_print ("ts: done $\n");
+            
             return;
         }
-        panic ("ts-task_switch: * Struct * \n");
+        panic ("ts: * Struct * \n");
     }
-    panic ("ts-task_switch: Unspected error\n");
+    panic ("ts: Unspected error\n");
 }
 
 
@@ -559,7 +596,7 @@ dispatch_current:
 
 void psTaskSwitch (void)
 {
-     debug_print ("TS ");
+    //debug_print ("TS ");
 
     // Check current process limits.
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
@@ -576,8 +613,8 @@ void psTaskSwitch (void)
     }
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    //debug_print (".");
-     //debug_print ("ts ");
+    debug_print (".");
+    //debug_print ("ts ");
 #endif
 
 //
@@ -595,7 +632,7 @@ void psTaskSwitch (void)
     // #importante:   
     // Retornando para _irq0 em x86/hw.inc.
 
-     debug_print ("TS_DONE \n");
+    //debug_print ("TS_DONE \n");
 }
 
 

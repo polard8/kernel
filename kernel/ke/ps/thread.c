@@ -1000,6 +1000,7 @@ get_next:
     // Quantos jiffies a thread pode rodar em um round.
     // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
     // Thread->quantum  = QUANTUM_BASE; 
+
     Thread->quantum  = ( Thread->priority * TIMESLICE_MULTIPLIER );
 
     // Quantidade limite de jiffies que uma thread pode rodar em um round.

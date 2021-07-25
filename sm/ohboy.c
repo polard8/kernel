@@ -62,9 +62,12 @@ void *ohboy_system_call (
 
 void testThread(void)
 {
-	debug_print("THREAD\n");
-	while(1){}
+    while (1){
+        debug_print("THREAD 2\n");
+        printf("2"); fflush(stdout);
+    }
 }
+
 
 void main(void)
 {
@@ -282,17 +285,26 @@ void main(void)
     //rtl_clone_and_execute("reboot.bin"); 
 
 
-    //char thread_stack[1024];
-   
-    //void *t1;
-    //#todo: IN: address, stack, name.
-    //t1 = (void *) rtl_create_thread(
-    //    &testThread,
-    //    &thread_stack[1023], 
-    //    "Ring3Thread" );
+//
+// Thread
+//
 
+    char thread_stack[1024];
+    void *t1;
+    //#todo: IN: address, stack, name.
+    t1 = (void *) rtl_create_thread(
+                      &testThread,
+                      &thread_stack[1023], 
+                      "Ring3Thread" );
     //#todo: Ainda não é possível, pois não temos timer.
-    //rtl_start_thread(t1);
+    rtl_start_thread(t1);
+
+
+
+
+//
+// Breakpoint
+//
 
     printf ("sm.bin: done *breakpoint\n");
         
@@ -308,10 +320,19 @@ void main(void)
     //asm ("int $199 \n");
 
     // #test
-    while(1){}
+    //while(1){}
+
+    while (1){
+        debug_print("THREAD 1\n");
+        printf("1"); fflush(stdout);
+    }
 
 // Return to marginal.asm
 }
+
+
+
+
 
 
 

@@ -47,12 +47,10 @@ int scheduler (void)
 
     struct thread_d  *TmpThread;
 
-
-    debug_print ("scheduler: [not tested] \n");
-
+    //debug_print ("scheduler: [not tested] \n");
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    debug_print(" [*SCHEDULER*] ");
+    debug_print(" SCHEDULER: ");
 #endif
 
 

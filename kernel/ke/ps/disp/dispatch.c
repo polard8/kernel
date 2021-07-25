@@ -100,7 +100,8 @@ void dispatcher ( int type )
     struct thread_d *dispatch_Pointer;
 
 
-    debug_print ("dispatcher: [not tested] \n");
+    debug_print (" DISPATCHER: ");
+
 
 	// Obs: 
 	// @todo:
@@ -238,7 +239,7 @@ dispatchReady:
 
 //Dispatch current.
 dispatchCurrent:
-    debug_print ("dispatcher: [TODO] dispatchCurrent\n"); 
+    //debug_print ("dispatcher: [TODO] dispatchCurrent\n"); 
     //current_thread = current_thread;
     goto do_dispatch;
 

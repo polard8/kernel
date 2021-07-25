@@ -135,14 +135,28 @@ void spawn_thread (int tid)
 
     debug_print ("spawn_thread: Load pml4\n");
 
+
+    // Set cr3 and flush TLB.
     // local
     __spawn_load_pml4_table ( Target->pml4_PA );
-
     // #bugbug: rever isso.
     asm ("movq %cr3, %rax");
     asm ("movq %rax, %cr3");
 
+//
+// iretq
+//
+
     debug_print ("spawn_thread: iretq\n");
+
+    // #todo
+    // Configurar a stackframe para saltar para
+    // qualquer ring.
+
+    if ( Target->iopl != RING3 ){
+        debug_print ("spawn_thread: Not a ring3 thread\n");
+        panic       ("spawn_thread: Not a ring3 thread\n");
+    }
 
 
     // #debug
@@ -164,6 +178,16 @@ void spawn_thread (int tid)
     // Probably given by a ring 3 process.
     unsigned long rsp3  = (unsigned long) Target->rsp;
 
+    // #test
+    // Isso porque o spawn só é chamado durante uma interrupção
+    // de timer.
+    // #todo
+    // Deveria ter uma flag indicando que estamos devendo um EOI.
+    
+    asm ("movb $0x20, %al \n");
+    asm ("outb %al, $0x20 \n");
+
+
     asm volatile ( 
         " movq $0, %%rax    \n" 
         " mov %%ax, %%ds    \n" 
@@ -175,7 +199,7 @@ void spawn_thread (int tid)
         " movq $0, %%rbp    \n" 
         " pushq $0x23       \n"  
         " pushq %%rsp       \n" 
-        " pushq $0x3202     \n"  // Interrupts enabled thread that are not the first.
+        " pushq $0x3202     \n"  // Interrupts enabled for the thread that is not the first.
         " pushq $0x1B       \n" 
         " pushq %%rax       \n" 
         " iretq             \n" :: "D"(entry), "S"(rsp3) );

@@ -131,21 +131,22 @@ link-kernel \
 clean    
 
 
+# The entry \o/
 # The x86 head of the monster.
 kernel-header:
 
 	# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) ke/arch/x86_64/pumpcore/unit0/head_64.asm \
+	$(NASM) entry/warden/unit0/x86_64/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I ke/arch/x86_64/pumpcore/unit0/ \
-	-I ke/arch/x86_64/pumpcore/unit1/ \
-	-I ke/arch/x86_64/pumpcore/unit3/ \
-	-I ke/arch/x86_64/pumpcore/unit4/ \
-	-I ke/arch/x86_64/pumpcore/visitor/ \
+	-I entry/warden/unit0/x86_64/ \
+	-I entry/student/unit1/x86_64/ \
+	-I entry/student/unit3/x86_64/ \
+	-I entry/warden/unit4/x86_64/ \
+	-I entry/visitor/x86_64/ \
 	-f elf64 -o head_64.o
 
-	# unit 2
-	$(CC) -c ke/arch/x86_64/pumpcore/unit2/sci.c \
+	# unit 2 (xapx)
+	$(CC) -c entry/visitor/x86_64/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    

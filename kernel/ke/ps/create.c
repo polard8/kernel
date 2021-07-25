@@ -55,8 +55,7 @@ void *create_CreateEarlyRing0IdleThread(void)
     }else{
         kThread->objectType  = ObjectTypeThread;
         kThread->objectClass = ObjectClassKernelObjects;
-        kThread->used  = TRUE;
-        kThread->magic = 1234;
+
         kThread->type = THREAD_TYPE_SYSTEM; 
 
         // #todo
@@ -193,7 +192,9 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
     //kThread->quantum = QUANTUM_BASE;
-    kThread->quantum  = ( kThread->priority * TIMESLICE_MULTIPLIER);
+    //kThread->quantum  = ( kThread->priority * TIMESLICE_MULTIPLIER);
+    //kThread->quantum = 20;
+    kThread->quantum = 40;
     
     // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
     kThread->quantum_limit = QUANTUM_LIMIT;
@@ -324,14 +325,30 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     debug_print ("[5]\n");
 
+
+    kThread->used  = TRUE;
+    kThread->magic = 1234;
+
+
     // #todo
     // This method really need a prefix.
     
     // With this movement, this thread is gonna run in the next
     // task switch.
     
+    
+    
+//
+// #bugbug
+//    
+    
+    
+    // Ainda não vamos colcoar essa thread para rodar pois
+    // o sistema ainda não roda threads em ring0.
+    
     // * MOVEMENT 1 (Initialized --> Standby).
-    SelectForExecution(kThread); 
+    //SelectForExecution(kThread); 
+
 
 // Done
     debug_print ("create_CreateEarlyRing0IdleThread: done\n");
@@ -402,11 +419,10 @@ void *create_CreateRing3InitThread (void)
             // Object header.
             
             // Identificadores 
-            
-            t->used  = TRUE;
-            t->magic = 1234;
-            t->position = SPECIAL_GUEST;
             t->tid = TID;
+
+
+            t->position = SPECIAL_GUEST;
 
             // #bugbug: 
             // Is this a valid pointer?
@@ -424,6 +440,7 @@ void *create_CreateRing3InitThread (void)
             // Execution plane.
             t->plane = BACKGROUND;
             // ...
+
         };
         // ...
     };
@@ -533,7 +550,9 @@ void *create_CreateRing3InitThread (void)
     t->step = 0; 
 
     //t->quantum  = QUANTUM_BASE;
-    t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
+    //t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
+    t->quantum = 20;
+
 
     // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
     t->quantum_limit = QUANTUM_LIMIT;
@@ -689,6 +708,10 @@ void *create_CreateRing3InitThread (void)
 	// colocando no estado standby.
     
     //queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
+
+
+    t->used  = TRUE;
+    t->magic = 1234;
 
 
     // == Execution ===============================
