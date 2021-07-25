@@ -57,16 +57,24 @@ void faults ( unsigned long number )
         case 12: x_panic("faults() 12"); break;
 
 
+        //General Protection Fault
         case 13: 
-            printf ("== PF ==\n");  
-            show_slots();
+            printf ("== GP ==\n");  
+            //show_slots();
             refresh_screen();
             // Esse tipo funciona mesmo antes do console
             // ter sido inicializado.
             x_panic("faults() 13"); 
             break;
         
-        case 14: x_panic("faults() 14"); break;
+        //Page Fault
+        case 14: 
+            printf ("== PF ==\n");  
+            show_slots();
+            refresh_screen();
+            x_panic("faults() 14"); 
+            break;
+        
         case 15: x_panic("faults() 15"); break;
         case 16: x_panic("faults() 16"); break;
         case 17: x_panic("faults() 17"); break;

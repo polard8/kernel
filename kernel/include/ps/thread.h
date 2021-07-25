@@ -861,6 +861,10 @@ void kill_all_threads (void);
 void spawn_thread (int tid);
 void KiSpawnThread (int tid);
 
+
+void spawn_pid(pid_t pid);
+void spawn_tid(int tid);
+
 #endif    
 
 

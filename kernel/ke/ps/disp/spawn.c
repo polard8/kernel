@@ -34,14 +34,14 @@ void spawn_thread (int tid)
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
-        printf ("spawn_thread: TID=%d", tid );
+        printf ("spawn_thread: TID=%d", tid );  
         die();
     }
 
     Target = (void *) threadList[tid]; 
 
     if ( (void *) Target == NULL ){
-        printf ("spawn_thread: Target TID={%d}", tid );
+        printf ("spawn_thread: Target TID={%d}", tid );  
         die();
     }
 
@@ -228,4 +228,49 @@ void KiSpawnThread (int tid)
     panic ("KiSpawnThread\n");
 }
 
+
+// Spawn the control thread of a process.
+// Remember we need to call this after 
+// the irq0 interrupt. Cause the spawn routine
+// has the eoi.
+void spawn_pid(pid_t pid)
+{
+    struct process_d *p;
+    
+    if (pid < 0 || pid >= PROCESS_COUNT_MAX )
+        panic("spawn_pid: pid\n");
+    
+    p = (struct process_d *) processList[pid];
+    
+    if ( (void*) p == NULL )
+        panic("spawn_pid: pid\n");
+
+    if ( p->used != TRUE || p->magic != 1234 )
+        panic("spawn_pid: validation\n");
+
+    KiSpawnThread(p->control);
+
+    return;
+}
+
+
+void spawn_tid(int tid)
+{
+    struct thread_d *t;
+    
+    if (tid < 0 || tid >= THREAD_COUNT_MAX )
+        panic("spawn_tid: tid\n");
+    
+    t = (struct thread_d *) threadList[tid];
+    
+    if ( (void*) t == NULL )
+        panic("spawn_tid: tid\n");
+
+    if ( t->used != TRUE || t->magic != 1234 )
+        panic("spawn_tid: validation\n");
+
+    KiSpawnThread(t);
+
+    return;
+}
 

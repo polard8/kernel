@@ -282,7 +282,9 @@ void main(void)
     // quando deixamos o task switching efetuar o spawn,
     // não estamos indo para ela pela primeira vez corretamente 
     
+    // #fail
     //rtl_clone_and_execute("reboot.bin"); 
+    //while(1){}
 
 
 //
@@ -291,11 +293,12 @@ void main(void)
 
     char thread_stack[1024];
     void *t1;
+
     //#todo: IN: address, stack, name.
     t1 = (void *) rtl_create_thread(
                       &testThread,
                       &thread_stack[1023], 
-                      "Ring3Thread" );
+                      "Ring3Thread1" );
     //#todo: Ainda não é possível, pois não temos timer.
     rtl_start_thread(t1);
 

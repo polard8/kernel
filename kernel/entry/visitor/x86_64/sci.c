@@ -228,6 +228,7 @@ void *gde_extra_services (
     }
 
 
+
     // chamado por gde_get_pid na api.
     // See: system.c
     if ( number == 9999 ){

@@ -630,8 +630,7 @@ do_clone:
 
     // See: thread.c and spawn.c
     //SelectForExecution(Clone->control);
-    //KiSpawnThread(Clone->control->tid);  // #todo This is a work in progress
-    
+    //KiSpawnThread(Clone->control->tid); 
 
     // #debug
     //refresh_screen();
@@ -649,6 +648,8 @@ fail:
     refresh_screen();
     return (pid_t) (-1);
 }
+
+
 
 
 unsigned long __GetProcessStats ( int pid, int index ){
