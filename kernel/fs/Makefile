@@ -70,19 +70,17 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 
-
-OBJS = fs.o \
-pipe.o \
+# Everything is a file.
+OBJS = fs.o pipe.o tty.o \
 search.o \
-disk_r.o disk_w.o \
 io.o \
+disk_r.o disk_w.o \
 ws.o \
 pci.o pciinfo.o pciscan.o \
 devmgr.o \
 serial.o \
 storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
-tty.o \
 video.o vsync.o screen.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o    
 
@@ -91,9 +89,11 @@ i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o
 all:
 
 	# fs
-	$(CC) -c fs.c      $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c pipe.c    $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
-	$(CC) -c search.c  $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
+	$(CC) -c fs.c           $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c pipe.c         $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c dev/tty/tty.c  $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c search.c       $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
+
 	$(CC) -c sdi/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
 	$(CC) -c sdi/disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
 
@@ -105,7 +105,6 @@ all:
 	$(CC) -c bus/pcibus/pciscan.c $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
 
 	$(CC) -c dev/devmgr.c  $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
-	$(CC) -c dev/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 
 	$(CC) -c dev/blkdev/storage.c  $(KERNEL_INCLUDE) $(CFLAGS) -o storage.o 
 
@@ -116,9 +115,7 @@ all:
 	$(CC) -c dev/blkdev/ide/atairq.c   $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
 	$(CC) -c dev/blkdev/ide/atapci.c   $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
 
-
-	$(CC) -c dev/tty/tty.c  $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
-
+	$(CC) -c dev/serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 
 	$(CC) -c dev/graphics/video.c   $(KERNEL_INCLUDE) $(CFLAGS) -o video.o
 	$(CC) -c dev/graphics/vsync.c   $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o

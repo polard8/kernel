@@ -128,11 +128,14 @@ fatLoadCluster (
     unsigned long address, 
     unsigned long spc )
 {
-    unsigned long i=0;
 
-    for ( i=0; i < spc; i++ ){
+    unsigned long i=0;
+    unsigned long SectorSize = 512;  //#todo: via argument.
+
+    for ( i=0; i<spc; i++ )
+    {
         read_lba ( address, sector + i );
-        address = (address +512); 
+        address = (address + SectorSize); 
     };
 }
 
@@ -156,7 +159,11 @@ fatLoadCluster (
 // Precisamos de uma estrutura com as informações sobre
 // a FAT atual.
 
-void fs_load_fat(unsigned long fat_address, unsigned long fat_lba, size_t fat_size)
+void 
+fs_load_fat( 
+    unsigned long fat_address, 
+    unsigned long fat_lba, 
+    size_t fat_size )
 {
 
     unsigned long __fatAddress=0;
@@ -237,8 +244,13 @@ fs_load_metafile (
 // O ponteiro para essa estrutura sera salvo na estrutura de processo
 // juntamente com o ponteiro da estrutura de cwd.
 
-void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t root_size)
+void 
+fs_load_rootdir(
+    unsigned long root_address, 
+    unsigned long root_lba, 
+    size_t root_size )
 {
+
     unsigned long RootAddress=0;
     unsigned long RootLBA=0;
     size_t        RootSize=0;
@@ -250,17 +262,11 @@ void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t 
 
     debug_print ("fs_load_rootdir:\n");
 
-    //__load_sequential_sectors ( 
-    //    VOLUME1_ROOTDIR_ADDRESS, 
-    //    VOLUME1_ROOTDIR_LBA, 
-    //    32 );
-
     __load_sequential_sectors ( 
         RootAddress, 
         RootLBA, 
         RootSize );
 }
-
 
 
 //

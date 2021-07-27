@@ -71,7 +71,9 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 
-OBJS = panic.o \
+# Everything is a file.
+OBJS = process.o thread.o threadi.o create.o \
+panic.o \
 reboot.o \
 request.o \
 detect.o \
@@ -79,15 +81,17 @@ hal.o \
 pit.o \
 ports64.o \
 rtc.o \
-x64init.o \
-x64.o \
-x64info.o \
-process.o thread.o threadi.o create.o \
-x64fault.o \
+x64init.o x64.o x64info.o x64fault.o \
 queue.o \
 mk.o \
 ts.o dispatch.o spawn.o x64cont.o \
-sched.o schedi.o    
+sched.o schedi.o \
+info.o \
+sysinit.o \
+runtime.o \
+system.o \
+debug.o \
+sys.o    
 
 
 
@@ -123,6 +127,15 @@ all:
 
 	$(CC) -c ps/sched/sched.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o sched.o  
 	$(CC) -c ps/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
+
+
+
+	$(CC) -c info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c sysinit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sysinit.o
+	$(CC) -c runtime.c  $(KERNEL_INCLUDE) $(CFLAGS) -o runtime.o
+	$(CC) -c system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
+	$(CC) -c debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c sys.c      $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
 
 
 #link

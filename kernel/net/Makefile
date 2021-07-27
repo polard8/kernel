@@ -70,14 +70,17 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 
-OBJS = network.o socket.o    
+# Everything is a file.
+OBJS = socket.o \
+network.o    
+
 
 
 
 all:
 
-	$(CC) -c network/network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
 	$(CC) -c socket/socket.c    $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
+	$(CC) -c network/network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
 
 
 #link

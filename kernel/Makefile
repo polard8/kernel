@@ -111,7 +111,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # We need classes: head | always | optional
 
 # head
-objects-y := head_64.o init.o sci.o  
+objects-y := head_64.o init.o sci.o archive_lib.o    
 
 objects-y += archive_ke.o archive_mm.o archive_fs.o \
 archive_net.o archive_user.o    
@@ -152,8 +152,11 @@ kernel-header:
 	$(CFLAGS) \
 	-o sci.o    
 
+	# init
 	$(CC) -c init/init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
 
+	# lib
+	$(Q) $(MAKE) -C lib/
 
 kernel-content:
 	@echo "Compiling: Compiling kernel content ..."
@@ -170,8 +173,9 @@ kernel-footer:
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
 
-	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(objects-y)    
+	$(LD) $(LDFLAGS) -T arch/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
 
 clean:
 	rm -rf *.o   
+
 

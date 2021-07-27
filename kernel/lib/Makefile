@@ -71,23 +71,25 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 # Everything is a file.
-OBJS = mminit.o mminfo.o mmpool.o pages.o    
+OBJS = ctype.o string.o stdlib.o kstdio.o signal.o unistd.o    
 
 
 all:
 
-	$(CC) -c mminit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminit.o
-	$(CC) -c mminfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminfo.o
-	$(CC) -c mmpool.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmpool.o
-	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o
+	$(CC) -c ctype.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ctype.o
+	$(CC) -c string.c  $(KERNEL_INCLUDE) $(CFLAGS) -o string.o
+	$(CC) -c stdlib.c  $(KERNEL_INCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c kstdio.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c signal.c  $(KERNEL_INCLUDE) $(CFLAGS) -o signal.o
+	$(CC) -c unistd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o unistd.o
 
 #link
-	$(LD) -r -o archive_mm.o $(OBJS)
+	$(LD) -r -o archive_lib.o $(OBJS)
 
 
 # todo: vamos ligar tudo e enviar somente a biblioteca.
 	#cp *.o ../
-	cp archive_mm.o ../
+	cp archive_lib.o ../
 	rm *.o
 	
 	
