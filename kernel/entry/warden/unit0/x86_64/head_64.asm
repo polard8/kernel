@@ -16,6 +16,11 @@ extern _kernel_main
 extern _magic
 
 
+; See:
+; kernel.h
+__SYSTEM_BOOTING EQU 1
+extern _system_state
+
 ;========================================================
 ; _kernel_begin:
 ;
@@ -77,10 +82,14 @@ START:
 
     cli
 
+    mov rax, qword __SYSTEM_BOOTING
+    mov qword [_system_state], rax 
+
     xor rax, rax
     xor rbx, rbx
     xor rcx, rcx
     xor rdx, rdx
+
 
     lgdt [GDT64.Pointer]
 

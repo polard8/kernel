@@ -224,10 +224,10 @@ int register_wm (void){
     }
 
     gramado_system_call ( 
-        515, 
-        __wm_desktop, 
-        __wm_pid, 
-        __wm_pid );
+        (unsigned long) 515, 
+        (unsigned long) __wm_desktop, 
+        (unsigned long) __wm_pid, 
+        (unsigned long) __wm_pid );
 
     // flag.
     __wm_registered = TRUE;

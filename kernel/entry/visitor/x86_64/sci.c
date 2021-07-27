@@ -1091,6 +1091,7 @@ void *sci1 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
+
     debug_print ("sci1: [TODO]\n");
 
     switch (number){
@@ -1124,6 +1125,7 @@ void *sci2 (
     unsigned long *a2 = (unsigned long*) arg2;
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
+
 
     debug_print("sci2: [TODO]\n");
 

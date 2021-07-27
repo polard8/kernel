@@ -206,19 +206,7 @@ int gLogoffPID;
 #define SM_GETMOUSEY 21
 
 //Continua ...
-//@todo.
 
-
-//
-//    ****    SYSTEM STATUS INDEX   **** 
-//
-
-#define SS_NULL          0  
-#define SS_LOGGED        1  //estamos logados.?
-#define SS_USING_GUI     2  // estamos no modo gráfico?
-#define SS_KERNELSTATUS  3  //
-//Continua ...
-//@todo.
 
 //procedure tupe mode
 //@TODO: CRIAR UM ENUM

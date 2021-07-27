@@ -107,34 +107,28 @@ desert
 # O BL.BIN procura o kernel no diretorio GRAMADO/
 # See: fs/loader.c
 gramado-kernel:
-	@echo "=================="
-	@echo "(Step 1) Creating the kernel image ..."
+	@echo "Build: Building Gramado kernel ..."
 
 	$(Q) $(MAKE) -C kernel/
 	sudo cp kernel/KERNEL.BIN  base/GRAMADO
 
 #2
 gramado-lib:
-
-	#::rtl (The libc)
-	@echo "==================="
-	@echo "Compiling rtl ..."
+	@echo "Build: Building usermode libraries ..."
 	$(Q) $(MAKE) -C lib/rtl/
-
-	#::lib (The frameworks)
-	@echo "==================="
-	@echo "Compiling  lib ..."
 	$(Q) $(MAKE) -C lib/lib/
 
 #3
 # Session Manager
 gramado-sm:
+	@echo "Build: Building Session Manager ..."
 	$(Q) $(MAKE) -C sm/
 	sudo cp sm/SM.BIN  base/
 
 #4
 gramado-cmd:
-	#::cmd
+	@echo "Build: Building cmd applications ..."
+
 	$(Q) $(MAKE) -C cmd/
 	-sudo cp cmd/bin/CAT.BIN        base/
 #	-sudo cp cmd/bin/FALSE.BIN      base/
@@ -146,7 +140,8 @@ gramado-cmd:
 
 #5
 gramado-setup:
-	#::setup
+	@echo "Build: Building setup applications ..."
+
 	$(Q) $(MAKE) -C setup/
 	sudo cp setup/bin/GDESHELL.BIN  base/
 	#sudo cp setup/bin/C4.BIN       base/
@@ -157,10 +152,8 @@ gramado-setup:
 #6
 # Gramado Window System files.
 gramado-ws:
+	@echo "Build: Building Window Server ..."
 
-	#:: Gramado WS
-	@echo "==================="
-	@echo "Compiling Gramado WS and some clients"
 	$(Q) $(MAKE) -C ws/
 
 # Server and main client.
@@ -181,18 +174,15 @@ gramado-ws:
 
 #7
 gramado-ns:
-	#::hard Services
-	@echo "==================="
-	@echo "Compiling hard..."
+	@echo "Build: Building Network Server ..."
+
 	$(Q) $(MAKE) -C ns/ 
-	# gns
 	-sudo cp ns/bin/GNSSRV.BIN  base/
 	-sudo cp ns/bin/GNS.BIN     base/
 
 #8
 gramado-boot:
-	@echo "==================="
-	@echo "Compiling tools/ and boot ... "
+	@echo "Build: Building bootloader ..."
 
 	$(Q) $(NASM) tools/vd/fat/main.asm \
 	-I tools/vd/fat/ \
@@ -220,7 +210,7 @@ desert:
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.
 /mnt/gramadoxvhd:
 	@echo "========================="
-	@echo "(Step 2) Creating the directory to mount the VHD ..."
+	@echo "Build: Creating the directory to mount the VHD ..."
 	sudo mkdir /mnt/gramadoxvhd
 
 #===================================================
@@ -228,7 +218,7 @@ desert:
 # ~ Step 3: vhd-mount - Mounting the VHD.
 vhd-mount:
 	@echo "=========================="
-	@echo "(Step 3) Mounting the VHD ..."
+	@echo "Build: Mounting the VHD ..."
 	-sudo umount /mnt/gramadoxvhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadoxvhd/
 
@@ -238,7 +228,7 @@ vhd-mount:
 # Copying the base folder into the mounted VHD.
 vhd-copy-files:
 	@echo "========================="
-	@echo "(Step 4) Copying files into the mounted VHD ..."
+	@echo "Build: Copying files into the mounted VHD ..."
 
 	#Copy SM.BIN to base/
 	#sudo cp sm/SM.BIN  base/
@@ -252,7 +242,7 @@ vhd-copy-files:
 # ~ Step 5 vhd-unmount  - Unmounting the VHD.
 vhd-unmount:
 	@echo "======================"
-	@echo "(Step 5) Unmounting the VHD ..."
+	@echo "Build: Unmounting the VHD ..."
 	sudo umount /mnt/gramadoxvhd
 
 
@@ -275,7 +265,7 @@ clean clean2 clean3 clean4 clean5
 	@echo "ok ?"
 clean:
 	@echo "==================="
-	@echo "(Step 6) Deleting the object files ..."
+	@echo "Build: Deleting the object files ..."
 	-rm *.o
 	-rm -rf lib/rtl/obj/*.o
 	-rm -rf lib/lib/libgns/obj/*.o

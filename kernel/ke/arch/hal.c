@@ -63,9 +63,24 @@ void hal_reboot(void)
 {
     debug_print("hal_reboot:\n");
 
+    switch (system_state ){
+
+    // Normal situations
+    case SYSTEM_BOOTING:
+    case SYSTEM_REBOOT:
+        debug_print("...\n");
+        break;
+    default:
+        debug_print("Booting on an unexpected situation\n");
+        break;
+    };
+
+    debug_print("Calling asm_reboot\n");
     asm_reboot(); 
+
     x_panic ("hal_reboot:\n");
 }    
+
 
 /*
  ********************************
@@ -106,6 +121,11 @@ void hal_shutdown (void){
     const char *shutdown_str;
 
     debug_print ("hal_shutdown:\n");
+
+
+    // Something is wrong.
+    if ( system_state != SYSTEM_POWEROFF )
+        panic ("hal_shutdown: system_state\n");
 
     /*
     if (qemu____){

@@ -134,6 +134,7 @@ clean
 # The entry \o/
 # The x86 head of the monster.
 kernel-header:
+	@echo "Compiling: Compiling kernel header ..."
 
 	# unit 0, unit 1, unit 3, unit 4, visitor
 	$(NASM) entry/warden/unit0/x86_64/head_64.asm \
@@ -151,24 +152,23 @@ kernel-header:
 	$(CFLAGS) \
 	-o sci.o    
 
-
 	$(CC) -c init/init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
 
 
 kernel-content:
-
+	@echo "Compiling: Compiling kernel content ..."
 	$(Q) $(MAKE) -C ke/
 	$(Q) $(MAKE) -C mm/
 	$(Q) $(MAKE) -C fs/
 
 kernel-footer:
+	@echo "Compiling: Compiling kernel footer ..."
 	$(Q) $(MAKE) -C net/
 	$(Q) $(MAKE) -C user/
 	# ...
 
 link-kernel:
-	@echo "================================="
-	@echo "(Step 2) Linking the kernel image ..."
+	@echo "Linking: Linking the kernel image ..."
 
 	$(LD) $(LDFLAGS) -T link.ld -o KERNEL.BIN $(objects-y)    
 

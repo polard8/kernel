@@ -1,10 +1,4 @@
 
-
-/* intel page size */
-#define INTEL_PAGE_SIZE 4096
-#define PAGE_SIZE    INTEL_PAGE_SIZE
-
-
 //
 // tables support
 //

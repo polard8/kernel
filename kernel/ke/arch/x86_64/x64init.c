@@ -29,15 +29,19 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 
 void __x64CreateInitialProcess (void)
 {
+    int fileret = -1;
+    
+    if ( system_state != SYSTEM_BOOTING )
+        panic ("__x64CreateInitialProcess: system_state\n");    
+
     //#todo
     debug_print ("__x64CreateInitialProcess: [TODO]\n");
     printf      ("__x64CreateInitialProcess: [TODO]\n");
     refresh_screen();
 
 
-    int fileret = -1;
 
-    debug_print ("__x64CreateInitialProcess:\n");
+    //debug_print ("__x64CreateInitialProcess:\n");
 
 //
 // Load imag SM.BIN.
@@ -230,14 +234,24 @@ void __x64CreateInitialProcess (void)
 
 void x64ExecuteInitialProcess (void)
 {
+    struct thread_d  *Thread;
+    int i=0;
+
     //#todo
     debug_print ("x64ExecuteInitialProcess: [TODO]\n");
     printf      ("x64ExecuteInitialProcess: [TODO]\n");
     refresh_screen();
    
-    
-    struct thread_d  *Thread;
-    int i=0;
+    if ( system_state != SYSTEM_BOOTING )
+        panic ("x64ExecuteInitialProcess: system_state\n");    
+
+
+    if ( InitialProcessInitialized != TRUE ){
+        debug_print ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        panic       ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+    }
+
+
 
 
     // Se essa rotina foi chamada antes mesmo
@@ -414,6 +428,11 @@ void x64ExecuteInitialProcess (void)
 
     PROGRESS("-- Fly -----------------------------------\n");
 
+
+    // Here is where the boot routine ends.
+
+    system_state = SYSTEM_RUNNING;
+
     // #important:
     // This is an special scenario,
     // Where we're gonna fly with the eflags = 0x3000,
@@ -493,8 +512,18 @@ int x64main (void)
     // Mudamos isso para o momento em que inicializamos os consoles.
  
     debug_print ("x64main: [TODO]\n");
+    
+    // #debug
     printf      ("x86main: [TODO]\n");
     refresh_screen();
+
+
+    if ( system_state != SYSTEM_BOOTING )
+    {
+        debug_print ("[x64] x64main: system_state\n");
+        x_panic     ("[x64] x64main: system_state\n");
+    }
+
 
     if (current_arch != CURRENT_ARCH_X86_64)
     {
@@ -525,7 +554,7 @@ int x64main (void)
     // Set Kernel phase.  
     // Status Flag.
     // edition flag.
-    
+
     InitializationPhase = 0;
 
     gSystemStatus = 1;
@@ -557,6 +586,7 @@ int x64main (void)
 
     if ( InitializationPhase != 0 ){
         x_panic ("x64main: InitializationPhase\n");
+        //KiAbort();
     }
 
 //================================
@@ -811,7 +841,20 @@ int x64main (void)
 //================================
     PROGRESS("Kernel:1:9\n"); 
     // Check some initialization flags.
-    
+
+/*
+#ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
+
+    Status = (int) debug();
+
+    if ( Status != 0 ){
+        printf ("[x86] x86main: debug\n");
+        system_state = KERNEL_ABORTED;
+        goto fail;
+    }
+
+#endif
+*/
 
 
 	// ======== # TESTS # ========
@@ -913,7 +956,7 @@ int x64main (void)
 //
 
     /*
-    if ( KernelStatus == KERNEL_INITIALIZED )
+    if ( system_state == KERNEL_INITIALIZED )
     {
         debug_print ("[x86] x86main: Initializing INIT ..\n");
         printf      ("[x86] x86main: Initializing INIT ..\n");

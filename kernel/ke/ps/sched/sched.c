@@ -47,6 +47,12 @@ int scheduler (void)
 
     struct thread_d  *TmpThread;
 
+
+    if ( system_state != SYSTEM_RUNNING )
+        panic ("scheduler: system_state\n");
+
+    system_state = SYSTEM_SCHEDULING;
+
     //debug_print ("scheduler: [not tested] \n");
 
 #ifdef SERIAL_DEBUG_VERBOSE
@@ -150,6 +156,8 @@ int scheduler (void)
 
 
 // done:
+
+    system_state = SYSTEM_RUNNING;
 
     // Start with the idle thread.
 

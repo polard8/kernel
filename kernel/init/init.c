@@ -86,13 +86,19 @@ void preinit_Globals(int arch_type)
 {
     asm ("cli");
 
+    // This is the first time we do the in the C part.
+    // See: head_64.asm
+
+    system_state = SYSTEM_BOOTING;
+
     // ...
 }
 
 void preinit_Serial(void)
 {
     serial_init();
-    debug_print("\n");
+    
+    //debug_print("\n");
     debug_print("\n");
     debug_print("== X ========\n");
     debug_print("preinit_Serial: Serial debug initialized!\n");
@@ -243,7 +249,11 @@ int kernel_main(int arch_type)
     preinit_Serial();
 
 
-    
+    //if ( system_state != SYSTEM_BOOTING ){
+    //    debug_print ("FAIL");
+    //    while(1){}
+    //}
+
     //
     // #progress
     // name:level:sublevel
@@ -582,6 +592,8 @@ int kernel_main(int arch_type)
         // ...
 
         default:
+            //system_state = SYSTEM_ABORTED;
+            
             debug_print ("kernel_main: [FAIL] Current arch not defined!\n");
             //printf("kernel_main: [FAIL] Current arch not defined!");
             goto fail2;
@@ -815,6 +827,7 @@ fail1:
 
 // No output support.
 fail0:
+    system_state = SYSTEM_ABORTED;
     // Return to xxxhead.asm and hang.
     return (-1);
 }

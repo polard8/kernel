@@ -9,6 +9,11 @@ int processNewPID;
 
 // Clonning the current process and 
 // executing the clone for the first time.
+// #todo
+// + We need a 'clone_flags' variable to known what we need to do.
+// + Maybe create the names dup_process_struct and dup_thread_struct.
+// + Create copy_files, copy_sighand, copy_signal, copy_thread
+// total_forks ?
 pid_t clone_and_execute_process ( const char *filename )
 {
 
@@ -641,6 +646,7 @@ do_clone:
     return (pid_t) Clone->pid;
 
 fail:
+//fail0:
     debug_print ("clone_and_execute_process: [X] Fail\n");
     debug_print ("---------------------------------------------\n");
     printf      ("clone_and_execute_process: [X] Fail\n");

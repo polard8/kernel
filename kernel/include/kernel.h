@@ -15,6 +15,32 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
+
+// ============================
+
+//
+// System State
+//
+
+// # This is a test yet.
+
+#define SYSTEM_NULL        0   // Nothing
+#define SYSTEM_BOOTING     1   // The system is starting ...
+#define SYSTEM_SCHEDULING  2   // The system is scheduling ...
+#define SYSTEM_RUNNING     3   // The system is running.
+#define SYSTEM_REBOOT      4   // The system is running the reboot routine.
+#define SYSTEM_POWEROFF    5   // The system is running the poweroff routine.
+#define SYSTEM_RESTART     6   // The system is running the routine to restart the kernel.
+#define SYSTEM_ABORTED     7  // The system was aborted ... ex: initialization fail
+#define SYSTEM_PANIC       8  // Running the panic routine.
+// ...
+
+int system_state;
+
+// ============================
+
+
+
 //
 // IO Control
 //
@@ -515,10 +541,12 @@ unsigned long KernelSize;
 unsigned long KernelHeapSize;
 unsigned long KernelStackSize;
 unsigned long KernelPages;
-unsigned long KernelStatus;
 //...
 
 
+//
+// #todo
+//
 
 //
 // symbol table

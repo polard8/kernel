@@ -48,9 +48,13 @@ int register_ns (void){
     }
 
     // Register this pid as ns.
-    gramado_system_call ( 521, __ns_desktop, __ns_pid, __ns_pid );
+    gramado_system_call ( 
+        (unsigned long) 521, 
+        (unsigned long) __ns_desktop, 
+        (unsigned long) __ns_pid, 
+        (unsigned long) __ns_pid );
 
-    __ns_registerd = 1;
+    __ns_registerd = TRUE;
     
     // O = OK.
     return 0;

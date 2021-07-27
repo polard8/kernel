@@ -123,7 +123,7 @@
 #define  CMIN  1
 
 
-// ^\
+// ^
 // (CQUIT: <Ctrl>\ or ASCII FS) 
 // Generate a quit signal. Its treatment is identical to the interrupt 
 // signal except that, unless a receiving process has made other 
