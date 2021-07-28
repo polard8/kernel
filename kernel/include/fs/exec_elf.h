@@ -935,8 +935,14 @@ int	exec_elf_makecmds(struct proc *, struct exec_package *);
 
 
 
+//
+// == prototypes =============
+//
+
+int elfCheckSignature( unsigned long address );
+
+
 
 #endif /* _SYS_EXEC_ELF_H_ */
-
 
 

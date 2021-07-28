@@ -72,7 +72,8 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 # Everything is a file.
-OBJS = process.o thread.o threadi.o create.o \
+OBJS = process.o plib.o thread.o tlib.o \
+create.o clone.o \
 panic.o \
 reboot.o \
 request.o \
@@ -113,12 +114,16 @@ all:
 
 
 	$(CC) -c ps/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
-	$(CC) -c ps/thread.c   $(KERNEL_INCLUDE) $(CFLAGS) -o thread.o
-	$(CC) -c ps/threadi.c  $(KERNEL_INCLUDE) $(CFLAGS) -o threadi.o
-	$(CC) -c ps/create.c   $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
+	$(CC) -c ps/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
+
+	$(CC) -c ps/thread.c  $(KERNEL_INCLUDE) $(CFLAGS) -o thread.o
+	$(CC) -c ps/tlib.c    $(KERNEL_INCLUDE) $(CFLAGS) -o tlib.o
+
+	$(CC) -c ps/create.c    $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
+	$(CC) -c ps/clone.c     $(KERNEL_INCLUDE) $(CFLAGS) -o clone.o
 	$(CC) -c ps/x86_64/x64fault.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
-	$(CC) -c ps/queue.c   $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
-	$(CC) -c ps/mk.c      $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o
+	$(CC) -c ps/queue.c    $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+	$(CC) -c ps/mk.c       $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o
 
 	$(CC) -c ps/disp/ts.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
 	$(CC) -c ps/disp/dispatch.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  

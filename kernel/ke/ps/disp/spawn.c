@@ -153,11 +153,17 @@ void spawn_thread (int tid)
     // Configurar a stackframe para saltar para
     // qualquer ring.
 
-    if ( Target->iopl != RING3 ){
-        debug_print ("spawn_thread: Not a ring3 thread\n");
-        panic       ("spawn_thread: Not a ring3 thread\n");
+    if ( Target->iopl == RING0 ){
+        debug_print ("spawn_thread: RING0\n");
+        printf ("spawn_thread: RING0\n");
+        //debug_print ("spawn_thread: RING0 not supported yet\n");
+        //panic       ("spawn_thread: RING0 not supported yet\n");
+        refresh_screen();
+        spawn_enter_kernelmode( 
+            TRUE,  // EOI
+            (unsigned long) Target->rip,
+            (unsigned long) Target->rsp );
     }
-
 
     // #debug
     // show_reg(Target->tid);
@@ -169,7 +175,15 @@ void spawn_thread (int tid)
     // Target->rflags
     // Target->cs     & 0xffff
     // Target->rip
+    
+    if ( Target->iopl == RING3 ){
+        spawn_enter_usermode( 
+            TRUE,  // EOI
+            (unsigned long) Target->rip,
+            (unsigned long) Target->rsp );
+    }
 
+    /*
     // This is the entry point of the new thread
     // Probably created by a ring 3 process.
     unsigned long entry = (unsigned long) Target->rip;
@@ -183,7 +197,7 @@ void spawn_thread (int tid)
     // de timer.
     // #todo
     // Deveria ter uma flag indicando que estamos devendo um EOI.
-    
+
     asm ("movb $0x20, %al \n");
     asm ("outb %al, $0x20 \n");
 
@@ -203,12 +217,109 @@ void spawn_thread (int tid)
         " pushq $0x1B       \n" 
         " pushq %%rax       \n" 
         " iretq             \n" :: "D"(entry), "S"(rsp3) );
-  
+
+    */
+
     PROGRESS("-- iretq fail -----------------\n");
 
     // Paranoia
     panic ("spawn_thread: [ERROR] iretq fail\n");
 }
+
+
+// do not check parameters.
+void 
+spawn_enter_usermode( 
+    int eoi,                 // do we need eoi ? TRUE or FALSE. 
+    unsigned long entry_va,  // Entry point
+    unsigned long rsp3_va )  // Stack pointer.
+{
+
+    // This is the entry point of the new thread
+    // Probably created by a ring 3 process.
+    unsigned long entry = (unsigned long) entry_va;
+
+    // This is the stack pointer for the ring 3 thread.
+    // Probably given by a ring 3 process.
+    unsigned long rsp3  = (unsigned long) rsp3_va;
+
+    if ( eoi == TRUE ){
+        asm ("movb $0x20, %al \n");
+        asm ("outb %al, $0x20 \n");
+    }
+
+    asm volatile ( 
+        " movq $0, %%rax    \n" 
+        " mov %%ax, %%ds    \n" 
+        " mov %%ax, %%es    \n" 
+        " mov %%ax, %%fs    \n" 
+        " mov %%ax, %%gs    \n" 
+        " movq %0, %%rax    \n" 
+        " movq %1, %%rsp    \n" 
+        " movq $0, %%rbp    \n" 
+        " pushq $0x23       \n"  
+        " pushq %%rsp       \n" 
+        " pushq $0x3202     \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x1B       \n" 
+        " pushq %%rax       \n" 
+        " iretq             \n" :: "D"(entry), "S"(rsp3) );
+  
+    PROGRESS("spawn_enter_usermode: -- iretq fail ---\n");
+
+    // Paranoia
+    panic ("spawn_enter_usermode: [ERROR] iretq fail\n");
+}
+
+
+// do not check parameters.
+void 
+spawn_enter_kernelmode( 
+    int eoi,                 // do we need eoi ? TRUE or FALSE. 
+    unsigned long entry_va,  // Entry point
+    unsigned long rsp0_va )  // Stack pointer.
+{
+
+    // This is the entry point of the new thread
+    unsigned long entry = (unsigned long) entry_va;
+
+    unsigned long rsp0  = (unsigned long) rsp0_va;
+
+    if ( eoi == TRUE ){
+        asm ("movb $0x20, %al \n");
+        asm ("outb %al, $0x20 \n");
+    }
+
+
+    // #todo
+    // We need to review the stack frame fpor ring0
+    asm volatile ( 
+        " movq $0, %%rax    \n" 
+        " mov %%ax, %%ds    \n" 
+        " mov %%ax, %%es    \n" 
+        " mov %%ax, %%fs    \n" 
+        " mov %%ax, %%gs    \n"
+        " movq %0, %%rax    \n" 
+        " movq %1, %%rsp    \n" 
+        " movq $0, %%rbp    \n" 
+        " pushq $0x10       \n"  
+        " pushq %%rsp       \n" 
+        " pushq $0x0202     \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x8       \n" 
+        " pushq %%rax       \n" 
+        " iretq             \n" :: "D"(entry), "S"(rsp0) );
+  
+    PROGRESS("spawn_enter_kernelmode: -- iretq fail ---\n");
+
+    // Paranoia
+    panic ("spawn_enter_kernelmode: [ERROR] iretq fail\n");
+}
+
+
+
+
+
+
+
 
 
 // KiSpawnTask:

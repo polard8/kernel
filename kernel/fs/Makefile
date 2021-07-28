@@ -72,7 +72,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 # Everything is a file.
 OBJS = fs.o pipe.o tty.o \
-search.o \
+elf.o search.o \
 io.o \
 disk_r.o disk_w.o \
 ws.o \
@@ -92,6 +92,9 @@ all:
 	$(CC) -c fs.c           $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
 	$(CC) -c pipe.c         $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
 	$(CC) -c dev/tty/tty.c  $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
+
+	$(CC) -c elf.c       $(KERNEL_INCLUDE) $(CFLAGS) -o elf.o
+
 	$(CC) -c search.c       $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
 
 	$(CC) -c sdi/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o

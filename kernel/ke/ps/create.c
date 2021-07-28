@@ -239,8 +239,8 @@ void *create_CreateEarlyRing0IdleThread(void)
     // Stack frame.
     kThread->ss     = 0x10 | 0; 
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
-    kThread->rflags = 0x0200;    // # Atenção !!  
-    kThread->cs     = 8 | 0; 
+    kThread->rflags = 0x0202;    // # Atenção !!  
+    kThread->cs     = 0x8 | 0; 
     kThread->rip    = (unsigned long) early_ring0_IdleThread;  //See: head.asm
 
     kThread->ds = 0x10 | 0;
@@ -346,8 +346,9 @@ void *create_CreateEarlyRing0IdleThread(void)
     // Ainda não vamos colcoar essa thread para rodar pois
     // o sistema ainda não roda threads em ring0.
     
-    // * MOVEMENT 1 (Initialized --> Standby).
-    //SelectForExecution(kThread); 
+    // MOVEMENT 1 (Initialized --> Standby).
+    
+    SelectForExecution(kThread); 
 
 
 // Done

@@ -242,10 +242,11 @@ sc_again:
 
         // Rotinas de teste
         if ( AsciiChar == VK_F5 ){ 
-            //Background_initialize();
-            hal_reboot(); 
+            Background_initialize();
+            show_slots(); // show information about all the threads.
+            //hal_reboot(); 
             //pages_calc_mem();
-            //refresh_screen();
+            refresh_screen();
         }  
         if ( AsciiChar == VK_F6 )
         { 

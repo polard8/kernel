@@ -895,7 +895,20 @@ unsigned long processList[PROCESS_COUNT_MAX];
 void __x64CreateInitialProcess (void);
 void x64ExecuteInitialProcess (void);
 
+
+//==============
+// clone.c
+int copy_process_structure( pid_t p1, pid_t p2 );
+pid_t copy_process( const char *filename, unsigned long clone_flags );
+int processCopyProcess ( pid_t p1, pid_t p2 );
 pid_t clone_and_execute_process ( const char *filename );
+
+
+//==============
+// plib.c
+void show_currentprocess_info (void);
+void show_process_information (void);
+
 
 unsigned long __GetProcessStats ( int pid, int index );
 int getprocessname ( int pid, char *buffer );
@@ -905,8 +918,6 @@ int processTesting (int pid);
 int processSendSignal (struct process_d *p, unsigned long signal);
 void init_processes (void);
 void CloseAllProcesses (void);
-void show_currentprocess_info (void);
-void show_process_information (void);
 
 // ===
 
@@ -953,8 +964,6 @@ void set_caller_process_id (int pid);
 int init_process_manager (void);
 
 int processCopyMemory ( struct process_d *process );
-int processCopyProcess ( pid_t p1, pid_t p2 );
-
 
 
 // Critical section

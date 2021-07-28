@@ -628,7 +628,7 @@ void *sci0 (
 
 
         // 73
-        // See: sci/sys/sys.c
+        // See: sys.c
         // Cria um processo e coloca a thread primária pra rodar.
         // #bugbug: 
         // Na inicializacao do kernel, nos criamos um processo

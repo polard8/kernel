@@ -11,6 +11,8 @@ unsigned long sys_get_system_metrics ( int n )
     return (unsigned long) systemGetSystemMetrics ( (int) n );
 }
 
+
+// Only ring3 for now.
 void *sys_create_process ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
@@ -21,9 +23,59 @@ void *sys_create_process (
     char *name,
     unsigned long iopl ) 
 {
+
+    struct process_d *new;
+
+//
+// Not tested
+//
+
     debug_print("sys_create_process: [TODO]\n");
+
     return NULL;
+
+    /*
+    // ==============
+
+    void *pml4_va = (void *) CloneKernelPML4();
+    unsigned long pml4_pa=0;
+
+    if ( pml4_va == 0 ){
+        panic ("sys_create_process: init_pml4_va\n");
+    }
+
+    pml4_pa = (unsigned long) virtual_to_physical ( 
+                                               pml4_va, 
+                                               gKernelPML4Address );
+
+    if ( pml4_pa == 0 ){
+        panic ("sys_create_process: init_mm_data.pml4_pa\n");
+    }
+
+    
+
+    new = (void *) create_process ( 
+                       NULL, NULL, NULL, 
+                       (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
+                       PRIORITY_HIGH, 
+                       (int) current_process, 
+                       "NEW-PROCESS", 
+                       RING3, 
+                       (unsigned long ) pml4_va,
+                       (unsigned long ) kernel_mm_data.pdpt0_va,
+                       (unsigned long ) kernel_mm_data.pd0_va );
+
+    if ((void*) new == NULL){
+        printf("sys_create_process: fail\n");
+        refresh_screen();
+        return NULL;
+    }
+
+    return (void*) new;
+    // ==============
+    */
 }
+
 
 /*
  *********************************************************

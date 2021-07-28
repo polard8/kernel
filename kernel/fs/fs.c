@@ -789,6 +789,13 @@ int file_truncate ( file *_file, size_t len)
 
 int fsCheckELFFile ( unsigned long address )
 {
+
+    // #todo
+    // Check validation.
+
+    return (int) elfCheckSignature(address);
+
+    /*
     unsigned char *buffer = (unsigned char *) address;
 
     if ( (void *) buffer == NULL ){
@@ -805,7 +812,10 @@ int fsCheckELFFile ( unsigned long address )
     // OK.
 
     return 0;
+    */
 }
+
+
 
 /*
  ****************************************
