@@ -237,17 +237,35 @@ void debug_breakpoint (void)
 }
 
 
+/*
+void 
+bug_check( 
+    int number, 
+    unsigned long parameter1,
+    unsigned long parameter2,
+    unsigned long parameter3,
+    unsigned long parameter4 )
+{
+    switch (number){
+    case 1:
+       
+    };
 
+    if( WeHavePanic == TRUE ){
+        panic("bug_check: panic\n");
+    }
 
+    if( WeHaveXPanic == TRUE ){
+        panic("bug_check: xpanic\n");
+    }
 
-
-
-
-
-
-
-
-
+    // We have nothing.
+    while(1){
+        asm (" cli ");
+        asm (" hlt ");
+    };
+}
+*/
 
 
 

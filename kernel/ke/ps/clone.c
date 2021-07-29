@@ -464,57 +464,45 @@ pid_t clone_and_execute_process ( const char *filename )
     // The directory virtual address of the current process. ??
     unsigned long *pml4;
 
+    // page table.
+    void *__pt;
 
 
     // #bugbug
     // Only for the rootdir.
     // Maybe we need to receive this values 
     // from parameters.
-    
-    // File support.
+
+
+// Image support.
     unsigned long dir_address = VOLUME1_ROOTDIR_ADDRESS;
     unsigned long dir_entries = FAT16_ROOT_ENTRIES;
-
-
     char *path;
     char *name;
 
-    // page table.
-    void *__pt;
-
-
-    // #debug
-    //debug_print ("clone_and_execute_process: [TODO] \n");
-    //printf      ("clone_and_execute_process:\n");
 
 //
-// argument
+// Check parameters
 //
 
+
+    // file_name
     if ( (void*) filename == NULL ){
         panic ("clone_and_execute_process: [ERROR] filename\n");
     }
-
     if ( *filename == 0 ){
         panic ("clone_and_execute_process: [ERROR] *filename\n");
     }
-
     path = filename;
     name = filename;
-
-    // #todo
-    // Essas rotinas de procura e garregamento podem ir para outro lugar.
-    // #bugbug
-    // O maior problema aqui eh o tamanho do diretorio, pois estamos pre-alocando
-    // memoria para conter o diretorio.
-
-    // from cwd?
     if (path[0] == '.' && path[1] == '/')
     {
         debug_print ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
         printf      ("clone_and_execute_process: [FIXME] Can't execute from cwd \n");
         goto fail;
     }
+
+
 
 
     // Shotcuts to execute programs.
@@ -549,12 +537,13 @@ __search:
     // Convert and search.
 
     fs_fntos ( (char *) name );
-
     Status = (int) search_in_dir ( name, dir_address );
-
     if (Status == 1){ 
         goto __found; 
     }
+
+
+
 
 // Fail.
 // Falhou a busca em todos os diretorios procurados.
@@ -569,6 +558,11 @@ __search:
 // The file was found into the directory.
 
 __found:
+
+    //printf (":)\n");
+    //refresh_screen();
+    //return -1;
+
 
 	//unsigned long old_image_pa; //usado para salvamento.
 
@@ -638,6 +632,11 @@ __found:
 // Cria uma estrutura do tipo processo, mas não inicializada.
 
 do_clone:
+
+    //printf (":)\n");
+    //refresh_screen();
+    //return -1;
+
     Clone = (struct process_d *) processObject();
     if ( (void *) Clone == NULL )
     {
@@ -729,8 +728,13 @@ do_clone:
     }
 
 //
-// Load image.
+// Load image
 //
+
+    //printf (":)\n");
+    //refresh_screen();
+    //return -1;
+
 
     // [3]
     debug_print ("clone_and_execute_process: [3] Loading the image.\n");
@@ -842,6 +846,9 @@ do_clone:
     // Retornaremos o endereço virtual da pagetable.
     // See: core/ps/x86/pages.c
 
+
+    // Isso foi obtido pela rotina de clonagem de processo,
+    // juntamente com seu endereço físico.
     if( (void*) Clone->pml4_VA == NULL ){
         panic("clone_and_execute_process: [2nd time] Clone->pml4_VA\n");
     }
@@ -864,8 +871,12 @@ do_clone:
 
 
 //
-// Breakpoint.
+// Breakpoint
 //
+
+    //printf (":)\n");
+    //refresh_screen();
+    //return -1;
 
 
     //debug_print ("clone_and_execute_process:  This is a work in progress\n");
@@ -896,8 +907,8 @@ do_clone:
     if ( (void*) __pt == NULL ){
         panic ("clone_and_execute_process: __pt\n");
     }
-    
-    
+
+
 
     // Configurando o endereço virtual padrão para aplicativos.
     // Novo endereço virtual da imagem. 
@@ -939,18 +950,22 @@ do_clone:
     // There is a limit here. End we will have a huge problem 
     // when reach it.
 
-    // Heap.
+//
+// Heap
+//
 
     Clone->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
     Clone->HeapSize = (unsigned long) g_heap_size;
     Clone->HeapEnd  = (unsigned long) (Clone->Heap + Clone->HeapSize); 
     g_heap_count++;
 
-    // Stack
+//
+// Stack
+//
 
     // Stack for the clone. 
-    Clone->control->rsp = CONTROLTHREAD_STACK;  //0x007FFFF0 
-    Clone->Stack        = CONTROLTHREAD_STACK;  //0x007FFFF0
+    Clone->control->rsp = CONTROLTHREAD_STACK;
+    Clone->Stack        = CONTROLTHREAD_STACK;
     Clone->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
     Clone->StackEnd = ( Clone->Stack - Clone->StackSize );
 
@@ -1001,6 +1016,9 @@ do_clone:
     
     SelectForExecution (Clone->control);
 
+    // Used by spawn.c
+    Clone->control->new_clone = TRUE;
+
     //refresh_screen();
 
 	//pai
@@ -1042,13 +1060,14 @@ do_clone:
     //printf ("\n");
     //current_thread = Clone->control->tid;
     //show_reg(current_thread);
-    
-    //printf ("--------------------------------------------\n");
-    //printf ("\n");
 
     // See: thread.c and spawn.c
     //SelectForExecution(Clone->control);
     //KiSpawnThread(Clone->control->tid); 
+
+    //printf ("--------------------------------------------\n");
+    //printf ("\n");
+
 
     // #debug
     //refresh_screen();

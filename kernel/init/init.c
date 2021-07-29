@@ -570,19 +570,17 @@ int kernel_main(int arch_type)
             //printf      ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             Status = (int) I_x64main();
             
-            if (Status < 0)
-            {
+            if (Status < 0){
                 x_panic("[Kernel] kernel_main: CURRENT_ARCH_X86 fail\n");
             }
             
             // #test
-            if (Status == 1234)
-            {
-                // No return.
+            // No return.
+            if (Status == 1234){
                 debug_print ("kernel_main: Calling x64ExecuteInitialProcess()\n");
                 I_x64ExecuteInitialProcess();
             }
-            
+
             //goto fail2;
             break;
 

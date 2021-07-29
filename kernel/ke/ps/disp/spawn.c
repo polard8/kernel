@@ -10,6 +10,10 @@ void __spawn_load_pml4_table(unsigned long phy_addr)
 }
 
 
+// Spawn a new thread.
+// The flag 'new_clone' indicates this is the control thread
+// of a clone process that is running for the first time.
+
 void spawn_thread (int tid)
 {
     struct thread_d  *Target;
@@ -21,6 +25,8 @@ void spawn_thread (int tid)
     // #debug
     printf ("spawn_thread: SPAWN !\n");
     refresh_screen();
+
+
 
 
     // The next will be the current thread.
@@ -50,6 +56,11 @@ void spawn_thread (int tid)
         panic("spawn_thread: Target validation");
     }
 
+    if ( Target->new_clone == TRUE ){
+        printf ("spawn_thread: Spawning the control thread of a new clone\n");
+        refresh_screen();
+    }
+    
 
     // Check tid validation
     if (Target->tid != tid){

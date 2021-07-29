@@ -1220,8 +1220,8 @@ void *sci2 (
     // IN: name, dir address.
     if ( number == 900 ){
         debug_print("sci2: [900] clone and execute\n");
-        //return (void *) clone_and_execute_process( (const char *) arg2 );
-    
+        return (void *) clone_and_execute_process( (const char *) arg2 );
+
         // #test
         // Vamos apenas criar um request e retornarmos
         //memcpy( nameBuffer, arg2, 11 );

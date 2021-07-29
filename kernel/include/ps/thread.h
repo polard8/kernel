@@ -179,6 +179,10 @@ struct thread_d
     //flag, Estado atual da tarefa. ( RUNNING, DEAD ... ).
     thread_state_t state;    
 
+    // The is the control thread of a new clone process.
+    int new_clone;
+
+
     // #todo
     // Identifica uma thread como sendo uma thread que 
     // pertence à um servidor. Então as threads desse tipo 

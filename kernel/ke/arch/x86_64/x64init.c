@@ -15,6 +15,7 @@ extern void x64_clear_nt_flag (void);
 
 
 // local
+// Call a mm routine for that.
 void x64init_load_pml4_table(unsigned long phy_addr)
 {
     asm volatile ("movq %0,%%cr3"::"r"(phy_addr));

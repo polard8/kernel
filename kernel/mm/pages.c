@@ -15,12 +15,16 @@ extern unsigned long SavedLFB;               // #todo: precisamos que o bl passe
 //extern unsigned long SavedBPP;
 // ...
 
+
+
+
 // Vamos criar uma pagetable com 512 entradas
 // para mapearmos uma região da memória física.
-// Em seguida instalar da tabelas passadas via argumento.
-// Os endereços virtuas das tabela passados via parâmetro
+// Em seguida instalar nas tabelas passadas via argumento.
+// Os endereços virtuas das tabelas passados via parâmetro
 // pertencem ao pml4 do kernel e nos permite acessar essas tabelas
 // para configurarmos elas.
+
 // #todo: This is a work in progress.
 // #bugbug: è uma rotina muito ruim, se possível substituir por algo melhor.
 
@@ -47,7 +51,6 @@ void *CreateAndIntallPageTable (
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pml4_va\n");
         return NULL;
     }
-
     if ( pml4_index <0 || pml4_index >= 512 )
     {
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pml4_index\n");
@@ -59,7 +62,6 @@ void *CreateAndIntallPageTable (
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pdpt_va\n");
         return NULL;
     }
-
     if ( pdpt_index <0 || pdpt_index >= 512 )
     {
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pdpt_index\n");
@@ -71,7 +73,6 @@ void *CreateAndIntallPageTable (
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pd_va\n");
         return NULL;
     }
-
     if ( pd_index <0 || pd_index >= 512 )
     {
         debug_print("CreateAndIntallPageTable: [FAIL] Invalid pd_index\n");
@@ -131,6 +132,19 @@ void *CreateAndIntallPageTable (
     unsigned long *PML4                      = (unsigned long *) pml4_va;
 
 
+
+//
+// #debug
+//
+    //printf("\n");
+    //printf (" pt va   : %x\n",PageTable);
+    //printf (" pd va   : %x\n",PageDirectory);
+    //printf (" pdpt va : %x\n",PageDirectoryPointerTable);
+    //printf (" pml4 va : %x\n",PML4);
+    //refresh_screen();
+    //while(1){}
+
+
     unsigned long __ptPA = (unsigned long) virtual_to_physical ( 
                                              PageTable, 
                                              gKernelPML4Address ); 
@@ -145,6 +159,19 @@ void *CreateAndIntallPageTable (
                                              PageDirectoryPointerTable, 
                                              gKernelPML4Address ); 
 
+ 
+
+//
+// #debug
+//
+    //printf("\n");
+    //printf (" pt pa   : %x\n",__ptPA);
+    //printf (" pd pa   : %x\n",__pdPA);
+    //printf (" pdpt pa : %x\n",__pdptPA);
+    //refresh_screen();
+    //while(1){}
+
+ 
  
     if ( __ptPA == 0 ){
         panic ("CreateAndIntallPageTable: __ptPA\n");
@@ -175,7 +202,6 @@ void *CreateAndIntallPageTable (
     // PML4
     PML4[pml4_index] = (unsigned long) __pdptPA;
     PML4[pml4_index] = (unsigned long) PML4[pml4_index] | 7; 
-
 
     
     // Retornando o endereço virtual da pt criada.

@@ -98,20 +98,17 @@ sys.o
 
 all:
 
-	$(CC) -c panic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
-	$(CC) -c reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
-	$(CC) -c request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
-
-	$(CC) -c arch/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
-	$(CC) -c arch/hal.c     $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
-
-	$(CC) -c arch/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
-	$(CC) -c arch/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
-	$(CC) -c arch/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
+	# arch
 	$(CC) -c arch/x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
-	$(CC) -c arch/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
-	$(CC) -c arch/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
 
+	# hal
+	$(CC) -c hal/hal.c             $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c hal/detect.c          $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hal/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c hal/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
+	$(CC) -c hal/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c hal/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
+	$(CC) -c hal/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
 
 	$(CC) -c ps/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
 	$(CC) -c ps/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
@@ -134,7 +131,9 @@ all:
 	$(CC) -c ps/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
 
 
-
+	$(CC) -c panic.c    $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
+	$(CC) -c reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
+	$(CC) -c request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
 	$(CC) -c info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
 	$(CC) -c sysinit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sysinit.o
 	$(CC) -c runtime.c  $(KERNEL_INCLUDE) $(CFLAGS) -o runtime.o
