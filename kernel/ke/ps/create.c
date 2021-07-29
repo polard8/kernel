@@ -692,9 +692,9 @@ void *create_CreateRing3InitThread (void)
     UPProcessorBlock.threads_counter++;
 
 
-    //
-    // == Queue =====================================
-    //
+//
+// == Queue =====================================
+//
  
  
 //
@@ -722,8 +722,6 @@ void *create_CreateRing3InitThread (void)
     
     SelectForExecution(t);    
 
-
-// Done
     debug_print ("create_CreateRing3InitThread: done\n");
 
     return (void *) t;

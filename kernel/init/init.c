@@ -568,7 +568,7 @@ int kernel_main(int arch_type)
             
             debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
             //printf      ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
-            Status = (int) x64main();
+            Status = (int) I_x64main();
             
             if (Status < 0)
             {
@@ -580,7 +580,7 @@ int kernel_main(int arch_type)
             {
                 // No return.
                 debug_print ("kernel_main: Calling x64ExecuteInitialProcess()\n");
-                x64ExecuteInitialProcess();
+                I_x64ExecuteInitialProcess();
             }
             
             //goto fail2;

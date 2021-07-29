@@ -35,6 +35,8 @@ struct mm_data_d
 struct mm_data_d kernel_mm_data;
 // Init process.
 struct mm_data_d init_mm_data;
+// A new process been created.
+struct mm_data_d newprocess_mm_data;
 // ...
 
 

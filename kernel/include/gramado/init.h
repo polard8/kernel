@@ -36,7 +36,6 @@ struct initialization_d Initialization;
 
 
 void init_globals (void);
-int init (void);
 
 #endif    
 

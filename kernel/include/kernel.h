@@ -647,10 +647,22 @@ struct kernel_classes_d KernelClasses;
 // See: kernel/main.c
 int kernel_main (int arch_type);
 
-// Inicialização da arquitetura x86.
-// See: x64init.c
-int x64main (void);
+// ================================================
 
+//
+// x86_64 Initialization. (Main routine)
+//
+
+// x64init.c
+int I_x64main (void);
+// sysinit.c
+int I_init (void);
+// x64init.c
+void I_x64CreateInitialProcess (void);
+void I_x64ExecuteInitialProcess (void);
+
+
+// ================================================
 
 //
 // Finalizations support.

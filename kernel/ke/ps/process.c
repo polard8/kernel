@@ -6,6 +6,11 @@
 int caller_process_id;
 int processNewPID;
 
+// Quando criamos um novo processo.
+//int NewProcessInitialized = FALSE;
+
+
+
 
 unsigned long __GetProcessStats ( int pid, int index ){
 

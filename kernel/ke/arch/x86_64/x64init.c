@@ -21,22 +21,22 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 }
 
 
-// Local routine.
+
 // + Carrega a imagem do primeiro processo que vai rodar em user mode.
 // + Configura sua estrutura de processo.
 // + Configura sua estrutura de thraed.
 // Não passa o comando para o processo.
 
-void __x64CreateInitialProcess (void)
+void I_x64CreateInitialProcess (void)
 {
     int fileret = -1;
     
     if ( system_state != SYSTEM_BOOTING )
-        panic ("__x64CreateInitialProcess: system_state\n");    
+        panic ("I_x64CreateInitialProcess: system_state\n");    
 
     //#todo
-    debug_print ("__x64CreateInitialProcess: [TODO]\n");
-    printf      ("__x64CreateInitialProcess: [TODO]\n");
+    debug_print ("I_x64CreateInitialProcess: [TODO]\n");
+    printf      ("I_x64CreateInitialProcess: [TODO]\n");
     refresh_screen();
 
 
@@ -75,8 +75,8 @@ void __x64CreateInitialProcess (void)
 
     // Coldn't load init.bin
     if ( fileret != 0 ){
-        debug_print("__x64CreateInitialProcess: Coldn't load init.bin \n");
-        panic      ("__x64CreateInitialProcess: Coldn't load init.bin \n");
+        debug_print("I_x64CreateInitialProcess: Coldn't load init.bin \n");
+        panic      ("I_x64CreateInitialProcess: Coldn't load init.bin \n");
     }
 
 
@@ -93,7 +93,7 @@ void __x64CreateInitialProcess (void)
     void *init_pml4_va = (void *) CloneKernelPML4();
 
     if ( init_pml4_va == 0 ){
-        panic ("__x64CreateInitialProcess: init_pml4_va\n");
+        panic ("I_x64CreateInitialProcess: init_pml4_va\n");
     }
 
     init_mm_data.pml4_va = init_pml4_va;
@@ -102,13 +102,15 @@ void __x64CreateInitialProcess (void)
                                                gKernelPML4Address );
 
     if ( init_mm_data.pml4_pa == 0 ){
-        panic ("__x64CreateInitialProcess: init_mm_data.pml4_pa\n");
+        panic ("I_x64CreateInitialProcess: init_mm_data.pml4_pa\n");
     }
 
     // ...
 
     init_mm_data.used  = TRUE;
     init_mm_data.magic = 1234;
+
+// ===========================================
 
     InitProcess = (void *) create_process ( 
                                NULL, NULL, NULL, 
@@ -122,13 +124,13 @@ void __x64CreateInitialProcess (void)
                                (unsigned long ) kernel_mm_data.pd0_va );
 
     if ( (void *) InitProcess == NULL ){
-        panic ("__x64CreateInitialProcess: InitProcess\n");
+        panic ("I_x64CreateInitialProcess: InitProcess\n");
     }else{
 
         
         if ( init_mm_data.used != TRUE || init_mm_data.magic != 1234 )
         {
-            panic ("__x64CreateInitialProcess: init_mm_data validation\n");
+            panic ("I_x64CreateInitialProcess: init_mm_data validation\n");
         }
 
         // Esse foi configurado agora.
@@ -157,7 +159,7 @@ void __x64CreateInitialProcess (void)
     InitThread = (void *) create_CreateRing3InitThread();
 
     if ( (void *) InitThread == NULL ){
-        panic ("__x64CreateInitialProcess: InitThread\n");
+        panic ("I_x64CreateInitialProcess: InitThread\n");
     }else{
 
         // Herdando do processo configurado logo antes.
@@ -232,23 +234,23 @@ void __x64CreateInitialProcess (void)
 // Passa o comando para o primeiro processo em user mode.
 // Esse processo ja foi previamente configurado.
 
-void x64ExecuteInitialProcess (void)
+void I_x64ExecuteInitialProcess (void)
 {
     struct thread_d  *Thread;
     int i=0;
 
     //#todo
-    debug_print ("x64ExecuteInitialProcess: [TODO]\n");
-    printf      ("x64ExecuteInitialProcess: [TODO]\n");
+    debug_print ("I_x64ExecuteInitialProcess: [TODO]\n");
+    printf      ("I_x64ExecuteInitialProcess: [TODO]\n");
     refresh_screen();
    
     if ( system_state != SYSTEM_BOOTING )
-        panic ("x64ExecuteInitialProcess: system_state\n");    
+        panic ("I_x64ExecuteInitialProcess: system_state\n");    
 
 
     if ( InitialProcessInitialized != TRUE ){
-        debug_print ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
-        panic       ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        debug_print ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        panic       ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
     }
 
 
@@ -258,8 +260,8 @@ void x64ExecuteInitialProcess (void)
     // do processo ter sido devidamente configurado.
 
     if ( InitialProcessInitialized != TRUE ){
-        debug_print ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
-        panic       ("x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        debug_print ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
+        panic       ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
     }
 
     // The first thread to run will the control thread 
@@ -269,14 +271,14 @@ void x64ExecuteInitialProcess (void)
 
 
     if ( (void *) Thread == NULL ){
-        debug_print ("x64ExecuteInitialProcess: Thread\n");
-        panic       ("x64ExecuteInitialProcess: Thread\n");
+        debug_print ("I_x64ExecuteInitialProcess: Thread\n");
+        panic       ("I_x64ExecuteInitialProcess: Thread\n");
     }
 
     if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
-        debug_print ("x64ExecuteInitialProcess: Thread validation\n");
-        //printf ("x64ExecuteInitialProcess: tid={%d} magic \n", 
+        debug_print ("I_x64ExecuteInitialProcess: Thread validation\n");
+        //printf ("I_x64ExecuteInitialProcess: tid={%d} magic \n", 
         //    Thread->tid);
         die();
     }
@@ -284,11 +286,11 @@ void x64ExecuteInitialProcess (void)
     // It its context is already saved, so this is not the fist time.
     
     if ( Thread->saved != FALSE ){
-        panic("x64ExecuteInitialProcess: saved\n");
+        panic("I_x64ExecuteInitialProcess: saved\n");
     }
 
     if ( Thread->tid < 0 ){
-        panic("x64ExecuteInitialProcess: tid\n");
+        panic("I_x64ExecuteInitialProcess: tid\n");
     }
 
     // Set the current thread.
@@ -301,7 +303,7 @@ void x64ExecuteInitialProcess (void)
 
     if ( Thread->state != STANDBY )
     {
-        printf ("x64ExecuteInitialProcess: state tid={%d}\n", 
+        printf ("I_x64ExecuteInitialProcess: state tid={%d}\n", 
             Thread->tid);
         die();
     }
@@ -315,7 +317,7 @@ void x64ExecuteInitialProcess (void)
         // #bugbug
         //
         
-        debug_print("x64ExecuteInitialProcess: [FIXME] Overflow\n");
+        debug_print("I_x64ExecuteInitialProcess: [FIXME] Overflow\n");
         
         //queue_insert_data( 
         //    queue, 
@@ -387,76 +389,69 @@ void x64ExecuteInitialProcess (void)
 	// Com isso alguns recursos somente para as fases anteriores
 	// deverão ficar indisponíveis.
 
+// End of phase.
+// Starting phase 4.
+
     InitializationPhase = 4;
 
-	// # go!
-	// Nos configuramos a idle thread em user mode e agora vamos saltar 
-	// para ela via iret.
+// =============
+// # go!
+// Nos configuramos a idle thread em user mode e agora vamos saltar 
+// para ela via iret.
+// #todo:
+// #importante:
+// Podemos usr os endereços que estão salvos na estrutura.
+// #bugbug:
+// temos a questão da tss:
+// será que a tss está configurada apenas para a thread idle do INIT ??
+// temos que conferir isso.
+// base dos arquivos.
+// #todo
+// Rever se estamos usando a base certa.
+// sm.bin (ELF)
+// See: fs.c
 
-	// #todo:
-	// #importante:
-	// Podemos usr os endereços que estão salvos na estrutura.
-
-	//#bugbug:
-	//temos a questão da tss:
-	//será que a tss está configurada apenas para a thread idle do INIT ??
-	//temos que conferir isso.
-
-	//base dos arquivos.
-
-    // #todo
-    // Rever se estamos usando a base certa.
-
-    // init.bin (ELF)
- 
-    // Image base.
-    // 0x00200000
-    unsigned char *buff1 = (unsigned char *) CONTROLTHREAD_BASE;
-
-    if ( buff1[0] != 0x7F ||
-         buff1[1] != 'E' || buff1[2] != 'L' || buff1[3] != 'F' )
-    {
-        debug_print ("x64ExecuteInitialProcess: init .ELF signature\n");
-        panic       ("x64ExecuteInitialProcess: init .ELF signature");
+    int elfStatus = -1;
+    elfStatus = (int) fsCheckELFFile ( (unsigned long) CONTROLTHREAD_BASE );
+    if ( elfStatus < 0 ){
+        debug_print ("I_x64ExecuteInitialProcess: .ELF signature\n");
+        panic       ("I_x64ExecuteInitialProcess: .ELF signature");
     }
 
-    // #debug
-    debug_print("x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
-    printf     ("x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
+// ==============
+// #debug
+
+    debug_print("I_x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
+    printf     ("I_x64ExecuteInitialProcess: [x64] Go to user mode! IRETQ\n");
     refresh_screen();
-
-
-    PROGRESS("-- Fly -----------------------------------\n");
-
 
     // Here is where the boot routine ends.
 
     system_state = SYSTEM_RUNNING;
 
-    // #important:
-    // This is an special scenario,
-    // Where we're gonna fly with the eflags = 0x3000,
-    // it means that the interrupts are disabled,
-    // and the init process will make a software interrupt
-    // to reenable the interrupts. 
-    // Softwre interrupts are not affecte by this flag, I guess.
+// =============
+// Fly!
+// #important:
+// This is an special scenario,
+// Where we're gonna fly with the eflags = 0x3000,
+// it means that the interrupts are disabled,
+// and the init process will make a software interrupt
+// to reenable the interrupts. 
+// Softwre interrupts are not affecte by this flag, I guess.
+// #bugbug
+// This routine is very ugly and very gcc dependent.
+// We deserve a better thing.
+// We need to have the same stack in the TSS.
+// ss, rsp, rflags, cs, rip;
+// See:
+// gva.h
 
-    // #bugbug
-    // This routine is very ugly and very gcc dependent.
-    // We deserve a better thing.
+    if (Thread->iopl != RING3 ){
+        panic ("I_x64ExecuteInitialProcess: iopl");
+    }
 
-    // Fly!
-    // We need to have the same stack in the TSS.
-    // ss, rsp, rflags, cs, rip;
+    PROGRESS("-- Fly -----------------------------------\n");
 
-//
-// #todo
-//
-
-    // See:
-    // gva.h
-
-    // ok, funciona
     unsigned long entry = 0x201000;
     unsigned long rsp3  = 0x00000000002FFFF0;
     asm volatile ( 
@@ -474,32 +469,168 @@ void x64ExecuteInitialProcess (void)
         " pushq $0x1B       \n" 
         " pushq %%rax       \n" 
         " iretq             \n" :: "D"(entry), "S"(rsp3) );
-  
-    PROGRESS("-- iretq fail -----------------\n");
 
-    // Paranoia
-    panic ("x64ExecuteInitialProcess: [FIXME] *breakpoint\n");
+// ====
+// Paranoia
+
+    PROGRESS("-- iretq fail ------------\n");
+    panic ("I_x64ExecuteInitialProcess: [FIXME] *breakpoint\n");
+}
+
+
+// Local
+void __CreateKernelProcess(void)
+{
+    debug_print ("__CreateKernelProcess:\n");
+
+    // IN: 
+    // Room, Desktop, Window
+    // base address, priority, ppid, name, iopl, page directory address.
+    // See: ps/action/process.c
+    
+    KernelProcess = (void *) create_process ( 
+                                 NULL, NULL, NULL, 
+                                 (unsigned long) 0x30000000, 
+                                 PRIORITY_HIGH, 
+                                 (int) 0, 
+                                 "KERNEL-PROCESS", 
+                                 RING0,   
+                                 (unsigned long ) gKernelPML4Address,
+                                 (unsigned long ) kernel_mm_data.pdpt0_va,
+                                 (unsigned long ) kernel_mm_data.pd0_va );
+
+    if ( (void *) KernelProcess == NULL ){
+        panic ("__CreateKernelProcess: KernelProcess\n");
+    }
+
+    if ( kernel_mm_data.used != TRUE || 
+         kernel_mm_data.magic != 1234 )
+    {
+        panic ("__CreateKernelProcess: kernel_mm_data validation\n");
+    }
+
+    KernelProcess->pml4_VA = kernel_mm_data.pml4_va;
+    KernelProcess->pml4_PA = kernel_mm_data.pml4_pa; 
+
+    KernelProcess->pdpt0_VA = kernel_mm_data.pdpt0_va;
+    KernelProcess->pdpt0_PA = kernel_mm_data.pdpt0_pa; 
+
+    KernelProcess->pd0_VA = kernel_mm_data.pd0_va;
+    KernelProcess->pd0_PA = kernel_mm_data.pd0_pa; 
+
+    KernelProcess->position = KING;
+    
+    fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
+    
+    //...
+}
+
+// local
+void __CreateEarlyRing0IdleThread(void)
+{
+    debug_print ("__CreateEarlyRing0IdleThread:\n");
+
+//
+// Thread
+//
+
+    EarlyRING0IDLEThread = (void *) create_CreateEarlyRing0IdleThread();
+
+    if ( (void *) EarlyRING0IDLEThread == NULL ){
+        panic ("__CreateEarlyRing0IdleThread: EarlyRING0IDLEThread\n");
+    }
+
+//
+// Memory
+//
+
+    EarlyRING0IDLEThread->pml4_VA  = KernelProcess->pml4_VA;
+    EarlyRING0IDLEThread->pml4_PA  = KernelProcess->pml4_PA;
+
+    EarlyRING0IDLEThread->pdpt0_VA = KernelProcess->pdpt0_VA;
+    EarlyRING0IDLEThread->pdpt0_PA = KernelProcess->pdpt0_PA;
+
+    EarlyRING0IDLEThread->pd0_VA   = KernelProcess->pd0_VA;
+    EarlyRING0IDLEThread->pd0_PA   = KernelProcess->pd0_PA;
+
+
+//
+// Idle thread
+//
+
+    // Idle thread
+    // #todo
+    // We can use a method in the scheduler for this.
+    // Or in the dispatcher?
+
+    ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
+
+
+    // ?
+    // Set position.
+
+    EarlyRING0IDLEThread->position = KING;
+
+
+//
+// tss
+//
+
+    // #bugbug 
+    // #todo
+    
+    // EarlyRING0IDLEThread->tss = current_tss;
+
+    set_thread_priority ( 
+        (struct thread_d *) EarlyRING0IDLEThread,
+        PRIORITY_MIN );
+
+    // #importante
+    // Sinalizando que ainda não podemos usar as rotinas que dependam
+    // de que o dead thread collector esteja funcionando.
+    // Esse status só muda quando a thread rodar.
+
+    dead_thread_collector_status = FALSE;
 }
 
 
 /*
  *************************************************
- * x86main: 
+ * I_x64main: 
  *
  * Function history:
  *     2015 - Created by Fred Nora.
  */
 
-// Called by kernel_main.
+// Initialization phases:
+// 0 - I_x64main()
+// 1 - See: I_init()
+// 2 - See: I_init()
+// 3 - See: I_x64main()
+// 4 - See: I_x64main()
 
-int x64main (void)
+// Called by kernel_main in init.c
+
+int I_x64main (void)
 {
     int Status=0;
-    
-    // Ainda não configuramos qual será o primeiro processo
-    // a rodar em user mode.
+
+
+// ============================
+// Phase counter
+
+// Starting phase 0.
+
+    InitializationPhase = 0;
+
+
+// ============================
+// The first ring3 process.
+// Ainda não configuramos qual será o primeiro processo
+// a rodar em user mode.
 
     InitialProcessInitialized = FALSE;
+
 
     // Obs: 
     // O video já foi inicializado em main.c.
@@ -511,141 +642,94 @@ int x64main (void)
     // #test: 
     // Mudamos isso para o momento em que inicializamos os consoles.
  
-    debug_print ("x64main: [TODO]\n");
-    
     // #debug
-    printf      ("x86main: [TODO]\n");
+    debug_print ("I_x64main: [TODO]\n");
+    printf      ("I_x64main: [TODO]\n");
     refresh_screen();
 
 
-    if ( system_state != SYSTEM_BOOTING )
-    {
-        debug_print ("[x64] x64main: system_state\n");
-        x_panic     ("[x64] x64main: system_state\n");
+//
+// System State
+//
+
+    if ( system_state != SYSTEM_BOOTING ){
+        debug_print ("[x64] I_x64main: system_state\n");
+        x_panic     ("[x64] I_x64main: system_state\n");
     }
 
+//
+// System Arch
+//
 
-    if (current_arch != CURRENT_ARCH_X86_64)
-    {
-        debug_print ("[x64] x64main: current_arch fail\n");
-        x_panic     ("[x64] x64main: current_arch fail\n");
+    if (current_arch != CURRENT_ARCH_X86_64){
+        debug_print ("[x64] I_x64main: current_arch fail\n");
+        x_panic     ("[x64] I_x64main: current_arch fail\n");
     }
 
-    // Threads counter.
+//
+// Threads counter
+//
 
     UPProcessorBlock.threads_counter = 0;
 
 
-//================================
-    PROGRESS("Kernel:1:1\n"); 
-    // sse support.
+// ================================
+// sse support.
 
-    debug_print ("[x64] x64main: [TODO] SSE support\n");
+    PROGRESS("Kernel:1:1\n"); 
+    debug_print ("[x64] I_x64main: [TODO] SSE support\n");
     // x86_sse_init();
 
-//
-// ======================================================
-//
-    //
-    // == phase 0 ========================================
-    //
 
-    // Essa eh uma boa rotina pra inicializar o contador de fases.
-    // Set Kernel phase.  
-    // Status Flag.
-    // edition flag.
-
-    InitializationPhase = 0;
+// ================================
+// Status Flag
 
     gSystemStatus = 1;
-    
-    // ?? #todo: this is not a x86 thing.
+
+// ================================
+// Edition flag ?
+
     gSystemEdition = 0;
 
-//
+// =========================
 // Hypervisor
-//
-    // Initializing the variable.
-    // #todo: this is not a x86 thing.
+// Initializing the variable.
+// We will check the hv and change this flag.
+// Not qemu for now.
 
     g_is_qemu = FALSE;
 
-//
-// ===============================================================
-//
 
-	// Antes de tudo: 
-	// CLI, Video, runtime.
+// ===================================
+// I_init
+// Calling the main initialization routine.
+// Antes de tudo: 
+// CLI, Video, runtime.
+// ## BUGBUG ##
+// As mensagens do abort podem não funcionarem nesse caso.
+// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
+// Essa rotina só pode ser chamada 
+// durante essa fase da inicialização.
+// See: sysinit.c
 
-	// ## BUGBUG ##
-	// As mensagens do abort podem não funcionarem nesse caso.
-	// AINDA NÃO INICIALIZAMOS O RECURSO DE MENSAGENS.
-
-    // Essa rotina só pode ser chamada 
-    // durante essa fase da inicialização.
+    PROGRESS("Kernel:1:2\n"); 
+    debug_print ("I_x64main: Calling I_init()\n");
 
     if ( InitializationPhase != 0 ){
-        x_panic ("x64main: InitializationPhase\n");
+        x_panic ("I_x64main: InitializationPhase\n");
         //KiAbort();
     }
 
-//================================
-    PROGRESS("Kernel:1:2\n"); 
-    // Calling 'init' kernel module. 
-
-    // See: 
-    // core/init.c
-
-    debug_print ("x64main: Calling init()\n");
-
-    Status = (int) init(); 
- 
-    if ( Status != 0 )
-    {
-        debug_print ("x64main: init fail\n");
-        x_panic     ("x64main: init fail\n");
+    // Phases 1 and 2.
+    Status = (int) I_init(); 
+    if ( Status != 0 ){
+        debug_print ("I_x64main: I_init fail\n");
+        x_panic     ("I_x64main: I_init fail\n");
     }
 
-    // ...
+// End of phase.
+// Starting phase 3.
 
-    // Testando o funcionamento das estruturas de console. tty.
-    //set_up_cursor(0,1);
-    //console_outbyte('f',fg_console);
-
-    //printf("*breakpoint\n");
-    //refresh_screen();
-    //while(1){}
-
-
-// Done: 
-//     Completas as 3 fases de inicialização do sistema.
-//     @todo: Na verdade serão mais fases..
-//           as fases estão em init().
-
-    //printf ("x86main: done\n");
-
-//
-// ====================================================================
-//
-
-	//#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
-
-
-//#ifdef BREAKPOINT_TARGET_AFTER_SYSTEM
-    //printf ("x86main: *breakpoint\n");
-    //refresh_screen(); 
-    //while (1){ asm ("hlt"); }
-//#endif
-
-
-    //printf("======================\n");
-    //printf("x86main: end of phase 2\n");
-
-//
-// == phase 3 ? ================================================
-//
     InitializationPhase = 3;
 
 //================================
@@ -667,180 +751,74 @@ int x64main (void)
     //while(1){}
 
 
-//================================
-    PROGRESS("Kernel:1:4\n"); 
-    // Initialize window server manager.
+// ================================
+// user/ ?
+// Initialize window server manager.
+// ws.c
+// #debug:  
+// Esperamos alcaçarmos esse alvo.
+// Isso funcionou gigabyte/intel
+// Vamos avançar
+// Quem chamou essa funçao foi o começo da inicializaçao do kernel.
+// Retornamos para x86main.c para arch x86.
 
-    // 2io/ws.c
+    PROGRESS("Kernel:1:4\n"); 
     ws_init();
 
-    // debug
-    //printf("~ws\n");
-    //refresh_screen();
-    //while(1){}
-
-    // #debug:  
-    // Esperamos alcaçarmos esse alvo.
-    // Isso funcionou gigabyte/intel
-    // Vamos avançar
-    // Quem chamou essa funçao foi o começo da inicializaçao do kernel.
-    // Retornamos para x86main.c para arch x86.
-
-    debug_print ("x64main: done\n");
-    debug_print ("====\n");
-    
-    //printf("*breakpoint\n");
-    //refresh_screen();
-    //while(1){}
-
-
-//================================
-    PROGRESS("Kernel:1:5\n"); 
-    // Setup GDT again.
-    // We already made this at kernel startup.
-
-    // # Caution.
-    // Lets create a TSS and setup a GDT.
-    // This way we can use 'current_tss' when we create threads.
-    // This function creates a TSS and sets up a GDT.
-    // See: hal/arch/x86/x86.c
-
-    debug_print ("[x64] x64main: [DANGER] Initializing GDT\n");
-    //printf      ("[x86] x86main: Initializing GDT\n");
-
+// ================================
+// GDT
+// Setup GDT again.
+// We already made this at kernel startup.
+// # Caution.
+// Lets create a TSS and setup a GDT.
+// This way we can use 'current_tss' when we create threads.
+// This function creates a TSS and sets up a GDT.
+// See: hal/arch/x86/x86.c
+// #todo
+// Depois de renovarmos a GDT precisamos
+// recarregar os registradores de segmento?
 
 //
 // DANGER !!!
 //
-        
+
+    PROGRESS("Kernel:1:5\n"); 
+    debug_print ("[x64] I_x64main: [DANGER] Initializing GDT\n");
+    printf      ("[x86] I_x64main: Initializing GDT\n");      
     x64_init_gdt();
 
 
-    // #todo
-    // Depois de renovarmos a GDT precisamos
-    // recarregar os registradores de segmento.
+// ================================
+// Creating kernel process.
+// Local
 
-    //printf("*breakpoint\n");
-    //refresh_screen();
-    //while(1){}
-
-    //
-    // == Processes and threads ===================================
-    //
-
-
-    debug_print ("[x64] x64main: processes and threads\n");
-    //printf      ("[x86] x86main: processes and threads\n");
-
-
-//================================
     PROGRESS("Kernel:1:6\n"); 
-    // Creating kernel process.
+    __CreateKernelProcess();
 
-    // IN: 
-    // Room, Desktop, Window
-    // base address, priority, ppid, name, iopl, page directory address.
-    // See: ps/action/process.c
-    
-    KernelProcess = (void *) create_process ( 
-                                 NULL, NULL, NULL, 
-                                 (unsigned long) 0x30000000, 
-                                 PRIORITY_HIGH, 
-                                 (int) 0, 
-                                 "KERNEL-PROCESS", 
-                                 RING0,   
-                                 (unsigned long ) gKernelPML4Address,
-                                 (unsigned long ) kernel_mm_data.pdpt0_va,
-                                 (unsigned long ) kernel_mm_data.pd0_va );
+// ================================
+// Creating a ring 0 thread for the kernel.
+// Local
 
-    if ( (void *) KernelProcess == NULL ){
-        panic ("x64main: KernelProcess\n");
-    }else{
-
-        if ( kernel_mm_data.used != TRUE || kernel_mm_data.magic != 1234 )
-        {
-            panic ("x64main: kernel_mm_data validation\n");
-        }
-
-        KernelProcess->pml4_VA = kernel_mm_data.pml4_va;
-        KernelProcess->pml4_PA = kernel_mm_data.pml4_pa; 
-
-        KernelProcess->pdpt0_VA = kernel_mm_data.pdpt0_va;
-        KernelProcess->pdpt0_PA = kernel_mm_data.pdpt0_pa; 
-
-        KernelProcess->pd0_VA = kernel_mm_data.pd0_va;
-        KernelProcess->pd0_PA = kernel_mm_data.pd0_pa; 
-
-        KernelProcess->position = KING;
-        fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
-        //...
-    };
-
-
-
-//================================
     PROGRESS("Kernel:1:7\n"); 
-    // Creating a ring 0 thread for the kernel.
-
-    EarlyRING0IDLEThread = (void *) create_CreateEarlyRing0IdleThread();
-
-    if ( (void *) EarlyRING0IDLEThread == NULL ){
-        panic ("x64main: EarlyRING0IDLEThread\n");
-    }else{
-
-        EarlyRING0IDLEThread->pml4_VA  = KernelProcess->pml4_VA;
-        EarlyRING0IDLEThread->pml4_PA  = KernelProcess->pml4_PA;
-        EarlyRING0IDLEThread->pdpt0_VA = KernelProcess->pdpt0_VA;
-        EarlyRING0IDLEThread->pdpt0_PA = KernelProcess->pdpt0_PA;
-        EarlyRING0IDLEThread->pd0_VA   = KernelProcess->pd0_VA;
-        EarlyRING0IDLEThread->pd0_PA   = KernelProcess->pd0_PA;
-
-        // Idle thread
-        // #todo
-        // We can use a method in the scheduler for this.
-        // Or in the dispatcher?
-
-        ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
-
-        EarlyRING0IDLEThread->position = KING;
-
-        // #bugbug #todo
-        // EarlyRING0IDLEThread->tss = current_tss;
-
-        set_thread_priority ( 
-            (struct thread_d *) EarlyRING0IDLEThread,
-            PRIORITY_MIN );
-
-		// #importante
-		// Sinalizando que ainda não podemos usar as rotinas que dependam
-		// de que o dead thread collector esteja funcionando.
-		// Esse status só muda quando a thread rodar.
-
-        dead_thread_collector_status = FALSE;
-    };
+    __CreateEarlyRing0IdleThread();
 
 
-//================================
-    PROGRESS("Kernel:1:8\n"); 
-    // Session Manager.
-    // Cria e inicializa apenas o SM.BIN
-
+// ================================
+// Session Manager.
+// Cria e inicializa apenas o SM.BIN
 // Local routine.
 // + Carrega a imagem do primeiro processo que vai rodar em user mode.
 // + Configura sua estrutura de processo.
 // + Configura sua estrutura de thraed.
 // Não passa o comando para o processo.
 
-    __x64CreateInitialProcess();
-
-    //printf("*breakpoint\n");
-    //refresh_screen();
-    //while(1){}
-
+    PROGRESS("Kernel:1:8\n"); 
+    I_x64CreateInitialProcess();
 
 //================================
+// Check some initialization flags.
     PROGRESS("Kernel:1:9\n"); 
-    // Check some initialization flags.
+
 
 /*
 #ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
@@ -866,178 +844,78 @@ int x64main (void)
     //timer_cursor_used   = 0;   //desabilitado.
     //timer_cursor_status = 0;
 
-//================================
+// ================================
+// Early ps/2 initialization.
+// Initializing ps/2 controller.
+// #todo: 
+// Essa inicialização deve ser adiada.
+// deixando para o processo init fazer isso.
+// Chamaremos essa inicialização básica nesse momento.
+// A inicialização completa será chamada pelo processo init.
+// See: i8042.c
+
     PROGRESS("Kernel:1:10\n"); 
-    // Early ps/2 initialization.
-
-	// Initializing ps/2 controller.
-	//#DEBUG
-	//printf ("testing ps2\n");
-	//refresh_screen(); 
-
-    debug_print ("[x64] x64main: ps2\n");      
-    
-    // #todo: 
-    // Essa inicialização deve ser adiada.
-    // deixando para o processo init fazer isso.
-    // Chamaremos essa inicialização básica nesse momento.
-    // A inicialização completa será chamada pelo processo init.
-    // See: i8042.c
-
+    debug_print ("[x64] I_x64main: ps2\n");      
     //PS2_initialize();           // This one will be called by the ring3 application.
     PS2_early_initialization();   // Use this one now.
 
+// ================================
+// Loading some system files.
+// icons, bmps, etc ...
+// Loading file tests.
+// #test:
+// Background support.
+// Used to test load_path()
+// See: ws/bg.c
+// #Aviso:
+// Isso funcionou, não mudar de lugar.
+// Mas isso faz parte da interface gráfica,
+// Só que somente nesse momento temos recursos 
+// suficientes para essa rotina funcionar.
 
-
-//================================
     PROGRESS("Kernel:1:11\n"); 
-    // Loading some system files.
-    // icons, bmps, etc ...
-    
-    // Loading file tests.
-    // #test:
-    // Background support.
-    // Used to test load_path()
-    // See: ws/bg.c
-    
     //bg_load_image ();
-    //refresh_screen();
-    //while(1){}
-
-	// #Aviso:
-	// Isso funcionou, não mudar de lugar.
-	// Mas isso faz parte da interface gráfica,
-	// Só que somente nesse momento temos recursos 
-	// suficientes para essa rotina funcionar.
-
     //windowLoadGramadoIcons();
 
-    //printf("*breakpoint\n");
-    //refresh_screen();
-    //while(1){}
+// ================================
+// Font support.
+// #bugbug
+// Font is independent from the x86 archtechture.
+// We can do this in some other place. Maybe :)
+// See: config/config.h
 
-
-//================================
     PROGRESS("Kernel:1:12\n"); 
-    // font support.
-
-    //
-    // Fonts.
-    //
-    
-    // #bugbug
-    // Font is independent from the x86 archtechture.
-    // We can do this in some other place. Maybe :)
- 
-    // See: config/config.h
     //gfontSize = DEFAULT_FONT_SIZE;
 
 
+// ================================
+// Testing some rectangle support.
 
-//================================
     PROGRESS("Kernel:1:13\n"); 
-    // Testing some rectangle support.
 
-//done:
-//================================
+// ================================
+// Done
+// The routine is over.
+// The caller will start the first thread create by us.
+// The expected return value is 1234.
+
     PROGRESS("Kernel:1:14\n"); 
-    // Start first thread ever.
-
-    debug_print ("[x64] x64main: done\n");
+    debug_print ("[x64] I_x64main: done\n");
     debug_print ("==============\n");
-
-    // debug
-    //printf("T\n");
-    //refresh_screen();
-    //while(1){}
-
-//
-// Starting idle thread.
-//
-
-    /*
-    if ( system_state == KERNEL_INITIALIZED )
-    {
-        debug_print ("[x86] x86main: Initializing INIT ..\n");
-        printf      ("[x86] x86main: Initializing INIT ..\n");
-        
-#ifdef KERNEL_VERBOSE
-    refresh_screen();
-#endif
-
-        //
-        // No return!
-        //
-
-        x64mainStartFirstThread(); 
-
-        panic("x86mainStartFirstThread: Couldn't spawn the first thread!\n");
-    }
-    */
-
-
-
-
-
-//
-// #todo
-//
-
-    // Estamos trabalhando nessa rotina, pois é ela que faz o salto
-    // para ring3. O salto esta falhando.
-    
-    // #todo
-    // pegar o retorno dessa funçao e retornar para quem nos chamou.
-    
-    // This will be called by the init.c in init/
-    //debug_print ("x64main: Calling x64ExecuteInitialProcess()\n");
-    //x64ExecuteInitialProcess();
-
-    // Expected return value.
 
     return (int) 1234;
 
-    // #test
-    // Estamos usando esse retorno ate fazermos achamada logo acima.
-
-    //return 0;
-
-   
-
-// ===============================
-
-// ===============================
-
-// fail
-// #todo
-// Uma opção aqui é usarmos a tipagem void para essa função
-// e ao invés de retornarmos, apenas entrarmos na thread idle
-// em ring 0, isso depois de criadas as threads em user mode.
+// ================================
+// The routine fails.
 
 fail:
-//================================
+    // Nothing
     PROGRESS("Kernel:1:00\n"); 
-    debug_print ("[x64] x64main: fail\n");
-    refresh_screen (); 
-    return -1;
+fail0:
+    debug_print ("[x64] I_x64main: fail\n");
+    refresh_screen(); 
+    return (int) (-1);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

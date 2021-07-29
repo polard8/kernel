@@ -892,8 +892,7 @@ unsigned long processList[PROCESS_COUNT_MAX];
 // == Prototypes =====================================================
 //
 
-void __x64CreateInitialProcess (void);
-void x64ExecuteInitialProcess (void);
+
 
 
 //==============

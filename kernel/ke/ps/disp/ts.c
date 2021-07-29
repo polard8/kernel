@@ -246,6 +246,10 @@ The remainder ??
                 extra = FALSE;
             }
 
+            //#provisório; Isso é extra também.
+            //KiRequest();
+            //request();
+ 
 			// Dead thread collector
 			// Avalia se é necessário acordar a thread do dead thread collector.
 			// É uma thread em ring 0.

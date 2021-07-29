@@ -163,6 +163,7 @@ int request (void){
 
     if (r >= KERNEL_REQUEST_MAX){
         // msg ...
+        printf ("request: invalid request\n");
         return -1;
     }
 
@@ -301,7 +302,13 @@ int request (void){
 		// todo: 
 		// Tratar mais tipos.	
 		//...
-
+		
+		// clone and execute process.
+        case 111:
+            current_process = REQUEST.target_pid;
+            current_thread  = REQUEST.target_tid;
+            return (void *) clone_and_execute_process( (const char *) REQUEST.long1  );
+            break;
 
         default:
             debug_print ("request: Default \n");  

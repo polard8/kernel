@@ -546,17 +546,16 @@ pid_t clone_and_execute_process ( const char *filename )
 
 __search:
 
-    // Convert
+    // Convert and search.
+
     fs_fntos ( (char *) name );
 
-    // Search.
     Status = (int) search_in_dir ( name, dir_address );
-    
-    // Found.
-    if (Status == 1)
-    { 
+
+    if (Status == 1){ 
         goto __found; 
     }
+
 // Fail.
 // Falhou a busca em todos os diretorios procurados.
     debug_print ("clone_and_execute_process: [FAIL] File not found!\n");
@@ -815,6 +814,7 @@ do_clone:
     // precisamos saber se a assinatura de ELF é válida.
     // Assinatura ELF inválida. 
     // Vamos matar a thread e o processo.
+    // See: fs.c
 
     Status = (int) fsCheckELFFile ( (unsigned long) Clone->Image );
     
@@ -1001,8 +1001,7 @@ do_clone:
     
     SelectForExecution (Clone->control);
 
-
-    refresh_screen();
+    //refresh_screen();
 
 	//pai
     current_process = Current->pid;
@@ -1022,9 +1021,12 @@ do_clone:
 
     
 
-    // [4] done.
+    // [5] done.
     debug_print ("clone_and_execute_process: [5] Done\n");
     debug_print ("---------------------------------------------\n");
+
+    printf ("clone_and_execute_process: [5] Done\n");
+    refresh_screen();
 
 //
 // Debug

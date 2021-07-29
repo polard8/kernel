@@ -288,10 +288,6 @@ void main(void)
 
 
 
-
-
-
-
 //
 // Thread
 //
@@ -315,7 +311,9 @@ void main(void)
 //
 
     printf ("sm.bin: done *breakpoint\n");
-        
+
+    rtl_clone_and_execute("reboot.bin"); 
+
 
 
 // interna
