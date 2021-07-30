@@ -25,55 +25,96 @@ void *sys_create_process (
 {
 
     struct process_d *new;
+    char NewName[32];
 
 //
 // Not tested
 //
 
+
     debug_print("sys_create_process: [TODO]\n");
+    printf     ("sys_create_process: [TODO]\n");
+    refresh_screen();
+    //return NULL;
 
-    return NULL;
-
-    /*
     // ==============
 
-    void *pml4_va = (void *) CloneKernelPML4();
-    unsigned long pml4_pa=0;
+    struct thread_d *CurrentThread;
 
-    if ( pml4_va == 0 ){
-        panic ("sys_create_process: init_pml4_va\n");
-    }
-
-    pml4_pa = (unsigned long) virtual_to_physical ( 
-                                               pml4_va, 
-                                               gKernelPML4Address );
-
-    if ( pml4_pa == 0 ){
-        panic ("sys_create_process: init_mm_data.pml4_pa\n");
-    }
-
+    CurrentThread = (struct thread_d *) threadList[current_thread];
     
+    // No switch yet.
+    if ((void*)CurrentThread==NULL){
+        return NULL;
+    }
+
+
+    // Create a ring0 copy of the name.
+    strncpy(NewName,name,16);
+    NewName[16]=0;  //finalize
+
+    unsigned long old_pml4=0;
+    old_pml4 = CurrentThread->pml4_PA;  //save
+
+    // Switch
+    x64_load_pml4_table( kernel_mm_data.pml4_pa );
+
+    // VA
+    void *pml4_va = (void *) CloneKernelPML4();
+    if ( pml4_va == 0 ){
+        panic ("sys_create_process: pml4_va\n");
+        //goto fail;
+    }
+
+    // PA
+    unsigned long pml4_pa=0;
+    pml4_pa = (unsigned long) virtual_to_physical ( 
+                                  pml4_va, gKernelPML4Address );
+    if ( pml4_pa == 0 ){
+        panic ("sys_create_process: pml4_pa\n");
+        //goto fail;
+    }
+
+//
+// Create process.
+//   
 
     new = (void *) create_process ( 
                        NULL, NULL, NULL, 
                        (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
                        PRIORITY_HIGH, 
                        (int) current_process, 
-                       "NEW-PROCESS", 
+                       (char *) NewName, 
                        RING3, 
                        (unsigned long ) pml4_va,
                        (unsigned long ) kernel_mm_data.pdpt0_va,
                        (unsigned long ) kernel_mm_data.pd0_va );
 
-    if ((void*) new == NULL){
-        printf("sys_create_process: fail\n");
+    if ((void*) new == NULL)
+    {
+        printf("sys_create_process: new\n");
         refresh_screen();
-        return NULL;
+        goto fail;
     }
 
+    printf("sys_create_process: done :)\n");
+    refresh_screen();
+
+    // Switch
+    x64_load_pml4_table( old_pml4 );
+
     return (void*) new;
-    // ==============
-    */
+
+// ==============
+
+fail:
+    printf("sys_create_process: fail\n");
+    refresh_screen();
+
+    // Switch
+    x64_load_pml4_table( old_pml4 );
+
+    return NULL;
 }
 
 

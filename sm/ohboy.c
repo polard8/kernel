@@ -304,8 +304,6 @@ void main(void)
     rtl_start_thread(t1);
 
 
-
-
 //
 // Breakpoint
 //
@@ -323,6 +321,31 @@ void main(void)
 
     // ok, funciona. Podemos usar o teclado.
     //asm ("int $199 \n");
+
+
+//
+// Create process
+//
+
+    /*
+    char pName[32];
+    sprintf(pName,"NewProcessR3");
+    pName[31] = 0;
+    // Create process
+    gramado_system_call( 
+        73, 
+        (unsigned long) &pName[0],
+        3,  //priority
+        0 );
+    */
+    
+    // ok.
+    //rtl_create_process("NewProcessR3");
+
+// Show info about all processes.
+
+    //gramado_system_call(82,0,0,0);
+
 
     // #test
     //while(1){}

@@ -628,7 +628,7 @@ void *sci0 (
 
 
         // 73
-        // See: sys.c
+        // See: ke/sys.c
         // Cria um processo e coloca a thread primária pra rodar.
         // #bugbug: 
         // Na inicializacao do kernel, nos criamos um processo
@@ -655,12 +655,15 @@ void *sci0 (
         case SYS_CREATEPROCESS:
             debug_print("sci0: [FIXME] SYS_CREATEPROCESS\n");
             return (void *) sys_create_process ( 
-                                NULL, NULL, NULL, 
-                                0, arg3,        //res, priority
-                                0, (char *) a2, //ppid, name
-                                RING3 ); 
+                                NULL,             // room
+                                NULL,             // desktop
+                                NULL,             // window
+                                0,                // Reserved
+                                arg3,             // priority
+                                current_process,  // ppid
+                                (char *) a2,      // name
+                                RING3 );          // iopl 
             break;
-
 
 
 

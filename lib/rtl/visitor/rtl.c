@@ -302,7 +302,24 @@ void rtl_exit_critical_section (void)
 void *rtl_create_process( const char *file_name )
 {
     debug_print("rtl_create_process:\n #todo\n");
-    return NULL;
+    //return NULL;
+
+    char pName[32];
+    
+    strncpy(pName,file_name,16);
+    pName[17] = 0;
+    pName[31] = 0;
+
+// Create process
+
+    // Retorna o ponteiro para uma estrutura de processo
+    // que esta em ring0, ou NULL.
+
+    return (void*) gramado_system_call( 
+        73, 
+        (unsigned long) &pName[0],
+        3,  //priority
+        0 );
 }
 
 

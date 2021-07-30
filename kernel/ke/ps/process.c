@@ -697,7 +697,7 @@ struct process_d *create_process (
     //Process->pathname = NULL;
  
     //#test
-    //64 bytes m�x.
+    //64 bytes max.
     strcpy ( Process->__processname, (const char *) name); 
 
     Process->processName_len = sizeof(Process->__processname);

@@ -96,6 +96,10 @@ int x64_init_intel (void);
 void x64_info (void);
 void show_cpu_intel_parameters (void);
 
+
+void x64_load_pml4_table(unsigned long phy_addr);
+
+
 #endif    
 
 
