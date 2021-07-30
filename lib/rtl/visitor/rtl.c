@@ -298,6 +298,35 @@ void rtl_exit_critical_section (void)
 
 
 
+
+void *rtl_create_process( const char *file_name )
+{
+    debug_print("rtl_create_process:\n #todo\n");
+    return NULL;
+}
+
+
+int rtl_start_process( void *process )
+{
+    debug_print("rtl_start_process:\n #todo\n");
+    return -1;
+}
+
+
+/*
+pid_t rtl_get_process_pid( void *process );
+pid_t rtl_get_process_pid( void *process )
+{
+}
+*/
+
+/*
+int rtl_start_process_pid( pid_t pid );
+int rtl_start_process_pid( pid_t pid )
+{
+}
+*/
+
 /*
  **************************
  * rtl_create_thread:
@@ -320,13 +349,13 @@ void *rtl_create_thread (
                         (unsigned long) name );
 }
 
-
 /*
  ****************************************************************
  * rtl_start_thread:
  *     Coloca no estado standby para executar pela primeira vez
  */
 
+// #todo: Change return to 'int'
 void rtl_start_thread (void *thread)
 {
     debug_print ("rtl_create_thread:\n");
@@ -335,6 +364,22 @@ void rtl_start_thread (void *thread)
         (unsigned long) thread, 
         (unsigned long) thread );
 }
+
+/*
+int rtl_get_thread_tid( void *thread);
+int rtl_get_thread_tid( void *thread)
+{
+}
+*/
+
+
+/*
+int rtl_start_thread_tid(int tid);
+int rtl_start_thread_tid(int tid)
+{
+}
+*/
+
 
 
 

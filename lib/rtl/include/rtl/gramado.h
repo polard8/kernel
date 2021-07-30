@@ -162,6 +162,17 @@ struct rtl_event_d *rtl_next_event (void);
 void rtl_enter_critical_section (void);
 void rtl_exit_critical_section (void);
 
+
+
+//
+// == process ===============================
+//
+
+
+void *rtl_create_process( const char *file_name );
+int rtl_start_process( void *process );
+
+
 //
 // == thread ===============================
 //
@@ -173,6 +184,7 @@ void *rtl_create_thread (
 
 void rtl_start_thread (void *thread);
 
+// ===================================================
 
 //vamos escrever em uma janela indefinida. NULL.
 //provavelmente a janela principal.
