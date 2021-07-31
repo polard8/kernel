@@ -909,6 +909,10 @@ void show_currentprocess_info (void);
 void show_process_information (void);
 
 
+int GetCurrentPID (void);
+struct process_d *GetCurrentProcess(void);
+
+
 unsigned long __GetProcessStats ( int pid, int index );
 int getprocessname ( int pid, char *buffer );
 struct process_d *processObject (void);

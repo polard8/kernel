@@ -277,6 +277,17 @@ _int130:
 
     mov qword [.int130Ret], rax 
 
+    ;test
+    ;recuperando os registradores modificados.
+    ;valido somente para ring3.
+    ;xor rax, rax
+    ;mov ax, word 0x23  
+    ;mov ds, ax
+    ;mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
+
+
     popfq
     pop rsp
     pop gs

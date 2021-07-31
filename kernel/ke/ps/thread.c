@@ -271,11 +271,11 @@ int init_threads (void){
 
 /*
  *****************************
- * GetCurrentThreadId
+ * GetCurrentTID
  *     Pega o id da thread atual.
  */
 
-int GetCurrentThreadId (void)
+int GetCurrentTID (void)
 {
     return (int) current_thread;
 }
@@ -287,8 +287,7 @@ int GetCurrentThreadId (void)
 
 void *GetCurrentThread (void){
 
-    struct thread_d *Current;
-
+    struct thread_d *t;
 
     if (current_thread < 0 || 
         current_thread >= THREAD_COUNT_MAX )
@@ -296,12 +295,11 @@ void *GetCurrentThread (void){
         return NULL;
     }
 
-    Current = (void *) threadList[current_thread];
+    t = (void *) threadList[current_thread];
 
-    if ( (void *) Current == NULL ){  return NULL; }
-
-    return (void *) Current;
+    return (void *) t;
 }
+
 
 /*
  ********************************************************
@@ -409,20 +407,13 @@ void show_thread_information (void){
 
     struct thread_d *Current;
 
-
     printf ("show_thread_information:\n");
 
 //
 // Current thread
 //
 
-	//Limits.
-    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
-    {
-        return;
-    }
-
-    Current = (void *) threadList[current_thread];
+    Current = (void *) GetCurrentThread();
 
     if( (void *) Current == NULL ){
         printf ("show_thread_information: [FAIL] Current\n");
@@ -484,13 +475,13 @@ int thread_profiler( int service ){
        return -1;
     }
 
-    //if ( current_thread < 0 )
-        //return -1;
+//
+// Current thread
+//
 
-    __current = (struct thread_d *) threadList[current_thread];
-    
-    if ( (void *) __current == NULL )
-    {
+    __current = (struct thread_d *) GetCurrentThread();
+
+    if ( (void *) __current == NULL ){
         panic ("thread_profiler: __current");
     }
 

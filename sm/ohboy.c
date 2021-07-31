@@ -244,11 +244,9 @@ void main(void)
     // #todo: 
     // Trabalhando na implementação dessa rotina em ring0.
     // See: x64init.c, pages.c, process.c ...
-    //rtl_clone_and_execute("gdeshell.bin");
-    //rtl_clone_and_execute("sm.bin"); 
 
-    //rtl_clone_and_execute("gdeshell.bin");   //fail
-    //rtl_clone_and_execute(".bin"); 
+
+    //rtl_clone_and_execute("reboot.bin");
 
 
 //
@@ -285,7 +283,6 @@ void main(void)
     // #fail
     //rtl_clone_and_execute("reboot.bin"); 
     //while(1){}
-
 
 
 //

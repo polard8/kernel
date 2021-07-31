@@ -296,9 +296,10 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
         // Updating the referency counter.
         // ??limits
         __f = (void*) Process2->Objects[i];
-        if ((void*)__f!= NULL)
+
+        // Quantos descritores de arquivo apontam para essa mesma estrutura.
+        if ( (void *)__f != NULL )
         {
-            // Quantos descritores de arquivo apontam para essa mesma estrutura.
             __f->fd_counter++;
         }
     };
@@ -576,58 +577,50 @@ __found:
 //
 
 
-    // ## Current ##
     // Checando a validade do processo atual.
 
-    if ( current_process < 0 ){
-        printf ("clone_and_execute_process: [FAIL] current_process \n");
-        goto fail;
-    }
-
-    Current = (struct process_d *) processList[current_process];
+    Current = (struct process_d *) GetCurrentProcess();
 
     if ( (void *) Current == NULL ){
         printf ("clone_and_execute_process: [FAIL] Current \n");
         goto fail;
-    }else{
-        if ( Current->used != TRUE || Current->magic != 1234 ){ 
-            printf ("clone_and_execute_process: [FAIL] Current validation \n");
-            goto fail;
-        }
+    }
 
-        // Saving the pml4 of the current process. The caller.
-        // We're gonna reload this one at the end of this routine.
-        //old_pml4 = Current->pml4_PA;
+    if ( Current->used != TRUE || Current->magic != 1234 ){ 
+        printf ("clone_and_execute_process: [FAIL] Current validation \n");
+        goto fail;
+    }
 
-        // Testing if the current process has a 
-        // null pml4 virtual address.
+    // Saving the pml4 of the current process. The caller.
+    // We're gonna reload this one at the end of this routine.
+    //old_pml4 = Current->pml4_PA;
 
-        if( (void*) Current->pml4_VA == NULL ){
-            printf ("clone_and_execute_process: [FAIL] Current->pml4_VA\n");
-            goto fail;
-        }
+    // Testing if the current process has a 
+    // null pml4 virtual address.
 
-        if( (void*) Current->pdpt0_VA == NULL ){
-            printf ("clone_and_execute_process: [FAIL] Current->pdpt0_VA\n");
-            goto fail;
-        }
+    if( (void*) Current->pml4_VA == NULL ){
+        printf ("clone_and_execute_process: [FAIL] Current->pml4_VA\n");
+        goto fail;
+    }
 
-        if( (void*) Current->pd0_VA == NULL ){
-            printf ("clone_and_execute_process: [FAIL] Current->pd0_VA\n");
-            goto fail;
-        }
+    if( (void*) Current->pdpt0_VA == NULL ){
+        printf ("clone_and_execute_process: [FAIL] Current->pdpt0_VA\n");
+        goto fail;
+    }
 
-        // Salvando o endereço fisico da imagem 
-        // que existe no processo.
-        // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
+    if( (void*) Current->pd0_VA == NULL ){
+        printf ("clone_and_execute_process: [FAIL] Current->pd0_VA\n");
+        goto fail;
+    }
 
-        //#debug
-        //printf(">>> check current process: %d %d \n", current_process, Current->pid );
-        
-        // Lets clone the current process.
-        goto do_clone;
-        // ...
-    };
+    // Salvando o endereço fisico da imagem 
+    // que existe no processo.
+    // old_image_pa = (unsigned long) virtual_to_physical ( Current->Image, gKernelPageDirectoryAddress ); 
+
+    //#debug
+    //printf(">>> check current process: %d %d \n", current_process, Current->pid );
+
+    // ...
 
 //
 // == Clone =========================================
@@ -1022,7 +1015,7 @@ do_clone:
     // Change the state to standby.
     // This thread is gonna run in the next taskswitch.
     // Or maybe in this moment.
-    
+
     SelectForExecution (Clone->control);
 
     // Used by spawn.c
@@ -1071,6 +1064,7 @@ do_clone:
     //show_reg(current_thread);
 
     // See: thread.c and spawn.c
+    //Current->control->state = DEAD;
     //SelectForExecution(Clone->control);
     //KiSpawnThread(Clone->control->tid); 
 

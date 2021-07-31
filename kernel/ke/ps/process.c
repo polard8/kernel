@@ -10,6 +10,27 @@ int processNewPID;
 //int NewProcessInitialized = FALSE;
 
 
+int GetCurrentPID (void)
+{
+    return (int) current_process;
+}
+
+
+
+struct process_d *GetCurrentProcess(void)
+{
+    struct process_d *p;
+    
+    if ( current_process < 0 || 
+         current_process >= PROCESS_COUNT_MAX )
+    {
+        return NULL;
+    }
+
+    p = (struct process_d *) processList[current_process];
+
+    return (struct process_d *) p;
+}
 
 
 unsigned long __GetProcessStats ( int pid, int index ){

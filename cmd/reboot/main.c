@@ -36,7 +36,7 @@ int main ( int argc, char *argv[] ){
 
     gramado_system_call(65,'3',0,0);
     printf ("REBOOT.BIN: This is a test\n");
-    
+
     while(1){}
     //asm("int $3");
 

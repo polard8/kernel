@@ -767,7 +767,9 @@ int getthreadname ( int tid, char *buffer );
 void *FindReadyThread (void);
 int GetThreadState (struct thread_d *thread);
 int GetThreadType (struct thread_d *thread);
-int GetCurrentThreadId (void);
+
+
+int GetCurrentTID (void);
 void *GetCurrentThread (void);
 
 

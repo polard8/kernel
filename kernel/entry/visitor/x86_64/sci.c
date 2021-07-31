@@ -1260,11 +1260,11 @@ void *sci2 (
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
 
-    // get the tid of the current thread.
+    // Get the tid of the current thread.
     if ( number == 10010 )
     {
-        debug_print("sci2: [10010] GetCurrentThreadId\n");
-        return (void*) GetCurrentThreadId();
+        debug_print("sci2: [10010] GetCurrentTID\n");
+        return (void*) GetCurrentTID();
     }
     
     // Se the foreground thread tid.
