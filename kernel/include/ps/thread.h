@@ -823,6 +823,9 @@ void
 __ps_initialize_thread_common_elements(
     struct thread_d *t );
 
+
+
+
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
@@ -830,7 +833,10 @@ struct thread_d *create_thread (
     unsigned long init_rip, 
     unsigned long init_stack, 
     int pid, 
-    char *name );
+    char *name,
+    int iopl );
+
+
 
 // =====
 

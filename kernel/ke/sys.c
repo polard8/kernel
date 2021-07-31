@@ -53,6 +53,9 @@ void *sys_create_process (
     strncpy(NewName,name,16);
     NewName[16]=0;  //finalize
 
+
+// Old pml4.
+
     unsigned long old_pml4=0;
     old_pml4 = CurrentThread->pml4_PA;  //save
 
@@ -100,7 +103,7 @@ void *sys_create_process (
     printf("sys_create_process: done :)\n");
     refresh_screen();
 
-    // Switch
+    // Switch back
     x64_load_pml4_table( old_pml4 );
 
     return (void*) new;
@@ -151,9 +154,18 @@ void *sys_create_thread (
 
     // Create thread.
     
+    
+    // #bugbug #todo
+    // Only ring3 for now.
+    // We need to receive a parameter for that.
+    
     Thread = (struct thread_d *) create_thread ( 
                                      room, desktop, window, 
-                                     init_rip, priority, ppid, name ); 
+                                     init_rip, 
+                                     priority, 
+                                     ppid, 
+                                     name,
+                                     RING3 ); 
 
     if ( (void *) Thread == NULL ){
         debug_print ("sys_create_thread: [FAIL] Thread\n");

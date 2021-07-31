@@ -242,6 +242,11 @@ unsigned long get_new_frame (void){
 }
 
 
+// Wrapper
+unsigned long alloc_frame(void)
+{
+    return (unsigned long) get_new_frame();
+}
 
 
 // ===================================================================
@@ -489,7 +494,6 @@ void notfreePage (struct page_d *p)
 }
 
 
-// #todo
 unsigned long 
 virtual_to_physical ( 
     unsigned long virtual_address, 
@@ -499,18 +503,18 @@ virtual_to_physical (
     //debug_print("virtual_to_physical: [TESTING] \n");
 
     //panic ("virtual_to_physical: [TODO] \n");
-    return (unsigned long) virtual_to_physical2 (virtual_address,pml4_va);
+    return (unsigned long) __virtual_to_physical (virtual_address,pml4_va);
 }
 
 
-//#test
+// Worker
 unsigned long 
-virtual_to_physical2 ( 
+__virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va ) 
 {
 
-    //debug_print ("virtual_to_physical2: [TESTING] \n");
+    //debug_print ("__virtual_to_physical: [TESTING] \n");
 
     //#debug
     //printf("virtual_address = %x \n",virtual_address);
@@ -520,7 +524,7 @@ virtual_to_physical2 (
 
 
     if ( virtual_address == 0 ){
-        debug_print ("virtual_to_physical2: [?] virtual_address == 0 \n");
+        debug_print ("__virtual_to_physical: [?] virtual_address == 0 \n");
     }
 
     unsigned int a = (unsigned int) ((virtual_address >> 39) & 0x1FF);   //  9 bits de pml4
@@ -540,7 +544,7 @@ virtual_to_physical2 (
     //#debug
     if ( a >= 512 || b >= 512 || d >= 512 || t >= 512 || o >= 512  )
     {
-        printf ("virtual_to_physical2: entry limits \n");
+        printf ("__virtual_to_physical: entry limits \n");
         refresh_screen();
         while(1){}
     }
@@ -551,7 +555,7 @@ virtual_to_physical2 (
     
     // #hackhack
     if ( a != 0 ){
-        printf ("virtual_to_physical2: [TODO] a != 0 \n");
+        printf ("__virtual_to_physical: [TODO] a != 0 \n");
         refresh_screen();
         while(1){}
         //return;
@@ -559,15 +563,15 @@ virtual_to_physical2 (
 
     // #hackhack
     if ( b != 0 ){
-        printf ("virtual_to_physical2: [TODO] b != 0 \n");
+        printf ("__virtual_to_physical: [TODO] b != 0 \n");
         refresh_screen();
         while(1){}
         //return;
     }
 
     if (pml4_va == 0){
-        debug_print ("virtual_to_physical2: [?] pml4_va == 0 \n");
-        panic ("virtual_to_physical: [FAIL] Invalid pml4_va\n");
+        debug_print ("__virtual_to_physical: [?] pml4_va == 0 \n");
+        panic       ("__virtual_to_physical: [FAIL] Invalid pml4_va\n");
     }
 
 // ==============================

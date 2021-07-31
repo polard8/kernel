@@ -554,6 +554,14 @@ __ps_setup_x64_context (
     unsigned long init_rip )
 {
 
+    // Checking only this one.
+    if (iopl != RING0 && iopl != RING3 ){
+        panic ("__ps_setup_x64_context: [ERROR] Invalid iopl\n");
+    }
+
+    t->iopl = iopl;
+
+
 //
 // == Context support =============================================
 //
@@ -563,37 +571,54 @@ __ps_setup_x64_context (
 
     // #todo
     // A stack frame vai depender do iopl.
-        
-    // Isso deve vir via parâmetro de função.
-    t->iopl = iopl;
-
-
-    //if ( Thread->iopl == RING3 ){ ...
-    //if ( Thread->iopl == RING0 ){ ...
-
-
+      
     // Stack frame.
-
     // #todo: Usar uma estrutura de contexto.
     // ss (0x20 | 3)
     // cs (0x18 | 3)
     // rflags for ring3: (0x3200).
+    
+    
 
-    t->ss     = 0x23;    
-    t->rsp    = (unsigned long) init_stack; 
-    t->rflags = 0x3200;
-    t->cs     = 0x1B; 
-    t->rip    = (unsigned long) init_rip; 
+    // ring 0
+    if ( t->iopl == RING0 )
+    {
+        t->ss     = 0x10;
+        t->rsp    = (unsigned long) init_stack; 
+        t->rflags = (unsigned long) 0x0202;
+        t->cs     = 0x8; 
+        t->rip    = (unsigned long) init_rip; 
 
-    // O endereço incial, para controle.
+        // (0x10 | 0)
+        t->ds = 0x10; 
+        t->es = 0x10; 
+        t->fs = 0x10; 
+        t->gs = 0x10; 
+    }
+
+    // ring 3
+    if ( t->iopl == RING3 )
+    {
+        t->ss     = 0x23;    
+        t->rsp    = (unsigned long) init_stack; 
+        t->rflags = (unsigned long) 0x3202;
+        t->cs     = 0x1B; 
+        t->rip    = (unsigned long) init_rip; 
+
+        // (0x20 | 3)
+        t->ds = 0x23; 
+        t->es = 0x23; 
+        t->fs = 0x23; 
+        t->gs = 0x23; 
+    }
+
+//
+// Common
+//
+
+    // This is used by the control thread.
     t->initial_rip = (unsigned long) init_rip; 
 
-    // (0x20 | 3)
-    t->ds = 0x23; 
-    t->es = 0x23; 
-    t->fs = 0x23; 
-    t->gs = 0x23; 
-    
     t->rax = 0;
     t->rbx = 0;
     t->rcx = 0;
@@ -601,7 +626,7 @@ __ps_setup_x64_context (
     t->rsi = 0;
     t->rdi = 0;
     t->rbp = 0;
-    
+
     // We can save something here for control purpose.
     // It can be used for the spawner.
 
@@ -613,7 +638,6 @@ __ps_setup_x64_context (
     t->r13 = 0;
     t->r14 = 0;
     t->r15 = 0;
-
 
     //Thread->tss = current_tss;
 
@@ -734,7 +758,7 @@ __ps_initialize_thread_common_elements(
 // setup all the machine independent elements.
 // The second one will setup all the machine dependent elements.
 
-
+// somente ring3.
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
@@ -742,7 +766,8 @@ struct thread_d *create_thread (
     unsigned long init_rip, 
     unsigned long init_stack, 
     int pid, 
-    char *name )
+    char *name,
+    int iopl )
 {
 
     struct process_d  *Process;  // Process
@@ -798,6 +823,11 @@ struct thread_d *create_thread (
     if( *name == 0 ){
         panic ("create_thread: [ERROR] *name\n");
     }
+    
+    if (iopl != RING0 && iopl != RING3 ){
+        panic ("create_thread: [ERROR] Invalid iopl\n");
+    }
+    
 
 //======================================
 	// Limits da thread atual.
@@ -811,8 +841,10 @@ struct thread_d *create_thread (
          current_thread >= THREAD_COUNT_MAX )
     {
         debug_print ("create_thread: current_thread fail\n");
+        printf      ("create_thread: current_thread fail\n");
         return NULL;
     }
+
 
 	//@todo:
 	//Checar se a prioridade � um argumento v�lido.
@@ -1060,11 +1092,21 @@ get_next:
 // Just like the context et al.
 // The contexts needs its own structure.
 
-   __ps_setup_x64_context( 
-       (struct thread_d *) Thread,
-       RING3,
-       (unsigned long) init_stack,
-       (unsigned long) init_rip );
+    if (iopl == RING0){
+    __ps_setup_x64_context( 
+        (struct thread_d *) Thread,
+        RING0,
+        (unsigned long) init_stack,
+        (unsigned long) init_rip );
+    }
+
+    if (iopl == RING3){
+    __ps_setup_x64_context( 
+        (struct thread_d *) Thread,
+        RING3,
+        (unsigned long) init_stack,
+        (unsigned long) init_rip );
+    }
 
 
     //cpu.
@@ -1297,11 +1339,21 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // #todo:We need a better name
     // use a buffer for that
     // char nameBuffer[32];
-    
+
+    if ( thread->iopl != RING3 )
+    {
+        panic ("threadCopyThread: todo");
+    }
+
+    if ( thread->iopl == RING3 ){
     clone = (struct thread_d *) create_thread ( 
                                     NULL, NULL, NULL, 
                                     thread->rip, thread->rsp,
-                                    current_process, "clone-thread" );
+                                    current_process, 
+                                    "clone-thread",
+                                    RING3 );
+    }
+
 
     // The copy.
     if ( (void *) clone == NULL ){

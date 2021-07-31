@@ -1141,7 +1141,10 @@ void testingPageAlloc (void);
 
 int kernel_gc (void);
 
+
+
 unsigned long get_new_frame (void);
+unsigned long alloc_frame(void);
 
 // #danger
 unsigned long get_table_pointer (void);
@@ -1160,18 +1163,17 @@ void notfreePage (struct page_d *p);
 
 
 
-//#todo
+// Wrapper
 unsigned long 
 virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va );
 
-//#test
+// Worker
 unsigned long 
-virtual_to_physical2 ( 
+__virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va );
-
 
 
 

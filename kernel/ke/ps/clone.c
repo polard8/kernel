@@ -467,6 +467,8 @@ pid_t clone_and_execute_process ( const char *filename )
     // page table.
     void *__pt;
 
+    // A place to save the pml4 of the current process.
+    //unsigned long old_pml4=0;
 
     // #bugbug
     // Only for the rootdir.
@@ -573,6 +575,7 @@ __found:
 // == Current process ===========================================
 //
 
+
     // ## Current ##
     // Checando a validade do processo atual.
 
@@ -592,8 +595,9 @@ __found:
             goto fail;
         }
 
-        // #test
-        //pml4 = (unsigned long *) Current->pml4_VA;
+        // Saving the pml4 of the current process. The caller.
+        // We're gonna reload this one at the end of this routine.
+        //old_pml4 = Current->pml4_PA;
 
         // Testing if the current process has a 
         // null pml4 virtual address.
@@ -632,6 +636,11 @@ __found:
 // Cria uma estrutura do tipo processo, mas não inicializada.
 
 do_clone:
+
+
+    // Switch
+    //x64_load_pml4_table( kernel_mm_data.pml4_pa );
+
 
     //printf (":)\n");
     //refresh_screen();
@@ -1072,6 +1081,9 @@ do_clone:
     // #debug
     //refresh_screen();
     //while(1){}
+    
+    // Switch back
+    //x64_load_pml4_table( old_pml4 );
 
     // Return child's PID.
 
@@ -1084,6 +1096,19 @@ fail:
     printf      ("clone_and_execute_process: [X] Fail\n");
     printf      ("---------------------------------------------\n");
     refresh_screen();
+
+    // Nem chegamos a pegar o valor.
+    // Nem mudar o pml4.
+    //if (old_pml4 == 0){
+    //    return (pid_t) (-1);
+    //}
+
+    // Switch back
+    // Se falhamos logo após pegarmos o valor.
+    //if (old_pml4 != 0){
+    //    x64_load_pml4_table( old_pml4 );
+    //}
+
     return (pid_t) (-1);
 }
 

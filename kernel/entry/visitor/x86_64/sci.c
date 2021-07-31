@@ -1216,31 +1216,12 @@ void *sci2 (
 	// #bugbug: Isso às vezes falha na máquina real.
 	// #todo: Use more arguments.
 	// See: See: ps/action/clone.c
-	// See: process.c
+	// See: clone.c
 
-    //char nameBuffer[32];
-    
     // IN: name, dir address.
     if ( number == 900 ){
         debug_print("sci2: [900] clone and execute\n");
         return (void *) clone_and_execute_process( (const char *) arg2 );
-
-        // #test
-        // Vamos apenas criar um request e retornarmos
-        //memcpy( nameBuffer, arg2, 11 );
-        //create_request ( 
-        //        (unsigned long) 111,      // number 
-        //        (int) 1,                 // status 
-        //        (int) 0,                 // timeout. 0=imediatamente.
-        //        (int) current_process,   // target_pid
-        //        (int) current_thread,    // target_tid
-        //        NULL,                    // window 
-        //        (int) 0,                 // msg  ??
-        //        (unsigned long) &nameBuffer[0],    // long1. The address of the name.  
-        //        (unsigned long) 0 );  // long2
-
-        //nameBuffer[31] = 0;  //segurança.
-        return NULL;
     }
 
 
