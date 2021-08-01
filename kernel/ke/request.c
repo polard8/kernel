@@ -307,7 +307,7 @@ int request (void){
         case 111:
             current_process = REQUEST.target_pid;
             current_thread  = REQUEST.target_tid;
-            return (void *) clone_and_execute_process( (const char *) REQUEST.long1  );
+            return (void *) clone_and_execute_process( (const char *) REQUEST.long1, (pid_t) current_process  );
             break;
 
         default:

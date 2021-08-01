@@ -307,6 +307,12 @@ void main(void)
 
     printf ("sm.bin: done *breakpoint\n");
 
+
+//
+// Test
+//
+
+    // fail!
     //rtl_clone_and_execute("reboot.bin"); 
 
 

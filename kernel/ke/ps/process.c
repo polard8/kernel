@@ -1553,7 +1553,135 @@ int process_get_tty (int pid)
     //f = ()
 
     return (int) tty->index;
-} 
+}
+
+
+struct process_d *__create_and_initialize_process_object(void)
+{
+    struct process_d *New;
+    int PID=-1;
+
+    New = (struct process_d *) processObject();
+    if ( (void *) New == NULL )
+    {
+        debug_print ("__create_and_initialize_process_object: [FAIL] New\n");
+        printf      ("__create_and_initialize_process_object: [FAIL] New\n");
+        goto fail;
+    }
+
+// Get PID.
+// Obtêm um índice para um slot vazio na lista de processos.
+// Precisa estar dentro do range válido para processos
+// em ring3.
+
+    // Invalidate.
+    New->pid = -1;
+
+    // Get new pid.
+    PID = (int) getNewPID();
+    if ( PID <= 0 || PID < USER_BASE_PID )
+    {
+        debug_print ("clone_and_execute_process: [FAIL] getNewPID\n");
+        printf      ("clone_and_execute_process: [FAIL] getNewPID %d \n", 
+            PID );
+        goto fail;
+    }
+
+    // Initializing the process structure.
+    // Saving the process pointer in the list.
+
+    New->pid = (pid_t) PID;
+    New->uid = (uid_t) current_user;
+    New->gid = (gid_t) current_group;
+    
+
+    // syscall counter
+    New->syscalls_counter = 0;
+
+
+        // #bugbug
+        // #todo
+        // Ok mesma coisa precisa ser feito para o endereço
+        // virtual da pilha.
+
+        // #Cuidado
+        // Heap for Clone.
+        // Essa é a rotina usada na criação de processo 
+        // pra gerar um heap para ele.
+        // Vamos tentar usar isso na rotina de clonagem.
+
+
+    if (g_heappool_va == 0){
+        panic("clone_and_execute_process: g_heappool_va\n");
+    }
+
+    if (g_heap_count == 0){
+        panic("clone_and_execute_process: g_heap_count\n");
+    }
+
+    if (g_heap_size == 0){
+        panic("clone_and_execute_process: g_heap_size\n");
+    }
+
+    // #bugbug
+    // There is a limit here. End we will have a huge problem 
+    // when reach it.
+
+//
+// Heap
+//
+
+    New->Heap     = (unsigned long) g_heappool_va + (g_heap_count * g_heap_size);
+    New->HeapSize = (unsigned long) g_heap_size;
+    New->HeapEnd  = (unsigned long) (New->Heap + New->HeapSize); 
+    g_heap_count++;
+
+//
+// Stack
+//
+
+    // Stack for the clone. 
+    New->control->rsp = CONTROLTHREAD_STACK;
+    New->Stack        = CONTROLTHREAD_STACK;
+    New->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
+    New->StackEnd = ( New->Stack - New->StackSize );
+
+
+
+
+
+
+//
+// Socket ============
+//
+
+    int sIndex=0;
+
+    for (sIndex=0; sIndex<32; ++sIndex){
+        New->socket_pending_list[sIndex] = 0; 
+    };
+
+    New->socket_pending_list_head = 0;
+    New->socket_pending_list_tail = 0;
+    New->socket_pending_list_max  = 0; //atualizado pelo listen();
+
+    New->Image        = (unsigned long) CONTROLTHREAD_BASE;        // 0x200000 
+    
+    New->used  = TRUE;
+    New->magic = 1234;
+    processList[PID] = (unsigned long) New;
+
+    // ok
+    return (struct process_d *) New;
+    
+fail:
+    return NULL;
+}
+
+
+
+
+
 
 
 

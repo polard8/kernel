@@ -4377,6 +4377,127 @@ void sys_cd_command ( const char *string )
     // ...
 }
 
+
+int __load_image( const char *filename, unsigned long image_va )
+{
+    int Status=-1;
+    unsigned long dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    unsigned long dir_entries = FAT16_ROOT_ENTRIES;
+    char *path;
+    char *name;
+
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
+
+    // para 32 entradas.
+    // ????????
+    unsigned long BUGBUG_OVERFLOW = ( 32*128 );
+
+
+//
+// Check parameters for image support
+//
+
+    // file_name
+    if ( (void*) filename == NULL ){
+        panic ("__load_image: [ERROR] filename\n");
+    }
+    if ( *filename == 0 ){
+        panic ("__load_image: [ERROR] *filename\n");
+    }
+    path = filename;
+    name = filename;
+    if (path[0] == '.' && path[1] == '/')
+    {
+        debug_print ("__load_image: [FIXME] Can't execute from cwd \n");
+        printf      ("__load_image: [FIXME] Can't execute from cwd \n");
+        goto fail;
+    }
+    
+//
+// Loop
+//
+
+    // Search
+    // Convertendo o formato do nome do arquivo.
+    // >>> "12345678XYZ"
+    // Procura o nome no diretório. 
+    // Que em nosso caso ainda é o diretório raiz.
+
+    // Convert and search.
+    // Fail if it was not found.
+
+__search:
+
+    fs_fntos ( (char *) name );
+    Status = (int) search_in_dir ( name, dir_address );
+    if (Status == 1){ 
+        goto __found; 
+    }
+
+    debug_print ("__load_image: [FAIL] File not found!\n");
+    printf      ("__load_image: [FAIL] File not found!\n");
+    goto fail;
+
+// The file was found into the directory.
+__found:
+
+// ============================
+
+    // [3]
+    debug_print ("__load_image: [3] Loading the image.\n");
+         printf ("__load_image: [3] Loading the image.\n");
+
+
+    // Loading from rootdir?
+
+    // >> Load file:
+    // #importante: 
+    // Carregando a imagem do processo filho.
+    // Se o carregamento falhar, temos que abortar a clonagem,
+    // caso contrário, executa a cópia da imagem do pai. ??
+    // #bugbug: Essa rotina começou a falhar aqui. Convertendo 
+    // num formato errado.
+    // Movemos essa conversão para o início dessa função,
+    // onde checaremos se o arquivo está no diretório.
+    // #bugbug
+    // Se isso não está funcionando direito e uma thread 
+    // defeituosa fica remanescente quando digitamos um 
+    // comando errado então vamos matar a thread e o processo.
+
+    // #todo
+    // Num ambiente 'mp' precisaremos de um lock aqui.
+
+    //#debug
+    //printf ("do_clone_execute_process: %s\n",filename);
+
+    //unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
+
+
+    if ( dir_address == 0 ){
+        panic("__load_image: dir_address\n");
+    }
+
+    if ( (void *) image_va == NULL ){
+        panic("__load_image: image_va\n");
+    }
+
+    Status = (int) fsLoadFile ( 
+                       VOLUME1_FAT_ADDRESS, 
+                       (unsigned long) dir_address,  //#bugbug: This is only for the root dir.
+                       (unsigned long) dir_entries,  //#bugbug: Number of entries. 
+                       name, 
+                       (unsigned long) image_va,
+                       BUGBUG_IMAGE_SIZE_LIMIT );
+
+    return Status;
+
+fail:
+    panic("__load_image: fail\n");
+    return -1;
+}
+
+
+
 //
 // End.
 //

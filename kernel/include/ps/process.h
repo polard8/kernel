@@ -900,7 +900,8 @@ unsigned long processList[PROCESS_COUNT_MAX];
 int copy_process_structure( pid_t p1, pid_t p2 );
 pid_t copy_process( const char *filename, unsigned long clone_flags );
 int processCopyProcess ( pid_t p1, pid_t p2 );
-pid_t clone_and_execute_process ( const char *filename );
+
+pid_t clone_and_execute_process ( const char *filename, pid_t pid );
 
 
 //==============
@@ -980,6 +981,9 @@ file *process_get_file ( int fd );
 
 
 int process_get_tty (int pid);
+
+struct process_d *__create_and_initialize_process_object(void);
+
 
 #endif    
 
