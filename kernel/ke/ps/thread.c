@@ -853,6 +853,8 @@ struct thread_d *create_thread (
     if( ProcessID < 0 || 
         ProcessID >= PROCESS_COUNT_MAX )
     {
+        //#bugbug: Isso pode ser um problemão.
+        panic("create_thread: pid");
         ProcessID = current_process;
     }
 
@@ -894,7 +896,8 @@ struct thread_d *create_thread (
 //
 
     Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
-    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA; 
+    Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
+
     Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
     Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
     Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
@@ -1293,8 +1296,9 @@ void exit_current_thread(void)
 // OUT:
 // Pointer for the clone.
 
-struct thread_d *threadCopyThread ( struct thread_d *thread ){
+struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, unsigned long rsp ){
 
+    struct thread_d  *father;
     struct thread_d  *clone;
 
     // Counters
@@ -1302,9 +1306,9 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     int q=0;
 
     // A thread que vai ser copiada.
-
-    if ( (void *) thread == NULL ){
-        panic ("threadCopyThread: thread\n");
+    father = thread;
+    if ( (void *) father == NULL ){
+        panic ("threadCopyThread: father\n");
     }
 
     // #todo
@@ -1331,25 +1335,44 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     // use a buffer for that
     // char nameBuffer[32];
 
-    if ( thread->iopl != RING3 )
-    {
-        panic ("threadCopyThread: todo");
+    if ( father->iopl != RING3 ){
+        panic ("threadCopyThread: iopl #todo");
     }
 
-    if ( thread->iopl == RING3 ){
+
+    // #bugbug
+    // Não podemos herdar o rip e o rsp.
+    // porque as threads terão espaço de endereçamento diferentes
+    // e uma não poderá acessar a pilha da outra.
+
+    if (rip == 0){
+        panic ("threadCopyThread: rip");
+    }
+
+    if (rsp == 0){
+        panic ("threadCopyThread: rsp");
+    }
+
+    // #bugbug
+    // Conferir quem é o pai owner pid dessa thread.
+
+    //father->ownerPID or current_process ??
+
+    if ( father->iopl == RING3 ){
     clone = (struct thread_d *) create_thread ( 
                                     NULL, NULL, NULL, 
-                                    thread->rip, thread->rsp,
-                                    current_process, 
+                                    rip,  // initial rip 
+                                    rsp,  // initial rsp
+                                    father->ownerPID,  //current_process, 
                                     "clone-thread",
                                     RING3 );
     }
-
 
     // The copy.
     if ( (void *) clone == NULL ){
         panic ("threadCopyThread: clone\n");
     }
+
 
 //
 // Saving ...
@@ -1364,8 +1387,8 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 //
     // type and input model.
 
-    clone->type        = thread->type; 
-    clone->input_model = thread->input_model; 
+    clone->type        = father->type; 
+    clone->input_model = father->input_model; 
 
 	// #importante
 	// Esse momento � critico.
@@ -1385,7 +1408,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 
 	// #todo: 
 	// ISSO DEVERIA VIR POR ARGUMENTO
-    clone->plane = thread->plane;
+    clone->plane = father->plane;
 
 	// A prioridade b�sica da thread � igual a prioridade b�sica 
 	// do processo.
@@ -1393,17 +1416,17 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	// priority; A prioridade din�mica da thread foi 
 	// passada por argumento.
 
-    clone->base_priority = thread->base_priority; 
-    clone->priority      = thread->priority;
+    clone->base_priority = father->base_priority; 
+    clone->priority      = father->priority;
 
 	// IOPL.
 	// Se ela vai rodar em kernel mode ou user mode.
 	// #todo: 
 	// Herdar o mesmo do processo.
 
-    clone->iopl = thread->iopl;            // Process->iopl;
-    clone->saved = thread->saved;          // Saved flag.
-    clone->preempted = thread->preempted;  // Se pode ou n�o sofrer preemp��o.
+    clone->iopl      = father->iopl;            // Process->iopl;
+    clone->saved     = father->saved;          // Saved flag.
+    clone->preempted = father->preempted;  // Se pode ou n�o sofrer preemp��o.
 
 	//Heap and Stack.
 	//Thread->Heap;
@@ -1424,39 +1447,39 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 
     // clone->step          = thread->step; 
     
-    clone->quantum       = thread->quantum; 
-    clone->quantum_limit = thread->quantum_limit;
+    clone->quantum       = father->quantum; 
+    clone->quantum_limit = father->quantum_limit;
 
 
 	// runningCount - Tempo rodando antes de parar.
 	// readyCount - Tempo de espera para retomar a execução.
 	// blockedCount - Tempo bloqueada.
 
-    clone->standbyCount    = thread->standbyCount;
-    clone->runningCount    = thread->runningCount; 
-    clone->initial_time_ms = thread->initial_time_ms;
-    clone->total_time_ms   = thread->total_time_ms;
+    clone->standbyCount    = father->standbyCount;
+    clone->runningCount    = father->runningCount; 
+    clone->initial_time_ms = father->initial_time_ms;
+    clone->total_time_ms   = father->total_time_ms;
 
 
     //quantidade de tempo rodadndo dado em ms.
-    clone->runningCount_ms = thread->runningCount_ms;
+    clone->runningCount_ms = father->runningCount_ms;
 
-    clone->readyCount      = thread->readyCount; 
-    clone->ready_limit     = thread->ready_limit;
-    clone->waitingCount    = thread->waitingCount;
-    clone->waiting_limit   = thread->waiting_limit;
-    clone->blockedCount    = thread->blockedCount; 
-    clone->blocked_limit   = thread->blocked_limit;
+    clone->readyCount      = father->readyCount; 
+    clone->ready_limit     = father->ready_limit;
+    clone->waitingCount    = father->waitingCount;
+    clone->waiting_limit   = father->waiting_limit;
+    clone->blockedCount    = father->blockedCount; 
+    clone->blocked_limit   = father->blocked_limit;
 
     // Not used now. But it works fine.
 
-    clone->ticks_remaining = thread->ticks_remaining; 
+    clone->ticks_remaining = father->ticks_remaining; 
 
     // Signal
     // Sinais para threads.
 
-    clone->signal = thread->signal;
-    clone->umask  = thread->umask;
+    clone->signal = father->signal;
+    clone->umask  = father->umask;
 
 
 	// #todo: 
@@ -1490,40 +1513,40 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 // Stack frame
 //
 
-    clone->ss     = thread->ss;    //RING 3.
-    clone->rsp    = thread->rsp; 
-    clone->rflags = thread->rflags;
-    clone->cs     = thread->cs;
-    clone->rip    = thread->rip; 
+    clone->ss     = father->ss;    //RING 3.
+    clone->rsp    = rsp; 
+    clone->rflags = father->rflags;
+    clone->cs     = father->cs;
+    clone->rip    = rip; 
 
 	//O endere�o incial, para controle.
 
-    clone->initial_rip = thread->initial_rip; 
+    clone->initial_rip = father->initial_rip; 
     
     // #bugbug:
     // We need the initial stack address
 
 	// (0x20 | 3)
-    clone->ds = thread->ds; 
-    clone->es = thread->es; 
-    clone->fs = thread->fs; 
-    clone->gs = thread->gs; 
+    clone->ds = father->ds; 
+    clone->es = father->es; 
+    clone->fs = father->fs; 
+    clone->gs = father->gs; 
 
-    clone->rax = thread->rax;
-    clone->rbx = thread->rbx;
-    clone->rcx = thread->rcx;
-    clone->rdx = thread->rdx;
-    clone->rsi = thread->rsi;
-    clone->rdi = thread->rdi;
-    clone->rbp = thread->rbp;
-    clone->r8 = thread->r8;
-    clone->r9 = thread->r9;
-    clone->r10 = thread->r10;
-    clone->r11 = thread->r11;
-    clone->r12 = thread->r12;
-    clone->r13 = thread->r13;
-    clone->r14 = thread->r14;
-    clone->r15 = thread->r15;
+    clone->rax = father->rax;
+    clone->rbx = father->rbx;
+    clone->rcx = father->rcx;
+    clone->rdx = father->rdx;
+    clone->rsi = father->rsi;
+    clone->rdi = father->rdi;
+    clone->rbp = father->rbp;
+    clone->r8 = father->r8;
+    clone->r9 = father->r9;
+    clone->r10 = father->r10;
+    clone->r11 = father->r11;
+    clone->r12 = father->r12;
+    clone->r13 = father->r13;
+    clone->r14 = father->r14;
+    clone->r15 = father->r15;
 
 //
 // TSS
@@ -1565,11 +1588,11 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 	// ORDEM: 
 	// O que segue � referenciado com pouca frequ�ncia.
 
-    clone->waitingCount = thread->waitingCount;    //Tempo esperando algo.
-    clone->blockedCount = thread->blockedCount;    //Tempo bloqueada.
+    clone->waitingCount = father->waitingCount;    //Tempo esperando algo.
+    clone->blockedCount = father->blockedCount;    //Tempo bloqueada.
 
     //qual processo pertence a thread.  
-    clone->process = thread->process; 
+    clone->process = father->process; 
 
 	//Thread->window_station
 	//Thread->desktop
@@ -1582,7 +1605,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
 
     // Razões para esperar.
     for ( w=0; w<8; w++ ){
-        clone->wait_reason[w] = thread->wait_reason[w];
+        clone->wait_reason[w] = father->wait_reason[w];
     };
 
     // Message
@@ -1605,16 +1628,24 @@ struct thread_d *threadCopyThread ( struct thread_d *thread ){
     //herdar o quantum do processo.
     //herdar a afinidade do processo.(cpu affinity) 
 
-    clone->exit_code = thread->exit_code;
+    clone->exit_code = father->exit_code;
 
-	//#debug
-	//mostra_slot (thread->tid);
-	//mostra_reg (thread->tid);	
-	//mostra_slot (clone->tid);
-	//mostra_reg (clone->tid);
-	//refresh_screen();
+
+//
+// #debug
+//
+
+/*
+	show_slot (thread->tid);
+	show_reg (thread->tid);
+
+	show_slot (clone->tid);
+	show_reg (clone->tid);
 	
-	//while(1){}
+	refresh_screen();
+	while(1){}
+*/
+
 
 
     // Returning the pointer for the clone.

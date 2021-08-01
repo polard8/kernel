@@ -849,7 +849,7 @@ struct thread_d *create_thread (
 void exit_thread (int tid);
 void exit_current_thread(void);
 
-struct thread_d *threadCopyThread ( struct thread_d *thread );
+struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, unsigned long rsp );
 
 int thread_getchar (void);
 

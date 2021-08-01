@@ -967,7 +967,7 @@ void set_caller_process_id (int pid);
 
 int init_process_manager (void);
 
-int processCopyMemory ( struct process_d *process );
+int __alloc_memory_for_image_and_stack ( struct process_d *process );
 
 
 // Critical section

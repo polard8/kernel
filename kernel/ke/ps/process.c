@@ -1225,6 +1225,9 @@ int init_process_manager (void)
 // Stack de 32KB.              (ok)
 // 
 
+
+
+
 // Explicando:
 // Copia a imagem do processo atual e salva o endereço
 // da copia num elemento da estrutura passada como argumento.
@@ -1232,7 +1235,8 @@ int init_process_manager (void)
 // OUT:
 // 
 
-int processCopyMemory ( struct process_d *process )
+// #bugbug: na verdade não estamos mais copiando e sim criando um endereçamento novo.
+int __alloc_memory_for_image_and_stack( struct process_d *process )
 {
     unsigned long __new_base=0;    // base
     unsigned long __new_stack=0;   // stack

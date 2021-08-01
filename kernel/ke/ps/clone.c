@@ -174,6 +174,7 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
 	// esse endere�o precisa ir pra thread.
 
 
+/*
 // ========
 // pml4
     Process2->pml4_VA = (unsigned long) CloneKernelPML4();
@@ -185,17 +186,21 @@ int processCopyProcess ( pid_t p1, pid_t p2 ){
     Process2->pml4_PA = (unsigned long) virtual_to_physical ( 
                                               Process2->pml4_VA, 
                                               gKernelPML4Address ); 
+*/
 
+/*
 // ========
 //pdpt0
     Process2->pdpt0_VA = Process1->pdpt0_VA;
     Process2->pdpt0_PA = Process1->pdpt0_PA;
+*/
 
+/*
 // ========
 // pd0
     Process2->pd0_VA = Process1->pd0_VA;
     Process2->pd0_PA = Process1->pd0_PA;
-
+*/
 
 
     // #bugbug
@@ -403,9 +408,44 @@ fail:
 pid_t clone_and_execute_process ( const char *filename, pid_t pid )
 {
 
+    // Usado como armazenamento temporário de endereço físico de tabela.
+    unsigned long phy=0;
+
+
 //
-// == This is a work in progress!  =================
+// Tables
 //
+
+    // =====================================
+    // Levels: PML4, PDPT, PD, PT
+    //
+    // PML4 - Page Map Level 4
+    // PDPT - Page Directory Pointer Table
+    // PD   - Page Directory
+    // PT   - Page Table    
+
+
+    void *_pml4;
+    void *_pdpt;
+    void *_pd;
+    void *_pt;
+
+    _pml4 = 0;
+    _pdpt = 0;
+    _pd   = 0; 
+    _pt   = 0;
+
+
+    // Copiar a tabela pml4 do kernel.
+    _pml4 = (void *) CloneKernelPML4();
+
+    if ( (void*) _pml4 == NULL ){
+        panic("clone_and_execute_process: _pml4");
+    }
+
+    //printf ("_pml4: %x\n",_pml4);
+    //refresh_screen();
+    //while(1){}
 
 
     // #todo
@@ -421,22 +461,15 @@ pid_t clone_and_execute_process ( const char *filename, pid_t pid )
 
     struct process_d *p;      // The process we will clone.
     struct process_d *Clone;  // The process we will create.
-
     // loop
     // Socket support.
     // indice usado na inicializaçao da lista de 
     // conexoes pendentes do processo servidor.
     register int sIndex=0;
-
     int Status = -1;
     int PID = -1;
 
-    // # What is this?
-    // The directory virtual address of the current process. ??
-    unsigned long *pml4;
 
-    // page table.
-    void *__pt;
 
     // A place to save the pml4 of the current process.
     //unsigned long old_pml4=0;
@@ -551,7 +584,51 @@ do_clone:
         printf      ("clone_and_execute_process: [FAIL] Clone\n");
         goto fail;
     }
+    
 
+
+// ==============================
+// pml4
+// A tabela pml4 usada pelo clone.
+// Ela é uma cópia da tabela do kernel.
+
+    Clone->pml4_VA = (unsigned long) _pml4;
+    
+    if ( (void *) Clone->pml4_VA == NULL ){
+        panic ("processCopyProcess: [FAIL] Clone->pml4_VA\n");
+    }
+
+    Clone->pml4_PA = (unsigned long) virtual_to_physical ( 
+                                              Clone->pml4_VA, 
+                                              gKernelPML4Address ); 
+
+    // #debug
+    // ok
+    //printf ("Clone->pml4_VA: %x\n",Clone->pml4_VA);
+    //printf ("Clone->pml4_PA: %x\n",Clone->pml4_PA);
+    //refresh_screen();
+    //while(1){}
+
+
+// ==============================
+// pdpt0
+// A tabela pdpt usada pelo clone.
+// Ela é uma cópia da tabela usada pelo processo pai
+
+    Clone->pdpt0_VA = p->pdpt0_VA;
+    Clone->pdpt0_PA = p->pdpt0_PA;
+
+// ========
+// pd0
+// A tabela do pd do clone.
+// Ela é uma cópia da tabela usada pelo processo pai.
+
+    Clone->pd0_VA = p->pd0_VA;
+    Clone->pd0_PA = p->pd0_PA;
+
+
+
+// ==================================
 
     // Copiando a memória e o processo.
     // Copy memory:
@@ -585,12 +662,24 @@ do_clone:
 // Copy process image and stack.
 //
 
+    // Explicando:
+    // Copia a imagem do processo atual e salva o endereço
+    // da copia num elemento da estrutura passada como argumento.
+    // See: process.c
+
+    // Salvaremos as informações assim:
+    // p->childImage    : Endereço virtual do buffer para a imagem do clone.
+    // p->childStack    : Endereço virtual para a pilha em ring3 usada pelo clone.
+    // p->childImage_PA : Endereço físico do buffer para a imagem do clone.
+    // p->childStackPA  : Endereço físico para a pilha em ring3 usada pelo clone.
+
     // [1]
+    // #bugbug: na verdade não estamos mais copiando e sim criando um endereçamento novo.
     debug_print ("clone_and_execute_process: [1] Copying process image and stack.\n");
     printf      ("clone_and_execute_process: [1] Copying process image and stack.\n");
-    Status = processCopyMemory(p);
+    Status = __alloc_memory_for_image_and_stack(p);
     if ( Status != 0 ){
-        panic ("clone_and_execute_process: [FAIL] processCopyMemory\n");
+        panic ("clone_and_execute_process: [FAIL] __alloc_memory_for_image_and_stack\n");
     }
 
 //
@@ -606,23 +695,59 @@ do_clone:
     if ( Status != 0 ){
         panic ("clone_and_execute_process: [FAIL] processCopyProcess\n");
     }
-    
-    
-    Clone->control = (struct thread_d *) threadCopyThread( p->control );
+
+
+    // #debug
+    // ok
+    //printf ("Clone->pml4_VA: %x\n",Clone->pml4_VA);
+    //printf ("Clone->pml4_PA: %x\n",Clone->pml4_PA);
+    //refresh_screen();
+    //while(1){}
+
+
+
+    unsigned long __rip = (unsigned long) 0x201000;
+    unsigned long __rsp = (unsigned long) (p->childStack + (30*1024));   // 32kb size
+
+    // #debug
+    //printf ("Stack : %x \n",__rsp);
+    //refresh_screen();
+    //while(1){}
+
+    Clone->control = (struct thread_d *) threadCopyThread( p->control, __rip, __rsp );
     if ( (void *) Clone->control == NULL ){
         panic ("clone_and_execute_process: [FAIL] threadCopyThread \n");
     }
-    
-    // #bugbug
-    // Em que momento pegamos isso?
-    // O valor é válido?
-    
-    if ( Clone->pml4_PA == 0 ){
-        panic ("clone_and_execute_process: [FAIL] Clone->pml4_PA \n");
-    }
 
+
+    // #debug
+    // ok
+    //printf ("Clone->pml4_VA: %x\n",Clone->pml4_VA);
+    //printf ("Clone->pml4_PA: %x\n",Clone->pml4_PA);
+    //refresh_screen();
+    //while(1){}
+
+
+    // # hack hack
+    // Vamos herdar porque configuramos esses valores para o process clone.
+    // Agora eles serão usados na thread de controle do clone.
+
+    Clone->control->pml4_VA = Clone->pml4_VA;
     Clone->control->pml4_PA = Clone->pml4_PA;
 
+    // #debug
+    //printf ("Clone->control->pml4_VA: %x\n",Clone->control->pml4_VA);
+    //printf ("Clone->control->pml4_PA: %x\n",Clone->control->pml4_PA);
+    //refresh_screen();
+    //while(1){}
+
+
+    // A control thread do processo clone
+    // está herdando as tabelas usadas por ele.
+    
+    Clone->control->pml4_PA  = Clone->pml4_PA;
+    
+    // Salvando o pid do owner.
     Clone->control->ownerPID = Clone->pid;
 
 
@@ -630,9 +755,23 @@ do_clone:
 // Load image
 //
 
-    //printf (":)\n");
-    //refresh_screen();
-    //return -1;
+    // Configurando os buffers.
+
+    // No processo pai estava salvo o endereço virtual do buffer
+    // reservado para a imagem do clone.
+    Clone->Image   = (unsigned long) p->childImage;
+    // Agora o endereço físico do buffer.
+    Clone->ImagePA = (unsigned long) p->childImage_PA;
+
+    if ( (void *) Clone->Image == NULL ){
+        panic ("processCopyProcess: [FAIL] Clone->Image\n");
+    }
+
+    if ( (void *) Clone->ImagePA == NULL ){
+        panic ("processCopyProcess: [FAIL] Clone->ImagePA\n");
+    }
+
+    // Carregando a imagem do clone no buffer criado para ela.
 
     // IN: name, image va.
     Status = (int) __load_image(filename,(unsigned long) Clone->Image);
@@ -671,9 +810,15 @@ do_clone:
     // Retornaremos o endereço virtual da pagetable.
     // See: core/ps/x86/pages.c
 
+//
+// Check again
+// 
+
+    // Checando as tabelas principais novamente.
 
     // Isso foi obtido pela rotina de clonagem de processo,
     // juntamente com seu endereço físico.
+
     if( (void*) Clone->pml4_VA == NULL ){
         panic("clone_and_execute_process: [2nd time] Clone->pml4_VA\n");
     }
@@ -684,12 +829,6 @@ do_clone:
 
     if( (void*) Clone->pd0_VA == NULL ){
         panic("clone_and_execute_process: [2nd time] Clone->pd0_VA\n");
-    }
-
-// ======
-
-    if( (void*) Clone->ImagePA == NULL ){
-        panic("clone_and_execute_process: Clone->ImagePA\n");
     }
 
 //
@@ -707,6 +846,18 @@ do_clone:
     printf      ("clone_and_execute_process: Calling CreateAndIntallPageTable :) \n");
     //panic       ("clone_and_execute_process: [Breakpoint] CreateAndIntallPageTable \n");
 
+
+
+//
+// pt
+//
+
+    // Page table para a imagem.
+    // Vamos criar a pagetable e instalar o ponteiro da pegatable.
+
+    // Mapeando a região usada pela imagem
+    // com base no endereço físico que obtivemos anteriormente.
+
     // =====================================
     // Levels: PML4, PDPT, PD, PT
     //
@@ -715,9 +866,9 @@ do_clone:
     // PD   - Page Directory
     // PT   - Page Table    
 
-
     // See: pages.c
-    __pt = CreateAndIntallPageTable (
+    // OUT: Retorna o endereço virtual da pagetable criada.
+    _pt = (void*) CreateAndIntallPageTable (
                (unsigned long) Clone->pml4_VA,   // page map level 4
                (unsigned long) 0,                // index  
                (unsigned long) Clone->pdpt0_VA,  // page directory pointer table
@@ -726,10 +877,14 @@ do_clone:
                (int)           ENTRY_USERMODE_PAGES,  // Install the pagetable into this entry of the page directory. See: gentry.h
                (unsigned long) Clone->ImagePA );      // region pa
 
-    if ( (void*) __pt == NULL ){
-        panic ("clone_and_execute_process: __pt\n");
+    if ( (void*) _pt == NULL ){
+        panic ("clone_and_execute_process: _pt\n");
     }
 
+    // #debug
+    //printf ("New page table : %x \n", _pt);
+    //refresh_screen();
+    //while(1){}
 
 
     // Configurando o endereço virtual padrão para aplicativos.
@@ -743,6 +898,9 @@ do_clone:
 
     Clone->Image        = (unsigned long) CONTROLTHREAD_BASE;        // 0x200000 
     Clone->control->rip = (unsigned long) CONTROLTHREAD_ENTRYPOINT;  // 0x201000
+
+
+
 
 
 //
@@ -803,30 +961,46 @@ do_clone:
 //
 // Debug
 //
-    
+
+
+    printf ("\n");
+    printf ("--[ Debug ]---------------------------------\n");
+
     //printf ("\n");
-    //printf ("--[ Debug ]---------------------------------\n");
+    //printf ("Original thread::\n");
+    // ok: Esses são iguais, como deveria ser.
+    //printf ("pml4_VA:%x  | pml4_PA:%x  \n",p->control->pml4_VA,  p->control->pml4_PA);
+    // ok: Esses são iguais, como deveria ser.
+    //printf ("pdpt0_VA:%x | pdpt0_PA:%x \n",p->control->pdpt0_VA, p->control->pdpt0_PA);
+    // ok: Esses são iguais, como deveria ser.
+    //printf ("pd0_VA:%x   | pd0_PA:%x   \n",p->control->pd0_VA,   p->control->pd0_PA);
+
+    printf ("\n");
+    printf ("Clone thread::\n");
+    // ok: Esses são iguais, como deveria ser.
+    printf ("pml4_VA:%x  | pml4_PA:%x  \n",Clone->control->pml4_VA,  Clone->control->pml4_PA);
+    // ok: Esses são iguais, como deveria ser.
+    printf ("pdpt0_VA:%x | pdpt0_PA:%x \n",Clone->control->pdpt0_VA, Clone->control->pdpt0_PA);
+    // ok: Esses são iguais, como deveria ser.
+    printf ("pd0_VA:%x   | pd0_PA:%x   \n",Clone->control->pd0_VA,   Clone->control->pd0_PA);
+
+    //show_slot (p->control->tid);
+    //show_reg  (p->control->tid);
+
+    show_slot (Clone->control->tid);
+    show_reg (Clone->control->tid);
 
     //printf ("\n");
     //current_process = Clone->pid;
     //show_currentprocess_info();
 
-    //printf ("\n");
-    //current_thread = Clone->control->tid;
-    //show_reg(current_thread);
-
-    // See: thread.c and spawn.c
-    //Current->control->state = DEAD;
-    //SelectForExecution(Clone->control);
-    //KiSpawnThread(Clone->control->tid); 
-
-    //printf ("--------------------------------------------\n");
-    //printf ("\n");
-
+    printf ("--------------------------------------------\n");
+    printf ("\n");
 
     // #debug
-    //refresh_screen();
-    //while(1){}
+    refresh_screen();
+    while(1){}
+    
     
     // Switch back
     //x64_load_pml4_table( old_pml4 );
