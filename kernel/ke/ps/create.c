@@ -605,11 +605,10 @@ void *create_CreateRing3InitThread (void)
 
     // Stack frame.
     // See: gva.h
-    //
 
     t->ss     = 0x23; 
     t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
-    t->rflags = 0x3200;    // #atenção!
+    t->rflags = 0x3200;    // #atenção! Change to 0x3202
     t->cs     = 0x1B;  
     t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 

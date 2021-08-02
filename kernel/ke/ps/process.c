@@ -433,17 +433,23 @@ copy_process_struct(
     // The function that called up is gonna fix this later. :)
     // Simply initialize for now!
 
+
+    //#bugbug
+    // Não inicialize com 0, pois esses valores foram
+    // configurados por um worker chamado antes desse.
+
+    /*
     //heap
     Process2->Heap     = (unsigned long) 0; //Process1->Heap;    
     Process2->HeapEnd  = (unsigned long) 0; // Process1->HeapEnd; 
     Process2->HeapSize = (unsigned long) 0; // Process1->HeapSize;
-
     //stack
     Process2->Stack       = (unsigned long) 0; // Process1->Stack;   
     Process2->StackEnd    = (unsigned long) 0; // Process1->StackEnd; 
     Process2->StackSize   = (unsigned long) 0; // Process1->StackSize;
     Process2->StackOffset = (unsigned long) 0; // Process1->StackOffset;
-
+    */
+    
 
     Process2->iopl = Process1->iopl;
 
@@ -2012,6 +2018,9 @@ struct process_d *__create_and_initialize_process_object(void)
     // There is a limit here. End we will have a huge problem 
     // when reach it.
 
+//===========================================================
+
+
 //
 // Heap
 //
@@ -2020,6 +2029,20 @@ struct process_d *__create_and_initialize_process_object(void)
     New->HeapSize = (unsigned long) g_heap_size;
     New->HeapEnd  = (unsigned long) (New->Heap + New->HeapSize); 
     g_heap_count++;
+
+
+//#debug
+
+    printf (":: Heap %x | HeadSize %x | HeapEnd %x \n",
+        New->Heap,
+        New->HeapSize,
+        New->HeapEnd );
+    
+    //refresh_screen();
+    //while(1){}
+
+//===========================================================
+
 
 //
 // Stack
@@ -2030,9 +2053,6 @@ struct process_d *__create_and_initialize_process_object(void)
     New->Stack        = CONTROLTHREAD_STACK;
     New->StackSize = (32*1024);    //isso foi usado na rotina de alocação.
     New->StackEnd = ( New->Stack - New->StackSize );
-
-
-
 
 
 

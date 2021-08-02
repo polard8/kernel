@@ -74,6 +74,10 @@ myObjects = marginal.o main.o \
 ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
 termios.o ioctl.o fcntl.o rtl.o    
 
+myObjects2 = marginal2.o main2.o \
+ctype.o stdio.o stdlib.o string.o conio.o unistd.o \
+termios.o ioctl.o fcntl.o rtl.o    
+
 
 .PHONY: all all-c shell-link finalize clean
 
@@ -85,12 +89,12 @@ head.o:
 
 crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
-	nasm marginal.asm -f elf64 -o marginal.o 
+	nasm marginal.asm  -f elf64 -o marginal.o 
 	nasm marginal2.asm -f elf64 -o marginal2.o 
 
 main.o:
-	$(CC)  -c  ohboy.c -I $(LIBC) $(CFLAGS) -o main.o
-#	$(CC)  -c  ohboy2.c -I $(LIBC) $(CFLAGS) -o main.o
+	$(CC)  -c  ohboy.c  -I $(LIBC) $(CFLAGS) -o main.o
+	$(CC)  -c  ohboy2.c -I $(LIBC) $(CFLAGS) -o main2.o
 
 all-c:
 
@@ -114,9 +118,9 @@ all-c:
 
 
 shell-link:
-	$(LD) -s -x -T applink.ld -o SM.BIN $(myObjects)    
-	$(LD) -s -x -T applink.ld -o SM2.BIN marginal2.o    
-	
+	$(LD) -s -x -T applink.ld -o SM.BIN   $(myObjects)    
+	$(LD) -s -x -T applink.ld -o SM2.BIN  $(myObjects2)  
+
 finalize:
 #	cp SM.BIN ../../bin/
 

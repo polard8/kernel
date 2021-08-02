@@ -64,7 +64,8 @@ void testThread(void)
 {
     while (1){
         debug_print("THREAD 2\n");
-        printf("2"); fflush(stdout);
+        //printf("2"); 
+        //fflush(stdout);
     }
 }
 
@@ -133,18 +134,10 @@ void main(void)
     // Environment.
     environ = ohboy_environ;
 
-
-//
-// #todo
-//
-
-
-    // ok
     // See: stdlib/stdlib.c
     ohboy_system_call(65,'1',0,0);
     libcInitRT();
 
-    // fail !
     // See: stdio/stdio.c
     ohboy_system_call(65,'2',0,0);
     stdioInitialize();
@@ -305,7 +298,9 @@ void main(void)
 // Breakpoint
 //
 
-    printf ("sm.bin: done *breakpoint\n");
+    printf ("\n");
+    printf ("ohboy.c: Hello world !\n");
+    printf ("\n");
 
 
 //
@@ -355,7 +350,8 @@ void main(void)
 
     while (1){
         debug_print("THREAD 1\n");
-        printf("1"); fflush(stdout);
+        //printf("1"); 
+        //fflush(stdout);
     }
 
 // Return to marginal.asm

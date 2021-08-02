@@ -27,11 +27,11 @@ main:
     ;int 0x80
     ;int 0x80
 
-    ;ohboy.c main()
-    ;;call _main
+    call _main
     
     ;int 3
-
     jmp $
+    
+
     
     

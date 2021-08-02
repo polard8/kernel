@@ -208,8 +208,22 @@ void I_x64CreateInitialProcess (void)
     //    while(1){}
     //}
 
+
+// ===========================
+
+
+//
+// Heap. (ring3)
+//
+
+    // The ring3 for the init process is kinda special
+    // using a shared area mapped for him.
+
     // #todo #bugbug
     InitProcess->Heap = (unsigned long) g_extraheap1_va;
+
+// ===========================
+
 
     // #importante
     // A thread de controle do processo init2.bin.

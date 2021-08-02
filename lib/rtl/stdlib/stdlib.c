@@ -500,15 +500,22 @@ int heapInit(void)
 	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
 	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
 
-    int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
 
+//
+// Current process
+//
+
+    int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
     if (thisprocess_id <= 0 ){
         debug_print ("heapInit: [FAIL] thisprocess_id \n");
     }
 
-    unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
 
-    // #debug
+//
+// Heap test
+//
+
+    unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
     if ( (void*) heaptest == NULL ){
         debug_print ("heapInit: [FAIL] heaptest \n");
     }
@@ -519,8 +526,13 @@ int heapInit(void)
     // Pois somente o processo init tem 2mb de heap, usando o extra heap 1.
     // Os outros processo possuem apenas 128 KB de heap.
 
+    // Precisamos de uma chamada que pega o 'heap size'
+    // e o heap size deve estar na estrutura do processo.
+
+    // See: #define G_DEFAULT_PROCESSHEAP_SIZE (1024*128)
+
     HEAP_START = (unsigned long) &heaptest[0];  //0x0000000030A00000 para init process
-    HEAP_END   = (unsigned long) (HEAP_START + (1024*1024*2) ); //(HEAP_START + (1024*128) );  //128KB 
+    HEAP_END   = (unsigned long) (HEAP_START + (1024*128) );  //(1024*1024*2) ); //(HEAP_START + (1024*128) );  //128KB 
     HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
 
 
