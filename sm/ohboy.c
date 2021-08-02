@@ -313,7 +313,7 @@ void main(void)
 //
 
     // fail!
-    //rtl_clone_and_execute("reboot.bin"); 
+    rtl_clone_and_execute("sm2.bin"); 
 
 
 // interna

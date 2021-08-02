@@ -33,6 +33,7 @@ int main ( int argc, char *argv[] ){
     char *env_user;
     unsigned char good=0;
 
+     //asm("int $3");
 
     gramado_system_call(65,'3',0,0);
     printf ("REBOOT.BIN: This is a test\n");

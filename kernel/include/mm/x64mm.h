@@ -1152,6 +1152,9 @@ unsigned long get_table_pointer (void);
 
 void load_pml4_table(void *phy_addr);
 
+
+void *CloneKernelPDPT0(void);
+void *CloneKernelPD0(void);
 void *CloneKernelPML4 (void);
 void *clone_pml4 ( unsigned long pml4_va );
 

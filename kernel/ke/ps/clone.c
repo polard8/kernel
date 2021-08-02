@@ -67,6 +67,13 @@ pid_t copy_process ( const char *filename, pid_t pid, unsigned long clone_flags 
     //refresh_screen();
     //while(1){}
 
+
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
     // The new process will be in a different pid.
     // We are clonning the thread.
     //if ( clone_flags & CLONE_THREAD ){
@@ -212,6 +219,13 @@ do_clone:
     }
     
 
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
+
 
 // ==============================
 // pml4
@@ -308,6 +322,15 @@ do_clone:
         panic ("clone_and_execute_process: [FAIL] __alloc_memory_for_image_and_stack\n");
     }
 
+
+
+
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
 //
 // Copy process structure.
 //
@@ -321,6 +344,11 @@ do_clone:
     if ( Status != 0 ){
         panic ("clone_and_execute_process: [FAIL] processCopyProcess\n");
     }
+
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
 
 
     // #debug
@@ -340,6 +368,14 @@ do_clone:
     if ( (void *) Clone->control == NULL ){
         panic ("clone_and_execute_process: [FAIL] copy_thread_struct \n");
     }
+
+
+    // #debug
+    // ok
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
 
     // rip and rsp
 
@@ -408,6 +444,14 @@ do_clone:
         goto fail;
     }
 
+
+    //#debug
+    //ok
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
     // [4]
     debug_print ("clone_and_execute_process: [4] Check signature.\n");
     printf      ("clone_and_execute_process: [4] Check signature.\n");
@@ -425,6 +469,15 @@ do_clone:
         printf      ("clone_and_execute_process: [FAIL] ELF fail \n");
         goto fail;
     }
+
+
+    //#debug
+    //ok
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
 
     // >> Page table:
     // Remapeando a imagem, mas agora no diretório de páginas
@@ -493,6 +546,22 @@ do_clone:
     // PD   - Page Directory
     // PT   - Page Table    
 
+
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
+//
+// BUG BUG BUG BUG
+//
+
+    // Algo está falhando nessa hora em que estamos criando a 
+    // pagetable para a imagem do processo.
+
+
+    /*
     // See: pages.c
     // OUT: Retorna o endereço virtual da pagetable criada.
     _pt = (void*) CreateAndIntallPageTable (
@@ -507,6 +576,104 @@ do_clone:
     if ( (void*) _pt == NULL ){
         panic ("clone_and_execute_process: _pt\n");
     }
+    */
+
+
+//
+// Page table
+//
+
+    // Alocando um endereço virtual onde criaremos nossa pagetable.
+
+    unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
+    if ( ptVA == 0 ){
+        panic ("copy_process: [FAIL] ptVA\n");
+    }
+
+    unsigned long ptPA = (unsigned long) virtual_to_physical ( 
+                                             ptVA, 
+                                             gKernelPML4Address ); 
+
+    // Vamos mapear uma região de memória 
+    // preenchendo a nossa page table recem criada.
+    // Essa rotina preenche uma pagetable, mapeando
+    // a região indicada.
+
+    // Cria uma page table com 512 entradas
+    // para uma região de 2mb e configura uma
+    // determinada entrada no diretório de páginas.
+    
+    // Antes vamos clonar o diretório de páginas do kernel.
+    Clone->pd0_VA = (unsigned long) CloneKernelPD0();
+
+    Clone->pd0_PA = (unsigned long) virtual_to_physical ( 
+                                        Clone->pd0_VA, 
+                                        gKernelPML4Address ); 
+
+    mm_fill_page_table( 
+        (unsigned long) Clone->pd0_VA,   // directory va. 
+        (int) ENTRY_USERMODE_PAGES,      // directory entry for image base.
+        (unsigned long) ptVA,            // page table va.
+        (unsigned long) Clone->ImagePA,  // Region 2mb pa.
+        (unsigned long) 7 );             // flags.
+
+
+
+    // CLonando o pdpt0 do kernel.
+    Clone->pdpt0_VA = (unsigned long) CloneKernelPDPT0();
+
+    Clone->pdpt0_PA = (unsigned long) virtual_to_physical ( 
+                                        Clone->pdpt0_VA, 
+                                        gKernelPML4Address ); 
+
+    //#debug
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+//
+// Installing (danger)
+//
+
+    
+    unsigned long *PageTable                 = (unsigned long *) ptVA;
+    unsigned long *PageDirectory             = (unsigned long *) Clone->pd0_VA;
+    unsigned long *PageDirectoryPointerTable = (unsigned long *) Clone->pdpt0_VA;
+    unsigned long *PML4                      = (unsigned long *) Clone->pml4_VA;
+
+
+    
+    //============================
+    // Page Directory
+    // Instalando o ponteiro para a pagetable entrada do diretório.
+    // #?? Isso ja foi feito pela rotina mm_fill_page_table.
+    // podemos criar uma rotina igual, mas que não instale o ponteiro no pd.
+    PageDirectory[ENTRY_USERMODE_PAGES] = (unsigned long) ptPA;
+    PageDirectory[ENTRY_USERMODE_PAGES] = (unsigned long) PageDirectory[ENTRY_USERMODE_PAGES] | 7; 
+
+    
+    //============================
+    // Page Directory Pointer Table
+    // Somente a ŕimeira entrada do pdpt0 é usada.
+    PageDirectoryPointerTable[0] = (unsigned long) Clone->pd0_PA;
+    PageDirectoryPointerTable[0] = (unsigned long) PageDirectoryPointerTable[0] | 7; 
+
+    
+    //============================
+    // PML4
+    // Somente a primeira entrada do pml4 é usada.
+    PML4[0] = (unsigned long) Clone->pdpt0_PA;
+    PML4[0] = (unsigned long) PML4[0] | 7; 
+    
+
+// ======================================
+
+    //#debug
+    // ok
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
 
     // #debug
     //printf ("New page table : %x \n", _pt);
@@ -527,9 +694,6 @@ do_clone:
     Clone->control->rip = (unsigned long) CONTROLTHREAD_ENTRYPOINT;  // 0x201000
 
 
-
-
-
 //
 // Process name.
 //
@@ -537,6 +701,16 @@ do_clone:
     strcpy ( Clone->__processname, (const char *) filename );   
     //Clone->processName_len = (size_t) strlen ( (const char *) filename );
     Clone->processName_len = (size_t) sizeof(Clone->__processname);
+
+
+
+    //#debug
+    //ok
+    //printf (" :) \n");
+    //refresh_screen();
+    //return 0;
+
+
 
 
 
@@ -567,11 +741,7 @@ do_clone:
     // Used by spawn.c
     Clone->control->new_clone = TRUE;
 
-    // Change the state to standby.
-    // This thread is gonna run in the next taskswitch.
-    // Or maybe in this moment.
 
-    SelectForExecution (Clone->control);
 
 // #todo
 // Antes de retornarmos, vamos exibir todas as informações
@@ -590,8 +760,8 @@ do_clone:
 //
 
 
-    printf ("\n");
-    printf ("--[ Debug ]---------------------------------\n");
+    //printf ("\n");
+    //printf ("--[ Debug ]---------------------------------\n");
 
     //printf ("\n");
     //printf ("Original thread::\n");
@@ -602,35 +772,47 @@ do_clone:
     // ok: Esses são iguais, como deveria ser.
     //printf ("pd0_VA:%x   | pd0_PA:%x   \n",p->control->pd0_VA,   p->control->pd0_PA);
 
-    printf ("\n");
-    printf ("Clone thread::\n");
+    //printf ("\n");
+    //printf ("Clone thread::\n");
     // ok: Esses são iguais, como deveria ser.
-    printf ("pml4_VA:%x  | pml4_PA:%x  \n",Clone->control->pml4_VA,  Clone->control->pml4_PA);
+    //printf ("pml4_VA:%x  | pml4_PA:%x  \n",Clone->control->pml4_VA,  Clone->control->pml4_PA);
     // ok: Esses são iguais, como deveria ser.
-    printf ("pdpt0_VA:%x | pdpt0_PA:%x \n",Clone->control->pdpt0_VA, Clone->control->pdpt0_PA);
+    //printf ("pdpt0_VA:%x | pdpt0_PA:%x \n",Clone->control->pdpt0_VA, Clone->control->pdpt0_PA);
     // ok: Esses são iguais, como deveria ser.
-    printf ("pd0_VA:%x   | pd0_PA:%x   \n",Clone->control->pd0_VA,   Clone->control->pd0_PA);
+    //printf ("pd0_VA:%x   | pd0_PA:%x   \n",Clone->control->pd0_VA,   Clone->control->pd0_PA);
 
     //show_slot (p->control->tid);
     //show_reg  (p->control->tid);
 
-    show_slot (Clone->control->tid);
-    show_reg (Clone->control->tid);
+    //show_slot (Clone->control->tid);
+    //show_reg (Clone->control->tid);
 
     //printf ("\n");
     //current_process = Clone->pid;
     //show_currentprocess_info();
 
-    printf ("--------------------------------------------\n");
-    printf ("\n");
+    //printf ("--------------------------------------------\n");
+    //printf ("\n");
 
     // #debug
     refresh_screen();
-    while(1){}
+    //while(1){}
     
     
     // Switch back
     //x64_load_pml4_table( old_pml4 );
+
+//
+// #todo
+//
+
+    // Ainda não selecionamos para execução.
+    // Então a thread de controle esta em INITIALIZED e não em STANDBY.
+
+    // Change the state to standby.
+    // This thread is gonna run in the next taskswitch.
+
+    SelectForExecution (Clone->control);
 
     // Return child's PID.
 

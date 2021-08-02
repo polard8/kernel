@@ -37,8 +37,20 @@ void *CreateAndIntallPageTable (
     int pd_index,            // Install the pagetable into this entry of the page directory. 
     unsigned long region_pa )
 {
+
+
+
+
+    panic("CreateAndIntallPageTable: suspended");
+
+
+
+    return NULL;
+
+/*
+
     int i=0;
-    
+
     // #todo
     // Vamos criar uma pagetable com 512 entradas
     // para mapearmos uma região da memória física.
@@ -93,7 +105,6 @@ void *CreateAndIntallPageTable (
 //
 
     unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
-
     if ( ptVA == 0 ){
         panic ("CreateAndIntallPageTable: [FAIL] ptVA\n");
     }
@@ -210,6 +221,8 @@ void *CreateAndIntallPageTable (
     //panic ("CreateAndIntallPageTable: [TODO] This is a work in progress.\n");
     // #todo retorno.
     //return NULL;
+    
+    */
 }
 
 
@@ -305,6 +318,75 @@ unsigned long get_table_pointer (void)
     }
 
     return (unsigned long) table_pointer_heap_base;
+}
+
+
+void *CloneKernelPDPT0(void)
+{
+    register int i=0;
+    unsigned long destAddressVA=0; 
+
+
+    //destAddressVA = (unsigned long) newPage (); 
+    destAddressVA = (unsigned long) get_table_pointer(); 
+
+    if ( destAddressVA == 0 ){
+        panic ("CloneKernelPML4: destAddressVA\n");
+    }
+
+
+    // The virtual address of the kernel page directory and
+    // the virtual address of the new page directory.
+    // #bugbug: What directory we are using right now? kernel?
+
+    unsigned long *src = (unsigned long *) kernel_mm_data.pdpt0_va; //gKernelPML4Address;
+    unsigned long *dst = (unsigned long *) destAddressVA;  
+
+    // Copy
+
+    for ( i=0; i < 512; ++i ){
+        dst[i] = (unsigned long) src[i];
+    };
+
+    // Done.
+    // The virtual address of the new pml4. 
+
+    return (void *) destAddressVA;
+}
+
+
+
+void *CloneKernelPD0(void)
+{
+    register int i=0;
+    unsigned long destAddressVA=0; 
+
+
+    //destAddressVA = (unsigned long) newPage (); 
+    destAddressVA = (unsigned long) get_table_pointer(); 
+
+    if ( destAddressVA == 0 ){
+        panic ("CloneKernelPML4: destAddressVA\n");
+    }
+
+
+    // The virtual address of the kernel page directory and
+    // the virtual address of the new page directory.
+    // #bugbug: What directory we are using right now? kernel?
+
+    unsigned long *src = (unsigned long *) kernel_mm_data.pd0_va; //gKernelPML4Address;
+    unsigned long *dst = (unsigned long *) destAddressVA;  
+
+    // Copy
+
+    for ( i=0; i < 512; ++i ){
+        dst[i] = (unsigned long) src[i];
+    };
+
+    // Done.
+    // The virtual address of the new pml4. 
+
+    return (void *) destAddressVA;
 }
 
 

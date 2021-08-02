@@ -86,6 +86,7 @@ head.o:
 crt0.o:
 #	gcc  -c  crt0.c -I $(LIBC) -I $(API) $(CFLAGS) -o crt0.o
 	nasm marginal.asm -f elf64 -o marginal.o 
+	nasm marginal2.asm -f elf64 -o marginal2.o 
 
 main.o:
 	$(CC)  -c  ohboy.c -I $(LIBC) $(CFLAGS) -o main.o
@@ -114,7 +115,8 @@ all-c:
 
 shell-link:
 	$(LD) -s -x -T applink.ld -o SM.BIN $(myObjects)    
-
+	$(LD) -s -x -T applink.ld -o SM2.BIN marginal2.o    
+	
 finalize:
 #	cp SM.BIN ../../bin/
 

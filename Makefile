@@ -124,6 +124,7 @@ gramado-sm:
 	@echo "Build: Building Session Manager ..."
 	$(Q) $(MAKE) -C sm/
 	sudo cp sm/SM.BIN  base/
+	sudo cp sm/SM2.BIN  base/
 
 #4
 gramado-cmd:
