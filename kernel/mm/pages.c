@@ -334,7 +334,7 @@ void *CloneKernelPML4(void)
     // the virtual address of the new page directory.
     // #bugbug: What directory we are using right now? kernel?
 
-    unsigned long *src = (unsigned long *) gKernelPML4Address;  
+    unsigned long *src = (unsigned long *) gKernelPML4Address;
     unsigned long *dst = (unsigned long *) destAddressVA;  
 
     // Copy

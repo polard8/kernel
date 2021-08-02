@@ -792,16 +792,16 @@ struct thread_d *create_thread (
     // #bugbug
     // Nao podemos usar isso aqui porque a rotina declonagem
     // chama essa funçao mas reconfigura esse valor logo em seguida.
-    if( init_rip == 0 ){
-        panic ("create_thread: [ERROR] init_rip\n");
-    }
+    //if( init_rip == 0 ){
+    //    panic ("create_thread: [ERROR] init_rip\n");
+    //}
 
     // #bugbug
     // Nao podemos usar isso aqui porque a rotina declonagem
     // chama essa funçao mas reconfigura esse valor logo em seguida.
-    if( init_stack == 0 ){
-        panic ("create_thread: [ERROR] init_stack\n");
-    }
+    //if( init_stack == 0 ){
+    //    panic ("create_thread: [ERROR] init_stack\n");
+    //}
 
     if( pid < 0 ){
         panic ("create_thread: [ERROR] pid\n");
@@ -1288,7 +1288,7 @@ void exit_current_thread(void)
 }
 
 /*
- * threadCopyThread:
+ * copy_thread_struct:
  *     Clona uma thread.
  *     Usado no suporte a fork e execução de novos processos.
  */
@@ -1296,7 +1296,7 @@ void exit_current_thread(void)
 // OUT:
 // Pointer for the clone.
 
-struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, unsigned long rsp ){
+struct thread_d *copy_thread_struct ( struct thread_d *thread ){
 
     struct thread_d  *father;
     struct thread_d  *clone;
@@ -1308,7 +1308,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
     // A thread que vai ser copiada.
     father = thread;
     if ( (void *) father == NULL ){
-        panic ("threadCopyThread: father\n");
+        panic ("copy_thread_struct: father\n");
     }
 
     // #todo
@@ -1336,7 +1336,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
     // char nameBuffer[32];
 
     if ( father->iopl != RING3 ){
-        panic ("threadCopyThread: iopl #todo");
+        panic ("copy_thread_struct: iopl #todo");
     }
 
 
@@ -1345,13 +1345,17 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
     // porque as threads terão espaço de endereçamento diferentes
     // e uma não poderá acessar a pilha da outra.
 
+    /*
     if (rip == 0){
-        panic ("threadCopyThread: rip");
+        panic ("copy_thread_struct: rip");
     }
+    */
 
+    /*
     if (rsp == 0){
-        panic ("threadCopyThread: rsp");
+        panic ("copy_thread_struct: rsp");
     }
+    */
 
     // #bugbug
     // Conferir quem é o pai owner pid dessa thread.
@@ -1361,8 +1365,8 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
     if ( father->iopl == RING3 ){
     clone = (struct thread_d *) create_thread ( 
                                     NULL, NULL, NULL, 
-                                    rip,  // initial rip 
-                                    rsp,  // initial rsp
+                                    0,  // initial rip 
+                                    0,  // initial rsp
                                     father->ownerPID,  //current_process, 
                                     "clone-thread",
                                     RING3 );
@@ -1370,7 +1374,7 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
 
     // The copy.
     if ( (void *) clone == NULL ){
-        panic ("threadCopyThread: clone\n");
+        panic ("copy_thread_struct: clone\n");
     }
 
 
@@ -1514,10 +1518,10 @@ struct thread_d *threadCopyThread ( struct thread_d *thread, unsigned long rip, 
 //
 
     clone->ss     = father->ss;    //RING 3.
-    clone->rsp    = rsp; 
+    clone->rsp    = father->rsp;   // wrong
     clone->rflags = father->rflags;
     clone->cs     = father->cs;
-    clone->rip    = rip; 
+    clone->rip    = father->rip;   // wrong 
 
 	//O endere�o incial, para controle.
 

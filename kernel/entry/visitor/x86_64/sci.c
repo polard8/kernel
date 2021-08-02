@@ -1218,10 +1218,14 @@ void *sci2 (
 	// See: See: ps/action/clone.c
 	// See: clone.c
 
-    // IN: name, dir address.
+    // IN: file name, parent pid, clone flags.
     if ( number == 900 ){
         debug_print("sci2: [900] clone and execute\n");
-        return (void *) clone_and_execute_process( (const char *) arg2, (pid_t) current_process );
+        
+        return (void *) copy_process( 
+                            (const char *) arg2, 
+                            (pid_t) current_process, 
+                            (unsigned long) arg3 );
     }
 
 

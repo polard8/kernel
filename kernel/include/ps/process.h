@@ -5,8 +5,13 @@
 #define __PROCESS_H    1
 
 
+//#bugbug
+//talvez aqui nao seja o melhor lugar pra definir isso.
+#define gramado_pid_t pid_t
+
 
 #define PROCESS_MAGIC  1234
+
 
 
 // #alternative
@@ -19,9 +24,6 @@
 #define BETA           3
 
 
-//#bugbug
-//talvez aqui nao seja o melhor lugar pra definir isso.
-#define gramado_pid_t pid_t
 
 
 // Image. 
@@ -161,6 +163,18 @@
 
 
 
+//
+// Flags for cloning a process.
+//
+
+// Used in copy_process();
+
+#define CLONE_THREAD    1
+// ...
+
+
+
+
 /*
  * process_state_t
  *     Status de um processo.
@@ -228,9 +242,6 @@ struct process_d
 	//UID, (User Identification),
 	//GID, (Group Identification),
 
-    //process group.
-    int pgrp;
-
     // process
     pid_t  pid;
     pid_t  ppid;
@@ -246,6 +257,9 @@ struct process_d
     gid_t  egid;
     gid_t  rgid;
     gid_t  sgid;
+
+    //process group.
+    int pgrp;
 
 	// State.
 	// flag ?
@@ -897,11 +911,15 @@ unsigned long processList[PROCESS_COUNT_MAX];
 
 //==============
 // clone.c
-int copy_process_structure( pid_t p1, pid_t p2 );
-pid_t copy_process( const char *filename, unsigned long clone_flags );
-int processCopyProcess ( pid_t p1, pid_t p2 );
 
-pid_t clone_and_execute_process ( const char *filename, pid_t pid );
+int 
+copy_process_struct(
+    struct process_d *p1,
+    struct process_d *p2 );
+
+pid_t copy_process ( const char *filename, pid_t pid, unsigned long clone_flags );
+
+
 
 
 //==============
