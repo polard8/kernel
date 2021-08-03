@@ -566,6 +566,12 @@ do_rm_startgui:
 
 .enableTextMode:
 
+    ; #bugbug
+    ; Não precisamso disso, pois estamos entrando no modo
+    ; gráfico através do vesa?
+    ; Mas o que acontece se falhar?
+    ; Precisaremos de um verbose em modo texto.
+
     mov ax, 0x0003
     int 0x10
 
@@ -744,6 +750,8 @@ ____gramado_mode_done:
     ; gui or cli.
     mov al, byte BOOTMODE_GUI
     call set_boot_mode
+
+; See: stage2/lib16/s2modes.inc
 
     JMP s2modesActivateMode 
     JMP $

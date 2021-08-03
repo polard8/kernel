@@ -85,6 +85,15 @@ KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endere�o fisico.
 ;
 ;++
 
+    ; IN:
+    ; al:  Boot mode.
+    ; ebx: LFB physical addres.
+    ; ecx: Boot block address.
+    ; edx: Boot block address.
+    ; ebp: Boot block address.
+    ; edi: Gramado mode. (jail, p1, home ...)
+
+
 global _bootloader_entry_point
 _bootloader_entry_point:
 
@@ -105,20 +114,17 @@ ____START:
     ;Debug.
     ;JMP $
 
-    ; Salva o modo de v�deo.
+    ; Salva o modo de vídeo.
     mov byte [bl_video_mode], al
 
     ; Verifica se usa gui ou n�o.
     cmp al, byte 'G'
     je .useGUI
-
 .dontuseGUI:
     mov dword [_SavedBootMode], 0    ;Text Mode flag.
     jmp .go 
-
 .useGUI:
     mov dword [_SavedBootMode], 1    ;GUI flag.
-
 .go:
 	;Salva o LFB.
 	;Global para endere�o f�sico do LFB.
@@ -144,17 +150,23 @@ ____START:
     
     mov dword [_SavedBootBlock], edx 
 
+
+    ; Gramado mode. (jail, p1, home ...)
+    mov dword [_SavedGramadoMode], edi 
+
+
 ;++
 ; ===============================================
 
     ; Boot block starts at 0x00090000
 
-    ; LFB_VA:      0x00090000 + 0
-    ; WIDTH:       0x00090000 + 8
-    ; HEIGHT:      0x00090000 + 16
-    ; BPP:         0x00090000 + 24
-    ; LAST_VALID:  0x00090000 + 32
-    ; ...
+    ; LFB_VA:        0x00090000 + 0
+    ; WIDTH:         0x00090000 + 8
+    ; HEIGHT:        0x00090000 + 16
+    ; BPP:           0x00090000 + 24
+    ; LAST_VALID:    0x00090000 + 32
+    ; GRAMADO MODE:  0x00090000 + 40
+
 
 ;
 ; LFB_PA, X, Y, BPP
@@ -187,6 +199,17 @@ ____START:
     mov dword [_SavedBPP], eax
     mov dword [0x90000 + 24], eax
     mov dword [0x90000 + 28], 0
+
+    ; 0x00090000 + 32
+    ; last valid
+    ; See:
+
+    ; 0x00090000 + 40
+    xor eax, eax
+    mov eax, dword [_SavedGramadoMode]  ;jail, p1, home ... 
+    mov dword [0x90000 + 40], eax
+    mov dword [0x90000 + 48], 0
+
 
 ; ===============================================
 ;--
@@ -284,12 +307,14 @@ ____START:
 ; == Go to kernel ================================
 ;
 
-;; o C salta para cá.
+; O C salta para cá.
+; See: pages.c
+
 global _go_to_kernel
 _go_to_kernel:
 
-    ; Flush
-    
+; Flush
+
     mov EAX, CR3  
     ; nop
     mov CR3, EAX
@@ -299,9 +324,9 @@ _go_to_kernel:
 ; cr0
 ;
 
-    ; Enable paging to activate long mode
-    ; Enable paging and protected mode.
-    ; The paging was NOT enabled in pages.c
+; Enable paging to activate long mode
+; Enable paging and protected mode.
+; The paging was NOT enabled in pages.c
 
     mov ebx, cr0
     or ebx,0x80000001 
@@ -312,7 +337,7 @@ _go_to_kernel:
 ; GDT
 ;
 
-    ; Load the 64-bit global descriptor table.
+; Load the 64-bit global descriptor table.
 
     lgdt [GDT64.Pointer]
 
@@ -329,6 +354,21 @@ _go_to_kernel:
     mov ax, 0x10    ;GDT64.Data
     mov ds, ax
     mov es, ax
+
+
+;
+; Go!
+;
+
+; IN:
+; Temos um bootblock em 0x00090000.
+; Temos também outro boot block em [] 
+; que não foi devidamente observado.
+
+; #todo: 
+; Vamos precisa passar o 'Gramado mode',
+; muita coisa no sistema depende disso.
+
 
     ; Isso funciona na maq real.
     ;xor eax, eax
@@ -453,8 +493,14 @@ _SavedBPP:
 global _SavedBootMode    ;;1=GUI; 0=Text Mode.
 _SavedBootMode:
     dd 0
-	
-	
+global _SavedGramadoMode   ; jail, p1, home ...
+_SavedGramadoMode:  
+    dd 0
+
+
+
+
+
 ;
 ; gdt ----------------------------
 ;

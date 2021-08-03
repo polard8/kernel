@@ -24,37 +24,37 @@ do_boot:
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_jail:
     mov byte [META$FILE.GRAMADO_MODE], 0x00
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_p1:
     mov byte [META$FILE.GRAMADO_MODE], 0x01
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_home:
     mov byte [META$FILE.GRAMADO_MODE], 0x02
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_p2:
     mov byte [META$FILE.GRAMADO_MODE], 0x03
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_castle:
     mov byte [META$FILE.GRAMADO_MODE], 0x04
     jmp rmStartGUI
     jmp $
 
-;      See: stage3/pm.inc 
+; See: stage3/pm.inc 
 do_gramado_mode_california:
     mov byte [META$FILE.GRAMADO_MODE], 0x05
     jmp rmStartGUI

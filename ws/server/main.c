@@ -1124,7 +1124,7 @@ int initGraphics (void){
 
     // Initialize the window server infrastructure.
     // The current display and the current screen.
-    // See: model/gws.c
+    // See: gws.c
 
     // It will create the root window.
 

@@ -61,6 +61,7 @@ unsigned long magic;
 #define bbOffsetY       2  // offset 16
 #define bbOffsetBPP     3  // offset 24
 #define bbLastValidPA   4  // offset 32  // Last valid physical address.
+#define bbGramadoMode   5  // offset 40  // jail, p1, home ...
 // ...
 
 
@@ -144,7 +145,7 @@ int kernel_main(int arch_type)
     // Magic
     unsigned long bootMagic = (unsigned long) (magic & 0x00000000FFFFFFFF); 
 
-    // The boot block address.
+    // The boot block address. 0x0000000000090000.
     // Each entry has 8 bytes.
     // virtual = physical.
     unsigned long *xxxxBootBlock = (unsigned long*) BootBlockVA; 
@@ -200,6 +201,16 @@ int kernel_main(int arch_type)
     xBootBlock.deviceHeight   = (unsigned long) xxxxBootBlock[bbOffsetY];
     xBootBlock.bpp            = (unsigned long) xxxxBootBlock[bbOffsetBPP];
     xBootBlock.last_valid_pa  = (unsigned long) xxxxBootBlock[bbLastValidPA];
+
+
+//
+// Gramado mode.
+//
+
+ 
+    // Gramado mode. (jail, p1, home ...)
+    current_mode = (unsigned long) xxxxBootBlock[bbGramadoMode];
+
     // ...
 
     // See: kernel.h
@@ -433,8 +444,42 @@ int kernel_main(int arch_type)
 
     set_up_cursor (0,1);
 
-    debug_print ("kernel_main: First message\n");
-    printf      ("kernel_main: First message \n");
+    debug_print ("Welcome to Gramado OS!\n");
+    printf      ("Welcome to Gramado OS!\n");
+
+
+//
+// Show gramado mode.
+//
+
+    switch (current_mode){
+    case GRAMADO_JAIL:
+        printf (">> GRAMADO_JAIL\n");
+        break;
+    case GRAMADO_P1:
+        printf (">> GRAMADO_P1\n");
+        break;
+    case GRAMADO_HOME:
+        printf (">> GRAMADO_HOME\n");
+        break;
+    case GRAMADO_P2:
+        printf (">> GRAMADO_P2\n");
+        break;
+    case GRAMADO_CASTLE:
+        printf (">> GRAMADO_CASTLE\n");
+        break;
+    case GRAMADO_CALIFORNIA:
+        printf (">> GRAMADO_CALIFORNIA\n");
+        break;
+    default:
+        printf (">> Undefined mode!\n");
+        break;
+    }
+
+    //#debug
+    //refresh_screen();
+    //while(1){}
+
 
     // ================================================
 

@@ -297,14 +297,15 @@ int gwssrv_init_globals(void)
     //Loop to clear something
     register int i=0;
 
+//
+// Gramado mode.
+//
+
     // get gramado mode.
     // jail, p1, home, p2, castle ...
+    // Check valiation and panic if fail.
  
     current_mode = gwssrv_get_system_metrics(130);
-
-
-    // #todo
-    // Check valiation and panic if fail.
     
     if (current_mode<0){
         printf("gwssrv_init_globals: [PANIC] current_mode\n");

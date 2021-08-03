@@ -226,25 +226,24 @@ start_msg_rebooting       db 'start: Rebooting..',      13,10,0
 
 startGUI:
 
-    ;;===============
-    ;; Setup machine
-
+;===============
+; Setup machine
 
     cli
 
-    ; GDT and IDT. 
+; GDT and IDT
 
     lgdt [lgdt_opcode]
     lidt [lidt_opcode]
 
-    ;; PIC
-    ;; #todo: 
-    ;; Nessa hora alguns vetores podem ser configurados.
-    ;; Primeiro as excess�es e depois as ISRs.
-    ;; Selecting the 'Processor Interrup Mode'.
-    ;; PIC MODE
-    ;; Todos os componentes APIC s�o ignorados e o sistema opera
-    ;; no modo single-thread usando LINT0.
+; PIC
+; #todo: 
+; Nessa hora alguns vetores podem ser configurados.
+; Primeiro as excess�es e depois as ISRs.
+; Selecting the 'Processor Interrup Mode'.
+; PIC MODE
+; Todos os componentes APIC s�o ignorados e o sistema opera
+; no modo single-thread usando LINT0.
 
 	mov al, 00010001b    ; Begin PIC 1 initialization.
 	out 0x20, al
@@ -317,12 +316,12 @@ startGUI:
 	;fat lba, root lba ...
 	;call fat16DetectFSParameters  ;;fat16lib.inc
 
-    ;;
-    ;; ========================================================
-    ;;
-    
-    ;; Set up LBA for first FAT, root dir and data area.
-    
+;
+; ========================================================
+;
+
+; Set up LBA for first FAT, root dir and data area.
+
     mov dword [g_current_fat_lba],        FAT16_FAT_LBA       ;Fat do volume atual
     mov dword [g_current_directory_lba],  FAT16_ROOTDIR_LBA   ;Diretorio do volume atual.
     mov dword [g_current_dataarea_lba],   FAT16_DATAAREA_LBA  ;?? ;lba do inicio da area de dados do volume atual.
@@ -347,25 +346,24 @@ startGUI:
 
     ;; ...
 
+; Mask all interrupts.
 
-    ; Mask all interrupts.
     mov al, 255
     out 0xA1, al
     out 0x21, al
 
+; Setup data registers and stack.
 
-    ; Setup data registers and stack.
-
-	mov ax, word 0x10  
-	mov ds, ax
-	mov es, ax 
+    mov ax, word 0x10 
+    mov ds, ax
+    mov es, ax 
 	;mov fs, ax
 	;mov gs, ax 
 	;; #bugbug
 	;; Missing ss register. (This is a test) (out. 2020)
-	mov ss, ax
-	mov eax, stack_ptr
-	mov esp, eax 
+    mov ss, ax
+    mov eax, stack_ptr
+    mov esp, eax 
 
     ;; #bugbug
     ;; Determinando tipo de volume.
@@ -381,10 +379,13 @@ startGUI:
 	call set_fs_type
 
 
+;
+; LFB
+;
     ;; internas.
     ;; Configura LFB e Buffer.
     ;; #todo: Change this name.
-    
+
     call setup_lfb
 
 
@@ -419,20 +420,18 @@ startGUI:
     ;jmp $
 
 
-	;;
-	;; == Testing strings ======================================
-	;;
+;
+; == Testing strings ========================
+;
 
-	;; #bugbug: 
-	;; As rotinas de 'char' 'string' e 'load' aparentemente est�o travando 
-	;; o sistema, as duas janelas de status est�o funcionando quando n�o 
-	;; chamamos essas fun��es.
-	
-	; #obs:
-	; Aqui vamos testar a rotina de mostrar strings no modo gr�fico.
-	; O caractere deve ser constru�do, p�xel por p�xel, utilizando 
-	; o mapa de caracteres do BIOS.
-
+; #bugbug: 
+; As rotinas de 'char' 'string' e 'load' aparentemente est�o travando 
+; o sistema, as duas janelas de status est�o funcionando quando n�o 
+; chamamos essas fun��es.
+; #obs:
+; Aqui vamos testar a rotina de mostrar strings no modo gr�fico.
+; O caractere deve ser constru�do, p�xel por p�xel, utilizando 
+; o mapa de caracteres do BIOS.
 
 .LtestingStrings:
 
@@ -539,7 +538,7 @@ startGUI:
 
 .LTestingPrintString:
 
-	;; Cursor.
+	;; Cursor
 	mov dword [g_cursor_x], 4
 	mov dword [g_cursor_y], 4
 	
@@ -602,16 +601,16 @@ startGUI:
 	;; Por�m o BL ainda est� no formato PE.
 
 
-    ;;
-    ;; Check PE binary in BL.BIN.
-    ;;
+;
+; == Image =============================
+;
 
+; Check PE binary in BL.BIN.
+; IMAGE_ADDRESS
 
-	;IMAGE_ADDRESS
-	
-	mov edx, dword 0x20000   
-	mov eax, [edx]
-    
+    mov edx, dword 0x20000   
+    mov eax, [edx]
+
 	;first byte.
 	cmp al, byte 'L'
 	jne .peFail
@@ -643,7 +642,13 @@ startGUI:
 	
 	;; #todo
 	;; Precismos passar mais informa��es sobre o disco.
-	
+
+
+;
+; Boot block
+;
+
+
 	; LFB address.
 	; Width in pixels.
 	; Height in pixel.
@@ -714,19 +719,33 @@ startGUI:
 
 	;Continua...
 
+
+;
+; Display mode. (Graphics)
+;
+
+    ;Flag. (using graphics)
+
     ;xor eax, eax
-    mov al, byte 'G'              ;Flag. (useing graphics)	
+    mov al, byte  'G'
+
 
     ;; #todo
     ;; Passar isso para BL.BIN
     ;; #mov ah, byte [META$FILE.GRAMADO_MODE]
 
+    ; LFB physical address.
 
-    mov ebx, dword [ModeInfo_PhysBasePtr]  ;LFB address (endere�o f�sico)
+    mov ebx, dword [ModeInfo_PhysBasePtr]
+
+    ; Boot block address.
 
     mov ebp, dword BootBlock
     mov ecx, ebp                ; Table
     mov edx, ebp                ; Table
+    
+    ; Gramado mode. (jail, p1, home ...)
+    mov edi, dword [tmp_gamemode]
 
 .LgoBL:
 
@@ -737,6 +756,15 @@ startGUI:
 
     ; Go!
     ; Jump to the entrypoint of the boot loader. (BL.BIN).
+    ; 0x00021000
+
+    ; IN:
+    ; al:  Boot mode.
+    ; ebx: LFB physical addres.
+    ; ecx: Boot block address.
+    ; edx: Boot block address.
+    ; ebp: Boot block address.
+    ; edi: Gramado mode. (jail, p1, home ...)
 
     jmp  8:IMAGE_ADDRESS_ENTRY_POINT
     JMP  $

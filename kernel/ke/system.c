@@ -374,6 +374,7 @@ unsigned long systemGetSystemMetrics ( int index )
         // ...
 
        // gramado mode, gamemode.
+       // jail, p1, home ...
        case 130:  return (unsigned long) current_mode;  break;
 
        // When a thread is running to call this service,

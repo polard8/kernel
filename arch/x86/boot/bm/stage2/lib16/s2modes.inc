@@ -254,41 +254,37 @@ mGui:
     xor bx, bx
     xor ax, ax
 
+; #importante
+; Temos que entrar no modo protegido ja estando 
+; no modo grafico.
 
-	;; #importante
-	;; Temos que entrar no modo protegido ja estando 
-	;; no modo grafico.
-
-	;;
-	;; GDTR
-	;;
-
+;
+; GDTR
+;
     lgdt [stage2_gdtr]
 
-
-	;;
-	;; CR0 - PE
-	;;
-	
+;
+; CR0 - PE
+;
 	;Muda PE.
+
     mov eax, cr0
     or al, 1
     mov cr0, eax
 
 
-    ;;
-	;; Flush pipeline
-	;;
-	
-s2modesFlushPipeline:
+;
+; Flush pipeline
+;
 
+s2modesFlushPipeline:
     jmp stage2_CODE_SEL:s2modespm32 
 
-	;;
-	;; ## 32 bit ## 
-	;;
+;
+; 32 bit 
+;
 
-    [BITS 32]
+[BITS 32]
 
 s2modespm32:
 
@@ -411,22 +407,23 @@ s2modespm32:
 	; 32bit modo grafico.
 
 
-;;
-;; == \o/ ============================
-;;
+;
+; == \o/ ============================
+;
 
-    ;;
-    ;; GO!
-    ;;
-    
-    ; stage3/start.inc
+;
+; Go!
+;
+
+; See:
+; stage3/start.inc
 
     jmp startGUI
     jmp $
 
-;;
-;; == \o/ ============================
-;;
+;
+; == \o/ ============================
+;
 
 
 s2modes_initmessageinGM db "s2modes: Initializing PM in GM", 13, 10, 0

@@ -256,6 +256,9 @@ void BlMain (void){
 // Interrupts
 //
 
+    // #todo
+    // Podemos adiar isso. :)
+
     asm ("sti");
 
 
