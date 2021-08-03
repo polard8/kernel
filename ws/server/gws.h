@@ -34,78 +34,57 @@ int current_mode;
  
 #include "globals.h"
 
+//
+// view
+//
 
-// #view
-#include "view/render/r_render.h"
-#include "view/colors.h"
-#include "view/bitblt.h"
-#include "view/char.h"
-#include "view/dtext.h"
-#include "view/line.h"
-#include "view/vk.h"       // # view input events
-#include "view/wt.h"
-#include "view/menu.h"
-
-#include "view/xxxinput.h"   //#test
-
-#include "view/window.h"
-#include "view/bmp.h"
-
+#include "r_render.h"
+#include "colors.h"
+#include "bitblt.h"
+#include "char.h"
+#include "dtext.h"
+#include "line.h"
+#include "vk.h"       // # view input events
+#include "wt.h"
+#include "menu.h"
+#include "xxxinput.h"   //#test
+#include "window.h"
+#include "bmp.h"
 // h:0.0
-#include "view/screen.h"   // X-like
-#include "view/display.h"  // X-like
-#include "view/host.h"     // X-like h:0.0
-
+#include "screen.h"   // X-like
+#include "display.h"  // X-like
+#include "host.h"     // X-like h:0.0
 // Teremos isso aqui no window server,
 // kgws é outro ws par ao ambiente de setup e tera 
 // seu próprio gerenciamento.
-
-#include "view/security.h"
-
-
-#include "view/gui.h"
-#include "view/comp.h"
-#include "view/event.h"    // view inputs
-// ...
-
-
-#include "view/grprim.h"
+#include "security.h"
+#include "gui.h"
+#include "comp.h"
+#include "event.h"    // view inputs
+#include "grprim.h"
+#include "sprite.h"
+#include "demos.h"
 
 
-#include "view/sprite.h"
-
-#include "view/demos.h"
-
+//
+// model
+//
 
 // # data model
-#include "model/packet.h"
-
-
+#include "packet.h"
 // # model. business logic
 // #todo:
 // We can put this thing in the library. (libgws)
 // or (libcon)
-#include "model/connect.h"
-
-// data model
-
-#include "model/nc2.h"   //nelson cole 2 font. 8x8
-#include "model/lt8x8.h"
-// ...
-#include "model/font.h"
-
-
-
-
+#include "connect.h"
+#include "nc2.h"   //nelson cole 2 font. 8x8
+#include "lt8x8.h"
+#include "font.h"
 // Client structure.
 // O proprio servidor poderia ser o cliente 0??
-
-#include "model/client.h"
-
-
+#include "client.h"
 // # model. business logic
-#include "model/services.h"
-
+#include "services.h"
 
 
 struct gws_graphics_d

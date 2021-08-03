@@ -54,14 +54,10 @@ user_ldflags = -m elf_x86_64 -T ../link.ld
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC    = ../../lib/rtl/include/
-LIBCOBJ = ../../lib/rtl/obj
-
-
-#GWS_INCLUDES  = include/    
-#RENDERER      = renderer/include/  
-#CMDLINE       = cmdline/include/   
-#TERMINAL      = terminal/include/   
+LIBC              = ../../lib/rtl/include/
+LIBCOBJ           = ../../lib/rtl/obj
+WS_INCLUDES       = include/ 
+WS_INCLUDES_LOCAL = .
 
 
 #
@@ -81,47 +77,48 @@ termios.o ioctl.o fcntl.o
 
 all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
+
 main.o:
-	$(CC)  -c  main.c $(user_ccflags) -I $(LIBC) -I $(API02)  -I include/ -I . -o main.o
+
+	$(CC)  -c  main.c $(user_ccflags) \
+	-I $(LIBC) \
+	-I $(API02) \
+	-I $(WS_INCLUDES) \
+	-I $(WS_INCLUDES_LOCAL) \
+	-o main.o
+	
+	
 all-c:
 
-	$(CC)  -c view/render/r_render.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o r_render.o
+	$(CC)  -c  r_render.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o r_render.o
+	$(CC)  -c  bitblt.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bitblt.o
+	$(CC)  -c  char.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o char.o
+	$(CC)  -c  dtext.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o dtext.o
+	$(CC)  -c  line.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o line.o
+	$(CC)  -c  rect.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o rect.o
+	$(CC)  -c  xxxinput.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o xxxinput.o
+	$(CC)  -c  createw.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o createw.o
+	$(CC)  -c  button.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o button.o
+	$(CC)  -c  comp.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o comp.o
+	$(CC)  -c  bmp.c       $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bmp.o
+	$(CC)  -c  grprim.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o grprim.o
+	$(CC)  -c  sprite.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o sprite.o
+	$(CC)  -c  demos.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o demos.o
 
-	# view-like component
 
-	$(CC)  -c  view/bitblt.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bitblt.o
-
-	$(CC)  -c  view/char.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o char.o
-	$(CC)  -c  view/dtext.c    $(user_ccflags) -I $(LIBC) -I include/ -I .  -o dtext.o
-	$(CC)  -c  view/line.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o line.o
-	$(CC)  -c  view/rect.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o rect.o
-
-	$(CC)  -c  view/xxxinput.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o xxxinput.o
-
-	$(CC)  -c  view/createw.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o createw.o
-
-	$(CC)  -c  view/button.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o button.o
-	$(CC)  -c  view/comp.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o comp.o
-
-	$(CC)  -c  view/bmp.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o bmp.o
-
-	$(CC)  -c  view/grprim.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o grprim.o
-	$(CC)  -c  view/sprite.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o sprite.o
-
-	$(CC)  -c  view/demos.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o demos.o
-	
 	# model-like component
-	$(CC)  -c  model/font.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o font.o
-	$(CC)  -c  model/connect.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o connect.o
-	$(CC)  -c  model/gws.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o gws.o
-	# ...
 
+	$(CC)  -c  connect.c  $(user_ccflags) -I $(LIBC) -I include/ -I .  -o connect.o
+	$(CC)  -c  font.c     $(user_ccflags) -I $(LIBC) -I include/ -I .  -o font.o
+	$(CC)  -c  gws.c      $(user_ccflags) -I $(LIBC) -I include/ -I .  -o gws.o
 
 	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o wm.o
 
-	#
-	# == imported objects =============================
-	#
+
+
+#
+# == imported objects =============================
+#
 
 
 	# rtl/
