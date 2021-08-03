@@ -303,12 +303,21 @@ void main(void)
     printf ("\n");
 
 
+
+
+
+
 //
 // Test
 //
 
+
     // fail!
     rtl_clone_and_execute("sm2.bin"); 
+    //rtl_clone_and_execute("reboot.bin"); 
+    //rtl_clone_and_execute("gdeshell.bin"); 
+    //rtl_clone_and_execute("gwssrv.bin"); 
+
 
 
 // interna

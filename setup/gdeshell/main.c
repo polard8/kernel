@@ -6763,6 +6763,10 @@ after_flags:
 noArgs:
     printf ("gdeshell: noArgs \n");
 
+//
+// With arguments
+//
+
 _ok:
 
     if (interactive == TRUE)
@@ -6796,7 +6800,7 @@ _ok:
 
     // =================================
     //++
-    gde_enter_critical_section ();
+    gde_enter_critical_section();
     // IN: status.
     hWindow = gdeshellCreateMainWindow();
     if ( (void *) hWindow == NULL ){
@@ -6804,7 +6808,7 @@ _ok:
         gde_exit_critical_section ();
         exit(1);
     }
-    gde_register_window (hWindow);
+    gde_register_window(hWindow);
     
 
     // a janela ativa tem que ser uma janela do tipo

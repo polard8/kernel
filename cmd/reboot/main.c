@@ -38,7 +38,7 @@ int main ( int argc, char *argv[] ){
     gramado_system_call(65,'3',0,0);
     printf ("REBOOT.BIN: This is a test\n");
 
-    while(1){}
+    //while(1){}
     //asm("int $3");
 
 
@@ -120,6 +120,7 @@ int main ( int argc, char *argv[] ){
     // #test
     // using the stadard method.
     goto via_rtl;
+    //goto via_libio;
 
 
     // get info from crt0.o
@@ -145,8 +146,7 @@ int main ( int argc, char *argv[] ){
 via_libio:
     printf ("reboot via libio\n");
     good = 0x02;
-    while (good & 0x02)
-    {
+    while (good & 0x02){
         good = libio_inport8(0x64);
     };
 

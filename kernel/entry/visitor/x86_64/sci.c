@@ -42,22 +42,20 @@ void *gde_extra_services (
     //Deprecated.
     //Outro n�mero fará esse trabalhao.
     if ( number == 260 ){
-        //return (void *) sys_read ( 
-        //                    (unsigned int) arg2, 
-        //                    (char *)       arg3, 
-        //                    (int)          arg4 );
+        return (void *) sys_read ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
     }
-     
+
     //Deprecated.
     //Outro n�mero fará esse trabalhao.
     if ( number == 261 ){
-        //return (void *) sys_write ( 
-        //                    (unsigned int) arg2, 
-        //                    (char *)       arg3, 
-        //                    (int)          arg4 );
+        return (void *) sys_write ( 
+                            (unsigned int) arg2, 
+                            (char *)       arg3, 
+                            (int)          arg4 );
     }
-
-
 
     // read on virtual console!
     // range: 0 ~ 3
@@ -69,7 +67,6 @@ void *gde_extra_services (
                             (const void *) arg3, (size_t) arg4 );
     }
 
-
     // write on virtual console!
     // range: 0 ~ 3
     // chamado por write_VC em ring3.
@@ -79,6 +76,59 @@ void *gde_extra_services (
         return (void *) console_write ( (int) arg2, 
                             (const void *) arg3, (size_t) arg4 );
     }
+
+    // Pega o número da tty de um processo, dado o pid.
+    // process.c
+    // IN: PID.
+    // OUT: tty id.
+    if (number == 266){
+        return (void *) process_get_tty ( (int) arg2 );
+    }
+
+
+    // Ligar duas tty, dados os pids dos processos que possuem as tty.
+    // tty/pty.c
+    // IN: master pid, slave pid.
+    //if (number == 267){
+    //    return (void *) pty_link_by_pid ( (int) arg2, (int) arg3 );
+    //}
+
+
+    // Channel is a file descriptor in the file list 
+    // of the current process.
+    // IN: fd, buf, count.         
+    if (number == 272){
+           return (void *) tty_read ( 
+                               (unsigned int) arg2,    // channel 
+                               (char *)       arg3,    // buf
+                               (int)          arg4 );  // nr
+    }
+
+
+    // Channel is a file descriptor in the file list 
+    // of the current process.
+    // IN: fd, buf, count.         
+    if (number == 273){
+        return (void *) tty_write ( 
+                            (unsigned int) arg2,    // channel 
+                            (char *)       arg3,    // buf
+                            (int)          arg4 );  // nr
+    }
+
+
+
+    // Get current virtual console.
+    if (number == 277 ){
+        return (void *) console_get_current_virtual_console();
+    }
+
+    // Set current cirtual console.
+    // #todo: precisa de privilégio. 
+    if (number == 278 ){
+        console_set_current_virtual_console ( (int) arg2 );
+        return NULL;
+    }
+
 
 
     // Returns the current runlevel.
@@ -93,6 +143,43 @@ void *gde_extra_services (
         return (void *) sys_serial_debug_printk ( (char *) arg2 );
     }
 
+
+    unsigned long __mm_size_mb = 0;
+    if ( number == 292 ){
+        __mm_size_mb = ( memorysizeTotal/0x400);
+        return (void *) __mm_size_mb;
+    }
+
+
+    // #bugbug: cuidado.
+    // get boot info.
+    // See: info.c
+    // IN: index to select the info.
+    
+    if ( number == 293 ){
+        return (void *) info_get_boot_info ( (int) arg2 );
+    }
+
+
+    // Inicializar ou reinicializar componentes do sistema
+    // depois da inicialização completa do kernel.
+    // Isso poderá ser chamado pelo init.bin, pelo shell
+    // ou qualquer outro.
+    if ( number == 350 ){
+        return (void *) sys_initialize_component ((int) arg2);
+    }
+
+
+    // 377 - todo: implement uname() libc support.
+    if ( number == 377 ){
+        printf ("gde_extra_services: [377] uname. [todo] \n");
+        sys_uname ( (struct utsname *) arg2 );        
+        refresh_screen();
+    }
+
+
+    // Get current desktop
+    //if (number == 519){  return (void *) CurrentDesktop; }
 
 
     // 600 - dup
@@ -110,8 +197,6 @@ void *gde_extra_services (
         return (void *) sys_dup3 ( (int) arg2, (int) arg3, (int) arg4 );
     }
 
-
-
     // 603 - lseek support.
     // See: unistd.c
     // IN: fd, offset, whence.
@@ -123,25 +208,150 @@ void *gde_extra_services (
     }
 
 
-    if (number == 640){
-        taskswitch_lock();
+    if (number == 640){  taskswitch_lock();    return NULL;  }
+    if (number == 641){  taskswitch_unlock();  return NULL;  }
+    if (number == 642){  scheduler_lock();     return NULL;  }
+    if (number == 643){  scheduler_unlock();   return NULL;  }
+
+
+
+    // Show device list.
+    if (number == 770){
+        systemShowDevicesInfo();
         return NULL;
     }
 
-    if (number == 641){
-        taskswitch_unlock();
+    // cpu usage for idle thread.
+    if (number == 777){
+        return (void *) profiler_percentage_idle_thread;
+    }
+
+
+    //get host name
+    if ( number == 801 ){
+        return (void *) __gethostname ( (char *) arg2);
+    }
+
+    //set host name
+    if ( number == 802 ){
+        return (void *) __sethostname ( (const char *) arg2); 
+    }
+
+    //get user name
+    if ( number == 803 ){
+        return (void *) __getusername ( (char *) arg2);
+    }
+
+    //set user name
+    if ( number == 804 ){
+        return (void *) __setusername ( (const char *) arg2); 
+    }
+
+
+    // #todo
+    // supporting ptsname libc function
+    // get_ptsname
+    // IN: fd do master, buffer em ring3 para o nome, buflen
+    //
+    if ( number == 808 ){
+        return (void *) __ptsname ( (int) arg2, 
+                            (char *) arg3, (size_t) arg4  ); 
+    }
+    
+    //#todo
+    //supporting ptsname_r libc function
+    //IN: fd do master, buffer e buflen.
+    if ( number == 809 ){
+        return (void *) __ptsname ( (int) arg2, 
+                            (char *) arg3, (size_t) arg4  ); 
+    } 
+
+
+    // Get process stats given pid
+    // IN: pid, number
+    if ( number == 880 ){
+       return (void *) __GetProcessStats ( (int) arg2, (int) arg3 );
+    }
+
+    // get thread stats given tid
+    // IN: tid, number
+    if ( number == 881 ){
+        return (void *) __GetThreadStats ( (int) arg2, (int) arg3 );
+    }
+
+
+    // Get process name
+    // IN: PID, ubuffer.
+    if ( number == 882 ){
+        return (void *) getprocessname ( (int) arg2, (char *) arg3);
+    }
+
+    // Get thread name
+    if ( number == 883 ){
+        return (void *) getthreadname ( (int) arg2, (char *) arg3);
+    }
+
+
+
+
+    // is it full ?
+    //See: sys.c
+    // IN: fd
+    // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+    if ( number == 913 ){
+        return (void *) sys_sleep_if_socket_is_empty(arg2);
+    }
+
+
+    // get screen window.
+    // #todo. checar validade
+    //if ( number == 955 ){  return (void *) gui->screen;  } 
+    
+    //if ( number == 956 ){  return (void *) gui->background; } 
+    
+    // get main window.
+    // #todo. checar validade
+    //if ( number == 957 ){ return (void *) gui->main; }  
+
+
+
+    // 970 - Create request.
+    // A interrupção n�o conseguir� retornar para a mesma thread.
+    // Chamar� o scheduler por conta pr�pria;
+    // IN: reason, reason
+
+    if ( number == 970 )
+    {
+            create_request ( 
+                (unsigned long) 15,      // number 
+                (int) 1,                 // status 
+                (int) 0,                 // timeout. 0=imediatamente.
+                (int) current_process,   // target_pid
+                (int) current_thread,    // target_tid
+                NULL,                    // window 
+                (int) 0,                 // msg  
+                (unsigned long) arg2,    // long1  
+                (unsigned long) arg3 );  // long2
+                
+		//wait_for_a_reason ( current_thread, (int) arg2 );
         return NULL;
     }
 
 
-    if (number == 642){
-        scheduler_lock();
-        return NULL;
-    }
+     // api - load file (string ???)
+     // #todo: Tem que retornar algum identificador para a api.
+     // poderia ser um indice na tabela de arquivos abertos pelo processo.
+     // #todo: rever.
+     // See: kstdio.c
+    //if ( number == 4002 ){
+    //    return (void *) k_fopen ( (const char *) arg2, "r+" );
+    //}
 
 
-    if (number == 643){
-        scheduler_unlock();
+
+    // Show root files system info.
+    if ( number == 4444 ){
+        fs_show_root_fs_info();
         return NULL;
     }
 
@@ -211,10 +421,30 @@ void *gde_extra_services (
      }
 
 
+    // socket info
+    // IN: pid
+    if ( number == 7008 ){
+        show_socket_for_a_process( (int) arg2 );
+        return NULL;
+    }
+
+
     // libc: shutdown() IN: fd, how
     if ( number == 7009 ){
         sys_socket_shutdown( (int) arg2, (int) arg3 );
         return NULL;
+    }
+
+
+    // ioctl ()
+    // IN: fd, request, arg
+    // See: sci/sys/sys.c    
+    
+    if ( number == 8000 ){
+        return (void *) sys_ioctl ( 
+                            (int) arg2, 
+                            (unsigned long) arg3, 
+                            (unsigned long) arg4 );
     }
 
 
@@ -263,7 +493,7 @@ void *sci0 (
 
 
     // #debug
-    debug_print("sc0:\n");
+    //debug_print("sc0:\n");
     //printf("sc0:\n");
     //refresh_screen();
 
