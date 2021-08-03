@@ -230,9 +230,46 @@ fail:
 
 
 
+int User_initialize(void)
+{
+
+    debug_print("User_initialize:\n");
+
+    current_user = 0;
+
+    // User session, room (Window Station), desktop, 
+    current_usersession  = 0;
+    current_room         = 0;
+    current_desktop      = 0;
+
+    // Initialize user info structure
+    printf ("User_initialize: init_user_info\n");
+    //init_user_info ();   
+
+
+//
+// Security
+//
+
+    // Initialize User Session, room and Desktop.
+    // user section
+    //printf ("User_initialize: initializing user session\n");
+    //init_user_session();
+
+    // room
+    // initialize window station default.
+    //printf ("User_initialize: initializing room\n");   
+    //init_room_manager();
+
+    // desktop
+    printf ("User_initialize: initializing desktop\n");   
+    init_desktop();
 
 
 
+    debug_print("User_initialize: done\n");
+    return 0;
+}
 
 
 

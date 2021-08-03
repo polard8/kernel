@@ -63,7 +63,7 @@ void *ohboy_system_call (
 void testThread(void)
 {
     while (1){
-        debug_print("THREAD 2\n");
+        //debug_print("THREAD 2\n");
         //printf("2"); 
         //fflush(stdout);
     }
@@ -192,13 +192,12 @@ void main(void)
 // write
 //
 
-    printf ("\n");
-    printf ("sm.bin: Testing write()\n");
-
-    char *s = "Fred";
+    //printf ("\n");
+    //printf ("sm.bin: Testing write()\n");
+    //char *s = "Fred";
     //putc('v',stdout);
     //write ( fileno(stdin), s, 4 );
-    write ( fileno(stdout), s, 4 );
+    //write ( fileno(stdout), s, 4 );
     //write ( fileno(stderr), s, 4 );
     //fflush(stdout);
     //while(1){}
@@ -207,11 +206,10 @@ void main(void)
 //
 // read
 //
-    printf ("\n");
-    printf ("sm.bin: Testing read()\n");
-
-    char ReadBuffer[32];
-    read( fileno(stdin), ReadBuffer, 4 );
+    //printf ("\n");
+    //printf ("sm.bin: Testing read()\n");
+    //char ReadBuffer[32];
+    //read( fileno(stdin), ReadBuffer, 4 );
     //read( fileno(stdout), ReadBuffer, 4 );
     //read( fileno(stderr), ReadBuffer, 4 );
 
@@ -298,9 +296,9 @@ void main(void)
 // Breakpoint
 //
 
-    printf ("\n");
+    //printf ("\n");
     printf ("ohboy.c: Hello world !\n");
-    printf ("\n");
+    //printf ("\n");
 
 
 
@@ -316,7 +314,10 @@ void main(void)
     rtl_clone_and_execute("sm2.bin"); 
     //rtl_clone_and_execute("reboot.bin"); 
     //rtl_clone_and_execute("gdeshell.bin"); 
-    //rtl_clone_and_execute("gwssrv.bin"); 
+    
+    // #todo
+    // we need to work on the refresh screen support.
+    // rtl_clone_and_execute("gwssrv.bin"); 
 
 
 

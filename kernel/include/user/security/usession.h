@@ -87,9 +87,9 @@ struct desktop_environment_d *DesktopEnvironment;
 
 struct usession_d
 {
-
     object_type_t   objectType;
     object_class_t  objectClass;
+
     struct object_d  *object;
 
     int used;
@@ -151,6 +151,7 @@ struct usession_d
 
     // =========================================================
 
+
     unsigned long BeginTime;
     unsigned long EndTime;
 
@@ -158,26 +159,32 @@ struct usession_d
 	//Lintas encadeadas de ponteiros para pool.
 	//ou vetores de ponteiros para pools.
 	//
-	
-	//Início da lista encadeada de ponteiros para pools.
-	unsigned long *dpHead;     //Desktop Pools.(wstations).
-	unsigned long *opHead;     //Object Pools.
-	unsigned long *pdpHead;    //Page Directory Pools. (page directory lists) 
 
-    struct usession_d *next;	
+    // Início da lista encadeada de ponteiros para pools.
+
+    //unsigned long *dpHead;     //Desktop Pools.(wstations).
+    //unsigned long *opHead;     //Object Pools.
+
+    //unsigned long *pdpHead;    //Page Directory Pools. (page directory lists) 
+
+    struct usession_d *next;
 };
 
 struct usession_d *usession0;
 struct usession_d *CurrentUserSession;
+
+// List
+unsigned long usessionList[USER_SESSION_COUNT_MAX];
 
 // Um mesmo usuário pode usar sessoes diferentes para atividades diferentes.
 // -Qual é a user session do usuário logado? Sabendo a user session que o usuário está
 // podemos determinar quais os pools que que estão disponíveis para ele, como pools de desktop
 // pools de pagedirectory, pool de objetos...
 
-// unsigned long usessionList[USER_SESSION_COUNT_MAX];
 
-
+//
+// == prototypes ===============================
+//
 
 
 #endif    

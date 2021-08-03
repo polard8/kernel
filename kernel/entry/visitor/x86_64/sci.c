@@ -178,13 +178,149 @@ void *gde_extra_services (
     }
 
 
+
+    // 512 - Get ws PID for a given desktop.
+    // Pega o wm de um dado desktop.
+    // IN: Desktop structure pointer.
+    // OUT: pid
+    if ( number == SYS_GET_WS_PID )
+    {
+        debug_print("SYS_GET_WS_PID\n");
+
+        __desktop = ( struct desktop_d *) arg2;
+
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed  == TRUE && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                return (void *) __desktop->ws; 
+            }
+        }
+        // It means pid=0.
+        return NULL;
+    }
+
+
+
+
+    // 513
+    // Register the ring3 window server.
+    // Set ws PID for a given desktop
+    // Register a window server.
+    // gramado_ports[11] = ws_pid
+    // Called by the window server.
+    // arg2 = desktop structure pointer.
+    // arg3 = The window server PID.
+    // #todo: We need a helper function for this.
+
+    if ( number == SYS_SET_WS_PID )
+    {
+        debug_print("SYS_SET_WS_PID\n");
+        
+        __desktop = ( struct desktop_d *) arg2;
+
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed  == TRUE && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                //register_ws_process(arg3);
+                __desktop->ws = (pid_t) arg3;
+                
+                // What is the process listen to the port 11.
+                // use this one: socket_set_gramado_port(...)
+                gramado_ports[GRAMADO_WS_PORT] = (int) current_process;
+                
+                //#todo
+                //WindowServer.desktop = (struct desktop_d *) __desktop;
+                //WindowServer.type = WindowServerTypeRing3Process;
+                //WindowServer.pid = (pid_t) current_process;
+                
+                // #test
+                // Eleva a prioridade da thread de controle para alem dos limites.
+                // #bugbug: Cancelado.
+                // Isso melhorou a performance somente no qemu.
+                // Todo o resto piorou. Piorou a conexao entre os processos e
+                // principalmente piorou em resoluçoes maiores e na maquina real.
+                //power_pid(current_process,4);
+                //power_pid(current_process,8);
+                
+                
+                // Changing the kernel input mode.
+                // #bugbug: Maybe we need to wait a little bit. hahaha
+                // The window server is still initializing ...
+                // but there is no problem to sent messages to its control thread.
+                // os am i wrong?
+                
+                //#importante
+                // Nao mudaremos mais o modo de input.
+                // Esse modo de input nao vai mais existir.
+                // o cliente pegara o input.
+                // current_input_mode = INPUT_MODE_WS; 
+                
+                // returning ok.
+                // But, we could return the port number.
+                return (void *) TRUE;  //ok 
+            }
+        }
+        return NULL; //fail
+    }    
+
+
+
+    // 514 - get wm PID for a given desktop
+    // IN: desktop
+    if ( number == SYS_GET_WM_PID )
+    {
+       debug_print("SYS_GET_WM_PID\n");
+        // pega o wm de um dado desktop.
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed  == TRUE && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                return (void *) __desktop->wm; 
+            }
+        }
+        return NULL; //#bugbug: Isso pode significar pid 0.
+    }
+
+
+
+    // 515 - set wm PID for a given desktop
+    // Register a ring3 wm.
+    // IN: desktop, pid
+    if ( number == SYS_SET_WM_PID )
+    {
+       debug_print("SYS_SET_WM_PID\n");
+        __desktop = ( struct desktop_d *) arg2;
+        if ( (void *) __desktop != NULL )
+        {
+            if ( __desktop->desktopUsed  == TRUE && 
+                 __desktop->desktopMagic == 1234 )
+            {
+                //register_wm_process(arg3);
+                 __desktop->wm = (pid_t) arg3;
+                gramado_ports[GRAMADO_WM_PORT] = (int) current_process;
+                return (void *) TRUE;  //ok 
+            }
+        }
+        return NULL; //fail
+    }
+
+
+
+
+
     // Get current desktop
-    //if (number == 519){  return (void *) CurrentDesktop; }
+    if (number == 519){  return (void *) CurrentDesktop; }
 
 
     // 600 - dup
     if ( number == 600 ){
-        return (void *) sys_dup ( (int) arg2 );
+        return (void *) sys_dup ( (int) arg2 );  
     }
 
     // 601 - dup2
@@ -1303,6 +1439,18 @@ void *sci0 (
         case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
 
         // ...
+
+
+        // =====================================
+        // (250 ~ 255) - Info support.
+
+        // 250
+        // See: 
+        case SYS_GETSYSTEMMETRICS:
+            return (void *) sys_get_system_metrics ( (int) arg2 );
+            break;
+
+
 
         default: 
             debug_print ("sci0: [FIXME] Default\n");

@@ -56,7 +56,7 @@ int KGWS_initialize(void)
     debug_print("KGWS_initialize:[TODO]\n");
 
     //#todo
-    //init_logon_manager();
+    init_logon_manager();
     
     return 0;
 }

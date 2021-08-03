@@ -1906,11 +1906,12 @@ fail:
 
 int gws_show_window_rect (struct gws_window_d *window)
 {
-    struct gws_window_d  *p;
+    //struct gws_window_d  *p;
 
-
+    debug_print("gws_show_window_rect:\n");
+    
     if ( (void *) window == NULL ){
-        debug_print ("gws_show_window_rect: window\n");
+        debug_print ("gws_show_window_rect: [FAIL] window\n");
         return (int) -1;
     }else{
         if ( window->used == TRUE || window->magic == 1234 )
@@ -1939,8 +1940,12 @@ int gws_show_window_rect (struct gws_window_d *window)
 
             
             //p = window->parent;
+
             
             // See: rect.c   
+
+            debug_print("gws_show_window_rect: Calling gws_refresh_rectangle\n");
+
             gws_refresh_rectangle ( 
                 window->left, window->top, 
                 window->width, window->height ); 
@@ -1948,13 +1953,19 @@ int gws_show_window_rect (struct gws_window_d *window)
             
             // Com isso o compositor não vai redesenhar
             // até que alguém invalide ela.
+
+            debug_print("gws_show_window_rect: Calling validate_window\n");
+            
             validate_window(window);
 
+            debug_print("gws_show_window_rect: done\n");
+            
             return 0;
         }
     };
 
     // fail.
+    debug_print("gws_show_window_rect: fail\n");
     return (int) -1;
 }
 

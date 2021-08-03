@@ -455,9 +455,15 @@ gws_refresh_rectangle (
     int bytes_count=0;
 
 
+
+    debug_print("gws_refresh_rectangle:\n");
+
+
     // Device info.
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
     //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+
+
 
 
 //

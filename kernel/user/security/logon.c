@@ -13,8 +13,8 @@ int init_logon_manager (void)
 
     debug_print("init_logon_manager: [TODO FIXME]\n");
 
-    printf ("init_logon_manager: Initialize version support \n");
-    systemSetupVersion();
+    //printf ("init_logon_manager: Initialize version support \n");
+    //systemSetupVersion();
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
 
@@ -42,7 +42,7 @@ int init_logon_manager (void)
 
 
     // See: userenv.c
-    //User_initialize();
+    User_initialize();
 
 
     // See: ws.h

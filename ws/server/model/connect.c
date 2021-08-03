@@ -50,6 +50,11 @@ int register_ws (void){
     __ws_desktop = (void *) gramado_system_call (519,0,0,0);
     if ( (void *) __ws_desktop == NULL ){
         gwssrv_debug_print ("register_ws: [FAIL] __ws_desktop fail\n");
+        
+        // #debug
+        printf ("register_ws: [FAIL] __ws_desktop fail\n");
+        exit(1);
+        
         return (int) (-1);
     }
 
@@ -61,7 +66,13 @@ int register_ws (void){
     // Get the PID of the server.
     __ws_pid = (int) getpid();
     if ( __ws_pid < 0 ){
+        
         gwssrv_debug_print ("register_ws: [FAIL] __ws_pid fail \n");
+
+        // #debug
+        printf ("register_ws: [FAIL] __ws_pid fail \n");
+        exit(1);
+
         return (int) (-1);
     }
 

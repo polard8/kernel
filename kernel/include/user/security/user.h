@@ -305,6 +305,9 @@ int __getusername (char *buffer);
 int __setusername ( const char *new_username );
 void *CreateUser ( char *name, int type );
 
+int User_initialize(void);
+
+
 #endif    
 
 

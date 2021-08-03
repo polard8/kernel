@@ -1084,9 +1084,17 @@ void create_background (void)
 
     //__root_window->dirty = 1;
 
-    if (current_mode == GRAMADO_JAIL){
-        refresh_screen();
+
+    // See: 
+    // gws.c
+
+    if (current_mode == GRAMADO_JAIL)
+    {
+        gwssrv_debug_print ("gwssrv: create_background: Calling refresh_screen\n");
+        //refresh_screen();
     }
+
+    gwssrv_debug_print ("gwssrv: create_background: done\n");
 
     //#debug
     //while(1){}
@@ -1111,11 +1119,16 @@ int initGraphics (void){
 
     debug_print("initGraphics\n");
 
+
+    //printf("initGraphics: \n");
+
     // Initialize the window server infrastructure.
     // The current display and the current screen.
     // See: model/gws.c
 
     // It will create the root window.
+
+    //printf("initGraphics: [1] gwsInit() \n");
 
     __init_status = gwsInit();
 
@@ -1146,11 +1159,22 @@ int initGraphics (void){
 
     // Create background.
 
+    //printf("initGraphics: [2] create_background() \n");
+
     // #bugbug
     // This is creating the root window again.
 
     create_background();
 
+
+
+//
+// BMP
+//
+
+    // Suspended for now!
+
+    /*
     // Testing bmp.
     // See:
     if (current_mode == GRAMADO_JAIL){
@@ -1165,6 +1189,7 @@ int initGraphics (void){
         //gwssrv_display_system_icon ( 3, 200, 200 );
         //gwssrv_display_system_icon ( 4,   600, 600 );
     };
+    */
 
     //#debug breakpoint
     //while(1){}
@@ -1192,10 +1217,20 @@ int initGraphics (void){
     // Now we can use 3d routines.
     // See: grprim.c
     
+    gwssrv_debug_print ("initGraphics: Calling grInit() \n");
+    //printf ("initGraphics: Calling grInit() \n");
+    
     grInit();
 
+
+    // #debug
+    gwssrv_debug_print ("initGraphics: :)\n");
+    //printf ("initGraphics: :)\n");
+    
+    //asm("int $3");
     //while(1){}
-     
+
+
     //
     // == demos ==================================
     //
@@ -1205,6 +1240,7 @@ int initGraphics (void){
     // Seleciona a animaçao.
     // Nao deve travar, deve ter timeout.
 
+    /*
     if (current_mode == GRAMADO_JAIL)
     {
          //demos_startup_animation(1);   //ok
@@ -1220,6 +1256,11 @@ int initGraphics (void){
          //while(1){}
          // ...
     }
+    */
+
+
+    // #debug
+    //asm("int $3");
 
     //
     // == tests =================================================
@@ -1565,7 +1606,18 @@ int initGraphics (void){
     // Refresh
     //
 
+    // #debug
+    asm("int $3");
+
+// #bugbug
+// Fail!!!
+// See: gws.c
+
     gws_show_backbuffer();
+
+
+    // #debug
+    //asm("int $3");
 
     // while(1){}
 
@@ -1587,6 +1639,7 @@ int initGraphics (void){
     //while(1){}
 
     debug_print("gwssrv: InitGraphics done\n");
+    
     //printf     ("gwssrv: InitGraphics done *hang\n");
     //while(1){}
  
@@ -2301,7 +2354,7 @@ int main (int argc, char **argv)
         //
 
         // #debug
-        printf ("gwssrv: Creating socket\n");
+        //printf ("gwssrv: [1] socket()\n");
 
         server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
 
@@ -2325,7 +2378,8 @@ int main (int argc, char **argv)
         //
 
         // #debug
-        printf ("gwssrv: bind\n");
+        //printf ("gwssrv: [2] bind()\n");
+
 
         bind_status = bind (
                           server_fd, 
@@ -2343,12 +2397,18 @@ int main (int argc, char **argv)
         // is able to have in the list.
         // 5 clients in the list.
 
+        // #debug
+        //printf ("gwssrv: [3] listen()\n");
+
         listen(server_fd,5);
 
         // Draw !!!
         // Init gws infrastructure.
         // Initialize the 3d graphics support.
         // Let's create the traditional green background.
+
+        // #debug
+        printf ("gwssrv: Init graphics\n");
  
         initGraphics();
         window_server->graphics_initialization_status = TRUE;

@@ -256,17 +256,27 @@ void gws_show_backbuffer(void)
     // Create this flag. 
     // if (!paint_ready) return;
 
-    //if ( (void*) gui == NULL ){}
+    if ( (void*) gui == NULL )
+    {
+        debug_print("gws_show_backbuffer: [PANIC] gui fail\n");
+        return;
+    }
 
 
     if ( (void *) gui->screen_window == NULL )
     {
-        debug_print("gws_show_backbuffer: [PANIC] screen window fail\n");
+        debug_print("gws_show_backbuffer: [PANIC] gui->screen_window\n");
         return;
     }
-    
-    //See: window.c
+
+
+    //See: wm.c
+
+    debug_print("gws_show_backbuffer: Calling gws_show_window_rect\n");
+
     gws_show_window_rect (gui->screen_window);
+
+    debug_print("gws_show_backbuffer: done\n");
 }
 
 

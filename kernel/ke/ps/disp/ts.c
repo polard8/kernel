@@ -617,7 +617,7 @@ void psTaskSwitch (void)
     }
 
 #ifdef SERIAL_DEBUG_VERBOSE
-    debug_print (".");
+    //debug_print (".");
     //debug_print ("ts ");
 #endif
 
