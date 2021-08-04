@@ -186,9 +186,9 @@ int gws(void)
     
     
     gws_debug_print ("-------------------------\n"); 
-    printf          ("-------------------------\n"); 
+    //printf          ("-------------------------\n"); 
     gws_debug_print ("gws.bin: Initializing ...\n");
-    printf          ("gws.bin: Initializing ...\n");
+    //printf          ("gws.bin: Initializing ...\n");
 
 
     //
@@ -196,7 +196,7 @@ int gws(void)
     // 
 
     // #debug
-    printf ("gws: Creating socket\n");
+    //printf ("gws: Creating socket\n");
 
     // Create a socket. 
     // AF_GRAMADO = 8000
@@ -217,13 +217,13 @@ int gws(void)
     // Tentando nos conectar ao endereço indicado na estrutura
     // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
 
-    printf ("gws: Trying to connect to the address 'ws' ...\n");      
+    //printf ("gws: Trying to connect to the address 'ws' ...\n");      
 
     while (TRUE){
         if ( connect (client_fd, (struct sockaddr *) &addr, addrlen ) < 0 )
         { 
             gws_debug_print ("gws: Connection Failed\n");
-            printf          ("gws: Connection Failed \n"); 
+            //printf          ("gws: Connection Failed \n"); 
             //exit(1);
         }else{ break; };
     };
@@ -377,6 +377,8 @@ int main ( int argc, char *argv[] )
     int client_fd = -1;
     int main_window = -1;
     
+
+    gws_debug_print ("gws.bin: Hello world \n");
 
     //================================
     

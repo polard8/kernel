@@ -476,33 +476,37 @@ void wm_process_windows (void)
     int background_status = -1;
 
 
+    // #debug
+    //invalidate();
+
+
     gwssrv_debug_print("wm_process_windows:\n");
 
 //
-// == Checl frame validation  ===========================
+// == Check frame validation  ===========================
 //
     
     // Se algo foi modificado no frame.
     __Dirty = isdirty();
     
     // Nothing to do.
+    // Ok, we can return or sleep.
+    // Mostrar o status se ele estiver habilitado.
+    // O problema é que isso conta como frame também aqueles
+    // que não foram modificados. 
+    // ok, por enquanto.
+    // Temos que marcar mesmo quando não ha commits.
+    // na verdade devemos contar o fps por janela. 
+
     if (__Dirty == FALSE)
     {
         gwssrv_debug_print("wm_process_windows: [Not dirty] Nothing to do\n");
-        
-        // Ok, we can return or sleep.
-        
-        // Mostrar o status se ele estiver habilitado.
-        // O problema é que isso conta como frame também aqueles
-        // que não foram modificados. 
-        // ok, por enquanto.
-        // Temos que marcar mesmo quando não ha commits.
-        // na verdade devemos contar o fps por janela. 
-        
+
         __update_fps();
-        
+
         return;
     }
+
 
 //===================================================================
 // ++  Start
@@ -519,8 +523,8 @@ void wm_process_windows (void)
     
     // The background is dirty.
     // Show the whole screen.
-    // #todo
-    // update fps
+    // #todo: update fps
+    // See:
 
     if (background_status == TRUE)
     {

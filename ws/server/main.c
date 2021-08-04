@@ -1303,8 +1303,8 @@ int initGraphics (void){
     }
 
 //#debug
-    gws_show_backbuffer();
-    while(1){}
+    //gws_show_backbuffer();
+    //while(1){}
 
 
 
@@ -1656,7 +1656,7 @@ int initGraphics (void){
     //
 
     // #debug
-    asm("int $3");
+    //asm("int $3");
 
 // #bugbug
 // Fail!!!
@@ -2462,6 +2462,20 @@ int main (int argc, char **argv)
         initGraphics();
         window_server->graphics_initialization_status = TRUE;
 
+
+
+//
+// #debug
+//
+
+        gws_show_backbuffer();
+        while(1){}
+
+
+//
+// Child
+//
+
         // Calling child.
         //printf ("gwssrv: Calling child \n"); 
 
@@ -2469,17 +2483,30 @@ int main (int argc, char **argv)
         if ( window_server->launch_first_client == TRUE )
         {
             // #todo: Get the status.
-            gwssrv_clone_and_execute ("gwm.bin");
+            //rtl_clone_and_execute("gws.bin");
+            //gwssrv_clone_and_execute ("gwm.bin");
             //gwssrv_clone_and_execute ("logon.bin");
         }
+        
 
+        rtl_clone_and_execute("gws.bin");
+        //rtl_clone_and_execute("gwm.bin");
+        
         // Wait
         // printf ("gwssrv: [FIXME] yield \n");
 
         // #bugbug: too much?
-        for (i=0; i<22; i++){
-            gwssrv_yield();
-        };
+        for (i=0; i<22; i++){  gwssrv_yield();  };
+
+
+
+//
+// #debug
+//
+
+        //gws_show_backbuffer();
+        //while(1){}
+
 
         //
         // =======================================

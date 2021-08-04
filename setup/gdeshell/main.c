@@ -6763,6 +6763,10 @@ after_flags:
 noArgs:
     printf ("gdeshell: noArgs \n");
 
+
+    // #debug
+    //asm ("int $3");
+
 //
 // With arguments
 //
@@ -6788,19 +6792,27 @@ _ok:
     // printf ("gdeshell: *breakpoint\n");
     // while (1){}
 
+// #debug
+     asm ("int $3");
 
-    //
-    // Main window
-    //
 
-    // Calling a helper function to create the main window.
-    // We need to manage the critical section. So this function
-    // needs to return NULL if it fails.
-    // See: shellui.c
+//
+// == Main window =================================
+//
+
+// Calling a helper function to create the main window.
+// We need to manage the critical section. So this function
+// needs to return NULL if it fails.
+// See: shellui.c
+
 
     // =================================
     //++
     gde_enter_critical_section();
+    
+    // #debug
+    //asm ("int $3");
+    
     // IN: status.
     hWindow = gdeshellCreateMainWindow();
     if ( (void *) hWindow == NULL ){
@@ -6809,7 +6821,12 @@ _ok:
         exit(1);
     }
     gde_register_window(hWindow);
-    
+
+
+    // #debug
+    //asm ("int $3");
+
+
 
     // a janela ativa tem que ser uma janela do tipo
     // overlapped.

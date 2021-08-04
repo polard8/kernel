@@ -311,13 +311,13 @@ void main(void)
 
 
     // fail!
-    //rtl_clone_and_execute("sm2.bin"); 
+    rtl_clone_and_execute("sm2.bin"); 
     //rtl_clone_and_execute("reboot.bin"); 
     //rtl_clone_and_execute("gdeshell.bin"); 
     
     // #todo
     // we need to work on the refresh screen support.
-    rtl_clone_and_execute("gwssrv.bin"); 
+    //rtl_clone_and_execute("gwssrv.bin"); 
 
 
 
