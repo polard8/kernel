@@ -248,6 +248,8 @@ void gwssrv_wait_message(void)
 void gws_show_backbuffer(void)
 {
 
+    debug_print("gws_show_backbuffer:\n");
+
     // #debug
     // [Deprecated] Using the kernel service.
     // gwssrv_show_backbuffer();
@@ -259,23 +261,32 @@ void gws_show_backbuffer(void)
     if ( (void*) gui == NULL )
     {
         debug_print("gws_show_backbuffer: [PANIC] gui fail\n");
-        return;
+        printf     ("gws_show_backbuffer: [PANIC] gui fail\n");
+        exit(1);
+        //return;
     }
 
+
+
+//
+// Show window rect.
+//
+
+    // See: wm.c
+
+    debug_print("gws_show_backbuffer: Calling gws_show_window_rect\n");
 
     if ( (void *) gui->screen_window == NULL )
     {
         debug_print("gws_show_backbuffer: [PANIC] gui->screen_window\n");
-        return;
+        printf     ("gws_show_backbuffer: [PANIC] gui->screen_window\n");
+        exit(1);
+        //return;
     }
 
+    gws_show_window_rect(gui->screen_window);
 
-    //See: wm.c
-
-    debug_print("gws_show_backbuffer: Calling gws_show_window_rect\n");
-
-    gws_show_window_rect (gui->screen_window);
-
+//done:
     debug_print("gws_show_backbuffer: done\n");
 }
 
@@ -308,7 +319,7 @@ int gwssrv_init_globals(void)
     current_mode = gwssrv_get_system_metrics(130);
     
     if (current_mode<0){
-        printf("gwssrv_init_globals: [PANIC] current_mode\n");
+        printf ("gwssrv_init_globals: [PANIC] current_mode\n");
         exit(1);
     }
 
@@ -418,6 +429,8 @@ int gwssrv_init_globals(void)
 
 int gwsInit(void)
 {
+
+    debug_print("gwsInit:\n");
 
     //paint_ready = FALSE;
 
@@ -585,14 +598,28 @@ int gwsInit(void)
 
     if ( (void*) tmpRootWindow == NULL)
     {
-        debug_print("gwsInit: [FAIL] Couldn't create root window\n");
-        printf     ("gwsInit: [FAIL] Couldn't create root window\n");
+        debug_print("gwsInit: tmpRootWindow\n");
+        printf     ("gwsInit: tmpRootWindow\n");
+        exit(1);
+    }
+
+    if ( tmpRootWindow->used != TRUE || tmpRootWindow->magic != 1234 )
+    {
+        debug_print("gwsInit: tmpRootWindow validation\n");
+        printf     ("gwsInit: tmpRootWindow validation\n");
         exit(1);
     }
 
 
+    //#debug
+    //debug_print(" $ \n");
+    //asm("int $3");
+
+
+// ==============
+
     // #bugbug
-    // Its is not a screen. It is only a window.
+    // Its is not a screen object. It is only a window object.
     // It is the main window of the gui structure.
     // The 'screen' window is the device screen and the
     // main window is the desktop window.
@@ -616,9 +643,9 @@ int gwsInit(void)
 
 
 
-    //
-    // Refresh
-    //
+//
+// == Refresh =========================================
+//
     
     // #todo
     // Configurar a estrutura de cliente.
@@ -626,14 +653,24 @@ int gwsInit(void)
     
     // #kgws.
     // Isso usa o kernel.
-    // #todo: Acho que nessa hora ja temos uma rotina própria válida.
+    // #todo: 
+    // Acho que nessa hora ja temos uma rotina própria válida.
 
     //paint_ready = TRUE;
     
+    // See:
+    // This document.
+ 
     gwssrv_show_backbuffer();
     
     // Validate the frame.
     validate();
+
+
+    debug_print("gwsInit: done. :)\n");
+
+    //asm ("int $3");
+    //while(1){}
     
     return 0;
 }

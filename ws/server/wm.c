@@ -1909,13 +1909,24 @@ int gws_show_window_rect (struct gws_window_d *window)
     //struct gws_window_d  *p;
 
     debug_print("gws_show_window_rect:\n");
-    
-    if ( (void *) window == NULL ){
+
+
+    if ( (void *) window == NULL )
+    {
         debug_print ("gws_show_window_rect: [FAIL] window\n");
-        return (int) -1;
-    }else{
-        if ( window->used == TRUE || window->magic == 1234 )
-        {
+        printf      ("gws_show_window_rect: [FAIL] window\n");
+        exit(1);
+        //return (int) -1;
+    }
+
+
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
+        debug_print ("gws_show_window_rect: window validation\n");
+        printf      ("gws_show_window_rect: window validation\n");
+        exit(1);
+        //return (int) -1;
+    }
 
 			//#shadow 
 			// ?? E se a janela tiver uma sombra, 
@@ -1938,32 +1949,41 @@ int gws_show_window_rect (struct gws_window_d *window)
 			//}
 
 
-            
-            //p = window->parent;
+    //p = window->parent;
 
-            
-            // See: rect.c   
 
-            debug_print("gws_show_window_rect: Calling gws_refresh_rectangle\n");
 
-            gws_refresh_rectangle ( 
-                window->left, window->top, 
-                window->width, window->height ); 
-            
-            
-            // Com isso o compositor não vai redesenhar
-            // até que alguém invalide ela.
 
-            debug_print("gws_show_window_rect: Calling validate_window\n");
-            
-            validate_window(window);
+//
+// Refresh rectangle
+//
 
-            debug_print("gws_show_window_rect: done\n");
-            
-            return 0;
-        }
-    };
+    // See: rect.c   
+    debug_print("gws_show_window_rect: Calling gws_refresh_rectangle\n");
 
+    gws_refresh_rectangle ( 
+        window->left, 
+        window->top, 
+        window->width, 
+        window->height ); 
+            
+
+//
+// Validate window
+//
+  
+    // Com isso o compositor não vai redesenhar
+    // até que alguém invalide ela.
+
+    debug_print("gws_show_window_rect: Calling validate_window\n");
+
+    validate_window(window);
+
+
+//done:
+    debug_print("gws_show_window_rect: done\n");
+    return 0;
+fail:
     // fail.
     debug_print("gws_show_window_rect: fail\n");
     return (int) -1;

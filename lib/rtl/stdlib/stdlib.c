@@ -180,11 +180,11 @@ unsigned long heapAllocateMemory (unsigned long size){
 
     struct mmblock_d *Current;
 
-    debug_print ("heapAllocateMemory:\n");
+    //debug_print ("heapAllocateMemory:\n");
 
 
 
-    debug_print ("heapAllocateMemory: [1]\n");
+    //debug_print ("heapAllocateMemory: [1]\n");
 	// Se não há heap disponível, não há muito o que fazer.
 
 	// Available heap.
@@ -206,7 +206,7 @@ unsigned long heapAllocateMemory (unsigned long size){
     }
 
 
-    debug_print ("heapAllocateMemory: [2]\n");
+    //debug_print ("heapAllocateMemory: [2]\n");
 
     // Size limits. (Min, max).
 
@@ -219,7 +219,7 @@ unsigned long heapAllocateMemory (unsigned long size){
         return (unsigned long) g_heap_pointer;
     }
 
-    debug_print ("heapAllocateMemory: [3]\n");
+    //debug_print ("heapAllocateMemory: [3]\n");
 
 	//Se o tamanho desejado é maior ou igual ao espaço disponível.
     if ( size >= g_available_heap )
@@ -242,7 +242,7 @@ unsigned long heapAllocateMemory (unsigned long size){
 
 // Contador de blocos.
 
-    debug_print ("heapAllocateMemory: [4] loop\n");
+    //debug_print ("heapAllocateMemory: [4] loop\n");
 
 try_again:
 
@@ -280,7 +280,7 @@ try_again:
 	// Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
 	// devemos usar o último válido que provavelmente está nos limites.
 
-    debug_print ("heapAllocateMemory: [5]\n");
+    //debug_print ("heapAllocateMemory: [5]\n");
 
     if ( g_heap_pointer < HEAP_START || g_heap_pointer >= HEAP_END )
     {
@@ -319,7 +319,7 @@ try_again:
 	// Obs: A estutura deverá ficar lá no espaço reservado para o header. 
 	// (antes da area alocada).
 
-    debug_print ("heapAllocateMemory: [6]\n");
+    //debug_print ("heapAllocateMemory: [6]\n");
 
     //O endereço do ponteiro da estrutura será o pointer do heap.
     
@@ -327,7 +327,7 @@ try_again:
 
     if ( (void *) Current != NULL )
     {
-        debug_print ("heapAllocateMemory: [OK] Current != NULL\n");
+        //debug_print ("heapAllocateMemory: [OK] Current != NULL\n");
 
 
         // Endereço onde começa o header.
@@ -403,7 +403,7 @@ try_again:
 	
 	    g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);		
 
-        debug_print ("heapAllocateMemory: done\n");
+        //debug_print ("heapAllocateMemory: done\n");
 
         // Retorna o ponteiro para o início da área alocada.
         // Obs: Esse é o valor que será usado pela função malloc.

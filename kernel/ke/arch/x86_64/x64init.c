@@ -892,8 +892,13 @@ int I_x64main (void)
 // suficientes para essa rotina funcionar.
 
     PROGRESS("Kernel:1:11\n"); 
+
     //bg_load_image ();
-    //windowLoadGramadoIcons();
+
+    // See: kgwm.c
+    windowLoadGramadoIcons();
+
+
 
 // ================================
 // Font support.

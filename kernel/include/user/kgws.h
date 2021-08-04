@@ -13,6 +13,11 @@
 
 int init_gramado (void);
 
+
+int windowLoadGramadoIcons (void);
+void *ui_get_system_icon ( int n );
+
+
 // ==
 
 int KGWS_initialize(void);

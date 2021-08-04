@@ -125,8 +125,10 @@ int grInit (void)
 
     gwssrv_debug_print ("grInit:\n");
 
-    if ( deviceWidth == 0 || deviceHeight == 0 ){
-        printf ("grInit: [FAIL] w h\n");
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        gwssrv_debug_print ("grInit: [FAIL] w h\n");
+        printf             ("grInit: [FAIL] w h\n");
         exit(1);
     }
 

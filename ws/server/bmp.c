@@ -482,7 +482,7 @@ bmpDisplayBMP (
 
     int i, j, base, offset;
 
-    unsigned long left, top, bottom;
+    unsigned int left, top, bottom;
 
 
     // Zoom support.
@@ -495,18 +495,18 @@ bmpDisplayBMP (
     int ihZoom=0;
 
 
-    unsigned long X=0;
-    unsigned long Y=0;
-    unsigned long Width=0;
-    unsigned long Height=0;
+    unsigned int X=0;
+    unsigned int Y=0;
+    unsigned int Width=0;
+    unsigned int Height=0;
     
-    unsigned long xLimit=0;
-    unsigned long yLimit=0;
+    unsigned int xLimit=0;
+    unsigned int yLimit=0;
 
     unsigned short sig=0;
 
-    unsigned long color=0;
-    unsigned long color2=0;
+    unsigned int color=0;
+    unsigned int color2=0;
     unsigned long pal_address=0;
 
 
@@ -514,7 +514,7 @@ bmpDisplayBMP (
     unsigned char *c  = (unsigned char *) &color;
     unsigned char *c2 = (unsigned char *) &color2;
 
-    unsigned long *palette       = (unsigned long *) (address + 0x36);
+    unsigned int *palette        = (unsigned int *) (address + 0x36);
     unsigned char *palette_index = (unsigned char *) &pal_address;
 
 
@@ -651,12 +651,14 @@ bmpDisplayBMP (
 
     // 0 = No compression.
 
+    /*
     if ( bi->bmpCompression != 0 ){
         gwssrv_debug_print ("bmpDisplayBMP: bmpCompression fail \n");
         printf             ("bmpDisplayBMP: bmpCompression fail \n");
         goto fail;
     }
-
+    */
+    
 
     //
     // Draw
@@ -757,7 +759,7 @@ bmpDisplayBMP (
                 if ( nibble_count_16colors == 2222 )
                 {
                     palette_index[0] = ( palette_index[0] & 0x0F);  
-                    color = (unsigned long) palette[  palette_index[0]  ];
+                    color = (unsigned int) palette[  palette_index[0]  ];
 
                     nibble_count_16colors = 0;
                     base = base + 1;
@@ -766,7 +768,7 @@ bmpDisplayBMP (
                 }else{
 
                     palette_index[0] =  ( (  palette_index[0] >> 4 ) & 0x0F);
-                    color = (unsigned long) palette[  palette_index[0] ];
+                    color = (unsigned int) palette[  palette_index[0] ];
 
                     nibble_count_16colors = 2222;
                     //base = base + 0;
@@ -778,7 +780,7 @@ bmpDisplayBMP (
             if ( bi->bmpBitCount == 8 )
             {   
                 offset = base;
-                color = (unsigned long) palette[  bmp[offset] ];
+                color = (unsigned int) palette[  bmp[offset] ];
 
                 base = base + 1; 
             }
@@ -867,7 +869,7 @@ bmpDisplayBMP (
 
                         if (useZoom==FALSE){
                             pixelBackBufferPutpixel ( //original, funciona.
-                                (unsigned long) color, 
+                                (unsigned int) color, 
                                 (unsigned long) left, 
                                 (unsigned long) bottom);
                         }
@@ -881,7 +883,7 @@ bmpDisplayBMP (
                             for (iwZoom=0; iwZoom < (ZoomFactor+1); iwZoom++){ 
 
                             pixelBackBufferPutpixel ( 
-                                (unsigned long) color, 
+                                (unsigned int) color, 
                                 (unsigned long) left   + (j * ZoomFactor) + iwZoom, 
                                 (unsigned long) bottom - (i * ZoomFactor) + ihZoom );
                             
@@ -902,7 +904,7 @@ bmpDisplayBMP (
                     if ( color == bmp_selected_color )
                     {
                         pixelBackBufferPutpixel ( 
-                            (unsigned long) bmp_substitute_color, 
+                            (unsigned int) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom );
 
@@ -919,7 +921,7 @@ bmpDisplayBMP (
                     }else{
 
                         pixelBackBufferPutpixel ( 
-                            (unsigned long) bmp_substitute_color, 
+                            (unsigned int) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom );
 
@@ -945,7 +947,7 @@ bmpDisplayBMP (
                 default:
 
                     pixelBackBufferPutpixel( 
-                        (unsigned long) bmp_substitute_color, 
+                        (unsigned int) bmp_substitute_color, 
                         (unsigned long) left, 
                         (unsigned long) bottom );
 

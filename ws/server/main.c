@@ -1066,21 +1066,43 @@ void create_background (void)
                                             gui->screen_window, 0, 
                                             COLOR_BACKGROUND, COLOR_BACKGROUND );    
 
+
+    // #debug
+    // asm ("int $3");
+
     if ( (void *) __root_window == NULL )
     {
-        gwssrv_debug_print ("gwssrv: __root_window fail\n"); 
-        printf             ("gwssrv: __root_window fail\n");
-        exit (1);
-        return;
+        gwssrv_debug_print ("create_background: __root_window\n"); 
+        printf             ("create_background: __root_window\n");
+        exit(1);
+        //return;
     }
+
+    /*
+    // #debug
+    if ( __root_window->used != TRUE || __root_window->magic != 1234 )
+    {
+        gwssrv_debug_print ("create_background: __root_window validation\n"); 
+        printf             ("create_background: __root_window validation\n");
+        exit(1);
+        //return;
+    }
+    */
+
 
     // Register.
     WindowId = gwsRegisterWindow (__root_window);
 
-    if (WindowId<0){
+    if (WindowId<0)
+    {
         gwssrv_debug_print ("create_background: Couldn't register window\n");
+        printf             ("create_background: Couldn't register window\n");
+        exit(1);
         //return;
     }
+
+    //#debug
+    //asm ("int $3");
 
     //__root_window->dirty = 1;
 
@@ -1126,7 +1148,9 @@ int initGraphics (void){
     // The current display and the current screen.
     // See: gws.c
 
-    // It will create the root window.
+//
+// It will create the root window.
+//
 
     //printf("initGraphics: [1] gwsInit() \n");
 
@@ -1145,16 +1169,27 @@ int initGraphics (void){
         exit(1);
     }
 
+    //while(1){}
+
     // #debug
     // Se o background a seguir falhar, entao veremos
     // pelo menos essa mensagem.
-
+    
+    // #bugbug #todo: 
+    // Isso só mostrou em GRAMADO_JAIL
+  
     if ( (void*) gui->screen_window != NULL )
     {
         dtextDrawText ( 
             (struct gws_window_d *) gui->screen_window,
             8, 8, COLOR_RED, "Initializing graphics" );
+    
+        gws_show_backbuffer();
     }
+
+// #debug
+
+    //while(1){}
 
 
     // Create background.
@@ -1166,6 +1201,9 @@ int initGraphics (void){
 
     create_background();
 
+//#debug
+    //gws_show_backbuffer();
+    //while(1){}
 
 
 //
@@ -1174,22 +1212,22 @@ int initGraphics (void){
 
     // Suspended for now!
 
-    /*
+    
     // Testing bmp.
     // See:
     if (current_mode == GRAMADO_JAIL){
         gwssrv_display_system_icon ( 1, 8, 100 );
         gwssrv_display_system_icon ( 2, 8, 120 );
-        //gwssrv_display_system_icon ( 3, 8, 140 );
-        //gwssrv_display_system_icon ( 4, 8, 160 );
+        gwssrv_display_system_icon ( 3, 8, 140 );
+        gwssrv_display_system_icon ( 4, 8, 160 );
         // ...
     }else{
-        gwssrv_display_system_icon ( 1,   200, 200 );
-        //gwssrv_display_system_icon ( 2,   400, 400 );
-        //gwssrv_display_system_icon ( 3, 200, 200 );
-        //gwssrv_display_system_icon ( 4,   600, 600 );
+        gwssrv_display_system_icon ( 1, 100, 100 );
+        gwssrv_display_system_icon ( 2, 200, 200 );
+        gwssrv_display_system_icon ( 3, 300, 300 );
+        gwssrv_display_system_icon ( 4, 400, 400 );
     };
-    */
+
 
     //#debug breakpoint
     //while(1){}
@@ -1211,6 +1249,9 @@ int initGraphics (void){
     }
 
 
+//#debug
+    //gws_show_backbuffer();
+    //while(1){}
 
 
     // Initialize the graphics support.
@@ -1223,24 +1264,28 @@ int initGraphics (void){
     grInit();
 
 
+//#debug
+    //gws_show_backbuffer();
+    //while(1){}
+
+
     // #debug
-    gwssrv_debug_print ("initGraphics: :)\n");
+    //gwssrv_debug_print ("initGraphics: :)\n");
     //printf ("initGraphics: :)\n");
-    
     //asm("int $3");
     //while(1){}
 
 
-    //
-    // == demos ==================================
-    //
- 
-    // Always run some demo if we are in JAIL mode.
-    // It's an animation in the initialization.
-    // Seleciona a animaçao.
-    // Nao deve travar, deve ter timeout.
+//
+// == demos ==================================
+//
 
-    /*
+// Always run some demo if we are in JAIL mode.
+// It's an animation in the initialization.
+// Seleciona a animaçao.
+// Nao deve travar, deve ter timeout.
+
+
     if (current_mode == GRAMADO_JAIL)
     {
          //demos_startup_animation(1);   //ok
@@ -1252,11 +1297,15 @@ int initGraphics (void){
          //demos_startup_animation(7);   //ok
          //demos_startup_animation(8);   //ok
          demos_startup_animation(9);     //ok
-         gwssrv_show_backbuffer();
+         //gwssrv_show_backbuffer();
          //while(1){}
          // ...
     }
-    */
+
+//#debug
+    gws_show_backbuffer();
+    while(1){}
+
 
 
     // #debug

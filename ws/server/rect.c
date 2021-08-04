@@ -328,8 +328,10 @@ void *rect_memcpy32 (
     unsigned long c )
 {
 
-    long *src = (long *) v_src;
-    long *dst = (long *) v_dst;
+    // Copiaremos 32bit por vez.
+
+    unsigned int *src = (unsigned int *) v_src;
+    unsigned int *dst = (unsigned int *) v_dst;
 
     register unsigned long Copy = c;
 
@@ -456,12 +458,12 @@ gws_refresh_rectangle (
 
 
 
-    debug_print("gws_refresh_rectangle:\n");
+    debug_print("gws_refresh_rectangle: :)\n");
 
 
     // Device info.
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
-    //unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+    unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
 
 
@@ -472,32 +474,75 @@ gws_refresh_rectangle (
 
     if ( RefreshRectangleUsingKGWS == TRUE )
     {
+        debug_print("gws_refresh_rectangle: Using R0\n");
         xxx_gws_refresh_rectangle(x,y,width,height);
         return;
     }
 
+//
+// Refresh in ring 3
+//
 
-    if ( ScreenWidth == 0 ){
-        printf ("gws_refresh_rectangle: [ERROR] ScreenWidth\n");  
+    debug_print("gws_refresh_rectangle: Using R3\n");
+
+    if ( ScreenWidth == 0 )
+    {
+        debug_print("gws_refresh_rectangle: [ERROR] ScreenWidth\n");
+        printf     ("gws_refresh_rectangle: [ERROR] ScreenWidth\n");  
+        exit(1);
+    }
+
+    if ( ScreenHeight == 0 )
+    {
+        debug_print("gws_refresh_rectangle: [ERROR] ScreenHeight\n");
+        printf     ("gws_refresh_rectangle: [ERROR] ScreenHeight\n");  
         exit(1);
     }
 
     line_size = (unsigned int) width; 
     lines     = (unsigned int) height;
 
+// #test
+// Não podemos fazer refresh fora da tela.
+// Não por enquanto. 
+// precisamos conhecer melhor nossos limites.
+
+    if ( y > ScreenHeight )
+    {
+        debug_print("gws_refresh_rectangle: [ERROR]  y > ScreenHeight\n");
+        printf     ("gws_refresh_rectangle: [ERROR]  y > ScreenHeight\n");  
+        exit(1);
+    }
+
+    if ( lines > (ScreenHeight-y) )
+    {
+        debug_print("gws_refresh_rectangle: [ERROR] lines\n");
+        printf     ("gws_refresh_rectangle: [ERROR] lines\n");  
+        exit(1);
+    }
+
+
     switch (SavedBPP){
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
         // ... #todo
         default:
-            printf ("gws_refresh_rectangle: [ERROR] SavedBPP\n");  
+            debug_print ("gws_refresh_rectangle: [ERROR] SavedBPP\n");  
+            printf      ("gws_refresh_rectangle: [ERROR] SavedBPP\n");  
             exit(1);
             break;
     };
 
+//
+// pitch - (largura da tela em bytes)
+//
 
     // screen line size in pixels * bytes per pixel.
     pitch = (unsigned int) (bytes_count * ScreenWidth);
+
+//
+// rectangle_pitch - (largura do retângulo em bytes)
+//
 
     // rectangle line size in pixels * bytes per pixel.
     rectangle_pitch = (unsigned int) (bytes_count * line_size);
@@ -690,6 +735,9 @@ rectBackbufferDrawRectangle (
     // Draw lines on backbuffer.
     if ( DrawRectangleUsingKGWS == TRUE )
     {
+
+         debug_print("rectBackbufferDrawRectangle: Using R0\n");
+ 
          xxx_gws_draw_rectangle (
              rect.left,
              rect.top,
@@ -704,6 +752,8 @@ rectBackbufferDrawRectangle (
 //
 // Drawing in ring3.
 //
+
+    debug_print("rectBackbufferDrawRectangle: Using R3\n");
 
     // Draw lines on backbuffer.
     while (rect.height--){

@@ -8,7 +8,7 @@
 
 int 
 pixelBackBufferPutpixel2 ( 
-    unsigned long color, 
+    unsigned int color, 
     int x, 
     int y );
 
@@ -16,7 +16,7 @@ pixelBackBufferPutpixel2 (
 //ACESSANDO O BACKBUFFER DIRETAMENTE
 int 
 pixelBackBufferPutpixel ( 
-    unsigned long color, 
+    unsigned int color, 
     int x, 
     int y );
     

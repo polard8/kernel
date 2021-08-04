@@ -620,6 +620,7 @@ void *xxxCreateWindow (
 
 
     // Validating the structure.
+    // #todo: Mover isso par ao fim da função.
 
     window->used  = TRUE;
     window->magic = 1234;
@@ -655,7 +656,7 @@ void *xxxCreateWindow (
 
     // #test
     if ( (void*) pWindow == NULL ){
-        debug_print ("xxxCreateWindow: [ERROR] Invalid parent window\n");
+        debug_print ("xxxCreateWindow: [CHECK THIS] Invalid parent window\n");
     }
 
     Parent = (void *) pWindow;
@@ -1423,7 +1424,6 @@ void *xxxCreateWindow (
         if ( (void*) Parent == NULL )
         { 
             gwssrv_debug_print ("xxxCreateWindow: [Background] Parent\n"); 
-
             rectBackbufferDrawRectangle ( 
                     window->left, window->top, 
                     window->width, window->height, 
@@ -1432,6 +1432,7 @@ void *xxxCreateWindow (
 
         if ( (void*) Parent != NULL )
         {
+            gwssrv_debug_print ("xxxCreateWindow: [Background] No Parent\n"); 
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, 
                 window->width, window->height, 
@@ -1439,7 +1440,8 @@ void *xxxCreateWindow (
         }
     }
 
-
+    //#debug
+    //asm ("int $3");
 
 //
 // == Button ====================
@@ -1610,6 +1612,10 @@ void *xxxCreateWindow (
 
 //done:
 
+    // #todo
+    //window->used  = TRUE;
+    //window->magic = 1234;
+
     return (void *) window;
 }
 
@@ -1700,6 +1706,10 @@ void *createwCreateWindow (
     //if ( (void*) windowname == NULL ){}
     //if ( *windowname == 0 ){}
 
+
+// ============================
+// Types with frame.
+
     // Overlapped
     if ( type == WT_OVERLAPPED )
     {
@@ -1777,7 +1787,9 @@ void *createwCreateWindow (
     }
 
 
-    // Types with no frame!
+// ============================
+// Types with no frame!
+
     if ( type == WT_SIMPLE )
     {
         __w = (void *) xxxCreateWindow ( 
@@ -1796,18 +1808,20 @@ void *createwCreateWindow (
         return (void *) __w;
     }
 
+//type_fail:
+
     gwssrv_debug_print ("createwCreateWindow: [FAIL] type \n");
     return NULL;
     
     
-    //
-    // == Draw frame ===============================
-    //
-    
-    // #todo:
-    // Lembrando que frame é coisa do wm.
-    // Porém tem algumas coisas que o window server faz,
-    // como as bordas de um editbox.
+//
+// == Draw frame ===============================
+//
+
+// #todo:
+// Lembrando que frame é coisa do wm.
+// Porém tem algumas coisas que o window server faz,
+// como as bordas de um editbox.
 
 draw_frame:
 
@@ -1921,13 +1935,16 @@ struct gws_window_d *createwCreateRootWindow(void)
     unsigned long width  = __device_width;
     unsigned long height = __device_height;
 
+
+    debug_print("createwCreateRootWindow:\n");
+
     // (root window)
     // #bugbug: EStamos usado device info sem checar.
     
     w = (struct gws_window_d *) createwCreateWindow ( 
                                     WT_SIMPLE,  1, 1, "RootWindow",  
                                     left, top, width, height,
-                                    NULL, 0, COLOR_BLACK, COLOR_BLACK );
+                                    NULL, 0, COLOR_PINK, COLOR_PINK );
     if ( (void*) w == NULL)
     {
         debug_print("createwCreateRootWindow: [FAIL] w\n");
@@ -1950,6 +1967,8 @@ struct gws_window_d *createwCreateRootWindow(void)
     // Root window
     gwsDefineInitialRootWindow (w);
 
+
+    debug_print("createwCreateRootWindow: done\n");
 
     return (struct gws_window_d *) w;
 }

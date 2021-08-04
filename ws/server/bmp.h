@@ -55,23 +55,23 @@ struct gws_bmp_header_d
     unsigned long  bmpSize;           /* Size of file */
     unsigned short bmpReserved1;      /* Reserved */
     unsigned short bmpReserved2;      /* ... */
-    unsigned long  bmpOffBits;        /* Offset to bitmap data */
+    unsigned int   bmpOffBits;        /* Offset to bitmap data */
 };
 
 //typedef struct bmp_infoheader_d bmp_infoheader_t;   
 struct gws_bmp_infoheader_d                     
 {
-    unsigned long  bmpSize;           /* Size of info header */
-    unsigned long  bmpWidth;          /* Width of image */
-    unsigned long  bmpHeight;         /* Height of image */
+    unsigned int  bmpSize;           /* Size of info header */
+    unsigned int  bmpWidth;          /* Width of image */
+    unsigned int  bmpHeight;         /* Height of image */
     unsigned short bmpPlanes;         /* Number of color planes */
     unsigned short bmpBitCount;       /* Number of bits per pixel */
-    unsigned long  bmpCompression;    /* Type of compression to use */
-    unsigned long  bmpSizeImage;      /* Size of image data */
-    unsigned long  bmpXPelsPerMeter;  /* X pixels per meter */
-    unsigned long  bmpYPelsPerMeter;  /* Y pixels per meter */
-    unsigned long  bmpClrUsed;        /* Number of colors used */
-    unsigned long  bmpClrImportant;   /* Number of important colors */
+    unsigned int  bmpCompression;    /* Type of compression to use */
+    unsigned int  bmpSizeImage;      /* Size of image data */
+    unsigned int  bmpXPelsPerMeter;  /* X pixels per meter */
+    unsigned int  bmpYPelsPerMeter;  /* Y pixels per meter */
+    unsigned int  bmpClrUsed;        /* Number of colors used */
+    unsigned int  bmpClrImportant;   /* Number of important colors */
 };
  
 

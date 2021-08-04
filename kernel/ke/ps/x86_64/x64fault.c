@@ -35,16 +35,20 @@ void faults ( unsigned long number )
         
         case 1: x_panic("faults() 1"); break;
         case 2: x_panic("faults() 2"); break;
-        
+
+
         case 3: 
-            printf ("== 3 ==\n");  
-            show_slots();
-            refresh_screen();
+            //printf ("== 3 ==\n");  
+            //show_slots();
+            //refresh_screen();
             // Esse tipo funciona mesmo antes do console
             // ter sido inicializado.
+            
             x_panic("faults() 3"); 
+            
             break;
-        
+
+
         
         case 4: x_panic("faults() 4"); break;
         case 5: x_panic("faults() 5"); break;

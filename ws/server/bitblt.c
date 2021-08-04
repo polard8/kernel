@@ -52,7 +52,7 @@ int servicepixelBackBufferPutpixel(void)
 // usando serviço do kernel
 int 
 pixelBackBufferPutpixel2 ( 
-    unsigned long color, 
+    unsigned int color, 
     int x, 
     int y )
 {
@@ -91,7 +91,7 @@ pixelBackBufferPutpixel2 (
 
 int 
 pixelBackBufferPutpixel ( 
-    unsigned long color, 
+    unsigned int color, 
     int x, 
     int y )
 {
@@ -117,8 +117,9 @@ pixelBackBufferPutpixel (
     // 4MB limit
     // #bubug: Não fazer multilicações
     //MaxOffset = (int) (1024*10124*4);
-    MaxOffset = (int) 0x00400000;
-
+    //MaxOffset = (int) 0x00400000;
+    MaxOffset = (int) 0x00200000;   // 2mb limit for 64bit full pagetable.
+    
     int width=0;
 
     char b, g, r, a;
