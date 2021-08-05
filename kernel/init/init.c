@@ -92,6 +92,10 @@ void preinit_Globals(int arch_type)
 
     system_state = SYSTEM_BOOTING;
 
+    // Initializing the global spinlock.
+
+    __spinlock_ipc = TRUE;
+
     // ...
 }
 
