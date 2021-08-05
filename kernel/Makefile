@@ -111,10 +111,14 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # We need classes: head | always | optional
 
 # head
-objects-y := head_64.o init.o sci.o archive_lib.o    
+objects-y := head_64.o init.o archive_lib.o    
 
 objects-y += archive_ke.o archive_mm.o archive_fs.o \
 archive_net.o archive_user.o    
+
+objects-y += sci.o    
+
+
 
 # test
 #objects-$(CONFIG_MAIN1) += archive_something.o   
