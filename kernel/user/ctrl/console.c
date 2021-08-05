@@ -284,37 +284,37 @@ console_interrupt(
     int Data         = data;
 
 
-    // #todo
-    // E se não tivermos uma foreground thread ?
-    // foreground representa a thred com 'foco de entrada'
-    // >> então, se não tivermos uma thread com foco de entrada,
-    // podemos mandar a mensagem para outra thread ?
+// #todo
+// E se não tivermos uma foreground thread ?
+// foreground representa a thred com 'foco de entrada'
+// >> então, se não tivermos uma thread com foco de entrada,
+// podemos mandar a mensagem para outra thread ?
 
-    // #todo: Check overflow
+// #todo: 
+// Check overflow
 
-    if ( TargetThread < 0 )
-    {
+// #todo
+// Maybe we can set the idle thread if it fail.
+
+    if ( TargetThread < 0 ){
         debug_print ("console_interrupt: [FAIL] TargetThread\n");
-        
-        // #todo
-        // Maybe we can set the idle thread if it fail.
-
         return;
     }
 
 
     switch (DeviceType){
 
+
         // keyboard
         // data =  raw byte.
         // See: vt/draw/model/kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
-            debug_print("console_interrupt: input from keyboard device\n");
-            
-            // #todo
-            // UserInput_SendKeyboardMessage (TargetThread, Data);
-            
+            debug_print("console_interrupt: input from keyboard device :)\n");
+
+            UserInput_SendKeyboardMessage(TargetThread,Data);
+
             break;
+
 
         // COM port
         case CONSOLE_DEVICE_SERIAL:

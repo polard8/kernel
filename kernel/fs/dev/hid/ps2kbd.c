@@ -1,5 +1,5 @@
 
-
+// ps2kbd.c
 
 #include <kernel.h>  
 
@@ -115,25 +115,24 @@ sc_again:
 //
     __raw = in8(0x60);
 
-    //===========================================
-    
+//===========================================
+
     // Get
-    
-    // strobe the keyboard to ack the char
+    // > Strobe the keyboard to ack the char
+    // > Send back
+    // Strobe the bit high
+    // and then strobe it low.
+
     val = in8(0x61); 
-    
-    // Send back
-    
-    // Strobe the bit high 
+ 
     out8(0x61, val | 0x80);  
-    
-    // now strobe it low
-    out8(0x61, val);         
-    //===========================================
+    out8(0x61, val);
+
+//===========================================
 
 
-
-    //===========================================
+//++
+// ===========================================
     // #todo
     // Temos que checar se o primeiro byte é um ack ou um resend.
     // isso acontece logo apos a inicialização.
@@ -141,7 +140,7 @@ sc_again:
     // #todo
     // me parece que o primeiro byte pode ser um ack ou resend.
     
-    // #define ACKNOWLEDGE         0xFA	
+    // #define ACKNOWLEDGE         0xFA
     // #define RESEND              0xFE
 
     if ( __raw == 0xFA ){
@@ -157,7 +156,8 @@ sc_again:
         printf ("DeviceInterface_PS2Keyboard: [test.first_byte] resend\n");
         refresh_screen();
     }
-    //===========================================
+// ===========================================
+//--
 
 
 
@@ -165,23 +165,21 @@ sc_again:
 // == Queue ====================================
 //
 
-     // #bugbug
-     // [Enter] in the numerical keyboard isn't working.
-     // teclas do teclado extendido.
-     // Nesse caso pegaremos dois sc da fila.
-    // #obs:
-    // O scancode é enviado para a rotina,
-    // mas ela precisa conferir ke0 antes de construir a mensagem,
-    // para assim usar o array certo.
-    // See: ws/ps2kbd.c
-    
-    // #bugbug
-    // Esse tratamento do scancode não faz sentido quando temos um
-    // window server instalado. Nesse caso deveríamos deixar o
-    // window server pegar os scancodes.
-    // Mas por enquanto, essa rotina manda mensagens para o ws
-    // caso tenha um instalado.
-
+// #bugbug
+// [Enter] in the numerical keyboard isn't working.
+// teclas do teclado extendido.
+// Nesse caso pegaremos dois sc da fila.
+// #obs:
+// O scancode é enviado para a rotina,
+// mas ela precisa conferir ke0 antes de construir a mensagem,
+// para assim usar o array certo.
+// See: ps2kbd.c
+// #bugbug
+// Esse tratamento do scancode não faz sentido quando temos um
+// window server instalado. Nesse caso deveríamos deixar o
+// window server pegar os scancodes.
+// Mas por enquanto, essa rotina manda mensagens para o ws
+// caso tenha um instalado.
 
      if ( __raw == 0 )   {                      goto done;  }
      if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done;  }
@@ -190,16 +188,16 @@ sc_again:
 
 // do_put:
 
-    // + Build the message and send it to the thread's queue.
-    // This routine will select the target thread.
-    // + Or send the message to the input TTY.
-    // This way the foreground process is able to get this data.
-    // See: ps2kbd.c
-    // See: user/console.c
+// + Build the message and send it to the thread's queue.
+// This routine will select the target thread.
+// + Or send the message to the input TTY.
+// This way the foreground process is able to get this data.
+// See: ps2kbd.c
+// See: user/console.c
 
-    // IN: 
-    // device type, data.
-    // 1=keyboard
+// IN: 
+// device type, data.
+// 1 = keyboard
 
     if ( foreground_thread < 0 ){
         debug_print ("DeviceInterface_PS2Keyboard: Invalid foreground_thread\n");
@@ -209,15 +207,17 @@ sc_again:
         goto done;
     }
 
+
     // #todo: Use this one.
-    //console_interrupt (
-    //    foreground_thread,
-    //    CONSOLE_DEVICE_KEYBOARD,
-    //    __raw );
+    console_interrupt (
+        foreground_thread,
+        CONSOLE_DEVICE_KEYBOARD,
+        __raw );
 
 
-    // ++
-    // ======================================================
+/*
+// ++
+// ======================================================
 
     // provisorio
     // Escape
@@ -377,13 +377,14 @@ sc_again:
         //refresh_screen();
     }
     
-    // ======================================================
-    // --
+// ======================================================
+// --
+*/
 
 
 
+// Clean the mess.
 
-    // Clean the mess.
     __has_e0_prefix = 0;
     __has_e1_prefix = 0;
 

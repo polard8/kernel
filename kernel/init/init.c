@@ -96,8 +96,19 @@ void preinit_Globals(int arch_type)
 
     __spinlock_ipc = TRUE;
 
+
+//
+// IO Control
+//
+
+    IOControl.useTTY = FALSE;        // Model not implemented yet.
+    IOControl.useEventQueue = TRUE;  // The current model.
+    IOControl.initialized = TRUE;    // IO system initialized.
+
     // ...
 }
+
+
 
 void preinit_Serial(void)
 {

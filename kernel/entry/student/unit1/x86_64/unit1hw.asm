@@ -242,7 +242,7 @@ _irq1:
     ;call _xxxxIRQ1_DEBUG_MESSAGE
    
     ;#test
-    ;; See: keyboard.c
+    ;; See: fs/dev/hid/keyboard.c
     call _irq1_KEYBOARD
 
     popfq
