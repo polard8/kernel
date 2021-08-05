@@ -240,6 +240,10 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == TRUE){
+                        Background_initialize();
+                        show_slots();
+                        //pages_calc_mem();
+                        refresh_screen();
                         //__kgwm_SendMessageToInitProcess(9217);  //gdeshell
                     }
                     return 0;
@@ -254,6 +258,7 @@ __kgwm_ps2kbd_procedure (
                         refresh_screen();
                     }
                     if (shift_status == TRUE){
+                       hal_reboot();
                        // #bugbug: Something is wrong with this routine.
                        //__kgwm_SendMessageToInitProcess(9218);  // redpill application
                     }

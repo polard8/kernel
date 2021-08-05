@@ -177,40 +177,55 @@ void I_x64CreateInitialProcess (void)
 
     InitThread = (void *) create_CreateRing3InitThread();
 
+// struct
     if ( (void *) InitThread == NULL ){
         panic ("I_x64CreateInitialProcess: InitThread\n");
-    }else{
+    }
 
-        // Herdando do processo configurado logo antes.
-        InitThread->pml4_VA  = InitProcess->pml4_VA;
-        InitThread->pml4_PA  = InitProcess->pml4_PA;
-        InitThread->pdpt0_VA = InitProcess->pdpt0_VA;
-        InitThread->pdpt0_PA = InitProcess->pdpt0_PA;
-        InitThread->pd0_VA   = InitProcess->pd0_VA;
-        InitThread->pd0_PA   = InitProcess->pd0_PA;
+// validation
+    if ( InitThread->used != TRUE || InitThread->magic != 1234 )
+    {
+        panic ("I_x64CreateInitialProcess: InitThread validation\n");
+    }
+
+// owner pid
+    if ( InitThread->ownerPID != GRAMADO_PID_INIT ){
+        panic ("I_x64CreateInitialProcess: Owner PID\n");
+    }
+
+//
+// Paging
+//
+
+    // Herdando do processo configurado logo antes.
+    InitThread->pml4_VA  = InitProcess->pml4_VA;
+    InitThread->pml4_PA  = InitProcess->pml4_PA;
+    InitThread->pdpt0_VA = InitProcess->pdpt0_VA;
+    InitThread->pdpt0_PA = InitProcess->pdpt0_PA;
+    InitThread->pd0_VA   = InitProcess->pd0_VA;
+    InitThread->pd0_PA   = InitProcess->pd0_PA;
 
 
-        InitThread->position = SPECIAL_GUEST;
+    InitThread->position = SPECIAL_GUEST;
 
-        //IdleThread->ownerPID = (int) InitProcess->pid;
+    //IdleThread->ownerPID = (int) InitProcess->pid;
 
-        // #todo #bugbug
-        //InitThread->tss = current_tss;
+    // #todo #bugbug
+    //InitThread->tss = current_tss;
+
+    // [Processing time]
+    current_process = InitProcess->pid;
+    current_thread  = InitThread->tid;
+
+    // [Focus]
+    active_process = current_process;
+    active_thread  = current_thread;
         
-        
-        // [Processing time]
-        current_process = InitProcess->pid;
-        current_thread  = InitThread->tid;
-        
-        // [Focus]
-        active_process = current_process;
-        active_thread  = current_thread;
-        
-        // foreground thread ?
-        
-        // [Scheduler stuff]
-        next_thread = InitThread->tid;
-    };
+    // foreground thread ?
+
+    // [Scheduler stuff]
+    next_thread = InitThread->tid;
+
 
 
     // This is a very good idea !
@@ -511,10 +526,9 @@ void I_x64ExecuteInitialProcess (void)
 }
 
 
-// Local
-void __CreateKernelProcess(void)
+void I_x64CreateKernelProcess(void)
 {
-    debug_print ("__CreateKernelProcess:\n");
+    debug_print ("I_x64CreateKernelProcess:\n");
 
     // IN: 
     // Room, Desktop, Window
@@ -535,17 +549,17 @@ void __CreateKernelProcess(void)
 
 // struct
     if ( (void *) KernelProcess == NULL ){
-        panic ("__CreateKernelProcess: KernelProcess\n");
+        panic ("I_x64CreateKernelProcess: KernelProcess\n");
     }
 
 // validation
     if ( (void *) KernelProcess->used != TRUE || KernelProcess->magic != 1234 ){
-        panic ("__CreateKernelProcess: KernelProcess validation\n");
+        panic ("I_x64CreateKernelProcess: KernelProcess validation\n");
     }
 
 // pid
     if ( (void *) KernelProcess->pid != GRAMADO_PID_KERNEL ){
-        panic ("__CreateKernelProcess: pid\n");
+        panic ("I_x64CreateKernelProcess: pid\n");
     }
 
 
@@ -554,7 +568,7 @@ void __CreateKernelProcess(void)
     if ( kernel_mm_data.used != TRUE || 
          kernel_mm_data.magic != 1234 )
     {
-        panic ("__CreateKernelProcess: kernel_mm_data validation\n");
+        panic ("I_x64CreateKernelProcess: kernel_mm_data validation\n");
     }
 
 
@@ -574,20 +588,37 @@ void __CreateKernelProcess(void)
     //...
 }
 
-// local
-void __CreateEarlyRing0IdleThread(void)
+
+void I_x64CreateEarlyRing0IdleThread(void)
 {
-    debug_print ("__CreateEarlyRing0IdleThread:\n");
+    debug_print ("I_x64CreateEarlyRing0IdleThread:\n");
 
 //
 // Thread
 //
 
+    // See: create.c
+
     EarlyRING0IDLEThread = (void *) create_CreateEarlyRing0IdleThread();
 
+// struct
     if ( (void *) EarlyRING0IDLEThread == NULL ){
-        panic ("__CreateEarlyRing0IdleThread: EarlyRING0IDLEThread\n");
+        panic ("I_x64CreateEarlyRing0IdleThread: EarlyRING0IDLEThread\n");
     }
+
+// validation
+    if ( EarlyRING0IDLEThread->used  != TRUE || 
+         EarlyRING0IDLEThread->magic != 1234 )
+    {
+        panic ("I_x64CreateEarlyRing0IdleThread: EarlyRING0IDLEThread validation\n");
+    }
+
+// owner pid
+    if ( EarlyRING0IDLEThread->ownerPID != GRAMADO_PID_KERNEL )
+    {
+        panic ("I_x64CreateEarlyRing0IdleThread: owner PID");
+    }
+
 
 //
 // Memory
@@ -602,17 +633,6 @@ void __CreateEarlyRing0IdleThread(void)
     EarlyRING0IDLEThread->pd0_VA   = KernelProcess->pd0_VA;
     EarlyRING0IDLEThread->pd0_PA   = KernelProcess->pd0_PA;
 
-
-//
-// Idle thread
-//
-
-    // Idle thread
-    // #todo
-    // We can use a method in the scheduler for this.
-    // Or in the dispatcher?
-
-    ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
 
 
     // ?
@@ -640,6 +660,18 @@ void __CreateEarlyRing0IdleThread(void)
     // Esse status só muda quando a thread rodar.
 
     dead_thread_collector_status = FALSE;
+
+
+//
+// Idle thread
+//
+
+    // Idle thread
+    // #todo
+    // We can use a method in the scheduler for this.
+    // Or in the dispatcher?
+
+    ____IDLE = (struct thread_d *) EarlyRING0IDLEThread;
 }
 
 
@@ -842,14 +874,14 @@ int I_x64main (void)
 // Local
 
     PROGRESS("Kernel:1:6\n"); 
-    __CreateKernelProcess();
+    I_x64CreateKernelProcess();
 
 // ================================
 // Creating a ring 0 thread for the kernel.
 // Local
 
     PROGRESS("Kernel:1:7\n"); 
-    __CreateEarlyRing0IdleThread();
+    I_x64CreateEarlyRing0IdleThread();
 
 
 // ================================

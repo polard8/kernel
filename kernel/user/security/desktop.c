@@ -58,13 +58,14 @@ void init_desktop (void)
         panic ("init_desktop: desktop0\n");
     }else{
 
-        desktop0->desktopUsed  = TRUE;
-        desktop0->desktopMagic = 1234;
+        desktop0->id = 0;
+        
+        desktop0->used  = TRUE;
+        desktop0->magic = 1234;
 
         //todo: object
         
         desktops_count = 1;
-        desktop0->desktopId = 0;
 
         desktop0->lTail = 0;
         desktop0->lHead = 0;
@@ -111,7 +112,8 @@ void set_current_desktop ( struct desktop_d *desktop )
         return; 
     }
 
-    current_desktop = (int) desktop->desktopId;
+    current_desktop = (int) desktop->id;
+
     CurrentDesktop = desktop;
 }
 
@@ -161,7 +163,7 @@ int RegisterDesktop (struct desktop_d *d)
         {
             desktopList[Offset] = (unsigned long) d; 
             
-            d->desktopId = Offset;
+            d->id = Offset;
             
             return 0;
         }
@@ -204,7 +206,6 @@ void *CreateDesktop ( struct room_d *room )
     if ( (void *) Current == NULL ){
         panic ("CreateDesktop: Current\n");
     } else {
-
         Current->room = (void *) room;
 
 		//continua...
@@ -219,7 +220,7 @@ void *CreateDesktop ( struct room_d *room )
         {
             desktopList[i] = (unsigned long) Current;
 
-            Current->desktopId = i;
+            Current->id = i;
 
             return (void *) Current;
         }

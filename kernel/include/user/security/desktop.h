@@ -7,15 +7,16 @@
 
 struct desktop_d
 {
-    //int tododummmy;
-
     object_type_t   objectType;
     object_class_t  objectClass;
 
-    int desktopId;
+    // DID - Desktop ID.
+    int id;
 
-    int desktopUsed;
-    int desktopMagic;
+    int used;
+    int magic;
+
+    uid_t uid;
 
     // usando o mesmo esquema do usuário.
     char __name[64];
@@ -42,7 +43,6 @@ struct desktop_d
 	int servers_max;
 	int apps_max;
 
-    int userID;
 
 
 	//Heap do desktop.

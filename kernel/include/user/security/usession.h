@@ -92,11 +92,13 @@ struct usession_d
 
     struct object_d  *object;
 
+
+    // SID - Session ID.
+    int id;
+
     int used;
     int magic;
 
-    // SID - Session ID.
-    int sid;
  
      // The user in this session.
     uid_t uid;

@@ -930,12 +930,27 @@ void xxxxINT128_DEBUG_MESSAGE(void)
 
 void early_ring0_IdleThread (void)
 {
+
 // #danger: Do NOT change this function.
+// #bugbug: This thread can't execute complex routine for now.
 Loop:
     asm ("sti");
     asm ("hlt");
     goto Loop;
+
+/*
+// #bugbug: This thread can't execute complex routine for now.
+Loop:
+    debug_print(" $$$$ Thread $$$$ \n");
+    printf(".\n");
+    refresh_screen();
+    asm ("sti");
+    asm ("hlt");
+    goto Loop;
+*/
 }
+
+
 
 //
 // End.

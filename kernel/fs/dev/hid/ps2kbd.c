@@ -214,175 +214,6 @@ sc_again:
         CONSOLE_DEVICE_KEYBOARD,
         __raw );
 
-
-/*
-// ++
-// ======================================================
-
-    // provisorio
-    // Escape
-    if( __raw == 0x01 ){
-        hal_reboot();
-    }
-
-    // provisorio
-    unsigned char ScanCode  = 0;
-    unsigned char AsciiChar = 0;
-    
-    void *buffer;
-    unsigned long tmp=0;
-
-    // pressionada
-    // Vamos imprimir somente a tecla pressionada.
-    // keydown
-    if ( (__raw & 0x80) == 0 )
-    { 
-        ScanCode = __raw & 0x7F;  //mask
-        AsciiChar = map_abnt2[ScanCode];
-
-        // Rotinas de teste
-        if ( AsciiChar == VK_F5 ){ 
-            Background_initialize();
-            show_slots(); // show information about all the threads.
-            //hal_reboot(); 
-            //pages_calc_mem();
-            refresh_screen();
-        }  
-        if ( AsciiChar == VK_F6 )
-        { 
-            Background_initialize();  // ok
-            // hal_reboot();          // ok
-            // create_thread ( NULL, NULL, NULL, 0, 0, current_process, "nothing" );  //fail  
-            // create_CreateEarlyRing0IdleThread(); //fail
-            // init_threads(); //ok
-            //show_process_information();
-            //show_thread_information();
-            //stdioInitialize();
-            //screenInit();
-            //init_pci(); //We already called this one in the initialization.
-            //pciInfo();
-            //disk_init();
-            //disk_show_info();
-            //volume_init();
-            volume_show_info();
-            //ata_initialize(FORCEPIO);
-            //show_ide_info();
-            buffer = kmalloc(1024*8);
-            if( (void*) buffer != NULL )
-            {
-                //pio_rw_sector(buffer,0,0x20,0,0);
-                //pio_rw_sector(buffer,0,0x20,0,0);
-                //pio_rw_sector(buffer,0,0x20,0,0);
-                //pio_rw_sector(buffer,559,0x20,0,0);
-                
-                fsLoadFile ( 
-                    VOLUME1_FAT_ADDRESS, 
-                    VOLUME1_ROOTDIR_ADDRESS, 
-                    FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
-                    "INIT    INI", 
-                    (unsigned long) buffer,
-                    (unsigned long) (1024*8) );
-                
-                printf("\n");
-                printf("\n");
-                printf("Buffer: %s\n",buffer);
-            }
-            refresh_screen();
-        }
-        if ( AsciiChar == VK_F7 ){ 
-            Background_initialize();  // ok
-            //hal_reboot(); 
-            x64_info();
-            
-            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
-            //printf ("Phys: %x\n",tmp);
-
-            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030200000, gKernelPML4Address );
-            //printf ("Phys: %x\n",tmp);
-
-            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030400000, gKernelPML4Address );
-            //printf ("Phys: %x\n",tmp);
-
-            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030000000, gKernelPML4Address );
-            //printf ("Phys: %x\n",tmp);
-
-            //tmp = (unsigned long) virtual_to_physical2( 0x0000000030001000, gKernelPML4Address );
-            //printf ("Phys: %x\n",tmp);
-
-            refresh_screen();
-            return;
-        }
-        if ( AsciiChar == VK_F8 ){ 
-            Background_initialize();  // ok
-            //hal_reboot(); 
-            //pciInfo();
-            //buffer = (void*) newPage();   // single page
-            //buffer = (void*) allocPages(200);  // multiple pages
-            //if( (void*) buffer == NULL )
-            //    printf("Buffer: Fail\n");
-            //if( (void*) buffer != NULL ){
-                //printf("Buffer: %x | %s\n",buffer,buffer);
-            //    printf("Buffer: %x \n",buffer);
-            //}
-            
-            // #test:
-            //p = (struct process_d *) create_process (
-            //    NULL, NULL, NULL,
-            //    (unsigned long) 0x00400000, //wrong #todo
-            //    PRIORITY_HIGH,
-            //     (int) 0, 
-            //     "RING0-PROCESS", 
-            //     RING0,   
-            //     (unsigned long ) gKernelPML4Address );
- 
-            // #todo: 
-            // Precisamos de um processo válido pra criarmos uma thread.
-            //current_process = p->pid;
-            
-            //create_thread ( 
-            //    NULL, NULL, NULL, 
-            //    0x00400000, 0x005F0000,  //wrong #todo
-            //    current_process, "test-thread" );
- 
-            // Criando uma thread em ring0 que pertence ao processo kernel.
-            //printf ("Create thread for kernel\n");
-            //KernelProcess = p;
-            //create_CreateEarlyRing0IdleThread();
-
-            // Criando uma thread em ring0 que pertence ao processo kernel.
-            //printf ("Create thread for init process\n");
-            //InitProcess = p;
-            //create_CreateRing3InitThread();
-            
-            printf ("Test done\n");
-            refresh_screen();
-            return;
-        }
-
-        //
-        // Fast
-        //
-        
-        // pinta no backbuffer e faz refresh apenas do retangulo do char..
-        console_putchar(AsciiChar,fg_console);
-        
-        //
-        // Slow
-        //
-
-        // imprime
-        // provisorio
-        //console_outbyte(AsciiChar,fg_console);
-        //printf("%c",AsciiChar);
-        //refresh_screen();
-    }
-    
-// ======================================================
-// --
-*/
-
-
-
 // Clean the mess.
 
     __has_e0_prefix = 0;
@@ -392,16 +223,16 @@ done:
     return;
 }
 
+// #todo: Change this name.
 void ldisc_init_modifier_keys (void)
 {
-	// Modifier keys.
-	
-	shift_status = 0;
-	ctrl_status = 0;
-	winkey_status = 0;
-    
-	// Alternate.
-    alt_status = 0;
+    // Modifier keys.
+
+    shift_status  = 0;
+    ctrl_status   = 0;
+    winkey_status = 0;
+    alt_status    = 0;
+
 
 	// Alternate Graphic.
     //altgr_status = 0; //@todo
@@ -412,6 +243,7 @@ void ldisc_init_modifier_keys (void)
 	//...
 }
 
+// #todo: Change this name.
 void ldisc_init_lock_keys (void)
 {
     // Capital Lock.	

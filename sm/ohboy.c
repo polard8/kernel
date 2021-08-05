@@ -66,7 +66,7 @@ void testThread(void)
         //debug_print("THREAD 2\n");
         //printf("2"); 
         //fflush(stdout);
-    }
+    };
 }
 
 
@@ -355,11 +355,21 @@ void main(void)
     //gramado_system_call(82,0,0,0);
 
 
-    // #test
-    //while(1){}
+//
+// Hang
+//
 
+    for(;;){
+    };
+
+// #bugbug
+// This is printing wrong messages into the serial
+// console.
+
+    //char *t1String = "THREAD 1\n";
     while (1){
-        debug_print("THREAD 1\n");
+        //debug_print("THREAD 1 \n");
+        //debug_print(t1String);
         //printf("1"); 
         //fflush(stdout);
     }

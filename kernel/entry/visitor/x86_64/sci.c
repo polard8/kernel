@@ -191,8 +191,8 @@ void *gde_extra_services (
 
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed  == TRUE && 
-                 __desktop->desktopMagic == 1234 )
+            if ( __desktop->used  == TRUE && 
+                 __desktop->magic == 1234 )
             {
                 return (void *) __desktop->ws; 
             }
@@ -222,8 +222,8 @@ void *gde_extra_services (
 
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed  == TRUE && 
-                 __desktop->desktopMagic == 1234 )
+            if ( __desktop->used  == TRUE && 
+                 __desktop->magic == 1234 )
             {
                 //register_ws_process(arg3);
                 __desktop->ws = (pid_t) arg3;
@@ -278,8 +278,8 @@ void *gde_extra_services (
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed  == TRUE && 
-                 __desktop->desktopMagic == 1234 )
+            if ( __desktop->used  == TRUE && 
+                 __desktop->magic == 1234 )
             {
                 return (void *) __desktop->wm; 
             }
@@ -298,8 +298,8 @@ void *gde_extra_services (
         __desktop = ( struct desktop_d *) arg2;
         if ( (void *) __desktop != NULL )
         {
-            if ( __desktop->desktopUsed  == TRUE && 
-                 __desktop->desktopMagic == 1234 )
+            if ( __desktop->used  == TRUE && 
+                 __desktop->magic == 1234 )
             {
                 //register_wm_process(arg3);
                  __desktop->wm = (pid_t) arg3;

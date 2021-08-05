@@ -11,12 +11,14 @@ struct room_d
     object_type_t  objectType;
     object_class_t objectClass;
 
+    // RID - Room ID.
     int id;
 
     int used;
     int magic;
 
-    int userID;
+
+    uid_t uid;
 
 //
 // Desktops

@@ -51,42 +51,43 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     if ( (void *) kThread == NULL ){
         debug_print ("create_CreateEarlyRing0IdleThread: kThread\n");
-        panic ("create_CreateEarlyRing0IdleThread: kThread \n");
-    }else{
-        kThread->objectType  = ObjectTypeThread;
-        kThread->objectClass = ObjectClassKernelObjects;
+        panic       ("create_CreateEarlyRing0IdleThread: kThread\n");
+    }
 
-        kThread->type = THREAD_TYPE_SYSTEM; 
 
-        // #todo
-        // #important
-        // This will affect the input model
-        kThread->input_model = THREAD_INPUTMODEL_KERNEL;
+    kThread->objectType  = ObjectTypeThread;
+    kThread->objectClass = ObjectClassKernelObjects;
 
-        kThread->position = KING;
+    kThread->type = THREAD_TYPE_SYSTEM; 
 
-        kThread->tid = TID;
+    // #todo
+    // #important
+    // This will affect the input model
+    kThread->input_model = THREAD_INPUTMODEL_KERNEL;
 
-        // #bugbug: 
-        // Is this a valid pointer?
-        // is this a valid pid?
-        kThread->ownerPID     = (int) KernelProcess->pid;
-        
-        kThread->name_address = (unsigned long) ThreadName; 
-        kThread->process      = (void *) KernelProcess;
+    kThread->position = KING;
 
-        // Características.
-        kThread->iopl  = RING0;
-        kThread->type  = THREAD_TYPE_SYSTEM; 
-        kThread->state = INITIALIZED; 
+    kThread->tid = TID;
 
-        // #todo
-        // Execution plane.
-        
-        kThread->plane = BACKGROUND;    
+    // #bugbug: 
+    // Is this a valid pointer?
+    // is this a valid pid?
+    kThread->ownerPID     = (int) KernelProcess->pid;
 
-        // ...
-    };
+    kThread->name_address = (unsigned long) ThreadName; 
+    kThread->process      = (void *) KernelProcess;
+
+    // Características.
+    kThread->iopl  = RING0;
+    kThread->type  = THREAD_TYPE_SYSTEM; 
+    kThread->state = INITIALIZED; 
+
+    // #todo
+    // Execution plane.
+
+    kThread->plane = BACKGROUND;    
+
+    // ...
 
 
     // Stack.
@@ -179,7 +180,6 @@ void *create_CreateEarlyRing0IdleThread(void)
     kThread->base_priority = PRIORITY_MIN;    // Static
     kThread->priority      = PRIORITY_MIN;    // Dynamic
 
-    kThread->saved = FALSE;
     kThread->preempted = UNPREEMPTABLE;
 
 
@@ -241,7 +241,7 @@ void *create_CreateEarlyRing0IdleThread(void)
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
     kThread->rflags = 0x0202;    // # Atenção !!  
     kThread->cs     = 0x8 | 0; 
-    kThread->rip    = (unsigned long) early_ring0_IdleThread;  //See: head.asm
+    kThread->rip    = (unsigned long) early_ring0_IdleThread;  //See: init/init.c
 
     kThread->ds = 0x10 | 0;
     kThread->es = 0x10 | 0;
@@ -269,6 +269,8 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     // O endereço incial, para controle.
     kThread->initial_rip = (unsigned long) kThread->rip; 
+
+    kThread->saved = FALSE;
 
 
 	//#bugbug
@@ -372,8 +374,13 @@ void *create_CreateEarlyRing0IdleThread(void)
 
 void *create_CreateRing3InitThread (void)
 {
-
     struct thread_d  *t;
+
+
+    // #todo
+    // #bugbug
+    // We need to review that thing!
+
     int TID = 1;
 
 
@@ -382,7 +389,7 @@ void *create_CreateRing3InitThread (void)
     register int i=0;    // Message queue.
     register int q=0;    // Message queue.
 
-    char *ThreadName = "Ring3InitThread"; 
+    char *ThreadName = "Ring3InitThread";
 
     // Stack pointer.
     void *__initStack;   
@@ -402,49 +409,40 @@ void *create_CreateRing3InitThread (void)
 
     // Struct.
 
-    t = (void *) kmalloc ( sizeof(struct thread_d) );
+    t = (void *) kmalloc( sizeof(struct thread_d) );
 
     if ( (void *) t == NULL ){
         panic ("create_CreateRing3InitThread: t\n");
-    } else {
+    } 
 
-        // #todo
-        // Isso jah foi feito logo acima.
-        // Remover.
-        
-        if ( (void *) InitProcess == NULL ){
-            panic ("create_CreateRing3InitThread: InitProcess\n");
-        }else{
+    // #todo
+    // Object header.
 
-            // #todo
-            // Object header.
-            
-            // Identificadores 
-            t->tid = TID;
+    // #todo
+    // #bugbug
+    // We need to review that thing!
 
+    t->tid = TID;
 
-            t->position = SPECIAL_GUEST;
+    // #bugbug: 
+    // Is this a valid pointer?
+    // is this a valid pid?
 
-            // #bugbug: 
-            // Is this a valid pointer?
-            // is this a valid pid?
-            t->ownerPID     = (int) InitProcess->pid; 
-            
-            t->name_address = (unsigned long) ThreadName; 
-            t->process      = (void *) InitProcess;
-      
-            // Caracteristicas.
-            t->iopl  = RING3; 
-            t->type  = THREAD_TYPE_IDLE;
-            t->state = INITIALIZED;
+    t->ownerPID  = (int) InitProcess->pid; 
+    t->process   = (void *) InitProcess;
 
-            // Execution plane.
-            t->plane = BACKGROUND;
-            // ...
+    t->name_address = (unsigned long) ThreadName; 
 
-        };
-        // ...
-    };
+    t->position = SPECIAL_GUEST;
+
+    t->iopl  = RING3; 
+    t->type  = THREAD_TYPE_IDLE;
+    t->state = INITIALIZED;
+
+    // Execution plane.
+    t->plane = BACKGROUND;
+
+    // ...
 
 
 	// @todo: 
@@ -541,14 +539,15 @@ void *create_CreateRing3InitThread (void)
     t->base_priority = PRIORITY_MIN;    // Static
     t->priority      = PRIORITY_MIN;    // Dynamic
 
-
-    t->saved = 0; 
     t->preempted = UNPREEMPTABLE; 
 
     // Temporizadores.
 
     // Jiffies
     t->step = 0; 
+
+
+    // #todo
 
     //t->quantum  = QUANTUM_BASE;
     //t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
@@ -606,9 +605,9 @@ void *create_CreateRing3InitThread (void)
     // Stack frame.
     // See: gva.h
 
-    t->ss     = 0x23; 
+    t->ss     = 0x23;
     t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
-    t->rflags = 0x3200;    // #atenção! Change to 0x3202
+    t->rflags = 0x3202;    // #atenção! Change to 0x3202
     t->cs     = 0x1B;  
     t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 
@@ -640,6 +639,7 @@ void *create_CreateRing3InitThread (void)
     // O endereço incial, para controle.
     t->initial_rip = (unsigned long) t->rip; 
 
+    t->saved = FALSE; 
 
 	//#bugbug
 	//Obs: As estruturas precisam j� estar devidamente inicializadas.

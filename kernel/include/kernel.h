@@ -655,11 +655,18 @@ int kernel_main (int arch_type);
 
 // x64init.c
 int I_x64main (void);
+
 // sysinit.c
 int I_init (void);
+
 // x64init.c
 void I_x64CreateInitialProcess (void);
 void I_x64ExecuteInitialProcess (void);
+
+// x64init.c
+void I_x64CreateKernelProcess(void);
+void I_x64CreateEarlyRing0IdleThread(void);
+
 
 
 // ================================================
