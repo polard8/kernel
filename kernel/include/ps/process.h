@@ -64,15 +64,6 @@
 
 
 
-//
-// Bases para a contagem de processos, do sistema e de usu�rios.
-// 
- 
-//Primeiro �ndice na contagem das processos do sistema.
-#define SYSTEM_BASE_PID 0
-//Primeiro �ndice na contagem das processos dos usu�rios.  
-#define USER_BASE_PID 100    
-
 
 //
 // == Priorities ==================================================

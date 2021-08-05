@@ -127,15 +127,30 @@ void I_x64CreateInitialProcess (void)
                                (unsigned long ) kernel_mm_data.pdpt0_va,
                                (unsigned long ) kernel_mm_data.pd0_va );
 
+
+// struct
     if ( (void *) InitProcess == NULL ){
         panic ("I_x64CreateInitialProcess: InitProcess\n");
-    }else{
+    }
 
-        
-        if ( init_mm_data.used != TRUE || init_mm_data.magic != 1234 )
-        {
-            panic ("I_x64CreateInitialProcess: init_mm_data validation\n");
-        }
+// validation
+    if ( (void *) InitProcess->used != TRUE || InitProcess->magic != 1234 ){
+        panic ("I_x64CreateInitialProcess: InitProcess validation\n");
+    }
+
+// struct
+    if ( (void *) InitProcess->pid != GRAMADO_PID_INIT ){
+        panic ("I_x64CreateInitialProcess: pid\n");
+    }
+
+
+
+
+
+    if ( init_mm_data.used != TRUE || init_mm_data.magic != 1234 )
+    {
+        panic ("I_x64CreateInitialProcess: init_mm_data validation\n");
+    }
 
         // Esse foi configurado agora.
         InitProcess->pml4_VA = init_mm_data.pml4_va;
@@ -151,7 +166,7 @@ void I_x64CreateInitialProcess (void)
 
         InitProcess->position = SPECIAL_GUEST;
         fs_initialize_process_cwd ( InitProcess->pid, "/" );
-    };
+
 
 //====================================================
 // Create thread
@@ -517,15 +532,31 @@ void __CreateKernelProcess(void)
                                  (unsigned long ) kernel_mm_data.pdpt0_va,
                                  (unsigned long ) kernel_mm_data.pd0_va );
 
+
+// struct
     if ( (void *) KernelProcess == NULL ){
         panic ("__CreateKernelProcess: KernelProcess\n");
     }
+
+// validation
+    if ( (void *) KernelProcess->used != TRUE || KernelProcess->magic != 1234 ){
+        panic ("__CreateKernelProcess: KernelProcess validation\n");
+    }
+
+// pid
+    if ( (void *) KernelProcess->pid != GRAMADO_PID_KERNEL ){
+        panic ("__CreateKernelProcess: pid\n");
+    }
+
+
+
 
     if ( kernel_mm_data.used != TRUE || 
          kernel_mm_data.magic != 1234 )
     {
         panic ("__CreateKernelProcess: kernel_mm_data validation\n");
     }
+
 
     KernelProcess->pml4_VA = kernel_mm_data.pml4_va;
     KernelProcess->pml4_PA = kernel_mm_data.pml4_pa; 

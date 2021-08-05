@@ -21,7 +21,7 @@ struct process_d *GetCurrentProcess(void)
 {
     struct process_d *p;
     
-    if ( current_process < 0 || 
+    if ( current_process < GRAMADO_PID_BASE || 
          current_process >= PROCESS_COUNT_MAX )
     {
         return NULL;
@@ -619,7 +619,11 @@ struct process_d *processObject (void){
  
 pid_t getNewPID (void){
 
-    int i = USER_BASE_PID;
+// See:
+// gpid.h
+
+    int i = GRAMADO_PID_BASE;
+    
     struct process_d  *p;
 
     while ( i < PROCESS_COUNT_MAX ){
@@ -1004,10 +1008,10 @@ struct process_d *create_process (
 	// contagem de processos criados.
 	// processNewPID � global ?
 
-    if ( processNewPID < USER_BASE_PID || 
+    if ( processNewPID < GRAMADO_PID_BASE || 
          processNewPID >= PROCESS_COUNT_MAX )
     {
-        processNewPID = (int) USER_BASE_PID;
+        processNewPID = (int) GRAMADO_PID_BASE;
     }
 
     // Base priority.
@@ -1038,7 +1042,7 @@ struct process_d *create_process (
 
         PID = (int) getNewPID();
 
-        if ( PID <= 0 || PID >= PROCESS_COUNT_MAX )
+        if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
         {
             debug_print ("create_process: [FAIL] getNewPID \n");
             printf      ("create_process: [FAIL] getNewPID %d \n", PID);
@@ -1510,7 +1514,7 @@ unsigned long GetProcessHeapStart ( pid_t pid )
 
     // Limits
 
-    if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
+    if ( pid < GRAMADO_PID_BASE || pid >= PROCESS_COUNT_MAX )
     {
         debug_print ("pid\n");
         goto fail; 
@@ -1581,7 +1585,7 @@ void set_caller_process_id (int pid)
 int init_process_manager (void)
 {
     caller_process_id = (int) 0;
-    processNewPID = (int) USER_BASE_PID;
+    processNewPID = (int) GRAMADO_PID_BASE;
 
 	//...
 
@@ -1970,7 +1974,7 @@ struct process_d *__create_and_initialize_process_object(void)
 
     // Get new pid.
     PID = (int) getNewPID();
-    if ( PID <= 0 || PID < USER_BASE_PID )
+    if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
     {
         debug_print ("clone_and_execute_process: [FAIL] getNewPID\n");
         printf      ("clone_and_execute_process: [FAIL] getNewPID %d \n", 

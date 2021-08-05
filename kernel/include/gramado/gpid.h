@@ -7,6 +7,30 @@
 #define __GPID_H    1
 
 
+//
+// Maind processes
+//
+
+#define GRAMADO_PID_KERNEL    0
+#define GRAMADO_PID_INIT      1
+// ...
+
+#define GRAMADO_PID_BASE    GRAMADO_PID_KERNEL
+
+
+
+// #deprecated.
+// Usaremos os valores acima.
+// Bases para a contagem de processos, do sistema e de usu�rios. 
+//Primeiro �ndice na contagem das processos do sistema.
+//#define SYSTEM_BASE_PID 0
+//Primeiro �ndice na contagem das processos dos usu�rios.  
+//#define USER_BASE_PID 100    
+
+
+
+
+
 // First of all.
 // we need to register some processes.
 // Registering 'folders'.
