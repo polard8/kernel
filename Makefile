@@ -39,12 +39,13 @@ PHONY := all
 all:  \
 build-gramado-files \
 /mnt/gramadoxvhd    \
-vhd-mount          \
-vhd-copy-files     \
-vhd-unmount        \
-clean              \
-clean4 \
-#generate
+vhd-mount \
+vhd-copy-files \
+vhd-unmount \
+clean \
+clean4    
+
+
 
 # Giving permitions to run ./run
 	chmod 755 ./run
@@ -96,7 +97,6 @@ gramado-new \
 gramado-lib \
 gramado-sm \
 gramado-cmd \
-gramado-setup \
 gramado-ws \
 gramado-ns \
 gramado-boot \
@@ -140,17 +140,6 @@ gramado-cmd:
 #	-sudo cp cmd/bin/UNAME.BIN      base/
 
 #5
-gramado-setup:
-	@echo "Build: Building setup applications ..."
-
-	$(Q) $(MAKE) -C setup/
-	sudo cp setup/bin/GDESHELL.BIN  base/
-	#sudo cp setup/bin/C4.BIN       base/
-	#sudo cp setup/bin/GRAMC.BIN    base/
-	#sudo cp setup/bin/GRAMC4.BIN   base/
-	#sudo cp setup/bin/GRAMCNF.BIN  base/
-
-#6
 # Gramado Window System files.
 gramado-ws:
 	@echo "Build: Building Window Server ..."
@@ -173,7 +162,7 @@ gramado-ws:
 # Copy the clients in another folder.
 #	-sudo cp ws/bin/*.BIN    base/PROGRAMS/
 
-#7
+#6
 gramado-ns:
 	@echo "Build: Building Network Server ..."
 
@@ -181,7 +170,7 @@ gramado-ns:
 	-sudo cp ns/bin/GNSSRV.BIN  base/
 	-sudo cp ns/bin/GNS.BIN     base/
 
-#8
+#7
 gramado-boot:
 	@echo "Build: Building bootloader ..."
 
@@ -200,7 +189,7 @@ gramado-boot:
 	sudo cp boot/x86/bin/BM.BIN  base/
 	sudo cp boot/x86/bin/BL.BIN  base/
 
-#9
+#8
 #========================================
 # Installing stuff from another project.
 desert:
@@ -278,7 +267,6 @@ clean2:
 	-rm *.ISO
 clean3:
 	-rm cmd/bin/*.BIN
-	-rm setup/bin/*.BIN
 	-rm ws/bin/*.BIN
 # clean base
 clean4:
@@ -288,7 +276,6 @@ clean4:
 	-rm -rf boot/x86/bin/*.BIN
 	-rm -rf sm/*.BIN
 	-rm -rf cmd/bin/*.BIN
-	-rm -rf setup/bin/*.BIN
 	-rm -rf ws/bin/*.BIN
 	-rm -rf ns/bin/*.BIN
 	-rm -rf lib/fonts/bin/*.FON

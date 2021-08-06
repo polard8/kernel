@@ -13,5 +13,6 @@
 	x86/bl/
 	The os boot loader.
 	It loader the kernel image and beyond.
+	The kernel base is found in the new/ folder.
 
 	2021 - Fred Nora.
