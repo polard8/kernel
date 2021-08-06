@@ -522,9 +522,14 @@ struct msg_d
 };
 
 
-
+// #deprecated
 struct window_d
 {
+
+    int used;
+    int magic;
+
+/*
 
     object_type_t   objectType;
     object_class_t  objectClass;
@@ -1068,7 +1073,7 @@ struct window_d
     // Navigation.
     struct window_d *prev; 
     struct window_d *next; 
-
+    */
 };
 
 struct window_d *CurrentWindow;    //Janela atual

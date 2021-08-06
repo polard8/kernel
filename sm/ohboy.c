@@ -10,6 +10,10 @@
 #include <unistd.h>
 
 
+#include <rtl/gramado.h>
+
+
+
 static char *ohboy_argv[] = { 
     "-flag1", 
     "-flag2", 
@@ -67,6 +71,53 @@ void testThread(void)
         //printf("2"); 
         //fflush(stdout);
     };
+}
+
+
+
+#define MSG_KEYDOWN       20
+#define MSG_KEYUP         21
+#define MSG_SYSKEYDOWN    22
+#define MSG_SYSKEYUP      23
+
+#define VK_F1    0x3B  //59    // No DOS é 0x170.  
+#define VK_F2    0x3C  //60 
+#define VK_F3    0x3D  //61 
+#define VK_F4    0x3E  //62 
+
+// local
+int 
+ohboyProcedure ( 
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+    switch (msg)
+    {
+        // 20 = MSG_KEYDOWN
+        case MSG_KEYDOWN:
+            switch (long1)
+            {
+                default:
+                    printf("%c",long1); fflush(stdout);
+                    break;
+            };
+            break;
+
+  // 22 = MSG_SYSKEYDOWN
+        case MSG_SYSKEYDOWN:
+            switch (long1)
+            {
+                case VK_F1: 
+                    printf ("F1\n");
+                    break;
+            };
+            break;
+    };
+
+    return 0;
 }
 
 
@@ -353,6 +404,37 @@ void main(void)
 // Show info about all processes.
 
     //gramado_system_call(82,0,0,0);
+
+
+//
+// Message loop
+//
+
+//=================================
+
+    rtl_focus_on_this_thread();
+
+    while (1){
+
+        if ( rtl_get_event() == TRUE )
+        {  
+            // Podemos chamar mais de um diálogo
+            // Retorna TRUE quando o diálogo chamado 
+            // consumiu o evento passado à ele.
+            // Nesse caso chamados 'continue;'
+            // Caso contrário podemos chamar outros diálogos.
+
+            ohboyProcedure ( 
+                (void*) RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
+        }
+    };
+//=================================
+
+
+
 
 
 //

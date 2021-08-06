@@ -4,6 +4,105 @@
 #include <kernel.h>  
 
 
+/*
+ *********************** 
+ * __do_111: 
+ *     Getting single system message from the process queue.
+ */
+
+// Getting single message.
+// No queue.
+// See: thread structure.
+
+	// #importante:
+	// Esse é o get message usado pelos aplicativos.
+	// O aplicativo envia um endereço de array e devemos colocar 4 longs 
+	// como mensagem.
+	// Isso funcionou. 
+	// Esse será o padrão até usarmos ponteiro para estrutura.
+	// A intenção agora é pegar a mensagem na estrutura de thread atual.
+	// Desse modo cada aplicativo, quando estiver rodando, pegará as 
+	// suas mensagens em sua própria fila.  
+	// Se não houver mensagem na estrutura da thread, então tentaremos colocar alguma.
+	// Vamos colocar alguma coisa do buffer de teclado.
+
+// #todo
+// Trocar por 'ubuf'
+
+// #bugbug
+// Isso eh valido para todos os tipos de mensagens nao somente teclado
+// isso deveria sair daqui desse arquivo.
+
+// Called by sci.c
+
+void *__do_111 ( unsigned long buffer )
+{
+    struct thread_d *t;
+
+    unsigned long *message_address = (unsigned long *) buffer;
+
+
+    // Buffer
+    // Se o buffer for inválido, não há o que fazer.
+    if ( buffer == 0 ){ 
+        panic ("__do_111: buffer\n"); 
+    }
+
+   // Again. 
+   // Se o buffer for inválido.
+   
+   if ( &message_address[0] == 0 ){
+       panic ("__do_111: &message_address[0] buffer\n");
+   }else{
+
+        t = (void *) threadList[current_thread];
+
+        if ( (void *) t == NULL ){
+            panic ("__do_111: Invalid thread calling \n");
+        }
+
+        if ( t->used != 1 || t->magic != 1234 ){
+            panic ("__do_111: Validation. Invalid thread calling \n");
+        }
+
+        // Get system message.
+        message_address[0] = (unsigned long) t->window_list[ t->head_pos ];
+        message_address[1] = (unsigned long) t->msg_list[ t->head_pos ];
+        message_address[2] = (unsigned long) t->long1_list[ t->head_pos ];
+        message_address[3] = (unsigned long) t->long2_list[ t->head_pos ];
+
+        // Extra. 
+        // Usado pelos servidores e drivers.
+        message_address[4] = (unsigned long) t->long3_list[ t->head_pos ];
+        message_address[5] = (unsigned long) t->long4_list[ t->head_pos ];
+
+        // Clean
+        t->window_list[ t->head_pos ] = NULL;
+        t->msg_list[ t->head_pos ]    = 0;
+        t->long1_list[ t->head_pos ]  = 0;
+        t->long2_list[ t->head_pos ]  = 0;
+        t->long3_list[ t->head_pos ]  = 0;
+        t->long4_list[ t->head_pos ]  = 0;
+        //...
+        
+        // Circula
+        t->head_pos++;
+        if ( t->head_pos >= 31 )
+            t->head_pos = 0;
+   
+        //Sinaliza que há mensagem
+        return (void *) 1; 
+    };
+
+    // No message.
+    return NULL;
+} 
+
+
+
+
+
+
 
 void ps2kbd_initialize_device (void)
 {
