@@ -49,14 +49,20 @@ extern ___last_valid_address
 ; Vari�veis importadas.
 
 
-;Endere�o f�sico do Linear Frame Buffer, LFB.
-extern _g_lbf_pa      
-;...
+
+; LFB - Linear Frame Buffer
+; physical address.
+
+extern _g_lbf_pa
 
 
-; Fun��es importadas.
 
-extern _BlMain                ; * Entrada da parte em C.
+
+;
+; Imported
+;
+
+extern _OS_Loader_Main                ; * Entrada da parte em C.
 extern _BlKernelModuleMain    ; * Reentrada do bl, agora na forma de m�dulo.
 ;extern _shell_main    ;Entrada do Shell do Boot Loader.
 
@@ -64,9 +70,12 @@ extern _BlKernelModuleMain    ; * Reentrada do bl, agora na forma de m�dulo.
 
 
 
-; Endere�os f�sicos do kernel base.
-KRN_BASE        equ  0x00100000    ;1MB.
-KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endere�o fisico.
+; Image address:
+; Physical address.
+
+KRN_BASE        equ  0x00100000  ; Image base. 1MB mark.
+KRN_ENTRYPOINT  equ  0x00101000  ; Entry point
+
 
 
 ; Directory and page table.
@@ -75,7 +84,7 @@ KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endere�o fisico.
 
 
 ;---------------------------------------------
-; _bootloader_entry_point:
+; _OS_Loader_Entry_Point:
 ; 
 ;     Entry point do Boot Loader.
 ;
@@ -85,23 +94,22 @@ KRN_ENTRYPOINT  equ  0x00101000    ;Entry point no endere�o fisico.
 ;
 ;++
 
-    ; IN:
-    ; al:  Boot mode.
-    ; ebx: LFB physical addres.
-    ; ecx: Boot block address.
-    ; edx: Boot block address.
-    ; ebp: Boot block address.
-    ; edi: Gramado mode. (jail, p1, home ...)
+; IN:
+; al:  Boot mode.
+; ebx: LFB physical addres.
+; ecx: Boot block address.
+; edx: Boot block address.
+; ebp: Boot block address.
+; edi: Gramado mode. (jail, p1, home ...)
 
+global _OS_Loader_Entry_Point
+_OS_Loader_Entry_Point:
 
-global _bootloader_entry_point
-_bootloader_entry_point:
-
-   JMP ____START
+   JMP StartLoader
 
     %include "header.inc"
 
-____START:
+StartLoader:
 
     ; #debug.
     ; text mode.
@@ -291,16 +299,14 @@ ____START:
 	;; #importante
 	;; Vamos deixar o kernel inicializar o PIT.
 
-    ;; Calling C part of the kernel base.
+;
+;  Call C part.
+;
 
-;.callBlMain:
+    ; Calling C part of the kernel base.
+    ; See: main.c
 
-	;;
-	;;  ## Call ##
-	;;
-
-    ;;call _BlMain
-    jmp _BlMain
+    jmp _OS_Loader_Main
 
 
 ;

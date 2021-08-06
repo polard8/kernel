@@ -185,20 +185,20 @@ gramado-ns:
 gramado-boot:
 	@echo "Build: Building bootloader ..."
 
-	$(Q) $(NASM) tools/vd/fat/main.asm \
-	-I tools/vd/fat/ \
+	$(Q) $(NASM) boot/vd/fat/main.asm \
+	-I boot/vd/fat/ \
 	-o GRAMADO.VHD 
 
-	$(Q) $(MAKE) -C arch/x86/boot/bm/ 
-	$(Q) $(MAKE) -C arch/x86/boot/bl/ 
+	$(Q) $(MAKE) -C boot/x86/bm/ 
+	$(Q) $(MAKE) -C boot/x86/bl/ 
 
 	# O mbr só consegue ler o root dir para pegar o BM.BIN
 	# See: stage1.asm
 	# O BM.BIN só consegue ler o root dir pra pegar o BL.BIN
 	# See: main.asm
 
-	sudo cp arch/x86/boot/bin/BM.BIN  base/
-	sudo cp arch/x86/boot/bin/BL.BIN  base/
+	sudo cp boot/x86/bin/BM.BIN  base/
+	sudo cp boot/x86/bin/BL.BIN  base/
 
 #9
 #========================================
@@ -285,7 +285,7 @@ clean4:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
 	-rm -rf kernel/KERNEL.BIN
-	-rm -rf arch/x86/boot/bin/*.BIN
+	-rm -rf boot/x86/bin/*.BIN
 	-rm -rf sm/*.BIN
 	-rm -rf cmd/bin/*.BIN
 	-rm -rf setup/bin/*.BIN

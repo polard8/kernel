@@ -551,10 +551,13 @@ struct menuitem_d MENU[8];
 
 
 
-/*
- * Ports support.
- */
 
+//
+// == prototypes ============================
+//
+
+
+// x86 Ports support.
 
 unsigned char in8 (int port);
 unsigned short in16 (int port);
@@ -564,11 +567,7 @@ void out16 (int port, unsigned short data);
 void out32 ( int port, unsigned long data );
 
 
-
-
-/*
- * CPU instructions support.
- */
+// CPU instructions support.
  
 void enable();
 void disable();
@@ -610,6 +609,8 @@ cpuSetMSR (
 //
 // Initialization support.
 //
+
+void OS_Loader_Main (void);
 
 int init();
 void init_globals();

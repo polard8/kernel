@@ -147,13 +147,13 @@ ____go:
 
 /*
  ************************************************
- * BlMain:
+ * OS_Loader_Main:
  * 
  *     This is the entrypoint for the C part of the boot loader.
  *     Initializes, loads the kernel image and returns to head.s.
  */
 
-void BlMain (void){
+void OS_Loader_Main (void){
 
     // #todo
     // Podemos cair num shell de recuperaçcao

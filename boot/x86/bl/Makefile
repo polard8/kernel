@@ -122,7 +122,7 @@ bl-x86:
 
 
 link-x86:
-	$(LD) -m i386pe -T link.ld -o BL.BIN $(myObjects)    
+	$(LD) -m i386pe -T x86/link.ld -o BL.BIN $(myObjects)    
 
 finalize:
 	cp BL.BIN ../bin/
