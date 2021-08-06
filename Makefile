@@ -92,7 +92,7 @@ do_run:
 
 PHONY := build-gramado-files
 build-gramado-files: \
-gramado-kernel \
+gramado-new \
 gramado-lib \
 gramado-sm \
 gramado-cmd \
@@ -106,11 +106,11 @@ desert
 # the kernel image
 # O BL.BIN procura o kernel no diretorio GRAMADO/
 # See: fs/loader.c
-gramado-kernel:
+gramado-new:
 	@echo "Build: Building Gramado kernel ..."
 
-	$(Q) $(MAKE) -C kernel/
-	sudo cp kernel/KERNEL.BIN  base/GRAMADO
+	$(Q) $(MAKE) -C new/
+	sudo cp new/KERNEL.BIN  base/GRAMADO
 
 #2
 gramado-lib:
@@ -284,7 +284,7 @@ clean3:
 clean4:
 	@echo "==================="
 	@echo "Cleaning all system binaries ..."
-	-rm -rf kernel/KERNEL.BIN
+	-rm -rf new/KERNEL.BIN
 	-rm -rf boot/x86/bin/*.BIN
 	-rm -rf sm/*.BIN
 	-rm -rf cmd/bin/*.BIN
