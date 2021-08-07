@@ -1056,8 +1056,11 @@ kgws_send_to_tid (
     unsigned long long2 )
 {
 
-    //struct window_d *w;
+    // Target thread.
     struct thread_d *t;
+
+    //struct window_d *w;
+
     
     unsigned long tmp_msg=0;
     unsigned long tmp_ch=0;
@@ -1101,6 +1104,19 @@ kgws_send_to_tid (
     t->tail_pos++;
     if ( t->tail_pos >= 31 )
         t->tail_pos = 0;
+
+
+//
+// #test
+//
+
+// lets end this round putting a given thread at the end
+// of this round.
+// This is gonna be the next, 
+// and the last of this round.
+    
+    cut_round( (struct thread_d *) t );
+
 
     //ok
     return 0;

@@ -171,9 +171,14 @@ int xxxScanApplicationQueue(void)
 
     // No, we do not have an event. 
     // Yield and clear.
-    if ( RTLEventBuffer[1] == 0 ){
+    if ( RTLEventBuffer[1] == 0 )
+    {
 
-        sc82 (265,0,0,0);
+        // ??
+        // In a test we saw that it was better without this thing.
+        // But just in case. It will stay here.
+
+        //sc82 (265,0,0,0);
 
         // #todo
         // Talvez limpar todo o buffer.

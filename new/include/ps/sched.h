@@ -43,6 +43,7 @@ unsigned long schedulerQueue[4];
 // == prototypes ============
 //
 
+void cut_round( struct thread_d *last_thread );
 
 int scheduler (void);
 void scheduler_lock (void);

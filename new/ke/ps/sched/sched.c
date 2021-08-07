@@ -215,6 +215,67 @@ void init_scheduler (void)
 }
 
 
+// lets end this round putting a given thread at the end
+// of this round.
+void cut_round( struct thread_d *last_thread )
+{
+    struct thread_d *Current;
+
+
+// The current thread.
+
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    {
+        return;
+    }
+
+    Current = (struct thread_d *) threadList[current_thread];
+
+    if ( (void *) Current == NULL )
+    {
+        return;
+    }
+    
+    if ( Current->used != TRUE || Current->magic != 1234 )
+    {
+        return;
+    }
+
+// ==========================
+
+//
+// last thread
+//
+
+    if ( (void *) last_thread == NULL )
+    {
+        return;
+    }
+    
+    if ( last_thread->used != TRUE || last_thread->magic != 1234 )
+    {
+        return;
+    }
+
+// ==========================
+
+//
+// Cut round
+// 
+
+    // The last thread of this round
+
+    Current->next = (struct thread_d *) last_thread;
+
+    last_thread->next = NULL; 
+
+    return;
+}
+
+
+
+
+
 //
 // End.
 //
