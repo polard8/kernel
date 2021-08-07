@@ -1,4 +1,5 @@
 
+// tlib.c
 
 #include <kernel.h>
 
@@ -186,11 +187,9 @@ set_thread_priority (
             t->priority = priority;
         
             t->quantum = ( priority * TIMESLICE_MULTIPLIER );
-            
-            if ( t->quantum > QUANTUM_LIMIT )
-            {
-                  t->quantum = QUANTUM_LIMIT;
-            }
+
+            if ( t->quantum < QUANTUM_MIN ){  t->quantum = QUANTUM_MIN; }
+            if ( t->quantum > QUANTUM_MAX ){  t->quantum = QUANTUM_MAX; }
         };    
         // ...
     };
@@ -209,7 +208,11 @@ void threadi_power(
     
     t->priority = priority;
     t->quantum = ( priority * TIMESLICE_MULTIPLIER );
+
+    if ( t->quantum < QUANTUM_MIN ){  t->quantum = QUANTUM_MIN; }
+    if ( t->quantum > QUANTUM_MAX ){  t->quantum = QUANTUM_MAX; }
 }
+
 
 /*
  ****************************************

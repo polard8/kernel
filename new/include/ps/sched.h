@@ -4,6 +4,8 @@
 #define __SCHED_H    1
 
 
+
+
 //#define NR_TASKS ??
 //#define FIRST_TASK ?
 //#define LAST_TASK ? 
@@ -17,9 +19,28 @@
 #define SCHEDULER_RR     1
 #define SCHEDULER_READY  2
 
+// ===============================================
+
+// Quantum in ms.
+#define QUANTUM_MIN    20
+#define QUANTUM_MAX    100
+
+#define QUANTUM_BASE   QUANTUM_MIN
+#define QUANTUM_LIMIT  QUANTUM_MAX
+
+// Limite de tempo esperando.
+#define READY_LIMIT      QUANTUM_MAX
+#define WAITING_LIMIT    QUANTUM_MAX
+#define BLOCKED_LIMIT    QUANTUM_MAX
+// ...
+
+
+
+
 // Hz padrão. 100Hz. 
 // Uma interrupção a cada 10ms.
 #define HZ  100
+
 
 // Tranca
 // #define LATCH (1193180/HZ)

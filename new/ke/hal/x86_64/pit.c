@@ -436,9 +436,9 @@ int timerInit (void)
 
     // Quantum
 
-    set_current_quantum (QUANTUM_BASE);
-    set_next_quantum (QUANTUM_BASE);
-    set_quantum (QUANTUM_BASE);
+    set_current_quantum (QUANTUM_MIN);
+    set_next_quantum (QUANTUM_MIN);
+    set_quantum (QUANTUM_MIN);
 
     // Timeout 
 
@@ -519,9 +519,9 @@ int early_timer_init (void)
 
     // Quantum
 
-    set_current_quantum (QUANTUM_BASE);
-    set_next_quantum (QUANTUM_BASE);
-    set_quantum (QUANTUM_BASE);
+    set_current_quantum (QUANTUM_MIN);
+    set_next_quantum (QUANTUM_MIN);
+    set_quantum (QUANTUM_MIN);
 
     // Timeout 
 

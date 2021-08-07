@@ -1009,7 +1009,6 @@ get_next:
 
     // Temporizadores. 
     // step - Quantas vezes ela usou o processador no total. 
-    // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
 
     // step: 
     // How many jiffies. total_jiffies.
@@ -1019,39 +1018,29 @@ get_next:
 
     Thread->step = 0;
 
-    // Quantum. 
-    // time-slice or quota. 
-    // See: ps/process.h
 
-    // Quantos jiffies a thread pode rodar em um round.
-    // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
-    // Thread->quantum  = QUANTUM_BASE; 
-
-    Thread->quantum  = ( Thread->priority * TIMESLICE_MULTIPLIER );
-
-    // Quantidade limite de jiffies que uma thread pode rodar em um round.
-    // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-    Thread->quantum_limit = QUANTUM_LIMIT; 
+    Thread->quantum       = QUANTUM_MIN;
+    Thread->quantum_limit = QUANTUM_MAX; 
 
     Thread->standbyCount = 0;
 
-    Thread->runningCount = 0;   
-
-    Thread->initial_time_ms = get_systime_ms();
-    Thread->total_time_ms = 0;
-
-    // Quantidade de tempo rodadndo dado em ms.
+    Thread->runningCount = 0;
     Thread->runningCount_ms = 0;
 
-    Thread->readyCount = 0; 
+    Thread->readyCount  = 0; 
     Thread->ready_limit = READY_LIMIT;
-    Thread->waitingCount = 0;
+
+    Thread->waitingCount  = 0;
     Thread->waiting_limit = WAITING_LIMIT;
-    Thread->blockedCount = 0; 
+
+    Thread->blockedCount  = 0; 
     Thread->blocked_limit = BLOCKED_LIMIT;
 
     // Not used now. But it works fine.
     Thread->ticks_remaining = 1000; 
+
+    Thread->initial_time_ms = get_systime_ms();
+    Thread->total_time_ms = 0;
 
 // ===================================
 
@@ -1296,8 +1285,8 @@ void exit_current_thread(void)
 // OUT:
 // Pointer for the clone.
 
-struct thread_d *copy_thread_struct ( struct thread_d *thread ){
-
+struct thread_d *copy_thread_struct ( struct thread_d *thread )
+{
     struct thread_d  *father;
     struct thread_d  *clone;
 
@@ -1440,7 +1429,6 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread ){
 
     // Temporizadores. 
     // step - Quantas vezes ela usou o processador no total.
-    // quantum_limit - (9*2);  O boost n�o deve ultrapassar o limite. 
 
 
 //
@@ -1454,24 +1442,26 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread ){
     clone->quantum       = father->quantum; 
     clone->quantum_limit = father->quantum_limit;
 
+    if ( clone->quantum < QUANTUM_MIN ){ clone->quantum = QUANTUM_MIN; }
+    if ( clone->quantum > QUANTUM_MAX ){ clone->quantum = QUANTUM_MAX; }
+
+    if ( clone->quantum_limit > QUANTUM_MAX ){ clone->quantum_limit = QUANTUM_MAX; }
 
 	// runningCount - Tempo rodando antes de parar.
 	// readyCount - Tempo de espera para retomar a execução.
 	// blockedCount - Tempo bloqueada.
 
     clone->standbyCount    = father->standbyCount;
+
     clone->runningCount    = father->runningCount; 
-    clone->initial_time_ms = father->initial_time_ms;
-    clone->total_time_ms   = father->total_time_ms;
-
-
-    //quantidade de tempo rodadndo dado em ms.
     clone->runningCount_ms = father->runningCount_ms;
 
     clone->readyCount      = father->readyCount; 
     clone->ready_limit     = father->ready_limit;
+
     clone->waitingCount    = father->waitingCount;
     clone->waiting_limit   = father->waiting_limit;
+
     clone->blockedCount    = father->blockedCount; 
     clone->blocked_limit   = father->blocked_limit;
 
@@ -1479,8 +1469,11 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread ){
 
     clone->ticks_remaining = father->ticks_remaining; 
 
-    // Signal
-    // Sinais para threads.
+    clone->initial_time_ms = father->initial_time_ms;
+    clone->total_time_ms   = father->total_time_ms;
+
+// Signal
+// Sinais para threads.
 
     clone->signal = father->signal;
     clone->umask  = father->umask;

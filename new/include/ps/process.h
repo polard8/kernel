@@ -118,24 +118,8 @@
 //...
 
 
-/*
- * Constantes para n�veis de quantum.
- * Tempo de processamento atribuido pelo scheduler � cada processo.
- * dado em quantidades de ticks ...
- * para saber quanto tempo tem que multiplicar por 10ms ... que � 
- * o tempo de cada interrup��o ... e somar o tempo perdido com taskswitch ...
- *  100ms + 5ms(que o timer fica esperando o kernel habilitar as interrup��es).
- */
 
-// #test
-#define QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
-#define QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-
-// #test
-// Limite de tempo esperando.
-#define READY_LIMIT   (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-#define WAITING_LIMIT (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-#define BLOCKED_LIMIT (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
+ 
  
  
 //Lista de status na cria��o de um processo.     

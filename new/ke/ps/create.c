@@ -188,39 +188,34 @@ void *create_CreateEarlyRing0IdleThread(void)
     
     // Jiffies
     kThread->step = 0;
-    
-
-    // QUANTUM_BASE   (PRIORITY_NORMAL*TIMESLICE_MULTIPLIER)
-    //kThread->quantum = QUANTUM_BASE;
-    //kThread->quantum  = ( kThread->priority * TIMESLICE_MULTIPLIER);
-    //kThread->quantum = 20;
-    kThread->quantum = 40;
-    
-    // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-    kThread->quantum_limit = QUANTUM_LIMIT;
 
 
-    // Contadores.
+// Contadores.
+
+    kThread->quantum       = QUANTUM_MIN;
+    kThread->quantum_limit = QUANTUM_MAX;
 
     kThread->standbyCount = 0;
-    kThread->runningCount = 0;  //Tempo rodando antes de parar.
-    kThread->readyCount   = 0;  //Tempo de espera para retomar a execução.
 
-    kThread->initial_time_ms = get_systime_ms();
-    kThread->total_time_ms = 0;
-
-    // Quantidade de tempo rodadndo dado em ms.
+    kThread->runningCount = 0;
     kThread->runningCount_ms = 0;
 
+    kThread->readyCount  = 0;
     kThread->ready_limit = READY_LIMIT;
+
     kThread->waitingCount  = 0;
     kThread->waiting_limit = WAITING_LIMIT;
-    kThread->blockedCount = 0;    //Tempo bloqueada.
+
+    kThread->blockedCount  = 0;
     kThread->blocked_limit = BLOCKED_LIMIT;
 
     kThread->ticks_remaining = 1000;
 
-    // Signal
+    kThread->initial_time_ms = get_systime_ms();
+    kThread->total_time_ms = 0;
+
+// Signal
+
     kThread->signal = 0;
     kThread->umask = 0;
 
@@ -547,37 +542,31 @@ void *create_CreateRing3InitThread (void)
     t->step = 0; 
 
 
-    // #todo
-
-    //t->quantum  = QUANTUM_BASE;
-    //t->quantum  = ( t->priority * TIMESLICE_MULTIPLIER);
-    t->quantum = 20;
+    t->quantum       = QUANTUM_MIN;
+    t->quantum_limit = QUANTUM_MAX;
 
 
-    // QUANTUM_LIMIT  (PRIORITY_MAX *TIMESLICE_MULTIPLIER)
-    t->quantum_limit = QUANTUM_LIMIT;
-
-
-    // Contadores.
     t->standbyCount = 0;
-    t->runningCount = 0;  // Tempo rodando antes de parar.
-    t->readyCount   = 0;  // Tempo de espera para retomar a execu��o.
 
-    t->initial_time_ms = get_systime_ms();
-    t->total_time_ms   = 0;
-
-    // Quantidade de tempo rodando dado em ms.
+    t->runningCount = 0;
     t->runningCount_ms = 0;
 
-    t->ready_limit   = READY_LIMIT;
+    t->readyCount  = 0;
+    t->ready_limit = READY_LIMIT;
+
     t->waitingCount  = 0;
     t->waiting_limit = WAITING_LIMIT;
+
     t->blockedCount  = 0;    //Tempo bloqueada.
     t->blocked_limit = BLOCKED_LIMIT;
 
     t->ticks_remaining = 1000;
 
-    // Signal
+    t->initial_time_ms = get_systime_ms();
+    t->total_time_ms   = 0;
+
+// Signal
+
     t->signal = 0;
     t->umask  = 0;
 

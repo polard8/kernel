@@ -411,6 +411,7 @@ struct thread_d
     // Quantos jiffies a thread pode rodar em um round.
     // Quantidade limite de jiffies que uma thread pode rodar em um round.
     // Limite quando dado boost. 
+
     unsigned long quantum;
     unsigned long quantum_limit;   
 

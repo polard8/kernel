@@ -1,4 +1,5 @@
 
+// schedi.c
 
 #include <kernel.h>  
 
@@ -35,7 +36,7 @@ int KiScheduler (void){
 
 
     if (g_scheduler_status == LOCKED){
-        debug_print ("schedi: Locked $\n");
+        debug_print ("KiScheduler: Locked $\n");
         return 0;
     }
 
@@ -45,12 +46,13 @@ int KiScheduler (void){
 
     if ( (void *) ____IDLE == NULL ){
         panic ("KiScheduler: ____IDLE fail");
-    }else{
-        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 ){
-            panic ("KiScheduler: ____IDLE validation");
-        }
-        // ...
-    };
+    }
+
+    if ( ____IDLE->used != TRUE || ____IDLE->magic != 1234 )
+    {
+        panic ("KiScheduler: ____IDLE validation");
+    }
+
 
 	// Retornaremos se tivermos apenas um thread rodando.
 	// Pois não há o que trocar.
@@ -71,10 +73,14 @@ int KiScheduler (void){
         return (int) current_thread;
     }
 
-    //Chama o Scheduler.
+
+//
+// Scheduler
+//
 
     return (int) scheduler();
 }
+
 
 
 /*
@@ -389,24 +395,18 @@ int get_current (void)
  
 void set_current (int id){
 
-    if ( id == current_thread )
-    {
-        return;
-    }
+    if ( id == current_thread ){  return;  }
 
+// Limits
 
-	// Limits.
     if (id < 0 || id >= THREAD_COUNT_MAX)
     {
         return;
     }
 
-	// Nothing ?!
-	// Done.
-
-
     current_thread = (int) id;
 }
+
 
 /*
  * wait_for_a_reason:
@@ -415,25 +415,28 @@ void set_current (int id){
 
 void wait_for_a_reason ( int tid, int reason ){
 
-    struct thread_d *t;
+    struct thread_d  *t;
 
-
+    // #debug
     printf ("wait_for_a_reason: %d\n", reason);
 
     // tid
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
         debug_print ("wait_for_a_reason: validation\n");
         return;
     } 
 
-    //reason
+    // reason
     if ( reason < 0 || reason >= 10 ){
         debug_print ("wait_for_a_reason: limits\n");
         return;
     }
 
+//
+// Thread
+//
 
-    //thread
     t = (struct thread_d *) threadList[tid];
 
     if ( (void *) t == NULL ){
@@ -445,24 +448,26 @@ void wait_for_a_reason ( int tid, int reason ){
         if ( t->used != 1 || t->magic != 1234 ){
             debug_print ("wait_for_a_reason: t validation\n");
         }
-        
-        if ( t->used == 1 && t->magic == 1234 )
-        {
-			t->wait_reason[reason] = 1;
-	        
-			//
-			// ## Wait ##
-			//
 
-			t->state =  WAITING;
+        if ( t->used == TRUE && t->magic == 1234 )
+        {
+            t->wait_reason[reason] = 1;
+
+		//
+		// ## Wait ##
+		//
+
+            t->state =  WAITING;
         }
     };
-    
+
    //KiScheduler ();
-    
+   
+   // #debug
    printf ("wait_for_a_reason: done\n");
    refresh_screen();
 }
+
 
 /*
  * wakeup_thread_reason:
@@ -491,7 +496,10 @@ int wakeup_thread_reason ( int tid, int reason ){
         goto fail;
     }
 
-    //thread
+//
+// Thread
+//
+
     t = (struct thread_d *) threadList[tid];
 
     if ( (void *) t == NULL ){
@@ -500,7 +508,7 @@ int wakeup_thread_reason ( int tid, int reason ){
 
     } else {
 
-        if ( t->used != 1 || t->magic != 1234 ){
+        if ( t->used != TRUE || t->magic != 1234 ){
             debug_print ("wakeup_thread_reason: t validation\n");
             goto fail;
         }
@@ -590,15 +598,23 @@ int wakeup_scan_thread_reason ( int reason ){
         wakeup_thread_reason ( i, reason );
     };
 
+
+//done:
+
+    // #debug
     printf ("wakeup_scan_thread_reason: done\n");
     refresh_screen();
+    
     return 0;
 
 // Fail
 
 fail:
+
+    // #debug
     printf ("wakeup_scan_thread_reason: fail\n");
     refresh_screen();
+
     return (int) 1;
 }
 
@@ -709,17 +725,12 @@ void yield (int tid){
 
 // Called by task_switch().
 
-void check_for_standby (void){
-
-
-
+void check_for_standby (void)
+{
     // loop
     register int i = 0;
     //register int Max = 32;  // max what?
     register int Max = THREAD_COUNT_MAX;  // max what?
-
-
-
 
     int newId=0;
  

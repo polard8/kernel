@@ -1,10 +1,7 @@
 
-
+// clone.c
 
 #include <kernel.h> 
-
-
-
 
 
 // Clonning the current process and 
