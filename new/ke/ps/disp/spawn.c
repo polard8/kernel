@@ -166,7 +166,7 @@ void spawn_thread (int tid)
 
     if ( Target->iopl == RING0 ){
         debug_print ("spawn_thread: RING0\n");
-        printf ("spawn_thread: RING0\n");
+        printf      ("spawn_thread: RING0\n");
         //debug_print ("spawn_thread: RING0 not supported yet\n");
         //panic       ("spawn_thread: RING0 not supported yet\n");
         refresh_screen();
@@ -294,6 +294,13 @@ spawn_enter_kernelmode(
     unsigned long entry = (unsigned long) entry_va;
 
     unsigned long rsp0  = (unsigned long) rsp0_va;
+
+
+    // #debug
+    //printf("rsp0: %x \n",rsp0);
+    //refresh_screen();
+    //while(1){}
+
 
     if ( eoi == TRUE ){
         asm ("movb $0x20, %al \n");

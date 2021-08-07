@@ -933,23 +933,35 @@ void early_ring0_IdleThread (void)
 
 // #danger: Do NOT change this function.
 // #bugbug: This thread can't execute complex routine for now.
-Loop:
-    asm ("sti");
-    asm ("hlt");
-    goto Loop;
 
-/*
-// #bugbug: This thread can't execute complex routine for now.
+    //printf("");  //fail
+
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("early_ring0_IdleThread: w h\n");
+        panic       ("early_ring0_IdleThread: w h\n");
+    }
+
 Loop:
-    debug_print(" $$$$ Thread $$$$ \n");
-    printf(".\n");
+
+// acende
+    drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
+    draw_string(8,8,COLOR_YELLOW," Gramado Operating System ");
     refresh_screen();
+
+// relax
     asm ("sti");
     asm ("hlt");
-    goto Loop;
-*/
-}
 
+// apaga
+    drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
+    refresh_screen();
+
+    goto Loop;
+}
 
 
 //

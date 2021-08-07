@@ -49,11 +49,6 @@ extern _contextR15
 ; Timer interrupt.
 unit3Irq0Release:
 
-    ;Flush TLB.
-    ;jmp dummy_flush
-    ;; NOP
-;dummy_flush:
-
     ; 64bit
     ; This is a 64bit pointer to the pml4 table.
 
@@ -64,6 +59,11 @@ unit3Irq0Release:
     nop
     nop
     mov CR3, RAX  
+
+    ;IODELAY 
+    ;IODELAY 
+    ;IODELAY 
+    ;IODELAY 
 
 ;
 ; == Restore context ====================

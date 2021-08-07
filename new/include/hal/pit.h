@@ -4,11 +4,13 @@
 #ifndef ____PIT_H
 #define ____PIT_H    1
 
+
 //
 // Counting variables support.
 //
 
-
+// #bugbug
+// Temos isso redefinido em sched.h
 #define  HZ  100
 
 // total ticks

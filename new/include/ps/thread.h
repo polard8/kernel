@@ -140,7 +140,10 @@ typedef enum {
 
 
 
-// #todo
+
+
+// TCB - Thread Control Block
+
 struct thread_d 
 {
     // Object control.

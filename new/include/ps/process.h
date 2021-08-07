@@ -190,6 +190,9 @@ typedef enum {
 
 
 
+
+// PCB - Process Control Block
+
 struct process_d 
 {
     // Object control

@@ -205,7 +205,6 @@ refresh_rectangle (
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
 
-
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         debug_print ("refresh_rectangle: w h\n");

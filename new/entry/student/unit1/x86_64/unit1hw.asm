@@ -122,13 +122,20 @@ _irq0:
     ;; #bugbug: sempre a mesma pilha?
     ;; Que pilha as interrupçoes de softwar estao usando?
 
-    xor rax, rax
-    mov ax, word 0x10 ;KERNEL_DS
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax ; Is it used ?
-    mov ss, ax ; Is it used ?
+
+; ===============================================================
+; #bugbug: 
+; Isso estava impedindo de rodar threads em ring 0.
+;
+    ;xor rax, rax
+    ;mov ax, word 0x10 
+    ;mov ds, ax
+    ;mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax
+    ;mov ss, ax
+; ===============================================================
+
 
     ; #bugbug
     ; #todo
