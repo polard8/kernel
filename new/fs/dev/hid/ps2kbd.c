@@ -307,7 +307,10 @@ sc_again:
     }
 
 
-    // #todo: Use this one.
+//
+// Console interrupt
+//
+
     console_interrupt (
         foreground_thread,
         CONSOLE_DEVICE_KEYBOARD,

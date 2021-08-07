@@ -31,6 +31,15 @@ __kgwm_ps2kbd_procedure (
     unsigned long long1, 
     unsigned long long2 );
 
+
+int 
+sendto_tty ( 
+    struct tty_d *target_tty,
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte );
+
 int 
 sendto_eventqueue ( 
     int tid,

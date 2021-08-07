@@ -21,6 +21,192 @@ int kgws_ws_status;
 
 
 
+//=================================
+
+/*
+ ******************* 
+ * sendto_tty:
+ * 
+ *     Colocamos na tty PS2KeyboardDeviceTTY ou imprimimos na tela.
+ */
+
+int 
+sendto_tty ( 
+    struct tty_d *target_tty,
+    struct window_d *window, 
+    int message,
+    unsigned long ascii_code,
+    unsigned long raw_byte )
+{
+    struct tty_d *tty;
+    
+    //tty = (struct tty_d *) PS2KeyboardDeviceTTY;
+    tty = (struct tty_d *) target_tty;
+
+    //==============
+    // [event block]
+    struct window_d  *Event_Window;            //arg1 - window pointer
+    int               Event_Message       =0;  //arg2 - message number
+    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
+    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
+    //===================
+
+
+    // setup event block
+    // get parameters.
+    
+    Event_Window        = (struct window_d  *) window;
+    Event_Message       = message;
+    Event_LongASCIICode = ascii_code;
+    Event_LongRawByte   = raw_byte;
+
+
+    // ===========================
+
+    // #todo
+    // Send the message to the TYY,
+    // this way the foreground process is able to read it
+    // using stdin.
+    // See:
+    // devmgr.h ps2kbd.c
+    // ...
+    
+    // only one standard event
+    unsigned long event_buffer[5];
+
+
+    int i=0;    //iterator.
+    char bugBuffer[4];
+
+
+//
+// SETUP INPUT MODE
+//
+
+    // The event mode is not the mode we want.
+    // We want the tty mode to put the chars into the keyboard tty.
+
+    //if ( current_input_mode != INPUT_MODE_TTY )
+    if ( IOControl.useTTY != TRUE )
+    {
+        panic("sendto_tty: [ERROR] Wrong input mode\n");
+    }
+
+//
+// TTY INPUT MODE
+//
+
+    //if ( current_input_mode == INPUT_MODE_TTY )
+    if ( IOControl.useTTY == TRUE )
+    {
+
+        if ( (void *) tty != NULL )
+        {
+            // ok. This is a valid tty pointer.
+       
+        // #test
+        // Let's write something ...
+            event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
+            event_buffer[1] = (unsigned long) Event_Message;                     // message number.
+            event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
+            event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
+       
+        // #todo
+        // >> PS2KeyboardDeviceTTY->_rbuffer
+        // No buffer 'bruto' colocamos os raw bytes.
+        // >> PS2KeyboardDeviceTTY->_cbuffer
+        // No buffer 'canonico' colocamos os ascii codes.
+        // ps: nao usaremos o buffer de output no caso do teclado. 
+        
+        //devemos cheacar se o tty esta configurado para
+        //escrever na fila bruta ou canonica e escrevermos no lugar certo
+        //Do mesmo modo deve ser a leitura.
+        //a configuraçao pode ser feita em ring3// see:ioctl
+        // esse tipo de decisao deve ficar dentro das rotinas de leitura e escrita e nao aqui.
+        
+        //quanto a fila eh canonica, escrevemos somente os keydown.
+                
+            //xxxbug[0] = 'x';  //fake bytes
+            bugBuffer[0] = Event_LongASCIICode & 0x000000ff;
+
+        // ?? #bugbug
+        // Explique melhor isso. ... estamos escrevendo um byte 
+        // no arquivo '0' ???
+        //if ( Event_Message == MSG_KEYDOWN)
+            sys_write(0,bugBuffer,1);
+        
+        // coloca o raw byte no buffer de raw byte.
+        //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
+        
+            //canonica
+            //if ( Event_Message == MSG_KEYDOWN)
+            file_write_buffer ( tty->_cbuffer, bugBuffer , 1);
+        
+        // #bugbug
+        // Estamos colocando um evento no buffer 'bruto'.
+       
+        // it is gonna write in the base of the buffer.
+        // >> Essa rotina escreve na fila bruta. (raw buffer).
+        // See: tty.c
+        
+        //__tty_write ( 
+        //    (struct tty_d *) PS2KeyboardDeviceTTY, 
+        //    (char *) event_buffer, 
+        //    (int) (4*4) );  //16 bytes = apenas um evento.
+         
+         // Sinalizamos que temos um novo evento.
+         
+         // #todo
+         // Precisamos de uma flag que diga que é para imprimirmos na tela.
+         
+         // o teclado esta escrevendo na tty
+         // ela decide se faz echo no console ou nao,
+         // dependendo da configuraçao da tty.
+         // #test: fazendo echo
+            if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] != '\n') )
+            {
+                // ainda nao pode ler.
+                tty->new_event = FALSE;
+         
+                console_write ( 
+                    (int) fg_console, 
+                    (const void *) bugBuffer, 
+                    (size_t) 1 );
+
+                
+                // #bugbug:
+                // Usado somente para teste.
+                refresh_screen(); 
+            }
+            //pode ler
+            if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] == 'q') )
+            {
+                tty->new_event = TRUE;
+
+             // da proxima vez escreveremos no inicio do buffer.
+             //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
+             // PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
+             //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
+             //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
+             //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
+            }
+  
+        }
+        
+        // ok
+        return 0;
+    } //fim do current input mode. (TTY MODE)
+
+
+fail:
+
+    // Invalid input mode.
+    debug_print ("sendto_tty: [FAIL] Invalid input mode\n");
+
+    // fail
+    return -1;
+}
+
 
 // ==================================
 // sendto_eventqueue:
@@ -721,10 +907,13 @@ done:
 // == dispatch event ======================================
 //
 
+    // Se não está inicializado.
     if ( IOControl.initialized != TRUE ){
         panic ("UserInput_SendKeyboardMessage: IO Control not initialized\n");
     }
 
+    // Se não podemos usar modo algum.
+    // Se não podemos usar tty e não podemos usar o modo event queue.
     if ( IOControl.useTTY != TRUE && 
          IOControl.useEventQueue != TRUE )
     {
@@ -753,11 +942,17 @@ done:
     // ...
 
 
+    // Se o modo tty está disponível.
+
     //if ( current_input_mode == INPUT_MODE_TTY )
     if ( IOControl.useTTY == TRUE )
     {
          panic ("UserInput_SendKeyboardMessage: [FIXME] File permission issue\n");
 
+
+         // # dummy compilation test
+         sendto_tty( NULL, NULL, 0, 0, 0 );
+          
          //sendto_tty (   
          //    (struct tty_d *)    PS2KeyboardDeviceTTY,
          //    (struct window_d *) Event_Window,

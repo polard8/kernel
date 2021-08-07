@@ -1376,137 +1376,18 @@ regularfile_ioctl (
 }
 
 
-/*
- ******************************************
- * stdioInitialize:
- *     Inicializando stdio pertencente ao kernel base.
- *     Inicializa as estruturas do fluxo padrão.
- *     Quem chamou essa inicialização ?? Em que hora ??
- *
- * #bugbug: Pelo jeito somente depois dessa inicialização é que temos mensagens 
- * com printf decentes. Então a inicialização do kernel precisa disso.
- * >> precisamos antecipar essa inicilização. Mas ela precisa ser depois da
- * inicialização da paginação.
- */
- 
-// Estamos no kernel base em ring 0.
-// Queremos que as streams sejam acessíveis para as rotinas
-// da libc em ring3. Para a libc alterar os elementos
-// da estrutura.
-// #bugbug: Talvez seja possível criar essas estruturas
-// em memória compartilhada, usado o alocaro apropriado.
-// kmalloc com certeza e ring0.
-
-// In this routine:
-// + Initializing the structures for stdin, stdout and stderr
-
-int stdioInitialize (void)
+// local
+void __initialize_stdin(void)
 {
-    kstdio_standard_streams_initialized =  FALSE;
 
-    int Status = 0;
     int slot=-1;
-
-    // register ?
-    int i=0;
-
-    file *tmp;
-    struct inode_d *tmp_inode;    
-
-
-    int cWidth  = get_char_width();
-    int cHeight = get_char_height();
-
-    if ( cWidth == 0 || cHeight == 0 ){
-        x_panic ("kstdio-stdioInitialize: [FAIL] Char info\n");
-    }
-
-    // #
-    // Ja temos suporte a print nesse momento por causa
-    // das configurações de console. Mas nessa rotina 
-    // refaremos as configurações de console.
-    
-    debug_print ("stdioInitialize: [TODO]\n");
-    printf      ("stdioInitialize: [TODO]\n");
-
-
-    // Ùltimo erro registrado.
-    errno = 0;
-    
-
-    // Os buffers dos arquivos acima.
-    // prompt[]
-    // Esses prompts são usados como arquivos.
-    // São buffers para as streams.
-    // See: kstdio.h
-
-    // Clean
-    for ( i=0; i<PROMPT_SIZE; i++ )
-    {
-        prompt[i]     = (char) '\0';
-        prompt_out[i] = (char) '\0';
-        prompt_err[i] = (char) '\0';
-    };
-    prompt_pos = 0;
-
-
-
-    //
-    // file_table and inode_table
-    //
-
-    //=====================
-    // file table
-    for (i=0; i<NUMBER_OF_FILES; i++)
-    {
-        tmp = (void*) kmalloc (sizeof(file));
-        if ((void*)tmp==NULL){
-           x_panic("kstdio-stdioInitialize: tmp\n");
-        }
-        tmp->used  = TRUE;
-        tmp->magic = 1234;
-        tmp->____object = ObjectTypeFile; //Regular file
-        tmp->_flags = 0; // (__SWR | __SRD); 
-        tmp->fd_counter = 0;
-        tmp->_tmpfname = NULL;
-        //...
- 
-        //salva
-        file_table[i] = (unsigned long) tmp; 
-    };
-    
-
-    //===================================
-    // inode table
-    for (i=0; i<32; i++)
-    {
-        tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
-        if ((void*)tmp_inode==NULL){
-            x_panic("kstdio-stdioInitialize: tmp_inode\n");
-        }
-        tmp_inode->used  = TRUE;
-        tmp_inode->magic = 1234;
-        tmp_inode->filestruct_counter = 0;
-        tmp_inode->path[0] = 0;
-        //...
-
-        //salva
-        inode_table[i] = (unsigned long) tmp_inode; 
-    };
-
-
-    // #bugbug
-    // 0 - keyboard tty.
-    // 1 - virtual console.
-    // 2 - regular file.
-
 
     //===========================================
     // stdin
     // pega slot em file_table[] para stdin
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: file slot");
+        x_panic("__initialize_stdin: file slot");
     }
     stdin = (file *) file_table[slot];
     stdin->filetable_index = slot;
@@ -1537,24 +1418,34 @@ int stdioInitialize (void)
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: [FAIL] stdin inode slot\n");
+        x_panic("__initialize_stdin: [FAIL] stdin inode slot\n");
     }
     stdin->inode = (struct inode_d *) inode_table[slot];
     stdin->inodetable_index = slot;
     if( (void*) stdin->inode == NULL ){
-        x_panic("kstdio-stdioInitialize: [FAIL] stdin inode struct\n");
+        x_panic("__initialize_stdin: [FAIL] stdin inode struct\n");
     }
     stdin->inode->filestruct_counter = 1; //inicialize
-    memcpy( (void*) stdin->inode->path, (const void*) stdin->_tmpfname, sizeof( stdin->inode->path ) );
-    // ... 
+    
+    memcpy ( 
+        (void*) stdin->inode->path, 
+        (const void*) stdin->_tmpfname, 
+        sizeof( stdin->inode->path ) );
+
+    return;
+}
 
 
+// local
+void __initialize_stdout(void)
+{
+    int slot=-1;
     //=============================================
     // stdout
     // pega slot em file_table[] para stdout
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: slot\n");
+        x_panic("__initialize_stdout: slot\n");
     }
     stdout = (file *) file_table[slot];
     stdout->filetable_index = slot;
@@ -1587,27 +1478,35 @@ int stdioInitialize (void)
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: stdout inode slot\n");
+        x_panic("__initialize_stdout: stdout inode slot\n");
     }
     stdout->inode = (struct inode_d *) inode_table[slot];
     stdout->inodetable_index = slot;
     if( (void*) stdout->inode == NULL ){
-        x_panic("kstdio-stdioInitialize: stdout inode struct\n");
+        x_panic("__initialize_stdout: stdout inode struct\n");
     }
     stdout->inode->filestruct_counter = 1; //inicialize
+
     memcpy( 
-        (void*)       stdout->inode->path, 
+        (void*) stdout->inode->path, 
         (const void*) stdout->_tmpfname, 
         sizeof( stdout->inode->path ) );
-    // ... 
+
+    return;
+}
 
 
+// local
+void __initialize_stderr(void)
+{
+    int slot = -1;
+    
     //=========================================
     // stderr
     // pega slot em file_table[] para stderr
     slot = get_free_slots_in_the_file_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: slot");
+        x_panic("__initialize_stderr: slot");
     }
     stderr = (file *) file_table[slot];
     stderr->filetable_index = slot;
@@ -1638,12 +1537,12 @@ int stdioInitialize (void)
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
     if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("kstdio-stdioInitialize: stderr inode slot\n");
+        x_panic("__initialize_stderr: stderr inode slot\n");
     }
     stderr->inode = (struct inode_d *) inode_table[slot];
     stderr->inodetable_index = slot;
     if( (void*) stderr->inode == NULL ){
-        x_panic("kstdio-stdioInitialize: stderr inode struct\n");
+        x_panic("__initialize_stderr: stderr inode struct\n");
     }
     stderr->inode->filestruct_counter = 1; //inicialize
     //copy the name.
@@ -1651,28 +1550,130 @@ int stdioInitialize (void)
         (void*)       stderr->inode->path, 
         (const void*) stderr->_tmpfname, 
         sizeof( stderr->inode->path ) );
-    // ... 
 
 
+    return;
+}
 
-    // ...
 
-	// Flag para o tipo de input.
-	// # Multiplas linhas.
+// Local.
+// Os buffers dos arquivos acima.
+// prompt[]
+// Esses prompts são usados como arquivos.
+// São buffers para as streams.
+// See: kstdio.h
 
-    g_inputmode = INPUT_MODE_MULTIPLE_LINES;
+void __clear_prompt_buffers(void)
+{
+    int i=0;
 
-    //
-    // Virtual console.
-    //
+    // Clean
+    for ( i=0; i<PROMPT_SIZE; i++ )
+    {
+        prompt[i]     = (char) '\0';
+        prompt_out[i] = (char) '\0';
+        prompt_err[i] = (char) '\0';
+    };
+    prompt_pos = 0;
     
-    // Configurando o cursor para todos os consoles.
-    // Estamos fazendo isso pela segunda vez.
-    // A primeira foi quando criamos os consoles.
+    return;
+}
 
-    // See:
-    // tty.h
-    // console.h
+
+// local
+void __initialize_file_table(void)
+{
+
+    file *tmp;
+    int i=0;
+
+
+    //=====================
+    // file table
+    for (i=0; i<NUMBER_OF_FILES; i++)
+    {
+        tmp = (void*) kmalloc (sizeof(file));
+        if ((void*)tmp==NULL){
+           x_panic("__initialize_file_table: tmp\n");
+        }
+        tmp->used  = TRUE;
+        tmp->magic = 1234;
+        tmp->____object = ObjectTypeFile; //Regular file
+        tmp->_flags = 0; // (__SWR | __SRD); 
+        tmp->fd_counter = 0;
+        tmp->_tmpfname = NULL;
+        //...
+ 
+        //salva
+        file_table[i] = (unsigned long) tmp; 
+    };
+
+     return;
+}
+
+// local
+void __initialize_inode_table(void)
+{
+    struct inode_d *tmp_inode;    
+    int i=0;
+    
+    //===================================
+    // inode table
+    for (i=0; i<32; i++)
+    {
+        tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
+        if ((void*)tmp_inode==NULL){
+            x_panic("__initialize_inode_table: tmp_inode\n");
+        }
+        tmp_inode->used  = TRUE;
+        tmp_inode->magic = 1234;
+        tmp_inode->filestruct_counter = 0;
+        tmp_inode->path[0] = 0;
+        //...
+
+        //salva
+        inode_table[i] = (unsigned long) tmp_inode; 
+    };
+
+    return;
+}
+
+
+// Local
+// #??
+// Maybe we are doing this for the second time.
+// Configurando o cursor para todos os consoles.
+// Estamos fazendo isso pela segunda vez.
+// A primeira foi quando criamos os consoles.
+// See:
+// tty.h
+// console.h
+
+void __initialize_virtual_consoles(void)
+{
+
+    int i=0;
+
+    // Char support.
+    int cWidth=0;
+    int cHeight=0;
+
+
+// Screen width and height
+
+    if ( SavedX == 0 || SavedY == 0 ){
+        x_panic ("__initialize_virtual_consoles: [FAIL] SavedX SavedY\n");
+    }
+
+
+// Char width and height
+
+    cWidth  = get_char_width();
+    cHeight = get_char_height();
+
+    if ( cWidth == 0 || cHeight == 0 ){
+        x_panic ("__initialize_virtual_consoles: [FAIL] cWidth cHeight\n");
+    }
 
     for (i=0; i<4; i++){
 
@@ -1687,10 +1688,6 @@ int stdioInitialize (void)
         CONSOLE_TTYS[i].initialized = TRUE;
     };
 
-    // #bugbug
-    // Estamos fazendo isso pela segunda vez.
-    // A primeira foi em kernel_main.
-    Background_initialize();
 
     // #bugbug
     // Testando o funcionamento das estruturas de console. tty.
@@ -1700,10 +1697,96 @@ int stdioInitialize (void)
     //while(1){}
     //Done !
 
-    stdio_terminalmode_flag = TRUE;
-    stdio_verbosemode_flag = TRUE;
-    kstdio_standard_streams_initialized = TRUE;
 
+    return;
+}
+
+/*
+ ******************************************
+ * stdioInitialize:
+ *     Inicializando stdio pertencente ao kernel base.
+ *     Inicializa as estruturas do fluxo padrão.
+ *     Quem chamou essa inicialização ?? Em que hora ??
+ *
+ * #bugbug: Pelo jeito somente depois dessa inicialização é que temos mensagens 
+ * com printf decentes. Então a inicialização do kernel precisa disso.
+ * >> precisamos antecipar essa inicilização. Mas ela precisa ser depois da
+ * inicialização da paginação.
+ */
+ 
+// Estamos no kernel base em ring 0.
+// Queremos que as streams sejam acessíveis para as rotinas
+// da libc em ring3. Para a libc alterar os elementos
+// da estrutura.
+// #bugbug: Talvez seja possível criar essas estruturas
+// em memória compartilhada, usado o alocaro apropriado.
+// kmalloc com certeza e ring0.
+
+// In this routine:
+// + Initializing the structures for stdin, stdout and stderr
+
+int stdioInitialize (void)
+{
+    kstdio_standard_streams_initialized =  FALSE;
+
+    // Ja temos suporte a print nesse momento por causa
+    // das configurações de console. Mas nessa rotina 
+    // refaremos as configurações de console.
+    
+    debug_print ("stdioInitialize: [TODO]\n");
+    printf      ("stdioInitialize: [TODO]\n");
+
+
+    // ??
+    // Input mode
+    // #bugbug
+    // We have another definition of input mode.
+    // An global io structure.
+    g_inputmode = INPUT_MODE_MULTIPLE_LINES;
+
+    // Ùltimo erro registrado.
+    errno = 0;
+
+
+    // Buffers used by the standard stream.
+    __clear_prompt_buffers();
+
+
+    // Initialize the global file table.
+    __initialize_file_table();
+
+
+    // Initialize the global inode table.
+    __initialize_inode_table();
+
+
+    // Create standard stream.
+    __initialize_stdin();
+    __initialize_stdout();
+    __initialize_stderr();
+
+
+//
+// Virtual console
+//
+
+    __initialize_virtual_consoles();
+
+//
+// Background
+//
+
+    // #bugbug
+    // Estamos fazendo isso pela segunda vez.
+    // A primeira foi em kernel_main.
+
+    Background_initialize();
+
+    stdio_terminalmode_flag = TRUE;
+    stdio_verbosemode_flag  = TRUE;
+
+//done:
+    kstdio_standard_streams_initialized = TRUE;
     return 0;
 
 fail:
