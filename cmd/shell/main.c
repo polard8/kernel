@@ -8,6 +8,8 @@
 
 #include "shell.h"
 
+unsigned long device_width;
+unsigned long device_height;
 
 #define MSG_KEYDOWN       20
 #define MSG_KEYUP         21
@@ -20,8 +22,61 @@
 #define VK_F4    0x3E  //62 
 
 
-#define VK_RETURN      0x1C
+#define VK_RETURN    0x1C
 #define VK_TAB       0x0F
+
+#define COLOR_BLACK    0x000000
+#define COLOR_GRAY     0x808080 
+
+
+//======================================
+// Calling kgws in ring0.
+// Using the kgws to refresh the rectangle.
+void 
+__shell_refresh_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height )
+{
+    unsigned long Buffer[5];
+    
+    Buffer[0] = (unsigned long) x;
+    Buffer[1] = (unsigned long) y;
+    Buffer[2] = (unsigned long) width;
+    Buffer[3] = (unsigned long) height;
+
+    gramado_system_call ( 
+        10, 
+        (unsigned long) &Buffer[0], 
+        0, 
+        0 );
+}
+
+void 
+__shell_draw_rectangle ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    int color )
+{
+    unsigned long Buffer[5];
+    
+    Buffer[0] = (unsigned long) x;
+    Buffer[1] = (unsigned long) y;
+    Buffer[2] = (unsigned long) width;
+    Buffer[3] = (unsigned long) height;
+    Buffer[4] = (unsigned long) (color & 0xFFFFFF);
+
+    gramado_system_call ( 
+        391, 
+        (unsigned long) &Buffer[0], 
+        (unsigned long) &Buffer[0], 
+        0 );
+}
+
+
 
 
 /*
@@ -89,6 +144,14 @@ do_compare:
 
     //shellInsertLF();
     printf("\n");
+
+
+    // cls
+    if ( strncmp(prompt,"cls",3) == 0 ){
+        shell_clear_screen();
+        goto exit_cmp;
+    }
+ 
 
     // about
     if ( strncmp ( prompt, "about", 5 ) == 0 )
@@ -287,6 +350,25 @@ done:
 }
 
 
+void shell_clear_screen(void)
+{
+
+// Clear screen
+    __shell_draw_rectangle(
+        0,
+        0,
+        device_width >> 1,
+        device_height >> 1,
+        COLOR_GRAY);
+        
+// Reset cursor
+    gramado_system_call(
+        34,
+        0,   // x
+        4,   // y
+        0);
+}
+
 
 int main ( int argc, char *argv[] )
 {
@@ -294,9 +376,41 @@ int main ( int argc, char *argv[] )
     debug_print ("------------------------------\n");
     debug_print ("shell.bin\n");
 
+    device_width  = rtl_get_system_metrics(1);
+    device_height = rtl_get_system_metrics(2);
 
-   printf ("Shell: $");
-   fflush(stdout);
+    __shell_draw_rectangle(
+        0,
+        0,
+        device_width >> 1,
+        device_height >> 1,
+        COLOR_BLACK);
+
+
+    // cursor
+    gramado_system_call( 
+        34,
+        0,
+        4,
+        0);
+
+    printf ("Gramado OS\n");
+
+    shellPrompt();
+
+    //#debug
+    //printf ("w: %d\n",device_width);
+    //printf ("h: %d\n",device_height);
+    //exit(0);
+
+    
+// #bugbug
+// Clear the screen.
+    //gramado_system_call(390,0,0,0);
+
+
+   //printf ("Shell: $");
+   //fflush(stdout);
 
 //
 // Message loop

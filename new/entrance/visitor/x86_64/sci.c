@@ -39,6 +39,8 @@ void *gde_extra_services (
     file *__bmfp;
 
 
+    unsigned long *message_address = (unsigned long *) arg2;
+
     //Deprecated.
     //Outro n�mero fará esse trabalhao.
     if ( number == 260 ){
@@ -175,8 +177,34 @@ void *gde_extra_services (
         printf ("gde_extra_services: [377] uname. [todo] \n");
         sys_uname ( (struct utsname *) arg2 );        
         refresh_screen();
+        return NULL;
     }
 
+
+    // #bugbug
+    // It crashes the system.
+    // Clear the screen.
+    if (number==390)
+    {
+        debug_print ("extra services: [390] :)\n");
+        //Background_initialize();
+        return NULL;
+    }
+
+
+    // #bugbug
+    // Falha se tentamos pintar a tela toda.
+    if (number==391)
+    {
+        drawDataRectangle ( 
+            (unsigned long) message_address[0],    //x 
+            (unsigned long) message_address[1],    //y
+            (unsigned long) message_address[2],    //width
+            (unsigned long) message_address[3],    //height
+            (unsigned int)  message_address[4] );  //color
+
+        return NULL;
+    }
 
 
     // 512 - Get ws PID for a given desktop.
@@ -790,7 +818,7 @@ void *sci0 (
                 (unsigned long) message_address[1],    //y
                 (unsigned long) message_address[2],    //width
                 (unsigned long) message_address[3],    //height
-                (unsigned long) message_address[4] );  //color
+                (unsigned int) message_address[4] );  //color
             return NULL;
             break;
 

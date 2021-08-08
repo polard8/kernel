@@ -78,7 +78,6 @@ __kgwm_ps2kbd_procedure (
             };
             break;
 
-
         // Pressionadas: teclas de funçao
         case MSG_SYSKEYDOWN: 
             switch (long1){
