@@ -75,17 +75,13 @@ OBJS = socket.o \
 network.o    
 
 
-
-
 all:
 
-	$(CC) -c socket/socket.c    $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
-	$(CC) -c network/network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
-
+	$(CC) -c socket.c   $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
+	$(CC) -c network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
 
 #link
 	$(LD) -r -o archive_net.o $(OBJS)
-
 
 # todo: vamos ligar tudo e enviar somente a biblioteca.
 	#cp *.o ../

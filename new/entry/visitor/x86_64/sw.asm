@@ -160,13 +160,15 @@ _int129:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
-    ;#test
+
+    ; #test
     xor rax, rax
-    mov ax, word 0x10 ;KERNEL_DS 
+    mov ax, word 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
+
 
     ;call _xxxxINT129_DEBUG_MESSAGE
     call _sci1
@@ -266,7 +268,7 @@ _int130:
 
     ;#test
     xor rax, rax
-    mov ax, word 0x10 ;KERNEL_DS 
+    mov ax, word 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -326,8 +328,9 @@ _int199:
     pop qword [frameRIP]
     pop qword [frameCS]
     pop qword [frameRFLAGS]
-   
+
     mov qword [frameRFLAGS], 0x0000000000003200
+    ;mov qword [frameRFLAGS], 0x0000000000003202
 
     push qword [frameRFLAGS]
     push qword [frameCS]

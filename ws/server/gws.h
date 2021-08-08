@@ -136,6 +136,7 @@ struct gws_d
     unsigned long version_major;
     unsigned long version_minor;
 
+    // fd
     int socket;
 
     // flag: When to quit the window server.

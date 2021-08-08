@@ -245,7 +245,9 @@ socket_gramado (
 
     // Esse é o arquivo usado pelos aplicativos.
     // Retornaremos seu fd.
+
     file *_file;
+
     struct process_d *Process;
 
     // Procurar slot livres.
@@ -268,6 +270,9 @@ socket_gramado (
         goto fail;
     }
 
+
+    // #todo
+    // Check current_process ?
 
     // Process.
 
@@ -301,7 +306,7 @@ socket_gramado (
 
 
     // Reserva um slot.
-    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    for ( i=3; i<NUMBER_OF_FILES; i++ )
     {
         if ( Process->Objects[i] == 0 ){ __slot = i; break; }
     };
@@ -330,9 +335,9 @@ socket_gramado (
     }
 
 
-	//
-	// File.
-	//
+//
+// File
+//
 
     _file = (void *) kmalloc ( sizeof(file) );
 
@@ -343,80 +348,99 @@ socket_gramado (
         debug_print ("socket_gramado: [FAIL] _file fail\n");
         printf      ("socket_gramado: [FAIL] _file fail\n");
         goto fail;
+    }
 
-    }else{
 
-        _file->used  = TRUE;
-        _file->magic = 1234;
-        _file->____object = ObjectTypeSocket;
-        _file->pid   = (pid_t) current_process;
-        _file->uid   = (uid_t) current_user;
-        _file->gid   = (gid_t) current_group;
-        
-        // sync
-        _file->sync.sender   = -1;
-        _file->sync.receiver = -1;
-        _file->sync.action = ACTION_NULL;
-        _file->sync.can_read    = TRUE;
-        _file->sync.can_write   = TRUE;
-        _file->sync.can_execute = FALSE;
-        _file->sync.can_accept  = TRUE;
-        _file->sync.can_connect = TRUE;
+// Object type
 
-        _file->sync.block_on_read = FALSE;
-        _file->sync.block_on_read_empty = TRUE;
+    _file->____object = ObjectTypeSocket;
 
-        _file->sync.block_on_write = TRUE;
-        _file->sync.block_on_write_full = TRUE;
-        
-        _file->sync.lock = FALSE;
-        
-        _file->_flags = __SWR;
+    //panic("$$$$");
 
-        // No name for now.
-        _file->_tmpfname = NULL;
+    _file->pid = (pid_t) current_process;
+    _file->uid = (uid_t) current_user;
+    _file->gid = (gid_t) current_group;
+
+
+// sync
+
+    _file->sync.sender   = -1;
+    _file->sync.receiver = -1;
+    _file->sync.action = ACTION_NULL;
+    _file->sync.can_read    = TRUE;
+    _file->sync.can_write   = TRUE;
+    _file->sync.can_execute = FALSE;
+    _file->sync.can_accept  = TRUE;
+    _file->sync.can_connect = TRUE;
+
+    _file->sync.block_on_read = FALSE;
+    _file->sync.block_on_read_empty = TRUE;
+
+    _file->sync.block_on_write = TRUE;
+    _file->sync.block_on_write_full = TRUE;
+
+    _file->sync.lock = FALSE;
+
+// flags
+
+    _file->_flags = __SWR;
+
+
+// No name for now.
+    _file->_tmpfname = NULL;
         //_file->_tmpfname = "socket";
-        
 
-        // Buffer.
-        _file->_base    = buff;
-        _file->_p       = buff;
-        _file->_lbfsize = BUFSIZ;
-      
-        // Quanto falta.
-        _file->_cnt = _file->_lbfsize;
-        
-        // Offsets
-        _file->_r = 0;
-        _file->_w = 0;
+//
+// Buffer
+//
 
-        // Status do buffer do socket.
-        _file->socket_buffer_full = 0;  
+    _file->_base    = buff;
+    _file->_p       = buff;
+    _file->_lbfsize = BUFSIZ;
 
-        // Socket pointer.
-        _file->socket = sock;
+    // Quanto falta
+    _file->_cnt = _file->_lbfsize;
 
-        // O arquivo do soquete, o buffer ?
-        sock->private_file = (file *) _file; 
+    // Offsets
+    _file->_r = 0;
+    _file->_w = 0;
 
-        // Socket pointer.
-        // Salvamos o ponteira para estrutura de soquete
-        // na estrutura de processo do processo atual.
-        Process->priv = (void *) sock;
+    // Status do buffer do socket.
+    _file->socket_buffer_full = 0;  
 
-        // fd.
-        _file->_file = __slot;
-        
-        //Colocando na lista de arquivos abertos no processo.
-        Process->Objects[__slot] = (unsigned long) _file;
-        
-        
-        debug_print ("socket_gramado: done\n");
 
-        // ok.
-        // Retornamos o fd na lista de arquivos abertos pelo processo.
-        return (int) __slot;
-    };
+// Socket pointer
+
+    _file->socket = sock;
+
+    // O arquivo do soquete, o buffer ?
+    sock->private_file = (file *) _file; 
+
+    // Socket pointer.
+    // Salvamos o ponteira para estrutura de soquete
+    // na estrutura de processo do processo atual.
+    Process->priv = (void *) sock;
+
+//
+// fd
+//
+
+    _file->_file = __slot;
+
+
+// Colocando na lista de arquivos abertos no processo.
+
+    Process->Objects[__slot] = (unsigned long) _file;
+
+    _file->used  = TRUE;
+    _file->magic = 1234;
+
+    debug_print ("socket_gramado: done\n");
+
+    // ok.
+    // Retornamos o fd na lista de arquivos abertos pelo processo.
+
+    return (int) __slot;
 
 fail:
     debug_print ("socket_gramado: [FAIL]\n");
@@ -1066,6 +1090,14 @@ sys_accept (
     }
 
 
+    if ( sProcess->used != TRUE || sProcess->magic != 1234 )
+    {
+        debug_print ("sys_accept: [FAIL] sProcess validation\n");
+        printf      ("sys_accept: [FAIL] sProcess validation\n");
+        goto fail;
+    }
+
+
     // file
     // O objeto que se refere ao socket do servidor.
     // The socket is a file and belongs to the process.
@@ -1079,11 +1111,20 @@ sys_accept (
         goto fail;
     }
 
-    // Is this file a socket ??
+    if ( sFile->used != TRUE || sFile->magic != 1234 )
+    {
+        debug_print ("sys_accept: [FAIL] sFile validation\n");
+        printf      ("sys_accept: [FAIL] sFile validation\n");
+        goto fail;
+    }
+
+
+// Is this file a socket?
+
     if (sFile->____object != ObjectTypeSocket )
     {
         debug_print ("sys_accept: sFile is not a socket object\n");
-             printf ("sys_accept: sFile is not a socket object\n");
+             printf ("sys_accept: sFile is not a socket object $\n");
         goto fail;
     }
     

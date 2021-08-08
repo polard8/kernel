@@ -485,7 +485,7 @@ copy_process_struct(
     // vamos clonar sem o fluxo padrão em ordem.
     file *__f;
 
-    for (i=0; i<32; i++)
+    for (i=0; i<NUMBER_OF_FILES; i++)
     {
         // Copy
         Process2->Objects[i] = Process1->Objects[i];
@@ -860,7 +860,7 @@ __ps_initialize_process_common_elements(
         panic ("__ps_initialize_process_common_elements: [ERROR] Standard stream is not initialized\n");
     }
     
-    for ( i=0; i<32; ++i ){ p->Objects[i] = 0; }
+    for ( i=0; i<NUMBER_OF_FILES; ++i ){ p->Objects[i] = (unsigned long) 0; }
 
     if ( (void *) stdin == NULL ){
         panic ("__ps_initialize_process_common_elements: [TEST] stdin");
