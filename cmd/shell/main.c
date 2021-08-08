@@ -90,12 +90,115 @@ do_compare:
     //shellInsertLF();
     printf("\n");
 
-
+    // about
     if ( strncmp ( prompt, "about", 5 ) == 0 )
     {
         printf ("Gramado Operating System\n");
         goto exit_cmp;
     }
+
+    // getpid
+    int my_pid=0;
+    if ( strncmp( prompt, "getpid", 6 ) == 0 )
+    {
+        my_pid=getpid();
+        printf ("pid: %d\n",my_pid);
+        goto exit_cmp;
+    }
+
+    // getppid
+    int my_ppid=0;
+    if ( strncmp( prompt, "getppid", 7 ) == 0 )
+    {
+        my_ppid=getppid();
+        printf ("ppid: %d\n",my_ppid);
+        goto exit_cmp;
+    }
+
+    // mm-size (MB)
+    unsigned long __mm_size_mb = 0;    
+    if ( strncmp( prompt, "mm-size", 7 ) == 0 )
+    {
+        __mm_size_mb = (unsigned long) gramado_system_call (292,0,0,0);
+        printf ("Memory size = %d MB \n",__mm_size_mb);
+        goto exit_cmp;
+    }
+
+    // current-process
+    if ( strncmp ( prompt, "current-process", 15 ) == 0 )
+    {
+        printf("\n");
+        //gramado_system_call ( SYSTEMCALL_CURRENTPROCESSINFO, 0, 0, 0 );
+        gramado_system_call ( 80, 0, 0, 0 );
+        goto exit_cmp; 
+    }
+
+
+    // process-info
+    if ( strncmp ( prompt, "process-info", 12 ) == 0 )
+    {
+        printf("\n");
+        gramado_system_call ( 82, 0, 0, 0 );
+        goto exit_cmp; 
+    }
+
+
+    if ( strncmp( prompt, "exit", 4 ) == 0 )
+    {
+        exit(0);
+        goto exit_cmp;
+    }
+
+
+    // malloc
+    void *hBuffer;
+    if ( strncmp( prompt, "malloc", 6 ) == 0 )
+    {
+        printf ("Testing heap: 32kb\n");
+        hBuffer = (void *) malloc ( 1024*32 );        // 32 kb
+        //...
+        if ( (void *) hBuffer == NULL ){
+            printf("Fail\n");
+        }else{
+            printf("OK\n");
+        };
+        printf("done\n");
+        goto exit_cmp;
+    }
+
+    // sync - salva os buffers em ring0 no disco fisico.
+    // Isso pode ser um programa.
+    // See: unistd.c
+    if ( strncmp( prompt, "sync", 4 ) == 0 )
+    {
+        //printf ("sync: \n");
+        sync();
+        goto exit_cmp;
+    }
+
+
+    
+    // tty3
+    if ( strncmp ( prompt, "tty3", 4 ) == 0 )
+    {
+        //if ( isatty(fileno(stdin)) == 0 ){
+        //    printf ("stdin is not a tty\n");
+        //}
+        //if ( isatty(fileno(stdout)) == 0 ){
+        //    printf ("stdout is not a tty\n");
+        //}
+        //if ( isatty(fileno(stderr)) == 0 ){
+        //    printf ("stderr is not a tty\n");
+        //}
+        goto exit_cmp;
+    }
+    
+
+
+
+launch_app:
+
+    //rtl_clone_and_execute(prompt);
 
     printf ("Command not found\n");
 
