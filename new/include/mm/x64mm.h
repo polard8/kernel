@@ -295,8 +295,14 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // 
 
 //Isso � usdo pelo heap.
-#define MMBLOCK_HEADER_SIZE 64 
+//#define MMBLOCK_HEADER_SIZE  64 
+#define MMBLOCK_HEADER_SIZE  128
 
+
+// #bugbug
+// @todo: Aumentar ...
+// Contagem de mmblock. 
+#define MMBLOCK_COUNT_MAX  (2*4096)
 
 
 
@@ -330,11 +336,7 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 //List.(1024 framepools de 4MB d� 4GB).
 #define FRAMEPOOL_COUNT_MAX 1024
 
-//#bugbug
-//@todo: Aumentar ...
-//Contagem de mmblock. 
-#define MMBLOCK_COUNT_MAX  (2*4096)
- 
+
 
 
 //
@@ -407,7 +409,7 @@ typedef enum {
  *     *dentro do heap usado pelo kernel eu acho ?? 
  */
 
-unsigned long mmblockCount;         
+unsigned long mmblockCount;
 
 
 

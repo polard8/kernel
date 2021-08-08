@@ -2,6 +2,9 @@
 
 all:
 
+	#test
+	make -C ./shell
+
 	# main commands.
 	make -C ./cat
 	make -C ./false

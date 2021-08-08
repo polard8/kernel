@@ -131,6 +131,9 @@ gramado-cmd:
 	@echo "Build: Building cmd applications ..."
 
 	$(Q) $(MAKE) -C cmd/
+
+	-sudo cp cmd/bin/SHELL.BIN      base/
+
 	-sudo cp cmd/bin/CAT.BIN        base/
 #	-sudo cp cmd/bin/FALSE.BIN      base/
 	-sudo cp cmd/bin/REBOOT.BIN     base/

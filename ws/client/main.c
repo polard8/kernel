@@ -496,6 +496,10 @@ int main ( int argc, char *argv[] )
     game_window = main_window;
     //========================
 
+    // #debug
+    gws_refresh_window (client_fd, main_window);
+    while(1){}
+
 
     //===============================
     gws_debug_print ("gws.bin: 1 Creating main window \n");

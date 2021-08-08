@@ -135,23 +135,24 @@ link-kernel \
 clean    
 
 
-# The entry \o/
+# The entrance \o/
 # The x86 head of the monster.
 kernel-header:
 	@echo "Compiling: Compiling kernel header ..."
 
+	# personas: warden, student, visitor.
 	# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) entry/warden/unit0/x86_64/head_64.asm \
+	$(NASM) entrance/warden/unit0/x86_64/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I entry/warden/unit0/x86_64/ \
-	-I entry/student/unit1/x86_64/ \
-	-I entry/student/unit3/x86_64/ \
-	-I entry/warden/unit4/x86_64/ \
-	-I entry/visitor/x86_64/ \
+	-I entrance/warden/unit0/x86_64/ \
+	-I entrance/student/unit1/x86_64/ \
+	-I entrance/student/unit3/x86_64/ \
+	-I entrance/warden/unit4/x86_64/ \
+	-I entrance/visitor/x86_64/ \
 	-f elf64 -o head_64.o
 
 	# unit 2 (xapx)
-	$(CC) -c entry/visitor/x86_64/sci.c \
+	$(CC) -c entrance/visitor/x86_64/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    

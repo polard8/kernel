@@ -368,8 +368,13 @@ void main(void)
     
     // #todo
     // we need to work on the refresh screen support.
-    rtl_clone_and_execute("gwssrv.bin"); 
+    //rtl_clone_and_execute("gwssrv.bin"); 
 
+
+    rtl_clone_and_execute("shell.bin"); 
+    
+//exit:
+    //return 0;
 
 
 // interna
@@ -412,7 +417,7 @@ void main(void)
 
 //=================================
 
-    rtl_focus_on_this_thread();
+    //rtl_focus_on_this_thread();
 
     while (1){
 

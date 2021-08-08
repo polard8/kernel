@@ -1,0 +1,8 @@
+
+	Personas:
+
+	+ Warden: The guard.
+	+ Student: The prisoner.
+	+ Visitor: The family, the dealers.
+
+

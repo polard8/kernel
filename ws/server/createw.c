@@ -472,6 +472,11 @@ void *xxxCreateWindow (
     unsigned long buttonBorderColor2=0;
     unsigned long buttonBorderColor2_light=0;
 
+
+
+    debug_print ("xxxCreateWindow: :)\n");
+
+
 	//salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
 	//unsigned long saveTop;
@@ -1667,6 +1672,11 @@ void *createwCreateWindow (
 
     int ValidType=FALSE;
 
+
+
+    gwssrv_debug_print ("createwCreateWindow: :)\n");
+
+
     switch (type){
     case WT_OVERLAPPED:  ValidType=TRUE; break;
     case WT_EDITBOX:     ValidType=TRUE; break;
@@ -1918,8 +1928,10 @@ draw_frame:
 
 
 //done:
+    gwssrv_debug_print ("createwCreateWindow: done\n");
     return (void *) __w;
 }
+
 
 
 // Create root window

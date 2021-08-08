@@ -897,9 +897,10 @@ int serviceCreateWindow (void){
     //printf("%s\n",name_buffer);
     //while(1){}
 
+//===================
 
     // Limits
-    if (pw<0 || pw>WINDOW_COUNT_MAX)
+    if (pw<0 || pw>=WINDOW_COUNT_MAX)
     {
         gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
@@ -934,9 +935,9 @@ int serviceCreateWindow (void){
         exit(1); 
     }
 
-    //
-    // Draw
-    //
+//
+// Draw
+//
 
     Window = (struct gws_window_d *) createwCreateWindow ( 
                                          type, 1, 1, name_buffer, 

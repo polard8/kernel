@@ -13,8 +13,10 @@
 //#define MMBLOCK_HEADER_SIZE   64
 #define MMBLOCK_HEADER_SIZE   128
 
-//Contagem de mmblock. 
-#define MMBLOCK_COUNT_MAX    256 
+// Contagem de mmblock.
+//#define MMBLOCK_COUNT_MAX    256 
+#define MMBLOCK_COUNT_MAX  (1024)
+//#define MMBLOCK_COUNT_MAX  (2*4096)
 
 
 //

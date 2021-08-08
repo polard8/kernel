@@ -175,13 +175,15 @@ heapSetLibcHeap (
  * sep 2016 - Revision.
  * ...
  */
- 
-unsigned long heapAllocateMemory (unsigned long size){
 
-    struct mmblock_d *Current;
+// Called by malloc.
 
-    //debug_print ("heapAllocateMemory:\n");
+unsigned long heapAllocateMemory (unsigned long size)
+{
+    struct mmblock_d  *Current;
 
+
+    debug_print ("heapAllocateMemory: $\n");
 
 
     //debug_print ("heapAllocateMemory: [1]\n");
@@ -201,8 +203,9 @@ unsigned long heapAllocateMemory (unsigned long size){
         debug_print ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
         printf      ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
         //refresh_screen();
+        
         return (unsigned long) 0;
-		//while(1){};
+        //while(1){};
     }
 
 
@@ -213,28 +216,27 @@ unsigned long heapAllocateMemory (unsigned long size){
 	//Se o tamanho desejado é igual a zero.
     if ( size == 0 )
     {
-        debug_print ("heapAllocateMemory: [ERROR] size={0}\n");
-        printf      ("heapAllocateMemory: [ERROR] size={0}\n");
+        debug_print ("heapAllocateMemory: [ERROR] size=0 \n");
+        printf      ("heapAllocateMemory: [ERROR] size=0 \n");
         //refresh_screen();
         return (unsigned long) g_heap_pointer;
     }
 
     //debug_print ("heapAllocateMemory: [3]\n");
 
-	//Se o tamanho desejado é maior ou igual ao espaço disponível.
+    // Se o tamanho desejado é maior ou igual ao espaço disponível.
+    // #todo: 
+    // Tentar crescer o heap para atender o size requisitado.
+
     if ( size >= g_available_heap )
     {
-	    //
-		// @todo: Tentar crescer o heap para atender o size requisitado.
-		//
-
-		//try_grow_heap() ...
-
         debug_print ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
         printf      ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
-		//refresh_screen();
+        //refresh_screen();
+        
         return (unsigned long) 0;
     }
+
 
     // Salvando o tamanho desejado.
     
@@ -253,12 +255,12 @@ try_again:
         debug_print ("heapAllocateMemory: [ERROR] mmblockCount limits!\n");
         printf      ("heapAllocateMemory: [ERROR] mmblockCount limits!\n");
  
-        printf ("heapAllocateMemory: [ERROR] g_heap_pointer=%x\n",
-            g_heap_pointer);
-        printf ("heapAllocateMemory: [ERROR] HEAP_START=%x\n", 
-            HEAP_START);
-        printf ("heapAllocateMemory: [ERROR] HEAP_END=%x\n", 
-            HEAP_END);
+        //printf ("heapAllocateMemory: [ERROR] g_heap_pointer=%x\n",
+            //g_heap_pointer);
+        //printf ("heapAllocateMemory: [ERROR] HEAP_START=%x\n", 
+            //HEAP_START);
+        //printf ("heapAllocateMemory: [ERROR] HEAP_END=%x\n", 
+            //HEAP_END);
 
 		//printf("*lib hang (fatal error)\n");
 		//refresh_screen();
@@ -297,16 +299,17 @@ try_again:
 
 		//Havendo um last heap pointer válido.
 		//?? isso não faz sentido.
+
         g_heap_pointer = (unsigned long) last_valid + last_size;
+
         goto try_again;
     }
 
-
 	// Agora temos um 'g_heap_pointer' válido, salvaremos ele.
 	// 'last_valid' NÃO é global. Fica nesse arquivo.
-	
-	last_valid = (unsigned long) g_heap_pointer;
-	
+
+    last_valid = (unsigned long) g_heap_pointer;
+
 	//
 	// Criando um bloco.
 	//
@@ -342,16 +345,17 @@ try_again:
         // See: mm.h
         Current->headerSize = MMBLOCK_HEADER_SIZE;           
         
-        Current->Id    = mmblockCount;                        //Id do mmblock.
-        Current->Used  = 1;                //Flag, 'sendo Usado' ou 'livre'.
+        Current->Id    = mmblockCount;    //Id do mmblock.
+        Current->Used  = 1;               //Flag, 'sendo Usado' ou 'livre'.
         Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
-        Current->Free  = 0;                //not free.
+        Current->Free  = 0;               //not free.
         // Continua ...
 
-	    //
-	    // Mensuradores. (tamanhos) (@todo:)
-	    //
-	
+
+//
+// Mensuradores. (tamanhos) (@todo:)
+//
+
 	    // @todo:
 	    // Tamanho da área reservada para o cliente.
 	    // userareaSize = (request size + unused bytes)
@@ -401,7 +405,7 @@ try_again:
 	    // Available heap:
 	    // Calcula o valor de heap disponível para as próximas alocações.
 	
-	    g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);		
+	    g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);
 
         //debug_print ("heapAllocateMemory: done\n");
 
@@ -695,7 +699,7 @@ int stdlibInitMM (void){
 	//#bugbug: temos que inicializar isso no kernel também.
 
     mmblockCount = 0;
-	
+
 	//
 	// Continua...
 	//
@@ -850,22 +854,25 @@ void *malloc ( size_t size )
 
     if ( s == 0 ){ s = 1; }
 
-
 	//s = (s ? s : 1);	/* if s == 0, s = 1 */
 
-	//??? @todo:
+
+
+
     ret = (void *) heapAllocateMemory(s);
 
     if ( (void *) ret == NULL )
     {
         debug_print ("malloc: [FAIL] ret\n");
 
-	    //printf("malloc: falha ao alocar memoria!\n");
-		//refresh_screen();
+        //printf("malloc: falha ao alocar memoria!\n");
+        //refresh_screen();
+
         return NULL;
     }
 
-	
+
+
 	/*
 	if((void*) ret < KERNEL_HEAP_START){
 	    printf("malloc: falha ao alocar memoria! Limits\n");

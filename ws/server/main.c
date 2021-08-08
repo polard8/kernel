@@ -2128,7 +2128,7 @@ int serviceAsyncCommand (void)
            //if (current_mode == GRAMADO_JAIL)
            //{
                rectBackbufferDrawRectangle ( 
-                   0, 0, 320, 200, COLOR_BLACK, 1 );
+                   0, 0, 28, 8, COLOR_GREEN, TRUE );
                return 0;
            //}
            break;
