@@ -1510,7 +1510,7 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 // Stack frame
 //
 
-    clone->ss     = father->ss;    //RING 3.
+    clone->ss     = father->ss;    // RING 3.
     clone->rsp    = father->rsp;   // wrong
     clone->rflags = father->rflags;
     clone->cs     = father->cs;

@@ -6,7 +6,11 @@
 
 
 #include <sys/types.h>  
+
+#include <stdio.h>
+
 #include <pty.h>
+
 
 
 //See: http://man7.org/linux/man-pages/man7/pty.7.html
@@ -47,7 +51,7 @@ openpty (
     const struct termios *termp,
     const struct winsize *winp)
 {
-    gde_debug_print ("openpty: [TODO]\n");
+    debug_print ("openpty: [TODO]\n");
     return -1;
 }
 
@@ -69,7 +73,7 @@ forkpty (
     const struct termios *termp,
     const struct winsize *winp)
 {
-    gde_debug_print ("forkpty: [TODO]\n");
+    debug_print ("forkpty: [TODO]\n");
     return -1;
 }
 

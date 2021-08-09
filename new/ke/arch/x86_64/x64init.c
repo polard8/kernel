@@ -77,10 +77,10 @@ void I_x64CreateInitialProcess (void)
                                   (unsigned long) CONTROLTHREAD_BASE, //0x00200000
                                   BUGBUG_IMAGE_SIZE_LIMIT );
 
-    // Coldn't load init.bin
+    // Coldn't load sm.bin
     if ( fileret != 0 ){
-        debug_print("I_x64CreateInitialProcess: Coldn't load init.bin \n");
-        panic      ("I_x64CreateInitialProcess: Coldn't load init.bin \n");
+        debug_print("I_x64CreateInitialProcess: Coldn't load sm.bin \n");
+        panic      ("I_x64CreateInitialProcess: Coldn't load sm.bin \n");
     }
 
 
@@ -529,6 +529,25 @@ void I_x64ExecuteInitialProcess (void)
 void I_x64CreateKernelProcess(void)
 {
     debug_print ("I_x64CreateKernelProcess:\n");
+
+    unsigned long fileret=1;
+
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
+
+    fileret = (unsigned long) fsLoadFile ( 
+                                  VOLUME1_FAT_ADDRESS, 
+                                  VOLUME1_ROOTDIR_ADDRESS, 
+                                  FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
+                                  "SM3     BIN", 
+                                  (unsigned long) 0x30E00000,  //0x30E00000
+                                  BUGBUG_IMAGE_SIZE_LIMIT ); 
+
+    // Coldn't load sm.bin
+    if ( fileret != 0 ){
+        debug_print("I_x64CreateInitialProcess: Coldn't load sm3.bin \n");
+        panic      ("I_x64CreateInitialProcess: Coldn't load sm3.bin \n");
+    }
+
 
     // IN: 
     // Room, Desktop, Window

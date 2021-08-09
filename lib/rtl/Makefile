@@ -19,7 +19,25 @@ TARGETOS ?= gramado
 # Gramado!
 ifeq ($(TARGETOS),gramado)
 
-CFLAGS = -m64 \
+CFLAGS_OLD = -m64 \
+	-std=gnu89 \
+	-nodefaultlibs \
+	-nostdinc \
+	-nostdlib \
+	-static \
+	-fgnu89-inline \
+	-ffreestanding \
+	-fno-builtin \
+	-fno-pie \
+	-fleading-underscore \
+	-fno-stack-protector \
+	-s \
+	-Werror=strict-prototypes \
+	-mno-red-zone \
+	-mno-mmx -mno-sse -mno-sse2   
+
+
+CFLAGS_OLD2 = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -33,6 +51,42 @@ CFLAGS = -m64 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
+
+CFLAGS := \
+	-Wall \
+	-Wundef \
+	-Wmissing-prototypes \
+	-Wno-uninitialized \
+	-Wno-format-security \
+	-Wno-trigraphs \
+	-Werror=strict-prototypes \
+	-Werror=implicit-function-declaration \
+	-Werror=implicit-int \
+	-Werror=return-type \
+	-std=gnu89 \
+	-m64 \
+	-s \
+	-static \
+	-fcommon \
+	-fgnu89-inline \
+	-finline-functions \
+	-fshort-wchar \
+	-ffreestanding \
+	-fleading-underscore \
+	-fstrict-overflow \
+	-nostdlib \
+	-nodefaultlibs \
+	-nostdinc \
+	-fno-builtin \
+	-fno-stack-protector \
+	-fno-strict-aliasing \
+	-fno-PIE \
+	-fno-pie \
+	-fno-omit-frame-pointer \
+	-fno-optimize-sibling-calls \
+	-mno-red-zone \
+	-mno-mmx -mno-sse -mno-sse2   
+
 
 endif
 
@@ -115,6 +169,8 @@ libc-footer:
 link:
 #	ar rc LIBC03.A $(OBJECTS)
 #	ld -m elf_i386 socrt0.o somain.o -nostdlib -T elf_ia32_efi.lds -shared -znocombreloc -Bsymbolic -L . -l:LIBC03.A -o LIBC03.SO -Map map.s
+
+	#$(LD) -r -o archive_rtl.o 
 
 install:
 	-mkdir        obj/

@@ -368,10 +368,10 @@ void main(void)
     
     // #todo
     // we need to work on the refresh screen support.
-    //rtl_clone_and_execute("gwssrv.bin"); 
+    rtl_clone_and_execute("gwssrv.bin"); 
 
 
-    rtl_clone_and_execute("shell.bin"); 
+    //rtl_clone_and_execute("shell.bin"); 
     
 //exit:
     //return 0;

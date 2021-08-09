@@ -1006,6 +1006,8 @@ int serviceCreateWindow (void){
     // Show the screen.
     //gws_show_backbuffer(); 
 
+    gwssrv_debug_print ("serviceCreateWindow: done\n");
+
     return 0;
 }
 

@@ -736,6 +736,101 @@ void xxxHandleNextSystemMessage (void)
 }
 
 
+#define wsMSG_KEYDOWN       20
+#define wsMSG_KEYUP         21
+#define wsMSG_SYSKEYDOWN    22
+#define wsMSG_SYSKEYUP      23
+
+#define wsVK_F1    0x3B  //59    // No DOS é 0x170.  
+#define wsVK_F2    0x3C  //60 
+#define wsVK_F3    0x3D  //61 
+#define wsVK_F4    0x3E  //62 
+
+
+#define wsVK_RETURN    0x1C
+#define wsVK_TAB       0x0F
+
+#define wsCOLOR_BLACK    0x000000
+#define wsCOLOR_GRAY     0x808080 
+
+
+
+int 
+wsInputProcedure ( 
+    struct gws_window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+    switch (msg)
+    {
+        // 20 = MSG_KEYDOWN
+        case wsMSG_KEYDOWN:
+            switch (long1)
+            {
+
+                // [Enter] - Finalize the command line and compare.
+                case wsVK_RETURN:
+                    input('\0');
+                    //shellCompare();
+                    //asm("int $3");
+                    goto done;
+                    break; 
+
+                case wsVK_TAB: 
+                    printf("\t");
+                    goto done; 
+                    break;
+
+                // keyboard arrows
+                case 0x48: printf ("UP   \n"); goto done; break;
+                case 0x4B: printf ("LEFT \n"); goto done; break;
+                case 0x4D: printf ("RIGHT\n"); goto done; break;
+                case 0x50: printf ("DOWN \n"); goto done; break;
+
+
+                case 0x47: 
+                    printf ("HOME\n");
+                    goto done; 
+                    break;
+                    
+                case 0x4F: 
+                    printf ("END \n"); 
+                    goto done; 
+                    break;
+
+                //pageup pagedown
+                case 0x49: printf ("PAGEUP   \n"); goto done; break;
+                case 0x51: printf ("PAGEDOWN \n"); goto done; break;
+
+                // insert delete
+                case 0x52: printf ("INSERT\n"); goto done; break;
+                case 0x53: printf ("DELETE\n"); goto done; break;
+
+                default:
+                    input ( (unsigned long) long1 );  
+                    printf("%c",long1); fflush(stdout);
+                    break;
+            };
+            break;
+
+  // 22 = MSG_SYSKEYDOWN
+        case wsMSG_SYSKEYDOWN:
+            switch (long1)
+            {
+                case wsVK_F1: printf ("F1\n");  break;
+                case wsVK_F2: printf ("F2\n");  break;
+            };
+            break;
+    };
+
+done:
+    return 0;
+}
+
+
+
 /*
  **********************************
  * gwsProcedure:
@@ -1299,7 +1394,7 @@ int initGraphics (void){
          //demos_startup_animation(6);   //ok
          //demos_startup_animation(7);   //ok
          //demos_startup_animation(8);   //ok
-         demos_startup_animation(9);     //ok
+         //demos_startup_animation(9);     //ok
          //gwssrv_show_backbuffer();
          //while(1){}
          // ...
@@ -2209,6 +2304,8 @@ char *gwssrv_get_version(void)
 int main (int argc, char **argv)
 {
 
+    int flagUseClient = FALSE;
+
     // #debug flags
     int UseCompositor = TRUE;
 
@@ -2564,10 +2661,12 @@ int main (int argc, char **argv)
 
     debug_print ("gwssrc: Calling client $$$$$\n");
 
-    rtl_clone_and_execute("gws.bin");
-    //rtl_clone_and_execute("gwm.bin");
-        
-    
+    if ( flagUseClient == TRUE )
+    {
+        rtl_clone_and_execute("gws.bin");
+        //rtl_clone_and_execute("gwm.bin");
+    }
+
     
     // Wait
         // printf ("gwssrv: [FIXME] yield \n");
@@ -2609,8 +2708,8 @@ int main (int argc, char **argv)
         // socket que usaremos ... por isso poderemos fecha-lo
         // para assim obtermos um novo da próxima vez.
     
-    // loop:
-        gwssrv_debug_print ("gwssrv: Entering main loop.\n");
+// loop:
+    gwssrv_debug_print ("gwssrv: Entering main loop.\n");
 
         //#todo:
         // No loop precisamos de accept() read() e write();
@@ -2620,11 +2719,11 @@ int main (int argc, char **argv)
         // + Normal messages. (It's like signals.)
  
         //not used for now.
-        connection_status = 1;
+    connection_status = 1;
 
         //curconn = ____saved_server_fd;
         //curconn = serverClient->fd;
-        newconn = -1;
+    newconn = -1;
 
         // #todo:
         // Precisamos criar uma fila de mensagens para o sistema
@@ -2637,11 +2736,37 @@ int main (int argc, char **argv)
         // um do sistema e outro dos apps.
  
         //initialize frames counter,
-        frames_count = 0;
-        fps = 0;
+    frames_count = 0;
+    fps = 0;
+ 
+ 
+ 
+//
+// Focus
+// 
+
+    rtl_focus_on_this_thread();
+
  
     while (running == TRUE)
     {
+
+        if ( rtl_get_event() == TRUE )
+        {  
+            // Podemos chamar mais de um diálogo
+            // Retorna TRUE quando o diálogo chamado 
+            // consumiu o evento passado à ele.
+            // Nesse caso chamados 'continue;'
+            // Caso contrário podemos chamar outros diálogos.
+
+            wsInputProcedure ( 
+                (void*) RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
+        }
+
+
             // Se tem ou não retângulos sujos.
             // #bugbug: Talvez isso seja trabalho do window manager.
             // mas ele teria que chamar o window server pra efetuar o refresh

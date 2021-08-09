@@ -3,6 +3,9 @@
 #include <utmp.h>
 
 
+#include <stdio.h>
+
+
 /*
     The login_tty() function prepares for a login on the terminal fd
     (which may be a real terminal device, or the slave of a
@@ -15,7 +18,7 @@
 
 int login_tty (int fd)
 {
-    gde_debug_print ("login_tty: [TODO]\n");
+    debug_print ("login_tty: [TODO]\n");
     return -1;
 }
 

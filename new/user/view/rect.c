@@ -25,23 +25,25 @@ drawDataRectangle (
     unsigned int color )
 {
 
+    debug_print("drawDataRectangle: r0 :)\n");
+    
     // #todo
     // Get the clipping window/rectangle.
 
     struct rect_d  Rect;
     struct rect_d  ClippingRect;
 
+
+// flag
     int UseClipping = TRUE;
 
-
-    // dc: Clippint
+// dc: Clipping
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
 
 
     //loop
-    register unsigned long internal_height = height;
-
+    unsigned long internal_height = (unsigned long) height;
 
     // Clipping support.
     
@@ -69,23 +71,40 @@ drawDataRectangle (
     ClippingRect.right  = deviceWidth;
     ClippingRect.bottom = deviceHeight;
 
+// #debug
+// Provisório
+
+    if ( ClippingRect.width > 800 )
+       panic("drawDataRectangle: width");
+
+    if ( ClippingRect.height > 600 )
+       panic("drawDataRectangle: height");
+
+
+    if ( ClippingRect.right > 800 )
+       panic("drawDataRectangle: right");
+
+    if ( ClippingRect.bottom > 600 )
+       panic("drawDataRectangle: bottom");
+
+
 //
-// Target rectangle
+// == Target rectangle ================
 //
 
-    Rect.bg_color = color;
+    Rect.bg_color = (unsigned int) color;
 
-    // Dimensions.
+    // Dimensions
     Rect.x = 0;
     Rect.y = 0;
     Rect.width  = width;
     Rect.height = height;
 
-    //Margins.
+    // Margins
     Rect.left   = x; 
     Rect.top    = y;
-    Rect.right  = (Rect.left + Rect.width);
-    Rect.bottom = (Rect.top  + Rect.height); 
+    Rect.right  = (unsigned long) (Rect.left + Rect.width);
+    Rect.bottom = (unsigned long) (Rect.top  + Rect.height); 
 
 
 //
@@ -115,23 +134,39 @@ drawDataRectangle (
 // Draw
 //
 
+
     // Draw lines on backbuffer.
 
-    while (internal_height--)
+    if ( internal_height > 600 )
+       panic("drawDataRectangle: internal_height");
+
+
+    while (1)
     {
+        // Pinta uma linha.
         my_buffer_horizontal_line ( 
             Rect.left, y, Rect.right, Rect.bg_color );
  
+        // incrementa a linha a ser pintada.
         y++;
         
         // #??
         // Porque podemos desejar escrever no backbuffer
         // um retângulo que ultrapasse a área do frontbuffer.
         
-        if ( UseClipping == TRUE ){
+        if ( UseClipping == TRUE )
+        {
             if ( y > ClippingRect.bottom ){ break; };
         }
+        
+        // decrementa o contador.
+        internal_height--;
+        
+        if (internal_height == 0)
+            break;
     };
+
+    debug_print("drawDataRectangle: Done\n");
 }
 
 /*
@@ -168,6 +203,9 @@ refresh_rectangle (
     unsigned long width, 
     unsigned long height )
 {
+
+    debug_print("refresh_rectangle: r0 :)\n");
+
     void *dest       = (void *)      FRONTBUFFER_ADDRESS;
     const void *src  = (const void*) BACKBUFFER_ADDRESS;
 

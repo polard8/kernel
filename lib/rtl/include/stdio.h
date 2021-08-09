@@ -819,6 +819,7 @@ int libcStartTerminal (void);
 /*Inicialização da biblioteca*/
 void stdioInitialize(void);
 
+void stdio_fntos (char *name);
 
 #endif    //__STDIO_H__
 

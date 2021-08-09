@@ -5,7 +5,11 @@
 
 #include <types.h> 
 #include <stddef.h>
+
+#include <stdio.h>
+
 #include <conio.h>
+
 
 
 // putch - Writes a character directly to the console.

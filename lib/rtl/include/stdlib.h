@@ -244,10 +244,11 @@ strtol(const char *nptr, char **endptr, int base);
 unsigned long
 strtoul( const char *nptr, char **endptr, int base);
 
-double strtod (const char *str, char **endptr);
-float strtof(const char *str, char **endptr);
-long double strtold(const char *str, char **endptr);
-double atof(const char *str);
+
+//double strtod (const char *str, char **endptr);
+//float strtof(const char *str, char **endptr);
+//long double strtold(const char *str, char **endptr);
+//double atof(const char *str);
 
 
 //=================================

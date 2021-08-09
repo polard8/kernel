@@ -3,8 +3,13 @@
 #include <types.h>
 #include <stdio.h>
 
-#include <rtl/gramado.h>
 
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+
+#include <rtl/gramado.h>
 
 #include "shell.h"
 
@@ -147,8 +152,34 @@ do_compare:
 
 
     // cls
-    if ( strncmp(prompt,"cls",3) == 0 ){
-        shell_clear_screen();
+    if ( strncmp(prompt,"cls",3) == 0 )
+    {
+        // suspenso
+        //shell_clear_screen();
+        
+         /*
+        //shell_clear_screen();
+        //while(1){}
+        
+
+        // Draw surface
+        debug_print("1\n");
+        __shell_draw_rectangle( 0, 0,
+            device_width >> 1,  device_height >> 1,  COLOR_GRAY );
+
+        // refresh surface
+        debug_print("2\n");
+        __shell_refresh_rectangle( 0, 0,
+            device_width >> 1,  device_height >> 1 );
+
+        // Reset cursor
+        debug_print("3\n");
+        gramado_system_call( 34, 0, 4, 0 );
+
+        debug_print("4\n");
+        shellPrompt();
+        */
+        
         goto exit_cmp;
     }
  
@@ -273,7 +304,7 @@ done:
 }
 
 
-// local
+
 int 
 shellProcedure ( 
     void *window, 
@@ -353,46 +384,74 @@ done:
 void shell_clear_screen(void)
 {
 
-// Clear screen
+//loop:
+
+// Draw surface
+    debug_print("1\n");
     __shell_draw_rectangle(
         0,
         0,
-        device_width >> 1,
-        device_height >> 1,
+        (unsigned long) (device_width >> 1),
+        (unsigned long) (device_height >> 1),
         COLOR_GRAY);
-        
+
+// refresh surface
+    debug_print("2\n");
+    __shell_refresh_rectangle(
+        0,
+        0,
+        (unsigned long) (device_width >> 1),
+        (unsigned long) (device_height >> 1) );
+
 // Reset cursor
+    debug_print("3\n");
     gramado_system_call(
         34,
         0,   // x
         4,   // y
         0);
+
+    debug_print("4\n");
+    
+    //goto loop;
+    
+    return;
 }
 
 
 int main ( int argc, char *argv[] )
 {
 
+    //argc=0;
+    //argv=NULL;
+    
     debug_print ("------------------------------\n");
     debug_print ("shell.bin\n");
 
     device_width  = rtl_get_system_metrics(1);
     device_height = rtl_get_system_metrics(2);
 
+
+    //shell_clear_screen();
+
+    /*
+    // draw surface.
     __shell_draw_rectangle(
         0,
         0,
-        device_width >> 1,
-        device_height >> 1,
-        COLOR_BLACK);
+        device_width,
+        device_height,
+        COLOR_GREEN );
+    */
 
-
+    /*
     // cursor
     gramado_system_call( 
         34,
         0,
         4,
         0);
+    */
 
     printf ("Gramado OS\n");
 

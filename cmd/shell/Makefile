@@ -13,7 +13,7 @@ EXTRAVERSION =
 #We need to simplify these flags
 
 
-CFLAGS = -m64 \
+CFLAGS_OLD = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
@@ -27,20 +27,91 @@ CFLAGS = -m64 \
 	-fno-stack-protector \
 	-s \
 	-Werror=strict-prototypes    
+
+CFLAGS_OLD2 := \
+	-Wall \
+	-Wundef \
+	-Wmissing-prototypes \
+	-Wno-uninitialized \
+	-Wno-format-security \
+	-Wno-trigraphs \
+	-Werror=strict-prototypes \
+	-Werror=implicit-function-declaration \
+	-Werror=implicit-int \
+	-Werror=return-type \
+	-std=gnu89 \
+	-m64 \
+	-s \
+	-static \
+	-fcommon \
+	-fgnu89-inline \
+	-finline-functions \
+	-fshort-wchar \
+	-ffreestanding \
+	-fleading-underscore \
+	-fstrict-overflow \
+	-nostdlib \
+	-nodefaultlibs \
+	-nostdinc \
+	-fno-builtin \
+	-fno-stack-protector \
+	-fno-strict-aliasing \
+	-fno-PIE \
+	-fno-pie \
+	-fno-omit-frame-pointer \
+	-fno-optimize-sibling-calls    
+
+
+CFLAGSzzz := -Wall -m64 -std=gnu89 -ffreestanding -mno-red-zone -mno-mmx -mno-sse \
+-mno-sse2 -nostdlib   
+
+CFLAGS := \
+	-Wall \
+	-Wundef \
+	-Wmissing-prototypes \
+	-Wno-uninitialized \
+	-Wno-format-security \
+	-Wno-trigraphs \
+	-Werror=strict-prototypes \
+	-Werror=implicit-function-declaration \
+	-Werror=implicit-int \
+	-Werror=return-type \
+	-std=gnu89 \
+	-m64 \
+	-s \
+	-static \
+	-fcommon \
+	-fgnu89-inline \
+	-finline-functions \
+	-fshort-wchar \
+	-ffreestanding \
+	-fleading-underscore \
+	-fstrict-overflow \
+	-nostdlib \
+	-nodefaultlibs \
+	-nostdinc \
+	-fno-builtin \
+	-fno-stack-protector \
+	-fno-strict-aliasing \
+	-fno-PIE \
+	-fno-pie \
+	-fno-omit-frame-pointer \
+	-fno-optimize-sibling-calls \
+	-mno-red-zone \
+	-mno-mmx -mno-sse -mno-sse2   
+	
 	
 
 LIBC    = ../../lib/rtl/include/
 LIBCOBJ = ../../lib/rtl/obj
 
-	##
-	## Objects
-	##
+#
+# Objects
+#
 
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
-unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
+unistd.o termios.o ioctl.o fcntl.o rtl.o     
 
 
 .PHONY: all all-c cat-link finalize clean

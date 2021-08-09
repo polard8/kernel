@@ -220,18 +220,20 @@ _doscan (
     const char *format, 
     va_list ap )
 {
-    int done = 0;     /* number of items done */
-    int nrchars = 0;  /* number of characters read */
-	int conv = 0;     /* # of conversions */
-	int base;         /* conversion base */
-	unsigned long	val;		/* an integer value */
-	register char	*str;		/* temporary pointer */
-	char		*tmp_string;	/* ditto */
-	unsigned	width = 0;	/* width of field */
-	int		flags;		/* some flags */
-	int		reverse;	/* reverse the checking in [...] */
+	return -1;
+/*
+    int done = 0;     // number of items done 
+    int nrchars = 0;  // number of characters read 
+	int conv = 0;     // # of conversions 
+	int base;         // conversion base 
+	unsigned long	val;		// an integer value 
+	register char	*str;		// temporary pointer 
+	char		*tmp_string;	// ditto 
+	unsigned	width = 0;	// width of field 
+	int		flags;		// some flags 
+	int		reverse;	// reverse the checking in [...] 
 	int		kind;
-	register int	ic = EOF;	/* the input character */
+	register int	ic = EOF;	// the input character 
 #ifndef	NOFLOAT
 	long double	ld_val;
 #endif
@@ -241,7 +243,7 @@ _doscan (
 	while (1) {
 		if (isspace(*format)) {
 			while (isspace(*format))
-				format++;	/* skip whitespace */
+				format++;	// skip whitespace 
 			ic = getc(stream);
 			nrchars++;
 			while (isspace (ic)) {
@@ -251,12 +253,12 @@ _doscan (
 			if (ic != EOF) ungetc(ic,stream);
 			nrchars--;
 		}
-		if (!*format) break;	/* end of format */
+		if (!*format) break;	// end of format 
 
 		if (*format != '%') {
 			ic = getc(stream);
 			nrchars++;
-			if (ic != *format++) break;	/* error */
+			if (ic != *format++) break;	// error 
 			continue;
 		}
 		format++;
@@ -291,19 +293,19 @@ _doscan (
 				ic = getc(stream);
 				nrchars++;
 			} while (isspace(ic));
-			if (ic == EOF) break;		/* outer while */
-		} else if (kind != 'n') {		/* %c or %[ */
+			if (ic == EOF) break;		// outer while 
+		} else if (kind != 'n') {		// %c or %[ 
 			ic = getc(stream);
-			if (ic == EOF) break;		/* outer while */
+			if (ic == EOF) break;		// outer while 
 			nrchars++;
 		}
 		switch (kind) {
 		default:
-			/* not recognized, like %q */
+			// not recognized, like %q 
 			return conv || (ic != EOF) ? done : EOF;
 			break;
 		case 'n':
-			if (!(flags & FL_NOASSIGN)) {	/* silly, though */
+			if (!(flags & FL_NOASSIGN)) {	//silly, though
 				if (flags & FL_SHORT)
 					*va_arg(ap, short *) = (short) nrchars;
 				else if (flags & FL_LONG)
@@ -312,16 +314,16 @@ _doscan (
 					*va_arg(ap, int *) = (int) nrchars;
 			}
 			break;
-		case 'p':		/* pointer */
+		case 'p':		//pointer 
 			set_pointer(flags);
-			/* fallthrough */
-		case 'b':		/* binary */
-		case 'd':		/* decimal */
-		case 'i':		/* general integer */
-		case 'o':		/* octal */
-		case 'u':		/* unsigned */
-		case 'x':		/* hexadecimal */
-		case 'X':		/* ditto */
+			//fallthrough 
+		case 'b':		// binary 
+		case 'd':		// decimal 
+		case 'i':		//general integer 
+		case 'o':		// octal 
+		case 'u':		//unsigned 
+		case 'x':		//hexadecimal 
+		case 'X':		//ditto 
 			if (!(flags & FL_WIDTHSPEC) || width > NUMLEN)
 				width = NUMLEN;
 			if (!width) return done;
@@ -332,10 +334,10 @@ _doscan (
 				    && (*str == '-'
 					|| *str == '+'))) return done;
 
-			/*
-			 * Although the length of the number is str-inp_buf+1
-			 * we don't add the 1 since we counted it already
-			 */
+			
+			 //Although the length of the number is str-inp_buf+1
+			 //we don't add the 1 since we counted it already
+			 
 			nrchars += str - inp_buf;
 
 			if (!(flags & FL_NOASSIGN)) {
@@ -387,7 +389,7 @@ _doscan (
 					nrchars++;
 				}
 			}
-			/* terminate the string */
+			//terminate the string
 			if (!(flags & FL_NOASSIGN))
 				*str = '\0';	
 			if (width) {
@@ -432,7 +434,7 @@ _doscan (
 			if (!*format) return done;
 			
 			if (!(Xtable[ic] ^ reverse)) {
-			/* MAT 8/9/96 no match must return character */
+			//MAT 8/9/96 no match must return character 
 				ungetc(ic, stream);
 				return done;
 			}
@@ -453,7 +455,7 @@ _doscan (
 				if (ic != EOF) ungetc(ic, stream);
 				nrchars--;
 			}
-			if (!(flags & FL_NOASSIGN)) {	/* terminate string */
+			if (!(flags & FL_NOASSIGN)) {	//terminate string 
 				*str = '\0';	
 			}
 			break;
@@ -474,10 +476,10 @@ _doscan (
 				&& (*str == '-'
 				    || *str == '+'))) return done;
 
-			/*
-			 * Although the length of the number is str-inp_buf+1
-			 * we don't add the 1 since we counted it already
-			 */
+			
+			 //Although the length of the number is str-inp_buf+1
+			 //we don't add the 1 since we counted it already
+			 
 			nrchars += str - inp_buf;
 
 			if (!(flags & FL_NOASSIGN)) {
@@ -492,13 +494,14 @@ _doscan (
 			}
 			break;
 #endif
-		}		/* end switch */
+		}		//end switch 
 		conv++;
 		if (!(flags & FL_NOASSIGN) && kind != 'n') done++;
 		format++;
 	}
 
 	return conv || (ic != EOF) ? done : EOF;
+	*/
 }
 
 
@@ -511,7 +514,7 @@ int fscanf (FILE *stream, const char *format, ...)
     va_list ap;
     va_start(ap, format);
 
-    retval = _doscan (stream, format, ap);
+    //retval = _doscan (stream, format, ap);
 
     va_end(ap);
     return retval;

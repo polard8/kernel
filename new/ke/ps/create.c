@@ -105,7 +105,7 @@ void *create_CreateEarlyRing0IdleThread(void)
 
     if ( (void *) earlyRing0IdleStack == NULL ){
         debug_print ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
-        panic ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
+        panic       ("create_CreateEarlyRing0IdleThread: earlyRing0IdleStack\n");
     }
 
     // #todo
@@ -236,7 +236,7 @@ void *create_CreateEarlyRing0IdleThread(void)
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
     kThread->rflags = 0x0202;    // # Atenção !!  
     kThread->cs     = 0x8 | 0; 
-    kThread->rip    = (unsigned long) early_ring0_IdleThread;  //See: init/init.c
+    kThread->rip    = (unsigned long) 0x30E01000; //SMALLSYSTEM_EXTRAHEAP3_START+ 0x1000;  
 
     kThread->ds = 0x10 | 0;
     kThread->es = 0x10 | 0;

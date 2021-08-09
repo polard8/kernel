@@ -206,14 +206,32 @@ lineBackbufferDrawHorizontalLine (
     unsigned long x1,
     unsigned long y, 
     unsigned long x2,  
-    unsigned long color )
+    unsigned int color )
 {
 
-    while (x1 < x2)
+    unsigned long __x1 = x1;
+    unsigned long __x2 = x2;
+    unsigned long __y  = y;
+    
+    //debug_print("Line\n");
+    
+    if (__x1 > __x2){
+        debug_print("lineBackbufferDrawHorizontalLine: __x1 > __x2\n");
+        return;
+    }
+
+    if (__x2 > 800){
+        debug_print("lineBackbufferDrawHorizontalLine: __x2 > 800\n");
+        return;
+    }
+    
+    while (__x1 < __x2)
     {
-        pixelBackBufferPutpixel ( color, x1, y );
-        x1++;  
+        pixelBackBufferPutpixel ( color, __x1, __y );
+        __x1++;  
     };
+
+    //debug_print("Line done\n");
 }
 
 

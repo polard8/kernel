@@ -26,6 +26,11 @@
 #include <sys/ioctls.h>
 #include <termios.h>
 #include <sys/utsname.h>
+
+#include <stdio.h>
+#include <string.h>
+
+
 #include <rtl/gramado.h> 
 
 
@@ -1985,7 +1990,7 @@ int getlin (char s[])
 l:
 
     // Se acabou a string.
-    if ( ( ch=getc() ) == '\0' )
+    if ( ( ch=getc(stdin) ) == '\0' )
     {
         return (1);
     }
@@ -1996,7 +2001,7 @@ l:
         // Avançamos até o fim da linha ou até o fim da string;
         while ( ch != '\n' && ch != '\0' )
         {
-            ch = getc();
+            ch = getc(stdin);
         };
 
         goto l;
@@ -2007,7 +2012,7 @@ l:
     // Não queremos os espaços.
 
     // Pulamos os espaços.
-    while ((ch=getc())==' '){};
+    while ((ch=getc(stdin))==' '){};
 
     
     while ( ch != ' '  && 
@@ -2015,7 +2020,7 @@ l:
             ch != '\0' ) 
     {
         s[i++] = ch;
-        ch = getc();
+        ch = getc(stdin);
     };
 
     s[i] = '\0';

@@ -435,7 +435,12 @@ gws_refresh_rectangle (
     unsigned long height )
 {
 
-    int RefreshRectangleUsingKGWS = TRUE;
+//
+// flag
+//
+    int RefreshRectangleUsingKGWS = FALSE;
+
+
 
     void       *dest = (void *)      ____FRONTBUFFER_VA;
     const void *src  = (const void*) ____BACKBUFFER_VA;
@@ -460,14 +465,6 @@ gws_refresh_rectangle (
 
     debug_print("gws_refresh_rectangle: :)\n");
 
-
-    // Device info.
-    unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
-    unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
-
-
-
-
 //
 // Refresh in ring0 using the kgws.
 //
@@ -479,11 +476,19 @@ gws_refresh_rectangle (
         return;
     }
 
+
 //
 // Refresh in ring 3
 //
 
+// ==========================================================
+
     debug_print("gws_refresh_rectangle: Using R3\n");
+
+    // Device info.
+    unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
+    unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
+
 
     if ( ScreenWidth == 0 )
     {
@@ -507,18 +512,20 @@ gws_refresh_rectangle (
 // Não por enquanto. 
 // precisamos conhecer melhor nossos limites.
 
-    if ( y > ScreenHeight )
+    if ( y >= ScreenHeight )
     {
         debug_print("gws_refresh_rectangle: [ERROR]  y > ScreenHeight\n");
-        printf     ("gws_refresh_rectangle: [ERROR]  y > ScreenHeight\n");  
-        exit(1);
+        return;
+        //printf     ("gws_refresh_rectangle: [ERROR]  y > ScreenHeight\n");  
+        //exit(1);
     }
 
     if ( lines > (ScreenHeight-y) )
     {
         debug_print("gws_refresh_rectangle: [ERROR] lines\n");
-        printf     ("gws_refresh_rectangle: [ERROR] lines\n");  
-        exit(1);
+        return;
+        //printf     ("gws_refresh_rectangle: [ERROR] lines\n");  
+        //exit(1);
     }
 
 
@@ -569,10 +576,13 @@ gws_refresh_rectangle (
 	//É bem mais rápido com múltiplos de 4.	
 
 
+    
     // Se for divisível por 4.
     // Copia uma linha ou um pouco mais caso não seja divisível por 4.
     if ( (rectangle_pitch % 4) == 0 )
     {
+        debug_print("gws_refresh_rectangle: [1]\n");
+    
         count = (rectangle_pitch / 4); 
 
         for ( i=0; i < lines; i++ ){
@@ -595,6 +605,8 @@ gws_refresh_rectangle (
     // Se não for divisível por 4.
     if ( (rectangle_pitch % 4) != 0 )
     {
+        debug_print("gws_refresh_rectangle: [2]\n");
+        
         for ( i=0; i < lines; i++ ){
              memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
              dest += pitch;
@@ -611,6 +623,8 @@ gws_refresh_rectangle (
         }while(i<lines);
         */
     }
+
+    debug_print("gws_refresh_rectangle: done :)\n");
 }
 
 
@@ -631,7 +645,15 @@ rectBackbufferDrawRectangle (
     int fill )
 {
 
-    int DrawRectangleUsingKGWS = TRUE;
+
+//
+// flag
+//
+
+    int DrawRectangleUsingKGWS = FALSE;
+
+
+    debug_print("rectBackbufferDrawRectangle:\n");
     
     struct gws_rect_d rect;
     
@@ -732,6 +754,7 @@ rectBackbufferDrawRectangle (
 // Drawing in ring0 using kgws.
 //
 
+
     // Draw lines on backbuffer.
     if ( DrawRectangleUsingKGWS == TRUE )
     {
@@ -753,17 +776,55 @@ rectBackbufferDrawRectangle (
 // Drawing in ring3.
 //
 
+//===============================================================
+
     debug_print("rectBackbufferDrawRectangle: Using R3\n");
 
+
+    if ( rect.width > w_max )
+        rect.width = w_max;
+
+    if ( rect.height > h_max )
+        rect.height = h_max;
+
+    if ( rect.left > rect.width )
+        return;
+
+    if ( rect.top > rect.height )
+        return;
+
+
+    //#debug
+    //printf ("w=%d h=%d l=%d t=%d \n",
+        //rect.width, rect.height, rect.left, rect.top );
+    //exit(1);
+    //asm ("int $3");
+
+    unsigned long I=0;
+
+    I=rect.height;
+
     // Draw lines on backbuffer.
-    while (rect.height--){
+    while (I--)
+    {   
+        if (rect.top >= h_max){ break; }
+
+        debug_print(" $ ");
+        
         lineBackbufferDrawHorizontalLine ( 
-            rect.left, rect.top, 
-            rect.right, rect.bg_color );
+            rect.left, 
+            rect.top, 
+            rect.right, 
+            (unsigned int) rect.bg_color );
        
        rect.top++;
     };
+ 
+    debug_print("rectBackbufferDrawRectangle: done\n");
+
+    //asm ("int $3");
 }
+
 
 
 

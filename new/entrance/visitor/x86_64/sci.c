@@ -196,15 +196,16 @@ void *gde_extra_services (
     // Falha se tentamos pintar a tela toda.
     if (number==391)
     {
+        debug_print("sci0: [391]\n");
         drawDataRectangle ( 
             (unsigned long) message_address[0],    //x 
             (unsigned long) message_address[1],    //y
             (unsigned long) message_address[2],    //width
             (unsigned long) message_address[3],    //height
             (unsigned int)  message_address[4] );  //color
-
         return NULL;
     }
+
 
 
     // 512 - Get ws PID for a given desktop.
@@ -813,18 +814,20 @@ void *sci0 (
         // passe o buffer como parametro
         //case SYS_BUFFER_DRAWRECT:
         case 9:
+            debug_print("sci0: [9]\n");
             drawDataRectangle ( 
                 (unsigned long) message_address[0],    //x 
                 (unsigned long) message_address[1],    //y
                 (unsigned long) message_address[2],    //width
                 (unsigned long) message_address[3],    //height
-                (unsigned int) message_address[4] );  //color
+                (unsigned int)  message_address[4] );  //color
             return NULL;
             break;
 
 
         // 10 - Refresh rectangle.
         case 10:
+            debug_print("sci0: [10]\n");
             refresh_rectangle ( 
                 (unsigned long) message_address[0],    //x 
                 (unsigned long) message_address[1],    //y

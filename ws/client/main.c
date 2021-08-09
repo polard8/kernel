@@ -466,15 +466,17 @@ int main ( int argc, char *argv[] )
     savedW      = w;
     savedH      = h;
 
-    while(1){
+    //while(1){
     //gws_async_command(client_fd,3,0,0);  // Hello
-    gws_async_command(client_fd,5,0,0);  // Draw black rectangle.
-    }
+    //gws_async_command(client_fd,5,0,0);  // Draw black rectangle.
+    //}
 
 
 // #debug
 // ok
-    //asm ("int $3");
+    
+    asm ("int $3");
+
 
 //
 // Window
@@ -498,7 +500,9 @@ int main ( int argc, char *argv[] )
 
     // #debug
     gws_refresh_window (client_fd, main_window);
-    while(1){}
+    //while(1){}
+
+    //asm ("int $3");
 
 
     //===============================

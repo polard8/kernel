@@ -7,7 +7,7 @@ unsigned long xxx_fault_number;
 void faults ( unsigned long number )
 {
 
-    debug_print ("faults:\n");
+    debug_print ("~faults:\n");
 
 
     // #debug

@@ -15,43 +15,44 @@ ENTRY(main)
 SECTIONS
 { 
 
-    /* The entry point. It's not the base of the image. */	
+    /* The entry point. It's not the base of the image. */
+
+    . = 0x00201000;
     .text 0x00201000: 
     {
-        code = .; 
-        _code = .; 
-        __code = .;
-           
-        *(.head_x86) 
+        _app_begin = .;
+    
+        _code_begin = .;
         *(.text)
-  
-       . = ALIGN(4096);
+        _code_end = .; 
     }
 
-    .data :
+    . = ALIGN(4096);
+    .rodata :
     {
-        data = .; 
-        _data = .; 
-        __data = .;
-
-        *(.data)
-
-        . = ALIGN(4096);
+        _rodata_begin = .;
+        *(.rdata)  *(.rodata) 
+        _rodata_end = .;
     }
 
-    .bss :
-    {
-        bss = .; 
-        _bss = .; 
-        __bss = .;
-
-        *(.bss)
-
-        . = ALIGN(4096);
+    . = ALIGN(4096);
+    .data :  
+    { 
+        _data_begin = .; 
+        *(.data) 
+        _data_end = .; 
     }
 
-    end = .; 
-    _end = .; 
-    __end = .;
+    . = ALIGN(4096);
+    .bss : 
+    { 
+        _bss_begin = .; 
+        *(COMMON)  *(.bss)
+        _bss_end = .; 
+    
+        _app_end = .; 
+    }
 }
+
+
 

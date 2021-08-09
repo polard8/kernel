@@ -19,7 +19,16 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#include <strings.h>
+
+
+
 #include <rtl/gramado.h> 
+
+
+
+
  
 // #todo: Check this.
 // exit().
@@ -1963,10 +1972,11 @@ void d_common(BYTE *buf,DWORD count,bool memory)  //Hex Dump
 //char _infinity[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x7f };
 //unsigned long __infinity = &_infinity[0];
 
-double _infinity = 0x7ff0000000000000;
+//double _infinity = 0x7ff0000000000000;
 //math.h
 //#define HUGE_VAL _infinity
 
+/*
 double strtod(const char *str, char **endptr){
 	
   double number;
@@ -2083,27 +2093,31 @@ double strtod(const char *str, char **endptr){
 
   return number;
 }
+*/
 
-
+/*
 // #bugbug: float not supported?
 float strtof(const char *str, char **endptr)
 {
     return (float) strtod(str, endptr);
 }
+*/
 
-
+/*
 // ?? #bugbug: 64bit ?? type not supported
 long double strtold(const char *str, char **endptr)
 {
     debug_print("strtold: [BUGBUG]\n"); 
     return strtod(str, endptr);
 }
+*/
 
-
+/*
 double atof(const char *str)
 {
   return strtod(str, NULL);
 }
+*/
 
 //================================================
 

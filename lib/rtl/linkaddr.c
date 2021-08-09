@@ -35,6 +35,7 @@
 #include <net/if_dl.h>
 #include <string.h>
 
+#include <stdio.h>
 
 
 static const char hexlist[] = "0123456789abcdef";
@@ -43,7 +44,7 @@ static const char hexlist[] = "0123456789abcdef";
 // #todo
 void link_addr(const char *addr, struct	sockaddr_dl *sdl)
 {
-    gde_debug_print ("link_addr: [TODO]\n");
+    debug_print ("link_addr: [TODO]\n");
 }
 
 

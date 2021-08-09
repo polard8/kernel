@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+
+#include <rtl/gramado.h>
+
 static char *argv[] = { 
     "-flag1", 
     "-flag2", 

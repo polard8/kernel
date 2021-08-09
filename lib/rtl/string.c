@@ -12,6 +12,10 @@
 #include <strings.h>
 #include <inttypes.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
+
 
 /*
  // ?? not tested

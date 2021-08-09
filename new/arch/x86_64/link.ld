@@ -33,7 +33,7 @@ SECTIONS
         *(.head_x86_64)  *(.text) 
         _code_end = .; 
     }
-    
+
     . = ALIGN(4096);
     .rodata :
     {
@@ -41,7 +41,7 @@ SECTIONS
         *(.rdata)  *(.rodata) 
         _rodata_end = .;
     }
-    
+
     . = ALIGN(4096);
     .data :  
     { 

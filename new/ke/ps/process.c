@@ -1674,14 +1674,19 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
 
     int number_of_pages = 0;
 
+// 200 kb
+
     // Quantas páginas temos em 200KB?
     number_of_pages = (int) (200*1024)/4096;
 
     __new_base = (unsigned long) allocPages(number_of_pages); 
     if ( __new_base == 0 )
     {
-        printf ("processCopyMemory: __new_base fail\n");
-        refresh_screen();
+        //printf ("processCopyMemory: __new_base fail\n");
+        //refresh_screen();
+        
+        panic("processCopyMemory: __new_base fail\n");
+        
         return (int) (-1);
     }
 
@@ -1696,15 +1701,21 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
     // Retorna um endereço virtual.
     // Mas usaremos apenas o endereço físico extraído desse endereço.
 
-    // Quantas páginas temos em 32KB?
-    number_of_pages = (int) (32*1024)/4096;
+// 32 KB
 
+    // Quantas páginas temos em 32KB?
+    number_of_pages = (int) (32*1024)/4096;  // original
+    //number_of_pages = (int) (128*1024)/4096;  // teste
+ 
     __new_stack = (unsigned long) allocPages(number_of_pages); 
 
     if ( __new_stack == 0 )
     {
-        printf ("processCopyMemory: __new_stack fail\n");
-        refresh_screen();
+        //printf ("processCopyMemory: __new_stack fail\n");
+        //refresh_screen();
+        
+        panic ("processCopyMemory: __new_stack fail\n");
+        
         return (int) (-1);
     }
 
@@ -1712,6 +1723,12 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
 //
 // == Copying memory ======================================
 //
+
+
+// #todo
+// Faremos isso somente se a flag indicar que queremos realizar um fork()
+
+    //if ( clone_flags & DO_FORK ){ ... }
 
     // Copying base and stack.
     // Copiando do processo atual para o buffer que alocamos
@@ -1731,6 +1748,12 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
         (const void *) ( CONTROLTHREAD_STACK-(32*1024) ), 
         (32*1024) );
 
+    //memcpy ( 
+        //(void *) __new_stack, 
+        //(const void *) ( CONTROLTHREAD_STACK-(128*1024) ), 
+        //(128*1024) );
+
+
 //
 // Getting the physical addresses.
 //
@@ -1740,15 +1763,23 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
     unsigned long new_base_PA  = (unsigned long) virtual_to_physical ( __new_base, gKernelPML4Address ); 
     unsigned long new_stack_PA = (unsigned long) virtual_to_physical ( __new_stack, gKernelPML4Address ); 
 
-    if ( new_base_PA == 0 ){
-        printf("processCopyMemory: new_base_PA\n");
-        refresh_screen();
+    if ( new_base_PA == 0 )
+    {
+        //printf("processCopyMemory: new_base_PA\n");
+        //refresh_screen();
+
+        panic("processCopyMemory: new_base_PA\n");
+        
         return -1;
     }
     
-    if ( new_stack_PA == 0 ){
+    if ( new_stack_PA == 0 )
+    {
+        //printf("processCopyMemory: new_stack_PA\n");
+        //refresh_screen();
+
         printf("processCopyMemory: new_stack_PA\n");
-        refresh_screen();
+        
         return -1;
     }
 
@@ -1781,13 +1812,14 @@ int __alloc_memory_for_image_and_stack( struct process_d *process )
     // #debug
     // Showing the addresses of base and stack pointers.
 
-    printf("processCopyMemory: new base PA %x | new stack PA %x \n",
-        new_base_PA, new_stack_PA );
+    //printf("processCopyMemory: new base PA %x | new stack PA %x \n",
+        //new_base_PA, new_stack_PA );
 
 // Done.
     //#debug
     //printf ("processCopyMemory: ok\n");
     //refresh_screen ();
+    
     return 0;
 }
 

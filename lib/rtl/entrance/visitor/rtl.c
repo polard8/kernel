@@ -8,6 +8,11 @@
 #include <types.h> 
 #include <stdarg.h> 
 #include <stddef.h>
+
+#include <string.h>
+#include <unistd.h>
+
+
 #include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
 #include <pthread.h>

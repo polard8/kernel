@@ -125,7 +125,8 @@ gramado-sm:
 	$(Q) $(MAKE) -C sm/
 	sudo cp sm/SM.BIN  base/
 	sudo cp sm/SM2.BIN  base/
-
+	sudo cp sm/SM3.BIN  base/
+	
 #4
 gramado-cmd:
 	@echo "Build: Building cmd applications ..."

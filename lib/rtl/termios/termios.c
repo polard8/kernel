@@ -11,6 +11,9 @@
 #include <sys/ioctls.h>
 #include <termios.h>
 
+#include <stdio.h>
+
+
 /*
 int tcgetwinsize(int fd, struct winsize *ws)
 {

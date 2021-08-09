@@ -96,8 +96,8 @@ pixelBackBufferPutpixel (
     int y )
 {
 
-    // #todo: It needs to be a parameter.
-    // 0xC0800000 ??
+    //debug_print("Pixel\n");
+
     unsigned char *where = (unsigned char *) ____BACKBUFFER_VA;
 
     // #todo
@@ -172,14 +172,18 @@ pixelBackBufferPutpixel (
     
     tmpOffset = (unsigned long) ( (bytes_count*width*y) + (bytes_count*x) );
 
-    if( tmpOffset >= MaxOffset ){
-        gwssrv_debug_print ("pixelBackBufferPutpixel: [ERROR] backbuffer limits > Max\n"); 
-        printf ("pixelBackBufferPutpixel: [ERROR] backbuffer limits > Max\n");
-        printf ("tmpOffset=%x\n",tmpOffset);
-        printf ("x=%d\n",x);
-        printf ("y=%d\n",y);
-        printf ("width=%d\n",width);
-        exit(1);
+    if( tmpOffset >= MaxOffset )
+    {
+        debug_print ("pixelBackBufferPutpixel: [ERROR] backbuffer limits > Max\n"); 
+        return -1;
+        //asm("int $3");
+        
+        //printf ("pixelBackBufferPutpixel: [ERROR] backbuffer limits > Max\n");
+        //printf ("tmpOffset=%x\n",tmpOffset);
+        //printf ("x=%d\n",x);
+        //printf ("y=%d\n",y);
+        //printf ("width=%d\n",width);
+        //exit(1);
         //goto fail;
     }
 
@@ -207,12 +211,18 @@ pixelBackBufferPutpixel (
     where[Offset +1] = g;
     where[Offset +2] = r;
     if ( SavedBPP == 32 ){ where[Offset +3] = a; };
+
+    //debug_print("Pixel done\n");
     
     return 0;
 
 fail:
+    //debug_print("Pixel fail\n");
     return -1;
 }
+
+
+
 
 
 // pega uma cor dado sua posição

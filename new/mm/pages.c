@@ -1417,6 +1417,7 @@ Entry_388:
 
 // 2048 KB = (2 MB).
 
+// heap
 // EXTRAHEAP1_VA
 Entry_389:
     mm_used_extraheap1 = (1024 * 2); 
@@ -1427,6 +1428,7 @@ Entry_389:
         (unsigned long) &pt_extraheap1[0], (unsigned long) SMALL_extraheap1_pa, 
         (unsigned long) 7 ); 
 
+// compositor heap.
 // EXTRAHEAP2_VA
 Entry_390:
     mm_used_extraheap2 = (1024 * 2); 
@@ -1435,8 +1437,9 @@ Entry_390:
     mm_fill_page_table( 
       (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_EXTRAHEAP2,
       (unsigned long) &pt_extraheap2[0], (unsigned long) SMALL_extraheap2_pa,
-      (unsigned long) 7 );
+      (unsigned long) 3 );
 
+// comsositor.
 // EXTRAHEAP3_VA
 Entry_391:
     mm_used_extraheap3 = (1024 * 2); 
@@ -1445,7 +1448,7 @@ Entry_391:
     mm_fill_page_table( 
         (unsigned long) &kernel_pd0[0], (int) PD_ENTRY_EXTRAHEAP3,
         (unsigned long) &pt_extraheap3[0], (unsigned long) SMALL_extraheap3_pa,
-        (unsigned long) 7 );
+        (unsigned long) 3 );
 
 // ====================================================================
 //--

@@ -10,6 +10,13 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 
+#include <stdio.h>
+#include <unistd.h>
+
+
+#include <rtl/gramado.h> 
+
+
 
 //sortix style;
 /*

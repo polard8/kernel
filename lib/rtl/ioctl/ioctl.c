@@ -4,6 +4,10 @@
 #include <sys/ioctl.h>
 #include <stdarg.h>
 
+#include <stdio.h>
+
+#include <rtl/gramado.h>
+
 
 /*
   The ioctl() system call manipulates the 

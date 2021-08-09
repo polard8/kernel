@@ -8,6 +8,10 @@
 #include <time.h>
 #include <types.h> 
 #include <sys/time.h>
+
+
+#include <stdio.h> 
+
 #include <rtl/gramado.h> 
 
 

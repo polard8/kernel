@@ -29,6 +29,13 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <errno.h>
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+
 #include <rtl/gramado.h> 
 
 // The main environment.
@@ -925,7 +932,7 @@ int putchar (int ch){
 
 char *gets (char *s)
 {
-    register c;
+    register int c;
     register char *cs;
 
     cs = s;
@@ -961,7 +968,7 @@ int puts (const char *s)
 char *fgets (char *s, int size, FILE *stream)
 {
     //int c=0;
-    register c;
+    register int c;
     register char *cs;
 
     cs = s;
@@ -6200,7 +6207,7 @@ int unix_get (int ifile)
         return (*ibuf++);
     }
 
-    if (__unix_get_nread = read (ifile, __unix_get_buf, 512, 0 ) )
+    if (__unix_get_nread = read (ifile, __unix_get_buf, 512) )
     {
         if (__unix_get_nread < 0) { goto err; }
         

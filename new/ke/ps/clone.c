@@ -381,8 +381,11 @@ do_clone:
     // rip and rsp
 
     Clone->control->rip = (unsigned long) 0x201000;
-    Clone->control->rsp = (unsigned long) (p->childStack + (30*1024));   // 32kb size
-
+    // 32kb size
+    //#todo precisa ser do mesmo tamanho que o pai 
+    //no caso de fork()
+    Clone->control->rsp = (unsigned long) (p->childStack + (30*1024));   // original   
+    //Clone->control->rsp = (unsigned long) (p->childStack + (120*1024));  // test
 
     // #debug
     // ok

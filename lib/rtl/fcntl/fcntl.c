@@ -13,6 +13,9 @@
 #include <fcntl.h>
 #include <sys/file.h>
 
+#include <stdio.h>
+#include <rtl/gramado.h>
+
 
 int fcntl ( int fd, int cmd, ... )
 {
