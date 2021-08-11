@@ -124,9 +124,14 @@ irq0_TIMER (void)
 
 void DeviceInterface_PIT(void)
 {
-	//#todo
-    //debug_print ("-- :) ---------\n");
-    //debug_print ("Tick\n");
+
+    jiffies++;
+    if ( (jiffies % 32) == 0 )
+    {
+        debug_print ("  -- TICK --  \n");
+        
+        CompositorFlag = TRUE;
+    }
 }
 
 

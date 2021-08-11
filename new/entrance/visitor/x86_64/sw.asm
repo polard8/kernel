@@ -26,9 +26,7 @@ extern _sci0
 ; Capture context
 global _int128
 _int128:
-    ;; Acumulator.
-    ;push rax
-   
+
     push rax
     push rbx
     push rcx
@@ -90,9 +88,6 @@ _int128:
     pop rbx
     pop rax
 
-    ;; The acumulator.
-    ;pop rax
-    
     mov rax, qword [.int128Ret] 
     iretq
 .int128Ret: dq 0
@@ -124,9 +119,7 @@ extern _sci1
 ; Capture context
 global _int129
 _int129:
-    ;; Acumulator.
-    ;push rax
-   
+
     push rax
     push rbx
     push rcx
@@ -159,16 +152,6 @@ _int129:
     push rdx      ; Saving arg4
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
-
-
-    ; #test
-    xor rax, rax
-    mov ax, word 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
 
     ;call _xxxxINT129_DEBUG_MESSAGE
     call _sci1
@@ -198,9 +181,6 @@ _int129:
     pop rbx
     pop rax
 
-    ;; The acumulator.
-    ;pop rax
-    
     mov rax, qword [.int129Ret] 
     iretq
 .int129Ret: dq 0
@@ -230,9 +210,7 @@ extern _sci2
 ; Capture context
 global _int130
 _int130:
-    ;; Acumulator.
-    ;push rax
-   
+
     push rax
     push rbx
     push rcx
@@ -266,29 +244,10 @@ _int130:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
-    ;#test
-    xor rax, rax
-    mov ax, word 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
     ;call _xxxxINT130_DEBUG_MESSAGE
     call _sci2
 
     mov qword [.int130Ret], rax 
-
-    ;test
-    ;recuperando os registradores modificados.
-    ;valido somente para ring3.
-    ;xor rax, rax
-    ;mov ax, word 0x23  
-    ;mov ds, ax
-    ;mov es, ax
-    ;mov fs, ax
-    ;mov gs, ax
-
 
     popfq
     pop rsp
@@ -313,9 +272,6 @@ _int130:
     pop rbx
     pop rax
 
-    ;; The acumulator.
-    ;pop rax
-    
     mov rax, qword [.int130Ret] 
     iretq
 .int130Ret: dq 0

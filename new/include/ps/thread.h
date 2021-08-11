@@ -153,6 +153,14 @@ struct thread_d
     int used;
     int magic;
 
+
+//
+// Surface
+//
+
+    struct rect_d *surface;
+
+
     int position;
 
     // #todo

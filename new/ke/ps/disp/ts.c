@@ -150,6 +150,19 @@ The remainder ??
         save_current_context();
         Current->saved = TRUE;
 
+//
+// Compositor
+//
+
+// Chamamos o compositor com o contexto salvo.
+// O pit aciona essa flag a cada 32 ms.
+
+        if (CompositorFlag==TRUE){
+            schedulerCompositor();
+            CompositorFlag=FALSE;
+        }
+
+
 		// #obs:
 		// A preempção acontecerá por dois possíveis motivos.
 		// + Se o timeslice acabar.

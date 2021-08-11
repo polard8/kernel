@@ -137,23 +137,9 @@ _irq0:
 ; ===============================================================
 
 
-    ; #bugbug
-    ; #todo
-    ; Where is our ring0 stack pointer?
-    ; It need to be that same in the tss?
-     
-    ;mov rax, qword 0x003FFFF0 
-    ;mov rsp, rax
-
 ;
 ; Calls
 ;
-
-    ;; No parameters
-    ;; dirty stack
-    
-    ;call _xxxxIRQ0_DEBUG_MESSAGE
-    ;call _xxxxIRQ0_DEBUG_MESSAGE
 
     ; Timer support. No task switch.
     ; See: pit.c
@@ -162,6 +148,7 @@ _irq0:
     ; Task switching.
     ; See: ts.c
     call _psTaskSwitch   ; Task switching
+
 
 
 ; Essa é a única interrupção que tem seu retorno

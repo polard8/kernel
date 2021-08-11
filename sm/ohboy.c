@@ -411,6 +411,14 @@ void main(void)
     //gramado_system_call(82,0,0,0);
 
 
+    //change the size of a rect ... it is a test
+
+    //gramado_system_call(897,0,0,0); //cria
+    while(1){
+        gramado_system_call(897,0,0,0);
+        //gramado_system_call(898,0,0,0);
+    }
+
 //
 // Message loop
 //

@@ -459,6 +459,55 @@ void *gde_extra_services (
 
 
 
+    // test
+    // aumenta minha surface.
+    struct thread_d *myThread; 
+    struct rect_d RectTest;
+    RectTest.left = 0;
+    RectTest.top = 0;
+    RectTest.width = 28;
+    RectTest.height = 28;
+    RectTest.used = TRUE;
+    RectTest.magic = 1234;
+    RectTest.ready_to_refresh = TRUE;
+    if ( number == 897 )
+    {
+         myThread = (struct thread_d *) threadList[current_thread];
+
+        if ( (void*) myThread != NULL )
+        {
+            if ( myThread->used == TRUE && myThread->magic == 1234 ){
+                myThread->surface = (struct rect_d *) &RectTest;
+            }
+        }
+    }
+
+
+    /*
+    if ( number == 898 )
+    {
+         myThread = (struct thread_d *) threadList[current_thread];
+
+        if ( (void*) myThread != NULL )
+        {
+            if ( myThread->used == TRUE && myThread->magic == 1234 )
+            {
+                if( (void*) myThread->surface != NULL )
+                {
+                    if( myThread->surface->magic == 1234 )
+                    {
+                        myThread->surface->width++;
+                        if ( myThread->surface->width > 100){
+                            myThread->surface->width = 28;
+                        }
+                        //myThread->surface->ready_to_refresh = TRUE;
+                    }
+                }
+            }
+        }
+    }
+    */
+
     // is it full ?
     //See: sys.c
     // IN: fd

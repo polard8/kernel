@@ -370,6 +370,15 @@ struct rect_d
     int used;
     int magic;
 
+//
+// end paint ?
+//
+
+    int ready_to_refresh;
+
+
+
+
     int flag;
 
     // Estilo de design

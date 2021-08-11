@@ -64,9 +64,22 @@ unsigned long schedulerQueue[4];
 // == prototypes ============
 //
 
-void cut_round( struct thread_d *last_thread );
 
+// ==================
+
+//
+// Compositor
+//
+
+int CompositorFlag;
+void schedulerCompositor(void);
+
+// ==================
+
+
+void cut_round( struct thread_d *last_thread );
 int scheduler (void);
+
 void scheduler_lock (void);
 void scheduler_unlock (void);
 unsigned long scheduler_get_status (void);

@@ -82,7 +82,9 @@ extern int main ( int argc, char *argv[] );
 
 
 
-int crt0 (void){
+//int crt0 (void){
+
+int crt0( unsigned long rdi){
 
     // Retorno de main().
     int retval=0;
@@ -92,6 +94,11 @@ int crt0 (void){
     char *token;
     int token_count=0;
     int index=0;
+
+
+
+    unsigned long *surface_config = (unsigned long *) rdi;
+
 
 
 	// #importante

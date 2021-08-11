@@ -97,7 +97,7 @@ gramado-new \
 gramado-lib \
 gramado-sm \
 gramado-cmd \
-gramado-ws \
+gramado-presence \
 gramado-ns \
 gramado-boot \
 desert    
@@ -145,26 +145,26 @@ gramado-cmd:
 
 #5
 # Gramado Window System files.
-gramado-ws:
+gramado-presence:
 	@echo "Build: Building Window Server ..."
 
-	$(Q) $(MAKE) -C ws/
+	$(Q) $(MAKE) -C  presence/
 
 # Server and main client.
-	-sudo cp ws/bin/GWSSRV.BIN    base/
-	-sudo cp ws/bin/GWS.BIN       base/ 
+	-sudo cp presence/bin/GWSSRV.BIN    base/
+	-sudo cp presence/bin/GWS.BIN       base/ 
 
 # Clients
-	-sudo cp ws/bin/GWM.BIN       base/
-	-sudo cp ws/bin/LOGON.BIN     base/
-	-sudo cp ws/bin/EDITOR.BIN    base/
-	-sudo cp ws/bin/TERMINAL.BIN  base/
-	-sudo cp ws/bin/FILEMAN.BIN   base/
-	-sudo cp ws/bin/BROWSER.BIN   base/
+	-sudo cp presence/bin/GWM.BIN       base/
+	-sudo cp presence/bin/LOGON.BIN     base/
+	-sudo cp presence/bin/EDITOR.BIN    base/
+	-sudo cp presence/bin/TERMINAL.BIN  base/
+	-sudo cp presence/bin/FILEMAN.BIN   base/
+	-sudo cp presence/bin/BROWSER.BIN   base/
 
 # Suspended
 # Copy the clients in another folder.
-#	-sudo cp ws/bin/*.BIN    base/PROGRAMS/
+#	-sudo cp presence/bin/*.BIN    base/PROGRAMS/
 
 #6
 gramado-ns:
@@ -271,7 +271,7 @@ clean2:
 	-rm *.ISO
 clean3:
 	-rm cmd/bin/*.BIN
-	-rm ws/bin/*.BIN
+	-rm presence/bin/*.BIN
 # clean base
 clean4:
 	@echo "==================="
@@ -280,7 +280,7 @@ clean4:
 	-rm -rf boot/x86/bin/*.BIN
 	-rm -rf sm/*.BIN
 	-rm -rf cmd/bin/*.BIN
-	-rm -rf ws/bin/*.BIN
+	-rm -rf presence/bin/*.BIN
 	-rm -rf ns/bin/*.BIN
 	-rm -rf lib/fonts/bin/*.FON
 clean5:

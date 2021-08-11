@@ -165,6 +165,97 @@ int scheduler (void)
 }
 
 
+void schedulerCompositor(void)
+{
+    int i=0;
+    struct thread_d *TmpThread;
+
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+
+    if ( deviceWidth == 0 || deviceHeight == 0 )
+    {
+        debug_print ("schedulerCompositor: w h\n");
+        panic       ("schedulerCompositor: w h\n");
+    }
+
+// ============================
+
+    /*
+    struct rect_d RectTest;
+    RectTest.left = 0;
+    RectTest.top = 0;
+    RectTest.width = 28;
+    RectTest.height = 28;
+    RectTest.used = TRUE;
+    RectTest.magic = 1234;
+    RectTest.ready_to_refresh = TRUE;
+
+    if ( (void*) InitThread != NULL )
+    {
+        if ( InitThread->used == TRUE && InitThread->magic == 1234 ){
+            InitThread->surface = (struct rect_d *) &RectTest;
+        }
+    }
+    */
+    
+// ============================
+
+
+    for ( i=0; i < THREAD_COUNT_MAX; ++i )
+    {
+        TmpThread = (void *) threadList[i];
+
+        if ( (void *) TmpThread != NULL )
+        {
+            if ( TmpThread->used  == TRUE && 
+                 TmpThread->magic == 1234 && 
+                 TmpThread->state == READY )
+            {
+                // #test 
+                debug_print("  ----  Compositor  ----  \n");
+                
+                if ( (void *) TmpThread->surface != NULL )
+                {
+                    if( TmpThread->surface->used == TRUE && 
+                        TmpThread->surface->magic == 1234 )
+                    {
+                        //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
+                        //draw_string(8,8,COLOR_YELLOW," surface found ");
+                        
+                        if( TmpThread->surface->ready_to_refresh == TRUE ){
+                        drawDataRectangle( 
+                            TmpThread->surface->left, 
+                            TmpThread->surface->top, 
+                            TmpThread->surface->width, 
+                            TmpThread->surface->height, 
+                            COLOR_RED );
+                            
+                        TmpThread->surface->ready_to_refresh = FALSE;
+                        refresh_screen();
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+// #test
+
+//
+// Fake bar
+//
+
+    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
+    //draw_string(8,8,COLOR_YELLOW," Compositor ");
+    //refresh_screen();
+}
+
+
+
+
+
+
 // Lock scheduler
 void scheduler_lock (void){
     g_scheduler_status = (unsigned long) LOCKED;

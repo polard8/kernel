@@ -96,26 +96,26 @@ all:
 
 
 	$(CC) -c vt.c   $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
-	$(CC) -c ctrl/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
-	$(CC) -c model/font.c  $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+	$(CC) -c font.c  $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
 
 
 	# security
-	$(CC) -c security/desktop.c   $(KERNEL_INCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c security/room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c security/usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
-	$(CC) -c security/logoff.c    $(KERNEL_INCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c security/logon.c     $(KERNEL_INCLUDE) $(CFLAGS) -o logon.o
-	$(CC) -c security/userenv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c desktop.c   $(KERNEL_INCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
+	$(CC) -c logoff.c    $(KERNEL_INCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c logon.c     $(KERNEL_INCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c userenv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
 
 
 	# view
-	$(CC) -c view/bg.c     $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c view/char.c   $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c view/dtext.c  $(KERNEL_INCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c view/line.c   $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c view/pixel.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pixel.o
-	$(CC) -c view/rect.c   $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c bg.c     $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c char.c   $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c dtext.c  $(KERNEL_INCLUDE) $(CFLAGS) -o dtext.o
+	$(CC) -c line.c   $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c pixel.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pixel.o
+	$(CC) -c rect.c   $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
     # ...
 
 
