@@ -1,5 +1,10 @@
 // kernel.h
-// proting from Gramado.
+// porting from Gramado 32bit.
+
+
+//
+// Gramado Alone
+//
 
 
 //

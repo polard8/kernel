@@ -113,6 +113,13 @@ ohboyProcedure (
                 case VK_F1: 
                     printf ("F1\n");
                     break;
+
+                // Create rectangle.
+                // This rectangle willbe used by the compositor.
+                //case VK_F2: 
+                    //gramado_system_call(897,0,0,0);
+                    //break;
+
             };
             break;
     };
@@ -370,7 +377,6 @@ void main(void)
     // we need to work on the refresh screen support.
     rtl_clone_and_execute("gwssrv.bin"); 
 
-
     //rtl_clone_and_execute("shell.bin"); 
     
 //exit:
@@ -414,16 +420,28 @@ void main(void)
     //change the size of a rect ... it is a test
 
     //gramado_system_call(897,0,0,0); //cria
-    while(1){
-        gramado_system_call(897,0,0,0);
-        //gramado_system_call(898,0,0,0);
-    }
+    //gramado_system_call(898,0,0,0);
+
+
+//
+// Gramado Alone
+//
+
+    // Create the rectangle
+    //while(1){
+        //gramado_system_call(897,0,0,0);
+    //}
+
 
 //
 // Message loop
 //
 
 //=================================
+
+//
+// No focus!
+//
 
     //rtl_focus_on_this_thread();
 

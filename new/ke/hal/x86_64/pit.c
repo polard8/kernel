@@ -120,19 +120,22 @@ irq0_TIMER (void)
 {
     DeviceInterface_PIT();
 }
-  
 
+
+// Presence of God!
 void DeviceInterface_PIT(void)
 {
 
+//
+// Gramado Alone
+//
+
     jiffies++;
-    if ( (jiffies % 32) == 0 )
-    {
-        debug_print ("  -- TICK --  \n");
-        
-        CompositorFlag = TRUE;
-    }
+
+    // Used for debug
+    // debug_print ("  -- TICK --  \n");
 }
+
 
 
 // Main globals.

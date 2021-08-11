@@ -150,6 +150,12 @@ void preinit_OutputSupport(void)
 
 int kernel_main(int arch_type)
 {
+
+//
+// Gramado Alone 
+//
+
+
     int Status = (-1);
     //int Options=0;
     //int SafeMode = FALSE;

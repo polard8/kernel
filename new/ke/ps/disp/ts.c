@@ -154,13 +154,15 @@ The remainder ??
 // Compositor
 //
 
-// Chamamos o compositor com o contexto salvo.
-// O pit aciona essa flag a cada 32 ms.
-
-        if (CompositorFlag==TRUE){
-            schedulerCompositor();
+//
+// Gramado Alone
+//
+        if (CompositorFlag==TRUE)
+        {
+            //nothing()
             CompositorFlag=FALSE;
         }
+
 
 
 		// #obs:
