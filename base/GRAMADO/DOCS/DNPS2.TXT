@@ -1,0 +1,19 @@
+O drama da emulação de ps2.
+
+O Gramado ainda não tem suporte à USB. Mas tem um driver de ps2 para mouse e teclado.
+
+Eu tenho um mouse USB. É possível usar esse mouse com meu driver ps2 porque o BIOS faz uma emulação.
+
+Essa emulação falha às vezes. A solução é comprar um mouse ps2 eu fazer um driver de USB e um driver de mouse USB.
+
+----
+
+Fiz o seguinte. Criei duas inicializações do controlador ps2. Uma inicializa só o teclado, evitando os problemas com o mouse e a outra faz uma inicialização completa.
+
+Pra evitar problemas o Gramado está inicializando o ps2 na forma que não falha e agora tem a opção de fazer a inicialização completa através de uma chamada ao sistema.
+
+Então o shell poderá reinicializar o ps2 pra fazer testes com o mouse.
+
+... pretendo estender essa técnica para outros componentes do sistema.
+
+

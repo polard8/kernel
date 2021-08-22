@@ -1,0 +1,16 @@
+	Pumpcore - This is the niddle.
+
+
+	head_32.asm:
+	The entry point for the kernel.
+
+	head/
+	Initialization.
+
+	hw/
+	Hardware interrupts.
+
+	sw/
+	Software interrupts.
+
+

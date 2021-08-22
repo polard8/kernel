@@ -1,0 +1,11 @@
+
+
+    See:
+
+    Shared files
+    Shared memory (with semaphores)
+    Pipes (named and unnamed)
+    Message queues
+    Sockets
+    Signals
+

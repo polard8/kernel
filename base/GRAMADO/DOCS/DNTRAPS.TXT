@@ -1,0 +1,21 @@
+BugBug
+Eu tenho um problema pra resolver com a segmentaçao na hora da interrupçao do sistema.
+
+--------
+[editando]
+resolvido +-: Criei mais interrupçoes e com elas consigo acessar tudo da forma em que queria. Agora consigo configurar direito as estruturas e estou entrando com as interrupçoes habilitadas. Estou feliz.
+
+--------
+Descriçao do problema:
+Com as IRQs esta tudo bem. Implementei de uma maneira que tudo esta funcionando como o esperado, mais ainda ha muito o que fazer. Mas estou feliz com isso.
+Ja as interrupçoes de software sao outra historia ... a coisa ta feia.
+Eu tenho uma interrupçao do sistema com um monte de serviços. Entao eh meio complicado fazer mudanças nela nesse momento. Eh pedir pra ter problemas. Mas vou descrever os problemas.
+A interrupçao do sistema esta entrando em ring 0 e deixando os mesmos registradores de segmento usados pelo processo em ring3. O lado bom eh que isso permite pegar facilmente os buffers em ring 3 e o lado ruim eh que nao eh possivel acessar corretamente as estruturas e variaveis dentro do kernel ... essa interrupçao funciona muito mal quando o assunto eh configurar as estruturas do kernel.
+Pelo que vi, os sistemas deixar alguns registradores de segmento pegando coisas dentro do kernel e outros pegando coisas no processo. Issa disposiçao varia de sistema para sistema.
+------
+Para solucionar meu problema estou implementando mais interrupçoes de sistema e vou adapta-las ate que eu consiga pegar todas as informaçoes da forma que eu quiser.
+Vou fazer assim porque nao posso simplesmente trocar os registradores de segmento em uma systemcall com muitos serviços ja funcionando.
+Com novas chamadas ao sistema poderei fazer experiencias sem comprometer a estabilidade.
+Talvez eu deixe essa systemcall assim como esta para sempre e construa outras que permitam pegar dados do jeito que quero.
+----
+Tambem tenho uma questao com a habilitaçao e desabilitaçao de interrupçoes ... pois na chamada ao sistema estou entrando com as interrupçoes desabilitadas. Mas isso eh outra conversa.

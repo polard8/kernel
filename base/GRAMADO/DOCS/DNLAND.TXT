@@ -1,0 +1,5 @@
+
+	land os:
+	This is the core of gramado operating system ...
+	This is the lower level of the system. It contains the boot loader,
+the base kernel and a command interpreter called gdeshell.

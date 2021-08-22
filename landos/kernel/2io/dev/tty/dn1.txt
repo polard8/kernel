@@ -1,0 +1,5 @@
+	todo:
+
+	Create separation between high level routines and low level routines.
+	Something like that: (tty_io.c and tty_ioctl.c) and 
+(serial.c,console.c and pty.c)

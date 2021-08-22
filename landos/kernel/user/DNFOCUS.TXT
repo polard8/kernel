@@ -1,0 +1,14 @@
+
+
+
+    Switching the active window using the keyboard.
+
+    
+    The function __kgwm_ps2kbd_procedure() in kgwm.c is able to intercept
+some special keyboard sequencies. We use this sequencies do switch the window
+with focus. This way a user can switch the active widnow using the keyboard.
+
+    With this function we can switch the window with focus using keyboard sequencies
+for any foreground thread.
+    The forground thread is the raw input thread.
+

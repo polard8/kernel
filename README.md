@@ -1,35 +1,71 @@
-# Welcome to Gramado OS
+# Welcome to Gramado 1.1.241 32bit
 
-Status: 
-Porting Gramado to 64bit.
-This is a work in progress.
-Here, you can see the old [32bit version](https://github.com/gramado/build241/).
+This repository has the source code for:
 
-## kernel/  (In progress, almost done)
-    The rin0 base kernel.
-    (This is a work in progress.)
+* Gramado boot loader
+* Gramado kernel
+* Gramado Window Server
+* Applications
+* Commands
 
-## lib/ (In progress, almost done)
-    The ring 3 libraries.
-    #todo We need to port some routines to 64bit.
+## What is Gramado?
 
-## init/ (In progress, some few tests)
-    This is the first ring3 process.
-    (We are using this process to test the ring3 library)
+    Gramado (c) is a 32 bit multithreaded operating system.
 
-## cmd/ (In progress, some few programs)
-    Some ring3 commands.
+## Kernel features.
 
-## ws/ (In progress, Testing the server and some few clients)
-    The ring 3 window server and clients.
-    
-## ns/ (In progress, not tested)
-    The ring 3 network server.
+> * Paging.
+> * Threads.
+> * FAT16 file system.
+> * ps/2 keyboard. 
+> * ps/2 mouse works fine only on qemu.
+> * serial port. 
+> * IDE PATA. 
+> * e1000 NIC.
 
-## boot/x86/ (Done)
-    This is the boot loader.
-    (It is working fine.)
+## Userland features.
 
-## boot/vd/ (Done)
-    The virtual disk.
+> * Working on a Window Server. (gws)
+> * Working on a virtual terminal. 
+> * unix-like commands running in the virtual console.
+
+## Libraries.
+
+> * unix-like library. (rtl)
+> * API for setup environment. (libcore)
+> * Lib for the window server's clients. (libgws)
+
+## Fred's compilation on Linux.
+```
+    Linux 5.4.0-42-generic x86_64
+    gcc (Ubuntu) 7.5.0
+    GNU ld (GNU Binutils for Ubuntu) 2.30
+    NASM version 2.13.02
+```
+## How to Build?
+
+> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/docs/build.md)
+
+## Testing
+
+```
+	$ ./run
+	$ make qemu-test
+```
+
+You can run the VHD on Oracle Virtual Box and qemu.
+Please, give us some feedback.
+
+## Documentation
+
+> See the [docs](https://github.com/frednora/gramado/tree/master/docs/).
+> See the [DOCS](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/).
+
+## More information
+
+Gramado is a Free and Open Source operating system.
+The source code uses the BSD license.
+
+# Quotes:
+> Oh boy, there is no spoon!
 

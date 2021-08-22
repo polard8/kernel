@@ -1,0 +1,46 @@
+
+
+    Design note for 'control + function key' conbinations:
+    
+    
+    Power trio:
+    
+    control + f1 - Select task number 1
+    control + f2 - Select task number 2
+    control + f3 - Select task number 3
+    control + f4 - Power trio switcher
+    
+    control + f5 - Select task number 1
+    control + f6 - Select task number 2
+    control + f7 - Select task number 3
+    control + f8 - Power trio switcher
+
+    control + f9  - Select task number 1
+    control + f10 - Select task number 2
+    control + f11 - Select task number 3
+    control + f12 - Power trio switcher
+
+
+    switch virtual console?
+    
+    shift + f1 = Switch to virtual console 0.    
+    shift + f2 = Switch to virtual console 1.    
+    shift + f3 = Switch to virtual console 2.    
+    shift + f4 = Switch to virtual console 3.    
+
+    shift + f5 = Switch active window. 
+    shift + f6 = Switch active window. 
+    shift + f7 = Switch active window. 
+    shift + f8 = Switch active window. 
+
+
+    Launch applications using the init process as a launcher:
+
+    shift + f9  = Launch reboot application. 
+    shift + f10 = Launch gdeshell application. 
+    shift + f11 = Launch redpill application. 
+    shift + f12 = Launch sysmon application. 
+
+
+
+    

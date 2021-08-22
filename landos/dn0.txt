@@ -1,0 +1,11 @@
+landos/
+
+
+	This is the system folder.
+
+	init/    The init process.
+	kernel/  The base kernel.
+
+
+	todo: 
+	We can put all the loadable drivers inside this window.

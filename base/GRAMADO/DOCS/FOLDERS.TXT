@@ -1,0 +1,13 @@
+
+	Folders:
+
+	admin/     Scripts and design notes.
+
+	base/      Root dir for the target installation disk.
+
+	gramado/   Gramado Operating system.
+
+	landboot/  The boot loader for Land OS.
+	landlib/   User API. Ring 3 libraries.
+	landos/    Land OS. The kernel and the init process.
+

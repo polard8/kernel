@@ -1,0 +1,10 @@
+
+
+
+    Gramado Setup.
+
+    The setup environment.
+    This environment is used to install/upgrade the system.
+    It uses the graphics resources inside the base kernel,
+not the loadable window server.
+

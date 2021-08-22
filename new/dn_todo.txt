@@ -1,8 +1,0 @@
-
-
-	mm = 0mem
-	kernel = 1pump
-	fs = 2io
-
-
-

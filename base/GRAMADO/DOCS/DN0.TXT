@@ -1,0 +1,36 @@
+
+
+    Some functions called during the kernel initialization.
+    
+
+hwi/init/x86/boot.asm
+=====================
+    _kernel_begin:
+
+
+hwi/init/x86/head.asm
+=====================
+    head_init:
+
+
+kernel/main.c
+=====================
+    kernel_main()
+
+
+hwi/init/x86/x86init.c
+=====================
+    x86main()
+    
+
+core/system.c
+=====================
+    systemInit()
+    systemStartUp()
+
+
+core/init.c
+=====================
+    init()
+    
+ 

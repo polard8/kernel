@@ -1,0 +1,5 @@
+	Maybe we can pool the mouse output buffer
+	instead of using the isr interrupt routine.
+	I guess Temple os is doing that.
+	Maybe it helps with the BIOS emulation issues in the
+	real machine.

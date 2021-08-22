@@ -1,0 +1,19 @@
+
+	#important
+	This is the window manager high level support
+	for the widnow server embedded inside the base kernel.
+	The low level part of the output support you can find on 2io/
+
+
+    GUI support embedded in the base kernel.
+    ring 0.
+    It is used by the setup environment. 
+
+
+    model:
+        data model and business logic.
+        it's a thing for developers.
+
+    view:
+        input support and graphical interface presentation.
+        it's a thing for designers.

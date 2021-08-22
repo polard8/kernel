@@ -1,0 +1,35 @@
+"Nóis eh pobre mais eh limpinho.", meu tributo ao Singularity OS.
+
+Código de sistema operacional é uma coisa sensível, 
+uma vírgula fora do lugar e a coisa toda desanda. Eu disse a 'COISA TODA'.
+Empresas que fabricam sistemas operacionais sabem disso e 
+não querem perder o jogo por causa de falta de zelo.
+
+Empresas como Microsoft e Apple fazem códigos primorosos, 
+que parecem uma obra de arte. Enquanto alguns fazem 
+códigos horrendos e depois argumentam contra o zelo dessa forma: 
+"O importante é funcionar, não adianta fazer um código bonito 
+que não funcione."
+
+Bem, mas todo mundo aqui sabe que existem  códigos feios, 
+minha fala não acrescenta nada até agora. 
+O que quero dizer é que com o mesmo nível de falta de zelo foram feitas 
+muitas das frameworks que o pessoal da web tem usado hoje em dia.
+
+Não acredito mais que exita linguagem feia. São os malabarismos e a rebuscagem 
+de programadores vaidosos que tornam o código ilegível e 
+dá a aparência que a linguagem é feia.
+Haverá quem diga que todo esse malabarismo resulte em ganho de desempenho. 
+Pois eu parei me importar com isso.
+
+Começei gostar da lógica simples e do código bem apresentável quando conheci 
+o sistema operacional Singularity da Microsoft. Esse sistema 
+tem um propósito educacional e não foca no desempenho. 
+Acho tudo bonito no Singularity.
+
+O Singularity utiliza linguagens como Assembly, C e C++, 
+mas principalmente C#.
+
+kiss
+
+

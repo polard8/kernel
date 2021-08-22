@@ -1,0 +1,4 @@
+    # Console support:
+    # The console is responsable for the output.
+    # It can be virtual terminal, serial or even network output.
+

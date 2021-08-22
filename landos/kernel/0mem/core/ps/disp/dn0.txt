@@ -1,0 +1,21 @@
+
+    dispatcher:
+    
+    The attribution of a dispatcher is:
+
+    context switch, task switch and spawn.
+    The scheduler will create the next round. 
+
+    Context Switching
+    Switching to user mode
+    Jumping to the proper location in the user program to restart that program
+
+    files:
+    
+    dispatch.c
+    spawn.c
+    ts.c
+    x86/x86cont.c
+    x86/x86start.c
+
+
