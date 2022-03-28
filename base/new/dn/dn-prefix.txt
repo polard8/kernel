@@ -1,0 +1,41 @@
+
+	Prefixes used by symbols inside the base kernel:
+
+
+// =================================
+
+Top layer:
+	( API )
+	newos_XXXX:
+	Exported symbols.
+	This is the kernel services interface.
+	The ring0 modules will be able to call
+	those symbols directly.
+	The main module is the window server,
+	called gwssrv.bin
+
+// =================================
+
+Bottom layer:
+	n0_
+
+
+// =================================
+
+	sys_xxxx:
+	Services called by the syscalls.
+
+	fs_xxxx:
+	File system interface.
+
+	ke_xxxx:
+	Process and thread support.
+
+	mm_xxxx:
+	Memory manager interface.
+
+	net_xxxx:
+	The net interface.
+
+	
+

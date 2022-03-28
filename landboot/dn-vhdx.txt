@@ -1,5 +1,0 @@
-
-	vdx
-
-	We can create cirtual disks of different styles
-	for different purposes.

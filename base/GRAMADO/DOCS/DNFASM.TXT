@@ -1,6 +1,0 @@
-	To run fasm on gramado, type:
-
-	$fasm -m128 test1.asm
-	$fasm -m128 test1.asm &
-
-

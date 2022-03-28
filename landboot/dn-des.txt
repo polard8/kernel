@@ -1,5 +1,0 @@
-	Codename desert.
-
-	We need here some boot drivers and applications.
-	For now we're loading only the kernel image.
-	But it is a good choice loading hals and drivers too.

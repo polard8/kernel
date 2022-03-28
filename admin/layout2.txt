@@ -1,0 +1,13 @@
+
+	Core folders:
+
+/base
+	This is the root directory for the target disk.
+/boot
+	The boot loader.
+/new
+	The base kernel.
+/gramado/core
+	The window server.
+
+

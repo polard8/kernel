@@ -1,2 +1,0 @@
-
-    rtl - Not gramado style.

@@ -1,5 +1,0 @@
-yield
-Quando chama yield() a thread desiste de seu tempo de processamento liberando o processador e voltando somente no proximo round. Para isso eh preciso ter o contexto salvo antes de parar.
-Pois bem, quando uma thread em ring3 estava chamando yield() atravez da system call ela estava desistindo do seu tempo de processamento mas nao estava salvando o contexto ... pois a chamada do sistema nao costuma fazer isso. ... entao provavelmente quando retornava, tinha que retornar no ultimo contexto salvo.
-Entao eu desisti dessa rotina por enquanto ... vou substituir no futuro por outra que salve o contexto ... mas acontece que varios programas estavam usando essa funçao ... e agora ao invez de desistirem do tempo de processamento eles simplesmente continuam o que estavam fazendo ... que provavelmente era 'pooling' ... com isso a digitaçao ficou mais lenta ... so vai voltar ao normal quando eu reimplementar esse recurso. Mas ta bom assim. melhor que usar a rotina com defeito.
-

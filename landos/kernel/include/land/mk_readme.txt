@@ -1,4 +1,0 @@
-
-
-    /arch
-    /pc (process control)

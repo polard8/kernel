@@ -1,0 +1,5 @@
+
+	entrance/visitor/x86_64/sci.c
+	drivers/video/fbdev/pixel.c
+
+

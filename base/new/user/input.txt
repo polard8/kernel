@@ -1,0 +1,12 @@
+
+
+
+ Input routine:
+ 
+     + ps2kbd.c:   DeviceInterface_PS2Keyboard
+     + console.c:  console_interrupt
+     + kgws.c:     xxxKeyEvent
+     + kgwm.c:     wmProcedure
+     
+     
+     

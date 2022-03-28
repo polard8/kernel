@@ -1,0 +1,12 @@
+
+https://github.com/frednora/gramadox
+
+Gramado X
+
+É nessa pasta que vai ficar minha tentativa de construir um sistema operacional de 64 bit.
+--------
+
+Qual é a diferença entre o Gramado de 32 bit e um Gramado de 64 bit? Apenas uns 10 arquivos!
+É comum os projetos deixarem 32bit e 64bit conviverem, mas ao custo de interminávies rotinas de pre-processamento que deixam o código muito ruim.
+Se minha tentativa der certo, o Gramado vai ser um sistema de 64 bit e não terá a versão de 32 bit. Nesse caso eu talvez copie todos os arquivos novamente para o repositório /gramado.
+Se você acompanhar esse repositório vai poder ver o Gramado sendo reconstruído do zero com o código já existente. Apenas uns 10 arquivos serão editados.

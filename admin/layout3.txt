@@ -1,0 +1,19 @@
+
+
+===========================
+Database tier:
+
+	admin/ - Sysadminland.
+	base/  - Boot, setup and kernel.
+	lib/   - libraries.
+
+===========================
+Communication tier:
+
+	ns/    - Network server.
+
+===========================
+Presentation tier:
+
+	gramado/core/ - The window server.
+	gramado/shell - The user interface applications.

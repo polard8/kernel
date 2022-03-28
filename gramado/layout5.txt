@@ -1,0 +1,6 @@
+
+	core/ the window server and the first client.
+	libgws/ the client-side library for the window server.
+	logon/ the logon environment.
+	setup/ the setup envitronment.
+	shell/ the User interface.

@@ -1,4 +1,5 @@
-# Welcome to Gramado 1.1.241 32bit
+# Welcome to Gramado OS - Codename 'Field'
+
 
 This repository has the source code for:
 
@@ -10,7 +11,7 @@ This repository has the source code for:
 
 ## What is Gramado?
 
-    Gramado (c) is a 32 bit multithreaded operating system.
+    Gramado (c) is a 64bit multithreaded operating system.
 
 ## Kernel features.
 
@@ -19,32 +20,32 @@ This repository has the source code for:
 > * FAT16 file system.
 > * ps/2 keyboard. 
 > * ps/2 mouse works fine only on qemu.
-> * serial port. 
+> * Serial port. 
 > * IDE PATA. 
-> * e1000 NIC.
+> * Window Server. See: gramado/core/
 
 ## Userland features.
 
-> * Working on a Window Server. (gws)
-> * Working on a virtual terminal. 
-> * unix-like commands running in the virtual console.
+> * Unix-like commands running in the virtual console.
+> * Some few clients connected to the window server via unix-sockets.
 
 ## Libraries.
 
 > * unix-like library. (rtl)
-> * API for setup environment. (libcore)
 > * Lib for the window server's clients. (libgws)
 
 ## Fred's compilation on Linux.
 ```
-    Linux 5.4.0-42-generic x86_64
-    gcc (Ubuntu) 7.5.0
-    GNU ld (GNU Binutils for Ubuntu) 2.30
-    NASM version 2.13.02
+    Host machine: Ubuntu 20.04.3 LTS
+    Linux 5.11.0-43-generic x86_64
+    gcc (Ubuntu) 9.3.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.34
+    NASM version 2.14.02
 ```
+
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/docs/build.md)
+> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/main/admin/docs/build.md)
 
 ## Testing
 
@@ -53,15 +54,23 @@ This repository has the source code for:
 	$ make qemu-test
 ```
 
-You can run the VHD on Oracle Virtual Box and qemu.
+Tested only on qemu and on my real machine.
+My machine: Gigabyte/Intel Core 2 Duo/Chipset VIA.
 Please, give us some feedback.
 
 ## Documentation
 
-> See the [docs](https://github.com/frednora/gramado/tree/master/docs/).
-> See the [DOCS](https://github.com/frednora/gramado/blob/master/base/GRAMADO/DOCS/).
+> See the [docs](https://github.com/frednora/gramado/tree/main/admin/docs).
 
-## More information
+## Author
+
+* **Fred Nora** - [frednora](https://twitter.com/frednora)
+
+## Contributors
+
+* **Fred Nora** - [frednora78](https://facebook.com/frednora78)
+
+## License
 
 Gramado is a Free and Open Source operating system.
 The source code uses the BSD license.

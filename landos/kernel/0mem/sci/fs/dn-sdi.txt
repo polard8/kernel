@@ -1,5 +1,0 @@
-
-	sdi -  storage device interface
-
-	Low level routines to read and write into the disk.
-	This is a test yet.
