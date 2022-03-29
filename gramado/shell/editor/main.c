@@ -99,6 +99,27 @@ int tmp_ip_y=8;
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
+//prototype
+static int 
+editorProcedure(
+    int fd, 
+    int event_window, 
+    int event_type, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+static void update_clients(int fd);
+
+// ============
+
+static void update_clients(int fd)
+{
+    gws_redraw_window(fd, addressbar_window, TRUE);
+    gws_redraw_window(fd, savebutton_window, TRUE);
+    gws_redraw_window(fd, client_window,     TRUE);
+}
+
+
 int fileman_init_globals(void)
 {
     //gws_debug_print("fileman_init_globals:\n");
@@ -209,15 +230,6 @@ editorSetCursor(
 }
 
 
-//prototype
-static int 
-editorProcedure(
-    int fd, 
-    int event_window, 
-    int event_type, 
-    unsigned long long1, 
-    unsigned long long2 );
-
 // local
 static int 
 editorProcedure(
@@ -248,7 +260,7 @@ editorProcedure(
         if( event_window == addressbar_window ||
             event_window == client_window )
         {
-            gws_redraw_window(fd, event_window, TRUE);
+            //gws_redraw_window(fd, event_window, TRUE);
             
             if(event_window == client_window)
             {
@@ -269,12 +281,13 @@ editorProcedure(
         return 0;
         break;
 
-    // Evento de teste.
-    case 1000:
+    //case 1000:  // Evento de teste.
+    case MSG_PAINT:
         // If the event window is the main window, so
         // redraw everyone.
         if( event_window == main_window )
         {
+            update_clients(fd);
             //gws_redraw_window(fd, addressbar_window, TRUE);
             //gws_redraw_window(fd, savebutton_window, TRUE);
             //gws_redraw_window(fd, client_window,     TRUE);

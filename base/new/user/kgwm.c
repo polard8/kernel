@@ -1258,6 +1258,7 @@ xxxMouseEvent(
     long long2 )
 {
 
+    unsigned long button_number = long1;
     //debug_print ("xxxMouseEvent:\n");
 
 // Buttons:
@@ -1266,11 +1267,10 @@ xxxMouseEvent(
         event_id == MSG_MOUSERELEASED )
     {
         wmProcedure(
-            (struct window_d *) 0,         // opaque pointer
-            (int)               event_id,  // msg code
-            (unsigned long)     long1,         // x
-            (unsigned long)     long2 );       // y
-        
+            (struct window_d *) 0,                // opaque pointer
+            (int)               event_id,         // msg code
+            (unsigned long)     button_number,    // button number
+            (unsigned long)     button_number );  // button number
         return 0;
     }
 

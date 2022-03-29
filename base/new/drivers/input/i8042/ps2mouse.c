@@ -273,44 +273,51 @@ void __ps2mouse_parse_data_packet (void)
 // Call the event handler.
 // Was it pressed or released?
 
+
+// 1 (left)
 // The button 0 changed the state.
+// O botao 0, eh na verdade o botao 1. (left)
     if( button0_changed == TRUE )
     {
         // Presssed
         if( mbuttons_current_state[0] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 0, 0 );
+            xxxMouseEvent( MSG_MOUSEPRESSED, 1, 1 );
         }
         // Released
         if( mbuttons_current_state[0] == FALSE ){
-            xxxMouseEvent( MSG_MOUSERELEASED, 0, 0 );
-        }
-        return;
-    }
-
-// The button 1 changed the state.
-    if( button1_changed == TRUE )
-    {
-        // Pressed
-        if( mbuttons_current_state[1] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 1, 1 );
-        }
-        // Relesed
-        if( mbuttons_current_state[1] == FALSE ){
             xxxMouseEvent( MSG_MOUSERELEASED, 1, 1 );
         }
         return;
     }
 
+// 2 (right)
+// The button 1 changed the state.
+// O botao 1, eh na verdade o botao 2. (right)
+    if( button1_changed == TRUE )
+    {
+        // Pressed
+        if( mbuttons_current_state[1] == TRUE ){
+            xxxMouseEvent( MSG_MOUSEPRESSED, 2, 2 );
+        }
+        // Relesed
+        if( mbuttons_current_state[1] == FALSE ){
+            xxxMouseEvent( MSG_MOUSERELEASED, 2, 2 );
+        }
+        return;
+    }
+
+// 3 (middle)
 // The button 2 changed the state.
+// O botao 2, eh na verdade o botao 3. (middle)
     if( button2_changed == TRUE )
     {
         // Pressed
         if( mbuttons_current_state[2] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 2, 2 );
+            xxxMouseEvent( MSG_MOUSEPRESSED, 3, 3 );
         }
         // Released
         if( mbuttons_current_state[2] == FALSE ){
-            xxxMouseEvent( MSG_MOUSERELEASED, 2, 2 );
+            xxxMouseEvent( MSG_MOUSERELEASED, 3, 3 );
         }
         return;
     }

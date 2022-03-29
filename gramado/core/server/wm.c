@@ -63,6 +63,7 @@ static unsigned long ____new_time=0;
 
 static void run_selected_option(void);
 static void on_mouse_event(int event_type, long x, long y);
+static void on_update_window(int event_type);
 
 // ===================
 
@@ -136,6 +137,40 @@ static void on_mouse_event(int event_type, long x, long y)
 {
 // Window with focus.
     struct gws_window_d *w;
+    long in_x=0;
+    long in_y=0;
+
+// Error. Nothing to do.
+    if(event_type<0)
+        return;
+
+    w = (struct gws_window_d *) get_focus();
+    if( (void*) w==NULL ){
+        return;
+    }
+
+    if( x >= w->left &&
+        x <= w->right &&
+        y >= w->top &&
+        y <= w->bottom )
+    {
+// data
+        w->single_event.wid   = w->id;
+        w->single_event.msg   = event_type;
+        w->single_event.long1 = x - w->left;
+        w->single_event.long2 = y - w->top;
+        w->single_event.has_event = TRUE;
+        return;
+    }
+//fail
+    w->single_event.has_event = FALSE;
+}
+
+
+static void on_update_window(int event_type)
+{
+// Window with focus.
+    struct gws_window_d *w;
 
 // Error. Nothing to do.
     if(event_type<0)
@@ -147,13 +182,11 @@ static void on_mouse_event(int event_type, long x, long y)
     }
 
 // data
-    w->single_event.wid   = w->id;
-    w->single_event.msg   = event_type;
-    w->single_event.long1 = x;  //#debug: O app esta pegando o valor que colocamos
-    w->single_event.long2 = y;  // aqui corretamente.
-
-// flag
-    w->single_event.has_event = TRUE;
+        w->single_event.wid   = w->id;
+        w->single_event.msg   = event_type;
+        w->single_event.long1 = 0;
+        w->single_event.long2 = 0;
+        w->single_event.has_event = TRUE;
 }
 
 
@@ -1544,6 +1577,9 @@ void wm_update_desktop(void)
                 // redraw, but do no show it.
                 redraw_window(w,FALSE);
                 
+                // paint the childs of the window with focus.
+                on_update_window(GWS_Paint);
+                
                 //invalidate_window(w);
                 //set_focus(w);
                 //set_active_window(w->id);
@@ -2263,7 +2299,7 @@ mainmenuDialog(
 // local
 // Se o mouse esta passando sobre os botoes
 // da barra de tarefas.
-void __probe_tb_botton_hover(long long1, long long2)
+void __probe_tb_button_hover(long long1, long long2)
 {
     int Status=0;
     int i=0;
@@ -2482,7 +2518,7 @@ wmProcedure(
 
         // Em qual botão o mouse esta passando por cima.
         // lembrando: o botao esta dentro de outra janela.
-        __probe_tb_botton_hover(long1,long2);
+        __probe_tb_button_hover(long1,long2);
 
 
         //========
@@ -2506,9 +2542,10 @@ wmProcedure(
         break;
 
     case GWS_MousePressed:
-        //if(long1==0){ yellow_status("P0"); }
+        // button number
         //if(long1==1){ yellow_status("P1"); }
         //if(long1==2){ yellow_status("P2"); }
+        //if(long1==3){ yellow_status("P3"); }
 
         // Em qual botão da taskbar?
         if(mousehover_window == tb_buttons[0] ||
@@ -2535,23 +2572,28 @@ wmProcedure(
 
     // 36
     case GWS_MouseReleased:
-        
+
+        // button number
+        //if(long1==1){ yellow_status("R1"); }
+        //if(long1==2){ yellow_status("R2"); }
+        //if(long1==3){ yellow_status("R3"); }
+
         // Post it to the app.
         on_mouse_event( 
             GWS_MouseReleased,              // event type
             comp_get_mouse_x_position() ,   // current cursor x
             comp_get_mouse_y_position() );  // current cursor y
         
-        //if(long1==0){ yellow_status("R0"); }
-        //if(long1==1){ yellow_status("R1"); wm_update_desktop(); return 0; }
-        if(long1==1){ 
+        //if(long1==1){ yellow_status("R1"); }
+        //if(long1==2){ yellow_status("R2"); wm_update_desktop(); return 0; }
+        //if(long1==1){ 
             //yellow_status("R1"); 
             //create_main_menu(8,8);
-            return 0; 
-        }
-        //if(long1==2){ yellow_status("R2"); return 0; }
-        //if(long1==1){ create_main_menu(mousex,mousey); return 0; }
-        //if(long1==1){ create_main_menu(mousex,mousey); return 0; }
+            //return 0; 
+        //}
+        //if(long1==3){ yellow_status("R3"); return 0; }
+        //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
+        //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
 
         //tb_button[0]
         if(mousehover_window == tb_buttons[0])
