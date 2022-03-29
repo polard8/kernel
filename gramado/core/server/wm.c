@@ -74,6 +74,9 @@ static void run_selected_option(void)
 
     yellow_status("RUN");
 
+// Nothing to do.
+    if( WindowManager.initialized != TRUE )
+        return;
 
     w = (struct gws_window_d *) windowList[active_window];
 
@@ -114,7 +117,8 @@ static void run_selected_option(void)
     }
     
     //#bugbug: e se a janela ativa for a root?
-    if(current_option==OPTION_MAXIMIZE){
+    if(current_option==OPTION_MAXIMIZE)
+    {
         //redraw_window_by_id(active_window,TRUE);
         //redraw_window(w,TRUE);
         wm_update_window_by_id(w->id);
@@ -309,14 +313,11 @@ void __init_wm_structure(void)
 {
 
 // Clear the structure.
-    WindowManager.mode = 1;  //tiling
+    WindowManager.mode = WM_MODE_TILED;  //tiling
 
-    WindowManager.is_fullscreen = FALSE;
-    //WindowManager.is_fullscreen = TRUE;
-    
 //orientation
-    WindowManager.vertical = TRUE;   //default
-    //WindowManager.vertical = FALSE;
+    WindowManager.vertical = FALSE;   // horizontal. default
+    //WindowManager.vertical = TRUE;
     
     WindowManager.root = NULL;
     WindowManager.taskbar = NULL;
@@ -324,6 +325,9 @@ void __init_wm_structure(void)
     WindowManager.wa_top = 0;
     WindowManager.wa_width=0;
     WindowManager.wa_height=0;
+
+    WindowManager.is_fullscreen = FALSE;
+    //WindowManager.is_fullscreen = TRUE;
 
 // Default background color.
     __set_default_background_color(WM_DEFAULT_BACKGROUND_COLOR);
@@ -1289,95 +1293,125 @@ void flush_frame(void)
 // Starting with the first window of the list,
 // create a stack o windows in the top/left corner
 // of the screen.
-
-void __Tile(void)
-{
-
 // #todo:
 // only overlapped windows?
 
+void __Tile(void)
+{
     struct gws_window_d *w;
-
     int cnt=0;
     int c=0;
     int i=0;
 
     debug_print("__Tile:\n");
 
+// Nothing to do.
+    if( WindowManager.initialized != TRUE )
+        return;
+
+// =============================
+// Get the size of the list.
     w=(struct gws_window_d *)first_window;
-    if((void*)w==NULL)
-    { 
+    if((void*)w==NULL){ 
         debug_print("__Tile: w==NULL\n");
         return; 
     }
-
-
-// Get the size of the list.
-
-    while((void*)w != NULL)
-    {
+    while((void*)w != NULL){
         w = (struct gws_window_d *) w->next;
         cnt++;
     };
 
-// Starting with the forst window of the list,
-// create a stack o windows in the top/left corner
-// of the screen.
-
+// =============================
+// Starting with the first window of the list,
+// create a stack of windows in the top/left corner of the screen.
     w = (struct gws_window_d *) first_window;
-
-    if ((void*)w==NULL)
-    { 
+    if ((void*)w==NULL){ 
         debug_print("__Tile: w==NULL\n");
         return; 
     }
 
+    // #bugbug: 
+    // limite provisorio
+    if( cnt>4 ){
+        cnt=4;
+    }
+
+    unsigned long Left=0;
+    unsigned long Top=0;
+    unsigned long Width=0;
+    unsigned long Height=0;
+
+    unsigned long l2=0;
+    unsigned long t2=0;
+    unsigned long w2=0;
+    unsigned long h2=0;
+
     i=0;
     while ((void*)w != NULL)
     {
-        if(i>=cnt)
-            break;
-
-        //#bugbug: limite provisorio
-        if(i>4){
-            cnt=4;
+        if(i>=cnt){
             break;
         }
-        
-        /*
-         //original
-        w->left = (i*10);
-        w->top  = (i*10);
-        w->width  = 240;
-        w->height = 120;
-        */
-        
-        // #test
-        // Empilhando verticalmente.
-        if( WindowManager.initialized == TRUE )
-        {
-            if(WindowManager.mode == 1)
-            {
-                //VERTICAL
-                if( WindowManager.vertical==TRUE)
-                {
-                    w->width  = WindowManager.wa_width;
-                    w->height = (WindowManager.wa_height / cnt); 
-                    w->left   = 0;
-                    w->top    = (w->height * i);
-                }
 
-                //NOT VERTICAL
-                if( WindowManager.vertical!=TRUE)
+        if(WindowManager.mode == WM_MODE_TILED)
+        {
+            // Horizontal
+            if( WindowManager.vertical==FALSE)
+            {
+                // for titlebar color support.
+                // not the active window.
+                w->active = FALSE;
+                
+                // resize.
+                Width  = (unsigned long) (WindowManager.wa_width / 2) -4;
+                Height = (unsigned long) (WindowManager.wa_height / cnt);
+                w2 = Width;
+                h2 = Height -4;
+                gws_resize_window(w, w2, h2);
+
+                // positions.
+                Left = (unsigned long) (WindowManager.wa_width / 2) +2;
+                Top  = (unsigned long) (Height * i);
+                l2 = Left;
+                t2 = Top +2; 
+                gwssrv_change_window_position(w, l2, t2);
+            
+                // master?
+                // Se estivermos na ultima janela,
+                // entao vamos refazer ele como master.
+                if(i == cnt-1)
                 {
-                    w->height = WindowManager.wa_height; 
-                    w->width  = (WindowManager.wa_width/cnt);
-                    w->left   = (w->width * i);
-                    w->top    = 0;
+                    // for titlebar color support.
+                    // the active window.
+                    w->active = TRUE;
+
+                    // resize.
+                    Width  = (unsigned long) (WindowManager.wa_width / 2);
+                    Height = (unsigned long) WindowManager.wa_height;
+                    w2 = Width  -4;
+                    h2 = Height -4;
+                    gws_resize_window(w, w2, h2);
+
+                    // positions.
+                    Left = (unsigned long) WindowManager.wa_left;
+                    Top  = (unsigned long) WindowManager.wa_top; 
+                    l2 = Left +2;
+                    t2 = Top  +2;
+                    gwssrv_change_window_position(w, l2, t2);
                 }
             }
+
+            // Vertical.
+            if( WindowManager.vertical==TRUE)
+            {
+                //#todo:
+                //w->height = WindowManager.wa_height; 
+                //w->width  = (WindowManager.wa_width/cnt);
+                //w->left   = (w->width * i);
+                //w->top    = 0;
+            }
         }
-        
+
         w = (struct gws_window_d *) w->next;
         i++;
     };
@@ -1418,15 +1452,13 @@ void wm_update_window_by_id(int wid)
     // Empilhando verticalmente.
     if( WindowManager.initialized != TRUE )
         return;
-    
-    
-    if(WindowManager.mode == 1)
+ 
+    // tiled mode.
+    // Esses metodos irao atualizar tambem os valores da barra de titulos.
+    if(WindowManager.mode == WM_MODE_TILED)
     {
-        //maximized
-        w->left=0;
-        w->top=0;
-        w->width  = WindowManager.wa_width;
-        w->height = WindowManager.wa_height; 
+        gwssrv_change_window_position(w,0,0);
+        gws_resize_window(w,WindowManager.wa_width,WindowManager.wa_height);
     }
     
     redraw_window(w,FALSE);
@@ -1545,6 +1577,8 @@ void wm_update_desktop(void)
 // Redraw and show the root window.
     redraw_window(__root_window,TRUE);
 
+
+// ======================================
 // Redraw the whole stack of windows,
 // but do not show them yet.
 // Only for app windows. (overlapped).
@@ -1552,7 +1586,6 @@ void wm_update_desktop(void)
 // Set focus on the last window of the stack. 
 
     w = (struct gws_window_d *) first_window;
-
     if((void*)w==NULL){ 
         return; 
     }
@@ -3561,7 +3594,7 @@ redraw_window (
                         window->type == WT_EDITBOX ||
                         window->type == WT_EDITBOX_MULTIPLE_LINES )
                     {
-                        __draw_window_border(window->parent,window);
+                        __draw_window_border(window->parent, window);
                     }
 
                     // se a janela for overlapped
@@ -3572,6 +3605,14 @@ redraw_window (
                         {
                             if (window->titlebar->magic == 1234 )
                             {
+                                if( window->active == TRUE ){
+                                    window->titlebar->bg_color = COLOR_BLUE1;
+                                }
+
+                                if( window->active == FALSE ){
+                                    window->titlebar->bg_color = COLOR_GRAY;
+                                }
+
                                 //bg
                                 rectBackbufferDrawRectangle ( 
                                     window->titlebar->left, 
@@ -4719,15 +4760,23 @@ gws_resize_window (
     {
         window->width  = (unsigned long) cx;
         window->height = (unsigned long) cy;
+
+        // Muda tambem as dimençoes da titlebar.
+        // Muda somente a largura, pois a altura deve 
+        // continuar a mesma;
+        if( window->type == WT_OVERLAPPED )
+        {
+            if( (void*) window->titlebar != NULL )
+            {
+                window->titlebar->width = 
+                    (window->width - window->border_size - window->border_size );
+            }
+        }
     }
-    
 
-    // #test
-    //window->dirty = TRUE;
-    invalidate_window(window);
-
-    //__root_window->dirty = 1;
-
+// #bugbug
+// Precisa mesmo pintar toda vez que mudar as dimensoes
+    //invalidate_window(window);
     return 0;
 }
 
@@ -4801,11 +4850,21 @@ gwssrv_change_window_position (
     window->y = y;
     window->left = (window->parent->left + window->x); 
     window->top  = (window->parent->top  + window->y); 
-    
-    //#test
-    //window->dirty = 1;
-    invalidate_window(window);
-    
+
+
+    // Muda tambem as posiçoes da titlebar.
+    if( window->type == WT_OVERLAPPED )
+    {
+        if( (void*) window->titlebar != NULL )
+        {
+            window->titlebar->left = ( window->left + window->border_size );
+            window->titlebar->top  = ( window->top  + window->border_size );
+        }
+    }
+
+// #bugbug
+// Precisa mesmo pinta toda vez que mudar a posiçao?
+    //invalidate_window(window);
     return 0;
 }
 

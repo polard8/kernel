@@ -81,6 +81,13 @@ struct gws_windowmanager_d
 // Not a pointer.
 struct gws_windowmanager_d  WindowManager;
 
+// layouts examples
+// tiled, monocle and floating layouts
+
+#define WM_MODE_TILED  1
+#define WM_MODE_OVERLAPPED  2
+#define WM_MODE_MONO  3
+
 // ======
 
 // wm prototypes
