@@ -177,11 +177,9 @@ unsigned long timerList[32];
 
 void DeviceInterface_PIT(void); 
 
-
 // ====
 
 int timerTimer (void);
-
 
 void timerInit8253 ( unsigned int freq );
 
@@ -218,7 +216,6 @@ void sleep (unsigned long ms);
 
 int timerInit (void);
 int early_timer_init (void);
-
 
 struct timer_d *create_timer ( 
     pid_t pid, 

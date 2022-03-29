@@ -1,6 +1,11 @@
 
 // intelmm.h
 
+
+#ifndef ____INTELMM_H
+#define ____INTELMM_H    1
+
+
 //
 // tables support
 //
@@ -41,5 +46,9 @@ struct intel_pte_d
     unsigned long Available3      :1;
     unsigned long PageBaseAddress :20;
 }; 
+
+#endif    
+
+
 
 

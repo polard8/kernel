@@ -23,7 +23,6 @@ long pathconf (const char *pathname, int name);
 
 off_t sys_lseek (int fd, off_t offset, int whence);
 
-
 // See:
 // sys.c
 unsigned long sys_alarm(unsigned long seconds);

@@ -42,8 +42,8 @@
 
 unsigned long kernel_request;
 
+
 /*
- *****************************************************
  * request_d:
  *     Estrutura para o request.
  *     Aqui ficarao os argumentos para atender o request.

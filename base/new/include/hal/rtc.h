@@ -99,7 +99,6 @@ unsigned long get_time (void);
 unsigned short rtcGetBaseMemory (void);
 unsigned short rtcGetExtendedMemory (void);
 
-
 int init_clock (void);
 void *get_cmos_info (void);
 

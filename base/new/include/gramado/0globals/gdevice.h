@@ -15,7 +15,7 @@
  */
 
 #ifndef ____GDEVICE_H
-#define ____GDEVICE_H 1
+#define ____GDEVICE_H  1
  
 
 /*

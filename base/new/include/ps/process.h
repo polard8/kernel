@@ -891,13 +891,15 @@ struct process_d
     struct process_d *next;
 };
 
-struct process_d *KernelProcess;     // Base kernel
-struct process_d *InitProcess;       // init process.
+struct process_d  *KernelProcess;  // Base kernel.
+struct process_d  *InitProcess;    // Init process.
+
+
 
 /*
  *    processList:
  *        Tabela de processos.
- *
+ * 
  *    **** LONG-TERM SCHEDULER FOR PROCESSES ****
  *
  *     Essa � a thread job list, ou job queue.
@@ -927,7 +929,6 @@ void set_current_process( pid_t pid );
 pid_t get_current_process(void);
 
 
-
 //==============
 // clone.c
 
@@ -938,14 +939,10 @@ copy_process_struct(
 
 pid_t copy_process ( const char *filename, pid_t pid, unsigned long clone_flags );
 
-
-
-
 //==============
 // plib.c
 void show_currentprocess_info (void);
 void show_process_information (void);
-
 
 int GetCurrentPID (void);
 struct process_d *GetCurrentProcess(void);
@@ -986,7 +983,6 @@ unsigned long GetProcessPML4_VA ( struct process_d *process );
 
 unsigned long GetProcessHeapStart ( pid_t pid );
 
-
 void 
 SetProcessPML4_VA ( 
     struct process_d *process, 
@@ -1005,7 +1001,6 @@ int init_process_manager (void);
 
 int alloc_memory_for_image_and_stack ( struct process_d *process );
 
-
 // Critical section
 #define __GATE_CLOSED    0
 #define __GATE_OPEN      1
@@ -1014,7 +1009,6 @@ void process_open_gate(int pid);    //228 open
 
 file *process_get_file_from_pid ( pid_t pid, int fd );
 file *process_get_file ( int fd );
-
 
 int process_get_tty (int pid);
 

@@ -633,10 +633,7 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 int is_socket (file *f);
 int is_virtual_console (file *f);
 
-
-
 unsigned long kinput ( unsigned long ch );
-
 
 void printchar (char **str, int c);
 int putchar (int ch);

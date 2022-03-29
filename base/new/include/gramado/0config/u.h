@@ -1,6 +1,6 @@
 
 #ifndef ____U_H
-#define ____U_H 1
+#define ____U_H  1
 
 
 //
@@ -40,7 +40,6 @@
 //
 // system
 //
-
 
 #define SYSTEM_VERSION_MAJOR    VERSION_MAJOR
 #define SYSTEM_VERSION_MINOR    VERSION_MINOR

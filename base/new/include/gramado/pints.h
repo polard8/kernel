@@ -1,7 +1,7 @@
 
 
 #ifndef ____PINTS_H
-#define ____PINTS_H
+#define ____PINTS_H    1
 
 
 //
@@ -9,7 +9,6 @@
 //
 
 // Variáveis globais para contagem de interrupções.
-
 
 //
 // System interrupt

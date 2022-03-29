@@ -741,8 +741,8 @@ unsigned long pcideviceList[PCI_DEVICE_LIST_SIZE];
 /*
  * pci_driver_d:
  *     Estrutura para drivers de dispositivos pci.     
- *
  */
+
 typedef struct pci_driver_d pci_driver_t;
 struct pci_driver_d
 {
@@ -793,7 +793,6 @@ struct pci_driver_d
 
 // List?
 struct pci_driver_d  *PciDrivers;
-//pci_driver_t *PciDrivers;
 //...
 
 
@@ -899,13 +898,8 @@ struct pci_device_d *scan_pci_device_list2 (
     unsigned char class, 
     unsigned char subclass );
 
-//====
-
 int pciInfo (void);
 int pciShowDeviceInfo (int number);
-
-
-// ==
 
 int 
 pciHandleDevice ( 

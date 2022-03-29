@@ -9,6 +9,15 @@
 int gUseDemos = TRUE;
 
 
+/*
+static int projection4x4[4][4] = { 
+        {1,0,0,0}, 
+        {0,1,0,0},
+        {0,0,0,0},
+        {1,1,0,0}
+        };
+*/
+
 void demoLines(void)
 {
     int i=0;
@@ -267,7 +276,8 @@ void demoFred2(void)
 // Sometimes it fails.
 void demoSA1(void)
 {
-
+    return;
+/*
     int useClippingWindow = FALSE;
     //int useClippingWindow = TRUE;
 
@@ -398,6 +408,7 @@ void demoSA1(void)
         
         count--;
     };
+*/
 }
 
 
@@ -1259,6 +1270,8 @@ void demoCurve(void)
 // page fault.
 void demoMatrix1(void)
 {
+/*
+
     register int i=0;
     
      //#define N 4
@@ -1364,6 +1377,7 @@ void demoMatrix1(void)
        gwssrv_yield(); 
        };
     };
+*/
 }
 
 

@@ -14,7 +14,7 @@
 
 
 // O próximo ID de unidade disponível.
-uint32_t __next_sd_id = 0; 
+static uint32_t __next_sd_id = 0; 
 
 
 // == prototypes ==================================
@@ -256,7 +256,7 @@ unsigned char __ata_assert_dever (char nport)
 
 // atapi_pio_read:
 
-static inline void atapi_pio_read ( void *buffer, uint32_t bytes )
+inline void atapi_pio_read ( void *buffer, uint32_t bytes )
 {
 
 // #todo

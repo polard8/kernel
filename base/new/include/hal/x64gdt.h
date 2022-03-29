@@ -26,8 +26,7 @@
 #define GTSS_CONT_SEL  6   //tss continuação.
 
 #define GLDT_SEL       7   /* Default LDT descriptor */
-#define GLDT_CONT_SEL       8   /* Default LDT descriptor */
-
+#define GLDT_CONT_SEL  8   /* Default LDT descriptor */
 
 
 // ========================
@@ -73,9 +72,7 @@
 #define SDT_MEMERAC	31	/* memory execute read accessed conforming */
 
 
-
-#define GSEL(s,r) (((s) << 3) | r)
-
+#define GSEL(s,r)  (((s) << 3) | r)
 
 
 /*
@@ -118,14 +115,14 @@ struct segment_descriptor_d
 // For now we are setting up gdt at the initialization
 // using Assembly language. 
 // Isso é uma gdt com 32 entradas.
-static struct segment_descriptor_d xxx_gdt[32];
+//static struct segment_descriptor_d xxx_gdt[32];
+struct segment_descriptor_d xxx_gdt[32];
 
 // Isso é o registro da gdt
-static struct gdt_ptr_d xxx_gdt_ptr;
-
+//static struct gdt_ptr_d xxx_gdt_ptr;
+struct gdt_ptr_d  xxx_gdt_ptr;
 
 // ======================
-
 
 
 /* 
@@ -243,8 +240,7 @@ static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
 #define load_gdt(dtr)   native_load_gdt(dtr)
 #define store_gdt(dtr)  native_store_gdt(dtr)
 
-
-int x64_init_gdt (void);
+int x64_init_gdt(void);
 
 #endif    
 

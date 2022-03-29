@@ -498,7 +498,6 @@ struct sockcred {
 
 
 /*
- **********************
  * socket_d:
  *     Socket struct.
  */
@@ -629,10 +628,8 @@ socket_inet (
 int socket_init (void);
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
 
-
 int socket_read ( unsigned int fd, char *buf, int count );
 int socket_write ( unsigned int fd, char *buf, int count );
-
 
 int socket_set_gramado_port (int port, pid_t pid);
 int socket_initialize_gramado_ports(void);
@@ -678,7 +675,6 @@ update_socket (
     unsigned long ip, 
     unsigned short port );
 
-
 int sys_socket ( int family, int type, int protocol );
 
 int
@@ -694,6 +690,7 @@ socket_dialog (
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
+
 
 #endif    
 

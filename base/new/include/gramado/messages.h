@@ -1,6 +1,5 @@
 /*
  * File: messages.h
- *
  *    Messages support.
  */
 

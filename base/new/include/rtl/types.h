@@ -155,8 +155,6 @@ typedef  unsigned int        __uint32_t;
 //...
 
 
-
-
 #endif    //____TYPES_H
 
 

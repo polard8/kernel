@@ -1,20 +1,18 @@
 /*
  * File: limits.h 
- * 
  *     It defines some limits in the libc.
  *     ring 0.
- * 
  *     2005 - Created by Fred Nora.
  */
 
 
 #ifndef ____LIMITS_H
-#define  ____LIMITS_H
+#define ____LIMITS_H    1
+
 
 // Max number of open files in a process.
 // See: gramado/limits
 #define OPEN_MAX    GRAMADO_FOPEN_MAX
-
 
 #define PIPE_BUF  GRAMADO_PIPE_BUF
 
@@ -34,7 +32,6 @@
  
 // Maximum value an 'unsigned short int' can hold.  (Minimum is 0.) 
 #define USHRT_MAX  65535
-
 
 
 #endif    

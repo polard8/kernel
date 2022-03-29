@@ -468,7 +468,7 @@ unsigned char __ata_assert_dever (char nport);
 void __ata_pio_read ( void *buffer, int bytes );
 void __ata_pio_write ( void *buffer, int bytes );
 
-static inline void atapi_pio_read ( void *buffer, uint32_t bytes );
+inline void atapi_pio_read ( void *buffer, uint32_t bytes );
 
 void ata_set_boottime_ide_port_index(unsigned int port_index);
 int ata_get_boottime_ide_port_index(void);

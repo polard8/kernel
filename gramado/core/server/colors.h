@@ -521,9 +521,6 @@ public BGREntry vga_palette4_gray[16] = {
 #define SKYBLUE    0xA6CAF0
 
 
-
-
-
 #endif    
 
 

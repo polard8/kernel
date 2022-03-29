@@ -1,8 +1,10 @@
 
+#ifndef GWS_PACKET_H
+#define GWS_PACKET_H    1
 
- // Socket packets.
- // Usados na troca de mensgens via socket.
- 
+// Socket packets.
+// Usados na troca de mensgens via socket.
+
 // # Podemos usar esse esquema em todos os servidores.
 // então isso deverá ir para bibliotecas.
 // Isso foi baseado nos tipos de pacotes usados pelo
@@ -32,6 +34,8 @@
 #define SERVER_PACKET_TYPE_ERROR      1003
 #define SERVER_PACKET_TYPE_DISCONNECT 1004
 
+
+#endif    
 
 
 

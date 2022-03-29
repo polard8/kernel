@@ -125,7 +125,6 @@ struct hardware_d  *Hardware;
 void hal_set_machine_type ( unsigned long type );
 unsigned long hal_get_machine_type (void);
 
-
 void hal_reboot (void);
 void hal_shutdown (void);
 

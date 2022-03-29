@@ -199,10 +199,6 @@ unsigned long keyboard_handler_address;
 // == prototypes ===========================
 //
 
-
-
-
-
 void kbdc_wait (unsigned char type);
 
 

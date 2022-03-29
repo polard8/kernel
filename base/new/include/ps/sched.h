@@ -4,9 +4,6 @@
 #define __SCHED_H    1
 
 
-
-
-
 //#define NR_TASKS ??
 //#define FIRST_TASK ?
 //#define LAST_TASK ? 
@@ -14,7 +11,6 @@
 // Status do scheduler.
 #define LOCKED    0
 #define UNLOCKED  1  
-
 
 /*
  * Scheduling policies
@@ -35,15 +31,11 @@ struct scheduler_info_d SchedulerInfo;
 
 // ===============================================
 
-
 #define QUANTUM_Q1  1
 #define QUANTUM_Q2  2
 #define QUANTUM_Q3  3
 #define QUANTUM_MIN    QUANTUM_Q1
 #define QUANTUM_MAX    QUANTUM_Q3
-
-
-
 
 #define QUANTUM_BASE   QUANTUM_MIN
 #define QUANTUM_LIMIT  QUANTUM_MAX
@@ -58,9 +50,9 @@ struct scheduler_info_d SchedulerInfo;
 // ...
 
 
-
 // Hz padrão. 100Hz. 
 // Uma interrupção a cada 10ms.
+// #bugbug: Isso ja esta definido em coisas do pit.
 #define HZ  100
 
 
@@ -81,7 +73,6 @@ int schedulerType;
 unsigned long schedulerQueue[4]; 
 
 
-
 // ==========================================
 // Input responder
 // See: schedi.c
@@ -96,14 +87,6 @@ void set_input_responder_tid(int tid);
 // == prototypes ============
 //
 
-
-// ==================
-
-
-
-// ==================
-
-
 int init_scheduler (unsigned long sched_flags);
 
 // ::core
@@ -115,7 +98,6 @@ void scheduler_unlock (void);
 unsigned long scheduler_get_status (void);
 
 void cut_round( struct thread_d *last_thread );
-
 
 // ===
 

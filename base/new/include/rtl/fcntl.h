@@ -76,7 +76,6 @@
 #define	O_ALT_IO	0x00040000	/* use alternate i/o semantics */
 #define	O_DIRECT	0x00080000	/* direct I/O hint */
 
-
 #define  O_DIRECTORY  0x00200000  /* fail if not a directory */
 #define  O_CLOEXEC    0x00400000  /* set close on exec */
 

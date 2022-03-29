@@ -1,14 +1,12 @@
 /*
  * File: host.h
- *
  *     Host manager support.
- *
  * 2016 - Created by Fred Nora.
  */
 
 
 #ifndef ____HOST_H
-#define ____HOST_H
+#define ____HOST_H    1
 
 
 
@@ -94,7 +92,6 @@ struct sockaddr_in {
 
 /*
  * host_info_d:
- * 
  *     The host structure.
  */
 

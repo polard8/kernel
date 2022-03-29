@@ -848,30 +848,28 @@ struct thread_d
     struct thread_d  *next;
 };
 
+
 //
 // Thread list
 //
-
 
 // Ponteiro para a idle thread atual
 // Sempre que mudar a idle thread devemos usar esse ponteiro
 // para mostrar qual será a nova idle thread.
 // Cada idle thread pode prestar um serviço diferente, como o
 // gerenciamento de energia.
-struct thread_d *____IDLE;
+struct thread_d  *____IDLE;
 
 // The control thread of the window sever kernel module.
-struct thread_d *ws_thread;
+struct thread_d  *ws_thread;
 
 // Essa é a thread de controle do processo init2.bin
 // É o primeiro processo em ring3.
 // Idle Thread. TID=0    
-struct thread_d *InitThread;
-
+struct thread_d  *InitThread;
 
 // Ponteiro para a thread usada na hora da clonagem de processos.
-struct thread_d *ClonedThread;
-
+struct thread_d  *ClonedThread;
 
 
 //
@@ -884,14 +882,13 @@ struct thread_d *ClonedThread;
  */
 
 // The fixed conductor to mark the start.
-struct thread_d *Conductor;
+struct thread_d  *Conductor;
 // The flexible conductor to create the list.
-struct thread_d *tmpConductor;  //Conductor2;
+struct thread_d  *tmpConductor;  //Conductor2;
 // The created root conductor.
-struct thread_d *rootConductor;
+struct thread_d  *rootConductor;
 
 int conductorIndex;
-
 
 //
 // == input round =======================================
@@ -900,8 +897,8 @@ int conductorIndex;
 // Configuramos essa thread para
 // se a thread que deve rodar logo após um evento de input.
 // teclado, mouse ou outra coisa.
-struct thread_d *first_after_keyboard_input;
-struct thread_d *first_after_mouse_input;
+struct thread_d  *first_after_keyboard_input;
+struct thread_d  *first_after_mouse_input;
 //struct thread_d *first_after_network_input;
 // ...
 
@@ -938,8 +935,6 @@ unsigned long interactive_threadList[THREAD_COUNT_MAX];
 
 void *sys_get_message ( unsigned long buffer );
 
-
-
 int init_threads (void);
 
 //See: main.c
@@ -952,7 +947,6 @@ void *create_tid1 (void);  // ?
 void *create_tid2 (void);  // ?
 void *create_tid3(void);   // first ring3 client. gws.bin
 
-
 // From thread.c
 
 // helper
@@ -963,10 +957,8 @@ void *FindReadyThread (void);
 int GetThreadState (struct thread_d *thread);
 int GetThreadType (struct thread_d *thread);
 
-
 int GetCurrentTID (void);
 void *GetCurrentThread (void);
-
 
 // From threadi.c
 void show_slot (int tid);
@@ -985,7 +977,6 @@ void threadi_power(
 void release ( int tid );
 
 void SelectForExecution ( struct thread_d *Thread );
-
 
 void thread_show_profiler_info (void);
 
@@ -1011,7 +1002,6 @@ ps_setup_x64_context (
 // worker for create_thread.
 void ps_initialize_thread_common_elements( struct thread_d *t );
 
-
 struct thread_d *copy_thread_struct ( struct thread_d *thread );
 
 struct thread_d *create_thread ( 
@@ -1024,7 +1014,6 @@ struct thread_d *create_thread (
     char *name,
     int iopl );
 
-
 // =====
 
 //
@@ -1033,7 +1022,6 @@ struct thread_d *create_thread (
 
 void exit_thread (int tid);
 void exit_current_thread(void);
-
 
 int thread_getchar (void);
 
@@ -1051,9 +1039,7 @@ void dead_thread_collector (void);
 void kill_thread (int tid);
 void kill_all_threads (void);
 
-
 // ==
-
 
 void 
 spawn_enter_usermode( 
@@ -1093,7 +1079,6 @@ unsigned long
 sys_post_message_to_tid( 
     int tid, 
     unsigned long message_buffer );
-
 
 #endif    
 

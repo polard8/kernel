@@ -53,11 +53,10 @@ struct tss_d  *CurrentTSS;
 // == prototypes ===========================
 //
 
-static void
+void 
 tss_init ( 
     struct tss_d *tss, 
     void *stack_address );
-
 
 void x64_load_ltr (int tr);
 

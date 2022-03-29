@@ -2,6 +2,9 @@
 // menu.h
 
 
+#ifndef GWS_MENU_H
+#define GWS_MENU_H    1
+
 // Menu item types
 #define MI_TYPE_SEPARATOR  1000
 #define MI_TYPE_TEXT       2000
@@ -80,18 +83,6 @@ struct gwssrv_menu_item_d *gwssrv_create_menu_item (
 int create_main_menu(int mousex, int mousey);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif    
 
 

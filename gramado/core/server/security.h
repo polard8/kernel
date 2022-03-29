@@ -13,9 +13,6 @@
 #define __SECURITY_H    1
 
 
-
-
-
 // user session
 struct gwssrv_usession_d
 {

@@ -69,7 +69,8 @@
  */
 
 #ifndef _I386_PTE_H_
-#define _I386_PTE_H_
+#define _I386_PTE_H_    1
+
 
 //#ifdef _KERNEL_OPT
 //#include "opt_xen.h"

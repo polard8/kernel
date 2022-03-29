@@ -34,7 +34,6 @@
 
 struct ttydrv_d 
 {
-
     //
     // == Identification =============
     //
@@ -63,11 +62,9 @@ struct ttydrv_d
     // control thread.
     struct process_d *thread;
     
-
-    //
-    // == (1) storage ========
-    //
-
+//
+// == (1) storage ========
+//
 
     struct tty_d *tty;
     // #todo
@@ -100,6 +97,7 @@ struct ttydrv_d
     
     //struct ttydrv_d *other;
 };
+
 struct ttydrv_d *CurrentTTYDRV;
 
 

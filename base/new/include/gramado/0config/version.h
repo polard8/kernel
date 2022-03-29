@@ -1,19 +1,13 @@
-/**********************************************************************
-
+/*
   File: version.h
-
         Product configuration.
- 
   History:
       2018 - Created by Fred Nora.
-
-**********************************************************************/
-
+*/
 
 
 #ifndef ____VERSION_H
-#define ____VERSION_H 1
-
+#define ____VERSION_H  1
 
 //
 //  == Product name ==========================================
@@ -52,11 +46,10 @@
 // We can read these files to get all that info.
 // Maybe we will delete all these defines here.
 
-#define VERSION_MAJOR     2
-#define VERSION_MINOR     0
+#define VERSION_MAJOR     1
+#define VERSION_MINOR     3
 #define VERSION_BUILD     0
-#define VERSION_STRING    "2.0"
-
+#define VERSION_STRING    "1.3"
 
 //
 // Version macro
@@ -64,8 +57,8 @@
 
 #define VER10    0x0100
 #define VER11    0x0101
+#define VER13    0x0130
 #define VER20    0x0200
-
 
 #endif
 

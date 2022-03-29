@@ -24,7 +24,6 @@ int __ptsname (int fd, char *buf, size_t buflen);
 void *kmalloc (size_t size);
 void kfree (void *ptr);
 
-
 int abs(int j);
 
 #endif    

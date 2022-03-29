@@ -1,7 +1,9 @@
 
+// globals.h
+
 
 #ifndef __GWSSRV_GLOBALS_H
-#define __GWSSRV_GLOBALS_H  1
+#define __GWSSRV_GLOBALS_H   1
 
 
 // Host Operating System
@@ -16,7 +18,6 @@
 #define VM_VMWARE      2
 #define VM_QEMU        3
 #define VM_VIRTUALBOX  4
-
 
 
 // ## button support ##
@@ -72,9 +73,7 @@
 //...
 
 
-
 /*
- *****************************************************
  * ColorSchemeType:
  *     Enumerando os esquemas de cores. 
  *     Esses são esquemas default.
@@ -94,9 +93,7 @@ typedef enum {
 }ColorSchemeType;
 
 
-
 /*
- ******************************************************
  * ColorSchemeIndex:
  *     csi - color scheme index. 
  *     Enumerando os elementos gráficos
@@ -133,10 +130,7 @@ typedef enum {
 }ColorSchemeIndex;  
 
 
-
-
 /*
- ***************************************************
  * color_scheme_d:
  *     Estrutura para esquema de cores. 
  *     O esquema de cores se aplica ao servidor 
@@ -219,8 +213,8 @@ int use_vsync;
 #define SCREEN_BACKBUFFER      1
 //#define SCREEN_BACKBUFFER2   2
 //#define SCREEN_BACKBUFFER3   3
-static unsigned long screens[MAX_SCREENS];
-
+//static unsigned long screens[MAX_SCREENS];  //not static
+unsigned long screens[MAX_SCREENS];
 
 
 
@@ -267,17 +261,12 @@ struct vid_d vidConfig;
 // ===============================================================
 
 
-
-
 //
 // == Prototypes ===================================================
 //
 
-void 
-gwssrv_initialize_color_schemes (int selected_type);
-
+void gwssrv_initialize_color_schemes (int selected_type);
 int gwssrv_select_color_scheme (int type);
-
 
 #endif   
 

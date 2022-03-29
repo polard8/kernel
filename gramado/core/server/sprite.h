@@ -129,8 +129,6 @@ PlotSprite3D (
     int just_one );
 
 
-
-
 #endif    
 
 

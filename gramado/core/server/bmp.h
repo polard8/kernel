@@ -1,8 +1,6 @@
 /*
  * File: bmp.h
- *
  *    Header para rotinas de BMP.
- *
  * History:
  *    2015 - Created by Fred Nora.
  *           24bpp support. 
@@ -27,12 +25,6 @@ unsigned long bmp_substitute_color;
  
 //cor selecionada para ser substituída ou ignorada. 
 unsigned long bmp_selected_color; 
-
-
-
-
-
-
 
 
 //
@@ -86,13 +78,9 @@ char *gwssrv_bmp_mouse_pointer;
 
 
 
-
 /*
- ******************************************************
  * bmpDisplayBMP:
- *
  * Mostra na tela uma imagem bmp carregada na memória. no backbuffer()
- * 
  * IN:
  *     address = endereço base
  *     x       = posicionamento 
@@ -104,8 +92,6 @@ bmpDisplayBMP (
     char *address, 
     unsigned long x, 
     unsigned long y );
-
-
 
 void *gwssrv_get_system_icon(int n);
 

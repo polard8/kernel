@@ -1,8 +1,6 @@
 /*
  * File: grprim.h 
- * 
  *     Header for primitives.
- * 
  * History:
  *     2020 - Created by Fred Nora.
  */
@@ -308,13 +306,14 @@ struct gr_bitmap_d
 
 // matrix
 
+/*
 static int projection4x4[4][4] = { 
         {1,0,0,0}, 
         {0,1,0,0},
         {0,0,0,0},
         {1,1,0,0}
         };
-
+*/
  
 void 
 multiply4(

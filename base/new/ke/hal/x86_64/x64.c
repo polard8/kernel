@@ -182,7 +182,7 @@ set_gdt_entry (
 // ======================
 
 
-static void
+void
 tss_init ( 
     struct tss_d *tss, 
     void *stack_address )

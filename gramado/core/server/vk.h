@@ -2,6 +2,10 @@
 // File: vk.h
 
 
+#ifndef GWS_VK_H
+#define GWS_VK_H    1
+
+
 // Virtual keys.
 #define VK_LBUTTON   0x01
 #define VK_RBUTTON   0x02
@@ -161,6 +165,11 @@
 //#define VK_
 //#define VK_
 //#define VK_
+
+
+
+#endif    
+
 
 
 //

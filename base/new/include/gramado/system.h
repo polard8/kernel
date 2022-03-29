@@ -332,7 +332,7 @@ struct system_d
     //...
 };
 
-struct system_d *System;
+struct system_d  *System;
 
 
 //
@@ -341,7 +341,6 @@ struct system_d *System;
 
 unsigned long systemGetSystemMetrics ( int index );
 
-
 int system_get_pid (int index);
 void systemShutdownViaAPM (void);
 void systemShutdown (void);
@@ -349,7 +348,6 @@ void systemShowDevicesInfo (void);
 void systemSetupVersion (void);
 void systemReboot (void);
 void *systemNull (void);
-
 
 int init_executive (void);
 

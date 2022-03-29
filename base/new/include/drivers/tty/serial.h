@@ -2,7 +2,8 @@
 
 
 #ifndef ____SERIAL_H
-#define ____SERIAL_H
+#define ____SERIAL_H    1
+
 
 // COM ports
 #define COM1_PORT  0x3F8 

@@ -1,5 +1,7 @@
+
+
 #ifndef __STDARG_H
-#define __STDARG_H
+#define __STDARG_H    1
 
 // Credits: kinguio, by nelson Cole.
 typedef __builtin_va_list va_list;

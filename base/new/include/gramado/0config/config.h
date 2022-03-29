@@ -1,13 +1,10 @@
 /*
  * File: config.h
- *     
  *      Setup compiling stuff.
  */
 
 #ifndef ____CONFIG_H_
-#define ____CONFIG_H_
-
-
+#define ____CONFIG_H_    1
 
 
 //
@@ -173,12 +170,9 @@ sixth..     ide5, usually PCI, probed
 
 
 
-
-
 //====================================================
 //    ######## more ... ########
 //
-
 
 
 //Essa flag aciona a rotina que vai checar o máximo de 
@@ -260,7 +254,6 @@ sixth..     ide5, usually PCI, probed
 #define DEFAULT_FONT_SIZE FONT8X8
 //#define DEFAULT_FONT_SIZE FONT8X16
 //...
-
 
 
 // CONTINUA

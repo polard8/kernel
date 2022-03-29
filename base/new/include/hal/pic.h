@@ -1,18 +1,16 @@
 /*
  * File: pic.h
- *
  * Descrição:
  *     Header para o driver do controlador PIC.
  *     Programmable Interrupt Controller.
- *
  *   Exemplo: 8259A.
- *
  * 2015 - Created by Fred Nora.
  */
- 
- 
+
+
 #ifndef ____PIC_H
 #define ____PIC_H    1
+
 
 // Estrutura para gerenciar as irqs do PIC.
 struct irq_d

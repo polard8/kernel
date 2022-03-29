@@ -1,8 +1,6 @@
 /*
  * File: dispatch.h
- *
  *     Dispatcher support.
- * 
  * History:
  *     2015 - Created by Fred Nora.
  */

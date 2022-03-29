@@ -16,7 +16,6 @@ void out8  ( unsigned short port, unsigned char  data );
 void out16 ( unsigned short port, unsigned short data );
 void out32 ( unsigned short port, unsigned int   data );
 
-
 void __x86_io_delay (void);
 
 void wait_ns(int count);
@@ -31,8 +30,6 @@ portsx86_OUT (
     int bits, 
     unsigned short port, 
     unsigned int value );
-
-
 
 
 #endif   

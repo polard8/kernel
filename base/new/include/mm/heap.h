@@ -17,7 +17,6 @@ unsigned long g_available_heap;     // Available.
 
 
 /*
- ***********************************
  * heap_d:
  *     Estrutura para heap.
  *     Cada processo tem seu heap.
@@ -33,7 +32,6 @@ struct heap_d
 
     int used;
     int magic;
-
 
     unsigned long HeapStart;  
     unsigned long HeapEnd;
@@ -114,15 +112,12 @@ unsigned long heapList[HEAP_COUNT_MAX];
 // Prototypes ==========================
 //
 
-
 unsigned long get_process_heap_pointer (int pid);
-
 
 // #todo
 struct heap_d *memory_create_new_head ( 
     unsigned long start_va, 
     unsigned long size );
-    
 
 // #todo
 void memory_destroy_heap (struct heap_d *heap);

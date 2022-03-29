@@ -8,14 +8,12 @@
 
 
 /*
- ***********************************************
  * struct object_d:
  *     Object controle ...
  *     Estrutura para controle de objetos.
  *     Isso deve ficar no início de cada estrutura 
  *     para controlar a utilização do objeto por parte 
  * dos processos e threads.
- * 
  */
 
 struct object_d 

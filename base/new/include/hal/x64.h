@@ -100,13 +100,11 @@ void x64_stop_cpu (void);
 //
 
 void x64_enable_cache (void);
-
 int x64_init_intel (void);
 
 //show
 void x64_info (void);
 void show_cpu_intel_parameters (void);
-
 
 void x64_load_pml4_table(unsigned long phy_addr);
 

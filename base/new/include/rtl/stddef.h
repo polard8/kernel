@@ -1,18 +1,14 @@
 /*
  * File: stddef.h 
- *
  * Descrição:
  *     Definições padrão da linguagem C, versão C99.
  */
 
 
-
 #ifndef ____STDDEF_H
 #define ____STDDEF_H    1
 
- 
- 
- 
+
 enum {
 	false  = 0,
 	true   = 1
@@ -34,7 +30,6 @@ Variables:
 
 /*
  * NULL HANDLE. 
- *
  * Observação: 
  *     Essa definição também existe em types.h.
  */ 
@@ -75,7 +70,6 @@ typedef int size_t;
  
 //#define offsetof(st, m) ((size_t)&(((st *)0)->m))
 //#define offset_of(tp, member) (((char*) &((tp*)0)->member) - (char*)0)
-
 
 #endif    //____STDDEF_H
 
