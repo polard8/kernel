@@ -109,9 +109,10 @@ int crt0 (unsigned long rdi)
 
     // #todo
     //char *shared_info = (char *) (0xC0800000 -0x100);
+    //char *shared_info = "nothing nothing";
+    //char *shared_info;
+    //char buffer[4096];
 
-    char *shared_info = "nothing nothing";
-    
 // Environment.
 // The library will have this default environment.
 // #todo: Change the name to '__libc_default_environ'
@@ -135,39 +136,6 @@ int crt0 (unsigned long rdi)
 */
 
 
-//
-// Tokenizing.
-//
-
-// Criando o ambiente.
-// Transferindo os ponteiros do vetor para o ambiente.
-
-    tokenList[0] = strtok ( &shared_info[0], LSH_TOK_DELIM );
-
-// Salva a primeira palavra digitada.
-    token = (char *) tokenList[0];
-    index=0; 
-
-    while ( token != NULL )
-    {
-        // Coloca na lista.
-        // Salva a primeira palavra digitada.
-        tokenList[index] = token;
-
-        //#debug
-        //printf("shellCompare: %s \n", tokenList[i] );
-
-        token = strtok ( NULL, LSH_TOK_DELIM );
-
-        // Incrementa o índice da lista
-        index++;
-
-        // Salvando a contagem.
-        token_count = index;
-    };
-
-// Finalizando a lista.
-    tokenList[index] = NULL;
 
 
 /*
@@ -241,6 +209,78 @@ int crt0 (unsigned long rdi)
 #endif
 */
 
+// ===================================================
+// #test
+// Reading command line from a file.
+
+    char buffer[4096];
+    memset(buffer, 0, 512);
+
+// rewind
+    //rewind(stdin);
+
+// Copy
+    int n=0;
+    n = read(
+            fileno(stdin),
+            buffer,
+            512 );
+// finzalize
+   buffer[511] = 0;
+
+    //if(n<=0){
+        //#bugbug: We can't do this
+        //stdout = stderr;
+        //printf("crt0.c: n<=0");
+        //fflush(stdout);
+    //}
+
+/*
+    // from shared buffer
+    // extra heap3.
+    char *shared_buffer = (char *) 0x30E00000;  //extra heap 3.
+    memcpy(buffer,shared_buffer,512);
+    shared_buffer[511]=0;
+*/
+// ===================================================
+
+//
+// Tokenizing.
+//
+
+// Criando o ambiente.
+// Transferindo os ponteiros do vetor para o ambiente.
+
+    //tokenList[0] = strtok ( &shared_info[0], LSH_TOK_DELIM );
+    tokenList[0] = strtok ( buffer, LSH_TOK_DELIM );
+    
+// Salva a primeira palavra digitada.
+    token = (char *) tokenList[0];
+    index=0; 
+
+    while ( token != NULL )
+    {
+        // Coloca na lista.
+        // Salva a primeira palavra digitada.
+        tokenList[index] = token;
+
+        //#debug
+        //printf("shellCompare: %s \n", tokenList[i] );
+
+        token = strtok ( NULL, LSH_TOK_DELIM );
+
+        // Incrementa o índice da lista
+        index++;
+
+        // Salvando a contagem.
+        token_count = index;
+    };
+
+// Finalizando a lista.
+    tokenList[index] = NULL;
+
+
+// ===================================================
 
 
     main_ret = (int) main(token_count,tokenList);

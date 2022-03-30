@@ -521,12 +521,56 @@ int main ( int argc, char *argv[] )
 
     // New stdout
     // Terminal application is reading from stderr.
-    stdout = stderr;
+    //stdout = stderr;
     //printf("SHELL.BIN: Hello terminal!\n");
 
 //
-// SHELL.BIN receberá input de teclado via stdin.
+// SHELL.BIN 
+// receberá input de teclado via stdin.
 //
+
+
+// #test
+// Reading the arguments.
+
+    //rewind(stdout);
+
+    // Still using the kernel console.
+    printf("argc={%d} ",argc);
+    fflush(stdout);
+
+    int i=0;
+
+    if(argc>0)
+    {
+        for(i=0; i<argc; i++)
+        {
+            // Still using the kernel console.
+            printf("argv[%d]: %s \n",
+                i, 
+                argv[i] );
+            //fflush(stdout);
+            //rewind(stdout);
+        };
+    }
+
+    //if ( strncmp( argv[0],"One", 3) == 0 )
+    //{
+        //printf("One");
+        //fflush(stdout);
+    //}
+
+//============================
+
+    //char buffer[512];
+    //in
+    //read(stdin,buffer,511);
+    //buffer[511]=0;
+    
+    //out
+    //rewind(stdout);
+    //printf("%s",buffer);
+    //fflush(stdout);
 
 
 // #bugbug: Isso nao funcionou, o kernel continua
@@ -576,6 +620,12 @@ int main ( int argc, char *argv[] )
     //#test  ok
     //printf("SHELL.BIN: Cursor| \x1b[8Bm |down!");
     //fflush(stdout);
+
+//
+// =========================================================
+//
+
+    stdout = stderr;
 
     // Simple string.
     printf("SHELL.BIN: Shell is alive!");

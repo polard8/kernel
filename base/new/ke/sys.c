@@ -485,9 +485,10 @@ sys_read (
 
 
 //==========================================================
+// ::0
 // stdin
 
-    /*
+    
     if ( __file->_file == 0 ){
         debug_print("sys_read: Reading from stdin\n");
         // Shortcut
@@ -495,9 +496,9 @@ sys_read (
             goto RegularFile;
         }
     }
-    */
-
+    
 //==========================================================
+// ::1
 // stdout
 
     if ( __file->_file == 1 ){
@@ -509,6 +510,7 @@ sys_read (
     }
 
 //==========================================================
+// ::2
 // stderr
 
     if ( __file->_file == 2 ){
@@ -931,19 +933,22 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 
 
 // =======================================================
+// ::0
 // stdin
 
-    /*
-    if ( __file->_file == 0 ){
+    if ( __file->_file == 0 )
+    {
         debug_print("sys_write: Writing into stdin\n");
+        // If the file is a regular file.
         // Shortcut
         if ( __file->____object == ObjectTypeFile ){
             goto RegularFile;
         }
     }
-    */
+    
 
 // =======================================================
+// ::1
 // stdout
 
     if ( __file->_file == 1 )
@@ -951,13 +956,13 @@ int sys_write (unsigned int fd, char *ubuf, int count)
         debug_print("sys_write: Writing into stdout\n");
         
         // If the file is a console.
-        if ( __file->____object == ObjectTypeVirtualConsole )
-        {
+        if ( __file->____object == ObjectTypeVirtualConsole ){
             return (int) console_write ( 
                              (int) fg_console, 
                              (const void *) ubuf, 
                              (size_t) count );
         }
+        // If the file is a regular file.
         // Shortcut
         if ( __file->____object == ObjectTypeFile ){
             goto RegularFile;
@@ -965,6 +970,7 @@ int sys_write (unsigned int fd, char *ubuf, int count)
     }
 
 // =======================================================
+// ::2
 // stderr
 
     if ( __file->_file == 2 ){

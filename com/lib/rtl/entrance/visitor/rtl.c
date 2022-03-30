@@ -1713,6 +1713,11 @@ int rtl_clone_and_execute ( char *name )
         return -1;
     }
 
+
+    //rewind(stdin);
+    //fprintf(stdin,"%s",name);
+    //fprintf(stdin,"One Two Three ...");
+
 // #todo
 // Parameters vector.
 // Maybe we can provide a default parameters vector.

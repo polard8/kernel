@@ -538,8 +538,84 @@ static void compareStrings(int fd)
 
 // rebubina o arquivo de input.
     //rewind(__terminal_input_fp);
+    
+// ==================================
 
-    rtl_clone_and_execute(prompt);
+//
+// Send command line via stdin
+//
+
+
+// Write it into stdin.
+// It's working
+// See: crt0.c
+    rewind(stdin);
+    prompt[511]=0;
+    write(fileno(stdin), prompt, 512);
+    //write(
+    //    fileno(stdin), 
+    //    "Data", 
+    //    4 );
+
+    //fail
+    //fprintf(stdin,"One Two Three ...");
+    //fflush(stdin);
+
+
+/*
+// it's working
+    char *shared_buffer = (char *) 0x30E00000;  //extra heap 3.
+    sprintf(shared_buffer,"One Two Three ...");
+    shared_buffer[511] = 0;
+*/
+
+// ==================================
+
+
+//
+// Get filename
+//
+
+
+// #bugbug
+// The command line accepts only one word
+// and the command line has too many words.
+ 
+//#todo
+//Create a method.
+//int rtl_get_first_word_in_a_string(char *buffer_pointer, char *string);
+ 
+    char filename_buffer[12]; //8+3+1
+    char *p;
+    p=prompt;
+    int ii=0;
+    while(1)
+    {
+        if(ii>=12){
+            filename_buffer[ii] = 0;  //finalize
+            break;
+        }
+        if( *p == 0 || 
+            *p == ' ' ||
+            *p == '\t' )
+        {
+            filename_buffer[ii] = 0;  //finalize
+            break;
+        }
+        
+        // printable.
+        // Put the char into the buffer.
+        if( *p >= 0x20 && *p <= 0x7F )
+        {
+            filename_buffer[ii] = (char) *p;
+        }
+        p++;    // next char in the command line.
+        ii++;   // next byte into the filename buffer.
+    };
+
+    //rtl_clone_and_execute(prompt);
+    rtl_clone_and_execute(filename_buffer);
+    
     isUsingEmbeddedShell = FALSE;
     return;
 
@@ -2606,7 +2682,7 @@ int main ( int argc, char *argv[] )
 // It's working.
 
        // rebubina o arquivo de input.
-        rewind(stdin);
+        //rewind(stdin);
 
         // agora vamos ler stderr
         InputStatus = __input_STDERR(client_fd);

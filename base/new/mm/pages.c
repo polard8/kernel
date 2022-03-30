@@ -1672,7 +1672,8 @@ void __initialize_extraheap3(void)
         (int) PD_ENTRY_EXTRAHEAP3,             // entry
         (unsigned long) &pt_extraheap3[0],     // pt
         (unsigned long) extraheap3_pa,   // region base
-        (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
+        (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
+        //(unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 
     g_extraheap3_initialized = TRUE;
 }
