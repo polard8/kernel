@@ -1,18 +1,14 @@
 /*
  * File: main.c
- * 
- *    ??
  *    Main file for the Gramado Network Server.
- * 
- *
  *    History:
- *        2020 - Created by Fred Nora. 
+ *        2020 - Created by Fred Nora.
  */
 
 
 #include <gns.h>
 
-int __saved_sync_id = -1;
+static int __saved_sync_id = -1;
 
 //
 // == Gramado Network Protocol ===============================
@@ -32,16 +28,19 @@ int __saved_sync_id = -1;
 #define GNP_LONG6      7
 // #body
 // Here starts the data section.
-// It goes untill the end of the socket. 
+// It goes untill the end of the socket.
 // Maybe 512-(16*4).
 #define GNP_BODY_OFFSET    16
 // ...
 
-int NoReply = FALSE;
-
-//
-// Buffer
-//
+// Status
+static int running = FALSE;
+// Server fd
+static int ____saved_server_fd = -1;
+// Current client fd
+static int ____saved_current_client_fd = -1;
+// Flag: Send or not a reoply.
+static int NoReply = FALSE;
 
 // Buffer for the messages.
 
@@ -49,41 +48,16 @@ int NoReply = FALSE;
 
 char __buffer[GNS_BUFFER_SIZE];
 
-//
-// Status
-//
-
-int running = FALSE;
-
-
-//
-// Server fd
-//
-
-int ____saved_server_fd = -1;
-
-//
-// Current client fd
-//
-
-int ____saved_current_client_fd = -1;
-
-
-//
 // Buffer
-//
-
 // This is the buffer ussed for the next response.
 // Marsheling ...
-
-// Esses valores serão enviados como 
+// Esses valores serão enviados como
 // resposta ao serviço atual.
-// Eles são configurados pelo dialogo na hora da 
+// Eles são configurados pelo dialogo na hora da
 // prestação do serviço.
 // No início desse array fica o header.
 
 unsigned long next_response[32];
-
 
 
 
@@ -93,8 +67,6 @@ unsigned long next_response[32];
 
 int serviceInitializeNetwork(void);
 
-void gnssrv_yield(void);
-
 // dialog
 int 
 gnsProcedure ( 
@@ -103,11 +75,10 @@ gnsProcedure (
     unsigned long long1, 
     unsigned long long2 );
 
-void xxxHandleNextRequest (int fd);
-
+static void dispatch(int fd);
 
 void gns_send_error_response (int fd, int code, char *error_message);
-
+void gnssrv_yield(void);
 
 //
 // ===============================
@@ -128,19 +99,18 @@ void gns_send_error_response (int fd, int code, char *error_message)
 // in the top of this file.
 // Called by main.
 
-void xxxHandleNextRequest(int fd)
+void dispatch(int fd)
 {
     // Isso permite ler a mensagem na forma de longs.
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__buffer[0];
 
     int n_reads = 0;     // For requests.
     int n_writes = 0;    // For responses.
 
-
 // Fail. Cleaning
 
     if (fd<0){
-        debug_print ("gnssrv: xxxHandleNextRequest fd\n");
+        debug_print ("gnssrv: dispatch fd\n");
         message_buffer[0] = 0;
         message_buffer[1] = 0;
         message_buffer[2] = 0;
@@ -165,8 +135,8 @@ void xxxHandleNextRequest(int fd)
     n_reads = read ( fd, __buffer, sizeof(__buffer) );
 
     if (n_reads <= 0)
-    { 
-        debug_print ("gnssrv: xxxHandleNextRequest n_reads\n");
+    {
+        debug_print ("gnssrv: dispatch n_reads\n");
 
         // No reply
         rtl_set_global_sync( 
@@ -180,15 +150,15 @@ void xxxHandleNextRequest(int fd)
         gnssrv_yield(); 
         return; 
     }
-  
-    // Nesse momento lemos alguma coisa.   
- 
+
+// Nesse momento lemos alguma coisa.
+
     //debug_print ("gws: request found on its own socket \n");  
        
     //  mensagem invalida  
     if (message_buffer[1] == 0)
     { 
-        debug_print ("gnssrv: xxxHandleNextRequest Unknown message\n");
+        debug_print ("gnssrv: dispatch Unknown message\n");
 
         // No reply
         rtl_set_global_sync( 
@@ -204,18 +174,17 @@ void xxxHandleNextRequest(int fd)
         return;
     }
 
-    //
-    // == Message OK =====================
-    //
+//
+// == Message OK =====================
+//
 
     debug_print ("gnssrv: Got a request!\n");
-    debug_print ("gnssrv: Calling window procedure \n");
+    //debug_print ("gnssrv: Calling window procedure \n");
                 
     //#debug: para a máquina real.
     //printf ("gws: got a message!\n");
     //printf ("gws: __socket_messages: calling window procedure \n");
- 
-                
+
     // realiza o serviço.
     gnsProcedure ( 
         (void *)        message_buffer[0], 
@@ -224,15 +193,14 @@ void xxxHandleNextRequest(int fd)
         (unsigned long) message_buffer[3] );
 
 
-    // #todo
-    // Se o request foi um request de evento,
-    // significa que o cliente deseja receber o próximo evento da 
-    // lista de eventos.
-    // podemos passar mensagens recebidas pelo gws para o cliente.
-
-    // ??
-    // espera ate conseguir enviar a resposta.
-    // o kernel precisa copiar para aquele conectado em accept[]
+// #todo
+// Se o request foi um request de evento,
+// significa que o cliente deseja receber o próximo evento da 
+// lista de eventos.
+// podemos passar mensagens recebidas pelo gws para o cliente.
+// ??
+// espera ate conseguir enviar a resposta.
+// o kernel precisa copiar para aquele conectado em accept[]
 
     if (NoReply == TRUE)
     {
@@ -244,8 +212,8 @@ void xxxHandleNextRequest(int fd)
 
 //
 // Sending reply.
-// 
- 
+//
+
     //debug_print ("Sending response ...\n");  
 
     //# it works.
@@ -253,7 +221,6 @@ void xxxHandleNextRequest(int fd)
     sprintf( m, "GRAMADO 501 Not Implemented\n\n");
     //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
     //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
-
 
 
     // Primeiros longs do buffer.
@@ -269,7 +236,7 @@ void xxxHandleNextRequest(int fd)
 
     // #todo:
     // while(1){...}
-    
+
     debug_print ("gnssrv: Sending response ...\n");
 
 
@@ -278,33 +245,38 @@ void xxxHandleNextRequest(int fd)
 //
 
 // set response
-    rtl_set_global_sync( __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    //rtl_set_global_sync( __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 
 //
 // Send
 //
 
     n_writes = write ( fd, __buffer, sizeof(__buffer) );
-    if (n_writes<=0){
-        debug_print ("gnssrv: xxxHandleNextRequest Response fail\n");
-        
+
+    if (n_writes<=0)
+    {
+        debug_print ("gnssrv: dispatch Response fail\n");
+ 
         // No response. It fails.
         rtl_set_global_sync( 
             __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         return;
     }
 
-    // Cleaning
+// Cleaning
     message_buffer[0] = 0;
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
 
-    // Cleaning
+// Cleaning
     int c=0;
     for(c=0; c<32; c++){
         next_response[c] = 0;
     };
+
+// set response
+    rtl_set_global_sync( __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 
     debug_print ("gnssrv: Response sent\n"); 
     //gnssrv_yield(); 
@@ -312,7 +284,6 @@ void xxxHandleNextRequest(int fd)
 
 
 /*
- **********************************
  * gnsProcedure:
  *     Main dialog.
  */
@@ -554,11 +525,8 @@ int serviceInitializeNetwork(void)
 
 
 
-
-
 /*
- ******************************
- * main: 
+ * main:
  *     gns main routine.
  */
 
@@ -574,13 +542,12 @@ int main (int argc, char **argv)
 
     addrlen = sizeof(server_address);
 
-
     int server_fd = -1; 
     int bind_status = -1;
 
     int i=0;
     int _status = -1;
-     
+ 
     //unsigned long w=0;
     //unsigned long h=0;
 
@@ -589,33 +556,32 @@ int main (int argc, char **argv)
     running = TRUE;
 
 // debug
-    debug_print ("-----------------------\n");
-    debug_print ("gnssrv: Initializing...\n");
+   // debug_print ("-----------------------\n");
+   // debug_print ("gnssrv: Initializing...\n");
     printf      ("gnssrv: Initializing...\n");
 
-
-    //sincronizaçao provisoria
-    //vamos precisar disso antes de tudo;
-    // vamos pegar a que foi criada pelo primeiro cliente.
-    // ele cria no começo da rotina.
-    // Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
-    
+// Sincronizaçao provisoria
+// vamos precisar disso antes de tudo;
+// vamos pegar a que foi criada pelo primeiro cliente.
+// ele cria no começo da rotina.
+// Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
+ 
     while(1)
     {
         __saved_sync_id = sc82 (10005,0,0,0);
+
         if( __saved_sync_id > 0 && __saved_sync_id < 1024 )
             break;
-    }
+    };
 
-
-
-// Register
 // Register this process as the network server.
 // See: connect.c
 
     _status = (int) register_ns();
-    if (_status<0){
-        debug_print ("gnssrv: Couldn't register the server \n");
+
+    if (_status<0)
+    {
+       // debug_print ("gnssrv: Couldn't register the server \n");
              printf ("gnssrv: Couldn't register the server \n");
         exit(1);
     }
@@ -626,8 +592,9 @@ int main (int argc, char **argv)
 //
 
     // #debug
-    printf ("gnssrv: Creating socket\n");
+    //printf ("gnssrv: Creating socket\n");
     server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
+
     if (server_fd<0){
         printf("gnssrv: [FAIL] Couldn't create the server socket\n");
         exit(1);
@@ -637,46 +604,30 @@ int main (int argc, char **argv)
 
 //
 // bind
-// 
+//
 
 // #debug
-    printf ("gnssrv: bind\n");
-    bind_status = bind ( 
+    //printf ("gnssrv: bind\n");
+
+    bind_status = bind (
                       server_fd, 
                       (struct sockaddr *) &server_address, 
                       addrlen );
+
     if (bind_status<0){
         printf("gnssrv: Couldn't bind to the socket\n");
         exit(1);
     }
 
-//
-// =======================================
-//
+// Calling child and wait.
 
-//
-// Calling child.
-//
+    rtl_clone_and_execute ("gns.bin");
 
-// #obs
-// Suspended ...
-// We are launching the server in background
-// and calling the child via command interpreter.
-
-    //printf ("gnssrv: Calling child \n");
-
-    rtl_clone_and_execute ("gns.bin"); 
-
-
-//
-// Wait
-//
-
-    printf ("gnssrv: [FIXME] yield \n");
-
-    for (i=0; i<11; i++){
+    for (i=0; i<11; i++)
+    {
         gnssrv_yield();
     };
+
 
 //
 // == Accept =====================================
@@ -689,7 +640,7 @@ int main (int argc, char **argv)
 
 
 // loop:
-    debug_print ("gnssrv: Entering main loop.\n");
+    //debug_print ("gnssrv: Entering main loop.\n");
 
 // Clients
     int newconn = -1;
@@ -697,18 +648,24 @@ int main (int argc, char **argv)
 
 // Accept connection from a client. 
 
-    while (1){
+    while (1)
+    {
         newconn = accept ( 
                       ____saved_server_fd, 
                       (struct sockaddr *) &server_address, 
                       (socklen_t *) addrlen );
+
         if (newconn < 0){
             debug_print ("gnssrv: [FAIL] Error on accept\n");
             gnssrv_yield(); 
         }else{
-            xxxHandleNextRequest (newconn);
+
+            if(newconn == 31){
+                dispatch(newconn);
+            }
         };
     };
+
 
 // =======================================
 

@@ -2559,8 +2559,9 @@ __gws_createwindow_request (
     //};
 
 
-    if( n_writes <= 0 )
+    if( n_writes <= 0 ){
         return -1;
+    }
 
     return n_writes;
     //return 0; 
@@ -3576,6 +3577,7 @@ gws_create_window (
         if (value == ACTION_REQUEST){ rtl_yield(); }
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
+        //if (value == ACTION_NULL )  { return -1; }  // no reply
     };
 
     // A sincronização nos diz que já temos um reply.

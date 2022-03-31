@@ -1,11 +1,9 @@
 /*
  * File: main.c
- *
  *    Client side application for Gramado Network Server.
  *    Using socket to connect with gns.
  *    AF_GRAMADO family.
  *    O propósito é testar o servidor gns.
- * 
  * History:
  *     2020 - Created by Fred Nora.
  */
@@ -21,18 +19,13 @@
 
 /*
     To make a process a TCP server, you need to follow the steps given below −
-
     Create a socket with the socket() system call.
-
     Bind the socket to an address using the bind() system call. 
     For a server socket on the Internet, an address consists of a 
     port number on the host machine.
-
     Listen for connections with the listen() system call.
-
     Accept a connection with the accept() system call. 
     This call typically blocks until a client connects with the server.
-
     Send and receive data using the read() and write() system calls.
 */ 
 
@@ -46,12 +39,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
 #include <rtl/gramado.h>
-
-// ??
 #include <packet.h>
-
 #include <gns.h>
 
 
@@ -61,8 +50,7 @@
 #define PORTS_FS  4042
 // ...
 
-
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+#define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
 
 /*
@@ -106,7 +94,7 @@ int main ( int argc, char *argv[] )
 
     int client_fd = -1;
 
-    debug_print ("-------------------------\n");
+    //debug_print ("-------------------------\n");
     debug_print ("gns.bin: Initializing ...\n");
 
 
@@ -151,13 +139,36 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-// See: libgns/
-    while (1){
+
+//
+// Loop.
+//
+
+// See: 
+// libgns/
+
+    int service_status = -1;
+
+    while (1)
+    {
+        //if( isTimeToQuit == TRUE )
+            //break;
+
+        // Send
         printf("gns.bin: Send message\n");
-        gns_hello(client_fd);
+        service_status = (int) gns_hello(client_fd);
+        if( service_status <= 0 ){
+            printf("gns.bin: service failed\n");
+        }
+        
+        // Sleep
         printf("gns.bin: Sleep\n");
         gns_yield();
+        gns_yield();
+        gns_yield();
+        gns_yield();
     };
+
     
 // Not reached.
 
