@@ -5,7 +5,7 @@
 
 	admin/ Admin stuff.
 
-	base/    Tier 1: A kind of place for data access tier.
-	com/     Tier 2: A kind of place for communication tier.
-	gramado/ Tier 3: A kind of place for presentation tier.
+	basetier/    Tier 1: A kind of place for data access tier.
+	comtier/     Tier 2: A kind of place for communication tier.
+	prestier/    Tier 3: A kind of place for presentation tier.
 

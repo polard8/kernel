@@ -67,7 +67,7 @@ clean
 #----------
 # build: Developer comand 1.
 # install
-# Build the images and put them all into base/disk/ folder.
+# Build the images and put them all into basetier/disk/ folder.
 PHONY := install
 install: do_install
 do_install: \
@@ -77,7 +77,7 @@ build-gramado-os
 #----------
 # build: Developer comand 2.
 # image
-# Copy all the files from base/disk/ to the VHD.
+# Copy all the files from basetier/disk/ to the VHD.
 PHONY := image
 image: do_image
 do_image: \
@@ -123,19 +123,19 @@ base-tier:
 
 
 # Create the VHD.
-	$(Q) $(NASM) base/boot/vd/fat/main.asm \
-	-I base/boot/vd/fat/ \
+	$(Q) $(NASM) basetier/boot/vd/fat/main.asm \
+	-I basetier/boot/vd/fat/ \
 	-o GRAMADO.VHD 
 # Build BM.BIN and BL.BIN.
-	$(Q) $(MAKE) -C base/boot/x86/bm/ 
-	$(Q) $(MAKE) -C base/boot/x86/bl/ 
+	$(Q) $(MAKE) -C basetier/boot/x86/bm/ 
+	$(Q) $(MAKE) -C basetier/boot/x86/bl/ 
 # Copy to the target folder.
-	sudo cp base/boot/x86/bin/BM.BIN  base/disk/
-	sudo cp base/boot/x86/bin/BL.BIN  base/disk/
+	sudo cp basetier/boot/x86/bin/BM.BIN  basetier/disk/
+	sudo cp basetier/boot/x86/bin/BL.BIN  basetier/disk/
 # Build kernel image.
-	$(Q) $(MAKE) -C base/new/
+	$(Q) $(MAKE) -C basetier/new/
 # Copy to the target folder.
-	sudo cp base/new/KERNEL.BIN  base/disk/GRAMADO
+	sudo cp basetier/new/KERNEL.BIN  basetier/disk/GRAMADO
 
 #2
 communication-tier:
@@ -143,13 +143,13 @@ communication-tier:
 
 # Build libraries.
 # Don't copy.
-	$(Q) $(MAKE) -C com/lib/rtl/
-	$(Q) $(MAKE) -C com/lib/
+	$(Q) $(MAKE) -C comtier/lib/rtl/
+	$(Q) $(MAKE) -C comtier/lib/
 # Build network server.
-	$(Q) $(MAKE) -C com/gns/ 
+	$(Q) $(MAKE) -C comtier/gns/ 
 # Copy to the target folder.
-	-sudo cp com/gns/bin/GNSSRV.BIN  base/disk/
-	-sudo cp com/gns/bin/GNS.BIN     base/disk/
+	-sudo cp comtier/gns/bin/GNSSRV.BIN  basetier/disk/
+	-sudo cp comtier/gns/bin/GNS.BIN     basetier/disk/
 
 #========================================
 
@@ -160,33 +160,33 @@ presentation-tier:
 	@echo ":: Building Window server, clients and userland."
 
 # Building window server and clients.
-	$(Q) $(MAKE) -C gramado/
+	$(Q) $(MAKE) -C prestier/
 # Copy to the target folder.
-	-sudo cp gramado/bin/GWSSRV.BIN    base/disk/
-	-sudo cp gramado/bin/GWS.BIN       base/disk/ 
-	-sudo cp gramado/bin/CMDLINE.BIN   base/disk/
-	-sudo cp gramado/bin/GWM.BIN       base/disk/
-	-sudo cp gramado/bin/LOGON.BIN     base/disk/
-	-sudo cp gramado/bin/EDITOR.BIN    base/disk/
-	-sudo cp gramado/bin/TERMINAL.BIN  base/disk/
-	-sudo cp gramado/bin/FILEMAN.BIN   base/disk/
-	-sudo cp gramado/bin/BROWSER.BIN   base/disk/
+	-sudo cp prestier/bin/GWSSRV.BIN    basetier/disk/
+	-sudo cp prestier/bin/GWS.BIN       basetier/disk/ 
+	-sudo cp prestier/bin/CMDLINE.BIN   basetier/disk/
+	-sudo cp prestier/bin/GWM.BIN       basetier/disk/
+	-sudo cp prestier/bin/LOGON.BIN     basetier/disk/
+	-sudo cp prestier/bin/EDITOR.BIN    basetier/disk/
+	-sudo cp prestier/bin/TERMINAL.BIN  basetier/disk/
+	-sudo cp prestier/bin/FILEMAN.BIN   basetier/disk/
+	-sudo cp prestier/bin/BROWSER.BIN   basetier/disk/
 # Building userland commands.
-	$(Q) $(MAKE) -C gramado/userland/
+	$(Q) $(MAKE) -C prestier/userland/
 # Copy to the target folder.
-	-sudo cp gramado/userland/bin/SHUTDOWN.BIN  base/disk/
-	-sudo cp gramado/userland/bin/REBOOT.BIN    base/disk/
-	-sudo cp gramado/userland/bin/SHELL.BIN     base/disk/
-	-sudo cp gramado/userland/bin/CAT.BIN       base/disk/
+	-sudo cp prestier/userland/bin/SHUTDOWN.BIN  basetier/disk/
+	-sudo cp prestier/userland/bin/REBOOT.BIN    basetier/disk/
+	-sudo cp prestier/userland/bin/SHELL.BIN     basetier/disk/
+	-sudo cp prestier/userland/bin/CAT.BIN       basetier/disk/
 #...
 
 # Suspended
 # Copy the clients in another folder.
-#	-sudo cp gramado/bin/*.BIN    base/disk/PROGRAMS/
+#	-sudo cp prestier/bin/*.BIN    basetier/disk/PROGRAMS/
 
 # Install BMPs
-#	sudo cp gramado/extra/themes/presence/*.BMP  base/disk/
-	sudo cp gramado/extra/themes/field/*.BMP  base/disk/
+#	sudo cp prestier/gws/themes/presence/*.BMP  basetier/disk/
+	sudo cp prestier/gws/themes/field/*.BMP  basetier/disk/
 #...
 
 #===================================================
@@ -209,14 +209,14 @@ vhd-mount:
 #===================================================
 #::4
 # ~ Step 4 vhd-copy-files - Copying files into the mounted VHD.
-# Copying the base/disk/ folder into the mounted VHD.
+# Copying the basetier/disk/ folder into the mounted VHD.
 vhd-copy-files:
 	@echo "========================="
 	@echo "Build: Copying files into the mounted VHD ..."
 
-	# Copy base/disk/
+	# Copy basetier/disk/
 	# sends everything from disk/ to root.
-	sudo cp -r base/disk/*  /mnt/gramadoxvhd
+	sudo cp -r basetier/disk/*  /mnt/gramadoxvhd
 
 #===================================================
 #:::5
@@ -240,70 +240,58 @@ danger-hdd-clone-vhd:
 # == clean ====================================
 #
 
-clean-all: \
-clean clean1 clean2 clean3    
+
+clean:
+
+# Main files.
+	-rm *.o
+	@echo ":)"
+
+clean-all: clean
 
 	-rm *.VHD
 	-rm *.ISO
 
-	@echo "==================="
-	@echo "ok ?"
-clean:
-	@echo "==================="
-	@echo "Build: Deleting the object files ..."
+# Base tier.
 
-	-rm *.o
-
-	-rm -rf com/lib/rtl/obj/*.o
-	-rm -rf com/lib/libgns/obj/*.o
-	-rm -rf com/lib/libio01/obj/*.o
-
-	-rm -rf gramado/final/server/*.o
-	-rm -rf gramado/final/client/*.o
-
-	@echo "Success?"
-
-# base-tier
-clean1:
 # Clear boot images
-	-rm -rf base/boot/x86/bin/*.BIN
-
+	-rm -rf basetier/boot/x86/bin/*.BIN
 # Clear newos kernel image
-	-rm -rf base/new/KERNEL.BIN
+	-rm -rf basetier/new/KERNEL.BIN
 
-# Clear root dir
-	-rm -rf base/disk/*.BIN 
-	-rm -rf base/disk/*.BMP
-# Clear system folder 
-	-rm -rf base/disk/GRAMADO/*.BIN 
-# Clear applications folder
-	-rm -rf base/disk/PROGRAMS/*.BIN 
-# Clear unix-like stuff
-	-rm -rf base/disk/UBASE/BOOT/*.BIN 
-	-rm -rf base/disk/UBASE/BIN/*.BIN 
-	-rm -rf base/disk/UBASE/SBIN/*.BIN
+	-rm -rf basetier/disk/*.BIN 
+	-rm -rf basetier/disk/*.BMP
 
-# communication-tier
-clean2:
+	-rm -rf basetier/disk/EFI/BOOT/*.EFI 
 
-# Clear libraries folder
-	-rm -rf com/lib/fonts/bin/*.FON
+	-rm -rf basetier/disk/GRAMADO/*.BIN 
+	-rm -rf basetier/disk/PROGRAMS/*.BIN 
+	-rm -rf basetier/disk/UBASE/BOOT/*.BIN 
+	-rm -rf basetier/disk/UBASE/BIN/*.BIN 
+	-rm -rf basetier/disk/UBASE/SBIN/*.BIN
 
-# Clear commands folder
-	-rm -rf com/cmd/bin/*.BIN
-# Clear gns service stuff
-	-rm -rf com/gns/bin/*.BIN
 
-# todo: 
-# We need clean up all the object files
-# for the applications.
-clean3:
+# Communication tier.
 
-# Clear system folder
-	-rm -rf gramado/bin/*.BIN
+	-rm -rf comtier/gns/bin/*.BIN
 
-	-rm gramado/bin/*.BIN
-	-rm gramado/userland/bin/*.BIN
+	-rm -rf comtier/lib/rtl/obj/*.o
+	-rm -rf comtier/lib/libgns/obj/*.o
+	-rm -rf comtier/lib/libio01/obj/*.o
+	-rm -rf comtier/lib/fonts/bin/*.FON
+
+# Presentation tier.
+
+	-rm -rf prestier/bin/*.BIN
+	-rm     prestier/bin/*.BIN
+	-rm     prestier/userland/bin/*.BIN
+
+	-rm -rf prestier/gws/libgws/*.o
+	-rm -rf prestier/gws/server/*.o
+	-rm -rf prestier/gws/client/*.o
+	# ...
+
+	@echo "Done ?"
 
 usage:
 	@echo "Building everything:"
