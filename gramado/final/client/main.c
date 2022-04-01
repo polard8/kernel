@@ -267,6 +267,9 @@ updateStatusBar(
     int second_number)
 {
 
+    if(status_window<0)
+        return;
+
 // first box
     gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
 // second box
@@ -381,33 +384,33 @@ gwsProcedure (
         case MSG_COMMAND:
             printf("gws.bin: MSG_COMMAND %d \n",long1);
             switch(long1){
+            
             case 4001:  //app1
             printf("gws.bin: 4001\n");
-            gws_clone_and_execute("browser.bin");  break;
+            gws_clone_and_execute("terminal.bin");  break;
             case 4002:  //app2
             printf("gws.bin: 4002\n");
-            gws_clone_and_execute("editor.bin");  break;
+            gws_clone_and_execute("fileman.bin");  break;
             case 4003:  //app3
             printf("gws.bin: 4003\n");
-            gws_clone_and_execute("fileman.bin");  break;
+            gws_clone_and_execute("editor.bin");  break;
             case 4004:  //app4
             printf("gws.bin: 4004\n");
-            gws_clone_and_execute("logon.bin");  break;
+            gws_clone_and_execute("reboot.bin");  break;
+            
             case 4005:  //app5
             printf("gws.bin: 4005\n");
-            gws_clone_and_execute("reboot.bin");  break;
+            gws_clone_and_execute("terminal.bin");  break;
             case 4006:  //app6
             printf("gws.bin: 4006\n");
-            //gws_clone_and_execute("shell.bin");  break;
+            gws_clone_and_execute("fileman.bin");  break;
             case 4007:  //app7
             printf("gws.bin: 4007\n");
-            gws_clone_and_execute("shutdown.bin");  break;
+            gws_clone_and_execute("editor.bin");  break;
             case 4008:  //app8
             printf("gws.bin: 4008\n");
-            gws_clone_and_execute("terminal.bin");  break;
-            case 4009:  // gns srv
-            printf("gws.bin: 4009\n");
-            gws_clone_and_execute("cmdline.bin");  break;
+            gws_clone_and_execute("reboot.bin");  break;
+            
             };
             break;
 
@@ -540,9 +543,12 @@ done:
 int main ( int argc, char *argv[] )
 {
 
+
+    //int launchChild = TRUE;
+    int launchChild = FALSE;
+
 // #config
     int ShowCube = FALSE;
-    int launchChild = TRUE;
     // ...
 
     int client_fd = -1;
@@ -752,9 +758,21 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
     status_window = tmp1;
+//========================
 
-// #test
+//
+// Messages
+//
+
+    // Char
     updateStatusBar(client_fd, 8, 8, 0,'G');
+
+    // String
+    // Open terminal application
+    gws_draw_text(client_fd,status_window,20,8,COLOR_RED,"PRESS: Control + F1");
+
+    // Invalidate status window.
+    gws_invalidate_window(client_fd,status_window);
 
 //========================
 
@@ -1231,6 +1249,10 @@ int main ( int argc, char *argv[] )
 // Caso contrário podemos chamar outros diálogos.
 
     while (TRUE){
+
+        //if( isTimeToQuit == TRUE )
+            //break;
+
         if ( rtl_get_event() == TRUE )
         {
             //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }

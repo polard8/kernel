@@ -185,8 +185,8 @@ presentation-tier:
 #	-sudo cp gramado/bin/*.BIN    base/disk/PROGRAMS/
 
 # Install BMPs
-#	sudo cp gramado/shell/themes/presence/*.BMP  base/disk/
-	sudo cp gramado/shell/themes/field/*.BMP  base/disk/
+#	sudo cp gramado/extra/themes/presence/*.BMP  base/disk/
+	sudo cp gramado/extra/themes/field/*.BMP  base/disk/
 #...
 
 #===================================================
@@ -258,13 +258,8 @@ clean:
 	-rm -rf com/lib/libgns/obj/*.o
 	-rm -rf com/lib/libio01/obj/*.o
 
-	-rm -rf gramado/core/cmdline/*.o
-
-	-rm -rf gramado/core/server/*.o
-	-rm -rf gramado/core/client/*.o
-
-	-rm -rf gramado/setup/client/*.o
-	-rm -rf gramado/logon/client/*.o
+	-rm -rf gramado/final/server/*.o
+	-rm -rf gramado/final/client/*.o
 
 	@echo "Success?"
 

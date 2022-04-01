@@ -7,22 +7,22 @@ all:
 	make -C libgws
 
 # Gramado Core
+# 'Final' game engine
+# This is the end of the system initialization. No apps.
 # The window server and the main client
-	make -C core/cmdline
-	make -C core/client
-	make -C core/server
-
-# Gramado setup
-	make -C setup/client
-
-# Gramado logon
-	make -C logon/client    
+	make -C final/client
+	make -C final/server
 
 # Gramado shell
-	make -C shell/browser
-	make -C shell/editor
-	make -C shell/fileman
-	make -C shell/terminal  
+# Extra stuff. Aps after system initialization.
+	make -C extra/browser
+	make -C extra/cmdline
+	make -C extra/editor
+	make -C extra/fileman
+	make -C extra/logon    
+	make -C extra/setup
+	make -C extra/terminal  
+
 
 # Gramado userland
     #make -C userland

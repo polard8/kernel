@@ -1,6 +1,0 @@
-
-	gramado/logon/
-
-	Logon Environment.
-	We open this environment instead of open
-	the Gramado Shell Environment.

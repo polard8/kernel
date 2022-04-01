@@ -889,11 +889,18 @@ wmProcedure (
 // Syskeyup.
 // liberadas: teclas de funçao
     case MSG_SYSKEYUP:
+        // Se nenhum modificador esta acionado,
+        // entao apenas enviamos a tecla de funçao 
+        // para o window server.
         // Send it to the window server.
-        wmSendInputToWindowManager(0,MSG_SYSKEYUP,long1,long2); 
-        return 0;
+        if( shift_status != TRUE &&
+            ctrl_status != TRUE &&
+            alt_status != TRUE )
+        {
+            wmSendInputToWindowManager(0,MSG_SYSKEYUP,long1,long2); 
+            return 0;
+        }
         break;
-
 
 // ==============
 // msg:
@@ -901,9 +908,18 @@ wmProcedure (
 // Pressionadas: teclas de funçao
     case MSG_SYSKEYDOWN:
 
+        // Se nenhum modificador esta acionado,
+        // entao apenas enviamos a tecla de funçao 
+        // para o window server.
         // Send it to the window server.
-        wmSendInputToWindowManager(0,MSG_SYSKEYDOWN,long1,long2); 
-
+        if( shift_status != TRUE &&
+            ctrl_status != TRUE &&
+            alt_status != TRUE )
+        {
+            wmSendInputToWindowManager(0,MSG_SYSKEYDOWN,long1,long2); 
+            return 0;
+        }
+        
         // Process a set of combinations.
         switch (long1){
 

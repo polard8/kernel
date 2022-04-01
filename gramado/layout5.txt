@@ -1,6 +1,25 @@
 
-	core/ the window server and the first client.
-	libgws/ the client-side library for the window server.
-	logon/ the logon environment.
-	setup/ the setup envitronment.
-	shell/ the User interface.
+
+	bin/    The compiled program goes here.
+	extra/  Client applications.
+	final/  The window server and the first client.
+	libgws/ The client-side library for the window server.
+
+
+-------------------------------
+
+Extra:
+    Client side applications.
+    These applications will run after the system initialization.
+
+
+Final:
+    Final is the game engine. It has a server and its first client.
+    It represents the end of the system initialization.
+    After that we're gonna run extra applications.
+
+libgws:
+    The client applications will gonna use this library
+    for building GUI applications.
+    
+    
