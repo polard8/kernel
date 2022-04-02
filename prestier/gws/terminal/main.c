@@ -308,6 +308,23 @@ static void compareStrings(int fd)
         return;
     }
 
+    // #libc
+    // Testing libc components.
+    if( strncmp(prompt,"libc",4) == 0 )
+    {
+        //close(0); 
+        //close(1); 
+        //close(2);
+        //#remember: stderr was redirected to stdout.
+        //fclose(stdin); 
+        //fclose(stdout); 
+        //fclose(stderr); 
+        
+        //creat ( "NEWFILE.TXT", 0666 );
+        //mkdir ( "NEWDIR", 0666 );
+        
+        goto exit_cmp; 
+    }
 
     // get window info: main window
     if ( strncmp(prompt,"w-main",6) == 0 )
@@ -2078,16 +2095,16 @@ int __input_GRAMADOTXT(int fd)
     int window_id = Terminal.client_window_id;
 
     FILE *new_stdin;
-    new_stdin = (FILE *) fopen("gramado.txt","a+");
 
-    if( (void*) new_stdin == NULL ){
+    new_stdin = (FILE *) fopen("gramado.txt","a+");
+    if( (void*) new_stdin == NULL )
+    {
         printf ("__input_GRAMADOTXT: new_stdin\n");
         return -1;
     }
 
 // O kernel seleciona qual será 
 // o arquivo para teclado ps2.
-
     gramado_system_call(
         8002,
         fileno(new_stdin),

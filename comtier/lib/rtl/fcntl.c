@@ -4,11 +4,12 @@
  * 2020 - Created by Fred Nora.
  */
 
-#include <sys/ioctl.h>
-#include <stdarg.h>
-#include <stddef.h>
 #include <types.h>
 #include <sys/types.h>
+#include <stddef.h>
+#include <stdarg.h>
+#include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/file.h>
@@ -119,8 +120,19 @@ int openat (int dirfd, const char *pathname, int flags)
 
 int open (const char *pathname, int flags, mode_t mode)
 {
-    int fd = -1;
     char tmp_path[64];
+    int fd = -1;
+    size_t StringSize=0;
+
+
+// String validation.
+    //if( (void*) pathname == NULL )
+    //    return -1;
+
+// String size limits.
+    //StringSize = (size_t) strlen(pathname);
+    //if(StringSize>64)
+        //StringSize=64;
 
 // #importante
 // adaptando para fat16.
@@ -153,11 +165,9 @@ int open (const char *pathname, int flags, mode_t mode)
     }
     */
 
-// Load the file into the address.
-// O arquivo será carregado no buffer em ring0,
-// A chamada não oferecerá um endereço em ring3,
-// pois não dá pra confiar na biblioteca,
-// o kernel não pode confiar na qualidade da libc.
+
+// O conteúdo do arquivo é carregado num buffer em ring0.
+// O fd é retornado para que possamos ler usando read();
 // IN: service, pathname, flags, mode 
 
     fd = (int) gramado_system_call ( 
@@ -196,15 +206,18 @@ int __open2(const char* path, int options, ...)
 */
 
 
+
 /*
- **********************************
  * creat:
  *     Linux klibc style.
  */
 
 int creat (const char *pathname, mode_t mode)
 {
-    return (int) open (pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
+    //if( (void*) pathname == NULL )
+        //return -1;
+
+    return (int) open(pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
 }
 
 

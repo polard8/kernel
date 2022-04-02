@@ -3920,7 +3920,6 @@ sys_read_file_from_disk (
 
     pid_t current_process = (pid_t) get_current_process();
 
-
     if ( (void*) file_name == NULL ){
         debug_print ("sys_read_file_from_disk: file_name\n");
         return -1;
@@ -4101,8 +4100,12 @@ __OK:
     //__file->_tmpfname = NULL;
 
     __file->_lbfsize = BUFSIZ;
+
+    // inicializando apenas.
     __file->_r = 0;
     __file->_w = 0;
+    __file->_cnt = BUFSIZ;  // anda temos bastante espaço. todo o buffer
+
     __file->_file = __slot;
     __file->fd_counter = 1; //inicializando. 
 
@@ -4140,25 +4143,36 @@ __OK:
     // #bugbug: OUT: 'unsigned long'
     FileSize = (size_t) fsGetFileSize( 
                             (unsigned char *) file_name,
-                            (unsigned long)VOLUME1_ROOTDIR_ADDRESS );
+                            (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
 
-    if (FileSize <= 0){
+    if (FileSize <= 0)
+    {
         printf ("sys_read_file_from_disk: File size fail\n");
         refresh_screen();
         return (-1);
     }
 
 // Limits.
-    if ( FileSize < __file->_lbfsize ){ FileSize = __file->_lbfsize; }
+    //if ( FileSize < __file->_lbfsize )
+    //{ 
+    //    FileSize = __file->_lbfsize; 
+    //}
 
 // Limits.
 // Se o arquivo for maior que buffer dispon�vel.
 // Podemos almentar o buffer.
-    if (FileSize > __file->_lbfsize)
+    if (FileSize >= __file->_lbfsize)
     {
+
+        // #debug
+        printf ("sys_read_file_from_disk: [todo] File size out of limits\n");
+        refresh_screen();
+        return (-1);
+        
         // #bugbug: Provisório.
         // Limite - 1MB.
-        if (FileSize > 1024*1024){
+        if (FileSize > 1024*1024)
+        {
             printf ("sys_read_file_from_disk: File size out of limits\n");
             printf ("%d bytes \n",FileSize);
             refresh_screen();
@@ -4182,15 +4196,17 @@ __OK:
 // Checando os limites novamente.
 // #bugbug: Provisório.
 // Limits - 1MB
-    if (FileSize > 1024*1024){
-        printf ("sys_read_file_from_disk: File size out of limits\n");
-        refresh_screen();
-        return -1;
-    }
+    //if (FileSize > 1024*1024)
+    //{
+    //    printf ("sys_read_file_from_disk: File size out of limits\n");
+    //    refresh_screen();
+    //    return -1;
+    //}
 
 // #paranoia.
 // Checando base novamente.
-    if ( (void *) __file->_base == NULL ){
+    if ( (void *) __file->_base == NULL )
+    {
         printf ("sys_read_file_from_disk: buffer fail\n");
         refresh_screen();
         return -1;
@@ -4198,6 +4214,30 @@ __OK:
 
 // Pointer.
     __file->_p = __file->_base;
+
+
+// Offsets
+// Atualizando os offsets que foram apenas inicializados.
+
+    // vamos ler do começo do arquivo.
+    __file->_r = 0;
+
+    // o ponteiro de escrita mudou pois escrevemos um 
+    // arquivo inteiro no buffer.
+    __file->_w = FileSize;
+
+
+    if( FileSize >= BUFSIZ )
+    {
+        printf ("sys_read_file_from_disk: the file is larger than the buffer \n");
+        refresh_screen();
+
+        __file->_cnt = 0;
+    }
+
+    // agora temos menos espaço no buffer.
+    __file->_cnt = ( BUFSIZ - FileSize );
+
 
 //
 // Load.
@@ -4291,13 +4331,22 @@ __OK:
 // Se não liberarmos para leitura então read()
 // não poderá ler.
 
+    // ok to read
     __file->_flags = (__file->_flags | __SRD);
+
+    // ok to write
+    //__file->_flags = (__file->_flags | __SWR);
 
 // Salva o ponteiro.  
 // Ja checamos fd.
     p->Objects[__slot] = (unsigned long) __file;
 
-    //printf ("done\n");
+
+
+    //#debug
+    //printf ("process name: %s\n",p->__processname);
+    //printf ("fd %d\n",__file->_file);
+    //printf("sys_read_file_from_disk-OUTPUT: %s \n",__file->_base);
     //refresh_screen();
 
 // Done.

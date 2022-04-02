@@ -602,9 +602,9 @@ sys_read (
             {
                 debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
                 __file->socket_buffer_full = FALSE;     // buffer vazio
-                __file->_flags &= ~__SRD;                 //nao posso mais LER.            
-                __file->_flags |= __SWR;                // pode escrever também
-                
+
+                __file->_flags &= ~__SRD;  // nao posso mais LER.            
+                __file->_flags |= __SWR;   // pode escrever também
                 
                 debug_print("sys_read: WAKEUP WRITER\n");
                 do_thread_ready( __file->tid_waiting ); // acorda escritores.
@@ -640,6 +640,18 @@ RegularFile:
 
     if ( __file->____object == ObjectTypeFile )
     {
+
+         //#debug
+         //if( __file->_file == 5)
+         //{
+         //    if ( (__file->_flags & __SRD) == 0 )
+         //        printf("cant read\n");
+         //    if ( __file->_flags & __SRD )
+         //        printf("can read\n");
+         //    printf("sys_read-OUTPUT 5: %s \n",__file->_base);
+         //    refresh_screen();
+         //}
+
         //debug_print("sys_read: [DEBUG] Trying to read a regular file object\n");
         
         //Se não pode ler.
@@ -653,8 +665,14 @@ RegularFile:
             //__file->tid_waiting = current_thread;
             //__file->_flags |= __SWR;  //pode escrever.
             //scheduler();
-            return 0;
+            
+            //printf("sys_read: __file->_flags & __SRD \n");
+            //refresh_screen();
+            
+            goto fail;
         }
+        
+        nbytes = 0;
 
         // Se puder ler:
         // + Call a function to read a regular file.
@@ -663,16 +681,35 @@ RegularFile:
 
         if ( __file->_flags & __SRD )
         {
+
             nbytes = (int) file_read_buffer ( 
                                (file *) __file, 
                                (char *) ubuf, 
                                (int) count );
 
+            
+            //#debug
+            //if( __file->_file == 5)
+            //{
+            //    printf("nbytes %d\n",nbytes);
+            //    refresh_screen();
+            //}
+ 
+            if(nbytes<=0)
+            {
+               //yield (current_thread);
+               goto fail;
+            }
+            
             // Se conseguimos ler.
             if ( nbytes>0 )
             {
+
+                //__file->_flags &= ~__SRD;  // nao posso mais LER.            
+                //__file->_flags |= __SWR;   // pode escrever também
+
                 // ok to write.
-                __file->_flags = __SWR;
+                __file->_flags |= __SWR;
                 __file->sync.can_write = TRUE;
         
                 // #test
@@ -1261,17 +1298,13 @@ fail2:
 int file_read_buffer ( file *f, char *buffer, int len )
 {
     char *p;
-
-    p = buffer;
-    
-    
     int local_len=0;
     
+    p = buffer;
+
+    
 // #test
-
     local_len = (int) (len & 0xFFFF);
-
-
 
 //
 // Parameters validation
@@ -1326,9 +1359,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // A próxima leitura precisa ser depois dessa.
 
 
+// =================================
 // Socket:
 // Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
-
     if ( f->____object == ObjectTypeSocket )
     {    
         memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
@@ -1338,9 +1371,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
         return local_len;
     }
 
+// =================================
 // Pipe:
 // Não concatenaremos
-
     if ( f->____object == ObjectTypePipe )
     {
         memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
@@ -1351,9 +1384,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
     }
 
 
+// =================================
 // Regular file, tty, iobuffer.
 // Nesse caso a leitura tem que respeitar os offsets e limites.
-
     if ( f->____object == ObjectTypeFile ||
          f->____object == ObjectTypeTTY  ||
          f->____object == ObjectTypeIoBuffer)
@@ -1372,18 +1405,27 @@ int file_read_buffer ( file *f, char *buffer, int len )
         }
 
         // ler no início do arquivo.
-        if ( f->_r < 0 ){
+        if ( f->_r < 0 )
+        {
             f->_r = 0;
+            printf ("file_read_buffer: f->_r = 0\n");
+            goto fail;
         }
         
         // nao leremos depois do fim do arquivo.
         if ( f->_r > f->_lbfsize )
         {
+            //#debug: provisorio
+            printf ("file_read_buffer: f->_r > f->_lbfsize\n");
+            goto fail;
+
             debug_print("file_read_buffer: f->_r > f->_lbfsize\n");
+
             f->_r = f->_lbfsize;
             f->_w = f->_lbfsize;
             f->_p = (f->_base + f->_lbfsize);
             f->_cnt = 0;
+
             return EOF;
         }
 
@@ -1392,6 +1434,10 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // #bugbug: mas talvez isso não seja assim para pipe.
         if ( f->_r > f->_w )
         {
+
+            printf ("file_read_buffer: f->_r > f->_w\n");
+            goto fail;
+
             debug_print("file_read_buffer: f->_r > f->_w\n");
             
             f->_r = f->_w;
@@ -1408,6 +1454,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
     
         if (local_len <= 0 )
         {
+            printf ("file_read_buffer: local_len <= 0 :)FIRST\n");
+            goto fail;
+
             //f->_flags = __SWR;
             return -1;
         }
@@ -1416,6 +1465,10 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // é maior que o espaço que temos.
         if( local_len > f->_lbfsize )
         {
+
+            printf ("file_read_buffer: local_len > f->_lbfsize\n");
+            goto fail;
+
             //printf ("file_read_buffer: [FAIL] local_len limits\n");
             //goto fail;
         
@@ -1425,26 +1478,61 @@ int file_read_buffer ( file *f, char *buffer, int len )
         }
  
  
-        // Se o tanque que queremos ler é maior
+        // Se o tanto que queremos ler é maior
         // que o que nos resta da buffer,
         // então vamos ler apenas o resto do buffer.
+        
+        // so podemos ler ate o limite de espaço que temos no buffer.
         if(local_len > f->_cnt)
+        {
+            //printf ("file_read_buffer: local_len > f->_cnt\n");
+            //goto fail;
+
             local_len = f->_cnt;
+        }
+ 
+       int delta = (f->_w - f->_r);
+                
+        // nada para ler.
+        // pois o ponteiro de escrita e o de leitura sao iguais,
+        if( delta == 0 )
+        {
+            // 0 bytes lidos,
+            return 0;
+        }
  
         // #delta
         // Se o tanto que queremos ler
         // é maior que o tanto que foi efetivamente escrito,
         // então leremos somente o que foi escrito.
         
-        if ( local_len > (f->_base + f->_w) - (f->_base + f->_r) ) 
-            local_len = (f->_base + f->_w) - (f->_base + f->_r);
-            
+        // se a diferença entra o ponteiro de escrita e o ponteiro
+        // de leitura for menor que a quantidade que queremos ler.
+        
+        // Se queremos ler mais do que foi escrito.
+        // entao vamos ler apenas o que foi escrito.
+        if ( local_len > delta )
+        { 
+            local_len = delta;
+        }
+
         // Vamos ler daqui.
         // A partir do offset de leitura.
         f->_p = (f->_base + f->_r);
 
 
         // read
+        
+        //#debug
+        if (local_len <= 0 )
+        {
+            printf ("file_read_buffer: local_len <= 0 SECOND\n");
+            goto fail;
+
+            //printf("local_len\n");
+            //refresh_screen();
+            return -1;
+        }
         
         //---
         memcpy ( (void *) buffer, (const void *) f->_p, local_len ); 
@@ -1471,6 +1559,7 @@ fail:
     refresh_screen ();
     return EOF;
 }
+
 
 /*
  * file_write_buffer: 
@@ -2291,7 +2380,7 @@ sys_open (
         printf ("sys_open: fail\n");
         return -1;
     }
-    
+
     return (int) _ret;
 }
 
