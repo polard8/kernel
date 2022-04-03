@@ -1,12 +1,10 @@
+
+// CMP.BIN
 // cmp command from unix v7
-
-
 
 // rtl
 #include <stdio.h>
 #include <ctype.h>
-
-
 
 FILE	*file1,*file2;
 int	eflg;
@@ -16,7 +14,21 @@ long	chr	= 0;
 long	skip1;
 long	skip2;
 
-long otoi(char *s);
+static long otoi(char *s);
+
+static long otoi(char *s)
+{
+	long v;
+	int base;
+
+	v = 0;
+	base = 10;
+	if (*s == '0')
+		base = 8;
+	while(isdigit(*s))
+		v = v*base + *s++ - '0';
+	return(v);
+}
 
 
 
@@ -44,10 +56,10 @@ int main ( int argc, char *argv[] )
 	arg = argv[1];
 	if( arg[0]=='-' && arg[1]==0 )
 		file1 = stdin;
-	else if((file1 = fopen(arg, "r")) == NULL)
+	else if((file1 = fopen(arg, "a+")) == NULL)
 		goto barg;
 	arg = argv[2];
-	if((file2 = fopen(arg, "r")) == NULL)
+	if((file2 = fopen(arg, "a+")) == NULL)
 		goto barg;
 	if (argc>3)
 		skip1 = otoi(argv[3]);
@@ -90,13 +102,15 @@ loop:
 	}
 	if(c2 == EOF)
 		goto earg;
-	if(lflg == 1) {
-		printf("%s %s differ: char %ld, line %ld\n", argv[1], arg,
-			chr, line);
+	if(lflg == 1) 
+	{
+		//printf("%s %s differ: char %ld, line %ld\n", argv[1], arg, chr, line);
+		printf("%s %s differ: char %d, line %d\n", argv[1], arg, chr, line);
 		exit(1);
 	}
 	eflg = 1;
-	printf("%6ld %3o %3o\n", chr, c1, c2);
+	//printf("%6ld %3o %3o\n", chr, c1, c2);
+	//printf("%6ld %3o %3o\n", chr, c1, c2);
 	goto loop;
 
 narg:
@@ -111,19 +125,8 @@ barg:
 earg:
 	printf("cmp: EOF on %s\n", arg);
 	exit(1);
+
+// Not reached.
+    return 0;
 }
 
-
-long otoi(char *s)
-{
-	long v;
-	int base;
-
-	v = 0;
-	base = 10;
-	if (*s == '0')
-		base = 8;
-	while(isdigit(*s))
-		v = v*base + *s++ - '0';
-	return(v);
-}

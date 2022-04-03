@@ -18,15 +18,17 @@ int main (int argc, char **argv)
     char ch[100];
     char *pos1, *pos2, *pos3;
 
-    printf("showfun:\n");
+    printf("showfun.bin:\n");
 
-    fp = fopen(argv[1], "r");
+// Open a file.
+
+    fp = (FILE *) fopen(argv[1], "a+");
 
     if (fp == NULL){
        printf("\nFile unable to open");
        return -1;
     }else{
-       printf("\nFile Opened to display function names :\n");
+       printf("File Opened to display function names:\n");
     };
 
 
@@ -56,6 +58,8 @@ int main (int argc, char **argv)
         }else{ break; }
     };
 
+    printf("done. Closing the file.");
+    fflush(stdout);
     fclose(fp);
 
     return 0;

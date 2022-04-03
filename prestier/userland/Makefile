@@ -1,18 +1,16 @@
 
-
 all:
 
-# it's working
 	make -C ./shutdown
 	make -C ./reboot
 	make -C ./shell
 	make -C ./cat
-
-
-# todo
-	#make -C ./false
-	#make -C ./true
-	#make -C ./showfun
-	#make -C ./uname
-
+	make -C ./tprintf
+	make -C ./showfun
+	make -C ./uname
+	make -C ./cmp
+	make -C ./sum
+	make -C ./tascii
+	make -C ./false
+	make -C ./true
 

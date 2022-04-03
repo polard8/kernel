@@ -17,8 +17,8 @@ EXTRAVERSION =
 #todo:
 #We need to simplify these flags
 
-CFLAGS = -m32 \
-	--std=gnu89 \
+CFLAGS = -m64 \
+	-std=gnu89 \
 	-nodefaultlibs \
 	-nostdinc \
 	-nostdlib \
@@ -27,34 +27,23 @@ CFLAGS = -m32 \
 	-ffreestanding \
 	-fno-builtin \
 	-fno-pie \
-	-no-pie \
+	-fleading-underscore \
 	-fno-stack-protector \
-	-s
-
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
+	-s \
+	-Werror=strict-prototypes    
 
 
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
 
+LIBC      = ../../../comtier/lib/rtl/include/
+LIBCOBJ   = ../../../comtier/lib/rtl/obj
 
-	##
-	## Objects
-	##
+#
+# Objects
+#
 
 myObjects = crt0.o main.o \
-ctype.o \
-stdio.o \
-stdlib.o \
-string.o \
-time.o \
-api.o \
-unistd.o \
-stubs.o    
+ctype.o stdio.o stdlib.o string.o time.o \
+unistd.o termios.o ioctl.o fcntl.o rtl.o     
 
 
 
@@ -65,13 +54,12 @@ all: main.o all-c tascii-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
-	
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
@@ -79,19 +67,20 @@ all-c:
 	cp $(LIBCOBJ)/string.o .
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
+	cp $(LIBCOBJ)/termios.o  .
+	cp $(LIBCOBJ)/ioctl.o  .
+	cp $(LIBCOBJ)/fcntl.o  .
 
-	cp $(APIOBJ)/api.o      .	
 
 tascii-link:
-	ld -m elf_i386 -T ../link.ld -o TASCII.BIN $(myObjects)    
-
-
+	ld -m elf_x86_64 -T ../link.ld -o TASCII.BIN $(myObjects)    
 
 finalize:
-	cp TASCII.BIN ../../bin
+	cp TASCII.BIN  ../bin
 
 clean:
 	-rm *.o
 	-rm TASCII.BIN 
+
 	
 	

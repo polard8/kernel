@@ -343,12 +343,16 @@ static void *__extra_services (
     }
 
 
-    // 377 - todo: implement uname() libc support.
-    if ( number == 377 ){
-        printf ("__extra_services: [377] uname. [todo] \n");
-        sys_uname ( (struct utsname *) arg2 );        
-        invalidate_screen();
+    // 377 
+    // todo: implement uname() libc support.
+    // See: sys.c
+    if ( number == 377 )
+    {
+        //printf ("__extra_services: [377] uname. [todo] \n");
+        //invalidate_screen();
         //refresh_screen();
+
+        sys_uname ( (struct utsname *) arg2 );        
         return NULL;
     }
 

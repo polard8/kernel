@@ -173,16 +173,27 @@ presentation-tier:
 	-sudo cp prestier/bin/BROWSER.BIN   basetier/disk/
 # Building userland commands.
 	$(Q) $(MAKE) -C prestier/userland/
+
+#	-sudo cp prestier/userland/bin/*.BIN    basetier/disk/
+
 # Copy to the target folder.
 	-sudo cp prestier/userland/bin/SHUTDOWN.BIN  basetier/disk/
 	-sudo cp prestier/userland/bin/REBOOT.BIN    basetier/disk/
 	-sudo cp prestier/userland/bin/SHELL.BIN     basetier/disk/
 	-sudo cp prestier/userland/bin/CAT.BIN       basetier/disk/
-#...
+	-sudo cp prestier/userland/bin/TPRINTF.BIN   basetier/disk/
+	-sudo cp prestier/userland/bin/SHOWFUN.BIN   basetier/disk/
+	-sudo cp prestier/userland/bin/UNAME.BIN     basetier/disk/
+	-sudo cp prestier/userland/bin/CMP.BIN       basetier/disk/
+	-sudo cp prestier/userland/bin/SUM.BIN       basetier/disk/
+	-sudo cp prestier/userland/bin/TASCII.BIN    basetier/disk/
+	-sudo cp prestier/userland/bin/FALSE.BIN     basetier/disk/
+	-sudo cp prestier/userland/bin/TRUE.BIN      basetier/disk/
+	#...
 
 # Suspended
 # Copy the clients in another folder.
-#	-sudo cp prestier/bin/*.BIN    basetier/disk/PROGRAMS/
+#	-sudo cp prestier/userland/bin/*.BIN    basetier/disk/PROGRAMS/
 
 # Install BMPs
 #	sudo cp prestier/gws/themes/presence/*.BMP  basetier/disk/

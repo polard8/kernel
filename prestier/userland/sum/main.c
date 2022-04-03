@@ -1,6 +1,5 @@
 /*
  * sum command.
- * 
  * Sum bytes in file mod 2^16
  * unix v7 ?
  */
@@ -10,8 +9,8 @@
 #include <stdio.h>
 
 
-int main ( int argc, char *argv[] ){
-
+int main ( int argc, char *argv[] )
+{
     register FILE *f;
 
     register unsigned sum;
@@ -24,7 +23,8 @@ int main ( int argc, char *argv[] ){
     do {
     
         if(i < argc) {
-			if ((f = fopen(argv[i], "r")) == NULL) {
+			if ((f = fopen(argv[i], "a+")) == NULL) 
+			{
 				fprintf(stderr, "sum: Can't open %s\n", argv[i]);
 				errflg += 10;
 				continue;

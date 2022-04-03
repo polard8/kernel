@@ -2699,34 +2699,49 @@ int sys_sleep_if_socket_is_empty ( int fd )
 
 
 // service 377.
+// IN: Imported pointe to utsname structure.
 int sys_uname (struct utsname *ubuf)
 {
-
     debug_print("sys_uname:\n");
 
-    if ( (void *) ubuf == NULL ){
+    if ( (void *) ubuf == NULL )
+    {
         debug_print("sys_uname: ubuf\n");
         return -EINVAL;
     }
 
 // Copy
+// #todo
+// We gotta get these information from pointer,
+// not from 'defines'
+
+// ##
+// For now we're using default definitions.
+// See:
+// gramado/utsname.h
+// gramado/0config/u.h
+// gramado/0config/version.h
 
     memcpy ( 
         (void *)  ubuf->sysname, 
         (const void *) OS_NAME, 
         sizeof(OS_NAME) );
+
     memcpy ( 
         (void *)  ubuf->nodename, 
         (const void *) NODE_NAME, 
         sizeof(NODE_NAME) );
+
     memcpy ( 
         (void *)  ubuf->release, 
         (const void *) RELEASE_NAME, 
         sizeof(RELEASE_NAME) );    
+
     memcpy ( 
         (void *)  ubuf->version, 
         (const void *) VERSION_NAME, 
         sizeof(VERSION_NAME) ); 
+
     memcpy ( 
         (void *)  ubuf->machine, 
         (const void *) MACHINE_NAME, 

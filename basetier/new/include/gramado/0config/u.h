@@ -22,19 +22,22 @@
 // 
 
 /* Operating system name (e.g., "Linux") */
-#define OS_NAME       "NOTHING"
+#define OS_NAME       "Gramado Operating System"
 
 /* Name within "some implementation-defined network" */
-#define NODE_NAME     "NOTHING"
+#define NODE_NAME     "gramado-node"
+
+// See:
+// gramado/0config/version.h
 
 /* Operating system release (e.g., "2.6.28") */
-#define RELEASE_NAME VERSION_STRING
+#define RELEASE_NAME  VERSION_STRING
 
 /* Operating system version */
-#define VERSION_NAME  VERSION_STRING
+#define VERSION_NAME  RELEASE_STRING
 
  /* Hardware identifier */
-#define MACHINE_NAME "NOTHING"
+#define MACHINE_NAME "hardware-name"
 
 
 //

@@ -33,8 +33,8 @@ LIBCOBJ  = ../../../comtier/lib/rtl/obj
 
 
 #deletar this is very old
-API     = ../../../libcore/include/
-APIOBJ  = ../../../libcore/obj
+#API     = ../../../libcore/include/
+#APIOBJ  = ../../../libcore/obj
 
 #
 # Objects
@@ -46,14 +46,13 @@ unistd.o termios.o ioctl.o fcntl.o rtl.o
 
 
 
-
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 
 all-c:
 
