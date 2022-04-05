@@ -256,6 +256,8 @@ struct vid_d vidConfig;
 // Usado somente por overlapped window.
 #define METRICS_TITLEBAR_ORNAMENT_SIZE    1
 
+#define METRICS_TITLEBAR_DEFAULT_HEIGHT  32
+
 // ...
 
 // ===============================================================

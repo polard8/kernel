@@ -763,7 +763,9 @@ struct gws_window_d
 // 5
 // Borders
 
-    unsigned int border_color;
+    unsigned int border_color1;  // top/left
+    unsigned int border_color2;  // right/bottom
+
     unsigned long border_size;
     int border_style;
     int borderUsed;

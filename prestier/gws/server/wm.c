@@ -551,14 +551,13 @@ __draw_button_borders(
 
 // worker:
 // no checks
-// Draw the border of an edit box.
+// Draw the border of edit box and overlapped windows.
 void 
 __draw_window_border( 
     struct gws_window_d *parent, 
     struct gws_window_d *window )
 {
-
-    debug_print("__draw_window_border:\n");
+    //debug_print("__draw_window_border:\n");
 
     if ( (void*) parent == NULL )
         return;
@@ -567,58 +566,89 @@ __draw_window_border(
         return;
 
 
+// editbox
     if( window->type == WT_EDITBOX || 
         window->type == WT_EDITBOX_MULTIPLE_LINES )
     {
-        // board1, borda de cima e esquerda.
+        // top
         rectBackbufferDrawRectangle( 
-            window->left, window->top, 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
-
+            window->left, 
+            window->top, 
+            window->width, 
+            window->border_size, 
+            window->border_color1, 
+            TRUE, 
+            0 );
+        // left
         rectBackbufferDrawRectangle( 
-            window->left, window->top, 
-            window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
-        // board2, borda direita e baixo.
+            window->left, 
+            window->top, 
+            window->border_size, 
+            window->height, 
+            window->border_color1, 
+            TRUE, 
+            0 );
+        // right
         rectBackbufferDrawRectangle( 
-            (window->left + window->width - window->border_size), window->top,  
-            window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
+            (window->left + window->width - window->border_size), 
+            window->top,  
+            window->border_size, 
+            window->height, 
+            window->border_color2, 
+            TRUE, 
+            0 );
+        // bottom
         rectBackbufferDrawRectangle ( 
-            window->left, (window->top + window->height - window->border_size), 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
+            window->left, 
+            (window->top + window->height - window->border_size), 
+            window->width, 
+            window->border_size, 
+            window->border_color2, 
+            TRUE, 
+            0 );
     }
 
+// overlapped
     if( window->type == WT_OVERLAPPED )
     {
-        // board1, borda de cima e esquerda.
+        // top
         rectBackbufferDrawRectangle( 
-            parent->left + window->left, parent->top + window->top, 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
-
+            parent->left + window->left, 
+            parent->top  + window->top, 
+            window->width, 
+            window->border_size, 
+            window->border_color1, 
+            TRUE, 
+            0 );
+        // left
         rectBackbufferDrawRectangle( 
-            parent->left + window->left, parent->top + window->top, 
+            parent->left + window->left, 
+            parent->top + window->top, 
             window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
-        //board2, borda direita e baixo.
+            window->border_color1, 
+            TRUE,
+            0 );
+        // right
         rectBackbufferDrawRectangle( 
-            (parent->left + window->left + window->width - window->border_size), (parent->top + window->top), 
-            window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
+            (parent->left + window->left + window->width - window->border_size), 
+            (parent->top + window->top), 
+            window->border_size, 
+            window->height, 
+            window->border_color2, 
+            TRUE,
+            0 );
+        // bottom
         rectBackbufferDrawRectangle ( 
-            (parent->left + window->left), (parent->top + window->top + window->height - window->border_size), 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
+            (parent->left + window->left), 
+            (parent->top + window->top + window->height - window->border_size), 
+            window->width, 
+            window->border_size, 
+            window->border_color2, 
+            TRUE,
+            0 );
     }
 
-    debug_print("__draw_window_border: done\n");
+    //debug_print("__draw_window_border: done\n");
 }
 
 
@@ -694,16 +724,21 @@ wmCreateWindowFrame (
 
     int Type=0;
 
-// Border color.
-    unsigned long BorderSize   = (border_size & 0xFFFF);
-    unsigned int  BorderColor1 = border_color1;
-    unsigned int  BorderColor2 = border_color2;
-    unsigned int  BorderColor3 = border_color3;
-    unsigned int  BorderColor  = border_color1;
 
-// Ornament color.
+// Border size
+    unsigned long BorderSize = (border_size & 0xFFFF);
+
+// Border color
+    unsigned int BorderColor1 = border_color1;  // top/left
+    unsigned int BorderColor2 = border_color2;  // right/bottom
+    unsigned int BorderColor3 = border_color3;
+
+// Ornament color
     unsigned int OrnamentColor1 = ornament_color1;
     unsigned int OrnamentColor2 = ornament_color2;
+
+// Title bar height
+    unsigned long TitleBarHeight = METRICS_TITLEBAR_DEFAULT_HEIGHT;
 
 // Title bar color.
     unsigned int TitleBarColor = COLOR_BLUE1;   // Light blue (Um pouco fosco) 
@@ -819,49 +854,29 @@ wmCreateWindowFrame (
 
         // Se tiver o foco.
         if ( window->focus == TRUE ){
-            BorderColor = COLOR_BLUE;
-            BorderSize = 4;
-        }else{
-            BorderColor = COLOR_BLACK;  // COLOR_INACTIVEBORDER;
+            BorderColor1 = COLOR_BLUE;
+            BorderColor2 = COLOR_BLUE;
             BorderSize = 2;
+        }else{
+            BorderColor1 = COLOR_INACTIVEBORDER;
+            BorderColor2 = COLOR_INACTIVEBORDER;
+            BorderSize = 1;
         };
         
         window->border_size = 0;
         window->borderUsed = FALSE;
         if (useBorder==TRUE){
-            window->border_color = BorderColor;
-            window->border_size  = BorderSize;
-            window->borderUsed   = TRUE;
+            
+            window->border_color1 = BorderColor1;
+            window->border_color2 = BorderColor2;
+            
+            window->border_size = BorderSize;
+            window->borderUsed = TRUE;
         }
 
         // Draw the border of an edit box.
         __draw_window_border(parent,window);
 
-        /*
-        // board1, borda de cima e esquerda.
-        rectBackbufferDrawRectangle( 
-            window->left, window->top, 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
-
-        rectBackbufferDrawRectangle( 
-            window->left, window->top, 
-            window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
-        // board2, borda direita e baixo.
-        rectBackbufferDrawRectangle( 
-            (window->left + window->width - window->border_size), window->top,  
-            window->border_size, window->height, 
-            window->border_color, TRUE,0 );
-
-        rectBackbufferDrawRectangle ( 
-            window->left, (window->top + window->height - window->border_size), 
-            window->width, window->border_size, 
-            window->border_color, TRUE,0 );
-        */
-        
-        // ok
         return 0;
     }
 
@@ -898,17 +913,22 @@ wmCreateWindowFrame (
 
         // Se tiver o foco.
         if ( window->focus == TRUE ){
-            BorderColor = COLOR_BLUE1;
+            BorderColor1 = COLOR_BLUE1;
+            BorderColor2 = COLOR_BLUE1;
         }else{
-            BorderColor = COLOR_INACTIVEBORDER;
+            BorderColor1 = COLOR_INACTIVEBORDER;
+            BorderColor2 = COLOR_INACTIVEBORDER;
         };
 
         window->border_size = 0;
         window->borderUsed = FALSE;
-        if (useBorder==TRUE){
-            window->border_color = BorderColor;
-            window->border_size  = BorderSize;
-            window->borderUsed   = TRUE;
+        if (useBorder==TRUE)
+        {
+            window->border_color1 = BorderColor1;
+            window->border_color2 = BorderColor2;
+            
+            window->border_size   = BorderSize;
+            window->borderUsed    = TRUE;
         }
 
         // Quatro bordas de uma janela overlapped.
@@ -943,8 +963,8 @@ wmCreateWindowFrame (
         // #todo: Essa janela foi registrada?
         if (useTitleBar == TRUE)
         {
-            window->titlebar_height = 32;
-            window->titlebar_color = TitleBarColor; //0x00AC81
+            window->titlebar_height = TitleBarHeight;
+            window->titlebar_color  = TitleBarColor;
 
             tbWindow = (void *) xxxCreateWindow ( 
                                     WT_SIMPLE, 0, 1, 1, "TitleBar", 
@@ -1577,7 +1597,6 @@ void wm_update_desktop(void)
 // Redraw and show the root window.
     redraw_window(__root_window,TRUE);
 
-
 // ======================================
 // Redraw the whole stack of windows,
 // but do not show them yet.
@@ -1626,7 +1645,6 @@ void wm_update_desktop(void)
 // Activate
     set_focus(l);
     set_active_window(l->id);
-
 
     current_option = OPTION_NOTHING;
 
@@ -2141,7 +2159,37 @@ void __switch_window(void)
 void __switch_focus(void)
 {
 // Switch focus support.
+    struct gws_window_d *current;
     struct gws_window_d *next;
+
+// ===================================================
+// #todo
+// Antes de tudo precisamos tirar o foco da janela
+// que atualmente possui o foco, mudando tambem as cores
+// de suas bordas.
+    if( window_with_focus >= 0 &&
+        window_with_focus <= WINDOW_COUNT_MAX )
+    {
+        current = (struct gws_window_d *) windowList[window_with_focus];
+        if( (void*) current != NULL )
+        {
+            if(current->magic == 1234)
+            {
+                current->border_color1 = COLOR_INACTIVEBORDER;
+                current->border_color2 = COLOR_INACTIVEBORDER;
+                current->border_size = 2;
+                // deixa de ser a janela ativa.
+                if( current->type == WT_OVERLAPPED )
+                {
+                    active_window = 0;  // root?
+                }
+                redraw_window(current,TRUE);
+                current->focus = FALSE;
+            }
+        }
+    }
+
+// ===================================================
 
     if( window_with_focus < 0 )
     {
@@ -2208,8 +2256,13 @@ do_select:
 
 do_redraw: 
 
-// redraw
+// Change border color.
+    next->border_color1 = COLOR_BLUE;
+    next->border_color2 = COLOR_BLUE;
 
+    current->border_size = 3;
+
+// redraw
     redraw_window(next,TRUE);
 
     // Activate app window
@@ -3292,65 +3345,44 @@ redraw_window (
 // A sombra pertence à janela e ao frame.
 // A sombra é maior que a própria janela.
 // ?? Se estivermos em full screen não tem sombra ??
+//CurrentColorScheme->elements[??]
+//@todo: 
+// ?? Se tiver barra de rolagem a largura da 
+// sombra deve ser maior. ?? Não ...
+//if()
+// @todo: Adicionar a largura das bordas verticais 
+// e barra de rolagem se tiver.
+// @todo: Adicionar as larguras das 
+// bordas horizontais e da barra de títulos.
+// Cinza escuro.  CurrentColorScheme->elements[??] 
+// @TODO: criar elemento sombra no esquema. 
+// ??
+// E os outros tipos, não tem sombra ??
+// Os outros tipos devem ter escolha para sombra ou não ??
+// Flat design pode usar sombra para definir se o botão 
+// foi pressionado ou não.
 
     //gwssrv_debug_print ("redraw_window: Shadow\n");
-    if ( window->shadowUsed == 1 )
+    
+    // shadow: Not used for now.
+    if ( window->shadowUsed == TRUE )
     {
-
-		//CurrentColorScheme->elements[??]
-		
-		//@todo: 
-		// ?? Se tiver barra de rolagem a largura da 
-		// sombra deve ser maior. ?? Não ...
-		//if()
-		
-        // @todo: Adicionar a largura das bordas verticais 
-		// e barra de rolagem se tiver.
-		// @todo: Adicionar as larguras das 
-		// bordas horizontais e da barra de títulos.
-		// Cinza escuro.  CurrentColorScheme->elements[??] 
-		// @TODO: criar elemento sombra no esquema. 
-
         if ( (unsigned long) window->type == WT_OVERLAPPED )
         {
             if (window->focus == 1){ __tmp_color = xCOLOR_GRAY1; }
             if (window->focus == 0){ __tmp_color = xCOLOR_GRAY2; }
 
-            //ok funciona
-            //rectBackbufferDrawRectangle ( 
-            //    window->left +1, window->top +1, 
-            //    window->width +1 +1, window->height +1 +1, 
-            //    __tmp_color, 1, 0 ); 
-            
-            //test
-            //remeber: the first window do not have a parent.
-            //if ( (void*) window->parent == NULL ){
- 
-                //gwssrv_debug_print ("redraw_window: [Shadow] Parent"); 
-                //exit(1); 
-                rectBackbufferDrawRectangle ( 
-                    (window->left +1), (window->top +1), 
-                    (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, 1, 0 ); 
-            //}
-            
-            //if ( (void*) window->parent != NULL ){
-            //    rectBackbufferDrawRectangle ( 
-            //        (window->left +1), (window->top +1), 
-            //        (window->width +1 +1), (window->height +1 +1), 
-            //        __tmp_color, 1, 0 ); 
-            //}
+            // Shadow rectangle.
+            rectBackbufferDrawRectangle ( 
+                (window->left +1), 
+                (window->top +1), 
+                (window->width +1 +1), 
+                (window->height +1 +1), 
+                __tmp_color, 
+                1, 
+                0 ); 
         }
-
-        // ??
-        // E os outros tipos, não tem sombra ??
-        // Os outros tipos devem ter escolha para sombra ou não ??
-        // Flat design pode usar sombra para definir se o botão 
-        // foi pressionado ou não.
-
-       // ...
-    } //fim do shadow
-  
+    }
 
 // =======================
 // backgroundUsed
@@ -3362,60 +3394,28 @@ redraw_window (
 // gui->main ou relativo à janela mãe.
 
     //gwssrv_debug_print ("redraw_window: Background\n");
-    if ( window->backgroundUsed == 1 )
+
+    // background rectangle.
+    if ( window->backgroundUsed == TRUE )
     {
+        // redraw the background rectandle.
+        rectBackbufferDrawRectangle ( 
+                window->left, 
+                window->top, 
+                window->width, 
+                window->height, 
+                window->bg_color, 
+                1, 
+                0 );
 
-        //window->bg_color = COLOR_PINK;
-        //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
-
-        // O argumento 'color' será a cor do bg para alguns tipos.
-        // Talvez não deva ser assim. Talvez tenha que se respeitar o tema instalado.
-        //if ( (unsigned long) window->type == WT_SIMPLE ) { window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_POPUP )  { window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_EDITBOX) { window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_CHECKBOX){ window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_SCROLLBAR){ window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_ICON )   { window->bg_color = color; }
-        //if ( (unsigned long) window->type == WT_BUTTON ) { window->bg_color = color; }
-        // ...
-
-		// Pintar o retângulo.
-		// #todo: 
-		// ?? width Adicionar a largura da bordas bordas verticais.
-		// #todo: 
-		// ?? height Adicionar as larguras das bordas horizontais e da barra de títulos.
-
-        /*
-        if ( (unsigned long) type == WT_STATUSBAR )
+        // All done for WT_SIMPLE type.
+        if( window->type == WT_SIMPLE )
         {
-            drawDataRectangle ( window->left, window->top, 
-                window->width -1, window->height, window->bg_color ); 
-
-            grDrawString ( window->left +8, window->top +8, 
-                COLOR_TEXT, window->name ); 
             goto done;
         }
-        */
+    }
 
-        // 
-        // Draw background!
-        //
 
-            rectBackbufferDrawRectangle ( 
-                window->left, window->top, 
-                window->width, window->height, 
-                window->bg_color, 1, 0 );
-
-        // all done for this type
-        if( window->type == WT_SIMPLE ){
-            goto done;
-            //return 0;
-        }
-    
-    }  //fim do background
-    
-    
-    
 //
 // botao ==========================================
 //
@@ -3473,7 +3473,7 @@ redraw_window (
             case BS_PRESSED:
                 Selected = 1;
                 border1 = xCOLOR_GRAY1;  //GWS_COLOR_BUTTONSHADOW3;
-                border2 = COLOR_WHITE; //GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = COLOR_WHITE;   //GWS_COLOR_BUTTONHIGHLIGHT3;
                 break;
 
             case BS_HOVER:
@@ -3490,12 +3490,10 @@ redraw_window (
             case BS_DEFAULT:
             default: 
                 Selected = 0;
-                border1 = COLOR_WHITE;  //GWS_COLOR_BUTTONHIGHLIGHT3;
+                border1 = COLOR_WHITE;    //GWS_COLOR_BUTTONHIGHLIGHT3;
                 border2 = xCOLOR_GRAY1;   //GWS_COLOR_BUTTONSHADOW3;
                 break;
         };
-        
-
         
         size_t tmp_size = (size_t) strlen ( (const char *) window->name );
 
@@ -3511,7 +3509,7 @@ redraw_window (
             // as cores vao depender do etado do botao.
             // #todo: veja como foi feito na hora da criaçao do botao.
             __draw_button_borders(
-                (struct gws_window_d *)window,
+                (struct gws_window_d *) window,
                 (unsigned int) border1,        //buttonBorderColor1,
                 (unsigned int) border2,        //buttonBorderColor2,
                 (unsigned int) xCOLOR_GRAY5,   //buttonBorderColor2_light,
@@ -3594,23 +3592,34 @@ redraw_window (
                         window->type == WT_EDITBOX ||
                         window->type == WT_EDITBOX_MULTIPLE_LINES )
                     {
+                        if(window->focus == TRUE )
+                            window->border_size = 2;
+                        if(window->focus != TRUE )
+                            window->border_size = 1;
                         __draw_window_border(window->parent, window);
                     }
 
-                    // se a janela for overlapped
-                    // temos que repintar a janela de titulos.
+                    // Redraw titlebar for overlapped windows.
                     if( window->type == WT_OVERLAPPED )
                     {
                         if( (void*) window->titlebar != NULL )
                         {
                             if (window->titlebar->magic == 1234 )
                             {
-                                if( window->active == TRUE ){
+                                if( window->active == TRUE )
+                                {
                                     window->titlebar->bg_color = COLOR_BLUE1;
+                                    window->titlebar_color = COLOR_BLUE1;
+                                    
+                                    window->titlebar_ornament_color = COLOR_BLACK;
                                 }
 
-                                if( window->active == FALSE ){
+                                if( window->active == FALSE )
+                                {
                                     window->titlebar->bg_color = COLOR_GRAY;
+                                    window->titlebar_color = COLOR_GRAY;
+                                    
+                                    window->titlebar_ornament_color = COLOR_GRAY;
                                 }
 
                                 //bg
@@ -3629,7 +3638,7 @@ redraw_window (
                                     ( (window->titlebar->top) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
                                     window->titlebar->width, 
                                     METRICS_TITLEBAR_ORNAMENT_SIZE, 
-                                    COLOR_BLACK, //OrnamentColor1, 
+                                    window->titlebar_ornament_color, 
                                     TRUE,
                                     0 );  // rop_flags
                             }
