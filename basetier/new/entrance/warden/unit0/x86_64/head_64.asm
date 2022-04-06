@@ -47,7 +47,7 @@ _kernel_begin:
     cld 
     jmp START
     nop
-    DB 'GRAMADO X'
+    DB '__GRAMADO__'
 
 align 4
     %include "header.inc"
@@ -238,6 +238,10 @@ START:
     ;mov dr2, eax
     ;mov dr7, eax
     ;; ...
+
+
+
+
 
 ; Use the calling convention for this compiler.
 ; rdi

@@ -68,10 +68,9 @@ pmTrampoline:
     [BITS 32]
 Gramado_pm32:
 
-; Debug em modo texto.
-
-    ;mov byte [0B8000h], byte 'P'
-    ;jmp $
+    ; Text mode debug.
+    ; mov byte [0B8000h], byte 'P'
+    ; jmp $
 
 ;
 ; ## Inicalizando modo de boot ##
@@ -86,9 +85,6 @@ Gramado_pm32:
 ; Aqui estamos selecionando o modo '0'.
     mov byte [BOOT.modo], bl
 
-; ldt
-    ;; xor   bx, bx
-    ;; lldt  bx
 
 ;
 ; Reconfigurando registradores.
@@ -117,24 +113,12 @@ Gramado_pm32:
     mov ebx, dword 0
     mov eax, dword 0
 
-.GoToStart:
-    nop
+; LDT
+; Initialize ldt with a NULL selector.
+; Intel VT needs that.
 
-; debug message.
-
-.debug_textmode:    
-
-    nop
-    ;mov byte [0B8000h], byte 'P'
-    ;mov byte [0B8001h], byte 7
-    ;mov byte [0B8002h], byte 'M'
-    ;mov byte [0B8003h], byte 7
-    ;jmp $
-
-.debug_graphicmode:
-    
-    nop 
-    ;jmp $
+    xor ebx, ebx
+    lldt bx
 
 .do_start:
     

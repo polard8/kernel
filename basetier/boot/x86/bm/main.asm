@@ -805,32 +805,24 @@ stage2_main:
 ; == Includes ========
 ;
 
-    %include "fs/s2metafile.inc"
-    %include "s2header.inc"
-    %include "fs/s2bpb.inc"
-    %include "x86/s2gdt.inc"
+; 16bit includes.
 
-; ===============================
-; #importante
-; Foi possível passar para BL.BIN Os dados de s2vesa.inc
-; Vamos tentar passar os dados de s2config16.inc, pois esta
-; relativamente proximo.
-
-    %include "drivers/s2vesa.inc" 
-    %include "s2config16.inc" 
-; ================================
-
-; lib.
-
-    %include "x86/s2a20.inc"
-    %include "s2lib.inc"
-    %include "fs/s2fat12.inc"
-    %include "fs/s2fat16.inc"
-    %include "s2menu16.inc"
-    %include "s2modes.inc"
-    %include "s2detect.inc"
-    %include "lib16.inc"
+    %include "rm/s2metafile.inc"
+    %include "rm/s2header.inc"
+    %include "rm/s2bpb.inc"
+    %include "rm/s2gdt.inc"
+    %include "rm/s2vesa.inc" 
+    %include "rm/s2config16.inc" 
+    %include "rm/s2a20.inc"
+    %include "rm/s2lib.inc"
+    %include "rm/s2fat12.inc"
+    %include "rm/s2fat16.inc"
+    %include "rm/s2menu16.inc"
+    %include "rm/s2modes.inc"
+    %include "rm/s2detect.inc"
+    %include "rm/lib16.inc"
     ; ...
+
 
 ; ==============================================================
 ; AFTER_DATA:
@@ -1102,14 +1094,13 @@ stage2_msg_pe_sigFound:
 
 ; ===================================================
 
-;
-; Switch to protected mode.
-;
 
+; trampoline.
 ; pm
+; Switch to protected mode.
 ; Comuta para o modo protegido.
 
-    %include  "x86/pm.inc"
+    %include  "rm/pm.inc"
 
 ;--------------------------------------------------------
 ; 32 bits - (Boot Manager 32bit Asm.)
