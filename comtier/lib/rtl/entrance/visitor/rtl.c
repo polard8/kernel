@@ -1905,5 +1905,75 @@ unsigned long rtl_memory_size_in_kb(void)
 }
 
 
+// #nottested
+// Send the command lint to stdin,
+// and execute a cloned process where it's name
+// is in the first word of the cmdline string.
+int rtl_execute_cmdline( char *cmdline )
+{
+    char cmd[512];
+    char filename_buffer[12]; //8+3+1
+    char *p;
+    int ii=0;    
+
+    if( (void*) cmdline == NULL )
+        return -1;
+
+    if( *cmdline == 0 )
+        return -1;
+
+    p = cmdline;
+
+
+// copy cmdline
+    int i=0;
+    for(i=0; i<512; i++)
+    {
+        cmd[i] = cmdline[i];
+    };
+    cmd[511]=0;
+
+// Send command line.
+    rewind(stdin);
+    write(fileno(stdin), cmd, 512);
+
+
+// Grab the first word.
+    while(1)
+    {
+        if(ii>=12){
+            filename_buffer[ii] = 0;  //finalize
+            break;
+        }
+        if( *p == 0 || 
+            *p == ' ' ||
+            *p == '\t' )
+        {
+            filename_buffer[ii] = 0;  //finalize
+            break;
+        }
+        
+        // printable.
+        // Put the char into the buffer.
+        if( *p >= 0x20 && *p <= 0x7F )
+        {
+            filename_buffer[ii] = (char) *p;
+        }
+        p++;    // next char in the command line.
+        ii++;   // next byte into the filename buffer.
+    };
+
+
+// Clone and execute.
+    rtl_clone_and_execute(filename_buffer);
+
+    return 0;
+}
+
+
+
+
+
+
 
 

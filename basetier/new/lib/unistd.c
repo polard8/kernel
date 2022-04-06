@@ -95,15 +95,14 @@ long pathconf (const char *pathname, int name)
 
 
 // #todo:
+// IN: ??
 // OUT: ??
 off_t sys_lseek (int fd, off_t offset, int whence)
 {
-    file *f;    
+    file *f;
     struct process_d *p;
 
     debug_print("sys_lseek: [WORK IN PROGRESS]\n");
-
-
 
 
     if (fd<0 || fd >= 32){

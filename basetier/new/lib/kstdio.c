@@ -1003,6 +1003,9 @@ int k_ferror ( file *f )
  *     and whence is what that offset is relative to.
  */
 
+// #todo
+// IN??
+
 int k_fseek ( file *f, long offset, int whence )
 {
 
@@ -1013,6 +1016,8 @@ int k_fseek ( file *f, long offset, int whence )
 
 // #todo
 // Checar limites do offset.
+
+// #dictioonary-ptbr: whence=deonde
 
     switch (whence){
 

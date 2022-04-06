@@ -49,15 +49,21 @@
 
 #define MYGREEN 0x0b6623
 
-unsigned long savedW=0;
-unsigned long savedH=0;
+static unsigned long savedW=0;
+static unsigned long savedH=0;
+
+
+static int main_window = (-1);
+static int game_window = (-1);
 
 int game_status=0;
 
 // area de jogo
-int game_window=0;
-int game_width=0;
-int game_height=0;
+
+
+//int game_width=0;
+//int game_height=0;
+
 int player_x=0;
 int player_y=0;
 int prize_x=0;
@@ -68,10 +74,26 @@ int status_window=0;
 
 
 //
-// == prototypes =============
+// == Private functions: prototypes =============
 //
 
-int gws(void);
+static int gws(void);
+
+static int 
+gwsProcedure ( 
+    int fd,
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+static void 
+updateStatusBar(
+    int fd,
+    unsigned long w, 
+    unsigned long h, 
+    int first_number, 
+    int second_number);
 
 //====================
 
@@ -258,7 +280,8 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
 }
 
 
-void 
+// local
+static void 
 updateStatusBar(
     int fd,
     unsigned long w, 
@@ -286,7 +309,7 @@ updateStatusBar(
 // do suporte as rotinas de socket e as definiçoes.
 // tem que incluir mais coisa na lib.
 
-int gws(void)
+static int gws(void)
 {
 
 // Vamos nos concetar com o processo identificado 
@@ -355,7 +378,7 @@ int gws(void)
 
 
 // local
-int 
+static int 
 gwsProcedure ( 
     int fd,
     void *window, 
@@ -543,6 +566,12 @@ done:
 int main ( int argc, char *argv[] )
 {
 
+// Flags
+// The features activated by the command line.
+    int fSignature = FALSE;  // GWS.BIN
+    //int 
+    // ...
+
 
     //int launchChild = TRUE;
     int launchChild = FALSE;
@@ -552,38 +581,62 @@ int main ( int argc, char *argv[] )
     // ...
 
     int client_fd = -1;
-    int main_window = -1;
 
 // hello
-    gws_debug_print ("gws.bin: First client \n");
-    printf          ("gws.bin: First client \n");
+    gws_debug_print ("GWS.BIN: First client \n");
+    printf          ("GWS.BIN: First client \n");
+
+
+// #test
+// The init command line.
+// The kernel needs to put a command line is stdin
+// and the crt0.o will split it for us.
+    printf ("GWS.BIN: argc{%d} \n",argc);
+    if(argc >= 2)
+    {
+        printf ("argv[0]: %s \n",argv[0]);
+        printf ("argv[1]: %s \n",argv[1]);
+    }
+
+// Check signature.
+    if( strncmp(argv[0],"GWS.BIN",7) == 0 )
+    {
+        fSignature=TRUE;
+        printf("signature ok\n");
+    }
+
+//...
+
+    //while(1){
+    //};
 
 //
 // Interrupts
 //
 
-    //gws_debug_print ("gws.bin: Enable interrupts \n");
-    //printf          ("gws.bin: Enable interrupts \n");
-    asm ("int $199 \n");
+// The taskswithing will not work without this.
 
-// interrupts
-// Unlock the taskswitching support.
-// Unlock the scheduler embedded into the base kernel.
-// Only the init process is able to do this.
+    asm ("int $199 \n");
 
 
 //============
 // Criando um sync point e retornando o id.
 // Provisoriamente o id ficara salvo no kernel.
+
     int sync_id = sc82 (10004,0,0,0);
 
-    if(sync_id <= 0 || sync_id >= 1024){
+    if(sync_id <= 0 || sync_id >= 1024)
+    {
         printf("GWS.BIN: sync_id fail %d\n",sync_id);
         while(1){}
     }
     printf("GWS.BIN: sync_id %d\n",sync_id);
 //============
 
+// interrupts
+// Unlock the taskswitching support.
+// Unlock the scheduler embedded into the base kernel.
+// Only the init process is able to do this.
 
     //gws_debug_print ("gws.bin: Unlock taskswitching and scheduler \n");
     //printf          ("gws.bin: Unlock taskswitching and scheduler \n");
@@ -593,7 +646,7 @@ int main ( int argc, char *argv[] )
 // Create the rectangle.
     //gws_debug_print ("gws.bin: Create rectangle \n");
     //printf          ("gws.bin: Create rectangle \n");
-    gramado_system_call(897,0,0,0);
+    //gramado_system_call(897,0,0,0);
 
 //
 // hang
@@ -612,7 +665,7 @@ int main ( int argc, char *argv[] )
 // Will we stay in a loop until the connection
 // is stablished?
 
-    client_fd = gws();
+    client_fd = (int) gws();
 
     if ( client_fd < 0 ){
          gws_debug_print ("gws.bin: gws initialization fail \n");
@@ -685,11 +738,9 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-    game_width  = (w & 0xFFFF);
-    game_height = (h & 0xFFFF);
-    savedW      = (w & 0xFFFF);
-    savedH      = (h & 0xFFFF);
-
+    //  saving.
+    savedW = (w & 0xFFFF);
+    savedH = (h & 0xFFFF);
 
     //ok
     //rtl_show_heap_info();
@@ -718,12 +769,14 @@ int main ( int argc, char *argv[] )
     //gws_debug_print ("gws.bin: 1 Creating main window \n");
     //printf          ("gws.bin: Creating main window \n");
 
-    main_window = gws_create_window (client_fd,
+    main_window = gws_create_window ( 
+                      client_fd,
                       WT_SIMPLE, 1, 1, "gws-main",
                       0, 0, w, h-40,
                       0, 0, MYGREEN, MYGREEN);
 
-    if (main_window<0){
+    if (main_window<0)
+    {
         printf ("gws.bin: main_window\n");
         exit(1);
     }

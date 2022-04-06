@@ -276,6 +276,7 @@ void rtl_invalidate_screen(void);
 // Use the kernel allocator for ring 3 shared memory.
 void *shAlloc( size_t size_in_bytes );
 
+int rtl_execute_cmdline( char *cmdline );
 
 #endif
 

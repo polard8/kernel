@@ -632,7 +632,11 @@ static void compareStrings(int fd)
 
     //rtl_clone_and_execute(prompt);
     rtl_clone_and_execute(filename_buffer);
-    
+
+    // #todo #test
+    // This is a method for the whole routine above.
+    // rtl_execute_cmdline(prompt);
+
     isUsingEmbeddedShell = FALSE;
     return;
 

@@ -13,6 +13,11 @@
 // The boot loader will load the fake kernel image before
 // setting up the long mode and the paging.
 
+// The main subsystem is the window system GWSSRV.BIN.
+// The first usermode application is GWS.BIN.
+// See:
+// GWSSRV.BIN: prestier/gws/server
+// GWS.BIN:    prestier/gws/client
 
 // #bsod
 // List of errors:
@@ -194,6 +199,10 @@ static void preinit_OutputSupport(void)
 
 int kernel_main(int arch_type)
 {
+
+// Command line sent to stdin.
+// GWS.BIN will read this data.
+    char cmdline[64];
 
 // Setup debug mode.
 // Enable the usage of the serial debug.
@@ -892,9 +901,22 @@ int kernel_main(int arch_type)
                 refresh_screen();
                 asm("hlt");
             }
+            
             // Initialize the first process.
             // This is the default first client of the window server.
             // GWS.BIN.
+
+            // Setup command line.
+            if( (void*) stdin != NULL )
+            {
+                memset(cmdline, 0, 64);
+                mysprintf(cmdline,"GWS.BIN hello");
+                cmdline[63]=0;
+                //rewind. See: kstdio.c
+                k_fseek(stdin, 0, SEEK_SET);
+                file_write_buffer( stdin, cmdline, 64 );
+            }
+            
             I_x64ExecuteInitialProcess();
         }
         break;
