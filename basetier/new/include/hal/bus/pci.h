@@ -1,4 +1,6 @@
+
 // pci.h
+// pci bus support.
 
 #ifndef __PCI_H
 #define __PCI_H    1
@@ -657,26 +659,25 @@ struct pci_device_d
     unsigned char dev;   
     unsigned char func;
 
+    unsigned short Device;
+    unsigned short Vendor;
 
-	//Primeiros.
-	unsigned short Device;	
-	unsigned short Vendor;
+    unsigned short Status;
+    unsigned short Command;
 
-	unsigned short Status;	
-	unsigned short Command;
+    unsigned char classCode;
+    unsigned char subclass;
+    unsigned char progif;
+    unsigned char revisionId;
 
-	unsigned char classCode;
-	unsigned char subclass;
-	unsigned char progif;	
-	unsigned char revisionId;
+    unsigned char bist;
+    unsigned char header_type;
+    unsigned char latency_timer;
+    unsigned char cache_line_size;
 
+// BARs:
+// 32bit addresses.
 
-	unsigned char bist;
-	unsigned char header_type;
-	unsigned char latency_timer;	
-	unsigned char cache_line_size;
-
-    // Addresses. 32bit
     unsigned int BAR0;
     unsigned int BAR1;
     unsigned int BAR2;
@@ -684,55 +685,59 @@ struct pci_device_d
     unsigned int BAR4;
     unsigned int BAR5;
 
+// Sub-system vendor id.
+// Sub-system device id.
 
-	//Sub-system vendor id
-	//sub-system device id	
-	unsigned short subsystem_Vendor;
-	unsigned short subsystem_Device;
+    unsigned short subsystem_Vendor;
+    unsigned short subsystem_Device;
 
-	//Últimos.
+    unsigned char max_latency;
+    unsigned char min_grant;
+    unsigned char irq_pin;     //??
+    unsigned char irq_line;    //Qual IRQ será usada pelo PIC.
 
-	unsigned char max_latency;
-	unsigned char min_grant;
-	unsigned char irq_pin;     //??
-    unsigned char irq_line;    //Qual IRQ será usada pelo PIC.	
-	
-    //continua ...
-
-    //estrutura para o driver do dispositivo.
+// Driver
+// Estrutura para o driver do dispositivo.
     struct pci_driver_d *driver;
-    
-    struct pci_device_d *next;
+
+// ...
+
+
+// A list of threads waiting on this device.
+    struct thread_d *waiting_list;
+
+    struct pci_device_d  *next;
 };
 
 struct pci_device_d  *pci_device;
 struct pci_device_d  *current_pci_device;    //Current.
 //...
 
-
-//
 // PCI structure.
 // Estrutura para gerenciar a interface pci.
 // apenas uma instância dessa estrutura deve existir.
 
 struct pci_d
 {
-    int devicesFound;    //Número de dispositivos encontrados.
-    int max;
-    struct pci_device_d  *deviceList;
+
+// Number of found devices.
+    unsigned int found_devices;
+
+// Max
+    unsigned int max;
+
+// List?
+    struct pci_device_d  *device_list;
 };
-struct pci_d  *Pci;   // #todo: Use PCI
 
+struct pci_d  PCI;
 
+// PCI device list.
 
-//
-// Lista as estruturas de dispositivos pci.
-//
-
-//#define PCI_DEVICE_LIST_SIZE    32
-#define PCI_DEVICE_LIST_SIZE    128
+#define PCI_DEVICE_LIST_SIZE  128
 
 unsigned long pcideviceList[PCI_DEVICE_LIST_SIZE];   
+
 
 //
 // DRIVER.
@@ -743,19 +748,20 @@ unsigned long pcideviceList[PCI_DEVICE_LIST_SIZE];
  *     Estrutura para drivers de dispositivos pci.     
  */
 
-typedef struct pci_driver_d pci_driver_t;
+//typedef struct pci_driver_d pci_driver_t;
 struct pci_driver_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
 
-    int id;    //id do driver de dispositivo pci.
     int used;
     int magic;
 
+// Driver ID.
+    int id;
 
-	//status do driver de dispositivo.
-	//Initialized, ... @todo: Criar enum. pci_device_status_t;
+//status do driver de dispositivo.
+//Initialized, ... @todo: Criar enum. pci_device_status_t;
 	//int status;
 	
 	//Nome do driver do dispositivo PCI.
@@ -782,22 +788,23 @@ struct pci_driver_d
 	//unsigned long io_buffer_address2;
 	//unsigned long io_buffer_address3;
 	//unsigned long io_buffer_address4;
-	
-	//Estrutura do dispositivo pci gerenciado pelo driver.
-	struct pci_device_d *pci_device;
+
+// Estrutura do dispositivo pci gerenciado pelo driver.
+    struct pci_device_d  *pci_device;
 
     // ...
 
-    //struct pci_driver_d *next;
+    struct pci_driver_d  *next;
 };
 
-// List?
-struct pci_driver_d  *PciDrivers;
+// Lists?
+//struct pci_driver_d  *pci_drivers_list;
 //...
-
 
 //Lista de drivers de dispositivos pci.
 //unsigned long pcidriversList[32];
+
+
 
 /*
  * The PCI interface treats multi-function devices as independent
@@ -857,7 +864,6 @@ pciGetBAR (
     unsigned char slot, 
     int number );
 
-
 unsigned char 
 pciGetClassCode (unsigned char bus, unsigned char slot);
 
@@ -885,9 +891,6 @@ unsigned short
 pciCheckVendor (unsigned char bus, unsigned char slot);
 
 int init_pci (void);
-
-// ====
-
 int pci_setup_devices (void);
 
 struct pci_device_d *scan_pci_device_list ( 

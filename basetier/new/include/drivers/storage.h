@@ -64,13 +64,13 @@ struct storage_d
     file *__file;
 };
 
-// Essa será a estrutura usada para saber informações sobre o 
-// sistema de arquivos atual e gerenciar o sistema de arquivos atual.
-// See: I_init in x64init.c
 
-struct storage_d *storage;
-//struct storage_d *CurrentStorage;
-// ...
+// Main structure for managing the storage information.
+// See: 
+// I_init() in x64init.c
+
+struct storage_d  *storage;
+
 
 // prototypes
 

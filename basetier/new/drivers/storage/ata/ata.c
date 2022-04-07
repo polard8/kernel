@@ -3,7 +3,7 @@
 // ata handshake.
 // write command and read status.
 // Created by Nelson Cole.
-
+// A lot of changes by Fred Nora.
 
 #include <kernel.h>  
 
@@ -16,17 +16,28 @@
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
 
+//
+// == Private functions: prototypes ==============
+//
 
-// == prototypes ==================================
 
-// Local
-void __local_io_delay (void);
-
+static void __local_io_delay (void);
+static void __ata_pio_read ( void *buffer, int bytes );
+static void __ata_pio_write ( void *buffer, int bytes );
+static unsigned char __ata_config_structure(char nport);
+static void __set_ata_addr (int channel);
 
 // =======================================================
 
+static void __local_io_delay (void)
+{
+    asm ("xorl %%eax, %%eax" ::);
+    asm ("outb %%al, $0x80"  ::);
+    return;
+}
+
 // low level worker
-void __ata_pio_read ( void *buffer, int bytes )
+static void __ata_pio_read ( void *buffer, int bytes )
 {
 
 // #todo:
@@ -40,7 +51,7 @@ void __ata_pio_read ( void *buffer, int bytes )
 }
 
 // low level worker
-void __ata_pio_write ( void *buffer, int bytes )
+static void __ata_pio_write ( void *buffer, int bytes )
 {
 
 // #todo:
@@ -53,8 +64,7 @@ void __ata_pio_write ( void *buffer, int bytes )
         "c"(bytes/2) );
 }
 
-
-
+// Global
 void ata_wait (int val)
 {
     if ( val <= 100 )
@@ -70,13 +80,7 @@ void ata_wait (int val)
 }
 
 
-void __local_io_delay (void)
-{
-    asm ("xorl %%eax, %%eax" ::);
-    asm ("outb %%al, $0x80"  ::);
-    return;
-}
-
+// Global
 // Forces a 400 ns delay.
 // Waste some time.
 void ata_delay (void)
@@ -175,7 +179,8 @@ unsigned char ata_wait_not_busy (void)
 }
 
 
-void set_ata_addr (int channel)
+// local worker
+static void __set_ata_addr (int channel)
 {
 
 // #todo
@@ -205,15 +210,16 @@ void set_ata_addr (int channel)
 }
 
 
-// __ata_assert_dever:
+// local
+// __ata_config_structure:
 // Set up the ata.xxx structure.
 // #todo: Where is that structure defined?
-// See: hal/dev/blkdev/ata.h
+// See: ata.h
 // De acordo com a porta, saberemos se é 
 // primary ou secondary e se é
 // master ou slave.
 
-unsigned char __ata_assert_dever (char nport)
+static unsigned char __ata_config_structure (char nport)
 {
 
 // todo
@@ -248,8 +254,8 @@ unsigned char __ata_assert_dever (char nport)
         break;
     };
 
-
-    set_ata_addr (ata.channel);
+    // local worker.
+    __set_ata_addr (ata.channel);
 
     return 0;
 }
@@ -531,10 +537,10 @@ int ata_initialize ( int ataflag )
 
         // Vamos trabalhar na lista de dispositivos.
         // Iniciando a lista.
-        // storage_device_d structure.
+        // ata_device_d structure.
 
         ready_queue_dev = 
-            ( struct storage_device_d * ) kmalloc ( sizeof( struct storage_device_d) );
+            ( struct ata_device_d * ) kmalloc ( sizeof(struct ata_device_d) );
 
         if ( (void*) ready_queue_dev == NULL ){
             printf("ata_initialize: ready_queue_dev\n");
@@ -551,7 +557,7 @@ int ata_initialize ( int ataflag )
         // There is a loop to reinitialize the
         // structure of each of all ports.
 
-        current_sd = ( struct storage_device_d * ) ready_queue_dev;
+        current_sd = ( struct ata_device_d * ) ready_queue_dev;
         current_sd->dev_id   = __next_sd_id++;
         current_sd->dev_type = -1;
         // Channel and device.
@@ -684,7 +690,7 @@ int ide_identify_device ( uint8_t nport )
 // Rever esse assert. 
 // Precisamos de uma mensagem de erro aqui.
 
-    __ata_assert_dever(nport);
+    __ata_config_structure(nport);
 
 // ??
 // Ponto flutuante
@@ -1223,7 +1229,7 @@ fail:
 
 int ide_dev_init (char port)
 {
-    struct storage_device_d  *new_dev;
+    struct ata_device_d  *new_dev;
 
     int isBootTimeIDEPort=FALSE;
 
@@ -1287,7 +1293,7 @@ int ide_dev_init (char port)
 
 // See: ata.h
 
-    new_dev = ( struct storage_device_d * ) kmalloc( sizeof( struct storage_device_d) );
+    new_dev = ( struct ata_device_d * ) kmalloc( sizeof(struct ata_device_d) );
 
     if ( (void *) new_dev ==  NULL )
     {
@@ -1571,7 +1577,7 @@ int ide_dev_init (char port)
             if( ____boot____disk->magic == 1234 )
             {
                 ____boot____disk->storage_device = 
-                    (struct storage_device_d *) new_dev;
+                    (struct ata_device_d *) new_dev;
                 
                 new_dev->disk = (struct disk_d *) ____boot____disk;
                 
@@ -1625,9 +1631,9 @@ int ide_dev_init (char port)
 //
 // Add no fim da lista (ready_queue_dev).
 //
-    struct storage_device_d  *tmp;
+    struct ata_device_d  *tmp;
 
-    tmp = ( struct storage_device_d * ) ready_queue_dev;
+    tmp = ( struct ata_device_d * ) ready_queue_dev;
     if ( (void *) tmp ==  NULL )
     {
         printf ("ide_dev_init: [FAIL] tmp\n");
@@ -1657,13 +1663,13 @@ fail:
 
 void ata_show_device_list_info(void)
 {
-    struct storage_device_d *sd;
+    struct ata_device_d *sd;
 
     unsigned long mb28=0;
     unsigned long mb48=0;
 
 // The head of the list
-    sd = (struct storage_device_d *) ready_queue_dev;
+    sd = (struct ata_device_d *) ready_queue_dev;
     
     while ( (void *) sd != NULL ){
 
@@ -1697,7 +1703,7 @@ void ata_show_device_list_info(void)
     printf("LBA28 {%d MB} LBA48{%d MB}\n",
         mb28, mb48 );
 
-    sd = (struct storage_device_d *) sd->next;
+    sd = (struct ata_device_d *) sd->next;
 
     };
 }
@@ -1841,7 +1847,7 @@ void show_ide_info (void)
 	// Estrutura 'atapi'
 	// Qual lista ??
 
-	// Estrutura 'storage_device_d'
+	// Estrutura 'ata_device_d'
 	// Estão na lista 'ready_queue_dev'	
 
     //refresh_screen ();

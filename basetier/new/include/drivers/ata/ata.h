@@ -295,7 +295,7 @@ struct ata_d
     uint32_t ahci_base_address;
 
 //#todo
-    //struct storage_device_d devs[4];
+    //struct ata_device_d devs[4];
 };
 
 // Not a pointer.
@@ -303,12 +303,17 @@ struct ata_d  ata;
 
 
 /*
- * storage_device_d
+ * ata_device_d
  * storage device.
  * É uma estrutura para dispositivos de armazenamento.
  */
 
-struct storage_device_d
+// #todo
+// Change to ata_device_d
+// Do jeito que esta, nos da a impressao errada de que 
+// todos os dispositivos de armazenamento sao do tipo ata.
+
+struct ata_device_d
 {
     unsigned long dev_id;
 
@@ -352,14 +357,17 @@ struct storage_device_d
 
     struct disk_d *disk;
 
-    struct storage_device_d *next;
+// A list of threads waiting on this device.
+    struct thread_d *waiting_list;
+
+    struct ata_device_d  *next;
 };
 
 // Current storage device.
-struct storage_device_d *current_sd;
+struct ata_device_d *current_sd;
 
 // List for storage devices.
-struct storage_device_d *ready_queue_dev;
+struct ata_device_d *ready_queue_dev;
 
 
 //======================================================
@@ -458,15 +466,6 @@ unsigned char ata_wait_not_busy (void);
 
 void ata_wait (int val);
 void ata_delay (void);
-
-void set_ata_addr (int channel);
-
-// worker
-unsigned char __ata_assert_dever (char nport);
-
-// low level workers.
-void __ata_pio_read ( void *buffer, int bytes );
-void __ata_pio_write ( void *buffer, int bytes );
 
 inline void atapi_pio_read ( void *buffer, uint32_t bytes );
 
@@ -567,23 +566,14 @@ ataDialog (
     unsigned long long2 );
 
 uint32_t diskPCIScanDevice ( int class );
-
-
 int atapciConfigurationSpace ( struct pci_device_d *D );
-
-
 unsigned char ata_wait_irq (void);
 int disk_ata_wait_irq (void);
-
 int ide_identify_device ( uint8_t nport );
 int ide_dev_init (char port);
-
-
 static inline void dev_switch (void);
 static inline int getnport_dev (void);
-
 int nport_ajust ( char nport );
-
 void show_ide_info (void);
 
 #endif    

@@ -1,5 +1,6 @@
 
-
+// plib.c
+// Process library.
 
 #include <kernel.h>
 
@@ -19,22 +20,19 @@
 
 void show_process_information (void)
 {
-    // loop
-    int i=0;
     struct process_d *p;
+    int i=0;
 
     printf ("show_process_information: \n");
 
     for ( i=0; i<PROCESS_COUNT_MAX; i++ )
     {
-
         p = (void *) processList[i];
 
         if ( (void *) p != NULL && 
-                      p->used  == TRUE && 
-                      p->magic == 1234 )
-        { 
-
+             p->used  == TRUE && 
+             p->magic == 1234 )
+        {
             //printf("\n");
             printf("\n=====================================\n");
             printf(">>[%s]\n", p->__processname);
@@ -44,8 +42,13 @@ void show_process_information (void)
                 p->Image, p->ImageSize );
             printf("heap-base  =%x heap-size  =%d \n", 
                 p->HeapStart,  p->HeapSize );
-            printf("stack-base =%x stack-size =%d \n", 
-                p->StackStart, p->StackSize );
+            
+            
+            // #bugbug: It's very wrong!
+            // See: create_process() in process.c
+            //
+            //printf("stack-base =%x stack-size =%d \n", 
+            //    p->StackStart, p->StackSize );
 
             //printf("dir-pa=%x dir-va=%x \n", 
             //    p->DirectoryPA, p->DirectoryVA );

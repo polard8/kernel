@@ -1,5 +1,6 @@
 
 // tlib.c
+// Thread library.
 
 #include <kernel.h>
 
