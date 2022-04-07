@@ -282,7 +282,7 @@ struct disk_d
 // See:
 // ata.h
 
-    struct ata_device_d *storage_device;
+    struct ata_device_d  *ata_device;
 
 //#todo
 //volume list.

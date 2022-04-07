@@ -21,8 +21,9 @@
 // __write_sequential_sectors
 
 
+// global worker.
 // #todo
-// Chenage the return value:
+// Change the return value:
 // Use TRUE or FALSE.
 
 int
@@ -50,8 +51,8 @@ __load_sequential_sectors (
     return 0;
 }
 
+
 /*
- ***********************
  * fatClustToSect:
  *     Calcula qual é o setor inicial de um dado cluster.
  *     Informações para o calculo: 
@@ -78,23 +79,19 @@ fatClustToSect (
 
 
 /*
- *****************************************************************
  * read_lba:
  *     Carrega um um setor na memória, dado o LBA.
  *     Obs: 
  *     Talvez essa rotina tenha que ter algum retorno no caso de falhas. 
  */
-
 // #bugbug
 // Essa rotina e' independente do sistema de arquivos.
 // Change name to dest_buffer
-
 // #bugbug
 // Disk info?
 // Qual é o disco?
 // Qual é a porta IDE?
 // ...
-
 // #todo
 // use 'buffer_va'.
 
@@ -166,8 +163,8 @@ fatLoadCluster (
     };
 }
 
+
 /*
- ****************************************
  * fs_load_fat:
  *    Carrega a fat na memória.
  *    Sistema de arquivos fat16.
@@ -175,9 +172,7 @@ fatLoadCluster (
  *    ? qual volume ? 
  *    #obs: Essa rotina poderia carregar a fat do volume atual do 
  * disco atual. É só checar na estrutura.
- *
  * current disk, current volume, fat status.
- *
  * + Se o status da fat para o vulume atual indicar que 
  * ela já está carregada, então não precisamos carregar novamente.
  */
@@ -259,15 +254,13 @@ fs_load_metafile (
         SizeInSectors );
 }
 
+
 /*
- ****************************** 
  * fs_load_rootdir:
  * 
  */
-
 // Carrega o diretório raiz.
 // address, lba, number of sectors.
-
 // #todo
 // Precisamos de uma estrutura com as informações sobre
 // o diretório raiz atual.
@@ -302,14 +295,4 @@ fs_load_rootdir(
 //
 // End.
 //
-
-
-
-
-
-
-
-
-
-
 

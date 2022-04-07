@@ -65,19 +65,17 @@ diskWritePCIConfigAddr (
     int data )
 {
     out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
-
     out32 ( PCI_PORT_DATA, data );
 }
 
+
 /*
- ********************************************
  * diskPCIScanDevice:
  *     Busca um dispositivo de acordo com a classe.  
  *     Esta função deve retornar uma varia'vel contendo: 
  *     + O número de barramento, 
  *     + o dispositivo e  
  *     + a função.
- *
  * IN: Class.
  * OUT: data.
  *      -1 = error (#bugbug, pois o tipo de retorno eh unsigned int)
@@ -89,22 +87,17 @@ uint32_t diskPCIScanDevice ( int class )
     int dev=0;
     int fun=0;
 
-
-	// #bugbug 
-	// Usando -1 para unsigned int. 
+// #bugbug 
+// Usando -1 para unsigned int. 
 
     uint32_t data = -1;
 
-#ifdef KERNEL_VERBOSE
-    printf ("diskPCIScanDevice:\n");
-    refresh_screen ();
-#endif
+//#ifdef KERNEL_VERBOSE
+    //printf ("diskPCIScanDevice:\n");
+    //refresh_screen ();
+//#endif
 
-
-	//
-	// Probe.
-	//
-
+// Probe.
 
     for ( bus=0; bus < 256; bus++ )
     {
@@ -119,29 +112,28 @@ uint32_t diskPCIScanDevice ( int class )
                 if ( ( data >> 24 & 0xff ) == class )
                 {
 
-#ifdef KERNEL_VERBOSE
-                    printf ("Detected PCI device: %s \n", 
-                        pci_classes[class] );
-#endif 
+//#ifdef KERNEL_VERBOSE
+//                    printf ("Detected PCI device: %s \n", 
+//                        pci_classes[class] );
+//#endif 
                     // Done !
 
                     return (uint32_t) ( fun + (dev*8) + (bus*32) );
                 }
-
             };
         };
     };
 
+
 // Fail
     printf ("diskPCIScanDevice: PCI device NOT detected\n");
 
-	//#bugbug
-	//isso e' lento
-	//refresh_screen();
+//#bugbug
+//isso e' lento
+    //refresh_screen();
 
     return (uint32_t) (-1);
 }
-
 
 
 /*

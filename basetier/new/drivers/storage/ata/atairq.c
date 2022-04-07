@@ -3,17 +3,31 @@
 #include <kernel.h>  
 
 
+static int ata_irq_invoked = FALSE;
 
-static unsigned long ata_irq_invoked = 0; 
+//
+// == Private functions: Prototypes ======================
+//
 
+static int disk_get_ata_irq_invoked (void);
+static void disk_reset_ata_irq_invoked (void);
+
+// ========================================================
 
 //local
-int disk_get_ata_irq_invoked (void);
-void disk_reset_ata_irq_invoked (void);
+static int disk_get_ata_irq_invoked (void)
+{
+    return (int) ata_irq_invoked;
+}
+
+//local
+static void disk_reset_ata_irq_invoked (void)
+{
+    ata_irq_invoked = FALSE;
+}
 
 
-
-
+// global
 void DeviceInterface_PrimaryIDE(void)
 {
     // Se o ata1 não estiver inicializado !
@@ -30,6 +44,7 @@ void DeviceInterface_PrimaryIDE(void)
     ata_irq_invoked = TRUE;
 }
 
+// global
 void DeviceInterface_SecondaryIDE(void)
 {
     // Se o ata2 não estiver inicializado !
@@ -46,32 +61,20 @@ void DeviceInterface_SecondaryIDE(void)
     ata_irq_invoked = TRUE;
 }
 
-
-
+// global
 __VOID_IRQ 
 irq14_PRIMARY_IDE (void)
 {
     debug_print("irq14_PRIMARY_IDE:\n");
 }
 
+// global
 __VOID_IRQ 
 irq15_SECONDARY_IDE (void)
 {
     debug_print("irq15_SECONDARY_IDE:\n");
-}    
-
-
-//local
-int disk_get_ata_irq_invoked (void)
-{
-    return (int) ata_irq_invoked;
 }
 
-//local
-void disk_reset_ata_irq_invoked (void)
-{
-    ata_irq_invoked = 0;
-}
 
 /*
  * ata_wait_irq:
@@ -85,7 +88,7 @@ void disk_reset_ata_irq_invoked (void)
 unsigned char ata_wait_irq (void)
 {
     unsigned long tmp = 0x10000;
-    unsigned char data;
+    unsigned char data=0;
 
 
     while (!ata_irq_invoked)
@@ -94,7 +97,7 @@ unsigned char ata_wait_irq (void)
 
         if ( (data & ATA_SR_ERR) )
         {
-            ata_irq_invoked = 0;
+            ata_irq_invoked = FALSE;
 
             // #bugbug: 
             // Returning -1 on unsigned char.
@@ -103,21 +106,19 @@ unsigned char ata_wait_irq (void)
         }
 
         // ns
-        if (--tmp)
-        { 
-            ata_wait (400);
+        if (--tmp){ 
+            ata_wait(400);
         }else{
-
-            ata_irq_invoked = 0;
+            ata_irq_invoked = FALSE;
             return 0x80;
         };
 
     };
 
-    ata_irq_invoked = 0;
-
+    ata_irq_invoked = FALSE;
     return 0;
 }
+
 
 /*
  * disk_ata_wait_irq:
@@ -135,8 +136,7 @@ unsigned char ata_wait_irq (void)
 int disk_ata_wait_irq (void)
 {
     unsigned long tmp = 0x10000;
-    unsigned char data;
-
+    unsigned char data=0;
 
     while (!ata_irq_invoked)
     {
@@ -145,50 +145,25 @@ int disk_ata_wait_irq (void)
         if ( (data & ATA_SR_ERR) )
         {
             // ok por status do controlador.
-            ata_irq_invoked = 0;
+            ata_irq_invoked = FALSE;
             
             return (int) -1;
         }
 
-
         //ns
-        if (tmp--)
-        {
-            ata_wait (400);
-        
+        if (tmp--){
+            ata_wait(400);
         }else{
 
             //ok por tempo esperado.
-            ata_irq_invoked = 0;
+            ata_irq_invoked = FALSE;
 
             return (int) 0x80;
         };
     };
 
 // ok por status da interrupção.
-
-    ata_irq_invoked = 0;
-
+    ata_irq_invoked = FALSE;
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

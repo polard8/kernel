@@ -1,18 +1,16 @@
 
+// disk_w.c
+
 
 #include <kernel.h>
 
 /*
- *************************************************
  * write_lba:
  *     Grava um setor no disco dado o endereço do buffer e o lba. 
  */
-
-
 // #bugbug
 // Essa rotina e' independente do sistema de arquivos.
-
-//int write_lba ( unsigned long address, unsigned long lba ) 
+// #todo: use 'int' return.
 
 void write_lba ( unsigned long address, unsigned long lba )
 {
@@ -68,13 +66,6 @@ fail:
  *   spc     ~ Número de setores por cluster.
  */
 
-	//Começa do primeiro setor do cluster.
-
-//int fatWriteCluster ( unsigned long sector, 
-//                      unsigned long address, 
-//                      int spc )
-
-
 // #todo
 // Return 'int'.
 
@@ -104,6 +95,7 @@ fatWriteCluster (
 
     //return 0;  //#todo
 }
+
 
 // Save fat into the disk.
 int 
@@ -185,8 +177,8 @@ fs_save_fat (
     return 0;
 }
 
+
 /*
- ***************************************************
  * fs_save_rootdir:
  *     Salva o diretório raiz no disco.
  *     @todo: Identificar parâmetros do sistema de arquivos atual. 
@@ -274,19 +266,8 @@ fs_save_rootdir (
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//
+// End
+//
 
 

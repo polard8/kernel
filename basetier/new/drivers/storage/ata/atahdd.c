@@ -1,5 +1,6 @@
 
 // atahdd.c
+// Low level routines for ata devices.
 
 #include <kernel.h>  
 
@@ -446,9 +447,8 @@ again:
 
 
 /*
- *****************************************
  * ataReadSector:
- * 
+ * IN:
  * buffer - buffer
  * lba - lba
  * reserved1 - null
@@ -526,9 +526,8 @@ ataReadSector (
 
 
 /*
- *************************************
  * ataWriteSector:
- * 
+ * IN: 
  * buffer - buffer
  * lba - lba
  * reserved1 - null

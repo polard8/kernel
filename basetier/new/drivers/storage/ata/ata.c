@@ -1569,14 +1569,18 @@ int ide_dev_init (char port)
 // So we're gonna save the pointer
 // into the boot disk structure.
 
-    new_dev->boottime_device = FALSE;  // Not a boottime device.
+// Not a boottime device.
+    new_dev->boottime_device = FALSE;
 
     if (isBootTimeIDEPort == TRUE )
     {
-        if( (void*) ____boot____disk != NULL ){
-            if( ____boot____disk->magic == 1234 )
+        if ( (void*) ____boot____disk != NULL )
+        {
+            if ( ____boot____disk->magic == 1234 )
             {
-                ____boot____disk->storage_device = 
+                // ??
+                // Only for ATA devices.
+                ____boot____disk->ata_device = 
                     (struct ata_device_d *) new_dev;
                 
                 new_dev->disk = (struct disk_d *) ____boot____disk;
