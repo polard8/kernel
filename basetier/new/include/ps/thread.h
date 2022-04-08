@@ -1041,6 +1041,12 @@ void kill_all_threads (void);
 
 // ==
 
+// The spawn routine need to make a eoi.
+void spawn_set_eoi_state(void);
+// The spawn routine do not need to make a eoi.
+void spawn_reset_eoi_state(void);
+
+
 void 
 spawn_enter_usermode( 
     int eoi, 

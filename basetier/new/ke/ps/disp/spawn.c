@@ -3,6 +3,40 @@
 #include <kernel.h>  
 
 
+static int __spawn_eoi_is_necessary = FALSE;
+
+
+//
+// == private functions: prototypes =======
+//
+
+static int __spawn_is_eoi_needed(void);
+
+//=====================
+
+
+// global
+// used by the taskswitching
+void spawn_set_eoi_state(void)
+{
+    __spawn_eoi_is_necessary = TRUE;
+}
+
+// global
+// used by the taskswitching
+
+void spawn_reset_eoi_state(void)
+{
+    __spawn_eoi_is_necessary = FALSE;
+}
+
+// local
+static int __spawn_is_eoi_needed(void)
+{
+    return (int) __spawn_eoi_is_necessary;
+}
+
+
 // local
 void __spawn_load_pml4_table(unsigned long phy_addr)
 {
@@ -215,6 +249,18 @@ void spawn_thread (int tid)
 // #todo
 // Configurar a stackframe para saltar para
 // qualquer ring.
+
+// #todo
+// Precisamos de uma flag que nos diga que estamos
+// lançando uma thread durante uma interrupçao de timer (pit)
+// para efetuarmos o 'EOI' propriamente.
+
+    int eoi_is_needed = __spawn_is_eoi_needed();
+
+    // #test #debug
+    if ( eoi_is_needed != TRUE ){
+        panic("spawn_thread: eoi_is_needed != TRUE\n");
+    }
 
     if ( target_thread->iopl == RING0 )
     {

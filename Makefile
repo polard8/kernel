@@ -137,6 +137,11 @@ base-tier:
 # Copy to the target folder.
 	sudo cp basetier/new/KERNEL.BIN  basetier/disk/GRAMADO
 
+# Install BMPs
+	sudo cp basetier/data/themes/field/*.BMP  basetier/disk/
+#...
+
+
 #2
 communication-tier:
 	@echo ":: Building libraries and network server."
@@ -194,11 +199,6 @@ presentation-tier:
 # Suspended
 # Copy the clients in another folder.
 #	-sudo cp prestier/userland/bin/*.BIN    basetier/disk/PROGRAMS/
-
-# Install BMPs
-#	sudo cp prestier/gws/themes/presence/*.BMP  basetier/disk/
-	sudo cp prestier/gws/themes/field/*.BMP  basetier/disk/
-#...
 
 #===================================================
 #::2

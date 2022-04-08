@@ -64,29 +64,29 @@ Bits         Usage
 
 
 //Status do módulo.
-int timerStatus;
+//int timerStatus;
 
 //Contador de ticks.
 //unsigned long timerTicks;
 
 //??  
-int timerColor;
+//int timerColor;
 
 //??
-unsigned long timerLine;
+//unsigned long timerLine;
 
 //??
-unsigned long timerIdleState;
+//unsigned long timerIdleState;
 
 //??
-int timerLock;
+//int timerLock;
 
 //??
-int timerError;
+//int timerError;
 
+// #deprecated
 // Text cursor
-
-int timerShowTextCursor;  
+static int timerShowTextCursor = FALSE;
 
 
 //??
@@ -111,9 +111,28 @@ irq0_TIMER (void)
 // Calling the timer routine.
 // See: pic.h
     DeviceInterface_PIT();
+
 // Calling the taskswitching routine.
 // See: ps/disp/ts.c
+// #todo #bugbug
+// nesse momento pode acontecer que teremos que
+// efetuar spawn de uma thread que esta em standby,
+// O nosso contexto ja estara salvo quando formos efetuar
+// o spawn, mas precisamos avisar a rotina de spawn
+// que precisamos realizar o EOI pois estamos num handler de pit.
+
+
+// The spawn routine need to make a eoi.
+// Tell the spawn routine that we need a eoi.
+// In the case of spawning a new thread.
+    spawn_set_eoi_state();
+
     psTaskSwitch();
+
+// The spawn routine do not need to make a eoi.
+// Tell the spawn routine that we do not need a eoi anymore.
+// The assembly routine will do that for us.
+    spawn_reset_eoi_state();
 }
 
 
