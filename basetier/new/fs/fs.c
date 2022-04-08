@@ -1943,8 +1943,10 @@ fsLoadFile (
 // Precisamos usar as estruturas de diretorio e 
 // as estruturas de buffer.
     
-    FileSize = (unsigned long) fsGetFileSize ( (unsigned char *) file_name, (unsigned long)dir_address );
-    
+    FileSize = (unsigned long) fsGetFileSize( 
+                   (unsigned char *) file_name, 
+                   (unsigned long)dir_address );
+
     if (FileSize==0)
     {
         debug_print ("fsLoadFile: [FIXME] FileSize\n");
@@ -2077,8 +2079,6 @@ __found:
 // Aliás, qual é o volume?
 
 //loadFAT:
-
-// 128?
 // 246?
 
     fs_load_fat(
@@ -2688,6 +2688,7 @@ int fs_initialize_process_cwd ( int pid, char *string )
  * fs_load_path:
  *     Carrega nesse endereço o arquivo que está nesse path.
  *     ??: O endereço pode ser ring3?
+ *     n levels.
  */
 
 // IN:
@@ -2743,7 +2744,6 @@ fs_load_path (
     char buffer[12];
     unsigned char *p;
 
-
     // Onde carregaremos o diretório.
     void *__src_buffer;
     void *__dst_buffer;
@@ -2751,7 +2751,6 @@ fs_load_path (
 
 
 // Path
-
     if ( (void*) path == NULL ){
         panic ("fs_load_path: path\n"); 
     }
@@ -2760,13 +2759,11 @@ fs_load_path (
     }
 
 // Address
-
     if (address == 0){
         panic ("fs_load_path: address\n");
     }
 
 // Buffer size
-
     if (buffer_size == 0){
         panic ("fs_load_path: buffer_size\n");
     }
@@ -2782,7 +2779,7 @@ fs_load_path (
     if (n_levels==0){
         panic ("fs_load_path: n_levels\n");
     }
-    
+
     // #debug
     printf ("fs_load_path: path with %d levels\n",n_levels);
     
@@ -2797,6 +2794,8 @@ fs_load_path (
 
     // Primeiro src =  root address;
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
+    
+    // 512 entradas de 32bytes.
     unsigned long limits = (512*32);
 
 
@@ -2812,7 +2811,6 @@ fs_load_path (
 
     for (l=0; l<n_levels; l++)
     {
-        printf ("\n");
         printf ("[LEVEL %d]\n",l);
 
         // The level needs to start with '/', even the first one.
@@ -2826,17 +2824,18 @@ fs_load_path (
         // Walk 13 chars in the same level.
         for ( i=0; i<12; i++ )
         {
-            // #debug Show the char.
-            printf ("%c", (char) *p);
-
             // Copia o char para o buffer até que o char seja '/'
             // indicando inicio do próximo nível.
             // E se não houver próximo nível?
+            // #debug Show the char.
 
             buffer[i] = (char) *p;
 
+            printf ("%c", (char) *p);
+
             // + O ponto deve aparecer no último nível.
             // caso contrário falhou
+            // + Precisa ter extensao por enquanto.
             // + Se o ponto está além do limite permitido.
             // + Se o ponto for antes do nono byte. OK.
 
@@ -2846,39 +2845,66 @@ fs_load_path (
                     panic ("fs_load_path: '.' found into a subdirectory\n");
                 }
 
-                //if (i>7){
-                if (i>=7){
-                    printf ("fs_load_path: '.' fail.\n");
-                    panic ("Name size bigger than 8.\n");
+                // #bugbug
+                // We can't start a filename with a dot.
+                if (i == 0){
+                    panic ("fs_load_path: [fail] Filename starting with a dot.\n");
+                }
+
+                // #bugbug
+                // igual a 8 eh normal, maior que 8 eh problema
+                if (i > 8){
+                    panic ("fs_load_path: Filename bigger than 8.\n");
                 }
 
                 // O ponto foi encontrado dentro do range permitido.
-                if (i<8)
+
+                // Nome tem no máximo 8 chars.
+                // Completamos com espaço, pois queremos o formato:
+                // "FILE    123"
+                if( i<=7 )
                 {
-                     // Nome tem no máximo 8 chars.
-                     // Completamos com espaço, pois queremos o formato:
-                     // "FILE    123"
-                     while (i<=7){ buffer[i] = ' '; i++; };
-
-                     // Skip the dot '.'.
-                     // Yes it is a dot. See the IF statement above.
-                     p++;
-
-                     // Add the extension.
-                     i=8;  // [8] [9] [10]
-                     while (i<11)
-                     {
-                         buffer[i] = (char) *p;
-                         i++;
-                         p++;
-                     } 
-                       
-                     // Finalize the string.
-                     buffer[11] = 0;
-                     
-                     printf ("\n");
-                     printf ("fs_load_path: This is the name {%s}\n",buffer);   
+                    while (i<=7){ 
+                        buffer[i] = ' '; 
+                        i++; 
+                    };
                 }
+                
+                if( i == 7 )
+                    i=8;
+                
+                // Skip the dot '.'.
+                // Yes it is a dot. See the IF statement above.
+                p++;
+                
+                if( i != 8 ){
+                    panic("fs_load_path: Extension base fail\n");
+                }
+
+                // Add the extension.
+                //i=8;  // [8] [9] [10]
+                while (i<11)
+                {
+                    if( *p == 0 ){ break; }
+                    
+                    buffer[i] = (char) *p;
+                    i++;
+                    p++;
+                };
+                
+                //se o break funcionou.
+                if(i<11){
+                    while(i<11){
+                        buffer[i] = ' ';  // 0 or ' '?
+                        i++;
+                    };
+                }
+                
+                // Finalize the string.
+                buffer[11] = 0;
+                     
+                printf ("\n");
+                printf ("fs_load_path: This is the name {%s}\n",buffer); 
 
 
                 //

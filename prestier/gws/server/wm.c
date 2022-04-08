@@ -1140,6 +1140,7 @@ void wm_flush_rectangle(struct gws_rect_d *rect)
 }
 
 
+// Check validation
 void wm_flush_window(struct gws_window_d *window)
 {
     if( (void*) window == NULL )
@@ -1267,36 +1268,49 @@ void wmRefreshDirtyRectangles(void)
 // But it is just a test.
 
 
+// =======================
 // #test
 
     //int UpdateScreenFlag=FALSE;
     int UpdateScreenFlag=TRUE;
 
-    if(UpdateScreenFlag == TRUE)
+    if (UpdateScreenFlag != TRUE){
+        return;
+    }
+
+// Refresh
+// Lookup the main window list.
+// #todo: This is very slow. We need a linked list.
+
+    for (i=0; i<WINDOW_COUNT_MAX; ++i)
     {
-        // Lookup the main window list.
+        // Get next
+        tmp = (struct gws_window_d  *) windowList[i];
 
-        for (i=0; i<WINDOW_COUNT_MAX; ++i)
+        // It is a valid window and
+        // it is a dirty window.
+        // Flush the window's rectangle.
+
+        if ( (void*) tmp != NULL )
         {
-            tmp = (struct gws_window_d  *) windowList[i];
-
-            if ( (void*) tmp != NULL )
+            if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
-                // It is a valid window and
-                // it is a dirty window.
-                // Flush the window's rectangle.
-                if ( tmp->used == TRUE && 
-                     tmp->magic == 1234 )
+                if ( tmp->dirty == TRUE )
                 {
-                    if ( tmp->dirty == TRUE )
-                    {
-                        wm_flush_window(tmp);
-                        validate_window(tmp);
-                    }
+                    //Wrappers
+                    //wm_flush_window(tmp);       //checking parameters
+                    //gws_show_window_rect(tmp);  //checking parameters and invalidate.
+
+                    // Direct, no checks.
+                    gws_refresh_rectangle ( 
+                        tmp->left, tmp->top, tmp->width, tmp->height ); 
+
+                    validate_window(tmp);
                 }
             }
-        };
-    }
+        }
+    };
+
 // =======================
 }
 

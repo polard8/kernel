@@ -4,15 +4,11 @@
 #include <kernel.h>  
 
 /*
- **********************************************************************
  * search_in_dir:
- * 
  *    Procura por um arquivo, dado o endereço do diretório, 
  * com o diretório já carregado na memória.
- *
  *   file_name: Nome do arquivo.
  *     address: Endereço na memória onde o diretório está.
- *
  * #todo: 
  *    Atender à especificações do sistemas de arquivos, como:
  *    +Tamanho do cluster
@@ -235,8 +231,8 @@ int search_in_root ( const char *file_name )
     return (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
 }
 
+
 /*
- ***************************************************************
  * fs_find_n_empty_entries:
  *     Encontrar uma quantidade específica de entradas na fat.
  *     Pois um arquivo demanda uma ou várias entradas, 
@@ -291,6 +287,7 @@ done:
 fail:
     return (unsigned short) 0;
 }
+
 
 /*
  * findEmptyDirectoryEntry:

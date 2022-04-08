@@ -46,6 +46,12 @@ static int saved_y=0;
 
 
 //
+// == Private functions: Prototypes ======================
+//
+
+static void __test_path(void);
+
+//
 // == prototypes ===============================
 //
 
@@ -58,6 +64,68 @@ void csi_L (int nr, int console_number);
 
 
 // =======================
+
+static void __test_path(void)
+{
+    int status = -1;
+
+    //unsigned long tmp_size = (512*4096);    // 512*4096 = 2MB
+    void *b; //= (void *) allocPages ( 512 );
+
+// ===================================
+// #test: 
+// Testando carregar usando path.
+
+// Valid shapes
+    //char PathAddress[] = "/GRAMADO/TEST.BMP";
+    //char PathAddress[] = "/GRAMADO/TEST.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/TEST.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/TEST2.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/TEST3.TXT";
+    char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/$$$$$$$$.TXT";
+
+// Invalid shapes
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678T.XT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1234567.8TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1234  78.TXT";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.1";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.12";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.123";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.C";
+    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.CPP";
+    
+// =========================================
+
+// (32*4096) bytes
+
+    unsigned long BufferSize = (32*4096);
+
+    b = (void *) allocPages(32); 
+
+    if( (void*) b == NULL )
+    {
+        printf("b fail\n");
+        return;
+    }
+
+    // IN: path, address, buffer size in bytes.
+    status = (int) fs_load_path ( 
+                       (const char*) PathAddress, 
+                       (unsigned long) b,
+                       (unsigned long) BufferSize ); 
+    if(status<0){
+        printf("__test_path: fs_load_path fail\n");
+        return;
+    }
+
+    if( (void*)b != NULL )
+        printf("OUTPUT:{%s}\n",b);
+}
+
+
 
 void __local_ri (void)
 {
@@ -1286,40 +1354,6 @@ void __test_thread(void)
     }
 
     //show_slots();
-}
-
-
-void __test_path(void)
-{
-    int status = -1;
-
-    //unsigned long tmp_size = (512*4096);    // 512*4096 = 2MB
-    void *b; //= (void *) allocPages ( 512 );
-
-// ===================================
-// #test: Testando carregar usando path.
-    //char PathAddress[] = "/GRAMADO/TEST.BMP";
-    //char PathAddress[] = "/GRAMADO/TEST.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/TEST2.TXT";
-    char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/TEST3.TXT";
-// =========================================
-
-    b = (void *) allocPages(32);   //32 KB
-    if( (void*) b == NULL ){
-        printf("b fail\n");
-        return;
-    }
-
-    status = (int) fs_load_path ( 
-                       (const char*) PathAddress, 
-                       (unsigned long) b,
-                       (unsigned long) 32*4096 );  //32KB
-    if(status<0){
-        printf("fail\n");
-        return;
-    }
-
-    printf("Data:{%s}\n",b);
 }
 
 

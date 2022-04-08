@@ -926,6 +926,14 @@ wmProcedure (
             // Exibir a surface do console.
             case VK_F1:
                 if (ctrl_status == TRUE){
+                    // control + shift + F1
+                    // Full ps2 initialization and launch the app.
+                    if( shift_status == TRUE){
+                        PS2_initialization();
+                        __launch_app_via_initprocess(4001);
+                        return 0;
+                    }
+                    // Only launch the app.
                     __launch_app_via_initprocess(4001);
                     return 0;
                 }

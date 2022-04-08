@@ -50,11 +50,14 @@ void __display_mouse_cursor(void)
 //#dangerdanger
 //#todo: show the backbuffer
 // APAGA
-    gws_refresh_rectangle( 
-        __old_mouse_x, 
-        __old_mouse_y,
-        8,
-        8 );
+
+    // So apagaremos se houve algum movimento.
+    //if( __old_mouse_x != __new_mouse_x ||
+    //    __old_mouse_y != __new_mouse_y )
+    //{
+        gws_refresh_rectangle( 
+            __old_mouse_x, __old_mouse_y, 8, 8 );
+    //}
 
 // save
     __old_mouse_x = __new_mouse_x;
@@ -95,8 +98,8 @@ void compose(void)
     if (Dirty == TRUE)
     {
         gws_show_backbuffer();
-        __display_mouse_cursor();
         validate_background();  
+        __display_mouse_cursor();
         return;
     }
 
@@ -117,11 +120,11 @@ void compose(void)
 
     //__update_fps();
 
-
 // mouse
     __display_mouse_cursor();
 
 // Validate the frame.
+    validate_background();
     validate();
 }
 
