@@ -3793,7 +3793,14 @@ static int on_execute(void)
     // #debug
     //printf ("gwssrv: [3] listen()\n");
 
-    listen (server_fd,5);
+// #bugbug
+// Isso afeta a velocidade do sistema,
+// pois com uma lista muito grande de clientes
+// o servidor vai perder muito tempo no accept();
+// Pois nosso accept() ainda eh pouco eficiente.
+
+    //listen (server_fd,32);
+    listen (server_fd,4);
 
     // #debug
     //printf ("fd: %d\n", serverClient->fd);
@@ -3999,6 +4006,8 @@ static int on_execute(void)
 
 // + Accept connection from a client.
 // + Call the dispatcher to porcess the message.
+// See:
+// https://man7.org/linux/man-pages/man2/accept.2.html
 
     gwssrv_debug_print ("gwssrv: Entering main loop.\n");
 

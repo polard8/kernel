@@ -76,6 +76,10 @@
 #define	EILSEQ		42	/* Illegal byte sequence */
 
 
+// The server can't accept the connection.
+//   Connection refused (POSIX.1-2001).
+#define ECONNREFUSED  61
+
 
 
 //?? Isso provavelmente foi definido dentro da libc.

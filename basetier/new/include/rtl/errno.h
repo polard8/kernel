@@ -81,6 +81,12 @@
 #define	EILSEQ		42	/* Illegal byte sequence */
 
 
+// The server can't accept the connection.
+//   Connection refused (POSIX.1-2001).
+#define ECONNREFUSED  61
+
+
+
 // Não sei se essa variável é usada também aqui dentro do kernel.
 // extern int errno;
 

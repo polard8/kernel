@@ -70,6 +70,8 @@ struct socket_d *create_socket_object(void)
 
     s->conn = (struct socket_d *) 0;
 
+// The counter.
+    s->connections_count = 0;
 
     //int i=0;
     for(i=0; i<32; i++){
@@ -1593,30 +1595,24 @@ fail:
 
 
 /*
- ************************************** 
  * sys_connect:
  *     Connecting to a server given an address.
  */
-
 // connect() is used on the client side, and 
 // assigns a free local port number to a socket. 
 // In case of a TCP socket, it causes an attempt 
 // to establish a new TCP connection.
-
 // connect.
 // Em nosso exemplo o cliente quer se conectar com o servidor.
 // Conectando a um servidor dado um endereço.
 // O endereço pode vir em formatos diferentes dependendo
 // do domínio indicado na estrutura.
-
 // #atenção
 // O servidor poderá estar conectado a vários clientes,
 // mas estará ouvindo a apenas um por vez. Ou precisaremos 
 // de instâncias.
-
 // #todo
 // O socket do cliente precisa ter um fd no processo servidor.
-
 // #??
 // connect() eh chamado uma vez pelo cliente quando
 // ele inicializa. Essa chamada fornece o fd do cliente.
@@ -1628,7 +1624,14 @@ fail:
 // Entao podemoriamos deixar as conexoes pendentes e selecionarmos
 // somete uma a cada accept. 
 // O write ira falhar se nao estiver conectado?
-
+/*
+ The backlog argument defines the maximum length to which the queue of
+ pending connections for sockfd may grow.  If a connection request
+ arrives when the queue is full, the client may receive an error with
+ an indication of ECONNREFUSED or, if the underlying protocol supports
+ retransmission, the request may be ignored so that a later reattempt
+ at connection succeed.
+*/
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 
@@ -2151,6 +2154,10 @@ __OK_new_slot:
 // e nao na estrutura de processo, dessa forma
 // o servidor pode ter mais de uma socket.
 
+    //server_socket->connections_count++;
+    //if(server_socket->connections_count >= server_socket->backlog_max )
+    //    return ECONNREFUSED;
+
 // circula
     server_socket->backlog_tail++;
     if( server_socket->backlog_tail >= server_socket->backlog_max )
@@ -2284,30 +2291,26 @@ sys_getsockname (
     return -1;
 }
 
+
 /*
- ************************** 
  * sys_listen:
  * 
  */
-
 // See:
 // https://man7.org/linux/man-pages/man2/listen.2.html
-
 /*
  The backlog argument defines the maximum length to which the queue of
  pending connections for sockfd may grow.  If a connection request
  arrives when the queue is full, the client may receive an error with
  an indication of ECONNREFUSED or, if the underlying protocol supports
  retransmission, the request may be ignored so that a later reattempt
- at connection succeed
+ at connection succeed.
 */
-
 // listen() is used on the server side, and 
 // causes a bound TCP socket to enter listening state.
-
 // IN:
 // sockfd  = The fd of the server's socket.
-// backlog = The server tell us the the 'size of the list'.
+// backlog = The server indicates the 'size of the list'.
 
 int sys_listen (int sockfd, int backlog) 
 {
@@ -2323,7 +2326,9 @@ int sys_listen (int sockfd, int backlog)
     //printf      ("sys_listen: [TODO] fd=%d backlog=%d\n",
         //sockfd, backlog);
 
-// sockfd  = The fd of the server's socket.
+// sockfd: 
+// The fd of the server's socket.
+
     if ( sockfd < 0 || sockfd >= NUMBER_OF_FILES )
     {
         debug_print ("sys_listen: [FAIL] fd\n");
@@ -2331,29 +2336,20 @@ int sys_listen (int sockfd, int backlog)
         return (int) (-EINVAL);
     }
 
-// backlog = The server tell us the the 'size of the list'.
+// backlog:
+// The server tell us the the 'size of the list'.
 
 // Wrong n. Ajusting to default.
-    if( backlog <= 0 )
-    { 
-        debug_print ("sys_listen: [FIXME] backlog fail\n");
+    if( backlog <= 0 ){ 
         n=1; 
     }
 
-// #hackhack
-// We need to do something
-    if( backlog > SOCKET_MAX_PENDING_CONNECTIONS )
-    { 
-        debug_print ("sys_listen: [ERROR] backlog overflow\n");
-        panic       ("sys_listen: [ERROR] backlog overflow\n");
-    }
+// It can't be bigger than the size of the array.
+// #todo: Use SOCKET_MAX_PENDING_CONNECTIONS
 
-// #hackhack
-// We need to do something
-    if( backlog > 8 )
-    { 
-        debug_print ("sys_listen: [FIXME] backlog too long\n");
-        n=1; 
+    if( backlog >= 32 )
+    {
+        backlog=31;
     }
 
 
@@ -2399,10 +2395,10 @@ int sys_listen (int sockfd, int backlog)
 
 // Is it a socket object?
 
-    int __is = -1;
+    int IsSocket = -1;
 
-    __is = is_socket ((file *)f);
-    if(__is != TRUE)
+    IsSocket = (int) is_socket((file *)f);
+    if(IsSocket != TRUE)
     {
         debug_print ("sys_listen: f is not a socket\n");
         printf      ("sys_listen: f is not a socket\n");
@@ -2425,6 +2421,12 @@ int sys_listen (int sockfd, int backlog)
         debug_print ("sys_listen: s fail\n");
         printf      ("sys_listen: s fail\n");
         goto fail;
+    }
+
+
+    if( f->socket != p->priv )
+    {
+        panic("sys_listen: [TEST] f->socket != p->priv\n");
     }
 
 // updating the socket structure.

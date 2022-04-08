@@ -540,6 +540,9 @@ struct socket_d
 // The list of pending connections.
 // Updated by listen().
 
+
+    int connections_count;
+
     int backlog_max;
     int backlog_head;
     int backlog_tail;

@@ -2392,11 +2392,26 @@ int main ( int argc, char *argv[] )
 
     //printf ("terminal: Connecting to ws via inet ...\n");
 
+    int con_status = -1;
+
     while (1){
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
-            debug_print ("terminal: Connection Failed \n"); 
-            printf      ("terminal: Connection Failed \n"); 
-        }else{ break; };
+
+        con_status = (int) connect(client_fd, (void *) &addr_in, sizeof(addr_in));
+
+        if ( con_status < 0 ){ 
+            
+            // Nesse caso a conexao pode ter sido recusada 
+            // porque o servidor tem clentes demais.
+            // Vamos esperar para sempre?
+            if( con_status == ECONNREFUSED )
+                rtl_yield();
+
+            debug_print ("terminal: Connection Failed \n");
+            printf      ("terminal: Connection Failed \n");
+
+        }else{ 
+            break; 
+        };
     };
 
 // Windows: it's global now.
