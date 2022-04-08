@@ -541,8 +541,13 @@ struct socket_d
 // Updated by listen().
 
     int backlog_max;
-    int backlog_pos;
-    int pending_connections[32];
+    int backlog_head;
+    int backlog_tail;
+    unsigned long pending_connections[32];  //list of sockets.
+
+// Em que posiçao o ponteiro do socket de cliente esta
+// dentro da fila de conecxoes pendentes no socket do servidor.
+    int client_backlog_pos;
 
 // It indicates that this socket is currently
 // accepting new connections.

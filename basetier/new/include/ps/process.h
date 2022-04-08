@@ -860,18 +860,6 @@ struct process_d
 // See: rtl/net/gdef.h
 // See: rtl/net/socket.h
 
-    unsigned long socket_pending_list[SOCKET_MAX_PENDING_CONNECTIONS];
-
-    int socket_pending_list_head;
-    int socket_pending_list_tail;
-
-// listen() will setup this thing.
-// nao pode ser mais que 32. que eh o tamanho do array
-// SOCKET_MAX_PENDING_CONNECTIONS is the limit for this.
-    int socket_pending_list_max;    
-
-//========================================
-
 // Motivo do processo fechar.
     int exit_code;
 

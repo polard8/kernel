@@ -70,12 +70,15 @@ struct socket_d *create_socket_object(void)
 
     s->conn = (struct socket_d *) 0;
 
-    s->backlog_max = 1;
-    s->backlog_pos = 0;
-    for(i=0; i<32; i++)
-    {
+
+    //int i=0;
+    for(i=0; i<32; i++){
         s->pending_connections[i]=0;
     };
+    s->backlog_head = 0;   //sai
+    s->backlog_tail = 0;   //entra
+    s->backlog_max = 4;
+
 
 // Not yet.
 // listen() will set this flag.
@@ -1082,6 +1085,9 @@ sys_accept (
     int fdServer = -1;
     int fdClient = -1;
 
+// Iterator for the pending connections queue.
+    int i=0;
+
     // #debug
     // debug_print ("sys_accept:\n");
 
@@ -1318,9 +1324,28 @@ sys_accept (
         // Nesse momento pegamos o primeiro da lista de conexões pendentes.
         // Mas desejamos ter uma lista de conexões pendentes e 
         // nesse momento pegaremos um da lista seguindo uma ordem.
-        
-        cSocket = (struct socket_d *) sProcess->socket_pending_list[0];
 
+        // circula
+        
+        sSocket->backlog_head++;
+        if( sSocket->backlog_head >= sSocket->backlog_max )
+            sSocket->backlog_head=0;
+        i=sSocket->backlog_head;
+        
+        if( i<0 || i >= sSocket->backlog_max ){
+            panic("sys_accept: i is out of limits.\n");
+        }
+        
+        while( i <= sSocket->backlog_max )
+        {
+            // Get pointer.
+            cSocket = (struct socket_d *) sSocket->pending_connections[i];
+            if( (void*) cSocket != NULL )
+                break;
+            // next
+            i++;
+        };
+        
         // Not valid Client socket
         if ( (void*) cSocket == NULL )
         {
@@ -1644,6 +1669,10 @@ sys_connect (
     struct sockaddr_in *addr_in;
 
     int Verbose=FALSE;
+
+// Iterator used in the pending connections queue.
+    int i=0;
+
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -2068,7 +2097,7 @@ __OK_new_slot:
 // no processo servidor.
 
     //sProcess->Objects[__slot] = (unsigned long) f;  // no que encontramos
-    sProcess->Objects[31]     = (unsigned long) f;  // no 31.
+    sProcess->Objects[31] = (unsigned long) f;  // no 31.
 
 //
 // == Connecting! ======================================
@@ -2122,14 +2151,23 @@ __OK_new_slot:
 // e nao na estrutura de processo, dessa forma
 // o servidor pode ter mais de uma socket.
 
-    sProcess->socket_pending_list[0] = (unsigned long) client_socket;
+// circula
+    server_socket->backlog_tail++;
+    if( server_socket->backlog_tail >= server_socket->backlog_max )
+        server_socket->backlog_tail = 0;
+    i=server_socket->backlog_tail;
 
+// coloca na fila.
+    server_socket->pending_connections[i] = (unsigned long) client_socket;
+
+// Em que posiçao estamos na fila.
+    client_socket->client_backlog_pos = i;
 
 // #
 // O cliente está esperando que sua conexão seja aceita pelo servidor.
 
     // #debug
-    debug_print("sys_connect: Pending connection\n");
+    //debug_print("sys_connect: Pending connection\n");
 
     // #debug
     //if (Verbose==TRUE){
@@ -2345,12 +2383,6 @@ int sys_listen (int sockfd, int backlog)
         goto fail;
     }
 
-// #todo
-// updating the process structure.
-
-    //p->socket_pending_list_head
-    //p->socket_pending_list_tail
-    //p->socket_pending_list_max = backlog;
 
 // file 
 // sender's file
@@ -2725,7 +2757,6 @@ int sys_socket ( int family, int type, int protocol )
     __socket->pid = (pid_t) current_process;
     __socket->uid = (uid_t) current_user;
     __socket->gid = (gid_t) current_group;
-
 
 //
 // Create socket file.

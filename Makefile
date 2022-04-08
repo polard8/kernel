@@ -7,7 +7,7 @@ EDITION_NAME  = ?todo
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 3
-VERSION_BUILD = 282
+VERSION_BUILD = 283
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
@@ -242,7 +242,11 @@ vhd-unmount:
 # This is gonna copy th image into the real HD.
 # My host is running on sdb and i copy the image into sda.
 # It is because the sda is in primary master IDE.
-danger-hdd-clone-vhd:
+danger-hdd-clone-vhd: danger-install-sda
+
+# Gramado has been tested on sda
+# and the Fred's Linux host machine is on sdb.
+danger-install-sda:
 	sudo dd if=./GRAMADO.VHD of=/dev/sda
 #	sudo dd if=./GRAMADO.VHD of=/dev/sdb
 

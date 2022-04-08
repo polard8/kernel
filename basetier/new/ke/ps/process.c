@@ -895,26 +895,6 @@ void ps_initialize_process_common_elements( struct process_d *p )
 // ==============
 
 //
-// == Socket ===================================
-//
-
-// loop
-// pending connections;
-// Lista de conexoes pendentes do processo servidor.
-
-    for ( 
-        i=0; 
-        i < SOCKET_MAX_PENDING_CONNECTIONS; 
-        ++i )
-    {
-        p->socket_pending_list[i] = 0; 
-    };
-
-    p->socket_pending_list_head = 0;
-    p->socket_pending_list_tail = 0;
-    p->socket_pending_list_max  = 0;  // atualizado pelo listen();
-
-//
 // tty support
 //
 
@@ -2121,21 +2101,6 @@ struct process_d *create_and_initialize_process_object(void)
 //#todo
 //#debug: print stack info.
 
-//
-// Socket ============
-//
-
-// #todo:
-// Maybe we need to save this index in some place.
-
-    for (i=0; i<32; ++i)
-    {
-        new_process->socket_pending_list[i] = 0; 
-    };
-
-    new_process->socket_pending_list_head = 0;
-    new_process->socket_pending_list_tail = 0;
-    new_process->socket_pending_list_max  = 0; //atualizado pelo listen();
 
 // #todo: Explain it better.
     new_process->Image = (unsigned long) CONTROLTHREAD_BASE;  // 0x200000 
