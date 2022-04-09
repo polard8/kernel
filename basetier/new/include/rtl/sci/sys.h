@@ -31,8 +31,8 @@ void *sys_create_thread (
     char *name );
 
 
-int sys_read (unsigned int fd, char *ubuf, int count);
-int sys_write (unsigned int fd, char *ubuf, int count);
+ssize_t sys_read  (int fd, char *ubuf, size_t count);
+ssize_t sys_write (int fd, char *ubuf, size_t count);
 
 int file_read_buffer ( file *f, char *buffer, int len );
 int file_write_buffer ( file *f, char *string, int len );

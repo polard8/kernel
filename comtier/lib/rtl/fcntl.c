@@ -6,6 +6,7 @@
 
 #include <types.h>
 #include <sys/types.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
@@ -13,7 +14,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/file.h>
-
 #include <stdio.h>
 #include <rtl/gramado.h>
 
@@ -38,11 +38,12 @@
 
 int fcntl ( int fd, int cmd, ... )
 {
-    int Ret = -1;
+    int value = -1;
 
-    if (fd<0) {
-        debug_print("fcntl: fd\n");
-        return -1;
+    if (fd<0)
+    {
+        errno = EBADF;
+        return (int)(-1);
     }
 
 //++
@@ -50,23 +51,22 @@ int fcntl ( int fd, int cmd, ... )
     va_start(ap, cmd);
     unsigned arg = va_arg(ap,int);
 
-    Ret = (int) sc82 ( 
+    value = (int) sc82 ( 
                     8001,
                     (unsigned long) fd,
                     (unsigned long) cmd,
                     (unsigned long) arg );
 
     va_end(ap);
-//--    
+//--
 
-    // #todo Error.
-    if (Ret < 0)
+    if (value < 0)
     {
-        //errno = (-Ret);
-        return (-1);
+        errno = (-value);
+        return (int) (-1);
     }
 
-    return (int) (Ret);
+    return (int) (value);
 }
 
 
@@ -75,36 +75,38 @@ int fcntl ( int fd, int cmd, ... )
 
 int openat (int dirfd, const char *pathname, int flags)
 {
-    int __ret = -1;
+    int value = -1;
 
-    // The directory
-    if ( dirfd < 0 ){ 
-        debug_print("openat: [FAIL] dirfd\n");
-        return -1; 
+// fd
+// The directory
+    if ( dirfd < 0 )
+    { 
+        errno = EBADF;
+        return (int) (-1);
     }
-    
-    // path
-    if (!pathname) {
-        debug_print("openat: [FAIL] pathname\n");
-        //errno = EFAULT;
-        return -1;
+
+// path
+    if ( (void *) pathname == NULL )
+    {
+        errno = EINVAL;
+        return (int) (-1);
     }
-    
+
     // Carrega um arquivo dado o nome e um modo.
 
-    __ret = (int) gramado_system_call ( 
+    value = (int) gramado_system_call ( 
                       246, 
                       (unsigned long) dirfd, 
                       (unsigned long) pathname, 
                       (unsigned long) flags ); 
 
-    if ( __ret < 0 ){ 
-        debug_print("openat: [FAIL]\n");
-        //errno = EFAULT;
-        return -1; 
+    if ( value < 0 )
+    {
+        errno = (-value);
+        return (int) (-1);
     }
 
-    return (int) __ret;
+    return (int) value;
 }
 
 
@@ -120,8 +122,8 @@ int openat (int dirfd, const char *pathname, int flags)
 
 int open (const char *pathname, int flags, mode_t mode)
 {
+    int value = -1;
     char tmp_path[64];
-    int fd = -1;
     size_t StringSize=0;
 
 
@@ -170,19 +172,21 @@ int open (const char *pathname, int flags, mode_t mode)
 // O fd é retornado para que possamos ler usando read();
 // IN: service, pathname, flags, mode 
 
-    fd = (int) gramado_system_call ( 
+    value = (int) gramado_system_call ( 
                    16,  
                    (unsigned long) tmp_path, 
                    (unsigned long) flags, 
                    (unsigned long) mode );
 
-    if (fd < 0){
-        printf ("open: [FAIL]\n");
+    if (value < 0)
+    {
+        errno = (-value);
         return (int) (-1);
     }
 
+// return fd.
 // fopen() needs this. 
-    return (int) fd;
+    return (int) value;
 }
 
 
@@ -214,9 +218,12 @@ int __open2(const char* path, int options, ...)
 
 int creat (const char *pathname, mode_t mode)
 {
-    //if( (void*) pathname == NULL )
-        //return -1;
-
+    if( (void*) pathname == NULL )
+    {
+        errno = EINVAL;
+        return (int) (-1);
+    }
+    
     return (int) open(pathname, O_CREAT|O_WRONLY|O_TRUNC, mode);
 }
 
@@ -241,9 +248,7 @@ int flock(int fd, int mode)
 
 
 /*
- ********************
  * flock:
- * 
  * 
  */
  
@@ -253,6 +258,13 @@ int flock(int fd, int mode)
 int flock (int fd, int operation)
 {
     debug_print("flock: [TODO]\n");
+
+    if(fd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
+    }
+
     return -1;
 }
 

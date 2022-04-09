@@ -8,6 +8,7 @@
 
 
 #include <sys/types.h>  
+#include <errno.h>
 #include <sys/socket.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -36,13 +37,14 @@
 // ...
 
 
-    //
-    // Error.
-    //
+//
+// Error.
+//
 
+// Global thing. Don't use 'static'.
 // Number of last error.
 // Maybe errno.c is a better place for this. 
-int errno = 0;
+int errno=0;
 
 
 // The <unistd.h> header shall declare 
@@ -180,35 +182,45 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
 }
 
 
-
 /*
- ********************************
  * read:
  *     Standard read() function.
  */
-
 // Usam a lista de arquivos abertos do processo.
 
 ssize_t read (int fd, const void *buf, size_t count)
 {
-    //int res = -1;
-    
+    ssize_t value = (-1);
+
     if (fd<0){
-        debug_print ("read: fd\n");
-        //errno = EBADF;  // #todo: Bad file descriptor.
-        return -1;
+        errno = EBADF;
+        return (ssize_t) (-1);
     }
 
-    if( (void*) buf == NULL )
-        return -1;
-    
-    
-    // Nothing to read.
-    if ( count <= 0 )
-    {
-        printf ("read: [FAIL] count\n");
-        return -1;
+    if ( (void *) buf == NULL ){
+        errno = EINVAL;
+        return (ssize_t) (-1);
     }
+
+    if (count <= 0){
+        errno = EINVAL;
+        return (ssize_t) (-1);
+    }
+
+// Read the data.
+    value = (ssize_t) sc82 ( 
+              (unsigned long) 18, 
+              (unsigned long) fd,
+              (unsigned long) buf, 
+              (unsigned long) count );
+
+    if( value < 0 )
+    {
+        errno = (-value);
+        return (ssize_t) -1;
+    }
+
+    return (ssize_t) value;
 
 // #todo
 // Maybe we need to call another layer, not the kernel service.
@@ -221,49 +233,50 @@ ssize_t read (int fd, const void *buf, size_t count)
     
     //rtl_enter_critical_section();
     //rtl_exit_critical_section();
-
-// Read the data.
-
-    return (ssize_t) sc82 ( 
-              (unsigned long) 18, 
-              (unsigned long) fd,
-              (unsigned long) buf, 
-              (unsigned long) count );
 }
 
 
 /*
- ********************************************
  * write: 
  *     Standard write() function. 
  */
-
 // Usam a lista de arquivos abertos do processo. 
 
 ssize_t write (int fd, const void *buf, size_t count)
 {
-    int res = -1;
-    
+    ssize_t value = -1;
+
     if (fd<0){
-        debug_print ("write: fd\n");
-        return -1;
+        errno = EBADF;
+        return (ssize_t) (-1);
     }
 
-    if( (void*) buf == NULL )
-        return -1;
-    
-    
-    // Nothing to write.
-    if ( count <= 0 )
+    if( (void*) buf == NULL ){
+        errno = EINVAL;
+        return (ssize_t) (-1);
+    }
+
+    if (count <= 0){
+        errno = EINVAL;
+        return (ssize_t) (-1);
+    }
+
+    value = (ssize_t) sc82 ( 
+        (unsigned long) 19, 
+        (unsigned long) fd,
+        (unsigned long) buf, 
+        (unsigned long) count ); 
+
+    if( value < 0 )
     {
-        debug_print ("write: [FAIL] count\n");
-        printf      ("write: [FAIL] count\n");
-        return -1;
+        errno = (-value);
+        return (ssize_t) (-1);
     }
 
+    return (ssize_t) value;
 
-    // #todo
-    // Maybe we need to call another layer, not the kernel service.
+// #todo
+// Maybe we need to call another layer, not the kernel service.
 
     //return (ssize_t) gramado_system_call ( 19, 
     //                     (unsigned long) fd,
@@ -274,12 +287,6 @@ ssize_t write (int fd, const void *buf, size_t count)
     //rtl_exit_critical_section();
 
     // debug_print ("write: Calling sc82\n");
-
-    return (ssize_t) sc82 ( 
-        (unsigned long) 19, 
-        (unsigned long) fd,
-        (unsigned long) buf, 
-        (unsigned long) count ); 
 }
 
 
@@ -287,14 +294,24 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 {
     debug_print ("pread: [TODO]\n");
 
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("pread: fd\n");
+        errno = EBADF;
         return -1;
     }
 
     if( (void*) buf == NULL )
+    {
+        errno = EINVAL;
         return -1;
-    
+    }
+
+    if( count <= 0 )
+    {
+        errno = EINVAL;
+        return -1;
+    }
 
     return -1;
 
@@ -310,6 +327,7 @@ ssize_t pread (int fd, void *buf, size_t count, off_t offset)
 }
 
 
+// #todo: not implemented yet.
 ssize_t 
 pwrite (
     int fd, 
@@ -318,14 +336,17 @@ pwrite (
     off_t offset )
 {
 
-    if (fd<0){
-        debug_print ("pwrite: fd\n");
+    if (fd<0)
+    {
+        errno = EBADF;
         return -1;
     }
 
     if( (void*) buf == NULL )
+    {
+        errno = EINVAL;
         return -1;
-    
+    }
 
     debug_print ("pwrite: [TODO]\n");
     return -1;
@@ -413,33 +434,31 @@ void exit (int status)
 }
 
 
-
-
 /*
- **************
  * fork:
  *     #define  UNISTD_SYSTEMCALL_FORK     71  
  */
 
-pid_t fork (void)
+pid_t fork(void)
 {
-    pid_t __ret = -1;
+    pid_t value = -1;
 
     debug_print("fork: \n");
 
-    __ret = (pid_t) gramado_system_call ( 
+    value = (pid_t) gramado_system_call ( 
                         UNISTD_SYSTEMCALL_FORK, 
                         0, 0, 0 );
     
-    if (__ret<0)
+    if (value<0)
     {
         debug_print("fork: [FAIL]\n");
-        //errno = -__ret;
-        return (__ret);
+        
+        errno = (-value);
+        return (pid_t) (-1);
     }
 
     debug_print("fork: Done\n");
-    return (__ret);
+    return (pid_t) value;
 }
 
 
@@ -454,13 +473,40 @@ pid_t vfork(void)
 // uid
 int setuid ( uid_t uid )
 {
-	//#todo: ainda não temos a suystem call.
-	//SYSTEMCALL_SETCURRENTUSERID
-	return (uid_t) gramado_system_call ( 151, 0, 0, 0 );
+    int value = -1;
+
+    if(uid<0)
+    {
+        errno = EINVAL;
+        return (int) -1;
+    }
+
+// #todo: 
+// Ainda não temos a suystem call.
+// SYSTEMCALL_SETCURRENTUSERID
+
+    value = (uid_t) gramado_system_call ( 151, 0, 0, 0 );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1; 
+    }
+
+    return (int) value;
 }
+
+
 uid_t getuid (void)
 {
-    return (uid_t) gramado_system_call ( 152, 0, 0, 0 );
+    uid_t value=-1;
+    value = (uid_t) gramado_system_call ( 152, 0, 0, 0 );
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1; 
+    }
+    return (int) value;
 }
 
 // ===============================
@@ -544,21 +590,29 @@ See: https://linux.die.net/man/3/tcsetpgrp
 
 pid_t tcgetpgrp (int fd)
 {
+    pid_t value = -1;
     int s=0;
 
     if(fd<0)
-       return -1;
-
-
-    // #todo: 
-    // work in ring0 to implement this.
-    if ( ioctl(fd, TIOCGPGRP, &s) < 0 )
     {
-        debug_print ("tcgetpgrp: error\n");
-        return ((pid_t)-1);
+        errno = EBADF;
+        return (pid_t) -1;
     }
 
-    return ((pid_t) s);
+// #todo: 
+// work in ring0 to implement this.
+
+    value = (pid_t) ioctl(fd, TIOCGPGRP, &s);
+
+    if ( value < 0 )
+    {
+        debug_print ("tcgetpgrp: error\n");
+        
+        errno = (-value);
+        return (pid_t) (-1);
+    }
+
+    return (pid_t) s;
 }
 
 
@@ -573,18 +627,35 @@ See: https://linux.die.net/man/3/tcsetpgrp
  */
 int tcsetpgrp (int fd, pid_t pgrp)
 {
+    int value = -1;
     int s=0;
 
     if(fd<0)
-       return -1;
+    {
+        errno = EBADF;
+        return -1;
+    }
 
     if(pgrp<0)
+    {
+       errno = EINVAL;
        return -1;
+    }
 
     s = pgrp;
 
-    //#todo: work in ring0 to implement this.
-    return (int) ( ioctl(fd, TIOCSPGRP, &s) );
+// #todo: 
+// work in ring0 to implement this.
+    
+    value = (int) ioctl(fd, TIOCSPGRP, &s);
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -741,19 +812,31 @@ void fcntl_dup(int fd)
 
 
 /*
- *************************************
  * dup:
  *
  */
+// https://man7.org/linux/man-pages/man2/dup.2.html
 
 int dup (int oldfd)
 {
+    int value = -1;
 
-    if ( oldfd < 0 ) 
-        return -1;
+    if ( oldfd < 0 )
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
 
-    return (int) gramado_system_call ( 
-                     (unsigned long) oldfd, 0, 0, 0 );
+    value = (int) gramado_system_call ( 
+                      (unsigned long) oldfd, 0, 0, 0 );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -764,15 +847,33 @@ int dup (int oldfd)
 
 int dup2 (int oldfd, int newfd)
 {
+    int value = -1;
 
-    //if ( oldfd < 0 ) 
-        //return -1;
+    if ( oldfd < 0 )
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
 
-    return (int) gramado_system_call ( 
+    if ( newfd < 0 )
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
+
+    value =  (int) gramado_system_call ( 
                      (unsigned long) oldfd, 
                      (unsigned long) newfd, 
                      0, 
                      0 );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -783,18 +884,33 @@ int dup2 (int oldfd, int newfd)
 
 int dup3 (int oldfd, int newfd, int flags)
 {
+    int value = -1;
 
-    //if ( oldfd < 0 ) 
-        //return -1;
+    if ( oldfd < 0 )
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
 
-    //if ( newfd < 0 ) 
-        //return -1;
+    if ( newfd < 0 )
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
 
-    return (int) gramado_system_call ( 
+    value = (int) gramado_system_call ( 
                      (unsigned long) oldfd, 
                      (unsigned long) newfd, 
                      (unsigned long) flags, 
                      0 );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -1143,29 +1259,30 @@ int fdatasync (int fd)
 // See:
 // https://man7.org/linux/man-pages/man2/close.2.html
 
-int close (int fd){
+int close (int fd)
+{
+    int value = -1;
 
-    int __ret = -1;
 
-    
     if (fd<0){
-        debug_print ("close: fd\n");
-        return -1;
+        errno = EBADF;
+        return (int) (-1);
     }    
-    
-    __ret = (int) gramado_system_call ( 17, 
-                     (unsigned long) fd, 
-                     (unsigned long) fd, 
-                     (unsigned long) fd );
 
-    // #test
-    if (__ret<0)
-        errno = __ret;
+    value = (int) gramado_system_call ( 
+              17, 
+              (unsigned long) fd, 
+              (unsigned long) fd, 
+              (unsigned long) fd );
 
+    if (value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
 
-    return (int) __ret;
+    return (int) value;
 }
-
 
 
 int pipe2 ( int pipefd[2], int flags )
@@ -1547,7 +1664,14 @@ int isatty (int fd)
 {
     int Ret=-1;
     struct termios  t;
-    
+
+    if(fd<0)
+    {
+        errno=EBADF;
+        return -1;
+    }
+
+
     Ret = (int) tcgetattr(fd,&t);
 
     //#todo: Simplify this thing.
@@ -1596,49 +1720,75 @@ getopt (
 }
 
 
-//sys/stat.h
+// sys/stat.h
 int fstat(int fd, struct stat *buf)
 {
+    int value = -1;
+
     debug_print ("fstat: [TODO]\n");
 
-    if (fd<0){
-        debug_print ("fstat: fd\n");
+    if (fd<0)
+    {
+        errno = EBADF;
         return -1;
     }
 
-    return (int) gramado_system_call ( 4005, 
+    value = (int) gramado_system_call ( 
+                    4005, 
                     (unsigned long) fd,
                     (unsigned long) buf,
                     (unsigned long) buf );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
 //sys/stat.h
 int stat(const char *path, struct stat *buf)
 {
-    int _fd = 0;
-    int _ret = 0;
-
+    int value = -1;
+    int _fd = -1;
 
     debug_print ("stat: [TODO]\n");
 
     if ( (void*) path == NULL )
+    {
+        errno = EINVAL;
         return -1;
-
+    }
+    
     if ( *path == 0 )
+    {
+        errno = EINVAL;
         return -1;
+    }
 
     // open
-    _fd = open (path, 0, 0);
+    _fd = (int) open (path, 0, 0);
     
     if (_fd<0)
+    {
+        errno = EBADF;
         return -1;
-    
-    _ret = fstat(_fd, buf);
+    }
+
+    value = (int) fstat(_fd,buf);
 
     close(_fd);
 
-    return (int) _ret;
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -1648,14 +1798,20 @@ int lstat(const char *path, struct stat *buf)
     debug_print ("lstat: [TODO]\n");
 
     if ( (void*) path == NULL )
+    {
+        errno = EINVAL;
         return -1;
+    }
+
 
     if ( *path == 0 )
+    {
+        errno = EINVAL;
         return -1;
+    }
 
-    return (int) stat (path, buf);
+    return (int) stat(path, buf);
 }
-
 
 
 // POSIX.1-2001, POSIX.1-2008, SVr4, 4.3BSD.
@@ -1668,6 +1824,7 @@ unsigned int alarm (unsigned int seconds)
 {
     debug_print ("alarm: [This is a work in progress]\n");
 
+// Is it an error?
     if ( seconds == 0 )
         return 0;
 
@@ -1677,7 +1834,6 @@ unsigned int alarm (unsigned int seconds)
                               0,
                               0 );
 }
-
 
 
 int brk (void *addr)
@@ -1718,17 +1874,34 @@ execvpe (
 }
 
 
-// Maybe it is easy.
+//#todo: Not implementeed yet.
 int chown (const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("chown: [TODO]\n");
 
     if ( (void*) pathname == NULL )
-        return -1;
+    {
+        errno = EINVAL;
+        return (int) (-1);
+    }
 
     if ( *pathname == 0 )
-        return -1;
+    {
+        errno = EINVAL;
+        return (int) (-1);
+    }
 
+    if ( owner < 0 )
+    {
+        errno = EINVAL;
+        return (int) (-1);
+    }
+
+    if ( group < 0 )
+    {
+        errno = EINVAL;
+        return (int) (-1);
+    }
 
     return -1; 
 }
@@ -1740,8 +1913,24 @@ int fchown(int fd, uid_t owner, gid_t group)
     debug_print ("fchown: [TODO]\n");
     
     if(fd<0)
+    {
+        errno = EBADF;
         return -1;
-    
+    }
+
+    if(owner<0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if(group<0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+
     return -1; 
 }
 
@@ -1752,10 +1941,30 @@ int lchown (const char *pathname, uid_t owner, gid_t group)
     debug_print ("lchown: [TODO]\n");
 
     if ( (void*) pathname == NULL )
+    {
+        errno = EINVAL;
         return -1;
+    }
+
 
     if ( *pathname == 0 )
+    {
+        errno = EINVAL;
         return -1;
+    }
+
+    if(owner<0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if(group<0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
 
     return -1; 
 }
@@ -1764,29 +1973,51 @@ int lchown (const char *pathname, uid_t owner, gid_t group)
 
 int chdir(const char *path)
 {
+    int value=-1;
+
     debug_print ("chdir: [TODO]\n");
 
     if ( (void*) path == NULL )
-        return -1;
+    {
+        errno = EINVAL;
+        return (int) -1;
+    }
 
     if (*path == 0)
-        return -1;
+    {
+        errno = EINVAL;
+        return (int) -1;
+    }
+
 
     // Atualizar no gerenciamento feito pelo kernel.
-    return (int) gramado_system_call ( 175, 
-                     (unsigned long) path,
-                     (unsigned long) path, 
-                     (unsigned long) path );
+    value = (int) gramado_system_call ( 
+              175, 
+              (unsigned long) path,
+              (unsigned long) path, 
+              (unsigned long) path );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
+//#todo: not implemented yet.
 int fchdir(int fd)
 {
     debug_print ("fchdir: [TODO]\n");
 
     if(fd<0)
+    {
+        errno = EBADF;
         return -1;
-
+    }
+    
     return -1; 
 }
    
@@ -1848,9 +2079,12 @@ off_t lseek (int fd, off_t offset, int whence)
 { 
     //debug_print ("lseek: [TODO]\n");
 
-    //if (fd<0)
-       //return 0; ??
-
+    if (fd<0)
+    {
+        errno = EBADF;
+        return -1;
+    }
+    
 // # isso muda o posicionamento dentro do arquivo lá no kernel.
 // isso está certo, pois precisamos disso pra sabermos
 // o tamanho do arquivo.
@@ -1879,10 +2113,14 @@ int access (const char *pathname, int mode)
     debug_print ("access: [TODO]\n");
 
     if( (void*) pathname == NULL )
-        return -1;
+
 
     if( *pathname == 0 )
-        return -1;
+    {
+        errno = EINVAL;
+        return (int) -1;
+    }
+
 
 	// #todo
 	//struct stat foo;

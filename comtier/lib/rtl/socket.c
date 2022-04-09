@@ -7,15 +7,12 @@
 // http://man7.org/linux/man-pages/man2/socket.2.html
 
 #include <sys/types.h>
+#include <errno.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-
 #include <stdio.h>
 #include <unistd.h>
-
-
 #include <rtl/gramado.h> 
-
 
 
 //sortix style;
@@ -47,19 +44,22 @@
 
 int socket ( int domain, int type, int protocol )
 {
-    int __fd = -1;
+    int value = -1;
 
-    __fd = (int) gramado_system_call ( 
-                     7000, 
-                     (unsigned long) domain, 
-                     (unsigned long) type, 
-                     (unsigned long) protocol );
+    value = (int) gramado_system_call ( 
+               7000, 
+               (unsigned long) domain, 
+               (unsigned long) type, 
+               (unsigned long) protocol );
 
-    if (__fd<0){
-        printf ("socket: [FAIL] Couldn't create the socket!\n");
+    if (value<0)
+    {
+        errno = (-value);
+        return (int) -1;
     }
 
-    return (int) __fd;
+// OUT: fd.
+    return (int) value;
 }
 
 
@@ -161,19 +161,27 @@ bind (
 
 int listen (int sockfd, int backlog)
 {
+    int value = -1;
 
-    int __status = -1;
-
-    __status = (int) gramado_system_call ( 7004, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) backlog, 
-                     (unsigned long) 0 );
-
-    if (__status<0){
-        printf ("connect: [FAIL] Couldn't listen\n");
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    return (int) __status;
+    value = (int) gramado_system_call ( 
+                 7004, 
+                 (unsigned long) sockfd, 
+                 (unsigned long) backlog, 
+                 (unsigned long) 0 );
+
+    if (value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -181,6 +189,7 @@ int listen (int sockfd, int backlog)
 // See: https://linux.die.net/man/2/accept4
 int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
 {
+    errno = -1;
     printf ("accept4: [TODO] Not implemented yet\n");
     return -1;
 }
@@ -207,19 +216,27 @@ int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
 
 int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-    int __fd = -1;
+    int value = -1;
     
-    __fd = (int) gramado_system_call ( 7010, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) addr, 
-                     (unsigned long) addrlen );
-
-    if(__fd<0){
-        //printf ("accept: Couldn't accept the connection\n");
-        //debug_print ("accept: Couldn't accept the connection\n");
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    return (int) __fd;
+    value = (int) gramado_system_call ( 
+              7010, 
+              (unsigned long) sockfd, 
+              (unsigned long) addr, 
+              (unsigned long) addrlen );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -231,19 +248,27 @@ int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 int accept (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-    int __fd = -1;
+    int value = -1;
     
-    __fd = (int) gramado_system_call ( 7002, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) addr, 
-                     (unsigned long) addrlen );
-
-    if(__fd<0){
-        //printf ("accept: Couldn't accept the connection\n");
-        //debug_print ("accept: Couldn't accept the connection\n");
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    return (int) __fd;
+    value = (int) gramado_system_call ( 
+              7002, 
+              (unsigned long) sockfd, 
+              (unsigned long) addr, 
+              (unsigned long) addrlen );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -261,19 +286,26 @@ connect (
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
-    int __status = -1;
+    int value = -1;
 
-
-    __status = (int) gramado_system_call ( 7001, 
-                     (unsigned long) sockfd, 
-                     (unsigned long) addr, 
-                     (unsigned long) addrlen );
-
-    if (__status<0){
-        printf ("connect: [FAIL] Couldn't connect\n");
+    if(sockfd<0){
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    return (int) __status;
+    value = (int) gramado_system_call ( 
+               7001, 
+               (unsigned long) sockfd, 
+               (unsigned long) addr, 
+               (unsigned long) addrlen );
+
+    if (value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -281,37 +313,39 @@ connect (
  * shutdown:
  *     shut down part of a full-duplex connection    
  */
-
 // See:
 // https://linux.die.net/man/3/shutdown
-
 // how: 
 // Muda as flags do arquivo. 
 // Alterando permissões de leitura ou escrita.
+// #todo
+// Deve existir uma rotina na libc que mude
+// as permissões de um arquivo. Então é ela que devemos
+// chamar agora e não uma system call.
 
 int shutdown ( int sockfd, int how )
 {
-    // #todo
-    // Deve existir uma rotina na libc que mude
-    // as permissões de um arquivo. Então é ela que devemos
-    // chamar agora e não uma system call.
+    int value = -1;
 
-    debug_print ("shutdown: [TODO]\n");
-    //return -1; 
-
-    int __status = -1;
-
-
-    __status = (int) gramado_system_call ( 7009, 
-                         (unsigned long) sockfd, 
-                         (unsigned long) how, 
-                         (unsigned long) how );
-
-    if (__status<0){
-        printf ("shutdown: fail\n");
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
-    
-    return (int) __status;
+
+    value = (int) gramado_system_call ( 
+              7009, 
+              (unsigned long) sockfd, 
+              (unsigned long) how, 
+              (unsigned long) how );
+
+    if (value<0)
+    {
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -367,7 +401,6 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
 
 
 /*
- ****************************************
  * send:
  * 
  */
@@ -419,9 +452,7 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
 }
 
 
-
 /*
- **************************************
  * recv:
  * 
  */
@@ -434,15 +465,17 @@ recv (
     int flags )
 {
 
-    //if (sockfd<0)
-        //return -1;
+    if (sockfd<0){
+        errno = EBADF;
+        return (ssize_t) (-1);
+    }
+
+   return (ssize_t) read( sockfd, (const void *) buf, len );
 
     // #todo: Usar esse.
     //return (ssize_t) recvfrom ( (int) sockfd, 
         //(void *) buf, (size_t) len, (int) flags,
         //(struct sockaddr *) src_addr, (socklen_t *) addrlen );
-
-   return (ssize_t) read ( sockfd, (const void *) buf, len );
 }
 
 

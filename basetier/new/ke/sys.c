@@ -374,22 +374,19 @@ void *sys_create_thread (
 // OUT:
 // 0 = Couldn't read.
 // -1 = Error.
+// return 'ssize_t'?
 
-int 
+ssize_t 
 sys_read (
-    unsigned int fd, 
-    char *ubuf, 
-    int count )
+    int fd,
+    char *ubuf,        //#todo: use 'void *'
+    size_t count )        //#todo: use 'size_t'.
 {
     file *__file;
 
-    struct socket_d   *s;
+    struct socket_d  *s;
     int nbytes=0; 
     int ubuf_len=0;
-
-    //debug_print("------------------------------------ R --\n");
-    //debug_print("sys_read:\n");
-
 
 // #bugbug
 // O argumento é 'unsigned int'.
@@ -398,29 +395,23 @@ sys_read (
 // fd
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_read: fd\n");
-        printf     ("sys_read: fd\n");
-        return (int) (-EINVAL);
+        return (int) (-EBADF);
     }
 
 // buf
 // todo: Checar a validade da região de memória.
-    if ( (char *) ubuf == (char *) 0 ){
-        debug_print ("sys_read: invalid ubuf address\n");
-        printf      ("sys_read: invalid ubuf address\n"); 
-        goto fail; 
+
+    if ( (void *) ubuf == NULL ){
+        return (int) (-EINVAL);
     }
 
 // count
-
-    if ( count < 0 ){ 
-        debug_print ("sys_read: count < 0\n");
-        return -1;
-        // return -EINVAL; 
+    if (count < 0){ 
+        return (int) (-EINVAL);
     }
 
-    if ( count == 0 ){ 
-        debug_print ("sys_read: count 0\n");
+    // Nothing to do.
+    if (count == 0){ 
         return 0; 
     }
 
@@ -809,9 +800,7 @@ fail:
 }
 
 
-
 /*
- ****************************
  * sys_write:
  *     Implemantation of write() for libc.
  */
@@ -836,7 +825,7 @@ fail:
 // 0 = Couldn't read.
 // -1 = Error.
 
-int sys_write (unsigned int fd, char *ubuf, int count)
+ssize_t sys_write (int fd, char *ubuf, size_t count)
 {
 
 // #todo
@@ -867,25 +856,21 @@ int sys_write (unsigned int fd, char *ubuf, int count)
 // fd
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_write: fd\n");
-        printf     ("sys_write: fd\n");
-        return (int) (-EINVAL);
+        return (int) (-EBADF);
     }
 
 // ubuf
-    if ( (char *) ubuf == (char *) 0 ){
-        debug_print ("sys_write: invalid ubuf address\n");  goto fail;
+    if ( (void *) ubuf == NULL ){
+        return (int) (-EINVAL);
     }
 
 // count
-
     if ( count < 0 ){ 
-        debug_print ("sys_write: count < 0\n");
-        return -1; 
+        return (int) (-EINVAL);
     }
 
+    // Nothing to do.
     if ( count == 0 ){ 
-        debug_print ("sys_write: count 0\n");
         return 0; 
     }
 
