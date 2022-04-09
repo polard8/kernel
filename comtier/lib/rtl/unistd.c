@@ -72,9 +72,7 @@ int tcsetpgrp(int fd, pid_t pgid)
 
 
 
-
 /*
- ************************************************
  * execv:
  * 
  */
@@ -86,16 +84,22 @@ char *__execv_environ[] = { NULL, NULL, NULL };
 
 int execv (const char *path, char *const argv[] )
 {
-    // #bugbug: Falta a tipagem do último argumento??
+
+    if( (void*) path == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+// #bugbug: 
+// Falta a tipagem do último argumento?
     return execve ( path, (char **) argv, __execv_environ );
     //return execve ( path, (char **) argv, (char **) __execv_environ );
     //return execve ( path, (char **) argv, environ ); //#todo: use this one.
 }
 
 
-
 /*
- ******************************* 
  * execve:
  * 
  */
@@ -106,31 +110,40 @@ execve (
     char *const argv[], 
     char *const envp[] )
 {
-    int __ret = -1;
+    int value = -1;
 
 
-    __ret = (int) gramado_system_call ( 248, 
+    if( (void*) path == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+
+    value = (int) gramado_system_call ( 
+                      248, 
                       (unsigned long) path, 
                       (unsigned long) argv,   
                       (unsigned long) envp );  
 
-    //Error.
-    if (__ret < 0)
+    if (value < 0)
     {
-        // errno = -__ret;  //#todo: Enable this thing.
-        return (-1);
+        errno = (-value);
+        return (int) (-1);
     } 
 
-    return (__ret);
+    return (int) value;
 }
-
 
 
 ssize_t read_tty (int fd, const void *buf, size_t count)
 {
     if (fd<0)
+    {
+        errno=EBADF;
         return -1;
-
+    }
+    
     return (ssize_t) gramado_system_call ( 272, 
                          (unsigned long) fd,      // dispositivo.
                          (unsigned long) buf, 
@@ -142,7 +155,10 @@ ssize_t read_tty (int fd, const void *buf, size_t count)
 ssize_t write_tty (int fd, const void *buf, size_t count)
 {
     if (fd<0)
+    {
+        errno=EBADF;
         return -1;
+    }
 
     return (ssize_t) gramado_system_call ( 273, 
                          (unsigned long) fd,      // dispositivo.
@@ -158,7 +174,10 @@ ssize_t write_tty (int fd, const void *buf, size_t count)
 ssize_t read_VC (int fd, const void *buf, size_t count)
 {
     if (fd<0)
+    {
+        errno=EBADF;
         return -1;
+    }
 
     return (ssize_t) gramado_system_call ( 262, 
                          (unsigned long) fd,      // dispositivo.
@@ -173,7 +192,10 @@ ssize_t read_VC (int fd, const void *buf, size_t count)
 ssize_t write_VC (int fd, const void *buf, size_t count)
 {
     if (fd<0)
+    {
+        errno=EBADF;
         return -1;
+    }
 
     return (ssize_t) gramado_system_call ( 263, 
                          (unsigned long) fd,      // dispositivo.
@@ -359,10 +381,17 @@ int truncate(const char *path, off_t length)
     debug_print ("truncate: [TODO]\n");
 
     if( (void*) path == NULL )
+    {
+        errno=EINVAL;
         return -1;
-    
+    }
+
     if(*path == 0)
+    {
+        errno=EINVAL;
         return -1;
+    }
+
 
     return -1;
 }
@@ -370,9 +399,10 @@ int truncate(const char *path, off_t length)
 
 int ftruncate (int fd, off_t length)
 { 
-
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("ftruncate: fd\n");
+        errno=EBADF;
         return -1;
     }
         
@@ -382,7 +412,6 @@ int ftruncate (int fd, off_t length)
 
 
 /*
- *************************************
  * exit:
  *     Torna zombie a thread atual.
  *     Mas o propósito é terminar sair do 
@@ -393,10 +422,7 @@ int ftruncate (int fd, off_t length)
  * de stderr na tela.
  * ?? Essa função também pertence à unistd
  */
-
 // cause normal process termination
-
-
 // Remember: The parent process called wait().
 // The exit() function causes normal process termination and the value
 // of status & 0xFF is returned to the parent.
@@ -513,6 +539,11 @@ uid_t getuid (void)
 // gid
 int setgid(gid_t gid)
 {
+    if(gid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
     return -1;
 }
 gid_t getgid (void)
@@ -526,6 +557,11 @@ gid_t getgid (void)
 // euid
 int seteuid(uid_t euid)
 {
+    if( euid<0 )
+    {
+        errno=EINVAL;
+        return -1;
+    }
     return -1;
 }
 uid_t geteuid (void)
@@ -541,6 +577,11 @@ uid_t geteuid (void)
 // egid
 int setegid(gid_t egid)
 {
+    if(egid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
     return -1;
 }
 gid_t getegid(void)
@@ -659,12 +700,22 @@ int tcsetpgrp (int fd, pid_t pgrp)
 }
 
 
+// #todo: Not implemented yet.
 int setpgid(pid_t pid, pid_t pgid)
 {
     debug_print ("setpgid: [TODO]\n");
 
     if(pid<0)
-        debug_print ("setpgid: pid\n");
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    if(pgid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
 
     // #todo
         
@@ -676,8 +727,11 @@ pid_t getpgid(pid_t pid)
 {
     debug_print ("getpgid: [TODO]\n");
 
-    if(pid<0){
+    if(pid<0)
+    {
         debug_print ("getpgid: pid\n");
+        errno=EINVAL;
+        return -1;
     }
 
     return (pid_t) (-1);
@@ -717,8 +771,22 @@ pid_t getpgrp(void)
 int bsd_setpgrp(pid_t pid, pid_t pgid)
 {
     debug_print ("bsd_setpgrp: [TODO]\n");
+
+    if(pid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    if(pgid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
     return -1;
 }
+
 
 /* BSD version */
 pid_t bsd_getpgrp(pid_t pid)
@@ -726,25 +794,33 @@ pid_t bsd_getpgrp(pid_t pid)
     debug_print ("bsd_getpgrp: [TODO]\n");
 
     if(pid<0)
+    {
         debug_print ("bsd_getpgrp: pid\n");
+        errno=EINVAL;
+        return -1;
+    }
     
     return -1;
 }
+
 
 char *getcwd (char *buf, size_t size)
 {
     debug_print ("getcwd: [TODO]\n");
 
 
-    if( (void*) buf == NULL ){
-        // msg
-        return (char *) 0;
+    if( (void*) buf == NULL )
+    {
+        errno=EINVAL;
+        return NULL;
     }
-    
-    
-    if ( size<0 ){
-        return (char *) 0;
+
+    if ( size<0 )
+    {
+        errno=EINVAL;
+        return NULL;
     }
+
 
     /*
     if (!buffer) {
@@ -753,7 +829,7 @@ char *getcwd (char *buf, size_t size)
     }
     */
         
-    return (char *) 0;
+    return NULL;
 }
 
 
@@ -762,11 +838,13 @@ char *getwd (char *buf)
     debug_print ("getwd: [TESTING]\n");
 
 
-    if ( (void*) buf == NULL ){
-        return (char *) 0;
+    if ( (void*) buf == NULL )
+    {
+        errno=EINVAL;
+        return NULL;
     }
 
-    char *p = getcwd(buf, PATH_MAX);
+    char *p = getcwd(buf,PATH_MAX);
 
     return (char *) p;
 }
@@ -775,9 +853,8 @@ char *getwd (char *buf)
 char *get_current_dir_name(void)
 {
     debug_print ("get_current_dir_name: [TODO]\n");
-    return (char *) 0;
+    return NULL;
 }
-
 
 
 /*
@@ -930,9 +1007,7 @@ int setpriority (int which, id_t who, int prio)
 }
 
 
-
 /*
- ************************************
  * nice:
  *     Change process priority.
  */
@@ -981,27 +1056,38 @@ int pause (void)
 
 int mkdir (const char *pathname, mode_t mode)
 {
-    int __ret=0;
-
+    int value = -1;
 
     debug_print ("mkdir: [TODO]\n");
 
     if ( (void*) pathname == NULL )
+    {
+        errno=EINVAL;
         return -1;
+    }
 
     if ( *pathname == 0 )
+    {
+        errno=EINVAL;
         return -1;
+    }
 
-
-    //gde_enter_critical_section();
-    __ret = (int) gramado_system_call ( 
+// #todo
+// 'mode' parameter.
+    value = (int) gramado_system_call ( 
                       44, 
                       (unsigned long) pathname, 
                       0, 
                       0);
-    //gde_exit_critical_section();    
 
-    return (int) __ret;
+
+    if(value<0)
+    {
+        errno= (-value);
+        return -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -1015,10 +1101,16 @@ int rmdir (const char *pathname)
     debug_print ("rmdir: [TODO]\n");
 
     if ( (void*) pathname == NULL )
+    {
+        errno=EINVAL;
         return -1;
+    }
 
     if ( *pathname == 0 )
+    {
+        errno=EINVAL;
         return -1;
+    }
 
 
     return -1; //#todo
@@ -1030,12 +1122,26 @@ int rmdir (const char *pathname)
  *
  */
 
-//Links a name to a file.
+// Links a name to a file.
+// #todo: Not implemented yet.
 
 int link (const char *oldpath, const char *newpath)
 {
     debug_print ("link: [TODO]\n");
-	return -1; //#todo
+
+    if( (void*) oldpath == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    if( (void*) newpath == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    return -1; //#todo
 }
 
 
@@ -1045,10 +1151,17 @@ int unlink (const char *pathname)
     debug_print ("unlink: [TODO]\n");
 
     if ( (void*) pathname == NULL )
+    {
+        errno = EINVAL;
         return -1;
+    }
 
     if ( *pathname == 0 )
+    {
+        errno = EINVAL;
         return -1;
+    }
+
 
     // ...
     
@@ -1066,10 +1179,17 @@ int mlock (const void *addr, size_t len)
     debug_print ("mlock: [TODO]\n");
 
     if( (void*) addr == NULL )
+    {
+        errno = EINVAL;
         return -1;
-    
+    }
+
     if(len<0)
+    {
+        errno = EINVAL;
         return -1;
+    }
+
 
     // ...
     
@@ -1087,10 +1207,17 @@ int munlock (const void *addr, size_t len)
     debug_print ("munlock: [TODO]\n");
 
     if( (void*) addr == NULL )
+    {
+        errno = EINVAL;
         return -1;
-    
+    }
+
     if(len<0)
+    {
+        errno = EINVAL;
         return -1;
+    }
+
 
     return -1; //#todo
 }
@@ -1170,11 +1297,13 @@ int syncfs(int fd)
 {
     debug_print ("syncfs: [TODO]\n");
 
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("syncfs: fd\n");
+        errno = EBADF;
         return -1;
     }    
-    
+
     // ...
     
     return -1;
@@ -1211,11 +1340,13 @@ int fsync (int fd)
 {
     debug_print ("fsync: [TODO]\n");
     
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("fsync: [ERROR] fd\n");
+        errno=EBADF;
         return -1;
     }    
-    
+
     // ...
     
     return -1;    //#todo
@@ -1234,11 +1365,13 @@ int fdatasync (int fd)
 {
     debug_print ("fdatasync: [TODO]\n");
 
-    if (fd<0){
+    if (fd<0)
+    {
         debug_print ("fdatasync: fd\n");
+        errno = EBADF;
         return -1;
     }    
-    
+
     // ...
     
     return -1; //#todo
@@ -1294,9 +1427,16 @@ int pipe2 ( int pipefd[2], int flags )
 }
 
 
-int pipe (int pipefd[2])
+int pipe(int pipefd[2])
 {
-    return (int) pipe2(pipefd,0);
+    int value=-1;
+    value = (int) pipe2(pipefd,0);
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+    return (int) value;
 }
 
 
@@ -1312,26 +1452,36 @@ long pathconf (const char *pathname, int name)
     debug_print ("pathconf: [TODO]\n");
 
     if( (void*) pathname == NULL )
+    {
+        errno=EINVAL;
         return -1;
+    }
     
     if(*pathname == 0)
+    {
+        errno=EINVAL;
         return -1;
+    }
+
 
     return -1;
 } 
 
 
-
 /*
- **********************************
  * __gethostname:
  * 
  */
 
+//static char __Hostname_buffer[64];
 char __Hostname_buffer[64];
+
 char *__gethostname (void)
 {
-    gramado_system_call ( 801, 
+    //static char __Hostname_buffer[64];
+
+    gramado_system_call ( 
+        801, 
        (unsigned long) &__Hostname_buffer[0],
        (unsigned long) &__Hostname_buffer[0],
        (unsigned long) &__Hostname_buffer[0] );
@@ -1341,9 +1491,7 @@ char *__gethostname (void)
 
 
 /*
- ******************************
  * gethostname
- * 
  * 
  */
  
@@ -1354,47 +1502,74 @@ char *__gethostname (void)
 
 int gethostname (char *name, size_t len)
 {
+    int value = -1;
 
-    int retValue = -1;
-
-    if( (void*) name == NULL ){
+    if( (void*) name == NULL )
+    {
         printf ("gethostname: buffer fail\n");
+        errno=EINVAL;
         return -1;
     }
 
-    if(len<0){
+    if(len<0)
+    {
         printf ("gethostname: len fail\n");
+        errno=EINVAL;
         return -1;
     }
-    
-    retValue = (int) gramado_system_call ( 
-                        38, 
-                        (unsigned long) name,
-                        (unsigned long) name,
-                        (unsigned long) name );
 
-     return (int) retValue;
+    value = (int) gramado_system_call ( 
+                      38, 
+                      (unsigned long) name,
+                      (unsigned long) name,
+                      (unsigned long) name );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return -1;
+    }
+
+    return (int) value;
 }
-
 
 
 //See: http://man7.org/linux/man-pages/man2/sethostname.2.html
 int sethostname (const char *name, size_t len)
 {
+    int value=-1;
 
     if( (void*) name == NULL )
+    {
+        errno=EINVAL;
         return -1;
-    
+    }
+
     if(*name == 0)
+    {
+        errno=EINVAL;
         return -1;
+    }
 
     if(len<0)
+    {
+        errno=EINVAL;
         return -1;
+    }
 
-    return (int) gramado_system_call ( 39, 
-                    (unsigned long) name,
-                    (unsigned long) name,
-                    (unsigned long) name );
+
+    value = (int) gramado_system_call ( 
+                      39, 
+                      (unsigned long) name,
+                      (unsigned long) name,
+                      (unsigned long) name );
+    if(value<0)
+    {
+        errno = (-value);
+        return -1;
+    }
+
+    return (int) value;
 }
 
 
@@ -1427,7 +1602,10 @@ char __Login_buffer[64];
 char *getlogin (void)
 {
 
-    gramado_system_call ( 803, 
+    //static char __Login_buffer[64];
+
+    gramado_system_call ( 
+        803, 
         (unsigned long) &__Login_buffer[0],
         (unsigned long) &__Login_buffer[0],
         (unsigned long) &__Login_buffer[0] );
@@ -1437,84 +1615,89 @@ char *getlogin (void)
 }
 
 
-
 int setlogin (const char *name)
 {
+    int value=-1;
 
-    if( (void*) name == NULL ){
-        //msg
-        return -1;
-    }
-    
-    if(*name == 0){
-        //msg
+    if( (void*) name == NULL )
+    {
+        errno=EINVAL;
         return -1;
     }
 
+    if(*name == 0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
 
-    //#todo: pegar retorno da função
-    //return (int) 
-    gramado_system_call ( 804, 
-        (unsigned long) name,
-        (unsigned long) name,
-        (unsigned long) name );
-       
-    
-    return 0; //poderia retornar o size.
+    value = (int) gramado_system_call ( 
+                      804, 
+                      (unsigned long) name,
+                      (unsigned long) name,
+                      (unsigned long) name );
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+
+    return (int) value;
 }
 
 
 /*
- **************************** 
  * getusername 
  * 
  */
- 
 // #todo
 // usar  setlogin 
- 
 int getusername (char *name, size_t len)
 {
-    int __len_ret=0;
+    int value=0;
 
-
-    if ( (void*) name == NULL ){
+    if ( (void*) name == NULL )
+    {
         printf ("getusername: buffer fail\n");
+        errno=EINVAL;
         return -1;
     }
-    
 
     if ( len < 0 || len > HOST_NAME_MAX )
     {
         printf ("getusername: len\n");
+        errno=EINVAL;
         return -1;
     }
 
-
     //coloca no buffer interno
-    __len_ret = (int) gramado_system_call ( 40, 
-                        (unsigned long) name,
-                        (unsigned long) name,
-                        (unsigned long) name );
+    value = (int) gramado_system_call ( 
+                      40, 
+                      (unsigned long) name,
+                      (unsigned long) name,
+                      (unsigned long) name );
 
-	if ( __len_ret < 0 || __len_ret > HOST_NAME_MAX )
-	{
-	    printf ("getusername: __len_ret\n");
-	    return -1;
-	}
-
-    if ( __len_ret > len ){
-        __len_ret = len;
+    
+    if( value<0 )
+    {
+        errno = (-value);
+        return -1;
     }
 
+    if( value > HOST_NAME_MAX )
+    {
+        return -1;
+    }
 
-    return 0;
+    if ( value > len ){
+        value = len;
+    }
+
+    return (int) value;
 }
 
 
-
 /*
- **************************** 
  * setusername 
  * 
  */
@@ -1528,44 +1711,62 @@ int getusername (char *name, size_t len)
 int setusername (const char *name, size_t len)
 {
     size_t __name_len = 0;
-
+    int value = -1;
 
     if( (void*) name == NULL )
+    {
+        errno=EINVAL;
         return -1;
-    
+    }
+
     if(*name == 0)
+    {
+        errno=EINVAL;
         return -1;
+    }
 
     if(len<0)
+    {
+        errno=EINVAL;
         return -1;
+    }
 
-
+// size.
     __name_len = strlen(name) + 1;
 
-    // Limite dado pelo sistema.
+// Limite dado pelo sistema.
     if (len < 0 || len >= HOST_NAME_MAX )
     {
         printf ("setusername: *len\n");
-        return 1;
+        errno = EINVAL;
+        return -1;
     }
 
     // Tamanho indicado pelo aplicativo.
-    if ( __name_len > len ){
+    if ( __name_len > len )
+    {
         printf ("setusername: len\n");
-        return 1;     
+        errno = EINVAL;
+        return -1;     
     }
 
-    return (int) gramado_system_call ( 41, 
+    value = (int) gramado_system_call( 
+                    41, 
                     (unsigned long) name,
                     (unsigned long) name,
                     (unsigned long) name );
+
+    if(value<0)
+    {
+        errno = (-value);
+        return -1;
+    }
+    
+    return (int) value;
 }
 
 
-
-
 /*
- ************** 
  * ttyname:
  * 
  */
@@ -1589,14 +1790,19 @@ char *ttyname (int fd)
     static char buf[PATH_MAX];
     int rv=0;
     
-    if (fd<0){
-        debug_print ("ttyname: fd\n");
-        return (char *) 0;
-    }    
+    if (fd<0)
+    {
+        errno=EBADF;
+        return NULL;
+    }
 
     rv = (int) ttyname_r (fd, buf, sizeof(buf));
 
-    if (rv != 0){
+// ??
+// #bugbug
+// #todo: Explain it better.
+    if (rv != 0)
+    {
         errno = rv;
         return NULL;
     }
@@ -1607,21 +1813,38 @@ char *ttyname (int fd)
 
 // POSIX.1-2001, POSIX.1-2008, 4.2BSD.
 // ttyname, ttyname_r - return name of a terminal
+// #todo: Not implemente yet.
+
 int ttyname_r(int fd, char *buf, size_t buflen)
 { 
     debug_print ("ttyname_r: [TODO]\n");
     
     if ( fd<0 )
+    {
+        errno=EBADF;
         return -1;
-    
+    }
+
     if( (void*) buf == NULL )
+    {
+        errno=EINVAL;
         return -1;
-     
+    }
+
     if(buflen<0)
+    {
+        errno=EINVAL;
         return -1;
+    }
+
     
     if(buflen >= PATH_MAX)
+    {
+        errno=EINVAL;
         return -1;
+    }
+
+    //#todo
 
     // ...
     
@@ -1716,6 +1939,19 @@ getopt (
     const char *optstring )
 {
     debug_print ("getopt: [TODO]\n");
+
+    if(argc<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    if( (void*) optstring == NULL )
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
     return -1;
 }
 
@@ -1946,7 +2182,6 @@ int lchown (const char *pathname, uid_t owner, gid_t group)
         return -1;
     }
 
-
     if ( *pathname == 0 )
     {
         errno = EINVAL;
@@ -2133,9 +2368,29 @@ int access (const char *pathname, int mode)
 // #see: sys/utsname.h
 int uname (struct utsname *buf)
 {
+    int value = -1;
+
     debug_print("uname: TODO\n");
-    return (int) gramado_system_call ( 377, 
-                     (unsigned long) buf, 0, 0);
+
+    if ( (void*) buf == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 
+                      377, 
+                      (unsigned long) buf, 
+                      0, 
+                      0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+    
+    return (int) value;
 }
 
 
@@ -2580,7 +2835,6 @@ StrOcc (
 }
 
 
-	
 //Point to 1st occurrence of marker set in str.
 unsigned char *StrFirstOcc (
     unsigned char *src,
@@ -2597,8 +2851,6 @@ unsigned char *StrFirstOcc (
 }
 
 
-
-	
 //Point to last occurrence of market set in str.
 unsigned char *StrLastOcc (
     unsigned char *src,
@@ -2631,9 +2883,26 @@ posix_spawn (
     char *const argv[], 
     char *const envp[] )
 {
+    int value=-1;
     debug_print ("posix_spawn: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if( (void*) path == NULL )
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+    
+    return (int) value;
 }
+
 
 int 
 posix_spawnp (
@@ -2676,40 +2945,137 @@ spawn (
 
 int spawnv(int mode, char *cmd, char **argv)
 {
+    int value=-1;
+
     debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) cmd, 0, 0 );
+
+    if( (void*) cmd == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 900, (unsigned long) cmd, 0, 0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+    
+    return (int) value;
 }
 
 
 
 int spawnve(int mode, char *path, char *argv[], char *envp[])
 {
-    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
-}
+    int value=-1;
 
+    debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
+
+    if( (void*) path == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+
+    return (int) value;
+}
 
 
 int spawnvp(int mode, char *path, char *argv[])
 {
+    int value=-1;
+
     debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if( (void*) path == NULL )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+
+    return (int) value;
 }
 
 
-
-int spawnvpe(int mode, char *path, char *argv[], char *envp[])
+int 
+spawnvpe(
+    int mode, 
+    char *path, 
+    char *argv[], 
+    char *envp[] )
 {
+    int value=-1;
     debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if( (void*) path == NULL )
+    {
+        errno=EINVAL;
+        return -1;
+    }
+    
+    value = (int) gramado_system_call ( 900, (unsigned long) path, 0, 0 );
+
+    if(value<0)
+    {
+        errno=(-value);
+        return -1;
+    }
+    
+    return (int) value;
 }
 
 
-
-int spawnveg(const char* command, char** argv, char** envv, pid_t pgid)
+int 
+spawnveg(
+    const char *command, 
+    char **argv, 
+    char **envv, 
+    pid_t pgid )
 {
+    int value=-1;
+
     debug_print ("spawnv: [FIXME] It's a work in progress.\n"); 
-    return (int) gramado_system_call ( 900, (unsigned long) command, 0, 0 );
+
+    if( (void*) command == NULL )
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    if(pgid<0)
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
+    value = (int) gramado_system_call ( 900, (unsigned long) command, 0, 0 );
+
+    if(value<0)
+    {
+       errno=(-value);
+       return -1;
+    }
+
+    return (int) value;
 }
 
 

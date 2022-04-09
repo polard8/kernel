@@ -1,6 +1,7 @@
 
 // ioctl.c
 
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,40 +34,41 @@
 
 int ioctl (int fd, unsigned long request, ...)
 {
-    int __ret = -1;
+    int value = -1;
 
-    if (fd<0) {
-        debug_print("ioctl: fd\n");
-        return -1;
+    if (fd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    //++
+//++
     va_list ap;
     va_start(ap,request);
     unsigned arg = va_arg(ap, unsigned long);
 
-    // # Using this syscall to have full access to the ring0 data.
-    __ret = (int) sc82 ( 
+// # Using this syscall to have full access to the ring0 data.
+    value = (int) sc82 ( 
                       8000,
                       (unsigned long) fd,
                       (unsigned long) request,
                       (unsigned long) arg );
 
-    //__ret = (int) gramado_system_call ( 8000,
+    //value = (int) gramado_system_call ( 8000,
     //                  (unsigned long) fd,
     //                  (unsigned long) request,
     //                  (unsigned long) arg );
 
     va_end (ap);
-    //--
+//--
 
-    // #todo Error.
-    if (__ret < 0)
+
+    if (value < 0)
     {
-        //errno = -__ret;
-        return (-1);
+        errno = (-value);
+        return (int) (-1);
     }
 
-    return (int) (__ret);
+    return (int) (value);
 }
 

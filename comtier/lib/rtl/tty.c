@@ -1,8 +1,9 @@
 
+// tty.c
+
 #include <sys/types.h>  
+#include <errno.h>
 #include <utmp.h>
-
-
 #include <stdio.h>
 
 
@@ -19,6 +20,13 @@
 int login_tty (int fd)
 {
     debug_print ("login_tty: [TODO]\n");
+
+    if(fd<0)
+    {
+        errno=EBADF;
+        return (int) -1;
+    }
+
     return -1;
 }
 

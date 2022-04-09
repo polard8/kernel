@@ -11,23 +11,22 @@
 
 
 /*
- *********************************
  * wait:
  *
  */
 
-pid_t wait ( int *status )
+pid_t wait( int *status )
 {
-    return (pid_t) waitpid ( (pid_t) -1, (int *) status, (int) 0 );
+    //if( (void*) status == NULL )
+        //return -1;
+    return (pid_t) waitpid( (pid_t) -1, (int *) status, (int) 0 );
 }
 
 
 /*
- ************************************
  * waitpid:
  *
  */
-
 //acho que isso é o retorno.??sei lá.
 //< -1	meaning wait for any child process whose process group ID is equal to the absolute value of pid.
 //-1	meaning wait for any child process.

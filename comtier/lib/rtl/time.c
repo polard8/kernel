@@ -1,33 +1,34 @@
 /*
  * File: time.c 
- *
  * 2018 - Created by Fred Nora.
  */
- 
 
+
+#include <types.h>
+//#include <errno.h> 
 #include <time.h>
-#include <types.h> 
 #include <sys/time.h>
-
-
 #include <stdio.h> 
-
 #include <rtl/gramado.h> 
-
-
 
 
 // time 
 // #obs: 
 // O que representa esse retorno ?
 // Isso funciona.
+// system call. (224) get time
 
+time_t time(time_t *timer)
+{
+    time_t Ret=0;
 
-time_t time (time_t *timer){
-
-    time_t Ret;
-
-	//system call. (224) get time
+/*
+    if( (void*) timer == NULL )
+    {
+        errno = EINVAL;
+        return 0;
+    }
+*/
 
     Ret = (time_t) gramado_system_call ( 224, 0, 0, 0 );
 

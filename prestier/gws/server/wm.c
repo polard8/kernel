@@ -1596,7 +1596,7 @@ fail:
 // que está em last_window.
 // No teste isso é chamado pelo kernel através do handler.
 // Mas também será usado por rotinas internas.
-void wm_update_desktop(void)
+void wm_update_desktop(int tile)
 {
     struct gws_window_d *w;  // tmp
     struct gws_window_d *l;  // last of the stack
@@ -1606,7 +1606,8 @@ void wm_update_desktop(void)
 // create a stack o windows in the top/left corner
 // of the screen.
 
-   __Tile();
+    if(tile)
+        __Tile();
 
 // Redraw and show the root window.
     redraw_window(__root_window,TRUE);
@@ -2685,7 +2686,7 @@ wmProcedure(
             comp_get_mouse_y_position() );  // current cursor y
         
         //if(long1==1){ yellow_status("R1"); }
-        //if(long1==2){ yellow_status("R2"); wm_update_desktop(); return 0; }
+        //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
         //if(long1==1){ 
             //yellow_status("R1"); 
             //create_main_menu(8,8);
@@ -2802,7 +2803,7 @@ wmProcedure(
             (int)msg,
             (unsigned long)long1,
             (unsigned long)long2);
-        //wm_update_desktop(); // 
+        //wm_update_desktop(TRUE); // 
         return 0;
         break;
         
@@ -2838,13 +2839,14 @@ wmProcedure(
 
         //=====
         if(long1==VK_F5){
-            wm_update_desktop();
+            wm_update_desktop(TRUE);
             return 0;
         }
 
         //=====
         if(long1==VK_F6){
-            show_client_list(3);
+            wm_update_desktop(FALSE);
+            //show_client_list(3);
             return 0;
         }
         return 0;
@@ -2942,7 +2944,7 @@ wmHandler(
     if ( msg == 9092 )
     {
         //debug_print ("wmHandler: 9092\n");
-        wm_update_desktop();
+        wm_update_desktop(TRUE);
         return 0;  //important: We need to return.
     }
 

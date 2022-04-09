@@ -2425,7 +2425,7 @@ int serviceAsyncCommand (void)
         break;
 
     case 11:
-        wm_update_desktop(); //see: wm.c
+        wm_update_desktop(TRUE); //see: wm.c
         return 0;
         break;
 

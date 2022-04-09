@@ -91,7 +91,6 @@ unsigned long heapList[HEAP_COUNT_MAX];
 // == prototypes ===============================================
 //
 
-int __init_heap(void);
 void heapSetLibcHeap( unsigned long HeapStart, unsigned long HeapSize);
 
 

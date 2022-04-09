@@ -50,15 +50,12 @@ const char *sys_siglist[NSIG] = {
 };
 
 
-
-
 /*
- **************************
  * signal:
  *     POSIX.1-2001, POSIX.1-2008, C89, C99.
  */
 
-    //#todo
+//#todo
     
 sighandler_t signal (int signum, sighandler_t handler)
 {
@@ -105,6 +102,14 @@ int kill (pid_t pid, int sig)
 {
     debug_print ("kill: [TODO] \n");
 
+
+    if(pid<0)
+    {
+        errno=EINVAL;
+        return (int) -1;
+    }
+
+
 	// #todo
 	/*
 	int ret;
@@ -128,7 +133,7 @@ int kill (pid_t pid, int sig)
 int raise (int sig)
 {
     // FIXME: Support multi-threaded programs.
-    return (int) kill ( getpid(), sig);
+    return (int) kill( getpid(), sig);
 }
 
 
@@ -153,6 +158,13 @@ int sigismember (const sigset_t* set, int signum)
 int killpg (int pgrp, int sig)
 {
     debug_print ("killpg: [TODO] \n");
+
+    if( pgrp<0 )
+    {
+        errno=EINVAL;
+        return -1;
+    }
+
     return -1;
 }
 
@@ -161,6 +173,7 @@ int killpg (int pgrp, int sig)
 int sigemptyset (sigset_t *set)
 {
     *set = 0;
+
     return 0;
 }
 
@@ -169,6 +182,7 @@ int sigemptyset (sigset_t *set)
 int sigfillset (sigset_t *set)
 {
     *set = 0xffffffff;
+
     return 0;
 }
 
@@ -219,7 +233,6 @@ void psiginfo (const siginfo_t *si, const char *s)
     psignal (si->si_signo, s);
 }
 */
-
 
 
 //

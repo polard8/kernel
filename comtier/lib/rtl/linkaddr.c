@@ -34,7 +34,6 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <string.h>
-
 #include <stdio.h>
 
 
@@ -48,8 +47,8 @@ void link_addr(const char *addr, struct	sockaddr_dl *sdl)
 }
 
 
-char *link_ntoa (const struct sockaddr_dl *sdl){
-
+char *link_ntoa (const struct sockaddr_dl *sdl)
+{
     static char obuf[64];
     char *out;
     const u_char *in, *inlim;
