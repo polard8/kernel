@@ -176,7 +176,6 @@ to_FAT_name (
     int i=0;
     char *ptr;
 
-
     // Parent directory
     if ( !strcmp(src,"..") ) {
         strcpy(dst,src);
@@ -218,6 +217,7 @@ to_FAT_name (
 
     while (i<11){ dst[i++] = 0x20; };
 }
+
 
 /*
  * get_filesystem_type:
@@ -311,8 +311,7 @@ void set_file ( void *file, int Index )
 
 	// Include pointer in the list.
 
-
-     file_table[Index] = (unsigned long) file;
+    file_table[Index] = (unsigned long) file;
 }
 
 
@@ -3307,6 +3306,7 @@ done:
     return;
 }
 
+
 // sys_pwd -  Service 170.
 void sys_pwd (void)
 {
@@ -3314,7 +3314,9 @@ void sys_pwd (void)
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+    if ( current_process < 0 || 
+         current_process >= PROCESS_COUNT_MAX )
+    {
         panic ("sys_pwd: [FAIL] current_process\n");
     }
 
@@ -3857,16 +3859,15 @@ sys_write_file_to_disk (
     debug_print ("sys_write_file_to_disk:\n");
 
 
-    if ( (void*) file_name == NULL ){
-        debug_print ("sys_write_file_to_disk: file_name\n");
-        return -1;
+    if ( (void*) file_name == NULL )
+    {
+        return (int) (-EINVAL);
     }
 
-    if ( *file_name == 0 ){
-        debug_print ("sys_write_file_to_disk: *file_name\n");
-        return -1;
+    if ( *file_name == 0 )
+    {
+        return (int) (-EINVAL);
     }
-
 
     //++
     // See: sci/fs/write.c
@@ -3946,15 +3947,16 @@ sys_read_file_from_disk (
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( (void*) file_name == NULL ){
-        debug_print ("sys_read_file_from_disk: file_name\n");
-        return -1;
+    if ( (void*) file_name == NULL )
+    {
+        return (int) (-EINVAL);
     }
 
-    if ( *file_name == 0 ){
-        debug_print ("sys_read_file_from_disk: *file_name\n");
-        return -1;
+    if ( *file_name == 0 )
+    {
+        return (int) (-EINVAL);
     }
+
 
 // Convertendo o formato do nome do arquivo.    
 // >>> "12345678XYZ"
@@ -4401,14 +4403,14 @@ int sys_create_empty_file ( char *file_name )
 
     debug_print ("sys_create_empty_file:\n");
 
-    if ( (void*) file_name == NULL ){
-        debug_print ("sys_create_empty_file: file_name\n");
-        return -1;
+    if ( (void*) file_name == NULL )
+    {
+        return (int) (-EINVAL);
     }
 
-    if ( *file_name == 0 ){
-        debug_print ("sys_create_empty_file: *file_name\n");
-        return -1;
+    if ( *file_name == 0 )
+    {
+        return (int) (-EINVAL);
     }
 
 
@@ -4454,15 +4456,16 @@ int sys_create_empty_directory ( char *dir_name )
 
     debug_print ("sys_create_empty_directory:\n");
 
-    if ( (void*) dir_name == NULL ){
-        debug_print ("sys_create_empty_directory: dir_name\n");
-        return -1;
+    if ( (void*) dir_name == NULL )
+    {
+        return (int) (-EINVAL);
     }
 
-    if ( *dir_name == 0 ){
-        debug_print ("sys_create_empty_directory: *dir_name\n");
-        return -1;
+    if ( *dir_name == 0 )
+    {
+        return (int) (-EINVAL);
     }
+
 
     fs_fntos ( (char *) dir_name );
 

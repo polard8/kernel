@@ -1928,21 +1928,10 @@ int process_get_tty (int pid)
     struct process_d *p;
     struct tty_d *tty;
 
-    //#debug
-    //printf ("process_get_tty: pid %d \n", pid);
-    //refresh_screen();
-
-// #todo
-// Overflow ?
-    
-    if ( pid < 0 )
+    if ( pid < 0 || pid >= PROCESS_COUNT_MAX )
     {
-        debug_print ("process_get_tty: pid \n");
-        //printf ("pid fail\n");
-        //refresh_screen();
-        return -1;
+        return (int) (-EINVAL);
     }
-
 
     p = (struct process_d *) processList[pid];
 

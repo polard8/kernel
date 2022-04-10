@@ -196,7 +196,8 @@ void *sys_create_process (
     CurrentThread = (struct thread_d *) threadList[current_thread];
     
     // No switch yet.
-    if ((void*)CurrentThread==NULL){
+    if ((void*)CurrentThread==NULL)
+    {
         return NULL;
     }
 
@@ -821,13 +822,6 @@ fail:
 // chamando as rotinas apropriadas para cada tipo 
 // de arquivo.
 
-// OUT:
-// 0 = Couldn't read.
-// -1 = Error.
-
-ssize_t sys_write (int fd, char *ubuf, size_t count)
-{
-
 // #todo
 // Copiar deve ser uma opcao e nao uma regra!
 // Precisamos de uma flag para copyonwrite.
@@ -841,6 +835,12 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // do socket privado do processo. Pois poderemos estar
 // escrevendo em outro socket que nao o privado.
 
+// OUT:
+// 0 = Couldn't read.
+// -1 = Error.
+
+ssize_t sys_write (int fd, char *ubuf, size_t count)
+{
     file *__file;
 
     struct socket_d  *s1;
@@ -1765,10 +1765,9 @@ int sys_close (int fd)
     struct process_d *p;
     pid_t current_process = (pid_t) get_current_process();
 
+// ??
+// Can we close this devices?
 
-    // ??
-    // Can we close this devices?
-    
     /*
     if (fd == 0 || fd == 1 || fd == 2 )
     {
@@ -1778,16 +1777,16 @@ int sys_close (int fd)
     }
     */
 
+// Invalid fd;
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_close: fd\n");
-        return (int) (-EINVAL);
+        return (int) (-EBADF);
     }
 
-    // Process.
-
-    // #todo: Check overflow.
-    if ( current_process < 0 ){
+// Process
+    if ( current_process < 0 || 
+         current_process >= PROCESS_COUNT_MAX )
+    {
         debug_print("sys_close: current_process\n");
         goto fail;
     }
@@ -1823,11 +1822,11 @@ int sys_close (int fd)
     }
 
 
-    // What type of object?
-    // socket, pipe, virtual console, tty, regular file ??
- 
-    // ===============================================
-    // socket
+// What type of object?
+// socket, pipe, virtual console, tty, regular file ??
+
+// ===============================================
+// socket
     if ( object->____object == ObjectTypeSocket )
     {
         debug_print("sys_close: Trying to close a socket object\n");
@@ -1837,8 +1836,8 @@ int sys_close (int fd)
         return 0;
     }
 
-    // ==============================================
-    // pipe
+// ==============================================
+// pipe
     if ( object->____object == ObjectTypePipe )
     {
         debug_print("sys_close: Trying to close a pipe object\n");
@@ -1848,16 +1847,15 @@ int sys_close (int fd)
         return 0;
     }
 
-
-    // ====================================================
-    // virtual console.
+// ====================================================
+// virtual console.
     if ( object->____object == ObjectTypeVirtualConsole ){
         debug_print("sys_close: Trying to close a virtual console object\n");
         return 0;
     }
- 
-    // =====================================================
-    // tty
+
+// =====================================================
+// tty
     if ( object->____object == ObjectTypeTTY )
     {
         debug_print("sys_close: Trying to close a tty object\n");
@@ -1867,15 +1865,15 @@ int sys_close (int fd)
         return 0;
     }
 
-    // #bugbug
-    // Poderemos ter problemas aqui com os diversos tipos
-    // de arquivos.
+// #bugbug
+// Poderemos ter problemas aqui com os diversos tipos
+// de arquivos.
 
-    // #bugbug
-    // ugly test
+// #bugbug
+// ugly test
 
-    // ===========================================
-    // regular file
+// ===========================================
+// regular file
     if ( object->____object == ObjectTypeFile )
     {
         debug_print("sys_close: [FIXME] trying to close a regular file\n");
@@ -1910,9 +1908,9 @@ int sys_close (int fd)
         return 0;
     }
 
-    //
-    // Object type not supported.
-    //
+//
+// Object type not supported.
+//
     
     debug_print("sys_close:[FAIL] Object type not supported yet \n");
 
@@ -1921,16 +1919,19 @@ fail:
     return (int) (-1);
 }
 
+
 // Exit thread.
 void sys_exit_thread (int tid)
 {
-    if ( tid < 0 ){
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
         //todo: message
         return;
     }
 
     exit_thread (tid);
 }
+
 
 int sys_fork (void)
 {
@@ -1949,17 +1950,14 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 {
     debug_print ("sys_fcntl:\n");
 
-// fd.
+// fd
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_fcntl: fd\n");
-        printf     ("sys_fcntl: fd\n");
-        return (int) (-EINVAL);
+        return (int) (-EBADF);
     }
 
     if ( cmd < 0 ){
-        debug_print ("sys_fcntl: cmd\n");
-        return -1;
+        return (int) (-EINVAL);
     }
 
 //POSIX Table 6-1.
@@ -2028,7 +2026,8 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
     };
 
     debug_print ("sys_fcntl: FAIL\n");
-    return -1; //#todo
+
+    return (int) -1; //#todo
 }
 
 
@@ -2071,13 +2070,10 @@ unsigned long sys_get_file_size ( char *path )
 
 int sys_get_file_sync (int fd, int request)
 {
-	
 	// #deprecated
-
 
     struct process_d  *p;
     file *object;
-
 
     pid_t current_process = (pid_t) get_current_process();
     
@@ -2095,8 +2091,7 @@ int sys_get_file_sync (int fd, int request)
 
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_get_file_sync: [FAIL] fd\n");
-        return (int) (-1);
+        return (int) (-EBADF);
     }
 
     // == Process ================
@@ -2301,12 +2296,10 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     debug_print ("sys_ioctl: [FIXME] \n");
 
-    // fd.
+// fd
     if ( fd < 0 || fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_ioctl: fd\n");
-        printf     ("sys_ioctl: fd\n");
-        return (int) (-EINVAL);
+        return (int) (-EBADF);
     }
 
 // Enquanto sys_ioctl eh chamada pelos applicativos,
@@ -2315,11 +2308,12 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     retvalue = (int) io_ioctl(fd,request,arg);
 
-    if( retvalue<0){
+    if( retvalue<0)
+    {
         printf("sys_ioctl: io_ioctl fail\n");
     }
-    
-    return retvalue;
+
+    return (int) retvalue;
 }
 
 
@@ -2346,6 +2340,11 @@ sys_open (
 
 // #todo:
 // check arguments.
+
+    if( (void*) pathname == NULL )
+    {
+        return (int) (-EINVAL);
+    }
 
 // ??
 // creat chama open.
@@ -2411,14 +2410,16 @@ void sys_reboot (void)
     panic("sys_reboot:");
 }
 
+
 // 289
 // See: sm/debug/debug.c
-int sys_serial_debug_printk ( char *s )
+int sys_serial_debug_printk(char *s)
 {
-    //#todo
-    //if ( (void *) s == NULL )
-        //return -1;
-        
+    if ( (void *) s == NULL )
+    {
+        return (int) (-EINVAL);
+    }
+
     debug_print ( (char *) s );
     return 0;
 }
@@ -2430,13 +2431,11 @@ int sys_serial_debug_printk ( char *s )
 void sys_set_file_sync(int fd, int request, int data)
 {
 
-    //
-    // #deprecated
-    //
-
+//
+// #deprecated
+//
     struct process_d  *p;
     file *object;
-
 
     pid_t current_process = (pid_t) get_current_process();
     
@@ -2601,32 +2600,28 @@ void sys_show_system_info ( int n )
 // FALSE= nao pode ler; 
 // TRUE= pode ler.
 
-int sys_sleep_if_socket_is_empty ( int fd )
+int sys_sleep_if_socket_is_empty(int fd)
 {
     struct process_d *p;
     file *object;
 
-
     pid_t current_process = (pid_t) get_current_process();
-
 
     if ( fd < 0 || 
          fd >= NUMBER_OF_FILES )
     {
-        debug_print("sys_sleep_if_socket_is_empty: fd\n");
-        return (int) (-1);
-        //return -EINVAL;
+        return (int) (-EBADF);
     }
 
-// #todo: max lim.
+// process
 
-    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+    if ( current_process < 0 || 
+         current_process >= PROCESS_COUNT_MAX )
+    {
         debug_print("sys_sleep_if_socket_is_empty: current_process\n");
         return (int) (-1);
     }
 
-    // process
-    
     p = (void *) processList[current_process];
 
     if ( (void *) p == NULL ){

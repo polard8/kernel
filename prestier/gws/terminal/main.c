@@ -2301,10 +2301,9 @@ int __input_STDIN(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        rtl_yield(); // relax
-        
+        //rtl_yield(); // relax
     };
-    
+
     return 0;
 }
 

@@ -271,29 +271,27 @@ static void *__extra_services (
     //    return (void *) pty_link_by_pid ( (int) arg2, (int) arg3 );
     //}
 
-
     // Channel is a file descriptor in the file list 
     // of the current process.
-    // IN: fd, buf, count.         
-    if (number == 272){
+    // IN: fd, buf, count.
+    if (number == 272)
+    {
            return (void *) tty_read ( 
                                (unsigned int) arg2,    // channel 
                                (char *)       arg3,    // buf
                                (int)          arg4 );  // nr
     }
 
-
     // Channel is a file descriptor in the file list 
     // of the current process.
-    // IN: fd, buf, count.         
-    if (number == 273){
+    // IN: fd, buf, count.
+    if (number == 273)
+    {
         return (void *) tty_write ( 
                             (unsigned int) arg2,    // channel 
                             (char *)       arg3,    // buf
                             (int)          arg4 );  // nr
     }
-
-
 
     // Get current virtual console.
     if (number == 277 ){
@@ -307,12 +305,10 @@ static void *__extra_services (
         return NULL;
     }
 
-
     // Returns the current runlevel.
     if ( number == 288 ){
         return (void *) newos_get_current_runlevel();
     }
-
 
     // Serial debug print.
     // See: sci/sys/sys.c
@@ -332,7 +328,6 @@ static void *__extra_services (
     if ( number == 293 ){
         return (void *) info_get_boot_info ( (int) arg2 );
     }
-
 
     // Inicializar ou reinicializar componentes do sistema
     // depois da inicialização completa do kernel.
@@ -406,8 +401,6 @@ static void *__extra_services (
         // It means pid=0.
         return NULL;
     }
-
-
 
 
     // 513
@@ -520,7 +513,9 @@ static void *__extra_services (
         return NULL; //fail
     }
 
-
+    // #bugbug
+    // This is a ring0 pointer.
+    // A ring3 process can't handle this thing.
     // Get current desktop
     if (number == 519){  return (void *) CurrentDesktop; }
 
@@ -636,6 +631,7 @@ static void *__extra_services (
     // #todo
     // supporting ptsname libc function
     // get_ptsname
+    // #todo: Change the name to sys_ptsname()
     // IN: fd do master, buffer em ring3 para o nome, buflen
     //
     if ( number == 808 ){
@@ -645,6 +641,7 @@ static void *__extra_services (
     
     //#todo
     //supporting ptsname_r libc function
+    // #todo: Change the name to sys_ptsname()
     //IN: fd do master, buffer e buflen.
     if ( number == 809 ){
         return (void *) __ptsname ( (int) arg2, 
@@ -982,8 +979,11 @@ void *sci0 (
 
 // Profiling in the process structure.
 
-    if (current_process<0)
+    if ( current_process<0 ||
+         current_process >= PROCESS_COUNT_MAX )
+    {
         panic("sci0: current_process\n");
+    }
 
     p = (struct process_d *) processList[current_process];
 
@@ -996,7 +996,8 @@ void *sci0 (
     
     // #debug
     // #todo: Explain it better.
-    if (number == 4321){
+    if (number == 4321)
+    {
         printf ("4321: arg2 %x | arg3 %x | arg4 %x \n",arg2,arg3,arg4);
         invalidate_screen();
         //refresh_screen();
@@ -1088,9 +1089,9 @@ void *sci0 (
             break;
 
         // 5
-        // See: sci/sys/sys.c 
+        // See: sys.c 
         case SYS_VSYNC:
-            sys_vsync();  
+            sys_vsync();
             return NULL;
             break;
 
@@ -1285,7 +1286,7 @@ void *sci0 (
 
         // 65
         // Put a char in the current virtual console.
-        // see: tty/console.c
+        // see: console.c
         // IN: ch, console id.
         case SYS_KGWS_PUTCHAR:
             console_putchar ( (int) arg2, (int) arg3 ); 
@@ -1411,6 +1412,7 @@ void *sci0 (
         // TID eh a thread atual.
         // PID veio via argumento.
         // IN: pid, status, option
+        // #todo: Change the name to sys_xxxx
  
         case SYS_WAIT4PID: 
             debug_print("sci0: [FIXME] SYS_WAIT4PID\n");
@@ -1715,9 +1717,8 @@ void *sci0 (
             return NULL;
             break;
 
-
         // 178
-        // See: sci/sys/sys.c
+        // See: sys.c
         case 178:
             return (void *) sys_get_file_size ( (unsigned char *) arg2 );
             break;
@@ -1838,6 +1839,14 @@ void *sci1 (
     debug_print ("sci1: [TODO]\n");
 
     pid_t current_process = (pid_t) get_current_process();
+
+
+    if ( current_process<0 ||
+         current_process >= PROCESS_COUNT_MAX )
+    {
+        panic("sci1: current_process\n");
+    }
+
 
     switch (number){
 

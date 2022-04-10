@@ -293,7 +293,7 @@ done:
 
 
 /*
- * tty_read:
+ * tty_read: service 272
  *     Ler uma certa quantidade de bytes, 
  * da tty para o buffer indicado no argumento.
  */
@@ -323,12 +323,18 @@ tty_read (
 
 // fd
 
-    if ( fd < 0 || fd > 31 ){
-        printf ("tty_read: invalid fd\n");
-        refresh_screen();
-        return -1;
+    if ( fd < 0 || fd > 31 )
+    {
+        return (int) (-EBADF);
     }
 
+//#todo
+    //if( (void*) buffer == NULL )
+    //{
+    //    return (int) (-EINVAL);
+    //}
+
+// #todo: 'n'
 
 // process.
 // Vamos pegar o ponteiro de estrutura
@@ -390,6 +396,7 @@ tty_read (
 }
 
 
+// service 273
 // IN: 
 // fd = indice na lista de arquivos abertos pelo processo.
 int 
@@ -407,12 +414,20 @@ tty_write (
     pid_t current_process = (pid_t) get_current_process();
 
 // fd
-
-    if ( fd < 0 || fd > 31 ){
-        printf ("tty_write: invalid fd\n");
-        refresh_screen();
-        return -1;
+    if ( fd < 0 || fd > 31 )
+    {
+        return (int) (-EBADF);
     }
+
+//#todo
+    //if( (void*) buffer == NULL )
+    //{
+    //    return (int) (-EINVAL);
+    //}
+
+// #todo: 'n'
+
+
 
 // process
 // vamos pegar o ponteiro do processo

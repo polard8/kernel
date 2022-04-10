@@ -33,6 +33,7 @@ int sys_setup_stdin( int stdin_fd )
     if(p->magic != 1234)
         return FALSE;
 
+
     if(stdin_fd < 0 || stdin_fd >= 32)
         return FALSE;
 

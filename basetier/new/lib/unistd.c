@@ -105,10 +105,14 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     debug_print("sys_lseek: [WORK IN PROGRESS]\n");
 
 
-    if (fd<0 || fd >= 32){
-        debug_print("sys_lseek: fd\n");
-        return -1; 
+    if (fd<0 || fd >= 32)
+    {
+        return (off_t) (-EBADF);
     }
+
+//#todo
+    //if(offset<0)
+        //return (off_t) (-EINVAL);
 
 // Process
 

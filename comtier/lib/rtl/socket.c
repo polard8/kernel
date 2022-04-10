@@ -136,18 +136,30 @@ bind (
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
-    int __status = -1;
+    int value = -1;
 
-    __status = (int) gramado_system_call ( 7003, 
+    if(sockfd<0)
+    {
+        errno=EBADF;
+        return -1;
+    }
+
+// #todo: Check addr and addrlen.
+
+    value = (int) gramado_system_call ( 
+                     7003, 
                      (unsigned long) sockfd, 
                      (unsigned long) addr, 
                      (unsigned long) addrlen );
 
-    if (__status<0){
+    if (value<0)
+    {
+        errno = (-value);
         printf ("bind: [FAIL] Couldn't bind\n");
+        return -1;
     }
 
-    return (int) __status;
+    return (int) value;
 }
 
 

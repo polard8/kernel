@@ -33,13 +33,21 @@ int abs(int j)
 }
 
 
-
 // Supporting the services 808 e 809.
+// See: sci.c
+// #todo: change the name to 'ubuf'.
 int __ptsname (int fd, char *buf, size_t buflen)
 {
      char *ptsname_buffer = (char *) buf;
 
      char test_str[50] = "new-__ptsname: test string";
+
+// #todo: fd
+
+    if ( (void*) buf == NULL )
+    {
+        return (int) (-EINVAL);
+    }
 
     // 64 bytes limit
     strcpy ( ptsname_buffer, (const char *) test_str );

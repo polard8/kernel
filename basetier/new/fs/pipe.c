@@ -32,8 +32,13 @@ int sys_dup ( int oldfd ){
     int i=0;
     int slot = -1;
 
-    pid_t current_process = (pid_t) get_current_process();
 
+    if( oldfd < 0 || oldfd > 31 )
+        return (int) (-EINVAL);
+
+// process
+
+    pid_t current_process = (pid_t) get_current_process();
 
     Process = (void *) processList[current_process];
 
@@ -122,12 +127,18 @@ fail:
 // Here is not the place for this function.
 // Move it to rtl.
 
-int sys_dup2 (int oldfd, int newfd){
-
+int sys_dup2 (int oldfd, int newfd)
+{
     file *f_old;
     file *f_new;
-
     struct process_d *Process;
+
+    if( oldfd < 0 || oldfd > 31 )
+        return (int) (-EINVAL);
+
+    if( newfd < 0 || newfd > 31 )
+        return (int) (-EINVAL);
+
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -195,14 +206,21 @@ fail:
 // Here is not the place for this function.
 // Move it to rtl.
 
-int sys_dup3 (int oldfd, int newfd, int flags){
-	
-	//#todo: flags.
+int sys_dup3 (int oldfd, int newfd, int flags)
+{
+    //#todo: flags.
 
     file  *f_old;
     file  *f_new;
-
     struct process_d *Process;
+
+
+    if( oldfd < 0 || oldfd > 31 )
+        return (int) (-EINVAL);
+
+    if( newfd < 0 || newfd > 31 )
+        return (int) (-EINVAL);
+
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -503,6 +521,13 @@ int sys_pipe ( int *pipefd, int flags )
 int sys_read_pipe ( int fd, char *ubuf, int count )
 {
     debug_print ("sys_read_pipe: TODO\n");
+
+    if(fd<0 || fd>31)
+        return (int) (-EBADF);
+
+    if( (void*) ubuf == NULL )
+        return (int) (-EINVAL);
+
     return -1;
 }
 
@@ -510,9 +535,15 @@ int sys_read_pipe ( int fd, char *ubuf, int count )
 int sys_write_pipe ( int fd, char *ubuf, int count )
 {
     debug_print ("sys_write_pipe: TODO\n");
+
+    if(fd<0 || fd>31)
+        return (int) (-EBADF);
+
+    if( (void*) ubuf == NULL )
+        return (int) (-EINVAL);
+
     return -1;
 }
-
 
 
 // The pipe is created with buffer in form of
@@ -533,14 +564,13 @@ pipe_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
-
     debug_print ("pipe_ioctl: TODO\n");
 
-
-    if (fd<0){
-        debug_print("pipe_ioctl: [FAIL] fd\n");
-        return -1;    
+    if (fd<0 || fd>31)
+    {
+        return (int) (-EBADF);
     }
+
 
     switch (request){
 
