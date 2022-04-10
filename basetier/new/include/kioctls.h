@@ -1,8 +1,9 @@
+
+// ioctls.h
 // Credits: linux.
 
 #ifndef __ASM_GENERIC_IOCTLS_H
-#define __ASM_GENERIC_IOCTLS_H
-
+#define __ASM_GENERIC_IOCTLS_H    1
 
 
 //#include <linux/ioctl.h>

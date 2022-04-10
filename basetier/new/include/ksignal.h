@@ -1,4 +1,5 @@
 
+// signal.h
 
 #ifndef  __SIGNAL_H
 #define  __SIGNAL_H    1
@@ -378,24 +379,6 @@ struct	sigcontext {
 #endif	/* _POSIX_SOURCE */
 
 
-
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

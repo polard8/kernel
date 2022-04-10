@@ -1,4 +1,6 @@
 
+// kstdlib.h
+
 #ifndef  __STDLIB_H
 #define __STDLIB_H    1
 
@@ -11,7 +13,6 @@
 
 // Números pseudo-aleatórios   
 #define RAND_MAX  32767    //0x7FFF
-
 
 
 //

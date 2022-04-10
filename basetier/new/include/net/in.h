@@ -4,8 +4,7 @@
  */
 
 #ifndef ____IN_H
-#define ____IN_H
-
+#define ____IN_H    1
 
 #define  _NETINET_IN_H_
 
@@ -16,7 +15,7 @@
 #define  __IPPROTO_TCP     6    // Transmission control protocol.
 #define  __IPPROTO_UDP    17    // User datagram protocol.
 
-#define  __IPPROTO_RAW          255   // Raw IP packet.
+#define  __IPPROTO_RAW    255   // Raw IP packet.
 
 
 #define FACILITY_TCP_PORT  __IPPROTO_TCP

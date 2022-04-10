@@ -9,10 +9,8 @@
  */
  
 
-
 #ifndef ____CTYPE_H
 #define ____CTYPE_H    1
-
 
 
 // linux
@@ -43,8 +41,7 @@
 //in lib/libc-src/ctype.c
 
 extern const unsigned char _ctype[];
-#define __ismask(x) (_ctype[(int)(unsigned char)(x)])
-
+#define __ismask(x)  (_ctype[(int)(unsigned char)(x)])
 
 
 //partes: básico, intermediário e definitivo.
@@ -64,9 +61,10 @@ extern const unsigned char _ctype[];
 #define isalpha(c)	((__ismask(c)&(_U|_L)) != 0)
 #define isupper(c)	((__ismask(c)&(_U)) != 0)
 #define islower(c)	((__ismask(c)&(_L)) != 0)
+//#ugly.
 static inline int isdigit(int c)
 {
-	return '0' <= c && c <= '9';
+    return '0' <= c && c <= '9';
 }
 #define isxdigit(c)	((__ismask(c)&(_D|_X)) != 0)
 #define isspace(c)	((__ismask(c)&(_S)) != 0)

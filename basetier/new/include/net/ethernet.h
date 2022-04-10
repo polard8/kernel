@@ -1,7 +1,8 @@
+
 // ethernet.h
 
 #ifndef ____ETHERNET_H
-#define ____ETHERNET_H
+#define ____ETHERNET_H   1
 
 
 
@@ -69,19 +70,17 @@ EtherType values for some notable protocols[8] EtherType 	Protocol
 
 
 
-
 // Ethernet header length
 #define ETHERNET_HEADER_LENGHT 14      
 
 // ethernet header
-struct ether_header {
-	
-	uint8_t dst[6];
-	uint8_t src[6];
-	uint16_t type;
-	
-} __attribute__((packed)); 
+struct ether_header 
+{
+    uint8_t dst[6];
+    uint8_t src[6];
 
+    uint16_t type;
+} __attribute__((packed)); 
 
 
 #endif    

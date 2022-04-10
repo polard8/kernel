@@ -1,12 +1,10 @@
 
-// File: sys/ioctl.h
-
-//see: sys/ioctls.h
+// File: ioctl.h
+// see: ioctls.h
 
 
 #ifndef ____IOCTL_H
 #define ____IOCTL_H    1
-
 
 
 /*

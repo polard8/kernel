@@ -53,9 +53,7 @@ char *k_strtok (char *s, const char *delim);
 
 char *strdup (const char *str);
 
-
 #endif    
-
 
 
 //

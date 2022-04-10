@@ -1,7 +1,12 @@
-// kernel.h
-// proting from Gramado.
 
+// kernel.h
+// Created by Fred Nora.
+
+
+// This status flag is setted when
+// the callouts to GWSSRV.BIN are installed.
 int gUseWMCallbacks;
+
 
 //
 // == gramado modes =========================
@@ -101,15 +106,13 @@ struct io_control_d  IOControl;
 
 // ...
 
-
+// global. Don't use static.
 // Importados de bl64.
 // See: main.c
 unsigned long SavedLFB;
 unsigned long SavedX;
 unsigned long SavedY;
 unsigned long SavedBPP;
-
-
 
 
 // =========================================================
@@ -140,29 +143,26 @@ unsigned long SavedBPP;
 #include "gramado/0globals/ginput.h"  // input manager support.
 #include "gramado/0globals/gwd.h"     // whatch dogs.
 
-//#test
-#include "rtl/stdarg.h"
-
-// rtl 
-// Inside the base kernel
-#include "rtl/errno.h"
-#include "rtl/cdefs.h"
-#include "rtl/stddef.h"
-#include "rtl/types.h"
-#include "rtl/types2.h"
-#include "rtl/limits.h"
-#include "rtl/kstdio.h"
-#include "rtl/stdlib.h"
-#include "rtl/string.h"
-#include "rtl/ctype.h"
-#include "rtl/iso646.h"
-#include "rtl/signal.h"
-#include "rtl/unistd.h"
-#include "rtl/fcntl.h"
-#include "rtl/ioctl.h"
-#include "rtl/ioctls.h"
-#include "rtl/termios.h"
-#include "rtl/ttydef.h"
+// libc support.
+#include "kstdarg.h"
+#include "kerrno.h"
+#include "kcdefs.h"
+#include "kstddef.h"
+#include "ktypes.h"
+#include "ktypes2.h"
+#include "klimits.h"
+#include "kstdio.h"
+#include "kstdlib.h"
+#include "kstring.h"
+#include "kctype.h"
+#include "kiso646.h"
+#include "ksignal.h"
+#include "kunistd.h"
+#include "kfcntl.h"
+#include "kioctl.h"
+#include "kioctls.h"
+#include "ktermios.h"
+#include "kttydef.h"
 
 
 
@@ -203,14 +203,7 @@ unsigned long SavedBPP;
 #include "hal/x64.h"
 #include "hal/detect.h"
 
-
 #include "drivers/tty/serial.h"
-
-
-// todo: 
-// podemos mover isso de lugar para perto de net/
-#include "rtl/net/mac.h"
-
 
 //ata
 #include "drivers/ata/ata.h"
@@ -226,23 +219,17 @@ unsigned long SavedBPP;
 #include "hal/pit.h"
 #include "hal/pic.h"
 #include "hal/apic.h"
-
 #include "hal/mp.h"
-
 #include "hal/cpuid.h"
 #include "hal/rtc.h"
-
 
 #include "drivers/input/i8042/keyboard.h"
 #include "drivers/input/i8042/mouse.h"
 
 #include "hal/bus/pci.h"
-
-
 #include "hal/up.h"
 #include "hal/breaker.h"
 #include "hal/hal.h"
-
 
 // ps
 #include "ps/image.h"
@@ -256,7 +243,6 @@ unsigned long SavedBPP;
 #include "ps/mk.h"
 #include "ps/dispatch.h"
 
-
 #include "user/ws.h"
 #include "user/graphics.h"
 #include "user/vk.h"
@@ -264,11 +250,7 @@ unsigned long SavedBPP;
 #include "user/window.h"
 // ...
 
-
-//
-// == Security ===============================
-//
-
+// Security
 #include "user/security/usession.h"
 #include "user/security/room.h"
 #include "user/security/desktop.h"
@@ -277,13 +259,11 @@ unsigned long SavedBPP;
 #include "user/security/user.h"
 #include "user/security/security.h"
 
-
 // tty
 #include "drivers/tty/ttyldisc.h"
 #include "drivers/tty/ttydrv.h"
 #include "drivers/tty/tty.h"
 #include "drivers/tty/pty.h"
-
 
 #include "user/vt.h"
 #include "user/console.h"
@@ -296,26 +276,20 @@ unsigned long SavedBPP;
 #include "drivers/input/i8042/ps2kbd.h"
 #include "drivers/input/i8042/ps2.h"
 
+// Network
 
-
-//
-// == NETWORK ====
-//
-
-//#include "rtl/net/connect.h" 
-#include "rtl/net/host.h"
-#include "rtl/net/ethernet.h"
-#include "rtl/net/arp.h"
-#include "rtl/net/udp.h"
-#include "rtl/net/tcp.h"
-
-#include "rtl/net/in.h"
-#include "rtl/net/un.h"
-#include "rtl/net/nports.h"     //(network) Network Ports  (sw)
-#include "rtl/net/icmp.h" 
-#include "rtl/net/network.h"     //(network) Gerenciamento de rede.  
-#include "rtl/net/socket.h"      //last always
-
+#include "net/mac.h"
+#include "net/host.h"
+#include "net/ethernet.h"
+#include "net/arp.h"
+#include "net/udp.h"
+#include "net/tcp.h"
+#include "net/in.h"
+#include "net/un.h"
+#include "net/nports.h"     //(network) Network Ports  (sw)
+#include "net/icmp.h" 
+#include "net/network.h"     //(network) Gerenciamento de rede.  
+#include "net/socket.h"      //last always
 
 // device manager
 #include "drivers/devmgr.h"      
@@ -338,7 +312,7 @@ unsigned long SavedBPP;
 // profiler
 #include "gramado/pints.h"
 
-#include "rtl/runtime.h"
+#include "runtime.h"
 #include "gramado/request.h"
 #include "gramado/gpid.h"      // Globals. PIDs support.
 #include "gramado/utsname.h"
@@ -352,8 +326,8 @@ unsigned long SavedBPP;
 // by the ring3 apps via system call.
 // This is the last #include. :^)
 
-#include "rtl/sci/syscall.h"        
-#include "rtl/sci/sys.h"
+#include "syscall.h"
+#include "sys.h"
 
 
 // ==============================

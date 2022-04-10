@@ -1,5 +1,7 @@
 
 
+// fcntl.h
+
 #ifndef ____FCNTL_H
 #define ____FCNTL_H    1
 
@@ -93,21 +95,11 @@ struct flock {
 };
 
 
-
-
 #endif  //____FCNTL_H
 
 
 //
 // End.
 //
-
-
-
-
-
-
-
-
 
 

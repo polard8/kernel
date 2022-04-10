@@ -1,18 +1,17 @@
 /*
  * File: nports.h
- *
  *  Descrição:
  *      Network ports manager.
  *      Portas de comunicação de rede.
- *
  */
- 
+
 
 #ifndef ____NPORTS_H
-#define ____NPORTS_H
+#define ____NPORTS_H    1
 
 
-// See: https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+// See: 
+// https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
  
 // Application services can subscribe to one or more port(s) 
 // to be notified if a UDP message is sent to that port  
