@@ -33,7 +33,7 @@ int sys_dup ( int oldfd ){
     int slot = -1;
 
 
-    if( oldfd < 0 || oldfd > 31 )
+    if( oldfd < 0 || oldfd >= OPEN_MAX )
         return (int) (-EINVAL);
 
 // process
@@ -133,10 +133,10 @@ int sys_dup2 (int oldfd, int newfd)
     file *f_new;
     struct process_d *Process;
 
-    if( oldfd < 0 || oldfd > 31 )
+    if( oldfd < 0 || oldfd >= OPEN_MAX )
         return (int) (-EINVAL);
 
-    if( newfd < 0 || newfd > 31 )
+    if( newfd < 0 || newfd >= OPEN_MAX )
         return (int) (-EINVAL);
 
 
@@ -215,10 +215,10 @@ int sys_dup3 (int oldfd, int newfd, int flags)
     struct process_d *Process;
 
 
-    if( oldfd < 0 || oldfd > 31 )
+    if( oldfd < 0 || oldfd >= OPEN_MAX )
         return (int) (-EINVAL);
 
-    if( newfd < 0 || newfd > 31 )
+    if( newfd < 0 || newfd >= OPEN_MAX )
         return (int) (-EINVAL);
 
 
@@ -367,7 +367,7 @@ int sys_pipe ( int *pipefd, int flags )
 	// Para evitar, começaremos depois deles.
 
     // Reserva um slot.
-    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    for ( i=3; i< OPEN_MAX; i++ )
     {
         if ( Process->Objects[i] == 0 )
         {
@@ -376,7 +376,7 @@ int sys_pipe ( int *pipefd, int flags )
     };
 
     // Reserva um slot.
-    for ( i=3; i< NUMBER_OF_FILES; i++ )
+    for ( i=3; i< OPEN_MAX; i++ )
     {
         if ( Process->Objects[i] == 0 )
         {
@@ -395,7 +395,7 @@ int sys_pipe ( int *pipefd, int flags )
 
 	// buffer
 
-    char *buff = (char *) kmalloc (BUFSIZ);
+    char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
 
     if ( (void *) buff == NULL ){
@@ -522,7 +522,7 @@ int sys_read_pipe ( int fd, char *ubuf, int count )
 {
     debug_print ("sys_read_pipe: TODO\n");
 
-    if(fd<0 || fd>31)
+    if(fd<0 || fd>=OPEN_MAX)
         return (int) (-EBADF);
 
     if( (void*) ubuf == NULL )
@@ -536,7 +536,7 @@ int sys_write_pipe ( int fd, char *ubuf, int count )
 {
     debug_print ("sys_write_pipe: TODO\n");
 
-    if(fd<0 || fd>31)
+    if(fd<0 || fd >= OPEN_MAX)
         return (int) (-EBADF);
 
     if( (void*) ubuf == NULL )
@@ -566,11 +566,10 @@ pipe_ioctl (
 {
     debug_print ("pipe_ioctl: TODO\n");
 
-    if (fd<0 || fd>31)
+    if (fd<0 || fd>=OPEN_MAX)
     {
         return (int) (-EBADF);
     }
-
 
     switch (request){
 

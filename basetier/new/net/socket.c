@@ -136,25 +136,26 @@ unsigned long getSocketPort ( struct socket_d *socket )
 
 // Get the pointer for the socket structure 
 // given the fd.
-struct socket_d *get_socket_from_fd (int fd){
-
+struct socket_d *get_socket_from_fd (int fd)
+{
     struct process_d *p;
     file *_file;
 
 
-    pid_t current_process = (pid_t) get_current_process();    
-
-
-    if (fd<0 || fd>=32){
+    if (fd<0 || fd>=OPEN_MAX)
+    {
         //msg
         return (struct socket_d *) 0;
     }
 
-// The process.
+// process
+
+    pid_t current_process = (pid_t) get_current_process();    
 
     p = (struct process_d *) processList[current_process];
     
-    if ( (void *) p == NULL){
+    if ( (void *) p == NULL)
+    {
         return (struct socket_d *) 0;
     }
 
@@ -180,15 +181,13 @@ void show_socket_for_a_process (pid_t pid){
     struct process_d  *p;
     struct socket_d   *s;
 
-
     printf ("Socket info for pid %d: \n", pid);
 
-    //#todo: max
-    if (pid<0){
+    if (pid<0 || pid >= PROCESS_COUNT_MAX)
+    {
         printf ("pid limits\n");
         goto fail;
     }
-
 
     p = (struct process_d *) processList[pid];
 
@@ -687,20 +686,15 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     debug_print ("socket_ioctl: TODO\n");
 
-    pid_t current_process = (pid_t) get_current_process();
-    
-    if (fd<=0){
-        debug_print ("socket_ioctl: fd <= 0\n");
-        return -1;
-    }
-    
-    if (fd>=32){
-        debug_print ("socket_ioctl: fd >= 32\n");
-        return -1;
+    if (fd < 0 || fd >= OPEN_MAX)
+    {
+        return (int) (-EBADF);
     }
 
     // process
-    
+
+    pid_t current_process = (pid_t) get_current_process();
+
     p = (void*) processList[current_process];
 
     if ( (void *) p == NULL )
@@ -1109,7 +1103,7 @@ sys_accept (
 
     fdServer = sockfd;
 
-    if ( fdServer < 0 || fdServer >= NUMBER_OF_FILES )
+    if ( fdServer < 0 || fdServer >= OPEN_MAX )
     {
         debug_print ("sys_accept: [FAIL] fdServer\n");
         return (int) (-EINVAL);
@@ -1463,8 +1457,7 @@ sys_bind (
     }
 
 // fd
-
-    if ( sockfd < 0 || sockfd >= NUMBER_OF_FILES )
+    if ( sockfd < 0 || sockfd >= OPEN_MAX )
     {
         debug_print ("sys_bind: sockfd fail\n");
         printf      ("sys_bind: sockfd fail\n");
@@ -1695,7 +1688,8 @@ sys_connect (
 
     client_socket_fd = sockfd;
 
-    if ( client_socket_fd < 0 || client_socket_fd >= NUMBER_OF_FILES )
+    if ( client_socket_fd < 0 || 
+         client_socket_fd >= OPEN_MAX )
     {
         debug_print ("sys_connect: [FAIL] client_socket_fd\n");
         printf      ("sys_connect: [FAIL] client_socket_fd\n");
@@ -2208,7 +2202,8 @@ sys_getsockname (
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( sockfd < 0 || sockfd >= 32 ){
+    if ( sockfd < 0 || sockfd >= OPEN_MAX )
+    {
         printf ("sys_getsockname: [FAIL ]sockfd \n");
         refresh_screen();
         return -1;
@@ -2329,7 +2324,7 @@ int sys_listen (int sockfd, int backlog)
 // sockfd: 
 // The fd of the server's socket.
 
-    if ( sockfd < 0 || sockfd >= NUMBER_OF_FILES )
+    if ( sockfd < 0 || sockfd >= OPEN_MAX )
     {
         debug_print ("sys_listen: [FAIL] fd\n");
         printf      ("sys_listen: [FAIL] fd\n");
@@ -2486,23 +2481,22 @@ int sys_socket_shutdown (int socket, int how)
     //printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
     //    socket, how );
 
+    // Invalid fd.
+    if ( socket < 0 || socket >= OPEN_MAX )
+    {
+        debug_print ("sys_socket_shutdown: [FAIL] fd\n");
+        printf      ("sys_socket_shutdown: [FAIL] fd\n");
+        return (int) (-EBADF);
+    }
+
+// Process
 
     pid_t current_process = (pid_t) get_current_process();
 
-    // Invalid fd.
-    if ( socket < 0 || socket >= NUMBER_OF_FILES ){
-        debug_print ("sys_socket_shutdown: [FAIL] fd\n");
-        printf      ("sys_socket_shutdown: [FAIL] fd\n");
-        return (int) (-EINVAL);
-    }
-
-    //
-    // Process
-    //
-    
     p = (struct process_d *) processList[current_process];
  
-    if ( (void *) p == NULL ){
+    if ( (void *) p == NULL )
+    {
         debug_print ("sys_socket_shutdown: p fail\n");
         printf      ("sys_socket_shutdown: p fail\n");
         goto fail;
