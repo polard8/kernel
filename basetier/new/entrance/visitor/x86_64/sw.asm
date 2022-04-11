@@ -3,6 +3,11 @@
 ; This file handles syscall for x86_64 processors.
 ; 0x80, 0x81, 0x82
 
+align 16
+__sw_local_fpu_buffer:
+    times 512 db 0
+align 16
+
 
 ;;-----
 ; _int128
@@ -60,8 +65,13 @@ _int128:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
-    ;call _xxxxINT128_DEBUG_MESSAGE
+
+    fxsave [__sw_local_fpu_buffer]
+
     call _sci0
+
+    fxrstor [__sw_local_fpu_buffer]
+
 
     mov qword [.int128Ret], rax 
 
@@ -153,8 +163,12 @@ _int129:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
-    ;call _xxxxINT129_DEBUG_MESSAGE
+    fxsave [__sw_local_fpu_buffer]
+
     call _sci1
+
+    fxrstor [__sw_local_fpu_buffer]
+
 
     mov qword [.int129Ret], rax 
 
@@ -244,8 +258,12 @@ _int130:
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
 
-    ;call _xxxxINT130_DEBUG_MESSAGE
+    fxsave [__sw_local_fpu_buffer]
+
     call _sci2
+
+    fxrstor [__sw_local_fpu_buffer]
+
 
     mov qword [.int130Ret], rax 
 
@@ -280,7 +298,6 @@ _int130:
 
 global _int199
 _int199:
-
     pop qword [frameRIP]
     pop qword [frameCS]
     pop qword [frameRFLAGS]

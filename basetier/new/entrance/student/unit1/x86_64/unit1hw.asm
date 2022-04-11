@@ -3,6 +3,11 @@
 ; This file handles the traps for the x86_64 processors.
 
 
+align 16
+__local_fpu_buffer:
+    times 512 db 0
+align 16
+
 
 ;================================
 global _DisableSSE
@@ -239,17 +244,16 @@ _irq1:
     ;mov gs, ax ; Is it used ?
     ;mov ss, ax ; Is it used ?
 
-    ;#test
-    ;int 3
 
-    ;#test
-    ;See: main.c
-    ;call _xxxxIRQ1_DEBUG_MESSAGE
-    ;call _xxxxIRQ1_DEBUG_MESSAGE
-   
-    ;#test
-    ;; See: fs/dev/hid/keyboard.c
+; See: 
+; keyboard.c
+
+    fxsave [__local_fpu_buffer]
+
     call _irq1_KEYBOARD
+
+    fxrstor [__local_fpu_buffer]
+
 
     popfq
     pop rsp
@@ -1018,8 +1022,15 @@ _irq12:
     pushfq
     cld
 
-; See: mouse.c
+; See: 
+; mouse.c
+
+
+    fxsave [__local_fpu_buffer]
+
     call _irq12_MOUSE
+
+    fxrstor [__local_fpu_buffer]
 
     popfq
     pop rsp
