@@ -1287,9 +1287,10 @@ rectBackbufferDrawRectangle0 (
     //int DrawRectangleUsingKGWS = TRUE;     // ok
     int DrawRectangleUsingKGWS = use_kgws;
 
-    debug_print("rectBackbufferDrawRectangle0:\n");
-
     struct gws_rect_d rect;
+
+
+    debug_print("rectBackbufferDrawRectangle0: :(\n");
     
 //
 // device
@@ -1481,7 +1482,8 @@ rectBackbufferDrawRectangle0 (
              rect.bg_color,
              rop_flags );
          rect.dirty = TRUE;
-         return;
+         goto done;
+         //return;
     }
 
 //===============================================================
@@ -1550,7 +1552,10 @@ rectBackbufferDrawRectangle0 (
 //done:
 // Invalidate rectangle.
     rect.dirty = TRUE;
+
+done:
     debug_print("rectBackbufferDrawRectangle0: done\n");
+    return;
 }
 
 

@@ -2486,8 +2486,8 @@ int serviceAsyncCommand (void)
 // #todo
 // Receive the tid of the client in the request packet.
 // Save it as an argument of the window structure.
-static
-int serviceCreateWindow (int client_fd)
+static int 
+serviceCreateWindow (int client_fd)
 {
 
 // #test
@@ -2530,7 +2530,8 @@ int serviceCreateWindow (int client_fd)
 
 
     gwssrv_debug_print ("serviceCreateWindow:\n");
-    //printf ("serviceCreateWindow:\n");
+    asm("cli");
+
 
 //
 // Get the arguments.
@@ -2638,6 +2639,8 @@ int serviceCreateWindow (int client_fd)
     {
         gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
+        
+        printf("pw\n");
         exit(1);
     }
 
@@ -2668,6 +2671,7 @@ int serviceCreateWindow (int client_fd)
         
         //  #bugbug
         //  This is a test.
+        printf("Parent\n");
         exit(1); 
     }
 
@@ -2693,7 +2697,8 @@ int serviceCreateWindow (int client_fd)
     {
        gwssrv_debug_print ("gwssrv: CreateWindow fail\n");
        next_response[1] = 0;
-       return -1;
+       goto fail;
+       //return -1;
     }
 
 // Register window
@@ -2701,7 +2706,8 @@ int serviceCreateWindow (int client_fd)
     if (id<0){
         gwssrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
         next_response[1] = 0;  // msg code.
-        return -1;
+        goto fail;
+        //return -1;
     }
 
 
@@ -2765,7 +2771,8 @@ int serviceCreateWindow (int client_fd)
         
         // associa a janela com uma estrutura de cliente.
         manage_status = wmManageWindow(Window);
-        if(manage_status<0){
+        if(manage_status<0)
+        {
             printf("serviceCreateWindow: wmManageWindow fail\n");
             while(1){}
         }
@@ -2817,9 +2824,14 @@ int serviceCreateWindow (int client_fd)
     //Window->dirty = TRUE;
 
     gwssrv_debug_print ("serviceCreateWindow: done\n");
-
+    asm("sti");
     return 0;
+fail:
+    gwssrv_debug_print ("serviceCreateWindow: FAIL\n");
+    asm("sti");
+    return -1;
 }
+
 
 // Draw char.
 // Service 1004.

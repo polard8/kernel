@@ -524,6 +524,7 @@ void *xxxCreateWindow (
     unsigned int buttonBorderColor2_light=0;
     unsigned int buttonBorder_outercolor=0;  //Essa cor muda de acordo com o foco 
 
+
     debug_print ("xxxCreateWindow:\n");
 
 
@@ -1697,7 +1698,12 @@ void *xxxCreateWindow (
 
     window->dirty = TRUE;
 
+//done
+    debug_print ("xxxCreateWindow: done\n");
     return (void *) window;
+fail:
+    debug_print ("xxxCreateWindow:\n");
+    return NULL;
 }
 
 
@@ -1739,7 +1745,7 @@ void *CreateWindow (
 
     int ValidType=FALSE;
 
-    gwssrv_debug_print ("CreateWindow: :)\n");
+    gwssrv_debug_print ("------------- CreateWindow: :)\n");
 
 
 //
@@ -1784,9 +1790,11 @@ void *CreateWindow (
     case WT_SIMPLE:      ValidType=TRUE; break;
     };
 
-    if ( ValidType == FALSE ){
+    if ( ValidType == FALSE )
+    {
         gwssrv_debug_print ("CreateWindow: Invalid type\n");
-        return NULL;
+        goto fail;
+        //return NULL;
     }
 
 
@@ -1821,6 +1829,8 @@ void *CreateWindow (
 // Overlapped
     if ( type == WT_OVERLAPPED )
     {
+        gwssrv_debug_print ("CreateWindow: WT_OVERLAPPED\n");
+        
         // #test
         if( WindowManager.initialized == TRUE)
         {
@@ -1850,9 +1860,11 @@ void *CreateWindow (
                            clientcolor, color, 
                            __rop_flags ); 
 
-         if ( (void *) __w == NULL ){
+         if ( (void *) __w == NULL )
+         {
              gwssrv_debug_print ("CreateWindow: xxxCreateWindow fail \n");
-             return NULL;
+             goto fail;
+             //return NULL;
          }
 
         // Pintamos simples, mas a tipagem será overlapped.
@@ -1873,6 +1885,8 @@ void *CreateWindow (
 //edit box
     if ( type == WT_EDITBOX || type==WT_EDITBOX_MULTIPLE_LINES )
     {
+        gwssrv_debug_print ("CreateWindow: WT_EDITBOX WT_EDITBOX_MULTIPLE_LINES \n");
+
         //if ( (void*) pWindow == NULL ){ return NULL; }
 
         if ( width < EDITBOX_MIN_WIDTH )  { width=EDITBOX_MIN_WIDTH; }
@@ -1886,9 +1900,11 @@ void *CreateWindow (
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color, 0 ); 
 
-         if ( (void *) __w == NULL ){
+         if ( (void *) __w == NULL )
+         {
              gwssrv_debug_print ("CreateWindow: xxxCreateWindow fail \n");
-             return NULL;
+             goto fail;
+             //return NULL;
          }
 
         //pintamos simples, mas a tipagem será  overlapped
@@ -1905,7 +1921,7 @@ void *CreateWindow (
 //button
     if ( type == WT_BUTTON )
     {
-        gwssrv_debug_print ("[DEBUG]: CreateWindow WT_BUTTON\n");
+        gwssrv_debug_print ("CreateWindow: WT_BUTTON \n");
       
         //if ( (void*) pWindow == NULL ){ return NULL; }
 
@@ -1920,9 +1936,11 @@ void *CreateWindow (
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color, 0 ); 
 
-         if ( (void *) __w == NULL ){
+         if ( (void *) __w == NULL )
+         {
              gwssrv_debug_print ("CreateWindow: xxxCreateWindow fail \n");
-             return NULL;
+             goto fail;
+             //return NULL;
          }
 
         //pintamos simples, mas a tipagem será  overlapped
@@ -1938,6 +1956,8 @@ void *CreateWindow (
 //simple
     if ( type == WT_SIMPLE )
     {
+        gwssrv_debug_print ("CreateWindow: WT_SIMPLE \n");
+        
         __w = (void *) xxxCreateWindow ( 
                            WT_SIMPLE, 0, status, view, 
                            (char *) name_local_copy, //window name
@@ -1945,20 +1965,25 @@ void *CreateWindow (
                            (struct gws_window_d *) pWindow, 
                            desktopid, clientcolor, color, 0 );  
 
-         if ( (void *) __w == NULL ){
+         if ( (void *) __w == NULL )
+         {
              gwssrv_debug_print ("CreateWindow: xxxCreateWindow fail \n");
-             return NULL;
+             goto fail;
+             //return NULL;
          }
 
         __w->type = WT_SIMPLE;
-        return (void *) __w;
+        
+        
+        goto draw_frame;
+        //return (void *) __w;
     }
 
 //type_fail:
 
     gwssrv_debug_print ("CreateWindow: [FAIL] type \n");
-    return NULL;
-    
+    goto fail;
+    //return NULL;
     
 //
 // == Draw frame ===============================
@@ -1971,6 +1996,21 @@ void *CreateWindow (
 
 draw_frame:
 
+    gwssrv_debug_print ("CreateWindow: draw_frame \n");
+    
+    if( (void*) __w == NULL )
+    {
+        gwssrv_debug_print ("CreateWindow.draw_frame: __w \n");
+        goto fail;
+    }
+
+    if(__w->magic != 1234)
+    {
+        gwssrv_debug_print ("CreateWindow.draw_frame: __w->magic \n");
+        goto fail;
+    }
+
+    
 // #IMPORTANTE
 // DESENHA O FRAME DOS TIPOS QUE PRECISAM DE FRAME.
 // OVERLAPED, EDITBOX, CHECKBOX ...
@@ -1997,6 +2037,7 @@ draw_frame:
 
         if ( (void*) __w != NULL )
         {
+            gwssrv_debug_print ("CreateWindow.draw_frame: calling wmCreateWindowFrame \n");
             wmCreateWindowFrame ( 
                 (struct gws_window_d *) pWindow,  //parent.
                 (struct gws_window_d *) __w,      //bg do botão em relação à sua parent. 
@@ -2041,7 +2082,8 @@ draw_frame:
 //
 
 // #test
-    
+    gwssrv_debug_print ("CreateWindow.draw_frame: level stuff \n");    
+
     if ( (void*) pWindow != NULL )
     {
         __w->level = (pWindow->level + 1);
@@ -2062,12 +2104,13 @@ draw_frame:
 //done:
     gwssrv_debug_print ("CreateWindow: done\n");
     return (void *) __w;
+fail:
+    gwssrv_debug_print ("CreateWindow: FAIL\n");
+    return NULL;
 }
 
 
-
 /*
- *******************************************************
  * RegisterWindow: 
  *     Register a window.
  */

@@ -211,7 +211,6 @@ int kernel_main(int arch_type)
     //enable_serial_debug();
     disable_serial_debug();
 
-
 // Open the kernel virtual console 
 // instead of first process.
 // We can receive thiflag via command line.
