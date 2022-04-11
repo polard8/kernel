@@ -566,7 +566,7 @@ struct gws_event_d *__gws_get_next_event_response (
     case GWS_SERVER_PACKET_TYPE_REQUEST:
     case GWS_SERVER_PACKET_TYPE_ERROR:
     default:
-        printf ("__gws_get_next_event_response: Invalid msg code\n"); 
+        //printf ("__gws_get_next_event_response: Invalid msg code\n"); 
         event->type = 0;
         event->used = FALSE;
         event->magic = 0;

@@ -2107,11 +2107,19 @@ static int serviceNextEvent (void)
 
 // Window with focus.
     struct gws_window_d *w;
-    
+
+    debug_print("serviceNextEvent:\n");
+    asm("cli");
+
     w = (struct gws_window_d *) get_focus();
-    if( (void*) w==NULL ){
-        return -1;
+    
+    if( (void*) w==NULL )
+    {
+        goto fail;
     }
+
+    if(w->magic != 1234)
+        goto fail;
 
     //w->single_event.wid   = w->id;
     //w->single_event.msg   = 1000;  // >>>>>> EVENT TYPE <<<<<<<
@@ -2146,15 +2154,18 @@ done:
     w->single_event.msg = 0;
     w->single_event.long1 = 0;
     w->single_event.long2 = 0;
+    debug_print("serviceNextEvent: done\n");
+    asm("sti");
     return 0;
-//fail:
-    //return -1; // pra gerar resposta de erro
+fail:
+    debug_print("serviceNextEvent: FAIL\n");
+    asm("sti");
+    return -1; // pra gerar resposta de erro
 }
 
 
 static int serviceGetWindowInfo(void)
 {
-
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
     //#todo
@@ -2175,10 +2186,16 @@ static int serviceGetWindowInfo(void)
     //w = (struct gws_window_d *) __taskbar_window;
 
 
-    printf("serviceGetWindowInfo: :)\n");
-
     int wid = -1;
     int msg_code = -1;
+
+
+    //printf("serviceGetWindowInfo: :)\n");
+    
+    debug_print("serviceGetWindowInfo: :)\n");
+    asm("cli");
+
+    
 
 // Get wid and message code.
 
@@ -2186,21 +2203,35 @@ static int serviceGetWindowInfo(void)
     msg_code = (int) message_address[1];  // message code
 
     if(wid<0 || wid >= WINDOW_COUNT_MAX)
-        return -1;
+    {
+        goto fail;
+    }
 
     if(msg_code != GWS_GetWindowInfo)
-        return -1;
+    {
+        goto fail;
+    }
+
 
 // Get window pointer.
 
     w = (struct gws_window_d *) windowList[wid];
 
     if( (void*) w == NULL )
-        return -1;
+    {
+        goto fail;
+    }
+
     if(w->used!=TRUE)
-        return -1;
+    {
+        goto fail;
+    }
+
     if(w->magic!=1234)
-        return -1;
+    {
+        goto fail;
+    }
+
 
 // Header
     next_response[0] = wid;  //
@@ -2227,8 +2258,14 @@ static int serviceGetWindowInfo(void)
         //__root_window->width, 
         //__root_window->height );
 
+done:
+    debug_print("serviceGetWindowInfo: FAIL\n");
+    asm("sti");
     return 0;     //ok, send a reply response.
-    //return -1;  //fail, send an error response.
+fail:
+    debug_print("serviceGetWindowInfo: done\n");
+    asm("sti");
+    return -1;  //fail, send an error response.
 }
 
 
@@ -2273,10 +2310,9 @@ int serviceGetClientMessage(void)
 // Async request.
 // No response.
 // #bugbug: Esta travando.
-static
-int serviceAsyncCommand (void)
+static int 
+serviceAsyncCommand (void)
 {
-    //O buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
     // int window_id=0;
@@ -2284,6 +2320,10 @@ int serviceAsyncCommand (void)
     unsigned long request_id=0;
     unsigned long subrequest_id=0;
     unsigned long data=0;
+
+
+    gwssrv_debug_print ("serviceAsyncCommand:\n");
+    asm("cli");
 
 // Parameters
     // window_id  = message_address[0];
@@ -2294,15 +2334,15 @@ int serviceAsyncCommand (void)
 
     // ...
 
-    gwssrv_debug_print ("serviceAsyncCommand:\n");
-
 // Validate our message number.
 
     if (message_id != 2222)
     {
         gwssrv_debug_print ("serviceAsyncCommand: [ERROR] message_id\n");
                     printf ("serviceAsyncCommand: [ERROR] message_id\n");
-        return (int) (-1);
+        
+        goto fail;
+        //return (int) (-1);
     }
 
 //
@@ -2323,6 +2363,7 @@ int serviceAsyncCommand (void)
         serviceExitGWS();
         printf("serviceAsyncCommand: [FAIL] fail when closing the GWS\n");
         exit(0);
+        goto done;
         break;
 
     case 2:
@@ -2331,14 +2372,16 @@ int serviceAsyncCommand (void)
         //Notify_CloseClient = TRUE;
         //Notify_PongClient = TRUE;
         //exit(0);
-        return 0;
+        //return 0;
+        goto done;
         break;
 
     case 3:
         gwssrv_debug_print ("serviceAsyncCommand: [3] hello\n");
         printf("HELLO\n");
         //exit(0);
-        return 0;
+        //return 0;
+        goto done;
         break;
 
     // Demos:
@@ -2350,8 +2393,10 @@ int serviceAsyncCommand (void)
             gwssrv_debug_print("serviceAsyncCommand: [request 4] demo\n"); 
             demos_startup_animation(subrequest_id);
             gwssrv_show_backbuffer();
-            return 0;
+            //return 0;
+            goto done;
         }
+        goto done;
         break;
 
     // Draw black rectangle.
@@ -2370,9 +2415,10 @@ int serviceAsyncCommand (void)
     // Setup if we will show or not the 'fps window'.
     case 6:
         gwssrv_debug_print ("serviceAsyncCommand: [6] \n");
-        if( subrequest_id == TRUE ){ show_fps_window = TRUE;  return 0; }
-        if( subrequest_id != TRUE ){ show_fps_window = FALSE; return 0; }
+        if( subrequest_id == TRUE ){ show_fps_window = TRUE;  goto done; }
+        if( subrequest_id != TRUE ){ show_fps_window = FALSE; goto done; }
         //show_fps_window = FALSE;
+        goto done;
         break;
 
 
@@ -2383,7 +2429,8 @@ int serviceAsyncCommand (void)
         //printf ("serviceAsyncCommand: [7] [BREAKPOINT] Register wm pid\n");
          ____saved_wm_magic_pid = (int) data;
         //exit(0);
-        return 0;
+        //return 0;
+        goto done;
         break;
  
     // 8
@@ -2397,11 +2444,13 @@ int serviceAsyncCommand (void)
         {
             //exit(0);
         }
+        goto done;
         break;
 
     case 9:
         gwssrv_debug_print ("serviceAsyncCommand: [9] \n");
         set_window_with_focus(data);
+        goto done;
         break;
 
 
@@ -2420,23 +2469,26 @@ int serviceAsyncCommand (void)
             FALSE );   // TRUE = use kgws. (kernel service)
 
         gws_refresh_rectangle(10, 10, 40, 40);
-        return 0;
-        
+        //return 0;
+        goto done;
         break;
 
     case 11:
         wm_update_desktop(TRUE); //see: wm.c
-        return 0;
+        //return 0;
+        goto done;
         break;
 
     case 12:
         __switch_focus();
-        return 0;
+        //return 0;
+        goto done;
         break;
 
     case 13:
         invalidate_window_by_id(data);
-        return 0;
+        //return 0;
+        goto done;
         break;
 
     // ...
@@ -2445,12 +2497,14 @@ int serviceAsyncCommand (void)
     case 88:
         printf("88: IsTimeToQuit\n");
         IsTimeToQuit = TRUE;
+        goto done;
         break;
 
     // Reboot the system via ws.
     case 89:
         printf("89: Reboot via ws\n");
         rtl_reboot();
+        goto done;
         break;
 
     // ...
@@ -2459,11 +2513,19 @@ int serviceAsyncCommand (void)
         gwssrv_debug_print ("serviceAsyncCommand: [ERROR] bad request\n");
                  // printf ("serviceAsyncCommand: [ERROR] bad request\n");
         // return -1;
+        goto fail;
         break;
     };
 
-//fail:
+    goto fail;
+
+done:
+    gwssrv_debug_print ("serviceAsyncCommand: done\n");
+    asm("sti");
+    return 0;
+fail:
     gwssrv_debug_print ("serviceAsyncCommand: FAIL\n");
+    asm("sti");
     return (int)(-1);
 }
 
@@ -3181,8 +3243,8 @@ fail:
 
 // 2021
 // Flush a given area into the framebuffer.
-static
-int serviceRefreshRectangle (void)
+static int 
+serviceRefreshRectangle (void)
 {
 	//o buffer é uma global nesse documento.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -3196,8 +3258,15 @@ int serviceRefreshRectangle (void)
 // Check all the header.
 
     unsigned long msg_code = message_address[1];
+
+    debug_print("serviceRefreshRectangle:\n");
+    asm("cli");
+
     if( msg_code != GWS_RefreshRectangle )
-        return -1;
+    {
+        goto fail;
+        //return -1;
+    }
 
 // #todo
 // Check if the message code is right.
@@ -3218,8 +3287,17 @@ int serviceRefreshRectangle (void)
 // Flush it into the framebuffer.
 // See: rect.c
     gws_refresh_rectangle ( left, top, width, height );
+
+done:
+    debug_print("serviceRefreshRectangle: done\n");
+    asm("sti");
     return 0;
+fail:
+    debug_print("serviceRefreshRectangle: fail\n");
+    asm("sti");
+    return -1;
 }
+
 
 // 1006
 // Flush a given window into the backbuffer.
@@ -3239,10 +3317,9 @@ int serviceRefreshWindow (void){
     //int __char;
     //char *text_buffer;    // #todo
 
-
     // #debug
     gwssrv_debug_print ("serviceRefreshWindow:\n");
-
+    asm("cli");
 
     // #todo
     // Check all the header.
@@ -3258,34 +3335,44 @@ int serviceRefreshWindow (void){
     // Special case.
     // Will be used in the ghost frame routines.
     
+    //??
     if ( window_id == (-4) )
     {
         gwssrv_debug_print("serviceRefreshWindow:\n");  //debug
         gwssrv_debug_print("== R (extra) ==\n");  //debug
         refresh_device_screen();
-        return 0;
+        
+        goto done;
+        //return 0;
     }
 
  
     // Limits
-    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX )
+    {
         //printf("%d\n",window_id);
         gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window_id\n");
-        return -1;
+        
+        goto fail;
+        //return -1;
     }
 
     //#todo
     // Get the window structure given the id.
     window = (struct gws_window_d *) windowList[window_id];
    
-    if ( (void *) window == NULL ){
+    if ( (void *) window == NULL )
+    {
         gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window\n");
-        return -1;
+        goto fail;
+        //return -1;
     }
-    
-    if ( window->used != 1 || window->magic != 1234 ){
+
+    if ( window->used != TRUE || window->magic != 1234 )
+    {
         gwssrv_debug_print ("serviceRefreshWindow: [FAIL] window validation\n");
-        return -1;
+        goto fail;
+        //return -1;
     }
 
 
@@ -3300,8 +3387,15 @@ int serviceRefreshWindow (void){
 //
 
     gws_show_window_rect(window);
-    
+
+done:
+    gwssrv_debug_print ("serviceRefreshWindow: done\n");
+    asm("sti");
     return 0;
+fail:
+    gwssrv_debug_print ("serviceRefreshWindow: fail\n");
+    asm("sti");
+    return -1;
 }
 
 

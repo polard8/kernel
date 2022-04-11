@@ -2376,9 +2376,8 @@ int main ( int argc, char *argv[] )
     //...
 
     // pid=2 fd=4
-    printf ("TERMINAL.BIN: pid{%d} fd{%d}\n",
-        Terminal.pid,
-        Terminal.client_fd );
+    //printf ("TERMINAL.BIN: pid{%d} fd{%d}\n",
+    //    Terminal.pid, Terminal.client_fd );
 
     //while(1){}
 
