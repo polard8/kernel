@@ -6,6 +6,54 @@
 
 #include "gws.h"
 
+//
+// == private functions: prototypes ====================
+//
+
+static void *__rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
+
+// Calling kgws in ring0.
+// Using the kgws to draw the rectangle.
+static void 
+__draw_rectangle_via_kgws ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned int color,
+    unsigned long rop_flags );
+
+static void 
+__drawrectangle0( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned int color,
+    unsigned long rop_flags,
+    int back_or_front );
+
+// Calling kgws in ring0.
+// Using the kgws to refresh the rectangle.
+static void 
+__refresh_rectangle_via_kgws ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height );
+
+
+// Copy a rectangle.
+static void 
+__refresh_rectangle0 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long buffer_dest,
+    unsigned long buffer_src );
+
+// ====================
 
 /*
 void invalidate_rectangle( struct gws_rect_d *rect );
@@ -355,12 +403,13 @@ rect_set_bottom (
     rect->bottom = value;
 }
 
+
 // #todo
 // Do not check the validation.
 // We need a prefix that tellus that we will no chack the validation
 // os the addresses
 
-void *rect_memcpy32 ( 
+static void *__rect_memcpy32 ( 
     void *v_dst, 
     const void *v_src, 
     unsigned long c )
@@ -433,8 +482,8 @@ int flush_rectangle(struct gws_rect_d *rect)
 // So, the caller needs to specify a rect structure,
 // this way we can invalidated it.
 
-void 
-draw_rectangle_via_kgws ( 
+static void 
+__draw_rectangle_via_kgws ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -442,7 +491,7 @@ draw_rectangle_via_kgws (
     unsigned int color,
     unsigned long rop_flags )
 {
-    unsigned long Buffer[6];
+    static unsigned long Buffer[6];
 
 // Set parameters.
     Buffer[0] = (unsigned long) x;
@@ -486,8 +535,8 @@ void invalidate_surface_retangle (void)
 
 
 // Copy a rectangle.
-void 
-refresh_rectangle0 ( 
+static void 
+__refresh_rectangle0 ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -637,7 +686,7 @@ refresh_rectangle0 (
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
             memcpy32 ( (void *) dest, (const void *) src, count );
-            //rect_memcpy32 ( (void *) dest, (const void *) src, count );
+            //__rect_memcpy32 ( (void *) dest, (const void *) src, count );
             dest += screen_pitch;
             src  += screen_pitch;
         };
@@ -670,14 +719,14 @@ refresh_rectangle0 (
 // Calling kgws in the kernel.
 // Using the kgws to refresh the rectangle.
 
-void 
-refresh_rectangle_via_kgws ( 
+static void 
+__refresh_rectangle_via_kgws ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
     unsigned long height )
 {
-    unsigned long Buffer[5];
+    static unsigned long Buffer[5];
     
     Buffer[0] = (unsigned long) x;
     Buffer[1] = (unsigned long) y;
@@ -693,7 +742,6 @@ refresh_rectangle_via_kgws (
 /*
  * gws_refresh_rectangle:
  */
-
 // From backbuffer to frontbuffer.
 
 void 
@@ -757,7 +805,7 @@ gws_refresh_rectangle (
     if ( RefreshRectangleUsingKGWS == TRUE )
     {
         debug_print("gws_refresh_rectangle: Using R0\n");
-        refresh_rectangle_via_kgws(X,Y,Width,Height);
+        __refresh_rectangle_via_kgws(X,Y,Width,Height);
         return;
     }
 
@@ -883,8 +931,10 @@ gws_refresh_rectangle (
     
         count = (rectangle_pitch / 4); 
 
-        for ( i=0; i < lines; i++ ){
-            rect_memcpy32 ( (void *) dest, (const void *) src, count );
+        for ( i=0; i < lines; i++ )
+        {
+            __rect_memcpy32 ( (void *) dest, (const void *) src, count );
+            
             dest += pitch;
             src  += pitch;
         };
@@ -892,7 +942,7 @@ gws_refresh_rectangle (
         /* doom style.
         i=0;
         do{
-            rect_memcpy32 ( (void *) dest, (const void *) src, count );
+            __rect_memcpy32 ( (void *) dest, (const void *) src, count );
             dest += pitch;
             src  += pitch;
             i++;
@@ -939,11 +989,8 @@ backbuffer_draw_rectangle(
 // 1=backbuffer
 // 2=frontbuffer
 
-    drawrectangle0(
-        x,
-        y,
-        width,
-        height,
+    __drawrectangle0(
+        x, y, width, height,
         color,
         rop_flags,
         1 );      // back or front.
@@ -963,11 +1010,8 @@ frontbuffer_draw_rectangle(
 // 1=backbuffer
 // 2=frontbuffer
 
-    drawrectangle0(
-        x,
-        y,
-        width,
-        height,
+    __drawrectangle0(
+        x, y, width, height,
         color,
         rop_flags,
         2 );      // back or front.
@@ -977,7 +1021,7 @@ frontbuffer_draw_rectangle(
 
 
 /* 
- * drawrectangle0: (API)
+ * __drawrectangle0:
  *     Draw a rectangle on backbuffer or frontbuffer.
  */
 
@@ -991,8 +1035,8 @@ frontbuffer_draw_rectangle(
 // 1=backbuffer
 // 2=frontbuffer
 
-void 
-drawrectangle0( 
+static void 
+__drawrectangle0( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -1002,7 +1046,7 @@ drawrectangle0(
     int back_or_front )
 {
 
-    gwssrv_debug_print("drawrectangle0: r0 :)\n");
+    gwssrv_debug_print("__drawrectangle0: :)\n");
 
 // Copy.
 
@@ -1017,8 +1061,8 @@ drawrectangle0(
     if (back_or_front != 1 && 
         back_or_front != 2 )
     {
-         //panic("drawrectangle0: back_or_front\n");
-         gwssrv_debug_print("drawrectangle0: back_or_front\n");
+         //panic("__drawrectangle0: back_or_front\n");
+         gwssrv_debug_print("__drawrectangle0: back_or_front\n");
          return;
     }
 
@@ -1045,8 +1089,8 @@ drawrectangle0(
     
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
-        gwssrv_debug_print ("drawrectangle0: [PANIC] w h\n");
-        //panic       ("drawrectangle0: [PANIC] w h\n");
+        gwssrv_debug_print ("__drawrectangle0: [PANIC] w h\n");
+        //panic       ("__drawrectangle0: [PANIC] w h\n");
         return;
     }
 
@@ -1073,22 +1117,22 @@ drawrectangle0(
 // Provisório
 
     if ( ClippingRect.width > 800 ){
-        gwssrv_debug_print("drawrectangle0: width");
+        gwssrv_debug_print("__drawrectangle0: width");
         return;
     }
     
     if ( ClippingRect.height > 600 ){
-        gwssrv_debug_print("drawrectangle0: height");
+        gwssrv_debug_print("__drawrectangle0: height");
         return;
     }
 
     if ( ClippingRect.right > 800 ){
-        gwssrv_debug_print("drawrectangle0: right");
+        gwssrv_debug_print("__drawrectangle0: right");
         return;
     }
     
     if ( ClippingRect.bottom > 600 ){
-        gwssrv_debug_print("drawrectangle0: bottom");
+        gwssrv_debug_print("__drawrectangle0: bottom");
         return;
     }
  
@@ -1141,7 +1185,7 @@ drawrectangle0(
 // Draw lines on backbuffer.
 
     if ( internal_height > 600 ){
-        gwssrv_debug_print("drawrectangle0: internal_height");
+        gwssrv_debug_print("__drawrectangle0: internal_height");
         return;
     }
 
@@ -1198,7 +1242,7 @@ drawrectangle0(
 
     Rect.dirty = TRUE;
 
-    gwssrv_debug_print("drawrectangle0: Done\n");
+    gwssrv_debug_print("__drawrectangle0: Done\n");
 }
 
 
@@ -1432,7 +1476,7 @@ rectBackbufferDrawRectangle0 (
     if ( DrawRectangleUsingKGWS == TRUE )
     {
          debug_print("rectBackbufferDrawRectangle0: Using R0\n");
-         draw_rectangle_via_kgws (
+         __draw_rectangle_via_kgws (
              rect.left, rect.top, rect.width, rect.height,
              rect.bg_color,
              rop_flags );

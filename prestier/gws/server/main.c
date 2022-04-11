@@ -2418,8 +2418,8 @@ int serviceAsyncCommand (void)
             TRUE,
             0,        // rop falgs
             FALSE );   // TRUE = use kgws. (kernel service)
-        refresh_rectangle_via_kgws(10, 10, 40, 40);
-        //demoLines();
+
+        gws_refresh_rectangle(10, 10, 40, 40);
         return 0;
         
         break;

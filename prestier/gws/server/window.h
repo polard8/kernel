@@ -1362,7 +1362,7 @@ rect_set_bottom (
 int is_rect_null( struct gws_rect_d *rect );
 int is_rect_empty( struct gws_rect_d *rect );
 int is_rect_dirty( struct gws_rect_d *rect );
-void *rect_memcpy32 ( void *v_dst, const void *v_src, unsigned long c );
+
 int gwssrv_refresh_this_rect( struct gws_rect_d *rect );
 int flush_rectangle(struct gws_rect_d *rect);
 struct gws_rect_d *clientrect_from_window(struct gws_window_d *window);
@@ -1387,29 +1387,6 @@ frontbuffer_draw_rectangle(
     unsigned int color,
     unsigned long rop_flags );
 
-
-void 
-drawrectangle0( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags,
-    int back_or_front );
-
-
-// Calling kgws in ring0.
-// Using the kgws to draw the rectangle.
-void 
-draw_rectangle_via_kgws ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height,
-    unsigned int color,
-    unsigned long rop_flags );
-
 // atualiza o retângulo da surface da thread.
 void 
 setup_surface_retangle ( 
@@ -1419,25 +1396,6 @@ setup_surface_retangle (
     unsigned long height );
 
 void invalidate_surface_retangle (void);
-
-// Calling kgws in ring0.
-// Using the kgws to refresh the rectangle.
-void 
-refresh_rectangle_via_kgws ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height );
-
-// Copy a rectangle.
-void 
-refresh_rectangle0 ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height,
-    unsigned long buffer_dest,
-    unsigned long buffer_src );
 
 void 
 gws_refresh_rectangle ( 

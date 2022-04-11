@@ -3,9 +3,42 @@
 
 #include <kernel.h>
 
+//
+// == private functions: prototypes =====================
+//
+
+static void 
+__drawrectangle0( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned int color,
+    unsigned long rop_flags,
+    int back_or_front );
+
+static void 
+__refresh_rectangle0 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height,
+    unsigned long buffer_dest,
+    unsigned long buffer_src );
+
+
+/*
+static void *__rectStrCopyMemory32 ( 
+    unsigned long *dest, 
+    unsigned long *src, 
+    int count );
+*/
+
+// =======================================
+
 
 /* 
- * drawrectangle0: (API)
+ * __drawrectangle0: 
  *     Draw a rectangle on backbuffer or frontbuffer.
  */
 
@@ -19,8 +52,8 @@
 // 1=backbuffer
 // 2=frontbuffer
 
-void 
-drawrectangle0( 
+static void 
+__drawrectangle0( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -30,7 +63,7 @@ drawrectangle0(
     int back_or_front )
 {
 
-    debug_print("drawrectangle0: r0 :)\n");
+    debug_print("__drawrectangle0: r0 :)\n");
 
 // Copy.
 
@@ -45,7 +78,7 @@ drawrectangle0(
     if (back_or_front != 1 && 
         back_or_front != 2 )
     {
-         panic("drawrectangle0: back_or_front\n");
+         panic("__drawrectangle0: back_or_front\n");
     }
 
 
@@ -70,8 +103,8 @@ drawrectangle0(
     
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
-        debug_print ("drawrectangle0: [PANIC] w h\n");
-        //panic       ("drawrectangle0: [PANIC] w h\n");
+        debug_print ("__drawrectangle0: [PANIC] w h\n");
+        //panic       ("__drawrectangle0: [PANIC] w h\n");
         return;
     }
 
@@ -98,17 +131,17 @@ drawrectangle0(
 // Provisório
 
     if ( ClippingRect.width > 800 )
-       panic("drawrectangle0: width");
+       panic("__drawrectangle0: width");
 
     if ( ClippingRect.height > 600 )
-       panic("drawrectangle0: height");
+       panic("__drawrectangle0: height");
 
 
     if ( ClippingRect.right > 800 )
-       panic("drawrectangle0: right");
+       panic("__drawrectangle0: right");
 
     if ( ClippingRect.bottom > 600 )
-       panic("drawrectangle0: bottom");
+       panic("__drawrectangle0: bottom");
 
 
 //
@@ -160,7 +193,7 @@ drawrectangle0(
     // Draw lines on backbuffer.
 
     if ( internal_height > 600 )
-       panic("drawrectangle0: internal_height");
+       panic("__drawrectangle0: internal_height");
 
 //
 // Paint
@@ -215,7 +248,7 @@ drawrectangle0(
 
     Rect.dirty = TRUE;
 
-    debug_print("drawrectangle0: Done\n");
+    debug_print("__drawrectangle0: Done\n");
 }
 
 
@@ -233,15 +266,13 @@ backbuffer_draw_rectangle(
 // 1=backbuffer
 // 2=frontbuffer
 
-    drawrectangle0(
-        x,
-        y,
-        width,
-        height,
+    __drawrectangle0(
+        x, y, width, height,
         color,
         rop_flags,
         1 );      // back or front.
 }
+
 
 void 
 frontbuffer_draw_rectangle( 
@@ -256,11 +287,8 @@ frontbuffer_draw_rectangle(
 // 1=backbuffer
 // 2=frontbuffer
 
-    drawrectangle0(
-        x,
-        y,
-        width,
-        height,
+    __drawrectangle0(
+        x, y, width, height,
         color,
         rop_flags,
         2 );      // back or front.
@@ -315,10 +343,10 @@ drawDataRectangle (
 // de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
 // Pois nao queremos escrever em area nao mapeada.
 
-// #
 // Copy a rectangle.
-void 
-refresh_rectangle0 ( 
+
+static void 
+__refresh_rectangle0 ( 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -327,7 +355,7 @@ refresh_rectangle0 (
     unsigned long buffer_src )
 {
 
-    debug_print("refresh_rectangle: r0 :)\n");
+    debug_print("__refresh_rectangle0: r0 :)\n");
 
 
     //void *dest       = (void *)      FRONTBUFFER_ADDRESS;
@@ -526,20 +554,15 @@ refresh_rectangle (
 
 
 
-    refresh_rectangle0(
-        x,
-        y,
-        width,
-        height,
+    __refresh_rectangle0(
+        x, y, width, height,
         FRONTBUFFER_ADDRESS,   // dest
         BACKBUFFER_ADDRESS );  // src
 }
 
 
 /*
- ************************* 
  * scroll_screen_rect:
- * 
  *     Scroll a rectangle. ?
  */
 
@@ -665,7 +688,8 @@ void scroll_screen_rect (void)
 // Zero-sized copy? 
 // Destination is Source?
 
-void *rectStrCopyMemory32 ( 
+/*
+static void *__rectStrCopyMemory32 ( 
     unsigned long *dest, 
     unsigned long *src, 
     int count ) 
@@ -691,5 +715,7 @@ void *rectStrCopyMemory32 (
 
     return dest;
 }
+*/
+
 
 

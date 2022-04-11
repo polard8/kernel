@@ -1009,15 +1009,7 @@ frontbuffer_draw_horizontal_line (
 // Draw rectangle into the backbuffer.
 //
 
-void 
-drawrectangle0( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags,
-    int back_or_front );
+
 
 void 
 backbuffer_draw_rectangle( 
@@ -1049,15 +1041,6 @@ drawDataRectangle (
 
 
 void 
-refresh_rectangle0 ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height,
-    unsigned long buffer_dest,
-    unsigned long buffer_src );
-
-void 
 refresh_rectangle ( 
     unsigned long x, 
     unsigned long y, 
@@ -1068,11 +1051,6 @@ refresh_rectangle (
 
 
 void scroll_screen_rect (void);
-
-void *rectStrCopyMemory32 ( 
-    unsigned long *dest, 
-    unsigned long *src, 
-    int count );
 
 
 
