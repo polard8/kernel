@@ -446,10 +446,6 @@ struct {
 //
 
 
-// Handlers for irqs.
-void DeviceInterface_PrimaryIDE(void);
-void DeviceInterface_SecondaryIDE(void);
-
 // Show info of the list of devices.
 void ata_show_device_list_info(void);
 

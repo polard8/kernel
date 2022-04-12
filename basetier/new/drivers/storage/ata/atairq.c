@@ -9,10 +9,42 @@ static int ata_irq_invoked = FALSE;
 // == Private functions: Prototypes ======================
 //
 
+// Handlers for irqs.
+static void DeviceInterface_PrimaryIDE(void);
+static void DeviceInterface_SecondaryIDE(void);
+
 static int disk_get_ata_irq_invoked (void);
 static void disk_reset_ata_irq_invoked (void);
 
 // ========================================================
+
+static void DeviceInterface_PrimaryIDE(void)
+{
+    // Device not initialized.
+    if ( __breaker_ata1_initialized == FALSE )
+        return;
+
+// Profiler: Counting interrupts.
+    g_profiler_ints_irq14++;
+
+// Set flag.
+    ata_irq_invoked = TRUE;
+}
+
+
+static void DeviceInterface_SecondaryIDE(void)
+{
+    // Device not initialized.
+    if ( __breaker_ata2_initialized == FALSE )
+        return;
+
+// Profiler: Counting interrupts.
+    g_profiler_ints_irq15++;
+
+// Set flag.
+    ata_irq_invoked = TRUE;
+}
+
 
 //local
 static int disk_get_ata_irq_invoked (void)
@@ -27,52 +59,22 @@ static void disk_reset_ata_irq_invoked (void)
 }
 
 
-// global
-void DeviceInterface_PrimaryIDE(void)
-{
-    // Se o ata1 não estiver inicializado !
-    if ( __breaker_ata1_initialized == 0 )
-        return;
-
-    //
-    // profiler
-    //
-
-    // Contando as interrupções desse tipo.
-    g_profiler_ints_irq14++;
-
-    ata_irq_invoked = TRUE;
-}
-
-// global
-void DeviceInterface_SecondaryIDE(void)
-{
-    // Se o ata2 não estiver inicializado !
-    if ( __breaker_ata2_initialized == 0 )
-        return;
-
-    //
-    // profiler
-    //
-
-    // Contando as interrupções desse tipo.
-    g_profiler_ints_irq15++;
-
-    ata_irq_invoked = TRUE;
-}
 
 // global
 __VOID_IRQ 
 irq14_PRIMARY_IDE (void)
 {
     debug_print("irq14_PRIMARY_IDE:\n");
+    DeviceInterface_PrimaryIDE();
 }
+
 
 // global
 __VOID_IRQ 
 irq15_SECONDARY_IDE (void)
 {
     debug_print("irq15_SECONDARY_IDE:\n");
+    DeviceInterface_SecondaryIDE();
 }
 
 
@@ -115,7 +117,9 @@ unsigned char ata_wait_irq (void)
 
     };
 
-    ata_irq_invoked = FALSE;
+    disk_reset_ata_irq_invoked();
+    //ata_irq_invoked = FALSE;
+    
     return 0;
 }
 
@@ -140,7 +144,7 @@ int disk_ata_wait_irq (void)
 
     while (!ata_irq_invoked)
     {
-        data = ata_status_read ();
+        data = ata_status_read();
         
         if ( (data & ATA_SR_ERR) )
         {

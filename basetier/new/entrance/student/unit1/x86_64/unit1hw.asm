@@ -4,7 +4,7 @@
 
 
 align 16
-__local_fpu_buffer:
+__hw_fpu_buffer:
     times 512 db 0
 align 16
 
@@ -248,11 +248,11 @@ _irq1:
 ; See: 
 ; keyboard.c
 
-    fxsave [__local_fpu_buffer]
+    fxsave [__hw_fpu_buffer]
 
     call _irq1_KEYBOARD
 
-    fxrstor [__local_fpu_buffer]
+    fxrstor [__hw_fpu_buffer]
 
 
     popfq
@@ -1025,12 +1025,11 @@ _irq12:
 ; See: 
 ; mouse.c
 
-
-    fxsave [__local_fpu_buffer]
+    fxsave [__hw_fpu_buffer]
 
     call _irq12_MOUSE
 
-    fxrstor [__local_fpu_buffer]
+    fxrstor [__hw_fpu_buffer]
 
     popfq
     pop rsp
@@ -1161,6 +1160,8 @@ _irq13:
 ;     ( ATA interface usually serves hard disk drives and CD drives ) 
 ;     O timer precisa ser desbilitado. ??
 
+extern _irq14_PRIMARY_IDE
+
 ; Capture context
 global _irq14
 _irq14:
@@ -1191,7 +1192,13 @@ _irq14:
     push gs
 
 
-    ;call _irq14_PRIMARY_IDE
+    fxsave [__hw_fpu_buffer]
+
+    call _irq14_PRIMARY_IDE
+
+    fxrstor [__hw_fpu_buffer]
+
+
 
     ;; EOI.
     ;; Order: Second, first.
@@ -1230,12 +1237,11 @@ _irq14:
     pop rbx
     pop rax
 
-    
     sti
 
     IRETQ    
     
-    
+
 ;=================================================	
 ; _irq15:
 ;     Tratador de interrupções para unidade slave.
@@ -1250,6 +1256,8 @@ _irq14:
 ;; EOI to the slave PIC; however you will still need to send the EOI 
 ;; to the master PIC because the master PIC itself won't know that it 
 ;; was a spurious IRQ from the slave. 
+
+extern _irq15_SECONDARY_IDE
 
 ; Capture context
 global _irq15
@@ -1281,10 +1289,13 @@ _irq15:
     push gs
 
 
+    fxsave [__hw_fpu_buffer]
 
-    ;call _irq15_SECONDARY_IDE
-    
-    
+    call _irq15_SECONDARY_IDE
+
+    fxrstor [__hw_fpu_buffer]
+
+
     ;; #bugbug
     ;; #todo
     ;; Spurious int for irq15.
