@@ -1,31 +1,28 @@
 
 // stdlib.c
 
-
 #include <bootloader.h>
 
 
-
-/* 
- * malloc:
- *     Standard malloc function. 
- */
+// malloc:
+// Simple malloc implementation. 
 
 void *malloc (size_t size)
 {
     void *h;
     unsigned long s = ( unsigned long) size;
 
-    //s = (s ? s : 1);	/* if s == 0, s = 1 */
+    /* if s == 0, s = 1 */
+    //s = (s ? s : 1);
 
     if ( s < 0 ){
         //#todo: Message
         return NULL;
     }
-    
 
-    if ( s == 0 ){ s=1; };
-
+    if ( s == 0 ){
+        s=1;
+    };
 
 //Alocar memória no heap do kernel.
 
@@ -62,8 +59,9 @@ void free (void *ptr)
 {
 
 //#todo: message
-    if ( (void *) ptr == NULL )
+    if ( (void *) ptr == NULL ){
         return;
+    }
 
 // See: 
 // memory.c

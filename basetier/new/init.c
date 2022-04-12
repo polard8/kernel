@@ -41,7 +41,9 @@
             + __GNUC_PATCHLEVEL__ )
 
 
-unsigned long InitializationPhase=0;
+// Global
+unsigned long gInitializationPhase=0;
+
 
 //#test
 //static const unsigned int something=1234;
@@ -61,17 +63,35 @@ unsigned long InitializationPhase=0;
 // No futuro poderemos usar as informações que estão dentro
 // do header ELF.
 // See: link.ld
-int ImportDataFromLinker = TRUE;
+static int ImportDataFromLinker = TRUE;
+
+extern unsigned long start_of_kernel_image(void);
+extern unsigned long end_of_kernel_image(void);
+
 extern unsigned long kernel_begin(void);
 extern unsigned long kernel_end(void);
+
 extern unsigned long code_begin(void);
 extern unsigned long code_end(void);
+
 extern unsigned long rodata_begin(void);
 extern unsigned long rodata_end(void);
+
 extern unsigned long data_begin(void);
 extern unsigned long data_end(void);
+
 extern unsigned long bss_begin(void);
 extern unsigned long bss_end(void);
+
+// ==========================
+
+static unsigned long KernelImageSize=0;
+
+static unsigned long KernelImage_Size=0;
+static unsigned long KernelImage_CODE_Size=0;
+static unsigned long KernelImage_RODATA_Size=0;
+static unsigned long KernelImage_DATA_Size=0;
+static unsigned long KernelImage_BSS_Size=0;
 
 // ==========================
 
@@ -698,16 +718,6 @@ int kernel_main(int arch_type)
 
 // ================================================
 
-// #test
-// Não queremos um tamanho de imagem que
-// exceda o tamanho da região de memória mapeada para ela.
-
-    unsigned long KernelImage_BSS_Size=0;
-    unsigned long KernelImage_DATA_Size=0;
-    unsigned long KernelImage_RODATA_Size=0;
-    unsigned long KernelImage_CODE_Size=0;
-    unsigned long KernelImage_Size=0;
-
 // #todo
 // Isso deve ter uma flag no aquivo de configuração.
 // config.h i guess.
@@ -716,20 +726,31 @@ int kernel_main(int arch_type)
     {
         //printf("\n");
  
-        // #bugbug
-        // Something is wrong here.
+
+        //KernelImageSize = (start_of_kernel_image - end_of_kernel_image);
+        //printf ("Image Size %d KB \n",KernelImageSize/1024);
+
+        //-------------
+
+        // Não queremos um tamanho de imagem que
+        // exceda o tamanho da região de memória mapeada para ela.
+
         KernelImage_Size = (kernel_end - kernel_begin);
         //printf ("Image Size %d KB \n",KernelImage_Size/1024);
 
+        // .text
         KernelImage_CODE_Size = (code_end - code_begin);
         //printf ("CODE Size %d KB \n",KernelImage_CODE_Size/1024);
 
+        // .rodata
         KernelImage_RODATA_Size = (rodata_end - rodata_begin);
         //printf ("RODATA Size %d KB \n",KernelImage_RODATA_Size/1024);
 
+        // .data
         KernelImage_DATA_Size = (data_end - data_begin);
         //printf ("DATA Size %d KB \n",KernelImage_DATA_Size/1024);
 
+        // .bss
         KernelImage_BSS_Size = (bss_end - bss_begin);
         //printf ("BSS Size %d KB \n",KernelImage_BSS_Size/1024);
 
@@ -737,12 +758,19 @@ int kernel_main(int arch_type)
         // The kernel image is too long.
         if ( KernelImage_Size/1024 > 1024 )
         {
-            panic ("Error 0x04");
+            panic ("Error 0x04: Image size");
+        }
+        
+        // Address limit for the kernel image.
+        // See: x64gva.h
+        if( kernel_end > KERNEL_HEAP_START )
+        {
+            panic ("Error 0x04: kernel_end");
         }
 
-        // #debug
-        // refresh_screen();
-        // while(1){}
+        // #debug: breakpoint
+        //refresh_screen();
+        //while(1){}
     }
 
 //

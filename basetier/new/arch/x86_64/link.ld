@@ -22,8 +22,8 @@ SECTIONS
     . = 0x30001000;
     .text 0x30001000:
     {
-        _kernel_begin = .;   
         _start_of_kernel_image = .;
+        _kernel_begin = .;   
         
         _code_begin = .;
         *(.head_x86_64)  *(.text) 

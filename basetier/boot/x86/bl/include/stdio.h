@@ -46,8 +46,7 @@ static int printi(char **out, int i, int b, int sg, int width, int pad, int letb
 static int print(char **out, int *varg);
 static int prints(char **out, const char *string, int width, int pad);
 int sprintf(char *out, const char *format, ...);
-void outbyte(int c);
-void _outbyte(int c);
+
 int printf_main(void); //teste ...
 
 void scroll(void);

@@ -20,22 +20,203 @@
 
 #include <bootloader.h>
 
+
 //static char *codename = "Gramado Boot";
 //char kernel_file_name[] = "kernel.bin";
 //static char **argv = { NULL, NULL, NULL };
 //static char **envp = { NULL, NULL, NULL };
 
 
-// == Prototypes =================
+//
+// == Private functions: Prototypes =======================
+//
 
-unsigned long init_testing_memory_size (int mb);
-int newOSLoadKernelImage(void);
-void BlSetupPaging(void);
+static unsigned long init_testing_memory_size(int mb);
+static int newOSLoadKernelImage(void);
+static void BlSetupPaging(void);
+static void blShowMenu (void);
+static void BlMenu(void);
 
 // =========================================
 
+//================================================================
+// begin - Testing memory size
+//================================================================
+
+static unsigned long init_testing_memory_size (int mb)
+{
+    unsigned char *BASE = (unsigned char *) 0;  
+    
+    int offset=0; 
+    int i=0;
+
+// Salvando os valores durante o test.
+    unsigned char ____value1 = 0;
+    unsigned char ____value2 = 0;
+
+//
+// Flag.
+//
+
+    // Acionando flag.
+    ____testing_memory_size_flag = 1;
+
+
+//#debug
+/*
+    printf ("=========================================\n");
+    printf ("init_testing_memory_size: Looking for %d MB base...\n", mb);
+    refresh_screen();
+*/
+
+
+// Começamos em 1MB porque o primeiro mega contem coisa do bios.
+    for (i=1; i< (mb+1); i++)
+    {
+        //printf ("i=%d \n", i);
+        //refresh_screen();
+
+        offset = 0x00100000 * i;
+        
+        //printf ("coloca \n");
+        //refresh_screen();
+
+         // #bugbug
+         // cuidado com ponteiro nulo.
+
+        //coloca.
+        BASE[offset +0] = 0xAA;  //1
+        BASE[offset +1] = 0x55;  //2
+        
+        //printf ("retira \n");
+        //refresh_screen();
+
+        //retira dois chars.
+        ____value1 = BASE[offset +0];
+        ____value2 = BASE[offset +1];
+        
+        // Se retiramos os mesmos bytes que colocamos.
+        if (____value1 == 0xAA && ____value2 == 0x55)
+        {
+            //salvamos o �ltimo endere�o de mem�ria v�lido.
+            __last_valid_address =  (unsigned long) &BASE[offset];
+        
+            // continua sondando.
+
+        // Se n�o conseguimos retirar os mesmos bytes que colocamos
+        // e n�o tivemos uma exce��o.
+        }else{
+
+            ____testing_memory_size_flag = 0;
+            
+            printf ("__testing_memory_size: out of range with no exception! \n");
+            printf ("__testing_memory_size: last valid address = %x \n", 
+                __last_valid_address);
+            refresh_screen();
+            
+            
+            ____testing_memory_size_flag = 0;
+            return __last_valid_address;
+            
+            /*
+            while(1)
+            {
+                asm ("cli");
+                asm ("hlt");
+            }
+            */
+        }
+    };
+
+     ____testing_memory_size_flag = 0;        
+            
+// ok temos um endereço de memoria
+// tambem sera salvo em uma variavel global 
+// para o caso de panic.
+
+    return __last_valid_address;
+}
+
+//================================================================
+// end - Testing memory size
+//================================================================
+
+
+/*
+ * newOSLoadKernelImage: 
+ *     It loads the kernel image at 0x00100000.
+ *     The entry point is at 0x00101000.
+ */ 
+
+// #todo
+// This way can chose the filename from a
+// configuration file.
+// This routine will try to load the default filename
+// if the provide name fail.
+// This routine will build the pathname
+// to search in the default folder.
+// Called by BlMain().
+
+static int newOSLoadKernelImage(void)
+{
+    int Status = -1;
+
+// Standard name.
+// #todo: Maybe we need some options, some config file.
+
+    char *image_name = "KERNEL.BIN";
+
+// #bugbug
+// Precisamos que essa rotina retorne
+// para termos a change de inicializarmos o
+// rescue shell. Mas acontece que por enquanto
+// essa função aborta ao primeiro sinal de perigo.
+
+    Status = (int) elfLoadKernelImage(image_name);
+
+    if ( Status != 0 ){
+        printf ("newOSLoadKernelImage: elfLoadKernelImage fail\n");
+        refresh_screen();
+        return (int) (-1);
+    }
+
+    return (int) Status;
+}
+
+/*
+ * BlSetupPaging:
+ *     Setup paging.
+ * In this function:
+ * @diretorio:
+ *   page_directory = 0x9C000
+ *   OBS: 
+ * Esse diret�rio criado ser� usado pelas primeiros processos durante
+ * essa fase de constru��o do sistema.
+ *        O ideal � um diret�rio por processo.
+ *        Toda vez que o kernel iniciar a execu��o de um processo ele deve 
+ * carregar o endere�o do diretorio do processo em CR3.
+ *       Por enquanto s� tem um diret�rio criado.
+ * @p�ginas:
+ *   km_page_table  = 0x8C000 (RING 0).
+ *   um_page_table  = 0x8E000 (RING 3).
+ *   vga_page_table = 0x8F000 (RING 3).
+ *   lfb_page_table = ?? (RING 3).
+ * @todo: 
+ * Esses endere�os precisam ser registrados em vari�veis globais ou
+ * dentro de uma estrutura para se passado para o Kernel.
+ * Essa deve ser uma interface que chama as rotinas 
+ * de configuraçao da paginaçao. 
+ */
+
+// See: pages.c
+static void BlSetupPaging(void)
+{
+    SetUpPaging();
+}
+
+
 // Show menu.
-void blShowMenu (void)
+static void blShowMenu (void)
 {
     int i=0;
 
@@ -66,13 +247,10 @@ void blShowMenu (void)
 
 
 
-void
-BlMenu(void)
+static void BlMenu(void)
 {
-
     char Key=0;
-    
-    
+
     // prepara o menu.
     
     MENU[0].used = 1;
@@ -88,11 +266,9 @@ BlMenu(void)
         
     sprintf( MENU[0].string, "menu item 0");
     sprintf( MENU[1].string, "menu item 1");    
-    
-    
+
     //mostra o menu.
     //blShowMenu(); 
-
 
     while (1){
 
@@ -102,8 +278,9 @@ BlMenu(void)
     
         switch (Key)
         {
-			
-			case 'x': goto ____go; break;
+            case 'x': 
+                goto ____go; 
+                break;
 
             case '\n':
                 //goto do_execute_item;
@@ -124,7 +301,6 @@ BlMenu(void)
                 break;
         };
     };
-    
 
 ____go:
     return;
@@ -142,6 +318,7 @@ ____go:
 // Podemos cair num shell de recuperaçcao
 // caso o carregamento der errado.
 
+// global.
 void OS_Loader_Main (void)
 {
     int Status = (-1);
@@ -419,10 +596,14 @@ void OS_Loader_Main (void)
 */
 
 //#debug
+/*
     printf ("OS_Loader_Main:\n");
     printf ("The kernel image is already loaded\n");
     printf ("Let's setup long mode,\n");
     printf ("paging and jump to the kernel.\n");
+*/
+
+    printf("OS_Loader_Main: Kernel image loaded.\n");
 
 //#breakpoint
     //refresh_screen();
@@ -449,6 +630,7 @@ See: https://wiki.osdev.org/X86-64
 // ================================
 // Check x86_64 support.
 // Test LM-bit
+// #todo: We can create a local herper for that thing.
 
     unsigned long a=0;
     unsigned long b=0;
@@ -526,86 +708,8 @@ See: https://wiki.osdev.org/X86-64
 }
 
 
-/*
- * newOSLoadKernelImage: 
- *     It loads the kernel image at 0x00100000.
- *     The entry point is at 0x00101000.
- */ 
-
-// #todo
-// This way can chose the filename from a
-// configuration file.
-// This routine will try to load the default filename
-// if the provide name fail.
-// This routine will build the pathname
-// to search in the default folder.
-// Called by BlMain().
-
-int newOSLoadKernelImage(void)
-{
-    int Status = -1;
-
-// Standard name.
-// #todo: Maybe we need some options, some config file.
-
-    char *image_name = "KERNEL.BIN";
-
-// #bugbug
-// Precisamos que essa rotina retorne
-// para termos a change de inicializarmos o
-// rescue shell. Mas acontece que por enquanto
-// essa função aborta ao primeiro sinal de perigo.
-
-    Status = (int) elfLoadKernelImage(image_name);
-
-    if ( Status != 0 ){
-        printf ("newOSLoadKernelImage: elfLoadKernelImage fail\n");
-        refresh_screen();
-        return (int) (-1);
-    }
-
-    // ok
-    return Status;
-}
-
-
-/*
- * BlSetupPaging:
- *     Setup paging.
- * In this function:
- * @diretorio:
- *   page_directory = 0x9C000
- *   OBS: 
- * Esse diret�rio criado ser� usado pelas primeiros processos durante
- * essa fase de constru��o do sistema.
- *        O ideal � um diret�rio por processo.
- *        Toda vez que o kernel iniciar a execu��o de um processo ele deve 
- * carregar o endere�o do diretorio do processo em CR3.
- *       Por enquanto s� tem um diret�rio criado.
- * @p�ginas:
- *   km_page_table  = 0x8C000 (RING 0).
- *   um_page_table  = 0x8E000 (RING 3).
- *   vga_page_table = 0x8F000 (RING 3).
- *   lfb_page_table = ?? (RING 3).
- * @todo: 
- * Esses endere�os precisam ser registrados em vari�veis globais ou
- * dentro de uma estrutura para se passado para o Kernel.
- * Essa deve ser uma interface que chama as rotinas 
- * de configuraçao da paginaçao. 
- */
-
-// See: pages.c
-void BlSetupPaging(void)
-{
-    SetUpPaging();
-}
-
-
-/*
- ********************************************
- * BlAbort:
- *     Rotina para abortar o bootloader em caso de erro grave.
- */
+// BlAbort:
+// Rotina para abortar o bootloader em caso de erro grave.
 
 void BlAbort()
 {
@@ -613,7 +717,6 @@ void BlAbort()
 //Talvez poderia ter uma interface antes de chamar a rotina abort().
 //ex:
     //checks()
-
     abort(); 
 }
 
@@ -629,110 +732,6 @@ void BlKernelModuleMain()
     //printf ("BlKernelModuleMain: Boot Loader\n");
     //refresh_screen();
 }
-
-//================================================================
-// begin - Testing memory size
-//================================================================
-
-//interna
-unsigned long init_testing_memory_size (int mb)
-{
-    unsigned char *BASE = (unsigned char *) 0;  
-    
-    int offset=0; 
-    int i=0;
-
-// Salvando os valores durante o test.
-    unsigned char ____value1 = 0;
-    unsigned char ____value2 = 0;
-
-//
-// Flag.
-//
-
-    // Acionando flag.
-    ____testing_memory_size_flag = 1;
-
-
-//#debug
-/*
-    printf ("=========================================\n");
-    printf ("init_testing_memory_size: Looking for %d MB base...\n", mb);
-    refresh_screen();
-*/
-
-
-// Começamos em 1MB porque o primeiro mega contem coisa do bios.
-    for (i=1; i< (mb+1); i++)
-    {
-        //printf ("i=%d \n", i);
-        //refresh_screen();
-
-        offset = 0x00100000 * i;
-        
-        //printf ("coloca \n");
-        //refresh_screen();
-
-         // #bugbug
-         // cuidado com ponteiro nulo.
-
-        //coloca.
-        BASE[offset +0] = 0xAA;  //1
-        BASE[offset +1] = 0x55;  //2
-        
-        //printf ("retira \n");
-        //refresh_screen();
-
-        //retira dois chars.
-        ____value1 = BASE[offset +0];
-        ____value2 = BASE[offset +1];
-        
-        // Se retiramos os mesmos bytes que colocamos.
-        if (____value1 == 0xAA && ____value2 == 0x55)
-        {
-            //salvamos o �ltimo endere�o de mem�ria v�lido.
-            __last_valid_address =  (unsigned long) &BASE[offset];
-        
-            // continua sondando.
-
-        // Se n�o conseguimos retirar os mesmos bytes que colocamos
-        // e n�o tivemos uma exce��o.
-        }else{
-
-            ____testing_memory_size_flag = 0;
-            
-            printf ("__testing_memory_size: out of range with no exception! \n");
-            printf ("__testing_memory_size: last valid address = %x \n", 
-                __last_valid_address);
-            refresh_screen();
-            
-            
-            ____testing_memory_size_flag = 0;
-            return __last_valid_address;
-            
-            /*
-            while(1)
-            {
-                asm ("cli");
-                asm ("hlt");
-            }
-            */
-        }
-    };
-
-     ____testing_memory_size_flag = 0;        
-            
-// ok temos um endereço de memoria
-// tambem sera salvo em uma variavel global 
-// para o caso de panic.
-
-    return __last_valid_address;
-}
-
-//================================================================
-// end - Testing memory size
-//================================================================
-
 
 
 // die:

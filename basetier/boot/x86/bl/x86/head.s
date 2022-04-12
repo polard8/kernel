@@ -36,15 +36,11 @@ segment .head_x86
 
 [bits 32]
 
-;; See: gdef.h
+; See: gdef.h
 extern ___last_valid_address 
 
 
-;
-; Imported
-;
-
-extern _g_lbf_pa  ; LFB - Linear Frame Buffer. (physical address).
+extern _g_lbf_pa            ; LFB - Linear Frame Buffer. (physical address).
 extern _OS_Loader_Main      ; Entrada da parte em C.
 extern _BlKernelModuleMain  ; Reentrada do bl, agora na forma de m�dulo.
 ;extern _shell_main         ; Entrada do Shell do Boot Loader.
@@ -82,7 +78,9 @@ KRN_ENTRYPOINT  equ  0x00101000  ; Entry point
 
 global _OS_Loader_Entry_Point
 _OS_Loader_Entry_Point:
+
    JMP StartLoader
+
     %include "header.inc"
     ;...
 StartLoader:
@@ -266,16 +264,15 @@ StartLoader:
     IODELAY
     out 0xA1, al
     IODELAY
-    
-    cli  ;; We don't need this here.
+
+    cli    ; We don't need this here.
 
 ; Unmask all interrupts.
     mov al, 0
     out 0xa1, al 
     IODELAY
     out 0x21, al 
-    IODELAY
-    
+    IODELAY 
 
 ;
 ; PIT
@@ -340,7 +337,6 @@ _go_to_kernel:
     mov ds, ax
     mov es, ax
 
-
 ;
 ; Go!
 ;
@@ -374,10 +370,9 @@ bl_Loop:
     hlt
     jmp bl_Loop
 
-
-;;
-;; ===============================================================
-;;
+;
+; =========================
+;
 
 align 8
 
@@ -409,9 +404,7 @@ GDT64:                           ; Global Descriptor Table (64-bit).
     dw $ - GDT64 - 1             ; Limit.
     dq GDT64                     ; Base.
 
-
-;; ==================================================
-
+; ==================================================
 align 8
 
 
@@ -442,25 +435,20 @@ BL_BootBlock:
     .cylinders: dd 0             ;; 36 
     .boot_mode:  dd 0            ;; 40
     .gramado_mode dd 0           ;; 44
-    
-    
-    
 
-
-;Continua...
-
-
+; ...
 
 
 ;;
 ;; Salvando alguns valores.
 ;;
-	
+
 ;----------------------------------------
 ; _SavedBootBlock:
 ;     Salvando os argumentos passados pelo Boot Manager em 
 ;     vari�veis globais.
-;	
+;
+
 global _SavedBootBlock
 _SavedBootBlock:  
     dd 0
@@ -482,9 +470,6 @@ _SavedBootMode:
 global _SavedGramadoMode   ; jail, p1, home ...
 _SavedGramadoMode:  
     dd 0
-
-
-
 
 
 ;
@@ -572,353 +557,351 @@ idt:
 	dw 0
 
 ;1 interrupt 1h, Debug exception.
-	dw 0                    		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;2 interrupt 2h, Non maskable interrupt.
-	dw 0                    		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;3 interrupt 3h, int3 trap.
-	dw 0                        		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;4 interrupt 4h, into trap.
-	dw 0                        		   
+	dw 0 
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;5 interrupt 5h, bound trap.
-	dw 0                          		   
+	dw 0 
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;6 interrupt 6h, invalid instruction.
-	dw 0                        		   
+	dw 0 
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;7 interrupt 7h, no coprocessor.
-	dw 0                         	   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;8 interrupt 8h, Double fault.
-	dw 0                         	  
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;9 interrupt 9h, Coprocessor segment overrun 1.
-	dw 0                         	    
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;10 interrupt Ah, Invalid tss.
-	dw 0                     		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;11 interrupt Bh, Segment not present.
-	dw 0                        		  
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;12 interrupt Ch, Stack fault.
-	dw 0                            	   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;13 interrupt Dh, #GPF, General Protection Fault.
-	dw 0           			   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;14 interrupt Eh, #PF, Page Fault.
-	dw 0           			   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;15 interrupt Fh, Reserved.
-	dw 0                		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;16 interrupt 10h, Coprocessor error.
-	dw 0                  		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;17 interrupt 11h, Alignment check.
-	dw 0                  		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;18 interrupt 12h, Machine check. 
-	dw 0 		  
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;19 interrupt 13h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;20 interrupt 14h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;21 interrupt 15h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;22 interrupt 16h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;23 interrupt 17h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;24 interrupt 18h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;25 interrupt 19h, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;26 interrupt 1Ah, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;27 interrupt 1Bh, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;28 interrupt 1Ch, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;29 interrupt 1Dh, Reserved.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;30 interrupt 1Eh, Reserved.
-	dw 0		   
-	dw sys_code		
-	db 0
-	db sys_interrupt
 	dw 0
-
-;31 interrupt 1Fh, Reserved.
-	dw 0		   
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
-	
+;31 interrupt 1Fh, Reserved.
+	dw 0
+	dw sys_code
+	db 0
+	db sys_interrupt
+	dw 0
+
 ;
 ;IRQs.
 ;
 
 ;32 interrupt 20h, _irq0, TIMER, IRQ0.
-	dw 0         
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;33 interrupt 21h, Keyboard, IRQ1.
-	dw 0               
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;34 interrupt 22h, Reserved, IRQ2.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;35 interrupt 23h, Reserved, IRQ3.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;36 interrupt 24h, Reserved, IRQ4.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;37 interrupt 25h, Reserved, IRQ5.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;38 interrupt 26h, Reserved, IRQ6.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;39 interrupt 27h, Reserved, IRQ7.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;40 interrupt 28h, Reserved, IRQ8.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;41 interrupt 29h, Reserved, IRQ9.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;42 interrupt 2Ah, Reserved, IRQ10.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;43 interrupt 2Bh, Reserved, IRQ11.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;44 interrupt 2Ch, Reserved, IRQ12.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;45 interrupt 2Dh, Reserved, IRQ13.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;46 interrupt 2Eh, Reserved, IRQ 14.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;47 interrupt 2Fh, Reserved, IRQ15.
-	dw 0		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
-	
 ;
 ;
 ;
 
 ;48 interrupt 30h.
-	dw 0		    
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;49 interrupt 31h.
-	dw 0		    
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
@@ -1968,15 +1951,15 @@ idt:
 	dw 0
 
 ;199 interrupt C7h.
-	dw 0 	   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
-	
+
 ;
-; *** Interrup��o do sistema.
-;	
+; System interrupt.
+;
 
 ;200 interrupt C8h, System Call.
 	dw 0    
@@ -1993,14 +1976,14 @@ idt:
 	dw 0
 
 ;202 interrupt CAh.
-	dw 0 		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;203 interrupt CBh.
-	dw 0 	   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
@@ -2363,7 +2346,7 @@ idt:
 	dw 0
 
 ;255 interrupt FFh.
-	dw 0 		   
+	dw 0
 	dw sys_code
 	db 0
 	db sys_interrupt
@@ -2383,59 +2366,51 @@ IDT_register:
 
 
 ;
-; Includes ---------------------------------------
+; Includes --------------------------
 ;
 
-;
-; Os includes est�o padronizados assim:
-;
-; head, headlib.
-; hardware, hardwarelib.
-; software, softwarelib.
-;
+; Order:
+;     head,     headlib.
+;     hardware, hardwarelib.
+;     software, softwarelib.
 
 
-    ;Fun��es de apoio a inicializa��o do boot loader.
+; Main library.
     %include "headlib.s"
 
-	;Interrup��es de hardware (irqs) e faults.(reservadas).
+; Hw support. 
+; Hardware interrupts and drivers.
     %include "hardware.inc"
     %include "hardwarelib.inc"
 
-	;interrup��es de software
-	%include "software.inc"
+; Sw support. 
+; Software interrupts and libraries.
+    %include "software.inc"
     %include "softwarelib.inc"
 
-
-;
-; DATA: in�cio do data segment.
-;
+; ===================
+; DATA segment.
 segment .data
 global _data_start
 _data_start:
     db 0x55    ;Data magic.
     db 0xAA    ;Data magic.
 
-
-
-;;
-;; ## BSS  ##
-;;
-
+; ===================
+; BSS segment.
 segment .bss
 global _bss_start
 _bss_start:
-    ;times (512*2) db 0 #bugbug isso n�o pode.
+;#bugbug isso nao pode.
+    ;times (512*2) db 0
 
-	
-	
-;;
-;; ## HEAP  ##
-;;
-	
-	
-;heap
-;inicio do heap do bootloader, ainda parte de bss.
+
+; ===================
+; BSS_HEAP segment.
+; heap
+; Inicio do heap do bootloader, 
+; ainda parte de bss.
+
 segment .bss_heap
 global _bootloader_heap_start
 _bootloader_heap_start:
@@ -2443,13 +2418,11 @@ _bootloader_heap_start:
 global _bootloader_heap_end 
 _bootloader_heap_end:
 
-;;
-;; ## STACK  ##
-;;
-
-
-;stack
-;inicio da stack do bootloader, ainda parte de bss.
+; ===================
+; BSS_STACK segment.
+; stack
+; Inicio da stack do bootloader, 
+; ainda parte de bss.
 segment .bss_stack
 global _bootloader_stack_end
 _bootloader_stack_end:
@@ -2459,7 +2432,6 @@ _bootloader_stack_start:
 
 
 ;
-;@_FIM
+; End.
 ;
-
 

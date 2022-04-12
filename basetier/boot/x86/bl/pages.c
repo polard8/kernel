@@ -12,12 +12,16 @@
 #include <bootloader.h>
 
 
+// local
+// inline?
 void load_pml4_table(void *phy_addr)
 {
     asm volatile (" movl %0, %%cr3 " :: "r" (phy_addr) );
 }
 
 
+// local
+// inline?
 // PAE and PGE
 void enable_pae()
 {
@@ -26,15 +30,14 @@ void enable_pae()
                    " movl %%eax, %%cr4  " :: );
 }
 
-
+// local
+// inline?
 void page_enable()
 {
     asm volatile ( " movl %%cr0, %%eax;      "
                    " orl $0x80000000, %%eax; "
                    " movl %%eax, %%cr0       " :: );
 }
-
-
 
 
 /*

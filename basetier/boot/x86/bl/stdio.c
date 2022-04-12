@@ -21,6 +21,170 @@ extern unsigned long SavedBPP;
 extern void my_buffer_load_bitmap_16x16();
 
 
+//
+// == Private functions: Prototypes ======================
+//
+
+static void _outbyte(int c);
+static void outbyte(int c);
+
+// ===================================
+
+
+// _outbyte: 
+// Coloca um char na tela. Com opções de modo de vídeo.
+// Called by outbyte().
+
+static void _outbyte (int c)
+{
+    unsigned long i=0;
+    unsigned long x=0;
+    unsigned long y=0;
+    char *vm = (char *) 0x000B8000;  
+
+// Char, attribute.
+    char ch = (char) c;
+    char ch_atributo = (char) g_char_attrib;
+
+
+// Caso estivermos em modo gráfico.
+    if (VideoBlock.useGui == 1)
+    {
+        //vsync();
+
+        switch (VideoBlock.vesaMode)
+        {
+		    //@todo: Listar aqui os modos VESA.
+		    case 1:
+			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
+			    break;
+				
+		    default:
+			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
+			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
+			    break;
+        };
+        return;
+    }
+
+// Caso estivermos em text mode.
+    if (VideoBlock.useGui == 0)
+    {
+        //calcula o valor do deslocamento para text mode 80x25.
+        y = (unsigned long) (g_cursor_y *80 *2);
+        x = (unsigned long) (g_cursor_x *2);
+        i = (unsigned long) (y + x);
+        
+		//envia o caractere.
+        vm[i+0] = ch;             //char.
+        vm[i+1] = ch_atributo;    //atributo (foreground,background).
+    }
+}
+
+
+// outbyte:
+// Trata o caractere antes de por na memória de video.
+
+static void outbyte (int c)
+{
+    // Copy.
+    register int Ch=c;
+
+    static char prev = 0;
+
+// Sendo menor que espaço, não pode ser 'tab,return,back...)    
+
+    if ( Ch <  ' '  && 
+         Ch != '\r' && 
+         Ch != '\n' && 
+         Ch != '\t' && 
+         Ch != '\b' )
+    {
+        return;
+    }
+
+// Sendo maior que 'espaço'. 
+
+// Volta ao início da linha.
+    if ( Ch == '\r' )
+    {
+        g_cursor_x = 0; //volta ao inicio da linha
+        prev = Ch;
+        return;    
+    }
+ 
+// Vai pra próxima linha e volta ao inicio da linha.    
+    if ( Ch == '\n' && prev != '\r' )
+    {
+        g_cursor_y++;      // proxima linha
+        g_cursor_x = 0;    // inicio da linha 
+        prev = Ch;
+        return;
+    }
+
+    if ( Ch == '\n' && prev == '\r' )
+    {
+        g_cursor_y++;    //proxima linha
+        prev = Ch;
+        return; 
+    }
+
+//tab
+    if ( Ch == '\t' )
+    {
+        g_cursor_x += (4);    //criar a var -> 'g_tab_size'
+        prev = Ch;
+        return;         
+    }
+
+//space 
+    if ( Ch == ' ' )
+    {
+        g_cursor_x++; 
+        prev = Ch;
+        return;         
+    }
+
+//delete 
+    if ( Ch == 8 )
+    {
+        g_cursor_x--; 
+        prev = Ch;
+        return; 
+    }
+
+/*
+ *  Filtra as dimensões da janela onde esta pintando.
+ */
+
+// limite horizontal
+    if ( g_cursor_x > 80)  // 80 = g_coluna_max 
+    {
+        g_cursor_x = 0;
+        g_cursor_y++;  
+    
+    }else{
+        g_cursor_x++;    //Incrementa coluna.                             
+    };
+
+// Limite vertical. 
+// (@todo: Testando limite maior, ja que estamos em modo grafico.)
+    if ( g_cursor_y > 74 ) //25 = g_linha_max (50*8 pixels) 
+    { 
+        scroll();
+        g_cursor_y = 74; //isso pode ir para dentro da função scroll().
+    }
+
+// #importante:
+// Imprime os caracteres normais.
+
+    _outbyte (Ch);
+
+// Atualisa o prev.
+    prev = Ch;
+}
+
+
 // =====================
 // panic:
 // Message support for fatal error.
@@ -40,8 +204,7 @@ void panic (const char *msg)
 
 /*
  * scroll:
- *     Scroll the screen in text mode.
- *     #bugbug: Na verdade só usmos modo gráfico ainda.
+ *   #bugbug: Is it for text mode?
  */
  
 void scroll (void)
@@ -380,6 +543,9 @@ static int print (char **out, int *varg)
  *     Assuming sizeof(void *) == sizeof(int). 
  */
 
+// #todo
+// Change the name to blprintf()
+
 int printf ( const char *format, ... )
 {
     // sincronisa.  
@@ -438,165 +604,6 @@ int putchar (int ch)
     outbyte (ch);
 
     return ch; 
-}
-
-
-/*
- * outbyte:
- *     Trata o caractere antes de por na memória de video.
- */
-
-void outbyte (int c)
-{
-    // Copy.
-    register int Ch=c;
-
-    static char prev = 0;
-
-// Sendo menor que espaço, não pode ser 'tab,return,back...)    
-
-    if ( Ch <  ' '  && 
-         Ch != '\r' && 
-         Ch != '\n' && 
-         Ch != '\t' && 
-         Ch != '\b' )
-    {
-        return;
-    }
-
-// Sendo maior que 'espaço'. 
-
-// Volta ao início da linha.
-    if ( Ch == '\r' )
-    {
-        g_cursor_x = 0; //volta ao inicio da linha
-        prev = Ch;
-        return;    
-    }
- 
-// Vai pra próxima linha e volta ao inicio da linha.    
-    if ( Ch == '\n' && prev != '\r' )
-    {
-        g_cursor_y++;      // proxima linha
-        g_cursor_x = 0;    // inicio da linha 
-        prev = Ch;
-        return;
-    };
-
-    if ( Ch == '\n' && prev == '\r' )
-    {
-        g_cursor_y++;    //proxima linha
-        prev = Ch;
-        return; 
-    }
-
-//tab
-    if ( Ch == '\t' )
-    {
-        g_cursor_x += (4);    //criar a var -> 'g_tab_size'
-        prev = Ch;
-        return;         
-    }
-
-//space 
-    if ( Ch == ' ' )
-    {
-        g_cursor_x++; 
-        prev = Ch;
-        return;         
-    }
-
-//delete 
-    if ( Ch == 8 )
-    {
-        g_cursor_x--; 
-        prev = Ch;
-        return; 
-    }
-
-/*
- *  Filtra as dimensões da janela onde esta pintando.
- */
-
-// limite horizontal
-    if ( g_cursor_x > 80)  // 80 = g_coluna_max 
-    {
-        g_cursor_x = 0;
-        g_cursor_y++;  
-    
-    }else{
-        g_cursor_x++;    //Incrementa coluna.                             
-    };
-
-// Limite vertical. 
-// (@todo: Testando limite maior, ja que estamos em modo grafico.)
-    if ( g_cursor_y > 74 ) //25 = g_linha_max (50*8 pixels) 
-    { 
-        scroll();
-        g_cursor_y = 74; //isso pode ir para dentro da função scroll().
-    }
-
-// #importante:
-// Imprime os caracteres normais.
-
-    _outbyte (Ch);
-
-// Atualisa o prev.
-    prev = Ch;
-}
-
-
-/*
- * _outbyte: 
- *     Coloca um char na tela. Com opções de modo de vídeo.
- */
-
-// Called by outbyte().
-
-void _outbyte (int c)
-{
-    unsigned long i=0;
-    unsigned long x=0;
-    unsigned long y=0;
-    char *vm = (char *) 0x000B8000;  
-
-// Char, attribute.
-    char ch = (char) c;
-    char ch_atributo = (char) g_char_attrib;
-
-
-// Caso estivermos em modo gráfico.
-    if (VideoBlock.useGui == 1)
-    {
-        //vsync();
-
-        switch (VideoBlock.vesaMode)
-        {
-		    //@todo: Listar aqui os modos VESA.
-		    case 1:
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
-			    break;
-				
-		    default:
-			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
-			    break;
-        };
-        return;
-    }
-
-// Caso estivermos em text mode.
-    if (VideoBlock.useGui == 0)
-    {
-        //calcula o valor do deslocamento para text mode 80x25.
-        y = (unsigned long) (g_cursor_y *80 *2);
-        x = (unsigned long) (g_cursor_x *2);
-        i = (unsigned long) (y + x);
-        
-		//envia o caractere.
-        vm[i+0] = ch;             //char.
-        vm[i+1] = ch_atributo;    //atributo (foreground,background).
-    }
 }
 
 
@@ -695,21 +702,21 @@ int printf_main (void){
  *     Coloca os caracteres digitados em uma string. 
  */
 
-unsigned long input (unsigned long ch){
-	
-	//Converte.
+unsigned long input (unsigned long ch)
+{
+
+//Converte.
 	char c = (char) ch;    
-	
-	//Filtra limite.
-	
+
+//Filtra limite.
 	if (prompt_pos > 250)
 	{ 
 	    printf ("input: The command is too large");	
 	    return (unsigned long) 0; 
 	}
- 	
-	//Trata caractere digitado.
-	
+
+//Trata caractere digitado.
+
 	switch (c)
 	{
 	    //enter
@@ -747,7 +754,6 @@ unsigned long input (unsigned long ch){
 			g_cursor_x--;
 			break;
 	};
-
 
 //Nothing.
 input_more:
@@ -905,6 +911,7 @@ my_buffer_char_blt (
  * vsync: 
  *     Sincroniza a pintura com o retraço vertical.
  *     OBS: Talvez deva usar cli e sti 
+ *     //#todo: Move this to another place, maybe fb device support.
  */
 
 void vsync()

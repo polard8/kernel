@@ -1,15 +1,12 @@
 /*
  * File: keyboard.c  
- *
  *  Descrição:
  *     Driver básico de teclado para o Boot Loader.
- *
  * Obs:
  * O padrão de teclado usado precisa ser revisto.
  * Pelo jeito estamos usando o padrão americano. Mas 
  * é possível adaptar para ABNT2 se muitos problemas.
  * Podemos copiar do driver do núcleo.
- *
  * Histórico:
  *     2015 - Adaptado de versões antigas por Fred Nora.
  *     2016 - Revisão.
@@ -367,7 +364,7 @@ void keyboardHandler(void)
         {
             ch = map[scancode];
             wParam[0] = ch;    //Envia. 
-        };
+        }
 
 		//Nothing.
     };

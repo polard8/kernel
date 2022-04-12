@@ -4,8 +4,10 @@
 #include <kernel.h>
 
 
-extern unsigned long InitializationPhase;
-int InitialProcessInitialized = FALSE;
+extern unsigned long gInitializationPhase;
+
+// private
+static int InitialProcessInitialized = FALSE;
 
 // Task switching support.
 extern void turn_task_switch_on (void);
@@ -454,7 +456,7 @@ void I_x64ExecuteInitialProcess (void)
 // End of phase.
 // Starting phase 4.
 
-    InitializationPhase = 4;
+    gInitializationPhase = 4;
 
 // =============
 // # go!
@@ -985,8 +987,8 @@ static int I_init (void)
 // ==================
 // Check kernel phase.
 
-    if ( InitializationPhase != 0 ){
-        printf ("I_init: InitializationPhase fail. Not 0\n");
+    if ( gInitializationPhase != 0 ){
+        printf ("I_init: gInitializationPhase fail. Not 0\n");
         return FALSE;
     }
 
@@ -1146,8 +1148,8 @@ static int I_init (void)
 // #important
 // We need to be in the phase 0.
 
-    if (InitializationPhase != 0){
-        printf ("I_init: InitializationPhase InitializationPhase != 0\n");
+    if (gInitializationPhase != 0){
+        printf ("I_init: gInitializationPhase gInitializationPhase != 0\n");
         return FALSE;
     }
 
@@ -1206,14 +1208,14 @@ static int I_init (void)
 // End of phase.
 // Starting phase 1.
 
-    InitializationPhase = 1;
+    gInitializationPhase = 1;
 
 
 // ========================
 // We need to be in the phase 1.
 
-    if ( InitializationPhase != 1 ){
-        printf ("I_init: InitializationPhase != 1\n");
+    if ( gInitializationPhase != 1 ){
+        printf ("I_init: gInitializationPhase != 1\n");
         return FALSE;
     }
 
@@ -1342,7 +1344,7 @@ static int I_init (void)
 // End of phase.
 // Starting phase 2.
 
-    InitializationPhase = 2;
+    gInitializationPhase = 2;
 
 // =========================================
 // keyboard stuff.
@@ -1392,7 +1394,7 @@ int I_x64main (void)
     int Status = FALSE;
 
 // Phase counter: Starting phase 0.
-    InitializationPhase = 0;
+    gInitializationPhase = 0;
 
 // The first ring3 process.
 // Ainda não configuramos qual será o primeiro processo
@@ -1477,10 +1479,10 @@ int I_x64main (void)
     PROGRESS("Kernel:1:2\n"); 
     //debug_print ("I_x64main: Calling I_init()\n");
 
-    if ( InitializationPhase != 0 )
+    if ( gInitializationPhase != 0 )
     {
-        debug_print ("I_x64main: InitializationPhase\n");
-        //x_panic ("I_x64main: InitializationPhase\n");
+        debug_print ("I_x64main: gInitializationPhase\n");
+        //x_panic ("I_x64main: gInitializationPhase\n");
         //KiAbort();
         return FALSE;
     }
@@ -1498,7 +1500,7 @@ int I_x64main (void)
 // End of phase.
 // Starting phase 3.
 
-    InitializationPhase = 3;
+    gInitializationPhase = 3;
 
 //================================
 // Initialize all the kernel graphics support.

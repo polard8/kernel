@@ -4,7 +4,7 @@
 #include <kernel.h>
 
 
-extern unsigned long InitializationPhase;
+extern unsigned long gInitializationPhase;
 
 
 static int __using_serial_debug = FALSE;
@@ -116,10 +116,10 @@ int debug_check_inicialization (void){
 
     // Check phase.
 
-    if ( InitializationPhase != 3 ){
+    if ( gInitializationPhase != 3 ){
        Status = 1;
-       printf ("debug_check_inicialization: InitializationPhase = {%d}\n",
-           InitializationPhase );
+       printf ("debug_check_inicialization: gInitializationPhase = {%d}\n",
+           gInitializationPhase );
        goto fail;
     }
 
