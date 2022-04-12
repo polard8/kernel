@@ -800,3 +800,171 @@ void x64_load_pml4_table(unsigned long phy_addr)
     asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
 }
 
+
+
+// If the MP Floating Point Structure 
+// can't be found in this area, 
+// then the area between 0xF0000 and 0xFFFFF should be searched. 
+// See:
+// https://wiki.osdev.org/Symmetric_Multiprocessing
+void smp_probe(void)
+{
+    int i=0;
+
+    printf("smp_probe:\n");
+
+//
+// Probe ebda address at bda base.
+//
+
+//#define __BDA_BASE    0x040E
+
+    unsigned long ebda_address=0;
+    
+    // pega um short
+    unsigned short *bda = (unsigned short*) 0x040E;
+
+    printf("EBDA short Address: %x \n",bda[0]); 
+ 
+    ebda_address = (unsigned long) ( bda[0] << 4 );
+    ebda_address = (unsigned long) ( ebda_address & 0xFFFFFFFF);
+
+    printf("EBDA Address: %x \n",ebda_address); 
+    refresh_screen();
+
+
+//
+// Probe 0x5F504D5F signature. 
+// "_MP_".
+//
+
+#define MP_SIG  0x5F504D5F
+
+    unsigned char *p;
+
+    unsigned char c1;
+    unsigned char c2;
+    unsigned char c3;
+    unsigned char c4;
+
+// base
+// between 0xF0000 and 0xFFFFF.
+// #todo: filter
+
+    p = ebda_address;
+
+    // the that was found?
+    static int mp_found = FALSE;
+
+    int max = (0xFFFFF - ebda_address);
+    for(i=0; i<max; i++)
+    {
+        c1 = p[i];
+        c2 = p[i+1];
+        c3 = p[i+2];
+        c4 = p[i+3];
+    
+        // "_MP_"
+        // This signature is the first element of the table.
+        // MP Floating Pointer Structure
+        if ( c1 == '_' && c2 == 'M' && c3 == 'P' && c4 == '_' )
+        {
+            printf (":: Found _MP_ at index %d. :)\n",i);
+            mp_found=TRUE;
+            break;
+        }
+    }
+
+    if(mp_found!=TRUE){
+        printf("MP table wasn't found!\n");
+        refresh_screen();
+        return;
+    } 
+
+// base + offset.
+// This is the base of the structure.
+// See:
+// basetier/new/include/hal/mp.h
+
+    unsigned long table_address = (ebda_address + i);
+
+    MPTable = (struct mp_floating_pointer_structure *) table_address;
+
+// Print table.
+
+
+// signature
+    printf("Signature: %c %c %c %c\n",
+        MPTable->signature[0],
+        MPTable->signature[1],
+        MPTable->signature[2],
+        MPTable->signature[3]);
+
+// configuration table
+    //32bit address.
+    unsigned long configurationtable_address = 
+        (unsigned long) (MPTable->configuration_table & 0xFFFFFFFF);
+
+    printf("Configuration table address %x\n",
+        configurationtable_address);
+
+// lenght
+// n*16 bytes
+    printf("lenght %d \n",MPTable->length);
+
+// revision
+// 1.x
+    printf("revision %d \n",
+        MPTable->mp_specification_revision);
+
+//checksum
+    printf("checksum %d \n",MPTable->checksum);
+// default configuration flag.
+    printf("default_configuration %d \n",MPTable->default_configuration);
+//  features.
+    printf("features %d \n",MPTable->features);
+
+    if( MPTable->features & (1 << 7) ){
+         printf("The IMCR is present and PIC mode is being used\n");
+    }
+
+    if( (MPTable->features & (1 << 7)) == 0 ){
+         printf("Using the virtual wire mode.\n");
+    }
+
+// ==============================================
+
+    MPConfigurationTable = 
+        (struct mp_configuration_table *) configurationtable_address;
+    
+// signature
+    printf("Signature: %c %c %c %c\n",
+        MPConfigurationTable->signature[0],
+        MPConfigurationTable->signature[1],
+        MPConfigurationTable->signature[2],
+        MPConfigurationTable->signature[3]);
+
+    //int i=0;
+
+    char oemid_string[8+1];
+    char productid_string[12+1];
+
+    for(i=0; i<8; i++)
+        oemid_string[i] = MPConfigurationTable->oem_id[i];
+    oemid_string[8]=0;
+
+    for(i=0; i<12; i++)
+        productid_string[i] = MPConfigurationTable->product_id[i];
+    productid_string[12]=0;
+
+    printf("oem id: %s\n",oemid_string);
+    printf("product id: %s\n",productid_string);
+    
+    printf("smp_probe: done\n");
+    refresh_screen();
+}
+
+
+
+
+

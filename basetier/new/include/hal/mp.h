@@ -64,11 +64,13 @@ struct mp_floating_pointer_structure
     uint8_t default_configuration; 
 
 // Few feature bytes.
-// If bit 7 is then the IMCR is present and PIC mode is being used, otherwise 
-// virtual wire mode is; all other bits are reserved
+// If bit 7 is set then 
+// the IMCR is present and PIC mode is being used, otherwise 
+// virtual wire mode is; 
+// all other bits are reserved
     uint32_t features; 
 };
-
+struct mp_floating_pointer_structure *MPTable;
 
 
 struct mp_configuration_table 
@@ -87,7 +89,7 @@ struct mp_configuration_table
     uint8_t extended_table_checksum;
     uint8_t reserved;
 };
-
+struct mp_configuration_table *MPConfigurationTable;
 
 /*
 struct entry_processor {
@@ -112,6 +114,14 @@ struct entry_io_apic {
     uint32_t address; // The memory mapped address of the IO APIC is memory
 }
 */
+
+
+//
+// prototypes ==========
+//
+
+// See: x64.c
+void smp_probe(void);
 
 #endif   
 

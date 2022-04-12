@@ -1239,68 +1239,6 @@ int consoleInputChar( int c )
 }
 
 
-// local
-// If the MP Floating Point Structure 
-// can't be found in this area, 
-// then the area between 0xF0000 and 0xFFFFF should be searched. 
-void __smp_testing(void)
-{
-    printf("SMP: Testing\n");
-
-//
-// Probe ebda address at bda base.
-//
-
-    unsigned long ebda_address=0;
-    
-    //pega um short
-    unsigned short *bda = (unsigned short*) 0x040E;
-
-    printf("EBDA short Address: %x \n",bda[0]); 
- 
-    ebda_address = (unsigned long) ( bda[0] << 4 );
-    ebda_address = (unsigned long) ( ebda_address & 0xFFFFFFFF);
-
-    printf("EBDA Address: %x \n",ebda_address); 
-    refresh_screen();
-
-
-//
-// Probe 0x5F504D5F signature. "_MP_".
-//
-
-#define MP_SIG 0x5F504D5F
-
-    unsigned char *p;
-    unsigned char c1;
-    unsigned char c2;
-    unsigned char c3;
-    unsigned char c4;
-
-// base
-// between 0xF0000 and 0xFFFFF.
-// #todo: filter
-
-    p = ebda_address;
-
-    int i=0;
-    int max = (0xFFFFF - ebda_address);
-    for(i=0; i<max; i++)
-    {
-        c1 = p[i];
-        c2 = p[i+1];
-        c3 = p[i+2];
-        c4 = p[i+3];
-    
-        if ( c1 == '_' && c2 == 'M' && c3 == 'P' && c4 == '_' )
-        {
-            printf ("Found _MP_ at index %d\n",i);
-            break;
-        }
-    }
-
-    refresh_screen();
-}
 
 void __dummy_thread(void)
 {
@@ -1393,9 +1331,10 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+    // See: x64.c
     if ( strncmp( prompt, "smp", 3 ) == 0 )
     {
-        __smp_testing();
+        smp_probe();
         goto exit_cmp;
     }
 

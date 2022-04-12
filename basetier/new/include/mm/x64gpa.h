@@ -209,10 +209,16 @@
 
 
 // #bugbug
+// EBDA address is found here.
+// 0x9FC00
+
+// #bugbug
 // Temos uma pilha aqui ??
 // eh possivel, temos espaço.
 // 0x0009FFF0 ??
 
+//#bugbug
+//See: basetier/boot/x86/bm/sysvar32.inc
 
 //
 // == 640 KB ==================================================
