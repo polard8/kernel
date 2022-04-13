@@ -957,6 +957,7 @@ void smp_probe(void)
         productid_string[i] = MPConfigurationTable->product_id[i];
     productid_string[12]=0;
 
+// intel: OEM00000 PROD00000000
     printf("oem id: %s\n",oemid_string);
     printf("product id: %s\n",productid_string);
     

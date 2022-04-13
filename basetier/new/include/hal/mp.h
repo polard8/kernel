@@ -36,6 +36,9 @@ signature "_MP_" which denotes the start of the
 floating pointer structure. 
 */
 
+// See
+// https://pdos.csail.mit.edu/6.828/2008/readings/ia32/MPspec.pdf
+
 struct mp_floating_pointer_structure 
 {
 
@@ -84,37 +87,74 @@ struct mp_configuration_table
     uint32_t oem_table;
     uint16_t oem_table_size;
     uint16_t entry_count; // This value represents how many entries are following this table
-    uint32_t lapic_address; // This is the memory mapped address of the local APICs 
+
+// This is the memory mapped address of the local APICs
+// The base address by which each processor accesses
+// its local APIC.
+
+    uint32_t lapic_address;  
+
     uint16_t extended_table_length;
     uint8_t extended_table_checksum;
     uint8_t reserved;
 };
 struct mp_configuration_table *MPConfigurationTable;
 
+
+// #
+// Logo abaixo da estrutura acima segue uma
+// sequencia de entadas de tipo e tamanhos diferentes.
+// As que descrevem processadores possuem 20bytes
+// as outras possuem 8 bytes.
+
 /*
-struct entry_processor {
+entry info:
+Description | Type | Length | Comments
+Processor  |     0 |     20 | One entry per processor.
+Bus        |     1 |      8 | One entry per bus.
+I/O APIC   |     2 |      8 | One entry per I/O APIC.
+I/O 
+Interrupt 
+Assignment |     3 |      8 | One entry per bus interrupt source.
+Local 
+Interrupt 
+Assignment |     4 |      8 | One entry per system interrupt source.
+*/
+
+/*
+//# size: 20 bytes
+struct entry_processor 
+{
     uint8_t type; // Always 0
     uint8_t local_apic_id;
     uint8_t local_apic_version;
-    uint8_t flags; // If bit 0 is clear then the processor must be ignored
-                   // If bit 1 is set then the processor is the bootstrap processor
+
+// flags:
+// If bit 0 is clear then the processor must be ignored
+// If bit 1 is set then the processor is the bootstrap processor
+    uint8_t flags;
+
     uint32_t signature;
+    
     uint32_t feature_flags;
-    uint64_t reserved;
-}
+    
+    unsigned long reserved;
+    //uint64_t reserved;
+};
 */
 
-
 /*
-struct entry_io_apic {
+// # size: 8 bytes
+struct entry_io_apic 
+{
     uint8_t type; // Always 2
     uint8_t id;
     uint8_t version;
     uint8_t flags; // If bit 0 is set then the entry should be ignored
+    
     uint32_t address; // The memory mapped address of the IO APIC is memory
-}
+};
 */
-
 
 //
 // prototypes ==========
