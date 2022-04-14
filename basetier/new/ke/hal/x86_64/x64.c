@@ -960,7 +960,52 @@ void smp_probe(void)
 // intel: OEM00000 PROD00000000
     printf("oem id: %s\n",oemid_string);
     printf("product id: %s\n",productid_string);
-    
+
+    printf("lapic address: %x\n",
+        MPConfigurationTable->lapic_address );
+
+
+
+// entries ===================================
+
+// The address of the first entry.
+    unsigned long entry_base = 
+    (unsigned long) ( configurationtable_address + sizeof( struct mp_configuration_table ) );
+
+    // tmp 
+    struct entry_processor *e;
+
+    // How many entries?
+    for(i=0; i<4; i++)
+    {
+        e = (struct entry_processor *) entry_base;
+        
+        if(e->type != 0)
+        {
+            printf("#test: Not a processor entry\n");
+            refresh_screen();
+            return;
+        }
+
+        printf("local_apic_id %d\n",e->local_apic_id);
+        printf("local_apic_version %d\n",e->local_apic_version);
+
+        if( (e->flags & (1<<0)) == 0 ){
+            printf("Processor must be ignored\n");
+        }
+
+        if( e->flags & (1<<1) ){
+            printf("The processor is a bootstrap processor\n");
+        }
+        
+        printf ("stepping: %d\n",(e->signature & 0x00F));
+        printf ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
+        printf ("  family: %d\n",((e->signature & 0xF00) >> 8) );
+
+        // Next entry
+        entry_base = (unsigned long) (entry_base + 20);
+    };
+
     printf("smp_probe: done\n");
     refresh_screen();
 }

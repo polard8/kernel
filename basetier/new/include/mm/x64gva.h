@@ -75,6 +75,8 @@
 #define EXTRAHEAP2_VA   0x0000000030C00000  // ?
 #define EXTRAHEAP3_VA   0x0000000030E00000  // ?
 
+//#test
+#define LAPIC_VA   0x0000000031000000
 
 //alias
 #define WS_IMAGE_VA       EXTRAHEAP1_VA

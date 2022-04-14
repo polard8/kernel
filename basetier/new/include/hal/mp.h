@@ -16,14 +16,6 @@
 #define ____MP_H    1
 
 
-// List for pointer of ProcessorBlock_d struture.
-// See: hal/cpu.h
-
-//#define MAX_PROCESSOR_COUNT 32
-
-unsigned long processorList[32]; 
-
-
 /*
 First, you need to find the floating pointer structure. 
 According to the spec, it can be in one of four places: 
@@ -92,7 +84,8 @@ struct mp_configuration_table
 // The base address by which each processor accesses
 // its local APIC.
 
-    uint32_t lapic_address;  
+    // MEMORY-MAPPED ADDRESS OF LOCAL APIC
+    uint32_t lapic_address;
 
     uint16_t extended_table_length;
     uint8_t extended_table_checksum;
@@ -121,7 +114,7 @@ Interrupt
 Assignment |     4 |      8 | One entry per system interrupt source.
 */
 
-/*
+
 //# size: 20 bytes
 struct entry_processor 
 {
@@ -130,10 +123,11 @@ struct entry_processor
     uint8_t local_apic_version;
 
 // flags:
-// If bit 0 is clear then the processor must be ignored
-// If bit 1 is set then the processor is the bootstrap processor
+// If bit 0 is clear then the processor must be ignored.
+// If bit 1 is set then the processor is the bootstrap processor.
     uint8_t flags;
 
+// Stepping, model, family
     uint32_t signature;
     
     uint32_t feature_flags;
@@ -141,7 +135,14 @@ struct entry_processor
     unsigned long reserved;
     //uint64_t reserved;
 };
-*/
+
+
+// List for pointer of ProcessorBlock_d struture.
+// See: hal/cpu.h
+//#define MAX_PROCESSOR_COUNT 32
+unsigned long processorList[32]; 
+//unsigned long entry_processor_List[8];
+
 
 /*
 // # size: 8 bytes

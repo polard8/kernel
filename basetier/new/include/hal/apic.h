@@ -121,6 +121,19 @@ See: apple opensource
 */
 
 
+// #test
+// The base address by which each processor accesses
+// its local APIC.
+struct lapic_info_d
+{
+    unsigned long lapic_va;
+    unsigned long lapic_pa; 
+    int entry;  // page table entry.
+};
+struct lapic_info_d LAPIC;
+
+
+// =======================
 
 // Check presence of apic.
 int check_apic (void);

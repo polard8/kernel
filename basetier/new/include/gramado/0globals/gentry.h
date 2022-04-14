@@ -33,6 +33,8 @@
 #define PD_ENTRY_EXTRAHEAP2   390
 #define PD_ENTRY_EXTRAHEAP3   391
 
+//#test
+#define PD_ENTRY_LAPIC  392
 
 
 //
