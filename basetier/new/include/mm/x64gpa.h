@@ -173,7 +173,7 @@
 // Static 
 //#define PAGETABLE_RES7       0x00080000
 #define PAGETABLE_RES6         0x00081000
-#define PAGETABLE_RES5         0x00082000
+#define PAGETABLE_RES5         0x00082000  //lapic. see: apic.c
 #define PAGETABLE_AHCI1        0x00083000   
 #define PAGETABLE_EXTRAHEAP3   0x00084000
 #define PAGETABLE_EXTRAHEAP2   0x00085000

@@ -802,6 +802,7 @@ void x64_load_pml4_table(unsigned long phy_addr)
 
 
 
+
 // If the MP Floating Point Structure 
 // can't be found in this area, 
 // then the area between 0xF0000 and 0xFFFFF should be searched. 
@@ -812,6 +813,17 @@ void smp_probe(void)
     int i=0;
 
     printf("smp_probe:\n");
+
+
+// At this point we gotta have a lot of information
+// in the structure 'processor'.
+    if( (void*) processor == NULL )
+        panic("smp_probe: processor\n");
+
+// Is APIC supported.
+    if (processor->hasAPIC != TRUE)
+        panic("smp_probe: No APIC!\n");
+
 
 //
 // Probe ebda address at bda base.
@@ -964,6 +976,10 @@ void smp_probe(void)
     printf("lapic address: %x\n",
         MPConfigurationTable->lapic_address );
 
+// See:
+// apic.c
+    lapic_initializing( 
+        (unsigned long) MPConfigurationTable->lapic_address );
 
 
 // entries ===================================

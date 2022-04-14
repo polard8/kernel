@@ -20,6 +20,22 @@
 #include <kernel.h>
 
 
+//
+// == private functions: prototypes =====================
+//
+
+static unsigned int local_apic_read_command(unsigned short addr);
+static void local_apic_write_command(unsigned short addr,unsigned int val);
+
+//#test
+static unsigned int local_apic_get_id(void);
+static unsigned int local_apic_get_version(void);
+
+// apic stuffs for x86.
+static inline void imcr_pic_to_apic (void);
+static inline void imcr_apic_to_pic (void);
+
+// =====================
 
 /* Flush caches */
 /*
@@ -33,14 +49,47 @@ void flush_cashes(void)
 //@todo: definir porta 70h usada nesse arquivo.
 
 
-//
-// Variáveis internas.
-//
 
-//int apicStatus;
-//int apicError;
-//...
 
+static unsigned int local_apic_read_command(unsigned short addr)
+{
+    if( (void *) LAPIC.lapic_va == NULL ){
+        panic("local_apic_read_command: LAPIC.lapic_va\n");
+    }
+
+// #todo
+// Review this method.
+    return *( (volatile unsigned int *)(LAPIC.lapic_va + addr));
+}
+
+static void local_apic_write_command(unsigned short addr,unsigned int val)
+{
+    if( (void *) LAPIC.lapic_va == NULL ){
+        panic("local_apic_write_command: LAPIC.lapic_va\n");
+    }
+
+// #good
+    *( (volatile unsigned int *)(LAPIC.lapic_va + addr)) = val;
+}
+
+
+//#test
+static unsigned int local_apic_get_id(void)
+{
+// bits 24~31 for pentium 4 and later.
+    return (unsigned int) (local_apic_read_command(LAPIC_APIC_ID) >> 24) & 0xFF;
+}
+
+//#test
+static unsigned int local_apic_get_version(void)
+{
+// bits: 0~7 for Integrated APIC.
+// 10H~15H
+    return (unsigned int) (local_apic_read_command(LAPIC_APIC_VERSION) & 0xFF);
+}
+
+
+// =========
 
 
 /*
@@ -72,9 +121,91 @@ static inline void imcr_apic_to_pic (void)
 }
 
 
+
+// =================
+
+
+
+void lapic_initializing(unsigned long lapic_pa)
+{
+    printf("lapic_initializing: \n");
+
+    LAPIC.initialized = FALSE;
+
+
+    if( lapic_pa != 0xFEE00000 )
+    {
+        panic("lapic_initializing: lapic_pa != 0xFEE00000 \n");
+    }
+    
+    // ===================
+
+// page table
+    unsigned long *pt_lapic = (unsigned long *) PAGETABLE_RES5;
+
+// pa
+    LAPIC.lapic_pa = (unsigned long) (lapic_pa & 0xFFFFFFFF);
+
+// va
+    LAPIC.lapic_va = (unsigned long) LAPIC_VA;
+
+// pagedirectory entry
+    LAPIC.entry = (int) PD_ENTRY_LAPIC; 
+
+
+// Create the table and include the pointer 
+// into the kernel page directory.
+// ## Estamos passando o ponteiro para o
+// diretorio de paginas do kernel.
+
+    mm_fill_page_table( 
+      (unsigned long) KERNEL_PD_PA,    // pd 
+      (int) PD_ENTRY_LAPIC,            // entry
+      (unsigned long) &pt_lapic[0],    // pt
+      (unsigned long) (lapic_pa & 0xFFFFFFFF),    // region base (pa)
+      (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
+
+//==========================================
+
+// flush tlb
+// #bugbug
+// Maybe we need to call a method for that.
+
+    asm ("movq %cr3, %rax");
+    asm ("movq %rax, %cr3");
+
+//=====================================
+	// Destination Format Register (DFR)
+	// Value after reset, flat mode
+	// depois de invalidar o pic?
+	//*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0xFFFFFFFF; 
+
+	// Logical Destination Register (LDR)
+	//// All cpus use logical id 1
+	//*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
+
+
+    //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
+
+    // #test
+    int localid = (int) local_apic_get_id();
+    printf("localid: %d\n",(localid & 0xFF));
+
+    // #test
+    // 8bits
+    // 10H~15H
+    int localversion = (int) local_apic_get_version();
+    printf("localversion: %xH\n", (localversion & 0xFF));
+
+    LAPIC.initialized = TRUE;
+}
+
+
+
 //
-// begin ======================================================
+// ======================================================
 //
+
 
 // #todo
 // Testando um código encontrado em https://wiki.osdev.org/APIC.
@@ -91,12 +222,16 @@ static inline void imcr_apic_to_pic (void)
 // #todo: Change function name.
 // See: cpuid.h
 
-int check_apic (void)
+int has_apic (void)
 {
    unsigned int eax=0;
    unsigned int ebx=0;
    unsigned int ecx=0;
    unsigned int edx=0;
+
+
+// #bugbug
+// Do we have cpuid support?
 
    cpuid( 1, eax, ebx, ecx, edx );
 

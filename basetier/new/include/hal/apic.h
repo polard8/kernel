@@ -44,29 +44,41 @@ losethos os - Adam1a.HPP.
 */
 
 
-#define LAPIC_BASE		0xFEE00000
-#define LAPIC_APIC_ID		        (LAPIC_BASE+0x020)
-#define LAPIC_APIC_VERSION	        (LAPIC_BASE+0x030)
-#define LAPIC_TASK_PRIORITY	        (LAPIC_BASE+0x080)
-#define LAPIC_ARIBITRATION_PRIORITY (LAPIC_BASE+0x090)
-#define LAPIC_PROCESSOR_PRIORITY    (LAPIC_BASE+0x0A0)
-#define LAPIC_EOI		            (LAPIC_BASE+0x0B0)
-#define LAPIC_LOG_DST		        (LAPIC_BASE+0x0D0)
-#define LAPIC_DFR		            (LAPIC_BASE+0x0E0)
-#define LAPIC_LDR		            (LAPIC_BASE+0x0D0)
-#define LAPICF_APIC_ENABLED		0x100
-#define LAPIC_SVR		(LAPIC_BASE+0x0F0)
-#define LAPIC_ISR		    (LAPIC_BASE+0x100)
-#define LAPIC_TMR		    (LAPIC_BASE+0x180)
-#define LAPIC_IRR		    (LAPIC_BASE+0x200)
-#define LAPIC_ICR_LOW		(LAPIC_BASE+0x300)
-#define LAPIC_ICR_HIGH		(LAPIC_BASE+0x310)
-#define LAPIC_LVT_TIMER		(LAPIC_BASE+0x320)
-#define LAPIC_LVT_THERMAL	(LAPIC_BASE+0x330)
-#define LAPIC_LVT_PERF		(LAPIC_BASE+0x340)
-#define LAPIC_LVT_LINT0		(LAPIC_BASE+0x350)
-#define LAPIC_LVT_LINT1		(LAPIC_BASE+0x360)
-#define LAPIC_LVT_ERR		(LAPIC_BASE+0x370)
+// Base physical address.
+#define LAPIC_BASE    0xFEE00000
+
+// Offsets:
+#define LAPIC_APIC_ID                0x020
+#define LAPIC_APIC_VERSION           0x030
+#define LAPIC_TASK_PRIORITY          0x080
+#define LAPIC_ARIBITRATION_PRIORITY  0x090
+#define LAPIC_PROCESSOR_PRIORITY     0x0A0
+#define LAPIC_EOI                    0x0B0
+#define LAPIC_LOG_DST                0x0D0
+#define LAPIC_LDR                    0x0D0
+#define LAPIC_DFR                    0x0E0
+#define LAPIC_SVR                    0x0F0
+
+#define LAPIC_ISR          0x100
+#define LAPIC_TMR          0x180
+
+#define LAPIC_IRR          0x200
+
+#define LAPIC_ICR_LOW      0x300
+#define LAPIC_ICR_HIGH     0x310
+#define LAPIC_LVT_TIMER    0x320
+#define LAPIC_LVT_THERMAL  0x330
+#define LAPIC_LVT_PERF     0x340
+#define LAPIC_LVT_LINT0    0x350
+#define LAPIC_LVT_LINT1    0x360
+#define LAPIC_LVT_ERR      0x370
+
+// ====================
+
+
+//#define LAPICF_APIC_ENABLED		0x100
+
+
 #define MPN_VECT		0x7F
 #define MP_VECT_ADDR	(MPN_VECT*0x1000)
 //I/O APIC Memory mapped window
@@ -126,24 +138,24 @@ See: apple opensource
 // its local APIC.
 struct lapic_info_d
 {
+    int initialized;
+
     unsigned long lapic_va;
     unsigned long lapic_pa; 
-    int entry;  // page table entry.
+    int entry;  // pagedirectory entry.
 };
 struct lapic_info_d LAPIC;
 
 
 // =======================
 
+void lapic_initializing(unsigned long lapic_pa);
+
 // Check presence of apic.
-int check_apic (void);
+int has_apic (void);
 
 void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
-
-// apic stuffs for x86.
-static inline void imcr_pic_to_apic (void);
-static inline void imcr_apic_to_pic (void);
 
 
 #endif    //____APIC_H

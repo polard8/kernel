@@ -234,6 +234,11 @@ void spawn_thread (int tid)
 
     debug_print ("spawn_thread: Load pml4\n");
     __spawn_load_pml4_table ( target_thread->pml4_PA );
+
+
+//#bugbug
+//Maybe we need to call a method for that.
+
     // #bugbug: rever isso.
     asm ("movq %cr3, %rax");
     // #todo: wait here, (remember: we're using registers.)

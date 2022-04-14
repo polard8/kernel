@@ -944,6 +944,7 @@ int kernel_main(int arch_type)
                 file_write_buffer( stdin, cmdline, 64 );
             }
             
+            
             I_x64ExecuteInitialProcess();
         }
         break;

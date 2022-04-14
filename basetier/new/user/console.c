@@ -1334,7 +1334,11 @@ int consoleCompareStrings(void)
     // See: x64.c
     if ( strncmp( prompt, "smp", 3 ) == 0 )
     {
-        smp_probe();
+        // #suspended
+        // We're making this test during the kernel initialization.
+        // See: init_hal() in hal.c
+        //smp_probe();
+        printf("#suspended: See init_hal() in hal.c\n");
         goto exit_cmp;
     }
 

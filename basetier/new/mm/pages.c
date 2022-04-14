@@ -1986,8 +1986,12 @@ int mmSetUpPaging (void)
     //in: MSR, LO, HI
     //cpuSetMSR( 0xC0000080, 0x100, 0 );
 
+
+    // #debug
     //refresh_screen();
-    //while(1){}
+    //while(1){
+    //    asm ("cli");
+    //}
 
 //done:
     debug_print("mmSetUpPaging: done\n");

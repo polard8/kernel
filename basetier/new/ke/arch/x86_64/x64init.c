@@ -1280,6 +1280,17 @@ static int I_init (void)
             return FALSE;
         }
 
+        // #debug
+        // Testando a inicializaçao do lapic.
+        // Tentando ler o id e a versao.
+        // See: x64.c
+        smp_probe();
+
+        //#breakpoint
+        //printf("#breakpoint in I_init()\n");
+        //refresh_screen();
+        //while(1){  asm ("cli");  }
+
         break;
     // ...
     default:

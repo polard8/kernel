@@ -33,8 +33,8 @@ void show_cpu_intel_parameters (void)
 // #todo
 // Check the pointer validation?
 
-    //if( (void*) processor == NULL )
-        //fail
+    if( (void*) processor == NULL )
+        panic("show_cpu_intel_parameters: processor\n");
 
 // Vendor and brand.
     printf("        Vendor: {%s}\n", &processor->Vendor[0] );
@@ -131,7 +131,19 @@ void show_cpu_intel_parameters (void)
         printf("No HTT!\n");
     }
 
+
+
+// LAPIC
+    if(LAPIC.initialized == TRUE){
+        printf("LAPIC.lapic_pa %x \n",LAPIC.lapic_pa);
+        printf("LAPIC.lapic_va %x \n",LAPIC.lapic_va);
+        printf("LAPIC.entry    %d \n",LAPIC.entry);
+    }else{
+        printf("[ERROR] LAPIC not initialized\n");
+    };
+
     // Continua ...
+
 
 // Show
 // #obs:
