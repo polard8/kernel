@@ -475,12 +475,40 @@ void I_x64ExecuteInitialProcess (void)
 // sm.bin (ELF)
 // See: fs.c
 
+// #bugbug
+// O processo init deve ter suas proprias tabelas de paginas.
+// checar um endereço usando a tabela de paginas do kernel
+// esta errado.
+// >>> Mas logo acima, acabamos de mudar as tabelas.
+
     int elfStatus = -1;
     elfStatus = (int) fsCheckELFFile ( (unsigned long) CONTROLTHREAD_BASE );
-    if ( elfStatus < 0 ){
+    if ( elfStatus < 0 )
+    {
         debug_print ("I_x64ExecuteInitialProcess: .ELF signature\n");
         panic       ("I_x64ExecuteInitialProcess: .ELF signature");
     }
+
+/*
+// ==============
+// #test
+// ok. It's working fine.
+// Testing the structure in exec_elf.h
+    struct elf_header_64bit_d *elf_header;
+
+    // The base of the image.
+    // The header is in the top.
+    elf_header = (struct elf_header_64bit_d *) CONTROLTHREAD_BASE;
+
+    printf ("Signature: %c %c %c \n",
+        elf_header->e_ident[1],     // 'E'
+        elf_header->e_ident[2],     // 'L'
+        elf_header->e_ident[3] );   // 'F'
+    refresh_screen();
+    while(1){}
+// ==============
+*/
+
 
 // ==============
 // #debug

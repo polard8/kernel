@@ -46,8 +46,7 @@
  */
 
 #ifndef _SYS_EXEC_ELF_H_
-#define _SYS_EXEC_ELF_H_
-
+#define _SYS_EXEC_ELF_H_    1
 
 
 //#include <sys/types.h>
@@ -84,19 +83,36 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
  * See http://www.sco.com/developers/gabi/latest/ch4.eheader.html
  */
 
-// offsets?
-#define EI_MAG0        0		/* file ID */
-#define EI_MAG1        1		/* file ID */
-#define EI_MAG2        2		/* file ID */
-#define EI_MAG3        3		/* file ID */
-#define EI_CLASS       4		/* file class */
-#define EI_DATA        5		/* data encoding */
-#define EI_VERSION     6		/* ELF header version */
-#define EI_OSABI       7		/* OS/ABI ID */
-#define EI_ABIVERSION  8		/* ABI version */
-#define EI_PAD         9		/* start of pad bytes */
-#define EI_NIDENT     16		/* Size of e_ident[] */
+// Offsets for the identification section.
 
+
+#define EI_MAG0  0  // 0x7F
+#define EI_MAG1  1  // 'E'
+#define EI_MAG2  2  // 'L'
+#define EI_MAG3  3  // 'F'
+
+// file class
+// 1 = 32 bit, 2 = 64 bit
+#define EI_CLASS  4
+
+// data encoding
+// 1 = little endian, 2 = big endian
+#define EI_DATA    5
+
+// ELF header version
+#define EI_VERSION    6
+
+// OS/ABI ID
+// OS ABI - usually 0 for System V
+#define EI_OSABI    7
+
+// ABI version
+#define EI_ABIVERSION    8
+
+// start of pad bytes
+#define EI_PAD    9
+
+// ===================================
 
 
 /* e_ident[] magic number */
@@ -158,57 +174,76 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
 */
 
 
+#define ELF_NIDENT    16
 
+// See:
+// (good) https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+// https://wiki.osdev.org/ELF
 
-/* ELF Header */
-// 32bit
+// Elf header for 64bit.
 
-typedef struct elfhdr {
+struct elf_header_64bit_d
+{
 
-    unsigned char  e_ident[EI_NIDENT];  // ELF Identification. 
-    
-    Elf32_Half  e_type;         // object file type 
-    Elf32_Half  e_machine;      // machine 
-    Elf32_Word  e_version;      // object file version 
-    Elf32_Addr  e_entry;        // virtual entry point 
-    Elf32_Off   e_phoff;        // program header table offset 
-    Elf32_Off   e_shoff;        // section header table offset 
-    Elf32_Word  e_flags;        // processor-specific flags 
-    Elf32_Half  e_ehsize;       // ELF header size 
-    Elf32_Half  e_phentsize;    // program header entry size 
-    Elf32_Half  e_phnum;        // number of program header entries 
-    Elf32_Half  e_shentsize;    // section header entry size 
-    Elf32_Half  e_shnum;        // number of section header entries 
-    
-    // section header table's "section header string table" 
-    // entry offset 
-    Elf32_Half  e_shstrndx;  
+// ELF Identification.
+    unsigned char e_ident[ELF_NIDENT];  //16bytes
 
-} Elf32_Ehdr;
+// Object file type
+// 1 = relocatable, 2 = executable, 3 = shared, 4 = core
+    unsigned short e_type;  //2 bytes
 
+// machine
+// Instruction set.
+// x86  3 | IA-64  0x32 | x86-64  0x3E
+    unsigned short e_machine;  //2 bytes
 
+// Object file version.
+// ELF Version
+// Set to 1 for the original version of ELF.
+    unsigned int e_version;  //4 bytes.
 
+// virtual entry point
+// Program entry position
+    unsigned long e_entry;  //8bytes.
 
-/*
-// header
-// 64bit
-typedef struct {
-	unsigned char	e_ident[EI_NIDENT];  //Id bytes 
-	Elf64_Half	e_type;			   // file type 
-	Elf64_Half	e_machine;		// machine type 
-	Elf64_Word	e_version;		// version number 
-	Elf64_Addr	e_entry;		// entry point 
-	Elf64_Off	e_phoff;		// Program hdr offset 
-	Elf64_Off	e_shoff;		// Section hdr offset 
-	Elf64_Word	e_flags;		// Processor flags 
-	Elf64_Half	e_ehsize;		// sizeof ehdr 
-	Elf64_Half	e_phentsize;		// Program header entry size 
-	Elf64_Half	e_phnum;		// Number of program headers 
-	Elf64_Half	e_shentsize;		// Section header entry size 
-	Elf64_Half	e_shnum;		// Number of section headers 
-	Elf64_Half	e_shstrndx;		// String table index 
-} Elf64_Ehdr;
-*/
+// program header table offset
+// Program header table position
+    unsigned long e_phoff;  //8bytes
+
+// section header table offset
+// Section header table position
+    unsigned long e_shoff;  //8bytes
+
+// processor-specific flags
+// Flags - architecture dependent;
+    unsigned int e_flags;  //4 bytes
+
+// ELF header size
+// Header size
+    unsigned short e_ehsize;  // 2 bytes
+
+// program header entry size
+// Size of an entry in the program header table
+    unsigned short e_phentsize;  // 2 bytes
+
+// number of program header entries
+// Number of entries in the program header table
+    unsigned short e_phnum;  // 2 bytes
+
+// section header entry size
+// Size of an entry in the section header table
+    unsigned short e_shentsize;  // 2 bytes
+
+// number of section header entries
+// Number of entries in the section header table
+    unsigned short e_shnum;  // 2 bytes
+
+// section header table's "section header string table" 
+// entry offset 
+// Index in section header table with the section names
+    unsigned short e_shstrndx;  // 2 bytes
+};
+
 
 
 /* e_type */
@@ -268,41 +303,63 @@ typedef struct {
 #define  PN_XNUM    0xffff
 
 
-/* Section Header for 32bit */
-typedef struct {
+/* Section Header for 64biy */
+// See:
+// https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+struct elf_section_header_64bit_d
+{
 
-    // name - index into section header
-    // string table section 
-    Elf32_Word  sh_name;
+// name - index into section header
+// string table section 
+// An offset to a string in the .shstrtab section 
+// that represents the name of this section.
+    unsigned int sh_name;  // 4 bytes
 
-    Elf32_Word  sh_type;       /* type */
-    Elf32_Word  sh_flags;      /* flags */
-    Elf32_Addr  sh_addr;       /* address */
-    Elf32_Off   sh_offset;     /* file offset */
-    Elf32_Word  sh_size;       /* section size */
-    Elf32_Word  sh_link;       /* section header table index link */
-    Elf32_Word  sh_info;       /* extra information */
-    Elf32_Word  sh_addralign;  /* address alignment */
-    Elf32_Word  sh_entsize;    /* section entry size */
+/* type */
+// Identifies the type of this header.
+    unsigned int sh_type;  //4 bytes
 
-} Elf32_Shdr;
+/* flags */
+// Identifies the attributes of the section.
+    unsigned long sh_flags;  //8 bytes
 
+/* address */
+// Virtual address of the section in memory, 
+// for sections that are loaded.
+    unsigned long sh_addr;  //8 bytes
 
-/*
-// section header for 64bit
-typedef struct {
-	Elf64_Word	sh_name;	    //section name 
-	Elf64_Word	sh_type;	    //section type 
-	Elf64_Xword	sh_flags;	    //section flags 
-	Elf64_Addr	sh_addr;	    //virtual address 
-	Elf64_Off	sh_offset;	    //file offset 
-	Elf64_Xword	sh_size;	    //section size 
-	Elf64_Word	sh_link;	    //link to another 
-	Elf64_Word	sh_info;	    //misc info 
-	Elf64_Xword	sh_addralign;	//memory alignment 
-	Elf64_Xword	sh_entsize;	    //table entry size 
-} Elf64_Shdr;
-*/
+/* file offset */
+//Offset of the section in the file image.
+    unsigned long sh_offset;  //8bytes
+
+/* section size */
+// Size in bytes of the section in the file image. May be 0.
+    unsigned long sh_size;  //8bytes
+
+/* section header table index link */
+// Contains the section index of an associated section. 
+// This field is used for several purposes, 
+// depending on the type of section.
+    unsigned int sh_link;  //4bytes
+
+/* extra information */
+// Contains extra information about the section. 
+// This field is used for several purposes, 
+// depending on the type of section.
+    unsigned int sh_info;  //4bytes
+
+/* address alignment */
+// Contains the required alignment of the section. 
+// This field must be a power of two.
+    unsigned long sh_addralign;  //8bytes
+
+/* section entry size */
+// Contains the size, in bytes, of each entry, 
+// for sections that contain fixed-size entries. 
+// Otherwise, this field contains zero.
+    unsigned long sh_entsize;  //8bytes
+};
+
 
 
 /* Special Section Indexes */
@@ -394,7 +451,6 @@ typedef struct {
                                             /*  specific section attributes */
 
 
-
 /* Symbol Table Entry for 32bit */
 typedef struct elf32_sym {
 
@@ -406,20 +462,6 @@ typedef struct elf32_sym {
     Elf32_Half     st_shndx;  /* section header index */
 
 } Elf32_Sym;
-
-
-
-/*
-// symbol table entry for 64 bit.
-typedef struct {
-	Elf64_Word	st_name;	    //Symbol name index in str table 
-	unsigned char	st_info;	// type / binding attrs 
-	unsigned char	st_other;	// unused 
-	Elf64_Half	st_shndx;	// section index of symbol 
-	Elf64_Addr	st_value;	// value of symbol 
-	Elf64_Xword	st_size;	// size of symbol 
-} Elf64_Sym;
-*/
 
 
 /* Symbol table index */
@@ -488,22 +530,6 @@ typedef struct {
 #define ELF32_R_INFO(s,t)    (((s) << 8) + (unsigned char)(t))
 
 
-/*
-typedef struct {
-	Elf64_Addr	r_offset;	//where to do it 
-	Elf64_Xword	r_info;		//index & type of relocation 
-} Elf64_Rel;
-*/
-
-/*
-typedef struct {
-	Elf64_Addr	r_offset;	//where to do it 
-	Elf64_Xword	r_info;		//index & type of relocation 
-	Elf64_Sxword	r_addend;	//adjustment value 
-} Elf64_Rela;
-*/
-
-
 
 //#define	ELF64_R_SYM(info)	((info) >> 32)
 //#define	ELF64_R_TYPE(info)	((info) & 0xFFFFFFFF)
@@ -528,36 +554,47 @@ typedef struct {
 
 
 
+// See:
+// https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
+//Program Header for 64 bit.
+struct elf_program_header_64bit_d
+{
 
+/* segment type */
+    unsigned int p_type;  //4 bytes.
 
-/* Program Header for 32 bit*/
-typedef struct {
+/* flags */
+// Segment-dependent flags (position for 64-bit structure).
+    unsigned int p_flags;  //4bytes
 
-    Elf32_Word  p_type;    /* segment type */
-    Elf32_Off   p_offset;  /* segment offset */
-    Elf32_Addr  p_vaddr;   /* virtual address of segment */
-    Elf32_Addr  p_paddr;   /* physical address - ignored? */
-    Elf32_Word  p_filesz;  /* number of bytes in file for seg. */
-    Elf32_Word  p_memsz;   /* number of bytes in mem. for seg. */
-    Elf32_Word  p_flags;   /* flags */
-    Elf32_Word  p_align;   /* memory alignment */
+/* segment offset */
+// Offset of the segment in the file image.
+    unsigned long p_offset;  // 8 bytes
 
-} Elf32_Phdr;
+/* virtual address of segment */
+// Virtual address of the segment in memory.
+    unsigned long p_vaddr;  // 8 bytes
 
+/* physical address - ignored? */
+// On systems where physical address is relevant, 
+// reserved for segment's physical address.
+    unsigned long p_paddr;  // 8 bytes
 
-/*
-// program header for 64bit.
-typedef struct {
-	Elf64_Word	p_type;		//entry type 
-	Elf64_Word	p_flags;	//flags 
-	Elf64_Off	p_offset;	//offset 
-	Elf64_Addr	p_vaddr;	//virtual address 
-	Elf64_Addr	p_paddr;	//physical address 
-	Elf64_Xword	p_filesz;	//file size 
-	Elf64_Xword	p_memsz;	//memory size 
-	Elf64_Xword	p_align;	//memory & file alignment 
-} Elf64_Phdr;
-*/
+/* number of bytes in file for seg. */
+// Size in bytes of the segment in the file image. May be 0.
+    unsigned long p_filesz;  // 8 bytes
+
+/* number of bytes in mem. for seg. */
+// Size in bytes of the segment in memory. May be 0.
+    unsigned long p_memsz;  // 8 bytes
+
+/* memory alignment */
+// 0 and 1 specify no alignment. 
+// Otherwise should be a positive, integral power of 2, 
+// with p_vaddr equating p_offset modulus p_align.
+    unsigned long p_align;  // 8 bytes
+};
+
 
 
 /* Segment types - p_type */
@@ -603,17 +640,6 @@ typedef struct {
 
 } Elf32_Dyn;
 
-
-/*
-// dynamic structure for 64bit
-typedef struct {
-	Elf64_Xword	d_tag;		//controls meaning of d_val 
-	union {
-		Elf64_Addr	d_ptr;
-		Elf64_Xword	d_val;
-	} d_un;
-} Elf64_Dyn;
-*/
 
 
 /* Dynamic Array Tags - d_tag */
@@ -697,13 +723,6 @@ typedef struct {
 } Elf32_Nhdr;
 
 
-/*
-typedef struct {
-	Elf64_Word n_namesz;
-	Elf64_Word n_descsz;
-	Elf64_Word n_type;
-} Elf64_Nhdr;
-*/
 
 
 /*
@@ -715,14 +734,6 @@ typedef struct {
     Elf32_Word type;
 } Elf32_Note;
 
-
-/*
-typedef struct {
-	Elf64_Word namesz;
-	Elf64_Word descsz;
-	Elf64_Word type;
-} Elf64_Note;
-*/
 
 
 /* Values for n_type. */
@@ -940,7 +951,6 @@ int	exec_elf_makecmds(struct proc *, struct exec_package *);
 //
 
 int elfCheckSignature( unsigned long address );
-
 
 
 #endif /* _SYS_EXEC_ELF_H_ */

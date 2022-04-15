@@ -585,6 +585,12 @@ do_clone:
     debug_print ("copy_process: [4] Check signature.\n");
     //printf ("copy_process: [4] Check signature.\n");
 
+// #bugbug
+// O processo init deve ter suas proprias tabelas de paginas.
+// checar um endereço usando a tabela de paginas do kernel
+// esta errado.
+
+
     Status = (int) fsCheckELFFile ( (unsigned long) child_process->Image );
 
     if ( Status < 0 )
