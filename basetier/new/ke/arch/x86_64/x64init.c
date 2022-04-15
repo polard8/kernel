@@ -337,18 +337,14 @@ void I_x64ExecuteInitialProcess (void)
 
     Thread = (struct thread_d *) InitThread; 
 
-    if ( (void *) Thread == NULL ){
-        debug_print ("I_x64ExecuteInitialProcess: Thread\n");
-        panic       ("I_x64ExecuteInitialProcess: Thread\n");
+    if ( (void *) Thread == NULL )
+    {
+        panic ("I_x64ExecuteInitialProcess: Thread\n");
     }
 
     if ( Thread->used != TRUE || Thread->magic != 1234 )
     {
-        debug_print ("I_x64ExecuteInitialProcess: Thread validation\n");
-        //printf ("I_x64ExecuteInitialProcess: tid={%d} magic \n", 
-        //    Thread->tid);
-        printf ("I_x64ExecuteInitialProcess: Thread validation\n");
-        die();
+        panic ("I_x64ExecuteInitialProcess: Thread validation\n");
     }
 
 // It its context is already saved, so this is not the fist time.
@@ -489,25 +485,68 @@ void I_x64ExecuteInitialProcess (void)
         panic       ("I_x64ExecuteInitialProcess: .ELF signature");
     }
 
+
 /*
 // ==============
 // #test
 // ok. It's working fine.
 // Testing the structure in exec_elf.h
+
+// #todo
+// Create a helper for this routine.
+
     struct elf_header_64bit_d *elf_header;
 
     // The base of the image.
     // The header is in the top.
     elf_header = (struct elf_header_64bit_d *) CONTROLTHREAD_BASE;
 
+
+// signature
     printf ("Signature: %c %c %c \n",
         elf_header->e_ident[1],     // 'E'
         elf_header->e_ident[2],     // 'L'
         elf_header->e_ident[3] );   // 'F'
+
+
+// file class
+// 1 = 32 bit, 2 = 64 bit
+    if( elf_header->e_ident[EI_CLASS] != ELFCLASS64 )
+    {
+        //
+    } 
+    printf ("Class: %x\n", elf_header->e_ident[EI_CLASS]);
+
+// type
+// 1 = relocatable, 2 = executable, 3 = shared, 4 = core
+    if( elf_header->e_type != ET_EXEC )
+    {
+        //
+    }
+    printf ("Type: %x\n", elf_header->e_type);
+
+// machine
+// x86  3 | IA-64  0x32 | x86-64  0x3E(62)
+    if( elf_header->e_machine != EM_X86_64 )
+    {
+        //
+    }
+    printf ("Machine: %x\n", elf_header->e_machine);
+
+// entry
+    if( elf_header->e_entry != CONTROLTHREAD_ENTRYPOINT )
+    {
+        //
+    }
+    printf ("Entry: %x\n", elf_header->e_entry);
+
+
+    //#breakpoint
     refresh_screen();
     while(1){}
 // ==============
 */
+
 
 
 // ==============
@@ -543,6 +582,7 @@ void I_x64ExecuteInitialProcess (void)
 
     PROGRESS("Go to ring3! \n");
 
+// CONTROLTHREAD_ENTRYPOINT
     unsigned long entry = (unsigned long) 0x0000000000201000;
     unsigned long rsp3  = (unsigned long) 0x00000000002FFFF0;
 
@@ -744,7 +784,6 @@ static int I_x64CreateKernelProcess(void)
     m->used  = TRUE;
     m->magic = 1234;
 
-// done.
     return TRUE;
 }
 
@@ -755,10 +794,7 @@ static int I_x64CreateWSThread(void)
 {
     //debug_print ("I_x64CreateWSThread:\n");
 
-//
 // Thread
-//
-
 // This is the control thread of the window server module.
 // See: create.c, thread.h.
 
@@ -820,7 +856,7 @@ static int I_x64CreateWSThread(void)
         (struct thread_d *) ws_thread,
         PRIORITY_MAX );
 
-// Qauntum
+// Quantum
 
     ws_thread->quantum = QUANTUM_MAX;
 

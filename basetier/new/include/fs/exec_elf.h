@@ -117,23 +117,21 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
 
 /* e_ident[] magic number */
 
-// Magic.
-#define  ELFMAG0    0x7f       /* e_ident[EI_MAG0] */
-#define  ELFMAG1    'E'        /* e_ident[EI_MAG1] */
-#define  ELFMAG2    'L'        /* e_ident[EI_MAG2] */
-#define  ELFMAG3    'F'        /* e_ident[EI_MAG3] */
+// Magic
+#define ELFMAG0  0x7f  //e_ident[EI_MAG0]
+#define ELFMAG1  'E'   //e_ident[EI_MAG1]
+#define ELFMAG2  'L'   //e_ident[EI_MAG2]
+#define ELFMAG3  'F'   //e_ident[EI_MAG3]
 
 //??
 #define  ELFMAG     "\177ELF"  /* magic */
 #define  SELFMAG    4          /* size of magic */
 
-
 /* e_ident[] file class */
-#define  ELFCLASSNONE  0	/* invalid */
-#define  ELFCLASS32    1	/* 32-bit objs */
-#define  ELFCLASS64    2	/* 64-bit objs */
-#define  ELFCLASSNUM   3	/* number of classes */
-
+#define  ELFCLASSNONE  0  // invalid
+#define  ELFCLASS32    1  // 32-bit objs
+#define  ELFCLASS64    2  // 64-bit objs
+#define  ELFCLASSNUM   3  // number of classes
 
 /* e_ident[] data encoding */
 #define ELFDATANONE  0	/* invalid */
@@ -163,15 +161,6 @@ typedef __uint16_t  Elf32_Half;   /* Unsigned medium integer */
 //#define ELFOSABI_GRAMADO      0x32
 //#define ELFOSABI_GRAMADO32    0x32
 //#define ELFOSABI_GRAMADO64    0x64
-
-
-/* e_ident */
-/*
-#define IS_ELF(ehdr) ((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
-                      (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
-                      (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
-                      (ehdr).e_ident[EI_MAG3] == ELFMAG3)
-*/
 
 
 #define ELF_NIDENT    16
@@ -245,65 +234,66 @@ struct elf_header_64bit_d
 };
 
 
-
 /* e_type */
-#define ET_NONE		0		/* No file type */
-#define ET_REL		1		/* relocatable file */
-#define ET_EXEC		2		/* executable file */
-#define ET_DYN		3		/* shared object file */
-#define ET_CORE		4		/* core file */
-#define ET_NUM		5		/* number of types */
-#define ET_LOPROC	0xff00		/* reserved range for processor */
-#define ET_HIPROC	0xffff		/*  specific e_type */
+#define ET_NONE    0       // No file type
+#define ET_REL     1       // relocatable file
+#define ET_EXEC    2       // executable file
+#define ET_DYN     3       // shared object file
+#define ET_CORE    4       // core file
+#define ET_NUM     5       // number of types
+#define ET_LOPROC  0xff00  // reserved range for processor
+#define ET_HIPROC  0xffff  // specific e_type
+
 
 /* e_machine */
-#define EM_NONE		0		/* No Machine */
-#define EM_M32		1		/* AT&T WE 32100 */
-#define EM_SPARC	2		/* SPARC */
-#define EM_386		3		/* Intel 80386 */
-#define EM_68K		4		/* Motorola 68000 */
-#define EM_88K		5		/* Motorola 88000 */
-#define EM_486		6		/* Intel 80486 - unused? */
-#define EM_860		7		/* Intel 80860 */
-#define EM_MIPS		8		/* MIPS R3000 Big-Endian only */
+#define EM_NONE   0  // No Machine
+#define EM_M32    1  // AT&T WE 32100
+#define EM_SPARC  2  // SPARC
+#define EM_386    3  // Intel 80386
+#define EM_68K    4  // Motorola 68000
+#define EM_88K    5  // Motorola 88000
+#define EM_486    6  // Intel 80486 - unused?
+#define EM_860    7  // Intel 80860
+#define EM_MIPS   8  // MIPS R3000 Big-Endian only
+
 /*
  * Don't know if EM_MIPS_RS4_BE,
  * EM_SPARC64, EM_PARISC,
  * or EM_PPC are ABI compliant
  */
-#define EM_MIPS_RS4_BE	10		/* MIPS R4000 Big-Endian */
-#define EM_SPARC64	11		/* SPARC v9 64-bit unofficial */
-#define EM_PARISC	15		/* HPPA */
-#define EM_SPARC32PLUS	18		/* Enhanced instruction set SPARC */
-#define EM_PPC		20		/* PowerPC */
-#define EM_PPC64	21		/* PowerPC 64 */
-#define EM_ARM		40		/* Advanced RISC Machines ARM */
-#define EM_ALPHA	41		/* DEC ALPHA */
-#define EM_SH		42		/* Hitachi/Renesas Super-H */
-#define EM_SPARCV9	43		/* SPARC version 9 */
-#define EM_IA_64	50		/* Intel IA-64 Processor */
-#define EM_AMD64	62		/* AMD64 architecture */
-#define EM_X86_64	EM_AMD64
-#define EM_VAX		75		/* DEC VAX */
-#define EM_AARCH64	183		/* ARM 64-bit architecture (AArch64) */
+#define EM_MIPS_RS4_BE  10  // MIPS R4000 Big-Endian
+#define EM_SPARC64      11  // SPARC v9 64-bit unofficial
+#define EM_PARISC       15  // HPPA
+#define EM_SPARC32PLUS  18  // Enhanced instruction set SPARC
+#define EM_PPC      20  // PowerPC
+#define EM_PPC64    21  // PowerPC 64
+#define EM_ARM      40  // Advanced RISC Machines ARM
+#define EM_ALPHA    41  // DEC ALPHA
+#define EM_SH       42  // Hitachi/Renesas Super-H
+#define EM_SPARCV9  43  // SPARC version 9
+#define EM_IA_64    50  // Intel IA-64 Processor
+#define EM_AMD64    62  // AMD64 architecture
+#define EM_X86_64   EM_AMD64
+#define EM_VAX      75   // DEC VAX */
+#define EM_AARCH64  183  // ARM 64-bit architecture (AArch64) */
 
 /* Non-standard */
-#define EM_ALPHA_EXP	0x9026		/* DEC ALPHA */
-#define EM__LAST__	(EM_ALPHA_EXP + 1)
+#define EM_ALPHA_EXP  0x9026  // DEC ALPHA
+#define EM__LAST__    (EM_ALPHA_EXP + 1)
 
-#define EM_NUM		22		/* number of machine types */
+#define EM_NUM  22  // number of machine types
 
 /* Version */
-#define EV_NONE		0		/* Invalid */
-#define EV_CURRENT	1		/* Current */
-#define EV_NUM		2		/* number of versions */
+#define EV_NONE     0  // Invalid
+#define EV_CURRENT  1  // Current
+#define EV_NUM      2  // number of versions
 
 // Magic for e_phnum: 
 // get real value from sh_info of first section header
-#define  PN_XNUM    0xffff
+#define PN_XNUM  0xffff
 
 
-/* Section Header for 64biy */
+/* Section Header for 64bit */
 // See:
 // https://en.wikipedia.org/wiki/Executable_and_Linkable_Format
 struct elf_section_header_64bit_d
