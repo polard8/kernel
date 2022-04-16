@@ -65,14 +65,6 @@
 unsigned long savedW=0;
 unsigned long savedH=0;
 
-    
-//
-// == prototypes =============
-//
-
-int gws (void);
-
-
 int game_status;
 
 // area de jogo
@@ -88,6 +80,81 @@ int prize_y;
 
 // barra de status
 int status_window;
+
+
+//
+// == private functions: prototypes =============
+//
+
+static int gws(void);
+
+// ==============================
+
+// initialize via AF_GRAMADO.
+// Ainda nao podemos mudar isso para a lib, pois precisamos
+// do suporte as rotinas de socket e as definiçoes.
+// tem que incluir mais coisa na lib.
+
+static int gws(void)
+{
+
+// Vamos nos concetar com o processo identificado 
+// com o nome 'ws'
+// The port name is 'port:/ws'
+
+//==============================
+    struct sockaddr addr; 
+    int addrlen;
+    
+    addr.sa_family = AF_GRAMADO; 
+    addr.sa_data[0] = 'w';
+    addr.sa_data[1] = 's';  
+
+    addrlen = sizeof(addr);
+//==============================
+
+    int client_fd = -1;
+
+    gws_debug_print ("gws.bin: Initializing ...\n");
+    //printf          ("gws.bin: Initializing ...\n");
+
+// Socket
+// Create a socket. 
+// AF_GRAMADO = 8000
+
+    // #debug
+    //printf ("gws: Creating socket\n");
+
+    client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
+    
+    if ( client_fd < 0 )
+    {
+       gws_debug_print ("gws: [FAIL] Couldn't create socket\n");
+       printf          ("gws: [FAIL] Couldn't create socket\n");
+       exit(1);  //#bugbug Cuidado.
+    }
+
+// Connect
+// Nessa hora colocamos no accept um fd.
+// então o servidor escreverá em nosso arquivo.
+// Tentando nos conectar ao endereço indicado na estrutura
+// Como o domínio é AF_GRAMADO, então o endereço é "w","s".
+
+    //printf ("gws: Trying to connect to the address 'ws' ...\n");      
+
+    while (TRUE){
+        if ( connect (client_fd, (struct sockaddr *) &addr, addrlen ) < 0 )
+        { 
+            gws_debug_print ("gws: Connection Failed\n");
+            //printf          ("gws: Connection Failed \n"); 
+            //exit(1);
+        }else{ break; };
+    };
+
+    return (int) client_fd;
+}
+
+
 
 
 void init_cursor(int fd)
@@ -249,83 +316,6 @@ updateStatusBar(
 // second number
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, second_number );
 }
-
-
-// initialize via AF_GRAMADO.
-// Ainda nao podemos mudar isso para a lib, pois precisamos
-// do suporte as rotinas de socket e as definiçoes.
-// tem que incluir mais coisa na lib.
-
-int gws(void)
-{
-
-    // Vamos nos concetar com o processo identificado 
-    // com o nome 'ws'
-    // The port name is 'port:/ws'
-
-    //==============================
-    struct sockaddr addr; 
-    int addrlen;
-    
-    addr.sa_family = AF_GRAMADO; 
-    addr.sa_data[0] = 'w';
-    addr.sa_data[1] = 's';  
-
-    addrlen = sizeof(addr);
-    //==============================
-    
-    
-    int client_fd = -1;
-    
-    
-    
-    
-    gws_debug_print ("-------------------------\n"); 
-    //printf          ("-------------------------\n"); 
-    gws_debug_print ("gws.bin: Initializing ...\n");
-    //printf          ("gws.bin: Initializing ...\n");
-
-
-    //
-    // Socket
-    // 
-
-    // #debug
-    //printf ("gws: Creating socket\n");
-
-    // Create a socket. 
-    // AF_GRAMADO = 8000
-    client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 ){
-       gws_debug_print ("gws: [FAIL] Couldn't create socket\n");
-       printf          ("gws: [FAIL] Couldn't create socket\n");
-       exit(1);  //#bugbug Cuidado.
-    }
-
-    //
-    // Connect
-    //
-
-    // Nessa hora colocamos no accept um fd.
-    // então o servidor escreverá em nosso arquivo.
-    // Tentando nos conectar ao endereço indicado na estrutura
-    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
-
-    //printf ("gws: Trying to connect to the address 'ws' ...\n");      
-
-    while (TRUE){
-        if ( connect (client_fd, (struct sockaddr *) &addr, addrlen ) < 0 )
-        { 
-            gws_debug_print ("gws: Connection Failed\n");
-            //printf          ("gws: Connection Failed \n"); 
-            //exit(1);
-        }else{ break; };
-    };
-
-    return (int) client_fd;
-}
-
 
 // local
 int 

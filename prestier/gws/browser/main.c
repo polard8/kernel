@@ -1,11 +1,8 @@
 /*
  * File: main.c
- *
  *    Browser application. UI.
- *
  * 2020 - Created by Fred Nora.
  */
-
 
 // rtl 
 #include <types.h>
@@ -17,15 +14,10 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <packet.h>
-
 // The client-side library.
 #include <gws.h>
 
-
-//
-// == ports ====================================
-//
-
+// network ports.
 #define PORTS_WS 4040
 #define PORTS_NS 4041
 #define PORTS_FS 4042
@@ -52,7 +44,10 @@ static int __button_window = -1;
 static int __client_window = -1;
 
 
-//prototype
+//
+// == Private functions: prototypes ================
+//
+
 static int 
 browserProcedure(
     int fd, 
@@ -61,7 +56,10 @@ browserProcedure(
     unsigned long long1, 
     unsigned long long2 );
 
-// local
+
+// ====================================
+
+
 static int 
 browserProcedure(
     int fd, 
@@ -70,12 +68,18 @@ browserProcedure(
     unsigned long long1, 
     unsigned long long2 )
 {
-    if(fd<0)
+
+    if(fd<0){
         return -1;
-    if(event_window<0)
+    }
+
+    if(event_window<0){
         return -1;
-    if(event_type<0)
+    }
+
+    if(event_type<0){
         return -1;
+    }
 
 
     switch(event_type){
@@ -116,10 +120,7 @@ int main ( int argc, char *argv[] )
     addr_in.sin_port        = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
 
-
-    //debug_print ("-------------------------\n");
     debug_print ("browser: Initializing ...\n");
-
 
 // Device info.
     unsigned long w = gws_get_system_metrics(1);
@@ -136,10 +137,12 @@ int main ( int argc, char *argv[] )
 // 
 
     // #debug
-    printf ("browser: Creating socket\n");
+    //printf ("browser: Creating socket\n");
 
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    if ( client_fd < 0 ){
+    
+    if ( client_fd < 0 )
+    {
        printf ("browser: Couldn't create socket\n");
        exit(1);
     }
@@ -152,8 +155,8 @@ int main ( int argc, char *argv[] )
 // Nessa hora colocamos no accept um fd.
 // Então o servidor escreverá em nosso arquivo.
 
-// #debug
-    printf ("browser: Connecting to the address via inet  ...\n");    
+    // #debug
+    //printf ("browser: Connecting to the address via inet  ...\n");    
 
     while (TRUE){
         if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
@@ -199,34 +202,40 @@ int main ( int argc, char *argv[] )
 // style: 
 // 0x0001=maximized | 0x0002=minimized | 0x0004=fullscreen | 0x0008 statusbar
 
-    main_window = gws_create_window ( 
-                      client_fd,
-                      WT_OVERLAPPED, 1, 1, "Browser",
-                      viewwindowx, viewwindowy, w_width, w_height,
-                      0, 
-                      0x0000,  
-                      COLOR_GRAY, COLOR_GRAY );
+    main_window = 
+        (int) gws_create_window ( 
+                  client_fd,
+                  WT_OVERLAPPED, 1, 1, "Browser",
+                  viewwindowx, viewwindowy, w_width, w_height,
+                  0, 
+                  0x0000,  
+                  COLOR_GRAY, COLOR_GRAY );
 
-    if ( main_window < 0 ){
+    if ( main_window < 0 )
+    {
         debug_print("browser: main_window fail\n"); 
         exit(1);
     }
-    
-    if ( main_window > 0 ){
-        // Save globally.
+
+    // Save globally.
+    if ( main_window > 0 )
+    {
         __main_window = main_window;
     }
 
 // ===================
 // address bar
-    addressbar_window = gws_create_window (
-                            client_fd,
-                            WT_EDITBOX,1,1,"AddressBar",
-                            4, 32 +4, 
-                            (w_width-32-4-4-4), 32,
-                            main_window, 0, COLOR_WHITE, COLOR_WHITE );
+// #todo: set focus.
+    addressbar_window = 
+        (int) gws_create_window (
+                  client_fd,
+                  WT_EDITBOX, 1, 1, "AddressBar",
+                  4, 32 +4, 
+                  (w_width-32-4-4-4), 32,
+                  main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( addressbar_window < 0 ){
+    if ( addressbar_window < 0 )
+    {
         debug_print("browser: addressbar_window fail\n"); 
     }
 
@@ -241,13 +250,16 @@ int main ( int argc, char *argv[] )
             "https://github.com/frednora");
     }
 
+
 // ===================
 // button
-    button = gws_create_window (client_fd,
-        WT_BUTTON,1,1,">",
-        (w_width-32-4), 32 +4, 
-        32, 32,
-        main_window, 0, COLOR_GRAY, COLOR_GRAY );
+    button = 
+        (int) gws_create_window (
+                  client_fd,
+                  WT_BUTTON, 1, 1, ">",
+                  (w_width-32-4), 32 +4, 
+                  32, 32,
+                  main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
     if ( button < 0 ) 
         debug_print("browser: button fail\n"); 
@@ -255,13 +267,16 @@ int main ( int argc, char *argv[] )
     if(button>0)
         __button_window=button;
 
+
 // ===================
 // client window (White)
-    client_window = gws_create_window (client_fd,
-        WT_SIMPLE,1,1,"client",
-        4, 32 +40, 
-        w_width-8, w_height - 40 - 4 -32,
-        main_window, 0, COLOR_WHITE, COLOR_WHITE );
+    client_window = 
+        (int) gws_create_window (
+                  client_fd,
+                  WT_SIMPLE,1,1,"client",
+                  4, 32 +40, 
+                  w_width-8, w_height - 40 - 4 -32,
+                  main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
     if ( client_window < 0 )             
         debug_print("browser: client_window fail\n"); 
@@ -289,6 +304,7 @@ int main ( int argc, char *argv[] )
 // ============================================
 // focus
 // Editbox!
+// #bugbug: It's not working!
 
     gws_async_command(
          client_fd,

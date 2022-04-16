@@ -1,44 +1,35 @@
 /*
  * File: main.c
- *
  *    Client side application for Gramado Window Server.
  *    Using socket to connect with gws.
  *    AF_GRAMADO family.
- *
  * History:
  *     2020 - Created by Fred Nora.
  */
 
+// ##
+// This is a test.
+// This code is a mess.
 
 // #todo
 // This is gonna be a command line interpreter application.
 // It will looks like the old gdeshell application.
 // #todo: See the 32bit version of gdeshell.
-
-
 // #todo
 // We can have a custom status bar in this client.
 // goal: Identity purpose.
-
-
-
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
  
 /*
     To make a process a TCP server, you need to follow the steps given below −
-
     Create a socket with the socket() system call.
-
     Bind the socket to an address using the bind() system call. 
     For a server socket on the Internet, an address consists of a 
     port number on the host machine.
-
     Listen for connections with the listen() system call.
-
     Accept a connection with the accept() system call. 
     This call typically blocks until a client connects with the server.
-
     Send and receive data using the read() and write() system calls.
 */ 
 
@@ -57,27 +48,16 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
 #include <rtl/gramado.h>
-
-
 // libgws - The client-side library.
 #include <gws.h>
 
 
-
-#define MYGREEN 0x0b6623
-
+#define MYGREEN  0x0b6623
 
 unsigned long savedW=0;
 unsigned long savedH=0;
 
-    
-//
-// == prototypes =============
-//
-
-int gws (void);
 
 
 int game_status;
@@ -92,178 +72,44 @@ int prize_x;
 int prize_y;
 
 
-
 // barra de status
 int status_window;
 
 
-void init_cursor(int fd)
-{
-    player_x = game_width >> 1;
-    player_y = game_height >> 1;
-
-    gws_draw_char ( 
-        fd, 
-        game_window, 
-        player_x, 
-        player_y, 
-        COLOR_RED, 
-        'g' );
-}
-
-void init_prize(int fd)
-{
-    prize_x = (rand() % 50) << 3;
-    prize_y = (rand() % 50) << 3;
-
-    gws_draw_char ( 
-        fd, 
-        game_window, 
-        prize_x, 
-        prize_y, 
-        COLOR_RED, 
-        '+' );
-}
-
-void gameTestASCIITable(int fd,unsigned long w, unsigned long h)
-{
-    int i=0;
-    int j=0;
-    int c=0;
-    
-    for(i=0; i<4; i++)
-    {
-        for(j=0; j<64; j++)
-        {
-            gws_draw_char ( 
-                fd, status_window, 
-                (w/64) * j, (i*8), 
-                COLOR_YELLOW, c );
-            c++;
-        };
-    };
-}
-
-
-void you_win(int fd)
-{
-    printf("You win!\n");
-    gws_clone_and_execute("fileman.bin");
-    game_status = FALSE;
-}
-
-
-void check_victory(int fd)
-{
-    int p1 = prize_x - 10;
-    int p2 = prize_x + 10;
-
-    int p3 = prize_y - 10;
-    int p4 = prize_y + 10;
-
-    if (game_status != TRUE)
-        return;
-
-    if ( player_x > p1 && player_x < p2 && 
-         player_y > p3 && player_y < p4 )
-    {
-        you_win(fd);
-    }
-}
-
-void game_redraw(int fd)
-{
-    gws_redraw_window(fd, game_window, TRUE); 
-    gws_redraw_window(fd, status_window, TRUE);
-    gws_refresh_window(fd, game_window);
-    init_cursor(fd);
-    init_prize(fd);
-}
-
-
-void game_reinitialize(int fd)
-{
-    int status=0;
-    status=gameInitialize(fd,game_width,game_height);
-    if(status<0)
-        printf("game_reinitialize: fail\n");
-}
-
-
 //
-// initialize 'game' support.
+// == Private functions: prototypes ====================
 //
 
-int gameInitialize(int fd,unsigned long w, unsigned long h)
-{
+static int gws(void);
+static void doPrompt(int fd);
+static void compareStrings(int fd);
+static void testASCIITable(int fd,unsigned long w, unsigned long h);
+static void print_ascii_table(int fd);
 
-    game_status = FALSE;
+static int 
+cmdlineProcedure ( 
+    int fd,
+    void *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
-    init_cursor(fd);
-    init_prize(fd);
-
-    // Test
-    // O refresh da tela faz à cada letra, 
-    // faz as letras aparecerem lentamente.
-
-    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
-    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
-    
-    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, '0' );
-    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, '0' );
-
-
-    gws_draw_text(
-        fd, status_window,
-        (w/30)  * 6, 8, COLOR_YELLOW, "cmdline:");
-
-    /*
-    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
-    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
-    gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'M' );
-    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
-    gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
-    gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
-    */
-
-    //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
-    
-    //...
-    
-    
-    game_status = TRUE;
-
-    return 0;
-}
-
-
-void 
+static void 
 updateStatusBar(
     int fd,
     unsigned long w, 
     unsigned long h, 
     int first_number, 
-    int second_number)
-{
+    int second_number);
 
-// first box
-    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
-// second box
-    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
-// first number
-    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, first_number );
-// second number
-    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, second_number );
-}
-
+//==================================
 
 // initialize via AF_GRAMADO.
 // Ainda nao podemos mudar isso para a lib, pois precisamos
 // do suporte as rotinas de socket e as definiçoes.
 // tem que incluir mais coisa na lib.
 
-int gws(void)
+static int gws(void)
 {
 
 //==============================
@@ -330,7 +176,7 @@ int gws(void)
 }
 
 
-void doPrompt(int fd)
+static void doPrompt(int fd)
 {
     int i=0;
 
@@ -359,11 +205,27 @@ void doPrompt(int fd)
     gws_refresh_window(fd,game_window);
 }
 
-
-void compareStrings(int fd)
+static void compareStrings(int fd)
 {
 
+    unsigned long message_buffer[8];
+    int init_tid=-1;
+
     printf("\n");
+
+
+    if ( strncmp(prompt,"test",4) == 0 )
+    {
+        //get init tid.
+        init_tid = (int) sc82(10021,0,0,0);
+        message_buffer[0] = 0;
+        message_buffer[1] = MSG_COMMAND;  //msg code
+        message_buffer[2] = 4002;  //fileman
+        message_buffer[3] = 4002;  //fileman
+        rtl_post_system_message(init_tid,message_buffer);
+        goto exit_cmp;
+    }
+
 
     if ( strncmp(prompt,"ascii",5) == 0 )
     {
@@ -372,11 +234,6 @@ void compareStrings(int fd)
          goto exit_cmp;
     }
 
-    if ( strncmp(prompt,"test",4) == 0 )
-    {
-         printf("==TEST==\n");
-         goto exit_cmp;
-    }
 
     if ( strncmp(prompt,"reboot",6) == 0 )
     {
@@ -398,8 +255,26 @@ exit_cmp:
     doPrompt(fd);
 }
 
-// local
-int 
+static void testASCIITable(int fd,unsigned long w, unsigned long h)
+{
+    int i=0;
+    int j=0;
+    int c=0;
+    
+    for(i=0; i<4; i++)
+    {
+        for(j=0; j<64; j++)
+        {
+            gws_draw_char ( 
+                fd, status_window, 
+                (w/64) * j, (i*8), 
+                COLOR_YELLOW, c );
+            c++;
+        };
+    };
+}
+
+static int 
 cmdlineProcedure ( 
     int fd,
     void *window, 
@@ -444,44 +319,44 @@ cmdlineProcedure (
                 // keyboard arrows
                 case 0x48: 
                     //printf ("UP   \n"); 
-                    player_y = (player_y - 8);
-                    if( player_y <= 0){ player_y = 0; }
-                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'U');
+                    //player_y = (player_y - 8);
+                    //if( player_y <= 0){ player_y = 0; }
+                    //gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    //updateStatusBar(fd,savedW,savedH,0, 'U');
                     goto done; 
                     break;
                 case 0x4B: 
                     //printf ("LEFT \n"); 
-                    player_x = (player_x - 8);
-                    if ( player_x <= 0){ player_x = 0;}
-                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'L');
+                    //player_x = (player_x - 8);
+                    //if ( player_x <= 0){ player_x = 0;}
+                    //gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    //updateStatusBar(fd,savedW,savedH,0, 'L');
                     goto done; 
                     break;
                 case 0x4D: 
                     //printf ("RIGHT\n"); 
-                    player_x = (player_x + 8);
-                    if ( player_x >= game_width){ player_x = (game_width - 8);}
-                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'R');
+                    //player_x = (player_x + 8);
+                    //if ( player_x >= game_width){ player_x = (game_width - 8);}
+                    //gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    //updateStatusBar(fd,savedW,savedH,0, 'R');
                     goto done; 
                     break;
                 case 0x50: 
                     //printf ("DOWN \n"); 
-                    player_y = (player_y + 8);
-                    if( player_y >= game_height){ player_y = (game_height-8); }
-                    gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
-                    updateStatusBar(fd,savedW,savedH,0, 'D');
+                    //player_y = (player_y + 8);
+                    //if( player_y >= game_height){ player_y = (game_height-8); }
+                    //gws_draw_char ( fd, game_window, player_x, player_y, COLOR_YELLOW, 'G' );
+                    //updateStatusBar(fd,savedW,savedH,0, 'D');
                     goto done; 
                     break;
                 
                 case '1':
-                    updateStatusBar(fd,savedW,savedH,'x','x');
+                    //updateStatusBar(fd,savedW,savedH,'x','x');
                     goto done;
                     break;
  
                 case '2': 
-                    game_redraw(fd);
+                    //game_redraw(fd);
                     goto done;
                     break;
                 
@@ -510,20 +385,20 @@ cmdlineProcedure (
                 case VK_F4: gws_clone_and_execute("terminal.bin"); break;
 
                 // 4~8
-                case VK_F5: gws_clone_and_execute("browser.bin"); break;
-                case VK_F6: gws_clone_and_execute("browser.bin"); break;
-                case VK_F7: gws_clone_and_execute("browser.bin"); break;
+                //case VK_F5: gws_clone_and_execute("browser.bin"); break;
+                //case VK_F6: gws_clone_and_execute("browser.bin"); break;
+                //case VK_F7: gws_clone_and_execute("browser.bin"); break;
                 case VK_F8: 
                     // #test
                     // Setup the flag to show or not the fps window.
                     // Request number 6.
-                    gws_async_command(fd,6,TRUE,0);
+                    //gws_async_command(fd,6,TRUE,0);
                     break;
 
 
                 // 9~12
                 case VK_F9: 
-                    gws_async_command(fd,4,1,0);
+                    //gws_async_command(fd,4,1,0);
                     //gws_async_command(fd,1,0,0);
                     //gws_async_command(fd,4,9,0);  // cat
                     //gws_async_command(fd,4,1,0);
@@ -531,11 +406,11 @@ cmdlineProcedure (
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F10: 
-                    gws_async_command(fd,4,6,0);
+                    //gws_async_command(fd,4,6,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
                 case VK_F11: 
-                    gws_async_command(fd,4,7,0);
+                    //gws_async_command(fd,4,7,0);
                     //gws_clone_and_execute("browser.bin"); 
                     break;
 
@@ -562,16 +437,114 @@ cmdlineProcedure (
     // consumiu o evento passado à ele.
 
 done:
-
-    check_victory(fd);
-
+    //check_victory(fd);
     return 0;
     //return (int) gws_default_procedure(fd,0,msg,long1,long2);
 }
 
 
 
-void print_ascii_table(int fd)
+
+
+
+void init_cursor(int fd)
+{
+    player_x = game_width >> 1;
+    player_y = game_height >> 1;
+
+    gws_draw_char ( 
+        fd, 
+        game_window, 
+        player_x, 
+        player_y, 
+        COLOR_RED, 
+        'g' );
+}
+
+void init_prize(int fd)
+{
+    prize_x = (rand() % 50) << 3;
+    prize_y = (rand() % 50) << 3;
+
+    gws_draw_char ( 
+        fd, 
+        game_window, 
+        prize_x, 
+        prize_y, 
+        COLOR_RED, 
+        '+' );
+}
+
+
+//
+// initialize 'game' support.
+//
+
+int gameInitialize(int fd,unsigned long w, unsigned long h)
+{
+
+    game_status = FALSE;
+
+    init_cursor(fd);
+    init_prize(fd);
+
+    // Test
+    // O refresh da tela faz à cada letra, 
+    // faz as letras aparecerem lentamente.
+
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
+    
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, '0' );
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, '0' );
+
+
+    gws_draw_text(
+        fd, status_window,
+        (w/30)  * 6, 8, COLOR_YELLOW, "cmdline:");
+
+    /*
+    gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
+    gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
+    gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
+    gws_draw_char ( fd, status_window, (w/30)  * 9, (8), COLOR_YELLOW, 'M' );
+    gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
+    gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
+    gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
+    */
+
+    //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
+    
+    //...
+    
+    
+    game_status = TRUE;
+
+    return 0;
+}
+
+
+static void 
+updateStatusBar(
+    int fd,
+    unsigned long w, 
+    unsigned long h, 
+    int first_number, 
+    int second_number)
+{
+
+// first box
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
+// second box
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
+// first number
+    gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, first_number );
+// second number
+    gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, second_number );
+}
+
+
+static void print_ascii_table(int fd)
 {
     int i=0;
     int line=0;
@@ -652,45 +625,23 @@ int main ( int argc, char *argv[] )
 // Only connect. Nothing more.
 // Create socket and call connect()
 
-    client_fd = gws();
+    client_fd = (int) gws();
 
     if ( client_fd < 0 )
     {
-         gws_debug_print ("cmdline.bin: gws initialization fail \n");
-         printf          ("cmdline.bin: gws initialization fail \n");
+         gws_debug_print ("cmdline.bin: gws() fail\n");
+         printf          ("cmdline.bin: gws() fail\n");
          exit(1);
     }
 
-// #ebug
+// #debug
     //printf(":: Entering CMDLINE.BIN pid{%d} fd{%d}\n",
         //getpid(), client_fd);
     //while(1){}
 
 
 //========================================
-    
-    // Waiting ...
-    // Wait for the moment where the server says: 'yes'
 
-    //gws_debug_print ("cmdline.bin:  \n");
-    //         printf ("cmdline.bin:  \n");
-
-
-    /*
-    rtl_set_file_sync( client_fd, SYNC_REQUEST_SET_ACTION, ACTION_ERROR );
-    int value = rtl_get_file_sync( client_fd, SYNC_REQUEST_GET_ACTION );
-    
-    printf ("VALUE {%d} \n", value);
-    
-    if( value == ACTION_ERROR )
-        printf("OK\n");
-
-    rtl_set_file_sync( client_fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
-    //close(client_fd);
-    //exit(0);
-    //while(1){}
-    */ 
-        
     /*
     char buf[32];
     while (1)
@@ -762,21 +713,24 @@ int main ( int argc, char *argv[] )
 // Window
 //
 
-    //===============================
+
+// ===========================
     gws_debug_print ("cmdline.bin: 1 Creating main window \n");
     //printf          ("cmdline.bin: Creating main window \n");
 
-    main_window = gws_create_window (client_fd,
-                      WT_SIMPLE, 1, 1, "cmdline",
-                      0, 0, w, h-40,
-                      0, 0, COLOR_GRAY, COLOR_GRAY);
+    main_window = (int) gws_create_window (
+                            client_fd,
+                            WT_SIMPLE, 1, 1, "cmdline",
+                            0, 0, w, h-40,
+                            0, 0, COLOR_GRAY, COLOR_GRAY);
 
-    if (main_window<0){
+    if (main_window<0)
+    {
         printf ("cmdline.bin: main_window\n");
         exit(1);
     }
     game_window = main_window;
-    //========================
+// ========================
 
     //printf ("CMDLINE.BIN: main_window created\n");
     //while(1){}
@@ -797,14 +751,14 @@ int main ( int argc, char *argv[] )
 //===============================
     gws_debug_print ("cmdline.bin:  Creating  window \n");
     //printf          ("cmdline.bin: Creating main window \n");
-    int tmp1;
-    tmp1 = gws_create_window (
-        client_fd,
-        WT_SIMPLE, 1, 1, "status",
-        0, 0, w, 24,
-        0, 0, COLOR_BLUE, COLOR_BLUE );
-
-    if (tmp1<0){
+    int tmp1 = -1;
+    tmp1 = (int) gws_create_window (
+                     client_fd,
+                     WT_SIMPLE, 1, 1, "status",
+                     0, 0, w, 24,
+                     0, 0, COLOR_BLUE, COLOR_BLUE );
+    if (tmp1<0)
+    {
         printf ("cmdline.bin: tmp1\n");
         exit(1);
     }
@@ -821,22 +775,20 @@ int main ( int argc, char *argv[] )
     //gws_refresh_window (client_fd, tmp1);
     //asm ("int $3");
 
-    // Drawing a char just for fun,not for profit.
 
-    //===================
+//===================
+// Drawing a char just for fun,not for profit.
+
     gws_debug_print ("cmdline.bin: 2 Drawing a char \n");
     //printf          ("cmdline.bin: Drawing a char \n");
-    if(main_window>0)
+    if(status_window>0)
     {
-        //gws_draw_char ( 
-        //    client_fd, 
-        //    main_window, 0, 0, COLOR_YELLOW, 'G' );
-
         gws_draw_char ( 
             client_fd, 
-            status_window, 0, 0, COLOR_YELLOW, 'G' );
+            status_window, 
+            0, 0, COLOR_YELLOW, 'G' );
     }
-    //====================   
+//====================   
 
 
     // #debug
@@ -928,197 +880,9 @@ int main ( int argc, char *argv[] )
     int south_color = COLOR_BLUE;
 
 
-/*
-    struct gr_cube_d  *cube;
-    cube = (void *) malloc( sizeof( struct gr_cube_d ) );
-
-    //int Count=0;
-    //for (Count=0; Count<100; Count = Count+10 ){
-    //zTest = zTest + 10;
-    if ( (void*) cube != NULL )
-    {
-        // =========
-        // south (frente) 
-        cube->p[0].x = frontLeft; 
-        cube->p[0].y = frontTop; 
-        cube->p[0].z = zTest;
-        cube->p[0].color = south_color;
-        
-        cube->p[1].x = frontRight; 
-        cube->p[1].y = frontTop;
-        cube->p[1].z = zTest;
-        cube->p[1].color = south_color;
-        
-        cube->p[2].x = frontRight;
-        cube->p[2].y = frontBottom;
-        cube->p[2].z = zTest;
-        cube->p[2].color = south_color;
-        
-        cube->p[3].x = frontLeft;
-        cube->p[3].y = frontBottom; 
-        cube->p[3].z = zTest;
-        cube->p[3].color = south_color;
-
-        // ===========
-        // north (trás)
-        cube->p[4].x = backLeft;
-        cube->p[4].y = backTop;
-        cube->p[4].z = zTest;
-        cube->p[4].color = north_color;
-        
-        cube->p[5].x = backRight; //140;
-        cube->p[5].y = backTop; //-90;
-        cube->p[5].z = zTest;
-        cube->p[5].color = north_color;
-        
-        cube->p[6].x = backRight;
-        cube->p[6].y = backBottom;
-        cube->p[6].z = zTest;
-        cube->p[6].color = north_color;
-        
-        cube->p[7].x = backLeft;
-        cube->p[7].y = backBottom;
-        cube->p[7].z = zTest;
-        cube->p[7].color = north_color;
- 
-        // plot cube 
-        if (ShowCube==TRUE){
-            gws_plotcube ( client_fd, (struct gr_cube_d *) cube );
-        }
-    }
-    //}; //for
-*/
-
-//
-// == rectangle ==================================
-//
-
-    /*
-    gws_debug_print ("gws.bin: 5 Testing Plot rect \n");
-    printf          ("gws.bin: 5 Testing Plot rect \n");
-
-    
-    struct gr_rectangle_d *rect;
-    rect = (void *) malloc( sizeof( struct gr_rectangle_d ) );
-    if ( (void*) rect != NULL )
-    {
-
-        rect->p[0].x = -20;
-        rect->p[0].y = 20;
-        rect->p[0].z = 0;
-        rect->p[0].color = COLOR_BLUE;
-        
-        rect->p[1].x = 10;
-        rect->p[1].y = 20;
-        rect->p[1].z = 0;
-        rect->p[1].color = COLOR_BLUE;
-        
-        rect->p[2].x = 10;
-        rect->p[2].y = 0;
-        rect->p[2].z = 0;
-        rect->p[2].color = COLOR_BLUE;
-        
-        rect->p[3].x = -20;
-        rect->p[3].y = 0;
-        rect->p[3].z = 0;
-        rect->p[3].color = COLOR_BLUE;
-        
-        
-        // plot rectangle 
-        gws_plotrectangle ( client_fd, (struct gr_rectangle_d *) rect );
-    }
-    */
-   
     gws_debug_print("LOOP:\n");
     //printf ("LOOP:\n");
 
-    // #debug
-    //while (1){
-
-    if( main_window > 0 )
-    {
-        //gws_draw_char ( 
-        //    client_fd, 
-        //    main_window, 8, 8, COLOR_YELLOW, 'x' );
-
-        gws_draw_char ( 
-            client_fd, 
-            status_window, 8, 8, COLOR_YELLOW, 'x' );
-    }
-
-        // ...
-
-        // Saving the fd into the libgws.
-        // it's gonna be used by the payment routine.
-        // See: connect.c
-        //gws_set_client_fd(client_fd);
-        //gws_payment();
-        
-        //refresh background and yield.
-        //gws_refresh_yield(client_fd);
-        
-        //gws_refresh_window (client_fd, main_window);
-        //gws_yield();
-    //}
-
-
-    // #test: Chamando um demo.
-    // gws_async_command(client_fd,4,9,0); //cat
-
-
-
-
-
-/*
-//============================================================
-
-    int i=0;
-    int x=0;  int y=0;  int z=0;
-    int offset=0;
-    int T=0;
-
-    //no translation
-    offset=0;
-    for(i=0; i<50; i++){
-    gws_plot0(client_fd, x+offset,        0,        0, COLOR_RED   );
-    gws_plot0(client_fd,        0, y+offset,        0, COLOR_GREEN );
-    gws_plot0(client_fd,        0,        0, z+offset, COLOR_BLUE  );
-    offset++;
-    };
-
-    // x translation
-    T=8;
-    offset=0;
-    for(i=0; i<50; i++){
-    gws_plot0(client_fd, x+offset+T,        0,        0, COLOR_RED   );
-    gws_plot0(client_fd,        0+T, y+offset,        0, COLOR_GREEN );
-    gws_plot0(client_fd,        0+T,        0, z+offset, COLOR_BLUE  );
-    offset++;
-    };
-
-    
-    // y translation
-    T=8;
-    offset=0;
-    for(i=0; i<50; i++){
-    gws_plot0(client_fd, x+offset,        0+T,        0, COLOR_RED   );
-    gws_plot0(client_fd,        0, y+offset+T,        0, COLOR_GREEN );
-    gws_plot0(client_fd,        0,        0+T, z+offset, COLOR_BLUE  );
-    offset++;
-    };
-    
-    // z translation
-    T=8;
-    offset=0;
-    for(i=0; i<50; i++){
-    gws_plot0(client_fd, x+offset,        0,        0+T, COLOR_RED   );
-    gws_plot0(client_fd,        0, y+offset,        0+T, COLOR_GREEN );
-    gws_plot0(client_fd,        0,        0, z+offset+T, COLOR_BLUE  );
-    offset++;
-    };
-
-//============================================================
-    */
 
     //
     // Loop
@@ -1137,7 +901,7 @@ int main ( int argc, char *argv[] )
 // Is this a prototype, a test?
 
     gameInitialize(client_fd,w,h);
-    //gameTestASCIITable(client_fd,w,h);
+    //testASCIITable(client_fd,w,h);
 
 
 // #test
@@ -1211,8 +975,9 @@ int main ( int argc, char *argv[] )
 // Set cursor position.
     gramado_system_call ( 34, 2, 2, 0 );
 
-    printf ("Gramado OS\n");
+    printf ("cmdline.bin: Gramado OS\n");
 
+/*
 //#tests
     printf ("#test s null: %s\n",NULL);
     printf ("#test S null: %S\n",NULL);
@@ -1223,6 +988,7 @@ int main ( int argc, char *argv[] )
     printf ("#test X:  %X  \n",0x1000ABCD);         //
     printf ("#test lX: %lX \n",0x1000ABCDDCBA0001); //
     // ...
+*/
 
 // ===============================
 // Testing fpu

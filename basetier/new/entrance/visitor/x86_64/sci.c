@@ -2112,6 +2112,17 @@ void *sci2 (
         return NULL;
     }
 
+    // Get Init PID.
+    if(number == 10020){
+        return (void*) GRAMADO_PID_INIT;
+    }
+
+    // Get Init TID
+    if(number == 10021){
+        return (void*) INIT_TID;
+    }
+
+
     // #todo
     // Maybe kill the caller.
     panic ("sci2: [FIXME] default syscall \n");

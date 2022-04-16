@@ -1,3 +1,5 @@
+
+// main.c
 // 'shutdown' command for Gramado.
 
 // rtl
@@ -8,14 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
 // libio
 #include <libio.h>
 
-
-//
-// =============================================================
-//
 
 // #test
 // Finding the size of a disk.
@@ -37,12 +34,30 @@
 #define Device_Control  2
 
 
+//
+// private functions: prototypes ==============
+//
+
+static void __serial_write_char (unsigned char data);
+static void test_disk_size(void);
+
+
+
+// Vai escrever em uma porta ja inicializada pelo kernel.
+static void __serial_write_char (unsigned char data) 
+{
+    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0);
+
+    libio_outport8 ( 0x3F8, (unsigned char) data );
+}
+
+
 // #
 // Essa rotina funcionou no qemu, mas não em minha máquina real.
 // Devemos mover ela para dentro do driver em ring0
 // e testar novamente.
 
-void test_disk_size(void)
+static void test_disk_size(void)
 {
     unsigned int d=0x1F0;   //for example
     unsigned int dd=0x3F4;
@@ -111,20 +126,6 @@ void test_disk_size(void)
 }
 
 
-//
-// =============================================================
-//
-
-// local worker
-// Vai escrever em uma porta ja inicializada pelo kernel.
-void __serial_write_char (unsigned char data) 
-{
-    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0);
-
-    libio_outport8 ( 0x3F8, (unsigned char) data );
-}
-
-
 // main:
 // #test
 // Testing shutdown in virtual machines.
@@ -148,11 +149,11 @@ int main ( int argc, char *argv[] )
 // acionar os locks, sincronizar os sistemas de arquivo
 // montados, etc ...
 
-    int isQEMU       = FALSE;
+    static int isQEMU = FALSE;
     //int isVirtualBox = FALSE;
     //int isBochs      = FALSE;
     
-    isQEMU       = rtl_get_system_metrics(300);
+    isQEMU = rtl_get_system_metrics(300);
     //isVirtualBox = rtl_get_system_metrics(?);
     //isBochs      = rtl_get_system_metrics(?);
 
@@ -161,10 +162,6 @@ int main ( int argc, char *argv[] )
 // In newer versions of QEMU, you can do shutdown with:
 
     if (isQEMU == TRUE){
-        //__serial_write_char('1');
-        //__serial_write_char('2');
-        //__serial_write_char('3');
-        //__serial_write_char(' ');
         debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down \n");
         libio_outport16(
             (unsigned short) 0x604, 

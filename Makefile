@@ -126,13 +126,19 @@ base-tier:
 	$(Q) $(NASM) basetier/boot/vd/fat/main.asm \
 	-I basetier/boot/vd/fat/ \
 	-o GRAMADO.VHD 
-# Build BM.BIN and BL.BIN.
+
+
+# ::Build BM.BIN.
 	$(Q) $(MAKE) -C basetier/boot/x86/bm/ 
-	$(Q) $(MAKE) -C basetier/boot/x86/bl/ 
 # Copy to the target folder.
 	sudo cp basetier/boot/x86/bin/BM.BIN  basetier/disk/
+
+# ::Build BL.BIN.
+	$(Q) $(MAKE) -C basetier/boot/x86/bl/ 
+# Copy to the target folder.
 	sudo cp basetier/boot/x86/bin/BL.BIN  basetier/disk/
-# Build kernel image.
+
+# ::Build kernel image.
 	$(Q) $(MAKE) -C basetier/new/
 # Copy to the target folder.
 	sudo cp basetier/new/KERNEL.BIN  basetier/disk/GRAMADO
@@ -146,11 +152,11 @@ base-tier:
 communication-tier:
 	@echo ":: Building libraries and network server."
 
-# Build libraries.
-# Don't copy.
-	$(Q) $(MAKE) -C comtier/lib/rtl/
+# ::Build libraries.
 	$(Q) $(MAKE) -C comtier/lib/
-# Build network server.
+# Don't copy to the disk.
+
+# ::Build network server.
 	$(Q) $(MAKE) -C comtier/gns/ 
 # Copy to the target folder.
 	-sudo cp comtier/gns/bin/GNSSRV.BIN  basetier/disk/
@@ -164,8 +170,8 @@ communication-tier:
 presentation-tier:
 	@echo ":: Building Window server, clients and userland."
 
-# Building window server and clients.
-	$(Q) $(MAKE) -C prestier/
+# ::Building window server and clients.
+	$(Q) $(MAKE) -C prestier/gws/
 # Copy to the target folder.
 	-sudo cp prestier/bin/GWSSRV.BIN    basetier/disk/
 	-sudo cp prestier/bin/GWS.BIN       basetier/disk/ 
@@ -176,11 +182,9 @@ presentation-tier:
 	-sudo cp prestier/bin/TERMINAL.BIN  basetier/disk/
 	-sudo cp prestier/bin/FILEMAN.BIN   basetier/disk/
 	-sudo cp prestier/bin/BROWSER.BIN   basetier/disk/
-# Building userland commands.
+
+# ::Building userland commands.
 	$(Q) $(MAKE) -C prestier/userland/
-
-#	-sudo cp prestier/userland/bin/*.BIN    basetier/disk/
-
 # Copy to the target folder.
 	-sudo cp prestier/userland/bin/SHUTDOWN.BIN  basetier/disk/
 	-sudo cp prestier/userland/bin/REBOOT.BIN    basetier/disk/

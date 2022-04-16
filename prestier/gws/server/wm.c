@@ -57,10 +57,18 @@ static unsigned long ____old_time=0;
 static unsigned long ____new_time=0;
 
 
+//
+// private functions: prototypes ==========================
+//
 
+static unsigned long 
+wmProcedure(
+    struct gws_window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 );
 
-// prototypes
-
+static void __Tile(void);
 static void run_selected_option(void);
 static void on_mouse_event(int event_type, long x, long y);
 static void on_update_window(int event_type);
@@ -1330,7 +1338,7 @@ void flush_frame(void)
 // #todo:
 // only overlapped windows?
 
-void __Tile(void)
+static void __Tile(void)
 {
     struct gws_window_d *w;
     int cnt=0;
@@ -2485,7 +2493,8 @@ void __probe_activewindow_hover(long long1, long long2)
 // The keyboard input messages will affect
 // the window with focus.
 // For the mouse input, the window has a NULL pointer.
-unsigned long 
+
+static unsigned long 
 wmProcedure(
     struct gws_window_d *window,
     int msg,

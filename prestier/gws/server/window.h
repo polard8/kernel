@@ -1266,14 +1266,6 @@ mainmenuDialog(
     int msg,
     unsigned long long1,
     unsigned long long2 );
-    
-unsigned long 
-wmProcedure(
-    struct gws_window_d *window,
-    int msg,
-    unsigned long long1,
-    unsigned long long2 );
-
 
 
 // Entry point
