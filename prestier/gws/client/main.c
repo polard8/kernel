@@ -623,7 +623,7 @@ int main ( int argc, char *argv[] )
 // Criando um sync point e retornando o id.
 // Provisoriamente o id ficara salvo no kernel.
 
-    int sync_id = sc82 (10004,0,0,0);
+    int sync_id = sc82(10004,0,0,0);
 
     if(sync_id <= 0 || sync_id >= 1024)
     {

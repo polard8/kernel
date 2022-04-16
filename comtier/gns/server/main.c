@@ -121,7 +121,7 @@ void dispatch(int fd)
 
 // Check if we heave a new request.
 
-    int value = rtl_get_global_sync( __saved_sync_id, SYNC_REQUEST_GET_ACTION );
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
 
     // Not a request.
     if ( value != ACTION_REQUEST )
@@ -139,8 +139,8 @@ void dispatch(int fd)
         debug_print ("gnssrv: dispatch n_reads\n");
 
         // No reply
-        rtl_set_global_sync( 
-            __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
 
         // Cleaning
         message_buffer[0] = 0;
@@ -161,8 +161,8 @@ void dispatch(int fd)
         debug_print ("gnssrv: dispatch Unknown message\n");
 
         // No reply
-        rtl_set_global_sync( 
-            __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
 
         // Cleaning
         message_buffer[0] = 0;
@@ -204,8 +204,8 @@ void dispatch(int fd)
 
     if (NoReply == TRUE)
     {
-        rtl_set_global_sync( 
-            __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         return;
     }
 
@@ -258,8 +258,8 @@ void dispatch(int fd)
         debug_print ("gnssrv: dispatch Response fail\n");
  
         // No response. It fails.
-        rtl_set_global_sync( 
-            __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         return;
     }
 
@@ -276,7 +276,7 @@ void dispatch(int fd)
     };
 
 // set response
-    rtl_set_global_sync( __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 
     debug_print ("gnssrv: Response sent\n"); 
     //gnssrv_yield(); 
@@ -566,6 +566,7 @@ int main (int argc, char **argv)
 // ele cria no começo da rotina.
 // Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
  
+    /*
     while(1)
     {
         __saved_sync_id = sc82 (10005,0,0,0);
@@ -573,7 +574,8 @@ int main (int argc, char **argv)
         if( __saved_sync_id > 0 && __saved_sync_id < 1024 )
             break;
     };
-
+    */
+    
 // Register this process as the network server.
 // See: connect.c
 

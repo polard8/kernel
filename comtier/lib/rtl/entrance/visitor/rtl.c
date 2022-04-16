@@ -147,15 +147,11 @@ void rtl_set_global_sync(int sync_id, int request, int data)
     //if (request<0)
         //return;
 
-    //debug_print ("rtl_set_file_sync:\n");
     sc82 (10002,sync_id,request,data);
 }
 
 int rtl_get_global_sync(int sync_id, int request)
 {
-
-    //debug_print ("rtl_get_file_sync:\n");
-
     //if(fd<0)
     //    return -1;
 
@@ -164,6 +160,33 @@ int rtl_get_global_sync(int sync_id, int request)
 
     return (int) sc82 (10003,sync_id,request,0);
 }
+
+// ========================
+
+
+void rtl_set_file_sync(int fd, int request, int data)
+{
+    if (fd<0)
+        return;
+
+    //if (request<0)
+        //return;
+
+    sc82 (10006,fd,request,data);
+}
+
+
+int rtl_get_file_sync(int fd, int request)
+{
+    //if(fd<0)
+    //    return -1;
+
+    //if(request<0)
+    //    return -1;
+
+    return (int) sc82 (10007,fd,request,0);
+}
+
 
 
 

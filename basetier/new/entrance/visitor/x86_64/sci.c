@@ -2047,25 +2047,39 @@ void *sci2 (
 
 //=====
 // See: sys.c
-    // set
+    // Set action.
     if ( number == 10002 ){
         sys_set_global_sync( (int) arg2, (int) arg3, (int) arg4 );
         return NULL;
     }
-    //get
+    // Get action.
     if ( number == 10003 ){
         return (void*) sys_get_global_sync( (int) arg2, (int) arg3 );
     }
-    //create
+    // Create sync.
     // OUT: sync id.
     if (number == 10004){
         return (void*) sys_create_new_sync();
     }
-    //provisorio para teste
+    // Get sync id.
+    // Provisorio para teste
     if(number == 10005){
         return (void*) get_saved_sync();
     }
 //=====
+
+    // Set file sync action
+    // IN: fd, request, data
+    if ( number == 10006 ){
+        sys_set_file_sync( (int) arg2, (int) arg3, (int) arg4 );
+        return NULL;
+    }
+    // Get file sync action
+    // IN: fd, request
+    if ( number == 10007 ){
+        return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
+    }
+
 
 
 

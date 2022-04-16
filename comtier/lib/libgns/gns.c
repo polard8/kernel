@@ -218,7 +218,7 @@ int gns_hello (int fd)
 {
     int status=-1;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         debug_print("gns_hello: fd\n");
@@ -229,8 +229,8 @@ int gns_hello (int fd)
 // Configuramos a flag para que possamos escrever.
    debug_print ("gns_hello: reset flags\n");      
     
-   rtl_set_global_sync( 
-       __saved_global_sync_id,   // 
+   rtl_set_file_sync( 
+       fd,   // 
        216,  // request. (We can write)
        0 );  // data
 
@@ -247,8 +247,8 @@ int gns_hello (int fd)
         return -1;
     }
 
-    rtl_set_global_sync( 
-        __saved_global_sync_id, 
+    rtl_set_file_sync( 
+        fd, 
         SYNC_REQUEST_SET_ACTION, 
         ACTION_REQUEST );
 
@@ -260,8 +260,8 @@ int gns_hello (int fd)
     int value=0;
     while (1)
     {
-        value = rtl_get_global_sync( 
-                    __saved_global_sync_id, 
+        value = rtl_get_file_sync( 
+                    fd, 
                     SYNC_REQUEST_GET_ACTION );
         
         if (value == ACTION_REQUEST){ rtl_yield(); }

@@ -230,6 +230,9 @@ struct __sbuf
 };
 
 
+// =======================================================
+// Sync
+
 #define ACTION_NULL       0
 #define ACTION_REQUEST    1000
 #define ACTION_REPLY      2000
@@ -388,15 +391,16 @@ struct file_d
    // =============================
 
 
-    //
-    // == (2) synchronization ========
-    //
-    
-    // #test
-    // Sincronizando a leitura e a escrita
-    // para arquivos como socket, tty, buffer ... etc.
-    
-    struct kstdio_sync_d sync;
+//
+// == (2) synchronization ========
+//
+
+// #test
+// Sincronizando a leitura e a escrita
+// para arquivos como socket, tty, buffer ... etc.
+
+    struct kstdio_sync_d  sync;
+
 
 
 	// flags, below; this FILE is free if 0 	

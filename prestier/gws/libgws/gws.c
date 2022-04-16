@@ -2678,7 +2678,7 @@ gws_plot0 (
     // Maybe we will not have a response.
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         return (-1);
@@ -2689,12 +2689,12 @@ gws_plot0 (
     req_status = __gws_plot0_request ( fd, x, y, z, color );
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync ( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
+    rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );    
 
 // Response
 // Waiting to read the response.
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -2714,7 +2714,7 @@ gws_plotcube (
 {
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         return -1;
@@ -2731,13 +2731,13 @@ gws_plotcube (
     req_status = __gws_plotcube_request (fd, (struct gr_cube_d *) cube );
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync ( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // Response
 // Waiting to read the response.
 
     while (1){
-        Value = rtl_get_global_sync ( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync ( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -2762,7 +2762,7 @@ gws_plotrectangle (
 {
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         return -1;
@@ -2777,12 +2777,12 @@ gws_plotrectangle (
     req_status = __gws_plotrectangle_request ( fd, (struct gr_rectangle_d *) rect );
     if( req_status<=0 )
         return -1;
-    rtl_set_global_sync ( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST ); 
+    rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST ); 
 
 // Response
 // Waiting to read the response.
     while (TRUE){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -2807,7 +2807,7 @@ gws_draw_char (
     int Response=0;
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0)    {return -1;}
     if (window<0){return -1;}
@@ -2824,8 +2824,8 @@ gws_draw_char (
         (unsigned int) (ch & 0xFF) );
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync( 
-        __saved_global_sync_id, 
+    rtl_set_file_sync( 
+        fd, 
         SYNC_REQUEST_SET_ACTION, 
         ACTION_REQUEST );
 
@@ -2834,7 +2834,7 @@ gws_draw_char (
 // Waiting to read the response.
     //gws_debug_print("gws_draw_char: response\n");
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -2866,7 +2866,7 @@ gws_draw_text (
 
     //gws_debug_print("gws_draw_text: [FIXME] sync\n");
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if(fd<0){
         return -1;
@@ -2891,8 +2891,8 @@ gws_draw_text (
         (char *) string );
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync( 
-        __saved_global_sync_id, 
+    rtl_set_file_sync( 
+        fd, 
         SYNC_REQUEST_SET_ACTION, 
         ACTION_REQUEST );
 
@@ -2900,7 +2900,7 @@ gws_draw_text (
 // Waiting to read the response.
     //gws_debug_print("gws_draw_text: response\n");
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -3117,7 +3117,7 @@ gws_change_window_position (
 
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
 // Arguments
     if (fd<0){
@@ -3133,15 +3133,15 @@ gws_change_window_position (
     req_status = __gws_change_window_position_request(fd,window,x,y);
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync ( 
-        __saved_global_sync_id, 
+    rtl_set_file_sync ( 
+        fd, 
         SYNC_REQUEST_SET_ACTION, 
         ACTION_REQUEST );    
 
 // Response
 // Waiting to read the response.
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -3165,7 +3165,7 @@ gws_resize_window(
 
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
 // Arguments
     if (fd<0){
@@ -3181,12 +3181,12 @@ gws_resize_window(
     req_status = __gws_resize_window_request(fd,window,w,h);
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync ( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync ( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // response
 // Waiting to read the response.
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -3208,7 +3208,7 @@ gws_redraw_window (
 {
     unsigned long Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
 // Arguments.
     if (fd<0){
@@ -3226,12 +3226,12 @@ gws_redraw_window (
     req_status = __gws_redraw_window_request (fd,window,flags);
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // Response
 // Waiting to read the response.
     while (TRUE){
-        Value = (unsigned long) rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -3256,7 +3256,7 @@ struct gws_event_d *gws_get_next_event(
     unsigned long Value=0;
 
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         debug_print("gws_get_next_event: fd\n");
@@ -3269,12 +3269,12 @@ struct gws_event_d *gws_get_next_event(
     if(req_status<=0){
         return NULL;
     }
-    rtl_set_global_sync( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // Response
 // Waiting to read the response.
     while (TRUE){
-        Value = (unsigned long) rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR )
@@ -3320,7 +3320,7 @@ struct gws_window_info_d *gws_get_window_info(
     unsigned long Value=0;
 
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         debug_print("gws_get_window_info: fd\n");
@@ -3332,12 +3332,12 @@ struct gws_window_info_d *gws_get_window_info(
     req_status = __gws_get_window_info_request(fd,wid);
     if(req_status<=0)
         return NULL;
-    rtl_set_global_sync( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // Response
 // Waiting to read the response.
     while (TRUE){
-        Value = (unsigned long) rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR )
@@ -3376,7 +3376,7 @@ int gws_refresh_window (int fd, int window )
 {
     int value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
 // Arguments
     if (fd<0)    { return -1; }
@@ -3387,12 +3387,12 @@ int gws_refresh_window (int fd, int window )
     req_status = __gws_refresh_window_request(fd,window);
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 // Response
 // Waiting to read the response.
     while (TRUE){
-        value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         if (value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -3415,7 +3415,7 @@ gws_refresh_retangle (
     int Response=0;
     int Value=0;
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0)    {return -1;}
 
@@ -3431,14 +3431,14 @@ gws_refresh_retangle (
     
     if(req_status<=0)
         return -1;
-    rtl_set_global_sync( __saved_global_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REQUEST );
 
 
 // Response
 // Waiting to read the response.
     gws_debug_print("gws_refresh_retangle: response\n");
     while (1){
-        Value = rtl_get_global_sync( __saved_global_sync_id, SYNC_REQUEST_GET_ACTION );
+        Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
         if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
@@ -3524,7 +3524,7 @@ gws_create_window (
     gws_debug_print("gws_create_window:\n");
 
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         return -1;
@@ -3555,8 +3555,8 @@ gws_create_window (
         return -1;
     
     //ok set the sync
-    rtl_set_global_sync( 
-        __saved_global_sync_id, 
+    rtl_set_file_sync( 
+        fd, 
         SYNC_REQUEST_SET_ACTION, 
         ACTION_REQUEST );
 
@@ -3570,8 +3570,8 @@ gws_create_window (
 
     while (1)
     {
-        value = rtl_get_global_sync( 
-                    __saved_global_sync_id, 
+        value = rtl_get_file_sync( 
+                    fd, 
                     SYNC_REQUEST_GET_ACTION );
         
         if (value == ACTION_REQUEST){ rtl_yield(); }
@@ -4095,7 +4095,7 @@ gws_async_command (
 
     //char *name = "Window name 1";
 
-    int __saved_global_sync_id = sc82 (10005,0,0,0);
+    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
 
     if (fd<0){
@@ -4139,8 +4139,8 @@ gws_async_command (
         
         //if (n_writes > 0)
         //{ 
-            rtl_set_global_sync ( 
-                __saved_global_sync_id, 
+            rtl_set_file_sync ( 
+                fd, 
                 SYNC_REQUEST_SET_ACTION, 
                 ACTION_REQUEST );
             //break; 
@@ -4154,8 +4154,8 @@ gws_async_command (
     int Value=0;
     while (1)
     {
-        Value = rtl_get_global_sync( 
-                    __saved_global_sync_id, 
+        Value = rtl_get_file_sync( 
+                    fd, 
                     SYNC_REQUEST_GET_ACTION );
         
         // Essa é a sincronização esperada.

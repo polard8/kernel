@@ -94,10 +94,14 @@ void rtl_set_input_mode(int mode);
 
 
 // ========================
-
-
+// global sync
 void rtl_set_global_sync(int sync_id, int request, int data);
 int rtl_get_global_sync(int sync_id, int request);
+
+// ========================
+// file sync
+void rtl_set_file_sync(int fd, int request, int data);
+int rtl_get_file_sync(int fd, int request);
 
 //==========================================
 

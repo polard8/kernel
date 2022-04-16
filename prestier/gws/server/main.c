@@ -641,7 +641,7 @@ exit1:
 
 // Sync. Set response.
 exit0:
-    rtl_set_global_sync( __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
+    rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
     return (int) Status;
 }
 
@@ -733,7 +733,7 @@ static void dispacher(int fd)
 // We can handle only requests.
 // Drop it!
 
-    int value = rtl_get_global_sync( __saved_sync_id, SYNC_REQUEST_GET_ACTION );
+    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
     if ( value != ACTION_REQUEST ){
         goto exit2;
     }
@@ -832,8 +832,8 @@ static void dispacher(int fd)
 // No momento todos os requests esperam por reposta?
 
     if (NoReply == TRUE){
-        rtl_set_global_sync( 
-            __saved_sync_id, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
+        rtl_set_file_sync( 
+            fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         goto exit0;
     }
 
@@ -4210,12 +4210,14 @@ int main (int argc, char **argv)
     // ele cria no começo da rotina.
     // Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
     
+    /*
     while(1)
     {
         __saved_sync_id = sc82 (10005,0,0,0);
         if( __saved_sync_id > 0 && __saved_sync_id < 1024 )
             break;
     };
+    */
 
     Status = on_execute();
 

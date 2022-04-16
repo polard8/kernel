@@ -2048,6 +2048,7 @@ unsigned long sys_get_file_size ( char *path )
     return (unsigned long) Size; 
 }
 
+
 // #todo
 // Comment the purpose of this routine.
 // It is used on socket communication.
@@ -2137,10 +2138,19 @@ int sys_get_file_sync (int fd, int request)
 
 
 // 10002
+// Set action.
+// See: kstdio.h
 void sys_set_global_sync(int sync_id, int request, int data)
 {
     struct kstdio_sync_d *s;
-    
+
+    if( sync_id < 0 ||
+        sync_id >= SYNC_COUNT_MAX )
+    {
+       //message? panic?
+       return;
+    }
+
     s = (struct kstdio_sync_d *) syncList[sync_id];
     
     if( request == SYNC_REQUEST_SET_ACTION )
@@ -2148,11 +2158,20 @@ void sys_set_global_sync(int sync_id, int request, int data)
 }
 
 
-// 10003 
+// 10003
+// Get action.
+// See: kstdio.h
 int sys_get_global_sync (int sync_id, int request)
 { 
     struct kstdio_sync_d *s;
-    
+
+    if( sync_id < 0 ||
+        sync_id >= SYNC_COUNT_MAX )
+    {
+       //message? panic?
+       return -1;
+    }
+
     s = (struct kstdio_sync_d *) syncList[sync_id];
     
     if( request == SYNC_REQUEST_GET_ACTION )
@@ -2165,6 +2184,9 @@ int sys_get_global_sync (int sync_id, int request)
 
 
 // 10004
+// Create sync structure and
+// put the pointer into the list.
+// See: kstdio.h
 int sync_count=0;
 static int __saved_sync_id=0;
 int sys_create_new_sync(void)
@@ -2187,7 +2209,10 @@ int sys_create_new_sync(void)
     return -1;
 }
 
-//provisorio, para testes
+
+// Get the id.
+// provisorio, para testes
+// See: kstdio.h
 int get_saved_sync(void)
 {
     return (int) __saved_sync_id;
