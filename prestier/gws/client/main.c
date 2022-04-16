@@ -619,6 +619,10 @@ int main ( int argc, char *argv[] )
     asm ("int $199 \n");
 
 
+
+// #todo:
+// This sync method is not used anymore.
+// We're using the sync method inside the file structure.
 //============
 // Criando um sync point e retornando o id.
 // Provisoriamente o id ficara salvo no kernel.
