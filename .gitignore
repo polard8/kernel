@@ -1,6 +1,6 @@
 !LICENSE
 !Makefile
-!base/**
+!basetier/**
 
 *.VHD
 *.BIN
@@ -9,5 +9,5 @@
 *.so
 *.SO
 
-*notes/
+
 
