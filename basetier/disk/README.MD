@@ -1,9 +1,17 @@
-# base
+# disk
 
 	boot partition:
 	This is the root dir for the boot partition.
 	It uses the FAT16 files system. This is why we 
 	have 8.3 DOS style here.
+
+	main folders:
+
+	EFI/
+	GRAMADO/
+	PROGRAMS/
+	USERS/
+
 
 	system partition:
 	We will create the system partition, it will be formated

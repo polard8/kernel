@@ -1,4 +1,4 @@
-# base
+# disk
 
 	EFI/      EFI standard folder.
 	GRAMADO/  System folder. System applications.
