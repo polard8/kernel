@@ -28,7 +28,7 @@ int tcgetattr (int fd, struct termios *termios_p)
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
 
     return (int) ioctl (fd, TCGETS, termios_p);
@@ -42,13 +42,11 @@ tcsetattr (
     int optional_actions,
     const struct termios *termios_p )
 {
-
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
-
 
     switch (optional_actions){
     case TCSANOW:    return (int) ioctl (fd, TCSETS , termios_p);
@@ -74,7 +72,7 @@ int tcsendbreak (int fd, int duration)
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
 
 
@@ -90,7 +88,7 @@ int tcdrain (int fd)
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
 
     value = (int) ioctl(fd, TIOCDRAIN, 0);
@@ -113,9 +111,9 @@ int tcflush (int fd, int queue_selector)
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
-    
+
     return -1;
 
 	/*
@@ -150,7 +148,7 @@ int tcflow (int fd, int action)
     if (fd<0)
     {
         errno = EBADF;
-        return -1;
+        return (int) -1;
     }
 
     return -1; 
@@ -160,7 +158,8 @@ int tcflow (int fd, int action)
 // Make raw
 void cfmakeraw (struct termios *termios_p)
 {
-    if ( (void *) termios_p == NULL ){
+    if ( (void *) termios_p == NULL )
+    {
         debug_print ("cfmakeraw: termios_p\n");
         return;
     }
@@ -188,8 +187,9 @@ speed_t cfgetispeed (const struct termios* tp)
         return 0;
     }
 
-    return tp->c_ispeed;
+    return (speed_t) tp->c_ispeed;
 }
+
 
 // Get o speed.
 speed_t cfgetospeed (const struct termios* tp)
@@ -199,7 +199,7 @@ speed_t cfgetospeed (const struct termios* tp)
         return 0;
     }
 
-    return tp->c_ospeed;
+    return (speed_t) tp->c_ospeed;
 }
 
 

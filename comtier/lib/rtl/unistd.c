@@ -239,22 +239,10 @@ ssize_t read (int fd, const void *buf, size_t count)
     if( value < 0 )
     {
         errno = (-value);
-        return (ssize_t) -1;
+        return (ssize_t) (-1);
     }
 
     return (ssize_t) value;
-
-// #todo
-// Maybe we need to call another layer, not the kernel service.
-
-    //return (ssize_t) gramado_system_call ( 18, 
-    //                     (unsigned long) fd,
-    //                     (unsigned long) buf, 
-    //                     (unsigned long) count ); 
-                         
-    
-    //rtl_enter_critical_section();
-    //rtl_exit_critical_section();
 }
 
 
@@ -266,7 +254,7 @@ ssize_t read (int fd, const void *buf, size_t count)
 
 ssize_t write (int fd, const void *buf, size_t count)
 {
-    ssize_t value = -1;
+    ssize_t value = (-1);
 
     if (fd<0){
         errno = EBADF;
@@ -296,19 +284,6 @@ ssize_t write (int fd, const void *buf, size_t count)
     }
 
     return (ssize_t) value;
-
-// #todo
-// Maybe we need to call another layer, not the kernel service.
-
-    //return (ssize_t) gramado_system_call ( 19, 
-    //                     (unsigned long) fd,
-    //                     (unsigned long) buf, 
-    //                     (unsigned long) count ); 
-
-    //rtl_enter_critical_section();
-    //rtl_exit_critical_section();
-
-    // debug_print ("write: Calling sc82\n");
 }
 
 
@@ -2332,13 +2307,9 @@ off_t lseek (int fd, off_t offset, int whence)
 }
 
 
-off_t tell (int fildes)
+off_t tell(int fildes)
 {
-
-    //if( fildes<0)
-       //return ?;
-       
-    return lseek (fildes, 0, SEEK_CUR);
+    return (off_t) lseek (fildes, 0, SEEK_CUR);
     //maybe: return(lseek(fildes, 0, 1));
 }
 

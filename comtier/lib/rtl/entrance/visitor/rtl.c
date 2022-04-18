@@ -1728,14 +1728,13 @@ int rtl_clone_and_execute ( char *name )
 {
     if ( (void *) name == NULL ){
         printf ("rtl_clone_and_execute: [FAIL] name\n");
-        return -1;
+        return (int) -1;
     }
 
     if ( *name == 0 ){
         printf ("rtl_clone_and_execute: [FAIL] *name\n");
-        return -1;
+        return (int) -1;
     }
-
 
     //rewind(stdin);
     //fprintf(stdin,"%s",name);
@@ -1746,7 +1745,7 @@ int rtl_clone_and_execute ( char *name )
 // Maybe we can provide a default parameters vector.
 // Maybe we can send a raw command line.
 
-    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
+    return (int) sc82( 900, (unsigned long) name, 0, 0 );
 }
 
 

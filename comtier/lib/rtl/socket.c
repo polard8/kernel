@@ -25,7 +25,6 @@
 
 
 /*
- *****************************************************
  * socket:
  *     Create an endpoint for communication.
  */
@@ -87,10 +86,15 @@ int socketpair (int domain, int type, int protocol, int sv[2])
     int fd = -1;
     int pipefd[2];
 
+
+// #bugbug
+// Only two types of family?
+
     if ( domain == AF_UNSPEC || domain == AF_UNIX )
     {
-        if ( protocol != 0 )
+        if ( protocol != 0 ){
             return (int) (-1);
+        }
 
         //if ( type != SOCK_STREAM )
             //return (int) (-1);
@@ -141,10 +145,11 @@ bind (
     if(sockfd<0)
     {
         errno=EBADF;
-        return -1;
+        return (int) -1;
     }
 
-// #todo: Check addr and addrlen.
+// #todo: 
+// Check addr and addrlen.
 
     value = (int) gramado_system_call ( 
                      7003, 
@@ -156,12 +161,11 @@ bind (
     {
         errno = (-value);
         printf ("bind: [FAIL] Couldn't bind\n");
-        return -1;
+        return (int) -1;
     }
 
     return (int) value;
 }
-
 
 
 /*
@@ -424,6 +428,11 @@ send (
     size_t len, 
     int flags )
 {
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (ssize_t) -1;
+    }
 
     //#todo: Usar esse.
     //return (ssize_t) sendto ( (int) sockfd, 
@@ -447,18 +456,24 @@ sendto (
     const struct sockaddr *dest_addr, 
     socklen_t addrlen )
 {
-
-    //if (sockfd<0)
-        //return -1;
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (ssize_t) -1;
+    }
 
     return (ssize_t) write ( sockfd, (const void *) buf, len );
 }
 
 
-//#important
-//Send a fd to another process. ??? cool
 ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
 {
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (ssize_t) -1;
+    }
+
     debug_print ("sendmsg: [TODO]\n");
     return -1;
 }
@@ -500,16 +515,24 @@ recvfrom (
     struct sockaddr *src_addr, 
     socklen_t *addrlen )
 {
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (ssize_t) -1;
+    }
 
-    //if (sockfd<0)
-        //return -1;
-
-     return (ssize_t) read ( sockfd, (const void *) buf, len );
+    return (ssize_t) read( sockfd, (const void *) buf, len );
 }
 
 
 ssize_t recvmsg (int sockfd, struct msghdr *msg, int flags)
 {
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (ssize_t) -1;
+    }
+
     debug_print ("recvmsg: [TODO]\n");
     return -1;
 }
@@ -521,6 +544,12 @@ getpeername (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
+
     debug_print ("getpeername: [TODO]\n");
     return -1;
 }
@@ -535,18 +564,29 @@ getsockname (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
-    int __status = -1;
+    int value = -1;
 
-    __status = (int) gramado_system_call ( 7007, 
-                         (unsigned long) sockfd, 
-                         (unsigned long) addr, 
-                         (unsigned long) addrlen );
-
-    if (__status<0){
-        printf ("getsockname: fail\n");
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) (-1);
     }
 
-    return (int) __status;
+    value = 
+        (int) gramado_system_call ( 
+                  7007, 
+                  (unsigned long) sockfd, 
+                  (unsigned long) addr, 
+                  (unsigned long) addrlen );
+
+    if (value<0)
+    {
+        printf ("getsockname: fail\n");
+        errno = (-value);
+        return (int) (-1);
+    }
+
+    return (int) value;
 }
 
 
@@ -634,12 +674,11 @@ struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
  * internet address; handles class a/b/c network
  * number formats.
  */
-in_addr_t
-inet_lnaof(struct in_addr in)
+in_addr_t inet_lnaof(struct in_addr in)
 {
     printf("inet_lnaof: [BUGBUG] Not implemented!\n");
     return 0;
-    
+
    /*
 	in_addr_t i = ntohl(in.s_addr);
 
@@ -678,22 +717,49 @@ in_addr_t inet_netof (struct in_addr in)
 }
 
 
+int 
+getsockopt(
+    int sockfd, 
+    int level, 
+    int optname, 
+    void *optval, 
+    socklen_t *optlen)
+{
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
 
-
-int getsockopt (int sockfd, int level, int optname, void *optval, socklen_t *optlen)
-{ 
     return -1; 
 }
 
-int setsockopt (int sockfd, int level, int optname, const void *optval, socklen_t optlen)
-{ 
+
+int 
+setsockopt (
+    int sockfd, 
+    int level, 
+    int optname, 
+    const void *optval, 
+    socklen_t optlen )
+{
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
+
     return -1; 
 }
+
 
 int sendfd(int sockfd, int fd)
 {
-    if ( sockfd < 0)
-        return -1;
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
  
     return -1; 
 }
@@ -701,9 +767,12 @@ int sendfd(int sockfd, int fd)
 
 int recvfd(int sockfd)
 {
-    if ( sockfd < 0)
-        return -1;
-        
+    if(sockfd<0)
+    {
+        errno = EBADF;
+        return (int) -1;
+    }
+
     return -1; 
 }
 

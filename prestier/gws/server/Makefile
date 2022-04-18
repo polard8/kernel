@@ -63,17 +63,9 @@ user_ccflags = \
 	-fno-omit-frame-pointer \
 	-fno-optimize-sibling-calls    
 	
-	
-	
-	
-	
-
-	
-
 
 # usermode linker flags.
 user_ldflags = -m elf_x86_64 -T x86_64/link_r0.ld
-
 
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
@@ -95,15 +87,10 @@ ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
 myObjects += archive_basics1.o
-
 myObjects += archive_basics2.o
-
 myObjects += archive_fx.o    
-
 myObjects += archive_extra.o    
-
 myObjects += wm.o   
-
 
 
 .PHONY: all all-c gws-link finalize clean
@@ -112,9 +99,7 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-
 	$(CC)  -c  main.c     $(user_ccflags) -I $(LIBC) -I . -o main.o
-
 all-c:
 
 #basics1
@@ -122,7 +107,6 @@ all-c:
 	$(CC)  -c  char.c      $(user_ccflags) -I $(LIBC) -I . -o char.o
 	$(CC)  -c  dtext.c     $(user_ccflags) -I $(LIBC) -I . -o dtext.o
 	$(LD) -r -o archive_basics1.o  bitblt.o char.o dtext.o 
-
 
 	$(CC)  -c  line.c      $(user_ccflags) -I $(LIBC) -I . -o line.o
 	$(CC)  -c  rect.c      $(user_ccflags) -I $(LIBC) -I . -o rect.o
@@ -146,16 +130,13 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	$(CC)  -c  font.c      $(user_ccflags) -I $(LIBC) -I . -o font.o
 	$(LD) -r -o archive_extra.o  xxxinput.o font.o 
 
-
 	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I include/ -I .  -o wm.o
-
 
 #
 # == imported objects =============================
 #
 
-
-	# rtl/
+# rtl/
 	cp $(LIBCOBJ)/crt0.o .
 	cp $(LIBCOBJ)/rtl.o .
 
@@ -171,14 +152,11 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
 
-
 gws-link:
 	$(LD) $(user_ldflags) -o GWSSRV.BIN $(myObjects)
 #	$(LD) -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
-
 finalize:
 	cp GWSSRV.BIN ../../bin
-
 clean:
 	-rm *.o
 	-rm GWSSRV.BIN 

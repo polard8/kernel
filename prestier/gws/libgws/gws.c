@@ -317,16 +317,13 @@ struct gws_window_info_d *__gws_get_window_info_response(
     int fd,
     struct gws_window_info_d *window_info )
 {
-
-// The buffer.
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
 
 // #importante
 // As informações devem ficar aqui até que o cliente pegue.
 // Um ponteiro será devolvido para ele.
 
-    int n_reads = 0;    // For receiving responses.
-
+    ssize_t n_reads=0;
 
     int wid=0;
     int msg_code=0;
@@ -334,7 +331,9 @@ struct gws_window_info_d *__gws_get_window_info_response(
     int sig2=0;
 
     if ( (void*) window_info == NULL )
+    {
         return NULL;
+    }
 
     // fail
     window_info->used = NULL;
@@ -343,13 +342,13 @@ struct gws_window_info_d *__gws_get_window_info_response(
 
 // read
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv ( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-// fail
     if (n_reads <= 0)
     { 
         //
@@ -507,25 +506,19 @@ struct gws_event_d *__gws_get_next_event_response (
     int fd, 
     struct gws_event_d *event )
 {
-
-// The buffer.
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
 
 // #importante
 // As informações devem ficar aqui até que o
 // cliente pegue.
 // Um ponteiro será devolvido para ele.
 
-
-    int n_reads = 0;    // For receiving responses.
-
+    ssize_t n_reads=0;
 
 // crazy fail
     if( (void*) event == NULL ){
         return NULL;
     }
-
 
 //
 // Recv
@@ -533,13 +526,13 @@ struct gws_event_d *__gws_get_next_event_response (
 
     gws_debug_print ("__gws_get_next_event_response: Reading ...\n"); 
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv ( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-// fail
     if (n_reads <= 0)
     { 
         printf ("__gws_get_next_event_response: Read 0 bytes\n"); 
@@ -714,9 +707,8 @@ __gws_refresh_window_request ( int fd, int window )
 
 int __gws_refresh_window_reponse ( int fd )
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
     //gws_debug_print ("__gws_refresh_window_reponse: Waiting ...\n");      
 
@@ -729,13 +721,16 @@ int __gws_refresh_window_reponse ( int fd )
 
     gws_debug_print ("__gws_refresh_window_reponse: Reading ...\n"); 
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv ( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-    if (n_reads <= 0){ return -1; }
+    if (n_reads <= 0){
+        return (int) -1;
+    }
 
 //
 // The msg packet
@@ -747,21 +742,19 @@ int __gws_refresh_window_reponse ( int fd )
     int value = (int) message_buffer[2];
 
     switch (msg){
-
-        // Reply!
-        case GWS_SERVER_PACKET_TYPE_REPLY:
-            return (int) value;
-            break;
-
-        case GWS_SERVER_PACKET_TYPE_REQUEST:
-        case GWS_SERVER_PACKET_TYPE_EVENT:
-        case GWS_SERVER_PACKET_TYPE_ERROR:
-        default:
-            return -1;
-            break; 
+    // Reply!
+    case GWS_SERVER_PACKET_TYPE_REPLY:
+        return (int) value;
+        break;
+    case GWS_SERVER_PACKET_TYPE_REQUEST:
+    case GWS_SERVER_PACKET_TYPE_EVENT:
+    case GWS_SERVER_PACKET_TYPE_ERROR:
+    default:
+        return (int) -1;
+        break; 
     };
 //fail:
-    return -1;
+    return (int) -1;
 }
 
 
@@ -818,21 +811,20 @@ __gws_redraw_window_request (
 }
 
 
-int 
-__gws_redraw_window_reponse ( int fd )
+int __gws_redraw_window_reponse ( int fd )
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_redraw_window_reponse: Waiting ...\n");      
@@ -863,11 +855,12 @@ __gws_redraw_window_reponse ( int fd )
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv ( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -998,22 +991,20 @@ __gws_change_window_position_request (
 }
 
 
-
-int 
-__gws_change_window_position_reponse ( int fd )
+int __gws_change_window_position_reponse (int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0]; 
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_change_window_position_reponse: Waiting ...\n");      
@@ -1044,12 +1035,13 @@ __gws_change_window_position_reponse ( int fd )
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-    
+    n_reads = 
+        (ssize_t) recv( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -1182,22 +1174,20 @@ __gws_resize_window_request (
 }
 
 
-
-int 
-__gws_resize_window_reponse ( int fd )
+int __gws_resize_window_reponse(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_resize_window_reponse: Waiting ...\n");      
@@ -1229,12 +1219,13 @@ __gws_resize_window_reponse ( int fd )
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-    
+    n_reads = 
+        (ssize_t) recv( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -1384,20 +1375,20 @@ __gws_plot0_request (
 
 
 //response
-int __gws_plot0_response (int fd)
+int __gws_plot0_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_plot0_response: Waiting ...\n");      
@@ -1429,12 +1420,15 @@ int __gws_plot0_response (int fd)
 response_loop:
 
     // Response
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-    
-    if (n_reads<=0){
+    n_reads = 
+        (ssize_t) recv(
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
+
+    if (n_reads <= 0)
+    {
         //gws_yield(); 
         return 0;
         //goto response_loop;
@@ -1624,18 +1618,18 @@ int __gws_plotcube_request ( int fd, struct gr_cube_d *cube )
 //response
 int __gws_plotcube_response (int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_plotcube_response: Waiting ...\n");      
@@ -1668,12 +1662,13 @@ int __gws_plotcube_response (int fd)
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-        
+    n_reads = 
+        (ssize_t) recv(
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
+
     // Se retornou -1 é porque algo está errado com o arquivo.
     if (n_reads <= 0){
         gws_debug_print ("__gws_plotcube_response: recv fail.\n");
@@ -1835,24 +1830,23 @@ int __gws_plotrectangle_request ( int fd, struct gr_rectangle_d *rect )
 //response
 int __gws_plotrectangle_response (int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
     // #todo
     //if (fd<0){
     //    return -1;
     //}
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("__gws_plotrectangle_response: Waiting ...\n");      
@@ -1877,19 +1871,19 @@ int __gws_plotrectangle_response (int fd)
     // #debug
     gws_debug_print ("__gws_plotrectangle_response: Reading ...\n");      
 
-
     // #caution
     // Waiting for response.
     // We can stay here for ever.
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-    
+    n_reads = 
+        (ssize_t) recv(
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
+
     //if (n_reads<=0){
     //     gws_yield(); 
     //    goto response_loop;
@@ -2030,8 +2024,8 @@ __gws_refresh_rectangle_request (
 // A sincronização nos diz que já temos um reply.
 int __gws_refresh_rectangle_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
 // A sincronização nos diz que já temos um reply.
     //int y=0;
@@ -2043,13 +2037,16 @@ int __gws_refresh_rectangle_response(int fd)
     // #debug
     gws_debug_print ("__gws_refresh_rectangle_response: Reading ...\n");      
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-    if (n_reads <= 0) {  return -1;  }
+    if (n_reads <= 0){
+        return (int) -1;
+    }
 
 //
 // The msg index.
@@ -2152,15 +2149,13 @@ __gws_drawchar_request (
 // A sincronização nos diz que já temos um reply.
 int __gws_drawchar_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
 // A sincronização nos diz que já temos um reply.
 
     //int y=0;
     //for(y=0; y<15; y++){ gws_yield(); };
-
 
 //
 // Read
@@ -2169,15 +2164,16 @@ int __gws_drawchar_response(int fd)
     // #debug
     gws_debug_print ("__gws_drawchar_response: Reading ...\n");      
 
+    n_reads = 
+        (ssize_t) recv( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-
-    if (n_reads <= 0) {  return -1;  }
-
+    if (n_reads <= 0){
+        return (int) -1;
+    }
 
 //
 // The msg index.
@@ -2315,22 +2311,21 @@ __gws_drawtext_request (
 }
 
 
-
 //response
 int __gws_drawtext_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
-    //
-    // Waiting for response. ==================
-    //
+//
+// Waiting for response. ==================
+//
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     gws_debug_print ("gws_drawtext_response: Waiting ...\n");      
@@ -2353,8 +2348,7 @@ int __gws_drawtext_response(int fd)
     //
 
     // #debug
-    gws_debug_print ("gws_drawtext_response: Reading ...\n");      
-
+    gws_debug_print ("gws_drawtext_response: Reading ...\n");
 
     // #caution
     // Waiting for response.
@@ -2362,11 +2356,12 @@ int __gws_drawtext_response(int fd)
 
 response_loop:
 
-    //n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    n_reads = recv ( fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
+    n_reads = 
+        (ssize_t) recv(
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
     //if (n_reads<=0){
     //     gws_yield(); 
@@ -2572,19 +2567,18 @@ __gws_createwindow_request (
 // A sincronização nos diz que já temos um reply.
 int __gws_createwindow_response(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];   
-    int n_reads = 0;    // For receiving responses.
-    //int y=0;
+    unsigned long *message_buffer = (unsigned long *) &__gws_message_buffer[0];
+    ssize_t n_reads=0;
 
 //
 // Waiting for response. ==================
 //
 
-    // Espera para ler a resposta. 
-    // Esperando com yield como teste.
-    // Isso demora, pois a resposta só será enviada depois de
-    // prestado o servido.
-    // obs: Nesse momento deveríamos estar dormindo.
+// Espera para ler a resposta. 
+// Esperando com yield como teste.
+// Isso demora, pois a resposta só será enviada depois de
+// prestado o servido.
+// obs: Nesse momento deveríamos estar dormindo.
 
     // #debug
     //gws_debug_print ("__gws_createwindow_response: Waiting ...\n");      
@@ -2605,27 +2599,27 @@ int __gws_createwindow_response(int fd)
     // então sabemos que é possível ler.
 
 
-    //
-    // read
-    //
+//
+// read
+//
 
     // #debug
-    gws_debug_print ("libgws__gws_createwindow_response: reading ...\n");      
+    gws_debug_print ("libgws__gws_createwindow_response: reading ...\n");
 
+    n_reads = 
+        (ssize_t) recv ( 
+                      fd, 
+                      __gws_message_buffer, 
+                      sizeof(__gws_message_buffer), 
+                      0 );
 
-// Read
+// #bugbug
+// If we do not read the file, so the flag will not switch
+// and we will not be able to write into the socket.
 
-    n_reads = recv ( 
-                  fd, 
-                  __gws_message_buffer, 
-                  sizeof(__gws_message_buffer), 
-                  0 );
-
-    // #bugbug
-    // If we do not read the file, so the flag will not switch
-    // and we will not be able to write into the socket.
-
-    if (n_reads <= 0) {  return -1;  }
+    if (n_reads <= 0){
+        return (int) -1;
+    }
 
 //
 // The response message

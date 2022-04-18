@@ -36,7 +36,6 @@
 
 /*
 See: https://wiki.osdev.org/Graphics_stack
-
     > Application Layer
     > Interoperation Layers
         +Desktop Management Layer
@@ -48,9 +47,7 @@ See: https://wiki.osdev.org/Graphics_stack
     > Display Layers
         +Device Driver Layer
         +Hardware Layer 
-
 */
-
 
 // This file is part of this project.
 // It is NOT a library.
@@ -98,18 +95,15 @@ static int running = FALSE;
 
 // =========================
 // h:d.s
-char *hostName;
-char *displayNum;
-char *screenNum;
-
+char *host_name;
+char *display_number;
+char *screen_number;
 
 //
-// == Prototypes ============================================
+// == Private functions: Prototypes ========
 //
 
 static int on_execute(void);
-
-// Get client's request from socket.
 static void dispacher(int fd);
 
 static int
@@ -125,88 +119,48 @@ static void initBackground(void);
 static void initClientSupport(void);
 static void initClientStruct( struct gws_client_d *c );
 
-//====================
-// prototypes
-
 // Line
-static
-int servicelineBackbufferDrawHorizontalLine (void);
-
+static int servicelineBackbufferDrawHorizontalLine (void);
 // Char
-// See> char.c
-static
-int serviceDrawChar(void);
-
+// See: char.c
+static int serviceDrawChar(void);
 // Text
-static
-int serviceDrawText(void);
-
+static int serviceDrawText(void);
 // Rectangle
-static
-int serviceRefreshRectangle(void);
-
+static int serviceRefreshRectangle(void);
 // Window
 // See: window.c
-static
-int serviceCreateWindow (int client_fd);
-
-static
-int serviceChangeWindowPosition(void);
-
-static
-int serviceResizeWindow(void);
-
-static
-int serviceRedrawWindow(void);
-
-static
-int serviceRefreshWindow(void);
-
+static int serviceCreateWindow (int client_fd);
+static int serviceChangeWindowPosition(void);
+static int serviceResizeWindow(void);
+static int serviceRedrawWindow(void);
+static int serviceRefreshWindow(void);
 // Button
-static
-int serviceDrawButton (void); 
-
-
+static int serviceDrawButton (void); 
 // When a client send us an event
-static
-int serviceClientEvent(void);
-
+static int serviceClientEvent(void);
 // When a client get the next event 
 // from it's own queue.
-static
-int serviceNextEvent(void);
-
+static int serviceNextEvent(void);
 // See: main.c
-static
-int serviceAsyncCommand (void);
-
-static
-void serviceExitGWS(void);
-
-static
-int servicePutClientMessage(void);
-
-static
-int serviceGetClientMessage(void);
-
+static int serviceAsyncCommand (void);
+static void serviceExitGWS(void);
+static int servicePutClientMessage(void);
+static int serviceGetClientMessage(void);
 // See: main.c
 static int serviceGetWindowInfo(void);
 
-//====================
-
-
-
-//
-// ==============================================================
-//
+// ===============================================
 
 // Print a simple string in the serial port.
 void gwssrv_debug_print (char *string)
 {
-    //if( (void*) string == NULL ){ return; }
-    //if(*string == 0){ return; }
+    if ( (void*) string == NULL ){
+        return;
+    }
 
-    gramado_system_call ( 289,
+    gramado_system_call ( 
+        289,
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
@@ -214,26 +168,11 @@ void gwssrv_debug_print (char *string)
 
 
 // #bugbug
-// For now we can't use this function in ring0, I guess.
+// For now we can't use this function in ring 0.
 int gwssrv_clone_and_execute ( char *name )
 {
-    
-    if ( (void*) name == NULL ){ 
-        printf ("gwssrv_clone_and_execute: [FAIL] name\n");
-        return -1; 
-    }
-    
-    if (*name == 0){ 
-        printf ("gwssrv_clone_and_execute: [FAIL] *name\n");
-        return -1; 
-    }
-
-    // #deprecated
-    // return (int) gramado_system_call ( 900, (unsigned long) name, 0, 0 );
-    
-    // #todo
-    // Use this one.
-    return (int) sc82 ( 900, (unsigned long) name, 0, 0 );
+    printf("gwssrv_clone_and_execute: #deprecated\n");
+    return (int) -1;
 }
 
 
@@ -505,7 +444,6 @@ int __send_response(int fd, int type)
     message_buffer[2] = (unsigned long) next_response[2];  // long1
     message_buffer[3] = (unsigned long) next_response[3];  // long2
 
-
 // 4,5,6,7  \./
 // Data.
     message_buffer[4] = (unsigned long) next_response[4];
@@ -526,7 +464,6 @@ int __send_response(int fd, int type)
     message_buffer[13] = (unsigned long) next_response[13];
     message_buffer[14] = (unsigned long) next_response[14];
     message_buffer[15] = (unsigned long) next_response[15];
-
 
 // more
     message_buffer[16] = (unsigned long) next_response[16];
@@ -557,7 +494,8 @@ int __send_response(int fd, int type)
     */
 
 
-    if(fd<0 || fd>31){
+    if(fd<0 || fd>31)
+    {
         Status = -1;
         goto exit2;
     }
@@ -593,26 +531,26 @@ int __send_response(int fd, int type)
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
+
     register int b=0;
     for (b=0; b<MSG_BUFFER_SIZE; ++b){
         __buffer[b] = 0;
     };
-
-// Cleaning
-// 32. #todo 512.
 
     register int c=0;
     for (c=0; c<NEXTRESPONSE_BUFFER_SIZE; ++c){
         next_response[c] = 0;
     };
 
-// No. We couldn't send a response.
+// No. 
+// We couldn't send a response.
 // O que acontece se nao conseguirmos enviar uma resposta?
 // Certamente o cliente tentara ler e tera problemas.
 // Deveriamos fechar a conexao?
 // Deveriamos enviar um alerta
-    
-    if (n_writes<=0){
+
+    if (n_writes <= 0)
+    {
         gwssrv_debug_print ("__send_response: response fail\n");
         printf             ("__send_response: Couldn't send reply\n");
         //close(fd);
@@ -621,13 +559,15 @@ int __send_response(int fd, int type)
     }
 
 // YES, We sent a response.
-    if (n_writes>0){
+    if (n_writes > 0)
+    {
         gwssrv_debug_print ("__send_response: Response sent\n");
         Status=0;
         goto exit0;
     }
 
 // ??
+// Fail
 
 exit2:
     message_buffer[0] = 0;
@@ -638,9 +578,8 @@ exit2:
     message_buffer[5] = 0;
 exit1:
     gwssrv_yield();
-
-// Sync. Set response.
 exit0:
+// Sync. Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
     return (int) Status;
 }
@@ -662,32 +601,19 @@ void Compositor_Thread(void)
 }
 
 
-
-
-
-
-/*
- ****************************
- * dispacher:
- *
- */
-
-// internal.
+// dispacher:
+// Get client's request from socket.
 // Messages sent via socket.
 // obs: read and write use the buffer '__buffer'
 // in the top of this file.
-
 // #todo:
 // No loop precisamos de accept() read() e write();
 // Get client's request from socket.
 
 static void dispacher(int fd)
 {
-    // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];
-
-    int n_reads  = 0;  // For requests.
-
+    ssize_t n_reads = 0;
     int Status=-1;
     int SendErrorResponse=FALSE;
 
@@ -733,8 +659,9 @@ static void dispacher(int fd)
 // We can handle only requests.
 // Drop it!
 
-    int value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-    if ( value != ACTION_REQUEST ){
+    int value = (int) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
+    if ( value != ACTION_REQUEST )
+    {
         goto exit2;
     }
 
@@ -749,8 +676,7 @@ static void dispacher(int fd)
 // Recv
 //
 
-
-//nao podemos escrever em nosso proprio socket.
+// nao podemos escrever em nosso proprio socket.
     if( fd == ____saved_server_fd )
     {
         printf("dispacher: fd == ____saved_server_fd\n");
@@ -764,9 +690,12 @@ static void dispacher(int fd)
         while(1){}
     }
 
+// Read
 
-    n_reads = read ( fd, __buffer, sizeof(__buffer) );
-    if (n_reads <= 0){
+    n_reads = (ssize_t) read( fd, __buffer, sizeof(__buffer) );
+
+    if (n_reads <= 0)
+    {
         gwssrv_debug_print ("dispacher: read fail\n");
         goto exit2;
     }
@@ -3750,12 +3679,12 @@ static int on_execute(void)
     /*
     //#test
     char display[100];
-    hostName    = "gramado";
-    displayNum  = ":0";
-    screenNum   = ".0";
-    strcpy(display, hostName);
-    strcat(display, displayNum);
-    strcat(display, screenNum);
+    host_name    = "gramado";
+    display_number  = ":0";
+    screen_number   = ".0";
+    strcpy(display, host_name);
+    strcat(display, display_number);
+    strcat(display, screen_number);
     printf("DISPLAY={%s}\n",display);
     while(1){}
     */
@@ -3980,20 +3909,13 @@ static int on_execute(void)
     //while(1){}
 
 
-//
 // Child
-//
-
-    // Calling child.
-    //printf ("gwssrv: Calling child \n"); 
 
     /*
     if ( window_server->launch_first_client == TRUE )
     {
-        // #todo: Get the status.
-        //rtl_clone_and_execute("gws.bin");
-        //gwssrv_clone_and_execute ("gwm.bin");
-        //gwssrv_clone_and_execute ("logon.bin");
+        // #bugbug
+        // We can't use this function in ring0.
     }
     */
 
