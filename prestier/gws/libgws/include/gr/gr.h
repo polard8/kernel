@@ -11,12 +11,12 @@
 
 struct gr_vec3D_d
 {
-    int x;
-    int y;
-    int z;
-    
-    // for interpolation.
-    unsigned long color;
+    float x;
+    float y;
+    float z;
+
+// For interpolation.
+    unsigned int color;
 };
 
 struct gr_line_d
