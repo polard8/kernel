@@ -133,20 +133,16 @@ struct x_boot_block_d  xBootBlock;
 
 
 //
-// == Prototypes ========
+// == Private functions: Prototypes ========
 //
 
 static void preinit_Globals(int arch_type);
 static void preinit_OutputSupport(void);
 static void preinit_Serial(void);
 
-
 // ================================
 
 
-
-
-// #todo
 static void preinit_Globals(int arch_type)
 {
     asm ("cli");
@@ -1129,6 +1125,7 @@ fail0:
 }
 
 
+// #deprecated
 // #see: 
 // kernel.h and hw.asm
 void xxxxIRQ0_DEBUG_MESSAGE(void)
@@ -1142,6 +1139,7 @@ void xxxxIRQ0_DEBUG_MESSAGE(void)
 }
 
 
+// #deprecated
 //#See: kernel.h and hw.asm
 void xxxxIRQ1_DEBUG_MESSAGE(void)
 {
@@ -1152,6 +1150,7 @@ void xxxxIRQ1_DEBUG_MESSAGE(void)
 }
 
 
+// #deprecated
 //#See: kernel.h and sw.asm
 void xxxxINT128_DEBUG_MESSAGE(void)
 {

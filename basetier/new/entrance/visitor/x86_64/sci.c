@@ -1454,9 +1454,12 @@ void *sci0 (
             break;
 
         // 110
+        // ## We need to return when a non-superuser process call this
+        // service. We don't wanna hang the system in this case.
         case SYS_REBOOT: 
             debug_print("sci0: SYS_REBOOT\n");
-            newos_reboot(0);
+            return (void*) sys_reboot();
+            //newos_reboot(0);
             break;
 
 

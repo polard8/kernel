@@ -1761,13 +1761,15 @@ int sys_close(int fd)
     }
     */
 
-// Invalid fd;
+// Invalid fd
     if ( fd < 0 || fd >= OPEN_MAX )
     {
         return (int) (-EBADF);
     }
 
 // Process
+// #todo: There is a helper for that small routine.
+
     if ( current_process < 0 || 
          current_process >= PROCESS_COUNT_MAX )
     {
@@ -1788,8 +1790,8 @@ int sys_close(int fd)
         goto fail;
     }
 
-    // object
-    // The object is a file structure.
+// object
+// The object is a file structure.
 
     object = (file *) p->Objects[fd];
         
@@ -1833,7 +1835,8 @@ int sys_close(int fd)
 
 // ====================================================
 // virtual console.
-    if ( object->____object == ObjectTypeVirtualConsole ){
+    if ( object->____object == ObjectTypeVirtualConsole )
+    {
         debug_print("sys_close: Trying to close a virtual console object\n");
         return 0;
     }
@@ -1905,21 +1908,27 @@ fail:
 
 
 // Exit thread.
+// #todo: Use 'int' as a return type.
 void sys_exit_thread (int tid)
 {
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
-        //todo: message
+        //#todo: return (int) -EINVAL;
         return;
     }
 
-    exit_thread (tid);
+    exit_thread(tid);
 }
 
 
-int sys_fork (void)
+// #todo:
+// We're working in a helper function for clonning processes.
+// See: clone.c
+int sys_fork(void)
 {
     debug_print ("sys_fork: \n");
+    // #todo
+    // Call copy_process(...)
     return -1;
 }
 
@@ -1934,7 +1943,7 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 {
     debug_print ("sys_fcntl:\n");
 
-// fd
+
     if ( fd < 0 || fd >= OPEN_MAX )
     {
         return (int) (-EBADF);
@@ -1946,6 +1955,7 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 
 //POSIX Table 6-1.
 //See: fcntl.h
+
     switch (cmd){
 
     //duplicate file descriptor
@@ -2033,18 +2043,11 @@ unsigned long sys_get_file_size ( char *path )
         return 0;
     }
 
+    Size = 
+    (unsigned long) fsGetFileSize ( 
+                        (unsigned char *) path, 
+                        (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
 
-    //taskswitch_lock();
-    //scheduler_lock();
-
-
-    Size = (unsigned long) fsGetFileSize ( 
-                               (unsigned char *) path, 
-                               (unsigned long) VOLUME1_ROOTDIR_ADDRESS ); 
-    
-    //scheduler_unlock();
-    //taskswitch_unlock();
-    
     return (unsigned long) Size; 
 }
 
@@ -2052,11 +2055,10 @@ unsigned long sys_get_file_size ( char *path )
 // #todo
 // Comment the purpose of this routine.
 // It is used on socket communication.
+// #todo: Explain the output values.
 
 int sys_get_file_sync (int fd, int request)
 {
-	// #deprecated
-
     struct process_d  *p;
     file *object;
 
@@ -2094,10 +2096,10 @@ int sys_get_file_sync (int fd, int request)
     }
 
     // #todo
-    // check validation
+    // check process validation
 
-    // object
-        
+// object
+
     object = (file *) p->Objects[fd];
 
     if ( (void*) object == NULL ){
@@ -2131,6 +2133,8 @@ int sys_get_file_sync (int fd, int request)
     };
 
     // ...
+
+// ?? Why '0'?
     return 0;
 }
 
@@ -2305,7 +2309,6 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     debug_print ("sys_ioctl: [FIXME] \n");
 
-// fd
     if ( fd < 0 || fd >= OPEN_MAX )
     {
         return (int) (-EBADF);
@@ -2317,8 +2320,7 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     retvalue = (int) io_ioctl(fd,request,arg);
 
-    if( retvalue<0)
-    {
+    if( retvalue<0){
         printf("sys_ioctl: io_ioctl fail\n");
     }
 
@@ -2397,9 +2399,25 @@ sys_open (
 // The higher level routine for reboot.
 // It's a wrapper, an interface.
 
-void sys_reboot (void)
+int sys_reboot (void)
 {
+    int value = FALSE;
+
+    // #todo
+    // Is it the superuser?
+    // We only trust in superusser for this call.
+
     debug_print("sys_reboot:\n");
+
+    value = (int) is_superuser();
+    if(value != TRUE)
+    {
+        //#todo:
+        return (-EPERM);
+    }
+
+// #todo
+// Use MAGIC arguments.
 
 // FAT cache.
 // This is the FAT cache for the system disk.
@@ -2421,7 +2439,9 @@ void sys_reboot (void)
     debug_print("sys_reboot: Rebooting...\n");
     hal_reboot();
 
-    panic("sys_reboot:");
+    //panic("sys_reboot:");
+    
+    return -1;
 }
 
 

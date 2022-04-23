@@ -73,13 +73,15 @@ sys_open (
     int flags, 
     mode_t mode );
 
-void sys_reboot (void);
+
+
+int sys_reboot(void);
+
 int sys_serial_debug_printk ( char *s );
 
 void sys_show_system_info ( int n );
 
 int sys_sleep_if_socket_is_empty ( int fd );
-
 
 int sys_uname (struct utsname *ubuf);
 

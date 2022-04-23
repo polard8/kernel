@@ -1,11 +1,9 @@
 
 // math.c
-
-// #
 // The system has the support for double in ring3.
-
 // #todo
 // Remember: double is double precision float.
+
 
 // x to power of y
 double pow (double __x, double __y)
@@ -13,10 +11,26 @@ double pow (double __x, double __y)
     return 0;
 }
 
-// returns square root of x
+
+// Credits: Sirius OS.
+// Not tested yet.
+// OUT: Square root of __x
 double sqrt (double __x)
 {
     return 0;
+/*
+    double value=0;
+
+    asm volatile (
+        "finit;"
+        "fldl %1;"  // st(0) => st(1), st(0) = x. FLDL means load double float
+        "fsqrt;"    // st(0) = square root st(0)
+        : "=t"(value) 
+        : "m"(x) );
+
+//OUT:
+    return (double) value;
+*/
 }
 
 

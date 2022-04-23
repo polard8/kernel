@@ -242,7 +242,8 @@ rtl_copy_text (
     int width, 
     int height );
 
-void rtl_reboot(void);
+
+int rtl_reboot(void);
 
 int rtl_sleep_if_socket_is_empty(int fd);
 

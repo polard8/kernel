@@ -9,6 +9,7 @@
 #include <types.h> 
 #include <stdarg.h> 
 #include <stddef.h>
+#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 #include <rtl/gramado.h> 
@@ -780,10 +781,21 @@ int rtl_file_exists (const char *filename)
 */
 
 
-void rtl_reboot(void)
+// #todo
+// We need some arguments here.
+int rtl_reboot(void)
 {
+    int value = -1;
+
     debug_print ("rtl_reboot:\n");
-    gramado_system_call (110,0,0,0);
+
+    value = (int) gramado_system_call(110,0,0,0);
+    if(value<0)
+    {
+        errno = (-value);
+        return (int) -1;
+    }
+    return (int) value;
 }
 
 
