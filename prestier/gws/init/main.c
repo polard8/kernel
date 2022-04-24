@@ -72,6 +72,13 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
+    if( strncmp(prompt,"ws",2) == 0 )
+    {
+        printf ("~WS\n");
+        rtl_clone_and_execute("gwssrv2.bin");
+        goto exit_cmp;
+    }
+
 
     // ...
 
