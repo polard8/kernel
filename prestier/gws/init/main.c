@@ -50,6 +50,21 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
+    if( strncmp(prompt,"reboot",6) == 0 )
+    {
+        printf ("REBOOT\n");
+        rtl_reboot();
+        goto exit_cmp;
+    }
+
+    if( strncmp(prompt,"shutdown",8) == 0 )
+    {
+        printf ("SHUTDOWN\n");
+        rtl_clone_and_execute("shutdown.bin");
+        goto exit_cmp;
+    }
+
+
     // ...
 
     printf ("Command not found\n");
