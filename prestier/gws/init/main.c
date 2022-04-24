@@ -12,6 +12,12 @@
 #define VK_RETURN    0x1C
 #define VK_TAB       0x0F
 
+// private functions: prototypes;
+static void initPrompt(void);
+static int initCompareString(void);
+
+
+// ====================
 
 static void initPrompt(void)
 {
@@ -46,7 +52,9 @@ static int initCompareString(void)
     
     if( strncmp(prompt,"help",4) == 0 )
     {
-        printf ("HELP\n");
+        printf ("HELP:\n");
+        printf("[control + f9] to open the kernel console\n");
+        printf ("Commands: help, reboot, shutdown ...\n");
         goto exit_cmp;
     }
 
@@ -100,7 +108,6 @@ int main( int argc, char **argv)
     gramado_system_call (643,0,0,0);
 
     printf(":: Gramado OS ::\n");
-    printf("Init process: press [control + f9] to open the console\n");
 
     int C=0;
 
