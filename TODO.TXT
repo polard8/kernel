@@ -1,5 +1,10 @@
 
 
+  em prestier/gws é preciso construir dois programas.
+  um é um modulo do kernel em ring 0 que tem o nome de gwssrv.bin, mas precisa mudar de nome. o segundo é o init process em ring 3 que tem o nome de gws.bin mas precisa mudar de nome.
+
+-----------------------
+
      #bugbug
      
      Os aplicativos estão ficando grandes e a falta de
