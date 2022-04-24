@@ -79,6 +79,13 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
+    if( strncmp(prompt,"client",6) == 0 )
+    {
+        printf ("~Client\n");
+        rtl_clone_and_execute("terminal.bin");
+        goto exit_cmp;
+    }
+
 
     // ...
 

@@ -179,15 +179,13 @@ presentation-tier:
 
 # test
 # Importing from another project.
-	-sudo cp ../gws/bin/GWSSRV2.BIN    basetier/disk/
+	-sudo cp ../gws/bin/GWSSRV2.BIN  basetier/disk/
+#bugbug: This client has some special calls.
+#do not use it for tests here.
+	#-sudo cp ../gws/bin/GWS2.BIN     basetier/disk/
 
-	#-sudo cp prestier/bin/CMDLINE.BIN   basetier/disk/
-	#-sudo cp prestier/bin/GWM.BIN       basetier/disk/
-	#-sudo cp prestier/bin/LOGON.BIN     basetier/disk/
-	#-sudo cp prestier/bin/EDITOR.BIN    basetier/disk/
-	#-sudo cp prestier/bin/TERMINAL.BIN  basetier/disk/
-	#-sudo cp prestier/bin/FILEMAN.BIN   basetier/disk/
-	#-sudo cp prestier/bin/BROWSER.BIN   basetier/disk/
+	-sudo cp ../gws/bin/TERMINAL.BIN  basetier/disk/
+
 
 # ::Building userland commands.
 	$(Q) $(MAKE) -C prestier/userland/

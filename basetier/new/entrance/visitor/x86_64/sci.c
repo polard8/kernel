@@ -403,15 +403,16 @@ static void *__extra_services (
     }
 
 
-    // 513
-    // Register the ring3 window server.
-    // Set ws PID for a given desktop
-    // Register a window server.
-    // gramado_ports[11] = ws_pid
-    // Called by the window server.
-    // arg2 = desktop structure pointer.
-    // arg3 = The window server PID.
-    // #todo: We need a helper function for this.
+// 513
+// Register the ring3 window server.
+// Set ws PID for a given desktop
+// Register a window server.
+// gramado_ports[11] = ws_pid
+// Called by the window server.
+// arg2 = desktop structure pointer.
+// arg3 = The window server PID.
+// #todo: 
+// We need a helper function for this.
 
     if ( number == SYS_SET_WS_PID )
     {
@@ -464,9 +465,21 @@ static void *__extra_services (
                 
                 // returning ok.
                 // But, we could return the port number.
+                
+                //#debug
+                //printf("513: done\n");
+                //refresh_screen();
+                //while(1){}
+                
                 return (void *) TRUE;  //ok 
             }
         }
+
+        //#debug
+        //printf("513: fail\n");
+        //refresh_screen();
+        //while(1){}
+        
         return NULL; //fail
     }    
 
