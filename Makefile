@@ -312,8 +312,6 @@ clean-all: clean
 
 	-rm -rf prestier/init/init/*.o
 	-rm -rf prestier/init/modr0/*.o
-	-rm -rf prestier/init/init/INIT.BIN
-	-rm -rf prestier/init/modr0/MOD0.BIN
 
 	# ...
 
