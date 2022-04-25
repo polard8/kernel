@@ -1,0 +1,10 @@
+
+
+ 
+ 	init/   
+ 	This is the init process.
+ 	It is a ring 3 process.
+ 	
+ 	modr0/
+ 	This is a ring 0 system module.
+ 	This image belongs to the kernel process.

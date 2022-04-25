@@ -24,7 +24,7 @@
 #define CLIENT0_TID  3  // First ring3 client. GWS.BIN
 
 // alias.
-#define WS_TID  MODULE0_TID
+#define TID0_TID  MODULE0_TID
 //#define ??      MODULE1_TID
 //#define ??      MODULE2_TID
 #define WS_FIRST_CLIENT_TID  CLIENT0_TID
@@ -861,7 +861,8 @@ struct thread_d
 struct thread_d  *____IDLE;
 
 // The control thread of the window sever kernel module.
-struct thread_d  *ws_thread;
+// The ring 0 thread. tid0
+struct thread_d  *tid0_thread;
 
 // Essa é a thread de controle do processo init2.bin
 // É o primeiro processo em ring3.

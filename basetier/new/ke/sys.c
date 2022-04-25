@@ -322,22 +322,29 @@ void *sys_create_thread (
 
     int iopl = RING3;
 
-    if ( ppid = WS_TID )
-        iopl = RING0;
+
+// #bugbug
+// isso significa que a tid0 só pode criar threads
+// que vão rodar em ring0 ?
+
+    //if ( ppid = TID0_TID )
+        //iopl = RING0;
 
     // #bugbug #todo
     // Only ring3 for now.
     // We need to receive a parameter for that.
     
-    Thread = (struct thread_d *) create_thread ( 
-                                     room, desktop, window, 
-                                     init_rip, 
-                                     priority, 
-                                     ppid, 
-                                     name,
-                                     iopl ); 
+    Thread = 
+        (struct thread_d *) create_thread ( 
+                                room, desktop, window, 
+                                init_rip, 
+                                priority, 
+                                ppid, 
+                                name,
+                                iopl ); 
 
-    if ( (void *) Thread == NULL ){
+    if ( (void *) Thread == NULL )
+    {
         debug_print ("sys_create_thread: [FAIL] Thread\n");
         return NULL;
     }

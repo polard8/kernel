@@ -170,12 +170,13 @@ communication-tier:
 presentation-tier:
 	@echo ":: Building Window server, clients and userland."
 
-# ::Building window server and clients.
-	$(Q) $(MAKE) -C prestier/gws/
 
+# ::Building mod0 and init process.
+	$(Q) $(MAKE) -C prestier/init/
 # Copy to the target folder.
-	-sudo cp prestier/bin/GWSSRV.BIN    basetier/disk/
-	-sudo cp prestier/bin/GWS.BIN       basetier/disk/ 
+	-sudo cp prestier/bin/INIT.BIN  basetier/disk/ 
+	-sudo cp prestier/bin/MOD0.BIN  basetier/disk/
+
 
 # test
 # Importing from another project.
@@ -309,9 +310,11 @@ clean-all: clean
 	-rm     prestier/bin/*.BIN
 	-rm     prestier/userland/bin/*.BIN
 
-	-rm -rf prestier/gws/libgws/*.o
-	-rm -rf prestier/gws/server/*.o
-	-rm -rf prestier/gws/client/*.o
+	-rm -rf prestier/init/init/*.o
+	-rm -rf prestier/init/modr0/*.o
+	-rm -rf prestier/init/init/INIT.BIN
+	-rm -rf prestier/init/modr0/MOD0.BIN
+
 	# ...
 
 	@echo "Done ?"

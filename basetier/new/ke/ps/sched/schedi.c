@@ -337,7 +337,7 @@ void do_thread_zombie (int tid){
 // System's ring 0 thread.
 // The window server's thread.
 
-    if ( tid == WS_TID )
+    if ( tid == TID0_TID )
         return;
 
 // Change the state
@@ -346,7 +346,6 @@ void do_thread_zombie (int tid){
 
 
 /*
- *****************************
  * do_waitpid:
  *     espera por qualquer um do processo filho.
  */

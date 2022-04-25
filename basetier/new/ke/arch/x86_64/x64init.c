@@ -28,14 +28,14 @@ extern void x64_clear_nt_flag (void);
 
 
 //
-// == Prototypes ========
+// == Private functions: Prototypes ========
 //
 
 static int I_init (void);
 static int I_x64CreateKernelProcess(void);
 static int I_x64CreateInitialProcess (void);
 
-static int I_x64CreateWSThread(void);
+static int I_x64CreateTID0(void);
 
 
 
@@ -96,18 +96,21 @@ static int I_x64CreateInitialProcess (void)
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
-    fileret = (unsigned long) fsLoadFile ( 
-                                  VOLUME1_FAT_ADDRESS, 
-                                  VOLUME1_ROOTDIR_ADDRESS, 
-                                  FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
-                                  "GWS     BIN", 
-                                  (unsigned long) CONTROLTHREAD_BASE, //0x00200000
-                                  BUGBUG_IMAGE_SIZE_LIMIT );
+    fileret = 
+        (unsigned long) fsLoadFile( 
+                            VOLUME1_FAT_ADDRESS, 
+                            VOLUME1_ROOTDIR_ADDRESS, 
+                            FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
+                            "INIT    BIN", 
+                            (unsigned long) CONTROLTHREAD_BASE, //0x00200000
+                            BUGBUG_IMAGE_SIZE_LIMIT );
 
-    if ( fileret != 0 ){
-        printf ("I_x64CreateInitialProcess: Coldn't load GWS.BIN \n");
+    if ( fileret != 0 )
+    {
+        printf ("I_x64CreateInitialProcess: Coldn't load INIT.BIN \n");
         return FALSE;
     }
+
 
 // Creating init process.
 // > Cria um diretório que é clone do diretório do kernel base 
@@ -142,31 +145,36 @@ static int I_x64CreateInitialProcess (void)
 
 // ===========================================
 
-    InitProcess = (void *) create_process ( 
-                               NULL, NULL, NULL, 
-                               (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
-                               PRIORITY_HIGH, 
-                               (int) KernelProcess->pid, 
-                               "GWS-PROCESS", 
-                               RING3, 
-                               (unsigned long ) init_pml4_va,
-                               (unsigned long ) kernel_mm_data.pdpt0_va,
-                               (unsigned long ) kernel_mm_data.pd0_va );
+//
+// Create init process
+//
 
+    InitProcess = 
+        (void *) create_process( 
+                     NULL, NULL, NULL, 
+                     (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
+                     PRIORITY_HIGH, 
+                     (int) KernelProcess->pid, 
+                     "INIT-PROCESS", 
+                     RING3, 
+                     (unsigned long) init_pml4_va,
+                     (unsigned long) kernel_mm_data.pdpt0_va,
+                     (unsigned long) kernel_mm_data.pd0_va );
 
-// struct
-    if ( (void *) InitProcess == NULL ){
+    if ( (void *) InitProcess == NULL )
+    {
         printf ("I_x64CreateInitialProcess: InitProcess\n");
         return FALSE;
     }
 
-// validation
     if ( InitProcess->used != TRUE || 
          InitProcess->magic != 1234 )
     {
         printf ("I_x64CreateInitialProcess: InitProcess validation\n");
         return FALSE;
     }
+
+
 
 // struct
     if ( InitProcess->pid != GRAMADO_PID_INIT )
@@ -622,26 +630,29 @@ static int I_x64CreateKernelProcess(void)
     //debug_print ("I_x64CreateKernelProcess:\n");
 
 //
-// Window server image.
+// Module 0 image.
 //
 
 // WS_IMAGE_VA
 
-    fileret = (unsigned long) fsLoadFile ( 
-                                  VOLUME1_FAT_ADDRESS, 
-                                  VOLUME1_ROOTDIR_ADDRESS, 
-                                  FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
-                                  "GWSSRV  BIN", 
-                                  (unsigned long) 0x30A00000,
-                                  BUGBUG_IMAGE_SIZE_LIMIT ); 
+    fileret = 
+        (unsigned long) fsLoadFile( 
+                            VOLUME1_FAT_ADDRESS, 
+                            VOLUME1_ROOTDIR_ADDRESS, 
+                            FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
+                            "MOD0    BIN", 
+                            (unsigned long) 0x30A00000,
+                            BUGBUG_IMAGE_SIZE_LIMIT ); 
 
-    if ( fileret != 0 ){
-        printf ("I_x64CreateInitialProcess: GWSSRV.BIN \n");
+    if ( fileret != 0 )
+    {
+        printf ("I_x64CreateInitialProcess: MOD0.BIN \n");
         return FALSE;
     }
 
+
 //
-// Kernel image.
+// Kernel process
 //
 
 // IN: 
@@ -650,21 +661,22 @@ static int I_x64CreateKernelProcess(void)
 // See: ps/action/process.c
 // KERNELIMAGE_VA
  
-    KernelProcess = (void *) create_process ( 
-                                 NULL, NULL, NULL, 
-                                 (unsigned long) 0x30000000, 
-                                 PRIORITY_HIGH, 
-                                 (int) 0,        //ppid
-                                 "KERNEL-PROCESS", 
-                                 RING0,   
-                                 (unsigned long ) gKernelPML4Address,
-                                 (unsigned long ) kernel_mm_data.pdpt0_va,
-                                 (unsigned long ) kernel_mm_data.pd0_va );
-
+    KernelProcess = 
+        (void *) create_process( 
+                     NULL, NULL, NULL, 
+                     (unsigned long) 0x30000000, 
+                     PRIORITY_HIGH, 
+                     (int) 0,        //ppid
+                     "KERNEL-PROCESS", 
+                     RING0,   
+                     (unsigned long ) gKernelPML4Address,
+                     (unsigned long ) kernel_mm_data.pdpt0_va,
+                     (unsigned long ) kernel_mm_data.pd0_va );
 
 // Struct and struct validation.
 
-    if ( (void *) KernelProcess == NULL ){
+    if ( (void *) KernelProcess == NULL )
+    {
         printf ("I_x64CreateKernelProcess: KernelProcess\n");
         return FALSE;
     }
@@ -721,7 +733,7 @@ static int I_x64CreateKernelProcess(void)
 // This is the control thread for the 
 // window server image.
 
-    Status = I_x64CreateWSThread();
+    Status = I_x64CreateTID0();
 
     if ( Status != TRUE ){
         printf("Couldn't Create the WS thread\n");
@@ -768,10 +780,10 @@ static int I_x64CreateKernelProcess(void)
 // See:
 // I_x64CreateWSControlThread()
 
-    m->thread = (struct thread_d *) ws_thread;
+    m->thread = (struct thread_d *) tid0_thread;
 
 // info
-    m->info.entry_point = (unsigned long) ws_thread->initial_rip;
+    m->info.entry_point = (unsigned long) tid0_thread->initial_rip;
     m->info.dialog_address = 0;
     m->info.function_table_address = 0;
 
@@ -790,37 +802,37 @@ static int I_x64CreateKernelProcess(void)
 
 // Create a ring0 thread for the window server image.
 // It belongs to the kernel process.
-static int I_x64CreateWSThread(void)
+static int I_x64CreateTID0(void)
 {
-    //debug_print ("I_x64CreateWSThread:\n");
+    //debug_print ("I_x64CreateTID0:\n");
 
 // Thread
 // This is the control thread of the window server module.
 // See: create.c, thread.h.
 
-    ws_thread = (void *) create_tid0();
+    tid0_thread = (void *) create_tid0();
 
-    if ( (void *) ws_thread == NULL ){
-        printf ("I_x64CreateWSThread: ws_thread\n");
+    if ( (void *) tid0_thread == NULL ){
+        printf ("I_x64CreateTID0: tid0_thread\n");
         return FALSE;
     }
 
-    if ( ws_thread->used  != TRUE || 
-         ws_thread->magic != 1234 )
+    if ( tid0_thread->used != TRUE || 
+         tid0_thread->magic != 1234 )
     {
-        printf ("I_x64CreateWSThread: ws_thread validation\n");
+        printf ("I_x64CreateTID0: tid0_thread validation\n");
         return FALSE;
     }
 
 // tid
-    if ( ws_thread->tid != WS_TID ){
-        printf ("I_x64CreateWSThread: WS_TID");
+    if ( tid0_thread->tid != TID0_TID ){
+        printf ("I_x64CreateTID0: TID0_TID");
         return FALSE;
     }
 
 // owner pid
-    if ( ws_thread->ownerPID != GRAMADO_PID_KERNEL ){
-        printf ("I_x64CreateWSThread: GRAMADO_PID_KERNEL");
+    if ( tid0_thread->ownerPID != GRAMADO_PID_KERNEL ){
+        printf ("I_x64CreateTID0: GRAMADO_PID_KERNEL");
         return FALSE;
     }
 
@@ -828,18 +840,18 @@ static int I_x64CreateWSThread(void)
 // Memory
 //
 
-    ws_thread->pml4_VA  = KernelProcess->pml4_VA;
-    ws_thread->pml4_PA  = KernelProcess->pml4_PA;
+    tid0_thread->pml4_VA  = KernelProcess->pml4_VA;
+    tid0_thread->pml4_PA  = KernelProcess->pml4_PA;
 
-    ws_thread->pdpt0_VA = KernelProcess->pdpt0_VA;
-    ws_thread->pdpt0_PA = KernelProcess->pdpt0_PA;
+    tid0_thread->pdpt0_VA = KernelProcess->pdpt0_VA;
+    tid0_thread->pdpt0_PA = KernelProcess->pdpt0_PA;
 
-    ws_thread->pd0_VA   = KernelProcess->pd0_VA;
-    ws_thread->pd0_PA   = KernelProcess->pd0_PA;
+    tid0_thread->pd0_VA   = KernelProcess->pd0_VA;
+    tid0_thread->pd0_PA   = KernelProcess->pd0_PA;
 
 // ?
 // Set position.
-    ws_thread->position = KING;
+    tid0_thread->position = KING;
 
 //
 // tss
@@ -848,17 +860,17 @@ static int I_x64CreateWSThread(void)
 // #bugbug 
 // #todo
     
-    // ws_thread->tss = current_tss;
+    // tid0_thread->tss = current_tss;
 
 // Priority
 
-    set_thread_priority ( 
-        (struct thread_d *) ws_thread,
+    set_thread_priority( 
+        (struct thread_d *) tid0_thread, 
         PRIORITY_MAX );
 
 // Quantum
 
-    ws_thread->quantum = QUANTUM_MAX;
+    tid0_thread->quantum = QUANTUM_MAX;
 
 // #importante
 // Sinalizando que ainda não podemos usar as rotinas que dependam
@@ -876,7 +888,7 @@ static int I_x64CreateWSThread(void)
 // But it is not actually a idle routine, 
 // it is a standard server code.
 
-    ____IDLE = (struct thread_d *) ws_thread;
+    ____IDLE = (struct thread_d *) tid0_thread;
 
 // ??
 // This is the control thread of the kernel process.
@@ -884,7 +896,7 @@ static int I_x64CreateWSThread(void)
 // the kernel process's control thread. :)
 
     if ((void*)KernelProcess != NULL){
-        KernelProcess->control = (struct thread_d *) ws_thread;
+        KernelProcess->control = (struct thread_d *) tid0_thread;
     }
 
     return TRUE;

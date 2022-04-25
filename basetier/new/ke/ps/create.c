@@ -1,4 +1,5 @@
 
+// create.c
 
 #include <kernel.h>  
 
@@ -7,18 +8,18 @@
 //     This is the control thread of the window server.
 //     See: gwssrv.bin.
 // 0x0000000030A00000
+
 void *create_tid0(void)
 {
-
     struct thread_d  *kThread;
-    int TID = WS_TID;
+    int TID = TID0_TID;
 
     // loops
     register int r=0;    // Wait reason.
     register int i=0;    // Message queue.
     register int q=0;    // Message queue.
 
-    char *ThreadName = "ws-thread";
+    char *ThreadName = "tid0-thread";
 
     // Stack pointer.
     void *earlyRing0IdleStack; 

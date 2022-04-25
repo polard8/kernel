@@ -1,4 +1,0 @@
-
-
-    client: o antigo primeiro cliente agora é o init/
-    server: o antigo window server agora é o modr0/

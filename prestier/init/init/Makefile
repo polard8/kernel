@@ -75,13 +75,13 @@ all-c:
 	#cp $(LIBGWSOBJ)/rw.o .
 	
 hello-link:
-	ld -m elf_x86_64 -T ../link.ld -o GWS.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o INIT.BIN $(myObjects)    
 
 finalize:
-	cp GWS.BIN  ../../bin
+	cp INIT.BIN  ../../bin
 
 clean:
 	-rm *.o
-	-rm GWS.BIN 
+	-rm INIT.BIN 
 	
-	
+

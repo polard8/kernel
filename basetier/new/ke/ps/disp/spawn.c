@@ -1,4 +1,5 @@
 
+// spawn.c
 
 #include <kernel.h>  
 
@@ -7,7 +8,7 @@ static int __spawn_eoi_is_necessary = FALSE;
 
 
 //
-// == private functions: prototypes =======
+// == Private functions: Prototypes =======
 //
 
 static int __spawn_is_eoi_needed(void);
@@ -148,7 +149,7 @@ void spawn_thread (int tid)
 // Linked list
 // The next thread will be the window server.
 
-    target_thread->next = (void *) ws_thread; 
+    target_thread->next = (void *) tid0_thread; 
 
 //
 // MOVEMENT 2 (Standby --> Running).
