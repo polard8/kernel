@@ -12,6 +12,9 @@
 #define VK_RETURN    0x1C
 #define VK_TAB       0x0F
 
+
+static isTimeToQuit = FALSE;
+
 // private functions: prototypes;
 static void initPrompt(void);
 static int initCompareString(void);
@@ -83,9 +86,9 @@ static int initCompareString(void)
     {
         printf ("~Client\n");
         rtl_clone_and_execute("terminal.bin");
+        isTimeToQuit = TRUE;
         goto exit_cmp;
     }
-
 
     // ...
 
@@ -127,7 +130,11 @@ int main( int argc, char **argv)
 
     initPrompt();
 
-    while(1){
+    while(1)
+    {
+        if( isTimeToQuit == TRUE ){
+            break;
+        }
         C = (int) fgetc(stdin);
         if( C == VK_RETURN )
             initCompareString();
@@ -139,8 +146,13 @@ int main( int argc, char **argv)
         }
     };
 
+    printf("~Quit\n");
 
-    while(1){}
+// hang
+    while (TRUE){
+        rtl_yield();
+    };
+
     return 0;
 }
 

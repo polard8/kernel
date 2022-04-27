@@ -186,6 +186,9 @@ presentation-tier:
 	#-sudo cp ../gws/bin/GWS2.BIN     basetier/disk/
 
 	-sudo cp ../gws/bin/TERMINAL.BIN  basetier/disk/
+	-sudo cp ../gws/bin/EDITOR.BIN    basetier/disk/
+	-sudo cp ../gws/bin/FILEMAN.BIN   basetier/disk/
+	-sudo cp ../gws/bin/BROWSER.BIN   basetier/disk/
 
 
 # ::Building userland commands.
@@ -251,19 +254,17 @@ vhd-unmount:
 # This is gonna copy th image into the real HD.
 # My host is running on sdb and i copy the image into sda.
 # It is because the sda is in primary master IDE.
-danger-hdd-clone-vhd: danger-install-sda
-
 # Gramado has been tested on sda
 # and the Fred's Linux host machine is on sdb.
 danger-install-sda:
 	sudo dd if=./GRAMADO.VHD of=/dev/sda
-#	sudo dd if=./GRAMADO.VHD of=/dev/sdb
+danger-install-sdb:
+	sudo dd if=./GRAMADO.VHD of=/dev/sdb
 
 
 #
-# == clean ====================================
+# == clean ========
 #
-
 
 clean:
 
