@@ -1,3 +1,4 @@
+
 // 'cat' command for Gramado.
 
 // rtl
@@ -18,8 +19,8 @@ int main ( int argc, char *argv[] )
     char buffer[1024];
     //char buffer[2048];
 
-    // Counters.
-    register int nreads  = 0;
+// Counters.
+    register int nreads = 0;
     register int nwrites = 0;
 
     size_t size=0;

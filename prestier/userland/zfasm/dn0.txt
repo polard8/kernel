@@ -1,4 +1,0 @@
-	usage:
-	fasm -m512 test2.asm
-
-         obs: test1.asm tem problemas com o preprocessador.

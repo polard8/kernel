@@ -96,9 +96,7 @@ __shell_draw_rectangle (
 
 
 
-
 /*
- **************************************************
  * shellPrompt:
  *     Inicializa o prompt.
  *     Na inicializa��o de stdio, 
@@ -119,7 +117,7 @@ void shellPrompt (void)
     prompt_max    = PROMPT_MAX_DEFAULT;  
 
     // Prompt
-    printf("\n");
+    //printf("\n");
     putc('$',stdout);
     putc(' ',stdout);
     fflush(stdout);
@@ -196,7 +194,8 @@ do_compare:
     // about
     if ( strncmp ( prompt, "about", 5 ) == 0 )
     {
-        printf ("Gramado Operating System\n");
+        printf ("Gramado Operating System");
+        fflush(stdout);
         goto exit_cmp;
     }
 
@@ -515,6 +514,7 @@ int main_backup ( int argc, char *argv[] )
     return 0;
 }
 
+
 //
 int main ( int argc, char *argv[] )
 {
@@ -628,14 +628,18 @@ int main ( int argc, char *argv[] )
     stdout = stderr;
 
     // Simple string.
-    printf("SHELL.BIN: Shell is alive!");
+    printf("SHELL.BIN: Shell is alive!$ ");
     fflush(stdout);
 
+//#test
+    //rewind(stdout);
+    //shellPrompt();
 
     int C=0;
-    
-    // pegamos o char de stdin e enviaremos para o terminal
-    // via stdout.
+
+// Pegamos o char de stdin e 
+// enviaremos para o terminal via stdout.
+
     while (1){
 
         C = fgetc(stdin);
@@ -654,6 +658,7 @@ int main ( int argc, char *argv[] )
              {
                  //printf("%c",'$');
                  //fflush(stdout);
+                 shellCompare();
              }
         
              // Printable chars.
