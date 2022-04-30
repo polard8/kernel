@@ -1490,7 +1490,7 @@ int consoleCompareStrings(void)
         //wmWindowMananer_SendMessage();
  
         //#test
-        wmSendInputToWindowManager(0,9092,0,0);  // update desktop
+        //wmSendInputToWindowManager(0,9092,0,0);  // update desktop
         //wmSendInputToWindowManager(0,9093,0,0);    // ramdom tests
         //wmSendInputToWindowManager(0,0,0,0);
         //wmSendInputToWindowManager(0,0,0,0);

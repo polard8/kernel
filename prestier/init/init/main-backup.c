@@ -9,82 +9,18 @@
 #include <rtl/gramado.h>
 
 
-#define __VK_RETURN    0x1C
-#define __VK_TAB       0x0F
-
-#define __MSG_COMMAND       40
+#define VK_RETURN    0x1C
+#define VK_TAB       0x0F
 
 
 static isTimeToQuit = FALSE;
 
 // private functions: prototypes;
-
-// local
-static int 
-gwsProcedure ( 
-    void *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
-
 static void initPrompt(void);
 static int initCompareString(void);
 
 
 // ====================
-
-// local
-static int 
-gwsProcedure ( 
-    void *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 )
-{
-
-    switch (msg){
-
-    // range: 4001~4009 
-    case __MSG_COMMAND:
-        printf("gws.bin: MSG_COMMAND %d \n",long1);
-        switch(long1)
-        {
-            case 4001:  //app1
-            printf("init.bin: 4001\n");
-            rtl_clone_and_execute("terminal.bin");  break;
-            case 4002:  //app2
-            printf("init.bin: 4002\n");
-            rtl_clone_and_execute("fileman.bin");  break;
-            case 4003:  //app3
-            printf("init.bin: 4003\n");
-            rtl_clone_and_execute("editor.bin");  break;
-            case 4004:  //app4
-            printf("init.bin: 4004\n");
-            rtl_clone_and_execute("reboot.bin");  break;
-            
-            case 4005:  //app5
-            printf("init.bin: 4005\n");
-            rtl_clone_and_execute("terminal.bin");  break;
-            case 4006:  //app6
-            printf("init.bin: 4006\n");
-            rtl_clone_and_execute("fileman.bin");  break;
-            case 4007:  //app7
-            printf("init.bin: 4007\n");
-            rtl_clone_and_execute("editor.bin");  break;
-            case 4008:  //app8
-            printf("init.bin: 4008\n");
-            rtl_clone_and_execute("reboot.bin");  break;
-            
-            default:break;
-        };
-        break;
-    default:
-        break;
-    };
-    
-    return 0;
-}
-
 
 static void initPrompt(void)
 {
@@ -111,10 +47,8 @@ static int initCompareString(void)
 {
     char *c;
     c = prompt;
-
-    if ( *c == '\0' ){
+    if( *c == '\0' )
         goto exit_cmp;
-    }
     
     //LF
     printf("\n");
@@ -122,8 +56,8 @@ static int initCompareString(void)
     if( strncmp(prompt,"help",4) == 0 )
     {
         printf ("HELP:\n");
-        printf ("Commands: ws, client, help, reboot, shutdown ...\n");
         printf("[control + f9] to open the kernel console\n");
+        printf ("Commands: help, reboot, shutdown ...\n");
         goto exit_cmp;
     }
 
@@ -148,14 +82,6 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"wsq",3) == 0 )
-    {
-        printf ("~WSQ\n");
-        rtl_clone_and_execute("gwssrv2.bin");
-        isTimeToQuit = TRUE;
-        goto exit_cmp;
-    }
-
     if( strncmp(prompt,"client",6) == 0 )
     {
         printf ("~Client\n");
@@ -163,7 +89,6 @@ static int initCompareString(void)
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
-
 
     // ...
 
@@ -211,7 +136,7 @@ int main( int argc, char **argv)
             break;
         }
         C = (int) fgetc(stdin);
-        if( C == __VK_RETURN )
+        if( C == VK_RETURN )
             initCompareString();
         if( C >= 0x20 && C <= 0x7F )
         {
@@ -222,26 +147,6 @@ int main( int argc, char **argv)
     };
 
     printf("~Quit\n");
-
-//================================
-
-    while (TRUE){
-
-        //if( isTimeToQuit == TRUE )
-            //break;
-
-        if ( rtl_get_event() == TRUE )
-        {
-            //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
-
-            gwsProcedure ( 
-                (void*) RTLEventBuffer[0], 
-                RTLEventBuffer[1], 
-                RTLEventBuffer[2], 
-                RTLEventBuffer[3] );
-        }
-    };
-
 
 // hang
     while (TRUE){

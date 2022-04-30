@@ -568,7 +568,8 @@ wmRegisterWSCallbacks(
 
 // Send input to the window manager
 // inside the window server ( gwssrv.bin )
-unsigned long wmSendInputToWindowManager(
+unsigned long 
+wmSendInputToWindowManager(
     unsigned long wid,
     unsigned long msg,
     unsigned long long1,
@@ -655,7 +656,7 @@ static void __exit_embedded_shell(void)
 
 // update desktop
     if ( gUseWMCallbacks == TRUE ){
-         wmSendInputToWindowManager(0,9092,0,0);
+         //wmSendInputToWindowManager(0,9092,0,0);
     }
 
 // done
@@ -789,7 +790,7 @@ wmProcedure (
     case MSG_MOUSEMOVE:
     case MSG_MOUSEPRESSED:
     case MSG_MOUSERELEASED:
-        wmSendInputToWindowManager(0,msg,long1,long2);
+        //wmSendInputToWindowManager(0,msg,long1,long2);
         return 0;
         break;
 
@@ -806,7 +807,7 @@ wmProcedure (
         // à janela com foco de entrada.
             
         if ( ShellFlag!=TRUE ){
-            wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
+            //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
         }
 
         switch (long1){
@@ -897,7 +898,7 @@ wmProcedure (
             ctrl_status != TRUE &&
             alt_status != TRUE )
         {
-            wmSendInputToWindowManager(0,MSG_SYSKEYUP,long1,long2); 
+            //wmSendInputToWindowManager(0,MSG_SYSKEYUP,long1,long2); 
             return 0;
         }
         break;
@@ -916,7 +917,7 @@ wmProcedure (
             ctrl_status != TRUE &&
             alt_status != TRUE )
         {
-            wmSendInputToWindowManager(0,MSG_SYSKEYDOWN,long1,long2); 
+            //wmSendInputToWindowManager(0,MSG_SYSKEYDOWN,long1,long2); 
             return 0;
         }
         
@@ -1066,7 +1067,7 @@ wmProcedure (
                     //wmSendInputToWindowManager(0,5,0,0);
                     //wmSendInputToWindowManager(0,6,0,0);
                     //wmSendInputToWindowManager(0,7,0,0);  //close
-                    wmSendInputToWindowManager(0,MSG_PAINT,0,0);
+                    //wmSendInputToWindowManager(0,MSG_PAINT,0,0);
                     //wmSendInputToWindowManager(0,9,0,0);
                     //wmSendInputToWindowManager(0,10,0,0);
                     //wmSendInputToWindowManager(0,18,0,0);   //set focus
@@ -1167,7 +1168,7 @@ wmProcedure (
                     refresh_screen();
                 }
                 if (shift_status == TRUE){
-                    wmSendInputToWindowManager(0,9090,0,0);   // Switch focus
+                    //wmSendInputToWindowManager(0,9090,0,0);   // Switch focus
                     //__kgwm_SendMessageToInitProcess(9219);  // sysmon
                     return 0;
                 }
@@ -2082,8 +2083,9 @@ void schedulerUpdateScreen(void)
 // at gwssrv.bin
 // 9091 = message code for calling the compositor.
 
-    if( gUseWMCallbacks == TRUE)
-        wmSendInputToWindowManager(0,9091,0,0);
+    if( gUseWMCallbacks == TRUE){
+        //wmSendInputToWindowManager(0,9091,0,0);
+    }
 
 // ============================
 

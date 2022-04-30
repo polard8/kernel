@@ -168,10 +168,11 @@ void DeviceInterface_PIT(void)
     //if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
     //if ( (jiffies % 16) == 0 )
     //{
-        if ( gUseWMCallbacks == TRUE ){
+        if ( gUseWMCallbacks == TRUE )
+        {
             //wmSendInputToWindowManager(0,9091,0,0);
             // IN: jiffies, clocks per second.
-            wmSendInputToWindowManager(0,9091,jiffies,sys_time_hz);
+            //wmSendInputToWindowManager(0,9091,jiffies,sys_time_hz);
         }
     //}
 }
