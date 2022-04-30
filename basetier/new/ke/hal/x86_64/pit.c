@@ -108,6 +108,7 @@ static int timerShowTextCursor = FALSE;
 __VOID_IRQ 
 irq0_TIMER (void)
 {
+
 // Calling the timer routine.
 // See: pic.h
     DeviceInterface_PIT();
@@ -136,7 +137,7 @@ irq0_TIMER (void)
 }
 
 
-// Presence of God!
+// Worker
 // Scheduler
 // Ignoramos a tid retornada pela rotina.
 void DeviceInterface_PIT(void)
@@ -163,42 +164,47 @@ void DeviceInterface_PIT(void)
 // See: In window server, see wmHandler() in wm.c.
 // IN: wid, msg_code, long1, long2
 
-// Es o meu alivio!
-
     //if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
     //if ( (jiffies % 16) == 0 )
     //{
-        if ( gUseWMCallbacks == TRUE )
-        {
+        //if ( gUseWMCallbacks == TRUE )
+        //{
             //wmSendInputToWindowManager(0,9091,0,0);
             // IN: jiffies, clocks per second.
             //wmSendInputToWindowManager(0,9091,jiffies,sys_time_hz);
-        }
+        //}
     //}
+    
+    
+// #todo
+// Refresh an array of surfaces.
+// Only the window server will be able to
+// setup all these surfaces.
+// The window server can be able to access an
+// internal display driver via ioctl().
+
 }
 
 
 // Main globals.
-int timerTimer (void)
+int timerTimer(void)
 {
-    // total ticks
+// total ticks
     jiffies = 0;
 
-    // por quantos segundos o sistema esta rodando
-    // jiffies/sys_time_hz
+// por quantos segundos o sistema esta rodando
+// jiffies/sys_time_hz
     seconds = 0; 
 
-    // Por quantos ms o sistema esta rodando.
+// Por quantos ms o sistema esta rodando.
     sys_time_ms = 0; 
 
-    // pit frequency
+// pit frequency
     sys_time_hz = 0;
 
     UpdateScreenFlag = FALSE;
 
-//
 // Profiler
-//
     profiler_ticks_count = 0;
     profiler_ticks_limit = PROFILER_TICKS_DEFAULT_LIMIT;
 
@@ -206,6 +212,7 @@ int timerTimer (void)
 
     return 0;
 }
+
 
 /*
 // read back
@@ -242,12 +249,9 @@ void set_pit_count(unsigned count)
 */
 
 
-
 /*
- ******************************************
  * timerInit8253:
  *    @todo: Compreender melhor isso.
- *
  * Seta a frequência de funcionamento do 
  * controlador 8253. "3579545 / 3" 
  * instead of 1193182 Hz. 
@@ -255,7 +259,6 @@ void set_pit_count(unsigned count)
  * à uma frequencia de "HZ".
  * Obs: Essa rotina substitui a rotina init_8253.
  */
-
 
 //ex: 
 // 0x36
@@ -294,12 +297,13 @@ void timerInit8253 ( unsigned int freq )
     unsigned int clocks_per_sec = (unsigned int) (freq & 0xFFFFFFFF);
 
 // para 1.1 MHz
-//The counter counts down to zero, then sends a hardware interrupt (IRQ 0) to the CPU.
+// The counter counts down to zero, then 
+// sends a hardware interrupt (IRQ 0) to the CPU.
 // 3579545/3
 
     unsigned int period = (unsigned int) ( (1193182) / clocks_per_sec );
 
-// #debug
+    // #debug
     //printf("Period %d\n",period);
     //refresh_screen();
     //while(1){}
@@ -403,17 +407,14 @@ unsigned long get_systime_totalticks (void)
 
 
 /*
- ***********************
  * get_systime_info:
- * 
  */
+// #todo 
+// Criar um enum para isso.
+// Comentar uma descrição em cada item.
 
-    // #todo 
-    // Criar um enum para isso.
-    // Comentar uma descrição em cada item.
-
-unsigned long get_systime_info (int n){
-
+unsigned long get_systime_info(int n)
+{
     switch (n){
     case 1: return (unsigned long) get_systime_hz();          break;
     case 2: return (unsigned long) get_systime_ms();          break;
@@ -446,10 +447,12 @@ int new_timer_id (void)
     return (int) -1;
 }
 
+
 void timerEnableTextCursor (void)
 {
     timerShowTextCursor = TRUE;
 }
+
 
 void timerDisableTextCursor (void)
 {
@@ -486,7 +489,6 @@ void sleep (unsigned long ms)
 
 
 /*
- ********************************************
  * timerInit:
  *     Inicializa o driver de timer.
  *     Inicializa as variáveis do timer.
@@ -500,9 +502,7 @@ int timerInit (void)
 
     // g_driver_timer_initialized = FALSE;
 
-//
 // Breaker
-//
     __breaker_timer_initialized = FALSE;
 
 
@@ -533,47 +533,37 @@ int timerInit (void)
 
     timerInit8253(HZ);
 
-
-	// #todo:
-	// alocar memoria para a estrutura do timer.
-	// inicializar algumas variaveis do timer.
-	// por enquanto estamos usando variaveis globais.
-	// ?? Não se se ja foi configurado o timer.
-	// ou devemos chamr init_8253() agora. ou depois.
-
+// #todo:
+// alocar memoria para a estrutura do timer.
+// inicializar algumas variaveis do timer.
+// por enquanto estamos usando variaveis globais.
+// ?? Não se se ja foi configurado o timer.
+// ou devemos chamr init_8253() agora. ou depois.
 
     //timerCountSeconds = 0;
 
-
-    // Quantum
-
+// Quantum
     set_current_quantum (QUANTUM_MIN);
     set_next_quantum (QUANTUM_MIN);
     set_quantum (QUANTUM_MIN);
 
-    // Timeout 
-
+// Timeout 
     set_timeout(0);
 
-//
 // Whatchdogs
-//
-    // Initializing whatchdogs.
-    // Eles serão zerados pelas interrupções dos dipositivos e
-    // incrementados pelo timer.
-    // A condição crítica é alcançar um limite, um timeout.
+// Initializing whatchdogs.
+// Eles serão zerados pelas interrupções dos dipositivos e
+// incrementados pelo timer.
+// A condição crítica é alcançar um limite, um timeout.
 
     ____whatchdog_ps2_keyboard = 0;
-    ____whatchdog_ps2_mouse    = 0;
+    ____whatchdog_ps2_mouse = 0;
     //...
 
 
 	//Continua...
 
-
-//
 // breaker
-//
     __breaker_timer_initialized = TRUE;
 
 // Done
@@ -597,9 +587,7 @@ int early_timer_init (void)
 
     //g_driver_timer_initialized = FALSE;
 
-//
 // Breaker
-//
     __breaker_timer_initialized = FALSE;
 
     timerTimer();
@@ -627,28 +615,21 @@ int early_timer_init (void)
     set_next_quantum (QUANTUM_MIN);
     set_quantum (QUANTUM_MIN);
 
-    // Timeout 
-
+// Timeout 
     set_timeout(0);
 
-
-    // Whatchdogs
-
-    // Initializing whatchdogs.
-    // Eles serão zerados pelas interrupções dos dipositivos e
-    // incrementados pelo timer.
-    // A condição crítica é alcançar um limite, um timeout.
+// Whatchdogs
+// Initializing whatchdogs.
+// Eles serão zerados pelas interrupções dos dipositivos e
+// incrementados pelo timer.
+// A condição crítica é alcançar um limite, um timeout.
     ____whatchdog_ps2_keyboard = 0;
-    ____whatchdog_ps2_mouse    = 0;
+    ____whatchdog_ps2_mouse = 0;
     //...
-
 
     // Continua...
 
-
-//
 // Breaker
-//
     __breaker_timer_initialized = TRUE;
 
 // Done
@@ -666,12 +647,10 @@ struct timer_d *timerObject()
 }
 */
 
-/*
- ******************** 
- * create_timer:
- * 
- */
 
+/*
+ * create_timer:
+ */
 // IN: pid, ms, type
 
 struct timer_d *create_timer ( 
@@ -679,16 +658,13 @@ struct timer_d *create_timer (
     unsigned long ms, 
     int type )
 {
-
     struct timer_d   *Timer;
     struct process_d *Process;
     struct thread_d  *Thread;
 
-
     int ID = -1;  //erro;
 
-
-    debug_print("=============\n");
+    //debug_print("=============\n");
     debug_print("create_timer:\n");
     
     //printf     ("create_timer: pid=%d ms=%d type=%d\n",
@@ -700,7 +676,8 @@ struct timer_d *create_timer (
     }
     
     Process = (struct process_d *) processList[pid];
-    if ( (void*) Process == NULL ){
+    if ( (void*) Process == NULL )
+    {
         debug_print("create_timer: [FAIL] Process\n");
         return NULL;
     }
@@ -708,14 +685,14 @@ struct timer_d *create_timer (
     // Thread de controle.
     //Thread = (struct thread_d *) Process->control;
     Thread = (struct thread_d *) threadList[current_thread];
-    if ( (void*) Thread == NULL ){
+    if ( (void*) Thread == NULL )
+    {
         debug_print("create_timer: [FAIL] Thread\n");
         return NULL;
     }
 
-
-	// limits
-	// limite de 1 tick.
+// limits
+// limite de 1 tick.
 
     // ms
     if (ms < (1000/sys_time_hz) )
@@ -733,9 +710,9 @@ struct timer_d *create_timer (
         //return NULL;
     }
 
-    //
-    // Structure.
-    //
+//
+// Structure
+//
 
     Timer = (void *) kmalloc( sizeof(struct timer_d) );
 
@@ -760,10 +737,10 @@ struct timer_d *create_timer (
 
         }else{
 
-            Timer->used  = TRUE;
+            Timer->used = TRUE;
             Timer->magic = 1234;
             Timer->id = ID;
-            
+
             // ms/(ms por tick)
             Timer->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
             Timer->count_down = Timer->initial_count_down;
@@ -788,33 +765,15 @@ struct timer_d *create_timer (
 
     // #debug
     debug_print("create_timer: done\n");
-    refresh_screen ();
+    refresh_screen();
 
     return (struct timer_d *) Timer;
 
 fail:
     debug_print("create_timer: [FAIL]\n");
     printf     ("create_timer: [FAIL]\n");
-    refresh_screen ();
+    refresh_screen();
     return NULL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

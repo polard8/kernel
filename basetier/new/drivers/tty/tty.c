@@ -1021,24 +1021,25 @@ tty_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
-
     struct process_d *p;
     file *f;
     struct tty_d *tty;
+    pid_t current_process = -1;
 
     debug_print ("tty_ioctl: TODO\n");
 
 
-    pid_t current_process = (pid_t) get_current_process();
-
-    if (fd<0){
-        debug_print ("tty_ioctl: fd\n");
-        return -1;
+    if ( fd < 0 || fd >= OPEN_MAX )
+    {
+        return (int) (-EBADF);
     }
 
+// Current process.
 // #todo
 // podemos checar novamente se realmente se trata de
 // um tty. Mas isso ja foi feito no wrapper sys_ioctl.
+
+    current_process = (pid_t) get_current_process();
 
     if (current_process < 0 ||
         current_process >= PROCESS_COUNT_MAX)
@@ -1092,14 +1093,20 @@ tty_ioctl (
     // Get termios.
     case TCGETS:
         debug_print ("tty_ioctl: TCGETS\n");
+        if ( (void*) arg == NULL ){
+            return (int) (-EINVAL);
+        }
         return (int) tty_gets ( tty, (struct termios *) arg );
         break;
 
     // Set termios.
     case TCSETS:
         debug_print ("tty_ioctl: TCSETS\n");
-        return (int) tty_sets ( tty, 
-                         TCSANOW, (struct termios *) arg );
+        if ( (void*) arg == NULL ){
+            return (int) (-EINVAL);
+        }
+        return (int) tty_sets ( 
+                         tty, TCSANOW, (struct termios *) arg );
         break;
 
     // ??
@@ -1155,7 +1162,7 @@ tty_ioctl (
 
     default:
         debug_print ("tty_ioctl: [FAIL] default\n");
-        return -1;
+        return (int) (-EINVAL);
         break;
     };
 

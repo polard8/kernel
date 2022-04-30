@@ -1,6 +1,7 @@
 
 // xpixel.c
 // Presentation: Put a pixel into the backbuffer.
+// #todo: We change this name to bltblt.c
 
 //D - Destination bitmap
 //P - Selected brush (also called pattern)

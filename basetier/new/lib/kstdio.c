@@ -1419,6 +1419,7 @@ k_setvbuf (
 
 // Maybe we can do some operations 
 // in a regular file using ioctl.
+// EINVAL request or argp is not valid.
 
 int 
 regularfile_ioctl ( 
@@ -1427,6 +1428,12 @@ regularfile_ioctl (
     unsigned long arg )
 {
     debug_print ("regularfile_ioctl: [TODO]\n");
+
+    if ( fd < 0 || fd >= OPEN_MAX )
+    {
+        return (int) (-EBADF);
+    }
+
     return -1;
 }
 

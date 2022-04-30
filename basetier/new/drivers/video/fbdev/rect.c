@@ -524,7 +524,13 @@ __refresh_rectangle0 (
 // ??
 // A ideia aqui é efetuar o refresh de um retângulo 
 // que esteja em um dado buffer.
-// ?? Not tested yet
+// #todo:
+// Refresh de retângulos é tudo o que precisamos 
+// para termos um compositor dentro do kernel.
+// Assim como o display driver pode ficar dentro do kernel,
+// o compositor tambem pode ficar dentro do kernel.
+// Podemos fazer o compositor dentro do window server em ring3
+// se tivermos um timer que interrompa o window server.
 
 void 
 refresh_rectangle ( 

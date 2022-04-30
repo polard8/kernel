@@ -34,7 +34,6 @@ int ioInit(void)
 // ioctl() requests.  The argument fd must be an open file descriptor.
 
 // return:
-// On error, -1 is returned, and errno is set appropriately.
 // EBADF  fd is not a valid file descriptor.
 // EFAULT argp references an inaccessible memory area.
 // EINVAL request or argp is not valid.
@@ -75,17 +74,13 @@ io_ioctl (
 {
 
     file *f;
-
     int ObjectType = -1;
 
     debug_print ("io_ioctl: [TODO]\n");
 
-// fd must to be on open file descriptor.
-
-    if ( fd<0 || fd>31 )
+    if ( fd < 0 || fd >= OPEN_MAX )
     {
-       debug_print("io_ioctl: [FAIL] Invalid fd\n");
-       return -1;  //EBADF
+        return (int) (-EBADF);
     }
 
 // Get file pointer.
@@ -106,6 +101,8 @@ io_ioctl (
     }
 
 // Object types.
+// #todo:
+// What type of file we will support here?
 
     ObjectType = (int) f->____object;
 
@@ -134,7 +131,7 @@ io_ioctl (
         break;
 
     // socket object
-    // see: socket.c ??
+    // see: net/socket.c ?
     case ObjectTypeSocket:
         debug_print ("io_ioctl: ObjectTypeSocket\n");
         return (int) socket_ioctl ( 
@@ -144,7 +141,7 @@ io_ioctl (
         break;
 
     // Console object
-    // See: console.c
+    // See: user/console.c
     case ObjectTypeVirtualConsole: 
         debug_print ("io_ioctl: ObjectTypeVirtualConsole\n");
         return (int) console_ioctl ( 

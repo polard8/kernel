@@ -678,11 +678,11 @@ int socket_initialize_gramado_ports(void)
     return 0;
 }
 
+
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
     struct process_d *p;
     file *f;
-
 
     debug_print ("socket_ioctl: TODO\n");
 
@@ -712,19 +712,17 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
         return -1;
     }
     
-    // #bugbug
-    // Se eh uma chamada vinda de ring3, entao nao conseguira
-    // acessar a estrutura ... problemas com registrador de segmentos.
+// #bugbug
+// Se eh uma chamada vinda de ring3, entao nao conseguira
+// acessar a estrutura ... problemas com registrador de segmentos.
 
     if (f->used != TRUE || f->magic != 1234 )
     {
         panic("socket_ioctl: validation\n");
     }
 
-    //
-    // Request
-    //
-    
+// Request
+
     switch (request){
 
         // #bugbug
@@ -738,6 +736,7 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
             debug_print ("socket_ioctl: [4000]\n");
             printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
             refresh_screen();
+            // Is it a valid pid?
             f->sync.sender = (pid_t) arg;
             return 0;
             break;
@@ -747,25 +746,22 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
             break;
         
         case 4002:
-            //return -1;
-            return f->sync.can_read;
+            return (int) f->sync.can_read;
             break;
 
         case 4003:
-            //return -1;
-            return f->sync.can_write;
+            return (int) f->sync.can_write;
             break;
 
         case 4004:
-            //return -1;
-            return f->sync.can_execute;
+            return (int) f->sync.can_execute;
             break;
-        
+
         // ...
-        
-        // #todo
-        //default:
-            //break;
+
+        default:
+            return (int) (-EINVAL);
+            break;
     };
 
     return -1;

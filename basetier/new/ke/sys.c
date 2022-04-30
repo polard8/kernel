@@ -2310,10 +2310,12 @@ int sys_initialize_component (int n)
 
 
 // Called by sc82 in sci.c
+// Enquanto sys_ioctl eh chamada pelos applicativos,
+// io_ioctl eh chamada pelas rotinas dentro do kernel.
+// See: drivers/io.c
+
 int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
-    int retvalue = (-1);
-
     debug_print ("sys_ioctl: [FIXME] \n");
 
     if ( fd < 0 || fd >= OPEN_MAX )
@@ -2321,19 +2323,8 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
         return (int) (-EBADF);
     }
 
-// Enquanto sys_ioctl eh chamada pelos applicativos,
-// io_ioctl eh chamada pelas rotinas dentro do kernel.
-// See: drivers/io.c
-
-    retvalue = (int) io_ioctl(fd,request,arg);
-
-    if( retvalue<0){
-        printf("sys_ioctl: io_ioctl fail\n");
-    }
-
-    return (int) retvalue;
+    return (int) io_ioctl(fd,request,arg);
 }
-
 
 
 //#??? isso não pertence à fcntl.c ?
