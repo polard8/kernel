@@ -28,7 +28,7 @@ unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 // ========================================
 
 //
-// == Prototypes ============================
+// == Private functions: Prototypes ===========
 //
 
 static int __check_address_validation( unsigned long address );
@@ -315,6 +315,27 @@ void set_file ( void *file, int Index )
 }
 
 
+
+int fs_initialize_dev_dir(void)
+{
+    int i=0;
+
+// Clear the list
+    for(i=0; i<32; i++)
+    {
+        dev_dir[i].used = FALSE;
+        dev_dir[i].magic = FALSE;
+        dev_dir[i].initialized = FALSE;
+        
+        dev_dir[i].path[0] = 0;
+        
+        dev_dir[i].fp = NULL;
+    };
+
+    return 0;
+}
+
+
 // fsInit:
 // Called by init() in init.c
 int fsInit (void)
@@ -339,6 +360,10 @@ int fsInit (void)
 
     // #todo
     fat16Init();
+
+
+// Init dev/ dir.
+    fs_initialize_dev_dir();
 
 //
 // == fileList =========================
@@ -3944,7 +3969,6 @@ sys_read_file_from_disk (
 
     debug_print ("sys_read_file_from_disk: $\n");
 
-
     pid_t current_process = (pid_t) get_current_process();
 
     if ( (void*) file_name == NULL )
@@ -4081,8 +4105,8 @@ __OK:
         return (int) (-1);
     }
  
-    // Struct
-    
+// File struct
+
     __file = (file *) kmalloc( sizeof(file) );
     
     if ( (void *) __file == NULL ){
@@ -4134,7 +4158,10 @@ __OK:
     __file->_w = 0;
     __file->_cnt = BUFSIZ;  // anda temos bastante espaço. todo o buffer
 
+// #
+// This is gonna be the return value.
     __file->_file = __slot;
+
     __file->fd_counter = 1; //inicializando. 
 
 // #todo
@@ -4156,7 +4183,8 @@ __OK:
 
     __file->_base = (char *) kmalloc(BUFSIZ);
     
-    if ( (void *) __file->_base == NULL ){
+    if ( (void *) __file->_base == NULL )
+    {
         printf ("sys_read_file_from_disk: buffer fail\n");
         refresh_screen();
         return -1;
@@ -4243,7 +4271,6 @@ __OK:
 // Pointer.
     __file->_p = __file->_base;
 
-
 // Offsets
 // Atualizando os offsets que foram apenas inicializados.
 
@@ -4253,7 +4280,6 @@ __OK:
     // o ponteiro de escrita mudou pois escrevemos um 
     // arquivo inteiro no buffer.
     __file->_w = FileSize;
-
 
     if( FileSize >= BUFSIZ )
     {
@@ -4267,21 +4293,20 @@ __OK:
     __file->_cnt = ( BUFSIZ - FileSize );
 
 
-//
 // Load.
-//
-
-// Carrega o arquivo na memória.
+// Load the file into the memory.
  
-    Status = (int) fsLoadFile ( 
-                       VOLUME1_FAT_ADDRESS, 
-                       VOLUME1_ROOTDIR_ADDRESS, 
-                       FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
-                       file_name, 
-                       (unsigned long) __file->_base,
-                       __file->_lbfsize );
+    Status = 
+        (int) fsLoadFile ( 
+                  VOLUME1_FAT_ADDRESS, 
+                  VOLUME1_ROOTDIR_ADDRESS, 
+                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
+                  file_name, 
+                  (unsigned long) __file->_base,
+                  __file->_lbfsize );
 
-    if ( Status != 0 ){
+    if ( Status != 0 )
+    {
         printf ("sys_read_file_from_disk: fsLoadFile fail\n");
         refresh_screen();
         return -1;
@@ -4370,7 +4395,6 @@ __OK:
     p->Objects[__slot] = (unsigned long) __file;
 
 
-
     //#debug
     //printf ("process name: %s\n",p->__processname);
     //printf ("fd %d\n",__file->_file);
@@ -4413,31 +4437,34 @@ int sys_create_empty_file ( char *file_name )
         return (int) (-EINVAL);
     }
 
-
     fs_fntos ( (char *) file_name );
 
-    // 0x20 = file.
-    // See: write.c
-    __ret = (int) fsSaveFile ( 
-                      VOLUME1_FAT_ADDRESS, 
-                      VOLUME1_ROOTDIR_ADDRESS, 
-                      FAT16_ROOT_ENTRIES,
-                      (char *)         file_name,
-                      (unsigned long)  number_of_sectors, 
-                      (unsigned long)  size_in_bytes,  
-                      (char *)         &buffer[0], 
-                      (char)           0x20 ); 
 
-    if (__ret<0){
+// 0x20 = file.
+// See: write.c
+    __ret = 
+        (int) fsSaveFile ( 
+                  VOLUME1_FAT_ADDRESS, 
+                  VOLUME1_ROOTDIR_ADDRESS, 
+                  FAT16_ROOT_ENTRIES,
+                  (char *)         file_name,
+                  (unsigned long)  number_of_sectors, 
+                  (unsigned long)  size_in_bytes,  
+                  (char *)         &buffer[0], 
+                  (char)           0x20 ); 
+
+    if (__ret<0)
+    {
         debug_print("sys_create_empty_file: fail\n");
         return -1;
     }
-    
-    // #todo
-    // the file structure.
+
+// #todo
+// the file structure.
 
     return (int) __ret;
 }
+
 
 // ================================
 // Service 44
@@ -4470,22 +4497,27 @@ int sys_create_empty_directory ( char *dir_name )
     fs_fntos ( (char *) dir_name );
 
 
-     // See: write.c
-     // 0x10 = directory. 
-    __ret = (int) fsSaveFile ( 
-                      VOLUME1_FAT_ADDRESS, 
-                      VOLUME1_ROOTDIR_ADDRESS, 
-                      FAT16_ROOT_ENTRIES,
-                      (char *)         dir_name,
-                      (unsigned long)  number_of_sectors, 
-                      (unsigned long)  size_in_bytes, 
-                      (char *)         &buffer[0], 
-                      (char)           0x10 ); 
+// See: write.c
+// 0x10 = directory. 
+    __ret = 
+        (int) fsSaveFile ( 
+                  VOLUME1_FAT_ADDRESS, 
+                  VOLUME1_ROOTDIR_ADDRESS, 
+                  FAT16_ROOT_ENTRIES,
+                  (char *)         dir_name,
+                  (unsigned long)  number_of_sectors, 
+                  (unsigned long)  size_in_bytes, 
+                  (char *)         &buffer[0], 
+                  (char)           0x10 ); 
 
-    if (__ret<0){
+    if (__ret<0)
+    {
         debug_print("sys_create_empty_directory: fail\n");
         return -1;
     }
+
+// #todo
+// the file structure.
 
     return (int) __ret;
 }
@@ -4530,14 +4562,12 @@ void *get_global_open_file (int Index){
     return (void *) file_table[Index];
 }
 
+
 /*
- *****************************
  *  sys_cd_command:
  * 
  */
-
 // Service 175. cd command.
-
 // #todo
 // ou usamos o cwd do processo ou
 // o diretorio raiz para paths absolutos.
@@ -4717,13 +4747,14 @@ __found:
         panic("fs_load_image: image_va\n");
     }
 
-    Status = (int) fsLoadFile ( 
-                       VOLUME1_FAT_ADDRESS, 
-                       (unsigned long) dir_va,  //#bugbug: This is only for the root dir.
-                       (unsigned long) dir_entries,  //#bugbug: Number of entries. 
-                       name, 
-                       (unsigned long) image_va,
-                       BUGBUG_IMAGE_SIZE_LIMIT );
+    Status = 
+        (int) fsLoadFile ( 
+                  VOLUME1_FAT_ADDRESS, 
+                  (unsigned long) dir_va,       //#bugbug: This is only for the root dir.
+                  (unsigned long) dir_entries,  //#bugbug: Number of entries. 
+                  name, 
+                  (unsigned long) image_va,
+                  BUGBUG_IMAGE_SIZE_LIMIT );
 
 // ok?
     return (int) Status;

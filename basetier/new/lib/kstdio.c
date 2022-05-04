@@ -1447,17 +1447,21 @@ void __initialize_stdin(void)
 // pega slot em file_table[] para stdin
 
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("__initialize_stdin: file slot");
+    if ( slot < 0 || 
+         slot >= NUMBER_OF_FILES )
+    {
+        x_panic("__initialize_stdin: slot");
     }
     stdin = (file *) file_table[slot];
+
+    if ( (void*) stdin == NULL ){
+        x_panic("__initialize_stdin: stdin");
+    }
+    
     stdin->filetable_index = slot;
 
-//
 // fd
-//
-
-    stdin->_file = 0;
+    stdin->_file = STDIN_FILENO;  //0;
 
 // This is a regular file.
     stdin->____object = ObjectTypeFile;
@@ -1472,13 +1476,10 @@ void __initialize_stdin(void)
     stdin->_flags = (__SWR | __SRD); 
 
 
-//
 // #bugbug
-//
-
 // Esse buffer está sendo usado pelo console.
 
-    stdin->_base     = &prompt[0];    //See: include/kernel/stdio.h
+    stdin->_base     = &prompt[0];    //See: kstdio.h
     stdin->_p        = &prompt[0];
     stdin->_bf._base = stdin->_base;
     stdin->_lbfsize = PROMPT_SIZE; //128; //#todo
@@ -1520,22 +1521,27 @@ void __initialize_stdout(void)
 // pega slot em file_table[] para stdout
 
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES){
-        x_panic("__initialize_stdout: slot\n");
+    if( slot < 0 || 
+        slot >= NUMBER_OF_FILES )
+    {
+        x_panic("__initialize_stdout: slot");
     }
     stdout = (file *) file_table[slot];
+
+    if ( (void*) stdout == NULL ){
+        x_panic("__initialize_stdout: stdout");
+    }
+
     stdout->filetable_index = slot;
 
-//
 // fd
-//
-
-    stdout->_file = 1;
+    stdout->_file = STDOUT_FILENO;  //1;
 
 // This is a virtual console.
 // Configurando a estrutura de stdout.
 // This is a virtual console device. Used to output
 // directly into the virtual console.
+// It is a device.
 
     stdout->____object = ObjectTypeVirtualConsole; 
 
@@ -1547,7 +1553,7 @@ void __initialize_stdout(void)
     stdout->sync.can_accept  = FALSE;
     stdout->sync.can_connect = FALSE;
     stdout->_flags = (__SWR | __SRD); 
-    stdout->_base     = &prompt_out[0];  //See: include/kernel/stdio.h
+    stdout->_base     = &prompt_out[0];  //See: kstdio.h
     stdout->_p        = &prompt_out[0];
     stdout->_bf._base = stdout->_base;
     stdout->_lbfsize  = PROMPT_SIZE; //128; //#todo
@@ -1589,17 +1595,21 @@ void __initialize_stderr(void)
 // pega slot em file_table[] para stderr
 
     slot = get_free_slots_in_the_file_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES){
+    if( slot < 0 || 
+        slot >= NUMBER_OF_FILES )
+    {
         x_panic("__initialize_stderr: slot");
     }
     stderr = (file *) file_table[slot];
+
+    if ( (void*) stderr == NULL ){
+        x_panic("__initialize_stderr: stderr");
+    }
+
     stderr->filetable_index = slot;
 
-//
 // fd
-//
-
-    stderr->_file = 2;
+    stderr->_file = STDERR_FILENO;  //2;
 
 // This is a regular file.
     stderr->____object = ObjectTypeFile;
@@ -1612,7 +1622,7 @@ void __initialize_stderr(void)
     stderr->sync.can_accept  = FALSE;
     stderr->sync.can_connect = FALSE;
     stderr->_flags = (__SWR | __SRD); 
-    stderr->_base     = &prompt_err[0];  //See: include/kernel/stdio.h
+    stderr->_base     = &prompt_err[0];  //See: kstdio.h
     stderr->_p        = &prompt_err[0];
     stderr->_bf._base = stderr->_base;
     stderr->_lbfsize  = PROMPT_SIZE; //128; //#todo
@@ -1669,22 +1679,25 @@ void __clear_prompt_buffers(void)
 
 
 // local
+// Create n files and put the pointer into the
+// file table.
 void __initialize_file_table(void)
 {
     file *tmp;
     int i=0;
 
-// file table
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
-        tmp = (void*) kmalloc (sizeof(file));
-        if ((void*)tmp==NULL){
+        tmp = (void*) kmalloc(sizeof(file));
+        
+        if ((void*)tmp==NULL)
+        {
            x_panic("__initialize_file_table: tmp\n");
         }
         memset( tmp, 0, sizeof(struct file_d) );
 
-        tmp->____object = ObjectTypeFile; //Regular file
-        tmp->_flags = 0; // (__SWR | __SRD); 
+        tmp->____object = ObjectTypeFile;  // Regular file.
+        tmp->_flags = 0;                   // (__SWR | __SRD); 
         tmp->fd_counter = 0;
         tmp->_tmpfname = NULL;
         //...
@@ -1699,12 +1712,12 @@ void __initialize_file_table(void)
 
 
 // local
+// Create n inodes and put the pointers
+// into the inode table.
 void __initialize_inode_table(void)
 {
     struct inode_d *tmp_inode;    
     int i=0;
-
-// inode table
 
     for (i=0; i<32; i++)
     {

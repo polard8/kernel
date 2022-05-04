@@ -521,7 +521,6 @@ pciCheckVendor (
 
 
 /*
- ***************************************
  * init_pci:
  *     Inicializa o módulo PCI em Kernel Mode, dentro do Kernel Base. 
  * todo: 
@@ -640,7 +639,6 @@ irq_SHARED3 (void)
 
 
 /*
- ********************************
  * pciHandleDevice
  *    Registra um dispositivo encontrado na sondagem. 
  *    Inicializa em alguns casos.
@@ -945,45 +943,43 @@ pciHandleDevice (
 // Ele precisa de um arquivo 'file'.
 
     file *__file;
-    
+
     __file = (file *) kmalloc ( sizeof(file) );
-    
-    if ( (void *) __file == NULL ){
+
+    if ( (void *) __file == NULL )
+    {
         panic("pciHandleDevice: __file\n");
-    }else{
+    }
 
-        memset( __file, 0, sizeof(struct file_d) );
-        
-        __file->used  = TRUE;
-        __file->magic = 1234;
-        __file->isDevice = TRUE;
 
-        //debug_print("pciHandleDevice: #todo Call devmgr_register_device()\n");
-        
-        // Register
+    memset( __file, 0, sizeof(struct file_d) );
 
-        // #importante
-        // Essa é a tabela de montagem de dispositivos.
-        // O nome do dispositivo deve ser um pathname.
-        // Mas podemos ter mais de um nome.
-        // vamos criar uma string aqui usando sprint e depois duplicala.
-     
-        // IN:
-        // file structure, device name, class (char,block,network).
-        // type (pci, legacy), pci device structure, tty driver struct.
- 
-        devmgr_register_device ( 
-            (file *) __file, 
-            newname, 
-            __class, 
-            1, 
-            (struct pci_device_d *) D,   // <<<< The PCI device.
-            NULL );
-        
-    };
+    __file->used = TRUE;
+    __file->magic = 1234;
+
+    __file->isDevice = TRUE;
+
+    //debug_print("pciHandleDevice: #todo Call devmgr_register_device()\n");
+
+// Register
+// #importante
+// Essa é a tabela de montagem de dispositivos.
+// O nome do dispositivo deve ser um pathname.
+// Mas podemos ter mais de um nome.
+// vamos criar uma string aqui usando sprint e depois duplicala.
+
+// IN:
+// file structure, device name, class (char,block,network).
+// type (pci, legacy), pci device structure, tty driver struct.
+
+    devmgr_register_device ( 
+        (file *) __file, 
+        newname, 
+        __class, 
+        1, 
+        (struct pci_device_d *) D,   // <<<< The PCI device.
+        NULL );
 
     return 0;
 }
-
-
 

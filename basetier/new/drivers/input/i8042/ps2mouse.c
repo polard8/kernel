@@ -372,6 +372,9 @@ int __get_device_id(void)
 0xE6 Set Scaling 1:1Linear mode
 */
 
+// #todo: 
+// We need a file structure and the function ps2mouse_ioctl();
+
 void ps2mouse_initialize_device (void)
 {
     unsigned char status=0;

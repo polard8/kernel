@@ -6,7 +6,8 @@
 
 #include <kernel.h>
 
-
+// #todo: 
+// We need a file structure and the function ps2kbd_ioctl();
 void ps2kbd_initialize_device (void)
 {
     debug_print ("ps2kbd_initialize_device:\n");

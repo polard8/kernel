@@ -5,6 +5,32 @@
 #define ____FS_H    1
 
 
+// The dev/ directory entry.
+struct dev_dir_entry_d
+{
+    int used;
+    int magic;
+
+    int id;
+
+    int initialized;
+
+// ex:
+// "/DEV/DEV1"
+    char path[64];
+    int path_size;
+    
+    file *fp;
+};
+
+struct dev_dir_entry_d  dev_dir[32];
+
+int fs_initialize_dev_dir(void);
+
+// =================
+
+
+
 struct directory_facility_d
 {
     unsigned long dir_address;  // va?
@@ -31,7 +57,7 @@ struct directory_facility_d directory_facility_usersDir;
 // == pwd =============================
 //
 
-// See: landos/kernel/include/rtl/fs/path.h
+// See: path.h
 // A string do diretório de trabalho.
 
 

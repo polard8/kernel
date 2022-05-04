@@ -2327,6 +2327,95 @@ int sys_ioctl ( int fd, unsigned long request, unsigned long arg )
 }
 
 
+// Get the device number in the dev_dir[] list
+// given the pathname.
+// ex: "/DEV/DEV1"
+
+int sys_get_device_number_by_path( char *path )
+{
+   return -1;
+}
+
+
+
+// #test
+// #todo
+// Precisamos uma syscall para esse serviço.
+// Open device by number.
+// Index in the dev_dir[] list.
+// Incluir o ponteiro para arquivo na lista 
+// de arquivos abertos do processo atual.
+// See: sys.h
+
+int sys_open_device_by_number(int device_index)
+{
+    struct process_d *p;
+    file *fp;
+    int __slot=0;
+
+    int i = device_index;
+
+    if (i<0 || i>=32)
+    {
+        return (int) (-EINVAL);
+    }
+
+    if(dev_dir[i].magic != 1234)
+        return (int) -1;
+
+    if(dev_dir[i].initialized != TRUE)
+        return (int) -1;
+
+// get file pointer.
+    fp = (file*) dev_dir[i].fp;
+    
+    if( (void*) fp == NULL )
+        return (int) -1;
+
+// put the pointer into the list.
+
+    pid_t current_process = (pid_t) get_current_process();
+
+    p = (struct process_d *) processList[current_process];
+
+    if ( (void *) p == NULL )
+    {
+        debug_print ("sys_open_device_by_number: p\n");
+        return -1;
+    }
+
+    if ( p->used != TRUE || p->magic != 1234 ){
+        debug_print ("sys_open_device_by_number: validation\n");
+        return -1;
+    }
+
+// Procurando um slot livre.
+    for (__slot=0; __slot<32; __slot++)
+    {
+         if ( p->Objects[__slot] == 0 ){ goto __OK; }
+    };
+
+// fail
+    panic ("sys_open_device_by_number: No slots!\n");
+
+// Slot found.
+__OK:
+
+    if ( __slot < 0 || __slot >= 32 )
+    {
+        printf ("sys_open_device_by_number: Slot fail\n");
+        refresh_screen();
+        return (int) (-1);
+    }
+
+// save
+    p->Objects[__slot] = (unsigned long) fp;
+
+// return fd.
+    return (int) __slot;
+}
+
+
 //#??? isso não pertence à fcntl.c ?
 //SVr4,  4.3BSD,  POSIX.1-2001. 
 
@@ -2362,6 +2451,42 @@ sys_open (
 
     debug_print ("sys_open: $ \n");
 
+
+// #todo
+// primeiro vamos checar se o arquivo 
+// tem seu pathname registrado na tabela de dispositivos
+// do diretorio dev/
+// See: fs.h
+
+    //#todo
+    //Se encontrarmos uma entrada correspondente ao pathname,
+    //então deve retornar o ponteiro para um arquivo,
+    //então colocaremos esse ponteiro em uma entrada da lista de
+    //arquivos abertos do processo.
+
+    //fs_search_pathname_in_dev_dir(pathname);
+
+// Searth for a device associated with this path
+// in the deviceList[]
+// See: devmgr.c
+
+    file *dev_fp;
+    dev_fp = (file *) devmgr_search_in_dev_list(pathname);
+
+    if( (void*) dev_fp != NULL )
+    {
+        if(dev_fp->isDevice == TRUE )
+        {
+            // #todo 
+            // Put it into the list inside the
+            // current process structure
+            // and return the fd.
+            
+        }
+    }
+
+
+// Vamos carregar o arquivo que esta no disco.
 // See: fs.c
 // OUT: fd
 

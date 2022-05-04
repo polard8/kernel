@@ -128,6 +128,8 @@ struct volume_d
     object_type_t  objectType;
     object_class_t objectClass;
 
+    //file *fp;
+
     volume_type_t   volumeType;
     volume_class_t  volumeClass;
     

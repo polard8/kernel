@@ -3,6 +3,56 @@
 #include <kernel.h>  
 
 
+// Search a neme into the list.
+// Used by sys_open();
+// OUT: 
+// fp or NULL
+
+file *devmgr_search_in_dev_list( char *path )
+{
+// #todo
+// Só podemos chamar isso se a lista ja estiver inicializada.
+// precisamos de uma flag.
+
+    int i=0;
+    struct device_d *tmp_dev;
+
+    if( (void*) path == NULL )
+        return NULL;
+
+    size_t path_size = strlen(path);
+
+    if(path_size>=64)
+        return NULL;
+
+    for (i=0; i<DEVICE_LIST_MAX; i++)
+    {
+        tmp_dev = (struct device_d *) deviceList[i];
+    
+        // is it a valid device?
+        if( (void*) tmp_dev != NULL )
+        {
+            // is it a valid structure
+            if( tmp_dev->magic == 1234 )
+            {
+                if( (void*) tmp_dev->mount_point != NULL )
+                {
+                    if( strncmp( tmp_dev->mount_point, path, path_size ) == 0 )
+                    {
+                        printf ("test: device found in the list\n");
+                        refresh_screen();
+                        
+                        return (file *) tmp_dev->__file;
+                    }
+                }
+            }
+        }
+    };
+
+    return NULL;
+}
+
+
 // Initialize the list.
 int devmgr_init_device_list(void)
 {
@@ -19,6 +69,8 @@ int devmgr_init_device_list(void)
     
     return 0;
 }
+
+
 
 // Show device list.
 void devmgr_show_device_list(void)
@@ -148,6 +200,14 @@ struct device_d *devmgr_device_object (void){
 // This is called by pciHandleDevice() in pci.c to register
 // every found device and for the ps2 devices initialization.
 // The pcidevice argument is null in this case.
+
+// #todo
+// #bugbug
+// Essa rotina tem um parametro para ponteiro de estrutura
+// de dispositivo pci.
+// #todo: precisamos de uma rotina similar, para registrar
+// qualquer tipo de dispositivo e associar um arquivo
+// a ele.
 
 int 
 devmgr_register_device ( 

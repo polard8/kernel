@@ -448,7 +448,9 @@ console_interrupt(
 }
 
 
-// Initializ virtual console.
+// Initializar virtual console.
+// Inicializa a estrutura de console virtual
+// configura uma entrada no diretorio dev/
 void console_init_virtual_console (int n)
 {
     int ConsoleIndex = -1;
@@ -1275,6 +1277,9 @@ void __test_process(void)
 }
 
 
+//#test
+//Creating a ring0 thread.
+//#bugbug: We're having problems with ring0 context swtitching.
 void __test_thread(void)
 {
     struct thread_d *t;
@@ -1348,6 +1353,14 @@ int consoleCompareStrings(void)
         printf("disk: Show ide info:\n");
         //show_ide_info();
         ata_show_device_list_info();
+        goto exit_cmp;
+    }
+
+
+// device list
+    if( strncmp(prompt,"device",6) == 0 )
+    {
+        devmgr_show_device_list();
         goto exit_cmp;
     }
 

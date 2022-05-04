@@ -180,15 +180,8 @@ struct fat_d  *bootvolume_fat;
 // == prototypes ==========================================
 //
 
-void 
-from_FAT_name (
-    char *src, 
-    char *dst );
-
-void 
-to_FAT_name (
-    char *src,
-    char *dst );
+void from_FAT_name( char *src, char *dst );
+void to_FAT_name( char *src, char *dst );
 
 #endif    
 

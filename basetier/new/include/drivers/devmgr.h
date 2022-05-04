@@ -21,7 +21,6 @@ struct device_d
     object_type_t  objectType;
     object_class_t objectClass;
 
-
     int index;
     int used;
     int magic;
@@ -177,6 +176,8 @@ struct ttydrv_d *PS2MouseDeviceTTYDriver;
 //
 // == prototypes ========================================
 //
+
+file *devmgr_search_in_dev_list( char *path );
 
 int devmgr_init_device_list(void);
 void devmgr_show_device_list(void);

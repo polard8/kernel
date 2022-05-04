@@ -83,6 +83,8 @@ struct ps2_mouse_d
     object_type_t  objectType;
     object_class_t objectClass;
 
+    file *fp;
+
     int device_id;
 
     int initialized;

@@ -3,7 +3,7 @@
 
 #include <kernel.h>    
 
-
+// global
 unsigned long sys_time_hz=0;
 
 

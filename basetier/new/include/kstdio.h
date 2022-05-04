@@ -470,10 +470,8 @@ struct file_d
 
     int iopl;
 
-    // dead line discipline    
-    // #todo: delete?
-    // não é usado ...
 
+    // #deprecated
     //int (*_close) __P((void *));
     //int (*_read)  __P((void *, char *, int));
     //fpos_t (*_seek)  __P((void *, fpos_t, int));
@@ -483,17 +481,23 @@ struct file_d
 // == device ============
 //
 
-    // 1= is a device; 0= is a file.
-    // Se � um dispositivo ou n�o.
-    // Se for um dispositivo ent�o o dispositivo ter�
-    // na lista deviceList[] 
+// TRUE = Yes, it is a device.
+// Se for um dispositivo, então a estrutura abaixo deve ser usada.
+// #todo: change to 'is_device'
 
     int isDevice;
 
-    // indice na lista deviceList[]
+// Índice na lista deviceList[]
+// #bugbug: Esse indice deve estar contido na
+// estrutura apontada logo abaixo.
 
-    int deviceId;  
-    
+    int deviceId;
+
+// #importante
+// A estrutura do dispositivo associado à esse arquivo.
+// Abrindo esse arquivo, se ele for um objeto do tipo
+// dispositivo, ent~ao io_control vai poder configura-lo
+
     struct device_d  *device;
 };
 

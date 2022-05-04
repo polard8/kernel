@@ -1,12 +1,10 @@
 
 // video.c
+
 // Rotinas paga gerenciar os controladores de video.
 // Crt, Vga ...
-
-
 // See:
 // https://wiki.osdev.org/Accelerated_Graphic_Cards
-
 // # importante
 // Essa deve ser a única maneira em que o sistema acessa
 // o controlador de vídeo.
@@ -67,13 +65,6 @@ See:
 //extern unsigned long SavedY;            //Screen height.
 //extern unsigned long SavedBPP;          //Bits per pixel.
 
-//
-// Variáveis internas.
-//
-
-int videoStatus;
-int videoError;
-//...
 
 // LFB - Esse é o endereço usado pelo driver de vídeo em /x
 // para acessar o LFB, ou seja o frontbuffer.
@@ -85,16 +76,33 @@ int videoError;
 // #importante: Esse driver poderá ser diferente para
 // cada modelo de placa de vídeo.
 
-//#todo: Use static.
-unsigned long __frontbuffer_va;
-unsigned long __frontbuffer_pa;  
 
-//cga
-unsigned long __cga_va;
-unsigned long __cga_pa;  
+// private:
+// We gotta build methods to get these values
+// from outside.
+
+static unsigned long __frontbuffer_va=0;
+static unsigned long __frontbuffer_pa=0;
+static unsigned long __cga_va=0;
+static unsigned long __cga_pa=0;
+
+//
+// == Private functions: Prototypes ========
+//
+
+static int __videoVideo(void);
+static int __videoInit(void);
+
+// ===============
+
+static int __videoVideo(void)
+{
+    // ??
+    return 0;
+}
 
 
-int videoInit (void)
+static int __videoInit(void)
 {
     int Status=0;
 
@@ -104,7 +112,7 @@ int videoInit (void)
         // Can we use the function?
         // No we can't
         //panic("videoInit:\n");
-        debug_print("videoInit:\n");
+        debug_print("__videoInit:\n");
         asm ("cli \n");
         while(1){ asm("hlt"); }
     }
@@ -152,26 +160,17 @@ int videoInit (void)
 }
 
 
-int videoVideo(void)
-{
-    videoStatus = 0;
-    videoError = 0;
-    //...
-    return 0;
-}
-
-
 int Video_initialize(void)
 {
     //debug_print ("Video_initialize: [TODO]\n");
     
     g_driver_video_initialized = FALSE;
-    videoVideo();
-    videoInit();
+    __videoVideo();
+    __videoInit();
     // ...
     g_driver_video_initialized = TRUE;
     return 0;
-}    
+}
 
 
 /*

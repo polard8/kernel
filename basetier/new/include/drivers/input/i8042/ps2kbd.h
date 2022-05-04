@@ -135,7 +135,9 @@ struct ps2_keyboard_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-    
+
+    file *fp;
+
     keyboard_type_t type;
 
     int initialized;

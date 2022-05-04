@@ -67,6 +67,9 @@ int sys_initialize_component (int n);
 
 int sys_ioctl ( int fd, unsigned long request, unsigned long arg );
 
+int sys_get_device_number_by_path( char *path );
+int sys_open_device_by_number(int device_index);
+
 int 
 sys_open (
     const char *pathname, 

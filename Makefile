@@ -7,7 +7,7 @@ EDITION_NAME  = Angels
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 4
-VERSION_BUILD = 286
+VERSION_BUILD = 287
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
@@ -189,6 +189,7 @@ presentation-tier:
 	-sudo cp ../gws/bin/EDITOR.BIN    basetier/disk/
 	-sudo cp ../gws/bin/FILEMAN.BIN   basetier/disk/
 	-sudo cp ../gws/bin/BROWSER.BIN   basetier/disk/
+	-sudo cp ../gws/bin/CMDLINE.BIN   basetier/disk/
 
 
 # ::Building userland commands.

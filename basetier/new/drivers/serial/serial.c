@@ -1,4 +1,5 @@
 
+// serial.c
 
 
 #include <kernel.h>
@@ -28,15 +29,14 @@ void serial4_handler (void)
 //=====================================
 unsigned int serial_in(unsigned int base, int offset)
 {
-    return (unsigned int) in8 (base + offset);
+    return (unsigned int) in8(base + offset);
 }
 
 void serial_out(unsigned int base, int offset, int value)
 {
-    out8 (value, base + offset);
+    out8(value, base + offset);
 }
 //====================================
-
 
 
 
@@ -48,9 +48,9 @@ int serial_init_port ( uint16_t port )
     
     PortBase = (int) port;
 
+// Se não é alguma das bases possiveis.
+// #todo: Existem máquinas com mais do que 4 portas seriais?
 
-    // Se não é alguma das bases possiveis.
-    // #todo: Existem máquinas com mais do que 4 portas seriais?
     if ( PortBase != COM1_PORT &&
          PortBase != COM2_PORT &&
          PortBase != COM3_PORT &&
@@ -65,7 +65,7 @@ int serial_init_port ( uint16_t port )
     }
 
 
-    // Disable all interrupts
+// Disable all interrupts
     out8 (PortBase + 1, 0x00);  
     
     // Set baud rate.
@@ -92,11 +92,11 @@ int serial_init_port ( uint16_t port )
     // #define LCR  3
     // See: serial.h
     // credits: https://wiki.osdev.org/Serial_Ports
-   
-    // Enable DLAB (set baud rate divisor)
+
+// Enable DLAB (set baud rate divisor)
     out8 (PortBase + LCR, 0x80);  
 
-    // Set divisor to 3 (lo byte) 38400 baud (hi byte)
+// Set divisor to 3 (lo byte) 38400 baud (hi byte)
     out8 (PortBase + 0, 0x03);  
     out8 (PortBase + 1, 0x00);
     
@@ -121,19 +121,16 @@ int serial_init_port ( uint16_t port )
     return 0;
 }
 
+
 /*
- ******************
  * serial_init:
  * 
  */
- 
 // inicializa todas as portas.
-
 // #IMPORTANT:
 // We can't use debug in this first initialization.
 // We can't use serial debug. It's because the serial port support
 // is not working yet. :)
-
 // # We don't have debug messages in this routine.
 
 int serial_init (void)
@@ -184,12 +181,15 @@ int serial_init (void)
 char serial_read_char (unsigned int port) 
 {
 
-    // #todo
-    // Check the port validation.
+// #todo
+// Check the port validation.
 
-    while (( in8(port + 5) & 1 ) == 0);
+    while ( ( in8(port + 5) & 1 ) == 0 )
+    {
+        // Nothing
+    };
 
-    return (char) in8 (port);
+    return (char) in8(port);
 }
 
 
@@ -200,21 +200,28 @@ char serial_read_char (unsigned int port)
 
 void serial_write_char (unsigned int port, char data) 
 {
-    // #todo
-    // Check the port validation.
 
-    while (( in8(port + 5) & 0x20 ) == 0);
+// #todo
+// Check the port validation.
+
+    while (( in8(port + 5) & 0x20 ) == 0)
+    {
+        // Nothing
+    };
 
     out8 (port, data);
 }
 
+
+// Print string
+// IN: port, string pointer.
 void serial_print (unsigned int port, char *data )
 {
     register int i=0;
 
-    // #todo
-    // Check the port validation.
-    
+// #todo
+// Check the port validation.
+
     for ( i=0; data[i] != '\0'; i++ )
     {
         serial_write_char ( port ,data[i] );
@@ -232,6 +239,7 @@ void debug_print_string ( char *data )
     };
 }
 
+
 // #todo
 // We need a ioctl for serial devices.
 int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
@@ -239,15 +247,6 @@ int serial_ioctl ( int fd, unsigned long request, unsigned long arg )
     debug_print("serial_ioctl: [TODO]\n");
     return -1;
 }
-
-
-
-
-
-
-
-
-
 
 
 

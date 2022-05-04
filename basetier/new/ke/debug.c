@@ -7,8 +7,10 @@
 extern unsigned long gInitializationPhase;
 
 
+// private
 static int __using_serial_debug = FALSE;
 
+// ==============================
 
 int is_using_serial_debug(void)
 {
@@ -156,6 +158,7 @@ fail:
     return -1;
 }
 
+
 /*
  * debug_check_drivers:
  *    Checar se os drivers estão inicializados.
@@ -205,21 +208,19 @@ int debug_check_drivers (void)
 
 
 /*
- ****************************************
  * debug:
  *     Checa por falhas depois de cumpridas as 
  *     três fases de inicialização.
  */
-
 // #bugbug
 // Será que o output está realmente disponível nesse momento ?!
 
-int debug (void){
-
+int debug (void)
+{
     int Status = -1; 
 
-    // Checa inicialização. 
-    // Fases, variáveis e estruturas.
+// Checa inicialização. 
+// Fases, variáveis e estruturas.
 
     Status = (int) debug_check_inicialization();
 

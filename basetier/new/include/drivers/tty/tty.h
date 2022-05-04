@@ -169,17 +169,19 @@ struct tty_queue
 
 struct tty_d
 {
-
-//
-// == Identification =============
-//
     object_type_t  objectType;
     object_class_t objectClass;
-    
+
+// The pipe fd, the socket fd, the read write operation.
+// #todo: use 'fp'.
+
+    file *_fp;    
+
 // In the TTYs table?
-    int index;
     int used;
     int magic;
+
+    int index;
 
 // tty name
     char name[64];      // 
@@ -241,10 +243,6 @@ struct tty_d
 //
 // == (3) transmition ========
 //
-
-// The pipe fd, the socket fd, the read write operation.
-
-    file *_fp;    
 
 //linked socket?
     struct tty_d *link;
@@ -373,16 +371,8 @@ extern int fg_console;
 #define CONSOLETTYS_COUNT_MAX    4
 //#define CONSOLETTYS_COUNT_MAX    8
 
-
-// #importante:
-// #todo
-// #bugbug
-// Aqui no Gramado X, funcionou sem 'static' e não funcionou com 'static'.
-// Talvez devamos usar sem o 'static', assim como fazemos em outros
-// modulos do kernel base.
-
 //static struct tty_d CONSOLE_TTYS[8];
-struct tty_d CONSOLE_TTYS[8];
+struct tty_d  CONSOLE_TTYS[8];
 
 
 // == prototypes ===============================================
@@ -412,10 +402,8 @@ tty_write (
     char *buffer, 
     int n );
 
-
 void tty_reset_termios ( struct tty_d *tty );
 struct tty_d *tty_create(void);
-
 
 struct tty_d *file_tty (file *f);
 int tty_delete ( struct tty_d *tty );
@@ -436,13 +424,11 @@ tty_sets (
 
 int tty_init_module (void);
 
-
 int 
 tty_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg );
-
 
 
 #endif    

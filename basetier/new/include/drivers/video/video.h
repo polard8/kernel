@@ -77,8 +77,6 @@ typedef struct _vbeInfoBlock {
 #define __VIDEO_H    1
 
 
-int videoInit (void);
-int videoVideo(void);
 int Video_initialize(void);
 
 unsigned long videoGetMode (void);

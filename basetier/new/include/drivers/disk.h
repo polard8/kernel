@@ -234,6 +234,8 @@ struct disk_d
     object_type_t  objectType;
     object_class_t objectClass;
 
+    file *fp;
+
 // Structure validation
     int used;
     int magic;
