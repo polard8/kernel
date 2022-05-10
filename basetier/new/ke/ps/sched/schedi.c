@@ -19,43 +19,50 @@
  *    + Quando uma tarefa está rodando à dois valores 
  * acima da sua prioridade, volta a prioridade para a 
  * sua prioridade básica e executa.
- *
- * @todo: 
- *     Essa rotina deve ter retorno do tipo 'int'.
  */
 
-int KiScheduler (void){
-    
-	// ?? Quem está chamando ? Filtros ?
-    // @todo: Talvez haja mais casos onde não se deva trocar a tarefa.
+// OUT: next tid.
+tid_t KiScheduler(void)
+{
 
-	//#bugbug 
-	//Porque retornamos 0 ???
-	//Scheduler Status. (LOCKED, UNLOCKED).
+// #bugbug
+// Quem está chamando? 
+// Filtros?
+// #todo: 
+// Talvez haja mais casos onde não se deva trocar a tarefa.
 
+//#bugbug 
+//Porque retornamos 0 ???
+//Scheduler Status. (LOCKED, UNLOCKED).
 
-    if (g_scheduler_status == LOCKED){
+    if (g_scheduler_status == LOCKED)
+    {
         debug_print ("KiScheduler: Locked $\n");
-        return 0;
+        
+
+        // #bugbug
+        // Why are we returning tid 0?
+        
+        //return 0;
+        return -1;  //error
     }
 
-//
 // Check idle
-//
 
     if ( (void *) ____IDLE == NULL ){
         panic ("KiScheduler: ____IDLE fail");
     }
-
     if ( ____IDLE->used != TRUE || ____IDLE->magic != 1234 )
     {
         panic ("KiScheduler: ____IDLE validation");
     }
 
+    if ( UPProcessorBlock.threads_counter == 0 )
+        panic("KiScheduler: UPProcessorBlock.threads_counter == 0");
 
-	// Retornaremos se tivermos apenas um thread rodando.
-	// Pois não há o que trocar.
-	//Se só temos uma então devemos retornar a idle.
+// Retornaremos se tivermos apenas um thread rodando.
+// Pois não há o que trocar.
+// Se só temos uma então devemos retornar a idle.
 
     //if ( ProcessorBlock.threads_counter == 1 )
     if ( UPProcessorBlock.threads_counter == 1 )
@@ -69,21 +76,19 @@ int KiScheduler (void){
         
         current_thread = ____IDLE->tid;
         debug_print("schedi: ____IDLE $\n");
-        return (int) current_thread;
+        
+        // Return tid.
+        return (tid_t) current_thread;
     }
 
-
-//
 // Scheduler
-//
+// Return tid.
 
-    return (int) scheduler();
+    return (tid_t) scheduler();
 }
 
 
-
 /*
- ************************************************************
  * do_thread_sleeping:
  *     Muda o state de uma thread pra blocked.
  *     @todo: Mudar o nome da função para do_thread_blocked.

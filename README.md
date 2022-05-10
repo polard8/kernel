@@ -37,8 +37,8 @@ This repository has the source code for:
 ## Fred's compilation on Linux.
 ```
     Host machine: Ubuntu 20.04.3 LTS
-    Linux 5.11.0-43-generic x86_64
-    gcc (Ubuntu) 9.3.0 
+    Linux 5.13.0-40-generic x86_64
+    gcc (Ubuntu) 9.4.0 
     GNU ld (GNU Binutils for Ubuntu) 2.34
     NASM version 2.14.02
 ```

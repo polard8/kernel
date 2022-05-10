@@ -524,9 +524,9 @@ void systemShutdown (void)
     die ();
 }
 
+
 /*
  * systemShowDevicesInfo:
- * 
  *     Mostrar informações sobre o sistema, seguindo a ordem de
  *     velocidade dos dispositivos e barramentos.
  *     Ex: CPU, Memória, PCIE (video), South Bridge, Super Io ...
@@ -535,15 +535,15 @@ void systemShutdown (void)
  *     See: devmgr.c
  */
 
-void systemShowDevicesInfo (void)
+void systemShowDevicesInfo(void)
 {
-    devmgr_show_device_list();
+    // #bugbug
+    // Showing only one type of object,
+    devmgr_show_device_list(ObjectTypeTTY);
 }
 
 
-
 /*
- ***************************************
  * systemSetupVersion:
  *     Setup version info.     
  */

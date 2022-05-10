@@ -1,3 +1,4 @@
+
 // x64cont.c
 // Context support for x86_64 arch.
 
@@ -6,7 +7,7 @@
 
 // ===============================================
 
-
+// globals.
 // Context:
 // Variáveis para salvar o contexto para x86_64.
 // Essas variáveis devem permanecer encapsuladas nesse arquivo 
@@ -118,19 +119,22 @@ void save_current_context (void)
     t = (void *) threadList[current_thread];
 
     if ( (void *) t == NULL ){
-        printf ("save_current_context: [ERROR] Struct Thread={%d}\n",
+        printk ("save_current_context: [ERROR] Struct Thread={%d}\n",
             current_thread );
         goto fail1;
     }
 
     if ( t->used != TRUE || t->magic != 1234 )
     {
-        printf ("save_current_context: [ERROR] Validation Thread={%d}\n",
+        printk ("save_current_context: [ERROR] Validation Thread={%d}\n",
             current_thread );
         goto fail1;
     }
 
-    // Fill the structure.
+// Fill the structure.
+
+// #todo
+// use t->x64_context.ss  ...
 
     // Stack frame
     t->ss     = (unsigned long) contextss[0];      // usermode
@@ -163,7 +167,7 @@ void save_current_context (void)
     t->r15 = (unsigned long) contextr15[0];
 
 
-// Save
+// Save fpu stuff.
 
     register int i=0;
     for(i=0; i<512; i++){
@@ -174,15 +178,38 @@ void save_current_context (void)
 
     int cpl=-1;
     unsigned long tmp_cpl = (unsigned long) context_cpl[0];
-    cpl = (int) (tmp_cpl & 3);  // 2 bits
 
+// 2 bits
+// The first 2 bits of cs.
+    cpl = (int) (tmp_cpl & 3);
+
+    t->current_iopl = (unsigned int) (tmp_cpl & 3);
+
+/*
     if (cpl){
         t->utime++;
-        t->iopl = 3;     // IOPL 3.
     }else{
         t->stime++;
-        //t->iopl = ?;   // IOPL 0,1,2 ?
     };
+*/
+
+    if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
+    {
+        panic("save_current_context: cpl");
+    }
+
+    if(cpl == 0){
+        t->stime++;
+    }
+    if(cpl == 1){
+        panic("save_current_context: cpl 1");
+    }
+    if(cpl == 2){
+        panic("save_current_context: cpl 2");
+    }
+    if(cpl == 3){
+        t->utime++;
+    }
 
 
 // #todo
@@ -332,14 +359,14 @@ fail0:
 // #bugbug: 
 // Nao usaremos mais isso.
 
-int contextCheckThreadRing3Context (int tid){
+int contextCheckThreadRing3Context (int tid)
+{
+    struct thread_d  *t;
 
-    struct thread_d *t; 
- 
     //...
 
-	// Limits.
-	// Erro. Status.
+// Limits.
+// Erro. Status.
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
@@ -361,8 +388,8 @@ int contextCheckThreadRing3Context (int tid){
 
     // iopl
 
-    if ( t->iopl != 3 ){
-        debug_print("contextCheckThreadRing3Context: iopl\n");
+    if ( t->initial_iopl != 3 ){
+        debug_print("contextCheckThreadRing3Context: initial_iopl\n");
         return FALSE;
     }
 

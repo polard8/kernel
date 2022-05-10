@@ -1,0 +1,17 @@
+
+	Não faz sentido que haja preempção de threads
+	que estão em ring0, pois as threads em ring0 devem fazer parte 
+	do kernel ou de seus módulos.
+
+	Somente as threads de ring3 devem sofrer preempção. Pois
+	são aplicativos e não componentes do kernel base.
+
+	Portanto as threads em ring0 podem ser cooperativas e não sofrerão
+	preempção.
+	Uma thread em ring0 deve desistir de seu tempo de processamento
+	quando achar conveniente.
+
+	Criar threads em ring 0 será um privilégio dos drivers 
+	de dispositivo. E drivers sempre foram potencialmente perigosos.
+
+

@@ -63,8 +63,6 @@ Bits         Usage
 #include <kernel.h>  
 
 
-//Status do módulo.
-//int timerStatus;
 
 //Contador de ticks.
 //unsigned long timerTicks;
@@ -92,6 +90,44 @@ static int timerShowTextCursor = FALSE;
 //??
 //unsigned long timerCountSeconds;  //Count Seconds.
 //...
+
+//
+// == Private functions: prototypes ===================
+//
+
+static int timerTimer(void);
+
+
+// =============================
+
+// Constructor
+// Main globals.
+static int timerTimer(void)
+{
+
+// total ticks
+    jiffies = 0;
+
+// por quantos segundos o sistema esta rodando
+// jiffies/sys_time_hz
+    seconds = 0; 
+
+// Por quantos ms o sistema esta rodando.
+    sys_time_ms = 0; 
+
+// pit frequency
+    sys_time_hz = 0;
+
+    UpdateScreenFlag = FALSE;
+
+// Profiler
+    profiler_ticks_count = 0;
+    profiler_ticks_limit = PROFILER_TICKS_DEFAULT_LIMIT;
+
+    // ...
+
+    return 0;
+}
 
 
 /*
@@ -123,12 +159,15 @@ irq0_TIMER (void)
 // que precisamos realizar o EOI pois estamos num handler de pit.
 
 
-// The spawn routine need to make a eoi.
+// The spawn routine need to make a eoi for pit interrupt.
 // Tell the spawn routine that we need a eoi.
 // In the case of spawning a new thread.
     spawn_set_eoi_state();
 
+
+// See: ps/disp/ts.c
     psTaskSwitch();
+
 
 // The spawn routine do not need to make a eoi.
 // Tell the spawn routine that we do not need a eoi anymore.
@@ -183,34 +222,6 @@ void DeviceInterface_PIT(void)
 // The window server can be able to access an
 // internal display driver via ioctl().
 
-}
-
-
-// Main globals.
-int timerTimer(void)
-{
-// total ticks
-    jiffies = 0;
-
-// por quantos segundos o sistema esta rodando
-// jiffies/sys_time_hz
-    seconds = 0; 
-
-// Por quantos ms o sistema esta rodando.
-    sys_time_ms = 0; 
-
-// pit frequency
-    sys_time_hz = 0;
-
-    UpdateScreenFlag = FALSE;
-
-// Profiler
-    profiler_ticks_count = 0;
-    profiler_ticks_limit = PROFILER_TICKS_DEFAULT_LIMIT;
-
-    // ...
-
-    return 0;
 }
 
 

@@ -1,4 +1,6 @@
 
+// x64fault.c
+
 #include <kernel.h>
 
 
@@ -48,7 +50,7 @@ void faults ( unsigned long number )
 
     int user_thread=FALSE;
     
-    if (CurrentThread->iopl == 3)
+    if (CurrentThread->initial_iopl == 3)
         user_thread=TRUE;
 
 

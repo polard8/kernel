@@ -5,8 +5,8 @@
 
 
 // create_tid0:
-//     This is the control thread of the window server.
-//     See: gwssrv.bin.
+//     ring0
+//     See: init?
 // 0x0000000030A00000
 
 void *create_tid0(void)
@@ -89,13 +89,17 @@ void *create_tid0(void)
     kThread->name_address = (unsigned long) ThreadName; 
     kThread->process      = (void *) KernelProcess;
 
-    // Características.
-    kThread->iopl  = RING0;
-    kThread->type  = THREAD_TYPE_SYSTEM; 
+// Características.
+
+    kThread->initial_iopl = (unsigned int) RING0;
+    kThread->current_iopl = (unsigned int) RING0;
+
+    kThread->type = THREAD_TYPE_SYSTEM; 
+
     kThread->state = INITIALIZED; 
 
-    // #todo
-    // Execution plane.
+// #todo
+// Execution plane.
 
     kThread->plane = BACKGROUND;    
 
@@ -450,8 +454,13 @@ void *create_tid3 (void)
 
     t->position = SPECIAL_GUEST;
 
-    t->iopl  = RING3; 
-    t->type  = THREAD_TYPE_IDLE;
+
+    t->initial_iopl = (unsigned int) RING3; 
+    t->current_iopl = (unsigned int) RING3; 
+
+
+    t->type = THREAD_TYPE_IDLE;
+
     t->state = INITIALIZED;
 
     // Execution plane.

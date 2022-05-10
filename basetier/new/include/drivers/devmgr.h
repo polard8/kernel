@@ -180,7 +180,7 @@ struct ttydrv_d *PS2MouseDeviceTTYDriver;
 file *devmgr_search_in_dev_list( char *path );
 
 int devmgr_init_device_list(void);
-void devmgr_show_device_list(void);
+void devmgr_show_device_list(int object_type);
 void init_device_manager (void);
 struct device_d *devmgr_device_object (void);
 
@@ -191,7 +191,7 @@ devmgr_register_device (
     int class, 
     int type,
     struct pci_device_d *pci_device,
-    struct ttydrv_d *tty_driver );
+    struct tty_d *tty_device );
 
 
 #endif    

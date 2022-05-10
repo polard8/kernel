@@ -5,13 +5,20 @@
 
 #include <kernel.h>
 
+//
+// == Private functions: prototypes =============
+//
+
+static tid_t __scheduler_rr(unsigned long sched_flags);
+
+
+// =======================================
 
 /*
  * __scheduler_rr:
  *    Troca a thread atual, escolhe uma nova thread atual 
  * para rodar no momento.
  *    O método é cooperativo, Round Robing.
- *
  * Ordem de escolha:
  * ================
  *  +fase 1 - Pega a próxima indicada na estrutura.
@@ -20,16 +27,13 @@
  *            @todo: Nessa fase devemos usar a idle atual, 
  *            indicada em current_idle_thread.  
  *  //...
- *
  * Obs:
- *     O que estamos fazendo aqui é incrementar a tarefa atual e olhando se a
- * próxima tarefa da lista threadList[] está pronta pra rodar.
- *
+ *     O que estamos fazendo aqui é incrementar a tarefa atual e 
+ * olhando se a próxima tarefa da lista threadList[] está pronta pra rodar.
  * Obs:
  *     Pega na fila ReadyQueue.
  *     O scheduler deve sempre pegar da fila do dispatcher.
  */
- 
 // #todo
 // Podemos contar os rounds.
 // Obs: 
@@ -39,14 +43,14 @@
 // E é importante que a thread idle seja usada, pois 
 // ela tem as instruções sti/hlt que atenua a utilização 
 // da CPU, reduzindo o consumo de energia.
+// OUT: next tid.
 
-int __scheduler_rr (unsigned long sched_flags)
+static tid_t __scheduler_rr(unsigned long sched_flags)
 {
-    int FirstTID = -1;
+    tid_t FirstTID = -1;
 
     // loop
     register int i=0;
-
 
     struct thread_d  *TmpThread;
 
@@ -85,7 +89,9 @@ int __scheduler_rr (unsigned long sched_flags)
     if (rootConductor->used != TRUE || rootConductor->magic != 1234)
         panic ("__scheduler_rr: rootConductor validation\n");
 
-    FirstTID = (int) rootConductor->tid;
+// First tid.
+
+    FirstTID = (tid_t) rootConductor->tid;
 
     if ( FirstTID < 0 || FirstTID >= THREAD_COUNT_MAX )
         panic ("__scheduler_rr: FirstTID\n");
@@ -109,16 +115,12 @@ int __scheduler_rr (unsigned long sched_flags)
 
 // ===============================================
 
-//
 // Conductor
-//
 
     Conductor       = (void *) rootConductor;
     Conductor->next = (void *) rootConductor;
 
-//
 // tmpConductor
-//
 
     tmpConductor       = (void *) rootConductor;
     tmpConductor->next = (void *) rootConductor;
@@ -178,11 +180,8 @@ int __scheduler_rr (unsigned long sched_flags)
     };
 
 
-    // #todo
-    // Let's try some other lists.
-
-
-
+// #todo
+// Let's try some other lists.
 
 
 // Finalizing the list.
@@ -195,21 +194,29 @@ int __scheduler_rr (unsigned long sched_flags)
 // done:
     system_state = SYSTEM_RUNNING;
 
-    // Start with the idle thread.
-
-    return (int) FirstTID;
+// Start with the idle thread.
+    return (tid_t) FirstTID;
 }
-
 
 
 // Wrapper for __scheduler();
 // Esperamos que o worker construa um round e
 // que a primeira tid seja a idle.
-int scheduler(void)
+// OUT: next tid.
+
+tid_t scheduler(void)
 {
-    int first_tid = (-1);
+    tid_t first_tid = (-1);
+
+    //#todo: Create a method for this.
     int policy = SchedulerInfo.policy;
+
+    //#todo: Create a method for this.
     unsigned long sched_flags = (unsigned long) SchedulerInfo.flags;
+
+
+    //#todo
+    //SchedulerInfo.initialized ?
 
 //
 // #filter
@@ -224,9 +231,9 @@ int scheduler(void)
 // pois eh configuravel.
 // IN: sched_flags
 
-    if (policy == SCHED_RR)
-        first_tid = (int) __scheduler_rr(0);
-
+    if (policy == SCHED_RR){
+        first_tid = (tid_t) __scheduler_rr(0);
+    }
 
     if ( (void *) ____IDLE == NULL )
         panic("scheduler: ____IDLE");
@@ -237,7 +244,8 @@ int scheduler(void)
     if ( first_tid != ____IDLE->tid )
         panic("scheduler: first_tid != ____IDLE->tid");
 
-    return (int) first_tid;
+// Return tid.
+    return (tid_t) first_tid;
 }
 
 

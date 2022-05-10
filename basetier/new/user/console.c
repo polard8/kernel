@@ -1360,7 +1360,10 @@ int consoleCompareStrings(void)
 // device list
     if( strncmp(prompt,"device",6) == 0 )
     {
-        devmgr_show_device_list();
+        printf("tty devices:\n");
+        devmgr_show_device_list(ObjectTypeTTY);
+        printf("pci devices:\n");
+        devmgr_show_device_list(ObjectTypePciDevice);
         goto exit_cmp;
     }
 

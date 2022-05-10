@@ -347,8 +347,8 @@ void show_slot (int tid){
 
     printf ("\n");
     printf ("TID   PID   pdPA  Prio  State Quan *Jiffies initial_rip rflags   tName \n");
-    printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  ===== \n");
-    printf ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s \n", 
+    printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
+    printf ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
         t->tid, 
         t->ownerPID,
         t->pml4_PA,
@@ -359,6 +359,9 @@ void show_slot (int tid){
         t->initial_rip,
         t->rflags,
         t->name_address );
+
+    //#test
+    printf(":: stime{%d} utime{%d}\n",t->stime,t->utime);
 
     goto done;
 

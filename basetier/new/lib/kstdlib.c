@@ -7,7 +7,6 @@
 
 #include <kernel.h>
 
-
 static int randseed = 1234;
 
 
@@ -67,67 +66,54 @@ void *slab_alloc (size_t size)
 
 
 /* 
- *****************************************
  * kmalloc:
  *     Standard kmalloc function. 
  */
-
-void *kmalloc (size_t size){
-
-    void *h;
-    unsigned long s = ( unsigned long) size;
-
-	//s = (s ? s : 1);	/* if s == 0, s = 1 */
-
-    if ( s < 0 ){
-        debug_print ("kmalloc: s\n");
-        return NULL;
-    }
-
-    if ( s == 0 ){
-        debug_print ("kmalloc: s ajust\n");
-        s=1;
-    }
-
 // Alocar memória no heap do kernel.
-// ps/x86/memory.c
+// See: memory.c
 
-    h = (void *) heapAllocateMemory(s);
+void *kmalloc(size_t size)
+{
+    void *ptr;
+    unsigned long new_size = ( unsigned long) size;
 
-    if ( (void *) h == NULL ){
-        debug_print ("kmalloc: h\n");
+    if ( size < 0 ){
+        debug_print ("kmalloc: size\n");
+        return NULL;
+    }
+    if ( size == 0 ){
+        debug_print ("kmalloc: size ajust\n");
+        new_size=1;
+    }
+    ptr = (void *) heapAllocateMemory(new_size);
+    if ( (void *) ptr == NULL ){
+        debug_print ("kmalloc: ptr\n");
         return NULL;
     }
 
-    // Ok.
-    return (void *) h; 
+    return (void *) ptr;
 }
 
 
 /*
- ************************************
  * kfree:
- *
  * >> #importante:
  * >> Tradicionalmente essa função só libera o que foi alocado 
  * pela última chamada de malloc. Mas estamos tentando algo diferente.
- *
  * The free() function frees the memory space pointed to by ptr, 
  * which must have been returned by a previous call 
  * to malloc(), calloc() or realloc(). 
  * Otherwise, or if free(ptr) has already been called before, 
  * undefined behavior occurs. 
  * >> If ptr is NULL, no operation is performed.
- *
  * Importante:
  *     uma estratégia seria apenas sinalizarmos na estrutura que 
  * desejamos que o GC libere os recurso. Em seguida devemos sinalizar 
- * no mmblock que libere o bloco para outras alocações. 
- *
+ * no mmblock que libere o bloco para outras alocações.
  */
 
-void kfree (void *ptr){
-
+void kfree (void *ptr)
+{
     if ( (void *) ptr == NULL ){
         debug_print ("kfree: ptr\n");
         return;
@@ -139,23 +125,24 @@ void kfree (void *ptr){
 
 
 /*
- * kcalloc: alloca e preenche com zero.
- * @todo:
+ * kcalloc: 
+ * Alloca e preenche com zero.
  */
-/*
-void *kcalloc (size_t count, size_t size)
-{
-    size_t s = count * size;
-    
-	void *value = malloc (s);
-    
-	if (value != 0)
-    {    
-	    memset (value, 0, s);
-	};
-  return value;
-};
-*/
 
+void *kcalloc(size_t count, size_t size)
+{
+    void *ptr;
+    size_t new_size = (size_t) (count * size);
+
+    if(count <= 0){
+        new_size = (1*size);
+    }
+    ptr = (void*) kmalloc(new_size);
+    if ( (void*) ptr != NULL ){
+        memset(ptr, 0, new_size);
+    }
+
+    return (void*) ptr;
+}
 
 

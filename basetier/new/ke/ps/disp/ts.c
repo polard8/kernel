@@ -33,7 +33,8 @@ void task_switch (void)
 // The owner of the current thread.
     pid_t owner_pid = (pid_t) (-1);  //fail
 
-    int tmp_tid = -1;
+// tmp tid
+    //tid_t tmp_tid = -1;
 
 
 // =======================================================
@@ -200,6 +201,20 @@ The remainder ??
     save_current_context();
     CurrentThread->saved = TRUE;
 
+// #test
+// signal? timer ?
+// O contexto da thread está salvo.
+// Podemos checar se ha um timer configurado 
+// para esse dado tick e saltarmos para o handler
+// de single shot configurado para esse timer.
+
+    //if( (jiffies % 16) == 0 )
+    //{
+        //spawn_test_signal();
+    //}
+
+//=======================================================
+
 // #obs:
 // Ja salvamos os contexto.
 // Se a thread ainda não esgotou seu quantum, 
@@ -225,9 +240,16 @@ The remainder ??
         if ( CurrentThread->state == RUNNING && 
              CurrentThread->_yield == TRUE )
         {
-            CurrentThread->state = READY;
+
+            // Retira a força.
+            //CurrentThread->state = READY;
+            //CurrentThread->_yield = FALSE;
+            //goto try_next;
+            
+            // Esgota o quantum e ela saírá naturalmente
+            // no próximo tick.
+            CurrentThread->runningCount = CurrentThread->quantum;
             CurrentThread->_yield = FALSE;
-            goto try_next;
         }
 
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
@@ -255,6 +277,18 @@ The remainder ??
 
     else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
 
+        // #bugbug
+        //  Isso está acontecendo.
+
+        //if ( CurrentThread->state != RUNNING )
+        //    panic("task_switch: CurrentThread->state != RUNNING");
+
+        //if ( CurrentThread->state != RUNNING )
+        //     goto try_next;
+
+        // Preempt
+        // #bugbug: Preempção para threads de ring0 e ring3.
+ 
         if ( CurrentThread->state == RUNNING )
         {
             //debug_print (" P ");
@@ -341,15 +375,26 @@ try_next:
     // debug_print(" N ");
 //#endif
 
+// #bugbug
+// No threads
+// See: up.h and cpu.h
+
+    if (UPProcessorBlock.threads_counter == 0){
+        panic("task_switch: UPProcessorBlock.threads_counter == 0");
+    }
+
 // We have only ONE thread.
 // Is that thread the idle thread?
 // Can we use the mwait instruction ?
+// See: up.h and cpu.h
 
     if (UPProcessorBlock.threads_counter == 1)
     {
         //debug_print(" JUSTONE ");
-        
-        // Is this a pointer?
+
+        // tid0_thread
+        // This is a ring0 thread.
+        // See: x86_64/x64init.c
         Conductor = ____IDLE;
         
         // If we will run only the idle thread, 
@@ -371,22 +416,15 @@ try_next:
 // #critério:
 // Se alcançamos o fim da lista encadeada cujo ponteiro é 'Conductor'.
 // Então chamamos o scheduler para reescalonar as threads.
+// Essa rotina reescalona e entrega um novo current_thread e
+// Conductor.
 
     if ( (void *) Conductor->next == NULL )
     {
-
-//#ifdef TS_DEBUG
-//        debug_print(" LAST ");
-//#endif
-
-        //printf ("ts: scheduler 1\n");
-        
-        // Essa rotina reescalona e entrega um novo current_thread.
-        // e conductor.
-        // KiScheduler();
-        current_thread = KiScheduler();
+        current_thread = (tid_t) KiScheduler();
         goto go_ahead;
     }
+
 
 // Circular.
 // #critério
@@ -396,14 +434,10 @@ try_next:
 
     if ( (void *) Conductor->next != NULL )
     {
-
-//#ifdef TS_DEBUG
-//        debug_print(" Q ");
-//#endif
-
         Conductor = (void *) Conductor->next;
         goto go_ahead;
     }
+
 
 // #bugbug
     panic ("ts: Unspected");
@@ -569,8 +603,10 @@ dispatch_current:
     }
 
     if ( TargetProcess->used != TRUE || 
-         TargetProcess->magic != 1234 ){
-        printf ("ts: TargetProcess %s validation \n", TargetProcess->name );
+         TargetProcess->magic != 1234 )
+    {
+        printf ("ts: TargetProcess %s validation \n", 
+            TargetProcess->name );
         die();
     }
 

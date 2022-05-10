@@ -268,7 +268,7 @@ void spawn_thread (int tid)
         panic("spawn_thread: eoi_is_needed != TRUE\n");
     }
 
-    if ( target_thread->iopl == RING0 )
+    if ( target_thread->initial_iopl == RING0 )
     {
         debug_print ("spawn_thread: RING0\n");
         printf      ("spawn_thread: RING0\n");
@@ -292,7 +292,7 @@ void spawn_thread (int tid)
     // Target->cs     & 0xffff
     // Target->rip
     
-    if ( target_thread->iopl == RING3 )
+    if ( target_thread->initial_iopl == RING3 )
     {
         spawn_enter_usermode( 
             TRUE,  // EOI

@@ -1,4 +1,5 @@
 
+// sched.h
 
 #ifndef __SCHED_H
 #define __SCHED_H    1
@@ -22,11 +23,14 @@
 
 struct scheduler_info_d
 {
+    //#todo
+    //int initialized;
+
     int policy;
     unsigned long flags;
 };
 
-struct scheduler_info_d SchedulerInfo;
+struct scheduler_info_d  SchedulerInfo;
 
 
 // ===============================================
@@ -90,8 +94,7 @@ void set_input_responder_tid(int tid);
 int init_scheduler (unsigned long sched_flags);
 
 // ::core
-int __scheduler_rr (unsigned long sched_flags);
-int scheduler (void);
+tid_t scheduler (void);
 
 void scheduler_lock (void);
 void scheduler_unlock (void);
@@ -101,7 +104,8 @@ void cut_round( struct thread_d *last_thread );
 
 // ===
 
-int KiScheduler (void);
+tid_t KiScheduler (void);
+
 void do_thread_blocked (int tid);
 void do_thread_dead (int tid);
 void do_thread_initialized (int tid);

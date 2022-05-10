@@ -264,7 +264,7 @@ typedef union sigval {
      void   *sival_ptr;         /* Pointer value */
 }sigval_t;
 
-typedef sigval_t __sigval_t;
+typedef sigval_t  __sigval_t;
 //...
 
 
@@ -336,18 +336,23 @@ struct sigvec {
 /*
  * Structure used in sigaltstack call.
  */
-struct	sigaltstack {
-	char  *ss_base;     /* signal stack base */
-	int    ss_len;      /* signal stack length */
-	int    ss_onstack;  /* current status */
+
+struct sigaltstack
+{
+    char  *ss_base;     /* signal stack base */
+    int    ss_len;      /* signal stack length */
+    int    ss_onstack;  /* current status */
 };
+
 
 /*
  * Structure used in sigstack call.
  */
-struct	sigstack {
-	char  *ss_sp;       /* signal stack pointer */
-	int    ss_onstack;  /* current status */
+
+struct sigstack
+{
+    char  *ss_sp;       /* signal stack pointer */
+    int    ss_onstack;  /* current status */
 };
 
 
@@ -358,14 +363,16 @@ struct	sigstack {
  * to the handler to allow it to restore state properly if
  * a non-standard exit is performed.
  */
-struct	sigcontext {
-	int	sc_onstack;  /* sigstack state to restore */
-	int	sc_mask;     /* signal mask to restore */
-	int	sc_sp;       /* sp to restore */
-	int	sc_fp;       /* fp to restore */
-	int	sc_ap;       /* ap to restore */
-	int	sc_pc;       /* pc to restore */
-	int	sc_ps;       /* psl to restore */
+
+struct sigcontext
+{
+    int	sc_onstack;  /* sigstack state to restore */
+    int	sc_mask;     /* signal mask to restore */
+    int	sc_sp;       /* sp to restore */
+    int	sc_fp;       /* fp to restore */
+    int	sc_ap;       /* ap to restore */
+    int	sc_pc;       /* pc to restore */
+    int	sc_ps;       /* psl to restore */
 };
 
 
@@ -373,10 +380,12 @@ struct	sigcontext {
  * Macro for converting signal number to a mask suitable for
  * sigblock().
  */
-#define sigmask(m)	(1 << ((m)-1))
+#define sigmask(m)  (1 << ((m)-1))
 
-#define	BADSIG		(void (*)())-1
-#endif	/* _POSIX_SOURCE */
+// ?? da fuck!
+#define BADSIG  (void (*)())-1
+
+#endif /* _POSIX_SOURCE */
 
 
 #endif    

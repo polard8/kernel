@@ -1,5 +1,5 @@
-// pit.h
 
+// pit.h
 
 #ifndef ____PIT_H
 #define ____PIT_H    1
@@ -9,6 +9,18 @@
 // Milliseconds (ms) 1.000
 // Microseconds (µs) 1.000.000
 // Nanoseconds  (ns) 1.000.000.000
+
+
+/*
+#define MODE_COUNTDOWN 0x00
+#define MODE_ONESHOT 0x02
+#define MODE_RATE 0x04
+#define MODE_SQUARE_WAVE 0x06
+
+#define BASE_FREQUENCY 1193182
+
+*/
+
 
 //
 // Counting variables support.
@@ -179,7 +191,6 @@ void DeviceInterface_PIT(void);
 
 // ====
 
-int timerTimer (void);
 
 void timerInit8253 ( unsigned int freq );
 

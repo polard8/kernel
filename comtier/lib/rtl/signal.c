@@ -64,19 +64,33 @@ sighandler_t signal (int signum, sighandler_t handler)
 
     debug_print ("signal: [TODO] \n");
 
+
+// #todo
+// signum limits.
+
+    //if(signum<0)
+        //return SIG_ERR;
+
+
+// new structure
     new_act.sa_handler = handler;
     new_act.sa_flags = 0;
     new_act.sa_mask = 0;
 
-    int rc = sigaction(signum, &new_act, &old_act);
-    if (rc < 0){
+    int rc = (int) sigaction( 
+                       signum, 
+                       &new_act, 
+                       &old_act );
+
+    if (rc < 0)
+    {
         debug_print("signal: rc\n");
         return SIG_ERR;
     }
 
     // ?? #bugbug: Qual é esse valor ??
 
-    return old_act.sa_handler;
+    return (sighandler_t) old_act.sa_handler;
 }
 
 
@@ -85,13 +99,21 @@ sighandler_t signal (int signum, sighandler_t handler)
  *
  */
 
+// #todo
+// Essa syscall passa para o kernel
+// o ponteiro pra duas estruturas.
+
 int 
 sigaction ( 
     int signum, 
     const struct sigaction *act,
-    struct sigaction *oldact )
+          struct sigaction *oldact )
 {
     debug_print ("sigaction: [TODO] \n");
+
+    //#todo: Create syscal for signal
+    //sc82(,,,);
+
     return -1; //#todo
 }
 
@@ -102,10 +124,9 @@ int kill (pid_t pid, int sig)
 {
     debug_print ("kill: [TODO] \n");
 
-
     if(pid<0)
     {
-        errno=EINVAL;
+        errno = EINVAL;
         return (int) -1;
     }
 

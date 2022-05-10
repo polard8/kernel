@@ -568,7 +568,6 @@ void tty_reset_termios ( struct tty_d *tty )
  * OUT:
  *     pointer.
  */
-
 // #test
 // We are including a pointer to the RIT. raw input thread.
 // This is the control thread of the window with focus on kgws.
@@ -576,8 +575,10 @@ void tty_reset_termios ( struct tty_d *tty )
 
 struct tty_d *tty_create(void)
 {
-    struct tty_d  *__tty;
     file *__file;
+
+    struct tty_d  *__tty;
+
     char __tmpname[64];
     int i=0;
 
@@ -594,9 +595,9 @@ struct tty_d *tty_create(void)
 
         memset( __tty, 0, sizeof(struct tty_d) );
         
-        __tty->objectType  = ObjectTypeTTY;
+        __tty->objectType = ObjectTypeTTY;
         __tty->objectClass = ObjectClassKernelObjects;
-        __tty->used  = TRUE;
+        __tty->used = TRUE;
         __tty->magic = 1234;
 
         //__tty->index = ?;
@@ -732,7 +733,8 @@ struct tty_d *tty_create(void)
 // ==========================================
 __ok_register:
 
-    if ( (void *) __tty == NULL ){
+    if ( (void *) __tty == NULL )
+    {
         panic("tty_create: __tty\n");
     }
 
@@ -744,11 +746,18 @@ __ok_register:
         "/DEV_TTY%d", 
         __tty->index );
 
-    char *newname = (char *) kmalloc (64);
-    if ( (void*) newname == NULL ){
+
+    char *newname = (char *) kmalloc(64);
+
+    if ( (void*) newname == NULL )
+    {
         panic("tty_create: newname\n");
     }
     strcpy (newname,__tmpname);
+
+//
+// File pointer.
+//
 
 // Agora registra o dispositivo pci na lista genérica
 // de dispositivos.
@@ -756,68 +765,72 @@ __ok_register:
 // Ele precisa de um arquivo 'file'.
     
     __file = (file *) kmalloc ( sizeof(file) );
-    
-    if ( (void *) __file == NULL ){
-        panic ("tty_create: __file fail, can't register device\n");
-    }else{
 
-       // file
+    if ( (void *) __file == NULL )
+    {
+        panic ("tty_create: __file\n");
+    }
 
-        __file->____object = ObjectTypeTTY;
-        __file->used  = TRUE;
-        __file->magic = 1234;
-        __file->isDevice = TRUE;
+    __file->used = TRUE;
+    __file->magic = 1234;
 
-        // A estrutura de tty associada com esse arquivo.
-        __file->tty = __tty;
+// Object type.
 
-        // sync
-        __file->sync.sender = -1;
-        __file->sync.receiver = -1;
-        __file->sync.action = ACTION_NULL;
-        __file->sync.can_read = TRUE;
-        __file->sync.can_write = TRUE;
-        __file->sync.can_execute = FALSE;
-        
-        // tty is not a socket.
-        __file->sync.can_accept = FALSE;
-        __file->sync.can_connect = FALSE;
+    __file->____object = ObjectTypeTTY;
 
-        //Todo: create the file name.
-        //__file->_tmpfname = "TTYX    TTY";
-        //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
-        //strcpy (?,__file->_tmpfname);
+    __file->isDevice = TRUE;
 
-        // Esse é o arquivo que aponta para essa estrutura.
-        __tty->_fp = __file;
 
-        // #todo
-        // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
-        // O indice da tty é fd do arquivo que aponta para a tty.
-        //__tty->index = __file->_file;
-        __tty->index = -1;
+// A estrutura de tty associada com esse arquivo.
+    __file->tty = __tty;
 
-//
-// == Register =====================
-//
+// Esse é o arquivo que aponta para essa estrutura.
+    __tty->_fp = __file;
 
-        // #importante
-        // Essa é a tabela de montagem de dispositivos.
-        // O nome do dispositivo deve ser um pathname.
-        // Mas podemos ter mais de um nome.
-        // vamos criar uma string aqui usando sprint e depois duplicala.
-        // See: ??
-        
-        devmgr_register_device ( 
-            (file *) __file, 
-            newname,                    // device name.  
-            0,                          // class (char, block, network)
-            1,                          // type (pci, legacy
-            (struct pci_device_d *) 0,  // pci device
-            NULL );                     // tty driver
 
-    };
+// sync
+    __file->sync.sender = -1;
+    __file->sync.receiver = -1;
+    __file->sync.action = ACTION_NULL;
+    __file->sync.can_read = TRUE;
+    __file->sync.can_write = TRUE;
+    __file->sync.can_execute = FALSE;
+// tty is not a socket.
+// Do not accet and do not connect.
+    __file->sync.can_accept = FALSE;
+    __file->sync.can_connect = FALSE;
+
+    //Todo: create the file name.
+    //__file->_tmpfname = "TTYX    TTY";
+    //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
+    //strcpy (?,__file->_tmpfname);
+
+
+    // #todo
+    // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
+    // O indice da tty é fd do arquivo que aponta para a tty.
+    //__tty->index = __file->_file;
+    __tty->index = -1;
+
+// Register device:
+// #importante
+// Essa é a tabela de montagem de dispositivos.
+// O nome do dispositivo deve ser um pathname.
+// Mas podemos ter mais de um nome.
+// vamos criar uma string aqui usando sprint e depois duplicala.
+// See: devmgr.c
+
+    devmgr_register_device ( 
+        (file *) __file, 
+        newname,            // device name.  
+        0,                  // class (char, block, network)
+        1,                  // type (pci, legacy
+        NULL,  // Not a pci device.
+        __tty );  // tty device
+
 // ==========================================
+
+
 
 // last check.
     if ( (void *) __tty == NULL ){

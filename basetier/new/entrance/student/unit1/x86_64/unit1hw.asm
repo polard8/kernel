@@ -159,6 +159,7 @@ _irq0:
 ;
 
 ; cpl
+; Get the first 2 bits of cs.
 ; see: x64cont.c
     mov rax, qword [_contextCS]
     and rax, 3

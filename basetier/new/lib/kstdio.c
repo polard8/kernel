@@ -11,6 +11,7 @@
 // service 8002
 // IN: fd for the new stdin
 // OUT: TRUE or FALSE.
+
 int sys_setup_stdin( int stdin_fd )
 {
     struct process_d *p;

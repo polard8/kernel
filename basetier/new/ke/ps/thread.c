@@ -62,7 +62,11 @@ unsigned long GetThreadStats ( int tid, int index )
             return (unsigned long) t->pml4_PA;  
             break; 
         
-        case 11:  return (unsigned long) t->iopl;  break; 
+        // The initial privilege level.
+        case 11:
+            return (unsigned long) (t->initial_iopl & 3);  //only 2 bits
+            break; 
+
         case 12:  return (unsigned long) t->base_priority;  break; 
         case 13:  return (unsigned long) t->priority;  break;          
 
@@ -115,7 +119,14 @@ unsigned long GetThreadStats ( int tid, int index )
             return (unsigned long) t->profiler_last_ticks;
             break;
 
-        case 41:  return (unsigned long) t->previous_iopl;  break;
+        // The current privilege level
+        // #bugbug
+        // It doesn't make sense.
+        case 41:
+            panic("GetThreadStats: 41");
+            //return (unsigned long) t->current_iopl;
+            break;
+        
         case 42:  return (unsigned long) t->signal;  break;
         case 43:  return (unsigned long) t->umask;  break;
         
@@ -567,7 +578,7 @@ ps_setup_x64_context (
         panic ("ps_setup_x64_context: [ERROR] Invalid iopl\n");
     }
 
-    t->iopl = iopl;
+    t->initial_iopl = (unsigned int) iopl;
 
 
 //
@@ -589,7 +600,7 @@ ps_setup_x64_context (
     
 
     // ring 0
-    if ( t->iopl == RING0 )
+    if ( t->initial_iopl == RING0 )
     {
         t->ss     = 0x10;
         t->rsp    = (unsigned long) init_stack; 
@@ -605,7 +616,7 @@ ps_setup_x64_context (
     }
 
     // ring 3
-    if ( t->iopl == RING3 )
+    if ( t->initial_iopl == RING3 )
     {
         t->ss     = 0x23;    
         t->rsp    = (unsigned long) init_stack; 
@@ -1133,20 +1144,30 @@ try_next_slot:
 // Just like the context et al.
 // The contexts needs its own structure.
 
-    if (iopl == RING0){
-    ps_setup_x64_context( 
-        (struct thread_d *) Thread,
-        RING0,
-        (unsigned long) init_stack,
-        (unsigned long) init_rip );
+// ring 0
+    if (iopl == RING0)
+    {
+        Thread->initial_iopl = (unsigned int) RING0;
+        Thread->current_iopl = (unsigned int) RING0;
+
+        ps_setup_x64_context( 
+            (struct thread_d *) Thread,
+            RING0,
+            (unsigned long) init_stack,
+            (unsigned long) init_rip );
     }
 
-    if (iopl == RING3){
-    ps_setup_x64_context( 
-        (struct thread_d *) Thread,
-        RING3,
-        (unsigned long) init_stack,
-        (unsigned long) init_rip );
+// ring 3
+    if (iopl == RING3)
+    {
+        Thread->initial_iopl = (unsigned int) RING3;
+        Thread->current_iopl = (unsigned int) RING3;
+
+        ps_setup_x64_context( 
+            (struct thread_d *) Thread,
+            RING3,
+            (unsigned long) init_stack,
+            (unsigned long) init_rip );
     }
 
 
@@ -1382,8 +1403,8 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     // use a buffer for that
     // char nameBuffer[32];
 
-    if ( father->iopl != RING3 ){
-        panic ("copy_thread_struct: iopl #todo");
+    if ( father->initial_iopl != RING3 ){
+        panic ("copy_thread_struct: initial_iopl #todo");
     }
 
 
@@ -1409,7 +1430,7 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 
     //father->ownerPID or current_process ??
 
-    if ( father->iopl == RING3 ){
+    if ( father->initial_iopl == RING3 ){
     clone = (struct thread_d *) create_thread ( 
                                     NULL, NULL, NULL, 
                                     0,  // initial rip 
@@ -1478,7 +1499,8 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 // #todo: 
 // Herdar o mesmo do processo.
 
-    clone->iopl      = father->iopl;            // Process->iopl;
+    clone->initial_iopl = (unsigned int) father->initial_iopl;  // Process->initial_iopl;
+    //clone->current_iopl = ?; //#todo
     clone->saved     = father->saved;          // Saved flag.
     clone->preempted = father->preempted;  // Se pode ou n�o sofrer preemp��o.
 

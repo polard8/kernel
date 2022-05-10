@@ -946,16 +946,21 @@ pciHandleDevice (
 
     __file = (file *) kmalloc ( sizeof(file) );
 
-    if ( (void *) __file == NULL )
-    {
+    if ( (void *) __file == NULL ){
         panic("pciHandleDevice: __file\n");
     }
-
 
     memset( __file, 0, sizeof(struct file_d) );
 
     __file->used = TRUE;
     __file->magic = 1234;
+
+// #bugbug
+// This is a test yet.
+// We need to specity the type of device.
+// Maybe 'pci' is the 'class' of this device.
+
+    __file->____object = ObjectTypePciDevice;
 
     __file->isDevice = TRUE;
 
@@ -977,8 +982,8 @@ pciHandleDevice (
         newname, 
         __class, 
         1, 
-        (struct pci_device_d *) D,   // <<<< The PCI device.
-        NULL );
+        (struct pci_device_d *) D,  // It's a pci device.
+        NULL );                     // It's not a tty device.
 
     return 0;
 }

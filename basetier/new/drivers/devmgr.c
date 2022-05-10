@@ -73,11 +73,11 @@ int devmgr_init_device_list(void)
 
 
 // Show device list.
-void devmgr_show_device_list(void)
+void devmgr_show_device_list(int object_type)
 {
-    register int i=0;
+    file *fp;
     struct device_d  *d;
-
+    register int i=0;
 
     printf ("\n devmgr_show_device_list: \n");
 
@@ -93,13 +93,29 @@ void devmgr_show_device_list(void)
             if ( d->used  == TRUE && 
                  d->magic == 1234 )
             {
-                //#todo: more ...
-                printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
-                    d->index, 
-                    d->__class, 
-                    d->type, 
-                    d->name,
-                    d->mount_point );  //#todo
+
+                fp = (file *) d->__file;
+
+                if( (void*) fp != NULL )
+                {
+                    if( fp->____object == object_type )
+                    {
+
+                        //#debug
+                        //if ( fp->____object == ObjectTypeTTY )
+                        //    printf ("TTY DEVICE: ");
+                        //if ( fp->____object == ObjectTypePciDevice )
+                        //    printf ("PCI DEVICE: ");
+
+                        //#todo: more ...
+                        printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
+                            d->index, 
+                            d->__class, 
+                            d->type, 
+                            d->name,
+                            d->mount_point );  //#todo
+                    }
+                }
             }
             
             //printf (".");
@@ -216,7 +232,7 @@ devmgr_register_device (
     int class, 
     int type,
     struct pci_device_d *pci_device,
-    struct ttydrv_d *tty_driver )
+    struct tty_d *tty_device )
 {
 
     struct device_d *d;
@@ -238,8 +254,8 @@ devmgr_register_device (
         panic ("devmgr_register_device: new_mount_point\n");
     }
 
-    // =======================
-    // FILE. Device object.
+// =======================
+// FILE. Device object.
 
     if ( (void *) f == NULL )
     {
@@ -254,8 +270,9 @@ devmgr_register_device (
         panic ("devmgr_register_device: This file is NOT a device!\n");
     }
 
-    // =======================
-    // Device structure. (It is NOT the pci device struct)
+// =======================
+// Device structure. 
+// (It is NOT the pci device struct)
 
     d = (struct device_d *) devmgr_device_object();
         
@@ -269,33 +286,48 @@ devmgr_register_device (
         panic ("devmgr_register_device: d validation \n");
     }
 
-    // ID
-    
+// ID
+
     id = d->index;
-            
-    if (id < 0 || id >= DEVICE_LIST_MAX )
+
+    if ( id < 0 || id >= DEVICE_LIST_MAX )
     {
         panic ("devmgr_register_device: id limits \n");
     }
 
-    // Saving.
-    f->device = (struct device_d *) d;
-    
-    
-    f->deviceId = d->index; 
+//
+// file
+//
+
+// The file pointer.
+
+    if( (void*) f == NULL ){
+        panic ("devmgr_register_device: f\n");
+    }
 
     d->__file  = (file *) f;
+
+
+// Device structure.
+    f->device = (struct device_d *) d;
+
+// Device index into the deviceList[].
+    f->deviceId = d->index; 
+
+
+
     d->__class = class;
     d->type    = type;
 
-    // #test 
-    //Todo: create the file.
-    
+
+// path    
     sprintf( (char *) &__tmp_mount_point[0], "/DEV%d", id);
     strcpy (new_mount_point,__tmp_mount_point);
 
-    // /dev/tty0
+// /dev/tty0
     d->mount_point = (char *) new_mount_point; 
+
+
    
     // DEV_8086_8086
     //d->name ??
@@ -303,29 +335,14 @@ devmgr_register_device (
     //#todo
     d->name[0] = 'x';
     d->name[0] = 0;
-    
-    //
-    // The PCI device structure. It is NOT the device structure.
-    //
 
-    // pci device.
-    // Passado via argumento
+
+// pci device
     d->pci_device = (struct pci_device_d *) pci_device;
 
-    // tty driver.
-    // Passado via argumento.
-    d->ttydrv = (struct ttydrv_d *) tty_driver;
-
-    // #todo
-    // We really need this thing. 
-    // But it will use a lot of memory.
-    
-    // #bugbug: 
-    // It fail. Crash!!
-    // We don't have all these resources for now.
-    // Let the ps2 devices create their own tty for now.
-
-    //d->tty = (struct tty_d *) tty_create();
+// tty device
+    d->tty = (struct tty_d *) tty_device;
+ 
 
     // ...
 

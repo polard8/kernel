@@ -330,10 +330,13 @@ struct thread_d
     unsigned long pd0_VA;
     unsigned long pd0_PA;
 
-// privilege level
-    unsigned long iopl;
-    //unsigned long current_iopl; //use this one?
-    unsigned long previous_iopl;
+
+// The initial privilege level.
+// The current privilege level.
+
+    unsigned int initial_iopl;
+    unsigned int current_iopl;
+
 
 // The thread is running in the ring0 phase
 // after the isr request.

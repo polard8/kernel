@@ -69,19 +69,16 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-
 # Everything is a file.
-OBJS = ctype.o string.o stdlib.o kstdio.o signal.o unistd.o    
-
+OBJS = kctype.o kstdio.o ksignal.o kstdlib.o kstring.o kunistd.o    
 
 all:
-
-	$(CC) -c ctype.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ctype.o
-	$(CC) -c string.c  $(KERNEL_INCLUDE) $(CFLAGS) -o string.o
-	$(CC) -c stdlib.c  $(KERNEL_INCLUDE) $(CFLAGS) -o stdlib.o
+	$(CC) -c kctype.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kctype.o
 	$(CC) -c kstdio.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kstdio.o
-	$(CC) -c signal.c  $(KERNEL_INCLUDE) $(CFLAGS) -o signal.o
-	$(CC) -c unistd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o unistd.o
+	$(CC) -c ksignal.c $(KERNEL_INCLUDE) $(CFLAGS) -o ksignal.o
+	$(CC) -c kstdlib.c $(KERNEL_INCLUDE) $(CFLAGS) -o kstdlib.o
+	$(CC) -c kstring.c $(KERNEL_INCLUDE) $(CFLAGS) -o kstring.o
+	$(CC) -c kunistd.c $(KERNEL_INCLUDE) $(CFLAGS) -o kunistd.o
 
 #link
 	$(LD) -r -o archive_lib.o $(OBJS)

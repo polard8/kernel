@@ -584,8 +584,8 @@ void I_x64ExecuteInitialProcess (void)
 // See:
 // gva.h
 
-    if (Thread->iopl != RING3 ){
-        panic ("I_x64ExecuteInitialProcess: iopl");
+    if (Thread->initial_iopl != RING3 ){
+        panic ("I_x64ExecuteInitialProcess: initial_iopl");
     }
 
     PROGRESS("Go to ring3! \n");

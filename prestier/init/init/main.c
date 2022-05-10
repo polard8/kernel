@@ -164,6 +164,14 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
+    if( strncmp(prompt,"editor",6) == 0 )
+    {
+        printf ("~Editor\n");
+        rtl_clone_and_execute("editor.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
+
 
     // ...
 
@@ -222,9 +230,11 @@ int main( int argc, char **argv)
     };
 
     printf("~Quit\n");
+    //while(1){}
 
 //================================
-
+    //rtl_focus_on_this_thread();
+    
     while (TRUE){
 
         //if( isTimeToQuit == TRUE )

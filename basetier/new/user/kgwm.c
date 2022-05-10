@@ -1716,6 +1716,18 @@ done:
             stdin->sync.can_read = TRUE;  // O aplicativo precisa disso.
             stdin->_flags = __SRD;        // O worker no kernel precisa disso.
         }
+        
+        // Send all the messages to the foreground thread.
+        // The thread with focus.
+        if(tid == foreground_thread)
+        {
+            post_message_to_tid(
+                (int) tid,            // tid
+                NULL,                 // window
+                (int) Event_Message,  // msg code
+                Event_LongASCIICode,  // long1
+                Event_LongRawByte );  // long2
+        }
     }
 
 // Process the event using the system's window procedures.

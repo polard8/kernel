@@ -171,3 +171,21 @@ dispatch_current:
     //return 0;
 }
 
+/*
+// if this thread has a sognal for this tick
+// so we need to restore a flat context
+// and iret to the signal handler, waiting for
+// a restorer.
+// After the restorer the thread will run the old saved context.
+void dispatch_signal(void);
+void dispatch_signal(void)
+{
+}
+*/
+
+
+
+
+
+
+
