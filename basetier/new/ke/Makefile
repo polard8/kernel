@@ -1,4 +1,7 @@
 
+# ke/
+# Compile all the files and create archive_ke.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -144,25 +147,9 @@ all:
 	$(CC) -c debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
 	$(CC) -c sys.c      $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
 
-
-#link
+# link
 	$(LD) -r -o archive_ke.o $(OBJS)
-
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
 	cp archive_ke.o ../
 	rm *.o
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	

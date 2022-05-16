@@ -937,7 +937,7 @@ unsigned long interactive_threadList[THREAD_COUNT_MAX];
 // The message has 6 standard elements.
 // See: thread.c
 
-void *sys_get_message ( unsigned long buffer );
+void *sys_get_message ( unsigned long ubuf );
 
 int init_threads (void);
 
@@ -961,8 +961,14 @@ void *FindReadyThread (void);
 int GetThreadState (struct thread_d *thread);
 int GetThreadType (struct thread_d *thread);
 
-int GetCurrentTID (void);
-void *GetCurrentThread (void);
+int GetCurrentTID(void);
+
+
+void *GetThreadByTID (int tid);
+void *GetCurrentThread(void);
+void *GetForegroundThread(void);
+void *GetWSThread(void);
+
 
 // From threadi.c
 void show_slot (int tid);
@@ -994,17 +1000,6 @@ int thread_profiler( int service );
 //
 // Creation
 //
-
-// worker for create_thread.
-void 
-ps_setup_x64_context ( 
-    struct thread_d *t, 
-    int iopl,
-    unsigned long init_stack,
-    unsigned long init_rip );
-
-// worker for create_thread.
-void ps_initialize_thread_common_elements( struct thread_d *t );
 
 struct thread_d *copy_thread_struct ( struct thread_d *thread );
 

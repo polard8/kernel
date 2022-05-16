@@ -6,6 +6,48 @@
 
 #include <kernel.h>
 
+
+//
+// == private functions: prototypes ================
+//
+
+
+static void keyboard_init_lock_keys(void);
+static void keyboard_init_modifier_keys(void);
+// ...
+
+
+// =========================
+
+
+// #todo: Change this name.
+static void keyboard_init_lock_keys(void)
+{
+    capslock_status = 0;
+    scrolllock_status = 0;
+    numlock_status = 0;
+    // ...
+}
+
+// #todo: Change this name.
+static void keyboard_init_modifier_keys(void)
+{
+// Modifier keys.
+    shift_status  = 0;
+    ctrl_status   = 0;
+    winkey_status = 0;
+    alt_status    = 0;
+
+// Alternate Graphic.
+    //altgr_status = 0; //@todo
+    
+	// Function.
+	//fn_status = 0;  //@todo
+	
+	//...
+}
+
+
 // #todo: 
 // We need a file structure and the function ps2kbd_ioctl();
 void ps2kbd_initialize_device (void)
@@ -15,8 +57,9 @@ void ps2kbd_initialize_device (void)
 
 
 // globals
-    keyboard_init_modifier_keys();
     keyboard_init_lock_keys();
+    keyboard_init_modifier_keys();
+    // ...
 
 // enable keyboard port
     wait_then_write(I8042_STATUS, 0xae);
@@ -222,9 +265,23 @@ NormalByte:
 // Handler for keyboard input.
 // See: kgwm.c
 
+// ##
+// Nesse caso o driver esta chamando a rotina
+// que lida com o evento. Mas o plano é apenas
+// colocar os eventos de teclado em um arquivo
+// que poderá ser aberto e lido pelo window server.
+
     if ( foreground_thread >= 0 && 
          foreground_thread < THREAD_COUNT_MAX )
     {
+
+       // #opçao
+       // Apenas enfileira os raw bytes.
+       // put_rawbyte(__raw)
+       
+       // lida com o evento.
+       // coloca na fila da thread em foreground e
+       // no arquivo stdin.
        xxxKeyEvent(
            (int) foreground_thread,
            (unsigned char) __raw );
@@ -236,39 +293,6 @@ NormalByte:
 
 done:
     return;
-}
-
-
-// #todo: Change this name.
-void keyboard_init_modifier_keys (void)
-{
-// Modifier keys.
-    shift_status  = 0;
-    ctrl_status   = 0;
-    winkey_status = 0;
-    alt_status    = 0;
-
-// Alternate Graphic.
-    //altgr_status = 0; //@todo
-    
-	// Function.
-	//fn_status = 0;  //@todo
-	
-	//...
-}
-
-
-// #todo: Change this name.
-void keyboard_init_lock_keys (void)
-{
-    // Capital Lock.	
-	capslock_status = 0;
-	
-	// Scrolling Lock.
-	scrolllock_status = 0;
-	
-	// Number Lock.
-	numlock_status = 0;	
 }
 
 

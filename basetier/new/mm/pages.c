@@ -1995,7 +1995,10 @@ int mmSetUpPaging (void)
 
 //done:
     debug_print("mmSetUpPaging: done\n");
+// OK
     return 0;
+fail:
+    return (int) -1;
 }
 
 

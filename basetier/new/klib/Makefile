@@ -1,4 +1,7 @@
 
+# klib/
+# Compile all the files and create archive_klib.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -80,16 +83,16 @@ all:
 	$(CC) -c kstring.c $(KERNEL_INCLUDE) $(CFLAGS) -o kstring.o
 	$(CC) -c kunistd.c $(KERNEL_INCLUDE) $(CFLAGS) -o kunistd.o
 
-#link
-	$(LD) -r -o archive_lib.o $(OBJS)
+# link
+	$(LD) -r -o archive_klib.o $(OBJS)
 
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
-	cp archive_lib.o ../
+# copy
+	cp archive_klib.o ../
 	rm *.o
 	
-	
+clean:
+	rm *.o
+
 
 
 

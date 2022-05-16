@@ -1,32 +1,35 @@
-/*
- * File: mminfo.c
- *
- * Informações sobre a gerência de memória.
- * Valores em variáveis e estruturas.
- * Testes para mostrar informações.
- */
+
+// mminfo.c
+// Memory info support.
 
 #include <kernel.h>  
+
 
 void mmShow_PML4Entry (int index, unsigned long pml4_va)
 {
 
-    // #fixme:
-    // 9 9 9 9 12
-    // Agora as tabelas possuem 512 entradas,
-    // pois é isso o que dá pra ter com apenas 9 bits.
-
+// #fixme:
+// 9 9 9 9 12
+// Agora as tabelas possuem 512 entradas,
+// pois é isso o que dá pra ter com apenas 9 bits.
 
     // pd address.
     unsigned long pd_va=0;
 
 
-	//#todo: filtros.
-
+// #todo: 
+// filtros.
 
     // #todo
     debug_print("mmShow_PML4Entry: [TODO]\n");
+    
+//
+// Returning ...
+//    
+    
     return;
+
+// =======================================
 
 	if (pml4_va == 0)
 		return;
@@ -37,23 +40,22 @@ void mmShow_PML4Entry (int index, unsigned long pml4_va)
 //
 
 
-	if (pd_va == 0)
-		return;
-
-
-	unsigned long *dir = (unsigned long *) pd_va;
-	
-	//#todo: filtros.
-	
-    if (index < 0)
+    if (pd_va == 0){
         return;
+    }
 
+    unsigned long *dir = (unsigned long *) pd_va;
+
+//#todo: filtros.
+
+    if (index < 0){
+        return;
+    }
 
     unsigned long value = dir[index];
 
-	printf (" DirVA = %x ", (unsigned long) pd_va );
-	printf (" DirEntry %d = %x ", index, (unsigned long) value );
-	
+    printf (" DirVA = %x ", (unsigned long) pd_va );
+    printf (" DirEntry %d = %x ", index, (unsigned long) value );
 
 //
 // pt
@@ -77,8 +79,12 @@ void mmShow_PML4Entry (int index, unsigned long pml4_va)
 
 void memoryShowMemoryInfo (void)
 {
-    unsigned long HeapTotal  = ((kernel_heap_end - kernel_heap_start)/1024);
-    unsigned long StackTotal = ((kernel_stack_start - kernel_stack_end)/1024);
+
+    unsigned long HeapTotal = 
+        ((kernel_heap_end - kernel_heap_start)/1024);
+
+    unsigned long StackTotal = 
+        ((kernel_stack_start - kernel_stack_end)/1024);
 
     printf ("RAM Memory info:\n");
     printf ("\n");
@@ -246,15 +252,18 @@ void memoryShowMemoryInfo (void)
     //...
 }
 
-void mmShowPML4EntryForAllProcesses (int entry_number){
 
+void mmShowPML4EntryForAllProcesses (int entry_number)
+{
     struct process_d  *p;
     int i=0;
 
     printf ("mmShowPML4EntryForAllProcesses:\n");
 
     if (entry_number < 0 || entry_number >= 512 )
+    {
         return;
+    }
 
     for ( i=0; i<111; i++)
     {
@@ -277,18 +286,20 @@ void mmShowPML4EntryForAllProcesses (int entry_number){
     refresh_screen();
 }  
 
+
 // Mostra as estruturas de pagina 
 // usadas para paginação no pagedpool.
 
-void showFreepagedMemory ( int max ){
-
+void showFreepagedMemory(int max)
+{
     struct page_d  *p;
     int i=0;
 
 
     if (max < 0 || max >= 512 )
+    {
         return;
-
+    }
 
     for ( i=0; i < max; i++ )
     {  
@@ -310,9 +321,7 @@ void showFreepagedMemory ( int max ){
 
 
 /*
- ********************************************************
  * show_memory_structs:
- * 
  *     IMPORTANTE.
  *     Mostra as informações das estruturas de memória. 
  *     Essas são as estruturas usadas pelo kmalloc.
@@ -326,18 +335,16 @@ void showFreepagedMemory ( int max ){
  * interessante.
  * Por enquanto apenas escrevemos provavelmente na janela como 
  * foco de entrada e o procedimento de janela do sistema efetua um 
-  *refresh screen
+ * refresh screen
  */
 
-void show_memory_structs (void)
+void show_memory_structs(void)
 {
     struct mmblock_d  *B;
     int i = 0;
 
-
-	// Title.
-	printf("Memory Block Information:\n\n");
-	//printf("=========================\n");
+// Title.
+    printf("Memory Block Information:\n");
 
     // Mostra os heap da lista.
     while (i < MMBLOCK_COUNT_MAX) 
@@ -371,20 +378,10 @@ void show_memory_structs (void)
 void testingPageAlloc (void)
 {
     // #todo
-}     
-
+}
 
 
 //
 // End.
 //
-
-
-
-
-
-
-
-
-
 

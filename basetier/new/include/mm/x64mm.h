@@ -1057,8 +1057,8 @@ unsigned long memorysizeAvailableVirtualMemory;
 void pages_print_info(int system_type);
 void pages_print_video_info(void);
 
-unsigned long slab_2mb_extraheap2(void);
-unsigned long slab_2mb_extraheap3(void);
+//unsigned long slab_2mb_extraheap2(void);
+//unsigned long slab_2mb_extraheap3(void);
 
 void *CreateAndIntallPageTable (
     unsigned long pml4_va,   // page map level 4

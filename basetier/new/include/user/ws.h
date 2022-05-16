@@ -203,6 +203,19 @@ struct color_scheme_d *CurrentColorScheme;
 // ===============================================================
 
 
+
+struct ws_info_d
+{
+    int initialized;
+    pid_t pid;
+    tid_t tid;
+};
+struct ws_info_d  WindowServerInfo;
+
+
+// ===============================================================
+
+
 //
 // # Principais variáveis globais #
 //

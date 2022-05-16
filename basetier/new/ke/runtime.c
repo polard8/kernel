@@ -37,12 +37,16 @@ int init_runtime (void)
         //debug_print ("[x86_64] init_runtime: [TODO] CURRENT_ARCH_X86_64\n");
         //printf      ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
         //goto fail;
-            
-        //#todo
-        //See: memory.c
+
+        // #todo
+        // #bugbug: And if it fails?
+        // OUT:?
+        //See: mminit.c
         //debug_print ("[x86_64] init_runtime: [TODO] Initializing mm ...\n");
         mmInit();
-            
+
+        // #bugbug: And if it fails?
+        // OUT:?
         //See: pages.c
         //debug_print ("[x86_64] init_runtime: [DANGER] Initializing paging ...\n");
         mmSetUpPaging();

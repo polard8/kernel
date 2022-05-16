@@ -16,6 +16,7 @@
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
 
 
+
 /*
  * create_socket_object: 
  *     It creates a socket structure.
@@ -1742,7 +1743,7 @@ sys_connect (
             
             // window server
             if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' )
-            {   
+            {
                 target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT]; 
             }
 

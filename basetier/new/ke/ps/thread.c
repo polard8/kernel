@@ -9,6 +9,222 @@
 
 tid_t current_thread=0;
 
+//
+// == private functions: prototypes ================
+//
+
+// worker for create_thread.
+static void __ps_initialize_thread_common_elements( struct thread_d *t );
+
+// worker for create_thread.
+static void 
+__ps_setup_x64_context ( 
+    struct thread_d *t, 
+    int iopl,
+    unsigned long init_stack,
+    unsigned long init_rip );
+
+//===================
+
+// worker
+static void __ps_initialize_thread_common_elements( struct thread_d *t )
+{
+    register int i=0;
+
+    t->objectType  = ObjectTypeThread;
+    t->objectClass = ObjectClassKernelObjects;
+
+//
+// == Wait support ==================
+//
+
+    // Thread->wait4pid =
+
+    // loop
+    // Waiting reasons.
+    for ( i=0; i<8; ++i ){ t->wait_reason[i] = (int) 0; };
+
+
+//
+// == Message support ============
+//
+
+// #todo
+// Devemos adiar inicialização desses elementos relativos 
+// a mensagens.
+
+// Single kernel event.
+    t->ke_window = NULL;
+    t->ke_msg    = 0;
+    t->ke_long1  = 0;
+    t->ke_long2  = 0;
+    t->ke_newmessageFlag = FALSE;
+
+// Clear the queue.
+    for ( i=0; i<32; ++i )
+    {
+        t->window_list[i] = 0;
+        t->msg_list[i]    = 0;
+        t->long1_list[i]  = 0;
+        t->long2_list[i]  = 0;
+        t->long3_list[i]  = 0;
+        t->long4_list[i]  = 0;
+    };
+    t->head_pos = 0;
+    t->tail_pos = 0;
+
+
+// ======================
+
+// For the msg_d structure.
+// see: window.h
+
+// Clear the message queue.
+    for ( i=0; i<32; ++i ){ t->MsgQueue[i] = 0; };
+    t->MsgQueueHead = 0;
+    t->MsgQueueTail = 0;
+
+// Create all the 32 pointers.
+    struct msg_d  *tmp;
+
+    for ( i=0; i<32; ++i )
+    {
+        tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
+        if( (void*) tmp == NULL )
+            panic("__ps_initialize_thread_common_elements: tmp");
+    
+        tmp->window = NULL;
+        tmp->msg = 0;
+        tmp->long1 = 0;
+        tmp->long2 = 0;
+        tmp->long3 = 0;
+        tmp->long4 = 0;
+
+        tmp->used = TRUE;
+        tmp->magic = 1234;
+        
+        // Coloca o ponteiro que criamos na lista de ponteiros.
+        t->MsgQueue[i] = (unsigned long) tmp;
+    }
+// ===================================
+
+// Signal support
+    t->signal = 0;
+    t->umask = 0;
+
+    t->exit_code = 0;
+
+    return;
+}
+
+// =======================================
+// local
+// low level worker
+// do not check parameters validation
+
+static void 
+__ps_setup_x64_context ( 
+    struct thread_d *t, 
+    int iopl,
+    unsigned long init_stack,
+    unsigned long init_rip )
+{
+
+    // Checking only this one.
+    if (iopl != RING0 && iopl != RING3 ){
+        panic ("__ps_setup_x64_context: Invalid iopl\n");
+    }
+
+    t->initial_iopl = (unsigned int) iopl;
+
+
+//
+// == Context support =============================================
+//
+
+    // (Machine dependent)
+    // We need a worker routine for that thing.
+
+    // #todo
+    // A stack frame vai depender do iopl.
+      
+    // Stack frame.
+    // #todo: Usar uma estrutura de contexto.
+    // ss (0x20 | 3)
+    // cs (0x18 | 3)
+    // rflags for ring3: (0x3200).
+    
+    
+
+    // ring 0
+    if ( t->initial_iopl == RING0 )
+    {
+        t->ss     = 0x10;
+        t->rsp    = (unsigned long) init_stack; 
+        t->rflags = (unsigned long) 0x0202;
+        t->cs     = 0x8; 
+        t->rip    = (unsigned long) init_rip; 
+
+        // (0x10 | 0)
+        t->ds = 0x10; 
+        t->es = 0x10; 
+        t->fs = 0x10; 
+        t->gs = 0x10; 
+    }
+
+    // ring 3
+    if ( t->initial_iopl == RING3 )
+    {
+        t->ss     = 0x23;    
+        t->rsp    = (unsigned long) init_stack; 
+        t->rflags = (unsigned long) 0x3202;
+        t->cs     = 0x1B; 
+        t->rip    = (unsigned long) init_rip; 
+
+        // (0x20 | 3)
+        t->ds = 0x23; 
+        t->es = 0x23; 
+        t->fs = 0x23; 
+        t->gs = 0x23; 
+    }
+
+//
+// Common
+//
+
+    // This is used by the control thread.
+    t->initial_rip = (unsigned long) init_rip; 
+
+    t->rax = 0;
+    t->rbx = 0;
+    t->rcx = 0;
+    t->rdx = 0;
+    t->rsi = 0;
+    t->rdi = 0;
+    t->rbp = 0;
+
+    // We can save something here for control purpose.
+    // It can be used for the spawner.
+
+    t->r8 = 0;
+    t->r9 = 0;
+    t->r10 = 0;
+    t->r11 = 0;
+    t->r12 = 0;
+    t->r13 = 0;
+    t->r14 = 0;
+    t->r15 = 0;
+
+    //Thread->tss = current_tss;
+
+// ===============================================
+
+    // The context is not saved.
+    t->saved = FALSE;
+
+    return;
+}
+
 // helper
 // Thread stats
 unsigned long GetThreadStats ( int tid, int index )
@@ -318,22 +534,45 @@ int GetCurrentTID (void)
 }
 
 
-// GetCurrentThread:
-//     Retorna o endereço da estrutura da thread atual.
 
-void *GetCurrentThread (void){
-
+void *GetThreadByTID (int tid)
+{
     struct thread_d *t;
 
-    if (current_thread < 0 || 
-        current_thread >= THREAD_COUNT_MAX )
+    if (tid < 0 || 
+        tid >= THREAD_COUNT_MAX )
     {
         return NULL;
     }
 
-    t = (void *) threadList[current_thread];
+    t = (void *) threadList[tid];
 
     return (void *) t;
+}
+
+
+// GetCurrentThread:
+//     Retorna o endereço da estrutura da thread atual.
+
+void *GetCurrentThread(void)
+{
+    return (void*) GetThreadByTID(current_thread);
+}
+
+
+void *GetForegroundThread(void)
+{
+    return (void*) GetThreadByTID(foreground_thread);
+}
+
+
+void *GetWSThread(void)
+{
+    int tid = -1;
+    if(WindowServerInfo.initialized != TRUE)
+        return NULL;
+    tid = (int) WindowServerInfo.tid;
+    return (void*) GetThreadByTID(tid);
 }
 
 
@@ -557,207 +796,6 @@ int thread_profiler( int service ){
     // a thread rodou durante o período.
 
     return -1;
-}
-
-
-// =======================================
-// local
-// low level worker
-// do not check parameters validation
-
-void 
-ps_setup_x64_context ( 
-    struct thread_d *t, 
-    int iopl,
-    unsigned long init_stack,
-    unsigned long init_rip )
-{
-
-    // Checking only this one.
-    if (iopl != RING0 && iopl != RING3 ){
-        panic ("ps_setup_x64_context: [ERROR] Invalid iopl\n");
-    }
-
-    t->initial_iopl = (unsigned int) iopl;
-
-
-//
-// == Context support =============================================
-//
-
-    // (Machine dependent)
-    // We need a worker routine for that thing.
-
-    // #todo
-    // A stack frame vai depender do iopl.
-      
-    // Stack frame.
-    // #todo: Usar uma estrutura de contexto.
-    // ss (0x20 | 3)
-    // cs (0x18 | 3)
-    // rflags for ring3: (0x3200).
-    
-    
-
-    // ring 0
-    if ( t->initial_iopl == RING0 )
-    {
-        t->ss     = 0x10;
-        t->rsp    = (unsigned long) init_stack; 
-        t->rflags = (unsigned long) 0x0202;
-        t->cs     = 0x8; 
-        t->rip    = (unsigned long) init_rip; 
-
-        // (0x10 | 0)
-        t->ds = 0x10; 
-        t->es = 0x10; 
-        t->fs = 0x10; 
-        t->gs = 0x10; 
-    }
-
-    // ring 3
-    if ( t->initial_iopl == RING3 )
-    {
-        t->ss     = 0x23;    
-        t->rsp    = (unsigned long) init_stack; 
-        t->rflags = (unsigned long) 0x3202;
-        t->cs     = 0x1B; 
-        t->rip    = (unsigned long) init_rip; 
-
-        // (0x20 | 3)
-        t->ds = 0x23; 
-        t->es = 0x23; 
-        t->fs = 0x23; 
-        t->gs = 0x23; 
-    }
-
-//
-// Common
-//
-
-    // This is used by the control thread.
-    t->initial_rip = (unsigned long) init_rip; 
-
-    t->rax = 0;
-    t->rbx = 0;
-    t->rcx = 0;
-    t->rdx = 0;
-    t->rsi = 0;
-    t->rdi = 0;
-    t->rbp = 0;
-
-    // We can save something here for control purpose.
-    // It can be used for the spawner.
-
-    t->r8 = 0;
-    t->r9 = 0;
-    t->r10 = 0;
-    t->r11 = 0;
-    t->r12 = 0;
-    t->r13 = 0;
-    t->r14 = 0;
-    t->r15 = 0;
-
-    //Thread->tss = current_tss;
-
-// ===============================================
-
-    // The context is not saved.
-    t->saved = FALSE;
-
-    return;
-}
-
-
-// worker
-void ps_initialize_thread_common_elements( struct thread_d *t )
-{
-    register int i=0;
-
-    t->objectType  = ObjectTypeThread;
-    t->objectClass = ObjectClassKernelObjects;
-
-//
-// == Wait support ==================
-//
-
-    // Thread->wait4pid =
-
-    // loop
-    // Waiting reasons.
-    for ( i=0; i<8; ++i ){ t->wait_reason[i] = (int) 0; };
-
-
-//
-// == Message support ============
-//
-
-// #todo
-// Devemos adiar inicialização desses elementos relativos 
-// a mensagens.
-
-// Single kernel event.
-    t->ke_window = NULL;
-    t->ke_msg    = 0;
-    t->ke_long1  = 0;
-    t->ke_long2  = 0;
-    t->ke_newmessageFlag = FALSE;
-
-// Clear the queue.
-    for ( i=0; i<32; ++i )
-    {
-        t->window_list[i] = 0;
-        t->msg_list[i]    = 0;
-        t->long1_list[i]  = 0;
-        t->long2_list[i]  = 0;
-        t->long3_list[i]  = 0;
-        t->long4_list[i]  = 0;
-    };
-    t->head_pos = 0;
-    t->tail_pos = 0;
-
-
-// ======================
-
-// For the msg_d structure.
-// see: window.h
-
-// Clear the message queue.
-    for ( i=0; i<32; ++i ){ t->MsgQueue[i] = 0; };
-    t->MsgQueueHead = 0;
-    t->MsgQueueTail = 0;
-
-// Create all the 32 pointers.
-    struct msg_d  *tmp;
-
-    for ( i=0; i<32; ++i )
-    {
-        tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
-        if( (void*) tmp == NULL )
-            panic("ps_initialize_thread_common_elements: tmp");
-    
-        tmp->window = NULL;
-        tmp->msg = 0;
-        tmp->long1 = 0;
-        tmp->long2 = 0;
-        tmp->long3 = 0;
-        tmp->long4 = 0;
-
-        tmp->used = TRUE;
-        tmp->magic = 1234;
-        
-        // Coloca o ponteiro que criamos na lista de ponteiros.
-        t->MsgQueue[i] = (unsigned long) tmp;
-    }
-// ===================================
-
-// Signal support
-    t->signal = 0;
-    t->umask = 0;
-
-    t->exit_code = 0;
-
-    return;
 }
 
 
@@ -993,9 +1031,9 @@ struct thread_d *create_thread (
     }
 // =====================
 
-// worker
+// local worker
 // Initializing the common basic elements.
-    ps_initialize_thread_common_elements( (struct thread_d *) Thread );
+    __ps_initialize_thread_common_elements( (struct thread_d *) Thread );
 
 //
 // Input model
@@ -1150,7 +1188,7 @@ try_next_slot:
         Thread->initial_iopl = (unsigned int) RING0;
         Thread->current_iopl = (unsigned int) RING0;
 
-        ps_setup_x64_context( 
+        __ps_setup_x64_context( 
             (struct thread_d *) Thread,
             RING0,
             (unsigned long) init_stack,
@@ -1163,7 +1201,7 @@ try_next_slot:
         Thread->initial_iopl = (unsigned int) RING3;
         Thread->current_iopl = (unsigned int) RING3;
 
-        ps_setup_x64_context( 
+        __ps_setup_x64_context( 
             (struct thread_d *) Thread,
             RING3,
             (unsigned long) init_stack,
@@ -1246,7 +1284,7 @@ try_next_slot:
 // ( NÃO COLOCAR PARA EXECUÇÃO, 
 //   OUTRA FUNÇÃO DEVE COLOCAR ISSO PARA EXECUÇÃO )
 
-    //SelectForExecution(t);  //***MOVEMENT 1 (Initialized ---> Standby)
+    //SelectForExecution(t);  //MOVEMENT 1 (Initialized ---> Standby)
 
 // Return the pointer.
     return (void *) Thread;

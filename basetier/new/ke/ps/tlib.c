@@ -18,18 +18,18 @@
 // It is called by the applications.
 // It is also used for ipc.
 
-void *sys_get_message ( unsigned long buffer )
+void *sys_get_message ( unsigned long ubuf )
 {
     struct thread_d  *t;
 
-    unsigned long *message_address = (unsigned long *) buffer;
-    int head_pos=0;
+    unsigned long *message_address = (unsigned long *) ubuf;
+    //int head_pos=0;
 
     //debug_print ("sys_get_message:\n");
 
 // buffer
 // #todo: Check some other invalid address.
-    if ( buffer == 0 ){ 
+    if ( ubuf == 0 ){ 
         panic ("sys_get_message: buffer\n");
         //return NULL;
     }
@@ -87,52 +87,56 @@ void *sys_get_message ( unsigned long buffer )
 
     //get the next head pointer.
     next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
-    
-    if ( (void*) next_msg != NULL )
-    {
-        if (next_msg->used == TRUE && next_msg->magic == 1234 )
-        {
-            // Get standard entries.
-            message_address[0] = (unsigned long) next_msg->window;
-            message_address[1] = (unsigned long) (next_msg->msg & 0xFFFFFFFF);
-            message_address[2] = (unsigned long) next_msg->long1;
-            message_address[3] = (unsigned long) next_msg->long2;
 
-            // Get extra entries.
-            message_address[4] = (unsigned long) next_msg->long3;
-            message_address[5] = (unsigned long) next_msg->long4;
+    if ( (void*) next_msg == NULL )
+        goto fail0;
+
+    if (next_msg->used != TRUE || next_msg->magic != 1234 )
+        goto fail0;
+
+// invalid
+    if( next_msg->msg == 0 )
+        goto fail0;
+
+// Get standard entries.
+    message_address[0] = (unsigned long) next_msg->window;
+    message_address[1] = (unsigned long) (next_msg->msg & 0xFFFFFFFF);
+    message_address[2] = (unsigned long) next_msg->long1;
+    message_address[3] = (unsigned long) next_msg->long2;
+
+// Get extra entries.
+    message_address[4] = (unsigned long) next_msg->long3;
+    message_address[5] = (unsigned long) next_msg->long4;
             
-            // clear the entry.
-            // Consumimos a mensagem. Ela não existe mais.
-            // Mas preservamos a estrutura.
-            next_msg->window = NULL;
-            next_msg->msg = 0;
-            next_msg->long1 = 0;
-            next_msg->long2 = 0;
-            next_msg->long3 = 0;
-            next_msg->long4 = 0;
-            
-            // round
-            t->MsgQueueHead++;
-            if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
-        }
-    }
+// clear the entry.
+// Consumimos a mensagem. Ela não existe mais.
+// Mas preservamos a estrutura.
+    next_msg->window = NULL;
+    next_msg->msg = 0;
+    next_msg->long1 = 0;
+    next_msg->long2 = 0;
+    next_msg->long3 = 0;
+    next_msg->long4 = 0;
+
 // ==================================
 
-//done:
-    //debug_print ("sys_get_message: done\n");
-
+done:
 // Yes, We have a message.
+// round
+    t->MsgQueueHead++;
+    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
     return (void *) 1;
 
-//fail0:
+fail0:
 // No message.
+// round
+    t->MsgQueueHead++;
+    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
     return NULL;
 } 
 
 
 /*
- *************************************************
  * kgws_send_to_tid:
  *
  */
@@ -171,27 +175,28 @@ post_message_to_tid (
 
 
     //#debug
-    debug_print("kgws_send_to_tid:\n");
+    //debug_print("post_message_to_tid:\n");
 
     if ( target_tid < 0 || target_tid >= THREAD_COUNT_MAX )
     {
-        debug_print("kgws_send_to_tid: target_tid\n");
-        goto fail;
+        panic("post_message_to_tid: target_tid\n");
+        //goto fail;
     }
 
-//
 // Pega a thread alvo. 
-//
 
     t = (struct thread_d *) threadList[target_tid];
-
     if ( (void *) t == NULL ){
-        panic ("kgws_send_to_tid: t \n");
+        panic ("post_message_to_tid: t \n");
+    }
+    if ( t->used != 1 || t->magic != 1234 ){
+        panic ("post_message_to_tid: t validation \n");
     }
 
-    if ( t->used != 1 || t->magic != 1234 ){
-        panic ("kgws_send_to_tid: t validation \n");
-    } 
+// Reset the running count.
+// Giving to the thread more time.
+    t->runningCount = 0;
+    t->runningCount_ms = 0;
 
 
 //
@@ -237,30 +242,33 @@ post_message_to_tid (
     // get the pointer for the next entry
     next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
 
-    // check validation
-    if ( (void*) next_msg != NULL )
-    {
-        if( next_msg->used == TRUE && next_msg->magic == 1234 )
-        {
-            next_msg->window = (struct window_d *) window;
-            next_msg->msg    = (int) (tmp_msg & 0xFFFF);
-            next_msg->long1  = (unsigned long) long1;
-            next_msg->long2  = (unsigned long) long2;
-        }
+    if ( (void*) next_msg == NULL )
+        panic ("post_message_to_tid: next_msg\n");
 
-        t->MsgQueueTail++;
-        if ( t->MsgQueueTail >= 31 )
-            t->MsgQueueTail = 0;
-    }
+    if( next_msg->used != TRUE || next_msg->magic != 1234 )
+        panic ("post_message_to_tid: next_msg validation \n");
 
+// #test
+// O slot ja tem uma mensagem que nao foi consumida.
+    //if( next_msg->msg != 0 ){
+    //    panic ("post_message_to_tid: not responding ...\n");
+    //}
 
-// ==========================================================
+    next_msg->window = (struct window_d *) window;
+    next_msg->msg    = (int) (tmp_msg & 0xFFFF);
+    next_msg->long1  = (unsigned long) long1;
+    next_msg->long2  = (unsigned long) long2;
 
-    //ok
+done:
+    t->MsgQueueTail++;
+    if ( t->MsgQueueTail >= 31 )
+        t->MsgQueueTail = 0;
     return 0;
 
-fail:
-    // fail
+fail0:
+    t->MsgQueueTail++;
+    if ( t->MsgQueueTail >= 31 )
+        t->MsgQueueTail = 0;
     return -1;
 }
 

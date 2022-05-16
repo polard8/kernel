@@ -91,9 +91,9 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # We need classes: head | always | optional
 
 # head
-objects-y := head_64.o init.o newos.o archive_lib.o    
+objects-y := head_64.o init.o newos.o archive_klib.o    
 
-objects-y += archive_ke.o archive_mm.o archive_drivers.o archive_fs.o \
+objects-y += archive_ke.o archive_mm.o archive_dev.o archive_fs.o \
 archive_net.o archive_user.o    
 
 objects-y += sci.o    
@@ -143,27 +143,23 @@ kernel-header:
 # Interface.
 	$(CC) -c newos.c  $(KERNEL_INCLUDE) $(CFLAGS) -o newos.o
 
-# lib
-	$(Q) $(MAKE) -C lib/
+# klib
+	$(Q) $(MAKE) -C klib/
 
 kernel-content:
 	@echo "Compiling: Compiling kernel content ..."
+	$(Q) $(MAKE) -C dev/
+	$(Q) $(MAKE) -C fs/
 	$(Q) $(MAKE) -C ke/
 	$(Q) $(MAKE) -C mm/
-	$(Q) $(MAKE) -C drivers/
-	$(Q) $(MAKE) -C fs/
-
+	$(Q) $(MAKE) -C net/
 kernel-footer:
 	@echo "Compiling: Compiling kernel footer ..."
-	$(Q) $(MAKE) -C net/
 	$(Q) $(MAKE) -C user/
 	# ...
-
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
-
 	$(LD) $(LDFLAGS) -T arch/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
-
 clean:
 	rm -rf *.o   
 

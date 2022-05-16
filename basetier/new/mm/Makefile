@@ -1,4 +1,7 @@
 
+# mm/
+# Compile all the files and create archive_mm.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -81,16 +84,12 @@ all:
 	$(CC) -c mmpool.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmpool.o
 	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o
 
-#link
+# link
 	$(LD) -r -o archive_mm.o $(OBJS)
-
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
 	cp archive_mm.o ../
 	rm *.o
 	
-	
+
 
 
 

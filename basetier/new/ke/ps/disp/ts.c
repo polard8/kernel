@@ -215,6 +215,44 @@ The remainder ??
 
 //=======================================================
 
+// #test
+// Select foreground thread
+// right after a keyboard input.
+// See: kgws.c
+// #bugbug
+// Is the forground thread a valid thread?
+
+
+
+/*
+
+// Only reset the running count
+// of the ws's control thread.
+// ## We're doing this when posting the message.
+
+    struct thread_d *ws_t;
+    if( weGotKeyboardInput == TRUE )
+    {
+        if( WindowServerInfo.initialized == TRUE)
+        {
+            // The control thread of the ws process.
+            ws_t = (struct thread_d *) GetWSThread();
+            if( (void*) ws_t != NULL )
+            {
+                if(ws_t->magic == 1234){
+                    ws_t->runningCount = 0;
+                    ws_t->runningCount_ms = 0;
+                }
+            }
+            weGotKeyboardInput = FALSE;
+        }
+    }
+*/
+
+
+
+//=======================================================
+
 // #obs:
 // Ja salvamos os contexto.
 // Se a thread ainda não esgotou seu quantum, 

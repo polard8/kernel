@@ -182,6 +182,11 @@ void *create_tid0(void)
 // ===========================================================
 */
 
+
+// #todo
+// podemos criar um metodo worker
+// para essa rotina abaixo.
+
 // ===========================================================
 // Message queue.
     for ( q=0; q<32; ++q ){ kThread->MsgQueue[q] = 0; }
@@ -190,7 +195,7 @@ void *create_tid0(void)
 
 
 // Create all the 32 pointers.
-    struct msg_d  *tmp;
+    struct msg_d *tmp;
 
     for ( i=0; i<32; ++i )
     {

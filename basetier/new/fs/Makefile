@@ -1,4 +1,7 @@
 
+# fs/
+# Compile all the files and create archive_fs.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -74,21 +77,17 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 OBJS = fs.o pipe.o elf.o search.o    
 
 
-
 all:
 	$(CC) -c fs.c      $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
 	$(CC) -c pipe.c    $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
 	$(CC) -c elf.c     $(KERNEL_INCLUDE) $(CFLAGS) -o elf.o
 	$(CC) -c search.c  $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
 
-
-#link
+# link
 	$(LD) -r -o archive_fs.o $(OBJS)
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
 	cp archive_fs.o ../
 	rm *.o
+	
 
 
 

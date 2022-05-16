@@ -1,4 +1,7 @@
 
+# user/
+# Compile all the files and create archive_user.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -104,15 +107,12 @@ all:
 	$(CC) -c gr/font.c   $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
 
 
-
-#link
+# link
 	$(LD) -r -o archive_user.o $(OBJS)
-
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
 	cp archive_user.o ../
 	rm *.o
+	
+	
 
 
 

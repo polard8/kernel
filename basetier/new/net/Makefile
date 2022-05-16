@@ -1,4 +1,7 @@
 
+# net/
+# Compile all the files and create archive_net.o
+
 AS	= as
 LD	= ld
 CC	= gcc
@@ -69,36 +72,16 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-
-# Everything is a file.
-OBJS = socket.o \
-network.o    
-
+OBJS = socket.o network.o    
 
 all:
-
 	$(CC) -c socket.c   $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
 	$(CC) -c network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
 
-#link
+# link
 	$(LD) -r -o archive_net.o $(OBJS)
-
-# todo: vamos ligar tudo e enviar somente a biblioteca.
-	#cp *.o ../
 	cp archive_net.o ../
 	rm *.o
 	
 	
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -8,7 +8,7 @@
 //#define SERVICE_NUMBER_MAX  255
 
 //
-// == Prototypes ========
+// == private functions: prototypes =============
 //
 
 static void *__extra_services ( 
@@ -28,9 +28,43 @@ static void __setup_surface_rectangle(
     unsigned long width,
     unsigned long height );
 
-//==================================
+static void __initialize_ws_info(pid_t pid);
 
-// local
+// =============================
+
+// Setup WindowServerInfo global structure.
+static void __initialize_ws_info(pid_t pid)
+{
+    struct process_d *p;
+    struct thread_d *t;
+    
+    if( WindowServerInfo.initialized == TRUE )
+        panic("__initialize_ws_info: The ws is already running");
+
+    WindowServerInfo.initialized = FALSE;
+    
+    if(pid < 0 || pid >= PROCESS_COUNT_MAX)
+    {
+        return;
+    }
+    p = (struct process_d *) processList[pid];
+    if( (void*) p == NULL )
+        return;
+    if(p->magic!=1234)
+        return;
+    t = (struct thread_d *) p->control;
+    if( (void*) t == NULL )
+        return;
+    if(t->magic!=1234)
+        return;
+
+    WindowServerInfo.pid = (pid_t) pid;
+    WindowServerInfo.tid = (tid_t) t->tid;
+
+    WindowServerInfo.initialized = TRUE;
+}
+
+
 static void __service897(void)
 {
     struct thread_d *myThread; 
@@ -38,18 +72,19 @@ static void __service897(void)
 
     unsigned int _Color=0;
 
-//
-// Current thread.
-//
-
+// Current thread
 // This routine only can be called by the 
 // init process. Its tid is INIT_TID.
 
-    if( current_thread != INIT_TID )
+    if( current_thread != INIT_TID ){
         return;
+    }
+    if( current_thread < 0 || 
+        current_thread >= THREAD_COUNT_MAX )
+    {
+        return;
+    }
 
-    if( current_thread < 0 )
-        return;
 
     _Color = (unsigned int) (COLOR_GREEN + 0);
 
@@ -65,36 +100,38 @@ static void __service897(void)
     r.used = TRUE;
     r.magic = 1234;
 
-
-//
 // Paint
-//
-
 // Invalidate means that the rectangle need to be flushed
 // into the framebuffer.
 // If the rectangle is dirty, so it needs to be flushed into 
 // the framebuffer.
 // When we draw a window it needs to be invalidated.
 
-    drawDataRectangle( r.left, r.top, r.width, r.height, _Color, 0 );
+    drawDataRectangle( 
+        r.left, 
+        r.top, 
+        r.width, 
+        r.height, 
+        _Color, 
+        0 );
 
     r.dirty = TRUE;
 
-//
 //  Thread
-//
 
     myThread = (struct thread_d *) threadList[current_thread];
 
     if ( (void*) myThread != NULL )
     {
-        if ( myThread->used == TRUE && myThread->magic == 1234 )
+        if ( myThread->used == TRUE && 
+             myThread->magic == 1234 )
         {
             myThread->surface_rect = (struct rect_d *) &r;
+            return;
         }
     }
 
-    return;
+    //return;
 }
 
 
@@ -107,9 +144,11 @@ static void __setup_surface_rectangle(
     struct thread_d *t;
     struct rect_d *r;
 
-
-    if (current_thread<0)
+    if ( current_thread<0 || 
+         current_thread >= THREAD_COUNT_MAX )
+    {
         return;
+    }
 
     /*
     // dc: Clippint
@@ -146,8 +185,11 @@ static void __invalidate_surface_rectangle(void)
     struct thread_d *t;
     struct rect_d *r;
 
-    if(current_thread<0)
+    if ( current_thread<0 || 
+         current_thread >= THREAD_COUNT_MAX )
+    {
         return;
+    }
 
     t = (struct thread_d *) threadList[current_thread];
     if ( (void*) t == NULL ){ return; }
@@ -428,9 +470,12 @@ static void *__extra_services (
                 //register_ws_process(arg3);
                 __desktop->ws = (pid_t) arg3;
                 
-                // What is the process listen to the port 11.
-                // use this one: socket_set_gramado_port(...)
-                socket_set_gramado_port(GRAMADO_WS_PORT,(pid_t)current_process);
+                socket_set_gramado_port(
+                    GRAMADO_WS_PORT,
+                    (pid_t) current_process );
+
+                //local
+                __initialize_ws_info(current_process);
 
                 // #test
                 // QUANTUM
@@ -519,7 +564,11 @@ static void *__extra_services (
             {
                 //register_wm_process(arg3);
                  __desktop->wm = (pid_t) arg3;
-                socket_set_gramado_port(GRAMADO_WM_PORT,(pid_t)current_process);
+
+                socket_set_gramado_port(
+                    GRAMADO_WM_PORT,
+                    (pid_t) current_process );
+
                 return (void *) TRUE;  //ok 
             }
         }
@@ -547,7 +596,11 @@ static void *__extra_services (
                  __desktop->magic == 1234 )
             {
                 __desktop->ns = (int) arg3;
-                socket_set_gramado_port(GRAMADO_NS_PORT,(pid_t)current_process);
+                
+                socket_set_gramado_port(
+                    GRAMADO_NS_PORT,
+                    (pid_t) current_process );
+
                 return (void *) TRUE;  //ok 
             }
         }
@@ -860,16 +913,14 @@ static void *__extra_services (
         return (void *) sys_listen ( (int) arg2, (int) arg3 );  
     }
 
-
-    // Salvar um pid em uma das portas.
-    // IN: gramado port, PID
+// Salvar um pid em uma das portas.
+// IN: gramado port, PID
     if (number == 7006){
         return (void *) socket_set_gramado_port( (int) arg2, (int) arg3 );
     }
 
-
-    // sys_getsockname()
-    // fd, sockaddr struct pointer, addr len.
+// sys_getsockname()
+// fd, sockaddr struct pointer, addr len.
     if ( number == 7007 ){
         return (void *) sys_getsockname ( 
                             (int) arg2, 
@@ -877,9 +928,8 @@ static void *__extra_services (
                             (socklen_t *) arg4 );
      }
 
-
-    // socket info
-    // IN: pid
+// socket info
+// IN: pid
     if ( number == 7008 ){
         show_socket_for_a_process( (int) arg2 );
         return NULL;
@@ -1476,7 +1526,7 @@ void *sci0 (
             break;
 
 
-        // See: thread.c
+        // See: tlib.c
         // IN: buffer for message elements.
         case 111:
             //debug_print("sci0: 111\n");

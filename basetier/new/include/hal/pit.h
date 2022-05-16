@@ -93,7 +93,10 @@ unsigned long profiler_percentage_idle_thread;
 // Aciona uma flag para que o ts.c realize atividades extras,
 // como gc, dead thread collector, request.
 
+//#todo: maybe move these to ts.h or something like that.
 int extra; 
+int weGotKeyboardInput;
+
 
 // timer pathname.
 // #define TIMER_DRIVER_PATHNAME  "Embedded"  

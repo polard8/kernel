@@ -453,6 +453,41 @@ struct file_context_d
 // == prototypes =====================================
 //
 
+int file_read_buffer( file *f, char *buffer, int len );
+int file_write_buffer( file *f, char *string, int len );
+
+ssize_t sys_read(int fd, char *ubuf, size_t count);
+ssize_t sys_write(int fd, char *ubuf, size_t count);
+
+int 
+sys_open(
+    const char *pathname, 
+    int flags, 
+    mode_t mode );
+int sys_close(int fd);
+
+int sys_fcntl( int fd, int cmd, unsigned long arg );
+int sys_ioctl( int fd, unsigned long request, unsigned long arg );
+
+file *get_file_from_fd(int fd);
+
+int sys_get_global_sync(int sync_id, int request);
+void sys_set_global_sync(int sync_id, int request, int data);
+int sys_create_new_sync(void);
+int get_saved_sync(void);
+
+int sys_get_file_sync(int fd, int request);
+void sys_set_file_sync(int fd, int request, int data);
+
+int sys_get_device_number_by_path( char *path );
+int sys_open_device_by_number(int device_index);
+
+unsigned long sys_get_file_size(char *path);
+
+int sys_sleep_if_socket_is_empty(int fd);
+
+// ========
+
 
 
 int get_free_slots_in_the_file_table(void);
@@ -501,6 +536,8 @@ fsListFiles (
     int directory_id );
     
 // ===
+
+
 
 
 int

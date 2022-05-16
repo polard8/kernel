@@ -1668,6 +1668,15 @@ done:
         return -1;
 
 // #todo
+// A sistema precisa ter uma flag
+// para cada tipo de processamento aqui.
+// ioctl() poderá mudar as configurações
+// do dispositivo de teclado, determinando
+// que tipo de recurso de processamento
+// de input estará disponível.
+
+
+// #todo
 // Check 'control + alt + del'.
 // Teclas de digitação.
 // Manda para o window server.
@@ -1704,29 +1713,50 @@ done:
     {
         if ( Event_Message == MSG_KEYDOWN )
         {
+
+            // #todo
+            // precisamos de uma flag que indique que isso deve ser feito.
+
+            if( (void*) stdin != NULL ){
+            if(stdin->magic == 1234)   {
             stdin->sync.can_write = TRUE;
             stdin->_flags = __SWR;
             ch_buffer[0] = (char) (Event_LongASCIICode & 0xFF);
 
             file_write_buffer ( 
-                (file *) stdin, 
-                (char *) ch_buffer, 
-                (int) 1 );
+                (file *) stdin, (char *) ch_buffer, (int) 1 );
 
             stdin->sync.can_read = TRUE;  // O aplicativo precisa disso.
             stdin->_flags = __SRD;        // O worker no kernel precisa disso.
+            }
+            }
         }
         
         // Send all the messages to the foreground thread.
         // The thread with focus.
+        // #bugbug
+        // Is the forground thread a valid thread?
         if(tid == foreground_thread)
         {
-            post_message_to_tid(
-                (int) tid,            // tid
-                NULL,                 // window
-                (int) Event_Message,  // msg code
-                Event_LongASCIICode,  // long1
-                Event_LongRawByte );  // long2
+            if( tid > 0 && 
+                tid < THREAD_COUNT_MAX )
+            {
+
+            // #todo
+            // precisamos de uma flag que indique que isso deve ser feito.
+
+                post_message_to_tid(
+                    (int) tid,            // tid
+                    NULL,                 // window
+                    (int) Event_Message,  // msg code
+                    Event_LongASCIICode,  // long1
+                    Event_LongRawByte );  // long2
+        
+                // See: ts.c
+                // #deprecated?
+                if( WindowServerInfo.initialized == TRUE )
+                    weGotKeyboardInput = TRUE;
+            }
         }
     }
 
@@ -1735,11 +1765,22 @@ done:
 // send the event to the loadable window server.
 // See: kgwm.c
 
-    wmProcedure(
-        (struct window_d *) Event_Window,    // opaque pointer
-        (int)               Event_Message,
-        (unsigned long)     Event_LongASCIICode,
-        (unsigned long)     Event_LongRawByte );
+// ##
+// Acho que esses são os aceleradores de teclado.
+// Então essa rotina somente será chamada se 
+// os aceleradores de teclado estiverem habilitados.
+
+// #todo
+// precisamos de uma flag que indique que isso deve ser feito.
+
+    //if( gKeyboardAccelleratorsStatus == TRUE )
+    //{
+        wmProcedure(
+            (struct window_d *) Event_Window,    // opaque pointer
+            (int)               Event_Message,
+            (unsigned long)     Event_LongASCIICode,
+            (unsigned long)     Event_LongRawByte );
+    //}
 
     return 0;
 }

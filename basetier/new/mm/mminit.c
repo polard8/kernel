@@ -4,19 +4,21 @@
 #include <kernel.h>    
 
 
-//Variáveis internas. 
-
 // Heap support.
-// #todo: Precisamos melhorar esses nomes. nada neles indica que
-// estamos lidando com heap.
-// #todo: inicializar isso e usar static.
-unsigned long heap_pointer_last_valid;  // Último heap pointer válido. 
-unsigned long last_size;        // Último tamanho alocado.
-unsigned long mm_prev_pointer;  // Endereço da úntima estrutura alocada.
+// #todo: 
+// Precisamos melhorar esses nomes, 
+// pois nada neles indica que estamos lidando com heap.
+
+// Último heap pointer válido.
+static unsigned long heap_pointer_last_valid=0;
+// Último tamanho alocado.
+static unsigned long last_size=0;
+// Endereço da última estrutura alocada.
+static unsigned long mm_prev_pointer=0;
 
 
 
-
+/*
 unsigned long slab_2mb_extraheap2(void)
 {
     if(g_extraheap2_initialized != TRUE)
@@ -24,7 +26,9 @@ unsigned long slab_2mb_extraheap2(void)
 
     return (unsigned long) g_extraheap2_va;
 }
+*/
 
+/*
 unsigned long slab_2mb_extraheap3(void)
 {
     if(g_extraheap3_initialized != TRUE)
@@ -32,10 +36,10 @@ unsigned long slab_2mb_extraheap3(void)
 
     return (unsigned long) g_extraheap3_va;
 }
+*/
 
 
 /*
- *********************************************
  * init_heap:
  *     Iniciar a gerência de Heap do kernel. 
  *     @todo: Usar heapInit() ou heapHeap(). memoryInitializeHeapManager().
@@ -160,9 +164,7 @@ fail:
 }
 
 
-
 /*
- **************************************************
  * init_stack:
  *     Iniciar a gerência de Stack do kernel. 
  *     #todo: Usar stackInit(). 
@@ -233,7 +235,6 @@ void memory_destroy_heap (struct heap_d *heap)
  * mmInit:
  *   Inicializa o memory manager.
  */
-
 // Called by:
 // init_runtime in runtime.c
 
@@ -356,19 +357,22 @@ int mmInit(void)
     //refresh_screen();
     //while(1){}
 
+// OK
     return 0;
     //return (int) Status;
 
 fail:
     debug_print("mmInit: fail\n");
+
+    // #breakpoint
     //refresh_screen();
     //while(1){}
-    return 1;
-}    
+
+    return (int) (-1);
+}
 
 
 /*
- ****************************************
  * heapAllocateMemory:
  *     Aloca memória no heap do kernel.
  * IMPORTANTE: 

@@ -203,18 +203,11 @@ unsigned long keyboard_handler_address;
 
 void kbdc_wait (unsigned char type);
 
-
-
 // ==
-
-void keyboard_init_modifier_keys (void);
-void keyboard_init_lock_keys (void);
 
 void keyboardDisable (void);
 void keyboardEnable (void);
-
 void keyboard_set_leds (char flag);
-
 unsigned long keyboardGetKeyState ( unsigned char key );
 
 int get_alt_status (void);
@@ -224,7 +217,6 @@ int get_shift_status (void);
 uint8_t xxx_keyboard_read (void);
 void xxx_keyboard_write (uint8_t data);
 
-//
 unsigned char zzz_keyboard_read (void);
 void keyboard_expect_ack (void);
 
