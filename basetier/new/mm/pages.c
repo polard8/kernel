@@ -3,14 +3,6 @@
 
 #include <kernel.h>
 
-// These values came from BL.BIN.
-// bootblock, lfb, device width, device height, bpp ...
-//extern unsigned long SavedBootBlock; 
-extern unsigned long SavedLFB;          // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
-//extern unsigned long SavedX;
-//extern unsigned long SavedY;
-//extern unsigned long SavedBPP;
-// ...
 
 // ==================================================
 // This is not global variable.
@@ -57,6 +49,24 @@ static unsigned long LARGE_extraheap3_pa=0;
 
 // ==================================================
 
+//
+// private functions:
+//
+
+static void mmInitializeKernelPageTables(void);
+
+static void __initialize_ring0area(void);
+static void __initialize_ring3area(void);
+static void __initialize_kernelimage_region(void);
+static void __initialize_frontbuffer(void);
+static void __initialize_backbuffer(void);
+static void __initialize_pagedpool(void);
+static void __initialize_heappool(void);
+static void __initialize_extraheap1(void);
+static void __initialize_extraheap2(void);
+static void __initialize_extraheap3(void);
+
+static void mmSetupMemoryUsage(void);
 
 // ==================================================
 
@@ -523,11 +533,6 @@ void *clone_pml4 ( unsigned long pml4_va )
 }
 
 
-static void __setup_memory_usage(void);
-static void __setup_memory_usage(void)
-{
-    debug_print ("SetUpPaging: Setup memory usage\n");
-
 // #Importante
 // Agora vamos calcular a quantidade de memória física usada 
 // até agora.
@@ -542,10 +547,14 @@ static void __setup_memory_usage(void)
 // Tem a questão do dma a se considerar também.
 // Tem dma abaixo da marca de 16mb.
 // Tem dma que usa memória virtual.
-
-
 // Used.
-    // #todo: mm_used_lfb ??
+// #todo: mm_used_lfb ??
+
+static void mmSetupMemoryUsage(void)
+{
+    debug_print ("mmSetupMemoryUsage: Setup memory usage\n");
+
+// used memory:
     memorysizeUsed = 
         (unsigned long) ( 
         mm_used_ring0_area +  
@@ -560,7 +569,7 @@ static void __setup_memory_usage(void)
         mm_used_frame_table 
         );
 
-// Free.
+// free memory
     memorysizeFree = (unsigned long) (memorysizeTotal - memorysizeUsed);
 
 
@@ -1125,7 +1134,7 @@ void __initialize_default_physical_regions(void)
     SMALL_kernel_base_pa = (unsigned long) SMALLSYSTEM_KERNELBASE;
     SMALL_user_pa        = (unsigned long) SMALLSYSTEM_USERBASE;
     SMALL_cga_pa         = (unsigned long) SMALLSYSTEM_CGA;
-    SMALL_frontbuffer_pa = (unsigned long) SavedLFB;                     //frontbuffer // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
+    SMALL_frontbuffer_pa = (unsigned long) gSavedLFB;                    //frontbuffer // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
     SMALL_backbuffer_pa  = (unsigned long) SMALLSYSTEM_BACKBUFFER;       //backbuffer
     SMALL_pagedpool_pa   = (unsigned long) SMALLSYSTEM_PAGEDPOLL_START;  //PAGED POOL
     SMALL_heappool_pa    = (unsigned long) SMALLSYSTEM_HEAPPOLL_START;
@@ -1138,7 +1147,7 @@ void __initialize_default_physical_regions(void)
     MEDIUM_kernel_base_pa = (unsigned long) MEDIUMSYSTEM_KERNELBASE;
     MEDIUM_user_pa        = (unsigned long) MEDIUMSYSTEM_USERBASE;
     MEDIUM_cga_pa         = (unsigned long) MEDIUMSYSTEM_CGA;
-    MEDIUM_frontbuffer_pa = (unsigned long) SavedLFB; // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
+    MEDIUM_frontbuffer_pa = (unsigned long) gSavedLFB; // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
     MEDIUM_backbuffer_pa  = (unsigned long) MEDIUMSYSTEM_BACKBUFFER;
     MEDIUM_pagedpool_pa   = (unsigned long) MEDIUMSYSTEM_PAGEDPOLL_START;
     MEDIUM_heappool_pa    = (unsigned long) MEDIUMSYSTEM_HEAPPOLL_START;
@@ -1151,7 +1160,7 @@ void __initialize_default_physical_regions(void)
     LARGE_kernel_base_pa = (unsigned long) LARGESYSTEM_KERNELBASE;
     LARGE_user_pa        = (unsigned long) LARGESYSTEM_USERBASE;
     LARGE_cga_pa         = (unsigned long) LARGESYSTEM_CGA;
-    LARGE_frontbuffer_pa = (unsigned long) SavedLFB; // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
+    LARGE_frontbuffer_pa = (unsigned long) gSavedLFB; // #todo: precisamos que o bl passe  endereço físico para mapearmos o lfb.
     LARGE_backbuffer_pa  = (unsigned long) LARGESYSTEM_BACKBUFFER;
     LARGE_pagedpool_pa   = (unsigned long) LARGESYSTEM_PAGEDPOLL_START;
     LARGE_heappool_pa    = (unsigned long) LARGESYSTEM_HEAPPOLL_START;
@@ -1186,7 +1195,7 @@ void __initialize_default_physical_regions(void)
 // Isso mapeia os primeiros 2MB da memória RAM em ring0.
 // SMALL_origin_pa = kernel_address_pa;
 
-void __initialize_ring0area(void)
+static void __initialize_ring0area(void)
 {
     unsigned long *pt_ring0area = (unsigned long *) PAGETABLE_RING0AREA; 
 
@@ -1249,7 +1258,7 @@ void __initialize_ring0area(void)
 // Isso mapeia 2 MB de memória em user mode.
 // SMALL_user_pa = user_address_pa
 
-void __initialize_ring3area(void)
+static void __initialize_ring3area(void)
 {
     unsigned long *pt_ring3area = (unsigned long *) PAGETABLE_RING3AREA;
 
@@ -1306,7 +1315,7 @@ void __initialize_ring3area(void)
 // Criamos a entrada 384 apontando para a pagetable.
 // SMALL_kernel_base_pa = kernel_base_pa;
 
-void __initialize_kernelimage_region(void)
+static void __initialize_kernelimage_region(void)
 {
     unsigned long *pt_kernelimage = (unsigned long *) PAGETABLE_KERNELIMAGE; 
 
@@ -1369,7 +1378,8 @@ void __initialize_kernelimage_region(void)
 // Criamos uma pagetable.
 // Apontamos a pagetable para a entrada 385 do diretório.
 // framebuffer_pa = Endereço físico do lfb.
-void __initialize_frontbuffer(void)
+
+static void __initialize_frontbuffer(void)
 {
     unsigned long *pt_frontbuffer = (unsigned long *) PAGETABLE_FRONTBUFFER;
 
@@ -1429,7 +1439,8 @@ void __initialize_frontbuffer(void)
 // Mapeando 2mb de memória em ring3 para o backbuffer.
 // Criamos a pagetable.
 // Apontamos a pagetable para a entrada 386 do diretório.
-void __initialize_backbuffer(void)
+
+static void __initialize_backbuffer(void)
 {
     unsigned long *pt_backbuffer = (unsigned long *) PAGETABLE_BACKBUFFER;
 
@@ -1481,16 +1492,14 @@ void __initialize_backbuffer(void)
 // 0x30600000;  // 2mb a mais que o backbuffer
 // g_pagedpool_va = (unsigned long) PAGEDPOOL_VA;
 // mapeando 2mb de memória em ring3 para o pagedpool.
-void __initialize_pagedpool(void)
+
+static void __initialize_pagedpool(void)
 {
     unsigned long *pt_pagedpool = (unsigned long *) PAGETABLE_PAGEDPOOL;
-
     unsigned long pagedpool_pa = (unsigned long) SMALL_pagedpool_pa;
-
 
 // 0x30600000;  // 2mb a mais que o backbuffer
     g_pagedpool_va = (unsigned long) PAGEDPOOL_VA;
-
 
     mm_used_pagedpool = (1024 * 2);  //2mb 
 
@@ -1530,15 +1539,13 @@ void __initialize_pagedpool(void)
 // O Window server é um processo em ring0.
 // Vamos garantir que ele não use um heap vindo desse pool.
 // Pois ele tem seu próprio heap em ring0.
-void __initialize_heappool(void)
+
+static void __initialize_heappool(void)
 {
     unsigned long *pt_heappool = (unsigned long *) PAGETABLE_HEAPPOOL; 
-
-
     unsigned long heappool_pa = (unsigned long) SMALL_heappool_pa;
 
     g_heappool_va = (unsigned long) HEAPPOOL_VA; //0x30800000;
-
 
     mm_used_heappool = (1024 * 2);
     g_heap_count     = 0;
@@ -1571,7 +1578,8 @@ void __initialize_heappool(void)
 // See: x64init.c When we setup the Heap pointer.
 // InitProcess->Heap = (unsigned long) g_extraheap1_va; :)
 // 2048 KB = (2 MB).
-void __initialize_extraheap1(void)
+
+static void __initialize_extraheap1(void)
 {
     unsigned long *pt_extraheap1 = (unsigned long *) PAGETABLE_EXTRAHEAP1;
 
@@ -1610,10 +1618,9 @@ void __initialize_extraheap1(void)
 }
 
 // local worker
-void __initialize_extraheap2(void)
+static void __initialize_extraheap2(void)
 {
     unsigned long *pt_extraheap2 = (unsigned long *) PAGETABLE_EXTRAHEAP2;
-
     unsigned long extraheap2_pa = (unsigned long) SMALL_extraheap2_pa;
 
     g_extraheap2_va = (unsigned long) EXTRAHEAP2_VA; //0x30C00000;
@@ -1648,24 +1655,15 @@ void __initialize_extraheap2(void)
 
 
 // local worker
-void __initialize_extraheap3(void)
+static void __initialize_extraheap3(void)
 {
     unsigned long *pt_extraheap3 = (unsigned long *) PAGETABLE_EXTRAHEAP3;
-
     unsigned long extraheap3_pa = (unsigned long) SMALL_extraheap3_pa;
 
     g_extraheap3_va = (unsigned long) EXTRAHEAP3_VA; //0x30E00000;
 
-
     mm_used_extraheap3 = (1024 * 2); 
     g_extraheap3_size = (1024 * 2);  
-
-    //mm_fill_page_table( 
-    //    (unsigned long) &kernel_pd0[0],        // pd 
-    //    (int) PD_ENTRY_EXTRAHEAP3,             // entry
-    //    (unsigned long) &pt_extraheap3[0],     // pt
-    //    (unsigned long) SMALL_extraheap3_pa,   // region base
-    //    (unsigned long) 3 );                   // flags
 
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,          // pd 
@@ -1694,13 +1692,13 @@ void __initialize_extraheap3(void)
 // 390 = extraheap2
 // 391 = extraheap3. The window server image.
 
-void __initialize_kernel_page_tables(void)
+static void mmInitializeKernelPageTables(void)
 {
 
 // Install some pagetables into the 
 // kernel pae directory 0.
 
-    //debug_print ("__initialize_kernel_page_tables:\n");
+    //debug_print ("mmInitializeKernelPageTables:\n");
 
 // Entry 0   | va=0          | Ring 0 area.
     __initialize_ring0area();
@@ -1734,18 +1732,20 @@ void __initialize_kernel_page_tables(void)
 
     // ...
 
-    //debug_print ("__initialize_kernel_page_tables: tables done\n");
-    //printf ("__initialize_kernel_page_tables: tables done\n");
+    //debug_print ("mmInitializeKernelPageTables: tables done\n");
+    //printf ("mmInitializeKernelPageTables: tables done\n");
 }
 
 
 // ======================================
 // mmSetUpPaging:
+//     Mapping the static system areas.
 //     Main routine.
 //     Initalizing the paging support.
 // Called by init_runtime in runtime.c
+// Called by mmInit() in mminit.c
 
-int mmSetUpPaging (void)
+int mmSetUpPaging(void)
 {
     register unsigned int i=0;
 
@@ -1924,7 +1924,7 @@ int mmSetUpPaging (void)
     kernel_pml4[0] = (unsigned long) ( kernel_pml4[0] | PAGE_USER | PAGE_WRITE | PAGE_PRESENT );
 
 // local worker: Initialize kernel page tables.
-    __initialize_kernel_page_tables();
+    mmInitializeKernelPageTables();
 
 
     if ( memorysizeTotal == 0 ){
@@ -1938,7 +1938,7 @@ int mmSetUpPaging (void)
     I_initialize_frame_table();
 
 // local worker: Setup memory usage.
-    __setup_memory_usage();
+    mmSetupMemoryUsage();
 
 // ==============================================
 

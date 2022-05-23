@@ -977,13 +977,10 @@ draw_string (
     unsigned int color,
     char *string ); 
 
-
-//
-// x_panic
-//
-
+// Early panic function.
+// #todo: Explain it better.
 void x_panic( char *string );
-void xxxDrawString( char *string );
+
 
 //
 // line
@@ -1009,8 +1006,6 @@ frontbuffer_draw_horizontal_line (
 // Draw rectangle into the backbuffer.
 //
 
-
-
 void 
 backbuffer_draw_rectangle( 
     unsigned long x, 
@@ -1029,7 +1024,6 @@ frontbuffer_draw_rectangle(
     unsigned int color,
     unsigned long rop_flags );
 
-
 void 
 drawDataRectangle ( 
     unsigned long x, 
@@ -1039,7 +1033,6 @@ drawDataRectangle (
     unsigned int color,
     unsigned long rop_flags );
 
-
 void 
 refresh_rectangle ( 
     unsigned long x, 
@@ -1047,11 +1040,7 @@ refresh_rectangle (
     unsigned long width, 
     unsigned long height );
 
-
-
-
 void scroll_screen_rect (void);
-
 
 
 //
@@ -1066,14 +1055,6 @@ void backgroundDraw (unsigned int color);
 // == wm =====================
 //
 
-
-// See: kgwm.c
-unsigned long 
-wmProcedure ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
 
 // See: kgwm.c
 void 
@@ -1097,15 +1078,9 @@ void kgwm_early_kernel_console(void);
 
 // ==========
 
-// Pega um scancode, transforma em caractere e envia na forma de mensagem
-// para a thread de controle associada com a janela que tem o foco de entrada.
-
-int 
-xxxKeyEvent (
-    int tid, 
-    unsigned char raw_byte );
-
-int xxxMouseEvent(int event_id,long long1, long long2);
+// Input events:
+int wmKeyEvent( tid_t tid, unsigned char raw_byte );
+int wmMouseEvent(int event_id,long long1, long long2);
 
 #endif    
 

@@ -4,6 +4,7 @@
 #include <kernel.h>
 
 
+//#todo: Use default lib.
 #define HEX_LEN  8
 #define ____INT_MAX  2147483647
 
@@ -1763,15 +1764,17 @@ void __initialize_virtual_consoles(void)
     int cHeight=0;
 
 // Screen width and height
-    if ( SavedX == 0 || SavedY == 0 ){
-        x_panic ("__initialize_virtual_consoles: [FAIL] SavedX SavedY\n");
+    if ( gSavedX == 0 || gSavedY == 0 )
+    {
+        x_panic("__initialize_virtual_consoles: gSavedX gSavedY");
     }
 
 // Char width and height
-    cWidth = get_char_width();
+    cWidth  = get_char_width();
     cHeight = get_char_height();
+    
     if ( cWidth == 0 || cHeight == 0 ){
-        x_panic ("__initialize_virtual_consoles: [FAIL] cWidth cHeight\n");
+        x_panic ("__initialize_virtual_consoles: cWidth cHeight");
     }
 
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
@@ -1791,8 +1794,8 @@ void __initialize_virtual_consoles(void)
         CONSOLE_TTYS[i].fullscreen_flag = TRUE;
         CONSOLE_TTYS[i].cursor_left   = 0;
         CONSOLE_TTYS[i].cursor_top    = 0;
-        CONSOLE_TTYS[i].cursor_right  = (SavedX/cWidth);
-        CONSOLE_TTYS[i].cursor_bottom = (SavedY/cHeight);
+        CONSOLE_TTYS[i].cursor_right  = (gSavedX/cWidth);
+        CONSOLE_TTYS[i].cursor_bottom = (gSavedY/cHeight);
         
         //Let's use the standard colors.
         //CONSOLE_TTYS[i].bg_color = COLOR_BLACK;

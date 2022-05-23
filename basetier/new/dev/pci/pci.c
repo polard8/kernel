@@ -918,18 +918,24 @@ pciHandleDevice (
 // isso não é o ponto de montagem.
 
 
-//buffer1.
+//buffer1
+
+    // clear buffer
+    memset( __tmpname, 0, 64 );
+
     sprintf ( 
         (char *) &__tmpname[0], 
         "/DEV_%x_%x", 
         D->Vendor, 
         D->Device );
 
-//buffer2.
-    newname = (char *) kmalloc (64);
+//buffer2
+    newname = (char *) kmalloc(64);
     if ( (void*) newname == NULL ){
         panic("pciHandleDevice: [FAIL] newname\n");
     }
+    // clear buffer
+    memset( newname, 0, 64 );
     strcpy (newname,__tmpname);
 
 
@@ -944,7 +950,7 @@ pciHandleDevice (
 
     file *__file;
 
-    __file = (file *) kmalloc ( sizeof(file) );
+    __file = (file *) kmalloc( sizeof(file) );
 
     if ( (void *) __file == NULL ){
         panic("pciHandleDevice: __file\n");
@@ -979,7 +985,7 @@ pciHandleDevice (
 
     devmgr_register_device ( 
         (file *) __file, 
-        newname, 
+        newname,            // pathname.
         __class, 
         1, 
         (struct pci_device_d *) D,  // It's a pci device.

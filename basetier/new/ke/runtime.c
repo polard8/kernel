@@ -9,7 +9,7 @@
 // Kernel heap and stack stuffs.
 // #todo: Mudar para runtimeInit().
 
-int init_runtime (void)
+int init_runtime(void)
 {
     int Status = 0;
 
@@ -25,39 +25,17 @@ int init_runtime (void)
     current_arch = CURRENT_ARCH_X86_64;
 
     switch (current_arch){
-
-    // Init Memory Manager for x86:
-    // Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
-    // See: 
-    // mm/memory.c
-    // mm/pages.c
-
+    // See: mminit.c
     case CURRENT_ARCH_X86_64:
-        
-        //debug_print ("[x86_64] init_runtime: [TODO] CURRENT_ARCH_X86_64\n");
-        //printf      ("[x86_64] init_runtime: [NOT SUPPORTED] CURRENT_ARCH_X86_64\n");
-        //goto fail;
-
-        // #todo
-        // #bugbug: And if it fails?
-        // OUT:?
-        //See: mminit.c
-        //debug_print ("[x86_64] init_runtime: [TODO] Initializing mm ...\n");
-        mmInit();
-
-        // #bugbug: And if it fails?
-        // OUT:?
-        //See: pages.c
-        //debug_print ("[x86_64] init_runtime: [DANGER] Initializing paging ...\n");
-        mmSetUpPaging();
-            
+        Status = (int) mmInit();
+        if (Status < 0){
+            debug_print("init_runtime: mmInit fail\n");
+            goto fail;
+        }
         return TRUE;
         break;
-
-    // armmain (); ??
-
-        // ...
-
+    // armmain(); ?
+    // ...
     default:
         debug_print ("[Kernel] init_runtime: Current arch not defined!\n *hang");
         goto fail;

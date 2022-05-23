@@ -60,12 +60,6 @@ See:
 //...
 
 
-//extern unsigned long SavedLFB;          //LFB address.  
-//extern unsigned long SavedX;            //Screen width. 
-//extern unsigned long SavedY;            //Screen height.
-//extern unsigned long SavedBPP;          //Bits per pixel.
-
-
 // LFB - Esse é o endereço usado pelo driver de vídeo em /x
 // para acessar o LFB, ou seja o frontbuffer.
 // Lembrando que o driver de vídeo deve ser independente do 
@@ -126,7 +120,7 @@ static int __videoInit(void)
 
 // frontbuffer
 
-    __frontbuffer_pa = (unsigned long) SavedLFB;
+    __frontbuffer_pa = (unsigned long) gSavedLFB;
     __frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
     g_frontbuffer_pa = (unsigned long) __frontbuffer_pa; 
     g_frontbuffer_va = (unsigned long) __frontbuffer_va;
@@ -143,9 +137,9 @@ static int __videoInit(void)
 // (herdadas do boot loader.)
 // See: globals/gdevice.h
 
-    g_device_screen_width  = (unsigned long) SavedX;
-    g_device_screen_height = (unsigned long) SavedY;
-    g_device_screen_bpp    = (unsigned long) SavedBPP;
+    g_device_screen_width  = (unsigned long) gSavedX;
+    g_device_screen_height = (unsigned long) gSavedY;
+    g_device_screen_bpp    = (unsigned long) gSavedBPP;
 
     // gwsSetCurrentFontAddress ( VIDEO_BIOS_FONT8X8_ADDRESS );
 

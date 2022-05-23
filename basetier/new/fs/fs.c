@@ -1430,8 +1430,7 @@ sys_open (
 // #todo:
 // check arguments.
 
-    if( (void*) pathname == NULL )
-    {
+    if ( (void*) pathname == NULL ){
         return (int) (-EINVAL);
     }
 
@@ -1439,7 +1438,7 @@ sys_open (
 // creat chama open.
 // open tenta ler num arquivo que nao existe?
 
-    debug_print ("sys_open: $ \n");
+    debug_print ("sys_open: $\n");
 
 
 // #todo
@@ -1480,13 +1479,13 @@ sys_open (
 // See: fs.c
 // OUT: fd
 
-    value = (int) sys_read_file_from_disk ( 
-                     (char *) pathname, 
-                     flags, 
-                     mode );
+    value = 
+        (int) sys_read_file_from_disk ( 
+                  (char *) pathname, 
+                  flags, 
+                  mode );
 
-    if (value<0)
-    {
+    if (value<0){
         return (int) -1;
     }
 
@@ -6282,13 +6281,12 @@ sys_read_file_from_disk (
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( (void*) file_name == NULL )
-    {
+
+// filename
+    if ( (void*) file_name == NULL ){
         return (int) (-EINVAL);
     }
-
-    if ( *file_name == 0 )
-    {
+    if (*file_name == 0){
         return (int) (-EINVAL);
     }
 
@@ -6315,20 +6313,18 @@ sys_read_file_from_disk (
     // fs_search_inode_table(file_name);
 
 // Searching for the file only on the root dir.
-
-    Status = (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
-
 // Quando não existe, tentamos criar.
 // #bugbug: Então 'cat' não deve chamar essa função.
 
-    // found
-    if (Status == TRUE)
-    {
-        debug_print("sys_read_file_from_disk: Found\n");
-        refresh_screen();
+    Status = 
+        (int) search_in_dir( file_name, VOLUME1_ROOTDIR_ADDRESS );
+
+// Found.
+    if (Status == TRUE){
         goto __go;
     }
-    
+
+// Not found.
     if (Status != TRUE)
     {
          //#debug
@@ -6336,49 +6332,43 @@ sys_read_file_from_disk (
          refresh_screen();
          
          // Create a new one.
+         // #todo: Use sys_crete_empty_file.
          if (flags & O_CREAT)
          {
              debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
 
              buff = (void*) kmalloc(1024);
-             if ((void*)buff==NULL)
-             {
-                 debug_print("sys_read_file_from_disk: buff fail\n");
-                 refresh_screen();
-                 return -1; 
+             
+             if ((void*)buff==NULL){
+                 printf("sys_read_file_from_disk: buff\n");
+                 goto fail;
              }
 
              //++
-             // See: sci/fs/write.c
-             //taskswitch_lock ();
-             //scheduler_lock ();
-
-             __ret = (int) fsSaveFile ( 
-                               VOLUME1_FAT_ADDRESS, 
-                               VOLUME1_ROOTDIR_ADDRESS, 
-                               FAT16_ROOT_ENTRIES, 
-                              (char *) file_name, 
-                              (unsigned long) 2,      // size in sectors 
-                              (unsigned long) 1024,   // size in bytes  
-                              (char *) buff,          // buffer ?
-                              (char) 0x20 );          // flag 
-
-              //scheduler_unlock ();
-              //taskswitch_unlock ();
+             // See: fs/write.c
+             __ret = 
+                 (int) fsSaveFile ( 
+                           VOLUME1_FAT_ADDRESS, 
+                           VOLUME1_ROOTDIR_ADDRESS, 
+                           FAT16_ROOT_ENTRIES, 
+                           (char *) file_name, 
+                           (unsigned long) 1,   //2,     // size in sectors 
+                           (unsigned long) 512, //1024,  // size in bytes  
+                           (char *) buff,         // buffer ?
+                           (char) 0x20 );         // flag 
               //--
               
               // Ok
               if (__ret == 0)
               {
                   debug_print("sys_read_file_from_disk: Created new file\n");
-                  refresh_screen();
+                  //refresh_screen();
                   goto __go;
               }
          }
 
          printf("sys_read_file_from_disk: [FIXME] Can't create new file\n");
-         refresh_screen();
-         return (int) (-1);
+         goto fail;
     }
 
 __go:
@@ -6388,13 +6378,12 @@ __go:
     p = (struct process_d *) processList[current_process];
 
     if ( (void *) p == NULL ){
-        debug_print ("sys_read_file_from_disk: p\n");
-        return -1;
+        printf("sys_read_file_from_disk: p\n");
+        goto fail;
     }
-
     if ( p->used != TRUE || p->magic != 1234 ){
-        debug_print ("sys_read_file_from_disk: validation\n");
-        return -1;
+        printf("sys_read_file_from_disk: p validation\n");
+        goto fail;
     }
 
 // Procurando um slot livre.
@@ -6404,7 +6393,9 @@ __go:
     };
 
 // fail
-    panic ("sys_read_file_from_disk: No slots!\n");
+    //panic ("sys_read_file_from_disk: No slots!\n");
+    printf("sys_read_file_from_disk: No slots!\n");
+    goto fail;
 
 // Slot found.
 __OK:
@@ -6412,24 +6403,21 @@ __OK:
     if ( __slot < 0 || __slot >= 32 )
     {
         printf ("sys_read_file_from_disk: Slot fail\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
     }
- 
+
 // File struct
 
     __file = (file *) kmalloc( sizeof(file) );
     
     if ( (void *) __file == NULL ){
         printf ("sys_read_file_from_disk: __file\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
-    // initialize.
+// initialize.
     __file->used = TRUE;
     __file->magic = 1234;
-
     __file->pid = (pid_t) current_process;
     __file->uid = (uid_t) current_user;
     __file->gid = (gid_t) current_group;
@@ -6494,30 +6482,29 @@ __OK:
 
     __file->_base = (char *) kmalloc(BUFSIZ);
     
-    if ( (void *) __file->_base == NULL )
-    {
-        printf ("sys_read_file_from_disk: buffer fail\n");
-        refresh_screen();
-        return -1;
+    if ( (void *) __file->_base == NULL ){
+        printf ("sys_read_file_from_disk: __file->_base\n");
+        goto fail;
     }
-
 
 // #debug
     //printf ("FILE_AGAIN={%s}\n",file_name);
     //refresh_screen();
-    
-    // File size.
-    // #bugbug: OUT: 'unsigned long'
-    FileSize = (size_t) fsGetFileSize( 
-                            (unsigned char *) file_name,
-                            (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
 
-    if (FileSize <= 0)
-    {
-        printf ("sys_read_file_from_disk: File size fail\n");
-        refresh_screen();
-        return (-1);
+// File size.
+// #bugbug: 
+// OUT: 'unsigned long' ?
+
+    FileSize = 
+        (size_t) fsGetFileSize( 
+                      (unsigned char *) file_name,
+                      (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
+
+    if (FileSize <= 0){
+        printf ("sys_read_file_from_disk: FileSize\n");
+        goto fail;
     }
+
 
 // Limits.
     //if ( FileSize < __file->_lbfsize )
@@ -6526,16 +6513,17 @@ __OK:
     //}
 
 // Limits.
-// Se o arquivo for maior que buffer dispon�vel.
-// Podemos almentar o buffer.
+// Se o arquivo for maior que buffer disponivel.
+// Podemos aumentar o buffer.
+
     if (FileSize >= __file->_lbfsize)
     {
 
         // #debug
-        printf ("sys_read_file_from_disk: [todo] File size out of limits\n");
-        refresh_screen();
-        return (-1);
-        
+        printf("sys_read_file_from_disk: [todo] File size out of limits\n");
+        printf("Size {%d}\n",FileSize);
+        goto fail;
+
         // #bugbug: Provisório.
         // Limite - 1MB.
         if (FileSize > 1024*1024)
@@ -6572,11 +6560,10 @@ __OK:
 
 // #paranoia.
 // Checando base novamente.
-    if ( (void *) __file->_base == NULL )
-    {
-        printf ("sys_read_file_from_disk: buffer fail\n");
-        refresh_screen();
-        return -1;
+
+    if ( (void *) __file->_base == NULL ){
+        printf("sys_read_file_from_disk: __file->_base (again)\n");
+        goto fail;
     }
 
 // Pointer.
@@ -6588,11 +6575,15 @@ __OK:
     // vamos ler do começo do arquivo.
     __file->_r = 0;
 
-    // o ponteiro de escrita mudou pois escrevemos um 
-    // arquivo inteiro no buffer.
+
+// O ponteiro de escrita mudou 
+// pois escrevemos um arquivo inteiro no buffer.
+
     __file->_w = FileSize;
 
-    if( FileSize >= BUFSIZ )
+// #bugbug
+
+    if ( FileSize >= BUFSIZ )
     {
         printf ("sys_read_file_from_disk: the file is larger than the buffer \n");
         refresh_screen();
@@ -6600,7 +6591,7 @@ __OK:
         __file->_cnt = 0;
     }
 
-    // agora temos menos espaço no buffer.
+// Agora temos menos espaço no buffer.
     __file->_cnt = ( BUFSIZ - FileSize );
 
 
@@ -6611,16 +6602,14 @@ __OK:
         (int) fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
                   VOLUME1_ROOTDIR_ADDRESS, 
-                  FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.
+                  FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
                   file_name, 
                   (unsigned long) __file->_base,
                   __file->_lbfsize );
 
-    if ( Status != 0 )
-    {
+    if (Status != 0){
         printf ("sys_read_file_from_disk: fsLoadFile fail\n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
 
 // #bugbug
@@ -6701,7 +6690,8 @@ __OK:
     // ok to write
     //__file->_flags = (__file->_flags | __SWR);
 
-// Salva o ponteiro.  
+
+// Salva o ponteiro de estrutura de arquivo.  
 // Ja checamos fd.
     p->Objects[__slot] = (unsigned long) __file;
 
@@ -6714,41 +6704,56 @@ __OK:
 
 // Done.
 // Vamos retornar o fd.
-// Pois essa rotina � usada por open();
+// Pois essa rotina eh usada por open();
 
-    debug_print ("sys_read_file_from_disk: done\n");
-                  
+done:
+    debug_print("sys_read_file_from_disk: done\n");
     return (int) __file->_file;
+
+fail:
+    refresh_screen();
+    return -1;
 }
 
 
 // ==============================
 // Service 43
 // See: fs_create_empty_file()
-int sys_create_empty_file ( char *file_name )
+
+int sys_create_empty_file( char *file_name )
 {
     int __ret = -1;
 
+
+    //char *FileName;
+    //FileName = (char *) file_name;
+
 // #bugbug: 
 // We need a buffer in another place.
-
+// #todo: Allocate space for a new file.
     char buffer[512];
-    int size_in_bytes = 512;
-    int number_of_sectors = 1;
+    //char *buf;
+
+// How many bytes.
+    int FileSizeInBytes = 512;
+
+// How many sectors.
+// (FileSizeInBytes/512)
+    int NumberOfSectors = 1;
+
 
     debug_print ("sys_create_empty_file:\n");
 
-    if ( (void*) file_name == NULL )
-    {
+
+    if ( (void*) file_name == NULL ){
+        return (int) (-EINVAL);
+    }
+    if (*file_name == 0){
         return (int) (-EINVAL);
     }
 
-    if ( *file_name == 0 )
-    {
-        return (int) (-EINVAL);
-    }
-
-    fs_fntos ( (char *) file_name );
+// Change the string format.
+    fs_fntos( (char *) file_name );
 
 
 // 0x20 = file.
@@ -6759,8 +6764,8 @@ int sys_create_empty_file ( char *file_name )
                   VOLUME1_ROOTDIR_ADDRESS, 
                   FAT16_ROOT_ENTRIES,
                   (char *)         file_name,
-                  (unsigned long)  number_of_sectors, 
-                  (unsigned long)  size_in_bytes,  
+                  (unsigned long)  NumberOfSectors, 
+                  (unsigned long)  FileSizeInBytes,  
                   (char *)         &buffer[0], 
                   (char)           0x20 ); 
 

@@ -18,9 +18,10 @@ extern unsigned long wmData_RCX;
 extern unsigned long wmWindowMananer_SendMessage(void);
 
 // used for handling screen dimensions.
-extern unsigned long SavedX;
-extern unsigned long SavedY;
+//extern unsigned long gSavedX;
+//extern unsigned long gSavedY;
 
+// global
 // Foreground console.
 int fg_console=0;
 
@@ -49,12 +50,12 @@ static int saved_y=0;
 // == Private functions: Prototypes ======================
 //
 
+
+static void __ConsoleOutbyte (int c, int console_number);
+
 static void __test_path(void);
 
-//
-// == prototypes ===============================
-//
-
+//#todo: Use static modifier.
 void __local_ri (void);
 void csi_J (int par);
 void csi_K(int par);
@@ -392,6 +393,7 @@ console_interrupt(
     int TargetThreadTID = (target_thread & 0xFFFF);
     int DeviceType = device_type;
     int Data = data;
+    int Status=-1;
 
 // #todo
 // E se não tivermos uma foreground thread ?
@@ -418,8 +420,10 @@ console_interrupt(
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device :)\n");
 
-            xxxKeyEvent(TargetThreadTID,Data);
-
+            Status = (int) wmKeyEvent( (tid_t) TargetThreadTID, Data );
+            if(Status<0)
+                return;
+            
             // Lets end this round putting a given thread at the end
             // of this round.
 
@@ -568,8 +572,8 @@ void console_init_virtual_console (int n)
 
 
 // #todo: 8 = char size.
-    unsigned long screen_width_in_chars  = (SavedX/8);
-    unsigned long screen_height_in_chars = (SavedY/8);
+    unsigned long screen_width_in_chars  = (gSavedX/8);
+    unsigned long screen_height_in_chars = (gSavedY/8);
 
 // Full screen
     CONSOLE_TTYS[ConsoleIndex].fullscreen_flag = TRUE;
@@ -789,7 +793,7 @@ void console_scroll (int console_number)
              i < (CONSOLE_TTYS[console_number].cursor_right-1);
              i++ )
        {
-           xxxConsoleOutbyte (' ',console_number); 
+           __ConsoleOutbyte(' ',console_number); 
        };
     }
 
@@ -817,7 +821,7 @@ void console_scroll (int console_number)
  * @todo: Colocar no buffer de arquivo.
  */
 
-// This functions calls xxxConsoleOutbyte to draw
+// This functions calls __ConsoleOutbyte to draw
 // the char into the screen.
 
 
@@ -1072,27 +1076,23 @@ void console_outbyte (int c, int console_number)
 // Atualisa o prev.
 
 draw:
-    xxxConsoleOutbyte(Ch,n);
+    __ConsoleOutbyte(Ch,n);
     prev = Ch;
 }
 
 
-/*
- * xxxConsoleOutbyte:
- * 
- *    Outputs a char on the console device;
- *    Low level function to draw the char into the screen.
- *    it calls the embedded window server.
- */
+// worker
+// __ConsoleOutbyte:
+// Outputs a char on the console device;
+// Low level function to draw the char into the screen.
+// it calls the embedded window server.
+// #test
+// Tentando pegar as dimensões do char.
+// #importante: 
+// Não pode ser 0, pois poderíamos ter divisão por zero.
+// Called by console_outbyte().
 
-	// #test
-	// Tentando pegar as dimensões do char.
-	// #importante: 
-	// Não pode ser 0, pois poderíamos ter divisão por zero.
-
-// Called by console_outbyte.
-
-void xxxConsoleOutbyte (int c, int console_number)
+static void __ConsoleOutbyte (int c, int console_number)
 {
 
 // Arguments.
@@ -1103,7 +1103,7 @@ void xxxConsoleOutbyte (int c, int console_number)
     int cHeight = get_char_height();
 
     // #debug
-    // debug_print ("xxxConsoleOutbyte:\n");
+    // debug_print ("__ConsoleOutbyte:\n");
 
 
     // #todo: Check verflow
@@ -1115,14 +1115,14 @@ void xxxConsoleOutbyte (int c, int console_number)
 
     if ( n < 0 || n >= CONSOLETTYS_COUNT_MAX  )
     {
-        debug_print ("xxxConsoleOutbyte: [FAIL] n\n");
-        x_panic     ("xxxConsoleOutbyte: [FAIL] n\n");
+        debug_print ("__ConsoleOutbyte: [FAIL] n\n");
+        x_panic     ("__ConsoleOutbyte: [FAIL] n\n");
     }
 
     if ( cWidth == 0 || cHeight == 0 )
     {
-        debug_print ("xxxConsoleOutbyte: char w h\n");
-        x_panic     ("xxxConsoleOutbyte: fail w h");
+        debug_print ("__ConsoleOutbyte: char w h\n");
+        x_panic     ("__ConsoleOutbyte: fail w h");
     }
 
 // #bugbug
@@ -1132,8 +1132,8 @@ void xxxConsoleOutbyte (int c, int console_number)
     //if ( VideoBlock.useGui != TRUE )
     if ( VideoBlock.useGui == FALSE )
     {
-        debug_print ("xxxConsoleOutbyte: kernel in text mode\n");
-        x_panic     ("xxxConsoleOutbyte: kernel in text mode\n");
+        debug_print ("__ConsoleOutbyte: kernel in text mode\n");
+        x_panic     ("__ConsoleOutbyte: kernel in text mode\n");
     }
 
 // #Importante: 
@@ -1364,6 +1364,9 @@ int consoleCompareStrings(void)
         devmgr_show_device_list(ObjectTypeTTY);
         printf("pci devices:\n");
         devmgr_show_device_list(ObjectTypePciDevice);
+        printf("devices with regular files:\n");
+        devmgr_show_device_list(ObjectTypeFile);
+        //...
         goto exit_cmp;
     }
 
@@ -2260,12 +2263,29 @@ int VirtualConsole_initialize(void)
 // Virtual Console:
 // The kernel only have four virtual consoles.
 
-    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++){
+    //struct tty_d *tmp_tty;
+
+    for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
+    {
         console_init_virtual_console(i);
+    
+        //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
+        
+        // Register tty device.
+        //devmgr_register_device ( 
+        //    (file *) __file, 
+        //    newname,            // pathname 
+        //    0,                  // class (char, block, network)
+        //    1,                  // type (pci, legacy
+        //    NULL,  // Not a pci device.
+        //    tmp_tty );  // tty device
+
     };
 
 // Setup foreground console.
     jobcontrol_switch_console(0);
+
+
 
 
 // Obs: 

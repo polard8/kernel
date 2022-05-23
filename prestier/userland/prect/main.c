@@ -1,12 +1,10 @@
+
 // Draw a rectangle.
 // Credits:
 // See: https://gist.github.com/Silva97/0d7cfd0ef8ae19d8d74b654367d35997
 
-
 // rtl
 #include <stdio.h>
-
-
 
 
 enum {
@@ -28,17 +26,17 @@ void printrect(int width, int height);
 
 
 
-int main(void){
-
+int main(void)
+{
     printf("\n");
     printf("\n");
-    printrect ( 10, 10);
-    
+    printrect(10,10);
     return 0;
 }
 
-void printrect(int width, int height){
-	
+
+void printrect(int width, int height)
+{
 	int i=0;
 	
     for(i=0; i < height; i++){
@@ -61,9 +59,9 @@ void printrect(int width, int height){
     }
 }
 
-void putmchar(int c, int times){
-	
-	int i=0;
+void putmchar(int c, int times)
+{
+    int i=0;
     for(i=0; i < times; i++)
         putchar(c);
 }

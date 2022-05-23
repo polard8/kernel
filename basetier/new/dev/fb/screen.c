@@ -5,16 +5,19 @@
 #include <kernel.h>
 
 
-extern unsigned long SavedX;
-extern unsigned long SavedY;
-extern unsigned long SavedBPP;
+unsigned long gSavedLFB;
+unsigned long gSavedX;
+unsigned long gSavedY;
+unsigned long gSavedBPP;
 
 
-unsigned long screen_width; 
-unsigned long screen_height;
-unsigned long screen_bpp;
-
-unsigned long screen_pitch;
+// Private variables.
+// Display device support.
+static unsigned long screen_width=0;
+static unsigned long screen_height=0;
+static unsigned long screen_bpp=0;
+static unsigned long screen_pitch=0;
+//...
 
 
 // Qual é o endereço virtual do início de uma dada linha da tela?
@@ -135,10 +138,9 @@ void fb_refresh_screen (unsigned long flags)
         return;
     }
 
-    if ( SavedX == 0 || SavedY == 0 || SavedBPP == 0 )
+    if ( gSavedX == 0 || gSavedY == 0 || gSavedBPP == 0 )
     {
-        debug_print_string("fb_refresh_screen: [FAIL] validation\n");
-        return;
+        panic("fb_refresh_screen: display info\n");
     }
 
 // #todo
@@ -151,7 +153,7 @@ void fb_refresh_screen (unsigned long flags)
 // mas teriamos uma tela recortada. kkk
 // Essa tecnica pode ser uma opçao configuravel
 
-    //int Total = (int)(SavedX*SavedBPP*SavedY);
+    //int Total = (int)(gSavedX*gSavedBPP*gSavedY);
     int Total = (screen_size_in_kb * 1024);
 
 /*
@@ -236,51 +238,61 @@ void invalidate_screen(void)
 // Screen is a reagion in the display, or in many displays.
 // Display is a monitor, or a set o hid in a given host.
 
-int screenInit (void){
-
+int screenInit(void)
+{
     debug_print ("screenInit:\n");
-
 
 // Validate the whole screen
 // We don't need to flush the screen yet.
 
     screen_is_dirty = FALSE;
 
-
 // Configura globais com base nos valores passados pelo Boot Loader.
 
-    screenSetSize ( (unsigned long) SavedX, (unsigned long) SavedY );
+    screenSetSize( 
+        (unsigned long) gSavedX, 
+        (unsigned long) gSavedY );
     
-    screen_bpp = SavedBPP;
-    screen_pitch = ( SavedBPP * SavedX );
+    screen_bpp = gSavedBPP;
+    screen_pitch = ( gSavedBPP * gSavedX );
 
 // Setup Screen structure.
 // See: screen.h
     
-    Screen = (void *) kmalloc ( sizeof(struct screen_d) );
-    
-    if ( (void *) Screen == NULL ){
-        panic ("screenInit:\n");
-    }else{
-        Screen->used  = TRUE;
-        Screen->magic = 1234;
-        Screen->id = 0;
-        Screen->left = SCREEN_DEFAULT_LEFT;
-        Screen->top  = SCREEN_DEFAULT_TOP; 
-        Screen->width  = (unsigned long) screenGetWidth();
-        Screen->height = (unsigned long) screenGetHeight();
-        Screen->next   = NULL;
-        // ...
- 
-        // salvando o ponteiro da estrutura. 
-        ScreenInfo    = (void *) Screen;
-        CurrentScreen = (void *) Screen;
-        //...
-    };
+    Screen = (void *) kmalloc( sizeof(struct screen_d) );
 
-    // ?
+    if ( (void *) Screen == NULL )
+    {
+        panic("screenInit: Screen\n");
+    }
+
+    Screen->id = 0;  //??
+
+    Screen->left   = (unsigned long) SCREEN_DEFAULT_LEFT;
+    Screen->top    = (unsigned long) SCREEN_DEFAULT_TOP; 
+    Screen->width  = (unsigned long) screenGetWidth();
+    Screen->height = (unsigned long) screenGetHeight();
+
+
+    if( Screen->width == 0 || Screen->height == 0 )
+    {
+        panic("screenInit: width height\n");
+    }
+
+    // ...
+
+    Screen->next = NULL;
+
+    Screen->used = TRUE;
+    Screen->magic = 1234;
+
+// Salvando o ponteiro da estrutura. 
+
+    ScreenInfo    = (void *) Screen;
+    CurrentScreen = (void *) Screen;
+
+    //...
 
     return 0;
 }
-
 

@@ -91,8 +91,7 @@ CFLAGS := \
 endif
 
 
-
-.PHONY: all libc-header libc-content libc-footer link install clean
+.PHONY: all libc-header libc-content libc-footer link install clean clean-all
 
 all: libc-header libc-content libc-footer \
 link install clean    
@@ -173,6 +172,9 @@ install:
 	-cp *.o       obj/
 	#-cp LIBC03.A  obj/
 	#-cp LIBC03.SO obj/
+
+clean-all: clean 
+	-rm obj/*.o
 
 clean:
 	-rm *.o

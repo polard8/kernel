@@ -177,6 +177,9 @@ void __ps2mouse_parse_data_packet (void)
     int button1_changed=FALSE;
     int button2_changed=FALSE;
 
+    int Status=-1;
+
+
 // Save the old values of x and y.
     saved_mouse_x = mouse_x;
     saved_mouse_y = mouse_y;
@@ -281,11 +284,11 @@ void __ps2mouse_parse_data_packet (void)
     {
         // Presssed
         if( mbuttons_current_state[0] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 1, 1 );
+            wmMouseEvent( MSG_MOUSEPRESSED, 1, 1 );
         }
         // Released
         if( mbuttons_current_state[0] == FALSE ){
-            xxxMouseEvent( MSG_MOUSERELEASED, 1, 1 );
+            wmMouseEvent( MSG_MOUSERELEASED, 1, 1 );
         }
         return;
     }
@@ -297,11 +300,11 @@ void __ps2mouse_parse_data_packet (void)
     {
         // Pressed
         if( mbuttons_current_state[1] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 2, 2 );
+            wmMouseEvent( MSG_MOUSEPRESSED, 2, 2 );
         }
         // Relesed
         if( mbuttons_current_state[1] == FALSE ){
-            xxxMouseEvent( MSG_MOUSERELEASED, 2, 2 );
+            wmMouseEvent( MSG_MOUSERELEASED, 2, 2 );
         }
         return;
     }
@@ -313,11 +316,11 @@ void __ps2mouse_parse_data_packet (void)
     {
         // Pressed
         if( mbuttons_current_state[2] == TRUE ){
-            xxxMouseEvent( MSG_MOUSEPRESSED, 3, 3 );
+            wmMouseEvent( MSG_MOUSEPRESSED, 3, 3 );
         }
         // Released
         if( mbuttons_current_state[2] == FALSE ){
-            xxxMouseEvent( MSG_MOUSERELEASED, 3, 3 );
+            wmMouseEvent( MSG_MOUSERELEASED, 3, 3 );
         }
         return;
     }
@@ -336,7 +339,7 @@ void __ps2mouse_parse_data_packet (void)
 // Call the event handler.
 // IN: event id, x, y.
     if (ps2_mouse_moving==TRUE){
-        xxxMouseEvent( MSG_MOUSEMOVE, mouse_x, mouse_y );
+        wmMouseEvent( MSG_MOUSEMOVE, mouse_x, mouse_y );
     }
 }
 
@@ -381,9 +384,35 @@ void ps2mouse_initialize_device (void)
     unsigned char device_id=0;
 
     debug_print ("ps2mouse_initialize_device:\n");
-
-
     PS2Mouse.initialized = FALSE;
+
+//====================================
+// #test
+// register device
+// create file.
+    file *fp;
+    fp = (file *) kmalloc( sizeof(file) );
+    if ( (void *) fp == NULL )
+    {
+        panic ("mouse: fp\n");
+    }
+    fp->used = TRUE;
+    fp->magic = 1234;
+    fp->____object = ObjectTypeFile;
+    fp->isDevice = TRUE;
+    //#todo: Initialize the file structure ... buffer ...
+    devmgr_register_device ( 
+        (file *) fp, 
+        "/DEV/MOUSE0",        // pathname 
+        0,             // class (char, block, network) #todo
+        1,             // type (pci, legacy)    #todo
+        NULL,          // Not a pci device.
+        NULL );        // Not a tty device. (not for now)
+//====================================
+
+
+
+
 
 // pointer.
 
@@ -810,6 +839,11 @@ void DeviceInterface_PS2Mouse(void)
         mouse_stage = 0;
         break;
     };
+
+   // #todo
+   // Coloque os pacotes num arquivo,
+   // o window server poderá ler depois.
+   //write_packet(mousefp,...)
 }
 
 

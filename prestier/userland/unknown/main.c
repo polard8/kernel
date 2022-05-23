@@ -1,19 +1,17 @@
-// unknown.bin
 
+// unknown.bin
 // Remonta o nome do arquivo, caso ele tenha sido
 // digitado com espaços ...
-
-
 
 // rtl
 #include <stdio.h>
 
 
-
 char buf[512];
 int nread = 1;
 
-int get (int ifile) 
+
+int get(int ifile) 
 {
     char *ibuf;
     //static ibuf;
@@ -21,14 +19,14 @@ int get (int ifile)
     //printf ("$");
     //fflush(stdout);
 
-    if(--nread)
-    {
+    if (--nread){
         return (*ibuf++);
     }
 
-    if (nread = read (ifile, buf, 512, 0 ) )
+    if ( nread = read(ifile, buf, 512, 0 ) )
     {
-        if(nread < 0)goto err;
+        if(nread < 0)
+            goto err;
         
         ibuf = buf;
         return (*ibuf++);
@@ -38,23 +36,20 @@ int get (int ifile)
     return (0);
 
 err:
-  nread = 1;
-  printf ("read error\n");
-  return(0);
-
+    nread = 1;
+    printf ("read error\n");
+    return(0);
 }
 
-int main (int argc, char *argv[]){
 
+int main(int argc, char *argv[])
+{
     char b[242];
     char c[60];
-    
-
 
     //int nread = 1;
 
     int l, isw, k, ifile, i, j;
-
 
     if (--argc <= 0)
 	{
@@ -66,14 +61,13 @@ int main (int argc, char *argv[]){
     l = 1;
 
     while (argc--)
-	{
+    {
         printf("%s:\n \n",argv[l]);
-        //
-        // open
-        //
 
-	    ifile = open (argv[l++],0, 0);
-	    
+        // open
+
+        ifile = open( argv[l++], 0, 0 );
+
 	    if(ifile < 0){
 			printf("cannot open input file\n");
 		    exit (1);
@@ -94,7 +88,8 @@ int main (int argc, char *argv[]){
             //fflush(stdout);
 
             // Se for letra.
-            if ((b[i] >= 'a' & b[i] <= 'z') || (b[i] >= 'A' & b[i] <= 'Z'))
+            if ( (b[i] >= 'a' & b[i] <= 'z') || 
+                 (b[i] >= 'A' & b[i] <= 'Z') )
             {
                 c[j++] = b[i];
                 goto cont;
@@ -116,7 +111,11 @@ int main (int argc, char *argv[]){
                 i = -1;
 
                 // Espaços.
-                while (((b[++i] = get(ifile)) == ' ') || (b[i] == '\t') || (b[i] == '\n'));
+                while ( ((b[++i] = get(ifile)) == ' ') || 
+                         (b[i] == '\t') || 
+                         (b[i] == '\n') )
+                {
+                };
                 c[j++] = b[i];
                 goto cont;
             }
@@ -124,7 +123,8 @@ int main (int argc, char *argv[]){
             // Pulando linha
             if (b[i] == '\n')
             {
-				if(isw != 1)goto newl;
+				if(isw != 1)
+				    goto newl;
 				i = -1; 
             }
 

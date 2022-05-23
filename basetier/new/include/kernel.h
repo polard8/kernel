@@ -106,42 +106,48 @@ struct io_control_d  IOControl;
 
 // ...
 
-// global. Don't use static.
-// Importados de bl64.
-// See: main.c
-unsigned long SavedLFB;
-unsigned long SavedX;
-unsigned long SavedY;
-unsigned long SavedBPP;
+// Display device support.
+// Imported from bl64.
+// Change to gSavedLFB ...
+// See: screen.c
+
+extern unsigned long gSavedLFB;
+extern unsigned long gSavedX;
+extern unsigned long gSavedY;
+extern unsigned long gSavedBPP;
 
 
 // =========================================================
 
+// #todo
+// Reorganizar esses headers quando puder.
+
+
 // (NT)
 // gramado OS headers.
 
-// oh boy
-#include "gramado/0boy/0boy.h"
+// Alpha Ii.
+#include "alpha/0alpha/0alpha.h"
 
 // config
-#include "gramado/0config/version.h"    // Product. 
-#include "gramado/0config/u.h"          // User
-#include "gramado/0config/config.h"     // Compiling.
+#include "alpha/0config/version.h"    // Product. 
+#include "alpha/0config/u.h"          // User
+#include "alpha/0config/config.h"     // Compiling.
 
 // globals
-#include "gramado/limits.h"
-#include "gramado/0globals/limits.h"
+#include "alpha/limits.h"
+#include "alpha/0globals/limits.h"
 
 #include "mm/x64gpa.h"
 #include "mm/x64gva.h"
 
-#include "gramado/0globals/gentry.h"
-#include "gramado/0globals/gdef.h"
-#include "gramado/0globals/gdevice.h"
-#include "gramado/0globals/gobject.h"
-#include "gramado/0globals/gspin.h"
-#include "gramado/0globals/ginput.h"  // input manager support.
-#include "gramado/0globals/gwd.h"     // whatch dogs.
+#include "alpha/0globals/gentry.h"
+#include "alpha/0globals/gdef.h"
+#include "alpha/0globals/gdevice.h"
+#include "alpha/0globals/gobject.h"
+#include "alpha/0globals/gspin.h"
+#include "alpha/0globals/ginput.h"  // input manager support.
+#include "alpha/0globals/gwd.h"     // whatch dogs.
 
 // libc support.
 #include "kstdarg.h"
@@ -172,9 +178,9 @@ unsigned long SavedBPP;
 #include "mm/intelmm.h"
 #include "mm/x64mm.h"     // mm, memory manager support.
 
-
-#include "drivers/video/video.h"
-#include "drivers/video/screen.h"
+// fb device
+#include "dev/fb/video.h"
+#include "dev/fb/screen.h"
 
 #include "user/fonts.h"
 #include "user/ascii.h" 
@@ -192,9 +198,8 @@ unsigned long SavedBPP;
 // hal
 #include "hal/ports64.h"
 
-
-#include "drivers/video/halvid.h"
-
+// fb device
+#include "dev/fb/halvid.h"
 
 // hal
 #include "hal/cpu.h"
@@ -203,17 +208,17 @@ unsigned long SavedBPP;
 #include "hal/x64.h"
 #include "hal/detect.h"
 
-#include "drivers/tty/serial.h"
+#include "dev/tty/serial.h"
 
 //ata
-#include "drivers/ata/ata.h"
-#include "drivers/ata/ide.h"
+#include "dev/ata/ata.h"
+#include "dev/ata/ide.h"
 
 // Block devices
-#include "drivers/super.h"
-#include "drivers/volume.h"
-#include "drivers/disk.h"  
-#include "drivers/storage.h" 
+#include "dev/super.h"
+#include "dev/volume.h"
+#include "dev/disk.h"  
+#include "dev/storage.h" 
 
 // hal
 #include "hal/pit.h"
@@ -223,8 +228,11 @@ unsigned long SavedBPP;
 #include "hal/cpuid.h"
 #include "hal/rtc.h"
 
-#include "drivers/input/i8042/keyboard.h"
-#include "drivers/input/i8042/mouse.h"
+// kbd device
+#include "dev/kbd/keyboard.h"
+
+// mouse device
+#include "dev/mouse/mouse.h"
 
 #include "hal/bus/pci.h"
 #include "hal/up.h"
@@ -260,21 +268,28 @@ unsigned long SavedBPP;
 #include "user/security/security.h"
 
 // tty
-#include "drivers/tty/ttyldisc.h"
-#include "drivers/tty/ttydrv.h"
-#include "drivers/tty/tty.h"
-#include "drivers/tty/pty.h"
+#include "dev/tty/ttyldisc.h"
+#include "dev/tty/ttydrv.h"
+#include "dev/tty/tty.h"
+#include "dev/tty/pty.h"
 
 #include "user/vt.h"
 #include "user/console.h"
 
 
 // =============================
+
 // i8042 ps2 controller.
-#include "drivers/input/i8042/i8042.h"
-#include "drivers/input/i8042/ps2mouse.h"
-#include "drivers/input/i8042/ps2kbd.h"
-#include "drivers/input/i8042/ps2.h"
+#include "dev/i8042.h"
+
+// mouse device
+#include "dev/mouse/ps2mouse.h"
+
+// kbd device
+#include "dev/kbd/ps2kbd.h"
+
+// i8042 ps2 controller.
+#include "dev/ps2.h"
 
 // Network
 
@@ -292,13 +307,13 @@ unsigned long SavedBPP;
 #include "net/socket.h"      //last always
 
 // device manager
-#include "drivers/devmgr.h"      
+#include "dev/devmgr.h"      
 
 #include "hal/io.h"               //io.
 
-#include "gramado/init.h"
-#include "gramado/debug.h"
-#include "gramado/system.h"   // system manager
+#include "alpha/init.h"
+#include "alpha/debug.h"
+#include "alpha/system.h"   // system manager
 
 // mm
 #include "mm/mmglobal.h"  // Deve ficar mais acima.
@@ -307,16 +322,16 @@ unsigned long SavedBPP;
 #include "mm/bank.h"      // Bank. database
 #include "mm/x64mm.h"     // mm, memory manager support.
 
-#include "gramado/object.h"
+#include "alpha/object.h"
 
 // profiler
-#include "gramado/pints.h"
+#include "alpha/pints.h"
 
 #include "runtime.h"
-#include "gramado/request.h"
-#include "gramado/gpid.h"      // Globals. PIDs support.
-#include "gramado/utsname.h"
-#include "gramado/info.h"      // last one?
+#include "alpha/request.h"
+#include "alpha/gpid.h"      // Globals. PIDs support.
+#include "alpha/utsname.h"
+#include "alpha/info.h"      // last one?
 
 
 // ==============================

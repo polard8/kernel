@@ -3,6 +3,7 @@
 
 #include <kernel.h>
 
+
 //
 // == private functions: prototypes =====================
 //
@@ -176,15 +177,13 @@ __drawrectangle0(
 	// Ou seja: O dedicated buffer de uma janela deve ser menor que
 	// o backbuffer.
 
-    //if ( Rect.right  > SavedX ){  Rect.right  = SavedX;  }
-    //if ( Rect.bottom > SavedY ){  Rect.bottom = SavedY;  }
+    //if ( Rect.right  > gSavedX ){  Rect.right  = gSavedX;  }
+    //if ( Rect.bottom > gSavedY ){  Rect.bottom = gSavedY;  }
 
-
-    if ( Rect.left   < ClippingRect.left   ){  Rect.left   = ClippingRect.left;   }
-    if ( Rect.top    < ClippingRect.top    ){  Rect.top    = ClippingRect.top;    }
-    if ( Rect.right  > ClippingRect.right  ){  Rect.right  = ClippingRect.right;  }
-    if ( Rect.bottom > ClippingRect.bottom ){  Rect.bottom = ClippingRect.bottom; }
-
+    if ( Rect.left   < ClippingRect.left   ){ Rect.left   = ClippingRect.left;   }
+    if ( Rect.top    < ClippingRect.top    ){ Rect.top    = ClippingRect.top;    }
+    if ( Rect.right  > ClippingRect.right  ){ Rect.right  = ClippingRect.right;  }
+    if ( Rect.bottom > ClippingRect.bottom ){ Rect.bottom = ClippingRect.bottom; }
 
 //
 // Draw
@@ -410,14 +409,14 @@ __refresh_rectangle0 (
     line_size = (unsigned int) (width  & 0xFFFF); 
     lines     = (unsigned int) (height & 0xFFFF);
 
-    switch (SavedBPP){
+    switch (gSavedBPP){
 
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
         // ... #todo
         
         default:
-            panic ("refresh_rectangle: SavedBPP\n");
+            panic("refresh_rectangle: SavedBPP\n");
             break;
     };
 
@@ -621,26 +620,28 @@ void scroll_screen_rect (void)
     line_size = (unsigned int) deviceWidth; 
     lines     = (unsigned int) deviceHeight;
 
-    switch (SavedBPP){
-        case 32:  bytes_count = 4;  break;
-        case 24:  bytes_count = 3;  break;
-        // ...
-        default:
-            panic("scroll_screen_rect: SavedBPP");
-            break;
+    switch (gSavedBPP){
+    case 32: bytes_count = 4; break;
+    case 24: bytes_count = 3; break;
+    // ...
+    default:
+        panic("scroll_screen_rect: gSavedBPP");
+        break;
     };
 
-
-//
 // Pointers
-//
-
 // Destination and Source.
 // Destination is the first line.
 // Source is the second line. It has the height of a char.
 
-    void *Dest = (void *) BACKBUFFER_ADDRESS;
-    const void *Src  = (const void *) BACKBUFFER_ADDRESS + ( bytes_count * SavedX * cHeight ) ;
+    void *Dest = 
+        (void *) BACKBUFFER_ADDRESS;
+    
+    unsigned long SrcOffset = 
+        (unsigned long) (bytes_count * gSavedX * cHeight);
+    
+    const void *Src = 
+        (const void *) (BACKBUFFER_ADDRESS + SrcOffset);
 
 //
 // Copy

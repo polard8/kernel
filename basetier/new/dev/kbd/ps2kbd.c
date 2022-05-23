@@ -56,6 +56,33 @@ void ps2kbd_initialize_device (void)
     PS2Keyboard.initialized = FALSE;
 
 
+//====================================
+// #test
+// register device
+// create file.
+    file *fp;
+    fp = (file *) kmalloc( sizeof(file) );
+    if ( (void *) fp == NULL )
+    {
+        panic ("kbd: fp\n");
+    }
+    fp->used = TRUE;
+    fp->magic = 1234;
+    fp->____object = ObjectTypeFile;
+    fp->isDevice = TRUE;
+    //#todo: Initialize the file structure ... buffer ...
+    devmgr_register_device ( 
+        (file *) fp, 
+        "/DEV/KBD0",        // pathname 
+        0,             // class (char, block, network) #todo
+        1,             // type (pci, legacy)    #todo
+        NULL,          // Not a pci device.
+        NULL );        // Not a tty device. (not for now)
+//====================================
+
+
+
+
 // globals
     keyboard_init_lock_keys();
     keyboard_init_modifier_keys();
@@ -282,9 +309,13 @@ NormalByte:
        // lida com o evento.
        // coloca na fila da thread em foreground e
        // no arquivo stdin.
-       xxxKeyEvent(
-           (int) foreground_thread,
-           (unsigned char) __raw );
+
+       wmKeyEvent( (tid_t) foreground_thread, (unsigned char) __raw );
+
+       // #todo
+       // Coloque os pacotes num arquivo,
+       // o window server poderá ler depois.
+       //write_packet(kbdfp,...)
     }
 
 // Clean the mess.

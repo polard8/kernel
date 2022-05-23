@@ -598,6 +598,7 @@ pid_t getppid (void)
 
 
 /*
+// tcgetpgrp, tcsetpgrp - get and set terminal foreground process group.
 The function tcgetpgrp() returns the process group ID of the 
 foreground process group on the terminal associated to fd, 
 which must be the controlling terminal of the calling process. 
@@ -862,28 +863,27 @@ void fcntl_dup(int fd)
 }
 */
 
-
-/*
- * dup:
- *
- */
+// dup()
 // https://man7.org/linux/man-pages/man2/dup.2.html
 
-int dup (int oldfd)
+int dup(int oldfd)
 {
     int value = -1;
 
-    if ( oldfd < 0 )
-    {
+    if (oldfd < 0){
         errno = EBADF;
         return (int) -1;
     }
 
-    value = (int) gramado_system_call ( 
-                      (unsigned long) oldfd, 0, 0, 0 );
+// Syscall 600.
+    value = 
+        (int) gramado_system_call( 
+                  600,
+                  (unsigned long) oldfd,
+                  (unsigned long) oldfd,
+                  (unsigned long) oldfd );
 
-    if(value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
@@ -892,35 +892,30 @@ int dup (int oldfd)
 }
 
 
-/*
- * dup2:
- *
- */
+// dup2()
 
-int dup2 (int oldfd, int newfd)
+int dup2(int oldfd, int newfd)
 {
     int value = -1;
 
-    if ( oldfd < 0 )
-    {
+    if (oldfd < 0){
+        errno = EBADF;
+        return (int) -1;
+    }
+    if (newfd < 0){
         errno = EBADF;
         return (int) -1;
     }
 
-    if ( newfd < 0 )
-    {
-        errno = EBADF;
-        return (int) -1;
-    }
+// Syscall 601.
+    value = 
+        (int) gramado_system_call ( 
+                  601,
+                  (unsigned long) oldfd, 
+                  (unsigned long) newfd, 
+                  0 );
 
-    value =  (int) gramado_system_call ( 
-                     (unsigned long) oldfd, 
-                     (unsigned long) newfd, 
-                     0, 
-                     0 );
-
-    if(value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
@@ -928,42 +923,37 @@ int dup2 (int oldfd, int newfd)
     return (int) value;
 }
 
+// dup3()
 
-/*
- * dup3:
- *
- */
-
-int dup3 (int oldfd, int newfd, int flags)
+int dup3(int oldfd, int newfd, int flags)
 {
     int value = -1;
 
-    if ( oldfd < 0 )
-    {
+    if (oldfd < 0){
+        errno = EBADF;
+        return (int) -1;
+    }
+    if (newfd < 0){
         errno = EBADF;
         return (int) -1;
     }
 
-    if ( newfd < 0 )
-    {
-        errno = EBADF;
-        return (int) -1;
-    }
+// Syscall 602
+    value = 
+        (int) gramado_system_call ( 
+                  602,
+                  (unsigned long) oldfd, 
+                  (unsigned long) newfd, 
+                  (unsigned long) flags );
 
-    value = (int) gramado_system_call ( 
-                     (unsigned long) oldfd, 
-                     (unsigned long) newfd, 
-                     (unsigned long) flags, 
-                     0 );
-
-    if(value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
 
     return (int) value;
 }
+
 
 
 // See: sys/resource.h
@@ -2314,19 +2304,18 @@ off_t tell(int fildes)
 }
 
 
-int access (const char *pathname, int mode)
+int access(const char *pathname, int mode)
 {
     debug_print ("access: [TODO]\n");
 
-    if( (void*) pathname == NULL )
-
-
-    if( *pathname == 0 )
-    {
+    if ( (void*) pathname == NULL ){
         errno = EINVAL;
         return (int) -1;
     }
-
+    if ( *pathname == 0 ){
+        errno = EINVAL;
+        return (int) -1;
+    }
 
 	// #todo
 	//struct stat foo;
@@ -2334,6 +2323,7 @@ int access (const char *pathname, int mode)
 
     return -1;
 }
+
 
 
 // #see: sys/utsname.h

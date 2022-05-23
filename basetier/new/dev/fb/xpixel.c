@@ -13,10 +13,7 @@
 // https://docs.microsoft.com/en-us/windows/win32/gdi/ternary-raster-operations
 
 
-
-
 #include <kernel.h>
-
 
 
 /*
@@ -41,7 +38,6 @@ putpixel0 (
     unsigned long _rop_flags,
     unsigned long buffer_va )
 {
-
     //unsigned char *where = (unsigned char *) BACKBUFFER_VA;
     unsigned char *where = (unsigned char *) buffer_va;
     
@@ -85,7 +81,7 @@ putpixel0 (
 // This is a global variable.
 // Esse valor foi herdado do bootloader.
 
-    switch (SavedBPP){
+    switch (gSavedBPP){
     case 32:  bytes_count=4;  break;
     case 24:  bytes_count=3;  break;
     //#testando
@@ -97,8 +93,8 @@ putpixel0 (
     //    break;
     default:
         //#todo: Do we have panic ar this moment?
-        //panic ("putpixel0: SavedBPP\n");
-        debug_print_string("putpixel0: SavedBPP\n");
+        //panic ("putpixel0: gSavedBPP\n");
+        debug_print_string("putpixel0: gSavedBPP\n");
         while(1){}
         break;
     };
@@ -106,7 +102,7 @@ putpixel0 (
 // #importante
 // Pegamos a largura do dispositivo.
 
-    int width = (int) (SavedX & 0xFFFF);
+    int width = (int) (gSavedX & 0xFFFF);
     
     width = (int) (width & 0xFFFF);
 
@@ -143,7 +139,7 @@ putpixel0 (
     b2 = where[offset];
     g2 = where[offset +1];
     r2 = where[offset +2];
-    if ( SavedBPP == 32 ){ a2 = where[offset +3]; };
+    if ( gSavedBPP == 32 ){ a2 = where[offset +3]; };
 
 
 // A cor transformada.
@@ -271,7 +267,7 @@ putpixel0 (
     where[offset]    = b3;
     where[offset +1] = g3;
     where[offset +2] = r3;
-    if ( SavedBPP == 32 ){ where[offset +3] = a3; };
+    if ( gSavedBPP == 32 ){ where[offset +3] = a3; };
 }
 
 

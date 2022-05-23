@@ -99,6 +99,12 @@ static unsigned long KernelImage_BSS_Size=0;
 
 //char InitialUserProcessName[32] = "INIT.BIN"
 
+// ??
+// #bugbug
+// Explain it better.
+// Someone is setting this variable from another document.
+// Change the name.
+// See: head_64.asm.
 unsigned long magic;
 
 // virtual = physical.
@@ -288,6 +294,7 @@ int kernel_main(int arch_type)
     int i=0;
 
 // Magic
+// #bugbug: Explain it better.
     unsigned long bootMagic = 
         (unsigned long) (magic & 0x00000000FFFFFFFF); 
 
@@ -365,10 +372,10 @@ int kernel_main(int arch_type)
 // See: 
 // kernel.h
 
-    SavedLFB = (unsigned long) xBootBlock.lfb_pa;
-    SavedX   = (unsigned long) xBootBlock.deviceWidth;
-    SavedY   = (unsigned long) xBootBlock.deviceHeight;
-    SavedBPP = (unsigned long) xBootBlock.bpp;
+    gSavedLFB = (unsigned long) xBootBlock.lfb_pa;
+    gSavedX   = (unsigned long) xBootBlock.deviceWidth;
+    gSavedY   = (unsigned long) xBootBlock.deviceHeight;
+    gSavedBPP = (unsigned long) xBootBlock.bpp;
 
 // Last valid physical address.
 // Used to get the available physical memory.
@@ -382,7 +389,7 @@ int kernel_main(int arch_type)
 // Setup the real boot block structure at gdef.h
 // BootBlock
 
-    screenSetSize (SavedX,SavedY);
+    screenSetSize (gSavedX,gSavedY);
 
 // teste para a máquina real.
 // preto

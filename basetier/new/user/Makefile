@@ -82,30 +82,27 @@ font.o \
 desktop.o room.o usession.o \
 logoff.o logon.o \
 userenv.o \
-char.o dtext.o    
-
+char.o text.o    
 
 all:
 
-	$(CC) -c graphics.c  $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
-	$(CC) -c kgwm.c      $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
-
-	$(CC) -c vt.c   $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
-	$(CC) -c console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+# gr
+	$(CC) -c gr/char.c $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c gr/font.c $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c gr/text.c $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
 
 # security
 	$(CC) -c security/desktop.c   $(KERNEL_INCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c security/room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c security/usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
 	$(CC) -c security/logoff.c    $(KERNEL_INCLUDE) $(CFLAGS) -o logoff.o
 	$(CC) -c security/logon.c     $(KERNEL_INCLUDE) $(CFLAGS) -o logon.o
+	$(CC) -c security/room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
 	$(CC) -c security/userenv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c security/usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
 
-# gr
-	$(CC) -c gr/char.c   $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c gr/dtext.c  $(KERNEL_INCLUDE) $(CFLAGS) -o dtext.o
-	$(CC) -c gr/font.c   $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
-
+	$(CC) -c console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+	$(CC) -c graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
+	$(CC) -c kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
+	$(CC) -c vt.c       $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
 
 # link
 	$(LD) -r -o archive_user.o $(OBJS)

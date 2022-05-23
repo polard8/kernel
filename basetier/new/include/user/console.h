@@ -79,7 +79,6 @@ void console_scroll (int console_number);
 // Char
 //
 
-void xxxConsoleOutbyte (int c, int console_number);
 void console_outbyte (int c, int console_number);
 void console_putchar ( int c, int console_number );
 int consoleInputChar( int c );

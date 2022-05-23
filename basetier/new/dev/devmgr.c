@@ -1,4 +1,6 @@
 
+// devmgr.c
+
 
 #include <kernel.h>  
 
@@ -69,7 +71,6 @@ int devmgr_init_device_list(void)
     
     return 0;
 }
-
 
 
 // Show device list.
@@ -238,7 +239,6 @@ devmgr_register_device (
     struct device_d *d;
     int id= -1;
 
-
     // mount point
     char __tmp_mount_point[64];
     char *new_mount_point;
@@ -286,19 +286,14 @@ devmgr_register_device (
         panic ("devmgr_register_device: d validation \n");
     }
 
-// ID
-
+// id
     id = d->index;
-
     if ( id < 0 || id >= DEVICE_LIST_MAX )
     {
         panic ("devmgr_register_device: id limits \n");
     }
 
-//
 // file
-//
-
 // The file pointer.
 
     if( (void*) f == NULL ){
@@ -307,22 +302,53 @@ devmgr_register_device (
 
     d->__file  = (file *) f;
 
-
 // Device structure.
     f->device = (struct device_d *) d;
 
 // Device index into the deviceList[].
     f->deviceId = d->index; 
 
-
-
     d->__class = class;
     d->type    = type;
 
 
-// path    
-    sprintf( (char *) &__tmp_mount_point[0], "/DEV%d", id);
-    strcpy (new_mount_point,__tmp_mount_point);
+// name
+
+    // clear buffer
+    memset( __tmp_mount_point, 0, 64 );
+
+
+    // Se um nome não foi indicado.
+    if( (void*) name == NULL )
+    {
+        sprintf ( 
+            (char *) &__tmp_mount_point[0], 
+            "/DEV%d", 
+            id );
+            
+        strcpy(
+            new_mount_point,
+            __tmp_mount_point );
+    }
+
+    size_t NameSize=0;
+ 
+    // Se um nome foi indicado.
+    if( (void*) name != NULL )
+    {
+        NameSize = (size_t) strlen(name);
+        if( NameSize >= 64)
+            panic("devmgr_register_device: NameSize");
+        
+        sprintf ( 
+            (char *) &__tmp_mount_point[0], 
+            name );
+            
+        strcpy(
+            new_mount_point,
+            __tmp_mount_point );
+
+    }
 
 // /dev/tty0
     d->mount_point = (char *) new_mount_point; 
@@ -333,7 +359,7 @@ devmgr_register_device (
     //d->name ??
     
     //#todo
-    d->name[0] = 'x';
+    //d->name[0] = 'x';
     d->name[0] = 0;
 
 

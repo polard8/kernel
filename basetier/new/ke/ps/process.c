@@ -558,18 +558,9 @@ copy_process_struct(
 //
 
 // Vamos criar uma tty para o processo clone.
-// Ela será uma tty privada, mas precisa ter um
+// Ela será uma tty privada, mas precisa ter
 // uma estrutura de arquivo que aponte para ela
 // e um fd na lista de objetos abertos pelo processo.
-
-    //++
-    Process2->tty = ( struct tty_d *) tty_create();
-
-    if ( (void *) Process2->tty == NULL ){
-         panic ("copy_process_struct: Couldn't create TTY\n");
-    }
-    tty_start (Process2->tty);
-    //--
 
     // panic()
     debug_print ("copy_process_struct: [FIXME] No slot for tty\n");
@@ -898,14 +889,17 @@ void ps_initialize_process_common_elements( struct process_d *p )
 // tty support
 //
 
-    //printf ("create_process: calling tty_create[DEBUG]\n");
+    //printf ("ps_initialize_process_common_elements: calling tty_create[DEBUG]\n");
 
+//++
     p->tty = ( struct tty_d *) tty_create(); 
 
-    if ( (void *) p->tty == NULL ){
-        panic ("create_process: Couldn't create tty\n");
+    if ( (void *) p->tty == NULL )
+    {
+        panic ("ps_initialize_process_common_elements: Couldn't create tty\n");
     }
     tty_start(p->tty);
+//--
 
     // ...
 
@@ -1012,7 +1006,7 @@ struct process_d *create_process (
 //
 // Process
 //
-    Process = (void *) kmalloc ( sizeof(struct process_d) );
+    Process = (void *) kmalloc( sizeof(struct process_d) );
 
     // #todo: 
     // Aqui pode retornar NULL.
@@ -1973,9 +1967,7 @@ int process_get_tty (int pid)
 // OUT: process struture pointer.
 struct process_d *create_and_initialize_process_object(void)
 {
-
     pid_t NewPID = (pid_t) (-1);  //fail
-
 
     struct process_d  *new_process;
     register int i=0;
@@ -2021,6 +2013,23 @@ struct process_d *create_and_initialize_process_object(void)
     new_process->uid = (uid_t) current_user;
     new_process->gid = (gid_t) current_group;
     new_process->syscalls_counter = 0;
+
+
+// tty
+//++
+    new_process->tty = ( struct tty_d *) tty_create();
+
+    if ( (void *) new_process->tty == NULL )
+    {
+         panic ("create_and_initialize_process_object: Couldn't create TTY\n");
+    }
+    
+    tty_start(new_process->tty);
+//--
+
+
+
+
 
 // #bugbug
 // #todo

@@ -219,6 +219,8 @@ fail:
 
 // Called by UserInput_SendKeyboardMessage in this document.
 
+
+// #deprecated?
 int 
 postto_eventqueue ( 
     int tid,
@@ -227,176 +229,8 @@ postto_eventqueue (
     unsigned long ascii_code,
     unsigned long raw_byte )
 {
-
-    //==============
-    // [event block]
-    struct window_d  *Event_Window;            //arg1 - window pointer
-    int               Event_Message       =0;  //arg2 - message number
-    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
-    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
-    //===================
-
-
-    // setup event block
-    // get parameters.
-    
-    Event_Window        = (struct window_d  *) window;
-    Event_Message       = message;
-    Event_LongASCIICode = ascii_code;
-    Event_LongRawByte   = raw_byte;
-
-
-
-    //if (current_input_mode != INPUT_MODE_EVENTS)
-    if ( IOControl.useEventQueue != TRUE )
-    {
-        panic("sendto_eventqueue: [ERROR] Wrong input mode\n");
-    }
-
-
-    if ( tid<0 ){
-        debug_print("sendto_eventqueue: tid\n");
-        return -1;
-    }
-
-    // -----
-
-    // Esse tratador é para todos os modos de input
-    // mas dentro dele tem rotinas para modos especificos.
-
-    // #todo
-    // Como essa rotina usa os quatro parametros começados com 'Event_'
-    // então talvez possamos chamar um diálogo.
-    // Mas precisa da tid também.
-    
-    switch (Event_Message){
-
-        // Para os dois casos.
-        // quando o control ou a tecla de funçao forem pressionadas ou liberadas.
-        case MSG_SYSKEYDOWN: 
-        case MSG_SYSKEYUP:
-            switch (Event_LongASCIICode){
-
-                // function key
-                // Quando pressionarmos uma tecla de funçao.
-                // no metodo olharemos control ou alt.
-                case VK_F1:  case VK_F2:  case VK_F3:  case VK_F4:
-                case VK_F5:  case VK_F6:  case VK_F7:  case VK_F8:
-                case VK_F9:  case VK_F10:  case VK_F11:  case VK_F12:
-                    // For all the input modes.
-                    if (Event_Message == MSG_SYSKEYDOWN)
-                    {
-                       // se alguma tecla de controle esta pressionada, chamaremos o procedimento local.
-                       if ( shift_status == 1 || ctrl_status == 1 || alt_status == 1 )
-                       {
-                           debug_print ("sendto_eventqueue: >>>> [MSG_SYSKEYUP] to system procedure\n"); 
-                        
-                            wmProcedure ( 
-                                Event_Window, 
-                                (int)           Event_Message, 
-                                (unsigned long) Event_LongASCIICode, 
-                                (unsigned long) Event_LongRawByte );
-                        
-                        debug_print("out of sysm procedure\n");
-                        return 0;
-                        }
-                        // caso nenhuma tecla de controle esteja pressionada,
-                        // enviaremos a tecla de funçao para a alicaçao.
-                        //if (current_input_mode == INPUT_MODE_SETUP)
-                        if ( IOControl.useEventQueue == TRUE )
-                        {
-                            //if ( EnableKGWS == FALSE ){ return 0; }
-                            //kgws_send_to_controlthread_of_currentwindow ( 
-                            //                    Event_Window,
-                            //    (int)           Event_Message, 
-                            //    (unsigned long) Event_LongASCIICode, 
-                            //    (unsigned long) Event_LongRawByte );
-
-                            post_message_to_tid (  tid,
-                                                Event_Window,
-                                (int)           Event_Message, 
-                                (unsigned long) Event_LongASCIICode, 
-                                (unsigned long) Event_LongRawByte );
-                                
-                            debug_print ("sendto_eventqueue: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
-                            return 0;
-                        }
-                    }
-                    return 0;
-                    break;
-
-                // todas as outras teclas de controle.
-                // Default syskeyups dent to control thread.
-                // This is a window of the embedded window server.
-                // Not the loadable window server.
-                // Only for the setup input mode.
-                default:
-                    // Only for the setup input mode.
-                    //if (current_input_mode == INPUT_MODE_SETUP)
-                    if ( IOControl.useEventQueue == TRUE )
-                    {
-                        post_message_to_tid (  tid,
-                                            Event_Window,
-                            (int)           Event_Message, 
-                            (unsigned long) Event_LongASCIICode, 
-                            (unsigned long) Event_LongRawByte );
-                        debug_print ("sendto_eventqueue: >>>> [MSG_SYSKEYUP.function] to wwf\n");        
-                    }
-                    
-                    // #todo
-                    // We are building a set of info about the ps2 devices.
-                    // We're gonna use the TTY here.
-                    // See: devmgr.h
-                    
-                    // PS2KeyboardTTY ??
-                    
-                    return 0; 
-                    break;
-            };
-            return 0;
-            break;
-
-        //===============
-        // Para todas as outras mensagens alem de syskeyup e syskeydown.
-        // kgws:
-        // Send a message to the thread associated with the
-        // window with focus.
-        // See: ws/kgws.c
-        default:
-           // Only for the setup input mode.
-           //if (current_input_mode == INPUT_MODE_SETUP)
-           if ( IOControl.useEventQueue == TRUE )
-           {
-               //if ( EnableKGWS == FALSE ){ return 0; }
-               //kgws_send_to_controlthread_of_currentwindow ( 
-               //                    Event_Window,
-               //    (int)           Event_Message, 
-               //    (unsigned long) Event_LongASCIICode, 
-               //    (unsigned long) Event_LongRawByte );
-
-               post_message_to_tid (  tid,
-                                   Event_Window,
-                   (int)           Event_Message, 
-                   (unsigned long) Event_LongASCIICode, 
-                   (unsigned long) Event_LongRawByte );
-                   
-               debug_print ("sendto_eventqueue: >>>> [default] to wwf\n");
-            
-               // #test
-               // Vamos escrever em stdin.
-               // Que tipo de objeto? file? tty?
-               // #bugbug: kernel panic!
-            
-               //sys_write ( 
-               //    (int) 0, (const void *) &ch, (size_t) 1 );
-            }
-            return 0;
-            break;
-    };
-
-    return 0;
+    return -1;
 }
-
 //==========================================================
 
 
@@ -904,8 +738,8 @@ void noraDrawingStuff3 (int x, int y, int z)
     register int _y=0;
     register int _z = z;
 
-    int limitX = (SavedX >> 1);
-    int limitY = (SavedY >> 1);
+    int limitX = (gSavedX >> 1);
+    int limitY = (gSavedY >> 1);
 
     // colunas.
     for (_x=x; _x<limitX; _x++)    
@@ -1050,14 +884,14 @@ int KGWS_initialize(void)
 // chamamos a rotina de inicializaçao de globais.
 // See: gwssrv_init_globals().
 
-    DeviceScreen->width  = SavedX;
-    DeviceScreen->height = SavedY;
-    DeviceScreen->bpp    = SavedBPP;  // bits per pixel
+    DeviceScreen->width  = gSavedX;
+    DeviceScreen->height = gSavedY;
+    DeviceScreen->bpp    = gSavedBPP;  // bits per pixel
 
 // #todo
 // Maybe we can check the validation of w h bpp.
 
-    DeviceScreen->pitch = ( SavedX * (SavedBPP/8) );
+    DeviceScreen->pitch = ( gSavedX * (gSavedBPP/8) );
 
 // #todo: 
 // Cuidado, não queremos divisão por zero.

@@ -122,26 +122,22 @@ kernel-header:
 
 	# personas: warden, student, visitor.
 	# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) entrance/warden/unit0/x86_64/head_64.asm \
+	$(NASM) entrance/x64/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I entrance/warden/unit0/x86_64/ \
-	-I entrance/student/unit1/x86_64/ \
-	-I entrance/student/unit3/x86_64/ \
-	-I entrance/warden/unit4/x86_64/ \
-	-I entrance/visitor/x86_64/ \
+	-I entrance/x64/ \
 	-f elf64 -o head_64.o
 
 	# unit 2 (xapx)
-	$(CC) -c entrance/visitor/x86_64/sci.c \
+	$(CC) -c entrance/x64/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    
 
 # init
-	$(CC) -c init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c init.c $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
 
 # Interface.
-	$(CC) -c newos.c  $(KERNEL_INCLUDE) $(CFLAGS) -o newos.o
+	$(CC) -c newos.c $(KERNEL_INCLUDE) $(CFLAGS) -o newos.o
 
 # klib
 	$(Q) $(MAKE) -C klib/

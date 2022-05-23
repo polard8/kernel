@@ -938,6 +938,9 @@ unsigned long interactive_threadList[THREAD_COUNT_MAX];
 // See: thread.c
 
 void *sys_get_message ( unsigned long ubuf );
+void *sys_get_message2(unsigned long ubuf, int index, int restart);
+
+
 
 int init_threads (void);
 
@@ -1074,6 +1077,14 @@ post_message_to_tid (
 
 int
 post_message_to_foreground_thread ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+// Post message to the ws control thread.
+int
+post_message_to_ws_thread ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 

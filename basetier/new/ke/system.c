@@ -3,6 +3,7 @@
 
 #include <kernel.h>    
 
+
 // global
 unsigned long sys_time_hz=0;
 
@@ -10,12 +11,11 @@ unsigned long sys_time_hz=0;
 /*
  * systemGetSystemMetrics:
  *     Retorna informações sobre o sistema.
- * 
  *     #todo: 
  *     Criam um enum para essa função, aqui mesmo nesse arquivo.
  */
 
-unsigned long systemGetSystemMetrics ( int index )
+unsigned long systemGetSystemMetrics(int index)
 {
 
     // # The solution.
@@ -71,7 +71,7 @@ unsigned long systemGetSystemMetrics ( int index )
             break;
 
         case 9:
-            return (unsigned long) SavedBPP;
+            return (unsigned long) gSavedBPP;
             break;    
 
         //

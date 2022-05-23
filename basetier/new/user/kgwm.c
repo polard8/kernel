@@ -506,6 +506,16 @@ STP|L,
 // Prototypes
 //
 
+
+// See: kgwm.c
+static int 
+wmProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+
 static void __launch_app_via_initprocess(int index);
 static void __enter_embedded_shell(int kernel_in_debug_mode);
 static void __exit_embedded_shell(void);
@@ -566,6 +576,10 @@ wmRegisterWSCallbacks(
 }
 
 
+// #
+// This callback is not used at the moment.
+// We're gonna use this to call some routines
+// inside the kernel modules.
 // Send input to the window manager
 // inside the window server ( gwssrv.bin )
 unsigned long 
@@ -604,8 +618,10 @@ wmSendInputToWindowManager(
 // Just a small range of messages are accepted.
 // See: gramado/core/client
 // range: 4001~4009
+
 static void __launch_app_via_initprocess(int index)
 {
+    tid_t init_thread_tid = -1; 
 
     if( index < 4001)
         return;
@@ -616,14 +632,20 @@ static void __launch_app_via_initprocess(int index)
     if( (void*) InitThread == NULL ){
         return;
     }
+    
+    init_thread_tid = InitThread->tid;
+
+    if(init_thread_tid<0)
+        return;
 
     post_message_to_tid(
-        (int) InitThread->tid,
-        NULL,  //window
-        (int) MSG_COMMAND,  //msg code
-        index,   // range: 4001~4009
+        (tid_t) init_thread_tid,
+        NULL,               // window
+        (int) MSG_COMMAND,  // msg code
+        index,              // range: 4001~4009
         0 );
 }
+
 
 static void __enter_embedded_shell(int kernel_in_debug_mode)
 {
@@ -745,7 +767,7 @@ void kgwm_early_kernel_console(void)
 // and take a decision. It will help us to compose the event message.
 // It is because each environment uses its own event format.
 
-unsigned long 
+static int 
 wmProcedure ( 
     struct window_d *window, 
     int msg, 
@@ -779,7 +801,7 @@ wmProcedure (
 
     if (msg<0){
         debug_print("wmProcedure: Invalid msg\n");
-        return 0;
+        return -1;
     }
 
     switch (msg){
@@ -791,7 +813,7 @@ wmProcedure (
     case MSG_MOUSEPRESSED:
     case MSG_MOUSERELEASED:
         //wmSendInputToWindowManager(0,msg,long1,long2);
-        return 0;
+        return -1;
         break;
 
 // ==============
@@ -984,6 +1006,8 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     //powertrio_next();
                     //__launch_app_via_initprocess(4004);
+                    //post_message_to_ws_thread( 
+                    //    NULL, 33888, 0, 0 ); //#TEST
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1001,7 +1025,9 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     //powertrio_select_client(0);
                     //reboot();
-                    __launch_app_via_initprocess(4005);
+                    //__launch_app_via_initprocess(4005);
+                    //post_message_to_ws_thread( 
+                        //NULL, 33888, 0, 0 ); //#TEST
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1185,62 +1211,49 @@ wmProcedure (
 // msg:
 // default
     default:
-        return 0;
+        return -1;
         break;
     };
 
 //unexpected_fail:
-    //debug_print("wmProcedure: unexpected fail\n");
-    return 0;
-
+    return -1;
 fail:
     debug_print("wmProcedure: fail\n");
     refresh_screen();
-    return 0;
+    return -1;
 }
 
 
-/*
- * xxxKeyEvent:
- * 
- *     Envia uma mensagem de teclado para a janela com o 
- * foco de entrada.
- */
-
+// wmKeyEvent:
+// Envia uma mensagem de teclado para a janela com o 
+// foco de entrada.
 // Called by DeviceInterface_PS2Keyboard in ps2kbd.c
-
 // Pega um scancode, transforma em caractere e envia 
 // na forma de mensagem para a thread de controle associada 
 // com a janela que tem o foco de entrada.
-
 // #todo
 // #importante
 // Precisa conferir ke0 antes de construir a mensagem,
 // para assim usar o array certo. ke0 indica o teclado estendido.
-
 // #todo
 // Na verdade é 'translate' and 'dispatch'.
 // Cria o evento usando o rawbyte, traduz o raw byte para ascii,
 // e por fim envia para o buffer da tty de teclado e para
 // a thread do processo em foreground. Tudo depende
 // do input mode.
-
 // Called by console_interrupt() in console.c
-
 // Is this the forground thread?
 // #bugbug: Não estamos usando o parâmetro tid.
 // Lembrando que numa interrupção de teclado,
 // não temos o contexto salvo. Então não podemos chamar o
 // scheduler. Mas podemos acionar uma flag
 // que de alguma direção para o escalonador.
-
+// Pega um scancode, transforma em caractere e envia na forma de mensagem
+// para a thread de controle associada com a janela que tem o foco de entrada.
 // IN:
 // target thread, raw byte 
 
-int 
-xxxKeyEvent (
-    int tid, 
-    unsigned char raw_byte )
+int wmKeyEvent( tid_t tid, unsigned char raw_byte )
 {
 
 // #todo
@@ -1284,7 +1297,7 @@ xxxKeyEvent (
 
     if (tid<0 || tid >= THREAD_COUNT_MAX)
     {
-        debug_print("xxxKeyEvent: tid\n");
+        debug_print("wmKeyEvent: tid\n");
         return (int) (-1);
     }
 
@@ -1296,6 +1309,16 @@ xxxKeyEvent (
 // através de parâmetro.
 
     Keyboard_RawByte = raw_byte;
+
+/*
+// #test
+// prefix
+    if (KEY_E0 true)
+        wordKeyboard_RawByte |= 0xE000;
+    if (KEY_E1 true)
+        wordKeyboard_RawByte |= 0xE100;
+*/
+
 
     //if ( Keyboard_RawByte == 0 )
         //return -1;
@@ -1667,6 +1690,21 @@ done:
     if ( Event_LongASCIICode == 0 )
         return -1;
 
+/*
+// #todo
+// Only keyboard messages
+    switch (Event_Message)
+    {
+        case MSG_KEYDOWN:
+        case MSG_KEYUP:
+        case MSG_SYSKEYDOWN:
+        case MSG_SYSKEYUP:
+            break;
+        default:
+            return -1;
+    };
+*/
+
 // #todo
 // A sistema precisa ter uma flag
 // para cada tipo de processamento aqui.
@@ -1736,14 +1774,16 @@ done:
         // The thread with focus.
         // #bugbug
         // Is the forground thread a valid thread?
-        if(tid == foreground_thread)
+        /*
+        if (tid == foreground_thread)
         {
-            if( tid > 0 && 
-                tid < THREAD_COUNT_MAX )
+            if ( tid > 0 && 
+                 tid < THREAD_COUNT_MAX )
             {
 
             // #todo
             // precisamos de uma flag que indique que isso deve ser feito.
+            // See: tlib.c
 
                 post_message_to_tid(
                     (int) tid,            // tid
@@ -1756,6 +1796,35 @@ done:
                 // #deprecated?
                 if( WindowServerInfo.initialized == TRUE )
                     weGotKeyboardInput = TRUE;
+            }
+        }
+        */
+
+        // Sempre envie mensagens de input 
+        // somente para o window server.
+        if( WindowServerInfo.initialized == TRUE )
+        {
+             tid = WindowServerInfo.tid;
+         
+            if ( tid > 0 && 
+                 tid < THREAD_COUNT_MAX )
+            {
+
+            // #todo
+            // precisamos de uma flag que indique que isso deve ser feito.
+            // See: tlib.c
+
+                post_message_to_tid(
+                    (int) tid,            // tid
+                    NULL,                 // window
+                    (int) Event_Message,  // msg code
+                    Event_LongASCIICode,  // long1
+                    Event_LongRawByte );  // long2
+        
+                // See: ts.c
+                // #deprecated?
+                //if( WindowServerInfo.initialized == TRUE )
+                    //weGotKeyboardInput = TRUE;
             }
         }
     }
@@ -1773,46 +1842,61 @@ done:
 // #todo
 // precisamos de uma flag que indique que isso deve ser feito.
 
+    int __Status=-1;
+
     //if( gKeyboardAccelleratorsStatus == TRUE )
     //{
-        wmProcedure(
-            (struct window_d *) Event_Window,    // opaque pointer
-            (int)               Event_Message,
-            (unsigned long)     Event_LongASCIICode,
-            (unsigned long)     Event_LongRawByte );
+        __Status = 
+            (int) wmProcedure(
+                (struct window_d *) Event_Window,    // opaque pointer
+                (int)               Event_Message,
+                (unsigned long)     Event_LongASCIICode,
+                (unsigned long)     Event_LongRawByte );
+        
+        return (int) __Status;
     //}
 
+// OK
     return 0;
 }
 
 
 //==========
 
+// wmMouseEvent:
 // For mouse events, see: window.h
-
 // #todo: change parameters.
 // we need more information about the mouse event.
-int 
-xxxMouseEvent(
-    int event_id,
-    long long1, 
-    long long2 )
+int wmMouseEvent(int event_id,long long1, long long2)
 {
-
+    int Status=-1;
     unsigned long button_number = long1;
     //debug_print ("xxxMouseEvent:\n");
+
+
+    if(event_id<0)
+        return -1;
 
 // Buttons:
 // Pressionado ou liberado
     if( event_id == MSG_MOUSEPRESSED ||
         event_id == MSG_MOUSERELEASED )
     {
-        wmProcedure(
-            (struct window_d *) 0,                // opaque pointer
-            (int)               event_id,         // msg code
-            (unsigned long)     button_number,    // button number
-            (unsigned long)     button_number );  // button number
+        post_message_to_tid(
+            foreground_thread,
+            NULL,
+            event_id,
+            button_number,
+            button_number );
         return 0;
+        //Status = 
+        //    (int) wmProcedure(
+        //        (struct window_d *) 0,                // opaque pointer
+        //        (int)               event_id,         // msg code
+        //        (unsigned long)     button_number,    // button number
+        //        (unsigned long)     button_number );  // button number
+
+        //return (int) Status;
     }
 
 
@@ -1868,11 +1952,14 @@ xxxMouseEvent(
         //frontbuffer_draw_rectangle( 
         //    long1, long2, 10, 10, COLOR_RED, 0 );
 
-        wmProcedure(
-            (struct window_d *) 0,         // opaque pointer
-            (int)               event_id,  // msg code
-            (unsigned long)     long1,         // x
-            (unsigned long)     long2 );       // y
+        Status = 
+            (int) wmProcedure(
+                (struct window_d *) 0,         // opaque pointer
+                (int)               event_id,  // msg code
+                (unsigned long)     long1,     // x
+                (unsigned long)     long2 );   // y
+        
+        return (int) Status;
     }
 //----
 
@@ -1894,6 +1981,8 @@ xxxMouseEvent(
         (unsigned long)     long1,         // x
         (unsigned long)     long2 );       // y
 */
+
+// OK
 done:
     //debug_print ("xxxMouseEvent: Done\n");
     return 0;
@@ -1909,15 +1998,11 @@ int init_gramado (void)
 }
 
 
-/*
- ***********************************
- * windowLoadGramadoIcons:
- * 
- *     Carrega alguns ícones do sistema.
- *     It's a part of the window system's initialization.
- */
+// windowLoadGramadoIcons:
+// Carrega alguns ícones do sistema.
+// It's a part of the window system's initialization.
 
-int windowLoadGramadoIcons (void)
+int windowLoadGramadoIcons(void)
 {
     unsigned long fRet=0;
 
@@ -1955,30 +2040,25 @@ int windowLoadGramadoIcons (void)
     shared_buffer_cursor_icon    = (void *) allocPages(4);
     // ...
 
-
     if ( (void *) shared_buffer_app_icon == NULL ){
         panic ("windowLoadGramadoIcons: shared_buffer_app_icon\n");
     }
-
     if ( (void *) shared_buffer_file_icon == NULL ){
         panic ("windowLoadGramadoIcons: shared_buffer_file_icon\n");
     }
-
     if ( (void *) shared_buffer_folder_icon == NULL ){
         panic ("windowLoadGramadoIcons: shared_buffer_folder_icon\n");
     }
-
     if ( (void *) shared_buffer_terminal_icon == NULL ){
         panic ("windowLoadGramadoIcons: shared_buffer_terminal_icon\n");
     }
-
     if ( (void *) shared_buffer_cursor_icon == NULL ){
         panic ("windowLoadGramadoIcons: shared_buffer_cursor_icon\n");
     }
 
-	//
-	// Load
-	//
+//
+// Load
+//
 
     // app icon
     fRet = (unsigned long) fsLoadFile ( 
@@ -2041,7 +2121,7 @@ int windowLoadGramadoIcons (void)
         panic ("windowLoadGramadoIcons: CURSOR.BMP\n");
     }
 
-	// More ?
+// More ?
 
     return 0;
 }
@@ -2053,14 +2133,15 @@ int windowLoadGramadoIcons (void)
 // it is gonna be used by the window server.
 // It is a pre allocated buffer containg an bmp icon loaded at it.
 // Service 9100
+// See: window.h
 
-void *ui_get_system_icon ( int n )
+void *ui_get_system_icon(int n)
 {
-    if (n <= 0){ return NULL; }
+    if (n <= 0){
+        return NULL;
+    }
 
-    // See: window.h
     switch (n){
-
     case 1: return (void *) shared_buffer_app_icon;       break;
     case 2: return (void *) shared_buffer_file_icon;      break;
     case 3: return (void *) shared_buffer_folder_icon;    break;
@@ -2187,12 +2268,12 @@ void schedulerUpdateScreen(void)
 
         if ( (void *) TmpThread != NULL )
         {
-            if ( TmpThread->used  == TRUE && 
+            if ( TmpThread->used == TRUE && 
                  TmpThread->magic == 1234 && 
                  TmpThread->state == READY )
             {
                 // #test 
-                debug_print("  ----  Compositor  ----  \n");
+                debug_print("  ---- Compositor ----  \n");
                 
                 if ( (void *) TmpThread->surface_rect != NULL )
                 {

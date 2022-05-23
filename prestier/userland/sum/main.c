@@ -4,12 +4,10 @@
  * unix v7 ?
  */
 
-
 // rtl
 #include <stdio.h>
 
-
-int main ( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
     register FILE *f;
 
@@ -63,9 +61,9 @@ int main ( int argc, char *argv[] )
 		
 	} while (++i < argc);
 
-
     printf("done\n");
-    exit (errflg);
-}
+    exit(errflg);
 
+    return 0;
+}
 

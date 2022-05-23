@@ -18,7 +18,7 @@
 // It is called by the applications.
 // It is also used for ipc.
 
-void *sys_get_message ( unsigned long ubuf )
+void *sys_get_message(unsigned long ubuf)
 {
     struct thread_d  *t;
 
@@ -133,31 +133,156 @@ fail0:
     t->MsgQueueHead++;
     if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
     return NULL;
-} 
+}
+
+// 120
+// get a message given the index.
+// IN: buffer, index, flag: TRUE=restart the queue at the end.
+
+void *sys_get_message2(unsigned long ubuf, int index, int restart)
+{
+    struct thread_d  *t;
+
+    unsigned long *message_address = (unsigned long *) ubuf;
+    //int head_pos=0;
+
+    //debug_print ("sys_get_message:\n");
+
+// buffer
+// #todo: Check some other invalid address.
+    if ( ubuf == 0 ){ 
+        panic ("sys_get_message2: buffer\n");
+        //return NULL;
+    }
+
+// #todo:
+// Check current_thread validation
+
+
+// Thread
+    t = (void *) threadList[current_thread];
+
+    if ( (void *) t == NULL ){
+        panic ("sys_get_message2: t\n");
+    }
+
+    if ( t->used != TRUE || t->magic != 1234 ){
+        panic ("sys_get_message2: t validation\n");
+    }
 
 
 /*
- * kgws_send_to_tid:
- *
- */
+// =====================================================
+// Offset
+    head_pos = (int) t->head_pos;
 
-// Send a message to the thread associated with the
-// window with focus.
+// Get standard entries.
+    message_address[0] = (unsigned long) t->window_list[head_pos];
+    message_address[1] = (unsigned long) t->msg_list[head_pos];
+    message_address[2] = (unsigned long) t->long1_list[head_pos];
+    message_address[3] = (unsigned long) t->long2_list[head_pos];
 
-// Called by KEYBOARD_SEND_MESSAGE() in ps2kbd.c.
+// Get extra entries.
+    message_address[4] = (unsigned long) t->long3_list[head_pos];
+    message_address[5] = (unsigned long) t->long4_list[head_pos];
 
-// #todo:
-// We need to associate the current thread and the current tty.
-// tty->control
-// window->control
+// Clean
+    t->window_list[head_pos] = NULL;
+    t->msg_list[head_pos] = 0;
+    t->long1_list[head_pos] = 0;
+    t->long2_list[head_pos] = 0;
+    t->long3_list[head_pos] = 0;
+    t->long4_list[head_pos] = 0;
 
+// Round
+    t->head_pos++;
+    if ( t->head_pos >= 31 ){  t->head_pos = 0;  }
+// =====================================================
+*/
+
+
+// ===========================================================
+// usando a fila de mensagens com estrutura.
+
+
+
+    struct msg_d  *next_msg;
+
+
+    t->MsgQueueHead = index;
+
+    //get the next head pointer.
+    next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
+
+    if ( (void*) next_msg == NULL )
+        goto fail0;
+
+    if (next_msg->used != TRUE || next_msg->magic != 1234 )
+        goto fail0;
+
+// invalid
+    if( next_msg->msg == 0 )
+        goto fail0;
+
+// Get standard entries.
+    message_address[0] = (unsigned long) next_msg->window;
+    message_address[1] = (unsigned long) (next_msg->msg & 0xFFFFFFFF);
+    message_address[2] = (unsigned long) next_msg->long1;
+    message_address[3] = (unsigned long) next_msg->long2;
+
+// Get extra entries.
+    message_address[4] = (unsigned long) next_msg->long3;
+    message_address[5] = (unsigned long) next_msg->long4;
+            
+// clear the entry.
+// Consumimos a mensagem. Ela não existe mais.
+// Mas preservamos a estrutura.
+    next_msg->window = NULL;
+    next_msg->msg = 0;
+    next_msg->long1 = 0;
+    next_msg->long2 = 0;
+    next_msg->long3 = 0;
+    next_msg->long4 = 0;
+
+// ==================================
+
+done:
+    if(restart==TRUE)
+    {
+        t->MsgQueueHead=0;
+        t->MsgQueueTail=0;
+        return (void*) 1;
+    }
+
+// Yes, We have a message.
+// round
+    t->MsgQueueHead++;
+    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    return (void *) 1;
+
+fail0:
+// No message.
+// round
+
+    if(restart==TRUE)
+    {
+        t->MsgQueueHead=0;
+        t->MsgQueueTail=0;
+        return NULL;
+    }
+
+    t->MsgQueueHead++;
+    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    return NULL;
+}
+
+
+// post_message_to_tid:
 // #bugbug
-// Only keyboard messages,
 // long1 and long2 will mask to single byte.
 // IN: tid, window, message code, ascii code, raw byte.
-
 // Post message.
-// Asynchronous.
+
 int
 post_message_to_tid ( 
     int tid, 
@@ -259,6 +384,10 @@ post_message_to_tid (
     next_msg->long1  = (unsigned long) long1;
     next_msg->long2  = (unsigned long) long2;
 
+// #test
+    next_msg->long3 = (unsigned long) jiffies;  // ktime.
+
+
 done:
     t->MsgQueueTail++;
     if ( t->MsgQueueTail >= 31 )
@@ -274,7 +403,6 @@ fail0:
 
 
 // Post message to the foreground thread.
-// Asynchronous.
 int
 post_message_to_foreground_thread ( 
     struct window_d *window, 
@@ -293,6 +421,28 @@ post_message_to_foreground_thread (
                      long1,
                      long2 );
 }
+
+// Post message to the ws control thread.
+int
+post_message_to_ws_thread ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+    if( WindowServerInfo.initialized == TRUE )
+        return -1;
+
+    return (int) post_message_to_tid( 
+                     WindowServerInfo.tid,
+                     window,
+                     msg,
+                     long1,
+                     long2 );
+}
+
+
 
 // service 112
 // Post message to tid.

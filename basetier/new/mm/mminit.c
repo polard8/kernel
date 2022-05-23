@@ -237,6 +237,8 @@ void memory_destroy_heap (struct heap_d *heap)
  */
 // Called by:
 // init_runtime in runtime.c
+// Init Memory Manager for x64:
+// Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
 
 int mmInit(void)
 {
@@ -308,10 +310,20 @@ int mmInit(void)
 
 // extended memory from cmos.
     //memorysizeExtendedMemory = (unsigned long) rtcGetExtendedMemory(); 
-    memorysizeExtendedMemory =  (__total_memory_in_kb - memorysizeBaseMemory - memorysizeOtherMemory);
+    memorysizeExtendedMemory =  
+        (unsigned long) ( 
+        __total_memory_in_kb - 
+        memorysizeBaseMemory - 
+        memorysizeOtherMemory 
+        );
 
 // Size in KB.
-    memorysizeTotal = (unsigned long) ( memorysizeBaseMemory + memorysizeOtherMemory + memorysizeExtendedMemory );
+    memorysizeTotal = 
+        (unsigned long) ( 
+        memorysizeBaseMemory + 
+        memorysizeOtherMemory + 
+        memorysizeExtendedMemory 
+        );
 
 // #IMPORTANTE 
 // Determinar o tipo de sistema de memória.
@@ -352,22 +364,20 @@ int mmInit(void)
 
     // Continua...
 
-    debug_print("mmInit: done\n");
+// Mapping all the static system areas.
+// See: pages.c
+    mmSetUpPaging();
 
+done:
+    debug_print("mmInit: done\n");
     //refresh_screen();
     //while(1){}
-
-// OK
     return 0;
-    //return (int) Status;
 
 fail:
     debug_print("mmInit: fail\n");
-
-    // #breakpoint
     //refresh_screen();
     //while(1){}
-
     return (int) (-1);
 }
 

@@ -384,7 +384,7 @@ int fflush (FILE *stream)
 // real flush.
 // called by fflush();
 
-int __fflush (FILE *stream)
+int __fflush(FILE *stream)
 {
     ssize_t nwrite = -1;
     size_t Count = 0;
@@ -899,25 +899,25 @@ int __putc (int ch, FILE *stream)
 
 
 // don't change it
-int getc (FILE *stream){
+int getc(FILE *stream){
     return (int) __getc (stream);
 }
 
 // don't change it
-int putc (int ch, FILE *stream){
+int putc(int ch, FILE *stream){
     return (int) __putc (ch, stream);
 }
 
 // don't change it
 // See: unix v7
-int fgetc ( FILE *stream )
+int fgetc( FILE *stream )
 {
     return (int) getc(stream);
 }
 
 // don't change it
 // See: unix v7
-int fputc ( int ch, FILE *stream )
+int fputc( int ch, FILE *stream )
 {
     return (int) putc(ch,stream);
 }
@@ -947,7 +947,7 @@ int putchar (int ch){
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
 
-char *gets (char *s)
+char *gets(char *s)
 {
     register int c;
     register char *cs;
@@ -2388,12 +2388,15 @@ void kinguio_puts(const char* str)
 }
 
 
+// #todo
+// #bugbug
+// Parameters can't be NULL.
 static char *_vsputs_r(char *dest, char *src)
 {
     unsigned char *usrc  = (unsigned char *) src;
     unsigned char *udest = (unsigned char *) dest;
 
-    while ( *usrc ) 
+    while (*usrc) 
     { 
         *udest++ = *usrc++; 
     };
@@ -2408,9 +2411,7 @@ kinguio_vsprintf(
     const char *fmt, 
     va_list ap )
 {
-
     int index=0;
-
 
 // Char/String support.
 
@@ -2977,36 +2978,32 @@ void outbyte (int c){
 
 
 /*
- ***********************************
  * _outbyte:
  *     Just output a byte on the screen.
- *
  *     Obs: A função não se preocupa com o cursor.
  *          Essa rotina está preparada somente par ao modo gráfico.
  *          Talvez usaremos um selecionador de modo.   
- *
  * #obs: 
  * #importante: Não me lebro se o kernel efetua o refresh do char 
  * nesse caso.
  */
+// #obs: 
+// Tamanho do char constante = 8. 
+// O que queremos é usar uma variável.
 
-	// #obs: 
-	// Tamanho do char constante = 8. 
-	// O que queremos é usar uma variável.
-
-void _outbyte ( int c )
+void _outbyte(int c)
 {
 
-	// #bugbug
-	// Essa funçao nao 'e usada ... NAO funciona.
-	// printf usa outra coisa (65).
-	// #bugbug: size = 8
+// #bugbug
+// Essa funçao nao 'e usada ... NAO funciona.
+// printf usa outra coisa (65).
+// #bugbug: size = 8
 
-    gramado_system_call ( 7, 
+    gramado_system_call (
+        7, 
         (8 * g_cursor_x), 
         (8 * g_cursor_y), 
         (unsigned long) c ); 
-
 
     //if ( (void *) stdout == NULL )
        //return;
@@ -3027,37 +3024,34 @@ int gramado_input ( const char *string, va_list arglist )
 */
 
 
-
 /*
- ************************************************************
  * input:
  *     Include the given chars into a string named 'prompt[]'.
  */
-
 // #bugbug: 
 // Deveríamos considerar o posicionamento dentro do arquivo.
 // Dentro da stream.
-
 // Isso eh chamado pelo shell pra construir uma linha de comandos
 // com as teclas digitadas.
 // Serve para construir uma string.
-
 // ??
 // E esse retorno ??
 
-unsigned long input ( unsigned long ch )
+unsigned long input(unsigned long ch)
 {
-    // Convert.
+
+// Convert.
     char c = (char) ch;
 
-    // Ajust prompt max.
-    if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
+// Ajust prompt max.
+    if ( prompt_max == 0 || 
+         prompt_max >= PROMPT_MAX_DEFAULT )
     {
         prompt_max = PROMPT_MAX_DEFAULT;
     }
 
-	//Filtra limite.
-	//retornar 1??
+//Filtra limite.
+//retornar 1??
 
     if ( prompt_pos > prompt_max )
     {
@@ -3065,12 +3059,10 @@ unsigned long input ( unsigned long ch )
         return (unsigned long) 0;   
     }
 
-
-    // Trata caractere digitado.
-
-    // #obs: 
-    // Não deve ser trabalho de input() atualizar
-    // o cursor do console. Ele somente atua sobre o buffer em ring3.
+// Trata caractere digitado.
+// #obs: 
+// Não deve ser trabalho de input() atualizar
+// o cursor do console. Ele somente atua sobre o buffer em ring3.
 
     switch (c){
 
@@ -3123,13 +3115,8 @@ unsigned long input ( unsigned long ch )
     return (unsigned long) 0;
 
 input_done:
-
     return VK_RETURN;
 }
-
-
-
-
 
 
 /*
@@ -3196,15 +3183,15 @@ int fprintf ( FILE *stream, const char *format, ... )
 }
 
 
+// #todo: testar.
+// Credits: Sombra OS.
 
-//#todo: testar.
-//Credits: Sombra OS.
-void nputs (char *cp, int len)
+void nputs(char *cp, int len)
 {
     int i = len;
     char *str;
 
-    // nao podemos escrever no endereço 0.
+// nao podemos escrever no endereço 0.
     if ( (void*) cp == NULL )
     {
         return;
@@ -3215,9 +3202,10 @@ void nputs (char *cp, int len)
         return;
     }
 
+// #notcool
     for (str = cp; i; str++, i--)
     {
-        putchar ( (int) *str);
+        putchar( (int) *str);
     }
 }
 
@@ -3232,10 +3220,10 @@ void nputs (char *cp, int len)
 	 */
 /* This is an UNSAFE function! */
 
-char *uclib_gets (char *str) 
+char *uclib_gets(char *str) 
 {
 
-    // nao podemos usr o endereço '0'.
+// nao podemos usr o endereço '0'.
     if ( (void *) str == NULL )
     {
        return (char *) 0;
@@ -3246,7 +3234,7 @@ char *uclib_gets (char *str)
        return (char *) 0;
     }
 
-    return (char *) fgets (str, INT_MAX, stdin);
+    return (char *) fgets(str, INT_MAX, stdin);
 }
 
 
@@ -3390,7 +3378,7 @@ static __inline__ off_t ftell(FILE *__f)
 // Deixaremos o kernel manipular a estrutura.
 // This function returns the current file position of the stream stream. 
 
-long ftell (FILE *stream)
+long ftell(FILE *stream)
 {
     int fd=-1;
     
@@ -3398,52 +3386,48 @@ long ftell (FILE *stream)
     long file_pos=0;
     
     int rCount=0;
-    
-    
-    
+
+
     if ( (void *) stream == NULL ){
         debug_print ("ftell: stream\n");
         return 0;
-    }else{
+    }
 
-        fd = fileno(stream);
-        
-        if (fd<0){
-            printf("ftell: [FAIL] fd\n");
-            return 0;
-        }
-        
-        // Corrigir overflow.
-        // local. (ring3)
-        if (stream->_cnt < 0){
-            stream->_cnt = 0;
-        }
-        
-        //fflush (stream);
-        
-        // Pegamos o valor, assim podemos atualizar a estrutura local.
-        
-        file_pos = (long) lseek ( fd, 0, SEEK_CUR); 
-        
-        // offset
-        // offset = stream->_ptr - stream->_base;
-        
-        // ??
-        //if (filepos == 0)
-        //    return((long)offset);
-        
-        // local
-        //if (stream->_cnt == 0)
-        //    offset = 0;
+    fd = (int) fileno(stream);
 
-        // rCount = stream->_cnt + (stream->_ptr - stream->_base);
-        
-        return (long) file_pos;
-    };
+    if (fd<0){
+        printf("ftell: [FAIL] fd\n");
+        return 0;
+    }
 
-    debug_print ("ftell: [ERROR] Something is wrong\n");
-    
-    return 0;
+// Corrigir overflow.
+// local. (ring3)
+
+    if (stream->_cnt < 0){
+        stream->_cnt = 0;
+    }
+
+    //fflush (stream);
+
+// Pegamos o valor, 
+// assim podemos atualizar a estrutura local.
+
+    file_pos = (long) lseek(fd, 0, SEEK_CUR); 
+
+    // offset
+    // offset = stream->_ptr - stream->_base;
+
+    // ??
+    //if (filepos == 0)
+    //    return((long)offset);
+
+    // local
+    //if (stream->_cnt == 0)
+    //    offset = 0;
+
+    // rCount = stream->_cnt + (stream->_ptr - stream->_base);
+
+    return (long) file_pos;
 }
 
 
@@ -3452,7 +3436,9 @@ long ftell (FILE *stream)
  *     Gets the file id.
  *     The kernel gets this value from the stream struct.
  */
-int fileno ( FILE *stream ){
+
+int fileno(FILE *stream)
+{
 
     //assert(stream);
  
@@ -3716,7 +3702,7 @@ int getchar6(FILE *input_stream,FILE *output_stream)
 
 
 /*
-int feof(FILE *fp)
+int feof2(FILE *fp)
 {
     if ( (void *) fp == NULL )
        return EOF;
@@ -3726,15 +3712,8 @@ int feof(FILE *fp)
 */
 
 
-/*
- *********************************
- * feof:
- */
-
-int feof ( FILE *stream )
+int feof(FILE *stream)
 {
-    //assert(stream);
-
     if ( (void *) stream == NULL )
     {
         return EOF;
@@ -3757,14 +3736,8 @@ void clearerr(FILE *fp)
 */
 
 
-/*
- *********************************
- * ferror:
- */
-
-int ferror ( FILE *stream )
+int ferror(FILE *stream)
 {
-
     if ( (void *) stream == NULL )
     {
        return EOF;
@@ -5544,22 +5517,23 @@ setvbuf (
 }
 
 
-unsigned int filesize (FILE *fp)
+// Get filesize using fseek.
+unsigned int filesize(FILE *fp)
 {
-    unsigned int ret = 0;
+    unsigned int ret=0;
 
     if (!fp){ 
         debug_print ("filesize: [FAIL] fp\n");
         return 0;
     }
 
-    fseek (fp, 0, SEEK_END);
+    fseek(fp, 0, SEEK_END);
 
     ret = (unsigned int) ftell(fp);
 
-    rewind (fp);
+    rewind(fp);
 
-    return ret;
+    return (unsigned int) ret;
 }
 
 
@@ -6308,14 +6282,16 @@ int fpurge (FILE *stream){
 }
 
 
-
-//#todo: esse protótipo pertence à stdio_ext.h
-void  __fpurge (FILE *stream)
+// #todo: 
+// esse protótipo pertence à stdio_ext.h
+void __fpurge(FILE *stream)
 {
     debug_print ("__fpurge: TODO: \n");
 
     if ( (void *) stream == NULL )
+    {
        return;
+    }
 }
 
 
@@ -6323,7 +6299,7 @@ void  __fpurge (FILE *stream)
 //POSIX.1-2001, POSIX.1-2008, Svr4.
 char *ctermid (char *s)
 {
-    debug_print ("ctermid: TODO: \n");	
+    debug_print ("ctermid: TODO: \n");
     return NULL; 
 }
 

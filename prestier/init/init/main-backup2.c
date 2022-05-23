@@ -43,9 +43,9 @@ gwsProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
-    if(msg<0){
+
+    if(msg<0)
         return -1;
-    }
 
     switch (msg){
 
@@ -234,16 +234,16 @@ int main( int argc, char **argv)
     gramado_system_call (641,0,0,0);
     gramado_system_call (643,0,0,0);
 
-
-// ====
-// Small command line interpreter.
-// We need to hang here because 
-// maybe there is no window server installed.
-
     printf(":: Gramado OS ::\n");
 
+/*
+ // #suspended
+ // We're not gonna use this small command line interpreter for now.
+
     int C=0;
+
     initPrompt();
+
     while(1)
     {
         if( isTimeToQuit == TRUE ){
@@ -260,21 +260,26 @@ int main( int argc, char **argv)
             input(C);
         }
     };
+*/
 
     printf("~Quit\n");
     //while(1){}
 
+// ring3 window server.
+    rtl_clone_and_execute("gwssrv2.bin");
+
 //================================
-    
-    //# no focus!
     //rtl_focus_on_this_thread();
     
     while (TRUE){
+
         //if( isTimeToQuit == TRUE )
             //break;
+
         if ( rtl_get_event() == TRUE )
         {
             //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
+
             gwsProcedure ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
@@ -282,6 +287,7 @@ int main( int argc, char **argv)
                 RTLEventBuffer[3] );
         }
     };
+
 
 // hang
     while (TRUE){

@@ -28,18 +28,12 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-LIBC     = ../../../comtier/lib/rtl/include/
-LIBCOBJ  = ../../../comtier/lib/rtl/obj
+LIBC      = ../../../comtier/lib/rtl/include/
+LIBCOBJ   = ../../../comtier/lib/rtl/obj
 
-
-#bugbug this is very old
-API     = ../../../libcore/include/
-APIOBJ  = ../../../libcore/obj
-
-
-	##
-	## Objects
-	##
+#
+# Objects
+#
 
 myObjects = crt0.o main.o \
 ctype.o \
@@ -64,8 +58,9 @@ all: main.o all-c cat-link finalize clean
 
 main.o:
 
+	gcc -c main.c $(CFLAGS) -I $(LIBC) -o main.o
+
 #	clang -g -Wall -Wextra miniyacc.c -o miniyacc
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
 #	clang  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
 
 
