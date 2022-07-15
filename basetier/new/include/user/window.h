@@ -528,32 +528,35 @@ struct msg_d
     int used;
     int magic;
 
-// Standard header.
-    struct window_d *window;
+// standard header
+    struct window_d *window;  //#opaque
     int msg;
     unsigned long long1;
     unsigned long long2;
 
-// extra payload.
+// extra payload
     unsigned long long3;
     unsigned long long4;
 
-// Extention:
+// extention
 
     pid_t sender_pid;
     pid_t receiver_pid;
+    tid_t sender_tid;
+    tid_t receiver_tid;
+    // ...
+    
+    //unsigned long jiffie1;
+    //unsigned long jiffie2;
 
-    int sender_tid;
-    int receiver_tid;
-
-// ...
-
-    // #todo
-    // We need some synchronization flags.
-    // Maybe its better putting this flag into the thread struct.
-    // t->msg_flags;
-
+// #todo
+// We need some synchronization flags.
+// Maybe its better putting this flag into the thread struct.
+// t->msg_flags;
     //unsigned long flags;
+
+// navigation?
+    struct msg_d *next;
 };
 
 
@@ -621,7 +624,7 @@ void *shared_buffer_cursor_icon;
 
 //esses tipo indicam algum posicionamento dentro da xorder.
 typedef enum {
-	zordertypeNull,     //ignorado
+    zordertypeNull,     //ignorado
     zordertypeTop,      //acima de todas
     zordertypeBottom,   //abaixo de rodas.
     //...	
@@ -632,21 +635,20 @@ typedef enum {
 //essas são as camadas onde os objetos gráficos ficam ...
 //estão associadas com formulários e containers.
 typedef enum {
-	zorderlayerNull,     //ignorado
+    zorderlayerNull,     //ignorado
     zorderlayerBack,     //back layer. é a área onde os métodos invocarão a construção de objetos gráficos.
     zorderlayerMiddle,   //middle layer. é onde os objetos gráficos e as etiquetas de controle são colocadas.
-	zorderlayerFront,    //front layer. são colocados os controles não gráficos como: 
-	                     //CommandButton, CheckBox e ListBox 
-    //...	
+    zorderlayerFront,    //front layer. são colocados os controles não gráficos como: 
+                         //CommandButton, CheckBox e ListBox 
+    //...
 }zorder_layer_t;
 
 
-//
-//Estrutura para controlar um índice de janela 
-//ponteiros de instãncias dessa estrutura ficarão na lista zorderList[].
+// Estrutura para controlar um índice de janela 
+// ponteiros de instãncias dessa estrutura ficarão na lista zorderList[].
 // Obs: uma estrutura de janela pode ter um poteiro para essa 
 // estrutura que controlará todas as propriedades de zorder relaticas a aquela janela.
-//
+
 struct zorder_d
 {
 	// tipo ... top ou bottom.
@@ -743,25 +745,20 @@ struct frontbufferinfo_d
 	
     //@todo:
 	// ?? O que nos podemos ter aqui ??	
-	// terminal., window, line disciplice, cursor ...	
+	// terminal., window, line disciplice, cursor ...
 };
 struct frontbufferinfo_d *FrontBufferInfo;
 
 
 
 /*
- **********************************************************
  * gui:
  *     Nível 0 
  *     ## gui  ##
  *
  * Obs: Foi incluído aqui os ponteiros para as janelas principais usadas nos 
  * principais recursos gráficos, como control menu do desktop por exemplo.
- *
- * Histórico: 
- * 2015 - Created.
- * 2016 - incluíndo novos elementos.
- * ...
+ * 2015 - Created by Fred Nora.
  */
 
 // #bugbug
@@ -813,22 +810,20 @@ struct gui_d
     void *backbuffer3;
     // ...
 
+/*
+ * Default dedicated buffers.
+ *     Esses ponteiros podem ser usados para aloca
+ * memória para buffer dedicado antes mesmo de se criar a estrutura
+ * da janela.
+ * Obs: Toda janela tem que ter um buffer dedicado, onde ela será pintada.
+ * Depois de pintada ela pertencerá a uma lista de janelas que serão
+ * enviadas para o LFB seguindo a ordem da lista.
+ */
 
-	/*
-	 * Default dedicated buffers.
-	 *     Esses ponteiros podem ser usados para aloca
-	 * memória para buffer dedicado antes mesmo de se criar a estrutura
-	 * da janela.
-	 * Obs: Toda janela tem que ter um buffer dedicado, onde ela será pintada.
-	 * Depois de pintada ela pertencerá a uma lista de janelas que serão
-	 * enviadas para o LFB seguindo a ordem da lista.
-	 */
-	
 	//void* defaultWindowDedicatedBuffer1;
 	//void* defaultWindowDedicatedBuffer2;
 	//void* defaultWindowDedicatedBuffer3;
-    //...	
-
+    //...
 
     // redraw
     // Flag para repintar todas as janelas.
@@ -886,9 +881,8 @@ struct gui_d
 	 * Grupo 6: Outras.
 	 */
 
-//
 // Security
-//
+
     struct usession_d  *CurrentUserSession;
     struct room_d      *CurrentRoom;
     struct desktop_d   *CurrentDesktop;
@@ -898,7 +892,6 @@ struct gui_d
 //
     //struct user_info_d *User; 
     //...
-
 };
 
 // #importante

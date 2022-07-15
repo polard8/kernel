@@ -1,24 +1,21 @@
 /*
  * File: ide.h
- *
  * Descrição:
  *     Header para rotinas de hardware para drivers de ide. hdd.
- *
  * #todo 
  * ide struct 
- * 
  * History:
  *     2015
  */
 
+#ifndef __IDE_H
+#define __IDE_H    1
 
-//
+
 // IDE ports.
-//
 
-
-int g_current_ide_channel;
-int g_current_ide_device;
+extern int g_current_ide_channel;
+extern int g_current_ide_device;
 
 
 
@@ -82,7 +79,10 @@ struct ide_ports_d
     // podemos usar ponteiros para estruturas.
 };
 
-struct ide_ports_d ide_ports[4];
+//see: ide.c
+extern struct ide_ports_d  ide_ports[4];
+
+
 
 
 #define IDE_ATA    0
@@ -100,12 +100,14 @@ struct ide_ports_d ide_ports[4];
 #define IDE_CMD_WRITE   0x30
 #define IDE_CMD_RDMUL   0xC4
 #define IDE_CMD_WRMUL   0xC5
- 
-unsigned long ide_handler_address;
+
+
+
+extern unsigned long ide_handler_address;
  
 
-//estrutura para canais da controladora IDE. 
-typedef struct ide_channel_d ide_channel_t; 
+// estrutura para canais da controladora IDE. 
+
 struct ide_channel_d
 {
     int id;
@@ -128,12 +130,16 @@ struct ide_channel_d
 	//...
 };
 
-struct ide_channel_d idechannelList[8];
+typedef struct ide_channel_d ide_channel_t; 
+
+extern struct ide_channel_d  idechannelList[8];
 
 
 
-//estrutura para discos controlados pela controladora ide.
-typedef struct ide_disk_d ide_disk_t;
+
+
+// estrutura para discos controlados pela controladora ide.
+
 struct ide_disk_d
 {
 	//id do disco ide.
@@ -159,7 +165,7 @@ struct ide_disk_d
 	
 };
 
-
+typedef struct ide_disk_d ide_disk_t;
  
  
 /*
@@ -170,7 +176,6 @@ struct ide_disk_d
  * Essa será a estrutura raiz para gerenciamento do controlador de IDE.
  */
 
-typedef struct ide_d ide_t;
 struct ide_d
 {
     // devemos colocar aqui um ponteiro para estrutura de informações 
@@ -183,19 +188,27 @@ struct ide_d
     struct ide_ports_d *secondary_master; 
     struct ide_ports_d *secondary_slave; 
 };
-struct ide_d IDE;
+
+typedef struct ide_d ide_t;
+
+//see: ide.c
+extern struct ide_d  IDE;
 
 
 
-typedef struct hdd_d hdd_t;
+
 struct hdd_d
 {
 	//...
 	int dummy;
 	//unsigned long hdd_handler_address;
 };
+
+typedef struct hdd_d hdd_t;
 //hdd_t *Hdd;
  
+
+// prototypes =================================
 
 //
 // lba
@@ -248,6 +261,11 @@ my_write_hd_sector (
  */
 
 int init_hdd(void);
+
+
+#endif    
+
+
 
 //
 // End.

@@ -195,17 +195,17 @@ void save_current_context (void)
 
     if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
-        panic("save_current_context: cpl");
+        panic("save_current_context: cpl\n");
     }
 
     if(cpl == 0){
         t->stime++;
     }
     if(cpl == 1){
-        panic("save_current_context: cpl 1");
+        panic("save_current_context: cpl 1\n");
     }
     if(cpl == 2){
-        panic("save_current_context: cpl 2");
+        panic("save_current_context: cpl 2\n");
     }
     if(cpl == 3){
         t->utime++;

@@ -61,10 +61,22 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 // + Configura sua estrutura de processo.
 // + Configura sua estrutura de thraed.
 // Não passa o comando para o processo.
-// See: gramado/core/client
 
-static int I_x64CreateInitialProcess (void)
+static int I_x64CreateInitialProcess(void)
 {
+    // This is a ring 3 process.
+    char *ImageName = "INIT    BIN";
+
+    // The virtual address for the base of the image.
+    // ps: We are using the kernel page directories now,
+    // this way but we're gonna clone the kernel pages
+    // when creating the init process.
+    // #define CONTROLTHREAD_BASE        0x00200000
+    // See: x64gva.h
+
+    unsigned long ImageAddress = 
+        (unsigned long) CONTROLTHREAD_BASE;
+
     int fileret = -1;
 
 // #debug
@@ -78,7 +90,7 @@ static int I_x64CreateInitialProcess (void)
     }
 
 //
-// Load image GWS.BIN in gramado/core/client.
+// Load image GWS.BIN
 //
 
 // Session manager
@@ -101,8 +113,8 @@ static int I_x64CreateInitialProcess (void)
                             VOLUME1_FAT_ADDRESS, 
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
-                            "INIT    BIN", 
-                            (unsigned long) CONTROLTHREAD_BASE, //0x00200000
+                            ImageName, 
+                            (unsigned long) ImageAddress,
                             BUGBUG_IMAGE_SIZE_LIMIT );
 
     if ( fileret != 0 )
@@ -618,13 +630,26 @@ void I_x64ExecuteInitialProcess (void)
 
 // Create the kernel process.
 // It will create a process for two images:
-// KERNEL.BIN and GWSSRV.BIN.
-// See: gramado/core/server.
 
 static int I_x64CreateKernelProcess(void)
 {
-    int Status=FALSE;
+    // This is a ring0 process.
+    // This process has two images,
+    // KERNEL.BIN loaded by the boot loader and
+    // MOD0.BIN loaded by the kernel base.
+
+    char *ImageName = "MOD0    BIN";
+
+    // This is the virtual address for the base of the image.
+    // We are using the kernel pagetables for that.
+    // #define EXTRAHEAP1_VA   0x0000000030A00000
+    // See: x64gva.h
+
+    unsigned long ImageAddress =
+        (unsigned long) 0x30A00000;
+
     unsigned long fileret=1;
+    int Status=FALSE;
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
     //debug_print ("I_x64CreateKernelProcess:\n");
@@ -640,8 +665,8 @@ static int I_x64CreateKernelProcess(void)
                             VOLUME1_FAT_ADDRESS, 
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
-                            "MOD0    BIN", 
-                            (unsigned long) 0x30A00000,
+                            ImageName, 
+                            (unsigned long) ImageAddress,
                             BUGBUG_IMAGE_SIZE_LIMIT ); 
 
     if ( fileret != 0 )

@@ -54,6 +54,40 @@ static int __libc_output_mode=0;
 static int terminal___PID=0;
 
 
+
+// globals
+
+int __libc_tty_id=0;
+
+//see: stdio.h
+unsigned long g_cursor_x=0;
+unsigned long g_cursor_y=0;
+unsigned long g_char_attrib=0;
+unsigned long g_columns=0;
+unsigned long g_rows=0;
+
+int g_using_gui=0;
+
+
+//
+// Standard stream.
+//
+
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+
+unsigned long Streams[NUMBER_OF_FILES];
+
+char prompt[PROMPT_MAX_DEFAULT]; 
+char prompt_out[PROMPT_MAX_DEFAULT]; 
+char prompt_err[PROMPT_MAX_DEFAULT]; 
+
+int prompt_pos=0;
+int prompt_max=0;
+int prompt_status=0;
+
+
 //
 // =========================================================
 //
@@ -2797,9 +2831,8 @@ void printchar ( char **str, int c )
 
 
 // Setup libc mode.
-void libc_set_output_mode (int mode){
-
-
+void libc_set_output_mode (int mode)
+{
     switch (mode)
     { 
 		case LIBC_DRAW_MODE:
@@ -6310,7 +6343,7 @@ char *ctermid (char *s)
  *     O retorno deve ser (int) e falhar caso dê algo errado.
  */
 
-// This routine ws called by crt0() in crt0.c
+// This routine is called by crt0() in crt0.c
 // #bugbug
 // Essa estrutura lida com elementos de estrutura em ring3.
 // #atenção: Algumas rotinas importantes estão usando esses elementos.

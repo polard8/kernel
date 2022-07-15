@@ -1,9 +1,7 @@
 /*
  * File: ata.h
- *
  * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
  * para suporte à IDE/AHCI.
- *
  * 2018 - Created by Nelson Cole. 
  */
 
@@ -16,25 +14,23 @@
 
 
 #ifndef __ATA_H__
-#define __ATA_H__
-
+#define __ATA_H__    1
 
 // nelson cole
 // suporte a disco.
 // usado no kernel base
 
-
-
 //
-// ==========================================================================
+// =====================================================================
 //     IDE controller support by Nelson Cole
-// ==========================================================================
+// =====================================================================
 //
 
+//see: ide.c
+extern int ATAFlag;
 
-int ATAFlag;
-#define FORCEPIO 1234
-
+#define FORCEPIO  1234
+//...
 
 
 
@@ -64,7 +60,7 @@ typedef void _void;
 */
 
 // IO Delay.
-#define io_delay() asm("out %%al,$0x80"::);
+#define io_delay()  asm("out %%al,$0x80"::);
 
 
 // Atenção:
@@ -242,15 +238,16 @@ struct dev_nport
     unsigned char dev30;
     unsigned char dev31;
 };
-struct dev_nport dev_nport;
+
+//see: ide.c
+extern struct dev_nport  dev_nport;
 
 
-//
+
 // História:
 //     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
 //     ICH5 integraçao do SATA e suporte total ACPI 2.0.
 //     ICH6 implementaram os controladores AHCI SATA pela primeira vez.
-//
 
 
 /*
@@ -258,6 +255,7 @@ struct dev_nport dev_nport;
  *     Suporta a IDE Controller.
  *     Essa é uma estrutura de superte a discos ata.
  */
+
 struct ata_pci
 {
     _u16 vendor_id;
@@ -287,7 +285,8 @@ struct ata_pci
 
 };
 
-struct ata_pci ata_pci;
+//see: ide.c
+extern struct ata_pci  ata_pci;
 
 
 
@@ -311,9 +310,10 @@ struct ata
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
-	
 };
-struct ata ata;
+
+//see: ide.c
+extern struct ata  ata;
 
 
 /*
@@ -321,7 +321,6 @@ struct ata ata;
  *
  */
 
-typedef struct st_dev st_dev_t;
 typedef struct st_dev 
 {
     _u32 dev_id;
@@ -339,18 +338,21 @@ typedef struct st_dev
     struct st_dev *next;
 }st_dev;
 
+typedef struct st_dev st_dev_t;
+
 
 //
 // variables
 //
 
-_u16 *ata_identify_dev_buf;
-_u8 ata_record_dev;
-_u8 ata_record_channel;
+//see: ide.c
+extern _u16 *ata_identify_dev_buf;
+extern _u8 ata_record_dev;
+extern _u8 ata_record_channel;
 
 
 //
-// prototypes
+// prototypes ============================================
 //
 
 
@@ -359,10 +361,8 @@ int nport_ajuste(char nport);
 void ide_mass_storage_initialize();
 int ide_dev_init(char port);
 
-
 // ata_main.c
 void set_ata_addr(int channel);
-
 
 // ata.c
 int ide_identify_device(uint8_t nport);
@@ -378,12 +378,10 @@ void ata_cmd_write(int cmd_val);
 // worker
 _u8 __ata_assert_dever(char nport);
 
-
 // low level workers.
 void __ata_pio_read(_void *buffer,_i32 bytes);
 void __ata_pio_write(_void *buffer,_i32 bytes);
 static inline void __atapi_pio_read ( void *buffer, uint32_t bytes );
-
 
 //ide_dma.c
 void 
@@ -395,7 +393,6 @@ ide_dma_data (
 void ide_dma_start();
 void ide_dma_stop();
 int ide_dma_read_status();
-
 
 //ahci.c
 void ahci_mass_storage_init();
@@ -433,18 +430,14 @@ diskATAPCIConfigurationSpace (
     char dev, 
     char fun );
 
-
 /*
- ****************************************************************
  * diskATAInitialize:
  *     Inicializa o IDE e mostra informações sobre o disco.
  */
 
 int diskATAInitialize( int ataflag );
 
-
 /*
- *******************************************
  * diskATADialog:
  *     Rotina de diálogo com o driver ATA.
  */

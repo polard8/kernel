@@ -6,9 +6,8 @@
  *     2016 - Created by Fred Nora.
  */
 
-
 //
-// ==  The boot block structure.
+// The boot block structure.
 //
 
 // #todo
@@ -32,7 +31,7 @@ struct boot_block_d
     //...
 };
 
-struct boot_block_d BootBlock;
+extern struct boot_block_d  BootBlock;
 
 
 //
@@ -41,11 +40,11 @@ struct boot_block_d BootBlock;
 
 
 // main flags.
-int gdefLegacyBIOSBoot;
-int gdefEFIBoot;
-int gdefSafeBoot;
-int gdefShowLogo;
-int gdefShowProgressBar;
+extern int gdefLegacyBIOSBoot;
+extern int gdefEFIBoot;
+extern int gdefSafeBoot;
+extern int gdefShowLogo;
+extern int gdefShowProgressBar;
 //...
 
 
@@ -56,9 +55,12 @@ int gdefShowProgressBar;
 
 // Essa flag será lida pela rotina de falta de página.
 // para ignorar e não parar o sistema.
-int ____testing_memory_size_flag;
-unsigned long __last_valid_address; //salvando o úlltimo endereço válido
+//int ____testing_memory_size_flag;
+extern int ____testing_memory_size_flag;
 
+//salvando o úlltimo endereço válido
+//unsigned long __last_valid_address; 
+extern unsigned long __last_valid_address;
 
 //
 // End.

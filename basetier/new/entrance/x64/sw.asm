@@ -28,6 +28,7 @@ align 16
 
 extern _xxxxINT128_DEBUG_MESSAGE
 extern _sci0
+extern _sci0_cpl
 ; Capture context
 global _int128
 _int128:
@@ -64,6 +65,15 @@ _int128:
     push rdx      ; Saving arg4
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
+  
+
+; cpl
+; Get the first 2 bits of cs.
+; see: sci.c
+    xor rax, rax
+    mov ax, cs
+    and rax, 3
+    mov qword [_sci0_cpl], rax
 
 
     fxsave [__sw_local_fpu_buffer]
@@ -126,6 +136,7 @@ _int128:
 
 ;extern _xxxxINT129_DEBUG_MESSAGE
 extern _sci1
+extern _sci1_cpl
 ; Capture context
 global _int129
 _int129:
@@ -162,6 +173,16 @@ _int129:
     push rdx      ; Saving arg4
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
+
+
+; cpl
+; Get the first 2 bits of cs.
+; see: sci.c
+    xor rax, rax
+    mov ax, cs
+    and rax, 3
+    mov qword [_sci1_cpl], rax
+
 
     fxsave [__sw_local_fpu_buffer]
 
@@ -221,6 +242,7 @@ _int129:
 
 ;extern _xxxxINT130_DEBUG_MESSAGE
 extern _sci2
+extern _sci2_cpl
 ; Capture context
 global _int130
 _int130:
@@ -257,6 +279,16 @@ _int130:
     push rdx      ; Saving arg4
     mov rdx, rcx  ; arg3:
     pop rcx       ; arg4: 
+
+
+; cpl
+; Get the first 2 bits of cs.
+; see: sci.c
+    xor rax, rax
+    mov ax, cs
+    and rax, 3
+    mov qword [_sci2_cpl], rax
+
 
     fxsave [__sw_local_fpu_buffer]
 

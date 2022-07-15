@@ -97,12 +97,10 @@ static int __init_heap(void)
     unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
 
 
-	
 	//HEAP_START = (unsigned long) &HeapBuffer[0];
 	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
 	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
-	
-	
+
 	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
 	
 	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
@@ -119,9 +117,11 @@ static int __init_heap(void)
 // Se essa libc for usada por ela, então o pid pode ser
 // o pid 0, do kernel.
 
-    int thisprocess_id = (int) gramado_system_call ( 85, 0, 0, 0); 
+    int thisprocess_id = (int) gramado_system_call( 85, 0, 0, 0); 
+
     //if (thisprocess_id <= 0 ){
-    if (thisprocess_id < 0 ){
+    if (thisprocess_id < 0 )
+    {
         debug_print ("__init_heap: [FAIL] thisprocess_id  ~~>  :) \n");
         goto fail;
     }
@@ -134,8 +134,11 @@ static int __init_heap(void)
 // Isso precisa ser um ponteiro em uma região em ring3
 // compartilhada com esse processo.
 
-    unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
-    if ( (void*) heaptest == NULL ){
+    unsigned char *heaptest = 
+        (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
+    
+    if ( (void*) heaptest == NULL )
+    {
         debug_print ("__init_heap: [FAIL] heaptest \n");
         goto fail;
     }
@@ -238,7 +241,8 @@ static int __init_heap(void)
     }
 
 // Heap list ~ Inicializa a lista de heaps.
-    while ( i < HEAP_COUNT_MAX ){
+    while ( i < HEAP_COUNT_MAX )
+    {
         heapList[i] = (unsigned long) 0;
         i++;
     };
@@ -269,7 +273,7 @@ fail:
     while(1){}
 */
 
-    return (int) 1;
+    return (int) -1;
 }
 
 
@@ -305,14 +309,12 @@ static int __init_mm (void)
     {
         debug_print ("__init_mm: [FAIL] __init_heap\n");
         //printf      ("__init_mm: [FAIL] __init_heap\n");
-        return (int) 1;
+        return (int) -1;
     }
-
 
 // Lista de blocos de memória dentro do heap.
 
     i=0;
-
     while ( i < MMBLOCK_COUNT_MAX )
     {
         mmblockList[i] = (unsigned long) 0;
@@ -323,17 +325,15 @@ static int __init_mm (void)
 //Primeiro Bloco.
 
     //current_mmblock = (void *) NULL;
-	
-	//#importante:
-	//#inicializando o índice la lista de ponteiros 
-	//par estruturas de alocação.
-	//#bugbug: temos que inicializar isso no kernel também.
+
+//#importante:
+//#inicializando o índice la lista de ponteiros 
+//par estruturas de alocação.
+//#bugbug: temos que inicializar isso no kernel também.
 
     mmblockCount = 0;
 
-	//
-	// Continua...
-	//
+// Continua...
 
     //#debug
     debug_print ("__init_mm: done\n");
@@ -869,9 +869,9 @@ unsigned long FreeHeap ( unsigned long size )
  * *IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
  * C seja usada. 
  */
-// This routine ws called by crt0() in crt0.c
+// This routine is called by crt0() in crt0.c
 
-int libcInitRT (void)
+int libcInitRT(void)
 {
     int Status = -1;
 
@@ -880,9 +880,9 @@ int libcInitRT (void)
 
     Status = (int) __init_mm();
 
-    if ( Status != 0 ){
+    if (Status != 0){
         debug_print ("libcInitRT: [FAIL] __init_mm\n");
-        return (int) 1; 
+        return (int) -1;
     }
 
     //...

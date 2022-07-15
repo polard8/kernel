@@ -7,6 +7,15 @@
 
 //#define SERVICE_NUMBER_MAX  255
 
+
+//globals
+//see:sw.asm
+unsigned long sci0_cpl=0;
+unsigned long sci1_cpl=0;
+unsigned long sci2_cpl=0;
+
+
+
 //
 // == private functions: prototypes =============
 //
@@ -297,10 +306,11 @@ static void *__extra_services (
                             (const void *) arg3, (size_t) arg4 );
     }
 
-    // Pega o número da tty de um processo, dado o pid.
-    // process.c
-    // IN: PID.
-    // OUT: tty id.
+// 266
+// Pega o número da tty de um processo, dado o pid.
+// process.c
+// IN: PID.
+// OUT: tty id.
     if (number == 266){
         return (void *) process_get_tty ( (int) arg2 );
     }
@@ -352,10 +362,10 @@ static void *__extra_services (
         return (void *) newos_get_current_runlevel();
     }
 
-    // Serial debug print.
-    // See: sci/sys/sys.c
+// Serial debug print string.
+// See: sys.c
     if ( number == 289 ){
-        return (void *) sys_serial_debug_printk ( (char *) arg2 );
+        return (void *) sys_serial_debug_printk( (char *) arg2 );
     }
 
     if ( number == 292 ){
@@ -640,18 +650,25 @@ static void *__extra_services (
         taskswitch_lock();
         return NULL;
     }
+
+// 641
+// Unlock taskswitching 
     if (number == 641)
     {
         if(current_thread != INIT_TID){return NULL;}
         taskswitch_unlock();
         return NULL;
     }
+
     if (number == 642)
     {
         if(current_thread != INIT_TID){return NULL;}
         scheduler_lock();
         return NULL;
     }
+
+// 643
+// Unlock scheduler
     if (number == 643)
     {
         if(current_thread != INIT_TID){return NULL;}
@@ -745,7 +762,10 @@ static void *__extra_services (
         return (unsigned long) sys_alarm( (unsigned long) arg2 );
     }
 
-    if ( number == 891 ){
+// 891
+// Allocate shared ring3 pages.
+    if ( number == 891 )
+    {
         debug_print("__extra_services: 891\n");
         return (void *) newos_alloc_shared_ring3_pages ( (pid_t) current_process, (int) arg2 );
     }
@@ -1008,7 +1028,6 @@ static void *__extra_services (
 }
 
 
-
 // unit2: Do the job.
 // 0x80 ?
 void *sci0 ( 
@@ -1033,6 +1052,35 @@ void *sci0 (
     pid_t current_process = (pid_t) get_current_process();
 
 
+/*
+//cpl
+    unsigned long *cpl_buffer = (unsigned long *) &sci0_cpl;
+    int cpl=-1;
+    unsigned long tmp_cpl = (unsigned long) cpl_buffer[0];
+    cpl = (int) (tmp_cpl & 3);
+
+    if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
+    {
+        panic("sci0: cpl");
+    }
+
+    if(cpl == 0){
+        //printf("number=%d\n",number);
+        panic("sci0: cpl 0\n");
+    }
+    if(cpl == 1){
+        panic("sci0: cpl 1\n");
+    }
+    if(cpl == 2){
+        panic("sci0: cpl 2\n");
+    }
+    if(cpl == 3){
+        // ok
+    }
+*/
+
+
+
     // #debug
     //debug_print("sc0:\n");
     //printf("sc0:\n");
@@ -1053,9 +1101,9 @@ void *sci0 (
     if ( (void*) p == NULL )
         panic("sci0: p\n");
 
-    // Counting ...
+// Counting ...
     p->syscalls_counter++;
-    
+
     
     // #debug
     // #todo: Explain it better.
@@ -1825,31 +1873,30 @@ void *sci0 (
         case SYS_GETTIME:  return (void *) get_time();  break;
         case SYS_GETDATE:  return (void *) get_date();  break;
 
-        // Obs: 
-        // #todo: 
-        // Poderia ser uma chamada para configurar o posicionamento 
-        // e outra para configurar as dimens�es.
-        //226 - get
+// 226 - get
+// Obs: 
+// #todo: 
+// Poderia ser uma chamada para configurar o posicionamento 
+// e outra para configurar as dimens�es.
         case SYS_GET_KERNELSEMAPHORE:
             return (void *) __spinlock_ipc;
             break;
 
-        // 227 - close gate
-        // Entering critical section.
-        // See: process.c
+// 227 - close gate
+// Entering critical section.
+// See: process.c
         case SYS_CLOSE_KERNELSEMAPHORE:
             process_close_gate(current_process);
             return NULL;
             break;
 
-
-        // 228 - open gate
-        // Exiting critical section.
-        // #todo: Quando um processo fechar e estiver
-        // em sua sessão crítica, então devemos liberar
-        // essa flag. Isso fica mais fácil de lembrar se
-        // existir uma flag na estrutura de processo.
-        // See: process.c
+// 228 - open gate
+// Exiting critical section.
+// #todo: Quando um processo fechar e estiver
+// em sua sessão crítica, então devemos liberar
+// essa flag. Isso fica mais fácil de lembrar se
+// existir uma flag na estrutura de processo.
+// See: process.c
         case SYS_OPEN_KERNELSEMAPHORE:
             process_open_gate(current_process);
             return NULL;
@@ -1914,6 +1961,34 @@ void *sci1 (
     pid_t current_process = (pid_t) get_current_process();
 
 
+/*
+//cpl
+    unsigned long *cpl_buffer = (unsigned long *) &sci1_cpl;
+    int cpl=-1;
+    unsigned long tmp_cpl = (unsigned long) cpl_buffer[0];
+    cpl = (int) (tmp_cpl & 3);
+
+    if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
+    {
+        panic("sci1: cpl");
+    }
+
+    if(cpl == 0){
+        panic("sci1: cpl 0\n");
+    }
+    if(cpl == 1){
+        panic("sci1: cpl 1\n");
+    }
+    if(cpl == 2){
+        panic("sci1: cpl 2\n");
+    }
+    if(cpl == 3){
+        // ok
+    }
+*/
+
+
+
     if ( current_process<0 ||
          current_process >= PROCESS_COUNT_MAX )
     {
@@ -1958,6 +2033,34 @@ void *sci2 (
 
 
     pid_t current_process = (pid_t) get_current_process();
+
+
+/*
+//cpl
+    unsigned long *cpl_buffer = (unsigned long *) &sci2_cpl;
+    int cpl=-1;
+    unsigned long tmp_cpl = (unsigned long) cpl_buffer[0];
+    cpl = (int) (tmp_cpl & 3);
+
+    if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
+    {
+        panic("sci2: cpl");
+    }
+
+    if(cpl == 0){
+        panic("sci2: cpl 0\n");
+    }
+    if(cpl == 1){
+        panic("sci2: cpl 1\n");
+    }
+    if(cpl == 2){
+        panic("sci2: cpl 2\n");
+    }
+    if(cpl == 3){
+        // ok
+    }
+*/
+
 
 
     // debug_print("sci2: [TODO]\n");

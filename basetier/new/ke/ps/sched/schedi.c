@@ -88,33 +88,34 @@ tid_t KiScheduler(void)
 }
 
 
-/*
- * do_thread_sleeping:
- *     Muda o state de uma thread pra blocked.
- *     @todo: Mudar o nome da função para do_thread_blocked.
- */
-
 // 7
-void do_thread_blocked (int tid)
+// do_thread_sleeping:
+// Muda o state de uma thread pra blocked.
+// #todo: Mudar o nome da função para do_thread_blocked.
+
+void do_thread_blocked(int tid)
 {
     struct thread_d  *t; 
+
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
         return;
     }
 
-// struct
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
 // #todo
 // Se a thread estiver rodando no momento
@@ -128,13 +129,13 @@ void do_thread_blocked (int tid)
     }
 */
 
-// Change the state.
     t->state = BLOCKED;
+    t->blocked_jiffie = (unsigned long) jiffies;
 }
 
 
 //3
-void do_thread_dead (int tid)
+void do_thread_dead(int tid)
 {
     struct thread_d  *t;
 
@@ -144,24 +145,26 @@ void do_thread_dead (int tid)
         return;
     }
 
-// struct
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if(t->magic != 1234){
         return;
+    }
 
-// change the state
     t->state = DEAD;
 }
 
+
 //0
-void do_thread_initialized (int tid)
+void do_thread_initialized(int tid)
 {
     struct thread_d  *t;
 
@@ -171,29 +174,29 @@ void do_thread_initialized (int tid)
         return;
     }
 
-// struct
-
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
-
-// change the state
     t->state = INITIALIZED;
 }
 
 
 //4
-void do_thread_ready (int tid)
+void do_thread_ready(int tid)
 {
     struct thread_d  *t;
+
 
     if ( tid < 0 || 
          tid >= THREAD_COUNT_MAX )
@@ -201,18 +204,19 @@ void do_thread_ready (int tid)
         return;
     }
 
-// Struct
-
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
 // #todo
 // Se a thread estiver rodando no momento
@@ -226,97 +230,92 @@ void do_thread_ready (int tid)
     }
 */
 
-//  Change the state.
-
     t->state = READY;
+    t->ready_jiffie = (unsigned long) jiffies;
 }
 
 
 //5
-void do_thread_running (int tid){
-
+void do_thread_running(int tid)
+{
     struct thread_d *t; 
 
-
-// tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
         return;
     }
 
-// struct
-
     t = (void *) threadList[tid];
 
-    if ( (void *) t != NULL )
-    {
-        if ( t->used == 1 && t->magic == 1234 )
+    if ( (void *) t != NULL ){
+        if ( t->used == TRUE && t->magic == 1234 )
         {
             t->state = RUNNING;
         }
     }
 }
 
+
 //1
-void do_thread_standby (int tid)
+void do_thread_standby(int tid)
 {
     struct thread_d *t; 
-
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
         return;
     }
 
-// struct
-
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
-// change the state
     t->state = STANDBY;
 }
 
 
 //6
-void do_thread_waiting (int tid)
+void do_thread_waiting(int tid)
 {
     struct thread_d *t; 
 
-    // tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
         return;
     }
 
-// struct
-
     t = (void *) threadList[tid];
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
-// change the state
     t->state = WAITING;
+    t->waiting_jiffie = (unsigned long) jiffies;
 }
 
-// 2
-void do_thread_zombie (int tid){
 
+// 2
+void do_thread_zombie(int tid)
+{
     struct thread_d  *t; 
 
 
@@ -325,28 +324,29 @@ void do_thread_zombie (int tid){
         return;
     }
 
-// struct
-
     t = (void *) threadList[tid]; 
 
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL ){
         return;
+    }
 
-    if(t->used != TRUE)
+    if (t->used != TRUE){
         return;
+    }
 
-    if(t->magic != 1234)
+    if (t->magic != 1234){
         return;
+    }
 
+// #test
+// Can't close this one.
 
-// System's ring 0 thread.
-// The window server's thread.
-
-    if ( tid == TID0_TID )
+    if ( tid == TID0_TID ){
         return;
+    }
 
-// Change the state
     t->state = ZOMBIE;
+    t->zombie_jiffie = (unsigned long) jiffies;
 }
 
 
@@ -700,7 +700,6 @@ fail:
 
 /*
  * wakeup_thread: 
- * 
  *    Para acordar uma thread, basta colocar ela no 
  * estado READY se ela estiver com seu contexto 
  * salvo e seu estado WAITING.
@@ -708,18 +707,17 @@ fail:
  * for possível.
  */
 
-void wakeup_thread (int tid)
+void wakeup_thread(int tid)
 {
     struct thread_d  *t;
     int Status=0;
+
 
     if ( tid < 0 || 
          tid >= THREAD_COUNT_MAX )
     {
         return;
     }
-
-// Struct.
 
     t = (void *) threadList[tid]; 
 
@@ -728,12 +726,13 @@ void wakeup_thread (int tid)
         return;
     }
 
-    if ( t->used != TRUE )
+    if ( t->used != TRUE ){
         return;
+    }
 
-    if ( t->magic != 1234 )
+    if ( t->magic != 1234 ){
         return;
-
+    }
 
 // Se o contexto não foi salvo. 
 // Não tem como acorda-la.
@@ -831,18 +830,23 @@ void set_input_responder_tid(int tid)
 }
 
 
-
+// #deprecated
 // Let's check if one thread was selected to run imediatly
 // because we had an input event.
 // This way the reponder doesn't deed to wait the end 
 // of the round to run.
-
 // OUT:
 //  -1: No thread was selected
 // tid: The tid of the selected thread.
 
 int check_for_input_responder(void)
 {
+
+//
+// #deprecated
+//
+
+
     struct thread_d *t;
 
 
@@ -893,7 +897,7 @@ done:
 
 // Called by task_switch().
 
-void check_for_standby (void)
+void check_for_standby(void)
 {
     // loop
     register int i = 0;
@@ -947,24 +951,23 @@ void check_for_standby (void)
     return;
 
 //
-// == SPAWN ===============
+// Spawn
 //
-    // spawn.c
 
+// See: spawn.c
 do_spawn:
 
-//#ifdef SERIAL_DEBUG_VERBOSE
-    //debug_print(" Spawn $ \n");
-//#endif
+    if( current_thread < 0 ||
+        current_thread >= THREAD_COUNT_MAX )
+    {
+        goto fail;
+    }
 
-    // #todo
-    // if ( current_thread < 0 ...
+    KiSpawnThread(current_thread);
 
-    // See: spawn.c
-    KiSpawnThread ( current_thread );
-
-    // Not reached.
-    panic ("check_for_standby: ERROR\n");
+// Not reached.
+fail:
+    panic("check_for_standby: ERROR\n");
 }
 
 

@@ -1,19 +1,17 @@
 /*
  * File: keyboard.h 
- *
  * Descrição:
  *     Header do driver de teclado do Boot Loader.
  *     Header do driver básico de teclado para o Boot Loader.
- *
  * Obs:
  * O padrão de teclado usado precisa ser revisto.
- * Pelo jeito estamos usando o padrão americano. Mas é possível adaptar para 
- * ABNT2 sem muitos problemas. @todo: Podemos copiar do driver do núcleo.
- *
+ * Pelo jeito estamos usando o padrão americano. 
+ * Mas é possível adaptar para 
+ * ABNT2 sem muitos problemas. 
+ * @todo: Podemos copiar do driver do núcleo.
  * History:
  *     2015 - Ported from older versions.
  */
-
 
 #ifndef __KEYBOARD_H
 #define __KEYBOARD_H    1
@@ -23,9 +21,10 @@
 // Buffer.
 //
 
-#define CHEIO 1
-#define VAZIO 0
-#define OBF 0x01    //Output Buffer Flag.
+#define CHEIO  1
+#define VAZIO  0
+
+#define OBF  0x01    //Output Buffer Flag.
 
 
 #define	L		0x01    // Locking function.
@@ -36,7 +35,6 @@
 #define	CPS		0x20	// Caps shift -- swaps case of letter.
 #define	ASCII	0x40	// ascii code for this key.
 #define	STP		0x80	// Stop output.
-
 
 
 //Teclas.
@@ -228,16 +226,17 @@
 
 
 // keyboard queue
-int keyboard_queue_tail;
-int keyboard_queue_head;
-char keyboard_queue[8];
+extern int keyboard_queue_tail;
+extern int keyboard_queue_head;
+extern char keyboard_queue[8];
+
 
 //avisa que uma tecla foi digitada.
-int keyboard_flag;
+extern int keyboard_flag;
 
 
 //
-// Prototypes.
+// Prototypes ==========================================
 //
 
 char keyboad_get_char(void);

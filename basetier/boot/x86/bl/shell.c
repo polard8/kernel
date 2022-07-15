@@ -20,6 +20,18 @@
 #include <bootloader.h>
 
 
+// globals
+
+// Prompt.
+char prompt[250];   
+unsigned long prompt_pos=0;
+
+//Quando o comando terminou. (string completa).
+unsigned long g_cmd_status=0;
+
+
+
+
 // Funções importadas.
 
 extern void asm_shut_down();

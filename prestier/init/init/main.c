@@ -124,11 +124,18 @@ static int initCompareString(void)
     
     //LF
     printf("\n");
+
+    if( strncmp(prompt,"about",5) == 0 )
+    {
+        printf ("INIT.BIN: This is the first user application.\n");
+        goto exit_cmp;
+    }
+
     
     if( strncmp(prompt,"help",4) == 0 )
     {
         printf ("HELP:\n");
-        printf ("Commands: ws, client, help, reboot, shutdown ...\n");
+        printf ("Commands: help, wsq, nsq, reboot, shutdown ...\n");
         printf("[control + f9] to open the kernel console\n");
         goto exit_cmp;
     }
@@ -202,9 +209,12 @@ static int initCompareString(void)
 
     // ...
 
-    printf ("Command not found\n");
+    printf ("Command not found, type help for more commands\n");
 
 exit_cmp:
+    if(isTimeToQuit==TRUE){
+        return 0;
+    }
     initPrompt();
     return 0;
 }
@@ -261,7 +271,8 @@ int main( int argc, char **argv)
         }
     };
 
-    printf("~Quit\n");
+    //#debug
+    //printf("~Quit\n");
     //while(1){}
 
 //================================

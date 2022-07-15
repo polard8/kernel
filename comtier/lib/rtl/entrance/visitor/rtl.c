@@ -17,6 +17,10 @@
 #include <pthread.h>
 
 
+
+unsigned long RTLEventBuffer[32];
+
+
 // =========================
 
 // System call.

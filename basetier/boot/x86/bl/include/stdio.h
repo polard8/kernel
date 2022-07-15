@@ -4,14 +4,8 @@
  *     Parte da lib C, C99.
  */
 
-
 #ifndef __STDIO_H
 #define __STDIO_H    1
-
-
-//
-// Defines.
-// 
  
 #define SCREEN_START 0x000B8000
 #define ScreenStart SCREEN_START

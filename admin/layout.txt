@@ -1,40 +1,12 @@
 /admin
 	Some design notes and scripts.
-/base
-	The root directory for the target boot partition.
-/boot
+/basetier/boot
 	Boot loader for the 'new' system.
 	It loads the kernel image.
-/boot/bl32
-	Boot loader. BL.BIN.
-/boot/bm1632
-	Boot manager. BM.BIN.
-/cmd
-	User mode uni-like commands.
+/basetier/disk
+	The root directory for the target boot partition.
 /docs
 	Documentation
 /gramado
 	Gramado operating system.
-/gramado/core
-	The window server and the first client.
-/gramado/libgws
-	The client-side library for the window server.
-/gramado/shell
-	The User Interface.
-/lib
-	User mode libraries.
-/lib/fonts
-	The font support.
-/lib/lib
-	Some user mode client-side libraries.
-/lib/rtl
-	Ring 3 runtime library. The libc.
-/new
-	The newos subsystem.
-	The kernel image.
-/ns
-	The network server.
-/scripts
-	Scripts
-/tools
-	Tools
+

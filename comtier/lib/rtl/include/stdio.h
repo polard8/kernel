@@ -1,22 +1,17 @@
 /*
  * File: stdio.h
- *
  *     Standard IO facilities.
  * 
  *     I/O routines support.
  *     c99 - ISO/IEC 9899:1999
- *
  * Environment: ring3.
- *
  * History:
  *     2015 - Created by Fred Nora.
  *     2020 - A lot of new functions.
  */
 
-
 #ifndef __STDIO_H__
-#define __STDIO_H__
-
+#define __STDIO_H__    1
 
 
 #include <sys/types.h>
@@ -32,10 +27,7 @@
 // Usado na inicialização da biblioteca.
 // See: stdio.c:
 
-int __libc_tty_id;
-
-
-
+extern int __libc_tty_id;
 
 //
 // # Modes #
@@ -333,24 +325,24 @@ typedef __gramado_off_t  fpos_t;
 //
 
 //cursor
-unsigned long g_cursor_x;
-unsigned long g_cursor_y;
+extern unsigned long g_cursor_x;
+extern unsigned long g_cursor_y;
 
 //char.
-unsigned long g_char_attrib;
+extern unsigned long g_char_attrib;
 
 //columns and rows
 //@todo: Esse precisa ser inicializado
 //Obs: Se essas variáveis forem 0, 
 // as rotinas de stdio usarão os valores default.
 //COLUMNS e ROWS.
-unsigned long g_columns;
-unsigned long g_rows;
+extern unsigned long g_columns;
+extern unsigned long g_rows;
 
 
 // ??
 // modo gráfico?
-int g_using_gui; 
+extern int g_using_gui; 
 
 
 
@@ -362,15 +354,13 @@ int g_using_gui;
 
 #define PROMPT_MAX_DEFAULT  BUFSIZ
 
-char prompt[PROMPT_MAX_DEFAULT]; 
-char prompt_out[PROMPT_MAX_DEFAULT]; 
-char prompt_err[PROMPT_MAX_DEFAULT]; 
+extern char prompt[PROMPT_MAX_DEFAULT]; 
+extern char prompt_out[PROMPT_MAX_DEFAULT]; 
+extern char prompt_err[PROMPT_MAX_DEFAULT]; 
 
-int prompt_pos;
-int prompt_max;
-int prompt_status;
-//char prompt_text[] = "$ ";
-//...
+extern int prompt_pos;
+extern int prompt_max;
+extern int prompt_status;
 
 // =========================================
 

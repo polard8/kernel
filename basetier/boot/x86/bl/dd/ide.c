@@ -19,6 +19,40 @@
 #include <bootloader.h>
 
 
+//
+// globals
+//
+
+//see: ata.h
+int ATAFlag=0;
+
+//see: ata.h
+struct dev_nport  dev_nport;
+struct ata_pci  ata_pci;
+struct ata  ata;
+
+
+_u16 *ata_identify_dev_buf;
+_u8 ata_record_dev=0;
+_u8 ata_record_channel=0;
+
+
+int g_current_ide_channel=0;
+int g_current_ide_device=0;
+
+//see: ide.h
+struct ide_ports_d  ide_ports[4];
+
+unsigned long ide_handler_address=0;
+
+
+//see: ide.h
+struct ide_channel_d  idechannelList[8];
+struct ide_d  IDE;
+
+
+
+
 // A unidade atualmente selecionada.
 st_dev_t *current_dev;
 

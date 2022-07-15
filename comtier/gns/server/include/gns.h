@@ -1,11 +1,6 @@
 /*
  * File: gns.h     todo: change to gnssrv.h 
- * 
- * 
- * 
  */
-
-
 
 
 // rtl

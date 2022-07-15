@@ -1,17 +1,13 @@
 /*
  * File: bootloader.h 
- * 
  *     #todo: Change the name to 'bl.h'
- *
  * Descrição:
  *     Header principal do Boot Loader de 32 bits, BL.BIN.
  *     Feito em 32bit C/Assembly.
  *     Declarações e protótipos para as funções principais do Boot Loader.
  *     Oferecer o suporte necessário nessa fase de inicialização.
  *     ...
- * 
  * History:
- * =========
  *     2013 - Created by Fred Nora.
  */
 
@@ -25,15 +21,11 @@
 // ...
 
 
-int current_mode;
-
+extern int current_mode;
 
 //
 // Variáveis para habilitações de verbose pra debug.
 //
-
- 
-
 
 #include <config/config.h>  
 #include <gdef.h>  
@@ -67,13 +59,10 @@ extern void refresh_screen();
 //#define LOAD_SUCCESS  0
 //#define LOAD_FAILURE  1    //Erro genérico.
 //#define LOAD_
-//Continua...		 
- 
- 
+//Continua...
 
 /*
  * FDC support.
- *
  * PORTS: Constants for support ports.
  *        @todo: Não oferecer mais suporte ao FDC. 
  */
@@ -106,7 +95,6 @@ extern void refresh_screen();
  * Boot Loader page directory constants.
  */
  
-
 /*
  * Memory page tables:
  *     Mapeando memória para o Boot Loader e os arquivos que ele tem 
@@ -142,7 +130,6 @@ extern void refresh_screen();
 /*
  * User mode memory constants.
  */
- 
 #define  USER_BASE       0x00400000    //4MB físico.
 //#define  USER_BASE32MB_PA   0x02000000    //32MB físico.
 
@@ -198,8 +185,6 @@ extern void refresh_screen();
 #define SECTOR_SIZE    512  
 #define INIT_SECTOR    20
 //...
-
-
 
 /*
  * Constants for text support.
@@ -275,7 +260,6 @@ extern void refresh_screen();
 #include <memmap.h>     //Memory Map - address.
 #include <diskmap.h>    //Disk Map   - sectors.
 
-
 //#test.
 #include <heap.h> 
 
@@ -286,7 +270,6 @@ extern void refresh_screen();
 #include <stdio.h>
 #include <string.h>
 //...
-
 
 //#test
 #include <cpuid.h>
@@ -303,10 +286,7 @@ extern void refresh_screen();
 
 #include <fs/fs.h>
 
-
 #include <pci.h>
-
-
 
 //#include <timer.h>     //irq 0.
 #include <dd/keyboard.h>    //irq 1.
@@ -319,7 +299,6 @@ extern void refresh_screen();
 // Obs: This must be the last one.
 
 #include <shell.h>
-
 
 //
 // (Boot Loader Internal). Para rotinas globais começadas com BlXXXX().
@@ -334,11 +313,9 @@ extern void refresh_screen();
 // Variáveis globais.
 //
 
-//Se o boot loader está inicializado.
-int g_initialized;
-
-int g_driver_hdd_initialized;
-
+// Se o boot loader está inicializado.
+extern int g_initialized;
+extern int g_driver_hdd_initialized;
 
 
 /*
@@ -347,20 +324,20 @@ int g_driver_hdd_initialized;
  * aqui no suporte à texto.
  */
 
-unsigned long g_cursor_x;        //Cursor.
-unsigned long g_cursor_y;        //Cursor. 
-unsigned long g_system_color;    //Color. 
-unsigned long g_char_attrib;     //Color.  
-unsigned long CURSOR_X;
-unsigned long CURSOR_Y; 
-unsigned long STATUS_X;
-unsigned long STATUS_Y;
-unsigned long EDITBOX_X;
-unsigned long EDITBOX_Y;
-unsigned long EDITBOX_LARGURA;
-unsigned long EDITBOX_ALTURA;
-unsigned long EDITBOX_BG_COLOR;
-unsigned long EDITBOX_TEXT_COLOR;
+extern unsigned long g_cursor_x;        //Cursor
+extern unsigned long g_cursor_y;        //Cursor
+extern unsigned long g_system_color;    //Color 
+extern unsigned long g_char_attrib;     //Color  
+extern unsigned long CURSOR_X;
+extern unsigned long CURSOR_Y; 
+extern unsigned long STATUS_X;
+extern unsigned long STATUS_Y;
+extern unsigned long EDITBOX_X;
+extern unsigned long EDITBOX_Y;
+extern unsigned long EDITBOX_LARGURA;
+extern unsigned long EDITBOX_ALTURA;
+extern unsigned long EDITBOX_BG_COLOR;
+extern unsigned long EDITBOX_TEXT_COLOR;
 
 
 
@@ -369,8 +346,8 @@ unsigned long EDITBOX_TEXT_COLOR;
 //
 
 //unsigned long registerCR3;
-unsigned long LegacyCR3;        //Valor existente.
-unsigned long BootLoaderCR3;    //Valor configurado pelo Boot Loader.
+extern unsigned long LegacyCR3;        //Valor existente.
+extern unsigned long BootLoaderCR3;    //Valor configurado pelo Boot Loader.
 
 //CR0
 //unsigned long registerCR0;
@@ -379,18 +356,17 @@ unsigned long BootLoaderCR3;    //Valor configurado pelo Boot Loader.
 /*
  *  Variables for GUI support. Usar ou não o modo gráfico.
  */
-int useGUI;         
+extern int useGUI;
 
 
 /*
  * Variables for window procedure support.
  */
- 
-unsigned long g_proc_status; 
-unsigned long g_next_app;
-unsigned long g_next_proc;
-unsigned long g_nova_mensagem;
-unsigned long next_address;  //??
+extern unsigned long g_proc_status; 
+extern unsigned long g_next_app;
+extern unsigned long g_next_proc;
+extern unsigned long g_nova_mensagem;
+extern unsigned long next_address;  //??
 
 
 /*
@@ -399,37 +375,35 @@ unsigned long next_address;  //??
  */ 
 //unsigned long current_task;
 
-//unsigned long proximo;  //??	
+//unsigned long proximo;  //??
 
 
 /*
  * Variables for LFB Address support. 
  */
-unsigned long g_lbf_pa;    //Endereço Físico do LFB.
-unsigned long g_lbf_va;    //Endereço Lógico do LFB.
-
+extern unsigned long g_lbf_pa;    //Endereço Físico do LFB.
+extern unsigned long g_lbf_va;    //Endereço Lógico do LFB.
 
 /*
  * Structures for Boot Loader.
  */
- 
-
 
 /*
  * system_d:
  *     Structure for global system informations.
  */
- 
-typedef struct system_d system_t;
+
 struct system_d
 {
     unsigned long processor_mode;        
     unsigned long video_mode;   
     //Continua...        
 };
-system_t system_info;
-//system_t systemInfo; 
-//...
+
+typedef struct system_d  system_t;
+
+extern system_t system_info;
+
  
  
 /*
@@ -440,9 +414,8 @@ system_t system_info;
  * VideoBlock:
  *     Estrutura para informações sobre parâmetros de vídeo.
  *     @todo: criar um header para video. video.h.
- *
  */
-typedef struct video_d VideoBlock_t;
+
 struct video_d
 {
 	int useGui;      //Se estamos ou não usando gui. text mode, video mode.
@@ -462,16 +435,16 @@ struct video_d
 	char chAtrib;              //Atributo do caractere. 
 	//...           
 };
-VideoBlock_t VideoBlock;    //@todo: Usar um ponteiro.
 
- 
- 
+typedef struct video_d VideoBlock_t;
+
+extern VideoBlock_t VideoBlock;    //@todo: Usar um ponteiro.
+
 
 /*
  * VESA support.
  */ 
  
-typedef struct vesa_d vesa_t;
 struct vesa_d
 {
     unsigned long mode_number;    //Número do modo.
@@ -480,8 +453,10 @@ struct vesa_d
     unsigned long bpp;            //Bits per pixel.		
 	//Continua...
 };
-vesa_t vesa_mode;
 
+typedef struct vesa_d vesa_t;
+
+extern vesa_t vesa_mode;
 
 
 
@@ -490,7 +465,6 @@ vesa_t vesa_mode;
  *
  */
 
-typedef struct procedure_d procedure_t;
 struct procedure_d
 {
     unsigned long next;      //Endereço do procimo procedimento.     
@@ -499,7 +473,10 @@ struct procedure_d
     unsigned long res2;      //Reservado.
     // ...        	
 };
-procedure_t procedure_info;
+
+typedef struct procedure_d procedure_t;
+
+extern procedure_t procedure_info;
 
 
 
@@ -534,9 +511,9 @@ struct menuitem_d
     
 };
 
-int menu_highlight;
+extern int menu_highlight;
 
-struct menuitem_d MENU[8];
+extern struct menuitem_d MENU[8];
 
 
 
@@ -605,8 +582,6 @@ int init();
 void init_globals();
 void boot(); 
 
-
-
 //
 // Text support.
 //
@@ -617,8 +592,6 @@ unsigned long get_cursor_x();
 unsigned long get_cursor_y();
 unsigned long input(unsigned long ch);
 void panic(const char *msg); 
-
-
 
 //
 // Timer support.
@@ -631,8 +604,6 @@ int BltimerInit();
 //
 int SetUpPaging();
 
-
-								   
 //
 // Disk support.
 //  @todo: usar inglês.
@@ -658,7 +629,6 @@ void write_lba( unsigned long address, unsigned long lba);
 void read_lba( unsigned long address, unsigned long lba);
 
 
-
 //
 // PCI support.
 //
@@ -682,7 +652,6 @@ pciConfigReadWord (
 //
 
 void system_services();
-
 
 void reboot();
 

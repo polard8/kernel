@@ -3,9 +3,7 @@
 
 #include <kernel.h>  
 
-
 static int __spawn_eoi_is_necessary = FALSE;
-
 
 //
 // == Private functions: Prototypes =======
@@ -45,11 +43,13 @@ void __spawn_load_pml4_table(unsigned long phy_addr)
 }
 
 
+// spawn_thread:
+// main worker.
 // Spawn a new thread.
 // The flag 'new_clone' indicates this is the control thread
 // of a clone process that is running for the first time.
 
-void spawn_thread (int tid)
+void spawn_thread(int tid)
 {
     struct thread_d *target_thread;
 
@@ -140,8 +140,12 @@ void spawn_thread (int tid)
     target_thread->blockedCount_ms = 0;
     // ...
 
-    target_thread->initial_jiffie = jiffies;  // initial jiffie
-    target_thread->step = 0;                  // how much tick untill now.
+// Initial jiffie
+// Spawn time.
+    target_thread->initial_jiffie = (unsigned long) jiffies;
+
+// how much tick untill now.
+    target_thread->step = 0;
 
     target_thread->initial_time_ms = 0;
     target_thread->total_time_ms = 0;
@@ -206,9 +210,7 @@ void spawn_thread (int tid)
         panic("spawn_thread: cur_pid\n");
     }
 
-//
 // The current process will be the owner pid.
-//
 
     set_current_process(cur_pid);
     
@@ -268,13 +270,21 @@ void spawn_thread (int tid)
         panic("spawn_thread: eoi_is_needed != TRUE\n");
     }
 
+// #bugbug
+// We're having problems when receiving syscalls from ring0.
+// Our system interrupt is only for ring3 processes.
+
     if ( target_thread->initial_iopl == RING0 )
     {
+        //#debug
+        
         debug_print ("spawn_thread: RING0\n");
-        printf      ("spawn_thread: RING0\n");
+        
+        //printf      ("spawn_thread: RING0\n");
         //debug_print ("spawn_thread: RING0 not supported yet\n");
         //panic       ("spawn_thread: RING0 not supported yet\n");
-        refresh_screen();
+        //refresh_screen();
+        
         spawn_enter_kernelmode( 
             TRUE,  // EOI
             (unsigned long) target_thread->rip,
@@ -442,45 +452,55 @@ spawn_enter_kernelmode(
 // KiSpawnTask:
 // Interface to spawn a thread.
 
-void KiSpawnThread (int tid)
+void KiSpawnThread(int tid)
 {
     debug_print ("KiSpawnThread:\n");
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
-        printf ("KiSpawnThread: TID=%d\n", tid );
+        printf("KiSpawnThread: TID=%d\n", tid );
         die();
     }
-    spawn_thread (tid);
-    panic ("KiSpawnThread\n");
+    spawn_thread(tid);
+    panic("KiSpawnThread:\n");
 }
 
 
+// spawn_pid:
 // Spawn the control thread of a process.
 // Remember we need to call this after 
 // the irq0 interrupt. Cause the spawn routine
 // has the eoi.
+// #bugbug
+// Not tested yet.
 void spawn_pid(pid_t pid)
 {
     struct process_d *p;
+    tid_t __tid=-1;
 
 // pid
-    if (pid < 0 || pid >= PROCESS_COUNT_MAX )
+    if (pid < 0 || pid >= PROCESS_COUNT_MAX ){
         panic("spawn_pid: pid\n");
+    }
 
 // process structure.
 
     p = (struct process_d *) processList[pid];
     
-    if ( (void*) p == NULL )
-        panic("spawn_pid: pid\n");
+    if ( (void*) p == NULL ){
+        panic("spawn_pid: p\n");
+    }
 
     if ( p->used != TRUE || p->magic != 1234 )
-        panic("spawn_pid: validation\n");
+    {
+        panic("spawn_pid: p validation\n");
+    }
 
 // spawn
-    KiSpawnThread(p->control);
-    return;
+    __tid = (tid_t) p->control->tid;
+    KiSpawnThread(__tid);
+// not reached
+    panic("spawn_pid: fail");
 }
 
 
@@ -488,11 +508,8 @@ void spawn_tid(int tid)
 {
     struct thread_d *t;
 
-// tid
     if (tid < 0 || tid >= THREAD_COUNT_MAX )
         panic("spawn_tid: tid\n");
-
-// thread structure.
 
     t = (struct thread_d *) threadList[tid];
     
@@ -503,7 +520,8 @@ void spawn_tid(int tid)
         panic("spawn_tid: validation\n");
 
 // spawn
-    KiSpawnThread(t);
-    return;
+    KiSpawnThread(tid);
+// not reached
+    panic("spawn_tid: fail");
 }
 

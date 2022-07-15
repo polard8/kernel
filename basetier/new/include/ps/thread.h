@@ -442,8 +442,27 @@ struct thread_d
 // Quantas vezes ela já rodou no total.
 // Tempo total dado em jiffies.
 
-    unsigned long initial_jiffie;  // jiffie at spawn moment. 
-    unsigned long step;            // how much jiffies untill now.
+// Spawn jiffie
+// jiffie at spawn moment.
+    unsigned long initial_jiffie;
+
+// Blocked jiffie
+// Time when blocked.
+    unsigned long blocked_jiffie;
+
+// Time whe the thred became ready.
+    unsigned long ready_jiffie;
+
+// Waiting jiffie
+// Time when the thread started to wait.
+    unsigned long waiting_jiffie;
+
+// Zombie jiffie.
+// Time when the thread became a zombie.
+    unsigned long zombie_jiffie;
+
+// how much jiffies untill now.
+    unsigned long step;
 
 // Quando ela foi criada.
 // systime inicial da thread.

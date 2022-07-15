@@ -1,5 +1,0 @@
-
-
-	boot/
-
-	The goal of the boot loader is to load the Land OS.

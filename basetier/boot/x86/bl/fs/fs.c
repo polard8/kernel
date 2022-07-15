@@ -24,6 +24,28 @@
 #include <bootloader.h>
 
 
+// globals
+
+int g_fat16_root_status=0;
+int g_fat16_fat_status=0;
+
+int g_file_system_type=0;
+
+// Buffer para salvar uma entrada de diretorio.
+// @todo: Tamanho da entrada? Desperdicio?
+
+char buffer_dir_entry[512];
+
+// Lista de clusters em um arquivo.
+// @todo: Tamanho de arquivos?
+
+unsigned short file_cluster_list[1024];
+
+//see: fs.h
+struct partition_table_d  partition;
+
+
+
 /*
  * fs_load_file:
  *     Carrega um arquivo na memória.

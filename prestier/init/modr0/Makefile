@@ -1,10 +1,13 @@
 
-# gws - Gramado Window Server.
-# 2020 - Created by Fred Nora.
 
-# todo:
-# Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
-# É desejável que isso mude.
+# ring0 application.
+# #bugbug:
+# We don't want syscalls from ring0.
+# #todo:
+# Check if crt0 initialization is making some ring0 syscall.
+
+
+
 
 VERSION = 0
 PATCHLEVEL = 1

@@ -21,7 +21,6 @@
 void *sys_get_message(unsigned long ubuf)
 {
     struct thread_d  *t;
-
     unsigned long *message_address = (unsigned long *) ubuf;
     //int head_pos=0;
 
@@ -34,11 +33,14 @@ void *sys_get_message(unsigned long ubuf)
         //return NULL;
     }
 
-// #todo:
-// Check current_thread validation
-
-
 // Thread
+
+    if(current_thread<0 ||
+       current_thread>=THREAD_COUNT_MAX)
+    {
+        return NULL;
+    }
+
     t = (void *) threadList[current_thread];
 
     if ( (void *) t == NULL ){
@@ -49,54 +51,27 @@ void *sys_get_message(unsigned long ubuf)
         panic ("sys_get_message: t validation\n");
     }
 
-
-/*
-// =====================================================
-// Offset
-    head_pos = (int) t->head_pos;
-
-// Get standard entries.
-    message_address[0] = (unsigned long) t->window_list[head_pos];
-    message_address[1] = (unsigned long) t->msg_list[head_pos];
-    message_address[2] = (unsigned long) t->long1_list[head_pos];
-    message_address[3] = (unsigned long) t->long2_list[head_pos];
-
-// Get extra entries.
-    message_address[4] = (unsigned long) t->long3_list[head_pos];
-    message_address[5] = (unsigned long) t->long4_list[head_pos];
-
-// Clean
-    t->window_list[head_pos] = NULL;
-    t->msg_list[head_pos] = 0;
-    t->long1_list[head_pos] = 0;
-    t->long2_list[head_pos] = 0;
-    t->long3_list[head_pos] = 0;
-    t->long4_list[head_pos] = 0;
-
-// Round
-    t->head_pos++;
-    if ( t->head_pos >= 31 ){  t->head_pos = 0;  }
-// =====================================================
-*/
-
-
 // ===========================================================
 // usando a fila de mensagens com estrutura.
 
     struct msg_d  *next_msg;
 
-    //get the next head pointer.
+// Get the next head pointer.
     next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
 
-    if ( (void*) next_msg == NULL )
+    if ( (void*) next_msg == NULL ){
         goto fail0;
+    }
 
     if (next_msg->used != TRUE || next_msg->magic != 1234 )
+    {
         goto fail0;
+    }
 
 // invalid
-    if( next_msg->msg == 0 )
+    if( next_msg->msg == 0 ){
         goto fail0;
+    }
 
 // Get standard entries.
     message_address[0] = (unsigned long) next_msg->window;
@@ -107,7 +82,22 @@ void *sys_get_message(unsigned long ubuf)
 // Get extra entries.
     message_address[4] = (unsigned long) next_msg->long3;
     message_address[5] = (unsigned long) next_msg->long4;
-            
+
+// #test
+    message_address[8] = (unsigned long) next_msg->sender_tid;
+    message_address[9] = (unsigned long) next_msg->receiver_tid;
+
+
+// Buffer size:
+// 32 slots.
+
+// jiffies when posted.
+    //message_address[10] = (unsigned long) next_msg->long3; 
+
+// jiffies when gotten by the app.
+    message_address[11] = (unsigned long) jiffies;
+
+
 // clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
@@ -142,7 +132,6 @@ fail0:
 void *sys_get_message2(unsigned long ubuf, int index, int restart)
 {
     struct thread_d  *t;
-
     unsigned long *message_address = (unsigned long *) ubuf;
     //int head_pos=0;
 
@@ -155,11 +144,14 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
         //return NULL;
     }
 
-// #todo:
-// Check current_thread validation
-
-
 // Thread
+
+    if(current_thread<0 ||
+       current_thread>=THREAD_COUNT_MAX)
+    {
+        return NULL;
+    }
+
     t = (void *) threadList[current_thread];
 
     if ( (void *) t == NULL ){
@@ -170,59 +162,29 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
         panic ("sys_get_message2: t validation\n");
     }
 
-
-/*
-// =====================================================
-// Offset
-    head_pos = (int) t->head_pos;
-
-// Get standard entries.
-    message_address[0] = (unsigned long) t->window_list[head_pos];
-    message_address[1] = (unsigned long) t->msg_list[head_pos];
-    message_address[2] = (unsigned long) t->long1_list[head_pos];
-    message_address[3] = (unsigned long) t->long2_list[head_pos];
-
-// Get extra entries.
-    message_address[4] = (unsigned long) t->long3_list[head_pos];
-    message_address[5] = (unsigned long) t->long4_list[head_pos];
-
-// Clean
-    t->window_list[head_pos] = NULL;
-    t->msg_list[head_pos] = 0;
-    t->long1_list[head_pos] = 0;
-    t->long2_list[head_pos] = 0;
-    t->long3_list[head_pos] = 0;
-    t->long4_list[head_pos] = 0;
-
-// Round
-    t->head_pos++;
-    if ( t->head_pos >= 31 ){  t->head_pos = 0;  }
-// =====================================================
-*/
-
-
 // ===========================================================
 // usando a fila de mensagens com estrutura.
 
-
-
     struct msg_d  *next_msg;
-
 
     t->MsgQueueHead = index;
 
-    //get the next head pointer.
+// Get the next head pointer.
     next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
 
-    if ( (void*) next_msg == NULL )
+    if ( (void*) next_msg == NULL ){
         goto fail0;
+    }
 
     if (next_msg->used != TRUE || next_msg->magic != 1234 )
+    {
         goto fail0;
+    }
 
 // invalid
-    if( next_msg->msg == 0 )
+    if( next_msg->msg == 0 ){
         goto fail0;
+    }
 
 // Get standard entries.
     message_address[0] = (unsigned long) next_msg->window;
@@ -233,7 +195,20 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
 // Get extra entries.
     message_address[4] = (unsigned long) next_msg->long3;
     message_address[5] = (unsigned long) next_msg->long4;
-            
+
+// #test
+    message_address[8] = (unsigned long) next_msg->sender_tid;
+    message_address[9] = (unsigned long) next_msg->receiver_tid;
+
+// Buffer size:
+// 32 slots.
+
+// jiffies when posted.
+    //message_address[10] = (unsigned long) next_msg->long3; 
+
+// jiffies when gotten by the app.
+    message_address[11] = (unsigned long) jiffies;
+
 // clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
@@ -294,28 +269,31 @@ post_message_to_tid (
 
 // Target thread.
     struct thread_d *t;
-    int target_tid = (int) (tid & 0xFFFF);
+    
+    tid_t TargetTID = (tid_t) (tid & 0xFFFF);
 
     unsigned long tmp_msg=0;
-
 
     //#debug
     //debug_print("post_message_to_tid:\n");
 
-    if ( target_tid < 0 || target_tid >= THREAD_COUNT_MAX )
+// Thread
+
+    if ( TargetTID < 0 || 
+         TargetTID >= THREAD_COUNT_MAX )
     {
-        panic("post_message_to_tid: target_tid\n");
+        panic("post_message_to_tid: TargetTID\n");
         //goto fail;
     }
-
-// Pega a thread alvo. 
-
-    t = (struct thread_d *) threadList[target_tid];
+    t = (struct thread_d *) threadList[TargetTID];
     if ( (void *) t == NULL ){
         panic ("post_message_to_tid: t \n");
     }
     if ( t->used != 1 || t->magic != 1234 ){
         panic ("post_message_to_tid: t validation \n");
+    }
+    if(TargetTID != t->tid){
+        panic("post_message_to_tid: TargetTID != t->tid");
     }
 
 // Reset the running count.
@@ -323,10 +301,7 @@ post_message_to_tid (
     t->runningCount = 0;
     t->runningCount_ms = 0;
 
-
-//
-// Wake up the target thread ?
-//
+// Wake up the target thread?
 
     // wakeup_thread(t->tid);
 
@@ -338,24 +313,6 @@ post_message_to_tid (
 //
 
     tmp_msg = (unsigned long) (msg & 0xFFFF);
-
-
-
-/*
-// =============================================
-    //Send system message to the thread.
-    t->window_list[ t->tail_pos ] = (unsigned long) window;
-    t->msg_list[ t->tail_pos ]    = (unsigned long) (tmp_msg & 0xFFFF);
-    t->long1_list[ t->tail_pos ]  = (unsigned long) long1;
-    t->long2_list[ t->tail_pos ]  = (unsigned long) long2;
-
-    t->tail_pos++;
-    if ( t->tail_pos >= 31 )
-        t->tail_pos = 0;
-// =============================================
-*/
-
-
 
 // ==========================================================
 // #test
@@ -387,6 +344,9 @@ post_message_to_tid (
 // #test
     next_msg->long3 = (unsigned long) jiffies;  // ktime.
 
+// #test
+    next_msg->sender_tid = -1;  // from kernel. 
+    next_msg->receiver_tid = (tid_t) TargetTID;
 
 done:
     t->MsgQueueTail++;
@@ -411,16 +371,22 @@ post_message_to_foreground_thread (
     unsigned long long2 )
 {
 
-    if( foreground_thread < 0 )
+// Paranoia.
+    if( foreground_thread < 0 || 
+        foreground_thread >= THREAD_COUNT_MAX )
+    {
         return -1;
+    }
+
+    if(msg<0){
+        return -1;
+    }
 
     return (int) post_message_to_tid( 
                      foreground_thread,
-                     window,
-                     msg,
-                     long1,
-                     long2 );
+                     window, msg, long1, long2 );
 }
+
 
 // Post message to the ws control thread.
 int
@@ -430,18 +396,16 @@ post_message_to_ws_thread (
     unsigned long long1, 
     unsigned long long2 )
 {
-
-    if( WindowServerInfo.initialized == TRUE )
+    if( WindowServerInfo.initialized == TRUE ){
         return -1;
-
+    }
+    if(msg<0){
+        return -1;
+    }
     return (int) post_message_to_tid( 
                      WindowServerInfo.tid,
-                     window,
-                     msg,
-                     long1,
-                     long2 );
+                     window, msg, long1, long2 );
 }
-
 
 
 // service 112
@@ -475,25 +439,19 @@ sys_post_message_to_tid(
 }
 
 
+// show_slot:
+// Show info about a thread.
 
-/*
- * show_slot:
- *     Show info about a thread.
- */
-
-void show_slot (int tid){
-
+void show_slot(int tid)
+{
     struct thread_d  *t;
 
-
-// tid
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         printf ("show_slot: tid\n");
         goto fail;
     }
 
-// Thread
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
@@ -529,12 +487,9 @@ done:
     return; 
 }
 
-/*
- *****************************************
- * show_slots:
- *     Show info about all threads.
- */
 
+// show_slots:
+// Show info about all threads.
 // Loop
 // Mostra as tarefas válidas, mesmo que estejam com problemas.
 
@@ -570,7 +525,6 @@ void show_slots(void)
 /*
  * show_reg:
  *     Show the content of the registers.
- * 
  *    rflags
  *    cs:rip
  *    ss:rsp
@@ -578,46 +532,42 @@ void show_slots(void)
  *    a,b,c,d
  */
 
-void show_reg (int tid){
+void show_reg(int tid)
+{
+    struct thread_d  *t;
 
-    struct thread_d *t; 
 
-
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-        printf ("show_reg: fail\n");
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    {
+        printf("show_reg: fail\n");
         return;
     }
 
-    // Structure.
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
         printf ("show_reg: fail\n");
         return;
+    } 
 
-    } else {
+// Show registers
 
-        // Show registers.
+    printf("\n");
+    printf("rflags=[%x] \n", 
+        t->rflags);
+    printf("cs:rip=[%x:%x] ss:rsp=[%x:%x] \n", 
+        t->cs, t->rip, t->ss, t->rsp );
+    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x] \n",
+        t->ds, t->es, t->fs, t->gs );
+    printf("a=[%x] b=[%x] c=[%x] d=[%x] \n",
+        t->rax, t->rbx, t->rcx, t->rdx );
 
-        printf ("\n rflags=[%x]", t->rflags);
-        printf ("\n cs:rip=[%x:%x] ss:rsp=[%x:%x]", 
-            t->cs, t->rip, t->ss, t->rsp );
-        printf ("\n ds=[%x] es=[%x] fs=[%x] gs=[%x]",
-            t->ds, t->es, t->fs, t->gs );
-        printf ("\n a=[%x] b=[%x] c=[%x] d=[%x]\n",
-            t->rax, t->rbx, t->rcx, t->rdx );
-        
-        // r8~r12
-        // ...
-    };
+    // r8~r12
+    // ...
 }
 
 
-
-/* 
- * set_thread_priority: 
- */
-
+// set_thread_priority:
 // Muda a prioridade e o quantum de acordo com a prioridade.
 // #bugbug
 // Isso nao eh bom, a funcao deve fazer exatamente
@@ -692,11 +642,13 @@ void threadi_power(
     struct thread_d *t, 
     unsigned long priority )
 {
-
     if ( (void *) t == NULL ){ return; }
    
-    if ( t->used != 1 || t->magic != 1234 ){ return; }
-    
+    if ( t->used != 1 || t->magic != 1234 )
+    {
+        return;
+    }
+
     t->priority = priority;
     t->quantum = ( priority * TIMESLICE_MULTIPLIER );
 
@@ -713,18 +665,20 @@ void threadi_power(
  * Obs: Aqui não devemos julgar se ela pode ou não ser
  * liberada, apenas alteramos se estado.
  */
- 
-void release ( int tid )
+// #importante:
+// Não estamos selecionando ela para execução,
+// apenas estamos dizendo que ela está pronta para executar.
+
+void release(int tid)
 {
     struct thread_d *Thread;
+
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         //  
         return; 
     }
-
-// struct
 
     Thread = (void *) threadList[tid];
 
@@ -737,12 +691,7 @@ void release ( int tid )
         return; 
     }
 
-// #importante:
-// Não estamos selecionando ela para execução
-// Apenas estamos dizendo que ela está pronta para
-// executar.
-
-    Thread->state = READY; 
+    Thread->state = READY;
 }
 
 
@@ -751,23 +700,21 @@ SetThread_PML4PA (
     struct thread_d *thread, 
     unsigned long pa )
 {
-
-    if ( (void *) thread == NULL ){
+    if ( (void *) thread == NULL )
+    {
         //
         return;
+    }
 
-    }else{
-		
-		//@todo:
-		//Aqui podemos checar a validade da estrutura,
-		//antes de operarmos nela.
+// #todo:
+// Aqui podemos checar a validade da estrutura,
+// antes de operarmos nela.
 
-        thread->pml4_PA = (unsigned long) pa;
-    };
+    thread->pml4_PA = (unsigned long) pa;
 }
 
 
-void check_for_dead_thread_collector (void)
+void check_for_dead_thread_collector(void)
 {
     // #importante
     // Essa flag é acionada quando uma thread 
@@ -798,16 +745,15 @@ void check_for_dead_thread_collector (void)
 }
 
 
-/*
- * dead_thread_collector:
- *     Procura por uma thread no estado zombie mata ela.
- *     #todo: Alertar o processo que a thread morreu.
- */
 
-void dead_thread_collector (void)
+// dead_thread_collector:
+// Procura por uma thread no estado zombie mata ela.
+// #todo: Alertar o processo que a thread morreu.
+
+void dead_thread_collector(void)
 {
     register int i=0;  //loop
-    
+
     struct process_d  *p; 
     struct thread_d   *Thread; 
 
@@ -997,10 +943,12 @@ done:
 }
 
 
-void kill_all_threads (void)
+void kill_all_threads(void)
 {
     register int i=0;
-    for ( i=0; i < THREAD_COUNT_MAX; ++i ){ kill_thread(i); };
+    for ( i=0; i < THREAD_COUNT_MAX; ++i ){ 
+        kill_thread(i);
+    };
 }
 
 

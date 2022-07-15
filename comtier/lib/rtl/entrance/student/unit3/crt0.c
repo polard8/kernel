@@ -173,8 +173,7 @@ int crt0 (unsigned long rdi)
 
 
 // Initialize heap support.
-// See: 
-// stdlib/stdlib.c
+// See: stdlib.c
 
     int rt_status = -1;  //fail
 
@@ -189,8 +188,7 @@ int crt0 (unsigned long rdi)
     //gramado_system_call(65,'2',0,0);
 
 // return void.
-// See: 
-// stdio/stdio.c
+// See: stdio.c
 
     stdioInitialize();
 

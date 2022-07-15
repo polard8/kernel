@@ -1,6 +1,5 @@
 /*
  * File: fs.h 
- *
  * History:
  *     2015 - Created by Fred Nora.
  */
@@ -8,7 +7,6 @@
 
 #ifndef ___FS_H
 #define ___FS_H    1
-
 
 
 #define SECTOR_SIZE    512 
@@ -43,34 +41,29 @@
 #define FAT_STATUS_4 0xffff2
 
 
-
-//
 // #importante:
 // Status de carregamento.
 // Se o diret�rio raiz j� est� carregado na mem�ria.
 // Se a FAT j� est� carregada na mem�ria.
-//
 
-int g_fat16_root_status;
-int g_fat16_fat_status;
+extern int g_fat16_root_status;
+extern int g_fat16_fat_status;
 
-// 
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
-//
 
-int g_file_system_type;
+extern int g_file_system_type;
 
-// 
-// Buffer para salvar uma entrada de diret�rio.
-//
 
-char buffer_dir_entry[512];    //@todo: Tamanho da entrada? Desperd�cio?   
+// Buffer para salvar uma entrada de diretorio.
+// @todo: Tamanho da entrada? Desperdicio?
 
-//
+extern char buffer_dir_entry[512];
+
+
 // Lista de clusters em um arquivo.
-//
+// @todo: Tamanho de arquivos?
 
-unsigned short file_cluster_list[1024];    //@todo: Tamanho de arquivos ?
+extern unsigned short file_cluster_list[1024];
 
 
 
@@ -92,13 +85,13 @@ struct partition_table_d
     unsigned long start_sector;
     unsigned long partition_size;    //In sectors.
 };
-struct partition_table_d partition;
-//...
+
+extern struct partition_table_d  partition;
 
 
-/*
- * Prot�tipos.
- */
+
+
+// prototypes =============================================
 
 
 //

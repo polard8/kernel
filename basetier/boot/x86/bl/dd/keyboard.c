@@ -17,6 +17,24 @@
 
 
 //
+// globals
+//
+
+//see: keyboard.h
+// keyboard queue
+int keyboard_queue_tail=0;
+int keyboard_queue_head=0;
+char keyboard_queue[8];
+
+
+//avisa que uma tecla foi digitada.
+int keyboard_flag=0;
+
+
+
+
+
+//
 // Variáveis internas.
 //
 
@@ -33,7 +51,7 @@ unsigned long shift_status=0;
 
 //Outros.
 unsigned long ambiente=0;
-unsigned long prompt_pos=0;
+//unsigned long prompt_pos=0; // #bugbug redfinition. see: shell.h
 unsigned long destroy_window = 1; 
 unsigned long quit_message = 1;
 

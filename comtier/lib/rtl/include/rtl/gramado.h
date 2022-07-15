@@ -124,7 +124,8 @@ unsigned long  rtl_to_ulong  (long ch);
 
 
 //  The buffer for the event elements.
-unsigned long RTLEventBuffer[32];
+// see: rtl.c
+extern unsigned long RTLEventBuffer[32];
 
 
 // Get an event from the thread's event queue.

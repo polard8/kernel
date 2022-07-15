@@ -4,12 +4,9 @@
         ========================
         flexible interface
 	> boot  
-	> land-os 
-	> land-lib
+	> new
         ========================
         consistent interface.
-	> gramado cmd 
-	> gramado setup 
-	> gramado core 
-	> gramado edge 
-	> desert
+	> gws (window server)
+	> gws/rtl
+	

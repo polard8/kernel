@@ -3,49 +3,57 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
+
+// globals
+
+unsigned long heapCount=0;         //Conta os heaps do sistema.
+unsigned long bl_heap_start=0;     //Start.
+unsigned long bl_heap_end=0;       //End.
+unsigned long g_heap_pointer=0;    //Pointer.
+unsigned long g_available_heap=0;  //Available.
+unsigned long mmblockCount=0;      //Conta os blocos de memória dentro de um heap. 
+
+// see: heap.h
+struct mmblock_d  *current_mmblock;
+
+// see: heap.h
+unsigned long mmblockList[MMBLOCK_COUNT_MAX]; 
+unsigned long heapList[HEAP_COUNT_MAX]; 
+
 
 
 //Variáveis internas. 
+//todo: use static?
 
 //int mmStatus;
-unsigned long last_valid;         // Último heap pointer válido. 
-unsigned long last_size;          // Último tamanho alocado.
-unsigned long mm_prev_pointer;    // Endereço da úntima estrutura alocada.
-
+unsigned long last_valid=0;         // Último heap pointer válido. 
+unsigned long last_size=0;          // Último tamanho alocado.
+unsigned long mm_prev_pointer=0;    // Endereço da úntima estrutura alocada.
 
 
 /*
- ************************************************************
  * heapAllocateMemory:
  *     Aloca memória no heap do bl.
- *
- * *IMPORTANTE: 
+ * IMPORTANTE: 
  *     Aloca BLOCOS de memória dentro do heap do bl.
- *
  * @todo: 
  *     ?? Ao fim dessa rotina, os valores da estrutura devem ser 
  * armazenas no header, lá onde foi alocado espaço para o header, 
  * assim tem-se informações sobre o header alocado. ??
- *
  *  A estrutura header do heap, é uma estrutura e deve ficar antes 
  * da área desejada. Partes={ header,client,footer }.
- *
  * Obs: 
  *     ?? A estrutura usada aqui é salva onde, ou não é salva ??
- *
  * IN:  size in bytes
  * OUT: address if success. 0 if fail.
- *
  * History:
  *     2015 - Created by Fred Nora.
  *     2016 - Revision.
- * ...
  */
 
-unsigned long heapAllocateMemory ( unsigned long size ){
-
+unsigned long heapAllocateMemory(unsigned long size)
+{
     struct mmblock_d *Current;
 
     // @todo: Aplicar filtro.
