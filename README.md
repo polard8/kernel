@@ -37,10 +37,10 @@ This repository has the source code for:
 ## Fred's compilation on Linux.
 ```
     Host machine: Ubuntu 20.04.3 LTS
-    Linux 5.13.0-40-generic x86_64
-    gcc (Ubuntu) 9.4.0 
-    GNU ld (GNU Binutils for Ubuntu) 2.34
-    NASM version 2.14.02
+    Linux 5.15.0-41-generic x86_64
+    gcc (Ubuntu) 11.2.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.38
+    NASM version 2.15.05
 ```
 
 ## How to Build?
