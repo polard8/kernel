@@ -1441,15 +1441,21 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     // use a buffer for that
     // char nameBuffer[32];
 
+
+// check iopl
+
     if ( father->initial_iopl != RING3 ){
-        panic ("copy_thread_struct: initial_iopl #todo");
+        panic ("copy_thread_struct: father initial_iopl\n");
     }
 
+    if ( father->current_iopl != RING3 ){
+        panic ("copy_thread_struct: father current_iopl\n");
+    }
 
-    // #bugbug
-    // Não podemos herdar o rip e o rsp.
-    // porque as threads terão espaço de endereçamento diferentes
-    // e uma não poderá acessar a pilha da outra.
+// #bugbug
+// Não podemos herdar o rip e o rsp.
+// porque as threads terão espaço de endereçamento diferentes
+// e uma não poderá acessar a pilha da outra.
 
     /*
     if (rip == 0){
@@ -1468,17 +1474,19 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 
     //father->ownerPID or current_process ??
 
-    if ( father->initial_iopl == RING3 ){
-    clone = (struct thread_d *) create_thread ( 
-                                    NULL, NULL, NULL, 
-                                    0,  // initial rip 
-                                    0,  // initial rsp
-                                    father->ownerPID,  //current_process, 
-                                    "clone-thread",
-                                    RING3 );
+    if ( father->initial_iopl == RING3 )
+    {
+         clone = 
+             (struct thread_d *) create_thread ( 
+                                     NULL, NULL, NULL, 
+                                     0,  // initial rip 
+                                     0,  // initial rsp
+                                     father->ownerPID,  //current_process, 
+                                     "clone-thread",
+                                     RING3 );
     }
 
-    // The copy.
+// The copy.
     if ( (void *) clone == NULL ){
         panic ("copy_thread_struct: clone\n");
     }
@@ -1532,13 +1540,23 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     clone->base_priority = father->base_priority; 
     clone->priority      = father->priority;
 
-// IOPL.
-// Se ela vai rodar em kernel mode ou user mode.
-// #todo: 
-// Herdar o mesmo do processo.
 
-    clone->initial_iopl = (unsigned int) father->initial_iopl;  // Process->initial_iopl;
-    //clone->current_iopl = ?; //#todo
+//
+// iopl
+//
+
+    clone->initial_iopl = (unsigned int) father->initial_iopl;
+    clone->current_iopl = (unsigned int) father->current_iopl;
+
+    if ( clone->initial_iopl != RING3 ){
+        panic ("copy_thread_struct: clone initial_iopl\n");
+    }
+
+    if ( clone->current_iopl != RING3 ){
+        panic ("copy_thread_struct: clone current_iopl\n");
+    }
+
+
     clone->saved     = father->saved;          // Saved flag.
     clone->preempted = father->preempted;  // Se pode ou n�o sofrer preemp��o.
 
@@ -1621,6 +1639,10 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 
 // Contexto x86 usado pela thread.
 
+// #todo
+// We gotta check all these values bellow.
+
+
 	// ss (0x20 | 3)
 	// cs (0x18 | 3)
 
@@ -1628,15 +1650,25 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 // Stack frame
 //
 
-    clone->ss     = father->ss;    // RING 3.
-    clone->rsp    = father->rsp;   // wrong
-    clone->rflags = father->rflags;
-    clone->cs     = father->cs;
-    clone->rip    = father->rip;   // wrong 
+    clone->ss     = (unsigned short) (father->ss & 0xFFFF);    // RING 3.
+    clone->rsp    = (unsigned long) father->rsp;   // wrong
+    clone->rflags = (unsigned long) father->rflags;
+    clone->cs     = (unsigned short) (father->cs & 0xFFFF);
+    clone->rip    = (unsigned long) father->rip;   // wrong 
 
-//O endere�o incial, para controle.
+//O endereço incial, para controle.
 
-    clone->initial_rip = father->initial_rip; 
+    clone->initial_rip = (unsigned long) father->initial_rip; 
+
+// check iopl
+
+     int cpl=-1;
+     cpl = (int) (clone->cs & 0xFF);
+     cpl = (int) (cpl & 3);
+     
+     if(cpl != 3){
+         panic("copy_thread_struct: cpl\n");
+     }
 
 // #bugbug:
 // We need the initial stack address

@@ -270,6 +270,9 @@ void spawn_thread(int tid)
         panic("spawn_thread: eoi_is_needed != TRUE\n");
     }
 
+// ===================
+// ring 0
+
 // #bugbug
 // We're having problems when receiving syscalls from ring0.
 // Our system interrupt is only for ring3 processes.
@@ -301,6 +304,22 @@ void spawn_thread(int tid)
     // Target->rflags
     // Target->cs     & 0xffff
     // Target->rip
+
+// ===================
+// ring 1
+
+    if ( target_thread->initial_iopl == RING1 )
+        panic("spawn_thread: ring1\n");
+
+// ===================
+// ring 2
+
+    if ( target_thread->initial_iopl == RING2 )
+        panic("spawn_thread: ring2\n");
+
+
+// ===================
+// ring 3
     
     if ( target_thread->initial_iopl == RING3 )
     {
@@ -424,7 +443,7 @@ spawn_enter_kernelmode(
     }
 
 // #todo
-// We need to review the stack frame fpor ring0
+// We need to review the stack frame for ring0
 
     asm volatile ( 
         " movq $0, %%rax    \n" 

@@ -107,7 +107,11 @@ void save_current_context (void)
 
     unsigned long *context_cpl = (unsigned long *) &contextCPL;
 
-    // Structure ~ Colocando o contexto na estrutura.
+
+// See: ts.c where we are using current_thread
+// before calling this routine.
+
+// Structure ~ Colocando o contexto na estrutura.
 
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
@@ -137,17 +141,17 @@ void save_current_context (void)
 // use t->x64_context.ss  ...
 
     // Stack frame
-    t->ss     = (unsigned long) contextss[0];      // usermode
+    t->ss     = (unsigned long) (contextss[0] & 0xFFFF);      // usermode
     t->rsp    = (unsigned long) contextrsp[0];     // usermode
     t->rflags = (unsigned long) contextrflags[0];
-    t->cs     = (unsigned long) contextcs[0];
+    t->cs     = (unsigned long) (contextcs[0]  & 0xFFFF);
     t->rip    = (unsigned long) contextrip[0];
 
     // Segments
-    t->ds = (unsigned long) contextds[0];
-    t->es = (unsigned long) contextes[0];
-    t->fs = (unsigned long) contextfs[0];
-    t->gs = (unsigned long) contextgs[0];
+    t->ds = (unsigned long) (contextds[0] & 0xFFFF);
+    t->es = (unsigned long) (contextes[0] & 0xFFFF);
+    t->fs = (unsigned long) (contextfs[0] & 0xFFFF);
+    t->gs = (unsigned long) (contextgs[0] & 0xFFFF);
 
     t->rax = (unsigned long) contextrax[0];
     t->rbx = (unsigned long) contextrbx[0];
@@ -193,15 +197,23 @@ void save_current_context (void)
     };
 */
 
+    //ja temos o valor do current process nesse momento?
+    //pid_t current_process = (pid_t) get_current_process();
+    
     if( cpl != 0 && cpl != 1 && cpl != 2 && cpl != 3 )
     {
         panic("save_current_context: cpl\n");
     }
 
     if(cpl == 0){
+        //ja temos o valor do current process nesse momento?
+        //if(current_process != 0){
+        //    panic("save_current_context: cpl 0\n");
+        //}
         t->stime++;
     }
     if(cpl == 1){
+        //printf("cs %x\n",t->cs);
         panic("save_current_context: cpl 1\n");
     }
     if(cpl == 2){

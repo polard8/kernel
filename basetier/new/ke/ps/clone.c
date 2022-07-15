@@ -155,6 +155,13 @@ pid_t copy_process(
         goto fail;
     }
 
+
+// iopl
+
+    if (parent_process->iopl != 3)
+        panic("copy_process: iopl\n");
+
+
 // Saving the pml4 of the current process. The caller.
 // We're gonna reload this one at the end of this routine.
 
@@ -195,14 +202,25 @@ pid_t copy_process(
 //
     parent_thread = (struct thread_d *) parent_process->control;
     
-    if( (void*) parent_thread == NULL )
-    {
+    if( (void*) parent_thread == NULL ){
         panic("copy_process: parent_thread\n");
     }
 
-// Change the state of the parent's control thread.
 
-    // [pai]
+// check iopl
+
+    if (parent_thread->initial_iopl != 3){
+        panic("copy_process: initial iopl\n");
+    }
+
+    if (parent_thread->current_iopl != 3){
+        panic("copy_process: current iopl\n");
+    }
+
+
+// Change the state of the parent's control thread.
+// [pai]
+
     parent_thread->state = READY;
 
  
@@ -270,7 +288,9 @@ do_clone:
 // See: 
 // process.c
 
-    child_process = (struct process_d *) create_and_initialize_process_object();
+    child_process = 
+        (struct process_d *) create_and_initialize_process_object();
+    
     if ( (void *) child_process == NULL )
     {
         debug_print ("copy_process: [FAIL] child_process\n");
@@ -278,7 +298,8 @@ do_clone:
         goto fail;
     }
 
-    // new pid
+// new pid
+
     child_pid = (pid_t) child_process->pid;
 
     if(child_pid < 0 || child_pid >= PROCESS_COUNT_MAX )
@@ -292,8 +313,7 @@ do_clone:
     }
 
 // Estamos clonando um processo,
-// Entao o processo filho nao pode ter o mesmo pid
-// do kernel e do window server.
+// Entao o processo filho nao pode ter o mesmo pid do kernel.
 
     if ( child_pid == GRAMADO_PID_KERNEL ){
         panic("copy_process: child_pid == GRAMADO_PID_KERNEL\n");
@@ -425,6 +445,7 @@ do_clone:
 // Copiar a estrutura de processo. 
 // Do atual para o clone que estamos criando.
 // #important: It will also copy the control thread.
+// see: process.c
 
 //#debug
     debug_print ("copy_process: [2] Copying process structure\n");
@@ -457,7 +478,10 @@ do_clone:
 // Copy thread structure.
 //
 
-    child_thread = (struct thread_d *) copy_thread_struct( parent_thread );
+// see: thread.c
+
+    child_thread = 
+        (struct thread_d *) copy_thread_struct( parent_thread );
 
     if ( (void *) child_thread == NULL ){
         panic ("copy_process: [FAIL] copy_thread_struct \n");
@@ -918,9 +942,9 @@ fail:
 // #debug
     debug_print ("copy_process: [X] Fail\n");
     //debug_print ("----------------------\n");
-    //printf      ("copy_process: [X] Fail\n");
+    printf      ("copy_process: [X] Fail\n");
     //printf      ("----------------------\n");
-    //refresh_screen();
+    refresh_screen();
 
     // Nem chegamos a pegar o valor.
     // Nem mudar o pml4.

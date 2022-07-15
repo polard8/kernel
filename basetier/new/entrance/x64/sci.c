@@ -1066,7 +1066,9 @@ void *sci0 (
 
     if(cpl == 0){
         //printf("number=%d\n",number);
-        panic("sci0: cpl 0\n");
+        if(current_process != 0){
+            panic("sci0: cpl 0\n");
+        }
     }
     if(cpl == 1){
         panic("sci0: cpl 1\n");
