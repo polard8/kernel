@@ -1662,6 +1662,9 @@ int I_x64main (void)
 // DANGER !!!
 //
 
+// #bugbug
+// see: x64.c
+
     PROGRESS("Kernel:1:5\n"); 
     //debug_print ("[x64] I_x64main: [DANGER] Initializing GDT\n");
     //printf      ("[x86] I_x64main: Initializing GDT\n");      

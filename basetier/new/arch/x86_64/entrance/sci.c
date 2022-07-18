@@ -1056,7 +1056,7 @@ void *sci0 (
     pid_t current_process = (pid_t) get_current_process();
 
 
-/*
+
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci0_cpl;
     int cpl=-1;
@@ -1084,7 +1084,7 @@ void *sci0 (
     if(cpl == 3){
         // ok
     }
-*/
+
 
 
 
@@ -1968,7 +1968,7 @@ void *sci1 (
     pid_t current_process = (pid_t) get_current_process();
 
 
-/*
+
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci1_cpl;
     int cpl=-1;
@@ -1992,7 +1992,6 @@ void *sci1 (
     if(cpl == 3){
         // ok
     }
-*/
 
 
 
@@ -2044,7 +2043,7 @@ void *sci2 (
     pid_t current_process = (pid_t) get_current_process();
 
 
-/*
+
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci2_cpl;
     int cpl=-1;
@@ -2068,7 +2067,7 @@ void *sci2 (
     if(cpl == 3){
         // ok
     }
-*/
+
 
 
 

@@ -225,6 +225,10 @@ int main( int argc, char **argv)
     //#todo
     //printf()
 
+//testando se esse codigo esta mesmo em ring3. 
+//#bugbug: this proces is running in ring0.
+    //asm ("cli");
+
 //
 // Interrupts
 //

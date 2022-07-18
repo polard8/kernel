@@ -38,6 +38,9 @@ int x64_init_gdt (void)
 
     // debug_print ("[x64] x64_init_gdt: [DANGER] \n");
 
+// #danger
+// limpando gdt.
+
     memset(
         &xxx_gdt[GNULL_SEL],
         0,
@@ -84,21 +87,66 @@ int x64_init_gdt (void)
 // IN: 
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
 
-    // null
+// null
     set_gdt_entry ( &xxx_gdt[GNULL_SEL], 
         0,0,0,0,0,0,0,0,0,0);
 
-    // ring 0
-    set_gdt_entry ( &xxx_gdt[GCODE_SEL], 
-        0,0x0,0xA,1,0,1,0,1,0,0); //dpl 0
-    set_gdt_entry ( &xxx_gdt[GDATA_SEL], 
-        0,0x0,0x2,1,0,1,0,1,0,0); //dpl 0
+// ring 0
+// dpl 0
+// (n, limit, base, type, s, dpl, p, avl, l, db, g)
+    set_gdt_entry ( 
+        &xxx_gdt[GCODE_SEL], 
+        0,
+        0x0,
+        0xA,
+        1,
+        0,  // dpl
+        1,
+        0,
+        1,
+        0,
+        0); 
+    set_gdt_entry ( 
+        &xxx_gdt[GDATA_SEL], 
+        0,
+        0x0,
+        0x2,
+        1,
+        0,  // dpl
+        1,
+        0,
+        1,
+        0,
+        0); 
 
-    // ring 3
-    set_gdt_entry ( &xxx_gdt[GUCODE_SEL], 
-        0,0x0,0xA,1,3,1,0,1,0,0); //dpl 3
-    set_gdt_entry ( &xxx_gdt[GUDATA_SEL], 
-        0,0x0,0x2,1,3,1,0,1,0,0); //dpl 3
+// ring 3
+// dpl 3
+// (n, limit, base, type, s, dpl, p, avl, l, db, g)
+    set_gdt_entry ( 
+        &xxx_gdt[GUCODE_SEL], 
+        0,
+        0x0,
+        0xA,
+        1,
+        3,  // dpl ??
+        1,
+        0,
+        1,
+        0,
+        0); 
+    set_gdt_entry ( 
+        &xxx_gdt[GUDATA_SEL], 
+        0,
+        0x0,
+        0x2,
+        1,
+        3,  // dpl ??
+        1,
+        0,
+        1,
+        0,
+        0);
+
 
     // tss
     set_gdt_entry ( &xxx_gdt[GTSS_SEL], 
@@ -114,8 +162,8 @@ int x64_init_gdt (void)
     xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
     xxx_gdt_ptr.base  = (unsigned long) &xxx_gdt[GNULL_SEL];
 
-    // register.
-    gdt_flush((unsigned long) &xxx_gdt_ptr);
+// register.
+    gdt_flush( (unsigned long) &xxx_gdt_ptr );
 
     // See: x64gdt.h
     //load_gdt (&xxx_gdt_ptr);
@@ -154,13 +202,15 @@ set_gdt_entry (
     unsigned char db,   //Sz 
     unsigned char g )
 {
-    // low limit
+
+// low limit
     sd->limit_15_0 = (limit & 0xFFFF); // (16) segment extent (lsb) 
 
-    // base low
+// base low
     sd->base_15_0   = (base & 0xFFFF);        // (16)
     sd->base_23_16  = ((base >> 16) & 0xFF);  // (8)
 
+// access byte
     sd->type  = ( type & 0xF );  // (4)
     sd->s     = ( s    & 0x1 );  // (1)
     sd->dpl   = ( dpl  & 0x3 );  // (2)
@@ -173,7 +223,7 @@ set_gdt_entry (
     sd->db   = (db  & 1);  // (1)
     sd->g    = (g   & 1);  // (1)
 
-    // base high
+// base high
     sd->base_31_24  = ((base  >> 24) & 0xFF);  // (8)
 }
 

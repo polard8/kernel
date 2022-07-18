@@ -77,6 +77,8 @@ START:
     xor rcx, rcx
     xor rdx, rdx
 
+; This gdt is here in this document.
+
     lgdt [GDT64.Pointer]
 
     mov ax, GDT64.Data
@@ -279,6 +281,7 @@ align 8
 ;; See:
 ;; https://wiki.osdev.org/Setting_Up_Long_Mode
 ;; Entry size ?
+;; o dpl são os bits 5 e 6 do access byte.
 
 GDT64:                  ; Global Descriptor Table (64-bit).
 .Null: equ $ - GDT64    ; The null descriptor.

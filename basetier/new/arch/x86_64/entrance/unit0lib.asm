@@ -279,7 +279,7 @@ _setup_system_interrupt:
 ; Lidando com o endereço.
 ;
 
-    ; Salva o endereço de 64bi em rdx.
+    ; Salva o endereço de 64bit em rdx.
     mov rdx, qword [d__address] 
 
     ; low 16 
@@ -307,6 +307,9 @@ _setup_system_interrupt:
     ;; #bugbug
     ;; Nao sei se essa operação eh possivel,
     ;; mas queremos mover de double em double
+
+;; #bugbug
+;; Checar o que representa esse seletor.
 
     ;==========================
     ; Primeiros 32 bits. 

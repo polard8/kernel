@@ -15,10 +15,6 @@ align 16
 ;     System Call number 0x80
 ;
 ;     ONLY CALLED FROM USERMODE!
-;     #bugbug: At the moment we have a ring0 module
-;     calling this syscall at the libc initialization.
-;     but that is not what we want, and we're gonna change that.
-;
 ;
 ;     + It is never called from kernel mode.
 ;     + It calls a system service without changing the segment registers.
@@ -44,6 +40,9 @@ global _int128
 _int128:
 
 ; #todo: Maybe we can save the stack frame.
+
+    pop qword [.int128_rip]
+    pop qword [.int128_cs]
 
     push rax
     push rbx
@@ -82,8 +81,11 @@ _int128:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: sci.c
+; #importante: temos que pegar cs na pilha e nao no registrador.
+; talvez durante a systemcall o processador mude o cs para o valor 
+; do seletor indicado na entrada da idt.
     xor rax, rax
-    mov ax, cs
+    mov rax, qword [.int128_cs]
     and rax, 3
     mov qword [_sci0_cpl], rax
 
@@ -121,8 +123,13 @@ _int128:
     pop rax
 
     mov rax, qword [.int128Ret] 
+
+    push qword [.int128_cs]      ; cs
+    push qword [.int128_rip]     ; rip
     iretq
 .int128Ret: dq 0
+.int128_cs: dq 0
+.int128_rip: dq 0
 ;--  
 
 
@@ -136,9 +143,6 @@ _int128:
 ;     System Call number 0x81
 ;
 ;     ONLY CALLED FROM USERMODE!
-;     #bugbug: At the moment we have a ring0 module
-;     calling this syscall at the libc initialization.
-;     but that is not what we want, and we're gonna change that.
 ;
 ;     + It is never called from kernel mode.
 ;     + It chamges the segment registers before calling the system service.
@@ -163,6 +167,9 @@ global _int129
 _int129:
 
 ; #todo: Maybe we can save the stack frame.
+
+    pop qword [.int129_rip]
+    pop qword [.int129_cs]
 
     push rax
     push rbx
@@ -201,8 +208,11 @@ _int129:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: sci.c
+; #importante: temos que pegar cs na pilha e nao no registrador.
+; talvez durante a systemcall o processador mude o cs para o valor 
+; do seletor indicado na entrada da idt.
     xor rax, rax
-    mov ax, cs
+    mov rax, qword [.int129_cs]
     and rax, 3
     mov qword [_sci1_cpl], rax
 
@@ -240,8 +250,13 @@ _int129:
     pop rax
 
     mov rax, qword [.int129Ret] 
+
+    push qword [.int129_cs]      ; cs
+    push qword [.int129_rip]     ; rip
     iretq
 .int129Ret: dq 0
+.int129_cs: dq 0
+.int129_rip: dq 0
 ;--  
 
 
@@ -253,9 +268,6 @@ _int129:
 ;     System Call number 0x82
 ;
 ;     ONLY CALLED FROM USERMODE!
-;     #bugbug: At the moment we have a ring0 module
-;     calling this syscall at the libc initialization.
-;     but that is not what we want, and we're gonna change that.
 ;
 ;     + It is never called from kernel mode.
 ;     + It chamges the segment registers before calling the system service.
@@ -280,6 +292,9 @@ global _int130
 _int130:
 
 ; #todo: Maybe we can save the stack frame.
+
+    pop qword [.int130_rip]
+    pop qword [.int130_cs]
 
     push rax
     push rbx
@@ -318,8 +333,11 @@ _int130:
 ; cpl
 ; Get the first 2 bits of cs.
 ; see: sci.c
+; #importante: temos que pegar cs na pilha e nao no registrador.
+; talvez durante a systemcall o processador mude o cs para o valor 
+; do seletor indicado na entrada da idt.
     xor rax, rax
-    mov ax, cs
+    mov rax, qword [.int130_cs]
     and rax, 3
     mov qword [_sci2_cpl], rax
 
@@ -357,8 +375,13 @@ _int130:
     pop rax
 
     mov rax, qword [.int130Ret] 
+
+    push qword [.int130_cs]      ; cs
+    push qword [.int130_rip]     ; rip
     iretq
 .int130Ret: dq 0
+.int130_cs: dq 0
+.int130_rip: dq 0
 ;--    
 
 ;
