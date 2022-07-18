@@ -85,11 +85,9 @@ WS_INCLUDES_LOCAL = .
 
 
 #head
-#myObjects = crt0.o main.o rtl.o \
-#ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-#termios.o ioctl.o fcntl.o    
-
-myObjects = main0.o    
+myObjects = crt0.o main.o rtl.o \
+ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
+termios.o ioctl.o fcntl.o    
 
 
 .PHONY: all all-c gws-link finalize clean
@@ -98,14 +96,26 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	#$(CC)  -c  main.c  $(user_ccflags) -I $(LIBC) -I . -o main.o
-	$(CC)  -c  main0.c  $(user_ccflags) -I . -o main0.o
+	$(CC)  -c  main.c  $(user_ccflags) -I $(LIBC) -I . -o main.o
 all-c:
 
 # == imported objects =============================
 
 # rtl/
+	cp $(LIBCOBJ)/crt0.o .
+	cp $(LIBCOBJ)/rtl.o .
 
+	cp $(LIBCOBJ)/ctype.o .
+	cp $(LIBCOBJ)/stdio.o .
+	cp $(LIBCOBJ)/stdlib.o .
+	cp $(LIBCOBJ)/string.o .
+	cp $(LIBCOBJ)/conio.o .
+	cp $(LIBCOBJ)/unistd.o .
+	cp $(LIBCOBJ)/socket.o .
+	cp $(LIBCOBJ)/signal.o .
+	cp $(LIBCOBJ)/termios.o .
+	cp $(LIBCOBJ)/ioctl.o .
+	cp $(LIBCOBJ)/fcntl.o .
 
 gws-link:
 	$(LD) $(user_ldflags) -o MOD0.BIN $(myObjects)

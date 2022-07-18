@@ -14,14 +14,24 @@ align 16
 ; 
 ;     System Call number 0x80
 ;
+;     ONLY CALLED FROM USERMODE!
+;     #bugbug: At the moment we have a ring0 module
+;     calling this syscall at the libc initialization.
+;     but that is not what we want, and we're gonna change that.
+;
+;
 ;     + It is never called from kernel mode.
 ;     + It calls a system service without changing the segment registers.
+;     + We are using the caller cr3.
 ;
 ;     It has four parameters:
 ;     rax - Argument 1
 ;     rbx - Argument 2
 ;     rcx - Argument 3
 ;     rdx - Argument 4
+;
+;     #todo: 
+;     Maybe we can receive more values using more registers.
 ;
 ;;-----
 
@@ -32,6 +42,8 @@ extern _sci0_cpl
 ; Capture context
 global _int128
 _int128:
+
+; #todo: Maybe we can save the stack frame.
 
     push rax
     push rbx
@@ -123,14 +135,23 @@ _int128:
 ; 
 ;     System Call number 0x81
 ;
+;     ONLY CALLED FROM USERMODE!
+;     #bugbug: At the moment we have a ring0 module
+;     calling this syscall at the libc initialization.
+;     but that is not what we want, and we're gonna change that.
+;
 ;     + It is never called from kernel mode.
 ;     + It chamges the segment registers before calling the system service.
+;     + We are using the caller cr3.
 ;
 ;     It has four parameters:
 ;     rax - Argument 1
 ;     rbx - Argument 2
 ;     rcx - Argument 3
 ;     rdx - Argument 4
+;
+;     #todo: 
+;     Maybe we can receive more values using more registers.
 ;
 ;;-----
 
@@ -140,6 +161,8 @@ extern _sci1_cpl
 ; Capture context
 global _int129
 _int129:
+
+; #todo: Maybe we can save the stack frame.
 
     push rax
     push rbx
@@ -229,14 +252,23 @@ _int129:
 ; 
 ;     System Call number 0x82
 ;
+;     ONLY CALLED FROM USERMODE!
+;     #bugbug: At the moment we have a ring0 module
+;     calling this syscall at the libc initialization.
+;     but that is not what we want, and we're gonna change that.
+;
 ;     + It is never called from kernel mode.
 ;     + It chamges the segment registers before calling the system service.
+;     + We are using the caller cr3.
 ;
 ;     It has four parameters:
 ;     rax - Argument 1
 ;     rbx - Argument 2
 ;     rcx - Argument 3
 ;     rdx - Argument 4
+;
+;     #todo: 
+;     Maybe we can receive more values using more registers.
 ;
 ;;-----
 
@@ -246,6 +278,8 @@ extern _sci2_cpl
 ; Capture context
 global _int130
 _int130:
+
+; #todo: Maybe we can save the stack frame.
 
     push rax
     push rbx
@@ -327,6 +361,12 @@ _int130:
 .int130Ret: dq 0
 ;--    
 
+;
+; This is called only from the init process in user mode.
+; It will enable the interrupts and the taskswitching
+; for the first time.
+; see: INIT.BIN.
+;
 
 global _int199
 _int199:

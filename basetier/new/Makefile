@@ -122,13 +122,13 @@ kernel-header:
 
 	# personas: warden, student, visitor.
 	# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) entrance/x64/head_64.asm \
+	$(NASM) arch/x86_64/entrance/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I entrance/x64/ \
+	-I arch/x86_64/entrance/ \
 	-f elf64 -o head_64.o
 
 	# unit 2 (xapx)
-	$(CC) -c entrance/x64/sci.c \
+	$(CC) -c arch/x86_64/entrance/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    

@@ -46,13 +46,17 @@ static void __initialize_ws_info(pid_t pid)
 {
     struct process_d *p;
     struct thread_d *t;
-    
-    if( WindowServerInfo.initialized == TRUE )
-        panic("__initialize_ws_info: The ws is already running");
+
+// #todo
+// Maybe we can just emit an error message and return.
+
+    if( WindowServerInfo.initialized == TRUE ){
+        panic("__initialize_ws_info: The ws is already running\n");
+    }
 
     WindowServerInfo.initialized = FALSE;
     
-    if(pid < 0 || pid >= PROCESS_COUNT_MAX)
+    if (pid < 0 || pid >= PROCESS_COUNT_MAX)
     {
         return;
     }
@@ -1065,10 +1069,11 @@ void *sci0 (
     }
 
     if(cpl == 0){
-        //printf("number=%d\n",number);
-        if(current_process != 0){
+        printf("number=%d\n",number);
+        printf("pid=%d\n",current_process);
+        //if(current_process != 0){
             panic("sci0: cpl 0\n");
-        }
+        //}
     }
     if(cpl == 1){
         panic("sci0: cpl 1\n");
@@ -2000,12 +2005,14 @@ void *sci1 (
 
     switch (number){
 
-        case 1:  return NULL;  break;  
+    case 1:
+        return NULL;
+        break;  
 
-        // ...
-        
-        default:
-            break;
+    // ...
+
+    default:
+        break;
     };
 
     // #todo

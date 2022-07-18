@@ -19,6 +19,8 @@ int main ( int argc, char *argv[] )
     char buffer[1024];
     //char buffer[2048];
 
+    int fd=-1;
+
 // Counters.
     register int nreads = 0;
     register int nwrites = 0;
@@ -32,9 +34,8 @@ int main ( int argc, char *argv[] )
     //int Max = argc;
     //char *p;
     
-    printf("CAT.BIN: argc %d | argv[1] %s \n", 
-        argc, 
-        argv[1] );
+    printf("CAT.BIN: argc %d | argv[1] %s\n", 
+        argc, argv[1] );
 
     // pula o primeiro porque eh o nome do programa.
     
@@ -56,7 +57,6 @@ int main ( int argc, char *argv[] )
             //exit (-1);
         //}
 
-        int fd=-1;
         fd = (int) open( (char *) argv[1],0, "a+" );
 
         // Poisiona no início do arquivo.
@@ -76,12 +76,11 @@ int main ( int argc, char *argv[] )
         //nreads = read( fileno(fp), buffer, sizeof(buffer) );
         //nreads = read( fileno(fp), buffer,  );  //#bugbug: Defined limitation
         nreads = read( fd, buffer, 511 );  //512 is the limit in kernel?
-        if ( nreads <= 0 )
+        if (nreads <= 0)
         {
             printf ("cat: read fail\n");
             //exit (-1);
         }
-        
 
         //#test
         //fgets(buffer,512,fp);
@@ -103,10 +102,10 @@ int main ( int argc, char *argv[] )
 
         // Write
         nwrites = write ( 1, buffer, sizeof(buffer) );
-        if ( nwrites <= 0 )
+        if (nwrites <= 0)
         {
             printf ("cat: write fail\n");
-        //    exit(-1);
+            //exit(-1);
         }
 
         //fprintf(stdout,buffer);
