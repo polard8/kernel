@@ -5,6 +5,8 @@
 #define ____X64GDT_H    1
 
 
+
+
 //#bugbug
 //sei que existe um máximo, mas não sei se existe mínimo.
 //#define	MINGDTSIZ	512

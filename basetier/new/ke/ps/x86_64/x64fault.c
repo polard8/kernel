@@ -6,18 +6,21 @@
 
 // Called by 'all_faults:' in unit1hw.asm.
 
-void faults ( unsigned long number )
+void faults (unsigned long number)
 {
-
-    struct thread_d   *CurrentThread;
+    struct thread_d  *CurrentThread;
 
     //Get these values using assembly inline.
     //unsigned long fault_pa=0;       //from cr2
     //unsigned long fault_pml4_pa=0;  //from cr3
 
     debug_print ("~faults:\n");
+    
+    printf ("number: %d\n",number);
+    refresh_screen();
 
 
+/*
 // #todo
 // Salvaremos o contexto se a fault aconteceu
 // em ring3. Pois nesse caso poderemos tentar retomar a
@@ -95,12 +98,12 @@ void faults ( unsigned long number )
         // #todo
         // dump this info.
     }
-
+*/
 
 
 // ============
 
-    switch ( number ){
+    switch (number){
 
         // Divisão por zero, ou resultado muito longo?
         // Se a falta ocoreu em ring 0, então precisamos
@@ -115,9 +118,11 @@ void faults ( unsigned long number )
 
 
         case 3: 
-            //printf ("== 3 ==\n");  
+            printf ("== 3 ==\n");  
+            save_current_context();
             //show_slots();
-            //refresh_screen();
+            show_reg(current_thread);
+            refresh_screen();
             // Esse tipo funciona mesmo antes do console
             // ter sido inicializado.
             
@@ -152,9 +157,9 @@ void faults ( unsigned long number )
         // #todo: Com assembly inline podemos pegar cr2 e cr3.
         case 14: 
             printf ("== PF ==\n");  
-            if(user_thread==TRUE){
-                printf("It's an user thread!\n");
-            }
+            //if(user_thread==TRUE){
+            //    printf("It's an user thread!\n");
+            //}
             show_slots();
             refresh_screen();
             x_panic("faults() 14"); 

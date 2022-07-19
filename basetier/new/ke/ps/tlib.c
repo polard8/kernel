@@ -536,7 +536,6 @@ void show_reg(int tid)
 {
     struct thread_d  *t;
 
-
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         printf("show_reg: fail\n");

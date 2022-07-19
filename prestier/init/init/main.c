@@ -112,6 +112,10 @@ static void initPrompt(void)
     fflush(stdout);
 }
 
+static inline void do_int3(void)
+{
+    asm ("int $3");
+}
 
 static int initCompareString(void)
 {
@@ -124,6 +128,13 @@ static int initCompareString(void)
     
     //LF
     printf("\n");
+
+
+    if( strncmp(prompt,"int3",4) == 0 )
+    {
+        do_int3();
+        goto exit_cmp;
+    }
 
     if( strncmp(prompt,"about",5) == 0 )
     {
