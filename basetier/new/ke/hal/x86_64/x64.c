@@ -46,44 +46,6 @@ int x64_init_gdt (void)
         0,
         sizeof(struct segment_descriptor_d)*32 );
 
-
-// Creating a TSS and initializing it.
-
-    tss = (void *) kmalloc ( sizeof(struct tss_d) );
-
-    if ( (void *) tss == NULL ){
-        debug_print ("[x64] x64_init_gdt: \n");
-              panic ("[x64] x64_init_gdt: \n");
-    }else{
- 
-        // Init TSS. 
-        tss_init ( 
-            (struct tss_d *) tss,  // tss 
-            (void *) &rsp0Stack    // ring 0 stack address
-            );
-
-        //tss_init ( 
-        //    (struct tss_d *) tss,  // tss 
-        //    (void *) 0x8000    // ring 0 stack address
-        //    );
-
-
-         // Setup current.
-         // ps: All threads are using the same tss.
-
-         CurrentTSS = tss;
-         
-         // #bugbug
-         // #todo: Validation
-         
-         //if ( (void *) CurrentTSS == NULL )
-             //panic( ...
-    };
-
-//
-// Initializing the GDT.
-//
-
 // IN: 
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
 
@@ -147,8 +109,28 @@ int x64_init_gdt (void)
         0,
         0);
 
+//
+// tss
+//
 
-    // tss
+// Creating a TSS and initializing it.
+// Save current tss.
+// Create gdt entry for the tss. (two entries)
+
+    tss = (void *) kmalloc ( sizeof(struct tss_d) );
+
+    if ( (void *) tss == NULL ){
+        debug_print ("[x64] x64_init_gdt: \n");
+              panic ("[x64] x64_init_gdt: \n");
+    }
+
+    tss_init ( 
+        (struct tss_d *) tss,  // tss 
+        (void *) &rsp0Stack    // ring 0 stack address
+        );
+
+    CurrentTSS = tss;
+
     set_gdt_entry ( &xxx_gdt[GTSS_SEL], 
         sizeof( struct tss_d ) - 1, (unsigned long) tss,0x9,0,3,1,0,0,0,1); //tss dpl 3
     set_gdt_entry ( &xxx_gdt[GTSS_CONT_SEL], 
@@ -167,8 +149,10 @@ int x64_init_gdt (void)
 
     // See: x64gdt.h
     //load_gdt (&xxx_gdt_ptr);
-    
-    
+
+// #todo
+// print gdt entries.
+
 //
 // Load tr   [DANGER]
 //

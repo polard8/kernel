@@ -426,6 +426,8 @@ do_clone:
     debug_print ("copy_process: [1] Copying process image and stack.\n");
     //printf      ("copy_process: [1] Copying process image and stack.\n");
 
+//see: process.c
+
     Status = (int) alloc_memory_for_image_and_stack( parent_process );
 
     if ( Status != 0 ){

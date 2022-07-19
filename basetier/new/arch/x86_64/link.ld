@@ -1,12 +1,12 @@
 /* 
  * File: link.ld
- * ld script to make the x86_64 kernel image.
+ *     ld script to make the x86_64 kernel image.
  * Base:
  *     0x30000000
  * Entry point: 
  *     0x30001000
  *     Kernel entry point in: 
- *     entrance/warden/unit0/x86_64/head_64.asm. 
+ *     arch/x86_64/entrance/head_64.asm. 
  * History:
  *     2021 - Created by Fred Nora.
  */

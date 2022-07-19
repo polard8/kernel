@@ -1318,8 +1318,7 @@ int consoleCompareStrings(void)
 // Exit the kernel console.
     if ( strncmp(prompt,"exit",4) == 0 )
     {
-        exit_kernel_console();
-        
+        exit_kernel_console(); 
         goto exit_cmp;
     }
 
