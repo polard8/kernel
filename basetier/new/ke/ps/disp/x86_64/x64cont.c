@@ -223,7 +223,17 @@ void save_current_context (void)
         t->utime++;
     }
 
-
+/*
+// rflags
+// ok, it's working
+    unsigned long rflags = (unsigned long) t->rflags;
+    int rflags_iopl = (int) (rflags & 0x200 );
+    if(cpl==3){
+    if(rflags_iopl!=0x200)
+        panic("rflags_iopl");
+    }
+*/
+    
 // #todo
 // Vamos analisar o que acabamos de capturar e
 // configurar seu destino daqui pra frente.

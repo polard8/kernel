@@ -32,7 +32,7 @@ unsigned char isa_irqs[16] = {
 extern void rsp0Stack(void);
 extern void gdt_flush(unsigned long gdtr_address);
 
-int x64_init_gdt (void)
+int x64_init_gdt(void)
 {
     struct tss_d  *tss;
 
@@ -47,7 +47,7 @@ int x64_init_gdt (void)
         sizeof(struct segment_descriptor_d)*32 );
 
 // IN: 
-// (n, limit, base, type, s, dpl, p, avl, l, db, g)
+// (entry address, limit, base, type, s, dpl, p, avl, l, db, g)
 
 // null
     set_gdt_entry ( &xxx_gdt[GNULL_SEL], 
@@ -58,56 +58,56 @@ int x64_init_gdt (void)
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
     set_gdt_entry ( 
         &xxx_gdt[GCODE_SEL], 
-        0,
-        0x0,
-        0xA,
-        1,
-        0,  // dpl
-        1,
-        0,
-        1,
-        0,
-        0); 
+        0,    // limit
+        0x0,  // base
+        SEG_CODE_EXRD, //0xA,  // type
+        1,    // s
+        RING0, //0,    // dpl
+        1,    // p
+        0,    // avl
+        1,    // l
+        0,    // db
+        0);   // g
     set_gdt_entry ( 
         &xxx_gdt[GDATA_SEL], 
-        0,
-        0x0,
-        0x2,
-        1,
-        0,  // dpl
-        1,
-        0,
-        1,
-        0,
-        0); 
+        0,    // limit
+        0x0,  // base
+        SEG_DATA_RDWR, //0x2,  // type
+        1,    // s
+        RING0, //0,    // dpl
+        1,    // p
+        0,    // avl
+        1,    // l
+        0,    // db
+        0);   // g
 
 // ring 3
 // dpl 3
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
     set_gdt_entry ( 
         &xxx_gdt[GUCODE_SEL], 
-        0,
-        0x0,
-        0xA,
-        1,
-        3,  // dpl ??
-        1,
-        0,
-        1,
-        0,
-        0); 
+        0,    // limit
+        0x0,  // base
+        SEG_CODE_EXRD, //0xA,  // type
+        1,    // s
+        RING3, //3,    // dpl ??
+        1,    // p
+        0,    // avl
+        1,    // l
+        0,    // db
+        0);   // g
     set_gdt_entry ( 
         &xxx_gdt[GUDATA_SEL], 
-        0,
-        0x0,
-        0x2,
-        1,
-        3,  // dpl ??
-        1,
-        0,
-        1,
-        0,
-        0);
+        0,      // limit   
+        0x0,    // base
+        SEG_DATA_RDWR, //0x2,    // type
+        1,      // s
+        RING3, //3,      // dpl ??
+        1,      // p
+        0,      // avl
+        1,      // l
+        0,      // db
+        0);     // g
 
 //
 // tss
@@ -140,9 +140,13 @@ int x64_init_gdt (void)
 // Load GDT.
 //
 
-    // Limit and base.
-    xxx_gdt_ptr.limit = (unsigned short) ((32 * sizeof(struct segment_descriptor_d) ) -1);
-    xxx_gdt_ptr.base  = (unsigned long) &xxx_gdt[GNULL_SEL];
+// Limit and base.
+
+    xxx_gdt_ptr.limit = 
+        (unsigned short) ((DESCRIPTOR_COUNT_MAX * sizeof(struct segment_descriptor_d) ) -1);
+    xxx_gdt_ptr.base = 
+        (unsigned long) &xxx_gdt[GNULL_SEL];
+
 
 // register.
     gdt_flush( (unsigned long) &xxx_gdt_ptr );
@@ -187,12 +191,21 @@ set_gdt_entry (
     unsigned char g )
 {
 
-// low limit
-    sd->limit_15_0 = (limit & 0xFFFF); // (16) segment extent (lsb) 
 
-// base low
-    sd->base_15_0   = (base & 0xFFFF);        // (16)
-    sd->base_23_16  = ((base >> 16) & 0xFF);  // (8)
+    if ( (void*) sd == NULL )
+    {
+        debug_print ("[x64] set_gdt_entry: sd\n");
+        panic       ("[x64] set_gdt_entry: sd\n");
+    }
+
+// limit
+    sd->limit_15_0  = (limit & 0xFFFF);       // (16) segment extent (lsw) 
+    sd->limit_19_16 = ((limit >> 16) & 0xF);  // (4)
+
+// base
+    sd->base_15_0   = (base & 0xFFFF);         // (16) lsw
+    sd->base_23_16  = ((base >> 16) & 0xFF);   // (8)
+    sd->base_31_24  = ((base  >> 24) & 0xFF);  // (8)
 
 // access byte
     sd->type  = ( type & 0xF );  // (4)
@@ -200,15 +213,11 @@ set_gdt_entry (
     sd->dpl   = ( dpl  & 0x3 );  // (2)
     sd->p     = ( p    & 0x1 );  // (1)
 
-    sd->limit_19_16 = ((limit >>16) & 0xF);  //(4)
-
+//
     sd->avl  = (avl & 1);  // (1)  
     sd->l    = (l   & 1);  // (1)
     sd->db   = (db  & 1);  // (1)
     sd->g    = (g   & 1);  // (1)
-
-// base high
-    sd->base_31_24  = ((base  >> 24) & 0xFF);  // (8)
 }
 
 
@@ -222,7 +231,8 @@ tss_init (
     void *stack_address )
 {
 
-    if ( (void *) tss == NULL ){
+    if ( (void *) tss == NULL )
+    {
         debug_print ("[x64] tss_init:\n");
         panic       ("[x64] tss_init:\n");
     }

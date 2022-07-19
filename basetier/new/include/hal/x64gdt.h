@@ -15,24 +15,22 @@
 
 // ========================
 
-//índices na gdt
-#define GNULL_SEL	0	/* Null descriptor */
-#define GCODE_SEL	1	/* Kernel code descriptor */
-#define GDATA_SEL	2	/* Kernel data descriptor */
-#define GUCODE_SEL	3	/* User code descriptor */
-#define GUDATA_SEL	4	/* User data descriptor */
-
-#define GTSS_SEL       5   //tss
-#define GTSS_CONT_SEL  6   //tss continuação.
-
-#define GLDT_SEL       7   /* Default LDT descriptor */
-#define GLDT_CONT_SEL  8   /* Default LDT descriptor */
-
+// índices na gdt.
+#define GNULL_SEL      0  // Null descriptor
+#define GCODE_SEL      1  // Kernel code descriptor
+#define GDATA_SEL      2  // Kernel data descriptor
+#define GUCODE_SEL     3  // User code descriptor
+#define GUDATA_SEL     4  // User data descriptor
+#define GTSS_SEL       5  // tss
+#define GTSS_CONT_SEL  6  // tss continuação
+#define GLDT_SEL       7  // Default LDT descriptor
+#define GLDT_CONT_SEL  8  // Default LDT descriptor
 
 // ========================
 
-#define SEL_KPL  0	/* kernel privilege level */
-#define SEL_UPL  3	/* user privilege level */
+// dpl
+#define SEL_KPL  0  // kernel privilege level
+#define SEL_UPL  3  // user privilege level
 
 
 /* system segments and gate types */
@@ -83,13 +81,19 @@
 
 // See:
 // https://wiki.osdev.org/Global_Descriptor_Table
-
+// https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/desc_defs.h
 // gdt structure.
+/* 8 byte segment descriptor */
 struct segment_descriptor_d 
 {
+
+// 16 bits
     unsigned long limit_15_0 :16;
 
+// 16 bits
     unsigned long base_15_0  :16;
+
+// 16 bits
     unsigned long base_23_16 :8;
 
     unsigned long type :4;  //segment type
@@ -97,6 +101,7 @@ struct segment_descriptor_d
     unsigned long dpl  :2;  //segment descriptor priority level 
     unsigned long p    :1;  //segment descriptor present 
 
+// 16 bits
     unsigned long limit_19_16 :4;
 
     unsigned long avl :1;
@@ -104,7 +109,7 @@ struct segment_descriptor_d
     unsigned long db  :1;
     unsigned long g   :1;
 
-    unsigned long long base_31_24 :8;
+    unsigned long base_31_24 :8;
 
 } __attribute__((packed));
 
@@ -115,12 +120,35 @@ struct segment_descriptor_d
 // For now we are setting up gdt at the initialization
 // using Assembly language. 
 // Isso é uma gdt com 32 entradas.
-//static struct segment_descriptor_d xxx_gdt[32];
-struct segment_descriptor_d xxx_gdt[32];
+
+#define DESCRIPTOR_COUNT_MAX    32
+
+struct segment_descriptor_d xxx_gdt[DESCRIPTOR_COUNT_MAX];
 
 // Isso é o registro da gdt
 //static struct gdt_ptr_d xxx_gdt_ptr;
 struct gdt_ptr_d  xxx_gdt_ptr;
+
+
+#define SEG_DATA_RD        0x00 // Read-Only
+#define SEG_DATA_RDA       0x01 // Read-Only, accessed
+#define SEG_DATA_RDWR      0x02 // Read/Write
+#define SEG_DATA_RDWRA     0x03 // Read/Write, accessed
+#define SEG_DATA_RDEXPD    0x04 // Read-Only, expand-down
+#define SEG_DATA_RDEXPDA   0x05 // Read-Only, expand-down, accessed
+#define SEG_DATA_RDWREXPD  0x06 // Read/Write, expand-down
+#define SEG_DATA_RDWREXPDA 0x07 // Read/Write, expand-down, accessed
+
+#define SEG_CODE_EX        0x08 // Execute-Only
+#define SEG_CODE_EXA       0x09 // Execute-Only, accessed
+#define SEG_CODE_EXRD      0x0A // Execute/Read
+#define SEG_CODE_EXRDA     0x0B // Execute/Read, accessed
+#define SEG_CODE_EXC       0x0C // Execute-Only, conforming
+#define SEG_CODE_EXCA      0x0D // Execute-Only, conforming, accessed
+#define SEG_CODE_EXRDC     0x0E // Execute/Read, conforming
+#define SEG_CODE_EXRDCA    0x0F // Execute/Read, conforming, accessed
+
+
 
 // ======================
 
