@@ -1,7 +1,6 @@
 
 // process.h
 
-
 #ifndef __PROCESS_H
 #define __PROCESS_H    1
 
@@ -10,9 +9,7 @@
 //talvez aqui nao seja o melhor lugar pra definir isso.
 #define gramado_pid_t  pid_t
 
-
 #define PROCESS_MAGIC  1234
-
 
 
 // #alternative
@@ -580,9 +577,12 @@ struct process_d
 // Environment.
 //
 
+    unsigned int cpl;
+
 // #todo: use 'unsigned int'
 // IOPL of the task. (ring).
-    unsigned long iopl; 
+    unsigned int rflags_iopl; 
+
 
 //
 // == Priorities ============
@@ -946,7 +946,7 @@ struct process_d *create_process (
     unsigned long priority, 
     ppid_t ppid, 
     char *name, 
-    unsigned long iopl,
+    unsigned int cpl,
     unsigned long pml4_va,
     unsigned long pdpt0_va,
     unsigned long pd0_va );

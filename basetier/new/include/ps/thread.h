@@ -331,11 +331,13 @@ struct thread_d
     unsigned long pd0_PA;
 
 
+// cpl
 // The initial privilege level.
 // The current privilege level.
 
-    unsigned int initial_iopl;
-    unsigned int current_iopl;
+    unsigned int cpl;
+    unsigned int rflags_initial_iopl;
+    unsigned int rflags_current_iopl;
 
 
 // The thread is running in the ring0 phase
@@ -1033,7 +1035,7 @@ struct thread_d *create_thread (
     unsigned long init_stack, 
     pid_t pid, 
     char *name,
-    int iopl );
+    unsigned int cpl );
 
 // =====
 

@@ -180,6 +180,16 @@ void save_current_context (void)
 
 // stime and utime
 
+// 
+// cpl
+//
+
+// This cpl came from the cs register found in the iretq stack frame,
+// right after the timer interrupt.
+// #bugbug:
+// Maybe it is not the same in the actual cs register
+// in the moment of the irq handler routine.
+
     int cpl=-1;
     unsigned long tmp_cpl = (unsigned long) context_cpl[0];
 
@@ -187,7 +197,9 @@ void save_current_context (void)
 // The first 2 bits of cs.
     cpl = (int) (tmp_cpl & 3);
 
-    t->current_iopl = (unsigned int) (tmp_cpl & 3);
+    if(cpl != t->cpl)
+        panic("save_current_context: cpl != t->cpl\n");
+
 
 /*
     if (cpl){
@@ -408,12 +420,30 @@ int contextCheckThreadRing3Context (int tid)
         return FALSE;
     }
 
-    // iopl
 
-    if ( t->initial_iopl != 3 ){
-        debug_print("contextCheckThreadRing3Context: initial_iopl\n");
+//
+// cpl
+//
+
+    if(t->cpl!=RING3)
+        panic("contextCheckThreadRing3Context: cpl\n");
+
+//
+// iopl
+//
+
+// For now we only accept ring 3 threads with weak protection
+
+    if ( t->rflags_initial_iopl != 3 ){
+        debug_print("contextCheckThreadRing3Context: rflags_initial_iopl\n");
         return FALSE;
     }
+
+    if ( t->rflags_current_iopl != 3 ){
+        debug_print("contextCheckThreadRing3Context: rflags_current_iopl\n");
+        return FALSE;
+    }
+
 
     // Segment
 

@@ -20,7 +20,7 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t );
 static void 
 __ps_setup_x64_context ( 
     struct thread_d *t, 
-    int iopl,
+    unsigned int cpl,
     unsigned long init_stack,
     unsigned long init_rip );
 
@@ -125,18 +125,19 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
 static void 
 __ps_setup_x64_context ( 
     struct thread_d *t, 
-    int iopl,
+    unsigned int cpl,
     unsigned long init_stack,
     unsigned long init_rip )
 {
 
-    // Checking only this one.
-    if (iopl != RING0 && iopl != RING3 ){
-        panic ("__ps_setup_x64_context: Invalid iopl\n");
+
+// cpl
+
+    if (cpl != RING0 && cpl != RING3 ){
+        panic ("__ps_setup_x64_context: Invalid cpl\n");
     }
 
-    t->initial_iopl = (unsigned int) iopl;
-
+    t->cpl = (unsigned int) cpl;
 
 //
 // == Context support =============================================
@@ -157,8 +158,11 @@ __ps_setup_x64_context (
     
 
     // ring 0
-    if ( t->initial_iopl == RING0 )
+    if ( t->cpl == RING0 )
     {
+        t->rflags_initial_iopl = (unsigned int) 0;
+        t->rflags_current_iopl = (unsigned int) 0;
+
         t->ss     = 0x10;
         t->rsp    = (unsigned long) init_stack; 
         t->rflags = (unsigned long) 0x0202;
@@ -173,8 +177,12 @@ __ps_setup_x64_context (
     }
 
     // ring 3
-    if ( t->initial_iopl == RING3 )
+    if ( t->cpl == RING3 )
     {
+        //#see: weak protection for threads in ring 3.
+        t->rflags_initial_iopl = (unsigned int) 3;
+        t->rflags_current_iopl = (unsigned int) 3;
+
         t->ss     = 0x23;    
         t->rsp    = (unsigned long) init_stack; 
         t->rflags = (unsigned long) 0x3202;
@@ -279,8 +287,9 @@ unsigned long GetThreadStats ( int tid, int index )
             break; 
         
         // The initial privilege level.
+        // only 2 bits
         case 11:
-            return (unsigned long) (t->initial_iopl & 3);  //only 2 bits
+            return (unsigned long) (t->rflags_initial_iopl & 3);  
             break; 
 
         case 12:  return (unsigned long) t->base_priority;  break; 
@@ -837,7 +846,7 @@ struct thread_d *create_thread (
     unsigned long init_stack, 
     pid_t pid, 
     char *name,
-    int iopl )
+    unsigned int cpl )
 {
     struct process_d *Process;
     struct thread_d  *Thread;
@@ -896,9 +905,9 @@ struct thread_d *create_thread (
         panic ("create_thread: [ERROR] *name\n");
     }
 
-// iopl
-    if( iopl != RING0 && iopl != RING3 ){
-        panic ("create_thread: [ERROR] Invalid iopl\n");
+// cpl
+    if( cpl != RING0 && cpl != RING3 ){
+        panic ("create_thread: [ERROR] Invalid cpl\n");
     }
 
 //======================================
@@ -1042,7 +1051,8 @@ struct thread_d *create_thread (
 // ??
     //Thread->input_model = THREAD_INPUTMODEL_NULL;
 
-    Thread->input_flags = (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
+    Thread->input_flags = 
+        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
 
 // ??
 // Explain it better.
@@ -1183,10 +1193,12 @@ try_next_slot:
 // The contexts needs its own structure.
 
 // ring 0
-    if (iopl == RING0)
+    if (cpl == RING0)
     {
-        Thread->initial_iopl = (unsigned int) RING0;
-        Thread->current_iopl = (unsigned int) RING0;
+        // iopl 0 for threads in ring 0.
+        // cpl = iopl
+        Thread->rflags_initial_iopl = (unsigned int) 0;
+        Thread->rflags_current_iopl = (unsigned int) 0;
 
         __ps_setup_x64_context( 
             (struct thread_d *) Thread,
@@ -1196,10 +1208,12 @@ try_next_slot:
     }
 
 // ring 3
-    if (iopl == RING3)
+    if (cpl == RING3)
     {
-        Thread->initial_iopl = (unsigned int) RING3;
-        Thread->current_iopl = (unsigned int) RING3;
+        // weak protection
+        // iopl 3 for threads in ring 3.
+        Thread->rflags_initial_iopl = (unsigned int) 3;
+        Thread->rflags_current_iopl = (unsigned int) 3;
 
         __ps_setup_x64_context( 
             (struct thread_d *) Thread,
@@ -1442,15 +1456,6 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     // char nameBuffer[32];
 
 
-// check iopl
-
-    if ( father->initial_iopl != RING3 ){
-        panic ("copy_thread_struct: father initial_iopl\n");
-    }
-
-    if ( father->current_iopl != RING3 ){
-        panic ("copy_thread_struct: father current_iopl\n");
-    }
 
 // #bugbug
 // Não podemos herdar o rip e o rsp.
@@ -1474,17 +1479,21 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 
     //father->ownerPID or current_process ??
 
-    if ( father->initial_iopl == RING3 )
-    {
-         clone = 
-             (struct thread_d *) create_thread ( 
-                                     NULL, NULL, NULL, 
-                                     0,  // initial rip 
-                                     0,  // initial rsp
-                                     father->ownerPID,  //current_process, 
-                                     "clone-thread",
-                                     RING3 );
-    }
+// #todo
+// for now we can copy only threads in ring 3.
+
+    unsigned int father_cpl = (unsigned int) father->cpl;
+    if(father_cpl != RING3)
+        panic("copy_thread_struct: father_cpl!=RING3\n");
+    
+    clone = 
+        (struct thread_d *) create_thread ( 
+                                NULL, NULL, NULL, 
+                                0,  // initial rip 
+                                0,  // initial rsp
+                                father->ownerPID,  //current_process, 
+                                "clone-thread",
+                                father_cpl );
 
 // The copy.
     if ( (void *) clone == NULL ){
@@ -1541,19 +1550,36 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     clone->priority      = father->priority;
 
 
+
+//
+// cpl
+//
+
+// #bugbug
+// for now we can only copy threads in ring 3.
+
+    unsigned int clone_cpl = (unsigned int) clone->cpl;
+    if(clone_cpl != RING3)
+        panic("copy_thread_struct: clone_cpl!=RING3\n");
+
+
+
 //
 // iopl
 //
 
-    clone->initial_iopl = (unsigned int) father->initial_iopl;
-    clone->current_iopl = (unsigned int) father->current_iopl;
+    clone->rflags_initial_iopl = (unsigned int) father->rflags_initial_iopl;
+    clone->rflags_current_iopl = (unsigned int) father->rflags_current_iopl;
 
-    if ( clone->initial_iopl != RING3 ){
-        panic ("copy_thread_struct: clone initial_iopl\n");
+// #bugbug
+// For now we can only accept weak protection for threads in ring 3.
+
+    if ( clone->rflags_initial_iopl != 3 ){
+        panic ("copy_thread_struct: clone rflags_initial_iopl\n");
     }
 
-    if ( clone->current_iopl != RING3 ){
-        panic ("copy_thread_struct: clone current_iopl\n");
+    if ( clone->rflags_current_iopl != 3 ){
+        panic ("copy_thread_struct: clone rflags_current_iopl\n");
     }
 
 

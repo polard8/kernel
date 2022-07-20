@@ -131,7 +131,11 @@ unsigned long GetProcessStats ( int pid, int index )
         case 29:  return (unsigned long) p->StackSize;   break;
 
         case 30:  return (unsigned long) p->StackOffset;  break;
-        case 31:  return (unsigned long) p->iopl;  break;
+        
+        case 31:
+            return (unsigned long) (p->rflags_iopl & 0xF);
+            break;
+
         case 32:  return (unsigned long) p->base_priority;  break;
         case 33:  return (unsigned long) p->priority;  break;
         case 34:  return (unsigned long) p->step;  break;
@@ -465,7 +469,11 @@ copy_process_struct(
     */
 
 
-    Process2->iopl = Process1->iopl;
+// cpl
+    Process2->cpl = Process1->cpl;
+
+// iopl
+    Process2->rflags_iopl = Process1->rflags_iopl;
 
 // Priority.
 
@@ -916,7 +924,7 @@ struct process_d *create_process (
     unsigned long priority, 
     ppid_t ppid, 
     char *name, 
-    unsigned long iopl,
+    unsigned int cpl,
     unsigned long pml4_va,
     unsigned long pdpt0_va,
     unsigned long pd0_va )
@@ -1058,7 +1066,19 @@ struct process_d *create_process (
     // Undefined
     Process->position = 0;
 
-    Process->iopl = iopl; 
+ 
+// cpl
+    Process->cpl = (unsigned int) cpl;
+
+    if (cpl!=RING0 && cpl!=RING3)
+        panic("create_process: cpl\n");
+
+// iopl
+// Qual é o privilágio padrão?
+// weak protection!
+    Process->rflags_iopl = (unsigned int) 3;  //weak protection 
+
+
 
     // Not a protected process!
     Process->_protected = 0;

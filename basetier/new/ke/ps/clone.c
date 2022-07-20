@@ -156,9 +156,15 @@ pid_t copy_process(
     }
 
 
-// iopl
+// cpl
+// Apenas processos em ring3 podem clonar por enquanto.
+    if (parent_process->cpl != RING3)
+        panic("copy_process: cpl != RING3\n");
 
-    if (parent_process->iopl != 3)
+// iopl
+// #todo: Para o futuro, precisamos aceitar
+// iopl 0, para termos mais proteção.
+    if (parent_process->rflags_iopl != 3)
         panic("copy_process: iopl\n");
 
 
@@ -207,14 +213,22 @@ pid_t copy_process(
     }
 
 
-// check iopl
+// cpl
+// For now we can only clone ring 3 threads.
+    if(parent_thread->cpl!=RING3)
+        panic("copy_process: parent_thread->cpl\n");
 
-    if (parent_thread->initial_iopl != 3){
-        panic("copy_process: initial iopl\n");
+// iopl
+// #bugbug:
+// For now, we can only clone threads in ring 3,
+// with weak protection;
+
+    if (parent_thread->rflags_initial_iopl != 3){
+        panic("copy_process: parent rflags_initial_iopl\n");
     }
 
-    if (parent_thread->current_iopl != 3){
-        panic("copy_process: current iopl\n");
+    if (parent_thread->rflags_current_iopl != 3){
+        panic("copy_process: parent rflags_current_iopl\n");
     }
 
 

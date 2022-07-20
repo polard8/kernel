@@ -270,6 +270,16 @@ void spawn_thread(int tid)
         panic("spawn_thread: eoi_is_needed != TRUE\n");
     }
 
+
+//
+// cpl
+//
+
+    if(target_thread->cpl != RING0 && target_thread->cpl != RING3)
+    {
+        panic("spawn_thread: Invalid cpl\n");
+    }
+
 // ===================
 // ring 0
 
@@ -277,7 +287,7 @@ void spawn_thread(int tid)
 // We're having problems when receiving syscalls from ring0.
 // Our system interrupt is only for ring3 processes.
 
-    if ( target_thread->initial_iopl == RING0 )
+    if ( target_thread->cpl == RING0 )
     {
         //#debug
         
@@ -308,20 +318,20 @@ void spawn_thread(int tid)
 // ===================
 // ring 1
 
-    if ( target_thread->initial_iopl == RING1 )
-        panic("spawn_thread: ring1\n");
+    //if ( target_thread->cpl == RING1 )
+    //    panic("spawn_thread: ring1\n");
 
 // ===================
 // ring 2
 
-    if ( target_thread->initial_iopl == RING2 )
-        panic("spawn_thread: ring2\n");
+    //if ( target_thread->cpl == RING2 )
+    //    panic("spawn_thread: ring2\n");
 
 
 // ===================
 // ring 3
     
-    if ( target_thread->initial_iopl == RING3 )
+    if ( target_thread->cpl == RING3 )
     {
         spawn_enter_usermode( 
             TRUE,  // EOI

@@ -4,8 +4,6 @@
 
 #include <kernel.h>
 
-
-
 /*
  * show_process_information:
  *     Mostra informa��es sobre os processos. 
@@ -54,7 +52,7 @@ void show_process_information (void)
             //    p->DirectoryPA, p->DirectoryVA );
 
             printf("iopl=%d prio=%d state=%d \n", 
-                p->iopl, p->priority, p->state );
+                p->rflags_iopl, p->priority, p->state );
 
             printf("syscalls = { %d }\n", p->syscalls_counter );
         }

@@ -596,8 +596,16 @@ void I_x64ExecuteInitialProcess (void)
 // See:
 // gva.h
 
-    if (Thread->initial_iopl != RING3 ){
-        panic ("I_x64ExecuteInitialProcess: initial_iopl");
+
+// cpl
+    if (Thread->cpl != RING3 ){
+        panic ("I_x64ExecuteInitialProcess: cpl\n");
+    }
+
+// iopl
+// weak protection
+    if (Thread->rflags_initial_iopl != 3 ){
+        panic ("I_x64ExecuteInitialProcess: rflags_initial_iopl\n");
     }
 
     PROGRESS("Go to ring3! \n");
@@ -605,6 +613,11 @@ void I_x64ExecuteInitialProcess (void)
 // CONTROLTHREAD_ENTRYPOINT
     unsigned long entry = (unsigned long) 0x0000000000201000;
     unsigned long rsp3  = (unsigned long) 0x00000000002FFFF0;
+
+// rflags:
+// 0x3002
+// iopl 3. weak protection.
+// Interrupts disabled for the first thread.
 
     asm volatile ( 
         " movq $0, %%rax  \n" 
@@ -617,7 +630,7 @@ void I_x64ExecuteInitialProcess (void)
         " movq $0, %%rbp  \n" 
         " pushq $0x23     \n"  
         " pushq %%rsp     \n" 
-        " pushq $0x3002   \n"  // Interrupts disabled for the first thread.
+        " pushq $0x3002   \n" 
         " pushq $0x1B     \n" 
         " pushq %%rax     \n" 
         " iretq           \n" :: "D"(entry), "S"(rsp3) );

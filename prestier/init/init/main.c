@@ -117,6 +117,22 @@ static inline void do_int3(void)
     asm ("int $3");
 }
 
+static inline void do_cli(void)
+{
+    asm ("cli");
+}
+
+static inline void do_sti(void)
+{
+    asm ("sti");
+}
+
+
+static inline void do_hlt(void)
+{
+    asm ("hlt");
+}
+
 static int initCompareString(void)
 {
     char *c;
@@ -135,6 +151,26 @@ static int initCompareString(void)
         do_int3();
         goto exit_cmp;
     }
+
+    if( strncmp(prompt,"cli",3) == 0 )
+    {
+        do_cli();
+        goto exit_cmp;
+    }
+
+    if( strncmp(prompt,"sti",3) == 0 )
+    {
+        do_sti();
+        goto exit_cmp;
+    }
+
+    // gp fault
+    if( strncmp(prompt,"hlt",3) == 0 )
+    {
+        do_hlt();
+        goto exit_cmp;
+    }
+
 
     if( strncmp(prompt,"about",5) == 0 )
     {

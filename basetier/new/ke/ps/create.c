@@ -68,8 +68,8 @@ void *create_tid0(void)
  // #suspenso. Vamos usar as flags em 't->input_flags'
     //kThread->input_model = THREAD_INPUTMODEL_KERNEL;
 
-    kThread->input_flags = (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
-
+    kThread->input_flags = 
+        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
 
 
     kThread->position = KING;
@@ -90,9 +90,6 @@ void *create_tid0(void)
     kThread->process      = (void *) KernelProcess;
 
 // Características.
-
-    kThread->initial_iopl = (unsigned int) RING0;
-    kThread->current_iopl = (unsigned int) RING0;
 
     kThread->type = THREAD_TYPE_SYSTEM; 
 
@@ -275,6 +272,13 @@ void *create_tid0(void)
 // Queremos que esse thread rode em ring0.
 // WS_ENTRYPOINT_VA
 
+// cpl and iopl
+// default iopl for threads in ring 0.
+// 0x0202
+    kThread->cpl = (unsigned int) RING0;
+    kThread->rflags_initial_iopl = (unsigned int) 0;
+    kThread->rflags_current_iopl = (unsigned int) 0;
+
 // Stack frame
     kThread->ss     = 0x10 | 0; 
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
@@ -362,7 +366,7 @@ void *create_tid0(void)
     debug_print ("[5]\n");
 
 
-    kThread->used  = TRUE;
+    kThread->used = TRUE;
     kThread->magic = 1234;
 
 
@@ -459,11 +463,6 @@ void *create_tid3 (void)
 
     t->position = SPECIAL_GUEST;
 
-
-    t->initial_iopl = (unsigned int) RING3; 
-    t->current_iopl = (unsigned int) RING3; 
-
-
     t->type = THREAD_TYPE_IDLE;
 
     t->state = INITIALIZED;
@@ -476,7 +475,8 @@ void *create_tid3 (void)
 
     // ...
 
-    t->input_flags = (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
+    t->input_flags = 
+        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
 
 	// @todo: 
 	// #bugbug: #importante
@@ -661,6 +661,16 @@ void *create_tid3 (void)
 
 // Stack frame.
 // See: gva.h
+
+
+// cpl and iopl
+// #bugbug: weak protection for threads in ring 3.
+// 0x3202
+
+    t->cpl = (unsigned int) RING3;
+    t->rflags_initial_iopl = (unsigned int) 3; 
+    t->rflags_current_iopl = (unsigned int) 3; 
+
     t->ss     = 0x23;
     t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
     t->rflags = 0x3202;    // #atenção! Change to 0x3202
