@@ -54,8 +54,9 @@ This repository has the source code for:
 	$ make qemu-test
 ```
 
-Tested only on qemu and on my real machine.
-My machine: Gigabyte/Intel Core 2 Duo/Chipset VIA.
+The old versions were tested for a long period of time on my 
+real machine. A Gigabyte/Intel Core 2 Duo/Chipset VIA.
+Now i'm testing only on qemu and virtualbox.
 Please, give us some feedback.
 
 ## Documentation
