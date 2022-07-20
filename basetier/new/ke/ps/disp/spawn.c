@@ -404,6 +404,10 @@ spawn_enter_usermode(
         asm ("outb %al, $0x20 \n");
     }
 
+
+// #bugbug
+// Only for ring 3 with iopl 3. weak protection.
+
     asm volatile ( 
         " movq $0, %%rax    \n" 
         " mov %%ax, %%ds    \n" 
@@ -454,6 +458,8 @@ spawn_enter_kernelmode(
 
 // #todo
 // We need to review the stack frame for ring0
+
+// only for ring 0 threads with iopl 0.
 
     asm volatile ( 
         " movq $0, %%rax    \n" 
