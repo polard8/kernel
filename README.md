@@ -1,4 +1,4 @@
-# Welcome to Gramado OS - Codename 'Gods'
+# Welcome to Gramado OS - Codename 'Angels'
 
 
 This repository has the source code for:
