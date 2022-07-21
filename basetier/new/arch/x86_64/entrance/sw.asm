@@ -397,9 +397,12 @@ _int199:
     pop qword [frameCS]
     pop qword [frameRFLAGS]
 
-    mov qword [frameRFLAGS], 0x0000000000003200
-    ;mov qword [frameRFLAGS], 0x0000000000003202
+; iopl 3
+    ;mov qword [frameRFLAGS], 0x0000000000003200
 
+; iopl 0
+    mov qword [frameRFLAGS], 0x0000000000000200
+    
     push qword [frameRFLAGS]
     push qword [frameCS]
     push qword [frameRIP]

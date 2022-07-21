@@ -4,6 +4,9 @@
 #include <kernel.h> 
 
 
+int copy_process_in_progress=FALSE;
+
+
 // #bugbug
 // Na maquina real, o processo clone esta recebendo
 // o mesmo pid do processo pai. Mas no qemu esta funcionando bem.
@@ -69,6 +72,10 @@ pid_t copy_process(
     _pdpt = 0;
     _pd = 0;
     _pt = 0;
+
+
+
+    copy_process_in_progress=TRUE;
 
 // Copiar a tabela pml4 do kernel.
     _pml4 = (void *) CloneKernelPML4();
@@ -227,9 +234,9 @@ pid_t copy_process(
         panic("copy_process: parent rflags_initial_iopl\n");
     }
 
-    if (parent_thread->rflags_current_iopl != 3){
-        panic("copy_process: parent rflags_current_iopl\n");
-    }
+    //if (parent_thread->rflags_current_iopl != 3){
+    //    panic("copy_process: parent rflags_current_iopl\n");
+    //}
 
 
 // Change the state of the parent's control thread.
@@ -947,6 +954,8 @@ do_clone:
         panic("copy_process: current_thread limits\n");
     }
 
+    copy_process_in_progress=FALSE;
+
 // Return child's PID.
 // Retornaremos para o pai.
 
@@ -973,6 +982,8 @@ fail:
     //if (old_pml4 != 0){
     //    x64_load_pml4_table( old_pml4 );
     //}
+
+    copy_process_in_progress=FALSE;
 
     return (pid_t) (-1);
 }

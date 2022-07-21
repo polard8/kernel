@@ -280,9 +280,12 @@ int main( int argc, char **argv)
 // Interrupts
 //
 
+// Changing  the interrupt flag and the iopl.
 // The taskswithing will not work without this.
-
-    asm ("int $199 \n");
+// #test: We're doint that at the libc initialization.
+// see: crt0.c
+ 
+    // asm volatile ("int $199 \n");
 
 
 // interrupts

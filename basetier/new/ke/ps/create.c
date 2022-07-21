@@ -673,7 +673,7 @@ void *create_tid3 (void)
 
     t->ss     = 0x23;
     t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
-    t->rflags = 0x3202;    // #atenção! Change to 0x3202
+    t->rflags = 0x3202;
     t->cs     = 0x1B;
     t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 

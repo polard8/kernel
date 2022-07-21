@@ -5,6 +5,8 @@
 #define __PROCESS_H    1
 
 
+extern int copy_process_in_progress;
+
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.
 #define gramado_pid_t  pid_t

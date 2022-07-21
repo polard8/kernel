@@ -280,6 +280,21 @@ int crt0 (unsigned long rdi)
 
 // ===================================================
 
+// Changing  the interrupt flag and the iopl.
+// The taskswithing will not work without this.
+
+/*
+funcionou ... mas a proteção só é ativada 
+ao fim da inicialização da libc ... 
+pouco antes de saltar para a função main()
+isso significa que eu posso decidir se a libc 
+ativa a proteção ou não ... dependendo se 
+é um driver ou aplicativo normal.
+por exemplo: o crt0 do aplicativo ativa a proteçao 
+e o crt0 do driver, não ativa.
+*/
+
+    asm volatile ("int $199");
 
     main_ret = (int) main(token_count,tokenList);
 

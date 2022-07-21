@@ -16,7 +16,15 @@ void faults (unsigned long number)
 
     debug_print ("~faults:\n");
     
+    printf("\n");
+    printf("\n");
+    printf("\n");
     printf ("number: %d\n",number);
+
+//see: clone.c    
+    if(copy_process_in_progress==TRUE)
+        printf("Fault while copying a process\n");
+
     refresh_screen();
 
 

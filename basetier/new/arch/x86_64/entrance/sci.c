@@ -1,6 +1,10 @@
 
 // sci.c
+// system call interface.
 // Handlers for the system interrupts.
+// #todo: 
+// There is another point:
+// The 'event delivery' and 'return' support.
 
 //#include <kernel.h>  
 #include <newos.h>  

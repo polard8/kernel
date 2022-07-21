@@ -1578,9 +1578,9 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
         panic ("copy_thread_struct: clone rflags_initial_iopl\n");
     }
 
-    if ( clone->rflags_current_iopl != 3 ){
-        panic ("copy_thread_struct: clone rflags_current_iopl\n");
-    }
+    //if ( clone->rflags_current_iopl != 3 ){
+    //    panic ("copy_thread_struct: clone rflags_current_iopl\n");
+    //}
 
 
     clone->saved     = father->saved;          // Saved flag.
