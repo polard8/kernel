@@ -6162,11 +6162,8 @@ FILE *fdopen (int fd, const char *mode)
 }
 
 
-
 /*
- ****************** 
  * freopen:
- * 
  */
 
 /*

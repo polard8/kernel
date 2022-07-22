@@ -1,9 +1,7 @@
-
 /*
  * File: rtl.c 
  * Created by Fred Nora.
  */
-
 
 #include <stdio.h>
 #include <types.h> 
@@ -15,7 +13,6 @@
 #include <rtl/gramado.h> 
 #include <sysdeps/gramado/syscall.h>
 #include <pthread.h>
-
 
 
 unsigned long RTLEventBuffer[32];
@@ -32,11 +29,9 @@ void *gramado_system_call (
     unsigned long d )
 {
     unsigned long __Ret=0;
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x80), "a"(a), "b"(b), "c"(c), "d"(d) );
-
     return (void *) __Ret; 
 }
 
@@ -50,11 +45,9 @@ void *sc80 (
     unsigned long d )
 {
     unsigned long __Ret=0;
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x80), "a"(a), "b"(b), "c"(c), "d"(d) );
-
     return (void *) __Ret; 
 }
 
@@ -68,11 +61,9 @@ void *sc81 (
     unsigned long d )
 {
     unsigned long __Ret=0;
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x81), "a"(a), "b"(b), "c"(c), "d"(d) );
-
     return (void *) __Ret; 
 }
 
@@ -85,11 +76,9 @@ void *sc82 (
     unsigned long d )
 {
     unsigned long __Ret=0;
-
     asm volatile ( " int %1 \n"
                  : "=a"(__Ret)
                  : "i"(0x82), "a"(a), "b"(b), "c"(c), "d"(d) );
-
     return (void *) __Ret; 
 }
 
@@ -556,7 +545,6 @@ rtl_draw_text (
     char *string )
 {
     unsigned long msg[8];
-
 
     if ( (void*) string == NULL ){
         debug_print("rtl_draw_text: string\n");

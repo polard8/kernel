@@ -10,6 +10,9 @@
 #include <stdlib.h>
 #include <rtl/gramado.h>
 
+//Used by creat()
+//#include <fcntl.h>
+
 
 #define __VK_RETURN    0x1C
 #define __VK_TAB       0x0F
@@ -49,7 +52,11 @@ gwsProcedure (
 
     switch (msg){
 
-    // range: 4001~4009 
+
+// Start a client.
+// It's gonna wor only if the is already running.
+// range: 4001~4009 
+
     case __MSG_COMMAND:
         printf("gws.bin: MSG_COMMAND %d \n",long1);
         switch(long1)
@@ -112,6 +119,12 @@ static void initPrompt(void)
     fflush(stdout);
 }
 
+static void do_clear_console(void)
+{
+    // clear the fg console window with a given color
+    ioctl(1,440, 0x0011DD11);
+}
+
 static inline void do_int3(void)
 {
     asm ("int $3");
@@ -135,9 +148,15 @@ static inline void do_hlt(void)
 
 static int initCompareString(void)
 {
+    int ret_val=-1;
+
     char *c;
     c = prompt;
 
+// Generic file support.
+    int fd= -1;
+    FILE *fp;
+ 
     if ( *c == '\0' ){
         goto exit_cmp;
     }
@@ -145,6 +164,26 @@ static int initCompareString(void)
     //LF
     printf("\n");
 
+    if( strncmp(prompt,"t1",2) == 0 )
+    {
+        //creat("saved1.txt",0);
+        //fd = open("saved1.txt",0,0);
+        //close(fd);
+        //fp = fopen("SYSLOG  TXT","r+");
+        //fprintf(fp,"Writing on syslog.txt from ring3.");
+        //close(fp->_file);
+        
+        //ioctl(1,400, 0x00FFDD11); //change virtual console fg color.
+        //ioctl(1,402, 0x0011DD11); //change virtual console bg color.
+        //ioctl(1,440, 0x0011DD11);  // clear console.
+        goto exit_cmp;
+    }
+
+    if( strncmp(prompt,"cls",3) == 0 )
+    {
+        do_clear_console();
+        goto exit_cmp;
+    }
 
     if( strncmp(prompt,"int3",4) == 0 )
     {
@@ -168,6 +207,12 @@ static int initCompareString(void)
     if( strncmp(prompt,"hlt",3) == 0 )
     {
         do_hlt();
+        goto exit_cmp;
+    }
+
+    if( strncmp(prompt,"quit",4) == 0 )
+    {
+        isTimeToQuit=TRUE;
         goto exit_cmp;
     }
 
@@ -213,7 +258,11 @@ static int initCompareString(void)
     if( strncmp(prompt,"wsq",3) == 0 )
     {
         printf ("~WSQ\n");
-        rtl_clone_and_execute("gwssrv2.bin");
+        ret_val = (int) rtl_clone_and_execute("gwssrv2.bin");
+        if (ret_val<=0){
+            printf("Couldn't clone\n");
+        }
+        //printf("pid=%d\n",ret_val);
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
@@ -252,7 +301,6 @@ static int initCompareString(void)
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
-
 
     // ...
 

@@ -1322,8 +1322,8 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-
-
+// #note
+// The is already doing that in the initialization.
     if ( strncmp(prompt,"fpu",3) == 0 )
     {
         printf("Initialize fpu support\n");
@@ -1598,13 +1598,10 @@ done:
 }
 
 
-
 /*
- **************************************************
  * consolePrompt:
  *     Inicializa o prompt.
  */
-
 // Clean prompt buffer.
 // Print the prompt string.
  
@@ -1709,19 +1706,11 @@ console_read (
 }
 
 
-
-
-
-
-
 /*
- *************************** 
  * console_write:
  * 
  */
-
 // Called by sys_write() in sys.c.
-
 // Tem escape sequence
 // console number, buffer, size.
 
@@ -1732,14 +1721,12 @@ console_write (
     const void *buf, 
     size_t count )
 {
-
     // loop
     int i=0;
     
     char ch=0; 
     char *data = (char *) buf;
     size_t StringSize=0;
-
 
 
     //debug_print ("console_write: [test]\n");
@@ -2094,7 +2081,7 @@ fail:
 // #bugbug
 // Isso tá errado.
 
-#define __RESPONSE "\033[?1;2c"
+#define __RESPONSE  "\033[?1;2c"
 
 void __respond (int console_number)
 {
@@ -2353,7 +2340,6 @@ console_ioctl (
         return (int) (-EBADF);
     }
 
-
     // #todo: Check overflow
     if (fg_console<0){
         debug_print ("console_ioctl: [ERROR] fg_console\n");
@@ -2363,12 +2349,35 @@ console_ioctl (
 
     switch (request){
 
-    // #test
-    // Change the color of the char for the current virtual console.
-    // ok. it is working.
-    case 1000:
+    // set fg color.
+    case 400:
         CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg;
-        return 0;  //ok
+        return 0;
+        break;
+    // get fg color.
+    case 401:
+        return (int) CONSOLE_TTYS[fg_console].fg_color;
+        break;
+    // set bg color.
+    case 402:
+        CONSOLE_TTYS[fg_console].bg_color = (unsigned int) arg;
+        return 0;
+        break;
+    // get bg color.
+    case 403:
+        return (int) CONSOLE_TTYS[fg_console].bg_color;
+        break;
+    
+    // clear console.
+    case 440:
+        // IN: color, console number.
+        clear_console( (unsigned int) arg, fg_console );
+        return 0;
+        break;
+
+    //#deprecated.
+    case 1000:
+        return 0;
         break;
 
     // cursor x position

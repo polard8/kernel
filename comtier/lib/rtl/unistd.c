@@ -1346,14 +1346,11 @@ int fdatasync (int fd)
 
 
 /*
- *****************************************
  * close:
  *    SVr4, 4.3BSD, POSIX.1-2001.
  */
-
 // #obs
 // Isso deve fechar o arquivo na lista de arquivo abertos.
-
 // See:
 // https://man7.org/linux/man-pages/man2/close.2.html
 
@@ -1361,17 +1358,17 @@ int close (int fd)
 {
     int value = -1;
 
-
     if (fd<0){
         errno = EBADF;
         return (int) (-1);
     }    
 
-    value = (int) gramado_system_call ( 
-              17, 
-              (unsigned long) fd, 
-              (unsigned long) fd, 
-              (unsigned long) fd );
+    value = 
+        (int) gramado_system_call ( 
+                  17, 
+                  (unsigned long) fd, 
+                  (unsigned long) fd, 
+                  (unsigned long) fd );
 
     if (value<0)
     {
