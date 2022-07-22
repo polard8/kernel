@@ -89,17 +89,20 @@ WS_INCLUDES_LOCAL = .
 #ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 #termios.o ioctl.o fcntl.o    
 
-myObjects = main0.o    
+myObjects = crt0.o main.o    
 
 
 .PHONY: all all-c gws-link finalize clean
 
-all: main.o all-c gws-link finalize clean
+all: crt0.o main.o all-c gws-link finalize clean
 	@echo "Ok?"
+	
+crt0.o:
+	$(CC)  -c  crt0.c  $(user_ccflags) -I . -o crt0.o
 
 main.o:
-	#$(CC)  -c  main.c  $(user_ccflags) -I $(LIBC) -I . -o main.o
-	$(CC)  -c  main0.c  $(user_ccflags) -I . -o main0.o
+	$(CC)  -c  main.c  $(user_ccflags) -I . -o main.o
+
 all-c:
 
 # == imported objects =============================
