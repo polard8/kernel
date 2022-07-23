@@ -192,6 +192,8 @@ presentation-tier:
 	-sudo cp ../gws/bin/BROWSER.BIN   basetier/disk/
 	-sudo cp ../gws/bin/CMDLINE.BIN   basetier/disk/
 
+	-sudo cp ../gws/bin/GDM.BIN     basetier/disk/
+	-sudo cp ../gws/bin/GDM2.BIN    basetier/disk/
 
 # ::Building userland commands.
 	$(Q) $(MAKE) -C prestier/userland/
