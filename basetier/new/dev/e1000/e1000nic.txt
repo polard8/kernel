@@ -1,0 +1,5 @@
+
+
+	This is the code for the Intel e1000 nic controller.
+	This version was for Gramado 32bit running on virtualbox.
+	Now we're gonna port it to Gramado 64bit. 

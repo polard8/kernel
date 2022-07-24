@@ -1,0 +1,5 @@
+	todo:
+
+	use e1000.c as event handler 
+	and create e1000dvr.c as device driver.
+
