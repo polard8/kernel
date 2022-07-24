@@ -78,12 +78,10 @@ typedef void _void;
 
 //#bugbug: precisa encontrar endereços válidos.
 //user mode 1:1
-#define DMA_PHYS_ADDR0 0xa0000
-#define DMA_PHYS_ADDR1 0xb0000
-#define DMA_PHYS_ADDR2 0xb0000
-#define DMA_PHYS_ADDR3 0xb0000 
-
-
+#define DMA_PHYS_ADDR0  0xa0000
+#define DMA_PHYS_ADDR1  0xb0000
+#define DMA_PHYS_ADDR2  0xb0000
+#define DMA_PHYS_ADDR3  0xb0000 
 
 #define PCI_CLASSE_MASS 1
 
@@ -97,7 +95,6 @@ typedef void _void;
 #define PCI_MSG_AVALIABLE   0x80
 #define PCI_MSG_SUCCESSFUL  0
 
-
 // IO Space Legacy BARs IDE. 
 #define ATA_IDE_BAR0 0x1F0  // Primary Command Block Base Address.
 #define ATA_IDE_BAR1 0x3F6  // Primary Control Block Base Address.
@@ -106,11 +103,7 @@ typedef void _void;
 #define ATA_IDE_BAR4 0      // Bus Master Base Address.
 #define ATA_IDE_BAR5 0      // Usado pelo AHCI.
 
-
-
-
 // ATA/ATAPI Command Set.
-
 #define ATA_CMD_CFA_ERASE_SECTORS               0xC0
 #define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE 0x03
 #define ATA_CMD_CHECK_MEDIA_CARD_TYPE           0xD1
@@ -137,15 +130,12 @@ typedef void _void;
 #define ATAPI_CMD_READ  0xA8
 #define ATAPI_CMD_EJECT 0x1B
 
-//ATA bits de status control (alternativo).
+// ATA bits de status control (alternativo).
 #define ATA_SC_HOB  0x80    // High Order Byte.
 #define ATA_SC_SRST 0x04    // Soft Reset.
 #define ATA_SC_nINE 0x02    // INTRQ.
 
-
-
-
-//ATA bits de status. 
+// ATA bits de status. 
 #define ATA_SR_BSY  0x80    // Busy
 #define ATA_SR_DRDY 0x40    // Device Ready
 #define ATA_SR_DF   0x20    // Device Fault
@@ -155,7 +145,7 @@ typedef void _void;
 #define ATA_SR_IDX  0x02    // Index
 #define ATA_SR_ERR  0x01    // Error
 
-//ATA bits de errro após a leitura.
+// ATA bits de errro após a leitura.
 #define ATA_ER_BBK   0x80    // 
 #define ATA_ER_UNC   0x40    //
 #define ATA_ER_MC    0x20    //
@@ -165,7 +155,7 @@ typedef void _void;
 #define ATA_ER_TK0NF 0x02    //
 #define ATA_ER_AMNF  0x01    //
 
-// Registradores. 
+// Registers
 #define ATA_REG_DATA     0x00
 #define ATA_REG_ERROR    0x01
 #define ATA_REG_FEATURES 0x01
@@ -177,26 +167,23 @@ typedef void _void;
 #define ATA_REG_CMD      0x07
 #define ATA_REG_STATUS   0x07
 
+// Devices
+#define ATA_MASTER_DEV  0x00
+#define ATA_SLAVE_DEV   0x01
 
-// Devices.
-#define ATA_MASTER_DEV 0x00
-#define ATA_SLAVE_DEV  0x01
-
-// Bus.
-#define ATA_PRIMARY   0x00
-#define ATA_SECONDARY 0x01
+// Bus
+#define ATA_PRIMARY    0x00
+#define ATA_SECONDARY  0x01
 
 // ATA type.
-#define ATA_DEVICE_TYPE   0x00
-#define ATAPI_DEVICE_TYPE 0x01
+#define ATA_DEVICE_TYPE    0x00
+#define ATAPI_DEVICE_TYPE  0x01
 
 // Modo de transferência.
-#define ATA_PIO_MODO 0 
-#define ATA_DMA_MODO 1
-#define ATA_LBA28    28
-#define ATA_LBA48    48
-
-
+#define ATA_PIO_MODO  0 
+#define ATA_DMA_MODO  1
+#define ATA_LBA28     28
+#define ATA_LBA48     48
 
 /*
  * dev_nport:
@@ -289,7 +276,6 @@ struct ata_pci
 extern struct ata_pci  ata_pci;
 
 
-
 /*
  * ata:
  *     Estrutura para o controle de execução do programa.
@@ -299,7 +285,6 @@ struct ata
 {
     //int used;
     //int magic;
-
     uint8_t  chip_control_type;
     uint8_t  channel;
     uint8_t  dev_type;
@@ -338,7 +323,7 @@ typedef struct st_dev
     struct st_dev *next;
 }st_dev;
 
-typedef struct st_dev st_dev_t;
+typedef struct st_dev  st_dev_t;
 
 
 //
@@ -402,8 +387,7 @@ void ahci_mass_storage_init();
 // PCI support.
 //
 
-
-// PCI READ.
+// Read
 uint32_t 
 diskReadPCIConfigAddr ( 
     int bus, 
@@ -411,8 +395,7 @@ diskReadPCIConfigAddr (
     int fun, 
     int offset );
 
-
-// PCI WRITE.
+// Write
 void 
 diskWritePCIConfigAddr ( 
     int bus, 
@@ -421,8 +404,7 @@ diskWritePCIConfigAddr (
     int offset, 
     int data );
 
-uint32_t diskPCIScanDevice( int class );
-
+uint32_t diskPCIScanDevice(int class);
 
 int 
 diskATAPCIConfigurationSpace ( 
@@ -430,18 +412,10 @@ diskATAPCIConfigurationSpace (
     char dev, 
     char fun );
 
-/*
- * diskATAInitialize:
- *     Inicializa o IDE e mostra informações sobre o disco.
- */
-
+// Inicializa o IDE e mostra informações sobre o disco.
 int diskATAInitialize( int ataflag );
 
-/*
- * diskATADialog:
- *     Rotina de diálogo com o driver ATA.
- */
-
+// Rotina de diálogo com o driver ATA.
 int 
 diskATADialog ( 
     int msg, 
@@ -449,16 +423,7 @@ diskATADialog (
     unsigned long long2 );
 
 int disk_ata_wait_irq();
-
 void show_ide_info();
 
-
 #endif
-
-
-
-
-
-
-
 

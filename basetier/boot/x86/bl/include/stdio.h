@@ -36,11 +36,17 @@
 int printf(const char *format, ...);
 int putchar(int ch);
 static void printchar(char **str, int c);
-static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase);
+static int printi(
+    char **out, 
+    int i, 
+    int b, 
+    int sg, 
+    int width, 
+    int pad, 
+    int letbase );
 static int print(char **out, int *varg);
 static int prints(char **out, const char *string, int width, int pad);
 int sprintf(char *out, const char *format, ...);
-
 int printf_main(void); //teste ...
 
 void scroll(void);
@@ -57,7 +63,6 @@ void my_buffer_char_blt( unsigned long x, unsigned long y, unsigned long color, 
 void carrega_bitmap_16x16( unsigned long ax, unsigned long bx, unsigned long cx, unsigned long dx );
 
 void clear_backbuffer(void);
-
 
 #endif    
 

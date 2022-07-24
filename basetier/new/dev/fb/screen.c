@@ -1,15 +1,12 @@
 
 // screen.c
 
-
 #include <kernel.h>
 
-
-unsigned long gSavedLFB;
-unsigned long gSavedX;
-unsigned long gSavedY;
-unsigned long gSavedBPP;
-
+unsigned long gSavedLFB=0;
+unsigned long gSavedX=0;
+unsigned long gSavedY=0;
+unsigned long gSavedBPP=0;
 
 // Private variables.
 // Display device support.
@@ -44,11 +41,9 @@ unsigned long screen_scanline_va( int scanline )
 
     scanline_va = (unsigned long) ( start + (pitch * scanline) );
 
-// done:
 // É o endereço virtual do início de uma dada linha da tela.
     return (unsigned long) scanline_va;
 }
-
 
 // Get screen width
 unsigned long screenGetWidth (void)
@@ -56,20 +51,17 @@ unsigned long screenGetWidth (void)
     return (unsigned long) screen_width;
 }
 
-
 // Get screen height
 unsigned long screenGetHeight (void)
 {
     return (unsigned long) screen_height;
 }
 
-
 // Get screen bpp
 unsigned long screenGetBPP (void)
 {
     return (unsigned long) screen_bpp;
 }
-
 
 // Get screen pitch
 unsigned long screenGetPitch (void)
@@ -90,14 +82,12 @@ void screenSetSize( unsigned long width, unsigned long height )
 
 
 /*
- *********************************************************
  * fb_refresh_screen:
  *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
  *     Ok, isso está no lugar certo. Pois somente
  *  O driver de vídeo pode acessar o LFB
  *  /x/video/screen.c 
  */
-
 // backup.
 // This is working very well.
 // Copying long by long.
@@ -114,22 +104,18 @@ void screenSetSize( unsigned long width, unsigned long height )
 // Como temos apenas 2MB de lfb mapeados, 
 // então vamos copiar menos dados pra evitar ultrapassar o limite
 // e causar PF.
-
 // #todo
 // We can also use 16 bytes ... SSE?
 
 void fb_refresh_screen (unsigned long flags)
 {
     int i=0;
-
 // Char. The slow way.
     unsigned char *backbuffer  = (unsigned char *) BACKBUFFER_VA;
     unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_VA;
-
 // Long. The fast way.
     unsigned long *backbuffer_long  = (unsigned long *) BACKBUFFER_VA;
     unsigned long *frontbuffer_long = (unsigned long *) FRONTBUFFER_VA;
-
 
 // We can't refresh.
 // The buffer wasn't validated.
@@ -154,7 +140,9 @@ void fb_refresh_screen (unsigned long flags)
 // Essa tecnica pode ser uma opçao configuravel
 
     //int Total = (int)(gSavedX*gSavedBPP*gSavedY);
-    int Total = (screen_size_in_kb * 1024);
+    int Total = 
+        (int) (screen_size_in_kb * 1024);
+
 
 /*
 // nao pode ser mais que 2mb
@@ -169,10 +157,10 @@ void fb_refresh_screen (unsigned long flags)
 // para debug na inicializaçao.
 // entao vamos limitar o tamanho do refresh screen
 // isso ajuda no refresh screen, mas nao em outras rotinas graficas.
-    if( g_use_fake_screen_size == TRUE)
+    if ( g_use_fake_screen_size == TRUE)
     {
         //fake_screen_size_in_kb = (( 320*4*200 )/1024);
-        Total = (fake_screen_size_in_kb * 1024);
+        Total = (int) (fake_screen_size_in_kb * 1024);
     }
 
 // nao pode ser mais que 2mb
@@ -195,7 +183,7 @@ void fb_refresh_screen (unsigned long flags)
     int FastTotal=0;
     if ( (Total % 8) == 0 )
     {
-        FastTotal = (Total >> 3);
+        FastTotal = (int) (Total >> 3);
         for ( i=0; i<FastTotal; i++ ){
             frontbuffer_long[i] = backbuffer_long[i];
         };
@@ -204,7 +192,6 @@ void fb_refresh_screen (unsigned long flags)
 
 // Slow way.
 // One byte per time.
-
     for ( i=0; i<Total; i++ ){
         frontbuffer[i] = backbuffer[i];
     };
@@ -218,22 +205,17 @@ void refresh_screen (void)
     fb_refresh_screen(0);
 }
 
-
 // The whole screen is dirty.
 // It can be flushed into the framebuffer.
-
 void invalidate_screen(void)
 {
     screen_is_dirty = TRUE;
 }
 
-
 /*
- **********************************************
  * screenInit:
  *     Inicializando o gerenciamento de tela.
  */ 
-
 // #bugbug
 // Screen is a reagion in the display, or in many displays.
 // Display is a monitor, or a set o hid in a given host.
@@ -244,15 +226,13 @@ int screenInit(void)
 
 // Validate the whole screen
 // We don't need to flush the screen yet.
-
     screen_is_dirty = FALSE;
 
 // Configura globais com base nos valores passados pelo Boot Loader.
-
     screenSetSize( 
         (unsigned long) gSavedX, 
         (unsigned long) gSavedY );
-    
+
     screen_bpp = gSavedBPP;
     screen_pitch = ( gSavedBPP * gSavedX );
 
@@ -266,13 +246,12 @@ int screenInit(void)
         panic("screenInit: Screen\n");
     }
 
-    Screen->id = 0;  //??
+    Screen->id = 0;  //?
 
     Screen->left   = (unsigned long) SCREEN_DEFAULT_LEFT;
     Screen->top    = (unsigned long) SCREEN_DEFAULT_TOP; 
     Screen->width  = (unsigned long) screenGetWidth();
     Screen->height = (unsigned long) screenGetHeight();
-
 
     if( Screen->width == 0 || Screen->height == 0 )
     {
@@ -286,8 +265,7 @@ int screenInit(void)
     Screen->used = TRUE;
     Screen->magic = 1234;
 
-// Salvando o ponteiro da estrutura. 
-
+// Salvando o ponteiro da estrutura.
     ScreenInfo    = (void *) Screen;
     CurrentScreen = (void *) Screen;
 

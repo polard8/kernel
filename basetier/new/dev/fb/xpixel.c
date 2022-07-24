@@ -25,7 +25,6 @@
  * IN: 
  *     color, x, y, rop_flags
  */
-
 // #todo
 // + Change the names of these parameters.
 // + Create a parameter for the address of the buffer.
@@ -53,12 +52,9 @@ putpixel0 (
     r = (Color & 0xFF0000) >> 16;
     a = (Color >> 24) + 1;
 
-
 // Positions
     int x = (int) (_x & 0xFFFF);
     int y = (int) (_y & 0xFFFF);
-
-
 
 // 3 = 24 bpp
 // 2 = 16 bpp
@@ -66,9 +62,7 @@ putpixel0 (
 
     int bytes_count=0;
 
-
 // Buffer address validation.
-
     if(buffer_va == 0){
         panic("putpixel0: buffer_va\n");
     }
@@ -106,7 +100,6 @@ putpixel0 (
     
     width = (int) (width & 0xFFFF);
 
-
     int offset=0;
     //int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 
@@ -116,12 +109,10 @@ putpixel0 (
     if (bytes_count==4){
         offset = (int) ( ((width<<2)*y) + (x<<2) );
     }
-
 // 24bpp
     if (bytes_count==3){
         offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
     }
-
 // 16bpp
     //if (bytes_count==2){
     //    offset = (int) ( ((width<<1)*y) + (x<<1) );
@@ -140,7 +131,6 @@ putpixel0 (
     g2 = where[offset +1];
     r2 = where[offset +2];
     if ( gSavedBPP == 32 ){ a2 = where[offset +3]; };
-
 
 // A cor transformada.
 // A cor a ser gravada.
@@ -278,7 +268,6 @@ backbuffer_putpixel (
     unsigned long _y, 
     unsigned long _rop_flags )
 {
-
 // Putpixel at the given buffer address.
     putpixel0(
         _color,
@@ -289,7 +278,6 @@ backbuffer_putpixel (
 }
 
 
-// #todo: Not tested yet.
 void 
 frontbuffer_putpixel ( 
     unsigned int  _color,
@@ -297,7 +285,6 @@ frontbuffer_putpixel (
     unsigned long _y, 
     unsigned long _rop_flags )
 {
-
 // Putpixel at the given buffer address.
     putpixel0(
         _color,
@@ -306,16 +293,4 @@ frontbuffer_putpixel (
         _rop_flags,
         FRONTBUFFER_VA );
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

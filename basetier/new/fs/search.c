@@ -36,38 +36,29 @@ search_in_dir (
     const char *file_name, 
     unsigned long dir_address )
 {
-
     int Status = -1;
-
 // Deslocamento do dir.
     unsigned long i=0;
 // Deslocamento no nome.
     unsigned long j=0;
-
 // Número máximo de entradas no diretório.
 // #todo: O número de entradas poderia ser passado via argumento.
     unsigned long NumberOfEntries = 512;
-
 // name.
     char NameX[13];
-
 // Buffer for copying the name.
     char NameBuffer[13];
-
 // Buffer.
 // #importante: 
 // O endereço do diretório foi passado via argumento.
 // #todo:
 // Podemos checar a validade desse ponteiro.
-
     char *dir = (char *) dir_address;
-
 // #bugbug
 // Vamos checar o tamanho da string
 // Me parece que quando um nome tem extensão
 // com menos de três letras, então as últimas 
 // letras etão com '0' e não espaços.
-
     size_t stringSize=0;
 
 
@@ -216,7 +207,6 @@ fail:
 
 int search_in_root ( const char *file_name )
 {
-
     if ( (void*) file_name == NULL ){
         debug_print ("search_in_root: [ERROR] file_name\n");
         return -1;
@@ -305,13 +295,10 @@ findEmptyDirectoryEntry (
     int j=0;
     unsigned char *dir = (unsigned char *) dir_address;
 
-
     if ( dir_address == 0 )     { goto fail; }
     if ( number_of_entries < 0 ){ goto fail; }
 
-
-    // The entry size is 32 bytes.
-
+// The entry size is 32 bytes.
     for ( i=0; i<number_of_entries; i++ )
     {
         if ( dir[j] == 0 ){ return (int) i; }

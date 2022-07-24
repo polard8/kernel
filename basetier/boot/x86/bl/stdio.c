@@ -17,6 +17,7 @@ extern unsigned long SavedX;
 extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
 
+// from assembly i guess.
 extern void my_buffer_load_bitmap_16x16();
 
 
@@ -45,36 +46,43 @@ static void _outbyte (int c)
     char ch = (char) c;
     char ch_atributo = (char) g_char_attrib;
 
-
-// Caso estivermos em modo gráfico.
-    if (VideoBlock.useGui == 1)
+// We are in graphics mode. 
+    if (VideoBlock.useGui == TRUE)
     {
         //vsync();
 
-        switch (VideoBlock.vesaMode)
-        {
-		    //@todo: Listar aqui os modos VESA.
-		    case 1:
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
-			    break;
-				
-		    default:
-			    //modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
-			    my_buffer_char_blt( 8*g_cursor_x, 8*g_cursor_y, COLOR_WHITE, c);
-			    break;
+        // #todo: 
+        // Listar aqui os modos VESA?
+        switch (VideoBlock.vesaMode){
+        case 1:
+            my_buffer_char_blt( 
+                (8*g_cursor_x), 
+                (8*g_cursor_y), 
+                COLOR_WHITE, 
+                c );
+            break;
+        // ...
+        // modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
+        default:
+            my_buffer_char_blt( 
+                (8*g_cursor_x), 
+                (8*g_cursor_y), 
+                COLOR_WHITE, 
+                c );
+            break;
         };
         return;
     }
 
-// Caso estivermos em text mode.
-    if (VideoBlock.useGui == 0)
+// We are not in graphics mode.
+    if (VideoBlock.useGui == FALSE)
     {
-        //calcula o valor do deslocamento para text mode 80x25.
+        // Calcula o valor do deslocamento para text mode 80x25.
         y = (unsigned long) (g_cursor_y *80 *2);
         x = (unsigned long) (g_cursor_x *2);
         i = (unsigned long) (y + x);
         
-		//envia o caractere.
+        // Envia o caractere.
         vm[i+0] = ch;             //char.
         vm[i+1] = ch_atributo;    //atributo (foreground,background).
     }
@@ -86,9 +94,7 @@ static void _outbyte (int c)
 
 static void outbyte (int c)
 {
-    // Copy.
-    register int Ch=c;
-
+    register int Ch=c;      // Copy
     static char prev = 0;
 
 // Sendo menor que espaço, não pode ser 'tab,return,back...)    
@@ -107,7 +113,7 @@ static void outbyte (int c)
 // Volta ao início da linha.
     if ( Ch == '\r' )
     {
-        g_cursor_x = 0; //volta ao inicio da linha
+        g_cursor_x = 0;
         prev = Ch;
         return;    
     }
@@ -115,8 +121,8 @@ static void outbyte (int c)
 // Vai pra próxima linha e volta ao inicio da linha.    
     if ( Ch == '\n' && prev != '\r' )
     {
-        g_cursor_y++;      // proxima linha
-        g_cursor_x = 0;    // inicio da linha 
+        g_cursor_y++;
+        g_cursor_x = 0; 
         prev = Ch;
         return;
     }
@@ -184,7 +190,6 @@ static void outbyte (int c)
 }
 
 
-// =====================
 // panic:
 // Message support for fatal error.
 
@@ -208,17 +213,15 @@ void panic (const char *msg)
  
 void scroll (void)
 {
-
     //loop
     register unsigned short i=0;
     register unsigned short j=0;
-
     // inicio da tela
     unsigned short *p1 = (unsigned short *) ScreenStart;
     // inicio da segunda linha
     unsigned short *p2 = (unsigned short *) (ScreenStart + 2 * SCREEN_WIDTH) ;
 
-    
+
     // 24 vezes
     for (i=0; i < ROWS - 1; i++)
     {
@@ -325,9 +328,7 @@ static int prints (
     int width, 
     int pad )
 {
-
     register int pc = 0, padchar = ' ';
-
 
     if (width > 0) 
     {
@@ -349,13 +350,11 @@ static int prints (
 		};
     }
 
-
 	for ( ; *string ; ++string )
 	{
 		printchar (out, *string);
 		++pc;
 	};
-
 
 	for ( ; width > 0; --width )
 	{
@@ -363,9 +362,8 @@ static int prints (
 		++pc;
 	};
 
-
     //Nothing.
-
+    
 done:
     return pc;
 }
@@ -403,38 +401,37 @@ static int printi (
         return prints (out, print_buf, width, pad);
     }
 
+    if ( sg && 
+         b == 10 && 
+         i < 0 )
+    {
+        neg = 1;
+        u = -i;
+    }
 
-	if (sg && b == 10 && i < 0)
-	{
-		neg = 1;
-		u = -i;
-	};
+    s = print_buf + PRINT_BUF_LEN-1;
 
+    *s = '\0';
 
-	s = print_buf + PRINT_BUF_LEN-1;
-	*s = '\0';
+    while (u) 
+    {
+        t = u % b;
 
-	while (u) 
-	{
-		t = u % b;
-		
-		if ( t >= 10 )
-		    t += letbase - '0' - 10;
-		    *--s = t + '0';
-		    u /= b;
-	};
-
+        if ( t >= 10 )
+            t += letbase - '0' - 10;
+        *--s = t + '0';
+        u /= b;
+    };
 
     if (neg) 
     {
-		if ( width && (pad & PAD_ZERO) ) 
-		{
-		    printchar (out, '-');
-			++pc;
-			--width;
-		}else{
-			*--s = '-';
-		};
+        if ( width && (pad & PAD_ZERO) ){
+            printchar (out, '-');
+            ++pc;
+            --width;
+        }else{
+            *--s = '-';
+        };
     }
 
 done:
@@ -449,15 +446,13 @@ done:
 
 static int print (char **out, int *varg)
 {
+    register int width, pad;
+    register int pc = 0;
+    register char *format = (char *)(*varg++);
+    char scr[2];
 
-	register int width, pad;
-	register int pc = 0;
-	register char *format = (char *)(*varg++);
-	char scr[2];
-
-
-	for (; *format != 0; ++format) 
-	{
+    for (; *format != 0; ++format) 
+    {
 		if (*format == '%') 
 		{
 			++format;
@@ -525,7 +520,7 @@ static int print (char **out, int *varg)
                 printchar (out, *format);
                  ++pc;
         };
-	};
+    };
 
     if (out){ 
         **out = '\0'; 
@@ -601,7 +596,6 @@ static void printchar (char **str, int c)
 int putchar (int ch)
 {
     outbyte (ch);
-
     return ch; 
 }
 
@@ -777,7 +771,6 @@ my_buffer_horizontal_line (
     unsigned long x2, 
     unsigned long color )
 {
-
     while (x1 < x2)
     {
         my_buffer_put_pixel ( color, x1, y, 0 );

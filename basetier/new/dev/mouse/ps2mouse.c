@@ -859,11 +859,9 @@ void zzz_mouse_write(unsigned char data)
 
 
 /*
- **************************************
  * zzz_mouse_read:
  *     Pega um byte na porta 0x60.
  */
-
 unsigned char zzz_mouse_read (void)
 {
     unsigned char Value=0;
@@ -879,7 +877,6 @@ unsigned char zzz_mouse_read (void)
     debug_print ("zzz_mouse_read: Done\n");
     return (unsigned char) Value;
 }
-
 
 
 void mouse_expect_ack (void)

@@ -2645,13 +2645,10 @@ int fs_initialize_dev_dir(void)
     return 0;
 }
 
-
 // fsInit:
 // Called by init() in init.c
 int fsInit (void)
 {
-    //#todo
-
     int slot = -1;
 
     debug_print ("fsInit: [TODO]\n");
@@ -2659,18 +2656,12 @@ int fsInit (void)
 // Undefined fs!
     set_filesystem_type(FS_TYPE_NULL);
 
-
-//
 // Initialize fat16 support for the system's volume.
-//
-
 // #todo: 
 // Devemos checar o tipo da partiçao de boot. 
 // Se nao aqui, depois!
 
-    // #todo
     fat16Init();
-
 
 // Init dev/ dir.
     fs_initialize_dev_dir();
@@ -2840,7 +2831,6 @@ int fsInit (void)
 // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
 
-// done:
     debug_print ("fsInit: done\n");
     return 0;
 }

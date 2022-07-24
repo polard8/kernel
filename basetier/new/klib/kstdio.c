@@ -53,16 +53,13 @@ int sys_setup_stdin( int stdin_fd )
 
 // The new stdin.
     stdin = (file *) f;
-
 // Permission for writing.
     stdin->sync.can_write = TRUE;
-
 // flags
     stdin->_flags |= __SWR;
 
 // ok, we have a new stdin.
 // this way the keyboard can put the bytes into this new file.
-
     return TRUE;
 }
 

@@ -11,19 +11,15 @@
 #ifndef __IDE_H
 #define __IDE_H    1
 
-
 // IDE ports.
-
 extern int g_current_ide_channel;
 extern int g_current_ide_device;
-
 
 
 // 0 primary master 
 // 1 primary slave 
 // 2 secondary master 
 // 3 secondary slave.
-
 typedef enum {
 
     ideportsPrimaryMaster,      // 0
@@ -33,7 +29,6 @@ typedef enum {
 
 }ide_ports_t;
 
-
 typedef enum {
 
     idetypesPrimaryMaster,      // 0
@@ -42,7 +37,6 @@ typedef enum {
     idetypesSecondarySlave      // 3
 
 }ide_types_t;
-
 
 typedef enum {
 
@@ -54,26 +48,17 @@ typedef enum {
 }ide_device_types_t;
 
 
-//
 // IDE ports support
-//
-
 struct ide_ports_d 
 {
     uint8_t id;
-
     int used;
     int magic;
-
     // PATA, SATA, PATAPI, SATAPI
     int type;
-
     unsigned short base_port;
-
     char *name;
-
     //...
-
     // Dá pra colocar aqui mais informações sobre 
     // o dispositivo conectado a porta.
     // podemos usar ponteiros para estruturas.
@@ -83,38 +68,28 @@ struct ide_ports_d
 extern struct ide_ports_d  ide_ports[4];
 
 
-
-
 #define IDE_ATA    0
 #define IDE_ATAPI  1
 
 #define ATA_MASTER  0
 #define ATA_SLAVE   1 
 
-
 //#define HDD1_IRQ 14 
 //#define HDD2_IRQ 15 
-
 
 #define IDE_CMD_READ    0x20
 #define IDE_CMD_WRITE   0x30
 #define IDE_CMD_RDMUL   0xC4
 #define IDE_CMD_WRMUL   0xC5
 
+extern unsigned long ide_handler_address; 
 
-
-extern unsigned long ide_handler_address;
- 
-
-// estrutura para canais da controladora IDE. 
-
+// Estrutura para canais da controladora IDE. 
 struct ide_channel_d
 {
     int id;
-
     int used;
     int magic;
-
     char name[8];
 
     // Cada canal vai ter uma porta diferente.
@@ -124,9 +99,7 @@ struct ide_channel_d
     unsigned char interrupt_number;
 
 	//@todo: lock stuff.
-	
 	//@todo: semaphore
-	
 	//...
 };
 
@@ -135,42 +108,28 @@ typedef struct ide_channel_d ide_channel_t;
 extern struct ide_channel_d  idechannelList[8];
 
 
-
-
-
-// estrutura para discos controlados pela controladora ide.
-
+// Estrutura para discos controlados pela controladora ide.
 struct ide_disk_d
 {
-	//id do disco ide.
-	int id;
-	
-	int used;
-	int magic;
-	
-	char name[8];
-    
-    unsigned short Type;        // 0: ATA, 1:ATAPI.	
-	
-	//O canal usado pelo disco.
-	//pode ser 0 ou 1, master ou slave.
-	//ou outroscanais.
-	struct ide_channel_d *channel; 
+    int id;    // id do disco ide.
+    int used;
+    int magic;
+    char name[8];         // #todo: bigger.
+    unsigned short Type;  // 0: ATA | 1:ATAPI.
 
-    //@todo: estrutura para partições.
+// O canal usado pelo disco.
+// pode ser 0 ou 1, master ou slave ou outroscanais.
+    struct ide_channel_d *channel; 
 
-    //
-	// Podemos ter muitos elementos aqui.
-	//
-	
+// #todo: estrutura para partições.
+// Podemos ter muitos elementos aqui.
 };
 
-typedef struct ide_disk_d ide_disk_t;
+typedef struct ide_disk_d  ide_disk_t;
  
  
 /*
  * ide_d:
- *
  * #IMPORTANTE
  * Estrutura para configurar a interface IDE. 
  * Essa será a estrutura raiz para gerenciamento do controlador de IDE.
@@ -182,7 +141,6 @@ struct ide_d
     // sobre o dispositivo controlador de ide.	
 
     int current_port;
-
     struct ide_ports_d *primary_master; 
     struct ide_ports_d *primary_slave; 
     struct ide_ports_d *secondary_master; 
@@ -195,8 +153,6 @@ typedef struct ide_d ide_t;
 extern struct ide_d  IDE;
 
 
-
-
 struct hdd_d
 {
 	//...
@@ -204,33 +160,23 @@ struct hdd_d
 	//unsigned long hdd_handler_address;
 };
 
-typedef struct hdd_d hdd_t;
-//hdd_t *Hdd;
+typedef struct hdd_d  hdd_t;
  
 
-// prototypes =================================
-
 //
-// lba
+// Prototypes =================================
 //
 
-// white lba on ide device.
-void 
-write_lba( 
-    unsigned long address, 
-    unsigned long lba );
-
-// read lba on ide device.
-void 
-read_lba ( 
-    unsigned long address, 
-    unsigned long lba );
-
-
 //
-// read or write a sector using PIO mode.
+// lba support.
 //
 
+// White lba on ide device.
+void write_lba( unsigned long address, unsigned long lba );
+// Read lba on ide device.
+void read_lba ( unsigned long address, unsigned long lba );
+
+// Read or write a sector using PIO mode.
 int 
 pio_rw_sector ( 
     unsigned long buffer, 
@@ -238,7 +184,6 @@ pio_rw_sector (
     int rw, 
     int port,
     int slave ); 
-
 
 void 
 my_read_hd_sector ( 
@@ -254,17 +199,9 @@ my_write_hd_sector (
     unsigned long cx, 
     unsigned long dx ); 
 
-
-/* 
- * init_hdd:
- *     Inicializa o módulo.
- */
-
 int init_hdd(void);
 
-
 #endif    
-
 
 
 //

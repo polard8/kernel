@@ -1,10 +1,16 @@
 
-/*
- * Boot Loader Heap support.
- */
+// heap.h
+// Heap support for x86 bootloader.
 
 #ifndef __HEAP_H
 #define __HEAP_H    1
+
+extern unsigned long heapCount;         //Conta os heaps do sistema.
+extern unsigned long bl_heap_start;     //Start.
+extern unsigned long bl_heap_end;       //End.
+extern unsigned long g_heap_pointer;    //Pointer.
+extern unsigned long g_available_heap;  //Available.
+extern unsigned long mmblockCount;      //Conta os blocos de memória dentro de um heap. 
 
 
 //@todo: diminuir
@@ -16,28 +22,16 @@
 #define BL_HEAP_END    (0x012FFFF0 - 0x8000)     // ??? stack start - stack size
 
 #define BL_HEAP_SIZE   ( BL_HEAP_END - BL_HEAP_START)
-
-
-
-extern unsigned long heapCount;         //Conta os heaps do sistema.
-extern unsigned long bl_heap_start;     //Start.
-extern unsigned long bl_heap_end;       //End.
-extern unsigned long g_heap_pointer;    //Pointer.
-extern unsigned long g_available_heap;  //Available.
-extern unsigned long mmblockCount;      //Conta os blocos de memória dentro de um heap. 
-
-
-
-#define MMBLOCK_COUNT_MAX    256    //Contagem de mmblock. 
-//Isso é usado pelo heap.
-#define MMBLOCK_HEADER_SIZE 64 
+// Contagem de mmblock.
+#define MMBLOCK_COUNT_MAX    256 
+// Isso é usado pelo heap.
+#define MMBLOCK_HEADER_SIZE  64 
 
 //fake process struct
 struct process_d 
 {
    int dummy;
 };
-
 
 
 /*

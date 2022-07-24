@@ -11,11 +11,9 @@
 // == private functions: prototypes ================
 //
 
-
 static void keyboard_init_lock_keys(void);
 static void keyboard_init_modifier_keys(void);
 // ...
-
 
 // =========================
 
@@ -117,7 +115,6 @@ void ps2kbd_initialize_device (void)
  * do evento de input. Para que o kernel acorde as trheads que estão esperando 
  * por eventos desse tipo.
  */
-
 // #importante:
 // Provavelmente uma interrupção irá fazer esse trabalho de 
 // enviar o scancode para o kernel para que ele coloque na fila.
@@ -132,11 +129,14 @@ void ps2kbd_initialize_device (void)
 
 void DeviceInterface_PS2Keyboard(void)
 {
-    // Usado nos testes
-    struct process_d *p;
+    unsigned char __raw = 0;
+    unsigned char val = 0;
 
     static int __has_e0_prefix = 0;
     static int __has_e1_prefix = 0;
+
+    // Usado nos testes
+    struct process_d *p;
 
 // =============================================
 // #test
@@ -169,11 +169,7 @@ void DeviceInterface_PS2Keyboard(void)
 // Não precisamos perguntar para o controlador se
 // podemos ler, porque foi uma interrupção que nos trouxe aqui.
 // #obs:
-// O byte pode ser uma resposta à um comando ou 
-// um scancode.
-
-    unsigned char __raw = 0;
-    unsigned char val   = 0;
+// O byte pode ser uma resposta à um comando ou um scancode.
 
 sc_again:
 

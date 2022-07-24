@@ -1,5 +1,5 @@
 
-// kgws.c
+// kgwm.c
 // Events and wm inside the kernel.
 
 #include <kernel.h> 
@@ -200,14 +200,6 @@ VK_F22,	 //133
 VK_F23,	 //134
 VK_F24,	 //135
 };
-
-
-
-
-
-
-
-
 
 
 /*
@@ -491,30 +483,16 @@ STP|L,
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
 //
-// Prototypes
+// Prototypes ===========================================
 //
 
-
-// See: kgwm.c
 static int 
 wmProcedure ( 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-
 
 static void __launch_app_via_initprocess(int index);
 static void __enter_embedded_shell(int kernel_in_debug_mode);
@@ -531,9 +509,7 @@ wmRegisterWSCallbacks(
     unsigned long callback1,
     unsigned long callback2 )
 {
-
     printf("wmRegisterWSCallbacks:\n");
-
 
     gUseWMCallbacks = TRUE;
 

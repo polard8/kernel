@@ -20,7 +20,6 @@ void backgroundDraw (unsigned int color)
     }
 
 // Draw a rectangle into the backbuffer.
-
     backbuffer_draw_rectangle( 
         0, 0, deviceWidth, deviceHeight, 
         color,
@@ -46,11 +45,9 @@ void backgroundDraw (unsigned int color)
     set_up_cursor(0,0);
 }
 
-
 // Called by kernel_main().
 int Background_initialize(void)
 {
-    // printf ("Background_initialize: TODO\n");
     backgroundDraw ( (unsigned int) COLOR_BLACK );
     return 0;
 }

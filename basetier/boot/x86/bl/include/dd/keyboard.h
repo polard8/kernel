@@ -26,7 +26,6 @@
 
 #define OBF  0x01    //Output Buffer Flag.
 
-
 #define	L		0x01    // Locking function.
 #define	SHF		0x02	// Keyboard shift.
 #define	ALT		0x04	// Alternate shift -- alternate chars.
@@ -36,8 +35,7 @@
 #define	ASCII	0x40	// ascii code for this key.
 #define	STP		0x80	// Stop output.
 
-
-//Teclas.
+// Keys
 #define KEY_TAB	     9
 #define KEY_RETURN  13
 #define KEY_SHIFT	16
@@ -54,8 +52,7 @@
 #define KEY_MOUSEBUTTON3   5000
 #define KEY_F4             6000
 
-
-//Teclas.
+// Virtual keys.
 #define VK_LBUTTON	1
 #define VK_RBUTTON	2
 #define VK_CANCEL	3
@@ -194,13 +191,10 @@
 #define VK_TAB    5
 #define VK_WINKEY 6
 
- 
-//botões.
+// Buttons.
 #define BN_CLICKED  200
 
-
-//mensagens. 
-//@todo: Algumas mensagens não são necessárias para o bootloader.
+// Messages.
 #define WM_SYSKEYUP       3000
 #define WM_KEYDOWN        3001
 #define WM_DESTROY        3002
@@ -209,8 +203,7 @@
 #define WM_PAINT          3005
 #define WM_SIZE           3006
 
-//mensagens de janela
-//@todo: Mensagens de janela não são necessárias para o bootloader.
+// Messages.
 #define MSG_CLOSE         4001
 #define MSG_DESTROY       4002
 #define MSG_SYSKEYDOWN    4003
@@ -223,17 +216,13 @@
 #define MSG_CREATE        4010
 #define MSG_VISIVEL       4011
 
-
-
 // keyboard queue
 extern int keyboard_queue_tail;
 extern int keyboard_queue_head;
 extern char keyboard_queue[8];
 
-
 //avisa que uma tecla foi digitada.
 extern int keyboard_flag;
-
 
 //
 // Prototypes ==========================================
@@ -243,9 +232,7 @@ char keyboad_get_char(void);
 char keyboard_wait_key(void);
 void keyboardHandler(void);
 
-
-#endif    
-
+#endif
 
 //
 // End.

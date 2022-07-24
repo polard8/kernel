@@ -50,27 +50,19 @@ extern int g_fat16_root_status;
 extern int g_fat16_fat_status;
 
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
-
 extern int g_file_system_type;
-
 
 // Buffer para salvar uma entrada de diretorio.
 // @todo: Tamanho da entrada? Desperdicio?
-
 extern char buffer_dir_entry[512];
-
 
 // Lista de clusters em um arquivo.
 // @todo: Tamanho de arquivos?
-
 extern unsigned short file_cluster_list[1024];
-
-
 
 /*
  * partition_table_d:
  *     Structure for partition table.
- *   
  * @todo:    
  *     Na verdade essa � uma estrutura para um entrada na tabela de 
  * parti��es do MBR.
@@ -89,15 +81,13 @@ struct partition_table_d
 extern struct partition_table_d  partition;
 
 
-
-
-// prototypes =============================================
-
+//
+// Prototypes ========================
+//
 
 //
 // File System initialization support.
 //
-
 
 int fsInit();
 void fsInitStructures();
@@ -106,7 +96,6 @@ void fsInitFat();
 //
 //  Cluster and LBA support. (Disc parameters)
 //
-
 
 unsigned long 
 fatClustToSect ( 
@@ -127,8 +116,6 @@ fatLoadCluster (
 
 int elfLoadKernelImage (const char *file_name);
 
-
-
 //
 // File support.
 //
@@ -141,9 +128,9 @@ fsLoadFile (
 
 unsigned long path_count (unsigned char *path);
 
-//esse � o endere�o do arquivo, que � o �ltimo n�vel do path.
+// Esse é o endereço do arquivo, 
+// que é o último nível do path.
 int load_path ( unsigned char *path, unsigned long address );
-
 
 unsigned long fsSearchFile(unsigned char *name);
 
@@ -165,22 +152,18 @@ unsigned long fsCreateFile( char *name, unsigned long id);
 
 //int fs_search_file(unsigned char *file_name);
 
-
 //
 // FAT support.
 //
 
 int fsCheckFat();
 void fsClearFat();
-
-
 void fs_load_fatEx();
 void fs_test_fat_vector();
 unsigned long fs_find_n_empty_entries(unsigned long n);
 unsigned long fs_get_fat_entry(unsigned long n);
 void fs_set_fat_entry(unsigned long n, unsigned long value);
 void fs_put_list_on_fat();
-
 
 //@todo: FAT ou ROOT DIR ?  
 unsigned long fs_find_not_empty_entry();
@@ -234,13 +217,11 @@ void fs_delete_entry(unsigned long id, unsigned long eid);
 unsigned long fs_makeboot();
 void fs_init_bootfile_struct();
 
-
 //
 // Install support.
 //
 
 void fs_install();
-
 
 //
 // Configuration support.
@@ -249,7 +230,6 @@ void fs_install();
 void fs_set_structures();
 void fs_save_structure();
 void fs_format();
-
 
 #endif    
 

@@ -9,11 +9,9 @@
 #ifndef ____CPUID_H
 #define ____CPUID_H    1
 
-
 //cpuid.
 #define cpuid( in, a, b, c, d)\
     asm ("cpuid": "=a" (a), "=b" (b), "=c" (c), "=d" (d) : "a" (in));
-
 
 // Vendor Strings. 
 #define CPUID_VENDOR_INTEL         "GenuineIntel"  // Intel.
@@ -30,7 +28,6 @@
 #define CPUID_VENDOR_NSC           "Geode by NSC"
 #define CPUID_VENDOR_RISE          "RiseRiseRise"
 //...
-
 
 //Intel.
 #define CPUID_VENDOR_INTEL_1  0x756e6547    //"Genu" 
@@ -185,9 +182,6 @@ enum {
 #define  CPUID_FEAT_EDX_TM1          (1 << 29)
 #define  CPUID_FEAT_EDX_IA64         (1 << 30)
 #define  CPUID_FEAT_EDX_PBE          (1 << 31)
-
-
-
 
 #endif    // ____CPUID_H 
 

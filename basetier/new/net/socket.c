@@ -7,14 +7,13 @@
 #include <kernel.h>  
 
 // Internal
-#define SYS_SOCKET_IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+#define SYS_SOCKET_IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
 // A small list of PIDs.
 // A server can register its PID here
 // telling the system that it is responsible for this kind of service.
 
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
-
 
 
 /*
@@ -28,7 +27,6 @@ struct socket_d *create_socket_object(void)
 {
     struct socket_d  *s;
     int i=0;
-
 
     s = (void *) kmalloc ( sizeof( struct socket_d ) );
     if ( (void *) s ==  NULL )
@@ -220,7 +218,7 @@ void show_socket_for_a_process (pid_t pid){
     };
 
 //
-// Show !!
+// Show
 //
       
     // sockaddr structure.  
@@ -231,7 +229,6 @@ void show_socket_for_a_process (pid_t pid){
     //printf ("",s->);
 
 //done:
-
     refresh_screen();
     return;
 
@@ -393,9 +390,7 @@ socket_gramado (
     _file->sync.lock = FALSE;
 
 // flags
-
     _file->_flags = __SWR;
-
 // No name for now.
     _file->_tmpfname = NULL;
         //_file->_tmpfname = "socket";
@@ -418,9 +413,7 @@ socket_gramado (
 // Status do buffer do socket.
     _file->socket_buffer_full = 0;  
 
-
 // Socket pointer
-
     _file->socket = sock;
 
 // O arquivo do soquete, o buffer ?
@@ -437,9 +430,7 @@ socket_gramado (
 
     _file->_file = __slot;
 
-
 // Colocando na lista de arquivos abertos no processo.
-
     Process->Objects[__slot] = (unsigned long) _file;
 
     _file->used  = TRUE;
@@ -481,12 +472,12 @@ socket_inet (
 
 
     if ( (void*) sock == NULL ){
-        debug_print ("socket_unix: [FAIL] sock\n");
+        debug_print ("socket_inet: [FAIL] sock\n");
         goto fail;
     }
 
     if (family != AF_INET){
-        debug_print ("socket_unix: [FAIL] bad family\n");
+        debug_print ("socket_inet: [FAIL] bad family\n");
         goto fail;
     }
 
@@ -607,7 +598,6 @@ socket_inet (
 
 // flags 
     _file->_flags = __SWR;
-
 // No name for now.
     _file->_tmpfname = NULL;
     //_file->_tmpfname = "socket";       
@@ -1009,31 +999,23 @@ fail:
     return (int) (-1);  
 }
 
-
 /*
- ******************************** 
  * sys_accept: 
  *     This is a work in progress.
  */
-
 // accept() is used on the server side. 
 // It accepts a received incoming attempt to create 
 // a new TCP connection from the remote client, 
 // and creates a new socket associated with 
 // the socket address pair of this connection.
-
 // #todo
 // Pega um socket da lista de conexoes incompletas.
-// Nosso maior objetivo aqui eh retornar o fd arquivo de socket do cliente.
-
+// Nosso maior objetivo aqui eh retornar o fd arquivo 
+// de socket do cliente.
 // #todo
 // We need to create a new socket. Only this way the process
 // will have a new file in p->Objects[].
-
-//
 // == todo =========================
-//
-
 // #solution
 // We create a new socket and connect this 
 // new socket with the client.
@@ -1041,17 +1023,14 @@ fail:
 // #obs:
 // When write() writes in the new socket, the data
 // will be copied to the client socket. But it can be only an option.
-
 /*
  * From Linux 0.98.1:
- * 
  * For accept, 
  * we attempt to create a new socket, 
  * set up the link with the client, 
  * wake up the client, then 
  * return the new connected fd.
  */
-
 // #importante: Retornando o fd do cliente.
 // Dessa forma o servido pode escrever nele
 // e o cliente poderá ler.

@@ -63,17 +63,14 @@ __drawrectangle0(
     unsigned long rop_flags,
     int back_or_front )
 {
-
     debug_print("__drawrectangle0: r0 :)\n");
 
 // Copy.
-
     unsigned long X      = (x      & 0xFFFF);
     unsigned long Y      = (y      & 0xFFFF);
     unsigned long Width  = (width  & 0xFFFF); 
     unsigned long Height = (height & 0xFFFF);
     unsigned int Color   = color;
-
 
 // Invalid argument
     if (back_or_front != 1 && 
@@ -81,7 +78,6 @@ __drawrectangle0(
     {
          panic("__drawrectangle0: back_or_front\n");
     }
-
 
     //loop
     unsigned long internal_height = (unsigned long) Height;
@@ -303,8 +299,6 @@ drawDataRectangle (
     unsigned int color,
     unsigned long rop_flags )
 {
-
-
 // Draw into the backbuffer.
     backbuffer_draw_rectangle( 
         x,
@@ -316,7 +310,6 @@ drawDataRectangle (
 }
 
 
-
 /*
  * refresh_rectangle:
  *     Copiar um retângulo do backbuffer para o frontbuffer. 
@@ -324,24 +317,18 @@ drawDataRectangle (
  * regiões da tela, como área de cliente efetuar scroll de buffer em páginas 
  * de navegador ou menus .. mas para isso, a cópia seria dentro do próprio 
  * backbuffer ou de um terceiro buffer para o backbuffer. 
- *
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
  */
-
 // #todo 
 //kgws não pode acessar o lfb, devemos chamar o diálogo em x/video.c
-
-
 //#importante
 //É bem mais rápido com múltiplos de 4.
-
 // #bugbug
 // Agora precisamos considerar o limite de apenas 2mb
 // de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
 // Pois nao queremos escrever em area nao mapeada.
-
 // Copy a rectangle.
 
 static void 
@@ -353,9 +340,7 @@ __refresh_rectangle0 (
     unsigned long buffer_dest,
     unsigned long buffer_src )
 {
-
     debug_print("__refresh_rectangle0: r0 :)\n");
-
 
     //void *dest       = (void *)      FRONTBUFFER_ADDRESS;
     //const void *src  = (const void*) BACKBUFFER_ADDRESS;
@@ -380,7 +365,6 @@ __refresh_rectangle0 (
     // = 3; 24bpp
     int bytes_count=0;
 
-
     int FirstLine = (int) (y & 0xFFFF);
 
     //int UseVSync = FALSE;
@@ -398,10 +382,7 @@ __refresh_rectangle0 (
         panic       ("refresh_rectangle: w h\n");
     }
 
-
-//
 // Internal
-//
 
     unsigned long X = (unsigned long) (x & 0xFFFF);
     unsigned long Y = (unsigned long) (y & 0xFFFF);
@@ -438,7 +419,6 @@ __refresh_rectangle0 (
 //offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
     offset = (unsigned int) ( (Y*screen_pitch) + (bytes_count*X) );
-
 
     dest = (void *)       (dest + offset); 
     src  = (const void *) (src  + offset); 
@@ -557,8 +537,6 @@ refresh_rectangle (
     }
 // =====================
 
-
-
     __refresh_rectangle0(
         x, y, width, height,
         FRONTBUFFER_ADDRESS,   // dest
@@ -580,7 +558,6 @@ refresh_rectangle (
 
 void scroll_screen_rect (void)
 {
-
     register unsigned int i=0;
     unsigned int line_size=0;  // w 
     unsigned int lines=0;      // h

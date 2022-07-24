@@ -119,7 +119,6 @@ static int __videoInit(void)
 //
 
 // frontbuffer
-
     __frontbuffer_pa = (unsigned long) gSavedLFB;
     __frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
     g_frontbuffer_pa = (unsigned long) __frontbuffer_pa; 
@@ -130,7 +129,6 @@ static int __videoInit(void)
 //
 
 // backbuffer
-
     g_backbuffer_va  = (unsigned long) BACKBUFFER_VA;
 
 // Device screen sizes. 
@@ -188,10 +186,9 @@ unsigned long videoGetMode (void)
 
 void videoSetMode (unsigned long mode)
 {
-
-    unsigned long VideoMode;
-    unsigned long Width;
-    unsigned long Height;
+    unsigned long VideoMode=0;
+    unsigned long Width=0;
+    unsigned long Height=0;
     //continua...(outros parametros)
 
     debug_print ("videoSetMode: [FIXME] This routine is wrong\n");

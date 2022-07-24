@@ -213,9 +213,7 @@ int networkGetStatus (void)
 
 
 /*
- **********************************************************
- * networkInit:
- * 
+ * networkInit: 
  * It only initializes some network structures. 
  * Not the adapters.
  * Initialize the buffers used by the NIC adapter.
@@ -223,9 +221,7 @@ int networkGetStatus (void)
  * Create a default socket structure for localhost. 
  * CurrentSocket = LocalHostHTTPSocket
  */ 
-
 // Called by init() in init.c.
-
 // #fixme
 // Provavelmente esse alocador ainda nao funciona.
 

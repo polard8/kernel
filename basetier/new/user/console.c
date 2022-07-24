@@ -24,17 +24,11 @@ extern unsigned long wmWindowMananer_SendMessage(void);
 // global
 // Foreground console.
 int fg_console=0;
-
-// ================
-
-//0=apaga 1=acende 
-int consoleTextCursorStatus;
-
-
+// 0=apaga 1=acende 
+int consoleTextCursorStatus=0;
 // Esse eh o marcador de estagio do escape sequence.
 // Usado para manipular csi
 static unsigned long __EscapeSequenceStage = 0;
-
 
 #define NPAR  16
 static unsigned long par[NPAR];
@@ -50,9 +44,7 @@ static int saved_y=0;
 // == Private functions: Prototypes ======================
 //
 
-
 static void __ConsoleOutbyte (int c, int console_number);
-
 static void __test_path(void);
 
 //#todo: Use static modifier.
@@ -62,7 +54,6 @@ void csi_K(int par);
 void csi_m(void);
 void csi_M ( int nr, int console_number );
 void csi_L (int nr, int console_number);
-
 
 // =======================
 
@@ -126,8 +117,6 @@ static void __test_path(void)
         printf("OUTPUT:{%s}\n",b);
 }
 
-
-
 void __local_ri (void)
 {
     //#todo
@@ -157,12 +146,11 @@ __local_gotoxy (
         return;
     }
 
-    CONSOLE_TTYS[console_number].cursor_x = new_x;
-    CONSOLE_TTYS[console_number].cursor_y = new_y;
+    CONSOLE_TTYS[console_number].cursor_x = 
+        (unsigned long) (new_x & 0xFFFFFFFF);
+    CONSOLE_TTYS[console_number].cursor_y = 
+        (unsigned long) (new_y & 0xFFFFFFFF);
 }
-
-
-
 
 void __local_save_cur (int console_number)
 {
@@ -816,18 +804,14 @@ void console_scroll (int console_number)
  * console_outbyte:
  *     Trata o caractere a ser imprimido e chama a rotina /_outbyte/
  * para efetivamente colocar o caractere na tela.
- *
  * Essa rotina é chamada pelas funções: /putchar/scroll/.
  * @todo: Colocar no buffer de arquivo.
  */
-
 // This functions calls __ConsoleOutbyte to draw
 // the char into the screen.
 
-
 void console_outbyte (int c, int console_number)
 {
-
 // Arguments.
     register int Ch = c;
     int n = (int) console_number;
@@ -1094,7 +1078,6 @@ draw:
 
 static void __ConsoleOutbyte (int c, int console_number)
 {
-
 // Arguments.
     register int Ch = c;
     int n = (int) console_number;
@@ -1177,12 +1160,10 @@ static void __ConsoleOutbyte (int c, int console_number)
 /*
  * console_putchar:
  *     Put a char into the screen of a virtual console.
- *     pinta no backbuffer e faz refresh apenas do retangulo do char..
+ *     pinta no backbuffer e faz refresh apenas do retangulo do char.
  */
-
 // #importante
 // Colocamos um caractere na tela de um console virtual.
-
 // #bugbug: 
 // Como essa rotina escreve na memória de vídeo,
 // então precisamos, antes de uma string efetuar a
@@ -1237,9 +1218,9 @@ int consoleInputChar( int c )
 {
     unsigned long ascii=0;
     ascii = (unsigned long) (c & 0xFF);
+
     return (int) kinput(ascii);
 }
-
 
 
 void __dummy_thread(void)
@@ -1283,13 +1264,15 @@ void __test_process(void)
 void __test_thread(void)
 {
     struct thread_d *t;
-    t = (struct thread_d *) create_thread ( 
+
+    t = 
+        (struct thread_d *) create_thread ( 
                                 NULL, NULL, NULL,   //room desktop window 
-                                    __dummy_thread, //init_rip, 
-                                    PRIORITY_HIGH, 
-                                    get_current_process(), 
-                                    "no-name",
-                                    RING0 ); 
+                                __dummy_thread, //init_rip, 
+                                PRIORITY_HIGH, 
+                                get_current_process(), 
+                                "no-name",
+                                RING0 ); 
 
     if( (void*)t==NULL ){
         printf("fail\n");
