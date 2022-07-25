@@ -234,10 +234,8 @@ d_offset_63_32: dd 0
 
 ;;==================================================================
 ; _setup_system_interrupt: 
-;
 ;    Configura um vetor da IDT para a interrupção do sistema. 
 ;    O endereço do ISR e o número do vetor são passados via argumento.
-;
 ; IN:
 ;    rax = endereço. (callback)(endereço do handler)
 ;    rbx = número do vetor (0x80).(número da interrupção.)
@@ -246,18 +244,15 @@ d_offset_63_32: dd 0
 global _setup_system_interrupt
 _setup_system_interrupt:
 
-
     push rax
     push rbx
     push rcx
     push rdx
 
-
     ; Endereço e índice na tabela.
 
     mov qword [d__address], rax    ;endereço. 64bit
     mov qword  [d__number], rbx    ;número do vetor.
-
 
     ; Calcula o deslocamaneto
     xor rax, rax
@@ -265,7 +260,6 @@ _setup_system_interrupt:
     mov rbx, qword [d__number]
     mul rbx
     ; O resuldado está em rax.
-
 
     ; Adiciona o deslocamento à base rdi.
     ; A base é o início da idt.
@@ -296,20 +290,15 @@ _setup_system_interrupt:
     shr rax, 32
     mov dword [address_offset_63_32], eax
 
-
-
-   ;------------------
-
-    ; Lembre-se: 
-    ; rdi contém o endereço de memória
-    ; dentro da idt, onde desejamos contruir a entrada.
-
-    ;; #bugbug
-    ;; Nao sei se essa operação eh possivel,
-    ;; mas queremos mover de double em double
-
-;; #bugbug
-;; Checar o que representa esse seletor.
+;------------------
+; Lembre-se: 
+; rdi contém o endereço de memória
+; dentro da idt, onde desejamos contruir a entrada.
+; #bugbug
+; Nao sei se essa operação eh possivel,
+; mas queremos mover de double em double
+; #bugbug
+; Checar o que representa esse seletor.
 
     ;==========================
     ; Primeiros 32 bits. 
@@ -538,9 +527,7 @@ setup_faults:
 
 ;=====================================
 ; setup_vectors:
-;
 ;     Setup some IDT vectors.
-;
 
 setup_vectors:
 
@@ -556,30 +543,22 @@ setup_vectors:
     mov rbx,  qword 32
     call _setup_system_interrupt
 
-
-
 ; 33 - PS2 Keyboard.
 ; See: unit1hw.asm
     mov rax,  qword _irq1
     mov rbx,  qword 33
     call _setup_system_interrupt
 
-
-
 ; 40 - Clock, rtc.
     mov rax,  qword unhandled_irq ; _irq8
     mov rbx,  qword 40
     call _setup_system_interrupt
-
-
 
 ; 44 - PS2 Mouse.
 ; See: unit1hw.asm
     mov rax,  qword _irq12
     mov rbx,  qword 44
     call _setup_system_interrupt
-
-
 
 ; 46 - ide
     mov rax,  qword unhandled_irq ; _irq14 
@@ -620,11 +599,11 @@ setup_vectors:
 
 ;; =====================
     
-    ;; #test
-    ;; Uma interrupção para habilitar as interrupções mascaráveis.
-    ;; quem usará isso será a thread primária do processo init.
-    ;; apenas uma vez.
-    ;; See: sw.asm
+; #test
+; Uma interrupção para habilitar as interrupções mascaráveis.
+; quem usará isso será a thread primária do processo init.
+; apenas uma vez.
+; See: sw.asm
     
     mov rax,  qword _int199
     mov rbx,  qword 199
@@ -636,6 +615,80 @@ setup_vectors:
     pop rax
 
     ret
+
+
+
+;;===============================================
+;;  interrupção 41. irq 9;
+
+global _nic_handler
+_nic_handler:
+    cli
+    ;pusha
+    push rax
+
+    ;#todo: call this routine in e1000.c
+    ;call _irq_E1000
+
+    ;; EOI.
+    ;; Order: Second, first.
+    mov al, 0x20
+    out 0xA0, al  
+    out 0x20, al
+
+    pop rax
+    ;popa
+    sti
+    iretq
+
+
+;;=================================================
+;;     # NIC #
+;;
+;; O kernel chma isso provisoriamente para criar uma entrada
+;; na idt para o nic intel.
+;;
+;; #bugbug: isso está em nicintel.c , mas precisa ser global para que todos 
+;; possam usar.
+;; talvez em kernel.h
+;; isso funcionou, tentar configurar outras interupções com isso.
+;;
+
+;; Isso foi declarado em nicintel.c
+;;pegaremos o valor 41 e o endereço do handler.
+extern _nic_idt_entry_new_number
+;extern _nic_idt_entry_new_address
+
+global _asm_nic_create_new_idt_entry
+_asm_nic_create_new_idt_entry:
+
+    ;pushaq
+    push rax
+    push rbx
+
+;; Isso é o endereço da rotina de handler, em assembly;
+;; está em hw.asm
+;; #bugbug: não usaremos o endereço enviado pois temos que configurar 
+;; o EOI e a pilha da rotina de handler.
+
+    mov rax, qword _nic_handler
+	;mov rax, dword [_nic_idt_entry_new_address]
+
+
+;; Isso é o número da interrupção. (41)
+    mov rbx, qword [_nic_idt_entry_new_number]
+    ;mov rbx, dword 41
+
+	call _setup_system_interrupt
+	
+	;;#test: Não sei se precisa carregar novamente.
+	;;ok, sem problemas.
+	lidt [_IDT_register] 
+	
+    pop rbx
+    pop rax
+    ;popaq
+    ret 
 
 
 

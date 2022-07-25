@@ -652,7 +652,6 @@ pciHandleDevice (
     unsigned char dev, 
     unsigned char fun )
 { 
-
     struct pci_device_d  *D;
     int Status = -1;
     uint32_t data=0;
@@ -782,6 +781,7 @@ pciHandleDevice (
         // Ver em que hora que os buffers são configurados.
         // precisam ser os mesmos encontrados na 
         // infraestrutura de network e usados pelos aplicativos.
+        // see: e1000.c
 
         // e1000 = 0x8086 0x100E
         // 82540EM Gigabit Ethernet Controller
@@ -794,9 +794,11 @@ pciHandleDevice (
             //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
             //printf("82540EM Gigabit Ethernet Controller found\n");
 
+
             /*
+             
             // See: 
-            // 2io/dev/tty/netdev/e1000/e1000.c
+            // dev/e1000/e1000.c
             Status = (int) e1000_init_nic ( 
                                (unsigned char) D->bus, 
                                (unsigned char) D->dev, 
@@ -822,12 +824,14 @@ pciHandleDevice (
                 printf ("pciHandleDevice: Unlocking interrupt handler \n");
                 e1000_interrupt_flag = TRUE;
                 //class=network device,
-                __class = 3;
+                //__class = 3;
  
             }else{
                 panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
             };
+            
             */
+            
         }
 
 

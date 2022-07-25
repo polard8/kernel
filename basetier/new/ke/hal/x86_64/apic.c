@@ -10,7 +10,6 @@
  *       +I/O APICs.
  * 2015.
  */
-
 // See:
 // hwi/dd/nhid/arch/x86/apic.c
 // https://wiki.osdev.org/Symmetric_Multiprocessing
@@ -132,7 +131,6 @@ void lapic_initializing(unsigned long lapic_pa)
 
     LAPIC.initialized = FALSE;
 
-
     if( lapic_pa != 0xFEE00000 )
     {
         panic("lapic_initializing: lapic_pa != 0xFEE00000 \n");
@@ -142,16 +140,12 @@ void lapic_initializing(unsigned long lapic_pa)
 
 // page table
     unsigned long *pt_lapic = (unsigned long *) PAGETABLE_RES5;
-
 // pa
     LAPIC.lapic_pa = (unsigned long) (lapic_pa & 0xFFFFFFFF);
-
 // va
     LAPIC.lapic_va = (unsigned long) LAPIC_VA;
-
 // pagedirectory entry
     LAPIC.entry = (int) PD_ENTRY_LAPIC; 
-
 
 // Create the table and include the pointer 
 // into the kernel page directory.
@@ -246,8 +240,9 @@ int has_apic (void)
 
 void cpu_set_apic_base(unsigned long apic) 
 {
-   unsigned int edx = 0;
-   unsigned int eax = (unsigned int) (apic & 0xfffff000) | IA32_APIC_BASE_MSR_ENABLE;
+   unsigned int edx=0;
+   unsigned int eax = 
+       (unsigned int) (apic & 0xfffff000) | IA32_APIC_BASE_MSR_ENABLE;
 
 //#ifdef __PHYSICAL_MEMORY_EXTENSION__
 //   edx = (apic >> 32) & 0x0f;

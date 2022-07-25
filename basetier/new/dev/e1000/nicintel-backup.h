@@ -1,23 +1,17 @@
 /*
  * File: nicintel.h
- *
- * 
  * Descrição:
  *     Header para driver de adaptador de rede.
  *     network interface card (NIC)
- *  
  * Opções:
  * Oracle virtual box: // 1022, 2000  //Advanced Micro Devices, 
  * PCnet LANCE PCI Ethernet Controller.
  * ASUS H81: REALTEK, VENDOR 0x10EC; DEVICE 0x8168 
- *
  * 8086/100e network controller encontrado na oracle virtual box.
- *
  * History:
  *     2016 - Created by Fred Nora.
  *      
  */
- 
  
 #ifndef ____NETWORK_INTEL_H
 #define ____NETWORK_INTEL_H
@@ -279,7 +273,7 @@ struct intel_nic_info_d
 // Esse nome genério não deveria ser usado para o caso 
 // específico da intel.
 
-struct intel_nic_info_d *currentNIC;
+struct intel_nic_info_d  *currentNIC;
 // ...
 
 
@@ -289,7 +283,6 @@ struct intel_nic_info_d *currentNIC;
 // #todo:
 // O valor máximo precisa ser definido. 
 unsigned long nicList[8]; 
-
 
 int e1000_interrupt_flag;
 
@@ -308,8 +301,6 @@ PCIRegisterIRQHandler (
     uint8_t func, 
     unsigned long handler,   
     void *priv ); 
- 
-
 
 int 
 e1000_init_nic ( 
@@ -318,14 +309,9 @@ e1000_init_nic (
     unsigned char fun, 
     struct pci_device_d *pci_device );
 
-
-
 void e1000_setup_irq (int irq_line);
 
-
 int e1000_reset_controller (void); 
-
-
 
 /*
 void 
@@ -346,13 +332,11 @@ E1000WriteCommand (
     uint16_t addr, 
     uint32_t val );
 
-
 uint32_t E1000ReadCommand (struct intel_nic_info_d *d, uint16_t addr);
 
 uint32_t E1000AllocCont ( uint32_t amount, uint32_t *virt );
 
 void nic_i8254x_transmit (void);
-
 
 //eeprom
 uint32_t E1000ReadEEPROM ( struct intel_nic_info_d *d, uint8_t addr );
@@ -363,10 +347,8 @@ e1000_ioctl (
     unsigned long request, 
     unsigned long arg );
 
-
 // See: e1000.c
 void DeviceInterface_e1000(void);
-
 
 #endif   
 

@@ -33,9 +33,8 @@
 
 #define PROCESSORS_MAX_COUNT 32
 
-//processors count
-int processors_count;
-
+// see: hal.c
+extern int processors_count;
 
 //
 // Structures.

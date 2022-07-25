@@ -1571,8 +1571,7 @@ static void __initialize_heappool(void)
 
 // local worker
 // ====================================================================
-// The window server image.
-// See: gramado/core/server.
+// Ring 0 kernel module. MOD0.BIN.
 // This is the core of the 'presentation tier'.
 // Extra heap used by the ring 3 init process.
 // See: x64init.c When we setup the Heap pointer.
@@ -1618,6 +1617,7 @@ static void __initialize_extraheap1(void)
 }
 
 // local worker
+// is it free yet?
 static void __initialize_extraheap2(void)
 {
     unsigned long *pt_extraheap2 = (unsigned long *) PAGETABLE_EXTRAHEAP2;
@@ -1655,6 +1655,7 @@ static void __initialize_extraheap2(void)
 
 
 // local worker
+// is it free yet?
 static void __initialize_extraheap3(void)
 {
     unsigned long *pt_extraheap3 = (unsigned long *) PAGETABLE_EXTRAHEAP3;

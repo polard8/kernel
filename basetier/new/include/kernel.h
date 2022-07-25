@@ -306,6 +306,10 @@ extern unsigned long gSavedBPP;
 #include "net/network.h"     //(network) Gerenciamento de rede.  
 #include "net/socket.h"      //last always
 
+
+// e1000 - nic intel
+#include "dev/e1000/nicintel.h"
+
 // device manager
 #include "dev/devmgr.h"      
 

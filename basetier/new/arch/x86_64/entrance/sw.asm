@@ -384,12 +384,29 @@ _int130:
 .int130_rip: dq 0
 ;--    
 
-;
+
+; int 198
+; Restorer.
+; Used to return from ring 3 to ring0
+; when the kernel calls a procedure in ring 3.
+; It can be a signal or a window procedure.
+; The purpose here is jumping to a c routine,
+; restore the context with the idle thread
+; and restart the ifle thread.
+;extern _x64_restorer
+;global _int198
+;_int198:
+;    jmp _x64_restorer
+    
+    
+
+
+
+; int 199
 ; This is called only from the init process in user mode.
 ; It will enable the interrupts and the taskswitching
 ; for the first time.
 ; see: INIT.BIN.
-;
 
 global _int199
 _int199:

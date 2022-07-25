@@ -556,53 +556,40 @@ void systemShowDevicesInfo(void)
 void systemSetupVersion (void)
 {
 
-//
 // Global structure
-//
+// #todo:
+// Isso deve ser considerado um erro fatal,
+// pois existem aplicações que dependem da versão do sistema 
+// para funcionarem corretamente.. 
 
     Version = (void *) kmalloc( sizeof(struct version_d) );
-
-    // #todo:
-    // Isso deve ser considerado um erro fatal,
-    // pois existem aplicações que dependem da versão do sistema 
-    // para funcionarem corretamente.. 
 
     if ( (void *) Version == NULL ){
         panic("systemSetupVersion: Version");
     }
 
-
     Version->Major = VERSION_MAJOR;
     Version->Minor = VERSION_MINOR;
     Version->Build = VERSION_BUILD;
 
-//
 // Global structure
-//
+// #todo:
+// Isso deve ser considerado um erro fatal,
+// pois existem aplicações que dependem da versão do sistema 
+// para funcionarem corretamente.. 
 
     VersionInfo = (void *) kmalloc ( sizeof(struct version_info_d) );
-
-    // #todo:
-    // Isso deve ser considerado um erro fatal,
-    // pois existem aplicações que dependem da versão do sistema 
-    // para funcionarem corretamente.. 
 
     if ( (void *) VersionInfo == NULL ){
         panic ("systemSetupVersion: VersionInfo\n");
     }
 
-
-//
 // Global structure
-//
+// Colocando na estrutura System se ela for válida.
 
     if ( (void *) System == NULL ){
         panic ("systemSetupVersion: System\n");
     }
-
-//
-// Colocando na estrutura System se ela for válida.
-//
 
     if ( (void *) System != NULL )
     {
@@ -618,8 +605,8 @@ void systemSetupVersion (void)
 	// More ?!
 }
 
+
 /*
- *******************************************************
  * systemReboot:
  *     Interface de inicialização da parte de sistema para o 
  * processo de reboot.
@@ -925,7 +912,6 @@ void *systemNull (void)
 int init_executive (void)
 {
     int Status = FALSE;
-
 
     Initialization.executive = FALSE;
 

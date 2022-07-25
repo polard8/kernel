@@ -175,6 +175,8 @@ _irq0:
     fxrstor [_context_fpu_buffer]
 
 ; Release a bandit.
+; see: unit3hw.asm
+
     jmp unit3Irq0Release
 ; --------------------------------------
 
@@ -838,8 +840,8 @@ _irq10:
 ;;  interrupção 41. irq 9;
 
 ; Capture context
-global _nic_handler
-_nic_handler:
+global _nic_handler2
+_nic_handler2:
     
     cli
     
@@ -901,7 +903,7 @@ _nic_handler:
     pop rax
 
     sti
-    iretd
+    iretq
 
 ;==================
 

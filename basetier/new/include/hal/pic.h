@@ -64,8 +64,8 @@ irq8_RTC (void);
 
 
 // See: e1000.c
-//__VOID_IRQ 
-//irq_E1000 (void);
+__VOID_IRQ 
+irq_E1000 (void);
 
 
 // See: mouse.c
@@ -88,6 +88,7 @@ __VOID_IRQ
 irq14_PRIMARY_IDE (void);
 __VOID_IRQ 
 irq15_SECONDARY_IDE (void);
+
 
 
 #endif    

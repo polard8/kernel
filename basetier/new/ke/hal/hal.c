@@ -15,6 +15,10 @@
 
 extern void asm_reboot (void);
 
+// not used?
+//processors count
+int processors_count;
+
 
 /*
 // Called by the idle handler for up.
@@ -84,14 +88,12 @@ void hal_reboot(void)
 
 
 /*
- ********************************
  * hal_shutdown: 
  *     Interface usada pelos outros módulos
  *     #todo: Todos os possiveis métodos ficarão nessa rotina.
  *     máquina real e máquina virtual.
  *     #importante: Essa será a única função em hal para chamar shutdown.
  * quanquer outra interfce deve ficar fora do módulo hal.
- 
  APM:
  ===
  This is the basic sequence of APM commands that must be given in 
@@ -101,32 +103,29 @@ void hal_reboot(void)
  +Connect the Real Mode interface.
  +Enable power management for all devices.
  +Set the power state for all devices to "Off" (03h).
- 
  ACPI:
  ====
   The ACPI shutdown is technically a really simple thing all 
   that is needed is a 
-  
   outw(PM1a_CNT, SLP_TYPa | SLP_EN ); 
- 
  and the computer is powered off. 
- 
  The problem lies in the gathering of these values 
  especialy since the SLP_TYPa is in the \_S5 object 
  which is in the DSDT and therefore AML encoded.
- 
  */
 
-void hal_shutdown (void){
-
+void hal_shutdown (void)
+{
     const char *shutdown_str;
 
     debug_print ("hal_shutdown:\n");
 
+// Something is wrong.
+// We need to be in the right system state.
 
-    // Something is wrong.
-    if ( system_state != SYSTEM_POWEROFF )
+    if ( system_state != SYSTEM_POWEROFF ){
         panic ("hal_shutdown: system_state\n");
+    }
 
     /*
     if (qemu____){
@@ -230,9 +229,7 @@ void hal_test_speaker (void){
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
  */
-
 // Called by init() in init.c
-
 // OUT: TRUE if its ok.
 
 int init_hal (void)
@@ -267,7 +264,6 @@ int init_hal (void)
 /*
  * hal_hardware_detect:
  *     Detecta fabricantes específicos suportados pelo núcleo.
- *
  * 8086, 1237  //PCI & Memory.
  * 8086, 7000  //PIIX3 PCI-to-ISA Bridge (Triton II).
  * 1022, 2000  //Advanced Micro Devices, PCnet LANCE PCI Ethernet Controller.
@@ -276,7 +272,6 @@ int init_hal (void)
  * //...
  *
  */
-
 // Consumer Chipsets (Z87, H87, H81) Haswell LGA1150. 
 // Business Chipsets (Q87, Q85, B85) Haswell LGA1150.
 
@@ -292,7 +287,6 @@ int hal_hardware_detect (void)
  *     Inicializa apenas o que for independente da arquitetura.
  *     @todo: Essa rotina pode ir para outro modulo do /hal. como cpu.c
  */
-
 // #todo 
 // O retorno deve ser int, para refletir o status.
     

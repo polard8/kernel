@@ -28,7 +28,7 @@ void *create_tid0(void)
     debug_print ("create_tid0:\n");
 
 
-    debug_print ("[1]\n");
+    //debug_print ("[1]\n");
     // The kernel process.
     if ( (void *) KernelProcess == NULL )
     {
@@ -43,7 +43,7 @@ void *create_tid0(void)
     // Struct.
     // Começamos a inicializaçao da estrtutura.
 
-    debug_print ("[2]\n");
+    //debug_print ("[2]\n");
 
     kThread = (void *) kmalloc ( sizeof(struct thread_d) );
 
@@ -75,9 +75,7 @@ void *create_tid0(void)
     kThread->position = KING;
 
 
-//
 // TID
-//
 
     kThread->tid = TID;
 
@@ -102,17 +100,15 @@ void *create_tid0(void)
 
     // ...
 
+// Stack.
+// #bugbug
+// estamos alocando uma stack dentro do heap do kernel.
+// nesse caso serve para a thread idle em ring 0.
+// 8KB
 
-    // Stack.
+    //debug_print ("[3]\n");
 
-    // #bugbug
-    // estamos alocando uma stack dentro do heap do kernel.
-    // nesse caso serve para a thread idle em ring 0.
-    // 8KB
-
-    debug_print ("[3]\n");
-
-    int StackSize = (8*1024);
+    int StackSize = (int) (8*1024);
 
     earlyRing0IdleStack = (void *) kmalloc (StackSize);
 
@@ -130,7 +126,7 @@ void *create_tid0(void)
     //    panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
     //}
 
-    debug_print ("[4]\n");
+    //debug_print ("[4]\n");
 
     // pml4 physical address
     kThread->pml4_PA = (unsigned long ) KernelProcess->pml4_PA;
@@ -138,7 +134,6 @@ void *create_tid0(void)
         debug_print ("create_tid0: kThread->pml4_PA\n");
         panic       ("create_tid0: kThread->pml4_PA\n");
     }
-
 
 // Clean the 'wait reason'.
     for ( r=0; r<8; ++r ){ kThread->wait_reason[r] = (int) 0; };
@@ -217,7 +212,6 @@ void *create_tid0(void)
 // =================================================
 
 
-
 // Priorities
 // This is a ring0 thread, only used for sti/hlt.
 // Maybe it is gonna be a idle thread to manage the energy.
@@ -226,7 +220,6 @@ void *create_tid0(void)
 
 // Pode sofrer preempção por tempo.
     kThread->preempted = PREEMPTABLE;
-
 
 // Temporizadores.
 // Counters
@@ -282,9 +275,9 @@ void *create_tid0(void)
 // Stack frame
     kThread->ss     = 0x10 | 0; 
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
-    kThread->rflags = 0x0202;    // # Atenção !!  
+    kThread->rflags = 0x0202;
     kThread->cs     = 0x8 | 0; 
-    kThread->rip    = (unsigned long) 0x30A01000; //SMALLSYSTEM_EXTRAHEAP3_START+ 0x1000;  
+    kThread->rip    = (unsigned long) 0x30A01000; //SMALLSYSTEM_EXTRAHEAP3_START+ 0x1000; 
 
     kThread->initial_rip = (unsigned long) kThread->rip; 
 
@@ -312,8 +305,6 @@ void *create_tid0(void)
     kThread->r14 = 0;
     kThread->r15 = 0;
 
-
-
     kThread->saved = FALSE;
 
 	//#bugbug
@@ -332,16 +323,15 @@ void *create_tid0(void)
     // Coloca na lista de estruturas.
     threadList[TID] = (unsigned long) kThread;
 
-    //
-    // == counter =================================
-    //
+//
+// == counter =================================
+//
 
-	// #bugbug
-	// Se deixarmos de criar alguma das threads esse contador falha.
-	// #todo: Deveríamos apenas incrementá-lo.
+// #bugbug
+// Se deixarmos de criar alguma das threads esse contador falha.
+// #todo: Deveríamos apenas incrementá-lo.
 
     UPProcessorBlock.threads_counter++;
-
 
 // This function is wrong .... 
 // Maybe it is putting values outside the vector.
@@ -358,29 +348,21 @@ void *create_tid0(void)
     //    (unsigned long) kThread, 
     //    QUEUE_INITIALIZED );
 
-
-//
-// == Select for execution ================
-//
-
-    debug_print ("[5]\n");
-
+    //debug_print ("[5]\n");
 
     kThread->used = TRUE;
     kThread->magic = 1234;
 
-
+// Select for execution.
 // #todo
 // This method really need a prefix.
-
 // With this movement, this thread is gonna run in the next
 // task switch.
 // :::: MOVEMENT 1 (Initialized --> Standby).
 
     SelectForExecution(kThread); 
 
-// Done
-    debug_print ("create_tid0: done\n");
+    //debug_print ("create_tid0: done\n");
 
     return (void *) kThread;
 }
@@ -417,7 +399,6 @@ void *create_tid3 (void)
 
     // Stack pointer.
     void *__initStack;   
-
 
     debug_print ("create_tid3:\n");
 
@@ -491,21 +472,19 @@ void *create_tid3 (void)
 	//InitThread->HeapSize = ?;
 	//InitThread->Stack = ?;
 	//InitThread->StackSize = ?;
-	
-	//Stack. @todo: A stack deve ser a que est� na TSS
-	//#BugBug.
-	// Estamos alocando mas n�o etamos usando.
-	//# podemos usar o alocador de p�ginas e alocar uma p�gina para isso.
 
-    // Stack.
-    
-    // #bugbug
-    // Não estamos usando isso.
-    // 8KB.
 
-    // #bugbug
-    // Essa stack está em ring0.
-    // Se o processo precisa de uma stack em ring 0 então usaremos essa.
+// Stack. @todo: A stack deve ser a que est� na TSS
+// #BugBug.
+// Estamos alocando mas n�o etamos usando.
+// #podemos usar o alocador de p�ginas e alocar uma p�gina para isso.
+// Stack.
+// #bugbug
+// Não estamos usando isso.
+// 8KB.
+// #bugbug
+// Essa stack está em ring0.
+// Se o processo precisa de uma stack em ring 0 então usaremos essa.
 
     __initStack = (void *) kmalloc (8*1024);
 
@@ -596,10 +575,8 @@ void *create_tid3 (void)
     }
 // ============================================
 
-
-    // Priorities.
-    // The idle thread has the lowest priority possible.
-
+// Priorities.
+// The idle thread has the lowest priority possible.
     t->base_priority = PRIORITY_MIN;    // Static
     t->priority      = PRIORITY_MIN;    // Dynamic
 
@@ -658,14 +635,13 @@ void *create_tid3 (void)
     // onde eflags inicia com o valor 0x3000.
     // See: x86init.c
 
-
 // Stack frame.
 // See: gva.h
-
-
 // cpl and iopl
 // #bugbug: weak protection for threads in ring 3.
 // 0x3202
+// Os processos em ring 3 chamam uma interrupção especial
+// que mudam seu iopl para 0. int 199.
 
     t->cpl = (unsigned int) RING3;
     t->rflags_initial_iopl = (unsigned int) 3; 
@@ -701,8 +677,7 @@ void *create_tid3 (void)
     t->r14 = 0;
     t->r15 = 0;
 
-
-    // O endereço incial, para controle.
+// O endereço incial, para controle.
     t->initial_rip = (unsigned long) t->rip; 
 
     t->saved = FALSE; 
@@ -724,42 +699,30 @@ void *create_tid3 (void)
     // Coloca na lista de estruturas.
     threadList[TID] = (unsigned long) t;
 
-
-//
-// == Conductor ===================================
-//
-
+// Conductor
 // #todo
 // We can use a method in the scheduler for this.
 
     rootConductor = (struct thread_d *) t;
 
-//
-// == counter =================================
-//
+// counter
+// #importante
+// Contador de threads
+// Vamos atualizar o contador de threads, 
+// pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
+// #importante 
+// nesse caso o contador foi configurado manualmente. 
+// isso acontece com as threads do gramado core.
+// #importante
+// A cria��o da thread idle vai inicializar o contador,
+// para depois s� incrementarmos.
 
-    // #importante
-    // Contador de threads
-    // Vamos atualizar o contador de threads, 
-    // pois mais uma thread existe, mesmo que n�o esteja rodando ainda.
-
-	//#importante 
-	//nesse caso o contador foi configurado manualmente. 
-	//isso acontece com as threads do gramado core.
-
-	// #importante
-	// A cria��o da thread idle vai inicializar o contador,
-	// para depois s� incrementarmos.
-	
-    //ProcessorBlock.threads_counter = (int) 1;
     UPProcessorBlock.threads_counter++;
-
+    //ProcessorBlock.threads_counter = (int) 1;
 
 //
 // == Queue =====================================
 //
-
-
 
     //debug_print ("create_CreateRing3InitThread: [FIXME] Overflow\n");
  
@@ -774,8 +737,7 @@ void *create_tid3 (void)
 
     //queue_insert_data ( queue, (unsigned long) t, QUEUE_INITIALIZED );
 
-
-    t->used  = TRUE;
+    t->used = TRUE;
     t->magic = 1234;
 
 
@@ -786,7 +748,7 @@ void *create_tid3 (void)
 
     SelectForExecution(t);    
 
-    debug_print ("create_tid3: done\n");
+    //debug_print ("create_tid3: done\n");
 
     return (void *) t;
 }

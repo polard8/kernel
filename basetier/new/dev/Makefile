@@ -85,6 +85,7 @@ storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 video.o vsync.o screen.o \
 xpixel.o line.o rect.o bg.o \
+e1000.o \
 i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o    
 
 
@@ -105,6 +106,9 @@ all:
 	$(CC) -c ata/atainit.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainit.o 
 	$(CC) -c ata/atairq.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
 	$(CC) -c ata/atapci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
+
+# e1000
+	$(CC) -c e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
 
 # fb
 	$(CC) -c fb/bg.c     $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o

@@ -874,9 +874,7 @@ static int I_x64CreateTID0(void)
         return FALSE;
     }
 
-//
 // Memory
-//
 
     tid0_thread->pml4_VA  = KernelProcess->pml4_VA;
     tid0_thread->pml4_PA  = KernelProcess->pml4_PA;
@@ -917,10 +915,7 @@ static int I_x64CreateTID0(void)
 
     dead_thread_collector_status = FALSE;
 
-//
 // Idle thread
-//
-
 // For now,
 // the control thread of the window server will be our idle thread.
 // But it is not actually a idle routine, 
@@ -1162,24 +1157,18 @@ static int I_init (void)
        return FALSE;
     }
 
-//
-// Storage
-//
-
+// volume
 // Initialize the disk structure.
 // See: storage.c
     disk_init();
 
+// disk
 // Initialize the disk structure.
 // It depends on the disk structures.
 // See: storage.c
     volume_init();
 
-
-//
 // fs
-//
-
     //vfsInit();
     fsInit();
     // ...
