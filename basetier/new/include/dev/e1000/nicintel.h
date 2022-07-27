@@ -88,14 +88,14 @@ struct intel_nic_info_d
 
 // rx
     struct legacy_rx_desc *legacy_rx_descs; //rx ring virtual address
-    uint32_t rx_descs_virt[32];
+    unsigned long rx_descs_virt[32];
 // tx
     struct legacy_tx_desc *legacy_tx_descs; //tx ring virtual address
-    uint32_t tx_descs_virt[8];
+    unsigned long tx_descs_virt[8];
 
-    // physical address.
-    uint32_t rx_descs_phys;  //rx ring physical address
-    uint32_t tx_descs_phys;  //tx ring physical address
+// physical address.
+    unsigned long rx_descs_phys;  //rx ring physical address
+    unsigned long tx_descs_phys;  //tx ring physical address
 
     struct arp_cache_item_d arp_cache[32];
 

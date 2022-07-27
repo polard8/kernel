@@ -270,7 +270,7 @@ int e1000_reset_controller (void)
     //printf("tx_address=%x\n",tx_address);
         
     currentNIC->tx_descs_phys = 
-        __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
+        (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
     if ( currentNIC->tx_descs_phys == 0 ){
         panic ("e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
@@ -289,12 +289,14 @@ int e1000_reset_controller (void)
 
         // IN:  size, return virtual address.
         // OUT: physical address
-
-        currentNIC->legacy_tx_descs[i].addr = 
-            __E1000AllocCont ( 
-                0x3000, 
-                (unsigned long *) &currentNIC->tx_descs_virt[i] );
-        currentNIC->legacy_tx_descs[i].addr2 = 0;
+        
+        unsigned long txaddress = 
+            (unsigned long) __E1000AllocCont ( 
+                 0x3000, 
+                 (unsigned long *) &currentNIC->tx_descs_virt[i] );
+        
+        currentNIC->legacy_tx_descs[i].addr  = (unsigned int) txaddress;
+        currentNIC->legacy_tx_descs[i].addr2 = (unsigned int) (txaddress>>32);
 
         if (currentNIC->legacy_tx_descs[i].addr == 0){
             panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
@@ -354,11 +356,13 @@ int e1000_reset_controller (void)
         // IN:  size, return virtual address.
         // OUT: physical address
 
-        currentNIC->legacy_rx_descs[i].addr = 
-            __E1000AllocCont ( 
+        unsigned long rxaddress = 
+            (unsigned long) __E1000AllocCont ( 
                 0x3000, 
                 (unsigned long *) &currentNIC->rx_descs_virt[i] );
-        currentNIC->legacy_rx_descs[i].addr2 = 0;
+        
+        currentNIC->legacy_rx_descs[i].addr  = (unsigned int) rxaddress;
+        currentNIC->legacy_rx_descs[i].addr2 = (unsigned int) (rxaddress>>32);
 
         // Buffer null.
         if (currentNIC->legacy_rx_descs[i].addr == 0){
@@ -380,6 +384,8 @@ int e1000_reset_controller (void)
 
     //printf("[5]:\n");
 
+// No multicast
+// MTA(n) = 0
     for (i=0; i < 0x80; i++){
         __E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
     };
@@ -423,48 +429,59 @@ int e1000_reset_controller (void)
 	//E1000WriteCommand(currentNIC, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
 
     //printf("[6]:\n");
-    
-	// Enable interrupts
-	//0xD0 Message Control (0x0080) Next Pointer (0xE0) Capability ID (0x05)
-	//    0000 0001  1111 0111  0000   0010  1101   0111
-	//0x1F6DC, 1f72d7
+
+
+// Enable interrupts:
+// 0xD0 Message Control (0x0080) Next Pointer (0xE0) Capability ID (0x05)
+//    0000 0001  1111 0111  0000   0010  1101   0111
+// 0x1F6DC, 1f72d7
+
     __E1000WriteCommand (currentNIC, 0xD0, 0x1F6DC);
-
-
-	//?
-	//E1000WriteCommand(currentNIC, 0xD0, 0xFB);
-    
+    //__E1000WriteCommand(currentNIC, 0xD0, 0xFB);
+    __E1000WriteCommand(currentNIC, 0xD0, 0xff & ~4);  
     __E1000ReadCommand (currentNIC, 0xC0);
 
-	
-	// ## RX ##
-	
-	// receive
-	// Setup the (receive) ring registers.
-	// Pass the physical address (and some other informations) of the receive buffer
-	
-    __E1000WriteCommand (currentNIC, 0x2800, currentNIC->rx_descs_phys );  // low
-    __E1000WriteCommand (currentNIC, 0x2804, 0);                           // high 
+
+// ## RX ##
+// receive
+// Setup the (receive) ring registers.
+// Pass the physical address (and some other informations) of the receive buffer
+
+// Address: low and high.
+    __E1000WriteCommand (
+        currentNIC, 0x2800, (unsigned int) currentNIC->rx_descs_phys );  // low
+    __E1000WriteCommand (
+        currentNIC, 0x2804, (unsigned int) (currentNIC->rx_descs_phys >> 32) );                           // high 
+
+// Buffer
     __E1000WriteCommand (currentNIC, 0x2808, 512);    // 32*16
     __E1000WriteCommand (currentNIC, 0x2810, 0);      // head
     __E1000WriteCommand (currentNIC, 0x2818, 31);     // tail
-    __E1000WriteCommand (currentNIC, 0x100, 0x602801E);  // RCTL	= 0x0100,	/* Receive Control */
-	
-	
-	// ## TX ##
-	
-	//transmit
-	//Setup the (transmit) ring registers.
-	// Pass the physical address (and some other informations) of the transmit buffer
-	
-	//TDBAL	= 0x3800,	/* Tx Descriptor Base Address Low */
-	//TDBAH	= 0x3804,	/* Tx Descriptor Base Address High */
-	
-    __E1000WriteCommand (currentNIC, 0x3800, currentNIC->tx_descs_phys );  //low (endereço do ring)
-    __E1000WriteCommand (currentNIC, 0x3804, 0);                           //high
-    __E1000WriteCommand (currentNIC, 0x3808, 128);    //8*16
-    __E1000WriteCommand (currentNIC, 0x3810, 0);      //head
-    __E1000WriteCommand (currentNIC, 0x3818, 7); //0);      //tail
+
+// receive control
+    __E1000WriteCommand (
+        currentNIC, 0x100, 0x602801E);  // RCTL	= 0x0100,	/* Receive Control */
+
+// RX Delay Timer Register
+    __E1000WriteCommand (currentNIC, 0x2820, 0);
+
+// ## TX ##
+//transmit
+//Setup the (transmit) ring registers.
+// Pass the physical address (and some other informations) of the transmit buffer
+//TDBAL	= 0x3800,	/* Tx Descriptor Base Address Low */
+//TDBAH	= 0x3804,	/* Tx Descriptor Base Address High */
+
+    
+    __E1000WriteCommand (
+        currentNIC, 0x3800, (unsigned int) currentNIC->tx_descs_phys );  //low (endereço do ring)
+    __E1000WriteCommand (
+        currentNIC, 0x3804, (unsigned int) (currentNIC->tx_descs_phys >> 32) );                           //high
+
+// Buffer
+    __E1000WriteCommand (currentNIC, 0x3808, 128);  //8*16
+    __E1000WriteCommand (currentNIC, 0x3810, 0);    //head
+    __E1000WriteCommand (currentNIC, 0x3818, 7);    //0);      //tail
 
 	//#define E1000_TCTL     0x00400  /* TX Control - RW */
     //• CT = 0x0F (16d collision)
@@ -493,9 +510,11 @@ int e1000_reset_controller (void)
 	//#define E1000_TXDCTL_GRAN    0x01000000 /* TXDCTL Granularity */
 	//#define E1000_TXDCTL   0x03828  /* TX Descriptor Control - RW */
 	
-    __E1000WriteCommand (currentNIC, 0x3828, (0x01000000 | 0x003F0000)); 
+    __E1000WriteCommand (
+        currentNIC, 0x3828, (0x01000000 | 0x003F0000)); 
 
-    __E1000WriteCommand ( currentNIC,  0x400, ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) ); 
+    __E1000WriteCommand ( 
+        currentNIC,  0x400, ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) ); 
 	
 	//?
 	//E1000WriteCommand(currentNIC, 0x400, 0x10400FA);  //TCTL	= 0x0400,	/* Transmit Control */
@@ -506,7 +525,8 @@ int e1000_reset_controller (void)
     //• IPGR1 = 2
     //• IPGR2 = 10
     //#define E1000_TIPG     0x00410  /* TX Inter-packet gap -RW */	
-    __E1000WriteCommand ( currentNIC,  0x410, (  0x0000000A | 0x00000008 | 0x00000002) ); 	
+    __E1000WriteCommand ( 
+        currentNIC,  0x410, (  0x0000000A | 0x00000008 | 0x00000002) ); 
 
 
 	//talvez ja fizemos isso. 
@@ -534,12 +554,17 @@ int e1000_reset_controller (void)
 	//    currentNIC->rx_descs_phys, 
 	//	currentNIC->tx_descs_phys );
 
+// enable interrupts
+    __E1000WriteCommand (currentNIC, 0xD0, 0x1F6DC);
+    //__E1000WriteCommand(currentNIC, 0xD0, 0xFB);
+    __E1000WriteCommand(currentNIC, 0xD0, 0xff & ~4);  
+    __E1000ReadCommand (currentNIC, 0xC0);
 
-	// Linkup
 
-    uint32_t val = __E1000ReadCommand (currentNIC, 0);
-	
-	//(1 << 6)
+// Linkup
+// (1 << 6)
+// #todo: Create a helper. 
+    unsigned int val = __E1000ReadCommand (currentNIC, 0);
     __E1000WriteCommand (currentNIC, 0, val | 0x40);
 
     return 0;
@@ -581,7 +606,7 @@ void e1000_setup_irq (int irq_line)
 // #bugbug: 
 // Na verdade o assembly esta usando outro endereço.
 // #todo: 64bit.
-    uint32_t handler = (uint32_t) &irq_E1000; 
+    unsigned long handler = (unsigned long) &irq_E1000; 
 
 // #importante
 // Transformando irq em número de interrupção.
@@ -592,15 +617,12 @@ void e1000_setup_irq (int irq_line)
 
 	//#debug OK (irq=9) 
     printf ("e1000_setup_irq: irq={%d}\n",irq);
+    printf ("e1000_setup_irq: idt_num={%d}\n",idt_num);
     printf ("e1000_setup_irq: handler={%x}\n", handler);
 	//printf ("PCIRegisterIRQHandler: pin={%d}\n",currentNIC->pci->irq_pin);//shared INTA#
 	//refresh_screen();
 	//while(1){}
 	//#debug interrupção=41 
-    printf ("e1000_setup_irq: interrupt={%d}\n", 
-        nic_idt_entry_new_number );
-    printf ("e1000_setup_irq: handler={%x}\n", 
-        nic_idt_entry_new_address );
      
 	//refresh_screen();
 	//while(1){}
@@ -625,9 +647,15 @@ void e1000_setup_irq (int irq_line)
 //na verdade o assembly esta usando outro endereço
     nic_idt_entry_new_address = (unsigned long) handler; 
 
-    extern void asm_nic_create_new_idt_entry(void);
+
+    printf ("e1000_setup_irq: interrupt={%d}\n", 
+        nic_idt_entry_new_number );
+    printf ("e1000_setup_irq: handler={%x}\n", 
+        nic_idt_entry_new_address );
+
 
 // Call assembly.
+    extern void asm_nic_create_new_idt_entry(void);
     asm_nic_create_new_idt_entry();
 }
 
@@ -939,11 +967,12 @@ e1000_init_nic (
 	//( bus, slot, func, PCI_COMMAND )
     
     uint16_t cmd=0;
-    cmd = (uint16_t) pciConfigReadWord ( 
-                         (unsigned char) bus, 
-                         (unsigned char) dev, 
-                         (unsigned char) fun, 
-                         (unsigned char) 0x04 );
+    cmd = 
+        (uint16_t) pciConfigReadWord ( 
+                       (unsigned char) bus, 
+                       (unsigned char) dev, 
+                       (unsigned char) fun, 
+                       (unsigned char) 0x04 );
 
     // IN: (bus, slot, func, PCI_COMMAND, cmd);
     if ( (cmd & 0x04) != 0x04 )
@@ -987,9 +1016,20 @@ e1000_init_nic (
 __VOID_IRQ 
 irq_E1000 (void)
 {
-    //e1000_interrupt_flag
-    printf("irq_E1000:\n");
+
+// #lock
+// see: pciHandleDevice in pci.c
+
+    if (e1000_interrupt_flag == FALSE)
+    {
+       printf("irq_E1000: LOCKED\n");
+       refresh_screen();
+       return;
+    }
+
+    printf("irq_E1000: UNLOCKED\n");
     refresh_screen();
+    
     //DeviceInterface_e1000();
 }
 

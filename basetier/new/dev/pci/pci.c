@@ -795,7 +795,17 @@ pciHandleDevice (
             //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
             //printf("82540EM Gigabit Ethernet Controller found\n");
 
+
             /*
+             
+            // #todo
+            // O driver funciona na virtualbox,
+            // se optarmos por PIIX3. Em ICH9 não funciona.
+            // Estamos suspendendo porque as interrupçoes
+            // geram muito ruido e a inicialização nem consegue
+            // terminar. Talvez tenha algo a ver com habilitar
+            // as interrupções antes do momento em que o
+            // init habilita as interrupções.
 
             // See: dev/e1000/e1000.c
             Status = 
@@ -823,12 +833,15 @@ pciHandleDevice (
                 
             // Unlock irq handler.
             printf ("pciHandleDevice: Unlocking interrupt handler\n");
-            e1000_interrupt_flag = TRUE;
+            
+            //e1000_interrupt_flag = TRUE;
+            e1000_interrupt_flag = FALSE;
             
             //class=network device,
             //__class = 3;
             
             */
+            
         }
 
 

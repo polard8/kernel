@@ -554,6 +554,12 @@ setup_vectors:
     mov rbx,  qword 40
     call _setup_system_interrupt
 
+;fake nic
+    ;mov rax,  qword _nic_handler
+    ;mov rbx,  qword 41
+    ;call _setup_system_interrupt
+
+
 ; 44 - PS2 Mouse.
 ; See: unit1hw.asm
     mov rax,  qword _irq12
@@ -629,8 +635,10 @@ _nic_handler:
     
     cli
     push rax
+    push rbx
+    push rcx
+    push rdx
 
-    ;int 3
     call _irq_E1000
 
     ; EOI: Order: Second, first.
@@ -638,6 +646,9 @@ _nic_handler:
     out 0xA0, al  
     out 0x20, al
 
+    pop rdx
+    pop rcx
+    pop rbx
     pop rax
     sti
 
@@ -661,11 +672,18 @@ _nic_handler:
 extern _nic_idt_entry_new_number
 ;extern _nic_idt_entry_new_address
 
+extern _IDT_register
+
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
 
+    ;int 3
+
     push rax
     push rbx
+    
+    xor rax, rax
+    xor rbx, rbx
 
 ;; Isso é o endereço da rotina de handler, em assembly;
 ;; está em hw.asm
@@ -673,11 +691,11 @@ _asm_nic_create_new_idt_entry:
 ;; o EOI e a pilha da rotina de handler.
 
     mov rax, qword _nic_handler
-    ;mov rax, dword [_nic_idt_entry_new_address]
+    ;mov rax, qword [_nic_idt_entry_new_address]
 
 ;; Isso é o número da interrupção. (41)
     ;mov rbx, qword [_nic_idt_entry_new_number]
-    mov rbx, dword 41 ;32+9
+    mov rbx, qword 41 ;32+9
 
     call _setup_system_interrupt
 

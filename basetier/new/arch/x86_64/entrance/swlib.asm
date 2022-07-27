@@ -12,6 +12,10 @@ unhandled_int:
     ;jmp unit3_unhandled_int_release
 ;unit3_unhandled_int_release:
     ; nop 
+    
+    ;#bugbug: talvez uma irq esta chamando isso e precisa de eoi.
+    ;#todo: criar um contador para isso.
+    
     iretq
 
 
