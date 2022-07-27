@@ -618,27 +618,29 @@ setup_vectors:
 
 
 
-;;===============================================
-;;  interrupção 41. irq 9;
+;=============================
+; e1000 Intel nic handler.
+; interrupção ?. irq ?;
+; see: e1000.c
 
+extern _irq_E1000
 global _nic_handler
 _nic_handler:
+    
     cli
-    ;pusha
     push rax
 
-    ;#todo: call this routine in e1000.c
-    ;call _irq_E1000
+    ;int 3
+    call _irq_E1000
 
-    ;; EOI.
-    ;; Order: Second, first.
+    ; EOI: Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
     out 0x20, al
 
     pop rax
-    ;popa
     sti
+
     iretq
 
 
@@ -662,7 +664,6 @@ extern _nic_idt_entry_new_number
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
 
-    ;pushaq
     push rax
     push rbx
 
@@ -672,22 +673,21 @@ _asm_nic_create_new_idt_entry:
 ;; o EOI e a pilha da rotina de handler.
 
     mov rax, qword _nic_handler
-	;mov rax, dword [_nic_idt_entry_new_address]
-
+    ;mov rax, dword [_nic_idt_entry_new_address]
 
 ;; Isso é o número da interrupção. (41)
-    mov rbx, qword [_nic_idt_entry_new_number]
-    ;mov rbx, dword 41
+    ;mov rbx, qword [_nic_idt_entry_new_number]
+    mov rbx, dword 41 ;32+9
 
-	call _setup_system_interrupt
-	
-	;;#test: Não sei se precisa carregar novamente.
-	;;ok, sem problemas.
-	lidt [_IDT_register] 
-	
+    call _setup_system_interrupt
+
+;;#test: Não sei se precisa carregar novamente.
+;;ok, sem problemas.
+    lidt [_IDT_register] 
+
     pop rbx
     pop rax
-    ;popaq
+
     ret 
 
 

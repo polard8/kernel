@@ -165,36 +165,37 @@ __E1000AllocCont (
     uint32_t amount, 
     unsigned long *virt )  //#todo: 64bit address
 {
-    //uint32_t va=0;
-    //uint32_t pa=0;
-
     unsigned long va=0;
     unsigned long pa=0;
-
 
     if (amount==0){
         panic ("__E1000AllocCont: [FAIL] amount\n");
     }
 
-    // ============
-    // va
+// ============
+// va
     va = (unsigned long) kmalloc ( (size_t) amount );
     *virt = va;
     if (*virt == 0){
         panic ("__E1000AllocCont: [FAIL] va allocation\n");
     }
+    //printf("va=%x\n",va);
 
-    
-    // ============
-    // pa
-    // ps: Using the kernel page directory.
-    pa = (unsigned long) virtual_to_physical (
-                        va, 
-                        gKernelPML4Address ); 
+
+// ============
+// pa
+// ps: Using the kernel page directory.
+// see: 
+
+    pa = 
+        (unsigned long) virtual_to_physical (
+                            va, 
+                            gKernelPML4Address ); 
     if (pa == 0){
         panic ("__E1000AllocCont: [FAIL] pa\n");
     }
-
+    //printf("pa=%x\n",pa);
+    
     return (unsigned long) pa;
 }
 
@@ -211,13 +212,12 @@ __E1000AllocCont (
 // see: nicintel.h
 int e1000_reset_controller (void)
 {
-
     int i=0;
     //register int i=0;
 
-
-    debug_print ("e1000_reset_controller\n");
-
+    debug_print ("e1000_reset_controller:\n");
+    printf ("e1000_reset_controller:\n");
+    
 	//unsigned long tmp;
 	
 	//#debug
@@ -237,8 +237,7 @@ int e1000_reset_controller (void)
     //esse será o endereço oficial.
     //currentNIC->mem_base	
 
-    if ( currentNIC->mem_base == 0 )
-    {
+    if ( currentNIC->mem_base == 0 ){
         panic ("e1000_reset_controller: [FAIL] currentNIC->mem_base\n");
     }
 
@@ -254,9 +253,10 @@ int e1000_reset_controller (void)
 	//===========================================
 	//
 	
-	//
-	//    ## TX ##
-	//
+//
+//    ## TX ##
+//
+    //printf("[1]:\n");
 
     // And alloc the phys/virt address of the transmit buffer
     // tx_descs_phys conterá o endereço físico e
@@ -265,21 +265,20 @@ int e1000_reset_controller (void)
     // IN:  size, return virtual address.
     // OUT: physical address
 
+    unsigned long tx_address = (unsigned long) &currentNIC->legacy_tx_descs;
+
+    //printf("tx_address=%x\n",tx_address);
+        
     currentNIC->tx_descs_phys = 
-        __E1000AllocCont ( 
-            0x1000, 
-            (unsigned long *)(&currentNIC->legacy_tx_descs) );
+        __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
-	// We failed, unmap everything
-
-    if ( currentNIC->tx_descs_phys == 0 )
-    {
+    if ( currentNIC->tx_descs_phys == 0 ){
         panic ("e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
     }
 
+    //printf("[2]:\n");
 
-	//tx
-	//i já foi declarado
+// tx
 
     for ( i=0; i < 8; i++ ) 
     {
@@ -297,13 +296,10 @@ int e1000_reset_controller (void)
                 (unsigned long *) &currentNIC->tx_descs_virt[i] );
         currentNIC->legacy_tx_descs[i].addr2 = 0;
 
-		// We failed, unmap everything
-
-        if (currentNIC->legacy_tx_descs[i].addr == 0)
-        {
+        if (currentNIC->legacy_tx_descs[i].addr == 0){
             panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
-        
+
         // #test: Configurando o tamanho do buffer
         currentNIC->legacy_tx_descs[i].length = 0x3000;
 
@@ -322,42 +318,39 @@ int e1000_reset_controller (void)
         currentNIC->legacy_tx_descs[i].status = 1;
     };
 
-	//#debug 
-	//Vamos imprimir os endereços usados pelos buffers para teste.	
+//#debug 
+//Vamos imprimir os endereços usados pelos buffers para teste.	
     //for ( i=0; i < 8; i++ )
     //    printf ("PA={%x} VA={%x} \n",currentNIC->legacy_tx_descs[i].addr, currentNIC->tx_descs_virt[i]);
 
+//
+//=============================================
+//
 
-	//
-	//=============================================
-	//
+//
+//    ## RX ##
+//
 
-	//
-	//    ## RX ##
-	//
-	
-	
-    // And alloc the phys/virt address of the transmit buffer
+// And alloc the phys/virt address of the transmit buffer
+
+    //printf("[3]:\n");
 
     currentNIC->rx_descs_phys = 
         __E1000AllocCont (
             0x1000, 
             (unsigned long *)(&currentNIC->legacy_rx_descs));
 
-    // We failed, unmap everything
-    if (currentNIC->rx_descs_phys == 0)
-    {
+    if (currentNIC->rx_descs_phys == 0){
         panic ("e1000_reset_controller: [FAIL] currentNIC->rx_descs_phys\n");
     }
 
+    //printf("[4]:\n");
 
-	//rx
-	//i já foi declarado
+// rx
 
     for ( i=0; i < 32; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
-
         // IN:  size, return virtual address.
         // OUT: physical address
 
@@ -368,27 +361,24 @@ int e1000_reset_controller (void)
         currentNIC->legacy_rx_descs[i].addr2 = 0;
 
         // Buffer null.
-        // We failed, unmap everything
-        if (currentNIC->legacy_rx_descs[i].addr == 0)
-        {
+        if (currentNIC->legacy_rx_descs[i].addr == 0){
             panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
 
         // #test: Configurando o tamanho do buffer
         currentNIC->legacy_rx_descs[i].length = 0x3000;
-
         currentNIC->legacy_rx_descs[i].status = 0;
     };
 
-
-	//#debug 
-	//Vamos imprimir os endereços edereços físicos dos buffers 
-	//e os edereços virtuais dos descritores.
-	//for ( i=0; i < 32; i++ )
+//#debug 
+//Vamos imprimir os endereços edereços físicos dos buffers 
+//e os edereços virtuais dos descritores.
+    //for ( i=0; i < 32; i++ )
     //    printf ("PA={%x} VA={%x} \n",currentNIC->legacy_rx_descs[i].addr, currentNIC->rx_descs_virt[i]);
-	
 
-	// ???
+// ???
+
+    //printf("[5]:\n");
 
     for (i=0; i < 0x80; i++){
         __E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
@@ -397,16 +387,14 @@ int e1000_reset_controller (void)
     currentNIC->rx_cur = 0;
     currentNIC->tx_cur = 0;
 
-	//irq #todo
-	//PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, currentNIC );
-	
-	
+//irq #todo
+//#bugbug: fow now we're doing this in pci.c.
+    //PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, currentNIC );
+
     /* Transmit Enable. */
     //#define E1000_REG_TCTL_EN	(1 << 1)
-
     /* Pad Short Packets. */
     //#define E1000_REG_TCTL_PSP	(1 << 3)
-
 
    //#define E1000_ICR      0x000C0  /* Interrupt Cause Read - R/clr */
    //#define E1000_ITR      0x000C4  /* Interrupt Throttling Rate - RW */
@@ -434,6 +422,8 @@ int e1000_reset_controller (void)
 
 	//E1000WriteCommand(currentNIC, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
 
+    //printf("[6]:\n");
+    
 	// Enable interrupts
 	//0xD0 Message Control (0x0080) Next Pointer (0xE0) Capability ID (0x05)
 	//    0000 0001  1111 0111  0000   0010  1101   0111
@@ -575,44 +565,30 @@ int e1000_reset_controller (void)
 uint8_t nic_idt_entry_new_number;
 //na verdade o assembly esta usando outro endereço
 //uint32_t nic_idt_entry_new_address;
-unsigned long nic_idt_entry_new_address;
+unsigned long nic_idt_entry_new_address=0; //global
 
 //global
 //see: nicintel.h
 void e1000_setup_irq (int irq_line)
 {
-
     debug_print ("e1000_setup_irq: [FIXME]\n");
 
-    // #test
+// irq line.
+    uint8_t irq = 
+        (uint8_t) (irq_line & 0xFF);
 
-
-	// pegando o número da irq.
-
-    //uint8_t irq = (uint8_t) currentNIC->pci->irq_line;
-    uint8_t irq = (uint8_t) irq_line;
-	
-	// handler address
-
-//na verdade o assembly esta usando outro endereço
+// handler address.
+// #bugbug: 
+// Na verdade o assembly esta usando outro endereço.
+// #todo: 64bit.
     uint32_t handler = (uint32_t) &irq_E1000; 
 
-	// #importante
-	// Transformando irq em número de interrupção.
-	// 9+32=41.
+// #importante
+// Transformando irq em número de interrupção.
+// 9+32=41.
+    uint8_t idt_num = (uint8_t) (irq + 32);
 
-    uint8_t idt_num = (irq + 32);
-
-	// Chamando asm:
-	// número e endereço.
-	// #obs: Essas variáveis são declaradas nesse arquivo
-	// o assembly terá que pegar.
-
-    nic_idt_entry_new_number  = (uint8_t) idt_num; 
-
-//na verdade o assembly esta usando outro endereço
-    nic_idt_entry_new_address = (unsigned long) handler; 
-
+// --------------
 
 	//#debug OK (irq=9) 
     printf ("e1000_setup_irq: irq={%d}\n",irq);
@@ -620,8 +596,6 @@ void e1000_setup_irq (int irq_line)
 	//printf ("PCIRegisterIRQHandler: pin={%d}\n",currentNIC->pci->irq_pin);//shared INTA#
 	//refresh_screen();
 	//while(1){}
-
-
 	//#debug interrupção=41 
     printf ("e1000_setup_irq: interrupt={%d}\n", 
         nic_idt_entry_new_number );
@@ -631,23 +605,31 @@ void e1000_setup_irq (int irq_line)
 	//refresh_screen();
 	//while(1){}
 
-	//
-	// Creating IDT entry.
-	//
-	
-	//Essa é a rotina em assembly que cria uma entrada na idt para 
-	//o nic, com base nas variáveis que são importadas pelo assembly.
-	
-	//headlib.asm
-	//deveria ir para hwlib.asm
+//
+// Creating IDT entry.
+//
 
-    extern void asm_nic_create_new_idt_entry (void);
+// Chamando asm:
+// número e endereço.
+// #obs: Essas variáveis são declaradas nesse arquivo
+// o assembly terá que pegar.
+// Essa é a rotina em assembly que cria uma entrada na idt para 
+// o nic, com base nas variáveis que são importadas pelo assembly.
+// headlib.asm
+// deveria ir para hwlib.asm
 
+    nic_idt_entry_new_number = 
+        (unsigned long) (idt_num & 0xFF);
+
+//not used for now.
+//na verdade o assembly esta usando outro endereço
+    nic_idt_entry_new_address = (unsigned long) handler; 
+
+    extern void asm_nic_create_new_idt_entry(void);
+
+// Call assembly.
     asm_nic_create_new_idt_entry();
 }
-
-
-
 
 
 static unsigned long __mapping_nic1_device_address(unsigned long pa)
@@ -1000,12 +982,14 @@ e1000_init_nic (
  * qual é o PID do processo que é o servidor de rede, e enviar
  * a mensagem para ele, contendo o endereço do buffer.
  */
-
 // Isso é chamado pelo assembly.
 
 __VOID_IRQ 
 irq_E1000 (void)
 {
+    //e1000_interrupt_flag
+    printf("irq_E1000:\n");
+    refresh_screen();
     //DeviceInterface_e1000();
 }
 

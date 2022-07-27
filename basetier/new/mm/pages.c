@@ -886,13 +886,27 @@ __virtual_to_physical (
     //refresh_screen();
     //while(1){}
 
-    //#debug
-    if ( a >= 512 || b >= 512 || d >= 512 || t >= 512 || o >= 512  )
+    //offset limits
+    //1111 1111 1111
+    //FFF
+
+    // #debug
+    // IN 64bit each table has only 512 entries.
+    // With 64KB pages, an offset can't have more than 4096 bytes.
+    if ( a >= 512 || b >= 512 || d >= 512 || t >= 512 || 
+         o >= 4096  )
     {
-        printf ("__virtual_to_physical: entry limits \n");
+        printf ("__virtual_to_physical: entry limits\n");
+        printf("a=%d\n",a);
+        printf("b=%d\n",b);
+        printf("d=%d\n",d); //directory
+        printf("t=%d\n",t); //page table
+        printf("o=%d\n",o); //offset 4096 bytes limit
         refresh_screen();
-        while(1){}
+        while(1){
+        }
     }
+
 
 // #todo
 // Por enquanto estamos usando apenas as entradas '0'

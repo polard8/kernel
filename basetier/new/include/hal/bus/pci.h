@@ -702,7 +702,6 @@ struct pci_device_d
 
 // ...
 
-
 // A list of threads waiting on this device.
     struct thread_d *waiting_list;
 
@@ -719,13 +718,10 @@ struct pci_device_d  *current_pci_device;    //Current.
 
 struct pci_d
 {
-
 // Number of found devices.
     unsigned int found_devices;
-
 // Max
     unsigned int max;
-
 // List?
     struct pci_device_d  *device_list;
 };

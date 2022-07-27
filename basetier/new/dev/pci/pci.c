@@ -637,13 +637,11 @@ irq_SHARED3 (void)
 }
 
 
-
 /*
  * pciHandleDevice
  *    Registra um dispositivo encontrado na sondagem. 
  *    Inicializa em alguns casos.
  */
-
 // Called by pci_setup_devices() in pciscan.c
 
 int 
@@ -662,6 +660,8 @@ pciHandleDevice (
     // name support.
     char __tmpname[64];
     char *newname;
+
+    unsigned char _irq_line=0;
 
 
     // #debug
@@ -716,6 +716,7 @@ pciHandleDevice (
 		//D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
 
         D->irq_line = (unsigned char) pciGetInterruptLine(bus,dev);
+        _irq_line = (unsigned char) D->irq_line;
         D->irq_pin  = (unsigned char) pciGetInterruptPin(bus,dev);
 
         // Next device.
@@ -794,44 +795,40 @@ pciHandleDevice (
             //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
             //printf("82540EM Gigabit Ethernet Controller found\n");
 
-
             /*
-             
-            // See: 
-            // dev/e1000/e1000.c
-            Status = (int) e1000_init_nic ( 
-                               (unsigned char) D->bus, 
-                               (unsigned char) D->dev, 
-                               (unsigned char) D->func, 
-                               (struct pci_device_d *) D );
 
-            // OK. Setup e1000 nic device.
-            if (Status == 0)
-            {
-                //irq and reset.
-                // See: 
-                // 2io/dev/tty/netdev/e1000/e1000.c
+            // See: dev/e1000/e1000.c
+            Status = 
+                (int) e1000_init_nic ( 
+                          (unsigned char) D->bus, 
+                          (unsigned char) D->dev, 
+                          (unsigned char) D->func, 
+                          (struct pci_device_d *) D );
+
+            if (Status != 0){
+                 panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
+            }
+            
+            // irq support and reset.
+            // See: e1000.c
+            // #debug
+            // currentNIC foi configurado pela rotina acima.
+            if ( currentNIC->pci->irq_line != _irq_line ){
+                panic("pciHandleDevice: currentNIC->pci->irq_line fail\n");
+            }
+            e1000_setup_irq(_irq_line);
+            
+            // Reset controller. 
+            e1000_reset_controller();
                 
-                // #debug
-                // currentNIC foi configurado pela rotina acima.
-                if ( D->irq_line != currentNIC->pci->irq_line )
-                {
-                     panic("pciHandleDevice: D->irq_line fail\n");
-                }
-                
-                e1000_setup_irq( D->irq_line );  //currentNIC->pci->irq_line
-                e1000_reset_controller();
-                printf ("pciHandleDevice: Unlocking interrupt handler \n");
-                e1000_interrupt_flag = TRUE;
-                //class=network device,
-                //__class = 3;
- 
-            }else{
-                panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
-            };
+            // Unlock irq handler.
+            printf ("pciHandleDevice: Unlocking interrupt handler\n");
+            e1000_interrupt_flag = TRUE;
+            
+            //class=network device,
+            //__class = 3;
             
             */
-            
         }
 
 
