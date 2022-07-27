@@ -1,0 +1,19 @@
+
+
+	basetier folder: (data tier)
+	:: database and legacy systems and external application.
+	:: Model layer
+	
+	The model layder is where we have the information.
+	All the data is find here.
+	The Controller layer is responsable for accessing this
+	information here.
+
+	There is no external dependencies for the modules inside
+	this folder.
+	It means that the modules here will never call any library
+	outside this folder.
+	
+	The purpose of this folder is give to the upper layers
+	access to the data.
+	

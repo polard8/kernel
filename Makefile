@@ -139,10 +139,17 @@ base-tier:
 # Copy to the target folder.
 	sudo cp basetier/boot/x86/bin/BL.BIN  basetier/disk/
 
+
 # ::Build kernel image.
 	$(Q) $(MAKE) -C basetier/new/
 # Copy to the target folder.
 	sudo cp basetier/new/KERNEL.BIN  basetier/disk/GRAMADO
+
+
+# ::Build the ring0 module image.
+	$(Q) $(MAKE) -C basetier/modr0/
+# Copy the ring0 module image.
+	sudo cp basetier/modr0/MOD0.BIN  basetier/disk/
 
 # Install BMPs
 	sudo cp basetier/data/themes/field/*.BMP  basetier/disk/
@@ -176,7 +183,7 @@ presentation-tier:
 	$(Q) $(MAKE) -C prestier/init/
 # Copy to the target folder.
 	-sudo cp prestier/bin/INIT.BIN  basetier/disk/ 
-	-sudo cp prestier/bin/MOD0.BIN  basetier/disk/
+
 
 
 # test
@@ -287,6 +294,9 @@ clean-all: clean
 	-rm -rf basetier/boot/x86/bin/*.BIN
 # Clear newos kernel image
 	-rm -rf basetier/new/KERNEL.BIN
+# Clear the ring0 module image
+	-rm -rf basetier/modr0/MOD0.BIN
+
 
 	-rm -rf basetier/disk/*.BIN 
 	-rm -rf basetier/disk/*.BMP

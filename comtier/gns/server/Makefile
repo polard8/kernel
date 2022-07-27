@@ -27,9 +27,10 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-#todo
-#path longo. vamos mudar  as libs de lugar para gramado/libs.
 
+
+
+# rtl
 LIBC    = ../../lib/rtl/include/
 LIBCOBJ = ../../lib/rtl/obj
 

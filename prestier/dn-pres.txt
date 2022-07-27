@@ -1,0 +1,13 @@
+
+
+	prestier folder:
+	:: this client and rich client.
+	:: View
+	
+	The users are in this layer. Sending requests to access the 
+	data via thin clients or rich clients.
+	The user uses the View layer to visualize the information.
+	But the user send requests to the controller to access
+	the data inside the model layer.
+
+	ui ex interfaces.

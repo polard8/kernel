@@ -6,7 +6,7 @@ all:
 # antigo primeiro cliente
 	make -C init
 # antigo window server
-	make -C modr0
+	#make -C modr0
 
 # client-side library
 	#make -C libgws

@@ -1,13 +1,9 @@
 
-
 # ring0 application.
 # #bugbug:
 # We don't want syscalls from ring0.
 # #todo:
 # Check if crt0 initialization is making some ring0 syscall.
-
-
-
 
 VERSION = 0
 PATCHLEVEL = 1
@@ -114,9 +110,9 @@ gws-link:
 	$(LD) $(user_ldflags) -o MOD0.BIN $(myObjects)
 #	$(LD) -m elf_i386 -T ../link.ld -o GWSSRV.BIN $(myObjects)  
 finalize:
-	cp MOD0.BIN ../../bin
+	#cp MOD0.BIN ../../bin
 clean:
 	-rm *.o
-	-rm MOD0.BIN 
+	#-rm MOD0.BIN 
 	
 

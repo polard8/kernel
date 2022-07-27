@@ -1,0 +1,17 @@
+
+
+	comtier/ folder
+	:: This is business logic.
+	:: The controller
+	
+	The controller is responsable for requesting information
+	in the model layer.
+	
+	Her we have services. The applications can use these 
+	servicess to handle the data and the legacy systems 
+	in the base tier.
+	
+	The purpose of this layer is giving to the presentation layer
+	access to the system resources in the base layer.
+	
+	

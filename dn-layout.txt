@@ -9,3 +9,21 @@
 	comtier/     Tier 2: A kind of place for communication tier.
 	prestier/    Tier 3: A kind of place for presentation tier.
 
+------------
+
+The three tiers of Windows DNA are:
+
+Presentation, or user interface
+
+Business logic
+
+Data storage
+
+It’s important to note that these three tiers are separations within the application. 
+
+
+----------------
+	But maybe its a way of thinking the whole system.
+
+
+

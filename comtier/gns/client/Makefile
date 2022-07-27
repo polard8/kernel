@@ -30,10 +30,14 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
+
+#rtl
 LIBC      = ../../lib/rtl/include/
 LIBCOBJ   = ../../lib/rtl/obj
-LIBGNS    = ../../lib/libgns/include/
-LIBGNSOBJ = ../../lib/libgns/obj
+
+#libgns
+LIBGNS    = ../libgns/include/
+LIBGNSOBJ = ../libgns/obj
 
 #
 # Objects
