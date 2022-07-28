@@ -15,6 +15,9 @@ pid_t kgws_ws_PID;
 int kgws_ws_status;
 
 
+//see: ws.h
+struct ws_info_d  WindowServerInfo;
+
 //=================================
 
 // write_in_tty:

@@ -89,17 +89,12 @@ typedef enum {
  * thread_type_t:
  *     Enumerando os tipos de threads:
  */
-
+// priority class
 typedef enum {
     THREAD_TYPE_NULL,
-    THREAD_TYPE_SYSTEM,     // first-come-first-served.
-    THREAD_TYPE_IDLE,       // 
-    THREAD_TYPE_PERIODIC,   // periodic threads with predefined intervals.
-    THREAD_TYPE_RR,         // first-come-first-served cooperative.
-    THREAD_TYPE_REALTIME,
-    THREAD_TYPE_UI, 
-    THREAD_TYPE_IO, 
-    // ...
+    THREAD_TYPE_SYSTEM,       // high priority
+    THREAD_TYPE_INTERACTIVE,  // medium priority
+    THREAD_TYPE_BATCH,        // low priority
 }thread_type_t;
 
 
@@ -156,6 +151,7 @@ typedef enum {
  * visualização através do gráfico.
  */
 
+// canonical.
 typedef enum {
 
 //0 Earth, Criado o contexto e parâmetros.
@@ -244,8 +240,31 @@ struct thread_d
 
 // type: 
 // Tipo de tarefa.
-// (SYSTEM, PERIODIC, RR, IDLE).
+// (SYSTEM, INTERACTIVE, BATCH)
     thread_type_t type;
+
+// ========================================================
+// ORDEM: 
+// O que segue é referenciado durante o processo de scheduler.
+
+// Priority levels.
+// Used by processes and threads.
+// Classes:
+// 1 ~ 5 = variable.
+// 6 ~ 9 = realtime.
+// variable:
+//     Can be changed on the fly.
+// realtime:
+//     Can't be changed on the fly.
+// # ps:
+// The base priority is never changed. It's used to classify
+// the priority level.
+// The priority can't be changed to a level below the base priority.
+// The base priority is static and the current priority is dynamic.
+
+    unsigned long base_priority;  // static 
+    unsigned long priority;       // dynamic
+
 
 // flag, Estado atual da tarefa. ( RUNNING, DEAD ... ).
     thread_state_t state;    
@@ -345,27 +364,6 @@ struct thread_d
 //    int in_syscall;
 
 
-// ========================================================
-// ORDEM: 
-// O que segue é referenciado durante o processo de scheduler.
-
-// Priority levels.
-// Used by processes and threads.
-// Classes:
-// 1 ~ 5 = variable.
-// 6 ~ 9 = realtime.
-// variable:
-//     Can be changed on the fly.
-// realtime:
-//     Can't be changed on the fly.
-// # ps:
-// The base priority is never changed. It's used to classify
-// the priority level.
-// The priority can't be changed to a level below the base priority.
-// The base priority is static and the current priority is dynamic.
-
-    unsigned long base_priority;  // static 
-    unsigned long priority;       // dynamic
 
 // preempted:
 // flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.

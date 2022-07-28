@@ -1002,7 +1002,11 @@ struct thread_d *create_thread (
 // #todo
 // The parameters needs to provide us this information.
 
-    Thread->type  = THREAD_TYPE_SYSTEM; 
+    Thread->type = THREAD_TYPE_SYSTEM; 
+    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THREAD;  //static
+    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THREAD;  //dynamic
+
+
     Thread->plane = FOREGROUND;
 
 // ==============
@@ -1025,19 +1029,6 @@ struct thread_d *create_thread (
 // ==============
 
 
-// A 'prioridade base' é fixa e 
-// a thread nunca poderá ter sua prioridade rebaixada 
-// para menos que a prioridade base.
-// Se pertence ao kernel a prioridade eh maxima.
-
-    Thread->base_priority = (unsigned long) PRIORITY_NORMAL;  //static
-    Thread->priority      = (unsigned long) PRIORITY_NORMAL;  //dynamic
-
-    if (Thread->ownerPID == GRAMADO_PID_KERNEL)
-    {
-        Thread->base_priority = (unsigned long) PRIORITY_MAX;
-        Thread->priority      = (unsigned long) Thread->base_priority;
-    }
 // =====================
 
 // local worker
@@ -1509,7 +1500,14 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 
     ClonedThread = clone;
 
+
+// Type, base priority and priority.
+
     clone->type  = father->type; 
+
+    clone->base_priority = father->base_priority; 
+    clone->priority      = father->priority;
+
 
 //
 // Input
@@ -1539,17 +1537,6 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 // #todo: 
 // ISSO DEVERIA VIR POR ARGUMENTO
     clone->plane = father->plane;
-
-// A prioridade b�sica da thread � igual a prioridade b�sica 
-// do processo.
-	// Process->base_priority;
-	// priority; A prioridade din�mica da thread foi 
-	// passada por argumento.
-
-    clone->base_priority = father->base_priority; 
-    clone->priority      = father->priority;
-
-
 
 //
 // cpl

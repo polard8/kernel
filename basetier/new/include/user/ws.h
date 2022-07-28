@@ -210,7 +210,9 @@ struct ws_info_d
     pid_t pid;
     tid_t tid;
 };
-struct ws_info_d  WindowServerInfo;
+
+// see: graphics.c
+extern struct ws_info_d  WindowServerInfo;
 
 
 // ===============================================================

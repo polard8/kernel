@@ -35,14 +35,19 @@ struct scheduler_info_d  SchedulerInfo;
 
 // ===============================================
 
+
+//----
 #define QUANTUM_Q1  1
 #define QUANTUM_Q2  2
 #define QUANTUM_Q3  3
+//----
+
 #define QUANTUM_MIN    QUANTUM_Q1
 #define QUANTUM_MAX    QUANTUM_Q3
 
 #define QUANTUM_BASE   QUANTUM_MIN
 #define QUANTUM_LIMIT  QUANTUM_MAX
+
 #define QUANTUM_FIRST_PLANE   QUANTUM_MAX
 #define QUANTUM_SECOND_PLANE  QUANTUM_MIN
 
@@ -53,6 +58,7 @@ struct scheduler_info_d  SchedulerInfo;
 #define BLOCKED_LIMIT    QUANTUM_MAX
 // ...
 
+#define QUANTUM_WINDOW_SERVER  QUANTUM_MAX
 
 // Hz padrão. 100Hz. 
 // Uma interrupção a cada 10ms.

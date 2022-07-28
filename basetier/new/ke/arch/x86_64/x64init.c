@@ -161,11 +161,14 @@ static int I_x64CreateInitialProcess(void)
 // Create init process
 //
 
+    unsigned long BasePriority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long Priority = PRIORITY_SYSTEM_PROCESS;
+
     InitProcess = 
         (void *) create_process( 
                      NULL, NULL, NULL, 
                      (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
-                     PRIORITY_HIGH, 
+                     BasePriority, 
                      (int) KernelProcess->pid, 
                      "INIT-PROCESS", 
                      RING3, 
@@ -198,7 +201,11 @@ static int I_x64CreateInitialProcess(void)
 // The init process is a system application.
 // GWS.BIN
 
-    InitProcess->type = SYSTEM_APPLICATION;
+    InitProcess->type = PROCESS_TYPE_SYSTEM;
+
+    InitProcess->base_priority = BasePriority;    
+    InitProcess->priority = Priority;
+
 
     if ( init_mm_data.used != TRUE || 
          init_mm_data.magic != 1234 )
@@ -671,6 +678,9 @@ static int I_x64CreateKernelProcess(void)
 
     //debug_print ("I_x64CreateKernelProcess:\n");
 
+    unsigned long BasePriority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long Priority = PRIORITY_SYSTEM_PROCESS;
+
 //
 // Module 0 image.
 //
@@ -707,7 +717,7 @@ static int I_x64CreateKernelProcess(void)
         (void *) create_process( 
                      NULL, NULL, NULL, 
                      (unsigned long) 0x30000000, 
-                     PRIORITY_HIGH, 
+                     BasePriority, 
                      (int) 0,        //ppid
                      "KERNEL-PROCESS", 
                      RING0,   
@@ -740,7 +750,10 @@ static int I_x64CreateKernelProcess(void)
 // The kernel process is a system program.
 // KERNEL.BIN and GWSSRV.BIN
 
-    KernelProcess->type = KERNEL_PROCESS;
+    KernelProcess->type = PROCESS_TYPE_SYSTEM;
+
+    KernelProcess->base_priority = BasePriority;
+    KernelProcess->priority = Priority;
 
 //
 // mm

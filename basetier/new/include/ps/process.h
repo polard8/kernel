@@ -79,20 +79,26 @@ extern int copy_process_in_progress;
 // The priority can't be changed to a level below the base priority.
 //
 
+// main set of priorities
 #define PRIORITY_P1  1
 #define PRIORITY_P2  2
 #define PRIORITY_P3  3
 
 
+// -----------
 #define PRIORITY_LOW4      PRIORITY_P1
 #define PRIORITY_LOW3      PRIORITY_P1
 #define PRIORITY_LOW2      PRIORITY_P1
 #define PRIORITY_LOW1      PRIORITY_P1
-#define PRIORITY_NORMAL    PRIORITY_P1
-#define PRIORITY_HIGH1     PRIORITY_P1
-#define PRIORITY_HIGH2     PRIORITY_P1
-#define PRIORITY_HIGH3     PRIORITY_P1
-#define PRIORITY_HIGH4     PRIORITY_P1
+
+#define PRIORITY_NORMAL    PRIORITY_P2
+
+#define PRIORITY_HIGH1     PRIORITY_P3
+#define PRIORITY_HIGH2     PRIORITY_P3
+#define PRIORITY_HIGH3     PRIORITY_P3
+#define PRIORITY_HIGH4     PRIORITY_P3
+// -----------
+
 
 // Aliases
 #define PRIORITY_MIN       PRIORITY_LOW4
@@ -102,10 +108,14 @@ extern int copy_process_in_progress;
 #define PRIORITY_LOW       PRIORITY_LOW1
 #define PRIORITY_HIGH      PRIORITY_HIGH1 
 
-// Aliases
-#define PRIORITY_FIRST_PLANE    PRIORITY_MAX
-#define PRIORITY_SECOND_PLANE   PRIORITY_MIN 
 
+#define PRIORITY_SYSTEM_PROCESS       PRIORITY_MAX
+#define PRIORITY_INTERACTIVE_PROCESS  PRIORITY_NORMAL
+#define PRIORITY_BATCH_PROCESS        PRIORITY_MIN
+
+#define PRIORITY_SYSTEM_THREAD       PRIORITY_MAX
+#define PRIORITY_INTERACTIVE_THREAD  PRIORITY_NORMAL
+#define PRIORITY_BATCH_THREAD        PRIORITY_MIN
 
 //
 // == Multiplier =========================
@@ -130,6 +140,13 @@ extern int copy_process_in_progress;
 // ...
 
 
+typedef enum {
+
+    PROCESS_TYPE_NULL,
+    PROCESS_TYPE_SYSTEM,       // high priority
+    PROCESS_TYPE_INTERACTIVE,  // medium priority
+    PROCESS_TYPE_BATCH,        // low priority
+}process_type_t;
 
 
 /*
@@ -139,7 +156,7 @@ extern int copy_process_in_progress;
  *            como estado de transi��o.
  *  Os status de um processo s�o diferentes do status de uma thread.
  */ 
-
+// canonical.
 typedef enum {
     PROCESS_CREATED,
     PROCESS_INITIALIZED,
@@ -152,25 +169,6 @@ typedef enum {
 }process_state_t;
 
 
-typedef enum {
-
-    INVALID_PROCESS_TYPE,
-
-// The kernel process.
-// It has the programs:
-// KERNEL.BIN and GWSSRV.BIN
-
-    KERNEL_PROCESS,
-
-// Services (Background)
-    SYSTEM_SERVICE,
-    USER_SERVICE,
-
-// Applications
-    SYSTEM_APPLICATION,
-    USER_APPLICATION,    
-
-}process_type_t;
 
 
 /* 

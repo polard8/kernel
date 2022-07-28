@@ -54,9 +54,16 @@ void *create_tid0(void)
 
     kThread->objectType  = ObjectTypeThread;
     kThread->objectClass = ObjectClassKernelObjects;
-    kThread->type = THREAD_TYPE_SYSTEM; 
-    kThread->surface_rect = NULL;
 
+// Priorities
+// This is a ring0 thread, only used for sti/hlt.
+// Maybe it is gonna be a idle thread to manage the energy.
+// The idle thread has low priority.
+// #bugbug: for now it is a thread for the first module.
+
+    kThread->type = THREAD_TYPE_SYSTEM; 
+    kThread->base_priority = PRIORITY_SYSTEM_THREAD;  // Static
+    kThread->priority      = PRIORITY_SYSTEM_THREAD;  // Dynamic
     // #todo
     // #important
     // This will affect the input model
@@ -87,9 +94,7 @@ void *create_tid0(void)
     kThread->name_address = (unsigned long) ThreadName; 
     kThread->process      = (void *) KernelProcess;
 
-// Características.
-
-    kThread->type = THREAD_TYPE_SYSTEM; 
+    kThread->surface_rect = NULL;
 
     kThread->state = INITIALIZED; 
 
@@ -210,13 +215,6 @@ void *create_tid0(void)
     }
 
 // =================================================
-
-
-// Priorities
-// This is a ring0 thread, only used for sti/hlt.
-// Maybe it is gonna be a idle thread to manage the energy.
-    kThread->base_priority = PRIORITY_MIN;    // Static
-    kThread->priority      = PRIORITY_MIN;    // Dynamic
 
 // Pode sofrer preempção por tempo.
     kThread->preempted = PREEMPTABLE;
@@ -382,8 +380,7 @@ void *create_tid2 (void)
 
 // ==================================================
 // create_tid3:
-// The control thread of the first ws's client.
-// See: gws.bin
+// The control thread of the first ring3 process.
 
 void *create_tid3 (void)
 {
@@ -420,8 +417,17 @@ void *create_tid3 (void)
         panic ("create_tid3: t\n");
     } 
 
-    // #todo
-    // Object header.
+    t->objectType  = ObjectTypeThread;
+    t->objectClass = ObjectClassKernelObjects;
+
+
+// INIT process control thread.
+// type: system
+// priority: low
+
+    t->type = THREAD_TYPE_SYSTEM;
+    t->base_priority = PRIORITY_SYSTEM_THREAD;  // Static
+    t->priority      = PRIORITY_SYSTEM_THREAD;  // Dynamic
 
     // #todo
     // #bugbug
@@ -442,11 +448,11 @@ void *create_tid3 (void)
 
     t->name_address = (unsigned long) ThreadName; 
 
-    t->position = SPECIAL_GUEST;
 
-    t->type = THREAD_TYPE_IDLE;
 
     t->state = INITIALIZED;
+
+    t->position = SPECIAL_GUEST;
 
     // Execution plane.
     t->plane = BACKGROUND;
@@ -574,11 +580,6 @@ void *create_tid3 (void)
         t->MsgQueue[i] = (unsigned long) tmp;
     }
 // ============================================
-
-// Priorities.
-// The idle thread has the lowest priority possible.
-    t->base_priority = PRIORITY_MIN;    // Static
-    t->priority      = PRIORITY_MIN;    // Dynamic
 
     t->preempted = UNPREEMPTABLE; 
 

@@ -226,25 +226,18 @@ fail:
 
 
 /*
- ****************************************
  * copy_process_struct
- * 
  *     + Copia os elementos da estrutura de processo.
  *     + Cria um diret�rio de p�ginas e salva os endere�os 
  *       virtual e f�sico dele na estrutura de processo.
- *
  *     Isso � chamado por do_fork_process.
  */
-
 // Called by clone_and_execute_process at clone.c
-
 // #
 // It will also copy the control thread.
-
 // IN:
 // p1 = atual.
 // p2 = clone. 
-
 // OUT:
 // 0 = ok
 // 1 = fail
@@ -254,21 +247,17 @@ copy_process_struct(
     struct process_d *p1,
     struct process_d *p2 )
 {
-
     struct process_d  *Process1;
     struct process_d  *Process2;
 
     int Status=0;
     int i=0;
-    unsigned long BasePriority=0;
-    unsigned long Priority=0;
 
 // Balancing the priority.
 // Please, don't inherit base priority!
-
-    BasePriority = (unsigned long) PRIORITY_NORMAL; 
-    Priority     = (unsigned long) PRIORITY_NORMAL;
-
+// The priority for the clone.
+    unsigned long CloneBasePriority=PRIORITY_NORMAL;
+    unsigned long ClonePriority=PRIORITY_NORMAL;
 
     /*
     if ( p1 == p2 ){
@@ -326,6 +315,10 @@ copy_process_struct(
 // Object.
     Process2->objectType  = Process1->objectType;
     Process2->objectClass = Process1->objectClass;
+
+    Process2->base_priority = (unsigned long) CloneBasePriority;
+    Process2->priority      = (unsigned long) ClonePriority;
+
 
 // O clone não inicializa na seção crítica, pois senão teríamos
 // dois processos na sessão crítica.
@@ -474,11 +467,6 @@ copy_process_struct(
 
 // iopl
     Process2->rflags_iopl = Process1->rflags_iopl;
-
-// Priority.
-
-    Process2->base_priority = (unsigned long) BasePriority;
-    Process2->priority      = (unsigned long) Process1->priority;
 
 // Security: 
 // usersession, room and desktop.
@@ -1005,24 +993,24 @@ struct process_d *create_process (
     //    processNewPID = (int) GRAMADO_PID_BASE;
     //}
 
-// Base priority.
-// Please, don't inherit base priority!
 
-    BasePriority = (unsigned long) PRIORITY_NORMAL; 
+    BasePriority = (unsigned long) priority; 
     Priority     = (unsigned long) priority;
 
 //
 // Process
 //
+
     Process = (void *) kmalloc( sizeof(struct process_d) );
 
-    // #todo: 
-    // Aqui pode retornar NULL.
     if ( (void *) Process == NULL ){
         panic ("create_process: Process\n");
     }
 
     memset( Process, 0, sizeof(struct process_d) );
+
+    Process->base_priority = BasePriority;
+    Process->priority = Priority;
 
 
 //get_next:
@@ -1378,12 +1366,6 @@ struct process_d *create_process (
 
     //cancelada.
     //Process->process_message_queue[8]
-
-//
-// Priority
-//
-    Process->base_priority = (unsigned long) BasePriority;
-    Process->priority      = (unsigned long) Priority;
 
 // Que tipo de scheduler o processo utiliza. (rr, realtime ...).
     //Process->scheduler_type = ; 

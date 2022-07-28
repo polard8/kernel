@@ -45,11 +45,15 @@ void task_switch (void)
 
 // Check current thread limits.
 
+// index
+
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
     {
         panic ("ts: current_thread\n");
     }
+
+// structure
 
     CurrentThread = (void *) threadList[current_thread]; 
 
@@ -58,7 +62,6 @@ void task_switch (void)
         panic ("ts: CurrentThread\n");
     }
 
-// validation
     if ( CurrentThread->used != TRUE ||  
          CurrentThread->magic != 1234 )
     {
@@ -73,11 +76,10 @@ void task_switch (void)
 
 // The owner of the current thread.
 
-    owner_pid = (pid_t) CurrentThread->ownerPID;
 
-// #todo: 
-// Check overflow too.
-// Check max limit.
+// pid
+
+    owner_pid = (pid_t) CurrentThread->ownerPID;
 
     if ( owner_pid < 0 ||
          owner_pid >= PROCESS_COUNT_MAX )
@@ -85,7 +87,7 @@ void task_switch (void)
         panic ("ts: owner_pid\n");
     }
 
-// The current process.
+// structure
 
     CurrentProcess = (void *) processList[owner_pid];
 
@@ -100,9 +102,8 @@ void task_switch (void)
         panic ("ts: CurrentProcess validation\n");
     }
 
-    // check
-    if ( CurrentProcess->pid != owner_pid )
-    {
+// check pid
+    if ( CurrentProcess->pid != owner_pid ){
         panic("ts: CurrentProcess->pid != owner_pid \n");
     }
 
@@ -198,6 +199,10 @@ The remainder ??
 //
 // Save context
 //
+
+// #todo:
+// Put the tid as an argument.
+
     save_current_context();
     CurrentThread->saved = TRUE;
 
@@ -215,43 +220,9 @@ The remainder ??
 
 //=======================================================
 
-// #test
-// Select foreground thread
-// right after a keyboard input.
-// See: kgws.c
-// #bugbug
-// Is the forground thread a valid thread?
-
-
-
-/*
-
-// Only reset the running count
-// of the ws's control thread.
-// ## We're doing this when posting the message.
-
-    struct thread_d *ws_t;
-    if( weGotKeyboardInput == TRUE )
-    {
-        if( WindowServerInfo.initialized == TRUE)
-        {
-            // The control thread of the ws process.
-            ws_t = (struct thread_d *) GetWSThread();
-            if( (void*) ws_t != NULL )
-            {
-                if(ws_t->magic == 1234){
-                    ws_t->runningCount = 0;
-                    ws_t->runningCount_ms = 0;
-                }
-            }
-            weGotKeyboardInput = FALSE;
-        }
-    }
-*/
-
-
-
-//=======================================================
+//
+// == Checar se esgotou o tempo de processamento ==
+//
 
 // #obs:
 // Ja salvamos os contexto.
@@ -273,8 +244,9 @@ The remainder ??
 // O seu contexto está salvo, mas o handler em assembly
 // vai usar o contexto que ele já possui.
 
-    if ( CurrentThread->runningCount < CurrentThread->quantum )
-    {
+    // Ainda não esgotou o tempo de processamento.
+    if ( CurrentThread->runningCount < CurrentThread->quantum ){
+
         if ( CurrentThread->state == RUNNING && 
              CurrentThread->_yield == TRUE )
         {
@@ -294,8 +266,8 @@ The remainder ??
         //debug_print (" The same again $\n");
         //debug_print ("s");  // the same again
         return; 
-    }
-
+    
+    
 // Fim do quantum.
 // Nesse momento a thread [esgotou] seu quantum, 
 // então sofrerá preempção e outra thread será colocada 
@@ -313,7 +285,8 @@ The remainder ??
 // ->preempted permitisse. 
 // talvez o certo seja ->preenptable.
 
-    else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
+    // Agora esgotou o tempo de processamento.
+    } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
 
         // #bugbug
         //  Isso está acontecendo.
@@ -391,6 +364,11 @@ The remainder ??
         check_for_standby(); 
 
         goto try_next;
+    
+    // Estamos perdidos com o tempo de processamento.
+    // Can we balance it?
+    }else{
+        panic ("ts: CurrentThread->runningCount\n");
     };
 
 
@@ -399,6 +377,7 @@ The remainder ??
 // Não deveríamos estar aqui.
 // Podemos abortar ou selecionar a próxima provisóriamente.
 
+    //#debug
     //panic ("ts.c: crazy fail");
 
     goto dispatch_current; 
@@ -409,36 +388,31 @@ The remainder ??
 
 try_next: 
 
-//#ifdef TS_DEBUG
-    // debug_print(" N ");
-//#endif
-
-// #bugbug
 // No threads
+// #todo: Can we reintialize the kernel?
 // See: up.h and cpu.h
 
+    // No thread. 
     if (UPProcessorBlock.threads_counter == 0){
-        panic("task_switch: UPProcessorBlock.threads_counter == 0");
+        panic("task_switch: No threads\n");
     }
 
-// We have only ONE thread.
+// Only '1' thread.
 // Is that thread the idle thread?
 // Can we use the mwait instruction ?
 // See: up.h and cpu.h
+// tid0_thread
+// This is a ring0 thread.
+// See: x86_64/x64init.c
+// If we will run only the idle thread, 
+// so we can use the mwait instruction. 
+// asm ("mwait"); 
 
+    // Only 1 thread.
+    // The Idle thread is gonna be the scheduler condutor.
     if (UPProcessorBlock.threads_counter == 1)
     {
-        //debug_print(" JUSTONE ");
-
-        // tid0_thread
-        // This is a ring0 thread.
-        // See: x86_64/x64init.c
         Conductor = ____IDLE;
-        
-        // If we will run only the idle thread, 
-        // so we can use the mwait instruction. 
-        // asm ("mwait"); 
-        
         goto go_ahead;
     }
 
@@ -449,14 +423,19 @@ try_next:
 // depois melhoramos o reescalonamento.
 // #importante:
 // #todo: #test: 
-// De pempos em tempos uma interrupção pode chamar o escalonador,
+// De tempos em tempos uma interrupção pode chamar o escalonador,
 // ao invés de chamarmos o escalonador ao fim de todo round.
 // #critério:
 // Se alcançamos o fim da lista encadeada cujo ponteiro é 'Conductor'.
 // Então chamamos o scheduler para reescalonar as threads.
 // Essa rotina reescalona e entrega um novo current_thread e
 // Conductor.
+// #?
+// Estamos reconstruindo o round muitas vezes por segundo.
+// Isso é ruin quando tem poucas threads, mas não faz diferença
+// se o round for composto por muitas threads.
 
+    // End of round. Rebuild the round.
     if ( (void *) Conductor->next == NULL )
     {
         current_thread = (tid_t) KiScheduler();
@@ -470,15 +449,23 @@ try_next:
 // a próxima da lista.
 // #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
 
+    // Get the next thread in the linked list.
     if ( (void *) Conductor->next != NULL )
     {
         Conductor = (void *) Conductor->next;
         goto go_ahead;
     }
 
+// #fail
+// No thread was selected.
+// Can we use the idle? or reschedule?
+
+    //Conductor = ____IDLE;
+    //goto go_ahead;
 
 // #bugbug
-    panic ("ts: Unspected");
+// Not reached yet.
+    panic ("ts: Unspected error\n");
 
 // Go ahead
 // #importante:
@@ -491,58 +478,51 @@ try_next:
 
 go_ahead:
 
-//############################//
-//  # We have a thread now #  //
-//############################//
+// :)
+//#########################################//
+//  # We have a new selected thread now #  //
+//#########################################//
 
-// Esse foi o ponteiro configurado pelo scheduler.
+// TARGET:
+// Esse foi o ponteiro configurado pelo scheduler
+// ou quando pegamos a próxima na lista.
 
     TargetThread = (void *) Conductor;
 
-    // Vamos checar sua validade.
-
-    if( (void *) TargetThread == NULL )
+    if ( (void *) TargetThread == NULL )
     { 
         debug_print ("ts: Struct ");
-        //KiScheduler();
-        current_thread = KiScheduler();
+        current_thread = (tid_t) KiScheduler();
         goto try_next;
+    }
 
-    }else{
+    if ( TargetThread->used != TRUE || 
+         TargetThread->magic != 1234 )
+    {
+        debug_print ("ts: val ");
+        current_thread = (tid_t) KiScheduler();
+        goto try_next;
+    }
 
-        if ( TargetThread->used != TRUE || 
-             TargetThread->magic != 1234 )
-        {
-            debug_print ("ts: val ");
-            //KiScheduler ();
-            current_thread = KiScheduler();
-            goto try_next;
-        }
-
-        if ( TargetThread->state != READY )
-        {
-            debug_print ("ts: state ");
-            //KiScheduler ();
-            current_thread = KiScheduler();
-            goto try_next;
-        }
-
-        //
-        // == Dispatcher ====
-        //
-        
-        // Current selected.
-
-        current_thread = (int) TargetThread->tid;
-        goto dispatch_current;
+    if ( TargetThread->state != READY )
+    {
+        debug_print ("ts: state ");
+        current_thread = (tid_t) KiScheduler();
+        goto try_next;
     }
 
 //
-// fail
+// == Dispatcher ====
 //
+    
+// Current selected.
 
-//superCrazyFail:
-    goto dispatch_current; 
+    current_thread = (int) TargetThread->tid;
+    goto dispatch_current;
+
+// #debug
+// Not reached
+    //panic("ts: [FAIL] dispatching target\n");
 
 // =================
 // Dispatch current 
@@ -550,23 +530,20 @@ go_ahead:
 
 dispatch_current:
 
-//#ifdef TS_DEBUG
-//    debug_print (" ts-dispatch_current: ");
-//#endif
-
 // Validation
 // Check current thread limits.
 // The target thread will be the current.
 
+
+// tid
+
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
     {
-        panic ("ts: [Dispatch current] current_thread\n");
+        panic ("ts-dispatch_current: current_thread\n");
     }
 
-//
-// The target thread!
-//
+// structure
 
     TargetThread = (void *) threadList[current_thread];
 
@@ -596,10 +573,20 @@ dispatch_current:
     TargetThread->blockedCount = 0;
     TargetThread->blockedCount_ms = 0;
 
-// E se o limite estiver errado?
+// Base Priority:
+    if ( TargetThread->base_priority > PRIORITY_MAX ){
+        TargetThread->base_priority = PRIORITY_MAX;
+    }
 
-//    if ( TargetThread->quantum > TargetThread->quantum_limit_max )
-//        TargetThread->quantum = TargetThread->quantum_limit_max;
+// Priority:
+    if ( TargetThread->priority > PRIORITY_MAX ){
+        TargetThread->priority = PRIORITY_MAX;
+    }
+
+// Quantum:
+    if ( TargetThread->quantum > QUANTUM_MAX ){
+        TargetThread->quantum = QUANTUM_MAX;
+    }
 
 
 // Call dispatcher.

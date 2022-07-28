@@ -33,7 +33,7 @@ static void *__extra_services (
 static void __service897(void);
 static void __servicePutChar( int c );
 static void __invalidate_surface_rectangle(void);
-static void __maximize_process_quantum(pid_t ws_pid);
+static void __maximize_process_priority(pid_t ws_pid);
 
 static void __setup_surface_rectangle(
     unsigned long left,
@@ -50,6 +50,12 @@ static void __initialize_ws_info(pid_t pid)
 {
     struct process_d *p;
     struct thread_d *t;
+
+    pid_t current_process = (pid_t) get_current_process();
+
+    if (pid != current_process){
+        panic("__initialize_ws_info: pid != current_process\n");
+    }
 
 // #todo
 // Maybe we can just emit an error message and return.
@@ -223,13 +229,29 @@ static void __invalidate_surface_rectangle(void)
 // #test
 // Changing the window server's quantum. 
 // The purpose here is boosting it when it is trying to register itself.
-static void __maximize_process_quantum(pid_t ws_pid)
+static void __maximize_process_priority(pid_t ws_pid)
 {
     struct process_d *p;
     struct thread_d *t;
 
+    unsigned long ProcessType = PROCESS_TYPE_SYSTEM;
+    unsigned long ProcessBasePriority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long ProcessPriority = PRIORITY_SYSTEM_PROCESS;
+
+    unsigned long ThreadType = THREAD_TYPE_SYSTEM;
+    unsigned long ThreadBasePriority = PRIORITY_SYSTEM_THREAD;
+    unsigned long ThreadPriority = PRIORITY_SYSTEM_THREAD;
+
+    pid_t current_process = (pid_t) get_current_process();
+
+    if (ws_pid != current_process){
+        panic("__maximize_process_priority: ws_pid != current_process\n");
+    }
+
     if(ws_pid<=0 || ws_pid >= PROCESS_COUNT_MAX)
         return;
+
+// process
     p = (struct process_d *) processList[ws_pid];
     if((void*)p==NULL)
         return;
@@ -238,12 +260,21 @@ static void __maximize_process_quantum(pid_t ws_pid)
     if(p->magic!=1234)
         return;
 
+    p->type = ProcessType;
+    p->base_priority = ProcessBasePriority;
+    p->priority = ProcessPriority;
+
+// thread
     t = (struct thread_d *) p->control;
     if ( (void*) t == NULL ){ return; }
     if ( t->magic != 1234 ) { return; }
 
-// quantum
-    t->quantum = QUANTUM_MAX;
+    t->type = ThreadType;
+    t->base_priority = ThreadBasePriority;
+    t->priority = ThreadPriority;
+
+// see: ps/sched.h
+    t->quantum = QUANTUM_WINDOW_SERVER;
 }
 
 
@@ -272,7 +303,6 @@ static void *__extra_services (
 
 
     unsigned long *message_address = (unsigned long *) arg2;
-
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -485,19 +515,18 @@ static void *__extra_services (
             if ( __desktop->used  == TRUE && 
                  __desktop->magic == 1234 )
             {
-                //register_ws_process(arg3);
-                __desktop->ws = (pid_t) arg3;
+                if(arg3 != current_process){
+                    panic("sci.c: [SYS_SET_WS_PID] arg3 != current_process\n");
+                }
+                //register_ws_process(current_process);
+                __desktop->ws = (pid_t) current_process;
                 
                 socket_set_gramado_port(
                     GRAMADO_WS_PORT,
                     (pid_t) current_process );
 
-                //local
                 __initialize_ws_info(current_process);
-
-                // #test
-                // QUANTUM
-                __maximize_process_quantum(arg3);
+                __maximize_process_priority(current_process);
                 
                 //#todo
                 //WindowServer.desktop = (struct desktop_d *) __desktop;
