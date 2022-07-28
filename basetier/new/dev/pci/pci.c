@@ -656,229 +656,253 @@ pciHandleDevice (
     
     // char, block, network
     int __class=0;
-    
+    int __subclass=0;
+
+    unsigned char _irq_line=0;
+    unsigned char _irq_pin=0;
+
     // name support.
     char __tmpname[64];
     char *newname;
-
-    unsigned char _irq_line=0;
 
 
     // #debug
     debug_print("pciHandleDevice:\n");
 	//printf ("bus=%d dev=%d fun=%d \n", bus, dev, fun);
 
-//
-// PCI device
-//
+// Object: pci device.
+// Structure for pci device.
+
     D = (void *) kmalloc ( sizeof( struct pci_device_d  ) );
-
     if ( (void *) D == NULL ){
-        panic ("pciHandleDevice: D\n");
-    }else{
+        panic("pciHandleDevice: D\n");
+    }
+    memset( D, 0, sizeof(struct pci_device_d) );
 
-// #important
+    D->objectType = ObjectTypePciDevice;
+    D->objectClass = ObjectClassKernelObjects;
 
-        memset( D, 0, sizeof(struct pci_device_d) );
+    D->used = (int) TRUE;
+    D->magic = (int) 1234;
 
-        D->objectType  = ObjectTypePciDevice;
-        D->objectClass = ObjectClassKernelObjects;
-        D->used  = (int) TRUE;
-        D->magic = (int) 1234;
+// Next device.
+    D->next = NULL; 
 
-        D->id = (int) pciListOffset;
+    D->id = (int) pciListOffset;
 
-        // Localização.
-        D->bus  = (unsigned char) bus;
-        D->dev  = (unsigned char) dev;
-        D->func = (unsigned char) fun; 
+// Location inside the pci bus.
+// bus, device, function.
+    D->bus  = (unsigned char) bus;
+    D->dev  = (unsigned char) dev;
+    D->func = (unsigned char) fun; 
 
-        // PCI Header.
-        D->Vendor = (unsigned short) pciCheckVendor(bus,dev);
-        D->Device = (unsigned short) pciCheckDevice(bus,dev);
+// Vendor and device.
+    D->Vendor = (unsigned short) pciCheckVendor(bus,dev);
+    D->Device = (unsigned short) pciCheckDevice(bus,dev);
 
-        D->name = "pcidevice-noname";
+// Name string.
+    D->name = "pcidevice-noname";
 
-        // #debug
-        // printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
+    // #debug
+    // printf ("$ vendor=%x device=%x \n",D->Vendor, D->Device);
 
-        // OK, it is working
-        // #todo: 
-        // Nao deveriamos estar usando rotina que pertence ao modulo ata.
-        // precisamos de uma rotina do modulo pci
-        // #todo: put the correct type.
-        data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-        D->classCode = (data >> 24) & 0xff;
-        D->subclass  = (data >> 16) & 0xff;
+// Getting device info.
+// #todo: 
+// Nao deveriamos estar usando rotina que pertence ao modulo ata.
+// precisamos de uma rotina do modulo pci
+// ou mesmo um nome genérico.
+// #todo: put the correct type.
 
-		//#bugbug: Isso falhou. Deletar isso e trabalhar essas funções.
-		//D->classCode = (unsigned char) pciGetClassCode(bus, dev);
-		//D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
+    data = 
+        (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
 
-        D->irq_line = (unsigned char) pciGetInterruptLine(bus,dev);
-        _irq_line = (unsigned char) D->irq_line;
-        D->irq_pin  = (unsigned char) pciGetInterruptPin(bus,dev);
+// Class and subclass.
+    D->classCode = (data >> 24) & 0xff;
+    D->subclass  = (data >> 16) & 0xff;
+    __class = D->classCode;
+    __subclass = D->subclass;
 
-        // Next device.
-        D->next = NULL; 
+// #bugbug: 
+// #test
+// Isso falhou. Deletar isso e trabalhar essas funções.
+    //D->classCode = (unsigned char) pciGetClassCode(bus, dev);
+    //D->subclass = (unsigned char) pciGetSubClass(bus, dev); 
 
-        // #debug
-        // 07d1	D-Link System Inc
-        // 101e	American Megatrends Inc.
-        // 1028	Dell
-        // 1022	Advanced Micro Devices, Inc. [AMD]
-        // 101c	Western Digital
-        // 103c	Hewlett-Packard Company
-        // 1043	ASUSTeK Computer Inc.
-        // 104c	Texas Instruments
-        // 1050	Winbond Electronics Corp
-        // 1078	Cyrix Corporation
-        // 108e	Oracle/SUN
-        // 10de	NVIDIA Corporation
-        // 1106	VIA Technologies, Inc.
-        // 1412	VIA Technologies Inc.
-        // 115f	Maxtor Corporation
-        // 1186	D-Link System Inc
-        // 11c3	NEC Corporation
-        // 121a	3Dfx Interactive, Inc.
-        // 10ec	Realtek Semiconductor Co., Ltd.
-        // 0bda Realtek Semiconductor Corp. 
-        // 807d	Asustek Computer, Inc.
-        // 8c4a	Winbond
-        // ...
+
+// IRQ line and IRQ pin.
+    D->irq_line = (unsigned char) pciGetInterruptLine(bus,dev);
+    D->irq_pin  = (unsigned char) pciGetInterruptPin(bus,dev);
+    _irq_line = (unsigned char) D->irq_line;
+    _irq_pin  = (unsigned char) D->irq_pin;  //?
+
+// #debug
+// 07d1	D-Link System Inc
+// 101e	American Megatrends Inc.
+// 1028	Dell
+// 1022	Advanced Micro Devices, Inc. [AMD]
+// 101c	Western Digital
+// 103c	Hewlett-Packard Company
+// 1043	ASUSTeK Computer Inc.
+// 104c	Texas Instruments
+// 1050	Winbond Electronics Corp
+// 1078	Cyrix Corporation
+// 108e	Oracle/SUN
+// 10de	NVIDIA Corporation
+// 1106	VIA Technologies, Inc.
+// 1412	VIA Technologies Inc.
+// 115f	Maxtor Corporation
+// 1186	D-Link System Inc
+// 11c3	NEC Corporation
+// 121a	3Dfx Interactive, Inc.
+// 10ec	Realtek Semiconductor Co., Ltd.
+// 0bda Realtek Semiconductor Corp. 
+// 807d	Asustek Computer, Inc.
+// 8c4a	Winbond
+// ...
         
-        // Illegal vendor.
-        if ( (D->Vendor == 0xFFFF) ){
-            debug_print ("pciHandleDevice: [BUGBUG] Illegal vendor\n");
+// Illegal vendor.
+// #todo: Clean the memory.
+    if (D->Vendor == 0xFFFF){
+        debug_print ("pciHandleDevice: [BUGBUG] Illegal vendor\n");
+        //D = NULL;
+        return -1;
+    }
+
+// nvidia
+    if (D->Vendor == 0x10DE){
+        debug_print ("pciHandleDevice: [TODO] nvidia device found\n");
+    }
+
+// VIA
+    if ( D->Vendor == 0x1106 || 
+         D->Vendor == 0x1412 )
+    {
+        debug_print ("pciHandleDevice: [TODO] VIA device found\n");
+    }
+
+// realtek
+    if ( D->Vendor == 0x10EC || 
+         D->Vendor == 0x0BDA )
+    {
+        debug_print ("pciHandleDevice: [TODO] realtek device found\n");
+    }
+    
+    // logitec
+    if (D->Vendor == 0x046D){
+        debug_print ("pciHandleDevice: [TODO] logitec device found\n");
+    }
+
+    // ...
+
+// Intel
+// e1000 intel nic = 0x8086 0x100E
+// 82540EM Gigabit Ethernet Controller
+// see: e1000.c
+
+    if ( (D->Vendor == 0x8086)  && 
+         (D->Device == 0x100E ) && 
+         (D->classCode == PCI_CLASSCODE_NETWORK) )
+    {
+        __class = PCI_CLASSCODE_NETWORK; //3;
+        debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n");
+
+        /*
+         // #test
+         // This thing is working fine on virtualbox with piix3.
+        Status = 
+            (int) e1000_init_nic ( 
+                      (unsigned char) D->bus, 
+                      (unsigned char) D->dev, 
+                      (unsigned char) D->func, 
+                      (struct pci_device_d *) D );
+
+        if (Status != 0){
+             panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
         }
+        */
 
-        // nvidia
-        if ( (D->Vendor == 0x10DE) ){
-            debug_print ("pciHandleDevice: [TODO] nvidia device found\n");
-        }
+        // locked: dai alguma rotina em ring3 desbloqueia.
+        e1000_interrupt_flag = FALSE;
+    }
 
-        // VIA
-        if ( (D->Vendor == 0x1106 || D->Vendor == 0x1412) ){
-            debug_print ("pciHandleDevice: [TODO] VIA device found\n");
-        }
+// Intel
+// 8086:1237
+// 440FX - 82441FX PMC [Natoma] - Intel Corporation
+    //if ( (D->Vendor == 0x8086)  && 
+         //(D->Device == 0x1237 ) && 
+         //(D->classCode == PCI_CLASSCODE_BRIDGE) )
+    //{}
 
-        // realtek
-        if ( (D->Vendor == 0x10EC || D->Vendor == 0x0BDA ) ){
-            debug_print ("pciHandleDevice: [TODO] realtek device found\n");
-        }
+// Intel
+// 8086:7000
+// 82371SB PIIX3 ISA [Natoma/Triton II] - Intel Corporation
+    //if ( (D->Vendor == 0x8086)  && 
+         //(D->Device == 0x7000 ) && 
+         //(D->classCode == PCI_CLASSCODE_BRIDGE) )
+    //{}
 
-        // logitec
-        if ( (D->Vendor == 0x046D) ){
-            debug_print ("pciHandleDevice: [TODO] logitec device found\n");
-        }
+// Intel
+// Serial controller.
+// Desejamos a subclasse 3 que é usb. 
+    if ( (D->Vendor == 0x8086)  && 
+         (D->Device == 0x7000 ) && 
+         (D->classCode == PCI_CLASSCODE_SERIALBUS ) )
+    {
+        __class = PCI_CLASSCODE_SERIALBUS;
+        debug_print ("0x8086:0x7000 found \n");  
 
-        // ...
+        /*
+        // See: usb.c
+        Status = (int) serial_bus_controller_init ( 
+                           (unsigned char) D->bus, 
+                           (unsigned char) D->dev, 
+                           (unsigned char) D->func, 
+                           (struct pci_device_d *) D );
 
-        // e1000 intel nic = 0x8086 0x100E
-        // 82540EM Gigabit Ethernet Controller
-        // see: e1000.c
+         if (Status == 0){
+             // ...
+         }else{
+             panic ("pciHandleDevice: [0x8086:0x7000] Serial controller\n");
+         };
+        */
+    }
 
-        if ( (D->Vendor == 0x8086)  && 
-             (D->Device == 0x100E ) && 
-             (D->classCode == PCI_CLASSCODE_NETWORK) )
-        {
-            debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n");
+// qemu
+// #todo
+// Display controller on qemu.
+    //if ( (D->Vendor == 0x1234)  && 
+         //(D->Device == 0x1111 ) && 
+         //(D->classCode == PCI_CLASSCODE_DISPLAY) )
+    //{}
 
-            /*
-             // #test
-             // This thing is working fine on virtualbox with piix3.
-            Status = 
-                (int) e1000_init_nic ( 
-                          (unsigned char) D->bus, 
-                          (unsigned char) D->dev, 
-                          (unsigned char) D->func, 
-                          (struct pci_device_d *) D );
+// Colocar a estrutura na lista.
+// #todo: Limits
+// #bugbug: limite determinado ... 
+// precisa de variável.
 
-            if (Status != 0){
-                 panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
-            }
-            */
+    if ( pciListOffset < 0 || 
+         pciListOffset >= PCI_DEVICE_LIST_SIZE )
+    { 
+        // #bugbug
+        // Suspendendo isso porque esta sujando muito a tela
+        // na maquina real.
 
-            // locked: dai alguma rotina em ring3 desbloqueia.
-            e1000_interrupt_flag = FALSE;
-        }
+        //debug_print ("pciHandleDevice: [FAIL] No more slots!\n");
+        printf ("pciHandleDevice: [FAIL] No more slots!\n");
 
-        // 8086:1237
-        // 440FX - 82441FX PMC [Natoma] - Intel Corporation
-        //if ( (D->Vendor == 0x8086)  && 
-             //(D->Device == 0x1237 ) && 
-             //(D->classCode == PCI_CLASSCODE_BRIDGE) )
-        //{}
+        return (int) (-1);
+    }
+ 
+ // Saving into the list for pci devices.
+    pcideviceList[pciListOffset] = (unsigned long) D;
+    pciListOffset++;
 
-        // 8086:7000
-        // 82371SB PIIX3 ISA [Natoma/Triton II] - Intel Corporation
-        //if ( (D->Vendor == 0x8086)  && 
-             //(D->Device == 0x7000 ) && 
-             //(D->classCode == PCI_CLASSCODE_BRIDGE) )
-        //{}
+    // #debug
+    //printf("$");
 
-         
-        // Serial controller.
-        // Desejamos a subclasse 3 que é usb. 
-        if ( (D->Vendor == 0x8086)  && 
-             (D->Device == 0x7000 ) && 
-             (D->classCode == PCI_CLASSCODE_SERIALBUS ) )
-        {
-            //serial debug
-            debug_print ("0x8086:0x7000 found \n");  
+// =============================================================
 
-            /*
-            // See: usb.c
-            Status = (int) serial_bus_controller_init ( 
-                               (unsigned char) D->bus, 
-                               (unsigned char) D->dev, 
-                               (unsigned char) D->func, 
-                               (struct pci_device_d *) D );
-                               
-             if (Status == 0)
-             {
-                 // ...
-             }else{
-                 panic ("pciHandleDevice: [0x8086:0x7000] Serial controller\n");
-             };
-             */
-        }
-
-        // #todo
-        // Display controller on qemu.
-        //if ( (D->Vendor == 0x1234)  && 
-             //(D->Device == 0x1111 ) && 
-             //(D->classCode == PCI_CLASSCODE_DISPLAY) )
-        //{}
-
-
-		//Colocar a estrutura na lista.
-
-        // #todo: Limits
-        // #bugbug: limite determinado ... 
-        // precisa de variável.
-
-        if ( pciListOffset < 0 || pciListOffset >= PCI_DEVICE_LIST_SIZE )
-        { 
-            
-            // #bugbug
-            // Suspendendo isso porque esta sujaando muito a tela
-            // na maquina real.
-            printf ("pciHandleDevice: [FAIL] No more slots!\n");
-            
-            //debug_print ("pciHandleDevice: [FAIL] No more slots!\n");
-            
-            return (int) (-1);
-        }
-
-        // Saving.
-        pcideviceList[pciListOffset] = (unsigned long) D;
-        pciListOffset++;
-
-        // #debug
-        //printf("$");
-    };
-
+    // Register the device structure.
 
 //
 // Name
@@ -889,12 +913,10 @@ pciHandleDevice (
 // #test
 // isso não é o ponto de montagem.
 
-
 //buffer1
 
     // clear buffer
     memset( __tmpname, 0, 64 );
-
     sprintf ( 
         (char *) &__tmpname[0], 
         "/DEV_%x_%x", 
@@ -919,17 +941,16 @@ pciHandleDevice (
 // de dispositivos.
 // #importante: 
 // Ele precisa de um arquivo 'file'.
+// #todo: Essa pequena rotina com arquivo
+// pode ir para uma função privada. Um worker.
 
     file *__file;
 
     __file = (file *) kmalloc( sizeof(file) );
-
     if ( (void *) __file == NULL ){
         panic("pciHandleDevice: __file\n");
     }
-
     memset( __file, 0, sizeof(struct file_d) );
-
     __file->used = TRUE;
     __file->magic = 1234;
 
@@ -939,7 +960,6 @@ pciHandleDevice (
 // Maybe 'pci' is the 'class' of this device.
 
     __file->____object = ObjectTypePciDevice;
-
     __file->isDevice = TRUE;
 
     //debug_print("pciHandleDevice: #todo Call devmgr_register_device()\n");
@@ -950,7 +970,6 @@ pciHandleDevice (
 // O nome do dispositivo deve ser um pathname.
 // Mas podemos ter mais de um nome.
 // vamos criar uma string aqui usando sprint e depois duplicala.
-
 // IN:
 // file structure, device name, class (char,block,network).
 // type (pci, legacy), pci device structure, tty driver struct.
@@ -963,6 +982,7 @@ pciHandleDevice (
         (struct pci_device_d *) D,  // It's a pci device.
         NULL );                     // It's not a tty device.
 
+// 0 = No error.
     return 0;
 }
 
