@@ -25,8 +25,8 @@
 // Internal
 //
 
-int pci_supported;
-int pciListOffset;
+int pci_supported=FALSE;
+int pciListOffset=0;
 //...
 
 
@@ -774,40 +774,19 @@ pciHandleDevice (
 
         // ...
 
-        //
-        // == NIC Intel. ===================
-        //
-
-        // #bugbug
-        // Ver em que hora que os buffers são configurados.
-        // precisam ser os mesmos encontrados na 
-        // infraestrutura de network e usados pelos aplicativos.
+        // e1000 intel nic = 0x8086 0x100E
+        // 82540EM Gigabit Ethernet Controller
         // see: e1000.c
 
-        // e1000 = 0x8086 0x100E
-        // 82540EM Gigabit Ethernet Controller
         if ( (D->Vendor == 0x8086)  && 
              (D->Device == 0x100E ) && 
              (D->classCode == PCI_CLASSCODE_NETWORK) )
         {
-            //serial debug
-            debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n"); 
-            //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
-            //printf("82540EM Gigabit Ethernet Controller found\n");
-
+            debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n");
 
             /*
-             
-            // #todo
-            // O driver funciona na virtualbox,
-            // se optarmos por PIIX3. Em ICH9 não funciona.
-            // Estamos suspendendo porque as interrupçoes
-            // geram muito ruido e a inicialização nem consegue
-            // terminar. Talvez tenha algo a ver com habilitar
-            // as interrupções antes do momento em que o
-            // init habilita as interrupções.
-
-            // See: dev/e1000/e1000.c
+             // #test
+             // This thing is working fine on virtualbox with piix3.
             Status = 
                 (int) e1000_init_nic ( 
                           (unsigned char) D->bus, 
@@ -818,32 +797,11 @@ pciHandleDevice (
             if (Status != 0){
                  panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
             }
-            
-            // irq support and reset.
-            // See: e1000.c
-            // #debug
-            // currentNIC foi configurado pela rotina acima.
-            if ( currentNIC->pci->irq_line != _irq_line ){
-                panic("pciHandleDevice: currentNIC->pci->irq_line fail\n");
-            }
-            e1000_setup_irq(_irq_line);
-            
-            // Reset controller. 
-            e1000_reset_controller();
-                
-            // Unlock irq handler.
-            printf ("pciHandleDevice: Unlocking interrupt handler\n");
-            
-            //e1000_interrupt_flag = TRUE;
-            e1000_interrupt_flag = FALSE;
-            
-            //class=network device,
-            //__class = 3;
-            
             */
-            
-        }
 
+            // locked: dai alguma rotina em ring3 desbloqueia.
+            e1000_interrupt_flag = FALSE;
+        }
 
         // 8086:1237
         // 440FX - 82441FX PMC [Natoma] - Intel Corporation

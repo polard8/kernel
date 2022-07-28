@@ -473,7 +473,7 @@ void DeviceInterface_e1000(void)
         // Precisamos entender ela melhor.
         // Todos os buffers de recebimento.
         // Olhamos um bit do status de todos os buffers.
-        // Sairemos do while qunado encontrarmos um buffer com o bit desativado.
+        // Sairemos do while quando encontrarmos um buffer com o bit desativado.
    
         while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {

@@ -644,8 +644,10 @@ _nic_handler:
     ; EOI: Order: Second, first.
     mov al, 0x20
     out 0xA0, al  
+    IODELAY  
     out 0x20, al
-
+    IODELAY  
+    
     pop rdx
     pop rcx
     pop rbx
@@ -694,9 +696,10 @@ _asm_nic_create_new_idt_entry:
     ;mov rax, qword [_nic_idt_entry_new_address]
 
 ;; Isso é o número da interrupção. (41)
+;; #bugbug: na virtualbox é 9 mas no qemu é 11.
     ;mov rbx, qword [_nic_idt_entry_new_number]
     mov rbx, qword 41 ;32+9
-
+    
     call _setup_system_interrupt
 
 ;;#test: Não sei se precisa carregar novamente.

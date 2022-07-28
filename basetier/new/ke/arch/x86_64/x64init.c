@@ -609,6 +609,10 @@ void I_x64ExecuteInitialProcess (void)
     }
 
     PROGRESS("Go to ring3! \n");
+    
+    //printf("go!\n");
+    //refresh_screen();
+    //while(1){}
 
 // CONTROLTHREAD_ENTRYPOINT
     unsigned long entry = (unsigned long) 0x0000000000201000;

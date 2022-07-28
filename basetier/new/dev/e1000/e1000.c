@@ -1,5 +1,49 @@
 
+// e1000.c
+// e1000 Intel nic driver.
+// jul 2022.
+// Ported from gramado 32bit.
+
 #include <kernel.h>
+
+
+// How many buffers.
+// #define E1000_NUM_TX_DESC 8
+// #define E1000_NUM_RX_DESC 32
+#define SEND_BUFFER_MAX       8
+#define RECEIVE_BUFFER_MAX   32
+
+
+// little endian
+#define ToNetByteOrder16(v)   ((v >> 8) | (v << 8))
+#define ToNetByteOrder32(v)   (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
+#define FromNetByteOrder16(v) ((v >> 8) | (v << 8))
+#define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
+
+//extra
+#define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
+
+
+//
+// == Ethernet ==============================================
+//
+
+// Ethernet header length
+#define ETHERNET_HEADER_LENGHT  14  
+
+// ethernet header
+struct e1000_ether_header_d 
+{
+    // mac
+    uint8_t dst[6];
+    uint8_t src[6];
+
+    // protocol
+    uint16_t type;
+
+} __attribute__((packed)); 
+
+
 
 
 //see: nicintel.h
@@ -14,6 +58,11 @@ int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
 
 
+static void DeviceInterface_e1000(void);
+static void 
+print_ethernet_header ( 
+    const unsigned char *Buffer, 
+    int Size );
 
 static uint32_t 
 __E1000ReadCommand ( 
@@ -37,6 +86,9 @@ __E1000AllocCont (
     unsigned long *virt );  //#todo: 64bit address
 
 static unsigned long __mapping_nic1_device_address(unsigned long pa);
+
+static void
+__e1000_enable_interrupt(struct intel_nic_info_d *nic_info);
 
 //
 // =====================
@@ -106,7 +158,7 @@ __E1000ReadEEPROM (
     struct intel_nic_info_d *d, 
     uint8_t addr )
 {
-    uint32_t data = 0;
+    uint32_t data=0;
 
 
     // #todo
@@ -142,21 +194,16 @@ __E1000ReadEEPROM (
 
 
 /*
- ********************************************************
  * E1000AllocCont: ??
- *     
  *     Retorna o endereço físico e 
  * coloca o virtual em *virt
- * 
  * ah ... então eu vou alocar usando endereços virtuais
  * ... e traduzir para físico 
  * ... colocar o virtual em *virt e retornar o físico.
  */
-
 // Precisamos de um endereço fisico.
 // + alocamos um endereço virtual
 // + convertemos para fisico
-
 // IN:  size, return virtual address.
 // OUT: physical address
 
@@ -201,13 +248,30 @@ __E1000AllocCont (
 
 
 
+static void
+__e1000_enable_interrupt(struct intel_nic_info_d *nic_info)
+{
+    if( (void*) nic_info == NULL ){
+        panic("__e1000_enable_interrupt: nic_info\n");
+    }
+
+// 0xD0 Message Control (0x0080) Next Pointer (0xE0) Capability ID (0x05)
+//    0000 0001  1111 0111  0000   0010  1101   0111
+// 0x1F6DC, 1f72d7
+
+// enable interrupts
+    __E1000WriteCommand (nic_info, 0xD0, 0x1F6DC);
+    //__E1000WriteCommand(nic_info, 0xD0, 0xFB);
+    __E1000WriteCommand(nic_info, 0xD0, 0xff & ~4);  
+    __E1000ReadCommand (nic_info, 0xC0);
+
+}
+
+
 //====================================================
 // ## reset ##
-//
-
 // Essa função é chamada pelo driver de PCI quando encontrar
 // o dispositivo Intel apropriado.
-
 // global
 // see: nicintel.h
 int e1000_reset_controller (void)
@@ -430,16 +494,8 @@ int e1000_reset_controller (void)
 
     //printf("[6]:\n");
 
-
-// Enable interrupts:
-// 0xD0 Message Control (0x0080) Next Pointer (0xE0) Capability ID (0x05)
-//    0000 0001  1111 0111  0000   0010  1101   0111
-// 0x1F6DC, 1f72d7
-
-    __E1000WriteCommand (currentNIC, 0xD0, 0x1F6DC);
-    //__E1000WriteCommand(currentNIC, 0xD0, 0xFB);
-    __E1000WriteCommand(currentNIC, 0xD0, 0xff & ~4);  
-    __E1000ReadCommand (currentNIC, 0xC0);
+// Enable interrupts. (first time)
+     __e1000_enable_interrupt(currentNIC);
 
 
 // ## RX ##
@@ -463,7 +519,7 @@ int e1000_reset_controller (void)
         currentNIC, 0x100, 0x602801E);  // RCTL	= 0x0100,	/* Receive Control */
 
 // RX Delay Timer Register
-    __E1000WriteCommand (currentNIC, 0x2820, 0);
+    //__E1000WriteCommand (currentNIC, 0x2820, 0);
 
 // ## TX ##
 //transmit
@@ -528,10 +584,8 @@ int e1000_reset_controller (void)
     __E1000WriteCommand ( 
         currentNIC,  0x410, (  0x0000000A | 0x00000008 | 0x00000002) ); 
 
-
 	//talvez ja fizemos isso. 
 	//Initialize the transmit descriptor registers (TDBAL, TDBAH, TDL, TDH, and TDT).
-
 
     //eth_write(base_addr, REG_ADDR_MAC_CONF,
 	//	  /* Set the RMII speed to 100Mbps */
@@ -554,12 +608,8 @@ int e1000_reset_controller (void)
 	//    currentNIC->rx_descs_phys, 
 	//	currentNIC->tx_descs_phys );
 
-// enable interrupts
-    __E1000WriteCommand (currentNIC, 0xD0, 0x1F6DC);
-    //__E1000WriteCommand(currentNIC, 0xD0, 0xFB);
-    __E1000WriteCommand(currentNIC, 0xD0, 0xff & ~4);  
-    __E1000ReadCommand (currentNIC, 0xC0);
-
+// Enable interrupts. (second time)
+     __e1000_enable_interrupt(currentNIC);
 
 // Linkup
 // (1 << 6)
@@ -574,15 +624,11 @@ int e1000_reset_controller (void)
 //=======================================================
 // e1000_setup_irq:
 //     Setup nic irq 
-//
 // #importante
 // Isso é usado por uma hotina em headlib.s para 
 // configurar uma nova entrada na idt. 
-//
-
 // Essa função é chamada pelo driver de PCI quando encontrar
 // o dispositivo Intel apropriado.
-
 // #bugbug
 // Called by pciHandleDevice.
 
@@ -686,6 +732,22 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa)
 }
 
 
+// Initialize the driver.
+//
+// == NIC Intel. ===================
+//
+// #bugbug
+// Ver em que hora que os buffers são configurados.
+// precisam ser os mesmos encontrados na 
+// infraestrutura de network e usados pelos aplicativos.
+// #todo
+// O driver funciona na virtualbox,
+// se optarmos por PIIX3. Em ICH9 não funciona.
+// Estamos suspendendo porque as interrupçoes
+// geram muito ruido e a inicialização nem consegue
+// terminar. Talvez tenha algo a ver com habilitar
+// as interrupções antes do momento em que o
+// init habilita as interrupções.
 
 int 
 e1000_init_nic ( 
@@ -694,7 +756,6 @@ e1000_init_nic (
     unsigned char fun, 
     struct pci_device_d *pci_device )
 {
-
     // loop
     register uint32_t i=0; 
     
@@ -714,6 +775,9 @@ e1000_init_nic (
     // #debug
     debug_print ("e1000_init_nic:\n");
     printf      ("e1000_init_nic:\n");
+
+    //printf("b=%d d=%d f=%d \n", D->bus, D->dev, D->func );
+    //printf("82540EM Gigabit Ethernet Controller found\n");
 
 // NIC Intel.
 // #importante
@@ -745,8 +809,6 @@ e1000_init_nic (
     // #debug
     printf ("Vendor=%x ",   (data       & 0xffff) );
     printf ("Device=%x \n", (data >> 16 & 0xffff) );
-
-
 
 //
 // pci_device structure.
@@ -836,26 +898,25 @@ e1000_init_nic (
         // ...
     };
 
-    // Base address
-    // #importante:
-    // Mapeando para obter o endereço virtual que 
-    // o kernel pode manipular.
-    // pages.c
-    // #bugbug: 
-    // >> Isso é um improviso. Ainda falta criar rotinas melhores.
+// Base address
+// #importante:
+// Mapeando para obter o endereço virtual que 
+// o kernel pode manipular.
+// pages.c
+// #bugbug: 
+// >> Isso é um improviso. Ainda falta criar rotinas melhores.
 
-    virt_address = (unsigned long) __mapping_nic1_device_address (phy_address);
+    virt_address = 
+        (unsigned long) __mapping_nic1_device_address(phy_address);
 
     if (virt_address == 0){
         panic ("e1000_init_nic: Invalid virt_address\n");
     }
 
-    // Endereço base.
-    // Preparando a mesma base de duas maneiras.
-
+// Endereço base.
+// Preparando a mesma base de duas maneiras.
     unsigned char *base_address   = (unsigned char *) virt_address;
     unsigned long *base_address32 = (unsigned long *) virt_address;
-
 
 //
 // == NIC =========================
@@ -865,16 +926,16 @@ e1000_init_nic (
 // Checar essa estrutura.
 // see: nicintel.h
 
-    currentNIC = (void *) kmalloc ( sizeof( struct intel_nic_info_d ) );
+    currentNIC = 
+        (void *) kmalloc( sizeof( struct intel_nic_info_d ) );
 
     if ( (void *) currentNIC ==  NULL ){
         panic ("e1000_init_nic: currentNIC struct\n");
     } else {
+
         currentNIC->used  = TRUE;
         currentNIC->magic = 1234;
-
         currentNIC->interrupt_count = 0;
-
         currentNIC->pci = (struct pci_device_d *) pci_device;
 
         // Salvando o endereço para outras rotinas usarem.
@@ -887,7 +948,7 @@ e1000_init_nic (
 		// Get info.
 		//
 
-		// Device status.
+        // Device status.
         currentNIC->DeviceStatus = base_address[0x8];
 
 
@@ -913,11 +974,9 @@ e1000_init_nic (
 		// ## MAC ##
 		//
 
-
 		// Let's read the MAC Address!
 
-
-	    // We can use the EEPROM!
+        // We can use the EEPROM!
         if (currentNIC->eeprom == 1) 
         {
 			//printf("MAC from eeprom \n");  
@@ -936,7 +995,6 @@ e1000_init_nic (
 		    currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
 		    currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
 
-
         // We can't use the EEPROM :(
         }else{
 
@@ -954,18 +1012,14 @@ e1000_init_nic (
         };
     };
 
+// ## bus mastering ##
+// Let's enable bus mastering!
+// #define PCI_COMMAND 0x04
+// We really need to do it?
+// Yes, set the bus mastering bit
+// And write back 
+//( bus, slot, func, PCI_COMMAND )
 
-	//
-	// ## bus mastering ##
-	//
-
-	// Let's enable bus mastering!
-	// #define PCI_COMMAND 0x04
-	// We really need to do it?
-	// Yes, set the bus mastering bit
-	// And write back 
-	//( bus, slot, func, PCI_COMMAND )
-    
     uint16_t cmd=0;
     cmd = 
         (uint16_t) pciConfigReadWord ( 
@@ -983,8 +1037,18 @@ e1000_init_nic (
             (int) 0x04, (int) cmd ); 
     }
 
-    printf ("Done\n");
+
+    unsigned char irq_line = 
+        (unsigned char) pciGetInterruptLine(bus,dev);
+
+    printf ("Done irqline %d\n",irq_line);
     refresh_screen();
+
+    e1000_setup_irq(irq_line);
+    
+    e1000_reset_controller();
+    
+    e1000_interrupt_flag = TRUE;
 
     //printf ("e1000_init_nic: Test #breakpoint\n");
     //refresh_screen();
@@ -994,13 +1058,170 @@ e1000_init_nic (
     return 0;
 }
 
+static void 
+print_ethernet_header ( 
+    const unsigned char *Buffer, 
+    int Size )
+{
+    struct e1000_ether_header_d *eth = 
+        (struct e1000_ether_header_d *) Buffer;
+
+    uint16_t Type=0;
+ 
+    printf("\n");
+    printf("Ethernet Header\n");
+
+    if ( (void*) eth == NULL )
+        return;
+
+    // Destination MAC
+    // Source MAC
+    // Protocol type.
+
+    printf ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
+        eth->dst[0], eth->dst[1], eth->dst[2], 
+        eth->dst[3], eth->dst[4], eth->dst[5] );
+
+    printf ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
+        eth->src[0], eth->src[1], eth->src[2], 
+        eth->src[3], eth->src[4], eth->src[5] );
+
+    printf ("   |-Ethertype           : %x \n",
+        (unsigned short) eth->type);
+    
+    Type = (uint16_t) e1000_FromNetByteOrder16(eth->type);
+
+    switch ( (uint16_t) Type ){
+    case 0x0800:
+        printf ("[0x0800]: IPV4 received\n");
+        break;
+    case 0x0806:
+        printf ("[0x0806]: ARP received\n");
+        break;
+    case 0x814C:
+        printf ("[0x814C]: SNMP received\n");
+        break;
+    case 0x86DD:
+        printf ("[0x86DD]: IPV6 received\n");
+        break;
+    case 0x880B:
+        printf ("[0x880B]: PPP received\n");
+        break;
+    };
+
+
+    refresh_screen();
+}
+
+
+static void DeviceInterface_e1000(void)
+{
+    uint32_t status=0;
+
+    uint32_t val=0;
+    uint16_t old=0;
+    uint32_t len=0;
+
+    unsigned char *buffer;
+
+    // The ethernet header.
+    struct e1000_ether_header_d *eh;
+    uint16_t Type=0;
+
+// Without this, the card may spam interrupts.
+    __E1000WriteCommand( currentNIC, 0xD0, 1 );
+
+// Status
+    status = __E1000ReadCommand( currentNIC, 0xC0 ); 
+
+    // 0x04 - Linkup
+    // Start link.
+    if (status & 0x04){
+        printf ("DeviceInterface_e1000: Start link\n");
+        refresh_screen();
+        val = __E1000ReadCommand ( currentNIC, 0 );
+        __E1000WriteCommand ( currentNIC, 0, val | 0x40 );
+        return;
+    // 0x80 - Reveive.
+    } else if (status & 0x80){
+
+        //printf ("DeviceInterface_e1000: Receive\n");
+        //refresh_screen();
+
+        // #lock
+        // see: pciHandleDevice in pci.c
+
+        //if (e1000_interrupt_flag == FALSE)
+        //{
+        //    printf("DeviceInterface_e1000: LOCKED\n");
+        //    refresh_screen();
+        //    return;
+        //}
+
+        // #todo
+        // Esse sequência está funcionando. Não mudar.
+        // Precisamos entender ela melhor.
+        // Todos os buffers de recebimento.
+        // Olhamos um bit do status de todos os buffers.
+        // Sairemos do while quando encontrarmos um buffer com o bit desativado.
+   
+        while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
+        {
+             old = currentNIC->rx_cur;
+             len = currentNIC->legacy_rx_descs[old].length;
+
+             //#test: Apenas pegando o buffer para usarmos logo adinate.
+             buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
+
+            //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
+            //chamaremos logo adiante, usando o buffer que pegamos acima.
+
+            // Our Net layer should handle it
+            // NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
+
+            // zera.
+            currentNIC->legacy_rx_descs[old].status = 0;
+
+            // ?? Provavelmente seleciona o buffer antes de circular.
+            __E1000WriteCommand ( currentNIC, 0x2818, old );
+            
+
+             // Se o bit de statos estava acionado, então copiamos esse
+             // buffer para outro acessível pelos aplicativos.
+             
+             // Envia para o buffer do gramado.
+             //if (____network_late_flag == TRUE)
+             //{
+                 //network_buffer_in ( (void *) buffer, (int) len );
+                 //printf("DeviceInterface_e1000: [DEBUG] iret\n");
+                 //refresh_screen();
+             //}  
+             
+             //#test buffer
+             if ( (void*) buffer != NULL )
+             {
+                 //eh = (void*) buffer;
+                 print_ethernet_header ( 
+                     (const unsigned char*) buffer, 
+                     1500 );
+             }
+             
+
+             // circula. (32 buffers)
+             // Seleciona o próximo buffer.
+             currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
+            
+             return;
+        };
+    };
+}
+
 
 /*
  *******************************************
  *    >>>> HANDLER <<<<
  *******************************************
  * irq_E1000:
- *     
  *     Esse é o handler da interrupção para o NIC intel 8086:100E.
  *     Esse é o driver do controlador, ele não atua sobre protocolos 
  * de rede, então deve-se enviar uma mensagem para o servidor de rede 
@@ -1015,22 +1236,8 @@ e1000_init_nic (
 
 __VOID_IRQ 
 irq_E1000 (void)
-{
-
-// #lock
-// see: pciHandleDevice in pci.c
-
-    if (e1000_interrupt_flag == FALSE)
-    {
-       printf("irq_E1000: LOCKED\n");
-       refresh_screen();
-       return;
-    }
-
-    printf("irq_E1000: UNLOCKED\n");
-    refresh_screen();
-    
-    //DeviceInterface_e1000();
+{    
+    DeviceInterface_e1000();
 }
 
 
