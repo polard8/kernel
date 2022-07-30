@@ -102,9 +102,7 @@ int main ( int argc, char *argv[] )
 // Socket
 // 
 
-    // printf ("gns.bin: Creating socket\n");
-
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
+    client_fd = (int) socket ( AF_INET, SOCK_STREAM, 0 );
 
     if ( client_fd < 0 ){
        //gws_debug_print ("gnst: Couldn't create socket\n");
@@ -119,10 +117,6 @@ int main ( int argc, char *argv[] )
 
 // Nessa hora colocamos no accept um fd.
 // Então o servidor escreverá em nosso arquivo.
-
-    // #debug
-    // gws_debug_print ("gnst: Connecting to ns via inet  ...\n");      
-    // printf ("gns.bin: Connecting to ns via inet  ...\n");      
 
     while (1){
         if (connect (client_fd, (void *) &server_address, addrlen ) < 0)
@@ -155,17 +149,17 @@ int main ( int argc, char *argv[] )
             //break;
 
         // Send
-        printf("gns.bin: Send message\n");
+        //printf("gns.bin: Send message\n");
         service_status = (int) gns_hello(client_fd);
         if( service_status <= 0 ){
             printf("gns.bin: service failed\n");
         }
         
         // Sleep
-        printf("gns.bin: Sleep\n");
-        gns_yield();
-        gns_yield();
-        gns_yield();
+        //printf("gns.bin: Sleep\n");
+        //gns_yield();
+        //gns_yield();
+        //gns_yield();
         gns_yield();
     };
 

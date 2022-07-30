@@ -5,8 +5,31 @@
 
 #include <kernel.h>    
 
-
 //#define TS_DEBUG
+
+// #test
+// variáveis usadas em unit3hw.asm para umplementar
+// a chamada de um callback em ring3.
+unsigned long fCallbackAfterCR3=0;
+unsigned long Ring3CallbackAddress=0;
+
+int _callback_status=FALSE;
+unsigned long _callback_address=0;
+unsigned long _callback_address_saved=0;
+
+static void __task_switch (void);
+
+//============
+
+
+// service 44000
+void tsSetupCallback(unsigned long r3_address)
+{
+    _callback_status = TRUE;
+    _callback_address = (unsigned long) r3_address;
+    
+    _callback_address_saved = (unsigned long) r3_address;
+}
 
 
 /*
@@ -17,8 +40,7 @@
  *     return to _irq0.
  *     Called by KiTaskSwitch.
  */
-
-void task_switch (void)
+static void __task_switch (void)
 {
 
 // Current
@@ -394,7 +416,7 @@ try_next:
 
     // No thread. 
     if (UPProcessorBlock.threads_counter == 0){
-        panic("task_switch: No threads\n");
+        panic("ts: No threads\n");
     }
 
 // Only '1' thread.
@@ -684,11 +706,9 @@ fail:
  * dispatcher e retorna para a função _irq0 em hw.inc, 
  * que configurará os registradores e executará a 
  * thread através do método iret.
- *
  * #importante:
  * Na verdade, é uma interface pra uma rotina que 
  * faz tudo isso.
- * 
  */
  
 /*
@@ -702,7 +722,6 @@ fail:
 // >> ?? Na saída ??
 // ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
 */
-
 
 // Called by:
 // irq0_TIMER in pit.c.
@@ -739,9 +758,30 @@ void psTaskSwitch(void)
         die();
     }
 
+// Permitindo que o assembly chame o callback.
+// Somente quando o processo interrompido for o init.
+
+    pid_t ws_pid=-1;
+    ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
+
+    //if(current_process == GRAMADO_PID_INIT)  //init
+    if(current_process == ws_pid)  //ws
+    {
+        if( _callback_status == TRUE )
+        {
+            fCallbackAfterCR3 = 0x1234; // o assembly precisa disso.
+            Ring3CallbackAddress = (unsigned long) _callback_address;
+            
+            _callback_status = FALSE;
+            _callback_address = 0;
+            //no taskswitching
+            return;
+        }
+    }
+
 // The task switching routine.
 
-    task_switch();
+    __task_switch();
 }
 
 
@@ -763,7 +803,6 @@ unsigned long get_task_status (void)
  *    Configura o status do mecanismo de task switch.
  *    Se o mecanismo de taskswitch estiver desligado 
  * não ocorrerá a mudança.
- *
  * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
  */ 
 
@@ -783,7 +822,7 @@ void taskswitch_unlock (void){
     task_switch_status = (unsigned long) UNLOCKED;
 }
 
-// Internal
+
 // Call extra routines scheduled to this moment.
 // called by task_switch.
 // #importante:

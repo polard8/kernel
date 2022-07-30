@@ -5,6 +5,9 @@
 
 #include <kernel.h>
 
+
+struct scheduler_info_d  SchedulerInfo;
+
 //
 // == Private functions: prototypes =============
 //
@@ -209,40 +212,39 @@ tid_t scheduler(void)
     tid_t first_tid = (-1);
 
     //#todo: Create a method for this.
-    int policy = SchedulerInfo.policy;
+    int Policy = SchedulerInfo.policy;
 
     //#todo: Create a method for this.
     unsigned long sched_flags = (unsigned long) SchedulerInfo.flags;
 
+    if (SchedulerInfo.initialized != TRUE){
+        panic("scheduler: SchedulerInfo.initialized\n");
+    }
 
-    //#todo
-    //SchedulerInfo.initialized ?
-
-//
-// #filter
-//
-
-    if (policy != SCHED_RR)
-        panic("scheduler: Invalid policy\n");
-
+    if (Policy != SCHED_RR){
+        panic("scheduler: Invalid Policy\n");
+    }
 
 // #todo: 
 // Pegaremos a sched_flags de uma variavel global
 // pois eh configuravel.
 // IN: sched_flags
 
-    if (policy == SCHED_RR){
+    if (Policy == SCHED_RR){
         first_tid = (tid_t) __scheduler_rr(0);
     }
 
-    if ( (void *) ____IDLE == NULL )
-        panic("scheduler: ____IDLE");
+    if ( (void *) ____IDLE == NULL ){
+        panic("scheduler: ____IDLE\n");
+    }
 
-    if ( ____IDLE->magic != 1234 )
-        panic("scheduler: ____IDLE validation");
+    if ( ____IDLE->magic != 1234 ){
+        panic("scheduler: ____IDLE validation\n");
+    }
 
-    if ( first_tid != ____IDLE->tid )
-        panic("scheduler: first_tid != ____IDLE->tid");
+    if ( first_tid != ____IDLE->tid ){
+        panic("scheduler: first_tid != ____IDLE->tid\n");
+    }
 
 // Return tid.
     return (tid_t) first_tid;
@@ -299,7 +301,6 @@ int init_scheduler (unsigned long sched_flags)
     debug_print ("init_scheduler: [TODO]\n");
     // ...
 
-
     scheduler_lock();
 
 // Input responder.
@@ -316,6 +317,7 @@ int init_scheduler (unsigned long sched_flags)
 
     SchedulerInfo.policy = SCHED_RR;
     SchedulerInfo.flags  = (unsigned long) sched_flags;
+    SchedulerInfo.initialized = TRUE;
 
     return 0;
 }

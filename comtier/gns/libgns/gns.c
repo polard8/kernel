@@ -2,7 +2,6 @@
 // gns.c
 // This is a client-side library for the GNS. 
 
-
 #include <types.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -17,10 +16,8 @@
 char __gns_buffer[SIZE_DONT_CHANGE];
 
 //=================================
-
 static int __gns_hello_request(int fd);
 static int __gns_hello_response(int fd);
-
 //=================================
 
 
@@ -66,23 +63,17 @@ void gns_yield(void)
 // hello request
 static int __gns_hello_request (int fd)
 {
-    // Isso permite ler a mensagem na forma de longs.
     unsigned long *message_buffer = (unsigned long *) &__gns_buffer[0];   
 
     int n_writes = 0;   // For sending requests.
     int i=0;
-
-// loop:
-// Loop for new message.
-
-new_message:
 
 //
 // Write
 //
 
     // #debug
-    debug_print ("__gns_hello_request: Writing ...\n");      
+    // debug_print ("__gns_hello_request: Writing ...\n");      
 
 // Enviamos um request para o servidor.
 // ?? Precisamos mesmo de um loop para isso. ??
@@ -98,24 +89,27 @@ new_message:
     // ...
 
     while (1){
+        n_writes = 
+            (int) write (
+                      fd, 
+                      __gns_buffer, 
+                      sizeof(__gns_buffer) );
 
-        n_writes = (int) write (
-                             fd, 
-                             __gns_buffer, 
-                             sizeof(__gns_buffer) );
-
-        if (n_writes>0)
+        if (n_writes>0){
            break;
-        
-        for (i=0; i<9; i++){
+        }
+
+        for (i=0; i<9; i++)
+        {
             //gramado_system_call (265,0,0,0); //yield thread.
             //gnst_yield();
             rtl_yield();
         }
     };
 
-    if (n_writes <= 0 )
+    if (n_writes <= 0){
         return -1;
+    }
 
     return (int) n_writes;
 }
@@ -128,27 +122,25 @@ static int __gns_hello_response(int fd)
     int i=0;
     char response_buffer[64];
     
-
-    if(fd<0)
+    if (fd<0){
         return -1;
+    }
 
 //
-// read
+// Read
 //
-
     // #debug
-    debug_print ("__gns_hello_response: reading ...\n");      
+    //debug_print ("__gns_hello_response: reading ...\n");      
 
-    n_reads = read ( 
+    n_reads = 
+        (int) read ( 
                   fd, 
                   __gns_buffer, 
                   sizeof(__gns_buffer) );
 
-    // #bugbug
-    // If we do not read the file, so the flag will not switch
-    // and we will not be able to write into the socket.
-    // Tentamos ler e falhou.
-    // no loop
+// #bugbug
+// If we do not read the file, so the flag will not switch
+// and we will not be able to write into the socket.
 
     if (n_reads <= 0){
         printf ("__gns_hello_response: recv fail\n");
@@ -189,36 +181,35 @@ static int __gns_hello_response(int fd)
         break;
     };
 
-
 process_reply:
 
 // Clear the buffer.
-//#bugbug: Overflow. We need a limit here.
-//#todo: Get the size of the message
-//and then put the message into the tmp buffer.
+// #bugbug: Overflow. We need a limit here.
+// #todo: Get the size of the message
+// and then put the message into the tmp buffer.
 // Se tem alguma coisa no buffer, mostra
 
-    for(i=0; i<64; i++)
+    for (i=0; i<64; i++){
         response_buffer[i]=0;
+    };
+
+// Get the payload.
 
     sprintf( response_buffer, (__gns_buffer+128) );
     response_buffer[63] = 0;  //finaliza
 
-    if( *response_buffer != 0 ){
-        printf("RESPONSE: {%s} \n", response_buffer );
+    if ( *response_buffer != 0 ){
+        printf("RESPONSE: { %s } \n", response_buffer );
     }
 
-    return n_reads;
+    return (int) n_reads;
 }
-
 
 
 // =============================================
 int gns_hello (int fd)
 {
     int status=-1;
-
-    //int __saved_global_sync_id = sc82 (10005,0,0,0);
 
     if (fd<0){
         debug_print("gns_hello: fd\n");
@@ -240,13 +231,12 @@ int gns_hello (int fd)
    debug_print ("gns_hello: Send request\n");      
 
     int req_status=-1;
-
     req_status = (int) __gns_hello_request(fd);
-
     if(req_status<0){
         return -1;
     }
 
+// Set a request.
     rtl_set_file_sync( 
         fd, 
         SYNC_REQUEST_SET_ACTION, 
@@ -260,30 +250,31 @@ int gns_hello (int fd)
     int value=0;
     while (1)
     {
-        value = rtl_get_file_sync( 
-                    fd, 
-                    SYNC_REQUEST_GET_ACTION );
+        value = 
+            (int) rtl_get_file_sync( 
+                      fd, 
+                      SYNC_REQUEST_GET_ACTION );
         
         if (value == ACTION_REQUEST){ rtl_yield(); }
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         if (value == ACTION_NULL )  { return -1; }  // no reply
     };
-    
 
-    // A sicronização nos diz que ja temos um reply,
-    // então não precisamos esperar.
-    
-    // ??
-    // Se não conseguimos ler a resposta.
-    // Então vamos reconfigurar as flags do arquivo
-    // dizendo que queremos autorização para escrever.
-    // Na verdade esse erro na hora de ler a resposta
-    // ja é motivo pra fechar a conexão.
+// A sicronização nos diz que ja temos um reply,
+// então não precisamos esperar.
+
+// ??
+// Se não conseguimos ler a resposta.
+// Então vamos reconfigurar as flags do arquivo
+// dizendo que queremos autorização para escrever.
+// Na verdade esse erro na hora de ler a resposta
+// ja é motivo pra fechar a conexão.
 
     status = (int) __gns_hello_response(fd);
-    if( status <= 0 )
+    if ( status <= 0 ){
         return -1;
+    }
     
     return TRUE;
 }

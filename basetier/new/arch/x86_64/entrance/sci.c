@@ -20,6 +20,7 @@ unsigned long sci2_cpl=0;
 
 
 
+
 //
 // == private functions: prototypes =============
 //
@@ -864,7 +865,7 @@ static void *__extra_services (
 
 
     // is it full ?
-    //See: sys.c
+    // See: sys.c
     // IN: fd
     // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
     if ( number == 913 ){
@@ -2071,11 +2072,7 @@ void *sci2 (
     unsigned long *a3 = (unsigned long*) arg3;
     unsigned long *a4 = (unsigned long*) arg4;
 
-
-
     pid_t current_process = (pid_t) get_current_process();
-
-
 
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci2_cpl;
@@ -2287,12 +2284,14 @@ void *sci2 (
 
     // Set file sync action
     // IN: fd, request, data
+    // see; fs.c
     if ( number == 10006 ){
         sys_set_file_sync( (int) arg2, (int) arg3, (int) arg4 );
         return NULL;
     }
     // Get file sync action
     // IN: fd, request
+    // see; fs.c
     if ( number == 10007 ){
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
@@ -2348,6 +2347,20 @@ void *sci2 (
             return (void*) g_extraheap3_va;
         return NULL;
     }
+
+    //see: ts.c
+    pid_t ws_pid=-1;
+    if(number == 44000)
+    {
+        ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
+        if(current_process!=ws_pid){
+            panic("sci2: [44000] current_process!=ws_pid\n");
+        }
+        
+        tsSetupCallback( (unsigned long) arg2 );
+        return NULL;
+    }
+
 
     // #todo
     // Maybe kill the caller.

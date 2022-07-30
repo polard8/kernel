@@ -1938,6 +1938,7 @@ int get_saved_sync(void)
 }
 
 
+// service 10007
 // #todo
 // Comment the purpose of this routine.
 // It is used on socket communication.
@@ -2025,16 +2026,13 @@ int sys_get_file_sync (int fd, int request)
 }
 
 
+// service 10006
 // #todo
 // Comment the purpose of this routine.
 // It is used on socket communication.
 
 void sys_set_file_sync(int fd, int request, int data)
 {
-
-//
-// #deprecated
-//
     struct process_d  *p;
     file *object;
 
@@ -2058,7 +2056,7 @@ void sys_set_file_sync(int fd, int request, int data)
         return;
     }
 
-    // == Process ================
+// == Process ================
 
     if ( current_process < 0 ){
         debug_print("sys_set_file_sync: [FAIL] current_process\n");
@@ -2073,10 +2071,12 @@ void sys_set_file_sync(int fd, int request, int data)
         return;
     }
 
-    // #todo
-    // check validation
+    if (p->magic != 1234){
+        return;
+    }
 
 // object
+// Everything is a file.
 
     object = (file *) p->Objects[fd];
 
@@ -2107,8 +2107,8 @@ void sys_set_file_sync(int fd, int request, int data)
     case 216:
         
         //#debug
-        printf("216:\n"); 
-        refresh_screen();
+        //printf("216:\n"); 
+        //refresh_screen();
         
         object->sync.action = 0;
         //object->_flags = (__SWR | __SRD); 
@@ -2117,6 +2117,7 @@ void sys_set_file_sync(int fd, int request, int data)
         object->_r = 0;
         object->_w = 0;
         object->socket_buffer_full = FALSE; //empty buffer
+        return;
         break;
 
     // #test
@@ -2124,12 +2125,13 @@ void sys_set_file_sync(int fd, int request, int data)
     case 217:
 
         //#debug
-        printf("217:\n"); 
-        refresh_screen();
+        //printf("217:\n"); 
+        //refresh_screen();
 
         object->sync.action = 0;
         //object->_flags = (__SWR | __SRD); 
         object->_flags = __SRD;
+        return;
         break;
 
     // ...
@@ -4267,9 +4269,10 @@ fsLoadFile (
 // Precisamos usar as estruturas de diretorio e 
 // as estruturas de buffer.
     
-    FileSize = (unsigned long) fsGetFileSize( 
-                   (unsigned char *) file_name, 
-                   (unsigned long)dir_address );
+    FileSize = 
+        (unsigned long) fsGetFileSize( 
+                           (unsigned char *) file_name, 
+                           (unsigned long) dir_address );
 
     if (FileSize==0)
     {
@@ -6835,30 +6838,29 @@ void set_global_open_file ( void *file, int Index )
 	// #todo:
 	// Limite m�ximo da lista.
 
-	// Structure.
 
+// Structure
     if ( (void *) file == NULL )
     {
         // ?? todo: message
         return;
     }
 
-
     if (Index < 0){
         // ?? todo: message
         return;
     }
 
-	// Include pointer in the list.
-
+// Include pointer in the list.
 
      file_table[Index] = (unsigned long) file;
 }
 
-void *get_global_open_file (int Index){
+void *get_global_open_file (int Index)
+{
 
-	//Limits.
-	//@todo: max. NUMBER_OF_FILES
+//Limits.
+//@todo: max. NUMBER_OF_FILES
 
     if (Index < 0){
         // ?? todo: message
@@ -6925,17 +6927,13 @@ void sys_cd_command ( const char *string )
         return;
     }
 
-    // Atualiza na estrutura de processo.
-    // Atualiza na estrutura global para diretorio alvo.
-
+// Atualiza na estrutura de processo.
+// Atualiza na estrutura global para diretorio alvo.
     fsUpdateWorkingDiretoryString( (char *) string );
-
-    // Isso carrega o diretorio que agora 'e o diretorio alvo.
+// Isso carrega o diretorio que agora 'e o diretorio alvo.
     fsLoadFileFromCurrentTargetDir();
-
     // ...
 }
-
 
 // helper.
 // Loading a image given the filename and its virtual address.

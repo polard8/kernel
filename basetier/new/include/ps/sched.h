@@ -23,14 +23,12 @@
 
 struct scheduler_info_d
 {
-    //#todo
-    //int initialized;
-
+    int initialized;
     int policy;
     unsigned long flags;
 };
 
-struct scheduler_info_d  SchedulerInfo;
+extern struct scheduler_info_d  SchedulerInfo;
 
 
 // ===============================================

@@ -63,6 +63,17 @@ Bits         Usage
 #include <kernel.h>  
 
 
+/*
+struct master_timer_d
+{
+    int initialized;
+    
+    pid_t pid;
+    unsigned long callback_address;
+};
+struct master_timer_d  MasterTimer;
+*/
+
 
 //Contador de ticks.
 //unsigned long timerTicks;
@@ -175,6 +186,7 @@ irq0_TIMER (void)
     spawn_reset_eoi_state();
 }
 
+extern unsigned long _callback_address_saved;
 
 // Worker
 // Scheduler
@@ -182,6 +194,14 @@ irq0_TIMER (void)
 void DeviceInterface_PIT(void)
 {
     jiffies++;
+
+    // reset callback stuff.
+    if ( (jiffies % (16*4)) == 0 )
+    { 
+        if( _callback_address_saved != 0)
+            tsSetupCallback(_callback_address_saved);
+    }
+
 
 /*
     if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
@@ -213,7 +233,6 @@ void DeviceInterface_PIT(void)
             //wmSendInputToWindowManager(0,9091,jiffies,sys_time_hz);
         //}
     //}
-    
     
 // #todo
 // Refresh an array of surfaces.
@@ -411,7 +430,7 @@ unsigned long get_systime_ms (void)
 
 
 // get_systime_totalticks:
-unsigned long get_systime_totalticks (void)
+unsigned long get_systime_totalticks(void)
 {
     return (unsigned long) jiffies;
 }

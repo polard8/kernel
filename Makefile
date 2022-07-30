@@ -3,7 +3,7 @@
 # See: 0config/version.h
 
 PRODUCT_NAME  = Gramado
-EDITION_NAME  = Angels
+EDITION_NAME  = Angels/Warden
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 4

@@ -16,6 +16,8 @@
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
 
 
+
+
 /*
  * create_socket_object: 
  *     It creates a socket structure.
@@ -772,6 +774,17 @@ int socket_write ( unsigned int fd, char *buf, int count )
     return -1;
 }
 
+
+pid_t socket_get_gramado_port (int port)
+{
+    //port
+    if ( port<0 || port >31){
+        debug_print ("socket_set_gramado_port: port fail\n");
+        return (pid_t) -1;
+    }
+    
+    return (pid_t) gramado_ports[port];
+}
 
 // Conjunto especiais de portas.
 // Usados apenas na famíla AF_GRAMADO.

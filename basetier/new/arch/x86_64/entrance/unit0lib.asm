@@ -603,6 +603,16 @@ setup_vectors:
 
     ;; ...
 
+
+;;========================
+;; callback restorer.
+;; temos que terminal a rotina do timer e
+;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+
+    mov rax,  qword callback_restorer
+    mov rbx,  qword 198
+    call _setup_system_interrupt  
+
 ;; =====================
     
 ; #test
@@ -614,6 +624,7 @@ setup_vectors:
     mov rax,  qword _int199
     mov rbx,  qword 199
     call _setup_system_interrupt  
+
 
     ;; ...
 

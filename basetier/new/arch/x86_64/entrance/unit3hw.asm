@@ -5,6 +5,13 @@
 ; Imports
 ;
 
+; #test
+; testando callbacks.
+extern _fCallbackAfterCR3
+extern _Ring3CallbackAddress
+
+
+
 extern _task_switch_status
 
 
@@ -48,11 +55,45 @@ extern _contextR15
 ; ...
 
 
+;;========================
+;; callback restorer.
+;; temos que terminal a rotina do timer e
+;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+callback_restorer:
+    ;drop the useless stack frame
+    pop rax ;rip
+    pop rax ;cs
+    pop rax ;rflags
+    pop rax ;rsp
+    pop rax ;ss
+
+; clear the variables
+; desse jeito a rotina de saida não tentara
+; chamar o callback novamente.
+    mov qword [_fCallbackAfterCR3], 0
+    mov qword [_Ring3CallbackAddress], 0
+
+;; temos que terminal a rotina do timer e
+;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+    jmp unit3Irq0Release
+
 ; Irq0 release.
 ; Timer interrupt.
 ; See: _irq0 in unit1hw.asm.
 
 unit3Irq0Release:
+
+    mov rax, qword [_fCallbackAfterCR3]
+    mov rbx, qword [_Ring3CallbackAddress]
+
+    ; ring3 callback
+    ; #bugbug: o problema é que pode ter havido uma troca
+    ; de tarefas e a rotina em C pode ter mudado o cr3.
+    ; Sendo assim podemos acabar saltando para um endereço
+    ; dentro de outro processo.
+    cmp rax, 0x1234
+    je Unit3IretqToRing3Callback
+
 
 ; 64bit
 ; This is a 64bit pointer to the pml4 table.
@@ -119,6 +160,22 @@ unit3Irq0Release:
 ; The flags in the 'eflags' will reenable it.
 
     sti
+    iretq
+
+
+;------------------------------------------------
+Unit3IretqToRing3Callback:
+
+    push qword [_contextSS]      ; ss
+    push qword [_contextRSP]     ; rsp
+    push qword 0x3000 ;[_contextRFLAGS]  ; rflags interrupçoes desabilitadas.
+    push qword [_contextCS]      ; cs
+    push rbx     ; rip
+    ; interrupçoes desabilitadas
+    ; eoi nao acionado.
+    ; quando uma interrupçao voltar para ring3, 
+    ; entao devemos usar unit3Irq0Release
+    ; para retomar as atividades do aplicativo.
     iretq
 
 
