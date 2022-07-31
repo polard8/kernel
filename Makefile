@@ -6,8 +6,8 @@ PRODUCT_NAME  = Gramado
 EDITION_NAME  = Angels/Warden
 
 VERSION_MAJOR = 1
-VERSION_MINOR = 4
-VERSION_BUILD = 291
+VERSION_MINOR = 5
+VERSION_BUILD = 292
 # test: Compiling on gcc 11.2
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
@@ -68,7 +68,7 @@ clean
 #----------
 # build: Developer comand 1.
 # install
-# Build the images and put them all into basetier/disk/ folder.
+# Build the images and put them all into control/disk/ folder.
 PHONY := install
 install: do_install
 do_install: \
@@ -78,7 +78,7 @@ build-gramado-os
 #----------
 # build: Developer comand 2.
 # image
-# Copy all the files from basetier/disk/ to the VHD.
+# Copy all the files from control/disk/ to the VHD.
 PHONY := image
 image: do_image
 do_image: \
@@ -103,13 +103,11 @@ do_run:
 
 PHONY := build-gramado-os  
 build-gramado-os: \
-base-tier \
-communication-tier \
-presentation-tier    
-
+control-tier \
+exposed-tier    
 
 #1
-base-tier:
+control-tier:
 	@echo ":: Building VHD, bootloaders and kernel image."
 
 # options: 
@@ -124,104 +122,109 @@ base-tier:
 
 
 # Create the VHD.
-	$(Q) $(NASM) basetier/boot/vd/fat/main.asm \
-	-I basetier/boot/vd/fat/ \
+	$(Q) $(NASM) control/boot/vd/fat/main.asm \
+	-I control/boot/vd/fat/ \
 	-o GRAMADO.VHD 
 
 
 # ::Build BM.BIN.
-	$(Q) $(MAKE) -C basetier/boot/x86/bm/ 
+	$(Q) $(MAKE) -C control/boot/x86/bm/ 
 # Copy to the target folder.
-	sudo cp basetier/boot/x86/bin/BM.BIN  basetier/disk/
+	sudo cp control/boot/x86/bin/BM.BIN  control/disk/
 
 # ::Build BL.BIN.
-	$(Q) $(MAKE) -C basetier/boot/x86/bl/ 
+	$(Q) $(MAKE) -C control/boot/x86/bl/ 
 # Copy to the target folder.
-	sudo cp basetier/boot/x86/bin/BL.BIN  basetier/disk/
+	sudo cp control/boot/x86/bin/BL.BIN  control/disk/
 
 
 # ::Build kernel image.
-	$(Q) $(MAKE) -C basetier/new/
+	$(Q) $(MAKE) -C control/new/
 # Copy to the target folder.
-	sudo cp basetier/new/KERNEL.BIN  basetier/disk/GRAMADO
+	sudo cp control/new/KERNEL.BIN  control/disk/GRAMADO
 
 
 # ::Build the ring0 module image.
-	$(Q) $(MAKE) -C basetier/modr0/
+	$(Q) $(MAKE) -C control/modr0/
 # Copy the ring0 module image.
-	sudo cp basetier/modr0/MOD0.BIN  basetier/disk/
+	sudo cp control/modr0/MOD0.BIN  control/disk/
 
 # Install BMPs
-	sudo cp basetier/data/themes/field/*.BMP  basetier/disk/
+	sudo cp control/data/themes/field/*.BMP  control/disk/
 #...
 
 
 #2
-communication-tier:
+exposed-tier:
 	@echo ":: Building libraries and network server."
 
 # ::Build libraries.
-	$(Q) $(MAKE) -C comtier/lib/
+	$(Q) $(MAKE) -C exposed/lib/
 # Don't copy to the disk.
 
 # ::Build network server.
-	$(Q) $(MAKE) -C comtier/gns/ 
+	$(Q) $(MAKE) -C exposed/gns/ 
 # Copy to the target folder.
-	-sudo cp comtier/gns/bin/GNSSRV.BIN  basetier/disk/
-	-sudo cp comtier/gns/bin/GNS.BIN     basetier/disk/
+	-sudo cp exposed/gns/bin/GNSSRV.BIN  control/disk/
+	-sudo cp exposed/gns/bin/GNS.BIN     control/disk/
 
 #========================================
 
 #3
 # The presentation tier.
 # Gramado Window System files.
-presentation-tier:
+
 	@echo ":: Building Window server, clients and userland."
 
 
 # ::Building mod0 and init process.
-	$(Q) $(MAKE) -C prestier/init/
+	$(Q) $(MAKE) -C exposed/init/
 # Copy to the target folder.
-	-sudo cp prestier/bin/INIT.BIN  basetier/disk/ 
+	-sudo cp exposed/bin/INIT.BIN  control/disk/ 
 
 
 
 # test
 # Importing from another project.
-	-sudo cp ../gws/bin/GWSSRV2.BIN  basetier/disk/
+
+#burgundy
+	-sudo cp ../gws/burgundy/bin/GWSSRV2.BIN  control/disk/
 #bugbug: This client has some special calls.
 #do not use it for tests here.
-	#-sudo cp ../gws/bin/GWS2.BIN     basetier/disk/
+	#-sudo cp ../gws/burgundy/bin/GWS2.BIN     control/disk/
+	-sudo cp ../gws/burgundy/bin/GDM.BIN     control/disk/
+	-sudo cp ../gws/burgundy/bin/GDM2.BIN    control/disk/
 
-	-sudo cp ../gws/bin/TERMINAL.BIN  basetier/disk/
-	-sudo cp ../gws/bin/EDITOR.BIN    basetier/disk/
-	-sudo cp ../gws/bin/FILEMAN.BIN   basetier/disk/
-	-sudo cp ../gws/bin/BROWSER.BIN   basetier/disk/
-	-sudo cp ../gws/bin/CMDLINE.BIN   basetier/disk/
+#blue
+	-sudo cp ../gws/blue/bin/TERMINAL.BIN  control/disk/
 
-	-sudo cp ../gws/bin/GDM.BIN     basetier/disk/
-	-sudo cp ../gws/bin/GDM2.BIN    basetier/disk/
+#beige
+	-sudo cp ../gws/beige/bin/BROWSER.BIN   control/disk/
+	-sudo cp ../gws/beige/bin/EDITOR.BIN    control/disk/
+	-sudo cp ../gws/beige/bin/FILEMAN.BIN   control/disk/
+	-sudo cp ../gws/beige/bin/CMDLINE.BIN   control/disk/
+
 
 # ::Building userland commands.
-	$(Q) $(MAKE) -C prestier/userland/
+	$(Q) $(MAKE) -C exposed/userland/
 # Copy to the target folder.
-	-sudo cp prestier/userland/bin/SHUTDOWN.BIN  basetier/disk/
-	-sudo cp prestier/userland/bin/REBOOT.BIN    basetier/disk/
-	-sudo cp prestier/userland/bin/SHELL.BIN     basetier/disk/
-	-sudo cp prestier/userland/bin/CAT.BIN       basetier/disk/
-	-sudo cp prestier/userland/bin/TPRINTF.BIN   basetier/disk/
-	-sudo cp prestier/userland/bin/SHOWFUN.BIN   basetier/disk/
-	-sudo cp prestier/userland/bin/UNAME.BIN     basetier/disk/
-	-sudo cp prestier/userland/bin/CMP.BIN       basetier/disk/
-	-sudo cp prestier/userland/bin/SUM.BIN       basetier/disk/
-	-sudo cp prestier/userland/bin/TASCII.BIN    basetier/disk/
-	-sudo cp prestier/userland/bin/FALSE.BIN     basetier/disk/
-	-sudo cp prestier/userland/bin/TRUE.BIN      basetier/disk/
+	-sudo cp exposed/userland/bin/SHUTDOWN.BIN  control/disk/
+	-sudo cp exposed/userland/bin/REBOOT.BIN    control/disk/
+	-sudo cp exposed/userland/bin/SHELL.BIN     control/disk/
+	-sudo cp exposed/userland/bin/CAT.BIN       control/disk/
+	-sudo cp exposed/userland/bin/TPRINTF.BIN   control/disk/
+	-sudo cp exposed/userland/bin/SHOWFUN.BIN   control/disk/
+	-sudo cp exposed/userland/bin/UNAME.BIN     control/disk/
+	-sudo cp exposed/userland/bin/CMP.BIN       control/disk/
+	-sudo cp exposed/userland/bin/SUM.BIN       control/disk/
+	-sudo cp exposed/userland/bin/TASCII.BIN    control/disk/
+	-sudo cp exposed/userland/bin/FALSE.BIN     control/disk/
+	-sudo cp exposed/userland/bin/TRUE.BIN      control/disk/
 	#...
 
 # Suspended
 # Copy the clients in another folder.
-#	-sudo cp prestier/userland/bin/*.BIN    basetier/disk/PROGRAMS/
+#	-sudo cp exposed/userland/bin/*.BIN    control/disk/PROGRAMS/
 
 #===================================================
 #::2
@@ -243,14 +246,14 @@ vhd-mount:
 #===================================================
 #::4
 # ~ Step 4 vhd-copy-files - Copying files into the mounted VHD.
-# Copying the basetier/disk/ folder into the mounted VHD.
+# Copying the control/disk/ folder into the mounted VHD.
 vhd-copy-files:
 	@echo "========================="
 	@echo "Build: Copying files into the mounted VHD ..."
 
-	# Copy basetier/disk/
+	# Copy control/disk/
 	# sends everything from disk/ to root.
-	sudo cp -r basetier/disk/*  /mnt/gramadoxvhd
+	sudo cp -r control/disk/*  /mnt/gramadoxvhd
 
 #===================================================
 #:::5
@@ -291,42 +294,42 @@ clean-all: clean
 # Base tier.
 
 # Clear boot images
-	-rm -rf basetier/boot/x86/bin/*.BIN
+	-rm -rf control/boot/x86/bin/*.BIN
 # Clear newos kernel image
-	-rm -rf basetier/new/KERNEL.BIN
+	-rm -rf control/new/KERNEL.BIN
 # Clear the ring0 module image
-	-rm -rf basetier/modr0/MOD0.BIN
+	-rm -rf control/modr0/MOD0.BIN
 
 
-	-rm -rf basetier/disk/*.BIN 
-	-rm -rf basetier/disk/*.BMP
+	-rm -rf control/disk/*.BIN 
+	-rm -rf control/disk/*.BMP
 
-	-rm -rf basetier/disk/EFI/BOOT/*.EFI 
+	-rm -rf control/disk/EFI/BOOT/*.EFI 
 
-	-rm -rf basetier/disk/GRAMADO/*.BIN 
-	-rm -rf basetier/disk/PROGRAMS/*.BIN 
-	-rm -rf basetier/disk/UBASE/BOOT/*.BIN 
-	-rm -rf basetier/disk/UBASE/BIN/*.BIN 
-	-rm -rf basetier/disk/UBASE/SBIN/*.BIN
+	-rm -rf control/disk/GRAMADO/*.BIN 
+	-rm -rf control/disk/PROGRAMS/*.BIN 
+	-rm -rf control/disk/UBASE/BOOT/*.BIN 
+	-rm -rf control/disk/UBASE/BIN/*.BIN 
+	-rm -rf control/disk/UBASE/SBIN/*.BIN
 
 
 # Communication tier.
 
-	-rm -rf comtier/gns/bin/*.BIN
+	-rm -rf exposed/gns/bin/*.BIN
 
-	-rm -rf comtier/lib/rtl/obj/*.o
-	-rm -rf comtier/lib/libgns/obj/*.o
-	-rm -rf comtier/lib/libio01/obj/*.o
-	-rm -rf comtier/lib/fonts/bin/*.FON
+	-rm -rf exposed/lib/rtl/obj/*.o
+	-rm -rf exposed/lib/libgns/obj/*.o
+	-rm -rf exposed/lib/libio01/obj/*.o
+	-rm -rf exposed/lib/fonts/bin/*.FON
 
 # Presentation tier.
 
-	-rm -rf prestier/bin/*.BIN
-	-rm     prestier/bin/*.BIN
-	-rm     prestier/userland/bin/*.BIN
+	-rm -rf exposed/bin/*.BIN
+	-rm     exposed/bin/*.BIN
+	-rm     exposed/userland/bin/*.BIN
 
-	-rm -rf prestier/init/init/*.o
-	-rm -rf prestier/init/modr0/*.o
+	-rm -rf exposed/init/init/*.o
+	-rm -rf exposed/init/modr0/*.o
 
 	# ...
 
