@@ -586,9 +586,15 @@ set_thread_priority (
 
 
 // Limits
+
+    if ( priority < PRIORITY_MIN )
+    {
+        priority=PRIORITY_MIN;
+        return;
+    }
     if ( priority > PRIORITY_MAX )
     {
-        //NewPriority = PRIORITY_MAX;
+        priority=PRIORITY_MAX;
         return;
     }
 

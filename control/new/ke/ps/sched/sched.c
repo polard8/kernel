@@ -50,31 +50,21 @@ static tid_t __scheduler_rr(unsigned long sched_flags);
 
 static tid_t __scheduler_rr(unsigned long sched_flags)
 {
+    struct thread_d *TmpThread;
+    register int i=0;
     tid_t FirstTID = -1;
 
-    // loop
-    register int i=0;
+// System state
 
-    struct thread_d  *TmpThread;
-
-
-    if ( system_state != SYSTEM_RUNNING )
+    if ( system_state != SYSTEM_RUNNING ){
         panic ("__scheduler_rr: system_state\n");
-
+    }
     system_state = SYSTEM_SCHEDULING;
 
     //debug_print ("scheduler: [not tested] \n");
 
-//#ifdef SERIAL_DEBUG_VERBOSE
-    //debug_print(" SCHEDULER \n");
-    //printf     (" SCHEDULER \n"); refresh_screen();
-//#endif
-
-
-//
 // rootConductor: 
 // The ring0 idle thread.
-//
 
 // BSP - bootstrap processor
 // The linked list for the BSP will always start with the
@@ -82,65 +72,104 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // #todo:
 // We need to create another hook for the AP cores.
 
-    // O Window server é o idle.
+
+// ===============================================
+// The idle thread is the current thread of the
+// first ring0 module. MOD0.BIN.
+
+    if ( (void*) ____IDLE == NULL ){
+        panic ("__scheduler_rr: ____IDLE\n");
+    }
+    if ( ____IDLE->used != TRUE || 
+         ____IDLE->magic != 1234 )
+    {
+        panic ("__scheduler_rr: ____IDLE validation\n");
+    }
+    // Estabiliza a idle thread.
+    ____IDLE->base_priority = PRIORITY_SYSTEM_THREAD;
+    ____IDLE->priority = PRIORITY_SYSTEM_THREAD;
+    ____IDLE->quantum = QUANTUM_MIN;
     rootConductor = (void *) ____IDLE;
 
-    // Check
-    if ( (void*) rootConductor == NULL )
-        panic ("__scheduler_rr: rootConductor\n");
-
-    if (rootConductor->used != TRUE || rootConductor->magic != 1234)
-        panic ("__scheduler_rr: rootConductor validation\n");
-
-// First tid.
+// First TID.
+// The TID of the ____IDLE thread.
 
     FirstTID = (tid_t) rootConductor->tid;
 
-    if ( FirstTID < 0 || FirstTID >= THREAD_COUNT_MAX )
+    if ( FirstTID < 0 || 
+         FirstTID >= THREAD_COUNT_MAX )
+    {
         panic ("__scheduler_rr: FirstTID\n");
+    }
 
-//
-// rootConductor->next: 
+// ===============================================
 // The control thread of the ring3 init process.
-//
+// INIT.BIN
+// rootConductor->next: 
 
-    //if ( (void*) InitProcess == NULL )
-        //panic ("__scheduler_rr: InitProcess\n");
-
-    if ( (void*) InitThread == NULL )
+    if ( (void*) InitThread == NULL ){
         panic ("__scheduler_rr: InitThread\n");
-
+    }
+    if ( InitThread->used != TRUE || 
+         InitThread->magic != 1234 )
+    {
+        panic ("__scheduler_rr: InitThread validation\n");
+    }
+    // Estabiliza a init thread.
+    InitThread->base_priority = PRIORITY_SYSTEM_THREAD;
+    InitThread->priority = PRIORITY_SYSTEM_THREAD;
+    InitThread->quantum = QUANTUM_MIN;
     rootConductor->next = (void*) InitThread;
-
-    // Check
-    if ( (void*) rootConductor->next == NULL )
-        panic ("__scheduler_rr: rootConductor->next\n");
 
 // ===============================================
 
 // Conductor
-
     Conductor       = (void *) rootConductor;
     Conductor->next = (void *) rootConductor;
 
 // tmpConductor
-
     tmpConductor       = (void *) rootConductor;
-    tmpConductor->next = (void *) rootConductor;
+    tmpConductor->next = (void *) rootConductor;  // The list starts here.
 
 
-//
-// Walking ...
-//
-
+// Walking
 // READY threads in the threadList[].
 
-    for ( i=0; i < THREAD_COUNT_MAX; ++i )
+    for ( i=0; i<THREAD_COUNT_MAX; ++i )
     {
         TmpThread = (void *) threadList[i];
 
         if ( (void *) TmpThread != NULL )
         {
+            // Scheduler.
+            // A thread esta pronta.
+            if ( TmpThread->used  == TRUE && 
+                 TmpThread->magic == 1234 && 
+                 TmpThread->state == READY )
+            {
+                // Recreate the linked list.
+                // The tmpConductor and it's next.
+                tmpConductor       = (void *) tmpConductor->next; 
+                tmpConductor->next = (void *) TmpThread;
+
+                // Initialize counters.
+                TmpThread->runningCount = 0;
+                TmpThread->runningCount_ms = 0;
+
+                // Checa se temos problemas com a prioridade base.
+                // Estabiliza.
+                if (TmpThread->base_priority < PRIORITY_MIN){
+                    TmpThread->base_priority=PRIORITY_NORMAL;
+                }
+                if (TmpThread->base_priority > PRIORITY_MAX){
+                    TmpThread->base_priority=PRIORITY_NORMAL;
+                }
+                // Voltamos para a base depois de checada a base.
+                // Caso tenha havido algum problema na 
+                // prioridade base, então ela foi para o equilíbrio.
+                TmpThread->priority = TmpThread->base_priority;
+            }
+
             // A thread esta esperando.
             if ( TmpThread->used  == TRUE && 
                  TmpThread->magic == 1234 && 
@@ -156,43 +185,16 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 //    TmpThread->state = READY;
                 //}
             }
-
-            // Scheduler.
-
-            // A thread esta pronta.
-            if ( TmpThread->used  == TRUE && 
-                 TmpThread->magic == 1234 && 
-                 TmpThread->state == READY )
-            {
-                // Initialize counters.
-                TmpThread->runningCount = 0;
-                TmpThread->runningCount_ms = 0;
-                
-                // A prioridade nunca pode ser menor que sua prioridade b
-                //if(TmpThread->priority < TmpThread->base_priority)
-                    //TmpThread->priority = TmpThread->base_priority;
-                
-                //if (TmpThread->priority == PRIORITY_MAX)
-                    //TmpThread->quantum = QUANTUM_MAX;
-                
-                // The tmpConductor and it's next.
-                tmpConductor       = (void *) tmpConductor->next; 
-                tmpConductor->next = (void *) TmpThread;
-            }
         }
     };
 
-
 // #todo
 // Let's try some other lists.
-
 
 // Finalizing the list.
 // The tmpConductor and it's next.
     tmpConductor       = (void *) tmpConductor->next; 
     tmpConductor->next = NULL;               // Reescalona ao fim do round.
-    //tmpConductor->next = (void *) ____IDLE;  // Reescalona quando o scheduler for chamado pelo timer.
-
 
 // done:
     system_state = SYSTEM_RUNNING;

@@ -109,6 +109,8 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
 // ===================================
 
 // Signal support
+
+// #remember: t->signal |= 1<<(signal-1);
     t->signal = 0;
     t->umask = 0;
 

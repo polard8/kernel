@@ -364,24 +364,26 @@ void I_x64ExecuteInitialProcess (void)
 
     Thread = (struct thread_d *) InitThread; 
 
-    if ( (void *) Thread == NULL )
-    {
+    if ( (void *) Thread == NULL ){
         panic ("I_x64ExecuteInitialProcess: Thread\n");
     }
-
-    if ( Thread->used != TRUE || Thread->magic != 1234 )
+    if ( Thread->used != TRUE || 
+         Thread->magic != 1234 )
     {
         panic ("I_x64ExecuteInitialProcess: Thread validation\n");
     }
+    if ( Thread->tid < 0 || 
+         Thread->tid > THREAD_COUNT_MAX )
+    {
+        panic("I_x64ExecuteInitialProcess: tid\n");
+    }
 
-// It its context is already saved, so this is not the fist time.
+
+// It its context is already saved, 
+// so this is not the fist time.
     
     if ( Thread->saved != FALSE ){
         panic("I_x64ExecuteInitialProcess: saved\n");
-    }
-
-    if ( Thread->tid < 0 ){
-        panic("I_x64ExecuteInitialProcess: tid\n");
     }
 
 // Set the current thread.
@@ -404,10 +406,13 @@ void I_x64ExecuteInitialProcess (void)
         Thread->state = RUNNING;
     }
 
+//
 // Current process.
-
-    //current_process = (pid_t) Thread->process->pid;
-    set_current_process(Thread->process->pid);
+//
+    if ( Thread->process->pid != GRAMADO_PID_INIT ){
+        panic("I_x64ExecuteInitialProcess: Thread->process->pid\n");
+    }
+    set_current_process(GRAMADO_PID_INIT);
 
 // List
 // Dispatcher ready list.
@@ -921,10 +926,6 @@ static int I_x64CreateTID0(void)
         (struct thread_d *) tid0_thread, 
         PRIORITY_MAX );
 
-// Quantum
-
-    tid0_thread->quantum = QUANTUM_MAX;
-
 // #importante
 // Sinalizando que ainda não podemos usar as rotinas que dependam
 // de que o dead thread collector esteja funcionando.
@@ -945,8 +946,9 @@ static int I_x64CreateTID0(void)
 // OK, the loadable tharead that belongs to the ws is
 // the kernel process's control thread. :)
 
-    if ((void*)KernelProcess != NULL){
-        KernelProcess->control = (struct thread_d *) tid0_thread;
+    if ((void*)KernelProcess != NULL)
+    {
+        KernelProcess->control = (struct thread_d *) ____IDLE;
     }
 
     return TRUE;

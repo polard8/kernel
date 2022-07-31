@@ -12,7 +12,7 @@
 void *create_tid0(void)
 {
     struct thread_d  *kThread;
-    int TID = TID0_TID;
+    int TID = (int)(TID0_TID & 0xFFFF);
 
     // loops
     register int r=0;    // Wait reason.

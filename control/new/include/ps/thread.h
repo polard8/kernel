@@ -17,21 +17,20 @@
 //     It belong to the init process.
 
 
-#define MODULE0_TID  0  // Window server. GWSSRV.BIN
-#define MODULE1_TID  1  //
-#define MODULE2_TID  2  //
+#define MODULE0_TID  0  // MOD0.BIN.
+#define MODULE1_TID  1  // ?
+#define MODULE2_TID  2  // ?
 
-#define CLIENT0_TID  3  // First ring3 client. GWS.BIN
+// First ring3 process. INI.BIN.
+#define CLIENT0_TID  3  
 
 // alias.
 #define TID0_TID  MODULE0_TID
-//#define ??      MODULE1_TID
-//#define ??      MODULE2_TID
+#define TID1_TID  MODULE1_TID
+#define TID2_TID  MODULE2_TID
+#define TID3_TID  CLIENT0_TID
 #define WS_FIRST_CLIENT_TID  CLIENT0_TID
-
-// alias.
-//#define SYSTEM_TID  MODULE0_TID
-#define INIT_TID    CLIENT0_TID
+#define INIT_TID             CLIENT0_TID
 // =================================
 
 

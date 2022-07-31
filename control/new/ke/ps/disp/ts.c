@@ -601,6 +601,8 @@ dispatch_current:
     }
 
 // Priority:
+// #todo: Delete this.
+// The current priority will be updated every schedule.
     if ( TargetThread->priority > PRIORITY_MAX ){
         TargetThread->priority = PRIORITY_MAX;
     }
