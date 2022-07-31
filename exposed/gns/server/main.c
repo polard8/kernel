@@ -512,7 +512,10 @@ int main (int argc, char **argv)
 
     int i=0;
     int _status = -1;
- 
+    
+    //int InitializeFirstClient = TRUE;
+    int InitializeFirstClient = FALSE;
+     
     //unsigned long w=0;
     //unsigned long h=0;
 
@@ -583,7 +586,9 @@ int main (int argc, char **argv)
     }
 
 // Calling child and wait.
-    rtl_clone_and_execute ("gns.bin");
+    if (InitializeFirstClient==TRUE){
+        rtl_clone_and_execute ("gns.bin");
+    }
 
     for (i=0; i<11; i++){
         gnssrv_yield();

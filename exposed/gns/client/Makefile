@@ -82,13 +82,10 @@ all-c:
 hello-link:
 	ld -m elf_x86_64 -T ../link.ld -o GNS.BIN $(myObjects)    
 
-
-
 finalize:
 	cp GNS.BIN  ../bin
 
 clean:
 	-rm *.o
 	-rm GNS.BIN 
-
 	

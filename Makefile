@@ -188,10 +188,10 @@ exposed-tier:
 # Importing from another project.
 
 #burgundy
-	-sudo cp ../gws/burgundy/bin/GWSSRV2.BIN  control/disk/
 #bugbug: This client has some special calls.
 #do not use it for tests here.
-	#-sudo cp ../gws/burgundy/bin/GWS2.BIN     control/disk/
+	-sudo cp ../gws/burgundy/bin/GWSSRV.BIN  control/disk/
+	#-sudo cp ../gws/burgundy/bin/GWS.BIN     control/disk/
 	-sudo cp ../gws/burgundy/bin/GDM.BIN     control/disk/
 	-sudo cp ../gws/burgundy/bin/GDM2.BIN    control/disk/
 

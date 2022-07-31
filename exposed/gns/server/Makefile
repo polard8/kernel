@@ -28,8 +28,6 @@ CFLAGS = -m64 \
 	
 
 
-
-
 # rtl
 LIBC    = ../../lib/rtl/include/
 LIBCOBJ = ../../lib/rtl/obj
@@ -47,12 +45,10 @@ GWS_INCLUDES  = include/
 # Objects
 #
 
-	
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 connect.o decode.o \
 termios.o ioctl.o fcntl.o    
-
 
 
 .PHONY: all all-c gws-link finalize clean

@@ -59,6 +59,10 @@ extern _contextR15
 ;; callback restorer.
 ;; temos que terminal a rotina do timer e
 ;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+
+; #bugbug
+; We gotta check what is the process calling this routine.
+
 callback_restorer:
     ;drop the useless stack frame
     pop rax ;rip
@@ -66,6 +70,11 @@ callback_restorer:
     pop rax ;rflags
     pop rax ;rsp
     pop rax ;ss
+
+
+; #bugbug
+; We gotta check what is the process calling this routine.
+     ;call __xxxxCheckCallerPID
 
 ; clear the variables
 ; desse jeito a rotina de saida não tentara

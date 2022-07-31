@@ -276,19 +276,18 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
-// Window Server:
 
+// Window Server:
     if( strncmp(prompt,"ws",2) == 0 )
     {
         printf ("~WS\n");
-        rtl_clone_and_execute("gwssrv2.bin");
+        rtl_clone_and_execute("gwssrv.bin");
         goto exit_cmp;
     }
-
     if( strncmp(prompt,"wsq",3) == 0 )
     {
         printf ("~WSQ\n");
-        ret_val = (int) rtl_clone_and_execute("gwssrv2.bin");
+        ret_val = (int) rtl_clone_and_execute("gwssrv.bin");
         if (ret_val<=0){
             printf("Couldn't clone\n");
         }
@@ -297,15 +296,14 @@ static int initCompareString(void)
         goto exit_cmp;
     }
 
-// Network Server:
 
+// Network Server:
     if( strncmp(prompt,"ns",2) == 0 )
     {
         printf ("~NS\n");
         rtl_clone_and_execute("gnssrv.bin");
         goto exit_cmp;
     }
-
     if( strncmp(prompt,"nsq",3) == 0 )
     {
         printf ("~NSQ\n");
