@@ -322,9 +322,7 @@ The remainder ??
         // Preempt
         // #bugbug: Preempção para threads de ring0 e ring3.
  
-        if ( CurrentThread->state == RUNNING )
-        {
-            //debug_print (" P ");
+        if ( CurrentThread->state == RUNNING ){
             CurrentThread->state = READY;
         }
 
@@ -368,10 +366,7 @@ The remainder ??
         // #bugbug
         // #todo: This is a work in progress!
 
-        if (dead_thread_collector_status == TRUE)
-        {
-            //#debug
-            //debug_print (" C "); 
+        if (dead_thread_collector_status == TRUE){
             check_for_dead_thread_collector();
         }
 

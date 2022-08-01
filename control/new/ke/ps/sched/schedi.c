@@ -648,11 +648,9 @@ done:
 }
 
 /*
- ******************************************
  * wakeup_scan_thread_reason:
  * 
  */
-
 // Acorda todas as threads da lista que estão esperando por 
 // evento de determinado tipo.
 
@@ -885,29 +883,21 @@ done:
 
 /*
  * check_for_standby:
- *
  * Check for a thread in standby.
  * In this case, this routine will not return.
- * 
  * Procura na lista de threads no estado StandyBy.
  * Se tiver uma thread nessa lista, ela se torna 
  * a current. Para rodar pela primeira vez, atravéz de Spawn.
  * Não retorna se encontrar uma threa na lista.
  */
-
-// Called by task_switch().
+// Called by __task_switch() in ts.c.
 
 void check_for_standby(void)
 {
-    // loop
     register int i = 0;
-    //register int Max = 32;  // max what?
-    register int Max = THREAD_COUNT_MAX;  // max what?
-
+    register int Max = THREAD_COUNT_MAX;
     int newId=0;
- 
     struct thread_d  *New;
-
 
 //#ifdef SERIAL_DEBUG_VERBOSE
     //debug_print (" check_for_standby ");
@@ -919,7 +909,6 @@ void check_for_standby(void)
         // #todo: 
         // As filas ainda não funcionam.
         // Vamos usar a lista global.
-        
         //New = (void *) queue->standbyList[i];
         
         New = (void *) threadList[i];
@@ -961,6 +950,13 @@ do_spawn:
         current_thread >= THREAD_COUNT_MAX )
     {
         goto fail;
+    }
+
+// A init thread foi a primeira thread a rodar.
+// Não podemos fazer spawn dela, pois ela tem uma rotina
+// especial para isso.
+    if ( current_thread == INIT_TID ){
+        panic("check_for_standby: Can't spawn INIT_TID\n");
     }
 
     KiSpawnThread(current_thread);

@@ -2198,6 +2198,7 @@ void *sci2 (
 // See: clone.c
 
     // IN: file name, parent pid, clone flags.
+    // OUT: Child's PID.
     if ( number == 900 )
     {
         debug_print("sci2: [900] clone and execute\n");
