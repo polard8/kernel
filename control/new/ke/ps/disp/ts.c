@@ -545,15 +545,13 @@ go_ahead:
 // Dispatch current 
 // =================
 
-dispatch_current:
-
 // Validation
 // Check current thread limits.
 // The target thread will be the current.
 
+dispatch_current:
 
 // tid
-
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
     {
@@ -561,13 +559,11 @@ dispatch_current:
     }
 
 // structure
-
     TargetThread = (void *) threadList[current_thread];
 
     if ( (void *) TargetThread == NULL ){
         panic ("ts-dispatch_current: TargetThread\n");
     }
-
     if ( TargetThread->used  != TRUE || 
          TargetThread->magic != 1234 || 
          TargetThread->state != READY )
@@ -607,18 +603,13 @@ dispatch_current:
         TargetThread->quantum = QUANTUM_MAX;
     }
 
-
 // Call dispatcher.
 // #bugbug
 // Talvez aqui devemos indicar que a current foi selecionada. 
-
     IncrementDispatcherCount (SELECT_DISPATCHER_COUNT);
 
-//
 // MOVEMENT 4 (Ready --> Running).
-//
     dispatcher(DISPATCHER_CURRENT); 
-
 
 //done:
 // We will return in the end of this function.
@@ -635,9 +626,7 @@ dispatch_current:
        die();
     }
 
-//
 // Target process 
-//
 
     TargetProcess = (void *) processList[ targetthread_OwnerPID ];
 
@@ -659,9 +648,7 @@ dispatch_current:
         panic("ts: TargetProcess->pid != targetthread_OwnerPID\n");
     }
 
-//
 // Update global variable.
-//
 
     //current_process = (pid_t) TargetProcess->pid;
     set_current_process (TargetProcess->pid);

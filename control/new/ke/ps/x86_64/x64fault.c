@@ -3,12 +3,73 @@
 
 #include <kernel.h>
 
+static int __kill_process(void);
+
+
+// #todo
+// Criar uma rotina onde, 
+// se o window server falhar, 
+// tem que pedir para o init reinicializar o window server.
+static int __kill_process(void)
+{
+    struct process_d *p;
+    struct thread_d *t;
+    pid_t pid=-1;
+    tid_t tid=-1;
+    
+    pid = (pid_t) get_current_process();
+    tid = (tid_t) current_thread;
+
+
+//pid
+    if(pid<0 || pid >= PROCESS_COUNT_MAX)
+        return -1;
+    if(pid==GRAMADO_PID_KERNEL)
+        return -1;
+    if(pid==GRAMADO_PID_INIT)
+        return -1;
+    p = (void*) processList[pid];
+    if (p->magic != 1234)
+        return -1; 
+    if (p == KernelProcess)
+        return -1;
+    if (p == InitProcess)
+        return -1; 
+
+//tid
+    if(tid<0 || tid >= THREAD_COUNT_MAX)
+        return -1;
+    if(tid == MODULE0_TID)  //idle thread
+        return -1;
+    if(tid == CLIENT0_TID)  //init thread
+        return -1;
+    t = (void*) threadList[tid];
+    if (t->magic != 1234)
+        return -1;
+
+// kill the process
+    if (p->control == t){
+        p->control = NULL;
+    }
+    p->magic = 0;
+    p->used = FALSE;
+    p=NULL;
+    
+// kill the thread
+    t->magic = 0;
+    t->used = FALSE;
+    t = NULL;
+
+    return 0; //ok
+}
+
 
 // Called by 'all_faults:' in unit1hw.asm.
 
 void faults (unsigned long number)
 {
-    struct thread_d  *CurrentThread;
+    //struct process_d *CurrentProcess;
+    //struct thread_d  *CurrentThread;
 
     //Get these values using assembly inline.
     //unsigned long fault_pa=0;       //from cr2
@@ -108,8 +169,32 @@ void faults (unsigned long number)
     }
 */
 
-
-// ============
+    int killstatus = (int)-1;
+    tid_t target_tid = INIT_TID;
+    pid_t target_pid = GRAMADO_PID_INIT;
+    
+    // GP and PF.
+    if (number == 13 || number == 14)
+    {
+        printf("fault: %d\n",number);
+        
+        killstatus= (int) __kill_process();
+        
+        if(killstatus==0)
+        {
+            current_thread = (tid_t) target_tid; 
+            IncrementDispatcherCount (SELECT_DISPATCHER_COUNT);
+            // MOVEMENT 4 (Ready --> Running).
+            // update cr3 and context.
+            dispatcher(DISPATCHER_CURRENT);  
+            //#todo: precisamos atualizar os contadores da proxima thread.
+            //update the global variable
+            set_current_process(target_pid);
+            printf("kill process and resume init\n");
+            refresh_screen();
+            return; // retorna pra assembly para efetuar iretq.
+        }
+    }
 
     switch (number){
 
@@ -138,8 +223,6 @@ void faults (unsigned long number)
             
             break;
 
-
-        
         case 4: x_panic("faults() 4"); break;
         case 5: x_panic("faults() 5"); break;
         case 6: x_panic("faults() 6"); break;

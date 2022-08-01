@@ -1619,6 +1619,7 @@ all_faults:
 
     cli
 
+
     pop qword [_contextRIP]     ; rip
     pop qword [_contextCS]      ; cs
     pop qword [_contextRFLAGS]  ; rflags
@@ -1663,6 +1664,64 @@ all_faults:
     mov rax, qword [_save_fault_number]
     mov rdi, rax 
     call _faults 
+    
+    ;jmp _AllFaultsHang
+
+; retornaremos com o contexto da proxima thread,
+; e com o cr3 atualizado pela rotina de restauraçao de contexto.
+; Nao precisa de eoi, pois não é uma interrupçao de dispositivo
+; é so retornar para a proxima thread. que sera a thread
+; de controle do processo init.
+
+    mov RAX, CR3  
+    IODELAY 
+    mov CR3, RAX  
+
+
+;
+; == Restore context ====================
+;
+
+    ; Segments
+    xor rax, rax
+    mov ax, word [_contextDS]
+    mov ds, ax
+    mov ax, word [_contextES]
+    mov es, ax
+    mov ax, word [_contextFS]
+    mov fs, ax
+    mov ax, word [_contextGS]
+    mov gs, ax
+
+    mov rsi, qword [_contextRSI] 
+    mov rdi, qword [_contextRDI] 
+    
+    mov rbp, qword [_contextRBP] 
+    
+    mov rax, qword [_contextRAX] 
+    mov rbx, qword [_contextRBX] 
+    mov rcx, qword [_contextRCX] 
+    mov rdx, qword [_contextRDX] 
+
+
+    ;; Stack frame. (all double)
+    push qword [_contextSS]      ; ss
+    push qword [_contextRSP]     ; rsp
+    push qword [_contextRFLAGS]  ; rflags
+    push qword [_contextCS]      ; cs
+    push qword [_contextRIP]     ; rip
+
+    ; Acumulator.
+    mov rax, qword [_contextRAX]
+
+; #bugbug
+; We do NOT need the 'sti'. 
+; The flags in the 'eflags' will reenable it.
+
+    sti
+    iretq
+
+
 
 ; #todo
 ; We're gonna restore the execution in some cases,

@@ -166,7 +166,7 @@ dispatch_current:
 // if something goes wrong. So this way we can try another thing.
 
     TargetThread->saved = FALSE;
-    restore_current_context();
+    restore_current_context();  // update cr3.
     return;
     //return 0;
 }
