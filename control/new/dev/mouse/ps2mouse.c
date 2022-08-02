@@ -338,6 +338,7 @@ void __ps2mouse_parse_data_packet (void)
 
 // Call the event handler.
 // IN: event id, x, y.
+// see: kgwm.c
     if (ps2_mouse_moving==TRUE){
         wmMouseEvent( MSG_MOUSEMOVE, mouse_x, mouse_y );
     }

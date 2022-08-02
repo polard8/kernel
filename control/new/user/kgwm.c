@@ -1843,18 +1843,20 @@ done:
 // For mouse events, see: window.h
 // #todo: change parameters.
 // we need more information about the mouse event.
+// called by __ps2mouse_parse_data_packet in ps2mouse.c
 int wmMouseEvent(int event_id,long long1, long long2)
 {
     int Status=-1;
     unsigned long button_number = long1;
     //debug_print ("xxxMouseEvent:\n");
 
-
-    if(event_id<0)
+    if (event_id<0){
         return -1;
+    }
 
 // Buttons:
-// Pressionado ou liberado
+// Pressionado ou liberado.
+// Post message.
     if( event_id == MSG_MOUSEPRESSED ||
         event_id == MSG_MOUSERELEASED )
     {

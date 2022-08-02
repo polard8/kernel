@@ -4,33 +4,13 @@
 #ifndef ____PS2KBD_H
 #define ____PS2KBD_H    1
 
-
-
-// #bugbug
-// We have these same definitions on ps2keyboard.c ??
-
-
-//
-// Imported functions.
-//
-
-//
-// Definições para uso interno do módulo.
-//
-
-
 // Ports:
 // =====
 //     The entire range for the keyboard is 60-6F,
 //     a total of 16 values (a 16bit range).
-//
 //  @todo:
 //      As portas do controlador ainda estão subutilizadas.
 //      fazer um driver mais completo utilizando melhor o controlador.
-
-
-
-//
 //Command Listing:
 //================
 //Command	Descripton
@@ -52,8 +32,6 @@
 //0xFE	Resend last result
 //0xFF	Reset keyboard to power on state and start self test
 
-
-
 /*
 #define KBC_DEVCMD_ACK		0xfa
 #define KBC_DEVCMD_RESEND	0xfe
@@ -61,7 +39,7 @@
 #define KBC_DEVCMD_BAT_FAIL	0xfc
 */
 
-// keyboard commands.
+// keyboard commands
 #define  KEYBOARD_SET_LEDS       0xED    // Set keyboard leds.
 #define  KEYBOARD_ECHO           0xEE
 //#define KEYBOARD_SELECT_SCAN_CODE_SET     0xF0
@@ -72,18 +50,16 @@
 #define  KEYBOARD_RESET_ENABLE   0xF6    // reset and enable scanning.
 #define  KEYBOARD_RESET          0xFF    // Reset.
 
-
 // keyboard responses
 // 0xAA, 0xFC, 0xF0, 0x37, 0x54
 
-// keyboard responses.
+// keyboard responses
 #define  KEYBOARD_COMPLETE_SUCCESS  0xAA
 #define  KEYBOARD_COMPLETE_FAILURE  0xFC
 #define  KEYBOARD_BREAK_CODE        0xF0
 //#define  KEYBOARD_DEBUG_HOTKEY_ENH  0x37 
 //#define  KEYBOARD_DEBUG_HOTKEY_AT   0x54 
 //...
-
 
 /*
 enum KYBRD_CTRL_STATS_MASK {
@@ -112,15 +88,14 @@ typedef enum {
 
 // keyboardMessage
 //     Estrutura interna para mensagens.
+// ??
+// #todo: 
+// Na verdade todo driver usará estrutura de janela 
+// descrita na API que o driver use.
 
 struct keyboardMessage 
 {
     unsigned char scancode;
-
-    //??
-    //#todo: 
-    // Na verdade todo driver usará estrutura de janela 
-    // descrita na API que o driver use.
 
     //? hwnd;  
     int message;
@@ -153,57 +128,32 @@ struct ps2_keyboard_d
 // If we have only one kbd device.
 struct ps2_keyboard_d  PS2Keyboard;
 
-
-//
 // ======================================================
-//
 
-
-//
-// Stop
-//
-
-// The interrupt handler will not work.
-
-//int ps2kbdStopped;
-
-
-//Se há uma nova mensagem de teclado. 
-int kbMsgStatus;
-
-//Status
-//@todo: Status pode ser (int).
-//variáveis usadas pelo line discipline para controlar o 
-//estado das teclas de controle.
-
-unsigned long key_status;
-unsigned long escape_status;
-unsigned long tab_status;
-unsigned long winkey_status;
-unsigned long ctrl_status;
-unsigned long alt_status;
-unsigned long shift_status;
-unsigned long capslock_status;
-unsigned long numlock_status;
-unsigned long scrolllock_status;
+// Status
+// @todo: Status pode ser (int).
+// variáveis usadas pelo line discipline para controlar o 
+// estado das teclas de controle.
+// #todo: talvez isso possa ir pra dentro da estrutura 
+// de teclado ps2.
+// see: keyboard.c
+extern unsigned long key_status;
+extern unsigned long escape_status;
+extern unsigned long tab_status;
+extern unsigned long winkey_status;
+extern unsigned long ctrl_status;
+extern unsigned long alt_status;
+extern unsigned long shift_status;
+extern unsigned long capslock_status;
+extern unsigned long numlock_status;
+extern unsigned long scrolllock_status;
 //...
-
-
-//
-// Driver handler support.
-//
-
-unsigned long keyboard_handler_address;
-
-
 
 //
 // == prototypes ===========================
 //
 
 void kbdc_wait (unsigned char type);
-
-// ==
 
 void keyboardDisable (void);
 void keyboardEnable (void);
@@ -221,8 +171,4 @@ unsigned char zzz_keyboard_read (void);
 void keyboard_expect_ack (void);
 
 #endif    
-
-
-
-
 
