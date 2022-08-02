@@ -63,6 +63,15 @@ Bits         Usage
 #include <kernel.h>  
 
 
+// total ticks
+unsigned long jiffies=0;
+// por quantos segundos o sistema esta rodando
+// jiffies/sys_time_hz
+unsigned long seconds=0;
+// Por quantos ms o sistema esta rodando.
+unsigned long sys_time_ms=0;
+
+
 /*
 struct master_timer_d
 {

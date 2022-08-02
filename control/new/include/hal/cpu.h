@@ -15,8 +15,6 @@
 // #define Processor_ARM   3
 //...
 
-
-
 // Intel modes.
 // #todo: We need better names.
 #define SI_RM 0    // Real Mode.
@@ -24,12 +22,10 @@
 #define SI_LM 2    // Long Mode.
 #define SI_SM 3    // SMM.
 
-
 // APIC
 #define IA32_APIC_BASE_MSR          0x1B
 #define IA32_APIC_BASE_MSR_BSP      0x100  // Processor is a BSP
 #define IA32_APIC_BASE_MSR_ENABLE   0x800
-
 
 #define PROCESSORS_MAX_COUNT 32
 
@@ -65,9 +61,8 @@ struct processor_d
 	// ULONG   InterruptCount;             // per precessor counts
 
     unsigned char Type;
-	
-	//@todo: ULONG MHz;
 
+	//@todo: ULONG MHz;
 
     // 0x0.
     // cpuid vars.
@@ -178,11 +173,11 @@ struct processor_d
 
     //...
 
-    // navigation
-
+// Navigation.
     struct processor_d  *next;
 };
-struct processor_d *processor;
+
+struct processor_d  *processor;
 
 
 /*

@@ -43,16 +43,10 @@
 // ...
 #define GRAMADO_PORT_MAX 32
 
-//int gramado_ports[GRAMADO_PORT_MAX];
 //--
 //=====================================================
 
 //=====================================================
-
-// #atenção. 
-// Variável global;
-int current_socket;
-
 
 // ...
 
@@ -583,11 +577,9 @@ struct socket_d
     //testing
     char magic_string[8];
 
-
     //se ele está ou não aceitando conexões. ...
     //...
     unsigned short flags; 
-
 
     // usada em endereços AF_GRAMADO
     struct sockaddr addr;
@@ -596,14 +588,16 @@ struct socket_d
     // Where is it defined?
     struct sockaddr_in addr_in; 
 };
-struct socket_d  *CurrentSocket;
-struct socket_d  *LocalHostHTTPSocket;
+
+// see: socket.c
+extern struct socket_d  *CurrentSocket;
+extern struct socket_d  *LocalHostHTTPSocket;
 // ...
 
 
 // #todo:
 // Refazer esse limite proviório.
-#define SOCKET_COUNT_MAX 32
+#define SOCKET_COUNT_MAX  32
 
 unsigned long socketList[SOCKET_COUNT_MAX];
 
@@ -639,13 +633,10 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
 int socket_read ( unsigned int fd, char *buf, int count );
 int socket_write ( unsigned int fd, char *buf, int count );
 
-
 // gramado ports.
 pid_t socket_get_gramado_port (int port);
 int socket_set_gramado_port (int port, pid_t pid);
 int socket_initialize_gramado_ports(void);
-
-
 
 int 
 socket_unix ( 
@@ -703,7 +694,6 @@ socket_dialog (
     unsigned long arg2, 
     unsigned long arg3, 
     unsigned long arg4 );
-
 
 #endif    
 

@@ -4,11 +4,9 @@
 
 // #todo
 // kernel side termios support.
-
 //provavelmente suporte ao gerenciamento de terminais.
 //http://man7.org/linux/man-pages/man3/termios.3.html
 //http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_12.html
-
 //#obs:
 //coisas pra fazer com terminal:
 //turn off input echoing
@@ -22,16 +20,12 @@
 #ifndef _TERMIOS_H
 #define _TERMIOS_H    1
 
-
 // Types.
 // Terminal input output data types.
-
 typedef unsigned char   cc_t;      // Terminal special characters.
 typedef unsigned int    speed_t;   // Terminal baud rates.
 typedef unsigned short  tcflag_t;  // Terminal modes.
 // ...
-
-
 
 /*
 tcflag_t c_iflag
@@ -47,13 +41,12 @@ cc_t c_cc[NCCS]
 */
 
 /*
-
 Data Type: tcflag_t
-    This is an unsigned integer type used to represent the various bit masks for terminal flags. 
-
+    This is an unsigned integer type used to represent 
+    the various bit masks for terminal flags. 
 Data Type: cc_t
-    This is an unsigned integer type used to represent characters associated with various terminal control functions. 
-
+    This is an unsigned integer type used to represent characters 
+    associated with various terminal control functions. 
 Macro: int NCCS
     The value of this macro is the number of elements in the c_cc array. 
 */
@@ -63,11 +56,9 @@ struct winsize
 {
     unsigned short ws_row;
     unsigned short ws_col;
-
     unsigned short ws_xpixel;
     unsigned short ws_ypixel;
 };
-
 
 
 // Indices into c_cc array.  
@@ -93,7 +84,7 @@ struct winsize
 // termio
 //
 
-#define NCC 8
+#define NCC  8
 
 struct termio 
 {
@@ -103,9 +94,9 @@ struct termio
     unsigned short c_cflag;  // control mode flags 
     unsigned short c_lflag;  // local mode flags 
 
-    unsigned char c_line;    //line discipline 
+    unsigned char c_line;     // line discipline 
 
-    unsigned char c_cc[NCC];  //control characters
+    unsigned char c_cc[NCC];  // control characters
 };
 
 // ================================================
@@ -119,7 +110,7 @@ struct termio
 /* Primary terminal control structure. POSIX Table 7-1. */
 
 // Size of cc_c array, some extra space for extensions.
-#define  NCCS  20
+#define NCCS  20
 
 struct termios 
 {
@@ -159,8 +150,6 @@ struct termios
 //...
 
 
-
-
 /* Values for termios c_cflag bit map.  POSIX Table 7-3. */
 #define  CLOCAL  0x0001  /* ignore modem status lines */
 #define  CREAD   0x0002  /* enable receiver */
@@ -173,8 +162,6 @@ struct termios
 #define  HUPCL   0x0020  /* hang up on last close */
 #define  PARENB  0x0040  /* enable parity on output */
 #define  PARODD  0x0080  /* use odd parity if set, else even */
-
-
 
 // Local mode flags.
 /* Values for termios c_lflag bit map.  POSIX Table 7-4. */
@@ -189,8 +176,6 @@ struct termios
 #define  TOSTOP    0x0100  /* send SIGTTOU (job control, not implemented*/
 
 
-
-
 /* 
  * You can't even generate this character with 'normal' keyboards.
  * But some language specific keyboards can generate 0xFF. It seems 
@@ -198,7 +183,7 @@ struct termios
  * (unsigned char)
  */
 
-#define  _POSIX_VDISABLE  (cc_t)0xFF
+#define _POSIX_VDISABLE  (cc_t)0xFF
 
 
 /* Values for the baud rate settings.  POSIX Table 7-6. */
@@ -218,7 +203,6 @@ struct termios
 #define  B9600   0xD000  /* 9600 baud */
 #define  B19200  0xE000  /* 19200 baud */
 #define  B38400  0xF000  /* 38400 baud */
-
 
 
 /* Optional actions for tcsetattr().  POSIX Sec. 7.2.1.2. */
@@ -254,7 +238,6 @@ struct termios
 #define  TCOON   2  /* restart suspended output */
 #define  TCIOFF  3  /* transmit a STOP character on the line */
 #define  TCION   4  /* transmit a START character on the line */
-
 
 
 /* modem lines */

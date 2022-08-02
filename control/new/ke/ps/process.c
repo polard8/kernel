@@ -13,6 +13,17 @@ static pid_t __current_pid = (pid_t) (-1);  //fail
 static pid_t caller_process_id=0;
 
 
+//
+// IPC
+//
+
+// Global:
+// #todo: It needs to be atomic.
+// see: gspin.h
+int __spinlock_ipc=0;
+//...
+
+
 void set_current_process( pid_t pid )
 {
     __current_pid = (pid_t) pid;

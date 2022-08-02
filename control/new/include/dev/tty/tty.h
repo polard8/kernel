@@ -98,14 +98,8 @@
 #define O_LCUC(tty)   _O_FLAG((tty),OLCUC)
 
 
-#define TTY_BUF_SIZE 1024
+#define TTY_BUF_SIZE  1024
 
-// Contador de linhas usados na hora da criação de linhas.
-int ttyLineCounter;
-
-// Cursor.
-int ttyCurrentX;
-int ttyCurrentY;
 
 /*
 struct ttybuffer_d

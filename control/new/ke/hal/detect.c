@@ -40,6 +40,10 @@ A FRED-enabled operating system cannot use them for ring transitions.
 #include <kernel.h>
 
 
+//see: gdef.h
+int g_is_qemu=FALSE;
+
+
 // #todo: Used during the initialization.
 int detect_IsQEMU(void)
 {

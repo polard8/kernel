@@ -8,6 +8,9 @@
 unsigned long sys_time_hz=0;
 
 
+
+
+
 /*
  * systemGetSystemMetrics:
  *     Retorna informações sobre o sistema.

@@ -37,7 +37,7 @@
 #define VERSION_NAME  RELEASE_STRING
 
  /* Hardware identifier */
-#define MACHINE_NAME "hardware-name"
+#define MACHINE_NAME  "hardware-name"
 
 
 //

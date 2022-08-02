@@ -28,19 +28,16 @@
 
 // #bugbug
 // Temos isso redefinido em sched.h
-#define  HZ  100
+#define HZ  100
 
+// see: pit.c
 // total ticks
-unsigned long jiffies;
-
+extern unsigned long jiffies;
 // por quantos segundos o sistema esta rodando
 // jiffies/sys_time_hz
-unsigned long seconds;
-
+extern unsigned long seconds;
 // Por quantos ms o sistema esta rodando.
-unsigned long sys_time_ms;
-
-
+extern unsigned long sys_time_ms;
 
 // pit frequency
 // See: system.c
@@ -59,7 +56,6 @@ extern unsigned long sys_time_hz;
 // Etc.
 // Será o tempo de referência para o profiler.
 
-
 #define PROFILER_TICKS_DEFAULT_LIMIT 200
 
 //contador do profiler ticks.
@@ -70,10 +66,10 @@ unsigned long profiler_ticks_count;
 //quando chegar aqui, então devemos calcular 
 //a porcentagem para todas as threads e processos.
 unsigned long profiler_ticks_limit;
-
 unsigned long profiler_percentage_all_normal_threads;
- 
 unsigned long profiler_percentage_idle_thread;
+ 
+ 
  
 // Usado no Linux. 
 //#define CT_TO_SECS(x)   ((x) / HZ)
@@ -192,11 +188,7 @@ unsigned long timerList[32];
 
 void DeviceInterface_PIT(void); 
 
-// ====
-
-
 void timerInit8253 ( unsigned int freq );
-
 
 void set_timeout ( unsigned long ticks );
 unsigned long get_timeout (void);
@@ -236,29 +228,5 @@ struct timer_d *create_timer (
     unsigned long ms, 
     int type );
 
-
-
-
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

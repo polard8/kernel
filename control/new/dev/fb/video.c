@@ -59,6 +59,12 @@ See:
 #define VIDEO_BIOS_FONT8X8_HEIGHT  8
 //...
 
+// frontbuffer and backbuffer.
+// see: gdef.h
+unsigned long g_frontbuffer_pa=0;
+unsigned long g_backbuffer_pa=0;
+
+
 
 // LFB - Esse é o endereço usado pelo driver de vídeo em /x
 // para acessar o LFB, ou seja o frontbuffer.

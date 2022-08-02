@@ -29,31 +29,26 @@
 #define CPUID_VENDOR_RISE          "RiseRiseRise"
 //...
 
-
-//Intel.
+// Intel
 #define CPUID_VENDOR_INTEL_1  0x756e6547    //"Genu" 
 #define CPUID_VENDOR_INTEL_2  0x49656e69    //"ineI" 
 #define CPUID_VENDOR_INTEL_3  0x6c65746e    //"ntel" 
-
-//AMD.
+// AMD
 #define CPUID_VENDOR_AMD_1    0x68747541    //"Auth" 
 #define CPUID_VENDOR_AMD_2    0x69746e65    //"enti" 
 #define CPUID_VENDOR_AMD_3    0x444d4163    //"cAMD"
-
 
 //" KVMKVMKVM " – KVM
 //"TCGTCGTCGTCG" – QEMU
 //"Microsoft Hv" – Microsoft Hyper-V or Windows Virtual PC
 //"VMwareVMware" – VMware
 // ...
-
 // QEMU hypervisor
 // invertido
 // "TCGTCGTCGTCG"
 #define CPUID_HV_QEMU_1  0x54474354  // 0x54434754  TCGT
 #define CPUID_HV_QEMU_2  0x43544743  // 0x43475443  CGTC
 #define CPUID_HV_QEMU_3  0x47435447  // 0x47544347  GTCG
-
 
 
 //
@@ -183,8 +178,6 @@ enum {
 #define  CPUID_FEAT_EDX_TM1          (1 << 29)
 #define  CPUID_FEAT_EDX_IA64         (1 << 30)
 #define  CPUID_FEAT_EDX_PBE          (1 << 31)
-
-
 
 #endif    // ____CPUID_H 
 

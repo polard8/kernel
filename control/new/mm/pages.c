@@ -4,6 +4,12 @@
 #include <kernel.h>
 
 
+// global
+// The virtual address of the kernel pml4 table.
+unsigned long gKernelPML4Address=0;
+
+
+
 // ==================================================
 // This is not global variable.
 // We will use this only on this initialization here.

@@ -5,9 +5,6 @@
 #ifndef __PCI_H
 #define __PCI_H    1
 
-//-----------------
-
-
 /*
  * PCI Configuration Space Header:
    ===============================
@@ -608,7 +605,7 @@ Class Code	Description
 // Variáveis internas.
 //
 
-unsigned long pci_handler_address;
+//unsigned long pci_handler_address;
 
 //
 // PCI class struct

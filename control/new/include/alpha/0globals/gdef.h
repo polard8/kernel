@@ -109,9 +109,13 @@ dessa conta.
 */
 
 
+//
+// Hypervisor support.
+//
 
-
-int g_is_qemu;
+//see: detect.c
+extern int g_is_qemu;
+// ...
 
 
 // ===================================================
@@ -203,20 +207,12 @@ unsigned long g_extraheap2_va;
 unsigned long g_extraheap3_va;
 
 
-//
-// buffer support
-//
-
-// #todo: 
-// Talvez essas globais deva ir para o microkernel/pc
 
 
-// frontbuffer lfb
-// The framebuffer
-unsigned long g_frontbuffer_pa; 
-
-// backbuffer
-unsigned long g_backbuffer_pa;
+// frontbuffer and backbuffer.
+// see: video.c
+extern unsigned long g_frontbuffer_pa; 
+extern unsigned long g_backbuffer_pa;
 
 
 //
@@ -264,6 +260,9 @@ int g_extraheap2_initialized;
 // extra heap 3
 unsigned long g_extraheap3_size;
 int g_extraheap3_initialized;
+
+
+// keyboard support.
 
 int gNextKeyboardMessage;
 

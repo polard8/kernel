@@ -9,13 +9,18 @@
 // Internal
 #define SYS_SOCKET_IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
+// globals
+// see: socket.h
+struct socket_d  *CurrentSocket;
+struct socket_d  *LocalHostHTTPSocket;
+// ...
+
+
+// private:
 // A small list of PIDs.
 // A server can register its PID here
 // telling the system that it is responsible for this kind of service.
-
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
-
-
 
 
 /*

@@ -27,24 +27,19 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 #ifndef ____CPUTYPES_H
-#define ____CPUTYPES_H
-
-
+#define ____CPUTYPES_H    1
 
 /*
  * Classes of Processor. CPU identification code depends on
  * this starting at 0, and having an increment of one.
  */
 
-#define  CPUCLASS_386    0
-#define  CPUCLASS_486    1
-#define  CPUCLASS_586    2
-#define  CPUCLASS_686    3
+#define CPUCLASS_386    0
+#define CPUCLASS_486    1
+#define CPUCLASS_586    2
+#define CPUCLASS_686    3
 //...
-
 
 /*
  * Kinds of Processor. Only the first 7 are used, as they are processors
@@ -72,7 +67,7 @@
 
 #define CPUVENDOR_UNKNOWN	0
 #define CPUVENDOR_INTEL		1
-#define CPUVENDOR_CYRIX		2	
+#define CPUVENDOR_CYRIX		2
 #define CPUVENDOR_NEXGEN	3
 #define CPUVENDOR_AMD		4
 #define CPUVENDOR_IDT		5
@@ -87,8 +82,5 @@
 #define  CPU_MAXFAMILY   7  /* Highest consecutive # we know (fake P4) */
 #define  CPU_FAMILY_P4  15  /* Family number for Pentium 4 */
 
-
 #endif   
-
-
 

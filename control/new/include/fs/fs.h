@@ -534,11 +534,6 @@ fsListFiles (
     int disk_id, 
     int volume_id, 
     int directory_id );
-    
-// ===
-
-
-
 
 int
 __load_sequential_sectors ( 
@@ -680,13 +675,11 @@ sys_read_file_from_disk (
     int flags, 
     mode_t mode );
 
-
 int sys_create_empty_file ( char *file_name );
 int sys_create_empty_directory ( char *dir_name );
 void set_global_open_file ( void *file, int Index );
 void *get_global_open_file (int Index);
 void sys_cd_command ( const char *string );
-
 
 int fs_load_image( const char *filename, unsigned long image_va );
 

@@ -5,7 +5,6 @@
 #define __X64MM_H    1
 
 
-
 // Definições dos campos das páginas.
 #define PAGE_PRESENT            0x001
 #define PAGE_WRITE              0x002
@@ -22,10 +21,10 @@
 #define PAGE_KERNEL_PGPROT       (PAGE_PRESENT_WRITE)
 
 
-
+// Kernel pml4. (cr3)
 // The virtual address of the kernel pml4 table.
-unsigned long gKernelPML4Address; 
-
+// see: pages.c
+extern unsigned long gKernelPML4Address; 
 
 
 // Some useful data for memory management.
@@ -407,10 +406,10 @@ typedef enum {
  * mmblockCount:
  *     mm block support.
  *     Conta os blocos de mem�ria dentro de um heap.
- *     *dentro do heap usado pelo kernel eu acho ?? 
+ *     dentro do heap usado pelo kernel eu acho ?? 
  */
-
-unsigned long mmblockCount;
+// see: mminit.c
+extern unsigned long mmblockCount;
 
 
 /*
@@ -842,6 +841,10 @@ typedef enum {
 int g_mm_system_type;
 
 
+//
+// Memory size support.
+// see: mminit.c
+//
 
 //base     = base memory retornada pelo cmos
 //other    = (1MB - base). (Shadow memory = 384 KB)
@@ -849,45 +852,47 @@ int g_mm_system_type;
 //total    = base + other + extended.
 
 // alias
-unsigned long memorysizeBaseMemoryViaCMOS;
+extern unsigned long memorysizeBaseMemoryViaCMOS;
 
-unsigned long memorysizeBaseMemory;
-unsigned long memorysizeOtherMemory;
-unsigned long memorysizeExtendedMemory;
-unsigned long memorysizeTotal;
+extern unsigned long memorysizeBaseMemory;
+extern unsigned long memorysizeOtherMemory;
+extern unsigned long memorysizeExtendedMemory;
+extern unsigned long memorysizeTotal;
 
-unsigned long memorysizeInstalledPhysicalMemory;
+extern unsigned long memorysizeInstalledPhysicalMemory;
 
-unsigned long memorysizeTotalPhysicalMemory;
-unsigned long memorysizeAvailablePhysicalMemory;
+extern unsigned long memorysizeTotalPhysicalMemory;
+extern unsigned long memorysizeAvailablePhysicalMemory;
 
 // Used
-unsigned long memorysizeUsed;
+extern unsigned long memorysizeUsed;
 
 // Free
-unsigned long memorysizeFree;
+extern unsigned long memorysizeFree;
 
 
 //========================================================
-
 // Used memory:
 // Estamos medindo o uso de memória física.
 // Lembrando que a mesma região de memória física
 // pode ser mapeada mais de uma vez.
-
 // #todo #bugbug
 // Precisamos checar corretamente qual é o endereço físico
 // de cada uma dessas regiões e suas sobreposições.
-unsigned long mm_used_ring0_area;  // start = 0 size = 4MB
-unsigned long mm_used_ring3_area;  // start = 0x400000 size = 4MB
-unsigned long mm_used_kernelimage;
-unsigned long mm_used_backbuffer;  // start = 0x800000 size = 4MB
-unsigned long mm_used_pagedpool;   // start = 0xC00000 size = 4MB  
-unsigned long mm_used_heappool;    // start = 0x01000000 size = 4MB   
-unsigned long mm_used_extraheap1;  // start = (0x01000000 + 0x400000) size = 4MB
-unsigned long mm_used_extraheap2;  // start = (0x01000000 + 0x800000) size = 4MB
-unsigned long mm_used_extraheap3;  // start = (0x01000000 + 0xC00000) size = 4MB
-unsigned long mm_used_frame_table;
+// see: mminit.c
+extern unsigned long mm_used_ring0_area;  // start = 0 size = 4MB
+extern unsigned long mm_used_ring3_area;  // start = 0x400000 size = 4MB
+extern unsigned long mm_used_kernelimage;
+extern unsigned long mm_used_backbuffer;  // start = 0x800000 size = 4MB
+extern unsigned long mm_used_pagedpool;   // start = 0xC00000 size = 4MB  
+extern unsigned long mm_used_heappool;    // start = 0x01000000 size = 4MB   
+extern unsigned long mm_used_extraheap1;  // start = (0x01000000 + 0x400000) size = 4MB
+extern unsigned long mm_used_extraheap2;  // start = (0x01000000 + 0x800000) size = 4MB
+extern unsigned long mm_used_extraheap3;  // start = (0x01000000 + 0xC00000) size = 4MB
+extern unsigned long mm_used_frame_table;
+
+// start = ?? size = 2MB
+extern unsigned long mm_used_lfb; 
 
 
 // ======================================================
@@ -1009,13 +1014,6 @@ struct frame_d SWAPPED_FRAMES[1024];
 
 // ...
 
-
-// start = ?? size = 4MB
-unsigned long mm_used_lfb; 
-
-//#todo
-//unsigned long mm_used_
-//more ...
 
 
 //

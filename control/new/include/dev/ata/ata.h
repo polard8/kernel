@@ -211,7 +211,6 @@ int g_boottime_ide_port_index;
  * PCIDeviceATA:
  *     Estrutura de dispositivos pci para um disco ata.
  *     #bugbug: E se tivermos mais que um instalado ???
- *
  *     #importante
  *     Esssa é uma estrutura de dispositivos pci criada para o gramado, 
  * definida em pci.h

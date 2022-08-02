@@ -24,10 +24,11 @@
   
 /*
  * variáveis usadas no hal.
- *
  */  
-  
-unsigned long g_machine_type;  
+
+
+// see: hal.c
+extern unsigned long g_machine_type;  
   
 //
 //....
@@ -131,15 +132,13 @@ void hal_shutdown (void);
 void hal_vsync (void);
 
 //
-// Speaker support.
+// Speaker support
 //
 
 //OUT - Play sound using built in speaker
 void hal_speaker_on (void);
-
 //IN - make it shutup
 void hal_speaker_off (void);
-
 // Testando o beep;
 void hal_test_speaker (void);
 

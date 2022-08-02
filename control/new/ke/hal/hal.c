@@ -16,8 +16,11 @@
 extern void asm_reboot (void);
 
 // not used?
-//processors count
-int processors_count;
+// processors count
+int processors_count=0;
+
+// see: hal.h
+unsigned long g_machine_type=0;
 
 
 /*

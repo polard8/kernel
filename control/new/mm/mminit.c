@@ -1,7 +1,63 @@
 
 // mminit.c
 
-#include <kernel.h>    
+#include <kernel.h>
+
+
+/*
+ * mmblockCount:
+ *     mm block support.
+ *     Conta os blocos de memória dentro de um heap.
+ *     dentro do heap usado pelo kernel eu acho ?? 
+ */
+unsigned long mmblockCount=0;
+
+//
+// Memory size support.
+//
+
+//base     = base memory retornada pelo cmos
+//other    = (1MB - base). (Shadow memory = 384 KB)
+//extended = retornada pelo cmos.
+//total    = base + other + extended.
+// alias
+unsigned long memorysizeBaseMemoryViaCMOS=0;
+
+unsigned long memorysizeBaseMemory=0;
+unsigned long memorysizeOtherMemory=0;
+unsigned long memorysizeExtendedMemory=0;
+unsigned long memorysizeTotal=0;
+
+unsigned long memorysizeInstalledPhysicalMemory=0;
+unsigned long memorysizeTotalPhysicalMemory=0;
+unsigned long memorysizeAvailablePhysicalMemory=0;
+// Used
+unsigned long memorysizeUsed=0;
+// Free
+unsigned long memorysizeFree=0;
+
+//========================================================
+// Used memory:
+// Estamos medindo o uso de memória física.
+// Lembrando que a mesma região de memória física
+// pode ser mapeada mais de uma vez.
+// #todo #bugbug
+// Precisamos checar corretamente qual é o endereço físico
+// de cada uma dessas regiões e suas sobreposições.
+// size=2MB
+// see: mminit.c
+unsigned long mm_used_ring0_area=0;
+unsigned long mm_used_ring3_area=0;
+unsigned long mm_used_kernelimage=0;
+unsigned long mm_used_backbuffer=0;
+unsigned long mm_used_pagedpool=0;
+unsigned long mm_used_heappool=0;
+unsigned long mm_used_extraheap1=0;
+unsigned long mm_used_extraheap2=0;
+unsigned long mm_used_extraheap3=0;
+unsigned long mm_used_frame_table=0;
+// start = ?? size = 2MB
+unsigned long mm_used_lfb=0; 
 
 
 // Heap support.

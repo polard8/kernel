@@ -5,12 +5,10 @@
 #define ____GSPIN_H 1
 
 
-//generic.
-int __spinlock_ipc;
-
-
-//#test
-//int __spinlock_get_scancode;
+// Global:
+// #todo: It needs to be atomic.
+// see: process.c
+extern int __spinlock_ipc;
 //...
 
 

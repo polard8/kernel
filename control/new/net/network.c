@@ -7,20 +7,16 @@
 // Status do driver de network
 // 0 - uninitialized
 // 1 - initialized
-
-int network_status;   
+int network_status=FALSE; 
 
 // Status para notificações.
 // Podemos ou não notificar os processo sobre os eventos de rede.
 // O shell vai habilitar essa notificação no momento em que
 // envia um stream para mensagens de texto.
-
-int notification_status; 
+int notification_status=FALSE;
 
 // Usado por esse módulo.
 file *____network_file;
-
-
 
 
 // Colocar um buffer numa lista de buffers.
@@ -365,7 +361,6 @@ int networkInit (void)
 // Status
     networkSetstatus(TRUE);
 
-//done:
     debug_print ("networkInit: done\n");
     return 0;
 }

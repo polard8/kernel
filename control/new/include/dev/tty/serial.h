@@ -1,6 +1,5 @@
 // serial.h
 
-
 #ifndef ____SERIAL_H
 #define ____SERIAL_H    1
 
