@@ -40,8 +40,10 @@ extern struct scheduler_info_d  SchedulerInfo;
 #define QUANTUM_Q3  3
 //----
 
-#define QUANTUM_MIN    QUANTUM_Q1
-#define QUANTUM_MAX    QUANTUM_Q3
+#define QUANTUM_MIN      QUANTUM_Q1
+#define QUANTUM_BALANCE  QUANTUM_Q2
+#define QUANTUM_MAX      QUANTUM_Q3
+
 
 #define QUANTUM_BASE   QUANTUM_MIN
 #define QUANTUM_LIMIT  QUANTUM_MAX

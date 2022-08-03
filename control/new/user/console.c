@@ -1632,24 +1632,18 @@ __console_write (
     register size_t i=0;
     char ch=0; 
 
-//
-// Check arguments.
-//
-
-// Console number.
+// Console number
     if ( n < 0 || n > 3 )
     {
        printf ("__console_write: n\n");
        goto fail;
     }
-
-// Buffer pointer.
+// Buffer pointer
     if ( (void *) buf == NULL )
     {
         printf ("__console_write: buf\n");
         goto fail;
     }
-
 // Max size.
     //if (count==0 || count > ?)
     if(!count)

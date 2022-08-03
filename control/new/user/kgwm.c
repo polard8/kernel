@@ -625,18 +625,15 @@ static void __launch_app_via_initprocess(int index)
 
 static void __enter_embedded_shell(int kernel_in_debug_mode)
 {
-
-//log
-    //backgroundDraw(COLOR_BLACK);
     backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
 
-    if(kernel_in_debug_mode)
+    if (kernel_in_debug_mode){
         printf("[[ KERNEL IN DEBUG MODE ]]\n");
-
+    }
     printf("kernel console number %d\n",fg_console);
     printf("Prompt ON: Type something\n");
-    consolePrompt();
-    refresh_screen();
+    consolePrompt();  // it will refresh the screen.
+    //refresh_screen();  
 
 // done
     ShellFlag = TRUE;
@@ -1242,8 +1239,8 @@ int wmKeyEvent( tid_t tid, unsigned char raw_byte )
 // Step 0 
 // Declarações de variáveis.
 
-    struct process_d  *__p;
-    struct thread_d   *t;
+    //struct process_d  *__p;
+    //struct thread_d   *t;
 
     unsigned long status = 0;
     int msg_status = -1;
@@ -1260,6 +1257,14 @@ int wmKeyEvent( tid_t tid, unsigned char raw_byte )
     unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
     unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
     //===================
+
+
+
+// #test
+// Not working yet.
+    //struct thread_d *input_thread;
+    //input_thread = (struct thread_d *) threadList[tid];
+    //input_thread->quantum = 20;
 
     // Inicializando a janela, 
     // pois os outros elementos já foram incializados logo acima.

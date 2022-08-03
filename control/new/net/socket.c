@@ -256,29 +256,32 @@ socket_gramado (
     int type, 
     int protocol )
 {
-
     pid_t current_process = (pid_t) get_current_process();
 
 // Esse é o arquivo usado pelos aplicativos.
+// Uma estrutura de socket será associada à 
+// essa estrutura der arquivo.
 // Retornaremos seu fd.
-
     file *_file;
 
     struct process_d *Process;
     int i=0;
     int __slot = -1;
 
-
     debug_print ("socket_gramado:\n");
 
-
     if ( (void*) sock == NULL ){
-        debug_print ("socket_gramado: [FAIL] sock\n");
+        debug_print ("socket_gramado: sock\n");
+        goto fail;
+    }
+
+    if (sock->magic!=1234){
+        debug_print ("socket_gramado: sock validation\n");
         goto fail;
     }
 
     if (family != AF_GRAMADO){
-        debug_print ("socket_gramado: [FAIL] bad family\n");
+        debug_print ("socket_gramado: family\n");
         goto fail;
     }
 
@@ -421,6 +424,7 @@ socket_gramado (
     _file->socket_buffer_full = 0;  
 
 // Socket pointer
+// Associando a estrutura de socket à estrutura de arquivo.
     _file->socket = sock;
 
 // O arquivo do soquete, o buffer ?
@@ -477,14 +481,18 @@ socket_inet (
     pid_t current_process = (pid_t) get_current_process();
 
 
-
     if ( (void*) sock == NULL ){
-        debug_print ("socket_inet: [FAIL] sock\n");
+        debug_print ("socket_inet: sock\n");
+        goto fail;
+    }
+
+    if (sock->magic!=1234){
+        debug_print ("socket_inet: sock validation\n");
         goto fail;
     }
 
     if (family != AF_INET){
-        debug_print ("socket_inet: [FAIL] bad family\n");
+        debug_print ("socket_inet: family\n");
         goto fail;
     }
 
@@ -840,19 +848,24 @@ socket_unix (
 
     if ( (void*) sock == NULL )
     {
-        debug_print ("socket_unix: [FAIL] sock\n");
+        debug_print ("socket_unix: sock\n");
         goto fail;
     }
 
+    if (sock->magic!=1234){
+        debug_print ("socket_unix: sock validation\n");
+        goto fail;
+    }
 
     if (family != AF_UNIX)
     {
-        debug_print ("socket_unix: [FAIL] bad family\n");
+        debug_print ("socket_unix: family\n");
         goto fail;
     }
 
 
     // Process.
+    //#todo: check pid validation
 
     Process = (void *) processList[current_process];
 
@@ -1431,7 +1444,6 @@ sys_bind (
     const struct sockaddr *addr,
     socklen_t addrlen )
 {
-
     struct process_d  *p;   // Process
     struct file_d     *f;   // File
     struct socket_d   *s;   // Socket
@@ -1468,6 +1480,7 @@ sys_bind (
     }
 
 // process
+// #todo: check pid validation.
 
     p = (struct process_d *) processList[current_process];
  
@@ -2283,7 +2296,8 @@ sys_getsockname (
 
 /*
  * sys_listen:
- * 
+ *     É usado pra dizer que o servidor esta 
+ * pronto para receber conecxões e a quantidade de cliente conectados.
  */
 // See:
 // https://man7.org/linux/man-pages/man2/listen.2.html
@@ -2327,19 +2341,17 @@ int sys_listen (int sockfd, int backlog)
 
 // backlog:
 // The server tell us the the 'size of the list'.
-
 // Wrong n. Ajusting to default.
-    if( backlog <= 0 ){ 
-        n=1; 
-    }
-
 // It can't be bigger than the size of the array.
 // #todo: Use SOCKET_MAX_PENDING_CONNECTIONS
+
+    if ( backlog <= 0 ){ n=1; }
 
     if( backlog >= 32 )
     {
         backlog=31;
     }
+
 
 
 // We need to get the socket structure in the process structure.
@@ -2412,33 +2424,24 @@ int sys_listen (int sockfd, int backlog)
         goto fail;
     }
 
-
-    if( f->socket != p->priv )
-    {
+    if ( f->socket != p->priv ){
         panic("sys_listen: [TEST] f->socket != p->priv\n");
     }
 
-// updating the socket structure.
-
+// Updating the socket structure.
     s->backlog_max = backlog;
-
 // This server is accepting new connections.
     s->AcceptingConnections = TRUE;
-
     // ...
 
-    debug_print ("sys_listen: [TODO] continue...\n");
+    //debug_print ("sys_listen: [TODO] continue...\n");
     //printf      ("sys_listen: [TODO] continue...\n");
 
     // ...
 
 //fake ok.
     return 0;
-
-//
 // ==============================================
-//
-
 fail:
     debug_print ("sys_listen: [FAIL]\n");
     printf      ("sys_listen: [FAIL]\n");
@@ -2679,9 +2682,21 @@ int sys_socket ( int family, int type, int protocol )
         return (int) (-EINVAL);
     }
 
+
+// #todo
+// We are accepting only the gramado native protocol for the sockets.
+// Each kind of request has its own message structure.
+// For now the message starts in the top of the buffer, 
+// there is no ethernet header or tcp/ip header and the message
+// is not in the payload. This is a plain for the future. #todo.
+// 0 = GRAMADO NATIVE PROTOCOL.
     if (protocol < 0){
         debug_print ("sys_socket: [FAIL] protocol not supported\n");
         return (int) (-EINVAL);
+    }
+//#debug
+    if( protocol != 0){
+        panic ("sys_socket: protocol not supported yet.\n");
     }
 
 // Current process.
@@ -2731,34 +2746,26 @@ int sys_socket ( int family, int type, int protocol )
     p->priv = (struct socket_d *) __socket;
 
 // family, type and protocol.
-
     __socket->family   = family;
     __socket->type     = type;      // DATAGRAM or STREAM 
     __socket->protocol = protocol;
 
 // ip:port
 // Initialized with '0'.
-
     __socket->ip   = ip;  //ipv4
     __socket->port = port;
 
 // pid, uid, gid.
-
     __socket->pid = (pid_t) current_process;
     __socket->uid = (uid_t) current_user;
     __socket->gid = (gid_t) current_group;
 
-//
 // Create socket file.
-//
-
 // #importante
 // As rotinas logo abaixo criarão o arquivo 
 // e retornarão o fd.
-
 // family
 // Setup the addr.
-
 
     switch (family){
 

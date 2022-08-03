@@ -88,7 +88,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     // Estabiliza a idle thread.
     ____IDLE->base_priority = PRIORITY_SYSTEM_THREAD;
     ____IDLE->priority = PRIORITY_SYSTEM_THREAD;
-    ____IDLE->quantum = QUANTUM_MIN;
+    ____IDLE->quantum = QUANTUM_MIN;  // Credits.
     rootConductor = (void *) ____IDLE;
 
 // First TID.
@@ -118,7 +118,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     // Estabiliza a init thread.
     InitThread->base_priority = PRIORITY_SYSTEM_THREAD;
     InitThread->priority = PRIORITY_SYSTEM_THREAD;
-    InitThread->quantum = QUANTUM_MIN;
+    InitThread->quantum = QUANTUM_MIN;  // Credits.
     rootConductor->next = (void*) InitThread;
 
 // ===============================================
@@ -168,6 +168,14 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Caso tenha havido algum problema na 
                 // prioridade base, então ela foi para o equilíbrio.
                 TmpThread->priority = TmpThread->base_priority;
+                
+                // #test
+                // Se alguma thread teve seus créditos aumentados,
+                // então devemos reequilibrar os creditos novamente.
+                //TmpThread->quantum = QUANTUM_BALANCE;
+                //if (TmpThread->base_priority == PRIORITY_MAX){
+                //    TmpThread->quantum = QUANTUM_MAX;
+                //}
             }
 
             // A thread esta esperando.
