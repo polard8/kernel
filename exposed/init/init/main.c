@@ -121,8 +121,12 @@ static void initPrompt(void)
 
 static void do_clear_console(void)
 {
-    // clear the fg console window with a given color
-    ioctl(1,440, 0x0011DD11);
+    // Change the console color.
+    //ioctl(1,440, 0x0011DD11);
+    
+    
+    // clear fg console.
+    sc82( 8003,0x0011DD11,0,0 );
 }
 
 static inline void do_int3(void)
@@ -374,6 +378,9 @@ int main( int argc, char **argv)
     gramado_system_call (641,0,0,0);
     gramado_system_call (643,0,0,0);
 
+
+// Clear the console and set cursor position to 0,0.
+    do_clear_console();
 
 // ====
 // Small command line interpreter.

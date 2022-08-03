@@ -926,10 +926,10 @@ fail:
 
     // #debug
     debug_print ("sys_read: [FAIL] something is wrong!\n");
+    
+//#bugbug: Isso pode degradar o desempenho.
     // printf      ("sys_read: [FAIL] something is wrong!\n");
-    
-    
-    refresh_screen();  //#bugbug: Isso pode degradar o desempenho.
+    //refresh_screen();  
 
     //bloqueando, autorizando a escrita e reescalonando.
     //do_thread_waiting (current_thread);
@@ -1392,7 +1392,9 @@ fail:
 fail2:
     
     //invalidate_screen();
-    refresh_screen();   // #bugbug: Isso pode degradar o desempenho.
+    
+// #bugbug: Isso pode degradar o desempenho.
+    //refresh_screen();   
     
     // Não conseguimos escrever ... 
     // Estamos com problemas 

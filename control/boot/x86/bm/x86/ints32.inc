@@ -1,18 +1,15 @@
 ;
 ; Arquivo: ints.inc
-;
 ; Descrição:
 ;     Rotinas de tratamento das interrupções.
 ;     Boot Manager para o BOOT.VHD project.
-;
-; Versão 1.0, 2015. 
-;
+;     2015 - Fred Nora 
 
 
 ;-----------------------------
 ; test_int30h:
-;     Handler para a interrupção do sistema.	
-;
+;     Handler para a interrupção do sistema.
+
 test_int30h:
 	
 	push ax
@@ -35,7 +32,7 @@ test_int30h:
 ; system_interrupt:
 ;     System interrupt handler.
 ;     Opcional.
-;
+
 system_interrupt:
 	push ds
 	push edx
@@ -51,39 +48,36 @@ system_interrupt:
 	pop eax
 	pop ebx
 	pop ecx
-	pop edx	
+	pop edx
 	pop ds
 	iret
-	
-	
+
 ;-------------------------------------------
 ; unhandled_int e unhandled_irq:
 ;     Handler para Irqs ou Interrupções
 ;     negligenciadas.
-;
-;
+
 unhandled_int:
 unhandled_irq:
     pushad
-	
+
     ;Debug.
     ;mov al, byte "I"	
-	;call write_char	
-	
+    ;call write_char
+
     push ax
-	mov al, 0x20
+    mov al, 0x20
     out 0x20, al
     pop ax
     
-	popad
+    popad
     IRETD
-  
 
 ;---------------------------------------------
 ; ignore_int:  
 ;     Handler para interrupções
 ;     negligenciadas.
-;	
+
 ignore_int:
 	push ds
 	push eax
@@ -95,40 +89,40 @@ ignore_int:
 	call write_char
 	
 	pop eax
-	pop ds	
-	IRETD	
+	pop ds
+	IRETD
 
 
 ;----------------------
 ; disable_irqs:
 ;     Disable all IRQs.   
-;
+; #todo: new name: Mask all interrupts.
+
 disable_irqs:
     push ax 
-	mov	al, 0xFF
-	out 0x21, al
-	out 0xA1, al
-	pop	ax
-	ret
-	
+    mov	al, 0xFF
+    out 0x21, al
+    out 0xA1, al
+    pop ax
+    ret
 
 ;---------------------
 ; enable_irqs:
 ;     Enable all IRQs.   
-;
+; #todo: new name: Unmask all interrupts.
+
 enable_irqs:
     push ax
-	mov al, 0x00
-	out 0x21, al
-	out 0xA1, al
-	pop	ax
-	ret
+    mov al, 0x00
+    out 0x21, al
+    out 0xA1, al
+    pop ax
+    ret
 
-	
 ;-----------------------------
 ; enable_irq:
 ;     Enable an IRQ.  cl = irq.
-;
+
 enable_irq:
 
     push ax
@@ -162,11 +156,10 @@ enable_irq:
 	pop	ax
 	RET
 
-
 ;------------------------------
 ; disable_irq:
 ;     Disable an IRQ.  cl = irq.
-;
+
 disable_irq:
 	push ax
 	push cx
@@ -189,11 +182,11 @@ disable_irq:
     mov ah, 1
 	shl	ah, cl
 
-	in al, 0x21
-	or al, ah
-	out 0x21, al
+    in al, 0x21
+    or al, ah
+    out 0x21, al
 
-	pop	cx
+	pop cx
 	pop ax
 	RET
 	
@@ -201,7 +194,7 @@ disable_irq:
 SendEOI:
 	push eax
 	mov al, 0x20    ;EOI Signal.
-	out 0x20, al	;Send it!
+	out 0x20, al    ;Send it!
 	pop eax
 	ret
 
@@ -219,16 +212,13 @@ SendEOI2:
   ;out  0xA1,al 
   ;out  0x21,al 
   ;sti 
-  ;ret 	
-	
-	
-	
+  ;ret 
+
 ;----------------------------------------
 ; int_113h:
-;
 ;     int 113h, Funções de disco.
 ;     (converter lba > chs .. usar bpb32).
-; 
+
 int_113h:
 	push eax
 	push ebx
@@ -242,5 +232,5 @@ int_113h:
     dd 0
 
 ;
-;fim
+; End
 ;

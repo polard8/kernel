@@ -1,16 +1,12 @@
 ;
-; File: shell/shcalls.inc
-;
+; File: shell32/shcalls.inc
 ; Descrição:
 ;     Rotinas para atender algumas chamadas do Boot Manager.
-;
 ; 2015 - Created.
-;
 
 
 ;===============================================================
 ; do_boot:
-;
 ;      Iniciaremos o modo gráfico padrão.
 ;      Chamaremos uma rotina que volta para o modo real, 
 ;      muda o modo de vídeo e 
@@ -98,7 +94,6 @@ do_shutdown:
 ;==============================================================
 ; do_mount_volume:
 ;     Montando o volume do sistema. (testing...)
-;
 ;     Obs: O volume do sistema será um subdiretório 
 ;          do diretório de volumes.
 
@@ -120,7 +115,7 @@ do_mount_volume:
 	;jc .ok	
 	;jmp .fail
 
-.ok:	
+.ok:
 	;Setup current dir.   
     mov dword [g_current_fat_lba], 256        ;Fat do volume atual
     mov dword [g_current_directory_lba], 510  ;Diretório do volume atual.   
@@ -153,10 +148,9 @@ do_mount_volume:
 
 ;==============================================================
 ; debug:
-;
 ;     Mostra as configurações de inicialização 
 ;     que estão no arquivo INIT.CNF.
-;++	
+;++
 
 debug:
     pushad
@@ -169,7 +163,7 @@ debug:
 ;==============================================================
 ; do_save:
 ;     Torna permanente as alterações de 
-;     inicialização e partições.		
+;     inicialização e partições.
 ;++
 
 do_save:
@@ -217,7 +211,7 @@ do_make_boot:
 ;==============================================================
 ; do_install:
 ;     Transfere conteúdo do disco 
-;     de uma lba para outra.	
+;     de uma lba para outra.
 ;     (da area reservada(lba 1024) para o sistema de arquivos.)
 ;++
 
@@ -235,7 +229,7 @@ do_install:
 ;==============================================================
 ; do_set_modo1:
 ;     Configura modo1.
-;++	
+;++
 
 do_set_modo1:
     push eax
@@ -250,7 +244,7 @@ do_set_modo1:
 ;==============================================================
 ; do_set_modo2:
 ;     Configura modo2.
-;++	
+;++
 
 do_set_modo2:
     push eax
@@ -265,7 +259,7 @@ do_set_modo2:
 ;==============================================================
 ; do_set_modo3:
 ;     Configura modo3.
-;++	
+;++
 
 do_set_modo3:
     push eax
@@ -280,7 +274,7 @@ do_set_modo3:
 ;==============================================================
 ; do_set_modo4:
 ;     Configura modo4.
-;++	
+;++
 
 do_set_modo4:
     push eax
@@ -353,33 +347,31 @@ do_openfile:
     jmp os_command_line
 ;--
 
-	
 ;==============================================================
 ; do_makefile:
 ;     Cria um arquivo.
-;++	
+;++
 
 do_makefile:
 	mov byte[file_flag], 2
 	jmp os_command_line
-;--	
-	
-	
+;--
+
 ;==============================================================
 ; do_deletefile: 
 ;     Deleta um arquivo.
-;++	
+;++
 
 do_deletefile:
 	mov byte[file_flag], 3
 	jmp os_command_line
-;--	
+;--
 	
 	
 ;==============================================================
 ; do_opendir:
 ;     Abre um diretório.
-;++	
+;++
 
 do_opendir:
 	mov byte[file_flag], 4
@@ -395,7 +387,7 @@ do_opendir:
 do_makedir:
 	mov byte[file_flag], 5
 	jmp os_command_line
-;--	
+;--
 	
 	
 ;==============================================================
@@ -435,10 +427,9 @@ ls:
 ; Show the entries in the root dir.
 ; #bugbug: 
 ; It is not working on my real machine. (fred)
+; See: 
+; fs32.inc
 ;++
-
-;; See: 
-;; fs32.inc
 
 dir:
     ;call os_screen_clear 
@@ -587,7 +578,7 @@ do_desativar:
 ; hd_test:
 ;     Exibir informações sobre um disco
 ;     Testando operações de disco.
-;++	
+;++
 
 hd_test:
 	pushad
@@ -621,7 +612,6 @@ particao_test:
     mov esi, debug_message_fixme2_loading_sector
     call os_output
 
-
     call blconfigFindActivePartition     ; encontra_particao_ativa
     call blconfigFindInitialLBA          ; encontrar_lba_inicial
     call blconfigGetActivePartitionInfo  ; pegar_parametros_da_particao_ativa
@@ -650,7 +640,6 @@ print_help:
 ;--
 
 
-
 ;----------------------------------
 ; shell_clear_screen:
 ;     Limpa a tela e reapresenta o cursor.
@@ -663,7 +652,6 @@ shell_clear_screen:
     call reset_cursor 
     jmp os_command_line
 ;--
-
 
 ;;========================================
 ;; print_ver:
@@ -681,7 +669,7 @@ print_ver:
 ;=========================================================
 ; fail:
 ;     We didn't get a valid command or program name.
-;++	
+;++
 
 fail:
     nop
@@ -697,7 +685,6 @@ shellcallsFail:
 ;-------------------------------------- 
 ; os_bmfs_file_list:
 ;     Generate a list of files on disk.
-;
 ; IN:	EDI = location to store list.
 ; OUT:	EDI = pointer to end of list.
 ;++
@@ -707,7 +694,6 @@ os_bmfs_file_list:
 	ret 
 ;--
 
-	
 ;--------------------------------------
 ; testzone: ?? 
 ;++
@@ -715,8 +701,7 @@ os_bmfs_file_list:
 	
 testzone:
 	jmp os_command_line
-;--	
-
+;--
 
 ;; debug messages
 debug_message_fixme2_loading_sector:  

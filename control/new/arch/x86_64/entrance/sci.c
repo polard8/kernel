@@ -2215,6 +2215,7 @@ void *sci2 (
 
     // ioctl()
     // See: ke/sys.c
+    // #bugbug: fd versus console number,
     if ( number == 8000 ){
         debug_print("sci2: [8000] ioctl\n");
         return (void *) sys_ioctl ( 
@@ -2231,6 +2232,19 @@ void *sci2 (
                             (int) arg2, 
                             (int) arg3, 
                             (unsigned long) arg4 );
+    }
+
+    if (number == 8003)
+    {
+        
+        if(fg_console<0 || fg_console > 3){
+            return NULL;
+        }
+        CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg2;
+        //IN: color, console number.
+        clear_console(arg2,fg_console);
+        refresh_screen();
+        return 0;
     }
 
     // Configurando sincronização de leitura e escrita em arquivo.

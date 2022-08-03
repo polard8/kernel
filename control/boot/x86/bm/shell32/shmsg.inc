@@ -1,9 +1,7 @@
 ;
-; File: shell/shmsg.inc 
-;
+; File: shell32/shmsg.inc 
 ; Descrição:
 ;     Mensagens e variáveis do Shell do Boot Manager.
-;
 ; History:
 ;     2015 - Created by Fred Nora.
 ;     2017 - Revision.
@@ -162,7 +160,6 @@ seleciona_p3  db  'p3', 0    ;Seleciona particao 3.
 
 ; ===============================================================
 ; Messages
-;
 
 version_msg:
 shellmsg_splash: 
@@ -178,9 +175,7 @@ shellmsg_splash:
 prompt:              db 'BM/>', 0       ;Prompt padrão.
 msg_shell_prompt:    db 'BM/>', 0
 
-
 prompt_change_file:  db 'filename=', 0  ;Para declarar o nome do arquivo.
-
 
 
 ;Volume support.
@@ -244,7 +239,6 @@ help_text:
     db 'boot', 13, 10,
     db 'bootjail, bootp1, boothome, bootp2, bootcastle', 13, 10,
     db 'cls, dir, disk, help, part, ver', 13, 10, 0
-
 
 ;
 ; End.

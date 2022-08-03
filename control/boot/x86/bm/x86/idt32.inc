@@ -1,11 +1,8 @@
 ;
 ; Arquivo: idt.inc
-;
 ; Descrição:
 ;     A IDT do Boot Manager.
-;
-; Versão 1.0, 2015.
-;
+;     2015 - Fred Nora
 
 
 ;====================================================;
@@ -14,28 +11,28 @@
 idt:
 
 ;0 interrupt 0h
-	dw unhandled_int			   ; div error
-	dw sys_code             ;seletor 8
+	dw unhandled_int    ; div error
+	dw sys_code         ; seletor 8
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;1 interrupt 1h
-	dw unhandled_int		   ; debug exception
+	dw unhandled_int    ; debug exception
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;2 interrupt 2h
-	dw unhandled_int		   ; non maskable interrupt
+	dw unhandled_int    ; non maskable interrupt
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;3 interrupt 3h
-	dw unhandled_int			   ; int3 trap
+	dw unhandled_int    ; int3 trap
 	dw sys_code
 	db 0
 	db sys_interrupt
@@ -237,7 +234,7 @@ idt:
 	db sys_interrupt
 	dw 0
 
-	
+
 ;
 ; IRQs ...
 ;
@@ -252,122 +249,122 @@ idt:
 
 	
 ;33 interrupt 21h, Irq 1, KEYBOARD. 
-	dw _irq1   
+	dw _irq1
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;34 interrupt 22h, IRQ2. 
-	dw unhandled_irq  		   
+	dw unhandled_irq  
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;35 interrupt 23h, IRQ3. 
-	dw unhandled_irq  		   
+	dw unhandled_irq   
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;36 interrupt 24h, IRQ4. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;37 interrupt 25h, IRQ5. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;38 interrupt 26h, IRQ6, FLOPPY. 
-	dw _irq6  	   
+	dw _irq6
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;39 interrupt 27h, IRQ7. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;40 interrupt 28h, ; IRQ8, CLOCK. 
-	dw _irq8   	   
+	dw _irq8
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;41 interrupt 29h, IRQ 9. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;42 interrupt 2Ah, IRQ10. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;43 interrupt 2Bh, IRQ11. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;44 interrupt 2Ch, IRQ12. 
-	dw unhandled_irq  	   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;45 interrupt 2Dh, IRQ13. 
-	dw unhandled_irq  		   
+	dw unhandled_irq
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;46 interrupt 2Eh, IRQ14, HD MASTER. 
-	dw _irq14  	   
+	dw _irq14
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
 ;47 interrupt 2Fh, IRQ15, HD SLAVE. 
-	dw _irq15 	   
+	dw _irq15
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
 
-	
 ;
 ; ...
-;	
-
 ;
-;48 interrupt 30h, *** SYSTEM INT *** .
-	dw test_int30h 		    
+
+; ## SYSTEM INT ##
+;48 interrupt 30h, 
+	dw test_int30h 
 	dw sys_code
 	db 0
 	db sys_interrupt
 	dw 0
+
 
 ;49 interrupt 31h
 	dw unhandled_int		    ; reserved

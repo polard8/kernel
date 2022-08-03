@@ -2,11 +2,8 @@
 ; File: shell/shell.inc
 ;
 ; Descrição:
-;
 ;     Boot Manager Shell.
-;
 ;     Arquivo principal do Shell do Boot Manager.
-;
 ; #importante: 
 ; No Boot Manager, o interpretador de comandos se revela importante, 
 ; especialmente quando é usado para ver informações sobre os dispositivos 
@@ -15,47 +12,36 @@
 ; as informações sobre o disco de boot e sobre a partição ativa. O único
 ; arquivo que o boot manager deve se preocupar é o Boot Loader, no caso
 ; BL.BIN.
-;
 ; #todo: 
 ; Visualizar e manipular informações no metafile sobre arquivos e 
 ; armazenamento de dados.
-;
 ; #importante: 
 ; É obrigação da rotina que fizer alguma alteração no metafile sinalizar, 
 ; configurando a flag 'shell_exit_flag' com as opções '0' ou '1'.
 ; Assim a rotina exit decidirá se salva o metafile antes de iniciar ou não.
 ; '1' significa salvar o metafile e '0' significa não salvar.
-;     
 ; History: 
 ;     Original - (BareMetal, Return Infinity).
 ;     2015     - Adapted by Fred Nora.
-;
 
 
 align 1
     db 'SHELL'
 align 1
 
-
-
-;;=====================================================
-;; os_command_line:
-;;     Início do loop para pegar comandos.
-;;
-;;     #### LOOP ####
-;;
-;; IN:
-;;     Nothing.
-;; OUT:
-;;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
-;;     EAX = 1, Sair salvando o metafile, depois reiniciar.
-;;++
-
-;; Called for the first time by startShellLoop in start.inc.
-
-;; #todo
-;; Simplify this thing.
-
+;=====================================================
+; os_command_line:
+;     Início do loop para pegar comandos.
+;     #### LOOP ####
+; IN:
+;     Nothing.
+; OUT:
+;     EAX = 0, Sair sem salvar o metafile, depois reiniciar. 
+;     EAX = 1, Sair salvando o metafile, depois reiniciar.
+; Called for the first time by startShellLoop in start.inc.
+; #todo
+; Simplify this thing.
+;++
 
 os_command_line:
 
@@ -64,15 +50,12 @@ os_command_line:
     je .do_prompt
 
 .do_change_font_color:
-
-	;Color.
-	;mov ebx, 0x00FF0000
-	;mov [os_Font_Color], ebx
-	
+    ;Color.
+    ;mov ebx, 0x00FF0000
+    ;mov [os_Font_Color], ebx
 .do_change_name:
 
-; Mostra uma string, que é um prompt para mudar o nome do arquivo.	
-
+; Mostra uma string, que é um prompt para mudar o nome do arquivo.
     mov esi, prompt_change_file
     call os_output
 
@@ -86,30 +69,30 @@ os_command_line:
     call show_prompt_string
 
 .no_prompt:
-	
+
 	;Color.
 	;mov ebx, 0x00FFFFFF
 	;mov [os_Font_Color], ebx
 
 	;Input.
 	;Limit the input to 250 characters.
-	mov edi, cli_temp_string
-	mov ecx, 250			    
-	call os_input
-	
-	; O [ENTER] foi pressionado, então saimos da rotina os_input.
-	; The user hit enter so print a new line.
-	; 'os_input_string' stores the number of charaters received in ECX.	
-	; Se não há caracteres no buffer, recomeça.
-	; O contador indica quantos caracteres foram armazenados.
-	
-.newLine:	
-	call os_print_newline    
-	jecxz os_command_line    ;;Loop
-	
-	; Remove extra spaces.
-	; 'os_string_parse' stores the number of words in ECX.
-	
+    mov edi, cli_temp_string
+    mov ecx, 250
+    call os_input
+
+; O [ENTER] foi pressionado, então saimos da rotina os_input.
+; The user hit enter so print a new line.
+; 'os_input_string' stores the number of charaters received in ECX.
+; Se não há caracteres no buffer, recomeça.
+; O contador indica quantos caracteres foram armazenados.
+
+.newLine:
+    call os_print_newline    
+    jecxz os_command_line    ;;Loop
+
+; Remove extra spaces.
+; 'os_string_parse' stores the number of words in ECX.
+
 .extraSpaces:
 	mov esi, edi
 	call os_string_parse
@@ -160,26 +143,18 @@ os_command_line:
     mov al, 0x00
     stosb
 
-	; Observações:
-	; At this point 'cli_command_string' holds at least 
-	; "a" and at most "abcdefgh.ijk".
-    ;
-	; Break the contents of 'cli_temp_string' 
-	; into individual strings.
-	;
-	;;@todo: Talvez devamos criar um push isso aqui,
-	;; já que tem um pop logo em baixo.
-    ;
-	;Change all instances of a character in a string.
-	; quando for espaço, colocaremos zero.
-	;;
-	;; OBS:  QUEM COLOCOU ISSO NA PILHA??
-	;;
-	;; os_string_change_char colocou e tirou esi da pilha.
-	;;
-	;;#BUGBUG
-
-
+; Observações:
+; At this point 'cli_command_string' holds at least 
+; "a" and at most "abcdefgh.ijk".
+; Break the contents of 'cli_temp_string' 
+; into individual strings.
+; #todo: Talvez devamos criar um push isso aqui,
+; já que tem um pop logo em baixo.
+; Change all instances of a character in a string.
+; quando for espaço, colocaremos zero.
+; OBS:  QUEM COLOCOU ISSO NA PILHA??
+; os_string_change_char colocou e tirou esi da pilha.
+; #BUGBUG
 ; Trocamos um caractere por outro dentro de uma string.
 
 .killSpaces:
@@ -351,12 +326,9 @@ os_command_line:
     call os_string_compare
     jc do_set_modo4
 
-
-;;
-;; Obs:
-;; Se a palavra digitada não for uma das palavras reservadas 
-;; testadas acima, pode ser edição de arquivos.
-;;
+; Obs:
+; Se a palavra digitada não for uma das palavras reservadas 
+; testadas acima, pode ser edição de arquivos.
 
 ; Checando flags relativas à operações em arquivos.
 
@@ -397,9 +369,9 @@ os_command_line:
 	;Check for a '.' in the string.
 	;If there was a '.' then a suffix is present.
 	mov al, '.'
-	call os_string_find_char	
+	call os_string_find_char
 	cmp eax, 0
-	jne full_name			
+	jne full_name
 
 	; No suffix was present, so we add the default application suffix 
 	; of ".app"
@@ -412,12 +384,12 @@ os_command_line:
 	call os_string_length
 	cmp ecx, 8
 	jg shellcallsFail    ;; shell\shellcalls.inc.
-	;jg fail             ;; shell\shellcalls.inc.				
+	;jg fail             ;; shell\shellcalls.inc.
 	
     ;
 	; Opções de operações com arquivo e diretórios:
 	;
-	
+
 	;Opção 1, Open file. 
     cmp byte [file_flag], 1
     je	full_name
@@ -605,17 +577,14 @@ os_command_line_ret:
 ; shellInit:
 ;     Interface para chamar o início do Shell do Boot Manager.
 ;     Obs: O Essa rotina pode receber algum argumento.
-;
 ; IN:
 ;     Nothing.
 ; OUT:
 ;     Nothing.
-;+ 
-
-
-;; #bugbug
-;; We need to initialize the i8042 when we enter 
-;; in the 32bit protected mode environment.
+; #bugbug
+; We need to initialize the i8042 when we enter 
+; in the 32bit protected mode environment.
+;+
 
 init_shell:
     nop
@@ -638,31 +607,18 @@ shellInit:
     ret
 ;--
 
-
-
-
-;;================================================================
-;; shellPrintShellVersion:
-;;
-;;     Print shell version.
-;;
-
-;; Called by startShellLoop in start.inc
-
+;================================================
+; shellPrintShellVersion:
+;     Print shell version.
+; Called by startShellLoop in start.inc
+; See: stage3/shell/shcalls.inc
+    
 shellPrintShellVersion:
-
-    ;; See: stage3/shell/shcalls.inc
     call print_ver
     ret
 
-
-;;
-;; == ## Includes ## ========
-;;
-
-
-;;
-;; End.
-;;
+;
+; End
+;
 
 

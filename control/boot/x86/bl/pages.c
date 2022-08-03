@@ -111,13 +111,10 @@ int SetUpPaging()
 
 // User, 0x00400000.
     unsigned long user_address = USER_BASE;
-
 // VGA, Físico=0x000B8000.
     unsigned long vga_address = VM_BASE;   
-
 // VESA LFB, foi passado pelo Boot Manager.
     unsigned long lfb_address  = (unsigned long) g_lbf_pa;
-
 // backbuffer: endereço físico provisório para o backbuffer
 // BUFFER, provisório. @todo: Mudar. 
 // (para sistemas com pouca memória.)
@@ -518,14 +515,12 @@ Entry_386:
     go_to_kernel();
 
 // Not reached
-
     while(1){
         asm("hlt");
     };
 
     return 0;
 }
-
 
 //
 // End.

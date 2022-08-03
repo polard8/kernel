@@ -290,12 +290,10 @@ static void blShowMenu (void)
 {
     int i=0;
 
-// Cursor.
+// Cursor
     g_cursor_x = 0;
     g_cursor_y = 0;
 
-// Clear backbuffer.
-// Black color.
     clear_backbuffer();
 
     for (i=0; i<8; i++)
@@ -382,7 +380,6 @@ ____go:
  *     This is the entrypoint for the C part of the boot loader.
  *     Initializes, loads the kernel image and returns to head.s.
  */
-
 // The function StartLoader in head.s jumps here.
 // #todo
 // Podemos cair num shell de recuperaçcao
@@ -536,11 +533,10 @@ void OS_Loader_Main (void)
     //refresh_screen();
 //#endif
 
-    if (g_initialized != 1){
+    if (g_initialized != TRUE){
         printf("OS_Loader_Main: g_initialized\n");
         die();
     }
-
 
 // #important:
 // ===========

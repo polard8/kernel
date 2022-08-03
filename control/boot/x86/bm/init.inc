@@ -1,18 +1,14 @@
 ;
 ; Arquivo: init.inc
-;
 ; Descrição:
 ;     Variáveis de inicialização dentro do Boot Manager.
-;	  Não são salvas no disco como no caso do META$FILE.
-;
-; Versão 1.0, 2015.
-;	
-	
-	
+;     Não são salvas no disco como no caso do META$FILE.
+;     2015 - Fred Nora
+
 ;
 ; Boot support.
-;	
-	
+;
+
 BOOT:
 .modo:           dd 1              ;+0   (step 1) modo de inicialização do boot manager.
 .disco_atual:    dd 0              ;+4   (step 2) disco atual 
@@ -24,9 +20,9 @@ BOOT:
 .status_bm16:    dd 0              ;+24  (step 7) 1 = ouve mudanças de configuração
                                    ;              0 = nao houve mudanças.          
 .status_bl32:    dd 0              ;+28  (step 8) 1 = reservado
-                                   ;              0 = reservado.	
-								   
-;				   
+                                   ;              0 = reservado.
+
+;
 ; System files support.
 ;
 
@@ -35,7 +31,7 @@ SYSTEMCNF:
    .cluster dd 0               ;+36
 INITCNF:
    .address dd 0x00100000      ;+40
-   .cluster dd 1               ;+44	
+   .cluster dd 1               ;+44
 BLBIN:
    .address dd 0x00200000      ;+48
    .cluster dd 2               ;+52
@@ -48,11 +44,11 @@ SYSTEMDIR:
 USERDIR:
    .address dd 0x00500000      ;+72
    .cluster dd 5               ;+76
-   
-    
+
+
 ;
 ; Disk support.
-;	
+;
 
 DiscoAtivo:	
     .disk_number       dd 0 ;número do disco selecionado.
@@ -61,37 +57,35 @@ DiscoAtivo:
     .flag_p0           db 0
     .flag_p1           db 0
     .flag_p2           db 0
-    .flag_p3           db 0	
+    .flag_p3           db 0
     .p0_name           db "/VOLUME0"
     .p1_name           db "/VOLUME1"
     .p2_name           db "/VOLUME2"
-    .p3_name           db "/VOLUME3"	
-	
-
+    .p3_name           db "/VOLUME3"
 
 ;
 ; Partition support.
 ;
-	
+
 ParticaoAtiva:
-    ;...
-    .flag:      db 0
-    ;...
-    .h_inicial: db 0      
-    .c_inicial: db 0      
-    .s_inicial: db 0
-    ;...	
-    .os_type:   db 0
-    ;...
-    .h_final:   db 0
-    .c_final:   db 0
-    .s_final:   db 0
-    ;...
-    .lba_inicial:         db 0x00, 0x00, 0x00, 0x00 
-    .tamanho_da_particao: db 0x00, 0x00, 0x00, 0x00 	
+.flag:      db 0
 
+.h_inicial: db 0      
+.c_inicial: db 0      
+.s_inicial: db 0
 
-	
+.os_type:   db 0
+
+.h_final:   db 0
+.c_final:   db 0
+.s_final:   db 0
+
+.lba_inicial:
+    db 0x00, 0x00, 0x00, 0x00 
+
+.tamanho_da_particao:
+    db 0x00, 0x00, 0x00, 0x00 
+
 ;
 ; File System support.
 ;
@@ -102,18 +96,16 @@ FILESYSTEM:
     .fs_res1   db 0
     .fs_res2   db 0
     .fs_res3   db 0
-	;...
-  
-
+    ;...
 
 ;
 ; Vídeo support.
 ;
-	
+
 VIDEO:
-   .lfb:        dd 0	
-   .buffer1:    dd 0	
-   .buffer2:    dd 0	
+   .lfb:        dd 0
+   .buffer1:    dd 0
+   .buffer2:    dd 0
    .buffer3:    dd 0
    .res1        dd 0
    .res2        dd 0
@@ -123,6 +115,7 @@ VIDEO:
    .res6        dd 0
    .res7        dd 0
    .res8        dd 0     
+
 ;
-;fim.
+; End
 ;   
