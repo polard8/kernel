@@ -179,11 +179,16 @@ extern unsigned long gSavedBPP;
 #include "mm/x64mm.h"     // mm, memory manager support.
 
 // fb device
-#include "dev/fb/video.h"
-#include "dev/fb/screen.h"
+#include "dev/fb/hw/halvid.h"
+#include "dev/fb/hw/video.h"
+#include "dev/fb/hw/screen.h"
 
-#include "user/fonts.h"
-#include "user/ascii.h" 
+#include "dev/fb/gr/fonts.h"
+#include "dev/fb/gr/ascii.h" 
+#include "dev/fb/gr/ws.h"
+#include "dev/fb/gr/window.h"
+#include "dev/fb/gr/graphics.h"
+
 
 // fs
 #include "fs/path.h"       // path.
@@ -199,7 +204,7 @@ extern unsigned long gSavedBPP;
 #include "hal/ports64.h"
 
 // fb device
-#include "dev/fb/halvid.h"
+//#include "dev/fb/halvid.h"
 
 // hal
 #include "hal/cpu.h"
@@ -251,30 +256,27 @@ extern unsigned long gSavedBPP;
 #include "ps/mk.h"
 #include "ps/dispatch.h"
 
-#include "user/ws.h"
-#include "user/graphics.h"
-#include "user/vk.h"
-#include "user/kbdabnt2.h"
-#include "user/window.h"
-// ...
+
+#include "dev/kbd/vk.h"
+#include "dev/kbd/kbdabnt2.h"
+
 
 // Security
-#include "user/security/usession.h"
-#include "user/security/room.h"
-#include "user/security/desktop.h"
-#include "user/security/logon.h"
-#include "user/security/logoff.h"
-#include "user/security/user.h"
-#include "user/security/security.h"
+#include "user/usession.h"
+#include "user/room.h"
+#include "user/desktop.h"
+#include "user/logon.h"
+#include "user/logoff.h"
+#include "user/user.h"
+#include "user/security.h"
 
 // tty
 #include "dev/tty/ttyldisc.h"
 #include "dev/tty/ttydrv.h"
 #include "dev/tty/tty.h"
 #include "dev/tty/pty.h"
-
-#include "user/vt.h"
-#include "user/console.h"
+#include "dev/tty/vt.h"
+#include "dev/tty/console.h"
 
 
 // =============================

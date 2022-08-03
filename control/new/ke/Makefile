@@ -86,6 +86,7 @@ apic.o pit.o ports64.o rtc.o \
 x64init.o x64.o x64info.o x64fault.o \
 queue.o \
 mk.o \
+ws.o \
 ts.o dispatch.o spawn.o x64cont.o \
 sched.o schedi.o \
 info.o \
@@ -128,6 +129,8 @@ all:
 	$(CC) -c ps/queue.c    $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
 	$(CC) -c ps/mk.c       $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o
 
+	$(CC) -c ps/ws.c       $(KERNEL_INCLUDE) $(CFLAGS) -o ws.o
+
 	$(CC) -c ps/disp/ts.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
 	$(CC) -c ps/disp/dispatch.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  
 	$(CC) -c ps/disp/spawn.c     $(KERNEL_INCLUDE)  $(CFLAGS) -o spawn.o  
@@ -135,7 +138,6 @@ all:
 
 	$(CC) -c ps/sched/sched.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o sched.o  
 	$(CC) -c ps/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
-
 
 	$(CC) -c panic.c    $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
 	$(CC) -c reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o

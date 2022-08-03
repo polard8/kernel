@@ -77,7 +77,6 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 OBJS = tty.o \
 io.o \
 disk_r.o disk_w.o \
-ws.o \
 pci.o pciinfo.o pciscan.o \
 devmgr.o \
 serial.o \
@@ -85,9 +84,11 @@ storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 video.o vsync.o screen.o \
 xpixel.o line.o rect.o bg.o \
+font.o char.o text.o \
+graphics.o \
 e1000.o \
-i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o    
-
+i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
+console.o vt.o kgwm.o    
 
 all:
 
@@ -95,7 +96,6 @@ all:
 	$(CC) -c disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
 	$(CC) -c storage.c $(KERNEL_INCLUDE) $(CFLAGS) -o storage.o 
 	$(CC) -c io.c      $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c ws.c      $(KERNEL_INCLUDE) $(CFLAGS) -o ws.o
 	$(CC) -c devmgr.c  $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
 	$(CC) -c i8042.c   $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
 
@@ -110,14 +110,19 @@ all:
 # e1000
 	$(CC) -c e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
 
-# fb
-	$(CC) -c fb/bg.c     $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c fb/line.c   $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c fb/rect.c   $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c fb/screen.c $(KERNEL_INCLUDE) $(CFLAGS) -o screen.o
-	$(CC) -c fb/video.c  $(KERNEL_INCLUDE) $(CFLAGS) -o video.o
-	$(CC) -c fb/vsync.c  $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c fb/xpixel.c $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
+# fb/hw
+	$(CC) -c fb/hw/video.c  $(KERNEL_INCLUDE) $(CFLAGS) -o video.o
+	$(CC) -c fb/hw/vsync.c  $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c fb/hw/screen.c $(KERNEL_INCLUDE) $(CFLAGS) -o screen.o
+
+	$(CC) -c fb/gr/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
+	$(CC) -c fb/gr/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c fb/gr/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c fb/gr/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c fb/gr/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c fb/gr/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
+	$(CC) -c fb/gr/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c fb/gr/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
 
 # kbd
 	$(CC) -c kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
@@ -136,7 +141,11 @@ all:
 	$(CC) -c serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 
 # tty
-	$(CC) -c tty/tty.c  $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+	$(CC) -c tty/vt.c       $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
+
+	$(CC) -c tty/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
 
 # link
 	$(LD) -r -o archive_dev.o $(OBJS)
