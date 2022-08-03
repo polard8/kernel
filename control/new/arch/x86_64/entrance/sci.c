@@ -2234,6 +2234,7 @@ void *sci2 (
                             (unsigned long) arg4 );
     }
 
+    // Clear the fg console background with a given color.
     if (number == 8003)
     {
         
