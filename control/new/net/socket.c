@@ -1417,7 +1417,7 @@ sys_accept (
 fail:
     debug_print ("sys_accept: [FAIL] Something is wrong!\n");
     //printf    ("sys_accept: [FAIL] Something is wrong!\n");
-    refresh_screen();
+    //refresh_screen();
     return -1;
 }
 

@@ -1652,7 +1652,8 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 // 300KB
 // Quantas páginas temos em 300KB?
 
-    int imagesize_in_kb = 300;
+    //int imagesize_in_kb = 300;
+    int imagesize_in_kb = 320;
 
     int number_of_pages=0;
     //number_of_pages = (int) (200*1024)/4096;   // #bugbug: Not enough.
