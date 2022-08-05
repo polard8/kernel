@@ -56,6 +56,8 @@ void *create_tid0(void)
     kThread->objectClass = ObjectClassKernelObjects;
     kThread->personality = (int) PERSONALITY_GRAMADO;
 
+    kThread->exit_in_progress = FALSE;
+
 // Priorities
 // This is a ring0 thread, only used for sti/hlt.
 // Maybe it is gonna be a idle thread to manage the energy.
@@ -422,6 +424,7 @@ void *create_tid3 (void)
     t->objectClass = ObjectClassKernelObjects;
     t->personality = (int) PERSONALITY_GRAMADO;
 
+    t->exit_in_progress = FALSE;
 
 // INIT process control thread.
 // type: system

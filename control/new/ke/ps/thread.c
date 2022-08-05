@@ -978,6 +978,8 @@ struct thread_d *create_thread (
     }
     memset( Thread, 0, sizeof(struct thread_d) );
 
+    Thread->exit_in_progress = FALSE;
+
 // Belongs to this process.
     Thread->process  = (void *) Process;
     Thread->ownerPID = (pid_t)  ProcessID;

@@ -1089,6 +1089,9 @@ void *sci0 (
     unsigned long arg4 )
 {
     struct process_d  *p;
+    struct thread_d  *t;
+
+
     unsigned long *message_address = (unsigned long *) arg2;
 
     unsigned long *a2 = (unsigned long*) arg2;
@@ -1172,12 +1175,27 @@ void *sci0 (
         panic      ("sci0: Personality\n");
     }
 
-
-
 // Counting ...
     p->syscalls_counter++;
 
-    
+// exit
+// Marcamos no processo nossa intenção de fechar.
+// Marcamos na thread de controle nossa intenção de fechar.
+// #todo: as outras threads do processo.
+    if (number == SYS_EXIT )
+    {
+        debug_print("sci0: SYS_EXIT\n");
+        p->exit_in_progress = TRUE;
+        // Quando o scheduler passar por ela,
+        // vai pular ela e marca-la como zombie.
+        if( (void*) p->control != NULL )
+        {
+            if(p->control->magic==1234)
+                p->control->exit_in_progress = TRUE;
+        }
+        return NULL;
+    }
+
     // #debug
     // #todo: Explain it better.
     if (number == 4321)
@@ -1482,31 +1500,37 @@ void *sci0 (
         // ## EXIT ##
         //
 
-		// 70 - Exit.
-		// Atende a funcao exit() da libc. 
-		// Criaremos um 'request' que sera atendido somente quando 
-		// houver uma interrupcao de timer. 
-		// Enquanto isso a thread deve esperar em um loop.
-		// #bugbug: Pode haver sobreposicao de requests?
-		// Assincrono.
-		// IN: ??
-        //#todo: 
-        // Criar um wrapper em sci/sys.c ou kernel/exit.c
+        // 70 - Exit.
+        // Atende a funcao exit() da libc. 
+        // Criaremos um 'request' que sera atendido somente quando 
+        // houver uma interrupcao de timer. 
+        // Enquanto isso a thread deve esperar em um loop.
+        // #bugbug: Pode haver sobreposicao de requests?
+        // Assincrono.
+        // IN: ??
+        // #todo: 
+        // Criar um wrapper em sys.c ou exit.c
         // See: request.c
         // Request number 12. (Exit thread)
   
         case SYS_EXIT:
-            debug_print ("sci0: SYS_EXIT\n");
-            create_request ( 
-                (unsigned long) 12,      // number 
-                (int) 1,                 // status 
-                (int) 0,                 // timeout. 0=imediatamente.
-                (int) current_process,   // target_pid
-                (int) current_thread,    // target_tid
-                NULL,                    // window 
-                (int) 0,                 // msg  ??
-                (unsigned long) arg2,    // long1  
-                (unsigned long) arg3 );  // long2
+            // #bugbug: Não podemos fechar a thread atual e
+            // retornarmos de uma systemcall.
+            // tem que agendar o exit através de um request.
+            // Mas os requests estão desabilitados no momento.
+            debug_print ("sci0: [TODO] SYS_EXIT\n");
+            
+            //create_request ( 
+            //    (unsigned long) 12,      // number 
+            //    (int) 1,                 // status 
+            //    (int) 0,                 // timeout. 0=imediatamente.
+            //    (int) current_process,   // target_pid
+            //    (int) current_thread,    // target_tid
+            //    NULL,                    // window 
+            //    (int) 0,                 // msg  ??
+            //    (unsigned long) arg2,    // long1  
+            //    (unsigned long) arg3 );  // long2
+
             return NULL;
             break;
    

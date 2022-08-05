@@ -139,6 +139,26 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     {
         TmpThread = (void *) threadList[i];
 
+        //exit in progress
+        if (TmpThread->magic==1234)
+        {
+            // Vira zombie e não sera selecionada para o proximo round
+            // se não for a idle thread nem a init thread.
+            if (TmpThread->exit_in_progress == TRUE)
+            {
+                if (TmpThread != ____IDLE &&
+                    TmpThread != InitThread)
+                {
+                    // não sera mais selecionada pelo scheduler.
+                    // O dead thred collector pode terminar de deleta
+                    // essa thread e deletar o processo dela
+                    // se ele estiver sinalizado como exit in progress
+                    // e ela for a thread de controle dele.
+                    TmpThread->state = ZOMBIE;
+                }
+            }
+        } 
+
         if ( (void *) TmpThread != NULL )
         {
             // Scheduler.

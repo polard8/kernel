@@ -209,6 +209,8 @@ struct process_d
     int magic;
 
     int personality;
+    
+    int exit_in_progress;
 
     process_type_t type;
 

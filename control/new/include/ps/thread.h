@@ -203,6 +203,8 @@ struct thread_d
     
     int personality;
 
+    int exit_in_progress;
+
 // Input model
 // Setup the input model for this thread ...
 // So the kernel will know where are the places

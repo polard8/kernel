@@ -1026,6 +1026,7 @@ struct process_d *create_process (
 
     Process->personality = (int) Personality;
 
+    Process->exit_in_progress = FALSE;
 
     Process->base_priority = BasePriority;
     Process->priority = Priority;

@@ -1508,6 +1508,8 @@ sys_open (
  */
 // Fechar um dos objetos abertos do processo atual.
 // O descritor é um índice na sua tabela de objetos abertos.
+// #todo: Se fecharmos um socket, tem que antes destruir a estrutura
+// de socket associada ao arquivo.
 // See:
 // https://man7.org/linux/man-pages/man2/close.2.html
 // https://pubs.opengroup.org/onlinepubs/009695399/functions/close.html
@@ -1515,8 +1517,8 @@ sys_open (
 int sys_close(int fd)
 {
     file *object;
-
     struct process_d *p;
+
     pid_t current_process = (pid_t) get_current_process();
 
 // ??
@@ -1583,11 +1585,15 @@ int sys_close(int fd)
 
 // ===============================================
 // socket
+// nada sera salvo no disco.
     if ( object->____object == ObjectTypeSocket )
     {
         debug_print("sys_close: Trying to close a socket object\n");
-        object = NULL;
-        p->Objects[fd] = (unsigned long) 0;
+        object->socket->used = FALSE; //invalidando a estrutura de socket
+        object->socket->magic = 0;//invalidando a estrutura de socket
+        object = NULL;   //destroi a estrutura de arquivo.
+        //p->priv = NULL; //socket privado do processo.
+        p->Objects[fd] = (unsigned long) 0;  // limpa o slot na estrutura de processo.
         debug_print("sys_close: [FIXME] Done\n");
         return 0;
     }
