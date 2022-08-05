@@ -1258,21 +1258,24 @@ void __test_process(void)
 }
 
 
-//#test
-//Creating a ring0 thread.
-//#bugbug: We're having problems with ring0 context swtitching.
+// #test
+// Creating a ring0 thread.
+// #bugbug: 
+// We're having problems with ring0 context switching.
+
 void __test_thread(void)
 {
     struct thread_d *t;
 
     t = 
         (struct thread_d *) create_thread ( 
-                                NULL, NULL, NULL,   //room desktop window 
-                                __dummy_thread, //init_rip, 
+                                NULL, NULL, NULL,  // room desktop window 
+                                __dummy_thread,    // init_rip, 
                                 PRIORITY_HIGH, 
                                 get_current_process(), 
                                 "no-name",
-                                RING0 ); 
+                                RING0,
+                                PERSONALITY_GRAMADO ); 
 
     if( (void*)t==NULL ){
         printf("fail\n");

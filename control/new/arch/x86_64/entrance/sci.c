@@ -54,6 +54,8 @@ static void __initialize_ws_info(pid_t pid)
 
     pid_t current_process = (pid_t) get_current_process();
 
+    debug_print ("__initialize_ws_info:\n");
+
     if (pid != current_process){
         panic("__initialize_ws_info: pid != current_process\n");
     }
@@ -71,16 +73,28 @@ static void __initialize_ws_info(pid_t pid)
     {
         return;
     }
+
+// process
     p = (struct process_d *) processList[pid];
     if( (void*) p == NULL )
         return;
     if(p->magic!=1234)
         return;
+    // Changing personality.
+    // The childs will have the same personality
+    p->personality = (int) PERSONALITY_GWS;
+    WindowServerInfo.pid_personality = (int) PERSONALITY_GWS;
+ 
+// thread
     t = (struct thread_d *) p->control;
     if( (void*) t == NULL )
         return;
     if(t->magic!=1234)
         return;
+    // Changing personality.
+    // The childs will have the same personality
+    t->personality = (int) PERSONALITY_GWS;
+    WindowServerInfo.tid_personality = (int) PERSONALITY_GWS;
 
     WindowServerInfo.pid = (pid_t) pid;
     WindowServerInfo.tid = (tid_t) t->tid;
@@ -1140,7 +1154,25 @@ void *sci0 (
     p = (struct process_d *) processList[current_process];
 
     if ( (void*) p == NULL )
+    {
+        debug_print("sci0: p\n");
         panic("sci0: p\n");
+    }
+
+    if ( p->used != TRUE || p->magic != 1234 )
+    {
+        debug_print("sci0: p validation\n");
+        panic("sci0: p validation\n");
+    }
+
+    if (p->personality != PERSONALITY_GRAMADO &&
+        p->personality != PERSONALITY_GWS)
+    {
+        debug_print("sci0: Personality\n");
+        panic      ("sci0: Personality\n");
+    }
+
+
 
 // Counting ...
     p->syscalls_counter++;
@@ -2113,13 +2145,25 @@ void *sci2 (
 
     p = (struct process_d *) processList[current_process];
 
-    if ( (void*) p == NULL ){
+    if ( (void*) p == NULL )
+    {
+        debug_print("sci2: p\n");
         panic("sci2: p\n");
     }
 
-    if ( p->used != TRUE || p->magic != 1234 ){
+    if ( p->used != TRUE || p->magic != 1234 )
+    {
+        debug_print("sci2: p validation\n");
         panic("sci2: p validation\n");
     }
+
+    if (p->personality != PERSONALITY_GRAMADO &&
+        p->personality != PERSONALITY_GWS)
+    {
+        debug_print("sci2: Personality\n");
+        panic      ("sci2: Personality\n");
+    }
+
 
 // Counting syscalls ...
     p->syscalls_counter++;
@@ -2322,9 +2366,9 @@ void *sci2 (
         return (void*) GetCurrentTID();
     }
 
+// foreground thread
 // Set the foreground thread tid.
-// #todo: 
-// We need a method for that.
+// #todo: We need a method for that.
 // IN: arg2=tid.
     if ( number == 10011 )
     {
@@ -2336,7 +2380,10 @@ void *sci2 (
         if( (void*) t == NULL ){ return NULL; }; //fail
         if(t->used != TRUE) { return NULL; }; //fail
         if(t->magic != 1234){ return NULL; }; //fail
-        t->quantum  = QUANTUM_FIRST_PLANE;
+        //Giving more credits. But the scheduler will balance
+        //it at the and of the round.
+        //t->quantum  = QUANTUM_FIRST_PLANE;
+        t->quantum  = (QUANTUM_MAX + 88);
         t->priority = PRIORITY_MAX;
         foreground_thread = (int) arg2;
         // it will select the next input reponder.

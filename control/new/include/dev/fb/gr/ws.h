@@ -207,8 +207,12 @@ struct color_scheme_d *CurrentColorScheme;
 struct ws_info_d
 {
     int initialized;
+
     pid_t pid;
+    int pid_personality;
+
     tid_t tid;
+    int tid_personality
 };
 
 // see: graphics.c

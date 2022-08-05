@@ -35,6 +35,7 @@ void show_process_information (void)
             printf("\n=====================================\n");
             printf(">>[%s]\n", p->__processname);
             printf("PID=%d PPID=%d \n", p->pid,  p->ppid );
+            printf("~Personality={%d}\n", p->personality);
             
             printf("image-base =%x image-size =%d \n", 
                 p->Image, p->ImageSize );

@@ -54,6 +54,7 @@ void *create_tid0(void)
 
     kThread->objectType  = ObjectTypeThread;
     kThread->objectClass = ObjectClassKernelObjects;
+    kThread->personality = (int) PERSONALITY_GRAMADO;
 
 // Priorities
 // This is a ring0 thread, only used for sti/hlt.
@@ -419,6 +420,7 @@ void *create_tid3 (void)
 
     t->objectType  = ObjectTypeThread;
     t->objectClass = ObjectClassKernelObjects;
+    t->personality = (int) PERSONALITY_GRAMADO;
 
 
 // INIT process control thread.

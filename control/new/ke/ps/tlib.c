@@ -267,9 +267,11 @@ post_message_to_tid (
     unsigned long long2 )
 {
 
+// #todo: Change these to target_thread e target_tid.
+
 // Target thread.
     struct thread_d *t;
-    
+// Target tid
     tid_t TargetTID = (tid_t) (tid & 0xFFFF);
 
     unsigned long tmp_msg=0;
@@ -300,6 +302,12 @@ post_message_to_tid (
 // Giving to the thread more time.
     t->runningCount = 0;
     t->runningCount_ms = 0;
+
+
+// Giving more credits to the receiver.
+// The receiver will lose this time in the scheduler.
+// The scheduler will balance the credits.
+    t->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX);
 
 // Wake up the target thread?
 
@@ -462,11 +470,12 @@ void show_slot(int tid)
 // Show one slot
 
     printf ("\n");
-    printf ("TID   PID   pdPA  Prio  State Quan *Jiffies initial_rip rflags   tName \n");
-    printf ("====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
-    printf ("%d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
+    printf ("TID   PID   Per   pdPA  Prio  State Quan *Jiffies initial_rip rflags   tName \n");
+    printf ("====  ====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
+    printf ("%d    %d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
         t->tid, 
         t->ownerPID,
+        t->personality,
         t->pml4_PA,
         t->priority, 
         t->state,

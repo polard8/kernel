@@ -849,7 +849,8 @@ struct thread_d *create_thread (
     unsigned long init_stack, 
     pid_t pid, 
     char *name,
-    unsigned int cpl )
+    unsigned int cpl,
+    int personality )
 {
     struct process_d *Process;
     struct thread_d  *Thread;
@@ -861,6 +862,8 @@ struct thread_d *create_thread (
 
 // Counter
     int i = USER_BASE_TID;
+
+    int Personality = personality;
 
 // #debug
     debug_print ("create_thread: #todo\n");
@@ -1419,11 +1422,22 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     int w=0;
     int q=0;
 
+
+    debug_print("copy_thread_struct:\n");
+
+
     // A thread que vai ser copiada.
     father = thread;
     if ( (void *) father == NULL ){
         panic ("copy_thread_struct: father\n");
     }
+
+    if(father->magic!=1234)
+    {
+        debug_print("copy_thread_struct: father validation\n");
+              panic("copy_thread_struct: father validation\n");
+    }
+
 
     // #todo
     // Aqui, na hora de criar o nome, vamos dar
@@ -1477,8 +1491,20 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 // for now we can copy only threads in ring 3.
 
     unsigned int father_cpl = (unsigned int) father->cpl;
+    int father_personality = (int) father->personality;
+
     if(father_cpl != RING3)
         panic("copy_thread_struct: father_cpl!=RING3\n");
+
+
+    if(father_personality != PERSONALITY_GRAMADO &&
+       father_personality != PERSONALITY_GWS )
+    {
+        debug_print("copy_thread_struct: father_personality\n");
+              panic("copy_thread_struct: father_personality\n");
+    }
+
+    debug_print("copy_thread_struct: create thread\n");
     
     clone = 
         (struct thread_d *) create_thread ( 
@@ -1487,13 +1513,31 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
                                 0,  // initial rsp
                                 father->ownerPID,  //current_process, 
                                 "clone-thread",
-                                father_cpl );
+                                father_cpl,
+                                father_personality );
 
 // The copy.
-    if ( (void *) clone == NULL ){
-        panic ("copy_thread_struct: clone\n");
+    if ( (void *) clone == NULL )
+    {
+        debug_print ("copy_thread_struct: clone\n");
+        panic       ("copy_thread_struct: clone\n");
     }
 
+    if(clone->magic!=1234)
+    {
+        debug_print ("copy_thread_struct: clone validation\n");
+        panic       ("copy_thread_struct: clone validation\n");
+    }
+
+/*
+    if ( clone->personality != father->personality)
+    {
+        debug_print("copy_thread_struct: clone->personality != father->personality\n");
+        panic      ("copy_thread_struct: clone->personality != father->personality\n");
+    }
+*/
+
+    clone->personality = (int) father->personality;
 
 //
 // Saving ...
@@ -1801,6 +1845,8 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 	while(1){}
 */
 
+    debug_print("copy_thread_struct: done\n");
+    
 // Returning the pointer for the clone.
 
     return (struct thread_d *) clone;

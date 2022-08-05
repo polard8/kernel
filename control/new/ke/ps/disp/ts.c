@@ -599,8 +599,13 @@ dispatch_current:
     }
 
 // Quantum:
-    if ( TargetThread->quantum > QUANTUM_MAX ){
-        TargetThread->quantum = QUANTUM_MAX;
+// #bugbug #todo
+// Uma thread pode ter recebido um boost,
+// e portanto precisa estar com mais creditos que o maximo permitido.
+// #todo: Criar um limite para o boost
+    if ( TargetThread->quantum > (QUANTUM_MAX + QUANTUM_BOOST_MAX) )
+    {
+        TargetThread->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX);
     }
 
 // Call dispatcher.

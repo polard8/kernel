@@ -14,6 +14,12 @@ extern int copy_process_in_progress;
 #define PROCESS_MAGIC  1234
 
 
+
+#define PERSONALITY_GRAMADO  1000
+#define PERSONALITY_GWS      1001
+// ...
+
+
 // #alternative
 // Position.
 // Position in cell.
@@ -202,6 +208,8 @@ struct process_d
     int used;
     int magic;
 
+    int personality;
+
     process_type_t type;
 
 // #todo
@@ -307,11 +315,6 @@ struct process_d
 // avisar o processo via mensagem.
 
     char *net_buffer;
-
-// Qual é apersonalidade do processo.
-// Ele deve agir como gramado-like, unix-like, etc?
-
-    int personality;
 
 // Importante:
 // isso substituir� a flag 'terminal'
@@ -949,7 +952,8 @@ struct process_d *create_process (
     unsigned int cpl,
     unsigned long pml4_va,
     unsigned long pdpt0_va,
-    unsigned long pd0_va );
+    unsigned long pd0_va,
+    int personality );
 
 // ===
 

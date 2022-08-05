@@ -219,6 +219,8 @@ pid_t copy_process(
         panic("copy_process: parent_thread\n");
     }
 
+    if(parent_thread->magic!=1234)
+        panic("copy_process: parent_thread validation\n");
 
 // cpl
 // For now we can only clone ring 3 threads.
@@ -279,7 +281,8 @@ pid_t copy_process(
 //====
 
     
-    if( parent_process->pid < 0 || parent_process->pid >= PROCESS_COUNT_MAX )
+    if( parent_process->pid < 0 || 
+        parent_process->pid >= PROCESS_COUNT_MAX )
     {
         panic("copy_process: parent_process->pid limits\n");
     }
@@ -314,10 +317,21 @@ do_clone:
     
     if ( (void *) child_process == NULL )
     {
-        debug_print ("copy_process: [FAIL] child_process\n");
-        printf      ("copy_process: [FAIL] child_process\n");
+        debug_print ("copy_process: child_process\n");
+        printf      ("copy_process: child_process\n");
         goto fail;
     }
+    
+    if (child_process->magic!=1234)
+    {
+        debug_print ("copy_process: child_process validation\n");
+        printf      ("copy_process: child_process validation\n");
+        goto fail;
+    }
+
+// Personality
+    child_process->personality = (int) parent_process->personality;
+
 
 // new pid
 
@@ -497,10 +511,16 @@ do_clone:
     //refresh_screen();
     //while(1){}
 
+
 //
-// Copy thread structure.
+// child thread.
 //
 
+//
+// Copy parent thread structure.
+//
+
+    debug_print ("copy_process: [3] Copying thread structure\n");
 // see: thread.c
 
     child_thread = 
@@ -509,6 +529,9 @@ do_clone:
     if ( (void *) child_thread == NULL ){
         panic ("copy_process: [FAIL] copy_thread_struct \n");
     }
+
+    //child_thread->personality = (int) parent_thread->personality;
+
 
 // save.
     child_process->control = (struct thread_d *) child_thread;
@@ -599,6 +622,8 @@ do_clone:
 // Load image
 //
 
+    debug_print ("copy_process: [3] load image\n");
+
 // Carregando a imagem do clone no buffer criado para ela.
 // IN: 
 // name, image va.
@@ -620,7 +645,7 @@ do_clone:
     //return 0;
 
 
-// [4]
+// [5]
 // Check ELF signature.
 // OK. O comando existe e o arquivo foi carregado, mas 
 // precisamos saber se a assinatura de ELF é válida.
@@ -629,8 +654,8 @@ do_clone:
 // See: fs.c
 
 // #debug
-    debug_print ("copy_process: [4] Check signature.\n");
-    //printf ("copy_process: [4] Check signature.\n");
+    debug_print ("copy_process: [5] Check signature.\n");
+    //printf ("copy_process: [5] Check signature.\n");
 
 // #bugbug
 // O processo init deve ter suas proprias tabelas de paginas.
@@ -935,7 +960,7 @@ do_clone:
 // priority and quantum.
 
     child_thread->priority = PRIORITY_MAX;
-    child_thread->quantum = QUANTUM_MAX;
+    child_thread->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX); //boost
 
 // Select for execution
 // Então a thread de controle esta em INITIALIZED e não em STANDBY.

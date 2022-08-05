@@ -111,8 +111,13 @@ void *sys_create_process (
     unsigned long iopl ) 
 {
     struct process_d *new;
-
     char NewName[32];
+    
+    struct thread_d *CurrentThread;
+    struct process_d *CurrentProcess;
+    
+    int ProcessPersonality=0;
+    int ThreadPersonality=0;
 
 //
 // Not tested
@@ -125,16 +130,22 @@ void *sys_create_process (
 
     // ==============
 
-    struct thread_d *CurrentThread;
-
     CurrentThread = (struct thread_d *) threadList[current_thread];
-    
-    // No switch yet.
-    if ((void*)CurrentThread==NULL)
-    {
+
+    if ((void*)CurrentThread==NULL){
         return NULL;
     }
 
+    if (CurrentThread->magic != 1234)
+        return NULL;
+
+    ThreadPersonality = (int) CurrentThread->personality;
+
+    if (ThreadPersonality!=PERSONALITY_GRAMADO &&
+        ThreadPersonality!=PERSONALITY_GWS)
+    {
+        panic("sys_create_process: ThreadPersonality\n");
+    }
 
     // Create a ring0 copy of the name.
     strncpy(NewName,name,16);
@@ -176,16 +187,38 @@ void *sys_create_process (
         panic("sys_create_process: current_pid\n");
     }
 
-    new = (void *) create_process ( 
-                       NULL, NULL, NULL, 
-                       (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
-                       PRIORITY_HIGH, 
-                       (int) current_pid, 
-                       (char *) NewName, 
-                       RING3, 
-                       (unsigned long ) pml4_va,
-                       (unsigned long ) kernel_mm_data.pdpt0_va,
-                       (unsigned long ) kernel_mm_data.pd0_va );
+    CurrentProcess = (struct process_d *) processList[current_pid];
+
+    if ( (void*) CurrentProcess == NULL )
+        return NULL;
+    if (CurrentProcess->magic!=1234)
+        return NULL;
+    
+    ProcessPersonality = (int) CurrentProcess->personality;
+
+    if (ProcessPersonality!=PERSONALITY_GRAMADO &&
+        ProcessPersonality!=PERSONALITY_GWS)
+    {
+        panic("sys_create_process: ProcessPersonality\n");
+    }
+
+    if( ProcessPersonality != ThreadPersonality)
+    {
+        panic("sys_create_process: Personality check\n");
+    }
+
+    new = 
+        (void *) create_process ( 
+                     NULL, NULL, NULL, 
+                     (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
+                     PRIORITY_HIGH, 
+                     (int) current_pid, 
+                     (char *) NewName, 
+                     RING3, 
+                     (unsigned long ) pml4_va,
+                     (unsigned long ) kernel_mm_data.pdpt0_va,
+                     (unsigned long ) kernel_mm_data.pd0_va,
+                     ProcessPersonality );
 
     if ((void*) new == NULL)
     {
@@ -236,6 +269,11 @@ void *sys_create_thread (
     char *name )
 {
     struct thread_d  *Thread;
+    
+    //#bugbug: Precisamos trabalhar isso.
+    //essa personalidade pode vir via argumento
+    //ou depender da personalidade do caller.
+    int ThreadPersonality = PERSONALITY_GRAMADO;
 
     debug_print ("sys_create_thread:\n");
 
@@ -275,7 +313,8 @@ void *sys_create_thread (
                                 priority, 
                                 ppid, 
                                 name,
-                                iopl ); 
+                                iopl,
+                                ThreadPersonality ); 
 
     if ( (void *) Thread == NULL )
     {

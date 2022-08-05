@@ -167,14 +167,15 @@ static int I_x64CreateInitialProcess(void)
     InitProcess = 
         (void *) create_process( 
                      NULL, NULL, NULL, 
-                     (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
+                     (unsigned long) CONTROLTHREAD_BASE,  //0x00200000 
                      BasePriority, 
                      (int) KernelProcess->pid, 
                      "INIT-PROCESS", 
                      RING3, 
                      (unsigned long) init_pml4_va,
                      (unsigned long) kernel_mm_data.pdpt0_va,
-                     (unsigned long) kernel_mm_data.pd0_va );
+                     (unsigned long) kernel_mm_data.pd0_va,
+                     PERSONALITY_GRAMADO );
 
     if ( (void *) InitProcess == NULL )
     {
@@ -728,7 +729,8 @@ static int I_x64CreateKernelProcess(void)
                      RING0,   
                      (unsigned long ) gKernelPML4Address,
                      (unsigned long ) kernel_mm_data.pdpt0_va,
-                     (unsigned long ) kernel_mm_data.pd0_va );
+                     (unsigned long ) kernel_mm_data.pd0_va,
+                     PERSONALITY_GRAMADO );
 
 // Struct and struct validation.
 
@@ -823,7 +825,7 @@ static int I_x64CreateKernelProcess(void)
 
 // name
 
-    char *name = "km::WindowServer";
+    char *name = "km::first";
     size_t s=0;
 
     memset(m->name,0,64);
@@ -848,6 +850,7 @@ static int I_x64CreateKernelProcess(void)
     m->info.function_table_address = 0;
 
 // Put it into the list.
+// #todo: Change this name
     m->id = KMODULE_WS;
     kmList[KMODULE_WS] = (unsigned long) m;
 

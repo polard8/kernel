@@ -168,14 +168,18 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Caso tenha havido algum problema na 
                 // prioridade base, então ela foi para o equilíbrio.
                 TmpThread->priority = TmpThread->base_priority;
-                
-                // #test
-                // Se alguma thread teve seus créditos aumentados,
-                // então devemos reequilibrar os creditos novamente.
-                //TmpThread->quantum = QUANTUM_BALANCE;
-                //if (TmpThread->base_priority == PRIORITY_MAX){
-                //    TmpThread->quantum = QUANTUM_MAX;
-                //}
+
+                // balance
+                if (TmpThread->personality == PERSONALITY_GRAMADO)
+                {
+                    TmpThread->quantum = QUANTUM_MIN;
+                }
+
+                // balance
+                if (TmpThread->personality == PERSONALITY_GWS)
+                {
+                    TmpThread->quantum = QUANTUM_MAX;
+                }
             }
 
             // A thread esta esperando.

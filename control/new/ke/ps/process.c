@@ -926,9 +926,9 @@ struct process_d *create_process (
     unsigned int cpl,
     unsigned long pml4_va,
     unsigned long pdpt0_va,
-    unsigned long pd0_va )
+    unsigned long pd0_va,
+    int personality )
 {
-
     struct process_d  *Process;
     pid_t PID = -1;
 
@@ -937,6 +937,9 @@ struct process_d *create_process (
 
     unsigned long BasePriority=0;
     unsigned long Priority=0;
+
+
+    int Personality = personality;
 
 
     debug_print ("create_process: #todo\n");
@@ -1019,6 +1022,10 @@ struct process_d *create_process (
     }
 
     memset( Process, 0, sizeof(struct process_d) );
+
+
+    Process->personality = (int) Personality;
+
 
     Process->base_priority = BasePriority;
     Process->priority = Priority;
@@ -1995,6 +2002,9 @@ struct process_d *create_and_initialize_process_object(void)
         printf      ("create_and_initialize_process_object: [FAIL] new_process\n");
         goto fail;
     }
+    
+    //no personality yet
+    new_process->personality = 0;
 
 // Get PID.
 // Obtêm um índice para um slot vazio na lista de processos.

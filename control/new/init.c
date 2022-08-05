@@ -230,8 +230,8 @@ int kernel_main(int arch_type)
 // Enable the usage of the serial debug.
 // It is not initialized yet.
 
-    //enable_serial_debug();
-    disable_serial_debug();
+    enable_serial_debug();
+    //disable_serial_debug();
 
 // Open the kernel virtual console 
 // instead of first process.

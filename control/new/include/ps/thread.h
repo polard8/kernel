@@ -200,6 +200,8 @@ struct thread_d
     object_class_t  objectClass;
     int used;
     int magic;
+    
+    int personality;
 
 // Input model
 // Setup the input model for this thread ...
@@ -1032,7 +1034,8 @@ struct thread_d *create_thread (
     unsigned long init_stack, 
     pid_t pid, 
     char *name,
-    unsigned int cpl );
+    unsigned int cpl,
+    int personality );
 
 // =====
 
