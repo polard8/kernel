@@ -943,6 +943,11 @@ static int I_x64CreateTID0(void)
 // it is a standard server code.
 
     ____IDLE = (struct thread_d *) tid0_thread;
+    UPProcessorBlock.IdleThread = (struct thread_d *) ____IDLE;
+
+    //if ( UPProcessorBlock.IdleThread != ____IDLE)
+    //   x_panic("here");
+
 
 // ??
 // This is the control thread of the kernel process.

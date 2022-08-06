@@ -193,8 +193,10 @@ struct ProcessorBlock_d
 {
     object_type_t   objectType;
     object_class_t  objectClass;
+
     int used;
     int magic;
+
     int id;
 
 // status flag.
@@ -203,52 +205,33 @@ struct ProcessorBlock_d
 
 // Processor Info. 
 // (Intel x86 only)
-
     struct processor_d  *processorInfo;
 
 //
-// == Process ====
+// Threads
 //
 
-    //int running_processes;
-    int processes_counter;
-
-    struct process_d *CurrentProcess;  
-    struct process_d *KernelProcess;  
-    //struct process_d *CurrentProcess;  
-
-
-//
-// == Threads ====
-//
-
-    // Number of total threads in this processor.
-    unsigned long threads_counter;
-
-
-    // Number of threads running in this processor.
-    //int running_threads;   
-
-    // more for other states.
-    // ...
-
-// Special threads.
-    struct thread_d *CurrentThread;
-    struct thread_d *NextThread;
+// The idle thread for this processor.
     struct thread_d *IdleThread;
+// The current thread running in this processor.
+    struct thread_d *CurrentThread;
+// The next thread to run in this processor.
+    struct thread_d *NextThread;
     //...
+// Number of total threads in this processor.
+    unsigned long threads_counter;
 
     // ...
 
     struct ProcessorBlock_d *next;
 };
 
-// struct ProcessorBlock_d *???;
+// See: up.h
 
-
+// #todo: Not used yet.
 // all processors's structs.
 // ProcessorBlock_d
-unsigned long processorsList[PROCESSORS_MAX_COUNT];
+//unsigned long processorsList[PROCESSORS_MAX_COUNT];
 
 
 

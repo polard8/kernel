@@ -571,6 +571,10 @@ dispatch_current:
         panic ("ts-dispatch_current: validation\n");
     }
 
+// #todo
+    //UPProcessorBlock.CurrentThread = (struct thread_d *) TargetThread;
+    //UPProcessorBlock.NextThread    = (struct thread_d *) TargetThread->next;
+    
 // Counters
 // Clean
 // The spawn routine will do something more.
@@ -666,6 +670,7 @@ dispatch_current:
         printf ("ts: Process %s pml4 fail\n", TargetProcess->name );
         die();
     }
+
 
 // #bugug
 // #todo

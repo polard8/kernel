@@ -72,6 +72,11 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // #todo:
 // We need to create another hook for the AP cores.
 
+    /*
+    if( UPProcessorBlock.IdleThread != ____IDLE){
+            panic ("__scheduler_rr: UPProcessorBlock.IdleThread\n");
+    }
+    */
 
 // ===============================================
 // The idle thread is the current thread of the
@@ -101,6 +106,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     {
         panic ("__scheduler_rr: FirstTID\n");
     }
+
+    //UPProcessorBlock.NextThread = (struct thread_d *) rootConductor;
 
 // ===============================================
 // The control thread of the ring3 init process.

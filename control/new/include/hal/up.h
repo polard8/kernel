@@ -13,8 +13,8 @@
 
 // Obs: 
 // Não tem ponteiro. Apenas para UniProcessor.
-
-struct ProcessorBlock_d  UPProcessorBlock;
+// See: cpu.h and hal.c 
+extern struct ProcessorBlock_d  UPProcessorBlock;
 
 
 #endif   

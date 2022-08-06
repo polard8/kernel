@@ -229,7 +229,6 @@ struct thread_d
 
     int _protected;
 
-
 //
 // Identifiers
 //
@@ -445,26 +444,19 @@ struct thread_d
 // Quantas vezes ela já rodou no total.
 // Tempo total dado em jiffies.
 
-// Spawn jiffie
-// jiffie at spawn moment.
+// initial_jiffie: Spawn jiffie. Jiffie at spawn moment.
+// ready_jiffie:   Time when the thred became ready.
+// waiting_jiffie: Time when the thread started to wait.
+// blocked_jiffie: Time when blocked.
+// zombie_jiffie:  Time when the thread became a zombie.
+
     unsigned long initial_jiffie;
-
-// Blocked jiffie
-// Time when blocked.
-    unsigned long blocked_jiffie;
-
-// Time whe the thred became ready.
     unsigned long ready_jiffie;
-
-// Waiting jiffie
-// Time when the thread started to wait.
     unsigned long waiting_jiffie;
-
-// Zombie jiffie.
-// Time when the thread became a zombie.
+    unsigned long blocked_jiffie;
     unsigned long zombie_jiffie;
 
-// how much jiffies untill now.
+// How much jiffies until now.
     unsigned long step;
 
 // Quando ela foi criada.
@@ -475,51 +467,50 @@ struct thread_d
     unsigned long total_time_ms; 
 
 
+// Credits:
 // Quantum. 
 // time-slice or quota. 
 // Quantos jiffies a thread pode rodar em um round.
 // Quantidade limite de jiffies que uma thread pode rodar em um round.
 // Limite do quantum quando dado boost. 
 // Ou seja, podemos aumentar o quantum de um thread até esse limite.
-
     unsigned long quantum;
     unsigned long quantum_limit_min;
     unsigned long quantum_limit_max;
+    
+// #todo: Can we boost the credits?
+    //int disable_boost;
 
 // Quantos jiffies a thread ficou no estado e espera para
 // pronta para rodar.
     unsigned long standbyCount;
     unsigned long standbyCount_ms;
 
-
 // Quantos jiffies ela está rodando antes de parar.
     unsigned long runningCount; 
     unsigned long runningCount_ms; 
 
+// obs: 
+// ??
+// A soma das 3 esperas é a soma do tempo de espera
+// depois que ela rodou pela primeira vez.
 
-    // obs: 
-    // ??
-    // A soma das 3 esperas é a soma do tempo de espera
-    // depois que ela rodou pela primeira vez.
-
-    // Contando o tempo nos estados de espera.
+//
+// Contando o tempo nos estados de espera.
+//
 
 // Tempo de espera para retomar a execução.
 // Limite esperando para rodar novamente.
 // Talvez essa contagem nao precise agora. 
- 
     unsigned long readyCount;
     unsigned long readyCount_ms;
     unsigned long ready_limit;
 
-
 // Quantos jiffies esperando por algum evento.
 // Quantos jiffies a thread pode esperar no maximo.
-
     unsigned long waitingCount; 
     unsigned long waitingCount_ms; 
     unsigned long waiting_limit;
-
 
 // Quantos jiffies ficou bloqueada.
 // Qauntos jiffies a thread pode esperar bloqueada.
@@ -530,23 +521,20 @@ struct thread_d
 
 // Zombie ?
 
+
 // #todo: 
 // Deadline.
 // Quando tempo a tarefa tem para que ela complete a sua execução.
-
 // unsigned long DeadLine.
 // unsigned long RemainingTime; 
-
 // Ticks remaining. (Deadline)
 // Contagem do prazo limite.
 // Contagem regressiva.
 // Isso eh usado por threads 'real-time'
-
     unsigned long ticks_remaining;
 
 // Alarm
 // Used by the alarm() standard syscall.
-
     unsigned long alarm;
 
 //
@@ -789,16 +777,12 @@ struct thread_d
 
 // ====================================
 
-//
 // Signal support
-//
-
     unsigned long signal;
     unsigned long umask;
 
 // Exit
 // Reason to close the thread.
-
     int exit_code;
 
 //
@@ -847,28 +831,24 @@ struct thread_d
 
 	//continua o contexto ...
 
-	//O endereço incial, para controle.
+//O endereço incial, para controle.
     unsigned long initial_rip;
 
-    // #todo
-    // 512 bytes, alinhados em 16.
-    // unsigned char fxsave[512]__atribute_aligned(...);
-
+// #todo
+// 512 bytes, alinhados em 16.
+// unsigned char fxsave[512]__atribute_aligned(...);
     unsigned char fpu_buffer[512];
 
 //
 //  tss
 //
 
-	//#todo
-	//isso é muito necessário.
-    // #todo: Create the structure.
+// #todo
+// isso é muito necessário.
+// #todo: Create the structure.
     //struct x64tss_d *tss;
 
-//====================================
-
-    // Navigation
-
+// Navigation
     struct thread_d  *prev;
     struct thread_d  *next;
 };

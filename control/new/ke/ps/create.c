@@ -5,8 +5,7 @@
 
 
 // create_tid0:
-//     ring0
-//     See: init?
+//     ring0 - The idle thread.
 // 0x0000000030A00000
 
 void *create_tid0(void)

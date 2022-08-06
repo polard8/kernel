@@ -4,6 +4,13 @@
 
 #include <kernel.h>  
 
+
+// Contador de dispatch por categoria de dispatch.
+// #todo: Cada processador pode ter uma dessa?
+// See: dispatch.h
+
+struct dispatch_count_d  *DispatchCountBlock;
+
 /*
  * IncrementDispatcherCount:
  *     Mensura os critérios de escolha.
@@ -17,23 +24,24 @@
 // #todo
 // Create error messages.
 // Isse é chamado várias vezes, é melhor não ter mensagem de debug.
+// See: dispatch.h
 
-void IncrementDispatcherCount ( int type )
+void IncrementDispatcherCount (int type)
 {
 
+// #todo: max limit.
     if (type < 0){
         debug_print("IncrementDispatcherCount: [FAIL] type\n");
         return;
     }
 
-// See:
-// dispatch.h
-
     if ( (void *) DispatchCountBlock == NULL ){
         panic ("IncrementDispatcherCount:\n");
     }
-
-// Activating the selected type.
+    
+    if (DispatchCountBlock->magic!=1234){
+        panic ("IncrementDispatcherCount: validation\n");
+    }
 
     switch (type){
         case SELECT_IDLE_COUNT:
@@ -89,7 +97,6 @@ void IncrementDispatcherCount ( int type )
  *     Porém os tipos diferentes de dispacher ainda não estão habilitados, 
  * só um funciona.
  */
-
 // #todo
 // Change the return type and return with error
 // if something goes wrong. So this way we can try another thing.
@@ -113,6 +120,7 @@ void dispatcher(int type)
 //#define DISPATCHER_IDLE       2  // Dispatch the current idle thread and select it as the current.
 // ...
 
+    //#hack
     if ( type != DISPATCHER_CURRENT ){
         type = DISPATCHER_CURRENT;
     }
@@ -133,7 +141,13 @@ dispatch_current:
         panic ("dispatcher: TargetThread\n");
     }
 
+// validation
+    if ( TargetThread->magic != 1234 ){
+        panic ("dispatcher: magic\n");
+    }
+
 // state
+// #todo: dispatch idle?
     if ( TargetThread->state != READY ){
         panic ("dispatcher: state\n");
     }
@@ -144,12 +158,40 @@ dispatch_current:
 // Reinicia a contagem.
 // Os outros elementos são reiniciados pelo caller
 
-    if ( TargetThread->state == READY )
+    if (TargetThread->state == READY)
     {
+        // #check
+        //if( TargetThread->readyCount > TargetThread->ready_limit)
+        //{}
+        
         TargetThread->state = RUNNING;
         TargetThread->runningCount = 0;
         TargetThread->runningCount_ms = 0;
+
+        // Inicializa a contagem de ready, waiting e blocked.
+        TargetThread->readyCount = 0;
+        TargetThread->readyCount_ms = 0;
+        TargetThread->waitingCount = 0;
+        TargetThread->waitingCount_ms = 0;
+        TargetThread->blockedCount = 0;
+        TargetThread->blockedCount_ms = 0;
     }
+
+// Priority
+    if (TargetThread->base_priority < PRIORITY_MIN){
+        TargetThread->base_priority = PRIORITY_MIN;
+    }
+    if (TargetThread->priority < PRIORITY_MIN){
+        TargetThread->priority = PRIORITY_MIN;
+    }
+
+// Não faz sentido liberar uma thread com quantum '0'.
+    if (TargetThread->quantum < QUANTUM_MIN){
+        TargetThread->quantum = QUANTUM_MIN;
+    }
+
+
+    UPProcessorBlock.CurrentThread = (struct thread_d *) TargetThread;
 
 //
 // ## RESTORE CONTEXT ##

@@ -13,64 +13,29 @@ int init_microkernel (void)
 
     debug_print ("init_microkernel:\n");
 
-//#ifdef KERNEL_VERBOSE
-    //printf ("MICROKERNEL:\n");
-//#endif
-
-    // Init scheduler.
-    // See: sched/sched.c
-
+// Init scheduler.
+// See: sched/sched.c
     init_scheduler(0);
 
-
-    // Init processes, threads, 
-    // See: process.c and thread.c
-
+// Init processes and threads, 
+// See: process.c and thread.c
     init_processes();
     init_threads();    
 
-    // Init IPC and Semaphore.
-    // See: ??
-
-    //ipc_init ();
+// #todo: Init IPC and Semaphore.
+    //ipc_init();
     //create_semaphore(); 
 
-//
 // queue
-//
-    // #deprecated
+// #deprecated ?
 
     queue = NULL;
 
-
-/*
-    // Inicializar as filas que alimentar�o a lista do dispatcher.
-
-    queue = kmalloc ( sizeof( struct queue_d ) );
-
-    if( (void *) queue == NULL ){
-        panic ("init_microkernel: queue\n");
-    }else{
-
-        // Inicializa todas as filas do microkernel.
-        init_queue(queue);
-
-        // Initializing the dispatcher list.
-        // See: disp/dispatch.c
-        //init_dispatcher();
-
-        // ...
-    };
-*/
-
-
-    // ...
-
-
-//
 // Dispatch Count Block
-//
-    DispatchCountBlock = (void *) kmalloc ( sizeof( struct dispatch_count_d ) );
+// see: dispatch.c
+
+    DispatchCountBlock = 
+        (void *) kmalloc ( sizeof( struct dispatch_count_d ) );
 
     if ( (void *) DispatchCountBlock == NULL ){
         printf ("init_microkernel: DispatchCountBlock\n");
@@ -85,18 +50,15 @@ int init_microkernel (void)
     DispatchCountBlock->SelectIdealCount = 0;
     DispatchCountBlock->SelectDispatcherQueueCount = 0;
     // ...
+    DispatchCountBlock->used=TRUE;
+    DispatchCountBlock->magic=1234;
+    DispatchCountBlock->initialized = TRUE;
 
-
-
-//#ifdef PS_VERBOSE
-    //printf ("Done\n");
-//#endif
-
+// #debug 
+// A primeira mensagem só aparece após a inicialização da runtime
+// por isso não deu pra limpar a tela antes.
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
-    //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
     printf (">>>debug hang: after init_microkernel");
     die();
 #endif
@@ -123,7 +85,7 @@ int jobcheck ( int type, int id )
         break;
     };
 
-do_process:	
+do_process:
     if( id <0 || id >= PROCESS_COUNT_MAX ){
 		goto fail;
 	}else{

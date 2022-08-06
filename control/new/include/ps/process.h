@@ -105,6 +105,8 @@ extern int copy_process_in_progress;
 #define PRIORITY_HIGH4     PRIORITY_P3
 // -----------
 
+//#define LOW_PRIORITY_THRESHOLD    PRIORITY_LOW4
+//#define HIGH_PRIORITY_THRESHOLD   PRIORITY_HIGH1
 
 // Aliases
 #define PRIORITY_MIN       PRIORITY_LOW4
@@ -122,6 +124,8 @@ extern int copy_process_in_progress;
 #define PRIORITY_SYSTEM_THREAD       PRIORITY_MAX
 #define PRIORITY_INTERACTIVE_THREAD  PRIORITY_NORMAL
 #define PRIORITY_BATCH_THREAD        PRIORITY_MIN
+
+
 
 //
 // == Multiplier =========================
