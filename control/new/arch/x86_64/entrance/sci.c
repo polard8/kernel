@@ -1670,8 +1670,9 @@ void *sci0 (
             //newos_reboot(0);
             break;
 
-
+        // 111
         // See: tlib.c
+        // Get the next system message.
         // IN: buffer for message elements.
         case 111:
             //debug_print("sci0: 111\n");
@@ -1686,10 +1687,11 @@ void *sci0 (
             return (void *) sys_post_message_to_tid( (int) arg2, (unsigned long) arg3 );
             break;
 
+        // ...
 
-        // 120 ~ 123 (livre)
-
-
+        // 120
+        // Get a message given the index.
+        // With restart support.
         case 120:
             //debug_print("sci0: \n");
             return (void *) sys_get_message2( 

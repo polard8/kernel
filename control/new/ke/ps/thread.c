@@ -9,6 +9,21 @@
 
 tid_t current_thread=0;
 
+// Ponteiro para a idle thread atual
+// Sempre que mudar a idle thread devemos usar esse ponteiro
+// para mostrar qual será a nova idle thread.
+// Cada idle thread pode prestar um serviço diferente, como o
+// gerenciamento de energia.
+struct thread_d  *____IDLE;
+// The control thread of the window sever kernel module.
+// The ring 0 thread. tid0
+struct thread_d  *tid0_thread;
+// Essa é a thread de controle do processo init2.bin
+// É o primeiro processo em ring3.
+// Idle Thread. TID=0    
+struct thread_d  *InitThread;
+// Ponteiro para a thread usada na hora da clonagem de processos.
+struct thread_d  *ClonedThread;
 
 //
 // == private functions: prototypes ================
@@ -54,25 +69,7 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
 // Devemos adiar inicialização desses elementos relativos 
 // a mensagens.
 
-// Single kernel event.
-    t->ke_window = NULL;
-    t->ke_msg    = 0;
-    t->ke_long1  = 0;
-    t->ke_long2  = 0;
-    t->ke_newmessageFlag = FALSE;
 
-// Clear the queue.
-    for ( i=0; i<32; ++i )
-    {
-        t->window_list[i] = 0;
-        t->msg_list[i]    = 0;
-        t->long1_list[i]  = 0;
-        t->long2_list[i]  = 0;
-        t->long3_list[i]  = 0;
-        t->long4_list[i]  = 0;
-    };
-    t->head_pos = 0;
-    t->tail_pos = 0;
 
 
 // ======================
@@ -303,7 +300,7 @@ unsigned long GetThreadStats ( int tid, int index )
             //return (unsigned long) t->pagefaultCount;
             break;          
 
-        case 15:  return (unsigned long) t->preempted;  break;
+        case 15:  return (unsigned long) t->is_preemptable;  break;
         case 16:  return (unsigned long) t->saved;  break;
 
         case 17:  return (unsigned long) t->HeapStart;   break;
@@ -1070,8 +1067,7 @@ struct thread_d *create_thread (
     Thread->position = 0;
 
 // This thread can be preempted.
-// Explain it better.
-    Thread->preempted = PREEMPTABLE;
+    Thread->is_preemptable = PREEMPTABLE;
 
     // ...
 
@@ -1619,8 +1615,10 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     //}
 
 
-    clone->saved     = father->saved;          // Saved flag.
-    clone->preempted = father->preempted;  // Se pode ou n�o sofrer preemp��o.
+// Is the context saved or not?
+    clone->saved = (int) father->saved;
+// Is it preemptable or not?
+    clone->is_preemptable = (int) father->is_preemptable;  
 
 	//Heap and Stack.
 	//Thread->Heap;
@@ -1809,21 +1807,6 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     for ( w=0; w<8; w++ ){
         clone->wait_reason[w] = father->wait_reason[w];
     };
-
-/*
-//==================================
-    // Message
-    for ( q=0; q<32; q++ )
-    {
-         clone->window_list[q] = 0;
-         clone->msg_list[q]    = 0;
-         clone->long1_list[q]  = 0;
-         clone->long2_list[q]  = 0;
-    };
-    clone->head_pos = 0;
-    clone->tail_pos = 0;
-//==================================
-*/
 
 //...
 //@todo:

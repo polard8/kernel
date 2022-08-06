@@ -126,7 +126,8 @@ fail0:
 }
 
 // 120
-// get a message given the index.
+// Get a message given the index.
+// With restart support.
 // IN: buffer, index, flag: TRUE=restart the queue at the end.
 
 void *sys_get_message2(unsigned long ubuf, int index, int restart)

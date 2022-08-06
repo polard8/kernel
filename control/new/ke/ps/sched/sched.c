@@ -5,8 +5,23 @@
 
 #include <kernel.h>
 
-
+// Scheduler main structure.
 struct scheduler_info_d  SchedulerInfo;
+
+
+//
+// Linked lists.
+//
+
+// The fixed conductor to mark the start.
+struct thread_d  *Conductor;
+// The flexible conductor to create the list.
+struct thread_d  *tmpConductor;
+// The created root conductor.
+struct thread_d  *rootConductor;
+
+
+
 
 //
 // == Private functions: prototypes =============

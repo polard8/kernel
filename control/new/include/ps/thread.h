@@ -42,14 +42,17 @@
 
 #define THREAD_MAGIC  1234
 
+// Stock:
+// The structure can be reused.
+//#define THREAD_STOCK  4321
 
 //
 // Preempt support.
 //
 
 // Se pode ou não entrar em preempção. 
-#define PREEMPTABLE    1    // Yes
-#define UNPREEMPTABLE  0    // No
+#define PREEMPTABLE    TRUE   // Yes
+#define UNPREEMPTABLE  FALSE  // No
 
 
 //#importante
@@ -200,9 +203,11 @@ struct thread_d
     object_class_t  objectClass;
     int used;
     int magic;
-    
-    int personality;
 
+// 1000=GRAMADO 1001=GWS
+    int personality;
+// We are waiting the right time to close a thread.
+// The scheduler will do this job.
     int exit_in_progress;
 
 // Input model
@@ -366,40 +371,20 @@ struct thread_d
 //    int in_syscall;
 
 
-
-// preempted:
-// flag ~ Sinaliza que uma tarefa pode ou não sofrer preempção.
-// Uma tarefa de menor prioridade pode deixar o estado running 
-// para assumir o estado ready em favor de uma tarefa de 
-// maior prioridade que assumirá o estado running.
-// todo: isso pode ser int, bool ou char.
-
-    unsigned long preempted;
-
-// #test: 
-// Escalonado duas vezes.
-// #deprecated.
-
-    //int DoubleShot;
+// Is preemptable or not.
+    int is_preemptable;
 
 // ========================================================
 // ORDEM: 
 // O que segue é referenciado durante o processo de dispatch.
 
-    // Sinaliza que a tarefa teve o seu contexto salvo.
-    // #todo: use 'int'
-    unsigned long saved;
+// The context is already saved or not?
+    int saved;
 
-
-// Heap
+// Heap and Stack
+// #todo: Is it a virtual address?
     unsigned long HeapStart;
     unsigned long HeapSize;
-
-//todo: 
-// Usar a estrutura. Maybe. 
-    //struct heap_d *heap;
-
-//Stack
     unsigned long StackStart;
     unsigned long StackSize;
 
@@ -600,16 +585,15 @@ struct thread_d
     struct room_d     *room;      // room. A kind of 'Window Station'.
     struct desktop_d  *desktop;   // desktop.
 
-    // ??
+// Callback:
+// The main procedure for a ring 3 application.
+// It is a callback, and the kernel will call this procedure
+// right after a timer interrupt.
+    //unsigned long user_procedure_va;
 
-    // ?? procedimento de janela.
-    unsigned long procedure; //Endereço do procedimento de janela da tarefa. 
-	//unsigned long control_menu_procedure; //procedimento do control menu.
-
-
-	// #ORDEM: 
-	// O que segue é referenciado durante as trocas de mensagens.
-	// utilização de canais e IPC.
+// #ORDEM:  
+// O que segue é referenciado durante as trocas de mensagens.
+// utilização de canais e IPC.
 
 //
 // LIS - Local Input State
@@ -651,19 +635,6 @@ struct thread_d
     // significa que o kernel deve processar essa mensagem.
 
 
-// #todo
-// Talvez possamos usar isso para algum tipo de 
-// envio de mensagem síncrona, sem fila.
-// Ou talvez deletar isso.
-
-//++
-    struct window_d  *ke_window;
-    int               ke_msg;
-    unsigned long     ke_long1;
-    unsigned long     ke_long2;
-    int               ke_newmessageFlag; 
-//--
-
 //
 // == Event queue ===========================================
 //
@@ -683,34 +654,6 @@ struct thread_d
 
     // MAXEVENTS
     // See: events.h
-
-
-
-
-// #bugbug
-// Vamos deletar esse conjunto de vetores aqui
-// pois estamos usado a nova fila criada logo abaixo.
-// Mas alguma coisa esta impedindo de fazer isso,
-// causando page fault.
-
-
-//++
-//========================
-// standard
-    struct window_d  *window_list[32];  // window pointer
-    int                  msg_list[32];  // message code
-    unsigned long      long1_list[32];  // long1
-    unsigned long      long2_list[32];  // long2
-// extra
-    unsigned long      long3_list[32];  // 
-    unsigned long      long4_list[32];  //
-// offsets
-    int tail_pos;
-    int head_pos;
-//=========================
-//--
-
-
 // ====================================================
 
 //
@@ -735,15 +678,7 @@ struct thread_d
 	//?? mensagens pendentes.
 	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
 	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
-	
 
-
-    // Each thread has its own mouse shape. ?
-    // Each window has its own mouse shape. ?
-    //int mouse_pointer_type;
-
-    // Is this valid for a thread or for a window?
-    // int mouse_is_captured;
 
 //
 // == Wait ======================================
@@ -789,12 +724,13 @@ struct thread_d
 // == Context ======================= 
 //
 
-	// #todo: 
-	// Usars uma estrutura.
-	// #todo: 
-	// Isso deve virar um ponteiro de estrutura.
-    // ?? O que faremos, pois temos mais de uma arquitetura.
-    // struct x86_context_d *context;
+// #todo: 
+// Usars uma estrutura.
+// #todo: 
+// Isso deve virar um ponteiro de estrutura.
+// ?? O que faremos, pois temos mais de uma arquitetura.
+
+    // struct x86_context_d  *context;
 
 	//stack frame;
     unsigned short ss;
@@ -853,67 +789,21 @@ struct thread_d
     struct thread_d  *next;
 };
 
+// See: thread.c
+extern struct thread_d  *____IDLE;
+extern struct thread_d  *tid0_thread;
+extern struct thread_d  *InitThread;
+extern struct thread_d  *ClonedThread;
 
-//
-// Thread list
-//
+// Linked lists
+// See: sched.c
+extern struct thread_d  *Conductor;
+extern struct thread_d  *tmpConductor;
+extern struct thread_d  *rootConductor;
 
-// Ponteiro para a idle thread atual
-// Sempre que mudar a idle thread devemos usar esse ponteiro
-// para mostrar qual será a nova idle thread.
-// Cada idle thread pode prestar um serviço diferente, como o
-// gerenciamento de energia.
-struct thread_d  *____IDLE;
-
-// The control thread of the window sever kernel module.
-// The ring 0 thread. tid0
-struct thread_d  *tid0_thread;
-
-// Essa é a thread de controle do processo init2.bin
-// É o primeiro processo em ring3.
-// Idle Thread. TID=0    
-struct thread_d  *InitThread;
-
-// Ponteiro para a thread usada na hora da clonagem de processos.
-struct thread_d  *ClonedThread;
-
-
-//
-// == round robin =======================================
-//
-
-/* 
- * Listas encadeadas de threads.
- * Usadas no gerenciamento de rounds 
- */
-
-// The fixed conductor to mark the start.
-struct thread_d  *Conductor;
-// The flexible conductor to create the list.
-struct thread_d  *tmpConductor;  //Conductor2;
-// The created root conductor.
-struct thread_d  *rootConductor;
-
-int conductorIndex;
-
-//
-// == input round =======================================
-//
-
-// Configuramos essa thread para
-// se a thread que deve rodar logo após um evento de input.
-// teclado, mouse ou outra coisa.
-struct thread_d  *first_after_keyboard_input;
-struct thread_d  *first_after_mouse_input;
-//struct thread_d *first_after_network_input;
-// ...
-
-
-// #Atenção
-
-
-// Número máximo de threads.
+// Maximum number of kernel threads in the system.
 #define THREAD_COUNT_MAX  1024 
+
 
 // Cada lista poderá usasr uma prioridadr diferente,
 // um quantum diferente e talvez ter uma frequencia de timer diferente.

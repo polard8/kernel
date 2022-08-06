@@ -145,42 +145,9 @@ void *create_tid0(void)
 // Clean the 'wait reason'.
     for ( r=0; r<8; ++r ){ kThread->wait_reason[r] = (int) 0; };
 
-    // ??
-    // The system window procedure used by this thread.
-    // This is a dialog inside the base kernel.
-
-    // #suspended  Gramado X will not use this for now.
-    // kThread->procedure = (unsigned long) &system_procedure;
-
 //
 // == message support =============
 //
-
-// Single kernel event
-    kThread->ke_window = NULL;
-    kThread->ke_msg    = 0;
-    kThread->ke_long1  = 0;
-    kThread->ke_long2  = 0;
-    kThread->ke_newmessageFlag =  FALSE;
-
-
-/*
-// ===========================================================
-// Message queue
-    for ( i=0; i<32; ++i )
-    {
-        kThread->window_list[i] = 0;
-        kThread->msg_list[i]    = 0;
-        kThread->long1_list[i]  = 0;
-        kThread->long2_list[i]  = 0;
-        kThread->long3_list[i]  = 0;
-        kThread->long4_list[i]  = 0;
-    };
-    kThread->head_pos = 0;
-    kThread->tail_pos = 0;
-// ===========================================================
-*/
-
 
 // #todo
 // podemos criar um metodo worker
@@ -193,33 +160,33 @@ void *create_tid0(void)
     kThread->MsgQueueTail = 0;
 
 
-// Create all the 32 pointers.
+// Allocate memory for all the 32 structure.
+// Add the pointers in the list.
+
     struct msg_d *tmp;
 
     for ( i=0; i<32; ++i )
     {
         tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
-        if( (void*) tmp == NULL )
-            panic("create_tid0: tmp");
-
+        if ( (void*) tmp == NULL ){
+            debug_print("create_tid0: tmp\n");
+            panic      ("create_tid0: tmp\n");
+        }
         tmp->window = NULL;
         tmp->msg = 0;
         tmp->long1 = 0;
         tmp->long2 = 0;
         tmp->long3 = 0;
         tmp->long4 = 0;
-
         tmp->used = TRUE;
         tmp->magic = 1234;
-        
-        // Coloca o ponteiro que criamos na lista de ponteiros.
         kThread->MsgQueue[i] = (unsigned long) tmp;
-    }
+    };
 
 // =================================================
 
 // Pode sofrer preempção por tempo.
-    kThread->preempted = PREEMPTABLE;
+    kThread->is_preemptable = PREEMPTABLE;
 
 // Temporizadores.
 // Counters
@@ -515,44 +482,9 @@ void *create_tid3 (void)
     // Clean the 'wait reason'.
     for ( r=0; r<8; ++r ){ t->wait_reason[r] = (int) 0; };
 
-    // ??
-    // The system window procedure used by this thread.
-    // This is a dialog inside the base kernel.
-
-    //t->procedure = (unsigned long) &system_procedure;
-
-
 //
 // == Message =========
 //
-
-    // Single kernel event.
-
-    t->ke_window = NULL;
-    t->ke_msg    = 0;
-    t->ke_long1  = 0;
-    t->ke_long2  = 0;
-
-    t->ke_newmessageFlag =  FALSE;
-
-
-/*
-//====================
-    // Clean the message queue.
-    for ( i=0; i<32; ++i )
-    {
-        t->window_list[i] = 0;
-        t->msg_list[i]    = 0;
-        t->long1_list[i]  = 0;
-        t->long2_list[i]  = 0;
-        t->long3_list[i]  = 0;
-        t->long4_list[i]  = 0;
-    };
-    t->head_pos = 0;
-    t->tail_pos = 0;
-//====================
-*/
-
 
 // ===============================
 // Message queue.
@@ -561,31 +493,32 @@ void *create_tid3 (void)
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
 
-// Create all the 32 pointers.
+// Allocate memory for all the 32 structures.
+// Add the pointers in the list.
+
     struct msg_d  *tmp;
 
     for ( i=0; i<32; ++i )
     {
         tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
-        if( (void*) tmp == NULL )
-            panic("create_tid3: tmp");
-
+        if ( (void*) tmp == NULL ){
+            debug_print("create_tid3: tmp\n");
+            panic      ("create_tid3: tmp\n");
+        }
         tmp->window = NULL;
         tmp->msg = 0;
         tmp->long1 = 0;
         tmp->long2 = 0;
         tmp->long3 = 0;
         tmp->long4 = 0;
-
         tmp->used = TRUE;
         tmp->magic = 1234;
-        
-        // Coloca o ponteiro que criamos na lista de ponteiros.
         t->MsgQueue[i] = (unsigned long) tmp;
-    }
+    };
 // ============================================
 
-    t->preempted = UNPREEMPTABLE; 
+// Pode sofrer preempção por tempo.
+    t->is_preemptable = PREEMPTABLE;
 
 // Temporizadores.
 

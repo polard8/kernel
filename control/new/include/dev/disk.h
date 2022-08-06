@@ -4,6 +4,12 @@
 #ifndef  __DISK_H
 #define  __DISK_H    1
 
+#define SECTOR_SIZE    512  
+//#define SECTOR_SIZE  4096  
+
+#define MBR_BOOTABLE        0x80
+#define MBR_SIGNATURE       0xAA55
+
 
 #define DISK_COUNT_MAX 1024    //8
 

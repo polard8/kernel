@@ -119,12 +119,7 @@ struct cwd_d CWD;
 #define  FS_TYPE_EXT2   1005
 // No more types. 
 
-// deveria is para disk.h
-#define SECTOR_SIZE    512  
-//#define SECTOR_SIZE  4096  
 
-//#define MBR_BOOTABLE        0x80
-//#define MBR_SIGNATURE       0xAA55
 
 
 // short.

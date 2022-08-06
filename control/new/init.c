@@ -34,12 +34,13 @@
 #include <kernel.h>
 
 
-//static char *s_hostname;
-
 #define GCC_VERSION ( __GNUC__ * 10000 \
             + __GNUC_MINOR__ * 100 \
             + __GNUC_PATCHLEVEL__ )
 
+
+//static char *s_hostname;
+//#define PLATFORM_STRING                 "x64"
 
 // Global
 unsigned long gInitializationPhase=0;
@@ -888,6 +889,9 @@ int kernel_main(int arch_type)
 // Initialize current archtecture.
 
     PROGRESS("Kernel:0:6\n"); 
+
+
+    //printf("Plataform: %s\n", PLATFORM_STRING );
 
 // #todo
 // A partir daqui faremos inicializações de partes
