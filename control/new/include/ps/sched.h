@@ -33,6 +33,7 @@ extern struct scheduler_info_d  SchedulerInfo;
 
 // ===============================================
 
+// Credits in ms.
 
 // Class 1: Priority Normal
 #define QUANTUM_Q1  1
