@@ -29,11 +29,13 @@ void mmShow_PML4Entry (int index, unsigned long pml4_va)
     
     return;
 
+/*
+ 
 // =======================================
 
-	if (pml4_va == 0)
-		return;
-
+    if (pml4_va == 0){
+        return;
+    }
 
 //
 // pd
@@ -69,6 +71,8 @@ void mmShow_PML4Entry (int index, unsigned long pml4_va)
 	
 	//primeira entrada da pt.
 	printf (" PT_Entry_0 = %x \n", (unsigned long) pt[0] );	
+
+*/
 }
 
 

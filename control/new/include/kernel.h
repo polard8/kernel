@@ -678,7 +678,7 @@ struct kernel_module_d
 };
 
 
-#define KMODULE_WS    0   // first of the list.
+#define KMODULE_MOD0  0   // first of the list.
 #define KMODULE_MAX   8
 
 unsigned long kmList[KMODULE_MAX];

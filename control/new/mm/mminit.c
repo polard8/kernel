@@ -3,6 +3,38 @@
 
 #include <kernel.h>
 
+// --------------------------------
+struct kernel_heap_d 
+{
+    int initialized;
+
+// va
+    unsigned long start;
+    unsigned long end;
+};
+
+// Global.
+struct kernel_heap_d KernelHeap;
+// --------------------------------
+
+// --------------------------------
+struct kernel_stack_d 
+{
+    int initialized;
+
+// va
+    unsigned long start;
+    unsigned long end;
+};
+
+// Global.
+struct kernel_stack_d KernelStack;
+// --------------------------------
+
+
+
+
+// --------------------------------
 
 /*
  * mmblockCount:
@@ -73,6 +105,12 @@ static unsigned long last_size=0;
 static unsigned long mm_prev_pointer=0;
 
 
+// ----------------------------
+
+static int __init_heap(void);
+static int __init_stack(void);
+
+// ----------------------------
 
 /*
 unsigned long slab_2mb_extraheap2(void)
@@ -96,25 +134,25 @@ unsigned long slab_2mb_extraheap3(void)
 
 
 /*
- * init_heap:
+ * __init_heap:
  *     Iniciar a gerência de Heap do kernel. 
- *     @todo: Usar heapInit() ou heapHeap(). memoryInitializeHeapManager().
  * Essa rotina controi a mão o heap usado pelo processo kernel.
  *     +Ela é chamada apenas uma vez.
- *     +Ela deve ser chamada entes de quelquer outra operação 
+ *     +Ela deve ser chamada entes de qualquer outra operação 
  * envolvendo o heap do processo kernel.
  * @todo: Rotinas de automação da criação de heaps para processos.
  */
 
-//int memoryInitializeHeapManager() 
-
-int init_heap (void)
+static int __init_heap (void)
 {
     int i=0;
 
     // #bugbug
     // não usar printf
     // printf ainda não funciona nesse momento.
+
+
+    KernelHeap.initialized = FALSE;
 
 //
 // Globals
@@ -123,6 +161,10 @@ int init_heap (void)
 // start and end.
     kernel_heap_start = (unsigned long) KERNEL_HEAP_START;
     kernel_heap_end   = (unsigned long) KERNEL_HEAP_END;
+
+    KernelHeap.start = (unsigned long) kernel_heap_start;
+    KernelHeap.end   = (unsigned long) kernel_heap_end;
+
 
 // Heap Pointer, Available heap and Counter.
     g_heap_pointer   = (unsigned long) kernel_heap_start; 
@@ -136,39 +178,32 @@ int init_heap (void)
 
 // Check Heap Pointer.
     if ( g_heap_pointer == 0 ){
-        //printf ("init_heap: [FAIL] g_heap_pointer\n");
-        debug_print ("init_heap: [FAIL] g_heap_pointer\n");
+        debug_print ("__init_heap: [FAIL] g_heap_pointer\n");
         goto fail;
     }
 
 // Check Heap Pointer overflow.
     if ( g_heap_pointer > kernel_heap_end ){
-        //printf ("init_heap: [FAIL] Heap Pointer Overflow\n");
-        debug_print ("init_heap: [FAIL] Heap Pointer Overflow\n");
+        debug_print ("__init_heap: [FAIL] Heap Pointer Overflow\n");
         goto fail;
     }
 
 // Heap Start
     if ( kernel_heap_start == 0 ){
-        debug_print("init_heap: [FAIL] HeapStart\n");
-        //printf ("init_heap: [FAIL] HeapStart={%x}\n", 
-            //kernel_heap_start );
+        debug_print("__init_heap: [FAIL] HeapStart\n");
         goto fail;
     }
 
 // Heap End
     if ( kernel_heap_end == 0 ){
-        debug_print("init_heap: [FAIL] HeapEnd\n");
-        //printf ("init_heap: [FAIL] HeapEnd={%x}\n", 
-        //    kernel_heap_end );
+        debug_print("__init_heap: [FAIL] HeapEnd\n");
         goto fail;
     }
 
 // Check available heap.
 // #todo: Tentar crescer o heap.
     if ( g_available_heap == 0 ){
-        debug_print ("init_heap: [FAIL] g_available_heap\n");
-        //printf      ("init_heap: [FAIL] g_available_heap\n");
+        debug_print ("__init_heap: [FAIL] g_available_heap\n");
         goto fail;
     }
 
@@ -184,13 +219,7 @@ int init_heap (void)
 
     //More?!
 
-// Done.
-
-//#ifdef PS_VERBOSE
-    // #bugbug
-    // printf ainda não funciona nesse momento.
-    //printf ("Done\n");
-//#endif
+    KernelHeap.initialized = TRUE;
 
     return 0;
 
@@ -200,67 +229,56 @@ int init_heap (void)
 
 fail:
 
-    // #debug
-    /*
-    printf("* Debug: %x %x %x %x \n", 
-        kernel_heap_start, kernel_heap_end,
-        kernel_stack_start, kernel_stack_end);
-    refresh_screen();
-    while(1){}
-    */
+    KernelHeap.initialized = FALSE;
 
-    // #bugbug
-    // printf ainda não funciona nesse momento.
-    //printf ("init_heap: Fail\n");
-    debug_print ("init_heap: Fail\n");
-    
-    refresh_screen ();
+    debug_print ("__init_heap: Fail\n");
+
+    //refresh_screen();
 
     return (int) 1;
 }
 
 
 /*
- * init_stack:
+ * __init_stack:
  *     Iniciar a gerência de Stack do kernel. 
  *     #todo: Usar stackInit(). 
  */
- 
-int init_stack (void)
+
+static int __init_stack (void)
 {
 
-//
+    KernelStack.initialized = FALSE;
+
 // Globals
-//
 
     kernel_stack_end   = (unsigned long) KERNEL_STACK_END; 
     kernel_stack_start = (unsigned long) KERNEL_STACK_START; 
 
+    KernelStack.end   = (unsigned long) kernel_stack_end;
+    KernelStack.start = (unsigned long) kernel_stack_start;
+
 // End
     if ( kernel_stack_end == 0 ){
-        debug_print ("init_stack: [FAIL] kernel_stack_end\n");
-        //printf ("init_stack: [FAIL] kernel_stack_end %x \n", 
-            //kernel_stack_end );
+        debug_print ("__init_stack: [FAIL] kernel_stack_end\n");
         goto fail;
     }
 
 // Start
     if ( kernel_stack_start == 0 ){
-        debug_print ("init_stack: [FAIL] kernel_stack_start\n");
-        //printf ("init_stack: [FAIL] kernel_stack_start %x \n", 
-            //kernel_stack_start );
+        debug_print ("__init_stack: [FAIL] kernel_stack_start\n");
         goto fail;
     }
 
-// Done.
+    KernelStack.initialized = TRUE;
+
     return 0;
 
 fail:
 
-    //#bugbug
-    // No support for this at this time.
-    
-    refresh_screen();
+    KernelStack.initialized = FALSE;
+
+    //refresh_screen();
     
     return (int) 1;
     //return (int) -1;
@@ -312,17 +330,15 @@ int mmInit(void)
 
 // heap and stack
 
-    Status = (int) init_heap();
+    Status = (int) __init_heap();
     if (Status != 0){
         debug_print("mmInit: [FAIL] Heap\n");
-        //printf ("mmInit: [FAIL] Heap\n");
         goto fail;
     }
 
-    Status = (int) init_stack();
+    Status = (int) __init_stack();
     if (Status != 0){
         debug_print ("mmInit: [FAIL] Stack\n");
-        //printf ("mmInit: [FAIL] Stack\n");
         goto fail;
     }
 
@@ -458,9 +474,12 @@ fail:
  * ...
  */
 
-unsigned long heapAllocateMemory ( unsigned long size )
+unsigned long heapAllocateMemory (unsigned long size)
 {
     struct mmblock_d *Current;
+
+    //pid_t current_process = (pid_t) get_current_process();
+    //#todo: process pointer.
 
 // #todo: 
 // Aplicar filtro.
@@ -617,10 +636,10 @@ try_again:
 
         Current->Header     = (unsigned long) g_heap_pointer; 
         Current->headerSize = (unsigned long) MMBLOCK_HEADER_SIZE; 
-        Current->Id = (unsigned long) mmblockCount; 
-        Current->Used  = 1;
-        Current->Magic = 1234;
-        Current->Free = 0;
+        Current->Id         = (unsigned long) mmblockCount; 
+        Current->Used       = TRUE;
+        Current->Magic      = 1234;
+        Current->Free       = 0;  // not free
 
         // Continua...
 
@@ -641,7 +660,8 @@ try_again:
         // a 'MMBLOCK_HEADER_SIZE'
         // E que 'Current->headerSize' é o início da estrutura.
 
-        Current->userArea = (unsigned long) ( Current->Header + Current->headerSize );
+        Current->userArea = 
+            (unsigned long) ( Current->Header + Current->headerSize );
 
         // Footer:
         // >> O footer começa no 
@@ -655,17 +675,12 @@ try_again:
         // Obs: Por enquanto o tamanho da área de cliente tem 
         // apenas o tamanho do espaço solicitado.
  
-        Current->Footer = (unsigned long) ( Current->userArea + size );
+        Current->Footer = 
+            (unsigned long) ( Current->userArea + size );
 
-
-        // Heap pointer. 
-        //     Atualiza o endereço onde vai ser a próxima alocação.
-
-        //if ( Current->Footer < KERNEL_HEAP_START){
-        //    Current->Used = 0;                //Flag, 'sendo Usado' ou 'livre'.
-        //    Current->Magic = 0;            //Magic number. Ver se não está corrompido.
-        //	goto try_again;
-        //}
+        //#todo:
+        //Current->pid = (pid_t) current_process;
+        //Current->process = p;
 
         // obs: 
         // O limite da contagem de blocos foi checado acima.
@@ -740,14 +755,18 @@ fail:
 }
 
 
-/*
- ********************
- * FreeHeap:
- */
 
+// Mark the structure as 'reusable'. STOCK
+// #todo: Precisamos de rotinas que nos mostre
+// essas estruturas.
+// IN: ptr.
+// Esse ponteiro indica o início da área alocada para uso.
+// Essa área fica logo após o header.
+// O tamanho do header é MMBLOCK_HEADER_SIZE.
 void FreeHeap (void *ptr)
 {
-    struct mmblock_d *Header;
+    struct mmblock_d  *Header;
+    
 
 // validation
     if ( (void *) ptr == NULL ){
@@ -783,21 +802,13 @@ void FreeHeap (void *ptr)
         return;
     }
 
-// Check
-    if ( mmblockList[mmblockCount] == (unsigned long) Header && 
-         Header->Id == mmblockCount )
-    {
-        mmblockList[mmblockCount] = 0;
-        mmblockCount--;
-    }
+// Apenas marcamos a estrutura como reusável,
+// pois agora ela esta no STOCK.
 
-// Isso invalida a estrutura, para evitar mal uso.
-
-    Header->Used = 0;
-    Header->Magic = 0;
-
-// ??   
-    g_heap_pointer = (unsigned long) Header;
+    Header->Used = TRUE;   // still alive.
+    Header->Magic = 4321;  // reusable, stock
+    
+    // A alocação continua do ponteiro onde parou.
 }
 
 

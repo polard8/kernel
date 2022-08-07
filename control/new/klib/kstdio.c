@@ -232,6 +232,16 @@ void printchar (char **str, int c)
 }
 
 
+void putchar_K(void)
+{
+    while(1){
+        putchar('K');
+        putchar('\n');
+        refresh_screen();
+    }
+}
+
+
 /*
  * putchar:
  *     Put a char on the screen. (libC).
