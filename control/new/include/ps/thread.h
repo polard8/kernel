@@ -298,7 +298,7 @@ struct thread_d
 // 1 = Sinaliza que a thread está dando a preferência
 // e que deve sair quando for seguro fazer isso.
 
-    int _yield;
+    int yield_in_progress;
 
 // error. @todo:
     //unsigned long error;
