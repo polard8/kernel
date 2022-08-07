@@ -34,7 +34,7 @@ static void *__extra_services (
 static void __service897(void);
 static void __servicePutChar( int c );
 static void __invalidate_surface_rectangle(void);
-static void __maximize_process_priority(pid_t ws_pid);
+
 
 static void __setup_surface_rectangle(
     unsigned long left,
@@ -43,6 +43,7 @@ static void __setup_surface_rectangle(
     unsigned long height );
 
 static void __initialize_ws_info(pid_t pid);
+static void __maximize_ws_priority(pid_t pid);
 
 // =============================
 
@@ -244,30 +245,33 @@ static void __invalidate_surface_rectangle(void)
 // #test
 // Changing the window server's quantum. 
 // The purpose here is boosting it when it is trying to register itself.
-static void __maximize_process_priority(pid_t ws_pid)
+// class 1: Normal threads.
+static void __maximize_ws_priority(pid_t pid)
 {
     struct process_d *p;
     struct thread_d *t;
 
-    unsigned long ProcessType = PROCESS_TYPE_SYSTEM;
-    unsigned long ProcessBasePriority = PRIORITY_SYSTEM_PROCESS;
-    unsigned long ProcessPriority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long ProcessType         = PROCESS_TYPE_SYSTEM;
+    unsigned long ProcessBasePriority = PRIORITY_SYSTEM;
+    unsigned long ProcessPriority     = PRIORITY_SYSTEM;
 
-    unsigned long ThreadType = THREAD_TYPE_SYSTEM;
-    unsigned long ThreadBasePriority = PRIORITY_SYSTEM_THREAD;
-    unsigned long ThreadPriority = PRIORITY_SYSTEM_THREAD;
+    unsigned long ThreadType         = ProcessType;
+    unsigned long ThreadBasePriority = ProcessBasePriority;
+    unsigned long ThreadPriority     = ProcessPriority;
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if (ws_pid != current_process){
-        panic("__maximize_process_priority: ws_pid != current_process\n");
+    if (pid != current_process)
+    {
+        debug_print ("__maximize_ws_priority: pid != current_process\n");
+        panic       ("__maximize_ws_priority: pid != current_process\n");
     }
 
-    if(ws_pid<=0 || ws_pid >= PROCESS_COUNT_MAX)
+    if(pid<=0 || pid >= PROCESS_COUNT_MAX)
         return;
 
 // process
-    p = (struct process_d *) processList[ws_pid];
+    p = (struct process_d *) processList[pid];
     if((void*)p==NULL)
         return;
     if(p->used!=TRUE)
@@ -276,8 +280,9 @@ static void __maximize_process_priority(pid_t ws_pid)
         return;
 
     p->type = ProcessType;
+    
     p->base_priority = ProcessBasePriority;
-    p->priority = ProcessPriority;
+    p->priority      = ProcessPriority;
 
 // thread
     t = (struct thread_d *) p->control;
@@ -285,11 +290,12 @@ static void __maximize_process_priority(pid_t ws_pid)
     if ( t->magic != 1234 ) { return; }
 
     t->type = ThreadType;
+
     t->base_priority = ThreadBasePriority;
-    t->priority = ThreadPriority;
+    t->priority      = ThreadPriority;
 
 // see: ps/sched.h
-    t->quantum = QUANTUM_WINDOW_SERVER;
+    t->quantum = QUANTUM_MAX;
 }
 
 
@@ -541,7 +547,7 @@ static void *__extra_services (
                     (pid_t) current_process );
 
                 __initialize_ws_info(current_process);
-                __maximize_process_priority(current_process);
+                __maximize_ws_priority(current_process);
                 
                 //#todo
                 //WindowServer.desktop = (struct desktop_d *) __desktop;

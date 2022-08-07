@@ -64,8 +64,8 @@ void *create_tid0(void)
 // #bugbug: for now it is a thread for the first module.
 
     kThread->type = THREAD_TYPE_SYSTEM; 
-    kThread->base_priority = PRIORITY_SYSTEM_THREAD;  // Static
-    kThread->priority      = PRIORITY_SYSTEM_THREAD;  // Dynamic
+    kThread->base_priority = PRIORITY_SYSTEM;  // Static
+    kThread->priority      = PRIORITY_SYSTEM;  // Dynamic
     // #todo
     // #important
     // This will affect the input model
@@ -79,9 +79,6 @@ void *create_tid0(void)
 
     kThread->input_flags = 
         (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
-
-
-    kThread->position = KING;
 
 
 // TID
@@ -100,10 +97,8 @@ void *create_tid0(void)
 
     kThread->state = INITIALIZED; 
 
-// #todo
-// Execution plane.
 
-    kThread->plane = BACKGROUND;    
+    kThread->plane = BACKGROUND_THREAD;    
 
     // ...
 
@@ -203,13 +198,13 @@ void *create_tid0(void)
     kThread->runningCount_ms = 0;
 
     kThread->readyCount  = 0;
-    kThread->ready_limit = READY_LIMIT;
+    kThread->ready_limit = QUANTUM_MAX;
 
     kThread->waitingCount  = 0;
-    kThread->waiting_limit = WAITING_LIMIT;
+    kThread->waiting_limit = QUANTUM_MAX;
 
     kThread->blockedCount  = 0;
-    kThread->blocked_limit = BLOCKED_LIMIT;
+    kThread->blocked_limit = QUANTUM_MAX;
 
     kThread->ticks_remaining = 1000;
 
@@ -397,8 +392,8 @@ void *create_tid3 (void)
 // priority: low
 
     t->type = THREAD_TYPE_SYSTEM;
-    t->base_priority = PRIORITY_SYSTEM_THREAD;  // Static
-    t->priority      = PRIORITY_SYSTEM_THREAD;  // Dynamic
+    t->base_priority = PRIORITY_SYSTEM;  // Static
+    t->priority      = PRIORITY_SYSTEM;  // Dynamic
 
     // #todo
     // #bugbug
@@ -419,14 +414,10 @@ void *create_tid3 (void)
 
     t->name_address = (unsigned long) ThreadName; 
 
-
-
     t->state = INITIALIZED;
 
-    t->position = SPECIAL_GUEST;
-
     // Execution plane.
-    t->plane = BACKGROUND;
+    t->plane = BACKGROUND_THREAD;
 
 
     t->surface_rect = NULL;
@@ -535,13 +526,13 @@ void *create_tid3 (void)
     t->runningCount_ms = 0;
 
     t->readyCount  = 0;
-    t->ready_limit = READY_LIMIT;
+    t->ready_limit = QUANTUM_MAX;
 
     t->waitingCount  = 0;
-    t->waiting_limit = WAITING_LIMIT;
+    t->waiting_limit = QUANTUM_MAX;
 
     t->blockedCount  = 0;    //Tempo bloqueada.
-    t->blocked_limit = BLOCKED_LIMIT;
+    t->blocked_limit = QUANTUM_MAX;
 
     t->ticks_remaining = 1000;
 

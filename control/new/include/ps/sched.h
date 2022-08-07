@@ -34,32 +34,23 @@ extern struct scheduler_info_d  SchedulerInfo;
 // ===============================================
 
 
-//----
+// Class 1: Priority Normal
 #define QUANTUM_Q1  1
 #define QUANTUM_Q2  2
 #define QUANTUM_Q3  3
-//----
-#define QUANTUM_MIN      QUANTUM_Q1
-#define QUANTUM_BALANCE  QUANTUM_Q2
-#define QUANTUM_MAX      QUANTUM_Q3
+// Class 2: Priority Realtime
+#define QUANTUM_Q4  4
+#define QUANTUM_Q5  5
+#define QUANTUM_Q6  6
 
-#define QUANTUM_BASE   QUANTUM_MIN
-#define QUANTUM_LIMIT  QUANTUM_MAX
-//----
 
-#define QUANTUM_BOOST_MAX  (QUANTUM_MAX*10)
+#define QUANTUM_BOOST    (QUANTUM_Q6*3)
 
-#define QUANTUM_FIRST_PLANE   QUANTUM_MAX
-#define QUANTUM_SECOND_PLANE  QUANTUM_MIN
+#define QUANTUM_MIN    QUANTUM_Q1
+#define QUANTUM_MAX    (QUANTUM_Q6 + QUANTUM_BOOST)
 
-// Aliases
-// Limite de tempo esperando.
-#define READY_LIMIT      QUANTUM_MAX
-#define WAITING_LIMIT    QUANTUM_MAX
-#define BLOCKED_LIMIT    QUANTUM_MAX
-// ...
+//----------------------------------------------
 
-#define QUANTUM_WINDOW_SERVER  QUANTUM_MAX
 
 // Hz padrão. 100Hz. 
 // Uma interrupção a cada 10ms.

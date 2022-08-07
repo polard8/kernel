@@ -960,7 +960,7 @@ do_clone:
 // priority and quantum.
 
     child_thread->priority = PRIORITY_MAX;
-    child_thread->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX); //boost
+    child_thread->quantum = QUANTUM_MAX;
 
 // Select for execution
 // Então a thread de controle esta em INITIALIZED e não em STANDBY.

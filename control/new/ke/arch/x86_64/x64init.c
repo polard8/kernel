@@ -161,8 +161,8 @@ static int I_x64CreateInitialProcess(void)
 // Create init process
 //
 
-    unsigned long BasePriority = PRIORITY_SYSTEM_PROCESS;
-    unsigned long Priority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long BasePriority = PRIORITY_SYSTEM;
+    unsigned long Priority     = PRIORITY_SYSTEM;
 
     InitProcess = 
         (void *) create_process( 
@@ -227,7 +227,6 @@ static int I_x64CreateInitialProcess(void)
     InitProcess->pd0_VA = kernel_mm_data.pd0_va;
     InitProcess->pd0_PA = kernel_mm_data.pd0_pa; 
 
-    InitProcess->position = SPECIAL_GUEST;
     fs_initialize_process_cwd ( InitProcess->pid, "/" );
 
 //====================================================
@@ -279,7 +278,6 @@ static int I_x64CreateInitialProcess(void)
     InitThread->pd0_VA   = InitProcess->pd0_VA;
     InitThread->pd0_PA   = InitProcess->pd0_PA;
 
-    InitThread->position = SPECIAL_GUEST;
 
     //IdleThread->ownerPID = (int) InitProcess->pid;
 
@@ -684,8 +682,8 @@ static int I_x64CreateKernelProcess(void)
 
     //debug_print ("I_x64CreateKernelProcess:\n");
 
-    unsigned long BasePriority = PRIORITY_SYSTEM_PROCESS;
-    unsigned long Priority = PRIORITY_SYSTEM_PROCESS;
+    unsigned long BasePriority = PRIORITY_SYSTEM;
+    unsigned long Priority     = PRIORITY_SYSTEM;
 
 //
 // Module 0 image.
@@ -784,8 +782,6 @@ static int I_x64CreateKernelProcess(void)
     KernelProcess->pd0_VA = kernel_mm_data.pd0_va;
     KernelProcess->pd0_PA = kernel_mm_data.pd0_pa; 
 
-// position
-    KernelProcess->position = KING;
 
 // cwd
     fs_initialize_process_cwd ( KernelProcess->pid, "/" ); 
@@ -909,10 +905,6 @@ static int I_x64CreateTID0(void)
 
     tid0_thread->pd0_VA   = KernelProcess->pd0_VA;
     tid0_thread->pd0_PA   = KernelProcess->pd0_PA;
-
-// ?
-// Set position.
-    tid0_thread->position = KING;
 
 //
 // tss

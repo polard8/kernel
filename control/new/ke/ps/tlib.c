@@ -308,7 +308,12 @@ post_message_to_tid (
 // Giving more credits to the receiver.
 // The receiver will lose this time in the scheduler.
 // The scheduler will balance the credits.
-    t->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX);
+    t->quantum = (t->quantum + QUANTUM_BOOST);
+
+    if ( t->quantum > QUANTUM_MAX ){
+        t->quantum = QUANTUM_MAX;
+    }
+
 
 // Wake up the target thread?
 
@@ -637,21 +642,33 @@ set_thread_priority (
 // Set new quantum.
 // Se aprioridade solicitada for diferente da prioridade atual.
 // Tambem nao pode ser menor que a base.
-    if ( priority != OldPriority )
-    {
-        // Set new priority!
+    if ( priority != OldPriority ){
         t->priority = priority;
-        
-        // Set new quantum!
-        t->quantum = ( priority * TIMESLICE_MULTIPLIER );
-        if ( t->quantum < QUANTUM_MIN ){  t->quantum = QUANTUM_MIN; }
-        if ( t->quantum > QUANTUM_MAX ){  t->quantum = QUANTUM_MAX; }
     }
 
-    // ...
+//
+// Quantum
+//
+
+// Não mudaremos os creditos, somente a prioridade no escalonamento.
+// Não se preocupe.
+// O scheduler equilibra ao fim do round
+
+// Quantum fora dos limites.
+
+    if ( t->quantum < QUANTUM_MIN )
+    {
+        t->quantum = QUANTUM_MIN;
+    }
+
+    if ( t->quantum > QUANTUM_MAX )
+    {
+        t->quantum = QUANTUM_MAX;
+    }
 }
 
 
+// #suspenso
 // muda a prioridade para alem dos limites ... teste.
 void threadi_power(
     struct thread_d *t, 
@@ -664,11 +681,20 @@ void threadi_power(
         return;
     }
 
-    t->priority = priority;
-    t->quantum = ( priority * TIMESLICE_MULTIPLIER );
+// Priority
 
-    if ( t->quantum < QUANTUM_MIN ){  t->quantum = QUANTUM_MIN; }
-    if ( t->quantum > QUANTUM_MAX ){  t->quantum = QUANTUM_MAX; }
+    t->priority = PRIORITY_MAX;
+    
+    // Aceita se tiver nos limites.
+    if( t->priority > PRIORITY_MIN &&
+        t->priority < PRIORITY_MAX )
+    {
+         t->priority = priority;
+    }
+
+// Credits
+
+    t->quantum = QUANTUM_MAX;
 }
 
 

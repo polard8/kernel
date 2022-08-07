@@ -1008,11 +1008,11 @@ struct thread_d *create_thread (
 // The parameters needs to provide us this information.
 
     Thread->type = THREAD_TYPE_SYSTEM; 
-    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THREAD;  //static
-    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THREAD;  //dynamic
+    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM;  //static
+    Thread->priority      = (unsigned long) PRIORITY_SYSTEM;  //dynamic
 
 
-    Thread->plane = FOREGROUND;
+    Thread->plane = FOREGROUND_THREAD;
 
 // ==============
 // Surface rectangle.
@@ -1062,10 +1062,6 @@ struct thread_d *create_thread (
     //#test 64 bytes max.
     strcpy ( Thread->__threadname, (const char *) name );
 
-// ?
-// Explain it better.
-    Thread->position = 0;
-
 // This thread can be preempted.
     Thread->is_preemptable = PREEMPTABLE;
 
@@ -1078,7 +1074,7 @@ struct thread_d *create_thread (
 // #bugbug: 
 // Isso pode virar um loop infinito!
 
-    int Round=0;
+    int Round=0;  //#todo: Change to cycle.
 
 try_next_slot:
 
@@ -1140,13 +1136,13 @@ try_next_slot:
     Thread->runningCount_ms = 0;
 
     Thread->readyCount  = 0; 
-    Thread->ready_limit = READY_LIMIT;
+    Thread->ready_limit = QUANTUM_MAX;
 
     Thread->waitingCount  = 0;
-    Thread->waiting_limit = WAITING_LIMIT;
+    Thread->waiting_limit = QUANTUM_MAX;
 
     Thread->blockedCount  = 0; 
-    Thread->blocked_limit = BLOCKED_LIMIT;
+    Thread->blocked_limit = QUANTUM_MAX;
 
 // Not used now. But it works fine.
     Thread->ticks_remaining = 1000; 

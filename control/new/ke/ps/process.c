@@ -1066,13 +1066,6 @@ struct process_d *create_process (
     //Process->objectType  = ObjectTypeProcess;
     //Process->objectClass = ObjectClassKernelObjects;
 
-    // foi para o fim.
-    //Process->used  = TRUE;
-    //Process->magic = PROCESS_MAGIC;
-
-    // Undefined
-    Process->position = 0;
-
  
 // cpl
     Process->cpl = (unsigned int) cpl;
@@ -1104,8 +1097,8 @@ struct process_d *create_process (
     //State of process
     //Process->state = INITIALIZED;  
 
-    //@TODO: ISSO DEVERIA VIR POR ARGUMENTO
-     Process->plane = FOREGROUND;
+// #todo: Via argument
+     Process->plane = FOREGROUND_PROCESS;
 
     //Error.
     //Process->error = 0;

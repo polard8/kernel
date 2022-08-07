@@ -1,4 +1,5 @@
 
+// microkernel
 
 #ifndef  __MK_H
 #define __MK_H    1
@@ -16,22 +17,11 @@
 
 
 //
-//  ## JOB CONTROL SUPPORT ##
-//
-
-#define PROCESS    10
-#define THREAD     20
-#define BACKGROUND 100 
-#define FOREGROUND 200
-
-//
 // == prototypes =========================
 //
 
 int init_microkernel (void);
 
-int jobcheck ( int type, int id );
-int jobcontrol ( int type, int id, int plane );
 
 #endif   
 

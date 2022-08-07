@@ -106,8 +106,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         panic ("__scheduler_rr: ____IDLE validation\n");
     }
     // Estabiliza a idle thread.
-    ____IDLE->base_priority = PRIORITY_SYSTEM_THREAD;
-    ____IDLE->priority = PRIORITY_SYSTEM_THREAD;
+    ____IDLE->base_priority = PRIORITY_SYSTEM;
+    ____IDLE->priority      = PRIORITY_SYSTEM;
     ____IDLE->quantum = QUANTUM_MIN;  // Credits.
     rootConductor = (void *) ____IDLE;
 
@@ -138,8 +138,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         panic ("__scheduler_rr: InitThread validation\n");
     }
     // Estabiliza a init thread.
-    InitThread->base_priority = PRIORITY_SYSTEM_THREAD;
-    InitThread->priority = PRIORITY_SYSTEM_THREAD;
+    InitThread->base_priority = PRIORITY_SYSTEM;
+    InitThread->priority      = PRIORITY_SYSTEM;
     InitThread->quantum = QUANTUM_MIN;  // Credits.
     rootConductor->next = (void*) InitThread;
 

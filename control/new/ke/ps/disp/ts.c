@@ -595,21 +595,15 @@ dispatch_current:
         TargetThread->base_priority = PRIORITY_MAX;
     }
 
-// Priority:
-// #todo: Delete this.
-// The current priority will be updated every schedule.
+// Priority
     if ( TargetThread->priority > PRIORITY_MAX ){
         TargetThread->priority = PRIORITY_MAX;
     }
 
-// Quantum:
-// #bugbug #todo
-// Uma thread pode ter recebido um boost,
-// e portanto precisa estar com mais creditos que o maximo permitido.
-// #todo: Criar um limite para o boost
-    if ( TargetThread->quantum > (QUANTUM_MAX + QUANTUM_BOOST_MAX) )
+// Credits limit.
+    if ( TargetThread->quantum > QUANTUM_MAX)
     {
-        TargetThread->quantum = (QUANTUM_MAX + QUANTUM_BOOST_MAX);
+        TargetThread->quantum = QUANTUM_MAX;
     }
 
 // Call dispatcher.

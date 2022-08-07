@@ -55,6 +55,16 @@
 #define UNPREEMPTABLE  FALSE  // No
 
 
+
+
+// Threads:
+// Entre as janelas overlapped, a que estiver ativa,
+// deve mudar o plano da thread para FOREGROUND.
+#define BACKGROUND_THREAD  1 
+#define FOREGROUND_THREAD  2
+
+
+
 //#importante
 //razões para esperar
 	//#todo: isso precisa ser inicializado.
@@ -95,7 +105,7 @@ typedef enum {
 typedef enum {
     THREAD_TYPE_NULL,
     THREAD_TYPE_SYSTEM,       // high priority
-    THREAD_TYPE_INTERACTIVE,  // medium priority
+    THREAD_TYPE_INTERACTIVE,  // medium priority (first plane)
     THREAD_TYPE_BATCH,        // low priority
 }thread_type_t;
 
@@ -225,8 +235,6 @@ struct thread_d
 // Surface
     struct rect_d *surface_rect;
 
-    int position;
-
 // #todo
 // Other process can't take some actions on this thread
 // if it is protected. 
@@ -295,8 +303,12 @@ struct thread_d
 // error. @todo:
     //unsigned long error;
 
-//ext.
-// plano de execução.
+
+// Plano de execução.
+// Threads:
+// Entre as janelas overlapped, a que estiver ativa,
+// deve mudar o plano da thread para FOREGROUND.
+
     int plane;
 
 //

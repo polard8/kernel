@@ -20,15 +20,11 @@ extern int copy_process_in_progress;
 // ...
 
 
-// #alternative
-// Position.
-// Position in cell.
-// Main classes for the processes and threads.
-
-#define KING           1
-#define SPECIAL_GUEST  2
-#define BETA           3
-
+// Processes:
+// Os processos BATCH são BACKGROUND.
+// Os processos GWS são FOREGROUND.
+#define BACKGROUND_PROCESS  1 
+#define FOREGROUND_PROCESS  2
 
 
 
@@ -85,60 +81,58 @@ extern int copy_process_in_progress;
 // The priority can't be changed to a level below the base priority.
 //
 
-// main set of priorities
+
+//
+// Main priority sets
+//
+
+// class 1: Normal
 #define PRIORITY_P1  1
 #define PRIORITY_P2  2
 #define PRIORITY_P3  3
+// class 2: Real time
+#define PRIORITY_P4  4
+#define PRIORITY_P5  5
+#define PRIORITY_P6  6
 
+#define PRIORITY_BOOST  (PRIORITY_P6*3)
 
-// -----------
-#define PRIORITY_LOW4      PRIORITY_P1
-#define PRIORITY_LOW3      PRIORITY_P1
-#define PRIORITY_LOW2      PRIORITY_P1
-#define PRIORITY_LOW1      PRIORITY_P1
-
+// Class 1: Normal
+#define PRIORITY_LOW       PRIORITY_P1
 #define PRIORITY_NORMAL    PRIORITY_P2
-
-#define PRIORITY_HIGH1     PRIORITY_P3
-#define PRIORITY_HIGH2     PRIORITY_P3
-#define PRIORITY_HIGH3     PRIORITY_P3
-#define PRIORITY_HIGH4     PRIORITY_P3
-// -----------
-
-//#define LOW_PRIORITY_THRESHOLD    PRIORITY_LOW4
-//#define HIGH_PRIORITY_THRESHOLD   PRIORITY_HIGH1
-
-// Aliases
-#define PRIORITY_MIN       PRIORITY_LOW4
-#define PRIORITY_MAX       PRIORITY_HIGH4
-
-// Aliases
-#define PRIORITY_LOW       PRIORITY_LOW1
-#define PRIORITY_HIGH      PRIORITY_HIGH1 
+#define PRIORITY_HIGH      PRIORITY_P3
+// Class 2: Real time
+#define PRIORITY_LOW_RT       PRIORITY_P4
+#define PRIORITY_NORMAL_RT    PRIORITY_P5
+#define PRIORITY_HIGH_RT      PRIORITY_P6
 
 
-#define PRIORITY_SYSTEM_PROCESS       PRIORITY_MAX
-#define PRIORITY_INTERACTIVE_PROCESS  PRIORITY_NORMAL
-#define PRIORITY_BATCH_PROCESS        PRIORITY_MIN
+// Class 1: Normal threashold
+#define PRIORITY_THRESHOLD       PRIORITY_LOW
+// Class 2: Real time threashold
+#define PRIORITY_THRESHOLD_RT    PRIORITY_LOW_RT
+// Class 1: Normal time critical
+#define PRIORITY_TIME_CRITICAL       PRIORITY_LOW_RT
+// Class 2: Real time time critical
+#define PRIORITY_TIME_CRITICAL_RT    PRIORITY_HIGH_RT
 
-#define PRIORITY_SYSTEM_THREAD       PRIORITY_MAX
-#define PRIORITY_INTERACTIVE_THREAD  PRIORITY_NORMAL
-#define PRIORITY_BATCH_THREAD        PRIORITY_MIN
 
+// Class 1: Normal
+#define PRIORITY_BATCH        PRIORITY_LOW
+#define PRIORITY_INTERACTIVE  PRIORITY_NORMAL
+#define PRIORITY_SYSTEM       PRIORITY_HIGH
+// Class 1: Real time
+#define PRIORITY_BATCH_RT        PRIORITY_LOW_RT
+#define PRIORITY_INTERACTIVE_RT  PRIORITY_NORMAL_RT
+#define PRIORITY_SYSTEM_RT       PRIORITY_HIGH_RT
 
+#define PRIORITY_MIN       PRIORITY_P1
+#define PRIORITY_MAX       (PRIORITY_P6 + PRIORITY_BOOST)
 
-//
-// == Multiplier =========================
-//
+// ##
+// A prioridade no escalonamento não afetara os créditos.
 
-// #todo: Criar uma vari�vel para esse multiplicador.
-// para fazermos testes;
-//unsigned long g_timeslice_multiplier;
-//#define TIMESLICE_MULTIPLIER 1
-//#define TIMESLICE_MULTIPLIER 2
-#define TIMESLICE_MULTIPLIER 3
-//...
-
+// ----------------------------------------------------
 
 //
 // Flags for cloning a process.
@@ -227,8 +221,6 @@ struct process_d
     //int disk_usage_in_percentage;
     //int network_usage_in_percentage;
 
-//??
-    int position;
 
 // Other process can't take some actions on this process 
 // if it is protected. ex: It can't be killed by another process.
@@ -265,8 +257,12 @@ struct process_d
 // flag ?
     process_state_t state; 
 
-// ??
-// plano de execuçao.
+
+// Plano de execuçao.
+// Processes:
+// Os processos BATCH são BACKGROUND.
+// Os processos GWS são FOREGROUND.
+
     int plane;
 
 // error.
