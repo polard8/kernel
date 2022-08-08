@@ -778,8 +778,8 @@ void wakeup_thread(int tid)
 // cooperativo.
 // Muda o seu tempo executando para: Próximo de acabar.
 
-void yield (int tid){
-
+void yield (tid_t tid)
+{
     struct thread_d  *t;
 
 // tid
@@ -790,9 +790,7 @@ void yield (int tid){
 
 // Thread
     t = (void *) threadList[tid];
-
     if ( (void *) t == NULL ){  return;  }
-
     if ( t->used != TRUE || t->magic != 1234 )
     {
         return;
@@ -803,12 +801,15 @@ void yield (int tid){
 // e que deve sair quando for seguro fazer isso.
 // Agenda o yield.
 // >>> O ts.c vai fazer isso na hora certa.
+// O ts.c vai esgotar o quantum dessa thread
+// no momento do task switching.
+// Isso não deve afetar a prioridde da thread.
 
-    t->_yield = TRUE;
+    t->yield_in_progress = TRUE;
 }
 
 
-
+//#bugbug: Suspended.
 void set_input_responder_tid(int tid)
 {
     if( tid < 0 )

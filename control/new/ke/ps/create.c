@@ -235,11 +235,12 @@ void *create_tid0(void)
     kThread->rflags_current_iopl = (unsigned int) 0;
 
 // Stack frame
+// see: extraheap1
     kThread->ss     = 0x10 | 0; 
     kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
     kThread->rflags = 0x0202;
     kThread->cs     = 0x8 | 0; 
-    kThread->rip    = (unsigned long) 0x30A01000; //SMALLSYSTEM_EXTRAHEAP3_START+ 0x1000; 
+    kThread->rip    = (unsigned long) 0x30A01000; //MOD0_ENTRYPOINT_VA 
 
     kThread->initial_rip = (unsigned long) kThread->rip; 
 

@@ -33,6 +33,7 @@ extern struct scheduler_info_d  SchedulerInfo;
 
 // ===============================================
 
+// Credits in ms.
 
 // Class 1: Priority Normal
 #define QUANTUM_Q1  1
@@ -122,7 +123,7 @@ void wait_for_a_reason ( int tid, int reason );
 int wakeup_thread_reason ( int tid, int reason );
 int wakeup_scan_thread_reason ( int reason );
 void wakeup_thread (int tid);
-void yield (int tid);
+void yield (tid_t tid);
 
 void check_for_standby (void);
 

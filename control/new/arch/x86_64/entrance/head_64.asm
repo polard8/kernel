@@ -41,6 +41,13 @@ extern _system_state
 ; The function _go_to_kernel jumps here
 ; from head.s in BL.BIN.
 
+; Function table
+extern _die
+extern _putchar_K
+extern _hal_reboot
+;extern _kernel_gc
+; ...
+
 global _kernel_begin 
 _kernel_begin:
 
@@ -50,6 +57,12 @@ _kernel_begin:
     nop
     DB '__GRAMADO__'
 
+; Function table
+    DQ _die          ; 0
+    DQ _putchar_K    ; 1
+    DQ _hal_reboot   ; 2
+    ; ...
+    
 align 4
     %include "header.inc"
 align 4

@@ -296,20 +296,7 @@ unsigned long fsbFreeFrames[FSB_FREEFRAMES_MAX];
 // memory:
 //
 
- 
-//
-// MM BLOCK.
-// 
 
-//Isso � usdo pelo heap.
-//#define MMBLOCK_HEADER_SIZE  64 
-#define MMBLOCK_HEADER_SIZE  128
-
-
-// #bugbug
-// @todo: Aumentar ...
-// Contagem de mmblock. 
-#define MMBLOCK_COUNT_MAX  (2*4096)
 
 
 // Quantidade m�xima de framepools.
@@ -498,17 +485,19 @@ struct memory_info_d *miMemoryInfo;
 //...
 
 
+
+// MM BLOCK.
+#define MMBLOCK_HEADER_SIZE  128   // canonical.
+#define MMBLOCK_COUNT_MAX  (2*4096)
+
+
 /*
  * mmblock_d:
  *     Estrutura para memory blocks.
  *     Temos v�rios blocos de mem�ria espalhados em lugares diferentes 
  * dentro de um heap.
  *     Essa estrutura � usada pelo kernel para controlar as �reas de mem�ria
- * alocadas din�micamente dentro do heap do kernel. Por�m poderemos
- * usar essa mesma estrutura para alocar mem�ria em outros heaps. Como o heap 
- * de um processo ou o heap de um desktop. @todo: Para isso essa estrutura 
- * poderia conter informa��es sobre qual heap estamos usando. Mas me parece 
- * que o tamanho do header deve ser fixo.
+ * alocadas din�micamente dentro do heap do kernel.
  * @todo: 
  * Os blocos precisam de alguma organiza��o. 
  * Por enquanto, o total � 256 heaps de tamanhos diferentes.
@@ -525,23 +514,16 @@ struct memory_info_d *miMemoryInfo;
  * em especial. (N�o incluir nenhuma vari�vel por enquanto!).
  */ 
 
-// Essa estrutura � para gerenciar �reas de mem�ria alocadas dinamicamente 
-// dentro do heap do processo kernel. Alocadas em tempo de eecu��o.
-// @todo: 
-// Talvez n�o seja poss�vel mudar essa estrutura. �la � diferente.
-// Portanto n�o definiremos inada o tipo de objeto que ela � e nem a classe.
-
-// #bugbug
-// Don't change this structure,
+// Essa estrutura é para gerenciar áreas de memória 
+// alocadas dinamicamente dentro do heap do processo kernel. 
+// >>> Don't change this structure.
+// It has a fixed size.
 
 struct mmblock_d 
 {
 
 // #bugbug
 // Don't change this structure,
-
-    //object_type_t objectType;
-    //object_class_t objectClass;
 
 // Identificadores.
     unsigned long Header;      //Endere�o onde come�a o header do heap. *Importante.
@@ -558,59 +540,34 @@ struct mmblock_d
     unsigned long unusedBytes;   //Quantidade de bytes n�o usados na �rea do cliente.	
     unsigned long userareaSize;  //Tamanho da �rea reservada para o cliente. 
                                  //(request size + unused bytes). 
-
-//@todo: 
-//    Incluir quando poss�vel.
-// Lembrando que talvez o tamanho dessa estrutura seja fixo.
-// Talvez n�o mudaremos nada no tamanho dela.	
-    //struct heap_d *heap;
-
-//
-// User area
-//
-
-// (Onde come�a a �rea solicitada).
-//In�cio da �rea alocada.
+// User area.
+// Address where the allocated are starts.
     unsigned long userArea;
 
-
-//
 // Footer
-//
-
-//Endere�o do in�cio do footer.
+// The address where the footer starts.
     unsigned long Footer;
 
-//
-// Process
-//
+// Process ID.
+    pid_t pid;
 
-    //pid_t pid;  //#todo
-    int processId;  // pid
-    struct process_d  *process;
-
-
-// Continua ?? ... 
-// Talvez n�o pode.
-
-// IMPORTANTE: 
-// Talvez temos algum limite para o tamanho dessa estrutura em especial. 
-// Nao inluir nada por enquanto.
+// Thread pointer
+    struct thread_d  *thread;
 
 // Navigation
     struct mmblock_d *Prev;
     struct mmblock_d *Next;
 };
 
-struct mmblock_d *current_mmblock;
+struct mmblock_d  *current_mmblock;
 
-//Lista de blocos. 
-//lista de blocos de mem�ria dentro de um heap.
-//#todo: Na verdade temos que usar lista encadeada. 
+// Lista de blocos. 
+// Lista de blocos de memória dentro de um heap.
+// #todo: Na verdade temos que usar lista encadeada. 
 
 unsigned long mmblockList[MMBLOCK_COUNT_MAX];  
 
-
+// -----------------------------------
 
 // Estrutura para gerencia de página.
 struct page_d
@@ -1085,13 +1042,8 @@ mm_fill_page_table(
 
 int mmSetUpPaging (void);
 
-int init_heap (void);
-int init_stack (void);
 
 int mmInit(void);
-
-unsigned long heapAllocateMemory ( unsigned long size );
-void FreeHeap (void *ptr);
 
 // ============
 
@@ -1101,8 +1053,6 @@ void mmShowPML4EntryForAllProcesses (int entry_number);
 void showFreepagedMemory ( int max );
 void show_memory_structs (void);
 void testingPageAlloc (void);
-
-// ==
 
 int kernel_gc (void);
 

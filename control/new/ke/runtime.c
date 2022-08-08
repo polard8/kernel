@@ -1,5 +1,7 @@
 
 // runtime.c
+// System memory support:
+// Heap, stack, memory usage and frames.
 
 #include <kernel.h>
 

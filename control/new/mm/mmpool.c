@@ -81,7 +81,8 @@ fail:
 
 /*
  * newPage:
- * Aloca uma página e retorna seu endereço virtual inicial. 
+ * Aloca uma página em memoria compartilhada de ring3 
+ * e retorna seu endereço virtual inicial. 
  * Isso é feito com base no id do pageframe e no endereço virtual 
  * inicial do pool de pageframes.
  * Obs: 
