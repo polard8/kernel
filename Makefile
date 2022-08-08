@@ -59,7 +59,8 @@ clean
 
 # Giving permitions to run ./run
 	chmod 755 ./run
-
+	chmod 755 ./runkvm
+	
 # Product info:
 	@echo "$(PRODUCT_NAME) $(EDITION_NAME) $(KERNELVERSION)"
 #	@echo "$(ARCH)"
@@ -95,6 +96,12 @@ PHONY := run
 run: do_run
 do_run:
 	sh ./run
+
+
+PHONY := runkvm
+run: do_runkvm
+do_run:
+	sh ./runkvm
 
 
 #===================================================
@@ -342,6 +349,7 @@ usage:
 	@echo "make clean-all"
 	@echo "Testing on qemu:"
 	@echo "./run"
+	@echo "./runkvm"
 
 # End.
 
