@@ -157,7 +157,6 @@ int has_apic (void);
 void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
 
-void test_enable_lapic(void);
 
 #endif    //____APIC_H
 

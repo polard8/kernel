@@ -646,8 +646,6 @@ unsigned long kinput ( unsigned long ch );
 void printchar (char **str, int c);
 int putchar (int ch);
 
-//#test
-void putchar_K(void);
 
 //
 // == printf support ===================

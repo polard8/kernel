@@ -41,13 +41,6 @@ extern _system_state
 ; The function _go_to_kernel jumps here
 ; from head.s in BL.BIN.
 
-; Function table
-extern _die
-extern _putchar_K
-extern _hal_reboot
-;extern _kernel_gc
-; ...
-
 global _kernel_begin 
 _kernel_begin:
 
@@ -57,12 +50,6 @@ _kernel_begin:
     nop
     DB '__GRAMADO__'
 
-; Function table
-    DQ _die          ; 0
-    DQ _putchar_K    ; 1
-    DQ _hal_reboot   ; 2
-    ; ...
-    
 align 4
     %include "header.inc"
 align 4
@@ -2711,17 +2698,31 @@ align 8
 ; ========
 ; Esses includes são padronizados. Não acrescentar outros.
 
-
+;---------------------
+; unit 0
 ; Inicialização.
-; Funções de apoio à inicialização do Kernel.
-    %include "init1.asm" 
-    %include "init2.asm" 
+; Funções de apoio à inicialização do Kernel 32bit.
+    %include "unit0lib.asm" 
+
+;---------------------
+; unit 1
 ; Interrupções de hardware (irqs) e faults.
-    %include "hw1.asm"
-    %include "hw2.asm"
+    %include "unit1hw.asm"
+
+; unit 2 in C.
+
+; unit 3
+    %include "unit3hw.asm"
+
+;---------------------
+; unit 4
+    %include "unit4lib.asm" 
+
+;---------------------
+; visitor
 ; Interrupções de software.
-    %include "sw1.asm"
-    %include "sw2.asm"
+    %include "sw.asm"
+    %include "swlib.asm"
 
 
 ;===================================================

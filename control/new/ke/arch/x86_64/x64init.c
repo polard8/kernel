@@ -671,7 +671,6 @@ static int I_x64CreateKernelProcess(void)
     // This is the virtual address for the base of the image.
     // We are using the kernel pagetables for that.
     // #define EXTRAHEAP1_VA   0x0000000030A00000
-    // MOD0_IMAGE_VA
     // See: x64gva.h
 
     unsigned long ImageAddress =
@@ -848,8 +847,8 @@ static int I_x64CreateKernelProcess(void)
 
 // Put it into the list.
 // #todo: Change this name
-    m->id = KMODULE_MOD0;
-    kmList[KMODULE_MOD0] = (unsigned long) m;
+    m->id = KMODULE_WS;
+    kmList[KMODULE_WS] = (unsigned long) m;
 
 // Finalize the module structure.
     m->initialized = FALSE;

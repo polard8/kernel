@@ -4,37 +4,13 @@
 #include <kernel.h>
 
 
-// GLOBAL
-// ------
-// Process used by the console during the job control.
-// #hackhack: 
-// For now we are using the control thread associated with the
-// window with focus.
-// #todo
-// But we need to use the control thread of the foreground process
-// associated with the console TTY.
-pid_t foreground_process;
-// This is the process with the active thread.
-pid_t active_process;    
-// [Processing time]
-// Only these can read the keyboard input.
-// Sometime it's the terminal.
-// It's child will read into a file.
-// See: ps/process.c
-pid_t criticalsection_pid;
-// ------
-
-
 //
 // current pid
 //
 
-// PRIVATE
 static pid_t __current_pid = (pid_t) (-1);  //fail
+
 static pid_t caller_process_id=0;
-
-
-
 
 
 //

@@ -269,16 +269,19 @@ The remainder ??
     // Ainda não esgotou o tempo de processamento.
     if ( CurrentThread->runningCount < CurrentThread->quantum ){
 
-        // Yield in progress. 
-        // Esgota o quantum e ela saírá naturalmente
-        // no próximo tick.
-        // Revertemos a flag acionada em schedi.c.
-
         if ( CurrentThread->state == RUNNING && 
-             CurrentThread->yield_in_progress == TRUE )
+             CurrentThread->_yield == TRUE )
         {
+
+            // Retira a força.
+            //CurrentThread->state = READY;
+            //CurrentThread->_yield = FALSE;
+            //goto try_next;
+            
+            // Esgota o quantum e ela saírá naturalmente
+            // no próximo tick.
             CurrentThread->runningCount = CurrentThread->quantum;
-            CurrentThread->yield_in_progress = FALSE;
+            CurrentThread->_yield = FALSE;
         }
 
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);

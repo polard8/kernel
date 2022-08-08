@@ -418,7 +418,7 @@ int current_group;
 // Organização dos processos
 
 // ------
-// see: process.c
+
 // Process used by the console during the job control.
 // #hackhack: 
 // For now we are using the control thread associated with the
@@ -426,29 +426,38 @@ int current_group;
 // #todo
 // But we need to use the control thread of the foreground process
 // associated with the console TTY.
-extern pid_t foreground_process;
-// This is the process with the active thread.
-extern pid_t active_process;    
+pid_t foreground_process;
+
 // [Processing time]
 // Only these can read the keyboard input.
 // Sometime it's the terminal.
 // It's child will read into a file.
 // See: ps/process.c
-extern pid_t criticalsection_pid;
+// pid_t current_process;   // Currently having the processing time.
+int criticalsection_pid;
+
+// [Focus]
+pid_t active_process;    // This is the process with the active thread.
+
 // ------
 
-
-// ------
 // See: ps/thread.c
-extern tid_t current_thread;     // Currently having the processing time.
-extern tid_t foreground_thread;  // Input thread.
-extern tid_t active_thread;      // This thread will receive the input.
-extern tid_t next_thread;        // next user mode thread.
+//extern int current_thread;    // Currently having the processing time.
+extern tid_t current_thread;    // Currently having the processing time.
+
+int foreground_thread;
+
+int active_thread;     // This thread will receive the input.
+
+//[Scheduler]
+int next_thread;     //next user mode thread.
+
 // ------
 
 
 // Current runlevel. Used in init process.
 int current_runlevel;
+
 
 // Organização dos discos.
 int current_disk;
@@ -678,7 +687,7 @@ struct kernel_module_d
 };
 
 
-#define KMODULE_MOD0  0   // first of the list.
+#define KMODULE_WS    0   // first of the list.
 #define KMODULE_MAX   8
 
 unsigned long kmList[KMODULE_MAX];

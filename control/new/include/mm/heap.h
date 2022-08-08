@@ -1,6 +1,4 @@
 
-// heap.h
-
 #ifndef  __HEAP_H
 #define  __HEAP_H    1
 
@@ -68,15 +66,16 @@ struct heap_d
 	//unsigned long freeBlocks[32];
 	//unsigned long Blocks[64];
 
-// Um heap pertence à um desktop.
+	//Um heap pertence à um desktop.
     struct desktop_d *desktop;
-
-// Um heap pertence à um processo.
+	
+	//Um heap pertence à um processo.
     struct process_d *process;
-
-// Um heap pode pertencer à um thread.
+	
+	//Um heap pode pertencer à um thread.
     struct thread_d *thread;
-
+	
+	//
 	// Compartilhamento de heap:
 	// ========================
 	//   + As threads de um mesmo processo podem compartilhar o mesmo heap
@@ -84,7 +83,8 @@ struct heap_d
 	//   + @todo: O desafio é fazer os processes que estão no mesmo desktop
 	//            compartilharem o mesmo heap, porque eles deveriam estar
 	//            na mesma área de memória para isso. 
-
+	//
+	
 	
     //
 	// Podemos criar aqui flags de porteção.
@@ -121,9 +121,6 @@ struct heap_d *memory_create_new_head (
 
 // #todo
 void memory_destroy_heap (struct heap_d *heap);
-
-unsigned long heapAllocateMemory ( unsigned long size );
-void FreeHeap (void *ptr);
 
 
 #endif    

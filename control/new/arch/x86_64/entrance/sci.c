@@ -19,6 +19,8 @@ unsigned long sci1_cpl=0;
 unsigned long sci2_cpl=0;
 
 
+
+
 //
 // == private functions: prototypes =============
 //
@@ -2255,7 +2257,7 @@ void *sci2 (
     // ...    
 
 // yield 
-// See: ps/sched/schedi.c
+// See: schedi.c
 // Set a flag that this thread will be preempted.
 
     if (number == 265){

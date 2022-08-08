@@ -1589,10 +1589,11 @@ static void __initialize_heappool(void)
 }
 
 
-
+// local worker
 // ====================================================================
-// 2mb, ring0, start = 0x30A00000.
 // Ring 0 kernel module. MOD0.BIN.
+// This is the core of the 'presentation tier'.
+// Extra heap used by the ring 3 init process.
 // See: x64init.c When we setup the Heap pointer.
 // InitProcess->Heap = (unsigned long) g_extraheap1_va; :)
 // 2048 KB = (2 MB).
@@ -1618,6 +1619,13 @@ static void __initialize_extraheap1(void)
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
 
+    //mm_fill_page_table( 
+    //    (unsigned long) &kernel_pd0[0],        // pd 
+    //    (int) PD_ENTRY_EXTRAHEAP1,             // entry
+    //    (unsigned long) &pt_extraheap1[0],     // pt
+    //    (unsigned long) SMALL_extraheap1_pa,   // region base
+    //    (unsigned long) 3 );                   // flags
+
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,          // pd 
         (int) PD_ENTRY_EXTRAHEAP1,             // entry
@@ -1628,8 +1636,6 @@ static void __initialize_extraheap1(void)
     g_extraheap1_initialized = TRUE;
 }
 
-
-// 2mb, ring0, start = 0x30C00000.
 // local worker
 // is it free yet?
 static void __initialize_extraheap2(void)
@@ -1650,18 +1656,25 @@ static void __initialize_extraheap2(void)
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
 
+    //mm_fill_page_table( 
+    //  (unsigned long) &kernel_pd0[0],       // pd 
+    //  (int) PD_ENTRY_EXTRAHEAP2,            // entry
+    //  (unsigned long) &pt_extraheap2[0],    // pt
+    //  (unsigned long) SMALL_extraheap2_pa,  // region base
+    //  (unsigned long) 3 );                  // flags
+
     mm_fill_page_table( 
       (unsigned long) KERNEL_PD_PA,          // pd 
-      (int) PD_ENTRY_EXTRAHEAP2,             // entry
-      (unsigned long) &pt_extraheap2[0],     // pt
-      (unsigned long) extraheap2_pa,         // region base
+      (int) PD_ENTRY_EXTRAHEAP2,            // entry
+      (unsigned long) &pt_extraheap2[0],    // pt
+      (unsigned long) extraheap2_pa,  // region base
       (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 
     g_extraheap2_initialized = TRUE;
 }
 
 
-// 2mb, ring3, start = 0x30E00000.
+// local worker
 // is it free yet?
 static void __initialize_extraheap3(void)
 {
@@ -1707,7 +1720,6 @@ static void mmInitializeKernelPageTables(void)
 // kernel pae directory 0.
 
     //debug_print ("mmInitializeKernelPageTables:\n");
-
 
 // Entry 0   | va=0          | Ring 0 area.
     __initialize_ring0area();
@@ -2013,8 +2025,8 @@ fail:
 
 void pages_print_info(int system_type)
 {
-    switch(system_type){
-
+    switch(system_type)
+    {
     case stSmallSystem:
             printf("Origin:            %xH \n", SMALL_origin_pa );
             printf("Base kernel start: %xH \n", SMALL_kernel_base_pa );

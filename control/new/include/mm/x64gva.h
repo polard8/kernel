@@ -76,15 +76,12 @@
 #define EXTRAHEAP2_VA   0x0000000030C00000  // ?
 #define EXTRAHEAP3_VA   0x0000000030E00000  // ?
 
-
-//alias
-#define MOD0_IMAGE_VA       EXTRAHEAP1_VA
-#define MOD0_ENTRYPOINT_VA  0x0000000030A01000
-
-
 //#test
 #define LAPIC_VA   0x0000000031000000
 
+//alias
+#define WS_IMAGE_VA       EXTRAHEAP1_VA
+#define WS_ENTRYPOINT_VA  0x0000000030A01000
 
 
 // The start of the kernel image virtual address.
@@ -99,12 +96,6 @@
 //
 // heap and stack  (va)
 //
-
-// #obs:
-// Estamos usando uma área dentro dos 2MB alocados
-// pelo boot loader para o kernel.
-// No momento da configuração do heap e da stack
-// ainda estamos usando o mapeamento feito pelo boot loader. 
 
 // heap
 #define KERNEL_HEAP_START  0x30100000 
