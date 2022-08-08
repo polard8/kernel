@@ -10,6 +10,7 @@
 
 void *create_tid0(void)
 {
+/*
     struct thread_d  *kThread;
     int TID = (int)(TID0_TID & 0xFFFF);
 
@@ -328,6 +329,8 @@ void *create_tid0(void)
     //debug_print ("create_tid0: done\n");
 
     return (void *) kThread;
+*/
+    return NULL;
 }
 
 
@@ -350,7 +353,9 @@ void *create_tid2 (void)
 void *create_tid3 (void)
 {
     struct thread_d  *t;
-    int TID = (int)(INIT_TID & 0xFFFF);
+    //int TID = (int)(INIT_TID & 0xFFFF);
+
+    int TID = 0;   //FIRST THREAD.
 
     // loops
     register int r=0;    // Wait reason.
@@ -647,8 +652,12 @@ void *create_tid3 (void)
 // A cria��o da thread idle vai inicializar o contador,
 // para depois s� incrementarmos.
 
-    UPProcessorBlock.threads_counter++;
-    //ProcessorBlock.threads_counter = (int) 1;
+    //UPProcessorBlock.threads_counter++;
+    UPProcessorBlock.threads_counter = (int) 1;  //primeira thread
+
+
+    ____IDLE = (struct thread_d *) t;
+    UPProcessorBlock.IdleThread = (struct thread_d *) ____IDLE;
 
 //
 // == Queue =====================================

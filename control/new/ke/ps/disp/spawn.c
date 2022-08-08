@@ -153,8 +153,8 @@ void spawn_thread(int tid)
 // Linked list
 // The next thread will be the window server.
 
-    target_thread->next = (void *) tid0_thread; 
-
+    //target_thread->next = (void *) tid0_thread; 
+    target_thread->next = (void *) InitThread; 
 //
 // MOVEMENT 2 (Standby --> Running).
 //
@@ -275,10 +275,20 @@ void spawn_thread(int tid)
 // cpl
 //
 
-    if(target_thread->cpl != RING0 && target_thread->cpl != RING3)
+/*
+    if( target_thread->cpl != RING0 && 
+        target_thread->cpl != RING3)
     {
         panic("spawn_thread: Invalid cpl\n");
     }
+*/
+
+    if( target_thread->cpl != RING3)
+    {
+        debug_print ("spawn_thread: Invalid cpl\n");
+        panic       ("spawn_thread: Invalid cpl\n");
+    }
+
 
 // ===================
 // ring 0

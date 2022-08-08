@@ -97,6 +97,8 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // The idle thread is the current thread of the
 // first ring0 module. MOD0.BIN.
 
+    //____IDLE = InitThread;
+
     if ( (void*) ____IDLE == NULL ){
         panic ("__scheduler_rr: ____IDLE\n");
     }
@@ -168,8 +170,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
             // se não for a idle thread nem a init thread.
             if (TmpThread->exit_in_progress == TRUE)
             {
-                if (TmpThread != ____IDLE &&
-                    TmpThread != InitThread)
+                if (TmpThread != ____IDLE)
                 {
                     // não sera mais selecionada pelo scheduler.
                     // O dead thred collector pode terminar de deleta

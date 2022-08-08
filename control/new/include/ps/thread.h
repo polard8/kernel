@@ -803,7 +803,9 @@ struct thread_d
 
 // See: thread.c
 extern struct thread_d  *____IDLE;
-extern struct thread_d  *tid0_thread;
+
+//extern struct thread_d  *tid0_thread;
+
 extern struct thread_d  *InitThread;
 extern struct thread_d  *ClonedThread;
 

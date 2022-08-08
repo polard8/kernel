@@ -254,8 +254,8 @@ static int I_x64CreateInitialProcess(void)
         return FALSE;
     }
 
-// tid
-    if ( InitThread->tid != INIT_TID ){
+// tid : tem que ser a primeira thread
+    if ( InitThread->tid != 0 ){
         printf ("I_x64CreateInitialProcess: INIT_TID\n");
         return FALSE;
     }
@@ -437,8 +437,8 @@ void I_x64ExecuteInitialProcess (void)
 // Isso deve ser liberado pelo processo init
 // depois que ele habilitar as interrupções.
     
-    taskswitch_lock();
-    scheduler_lock();
+    //taskswitch_lock();
+    //scheduler_lock();
 
 // timer.
 
@@ -792,12 +792,13 @@ static int I_x64CreateKernelProcess(void)
 // This is the control thread for the 
 // window server image.
 
+    /*
     Status = I_x64CreateTID0();
-
     if ( Status != TRUE ){
         printf("Couldn't Create the WS thread\n");
         return FALSE;
     }
+    */
 
 // ====================
 // Initialize the kernel module list.
@@ -839,10 +840,10 @@ static int I_x64CreateKernelProcess(void)
 // See:
 // I_x64CreateWSControlThread()
 
-    m->thread = (struct thread_d *) tid0_thread;
+    //m->thread = (struct thread_d *) tid0_thread;
 
 // info
-    m->info.entry_point = (unsigned long) tid0_thread->initial_rip;
+    //m->info.entry_point = (unsigned long) tid0_thread->initial_rip;
     m->info.dialog_address = 0;
     m->info.function_table_address = 0;
 
@@ -864,6 +865,7 @@ static int I_x64CreateKernelProcess(void)
 // It belongs to the kernel process.
 static int I_x64CreateTID0(void)
 {
+/*
     //debug_print ("I_x64CreateTID0:\n");
 
 // Thread
@@ -952,6 +954,7 @@ static int I_x64CreateTID0(void)
         KernelProcess->control = (struct thread_d *) ____IDLE;
     }
 
+*/
     return TRUE;
 }
 

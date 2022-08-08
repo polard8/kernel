@@ -22,9 +22,11 @@ tid_t next_thread=0;       // next user mode thread.
 // Cada idle thread pode prestar um serviço diferente, como o
 // gerenciamento de energia.
 struct thread_d  *____IDLE;
+
 // The control thread of the window sever kernel module.
 // The ring 0 thread. tid0
-struct thread_d  *tid0_thread;
+//struct thread_d  *tid0_thread;
+
 // Essa é a thread de controle do processo init2.bin
 // É o primeiro processo em ring3.
 // Idle Thread. TID=0    
