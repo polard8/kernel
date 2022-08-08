@@ -14,7 +14,13 @@
 // hwi/dd/nhid/arch/x86/apic.c
 // https://wiki.osdev.org/Symmetric_Multiprocessing
 // https://www.cheesecake.org/sac/smp.html
+// https://wiki.osdev.org/APIC
 
+// see: I/O APIC (e.g. intel 82093AA) 
+
+// eoi: 
+// Write to the register with offset 0xB0 using the value 0 
+// to signal an end of interrupt.
 
 #include <kernel.h>
 
@@ -46,6 +52,33 @@ void flush_cashes(void)
 
 
 //@todo: definir porta 70h usada nesse arquivo.
+
+/*
+// #todo
+void disable_pic(void);
+void disable_pic(void) 
+{
+    //Set ICW1 
+    outb(0x20, 0x11);
+    outb(0xa0, 0x11);
+
+    // Set ICW2 (IRQ base offsets) 
+    outb(0x21, 0xe0);
+    outb(0xa1, 0xe8);
+
+    // Set ICW3 
+    outb(0x21, 4);
+    outb(0xa1, 2);
+
+    // Set ICW4 
+    outb(0x21, 1);
+    outb(0xa1, 1);
+
+    // Set OCW1 (interrupt masks) 
+    outb(0x21, 0xff);
+    outb(0xa1, 0xff);
+}
+*/
 
 
 
@@ -124,7 +157,7 @@ static inline void imcr_apic_to_pic (void)
 // =================
 
 
-
+// called by smp_probe() in x64.c
 void lapic_initializing(unsigned long lapic_pa)
 {
     printf("lapic_initializing: \n");
@@ -192,6 +225,10 @@ void lapic_initializing(unsigned long lapic_pa)
     printf("localversion: %xH\n", (localversion & 0xFF));
 
     LAPIC.initialized = TRUE;
+    
+    //#debug
+    //refresh_screen();
+    //while(1){}
 }
 
 
@@ -278,6 +315,15 @@ unsigned long cpu_get_apic_base (void)
 */
 
     return (unsigned long) (eax & 0xfffff000);
+}
+
+
+
+
+void test_enable_lapic(void)
+{
+    //write_reg (0xF0, ReadRegister(0xF0) | 0x100);
+    local_apic_write_command (0xF0, local_apic_read_command(0xF0) | 0x1FF);
 }
 
 

@@ -1040,11 +1040,13 @@ void smp_probe(void)
     {
         e = (struct entry_processor *) entry_base;
         
-        if(e->type != 0)
+        //ultima
+        if (e->type != 0)
         {
-            printf("#test: Not a processor entry\n");
-            refresh_screen();
-            return;
+            printf("#test: Not a processor entry or end of list\n");
+            goto done;
+            //refresh_screen();
+            //return;
         }
 
         printf("local_apic_id %d\n",e->local_apic_id);
@@ -1066,8 +1068,19 @@ void smp_probe(void)
         entry_base = (unsigned long) (entry_base + 20);
     };
 
+
+
+done:
+    
+    // #danger: Isso pode fazer as interrupçoes
+    // de lapic começarem.
+    //test_enable_lapic();
+
     printf("smp_probe: done\n");
-    refresh_screen();
+    
+    //#debug
+    //refresh_screen();
+    //while(1){};
 }
 
 

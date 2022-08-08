@@ -626,6 +626,11 @@ setup_vectors:
     call _setup_system_interrupt  
 
 
+    ; lapic spurius
+    ;mov rax,  qword _int255
+    ;mov rbx,  qword 255
+    ;call _setup_system_interrupt  
+
     ;; ...
 
     pop rbx
