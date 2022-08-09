@@ -129,22 +129,26 @@ __local_gotoxy (
     int new_y, 
     int console_number )
 {
-
-// #todo: max limit.
-
-    if (console_number<0){
-        return;
-    }
-
-    if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
+    if (console_number<0 || console_number > 3)
     {
         return;
     }
 
-    if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
+// Maior que o largura da linha.
+    //if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
+    if ( new_x > CONSOLE_TTYS[console_number].cursor_right)
     {
         return;
     }
+
+// Maior que a altura da coluna.
+    //if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
+    if ( new_y > CONSOLE_TTYS[console_number].cursor_bottom)
+    {
+        return;
+    }
+
+// Set
 
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (new_x & 0xFFFFFFFF);
@@ -160,37 +164,42 @@ void __local_save_cur (int console_number)
 
 void __local_restore_cur (int console_number)
 {
-//#todo: max limit
-    if(console_number<0){
+    if (console_number<0 || console_number >3)
+    {
         return;
     }
-    CONSOLE_TTYS[console_number].cursor_x = (unsigned long) (saved_x & 0xFFFF);
-    CONSOLE_TTYS[console_number].cursor_y = (unsigned long) (saved_y & 0xFFFF);
-}
 
+    CONSOLE_TTYS[console_number].cursor_x = 
+        (unsigned long) (saved_x & 0xFFFF);
+
+    CONSOLE_TTYS[console_number].cursor_y = 
+        (unsigned long) (saved_y & 0xFFFF);
+}
 
 void __local_insert_line (int console_number)
 {
     int oldtop    = 0;
     int oldbottom = 0;
 
-    if(console_number<0){
+    if (console_number<0 || console_number >3)
+    {
         return;
     }
-
 
     oldtop    = CONSOLE_TTYS[console_number].cursor_top;
     oldbottom = CONSOLE_TTYS[console_number].cursor_bottom;
 
-    CONSOLE_TTYS[console_number].cursor_top = CONSOLE_TTYS[console_number].cursor_y;
-    
+    CONSOLE_TTYS[console_number].cursor_top = 
+        CONSOLE_TTYS[console_number].cursor_y;
+
     //#bugbug: apontando par asi mesmo.
     //CONSOLE[console_number].cursor_bottom = CONSOLE[console_number].cursor_bottom;
 
     //if (console_number<0)
         //return;
 
-    if( CONSOLE_TTYS[console_number].fullscreen_flag == TRUE ){
+    if( CONSOLE_TTYS[console_number].fullscreen_flag == TRUE )
+    {
         console_scroll(console_number);
     }
 
@@ -452,6 +461,7 @@ void console_init_virtual_console (int n)
 // Limits
 
     ConsoleIndex = (int) n;
+
     if ( ConsoleIndex < 0 || 
          ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
     {
@@ -545,23 +555,21 @@ void console_init_virtual_console (int n)
     //CONSOLE_TTYS[ConsoleIndex]._cbuffer = (file *) 0;
     //CONSOLE_TTYS[ConsoleIndex]._obuffer = (file *) 0;
 
-
-    // cursor dimentions in pixel.
-    // #bugbug: determinado
+// Cursor dimentions in pixel.
+// #bugbug: determinado
     CONSOLE_TTYS[ConsoleIndex].cursor_width_in_pixels = 8; 
     CONSOLE_TTYS[ConsoleIndex].cursor_height_in_pixels = 8;
 
-    //cursor position in chars.
+// Cursor position in chars.
     CONSOLE_TTYS[ConsoleIndex].cursor_x = 0;
     CONSOLE_TTYS[ConsoleIndex].cursor_y = 0;
 
-    
-// cursor limits
+// Cursor limits
 
-
-// #todo: 8 = char size.
-    unsigned long screen_width_in_chars  = (gSavedX/8);
-    unsigned long screen_height_in_chars = (gSavedY/8);
+// #todo #bugbug
+// determinado: 8 = char size.
+    unsigned long screen_width_in_chars  = (unsigned long) (gSavedX/8);
+    unsigned long screen_height_in_chars = (unsigned long) (gSavedY/8);
 
 // Full screen
     CONSOLE_TTYS[ConsoleIndex].fullscreen_flag = TRUE;
@@ -575,6 +583,7 @@ void console_init_virtual_console (int n)
     CONSOLE_TTYS[ConsoleIndex].bg_color = COLOR_BLUE;
     CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_WHITE;
 
+// Default colors.
 // A different color for each console number.
     if (ConsoleIndex == 0){
         CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_WHITE; 
@@ -595,33 +604,26 @@ void console_init_virtual_console (int n)
     //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
 
 
-    //#todo
-    // Local mode flags.
     CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
-
 
     //CONSOLE_TTYS[ConsoleIndex].vc_mode = 0;
 
-    // #bugbug
-    // A estrutura tem mais elementos que podem ser inicializados.
-    // Tivemos problemas ao tentar inicializa-los.
+// #bugbug
+// A estrutura tem mais elementos que podem ser inicializados.
+// Tivemos problemas ao tentar inicializa-los.
 
-    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE;
-    
-    //if ( CONSOLE_TTYS[ConsoleIndex].initialized != TRUE )
-        //x_panic("FUCK");
-    
+    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE;    
 }
-
 
 void console_set_current_virtual_console (int n)
 {
-    if ( n < 0 || n >= 4 ){
+    if ( n < 0 || n >= 4 )
+    {
         debug_print ("console_set_current_virtual_console: Limits\n");
         return;
     }
 
-    fg_console = n;
+    fg_console = (int) n;
 }
 
 
@@ -2320,9 +2322,9 @@ console_ioctl (
         return (int) (-EBADF);
     }
 
-    // #todo: Check overflow
-    if (fg_console<0){
-        debug_print ("console_ioctl: [ERROR] fg_console\n");
+    if (fg_console<0 || fg_console > 3)
+    {
+        debug_print ("console_ioctl: fg_console\n");
         return -1;
     }
 
@@ -2478,23 +2480,19 @@ void REFRESH_STREAM ( file *f )
 }
 
 
-// kclear:
-//     Clear console.
-// #todo: change the name of the function.
-
+// Clear console.
 int clear_console (unsigned int color, int console_number)
 {
-
-// #todo: max limit.
-    if (console_number<0){
+    if ( VideoBlock.useGui != TRUE ){
         return -1;
     }
-    if ( VideoBlock.useGui != TRUE ){
+    if (console_number<0 || console_number > 3){
         return -1;
     }
     backgroundDraw (color);
     CONSOLE_TTYS[console_number].cursor_x = 0;
     CONSOLE_TTYS[console_number].cursor_y = 0;
+
     return 0;
 }
 

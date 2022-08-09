@@ -4,335 +4,11 @@
 #include <kernel.h>  
 
 
-// create_tid0:
-//     ring0 - The idle thread.
 // 0x0000000030A00000
-
 void *create_tid0(void)
 {
-/*
-    struct thread_d  *kThread;
-    int TID = (int)(TID0_TID & 0xFFFF);
-
-    // loops
-    register int r=0;    // Wait reason.
-    register int i=0;    // Message queue.
-    register int q=0;    // Message queue.
-
-    char *ThreadName = "tid0-thread";
-
-    // Stack pointer.
-    void *earlyRing0IdleStack; 
-
-
-    debug_print ("create_tid0:\n");
-
-
-    //debug_print ("[1]\n");
-    // The kernel process.
-    if ( (void *) KernelProcess == NULL )
-    {
-        debug_print ("create_tid0: KernelProcess\n");
-        panic       ("create_tid0: KernelProcess\n");
-    }
-
-    // ??
-    // e a validade da estrutura de processo? 
-
-
-    // Struct.
-    // Começamos a inicializaçao da estrtutura.
-
-    //debug_print ("[2]\n");
-
-    kThread = (void *) kmalloc ( sizeof(struct thread_d) );
-
-    if ( (void *) kThread == NULL ){
-        debug_print ("create_tid0: kThread\n");
-        panic       ("create_tid0: kThread\n");
-    }
-
-    kThread->objectType  = ObjectTypeThread;
-    kThread->objectClass = ObjectClassKernelObjects;
-    kThread->personality = (int) PERSONALITY_GRAMADO;
-
-    kThread->exit_in_progress = FALSE;
-
-// Priorities
-// This is a ring0 thread, only used for sti/hlt.
-// Maybe it is gonna be a idle thread to manage the energy.
-// The idle thread has low priority.
-// #bugbug: for now it is a thread for the first module.
-
-    kThread->type = THREAD_TYPE_SYSTEM; 
-    kThread->base_priority = PRIORITY_SYSTEM;  // Static
-    kThread->priority      = PRIORITY_SYSTEM;  // Dynamic
-    // #todo
-    // #important
-    // This will affect the input model
-
-//
-// Input
-//
-
- // #suspenso. Vamos usar as flags em 't->input_flags'
-    //kThread->input_model = THREAD_INPUTMODEL_KERNEL;
-
-    kThread->input_flags = 
-        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
-
-
-// TID
-
-    kThread->tid = TID;
-
-    // #bugbug: 
-    // Is this a valid pointer?
-    // is this a valid pid?
-    kThread->ownerPID     = (int) KernelProcess->pid;
-
-    kThread->name_address = (unsigned long) ThreadName; 
-    kThread->process      = (void *) KernelProcess;
-
-    kThread->surface_rect = NULL;
-
-    kThread->state = INITIALIZED; 
-
-
-    kThread->plane = BACKGROUND_THREAD;    
-
-    // ...
-
-// Stack.
-// #bugbug
-// estamos alocando uma stack dentro do heap do kernel.
-// nesse caso serve para a thread idle em ring 0.
-// 8KB
-
-    //debug_print ("[3]\n");
-
-    int StackSize = (int) (8*1024);
-
-    earlyRing0IdleStack = (void *) kmalloc (StackSize);
-
-    if ( (void *) earlyRing0IdleStack == NULL ){
-        debug_print ("create_tid0: earlyRing0IdleStack\n");
-        panic       ("create_tid0: earlyRing0IdleStack\n");
-    }
-
-    // #todo
-    // Clear stack
-
-    // Page Directory
-    //kThread->DirectoryPA = (unsigned long ) KernelProcess->DirectoryPA;
-    //if ( kThread->DirectoryPA == 0 ){
-    //    panic("create_CreateEarlyRing0IdleThread: kThread->DirectoryPA\n");
-    //}
-
-    //debug_print ("[4]\n");
-
-    // pml4 physical address
-    kThread->pml4_PA = (unsigned long ) KernelProcess->pml4_PA;
-    if ( kThread->pml4_PA == 0 ){
-        debug_print ("create_tid0: kThread->pml4_PA\n");
-        panic       ("create_tid0: kThread->pml4_PA\n");
-    }
-
-// Clean the 'wait reason'.
-    for ( r=0; r<8; ++r ){ kThread->wait_reason[r] = (int) 0; };
-
-//
-// == message support =============
-//
-
-// #todo
-// podemos criar um metodo worker
-// para essa rotina abaixo.
-
-// ===========================================================
-// Message queue.
-    for ( q=0; q<32; ++q ){ kThread->MsgQueue[q] = 0; }
-    kThread->MsgQueueHead = 0;
-    kThread->MsgQueueTail = 0;
-
-
-// Allocate memory for all the 32 structure.
-// Add the pointers in the list.
-
-    struct msg_d *tmp;
-
-    for ( i=0; i<32; ++i )
-    {
-        tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
-        if ( (void*) tmp == NULL ){
-            debug_print("create_tid0: tmp\n");
-            panic      ("create_tid0: tmp\n");
-        }
-        tmp->window = NULL;
-        tmp->msg = 0;
-        tmp->long1 = 0;
-        tmp->long2 = 0;
-        tmp->long3 = 0;
-        tmp->long4 = 0;
-        tmp->used = TRUE;
-        tmp->magic = 1234;
-        kThread->MsgQueue[i] = (unsigned long) tmp;
-    };
-
-// =================================================
-
-// Pode sofrer preempção por tempo.
-    kThread->is_preemptable = PREEMPTABLE;
-
-// Temporizadores.
-// Counters
-
-    kThread->step = 0;
-
-    kThread->quantum           = QUANTUM_MIN;
-    kThread->quantum_limit_min = QUANTUM_MIN;
-    kThread->quantum_limit_max = QUANTUM_MAX;
-    
-    kThread->standbyCount = 0;
-
-    kThread->runningCount = 0;
-    kThread->runningCount_ms = 0;
-
-    kThread->readyCount  = 0;
-    kThread->ready_limit = QUANTUM_MAX;
-
-    kThread->waitingCount  = 0;
-    kThread->waiting_limit = QUANTUM_MAX;
-
-    kThread->blockedCount  = 0;
-    kThread->blocked_limit = QUANTUM_MAX;
-
-    kThread->ticks_remaining = 1000;
-
-    kThread->initial_time_ms = get_systime_ms();
-    kThread->total_time_ms = 0;
-
-// Unix signal support.
-    kThread->signal = 0;
-    kThread->umask = 0;
-
-// #obs: 
-// Essa parte eh dependente da arquitetura, 
-// deveria estar em uma pasta, por exemplo, x86/.
-    // if(MachineType == i386Type){...};
-    //
-
-// x86_64 Context:
-// Isso deve ir para uma estrutura de contexto.
-// Obs: rflags 0x0202.
-// Queremos que esse thread rode em ring0.
-// WS_ENTRYPOINT_VA
-
-// cpl and iopl
-// default iopl for threads in ring 0.
-// 0x0202
-    kThread->cpl = (unsigned int) RING0;
-    kThread->rflags_initial_iopl = (unsigned int) 0;
-    kThread->rflags_current_iopl = (unsigned int) 0;
-
-// Stack frame
-// see: extraheap1
-    kThread->ss     = 0x10 | 0; 
-    kThread->rsp    = (unsigned long) ( earlyRing0IdleStack + (8*1024) );  //Stack
-    kThread->rflags = 0x0202;
-    kThread->cs     = 0x8 | 0; 
-    kThread->rip    = (unsigned long) 0x30A01000; //MOD0_ENTRYPOINT_VA 
-
-    kThread->initial_rip = (unsigned long) kThread->rip; 
-
-    kThread->ds = 0x10 | 0;
-    kThread->es = 0x10 | 0;
-    kThread->fs = 0x10 | 0;
-    kThread->gs = 0x10 | 0;
-    
-    kThread->rax = 0;
-    kThread->rbx = 0;
-    kThread->rcx = 0;
-    kThread->rdx = 0;
-
-    kThread->rsi = 0;
-    kThread->rdi = 0;
-    kThread->rbp = 0;
-    // ...
-
-    kThread->r8 = 0;
-    kThread->r9 = 0;
-    kThread->r10 = 0;
-    kThread->r11 = 0;
-    kThread->r12 = 0;
-    kThread->r13 = 0;
-    kThread->r14 = 0;
-    kThread->r15 = 0;
-
-    kThread->saved = FALSE;
-
-	//#bugbug
-	//Obs: As estruturas precisam já estar decidamente inicializadas.
-	//kThread->root = (struct _iobuf *) file_root;
-	//kThread->pwd  = (struct _iobuf *) file_pwd;	
-
-	//CPU stuffs.
-	//kThread->cpuID = 0;              //Qual processador.
-	//kThread->confined = 1;           //Flag, confinado ou não.
-	//kThread->CurrentProcessor = 0;   //Qual processador.
-	//kThread->NextProcessor = 0;      //Próximo processador. 
-
-    kThread->next = NULL;
-
-    // Coloca na lista de estruturas.
-    threadList[TID] = (unsigned long) kThread;
-
-//
-// == counter =================================
-//
-
-// #bugbug
-// Se deixarmos de criar alguma das threads esse contador falha.
-// #todo: Deveríamos apenas incrementá-lo.
-
-    UPProcessorBlock.threads_counter++;
-
-// This function is wrong .... 
-// Maybe it is putting values outside the vector.
-
-    //debug_print ("create_tid0: [FIXME] Overflow in queue_insert_data() \n");
-
-
-//
-// #bugbug      OVERFLOW !!!!!
-//
-    
-    //queue_insert_data ( 
-    //    queue, 
-    //    (unsigned long) kThread, 
-    //    QUEUE_INITIALIZED );
-
-    //debug_print ("[5]\n");
-
-    kThread->used = TRUE;
-    kThread->magic = 1234;
-
-// Select for execution.
-// #todo
-// This method really need a prefix.
-// With this movement, this thread is gonna run in the next
-// task switch.
-// :::: MOVEMENT 1 (Initialized --> Standby).
-
-    SelectForExecution(kThread); 
-
-    //debug_print ("create_tid0: done\n");
-
-    return (void *) kThread;
-*/
     return NULL;
 }
-
 
 // 0x0000000030C00000
 void *create_tid1 (void)
@@ -638,7 +314,7 @@ void *create_tid3 (void)
 // #todo
 // We can use a method in the scheduler for this.
 
-    rootConductor = (struct thread_d *) t;
+    //rootConductor = (struct thread_d *) t;
 
 // counter
 // #importante
@@ -652,18 +328,24 @@ void *create_tid3 (void)
 // A cria��o da thread idle vai inicializar o contador,
 // para depois s� incrementarmos.
 
-    //UPProcessorBlock.threads_counter++;
-    UPProcessorBlock.threads_counter = (int) 1;  //primeira thread
 
+// Usado pelo scheduler.
+// See: sched.c
+    Conductor = (struct thread_d *) t;
 
-    ____IDLE = (struct thread_d *) t;
-    UPProcessorBlock.IdleThread = (struct thread_d *) ____IDLE;
+// The Idle thread for this processor.
+    UPProcessorBlock.IdleThread = (struct thread_d *) t;
+
+// The Next thread for this processor.
+    UPProcessorBlock.NextThread = (struct thread_d *) t;
+
+// The thread counter for this processor.
+// This is the first thread.
+    UPProcessorBlock.threads_counter = (int) 1; // :)
 
 //
 // == Queue =====================================
 //
-
-    //debug_print ("create_CreateRing3InitThread: [FIXME] Overflow\n");
  
     // #bugbug
 	// N�o h� a necessidade de colocar na fila de inicializadas

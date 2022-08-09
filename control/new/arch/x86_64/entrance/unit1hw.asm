@@ -532,20 +532,20 @@ _irq7:
     push gs
 
 
-    ;; ++
-    ;; ================================================
-    ;; #test
-    ;; Testing the spurious interrupt management.
+; ++
+; ================================================
+; #test
+; Testing the spurious interrupt management.
 
     xor rax, rax
     mov  al, 03h                ; PIC.OCW3 set function to read ISR (In Service Register)
     out  23h, al                ; write to PIC.OCW3 master
     in   al, 20h                ; read ISR master.
-    test al, 80h                           ; if the in-service register does not have IR7 bit set
-    jz short _NotParallelPort  ; this would be a spurious interrupt.
+    test al, 80h                ; if the in-service register does not have IR7 bit set
+    jz short ExitParallelPort_WithoutEOI   ; this would be a spurious interrupt.
 
-    ;; ================================================
-    ;; --
+; ================================================
+; --
 
 ;; Not spurious
 ;; So this is a norma parallel por interrupt.
@@ -553,7 +553,7 @@ _irq7:
     ;call _first_parallel_port_Handler
 
 ; EOI. Master. for parallel port
-_eoiForParallelPort:
+ExitParallelPort_WithEOI:
 
     ;xor rax, rax
     mov al, 0x20
@@ -561,7 +561,7 @@ _eoiForParallelPort:
     IODELAY  
 
 ; No eoi for irq 7 spurious
-_NotParallelPort:
+ExitParallelPort_WithoutEOI:
   
     ;popad
     pop gs
@@ -1396,13 +1396,15 @@ unhandled_irq:
 ;--
 
 
-align 8
 
 ;----------------------------
-
 ; Building trampolines for the faults.
 
-; int 0 
+align 8
+
+; int 0
+; Se ocorrer em ring 0 o sistema tem que terminar,
+; e se for em ring3, fechamos o aplicativo.
 global _fault_N0
 _fault_N0:
     mov qword [_save_fault_number], qword 0
@@ -1438,10 +1440,9 @@ _fault_N5:
      mov qword [_save_fault_number], qword 5
     jmp all_faults
 
-; #todo: Change this name.
-; int 6 - Instrução inválida.
-global _fault_INTRUCAO_INVALIDA
-_fault_INTRUCAO_INVALIDA:
+; int 6: Invalid opcode
+global _fault_INVALID_OPCODE
+_fault_INVALID_OPCODE:
     mov qword [_save_fault_number], qword 6
     jmp all_faults
 
@@ -1520,79 +1521,79 @@ _fault_N18:
     mov qword [_save_fault_number], qword 18
     jmp all_faults
 
-; int 19
+; int 19 - Intel reserved.
 global _fault_N19
 _fault_N19:
     mov qword [_save_fault_number], qword 19
     jmp all_faults
 
-; int 20 
+; int 20 - Intel reserved. 
 global _fault_N20
 _fault_N20:
     mov qword [_save_fault_number], qword 20
     jmp all_faults
 
-; int 21
+; int 21 - Intel reserved.
 global _fault_N21
 _fault_N21:
     mov qword [_save_fault_number], qword 21
     jmp all_faults
 
-; int 22
+; int 22 - Intel reserved.
 global _fault_N22
 _fault_N22:
     mov qword [_save_fault_number], qword 22
     jmp all_faults
 
-; int 23 
+; int 23 - Intel reserved. 
 global _fault_N23
 _fault_N23:
     mov qword [_save_fault_number], qword 23
     jmp all_faults
 
-; int 24 
+; int 24 - Intel reserved. 
 global _fault_N24
 _fault_N24:
     mov qword [_save_fault_number], qword 24
     jmp all_faults
 
-; int 25 
+; int 25 - Intel reserved. 
 global _fault_N25
 _fault_N25:
     mov qword [_save_fault_number], qword 25
     jmp all_faults
 
-; int 26 
+; int 26 - Intel reserved. 
 global _fault_N26
 _fault_N26:
     mov qword [_save_fault_number], qword 26
     jmp all_faults
 
-; int 27 
+; int 27 - Intel reserved. 
 global _fault_N27
 _fault_N27:
     mov qword [_save_fault_number], qword 27
     jmp all_faults
 
-; int 28 
+; int 28 - Intel reserved. 
 global _fault_N28
 _fault_N28:
     mov qword [_save_fault_number], qword 28
     jmp all_faults
 
-; int 29
+; int 29 - Intel reserved.
 global _fault_N29
 _fault_N29:
     mov qword [_save_fault_number], qword 29
     jmp all_faults
 
-; int 30
+; int 30 - Intel reserved.
 global _fault_N30
 _fault_N30:
     mov qword [_save_fault_number], qword 30
     jmp all_faults
 
-; int 31 
+; int 31 - Intel reserved. 
 global _fault_N31
 _fault_N31:
     mov qword [_save_fault_number], qword 31

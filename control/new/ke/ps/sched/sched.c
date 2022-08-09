@@ -18,7 +18,7 @@ struct thread_d  *Conductor;
 // The flexible conductor to create the list.
 struct thread_d  *tmpConductor;
 // The created root conductor.
-struct thread_d  *rootConductor;
+//struct thread_d  *rootConductor;
 
 
 
@@ -64,17 +64,12 @@ static tid_t __scheduler_rr(unsigned long sched_flags);
 // OUT: next tid.
 
 static tid_t __scheduler_rr(unsigned long sched_flags)
-{
+{ 
+    struct thread_d *Idle;
     struct thread_d *TmpThread;
     register int i=0;
     tid_t FirstTID = -1;
 
-// System state
-
-    if ( system_state != SYSTEM_RUNNING ){
-        panic ("__scheduler_rr: system_state\n");
-    }
-    system_state = SYSTEM_SCHEDULING;
 
     //debug_print ("scheduler: [not tested] \n");
 
@@ -87,36 +82,30 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // #todo:
 // We need to create another hook for the AP cores.
 
-    /*
-    if( UPProcessorBlock.IdleThread != ____IDLE){
-            panic ("__scheduler_rr: UPProcessorBlock.IdleThread\n");
+
+
+// O processador atual precisa ter uma idle configurada.
+// #todo: Por enquanto estamos usando o UP, mas usaremos
+// um dado processador para escalonar para ele.
+
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+
+    if ( (void*) Idle == NULL ){
+        panic ("__scheduler_rr: Idle\n");
     }
-    */
-
-// ===============================================
-// The idle thread is the current thread of the
-// first ring0 module. MOD0.BIN.
-
-    //____IDLE = InitThread;
-
-    if ( (void*) ____IDLE == NULL ){
-        panic ("__scheduler_rr: ____IDLE\n");
-    }
-    if ( ____IDLE->used != TRUE || 
-         ____IDLE->magic != 1234 )
+    if ( Idle->used != TRUE || 
+         Idle->magic != 1234 )
     {
-        panic ("__scheduler_rr: ____IDLE validation\n");
+        panic ("__scheduler_rr: Idle validation\n");
     }
     // Estabiliza a idle thread.
-    ____IDLE->base_priority = PRIORITY_SYSTEM;
-    ____IDLE->priority      = PRIORITY_SYSTEM;
-    ____IDLE->quantum = QUANTUM_MIN;  // Credits.
-    rootConductor = (void *) ____IDLE;
+    Idle->base_priority = PRIORITY_SYSTEM;
+    Idle->priority      = PRIORITY_SYSTEM;
+    Idle->quantum = QUANTUM_MIN;  // Credits.
 
-// First TID.
-// The TID of the ____IDLE thread.
 
-    FirstTID = (tid_t) rootConductor->tid;
+// Check TID.
+    FirstTID = (tid_t) Idle->tid;
 
     if ( FirstTID < 0 || 
          FirstTID >= THREAD_COUNT_MAX )
@@ -124,37 +113,30 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         panic ("__scheduler_rr: FirstTID\n");
     }
 
-    //UPProcessorBlock.NextThread = (struct thread_d *) rootConductor;
 
-// ===============================================
-// The control thread of the ring3 init process.
-// INIT.BIN
-// rootConductor->next: 
+// Por enquanto a Idle thread desse processador
+// precisa ser a InitThread. Pois ela a a primeira
+// thread em user mode do primeiro processador.
 
-    if ( (void*) InitThread == NULL ){
-        panic ("__scheduler_rr: InitThread\n");
+    if ( Idle != InitThread ){
+        panic ("__scheduler_rr: Idle != InitThread\n");
     }
-    if ( InitThread->used != TRUE || 
-         InitThread->magic != 1234 )
-    {
-        panic ("__scheduler_rr: InitThread validation\n");
-    }
-    // Estabiliza a init thread.
-    InitThread->base_priority = PRIORITY_SYSTEM;
-    InitThread->priority      = PRIORITY_SYSTEM;
-    InitThread->quantum = QUANTUM_MIN;  // Credits.
-    rootConductor->next = (void*) InitThread;
 
 // ===============================================
 
 // Conductor
-    Conductor       = (void *) rootConductor;
-    Conductor->next = (void *) rootConductor;
+// Esse é o condutor exportado, que o ts.c vai usar.
+// Começamos a lista com a Idle thread desse processador.
+    Conductor       = (void *) Idle;
+    Conductor->next = (void *) Idle;
+    //UPProcessorBlock.NextThread = (struct thread_d *) Idle;
+
+    //rootConductor = (void *) Conductor;
 
 // tmpConductor
-    tmpConductor       = (void *) rootConductor;
-    tmpConductor->next = (void *) rootConductor;  // The list starts here.
-
+// Interno, usado pra construir a lista.
+    tmpConductor       = (void *) Conductor;
+    //tmpConductor->next = (void *) Conductor;  // The list starts here.
 
 // Walking
 // READY threads in the threadList[].
@@ -162,25 +144,6 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     for ( i=0; i<THREAD_COUNT_MAX; ++i )
     {
         TmpThread = (void *) threadList[i];
-
-        //exit in progress
-        if (TmpThread->magic==1234)
-        {
-            // Vira zombie e não sera selecionada para o proximo round
-            // se não for a idle thread nem a init thread.
-            if (TmpThread->exit_in_progress == TRUE)
-            {
-                if (TmpThread != ____IDLE)
-                {
-                    // não sera mais selecionada pelo scheduler.
-                    // O dead thred collector pode terminar de deleta
-                    // essa thread e deletar o processo dela
-                    // se ele estiver sinalizado como exit in progress
-                    // e ela for a thread de controle dele.
-                    TmpThread->state = ZOMBIE;
-                }
-            }
-        } 
 
         if ( (void *) TmpThread != NULL )
         {
@@ -192,8 +155,9 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
             {
                 // Recreate the linked list.
                 // The tmpConductor and it's next.
-                tmpConductor       = (void *) tmpConductor->next; 
+                 
                 tmpConductor->next = (void *) TmpThread;
+                tmpConductor       = (void *) tmpConductor->next;
 
                 // Initialize counters.
                 TmpThread->runningCount = 0;
@@ -225,6 +189,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 }
             }
 
+            // Alarm
             // A thread esta esperando.
             if ( TmpThread->used  == TRUE && 
                  TmpThread->magic == 1234 && 
@@ -240,6 +205,26 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 //    TmpThread->state = READY;
                 //}
             }
+
+            // Exit
+            // exit in progress
+            if (TmpThread->magic==1234)
+            {
+                // Vira zombie e não sera selecionada para o proximo round
+                // se não for a idle thread nem a init thread.
+                if (TmpThread->exit_in_progress == TRUE)
+                {
+                    if (TmpThread != Idle)
+                    {
+                    // não sera mais selecionada pelo scheduler.
+                    // O dead thred collector pode terminar de deleta
+                    // essa thread e deletar o processo dela
+                    // se ele estiver sinalizado como exit in progress
+                    // e ela for a thread de controle dele.
+                        TmpThread->state = ZOMBIE;
+                    }
+                }
+            }
         }
     };
 
@@ -248,11 +233,11 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
 // Finalizing the list.
 // The tmpConductor and it's next.
-    tmpConductor       = (void *) tmpConductor->next; 
+    //tmpConductor       = (void *) tmpConductor->next; 
     tmpConductor->next = NULL;               // Reescalona ao fim do round.
 
 // done:
-    system_state = SYSTEM_RUNNING;
+
 
 // Start with the idle thread.
     return (tid_t) FirstTID;
@@ -274,8 +259,20 @@ tid_t scheduler(void)
     //#todo: Create a method for this.
     unsigned long sched_flags = (unsigned long) SchedulerInfo.flags;
 
+
+// System state
+    if ( system_state != SYSTEM_RUNNING ){
+        panic ("__scheduler_rr: system_state\n");
+    }
+    system_state = SYSTEM_SCHEDULING;
+
+
     if (SchedulerInfo.initialized != TRUE){
         panic("scheduler: SchedulerInfo.initialized\n");
+    }
+
+    if ( UPProcessorBlock.threads_counter == 0 ){
+        panic("scheduler: UPProcessorBlock.threads_counter == 0\n");
     }
 
     if (Policy != SCHED_RR){
@@ -291,17 +288,27 @@ tid_t scheduler(void)
         first_tid = (tid_t) __scheduler_rr(0);
     }
 
-    if ( (void *) ____IDLE == NULL ){
-        panic("scheduler: ____IDLE\n");
+// ===================
+    struct thread_d *Idle;
+
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+
+    if ( (void *) Idle == NULL ){
+        panic("scheduler: Idle\n");
     }
 
-    if ( ____IDLE->magic != 1234 ){
-        panic("scheduler: ____IDLE validation\n");
+    if ( Idle->magic != 1234 ){
+        panic("scheduler: Idle validation\n");
     }
 
-    if ( first_tid != ____IDLE->tid ){
-        panic("scheduler: first_tid != ____IDLE->tid\n");
+// A primeira thread precisa ser a idle thread.
+    if ( first_tid != Idle->tid )
+    {
+        panic("scheduler: first_tid != Idle->tid\n");
     }
+
+// System state
+    system_state = SYSTEM_RUNNING;
 
 // Return tid.
     return (tid_t) first_tid;

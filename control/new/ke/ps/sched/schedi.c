@@ -39,7 +39,6 @@ tid_t KiScheduler(void)
     {
         debug_print ("KiScheduler: Locked $\n");
         
-
         // #bugbug
         // Why are we returning tid 0?
         
@@ -47,35 +46,24 @@ tid_t KiScheduler(void)
         return -1;  //error
     }
 
-// Check idle
+// Não existem threads nesse processador.
 
-    if ( (void *) ____IDLE == NULL ){
-        panic ("KiScheduler: ____IDLE fail");
-    }
-    if ( ____IDLE->used != TRUE || ____IDLE->magic != 1234 )
-    {
-        panic ("KiScheduler: ____IDLE validation");
+    if ( UPProcessorBlock.threads_counter == 0 ){
+        panic("KiScheduler: UPProcessorBlock.threads_counter == 0\n");
     }
 
-    if ( UPProcessorBlock.threads_counter == 0 )
-        panic("KiScheduler: UPProcessorBlock.threads_counter == 0");
+// So existe uma thread nesse processador.
+// Então ela precisa ser a idle.
+// Ela será a current_thread.
 
-// Retornaremos se tivermos apenas um thread rodando.
-// Pois não há o que trocar.
-// Se só temos uma então devemos retornar a idle.
-
-    //if ( ProcessorBlock.threads_counter == 1 )
     if ( UPProcessorBlock.threads_counter == 1 )
-    { 
-        // #bugbug
-        // Isso não é uma coisa boa, pois quem chamou a
-        // gente está esperando por um novo Conductor.
+    {         
+        Conductor = 
+            (struct thread_d *) UPProcessorBlock.IdleThread;
         
-        //#test
-        Conductor = ____IDLE;
+        current_thread = (tid_t) Conductor->tid;
         
-        current_thread = ____IDLE->tid;
-        debug_print("schedi: ____IDLE $\n");
+        debug_print("schedi: Idle $\n");
         
         // Return tid.
         return (tid_t) current_thread;

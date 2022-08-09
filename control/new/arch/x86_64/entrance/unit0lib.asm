@@ -390,8 +390,8 @@ setup_faults:
     mov rbx, qword 5
     call _setup_system_interrupt
 
-    ;#6 - Instrução inválida.
-    mov rax, qword _fault_INTRUCAO_INVALIDA
+    ;#6 - Invalid opcode
+    mov rax, qword _fault_INVALID_OPCODE
     mov rbx, qword 6
     call _setup_system_interrupt
 
@@ -455,67 +455,67 @@ setup_faults:
     mov rbx, qword 18
     call _setup_system_interrupt
 
-    ;#19  
+    ;#19 - Intel reserved.
     mov rax, qword _fault_N19
     mov rbx, qword 19
     call _setup_system_interrupt
 
-    ;#20  
+    ;#20 - Intel reserved.
     mov rax, qword _fault_N20
     mov rbx, qword 20
     call _setup_system_interrupt
 
-    ;#21  
+    ;#21 - Intel reserved.
     mov rax, qword _fault_N21
     mov rbx, qword 21
     call _setup_system_interrupt
 
-    ;#22  
+    ;#22 - Intel reserved.
     mov rax, qword _fault_N22
     mov rbx, qword 22
     call _setup_system_interrupt
 
-    ;#23 
+    ;#23 - Intel reserved.
     mov rax, qword _fault_N23
     mov rbx, qword 23
     call _setup_system_interrupt
 
-    ;#24  
+    ;#24 - Intel reserved.
     mov rax, qword _fault_N24
     mov rbx, qword 24
     call _setup_system_interrupt
 
-    ;#25  
+    ;#25 - Intel reserved.
     mov rax, qword _fault_N25
     mov rbx, qword 25
     call _setup_system_interrupt
 
-    ;#26 
+    ;#26 - Intel reserved.
     mov rax, qword _fault_N26
     mov rbx, qword 26
     call _setup_system_interrupt
 
-    ;#27  
+    ;#27 - Intel reserved.
     mov rax, qword _fault_N27
     mov rbx, qword 27
     call _setup_system_interrupt
 
-    ;#28 
+    ;#28 - Intel reserved.
     mov rax, qword _fault_N28
     mov rbx, qword 28
     call _setup_system_interrupt
 
-    ;#29  
+    ;#29 - Intel reserved.
     mov rax, qword _fault_N29
     mov rbx, qword 29
     call _setup_system_interrupt
 
-    ;#30  
+    ;#30 - Intel reserved.
     mov rax, qword _fault_N30
     mov rbx, qword 30
     call _setup_system_interrupt
 
-    ;#31 
+    ;#31 - Intel reserved.
     mov rax, qword _fault_N31
     mov rbx, qword 31
     call _setup_system_interrupt

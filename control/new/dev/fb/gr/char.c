@@ -27,9 +27,7 @@ int get_char_height (void)
     return (int) gcharHeight;
 }
 
-
 /*
- *****************************************************
  * d_draw_char:
  *     Constroi um caractere 8x8 no buffer.
  *     Desenha um caractere e pinta o pano de fundo.
@@ -44,49 +42,12 @@ d_draw_char (
     unsigned int fgcolor,
     unsigned int bgcolor )
 {
-
-    // loop
     register int y2=0;
     register int x2=0;
-
-    // #todo: 
-    // Rever isso.
-
-    // The window.
-    //struct window_d *hWindow;
-
     // The char.
-    char *work_char; 
-
+    char *work_char;
     // The mask.
     unsigned char bit_mask = 0x80;
-
-
-    // #debug
-    //debug_print ("d_draw_char:\n");
-
-	//
-	// Window Terminal.
-	//
-
-
-	/*
-	if( VideoBlock.useGui == 1 )
-	{
-        //se existe um terminal.
-		if( (void *) terminal != NULL )
-        {
-		    if( (void*) terminal->window != NULL )
-			{
-			    hWindow = (void*) terminal->window;
-			
-			    x = hWindow->left + x;
-			    y = hWindow->top + y;
-			};
-		};
-    };
-	*/
-
 
 
 	/*
@@ -102,31 +63,29 @@ d_draw_char (
 	 */
 
 
-	// Default:
-	//     Testando o uso de uma fonte default no caso de erro.
-	//     Testando a troca da fonte padr�o.
-	//     O sistema n�o vai parar no caso de erro. Nesse caso ele escolhera
-	// um valor default.
-	// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
+// Default:
+//     Testando o uso de uma fonte default no caso de erro.
+//     Testando a troca da fonte padr�o.
+//     O sistema n�o vai parar no caso de erro. Nesse caso ele escolhera
+// um valor default.
+// Definido em: ws.h
+// Trying to use the ROM BIOS font 
+// if we do not have loadable one.
 
 
-    // Trying to use the ROM BIOS font 
-    // if we do not have loadable one.
-
+    // default: BIOS font.
     if ( gws_currentfont_address == 0 ){
         gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
 
-
-    // 8x8
+    // default: 8x8
     if ( gcharWidth <= 0 || gcharHeight <= 0 )
     {
         gcharWidth  = DEFAULT_CHAR_WIDTH;
         gcharHeight = DEFAULT_CHAR_HEIGHT;
     }
 
-
-    // Checking the font size.
+// Checking the font size.
 
     switch (gfontSize){
 
@@ -147,16 +106,11 @@ d_draw_char (
             set_char_height (16);
             break;
 
+        // ...
 
-		// #todo: 
-		// Criar op��es
-		// ...
-
-
-		// #importante:
-		// #BUGBUG
-		// Se n�o temos um tamanho selecionado ent�o teremos 
-		// que usar o tamanho padr�o.
+        // #bugbug
+        // Se n�o temos um tamanho selecionado ent�o teremos 
+        // que usar o tamanho padr�o.
 
         // ROM bios.
         default:
@@ -168,31 +122,36 @@ d_draw_char (
     };
 
 
+// ??
+// tentando pintar um espa�o em branco.
+// Nas rotinas da biblioteca gr�fica, quando encontram
+// um espa�o(32), nem manda para c�, apenas incrementam o cursor.
 
-	// tentando pintar um espa�o em branco.
-	// Nas rotinas da biblioteca gr�fica, quando encontram
-	// um espa�o(32), nem manda para c�, apenas incrementam o cursor.
+// Work char:
+// O caractere sendo trabalhado.
+// Offset da tabela de chars de altura 8 na ROM.
 
-	// #imporatante:
-	// O caractere sendo trabalhado.
-	// Offset da tabela de chars de altura 8 na ROM.
+    work_char = 
+        (void *) gws_currentfont_address + (c * gcharHeight);
 
-    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
-
-
-	// Draw.
-
+// Draw
+    
+    unsigned int FinalColor = 0;
+    
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
         bit_mask = 0x80;
 
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
+            FinalColor = (*work_char & bit_mask) ? fgcolor: bgcolor;
+             
+            // IN: color, x, y, rop_flags.
             backbuffer_putpixel ( 
-                *work_char & bit_mask ? fgcolor: bgcolor,  // color
-                (x + x2),                                  // x 
-                y,                                         // y
-                0 );                                       // rop_flags
+                FinalColor,
+                (x + x2), 
+                y,
+                0 );
 
             bit_mask = (bit_mask >> 1); 
         };
@@ -203,9 +162,7 @@ d_draw_char (
     };
 }
 
-
 /*
- ******************************************************
  * d_drawchar_transparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
@@ -218,62 +175,10 @@ d_drawchar_transparent (
     unsigned int color, 
     unsigned long c )
 {
-
-    // loop
     register int y2=0;
     register int x2=0;
-
-    // #todo: 
-    // Rever isso.
-
-    //struct window_d *hWindow;
-    
     unsigned char bit_mask = 0x80;
-
     char *work_char;  
-
-
-
-    // #debug
-    // debug_print ("d_drawchar_transparent:\n");
-
-
-	//
-	// Window Terminal.
-	//
-
-
-	/*
-	if( VideoBlock.useGui == 1 )
-	{
-        //se existe um terminal.
-		if( (void *) terminal != NULL )
-        {
-		    if( (void*) terminal->window != NULL )
-			{
-			    hWindow = (void*) terminal->window;
-			
-			    x = hWindow->left + x;
-			    y = hWindow->top + y;
-			};
-		};
-    };
-	*/
-
-
-
-	/*
-	 * @todo: 
-	 *     +Criar vari�veis internas para tamanho de fonte.
-	 *     +Pegar as informa��es em uma estrutura.
-	 *     ...
-	 */
-
-
-
-	//int CharWidth;
-	//int CharHeight;  
-
 
 
 	/*
@@ -296,28 +201,28 @@ d_drawchar_transparent (
 	// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
 
 
-    // Trying to use the ROM BIOS font 
-    // if we do not have loadable one.
+// Trying to use the ROM BIOS font 
+// if we do not have loadable one.
+// default: bios font
 
     if ( gws_currentfont_address == 0 ){
         gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
 
-    // Selecting the default char properties.
-    // #bugbug: Is it 'int' type?
-    // 8x8
+// Selecting the default char properties.
+// #bugbug: Is it 'int' type?
+// default: 8x8
+
     if ( gcharWidth <= 0 || gcharHeight <= 0 )
     {
         gcharWidth  = DEFAULT_CHAR_WIDTH;
         gcharHeight = DEFAULT_CHAR_HEIGHT;
     }
 
-
-    // Checking the font size.
-    
-    // #bugbug
-    // Não precisamos configurar a fonte
-    // toda vez que formos desenhar um char.
+// Checking the font size.
+// #bugbug
+// Não precisamos configurar a fonte
+// toda vez que formos desenhar um char.
 
     switch (gfontSize){
 
@@ -337,16 +242,12 @@ d_drawchar_transparent (
             set_char_height (16);
             break;
 
-		//#todo: 
-		//Criar op��es
-		//...
+        //...
 
-		// #importante:
-		// #BUGBUG
-		// Se n�o temos um tamanho selecionado ent�o teremos 
-		// que usar o tamanho padr�o.
-
-        ////ROM bios.
+        // #BUGBUG
+        // Se n�o temos um tamanho selecionado ent�o teremos 
+        // que usar o tamanho padr�o.
+        // ROM bios
         default:
             gws_currentfont_address = (unsigned long) BIOSFONT8X8;    
             set_char_width (8);
@@ -355,25 +256,21 @@ d_drawchar_transparent (
             break;
     };
 
-
-	// #importante:
-	// O caractere sendo trabalhado.
-	// Offset da tabela de chars de altura 8 na ROM.
+// O caractere sendo trabalhado.
+// Offset da tabela de chars de altura 8 na ROM.
 
     if ( gws_currentfont_address == 0 ){
         debug_print ("d_drawchar_transparent: [FAIL]gws_currentfont_address\n");
         return;
     }
 
-    work_char = (void *) gws_currentfont_address + (c * gcharHeight);
+// Work char:
 
+    work_char = 
+        (void *) gws_currentfont_address + (c * gcharHeight);
 
-//
 // Draw
-//
-
-// See:
-// drivers/video/fbdev/pixel.c
+// See:  pixel.c
 
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
@@ -383,11 +280,12 @@ d_drawchar_transparent (
         {
             if ( ( *work_char & bit_mask ) )
             {
+                // IN: color, x, y, rop_flags
                 backbuffer_putpixel ( 
-                    color,     // color 
-                    (x + x2),  // x
-                    y,         // y
-                    0 );       // rop_flags
+                    color,
+                    (x + x2),
+                    y,
+                    0 );
             }
             // Next bit.
             bit_mask = (bit_mask >> 1); 
@@ -397,7 +295,5 @@ d_drawchar_transparent (
         y++; 
         work_char++; 
     };
-
-	// Algo mais ?
 }
 

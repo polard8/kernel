@@ -21,7 +21,7 @@ tid_t next_thread=0;       // next user mode thread.
 // para mostrar qual será a nova idle thread.
 // Cada idle thread pode prestar um serviço diferente, como o
 // gerenciamento de energia.
-struct thread_d  *____IDLE;
+//struct thread_d  *____IDLE;
 
 // The control thread of the window sever kernel module.
 // The ring 0 thread. tid0
@@ -686,72 +686,57 @@ thread_get_profiler_percentage (struct thread_d *thread)
     return ( unsigned long ) thread->profiler_percentage_running;
 }
 
-
-// Show current thread information.
-void show_thread_information (void){
-
-    struct thread_d *Current;
+// threads
+void show_thread_information (void)
+{
+    struct thread_d  *Idle;
+    struct thread_d  *Current;
 
     printf ("show_thread_information:\n");
 
-//
-// Current thread
-//
-
-    Current = (void *) GetCurrentThread();
-
-    if( (void *) Current == NULL ){
-        printf ("show_thread_information: [FAIL] Current\n");
-        refresh_screen ();
-        return;
-    } else {
-        printf ("currentTID=%d\n", current_thread );
-        // ...
-    };
-
-//
-// Check idle
-//
-
-    if ( (void *) ____IDLE == NULL ){
-        panic ("dead_thread_collector: ____IDLE fail\n");
-    }else{
-        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
+// =================================
+// Idle thread
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+    if ( (void *) Idle != NULL )
+    {
+        if (Idle->magic == 1234)
         {
-            panic ("dead_thread_collector: ____IDLE validation\n");
+            printf ("Idle->tid = %d\n", Idle->tid );
         }
-
-	   printf ("Idle thread = %d\n", ____IDLE->tid );
-    };
+    }
 
 
-//
-// Slots
-//
+// =================================
+// Current thread
+    Current = (void *) GetCurrentThread();
+    if ( (void *) Current != NULL )
+    {
+        if (Current->magic == 1234)
+        {
+            printf ("Current->tid   = %d\n", Current->tid );
+            printf ("current_thread = %d\n", current_thread );
+        }
+    }
 
-    // threadi.c
+// Show all the slots
+// see: threadi.c
 
     show_slots(); 
 
-    // ??
-    // show_queue_information(queue);
-
-    // Nothing for now.
-
     printf("Done\n");
-    refresh_screen ();
+    refresh_screen();
 }
 
 
 // ??
 // Chamada pelo timer.c
-int thread_profiler( int service ){
-
+int thread_profiler(int service)
+{
+    struct thread_d  *Idle;
     struct thread_d  *__current;
     struct thread_d  *__tmp;
     int i=0;
     unsigned long __total = 0; //todas inclusive idle.
-    
     
     // safety
     if ( service < 0 )
@@ -760,6 +745,15 @@ int thread_profiler( int service ){
        return -1;
     }
 
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+    if ( (void *) Idle == NULL ){
+        panic("thread_profiler: Idle\n");
+    }
+    if (Idle->magic != 1234){
+        panic("thread_profiler: Idle validation\n");
+    }
+   
+
 //
 // Current thread
 //
@@ -767,51 +761,78 @@ int thread_profiler( int service ){
     __current = (struct thread_d *) GetCurrentThread();
 
     if ( (void *) __current == NULL ){
-        panic ("thread_profiler: __current");
+        panic ("thread_profiler: __current\n");
+    }
+
+    if (__current->magic != 1234){
+        panic ("thread_profiler: __current validation\n");
     }
 
     //unsigned long __total_ticks;
     //__total_ticks = (unsigned long) get_systime_totalticks();
-  
+
+
+// Service
+
     switch (service)
     {
-        // Increment
+        // Increment current thread.
         case 1:
             __current->profiler_ticks_running++;
             return 0;
             break;
 
-        // Finalize
+        // Finalize?
+        // Trabalha no profiler de todas as threads.
         case 2:
             for (i=0; i<THREAD_COUNT_MAX; i++)
             {
                 __tmp = (struct thread_d *) threadList[i];
+                
                 if ( (void *) __tmp != NULL )
                 {
-                    if ( __tmp->used == 1 && __tmp->magic == 1234 )
+                    if ( __tmp->used == TRUE && 
+                         __tmp->magic == 1234 )
                     {
                         // Salva a contagem dessa thread para consulta futura.
                         __tmp->profiler_last_ticks = __tmp->profiler_ticks_running;
-                        // Sera a contagem dessa thread,
+                        
+                        // zera a contagem dessa thread,
                         __tmp->profiler_ticks_running = 0;
-                        __tmp->profiler_percentage_running_res = (__tmp->profiler_last_ticks / profiler_ticks_limit );
-                        __tmp->profiler_percentage_running_mod = (__tmp->profiler_last_ticks % profiler_ticks_limit );    
-                        __tmp->profiler_percentage_running =  (__tmp->profiler_percentage_running_mod / (profiler_ticks_limit/100) );
+                        
+                        __tmp->profiler_percentage_running_res = 
+                            (__tmp->profiler_last_ticks / profiler_ticks_limit );
+                        
+                        __tmp->profiler_percentage_running_mod = 
+                            (__tmp->profiler_last_ticks % profiler_ticks_limit );    
+                        
+                        __tmp->profiler_percentage_running = 
+                            (__tmp->profiler_percentage_running_mod / (profiler_ticks_limit/100) );
                     }
                 }  
             };
 
-            profiler_percentage_all_normal_threads = (100 - ____IDLE->profiler_percentage_running );
-            profiler_percentage_idle_thread = ____IDLE->profiler_percentage_running ;
-            return 0;
+            // Todas menos a Idle.
+            // (system usage)
+            profiler_percentage_all_normal_threads = 
+                (100 - Idle->profiler_percentage_running );
+            
+            // Idle state.
+            profiler_percentage_idle_thread = 
+                Idle->profiler_percentage_running ;
+            
+            return 0;  //ok done.
 
             break;
 
-		//...
+        //...
+        
+        default:
+            break;
     };
 
-    // Salva a contagem de vezes que 
-    // a thread rodou durante o período.
+// Salva a contagem de vezes que 
+// a thread rodou durante o período.
 
     return -1;
 }
@@ -1314,6 +1335,7 @@ try_next_slot:
  
 void exit_thread (int tid)
 {
+    struct thread_d  *Idle;
     struct thread_d  *Thread;
 
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
@@ -1322,79 +1344,50 @@ void exit_thread (int tid)
         return;
     }
 
-    // The idle thread.
-    if ( (void *) ____IDLE == NULL ){
-        panic ("exit_thread: ____IDLE fail");
-    }else{
-        if ( ____IDLE->used != TRUE || ____IDLE->magic != 1234 )
-        {
-            panic ("exit_thread: ____IDLE validation\n");
-        }
+//
+// Init thread.
+//
 
-        // We can't exit the idle thread.
-        if ( tid == ____IDLE->tid ){
-            panic ("exit_thread: Sorry, we can't kill the idle thread!\n");
-        }
+// We can't exit the idle thread.
 
-        // ...
-    };
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+    if ( (void *) Idle == NULL ){
+        panic ("exit_thread: Idle\n");
+    }
+    if ( Idle->magic != 1234 ){
+        panic ("exit_thread: Idle validation\n");
+    }
+    if ( tid == Idle->tid ){
+        panic ("exit_thread: We can't kill the Idle thread!\n");
+    }
 
+//
+// Thread
+//
 
 // Get thread structure.
 
     Thread = (void *) threadList[tid];
-
     if ( (void *) Thread == NULL ){
-        printf ("exit_thread: [FAIL] This thread doesn't exist\n");
+        printf ("exit_thread: Thread doesn't exist\n");
         goto fail;
-    }else{
-        if ( Thread->used != TRUE || Thread->magic != 1234 )
-        {
-            printf ("exit_thread: validation \n");
+    }
+    if ( Thread->magic != 1234 ){
+            printf ("exit_thread: Thread validation \n");
             goto fail;
-            //refresh_screen();
-            //return;
-        }
+    }
 
-        // Zombie
-        // Lembrando que se deixarmos no estado ZOMBIE o 
-        // deadthread collector vai destruir a estrutura.
+// Zombie
+// Lembrando que se deixarmos no estado ZOMBIE o 
+// deadthread collector vai destruir a estrutura.
 
-        Thread->state = ZOMBIE;
-        
-        // #bugbug: Not used for now !!!
-        
-        // Isso avisa o sistema que ele pode 
-        // acordar o dead thread collector.
-        // Isso poderia ser apenas uma atividade extra, 
-        // como acontece com os requests.
-        
-        dead_thread_collector_flag = TRUE; 
-        
-        // Se matamos a thread atual. 
-        // #bugbug: It looks very dangeours!
-        if ( tid == current_thread ){ 
-            debug_print ("exit_thread: scheduler\n");
-            
-            //#todo
-            //scheduler(); 
-        }
-
-        // Se falhou o escalonamento. 
-        // Tentaremos a idle, previamente conferida.
-        
-        if ( current_thread < 0 || 
-             current_thread >= THREAD_COUNT_MAX )
-        {
-            current_thread = ____IDLE->tid;
-            debug_print ("exit_thread: scheduler fail. Using idle\n");
-        }
-    };
-
-done:
-    debug_print ("exit_thread: done\n");
+        // Let the scheduler put this thread in the ZOMBIE state.
+        Thread->exit_in_progress = TRUE;
+        //Thread->state = ZOMBIE;
     return;
+
 fail:
+    //#debug
     refresh_screen();
     return;
 }

@@ -10,6 +10,11 @@ static int __kill_process(void);
 // Criar uma rotina onde, 
 // se o window server falhar, 
 // tem que pedir para o init reinicializar o window server.
+
+// #bugbug: #todo
+// E se a excessão ocorrer durante a fase em ring 0 de um proceso
+// em ring 3?
+
 static int __kill_process(void)
 {
     struct process_d *p;
@@ -24,13 +29,20 @@ static int __kill_process(void)
 //pid
     if(pid<0 || pid >= PROCESS_COUNT_MAX)
         return -1;
-    if(pid==GRAMADO_PID_KERNEL)
+
+// We can't close the Kernel process or the Init process.
+    if (pid==GRAMADO_PID_KERNEL){
         return -1;
-    if(pid==GRAMADO_PID_INIT)
+    }
+    if (pid==GRAMADO_PID_INIT){
         return -1;
+    }
+
     p = (void*) processList[pid];
     if (p->magic != 1234)
         return -1; 
+
+// We can't close the Kernel process or the Init process.
     if (p == KernelProcess)
         return -1;
     if (p == InitProcess)
@@ -39,15 +51,26 @@ static int __kill_process(void)
 //tid
     if(tid<0 || tid >= THREAD_COUNT_MAX)
         return -1;
-    if(tid == MODULE0_TID)  //idle thread
-        return -1;
-    if(tid == CLIENT0_TID)  //init thread
+
+// We can't close the Iit thread.
+// #bugbug: Change name. The init is NOT a client application.
+// It is just the first ring 3 tid and the idle thread for now.
+// See: create.c
+    //if(tid == CLIENT0_TID)  //init thread
+    if(tid == 0)  // The first thread    
         return -1;
     t = (void*) threadList[tid];
     if (t->magic != 1234)
         return -1;
 
+// We can't close the Iit thread.
+    if (t == InitThread)
+        return -1;
+
+//
 // kill the process
+//
+
     if (p->control == t){
         p->control = NULL;
     }
@@ -86,6 +109,7 @@ void faults (unsigned long number)
     if(copy_process_in_progress==TRUE)
         printf("Fault while copying a process\n");
 
+    //#debug: We dont need this in every pagefault.
     refresh_screen();
 
 
@@ -170,10 +194,13 @@ void faults (unsigned long number)
 */
 
     int killstatus = (int)-1;
+    
+    // next process.
     tid_t target_tid = INIT_TID;
     pid_t target_pid = GRAMADO_PID_INIT;
     
-    // GP and PF.
+    // GP, PF and reserved by intel
+    //if (number == 13 || number == 14 || number == 15)
     if (number == 13 || number == 14)
     {
         printf("fault: %d\n",number);
@@ -202,6 +229,8 @@ void faults (unsigned long number)
         // Se a falta ocoreu em ring 0, então precisamos
         // encerrar o sistema, mas se a falta aconteceu em ring3,
         // podemos simplesmente fechar o aplicativo.
+        // Se ocorrer em cpl 0, terminamos o sistema.
+        // Se ocorrer em cpl 3, terminamos o processo.
         case 0: 
             x_panic("faults() 0"); 
             break;
@@ -209,8 +238,12 @@ void faults (unsigned long number)
         case 1: x_panic("faults() 1"); break;
         case 2: x_panic("faults() 2"); break;
 
-
+        // #todo: Accept arguments.
+        // service, arg1 and arg2.
+        // So, we need to put some arguments in the faults() function.
+        // #todo: faults(number,arg1,arg2,arg3).
         case 3: 
+            printf("\n");
             printf ("== 3 ==\n");  
             save_current_context();
             //show_slots();
@@ -226,10 +259,23 @@ void faults (unsigned long number)
         case 4: x_panic("faults() 4"); break;
         case 5: x_panic("faults() 5"); break;
         case 6: x_panic("faults() 6"); break;
-        case 7: x_panic("faults() 7"); break;
-        case 8: x_panic("faults() 8"); break;
+        
+        // Math co-processor not available.
+        case 7: 
+            x_panic("fault 7: No 80387");
+            break;
+        
+        // Double fault.
+        case 8: 
+            x_panic("fault 8: DOUBLE");
+            break;
+        
         case 9: x_panic("faults() 9"); break;
-        case 10: x_panic("faults() 10"); break;
+        
+        case 10:
+            x_panic("fault 10: Invalid tss");
+            break;
+        
         case 11: x_panic("faults() 11"); break;
         case 12: x_panic("faults() 12"); break;
 
@@ -256,10 +302,22 @@ void faults (unsigned long number)
             x_panic("faults() 14"); 
             break;
 
-        case 15: x_panic("faults() 15"); break;
-        case 16: x_panic("faults() 16"); break;
+        // Intel reserved.
+        // Se ocorrer em ring3 podemos fechar o processo.
+        case 15:
+            x_panic("fault 15: Intel reserved");
+            break;
+        
+        // Co-processor error on 486 and above.
+        case 16: 
+            x_panic("fault 16: Coprocessor error");
+            break;
+
         case 17: x_panic("faults() 17"); break;
         case 18: x_panic("faults() 18"); break;
+        
+        // Intel reserved faults
+        // 19~31
         case 19: x_panic("faults() 19"); break;
         case 20: x_panic("faults() 20"); break;
         case 21: x_panic("faults() 21"); break;

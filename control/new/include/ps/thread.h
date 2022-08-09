@@ -802,9 +802,9 @@ struct thread_d
 };
 
 // See: thread.c
-extern struct thread_d  *____IDLE;
-
+//extern struct thread_d  *____IDLE;
 //extern struct thread_d  *tid0_thread;
+//extern struct thread_d  *rootConductor;
 
 extern struct thread_d  *InitThread;
 extern struct thread_d  *ClonedThread;
@@ -813,7 +813,7 @@ extern struct thread_d  *ClonedThread;
 // See: sched.c
 extern struct thread_d  *Conductor;
 extern struct thread_d  *tmpConductor;
-extern struct thread_d  *rootConductor;
+
 
 // Maximum number of kernel threads in the system.
 #define THREAD_COUNT_MAX  1024 

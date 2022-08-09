@@ -790,80 +790,84 @@ void check_for_dead_thread_collector(void)
 // dead_thread_collector:
 // Procura por uma thread no estado zombie mata ela.
 // #todo: Alertar o processo que a thread morreu.
+// #todo: O scheduler colocou algumas threads em zombie state
+// e agora, temos a condição de matar as threads zombie,
+// mas não pode ser a thread idle nem a thread atual.
 
 void dead_thread_collector(void)
 {
     register int i=0;  //loop
 
-    struct process_d  *p; 
-    struct thread_d   *Thread; 
+    struct thread_d  *Target;
+    struct thread_d  *Idle; 
 
 //
 // Check idle
 //
 
-    if ( (void *) ____IDLE == NULL ){
-        panic ("dead_thread_collector: ____IDLE fail");
-    }else{
+    Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+    if ( (void *) Idle == NULL ){
+        panic("dead_thread_collector: Idle\n");
+    }
+    if (Idle->magic != 1234){
+        panic("dead_thread_collector: Idle validation\n");
+    }
 
-        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
-        {
-            panic ("dead_thread_collector: ____IDLE validation");
-        }
-        // ...
-    };
 
 // loop
 // Scan
+// Kill zombie
+//
+
     for ( i=0; i < THREAD_COUNT_MAX; i++ )
     {
-        Thread = (void *) threadList[i];
+        Target = (void *) threadList[i];
 
-		if ( (void *) Thread != NULL )
-		{
-		    if ( Thread->state == ZOMBIE && 
-			     Thread->used == 1 && 
-				 Thread->magic == 1234 )
-			{
-
-                // Se queremos deletar a idle.
-                if ( Thread->tid == ____IDLE->tid ){
-                    panic ("dead_thread_collector: Sorry, we can't kill the idle thread!");
+        if ( (void *) Target != NULL )
+        {
+            if ( Target->state == ZOMBIE  && 
+                 Target->used  == TRUE    && 
+                 Target->magic == 1234 )
+            {
+                // Não podemos matar a Idle thread.
+                if ( Target == Idle ){
+                    panic ("dead_thread_collector: We can't kill the Idle thread!\n");
                 }
 
-				//kill_thread(Thread->tid);
-				Thread->used = 0;
-				Thread->magic = 0;
-				Thread->state = DEAD; // Por enquanto apenas fecha.
-				//...
-			    
-				// #importante:
-				// Nessa hora precisamos notificar o 
-				// a thread que estava esperando essa thread  
-				// terminar.
-				// Se essa for a thread primária então o processo 
-				// irá terminar também, então o processo que esperava 
-				// também deverá ser notificado.
-				
-                //Thread = NULL;
-	            //threadList[i] = NULL;   //@todo: Liberar o espaço na lista.
+                // Não podemos matar thread atual,
+                // pois precisamos retornar a execução dela.
+                if ( Target->tid == current_thread ){
+                    panic ("dead_thread_collector: We can't kill the current_thread!\n");
+                }
 
+                // Kill
+                // #todo: Podemos apenas colocar a estrutura no stock
+                // ao invez de destruir ela.
 
-				//ProcessorBlock.threads_counter--;
-				//if ( ProcessorBlock.threads_counter < 1 ){
-					//panic("dead_thread_collector: threads_counter");
-				//}
+                Target->used = 0;
+                Target->magic = 0;
+                Target->state = DEAD; // Por enquanto apenas fecha.
 
-				UPProcessorBlock.threads_counter--;
-				if ( UPProcessorBlock.threads_counter < 1 ){
-					panic ("dead_thread_collector: threads_counter");
-				}
+                Target = NULL;
+                threadList[i] = (unsigned long) 0;
 
-			};
-			//Nothing.
-		};
-		//Nothing.
-	};
+                // diminui o contador                
+                UPProcessorBlock.threads_counter--;
+                if ( UPProcessorBlock.threads_counter < 1 ){
+                    panic("dead_thread_collector: threads_counter\n");
+                }
+
+                // #importante:
+                // Nessa hora precisamos notificar o 
+                // a thread que estava esperando essa thread terminar.
+                // Se essa for a thread primária então o processo 
+                // irá terminar também, então o processo que esperava 
+                // também deverá ser notificado.
+            };
+            //Nothing.
+        };
+        //Nothing.
+    };
 
 //@todo:
 // MOVEMENT 10 (zombie --> Dead)
@@ -880,114 +884,19 @@ void dead_thread_collector(void)
 
 void kill_thread (int tid)
 {
-    struct thread_d *__Thread;
-
-// Limits.
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-        debug_print ("kill_thread: tid");
-        return;
-    }
-
-// #bugbug
-// The IDLE thread.
-    
-    if ( (void *) ____IDLE == NULL ){
-        panic ("kill_thread: ____IDLE fail");
-    
-    }else{
-
-        if ( ____IDLE->used != 1 || ____IDLE->magic != 1234 )
-        {
-            panic ("kill_thread: ____IDLE validation");
-        }
-
-        // Se queremos deletar a idle.
-        if ( tid == ____IDLE->tid ){
-            panic ("kill_thread: Sorry, we can't kill the idle thread!");
-        }
-        // ...
-    };
-
-// @todo: 
-//    Deve acordar o pai que está esperando o filho fechar.
-//    Mas no caso estamos apenas fechando uma thread.
-//    Caso essa não seja a thread primária, isso não deve 
-// causar o fechamento do processo.
-
-    __Thread = (void *) threadList[tid];
-
-    if ( (void *) __Thread == NULL )
-    {
-        // A thread alvo nem existe,
-        // vamos apenas continuar.
-
-        printf ("kill_thread: This thread doesn't exist!\n");
-        refresh_screen();
-        return;
-
-    }else{
-
-
-        /*
-        // This process can't be killed by another process.
-        if ( __Thread->_protected == 1 )
-        {
-            debug_print("exit_process: [FAIL] This thread can't be killed\n");
-            debug_print("This is a protected thread!\n");
-            return;  
-        }
-        */
-
-
-        // #todo 
-        // Pegar o id do pai e enviar um sinal e acorda-lo
-        //se ele estiver esperando por filho.
-        __Thread->used  = 0;
-        __Thread->magic = 0; 
-        __Thread->state = DEAD; 
-        // ...
-
-		//ProcessorBlock.threads_counter--;
-		//if ( ProcessorBlock.threads_counter < 1 ){
-			//#bugbug
-			//panic("kill_thread: threads_counter");
-		//}
-
-        UPProcessorBlock.threads_counter--;
-        if ( UPProcessorBlock.threads_counter < 1 ){
-            panic ("kill_thread: threads_counter");
-        }
-
-        threadList[tid] = (unsigned long) 0;
-        __Thread = NULL;
-         
-        // se matamos a thread atual.         
-        if ( tid == current_thread )
-        {
-            //#todo:
-            panic("kill_thread: #todo call scheduler()\n");
-            //scheduler ();
-        }
-
-        
-        // Se falhou o escalonamento.
-        if ( current_thread < 0 || 
-             current_thread >= THREAD_COUNT_MAX )
-        {
-            current_thread = ____IDLE->tid;
-        }
-    };
-
-done:
-    debug_print ("kill_thread: done\n");
-    return;
+    int Lzzz = tid;
+    debug_print ("kill_thread: Not implemented\n");
+    panic       ("kill_thread: Not implemented\n");
 }
-
 
 void kill_all_threads(void)
 {
     register int i=0;
-    for ( i=0; i < THREAD_COUNT_MAX; ++i ){ 
+    
+    // Start at '1'.
+    // Cant kill Idle thread.
+    for ( i=1; i < THREAD_COUNT_MAX; ++i )
+    { 
         kill_thread(i);
     };
 }

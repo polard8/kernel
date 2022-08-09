@@ -426,7 +426,7 @@ try_next:
     // The Idle thread is gonna be the scheduler condutor.
     if (UPProcessorBlock.threads_counter == 1)
     {
-        Conductor = ____IDLE;
+        Conductor = (void *) UPProcessorBlock.IdleThread;
         goto go_ahead;
     }
 

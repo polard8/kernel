@@ -121,6 +121,8 @@ void spawn_thread(int tid)
 // Not saved
     target_thread->saved = FALSE;
 
+    target_thread->exit_in_progress = FALSE;
+
 // ??
 // More checks ?
 // Prepare some elements.
@@ -507,6 +509,7 @@ void KiSpawnThread(int tid)
         die();
     }
     spawn_thread(tid);
+// Not reached
     panic("KiSpawnThread:\n");
 }
 
