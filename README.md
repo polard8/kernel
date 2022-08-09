@@ -69,7 +69,7 @@ Please, give us some feedback.
 
 ## Contributors
 
-* **Fred Nora** - [frednora78](https://facebook.com/frednora78)
+* **Fred Nora** - [frednora](https://facebook.com/frednora)
 
 ## License
 
