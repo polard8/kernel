@@ -13,8 +13,9 @@ void module_crt0(void)
         (int) module_main(reason);
 
 
-    while(1){
-    };
+// Return to kernel
+
+    //while(1){};
 }
 
 

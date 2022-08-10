@@ -1036,12 +1036,7 @@ refresh_rectangle (
 void scroll_screen_rect (void);
 
 
-//
-// Background
-//
 
-int Background_initialize(void);
-void backgroundDraw (unsigned int color);
 
 
 //

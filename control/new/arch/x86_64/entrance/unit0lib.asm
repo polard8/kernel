@@ -47,12 +47,6 @@ tss1:
 tss1_end:
 
 
-;;#delete
-;headlib_something:
-;	ret
-
-
-
 ;; ==================================
 ;; Limpar a flag nt em rflags
 ;; e dar refresh na pipeline. #todo
@@ -624,7 +618,6 @@ setup_vectors:
     mov rax,  qword _int199
     mov rbx,  qword 199
     call _setup_system_interrupt  
-
 
     ;; ...
 

@@ -187,8 +187,8 @@ extern unsigned long gSavedBPP;
 #include "dev/fb/gr/ascii.h" 
 #include "dev/fb/gr/ws.h"
 #include "dev/fb/gr/window.h"
+#include "dev/fb/gr/bg.h"
 #include "dev/fb/gr/graphics.h"
-
 
 // fs
 #include "fs/path.h"       // path.

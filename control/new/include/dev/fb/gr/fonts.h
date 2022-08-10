@@ -27,6 +27,8 @@ typedef enum {
 // == prototypes ============================
 //
 
+int gwsInitializeDefaultKernelFont(void);
+
 int gwsGetCurrentFontCharWidth (void);
 void gwsSetCurrentFontCharWidth (int width);
 

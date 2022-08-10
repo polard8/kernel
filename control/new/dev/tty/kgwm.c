@@ -1121,7 +1121,7 @@ wmProcedure (
                     refresh_screen();
                 }
                 if (shift_status == TRUE){
-                    Background_initialize();
+                    Background_initialize(COLOR_KERNEL_BACKGROUND);
                     show_slots(); //See: tlib.c
                     //pages_calc_mem();
                     refresh_screen();
@@ -2232,7 +2232,7 @@ void schedulerUpdateScreen(void)
     unsigned long fps = get_update_screen_frequency();
     char data[32];
     drawDataRectangle( 
-        0, 0, deviceWidth, 24, COLOR_BLUE, 0 );
+        0, 0, deviceWidth, 24, COLOR_KERNEL_BACKGROUND, 0 );
     sprintf(data,"  FPS %d       ",fps);
     data[12]=0;
     draw_string(0,8,COLOR_YELLOW,data);

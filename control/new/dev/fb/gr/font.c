@@ -1,8 +1,22 @@
 
-
+// font.c
 
 #include <kernel.h>
 
+
+// #todo: 
+// We need a global structure for font support.
+
+int gwsInitializeDefaultKernelFont(void)
+{
+    gwsSetCurrentFontAddress(BIOSFONT8X8);
+    gwsSetCurrentFontCharWidth(8);
+    gwsSetCurrentFontCharHeight(8);
+    
+    gfontSize = FONT8X8;
+
+    return 0;
+}
 
 
 int gwsGetCurrentFontCharWidth (void)
@@ -42,8 +56,8 @@ void gwsSetCurrentFontAddress ( unsigned long address )
  *     Carregando e instalando uma fonte dado o nome. 
  */
 
-int gwsInstallFont ( char *file_name ){
-
+int gwsInstallFont ( char *file_name )
+{
     unsigned long fileret=0;
 
 	// #todo #bugbug
@@ -72,13 +86,14 @@ int gwsInstallFont ( char *file_name ){
     unsigned long dir_address = VOLUME1_ROOTDIR_ADDRESS;
     int number_of_entries = FAT16_ROOT_ENTRIES;
 
-    fileret = (unsigned long) fsLoadFile ( 
-                                  (unsigned long) VOLUME1_FAT_ADDRESS, 
-                                  (unsigned long) dir_address, 
-                                  (int) number_of_entries, 
-                                  (const char *) file_name, 
-                                  (unsigned long) font_buffer,
-                                  (unsigned long) tmp_size );
+    fileret = 
+        (unsigned long) fsLoadFile ( 
+                            (unsigned long) VOLUME1_FAT_ADDRESS, 
+                            (unsigned long) dir_address, 
+                            (int) number_of_entries, 
+                            (const char *) file_name, 
+                            (unsigned long) font_buffer,
+                            (unsigned long) tmp_size );
 
     if ( fileret != 0 ){
         panic ("gwsInstallFont: fileret\n");

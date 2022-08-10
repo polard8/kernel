@@ -35,7 +35,7 @@ extern _system_state
 ; Jump
 ; Th CS stuff.
 ; Do a proper 64-bit jump. Should not be needed as the ...
-; jmp GDT64.Code:0x30001000 in the boot loader would have sent us ...
+; jmp EARLY_GDT64.Code:0x30001000 in the boot loader would have sent us ...
 ; out of compatibility mode and into 64-bit mode.
 
 ; The function _go_to_kernel jumps here
@@ -45,6 +45,7 @@ extern _system_state
 extern _die
 extern _putchar_K
 extern _hal_reboot
+extern _refresh_screen
 ;extern _kernel_gc
 ; ...
 
@@ -59,8 +60,9 @@ _kernel_begin:
 
 ; Function table
     DQ _die          ; 0
-    DQ _putchar_K    ; 1
+    DQ _putchar_K    ; 1 see: kstdio.c
     DQ _hal_reboot   ; 2
+    DQ _refresh_screen ; 3
     ; ...
     
 align 4
@@ -92,14 +94,18 @@ START:
 
 ; This gdt is here in this document.
 
-    lgdt [GDT64.Pointer]
+    lgdt [EARLY_GDT64.Pointer]
 
-    mov ax, GDT64.Data
+    mov ax, EARLY_GDT64.Data
     mov ds, ax
     mov es, ax
-    mov ss, ax
+    ;mov fs, ax
+    ;mov gs, ax
 
-    mov rsp, _xxxStack
+; Early kernel stack. 
+; 64 KB.
+    mov ss, ax
+    mov rsp,  _EarlyKernelStack
 
 ; LDT
 ; Initialize ldt with a NULL selector.
@@ -142,10 +148,10 @@ START:
  
     ;mov rax, qword tss0
 
-    ;mov [GDT64.tssData + 2], ax
+    ;mov [EARLY_GDT64.tssData + 2], ax
     ;shr rax, 16
-    ;mov [GDT64.tssData + 4],  al
-    ;mov [GDT64.tssData + 7],  ah
+    ;mov [EARLY_GDT64.tssData + 4],  al
+    ;mov [EARLY_GDT64.tssData + 7],  ah
 
 ; Load TR.
 ; 0x2B = (0x28+3).
@@ -255,21 +261,16 @@ START:
     ;mov dr7, eax
     ;; ...
 
-
-
-
-
 ; Use the calling convention for this compiler.
 ; rdi
 ; No return
 ; See: new/init.c
-
+ ; #todo: arch type (2) ??
+ 
     xor rax, rax
-    mov rdi, rax          ; #todo: arch type (2) ??
-    ;mov rsi, Loop        ; #todo: emergency ring 0 idle thread.
-    ;mov rdx, _xxxStack   ; #todo: base kernel stack
-    ;mov rcx, _rsp0Stack  ; #todo: ring 0 stack used by the apps in tss.
-
+    mov rdi, rax    ; First argument.
+    ; ...
+    
     call _kernel_main
 
 dieLoop:
@@ -296,43 +297,43 @@ align 8
 ;; Entry size ?
 ;; o dpl são os bits 5 e 6 do access byte.
 
-GDT64:                  ; Global Descriptor Table (64-bit).
-.Null: equ $ - GDT64    ; The null descriptor.
+EARLY_GDT64:            ; Global Descriptor Table (64-bit).
+.Null: equ $ - EARLY_GDT64    ; The null descriptor.
     dw 0xFFFF           ; Limit (low).
     dw 0                ; Base (low).
     db 0                ; Base (middle)
     db 0                ; Access.
     db 1                ; Granularity.
     db 0                ; Base (high).
-.Code: equ $ - GDT64    ; The code descriptor.
+.Code: equ $ - EARLY_GDT64    ; The code descriptor.
     dw 0                ; Limit (low).
     dw 0                ; Base (low).
     db 0                ; Base (middle)
     db 10011010b        ; Access (exec/read).
     db 10101111b        ; Granularity, 64 bits flag, limit19:16.
     db 0                ; Base (high).
-.Data: equ $ - GDT64    ; The data descriptor.
+.Data: equ $ - EARLY_GDT64    ; The data descriptor.
     dw 0                ; Limit (low).
     dw 0                ; Base (low).
     db 0                ; Base (middle)
     db 10010010b        ; Access (read/write).
     db 00000000b        ; Granularity.
     db 0                ; Base (high).
-.Ring3Code: equ $ - GDT64    ; The code descriptor.
+.Ring3Code: equ $ - EARLY_GDT64    ; The code descriptor.
     dw 0                     ; Limit (low).
     dw 0                     ; Base (low).
     db 0                     ; Base (middle)
     db 11111010b             ; Access (exec/read).
     db 10101111b             ; Granularity, 64 bits flag, limit19:16.
     db 0                     ; Base (high).
-.Ring3Data: equ $ - GDT64    ; The data descriptor.
+.Ring3Data: equ $ - EARLY_GDT64    ; The data descriptor.
     dw 0                     ; Limit (low).
     dw 0                     ; Base (low).
     db 0                     ; Base (middle)
     db 11110010b             ; Access (read/write).
     db 00000000b             ; Granularity.
     db 0                     ; Base (high).
-;.tssData: equ $ - GDT64     ; The data descriptor.
+;.tssData: equ $ - EARLY_GDT64     ; The data descriptor.
 ;    dw 0                    ; Limit (low).
 ;    dw 0                    ; Base (low).
 ;    db 0                    ; Base (middle)
@@ -340,8 +341,8 @@ GDT64:                  ; Global Descriptor Table (64-bit).
 ;    db 0x10                 ; Granularity.
 ;    db 0                    ; Base (high).
 .Pointer:               ; The GDT-pointer.
-    dw $ - GDT64 - 1    ; Limit.
-    dq GDT64            ; Base.
+    dw $ - EARLY_GDT64 - 1    ; Limit.
+    dq EARLY_GDT64            ; Base.
 
 align 8
 
@@ -2750,28 +2751,6 @@ _data_start:
     db 0xAA
 
 
-;; Stack usada pelo kernel
-;global _xxxStackEnd
-;_xxxStackEnd:
-;    times (1024*64) db 0
-;global _xxxStack
-;_xxxStack:
-
-
-;; Stack usada pelo aplicativo quando entra em ring 0
-;; #todo: 
-;; Talvez isso possa ficar no bss.
-;; See:
-;; headlib.asm and tss.c
-;global _rsp0StackEnd
-;_rsp0StackEnd:
-;    times (1024*64) db 0
-;global _rsp0Stack
-;_rsp0Stack:
-
-
-
-
 ;=================================================================
 ; BSS:
 ;     Início do segmento BSS.
@@ -2785,18 +2764,19 @@ _bss_start:
     ;db 0xAA
 
 
-;; Stack usada pelo kernel
-global _xxxStackEnd
-_xxxStackEnd:
-    ;times (1024*64) db 0
+; Stack usada pelo kernel
+; 64 KB.
+global _EarlyKernelStackEnd
+_EarlyKernelStackEnd:
     resb (1024*64)
-global _xxxStack
-_xxxStack:
+global _EarlyKernelStack
+_EarlyKernelStack:
 
-;;
+
+; Used by the tss in unit0lib.asm.
+; 64 KB
 global _rsp0StackEnd
 _rsp0StackEnd:
-    ;times (1024*64) db 0
     resb (1024*64)
 global _rsp0Stack
 _rsp0Stack:
@@ -2804,9 +2784,3 @@ _rsp0Stack:
 
 
 
-
-
-
-
-
-    

@@ -26,27 +26,25 @@
 //...
 
 
-
 //
 // == Colors =======================================================
 // 
 
-
-#define COLOR_WHITE    0xFFFFFF
-#define COLOR_BLACK    0x000000
-#define COLOR_RED      0xFF0000 
-#define COLOR_GREEN    0x00FF00
-#define COLOR_BLUE     0x0000FF
+#define COLOR_WHITE    0x00FFFFFF
+#define COLOR_BLACK    0x00000000
+#define COLOR_RED      0x00FF0000 
+#define COLOR_GREEN    0x0000FF00
+#define COLOR_BLUE     0x000000FF
 #define COLOR_GRAY     0x00808080 
 #define COLOR_PINK     0x00FFC0CB
 #define COLOR_ORANGE   0x00FFA500
 #define COLOR_YELLOW   0x00FFFF00
 // ...
 
-#define COLOR_CYAN     0x00FFFF
+#define COLOR_CYAN     0x0000FFFF
 
 #define COLOR_EMBEDDED_SHELL_BG  COLOR_BLUE
-
+#define COLOR_KERNEL_BACKGROUND  COLOR_BLUE
 
 // My gray scale.
 #define xCOLOR_BLACK 0x000000  //preto

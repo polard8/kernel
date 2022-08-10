@@ -234,11 +234,11 @@ void printchar (char **str, int c)
 
 void putchar_K(void)
 {
-    while(1){
+    //while(1){
         putchar('K');
-        putchar('\n');
-        refresh_screen();
-    }
+        //putchar('\n');
+        //refresh_screen();
+    //}
 }
 
 
@@ -1896,7 +1896,8 @@ int kstdio_initialize (void)
 // #bugbug
 // Estamos fazendo isso pela segunda vez.
 // A primeira foi em kernel_main.
-    Background_initialize();
+
+    Background_initialize(COLOR_KERNEL_BACKGROUND);
 
 // done
     kstdio_standard_streams_initialized = TRUE;

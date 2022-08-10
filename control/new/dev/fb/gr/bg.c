@@ -46,9 +46,10 @@ void backgroundDraw (unsigned int color)
 }
 
 // Called by kernel_main().
-int Background_initialize(void)
+int Background_initialize(unsigned int color)
 {
-    backgroundDraw ( (unsigned int) COLOR_BLACK );
+    backgroundDraw ( (unsigned int) color );
+    //set_up_cursor(0,0);
     return 0;
 }
 

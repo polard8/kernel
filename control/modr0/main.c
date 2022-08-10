@@ -55,12 +55,16 @@ int module_main( int reason )
     int DIE=0;      //it works
     int PUTCHARK=1; //it works
     int REBOOT=2;   //it works
+    int REFESHSCREEN=3;
     // #todo: Call dead thread collector, scheduler ...
     // read flags
     // read messages
     // ...
     if (Found==1)
     {
+        for (i=0; i<100; i++)
+            caller( (unsigned long) functions[PUTCHARK] );
+        
         //caller( (unsigned long) functions[DIE] );
         //caller( (unsigned long) functions[PUTCHARK] );
         //caller( (unsigned long) functions[REBOOT] );
@@ -72,10 +76,10 @@ int module_main( int reason )
         return 0;
     }
 
-    while(1){
+    //while(1){
         // Relax
         //do_hlt();
-    };
+    //};
 
     return 0;
 }

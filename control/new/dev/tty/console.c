@@ -1287,6 +1287,13 @@ void __test_thread(void)
     //show_slots();
 }
 
+//#test: Calling module.
+void caller(unsigned long function_address);
+void caller(unsigned long function_address)
+{
+    asm("call *%0" : : "r"(function_address));
+}
+
 
 // =====================================
 
@@ -1300,6 +1307,13 @@ int consoleCompareStrings(void)
     debug_print("consoleCompareStrings: \n");
     printf("\n");
 
+
+    if ( strncmp(prompt,"mod0",4) == 0 )
+    {
+        //mod0.bin entry point.
+        caller((unsigned long) 0x30A01000); 
+        goto exit_cmp;
+    }
 
 // ========
 // exit

@@ -12,6 +12,15 @@
 #define ____PIC_H    1
 
 
+/* i8259A PIC registers */
+/*
+#define PIC_MASTER_CMD		0x20
+#define PIC_MASTER_IMR		0x21
+#define PIC_SLAVE_CMD		0xa0
+#define PIC_SLAVE_IMR		0xa1
+*/
+
+
 // Estrutura para gerenciar as irqs do PIC.
 struct irq_d
 {

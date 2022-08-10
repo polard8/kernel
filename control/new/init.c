@@ -309,11 +309,8 @@ int kernel_main(int arch_type)
 // lfb
 //
 
-// #test
-// isso não é possivel porque a paginação feita pelo bootloader
-// ainda não esta pronta.
-// #todo:
-// Talvez possamos refazer a paginação usada pelo kernel.
+// Esse endereço virtual foi configurado pelo bootloader.
+// Ainda não configuramos a paginação no kernel.
 
     unsigned long *fb = (unsigned long *) FRONTBUFFER_VA; 
     fb[0] = 0x00FFFFFF;
@@ -506,6 +503,10 @@ int kernel_main(int arch_type)
     //for (i=0; i< 320*25; i++){ fb[i] = 0; };
     //while(1){asm("hlt");};
 
+// Runtime:
+// System memory support.
+// Heap, stack, memory usage and frames.
+
     PROGRESS("Kernel:0:4\n");
     Runtime_initialize();
 
@@ -513,33 +514,19 @@ int kernel_main(int arch_type)
 // Clear the screen.
 // print some basic info.
 // Setup printing resources.
-// ROM BIOS 8x8 font
-// #todo: Isso ja foi feito em outro lugar?
 
     PROGRESS("Kernel:0:5\n");
 
-    gws_currentfont_address = (unsigned long) BIOSFONT8X8;
-    set_char_width(8);
-    set_char_height(8);
-    gfontSize = FONT8X8;
+// Setup Default kernel font.
+// ROM BIOS 8x8 font.
+// see: font.c
 
-// Background
-// Initializing background 
-// for the very first time.
-// Now we have a black screen.
-// But the cursor position is wrong yet.
-// #todo
-// See: drivers/video/fbdev/bg.c
+    gwsInitializeDefaultKernelFont();
 
-    //#breakpoint: BLACK ON WHITE.
-    //ok, funcionou na maq real no modo jail, provavelmente 320x200.
-    //Ainda nao podemos usar o refresh screen porque a
-    //flag refresh_screen_enabled ainda nao foi acionada.
-    //for (i=0; i< 320*25; i++){ fb[i] = 0; };
-    //while(1){asm("hlt");};
+// Initializing background for the very first time.
+// See: bg.c
 
-    Background_initialize();
-
+    Background_initialize(COLOR_KERNEL_BACKGROUND);
 
 // No refresh screen yet!
 // Ainda nao podemos usar o refresh screen porque a
@@ -650,7 +637,7 @@ int kernel_main(int arch_type)
 // BANNER!
 // Welcome message.
 // This is the first message in the screen
-// See: user/console.c
+// See: console.c
 
     console_banner(0);
 
@@ -911,7 +898,7 @@ int kernel_main(int arch_type)
 
     case CURRENT_ARCH_X86_64:
         //debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
-        Background_initialize();
+        Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
         Status = (int) I_x64main();
         
         if (Status != TRUE){
@@ -921,7 +908,7 @@ int kernel_main(int arch_type)
         if (Status == TRUE)
         {
             // Clear the screen.
-            Background_initialize();
+            Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
 
             // ::: Initialization on debug mode.
             // Initialize the default kernel virtual console.
@@ -1197,7 +1184,7 @@ void early_ring0_IdleThread (void)
 Loop:
 
 // acende
-    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
+    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
     //draw_string(8,8,COLOR_YELLOW," Gramado Operating System ");
     //refresh_screen();
 
@@ -1206,8 +1193,8 @@ Loop:
     asm ("hlt");
 
 // apaga
-    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_BLUE );
-    //drawDataRectangle( 0, 0, deviceWidth, deviceHeight, COLOR_BLUE );  //#bug
+    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
+    //drawDataRectangle( 0, 0, deviceWidth, deviceHeight, COLOR_KERNEL_BACKGROUND );  //#bug
     //refresh_screen();
 
     goto Loop;

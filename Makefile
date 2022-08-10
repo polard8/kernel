@@ -97,10 +97,9 @@ run: do_run
 do_run:
 	sh ./run
 
-
 PHONY := runkvm
-run: do_runkvm
-do_run:
+runkvm: do_runkvm
+do_runkvm:
 	sh ./runkvm
 
 
