@@ -4,6 +4,9 @@
 #include <kernel.h>
 
 
+//see: fs.h
+struct filesystem_d  *root;
+
 //
 // == Cluster list ===============================
 //
@@ -2946,7 +2949,7 @@ void fs_init_structures (void)
 
     root->objectType  = ObjectTypeFileSystem;
     root->objectClass = ObjectClassKernelObjects;
-    root->used  = TRUE;
+    root->used = TRUE;
     root->magic = 1234;
     root->name = (char *) ____root_name;
 
@@ -2971,7 +2974,7 @@ void fs_init_structures (void)
          panic("fs_init_structures: storage");
     }
 
-    storage->fs = root;
+    storage->fs = (void*) root;
     // ...
 
 // Type
@@ -2988,7 +2991,7 @@ void fs_init_structures (void)
     Type = ( Type & 0xFFFF );
 
     if ( Type <= 0 ){
-        panic ("fs_init_structures: [PANIC] Type");
+        panic ("fs_init_structures: [PANIC] Type\n");
     }else{
         root->type = (int) Type;
     };
@@ -3051,7 +3054,7 @@ void fs_init_structures (void)
 
     case FS_TYPE_EXT2:
     default:
-        panic ("fs_init_structures: [PANIC] default Type");
+        panic ("fs_init_structures: [todo] default Type\n");
         break;
     };
 }
@@ -4069,7 +4072,6 @@ fsLoadFile (
     unsigned long buffer,
     unsigned long buffer_size_in_bytes )
 {
-
     int Status=-1;
     int i=0;
     int SavedDirEntry = 0;
@@ -4089,12 +4091,17 @@ fsLoadFile (
     unsigned long Buffer      = (unsigned long) buffer;
 
 // Size: maximum buffer size in size.
-    unsigned long BufferSizeInBytes = (unsigned long) (buffer_size_in_bytes & 0xFFFFFFFF);
+    unsigned long BufferSizeInBytes = 
+        (unsigned long) (buffer_size_in_bytes & 0xFFFFFFFF);
 
     unsigned long z=0;  //Deslocamento do rootdir 
     unsigned long n=0;  //Deslocamento no nome.
 
-    char tmpName[13];
+// #bugbug: Na verdade uma rotina abaixo esta copiando
+// mais do que o nome do arquivo, pois a rotina de copia
+// esta copiando shorts e não chars.
+// Então vamos aumentar esse buffer por enquanto.
+    char tmpName[256];
     size_t FileNameSize = 0;
     unsigned long FileSize = 0;
 
@@ -4108,7 +4115,7 @@ fsLoadFile (
     unsigned long S=0;  
 
 // Usado junto com o endereço do arquivo.
-    unsigned long SectorSize=0;
+    unsigned long SectorSize = SECTOR_SIZE;
 
 // Sectors per cluster.
     int Spc=0;
@@ -4151,41 +4158,41 @@ fsLoadFile (
         SectorSize = SECTOR_SIZE;
     }
     */
-
-    SectorSize = SECTOR_SIZE;
-
+ 
 // ...
 
 
 // =======================
 
 // How many entries in this directory.
+// For now, this is the limit of the rootdir.
 
-    if ( MaxEntries == 0 || MaxEntries > FAT16_ROOT_ENTRIES )
+    //if ( MaxEntries == 0 || MaxEntries >= FAT16_ROOT_ENTRIES )
+    if ( MaxEntries != FAT16_ROOT_ENTRIES )
     {
-        panic ("fsLoadFile: [FAIL] MaxEntries limits\n");
+        panic ("fsLoadFile: MaxEntries limits\n");
     }
 
     if ( DirEntries > MaxEntries ){
-        panic ("fsLoadFile: [FAIL] DirEntries\n");
+        panic ("fsLoadFile: DirEntries\n");
     }
 
-// #test
-// Used only for debug.
-
-    if ( DirEntries < MaxEntries ){
+// #test: Used only for debug. 512 entries in rootdir.
+    if (DirEntries != MaxEntries){
         panic ("fsLoadFile: [DEBUG] DirEntries IS LESS THE 512\n");
     }
 
-// =======================
+
+// Buffer size in bytes
+// Max = 512 pages.
 
     if ( BufferSizeInBytes == 0 ){
-        panic("fsLoadFile: [FAIL] BufferSizeInBytes\n");
+        panic("fsLoadFile: BufferSizeInBytes = 0\n");
     }
 
-// limite maximo de uma imagem de processo.
+
     if ( BufferSizeInBytes > (512*4096) ){
-        panic("fsLoadFile: [FAIL] BufferSizeInBytes\n");
+        panic("fsLoadFile: BufferSizeInBytes limits\n");
     }
 
 // Root file system structure.
@@ -4195,29 +4202,37 @@ fsLoadFile (
 //    máximo de entradas.
 // ...
 
+
+// Root file system for the boot disk.
+
     if ( (void *) root == NULL ){
-        panic ("fsLoadFile: No root file system.\n");
-    }else{
+        panic ("fsLoadFile: root\n");
+    }
 
-        // #todo
-        // Check if the root is initialized.
-        //if (root->used != 1 || root->magic != 1234){
-        //    panic ("fsLoadFile: validation");
-        //}
+    if ( root->used != TRUE || 
+         root->magic != 1234)
+    {
+        panic ("fsLoadFile: root validation\n");
+    }
 
-        Spc = root->spc;
-        if (Spc <= 0){ panic ("fsLoadFile: Spc\n"); }
+    // Sectors Per Cluster.
+    // #todo: We need a max limit.
+    Spc = (int) root->spc;
+    if (Spc <= 0){
+        panic ("fsLoadFile: Spc\n");
+    }
 
-        // Max entries 
-        // Número de entradas no rootdir.
-        // #bugbug: 
-        // Devemos ver o número de entradas no diretório corrente.
+// Max entries 
+// Número de entradas no rootdir.
+// #bugbug: 
+// Devemos ver o número de entradas no diretório corrente.
+// Por enquanto so aceitamos 512.
+    if ( root->dir_entries != MaxEntries )
+    {
+        panic ("fsLoadFile: root->dir_entries\n"); 
+    }
 
-        //max = root->rootdir_entries;
-        if (MaxEntries <= 0){ panic ("fsLoadFile: max root entries \n"); }
-
-        // ...
-    };
+    // ...
 
 
 // Continua ... 
@@ -4235,12 +4250,12 @@ fsLoadFile (
 // file name
 
     if ( (void *) file_name == NULL ){
-        printf ("fsLoadFile: [FAIL] file_name\n");
+        printf ("fsLoadFile: file_name\n");
         goto fail;
     }
 
     if ( *file_name == 0 ){
-        printf ("fsLoadFile: [FAIL] *file_name\n");
+        printf ("fsLoadFile: *file_name\n");
         goto fail;
     }
 
@@ -4254,15 +4269,17 @@ fsLoadFile (
     FileNameSize = (size_t) strlen (file_name); 
 
     if ( FileNameSize > 11 ){
-         printf ("fsLoadFile: [FAIL] name size %d\n", FileNameSize ); 
-         FileNameSize = 11;
+         printf ("fsLoadFile: Name size %d\n", FileNameSize ); 
+         //FileNameSize = 11;
          //return 1; //fail
+         goto fail;
     }
 
 //
 // File size
 //
 
+// #bugbug
 // Pegar o tamanho do arquivo e comparar com o limite do buffer.
 // #bugbug: 
 // Essa rotina so pega o tamanho dos arquivos que estao 
@@ -4282,24 +4299,20 @@ fsLoadFile (
                            (unsigned char *) file_name, 
                            (unsigned long) dir_address );
 
-    if (FileSize==0)
+// Queremos abrir um arquivo que contenha 0 bytes.
+// New file.
+    if (FileSize == 0)
     {
         debug_print ("fsLoadFile: [FIXME] FileSize\n");
         printf      ("fsLoadFile: [FIXME] FileSize %d\n", FileSize);
         //goto fail;
     }
 
-    //printf ("Antes: FileSize %d BufferLimit %d\n",
-    //        FileSize, BufferLimit );
-
-
-// Limits:
 // The file size can't be bigger than the buffer size.
-
-    if ( FileSize > BufferSizeInBytes )
+    if ( FileSize >= BufferSizeInBytes )
     {
-        debug_print ("fsLoadFile: [FAIL] Buffer Overflow\n");
-             printf ("fsLoadFile: [FAIL] FileSize %d BufferSizeInBytes %d\n",
+        debug_print ("fsLoadFile: [FIXME] Buffer Overflow\n");
+             printf ("fsLoadFile: [FIXME] FileSize %d BufferSizeInBytes %d\n",
                  FileSize, BufferSizeInBytes );
         goto fail;
     }
@@ -4339,14 +4352,21 @@ fsLoadFile (
     i=0; 
     while ( i < MaxEntries )
     {
-        if ( __dir[z] != 0 )
+        // Se a entrada não começar com a short '0x0000'.
+        if ( __dir[z] != 0x0000 )
         {
+            //#bugbug: Estamos movendo shorts e não chars.
+            //memcpy ( tmpName, &__dir[z], (FileNameSize/2) );
             memcpy ( tmpName, &__dir[z], FileNameSize );
             tmpName[FileNameSize] = 0;
 
             Status = strncmp( file_name, tmpName, FileNameSize );
 
-            if ( Status == 0 ){ SavedDirEntry = i; goto __found; }
+            if ( Status == 0 )
+            {
+                SavedDirEntry = i; 
+                goto __found;
+            }
         }; 
         z += 16;
         i++;
@@ -4387,7 +4407,7 @@ __found:
 // #todo
 // Na verdade os dois primeiros clusters estão indisponíveis.
 
-    cluster = __dir[ z+13 ];
+    cluster = (unsigned short) __dir[ z+13 ];
 
     if ( cluster <= 0 || cluster > 0xFFF0 )
     {
@@ -4495,7 +4515,7 @@ __loop_next_entry:
 
     is_valid = (int) __check_address_validation( (unsigned long) Buffer );
     if( is_valid != TRUE ){
-        panic ("fsLoadFile: is_valid");
+        panic ("fsLoadFile: Not a valid address\n");
     }
 
 //
@@ -4524,10 +4544,11 @@ __loop_next_entry:
 // #important
 // Check this value against a vector limit.
 // We already did that a single time before.
+// #bugbug: Não pode ser menor que 0, pois é unsigned short.
 
     if ( cluster <= 0 || cluster > 0xFFF0 )
     {
-        panic("fsLoadFile: fat[] vector overflow.");
+        panic("fsLoadFile: fat[] vector overflow.\n");
     }
 
     next = (unsigned short) fat[cluster];

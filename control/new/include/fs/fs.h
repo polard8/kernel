@@ -314,25 +314,19 @@ struct filesystem_d
     object_type_t  objectType;
     object_class_t objectClass;
 
-//#todo:
-    //int id;
-
     int used;
     int magic;
 
+//#todo: int id;
+
     int type;
-
     char *name;
-
 // Sectors per cluster.
     int spc; 
-
 // Number of entries in the root dir.
     int dir_entries;
-    
 // Size of the entry in bytes.
     int entry_size; 
-
 
 // The whole filesystem size.
 // (tables + data)
@@ -380,7 +374,8 @@ struct filesystem_d
 
 // The root file system.
 // See: fs_init_structures in fs.c
-struct filesystem_d  *root;
+// See: fs.h
+extern struct filesystem_d  *root;
 // ...
 
 
