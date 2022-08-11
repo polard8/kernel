@@ -105,18 +105,15 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
 
 // Check TID.
-    FirstTID = (tid_t) Idle->tid;
-
-    if ( FirstTID < 0 || 
-         FirstTID >= THREAD_COUNT_MAX )
-    {
-        panic ("__scheduler_rr: FirstTID\n");
-    }
-
-
 // Por enquanto a Idle thread desse processador
 // precisa ser a InitThread. Pois ela a a primeira
 // thread em user mode do primeiro processador.
+
+    FirstTID = (tid_t) Idle->tid;
+
+    if (FirstTID != SYSTEM_THRESHOLD_TID){
+        panic ("__scheduler_rr: FirstTID\n");
+    }
 
     if ( Idle != InitThread ){
         panic ("__scheduler_rr: Idle != InitThread\n");

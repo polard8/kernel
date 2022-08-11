@@ -4,34 +4,19 @@
 #include <kernel.h>  
 
 
-// 0x0000000030A00000
-void *create_tid0(void)
-{
-    return NULL;
-}
-
-// 0x0000000030C00000
-void *create_tid1 (void)
-{
-    return NULL;
-}
-
-// 0x0000000030E00000
-void *create_tid2 (void)
-{
-    return NULL;
-}
-
 // ==================================================
-// create_tid3:
+// create_init_thread:
 // The control thread of the first ring3 process.
+// This is the init thread.
 
-void *create_tid3 (void)
+struct thread_d *create_init_thread (void)
 {
     struct thread_d  *t;
-    //int TID = (int)(INIT_TID & 0xFFFF);
 
-    int TID = 0;   //FIRST THREAD.
+
+// This is the first thread.
+// See: thread.h
+    int TID = (int) INIT_TID;
 
     // loops
     register int r=0;    // Wait reason.
@@ -371,7 +356,7 @@ void *create_tid3 (void)
 
     //debug_print ("create_tid3: done\n");
 
-    return (void *) t;
+    return (struct thread_d *) t;
 }
 
 

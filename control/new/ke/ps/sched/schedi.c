@@ -327,9 +327,9 @@ void do_thread_zombie(int tid)
     }
 
 // #test
-// Can't close this one.
+// Can't close the init thread for now.
 
-    if ( tid == TID0_TID ){
+    if ( tid == INIT_TID ){
         return;
     }
 

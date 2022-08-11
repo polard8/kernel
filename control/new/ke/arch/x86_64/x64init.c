@@ -234,13 +234,12 @@ static int I_x64CreateInitialProcess(void)
 
 
 // Criamos um thread em ring3.
-// O valor de eflags é 0x3200.
-// The control thread of the first ws's client.
-// See: gws.bin
-
+// O valor de eflags é 0x3200. The app is gonna change that.
+// The control thread of the first ring 3 process.
+// See: create.c
 // Struct, and struct validation.
 
-    InitThread = (void *) create_tid3();
+    InitThread = (struct thread_d *) create_init_thread();
 
     if ( (void *) InitThread == NULL ){
         printf ("I_x64CreateInitialProcess: InitThread\n");

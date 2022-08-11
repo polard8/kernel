@@ -888,7 +888,8 @@ struct thread_d *create_thread (
     pid_t ProcessID = -1;
 
 // Counter
-    int i = USER_BASE_TID;
+// see: thread.h
+    int i = (int) USER_THRESHOLD_TID;
 
     int Personality = personality;
 
@@ -1101,40 +1102,38 @@ struct thread_d *create_thread (
 
 // Loop.
 // Vamos gerar um TID válido.
-// #bugbug: 
-// Isso pode virar um loop infinito!
 
-    int Round=0;  //#todo: Change to cycle.
+    i = (int) USER_THRESHOLD_TID;  // começa na base.
+    int Cycle=0;
 
 try_next_slot:
 
-    // 3 rounds.
-    if (Round > 3){
+    // 3 tentativas.
+    if (Cycle >= 3){
         panic ("create_thread: [FAIL] No more slots\n");
         //return NULL;
-    }
-
-// Recomeça o loop na base para id de usuarios.
-
-    i++;
-    if ( i >= THREAD_COUNT_MAX )
-    {
-       i = USER_BASE_TID;  
-       Round++; 
     }
 
 // Get empty thread structure pointer.
 // Not empty
 // Voltamos.
-// #bugbug: 
-// Isso pode n�o parar nunca.
 
     Empty = (void *) threadList[i];
 
-    if ( (void *) Empty != NULL ){
+    if ( (void *) Empty != NULL )
+    {
+        // Recomeça o loop na base para id de usuarios.
+        i++;
+        if (i >= THREAD_COUNT_MAX)
+        {
+            i = (int) USER_THRESHOLD_TID;  
+           Cycle++; 
+        }
+        
         goto try_next_slot;
     }
-    
+
+
 // ======================================
 
 // Index Ok.

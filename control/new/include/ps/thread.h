@@ -6,39 +6,24 @@
 
 
 // =================================
-// System threads:
+// System threads: (canonical)
+// The first system thread is '0'. It is the ring 3 init thread.
+// The first user thread is '100'.
+// We're gonna give less privilegies for those threads 
+// equal and above 100. 
 
-// 0 = GWSSRV.BIN's control thread
-//     A ring 0 thread that belongs to the kernel process.
-//     it is the window server it self.
-// 3 = GWS.BIN's control thread
-//     This is the first client for the window server.
-//     It is a ring3 application.
-//     It belong to the init process.
-
-
-#define MODULE0_TID  0  // MOD0.BIN.
-#define MODULE1_TID  1  // ?
-#define MODULE2_TID  2  // ?
-
-// First ring3 process. INI.BIN.
-#define CLIENT0_TID  3  
-
-// alias.
-#define TID0_TID  MODULE0_TID
-#define TID1_TID  MODULE1_TID
-#define TID2_TID  MODULE2_TID
-#define TID3_TID  CLIENT0_TID
-#define WS_FIRST_CLIENT_TID  CLIENT0_TID
-#define INIT_TID             CLIENT0_TID
-// =================================
-
-
+// -----------------------------------------
 // The system's thread counter starts here.
-#define SYSTEM_BASE_TID  0
-// The user's thread counter starts here.
-#define USER_BASE_TID    100
+#define SYSTEM_THRESHOLD_TID  0
+#define INIT_TID    SYSTEM_THRESHOLD_TID
+//...
 
+// -----------------------------------------
+// The user's thread counter starts here.
+#define USER_THRESHOLD_TID    100
+
+
+// --------------------------------
 
 #define THREAD_MAGIC  1234
 
@@ -853,12 +838,12 @@ int init_threads (void);
 //See: main.c
 void early_ring0_IdleThread (void);
 
-// See: 
-// create.c
-void *create_tid0(void);   // ws
-void *create_tid1 (void);  // ?
-void *create_tid2 (void);  // ?
-void *create_tid3(void);   // first ring3 client. gws.bin
+
+// Create the init thread.
+// This is the first thread ever.
+// See: create.c
+
+struct thread_d *create_init_thread(void); 
 
 // From thread.c
 
