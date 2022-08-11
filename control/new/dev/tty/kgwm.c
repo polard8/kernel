@@ -1229,6 +1229,8 @@ fail:
 int wmKeyEvent( tid_t tid, unsigned char raw_byte )
 {
 
+// Post keyboard event to the current foreground thread.
+
 // #todo
 // Devemos considerar os marcadores de teclado extendido
 // obtidos em DeviceInterface_PS2Keyboard() em ps2kbd.c
@@ -1851,9 +1853,43 @@ done:
 // called by __ps2mouse_parse_data_packet in ps2mouse.c
 int wmMouseEvent(int event_id,long long1, long long2)
 {
+
+//  Post mouse events only to the window server's control thread.
+
+
+    struct process_d *ws_process;
+
     int Status=-1;
     unsigned long button_number = long1;
     //debug_print ("xxxMouseEvent:\n");
+
+
+    //get the window server pid.
+    pid_t ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
+
+    if(ws_pid<0 || ws_pid>=PROCESS_COUNT_MAX)
+        return -1;
+    ws_process = (struct process_d *) processList[ws_pid];
+
+    if( (void*) ws_process == NULL )
+        return -1;
+    if(ws_process->magic!=1234)
+        return -1;
+     
+     struct thread_d *t;
+     t = (struct thread_d *) ws_process->control;
+     
+    if( (void*) t == NULL )
+        return -1;
+    if(t->magic!=1234)
+        return -1;
+     
+
+    tid_t ws_tid = t->tid;
+
+    if(ws_tid<0 || ws_tid>=THREAD_COUNT_MAX)
+        return -1;
+
 
     if (event_id<0){
         return -1;
@@ -1866,7 +1902,7 @@ int wmMouseEvent(int event_id,long long1, long long2)
         event_id == MSG_MOUSERELEASED )
     {
         post_message_to_tid(
-            foreground_thread,
+            ws_tid,  //Send it to the window server.
             NULL,
             event_id,
             button_number,
@@ -1935,14 +1971,22 @@ int wmMouseEvent(int event_id,long long1, long long2)
         //frontbuffer_draw_rectangle( 
         //    long1, long2, 10, 10, COLOR_RED, 0 );
 
-        Status = 
-            (int) wmProcedure(
-                (struct window_d *) 0,         // opaque pointer
-                (int)               event_id,  // msg code
-                (unsigned long)     long1,     // x
-                (unsigned long)     long2 );   // y
+        //Status = 
+        //    (int) wmProcedure(
+        //        (struct window_d *) 0,         // opaque pointer
+        //        (int)               event_id,  // msg code
+        //        (unsigned long)     long1,     // x
+        //        (unsigned long)     long2 );   // y
         
-        return (int) Status;
+        post_message_to_tid(
+            ws_tid,  //Send it to the window server.
+            NULL,
+            event_id,
+            long1,    //x
+            long2 );  //y
+        
+        return 0;
+        //return (int) Status;
     }
 //----
 
