@@ -7,6 +7,29 @@
 //see: fs.h
 struct filesystem_d  *root;
 
+
+// gcc -Wall Defined but not used!
+static char *____root_name = "/";
+
+// Boot partition.
+int fat_cache_saved=FALSE;
+int fat_cache_loaded=FALSE;
+
+
+struct cwd_d  CWD;
+
+
+//char search_path[?];
+unsigned long search_path_dir_address=0;
+unsigned long search_path_dir_entries=0;
+
+
+// List of clusters. 
+// Usado na rotina de carregamento de arquivo.
+// #bugbug: Isso não é desperdício?
+unsigned short file_cluster_list[1024]; 
+
+
 //
 // == Cluster list ===============================
 //

@@ -7,7 +7,7 @@
 // global
 unsigned long sys_time_hz=0;
 
-
+static char *default_user_name = DEFAULT_USERNAME;
 
 
 

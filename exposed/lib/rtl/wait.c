@@ -25,7 +25,7 @@ pid_t wait( int *status )
 
 /*
  * waitpid:
- *
+ *     #bugbug:  THIS IS A WORKIN PROGRESS!
  */
 //acho que isso é o retorno.??sei lá.
 //< -1	meaning wait for any child process whose process group ID is equal to the absolute value of pid.
@@ -47,13 +47,16 @@ pid_t waitpid (pid_t pid, int *status, int options)
 	// então devemos esperar até que algum processo filho termine.
 
     pid_t __pid;
+    unsigned long r=0;
 
-again:
+    r = 
+        (unsigned long) gramado_system_call ( 
+                            83, 
+                            (unsigned long) pid, 
+                            (unsigned long) status, 
+                            (unsigned long) options );
 
-    __pid = (pid_t) gramado_system_call ( 83, 
-                         (unsigned long) pid, 
-                         (unsigned long) status, 
-                         (unsigned long) options );
+    __pid = (pid_t) (r & 0xFFFFFFFF);
 
     if ( __pid > 0 ){
         return (pid_t) __pid;
@@ -74,12 +77,6 @@ again:
 	//#bugbug
 	//estamos retornando para não entrarmos no loop,
 	//depois que criarmos a rotina sleep, deletaremos esse retorno.
-
-    return (pid_t) __pid;
-
-    goto again;
-
-// done:
 
     return (pid_t) __pid;
 }

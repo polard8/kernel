@@ -1,11 +1,21 @@
 
 // assert.c
-// Credits: Serenity OS
+// Credits: Serenity OS (bsd license)
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+
+enum {
+    DIAGASSERT_ABORT   =  1<<0,
+    DIAGASSERT_STDERR  =  1<<1,
+    DIAGASSERT_SYSLOG  =  1<<2
+};
+
+// private
+// static int diagassert_flags = -1;
 
 
 #ifdef DEBUG
@@ -78,16 +88,6 @@ __assert(const char *file, int line, const char *failedexpr)
 	//NOTREACHED
 }
 */
-
-
-enum {
-    DIAGASSERT_ABORT   =  1<<0,
-    DIAGASSERT_STDERR  =  1<<1,
-    DIAGASSERT_SYSLOG  =  1<<2
-};
-
-
-static int diagassert_flags = -1;
 
 
 /*

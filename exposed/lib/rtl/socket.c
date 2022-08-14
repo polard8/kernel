@@ -646,8 +646,7 @@ char *inet_ntoa ( struct in_addr in )
  
 struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 {
-    
-    in_addr_t addr;
+    //in_addr_t addr;
     struct in_addr ret;
 
     printf("inet_makeaddr: [BUGBUG] Not implemented!\n");

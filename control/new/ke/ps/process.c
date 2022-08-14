@@ -31,6 +31,9 @@ pid_t criticalsection_pid;
 
 // PRIVATE
 static pid_t __current_pid = (pid_t) (-1);  //fail
+
+
+
 static pid_t caller_process_id=0;
 
 
@@ -58,60 +61,50 @@ pid_t get_current_process(void)
     return (pid_t) __current_pid;
 }
 
-
-// Quando criamos um novo processo.
-//int NewProcessInitialized = FALSE;
-
-
-int GetCurrentPID (void)
+pid_t get_current_pid(void)
 {
-    //return (int) current_process;
     return (pid_t) get_current_process();
 }
 
-
-
-struct process_d *GetCurrentProcess(void)
+// Return the pointer for a valid current process.
+struct process_d *get_current_process_pointer(void)
 {
     struct process_d *p;
-    
-    pid_t current_process = (pid_t) get_current_process();
-    
-    if ( current_process < GRAMADO_PID_BASE || 
-         current_process >= PROCESS_COUNT_MAX )
+    pid_t __pid = (pid_t) get_current_process();
+    if ( __pid < 0 || __pid >= PROCESS_COUNT_MAX )
     {
         return NULL;
     }
-
-    p = (struct process_d *) processList[current_process];
-
+    p = (struct process_d *) processList[__pid];
+    if (p->used!=TRUE)
+        panic ("get_current_process_pointer: used\n");
+    if (p->magic!=1234)
+        panic ("get_current_process_pointer: magic\n");
     return (struct process_d *) p;
 }
 
 
-// helper
-unsigned long GetProcessStats ( int pid, int index )
+// #todo: Observar metodos melhores para distribuir as informações.
+// Unix-like coloca as informações emum arquivo para ser lido
+// pelos aplicativos.
+unsigned long get_process_stats ( pid_t pid, int index )
 {
     struct process_d *p;
 
-
-    if (pid<0){
-        panic ("GetProcessStats: pid \n");
+    if (pid<0 || pid >= PROCESS_COUNT_MAX)
+    {
+        panic ("get_process_stats: pid \n");
     }
-
-    // Process
 
     p = (void *) processList[pid];
 
     if ( (void *) p == NULL ){
-        printf ("GetProcessStats: struct \n");
-        return 0; 
+        return 0;
+    } 
 
-    } else {
-        //checar validade.
-		//...
-    };
-
+    if (p->magic!=1234){
+        return 0;
+    } 
 
     switch (index){
 
@@ -127,20 +120,16 @@ unsigned long GetProcessStats ( int pid, int index )
 
         case 10:  
             return (unsigned long) p->private_memory_size;
-            break;  
-
+            break;
         case 11:
             return (unsigned long) p->shared_memory_size;
-            break;          
-
+            break;
         case 12:
             return (unsigned long) p->workingset_size;
-            break;          
-
+            break;
         case 13:
             return (unsigned long) p->workingset_peak_size;
-            break;          
-
+            break;
         case 14:
             return (unsigned long) p->pagefaultCount;
             break;          
@@ -211,48 +200,49 @@ unsigned long GetProcessStats ( int pid, int index )
     return 0;
 }
 
+
 // Systemcall 882.
-// Pega o nome do processo.
 // OUT: string len.
-int getprocessname ( int pid, char *buffer ){
-
+// type: ssize_t ?
+int getprocessname ( pid_t pid, char *buffer )
+{
     struct process_d  *p;
-
     char *name_buffer = (char *) buffer;
 
-    //#todo
-    //checar validade dos argumentos.
+// #todo
+// checar validade dos argumentos.
 
-    if (pid<0){
-        debug_print ("getprocessname: [FAIL] pid\n");
+    if (pid<0 || pid >= PROCESS_COUNT_MAX)
+    {
         goto fail;
     }
 
-    //#todo
-    //buffer validation
+    if ( (void*) buffer == NULL )
+    {
+        goto fail;
+    }
  
     p = (struct process_d *) processList[pid]; 
 
     if ( (void *) p == NULL ){
-        debug_print ("getprocessname: [FAIL] p\n");
         goto fail;
     }
 
     if ( p->used != TRUE || p->magic != 1234 )
     {
-        debug_print ("getprocessname: [FAIL] Validation\n");
         goto fail;
     }
 
-    // 64 bytes
-    strcpy ( name_buffer, (const char *) p->__processname );  
+// 64 bytes
+// #todo #bugbug: Check the lenght and use another copy function.
+    strcpy ( 
+        name_buffer, 
+        (const char *) p->__processname );  
 
-//done:
+// Return the len.
+// #bugbug: 
+// Provavelmente isso ainda nem foi calculado.
 
-    // #bugbug: 
-    // Provavelmente isso ainda nem foi calculado.
-
-    // Return the len.
     return (int) p->processName_len;
 
 fail:
@@ -790,51 +780,35 @@ void init_processes (void)
 }
 
 
-/*
- * CloseAllProcesses:
- *     Bloqueia todos os processos da lista de processos.
- *     Menos o processo '0'.
- *     processCloseAllProcesses();    
- */
+// #todo
+// This is a work in progress.
+// + Block all processes in the list but not the KernelProcess.
+// + Invalidate all the strutures.
+// ...
 
-void CloseAllProcesses (void)
+void close_all_processes(void)
 {
+    struct process_d  *p;
     int i=0;
-    struct process_d  *P;
 
-// #importante:
-// Menos o 0, pois � o kernel. 
-// Pega, bloqueia e tira da lista.
+    if ( (void *) KernelProcess == NULL ){
+        panic ("close_all_processes: KernelProcess\n");
+    }
 
-    for ( i=1; i < PROCESS_COUNT_MAX; i++ )
+    for ( i=0; 
+          i <= PROCESS_COUNT_MAX; 
+          i++ )
     {
-        P = (void *) processList[i];
-        P->state = PROCESS_BLOCKED;
+        p = (void *) processList[i];
         
-        // Not kernel.
-        //#bugbug: review
-        if (i != 100){
+        if (p != KernelProcess )
+        {
+            p->state = PROCESS_BLOCKED;
+            p->used = FALSE;
+            p->magic = 0;
             processList[i] = (unsigned long) 0;
         }
     };
-
-// Check process 0.
-    P = (void *) processList[0];
-    if ( (void *) P == NULL ){
-        panic ("CloseAllProcesses: P\n");
-    }
-
-// #todo: validation?
-
-// #bugbug
-// The kernel is process 100. #bugbug
-//#bugbug: review
-    
-    P = (void *) processList[100];
-
-    if ( (void *) P == NULL ){
-        panic ("CloseAllProcesses: kernel\n");
-    }
 }
 
 

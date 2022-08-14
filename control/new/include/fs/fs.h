@@ -10,9 +10,7 @@ struct dev_dir_entry_d
 {
     int used;
     int magic;
-
     int id;
-
     int initialized;
 
 // ex:
@@ -70,7 +68,8 @@ struct cwd_d
     int size;
     int initialized;
 };
-struct cwd_d CWD;
+
+extern struct cwd_d  CWD;
 
 
 
@@ -145,11 +144,9 @@ struct cwd_d CWD;
 //
 
 // Boot partition.
-int fat_cache_saved;
-int fat_cache_loaded;
+extern int fat_cache_saved;
+extern int fat_cache_loaded;
 
-// gcc -Wall Defined but not used!
-static char *____root_name = "/";
 
 
 //
@@ -176,9 +173,8 @@ static char *____root_name = "/";
 // and a search path, became part of the operating system.
 
 
-//char search_path[?];
-unsigned long search_path_dir_address;
-unsigned long search_path_dir_entries;
+extern unsigned long search_path_dir_address;
+extern unsigned long search_path_dir_entries;
 
 
 // ?? - Contagem de diretórios.
@@ -188,7 +184,7 @@ unsigned long search_path_dir_entries;
 // List of clusters. 
 // Usado na rotina de carregamento de arquivo.
 // #bugbug: Isso não é desperdício?
-unsigned short file_cluster_list[1024]; 
+extern unsigned short file_cluster_list[1024]; 
 
 
 

@@ -787,11 +787,10 @@ static void *__extra_services (
                             (char *) arg3, (size_t) arg4  ); 
     } 
 
-
     // Get process stats given pid
-    // IN: pid, number
+    // IN: pid, index
     if ( number == 880 ){
-       return (void *) GetProcessStats ( (int) arg2, (int) arg3 );
+       return (void *) get_process_stats ( (pid_t) arg2, (int) arg3 );
     }
 
     // get thread stats given tid
@@ -804,12 +803,12 @@ static void *__extra_services (
     // Get process name
     // IN: PID, ubuffer.
     if ( number == 882 ){
-        return (void *) getprocessname ( (int) arg2, (char *) arg3);
+        return (void *) getprocessname( (pid_t) arg2, (char *) arg3 );
     }
 
     // Get thread name
     if ( number == 883 ){
-        return (void *) getthreadname ( (int) arg2, (char *) arg3);
+        return (void *) getthreadname ( (int) arg2, (char *) arg3 );
     }
 
     // alarm()

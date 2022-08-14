@@ -76,16 +76,22 @@ typedef struct {
 } ldiv_t;
 
 
+/*
+//#bugbug: __STDC_VERSION__ not defined.
 #if !defined(_ANSI_SOURCE) && \
     (defined(_ISOC99_SOURCE) || (__STDC_VERSION__ - 0) >= 199901L || \
      (__cplusplus - 0) >= 201103L || defined(_NETBSD_SOURCE))
+
 typedef struct {
-	/* LONGLONG */
-	long long int quot;	/* quotient */
-	/* LONGLONG */
-	long long int rem;	/* remainder */
+
+    long long int quot;  //quotient
+    long long int rem;   //remainder
+
 } lldiv_t;
+
 #endif
+*/
+
 
 #if defined(_NETBSD_SOURCE)
 typedef struct {

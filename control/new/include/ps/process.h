@@ -905,8 +905,11 @@ unsigned long processList[PROCESS_COUNT_MAX];
 //
 
 
-void set_current_process( pid_t pid );
+void set_current_process(pid_t pid);
 pid_t get_current_process(void);
+
+pid_t get_current_pid(void);
+struct process_d *get_current_process_pointer(void);
 
 
 //==============
@@ -924,19 +927,19 @@ pid_t copy_process ( const char *filename, pid_t pid, unsigned long clone_flags 
 void show_currentprocess_info (void);
 void show_process_information (void);
 
-int GetCurrentPID (void);
-struct process_d *GetCurrentProcess(void);
 
-//helper
-unsigned long GetProcessStats ( int pid, int index );
+unsigned long get_process_stats ( pid_t pid, int index );
 
-int getprocessname ( int pid, char *buffer );
+int getprocessname ( pid_t pid, char *buffer );
+
 struct process_d *processObject (void);
 pid_t getNewPID (void);
 int processTesting (int pid);
 int processSendSignal (struct process_d *p, unsigned long signal);
 void init_processes (void);
-void CloseAllProcesses (void);
+
+
+void close_all_processes(void);
 
 // ===
 

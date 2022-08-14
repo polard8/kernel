@@ -7,6 +7,22 @@
 
 #include <kernel.h>  
 
+// base address 
+// BAR0 is the start of the I/O ports used by the primary channel.
+// BAR1 is the start of the I/O ports which control the primary channel.
+// BAR2 is the start of the I/O ports used by secondary channel.
+// BAR3 is the start of the I/O ports which control secondary channel.
+// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
+// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
+
+unsigned long ATA_BAR0_PRIMARY_COMMAND_PORT=0;    // Primary Command Block Base Address
+unsigned long ATA_BAR1_PRIMARY_CONTROL_PORT=0;    // Primary Control Block Base Address
+unsigned long ATA_BAR2_SECONDARY_COMMAND_PORT=0;  // Secondary Command Block Base Address
+unsigned long ATA_BAR3_SECONDARY_CONTROL_PORT=0;  // Secondary Control Block Base Address
+unsigned long ATA_BAR4=0;  // Legacy Bus Master Base Address
+unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Address
+
+
 /* 
  * Obs:
  * O que segue são rotinas de suporte ao controlador IDE.

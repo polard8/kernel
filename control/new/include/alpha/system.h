@@ -254,7 +254,7 @@ int gSystemStatus; //?? Usado pelo construtor.
 //O endereço e a rotina são de 32bit.
 unsigned long shutdown_address;
 
-static char *default_user_name = DEFAULT_USERNAME;
+
 
 /*
  * version_d:
@@ -278,7 +278,8 @@ struct version_d
     unsigned long Minor;
     unsigned long Build;
 };
-struct version_d *Version;
+
+struct version_d  *Version;
 //...
 
 /*
@@ -339,8 +340,7 @@ struct system_d  *System;
 // == Prototypes =====================
 //
 
-unsigned long systemGetSystemMetrics ( int index );
-
+unsigned long systemGetSystemMetrics (int index);
 int system_get_pid (int index);
 void systemShutdownViaAPM (void);
 void systemShutdown (void);
@@ -348,7 +348,6 @@ void systemShowDevicesInfo (void);
 void systemSetupVersion (void);
 void systemReboot (void);
 void *systemNull (void);
-
 int init_executive (void);
 
 #endif    

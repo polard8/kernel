@@ -379,20 +379,13 @@ struct ata_device_d *ready_queue_dev;
 #define DISK4 4
 
 
-// base address 
-// BAR0 is the start of the I/O ports used by the primary channel.
-// BAR1 is the start of the I/O ports which control the primary channel.
-// BAR2 is the start of the I/O ports used by secondary channel.
-// BAR3 is the start of the I/O ports which control secondary channel.
-// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
-// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
+extern unsigned long ATA_BAR0_PRIMARY_COMMAND_PORT;    // Primary Command Block Base Address
+extern unsigned long ATA_BAR1_PRIMARY_CONTROL_PORT;    // Primary Control Block Base Address
+extern unsigned long ATA_BAR2_SECONDARY_COMMAND_PORT;  // Secondary Command Block Base Address
+extern unsigned long ATA_BAR3_SECONDARY_CONTROL_PORT;  // Secondary Control Block Base Address
+extern unsigned long ATA_BAR4;  // Legacy Bus Master Base Address
+extern unsigned long ATA_BAR5;  // AHCI Base Address / SATA Index Data Pair Base Address
 
-static unsigned long ATA_BAR0_PRIMARY_COMMAND_PORT;    // Primary Command Block Base Address
-static unsigned long ATA_BAR1_PRIMARY_CONTROL_PORT;    // Primary Control Block Base Address
-static unsigned long ATA_BAR2_SECONDARY_COMMAND_PORT;  // Secondary Command Block Base Address
-static unsigned long ATA_BAR3_SECONDARY_CONTROL_PORT;  // Secondary Control Block Base Address
-static unsigned long ATA_BAR4;  // Legacy Bus Master Base Address
-static unsigned long ATA_BAR5;  // AHCI Base Address / SATA Index Data Pair Base Address
 
 
 //

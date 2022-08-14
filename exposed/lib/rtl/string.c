@@ -1364,8 +1364,11 @@ size_t strcspn ( const char *str, const char *reject ){
  * Credits: 
  * Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
- 
-size_t strspn ( const char *str, const char *accept ){
+
+// #bugbug
+
+size_t strspn ( const char *str, const char *accept )
+{
 
     // The return
     int result=0;
@@ -1386,7 +1389,7 @@ size_t strspn ( const char *str, const char *accept ){
         accept_length++;
     };
 
-    
+    // #bugbug: result==1  ??
     for ( result = 0; result = 1; result++ )
     {
         char c = str[result];
@@ -1496,7 +1499,6 @@ cont:
 
 
 /*
- *********************************************
  * strtok:
  *     strtok 
  */
