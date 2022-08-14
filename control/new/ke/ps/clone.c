@@ -444,29 +444,25 @@ do_clone:
 // Copia a imagem do processo atual e salva o endereço
 // da copia num elemento da estrutura passada como argumento.
 // See: process.c
-
 // Salvaremos as informações assim:
-    // parent_process->childImage    : Endereço virtual do buffer para a imagem do clone.
-    // parent_process->childStack    : Endereço virtual para a pilha em ring3 usada pelo clone.
-    // parent_process->childImage_PA : Endereço físico do buffer para a imagem do clone.
-    // parent_process->childStackPA  : Endereço físico para a pilha em ring3 usada pelo clone.
-
-
+// parent_process->childImage    : Endereço virtual do buffer para a imagem do clone.
+// parent_process->childStack    : Endereço virtual para a pilha em ring3 usada pelo clone.
+// parent_process->childImage_PA : Endereço físico do buffer para a imagem do clone.
+// parent_process->childStackPA  : Endereço físico para a pilha em ring3 usada pelo clone.
 // [1]
 // #bugbug: 
 // Na verdade não estamos mais copiando e 
 // sim criando um endereçamento novo.
+//see: process.c
 
 // #debug
     debug_print ("copy_process: [1] Copying process image and stack.\n");
     //printf      ("copy_process: [1] Copying process image and stack.\n");
 
-//see: process.c
-
     Status = (int) alloc_memory_for_image_and_stack( parent_process );
 
-    if ( Status != 0 ){
-        panic ("copy_process: [FAIL] __alloc_memory_for_image_and_stack\n");
+    if (Status != 0){
+        panic ("copy_process: __alloc_memory_for_image_and_stack\n");
     }
 
     //#debug

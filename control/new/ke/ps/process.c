@@ -1597,13 +1597,15 @@ int init_process_manager (void)
 
 int alloc_memory_for_image_and_stack( struct process_d *process )
 {
-    unsigned long __new_base=0;   // base
-    unsigned long __new_stack=0;  // stack
+    unsigned long __new_base=0;   // Image base.
+    unsigned long __new_stack=0;  // App stack.
 
     if ( (void *) process == NULL ){
-        panic ("alloc_memory_for_image_and_stack: [FAIL] process \n");
+        panic ("alloc_memory_for_image_and_stack: process\n");
     }
 
+    if (process->magic!=1234)
+        panic("alloc_memory_for_image_and_stack: process validation\n");
 
 // ==================================================
 
@@ -1648,17 +1650,8 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
      Os aplicativos estão com tamanhos que variam de 100KB à 200KB.
 */
 
-// 300KB
-// Quantas páginas temos em 300KB?
-
-    //int imagesize_in_kb = 300;
-    //int imagesize_in_kb = 320;
-    int imagesize_in_kb = 400;
-
-    int number_of_pages=0;
-    //number_of_pages = (int) (200*1024)/4096;   // #bugbug: Not enough.
-    number_of_pages = (int) (imagesize_in_kb*1024)/4096;     // 
-
+// ==================================================
+// Image
 
 // Duas tentativas:
 // Se o slab allocator se esgotar, então usaremos
@@ -1666,12 +1659,15 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 // O slab allocator nos dar 1MB e o alocador d páginas
 // nos dara quantas páginas pedirmos. Mas ele é muito limitado ainda.
 
+    int imagesize_in_kb = 400;
+    int number_of_pages_on_image=0;
+    number_of_pages_on_image = (int) (imagesize_in_kb*1024)/4096;     // 
 
     __new_base = (unsigned long) slab_1MB_allocator();
     
     // Se o slab se esgotou, então tenta o alocador normal.
     if (__new_base == 0){
-        __new_base = (unsigned long) allocPages(number_of_pages); 
+        __new_base = (unsigned long) allocPages(number_of_pages_on_image); 
     }
 
 // Check!
@@ -1685,28 +1681,22 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 
 // ==================================================
 
-//
-// Image stack
-//
+// ==================================================
+// Stack
 
 // 32 KB.
 // Allocating memory for the process's stack.
 // #todo: We need this size.
 // Retorna um endereço virtual.
 // Mas usaremos apenas o endereço físico extraído desse endereço.
-
 // 32 KB
 // Quantas páginas temos em 32KB?
 
-    number_of_pages = (int) (32*1024)/4096;     // original
-    //number_of_pages = (int) (128*1024)/4096;  // teste
-
-    __new_stack = (unsigned long) allocPages(number_of_pages); 
-
-    if ( __new_stack == 0 )
-    {
-        // #important
-        panic ("alloc_memory_for_image_and_stack: [FAIL] __new_stack\n");
+    int number_of_pages_on_stack=0;
+    number_of_pages_on_stack = (int) (32*1024)/4096;
+    __new_stack = (unsigned long) allocPages(number_of_pages_on_stack); 
+    if (__new_stack == 0){
+        panic ("alloc_memory_for_image_and_stack: __new_stack\n");
     }
 
 // ==================================================
