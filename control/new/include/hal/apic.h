@@ -144,12 +144,14 @@ struct lapic_info_d
     unsigned long lapic_pa; 
     int entry;  // pagedirectory entry.
 };
-struct lapic_info_d LAPIC;
+struct lapic_info_d  LAPIC;
 
 
 // =======================
 
+
 void lapic_initializing(unsigned long lapic_pa);
+
 
 // Check presence of apic.
 int has_apic (void);

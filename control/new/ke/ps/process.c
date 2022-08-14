@@ -1678,18 +1678,31 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 // Quantas páginas temos em 300KB?
 
     //int imagesize_in_kb = 300;
-    int imagesize_in_kb = 320;
+    //int imagesize_in_kb = 320;
+    int imagesize_in_kb = 400;
 
     int number_of_pages=0;
     //number_of_pages = (int) (200*1024)/4096;   // #bugbug: Not enough.
     number_of_pages = (int) (imagesize_in_kb*1024)/4096;     // 
 
-    __new_base = (unsigned long) allocPages(number_of_pages); 
 
-    if ( __new_base == 0 )
-    {
-        // #important
-        panic ("alloc_memory_for_image_and_stack: [FAIL] __new_base\n");
+// Duas tentativas:
+// Se o slab allocator se esgotar, então usaremos
+// o allocador de páginas.
+// O slab allocator nos dar 1MB e o alocador d páginas
+// nos dara quantas páginas pedirmos. Mas ele é muito limitado ainda.
+
+
+    __new_base = (unsigned long) slab_1MB_allocator();
+    
+    // Se o slab se esgotou, então tenta o alocador normal.
+    if (__new_base == 0){
+        __new_base = (unsigned long) allocPages(number_of_pages); 
+    }
+
+// Check!
+    if (__new_base == 0){
+        panic ("alloc_memory_for_image_and_stack: __new_base\n");
     }
 
 // ==================================================

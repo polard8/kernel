@@ -70,8 +70,13 @@
 #define KERNELIMAGE_VA  0x0000000030000000  
 #define FRONTBUFFER_VA  0x0000000030200000
 #define BACKBUFFER_VA   0x0000000030400000
+
+// 2mb só da pra 512 páginas.
 #define PAGEDPOOL_VA    0x0000000030600000
+
+// pequeno pool usado pra alocar heaps.
 #define HEAPPOOL_VA     0x0000000030800000
+
 #define EXTRAHEAP1_VA   0x0000000030A00000  // MOD0.BIN
 #define EXTRAHEAP2_VA   0x0000000030C00000  // ?
 #define EXTRAHEAP3_VA   0x0000000030E00000  // ?
@@ -82,9 +87,11 @@
 #define MOD0_ENTRYPOINT_VA  0x0000000030A01000
 
 
-//#test
+// Os registradores do lapic.
 #define LAPIC_VA   0x0000000031000000
 
+// NIC Intel e1000, entry 393 no pd.
+// 0x0000000031200000
 
 
 // The start of the kernel image virtual address.

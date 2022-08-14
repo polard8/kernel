@@ -27,6 +27,20 @@
 extern unsigned long gKernelPML4Address; 
 
 
+/*
+ // #test x86 32bit entry #todo 64bit
+typedef struct page
+{
+   u32int present    : 1;   // Page present in memory
+   u32int rw         : 1;   // Read-only if clear, readwrite if set
+   u32int user       : 1;   // Supervisor level only if clear
+   u32int accessed   : 1;   // Has the page been accessed since last refresh?
+   u32int dirty      : 1;   // Has the page been written to since last refresh?
+   u32int unused     : 7;   // Amalgamation of unused and reserved bits
+   u32int frame      : 20;  // Frame address (shifted right 12 bits)
+} page_t;
+*/
+
 // Some useful data for memory management.
 
 struct mm_data_d
@@ -569,20 +583,21 @@ unsigned long mmblockList[MMBLOCK_COUNT_MAX];
 
 // -----------------------------------
 
-// Estrutura para gerencia de página.
+// Estrutura para gerência de página.
 struct page_d
 {
 
-//identificador da estrutura.
-//� um �ndice na lista de p�ginas do pagedpool.
+// Identificador da estrutura.
+// É um índice dentro da lista de páginas de um pool.
 
     int id;
+
     int used;
     int magic;
 
-// Identificador de frame.
-// (pa/4096)
-    int frame_number;
+// Índice do frame.
+// Começando a contar do início da memória física.
+    unsigned int frame_number;
 
 // Locked:
 // Não pode ser descarregado para o disco.
@@ -604,11 +619,18 @@ struct page_d
 // Pool de memória paginável usado para alocação.
 // Aqui ficam os ponteiros para estrutura do tipo page.
 
-#define PAGE_COUNT_MAX   1024    //??
+// #bugbug
+// O pagepool so tem 2mb,
+// então só podemos mapear 2*1024*1024/4096 páginas dentro dele.
+// 512 páginas.
+// 512 páginas de 4KB dá 2MB.
+
+//#bugbug: a alocação estava invadindo a área usada por outro
+// componente do kernel. Precisamos usar apenas nossos 2mb para isso.
+//#define PAGE_COUNT_MAX    1024  
+#define PAGE_COUNT_MAX    512
 
 unsigned long pageAllocList[PAGE_COUNT_MAX];
-
-
 
 
 /*
@@ -1050,7 +1072,9 @@ int mmInit(void);
 void memoryShowMemoryInfo (void);
 void mmShow_PML4Entry (int index, unsigned long pml4_va);
 void mmShowPML4EntryForAllProcesses (int entry_number);
-void showFreepagedMemory ( int max );
+
+void showPagedMemoryList(int max);
+
 void show_memory_structs (void);
 void testingPageAlloc (void);
 
@@ -1090,7 +1114,6 @@ __virtual_to_physical (
 // #todo
 void pages_calc_mem (void);
 
-void *page(void);
 
 // #todo
 // #fixme
@@ -1099,9 +1122,12 @@ void *newPage (void);
 void *mm_alloc_single_page (void);
 void *mm_alloc_contig_pages (size_t size);
 
-int firstSlotForAList ( int size );
+
+
 void *allocPages (int size);
 void initializeFramesAlloc (void);
+
+void *slab_1MB_allocator(void);
 
 #endif    
 

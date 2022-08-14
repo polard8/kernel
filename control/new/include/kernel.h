@@ -140,8 +140,8 @@ extern unsigned long gSavedBPP;
 
 #include "mm/x64gpa.h"
 #include "mm/x64gva.h"
+#include "mm/gentry.h"
 
-#include "alpha/0globals/gentry.h"
 #include "alpha/0globals/gdef.h"
 #include "alpha/0globals/gdevice.h"
 #include "alpha/0globals/gobject.h"

@@ -123,8 +123,9 @@ static inline void imcr_apic_to_pic (void)
 
 // =================
 
-
-
+// #bugbug
+// This routine used a lot of hardcoded addresses and a pd entry.
+// PAGETABLE_RES5, LAPIC_VA, PD_ENTRY_LAPIC, KERNEL_PD_PA.
 void lapic_initializing(unsigned long lapic_pa)
 {
     printf("lapic_initializing: \n");

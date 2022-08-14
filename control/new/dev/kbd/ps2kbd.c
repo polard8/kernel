@@ -136,7 +136,10 @@ void DeviceInterface_PS2Keyboard(void)
     static int __has_e1_prefix = 0;
 
     // Usado nos testes
-    struct process_d *p;
+    //struct process_d *p;
+
+    // Usado pra checar se a foreground thread quer raw input.
+    struct thread_d *t;
 
 // =============================================
 // #test
@@ -305,6 +308,13 @@ NormalByte:
        // lida com o evento.
        // coloca na fila da thread em foreground e
        // no arquivo stdin.
+       
+       // #todo
+       // Podemos checar se a foreground thread deseja receber
+       // raw input. Nesse caso, podemos postar e sair imediatamente.
+       
+       //t = (struct thread_d *) threadList[foreground_thread];
+       //if(t->wantRawInput == TRUE){POST(RAW)}
 
        wmKeyEvent( (tid_t) foreground_thread, (unsigned char) __raw );
 

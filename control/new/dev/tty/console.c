@@ -1315,6 +1315,14 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+    if ( strncmp(prompt,"mm1",3) == 0 )
+    {
+        //IN: max index
+        showPagedMemoryList(512); 
+        goto exit_cmp;
+    }
+
+
 // ========
 // exit
 // Exit the kernel console.

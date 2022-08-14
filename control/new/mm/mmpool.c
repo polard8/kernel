@@ -3,6 +3,8 @@
 
 #include <kernel.h>   
 
+static void *__pageObject(void);
+static int __firstSlotForAList(int size);
 
 /*
  * page:
@@ -15,10 +17,9 @@
 // OUT:
 // Retorna o ponteiro de estrutura.
 
-void *page (void)
+static void *__pageObject(void)
 {
     struct page_d *New;
-
     int __slot = 0;
 
 
@@ -43,14 +44,15 @@ void *page (void)
             // ?? panic ??
             if ( New == NULL )
             {
-                debug_print ("mmpool-page:\n");
-                printf      ("mmpool-page:\n");
+                debug_print ("__pageObject:\n");
+                printf      ("__pageObject:\n");
 
                 // #todo: free() ??
                 goto fail;
             }
 
-            New->id = __slot;
+            New->id = __slot;  // Índice dentro da lista.
+            
             New->used  = TRUE;
             New->magic = 1234;
 
@@ -107,124 +109,123 @@ void *newPage (void)
 
     unsigned long va=0;
     unsigned long pa=0;
+    
+    int PageSize = PAGE_SIZE;  //4096;
 
+    //debug_print ("newPage:\n");
 
-    debug_print ("newPage:\n");
+    if ( base == 0 )
+    {
+        debug_print ("newPage: base\n");
+        panic       ("newPage: base\n");
+        //return NULL;
+    }
 
+// Cria e registra uma estrutura de página.
+// Objeto página.
 
-    if ( base == 0 ){
-        debug_print ("newPage: [FAIL] base\n");
-        return NULL;
+    New = (void *) __pageObject();
+
+    if ( New == NULL )
+    {
+        debug_print ("newPage: New\n");
+        panic       ("newPage: New\n");
+        //goto fail;
+    }
+
+    if ( New->used != TRUE )
+    {
+        debug_print ("newPage: New used\n");
+        panic       ("newPage: New used \n");
+    }
+
+    if ( New->magic != 1234 )
+    {
+        debug_print ("newPage: New magic\n");
+        panic       ("newPage: New magic \n");
     }
 
 
-// Cria e registra uma estrutura de página.
+// Pega o id 
+// Checa o limite de slots.
 
-    New = (void *) page();
 
-    if ( New == NULL ){
-        debug_print ("mmpool-newPage: New\n");
-        //printf ("mmpool-newPage: New\n");
-        goto fail;
-    }else{
-        if ( New->used == TRUE && New->magic == 1234 )
-        {
-            // Pega o id 
-            // Checa o limite de slots.
+    if (New->id < 0)
+        panic ("newPage: out of range\n");
 
-            //if ( New->id <= 0 ){
-            //    debug_print ("newPage: New->id <= 0\n");
-            //}
-            
-            //if ( New->id > 0 && New->id < PAGE_COUNT_MAX )
-            if ( New->id >= 0 && New->id < PAGE_COUNT_MAX )
-            {
-                // trava ou não??
-                New->locked = 0;
+    if (New->id >= PAGE_COUNT_MAX)
+        panic ("newPage: out of range\n");
 
-                // contador de referências.
-                New->ref_count = 1;
+// trava ou não?
+    New->locked = 0;
 
-                //#importante
-                //precisamos pegar o endereço físico e dividir pelo tamanho da página.
+// contador de referências.
+// Quantos processos estão usando essa página compartilhada.
+    New->ref_count = 1;
 
-                // #debug  #bugbug: Wrong value for 'base'.
-                //printf ("newPage: base=%x id=%d \n",base,New->id);
-                //refresh_screen();
-                //while(1){}
-                
-                // #debug
-                //if ( New->id > 10 ){
-                //    printf ("newPage: New->id > 10\n");
-                //    refresh_screen();
-                //    while(1){}
-                //}
+// #importante
+// precisamos pegar o endereço físico e dividir pelo tamanho da página.
+// #debug  #bugbug: Wrong value for 'base'.
+    //printf ("newPage: base=%x id=%d \n",base,New->id);
+    //refresh_screen();
+    //while(1){}
 
-                // Pegando o endereço virtual.
+//
+//  VA
+//
 
-                va = (unsigned long) ( base + (New->id * 4096) );
+// Pegando o endereço virtual.
+// Temos uma base, que é um endereço virtual,
+// um índice e um tamanho de página.
+    va = (unsigned long) ( base + (New->id * PageSize) );
 
-                // #todo
-                // #fixme
-                // Use pml4 address
+    if (va==0){
+        panic ("newPage: va==0\n");
+    }
 
-                // Pegando o endereço físico.
-                pa = (unsigned long) virtual_to_physical ( va, gKernelPML4Address ); 
+//
+//  PA
+//
 
-                //
-                // Calculando o número do pageframe.
-                //
+// Pegando o endereço físico.
+// Convertendo de virtual para físico,
+// usando o pml4 do kernel.
 
-                // #todo
-                // Salvar o endereço físico ??
-                
-                // #bugbug 
-                // ?? Isso tá certo ??
-                
-                // Se o resto da divisão do endereço físico, pelo 
-                // tamanho de uma página for diferente de zero, então 
-                // o endereço físico vai sero endereço físico menos 
-                // esse resto.
-                
-                if ( ( pa % PAGE_SIZE ) != 0 )
-                {
-                    pa = pa - ( pa % PAGE_SIZE);
-                }
+    pa = 
+        (unsigned long) virtual_to_physical ( va, gKernelPML4Address );
 
-                // Temos um id de frame com base no endereço
-                // modificado.
-                
-                New->frame_number = (pa / PAGE_SIZE);
+// O pool não começa no endereço físico '0'.
+// Então nenhum dos frames pode começar em '0'.
+    if (pa==0){
+        panic ("newPage: pa==0\n");
+    }
 
-                // #bugbug
-                // FIXME.
-                // Isso está errado. 
-                // Pois a heap onde pegamos os frames não começa
-                // em 0.
-                
-                // Se o endereço físico for 0, o id do frame é 0.
-                if ( pa == 0 )
-                {
-                    //New->frame_number = 0;
-                    New->frame_number = -1;
+// #test
+// Calculando o número do frame com base
+// no endereço físico.
 
-                    debug_print ("newPage: [ERROR] pa == 0\n");
-                          panic ("newPage: FIXME, frame number\n");
-                }
+    unsigned long alignedPA = (unsigned long) pa;
+    unsigned long remainder = (unsigned long)( pa % PAGE_SIZE );
 
-                // #importante:
-                // Retorna o endereço virtual.
-                // A base, mas o deslocamento dado em páginas.
+// Se temos um resto, ajustamos o endereço físico
+// par apontar par ao início do frame.
+    if (remainder != 0){
+        alignedPA = (unsigned long) ( pa - remainder );
+    }
 
-                //debug_print ("newPage: ok\n");
+// Com base no endereço do início do frame,
+// calculamos o indic do frame.
+// Os frames são contados à partir do início 
+// da memória física.                 
+    New->frame_number = (unsigned int) (alignedPA / PAGE_SIZE);
 
-                return (void *) ( base + (New->id * 4096) );
-             }
-        };
-    };
+// Return the virtual address.
+    //return (void *) va;
+    return (void *) ( base + (New->id * PageSize) );
 
 fail:
     debug_print ("newPage: fail\n");
+    panic       ("newPage: fail\n");
     return NULL;
 }
 
@@ -254,7 +255,7 @@ void *mm_alloc_contig_pages (size_t size)
 
 
 /*
- * firstSlotForAList:
+ * __firstSlotForAList:
  * Retorna o primeiro índice de uma sequência de slots livres 
  * em pageAllocList[].
  */
@@ -268,10 +269,13 @@ void *mm_alloc_contig_pages (size_t size)
 // Ou retorn '-1' no caso de erro.
 // #todo: Explain it better.
 
-int firstSlotForAList ( int size )
+static int __firstSlotForAList(int size)
 {
     register int i=0;
-    int Max=1024;  // Nosso limite é 1024, que é o tamanho do pool.
+
+// Nosso limite é 512, que é o tamanho do pool.
+// pois o pool tem 2mb,que dá 512 páginas de 4kb.
+    int Max = PAGE_COUNT_MAX;//512;  
 
     int Base = 0;
     int Count = 0;
@@ -283,11 +287,14 @@ tryAgain:
     {
         slot = (void *) pageAllocList[i];
 
+        // tenta novamente, começando numa base diferente.
         if ( (void *) slot != NULL )
         {
             Base = (Base + Count);
             Base++;
             Count = 0;
+            
+            //#bugbug: Podemos fica aqui pra sempre?
             goto tryAgain;
         }
 
@@ -330,9 +337,17 @@ tryAgain:
 // São compartilhadas.
 // #todo: Explicar o ring e as permissões.
 
+// #tomos que ter um marcador de páginas disponíveis para
+// livres para alocação.
+// Nosso limite é 512 páginas, pois so temos 2mb de pool.
+
 void *allocPages (int size)
 {
-    // Esse é o endereço virtual do início do pool de pageframes.
+
+// Esse é o endereço virtual do início do pool de pageframes.
+// #bugbug: O paged pool so tem 2mb, veja pages.c
+// então só podemos mapear 2*1024*1024/4096 páginas.
+
     unsigned long base = (unsigned long) g_pagedpool_va;
 
     int __slot=0;
@@ -340,7 +355,7 @@ void *allocPages (int size)
 //página inicial da lista
     struct page_d *Ret;   
 
-    struct page_d *Conductor;
+    struct page_d *pageConductor;
     struct page_d *p;
 
     unsigned long va=0;
@@ -349,7 +364,7 @@ void *allocPages (int size)
     int __first_free_slot = -1;
 
 
-    debug_print ("allocPages: [TESTING]\n");
+    debug_print ("allocPages:\n");
 
 //
 // Checando limites.
@@ -362,9 +377,10 @@ void *allocPages (int size)
 //problemas com o size.
     if (size <= 0)
     {
+        //size = 1;
         //if debug
-        printf ("allocPages: size 0\n");
-        return NULL;
+        panic("allocPages: size 0\n");
+        //return NULL;
     }
 
 // Se é pra alocar apenas uma página.
@@ -373,11 +389,8 @@ void *allocPages (int size)
     }
 
 // Se o size for maior que o limite.
-    if ( size > PAGE_COUNT_MAX )
-    {
-        //if debug
-        printf ("allocPages: [FAIL] size limits\n");
-        goto fail;
+    if ( size >= PAGE_COUNT_MAX ){
+        panic ("allocPages: [FAIL] size limits\n");
     }
 
 // Isso encontra slots o suficiente para alocarmos 
@@ -388,13 +401,13 @@ void *allocPages (int size)
 // Liberar páginas mandando para o disco conforme
 // critéria à definir ainda,
 
-    __first_free_slot = (int) firstSlotForAList(size);
+    __first_free_slot = (int) __firstSlotForAList(size);
 
     //if ( __first_free_slot < 0 )
     if ( __first_free_slot == -1 )
     {
-        debug_print ("allocPages: [FAIL] No more free slots\n");
-        panic       ("allocPages: [FAIL] No more free slots\n");
+        debug_print ("allocPages: No more free slots\n");
+        panic       ("allocPages: No more free slots\n");
     }
 
 // Procurar slot vazio.
@@ -415,9 +428,11 @@ void *allocPages (int size)
 
             p = (void *) kmalloc ( sizeof( struct page_d ) );
 
-            if ( p == NULL ){
-                printf ("allocPages: fail 2\n");
-                goto fail;
+            if ( p == NULL )
+            {
+                //printf ("allocPages: fail 2\n");
+                panic ("allocPages: fail 2\n");
+                //goto fail;
             }
 
             //printf("#");
@@ -453,8 +468,8 @@ void *allocPages (int size)
 
             pageAllocList[__slot] = ( unsigned long ) p;
 
-            Conductor->next = (void *) p;
-            Conductor = (void *) Conductor->next;
+            pageConductor->next = (void *) p;
+            pageConductor = (void *) pageConductor->next;
 
             // #obs:
             // Vamos precisr da estrutura da primeira página alocada.
@@ -474,8 +489,9 @@ void *allocPages (int size)
     };
 
 fail:
-    debug_print ("mmpool-allocPages: fail \n");
-    printf      ("mmpool-allocPages: fail \n");
+    debug_print ("allocPages: fail\n");
+    //printf      ("allocPages: fail\n");
+    panic       ("allocPages: fail\n");
     return NULL;
 }
 
@@ -490,10 +506,11 @@ void initializeFramesAlloc (void)
     struct page_d  *p;
     int __slot = 0;
 
-
-    debug_print("initializeFramesAlloc: \n");
+    debug_print("initializeFramesAlloc:\n");
 
 // Inicializando a lista de pages.
+// 512 pages
+
     for ( __slot=0; 
           __slot < PAGE_COUNT_MAX; 
           __slot++ )
@@ -510,13 +527,14 @@ void initializeFramesAlloc (void)
 
     p = (void *) kmalloc ( sizeof( struct page_d ) );
 
-    if ( p == NULL )
+    if (p == NULL)
     {
         debug_print ("initializeFramesAlloc:\n");
-        panic ("initializeFramesAlloc:\n");
+        panic       ("initializeFramesAlloc:\n");
     }
 
     p->id = 0;
+
     p->used = TRUE;
     p->magic = 1234;
 

@@ -10,6 +10,31 @@ unsigned long gKernelPML4Address=0;
 
 
 
+// O pool tem dois blocos de 2mb cada.
+// O alocador vai alocar blocos de 500 KB.
+// se falhar retornará 0, permitindo que quem chamou o alocar
+// possa chamar outro alocados de páginas.
+// Quem usara esse alocador é a rotina de clonagem de processos
+// dara 1MB para cada um dos 4 primeiros clones. Sortudos.
+// Isso é provisorio ... so ate melhorarmos o alocador.
+// slab allocator.
+  
+struct newpagedpool_d
+{
+    int initialized;
+
+    unsigned long a1_va;
+    unsigned long a2_va;
+    unsigned long b1_va;
+    unsigned long b2_va;
+
+// Status
+// TRUE = FREE | FALSE = NOT FREE
+    int Free[4];
+};
+struct newpagedpool_d  NewPagedPool;
+
+
 // ==================================================
 // This is not global variable.
 // We will use this only on this initialization here.
@@ -66,7 +91,10 @@ static void __initialize_ring3area(void);
 static void __initialize_kernelimage_region(void);
 static void __initialize_frontbuffer(void);
 static void __initialize_backbuffer(void);
+
 static void __initialize_pagedpool(void);
+static void __initialize_pagedpool2(void);
+
 static void __initialize_heappool(void);
 static void __initialize_extraheap1(void);
 static void __initialize_extraheap2(void);
@@ -342,6 +370,8 @@ unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
 
 // Isso serve pra pegarmos um endereço físico
 // que servira de base para criarmos uma pagetable.
+// Mas endereço físico e virtual são iguais nessa região.
+// Identidade 1:1.
 
 unsigned long get_table_pointer (void)
 {
@@ -358,7 +388,7 @@ unsigned long get_table_pointer (void)
 // #bugbug
 // Todo o espaço entre 0x1000 e 0x000B8000 esta livre ?
 // Onde estao a fat e o root dir?
-// MBR_ADDRESS = 0x20000. 
+// MBR_ADDRESS = 0x20000. /
 // Esse o o endereço mais baixo entre os endereços usados
 // pelo sistema de arquivos.
 
@@ -385,7 +415,7 @@ void *CloneKernelPDPT0(void)
     destAddressVA = (unsigned long) get_table_pointer(); 
 
     if ( destAddressVA == 0 ){
-        panic ("CloneKernelPML4: destAddressVA\n");
+        panic ("CloneKernelPDPT0: destAddressVA\n");
     }
 
 // The virtual address of the kernel page directory and
@@ -419,7 +449,7 @@ void *CloneKernelPD0(void)
     destAddressVA = (unsigned long) get_table_pointer(); 
 
     if ( destAddressVA == 0 ){
-        panic ("CloneKernelPML4: destAddressVA\n");
+        panic ("CloneKernelPD0: destAddressVA\n");
     }
 
 // The virtual address of the kernel page directory and
@@ -434,7 +464,6 @@ void *CloneKernelPD0(void)
         dst[i] = (unsigned long) src[i];
     };
 
-// Done.
 // The virtual address of the new pml4. 
     return (void *) destAddressVA;
 }
@@ -452,8 +481,9 @@ void *CloneKernelPML4(void)
     register int i=0;
     unsigned long destAddressVA=0; 
 
-// Pegamos um edereço que serve de base para
+// Pegamos um edereço físico que serve de base para
 // criarmos um pml4.
+// Mas endereço físico e virtual são iguais nessa região.
 // Identidade 1:1.
 
     //destAddressVA = (unsigned long) newPage (); 
@@ -495,8 +525,10 @@ void *CloneKernelPML4(void)
 // Pertence ao diretorio que estamos usando no momento?
 // #todo
 // clone_pml4
+// OUT:
+// The address of the new pml4.
 
-void *clone_pml4 ( unsigned long pml4_va )
+void *clone_pml4(unsigned long pml4_va)
 {
     register int i=0;
     unsigned long destAddressVA=0; 
@@ -504,10 +536,9 @@ void *clone_pml4 ( unsigned long pml4_va )
 // #test
 // no directory in the address '0'
 
-    if ( pml4_va == 0 )
+    if ( pml4_va == 0 ){
         panic("clone_pml4: pml4_va\n");
-
-
+    }
 
 // Get a target address for the directory.
 // #bugbug:
@@ -520,8 +551,8 @@ void *clone_pml4 ( unsigned long pml4_va )
 
     destAddressVA = (unsigned long) get_table_pointer(); 
     
-    if ( destAddressVA == 0 ){
-        panic ("CreatePageDirectory: destAddressVA\n");
+    if (destAddressVA == 0){
+        panic ("clone_pml4: destAddressVA\n");
     }
 
 // Initialization
@@ -533,7 +564,6 @@ void *clone_pml4 ( unsigned long pml4_va )
         dst[i] = (unsigned long) src[i]; 
     };
 
-// OUT:
 // The address of the new pml4.
     return (void *) destAddressVA;
 }
@@ -576,7 +606,8 @@ static void mmSetupMemoryUsage(void)
         );
 
 // free memory
-    memorysizeFree = (unsigned long) (memorysizeTotal - memorysizeUsed);
+    memorysizeFree = 
+        (unsigned long) (memorysizeTotal - memorysizeUsed);
 
 
 // memorysizeFree  is the size in KB.
@@ -1056,6 +1087,7 @@ void load_pml4_table(void *phy_addr)
 }
 
 
+// inline?
 // PAE and PGE
 void enable_pae(void)
 {
@@ -1065,7 +1097,7 @@ void enable_pae(void)
                    " movq %%rax, %%cr4  " :: );
 }
 
-
+// inline?
 void page_enable(void)
 {
     // Only paging.
@@ -1075,18 +1107,188 @@ void page_enable(void)
 }
 
 
-// #test
+
+
+/*
+// 8 pagetables
+// #bugbug: IT IS NOT WORKING!
+// #todo: THIS IS A WORK IN PROGRESS
+void *mm_allocate_memory_for_new_paged_pool(void);
+void *mm_allocate_memory_for_new_paged_pool(void)
+{
+    //#test: mapeando varias pagetables.
+    //cada pagetable aloca 2mb.
+
+    // 16 mb começando em 200mb mark.
+    unsigned long region_start_pa = (200*1024*1024);
+
+    void *first_va_allocated_for_pts;
+    
+// alocando memoria virtual
+// onde colocaremos 8 pagetables.
+
+    first_va_allocated_for_pts = (void *) allocPages(8);
+    if ((void*) first_va_allocated_for_pts == NULL )
+    {
+        //fail
+        return NULL;
+    }
+    
+    //IN:
+    mm_fill_n_pagetables(
+        KERNEL_PD_PA, // va do pd do kernel
+        400,          // directory first entry of a sequence
+        8,            // number of entries in the dir.
+        first_va_allocated_for_pts, // first pt va of a sequence.
+        region_start_pa,     // region start pa of a sequence
+        8*(2*1024*1024),  // quantos megas na area alocada.
+        7 );              // flags para user code. 
+
+    //#todo: retornar o endereço referente
+    //à primeira entrada.
+    // (400 * (2*1024*1024)
+    // 2mb por entrada.
+    
+    // o endereço virtual onde começa a área alocada.
+    // no espaço de endereçamento do kernel.
+    unsigned long base_va = (400 * (2*1024*1024));
+
+    //flush the current pml4..
+    //#bugbg: mas precisa ser o do kernel
+    //entao precisamos chamar essa rotina na inicializaçao do kernel.
+    asm ("movq %cr3, %rax");
+    asm ("movq %rax, %cr3");
+    
+    return (void*) base_va;
+}
+*/
+
+
+
+/*
+//
+// IN:
+//
+// directory_va: 
+//     Endereço virtual do diretório de páginas
+//     onde serão colocadas 'n' entradas que apontam 
+//     para n pagetables. 
+//
+// directory_first_entry: 
+//     Índice da primeira entrada no diretorio indicado,
+//     Essa é a primeira de uma sequencia de n entradas.
+//
+// number_of_entries:
+//     Numero de entadas que iremos criar,começando
+//     da primeira indicada logo acima.
+//
+// first_pt_va:
+//     Endereço virtual da primeira tabela de páginas.
+//     Lembrando que as outras pagetables devem
+//     ser subsequentes a essa. Cada uma tem 4kb.
+//
+// region_start_pa: 
+//     Endereço físico do inicio da região que queremos
+// mapear. O tamanho dessa região deve estar de acordo
+// com a quantidade de tabelas que queremos criar.
+// cada tabela consegue mapear 2mb.
+//
+// region_size_in_mb:
+//     tamanho da regiao dado em mb.
+//     usado pra conferir se os dados acima estao consistentes
+//     ajudar na contabilidade.
+//
+// flags:
+//     As flags usadas em todas as entradas da pagetable
+//     e na entrada do diretório de páginas.
+
+// #todo: THIS IS A WORK IN PROGRESS
+int 
+mm_fill_n_pagetables( 
+    unsigned long directory_va, 
+    int           directory_first_entry,
+    int           number_of_entries,
+    unsigned long first_pt_va,
+    unsigned long region_start_pa,
+    int           region_size_in_mb,
+    unsigned long flags );
+
+int 
+mm_fill_n_pagetables( 
+    unsigned long directory_va, 
+    int           directory_first_entry,
+    int           number_of_entries,
+    unsigned long first_pt_va,
+    unsigned long region_start_pa,
+    int           region_size_in_mb,
+    unsigned long flags )
+{
+
+// o pd do kernel tem endreços fisico e virtual iguais.
+    //unsigned long pd_pa = directory_va;
+    unsigned long pd_pa = KERNEL_PD_PA;
+    
+// entries iterator
+    int e  =directory_first_entry;
+    int max=number_of_entries;
+
+
+// #bugbug: Talvez esses endereços não sejam válidos 
+// para fazermos isso.
+// #temos que criar um array de endereços de pagetables
+// e esses endereços serão usados pra essa alocação.
+    unsigned long pt_va = first_pt_va;
+    unsigned long address = region_start_pa;
+
+
+    for( e = directory_first_entry;
+         e < number_of_entries;
+         e++ )
+    {
+        mm_fill_page_table( 
+            (unsigned long) pd_pa,         // pd 
+            (int) e,            // entry
+            (unsigned long) pt_va,    // pt
+            (unsigned long) address,  // region base 
+            (unsigned long) flags );  // flags
+        
+        // proximos 2mb.
+        address = address + (2*1024*1024);
+        pt_va   = pt_va   + (4*1024);  //
+    }
+    
+    return 0;
+}
+*/
+
+
+
+// ---------------------------
+
 // Cria uma page table com 512 entradas
 // para uma região de 2mb e configura uma
 // determinada entrada no diretório de páginas indicado.
+//
 // IN:
-// Endereço virtual do diretório de páginas.
-// Índice da entrada no diretório indicado.
-// Endereço virtual da tabela de páginas.
-// Endereço físico da região de 2MB que queremos mapear.
-// As flags usadas em todas as entradas da pagetable
-// e na entrada do diretório de páginas.
-int mm_fill_page_table( 
+//
+// directory_va: 
+//     Endereço virtual do diretório de páginas.
+//
+// directory_entry: 
+//     Índice da entrada no diretório indicado.
+//
+// pt_va:
+//     Endereço virtual da tabela de páginas.
+//
+// region_2mb_pa: 
+//     Endereço físico da região de 2MB que queremos mapear.
+//
+// flags:
+//     As flags usadas em todas as entradas da pagetable
+//     e na entrada do diretório de páginas.
+
+int 
+mm_fill_page_table( 
     unsigned long directory_va, 
     int           directory_entry,
     unsigned long pt_va,
@@ -1518,6 +1720,10 @@ static void __initialize_pagedpool(void)
     unsigned long *pt_pagedpool = (unsigned long *) PAGETABLE_PAGEDPOOL;
     unsigned long pagedpool_pa = (unsigned long) SMALL_pagedpool_pa;
 
+
+// Esse é o endereço virtual do início do pool de pageframes.
+// #bugbug: O paged pool so tem 2mb, veja pages.c
+// então só podemos mapear 2*1024*1024/4096 páginas.
 // 0x30600000;  // 2mb a mais que o backbuffer
     g_pagedpool_va = (unsigned long) PAGEDPOOL_VA;
 
@@ -1540,6 +1746,83 @@ static void __initialize_pagedpool(void)
         (unsigned long) pagedpool_pa,  // region base 
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 }
+
+
+static void __initialize_pagedpool2(void)
+{
+    NewPagedPool.initialized = FALSE;
+
+    if ( g_extraheap2_va == 0 ||
+         g_extraheap3_va == 0 )
+    {
+        panic("__initialize_pagedpool2: address\n");
+    }
+
+//----
+
+    NewPagedPool.a1_va = 
+        (unsigned long) g_extraheap2_va;
+    NewPagedPool.Free[0] = TRUE;
+
+    NewPagedPool.a2_va = 
+        (unsigned long) (g_extraheap2_va + (1024*1024) );
+    NewPagedPool.Free[1] = TRUE;
+
+//----
+
+    NewPagedPool.b1_va = 
+        (unsigned long) g_extraheap3_va;
+    NewPagedPool.Free[2] = TRUE;
+
+    NewPagedPool.b2_va = 
+        (unsigned long) (g_extraheap3_va + (1024*1024) );
+    NewPagedPool.Free[3] = TRUE;
+
+//----
+
+    NewPagedPool.initialized = TRUE;
+}
+
+
+//global
+// Used by alloc_memory_for_image_and_stack() in process.c
+void *slab_1MB_allocator(void)
+{
+
+// não inicializado
+    if (NewPagedPool.initialized != TRUE)
+        return NULL;
+
+// procure um livre.
+    
+//a1
+    if (NewPagedPool.Free[0] == TRUE)
+    {
+        NewPagedPool.Free[0] = FALSE;  // NOT FREE
+        return (void *) NewPagedPool.a1_va; 
+    }
+//a2
+    if (NewPagedPool.Free[1] == TRUE)
+    {
+        NewPagedPool.Free[1] = FALSE;  // NOT FREE
+        return (void *) NewPagedPool.a2_va; 
+    }
+//b1
+    if (NewPagedPool.Free[2] == TRUE)
+    {
+        NewPagedPool.Free[2] = FALSE;  // NOT FREE
+        return (void *) NewPagedPool.b1_va; 
+    }
+//b2
+    if (NewPagedPool.Free[3] == TRUE)
+    {
+        NewPagedPool.Free[3] = FALSE;  // NOT FREE
+        return (void *) NewPagedPool.b2_va; 
+    }
+    
+    return NULL;
+}
+
 
 
 // local worker
@@ -1631,7 +1914,7 @@ static void __initialize_extraheap1(void)
 
 // 2mb, ring0, start = 0x30C00000.
 // local worker
-// is it free yet?
+// used by the slab allocator.
 static void __initialize_extraheap2(void)
 {
     unsigned long *pt_extraheap2 = (unsigned long *) PAGETABLE_EXTRAHEAP2;
@@ -1655,14 +1938,14 @@ static void __initialize_extraheap2(void)
       (int) PD_ENTRY_EXTRAHEAP2,             // entry
       (unsigned long) &pt_extraheap2[0],     // pt
       (unsigned long) extraheap2_pa,         // region base
-      (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
+      (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 
     g_extraheap2_initialized = TRUE;
 }
 
 
 // 2mb, ring3, start = 0x30E00000.
-// is it free yet?
+// used by the slab allocator.
 static void __initialize_extraheap3(void)
 {
     unsigned long *pt_extraheap3 = (unsigned long *) PAGETABLE_EXTRAHEAP3;
@@ -1741,6 +2024,16 @@ static void mmInitializeKernelPageTables(void)
 
     // ...
 
+
+//
+// New paged pool
+//
+
+// Criado com dois blocos consecutivos de 2mb cada,
+// previamente alocados.
+
+    __initialize_pagedpool2();
+    
     //debug_print ("mmInitializeKernelPageTables: tables done\n");
     //printf ("mmInitializeKernelPageTables: tables done\n");
 }

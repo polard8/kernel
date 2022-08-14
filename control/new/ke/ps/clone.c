@@ -802,19 +802,30 @@ do_clone:
                                 child_process->pd0_VA, 
                                 gKernelPML4Address ); 
 
+    if(child_process->pd0_VA==0)
+        panic("copy_process: child_process->pd0_VA==0\n");
+    if(child_process->pd0_PA==0)
+        panic("copy_process: child_process->pd0_PA==0\n");
+
+//See: gentry.h
     mm_fill_page_table( 
         (unsigned long) child_process->pd0_VA,   // directory va. 
-        (int) ENTRY_USERMODE_PAGES,      // directory entry for image base.
+        (int) PD_ENTRY_RING3AREA,      // directory entry for image base.
         (unsigned long) ptVA,            // page table va.
         (unsigned long) child_process->ImagePA,  // Region 2mb pa.
         (unsigned long) 7 );             // flags.
 
 // Clonando o pdpt0 do kernel.
     child_process->pdpt0_VA = (unsigned long) CloneKernelPDPT0();
-
     child_process->pdpt0_PA = (unsigned long) virtual_to_physical ( 
                                   child_process->pdpt0_VA, 
                                   gKernelPML4Address ); 
+
+    if(child_process->pdpt0_VA==0)
+        panic("copy_process: child_process->pdpt0_VA==0\n");
+    if(child_process->pdpt0_PA==0)
+        panic("copy_process: child_process->pdpt0_PA==0\n");
+
 
     //#debug
     //printf (" :) \n");
@@ -835,12 +846,14 @@ do_clone:
 // Instalando o ponteiro para a pagetable entrada do diretório.
 // #?? Isso ja foi feito pela rotina mm_fill_page_table.
 // podemos criar uma rotina igual, mas que não instale o ponteiro no pd.
-    PageDirectory[ENTRY_USERMODE_PAGES] = (unsigned long) ptPA;
-    PageDirectory[ENTRY_USERMODE_PAGES] = (unsigned long) PageDirectory[ENTRY_USERMODE_PAGES] | 7; 
+    PageDirectory[PD_ENTRY_RING3AREA] = 
+        (unsigned long) ptPA;
+    PageDirectory[PD_ENTRY_RING3AREA] = 
+        (unsigned long) (PageDirectory[PD_ENTRY_RING3AREA] | 7); 
 
 //============================
 // Page Directory Pointer Table
-// Somente a ŕimeira entrada do pdpt0 é usada.
+// Somente a primeira entrada do pdpt0 é usada.
     PageDirectoryPointerTable[0] = (unsigned long) child_process->pd0_PA;
     PageDirectoryPointerTable[0] = (unsigned long) PageDirectoryPointerTable[0] | 7; 
 
@@ -973,13 +986,14 @@ do_clone:
 // Current thread
 // the parent thread.
 
-    current_thread  = (int)   parent_thread->tid;
-    if( current_thread < 0 || current_thread >= THREAD_COUNT_MAX )
+    current_thread = (tid_t) parent_thread->tid;
+    if ( current_thread < 0 || 
+         current_thread >= THREAD_COUNT_MAX )
     {
         panic("copy_process: current_thread limits\n");
     }
 
-    copy_process_in_progress=FALSE;
+    copy_process_in_progress = FALSE;
 
 // Return child's PID.
 // Retornaremos para o pai.

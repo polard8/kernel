@@ -387,6 +387,10 @@ void I_x64ExecuteInitialProcess (void)
 // Set the current thread.
     set_current_thread(Thread->tid);
 
+// Set the first foreground thread.
+// #todo: We need a function for this job.
+    foreground_thread = (tid_t) Thread->tid;
+
 // State
 // The thread needs to be in Standby state.
 

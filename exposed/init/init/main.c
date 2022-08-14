@@ -126,7 +126,8 @@ static void do_clear_console(void)
     
     
     // clear fg console.
-    sc82( 8003,0x0011DD11,0,0 );
+    //sc82( 8003,0x0011DD11,0,0 );
+    sc82( 8003,0x00FF0000,0,0 );
 }
 
 static inline void do_int3(void)

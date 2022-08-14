@@ -83,10 +83,8 @@ void mmShow_PML4Entry (int index, unsigned long pml4_va)
 
 void memoryShowMemoryInfo (void)
 {
-
     unsigned long HeapTotal = 
         ((kernel_heap_end - kernel_heap_start)/1024);
-
     unsigned long StackTotal = 
         ((kernel_stack_start - kernel_stack_end)/1024);
 
@@ -113,12 +111,10 @@ void memoryShowMemoryInfo (void)
     printf ("extraheap3     (%d KB)\n", mm_used_extraheap3 );
     printf ("frame table    (%d KB)\n", mm_used_frame_table );
 
-
     // System type
     printf ("\n");
     printf ("====================================\n");
     printf ("This is a ");
-
 
     if( g_mm_system_type == stSmallSystem ){
         printf ("SMALL system ");
@@ -213,8 +209,10 @@ void memoryShowMemoryInfo (void)
 
     unsigned long imageAvailableAreaStart = KERNEL_IMAGE_BASE;
     unsigned long imageAvailableAreaEnd   = (kernel_heap_start - 8);
-    unsigned long imageAvailableAreaSize_in_Bytes = (imageAvailableAreaEnd - imageAvailableAreaStart);
-    unsigned long imageAvailableAreaSize_in_KB    = (imageAvailableAreaSize_in_Bytes/1024);
+    unsigned long imageAvailableAreaSize_in_Bytes = 
+        (imageAvailableAreaEnd - imageAvailableAreaStart);
+    unsigned long imageAvailableAreaSize_in_KB = 
+        (imageAvailableAreaSize_in_Bytes/1024);
 
     printf("\n\n");
     printf("IMAGE SIZE: #todo \n");
@@ -225,9 +223,9 @@ void memoryShowMemoryInfo (void)
         imageAvailableAreaEnd, 
         imageAvailableAreaSize_in_KB );
 
-    //
-    //  heap e stack 
-    //
+//
+//  heap e stack 
+//
     
     //printf("\n[Kernel Heap and Stack info:]\n");
 
@@ -294,13 +292,13 @@ void mmShowPML4EntryForAllProcesses (int entry_number)
 // Mostra as estruturas de pagina 
 // usadas para paginação no pagedpool.
 
-void showFreepagedMemory(int max)
+void showPagedMemoryList(int max)
 {
     struct page_d  *p;
     int i=0;
 
 
-    if (max < 0 || max >= 512 )
+    if (max < 0 || max > 512 )
     {
         return;
     }
@@ -309,14 +307,13 @@ void showFreepagedMemory(int max)
     {  
         p = (void *) pageAllocList[i]; 
 
-		//if ( (void *) p == NULL )
-		//{
-		//    printf("null\n");	 
-		//}
-
-        if ( (void *) p != NULL ){
+        if ( (void *) p != NULL )
+        {
             printf ("id=%d free=%d frameno=%d ref=%d \n", 
-                p->id, p->free, p->frame_number, p->ref_count );
+                p->id,            // Número do slot.
+                p->free,          // ?
+                p->frame_number,  // 
+                p->ref_count );   // Quantos processos estão usando essa pag.
         }
     };
 
