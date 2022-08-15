@@ -1793,30 +1793,50 @@ void *slab_1MB_allocator(void)
     if (NewPagedPool.initialized != TRUE)
         return NULL;
 
+
+// Se devemos ou não incremetar o contador de uso.
+    int IncrementUsageCounter=TRUE; //P->allocated_memory
+    struct process_d *process;
+    process = (void*) get_current_process_pointer();
+    if( (void*) process == NULL )
+        IncrementUsageCounter=FALSE;
+    if(process->magic!=1234)
+        IncrementUsageCounter=FALSE;
+
+
+
 // procure um livre.
     
 //a1
     if (NewPagedPool.Free[0] == TRUE)
     {
         NewPagedPool.Free[0] = FALSE;  // NOT FREE
+        if( (void*) process != NULL )
+            process->allocated_memory += (1*1024*1024);
         return (void *) NewPagedPool.a1_va; 
     }
 //a2
     if (NewPagedPool.Free[1] == TRUE)
     {
         NewPagedPool.Free[1] = FALSE;  // NOT FREE
+        if( (void*) process != NULL )
+            process->allocated_memory += (1*1024*1024);
         return (void *) NewPagedPool.a2_va; 
     }
 //b1
     if (NewPagedPool.Free[2] == TRUE)
     {
         NewPagedPool.Free[2] = FALSE;  // NOT FREE
+        if( (void*) process != NULL )
+            process->allocated_memory += (1*1024*1024);
         return (void *) NewPagedPool.b1_va; 
     }
 //b2
     if (NewPagedPool.Free[3] == TRUE)
     {
         NewPagedPool.Free[3] = FALSE;  // NOT FREE
+        if( (void*) process != NULL )
+            process->allocated_memory += (1*1024*1024);
         return (void *) NewPagedPool.b2_va; 
     }
     
