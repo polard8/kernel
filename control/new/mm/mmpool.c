@@ -341,6 +341,7 @@ tryAgain:
 // livres para alocação.
 // Nosso limite é 512 páginas, pois so temos 2mb de pool.
 
+// #todo: change to 'int number_of_pages'.
 void *allocPages (int size)
 {
 
@@ -350,21 +351,32 @@ void *allocPages (int size)
 
     unsigned long base = (unsigned long) g_pagedpool_va;
 
+    void *final_va;
+
     int __slot=0;
 
 //página inicial da lista
     struct page_d *Ret;   
 
     struct page_d *pageConductor;
-    struct page_d *p;
+    struct page_d *p;  //#todo: use page instead of p.
 
     unsigned long va=0;
     unsigned long pa=0;
     int Count=0;
     int __first_free_slot = -1;
 
-
     debug_print ("allocPages:\n");
+
+// Se devemos ou não incremetar o contador de uso.
+    int IncrementUsageCounter=TRUE; //P->allocated_memory
+    struct process_d *process;
+    process = (void*) get_current_process_pointer();
+    if( (void*) process == NULL )
+        IncrementUsageCounter=FALSE;
+    if(process->magic!=1234)
+        IncrementUsageCounter=FALSE;
+
 
 //
 // Checando limites.
@@ -384,13 +396,25 @@ void *allocPages (int size)
     }
 
 // Se é pra alocar apenas uma página.
-    if (size == 1){
-        return (void *) newPage();
+    if (size == 1)
+    {
+        final_va = (void *) newPage();
+        
+        if ( (void*) final_va != NULL )
+        {
+            if (IncrementUsageCounter == TRUE)
+            {
+                if ( (void*) process != NULL )
+                    process->allocated_memory += PAGE_SIZE;
+            }
+        }
+        
+        return (void*) final_va;
     }
 
 // Se o size for maior que o limite.
     if ( size >= PAGE_COUNT_MAX ){
-        panic ("allocPages: [FAIL] size limits\n");
+        panic ("allocPages: size limits\n");
     }
 
 // Isso encontra slots o suficiente para alocarmos 
@@ -481,6 +505,12 @@ void *allocPages (int size)
             if ( Count >= size )
             {
                 Ret = (void *) pageAllocList[__first_free_slot];
+                
+                if (IncrementUsageCounter==TRUE)
+                {
+                    if( (void*) process != NULL )
+                        process->allocated_memory += (size*PAGE_SIZE);
+                }
                 
                 return (void *) ( base + (Ret->id * 4096) );
             }

@@ -389,15 +389,24 @@ struct process_d
     struct frame_pool_d *framepoolListHead;
 
 
-// Quantidade de mem�ria f�sica usada pelo processo que n�o pode ser compartilhada
+// Memory usage in bytes.
+// Increment when the process call an allocator.
+// Essa é a memoria alocada pelo processo,
+// não a memoria alocada pelo sistema para o processo.
+    unsigned long allocated_memory;
+
+// Quantidade de memória física usada pelo processo 
+// que nao pode ser compartilhada
 // com outros processos. (em KB).
     unsigned long private_memory_size;
 
-// Quantidade de mem�ria f�sica usada pelo processo que pode ser compartilhada
+// Quantidade de memória física usada pelo processo 
+// que pode ser compartilhada
 // com outros processos. (em KB).
     unsigned long shared_memory_size;
 
-// Quantidade de mem�ria usada por um processo em determinado espa�o de tempo.
+// Quantidade de memória usada por um processo 
+// em determinado espaço de tempo.
 // workset = (private + shared);
     unsigned long workingset_size;
     unsigned long workingset_peak_size;

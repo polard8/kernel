@@ -70,16 +70,29 @@ pid_t get_current_pid(void)
 struct process_d *get_current_process_pointer(void)
 {
     struct process_d *p;
+
+// so podemos chamar essa rotina depois que o kernel lançou
+// o primeiro thread.
+    if(system_state != SYSTEM_RUNNING){
+        //panic("get_current_process_pointer: system_state\n");
+        return NULL;
+    }
+    
     pid_t __pid = (pid_t) get_current_process();
     if ( __pid < 0 || __pid >= PROCESS_COUNT_MAX )
     {
         return NULL;
     }
     p = (struct process_d *) processList[__pid];
-    if (p->used!=TRUE)
-        panic ("get_current_process_pointer: used\n");
-    if (p->magic!=1234)
-        panic ("get_current_process_pointer: magic\n");
+    if (p->used!=TRUE){
+        //panic ("get_current_process_pointer: used\n");
+        return NULL;
+    }
+    if (p->magic!=1234){
+        //panic ("get_current_process_pointer: magic\n");
+        return NULL;
+    }
+    
     return (struct process_d *) p;
 }
 
@@ -845,6 +858,19 @@ void ps_initialize_process_common_elements( struct process_d *p )
     p->file_cwd  = (file *) 0;
     p->inode_root = (struct inode_d *) 0;
     p->inode_cwd  = (struct inode_d *) 0;
+
+
+// Memory usage in bytes.
+// Increment when the process call an allocator.
+
+    p->allocated_memory = 0;
+
+    p->private_memory_size=0;
+    p->shared_memory_size=0;
+    p->workingset_size=0;
+    p->workingset_peak_size=0;
+
+
 
 // wait4pid: 
 // O processo esta esperando um processo filho fechar.

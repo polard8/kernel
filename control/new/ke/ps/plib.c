@@ -56,6 +56,9 @@ void show_process_information (void)
                 p->rflags_iopl, p->priority, p->state );
 
             printf("syscalls = { %d }\n", p->syscalls_counter );
+            
+            printf("allocated memory = { %d Bytes }\n", 
+                p->allocated_memory );
         }
     // Nothing.
     };

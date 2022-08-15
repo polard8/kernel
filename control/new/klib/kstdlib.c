@@ -77,6 +77,17 @@ void *kmalloc(size_t size)
     void *ptr;
     unsigned long new_size = ( unsigned long) size;
 
+
+// Se devemos ou não incremetar o contador de uso.
+    int IncrementUsageCounter=TRUE; //P->allocated_memory
+    struct process_d *process;
+    process = (void*) get_current_process_pointer();
+    if( (void*) process == NULL )
+        IncrementUsageCounter=FALSE;
+    if(process->magic!=1234)
+        IncrementUsageCounter=FALSE;
+
+
     if ( size < 0 ){
         debug_print ("kmalloc: size\n");
         return NULL;
@@ -85,10 +96,18 @@ void *kmalloc(size_t size)
         debug_print ("kmalloc: size ajust\n");
         new_size=1;
     }
+
     ptr = (void *) heapAllocateMemory(new_size);
-    if ( (void *) ptr == NULL ){
+    if ( (void *) ptr == NULL )
+    {
         debug_print ("kmalloc: ptr\n");
         return NULL;
+    }
+
+    if (IncrementUsageCounter==TRUE)
+    {
+        if ( (void*) process != NULL )
+            process->allocated_memory += new_size;
     }
 
     return (void *) ptr;

@@ -781,7 +781,7 @@ sys_read (
             }
         } 
 
-        panic ("sys_read: [FAIL] Unexpected error when reading socket\n \n");
+        panic ("sys_read: Unexpected error when reading socket\n");
     }
 
 
@@ -1290,7 +1290,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
             }
         }
 
-        panic("sys_write: [FAIL] unexpected error when writing on socket.\n");
+        panic("sys_write: Unexpected error when writing on socket\n");
     }
 
 
