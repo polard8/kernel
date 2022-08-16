@@ -494,6 +494,8 @@ wmProcedure (
     unsigned long long1, 
     unsigned long long2 );
 
+
+static int __feedSTDIN( unsigned long ch );
 static void __launch_app_via_initprocess(int index);
 static void __enter_embedded_shell(int kernel_in_debug_mode);
 static void __exit_embedded_shell(void);
@@ -586,6 +588,51 @@ wmSendInputToWindowManager(
 // See: swlib.asm
 
     return (unsigned long) wmWindowMananer_SendMessage();
+}
+
+
+//#todo: Talvez essa rotina possa ir pra outro lugar.
+// talvez na lib.
+static int __feedSTDIN( unsigned long ch )
+{
+    //char Data = (char) (ch & 0x7F);
+    char Data = (char) (ch & 0xFF);
+    char ch_buffer[2];
+
+    if( (void*) stdin == NULL ){
+        goto fail;
+    }
+
+    if(stdin->used != TRUE) { return -1; }
+    if(stdin->magic != 1234){ return -1; }
+
+// Can write.
+    stdin->sync.can_write = TRUE;
+
+// Can write and read.
+    stdin->_flags = __SWR;
+
+// Data
+    ch_buffer[0] = (char) (Data & 0xFF);
+
+// Write
+// Write 1 byte.
+
+    file_write_buffer ( 
+        (file *) stdin, 
+        (char *) ch_buffer, 
+        (int) 1 );
+
+// Can read.
+// O aplicativo precisa disso.
+    stdin->sync.can_read = TRUE;
+// Can read.
+// O worker no kernel precisa disso.
+    stdin->_flags = __SRD;
+
+    return 0;
+fail:
+    return -1;
 }
 
 
@@ -749,8 +796,8 @@ wmProcedure (
 {
     int Status = -1;
     int UseSTDIN=TRUE;      // Input model
-    char ch_buffer[2];
-    char buffer[128];
+    char ch_buffer[2];  // char string.
+    char buffer[128];   // string buffer
 
     unsigned long tmp_value=0;
 
@@ -785,7 +832,6 @@ wmProcedure (
     case MSG_MOUSEMOVE:
     case MSG_MOUSEPRESSED:
     case MSG_MOUSERELEASED:
-        //wmSendInputToWindowManager(0,msg,long1,long2);
         return -1;
         break;
 
@@ -893,7 +939,6 @@ wmProcedure (
             ctrl_status != TRUE &&
             alt_status != TRUE )
         {
-            //wmSendInputToWindowManager(0,MSG_SYSKEYUP,long1,long2); 
             return 0;
         }
         break;
@@ -934,11 +979,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f1\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77101,0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(0);
+                    //post_message_to_ws( NULL, (int) 88101,0, 0 );
                 }
                 return 0;
                 break;
@@ -950,11 +995,11 @@ wmProcedure (
                      return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f2\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77102,0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(1);
+                    //post_message_to_ws( NULL, (int) 88102,0, 0 );
                 }
                 return 0;
                 break;
@@ -966,11 +1011,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f3\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77103,0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(2);
+                    //post_message_to_ws( NULL, (int) 88103,0, 0 );
                 }
                 return 0;
                 break;
@@ -984,11 +1029,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f4\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77104,0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(3);
+                    //post_message_to_ws( NULL, (int) 88104,0, 0 );
                 }
                 return 0;
                 break;
@@ -1004,11 +1049,10 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f5\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77105,0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //kgwm_next();
+                    //post_message_to_ws( NULL, (int) 88105,0, 0 );
                 }
                 return 0;
                 break;
@@ -1026,11 +1070,10 @@ wmProcedure (
                     return 0; 
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f6\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77106,0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //kgwm_next();
+                    //post_message_to_ws( NULL, (int) 88106,0, 0 );
                 }
                 return 0;
                 break;
@@ -1045,11 +1088,10 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f7\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77107,0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //kgwm_next();
+                    //post_message_to_ws( NULL, (int) 88107,0, 0 );
                 }
                 return 0;
                 break;
@@ -1057,36 +1099,13 @@ wmProcedure (
             // Test 2.
             case VK_F8:
                 if (ctrl_status == TRUE){
-
-                    // #test: IN: (wid,msg,long1,long2)
-                    //wmSendInputToWindowManager(0,1,0,0);
-                    //wmSendInputToWindowManager(0,2,0,0);
-                    //wmSendInputToWindowManager(0,3,0,0);
-                    //wmSendInputToWindowManager(0,4,0,0);
-                    //wmSendInputToWindowManager(0,5,0,0);
-                    //wmSendInputToWindowManager(0,6,0,0);
-                    //wmSendInputToWindowManager(0,7,0,0);  //close
-                    //wmSendInputToWindowManager(0,MSG_PAINT,0,0);
-                    //wmSendInputToWindowManager(0,9,0,0);
-                    //wmSendInputToWindowManager(0,10,0,0);
-                    //wmSendInputToWindowManager(0,18,0,0);   //set focus
-                    //wmSendInputToWindowManager(0,19,0,0);   //get focus
-
-                    //#oldtest
-                    //powertrio_next();
-                    // Send message to init process to launch the launcher.
-                    //__kgwm_SendMessageToInitProcess(9216); 
-                    //__kgwm_SendMessageToInitProcess(9218);  // launch sysmon
-                        
-                    //__launch_app_via_initprocess(4008);
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f8\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77108,0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //kgwm_next();
+                    //post_message_to_ws( NULL, (int) 88108,0, 0 );
                 }
                 return 0;
                 break;
@@ -1097,8 +1116,7 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f9\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77109,0, 0 );
                 }
                 if (shift_status == TRUE){
                     // #goal
@@ -1106,7 +1124,7 @@ wmProcedure (
                     // We can't call another process and 
                     // we want to reboot the machine.
                     sys_reboot();
-                    //__kgwm_SendMessageToInitProcess(9216);  //reboot
+                    //post_message_to_ws( NULL, (int) 88109,0, 0 );
                 }
                 return 0;
                 break;
@@ -1117,59 +1135,49 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f10\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77110,0, 0 );
                 }
                 if (shift_status == TRUE){
                     Background_initialize(COLOR_KERNEL_BACKGROUND);
                     show_slots(); //See: tlib.c
                     //pages_calc_mem();
                     refresh_screen();
-                    //__kgwm_SendMessageToInitProcess(9217);  //gdeshell
+                    //post_message_to_ws( NULL, (int) 88110,0, 0 );
                 }
                 return 0;
                 break;
 
             case VK_F11:
-                // #todo:
-                // [Window Manager]: Restore
-                if (ctrl_status == TRUE)
-                {
+                if (ctrl_status == TRUE){
+                    // Mostra informaçoes sobre as threads.
                     show_slots();
-                    //tmp_value = get_update_screen_frequency();
-                    //tmp_value--;
-                    //set_update_screen_frequency(tmp_value);
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f11\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77111,0, 0 );
                 }
                 if (shift_status == TRUE){
                    hal_reboot();
-                   // #bugbug: Something is wrong with this routine.
-                   //__kgwm_SendMessageToInitProcess(9218);  // redpill application
+                   //post_message_to_ws( NULL, (int) 88111,0, 0 );
                 }
                 return 0;
                 break;
 
             case VK_F12:
-                // #todo:
-                // [Window Manager]: Close
-                if (ctrl_status == TRUE)
-                {
+                if (ctrl_status == TRUE){
+                    // Mostra informaçoes sobre os processos.
                     show_process_information();
-                    //tmp_value = get_update_screen_frequency();
-                    //tmp_value++;
-                    //set_update_screen_frequency(tmp_value);
                 }
                 if (alt_status == TRUE){
-                    printf ("wmProcedure: alt + f12\n");
-                    refresh_screen();
+                    //post_message_to_ws( NULL, (int) 77112,0, 0 );
                 }
+                // #test
+                // SHIFT + F12
+                // Switch focus?
+                // Posting messages to the window server.
+                // Into the control thread's queue,
+                // IN: window, msg code, data1, data2.
                 if (shift_status == TRUE){
-                    //wmSendInputToWindowManager(0,9090,0,0);   // Switch focus
-                    //__kgwm_SendMessageToInitProcess(9219);  // sysmon
-                    return 0;
+                    post_message_to_ws( NULL, (int) 88112,0, 0 );
                 }
                 return 0;
                 break;
@@ -1728,89 +1736,31 @@ done:
 
     char ch_buffer[2];
 
-    // Colocamos no arquivo somente se não estivermos
-    // no modo console.
-    if ( ShellFlag != TRUE )
+
+// ==================================
+// Coloca no arquivo stdin.
+// Envia para a thread de controle do window server.        
+// Colocamos no arquivo somente se não estivermos
+// no modo console.
+
+    if (ShellFlag != TRUE)
     {
-        if ( Event_Message == MSG_KEYDOWN )
-        {
-
-            // #todo
-            // precisamos de uma flag que indique que isso deve ser feito.
-
-            if( (void*) stdin != NULL ){
-            if(stdin->magic == 1234)   {
-            stdin->sync.can_write = TRUE;
-            stdin->_flags = __SWR;
-            ch_buffer[0] = (char) (Event_LongASCIICode & 0xFF);
-
-            file_write_buffer ( 
-                (file *) stdin, (char *) ch_buffer, (int) 1 );
-
-            stdin->sync.can_read = TRUE;  // O aplicativo precisa disso.
-            stdin->_flags = __SRD;        // O worker no kernel precisa disso.
-            }
-            }
+        // Coloca no arquivo stdin.
+        // Somente ascii.
+        // #todo: Nesse caso da pra enviar os primeiros ascii
+        // que representam comandos.
+        if ( Event_Message == MSG_KEYDOWN ){
+            __feedSTDIN( (unsigned long) Event_LongASCIICode );
         }
-        
-        // Send all the messages to the foreground thread.
-        // The thread with focus.
-        // #bugbug
-        // Is the forground thread a valid thread?
-        /*
-        if (tid == foreground_thread)
-        {
-            if ( tid > 0 && 
-                 tid < THREAD_COUNT_MAX )
-            {
-
-            // #todo
-            // precisamos de uma flag que indique que isso deve ser feito.
-            // See: tlib.c
-
-                post_message_to_tid(
-                    (int) tid,            // tid
-                    NULL,                 // window
-                    (int) Event_Message,  // msg code
-                    Event_LongASCIICode,  // long1
-                    Event_LongRawByte );  // long2
-        
-                // See: ts.c
-                // #deprecated?
-                if( WindowServerInfo.initialized == TRUE )
-                    weGotKeyboardInput = TRUE;
-            }
-        }
-        */
-
-        // Sempre envie mensagens de input 
-        // somente para o window server.
-        if( WindowServerInfo.initialized == TRUE )
-        {
-             tid = WindowServerInfo.tid;
-         
-            if ( tid > 0 && 
-                 tid < THREAD_COUNT_MAX )
-            {
-
-            // #todo
-            // precisamos de uma flag que indique que isso deve ser feito.
-            // See: tlib.c
-
-                post_message_to_tid(
-                    (int) tid,            // tid
-                    NULL,                 // window
-                    (int) Event_Message,  // msg code
-                    Event_LongASCIICode,  // long1
-                    Event_LongRawByte );  // long2
-        
-                // See: ts.c
-                // #deprecated?
-                //if( WindowServerInfo.initialized == TRUE )
-                    //weGotKeyboardInput = TRUE;
-            }
-        }
+        // Envia para a thread de controle do window server.
+        // Todo tipo de tecla.        
+        post_message_to_ws(
+            NULL, 
+            Event_Message, 
+            Event_LongASCIICode,
+            Event_LongRawByte ); 
     }
+
 
 // Process the event using the system's window procedures.
 // It can use the kernel's virtual console or
@@ -1827,20 +1777,24 @@ done:
 
     int __Status=-1;
 
-    //if( gKeyboardAccelleratorsStatus == TRUE )
-    //{
-        __Status = 
-            (int) wmProcedure(
-                (struct window_d *) Event_Window,    // opaque pointer
-                (int)               Event_Message,
-                (unsigned long)     Event_LongASCIICode,
-                (unsigned long)     Event_LongRawByte );
-        
-        return (int) __Status;
-    //}
 
-// OK
-    return 0;
+// Quando devemos processar internamente?
+// + Somente quando uma tecla de controle estiver acionada.
+
+// Uma flag global poderia nos dizer se devemos ou não
+// processar algumas combinações. Mas o sistema deve
+// sim processar algumas combinações, independente dos aplicativos.
+// Como a chamada aos consoles do kernel ou control+alt+del.
+
+    __Status = 
+        (int) wmProcedure(
+        (struct window_d *) Event_Window,    // opaque pointer
+        (int)               Event_Message,
+        (unsigned long)     Event_LongASCIICode,
+        (unsigned long)     Event_LongRawByte );
+
+    return (int) __Status;
+    //return 0;
 }
 
 
@@ -1851,73 +1805,61 @@ done:
 // #todo: change parameters.
 // we need more information about the mouse event.
 // called by __ps2mouse_parse_data_packet in ps2mouse.c
-int wmMouseEvent(int event_id,long long1, long long2)
-{
+
 
 //  Post mouse events only to the window server's control thread.
+// #todo
+// Se uma tecla de controle estiver precionada,
+// então podemos enviar o status das teclads de controle
+// atraves do segundo long.
 
-
-    struct process_d *ws_process;
-
+int 
+wmMouseEvent(
+    int event_id,
+    long long1, 
+    long long2 )
+{
     int Status=-1;
-    unsigned long button_number = long1;
+
     //debug_print ("xxxMouseEvent:\n");
 
 
-    //get the window server pid.
-    pid_t ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
-
-    if(ws_pid<0 || ws_pid>=PROCESS_COUNT_MAX)
-        return -1;
-    ws_process = (struct process_d *) processList[ws_pid];
-
-    if( (void*) ws_process == NULL )
-        return -1;
-    if(ws_process->magic!=1234)
-        return -1;
-     
-     struct thread_d *t;
-     t = (struct thread_d *) ws_process->control;
-     
-    if( (void*) t == NULL )
-        return -1;
-    if(t->magic!=1234)
-        return -1;
-     
-
-    tid_t ws_tid = t->tid;
-
-    if(ws_tid<0 || ws_tid>=THREAD_COUNT_MAX)
-        return -1;
-
-
+// Event id:
     if (event_id<0){
-        return -1;
+        goto fail;
     }
 
+// data:
+    unsigned long button_number = (unsigned long) (long1 & 0xFFFF);
+    //unsigned long ? = long2;
+
+// ====================================
+// Button events:
 // Buttons:
 // Pressionado ou liberado.
 // Post message.
+
     if( event_id == MSG_MOUSEPRESSED ||
         event_id == MSG_MOUSERELEASED )
     {
-        post_message_to_tid(
-            ws_tid,  //Send it to the window server.
+
+        // #todo
+        // Se uma tecla de controle estiver precionada,
+        // então podemos enviar o status das teclads de controle
+        // atraves do segundo long.
+
+        // IN: window pointer, event id, button number. button number.
+        post_message_to_ws(
             NULL,
             event_id,
             button_number,
-            button_number );
+            button_number ); //#todo: send control keys status.
         return 0;
-        //Status = 
-        //    (int) wmProcedure(
-        //        (struct window_d *) 0,                // opaque pointer
-        //        (int)               event_id,         // msg code
-        //        (unsigned long)     button_number,    // button number
-        //        (unsigned long)     button_number );  // button number
-
-        //return (int) Status;
     }
 
+
+// ====================================
+// mouse move events:
 
     //old: for ereasing
     static long old_x=0;
@@ -1926,7 +1868,8 @@ int wmMouseEvent(int event_id,long long1, long long2)
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
 
-
+// #bugbug
+// low limits? 
     deviceWidth  = (deviceWidth & 0xFFFF);
     deviceHeight = (deviceHeight & 0xFFFF);
 
@@ -1953,66 +1896,19 @@ int wmMouseEvent(int event_id,long long1, long long2)
 
     if ( event_id == MSG_MOUSEMOVE )
     {
-        // #bugbug
-        // #todo
-        // Essa rotina de exibiçao de cursor deve acontecer
-        // la no window server, quando enviarmos as
-        // informaçoes de evento para la. Nao aqui.
-        // See: gramado/core/server/wm.c
-        // Erease cursor.
-        // Ereasing the cursor by refreshing a little
-        // part of the backbuffer into the front buffer.
-        //refresh_rectangle ( old_x, old_y, 10, 10 );
-        //old_x = long1;
-        //old_y = long2;
-        // Drawing the cursor.
-        // Drawing the cursor directly into
-        // the framebuffer.
-        //frontbuffer_draw_rectangle( 
-        //    long1, long2, 10, 10, COLOR_RED, 0 );
+        // IN: window pointer, event id, x, y.
+        post_message_to_ws(
+            NULL, event_id, long1, long2 );
 
-        //Status = 
-        //    (int) wmProcedure(
-        //        (struct window_d *) 0,         // opaque pointer
-        //        (int)               event_id,  // msg code
-        //        (unsigned long)     long1,     // x
-        //        (unsigned long)     long2 );   // y
-        
-        post_message_to_tid(
-            ws_tid,  //Send it to the window server.
-            NULL,
-            event_id,
-            long1,    //x
-            long2 );  //y
-        
         return 0;
-        //return (int) Status;
     }
 //----
 
-
-//
-// == Dispatch ====
-//
-
-// Process the event using the system's window procedures.
-// It can use the kernel's virtual console or
-// send the event to the loadable window server.
-// See: kgwm.c
-// For mouse events, see: window.h
-
-/*
-    wmProcedure(
-        (struct window_d *) 0,         // opaque pointer
-        (int)               event_id,  // msg code
-        (unsigned long)     long1,         // x
-        (unsigned long)     long2 );       // y
-*/
-
-// OK
 done:
-    //debug_print ("xxxMouseEvent: Done\n");
     return 0;
+fail:
+    //debug_print ("xxxMouseEvent: fail\n");
+    return -1;
 }
 
 

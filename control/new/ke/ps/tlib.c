@@ -326,7 +326,7 @@ post_message_to_tid (
 // The message
 //
 
-    tmp_msg = (unsigned long) (msg & 0xFFFF);
+    tmp_msg = (unsigned long) (msg & 0xFFFFFFFF);
 
 // ==========================================================
 // #test
@@ -351,12 +351,22 @@ post_message_to_tid (
     //}
 
     next_msg->window = (struct window_d *) window;
-    next_msg->msg    = (int) (tmp_msg & 0xFFFF);
+    next_msg->msg    = (int) (tmp_msg & 0xFFFFFFFF);
     next_msg->long1  = (unsigned long) long1;
     next_msg->long2  = (unsigned long) long2;
 
 // #test
-    next_msg->long3 = (unsigned long) jiffies;  // ktime.
+// ktime.
+    next_msg->long3 = (unsigned long) jiffies;
+
+// #test
+// Status das teclas de controle.
+// #todo:
+// Como o driver de teclado esta dentro do kernel,
+// então podemos chamar uma função que pegue uma 
+// variavel contendo o status de todas as teclas de controle.
+
+    //next_msg->long4 = (unsigned long) wmGetControlKeysState();
 
 // #test
     next_msg->sender_tid = -1;  // from kernel. 
@@ -373,6 +383,42 @@ fail0:
     if ( t->MsgQueueTail >= 31 )
         t->MsgQueueTail = 0;
     return -1;
+}
+
+int
+post_message_to_ws ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 )
+{
+
+    tid_t tid=-1;
+
+    if( WindowServerInfo.initialized != TRUE )
+        return -1;
+
+    tid = (tid_t) WindowServerInfo.tid;
+         
+    if ( tid < 0 || 
+         tid >= THREAD_COUNT_MAX )
+    {
+        return -1;
+    }
+
+// #todo
+// precisamos de uma flag que indique que isso deve ser feito.
+// See: tlib.c
+
+    // IN: tid, window pointer, msgcode, data1, data2.
+    post_message_to_tid(
+        (int) tid,
+        NULL,
+        (int) msg,
+        long1,
+        long2 );
+
+   return 0;
 }
 
 

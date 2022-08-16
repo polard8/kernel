@@ -968,6 +968,13 @@ post_message_to_tid (
     unsigned long long2 );
 
 int
+post_message_to_ws( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+int
 post_message_to_foreground_thread ( 
     struct window_d *window, 
     int msg, 
