@@ -271,11 +271,13 @@ fail:
  *     Isso � chamado por do_fork_process.
  */
 // Called by clone_and_execute_process at clone.c
+// Cloning the process structure.
+// #todo: It depends on the childs personality.
 // #
 // It will also copy the control thread.
 // IN:
 // p1 = atual.
-// p2 = clone. 
+// p2 = clone. (child)
 // OUT:
 // 0 = ok
 // 1 = fail
@@ -290,6 +292,11 @@ copy_process_struct(
 
     int Status=0;
     int i=0;
+
+
+// #todo
+// Childs personality first of all.
+    //int ChildsPersonality = Process2->personality;
 
 // Balancing the priority.
 // Please, don't inherit base priority!
@@ -553,6 +560,7 @@ copy_process_struct(
 // O fluxo padrão foi criando antes em klib/kstdio.c
 // #todo: 
 // Checar as características desses arquivos.
+// # Todo processo esta usando o mesmo fluxo.
 
     Process2->Objects[0] = (unsigned long) stdin;
     Process2->Objects[1] = (unsigned long) stdout;
@@ -585,6 +593,8 @@ copy_process_struct(
 //?? herda a lista de threads ??
     Process2->threadListHead = Process1->threadListHead;
     Process2->zombieChildListHead = Process1->zombieChildListHead;
+
+// Not in use at the moment.
     Process2->dialog_address = Process1->dialog_address;
 
 //
@@ -597,7 +607,7 @@ copy_process_struct(
 // e um fd na lista de objetos abertos pelo processo.
 
     // panic()
-    debug_print ("copy_process_struct: [FIXME] No slot for tty\n");
+    // debug_print ("copy_process_struct: [FIXME] No slot for tty\n");
  
 __OK:
     Process2->exit_code = Process1->exit_code;

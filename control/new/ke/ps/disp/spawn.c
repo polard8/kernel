@@ -189,14 +189,11 @@ void spawn_thread(int tid)
     }
 
 
-// ??
-// Set current process
+// Do we have an owner process?
 
-    if ( (void*) target_thread->process == NULL )
-    {
-        panic("spawn_thread: target_thread->process\n");
+    if ( (void*) target_thread->owner_process == NULL ){
+        panic("spawn_thread: target_thread->owner_process\n");
     }
-
 
 // Pegamos o pid.
 // #bugbug: 
@@ -204,7 +201,7 @@ void spawn_thread(int tid)
 
     //pid_t cur_pid = (pid_t) target_thread->process->pid;
     
-    pid_t cur_pid = (pid_t) target_thread->ownerPID;
+    pid_t cur_pid = (pid_t) target_thread->owner_pid;
     
     if ( cur_pid < 0 || 
          cur_pid >= PROCESS_COUNT_MAX )

@@ -38,7 +38,6 @@ pid_t copy_process(
     pid_t pid, 
     unsigned long clone_flags )
 {
-
     pid_t parent_pid = (pid_t) pid;    //parameter
     pid_t child_pid  = (pid_t) (-1);   //fail
 
@@ -74,14 +73,12 @@ pid_t copy_process(
     _pt = 0;
 
 
-
     copy_process_in_progress=TRUE;
 
 // Copiar a tabela pml4 do kernel.
     _pml4 = (void *) CloneKernelPML4();
-    if ( (void*) _pml4 == NULL )
-    {
-        panic("copy_process: _pml4");
+    if ( (void*) _pml4 == NULL ){
+        panic("copy_process: _pml4\n");
     }
 
     //printf ("_pml4: %x\n",_pml4);
@@ -138,42 +135,46 @@ pid_t copy_process(
 // == Current process ===========================================
 //
 
+// parent_pid came from function parameters.
+
 // parent pid.
     if ( parent_pid < 0 || 
-         parent_pid >= PROCESS_COUNT_MAX)
+         parent_pid >= PROCESS_COUNT_MAX )
     {
-        printf ("copy_process: [FAIL] parent_pid \n");
+        printf("copy_process: parent_pid\n");
         goto fail;
     }
 
-//
-// parent process.
-//
-
+// parent process pointer.
     parent_process = (struct process_d *) processList[ parent_pid ];
     if ( (void *) parent_process == NULL )
     {
-        printf ("copy_process: [FAIL] parent_process \n");
+        printf("copy_process: parent_process\n");
         goto fail;
     }
-    if ( parent_process->used != TRUE || parent_process->magic != 1234 )
-    { 
-        printf ("copy_process: [FAIL] parent_process validation \n");
+    if ( parent_process->used != TRUE || 
+         parent_process->magic != 1234 )
+    {
+        printf("copy_process: parent_process validation\n");
         goto fail;
     }
 
-
-// cpl
+// cpl:
 // Apenas processos em ring3 podem clonar por enquanto.
-    if (parent_process->cpl != RING3)
+    if (parent_process->cpl != RING3){
         panic("copy_process: cpl != RING3\n");
+    }
 
-// iopl
+// iopl:
 // #todo: Para o futuro, precisamos aceitar
 // iopl 0, para termos mais proteção.
-    if (parent_process->rflags_iopl != 3)
-        panic("copy_process: iopl\n");
+// #bugbug: Actually the caller is running with the iopl=0,
+// but maybe the dispatcher is saving 
+// this context in another variable.
 
+    //if (parent_process->rflags_iopl != 3){
+    //    panic("copy_process: iopl\n");
+    //}
 
 // Saving the pml4 of the current process. The caller.
 // We're gonna reload this one at the end of this routine.
@@ -183,16 +184,19 @@ pid_t copy_process(
 // Testing if the current process has a 
 // null pml4 virtual address.
 
+// pml4
     if( (void*) parent_process->pml4_VA == NULL )
     {
         printf ("copy_process: [FAIL] parent_process->pml4_VA\n");
         goto fail;
     }
+// pdpt
     if( (void*) parent_process->pdpt0_VA == NULL )
     {
         printf ("copy_process: [FAIL] parent_process->pdpt0_VA\n");
         goto fail;
     }
+// pd
     if( (void*) parent_process->pd0_VA == NULL )
     {
         printf ("copy_process: [FAIL] parent_process->pd0_VA\n");
@@ -209,7 +213,6 @@ pid_t copy_process(
 
     // ...
 
-
 //
 // Parent's control thread
 //
@@ -219,8 +222,9 @@ pid_t copy_process(
         panic("copy_process: parent_thread\n");
     }
 
-    if(parent_thread->magic!=1234)
+    if(parent_thread->magic!=1234){
         panic("copy_process: parent_thread validation\n");
+    }
 
 // cpl
 // For now we can only clone ring 3 threads.
@@ -231,66 +235,58 @@ pid_t copy_process(
 // #bugbug:
 // For now, we can only clone threads in ring 3,
 // with weak protection;
+// #bugbug: Actually the initial iopl is 3, 
+// but the app is changing its on iopl at the end
+// of the rtl initialization.
 
-    if (parent_thread->rflags_initial_iopl != 3){
-        panic("copy_process: parent rflags_initial_iopl\n");
-    }
-
-    //if (parent_thread->rflags_current_iopl != 3){
-    //    panic("copy_process: parent rflags_current_iopl\n");
+    //if (parent_thread->rflags_initial_iopl != 3){
+    //    panic("copy_process: parent rflags_initial_iopl\n");
     //}
 
+//
+// == PREEMPT ========
+//
 
-// Change the state of the parent's control thread.
 // [pai]
-
+// Change the state of the parent's control thread.
     parent_thread->state = READY;
 
- 
-// o dono da parent thread tem que ser o processo pai.
-    if( parent_thread->ownerPID != parent_process->pid )
+// O dono da parent thread tem que ser o processo pai.
+    if( parent_thread->owner_pid != parent_process->pid )
     {
-        panic("copy_process: parent_thread->ownerPID != parent_process->tid\n");
+        panic("copy_process: parent_thread->owner_pid\n");
     }
 
-    // a thread de controle do pai
-    // tem que ser igual a thread que fez a chamada.
-    if( parent_thread->tid != current_thread )
-    {
-        panic("copy_process: parent_thread->tid != current_thread\n");
+// A thread que fez a chamada precisa ser
+// a thread de controle do processo pai.
+    if ( current_thread != parent_thread->tid ){
+        panic("copy_process: current_thread mismatched\n");
     }
 
-
-
-//pid
-
-    if(parent_process->pid != parent_pid)
-    {
-        panic("copy_process: parent_process->pid != parent_pid\n");
+// O pid do processo pai.
+    if ( parent_pid != parent_process->pid ){
+        panic("copy_process: parent_pid mismatched\n");
     }
 
-
-//
 // Select the 
 // new current process and the 
 // new current thread.
-//
 
 // #todo: Isso pode ir para o fim da rotina?
 
 //====
 
-    
+// Limits for the callers pid.
     if( parent_process->pid < 0 || 
         parent_process->pid >= PROCESS_COUNT_MAX )
     {
         panic("copy_process: parent_process->pid limits\n");
     }
 
-    // tem que ser igual ao current_process que pegamos logo acima
-    // pois o pai tem que ser quem esta chamando.
-    if( parent_process->pid != current_process )
-    {
+// pid again.
+// Tem que ser igual ao current_process que pegamos logo acima
+// pois o pai tem que ser quem esta chamando.
+    if( parent_process->pid != current_process ){
         panic("copy_process: parent_process->pid != current_process\n");
     }
 
@@ -329,30 +325,32 @@ do_clone:
         goto fail;
     }
 
-// Personality
+// Personality first of all. 
+// Because some features depends on that.
+
     child_process->personality = (int) parent_process->personality;
 
-
-// new pid
+// pid
 
     child_pid = (pid_t) child_process->pid;
 
-    if(child_pid < 0 || child_pid >= PROCESS_COUNT_MAX )
+    if ( child_pid < 0 || 
+         child_pid >= PROCESS_COUNT_MAX )
     {
         panic("copy_process: child_pid limits\n");
     }
 
-    if ( child_pid == parent_pid )
-    {
+// The child pid can't be the same of his father.
+    if ( child_pid == parent_pid ){
         panic("copy_process: child_pid == parent_pid\n");
     }
 
-// Estamos clonando um processo,
-// Entao o processo filho nao pode ter o mesmo pid do kernel.
-
+// The child pid can't be the same of the kernel.
     if ( child_pid == GRAMADO_PID_KERNEL ){
         panic("copy_process: child_pid == GRAMADO_PID_KERNEL\n");
     }
+
+// Breakpoint
 
     //#debug
     //printf (" :) \n");
@@ -367,21 +365,26 @@ do_clone:
 // pml4
 // A tabela pml4 usada pelo clone.
 // Ela é uma cópia da tabela do kernel.
+// Fizemos essa clonagem no início da rotina.
 
+
+// Endereço virtual do pml4 do processo filho.
     child_process->pml4_VA = (unsigned long) _pml4;
 
-    if ( (void *) child_process->pml4_VA == NULL )
-    {
+    if ( (void *) child_process->pml4_VA == NULL ){
         panic ("copy_process: [FAIL] child_process->pml4_VA\n");
     }
 
+// Endereço físico do pml4 do processo filho.
     child_process->pml4_PA = 
         (unsigned long) virtual_to_physical ( 
                             child_process->pml4_VA, 
                             gKernelPML4Address ); 
 
+
+// Breakpoint
+
     // #debug
-    // ok
     //printf ("child_process->pml4_VA: %x\n",child_process->pml4_VA);
     //printf ("child_process->pml4_PA: %x\n",child_process->pml4_PA);
     //refresh_screen();
@@ -391,7 +394,7 @@ do_clone:
 // ==============================
 // pdpt0
 // A tabela pdpt usada pelo clone.
-// Ela é uma cópia da tabela usada pelo processo pai
+// Ela é uma cópia da tabela usada pelo processo pai.
 
     child_process->pdpt0_VA = (unsigned long) parent_process->pdpt0_VA;
     child_process->pdpt0_PA = (unsigned long) parent_process->pdpt0_PA;
@@ -404,42 +407,37 @@ do_clone:
     child_process->pd0_VA = (unsigned long) parent_process->pd0_VA;
     child_process->pd0_PA = (unsigned long) parent_process->pd0_PA;
 
-
-
 // ==================================
 
-    // Copiando a memória e o processo.
-    // Copy memory:
-    // >> Copia a memória usada pela imagem do processo.
-    // #bugbug: Esse é um momento crítico.
-    // #todo: Precisamos do suporte a imagens ELF.
-    // >> Clone the process: 
-    // Lets create the page directory for the Clone.
-    // Now we need to map the physical addresses we got 
-    // in the allocation routine.
-    // #obs: 
-    // Na hora de copiar o processo, a estrutura do clone 
-    // receberá os valores da estrutura do processo atual,
-    // até mesmo o endereço do diretório de páginas.
-    // See: process.c
+// #todo:
+// Rever esse comentário todo, colocar uma síntese aqui
+// e umcomentário completo la na função chamada.
 
-    // Explicando:
-    // Copia a imagem do processo atual e salva o endereço
-    // da copia num elemento da estrutura passada como argumento.
-
-    // #bugbug
-    // Estamos usando o ponteiro Current, 
-    // sem antes ao menos checarmos a validade.
-
-    // Explicando:
-    // Copia a imagem do processo atual e salva o endereço
-    // da copia num elemento da estrutura passada como argumento.
-    // #changeme: Essa rotina é um absurdo.
-
-//
+// Copiando a memória e o processo.
+// Copy memory:
+// >> Copia a memória usada pela imagem do processo.
+// #bugbug: Esse é um momento crítico.
+// #todo: Precisamos do suporte a imagens ELF.
+// >> Clone the process: 
+// Lets create the page directory for the Clone.
+// Now we need to map the physical addresses we got 
+// in the allocation routine.
+// #obs: 
+// Na hora de copiar o processo, a estrutura do clone 
+// receberá os valores da estrutura do processo atual,
+// até mesmo o endereço do diretório de páginas.
+// See: process.c
+// #explicando:
+// Copia a imagem do processo atual e salva o endereço
+// da copia num elemento da estrutura passada como argumento.
+// #bugbug
+// Estamos usando o ponteiro Current, 
+// sem antes ao menos checarmos a validade.
+// #explicando:
+// Copia a imagem do processo atual e salva o endereço
+// da copia num elemento da estrutura passada como argumento.
+// #changeme: Essa rotina é um absurdo.
 // Copy process image and stack.
-//
-
 // Explicando:
 // Copia a imagem do processo atual e salva o endereço
 // da copia num elemento da estrutura passada como argumento.
@@ -455,9 +453,12 @@ do_clone:
 // sim criando um endereçamento novo.
 //see: process.c
 
-// #debug
+    // #debug
     debug_print ("copy_process: [1] Copying process image and stack.\n");
     //printf      ("copy_process: [1] Copying process image and stack.\n");
+
+
+// Allocating memory for the image and for the stack.
 
     Status = (int) alloc_memory_for_image_and_stack( parent_process );
 
@@ -465,30 +466,35 @@ do_clone:
         panic ("copy_process: __alloc_memory_for_image_and_stack\n");
     }
 
+// Breakpoint
+
     //#debug
     //printf (" :) \n");
     //refresh_screen();
     //return 0;
 
-//
 // Copy process structure.
-//
-
 // [2]
 // Copiar a estrutura de processo. 
 // Do atual para o clone que estamos criando.
 // #important: It will also copy the control thread.
 // see: process.c
 
-//#debug
+    //#debug
     debug_print ("copy_process: [2] Copying process structure\n");
     //printf ("copy_process: [2] Copying process structure\n");
 
-    Status = copy_process_struct( parent_process, child_process );
+// Cloning the process structure.
+// #todo: It depends on the childs personality.
+
+    Status = 
+        (int) copy_process_struct( parent_process, child_process );
 
     if ( Status != 0 ){
         panic ("copy_process: [FAIL] copy_process_struct\n");
     }
+
+// Breakpoint
 
     //#debug
     //printf (" :) \n");
@@ -526,36 +532,44 @@ do_clone:
         panic ("copy_process: [FAIL] copy_thread_struct \n");
     }
 
+// #bugbug: We already get the childs personality.
+// it needs to be a parameter given by the caller.
+
     //child_thread->personality = (int) parent_thread->personality;
 
-
-// save.
+// Save the pointer for the control thread.
     child_process->control = (struct thread_d *) child_thread;
 
-// #test
-// Salvando o ponteiro para o processo pai
-    child_thread->process = (struct process_d *) parent_process;
-    
+// The child process is the owner of the child thread.
+    child_thread->owner_process = (struct process_d *) child_process;
+
 // Salvando o pid do owner.
-    child_thread->ownerPID = (pid_t) child_pid;
+    child_thread->owner_pid = (pid_t) child_pid;
+
+// Breakpoint
 
     // #debug
-    // ok
     //printf (" :) \n");
     //refresh_screen();
     //return 0;
 
 // rip and rsp
 
-    // Standard va entry point.
-    child_thread->rip = (unsigned long) 0x201000;
+// Standard va entry point.
+// 0x201000
+
+    child_thread->rip = (unsigned long) CONTROLTHREAD_ENTRYPOINT;
     
-    // 32KB size
-    // #todo 
-    // Precisa ser do mesmo tamanho que o pai 
-    // no caso de fork()
-    child_thread->rsp = (unsigned long) (parent_process->childStack + (30*1024));   // original   
-    //child_thread->rsp = (unsigned long) (parent_process->childStack + (120*1024));  // test
+// 32KB size
+// #todo 
+// Precisa ser do mesmo tamanho que o pai 
+// no caso de fork()
+// #todo: Precismos levar emconsideração o tamanho da stack
+// que foi alocada anteriormente. Precisamos de uma variavel
+// na estrutura que registre seu tamanho.
+
+    child_thread->rsp = 
+        (unsigned long) (parent_process->childStack + (30*1024));
 
     // #debug
     // ok

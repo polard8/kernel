@@ -260,7 +260,7 @@ static int I_x64CreateInitialProcess(void)
     }
 
 // owner pid
-    if ( InitThread->ownerPID != GRAMADO_PID_INIT ){
+    if ( InitThread->owner_pid != GRAMADO_PID_INIT ){
         printf ("I_x64CreateInitialProcess: GRAMADO_PID_INIT\n");
         return FALSE;
     }
@@ -411,8 +411,8 @@ void I_x64ExecuteInitialProcess (void)
 //
 // Current process.
 //
-    if ( Thread->process->pid != GRAMADO_PID_INIT ){
-        panic("I_x64ExecuteInitialProcess: Thread->process->pid\n");
+    if ( Thread->owner_process->pid != GRAMADO_PID_INIT ){
+        panic("I_x64ExecuteInitialProcess: Thread->owner_process->pid\n");
     }
     set_current_process(GRAMADO_PID_INIT);
 

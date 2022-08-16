@@ -101,7 +101,7 @@ static void __task_switch (void)
 
 // pid
 
-    owner_pid = (pid_t) CurrentThread->ownerPID;
+    owner_pid = (pid_t) CurrentThread->owner_pid;
 
     if ( owner_pid < 0 ||
          owner_pid >= PROCESS_COUNT_MAX )
@@ -617,7 +617,7 @@ dispatch_current:
 // Owner validation.
 // Owner PID.
 
-    pid_t targetthread_OwnerPID = (pid_t) TargetThread->ownerPID;
+    pid_t targetthread_OwnerPID = (pid_t) TargetThread->owner_pid;
 
     if ( targetthread_OwnerPID < 0 || 
          targetthread_OwnerPID >= THREAD_COUNT_MAX )

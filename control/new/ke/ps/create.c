@@ -72,12 +72,12 @@ struct thread_d *create_init_thread (void)
 
     t->tid = (int) (TID & 0xFFFF);
 
-    // #bugbug: 
-    // Is this a valid pointer?
-    // is this a valid pid?
+// #bugbug: 
+// Is this a valid pointer?
+// is this a valid pid?
 
-    t->ownerPID  = (int) InitProcess->pid; 
-    t->process   = (void *) InitProcess;
+    t->owner_process = (void *) InitProcess;
+    t->owner_pid = (pid_t) InitProcess->pid; 
 
     t->name_address = (unsigned long) ThreadName; 
 
@@ -92,7 +92,7 @@ struct thread_d *create_init_thread (void)
     // ...
 
     t->input_flags = 
-        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
+        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE);
 
 	// @todo: 
 	// #bugbug: #importante

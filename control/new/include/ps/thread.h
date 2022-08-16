@@ -235,8 +235,8 @@ struct thread_d
     int tid;
 
 // Owner process
-    struct process_d  *process;
-    int ownerPID;
+    struct process_d  *owner_process;
+    pid_t owner_pid;
 
 // type: 
 // Tipo de tarefa.

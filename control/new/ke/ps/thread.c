@@ -277,7 +277,7 @@ unsigned long GetThreadStats ( int tid, int index )
     switch (index){
 
         case 1:  return (unsigned long) t->tid;       break;
-        case 2:  return (unsigned long) t->ownerPID;  break;
+        case 2:  return (unsigned long) t->owner_pid;  break;
         case 3:  return (unsigned long) t->type;      break;
         case 4:  return (unsigned long) t->state;     break;
         case 5:  return (unsigned long) t->plane;     break;
@@ -1009,8 +1009,8 @@ struct thread_d *create_thread (
     Thread->exit_in_progress = FALSE;
 
 // Belongs to this process.
-    Thread->process  = (void *) Process;
-    Thread->ownerPID = (pid_t)  ProcessID;
+    Thread->owner_process = (void *) Process;
+    Thread->owner_pid = (pid_t)  ProcessID;
 
 // Paging
 
@@ -1506,7 +1506,7 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
                                 NULL, NULL, NULL, 
                                 0,  // initial rip 
                                 0,  // initial rsp
-                                father->ownerPID,  //current_process, 
+                                father->owner_pid, 
                                 "clone-thread",
                                 father_cpl,
                                 father_personality );
@@ -1792,8 +1792,10 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     clone->waitingCount = father->waitingCount;  //Tempo esperando algo.
     clone->blockedCount = father->blockedCount;  //Tempo bloqueada.
 
-//qual processo pertence a thread.  
-    clone->process = father->process; 
+// Qual processo pertence a thread clone.
+// Pois bem, por enquanto ela pertence ao mesmo dono
+// da thread pai.
+    clone->owner_process = father->owner_process; 
 
 	//Thread->window_station
 	//Thread->desktop
