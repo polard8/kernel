@@ -45,6 +45,17 @@ extern struct scheduler_info_d  SchedulerInfo;
 #define QUANTUM_Q6  6
 
 
+// Class 1: Normal threashold
+#define QUANTUM_THRESHOLD       QUANTUM_Q1
+// Class 2: Real time threashold
+#define QUANTUM_THRESHOLD_RT    QUANTUM_Q4
+// Class 1: Normal time critical
+#define QUANTUM_TIME_CRITICAL       QUANTUM_Q3
+// Class 2: Real time time critical
+#define QUANTUM_TIME_CRITICAL_RT    QUANTUM_Q6
+
+
+
 #define QUANTUM_BOOST    (QUANTUM_Q6*3)
 
 #define QUANTUM_MIN    QUANTUM_Q1

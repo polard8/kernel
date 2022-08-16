@@ -112,7 +112,7 @@ extern int copy_process_in_progress;
 // Class 2: Real time threashold
 #define PRIORITY_THRESHOLD_RT    PRIORITY_LOW_RT
 // Class 1: Normal time critical
-#define PRIORITY_TIME_CRITICAL       PRIORITY_LOW_RT
+#define PRIORITY_TIME_CRITICAL       PRIORITY_HIGH
 // Class 2: Real time time critical
 #define PRIORITY_TIME_CRITICAL_RT    PRIORITY_HIGH_RT
 

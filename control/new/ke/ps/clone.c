@@ -249,8 +249,18 @@ pid_t copy_process(
 
 // [pai]
 // Change the state of the parent's control thread.
-    parent_thread->state = READY;
+// #bugbug: Por que?
+// A rotina copy_process foi chamada por um processo em ring3
+// via systemcall e não tem o seu contexto salvo na estrutura da thread,
+// Uma systemcall vai retornar para o processo usando a rotina 
+// em assembly e não as rotinas do taskswitch,
+// Portanto, não mude o state da thread do processo pai.
+// Apenas retorne para o processo depois da syscall.
+// O processo filho ficara pronto e o scheduler 
+// colocara ele pra rodar depois,
 
+    parent_thread->state = RUNNING;
+    
 // O dono da parent thread tem que ser o processo pai.
     if( parent_thread->owner_pid != parent_process->pid )
     {
@@ -979,11 +989,28 @@ do_clone:
     // Switch back
     //x64_load_pml4_table( old_pml4 );
 
+//
+// Balance 
+//
 
 // priority and quantum.
 
-    child_thread->priority = PRIORITY_MAX;
-    child_thread->quantum = QUANTUM_MAX;
+
+// Threshold
+    parent_thread->priority = PRIORITY_THRESHOLD;
+    child_thread->priority  = PRIORITY_THRESHOLD;
+    parent_thread->quantum  = QUANTUM_THRESHOLD;
+    child_thread->quantum   = QUANTUM_THRESHOLD;
+
+// Time critical
+    if ( parent_thread->type == THREAD_TYPE_SYSTEM ||
+         child_thread->type == THREAD_TYPE_SYSTEM )
+    {
+        parent_thread->priority = PRIORITY_TIME_CRITICAL;
+        child_thread->priority  = PRIORITY_TIME_CRITICAL;
+        parent_thread->quantum  = QUANTUM_TIME_CRITICAL;
+        child_thread->quantum   = QUANTUM_TIME_CRITICAL;
+    }
 
 // Select for execution
 // Então a thread de controle esta em INITIALIZED e não em STANDBY.

@@ -84,7 +84,6 @@ char *__execv_environ[] = { NULL, NULL, NULL };
 
 int execv (const char *path, char *const argv[] )
 {
-
     if( (void*) path == NULL )
     {
         errno = EINVAL;
@@ -112,19 +111,18 @@ execve (
 {
     int value = -1;
 
-
     if( (void*) path == NULL )
     {
         errno = EINVAL;
         return -1;
     }
 
-
-    value = (int) gramado_system_call ( 
-                      248, 
-                      (unsigned long) path, 
-                      (unsigned long) argv,   
-                      (unsigned long) envp );  
+    value = 
+        (int) gramado_system_call ( 
+                  248, 
+                  (unsigned long) path, 
+                  (unsigned long) argv,   
+                  (unsigned long) envp );  
 
     if (value < 0)
     {
@@ -423,7 +421,8 @@ void exit (int status)
 
 
     // 70
-    gramado_system_call ( UNISTD_SYSTEMCALL_EXIT, 
+    gramado_system_call ( 
+        UNISTD_SYSTEMCALL_EXIT, 
         (unsigned long) status, 
         (unsigned long) status, 
         (unsigned long) status );

@@ -187,7 +187,7 @@ static int __init_heap(void)
 // #bugbug: No permission
 //
     //#testing heaps permission
-    debug_print ("__init_heap: Testing heaps permission \n");    
+    //debug_print ("__init_heap: Testing heaps permission \n");    
     
     //Endereço valido somente para processo init
     //if ( heap_start != 0x0000000030A00000 ){
@@ -529,27 +529,20 @@ heapSetLibcHeap (
 }
 
 
-
 /*
- ****************************
  * heapAllocateMemory:
  *     Aloca memória no heap do kernel.
- *
- * *IMPORTANTE: 
+ * IMPORTANTE: 
  * Aloca BLOCOS de memória dentro do heap do processo Kernel.
- *
  * Obs: A estrutura usada aqui é salva onde ??
- *
  * @todo: 
  *     Ao fim dessa rotina, os valores da estrutura devem ser armazenas no 
  * header, lá onde foi alocado espaço para o header, assim tem-se informações 
  * sobre o header alocado.
  *  A estrutura header do heap, é uma estrutura e deve ficar antes da 
  *  área desejada. partes={header,client,footer}.
- *
  * 2015 - Created.
  * sep 2016 - Revision.
- * ...
  */
 
 // Called by malloc.
@@ -558,9 +551,7 @@ unsigned long heapAllocateMemory (unsigned long size)
 {
     struct mmblock_d  *Current;
 
-
     debug_print ("heapAllocateMemory: $\n");
-
 
     //debug_print ("heapAllocateMemory: [1]\n");
 	// Se não há heap disponível, não há muito o que fazer.
@@ -956,7 +947,6 @@ void stdlib_die (char *str)
 
     abort();
 }
-
 
 
 void *rtl_malloc ( size_t size )
