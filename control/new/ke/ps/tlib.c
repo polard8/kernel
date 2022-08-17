@@ -11,9 +11,7 @@
  * put it into the given buffer.
  *     The message has 6 standard elements.
  */
-
 // Called by sci.c
-
 // Service 111.
 // It is called by the applications.
 // It is also used for ipc.
@@ -153,37 +151,40 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
         return NULL;
     }
 
+// Thread pointer.
     t = (void *) threadList[current_thread];
-
     if ( (void *) t == NULL ){
         panic ("sys_get_message2: t\n");
     }
-
     if ( t->used != TRUE || t->magic != 1234 ){
         panic ("sys_get_message2: t validation\n");
     }
+
+// Get the index.
+
+    if( index<0 || index >= 32){
+        goto fail0;
+    }
+
+    t->MsgQueueHead = (int) (index & 0xFFFFFFFF);
 
 // ===========================================================
 // usando a fila de mensagens com estrutura.
 
     struct msg_d  *next_msg;
 
-    t->MsgQueueHead = index;
-
 // Get the next head pointer.
     next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
-
     if ( (void*) next_msg == NULL ){
         goto fail0;
     }
-
-    if (next_msg->used != TRUE || next_msg->magic != 1234 )
+    if (next_msg->used != TRUE || next_msg->magic != 1234)
     {
         goto fail0;
     }
 
-// invalid
-    if( next_msg->msg == 0 ){
+// Invalid message code.
+    if ( next_msg->msg == 0 ){
         goto fail0;
     }
 
@@ -210,7 +211,7 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
 // jiffies when gotten by the app.
     message_address[11] = (unsigned long) jiffies;
 
-// clear the entry.
+// Clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
     next_msg->window = NULL;
@@ -222,9 +223,9 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
 
 // ==================================
 
+// It is a valid thread pointer.
 done:
-    if(restart==TRUE)
-    {
+    if (restart==TRUE){
         t->MsgQueueHead=0;
         t->MsgQueueTail=0;
         return (void*) 1;
@@ -233,22 +234,30 @@ done:
 // Yes, We have a message.
 // round
     t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    if ( t->MsgQueueHead >= 32 ){ t->MsgQueueHead = 0; }
     return (void *) 1;
 
+// Is it a valid thread pointer?
 fail0:
 // No message.
 // round
 
-    if(restart==TRUE)
+    if (restart==TRUE)
     {
-        t->MsgQueueHead=0;
-        t->MsgQueueTail=0;
+        if ( (void*) t != NULL ){
+            t->MsgQueueHead=0;
+            t->MsgQueueTail=0;
+        }
         return NULL;
     }
 
-    t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    if( (void*) t != NULL){
+        t->MsgQueueHead++;
+        if ( t->MsgQueueHead >= 32 ){
+            t->MsgQueueHead = 0;
+        }
+    }
+
     return NULL;
 }
 
