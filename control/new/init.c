@@ -148,7 +148,63 @@ static void preinit_Globals(int arch_type);
 static void preinit_OutputSupport(void);
 static void preinit_Serial(void);
 
+
+// Booting
+static int booting_begin(int arch_type);
+static int booting_end(int arch_type);
 // ================================
+
+// Last step:
+// This function stays in the top of this document.
+static int booting_end(int arch_type)
+{
+    char cmdline[64];
+
+// Open the kernel virtual console 
+// instead of first process.
+// We can receive this flag via command line.
+
+    static int debug_mode=FALSE;
+    //static int debug_mode=TRUE;
+
+
+// Clear the screen.
+     Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
+
+// ::: Initialization on debug mode.
+// Initialize the default kernel virtual console.
+// It depends on the run_level.
+// See: kgwm.c
+
+    if( debug_mode == TRUE )
+    {
+        printf("init.c: The kernel is in debug mode.\n");
+        refresh_screen();
+        kgwm_early_kernel_console();
+        printf("init.c: End of debug mode.\n");
+        refresh_screen();
+        asm("hlt");
+    }
+
+    // Setup command line.
+    if( (void*) stdin != NULL )
+    {
+            memset(cmdline, 0, 64);
+            mysprintf(cmdline,"GWS.BIN hello");
+            cmdline[63]=0;
+            //rewind. See: kstdio.c
+            k_fseek(stdin, 0, SEEK_SET);
+            file_write_buffer( stdin, cmdline, 64 );
+     }
+
+    if( arch_type == CURRENT_ARCH_X86_64 )
+    {
+        // Do not return!
+        I_x64ExecuteInitialProcess();
+    }
+    return -1;
+}
+
 
 
 static void preinit_Globals(int arch_type)
@@ -224,9 +280,11 @@ static void preinit_OutputSupport(void)
 int kernel_main(int arch_type)
 {
 
-// Command line sent to stdin.
-// GWS.BIN will read this data.
-    char cmdline[64];
+/*
+    char hostname[64];
+    sprintf(hostname,"gramado");
+    s_hostname = (char *) &hostname[0];
+*/
 
 // Setup debug mode.
 // Enable the usage of the serial debug.
@@ -234,32 +292,6 @@ int kernel_main(int arch_type)
 
     //enable_serial_debug();
     disable_serial_debug();
-
-// Open the kernel virtual console 
-// instead of first process.
-// We can receive thiflag via command line.
-
-    static int debug_mode=FALSE;
-    //static int debug_mode=TRUE;
-
-
-    Initialization.phase1 = FALSE;
-    Initialization.phase2 = FALSE;
-    Initialization.phase3 = FALSE;
-
-    Initialization.hal = FALSE;
-    Initialization.microkernel = FALSE;
-    Initialization.executive = FALSE;
-    Initialization.gramado = FALSE;
-
-    Initialization.serial_log = FALSE;
-    Initialization.console_log = FALSE;
-
-/*
-    char hostname[64];
-    sprintf(hostname,"gramado");
-    s_hostname = (char *) &hostname[0];
-*/
 
 //
 // Presence level
@@ -289,6 +321,30 @@ int kernel_main(int arch_type)
 
 // ==================
 
+
+    Initialization.phase1 = FALSE;
+    Initialization.phase2 = FALSE;
+    Initialization.phase3 = FALSE;
+
+    Initialization.hal = FALSE;
+    Initialization.microkernel = FALSE;
+    Initialization.executive = FALSE;
+    Initialization.gramado = FALSE;
+
+    Initialization.serial_log = FALSE;
+    Initialization.console_log = FALSE;
+
+// Booting begin
+
+    booting_begin(arch_type);
+
+    while(1){}
+    return -1;
+}
+
+
+static int booting_begin(int arch_type)
+{
     int Status = (-1);
     //int Options=0;
     //int SafeMode = FALSE;
@@ -891,57 +947,17 @@ int kernel_main(int arch_type)
 
     switch (current_arch){
 
-    // Not supported on Gramado X.
-    //case CURRENT_ARCH_X86:
-    //    break;
     // See: x64init.c in ke/arch/x86_64/
-
     case CURRENT_ARCH_X86_64:
         //debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
         Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
         Status = (int) I_x64main();
-        
-        if (Status != TRUE){
-            x_panic("Panic: Error 0x01");
+        if (Status == TRUE){
+            // Do not return!
+            booting_end(CURRENT_ARCH_X86_64);
         }
-        
-        if (Status == TRUE)
-        {
-            // Clear the screen.
-            Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
-
-            // ::: Initialization on debug mode.
-            // Initialize the default kernel virtual console.
-            // It depends on the run_level.
-            // See: kgwm.c
-            if( debug_mode == TRUE )
-            {
-                printf("init.c: The kernel is in debug mode.\n");
-                refresh_screen();
-                kgwm_early_kernel_console();
-                printf("init.c: End of debug mode.\n");
-                refresh_screen();
-                asm("hlt");
-            }
-            
-            // Initialize the first process.
-            // This is the default first client of the window server.
-            // GWS.BIN.
-
-            // Setup command line.
-            if( (void*) stdin != NULL )
-            {
-                memset(cmdline, 0, 64);
-                mysprintf(cmdline,"GWS.BIN hello");
-                cmdline[63]=0;
-                //rewind. See: kstdio.c
-                k_fseek(stdin, 0, SEEK_SET);
-                file_write_buffer( stdin, cmdline, 64 );
-            }
-            
-            
-            I_x64ExecuteInitialProcess();
-        }
+        debug_print ("kernel_main: CURRENT_ARCH_X86_64 fail\n");
+        x_panic("Panic: Error 0x01");
         break;
 
     // See:
@@ -950,7 +966,7 @@ int kernel_main(int arch_type)
     // ...
 
     default:
-        debug_print ("kernel_main: [FAIL] Current arch not defined!\n");
+        debug_print ("kernel_main: Current arch not defined!\n");
         //system_state = SYSTEM_ABORTED;
         x_panic("Error 0x03");
         break;
@@ -1124,6 +1140,12 @@ fail0:
 }
 
 
+void gramado_shutdown (int how)
+{
+    //hal_shutdown();
+}
+
+
 // #deprecated
 // #see: 
 // kernel.h and hw.asm
@@ -1164,6 +1186,7 @@ void xxxxINT128_DEBUG_MESSAGE(void)
 // This thread will start to run at the moment when
 // the init process enable the interrupts.
 
+// #suspended
 void early_ring0_IdleThread (void)
 {
 

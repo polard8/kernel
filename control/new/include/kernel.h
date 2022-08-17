@@ -692,6 +692,7 @@ unsigned long kmList[KMODULE_MAX];
 // inicialização do kernel, independente da arquitetura.
 // See: kernel/main.c
 int kernel_main (int arch_type);
+void gramado_shutdown (int how);
 
 // ================================================
 

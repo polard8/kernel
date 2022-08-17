@@ -96,7 +96,6 @@ _int128:
 
     fxrstor [__sw_local_fpu_buffer]
 
-
     mov qword [.int128Ret], rax 
 
     popfq
@@ -410,24 +409,22 @@ _int130:
 
 global _int199
 _int199:
-    pop qword [frameRIP]
-    pop qword [frameCS]
-    pop qword [frameRFLAGS]
+    pop qword [.frameRIP]
+    pop qword [.frameCS]
+    pop qword [.frameRFLAGS]
 
 ; iopl 3
-    ;mov qword [frameRFLAGS], 0x0000000000003200
-
+    ;mov qword [.frameRFLAGS], 0x0000000000003200
 ; iopl 0
-    mov qword [frameRFLAGS], 0x0000000000000200
+    mov qword [.frameRFLAGS], 0x0000000000000200
     
-    push qword [frameRFLAGS]
-    push qword [frameCS]
-    push qword [frameRIP]
+    push qword [.frameRFLAGS]
+    push qword [.frameCS]
+    push qword [.frameRIP]
     iretq
-
-frameRIP:     dq 0
-frameCS:      dq 0
-frameRFLAGS:  dq 0
+.frameRIP:     dq 0
+.frameCS:      dq 0
+.frameRFLAGS:  dq 0
 
 
 

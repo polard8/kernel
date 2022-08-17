@@ -511,7 +511,7 @@ int sys_serial_debug_printk(char *s)
 void sys_shutdown (void)
 {
     debug_print("sys_shutdown: [TODO]\n");
-    //hal_shutdown();
+    gramado_shutdown(0);
 }
 
 
