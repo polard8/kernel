@@ -1670,7 +1670,6 @@ void *sci0 (
         case SYS_REBOOT: 
             debug_print("sci0: SYS_REBOOT\n");
             return (void*) sys_reboot();
-            //newos_reboot(0);
             break;
 
         // 111

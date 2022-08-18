@@ -67,36 +67,42 @@ static void __test_path(void)
 // ===================================
 // #test: 
 // Testando carregar usando path.
+// #bugbug:
+// We have only few pre-allocated buffers,
+// so, we only can use four levels for now. (/../../../file.txt)
+
 
 // Valid shapes
     //char PathAddress[] = "/GRAMADO/TEST.BMP";
-    //char PathAddress[] = "/GRAMADO/TEST.TXT";
+    //char PathAddress[] = "/GRAMADO.TXT";
     //char PathAddress[] = "/GRAMADO/FOLDER/TEST.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/TEST2.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/TEST3.TXT";
-    char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/$$$$$$$$.TXT";
 
-// Invalid shapes
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678T.XT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1234567.8TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/1234  78.TXT";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.1";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.12";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.123";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.C";
-    //char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/FOLDER3/12345678.CPP";
+// :)
+// 4 levels
+    char PathAddress[] = "/GRAMADO/FOLDER/FOLDER2/TEST2.TXT";
+
+// Invalid folder name
+    //char PathAddress[] = "/GRAMADO///FOLDER/";
+    //char PathAddress[] = "/GRAMADO/1234567812345456456/";
+
+
     
 // =========================================
 
 // (32*4096) bytes
 
-    unsigned long BufferSize = (32*4096);
 
-    b = (void *) allocPages(32); 
+    //unsigned long BufferSize = (32*4096);
+    //b = (void *) allocPages(32); 
 
+    // It is a simple text file.
+    // We don't need too much memory.
+    // #bugbug: The loader is not getting the file size
+    // from the fat entry.
+    unsigned long BufferSize = (4096);  //One page!
+    b = (void *) allocPages(1); 
+
+ 
     if( (void*) b == NULL )
     {
         printf("b fail\n");
@@ -1422,6 +1428,8 @@ int consoleCompareStrings(void)
 // 'path'
     if ( strncmp(prompt,"path",4) == 0 )
     {
+        // #test: This test will allocate some pages
+        // for the buffer where we are gonna load the file.
         __test_path();
         goto exit_cmp;
     }

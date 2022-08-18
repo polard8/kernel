@@ -64,8 +64,11 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 
 static int I_x64CreateInitialProcess(void)
 {
-    // This is a ring 3 process.
+// This is a ring 3 process.
     char *ImageName = "INIT    BIN";
+    char *PathName = "/INIT.BIN";
+    char *PathName2 = "/GRAMADO/INIT.BIN";
+
 
     // The virtual address for the base of the image.
     // ps: We are using the kernel page directories now,
@@ -108,6 +111,7 @@ static int I_x64CreateInitialProcess(void)
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
+
     fileret = 
         (unsigned long) fsLoadFile( 
                             VOLUME1_FAT_ADDRESS, 
@@ -116,12 +120,30 @@ static int I_x64CreateInitialProcess(void)
                             ImageName, 
                             (unsigned long) ImageAddress,
                             BUGBUG_IMAGE_SIZE_LIMIT );
-
-    if ( fileret != 0 )
+    if (fileret != 0)
     {
         printf ("I_x64CreateInitialProcess: Coldn't load INIT.BIN \n");
         return FALSE;
     }
+
+/*
+    // #bugbug
+    // Essa rotina ainda não leva direito emconsideração
+    // o limite do tamanho do arquivo.
+    // Estamos passando o tamanho do buffer definido,
+    // mas a rotina ignora.
+    
+    fileret = (int) fs_load_path ( 
+                       (const char*) PathName, 
+                       (unsigned long) ImageAddress,
+                       (unsigned long) BUGBUG_IMAGE_SIZE_LIMIT ); 
+
+    if (fileret<0)
+    {
+        printf ("I_x64CreateInitialProcess: Coldn't load INIT.BIN \n");
+        return FALSE;
+    }
+*/
 
 
 // Creating init process.

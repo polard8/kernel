@@ -1,12 +1,9 @@
 /*
  * File: pipe.c
- * 
  *    Pipe support.
- *  
  * History:
  *     2019 -  Created by Fred Nora.
  */
-
 
 #include <kernel.h>
 
@@ -22,8 +19,8 @@ unsigned int pipe_max_size = 4096;
 // Here is not the place for this function.
 // Move it to rtl.
 
-int sys_dup ( int oldfd ){
-
+int sys_dup (int oldfd)
+{
     file *f_old;
     file *f_new;
 
@@ -32,9 +29,9 @@ int sys_dup ( int oldfd ){
     int i=0;
     int slot = -1;
 
-
-    if( oldfd < 0 || oldfd >= OPEN_MAX )
+    if ( oldfd < 0 || oldfd >= OPEN_MAX ){
         return (int) (-EINVAL);
+    }
 
 // process
 
@@ -54,7 +51,7 @@ int sys_dup ( int oldfd ){
     };
 
 
-    // Get an empty slot.
+// Get an empty slot.
 
     for ( i=3; i< NUMBER_OF_FILES; i++ )
     {
@@ -115,9 +112,9 @@ int sys_dup ( int oldfd ){
         return (int) slot;
     };
 
-	// On success, these system calls return the new file descriptor.  
-	// On error, -1 is returned, and errno is set appropriately.	
-	
+// On success, these system calls return the new file descriptor.  
+// On error, -1 is returned, and errno is set appropriately.
+
 fail:
     //errno = ?;
     return -1;
@@ -157,15 +154,13 @@ int sys_dup2 (int oldfd, int newfd)
 
     int slot = newfd;
 
-
     if ( slot == -1 ){
-		Process->Objects[slot] = (unsigned long) 0;
-	    return -1;
-    }	
+        Process->Objects[slot] = (unsigned long) 0;
+        return -1;
+    }
 
+//#todo: filtrar oldfd
 
-	//#todo: filtrar oldfd
-	
     f_old = (file *) Process->Objects[oldfd];
 
     if ( (void *) f_old == NULL ){
@@ -193,14 +188,13 @@ int sys_dup2 (int oldfd, int newfd)
         return (int) slot;
     };
 
-	// On success, these system calls return the new file descriptor.  
-	// On error, -1 is returned, and errno is set appropriately.	
-	
+// On success, these system calls return the new file descriptor.  
+// On error, -1 is returned, and errno is set appropriately.
+
 fail:
 	//errno = ?;
     return -1;
 }
-
 
 // #todo
 // Here is not the place for this function.
@@ -248,14 +242,13 @@ int sys_dup3 (int oldfd, int newfd, int flags)
         return -1;
     }
 
-	//#todo: filtrar oldfd
-	
-	f_old = (file *) Process->Objects[oldfd];
-	
-    if ( (void *) f_old == NULL ){
-		Process->Objects[slot] = (unsigned long) 0;
-	    return -1;
+//#todo: filtrar oldfd
 
+    f_old = (file *) Process->Objects[oldfd];
+
+    if ( (void *) f_old == NULL ){
+        Process->Objects[slot] = (unsigned long) 0;
+        return -1;
     }else{
 
         f_new = (file *) Process->Objects[slot];
@@ -280,9 +273,8 @@ int sys_dup3 (int oldfd, int newfd, int flags)
         return (int) slot;
     };
 
-	// On success, these system calls return the new file descriptor.  
-	// On error, -1 is returned, and errno is set appropriately.	
-
+// On success, these system calls return the new file descriptor.  
+// On error, -1 is returned, and errno is set appropriately.	
 
 fail:
 	//errno = ?;
@@ -291,25 +283,21 @@ fail:
 
 
 /*
- *************************************
  * sys_pipe:
  *     It creates two structures of stream that point 
  * to the same buffer.
  *     It has no name.
  *     It return two file descriptors.
  */
-
 // #bugbug
 // Maybe we need just one stream and two pointer.
 // So we need to control the reader and the writer.
-
 // #todo
 // Isso precisa ter duas estruturas de arquivos,
 // dois descritores, mas apenas um buffer.
 
 int sys_pipe ( int *pipefd, int flags )
 {
-
     file *f1;
     file *f2;
 
@@ -319,9 +307,7 @@ int sys_pipe ( int *pipefd, int flags )
     int slot1 = -1;
     int slot2 = -1;
 
-
     debug_print ("sys_pipe:\n");
-
 
     pid_t current_process = (pid_t) get_current_process();
         
@@ -340,10 +326,9 @@ int sys_pipe ( int *pipefd, int flags )
         debug_print("sys_pipe: Process\n");
         //todo printf
         return (int) (-1);
-
     }else{
 
-        if ( Process->used != 1 || Process->magic != 1234 ){
+        if ( Process->used != TRUE || Process->magic != 1234 ){
             debug_print("sys_pipe: validation\n");
             //todo printf
             return (int) (-1);
@@ -352,19 +337,19 @@ int sys_pipe ( int *pipefd, int flags )
     };
 
 
-	//#todo
-	//temos que criar uma rotina que procure slots em Process->Streams[]
-	//e colocarmos em process.c
-	//essa é afunção que estamos criando.
+//#todo
+//temos que criar uma rotina que procure slots em Process->Streams[]
+//e colocarmos em process.c
+//essa é afunção que estamos criando.
 	// process_find_empty_stream_slot ( struct process_d *process );
-	
-	// procurar 2 slots livres.
-	
-	// #improvisando
-	// 0, 1, 2 são reservados para o fluxo padrão.
-	// Como ainda não temos rotinas par ao fluxo padrão,
-	// pode ser que peguemos os índices reservados.
-	// Para evitar, começaremos depois deles.
+
+// procurar 2 slots livres.
+
+// #improvisando
+// 0, 1, 2 são reservados para o fluxo padrão.
+// Como ainda não temos rotinas par ao fluxo padrão,
+// pode ser que peguemos os índices reservados.
+// Para evitar, começaremos depois deles.
 
     // Reserva um slot.
     for ( i=3; i< OPEN_MAX; i++ )
@@ -392,8 +377,7 @@ int sys_pipe ( int *pipefd, int flags )
         return (int) (-1);
     }
 
-
-	// buffer
+// buffer
 
     char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
@@ -405,8 +389,7 @@ int sys_pipe ( int *pipefd, int flags )
         return (int) (-1);
     }
 
-
-    // File structures.
+// File structures.
      
     f1 = (void *) kmalloc( sizeof(file) );
     f2 = (void *) kmalloc( sizeof(file) );
@@ -522,13 +505,15 @@ int sys_read_pipe ( int fd, char *ubuf, int count )
 {
     debug_print ("sys_read_pipe: TODO\n");
 
-    if(fd<0 || fd>=OPEN_MAX)
+    if (fd<0 || fd>=OPEN_MAX){
         return (int) (-EBADF);
+    }
 
-    if( (void*) ubuf == NULL )
+    if ( (void*) ubuf == NULL ){
         return (int) (-EINVAL);
+    }
 
-    return -1;
+    return (int) -1;
 }
 
 // #todo:

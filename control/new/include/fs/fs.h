@@ -5,6 +5,14 @@
 #define ____FS_H    1
 
 
+// Buffers to walk on a pathname,
+// loading until 8 directories.
+// 1 page size.
+#define FS_N_BUFFERS    5
+extern unsigned long fs_buffers[FS_N_BUFFERS];
+
+
+
 // The dev/ directory entry.
 struct dev_dir_entry_d
 {
@@ -575,36 +583,17 @@ fs_save_rootdir (
     
 // ===
 
-unsigned long fsGetFileSize ( unsigned char *file_name, unsigned long dir_address );
-
 unsigned long 
-fsLoadFile ( 
-    unsigned long fat_address,
-    unsigned long dir_address,
-    int dir_entries,
-    const char *file_name, 
-    unsigned long buffer,
-    unsigned long buffer_size_in_bytes );
+fsGetFileSize ( 
+    unsigned char *file_name, 
+    unsigned long dir_address );
 
-unsigned long 
-fsLoadFile2 ( 
-    struct file_context_d *fc, 
-    unsigned char *file_name );
-
-
-int fsLoadFileFromCurrentTargetDir (void);
 void fsUpdateWorkingDiretoryString ( char *string );
 void fs_fat16_cache_not_saved(void);
 void fs_fntos ( char *name );
 int fs_get_free_fd_from_pid (int pid);
 int fs_initialize_process_cwd ( int pid, char *string );
 
-int 
-fs_load_path ( 
-    const char *path, 
-    unsigned long address, 
-    unsigned long buffer_size );
-    
 void fs_pathname_backup ( int pid, int n );
 int fs_print_process_cwd (int pid);
 void fs_show_file_info (file *f);
@@ -667,24 +656,37 @@ void set_global_open_file ( void *file, int Index );
 void *get_global_open_file (int Index);
 void sys_cd_command ( const char *string );
 
+
+//
+// From fsload.c
+//
+
+unsigned long 
+fsLoadFile ( 
+    unsigned long fat_address,
+    unsigned long dir_address,
+    int dir_entries,
+    const char *file_name, 
+    unsigned long buffer,
+    unsigned long buffer_size_in_bytes );
+
+unsigned long 
+fsLoadFile2 ( 
+    struct file_context_d *fc, 
+    unsigned char *file_name );
+
+int 
+fs_load_path ( 
+    const char *path, 
+    unsigned long address, 
+    unsigned long buffer_size );
+
+int fsLoadFileFromCurrentTargetDir (void);
+
 int fs_load_image( const char *filename, unsigned long image_va );
 
+// --------------
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
