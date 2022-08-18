@@ -89,20 +89,21 @@ void memoryShowMemoryInfo (void)
         ((kernel_stack_start - kernel_stack_end)/1024);
 
     printf ("RAM Memory info:\n");
+
     printf ("\n");
     printf ("BaseMemory     (%d KB)\n", memorysizeBaseMemory );
     printf ("OtherMemory    (%d KB)\n", memorysizeOtherMemory );
     printf ("ExtendedMemory (%d KB)\n", memorysizeExtendedMemory );
     printf ("TotalMemory    (%d KB)\n", memorysizeTotal );
+
     printf ("\n");
     printf ("TotalUsed      (%d KB)\n", memorysizeUsed );
     printf ("TotalFree      (%d KB)\n", memorysizeFree );
-    printf ("\n");
-    
+
+    printf ("\n");    
     printf ("ring0 area     (%d KB)\n", mm_used_ring0_area );
     printf ("ring3 area     (%d KB)\n", mm_used_ring3_area );
-    printf ("kernel image area      (%d KB)\n", mm_used_kernelimage );
-    
+    printf ("kernel image area  (%d KB)\n", mm_used_kernelimage );
     printf ("backbuffer     (%d KB)\n", mm_used_backbuffer );
     printf ("paged pool     (%d KB)\n", mm_used_pagedpool );
     printf ("heap pool      (%d KB)\n", mm_used_heappool );
@@ -111,9 +112,9 @@ void memoryShowMemoryInfo (void)
     printf ("extraheap3     (%d KB)\n", mm_used_extraheap3 );
     printf ("frame table    (%d KB)\n", mm_used_frame_table );
 
-    // System type
+// System type
     printf ("\n");
-    printf ("====================================\n");
+    printf ("=======================\n");
     printf ("This is a ");
 
     if( g_mm_system_type == stSmallSystem ){
@@ -132,9 +133,9 @@ void memoryShowMemoryInfo (void)
     pages_print_info(g_mm_system_type);
             
 //==================================
-// #todo:
 // Frame table
 
+    printf ("\n");
     printf ("Frame Table:\n");
     printf("start: %xH | end: %xH\n", FT.start_pa, FT.end_pa );
     printf ("size: %d KB\n", FT.size_in_kb );
@@ -145,10 +146,8 @@ void memoryShowMemoryInfo (void)
 
 //==================================
 
-
     //#todo
     //See: gramnt/kernel/include/mm/x86mm.h
-
 
 	//system zone
 	//printf("systemzoneStart  = 0x%x\n", systemzoneStart);
@@ -159,14 +158,12 @@ void memoryShowMemoryInfo (void)
 	//printf("windowzoneStart  = 0x%x\n", windowzoneStart);
 	//printf("windowzoneEnd    = 0x%x\n", windowzoneEnd);
 	//printf("windowzoneSize   = 0x%x\n", windowzoneSize);
-	
-	
-    
+
 	// #Suspenso
 	// Suspendemos o uso de variáveis importadas do makefile.
-	
-/*	
-#ifdef IMPORTED_VARIABLES	
+
+/*
+#ifdef IMPORTED_VARIABLES
 	//=======================================
 	// #Warning                            //
 	// Variables imported from link.ld     //
@@ -195,12 +192,9 @@ void memoryShowMemoryInfo (void)
 #endif
 */
 
-
-
-    //
-    // kernel image 
-    //
-
+//
+// kernel image 
+//
 
     //#todo
     //unsigned long imageStart = KERNEL_IMAGE_BASE;
@@ -214,10 +208,10 @@ void memoryShowMemoryInfo (void)
     unsigned long imageAvailableAreaSize_in_KB = 
         (imageAvailableAreaSize_in_Bytes/1024);
 
-    printf("\n\n");
+    printf("\n");
     printf("IMAGE SIZE: #todo \n");
 
-    printf("\n\n");
+    printf("\n");
     printf("IMAGE AVAILABLE AREA:  [%x...%x] Total={%d KB} \n",
         imageAvailableAreaStart, 
         imageAvailableAreaEnd, 
@@ -229,7 +223,7 @@ void memoryShowMemoryInfo (void)
     
     //printf("\n[Kernel Heap and Stack info:]\n");
 
-    printf("\n\n");
+    printf("\n");
     printf("HEAP:  [%x...%x] Total={%d KB} \n",
         kernel_heap_start, kernel_heap_end, HeapTotal );
     printf("AvailableHeap={%d KB}\n", (g_available_heap/1024) );
@@ -243,7 +237,7 @@ void memoryShowMemoryInfo (void)
 // Pois bem, é mais digno mostrar aqui o endereço da pilha, 
 // indicado no TSS.
 
-    printf("\n\n");
+    printf("\n");
     printf("STACK: [%x...%x] Total={%d KB} \n", 
         kernel_stack_start, kernel_stack_end, StackTotal );
     printf("STACK: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );

@@ -91,7 +91,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # We need classes: head | always | optional
 
 # head
-objects-y := head_64.o init.o newos.o archive_klib.o    
+objects-y := head_64.o init.o archive_klib.o    
 
 objects-y += archive_ke.o archive_mm.o archive_dev.o archive_fs.o \
 archive_net.o archive_user.o    
@@ -120,26 +120,25 @@ clean
 kernel-header:
 	@echo "Compiling: Compiling kernel header ..."
 
-	# personas: warden, student, visitor.
-	# unit 0, unit 1, unit 3, unit 4, visitor
+# head_64.o
+# personas: warden, student, visitor.
+# unit 0, unit 1, unit 3, unit 4, visitor
 	$(NASM) arch/x86_64/entrance/head_64.asm \
 	$(KERNEL_INCLUDE) \
 	-I arch/x86_64/entrance/ \
 	-f elf64 -o head_64.o
 
-	# unit 2 (xapx)
+# sci.o
+# unit 2 (xapx)
 	$(CC) -c arch/x86_64/entrance/sci.c \
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    
 
-# init
+# init.o
 	$(CC) -c init.c $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
 
-# Interface.
-	$(CC) -c newos.c $(KERNEL_INCLUDE) $(CFLAGS) -o newos.o
-
-# klib
+# klib/
 	$(Q) $(MAKE) -C klib/
 
 kernel-content:

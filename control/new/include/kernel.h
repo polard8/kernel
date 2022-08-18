@@ -350,8 +350,13 @@ extern unsigned long gSavedBPP;
 #include "syscall.h"
 #include "sys.h"
 
+#include "newos.h"
 
 // ==============================
+// #bugbug: O resto das coisas daqui pra 
+// baixo são incluidas mais de uma vez, pois não te ifndef pra elas
+// podemos colocar todas elas dentro de arquivos .h
+// e mover as definições para arquivos .c.
 
 
 //keyboard suppport 
