@@ -487,30 +487,6 @@ diskWritePCIConfigAddr (
 int ata_initialize ( int ataflag );
 
 
-uint8_t hdd_ata_status_read (unsigned int port_index);
-
-void 
-hdd_ata_cmd_write ( 
-    unsigned int port_index, 
-    unsigned char cmd_val );
-
-int hdd_ata_wait_not_busy (unsigned int port_index);
-int hdd_ata_wait_no_drq (unsigned int port_index);
-
-// Read disk using pio mode.
-void 
-hdd_ata_pio_read ( 
-    unsigned int port_index, 
-    void *buffer, 
-    int bytes );
-
-// Write disk using pio mode.
-void 
-hdd_ata_pio_write ( 
-    unsigned int port_index, 
-    void *buffer, 
-    int bytes );
-
 // Read and write via pio mode.
 int 
 pio_rw_sector ( 
