@@ -1,11 +1,9 @@
-/*
- * File: config.h
- *      Setup compiling stuff.
- */
 
-#ifndef ____CONFIG_H_
-#define ____CONFIG_H_    1
+// config.h
+// Config for the Gramado kernel only. Not the whole system.
 
+#ifndef ____KERNEL_CONFIG_H
+#define ____KERNEL_CONFIG_H    1
 
 //
 // ## IMPORNTANTE ##

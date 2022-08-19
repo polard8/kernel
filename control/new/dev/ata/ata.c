@@ -940,6 +940,13 @@ int ide_identify_device ( uint8_t nport )
 // # Type
 //
 
+/*
+	if (lba1==0x00 && lba2==0x00) = ATADEV_PATA
+	if (lba1==0x3c && lba2==0xc3) = ATADEV_SATA
+	if (lba1==0x14 && lba2==0xEB) = ATADEV_PATAPI
+	if (lba1==0x69 && lba2==0x96) = ATADEV_SATAPI
+*/
+
 // ==========================
 // # PATA
     if ( sig_byte_1 == 0 && 

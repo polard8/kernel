@@ -1,8 +1,6 @@
 
-; See: 
-; include/alpha/
 
-%include "alpha/head.inc"
+%include "head0.inc"
 
 ; segment .head_x86_64
 __HEAD

@@ -124,38 +124,42 @@ extern unsigned long gSavedBPP;
 
 
 // (NT)
-// gramado OS headers.
+// Gramado OS headers.
 
-// Alpha Ii.
-#include "alpha/0alpha/0alpha.h"
+// ==================================
+// Gramado Configuration
+#include "config/gramado/config.h"
+#include "config/gramado/version.h"    // Product. 
+#include "config/gramado/u.h"          // User
+#include "config/gramado/system.h"
+#include "config/gramado/utsname.h"
 
-// config
-#include "alpha/0config/version.h"    // Product. 
-#include "alpha/0config/u.h"          // User
-#include "alpha/0config/config.h"     // Compiling.
+// ==================================
+// Kernel configuration.
+// Compiling.
+#include "config/kernel/config.h"
+#include "config/kernel/limits.h"
+#include "config/kernel/limits2.h"
+#include "config/kernel/gdef.h"
+#include "config/kernel/gdevice.h"
+#include "config/kernel/ginput.h"  // input manager support.
+#include "config/kernel/gspin.h"
+#include "config/kernel/gwd.h"     // whatch dogs.
+#include "config/kernel/pints.h"   // profiler
+#include "config/kernel/request.h"
+#include "config/kernel/info.h"    // last one?
+#include "config/kernel/kinit.h"   // kernel initialization.
+#include "config/kernel/debug.h"
 
-// globals
-#include "alpha/limits.h"
-#include "alpha/0globals/limits.h"
 
-#include "mm/x64gpa.h"
-#include "mm/x64gva.h"
-#include "mm/gentry.h"
-
-#include "alpha/0globals/gdef.h"
-#include "alpha/0globals/gdevice.h"
-#include "alpha/0globals/gobject.h"
-#include "alpha/0globals/gspin.h"
-#include "alpha/0globals/ginput.h"  // input manager support.
-#include "alpha/0globals/gwd.h"     // whatch dogs.
-
-// libc support.
+// klib: libc support.
 #include "kstdarg.h"
 #include "kerrno.h"
 #include "kcdefs.h"
 #include "kstddef.h"
 #include "ktypes.h"
 #include "ktypes2.h"
+#include "kobject.h"
 #include "klimits.h"
 #include "kstdio.h"
 #include "kstdlib.h"
@@ -169,27 +173,138 @@ extern unsigned long gSavedBPP;
 #include "kioctls.h"
 #include "ktermios.h"
 #include "kttydef.h"
+#include "kpid.h"      // Globals. PIDs support.
 
 
 
-// memory management support.
+// Memory management.
+#include "mm/x64gpa.h"
+#include "mm/x64gva.h"
+#include "mm/gentry.h"
 #include "mm/mm.h"
 #include "mm/memmap.h" 
 #include "mm/intelmm.h"
-#include "mm/x64mm.h"     // mm, memory manager support.
+#include "mm/x64mm.h"
+#include "mm/mmglobal.h"  // Deve ficar mais acima.
+#include "mm/heap.h"      // Heap pointer support.
+#include "mm/aspace.h"    // Address Space, (data base account).
+#include "mm/bank.h"      // Bank. database
+
+
+// memory and libc
+#include "runtime.h"
+
+
+// hal
+#include "hal/ports64.h"
+#include "hal/cpu.h"
+#include "hal/tss.h"
+#include "hal/x64gdt.h"
+#include "hal/x64.h"
+#include "hal/detect.h"
+// hal pci
+#include "hal/bus/pci.h"  // PCI bus.
+// hal cpu
+#include "hal/cpuid.h"
+#include "hal/up.h"
+#include "hal/mp.h"
+// hal pic/apic
+#include "hal/pic.h"
+#include "hal/apic.h"
+#include "hal/breaker.h"
+// hal timers.
+#include "hal/pit.h"
+#include "hal/rtc.h"
+// hal io
+#include "hal/io.h"    //io.
+// hal global
+#include "hal/hal.h"     // last one.
+
+
+//  primeiro char, depois block, depois network.
+
+//
+// TTY ------------------
+//
+
+// tty
+#include "dev/tty/ttyldisc.h"
+#include "dev/tty/ttydrv.h"
+#include "dev/tty/tty.h"
+#include "dev/tty/pty.h"
+#include "dev/tty/vt.h"
+#include "dev/tty/console.h"
+
+//
+// Serial devices ------------------
+//
 
 // fb device
 #include "dev/fb/hw/halvid.h"
 #include "dev/fb/hw/video.h"
 #include "dev/fb/hw/screen.h"
-
 #include "dev/fb/gr/fonts.h"
 #include "dev/fb/gr/ascii.h" 
 #include "dev/fb/gr/ws.h"
 #include "dev/fb/gr/window.h"
 #include "dev/fb/gr/bg.h"
 #include "dev/fb/gr/graphics.h"
+// Serial port. (COM).
+#include "dev/tty/serial.h"
+// ps2 - i8042
+#include "dev/kbd/vk.h"
+#include "dev/kbd/kbdabnt2.h"
+#include "dev/kbd/keyboard.h"
+#include "dev/kbd/ps2kbd.h"
+#include "dev/mouse/mouse.h"
+#include "dev/mouse/ps2mouse.h"
+#include "dev/i8042.h"
+#include "dev/ps2.h"
 
+
+//
+// Block devices ----------------------
+//
+
+// ata, sata
+#include "dev/ata/ata.h"
+#include "dev/ata/ide.h"
+// storage
+#include "dev/super.h"
+#include "dev/volume.h"
+#include "dev/disk.h"  
+#include "dev/storage.h" 
+
+
+//
+// Network devices ---------------------------
+// 
+
+// primeiro controladoras depois protocolos
+// e1000 - nic intel
+#include "dev/e1000/nicintel.h"
+#include "net/mac.h"
+#include "net/host.h"
+#include "net/ethernet.h"
+#include "net/arp.h"
+#include "net/udp.h"
+#include "net/tcp.h"
+#include "net/in.h"
+#include "net/un.h"
+#include "net/nports.h"     //(network) Network Ports  (sw)
+#include "net/icmp.h" 
+#include "net/network.h"     //(network) Gerenciamento de rede.  
+#include "net/socket.h"      //last always
+
+// ----------------------
+
+// por ultimo em devices.
+// device manager
+#include "dev/devmgr.h"  
+
+// ----------------------
+
+// depois de devices.
 // fs
 #include "fs/path.h"       // path.
 #include "fs/fat.h"        // fat16.
@@ -200,49 +315,9 @@ extern unsigned long gSavedBPP;
 #include "fs/fs.h"
 
 
-// hal
-#include "hal/ports64.h"
-
-// fb device
-//#include "dev/fb/halvid.h"
-
-// hal
-#include "hal/cpu.h"
-#include "hal/tss.h"
-#include "hal/x64gdt.h"
-#include "hal/x64.h"
-#include "hal/detect.h"
-
-#include "dev/tty/serial.h"
-
-//ata
-#include "dev/ata/ata.h"
-#include "dev/ata/ide.h"
-
-// Block devices
-#include "dev/super.h"
-#include "dev/volume.h"
-#include "dev/disk.h"  
-#include "dev/storage.h" 
-
-// hal
-#include "hal/pit.h"
-#include "hal/pic.h"
-#include "hal/apic.h"
-#include "hal/mp.h"
-#include "hal/cpuid.h"
-#include "hal/rtc.h"
-
-// kbd device
-#include "dev/kbd/keyboard.h"
-
-// mouse device
-#include "dev/mouse/mouse.h"
-
-#include "hal/bus/pci.h"
-#include "hal/up.h"
-#include "hal/breaker.h"
-#include "hal/hal.h"
+//
+// Kernel --------------------------
+//
 
 // ps
 #include "ps/image.h"
@@ -257,10 +332,13 @@ extern unsigned long gSavedBPP;
 #include "ps/dispatch.h"
 
 
-#include "dev/kbd/vk.h"
-#include "dev/kbd/kbdabnt2.h"
+
+//
+// Configurações finais
+//
 
 
+// Autentication
 // Security
 #include "user/usession.h"
 #include "user/room.h"
@@ -269,76 +347,6 @@ extern unsigned long gSavedBPP;
 #include "user/logoff.h"
 #include "user/user.h"
 #include "user/security.h"
-
-// tty
-#include "dev/tty/ttyldisc.h"
-#include "dev/tty/ttydrv.h"
-#include "dev/tty/tty.h"
-#include "dev/tty/pty.h"
-#include "dev/tty/vt.h"
-#include "dev/tty/console.h"
-
-
-// =============================
-
-// i8042 ps2 controller.
-#include "dev/i8042.h"
-
-// mouse device
-#include "dev/mouse/ps2mouse.h"
-
-// kbd device
-#include "dev/kbd/ps2kbd.h"
-
-// i8042 ps2 controller.
-#include "dev/ps2.h"
-
-// Network
-
-#include "net/mac.h"
-#include "net/host.h"
-#include "net/ethernet.h"
-#include "net/arp.h"
-#include "net/udp.h"
-#include "net/tcp.h"
-#include "net/in.h"
-#include "net/un.h"
-#include "net/nports.h"     //(network) Network Ports  (sw)
-#include "net/icmp.h" 
-#include "net/network.h"     //(network) Gerenciamento de rede.  
-#include "net/socket.h"      //last always
-
-
-// e1000 - nic intel
-#include "dev/e1000/nicintel.h"
-
-// device manager
-#include "dev/devmgr.h"      
-
-#include "hal/io.h"               //io.
-
-#include "alpha/init.h"
-#include "alpha/debug.h"
-#include "alpha/system.h"   // system manager
-
-// mm
-#include "mm/mmglobal.h"  // Deve ficar mais acima.
-#include "mm/heap.h"      // Heap pointer support.
-#include "mm/aspace.h"    // Address Space, (data base account).
-#include "mm/bank.h"      // Bank. database
-#include "mm/x64mm.h"     // mm, memory manager support.
-
-#include "alpha/object.h"
-
-// profiler
-#include "alpha/pints.h"
-
-#include "runtime.h"
-#include "alpha/request.h"
-#include "alpha/gpid.h"      // Globals. PIDs support.
-#include "alpha/utsname.h"
-#include "alpha/info.h"      // last one?
-
 
 // ==============================
 

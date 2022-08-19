@@ -39,7 +39,6 @@ struct initialization_d
 // No pointer.
 struct initialization_d Initialization;
 
-
 void init_globals (void);
 
 #endif    

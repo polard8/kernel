@@ -83,6 +83,20 @@ __hdd_ata_cmd_write (
 }
 
 
+/*
+ //#todo: Implement this function
+static int __hdd_ata_wait_busy(int p);
+static int __hdd_ata_wait_busy(int p)
+{
+    	while(!(ata_status_read(p) &ATA_SR_BSY))
+    	if(ata_status_read(p) &ATA_SR_ERR)
+    	return 1;
+
+    	return 0;
+}
+*/
+
+
 static int __hdd_ata_wait_not_busy (unsigned int port_index)
 {
     if (port_index>3){
@@ -102,6 +116,21 @@ static int __hdd_ata_wait_not_busy (unsigned int port_index)
 
     return FALSE;
 }
+
+
+/*
+ //#todo
+static int __hdd_ata_wait_drq(int p);
+static int __hdd_ata_wait_drq(int p)
+{
+    
+    	while(!(ata_status_read(p) &ATA_SR_DRQ))
+    	if(ata_status_read(p) &ATA_SR_ERR)
+    	return 1;
+
+    	return 0;
+}
+*/
 
 static int __hdd_ata_wait_no_drq (unsigned int port_index)
 {
