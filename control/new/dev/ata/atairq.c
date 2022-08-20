@@ -139,35 +139,34 @@ unsigned char ata_wait_irq (void)
 
 int disk_ata_wait_irq (void)
 {
-    unsigned long tmp = 0x10000;
-    unsigned char data=0;
-
+    unsigned long Timeout = 1000;
+    unsigned char Data=0;
+// Ok, recebemos uma interrupção e retornaremos 0 erros.
+    if ( ata_irq_invoked == TRUE ){ goto done; }
     while (!ata_irq_invoked)
     {
-        data = ata_status_read();
-        
-        if ( (data & ATA_SR_ERR) )
-        {
-            // ok por status do controlador.
-            ata_irq_invoked = FALSE;
-            
+        Data = (unsigned char) ata_status_read();
+        // O status indicou um erro.
+        if (Data & ATA_SR_ERR){
+            ata_irq_invoked = FALSE;   
             return (int) -1;
         }
-
-        //ns
-        if (tmp--){
-            ata_wait(400);
-        }else{
-
-            //ok por tempo esperado.
+        // Não temos erro.
+        // Se o tempo acabou, saímos indcando com 0x80.
+        if (Timeout==0){
             ata_irq_invoked = FALSE;
-
             return (int) 0x80;
-        };
+        }
+        // Continua a contagem.
+        ata_wait(400);
+        Timeout--;
     };
-
-// ok por status da interrupção.
+// Saímos do while. 
+// Isso indica que a flag foi acionada durante o loop.
+// OK por status da interrupção.
+done:
     ata_irq_invoked = FALSE;
     return 0;
 }
+
 

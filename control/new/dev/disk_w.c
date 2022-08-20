@@ -45,6 +45,7 @@ __do_save_sequence (
         
         // #todo:
         // Maybe, do not use this on vms.
+        // See: atairq.c
         // if (is_qemu != TRUE)
         disk_ata_wait_irq();
 

@@ -36,18 +36,15 @@ __load_sequential_sectors (
     unsigned long b=0;
     unsigned long next_lba=0;
 
-    debug_print ("__load_sequential_sectors:\n");
-
+    // debug_print ("__load_sequential_sectors:\n");
 
     for ( i=0; i < sectors; i++ )
     {
-        next_lba = (lba + i);
-
+        next_lba = (unsigned long) (lba + i);
         ataReadSector ( address + b, next_lba, 0, 0 );
-        
         b = (b +512);
     };
-    
+
     return 0;
 }
 
