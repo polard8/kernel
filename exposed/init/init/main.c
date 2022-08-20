@@ -121,16 +121,24 @@ static void initPrompt(void)
     fflush(stdout);
 }
 
+
+//#todo: Create a function in rtl for this.
 static void do_clear_console(void)
 {
+
+#define __COLOR_BLUE     0x000000FF
+#define __COLOR_WHITE    0x00FFFFFF
+
     // Change the console color.
     //ioctl(1,440, 0x0011DD11);
-    
-    
-    // clear fg console.
-    //sc82( 8003,0x0011DD11,0,0 );
-    sc82( 8003,0x00FF0000,0,0 );
+
+// White on blue.
+// Clear the background of the fg console.
+     sc82( 8003,__COLOR_BLUE,0,0 );
+// Change the fg color of the fg console.
+     sc82( 8004,__COLOR_WHITE,0,0 );
 }
+
 
 static inline void do_int3(void)
 {

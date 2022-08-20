@@ -5,6 +5,12 @@
 #ifndef ____KERNEL_CONFIG_H
 #define ____KERNEL_CONFIG_H    1
 
+
+#define USE_E1000    0
+// ...
+
+
+
 //
 // ## IMPORNTANTE ##
 //

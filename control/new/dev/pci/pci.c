@@ -109,11 +109,8 @@ static const char* bridge_subclass_strings[] = {
 
 
 
-/*
- ********************************************************
- * pciConfigReadByte:
- *     Read com retorno do tipo unsigned char.
- */
+// pciConfigReadByte:
+// Read com retorno do tipo unsigned char.
 
 unsigned char 
 pciConfigReadByte ( 
@@ -165,30 +162,25 @@ pciConfigReadByte (
 
 
 /*
- *******************************
  * pciConfigReadWord:
  *    Read com retorno do tipo unsigned short.
  *    Envia o comando (32bit) para a porta 0xCF8, e retorna o status (16bit) 
  * armazenado na porta 0xCFC.
- * 
  * Argumentos:
  *    bus    = Número do BUS.           total 256.
  *    slot   = Número do slot. (device) total 32.
  *    func   = Número da função.        total 8. 
  *    offset = Offset.
- *
  *  Ex: 0x80000000 | bus << 16 | device << 11 | function <<  8 | offset.
- *
  *  1111,1111, | 1111,1 | 111.
- *
  * @todo: 
- *     Essa função retorna short. Criar funções equivalentes para retornar 
+ *     Essa função retorna short. 
+ * Criar funções equivalentes para retornar 
  * char e unsigned long.
- *
  * @todo: 
- *     Criar a função equivalente oposta, para escrever. pciConfigWriteWord(...)
+ *     Criar a função equivalente oposta, 
+ * para escrever. pciConfigWriteWord(...)
  * para podermos configurar o BAR.
- *
  */
 
 unsigned short 
@@ -212,14 +204,12 @@ pciConfigReadWord (
 // 32bit
     unsigned int address = 0;
 
-
-    // #todo: 
-    // Filtros de tamanho máximo.
+// #todo: 
+// Filtros de tamanho máximo.
 
 // Create configuration address.
 // 32bit
     address = (unsigned int) ((ibus << 16) | (islot << 11) | (ifunc << 8) | (offset & 0xfc) | ((unsigned int)0x80000000));
-
 
 // sendComand:
 // Write out the address. (0x0CF8).
@@ -246,12 +236,11 @@ pciConfigReadWord (
 
 
 /* 
- *****************************
  * pciConfigReadDWord:
  *     Read com retorno do tipo unsigned int. 32bit
  */
-
 // 32bit
+
 unsigned int 
 pciConfigReadDWord ( 
     unsigned char bus, 
@@ -303,7 +292,6 @@ pciConfigReadDWord (
 /*
  * pciGetBAR:
  *     Get BAR.
- *
  * Offsets:
  * #define PCI_OFFSET_BASEADDRESS0   0x10
  * #define PCI_OFFSET_BASEADDRESS1   0x14
@@ -311,7 +299,6 @@ pciConfigReadDWord (
  * #define PCI_OFFSET_BASEADDRESS3   0x1C
  * #define PCI_OFFSET_BASEADDRESS4   0x20
  * #define PCI_OFFSET_BASEADDRESS5   0x24
- *
  * Obs: 
  * #todo: 
  *     Talvez o retorno não pegue uma unsigned long como desejado e sim 
@@ -787,7 +774,7 @@ pciHandleDevice (
         debug_print ("pciHandleDevice: [TODO] realtek device found\n");
     }
     
-    // logitec
+// logitec
     if (D->Vendor == 0x046D){
         debug_print ("pciHandleDevice: [TODO] logitec device found\n");
     }
@@ -806,9 +793,10 @@ pciHandleDevice (
         __class = PCI_CLASSCODE_NETWORK; //3;
         debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found \n");
 
-        /*
-         // #test
-         // This thing is working fine on virtualbox with piix3.
+        // see: kernel/config.h
+        if (USE_E1000 == TRUE){
+        // #test
+        // This thing is working fine on virtualbox with piix3.
         Status = 
             (int) e1000_init_nic ( 
                       (unsigned char) D->bus, 
@@ -819,7 +807,7 @@ pciHandleDevice (
         if (Status != 0){
              panic ("pciHandleDevice: NIC Intel [0x8086:0x100E]");
         }
-        */
+        }
 
         // locked: dai alguma rotina em ring3 desbloqueia.
         e1000_interrupt_flag = FALSE;

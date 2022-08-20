@@ -2208,7 +2208,7 @@ void *sci2 (
 // #todo: This operation needs permition?
 
     if ( number == 1 ){
-        CONSOLE_TTYS[fg_console].magic = arg2;
+        //CONSOLE_TTYS[fg_console].magic = arg2;
         return NULL;
     }
 
@@ -2311,17 +2311,26 @@ void *sci2 (
     }
 
     // Clear the fg console background with a given color.
+    // Do not change the colors.
     if (number == 8003)
+    { 
+        if(fg_console<0 || fg_console > 3){
+            return NULL;
+        }
+        //IN: color, console number.
+        clear_console((unsigned int) arg2,fg_console);
+        refresh_screen();
+        return NULL;
+    }
+    
+    // Change the foreground color of the current console.
+    if (number == 8004)
     {
-        
         if(fg_console<0 || fg_console > 3){
             return NULL;
         }
         CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg2;
-        //IN: color, console number.
-        clear_console(arg2,fg_console);
-        refresh_screen();
-        return 0;
+        return NULL;
     }
 
     // Configurando sincronização de leitura e escrita em arquivo.
