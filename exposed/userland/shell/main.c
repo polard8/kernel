@@ -1,5 +1,5 @@
 
-// shell
+// shell.bin
 
 // rtl
 #include <types.h>

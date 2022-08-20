@@ -1,17 +1,19 @@
 
 // UNAME.BIN
+// 2022 - Fred Nora.
 
 #include <stdio.h>
 #include <sys/utsname.h>
 
-
 /*
 char  sysname[]  Name of this implementation of the operating system. 
-char  nodename[] Name of this node within the communications 
-                 network to which this node is attached, if any. 
 char  release[]  Current release level of this implementation. 
 char  version[]  Current version level of this release. 
+
+char  nodename[] Name of this node within the communications 
+                 network to which this node is attached, if any. 
 char  machine[]  Name of the hardware type on which the system is running. 
+#todo: domain name.
 */
 
 // See:
@@ -19,31 +21,29 @@ char  machine[]  Name of the hardware type on which the system is running.
 
 int main (int argc, char **argv)
 {
-    struct utsname name;
 
-// #??
-// Where are the strings?
-// Do we have access to these addresses?
+// The kernel will put the strings here. I guess.
+    struct utsname  name;
+
+
+    //#todo: Get parametes.
 
     uname(&name);
 
-    //printf ("UNAME.BIN: Initializing ...\n");
-    //fflush(stdout);
+    printf ("\n");
 
-    printf ("kernel name:    %s \n",name.sysname);  //kernel name.
-    printf ("kernel release: %s \n",name.release);  //kernel release name.
-    printf ("kernel version: %s \n",name.version);  //kernel version.
+// Kernel info
+    printf ("kernel name:    %s\n",name.sysname);  //kernel name.
+    printf ("kernel version: %s\n",name.version);  //kernel version.
+    printf ("kernel release: %s\n",name.release);  //kernel release name.
+// Machine info
+    printf ("machine name:   %s\n",name.machine);  //hw name.
+    printf ("host name:      %s\n",name.nodename); //node name in the network.
+// #todo: Domain name.
 
-    printf ("machine name:   %s \n",name.machine);  // hw name.
-    printf ("host name:      %s \n",name.nodename); // node name in the network.
-
-    //printf ("UNAME.BIN: Done\n");
-    //fflush(stdout);
-
-    while(1){}
+    while(1){
+    };
         
     return 0;
 }
-
-
 

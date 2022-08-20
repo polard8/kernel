@@ -1,5 +1,6 @@
 
 // 'cat' command for Gramado.
+// 2022 - Fred Nora.
 
 // rtl
 #include <rtl/gramado.h>
@@ -59,6 +60,10 @@ int main ( int argc, char *argv[] )
 
         fd = (int) open( (char *) argv[1],0, "a+" );
 
+        //if (fd<0){
+        //    return -1;
+        //}
+            
         // Poisiona no início do arquivo.
         //rewind(fp);
 
@@ -101,6 +106,7 @@ int main ( int argc, char *argv[] )
         //printf (">> size %d \n",size);
 
         // Write
+        // Write on stdout.
         nwrites = write ( 1, buffer, sizeof(buffer) );
         if (nwrites <= 0)
         {

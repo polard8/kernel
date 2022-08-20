@@ -5,14 +5,12 @@
       2018 - Created by Fred Nora.
 */
 
-
 #ifndef ____VERSION_H
 #define ____VERSION_H  1
 
 //
 //  == Product name ==========================================
 //
-
 
 #define PRODUCT_NAME    "Gramado Operating System"
 
@@ -23,16 +21,12 @@
 
 // The business server.
 #define PT_GRAMADO_SERVER         1000
-
 // Enterprise machines to access the business server.
 #define PT_GRAMADO_WORKSTATION    2000
-
 // Regular desktop machine.
 #define PT_GRAMADO_DESKTOP        3000 
-
 // iot machine
 #define PT_GRAMADO_IOT            4000 
-
 // static
 #define PRODUCT_TYPE    PT_GRAMADO_DESKTOP
 
@@ -47,19 +41,16 @@
 // Maybe we will delete all these defines here.
 
 #define VERSION_MAJOR     1
-#define VERSION_MINOR     3
+#define VERSION_MINOR     5
 #define VERSION_BUILD     0
 
-#define VERSION_STRING    "1.3"
+#define VERSION_STRING    "1.5"
 #define RELEASE_STRING    "dev-release"
 
-//
 // Version macro
-//
-
 #define VER10    0x0100
 #define VER11    0x0101
-#define VER13    0x0130
+#define VER13    0x0105
 #define VER20    0x0200
 
 #endif
