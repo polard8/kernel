@@ -18,8 +18,103 @@ unsigned long _callback_address=0;
 unsigned long _callback_address_saved=0;
 
 static void __task_switch (void);
+static void __on_finished_executing( struct thread_d *t );
 
 //============
+
+// ## PREEMPT ##
+// Preempt
+// >> MOVEMENT 3 (Running --> Ready).
+// sofrendo preempção por tempo.
+// #todo: Mas isso só poderia acontecer se a flag
+// ->preempted permitisse. 
+// talvez o certo seja ->preenptable.
+// Fim do quantum.
+// Nesse momento a thread [esgotou] seu quantum, 
+// então sofrerá preempção e outra thread será colocada 
+// para rodar de acordo com a ordem estabelecida 
+// pelo escalonador.
+
+static void __on_finished_executing( struct thread_d *t )
+{
+    if ( (void*) t == NULL )
+        panic("__on_finished_executing: t\n");
+
+    if (t->magic!=1234)
+        panic("__on_finished_executing: t magic\n");
+
+        // #bugbug
+        //  Isso está acontecendo.
+
+        //if ( CurrentThread->state != RUNNING )
+        //    panic("task_switch: CurrentThread->state != RUNNING");
+
+        //if ( CurrentThread->state != RUNNING )
+        //     goto try_next;
+
+        // Preempt
+        // #bugbug: Preempção para threads de ring0 e ring3.
+ 
+        if ( t->state == RUNNING ){
+            t->state = READY;
+        }
+
+        //debug_print (" ok ");
+
+
+        //
+        // == EXTRA ==========
+        //
+
+        // Call extra routines scheduled to this moment.
+
+        // #hackhack
+        // Vamos validar isso, pois isso é trabalho de uma rotina
+        // do timer qua ainda não esta pronta.
+        
+        //extra = TRUE;
+        extra = FALSE;
+        
+        if (extra == TRUE)
+        {
+            //#debug
+            //debug_print (" X "); 
+                
+            tsCallExtraRoutines();
+            extra = FALSE;
+        }
+        
+        //#provisório; Isso é extra também.
+        //KiRequest();
+        //request();
+ 
+        // Dead thread collector
+        // Avalia se é necessário acordar a thread do dead thread collector.
+        // É uma thread em ring 0.
+        // Só chamamos se ele ja estiver inicializado e rodando.
+        // #bugbug
+        // precismos rever essa questão pois isso pode estar
+        // fazendo a idle thread dormir. Isso pode prejudicar
+        // a contagem.
+        // See: ps/threadi.c
+        // #bugbug
+        // #todo: This is a work in progress!
+
+        if (dead_thread_collector_status == TRUE){
+            check_for_dead_thread_collector();
+        }
+
+        //
+        // Spawn thread 
+        //
+
+        // Check for a thread in standby.
+        // In this case, this routine will not return.
+        // See: schedi.c
+
+        check_for_standby();   
+           
+}
 
 
 // service 44000
@@ -285,98 +380,14 @@ The remainder ??
         //debug_print (" The same again $\n");
         //debug_print ("s");  // the same again
         return; 
-    
-    
-// Fim do quantum.
-// Nesse momento a thread [esgotou] seu quantum, 
-// então sofrerá preempção e outra thread será colocada 
-// para rodar de acordo com a ordem estabelecida 
-// pelo escalonador.
 
-//
-// ## PREEMPT ##
-//
-
-// Preempt
-// >> MOVEMENT 3 (Running --> Ready).
-// sofrendo preempção por tempo.
-// #todo: Mas isso só poderia acontecer se a flag
-// ->preempted permitisse. 
-// talvez o certo seja ->preenptable.
-
+    // End of quantum:
+    // Preempt: >> MOVEMENT 3 (Running --> Ready).
     // Agora esgotou o tempo de processamento.
+    // Calling local worker.
     } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
 
-        // #bugbug
-        //  Isso está acontecendo.
-
-        //if ( CurrentThread->state != RUNNING )
-        //    panic("task_switch: CurrentThread->state != RUNNING");
-
-        //if ( CurrentThread->state != RUNNING )
-        //     goto try_next;
-
-        // Preempt
-        // #bugbug: Preempção para threads de ring0 e ring3.
- 
-        if ( CurrentThread->state == RUNNING ){
-            CurrentThread->state = READY;
-        }
-
-        //debug_print (" ok ");
-
-        //
-        // == EXTRA ==========
-        //
-
-        // Call extra routines scheduled to this moment.
-
-        // #hackhack
-        // Vamos validar isso, pois isso é trabalho de uma rotina
-        // do timer qua ainda não esta pronta.
-        
-        //extra = TRUE;
-        extra = FALSE;
-        
-        if (extra == TRUE)
-        {
-            //#debug
-            //debug_print (" X "); 
-                
-            tsCallExtraRoutines();
-            extra = FALSE;
-        }
-
-        //#provisório; Isso é extra também.
-        //KiRequest();
-        //request();
- 
-        // Dead thread collector
-        // Avalia se é necessário acordar a thread do dead thread collector.
-        // É uma thread em ring 0.
-        // Só chamamos se ele ja estiver inicializado e rodando.
-        // #bugbug
-        // precismos rever essa questão pois isso pode estar
-        // fazendo a idle thread dormir. Isso pode prejudicar
-        // a contagem.
-        // See: ps/threadi.c
-        // #bugbug
-        // #todo: This is a work in progress!
-
-        if (dead_thread_collector_status == TRUE){
-            check_for_dead_thread_collector();
-        }
-
-        //
-        // Spawn thread 
-        //
-
-        // Check for a thread in standby.
-        // In this case, this routine will not return.
-        // See: schedi.c
-
-        check_for_standby(); 
-
+        __on_finished_executing(CurrentThread);
         goto try_next;
     
     // Estamos perdidos com o tempo de processamento.

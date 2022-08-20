@@ -323,7 +323,6 @@ post_message_to_tid (
         t->quantum = QUANTUM_MAX;
     }
 
-
 // Wake up the target thread?
 
     // wakeup_thread(t->tid);

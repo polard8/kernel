@@ -4171,6 +4171,25 @@ void fs_fat16_cache_not_saved(void)
 }
 
 
+int fs_save_fat16_cache(void)
+{
+    debug_print("fs_save_fat16_cache: Saving FAT cache\n");
+
+    if (fat_cache_saved != FAT_CACHE_NOT_SAVED){
+        return -1;
+    }
+    // #todo: Change this name.
+    // see: dev/disk_w.c
+    fs_save_fat(
+        VOLUME1_FAT_ADDRESS,
+        VOLUME1_FAT_LBA,
+        VOLUME1_FAT_SIZE );
+    fat_cache_saved = FAT_CACHE_SAVED;
+
+    return 0;
+}
+
+
 /*
  * fs_fntos:     
  *     'file name to string'.

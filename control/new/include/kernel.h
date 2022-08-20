@@ -320,6 +320,8 @@ extern unsigned long gSavedBPP;
 //
 
 // ps
+#include "ps/prio.h"     // Priority
+#include "ps/quantum.h"  // Quantum
 #include "ps/image.h"
 #include "ps/x64cont.h"
 #include "ps/ts.h"

@@ -1665,11 +1665,15 @@ void *sci0 (
             break;
 
         // 110
-        // ## We need to return when a non-superuser process call this
+        // Use 'int'
+        // # We need to return when a non-superuser process call this
         // service. We don't wanna hang the system in this case.
+        // see: ke/sys.c
+        int reb_ret=-1;
         case SYS_REBOOT: 
             debug_print("sci0: SYS_REBOOT\n");
-            return (void*) sys_reboot();
+            reb_ret = (int) sys_reboot();
+            return (void *) (reb_ret & 0xFFFFFFFF);
             break;
 
         // 111

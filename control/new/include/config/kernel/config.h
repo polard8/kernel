@@ -49,6 +49,7 @@
 #define __IDE_PORT    __CHANNEL0
 
 
+//-------------------------------
 
 // #bugbug
 // Ouve uma falha..
@@ -239,7 +240,8 @@ sixth..     ide5, usually PCI, probed
 // ## targets ##
 //
 
-//Também pretendo fazer a inicialização mudar de direção dependendo do alvo programado.
+// Também pretendo fazer a inicialização mudar de 
+// direção dependendo do alvo programado.
 
 //Isso inicializa os três aplicativos do gramado core.
 //#define TARGET_GRAMADOCORE_APPS 1
@@ -248,15 +250,13 @@ sixth..     ide5, usually PCI, probed
 //#define TARGET_GRAMADOCORE_INIT 1
 
 
-// See: include/kernel/sysio/kservers/kgws/kgws/fonts.h
+// See: fonts.h
 #define DEFAULT_FONT_SIZE FONT8X8
 //#define DEFAULT_FONT_SIZE FONT8X16
 //...
 
-
-// CONTINUA
-// ...
-
+// See: ps/quantum.h
+#define CONFIG_QUANTUM_MULTIPLIER    1
 
 #endif 
 

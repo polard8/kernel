@@ -31,39 +31,6 @@ struct scheduler_info_d
 extern struct scheduler_info_d  SchedulerInfo;
 
 
-// ===============================================
-
-// Credits in ms.
-
-// Class 1: Priority Normal
-#define QUANTUM_Q1  1
-#define QUANTUM_Q2  2
-#define QUANTUM_Q3  3
-// Class 2: Priority Realtime
-#define QUANTUM_Q4  4
-#define QUANTUM_Q5  5
-#define QUANTUM_Q6  6
-
-
-// Class 1: Normal threashold
-#define QUANTUM_THRESHOLD       QUANTUM_Q1
-// Class 2: Real time threashold
-#define QUANTUM_THRESHOLD_RT    QUANTUM_Q4
-// Class 1: Normal time critical
-#define QUANTUM_TIME_CRITICAL       QUANTUM_Q3
-// Class 2: Real time time critical
-#define QUANTUM_TIME_CRITICAL_RT    QUANTUM_Q6
-
-
-
-#define QUANTUM_BOOST    (QUANTUM_Q6*3)
-
-#define QUANTUM_MIN    QUANTUM_Q1
-#define QUANTUM_MAX    (QUANTUM_Q6 + QUANTUM_BOOST)
-
-//----------------------------------------------
-
-
 // Hz padrão. 100Hz. 
 // Uma interrupção a cada 10ms.
 // #bugbug: Isso ja esta definido em coisas do pit.

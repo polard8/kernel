@@ -60,11 +60,9 @@ CFLAGS := \
 	-fno-optimize-sibling-calls    
 
 
-
 # Exported files. Kernel api;
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I include/uapi/
-
 
 # Internal files
 # Used to build the kernel.

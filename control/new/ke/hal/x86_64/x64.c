@@ -749,6 +749,7 @@ void fpu_load_control_word(const uint16_t control)
 
 
 // x64 disable interrupts.
+// maybe inline.
 void x64_disable_interrupts (void)
 {
     asm ("cli"); 

@@ -439,26 +439,29 @@ int sys_initialize_component (int n)
  *     Chamando uma rotina interna de reboot do sistema.
  */
 // The service 110.
-// It's called by gde_serv.c.
+// It's called by sci.c.
 // The higher level routine for reboot.
 // It's a wrapper, an interface.
-
+// #todo: maybe we can use arguments.
+// # We need to return when a non-superuser process call this
+// service. We don't wanna hang the system in this case.
+        
 int sys_reboot (void)
 {
     int value = FALSE;
 
-    // #todo
-    // Is it the superuser?
-    // We only trust in superusser for this call.
+// #todo
+// Is it the superuser?
+// We only trust in superusser for this call.
 
     debug_print("sys_reboot:\n");
 
+/*
     value = (int) is_superuser();
-    if(value != TRUE)
-    {
-        //#todo:
+    if(value != TRUE){
         return (-EPERM);
     }
+*/
 
 // #todo
 // Use MAGIC arguments.
@@ -466,25 +469,19 @@ int sys_reboot (void)
 // FAT cache.
 // This is the FAT cache for the system disk.
 // The boot partition.
-
-// Message
-    if(fat_cache_saved == FAT_CACHE_NOT_SAVED)
+    int Status = -1;
+    Status = (int) fs_save_fat16_cache();
+    if ( Status < 0 || 
+         fat_cache_saved != FAT_CACHE_SAVED )
     {
-        debug_print("sys_reboot: FAT_CACHE_NOT_SAVED\n");
-        debug_print("sys_reboot: Saving FAT cache\n");
-        fs_save_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
-        fat_cache_saved = FAT_CACHE_SAVED;
+        debug_print("sys_reboot: Can't reboot without saving the fat cache\n");
+        goto fail;
     }
-
-//
 // Reboot
-//
-
-    debug_print("sys_reboot: Rebooting...\n");
+    debug_print("sys_reboot: Rebooting\n");
     hal_reboot();
-
-    //panic("sys_reboot:");
-    
+    panic("sys_reboot: Unexpected error\n");
+fail:
     return -1;
 }
 

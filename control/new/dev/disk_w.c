@@ -4,6 +4,70 @@
 
 #include <kernel.h>
 
+
+static int 
+__do_save_sequence ( 
+    unsigned long buffer_va, 
+    unsigned long lba, 
+    size_t number_of_clusters );
+
+    
+// ----------------------------
+
+static int 
+__do_save_sequence ( 
+    unsigned long buffer_va, 
+    unsigned long lba, 
+    size_t number_of_clusters )
+{
+    int i=0;
+
+// Arguments
+    unsigned long buffer_base = (unsigned long) buffer_va;
+    unsigned long buffer_off=0;
+    unsigned long lba_base = (unsigned long) lba;
+    unsigned long lba_off=0;
+    size_t Total = (size_t) (number_of_clusters & 0xFFFFFFFF);
+    //size_t Max=0; 
+
+// #todo:
+// #bugbug:
+// How much is the max number of cluster we can save 
+// into this disk.
+
+// Esperando antes do próximo.
+        
+    for ( i=0; i<Total; i++ )
+    {
+        // Waiting before the next.
+        // #bugbug: 
+        // Maybe this is make this process very slow in the vms.
+        
+        // #todo:
+        // Maybe, do not use this on vms.
+        // if (is_qemu != TRUE)
+        disk_ata_wait_irq();
+
+        ataWriteSector ( 
+            (unsigned long) ( buffer_base + buffer_off ), 
+            (unsigned long) ( lba_base    + lba_off ), 
+            0, 
+            0 );
+
+        // Update offsets.
+        // Sector size is 512 and the cluster has only one sector for now.
+        // #todo
+        // We need different sizes of sectors and 
+        // different n umber of spc.
+        buffer_off += 0x200;  
+        lba_off    += 1;
+    };
+    
+// ok. No errors.
+    return 0;
+}
+
+
 /*
  * write_lba:
  *     Grava um setor no disco dado o endereço do buffer e o lba. 
@@ -68,6 +132,7 @@ fail:
 
 // #todo
 // Return 'int'.
+// #bugbug: it is not only for fat... it is hw worker.
 
 void 
 fatWriteCluster ( 
@@ -98,6 +163,7 @@ fatWriteCluster (
 
 
 // Save fat into the disk.
+// Low level. It doesn't check the status of the fat cache.
 int 
 fs_save_fat ( 
     unsigned long fat_address, 
@@ -105,73 +171,36 @@ fs_save_fat (
     size_t fat_size )
 {
 
-    // #todo
-    // Descrever essas variáveis.
-
-    int f=0;
-    int off=0;
-    int lbaoff=0;
-
-    unsigned long __fatAddress = 0;
-    unsigned long __fatLBA     = 0;
-    size_t        __fatSize    = 0;
-
-
-    __fatAddress = fat_address;
-    __fatLBA     = fat_lba;
-    __fatSize    = fat_size;   //fat size in sectors. 246?
-    
-    
-    //#bugbug: provisorio
+// #bugbug: 
+// Debug provisório.
     debug_print ("fs_save_fat:\n");
-    printf ("Saving fat..\n");
-    refresh_screen ();
+    printf      ("Saving fat\n");
+    refresh_screen();
 
+// Filters
 
+    if (fat_address == 0){
+        panic("fs_save_fat: fat_address\n");
+    }
+    if (fat_lba == 0){
+        panic("fs_save_fat: fat_lba\n");
+    }
+    // VOLUME1_FAT_SIZE
+    // Only one size for now
+    if (fat_size != VOLUME1_FAT_SIZE){
+        panic("fs_save_fat: fat_size\n");
+    }
 
-	// #bugbug: 
-	// Precisamos saber o tamanho da fat ... 
-	// Precismos de estrututra de fat
-	//#obs: 
-	// Estamos salvando 246 setores da FAT,
+// Do save!
+    __do_save_sequence(
+        (unsigned long) fat_address,
+        (unsigned long) fat_lba,
+        (size_t) fat_size );
 
-
-    //for ( f=0; f<246; f++ )
-    for ( f=0; f<__fatSize; f++ )
-    {
- 
-       //#debug
-       //printf("write_lba n={%d} \n",f);  
-       //refresh_screen();
-
-        // Esperando antes do próximo.
-        disk_ata_wait_irq ();
-
-
-        //ataWriteSector ( 
-        //    (unsigned long) ( VOLUME1_FAT_ADDRESS + off), 
-        //    (unsigned long) ( VOLUME1_FAT_LBA     + lbaoff ), 
-        //    0, 
-        //    0 );
-
-        ataWriteSector ( 
-            (unsigned long) ( __fatAddress + off), 
-            (unsigned long) ( __fatLBA     + lbaoff ), 
-            0, 
-            0 );
-
-
-        off    = (off    + 0x200);
-        lbaoff = (lbaoff + 1);
-        
-        // esperar ??
-    };
-
-
-    // #debug
+// #bugbug: 
+// Debug provisório.
     debug_print ("fs_save_fat: Done\n");
     printf      ("fs_save_fat: Done\n"); 
-
     refresh_screen ();
 
     return 0;
@@ -190,77 +219,38 @@ fs_save_rootdir (
     unsigned long root_lba, 
     size_t root_size )
 {
-
-    // #todo
-    // Descrever essas variáveis.
-    
-    int r=0;
-    int roff=0;
-    int rlbaoff=0;
-
-    unsigned long RootAddress = 0;
-    unsigned long RootLBA     = 0;
-    size_t        RootSize    = 0;
-
-
-    RootAddress = root_address;
-    RootLBA     = root_lba;
-    RootSize    = root_size;    // number of sectors.
-
-    // size = number of sectors
-    // 512*32
-    // 512 entradas de 32 bytes.
-
-    // #obs:
-    // Não precisamos fazer isso o tempo todo.
-    // Podemos apenas sinalizar que a sincronização está pendente.
-    
+// #bugbug: 
+// Debug provisório.
     debug_print ("fs_save_rootdir:\n");
-    printf ("Saving root..\n");
+    printf      ("Saving rootdie\n");
+    refresh_screen();
+
+// Filters
+
+    if (root_address == 0){
+        panic("fs_save_rootdir: root_address\n");
+    }
+    if (root_lba == 0){
+        panic("fs_save_rootdir: root_lba\n");
+    }
+    // 32 setores
+    // 512 entradas de 32 bytes cada.
+    // Only one size for now
+    if (root_size != 32){
+        panic("fs_save_rootdir: root_size\n");
+    }
+
+// Do save!
+    __do_save_sequence(
+        (unsigned long) root_address,
+        (unsigned long) root_lba,
+        (size_t) root_size );
+
+// #bugbug: 
+// Debug provisório.
+    debug_print ("fs_save_rootdir: Done\n");
+    printf      ("fs_save_rootdir: Done\n"); 
     refresh_screen ();
-
-
-	// #bugbug: 
-	// Precisamos saber o tamanho do root ... 
-	// Precismos de estrututra de root
-
-    // size = number of sectors
-    // 512*32
-    // 512 entradas de 32 bytes.
-    
-    //for ( r=0; r<32; r++ )
-    for ( r=0; r< RootSize; r++ )
-    {
-        // #debug
-        //printf("write_lba n={%d} \n",r); 
-        //refresh_screen();
-
-        // Wait interrupt. Isso funcionou.
-        // #bugbug
-        // ?? Estamos esperando antes de gravarmos o próximo.
-        // wait irq
-        disk_ata_wait_irq ();
-
-        // #bugbug: 
-        // Não podemos determinar os valores. Precisamos de estruturas.
-
-        //ataWriteSector ( 
-        //    (unsigned long) ( VOLUME1_ROOTDIR_ADDRESS + roff), 
-        //    (unsigned long) ( VOLUME1_ROOTDIR_LBA     + rlbaoff ), 
-        //    0, 
-        //    0 );
-
-        ataWriteSector ( 
-            (unsigned long) ( RootAddress + roff), 
-            (unsigned long) ( RootLBA + rlbaoff ), 
-            0, 
-            0 );
-
-        roff    = (roff    + 0x200);
-        rlbaoff = (rlbaoff + 1);
-        
-        // ?? esperar
-    };
 
     return 0;
 }

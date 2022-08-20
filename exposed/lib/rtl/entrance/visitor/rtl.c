@@ -1728,15 +1728,16 @@ ssize_t rtl_console_beep(void)
 }
 
 
-int rtl_clone_and_execute ( char *name )
+// Launch a new process.
+// Clone and execute.
+int rtl_clone_and_execute(char *name)
 {
     if ( (void *) name == NULL ){
-        printf ("rtl_clone_and_execute: [FAIL] name\n");
+        printf ("rtl_clone_and_execute: name\n");
         return (int) -1;
     }
-
     if ( *name == 0 ){
-        printf ("rtl_clone_and_execute: [FAIL] *name\n");
+        printf ("rtl_clone_and_execute: *name\n");
         return (int) -1;
     }
 

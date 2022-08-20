@@ -1,7 +1,7 @@
 
 // Init process. INIT.BIN.
-// This is the first ring3 application.
-// (old GWS.BIN)
+// This is the first ring3 process.
+// This is also a server.
 
 #include <types.h>
 #include <stdio.h>
@@ -32,6 +32,8 @@ gwsProcedure (
     unsigned long long1, 
     unsigned long long2 );
 
+static int __server_loop(void);
+
 static void initPrompt(void);
 static int initCompareString(void);
 
@@ -58,7 +60,7 @@ gwsProcedure (
 // range: 4001~4009 
 
     case __MSG_COMMAND:
-        printf("gws.bin: MSG_COMMAND %d \n",long1);
+        printf("init.bin: MSG_COMMAND %d \n",long1);
         switch(long1)
         {
             case 4001:  //app1
@@ -348,6 +350,36 @@ exit_cmp:
 }
 
 
+
+static int __server_loop(void)
+{
+
+// #todo
+// Get the id of the caller.
+// Get the message code.
+// Who can call us?
+
+    while (TRUE)
+    {
+
+        //if( isTimeToQuit == TRUE )
+            //break;
+        
+        if ( rtl_get_event() == TRUE )
+        {
+            //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
+            gwsProcedure ( 
+                (void*) RTLEventBuffer[0], 
+                RTLEventBuffer[1], 
+                RTLEventBuffer[2], 
+                RTLEventBuffer[3] );
+        }
+    };
+
+    return 0;
+}
+
+
 int main( int argc, char **argv)
 {
     //#todo
@@ -417,7 +449,16 @@ int main( int argc, char **argv)
     
     //# no focus!
     //rtl_focus_on_this_thread();
-    
+
+//
+// Server loop.
+// 
+    int ServerLoopStatus = -1;
+
+    ServerLoopStatus = (int) __server_loop();
+
+
+/*
     while (TRUE){
         //if( isTimeToQuit == TRUE )
             //break;
@@ -431,6 +472,7 @@ int main( int argc, char **argv)
                 RTLEventBuffer[3] );
         }
     };
+*/
 
 // hang
     while (TRUE){

@@ -32,6 +32,8 @@
 #define VOLUME1_DATAAREA_LBA  591   //( size=FFFF setores)
 #define VOLUME1_SPC  1 // sectors per cluster.
 
+#define VOLUME1_FAT_SIZE    246
+
 //=======================================
 // system partition
 // #bugbug: Isso esta errado.
