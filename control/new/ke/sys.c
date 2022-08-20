@@ -580,9 +580,9 @@ int sys_uname (struct utsname *ubuf)
         sizeof(OS_NAME) );
 
     memcpy ( 
-        (void *)  ubuf->nodename, 
-        (const void *) NODE_NAME, 
-        sizeof(NODE_NAME) );
+        (void *)  ubuf->version, 
+        (const void *) VERSION_NAME, 
+        sizeof(VERSION_NAME) ); 
 
     memcpy ( 
         (void *)  ubuf->release, 
@@ -590,14 +590,16 @@ int sys_uname (struct utsname *ubuf)
         sizeof(RELEASE_NAME) );    
 
     memcpy ( 
-        (void *)  ubuf->version, 
-        (const void *) VERSION_NAME, 
-        sizeof(VERSION_NAME) ); 
-
-    memcpy ( 
         (void *)  ubuf->machine, 
         (const void *) MACHINE_NAME, 
         sizeof(MACHINE_NAME) );    
+
+    memcpy ( 
+        (void *)  ubuf->nodename, 
+        (const void *) NODE_NAME, 
+        sizeof(NODE_NAME) );
+
+// #todo: domain name.
 
 //done:
     debug_print("sys_uname: done\n");
