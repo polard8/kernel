@@ -634,6 +634,7 @@ void SelectForExecution ( struct thread_d *Thread )
 // MOVIMENT 1, (Initialized --> Standby).
 //
     Thread->state = (int) STANDBY;
+    Thread->standbyCount = 0;
 
 //
 // #bugbug      OVERFLOW !!!!!
@@ -642,10 +643,10 @@ void SelectForExecution ( struct thread_d *Thread )
 // This function is wrong .... 
 // Maybe it is putting values outside the vector.
 
-    debug_print ("SelectForExecution: [FIXME] Overflow in queue_insert_data() \n");
-    
-    //queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
+    // debug_print ("SelectForExecution: [FIXME] Overflow in queue_insert_data() \n");
+    // queue_insert_data ( queue, (unsigned long) Thread, QUEUE_STANDBY );
 }
+
 
 void thread_show_profiler_info (void)
 {

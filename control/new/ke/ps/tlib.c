@@ -267,6 +267,7 @@ fail0:
 // long1 and long2 will mask to single byte.
 // IN: tid, window, message code, ascii code, raw byte.
 // Post message.
+// Async
 
 int
 post_message_to_tid ( 

@@ -12,6 +12,9 @@
 //#define SERVICE_NUMBER_MAX  255
 
 
+static unsigned long __default_syscall_counter=0;
+
+
 //globals
 //see:sw.asm
 unsigned long sci0_cpl=0;
@@ -2037,8 +2040,8 @@ void *sci0 (
             return (void *) newos_get_system_metrics ( (int) arg2 );
             break;
 
-
-        default: 
+        default:
+            __default_syscall_counter++;
             debug_print ("sci0: [FIXME] Default\n");
             printf      ("sci0: [FIXME] Default SYSCALL {%d}\n", number );
             invalidate_screen();
@@ -2109,6 +2112,8 @@ void *sci1 (
     // ...
 
     default:
+        __default_syscall_counter++;
+        return NULL;
         break;
     };
 
@@ -2195,7 +2200,6 @@ void *sci2 (
         debug_print("sci2: Personality\n");
         panic      ("sci2: Personality\n");
     }
-
 
 // Counting syscalls ...
     p->syscalls_counter++;
@@ -2426,21 +2430,17 @@ void *sci2 (
         //t->quantum  = QUANTUM_FIRST_PLANE;
         t->quantum  = (QUANTUM_MAX + 88);
         t->priority = PRIORITY_MAX;
+        
         foreground_thread = (int) arg2;
         // it will select the next input reponder.
         set_input_responder_tid(foreground_thread);
         return NULL;
     }
 
-    // Get Init PID.
-    if(number == 10020){
-        return (void*) GRAMADO_PID_INIT;
-    }
-
+    // Get Init PID
+    if(number == 10020){ return (void*) GRAMADO_PID_INIT; }
     // Get Init TID
-    if(number == 10021){
-        return (void*) INIT_TID;
-    }
+    if(number == 10021){ return (void*) INIT_TID; }
 
 // #test
 // shared memory 2mb surface.
@@ -2466,8 +2466,13 @@ void *sci2 (
     }
 
 
+
+    __default_syscall_counter++;
+
     // #todo
-    // Maybe kill the caller.
+    // Maybe kill the caller. 
+    // Maybe return.
+
     panic ("sci2: [FIXME] default syscall \n");
     return NULL;
 }

@@ -20,6 +20,8 @@ unsigned long _callback_address_saved=0;
 static void __task_switch (void);
 static void __on_finished_executing( struct thread_d *t );
 
+static void cry(unsigned long flags);
+
 //============
 
 // ## PREEMPT ##
@@ -43,79 +45,123 @@ static void __on_finished_executing( struct thread_d *t )
     if (t->magic!=1234)
         panic("__on_finished_executing: t magic\n");
 
-        // #bugbug
-        //  Isso está acontecendo.
+// #bugbug
+//  Isso está acontecendo.
 
-        //if ( CurrentThread->state != RUNNING )
-        //    panic("task_switch: CurrentThread->state != RUNNING");
+    //if ( CurrentThread->state != RUNNING )
+    //    panic("task_switch: CurrentThread->state != RUNNING");
 
-        //if ( CurrentThread->state != RUNNING )
-        //     goto try_next;
+    //if ( CurrentThread->state != RUNNING )
+    //     goto try_next;
 
-        // Preempt
-        // #bugbug: Preempção para threads de ring0 e ring3.
+//
+// Preempt
+//
  
-        if ( t->state == RUNNING ){
-            t->state = READY;
-        }
+    if ( t->state == RUNNING )
+    {
+        t->state = READY;
+        t->readyCount = 0;
+    }
 
-        //debug_print (" ok ");
+//
+// Spawn thread 
+//
+
+// Check for a thread in standby.
+// In this case, this routine will not return.
+// See: schedi.c
+
+    check_for_standby();   
+
+// ---------------------------------------------------------
+
+//
+// Services:
+// 
+
+// Nesse momento uma thread esgotou seu quantum,
+// podemos checar se tem ela alguma mensagem para o kernel,
+// responter a mensagem realizando uma chamada à algum
+// serviço em ring 3 ou chamando alguma rotina interna. 
+
+// #todo
+// Podemos atualizar contadores, considerando
+// essa condição de termos encerrado nossos creditos.
+
+// Essa pode ser uma boa hora pra checar o working set de uma thread.
+// Quais foram as páginas mais usadas?
+// Quantas páginas?
+
+// Esse pode ser um bom momento para checar estatísticas dessa thread.
+// E avaliarmos o mal-comportamento dela. Como uso de systemcalls,
+// recursos, pagefaults, etc...
+
+// Esse pode ser um bom momento para enfileirarmos essa thread
+// caso o tipo de scheduler nos permita. Se for round robin,
+// não precisa, mas se for outra política, então podemos
+// colocar ele na fila de prontos em tail, 
+// pois serão retirados em head.
+
+    // ready_q[tail] = (unsigned long) t;
 
 
-        //
-        // == EXTRA ==========
-        //
 
-        // Call extra routines scheduled to this moment.
 
-        // #hackhack
-        // Vamos validar isso, pois isso é trabalho de uma rotina
-        // do timer qua ainda não esta pronta.
+//
+// == EXTRA ==========
+//
+
+// Call extra routines scheduled to this moment.
+// #hackhack
+// Vamos validar isso, pois isso é trabalho de uma rotina
+// do timer qua ainda não esta pronta.
         
-        //extra = TRUE;
-        extra = FALSE;
-        
-        if (extra == TRUE)
-        {
-            //#debug
-            //debug_print (" X "); 
-                
-            tsCallExtraRoutines();
-            extra = FALSE;
-        }
-        
-        //#provisório; Isso é extra também.
+    //extra = TRUE;
+    extra = FALSE;
+
+    if (extra == TRUE)
+    {
+        //#debug
+        //debug_print (" X "); 
+
+        tsCallExtraRoutines();
+
         //KiRequest();
         //request();
- 
-        // Dead thread collector
-        // Avalia se é necessário acordar a thread do dead thread collector.
-        // É uma thread em ring 0.
-        // Só chamamos se ele ja estiver inicializado e rodando.
-        // #bugbug
-        // precismos rever essa questão pois isso pode estar
-        // fazendo a idle thread dormir. Isso pode prejudicar
-        // a contagem.
-        // See: ps/threadi.c
-        // #bugbug
-        // #todo: This is a work in progress!
 
-        if (dead_thread_collector_status == TRUE){
-            check_for_dead_thread_collector();
-        }
+        extra = FALSE;
+    }
 
-        //
-        // Spawn thread 
-        //
+// Dead thread collector
+// Avalia se é necessário acordar a thread do dead thread collector.
+// É uma thread em ring 0.
+// Só chamamos se ele ja estiver inicializado e rodando.
+// #bugbug
+// precismos rever essa questão pois isso pode estar
+// fazendo a idle thread dormir. Isso pode prejudicar
+// a contagem.
+// See: .c
+// #bugbug
+// #todo: This is a work in progress!
 
-        // Check for a thread in standby.
-        // In this case, this routine will not return.
-        // See: schedi.c
-
-        check_for_standby();   
-           
+    if (dead_thread_collector_status == TRUE){
+        check_for_dead_thread_collector();
+    }
+    
+    if(t->tid == INIT_TID)
+    {
+        if (t->_its_my_party_and_ill_cry_if_i_want_to == TRUE)
+            cry(0);
+    }
 }
 
+// :(
+static void cry(unsigned long flags)
+{
+    if (flags & 0x8000)
+        gramado_shutdown(0);
+}
 
 // service 44000
 void tsSetupCallback(unsigned long r3_address)

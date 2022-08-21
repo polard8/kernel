@@ -284,6 +284,8 @@ struct thread_d
 // e que deve sair quando for seguro fazer isso.
 
     int yield_in_progress;
+    
+    int _its_my_party_and_ill_cry_if_i_want_to;
 
 // error. @todo:
     //unsigned long error;
@@ -651,19 +653,14 @@ struct thread_d
 
     // MAXEVENTS
     // See: events.h
+
 // ====================================================
-
-//
 // Message Queue
-//
-
 // For the msg_d structure,
 // see: window.h
-
     unsigned long MsgQueue[32];
     int MsgQueueHead;
     int MsgQueueTail;
-
 // ====================================================
 
 
@@ -697,8 +694,11 @@ struct thread_d
 
     int wait_reason[10]; 
 
-    int wait4pid;   //id do processo que a thread está esperando morrer.
-    int wait4tid;   //id da thread que a thread está esperando morrer.
+// id do processo que a thread está esperando morrer.
+    int wait4pid;
+// id da thread que a thread está esperando morrer.
+    int wait4tid;
+
 
 // Objeto pelo qual a thread está esperando.
 // #todo: mudar esses nomes, pode confundir com o header no início da 

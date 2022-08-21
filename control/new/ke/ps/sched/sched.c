@@ -213,12 +213,25 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 {
                     if (TmpThread != Idle)
                     {
-                    // não sera mais selecionada pelo scheduler.
-                    // O dead thred collector pode terminar de deleta
-                    // essa thread e deletar o processo dela
-                    // se ele estiver sinalizado como exit in progress
-                    // e ela for a thread de controle dele.
+                        // não sera mais selecionada pelo scheduler.
+                        // O dead thred collector pode terminar de deleta
+                        // essa thread e deletar o processo dela
+                        // se ele estiver sinalizado como exit in progress
+                        // e ela for a thread de controle dele.
                         TmpThread->state = ZOMBIE;
+                        
+                        // Uma thread importante morreu?
+                        // if (TmpThread->personality == PERSONALITY_GRAMADO )
+                        //     oops();
+                        
+                        //se tick=1000 ticks per second.
+                        //TmpThread->total_time_ms = initial_time_ms - TmpThread->steps;
+                        
+                        // #todo
+                        // procure a thread que estava esperando esse evento
+                        // e acorde ela.
+                        // fazer loop.
+                        // TmpThread->tid == x->wait4tid
                     }
                 }
             }

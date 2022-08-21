@@ -5,7 +5,7 @@
 
 
 int copy_process_in_progress=FALSE;
-
+unsigned long __copy_process_counter=0;
 
 // #bugbug
 // Na maquina real, o processo clone esta recebendo
@@ -1019,7 +1019,6 @@ do_clone:
 
     SelectForExecution (child_thread);  // :)
 
-
 // Current thread
 // the parent thread.
 
@@ -1030,6 +1029,7 @@ do_clone:
         panic("copy_process: current_thread limits\n");
     }
 
+    __copy_process_counter++;
     copy_process_in_progress = FALSE;
 
 // Return child's PID.

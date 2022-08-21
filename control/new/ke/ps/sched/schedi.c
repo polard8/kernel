@@ -797,6 +797,39 @@ void yield (tid_t tid)
 }
 
 
+/*
+int 
+sched_thread (
+    struct thread_d *t, 
+    unsigned long quantum,
+    unsigned long priority );
+int 
+sched_thread (
+    struct thread_d *t, 
+    unsigned long quantum,
+    unsigned long priority )
+{
+    if ( (void*) t == NULL )
+        return -1;
+    if (t->magic != 1234)
+        return -1;
+
+// quantum
+    if (quantum>QUANTUM_MAX){
+        return -1;
+    }
+    t->quantum = (unsigned long) quantum;
+
+// priority
+    if (priority>PRIORITY_MAX){
+        return -1;
+    }
+    t->priority = (unsigned long) priority;
+
+    return 0;
+}
+*/
+
 //#bugbug: Suspended.
 void set_input_responder_tid(int tid)
 {
@@ -879,7 +912,7 @@ done:
  * a current. Para rodar pela primeira vez, atravéz de Spawn.
  * Não retorna se encontrar uma threa na lista.
  */
-// Called by __task_switch() in ts.c.
+// Called by __on_finished_executing() in ts.c.
 
 void check_for_standby(void)
 {
