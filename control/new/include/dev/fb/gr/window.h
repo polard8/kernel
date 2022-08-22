@@ -56,7 +56,6 @@
 
 
 /*
- ***********************************************
  * Messages.
  * mensagens para procedimentos de janelas e 
  * para diálogos dentro do gws.
@@ -155,15 +154,11 @@
 //o driver de network está notificando um processo em ring3.
 #define MSG_NETWORK_NOTIFY_PROCESS 56
 
-
-//
 // mouse support: continuação ...
-//
 #define MSG_MOUSE_DOUBLECLICKED   60
 #define MSG_MOUSE_DRAG            61
 #define MSG_MOUSE_DROP            62
 //...
-
 
 // #test
 // seleciona todos os elementos.
@@ -171,14 +166,19 @@
 #define MSG_SELECT_ALL    70
 // control+f
 #define MSG_SEARCH    71
+#define MSG_FIND      71 
+
 // control+s
 #define MSG_SAVE    72
 
 
-//
-//  terminal commands
-//
+#define MSG_CONTROL_ARROW_UP     80
+#define MSG_CONTROL_ARROW_DOWN   81
+#define MSG_CONTROL_ARROW_LEFT   82
+#define MSG_CONTROL_ARROW_RIGHT  83
 
+
+//  terminal commands
 #define MSG_TERMINALCOMMAND      100
 #define TERMINALCOMMAND_PRINTCHAR 1000
 //#define TERMINALCOMMAND_PRINT??? 1001
@@ -1080,7 +1080,13 @@ void kgwm_early_kernel_console(void);
 // ==========
 
 // Input events:
-int wmKeyEvent( tid_t tid, unsigned char raw_byte );
+
+int 
+wmKeyEvent(
+    tid_t tid, 
+    unsigned char raw_byte,
+    int prefix );
+
 int wmMouseEvent(int event_id,long long1, long long2);
 
 #endif    

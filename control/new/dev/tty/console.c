@@ -423,9 +423,16 @@ console_interrupt(
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device :)\n");
 
-            Status = (int) wmKeyEvent( (tid_t) TargetThreadTID, Data );
-            if(Status<0)
+            // IN: tid, scancode, prefix.
+            Status = 
+                (int) wmKeyEvent( 
+                          (tid_t) TargetThreadTID, 
+                          Data,
+                          (int) 0 );
+            
+            if (Status<0){
                 return;
+            }
             
             // Lets end this round putting a given thread at the end
             // of this round.

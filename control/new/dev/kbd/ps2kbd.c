@@ -132,8 +132,7 @@ void DeviceInterface_PS2Keyboard(void)
     unsigned char __raw = 0;
     unsigned char val = 0;
 
-    static int __has_e0_prefix = 0;
-    static int __has_e1_prefix = 0;
+    static int __prefix=0;
 
     // Usado nos testes
     //struct process_d *p;
@@ -266,10 +265,12 @@ sc_again:
 
 CheckByte:
 
-// Check prefix for extended keyboard sequence
-    if ( __raw == 0xE0 ){ __has_e0_prefix = 1; goto done; }
-    if ( __raw == 0xE1 ){ __has_e1_prefix = 1; goto done; }
-
+// Check prefix for extended keyboard sequence.
+    if (__raw == 0xE0 || __raw == 0xE1)
+    {
+        __prefix = (int) (__raw & 0xFF);
+        goto done;
+    }
 
 // Process the normal byte
 NormalByte:
@@ -316,7 +317,11 @@ NormalByte:
        //t = (struct thread_d *) threadList[foreground_thread];
        //if(t->wantRawInput == TRUE){POST(RAW)}
 
-       wmKeyEvent( (tid_t) foreground_thread, (unsigned char) __raw );
+       // IN: tid, scancode, prefix.
+       wmKeyEvent( 
+           (tid_t) foreground_thread, 
+           (unsigned char) __raw,
+           (int) (__prefix & 0xFF) );
 
        // #todo
        // Coloque os pacotes num arquivo,
@@ -325,8 +330,7 @@ NormalByte:
     }
 
 // Clean the mess.
-    __has_e0_prefix = 0;
-    __has_e1_prefix = 0;
+    __prefix=0;
 
 done:
     return;
