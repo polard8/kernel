@@ -151,23 +151,19 @@ void DeviceInterface_PS2Keyboard(void)
 
 // Get status.
     unsigned char status = in8(I8042_STATUS);
-
 // buffer full?
     if (!(status & I8042_BUFFER_FULL))
         return;
-
 // which device?
     int is_mouse_device = 
         ((status & I8042_WHICH_BUFFER) == I8042_MOUSE_BUFFER) 
         ? TRUE 
         : FALSE;
-
-    // Yes it is a mouse.
+// Yes it is a mouse.
     if ( is_mouse_device == TRUE )
         return;
 
 // =============================================
-
 // Não precisamos perguntar para o controlador se
 // podemos ler, porque foi uma interrupção que nos trouxe aqui.
 // #obs:
@@ -221,7 +217,7 @@ sc_again:
     // ACKNOWLEDGE
     case 0xFA:
         //#test
-        printf ("DeviceInterface_PS2Keyboard: [test.first_byte] ack\n");
+        printf ("DeviceInterface_PS2Keyboard: ack\n");
         refresh_screen();
         goto done;
         break;
@@ -229,7 +225,7 @@ sc_again:
     // RESEND
     case 0xFE:
         //#test
-        printf ("DeviceInterface_PS2Keyboard: [test.first_byte] resend\n");
+        printf ("DeviceInterface_PS2Keyboard: resend\n");
         refresh_screen();
         goto done;
         break;

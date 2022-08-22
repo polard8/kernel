@@ -494,7 +494,7 @@ __wmProcessExtendedKeyboardKeyStroke(
     int prefix,
     int msg, 
     unsigned long vk,
-    unsigned long scancode );
+    unsigned long rawbyte );
 
 
 // ============================
@@ -1262,7 +1262,7 @@ __wmProcessExtendedKeyboardKeyStroke(
     int prefix,
     int msg, 
     unsigned long vk,
-    unsigned long scancode )
+    unsigned long rawbyte )
 {
 
 /*
@@ -1291,9 +1291,11 @@ __wmProcessExtendedKeyboardKeyStroke(
     //printf("sc={%x}\n",scancode);
     //refresh_screen();
 
-    if (scancode > 0xFF){
+    if (rawbyte >= 0xFF){
         return -1;
     }
+
+    unsigned long scancode = (unsigned long) (rawbyte & 0x7F);
 
     switch (scancode)
     {
@@ -1418,11 +1420,9 @@ wmKeyEvent(
     // [event block]
     struct window_d  *Event_Window;            //arg1 - window pointer
     int               Event_Message       =0;  //arg2 - message number
-    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
+    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code (vk)
     unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
     //===================
-
-
 
 // #test
 // Not working yet.
