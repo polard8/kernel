@@ -7,15 +7,8 @@
 
 //#define TS_DEBUG
 
-// #test
-// variáveis usadas em unit3hw.asm para umplementar
-// a chamada de um callback em ring3.
-unsigned long fCallbackAfterCR3=0;
-unsigned long Ring3CallbackAddress=0;
+//--------------------------------------
 
-int _callback_status=FALSE;
-unsigned long _callback_address=0;
-unsigned long _callback_address_saved=0;
 
 static void __task_switch (void);
 static void __on_finished_executing( struct thread_d *t );
@@ -73,6 +66,28 @@ static void __on_finished_executing( struct thread_d *t )
 // See: schedi.c
 
     check_for_standby();   
+
+// ---------------------------------------------------------
+
+//
+// Signals
+//
+
+// Peding signals for this thread.
+// #todo: Put signals this way = t->signal |= 1<<(signal-1);
+
+    // Se existe algum sinal para essa thread
+    if (t->signal != 0)
+    {
+        //#test
+        //if ( t->signal & (1<<(SIGALRM-1)) )
+        //    printf("SIGALRM\n");
+        //if ( t->signal & (1<<(SIGKILL-1)) )
+        //    printf("SIGKILL\n");
+
+        //refresh_screen();    
+        //panic("__on_finished_executing: t->signal\n");
+    }
 
 // ---------------------------------------------------------
 
@@ -163,14 +178,6 @@ static void cry(unsigned long flags)
         gramado_shutdown(0);
 }
 
-// service 44000
-void tsSetupCallback(unsigned long r3_address)
-{
-    _callback_status = TRUE;
-    _callback_address = (unsigned long) r3_address;
-    
-    _callback_address_saved = (unsigned long) r3_address;
-}
 
 
 /*
@@ -806,16 +813,17 @@ void psTaskSwitch(void)
     pid_t ws_pid=-1;
     ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
 
-    //if(current_process == GRAMADO_PID_INIT)  //init
-    if(current_process == ws_pid)  //ws
+    // Se estamos na thread do window server.
+    if (current_process == ws_pid)
     {
-        if( _callback_status == TRUE )
+
+        // Se o callback ja foi inicializado
+        // por uma chamada do window server.
+        if ( ws_callback_info.ready == TRUE )
         {
-            fCallbackAfterCR3 = 0x1234; // o assembly precisa disso.
-            Ring3CallbackAddress = (unsigned long) _callback_address;
-            
-            _callback_status = FALSE;
-            _callback_address = 0;
+            //see: callback.c
+            prepare_next_ws_callback();
+
             //no taskswitching
             return;
         }

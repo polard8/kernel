@@ -7,9 +7,8 @@
 
 ; #test
 ; testando callbacks.
-extern _fCallbackAfterCR3
-extern _Ring3CallbackAddress
-
+extern _asmflagDoCallbackAfterCR3
+extern _asmRing3CallbackAddress
 
 
 extern _task_switch_status
@@ -55,7 +54,7 @@ extern _contextR15
 ; ...
 
 
-;;========================
+; -------------------------------------
 ;; callback restorer.
 ;; temos que terminal a rotina do timer e
 ;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
@@ -71,7 +70,6 @@ callback_restorer:
     pop rax ;rsp
     pop rax ;ss
 
-
 ; #bugbug
 ; We gotta check what is the process calling this routine.
      ;call __xxxxCheckCallerPID
@@ -79,27 +77,43 @@ callback_restorer:
 ; clear the variables
 ; desse jeito a rotina de saida não tentara
 ; chamar o callback novamente.
-    mov qword [_fCallbackAfterCR3], 0
-    mov qword [_Ring3CallbackAddress], 0
+    mov qword [_asmflagDoCallbackAfterCR3], 0
+    mov qword [_asmRing3CallbackAddress], 0
 
+;; Normal timer exit. (after cr3).
 ;; temos que terminal a rotina do timer e
 ;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+;; que ainda é o window server.
     jmp unit3Irq0Release
 
+
+; -------------------------------------
 ; Irq0 release.
 ; Timer interrupt.
 ; See: _irq0 in unit1hw.asm.
+; See: ts.c, pit.c, sci.c.
 
 unit3Irq0Release:
 
-    mov rax, qword [_fCallbackAfterCR3]
-    mov rbx, qword [_Ring3CallbackAddress]
+; ring3 callback
+; Se a flag indicar que sim,
+; então iremos efetuar um iretq para dentro
+; do processo window server.
+; Quem aciona essa flag é psTaskSwitch() em ts.c.
+; Depois que o contexto esta salve e se certificou
+; que estamos rodando a thread de controle do window server.
+; #importante: Antes da troca de tarefa, 
+; então cr3 permanece sendo o do processo window server.
+; #bugbug: 
+; Precisa realmente ser antes de ts.c trocar de tarefa e 
+; o contexto precisa estar salvo.
+; Se fosse depois, então saltaríamos para outra tarefa
+; diferente do window server e usaríamos endereços errados.
 
-    ; ring3 callback
-    ; #bugbug: o problema é que pode ter havido uma troca
-    ; de tarefas e a rotina em C pode ter mudado o cr3.
-    ; Sendo assim podemos acabar saltando para um endereço
-    ; dentro de outro processo.
+
+    mov rax, qword [_asmflagDoCallbackAfterCR3]
+    mov rbx, qword [_asmRing3CallbackAddress]
+    ; Callback ring3 procedure.
     cmp rax, 0x1234
     je Unit3IretqToRing3Callback
 
@@ -173,13 +187,14 @@ unit3Irq0Release:
 
 
 ;------------------------------------------------
+; IN: rbx = rip
 Unit3IretqToRing3Callback:
 
     push qword [_contextSS]      ; ss
     push qword [_contextRSP]     ; rsp
-    push qword 0x3000 ;[_contextRFLAGS]  ; rflags interrupçoes desabilitadas.
+    push qword 0x3000            ; rflags interrupçoes desabilitadas.
     push qword [_contextCS]      ; cs
-    push rbx     ; rip
+    push rbx                     ; rip
     ; interrupçoes desabilitadas
     ; eoi nao acionado.
     ; quando uma interrupçao voltar para ring3, 

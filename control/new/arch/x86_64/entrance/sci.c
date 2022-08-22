@@ -2431,6 +2431,10 @@ void *sci2 (
         t->quantum  = (QUANTUM_MAX + 88);
         t->priority = PRIORITY_MAX;
         
+        //#test
+        //t->signal |= 1<<(SIGALRM-1);
+        //t->signal |= 1<<(SIGKILL-1);
+        
         foreground_thread = (int) arg2;
         // it will select the next input reponder.
         set_input_responder_tid(foreground_thread);
@@ -2452,16 +2456,30 @@ void *sci2 (
         return NULL;
     }
 
-    //see: ts.c
-    pid_t ws_pid=-1;
+    // see: ts.c
+    // see: pit.c
+    pid_t ws_pid = -1;
+    unsigned long r3_handler=0;
     if(number == 44000)
     {
+        // Somente o window server pode chamar esse serviço.
         ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
-        if(current_process!=ws_pid){
+        if (current_process != ws_pid){
             panic("sci2: [44000] current_process!=ws_pid\n");
         }
-        
-        tsSetupCallback( (unsigned long) arg2 );
+        // nao foi inicializado pela inicialização do kenrel.
+        if( ws_callback_info.initialized != TRUE ){
+            panic("sci2: [44000] callback support Not initialized\n");
+        }
+        // Se ele ja esta pronto para efetuarmos o iretq
+        // é porque tem alguma coisa errada.
+        if( ws_callback_info.ready == TRUE ){
+            panic("sci2: [44000] called again\n");
+        }
+        // Enable for the first time.
+        // Configuramos o callback em ts.c.
+        r3_handler = (unsigned long) arg2;
+        setup_callback( (unsigned long) r3_handler );
         return NULL;
     }
 

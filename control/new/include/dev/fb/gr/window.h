@@ -120,8 +120,10 @@
 //outros (40 - ...)
 #define MSG_COMMAND       40
 #define MSG_CUT           41
+
 #define MSG_COPY          42
 #define MSG_PASTE         43
+
 #define MSG_CLEAR         44 
 #define MSG_UNDO          45
 #define MSG_INSERT        46
@@ -161,6 +163,17 @@
 #define MSG_MOUSE_DRAG            61
 #define MSG_MOUSE_DROP            62
 //...
+
+
+// #test
+// seleciona todos os elementos.
+// control+a
+#define MSG_SELECT_ALL    70
+// control+f
+#define MSG_SEARCH    71
+// control+s
+#define MSG_SAVE    72
+
 
 //
 //  terminal commands

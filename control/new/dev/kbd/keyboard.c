@@ -7,6 +7,10 @@
 
 #include <kernel.h>
 
+
+unsigned long gPS2KeyboardInputTime=0;
+
+
 static unsigned long ps2keyboard_watchdog_jiffies=0;
 
 
@@ -40,6 +44,9 @@ unsigned long ps2keyboard_get_last_wd_jiffies(void)
 __VOID_IRQ 
 irq1_KEYBOARD (void)
 {
+
+    gPS2KeyboardInputTime = (unsigned long) jiffies;
+
     // If ps2 keyboard isn't initialized yet.
     if ( PS2.keyboard_initialized != TRUE ){
         in8(0x60);

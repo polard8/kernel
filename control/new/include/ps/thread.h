@@ -212,6 +212,11 @@ struct thread_d
 
     unsigned long input_flags;
 
+// 0x0001=SENDING | 0x0002=RECEIVING
+    //unsigned long ipc_flags;
+// Receiving from this thread only.
+    //tid_t getfrom_tid;
+
 // #suspenso. 
 // Vamos usar as flags em 't->input_flags'
 

@@ -44,8 +44,6 @@ struct e1000_ether_header_d
 } __attribute__((packed)); 
 
 
-
-
 //see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
 
@@ -56,6 +54,10 @@ unsigned long nicList[8];
 
 int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
+
+
+unsigned long gE1000InputTime=0;
+
 
 
 static void DeviceInterface_e1000(void);
@@ -1236,7 +1238,8 @@ static void DeviceInterface_e1000(void)
 
 __VOID_IRQ 
 irq_E1000 (void)
-{    
+{
+    gE1000InputTime = (unsigned long) jiffies;  
     DeviceInterface_e1000();
 }
 

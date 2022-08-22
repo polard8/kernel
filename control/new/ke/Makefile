@@ -77,6 +77,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # Everything is a file.
 OBJS = process.o plib.o thread.o tlib.o \
 create.o clone.o \
+callback.o \
 panic.o \
 reboot.o \
 request.o \
@@ -125,6 +126,9 @@ all:
 
 	$(CC) -c ps/create.c    $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
 	$(CC) -c ps/clone.c     $(KERNEL_INCLUDE) $(CFLAGS) -o clone.o
+
+	$(CC) -c ps/callback.c  $(KERNEL_INCLUDE) $(CFLAGS) -o callback.o
+
 	$(CC) -c ps/x86_64/x64fault.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
 	$(CC) -c ps/queue.c    $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
 	$(CC) -c ps/mk.c       $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o

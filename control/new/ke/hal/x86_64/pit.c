@@ -204,12 +204,30 @@ void DeviceInterface_PIT(void)
 {
     jiffies++;
 
-    // reset callback stuff.
+//--------------------
+// It is time to flush the dirty rectangles
+// in the window server.
+// 1000/16*4 = 15,625 fps.
+// #test 60fps com o pit a 1000.
+// 1000/16*1 = 62.5
+// 1000/16*2 = 31,25
+// 1000/16*3 = 20,83
+// 1000/16*4 = 15,625
+// ::: Reset callback stuff.
+// Reconfigura os dados sobre o callback.
+// #todo: Podemos ter uma estrutura para eles.
+// Acho que o assembly importa esses valores,
+// e é mais difícil importar de estruturas.
     if ( (jiffies % (16*4)) == 0 )
-    { 
-        if( _callback_address_saved != 0)
-            tsSetupCallback(_callback_address_saved);
+    {
+        // reinitialize callback based on the saved value.
+        if ( ws_callback_info.initialized == TRUE )
+        {
+            if ( ws_callback_info.callback_address_saved != 0 )
+                setup_callback(ws_callback_info.callback_address_saved);
+        }
     }
+//--------------------
 
 
 /*
@@ -218,40 +236,9 @@ void DeviceInterface_PIT(void)
         KiScheduler();
     }
 */
-
-
-// #test 60fps com o pit a 1000.
-// 1000/16*1 = 62.5
-// 1000/16*2 = 31,25
-// 1000/16*3 = 20,83
-// 1000/16*4 = 15,625
-// Chamando o compositor dentro do window server.
-// Se os callbacks do window server ja foram configurados
-// anteriormente, então chamamos um deles.
-// 9091 = Compositor.
-// See: In window server, see wmHandler() in wm.c.
-// IN: wid, msg_code, long1, long2
-
-    //if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
-    //if ( (jiffies % 16) == 0 )
-    //{
-        //if ( gUseWMCallbacks == TRUE )
-        //{
-            //wmSendInputToWindowManager(0,9091,0,0);
-            // IN: jiffies, clocks per second.
-            //wmSendInputToWindowManager(0,9091,jiffies,sys_time_hz);
-        //}
-    //}
-    
-// #todo
-// Refresh an array of surfaces.
-// Only the window server will be able to
-// setup all these surfaces.
-// The window server can be able to access an
-// internal display driver via ioctl().
-
 }
 
+//-------------------------
 
 /*
 // read back

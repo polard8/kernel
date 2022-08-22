@@ -6,6 +6,8 @@
 
 #include <kernel.h>
 
+unsigned long gPS2MouseInputTime=0;
+
 static unsigned long ps2mouse_watchdog_jiffies=0;
 
 unsigned long g_mousepointer_width=0;
@@ -35,6 +37,9 @@ unsigned long ps2mouse_get_last_wd_jiffies(void)
 __VOID_IRQ 
 irq12_MOUSE (void)
 {
+
+    gPS2MouseInputTime = (unsigned long) jiffies;
+
     // If ps2 mouse isn't initialized yet.
     if ( PS2.mouse_initialized != TRUE ){
         in8(0x60);

@@ -1695,6 +1695,10 @@ int I_x64main (void)
     PROGRESS("Kernel:1:4\n"); 
     ws_init();
 
+// see: callback.c
+    initialize_ws_callback_info();
+
+
 // ================================
 // GDT
 // Setup GDT again.

@@ -52,15 +52,11 @@ static unsigned long flush_fps=30;
 //unsigned long control_charmap_address;
 //
 
-
-
-/*
- * NORMAL ABNT2.
- *     ?? const char* ??
- * obs: Isso pode ser carregável para várias configurações de teclado.
- */
-
-// minusculas
+// ---------------------------------
+// private:
+// lowercase
+// NORMAL ABNT2.
+// obs: Isso pode ser carregável para várias configurações de teclado.
 
 static unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  0,      //Scancode 0.
@@ -202,14 +198,12 @@ VK_F24,	 //135
 };
 
 
-/*
- * SHIFT ABNT2.
- */
-
-// CAPS LOCK LIGADO
-
+// ---------------------------------------
 // maiúsculas
-
+// uppercase
+// SHIFT ABNT2.
+// +Combinação com shift pressionado.
+// +Com capslock acionado.
 static unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 0, 
 033,   // "
@@ -342,15 +336,10 @@ VK_ABNT2_DELETE,  //',',    //83 abnt2(,)
 };
 
 
-
-
-/*
- * CONTROL ABNT2.
- */
-
-// com control
+// ------------------------------
 // control + key
-
+// CONTROL ABNT2.
+ 
 static unsigned char ctl_abnt2[ABNT2_CHARMAP_SIZE] = {
 0,     //0
 033,   //1
@@ -902,8 +891,62 @@ wmProcedure (
             // NO, we're not using the kernel console.
             // Pois não queremos que algum aplicativo imprima na tela
             // enquanto o console virtual está imprimindo.
-            if ( ShellFlag!=TRUE )
+            if ( ShellFlag != TRUE )
             {
+
+                if ( ctrl_status == TRUE && long1 == 'x')
+                { 
+                    //printf("CUT\n"); refresh_screen(); 
+                    post_message_to_ws( NULL, MSG_CUT, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 'c')
+                { 
+                    //printf("COPY\n"); refresh_screen(); 
+                    post_message_to_ws( NULL, MSG_COPY, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 'v')
+                {
+                    //printf("PASTE\n"); refresh_screen();
+                    post_message_to_ws( NULL, MSG_PASTE, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 'z')
+                {
+                    //printf("UNDO\n"); refresh_screen();
+                    post_message_to_ws( NULL, MSG_UNDO, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 'a')
+                {
+                    //printf("SELECT ALL\n"); refresh_screen();
+                    post_message_to_ws( NULL, MSG_SELECT_ALL, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 'f')
+                {
+                    //printf("SEARCH\n"); refresh_screen();
+                    post_message_to_ws( NULL, MSG_SEARCH, long1, long2 );
+                    return 0;
+                }
+
+                if ( ctrl_status == TRUE && long1 == 's')
+                {
+                    //printf("SAVE\n"); refresh_screen();
+                    post_message_to_ws( NULL, MSG_SAVE, long1, long2 );
+                    return 0;
+                }
+
+
+                // Enviando combinação de shift + tecla de digitaçao.
+                post_message_to_ws( NULL, msg, long1,long2 );
+
                 // Send it to the window server.
                 //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
                 // #test
@@ -930,6 +973,8 @@ wmProcedure (
 // msg:
 // Syskeyup.
 // liberadas: teclas de funçao
+// syskeyup foi enviado antes pela função que chamou essa função.
+// não existe combinação de tecla de controle e syskeyup.
     case MSG_SYSKEYUP:
         // Se nenhum modificador esta acionado,
         // entao apenas enviamos a tecla de funçao 
@@ -947,20 +992,24 @@ wmProcedure (
 // msg:
 // Syskeydown.
 // Pressionadas: teclas de funçao
+// Se nenhum modificador esta acionado,
+// entao apenas enviamos a tecla de funçao 
+// para o window server.
+// Send it to the window server.
+// #bugbug:
+// Esse tratamento é feito pela rotina que chamou
+// essa rotina. Mas isso também pode ficar aqui.
+        
     case MSG_SYSKEYDOWN:
 
-        // Se nenhum modificador esta acionado,
-        // entao apenas enviamos a tecla de funçao 
-        // para o window server.
-        // Send it to the window server.
+        // Esse procedimento é para combinações de teclas.
         if( shift_status != TRUE &&
             ctrl_status != TRUE &&
             alt_status != TRUE )
         {
-            //wmSendInputToWindowManager(0,MSG_SYSKEYDOWN,long1,long2); 
             return 0;
         }
-        
+
         // Process a set of combinations.
         switch (long1){
 
@@ -969,13 +1018,13 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     // control + shift + F1
                     // Full ps2 initialization and launch the app.
+                    // #danger: Mouse is not well implemented yet.
                     if( shift_status == TRUE){
                         PS2_initialization();
                         __launch_app_via_initprocess(4001);
                         return 0;
                     }
-                    // Only launch the app.
-                    __launch_app_via_initprocess(4001);
+                    __launch_app_via_initprocess(4001);  //terminal
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -990,8 +1039,7 @@ wmProcedure (
 
             case VK_F2:
                 if (ctrl_status == TRUE){
-                     __launch_app_via_initprocess(4002);
-                     //powertrio_select_client(1);
+                     __launch_app_via_initprocess(4002);  //fileman
                      return 0;
                 }
                 if (alt_status == TRUE){
@@ -1006,8 +1054,7 @@ wmProcedure (
 
             case VK_F3:
                 if (ctrl_status == TRUE){
-                    //powertrio_select_client(2);
-                    __launch_app_via_initprocess(4003);
+                    __launch_app_via_initprocess(4003);  //editor
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1022,14 +1069,16 @@ wmProcedure (
 
             case VK_F4:
                 if (ctrl_status == TRUE){
-                    //powertrio_next();
                     //__launch_app_via_initprocess(4004);
                     //post_message_to_ws_thread( 
                     //    NULL, 33888, 0, 0 ); //#TEST
                     return 0;
                 }
+                // alt+f4: The vm handle this combination.
+                // We can't use it on vms.
                 if (alt_status == TRUE){
                     //post_message_to_ws( NULL, (int) 77104,0, 0 );
+                    return 0;
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(3);
@@ -1041,8 +1090,6 @@ wmProcedure (
             // Reboot
             case VK_F5:
                 if (ctrl_status == TRUE){
-                    //powertrio_select_client(0);
-                    //reboot();
                     //__launch_app_via_initprocess(4005);
                     //post_message_to_ws_thread( 
                         //NULL, 33888, 0, 0 ); //#TEST
@@ -1061,12 +1108,7 @@ wmProcedure (
             // 9216 - Launch the redpill application
             case VK_F6:
                 if (ctrl_status == TRUE){
-                    __launch_app_via_initprocess(4006);
-                    //powertrio_select_client(1);
-                    // #todo: 
-                    // shutdown. Only the ring3 applications
-                    // can shutdown via qemu for now. 
-                    //__kgwm_SendMessageToInitProcess(9216); 
+                    // __launch_app_via_initprocess(4006);
                     return 0; 
                 }
                 if (alt_status == TRUE){
@@ -1081,10 +1123,7 @@ wmProcedure (
             // Test 1.
             case VK_F7:
                 if (ctrl_status == TRUE){
-                    __launch_app_via_initprocess(4007);
-                    //powertrio_select_client(2);
-                    // Send message to init process to launch gdeshell.
-                    //__kgwm_SendMessageToInitProcess(9217);
+                    //__launch_app_via_initprocess(4007);
                     return 0;
                 }
                 if (alt_status == TRUE){
@@ -1112,6 +1151,7 @@ wmProcedure (
 
             case VK_F9:
                 if (ctrl_status == TRUE){
+                    // Enter ring0 embedded shell.
                     __enter_embedded_shell(FALSE);
                     return 0;
                 }
@@ -1131,6 +1171,7 @@ wmProcedure (
 
             case VK_F10:
                 if (ctrl_status == TRUE){
+                    // Exit ring0 embedded shell.
                     __exit_embedded_shell();
                     return 0;
                 }
@@ -1139,10 +1180,10 @@ wmProcedure (
                 }
                 if (shift_status == TRUE){
                     Background_initialize(COLOR_KERNEL_BACKGROUND);
-                    show_slots(); //See: tlib.c
+                    show_slots();   //See: tlib.c
                     //pages_calc_mem();
-                    refresh_screen();
                     //post_message_to_ws( NULL, (int) 88110,0, 0 );
+                    refresh_screen();
                 }
                 return 0;
                 break;
@@ -1151,6 +1192,7 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     // Mostra informaçoes sobre as threads.
                     show_slots();
+                    return 0;
                 }
                 if (alt_status == TRUE){
                     //post_message_to_ws( NULL, (int) 77111,0, 0 );
@@ -1166,6 +1208,7 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     // Mostra informaçoes sobre os processos.
                     show_process_information();
+                    return 0;
                 }
                 if (alt_status == TRUE){
                     //post_message_to_ws( NULL, (int) 77112,0, 0 );
@@ -1198,6 +1241,7 @@ wmProcedure (
 
 //unexpected_fail:
     return -1;
+
 fail:
     debug_print("wmProcedure: fail\n");
     refresh_screen();
@@ -1637,10 +1681,10 @@ int wmKeyEvent( tid_t tid, unsigned char raw_byte )
         if (Event_Message == MSG_KEYDOWN)
         {
             // Minúsculas.
-            if (capslock_status == FALSE)
+            if (capslock_status == FALSE && shift_status == FALSE)
             { Event_LongASCIICode = map_abnt2[Keyboard_ScanCode];   goto done; }
             // Maiúsculas.
-            if (capslock_status == TRUE)
+            if (capslock_status == TRUE || shift_status == TRUE)
             { Event_LongASCIICode = shift_abnt2[Keyboard_ScanCode]; goto done; }
             // ...
         }
@@ -1654,7 +1698,7 @@ int wmKeyEvent( tid_t tid, unsigned char raw_byte )
             if (capslock_status == FALSE)
             { Event_LongASCIICode = map_abnt2[Keyboard_ScanCode];   goto done; }
             // se pressionamos teclas de sistema como capslock desligado
-            if (capslock_status == TRUE)
+            if (capslock_status == TRUE || shift_status == TRUE)
             { Event_LongASCIICode = shift_abnt2[Keyboard_ScanCode]; goto done; }
             // ...
         }
@@ -1749,18 +1793,46 @@ done:
         // Somente ascii.
         // #todo: Nesse caso da pra enviar os primeiros ascii
         // que representam comandos.
-        if ( Event_Message == MSG_KEYDOWN ){
-            __feedSTDIN( (unsigned long) Event_LongASCIICode );
+        if ( Event_Message == MSG_KEYDOWN )
+        {
+            // Se uma tecla de controle estiver acionada,
+            // então não mandamos o evento para o arquivo,
+            // pois vamos chamar o procedimento local e
+            // considerarmos a combinação de teclas, 
+            // antes de enviarmos o evento.
+            if( alt_status != TRUE && 
+                ctrl_status != TRUE && 
+                shift_status != TRUE )
+            {
+                __feedSTDIN( (unsigned long) Event_LongASCIICode );
+            }
         }
-        // Envia para a thread de controle do window server.
-        // Todo tipo de tecla.        
-        post_message_to_ws(
-            NULL, 
-            Event_Message, 
-            Event_LongASCIICode,
-            Event_LongRawByte ); 
-    }
 
+        // Envia para a thread de controle do window server.
+        // Todo tipo de tecla.
+        // Se uma tecla de controle estiver acionada,
+        // então não mandamos o evento para a thread,
+        // pois vamos chamar o procedimento local e
+        // considerarmos a combinação de teclas, 
+        // antes de enviarmos o evento.
+        // O estado de capslock não importa aqui.
+        if( alt_status != TRUE && 
+            ctrl_status != TRUE && 
+            shift_status != TRUE )
+        {
+            post_message_to_ws(
+                NULL, 
+                Event_Message, 
+                Event_LongASCIICode,
+                Event_LongRawByte );
+            
+            // Não há tecla de controle pressionada.
+            // então podemos retornar depois de termos
+            // enviado uma mensagem para a thread.
+            // Dessa forma, evitamos chamar o procedimento local.
+            return 0;  //ok 
+        }
+    }
 
 // Process the event using the system's window procedures.
 // It can use the kernel's virtual console or
@@ -1894,12 +1966,11 @@ wmMouseEvent(
 // é um código portado da arquitetura de 32bit 
 // para a arquitetura de 64bit.
 
-    if ( event_id == MSG_MOUSEMOVE )
+    // IN: window pointer, event id, x, y.
+    if (event_id == MSG_MOUSEMOVE)
     {
-        // IN: window pointer, event id, x, y.
         post_message_to_ws(
             NULL, event_id, long1, long2 );
-
         return 0;
     }
 //----

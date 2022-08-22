@@ -326,6 +326,7 @@ extern unsigned long gSavedBPP;
 #include "ps/x64cont.h"
 #include "ps/ts.h"
 #include "ps/tasks.h"
+#include "ps/callback.h"
 #include "ps/process.h"
 #include "ps/thread.h"
 #include "ps/sched.h"
