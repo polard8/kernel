@@ -7,7 +7,7 @@ EDITION_NAME  = Angels/Warden
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 5
-VERSION_BUILD = 294
+VERSION_BUILD = 295
 # test: Compiling on gcc 11.2
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
@@ -164,73 +164,64 @@ control-tier:
 exposed-tier:
 	@echo ":: Building libraries and network server."
 
+#========================================
 # ::Build libraries.
 	$(Q) $(MAKE) -C exposed/lib/
 # Don't copy to the disk.
 
-# ::Build network server.
-	$(Q) $(MAKE) -C exposed/gns/ 
+#========================================
+# ::Building init process.
+	$(Q) $(MAKE) -C exposed/arctic/
 # Copy to the target folder.
-	-sudo cp exposed/gns/bin/GNSSRV.BIN  control/disk/
-	-sudo cp exposed/gns/bin/GNS.BIN     control/disk/
+	-sudo cp exposed/arctic/bin/INIT.BIN  control/disk/ 
 
 #========================================
-
-#3
-# The presentation tier.
-# Gramado Window System files.
-
-	@echo ":: Building Window server, clients and userland."
-
-
-# ::Building mod0 and init process.
-	$(Q) $(MAKE) -C exposed/init/
+# ::Building userland commands.
+# userland
+	@echo ":: Making userland."
+	$(Q) $(MAKE) -C exposed/azure/
 # Copy to the target folder.
-	-sudo cp exposed/bin/INIT.BIN  control/disk/ 
+	-sudo cp exposed/azure/bin/SHUTDOWN.BIN  control/disk/
+	-sudo cp exposed/azure/bin/REBOOT.BIN    control/disk/
+	-sudo cp exposed/azure/bin/SHELL.BIN     control/disk/
+	-sudo cp exposed/azure/bin/CAT.BIN       control/disk/
+	-sudo cp exposed/azure/bin/TPRINTF.BIN   control/disk/
+	-sudo cp exposed/azure/bin/SHOWFUN.BIN   control/disk/
+	-sudo cp exposed/azure/bin/UNAME.BIN     control/disk/
+	-sudo cp exposed/azure/bin/CMP.BIN       control/disk/
+	-sudo cp exposed/azure/bin/SUM.BIN       control/disk/
+	-sudo cp exposed/azure/bin/TASCII.BIN    control/disk/
+	-sudo cp exposed/azure/bin/FALSE.BIN     control/disk/
+	-sudo cp exposed/azure/bin/TRUE.BIN      control/disk/
+	#...
 
+#========================================
+# ::Build network server.
+	$(Q) $(MAKE) -C exposed/indigo/ 
+# Copy to the target folder.
+	-sudo cp exposed/indigo/bin/GNSSRV.BIN  control/disk/
+	-sudo cp exposed/indigo/bin/GNS.BIN     control/disk/
 
-
-# test
+#========================================
+	@echo ":: Copying Window server and clients."
+# test ---------------------------
 # Importing from another project.
-
 #burgundy
 #bugbug: This client has some special calls.
 #do not use it for tests here.
-	-sudo cp ../gws/burgundy/bin/GWSSRV.BIN  control/disk/
-	#-sudo cp ../gws/burgundy/bin/GWS.BIN     control/disk/
-	-sudo cp ../gws/burgundy/bin/GDM.BIN     control/disk/
-	-sudo cp ../gws/burgundy/bin/GDM2.BIN    control/disk/
-
+	-sudo cp ../hot/burgundy/bin/GWSSRV.BIN  control/disk/
+	#-sudo cp ../hot/burgundy/bin/GWS.BIN     control/disk/
+	-sudo cp ../hot/burgundy/bin/GDM.BIN     control/disk/
+	-sudo cp ../hot/burgundy/bin/GDM2.BIN    control/disk/
 #blue
-	-sudo cp ../gws/blue/bin/TERMINAL.BIN  control/disk/
-
+	-sudo cp ../hot/blue/bin/TERMINAL.BIN  control/disk/
 #beige
-	-sudo cp ../gws/beige/bin/BROWSER.BIN   control/disk/
-	-sudo cp ../gws/beige/bin/EDITOR.BIN    control/disk/
-	-sudo cp ../gws/beige/bin/FILEMAN.BIN   control/disk/
-	-sudo cp ../gws/beige/bin/CMDLINE.BIN   control/disk/
+	-sudo cp ../hot/beige/bin/EDITOR.BIN    control/disk/
+	-sudo cp ../hot/beige/bin/FILEMAN.BIN   control/disk/
+	-sudo cp ../hot/beige/bin/CMDLINE.BIN   control/disk/
+#attitude
+	-sudo cp ../hot/attitude/bin/BROWSER.BIN   control/disk/
 
-
-# ::Building userland commands.
-	$(Q) $(MAKE) -C exposed/userland/
-# Copy to the target folder.
-	-sudo cp exposed/userland/bin/SHUTDOWN.BIN  control/disk/
-	-sudo cp exposed/userland/bin/REBOOT.BIN    control/disk/
-	-sudo cp exposed/userland/bin/SHELL.BIN     control/disk/
-	-sudo cp exposed/userland/bin/CAT.BIN       control/disk/
-	-sudo cp exposed/userland/bin/TPRINTF.BIN   control/disk/
-	-sudo cp exposed/userland/bin/SHOWFUN.BIN   control/disk/
-	-sudo cp exposed/userland/bin/UNAME.BIN     control/disk/
-	-sudo cp exposed/userland/bin/CMP.BIN       control/disk/
-	-sudo cp exposed/userland/bin/SUM.BIN       control/disk/
-	-sudo cp exposed/userland/bin/TASCII.BIN    control/disk/
-	-sudo cp exposed/userland/bin/FALSE.BIN     control/disk/
-	-sudo cp exposed/userland/bin/TRUE.BIN      control/disk/
-	#...
-
-# Suspended
-# Copy the clients in another folder.
-#	-sudo cp exposed/userland/bin/*.BIN    control/disk/PROGRAMS/
 
 #===================================================
 #::2
@@ -286,9 +277,8 @@ danger-install-sdb:
 # == clean ========
 #
 
-clean:
-
 # Main files.
+clean:
 	-rm *.o
 	@echo ":)"
 
@@ -297,7 +287,8 @@ clean-all: clean
 	-rm *.VHD
 	-rm *.ISO
 
-# Base tier.
+# ==================
+# control tier.
 
 # Clear boot images
 	-rm -rf control/boot/x86/bin/*.BIN
@@ -305,39 +296,25 @@ clean-all: clean
 	-rm -rf control/new/KERNEL.BIN
 # Clear the ring0 module image
 	-rm -rf control/modr0/MOD0.BIN
-
-
+# Clear the disk cache
 	-rm -rf control/disk/*.BIN 
 	-rm -rf control/disk/*.BMP
-
 	-rm -rf control/disk/EFI/BOOT/*.EFI 
-
 	-rm -rf control/disk/GRAMADO/*.BIN 
 	-rm -rf control/disk/PROGRAMS/*.BIN 
-	-rm -rf control/disk/UBASE/BOOT/*.BIN 
-	-rm -rf control/disk/UBASE/BIN/*.BIN 
-	-rm -rf control/disk/UBASE/SBIN/*.BIN
+	-rm -rf control/disk/USERS/*.BIN 
 
+# ==================
+# exposed tier.
 
-# Communication tier.
-
-	-rm -rf exposed/gns/bin/*.BIN
-
-	-rm -rf exposed/lib/rtl/obj/*.o
-	-rm -rf exposed/lib/libgns/obj/*.o
-	-rm -rf exposed/lib/libio01/obj/*.o
-	-rm -rf exposed/lib/fonts/bin/*.FON
-
-# Presentation tier.
-
-	-rm -rf exposed/bin/*.BIN
-	-rm     exposed/bin/*.BIN
-	-rm     exposed/userland/bin/*.BIN
-
-	-rm -rf exposed/init/init/*.o
-	-rm -rf exposed/init/modr0/*.o
-
-	# ...
+	-rm exposed/arctic/bin/*.BIN
+	-rm exposed/arctic/init/*.o
+	-rm exposed/azure/bin/*.BIN
+	-rm exposed/indigo/bin/*.BIN
+	-rm exposed/lib/fonts/bin/*.FON
+	-rm exposed/lib/libgns/obj/*.o
+	-rm exposed/lib/libio01/obj/*.o
+	-rm exposed/lib/rtl/obj/*.o
 
 	@echo "Done ?"
 
