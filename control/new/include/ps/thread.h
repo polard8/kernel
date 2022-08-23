@@ -668,6 +668,11 @@ struct thread_d
     int MsgQueueTail;
 // ====================================================
 
+// #test
+// Contador de mensagens enviadas.
+// Também podemos contar alguns tipos de mensagens.
+
+    //unsigned long post_message_counter;
 
     // Quando um processo só pode receber mensagens de um 
     // determinado processo. Ou de qualquer um.

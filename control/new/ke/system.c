@@ -10,6 +10,7 @@ unsigned long sys_time_hz=0;
 static char *default_user_name = DEFAULT_USERNAME;
 
 
+static void __a_soft_place_to_fall(void);
 
 /*
  * systemGetSystemMetrics:
@@ -433,12 +434,7 @@ done:
 }
 
 
-
-
-
-
-
-void a_soft_place_to_fall(void)
+static void __a_soft_place_to_fall(void)
 {
     while (TRUE)
     { 
@@ -449,18 +445,21 @@ void a_soft_place_to_fall(void)
 }
 
 // The kernel hangs.
-void die (void){
-
-    // Bullet.
-    printf ("die: * System Halted\n");
-
-    if ( VideoBlock.useGui == TRUE ){
-        refresh_screen ();
+void die(void)
+{
+    if( Initialization.serial_log == TRUE ){
+        PROGRESS("die:\n");
     }
 
-    a_soft_place_to_fall();
+    if( Initialization.console_log == TRUE ){
+        printf("die: System Halted\n");
+        refresh_screen();
+    }
+
+    __a_soft_place_to_fall();
     die();
 }
+
 
 /*
  * system_get_pid:

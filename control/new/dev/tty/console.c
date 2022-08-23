@@ -3,11 +3,9 @@
 
 #include <kernel.h>
 
-
 // 
 // Imports
 //
-
 
 // from swlib.asm
 // Used to handle callbacks used by the window server.
@@ -2315,27 +2313,21 @@ int VirtualConsole_initialize(void)
     return 0;
 }
 
+// Console banner:
+// This will be the first message in the screen.
+// It is goona be seen at top/left corner of the screen.
 
-// This will be the firt message
-// at the top/left corner of the screen.
 void console_banner(unsigned long banner_flags)
 {
-
-// Serial
-    if ( Initialization.serial_log == TRUE ){
-        debug_print ("Welcome to Gramado OS!\n");
+// Serial debug
+    if (Initialization.serial_log == TRUE){
+        debug_print ("Gramado OS\n");
     }
-
 // Virtual console
-// #todo
-// Print some more basic info
-// just like the processor brand and the size of the ram.
-    if( Initialization.console_log == TRUE )
-    {
-        set_up_cursor (0,0);
-        printf ("Welcome to Gramado OS!\n");
+    if (Initialization.console_log == TRUE){
+        set_up_cursor(0,0);
+        printf ("Gramado OS\n");
     }
-    
     refresh_screen();
 }
 

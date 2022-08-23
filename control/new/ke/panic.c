@@ -13,11 +13,10 @@ void panic ( const char *format, ... )
 {
     register int *varg = (int *) (&format);
 
-
 // Se podemos usar o dispositivo serial para log.
     if ( Initialization.serial_log == TRUE )
     {
-        debug_print("panic: \n");
+        PROGRESS("panic: \n");
     }
 
 // Se podemos usar o console virtual para log.
