@@ -151,9 +151,9 @@ control-tier:
 
 
 # ::Build the ring0 module image.
-	$(Q) $(MAKE) -C control/modr0/
+	$(Q) $(MAKE) -C control/newm0/
 # Copy the ring0 module image.
-	sudo cp control/modr0/MOD0.BIN  control/disk/
+	sudo cp control/newm0/MOD0.BIN  control/disk/
 
 # Install BMPs
 	sudo cp control/data/themes/field/*.BMP  control/disk/
@@ -295,7 +295,7 @@ clean-all: clean
 # Clear newos kernel image
 	-rm -rf control/new/KERNEL.BIN
 # Clear the ring0 module image
-	-rm -rf control/modr0/MOD0.BIN
+	-rm -rf control/newm0/MOD0.BIN
 # Clear the disk cache
 	-rm -rf control/disk/*.BIN 
 	-rm -rf control/disk/*.BMP
