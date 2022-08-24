@@ -1468,21 +1468,6 @@ sys_open (
 
     debug_print ("sys_open: $\n");
 
-
-// #todo
-// primeiro vamos checar se o arquivo 
-// tem seu pathname registrado na tabela de dispositivos
-// do diretorio dev/
-// See: fs.h
-
-    //#todo
-    //Se encontrarmos uma entrada correspondente ao pathname,
-    //então deve retornar o ponteiro para um arquivo,
-    //então colocaremos esse ponteiro em uma entrada da lista de
-    //arquivos abertos do processo.
-
-    //fs_search_pathname_in_dev_dir(pathname);
-
 // Searth for a device associated with this path
 // in the deviceList[]
 // See: devmgr.c
@@ -1499,9 +1484,11 @@ sys_open (
             // current process structure
             // and return the fd.
             
+            printf("sys_open: #todo\n");
+            refresh_screen();
+            return -1;
         }
     }
-
 
 // Vamos carregar o arquivo que esta no disco.
 // See: fs.c
@@ -5240,7 +5227,7 @@ sys_write_file_to_disk (
 
 /*
  * sys_read_file_from_disk: 
- *     This is called by sys_open() in sys.c
+ *     This is called by sys_open().
  */
 
 // usada por open()
@@ -5273,22 +5260,17 @@ sys_read_file_from_disk (
     mode_t mode )
 {
     int __ret = -1;
+    int Status = -1;
 
     file  *__file;
-    size_t FileSize=-1;
-    
-    struct process_d *p;
+    size_t FileSize = -1;
 
+    struct process_d *p;
     int __slot = -1;  // ofd.
-    int Status = -1;
 
     void *buff;
 
-
-    debug_print ("sys_read_file_from_disk: $\n");
-
-    pid_t current_process = (pid_t) get_current_process();
-
+    // debug_print ("sys_read_file_from_disk: $\n");
 
 // filename
     if ( (void*) file_name == NULL ){
@@ -5381,9 +5363,9 @@ sys_read_file_from_disk (
 
 __go:
 
-// Process.
-  
-    p = (struct process_d *) processList[current_process];
+// Process
+
+    p = (struct process_d *) get_current_process_pointer();
 
     if ( (void *) p == NULL ){
         printf("sys_read_file_from_disk: p\n");
@@ -5426,7 +5408,7 @@ __OK:
 // initialize.
     __file->used = TRUE;
     __file->magic = 1234;
-    __file->pid = (pid_t) current_process;
+    __file->pid = (pid_t) p->pid; //current_process;
     __file->uid = (uid_t) current_user;
     __file->gid = (gid_t) current_group;
 

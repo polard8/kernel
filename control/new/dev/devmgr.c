@@ -5,45 +5,50 @@
 #include <kernel.h>  
 
 
-// Search a neme into the list.
+// Search a name into the device list.
 // Used by sys_open();
-// OUT: 
+// OUT:
 // fp or NULL
-
-file *devmgr_search_in_dev_list( char *path )
-{
 // #todo
 // Só podemos chamar isso se a lista ja estiver inicializada.
-// precisamos de uma flag.
+// precisamos de uma flag. Pois os valores podem estar sujos.
 
+file *devmgr_search_in_dev_list(char *path)
+{
     int i=0;
+    size_t PathSize=0;
     struct device_d *tmp_dev;
+    void *p;
 
-    if( (void*) path == NULL )
+    if( (void*) path == NULL ){
         return NULL;
+    }
 
-    size_t path_size = strlen(path);
-
-    if(path_size>=64)
+    PathSize = (size_t) strlen(path);
+    if (PathSize >= 64){
         return NULL;
+    }
 
     for (i=0; i<DEVICE_LIST_MAX; i++)
     {
         tmp_dev = (struct device_d *) deviceList[i];
     
-        // is it a valid device?
-        if( (void*) tmp_dev != NULL )
+        // Is it a valid pointer?
+        if ( (void*) tmp_dev != NULL )
         {
-            // is it a valid structure
-            if( tmp_dev->magic == 1234 )
+            // Is it a valid structure?
+            if ( tmp_dev->magic == 1234 )
             {
-                if( (void*) tmp_dev->mount_point != NULL )
+                // Is this a valid mount point?
+                p = (void*) tmp_dev->mount_point;
+                if ( (void*) p != NULL )
                 {
-                    if( strncmp( tmp_dev->mount_point, path, path_size ) == 0 )
+                    if ( strncmp( p, path, PathSize ) == 0 )
                     {
-                        printf ("test: device found in the list\n");
+                        // #debug
+                        printf ("Device found!\n");
                         refresh_screen();
-                        
+
                         return (file *) tmp_dev->__file;
                     }
                 }

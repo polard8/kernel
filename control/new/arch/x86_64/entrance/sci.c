@@ -1368,8 +1368,8 @@ void *sci0 (
         //rede: 12,13,14,15
 
         // 16 - open()
-        // In ring0, see: fs.c
         // In ring3, see: fcntl.c
+        // In ring0, see: fs.c
         // IN: pathname, flags, mode
         // OUT: fd
 
