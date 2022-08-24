@@ -4,7 +4,8 @@
 #ifndef ____PS2MOUSE_H
 #define ____PS2MOUSE_H    1
 
-
+// 0~3
+#define PS2MOUSE_RESULUTION_TEST  1
 #define PS2MOUSE_RESULUTION    3
 
 // Sampling Rate: 

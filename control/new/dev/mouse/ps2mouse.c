@@ -37,8 +37,8 @@ static char buffer_mouse[4];
 unsigned int mbuttons_old_state[5];
 
 
-static long mouse_x = 0;
-static long mouse_y = 0;
+static long mouse_x=0;
+static long mouse_y=0;
 static long saved_mouse_x=0;
 static long saved_mouse_y=0;
 
@@ -81,6 +81,30 @@ static int ps2_mouse_moving=0;
 // ID support:
 // #define PS2MOUSE_INTELLIMOUSE_ID 0x03
 // ...
+
+
+static void __ps2mouse_parse_data_packet(void);
+static void __initialize_mouse_position(void);
+
+// ----------------------------------------------------
+
+static void __initialize_mouse_position(void)
+{
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+
+    deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
+    deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
+    if (deviceWidth==0 || deviceHeight==0)
+    {
+        panic("initialize_mouse_position: w h\n");
+    }
+
+    mouse_x = (long) (deviceWidth >> 1);
+    mouse_y = (long) (deviceHeight >> 1);
+    saved_mouse_x = (long) mouse_x;
+    saved_mouse_y = (long) mouse_x;
+}
 
 
 // #deprecated!
@@ -158,7 +182,8 @@ quit:
 // an updated x and y values.
 // #todo: We need to review the number given to the buttons,
 // 1,2,3 or 0,1,2. What is the right standard?
-void __ps2mouse_parse_data_packet (void)
+
+static void __ps2mouse_parse_data_packet(void)
 {
 // The first byte.
     unsigned char Flags=0;
@@ -178,7 +203,6 @@ void __ps2mouse_parse_data_packet (void)
     int button2_changed=FALSE;
 
     int Status=-1;
-
 
 // Save the old values of x and y.
     saved_mouse_x = mouse_x;
@@ -221,14 +245,15 @@ void __ps2mouse_parse_data_packet (void)
 // Final x and y positions.
 //
 
-// It is relative.
     mouse_x = (long) (mouse_x + mouse_packet_x);
     mouse_y = (long) (mouse_y - mouse_packet_y);
 
-// Limits.
-// #bugbug: Not good for high resolutions.
     mouse_x = (long) (mouse_x & 0x000003FF );
     mouse_y = (long) (mouse_y & 0x000003FF );
+
+//
+// Buttons
+//
 
 // Left button.
     if ( ( Flags & MOUSE_LEFT_BUTTON ) == 0 ){
@@ -411,19 +436,8 @@ void ps2mouse_initialize_device (void)
         NULL );        // Not a tty device. (not for now)
 //====================================
 
-
-
-
-
 // pointer.
-
-    //mouse_x = (long) (SavedX >> 1);
-    //mouse_y = (long) (SavedY >> 1);
-    mouse_x = (long) 8;
-    mouse_y = (long) 8;
-    saved_mouse_x = (long) mouse_x;
-    saved_mouse_y = (long) mouse_y;
-
+    __initialize_mouse_position();
 
 //++
 //======================================================
@@ -520,13 +534,15 @@ void ps2mouse_initialize_device (void)
 
     zzz_mouse_write(__PS2MOUSE_SET_RESOLUTION);
     mouse_expect_ack(); // ACK
-    zzz_mouse_write(PS2MOUSE_RESULUTION);  //3
+    zzz_mouse_write(PS2MOUSE_RESULUTION);  //0~3
     mouse_expect_ack(); // ACK
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
 // ========================================
-//set scaling 1:1
-// Scaling: Apply a simple non-linear distortion to mouse movement.
+// set scaling 1:1
+// Scaling: 
+// Apply a simple non-linear distortion 
+// to mouse movement.
     zzz_mouse_write(0xE6);
     mouse_expect_ack(); // ACK
 
@@ -534,7 +550,6 @@ void ps2mouse_initialize_device (void)
 // Enable the mouse
     zzz_mouse_write(0xF4);
     mouse_expect_ack(); // ACK
-
 
 //
 // #test
@@ -682,6 +697,14 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 //=================================================
 //--
 
+// resolution again
+    zzz_mouse_write(__PS2MOUSE_SET_RESOLUTION);
+    mouse_expect_ack(); // ACK
+    zzz_mouse_write(PS2MOUSE_RESULUTION);  //0~3
+    mouse_expect_ack(); // ACK
+    PS2Mouse.resolution = PS2MOUSE_RESULUTION;
+
+
     PS2Mouse.initialized = TRUE;
     debug_print ("ps2mouse_initialize_device: done\n");
 }
@@ -746,7 +769,6 @@ void DeviceInterface_PS2Mouse(void)
 // buffer full?
     if (!(status & I8042_BUFFER_FULL))
         return;
-
 // which device?
 // Is it a mouse device?
 // Return if it is not a mouse device.
@@ -758,20 +780,8 @@ void DeviceInterface_PS2Mouse(void)
         return;
 // =============================================
 
-
-//#debug
-//#todo: deletar isso.
-    //debug_print ("[Get byte]: #bugbug PF\n");
-
-
-// Get the byte.
-
-    //_byte = (unsigned char) zzz_mouse_read();
+// Get the byte
     _byte = (unsigned char) in8(0x60);
-
-// #bugbug
-// Talvez esses bytes so importem se forem pegos 
-// na porta de status, não na porta 0x60
 
 // ACK: 
 // Significa início do pacote quando no modo
@@ -841,9 +851,9 @@ void DeviceInterface_PS2Mouse(void)
         break;
     };
 
-   // #todo
-   // Coloque os pacotes num arquivo,
-   // o window server poderá ler depois.
+// #todo
+// Coloque os pacotes num arquivo,
+// o window server poderá ler depois.
    //write_packet(mousefp,...)
 }
 

@@ -2022,35 +2022,42 @@ wmMouseEvent(
     long long2 )
 {
     int Status=-1;
+    //static long old_x=0;
+    //static long old_y=0;
 
-    //debug_print ("xxxMouseEvent:\n");
+// data:
+    unsigned long button_number = (unsigned long) (long1 & 0xFFFF);
+    //unsigned long ? = long2;
 
+
+    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceHeight = (unsigned long) screenGetHeight();
+
+    deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
+    deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
+    if (deviceWidth==0 || deviceHeight==0)
+    {
+        panic("wmMouseEvent: w h\n");
+    }
 
 // Event id:
     if (event_id<0){
         goto fail;
     }
 
-// data:
-    unsigned long button_number = (unsigned long) (long1 & 0xFFFF);
-    //unsigned long ? = long2;
-
 // ====================================
 // Button events:
 // Buttons:
 // Pressionado ou liberado.
 // Post message.
+// #todo
+// Se uma tecla de controle estiver precionada,
+// então podemos enviar o status das teclads de controle
+// atraves do segundo long.
+// IN: window pointer, event id, button number. button number.
 
-    if( event_id == MSG_MOUSEPRESSED ||
-        event_id == MSG_MOUSERELEASED )
+    if ( event_id == MSG_MOUSEPRESSED || event_id == MSG_MOUSERELEASED )
     {
-
-        // #todo
-        // Se uma tecla de controle estiver precionada,
-        // então podemos enviar o status das teclads de controle
-        // atraves do segundo long.
-
-        // IN: window pointer, event id, button number. button number.
         post_message_to_ws(
             NULL,
             event_id,
@@ -2059,32 +2066,21 @@ wmMouseEvent(
         return 0;
     }
 
-
 // ====================================
 // mouse move events:
 
-    //old: for ereasing
-    static long old_x=0;
-    static long old_y=0;
-
-    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
-    unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
-// #bugbug
-// low limits? 
-    deviceWidth  = (deviceWidth & 0xFFFF);
-    deviceHeight = (deviceHeight & 0xFFFF);
-
-    if ( long1 < 1 ){ long1 = 1; }
-    if ( long2 < 1 ){ long2 = 1; }
-    //if ( x > (SavedX-16) ){ x = (SavedX-16); }
-    //if ( y > (SavedY-16) ){ y = (SavedY-16); }
-
-    if ( long1 > (deviceWidth-1)  ){ long1 = (deviceWidth-1);  }
-    if ( long2 > (deviceHeight-1) ){ long2 = (deviceHeight-1); }
-
+    if ( long1 < 1 ){ long1=1; }
+    if ( long2 < 1 ){ long2=1; }
+    if ( long1 >= deviceWidth ) { long1 = (deviceWidth-1);  }
+    if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
 
 //----
+
+    //#debug
+    //printf ("w:%d h:%d\n",deviceWidth, deviceHeight);
+    //printf ("x:%d y:%d\n",long1, long2);
+    //refresh_screen();
+    //while(1){}
 
 // #test
 // Draw rectangle.
@@ -2095,12 +2091,15 @@ wmMouseEvent(
 // tipagem de algumas variáveis ... pois esse
 // é um código portado da arquitetura de 32bit 
 // para a arquitetura de 64bit.
+// IN: window pointer, event id, x, y.
 
-    // IN: window pointer, event id, x, y.
     if (event_id == MSG_MOUSEMOVE)
     {
         post_message_to_ws(
-            NULL, event_id, long1, long2 );
+            NULL, 
+            event_id, 
+            (unsigned long) long1, 
+            (unsigned long) long2 );
         return 0;
     }
 //----

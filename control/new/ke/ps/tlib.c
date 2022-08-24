@@ -401,31 +401,35 @@ post_message_to_ws (
     unsigned long long1, 
     unsigned long long2 )
 {
-
     tid_t tid=-1;
 
-    if( WindowServerInfo.initialized != TRUE )
+    if(WindowServerInfo.initialized != TRUE){
         return -1;
+    }
 
     tid = (tid_t) WindowServerInfo.tid;
          
-    if ( tid < 0 || 
-         tid >= THREAD_COUNT_MAX )
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         return -1;
     }
 
+    //if(msg==MSG_MOUSEMOVE){
+    //    printf ("x:%d y:%d\n",long1, long2);
+    //    refresh_screen();
+    //}
+
 // #todo
 // precisamos de uma flag que indique que isso deve ser feito.
 // See: tlib.c
+// IN: tid, window pointer, msgcode, data1, data2.
 
-    // IN: tid, window pointer, msgcode, data1, data2.
     post_message_to_tid(
         (int) tid,
         NULL,
         (int) msg,
-        long1,
-        long2 );
+        (unsigned long) long1,
+        (unsigned long) long2 );
 
    return 0;
 }
