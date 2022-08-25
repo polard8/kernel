@@ -1454,6 +1454,7 @@ sys_open (
     mode_t mode )
 {
     int value = -1;
+    file *fp;
 
 // #todo:
 // check arguments.
@@ -1462,22 +1463,25 @@ sys_open (
         return (int) (-EINVAL);
     }
 
+    if ( *pathname == 0 ){
+        return (int) (-EINVAL);
+    }
+
 // ??
 // creat chama open.
 // open tenta ler num arquivo que nao existe?
 
-    debug_print ("sys_open: $\n");
+    //debug_print ("sys_open: $\n");
 
 // Searth for a device associated with this path
 // in the deviceList[]
 // See: devmgr.c
 
-    file *dev_fp;
-    dev_fp = (file *) devmgr_search_in_dev_list(pathname);
+    fp = (file *) devmgr_search_in_dev_list(pathname);
 
-    if( (void*) dev_fp != NULL )
+    if ( (void*) fp != NULL )
     {
-        if(dev_fp->isDevice == TRUE )
+        if (fp->isDevice == TRUE)
         {
             // #todo 
             // Put it into the list inside the
@@ -1504,10 +1508,10 @@ sys_open (
         return (int) -1;
     }
 
-    // The limit is 32.
-    // Too many open files.
-    if (value>31)
-    {
+// The limit is 32.
+// Too many open files.
+
+    if (value>31){
         return (int) (-EMFILE);
     }
 
@@ -2718,7 +2722,6 @@ int fsInit (void)
 // #todo: 
 // Devemos checar o tipo da partiçao de boot. 
 // Se nao aqui, depois!
-
     fat16Init();
 
 // Init dev/ dir.
@@ -2837,15 +2840,11 @@ int fsInit (void)
 // == pipe_gramadocore_init_execve ================================ 
 //
 
-	//
-	// ## Inicializando os pipes usados em execve ## 
-	//
-
-	//gramado core init execve 
-
-    //#todo: mudar para pipe_gramadocore_init_execve_fp
-
-	//aloca memoria para a estrutura.
+// ## Inicializando os pipes usados em execve ## 
+// gramado core init execve 
+// #todo: mudar para pipe_gramadocore_init_execve_fp
+// aloca memoria para a estrutura.
+    
     pipe_gramadocore_init_execve = (file *) kmalloc ( sizeof(file) );
 
     if ( (void *) pipe_gramadocore_init_execve == NULL ){
@@ -3168,7 +3167,6 @@ void fs_init_fat (void)
         panic ("fs_init_fat: fat->type\n");
     }
 
-
     bootvolume_fat->volume = NULL;
 
     // ...
@@ -3278,16 +3276,12 @@ fsFAT16ListFiles (
 
     // iterator
     int i=0;
-
     // offset
     int j=0;  
-    
     // Max number of entries.
     int max = number_of_entries;
-
     //8.3
     char NameString[12];
-
     // Buffer.
     unsigned short *shortBuffer = (unsigned short *) dir_address;
     unsigned char  *charBuffer  = (unsigned char *)  dir_address;
@@ -3310,16 +3304,14 @@ fsFAT16ListFiles (
     // printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
     //        dir_name );
             
-    // Number of entries.
-
+// Number of entries.
     if ( number_of_entries <= 0 ){
         debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries\n");
         goto fail;
     }
 
-    // #bugbug
-    // Number of entries.
-
+// #bugbug
+// Number of entries.
     if ( number_of_entries >= 512 )
     {
         debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries is too big\n");
@@ -3366,7 +3358,6 @@ fail:
 done:
     refresh_screen();
 }
-
 
 
 /*
@@ -3423,13 +3414,12 @@ void fsInitializeWorkingDiretoryString (void)
 	// ## separador ##
     strcat ( CWD.path, FS_PATHNAME_SEPARATOR );
 
+//
+// volume root dir 
+//
 
-	//
-	// volume root dir 
-	//
-
-    // #todo
-    // Check overflow.
+// #todo
+// Check overflow.
 
     if ( current_volume < 0 ){
         panic ("fsInitializeWorkingDiretoryString: current_volume\n");
@@ -3495,11 +3485,10 @@ void fsInitializeWorkingDiretoryString (void)
         CWD.path[31] = 0;
     };
 
-    // #bugbug
-    // What is the limit for this string ? 32 bytes.
-    // See: rtl/fs/path.h and globals.h
-
-    // Separador
+// #bugbug
+// What is the limit for this string ? 32 bytes.
+// See: rtl/fs/path.h and globals.h
+// Separador
 
     strcat ( 
         CWD.path, 
@@ -3551,7 +3540,6 @@ int fsInitTargetDir (unsigned long dir_address, char *dir_name)
 {
     int i=0;
 
-
     current_target_dir.used  = TRUE;
     current_target_dir.magic = 1234;
 
@@ -3559,9 +3547,7 @@ int fsInitTargetDir (unsigned long dir_address, char *dir_name)
         current_target_dir.name[i] = '\0';
     };
 
-
 // Dir address
-
     if (dir_address == 0)
         panic("fsInitTargetDir: dir_address\n");
 
@@ -3697,12 +3683,10 @@ fail:
 
 
 /*
- *********************************
  * fsListFiles:
  *     Lista os arquivos em um diret�rio, dados os �ndices de disco, 
  * volume e diret�rio.
  */
-
 // #bugbug
 // Do not list this in ring0.
 
@@ -3726,8 +3710,8 @@ fsListFiles (
     printf ("fsListFiles: disk={%d} vol={%d} dir={%d}\n", 
         disk_id, volume_id, directory_id );
 
-	// Show!
-	// Se o diret�rio selecionado � o diret�rio raiz do VFS.
+// Show!
+// Se o diret�rio selecionado � o diret�rio raiz do VFS.
 
     if ( current_disk == 0 && current_volume == 0 && current_directory == 0 )
     {
@@ -4202,15 +4186,17 @@ void fs_fntos ( char *name )
     char ext[4];
     ext[0] = 0;  ext[1] = 0;  ext[2] = 0;  ext[3] = 0;
 
-    //#test
+    if ( (void*) name == NULL ){
+        return;
+    }
 
-    if ( (void*) name == NULL ){ return; }
+    if (*name == 0){
+        return;
+    }
 
-    if (*name == 0){ return; }
-
-
-    // Transforma em maiúscula enquanto não achar um ponto.
-    // #bugbug: E se a string já vier maiúscula teremos problemas.
+// Transforma em maiúscula enquanto não achar um ponto.
+// #bugbug: 
+// E se a string já vier maiúscula teremos problemas.
 
     while ( *name && *name != '.' )
     {
@@ -4223,9 +4209,9 @@ void fs_fntos ( char *name )
         ns++;
     };
 
-    // #bugbug
-    // Esse negócio de acrescentar a extensão
-    // não é bom para todos os casos.
+// #bugbug
+// Esse negócio de acrescentar a extensão
+// não é bom para todos os casos.
 
     if ( name[0] == '\0' && ns <= 8 )
     {
@@ -4260,13 +4246,11 @@ void fs_fntos ( char *name )
         }
     };
 
-
-
-CompleteWithSpaces:
-
 // Acrescentamos ' ' até completarmos as oito letras do nome.
 // Acrescentamos a extensão
 // Finalizamos.
+
+CompleteWithSpaces:
  
     while (ns < 8)
     {
@@ -4290,14 +4274,13 @@ int fs_get_free_fd_from_pid (int pid)
     struct process_d *p;
     int __slot=0;
 
-    //#todo max
-    if ( pid<0 ){
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
         debug_print ("fs_get_free_fd_from_pid: [FAIL] pid\n");
         return -1;
     }
 
-    // #bugbug
-    // Check limit
+// #bugbug
+// Check limit
 
 //
 // Process.
@@ -4312,7 +4295,6 @@ int fs_get_free_fd_from_pid (int pid)
         debug_print ("fs_get_free_fd_from_pid: p validation\n");
         return -1;
     }
-
 
 // Pick a free one.
 // and return the index.
@@ -4330,7 +4312,6 @@ int fs_get_free_fd_from_pid (int pid)
  * fs_initialize_process_cwd:
  *     Cada processo deve inicialiar seus dados aqui. 
  */
-
 // #todo:
 // handle return value ...
 // What functions is calling us?
@@ -4340,8 +4321,7 @@ int fs_initialize_process_cwd ( int pid, char *string )
     struct process_d *p;
     int i=0;
 
-
-    if (pid<0){
+    if (pid<0 || pid >= PROCESS_COUNT_MAX){
         debug_print ("fs_initialize_process_cwd: pid\n");
         return 1;
     }
@@ -4394,29 +4374,27 @@ int fs_initialize_process_cwd ( int pid, char *string )
 
 // #todo: Describe 'n'.
 
-void fs_pathname_backup ( int pid, int n ){
-
+void fs_pathname_backup ( int pid, int n )
+{
     struct process_d *p;
     int i=0;
 
 // CWD
-
     if ( CWD.initialized != TRUE ){
         printf ("fs_pathname_backup: [FAIL] CWD not initialized\n"); 
         return;
     } 
 
 // pid
-
-    if ( pid<0 ){
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
         printf ("fs_pathname_backup: [FAIL] pid\n"); 
         return;
     }
 
 // n
-
-    if (n<0) {  return;  }
-    if (n==0){  return;  }
+    if (n <= 0) {
+        return;
+    }
 
 // Process
 
@@ -4468,13 +4446,11 @@ int fs_print_process_cwd (int pid)
 {
     struct process_d *p;
 
-
     debug_print ("fs_print_process_cwd:\n");
     printf      ("fs_print_process_cwd:\n");
 
 // pid
-
-    if (pid<0){
+    if (pid<0 || pid>=PROCESS_COUNT_MAX){
         debug_print ("fs_print_process_cwd: [FAIL] pid\n");
         return -1;
     }
@@ -4523,7 +4499,6 @@ int fs_print_process_cwd (int pid)
 
 void fs_show_file_info (file *f)
 {
-
     if ((void*)f==NULL)
     {
         debug_print("fs_show_file_info: fail\n");
@@ -4545,7 +4520,6 @@ void fs_show_file_table(void)
 {
     file *f;
     int i=0;
-
 
     printf ("\nfile_table:\n");
     
@@ -4581,7 +4555,6 @@ void fs_show_inode_table(void)
 {
     struct inode_d *inode;
     register int i=0;
-
 
     printf ("\n inode_table: \n");
     
@@ -4771,11 +4744,10 @@ fsSaveFile (
         panic ("fsSaveFile: [FAIL] max dir entries");
     }
 
-
-	// file_size
-	// #todo: 
-	// precisamos implementar um limite para o tamanho do arquivo,
-	// principamente nessa fase de teste.
+// file_size
+// #todo: 
+// precisamos implementar um limite para o tamanho do arquivo,
+// principamente nessa fase de teste.
 
     // #bugbug
     // Limite provisorio
@@ -4838,9 +4810,9 @@ fsSaveFile (
         i++;    // Incrementa a quantidade de busca.
     }; 
 
-    // Fail
-    // Nossa busca por clusters livres dentro da fat não deu certo.
-    // Provavelmente não encontramos uma quantidade suficiente.
+// Fail
+// Nossa busca por clusters livres dentro da fat não deu certo.
+// Provavelmente não encontramos uma quantidade suficiente.
 
 out_of_range:  
 
@@ -4914,15 +4886,16 @@ save_file:
 
     // Reserved.
     DirEntry[12] = 0; 
-
     // Creation time. 14 15 16
-    DirEntry[13] = 0x08;  DirEntry[14] = 0x08;  DirEntry[15] = 0xb6;
-
+    DirEntry[13] = 0x08;  
+    DirEntry[14] = 0x08;  
+    DirEntry[15] = 0xb6;
     // Creation date.
-    DirEntry[16] = 0xb6;  DirEntry[17] = 0x4c;
-
+    DirEntry[16] = 0xb6; 
+    DirEntry[17] = 0x4c;
     // Access date.
-    DirEntry[18] = 0xb8;  DirEntry[19] = 0x4c;
+    DirEntry[18] = 0xb8;
+    DirEntry[19] = 0x4c;
 
 	// ??
 	// First cluster. 
@@ -4931,10 +4904,11 @@ save_file:
     DirEntry[21] = 0;
 
     // Modifield time.
-    DirEntry[22] = 0xa8;  DirEntry[23] = 0x49;
-
+    DirEntry[22] = 0xa8;
+    DirEntry[23] = 0x49;
     // Modifield date.
-    DirEntry[24] = 0xb8;  DirEntry[25] = 0x4c;
+    DirEntry[24] = 0xb8;
+    DirEntry[25] = 0x4c;
 
     // First cluster. Low word.
     // 0x1A and 0x1B
@@ -4952,43 +4926,43 @@ save_file:
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[31] = (char) size_in_bytes;
 
-	// #importante:
-	// Vamos encontrar uma entrada livre no diretório para
-	// salvarmos o nome do arquivo.
-	// Copia o nome para dentro da entrada do diretório.
-	// Obs: As entradas são de 32 bytes. Como root[] é um 
-	// array de short então faremos um deslocamento de 16 shorts.
-	// root[]
-	// #importante: root[] é um array de short.	
-	// IN: 
-	// Endereço do diretótio e número máximo de entradas.
-	// #todo: 
-	// Talvez possamos ampliar esse número para o máximo 
-	// de entradas no diretório.
-	// #bugbug: A quantidade de entrada depende to diretório.
-	// See: search.c
+// #importante:
+// Vamos encontrar uma entrada livre no diretório para
+// salvarmos o nome do arquivo.
+// Copia o nome para dentro da entrada do diretório.
+// Obs: As entradas são de 32 bytes. Como root[] é um 
+// array de short então faremos um deslocamento de 16 shorts.
+// root[]
+// #importante: root[] é um array de short.	
+// IN: 
+// Endereço do diretótio e número máximo de entradas.
+// #todo: 
+// Talvez possamos ampliar esse número para o máximo 
+// de entradas no diretório.
+// #bugbug: A quantidade de entrada depende to diretório.
+// See: search.c
 
-
-    // IN: 
-    // directory address, max number of entries.
+// IN: 
+// directory address, max number of entries.
     
-    FreeIndex = (int) findEmptyDirectoryEntry ( 
-                          dir_address, 
-                          dir_entries );
+    FreeIndex = 
+        (int) findEmptyDirectoryEntry ( 
+                  dir_address, 
+                  dir_entries );
 
     if ( FreeIndex == -1 ){
         printf ("fsSaveFile: [FAIL] No empty entry\n");
         goto fail;
     }
 
-    // 32/2 = 16 words.
-    // Offset:
-    // Deslocamento dentro do diretório.
-    // representa o início da entrada que encontramos.
-    // Encontramos multiplicando o índice da entrada pelo 
-    // tamanho da entrada.
-    // Copy entry into the root in the memory.
-    // Copia 32 bytes.
+// 32/2 = 16 words.
+// Offset:
+// Deslocamento dentro do diretório.
+// representa o início da entrada que encontramos.
+// Encontramos multiplicando o índice da entrada pelo 
+// tamanho da entrada.
+// Copy entry into the root in the memory.
+// Copia 32 bytes.
  
     EntrySize = (FAT16_ENTRY_SIZE/2);
     Offset = (int) ( FreeIndex * EntrySize );
@@ -4998,7 +4972,6 @@ save_file:
 
 // reset
 // Reiniciamos o controlador antes de usarmos.
-
 
 //resetIDE:
 
@@ -5013,18 +4986,17 @@ save_file:
 
     i=0; 
 
-	//#debug 
-	//improvisando um endereço válido
+//#debug 
+//improvisando um endereço válido
 
     unsigned long address = (unsigned long) file_address;
 
-
-    //
-    // Save!
-    //
+//
+// Save!
+//
     
-    // Saving the file into the disk.
-    // Cluster by cluster.
+// Saving the file into the disk.
+// Cluster by cluster.
 
 //SavingFile:
 
@@ -5041,15 +5013,14 @@ save_file:
         //what??
 
 
-    // Loop
+// Loop
+// Pegamos o atual na lista.
+// Se ele eh o sinalizador de fim de lista, 
+// entao entao colocamos o sinalizador de fim de arquivo
+// no offset indicado pelo penultimo elemento da lista.
 
     while (TRUE){
- 
-        // Pegamos o atual na lista.
-        // Se ele eh o sinalizador de fim de lista, 
-        // entao entao colocamos o sinalizador de fim de arquivo
-        // no offset indicado pelo penultimo elemento da lista.
-        
+
         next = fat16ClustersToSave[i];
 
         // #debug.
@@ -5109,43 +5080,39 @@ save_file:
         // ??
     };
 
-    //
     // FAIL
-    //
 
     debug_print ("fsSaveFile: Loop fail\n");
     goto fail;
    
-    //
-    // == done ========================================
-    //
+//
+// == done ========================================
+//
 
-    // Saving rood dir and FAT.
-    // Nesse momento já salvamos os clusters do arquivo.
-    // OK. Funcionou no qemu.
-    // #bugbug
-    // Não vamos mais salvar a fat toda vez que salvarmos
-    // um arquivo.
-    // Vamos salvar a FAT apenas no fim da sessão.
-    // Como ainda não temos shutdown, então vamos salvar 
-    // quando chamarmos reboot.
-    // #important
-    // Updating the cache state.
+// Saving rood dir and FAT.
+// Nesse momento já salvamos os clusters do arquivo.
+// OK. Funcionou no qemu.
+// #bugbug
+// Não vamos mais salvar a fat toda vez que salvarmos
+// um arquivo.
+// Vamos salvar a FAT apenas no fim da sessão.
+// Como ainda não temos shutdown, então vamos salvar 
+// quando chamarmos reboot.
+// #important
+// Updating the cache state.
 
 do_save_dir_and_fat:
 
     debug_print ("fsSaveFile: [DEBUG] do_save_dir_and_fat\n");
     
-    // Save root
-    // #bugbug: We need to save a directory, not the root.
-
-    // IN: root dir address, root dir lba, root dir size in sectors.
+// Save root
+// #bugbug: We need to save a directory, not the root.
+// IN: root dir address, root dir lba, root dir size in sectors.
 
     //if ( dir_address == ROO...
     fs_save_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
 
-    // Sinalizando que o cache de fat precisa ser salvo.
-
+// Sinalizando que o cache de fat precisa ser salvo.
     fs_fat16_cache_not_saved();
 
     debug_print ("fsSaveFile: done\n");
@@ -5161,18 +5128,16 @@ fail:
 
 }
 
+
 /*
- *****************************
  * sys_write_file_to_disk:
  *     Interface para salvar arquivo ou diretório.
  *     Isso pode ser usado para criar um diretório ou 
  * copiar um diretório. 
  */
-
 // #todo:
 // vamos fazer igual ao sys_read_file 
 // e criarmos opções ... se possível.
-
 // IN: 
 // name, size in sectors, size in bytes, adress, flag.
 
@@ -5204,15 +5169,16 @@ sys_write_file_to_disk (
     //taskswitch_lock ();
     //scheduler_lock ();
 
-    __ret = (int) fsSaveFile ( 
-                      VOLUME1_FAT_ADDRESS, 
-                      VOLUME1_ROOTDIR_ADDRESS, 
-                      FAT16_ROOT_ENTRIES,
-                      (char *) file_name,    
-                      (unsigned long) file_size,       
-                      (unsigned long) size_in_bytes,  
-                      (char *) file_address,          
-                      (char) flag );                  
+    __ret = 
+        (int) fsSaveFile ( 
+                  VOLUME1_FAT_ADDRESS, 
+                  VOLUME1_ROOTDIR_ADDRESS, 
+                  FAT16_ROOT_ENTRIES,
+                  (char *) file_name,    
+                  (unsigned long) file_size,       
+                  (unsigned long) size_in_bytes,  
+                  (char *) file_address,          
+                  (char) flag );                  
 
     //scheduler_unlock ();
     //taskswitch_unlock ();
@@ -5714,7 +5680,6 @@ int sys_create_empty_file( char *file_name )
 {
     int __ret = -1;
 
-
     //char *FileName;
     //FileName = (char *) file_name;
 
@@ -5832,9 +5797,8 @@ int sys_create_empty_directory ( char *dir_name )
 void set_global_open_file ( void *file, int Index )
 {
 
-	// #todo:
-	// Limite m�ximo da lista.
-
+// #todo:
+// Limite maximo da lista.
 
 // Structure
     if ( (void *) file == NULL )
@@ -5892,12 +5856,11 @@ void sys_cd_command ( const char *string )
     }
 
 
-    // Reset global structure and cwd on process structure.
+// Reset global structure and cwd on process structure.
 
-
-    // #bugbug
-    // Talvez esse tipo de tratamento precise 
-    // ser feito pelo próprio shell.
+// #bugbug
+// Talvez esse tipo de tratamento precise 
+// ser feito pelo próprio shell.
 
     if ( string[1] == 0 )
     {
@@ -5931,7 +5894,6 @@ void sys_cd_command ( const char *string )
     fsLoadFileFromCurrentTargetDir();
     // ...
 }
-
 
 //
 // End

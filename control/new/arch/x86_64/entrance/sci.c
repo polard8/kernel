@@ -445,7 +445,9 @@ static void *__extra_services (
     // depois da inicialização completa do kernel.
     // Isso poderá ser chamado pelo init.bin, pelo shell
     // ou qualquer outro.
+    // see: 
     if ( number == 350 ){
+        printf("350:\n"); refresh_screen();
         return (void *) sys_initialize_component ((int) arg2);
     }
 

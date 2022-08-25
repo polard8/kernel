@@ -395,9 +395,10 @@ int sys_getppid (void)
 }
 
 
+// service 350. sci0
 // Helper function to initialize system's component
 // after kernel initialization.
-//  This is called by ring3 apps.
+// This is called by ring3 apps.
 
 int sys_initialize_component (int n)
 {
@@ -406,8 +407,9 @@ int sys_initialize_component (int n)
 
     switch (n)
     {
+        // ps2 full initialization.
         case 1:
-            //PS2_early_initialization();
+            //Not working when called from ring3.
             //PS2_initialize();
             return 0;
             break;
