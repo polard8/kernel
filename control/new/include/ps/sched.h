@@ -84,14 +84,18 @@ void cut_round( struct thread_d *last_thread );
 
 tid_t KiScheduler (void);
 
-void do_thread_blocked (int tid);
-void do_thread_dead (int tid);
-void do_thread_initialized (int tid);
-void do_thread_ready (int tid);
-void do_thread_running (int tid);
-void do_thread_standby (int tid);
-void do_thread_waiting (int tid);
-void do_thread_zombie (int tid);
+
+// Switching states.
+void do_thread_initialized(tid_t tid);
+void do_thread_standby(tid_t tid);
+void do_thread_running(tid_t tid);
+void do_thread_ready(tid_t tid);
+void do_thread_waiting(tid_t tid);
+void do_thread_blocked(tid_t tid);
+void do_thread_zombie(tid_t tid);
+void do_thread_dead(tid_t tid);
+
+void drop_quantum(struct thread_d *thread);
 
 int do_waitpid (pid_t pid, int *status, int options);
 

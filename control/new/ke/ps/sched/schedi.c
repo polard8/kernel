@@ -75,87 +75,10 @@ tid_t KiScheduler(void)
     return (tid_t) scheduler();
 }
 
-
-// 7
-// do_thread_sleeping:
-// Muda o state de uma thread pra blocked.
-// #todo: Mudar o nome da função para do_thread_blocked.
-
-void do_thread_blocked(int tid)
-{
-    struct thread_d  *t; 
-
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
-        return;
-    }
-
-    t = (void *) threadList[tid];
-
-    if ( (void*) t == NULL ){
-        return;
-    }
-
-    if (t->used != TRUE){
-        return;
-    }
-
-    if (t->magic != 1234){
-        return;
-    }
-
-// #todo
-// Se a thread estiver rodando no momento
-// e ela mesmo ou uma thread de outro núcleo
-// chamou essa rotina, então precisamos reescalonar ?
-
-/*
-    if (t->state == RUNNING)
-    {
-        // Set the 'Need to reeschedule' flag.
-    }
-*/
-
-    t->state = BLOCKED;
-    t->blocked_jiffie = (unsigned long) jiffies;
-}
-
-
-//3
-void do_thread_dead(int tid)
+// 0, 11
+void do_thread_initialized(tid_t tid)
 {
     struct thread_d  *t;
-
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
-        return;
-    }
-
-    t = (void *) threadList[tid];
-
-    if ( (void*) t == NULL ){
-        return;
-    }
-
-    if (t->used != TRUE){
-        return;
-    }
-
-    if(t->magic != 1234){
-        return;
-    }
-
-    t->state = DEAD;
-}
-
-
-//0
-void do_thread_initialized(int tid)
-{
-    struct thread_d  *t;
-
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
@@ -179,9 +102,55 @@ void do_thread_initialized(int tid)
     t->state = INITIALIZED;
 }
 
+// 1
+void do_thread_standby(tid_t tid)
+{
+    struct thread_d *t; 
 
-//4
-void do_thread_ready(int tid)
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
+    {
+        return;
+    }
+
+    t = (void *) threadList[tid];
+
+    if ( (void*) t == NULL ){
+        return;
+    }
+
+    if (t->used != TRUE){
+        return;
+    }
+
+    if (t->magic != 1234){
+        return;
+    }
+
+    t->state = STANDBY;
+}
+
+// 2,4
+void do_thread_running(tid_t tid)
+{
+    struct thread_d *t; 
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
+    {
+        return;
+    }
+
+    t = (void *) threadList[tid];
+
+    if ( (void *) t != NULL ){
+        if ( t->used == TRUE && t->magic == 1234 )
+        {
+            t->state = RUNNING;
+        }
+    }
+}
+
+// 3,6
+void do_thread_ready(tid_t tid)
 {
     struct thread_d  *t;
 
@@ -222,58 +191,8 @@ void do_thread_ready(int tid)
     t->ready_jiffie = (unsigned long) jiffies;
 }
 
-
-//5
-void do_thread_running(int tid)
-{
-    struct thread_d *t; 
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
-        return;
-    }
-
-    t = (void *) threadList[tid];
-
-    if ( (void *) t != NULL ){
-        if ( t->used == TRUE && t->magic == 1234 )
-        {
-            t->state = RUNNING;
-        }
-    }
-}
-
-
-//1
-void do_thread_standby(int tid)
-{
-    struct thread_d *t; 
-
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
-        return;
-    }
-
-    t = (void *) threadList[tid];
-
-    if ( (void*) t == NULL ){
-        return;
-    }
-
-    if (t->used != TRUE){
-        return;
-    }
-
-    if (t->magic != 1234){
-        return;
-    }
-
-    t->state = STANDBY;
-}
-
-
-//6
-void do_thread_waiting(int tid)
+// 5, 13
+void do_thread_waiting(tid_t tid)
 {
     struct thread_d *t; 
 
@@ -300,9 +219,52 @@ void do_thread_waiting(int tid)
     t->waiting_jiffie = (unsigned long) jiffies;
 }
 
+// 12, 7
+// do_thread_sleeping:
+// Muda o state de uma thread pra blocked.
+// #todo: Mudar o nome da função para do_thread_blocked.
 
-// 2
-void do_thread_zombie(int tid)
+void do_thread_blocked(tid_t tid)
+{
+    struct thread_d  *t; 
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
+    {
+        return;
+    }
+
+    t = (void *) threadList[tid];
+
+    if ( (void*) t == NULL ){
+        return;
+    }
+
+    if (t->used != TRUE){
+        return;
+    }
+
+    if (t->magic != 1234){
+        return;
+    }
+
+// #todo
+// Se a thread estiver rodando no momento
+// e ela mesmo ou uma thread de outro núcleo
+// chamou essa rotina, então precisamos reescalonar ?
+
+/*
+    if (t->state == RUNNING)
+    {
+        // Set the 'Need to reeschedule' flag.
+    }
+*/
+
+    t->state = BLOCKED;
+    t->blocked_jiffie = (unsigned long) jiffies;
+}
+
+// 9
+void do_thread_zombie(tid_t tid)
 {
     struct thread_d  *t; 
 
@@ -335,6 +297,45 @@ void do_thread_zombie(int tid)
 
     t->state = ZOMBIE;
     t->zombie_jiffie = (unsigned long) jiffies;
+}
+
+// 10
+void do_thread_dead(tid_t tid)
+{
+    struct thread_d  *t;
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
+    {
+        return;
+    }
+
+    t = (void *) threadList[tid];
+
+    if ( (void*) t == NULL ){
+        return;
+    }
+
+    if (t->used != TRUE){
+        return;
+    }
+
+    if(t->magic != 1234){
+        return;
+    }
+
+    t->state = DEAD;
+}
+
+// ----------------------
+
+void drop_quantum(struct thread_d *thread)
+{
+    if ( (void*) thread == NULL )
+        return;
+    if (thread->magic!=1234)
+        return;
+
+    thread->quantum = QUANTUM_MIN;
 }
 
 
