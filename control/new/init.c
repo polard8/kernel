@@ -677,8 +677,11 @@ static int booting_begin(int arch_type)
 // System memory support.
 // Heap, stack, memory usage and frames.
 
+// #hackhack
+    current_arch = CURRENT_ARCH_X86_64;
+
     PROGRESS("booting_begin: Runtime_initialize\n");
-    Runtime_initialize();
+    Runtime_initialize(current_arch);
 
 // =========================
 // Clear the screen.

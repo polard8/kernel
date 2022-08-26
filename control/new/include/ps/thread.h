@@ -323,16 +323,14 @@ struct thread_d
 // == CPU =========================================
 //
 
-// What processor the thread is running.
-    int cpu;
-
+// What processor the thread is running now.
+    int current_processor;
 // What will be the next processor for this thread.
-    int next_cpu;
-
+    int next_processor;
 // Processor affinity. (CPU pinning)
 // The thread will execute only on the designated CPU.
 // See: https://en.wikipedia.org/wiki/Processor_affinity
-    int affinity;
+    int affinity_processor;
 
 // ORDEM: 
 // O que segue é referenciado durante a interrupção de timer.

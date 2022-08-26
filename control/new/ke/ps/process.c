@@ -44,8 +44,8 @@ static pid_t caller_process_id=0;
 // IPC
 //
 
-// Global:
-// #todo: It needs to be atomic.
+// Global spin lock.
+// The process does not block, it spins in a loop.
 // see: gspin.h
 int __spinlock_ipc=0;
 //...

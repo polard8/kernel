@@ -722,8 +722,6 @@ extern _IDT_register
 global _asm_nic_create_new_idt_entry
 _asm_nic_create_new_idt_entry:
 
-    ;int 3
-
     push rax
     push rbx
     
@@ -755,5 +753,21 @@ _asm_nic_create_new_idt_entry:
     ret 
 
 
+
+; #test:
+;Other atomic hardware primitives:
+;    test and set (x86)
+;    atomic increment (x86)
+;    bus lock prefix (x86)
+;global _atomic_increment_spinlock
+;_atomic_increment_spinlock:
+;    lock inc qword [__spinlock_test]
+;    ret
+;global _get_spinlock
+;_get_spinlock:
+;    mov rax, qword [__spinlock_test]
+;    ret
+;__spinlock_test: dq 0
+;
 
 

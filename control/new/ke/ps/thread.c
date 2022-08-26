@@ -244,31 +244,31 @@ __ps_setup_x64_context (
 
 // helper
 // Thread stats
-unsigned long GetThreadStats ( int tid, int index )
+unsigned long GetThreadStats( int tid, int index )
 {
-    struct thread_d  *t;
+    struct thread_d *t;
 
-//#todo:
-//checar validade dos argumentos.
+// Invalid index.
 
-    if ( tid < 0 || index < 0 )
-    {
-       return 0;
+    if (index<0){
+        return 0;
     }
 
-// Struct
+// Thread
+
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
+    {
+        return 0;
+    }
 
     t = (void *) threadList[tid];
 
     if ( (void *) t == NULL ){
-        // ?? refresh
-        printf ("GetThreadStats: struct \n");
         return 0; 
-
-    } else {
-        // Checar validade
-        // ...
-    };
+    }
+    if (t->magic != 1234){
+        return 0;
+    }
 
 // See: 
 // https://en.wikipedia.org/wiki/Processor_affinity
@@ -281,18 +281,32 @@ unsigned long GetThreadStats ( int tid, int index )
         case 3:  return (unsigned long) t->type;      break;
         case 4:  return (unsigned long) t->state;     break;
         case 5:  return (unsigned long) t->plane;     break;
-        case 6:  return (unsigned long) t->cpu;       break;
-        case 7:  return (unsigned long) t->affinity;  break;
- 
-        // #bugbug: repetido. 6.
-        case 8:  return (unsigned long) t->cpu;  break;   
         
-        case 9:  return (unsigned long) t->next_cpu;  break; 
+        // #todo: Not used. 
+        case 6:
+            return 0;
+            break;
 
-        // #
-        case 10:  
-            //return (unsigned long) t->DirectoryPA; 
-            return (unsigned long) t->pml4_PA;  
+        // Em qual processador a thread esta rodando no momento.
+        case 7:
+            return (unsigned long) t->current_processor;
+            break;
+        // Qual será a próximo processador que a thread vai rodar.
+        case 8:
+            return (unsigned long) t->next_processor;
+            break;   
+        // Confined into one given processor.
+        case 9:
+            return (unsigned long) t->affinity_processor;
+            break; 
+
+        // pml4_PA: 
+        // Phisical address of the pml4 table for the curren thread.
+        // #bugbug: We don't wanna share this information with 
+        // all the callers.
+        case 10:
+            return 0;
+            //return (unsigned long) t->pml4_PA;  
             break; 
         
         // The initial privilege level.
@@ -302,7 +316,7 @@ unsigned long GetThreadStats ( int tid, int index )
             break; 
 
         case 12:  return (unsigned long) t->base_priority;  break; 
-        case 13:  return (unsigned long) t->priority;  break;          
+        case 13:  return (unsigned long) t->priority;  break;
 
         case 14:
             return (unsigned long) 0;
@@ -312,11 +326,13 @@ unsigned long GetThreadStats ( int tid, int index )
         case 15:  return (unsigned long) t->is_preemptable;  break;
         case 16:  return (unsigned long) t->saved;  break;
 
+        // 17~20: heap and stack.
+
         case 17:  return (unsigned long) t->HeapStart;   break;
         case 18:  return (unsigned long) t->StackStart;  break;
+        case 19:  return (unsigned long) t->HeapSize;    break;
+        case 20:  return (unsigned long) t->StackSize;   break;
 
-        case 19:  return (unsigned long) t->HeapSize;  break;
-        case 20:  return (unsigned long) t->StackSize;  break;
         case 21:  return (unsigned long) t->step;  break;
         case 22:  return (unsigned long) t->initial_time_ms;  break;
         case 23:  return (unsigned long) t->total_time_ms;  break;
@@ -333,22 +349,20 @@ unsigned long GetThreadStats ( int tid, int index )
         case 34:  return (unsigned long) t->blocked_limit;  break;
         case 35:  return (unsigned long) t->ticks_remaining;  break;
         
+        // 36~40: Profiler.
+        
         case 36:  
             return (unsigned long) t->profiler_percentage_running;
             break;
-            
         case 37:
             return (unsigned long) t->profiler_percentage_running_res;
             break;
-
         case 38:
             return (unsigned long) t->profiler_percentage_running_mod;
             break;
-         
         case 39:
             return (unsigned long) t->profiler_ticks_running;
             break;
-
         case 40:
             return (unsigned long) t->profiler_last_ticks;
             break;
@@ -377,37 +391,44 @@ unsigned long GetThreadStats ( int tid, int index )
 int getthreadname ( int tid, char *buffer )
 {
     struct thread_d  *t;
-
     char *name_buffer = (char *) buffer;
 
-//#todo
-//checar validade dos argumentos.
+// Buffer
 
-    if ( tid < 0  )
-    {
-       return 0;
+    if ( (void*) buffer == NULL ){
+        goto fail;
     }
 
+// Thread
 
-// struct 
+    if ( tid<0 || tid >= THREAD_COUNT_MAX )
+    {
+        goto fail;
+    }
+
     t = (struct thread_d *) threadList[tid]; 
 
     if ( (void *) t == NULL ){
-        // msg
-        return -1;
-    }else{
-        if ( t->used != TRUE || t->magic != 1234 ){
-            //msg
-            return -1;
-        }
-        
-        // 64 bytes
-        strcpy ( name_buffer, (const char *) t->__threadname );       
-        
-        return (int) t->threadName_len;
-    };
+        goto fail;
+    }
 
-    return -1;
+    if ( t->used != TRUE || 
+         t->magic != 1234 )
+    {
+        goto fail;
+    }
+
+// Copy
+// 64 bytes
+
+    strcpy(
+        name_buffer, 
+        (const char *) t->__threadname );       
+
+// Return the lenght.
+    return (int) t->threadName_len;
+fail:
+    return (int) (-1);
 }
 
 
@@ -416,35 +437,32 @@ int getthreadname ( int tid, char *buffer )
  *     Pega a primeira thread READY que encontrar.
  *     E se não encontrar nenhuma, retorna NULL.
  */
-
+// #todo: This is a job for the scheduler.
+// Change the name to schedFindFirstReadyThread().
 // OUT:
 // Return a pointer to the found thread.
 
-void *FindReadyThread (void)
+void *FindReadyThread(void)
 {
     register int i=0;
-    struct thread_d  *Thread;
-
+    struct thread_d  *t;
     for ( i=0; i<THREAD_COUNT_MAX; ++i )
     {
-        Thread = (void *) threadList[i];
-
-        if ( (void *) Thread != NULL )
+        t = (void *) threadList[i];
+        if ( (void *) t != NULL )
         {
-            if ( Thread->used  == TRUE && 
-                 Thread->magic == 1234 && 
-                 Thread->state == READY )
+            if ( t->used  == TRUE && 
+                 t->magic == 1234 && 
+                 t->state == READY )
             {
-                return (void *) Thread;
+                return (void *) t;
             }
         }
     };
-
-    // Nenhuma foi encontrada.   
-    // #todo: Message ??
-
+// Fail
     return NULL;
 }
+
 
 // Get State 
 // (Zero e' tipo NULL?).
@@ -483,27 +501,28 @@ int GetThreadType (struct thread_d *thread)
 
 // Called by init_microkernel in mk.c
 
-int init_threads (void){
-
+int init_threads(void)
+{
     register int i=0;
-
 
     debug_print("init_threads:\n");
 
-	// Globais
-	current_thread = 0;  //Atual. 
+// Globais
+    current_thread=0;  //tid.
 
-	//ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
-	UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
-	
+    //ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
+    UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
+
+// #todo: outdated.
     old = 0;                                   //?
     forkid = 0;                                //
     task_count = (unsigned long) 0;            //Zera o contador de tarefas criadas.
-	//...
-	
-	// @todo: Porque essas vari�veis usam o termo 'task'?
-	//        task � sinonimo de process.
-	
+   //...
+
+// #todo: 
+// Porque essas vari�veis usam o termo 'task'?
+//        task � sinonimo de process.
+
 	//Vari�veis usadas na inicializa��o de uma nova tarefa.	
 	start_new_task_status  = (unsigned long) 0;    //Se h� uma nova tarefa.
 	start_new_task_id = (int) 0;                   //Id d� nova tarefa.
@@ -536,8 +555,7 @@ int init_threads (void){
         i++;
     };
 
-
-// ...
+    // ...
 
     return 0;
 }
@@ -545,13 +563,11 @@ int init_threads (void){
 
 // GetCurrentTID
 //      Pega o id da thread atual.
-
-int GetCurrentTID (void)
+// #todo: use tid_t type.
+int GetCurrentTID(void)
 {
     return (int) current_thread;
 }
-
-
 
 void *GetThreadByTID (int tid)
 {
@@ -587,8 +603,9 @@ void *GetForegroundThread(void)
 void *GetWSThread(void)
 {
     int tid = -1;
-    if(WindowServerInfo.initialized != TRUE)
+    if (WindowServerInfo.initialized != TRUE){
         return NULL;
+    }
     tid = (int) WindowServerInfo.tid;
     return (void*) GetThreadByTID(tid);
 }

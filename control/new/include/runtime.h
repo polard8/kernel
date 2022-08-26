@@ -1,11 +1,10 @@
 
+// runtime.h
+
 #ifndef __RUNTIME_H
-#define __RUNTIME_H  1
+#define __RUNTIME_H    1
 
-int init_runtime (void);
-int Runtime_initialize(void);
-
+int Runtime_initialize(int arch_type);
 
 #endif    
-
 

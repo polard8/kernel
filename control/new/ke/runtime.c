@@ -5,84 +5,60 @@
 
 #include <kernel.h>
 
+static int __init_runtime(int arch_type);
 
-// init_runtime:
-// Initializing run time. 
-// Kernel heap and stack stuffs.
-// #todo: Mudar para runtimeInit().
 
-int init_runtime(void)
+// Private:
+// Initializing runtime. 
+// Kernel heap and stack initialization.
+
+static int __init_runtime(int arch_type)
 {
-    int Status = 0;
+    int Status=0;
 
     //debug_print ("init_runtime:\n");
     //debug_print ("[Kernel] init_runtime: Initializing runtime ...\n");
 
+    //if (g_module_runtime_initialized == TRUE){
+    //    Already initialized.
+    //}
 
-//
-// #hackhack
-//
-
-// Current arch.
-    current_arch = CURRENT_ARCH_X86_64;
-
-    switch (current_arch){
+    switch (arch_type){
     // See: mminit.c
     case CURRENT_ARCH_X86_64:
         Status = (int) mmInit();
-        if (Status < 0){
-            debug_print("init_runtime: mmInit fail\n");
+        if (Status < 0)
+        {
+            if (Initialization.serial_log == TRUE){
+                debug_print("__init_runtime: mmInit fail\n");
+            }
             goto fail;
         }
-        return TRUE;
+        return TRUE;  // OK.
         break;
     // armmain(); ?
     // ...
     default:
-        debug_print ("[Kernel] init_runtime: Current arch not defined!\n *hang");
+        if (Initialization.serial_log == TRUE){
+            debug_print ("__init_runtime: current_arch\n");
+        }
         goto fail;
         break; 
     };
 
-// obs:
+// #todo: Testar esses comentários.
 // Now we have malloc, free and messages support.
 // The video support is using the boot loader configuration yet.
-
-// #### importante ####
-// provavelmente aqui é o primeiro lugar onde as mensagens funcionam.
-// #bugbug
-// mas temos um problema no Y.
-// #bugbug
-
-//#ifdef EXECVE_VERBOSE
-    //backgroundDraw ( (unsigned long) COLOR_BLUE ); 
-//#endif
-
-// #todo:
-// podemos analisar o status aqui.
-
-//#ifdef BREAKPOINT_TARGET_AFTER_RUNTIME
-    //#debug 
-	//a primeira mensagem só aparece após a inicialização da runtime.
-	//por isso não deu pra limpar a tela antes.
-	//printf (">>>debug hang init_runtime: after runtime initialization");
-	//refresh_screen(); 
-	//while (1){ asm ("hlt"); };
-//#endif
+// Provavelmente aqui é o primeiro lugar onde as mensagens funcionam.
+// Mas temos um problema no Y.
 
 fail:
-    debug_print ("[Kernel] init_runtime: Runtime fail\n");
-    
-    // #bugbug
-    // No support for this at this time?
-    //refresh_screen();
-    
     return FALSE;
 }
 
 
-// called by main.c
-int Runtime_initialize(void)
+// Called by init.c
+int Runtime_initialize(int arch_type)
 {
     int Status=0;
 
@@ -90,13 +66,12 @@ int Runtime_initialize(void)
 
     g_module_runtime_initialized = FALSE;
 
-    Status = (int) init_runtime();
-
-    if (Status != TRUE){
-        debug_print ("Runtime_initialize: Runtime fail. *hang\n");
-        // No message support at the moment ?!
-        asm ("cli \n");
-        while (1){  asm ("hlt \n");  };
+    Status = (int) __init_runtime(arch_type);
+    if (Status!=TRUE){
+        if (Initialization.serial_log == TRUE){
+            debug_print("Runtime_initialize: __init_runtime fail\n");
+        }
+        die();
     }
 
     // ...

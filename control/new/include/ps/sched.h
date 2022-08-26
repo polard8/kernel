@@ -25,6 +25,7 @@ struct scheduler_info_d
 {
     int initialized;
     int policy;
+    unsigned long rr_round_counter;
     unsigned long flags;
 };
 

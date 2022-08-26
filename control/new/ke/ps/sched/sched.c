@@ -6,6 +6,7 @@
 #include <kernel.h>
 
 // Scheduler main structure.
+// see: sched.h
 struct scheduler_info_d  SchedulerInfo;
 
 
@@ -70,7 +71,6 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     register int i=0;
     tid_t FirstTID = -1;
 
-
     //debug_print ("scheduler: [not tested] \n");
 
 // rootConductor: 
@@ -82,6 +82,14 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // #todo:
 // We need to create another hook for the AP cores.
 
+
+    if (SchedulerInfo.initialized != TRUE){
+        panic("__scheduler_rr: Scheduler not initialized\n");
+    }
+
+    if (SchedulerInfo.policy != SCHED_RR){
+        panic("__scheduler_rr: Scheduler policy\n");
+    }
 
 
 // O processador atual precisa ter uma idle configurada.
@@ -101,8 +109,11 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     // Estabiliza a idle thread.
     Idle->base_priority = PRIORITY_SYSTEM;
     Idle->priority      = PRIORITY_SYSTEM;
-    Idle->quantum = QUANTUM_MIN;  // Credits.
+    Idle->quantum = QUANTUM_THRESHOLD;  // Credits.
 
+    //Idle->affinity_processor = 0;
+    //Idle->current_processor = 0;
+    //Idle->next_processor = 0;
 
 // Check TID.
 // Por enquanto a Idle thread desse processador
@@ -173,13 +184,15 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // prioridade base, então ela foi para o equilíbrio.
                 TmpThread->priority = TmpThread->base_priority;
 
-                // balance
+                // Balance
+                // Non interactive system services and processes.
                 if (TmpThread->personality == PERSONALITY_GRAMADO)
                 {
                     TmpThread->quantum = QUANTUM_MIN;
                 }
 
-                // balance
+                // Balance
+                // Interactive gui applications.
                 if (TmpThread->personality == PERSONALITY_GWS)
                 {
                     TmpThread->quantum = QUANTUM_MAX;
@@ -247,7 +260,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     tmpConductor->next = NULL;               // Reescalona ao fim do round.
 
 // done:
-
+    SchedulerInfo.rr_round_counter++;
 
 // Start with the idle thread.
     return (tid_t) FirstTID;
@@ -390,6 +403,7 @@ int init_scheduler (unsigned long sched_flags)
 // sched.h
 
     SchedulerInfo.policy = SCHED_RR;
+    SchedulerInfo.rr_round_counter = 0;
     SchedulerInfo.flags  = (unsigned long) sched_flags;
     SchedulerInfo.initialized = TRUE;
 
