@@ -12,20 +12,15 @@
 ;; para não arrumar problemas.
 ;; History:
 ;;     2017 - Fred Nora.
-
 ;; Partition table:
 ;; See:
 ;;     https://thestarman.pcministry.com/asm/mbr/PartTables.htm
-
-
 ;; org = 0
 ;; See: main.asm 
 
 
 END_OF_CLUSTER EQU 0xFFFF
 ;;END_OF_CLUSTER2 EQU 0xFFF8
-
-
 ROOTDIRSTART EQU (BUFFER_NAME)
 ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 ;datasector      EQU (BUFFER_NAME)
@@ -34,15 +29,12 @@ ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 ;CylinderNumbers EQU (BUFFER_VOLUME_ID)
 
 
-
 ;; 16bit. Esse é o MBR do VHD.
 [bits 16]
 
+; Jump to the real start routine.
 stage1_main:
-
-    ; Jump after the BPB and some a small data area.
-
-    jmp after_BPB
+    jmp GRAMADOINIT
 
 ; ===================
 ; BPB:
@@ -72,14 +64,12 @@ Signature             db 0x29    ;; 41
 BUFFER_VOLUME_ID      dd 0x980E63F5
 VolumeLabel           db "GRAMADO    "   ;;11 bytes
 SystemID              db "FAT16   "
-
 ; =========================================
 ; End of BPB.
 
 
 ;=================================
 ; Start of a small data area.
-
 DAPSizeOfPacket db 10h
 DAPReserved     db 00h
 DAPTransfer     dw 0001h
@@ -92,106 +82,191 @@ cluster     dw  0x0000
 ;absoluteSector db 0x00
 ;absoluteHead   db 0x00
 ;absoluteTrack  db 0x00
-
 ;CylinderNumbers:  dd 0  ;;dword
-
-;
-; Messages
-;
 
 ; The image name.
 ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
 ; 'R' = Root fail.
 msgFailure    db "R", 0x00 
 ;...
-
 ;=================================
 ; End of the data area.
 
-;
-; ====================================
-; after_BPB:
-;
+; -----------------------------------------
+; DisplayMessage:
+; Display ASCIIZ string at "ds:si" via BIOS.
+; Standadr print string routine.
+DisplayMessage:
+    lodsb                  ; Load next character.
+    or al, al              ; Test for NUL character.
+    jz .DONE
+    mov ah, 0x0E           ; BIOS teletype. 
+    mov bx, 0x0007         ; Página e atributo.  
+    int 0x10               ; Invoke BIOS.
+    jmp  DisplayMessage
+.DONE:
+    RET
+
+; -----------------------------------------
+; ClusterLBA:
+; Convert FAT cluster into LBA addressing scheme
+; LBA = (cluster - 2) * sectors per cluster
+ClusterLBA:
+    sub ax, 0x0002                      ; zero base cluster number
+    xor cx, cx
+    mov cl, BYTE [SectorsPerCluster]    ; convert byte to word
+    mul cx
+    add ax, WORD [datasector]           ; base data sector
+    RET
+
+; -----------------------------------------
+; ReadSectors:
+; Reads "cx" sectors from disk starting at "ax" 
+; into memory location "es:bx"
+
+ReadSectors:
+
+    mov WORD [DAPBuffer]   ,bx
+    mov WORD [DAPBuffer+2] ,es
+    mov WORD [DAPStart]    ,ax
+; Tentativas.
+.MAIN:
+    mov di, 0x0005  
+.SECTORLOOP:
+
+    push  ax
+    push  bx
+    push  cx
+
+    push si
+    mov ah, 0x42
+    mov dl, 0x80
+    mov si, DAPSizeOfPacket
+    int 0x13
+    pop si
+ 
+    jnc  .__SUCCESS    ; Test for read error.
+    xor  ax, ax        ; BIOS reset disk.
+    int  0x13          ; Invoke BIOS.
+    
+    dec  di            ; Decrement error counter.
+    
+    pop  cx
+    pop  bx
+    pop  ax
+
+; Attempt to read again
+    jnz  .SECTORLOOP    
+;.fail:
+    int  0x18
+.__SUCCESS:
+
+    ; Importante: 
+    ; Mensagem de progresso.    
+    ;mov  si, msgProgress
+    ;call  DisplayMessage
+    
+    pop  cx
+    pop  bx
+    pop  ax
+
+    ; Queue next buffer.
+    add bx, WORD [BytesPerSector] 
+    cmp bx, 0x0000
+    jne .NextSector
+
+    ; Trocando de segmento.
+
+    push ax
+    mov  ax, es
+    add  ax, 0x1000
+    mov  es, ax
+    pop  ax
+
+.NextSector:
+
+    inc  ax                     ; Queue next sector.
+    mov WORD [DAPBuffer], bx
+    mov WORD [DAPStart], ax
+    loop  .MAIN                 ; Read next sector.
+    RET
+
+; -----------------------------------------
+; XXX
+FAILURE:
+    ; int 0x18  
+    mov si, msgFailure
+    call DisplayMessage
+    mov ah, 0x00
+    int 0x16        ; Await keypress
+    int 0x19        ; Warm boot computer
+
+; -----------------------------------------
+; -----------------------------------------
+; GRAMADOINIT:  REAL START
 ; Real Start!
 ; Start here 0x07C0:0.
 ; Stack here 0:6000h.
 ; Root dir in 0x07C0:0x0200.
 ; Load the FAT in es:bx 0x17C0:0x0200.
 ; Load image in 0:8000h.
+; #todo
+; BootSegment   equ 0x07C0
+; BootOffset    equ 0
+; StackSegment  equ 0
+; StackOffset   equ 0x6000
+; RootSegment   equ 0x07C0
+; RootOffset    equ 0x0200
+; FATSegment    equ 0x17C0
+; FATOffset     equ 0x0200
+; ImageSegment  equ 0
+; ImageOffset   equ 0x8000
 
-;; #todo
-;BootSegment   equ 0x07C0
-;BootOffset    equ 0
-;StackSegment  equ 0
-;StackOffset   equ 0x6000
-;RootSegment   equ 0x07C0
-;RootOffset    equ 0x0200
-;FATSegment    equ 0x17C0
-;FATOffset     equ 0x0200
-;ImageSegment  equ 0
-;ImageOffset   equ 0x8000
+GRAMADOINIT:
 
-after_BPB:
-    ;nop
-;Step1: 
-
-    cli
-
+; Step1:
 ; Code located at 0x7C00, adjust segment registers to 0x07C0:0.
 ; Create stack.   0:6000h
-
-    mov  ax, 0x07C0
-    mov  ds, ax
-    mov  es, ax
-    mov  ax, 0x0000
-    mov  ss, ax
-    mov  sp, 0x6000
-
+    cli
+    mov ax, 0x07C0
+    mov ds, ax
+    mov es, ax
+    mov ax, 0x0000
+    mov ss, ax
+    mov sp, 0x6000
     sti
 
 Step2:
     mov byte [DriveNumber], byte dl 
-
     ;cmp dl, byte 0x80
     ;jne FAILURE
 
-;Clear the Screen.
 Step3:
-
-; We don't need this.
-; This routine is too long.
-
+; Clear the Screen.
     mov ax, 02h
     int 010h
 
-;Step4:
-    ;@todo: Certificar que int 13h é suportada.	
+; Step4:
+; #todo: Certificar que int 13h é suportada.
 
-;Step5:
-    ;@todo: Reset driver.
+; Step5:
+; #todo: Reset driver.
 
-;;
-;; >> As informações sobre disco 
-;;    serão pegadas no BM.BIN.
-;;
+; Step6:
+; As informações sobre disco 
+; serão pegadas no BM.BIN.
+; O STEP6 FOI RETIRADO E AGORA ESTÁ NO PARA O BM.BIN
+; DESSE MODO NÃO PRECISAMOS MAIS PASSAR ARGUMENTOS PARA O BM.BIN 
+; PASSAREMOS SOMENTE O 'DRIVE NUMBER'
 
-;Step6:
-
-;; O STEP6 FOI RETIRADO E AGORA ESTÁ NO PARA O BM.BIN
-;; DESSE MODO NÃO PRECISAMOS MAIS PASSAR ARGUMENTOS PARA O BM.BIN 
-;; PASSAREMOS SOMENTE O 'DRIVE NUMBER'
-
-;Step7:
-
+; Step7:
 ; Carregamentos...
+; Load root, fat and image.
 ; Carregar o ROOT.
 ; #todo: 
 ; Cuidadosamente rever os cálculos feitos aqui para permitir que
 ; que carreguemos o sistema usando discos de vários tamanhos. 
 ; Por enquanto estamos predeterminando as diretrizes de carregamento. 
-
-LOAD_ROOT:
-
 ;  559 (root)
 ; ( MBR + Reserved Sectors + VBR + Hidden Sectors + TotalFATs * SectorsPerFAT )
 ; (  1  +      62          +  1  +    3           +    2      *     246)
@@ -204,6 +279,8 @@ LOAD_ROOT:
 ;   3 - Hidden sectors. (*hidden)
 ;  32 - root. (512 entradas)
 ; xxx - data area.
+
+LOADROOT:
 
 ; ## data area location ## 
 ; Calcula o início da área de dados.
@@ -246,19 +323,13 @@ LOAD_ROOT:
 ; Obs: 
 ; A variável 'datasector' precisa ser inicializada aqui, 
 ; pois é usada mais à frente na rotina de conversão.
-
 ; Obtivemos com o cálculo:
     ;; cx           = Tamanho do diretório raiz, dado em número de setores.
     ;; [datasector] = Início da área de dados.
-
-;;
 ;; >> Carregar o diretório raiz em es:bx 0x07C0:0x0200.
-;;
-
 ;; Obs: 
 ;; Me parece seguro permitirmos que carregue o diretório raiz inteiro,
 ;; Porém desnecessário ainda.
-
 ;; 559 (root)
 ;; ( MBR + Reserved Sectors + VBR + Hidden Sectors + TotalFATs * SectorsPerFAT )
 ;; (  1  +      62          +  1  +    3           +    2      *     246)
@@ -284,9 +355,7 @@ LOAD_ROOT:
     mov  bx, 0x0200
     call  ReadSectors
 
-
 ; Uma mensagem de espaçamento.
-;.msg:
 
     ;pusha
     ;mov  si, msgCRLF
@@ -294,13 +363,10 @@ LOAD_ROOT:
     ;popa
 
 ; Procurando o arquivo BM.BIN no diretório raiz.
-.searchFile:
-
 ; Browse root directory for binary image.
-
+.searchFile:
     mov  cx, WORD [MaxRootEntries]  ; Load loop counter.
     mov  di, 0x0200                 ; Determinando o offset do início do diretório.
-
 .LOOP:
     push  cx
     mov  cx, 0x000B       ; Eleven character name.
@@ -311,7 +377,7 @@ LOAD_ROOT:
     push  di
     rep  cmpsb            ; Test for entry match.
     pop  di
-    je  LOAD_FAT          ; Se o arquivo foi encontrado.
+    je  LOADFAT     ; Se o arquivo foi encontrado.
     pop  cx
     add  di, 0x0020       ; Queue next directory entry.
     loop  .LOOP
@@ -320,9 +386,7 @@ LOAD_ROOT:
 ; Load the FAT in es:bx 0x17C0:0200.
 ; #bugbug Size?
 
-LOAD_FAT:
-    ;nop
-;.msg:
+LOADFAT:
 
     ;pusha
     ;mov  si, msgFAT
@@ -348,14 +412,6 @@ LOAD_FAT:
 ; Estamos carregando apenas metade da fat.
 ; ?? Por que ?? Qual é o problema ??
 ;===================================
-
-.loadFAT:
-
-; Configurando o segmento 'es'. 
-
-    mov ax, 0x17C0
-    mov es, ax   
-
 ; Read FAT into memory (17C0:0200).
 ; Obs: Confiar no cáculo do início da LBA é perigoso, apesar de necessário.
 ; Por enquanto vamos determiná-lo.
@@ -363,6 +419,11 @@ LOAD_FAT:
 ; por enquanto, determiná-lo.
 ; Obs: Não estamos carregando a FAT inteira. Isso pode ser arriscado, mas 
 ; por enquanto, como temos poucos arquivos, vamos carrega apenas metade da FAT.
+
+.loadFAT:
+
+    mov ax, 0x17C0
+    mov es, ax   
 
 ; Compute location of FAT and store in "ax".
 ; Calculado qual é a LBA inicial da FAT e salvando em 'ax'.
@@ -386,7 +447,6 @@ LOAD_FAT:
 
 ; Carregar o arquivo BM.BIN na memória 
 ; em es:bx, 0:8000h.
-
 
 ; Mensagem de espaçamento.
     ;mov  si, msgCRLF
@@ -413,10 +473,8 @@ LOAD_FAT:
     mov ax, 0x17C0    ; FAT Segment
     mov gs, ax
 
-;
 ; >> Carrega o arquivo na memória 
 ;    em es:bx, 0:8000h.
-;
 
 __loop_LOAD_IMAGE:
 
@@ -473,170 +531,17 @@ __loop_LOAD_IMAGE:
     cmp  dx, END_OF_CLUSTER  
     jne  __loop_LOAD_IMAGE
 
-
-; ========
 ; Done:
 ; Pass an argument to the next stage.
 ; Disk Number.
 ; Passando o comando para o BM.BIN em 0:8000h.
 
-DONE:
-
-;Step8:
+Step8_PARAMETERS:
     mov dl, byte [DriveNumber]
-
-;Step9:
-.FLY:
+Step9_FLY:
     PUSH WORD  0         ; cs
     PUSH WORD  0x8000    ; offset 
     RETF
-
-
-;; =========================================
-;; ReadSectors:
-;; 
-;;     Reads "cx" sectors from disk starting at "ax" 
-;; into memory location "es:bx"
-;; ************************************************
-
-ReadSectors:
-
-    mov WORD [DAPBuffer]   ,bx
-    mov WORD [DAPBuffer+2] ,es
-    mov WORD [DAPStart]    ,ax
-
-    ; Tentativas.
-    
-.MAIN:
-    mov di, 0x0005  
-
-.SECTORLOOP:
-
-    push  ax
-    push  bx
-    push  cx
-
-    push si
-    mov ah, 0x42
-    mov dl, 0x80
-    mov si, DAPSizeOfPacket
-    int 0x13
-    pop si
- 
-    jnc  .__SUCCESS    ; Test for read error.
-    xor  ax, ax        ; BIOS reset disk.
-    int  0x13          ; Invoke BIOS.
-    
-    dec  di            ; Decrement error counter.
-    
-    pop  cx
-    pop  bx
-    pop  ax
-
-    ; Attempt to read again
-    jnz  .SECTORLOOP    
-
-;.fail:
-    int  0x18
-
-
-.__SUCCESS:
-
-    ; Importante: 
-    ; Mensagem de progresso.
-    
-    ;mov  si, msgProgress
-    ;call  DisplayMessage
-    
-    pop  cx
-    pop  bx
-    pop  ax
-
-    ; Queue next buffer.
-    add bx, WORD [BytesPerSector] 
-    cmp bx, 0x0000
-    jne .NextSector
-
-    ; Trocando de segmento.
-
-    push ax
-    mov  ax, es
-    add  ax, 0x1000
-    mov  es, ax
-    pop  ax
-
-.NextSector:
-
-    inc  ax                     ; Queue next sector.
-    mov WORD [DAPBuffer], bx
-    mov WORD [DAPStart], ax
-    loop  .MAIN                 ; Read next sector.
-    RET
- 
- 
-;; ************************************************
-;; ClusterLBA:
-;;
-;;     Convert FAT cluster into LBA addressing scheme
-;;     LBA = (cluster - 2) * sectors per cluster
-;; *************************************************
-
-ClusterLBA:
-
-    sub ax, 0x0002                      ; zero base cluster number
-    xor cx, cx
-    mov cl, BYTE [SectorsPerCluster]    ; convert byte to word
-    mul cx
-    add ax, WORD [datasector]           ; base data sector
-    RET
-
-
-
-;; ********************************************************
-;; DisplayMessage:
-;;
-;;     Display ASCIIZ string at "ds:si" via BIOS.
-;;     Standadr print string routine.
-;; ********************************************************
-
-DisplayMessage:
-
-    lodsb                  ; Load next character.
-    or al, al              ; Test for NUL character.
-    jz .DONE
-    mov ah, 0x0E           ; BIOS teletype. 
-    mov bx, 0x0007         ; Página e atributo.  
-    int 0x10               ; Invoke BIOS.
-    jmp  DisplayMessage
-.DONE:
-    RET
-
-    ;;
-    ;; Fail!
-    ;;
-
-FAILURE:
-
-    ; Para economizar espaço.
-    ; int 0x18  
-    
-    mov si, msgFailure
-    call DisplayMessage
-    
-    mov ah, 0x00
-    int 0x16        ; await keypress
-    int 0x19        ; warm boot computer
-
-
-    ;;
-    ;; Partition table support.
-    ;;
-
-    ; Colocando a partition table no lugar certo. 
-    ; (0x1BE).
-
-    TIMES 446-($-$$) DB 0 
-
 
 
 ;; ======================================================
@@ -647,33 +552,32 @@ FAILURE:
 ; bios = limits: h=4, c=3FF, s=A
 ; vhd = CHS=963/4/17
 
+; Partition table support.
+; Colocando a partition table no lugar certo. 
+; (0x1BE).
+    TIMES 446-($-$$) DB 0 
+
 ; Partition 0. 
 P0:
-
 .flag:      db  0x80
 .startH:    db  0x01
 .startC:    db  0x01
 .startS:    db  0
-
-.osType:    db  0xEF             ;; efi
+.osType:    db  0xEF             ; EFI
 .endH:      db  0
 .endC:      db  0
 .endS:      db  0
-
-.startLBA:       dd  0x3F        ;; 63
-
-.partitionSize:  dd  0x0000FFA7  ;; in sectors. almost 32 mb
+.startLBA:       dd  0x3F        ; 63
+.partitionSize:  dd  0x0000FFA7  ; in sectors. almost 32MB
 
 ; Partition 1, 2 and 3.
 P1: dd 0,0,0,0 
 P2: dd 0,0,0,0 
 P3: dd 0,0,0,0 
 
-
+; ----------------------------------------
 ; Signature.
-
 MBR_SIG: 
-
     TIMES 510-($-$$) DB 0
     DW 0xAA55
     
