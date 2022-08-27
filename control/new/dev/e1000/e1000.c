@@ -92,10 +92,13 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa);
 static void
 __e1000_enable_interrupt(struct intel_nic_info_d *nic_info);
 
+
+static int __e1000_reset_controller(void);
+static void __e1000_setup_irq (int irq_line);
+
 //
 // =====================
 //
-
 
 static uint32_t 
 __E1000ReadCommand ( 
@@ -103,26 +106,7 @@ __E1000ReadCommand (
     uint16_t addr )
 {
 
-    // #todo
-    // Check the pointer validation
-    
-    //if( (void*) d == NULL )
-        //return 0;
-
-
-	// Use the IO ports?
-	//if (dev->use_io) 
-	//{	
-	//  Yes
-	//	PortOutLong(dev->io_base, addr);	
-	//	return PortInLong(dev->io_base + 4);
-	//} else {
-	//  No
-	//	return *( (volatile unsigned int *) (d->mem_base + addr));
-	//}
-
-
-    // return (uint32_t) ...
+// Read from memory mapped register.
     return *( (volatile unsigned int *) (d->mem_base + addr));
 }
 
@@ -133,24 +117,7 @@ __E1000WriteCommand (
     uint32_t val )
 {
 
-    // #todo
-    // Check the pointer validation
-    
-    //if( (void*) d == NULL )
-        //return 0;
-
-	// Use the IO ports?
-	//if (dev->use_io) 
-	//{
-	//  Yes
-	//	PortOutLong(dev->io_base, addr);	
-	//	PortOutLong(dev->io_base + 4, val);
-	//} else {
-	//  No
-	//	*( (volatile unsigned int *)(d->mem_base + addr)) = val;	
-	//}
-
-
+// Write to memory mapped register.
     *( (volatile unsigned int *)(d->mem_base + addr)) = val;
 }
 
@@ -269,42 +236,35 @@ __e1000_enable_interrupt(struct intel_nic_info_d *nic_info)
 
 }
 
-
-//====================================================
-// ## reset ##
-// Essa função é chamada pelo driver de PCI quando encontrar
-// o dispositivo Intel apropriado.
-// global
-// see: nicintel.h
-int e1000_reset_controller (void)
+// Reset the controller.
+static int __e1000_reset_controller(void)
 {
     int i=0;
     //register int i=0;
 
-    debug_print ("e1000_reset_controller:\n");
-    printf ("e1000_reset_controller:\n");
+    debug_print ("__e1000_reset_controller:\n");
+    printf      ("__e1000_reset_controller:\n");
     
 	//unsigned long tmp;
 	
 	//#debug
-	//printf("e1000_reset_controller: Reseting controller ... \n");
+	//printf("__e1000_reset_controller: Reseting controller ... \n");
 	
 	/*
 	if ( (void *) currentNIC ==  NULL )
 	{
-		printf("e1000_reset_controller: currentNIC struct\n");
-	    return (int) 1;	
-		
-	}	
+		printf("__e1000_reset_controller: currentNIC struct\n");
+	    return (int) 1;
+	}
     */
-	
+
 	//#todo: precisamos checar a validade dessa estrutura e do endereço.
 	
     //esse será o endereço oficial.
-    //currentNIC->mem_base	
+    //currentNIC->mem_base
 
     if ( currentNIC->mem_base == 0 ){
-        panic ("e1000_reset_controller: [FAIL] currentNIC->mem_base\n");
+        panic ("__e1000_reset_controller: [FAIL] currentNIC->mem_base\n");
     }
 
 
@@ -339,7 +299,7 @@ int e1000_reset_controller (void)
         (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
     if ( currentNIC->tx_descs_phys == 0 ){
-        panic ("e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
+        panic ("__e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
     }
 
     //printf("[2]:\n");
@@ -365,7 +325,7 @@ int e1000_reset_controller (void)
         currentNIC->legacy_tx_descs[i].addr2 = (unsigned int) (txaddress>>32);
 
         if (currentNIC->legacy_tx_descs[i].addr == 0){
-            panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
+            panic ("__e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
 
         // #test: Configurando o tamanho do buffer
@@ -409,7 +369,7 @@ int e1000_reset_controller (void)
             (unsigned long *)(&currentNIC->legacy_rx_descs));
 
     if (currentNIC->rx_descs_phys == 0){
-        panic ("e1000_reset_controller: [FAIL] currentNIC->rx_descs_phys\n");
+        panic ("__e1000_reset_controller: [FAIL] currentNIC->rx_descs_phys\n");
     }
 
     //printf("[4]:\n");
@@ -432,7 +392,7 @@ int e1000_reset_controller (void)
 
         // Buffer null.
         if (currentNIC->legacy_rx_descs[i].addr == 0){
-            panic ("e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
+            panic ("__e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
         }
 
         // #test: Configurando o tamanho do buffer
@@ -450,12 +410,18 @@ int e1000_reset_controller (void)
 
     //printf("[5]:\n");
 
-// No multicast
-// MTA(n) = 0
-    for (i=0; i < 0x80; i++){
+// Clear Multicast Table Array (MTA).
+    for (i=0; i < 128; i++){
         __E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
     };
 
+// #todo 
+// Initialize statistics registers.
+// E1000_REG_CRCERRS
+    //for (i = 0; i < 64; i++)
+    //    __E1000WriteCommand(currentNIC, 0x04000 + i * 4, 0);
+
+// Current.
     currentNIC->rx_cur = 0;
     currentNIC->tx_cur = 0;
 
@@ -507,9 +473,13 @@ int e1000_reset_controller (void)
 
 // Address: low and high.
     __E1000WriteCommand (
-        currentNIC, 0x2800, (unsigned int) currentNIC->rx_descs_phys );  // low
+        currentNIC, 
+        0x2800, 
+        (unsigned int) currentNIC->rx_descs_phys );  // low
     __E1000WriteCommand (
-        currentNIC, 0x2804, (unsigned int) (currentNIC->rx_descs_phys >> 32) );                           // high 
+        currentNIC, 
+        0x2804, 
+        (unsigned int) (currentNIC->rx_descs_phys >> 32) );                           // high 
 
 // Buffer
     __E1000WriteCommand (currentNIC, 0x2808, 512);    // 32*16
@@ -517,8 +487,11 @@ int e1000_reset_controller (void)
     __E1000WriteCommand (currentNIC, 0x2818, 31);     // tail
 
 // receive control
+// RCTL = 0x0100, /* Receive Control */
     __E1000WriteCommand (
-        currentNIC, 0x100, 0x602801E);  // RCTL	= 0x0100,	/* Receive Control */
+        currentNIC, 
+        0x100, 
+        0x602801E );  
 
 // RX Delay Timer Register
     //__E1000WriteCommand (currentNIC, 0x2820, 0);
@@ -532,9 +505,13 @@ int e1000_reset_controller (void)
 
     
     __E1000WriteCommand (
-        currentNIC, 0x3800, (unsigned int) currentNIC->tx_descs_phys );  //low (endereço do ring)
+        currentNIC, 
+        0x3800, 
+        (unsigned int) currentNIC->tx_descs_phys );  //low (endereço do ring)
     __E1000WriteCommand (
-        currentNIC, 0x3804, (unsigned int) (currentNIC->tx_descs_phys >> 32) );                           //high
+        currentNIC, 
+        0x3804, 
+        (unsigned int) (currentNIC->tx_descs_phys >> 32) );                           //high
 
 // Buffer
     __E1000WriteCommand (currentNIC, 0x3808, 128);  //8*16
@@ -567,14 +544,18 @@ int e1000_reset_controller (void)
 	//#define E1000_TXDCTL_WTHRESH 0x003F0000 /* TXDCTL Writeback Threshold */
 	//#define E1000_TXDCTL_GRAN    0x01000000 /* TXDCTL Granularity */
 	//#define E1000_TXDCTL   0x03828  /* TX Descriptor Control - RW */
-	
+
     __E1000WriteCommand (
-        currentNIC, 0x3828, (0x01000000 | 0x003F0000)); 
+        currentNIC, 
+        0x3828, 
+        (0x01000000 | 0x003F0000) );
 
     __E1000WriteCommand ( 
-        currentNIC,  0x400, ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) ); 
-	
-	//?
+        currentNIC, 
+        0x400, 
+        ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) ); 
+
+    //?
 	//E1000WriteCommand(currentNIC, 0x400, 0x10400FA);  //TCTL	= 0x0400,	/* Transmit Control */
 	//E1000WriteCommand(currentNIC, 0x400, 0x3003F0FA);
 	//E1000WriteCommand(currentNIC, 0x400, (1 << 1) | (1 << 3) );
@@ -583,11 +564,14 @@ int e1000_reset_controller (void)
     //• IPGR1 = 2
     //• IPGR2 = 10
     //#define E1000_TIPG     0x00410  /* TX Inter-packet gap -RW */	
+    
     __E1000WriteCommand ( 
-        currentNIC,  0x410, (  0x0000000A | 0x00000008 | 0x00000002) ); 
+        currentNIC,
+        0x410,
+        (  0x0000000A | 0x00000008 | 0x00000002) ); 
 
-	//talvez ja fizemos isso. 
-	//Initialize the transmit descriptor registers (TDBAL, TDBAH, TDL, TDH, and TDT).
+// Talvez ja fizemos isso. 
+// Initialize the transmit descriptor registers (TDBAL, TDBAH, TDL, TDH, and TDT).
 
     //eth_write(base_addr, REG_ADDR_MAC_CONF,
 	//	  /* Set the RMII speed to 100Mbps */
@@ -624,7 +608,7 @@ int e1000_reset_controller (void)
 
 
 //=======================================================
-// e1000_setup_irq:
+// __e1000_setup_irq:
 //     Setup nic irq 
 // #importante
 // Isso é usado por uma hotina em headlib.s para 
@@ -640,15 +624,12 @@ uint8_t nic_idt_entry_new_number;
 //uint32_t nic_idt_entry_new_address;
 unsigned long nic_idt_entry_new_address=0; //global
 
-//global
-//see: nicintel.h
-void e1000_setup_irq (int irq_line)
+static void __e1000_setup_irq(int irq_line)
 {
-    debug_print ("e1000_setup_irq: [FIXME]\n");
+    debug_print ("__e1000_setup_irq: [FIXME]\n");
 
 // irq line.
-    uint8_t irq = 
-        (uint8_t) (irq_line & 0xFF);
+    uint8_t irq = (uint8_t) (irq_line & 0xFF);
 
 // handler address.
 // #bugbug: 
@@ -663,10 +644,10 @@ void e1000_setup_irq (int irq_line)
 
 // --------------
 
-	//#debug OK (irq=9) 
-    printf ("e1000_setup_irq: irq={%d}\n",irq);
-    printf ("e1000_setup_irq: idt_num={%d}\n",idt_num);
-    printf ("e1000_setup_irq: handler={%x}\n", handler);
+//#debug OK (irq=9) 
+    printf ("__e1000_setup_irq: irq={%d}\n", irq);
+    printf ("__e1000_setup_irq: idt_num={%d}\n", idt_num);
+    printf ("__e1000_setup_irq: handler={%x}\n", handler);
 	//printf ("PCIRegisterIRQHandler: pin={%d}\n",currentNIC->pci->irq_pin);//shared INTA#
 	//refresh_screen();
 	//while(1){}
@@ -695,12 +676,10 @@ void e1000_setup_irq (int irq_line)
 //na verdade o assembly esta usando outro endereço
     nic_idt_entry_new_address = (unsigned long) handler; 
 
-
-    printf ("e1000_setup_irq: interrupt={%d}\n", 
+    printf ("__e1000_setup_irq: interrupt={%d}\n", 
         nic_idt_entry_new_number );
-    printf ("e1000_setup_irq: handler={%x}\n", 
+    printf ("__e1000_setup_irq: handler={%x}\n", 
         nic_idt_entry_new_address );
-
 
 // Call assembly.
     extern void asm_nic_create_new_idt_entry(void);
@@ -734,10 +713,11 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa)
 }
 
 
+// ---------------------------------------------
+// e1000_init_nic:
+// Called by ...
 // Initialize the driver.
-//
 // == NIC Intel. ===================
-//
 // #bugbug
 // Ver em que hora que os buffers são configurados.
 // precisam ser os mesmos encontrados na 
@@ -758,23 +738,16 @@ e1000_init_nic (
     unsigned char fun, 
     struct pci_device_d *pci_device )
 {
-    // loop
-    register uint32_t i=0; 
-    
-    // pci info.
-    uint32_t data=0;
-
-    unsigned short Vendor = 0;
-    unsigned short Device = 0;
-
-    unsigned long phy_address  = 0;
-    unsigned long virt_address = 0;
-
+    register uint32_t i=0;  // loop
+    uint32_t data=0;        // pci info 
+    unsigned short Vendor=0;
+    unsigned short Device=0;
+    unsigned long phy_address=0;
+    unsigned long virt_address=0;
     unsigned short tmp16=0;
-
     uint32_t Val=0;
 
-    // #debug
+// #debug
     debug_print ("e1000_init_nic:\n");
     printf      ("e1000_init_nic:\n");
 
@@ -796,109 +769,91 @@ e1000_init_nic (
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
         debug_print ("e1000_init_nic: [FAIL] Device not found\n");
-
-        printf ("e1000_init_nic: [FAIL] Device not found\n");
-        refresh_screen();
-        while(1){}
-        
-        // #todo
-        // #bugbug
-        // Temos que sinalizar que o dispositivo nao foi inicializado.
-        
+        panic       ("e1000_init_nic: [FAIL] Device not found\n");
+        // #bugbug: Maybe only return.
         return (int) (-1);
     }
 
-    // #debug
+// #debug
     printf ("Vendor=%x ",   (data       & 0xffff) );
     printf ("Device=%x \n", (data >> 16 & 0xffff) );
 
-//
 // pci_device structure.
-//
-
 // pci device struct
 // passado via argumento. 
 
     if ( (void *) pci_device ==  NULL ){
         panic ("e1000_init_nic: pci_device\n");
-    }else{
-        pci_device->used   = TRUE;
-        pci_device->magic  = 1234;
-        pci_device->bus    = (unsigned char) bus;
-        pci_device->dev    = (unsigned char) dev;
-        pci_device->func   = (unsigned char) fun;
-        pci_device->Vendor = (unsigned short) (data       & 0xffff);
-        pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
+    }
 
+    // We can to this at the end of this routine.
+    pci_device->used = TRUE;
+    pci_device->magic = 1234;
 
-		// #IMPORTANTE
-		// #bugbug:
-		// Esse driver é para placa Intel, vamos cancelar a inicialização 
-		// do driver se a placa não for Intel.
+    pci_device->bus  = (unsigned char) bus;
+    pci_device->dev  = (unsigned char) dev;
+    pci_device->func = (unsigned char) fun;
 
-		// 8086:100e
-		// 82540EM Gigabit Ethernet Controller
+    pci_device->Vendor = (unsigned short) (data       & 0xffff);
+    pci_device->Device = (unsigned short) (data >> 16 & 0xffff);
 
-		// #todo
-		// Fazer uma lista de dispositivos Intel suportados por esse driver.
-		// +usar if else.
-		// já fizemos essa checagem antes.
+// #IMPORTANTE
+// #bugbug:
+// Esse driver é para placa Intel, vamos cancelar a inicialização 
+// do driver se a placa não for Intel.
+// 8086:100e | 82540EM Gigabit Ethernet Controller
+// #todo
+// Fazer uma lista de dispositivos Intel suportados por esse driver.
+// +usar if else.
+// já fizemos essa checagem antes.
 
-        if ( pci_device->Vendor != 0x8086 || 
-             pci_device->Device != 0x100E )
-        {
-            panic ("e1000_init_nic: 82540EM not found\n");
-            // #bugbug
-            // Maybe only return.
-            // debug_print ("e1000_init_nic: 82540EM not found\n");
-            // return -1;
-        }
+    if ( pci_device->Vendor != 0x8086 || 
+         pci_device->Device != 0x100E )
+    {
+        panic ("e1000_init_nic: 82540EM not found\n");
+        // #bugbug: Maybe only return.
+        return (int) (-1);
+    }
 
+// BARs
 
-		//
-		// BARs
-		//
+    pci_device->BAR0 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
+    pci_device->BAR1 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x14 ); 
+    pci_device->BAR2 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
+    pci_device->BAR3 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
+    pci_device->BAR4 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
+    pci_device->BAR5 = 
+        (unsigned long) diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
 
-        pci_device->BAR0 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x10 );
-        pci_device->BAR1 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x14 ); 
-        pci_device->BAR2 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x18 );
-        pci_device->BAR3 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x1C );
-        pci_device->BAR4 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x20 );
-        pci_device->BAR5 = (unsigned long) diskReadPCIConfigAddr ( 
-                                               bus, dev, fun, 0x24 );
+// IRQ
 
-        // IRQ.
+// irq
+    pci_device->irq_line = 
+        (uint8_t) pciConfigReadByte ( bus, dev, fun, 0x3C );
+// letras
+    pci_device->irq_pin = 
+        (uint8_t) pciConfigReadByte ( bus, dev, fun, 0x3D ); 
 
-        // irq
-        pci_device->irq_line = (uint8_t) pciConfigReadByte ( 
-                                             bus, dev, fun, 0x3C );
-        // letras
-        pci_device->irq_pin  = (uint8_t) pciConfigReadByte ( 
-                                             bus, dev, fun, 0x3D ); 
+// The physical address!
+// #importante:
+// Grab the Base I/O Address of the device
+// Aqui nós pegamos o endereço dos registadores na BAR0,
+// Então mapeamos esse endereço físico para termos um 
+// endereço virtual para manipularmos os registradores. 
+//#bugbug: size 32bit 64bit?
 
+    phy_address = (unsigned long) ( pci_device->BAR0 & 0xFFFFFFF0 );
 
-        // The physical address!
-        // #importante:
-        // Grab the Base I/O Address of the device
-        // Aqui nós pegamos o endereço dos registadores na BAR0,
-        // Então mapeamos esse endereço físico para termos um 
-        // endereço virtual para manipularmos os registradores. 
-        
-        //#bugbug: size 32bit 64bit?
-
-        phy_address = (unsigned long) ( pci_device->BAR0 & 0xFFFFFFF0 );
-
-        if (phy_address == 0){
-            panic ("e1000_init_nic: Invalid phy_address\n");
-        }
-        
-        // ...
-    };
+    if (phy_address == 0){
+        panic ("e1000_init_nic: Invalid phy_address\n");
+    }
+  
+    // ...
 
 // Base address
 // #importante:
@@ -933,85 +888,90 @@ e1000_init_nic (
 
     if ( (void *) currentNIC ==  NULL ){
         panic ("e1000_init_nic: currentNIC struct\n");
-    } else {
+    } 
 
-        currentNIC->used  = TRUE;
-        currentNIC->magic = 1234;
-        currentNIC->interrupt_count = 0;
-        currentNIC->pci = (struct pci_device_d *) pci_device;
+    currentNIC->used = TRUE;
+    currentNIC->magic = 1234;
 
-        // Salvando o endereço para outras rotinas usarem.
-        currentNIC->registers_base_address = (unsigned long) &base_address[0];
-        currentNIC->mem_base = (uint32_t) &base_address[0];
+    currentNIC->interrupt_count = 0;
 
-        currentNIC->use_io = 0; //False;
+    currentNIC->pci = (struct pci_device_d *) pci_device;
 
-		//
-		// Get info.
-		//
+// #bugbug: Using 32bit address?
+// Salvando o endereço para outras rotinas usarem.
+    currentNIC->registers_base_address = (unsigned long) &base_address[0];
+    currentNIC->mem_base = (uint32_t) &base_address[0];
 
-        // Device status.
-        currentNIC->DeviceStatus = base_address[0x8];
+    currentNIC->use_io = 0; //False;
 
+//
+// Get info.
+//
 
-		//
-		// ## EEPROM ##
-		//
-		
-		//False;
-		//Como ainda não sabemos, vamos dizer que não.
-		currentNIC->eeprom = 0; 
+// Device status.
+    currentNIC->DeviceStatus = base_address[0x8];
 
-		// Let's try to discover reading the status field!
-        for ( i=0; i < 1000 && !currentNIC->eeprom; ++i ) 
-        {
-            Val = __E1000ReadCommand ( currentNIC, 0x14 );
+//
+// ## EEPROM ##
+//
 
-            // We have? Yes!.
-            if ( (Val & 0x10) == 0x10) { currentNIC->eeprom = 1; }
-        };
+// False:
+// Como ainda não sabemos, vamos dizer que não.
+    currentNIC->eeprom = 0; 
 
+// Let's try to discover reading the status field!
 
-		//
-		// ## MAC ##
-		//
+    for ( i=0; 
+          i < 1000 && !currentNIC->eeprom; 
+          ++i ) 
+    {
+        Val = __E1000ReadCommand ( currentNIC, 0x14 );
 
-		// Let's read the MAC Address!
+        // We have? Yes!.
+        if ( (Val & 0x10) == 0x10){
+            currentNIC->eeprom = 1; 
+        }
+    };
 
-        // We can use the EEPROM!
-        if (currentNIC->eeprom == 1) 
-        {
-			//printf("MAC from eeprom \n");  
-			//refresh_screen();
-			//while(1){}
-			 
-		    uint32_t tmp = __E1000ReadEEPROM ( currentNIC, 0 );
-		    currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
-		    currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
+//
+// ## MAC ##
+//
 
-		    tmp = __E1000ReadEEPROM ( currentNIC, 1);
-		    currentNIC->mac_address[2] = (uint8_t)(tmp & 0xFF);
-		    currentNIC->mac_address[3] = (uint8_t)(tmp >> 8);
-		
-		    tmp = __E1000ReadEEPROM ( currentNIC, 2);
-		    currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
-		    currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
+// Let's read the MAC Address!
 
-        // We can't use the EEPROM :(
-        }else{
+    // We can use the EEPROM!
+    if (currentNIC->eeprom == 1) 
+    {
+        //printf("MAC from eeprom \n");  
+        //refresh_screen();
+        //while(1){}
+ 
+        uint32_t tmp = __E1000ReadEEPROM ( currentNIC, 0 );
+        currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
 
-			//printf("MAC from registers \n"); 
-			//refresh_screen();
-			//while(1){}
+        tmp = __E1000ReadEEPROM ( currentNIC, 1);
+        currentNIC->mac_address[2] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[3] = (uint8_t)(tmp >> 8);
 
-            // MAC - pegando o mac nos registradores.
-            currentNIC->mac_address[0] = base_address[ 0x5400 + 0 ];
-            currentNIC->mac_address[1] = base_address[ 0x5400 + 1 ];
-            currentNIC->mac_address[2] = base_address[ 0x5400 + 2 ];
-            currentNIC->mac_address[3] = base_address[ 0x5400 + 3 ];
-            currentNIC->mac_address[4] = base_address[ 0x5400 + 4 ];
-            currentNIC->mac_address[5] = base_address[ 0x5400 + 5 ];
-        };
+        tmp = __E1000ReadEEPROM ( currentNIC, 2);
+        currentNIC->mac_address[4] = (uint8_t)(tmp & 0xFF);
+        currentNIC->mac_address[5] = (uint8_t)(tmp >> 8);
+
+    // We can't use the EEPROM :(
+    }else{
+
+        //printf("MAC from registers \n"); 
+        //refresh_screen();
+        //while(1){}
+
+        // MAC - pegando o mac nos registradores.
+        currentNIC->mac_address[0] = base_address[ 0x5400 + 0 ];
+        currentNIC->mac_address[1] = base_address[ 0x5400 + 1 ];
+        currentNIC->mac_address[2] = base_address[ 0x5400 + 2 ];
+        currentNIC->mac_address[3] = base_address[ 0x5400 + 3 ];
+        currentNIC->mac_address[4] = base_address[ 0x5400 + 4 ];
+        currentNIC->mac_address[5] = base_address[ 0x5400 + 5 ];
     };
 
 // ## bus mastering ##
@@ -1040,15 +1000,17 @@ e1000_init_nic (
     }
 
 
+// irq line:
+
     unsigned char irq_line = 
         (unsigned char) pciGetInterruptLine(bus,dev);
-
     printf ("Done irqline %d\n",irq_line);
     refresh_screen();
 
-    e1000_setup_irq(irq_line);
-    
-    e1000_reset_controller();
+    __e1000_setup_irq(irq_line);
+
+// Reset the controller.
+    __e1000_reset_controller();
     
     e1000_interrupt_flag = TRUE;
 

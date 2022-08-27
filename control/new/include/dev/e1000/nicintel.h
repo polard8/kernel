@@ -84,7 +84,7 @@ struct intel_nic_info_d
     int use_io;
 
     uint16_t io_base;
-    uint32_t mem_base;
+    uint32_t mem_base;    // #bugbug:  32bit address?
 
 // rx
     struct legacy_rx_desc *legacy_rx_descs; //rx ring virtual address
@@ -134,18 +134,12 @@ extern int e1000_irq_count;
 // == Prototypes ========
 //
 
-void e1000_setup_irq (int irq_line);
-int e1000_reset_controller (void);
-
 int 
 e1000_init_nic ( 
     unsigned char bus, 
     unsigned char dev, 
     unsigned char fun, 
     struct pci_device_d *pci_device );
-
-
-
 
 #endif    
 
