@@ -1083,7 +1083,6 @@ void kgwm_early_kernel_console(void);
 
 int 
 wmKeyEvent(
-    tid_t tid, 
     unsigned char raw_byte,
     int prefix );
 

@@ -269,61 +269,20 @@ CheckByte:
     }
 
 // Process the normal byte
+// >>> Posting the message into the windows server queue.
 NormalByte:
 
-// + Build the message and send it to the thread's queue.
-// This routine will select the target thread.
-// + Or send the message to the input TTY.
-// This way the foreground process is able to get this data.
-// See: ps2kbd.c
-// See: user/console.c
-
-// IN: 
-// device type, data.
-// 1 = keyboard
-
-// Call the event handler.
-// Console interrupt
-// Valid foreground thread.
-// Handler for keyboard input.
-// See: kgwm.c
-
-// ##
-// Nesse caso o driver esta chamando a rotina
-// que lida com o evento. Mas o plano é apenas
-// colocar os eventos de teclado em um arquivo
-// que poderá ser aberto e lido pelo window server.
-
-    if ( foreground_thread >= 0 && 
-         foreground_thread < THREAD_COUNT_MAX )
-    {
-
-       // #opçao
-       // Apenas enfileira os raw bytes.
-       // put_rawbyte(__raw)
-       
-       // lida com o evento.
-       // coloca na fila da thread em foreground e
-       // no arquivo stdin.
-       
-       // #todo
-       // Podemos checar se a foreground thread deseja receber
-       // raw input. Nesse caso, podemos postar e sair imediatamente.
-       
-       //t = (struct thread_d *) threadList[foreground_thread];
-       //if(t->wantRawInput == TRUE){POST(RAW)}
-
-       // IN: tid, scancode, prefix.
+// #opçao
+// Apenas enfileira os raw bytes.
+   // put_rawbyte(__raw)
+ 
+// We don't need this.
+// The routine bellow is always posting 
+// to the windows server.
+// IN: tid, scancode, prefix.
        wmKeyEvent( 
-           (tid_t) foreground_thread, 
            (unsigned char) __raw,
            (int) (__prefix & 0xFF) );
-
-       // #todo
-       // Coloque os pacotes num arquivo,
-       // o window server poderá ler depois.
-       //write_packet(kbdfp,...)
-    }
 
 // Clean the mess.
     __prefix=0;

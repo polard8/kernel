@@ -389,7 +389,6 @@ console_interrupt(
     int device_type, 
     int data )
 {
-
     //int TargetThread = foreground_thread;
     int TargetThreadTID = (target_thread & 0xFFFF);
     int DeviceType = device_type;
@@ -421,12 +420,11 @@ console_interrupt(
         case CONSOLE_DEVICE_KEYBOARD:
             debug_print("console_interrupt: input from keyboard device :)\n");
 
-            // IN: tid, scancode, prefix.
+            // In this case the target tid is the window server.
+            // IN: scancode, prefix.
+            // #bugbug: No prefix always. We need a prefix.
             Status = 
-                (int) wmKeyEvent( 
-                          (tid_t) TargetThreadTID, 
-                          Data,
-                          (int) 0 );
+                (int) wmKeyEvent( Data, (int) 0 );
             
             if (Status<0){
                 return;

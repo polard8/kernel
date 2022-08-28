@@ -1397,6 +1397,7 @@ __wmProcessExtendedKeyboardKeyStroke(
 // a thread do processo em foreground. Tudo depende
 // do input mode.
 // Called by console_interrupt() in console.c
+// and by the kdb device driver in ps2kbd.c.
 // Is this the forground thread?
 // #bugbug: Não estamos usando o parâmetro tid.
 // Lembrando que numa interrupção de teclado,
@@ -1405,12 +1406,30 @@ __wmProcessExtendedKeyboardKeyStroke(
 // que de alguma direção para o escalonador.
 // Pega um scancode, transforma em caractere e envia na forma de mensagem
 // para a thread de controle associada com a janela que tem o foco de entrada.
+// + Build the message and send it to the thread's queue.
+// This routine will select the target thread.
+// + Or send the message to the input TTY.
+// This way the foreground process is able to get this data.
+// See: ps2kbd.c
+// See: console.c
+// IN: 
+// device type, data.
+// 1 = keyboard
+// Call the event handler.
+// Console interrupt
+// Valid foreground thread.
+// Handler for keyboard input.
+// See: kgwm.c
+// ##
+// Nesse caso o driver esta chamando a rotina
+// que lida com o evento. Mas o plano é apenas
+// colocar os eventos de teclado em um arquivo
+// que poderá ser aberto e lido pelo window server.
 // IN:
 // target thread, raw byte 
 
 int 
 wmKeyEvent( 
-    tid_t tid, 
     unsigned char raw_byte,
     int prefix )
 {
@@ -1456,11 +1475,11 @@ wmKeyEvent(
 //#todo
     //debug_print("xxxKeyEvent:\n");
 
-    if (tid<0 || tid >= THREAD_COUNT_MAX)
-    {
-        debug_print("wmKeyEvent: tid\n");
-        return (int) (-1);
-    }
+    //if (tid<0 || tid >= THREAD_COUNT_MAX)
+    //{
+    //    debug_print("wmKeyEvent: tid\n");
+    //    return (int) (-1);
+    //}
 
 
 // =============
