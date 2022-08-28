@@ -410,7 +410,7 @@ post_message_to_ws (
     }
 
     tid = (tid_t) WindowServerInfo.tid;
-         
+
     if ( tid < 0 || tid >= THREAD_COUNT_MAX )
     {
         return -1;

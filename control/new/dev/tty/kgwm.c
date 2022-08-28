@@ -2097,7 +2097,8 @@ wmMouseEvent(
 // atraves do segundo long.
 // IN: window pointer, event id, button number. button number.
 
-    if ( event_id == MSG_MOUSEPRESSED || event_id == MSG_MOUSERELEASED )
+    if ( event_id == MSG_MOUSEPRESSED || 
+         event_id == MSG_MOUSERELEASED )
     {
         post_message_to_ws(
             NULL,
@@ -2109,13 +2110,6 @@ wmMouseEvent(
 
 // ====================================
 // mouse move events:
-
-    if ( long1 < 1 ){ long1=1; }
-    if ( long2 < 1 ){ long2=1; }
-    if ( long1 >= deviceWidth ) { long1 = (deviceWidth-1);  }
-    if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
-
-//----
 
     //#debug
     //printf ("w:%d h:%d\n",deviceWidth, deviceHeight);
@@ -2136,6 +2130,11 @@ wmMouseEvent(
 
     if (event_id == MSG_MOUSEMOVE)
     {
+        if ( long1 < 1 ){ long1=1; }
+        if ( long2 < 1 ){ long2=1; }
+        if ( long1 >= deviceWidth ) { long1 = (deviceWidth-1);  }
+        if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
+
         post_message_to_ws(
             NULL, 
             event_id, 
@@ -2143,15 +2142,12 @@ wmMouseEvent(
             (unsigned long) long2 );
         return 0;
     }
-//----
 
 done:
     return 0;
 fail:
-    //debug_print ("xxxMouseEvent: fail\n");
     return -1;
 }
-
 
 // called by I_init()
 // OUT: return TRUE if its ok.
