@@ -186,17 +186,41 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
                 // Balance
                 // Non interactive system services and processes.
-                if (TmpThread->personality == PERSONALITY_GRAMADO)
-                {
-                    TmpThread->quantum = QUANTUM_MIN;
-                }
+                //if (TmpThread->personality == PERSONALITY_GRAMADO)
+                //{
+                //    TmpThread->quantum = QUANTUM_MIN;
+                //}
 
                 // Balance
                 // Interactive gui applications.
-                if (TmpThread->personality == PERSONALITY_GWS)
-                {
-                    TmpThread->quantum = QUANTUM_MAX;
+                //if (TmpThread->personality == PERSONALITY_GWS)
+                //{
+                //    TmpThread->quantum = QUANTUM_MAX;
+                //}
+                
+                // Balance all.
+                // Priority normal. balance.
+                TmpThread->quantum = QUANTUM_Q2;
+
+                // Init thread: low
+                if ( TmpThread == Idle ){
+                    TmpThread->quantum = QUANTUM_THRESHOLD;
                 }
+
+                // Foreground thread: high
+                if ( TmpThread->tid == foreground_thread ){
+                    TmpThread->quantum = QUANTUM_TIME_CRITICAL_RT;
+                }
+
+                // Window server: Very high
+                // needs to be responsive.
+                // Because this threads receives all the input events.
+                if (WindowServerInfo.initialized == TRUE)
+                {
+                    if (TmpThread->tid == WindowServerInfo.tid)
+                        TmpThread->quantum = QUANTUM_MAX;
+                }
+
             }
 
             // Alarm

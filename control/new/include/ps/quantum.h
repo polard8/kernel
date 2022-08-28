@@ -31,8 +31,9 @@
 // Class 2: Real time time critical
 #define QUANTUM_TIME_CRITICAL_RT    QUANTUM_Q6
 
-
-#define QUANTUM_BOOST    (QUANTUM_Q6*3)
+//#test
+//#define QUANTUM_BOOST    (QUANTUM_Q6*3)
+#define QUANTUM_BOOST    (QUANTUM_Q6*4)
 
 #define QUANTUM_MIN    QUANTUM_Q1
 #define QUANTUM_MAX    (QUANTUM_Q6 + QUANTUM_BOOST)

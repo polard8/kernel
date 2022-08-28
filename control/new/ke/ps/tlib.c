@@ -523,7 +523,7 @@ void show_slot(int tid)
 // Show one slot
 
     printf ("\n");
-    printf ("TID   PID   Per   pdPA  Prio  State Quan *Jiffies initial_rip rflags   tName \n");
+    printf ("TID   PID   Per   pdPA  Prio  State Quan Jiffies initial_rip rflags   tName \n");
     printf ("====  ====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
     printf ("%d    %d    %d    %x   %d    %d    %d    %d      %x          %x      %s      \n", 
         t->tid, 
@@ -540,6 +540,15 @@ void show_slot(int tid)
 
     //#test
     printf(":: stime{%d} utime{%d}\n",t->stime,t->utime);
+
+    if(t->tid == foreground_thread)
+        printf("[__FOREGROUND__]\n");
+
+    if(t->state == ZOMBIE)
+        printf("[__ZOMBIE__]\n");
+
+    if(t->state == DEAD)
+        printf("[__DEAD__]\n");
 
     goto done;
 
@@ -566,7 +575,9 @@ void show_slots(void)
         //jiffies, seconds, (seconds/60));
 
     printf("Thread info: jiffies{%d} \n", jiffies );
-    printf("Focus tid {%d}\n",foreground_thread);
+    printf("Threads running: %d\n",UPProcessorBlock.threads_counter);
+    printf("Foreground thread: {%d}\n",foreground_thread);
+
 
     for ( i=0; i<THREAD_COUNT_MAX; i++ )
     {
