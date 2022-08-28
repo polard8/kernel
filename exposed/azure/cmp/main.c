@@ -1,18 +1,21 @@
 
 // CMP.BIN
 // cmp command from unix v7
+// compare, or compare skipping.
+// cmp file1 file2
+// #todo: 
 
 // rtl
 #include <stdio.h>
 #include <ctype.h>
 
 FILE	*file1,*file2;
-int	eflg;
-int	lflg	= 1;
-long	line	= 1;
-long	chr	= 0;
-long	skip1;
-long	skip2;
+int	eflg=0;
+int	lflg = 1;
+long	line= 1;
+long	chr=0;
+long	skip1=0;
+long	skip2=0;
 
 static long otoi(char *s);
 
@@ -34,57 +37,76 @@ static long otoi(char *s)
 
 int main ( int argc, char *argv[] )
 {
-	register c1, c2;
+	register char c1, c2;
 	char *arg;
 
 	if(argc < 3)
 		goto narg;
+
 	arg = argv[1];
 	if(arg[0] == '-' && arg[1] == 's') {
 		lflg--;
 		argv++;
 		argc--;
 	}
+
 	arg = argv[1];
 	if(arg[0] == '-' && arg[1] == 'l') {
 		lflg++;
 		argv++;
 		argc--;
 	}
-	if(argc < 3)
+
+	if(argc < 3){
 		goto narg;
+    }
+	
 	arg = argv[1];
-	if( arg[0]=='-' && arg[1]==0 )
+	if( arg[0]=='-' && arg[1]==0 ){
 		file1 = stdin;
-	else if((file1 = fopen(arg, "a+")) == NULL)
+	} else if((file1 = fopen(arg, "a+")) == NULL){
 		goto barg;
+    }
+
 	arg = argv[2];
-	if((file2 = fopen(arg, "a+")) == NULL)
+	if((file2 = fopen(arg, "a+")) == NULL){
 		goto barg;
-	if (argc>3)
+	}
+
+	if (argc>3){
 		skip1 = otoi(argv[3]);
-	if (argc>4)
+	}
+	if (argc>4){
 		skip2 = otoi(argv[4]);
-	while (skip1) {
-		if ((c1 = getc(file1)) == EOF) {
+	}
+	
+	while (skip1)
+	{
+		if ((c1 = getc(file1)) == EOF)
+		{
 			arg = argv[1];
 			goto earg;
 		}
 		skip1--;
-	}
-	while (skip2) {
-		if ((c2 = getc(file2)) == EOF) {
+	};
+	
+	while (skip2)
+	{
+		if ((c2 = getc(file2)) == EOF) 
+		{
 			arg = argv[2];
 			goto earg;
 		}
 		skip2--;
-	}
+	};
 
 loop:
 	chr++;
 	c1 = getc(file1);
 	c2 = getc(file2);
-	if(c1 == c2) {
+	
+	if(c1 == c2)
+	{
 		if (c1 == '\n')
 			line++;
 		if(c1 == EOF) {
@@ -94,6 +116,7 @@ loop:
 		}
 		goto loop;
 	}
+	
 	if(lflg == 0)
 		exit(1);
 	if(c1 == EOF) {
@@ -105,7 +128,8 @@ loop:
 	if(lflg == 1) 
 	{
 		//printf("%s %s differ: char %ld, line %ld\n", argv[1], arg, chr, line);
-		printf("%s %s differ: char %d, line %d\n", argv[1], arg, chr, line);
+		printf("%s %s differ: char %d, line %d\n",
+		    argv[1], arg, chr, line);
 		exit(1);
 	}
 	eflg = 1;
@@ -118,8 +142,9 @@ narg:
 	exit(2);
 
 barg:
-	if (lflg)
-	printf("cmp: cannot open %s\n", arg);
+	if (lflg){
+	    printf("cmp: cannot open %s\n", arg);
+	}
 	exit(2);
 
 earg:

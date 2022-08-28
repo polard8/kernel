@@ -1,24 +1,19 @@
 ;
-; File: stage3/blconfig.inc 
-;
+; File: blconfig.inc 
 ; Descrição:
 ; Rotinas para configurar os arquivos de inicialização system.cnf e init.cnf.
 ; @todo: rever os arquivos de inicialização. Pois estamos usando apenas
 ; um META$FILE.
-;   
 ; Obs:
 ;     Temos um arquivo de configurações de inicialização, de somente
 ; leitura chamado INIT.TXT, que será carregado posteriormente pelo Boot Loader.
 ; Talvez podéssemos ler alguma coisa nele antes do Boot Loader.
-;
 ; Funções principais:
 ;     *alterar           - Coloca os valores em init.inc.
 ;     *salvar alterações - Salva init.inc em init.cnf. 
 ;                         (tornar permanente as alterações.)
-;
-; Histórico:
-;     Versão: 1.0, 2015 - Created.
-;
+; History:
+;     2015 - Created by Fred Nora.
 
 
 

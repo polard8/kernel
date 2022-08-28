@@ -34,6 +34,7 @@ int main (int argc, char **argv)
 
     while (TRUE){
 
+        //if ((fgets(ch, 40, fp)) != NULL)
         if ((fgets(ch, 100, fp)) != NULL)
         {
             if ((strstr(ch, "/*")) == NULL)

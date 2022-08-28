@@ -40,7 +40,7 @@
 
 static void __serial_write_char (unsigned char data);
 static void test_disk_size(void);
-
+static int is_qemu(void);
 
 
 // Vai escrever em uma porta ja inicializada pelo kernel.
@@ -126,6 +126,16 @@ static void test_disk_size(void)
 }
 
 
+static int is_qemu(void)
+{
+    int isQEMU=-1;
+    isQEMU = (int) rtl_get_system_metrics(300);
+    //isVirtualBox = rtl_get_system_metrics(?);
+    //isBochs      = rtl_get_system_metrics(?);
+
+    return (int) (isQEMU & 0xFFFFFFFF);
+}
+
 // main:
 // #test
 // Testing shutdown in virtual machines.
@@ -135,6 +145,9 @@ static void test_disk_size(void)
 
 int main ( int argc, char *argv[] )
 {
+
+// #todo: parameters.
+// Or maybe we need a application called poweroff.bin.
 
 /*
  // #test: disk size.
@@ -149,18 +162,19 @@ int main ( int argc, char *argv[] )
 // acionar os locks, sincronizar os sistemas de arquivo
 // montados, etc ...
 
+// #todo
+// Podemos testar para outros hv, como kvm ...
+
     static int isQEMU = FALSE;
     //int isVirtualBox = FALSE;
     //int isBochs      = FALSE;
     
-    isQEMU = rtl_get_system_metrics(300);
-    //isVirtualBox = rtl_get_system_metrics(?);
-    //isBochs      = rtl_get_system_metrics(?);
+
 
 // ==============================
 // qemu
 // In newer versions of QEMU, you can do shutdown with:
-
+    isQEMU = (int) is_qemu();
     if (isQEMU == TRUE){
         debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down \n");
         libio_outport16(

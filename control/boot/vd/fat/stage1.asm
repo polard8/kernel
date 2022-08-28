@@ -19,7 +19,7 @@
 ;; See: main.asm 
 
 
-END_OF_CLUSTER EQU 0xFFFF
+END_OF_CLUSTER EQU  0xFFFF
 ;;END_OF_CLUSTER2 EQU 0xFFF8
 ROOTDIRSTART EQU (BUFFER_NAME)
 ROOTDIRSIZE  EQU (BUFFER_NAME+4)
@@ -28,6 +28,7 @@ ROOTDIRSIZE  EQU (BUFFER_NAME+4)
 ;SAVE3           EQU (BUFFER_NAME+4)
 ;CylinderNumbers EQU (BUFFER_VOLUME_ID)
 
+SECTOR_SIZE EQU  0x0200    ; Sector size in bytes
 
 ;; 16bit. Esse é o MBR do VHD.
 [bits 16]
@@ -42,27 +43,40 @@ stage1_main:
 ; Na inicialização, reaproveitamos esse endereço como buffer.
 
 BUFFER_NAME:
-    DB "MSDOS"
-    DB "5.0"
+    DB "MSDOS"    ; OS name
+    DB "5.0"      ; OS version
+
 ; The BPB itself.
 BPB:
-BytesPerSector        dw 0x0200
-SectorsPerCluster     db 1
-ReservedSectors       dw 62      ;; 62
-TotalFATs             db 0x02
-MaxRootEntries        dw 0x0200
-TotalSectorsSmall     dw 0x0000  ;; (CHS=963/4/17-5)(Number of sectors - number of hidden sectors)
+BytesPerSector        dw SECTOR_SIZE  ; 0x0200=512
+SectorsPerCluster     db 1            ; Sectors per cluster
+ReservedSectors       dw 62           ; Reserved sectors 
+TotalFATs             db 0x02         ; Number of FATs
+MaxRootEntries        dw 0x0200       ; Number of root entries.
+; #wrong: (CHS: (963*4*17)-5)(Number of sectors - number of hidden sectors)
+; #right: (4*17*963)-5
+TotalSectorsSmall     dw 0x0000  
 MediaDescriptor       db 0xF8
 SectorsPerFAT         dw 246    
-SectorsPerTrack       dw 17      ;; 19 SPT.  
-NumHeads              dw 4       ;; 4 HEADS. Number of surfaces
-HiddenSectors         dd 5       ;; 1+1+3 ( mbr + vbr + reserved sectors depois do vbr)
-TotalSectorsLarge     dd 0       ;; Number of sectors, if 'TotalSectorsSmall = 0'.
-DriveNumber           db 0x80    
-Flags                 db 0x00    ;; ?? Current Head ??
-Signature             db 0x29    ;; 41
-BUFFER_VOLUME_ID      dd 0x980E63F5
-VolumeLabel           db "GRAMADO    "   ;;11 bytes
+SectorsPerTrack       dw 17    ; 19 SPT.  
+NumHeads              dw 4     ; 4 HEADS. Number of surfaces
+; Hidden sectors.
+; 1+1+3 ( mbr + vbr + reserved sectors depois do vbr)
+HiddenSectors         dd 5
+; Number of sectors, if 'TotalSectorsSmall = 0'.
+; 32 bit version of number of sectors.
+TotalSectorsLarge     dd 0       
+DriveNumber           db 0x80
+; Flags: is this the old 'current head' field?
+Flags                 db 0x00
+; Signature: 0x29 | 41.
+Signature             db 0x29
+
+; Volume ID and Volume label.
+VolumeID              dd 0x980E63F5     ; 32bit
+VolumeLabel           db "GRAMADO    "  ; 11 bytes
+
+; File system identification string. 
 SystemID              db "FAT16   "
 ; =========================================
 ; End of BPB.
@@ -577,12 +591,12 @@ P3: dd 0,0,0,0
 
 ; ----------------------------------------
 ; Signature.
-MBR_SIG: 
-    TIMES 510-($-$$) DB 0
+FREE_SPACE_SIZE EQU  510-($-$$)
+MBR_SIG:
+    TIMES FREE_SPACE_SIZE DB 0
     DW 0xAA55
-    
-  
-;;
-;; End.
-;;
-    
+
+;
+; End
+;
+

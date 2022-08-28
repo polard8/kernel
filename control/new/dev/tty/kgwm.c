@@ -497,6 +497,8 @@ __wmProcessExtendedKeyboardKeyStroke(
     unsigned long rawbyte );
 
 
+static unsigned long __last_tick(void);
+
 // ============================
 
 
@@ -549,6 +551,10 @@ wmRegisterWSCallbacks(
     //while(1){}
 }
 
+static unsigned long __last_tick(void)
+{
+    return (unsigned long) jiffies;
+}
 
 // #
 // This callback is not used at the moment.
@@ -1077,7 +1083,7 @@ wmProcedure (
             case VK_F4:
                 if (ctrl_status == TRUE){
                     //__launch_app_via_initprocess(4004);
-                    //post_message_to_ws_thread( 
+                    //post_message_to_ws( 
                     //    NULL, 33888, 0, 0 ); //#TEST
                     return 0;
                 }
@@ -1098,7 +1104,7 @@ wmProcedure (
             case VK_F5:
                 if (ctrl_status == TRUE){
                     //__launch_app_via_initprocess(4005);
-                    //post_message_to_ws_thread( 
+                    //post_message_to_ws( 
                         //NULL, 33888, 0, 0 ); //#TEST
                     return 0;
                 }
@@ -1363,7 +1369,17 @@ __wmProcessExtendedKeyboardKeyStroke(
 }
 
 
+// ----------------------------------------------
 // wmKeyEvent:
+// This is basically the low level support for the
+// ps2 keyboard on Gramado OS.
+// We are called from the embedded ps2 keyboard device driver.
+// :: We are called, we do not read data from a file provided
+// by the device driver.
+// We post the message into the stdin file and into the
+// control thread of the widnow server and sometimes
+// we process the input before sending a message.
+// ----------------------------------------------
 // Envia uma mensagem de teclado para a janela com o 
 // foco de entrada.
 // Called by DeviceInterface_PS2Keyboard in ps2kbd.c
@@ -2000,15 +2016,21 @@ done:
 }
 
 
-//==========
-
+// ----------------------------------------------
 // wmMouseEvent:
+// This is basically the low level support for the
+// ps2 mouse on Gramado OS.
+// We are called from the embedded ps2 mouse device driver.
+// :: We are called, we do not read data from a file provided
+// by the device driver.
+// We post the message into the stdin file and into the
+// control thread of the widnow server and sometimes
+// we process the input before sending a message.
+// ----------------------------------------------
 // For mouse events, see: window.h
 // #todo: change parameters.
 // we need more information about the mouse event.
 // called by __ps2mouse_parse_data_packet in ps2mouse.c
-
-
 //  Post mouse events only to the window server's control thread.
 // #todo
 // Se uma tecla de controle estiver precionada,

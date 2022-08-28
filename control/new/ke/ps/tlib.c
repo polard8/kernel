@@ -394,6 +394,8 @@ fail0:
     return -1;
 }
 
+
+// well tested.
 int
 post_message_to_ws ( 
     struct window_d *window, 
@@ -461,26 +463,6 @@ post_message_to_foreground_thread (
 }
 
 
-// Post message to the ws control thread.
-int
-post_message_to_ws_thread ( 
-    struct window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 )
-{
-    if( WindowServerInfo.initialized == TRUE ){
-        return -1;
-    }
-    if(msg<0){
-        return -1;
-    }
-    return (int) post_message_to_tid( 
-                     WindowServerInfo.tid,
-                     window, msg, long1, long2 );
-}
-
-
 // service 112
 // Post message to tid.
 // Asynchronous.
@@ -489,24 +471,30 @@ sys_post_message_to_tid(
     int tid, 
     unsigned long message_buffer )
 {
-
-    if( tid < 0 || tid >= THREAD_COUNT_MAX )
+    if ( tid < 0 || 
+         tid >= THREAD_COUNT_MAX )
+    {
         return 0;
+    }
 
-    if( message_buffer == 0 )
+    if (message_buffer == 0){
         return 0;
+    }
 
     unsigned long *buf = (unsigned long *) message_buffer;
 
+    int MessageCode = (int) ( buf[1] & 0xFFFFFFFF );
+
 // Post message.
 // Asynchronous.
-
+// IN: target tid, opaque struct pointer, msg code, data1, data2.
+// #todo: get the return value?
     post_message_to_tid(
-        tid,       //tid
-        buf[0],    //window
-        buf[1],    //msg code
-        buf[2],    //long1
-        buf[3] );  //long2
+        (int) tid,
+        (struct window_d *) buf[0],  // #bugbug: It needs to be NULL?! 
+        (int) MessageCode,
+        (unsigned long) buf[2],
+        (unsigned long) buf[3] );
 
     return 0;
 }

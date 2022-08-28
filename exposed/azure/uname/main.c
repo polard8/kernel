@@ -25,8 +25,8 @@ int main (int argc, char **argv)
 // The kernel will put the strings here. I guess.
     struct utsname  name;
 
-
-    //#todo: Get parametes.
+// #todo: 
+// Get parametes.
 
     uname(&name);
 
@@ -41,8 +41,8 @@ int main (int argc, char **argv)
     printf ("host name:      %s\n",name.nodename); //node name in the network.
 // #todo: Domain name.
 
-    while(1){
-    };
+    //while(1){
+    //};
         
     return 0;
 }

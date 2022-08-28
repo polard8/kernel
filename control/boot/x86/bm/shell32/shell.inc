@@ -1,5 +1,5 @@
 ;
-; File: shell/shell.inc
+; File: shell32/shell.inc
 ;
 ; Descrição:
 ;     Boot Manager Shell.
@@ -20,9 +20,10 @@
 ; configurando a flag 'shell_exit_flag' com as opções '0' ou '1'.
 ; Assim a rotina exit decidirá se salva o metafile antes de iniciar ou não.
 ; '1' significa salvar o metafile e '0' significa não salvar.
-; History: 
+; Credits:
 ;     Original - (BareMetal, Return Infinity).
-;     2015     - Adapted by Fred Nora.
+; History: 
+;     2015 - Adapted by Fred Nora.
 
 
 align 1
@@ -70,12 +71,13 @@ os_command_line:
 
 .no_prompt:
 
-	;Color.
-	;mov ebx, 0x00FFFFFF
-	;mov [os_Font_Color], ebx
+    ;Color.
+    ;mov ebx, 0x00FFFFFF
+    ;mov [os_Font_Color], ebx
 
-	;Input.
-	;Limit the input to 250 characters.
+;Input.
+;Limit the input to 250 characters.
+
     mov edi, cli_temp_string
     mov ecx, 250
     call os_input
@@ -92,28 +94,24 @@ os_command_line:
 
 ; Remove extra spaces.
 ; 'os_string_parse' stores the number of words in ECX.
-
 .extraSpaces:
 	mov esi, edi
 	call os_string_parse
 	jecxz os_command_line    ;;Loop 
 
-	; Store the number of words in the string.
-	; Salva o número de palavras digitadas.
-	
+; Store the number of words in the string.
+; Salva o número de palavras digitadas.
 .saveTotalWords:
-	mov byte [app_argc], cl
+    mov byte [app_argc], cl
 
 ; Copy the first word in the string to a new string. 
 ; This is the command/application to run.
-
 .copyFirstword:
-
     xor ecx, ecx
     mov esi, cli_temp_string
     mov edi, cli_command_string
 
-    ;Push the command string (primeira palavra).
+;Push the command string (primeira palavra).
     push edi
 .nextbyte1:
     add ecx, dword 1

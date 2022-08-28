@@ -1,21 +1,16 @@
 ;
-; File: lib32/lib32.inc 
-;
+; File: lib32.inc 
 ; Descriçao:
 ;     Rotinas para o Boot Manager.
-;
 ; In this file:
 ;     + Rotina de servi�os oferecidos pelo Boot Manager.
 ;     + Recursos gr�ficos.
 ;     + Outras rotinas gerais.
-;
 ; History:
 ;     2015 - Created by Fred Nora.
-;     ... 
-;
 
 
-LIB32_BACKBUFFER EQU (0x1000000 - 0x800000)
+LIB32_BACKBUFFER EQU  (0x1000000 - 0x800000)
 
 ;
 ; Variaveis internas.
@@ -28,20 +23,16 @@ TotalMemoryMB: dd 0
 ;; ==============================
 ;; lib32PrintChar:
 ;;     Imprime um caractere na tela em modo gr�fico.
-;;
 ;; Obs: 
 ;; O caractere precisa ser desenhado, pixel por pixel.
 ;; @todo: Argumentos ... vari�veis ...
-;;
 ;; a =  cor (rrggbbaa)
 ;; b =  x ignorado 
 ;; c =  y ignorado
 ;; d =  Char.
-;;
 ;; obs: 
 ;; x e y serao ignorados
 ;; e o char sera pintado nas cordenadas do 'cursor'.
-;;
 
 lib32PrintChar:
 
@@ -50,18 +41,18 @@ lib32PrintChar:
     push ecx
     push edx
 
-    ;;salva color e char.
+;salva color e char.
     mov dword [.color], eax 
     mov byte [.char], dl  
     ;; ...
 
-	;; ??
-	;; Pega a coordenada x.
-	;; Me parece que temos vari�veis para posi��o de cursor.
-	
+; ??
+; Pega a coordenada x.
+; Me parece que temos vari�veis para posi��o de cursor.
+
     mov eax, dword [g_cursor_x]
 
-	; Se estivermos no fim da linha.
+; Se estivermos no fim da linha.
 
     cmp eax, dword 80
     jge .nextLine

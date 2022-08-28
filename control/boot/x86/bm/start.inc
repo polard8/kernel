@@ -28,9 +28,8 @@
 ;    EBX = 0
 ;    ECX = 0
 ;    EDX = 0
-;
-; 2015 - Created by Fred Nora.
-;
+; History:
+;     2015 - Created by Fred Nora.
 
 
 ;;=======================================================
@@ -129,13 +128,11 @@ startCLI:
     ; call clear_screen
 
 ; Enable all the interrupts.
-
 .LenableInterrupts:
 
     mov al, 0
     out 0xA1, al 
-    out 0x21, al 
-
+    out 0x21, al
     sti 
 
 ;; startShellLoop:
