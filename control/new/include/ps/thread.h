@@ -967,9 +967,16 @@ void KiSpawnThread (int tid);
 void spawn_pid(pid_t pid);
 void spawn_tid(int tid);
 
+int 
+gramado_post( 
+    tid_t sender_tid,
+    tid_t receiver_tid,
+    struct msg_d *message );
+
 int
 post_message_to_tid ( 
-    int tid, 
+    tid_t sender_tid,
+    tid_t receiver_tid, 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 

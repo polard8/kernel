@@ -18,20 +18,20 @@
 
 void *sys_get_message(unsigned long ubuf)
 {
-    struct thread_d  *t;
-    unsigned long *message_address = (unsigned long *) ubuf;
-    //int head_pos=0;
+    struct thread_d *t;
+    struct msg_d *m;
 
-    //debug_print ("sys_get_message:\n");
+    unsigned long *message_address = (unsigned long *) ubuf;
 
 // buffer
 // #todo: Check some other invalid address.
     if ( ubuf == 0 ){ 
-        panic ("sys_get_message: buffer\n");
+        panic ("sys_get_message: ubuf\n");
         //return NULL;
     }
 
 // Thread
+// Essa é a thread que chamou esse serviço.
 
     if(current_thread<0 ||
        current_thread>=THREAD_COUNT_MAX)
@@ -52,45 +52,43 @@ void *sys_get_message(unsigned long ubuf)
 // ===========================================================
 // usando a fila de mensagens com estrutura.
 
-    struct msg_d  *next_msg;
-
 // Get the next head pointer.
-    next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
+    m = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
 
-    if ( (void*) next_msg == NULL ){
+    if ( (void*) m == NULL ){
         goto fail0;
     }
 
-    if (next_msg->used != TRUE || next_msg->magic != 1234 )
+    if (m->used != TRUE || m->magic != 1234 )
     {
         goto fail0;
     }
 
-// invalid
-    if( next_msg->msg == 0 ){
+// Invalid message code
+    if( m->msg <= 0 ){
         goto fail0;
     }
 
 // Get standard entries.
-    message_address[0] = (unsigned long) next_msg->window;
-    message_address[1] = (unsigned long) (next_msg->msg & 0xFFFFFFFF);
-    message_address[2] = (unsigned long) next_msg->long1;
-    message_address[3] = (unsigned long) next_msg->long2;
+    message_address[0] = (unsigned long) m->window;
+    message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
+    message_address[2] = (unsigned long) m->long1;
+    message_address[3] = (unsigned long) m->long2;
 
 // Get extra entries.
-    message_address[4] = (unsigned long) next_msg->long3;
-    message_address[5] = (unsigned long) next_msg->long4;
+    message_address[4] = (unsigned long) m->long3;
+    message_address[5] = (unsigned long) m->long4;
 
 // #test
-    message_address[8] = (unsigned long) next_msg->sender_tid;
-    message_address[9] = (unsigned long) next_msg->receiver_tid;
+    message_address[8] = (unsigned long) m->sender_tid;
+    message_address[9] = (unsigned long) m->receiver_tid;
 
 
 // Buffer size:
 // 32 slots.
 
 // jiffies when posted.
-    //message_address[10] = (unsigned long) next_msg->long3; 
+    //message_address[10] = (unsigned long) m->long3; 
 
 // jiffies when gotten by the app.
     message_address[11] = (unsigned long) jiffies;
@@ -99,12 +97,12 @@ void *sys_get_message(unsigned long ubuf)
 // clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
-    next_msg->window = NULL;
-    next_msg->msg = 0;
-    next_msg->long1 = 0;
-    next_msg->long2 = 0;
-    next_msg->long3 = 0;
-    next_msg->long4 = 0;
+    m->window = NULL;
+    m->msg = 0;
+    m->long1 = 0;
+    m->long2 = 0;
+    m->long3 = 0;
+    m->long4 = 0;
 
 // ==================================
 
@@ -128,22 +126,25 @@ fail0:
 // With restart support.
 // IN: buffer, index, flag: TRUE=restart the queue at the end.
 
-void *sys_get_message2(unsigned long ubuf, int index, int restart)
+void *sys_get_message2(
+    unsigned long ubuf, 
+    int index, 
+    int restart)
 {
-    struct thread_d  *t;
-    unsigned long *message_address = (unsigned long *) ubuf;
-    //int head_pos=0;
+    struct thread_d *t;
+    struct msg_d *m;
 
-    //debug_print ("sys_get_message:\n");
+    unsigned long *message_address = (unsigned long *) ubuf;
 
 // buffer
 // #todo: Check some other invalid address.
     if ( ubuf == 0 ){ 
-        panic ("sys_get_message2: buffer\n");
+        panic ("sys_get_message2: ubuf\n");
         //return NULL;
     }
 
 // Thread
+// Essa é a thread que chamou esse serviço.
 
     if(current_thread<0 ||
        current_thread>=THREAD_COUNT_MAX)
@@ -151,7 +152,6 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
         return NULL;
     }
 
-// Thread pointer.
     t = (void *) threadList[current_thread];
     if ( (void *) t == NULL ){
         panic ("sys_get_message2: t\n");
@@ -171,42 +171,40 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
 // ===========================================================
 // usando a fila de mensagens com estrutura.
 
-    struct msg_d  *next_msg;
-
 // Get the next head pointer.
-    next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
-    if ( (void*) next_msg == NULL ){
+    m = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
+    if ( (void*) m == NULL ){
         goto fail0;
     }
-    if (next_msg->used != TRUE || next_msg->magic != 1234)
+    if (m->used != TRUE || m->magic != 1234)
     {
         goto fail0;
     }
 
 // Invalid message code.
-    if ( next_msg->msg == 0 ){
+    if ( m->msg <= 0 ){
         goto fail0;
     }
 
 // Get standard entries.
-    message_address[0] = (unsigned long) next_msg->window;
-    message_address[1] = (unsigned long) (next_msg->msg & 0xFFFFFFFF);
-    message_address[2] = (unsigned long) next_msg->long1;
-    message_address[3] = (unsigned long) next_msg->long2;
+    message_address[0] = (unsigned long) m->window;
+    message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
+    message_address[2] = (unsigned long) m->long1;
+    message_address[3] = (unsigned long) m->long2;
 
 // Get extra entries.
-    message_address[4] = (unsigned long) next_msg->long3;
-    message_address[5] = (unsigned long) next_msg->long4;
+    message_address[4] = (unsigned long) m->long3;
+    message_address[5] = (unsigned long) m->long4;
 
 // #test
-    message_address[8] = (unsigned long) next_msg->sender_tid;
-    message_address[9] = (unsigned long) next_msg->receiver_tid;
+    message_address[8] = (unsigned long) m->sender_tid;
+    message_address[9] = (unsigned long) m->receiver_tid;
 
 // Buffer size:
 // 32 slots.
 
 // jiffies when posted.
-    //message_address[10] = (unsigned long) next_msg->long3; 
+    //message_address[10] = (unsigned long) m->long3; 
 
 // jiffies when gotten by the app.
     message_address[11] = (unsigned long) jiffies;
@@ -214,12 +212,12 @@ void *sys_get_message2(unsigned long ubuf, int index, int restart)
 // Clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
-    next_msg->window = NULL;
-    next_msg->msg = 0;
-    next_msg->long1 = 0;
-    next_msg->long2 = 0;
-    next_msg->long3 = 0;
-    next_msg->long4 = 0;
+    m->window = NULL;
+    m->msg = 0;
+    m->long1 = 0;
+    m->long2 = 0;
+    m->long3 = 0;
+    m->long4 = 0;
 
 // ==================================
 
@@ -262,6 +260,37 @@ fail0:
 }
 
 
+// #todo: Not tested yet.
+int 
+gramado_post( 
+    tid_t sender_tid,
+    tid_t receiver_tid,
+    struct msg_d *message )
+{
+    if (sender_tid<0){
+        return -1;
+    }
+    if (receiver_tid<0){
+        return -1;
+    }
+
+    if ( (void*) message == NULL ){
+        return -1;
+    }
+
+    message->sender_tid   = (tid_t) sender_tid;
+    message->receiver_tid = (tid_t) receiver_tid;
+    
+// Post
+    return (int) post_message_to_tid( 
+                     (tid_t) message->sender_tid,
+                     (tid_t) message->receiver_tid,
+                     NULL,
+                     (int) message->msg,
+                     (unsigned long) message->long1,
+                     (unsigned long) message->long2 );
+}
+
 // post_message_to_tid:
 // #bugbug
 // long1 and long2 will mask to single byte.
@@ -271,7 +300,8 @@ fail0:
 
 int
 post_message_to_tid ( 
-    int tid, 
+    tid_t sender_tid,
+    tid_t receiver_tid, 
     struct window_d *window, 
     int msg, 
     unsigned long long1, 
@@ -282,31 +312,38 @@ post_message_to_tid (
 
 // Target thread.
     struct thread_d *t;
-// Target tid
-    tid_t TargetTID = (tid_t) (tid & 0xFFFF);
 
-    unsigned long tmp_msg=0;
+// TIDs
+    tid_t src_tid = (tid_t) (sender_tid & 0xFFFF);
+    tid_t dst_tid = (tid_t) (receiver_tid & 0xFFFF);
 
-    //#debug
-    //debug_print("post_message_to_tid:\n");
+    struct msg_d *m;
+    int MessageCode=0;
+
+
+// Message code.
+    MessageCode = (int) (msg & 0xFFFFFFFF);
+    if( MessageCode<0 ){
+        return -1;
+    }
 
 // Thread
 
-    if ( TargetTID < 0 || 
-         TargetTID >= THREAD_COUNT_MAX )
+    if ( dst_tid < 0 || 
+         dst_tid >= THREAD_COUNT_MAX )
     {
-        panic("post_message_to_tid: TargetTID\n");
+        panic("post_message_to_tid: dst_tid\n");
         //goto fail;
     }
-    t = (struct thread_d *) threadList[TargetTID];
+    t = (struct thread_d *) threadList[dst_tid];
     if ( (void *) t == NULL ){
         panic ("post_message_to_tid: t \n");
     }
     if ( t->used != 1 || t->magic != 1234 ){
         panic ("post_message_to_tid: t validation \n");
     }
-    if(TargetTID != t->tid){
-        panic("post_message_to_tid: TargetTID != t->tid");
+    if(dst_tid != t->tid){
+        panic("post_message_to_tid: dst_tid != t->tid");
     }
 
 // Reset the running count.
@@ -331,42 +368,27 @@ post_message_to_tid (
 // #todo
 // Podemos melhorar a prioridade ou o quantum da thread alvo.
 
-//
-// The message
-//
-
-    tmp_msg = (unsigned long) (msg & 0xFFFFFFFF);
-
 // ==========================================================
 // #test
 // Vamos colocar essa mensagem na outra fila de mensagens.
 // Essa nova fila sera a única fila no futuro.
 
-    struct msg_d *next_msg;
+// Get the pointer for the next entry.
+    m = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
 
-    // get the pointer for the next entry
-    next_msg = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
+    if ( (void*) m == NULL )
+        panic ("post_message_to_tid: m\n");
 
-    if ( (void*) next_msg == NULL )
-        panic ("post_message_to_tid: next_msg\n");
+    if( m->used != TRUE || m->magic != 1234 )
+        panic ("post_message_to_tid: m validation \n");
 
-    if( next_msg->used != TRUE || next_msg->magic != 1234 )
-        panic ("post_message_to_tid: next_msg validation \n");
-
-// #test
-// O slot ja tem uma mensagem que nao foi consumida.
-    //if( next_msg->msg != 0 ){
-    //    panic ("post_message_to_tid: not responding ...\n");
-    //}
-
-    next_msg->window = (struct window_d *) window;
-    next_msg->msg    = (int) (tmp_msg & 0xFFFFFFFF);
-    next_msg->long1  = (unsigned long) long1;
-    next_msg->long2  = (unsigned long) long2;
+    m->window = (struct window_d *) window;
+    m->msg    = (int) (MessageCode & 0xFFFFFFFF);
+    m->long1  = (unsigned long) long1;
+    m->long2  = (unsigned long) long2;
 
 // #test
-// ktime.
-    next_msg->long3 = (unsigned long) jiffies;
+    m->long3 = (unsigned long) jiffies;
 
 // #test
 // Status das teclas de controle.
@@ -375,11 +397,13 @@ post_message_to_tid (
 // então podemos chamar uma função que pegue uma 
 // variavel contendo o status de todas as teclas de controle.
 
-    //next_msg->long4 = (unsigned long) wmGetControlKeysState();
+    //m->long4 = (unsigned long) wmGetControlKeysState();
 
 // #test
-    next_msg->sender_tid = -1;  // from kernel. 
-    next_msg->receiver_tid = (tid_t) TargetTID;
+// Who is the sender?
+// It came from another thread or it came from the hardware?
+    m->sender_tid   = (tid_t) src_tid; 
+    m->receiver_tid = (tid_t) dst_tid;
 
 done:
     t->MsgQueueTail++;
@@ -403,15 +427,16 @@ post_message_to_ws (
     unsigned long long1, 
     unsigned long long2 )
 {
-    tid_t tid=-1;
+    tid_t src_tid = 0;   // sender tid #todo
+    tid_t dst_tid = -1;  // receiver tid
 
     if(WindowServerInfo.initialized != TRUE){
         return -1;
     }
 
-    tid = (tid_t) WindowServerInfo.tid;
+    dst_tid = (tid_t) WindowServerInfo.tid;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
+    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX )
     {
         return -1;
     }
@@ -427,7 +452,8 @@ post_message_to_ws (
 // IN: tid, window pointer, msgcode, data1, data2.
 
     post_message_to_tid(
-        (int) tid,
+        (tid_t) src_tid,  // sender tid
+        (tid_t) dst_tid,  // receiver tid
         NULL,
         (int) msg,
         (unsigned long) long1,
@@ -457,11 +483,15 @@ post_message_to_foreground_thread (
         return -1;
     }
 
-    return (int) post_message_to_tid( 
-                     foreground_thread,
-                     window, msg, long1, long2 );
+// #todo: Sender?
+    return (int) post_message_to_tid(
+                     (tid_t) 0, 
+                     (tid_t) foreground_thread,
+                     window, 
+                     (int) msg, 
+                     (unsigned long) long1,
+                     (unsigned long) long2 );
 }
-
 
 // service 112
 // Post message to tid.
@@ -471,8 +501,12 @@ sys_post_message_to_tid(
     int tid, 
     unsigned long message_buffer )
 {
-    if ( tid < 0 || 
-         tid >= THREAD_COUNT_MAX )
+    tid_t src_tid = (tid_t) current_thread;   // caller's tid.
+    tid_t dst_tid = (tid_t) tid;              // targt tid.
+
+// Invalid target tid.
+    if ( dst_tid < 0 || 
+         dst_tid >= THREAD_COUNT_MAX )
     {
         return 0;
     }
@@ -489,8 +523,10 @@ sys_post_message_to_tid(
 // Asynchronous.
 // IN: target tid, opaque struct pointer, msg code, data1, data2.
 // #todo: get the return value?
+
     post_message_to_tid(
-        (int) tid,
+        (tid_t) src_tid,    // sender tid
+        (tid_t) dst_tid,    // receiver tid
         (struct window_d *) buf[0],  // #bugbug: It needs to be NULL?! 
         (int) MessageCode,
         (unsigned long) buf[2],

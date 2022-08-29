@@ -1544,9 +1544,10 @@ int consoleCompareStrings(void)
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
         post_message_to_tid(
-            InitThread->tid,
-            NULL,  //window
-            MSG_CLOSE,  //msg code
+            (tid_t) 0,                //sender tid. #todo
+            (tid_t) InitThread->tid,  //receiver tid.
+            NULL,                     //window
+            (int) MSG_CLOSE,          //msg code
             0,
             0 );
         goto exit_cmp;
@@ -1559,10 +1560,11 @@ int consoleCompareStrings(void)
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
         post_message_to_tid(
-            (int) InitThread->tid,
-            NULL,  //window
-            (int)MSG_COMMAND,  //msg code
-            4001,
+            (tid_t) 0,                // sender tid #todo
+            (tid_t) InitThread->tid,  // receiver tid
+            NULL,                     // window
+            (int) MSG_COMMAND,        // msg code
+            (unsigned long) 4001,     // data1
             0 );
         printf("app1: done\n");
         //refresh_screen();
@@ -1576,10 +1578,11 @@ int consoleCompareStrings(void)
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
         post_message_to_tid(
-            (int) InitThread->tid,
-            NULL,  //window
-            (int)MSG_COMMAND,  //msg code
-            4002,
+            (tid_t) 0,                 //sender tid #todo
+            (tid_t) InitThread->tid,   //receiver tid
+            NULL,                      //window
+            (int) MSG_COMMAND,         //msg code
+            (unsigned long) 4002,      //data1
             0 );
         printf("app2: done\n");
         //refresh_screen();
@@ -1592,12 +1595,14 @@ int consoleCompareStrings(void)
     if ( strncmp(prompt,"app3",4) == 0 )
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
+        //#todo: We do not have a sender tid yet.
         post_message_to_tid(
-            (int) InitThread->tid,
-            NULL,  //window
-            (int)MSG_COMMAND,  //msg code
-            4003,
-            0 );
+            (tid_t) 0,                // sender tid. (#todo)
+            (tid_t) InitThread->tid,  // receiver tid
+            NULL,                     // window
+            (int) MSG_COMMAND,        // msg code
+            (unsigned long) 4003,     // data
+            (unsigned long) 0 );      // data
         printf("app3: done\n");
         //refresh_screen();
         goto exit_cmp;

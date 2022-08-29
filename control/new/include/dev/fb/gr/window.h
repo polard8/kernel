@@ -533,7 +533,7 @@ struct window_class_d
 };
 
 
-// Single message struct model.
+// Message structure.
 struct msg_d 
 {
 
@@ -555,6 +555,7 @@ struct msg_d
 
     pid_t sender_pid;
     pid_t receiver_pid;
+
     tid_t sender_tid;
     tid_t receiver_tid;
     // ...

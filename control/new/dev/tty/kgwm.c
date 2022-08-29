@@ -646,31 +646,24 @@ fail:
 
 static void __launch_app_via_initprocess(int index)
 {
-    tid_t init_thread_tid = -1; 
+    tid_t src_tid = 0;  //#todo
+    tid_t dst_tid = (tid_t) INIT_TID;
 
-    if( index < 4001)
-        return;
-
-    if( index > 4009)
-        return;
-
-    if( (void*) InitThread == NULL ){
+    if( index < 4001 || index > 4009 )
+    {
         return;
     }
-    
-    init_thread_tid = InitThread->tid;
 
-    if(init_thread_tid<0)
-        return;
-
+// Post
+// #todo: sender.
     post_message_to_tid(
-        (tid_t) init_thread_tid,
-        NULL,               // window
-        (int) MSG_COMMAND,  // msg code
-        index,              // range: 4001~4009
+        (tid_t) src_tid,        // sender tid
+        (tid_t) dst_tid,        // receiver tid
+        NULL,                   // window
+        (int) MSG_COMMAND,      // msg code
+        (unsigned long) index,  // range: 4001~4009
         0 );
 }
-
 
 static void __enter_embedded_shell(int kernel_in_debug_mode)
 {
