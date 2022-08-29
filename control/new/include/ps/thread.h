@@ -175,13 +175,8 @@ typedef enum {
 }thread_state_t;
 
 
-
-//
 // Input model
-//
-
 // t->input_flags
-
 // Com essa flag o kernel deve enviar input de teclado
 // para stdin.
 #define INPUT_MODEL_STDIN         1
@@ -189,6 +184,14 @@ typedef enum {
 // a fila de mensagens na current thread.
 #define INPUT_MODEL_MESSAGEQUEUE  2
 
+
+// t->flags:
+#define BLOCKED_SENDING      0x1000
+#define BLOCKED_RECEIVING    0x2000
+// ...
+
+
+// --------------------------------
 
 // TCB - Thread Control Block
 
@@ -205,17 +208,22 @@ struct thread_d
 // The scheduler will do this job.
     int exit_in_progress;
 
+// flags:
+// 1000 - Blocked when trying to send.
+// 2000 - Blocked when trying to receive.
+// ...
+
+    unsigned long flags;
+
 // Input model
 // Setup the input model for this thread ...
 // So the kernel will know where are the places
 // to send the input when this is the current thread.
+// #todo:
+// NOT_RECEIVING
 
     unsigned long input_flags;
 
-// 0x0001=SENDING | 0x0002=RECEIVING
-    //unsigned long ipc_flags;
-// Receiving from this thread only.
-    //tid_t getfrom_tid;
 
 // #suspenso. 
 // Vamos usar as flags em 't->input_flags'
@@ -236,8 +244,8 @@ struct thread_d
 // Identifiers
 //
 
-// Thread id
-    int tid;
+// Thread ID.
+    tid_t tid;
 
 // Owner process
     struct process_d  *owner_process;
@@ -563,10 +571,7 @@ struct thread_d
 	//struct _iobuf *root;  // 4 root directory
     //struct _iobuf *pwd;     // 5 (print working directory) 
 	//...
-		
-	
-	//@todo: Uma thread pode estar esperando varias outras por motivos diferenes.
-	//struct wait_d WaitBlock;
+
 
 //
 // == tty ==========================
@@ -672,48 +677,14 @@ struct thread_d
 
     //unsigned long post_message_counter;
 
-    // Quando um processo só pode receber mensagens de um 
-    // determinado processo. Ou de qualquer um.
-    // Ex: ANY=-1, PID ...
-    // pid_t receive_from_pid;
 
-	//?? mensagens pendentes.
-	//struct thread_d *sendersList; //Lista encadeada de threads querendo enviar mensagem
-	//struct thread_d *nextSender;  //próxima thread a enviar mensagem.
-
-
-//
-// == Wait ======================================
-//
-
-// #importante
-// razões para esperar
-// #todo: 
-// Isso precisa ser inicializado.
-//@todo: tem que fazer um enum para enumerar as razões.
-//o índice é o selecionador da razão pela 
-//qual a thread está esperando.
-//existem umas 20 razões pra esperar.
-// 0 - esperando por mensagem.(presa num loop)
-// 1 - esperando outra thread finalizar. wait4tid
-// 2 - esperando um processo finalizar. wait4pid
-// 3 - esperando um objeto. (espera genérica)
-// ...
-
-    int wait_reason[10]; 
+// ------------------
+// Waiting for a child.
 
 // id do processo que a thread está esperando morrer.
     int wait4pid;
 // id da thread que a thread está esperando morrer.
     int wait4tid;
-
-
-// Objeto pelo qual a thread está esperando.
-// #todo: mudar esses nomes, pode confundir com o header no início da 
-// estrutura. (waiting_object_type ...  woType woClass )
-
-    object_type_t   woType;   //obType;   //woType
-    object_class_t  woClass;  //obClass;  //woClass
 
 // ====================================
 
@@ -794,11 +765,8 @@ struct thread_d
     struct thread_d  *next;
 };
 
-// See: thread.c
-//extern struct thread_d  *____IDLE;
-//extern struct thread_d  *tid0_thread;
-//extern struct thread_d  *rootConductor;
 
+// See: thread.c
 extern struct thread_d  *InitThread;
 extern struct thread_d  *ClonedThread;
 
@@ -810,20 +778,21 @@ extern struct thread_d  *tmpConductor;
 
 // Maximum number of kernel threads in the system.
 #define THREAD_COUNT_MAX  1024 
-
+//#define THREAD_COUNT_MAX  4096
 
 // Cada lista poderá usasr uma prioridadr diferente,
 // um quantum diferente e talvez ter uma frequencia de timer diferente.
 
-// Normal threads
-unsigned long threadList[THREAD_COUNT_MAX];
+// All the threads
+// see: thread.c
+extern unsigned long threadList[THREAD_COUNT_MAX];
 
 // Threads doing some kind of i/o operations.
-unsigned long io_threadList[THREAD_COUNT_MAX];
+//unsigned long io_threadList[THREAD_COUNT_MAX];
 
 // Interactive threads.
 // Just like keyboard and windows with focus.
-unsigned long interactive_threadList[THREAD_COUNT_MAX];
+//unsigned long interactive_threadList[THREAD_COUNT_MAX];
 
 
 //
@@ -836,16 +805,13 @@ unsigned long interactive_threadList[THREAD_COUNT_MAX];
 // The message has 6 standard elements.
 // See: thread.c
 
-void *sys_get_message ( unsigned long ubuf );
+void *sys_get_message(unsigned long ubuf);
 void *sys_get_message2(unsigned long ubuf, int index, int restart);
 
+int init_threads(void);
 
-
-int init_threads (void);
-
-//See: main.c
-void early_ring0_IdleThread (void);
-
+// See: main.c
+void early_ring0_IdleThread(void);
 
 // Create the init thread.
 // This is the first thread ever.
@@ -856,7 +822,7 @@ struct thread_d *create_init_thread(void);
 // From thread.c
 
 // helper
-unsigned long GetThreadStats ( int tid, int index );
+unsigned long GetThreadStats( int tid, int index );
 
 int getthreadname ( int tid, char *buffer );
 void *FindReadyThread (void);
@@ -865,17 +831,15 @@ int GetThreadType (struct thread_d *thread);
 
 int GetCurrentTID(void);
 
-
 void *GetThreadByTID (int tid);
 void *GetCurrentThread(void);
 void *GetForegroundThread(void);
 void *GetWSThread(void);
 
-
 // From threadi.c
-void show_slot (int tid);
+void show_slot(int tid);
 void show_slots(void);
-void show_reg (int tid);
+void show_reg(int tid);
 
 void 
 set_thread_priority ( 
@@ -886,7 +850,7 @@ void threadi_power(
     struct thread_d *t, 
     unsigned long priority );
 
-void release ( int tid );
+void release(int tid);
 
 void SelectForExecution ( struct thread_d *Thread );
 
@@ -897,7 +861,7 @@ thread_get_profiler_percentage (struct thread_d *thread);
 
 void show_thread_information (void);
 
-int thread_profiler( int service );
+int thread_profiler(int service);
 
 //
 // Creation
@@ -922,11 +886,8 @@ struct thread_d *create_thread (
 // Exit
 //
 
-void exit_thread (int tid);
+void exit_thread(int tid);
 void exit_current_thread(void);
-
-int thread_getchar (void);
-
 
 // ===
 
@@ -938,8 +899,8 @@ SetThread_PML4PA (
 void check_for_dead_thread_collector (void);
 void dead_thread_collector (void);
 
-void kill_thread (int tid);
-void kill_all_threads (void);
+void kill_thread(int tid);
+void kill_all_threads(void);
 
 // ==
 
@@ -947,7 +908,6 @@ void kill_all_threads (void);
 void spawn_set_eoi_state(void);
 // The spawn routine do not need to make a eoi.
 void spawn_reset_eoi_state(void);
-
 
 void 
 spawn_enter_usermode( 

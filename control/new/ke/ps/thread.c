@@ -34,6 +34,10 @@ struct thread_d  *InitThread;
 // Ponteiro para a thread usada na hora da clonagem de processos.
 struct thread_d  *ClonedThread;
 
+// List of all threads.
+unsigned long threadList[THREAD_COUNT_MAX];
+
+
 //
 // == private functions: prototypes ================
 //
@@ -67,8 +71,9 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
 
     // loop
     // Waiting reasons.
-    for ( i=0; i<8; ++i ){ t->wait_reason[i] = (int) 0; };
+    // for ( i=0; i<8; ++i ){ t->wait_reason[i] = (int) 0; };
 
+    t->flags = 0;
 
 //
 // == Message support ============
@@ -542,18 +547,18 @@ int init_threads(void)
     };
 
 // i/o threads
-    i=0;
-    while ( i < THREAD_COUNT_MAX ){
-        io_threadList[i] = (unsigned long) 0; 
-        i++;
-    };
+    //i=0;
+    //while ( i < THREAD_COUNT_MAX ){
+    //    io_threadList[i] = (unsigned long) 0; 
+    //    i++;
+    //};
 
 // interactive threads
-    i=0;
-    while ( i < THREAD_COUNT_MAX ){
-        interactive_threadList[i] = (unsigned long) 0; 
-        i++;
-    };
+    //i=0;
+    //while ( i < THREAD_COUNT_MAX ){
+    //    interactive_threadList[i] = (unsigned long) 0; 
+    //    i++;
+    //};
 
     // ...
 
@@ -1821,9 +1826,11 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 	//Thread->wait4pid =
 
 // Razões para esperar.
-    for ( w=0; w<8; w++ ){
-        clone->wait_reason[w] = father->wait_reason[w];
-    };
+    //for ( w=0; w<8; w++ ){
+    //    clone->wait_reason[w] = father->wait_reason[w];
+    //};
+
+    clone->flags = 0;
 
 //...
 //@todo:
@@ -1854,73 +1861,9 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
     return (struct thread_d *) clone;
 }
 
-
-// #bugbug 
-// It's a work in progress
-int thread_getchar (void)
-{
-    debug_print ("thread_getchar: [FIXME]\n");
-    return -1;
-    //return (int) ps2tty_get_byte_from_input_buffer(); 
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//
+// End
+//
 
 
 

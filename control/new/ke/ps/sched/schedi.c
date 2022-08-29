@@ -519,12 +519,9 @@ void wait_for_a_reason ( int tid, int reason ){
 
         if ( t->used == TRUE && t->magic == 1234 )
         {
-            t->wait_reason[reason] = 1;
+            // t->wait_reason[reason] = 1;
 
-		//
-		// ## Wait ##
-		//
-
+            // ## Wait ##
             t->state =  WAITING;
         }
     };
@@ -547,8 +544,11 @@ void wait_for_a_reason ( int tid, int reason ){
 //uma outra função pode fazer um loop acordando 
 //todas as threads que esperam pelo memso motivo.
 
-int wakeup_thread_reason ( int tid, int reason ){
+int wakeup_thread_reason ( int tid, int reason )
+{
+    panic("wakeup_thread_reason: #todo\n");
 
+/*
     struct thread_d *t;
 
 
@@ -632,6 +632,8 @@ int wakeup_thread_reason ( int tid, int reason ){
 
 fail:
     return (int) 1;
+*/
+
 done:
     return 0;
 }
@@ -643,8 +645,11 @@ done:
 // Acorda todas as threads da lista que estão esperando por 
 // evento de determinado tipo.
 
-int wakeup_scan_thread_reason ( int reason ){
+int wakeup_scan_thread_reason ( int reason )
+{
+    panic("wakeup_scan_thread_reason: #todo\n");
 
+/*
     //loop
     register int i=0;
 
@@ -681,6 +686,7 @@ fail:
     printf ("wakeup_scan_thread_reason: fail\n");
     refresh_screen();
 
+*/
     return (int) 1;
 }
 

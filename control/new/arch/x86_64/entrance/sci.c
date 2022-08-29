@@ -1780,22 +1780,13 @@ void *sci0 (
             return NULL;
             break;
 
-		// 135 - livre.
-		// 136 - livre.
+        // 135 - livre.
+        // 136 - livre.
 
-        // 137
-        // Isso eh um metodo alternativo de pegar input.
-        // Ainda esta sobre avaliaçao.
-        // Isso eh usado pela biblioteca stdio em user mode
-        // na funçao 'getchar()'
-        // Isso tambem eh usado por gde_getchar em libcore/ em grass/
-        // ??? Pega caractere no stdin do teclado.
-        // ?? Isso funciona.
-        // #bugbug: >>>> Rever isso.
-        
-        // See: core/ps/thread.c
-        case SYS_GETCH:  
-            return (void *) thread_getchar();
+        // 137 - #deprecated.
+        case SYS_GETCH:
+            panic("SYS_GETCH: #deprecated\n"); 
+            return NULL;
             break;
 
         // 138 - get key state.

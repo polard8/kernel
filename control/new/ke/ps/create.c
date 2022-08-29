@@ -138,7 +138,9 @@ struct thread_d *create_init_thread (void)
     }
 
     // Clean the 'wait reason'.
-    for ( r=0; r<8; ++r ){ t->wait_reason[r] = (int) 0; };
+    //for ( r=0; r<8; ++r ){ t->wait_reason[r] = (int) 0; };
+
+    t->flags = 0;
 
 //
 // == Message =========
