@@ -275,10 +275,11 @@ int xxxScanApplicationQueue(void)
     RTLEventBuffer[1] = 0;
     RTLEventBuffer[2] = 0;  //long1
     RTLEventBuffer[3] = 0;  //long2
-    RTLEventBuffer[4] = 0;  //long3
- 
 
-    // Get event from the thread's event queue.
+    RTLEventBuffer[4] = 0;  //long3
+    RTLEventBuffer[5] = 0;  //long3
+
+// Get event from the thread's event queue.
     rtl_enter_critical_section(); 
     rtl_get_system_message( (unsigned long) &RTLEventBuffer[0] );
     //gramado_system_call ( 111,
@@ -309,6 +310,7 @@ int xxxScanApplicationQueue(void)
         RTLEventBuffer[1] = 0;
         RTLEventBuffer[2] = 0;  //long1
         RTLEventBuffer[3] = 0;  //long2
+
         RTLEventBuffer[4] = 0;  //long3
 
         return FALSE;

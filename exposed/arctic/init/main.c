@@ -22,6 +22,10 @@
 
 static isTimeToQuit = FALSE;
 
+// The tid of the caller.
+// Sent us a system message.
+static int __Caller=-1;
+
 // private functions: prototypes;
 
 // local
@@ -35,7 +39,7 @@ gwsProcedure (
 static int __server_loop(void);
 
 static void initPrompt(void);
-static int initCompareString(void);
+static int __CompareString(void);
 
 
 // ====================
@@ -93,6 +97,26 @@ gwsProcedure (
                 break;
         };
         break;
+
+    // #test Hello.
+    // Responding the hello.
+    // Hey init, are you up?
+    case 44888:
+        //printf("init.bin: 44888 received | sender=%d receiver=%d\n",
+        //    RTLEventBuffer[8],   //sender (the caller)
+        //    RTLEventBuffer[9] ); //receiver
+        printf("init.bin: 44888 received from %d\n", __Caller);
+        // Reply: Sending response
+        // Sending back the same message found into the buffer.
+        rtl_post_system_message( 
+            (int) __Caller,  //message back to caller.
+            (unsigned long) &RTLEventBuffer[0] );
+
+        //rtl_clone_and_execute("gnssrv.bin");
+        //rtl_clone_and_execute("gns.bin");
+        break;
+
+
     default:
         break;
     };
@@ -179,16 +203,15 @@ void callback1(void)
 
 
 
-static int initCompareString(void)
+static int __CompareString(void)
 {
     int ret_val=-1;
-
     char *c;
     c = prompt;
-
 // Generic file support.
     int fd= -1;
     FILE *fp;
+ 
  
     if ( *c == '\0' ){
         goto exit_cmp;
@@ -200,13 +223,14 @@ static int initCompareString(void)
 
 //testando callback
 //o kernel tem que retornar para a funçao indicada.
-    if( strncmp(prompt,"callback",8) == 0 )
-    {
-        printf("~callback\n");
-        sc82(44000,&callback1,&callback1,&callback1);
-        printf("~done\n");
-        goto exit_cmp;
-    }
+//#suspended: The ws is using this callback support.
+    //if( strncmp(prompt,"callback",8) == 0 )
+    //{
+    //    printf("~callback\n");
+    //    sc82(44000,&callback1,&callback1,&callback1);
+    //    printf("~done\n");
+    //    goto exit_cmp;
+    //}
 
 
     if( strncmp(prompt,"t1",2) == 0 )
@@ -375,7 +399,9 @@ static int __server_loop(void)
         
         if ( rtl_get_event() == TRUE )
         {
-            //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
+            // save
+            __Caller = (int) ( RTLEventBuffer[8] & 0xFFFF );
+
             gwsProcedure ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
@@ -438,8 +464,9 @@ int main( int argc, char **argv)
             break;
         }
         C = (int) fgetc(stdin);
-        if( C == __VK_RETURN )
-            initCompareString();
+        if( C == __VK_RETURN ){
+            __CompareString();
+        }
         if( C >= 0x20 && C <= 0x7F )
         {
             printf("%c",C);
