@@ -404,12 +404,12 @@ int kmain(int arch_type)
         // talvez algum modo de recuperação ou simplificado.
  
         if( Initialization.serial_log == TRUE ){
-            PROGRESS("kernel_main: booting_end fail\n");
+            PROGRESS("kmain: booting_end fail\n");
         }
         if( Initialization.console_log == TRUE )
         {
-            printf("kernel_main: booting_end fail\n");
-            printf("kernel_main: Trying debug mode\n");
+            printf("kmain: booting_end fail\n");
+            printf("kmain: Trying debug mode\n");
             __enter_debug_mode();
         }
         die();
@@ -417,10 +417,10 @@ int kmain(int arch_type)
 
 // Final messages
     if( Initialization.serial_log == TRUE ){
-        PROGRESS("kernel_main: [final message] FAILURE\n");
+        PROGRESS("kmain: [final message] FAILURE\n");
     }
     if( Initialization.console_log == TRUE ){
-        printf("kernel_main: [final message] FAILURE\n");
+        printf("kmain: [final message] FAILURE\n");
         refresh_screen();
     }
 

@@ -197,6 +197,17 @@ irq0_TIMER (void)
 
 extern unsigned long _callback_address_saved;
 
+
+//static int __CallbackFlagInterval = (16*4);  // 15
+//static int __CallbackFlagInterval = (16*3);  // 20
+//static int __CallbackFlagInterval = (16*2);  // 31 :)
+static int __CallbackFlagInterval = (16*1);  // 62
+
+// #bugbug
+// Quando a flag é acionada, 
+// anda temos que esperar o scheduler selecionar o ws
+// para vermos o callback sendo chamado.
+
 // Worker
 // Scheduler
 // Ignoramos a tid retornada pela rotina.
@@ -218,7 +229,8 @@ void DeviceInterface_PIT(void)
 // #todo: Podemos ter uma estrutura para eles.
 // Acho que o assembly importa esses valores,
 // e é mais difícil importar de estruturas.
-    if ( (jiffies % (16*4)) == 0 )
+    //if ( (jiffies % (16*4)) == 0 )
+    if ( (jiffies % (__CallbackFlagInterval)) == 0 )
     {
         // reinitialize callback based on the saved value.
         if ( ws_callback_info.initialized == TRUE )

@@ -223,7 +223,8 @@ void *sys_get_message2(
 
 // It is a valid thread pointer.
 done:
-    if (restart==TRUE){
+    if (restart==TRUE)
+    {
         t->MsgQueueHead=0;
         t->MsgQueueTail=0;
         return (void*) 1;

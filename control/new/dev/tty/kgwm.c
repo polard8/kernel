@@ -1427,7 +1427,6 @@ wmKeyEvent(
     int prefix )
 {
 // Post keyboard event to the current foreground thread.
-
     int Prefix = (int) (prefix & 0xFF);
 
 // Step 0 
