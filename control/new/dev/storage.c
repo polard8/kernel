@@ -3,6 +3,11 @@
 
 #include <kernel.h>  
 
+const char* sda_string = "sda";
+const char* sdb_string = "sdb";
+const char* sdc_string = "sdc";
+const char* sdd_string = "sdd";
+const char* sdfail_string = "sd?";
 
 //
 // private functions: prototypes ============
@@ -370,18 +375,25 @@ int disk_init (void)
 // Nao chamar um metodo fora desse modulo 
 // para realizar esse trabalho.
 
-    d->boot_disk_number = (char) info_get_boot_info(3);
+    //#bugbug: This methoc gets info from a non initialized structure.
+    // see: BootBlock in info.h
+    //d->boot_disk_number = (char) info_get_boot_info(3);
+    d->boot_disk_number = -1;  //#fail
 
     BootDisk = (char) d->boot_disk_number;
 
+// #bugbug: if d->name is a ponter we need to point to
+// a const well define string, or create a new one.
+
+
     switch (BootDisk){
-    case 0x80:  d->name = "sda";  break;
-    case 0x81:  d->name = "sdb";  break;
-    case 0x82:  d->name = "sdc";  break;
-    case 0x83:  d->name = "sdd";  break;
+    case 0x80:  d->name = sda_string;  break;
+    case 0x81:  d->name = sdb_string;  break;
+    case 0x82:  d->name = sdc_string;  break;
+    case 0x83:  d->name = sdd_string;  break;
     default:
         debug_print("disk_init: [FAIL] default boot disk number\n");
-        d->name = "sd?";
+        d->name = sdfail_string;
         break;
     };
 
@@ -436,7 +448,7 @@ int diskShowDiskInfo ( int descriptor )
         goto fail;
     }
 
-    printf ("disk %d - %s \n", d->id, d->name );
+    printf ("disk %d - {{{{ %s }}}} \n", d->id, d->name );
     printf ("boot_disk = {%d}\n",d->boot_disk_number);
     printf ("diskType  = {%d}\n", d->diskType );
     //printf ("name={%s}\n", d->name );

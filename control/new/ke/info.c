@@ -1,59 +1,65 @@
 
-#include <kernel.h>
+// info.h
 
+#include <kernel.h>
 
 // ================================================
 // The data comes from boot block and beyond.
 
 // #test
 // Lets use the info that omes from the BootBlock structure.
-// This structure was initialized for kernel_main() in main.c
+// This structure was initialized for kmain() in main.c
 
-unsigned long info_get_boot_info ( int i )
+unsigned long info_get_boot_info(int index)
 {
 
-    if (i<0){  return 0;  }
+    if (index<0){
+        return 0;
+    }
 
-    switch (i){
 
-        // #bugbug
-        // If we use the BootBlock structure, maybe the info
-        // will be accessible only using the sci2. int 0x82.
+// #bugbug
+// If we use the BootBlock structure, maybe the info
+// will be accessible only using the sci2. int 0x82.
+// Is it initialized?
 
-        case 1:
-           return (unsigned long) BootBlock.last_valid_address;
-           break;
+// #bugbug
+// This structure is not initialized yet.
+// We are using xBootBlock in init.c
 
-        case 2:
-           return (unsigned long) BootBlock.metafile_address;
-           break;
+    //#todo
+    if (BootBlock.initialized != TRUE){
+        panic("info.c: BootBlock.initialized #todo\n");
+    }
 
-        case 3:
-           return (unsigned long) BootBlock.disk_number;
-           break;
-
-        case 4:
-           return (unsigned long) BootBlock.heads;
-           break;
-
-        case 5:
-           return (unsigned long) BootBlock.spt;
-           break;
-
-        case 6:
-           return (unsigned long) BootBlock.cylinders;
-           break;
-
-        case 7:
-           //return (unsigned long) 
-           break;
-
-        case 9:
-           //return (unsigned long) 
-           break;
+    switch (index){
+    case 1:
+       return (unsigned long) BootBlock.last_valid_address;
+       break;
+    case 2:
+       return (unsigned long) BootBlock.metafile_address;
+       break;
+    case 3:
+       return (unsigned long) BootBlock.disk_number;
+       break;
+    case 4:
+       return (unsigned long) BootBlock.heads;
+       break;
+    case 5:
+       return (unsigned long) BootBlock.spt;
+       break;
+    case 6:
+       return (unsigned long) BootBlock.cylinders;
+       break;
+    case 7:
+       //return (unsigned long) 
+       break;
+    case 9:
+       //return (unsigned long) 
+       break;
     };
-    
-   //fail 
+
+//fail 
    return 0;
 }
 

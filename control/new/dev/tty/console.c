@@ -1369,8 +1369,15 @@ int consoleCompareStrings(void)
     // See: ata.c
     if ( strncmp( prompt, "disk", 4 ) == 0 ){
         printf("disk: Show ide info:\n");
-        //show_ide_info();
         ata_show_device_list_info();
+        //show_ide_info();
+        //disk_show_info();
+        goto exit_cmp;
+    }
+
+    if( strncmp(prompt,"volume",6) == 0 )
+    {
+        volume_show_info();
         goto exit_cmp;
     }
 

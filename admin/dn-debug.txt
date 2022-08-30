@@ -2,7 +2,7 @@
 
 	We enable debug via serial port in the beginning 
 	of the kernel initialization at the function
-	kernel_main().
+	kmain().
 
 	Using the methods: enable_serial_debug() and
 	disable_serial_debug().

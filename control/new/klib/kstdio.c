@@ -3,7 +3,6 @@
 
 #include <kernel.h>
 
-
 //#todo: Use default lib.
 #define HEX_LEN  8
 #define ____INT_MAX  2147483647
@@ -13,13 +12,12 @@
 // IN: fd for the new stdin
 // OUT: TRUE or FALSE.
 
-int sys_setup_stdin( int stdin_fd )
+int sys_setup_stdin(int stdin_fd)
 {
     struct process_d *p;
     file *f;
 
     pid_t current_process = (pid_t) get_current_process();
-
 
     if( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
         return FALSE;
@@ -63,32 +61,25 @@ int sys_setup_stdin( int stdin_fd )
     return TRUE;
 }
 
-
-int is_socket (file *f)
+int is_socket(file *f)
 {
-    // Fail
+// Fail
     if ( (void *) f == NULL ){ return FALSE; }
-
-    // Yes
+// Yes
     if ( f->____object == ObjectTypeSocket ){ return TRUE; }
-
-    // No
+// No
     return FALSE;
 }
 
-
-int is_virtual_console (file *f)
+int is_virtual_console(file *f)
 {
-    // Fail
+// Fail
     if ( (void *) f == NULL ){ return FALSE; }
-
-    // Yes
+// Yes
     if ( f->____object == ObjectTypeVirtualConsole ){ return TRUE; } 
-   
-    // No
+// No
     return FALSE;
 }
-
 
 // Kernel size version of the
 // standard input() libc function.
@@ -1470,11 +1461,10 @@ void __initialize_stdin(void)
     stdin->filetable_index = slot;
 
 // fd
-    stdin->_file = STDIN_FILENO;  //0;
-
+    stdin->_file = STDIN_FILENO;  //0
 // This is a regular file.
     stdin->____object = ObjectTypeFile;
-
+// sync
     stdin->sync.sender = -1;
     stdin->sync.receiver = -1;
     stdin->sync.can_read    = TRUE;
@@ -1482,8 +1472,8 @@ void __initialize_stdin(void)
     stdin->sync.can_execute = FALSE;
     stdin->sync.can_accept  = FALSE;
     stdin->sync.can_connect = FALSE;
+// _flags
     stdin->_flags = (__SWR | __SRD); 
-
 
 // #bugbug
 // Esse buffer está sendo usado pelo console.
@@ -1544,7 +1534,7 @@ void __initialize_stdout(void)
     stdout->filetable_index = slot;
 
 // fd
-    stdout->_file = STDOUT_FILENO;  //1;
+    stdout->_file = STDOUT_FILENO;  //1
 
 // This is a virtual console.
 // Configurando a estrutura de stdout.
@@ -1554,6 +1544,7 @@ void __initialize_stdout(void)
 
     stdout->____object = ObjectTypeVirtualConsole; 
 
+// sync
     stdout->sync.sender = -1;
     stdout->sync.receiver = -1;
     stdout->sync.can_read    = TRUE;
@@ -1561,7 +1552,10 @@ void __initialize_stdout(void)
     stdout->sync.can_execute = FALSE;
     stdout->sync.can_accept  = FALSE;
     stdout->sync.can_connect = FALSE;
+// _flags
     stdout->_flags = (__SWR | __SRD); 
+
+// buffer
     stdout->_base     = &prompt_out[0];  //See: kstdio.h
     stdout->_p        = &prompt_out[0];
     stdout->_bf._base = stdout->_base;
@@ -1618,11 +1612,10 @@ void __initialize_stderr(void)
     stderr->filetable_index = slot;
 
 // fd
-    stderr->_file = STDERR_FILENO;  //2;
-
+    stderr->_file = STDERR_FILENO;  //2
 // This is a regular file.
     stderr->____object = ObjectTypeFile;
-
+// sync
     stderr->sync.sender = -1;
     stderr->sync.receiver = -1;
     stderr->sync.can_read    = TRUE;
@@ -1630,7 +1623,9 @@ void __initialize_stderr(void)
     stderr->sync.can_execute = FALSE;
     stderr->sync.can_accept  = FALSE;
     stderr->sync.can_connect = FALSE;
+// _flags
     stderr->_flags = (__SWR | __SRD); 
+// buffer
     stderr->_base     = &prompt_err[0];  //See: kstdio.h
     stderr->_p        = &prompt_err[0];
     stderr->_bf._base = stderr->_base;
@@ -1699,8 +1694,7 @@ void __initialize_file_table(void)
     {
         tmp = (void*) kmalloc(sizeof(file));
         
-        if ((void*)tmp==NULL)
-        {
+        if ((void*)tmp==NULL){
            x_panic("__initialize_file_table: tmp\n");
         }
         memset( tmp, 0, sizeof(struct file_d) );
@@ -1714,7 +1708,6 @@ void __initialize_file_table(void)
         tmp->used = TRUE;
         tmp->magic = 1234;
  
-        //salva
         file_table[i] = (unsigned long) tmp; 
     };
 }
@@ -1731,8 +1724,7 @@ void __initialize_inode_table(void)
     for (i=0; i<32; i++)
     {
         tmp_inode = (void*) kmalloc (sizeof(struct inode_d));
-        if ((void*)tmp_inode==NULL)
-        {
+        if ((void*)tmp_inode==NULL){
             x_panic("__initialize_inode_table: tmp_inode\n");
         }
         memset( tmp_inode, 0, sizeof(struct inode_d) );
@@ -1743,7 +1735,7 @@ void __initialize_inode_table(void)
 
         tmp_inode->used = TRUE;
         tmp_inode->magic = 1234;
-        //salva
+
         inode_table[i] = (unsigned long) tmp_inode; 
     };
 }
@@ -1758,7 +1750,6 @@ void __initialize_inode_table(void)
 // See:
 // tty.h
 // console.h
-
 // #bugbug
 // Isso ja foi feito antes em VirtualConsole_initialize?
 // See console.c
@@ -1822,17 +1813,14 @@ void __initialize_virtual_consoles(void)
 
 /*
  * kstdio_initialize:
- * 
  *     Inicializando stdio pertencente ao kernel base.
  *     Inicializa as estruturas do fluxo padrão.
  *     Quem chamou essa inicialização ?? Em que hora ??
- *
  * #bugbug: Pelo jeito somente depois dessa inicialização é que temos mensagens 
  * com printf decentes. Então a inicialização do kernel precisa disso.
  * >> precisamos antecipar essa inicilização. Mas ela precisa ser depois da
  * inicialização da paginação.
  */
- 
 // Estamos no kernel base em ring 0.
 // Queremos que as streams sejam acessíveis para as rotinas
 // da libc em ring3. Para a libc alterar os elementos
@@ -1895,7 +1883,7 @@ int kstdio_initialize (void)
 // Background
 // #bugbug
 // Estamos fazendo isso pela segunda vez.
-// A primeira foi em kernel_main.
+// A primeira foi em kmain.
 
     Background_initialize(COLOR_KERNEL_BACKGROUND);
 

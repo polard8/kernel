@@ -5,7 +5,7 @@
 
 // #bugbug
 // Essa rotina é sensível, pois agora usamos 64bit.
-// Called by kernel_main()
+// Called by kmain()
 // Where? backbuffer?
 void backgroundDraw (unsigned int color)
 {
@@ -45,7 +45,7 @@ void backgroundDraw (unsigned int color)
     set_up_cursor(0,0);
 }
 
-// Called by kernel_main().
+// Called by kmain().
 int Background_initialize(unsigned int color)
 {
     backgroundDraw ( (unsigned int) color );

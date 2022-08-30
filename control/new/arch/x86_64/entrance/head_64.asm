@@ -9,7 +9,7 @@ __HEAD
 
 ; See: init.c
 extern _magic
-extern _kernel_main
+extern _kmain
 
 ; See:
 ; kernel.h
@@ -262,14 +262,14 @@ START:
 ; Use the calling convention for this compiler.
 ; rdi
 ; No return
-; See: new/init.c
- ; #todo: arch type (2) ??
+; See: init.c
+; #todo: arch type (2) ??
  
     xor rax, rax
     mov rdi, rax    ; First argument.
     ; ...
     
-    call _kernel_main
+    call _kmain
 
 dieLoop:
     cli

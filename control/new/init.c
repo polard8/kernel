@@ -328,13 +328,12 @@ static void preinit_OutputSupport(void)
 }
 
 
-// main
-// Called by START in 
-// entrance/warden/unit0/x86_64/head_64.asm.
-// See:
-// init.h
+// ------------------------------
+// kmain:
+// Called by START in arch/x86_64/entrance/head_64.asm.
+// See: kernel.h
 
-int kernel_main(int arch_type)
+int kmain(int arch_type)
 {
     int Status=FALSE;
 
@@ -435,6 +434,8 @@ int kernel_main(int arch_type)
 
 
 // limitation: No serial debug yet.
+// #todo: #bugbug
+// We have another BootBlock structure in info.h
 static int preinit_SetupBootblock(void)
 {
 // ---------------------------

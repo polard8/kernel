@@ -347,7 +347,7 @@ static int I_x64CreateInitialProcess(void)
 
 // Passa o comando para o primeiro processo em user mode.
 // Esse processo ja foi previamente configurado.
-// Called by kernel_main() in init.c
+// Called by kmain() in init.c
 void I_x64ExecuteInitialProcess (void)
 {
     struct thread_d  *Thread;
@@ -1549,7 +1549,7 @@ fail0:
 // 2 - See: I_init()
 // 3 - See: I_x64main()
 // 4 - See: I_x64main()
-// Called by kernel_main in init/init.c
+// Called by kmain in init.c
 
 int I_x64main (void)
 {
@@ -1561,7 +1561,6 @@ int I_x64main (void)
 // The first ring3 process.
 // Ainda não configuramos qual será o primeiro processo
 // a rodar em user mode.
-
     InitialProcessInitialized = FALSE;
 
 // Obs: 
@@ -1579,41 +1578,33 @@ int I_x64main (void)
 
 // #debug
 // For real machine.
-
     //printf      ("I_x64main: [TODO]\n");
     //refresh_screen();
 
 // System State
-
-    if (system_state != SYSTEM_BOOTING)
-    {
+    if (system_state != SYSTEM_BOOTING){
         debug_print ("[x64] I_x64main: system_state\n");
         //x_panic     ("[x64] I_x64main: system_state\n");
         return FALSE;
     }
 
 // System Arch
-
-    if (current_arch != CURRENT_ARCH_X86_64)
-    {
+    if (current_arch != CURRENT_ARCH_X86_64){
         debug_print ("[x64] I_x64main: current_arch fail\n");
         //x_panic     ("[x64] I_x64main: current_arch fail\n");
         return FALSE;
     }
 
 // Threads counter
-
     UPProcessorBlock.threads_counter = 0;
 
 // ================================
 // sse support.
-
     PROGRESS("Kernel:1:1\n"); 
     //debug_print ("[x64] I_x64main: [TODO] SSE support\n");
     // x86_sse_init();
 
 // Status Flag and Edition flag.
-
     gSystemStatus = 1;
     gSystemEdition = 0;
 
@@ -1622,7 +1613,6 @@ int I_x64main (void)
 // Initializing the variable.
 // We will check the hv and change this flag.
 // Not qemu for now.
-
     g_is_qemu = FALSE;
 
 
@@ -1823,13 +1813,11 @@ int I_x64main (void)
 // It is working
     PS2_early_initialization();
 
-
 // ================
 // This is the full initialization.
 // #bugbug This is a test yet.
 // It fails in the real machine.
     //PS2_initialization();
-
 
 // ================================
 // Loading some system files.
@@ -1892,5 +1880,4 @@ fail0:
     refresh_screen(); 
     return FALSE;
 }
-
 
