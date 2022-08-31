@@ -1196,8 +1196,7 @@ void *sci0 (
         p->exit_in_progress = TRUE;
         // Quando o scheduler passar por ela,
         // vai pular ela e marca-la como zombie.
-        if( (void*) p->control != NULL )
-        {
+        if( (void*) p->control != NULL ){
             if(p->control->magic==1234)
                 p->control->exit_in_progress = TRUE;
         }

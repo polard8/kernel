@@ -1,0 +1,18 @@
+
+    Data driven kernel
+    ------------------
+
+(1) i/o:
+    dev/
+    fs/
+    net/
+
+(2) process:
+    arch/
+    ke/
+    klib/
+    mm/
+
+(3) user/security:
+    user/
+

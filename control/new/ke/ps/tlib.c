@@ -982,7 +982,31 @@ void kill_thread (int tid)
     int Lzzz = tid;
     debug_print ("kill_thread: Not implemented\n");
     panic       ("kill_thread: Not implemented\n");
+
+/*
+    //#todo: This is a good routine.
+   
+    if (tid == INIT_TID)
+        return;
+
+    if(tid<0)
+        return;
+    if(tid>=THREAD_COUNT_MAX)
+        return;
+
+    struct thread_d *t;
+    t = (struct thread_d *) threadList[tid];
+    if( (void*) t == NULL )
+        return;
+    if(t->magic!=1234)
+        return;
+
+// Let the scheduler to the job.
+    t->exit_in_progress = TRUE;
+*/
+
 }
+
 
 void kill_all_threads(void)
 {

@@ -1075,6 +1075,13 @@ wmProcedure (
 
             case VK_F4:
                 if (ctrl_status == TRUE){
+                    
+                    // kill fg thread if it is possible.
+                    if( shift_status == TRUE){
+                        // #todo: see: tlib.c 
+                        // kill_thread(foreground_thread)
+                        return 0;
+                    }
                     //__launch_app_via_initprocess(4004);
                     //post_message_to_ws( 
                     //    NULL, 33888, 0, 0 ); //#TEST
