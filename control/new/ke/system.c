@@ -9,8 +9,13 @@ unsigned long sys_time_hz=0;
 
 static char *default_user_name = DEFAULT_USERNAME;
 
-
 static void __a_soft_place_to_fall(void);
+
+
+//
+// ====================================
+//
+
 
 /*
  * systemGetSystemMetrics:
@@ -416,9 +421,9 @@ unsigned long systemGetSystemMetrics(int index)
            return (unsigned long) WindowServer_initialized; 
            break;
         
-        // is quemu
+// is quemu
         case 300:
-            return (unsigned long) g_is_qemu;
+            return (unsigned long) isQEMU();
             break;
            
 

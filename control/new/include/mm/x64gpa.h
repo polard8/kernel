@@ -504,20 +504,22 @@
 */
 
 
+// [APIC I/O unit]
+// i/o apic physical.
+// The address space reserved for the local APIC 
+// is used by each processor to access its own local APIC.
+// Subsequent I/O APIC addresses are assigned in 4K increments.
+// 0xFEC00000 + 0x1000
+#define __IOAPIC_PA  0xFEC00000
+
+// [APIC Local Unit]
+// local apic physical address.
+// The address space reserved for the I/O APIC 
+// must be shareable by all processors 
+// to permit dynamic reconfiguration
+#define __LAPIC_PA   0xFEE00000
+
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

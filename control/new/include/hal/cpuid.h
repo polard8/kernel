@@ -38,24 +38,10 @@
 #define CPUID_VENDOR_AMD_2    0x69746e65    //"enti" 
 #define CPUID_VENDOR_AMD_3    0x444d4163    //"cAMD"
 
-//" KVMKVMKVM " – KVM
-//"TCGTCGTCGTCG" – QEMU
-//"Microsoft Hv" – Microsoft Hyper-V or Windows Virtual PC
-//"VMwareVMware" – VMware
-// ...
-// QEMU hypervisor
-// invertido
-// "TCGTCGTCGTCG"
-#define CPUID_HV_QEMU_1  0x54474354  // 0x54434754  TCGT
-#define CPUID_HV_QEMU_2  0x43544743  // 0x43475443  CGTC
-#define CPUID_HV_QEMU_3  0x47435447  // 0x47544347  GTCG
 
-
-//
 // CPU Features
 // When called with EAX = 1 (CPUID_GETFEATURES), CPUID returns a bit field 
 // in EDX containing the following values. (osdev)
-//
 
 /*
 

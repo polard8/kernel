@@ -220,6 +220,8 @@ extern unsigned long gSavedBPP;
 #include "hal/detect.h"
 // hal pci
 #include "hal/bus/pci.h"  // PCI bus.
+// hv
+#include "hal/hv.h"
 // hal cpu
 #include "hal/cpuid.h"
 #include "hal/up.h"

@@ -1015,11 +1015,6 @@ static int booting_begin(int arch_type)
     //ok
     //debug_print ("kernel_main: Testing reboot\n");
     //hal_reboot();
-    
-    // See: detect.c
-    //if ( detect_IsQEMU() == TRUE ){
-    //    debug_print ("kernel_main: Running on QEMU\n");
-    //}
 
     //void *buff;
     //buff = (void*) kmalloc(1024*512);

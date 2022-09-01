@@ -109,15 +109,6 @@ dessa conta.
 */
 
 
-//
-// Hypervisor support.
-//
-
-//see: detect.c
-extern int g_is_qemu;
-// ...
-
-
 // ===================================================
 
 

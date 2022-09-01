@@ -1114,15 +1114,12 @@ __virtual_to_physical (
 // #todo
 void pages_calc_mem (void);
 
-
 // #todo
 // #fixme
 void *newPage (void);
 
 void *mm_alloc_single_page (void);
 void *mm_alloc_contig_pages (size_t size);
-
-
 
 void *allocPages (int size);
 void initializeFramesAlloc (void);

@@ -1458,12 +1458,31 @@ int consoleCompareStrings(void)
 // Testing the full initialization of ps2 interface.
 // This is a work in progress.
 // See: dev/i8042.c
-    if ( strncmp( prompt, "ps2", 3 ) == 0 )
+    if ( strncmp( prompt, "ps2-qemu", 8 ) == 0 )
     {
-        printf("[Test]: Full ps2 full initialization!\n");
-        PS2_initialization();
+        if (HVInfo.initialized == TRUE){
+            if (HVInfo.type == HV_TYPE_QEMU){
+                printf("#test: PS2 full initialization on qemu\n");
+                PS2_initialization();
+            }
+        }
         goto exit_cmp;
     }
+
+// #bugbug
+// The initialization is not working on kvm.
+    if ( strncmp( prompt, "ps2-kvm", 7 ) == 0 )
+    {
+        printf ("#todo: Initialization not working on kvm\n");
+        if (HVInfo.initialized == TRUE){
+            if (HVInfo.type == HV_TYPE_KVM){
+                //printf("#test: PS2 full initialization on kvm\n");
+                //PS2_initialization();
+            }
+        }
+        goto exit_cmp;
+    }
+
 
 // ========
 // 'reboot'

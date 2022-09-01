@@ -1451,15 +1451,13 @@ static int I_init (void)
     };
 
 // =======================
-// qemu
-// Check if we are running on qemu.
+// Detect the hypervisor string 
+// saved into the processor data structure.
+// Save the option found into a global variable.
+// #todo: We need a structure for that thing.
+// see: detect.c
 
-    int isQEMU=FALSE;
-    isQEMU = detect_IsQEMU();
-    if( isQEMU == TRUE ){
-        debug_print("I_init: Running on QEMU\n");
-        //printf ("Running on QEMU\n");
-    }
+    detect_hv();
 
 
 // =========================================

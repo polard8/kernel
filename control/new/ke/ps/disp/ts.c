@@ -21,14 +21,13 @@ static void cry(unsigned long flags);
 // Preempt
 // >> MOVEMENT 3 (Running --> Ready).
 // sofrendo preempção por tempo.
-// #todo: Mas isso só poderia acontecer se a flag
-// ->preempted permitisse. 
-// talvez o certo seja ->preenptable.
 // Fim do quantum.
 // Nesse momento a thread [esgotou] seu quantum, 
 // então sofrerá preempção e outra thread será colocada 
-// para rodar de acordo com a ordem estabelecida 
-// pelo escalonador.
+// para rodar de acordo com a ordem estabelecida pelo escalonador.
+// #todo: Mas isso só poderia acontecer se a flag
+// ->preempted permitisse. 
+// talvez o certo seja ->preenptable.
 
 static void __on_finished_executing( struct thread_d *t )
 {
@@ -415,6 +414,8 @@ The remainder ??
 // vai usar o contexto que ele já possui.
 
     // Ainda não esgotou o tempo de processamento.
+    // Vamos retornar e permitir que ela continue rodando,
+    // ou sinalizar que
     if ( CurrentThread->runningCount < CurrentThread->quantum ){
 
         // Yield in progress. 

@@ -39,29 +39,88 @@ A FRED-enabled operating system cannot use them for ring transitions.
 
 #include <kernel.h>
 
-
-//see: gdef.h
+//see: hv.h
 int g_is_qemu=FALSE;
+int g_is_kvm=FALSE;
+int g_is_bhyve=FALSE;
+int g_is_qnx=FALSE;
+int g_is_acrn=FALSE;
+// ...
 
+// see: hv.h
+struct hv_d  HVInfo;
+
+// ===================================
 
 // #todo: Used during the initialization.
-int detect_IsQEMU(void)
+// called by I_init() in x64init.c
+int detect_hv(void)
 {
+    HVInfo.initialized = FALSE;
+    HVInfo.type = HV_TYPE_UNDEFINED;
+
     g_is_qemu = FALSE;
+    g_is_kvm = FALSE;
+    g_is_bhyve = FALSE;
+    g_is_qnx = FALSE;
+    g_is_acrn = FALSE;
+    // ...
+
+// #todo #bugbug
+// This structure is for the current processor?
+// oIntel onely?
 
     if ( (void *) processor == NULL ){
-        x_panic ("detect_IsQEMU: processor struct\n");
+        x_panic ("detect_hv: processor struct\n");
     }
 
-    if ( processor->hvName[0] == CPUID_HV_QEMU_1 &&
-         processor->hvName[1] == CPUID_HV_QEMU_2 &&
-         processor->hvName[2] == CPUID_HV_QEMU_3 )
+// qemu?
+    if ( processor->hvName[0] == HV_STRING_QEMU_PART1 &&
+         processor->hvName[1] == HV_STRING_QEMU_PART2 &&
+         processor->hvName[2] == HV_STRING_QEMU_PART3 )
     {
+         HVInfo.type = HV_TYPE_QEMU;
          g_is_qemu = TRUE;
-         return TRUE;
+         goto done;
     }
 
+// bhyve?
+    if ( processor->hvName[0] == HV_STRING_BHYVE_PART1 &&
+         processor->hvName[1] == HV_STRING_BHYVE_PART2 &&
+         processor->hvName[2] == HV_STRING_BHYVE_PART3 )
+    {
+         HVInfo.type = HV_TYPE_BHYVE;
+         g_is_bhyve = TRUE;
+         goto done;
+    }
+
+// qnx?
+    if ( processor->hvName[0] == HV_STRING_QNX_PART1 &&
+         processor->hvName[1] == HV_STRING_QNX_PART2 &&
+         processor->hvName[2] == HV_STRING_QNX_PART3 )
+    {
+         HVInfo.type = HV_TYPE_QNX;
+         g_is_qnx = TRUE;
+         goto done;
+    }
+
+// acrn?
+    if ( processor->hvName[0] == HV_STRING_ACRN_PART1 &&
+         processor->hvName[1] == HV_STRING_ACRN_PART2 &&
+         processor->hvName[2] == HV_STRING_ACRN_PART3 )
+    {
+         HVInfo.type = HV_TYPE_ACRN;
+         g_is_acrn = TRUE;
+         goto done;
+    }
+
+
+fail:
+    HVInfo.initialized = FALSE;
     return FALSE;
+done:
+    HVInfo.initialized = TRUE;
+    return TRUE;
 }
 
 
