@@ -4,11 +4,120 @@
 #include <kernel.h>
 
 
-extern unsigned long gInitializationPhase;
-
-
 // private
 static int __using_serial_debug = FALSE;
+
+
+//
+// Private functions: Prototypes.
+//
+
+static int __debug_check_inicialization(void);
+static int __debug_check_drivers(void);
+
+
+// ==============================
+
+// __debug_check_inicialization:
+//     Checar se o kernel e os módulos foram inicializados.
+//     Checa o valor das flags.
+//     Checar todos contextos de tarefas válidas.
+// #todo
+// Rever esses nomes e etapas.
+
+static int __debug_check_inicialization (void)
+{
+    int Status = TRUE;
+
+//
+// Check phase
+//
+
+    if (Initialization.current_phase != 3){
+       Status = FALSE;
+       printf ("__debug_check_inicialization: Initialization phase = {%d}\n",
+           Initialization.current_phase );
+       goto fail;
+    }
+
+//
+// Checkpoints
+//
+
+// Hal
+    if (Initialization.hal_checkpoint != TRUE){
+        Status = FALSE;
+        printf ("__debug_check_inicialization: hal\n");
+        goto fail;
+    }
+
+// Microkernel
+    if (Initialization.microkernel_checkpoint != TRUE){
+       Status = FALSE;
+       printf ("__debug_check_inicialization: microkernel\n");
+       goto fail;
+    }
+
+// Executive
+    if (Initialization.executive_checkpoint != TRUE){
+        Status = FALSE;
+        printf ("__debug_check_inicialization: executive\n");
+        goto fail;
+    }
+
+// More?!
+
+// OK
+done:
+    return (int) Status;
+fail:
+    die(); 
+    return (int) Status;
+}
+
+
+/*
+ * __debug_check_drivers:
+ *    Checar se os drivers estão inicializados.
+ */
+
+static int __debug_check_drivers(void)
+{
+    int Status = FALSE;
+
+    debug_print("__debug_check_drivers: #todo\n");
+
+    /*
+     
+	if (g_driver_ps2keyboard_initialized != 1){
+	    //erro
+	}
+
+	if (g_driver_ps2mouse_initialized != 1){
+	    //erro
+	}
+
+
+	if (g_driver_hdd_initialized != 1){
+	    //erro
+	}
+
+    if (g_driver_pci_initialized != 1){
+	    //erro
+	}
+	
+    if (g_driver_rtc_initialized != 1){
+	    //erro
+	}
+	
+    if (g_driver_timer_initialized != 1){
+	    //erro
+	}
+
+    */
+
+    return (int) Status;
+}
 
 // ==============================
 
@@ -27,31 +136,9 @@ void disable_serial_debug(void)
     __using_serial_debug = FALSE;
 }
 
-
-// debug_compute_checksum: 
-// retorna um checksum dado um buffer e um tamanho.
-
-unsigned long 
-debug_compute_checksum ( 
-    unsigned char *buffer, 
-    unsigned long lenght )
-{
-    unsigned long CheckSum = 0;
-
-
-    while (lenght > 0){
-        CheckSum = ( CheckSum + (unsigned long) *buffer++ );
-        lenght--;
-    };
-
-    return (unsigned long) CheckSum;
-}
-
-
 void debug_print ( char *data )
 {
     register int i=0;
-
 
 // Are we using this debug method 
 // at this moment or not?
@@ -104,109 +191,6 @@ void PROGRESS( char *string )
 }
 
 
-// debug_check_inicialization:
-//     Checar se o kernel e os módulos foram inicializados.
-//     Checa o valor das flags.
-//     Checar todos contextos de tarefas válidas.
-
-// #todo
-// Rever esses nomes e etapas.
-
-int debug_check_inicialization (void){
-
-    int Status = 0;
-
-    // Check phase.
-
-    if ( gInitializationPhase != 3 ){
-       Status = 1;
-       printf ("debug_check_inicialization: gInitializationPhase = {%d}\n",
-           gInitializationPhase );
-       goto fail;
-    }
-
-
-    // Executive.
-    if ( Initialization.executive != 1 ){
-        Status = 1;
-        printf ("debug_check_inicialization: executive\n");
-        goto fail;
-    }
-
-
-    // Microkernel.
-    if ( Initialization.microkernel != 1 ){
-       Status = 1;
-       printf ("debug_check_inicialization: microkernel\n");
-       goto fail;
-    }
-
-
-    // Hal.
-    if ( Initialization.hal != 1 ){
-        Status = 1;
-        printf ("debug_check_inicialization: hal\n");
-        goto fail;
-    }
-
-    // More?!
-
-//done:
-    return (int) Status;
-fail:
-    die(); 
-    return -1;
-}
-
-
-/*
- * debug_check_drivers:
- *    Checar se os drivers estão inicializados.
- */
- 
-int debug_check_drivers (void)
-{
-    int Status = 0;
-
-
-    // #todo
-    // This routine is very cool.
-
-    debug_print("debug_check_drivers: TODO\n");
-
-    /*
-     
-	if (g_driver_ps2keyboard_initialized != 1){
-	    //erro
-	}
-
-	if (g_driver_ps2mouse_initialized != 1){
-	    //erro
-	}
-
-
-	if (g_driver_hdd_initialized != 1){
-	    //erro
-	}
-
-    if (g_driver_pci_initialized != 1){
-	    //erro
-	}
-	
-    if (g_driver_rtc_initialized != 1){
-	    //erro
-	}
-	
-    if (g_driver_timer_initialized != 1){
-	    //erro
-	}
-
-    */
-
-    return (int) Status;
-}
-
-
 /*
  * debug:
  *     Checa por falhas depois de cumpridas as 
@@ -222,10 +206,10 @@ int debug (void)
 // Checa inicialização. 
 // Fases, variáveis e estruturas.
 
-    Status = (int) debug_check_inicialization();
+    Status = (int) __debug_check_inicialization();
 
-    if (Status == 1){
-        panic ("debug: debug_check_inicialization fail\n");
+    if (Status == TRUE){
+        panic ("debug: __debug_check_inicialization fail\n");
     }
 
     // 'processor' struct.
@@ -234,24 +218,22 @@ int debug (void)
         panic ("debug: processor struct fail\n");
     }
 
-    // Check drivers status. 
-    // ( Ver se os principais drivers estão inicializados )
+// Check drivers status. 
+// ( Ver se os principais drivers estão inicializados )
+    __debug_check_drivers();
 
-    debug_check_drivers();
-
-	/*
-	 * @todo: 
-	 *     Checar se existe componentes do sistema como mbr, root, fat 
-	 * e arquivos e programas básicos do sistema.
-	 */
-	 
-	 
-	/* 
-	 * @todo: 
-	 *     Checar por falhas no sistema de arquivos.
-	 */
-	 
-	 
+/*
+ * @todo: 
+ *     Checar se existe componentes do sistema como mbr, root, fat 
+ * e arquivos e programas básicos do sistema.
+ */
+ 
+/* 
+ * @todo: 
+ *     Checar por falhas no sistema de arquivos.
+ */
+ 
+ 
 	/*
      * @todo:	
 	 *     Checar por falhas nas estruturas de tarefas.
@@ -276,35 +258,24 @@ void debug_breakpoint (void)
 }
 
 
-/*
-void 
-bug_check( 
-    int number, 
-    unsigned long parameter1,
-    unsigned long parameter2,
-    unsigned long parameter3,
-    unsigned long parameter4 )
+// Compute checksum
+// IN: address, lenght.
+// see: kstring.c
+unsigned long 
+debug_compute_checksum ( 
+    unsigned char *buffer, 
+    unsigned long lenght )
 {
-    switch (number){
-    case 1:
-       
-    };
-
-    if( WeHavePanic == TRUE ){
-        panic("bug_check: panic\n");
-    }
-
-    if( WeHaveXPanic == TRUE ){
-        panic("bug_check: xpanic\n");
-    }
-
-    // We have nothing.
-    while(1){
-        asm (" cli ");
-        asm (" hlt ");
-    };
+    unsigned long res=0;
+    
+    res = 
+        (unsigned long) string_compute_checksum(
+                            (unsigned char *) buffer,
+                            (unsigned long) lenght );
+    return (unsigned long) res;
 }
-*/
 
-
+//
+// End
+//
 

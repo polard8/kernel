@@ -11,7 +11,10 @@ int init_microkernel (void)
 {
     int Status = FALSE;
 
+    Initialization.microkernel_checkpoint = TRUE;
+
     debug_print ("init_microkernel:\n");
+
 
 // Init scheduler.
 // See: sched/sched.c
@@ -54,16 +57,16 @@ int init_microkernel (void)
     DispatchCountBlock->magic=1234;
     DispatchCountBlock->initialized = TRUE;
 
+    Initialization.microkernel_checkpoint = TRUE;
+
 // #debug 
 // A primeira mensagem só aparece após a inicialização da runtime
 // por isso não deu pra limpar a tela antes.
 
 #ifdef BREAKPOINT_TARGET_AFTER_MK
-    printf (">>>debug hang: after init_microkernel");
+    printf ("#breakpoint: after init_microkernel");
     die();
 #endif
-
-    Initialization.microkernel = TRUE;
 
     return TRUE;
 }

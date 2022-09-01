@@ -4,15 +4,13 @@
 #include <kernel.h>
 
 
-extern unsigned long gInitializationPhase;
-
-// private
-static int InitialProcessInitialized = FALSE;
-
 // Task switching support.
 extern void turn_task_switch_on (void);
 
 extern void x64_clear_nt_flag (void);
+
+// private
+static int InitialProcessInitialized = FALSE;
 
 
 //Onde ficam os códigos e arquivos de configuração usados na inicialização.
@@ -508,7 +506,7 @@ void I_x64ExecuteInitialProcess (void)
 // End of phase.
 // Starting phase 4.
 
-    gInitializationPhase = 4;
+    Initialization.current_phase = 4;
 
 // =============
 // # go!
@@ -1144,8 +1142,8 @@ static int I_init (void)
 // ==================
 // Check kernel phase.
 
-    if ( gInitializationPhase != 0 ){
-        printf ("I_init: gInitializationPhase fail. Not 0\n");
+    if (Initialization.current_phase != 0){
+        printf ("I_init: Initialization phase is Not 0.\n");
         return FALSE;
     }
 
@@ -1299,11 +1297,10 @@ static int I_init (void)
 // #important
 // We need to be in the phase 0.
 
-    if (gInitializationPhase != 0){
-        printf ("I_init: gInitializationPhase gInitializationPhase != 0\n");
+    if (Initialization.current_phase != 0){
+        printf ("I_init: Initialization phase is NOT 0.\n");
         return FALSE;
     }
-
 
 // ==========================
 // hal
@@ -1355,18 +1352,15 @@ static int I_init (void)
     PROGRESS("Kernel:2:12\n"); 
     //init_window_manager();
 
-
 // End of phase.
 // Starting phase 1.
-
-    gInitializationPhase = 1;
-
+    Initialization.current_phase = 1;
 
 // ========================
 // We need to be in the phase 1.
 
-    if ( gInitializationPhase != 1 ){
-        printf ("I_init: gInitializationPhase != 1\n");
+    if (Initialization.current_phase != 1){
+        printf ("I_init: Initialization phase is NOT 1\n");
         return FALSE;
     }
 
@@ -1376,7 +1370,7 @@ static int I_init (void)
 // ?? Is it 'up' or 'smp' ?
 
     PROGRESS("Kernel:2:13\n"); 
-    processor = (void *) kmalloc ( sizeof( struct processor_d ) ); 
+    processor = (void *) kmalloc( sizeof( struct processor_d ) ); 
     if ( (void *) processor == NULL )
     {
         printf("I_init: processor\n");
@@ -1500,11 +1494,9 @@ static int I_init (void)
     //set_task_status(LOCKED); 
     //scheduler_lock();
 
-
 // End of phase.
 // Starting phase 2.
-
-    gInitializationPhase = 2;
+    Initialization.current_phase = 2;
 
 // =========================================
 // keyboard stuff.
@@ -1554,7 +1546,8 @@ int I_x64main (void)
     int Status = FALSE;
 
 // Phase counter: Starting phase 0.
-    gInitializationPhase = 0;
+// We already did that before in kmain().
+    Initialization.current_phase = 0;
 
 // The first ring3 process.
 // Ainda não configuramos qual será o primeiro processo
@@ -1606,14 +1599,6 @@ int I_x64main (void)
     gSystemStatus = 1;
     gSystemEdition = 0;
 
-// =========================
-// Hypervisor
-// Initializing the variable.
-// We will check the hv and change this flag.
-// Not qemu for now.
-    g_is_qemu = FALSE;
-
-
 // ===================================
 // I_init
 // Calling the main initialization routine.
@@ -1627,13 +1612,9 @@ int I_x64main (void)
 // See: sysinit.c
 
     PROGRESS("Kernel:1:2\n"); 
-    //debug_print ("I_x64main: Calling I_init()\n");
 
-    if ( gInitializationPhase != 0 )
-    {
-        debug_print ("I_x64main: gInitializationPhase\n");
-        //x_panic ("I_x64main: gInitializationPhase\n");
-        //KiAbort();
+    if (Initialization.current_phase != 0){
+        debug_print ("I_x64main: Initialization phase is NOT 0.\n");
         return FALSE;
     }
 
@@ -1646,11 +1627,9 @@ int I_x64main (void)
         return FALSE;
     }
 
-
 // End of phase.
 // Starting phase 3.
-
-    gInitializationPhase = 3;
+    Initialization.current_phase = 3;
 
 //================================
 // Initialize all the kernel graphics support.

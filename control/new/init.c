@@ -35,6 +35,17 @@
 #include <kernel.h>
 
 
+//
+// Initialization :)
+//
+
+// Global
+//unsigned long gInitializationPhase=0;
+
+// No pointer.
+struct initialization_d  Initialization;
+
+
 #define GCC_VERSION ( __GNUC__ * 10000 \
             + __GNUC_MINOR__ * 100 \
             + __GNUC_PATCHLEVEL__ )
@@ -43,12 +54,6 @@
 //static char *s_hostname;
 //#define PLATFORM_STRING                 "x64"
 
-// Global
-unsigned long gInitializationPhase=0;
-
-
-//#test
-//static const unsigned int something=1234;
 
 #define RELEASE_TYPE_NULL  0
 #define RELEASE_TYPE_RC    1
@@ -339,6 +344,10 @@ int kmain(int arch_type)
 
     asm ("cli");
 
+// Starting the counter.
+    Initialization.current_phase = 0;
+
+
 /*
     char hostname[64];
     sprintf(hostname,"gramado");
@@ -564,15 +573,17 @@ static int preinit(void)
 {
     system_state = SYSTEM_PREINIT;
 
-    Initialization.phase1 = FALSE;
-    Initialization.phase2 = FALSE;
-    Initialization.phase3 = FALSE;
 
-    Initialization.hal = FALSE;
-    Initialization.microkernel = FALSE;
-    Initialization.executive = FALSE;
-    Initialization.gramado = FALSE;
+// Checkpoints
+    Initialization.phase1_checkpoint = FALSE;
+    Initialization.phase2_checkpoint = FALSE;
+    Initialization.phase3_checkpoint = FALSE;
+    Initialization.hal_checkpoint = FALSE;
+    Initialization.microkernel_checkpoint = FALSE;
+    Initialization.executive_checkpoint = FALSE;
+    Initialization.gramado_checkpoint = FALSE;
 
+// Flags
     Initialization.serial_log = FALSE;
     Initialization.console_log = FALSE;
 

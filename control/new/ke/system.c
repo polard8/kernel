@@ -425,7 +425,6 @@ unsigned long systemGetSystemMetrics(int index)
         case 300:
             return (unsigned long) isQEMU();
             break;
-           
 
         // ...
                 
@@ -908,19 +907,17 @@ void *systemNull (void)
 
 /*
  * init_executive:
- *
  *     Initialize the kernel executive.
  *     Archtecture (independent) inicialization. 
  */
-
-// called by init()
+// called by I_Init().
 // OUT: return TRUE if its ok.
 
 int init_executive (void)
 {
     int Status = FALSE;
 
-    Initialization.executive = FALSE;
+    Initialization.executive_checkpoint = FALSE;
 
     debug_print ("init_executive:\n");
 
@@ -969,7 +966,7 @@ int init_executive (void)
 	//#debug
 	//printf("Done!\n");
 
-    Initialization.executive = TRUE;
+    Initialization.executive_checkpoint = TRUE;
 
     return (int) TRUE;
 }

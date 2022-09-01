@@ -39,14 +39,6 @@ A FRED-enabled operating system cannot use them for ring transitions.
 
 #include <kernel.h>
 
-//see: hv.h
-int g_is_qemu=FALSE;
-int g_is_kvm=FALSE;
-int g_is_bhyve=FALSE;
-int g_is_qnx=FALSE;
-int g_is_acrn=FALSE;
-// ...
-
 // see: hv.h
 struct hv_d  HVInfo;
 
@@ -59,16 +51,9 @@ int detect_hv(void)
     HVInfo.initialized = FALSE;
     HVInfo.type = HV_TYPE_UNDEFINED;
 
-    g_is_qemu = FALSE;
-    g_is_kvm = FALSE;
-    g_is_bhyve = FALSE;
-    g_is_qnx = FALSE;
-    g_is_acrn = FALSE;
-    // ...
-
 // #todo #bugbug
 // This structure is for the current processor?
-// oIntel onely?
+// on Intel only?
 
     if ( (void *) processor == NULL ){
         x_panic ("detect_hv: processor struct\n");
@@ -80,7 +65,6 @@ int detect_hv(void)
          processor->hvName[2] == HV_STRING_QEMU_PART3 )
     {
          HVInfo.type = HV_TYPE_QEMU;
-         g_is_qemu = TRUE;
          goto done;
     }
 
@@ -90,7 +74,6 @@ int detect_hv(void)
          processor->hvName[2] == HV_STRING_BHYVE_PART3 )
     {
          HVInfo.type = HV_TYPE_BHYVE;
-         g_is_bhyve = TRUE;
          goto done;
     }
 
@@ -100,7 +83,6 @@ int detect_hv(void)
          processor->hvName[2] == HV_STRING_QNX_PART3 )
     {
          HVInfo.type = HV_TYPE_QNX;
-         g_is_qnx = TRUE;
          goto done;
     }
 
@@ -110,10 +92,8 @@ int detect_hv(void)
          processor->hvName[2] == HV_STRING_ACRN_PART3 )
     {
          HVInfo.type = HV_TYPE_ACRN;
-         g_is_acrn = TRUE;
          goto done;
     }
-
 
 fail:
     HVInfo.initialized = FALSE;
@@ -127,7 +107,14 @@ done:
 // #todo: Used by system metrics.
 int isQEMU(void)
 {
-    return (int) g_is_qemu;
+    if (HVInfo.initialized == TRUE)
+    {
+        if (HVInfo.type == HV_TYPE_QEMU){
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 

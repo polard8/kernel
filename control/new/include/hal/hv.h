@@ -60,14 +60,6 @@
 
 // =============================================
 
-//see: detect.c
-extern int g_is_qemu;
-extern int g_is_kvm;
-extern int g_is_bhyve;
-extern int g_is_qnx;
-extern int g_is_acrn;
-// ...
-
 
 #define HV_TYPE_UNDEFINED  0
 #define HV_TYPE_QEMU       1000

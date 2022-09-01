@@ -2,9 +2,49 @@
 #include <kernel.h>
 
 
+// string_compute_checksum: 
+// retorna um checksum dado um buffer e um tamanho.
+// This is good for ring0, 
+// because kernel has access to the whole memory.
+
+unsigned long 
+string_compute_checksum ( 
+    unsigned char *buffer, 
+    unsigned long lenght )
+{
+// Quantidade de bytes a serem somados.
+    register unsigned long l = (unsigned long) lenght;
+// Valor do último byte obtido.
+    unsigned char NextCharValue = 0;
+// Valor do último byte obtido, convertido em long.
+    unsigned long NextLongValue = 0;
+// Armazena o resultado total.
+    unsigned long Total=0;
+
+    if(l==0){
+        return (unsigned long) 0;
+    }
+
+    while (l>0)
+    {
+        // Pega um char no buffer.
+        NextCharValue = (unsigned char) *buffer; 
+        // Converte para long.
+        NextLongValue = (unsigned long) (NextCharValue & 0xFF);
+        // Atualiza o valor todal.
+        Total = (unsigned long)(Total + NextLongValue);
+        // Salta para o próximo byte no buffer.
+        buffer++;
+        // Decrementa o contador de bytes.
+        l--;
+    };
+
+    return (unsigned long) Total;
+}
+
 
 // strcmp:
-//     COmpare two strings. 
+//     Compare two strings. 
 
 int strcmp (char *s1, char *s2)
 {

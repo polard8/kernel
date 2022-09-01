@@ -30,6 +30,12 @@ size_t strcspn(const char *str, const char *reject);
 size_t strspn (const char *str, const char *accept);
 
 
+unsigned long 
+string_compute_checksum ( 
+    unsigned char *buffer, 
+    unsigned long lenght );
+
+
 //
 // == strtok ============
 //

@@ -237,33 +237,22 @@ void hal_test_speaker (void){
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
  */
-// Called by init() in init.c
+// Called by I_Init() in init.c
 // OUT: TRUE if its ok.
 
-int init_hal (void)
+int init_hal(void)
 {
     int Status = FALSE;
 
-    Initialization.hal = FALSE;
-
-// nothing
-
+    Initialization.hal_checkpoint = FALSE;
     init_cpu();
-
 // #todo:
 // Chamaremos essa inicialização básica nesse momento.
 // A inicialização completa será chamada pelo processo init.
-
     early_timer_init();
-
-
 // Detecta fabricantes específicos suportados pelo núcleo.  
-
-    // nothing
-
     hal_hardware_detect();
-
-    Initialization.hal = TRUE;
+    Initialization.hal_checkpoint = TRUE;
 
     return TRUE;
 }
