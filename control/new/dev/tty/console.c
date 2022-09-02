@@ -468,9 +468,7 @@ void console_init_virtual_console (int n)
     debug_print ("console_init_virtual_console:\n");
 
 // Limits
-
     ConsoleIndex = (int) n;
-
     if ( ConsoleIndex < 0 || 
          ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
     {
@@ -626,6 +624,9 @@ void console_init_virtual_console (int n)
 
 void console_set_current_virtual_console (int n)
 {
+    if (n == fg_console)
+        return;
+
     if ( n < 0 || n >= 4 )
     {
         debug_print ("console_set_current_virtual_console: Limits\n");
@@ -646,19 +647,18 @@ int console_get_current_virtual_console (void)
 // __local_ps2kbd_procedure in ps2kbd.c
 // VirtualConsole_initialize in console.c
 // __initialize_virtual_consoles in kstdio.c
+// #todo:
+// maybe we can do somo other configuration here.
+// Change the foreground console.
 
 void jobcontrol_switch_console(int n)
 {
-    // #todo:
-    // maybe we can do somo other configuration here.
- 
     if ( n<0 || n >= CONSOLETTYS_COUNT_MAX )
     {
         debug_print("jobcontrol_switch_console: Limits\n");
         return;
     }
-    
-// Change the foreground console.
+
     console_set_current_virtual_console(n);
 }
 
@@ -667,23 +667,18 @@ void jobcontrol_switch_console(int n)
  * set_up_cursor:
  *     Setup cursor for the current virtual console.
  */
-
 // #todo
 // Maybe change to console_set_up_cursor();
-
 // We need a routine to change the cursor inside a wigen window.
 // The console has a window ? No ? ... but it has a dimension.
 // See the tty structure at hal/dev/tty/tty.h
-
 // We need to know that there is a difference between 
 // printing at a given console and printing at a given window.
 // The tty has a window, but we are not using it, we are using
 // the margins for the console.
-
 // #todo
 // Quando estivermos colocando o cursor em uma janela e
 // a janela não for válida, então colocamos o cursor na posição 0,0.
-
 // #todo
 // Podemos criar uma rotina que mude o cursor de um dado console.
 //void set_up_cursor2 ( int console, unsigned long x, unsigned long y );
@@ -697,6 +692,17 @@ void set_up_cursor ( unsigned long x, unsigned long y )
     CONSOLE_TTYS[fg_console].cursor_x = (unsigned long) x;
     CONSOLE_TTYS[fg_console].cursor_y = (unsigned long) y;
 }
+
+/*
+void set_up_cursor2 ( int console_number, unsigned long x, unsigned long y );
+void set_up_cursor2 ( int console_number, unsigned long x, unsigned long y )
+{
+    if (console_number<0){ return; }
+    if (console_number>=CONSOLETTYS_COUNT_MAX){ return; }
+    CONSOLE_TTYS[console_number].cursor_x = (unsigned long) x;
+    CONSOLE_TTYS[console_number].cursor_y = (unsigned long) y;
+}
+*/
 
 
 /*
@@ -738,26 +744,23 @@ void console_scroll (int console_number)
 
     register int i=0;
 
+    // debug_print ("console_scroll: #todo #fixme\n");
 
-    debug_print ("console_scroll: #todo #fixme\n");
-
-    if ( VideoBlock.useGui != TRUE )
-    {
+    if ( VideoBlock.useGui != TRUE ){
         debug_print ("console_scroll: no GUI\n");
         panic       ("console_scroll: no GUI\n");
     }
 
-    // #todo: check overflow
-    if ( console_number < 0 ){
-        panic ("console_scroll: [FAIL] console_number\n");
+    if ( console_number < 0 || 
+         console_number >= CONSOLETTYS_COUNT_MAX )
+    {
+        panic ("console_scroll: console_number\n");
     }
 
-    // Scroll the screen rectangle.
-    // See: rect.c
-
-    // #todo
-    // Isso deveria ser apenas scroll_rectangle()
-
+// Scroll the screen rectangle.
+// See: rect.c
+// #todo
+// Isso deveria ser apenas scroll_rectangle()
     scroll_screen_rect();
 
 // Clear the last line.
@@ -771,20 +774,16 @@ void console_scroll (int console_number)
     OldTop    = CONSOLE_TTYS[console_number].cursor_top;
     OldRight  = CONSOLE_TTYS[console_number].cursor_right;
     OldBottom = CONSOLE_TTYS[console_number].cursor_bottom;
-    
 
 // Cursor na ultima linha.
 // Para podermos limpa-la.
-
     CONSOLE_TTYS[console_number].cursor_x =   CONSOLE_TTYS[console_number].cursor_left; 
     CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom); 
-
 
 // Limpa a últime linha.
 // #bugbug: 
 // Essa rotina pode sujar alguns marcadores importantes.
 // Depois disso precisamos restaurar os valores salvos
-
 
    if ( CONSOLE_TTYS[console_number].cursor_left < (CONSOLE_TTYS[console_number].cursor_right-1) )
    {
@@ -796,7 +795,6 @@ void console_scroll (int console_number)
        };
     }
 
-
 // Restaura limits
     CONSOLE_TTYS[console_number].cursor_left   = (OldLeft   & 0xFFFF);
     CONSOLE_TTYS[console_number].cursor_top    = (OldTop    & 0xFFFF);
@@ -806,8 +804,14 @@ void console_scroll (int console_number)
     CONSOLE_TTYS[console_number].cursor_x = 0; 
     CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom -1); 
 
-    invalidate_screen();
-    //refresh_screen();
+// #todo:
+// Essa flag permite que o taskswitch faça o refresh
+// da tela.
+// see: schedulerUpdateScreen() in kgwm.c
+// O certo seria dispatchUpdateScreen()
+
+    //invalidate_screen();  //#bugbug not working
+    refresh_screen();
 }
 
 

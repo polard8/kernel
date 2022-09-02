@@ -2022,6 +2022,8 @@ done:
 // sim processar algumas combinações, independente dos aplicativos.
 // Como a chamada aos consoles do kernel ou control+alt+del.
 
+
+    // ShellFlag == TRUE
     __Status = 
         (int) wmProcedure(
         (struct window_d *) Event_Window,    // opaque pointer
