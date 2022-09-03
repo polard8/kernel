@@ -1308,6 +1308,37 @@ void caller(unsigned long function_address)
 }
 
 
+void DANGER_VGA_clear_screen(void);
+void DANGER_VGA_clear_screen(void)
+{
+/*
+    unsigned int x=0;
+    unsigned int y=0;
+
+    unsigned char *VGA_address = (unsigned char *) 0xA0000;
+    //unsigned char *VGA_address = (unsigned char *) FRONTBUFFER_VA;
+    unsigned int VGA_width = 320;
+    unsigned int VGA_height = 200;
+
+    //printf ("VGA_clear_screen:\n");
+    
+    for(y=0; y<VGA_height; y++)
+    {
+        for (x=0; x<VGA_width; x++)
+        {
+            VGA_address[ VGA_width*y+x ] = 0x0f;
+            //VGA_address[ y+x ] = 0xFF;
+        };
+    };
+
+    while(1){}
+*/
+
+    printf("done\n");
+    refresh_screen();
+}
+
+
 // =====================================
 
 // Compare the strings that were
@@ -1325,6 +1356,13 @@ int consoleCompareStrings(void)
     {
         //mod0.bin entry point.
         caller((unsigned long) 0x30A01000); 
+        goto exit_cmp;
+    }
+
+
+    if ( strncmp(prompt,"vga-cls",7) == 0 )
+    { 
+        //DANGER_VGA_clear_screen();
         goto exit_cmp;
     }
 

@@ -182,7 +182,10 @@ exposed-tier:
 	$(Q) $(MAKE) -C exposed/azure/
 # Copy to the target folder.
 	-sudo cp exposed/azure/bin/SHUTDOWN.BIN  control/disk/
+
 	-sudo cp exposed/azure/bin/REBOOT.BIN    control/disk/
+	-sudo cp exposed/azure/bin/VGA1.BIN      control/disk/
+
 	-sudo cp exposed/azure/bin/SHELL.BIN     control/disk/
 	-sudo cp exposed/azure/bin/CAT.BIN       control/disk/
 	-sudo cp exposed/azure/bin/TPRINTF.BIN   control/disk/

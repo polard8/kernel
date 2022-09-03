@@ -26,11 +26,16 @@ static isTimeToQuit = FALSE;
 // Sent us a system message.
 static int __Caller=-1;
 
+static const char *app1_name = "gwssrv.bin";
+static const char *app2_name = "gws.bin";
+static const char *app3_name = "gnssrv.bin";
+static const char *app4_name = "gns.bin";
+
 // private functions: prototypes;
 
 // local
 static int 
-gwsProcedure ( 
+__Procedure ( 
     void *window, 
     int msg, 
     unsigned long long1, 
@@ -45,8 +50,9 @@ static int __CompareString(void);
 // ====================
 
 // local
+// #todo: change this name.
 static int 
-gwsProcedure ( 
+__Procedure ( 
     void *window, 
     int msg, 
     unsigned long long1, 
@@ -76,6 +82,7 @@ gwsProcedure (
             case 4003:  //app3
             printf("init.bin: 4003\n");
             rtl_clone_and_execute("editor.bin");  break;
+            //rtl_clone_and_execute("cmdline.bin");  break;
             case 4004:  //app4
             printf("init.bin: 4004\n");
             rtl_clone_and_execute("reboot.bin");  break;
@@ -92,6 +99,7 @@ gwsProcedure (
             case 4008:  //app8
             printf("init.bin: 4008\n");
             rtl_clone_and_execute("reboot.bin");  break;
+
             
             default:
                 break;
@@ -315,18 +323,18 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
-
+//==============================
 // Window Server:
     if( strncmp(prompt,"ws",2) == 0 )
     {
-        printf ("~WS\n");
-        rtl_clone_and_execute("gwssrv.bin");
+        //printf ("~WS\n");
+        //rtl_clone_and_execute("gwssrv.bin");
         goto exit_cmp;
     }
     if( strncmp(prompt,"wsq",3) == 0 )
     {
         printf ("~WSQ\n");
-        ret_val = (int) rtl_clone_and_execute("gwssrv.bin");
+        ret_val = (int) rtl_clone_and_execute(app1_name);
         if (ret_val<=0){
             printf("Couldn't clone\n");
         }
@@ -335,18 +343,18 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
-
+//==============================
 // Network Server:
     if( strncmp(prompt,"ns",2) == 0 )
     {
-        printf ("~NS\n");
-        rtl_clone_and_execute("gnssrv.bin");
+        //printf ("~NS\n");
+        //rtl_clone_and_execute("gnssrv.bin");
         goto exit_cmp;
     }
     if( strncmp(prompt,"nsq",3) == 0 )
     {
         printf ("~NSQ\n");
-        rtl_clone_and_execute("gnssrv.bin");
+        rtl_clone_and_execute(app3_name);
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
@@ -402,7 +410,7 @@ static int __server_loop(void)
             // save
             __Caller = (int) ( RTLEventBuffer[8] & 0xFFFF );
 
-            gwsProcedure ( 
+            __Procedure ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
                 RTLEventBuffer[2], 
@@ -500,7 +508,7 @@ int main( int argc, char **argv)
         if ( rtl_get_event() == TRUE )
         {
             //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
-            gwsProcedure ( 
+            __Procedure ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
                 RTLEventBuffer[2], 

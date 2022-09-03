@@ -2,7 +2,10 @@
 all:
 
 	make -C ./shutdown
+
 	make -C ./reboot
+	make -C ./vga1
+
 	make -C ./shell
 	make -C ./cat
 	make -C ./tprintf

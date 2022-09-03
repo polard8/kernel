@@ -1,6 +1,27 @@
 
 // main file for the ring 0 kernel module.
 // called by ./crt0.c
+// #todo: Do not use 'interrupts'.
+
+struct module_initialization_d
+{
+    int initialized;
+    //unsigned long ksysmboltable_address;
+};
+struct module_initialization_d  ModuleInitialization;
+
+
+// kernel sysboltable address.
+// unsigned long imported_functions[32];
+unsigned long *kfunctions;
+int DIE=0;      //it works
+int PUTCHARK=1; //it works
+int REBOOT=2;   //it works
+int REFESHSCREEN=3;
+    // #todo: Call dead thread collector, scheduler ...
+    // read flags
+    // read messages
+    // ...
 
 inline void do_int3(void)
 {
@@ -17,13 +38,28 @@ void caller(unsigned long function_address)
     asm("call *%0" : : "r"(function_address));
 }
 
-int module_main( int reason )
-{
-    // The kernel entry point.
-    // #bugbug: It's not safe.
-    // We need a random address.
-    unsigned char *k = (unsigned char *) 0x30001000;
 
+int module_print( char *string );
+int module_print( char *string )
+{
+    //#todo: We nned to send an argument to the kernel function.
+    caller( (unsigned long) kfunctions[PUTCHARK] );
+    return 0;
+}
+
+
+//
+// main:
+//
+
+int module_main(int reason)
+{
+
+// The kernel entry point.
+// #bugbug: It's not safe.
+// We need a random address.
+
+    unsigned char *k = (unsigned char *) 0x30001000;
 
 // #test
 // Lookup for "__GRAMADO__"
@@ -51,25 +87,27 @@ int module_main( int reason )
         }
     };
 
-    unsigned long *functions = (unsigned long *) __function_table;
-    int DIE=0;      //it works
-    int PUTCHARK=1; //it works
-    int REBOOT=2;   //it works
-    int REFESHSCREEN=3;
-    // #todo: Call dead thread collector, scheduler ...
-    // read flags
-    // read messages
-    // ...
+// Symbol table 'exported' hehe by the kernel.
+    //unsigned long *kfunctions = (unsigned long *) __function_table;
+    kfunctions = (unsigned long *) __function_table;
+
     if (Found==1)
     {
         for (i=0; i<100; i++)
-            caller( (unsigned long) functions[PUTCHARK] );
+            caller( (unsigned long) kfunctions[PUTCHARK] );
         
-        //caller( (unsigned long) functions[DIE] );
-        //caller( (unsigned long) functions[PUTCHARK] );
-        //caller( (unsigned long) functions[REBOOT] );
+        //caller( (unsigned long) kfunctions[DIE] );
+        //caller( (unsigned long) kfunctions[PUTCHARK] );
+        //caller( (unsigned long) kfunctions[REBOOT] );
         //do_int3();
     }
+
+
+// #todo:
+// Call a function sending a pointer to a vector
+// where the kernel will put all the exported functions.
+
+    //unsigned long imported_functions[32];
 
 
     if (reason==1){

@@ -1,7 +1,7 @@
 
 // crt0 file for a ring 0 kernel module.
 
-extern int module_main( int reason );
+extern int module_main(int reason);
 
 void module_crt0(void)
 {
@@ -12,11 +12,8 @@ void module_crt0(void)
     ret_val = 
         (int) module_main(reason);
 
-
 // Return to kernel
-
     //while(1){};
 }
-
 
 
