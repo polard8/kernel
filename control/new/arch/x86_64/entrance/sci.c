@@ -1789,6 +1789,7 @@ void *sci0 (
             break;
 
         // 138 - get key state.
+        // IN: vk.
         case 138:
             return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
             break;

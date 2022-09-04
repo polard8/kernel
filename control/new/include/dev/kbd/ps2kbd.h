@@ -158,7 +158,8 @@ void kbdc_wait (unsigned char type);
 void keyboardDisable (void);
 void keyboardEnable (void);
 void keyboard_set_leds (char flag);
-unsigned long keyboardGetKeyState ( unsigned char key );
+
+unsigned long keyboardGetKeyState(int vk);
 
 int get_alt_status (void);
 int get_ctrl_status (void);

@@ -361,19 +361,19 @@ void keyboard_set_leds (char flag)
 }
 
 
-/*
- * keyboardGetKeyState: 
- * 
- */
-
+// keyboardGetKeyState:
 // Pega o status das teclas de modificação.
-
-unsigned long keyboardGetKeyState ( unsigned char key )
+unsigned long keyboardGetKeyState(int vk)
 {
-	unsigned long State=0;
-	
-	switch (key){
-	case VK_LSHIFT:    State = shift_status;       break;
+    unsigned long State=0;
+    int Lvk = (int) (vk & 0xFF);
+
+    if(Lvk<0){
+        return 0;
+    }
+
+    switch (Lvk){
+    case VK_LSHIFT:    State = shift_status;       break;
     case VK_LCONTROL:  State = ctrl_status;        break;
     case VK_LWIN:      State = winkey_status;      break;
     case VK_LMENU:     State = alt_status;         break;
@@ -384,9 +384,13 @@ unsigned long keyboardGetKeyState ( unsigned char key )
     case VK_NUMLOCK:   State = numlock_status;     break;
     case VK_SCROLL:    State = scrolllock_status;  break;
     // ...
-	};
+    default:
+        return 0;
+        break;
+    };
 
-    return (unsigned long) State;
+// TRUE or FALSE.
+    return (unsigned long) (State & 0xFFFFFFFF);
 }
 
 
