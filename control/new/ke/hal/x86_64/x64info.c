@@ -1,12 +1,8 @@
-/*
- * File: x86info.c
- * 
- * 
- */
 
+// x64info.c
+// handle x64 cpu informations.
 
 #include <kernel.h>
-
 
 
 //#test

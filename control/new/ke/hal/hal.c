@@ -23,10 +23,12 @@ int processors_count=0;
 unsigned long g_machine_type=0;
 
 
-// Obs: 
-// Não tem ponteiro. Apenas para UniProcessor.
-// See: up.h and cpu.h
-struct ProcessorBlock_d  UPProcessorBlock;
+// --------------------
+// main processor support.
+// See: cpu.h
+struct UPProcessorBlock_d  UPProcessorBlock;
+struct processor_d  *processor;
+
 
 /*
 // Called by the idle handler for up.

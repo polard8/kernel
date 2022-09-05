@@ -48,6 +48,8 @@ struct hv_d  HVInfo;
 // called by I_init() in x64init.c
 int detect_hv(void)
 {
+    int i=0;
+
     HVInfo.initialized = FALSE;
     HVInfo.type = HV_TYPE_UNDEFINED;
 
@@ -59,6 +61,29 @@ int detect_hv(void)
         x_panic ("detect_hv: processor struct\n");
     }
 
+
+//
+// Memory limits
+//
+
+    HVInfo.Physical_Address_Size = 
+        (unsigned int) processor->Physical_Address_Size; 
+    HVInfo.Virtual_Address_Size = 
+        (unsigned int) processor->Virtual_Address_Size;
+
+//
+// name string
+//
+
+    //Copy 4 integers.
+    for (i=0; i<4; i++){
+        HVInfo.hvName[i] = (unsigned int) processor->hvName[i];
+    };
+
+//
+// type
+//
+
 // qemu?
     if ( processor->hvName[0] == HV_STRING_QEMU_PART1 &&
          processor->hvName[1] == HV_STRING_QEMU_PART2 &&
@@ -67,7 +92,6 @@ int detect_hv(void)
          HVInfo.type = HV_TYPE_QEMU;
          goto done;
     }
-
 // bhyve?
     if ( processor->hvName[0] == HV_STRING_BHYVE_PART1 &&
          processor->hvName[1] == HV_STRING_BHYVE_PART2 &&
@@ -76,7 +100,6 @@ int detect_hv(void)
          HVInfo.type = HV_TYPE_BHYVE;
          goto done;
     }
-
 // qnx?
     if ( processor->hvName[0] == HV_STRING_QNX_PART1 &&
          processor->hvName[1] == HV_STRING_QNX_PART2 &&
@@ -85,7 +108,6 @@ int detect_hv(void)
          HVInfo.type = HV_TYPE_QNX;
          goto done;
     }
-
 // acrn?
     if ( processor->hvName[0] == HV_STRING_ACRN_PART1 &&
          processor->hvName[1] == HV_STRING_ACRN_PART2 &&

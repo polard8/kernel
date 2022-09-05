@@ -73,7 +73,18 @@ struct hv_d
 {
 // The structure is fully initializzed.
     int initialized;
+
+// Hypervisor type.
     int type;
+
+// from cpuid:
+// hypervisor name string.
+    unsigned int hvName[4];
+
+// from cpuid:
+// The memory limits in this machine.
+    unsigned int Physical_Address_Size;
+    unsigned int Virtual_Address_Size;
 };
 
 // see: detect.c

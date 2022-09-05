@@ -137,12 +137,6 @@ struct entry_processor
 };
 
 
-// List for pointer of ProcessorBlock_d struture.
-// See: hal/cpu.h
-//#define MAX_PROCESSOR_COUNT 32
-unsigned long processorList[32]; 
-//unsigned long entry_processor_List[8];
-
 
 /*
 // # size: 8 bytes

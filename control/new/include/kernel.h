@@ -153,19 +153,19 @@ extern unsigned long gSavedBPP;
 // ==================================
 // Kernel configuration.
 // Compiling.
-#include "config/kernel/config.h"
-#include "config/kernel/limits.h"
-#include "config/kernel/limits2.h"
-#include "config/kernel/gdef.h"
-#include "config/kernel/gdevice.h"
-#include "config/kernel/ginput.h"  // input manager support.
-#include "config/kernel/gspin.h"
-#include "config/kernel/gwd.h"     // whatch dogs.
-#include "config/kernel/pints.h"   // profiler
-#include "config/kernel/request.h"
-#include "config/kernel/info.h"    // last one?
-#include "config/kernel/kinit.h"   // kernel initialization.
-#include "config/kernel/debug.h"
+#include "config/superv/config.h"
+#include "config/superv/limits.h"
+#include "config/superv/limits2.h"
+#include "config/superv/gdef.h"
+#include "config/superv/gdevice.h"
+#include "config/superv/ginput.h"  // input manager support.
+#include "config/superv/gspin.h"
+#include "config/superv/gwd.h"     // whatch dogs.
+#include "config/superv/pints.h"   // profiler
+#include "config/superv/request.h"
+#include "config/superv/info.h"    // last one?
+#include "config/superv/kinit.h"   // kernel initialization.
+#include "config/superv/debug.h"
 
 
 // klib: libc support.
@@ -221,7 +221,7 @@ extern unsigned long gSavedBPP;
 // hal pci
 #include "hal/bus/pci.h"  // PCI bus.
 // hv
-#include "hal/hv.h"
+#include "config/hyperv/hv.h"
 // hal cpu
 #include "hal/cpuid.h"
 #include "hal/up.h"

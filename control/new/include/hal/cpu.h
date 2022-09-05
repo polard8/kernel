@@ -64,11 +64,11 @@ struct processor_d
 
 	//@todo: ULONG MHz;
 
-    // 0x0.
-    // cpuid vars.
+// 0x0.
+// cpuid vars.
     unsigned int Vendor[4];
 
-    //0x1(eax)
+//0x1(eax)
     int Stepping_ID;           // 4 bit stepping
     int Model;                 // 4 bit model
     int Family_ID;             // 4 bit family
@@ -98,37 +98,37 @@ struct processor_d
 
 //0x1(edx)
     unsigned int hasX87FPU;  //0 - FPU x87 FPU on Chip
-	//1 VME Virtual-8086 Mode Enhancement
-	//2 DE Debugging Extensions
+    //1 VME Virtual-8086 Mode Enhancement
+    //2 DE Debugging Extensions
     unsigned int hasPSE;  //3 PSE Page Size Extensions
     unsigned int hasTSC;  //4 TSC Time Stamp Counter
     unsigned int hasMSR;  //5 MSR RDMSR and WRMSR Support
     unsigned int hasPAE;  //6 PAE Physical Address Extensions
-	//7 MCE Machine Check Exception
-	//8 CX8 CMPXCHG8B Inst.
+    //7 MCE Machine Check Exception
+    //8 CX8 CMPXCHG8B Inst.
     unsigned int hasAPIC;    //O processador suporta APIC.	
-	//10 n/a Reserved
-	//11 SEP SYSENTER and SYSEXIT
+    //10 n/a Reserved
+    //11 SEP SYSENTER and SYSEXIT
     unsigned int hasMTRR;  //12 MTRR Memory Type Range Registers
-	//13 PGE PTE Global Bit
-	//14 MCA Machine Check Architecture
-	//15 CMOV Conditional Move/Compare Instruction
+    //13 PGE PTE Global Bit
+    //14 MCA Machine Check Architecture
+    //15 CMOV Conditional Move/Compare Instruction
     unsigned int hasPAT;  //16 PAT Page Attribute Table
     unsigned int hasPSE36;  //17 PSE Page Size Extension
     unsigned int hasPSN;  //18 PSN Processor Serial Number
-	//19 CLFSH CFLUSH Instruction
-	//20 n/a Reserved
-	//21 DS Debug Store
-	//22 ACPI Thermal Monitor and Clock Ctrl
+    //19 CLFSH CFLUSH Instruction
+    //20 n/a Reserved
+    //21 DS Debug Store
+    //22 ACPI Thermal Monitor and Clock Ctrl
     unsigned int hasMMX;  //23 MMX MMX Technology
-	//24 FXSR FXSAVE/FXRSTOR
+    //24 FXSR FXSAVE/FXRSTOR
     unsigned int hasSSE;  //25 SSE SSE Extensions
     unsigned int hasSSE2;  //26 SSE2 SSE2 Extensions
-	//27 SS Self Snoop
+    //27 SS Self Snoop
     unsigned int hasHTT;  //28 HTT Hyper-threading technology
-	//29 TM Thermal Monitor
-	//30 n/a Reserved (IA64)
-	//31 PBE Pend. Brk. En.
+    //29 TM Thermal Monitor
+    //30 n/a Reserved (IA64)
+    //31 PBE Pend. Brk. En.
 
 //----
 
@@ -140,7 +140,7 @@ struct processor_d
 // extended function CPUID information.
     unsigned int MaxFeatureId;
 
-// 0x80000002,0x80000003,0x80000004 (Brand name)	
+// 0x80000002,0x80000003,0x80000004 (Brand name)
     unsigned int BrandName[4*3];
 
 // 0x80000006(ecx) (L2 cache information (Intel)).
@@ -162,50 +162,15 @@ struct processor_d
     unsigned int Virtual_Address_Size;
     //...
 
-	//unsigned long MemorySize; 
+    //unsigned long MemorySize; 
 
-	// cada processador tem sua gdt, idt, tss.
-	// #todo usar ponteiro para estrutura.
+// cada processador tem sua gdt, idt, tss.
+// #todo usar ponteiro para estrutura.
 
     unsigned long Gdt;
     unsigned long Idt;
     unsigned long Tss;
 
-    //...
-
-// Navigation.
-    struct processor_d  *next;
-};
-
-struct processor_d  *processor;
-
-
-/*
- * ProcessorBlock_d:
- *     Processor Block.
- *     Used in the task switch routines.
- *     It handles information about CPU and the process running
- * into the CPU.
- *     It handles the running threads count.
- */
-
-struct ProcessorBlock_d
-{
-    object_type_t   objectType;
-    object_class_t  objectClass;
-
-    int used;
-    int magic;
-
-    int id;
-
-// status flag.
-// Aweked
-    int status;
-
-// Processor Info. 
-// (Intel x86 only)
-    struct processor_d  *processorInfo;
 
 //
 // Threads
@@ -221,19 +186,61 @@ struct ProcessorBlock_d
 // Number of total threads in this processor.
     unsigned long threads_counter;
 
-    // ...
+    //...
 
-    struct ProcessorBlock_d *next;
+// Navigation.
+    struct processor_d  *next;
 };
 
-// See: up.h
+extern struct processor_d  *processor;
 
-// #todo: Not used yet.
-// all processors's structs.
-// ProcessorBlock_d
+// List of processors.
 //unsigned long processorsList[PROCESSORS_MAX_COUNT];
 
 
+
+/*
+ * UPProcessorBlock_d:
+ *     Processor Block.
+ *     Used in the task switch routines.
+ *     It handles information about CPU and the process running
+ * into the CPU.
+ *     It handles the running threads count.
+ */
+
+struct UPProcessorBlock_d
+{
+    object_type_t   objectType;
+    object_class_t  objectClass;
+    int used;
+    int magic;
+    int id;
+
+// status flag.
+// Aweked
+    int status;
+
+// Main processor:
+// (This structure is only for Intel yet.)
+    struct processor_d  *main_processor;
+
+//
+// Threads
+//
+
+// The idle thread for this processor.
+    struct thread_d *IdleThread;
+// The current thread running in this processor.
+    struct thread_d *CurrentThread;
+// The next thread to run in this processor.
+    struct thread_d *NextThread;
+    //...
+// Number of total threads in this processor.
+    unsigned long threads_counter;
+
+// No navigation links in this case.
+};
+extern struct UPProcessorBlock_d  UPProcessorBlock;
 
 
 //
