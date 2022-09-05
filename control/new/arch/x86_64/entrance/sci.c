@@ -1330,8 +1330,9 @@ void *sci0 (
             break;
 
         // 9 - Draw rectangle.
-        // #todo: #BugBug, aqui precisamos de 5 par�metros.
+        // #todo: #BugBug, aqui precisamos de 5 parametros.
         // passe o buffer como parametro
+        // Usado pelo window server para pintar retângulos.
         //case SYS_BUFFER_DRAWRECT:
         case 9:
             //debug_print("sci0: [9]\n");

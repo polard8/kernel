@@ -260,7 +260,6 @@ backbuffer_draw_rectangle(
 
 // 1=backbuffer
 // 2=frontbuffer
-
     __drawrectangle0(
         x, y, width, height,
         color,

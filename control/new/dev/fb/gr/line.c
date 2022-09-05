@@ -35,12 +35,9 @@ backbuffer_draw_horizontal_line (
         return;
     }
 
-    while (x1 < x2)
-    {
-        // IN: color, x, y, rop flags.
-        backbuffer_putpixel ( 
-            color, x1, y, rop_flags ); 
-
+// IN: color, x, y, rop flags.
+    while (x1 < x2){
+        backbuffer_putpixel ( color, x1, y, rop_flags ); 
         x1++;
     };
 }
@@ -62,12 +59,9 @@ frontbuffer_draw_horizontal_line (
         return;
     }
 
-    while (x1 < x2)
-    {
-        // IN: color, x, y, rop flags.
-        frontbuffer_putpixel ( 
-            color, x1, y, rop_flags ); 
-
+// IN: color, x, y, rop flags.
+    while (x1 < x2){
+        frontbuffer_putpixel ( color, x1, y, rop_flags ); 
         x1++;
     };
 }

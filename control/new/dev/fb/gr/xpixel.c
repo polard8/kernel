@@ -144,12 +144,12 @@ putpixel0 (
 // 16, 32, 64, 128 
 
 
-// Sem modificação
+
+// 0 - Sem modificação
 // A cor a ser registrada é a mesma enviada por argumento.
     if (operation == 0){
         r3=r;  g3=g;  b3=b;  a3=a;
     }
-
 // 1 = or
     if (operation == 1)
     {
@@ -158,7 +158,6 @@ putpixel0 (
         b3 = (b2 | b);
         a3 = a2;
     }
-
 // 2 = and
     if (operation == 2)
     {
@@ -167,8 +166,7 @@ putpixel0 (
         b3 = (b2 & b);
         a3 = a2;
     }
-
-    // 3 = xor
+// 3 = xor
     if (operation == 3)
     {
         r3 = (r2 ^ r);
@@ -179,7 +177,7 @@ putpixel0 (
 
 // ============
 
-    // red
+// 10 - less red
     if (operation == 10)
     {
         r3 = (r2 & 0xFE);
@@ -188,7 +186,7 @@ putpixel0 (
         a3 = a2;
     }
 
-    // green
+// 11 - less green
     if (operation == 11)
     {
         r3 = r2;
@@ -196,8 +194,7 @@ putpixel0 (
         b3 = b2; 
         a3 = a2;
     }
-
-    // blue
+// 12 - less blue
     if (operation == 12)
     {
         r3 = r2;
@@ -205,11 +202,7 @@ putpixel0 (
         b3 = (b2 & 0xFE); 
         a3 = a2;
     }
-
-
-// ============
-
-    // gray
+// 20 - gray
     if (operation == 20)
     {
         r3 = (r2 & 0x80);
@@ -217,8 +210,7 @@ putpixel0 (
         b3 = (b2 & 0x80);
         a3 = a2;
     }
-
-    // gray
+// 21 - no red 
     if (operation == 21)
     {
         r3 = (r2 & 0x00);
