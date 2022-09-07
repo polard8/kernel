@@ -1,5 +1,7 @@
 
 // ws.h
+// Window server support.
+// Colors and color scheme.
 
 #ifndef __WS_H
 #define __WS_H    1
@@ -12,12 +14,10 @@
 #define WINDOW_COUNT_MAX          1024 
 #define MAX_WINDOWS WINDOW_COUNT_MAX 
 
-
 // # video mode support #
 #define VIDEO_MODE_TEXT     1
 #define VIDEO_MODE_GRAPHIC  2 
- 
- 
+
 // # char support # 
 #define CHAR_WIDTH   8
 #define CHAR_HEIGHT  8 
@@ -25,11 +25,11 @@
 #define DEFAULT_CHAR_HEIGHT  8
 //...
 
-
 //
-// == Colors =======================================================
-// 
+// Colors
+//
 
+// Basics
 #define COLOR_WHITE    0x00FFFFFF
 #define COLOR_BLACK    0x00000000
 #define COLOR_RED      0x00FF0000 
@@ -41,12 +41,14 @@
 #define COLOR_YELLOW   0x00FFFF00
 // ...
 
+// Cyan
 #define COLOR_CYAN     0x0000FFFF
 
+// Background
 #define COLOR_EMBEDDED_SHELL_BG  COLOR_BLUE
 #define COLOR_KERNEL_BACKGROUND  COLOR_BLUE
 
-// My gray scale.
+// Gray scale.
 #define xCOLOR_BLACK 0x000000  //preto
 #define xCOLOR_GRAY1 0x202020  //cinza mais escuro
 #define xCOLOR_GRAY2 0x404040  //cinza
@@ -57,7 +59,7 @@
 #define xCOLOR_GRAY7 0xe0e0e0  //cinza mais clarinho
 #define xCOLOR_WHITE 0xffffff  //branco  
 
-
+// Humility theme. (gray)
 #define HUMILITY_COLOR_BACKGROUND                0x00008080 
 #define HUMILITY_COLOR_WINDOW                    0x00FFFFFF 
 #define HUMILITY_COLOR_WINDOW_BACKGROUND         0x00202020 
@@ -73,6 +75,7 @@
 #define HUMILITY_COLOR_TERMINALFONT              0x00FFFFFF 
 //...
 
+// Pride theme. (colorful)
 #define PRIDE_COLOR_BACKGROUND                  0x00008080 
 #define PRIDE_COLOR_WINDOW                      0x00FFFFFF 
 #define PRIDE_COLOR_WINDOW_BACKGROUND           0x00202020 
@@ -88,17 +91,12 @@
 #define PRIDE_COLOR_TERMINALFONT                0x00FFFFFF
 // ...
 
-//
-// ===================================================================
-//
-
 
 /*
  * ColorSchemeType:
  *     Enumerando os esquemas de cores. 
  *     Esses são esquemas default.
- *     Poderemos carregar outros e cada esquema terá 
- * seu índice.
+ *     Poderemos carregar outros e cada esquema terá seu índice.
  *     Esses serão sempre os primeiros.    
  */
 typedef enum {
@@ -123,13 +121,11 @@ typedef enum {
 
     csiNull,                    //0
     csiDesktop,                 //1 área de trabalho.
-
 //window
     csiWindow,                  //2
     csiWindowBackground,        //3
     csiActiveWindowBorder,      //4
     csiInactiveWindowBorder,    //5
-
 //bar
     csiActiveWindowTitleBar,    //6
     csiInactiveWindowTitleBar,  //7
@@ -141,18 +137,16 @@ typedef enum {
     csiSystemFontColor,         //12 BLACK
     csiTerminalFontColor,       //13 WHITE
     //...
-
 //@todo: focus,
 //@todo: Window 'shadow' (black??)
 
 }ColorSchemeIndex;  
- 
- 
+
+
 /*
  * color_scheme_d:
  *     Estrutura para esquema de cores. 
  *     O esquema de cores se aplica ao servidor de recursos gráficos. 
- * GWS.
  */ 
 
 struct color_scheme_d
@@ -220,9 +214,8 @@ extern struct ws_info_d  WindowServerInfo;
 // ===============================================================
 
 
-//
 // # Principais variáveis globais #
-//
+// This is not the right place for them.
 
 // monitor. (hardware)
 int current_display; 
@@ -232,17 +225,12 @@ int current_display;
 // e uma screen pode estar em mais de um monitor
 int current_screen;      
 
-
-
 int guiStatus;       //Status da Interface gráfica do usuário.
-
-
 
 //Status de ambientes gráficos.
 int logonStatus;              //Logon status.
 int logoffStatus;             //Logoff status.
 int userenvironmentStatus;    //User environment status.
-
 
 //Contagens de ambientes;
 int rooms_count;  
@@ -281,12 +269,8 @@ int terminal_window;
 //int current_first responder.
 //...
 
-//
 // gws fonts
-//
-
-
-//As fontes usadas pelo servidor gws
+// As fontes usadas pelo servidor gws.
 unsigned long gws_currentfont_address;  // fonte atual.
 unsigned long g8x8fontAddress;          // 8×8, 80×25,CGA, EGA
 unsigned long g8x14fontAddress;         // 8x14,80×25,EGA
@@ -304,16 +288,12 @@ int gcharHeight;
 unsigned long g_system_color;
 unsigned long g_char_attrib;
 
-
-
 // LFB - address for kernel graphic mode
 unsigned long g_kernel_lfb; 
 
 //video mode
 unsigned long g_current_vm;          //video memory
 unsigned long g_current_video_mode;  //video mode
-
-
 
 //status do cursor.
 //se ele deve aparecer e piscar ou não.

@@ -147,13 +147,10 @@ static void __service897(void)
 // the framebuffer.
 // When we draw a window it needs to be invalidated.
 
-    drawDataRectangle( 
-        r.left, 
-        r.top, 
-        r.width, 
-        r.height, 
+    backbuffer_draw_rectangle( 
+        r.left, r.top, r.width, r.height, 
         _Color, 
-        0 );
+        0 );      // #todo: rop flags.
 
     r.dirty = TRUE;
 
@@ -481,14 +478,14 @@ static void *__extra_services (
     // Falha se tentamos pintar a tela toda.
     if (number==391)
     {
-        debug_print("__extra_services: [391]\n");
-        drawDataRectangle ( 
+        //debug_print("__extra_services: [391]\n");
+        backbuffer_draw_rectangle ( 
             (unsigned long) message_address[0],    //x 
             (unsigned long) message_address[1],    //y
             (unsigned long) message_address[2],    //width
             (unsigned long) message_address[3],    //height
             (unsigned int)  message_address[4],    //color
-            (unsigned long) message_address[5] );  // rop_flags
+            (unsigned long) message_address[5] );  //rop_flags
         return NULL;
     }
 
@@ -1329,14 +1326,13 @@ void *sci0 (
             return NULL;
             break;
 
-        // 9 - Draw rectangle.
-        // #todo: #BugBug, aqui precisamos de 5 parametros.
-        // passe o buffer como parametro
-        // Usado pelo window server para pintar retângulos.
+        // 9 - Draw a rectangle into the backbuffer.
+        // see: _int128 in sw.asm.
+        // see: rect.c
         //case SYS_BUFFER_DRAWRECT:
         case 9:
             //debug_print("sci0: [9]\n");
-            drawDataRectangle ( 
+            backbuffer_draw_rectangle ( 
                 (unsigned long) message_address[0],    //x 
                 (unsigned long) message_address[1],    //y
                 (unsigned long) message_address[2],    //width
@@ -1345,7 +1341,6 @@ void *sci0 (
                 (unsigned long) message_address[5] );  //rop_flags
             return NULL;
             break;
-
 
         // 10 - Refresh rectangle.
         case 10:

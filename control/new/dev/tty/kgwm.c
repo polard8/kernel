@@ -2413,7 +2413,7 @@ void schedulerUpdateScreen(void)
 // Blue bar:
     unsigned long fps = get_update_screen_frequency();
     char data[32];
-    drawDataRectangle( 
+    backbuffer_draw_rectangle( 
         0, 0, deviceWidth, 24, COLOR_KERNEL_BACKGROUND, 0 );
     sprintf(data,"  FPS %d       ",fps);
     data[12]=0;

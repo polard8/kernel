@@ -4,9 +4,6 @@
 #ifndef __KGWS_H
 #define __KGWS_H    1
 
-
-
-
 #define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
 #define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
 

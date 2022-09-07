@@ -1234,7 +1234,7 @@ void early_ring0_IdleThread (void)
 Loop:
 
 // acende
-    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
     //draw_string(8,8,COLOR_YELLOW," Gramado Operating System ");
     //refresh_screen();
 
@@ -1243,8 +1243,8 @@ Loop:
     asm ("hlt");
 
 // apaga
-    //drawDataRectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
-    //drawDataRectangle( 0, 0, deviceWidth, deviceHeight, COLOR_KERNEL_BACKGROUND );  //#bug
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, 28, COLOR_KERNEL_BACKGROUND );
+    //backbuffer_draw_rectangle( 0, 0, deviceWidth, deviceHeight, COLOR_KERNEL_BACKGROUND );  //#bug
     //refresh_screen();
 
     goto Loop;

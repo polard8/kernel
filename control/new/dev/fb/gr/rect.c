@@ -63,7 +63,7 @@ __drawrectangle0(
     unsigned long rop_flags,
     int back_or_front )
 {
-    debug_print("__drawrectangle0: r0 :)\n");
+    //debug_print("__drawrectangle0: r0 :)\n");
 
 // Copy.
     unsigned long X      = (x      & 0xFFFF);
@@ -243,11 +243,14 @@ __drawrectangle0(
 
     Rect.dirty = TRUE;
 
-    debug_print("__drawrectangle0: Done\n");
+    //debug_print("__drawrectangle0: Done\n");
 }
 
 
-
+// Service 9: 
+// Draw a rectangle into the backbuffer.
+// Usado pelo window server para pintar retângulos.
+// Called by sci0() in sci.c.
 void 
 backbuffer_draw_rectangle( 
     unsigned long x, 
@@ -286,26 +289,6 @@ frontbuffer_draw_rectangle(
         color,
         rop_flags,
         2 );      // back or front.
-}
-
-
-void 
-drawDataRectangle ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags )
-{
-// Draw into the backbuffer.
-    backbuffer_draw_rectangle( 
-        x,
-        y,
-        width,
-        height,
-        color,
-        rop_flags );
 }
 
 
@@ -521,18 +504,16 @@ refresh_rectangle (
 
 // == FLASH ========
 // #todo: Create a global variable for this.
-
 // #debug
 // Used for optimization tests.
 
     //int RefreshFlash=TRUE;
     int RefreshFlash=FALSE;
-    
-    if(RefreshFlash==TRUE)
-    {
+
+    if (RefreshFlash==TRUE){
         frontbuffer_draw_rectangle( 
-            x, y, 
-            width, height, COLOR_YELLOW, 0 );
+            x, y, width, height, 
+            COLOR_YELLOW, 0 );
     }
 // =====================
 

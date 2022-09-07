@@ -7,11 +7,11 @@
 // Essa rotina é sensível, pois agora usamos 64bit.
 // Called by kmain()
 // Where? backbuffer?
+// Draw a rectangle into the backbuffer.
 void backgroundDraw (unsigned int color)
 {
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         debug_print ("backgroundDraw: [PANIC] w h\n");
@@ -19,31 +19,16 @@ void backgroundDraw (unsigned int color)
         return;
     }
 
-// Draw a rectangle into the backbuffer.
     backbuffer_draw_rectangle( 
         0, 0, deviceWidth, deviceHeight, 
         color,
         0 );   //rop_flags
 
-/*
-    //loop
-    register unsigned long i=0;
-
-    if (VideoBlock.useGui != 1){
-        debug_print ("backgroundDraw: No GUI\n");
-        return;
-    }
-
-    for ( i=0; i<SavedY; i++ ){
-        backbuffer_draw_horizontal_line ( 0, i, SavedX, color );
-    };
-    
-    */
-
 // Cursor.
-// Nao funciona
+// #bugbug: This routine is not working at this time.
     set_up_cursor(0,0);
 }
+
 
 // Called by kmain().
 int Background_initialize(unsigned int color)

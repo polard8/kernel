@@ -1032,15 +1032,6 @@ frontbuffer_draw_rectangle(
     unsigned long rop_flags );
 
 void 
-drawDataRectangle ( 
-    unsigned long x, 
-    unsigned long y, 
-    unsigned long width, 
-    unsigned long height, 
-    unsigned int color,
-    unsigned long rop_flags );
-
-void 
 refresh_rectangle ( 
     unsigned long x, 
     unsigned long y, 
