@@ -119,7 +119,7 @@ extern struct intel_nic_info_d  *currentNIC;
 // Lista de placas de rede.
 // #todo:
 // O valor máximo precisa ser definido. 
-extern unsigned long nicList[8]; 
+//extern unsigned long nicList[8]; 
 
 extern int e1000_interrupt_flag;
 extern int e1000_irq_count;

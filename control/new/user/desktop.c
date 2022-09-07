@@ -1,9 +1,5 @@
 
-
 #include <kernel.h>
-
-
-int desktopdummmy;    
 
 /*
  * init_desktop_list:
@@ -23,9 +19,7 @@ void init_desktop_list (void)
 }
 
 
-
 /*
- ***********************************************
  * init_desktop:
  *     Inicializa o desktop 0.
  *     int ?

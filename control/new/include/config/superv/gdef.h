@@ -125,6 +125,12 @@ unsigned long blSavedSPT;
 unsigned long blSavedCylinders;
 //...
 
+//keyboard suppport 
+//abnt2 flag.
+//#todo: Move this to another file.
+//maybe gdef.h
+extern int abnt2;
+//...
 
 
 
@@ -178,8 +184,10 @@ struct boot_block_d
     int initialized;
 };
 
-struct boot_block_d BootBlock;
+// see: globals.c
+extern struct boot_block_d  BootBlock;
 
+//#todo: move this to socket.h
 #define SOCKET_MAX_PENDING_CONNECTIONS   32
 
 // 
@@ -198,17 +206,11 @@ unsigned long g_extraheap2_va;
 unsigned long g_extraheap3_va;
 
 
-
-
 // frontbuffer and backbuffer.
 // see: video.c
 extern unsigned long g_frontbuffer_pa; 
 extern unsigned long g_backbuffer_pa;
 
-
-//
-//
-//
 
 /*
 struct display_info_d
@@ -220,10 +222,6 @@ struct display_info_d
     unsigned long depth;    // bits per pixel.
 };
 */
-
-
-
-
 
 
 // endereço virtual do pool de heaps.
@@ -258,12 +256,9 @@ int g_extraheap3_initialized;
 int gNextKeyboardMessage;
 
 
-
 #endif   
 
-
-
 //
-// End.
+// End
 //
 

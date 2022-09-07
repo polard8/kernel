@@ -1023,7 +1023,7 @@ void init_globals (void)
 
 // Profiler
 // See: 
-// include/kernel/profiler/pints.h
+// pints.h
 
 // Legacy hardware interrupts (irqs) (legacy pic)
     g_profiler_ints_irq0  = 0;

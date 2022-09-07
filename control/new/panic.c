@@ -1,10 +1,7 @@
 
 // panic.c
 
-
 #include <kernel.h>    
-
-
 
 // This function shows a formated string and 
 // hang the system.

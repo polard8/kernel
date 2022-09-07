@@ -5,6 +5,17 @@
 #include <kernel.h>  
 
 
+// Lista de placas de rede.
+// #todo:
+// O valor máximo precisa ser definido. 
+// #todo:
+// Uma lista de ponteiros para estruturas de 
+// tipo generico, esse ponteiro contera um ponteiro
+// para uma estrutura de dispositivo nic de marca especifica.
+unsigned long nicList[8]; 
+
+
+
 // Search a name into the device list.
 // Used by sys_open();
 // OUT:

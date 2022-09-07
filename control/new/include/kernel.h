@@ -5,7 +5,7 @@
 
 // This status flag is setted when
 // the callouts to GWSSRV.BIN are installed.
-int gUseWMCallbacks;
+extern int gUseWMCallbacks;
 
 
 //
@@ -57,7 +57,7 @@ int gUseWMCallbacks;
 #define SYSTEM_DEAD        10
 // ...
 
-int system_state;
+extern int system_state;
 
 // ============================
 
@@ -388,27 +388,18 @@ extern unsigned long gSavedBPP;
 // e mover as definições para arquivos .c.
 
 
-//keyboard suppport 
-//abnt2 flag.
-//#todo: Move this to another file.
-//maybe gdef.h
-int abnt2;
-//...
-
-
+// ------------------------------
 // Product type.
 typedef enum {
-   PT_THINGS,        // Things.
-   PT_EDGEDEVICES,   // Edge Devices.
-   //PT_COREDEVICES,   // Core Devices. (haha)
+    PT_UNDEFINED,
+    PT_THINGS,          // Things.
+    PT_EDGEDEVICES,     // Edge Devices.
+    //PT_COREDEVICES,   // Core Devices. (haha)
 }ProductType_t;
-
-
 //Type of product.
-int g_product_type; 
+extern int g_product_type; 
 
-
-
+// ------------------------------
 // Platform type.
 typedef enum {
    PFT_16BIT,       //16bit processor.
@@ -416,17 +407,17 @@ typedef enum {
    PFT_64BIT,       //64bit processor.
    //...
 }PlatformType_t;
+//size of processor word.
+extern int g_platform_type;
 
-
+// ------------------------------
 // UP ou MP
 typedef enum {
-
     SYSTEM_TYPE_NULL,
     SYSTEM_TYPE_UNIPROCESSOR,
     SYSTEM_TYPE_MULTIPROCESSOR
-
 } SystemType_t;
-
+extern int g_system_type;
 
 
 //
@@ -434,19 +425,17 @@ typedef enum {
 //
 
 // GRAMADO_JAIL, GRAMADO_P1 ...
-int current_mode;
+extern int current_mode;
 
-// INPUT_MODE_SETUP, INPUT_MODE_WS ...
-//int current_input_mode;
+#define CURRENT_ARCH_X86      1000
+#define CURRENT_ARCH_X86_64   1001
+// ...
 
 // x86 ...
-int current_arch;
-
-
+extern int current_arch;
 // Organização de usuários.
-int current_user; 
-int current_group; 
-
+extern int current_user; 
+extern int current_group; 
 
 
 // Organização dos processos
@@ -480,39 +469,26 @@ extern tid_t active_thread;      // This thread will receive the input.
 extern tid_t next_thread;        // next user mode thread.
 // ------
 
-
-// Current runlevel. Used in init process.
-int current_runlevel;
-
-// Organização dos discos.
-int current_disk;
-int current_volume;
-
-// Organização dos arquivos.
-int current_directory;
-int current_file;
 pid_t current_dead_process;
 int current_dead_thread;
 
+
+// Current runlevel. Used in init process.
+extern int current_runlevel;
+
+// Organização dos discos.
+extern int current_disk;
+extern int current_volume;
+
+// Organização dos arquivos.
+extern int current_directory;
+extern int current_file;
+
 // Organização dos terminais
-int current_tty;
-int current_terminal;
-//int current_pty;
-//int current_pts;
-
-
-//...
-
-// ==== ====
-
-
-
-//size of processor word.
-int g_platform_type;
-
-
-
-
+extern int current_tty;
+extern int current_terminal;
+//extern int current_pty;
+//extern int current_pts;
 
 
 //se ele est'a inicializado ou nao
@@ -525,22 +501,13 @@ int dead_thread_collector_flag;
 unsigned long current_process_pagedirectory_address;
 
 
-
-//
 // Logon.
-//
+extern int g_logged;
 
-int g_logged;
-
-
-//
 // GUI
-//
-
 //flag.
 //If the kernel is in graphics mode.
-int g_useGUI; 
-
+extern int g_useGUI; 
 
 //Messages support.
 unsigned long g_new_message;
@@ -578,34 +545,20 @@ int g_module_uem_initialized;             //user environment manager.
 
 
 // Kernel information variables.
-unsigned long KernelSize;
-unsigned long KernelHeapSize;
-unsigned long KernelStackSize;
-unsigned long KernelPages;
+extern unsigned long KernelSize;
+extern unsigned long KernelHeapSize;
+extern unsigned long KernelStackSize;
+extern unsigned long KernelPages;
 //...
 
-
-//
-// #todo
-//
-
-//
 // symbol table
-//
-
-int g_kernel_symbols_available;
-
-
-//Task support variables.
-
-//??
-unsigned long kernel_switch;
+extern int g_kernel_symbols_available;
 
 
 //#bugbug
 //move this to kernel (ring 0) crt support.
 //error support.
-unsigned long errno;
+extern unsigned long errno;
 
 //
 // Plataform support.
@@ -650,7 +603,7 @@ struct kernel_args_d
     unsigned long arg3;
     unsigned long arg4;
 }; 
-struct kernel_args_d KernelArgs;
+struct kernel_args_d  KernelArgs;
 
 
 //system classes.
@@ -661,7 +614,7 @@ struct system_classes_d
     unsigned long Microkernel;
     unsigned long Hal;
 };
-struct system_classes_d SystemClasses;
+struct system_classes_d  SystemClasses;
 
 
 //Kernel classes.
@@ -672,11 +625,6 @@ struct kernel_classes_d
 };
 struct kernel_classes_d  KernelClasses;
 //...
-
-#define CURRENT_ARCH_X86      1000
-#define CURRENT_ARCH_X86_64   1001
-// ...
-
 
 // Informações compartilhadas 
 // entre o kernel e um dado módulo.
@@ -697,18 +645,16 @@ struct kernel_module_d
 {
     int used;
     int magic;
-
     int id;
-
     char name[64];
     size_t name_size;
-
 // Shared info
     struct km_shared_info_d info;
-
     int initialized;
-
     struct thread_d  *thread;
+
+// navigation
+    //struct kernel_module_d *next;
 };
 
 
@@ -721,7 +667,6 @@ unsigned long kmList[KMODULE_MAX];
 //
 // == prototypes ==========================================
 //
-
 
 // inicialização do kernel, independente da arquitetura.
 // See: init.c
@@ -738,7 +683,6 @@ void gramado_shutdown (int how);
 int I_x64main (void);
 void I_x64ExecuteInitialProcess (void);
 
-
 // ================================================
 
 //
@@ -746,7 +690,6 @@ void I_x64ExecuteInitialProcess (void);
 //
 
 void faults(unsigned long number);
-
 
 // #debug
 // usado durante a construçao dos handlers das irqs.
@@ -756,9 +699,5 @@ void xxxxIRQ1_DEBUG_MESSAGE(void);
 // See: main.c Sw.asm headlib.asm
 void xxxxINT128_DEBUG_MESSAGE(void);
 
-
 void panic ( const char *format, ... );
 void die (void);
-
-
-

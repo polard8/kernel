@@ -785,9 +785,6 @@ void init_processes (void)
 // n�o precisa, isso � atualizado pelo request()
     //kernel_tick = 0;
 
-// ?? Ativa o kernel switch do scheduler.
-    kernel_switch = 0;
-
     set_current_process(0);
     //current_process = 0;
 

@@ -7,8 +7,9 @@ EDITION_NAME  = Angels/Warden
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 5
-VERSION_BUILD = 295
-# test: Compiling on gcc 11.2
+VERSION_BUILD = 296
+# Compiling on gcc 11.2
+# Linking on ld 2.38
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 

@@ -340,15 +340,11 @@ struct system_d  *System;
 // == Prototypes =====================
 //
 
-unsigned long systemGetSystemMetrics (int index);
-int system_get_pid (int index);
-void systemShutdownViaAPM (void);
-void systemShutdown (void);
-void systemShowDevicesInfo (void);
-void systemSetupVersion (void);
-void systemReboot (void);
-void *systemNull (void);
-int init_executive (void);
+int init_executive(void);
+
+unsigned long doGetSystemMetrics(int index);
+
+void doSetupVersion(void);
 
 #endif    
 

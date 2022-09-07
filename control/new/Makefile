@@ -85,26 +85,35 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # ...
 
 # ========================
-# Objects (This is a test)
-# We need classes: head | always | optional
+# Objects
+# Classes: Head | Body | Hooks
 
-# head
+# Head
 objects-y := head_64.o init.o archive_klib.o    
-
-objects-y += archive_ke.o archive_mm.o archive_dev.o archive_fs.o \
-archive_net.o archive_user.o    
-
+# Body
+objects-y += archive_dev.o  
+objects-y += archive_fs.o  
+objects-y += archive_ke.o  
+objects-y += archive_mm.o  
+objects-y += archive_net.o  
+objects-y += archive_user.o    
+# Hooks
+objects-y += debug.o  
+objects-y += info.o  
+objects-y += globals.o  
+objects-y += panic.o  
+objects-y += reboot.o  
+objects-y += request.o  
+objects-y += runtime.o  
+objects-y += system.o  
+objects-y += sys.o    
 objects-y += sci.o    
-
-
 
 # test
 #objects-$(CONFIG_MAIN1) += archive_something.o   
 #objects-$(CONFIG_MAIN2) += archive_something.o   
 #objects-$(CONFIG_MAIN3) += archive_something.o   
 #objects-$(CONFIG_MAIN4) += archive_something.o   
-
-
 
 
 PHONY := all
@@ -118,6 +127,7 @@ clean
 kernel-header:
 	@echo "Compiling: Compiling kernel header ..."
 
+# Head
 # head_64.o
 # personas: warden, student, visitor.
 # unit 0, unit 1, unit 3, unit 4, visitor
@@ -126,6 +136,23 @@ kernel-header:
 	-I arch/x86_64/entrance/ \
 	-f elf64 -o head_64.o
 
+# Init
+# init.o
+	$(CC) -c init.c $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
+
+	$(CC) -c debug.c    $(KERNEL_INCLUDE) $(CFLAGS) -o debug.o
+	$(CC) -c info.c     $(KERNEL_INCLUDE) $(CFLAGS) -o info.o
+	$(CC) -c globals.c  $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
+	$(CC) -c panic.c    $(KERNEL_INCLUDE) $(CFLAGS) -o panic.o  
+	$(CC) -c reboot.c   $(KERNEL_INCLUDE) $(CFLAGS) -o reboot.o
+	$(CC) -c request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
+	$(CC) -c runtime.c  $(KERNEL_INCLUDE) $(CFLAGS) -o runtime.o
+	$(CC) -c system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
+
+# sys_xxx()
+	$(CC) -c sys/sys.c $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
+
+# Systemcall interface.
 # sci.o
 # unit 2 (xapx)
 	$(CC) -c arch/x86_64/entrance/sci.c \
@@ -133,9 +160,7 @@ kernel-header:
 	$(CFLAGS) \
 	-o sci.o    
 
-# init.o
-	$(CC) -c init.c $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
-
+# ring0 libc.
 # klib/
 	$(Q) $(MAKE) -C klib/
 

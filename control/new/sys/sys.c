@@ -90,11 +90,14 @@ unsigned long sys_alarm(unsigned long seconds)
 }
 
 
-// 250
+// 3 | 250
 // See: system.c
-unsigned long sys_get_system_metrics ( int n )
+unsigned long sys_get_system_metrics(int n)
 {
-    return (unsigned long) systemGetSystemMetrics ( (int) n );
+    if(n<0){
+        return 0;
+    }
+    return (unsigned long) doGetSystemMetrics ( (int) n );
 }
 
 

@@ -4,6 +4,9 @@
 #ifndef ____DEVMGR_H
 #define ____DEVMGR_H    1
 
+
+extern unsigned long nicList[8]; 
+
 // struct more complete, with a lot of information.
 struct device_class_d 
 {

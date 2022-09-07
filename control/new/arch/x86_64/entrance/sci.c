@@ -734,15 +734,16 @@ static void *__extra_services (
         return NULL;
     }
 
-
-
-    // Show device list.
-    if (number == 770){
-        systemShowDevicesInfo();
+// Show device list.
+    if (number == 770)
+    {
+        // #bugbug
+        // Showing only one type of object,
+        devmgr_show_device_list(ObjectTypeTTY);
         return NULL;
     }
 
-    // cpu usage for idle thread.
+// cpu usage for idle thread.
     if (number == 777){
         return (void *) profiler_percentage_idle_thread;
     }
@@ -1059,11 +1060,11 @@ static void *__extra_services (
     }
 
     // ...
-    
-    // chamado por gde_get_pid na api.
-    // See: system.c
+
+
+    // #deprecated
     if ( number == 9999 ){
-        return (void *) system_get_pid ( (int) arg2 );
+        panic("__extra_services: [9999] #deprecated\n");
     }
 
 // 
@@ -2025,8 +2026,7 @@ void *sci0 (
 
         // 250
         case SYS_GETSYSTEMMETRICS:
-            //debug_print ("sci0: SYS_GETSYSTEMMETRICS\n");
-            return (void *) newos_get_system_metrics ( (int) arg2 );
+            return (void *) sys_get_system_metrics ( (int) arg2 );
             break;
 
         default:
@@ -2205,17 +2205,16 @@ void *sci2 (
         return NULL;
     }
 
-    //get magic
+    // Get magic
     if ( number == 2 ){
         return (void*) CONSOLE_TTYS[fg_console].magic;
     }
 
-    if ( number == 3 ){
-        debug_print("sci2: [3] metrics\n");
-        //return (void*) systemGetSystemMetrics(arg2);
-        return NULL;
+    // Get system metrics
+    if (number == 3){
+        return (void*) sys_get_system_metrics(arg2);
     }
-        
+
     if ( number == 4 ){
         debug_print("sci2: [4] ioctl\n");
         //return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
@@ -2545,7 +2544,7 @@ unsigned long newos_get_system_metrics(int index)
         return 0;
     }
 
-    return (unsigned long) sys_get_system_metrics ( (int) index );
+    return (unsigned long) doGetSystemMetrics ( (int) index );
 }
 
 pid_t newos_getpid(void)
