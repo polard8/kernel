@@ -1,14 +1,10 @@
-/*
- * File: stdlib.c
- * stdlib
- * 2015
- */
 
+// kstdlib.c
+// 2015 - Fred Nora.
 
 #include <kernel.h>
 
-static int randseed = 1234;
-
+static int __randseed = 1234;
 
 //Alimenta a função rand.
 //void srand(unsigned int seed)
@@ -19,18 +15,20 @@ static int randseed = 1234;
  * Gera um número inteiro semi-randômico. 
  */
 
-int rand (void)
+int rand(void)
 {
-    return (int) ( randseed = randseed * 1234 + 5 );
+    int extra = (int) (jiffies & 0xFFFFFFFF);
+    __randseed = (int) ((__randseed * extra) + 8);
+
+    return (int) __randseed;
 }
 
-
-// ok.
 int abs(int j)
 {
-    return (j < 0 ? -j : j);
-}
+    int Value = (int) (j<0 ? -j : j);
 
+    return (int) Value;
+}
 
 // Supporting the services 808 e 809.
 // See: sci.c
@@ -39,7 +37,7 @@ int __ptsname (int fd, char *buf, size_t buflen)
 {
      char *ptsname_buffer = (char *) buf;
 
-     char test_str[50] = "new-__ptsname: test string";
+     char test_str[50] = "__ptsname: test string";
 
 // #todo: fd
 

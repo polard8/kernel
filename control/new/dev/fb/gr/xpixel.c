@@ -123,10 +123,10 @@ putpixel0 (
 // == Modify ==============================
 //
 
-// a cor no framebuffer
+// A cor que estava no framebuffer.
     unsigned char b2, g2, r2, a2;
 
-// get
+// Get yhe color.
     b2 = where[offset];
     g2 = where[offset +1];
     r2 = where[offset +2];
@@ -144,12 +144,16 @@ putpixel0 (
 // 16, 32, 64, 128 
 
 
-
+// -------------------------
 // 0 - Sem modificação
 // A cor a ser registrada é a mesma enviada por argumento.
     if (operation == 0){
-        r3=r;  g3=g;  b3=b;  a3=a;
+        r3=r;  
+        g3=g;  
+        b3=b;  
+        a3=a;
     }
+// -------------------------
 // 1 = or
     if (operation == 1)
     {
@@ -158,6 +162,7 @@ putpixel0 (
         b3 = (b2 | b);
         a3 = a2;
     }
+// -------------------------
 // 2 = and
     if (operation == 2)
     {
@@ -166,6 +171,7 @@ putpixel0 (
         b3 = (b2 & b);
         a3 = a2;
     }
+// -------------------------
 // 3 = xor
     if (operation == 3)
     {
@@ -174,9 +180,20 @@ putpixel0 (
         b3 = (b2 ^ b);
         a3 = a2;
     }
+// -------------------------
+// 4 - nand? #text
+    if (operation == 4)
+    {
+        r2 = ~r2;
+        g2 = ~g2;
+        b2 = ~b2;
+        r3 = (r2 & r);
+        g3 = (g2 & g);
+        b3 = (b2 & b);
+        a3 = a2;
+    }
 
-// ============
-
+// -------------------------
 // 10 - less red
     if (operation == 10)
     {
@@ -185,7 +202,7 @@ putpixel0 (
         b3 = b2; 
         a3 = a2;
     }
-
+// -------------------------
 // 11 - less green
     if (operation == 11)
     {
@@ -194,6 +211,7 @@ putpixel0 (
         b3 = b2; 
         a3 = a2;
     }
+// -------------------------
 // 12 - less blue
     if (operation == 12)
     {
@@ -202,6 +220,7 @@ putpixel0 (
         b3 = (b2 & 0xFE); 
         a3 = a2;
     }
+// -------------------------
 // 20 - gray
     if (operation == 20)
     {
@@ -210,6 +229,7 @@ putpixel0 (
         b3 = (b2 & 0x80);
         a3 = a2;
     }
+// -------------------------
 // 21 - no red 
     if (operation == 21)
     {
