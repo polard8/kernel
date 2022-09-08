@@ -102,8 +102,6 @@ _gdt_flush:
 ;     preenche todos os vetores, 
 ;     apontando para um só endereço. 'unhandled_int'.
 ;     See: sw.asm
-;++
-
 ;; called by xxxhead.asm
 
 setup_idt:
@@ -220,7 +218,6 @@ rp_sidt:
 d_offset_15_0:  dw 0
 d_offset_31_16: dw 0
 d_offset_63_32: dd 0
-;;--
 ;;====================================
 
 
@@ -347,186 +344,155 @@ address_offset_63_32: dd 0
 ;=============================================
 ; setup_faults:
 ;    Configura vetores da idt para faults.
-;
+; hw interrupts:
+; see: hw1.asm
 
 setup_faults:
-
     push rax
     push rbx
-
-    ;#0  
+;#0
     mov rax, qword _fault_N0
     mov rbx, qword 0
     call _setup_system_interrupt
-
-    ;#1  
+;#1  
     mov rax, qword _fault_N1
     mov rbx, qword 1
     call _setup_system_interrupt
-
-    ;#2  
+;#2  
     mov rax, qword _fault_N2
     mov rbx, qword 2
     call _setup_system_interrupt
-
-    ;#3  debug
+;#3  debug
     mov rax, qword _fault_N3
     mov rbx, qword 3
     call _setup_system_interrupt
-
-    ;#4  
+;#4  
     mov rax, qword _fault_N4
     mov rbx, qword 4
     call _setup_system_interrupt
-
-    ;#5  
+;#5  
     mov rax, qword _fault_N5
     mov rbx, qword 5
     call _setup_system_interrupt
-
-    ;#6 - Invalid opcode
+;#6 - Invalid opcode
     mov rax, qword _fault_INVALID_OPCODE
     mov rbx, qword 6
     call _setup_system_interrupt
-
-    ;#7  
+;#7  
     mov rax, qword _fault_N7
     mov rbx, qword 7
     call _setup_system_interrupt
-
-    ;#8 - double fault
+;#8 - double fault
     mov rax, qword _fault_DOUBLE
     mov rbx, qword 8
     call _setup_system_interrupt
-
-    ;#9  
+;#9  
     mov rax, qword _fault_N9
     mov rbx, qword 9
     call _setup_system_interrupt
-
-    ;#10  
+;#10  
     mov rax, qword _fault_N10
     mov rbx, qword 10
     call _setup_system_interrupt
-
-    ;#11  
+;#11  
     mov rax, qword _fault_N11
     mov rbx, qword 11
     call _setup_system_interrupt
-
-    ;#12 - stack
+;#12 - stack
     mov rax, qword _fault_STACK
     mov rbx, qword 12
     call _setup_system_interrupt
-
-    ;#13 - general protection
+;#13 - general protection
     mov rax, qword _fault_GP
     mov rbx, qword 13
     call _setup_system_interrupt
-
-    ;#14  
+;#14  
     mov rax, qword _fault_N14
     mov rbx, qword 14
     call _setup_system_interrupt
-
-    ;#15 
+;#15 
     mov rax, qword _fault_N15
     mov rbx, qword 15
     call _setup_system_interrupt
-
-    ;#16 
+;#16 
     mov rax, qword _fault_N16
     mov rbx, qword 16
     call _setup_system_interrupt
-
-    ;#17  
+;#17  
     mov rax, qword _fault_N17
     mov rbx, qword 17
     call _setup_system_interrupt
-
-    ;#18  
+;#18  
     mov rax, qword _fault_N18
     mov rbx, qword 18
     call _setup_system_interrupt
-
-    ;#19 - Intel reserved.
+;#19 - Intel reserved.
     mov rax, qword _fault_N19
     mov rbx, qword 19
     call _setup_system_interrupt
-
-    ;#20 - Intel reserved.
+;#20 - Intel reserved.
     mov rax, qword _fault_N20
     mov rbx, qword 20
     call _setup_system_interrupt
-
-    ;#21 - Intel reserved.
+;#21 - Intel reserved.
     mov rax, qword _fault_N21
     mov rbx, qword 21
     call _setup_system_interrupt
-
-    ;#22 - Intel reserved.
+;#22 - Intel reserved.
     mov rax, qword _fault_N22
     mov rbx, qword 22
     call _setup_system_interrupt
-
-    ;#23 - Intel reserved.
+;#23 - Intel reserved.
     mov rax, qword _fault_N23
     mov rbx, qword 23
     call _setup_system_interrupt
-
-    ;#24 - Intel reserved.
+;#24 - Intel reserved.
     mov rax, qword _fault_N24
     mov rbx, qword 24
     call _setup_system_interrupt
-
-    ;#25 - Intel reserved.
+;#25 - Intel reserved.
     mov rax, qword _fault_N25
     mov rbx, qword 25
     call _setup_system_interrupt
-
-    ;#26 - Intel reserved.
+;#26 - Intel reserved.
     mov rax, qword _fault_N26
     mov rbx, qword 26
     call _setup_system_interrupt
-
-    ;#27 - Intel reserved.
+;#27 - Intel reserved.
     mov rax, qword _fault_N27
     mov rbx, qword 27
     call _setup_system_interrupt
-
-    ;#28 - Intel reserved.
+;#28 - Intel reserved.
     mov rax, qword _fault_N28
     mov rbx, qword 28
     call _setup_system_interrupt
-
-    ;#29 - Intel reserved.
+;#29 - Intel reserved.
     mov rax, qword _fault_N29
     mov rbx, qword 29
     call _setup_system_interrupt
-
-    ;#30 - Intel reserved.
+;#30 - Intel reserved.
     mov rax, qword _fault_N30
     mov rbx, qword 30
     call _setup_system_interrupt
-
-    ;#31 - Intel reserved.
+;#31 - Intel reserved.
     mov rax, qword _fault_N31
     mov rbx, qword 31
     call _setup_system_interrupt
-
     pop rbx
     pop rax
-    
-    ret
+    RET
 
 ;=====================================
 ; setup_vectors:
 ;     Setup some IDT vectors.
+; hw interrupts:
+; see: hw1.asm
 
 setup_vectors:
 
     push rax
     push rbx 
+
 
 ; 32 - Timer.
 ; Iniciamos um timer provisório, 
@@ -574,22 +540,20 @@ setup_vectors:
 ; == System calls ===========================
 ;
 
-    ; System interrupts
-    ; 128 - 0x80
-    ; 129 - 0x81
-    ; 130 - 0x82
-    ; ...
+; System interrupts
+; see: sw1.asm
+; 128 - 0x80
+; 129 - 0x81
+; 130 - 0x82
 
 ; 0x80
     mov rax,  qword _int128
     mov rbx,  qword 128
     call _setup_system_interrupt  
-
 ; 0x81
     mov rax,  qword _int129
     mov rbx,  qword 129
     call _setup_system_interrupt  
-
 ; 0x82
     mov rax,  qword _int130
     mov rbx,  qword 130
@@ -608,8 +572,7 @@ setup_vectors:
     call _setup_system_interrupt  
 
 ;; =====================
-    
-; #test
+
 ; Uma interrupção para habilitar as interrupções mascaráveis.
 ; quem usará isso será a thread primária do processo init.
 ; apenas uma vez.
@@ -625,79 +588,6 @@ setup_vectors:
     pop rax
 
     ret
-
-
-
-;=============================
-; e1000 Intel nic handler.
-; interrupção ?. irq ?;
-; see: e1000.c
-
-extern _irq_E1000
-global _nic_handler
-_nic_handler:
-    
-    cli
-
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push rsi
-    push rdi
-    push rbp
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
-    
-    ;push ds
-    ;push es
-    push fs
-    push gs
-    push rsp
-    pushfq
-    cld
-    
-
-    call _irq_E1000
-
-    ; EOI: Order: Second, first.
-    mov al, 0x20
-    out 0xA0, al  
-    IODELAY  
-    out 0x20, al
-    IODELAY  
-    
-    popfq
-    pop rsp
-    pop gs
-    pop fs
-    ;pop es
-    ;pop ds
-
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rbp
-    pop rdi
-    pop rsi
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
-
-    sti
-    iretq
 
 
 ;;=================================================

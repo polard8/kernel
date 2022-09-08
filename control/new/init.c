@@ -1198,14 +1198,6 @@ void xxxxIRQ1_DEBUG_MESSAGE(void)
 }
 
 
-// #deprecated
-//#See: kernel.h and sw.asm
-void xxxxINT128_DEBUG_MESSAGE(void)
-{
-    debug_print ("xxxxINT128_DEBUG_MESSAGE:\n");
-    //x_panic("xxxxINT128_DEBUG_MESSAGE: hang");
-}
-
 // == Idle thread in ring 0  ===============
 // #test
 

@@ -9,32 +9,24 @@ __sw_local_fpu_buffer:
 align 16
 
 
-;;-----
+;------------------------
 ; _int128
-; 
 ;     System Call number 0x80
-;
-;     ONLY CALLED FROM USERMODE!
-;
+;     >>>> ONLY CALLED FROM USERMODE!
 ;     + It is never called from kernel mode.
 ;     + It calls a system service without changing the segment registers.
 ;     + We are using the caller cr3.
-;
 ;     It has four parameters:
 ;     rax - Argument 1
 ;     rbx - Argument 2
 ;     rcx - Argument 3
 ;     rdx - Argument 4
-;
 ;     #todo: 
 ;     Maybe we can receive more values using more registers.
-;
-;;-----
 
-
-extern _xxxxINT128_DEBUG_MESSAGE
 extern _sci0
 extern _sci0_cpl
+
 ; Capture context
 global _int128
 _int128:

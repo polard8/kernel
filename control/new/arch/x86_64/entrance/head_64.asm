@@ -1,6 +1,9 @@
 
+; head_64.asm
+; Kernel entry point.
 
-%include "head0.inc"
+
+%include "header/header1.inc"
 
 ; segment .head_x86_64
 __HEAD
@@ -53,18 +56,20 @@ _kernel_begin:
     cli
     cld 
     jmp START
-    nop
-    DB '__GRAMADO__'
 
-; Function table
-    DQ _die          ; 0
-    DQ _putchar_K    ; 1 see: kstdio.c
-    DQ _hal_reboot   ; 2
-    DQ _refresh_screen ; 3
+; ----------------------
+; header data area:
+    nop                ; Nop
+    DB '__GRAMADO__'   ; Signature
+    DQ _die            ; symbol 0:
+    DQ _putchar_K      ; symbol 1: see: kstdio.c
+    DQ _hal_reboot     ; symbol 2:
+    DQ _refresh_screen ; symbol 3:
     ; ...
-    
+; ----------------------
+
 align 4
-    %include "header.inc"
+    %include "header/header2.inc"
 align 4
 
 ; START
@@ -157,16 +162,13 @@ START:
     ;mov ax, word 0x2B
     ;ltr ax
 
-
 ; PIC
 ; Early PIC initialization.
 ; PIC MODE
 ; Selecting the 'Processor Interrup Mode'.
 ; All the APIC components are ignored here, and
 ; the system will operate in the single-thread mode using LINT0.
-
     cli
-
     xor rax, rax
     mov al, 00010001b    ; begin PIC1 initialization.
     out 0x20, al
@@ -194,7 +196,6 @@ START:
     IODELAY
 
 ; Mask all interrupts.
-
     cli
     mov  al, 255
     out  0xA1,  al
@@ -209,7 +210,6 @@ START:
 ; PIT 8253 e 8254 = (1234DD) 1193181.6666 / 100 = 11930. ; 1.19MHz.
 ; APIC timer      = 3,579,545 / 100 = 35796  3.5 MHz.
 ; 11931    ; (1193181.6666 / 100 = 11930) timer frequency 100 HZ.
-
 ; Send 0x36 to 0x43.
 ; Send 11931 to 0x40.
 
@@ -230,7 +230,6 @@ START:
 ; RTC
 
 ; Unmask all maskable interrupts.
-
     mov al, 0
     out 0xA1, al
     IODELAY
@@ -2711,30 +2710,19 @@ align 8
 ; Esses includes são padronizados. Não acrescentar outros.
 
 ;---------------------
-; unit 0
 ; Inicialização.
 ; Funções de apoio à inicialização do Kernel 32bit.
-    %include "unit0lib.asm" 
-
+    %include "header/header3.asm"  ; unit 0
+    %include "header/header4.asm"  ; unit 4
 ;---------------------
-; unit 1
 ; Interrupções de hardware (irqs) e faults.
-    %include "unit1hw.asm"
-
-; unit 2 in C.
-
-; unit 3
-    %include "unit3hw.asm"
-
-;---------------------
-; unit 4
-    %include "unit4lib.asm" 
-
+    %include "hw/hw1.asm"  ; unit 1
+    %include "hw/hw2.asm"  ; unit 3
 ;---------------------
 ; visitor
 ; Interrupções de software.
-    %include "sw.asm"
-    %include "swlib.asm"
+    %include "sw/sw1.asm"
+    %include "sw/sw2.asm"
 
 
 ;===================================================

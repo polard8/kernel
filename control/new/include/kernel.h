@@ -696,8 +696,6 @@ void faults(unsigned long number);
 // See: main.c hw.asm headlib.asm
 void xxxxIRQ0_DEBUG_MESSAGE(void);
 void xxxxIRQ1_DEBUG_MESSAGE(void);
-// See: main.c Sw.asm headlib.asm
-void xxxxINT128_DEBUG_MESSAGE(void);
 
 void panic ( const char *format, ... );
 void die (void);
