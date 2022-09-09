@@ -24,12 +24,6 @@ unsigned long search_path_dir_address=0;
 unsigned long search_path_dir_entries=0;
 
 
-// List of clusters. 
-// Usado na rotina de carregamento de arquivo.
-// #bugbug: Isso não é desperdício?
-unsigned short file_cluster_list[1024]; 
-
-
 //
 // == Cluster list ===============================
 //

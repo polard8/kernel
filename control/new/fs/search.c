@@ -1,7 +1,14 @@
 
 // search.c  
 
-#include <kernel.h>  
+#include <kernel.h>
+
+// List of clusters. 
+// Usado na rotina de carregamento de arquivo.
+// #bugbug: Isso não é desperdício?
+// um arquivo só pode ter 1024 indices?
+unsigned short file_cluster_list[1024]; 
+
 
 /*
  * search_in_dir:
@@ -14,20 +21,15 @@
  *    +Tamanho do cluster
  *    +Tamanho do disco
  *    +Tipo de sistema de arquivos. 
- *    +...
  */ 
-
 // #todo
 // We need to search in the file table first of all.
 // The structure found there will give us the inode structure pointer.
-
 // IN:
 // File name. "12345678XYZ"
 // Address of the directory.
-
 // OUT:
 // 1 = Found.
-
 // #todo
 // Is it a virtual address? change to dir_va in this case.
 
@@ -61,7 +63,6 @@ search_in_dir (
 // letras etão com '0' e não espaços.
     size_t stringSize=0;
 
-
     debug_print ("search_in_dir: $\n");
 
 //
@@ -79,15 +80,12 @@ search_in_dir (
 // The teminal.bin application is sending 
 // the whole commant line to this routine.
 // We need only the filename.
-    if (stringSize > 11 ){
+    if (stringSize > 11){
         printf ("search_in_dir: [ERROR] Wrong name size. {%d} \n", 
-        stringSize);
+            stringSize);
         printf("filename: %s\n",file_name);
         goto fail;
     }
-
-// copy
-    strncpy (NameBuffer, file_name, stringSize);
 
     if (stringSize < 11 )
     {
@@ -124,7 +122,14 @@ search_in_dir (
         }
     }
 
+// copy
+    strncpy (NameBuffer, file_name, stringSize);
+// finalize
     NameBuffer[11] = 0;
+//---------------------------
+
+
+
 
 /*
 // hack hack
@@ -235,41 +240,53 @@ int search_in_root ( const char *file_name )
 // #bugbug
 // empty uninitialized.
 // Search in file_cluster_list[]
-
-unsigned short fs_find_n_empty_entries ( int n )
+// IN: 
+// Desired number of empty entries.
+// OUT:
+// + The number of the first cluster in the list.
+// + 0 if failure.
+unsigned short fs_find_n_empty_entries (int n)
 {
 
-    //
-    // #fixme
-    //
+//
+// #fixme
+//
 
-    int i = 0;
-    int l = 0;
-    unsigned short empty = 0;
+    panic("fs_find_n_empty_entries: #fixme\n");
 
-	// Limits.
-    if ( n < 0 || n > 1024 ){ goto fail; }
+    int i=0;
+    int l=0;
+    unsigned short empty=0;
 
+// Limits
+// #todo:
+// Maybe we need a bigger limit, for bigger files.
+    if ( n < 0 || n > 1024 ){
+        goto fail;
+    }
 
-	// Loop ~ Procurar uma quantidade de entradas vazias.
+// Loop
+// Procurar uma quantidade de entradas vazias.
+
     for ( i=0; i < n; i++ )
     {
-		//empty = (unsigned short) fs_find_empty_entry(?);
-		
-		// Preenche a lista de entradas vazias.	
-        if ( empty != 0 && empty < 1024 )
-        {
+        //empty = (unsigned short) fs_find_empty_entry(?);
+
+        // Preenche a lista de entradas vazias.
+        if ( empty != 0 && empty < 1024 ){
+
             file_cluster_list[l] = (unsigned short) empty;
             l++;
         
-        }else{ goto fail; };
+        }else{ 
+            goto fail;
+        };
 
     };
 
     // Finaliza a lista com uma assinatura.
 
     file_cluster_list[l] = 0xFFF8; 
-
 
 // Retorna o primeiro da lista.
 done:
