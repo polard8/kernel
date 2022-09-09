@@ -360,22 +360,18 @@ static int __CompareString(void)
     }
 
 
-
-    if( strncmp(prompt,"client",6) == 0 )
+// #todo
+// Something is not working fine
+// when we put the name directly in the parameters field.
+// We need a pointer instead.
+    if( strncmp(prompt,"game1",5) == 0 )
     {
-        printf ("~Client\n");
-        rtl_clone_and_execute("terminal.bin");
+        printf ("~ Game 1:\n");
+        rtl_clone_and_execute("game1.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"editor",6) == 0 )
-    {
-        printf ("~Editor\n");
-        rtl_clone_and_execute("editor.bin");
-        isTimeToQuit = TRUE;
-        goto exit_cmp;
-    }
 
     // ...
 

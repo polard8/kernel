@@ -7,7 +7,7 @@ EDITION_NAME  = Angels/Warden
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 5
-VERSION_BUILD = 296
+VERSION_BUILD = 297
 # Compiling on gcc 11.2
 # Linking on ld 2.38
 
@@ -220,11 +220,12 @@ exposed-tier:
 #blue
 	-sudo cp ../hot/blue/bin/TERMINAL.BIN  control/disk/
 #beige
+	-sudo cp ../hot/beige/bin/BROWSER.BIN   control/disk/
 	-sudo cp ../hot/beige/bin/EDITOR.BIN    control/disk/
 	-sudo cp ../hot/beige/bin/FILEMAN.BIN   control/disk/
 	-sudo cp ../hot/beige/bin/CMDLINE.BIN   control/disk/
 #attitude
-	-sudo cp ../hot/attitude/bin/BROWSER.BIN   control/disk/
+	-sudo cp ../hot/attitude/bin/GAME1.BIN   control/disk/
 
 
 #===================================================
