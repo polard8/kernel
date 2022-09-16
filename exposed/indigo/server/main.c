@@ -519,14 +519,11 @@ int main (int argc, char **argv)
     //unsigned long w=0;
     //unsigned long h=0;
 
-
 // Global flag for the loop.
     running = TRUE;
 
 // debug
-   // debug_print ("-----------------------\n");
-   // debug_print ("gnssrv: Initializing...\n");
-    printf      ("gnssrv: Initializing...\n");
+    printf ("gnssrv: Initializing...\n");
 
 // Sincronizaçao provisoria
 // vamos precisar disso antes de tudo;
@@ -549,10 +546,8 @@ int main (int argc, char **argv)
 
     _status = (int) register_ns();
 
-    if (_status<0)
-    {
-       // debug_print ("gnssrv: Couldn't register the server \n");
-             printf ("gnssrv: Couldn't register the server \n");
+    if (_status<0){
+        printf ("gnssrv: Couldn't register the server \n");
         exit(1);
     }
     debug_print ("gnssrv: Registration ok \n");
