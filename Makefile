@@ -226,7 +226,7 @@ exposed-tier:
 	-sudo cp ../hot/beige/bin/CMDLINE.BIN   control/disk/
 #attitude
 	-sudo cp ../hot/attitude/bin/GAME1.BIN   control/disk/
-
+	-sudo cp ../hot/attitude/bin/GAME2.BIN   control/disk/
 
 #===================================================
 #::2
