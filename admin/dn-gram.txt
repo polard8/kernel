@@ -1,12 +1,18 @@
 
-	gramado os model:
 
-        ========================
-        flexible interface
+    Gramado OS model:
+
+ ========================
+ Flexible interface
+ gramado/
+ control/
+ exposed/
 	> boot  
 	> new
-        ========================
-        consistent interface.
+ 
+ ========================
+  Consistent interface.
+  hot/
 	> gws (window server)
 	> gws/rtl
 	

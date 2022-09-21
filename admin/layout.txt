@@ -1,12 +1,7 @@
+
 /admin
 	Some design notes and scripts.
-/basetier/boot
-	Boot loader for the 'new' system.
-	It loads the kernel image.
-/basetier/disk
-	The root directory for the target boot partition.
-/docs
-	Documentation
-/gramado
-	Gramado operating system.
-
+/control
+	The boot loader and the kernel.
+/exposed
+	Init process and command application.

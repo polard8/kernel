@@ -1,4 +1,0 @@
-
-	Starvation:
-	Se o ws rodar pouco, entao teremos rotinas de pintura lentas.
-	Se os clientes rodarem pouco, entao teremos inputs mais lentos.
