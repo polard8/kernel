@@ -19,6 +19,30 @@ int notification_status=FALSE;
 file *____network_file;
 
 
+// handle ipv4 package
+// Called by all the embedded nic device drivers.
+void 
+network_handle_ipv4( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+    printf("network_handle_ipv4: ==== IPV4 ====\n");
+}
+
+// handle arp package
+// Called by all the embedded nic device drivers.
+void 
+network_handle_arp( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+    printf("network_handle_arp: ==== ARP ====\n");
+}
+
+
+
+
+
 // Colocar um buffer numa lista de buffers.
 // Vamos copiar o pacote para alguma fila de buffers.
 // A rotina de decodificar o pacote pegará o

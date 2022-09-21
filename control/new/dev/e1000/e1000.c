@@ -24,6 +24,7 @@
 #define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 
 
+
 //
 // == Ethernet ==============================================
 //
@@ -31,14 +32,13 @@
 // Ethernet header length
 #define ETHERNET_HEADER_LENGHT  14  
 
-// ethernet header
+// Ethernet header
 struct e1000_ether_header_d 
 {
-    // mac
+// MAC
     uint8_t dst[6];
     uint8_t src[6];
-
-    // protocol
+// Protocol type
     uint16_t type;
 
 } __attribute__((packed)); 
@@ -56,12 +56,14 @@ int e1000_irq_count=0;
 unsigned long gE1000InputTime=0;
 
 
-
+// NIC device handler.
 static void DeviceInterface_e1000(void);
+
+// handle package.
 static void 
-print_ethernet_header ( 
-    const unsigned char *Buffer, 
-    int Size );
+on_receiving ( 
+    const unsigned char *buffer, 
+    ssize_t size );
 
 static uint32_t 
 __E1000ReadCommand ( 
@@ -1019,15 +1021,22 @@ e1000_init_nic (
     return 0;
 }
 
+
 static void 
-print_ethernet_header ( 
-    const unsigned char *Buffer, 
-    int Size )
+on_receiving ( 
+    const unsigned char *buffer, 
+    ssize_t size )
 {
     struct e1000_ether_header_d *eth = 
-        (struct e1000_ether_header_d *) Buffer;
-
+        (struct e1000_ether_header_d *) buffer;
     uint16_t Type=0;
+
+
+    if ( (void*) buffer == NULL )
+        return;
+    if(size<0)
+        return;
+
  
     printf("\n");
     printf("Ethernet Header\n");
@@ -1055,9 +1064,11 @@ print_ethernet_header (
     switch ( (uint16_t) Type ){
     case 0x0800:
         printf ("[0x0800]: IPV4 received\n");
+        network_handle_ipv4(buffer,size);
         break;
     case 0x0806:
         printf ("[0x0806]: ARP received\n");
+        network_handle_arp(buffer,size);
         break;
     case 0x814C:
         printf ("[0x814C]: SNMP received\n");
@@ -1070,22 +1081,21 @@ print_ethernet_header (
         break;
     };
 
-
     refresh_screen();
 }
 
 
 static void DeviceInterface_e1000(void)
 {
+    unsigned char *buffer;
+
     uint32_t status=0;
 
     uint32_t val=0;
     uint16_t old=0;
     uint32_t len=0;
 
-    unsigned char *buffer;
-
-    // The ethernet header.
+// The ethernet header.
     struct e1000_ether_header_d *eh;
     uint16_t Type=0;
 
@@ -1162,7 +1172,7 @@ static void DeviceInterface_e1000(void)
              if ( (void*) buffer != NULL )
              {
                  //eh = (void*) buffer;
-                 print_ethernet_header ( 
+                 on_receiving ( 
                      (const unsigned char*) buffer, 
                      1500 );
              }

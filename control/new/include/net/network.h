@@ -120,6 +120,16 @@ int ____network_late_flag;
 // == Prototypes ====================
 //
 
+void 
+network_handle_ipv4( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
+void 
+network_handle_arp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 
 int network_buffer_in( void *buffer, int len );
 int network_buffer_out ( void *buffer, int len );
