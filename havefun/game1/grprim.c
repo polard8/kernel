@@ -1795,21 +1795,18 @@ plotLine3dLT2 (
     unsigned int color,
     int draw )
 {
- 
     int ResultNumberOfVectors=0;
- 
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
+
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+
    //#bugbug: This macro is wrong?!
    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
    
    int dm = grMAX3(dx,dy,dz);
    register int i = dm;
    ResultNumberOfVectors = (int) i;
-
- 
 
     // x1 = y1 = z1 = dm/2; /* error offset */
  
@@ -1829,34 +1826,26 @@ plotLine3dLT2 (
             if ( (void*) x2 != NULL ){ *x2 = x0; }
             if ( (void*) y2 != NULL ){ *y2 = y0; }
             if ( (void*) z2 != NULL ){ *z2 = z0; }
-            
-            // do not break.
-            //break;
+            // Do not break.
         }
 
-        // end of line
+        // End of line.
         if (i == 0){
             break;
         }
-        
-        x1 -= dx; 
-        if (x1 < 0) 
-        { x1 += dm; x0 += sx; }
-        
+
+        x1 -= dx;
+        if (x1 < 0) { x1 += dm; x0 += sx; }
         y1 -= dy; 
-        if (y1 < 0) 
-        { y1 += dm; y0 += sy; }
-        
-        z1 -= dz; 
-        if (z1 < 0) 
-        { z1 += dm; z0 += sz; }
-        
+        if (y1 < 0) { y1 += dm; y0 += sy; }
+        z1 -= dz;
+        if (z1 < 0) { z1 += dm; z0 += sz; }
+
         i--;
     };
-    
+
     return (int) ResultNumberOfVectors;
 }
-
 
 
 // #todo
@@ -2191,6 +2180,11 @@ xxxDeflateCubeZ (
     return 0;
 }
 
+int grTriangleScale0( struct gr_triangle_d *t);
+int grTriangleScale0( struct gr_triangle_d *t)
+{
+    return 0;
+}
 
 // Triangle
 // Draw a not filled triangle
@@ -2198,7 +2192,7 @@ xxxDeflateCubeZ (
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle )
+    struct gr_triangle_d *triangle )
 {
 
     if ( (void*) triangle == NULL ){
@@ -2234,7 +2228,7 @@ xxxTriangleZ(
 int 
 xxxFillTriangle0(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle )
+    struct gr_triangle_d *triangle )
 {
 
     int tmpx=0;
@@ -2493,13 +2487,13 @@ xxxFillTriangle0(
 int 
 xxxTriangleZ1(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle )
+    struct gr_triangle_d *triangle )
 {
     return (int) xxxFillTriangle0(window,triangle);
 }
 
 
-int grTriangle( struct gr_triandle_d *triangle )
+int grTriangle( struct gr_triangle_d *triangle )
 {
     int Status=0;
     
@@ -2884,10 +2878,8 @@ plotCircle (
       
     } while (x < 0);
 }
-   
 
 
-// ?? what means 'm' ???
 void 
 plotCircleZ ( 
     struct gws_window_d *window,
@@ -2897,47 +2889,148 @@ plotCircleZ (
     unsigned int color, 
     int z )
 {
-
     /* II. Quadrant */ 
-   //int x = -r, y = 0, err = 2-2*r; 
-   
-    //loop
-    register int x = -r;
-   
-    int y = 0;
-    int err =  (2-(2*r));
+    //int x = -r, y = 0, err = 2-2*r; 
+
+    register int x = (int) -r;
+             int y=0;
+
+    // decrementa o diâmetro.
+    int err = (int) (2-(2*r));
+    int tmp=0;
 
     do {
-      
-      //setPixel(xm-x, ym+y); /*   I. Quadrant */
-      //setPixel(xm-y, ym-x); /*  II. Quadrant */
-      //setPixel(xm+x, ym-y); /* III. Quadrant */
-      //setPixel(xm+y, ym+x); /*  IV. Quadrant */
-      
-      grPlot0 ( window, z, xm-x, ym+y, color);
-      grPlot0 ( window, z, xm-y, ym-x, color);
-      grPlot0 ( window, z, xm+x, ym-y, color);
-      grPlot0 ( window, z, xm+y, ym+x, color);
+
+      grPlot0 ( window, z, xm-x, ym+y, color);//d  /*   I. Quadrant */
+      grPlot0 ( window, z, xm-y, ym-x, color);//c  /*  II. Quadrant */
+      grPlot0 ( window, z, xm+x, ym-y, color);//e  /* III. Quadrant */
+      grPlot0 ( window, z, xm+y, ym+x, color);//b  /*  IV. Quadrant */
 
       r = err;
       
-      // #ugly routine.
-      
-      /* e_xy+e_y < 0 */
+      //e_xy+e_y < 0
       if (r <= y) 
-      { 
-           err += ++y * 2 + 1; 
-      }           
+      {
+           tmp = ++y * 2+1;
+           err += tmp; 
+      }
       
-      /* e_xy+e_x > 0 or no 2nd y-step */
+      // e_xy+e_x > 0 or no 2nd y-step
       if (r > x || err > y) 
-      { 
-          err += ++x * 2+1; 
+      {
+          tmp = ++x * 2+1;
+          err += tmp; 
       }
       
     } while (x < 0);
 }
  
+
+
+// Retorna vetor do n ponto partindo da reta data.
+// n não pode ser maior que o raio.
+// anti-horário?
+// 1=c | 2=e | 3=b | 4=d
+// OUT:
+// -1 on error | 0 if ok.
+int
+plotCircleZLT0 ( 
+    struct gws_window_d *window,
+    int xm, 
+    int ym, 
+    int r, 
+    unsigned int color, 
+    int z,
+    int axis_n,                           // qual eixo?   
+    int n,                                // number of the target pointer.
+    int *res_x, int *res_y, int *res_z,   // return vector.
+    int draw )                            // draw or not.  
+{
+    /* II. Quadrant */ 
+    //int x = -r, y = 0, err = 2-2*r; 
+
+    register int x = (int) -r;
+             int y=0;
+
+    // decrementa o diâmetro.
+    int err = (int) (2-(2*r));
+    int tmp=0;
+
+// qual eixo?
+    if( axis_n < 1 || axis_n > 4){
+        return -1;
+    }
+
+// Não pode ser maior que o raio.
+    if(n>r){
+        return -1;
+    }
+
+    if ( (void*) res_x == NULL ||
+         (void*) res_y == NULL ||
+         (void*) res_z == NULL )
+    {
+        return -1;
+    }
+
+    do {
+      // anti-horário?
+      // 1=c | 2=e | 3=b | 4=d
+      
+      if( n == (-x) )
+      {
+          if (axis_n==1){  //c
+          *res_x = (int) xm-x;
+          *res_y = (int) ym+y;
+          *res_z = (int) z;
+          }
+          if (axis_n==2){  //e
+          *res_x = (int) xm-y;
+          *res_y = (int) ym-x;
+          *res_z = (int) z;
+          }
+          if (axis_n==3){  //b
+          *res_x = (int) xm+x;
+          *res_y = (int) ym-y;
+          *res_z = (int) z;
+          }
+          if (axis_n==4){  //d
+          *res_x = (int) xm+y;
+          *res_y = (int) ym+x;
+          *res_z = (int) z;
+          }
+      }
+      
+      if (draw){
+          grPlot0 ( window, z, xm-x, ym+y, color);//c  /*   I. Quadrant */
+          grPlot0 ( window, z, xm-y, ym-x, color);//e  /*  II. Quadrant */
+          grPlot0 ( window, z, xm+x, ym-y, color);//b  /* III. Quadrant */
+          grPlot0 ( window, z, xm+y, ym+x, color);//d  /*  IV. Quadrant */
+      }
+      
+      r = err;
+      
+      //e_xy+e_y < 0
+      if (r <= y) 
+      {
+           tmp = ++y * 2+1;
+           err += tmp; 
+      }
+      
+      // e_xy+e_x > 0 or no 2nd y-step
+      if (r > x || err > y) 
+      {
+          tmp = ++x * 2+1;
+          err += tmp; 
+      }
+      
+    } while (x < 0);
+
+// ok
+    return 0;
+}
+ 
+
  
 /* 
  //credits: uVGA

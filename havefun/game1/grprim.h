@@ -80,7 +80,7 @@ struct gr_line_d
 };
 
 // 3D triangle
-struct gr_triandle_d
+struct gr_triangle_d
 {
     int used;
     int magic;
@@ -93,8 +93,8 @@ struct gr_triandle_d
     struct gr_vec2D_d pt2D[3];
 
     // mesh support.
-    struct gr_triandle_d *last;
-    struct gr_triandle_d *next;
+    struct gr_triangle_d *last;
+    struct gr_triangle_d *next;
 };
 
 // 3D rectangle.
@@ -686,21 +686,21 @@ int serviceGrRectangle(void);
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle );
+    struct gr_triangle_d *triangle );
 
 
 int 
 xxxFillTriangle0(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle );
+    struct gr_triangle_d *triangle );
 
 // #test
 int 
 xxxTriangleZ1(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle );
+    struct gr_triangle_d *triangle );
 
-int grTriangle( struct gr_triandle_d *triangle);
+int grTriangle( struct gr_triangle_d *triangle);
 
 //
 // == polygon ===========================
@@ -740,6 +740,21 @@ plotCircleZ (
     int r, 
     unsigned int color, 
     int z );
+
+
+int
+plotCircleZLT0 ( 
+    struct gws_window_d *window,
+    int xm, 
+    int ym, 
+    int r, 
+    unsigned int color, 
+    int z,
+    int axis_n,                           // qual eixo.
+    int n,                                // number of the target pointer.
+    int *res_x, int *res_y, int *res_z,   // return vector.
+    int draw );                           // draw or not.  
+
 
 //
 // == Ellipse ====================================

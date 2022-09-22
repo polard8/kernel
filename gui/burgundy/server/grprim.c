@@ -1421,7 +1421,7 @@ xxxDeflateCubeZ (
 
 
 // Triangle.
-int xxxTriangleZ ( struct gr_triandle_d *triangle )
+int xxxTriangleZ ( struct gr_triangle_d *triangle )
 {
 
     if ( (void*) triangle == NULL ){
@@ -1452,7 +1452,7 @@ int xxxTriangleZ ( struct gr_triandle_d *triangle )
 }
 
 
-int grTriangle( struct gr_triandle_d *triangle )
+int grTriangle( struct gr_triangle_d *triangle )
 {
     int Status=0;
     

@@ -1052,13 +1052,13 @@ void demoTriangle(void)
 
 
 //------------------------------------------
-    struct gr_triandle_d *triangle;
+    struct gr_triangle_d *triangle;
 
     int line_size = 40;
 
 
 // Create the triangle.
-    triangle = (void *) malloc( sizeof( struct gr_triandle_d ) );
+    triangle = (void *) malloc( sizeof( struct gr_triangle_d ) );
     if ( (void*) triangle == NULL )
         return;
     triangle->used = TRUE;

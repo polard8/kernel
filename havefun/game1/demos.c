@@ -47,12 +47,12 @@ __create_demo_window (
     unsigned long width,
     unsigned long height );
 
-void __change_triangle( struct gr_triandle_d *triangle, int direction );
+void __change_triangle( struct gr_triangle_d *triangle, int direction );
 
 //======================
 
 
-void __change_triangle( struct gr_triandle_d *triangle, int direction )
+void __change_triangle( struct gr_triangle_d *triangle, int direction )
 {
     long setx = 2;
     long sety = 2;
@@ -664,6 +664,8 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 //---
 
 // head
+
+//original
 // IN: x,y,r,color,z
     plotCircleZ ( 
         ow,
@@ -672,6 +674,24 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         25,   //r
         GRCOLOR_LIGHTBLACK,  //color 
         model_z );   // z 
+
+
+/*
+ // head com line tracker
+    int res_x=0; int res_y=0; int res_z=0;
+// IN: x,y,r,color,z, n, return xyz, draw.
+    plotCircleZLT0 ( 
+        ow,
+        model_x + 0,    //x
+        model_y + 12,   //y
+        25,   //r
+        GRCOLOR_LIGHTBLACK,  //color 
+        model_z,             //z
+        4,                   // (1~4). Qual eixo?
+        1,                   //n
+        &res_x, &res_y, &res_z,               //return vector
+        TRUE );  //draw
+*/
 
 // eyes
     if ( CatModel.eyesVisible == TRUE )
@@ -739,6 +759,7 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
              GRCOLOR_LIGHTBLACK); 
 
        unveil_camera ( model_x, model_y, model_z );
+       //unveil_camera ( res_x, res_y, res_z );
     }
 //---
 }
@@ -1122,12 +1143,12 @@ void demoTriangle(void)
 
 
 //------------------------------------------
-    struct gr_triandle_d *triangle;
+    struct gr_triangle_d *triangle;
 
     int line_size = 40;
 
 // Create the triangle.
-    triangle = (void *) malloc( sizeof( struct gr_triandle_d ) );
+    triangle = (void *) malloc( sizeof( struct gr_triangle_d ) );
     if ( (void*) triangle == NULL )
         return;
     triangle->used = TRUE;
@@ -1210,7 +1231,7 @@ void from_vector_list ( unsigned long list_address, int n )
     int tt=0;
     int count=0;
     int Offset=0;
-    struct gr_triandle_d t;
+    struct gr_triangle_d t;
     struct gr_vec3D_d *tmpvec;
 
     /*

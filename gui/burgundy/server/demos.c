@@ -261,11 +261,11 @@ void demoLine1(void)
 
 void demoTriangle(void)
 {
-    struct gr_triandle_d *triangle;
+    struct gr_triangle_d *triangle;
 
     //printf("demoTriangle:\n");
 
-    triangle = (void *) malloc( sizeof( struct gr_triandle_d ) );
+    triangle = (void *) malloc( sizeof( struct gr_triangle_d ) );
 
     if ( (void*) triangle == NULL )
         return;

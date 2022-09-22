@@ -1961,7 +1961,7 @@ xxxDeflateCubeZ (
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle )
+    struct gr_triangle_d *triangle )
 {
 
     if ( (void*) triangle == NULL ){
@@ -1993,7 +1993,7 @@ xxxTriangleZ(
 }
 
 
-int grTriangle( struct gr_triandle_d *triangle )
+int grTriangle( struct gr_triangle_d *triangle )
 {
     int Status=0;
     

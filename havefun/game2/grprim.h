@@ -80,15 +80,15 @@ struct gr_line_d
 };
 
 // 3D triangle
-struct gr_triandle_d
+struct gr_triangle_d
 {
     int used;
     int magic;
     int initialized;
     struct gr_vec3D_d p[3];
     // mesh support.
-    struct gr_triandle_d *last;
-    struct gr_triandle_d *next;
+    struct gr_triangle_d *last;
+    struct gr_triangle_d *next;
 };
 
 // 3D rectangle.
@@ -146,8 +146,8 @@ struct gr_mesh_line_d
 struct gr_mesh_triangle_d
 {
     int n;
-    struct gr_triandle_d *first_triangle;
-    struct gr_triandle_d *last_triangle;
+    struct gr_triangle_d *first_triangle;
+    struct gr_triangle_d *last_triangle;
 };
 
 // quad mesh
@@ -596,9 +596,9 @@ int serviceGrRectangle(void);
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 
-    struct gr_triandle_d *triangle );
+    struct gr_triangle_d *triangle );
 
-int grTriangle( struct gr_triandle_d *triangle);
+int grTriangle( struct gr_triangle_d *triangle);
 
 //
 // == polygon ===========================

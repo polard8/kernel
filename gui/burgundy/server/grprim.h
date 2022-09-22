@@ -47,11 +47,11 @@ struct gr_line_d
 };
 
 // 3D triangle
-struct gr_triandle_d
+struct gr_triangle_d
 {
     struct gr_vec3D_d p[3];
-    struct gr_triandle_d *last;
-    struct gr_triandle_d *next;
+    struct gr_triangle_d *last;
+    struct gr_triangle_d *next;
 };
 
 // 3D rectangle
@@ -360,9 +360,9 @@ int serviceGrRectangle(void);
 // == triangle ==========================
 //
 
-int xxxTriangleZ ( struct gr_triandle_d *triangle );
+int xxxTriangleZ ( struct gr_triangle_d *triangle );
 
-int grTriangle( struct gr_triandle_d *triangle);
+int grTriangle( struct gr_triangle_d *triangle);
 
 //
 // == polygon ===========================
