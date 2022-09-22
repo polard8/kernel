@@ -683,6 +683,8 @@ int serviceGrRectangle(void);
 // == triangle ==========================
 //
 
+int grTriangleScale0( struct gr_triangle_d *t, int factor);
+
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 

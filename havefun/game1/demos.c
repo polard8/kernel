@@ -1193,6 +1193,8 @@ void demoTriangle(void)
     triangle->initialized = TRUE;
 
 
+    //grTriangleScale0(triangle,2); // bigger
+
     int i=0;
     int j=0;
     int max = 400; //150;
@@ -1211,6 +1213,7 @@ void demoTriangle(void)
         }
         // Change the triangle values.
         __change_triangle(triangle,direction);
+        
         // #test: weak rasterization.
         xxxFillTriangle0(dw,triangle);
         

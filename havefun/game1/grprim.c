@@ -2180,11 +2180,29 @@ xxxDeflateCubeZ (
     return 0;
 }
 
-int grTriangleScale0( struct gr_triangle_d *t);
-int grTriangleScale0( struct gr_triangle_d *t)
+
+int grTriangleScale0( struct gr_triangle_d *t, int factor)
 {
+    if((void*)t==NULL)
+        return -1;
+    if(t->initialized!=TRUE)
+        return -1;
+
+    t->p[0].x *= factor;
+    t->p[0].y *= factor;
+    t->p[0].z *= factor;
+
+    t->p[1].x *= factor;
+    t->p[1].y *= factor;
+    t->p[1].z *= factor;
+
+    t->p[2].x *= factor;
+    t->p[2].y *= factor;
+    t->p[2].z *= factor;
+
     return 0;
 }
+
 
 // Triangle
 // Draw a not filled triangle
