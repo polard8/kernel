@@ -1,0 +1,29 @@
+
+
+attitude:
+    Streets.
+    Wild and free clients.
+    This is a funny place.
+    Maybe games and game engines.
+    browser - Attitude Browser.
+beige:
+    Unit I clients.
+    cmdline, editor, fileman, setup, tests.
+blue:
+    Unit II clients.
+    terminal
+burgundy:
+    Unit III clients.
+    Sobriety.
+    server - The Gramado Window Server.
+    client - The first client for gws.
+    gdm    - Gramado Display manager.
+    gdm2   - Simple gdm.
+libs:
+    Libraries.
+    libgws - Client-side library for gws.
+    rtl    - ring 3 libc.
+
+
+
+

@@ -1,0 +1,8 @@
+
+
+
+	The display server:
+
+	#todo: 
+	We can change the folder's name to gws/
+	instead of server/.

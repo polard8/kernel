@@ -1,6 +1,5 @@
 !LICENSE
 !Makefile
-!basetier/**
 
 *.VHD
 *.BIN
