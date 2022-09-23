@@ -18,4 +18,16 @@ PHONY := step1-base
 step1-base:
 	make -C  base
 
+clean-all:
+# In base/
+	-rm base/control/new/KERNEL.BIN
+	-rm base/control/newm0/MOD0.BIN
+	-rm base/exposed/arctic/bin/INIT.BIN
+# In gui/
+	-rm gui/attitude/bin/*.BIN
+	-rm gui/beige/bin/*.BIN
+	-rm gui/blue/bin/*.BIN
+	-rm gui/burgundy/bin/*.BIN
+# In havefun/
+	-rm havefun/bin/*.BIN
 

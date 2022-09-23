@@ -228,9 +228,11 @@ exposed-tier:
 	-sudo cp ../gui/beige/bin/CMDLINE.BIN      control/disk/
 	-sudo cp ../gui/attitude/bin/BROWSER.BIN   control/disk/
 #havefun
+	-sudo cp ../havefun/bin/DEMO1.BIN   control/disk/
+	-sudo cp ../havefun/bin/DEMO2.BIN   control/disk/
 	-sudo cp ../havefun/bin/GAME1.BIN   control/disk/
 	-sudo cp ../havefun/bin/GAME2.BIN   control/disk/
-
+	
 #===================================================
 #::2
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.

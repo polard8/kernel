@@ -85,13 +85,7 @@ struct gr_triangle_d
     int used;
     int magic;
     int initialized;
-
-// 3D representqation of the triangle.
     struct gr_vec3D_d p[3];
-// 2D representation of the triangle
-// Good for rasterization. Maybe for texture.
-    struct gr_vec2D_d pt2D[3];
-
     // mesh support.
     struct gr_triangle_d *last;
     struct gr_triangle_d *next;
@@ -100,13 +94,7 @@ struct gr_triangle_d
 // 3D rectangle.
 struct gr_rectangle_d
 {
-
-// 3D representation of the rectangle.
     struct gr_vec3D_d p[4];
-// 2D representation of the rectangle.
-// Good for rasterization. Maybe for texture.
-    struct gr_vec2D_d pt2D[4];
-
     // mesh support.
     struct gr_rectangle_d *last;
     struct gr_rectangle_d *next;
@@ -140,7 +128,8 @@ struct gr_mesh_point_d
 {
 // raw color
     unsigned int color;
-// Cada número representa um índice num array de vetores.
+// cada número representa um 
+// índice num vetor de indices.
     int n[1];
 };
 
@@ -148,72 +137,35 @@ struct gr_mesh_line_d
 {
 // raw color
     unsigned int color;
-// Cada número representa um índice num array de vetores.
+// cada número representa um 
+// índice num vetor de indices.
     int n[2];
 };
 
 // tri mesh
 struct gr_mesh_triangle_d
 {
-// raw color
-    unsigned int color;
-// Cada número representa um índice num array de vetores.
-    int n[3];
+    int n;
+    struct gr_triangle_d *first_triangle;
+    struct gr_triangle_d *last_triangle;
 };
-
-/*
-struct gr_mesh_triangle_queue_d
-{
-    void *base;
-// raw color
-    unsigned int color;
-// Cada número representa um índice num array de vetores.
-    int n[3];
-// navigation
-    struct gr_mesh_triangle_queue_d *next;
-    struct gr_mesh_triangle_queue_d *last;
-};
-*/
-
 
 // quad mesh
 struct gr_mesh_rectangle_d
 {
-// raw color
-    unsigned int color;
-// Cada número representa um índice num array de vetores.
-    int n[4];
+    int n;
+    struct gr_rectangle_d *first_rectangle;
+    struct gr_rectangle_d *last_rectangle;   
 };
-
-/*
-struct gr_mesh_rectangle_queue_d
-{
-    void *base;
-// raw color
-    unsigned int color;
-// Cada número representa um índice num array de vetores.
-    int n[4];
-// navigation
-    struct gr_mesh_rectangle_queue_d *next;
-    struct gr_mesh_rectangle_queue_d *last;
-};
-*/
-
-
 
 struct gr_mesh_d
 {
 // Quantos bytes tem a face list.
     int facelist_size_in_bytes;   // bytes
     int facelist_size_in_dwords;  // ints
-
-
-// lista de triangulos
-    struct gr_mesh_triangle_d *tris;
-// lista de retângulos.
-    struct gr_mesh_rectangle_d *rects;
-
-
+// lista de indices.
+// cada indice representa um vetor.
+    void *facelist;
 // Se o tipo for triangulo, então
 // na facelist os indices serão agrupados de 3 em 3.
 // Se for quad, então serão agrupados de 4 em 4.
@@ -470,17 +422,6 @@ multiply4(
     int mat2[4][4], 
     int res[4][4] );
 
-void grInitializematrix0 (long *r);
-
-void 
-grSetTranslation4x4 (
-    long *r,   // matrix base.
-    long *_x, long *_y, long *_z );
-//#test
-void 
-grRot4x4 (
-    long *r,   // matrix base.
-    long *_x, long *_y, long *_z );
 
 //
 // ===========================================================
@@ -600,18 +541,6 @@ int serviceGrPlot0(void);
 // == Line ==============================================
 //
 
-struct gr_vec2D_d *gr_cast2D (
-    struct gr_vec2D_d *wp1, struct gr_vec2D_d *wp2,
-    struct gr_vec2D_d *rp1, struct gr_vec2D_d *rp2 );
-
-
-void
-grLineRect4 ( 
-    struct gws_window_d *window,
-    int x1, int y1, 
-    int x2, int y2,
-    unsigned int color );
-
 void 
 plotLine3d (
     struct gws_window_d *window,
@@ -619,25 +548,6 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color );
 
-void 
-plotLine3dLT (
-    struct gws_window_d *window,
-    int x0, int y0, int z0, 
-    int x1, int y1, int z1,
-    int *x2, int *y2, int *z2, 
-    unsigned int color );
-
-// track a given vector.
-// OUT: the number of vectors in this line.
-int 
-plotLine3dLT2 (
-    struct gws_window_d *window,
-    int x0, int y0, int z0, 
-    int x1, int y1, int z1,
-    int *x2, int *y2, int *z2, 
-    int n,   // track this vector.
-    unsigned int color,
-    int draw );
 
 // plot line given two colors.
 // interpolation ?
@@ -683,22 +593,8 @@ int serviceGrRectangle(void);
 // == triangle ==========================
 //
 
-int grTriangleScale0( struct gr_triangle_d *t, int factor);
-
 int 
 xxxTriangleZ(
-    struct gws_window_d *window, 
-    struct gr_triangle_d *triangle );
-
-
-int 
-xxxFillTriangle0(
-    struct gws_window_d *window, 
-    struct gr_triangle_d *triangle );
-
-// #test
-int 
-xxxTriangleZ1(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle );
 
@@ -742,21 +638,6 @@ plotCircleZ (
     int r, 
     unsigned int color, 
     int z );
-
-
-int
-plotCircleZLT0 ( 
-    struct gws_window_d *window,
-    int xm, 
-    int ym, 
-    int r, 
-    unsigned int color, 
-    int z,
-    int axis_n,                           // qual eixo.
-    int n,                                // number of the target pointer.
-    int *res_x, int *res_y, int *res_z,   // return vector.
-    int draw );                           // draw or not.  
-
 
 //
 // == Ellipse ====================================

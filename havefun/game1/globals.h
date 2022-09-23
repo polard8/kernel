@@ -230,7 +230,6 @@ extern int use_vsync;
 
 extern unsigned long screens[MAX_SCREENS];
 
-extern long g_m4x4_buffer[16];
 
 
 /*

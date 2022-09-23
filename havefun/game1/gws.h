@@ -17,6 +17,8 @@ extern int current_mode;
 #include <sys/socket.h>
 #include <rtl/gramado.h>
 
+//#test
+#include <math.h>
 
 #include "protocol.h"
 

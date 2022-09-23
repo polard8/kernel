@@ -7,8 +7,6 @@
 
 #include "gws.h"
 
-
-
 // See:
 // https://wiki.osdev.org/3D_Renderer_Basics
 // http://members.chello.at/easyfilter/bresenham.html
@@ -270,74 +268,6 @@ int camera_initialize(void)
     return 0;
 }
 
-
-// #test
-// line-line intersaction point.
-// IN: Wall point 1, wall point 2, ray point1, ray point 2
-// OUT: pointer or NULL.
-struct gr_vec2D_d *gr_cast2D (
-    struct gr_vec2D_d *wp1, struct gr_vec2D_d *wp2,
-    struct gr_vec2D_d *rp1, struct gr_vec2D_d *rp2 )
-{
-
-// check pointers
-    if( (void*) wp1 == NULL )
-        return NULL;
-    if( (void*) wp2 == NULL )
-        return NULL;
-    if( (void*) rp1 == NULL )
-        return NULL;
-    if( (void*) rp2 == NULL )
-        return NULL;
-
-
-// Building the wall.
-// Pega os pontos do wall.
-    int wx1 = (int) wp1->x;
-    int wy1 = (int) wp1->y;
-    int wx2 = (int) wp2->x;
-    int wy2 = (int) wp2->y;
-
-// check pointer
-    //if( (void*) CurrentCamera == NULL )
-    //    return NULL;
-
-// Buiding the ray.
-// Position and direction from camera structure.
-    int rx3 = (int) rp1->x;
-    int ry3 = (int) rp1->y;
-    int rx4 = (int) rp1->x + rp2->x;
-    int ry4 = (int) rp1->y + rp2->y;
-
-// the denominator
-// Can't be '0'. :)
-    int den = (int) (wx1 - wx2) * (ry3 - ry4) - (wy1 - wy2) * (rx3 - rx4);
-    if (den == 0){
-      return NULL;   // No point.
-    }
-
-    int t = (int)  ((wx1 - rx3) * (ry3 - ry4) - (wy1 - ry3) * (rx3 - rx4)) / den;
-    int u = (int) -((wx1 - wx2) * (wy1 - ry3) - (wy1 - wy2) * (wx1 - rx3)) / den;
-
-// Not a pointer.
-    struct gr_vec2D_d magic_pointer; 
-
-    if ( t > 0 && 
-         t < 1 && 
-         u > 0 ){
-        //const pt = createVector();
-      magic_pointer.x = (int) wx1 + t * (wx2 - wx1);
-      magic_pointer.y = (int) wy1 + t * (wy2 - wy1);
-      
-      //printf("ok\n");
-      return (struct gr_vec2D_d *) &magic_pointer;
-
-    } else {
-      return NULL;
-    };
-}
-
-
 int 
 camera ( 
     int x, int y, int z,
@@ -576,11 +506,7 @@ unveil_camera(
     r.p[RAY_TARGET].y = (int) CurrentCamera->lookat.y; 
     r.p[RAY_TARGET].z = (int) CurrentCamera->lookat.z;
     r.p[RAY_TARGET].color = COLOR_WHITE;
-
-
 // Draw line (ray)
-// The target is the model.
-
     plotLine3d ( 
         ow,
         r.p[RAY_ORIGIN].x,  r.p[RAY_ORIGIN].y, r.p[RAY_ORIGIN].z, 
@@ -874,7 +800,7 @@ gwsDepthRange(
 
 // Transforme from the (x,y,z) coordinates of the 'view space'
 // to the (x,y) coordinates of the 2d screen space.
-// Hand-made. No projection matrix.
+// Hand-made. No matrix.
 // Using the left-hand style. The same found in Direct3D.
 // Not normalized screen.
 // Called by grPlot0().
@@ -1284,13 +1210,9 @@ grPlot0 (
     int UseClipping = FALSE;
 
 
-// #todo
-// We can set this in the global configuration.
-// see: globals.c
     int UseLeftHand = gUseLeftHand;
-    //#test
-    //UseLeftHand = TRUE; // left
-    //UseLeftHand = FALSE;  //right
+    //UseLeftHand = TRUE;   //LEFT HAND
+    //UseLeftHand = FALSE;  //RIGHT HAND
 
 //
 // Device screen structure
@@ -1402,9 +1324,8 @@ grPlot0 (
     {
         __transform_from_viewspace_to_screespace( 
             (int *) &X, (int *) &Y, x, y, z,
-            UseLeftHand, 
-            HotSpotX, 
-            HotSpotY ); 
+            UseLeftHand,
+            HotSpotX, HotSpotY ); 
     }
 
     // Se temos uma clipping window válida,
@@ -1421,6 +1342,7 @@ grPlot0 (
             w->left + (w->width /2), 
             w->top  + (w->height /2) ); 
     }
+
 
 // Draw and clipping.
 // #todo
@@ -1649,27 +1571,6 @@ void plotLine(int x0, int y0, int x1, int y1)
 */
 
 
-// Draw a not filled rectangle.
-// IN: window, (left/top), (right/bottom), color.
-void
-grLineRect4 ( 
-    struct gws_window_d *window,
-    int x1, int y1, 
-    int x2, int y2,
-    unsigned int color )
-{
-    if ( (void*)window==NULL){
-        return;
-    }
-    if(window->magic!=1234){
-        return;
-    }
-    plotLine3d (window, x1,y1,0, x2,y1,0, color);
-    plotLine3d (window, x2,y1,0, x2,y2,0, color);
-    plotLine3d (window, x2,y2,0, x1,y2,0, color);
-    plotLine3d (window, x1,y2,0, x1,y1,0, color);
-}
-
 
 /*
  * plotLine3d:  
@@ -1685,13 +1586,14 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color )
 {
+
    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
    
    //#bugbug: This macro is wrong?!
    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-
+   
    int dm = grMAX3(dx,dy,dz);
    register int i = dm;
 
@@ -1719,132 +1621,6 @@ plotLine3d (
         if (z1 < 0) 
         { z1 += dm; z0 += sz; }
     };
-}
-
-
-// print line and line tracker.
-// track the last-1 vector.
-void 
-plotLine3dLT (
-    struct gws_window_d *window,
-    int x0, int y0, int z0, 
-    int x1, int y1, int z1,
-    int *x2, int *y2, int *z2, 
-    unsigned int color )
-{
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
-   //#bugbug: This macro is wrong?!
-   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
-
-    // x1 = y1 = z1 = dm/2; /* error offset */
- 
-    x1 = (dm >> 1);
-    y1 = x1;
-    z1 = x1;
-
-    for (;;) {
-
-        grPlot0 ( window, z0, x0, y0, color );
-
-        // (n-1)?
-        if (i == 1)
-        {
-            if ( (void*) x2 != NULL ){ *x2 = x0; }
-            if ( (void*) y2 != NULL ){ *y2 = y0; }
-            if ( (void*) z2 != NULL ){ *z2 = z0; }
-            
-            break;
-        }
-
-        if (i == 0){
-            break;
-        }
-        
-        x1 -= dx; 
-        if (x1 < 0) 
-        { x1 += dm; x0 += sx; }
-        
-        y1 -= dy; 
-        if (y1 < 0) 
-        { y1 += dm; y0 += sy; }
-        
-        z1 -= dz; 
-        if (z1 < 0) 
-        { z1 += dm; z0 += sz; }
-        
-        i--;
-    };
-}
-
-
-// track a given vector.
-// OUT: the number of vectors in this line.
-int
-plotLine3dLT2 (
-    struct gws_window_d *window,
-    int x0, int y0, int z0, 
-    int x1, int y1, int z1,
-    int *x2, int *y2, int *z2, 
-    int n,   // track this vector.
-    unsigned int color,
-    int draw )
-{
-    int ResultNumberOfVectors=0;
-
-    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-
-   //#bugbug: This macro is wrong?!
-   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
-   ResultNumberOfVectors = (int) i;
-
-    // x1 = y1 = z1 = dm/2; /* error offset */
- 
-    x1 = (dm >> 1);
-    y1 = x1;
-    z1 = x1;
-
-    for (;;) {
-
-        if(draw){
-            grPlot0 ( window, z0, x0, y0, color );
-        }
-        
-        //
-        if (i == n)
-        {
-            if ( (void*) x2 != NULL ){ *x2 = x0; }
-            if ( (void*) y2 != NULL ){ *y2 = y0; }
-            if ( (void*) z2 != NULL ){ *z2 = z0; }
-            // Do not break.
-        }
-
-        // End of line.
-        if (i == 0){
-            break;
-        }
-
-        x1 -= dx;
-        if (x1 < 0) { x1 += dm; x0 += sx; }
-        y1 -= dy; 
-        if (y1 < 0) { y1 += dm; y0 += sy; }
-        z1 -= dz;
-        if (z1 < 0) { z1 += dm; z0 += sz; }
-
-        i--;
-    };
-
-    return (int) ResultNumberOfVectors;
 }
 
 
@@ -2181,32 +1957,7 @@ xxxDeflateCubeZ (
 }
 
 
-int grTriangleScale0( struct gr_triangle_d *t, int factor)
-{
-    if((void*)t==NULL)
-        return -1;
-    if(t->initialized!=TRUE)
-        return -1;
-
-    t->p[0].x *= factor;
-    t->p[0].y *= factor;
-    t->p[0].z *= factor;
-
-    t->p[1].x *= factor;
-    t->p[1].y *= factor;
-    t->p[1].z *= factor;
-
-    t->p[2].x *= factor;
-    t->p[2].y *= factor;
-    t->p[2].z *= factor;
-
-    return 0;
-}
-
-
 // Triangle
-// Draw a not filled triangle
-// using 3D parameters.
 int 
 xxxTriangleZ(
     struct gws_window_d *window, 
@@ -2239,275 +1990,6 @@ xxxTriangleZ(
         triangle->p[0].color );
 
     return 0;
-}
-
-
-
-int 
-xxxFillTriangle0(
-    struct gws_window_d *window, 
-    struct gr_triangle_d *triangle )
-{
-
-    int tmpx=0;
-    int tmpy=0;
-
-
-    if ( (void*) triangle == NULL ){
-        return -1;
-    }
-
-    if ( (void*) window == NULL ){
-        return -1;
-    }
-    if(window->magic != 1234)
-        return -1;
-
-
-// -------------------------------------------
-// Draws a not filled triangle.
-// 3d coordinates
-
-    plotLine3d (
-        window,
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[1].color );
-    plotLine3d (
-        window,
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[2].color );
-    plotLine3d (
-        window,
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[0].color );
-//-------------------------------------------
-
-    int i=0;
-    int res_lt0x=0;
-    int res_lt0y=0;
-    int res_lt0z=0;
-    int res_lt1x=0;
-    int res_lt1y=0;
-    int res_lt1z=0;
-
-    // Number of vectors.
-    int nov1=0;
-    int nov2=0;
-
-// #test
-// 3 'demãos' de tinta, porque pintar na diagonal
-// não fica tão perfeitinho quanto pintar na horizontal,
-// ou vertical.
-// Mas no futuro vamos criar alguma solução que 
-// pinte na horizontal pra ficar pefeitinho.
-
-
-//--------------------------------------------------
-// first time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           COLOR_YELLOW );
-     };
-
-//--------------------------------------------------
-// second time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           COLOR_YELLOW );
-     };
-
-//--------------------------------------------------
-// third time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           COLOR_YELLOW );
-     };
-
-
-
-/*
-//-------------------------------------------
-// deltas absolutos
-
-    // y
-    int d1 = triangle->p[0].y - triangle->p[1].y;
-    int abs_d1 = abs(d1);
-    int d2 = triangle->p[0].y - triangle->p[2].y;
-    int abs_d2 = abs(d2);
-    int abs_d1d2 = d1 + d2;
-    
-    // x
-    int d3 = triangle->p[0].x - triangle->p[1].x;
-    int abs_d3 = abs(d3);
-    int d4 = triangle->p[0].x - triangle->p[2].x;
-    int abs_d4 = abs(d4);
-    int abs_d3d4 = d3 + d4;
-
-    int tmp;
-    
-    // dy <= dx
-    if ( abs_d1d2 <= abs_d1d2 )
-    {
-        if (triangle->p[2].x < triangle->p[1].x)
-        {
-            tmp = triangle->p[2].x;
-            triangle->p[2].x = triangle->p[1].x;
-            triangle->p[1].x = tmp;
-        }
-        if (triangle->p[1].x < triangle->p[0].x)
-        {
-            tmp = triangle->p[1].x;
-            triangle->p[1].x = triangle->p[0].x;
-            triangle->p[0].x = tmp;
-        }
-
-        if (triangle->p[2].y < triangle->p[1].y)
-        {
-            tmp = triangle->p[2].y;
-            triangle->p[2].y = triangle->p[1].y;
-            triangle->p[1].y = tmp;
-        }
-        if (triangle->p[1].y < triangle->p[0].y)
-        {
-            tmp = triangle->p[1].y;
-            triangle->p[1].y = triangle->p[0].y;
-            triangle->p[0].y = tmp;
-        }
-
-        plotLine3d(
-            window,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            COLOR_WHITE );
-            
-
-    }
-    else{
-    };
-*/
-
-
-    return 0;
-}
-
-// This routine uses a crazy rasterization routine.
-int 
-xxxTriangleZ1(
-    struct gws_window_d *window, 
-    struct gr_triangle_d *triangle )
-{
-    return (int) xxxFillTriangle0(window,triangle);
 }
 
 
@@ -2896,8 +2378,10 @@ plotCircle (
       
     } while (x < 0);
 }
+   
 
 
+// ?? what means 'm' ???
 void 
 plotCircleZ ( 
     struct gws_window_d *window,
@@ -2907,148 +2391,47 @@ plotCircleZ (
     unsigned int color, 
     int z )
 {
+
     /* II. Quadrant */ 
-    //int x = -r, y = 0, err = 2-2*r; 
-
-    register int x = (int) -r;
-             int y=0;
-
-    // decrementa o diâmetro.
-    int err = (int) (2-(2*r));
-    int tmp=0;
+   //int x = -r, y = 0, err = 2-2*r; 
+   
+    //loop
+    register int x = -r;
+   
+    int y = 0;
+    int err =  (2-(2*r));
 
     do {
-
-      grPlot0 ( window, z, xm-x, ym+y, color);//d  /*   I. Quadrant */
-      grPlot0 ( window, z, xm-y, ym-x, color);//c  /*  II. Quadrant */
-      grPlot0 ( window, z, xm+x, ym-y, color);//e  /* III. Quadrant */
-      grPlot0 ( window, z, xm+y, ym+x, color);//b  /*  IV. Quadrant */
+      
+      //setPixel(xm-x, ym+y); /*   I. Quadrant */
+      //setPixel(xm-y, ym-x); /*  II. Quadrant */
+      //setPixel(xm+x, ym-y); /* III. Quadrant */
+      //setPixel(xm+y, ym+x); /*  IV. Quadrant */
+      
+      grPlot0 ( window, z, xm-x, ym+y, color);
+      grPlot0 ( window, z, xm-y, ym-x, color);
+      grPlot0 ( window, z, xm+x, ym-y, color);
+      grPlot0 ( window, z, xm+y, ym+x, color);
 
       r = err;
       
-      //e_xy+e_y < 0
-      if (r <= y) 
-      {
-           tmp = ++y * 2+1;
-           err += tmp; 
-      }
+      // #ugly routine.
       
-      // e_xy+e_x > 0 or no 2nd y-step
+      /* e_xy+e_y < 0 */
+      if (r <= y) 
+      { 
+           err += ++y * 2 + 1; 
+      }           
+      
+      /* e_xy+e_x > 0 or no 2nd y-step */
       if (r > x || err > y) 
-      {
-          tmp = ++x * 2+1;
-          err += tmp; 
+      { 
+          err += ++x * 2+1; 
       }
       
     } while (x < 0);
 }
  
-
-
-// Retorna vetor do n ponto partindo da reta data.
-// n não pode ser maior que o raio.
-// anti-horário?
-// 1=c | 2=e | 3=b | 4=d
-// OUT:
-// -1 on error | 0 if ok.
-int
-plotCircleZLT0 ( 
-    struct gws_window_d *window,
-    int xm, 
-    int ym, 
-    int r, 
-    unsigned int color, 
-    int z,
-    int axis_n,                           // qual eixo?   
-    int n,                                // number of the target pointer.
-    int *res_x, int *res_y, int *res_z,   // return vector.
-    int draw )                            // draw or not.  
-{
-    /* II. Quadrant */ 
-    //int x = -r, y = 0, err = 2-2*r; 
-
-    register int x = (int) -r;
-             int y=0;
-
-    // decrementa o diâmetro.
-    int err = (int) (2-(2*r));
-    int tmp=0;
-
-// qual eixo?
-    if( axis_n < 1 || axis_n > 4){
-        return -1;
-    }
-
-// Não pode ser maior que o raio.
-    if(n>r){
-        return -1;
-    }
-
-    if ( (void*) res_x == NULL ||
-         (void*) res_y == NULL ||
-         (void*) res_z == NULL )
-    {
-        return -1;
-    }
-
-    do {
-      // anti-horário?
-      // 1=c | 2=e | 3=b | 4=d
-      
-      if( n == (-x) )
-      {
-          if (axis_n==1){  //c
-          *res_x = (int) xm-x;
-          *res_y = (int) ym+y;
-          *res_z = (int) z;
-          }
-          if (axis_n==2){  //e
-          *res_x = (int) xm-y;
-          *res_y = (int) ym-x;
-          *res_z = (int) z;
-          }
-          if (axis_n==3){  //b
-          *res_x = (int) xm+x;
-          *res_y = (int) ym-y;
-          *res_z = (int) z;
-          }
-          if (axis_n==4){  //d
-          *res_x = (int) xm+y;
-          *res_y = (int) ym+x;
-          *res_z = (int) z;
-          }
-      }
-      
-      if (draw){
-          grPlot0 ( window, z, xm-x, ym+y, color);//c  /*   I. Quadrant */
-          grPlot0 ( window, z, xm-y, ym-x, color);//e  /*  II. Quadrant */
-          grPlot0 ( window, z, xm+x, ym-y, color);//b  /* III. Quadrant */
-          grPlot0 ( window, z, xm+y, ym+x, color);//d  /*  IV. Quadrant */
-      }
-      
-      r = err;
-      
-      //e_xy+e_y < 0
-      if (r <= y) 
-      {
-           tmp = ++y * 2+1;
-           err += tmp; 
-      }
-      
-      // e_xy+e_x > 0 or no 2nd y-step
-      if (r > x || err > y) 
-      {
-          tmp = ++x * 2+1;
-          err += tmp; 
-      }
-      
-    } while (x < 0);
-
-// ok
-    return 0;
-}
- 
-
  
 /* 
  //credits: uVGA
@@ -3298,110 +2681,6 @@ void multiply4 (int mat1[4][4], int mat2[4][4], int res[4][4])
         };
     };
 }
-
-
-// IN: matrix base.
-void grInitializematrix0 (long *r)
-{
-// Invalid buffer.
-    if ( (void*)  r == NULL ){return;}
-
-    r[0]  = (long) 1;
-    r[1]  = (long) 0;
-    r[2]  = (long) 0;
-    r[3]  = (long) 0;
-
-    r[4]  = (long) 0;
-    r[5]  = (long) 1;
-    r[6]  = (long) 0;
-    r[7]  = (long) 0;
-
-    r[8]  = (long) 0;
-    r[9]  = (long) 0;
-    r[10]  = (long) 1;
-    r[11]  = (long) 0;
-
-    r[12]  = (long) 0;
-    r[13]  = (long) 0;
-    r[14]  = (long) 0;
-    r[15]  = (long) 0;
-}
-
-
-void 
-grSetTranslation4x4 (
-    long *r,   // matrix base.
-    long *_x, long *_y, long *_z )
-{
-// Invalid buffer.
-    if ( (void*)  r == NULL ){return;}
-    if ( (void*) _x == NULL ){return;}
-    if ( (void*) _y == NULL ){return;}
-    if ( (void*) _z == NULL ){return;}
-
-    r[3]  = (long) *_x;
-    r[7]  = (long) *_y;
-    r[11] = (long) *_z;
-    r[15] = (long) 1;
-}
-
-
-//#test
-void 
-grRot4x4 (
-    long *r,   // matrix base.
-    long *_x, long *_y, long *_z )
-{
-// fixed-point
-
-    long x1=0; 
-    long y1=0; 
-    long z1=0;
-
-// Invalid buffer.
-    if ( (void*)  r == NULL ){return;}
-    if ( (void*) _x == NULL ){return;}
-    if ( (void*) _y == NULL ){return;}
-    if ( (void*) _z == NULL ){return;}
-
-    long xx = (long) *_x; 
-    long yy = (long) *_y; 
-    long zz = (long) *_z;
-
-//----------------------
-// x1
-    x1 = 
-        (long) ( (r[0] * xx) + 
-                 (r[1] * yy) + 
-                 (r[2] * zz) + 
-                  r[3] );
-    //x1 = (long) (x1 >> 32);
-
-//----------------------
-// y1
-    y1 = 
-        (long) ( (r[4] * xx) + 
-                 (r[5] * yy) + 
-                 (r[6] * zz) + 
-                  r[7] );
-    //y1 = (long) (y1 >> 32);
-
-//----------------------
-// z1
-    z1 = 
-        (long) ( (r[8]  * xx) + 
-                 (r[9]  * yy) + 
-                 (r[10] * zz) +
-                  r[11] );
-    //z1 = (long) (z1 >> 32);
-
-
-  *_x = (long) x1; 
-  *_y = (long) y1;
-  *_z = (long) z1;
-}
-
-
 
 
 int scalar_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )

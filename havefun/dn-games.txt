@@ -3,12 +3,14 @@
 	This is a funny plane.
 	A place for games, tests and hacks.
 	
-	
+----------------	
 bin/
     ...
-game1/
-    No float, no double.
-game2/
+----------------
+demo1/ and demo2/ 
+    No float or double.
+----------------
+game1/ and game2/
     Trying to use float and double stuff.
     see: math.c
  

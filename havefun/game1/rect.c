@@ -1219,7 +1219,7 @@ __drawrectangle0(
 
 
 /*
- * rectBackbufferDrawRectangle0: (API)
+ * rectBackbufferDrawRectangle: (API)
  *     Draw a rectangle on backbuffer. 
  */
 

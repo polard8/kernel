@@ -11,7 +11,6 @@ char *screen_number;
 
 int current_mode=0;
 
-//#todo
 int gUseLeftHand=TRUE;
 
 // #ordem
@@ -41,7 +40,13 @@ int use_vsync=FALSE;
 
 // unsigned long gws_pallete_16[16];
 
-long g_m4x4_buffer[16];
+
+
+
+
+
+
+
 
 
 

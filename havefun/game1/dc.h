@@ -50,9 +50,6 @@ struct dc_d
 // Buffer ?
     unsigned char *data;
 
-// Pointer to a 4x4 matrix.
-    long *m4x4_base;
-
 // z-buffer
 // Esse é o z-buffer da tela toda 
 // do dispositivo sendo descrito aqui.

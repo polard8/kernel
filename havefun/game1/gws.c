@@ -536,9 +536,8 @@ int gwsInit(void)
     gr_dc->display = (struct gws_display_d *) CurrentDisplay;
 
     //buffers
-    gr_dc->data = NULL;       // data
-    gr_dc->m4x4_base = (long *) g_m4x4_buffer;  //4x4 matric base.
-    gr_dc->depth_buf = NULL;  // z-buffer
+    gr_dc->data = NULL;
+    gr_dc->depth_buf = NULL;
 
     gr_dc->flags = 0;
     

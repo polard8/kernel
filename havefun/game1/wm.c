@@ -6346,8 +6346,9 @@ void wm_Update_TaskBar( char *string, int flush )
     };
 
 
-// String:
-// String info.
+
+// String
+// String info
 
     unsigned long string1_left = 
         (unsigned long) (taskbar_window->width - 100);
@@ -6356,6 +6357,7 @@ void wm_Update_TaskBar( char *string, int flush )
     unsigned long string_top  = ((taskbar_window->height-8) >> 1);//8 
     unsigned int string_color = COLOR_BLACK;
     size_t string_size = (size_t) strlen(string);
+
 
     char frame_counter_string[32];
     itoa(

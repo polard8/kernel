@@ -96,6 +96,8 @@ myObjects += archive_fx.o
 myObjects += archive_extra.o    
 myObjects += wm.o   
 
+myObjects += math.o   
+
 
 .PHONY: all all-c gws-link finalize clean
 
@@ -157,7 +159,11 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
 
+#test
+	cp $(LIBCOBJ)/math.o .
+
 	cp $(LIBGDOBJ)/libgd.o .
+
 
 gws-link:
 	$(LD) $(user_ldflags) -o GAME1.BIN $(myObjects)

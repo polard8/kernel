@@ -364,6 +364,32 @@ static int __CompareString(void)
 // Something is not working fine
 // when we put the name directly in the parameters field.
 // We need a pointer instead.
+    if( strncmp(prompt,"demo1",5) == 0 )
+    {
+        printf ("~ Demo 1:\n");
+        rtl_clone_and_execute("demo1.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
+
+// #todo
+// Something is not working fine
+// when we put the name directly in the parameters field.
+// We need a pointer instead.
+    if( strncmp(prompt,"demo2",5) == 0 )
+    {
+        printf ("~ Demo 2:\n");
+        rtl_clone_and_execute("demo2.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
+
+//-------
+
+// #todo
+// Something is not working fine
+// when we put the name directly in the parameters field.
+// We need a pointer instead.
     if( strncmp(prompt,"game1",5) == 0 )
     {
         printf ("~ Game 1:\n");
@@ -383,6 +409,7 @@ static int __CompareString(void)
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
+
 
 
     // ...
