@@ -1,3 +1,4 @@
-# gws - gramado window server
+# gui - The Desktop Environment.
+
 
 

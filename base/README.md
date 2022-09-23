@@ -1,4 +1,4 @@
-# Gramado kernel
+# base - The Gramado kernel
 
 This repository has the source code for:
 
