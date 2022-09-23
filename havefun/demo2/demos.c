@@ -35,6 +35,7 @@ static int __r[4][4] = {
 static void __setupCatModel(int eyes, int whiskers, int mouth );
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
 
+static void __draw_rect_based_on_circle(struct gws_window_d *window);
 
 static void __draw_demo_curve1(int position, int model_z);
 
@@ -634,6 +635,85 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
 }
 
 
+static void __draw_rect_based_on_circle(struct gws_window_d *window)
+{
+// Draw a not filled rectangle,
+// based on the radius of a circle.
+
+    int r=25;
+
+// the final rect.
+    int rectx1=0;
+    int recty1=0;
+    int rectx2=0;
+    int recty2=0;
+
+    int circlex=0;
+    int circley=0;
+    int circlez=0;
+ 
+ 
+    if( (void*) window == NULL )
+        return;
+    if(window->magic!=1234)
+        return;
+ 
+//
+// The circle. 
+// The line tracker.
+//
+
+// head com line tracker
+    int res_x=0; int res_y=0; int res_z=0;
+
+// qual eixo?
+    int i=1;  // iterate: 1~4.
+// qual ponto?
+    int j=1;
+
+    for(i=1; i<5; i++)
+    {
+        // IN: x,y,r,color,z, n, return xyz, draw.
+        plotCircleZLT0 ( 
+            window,                  // clipping window.
+            circlex + 0,             // Circle x
+            circley + 12,            // Circle y
+            r,                       // r
+            GRCOLOR_LIGHTBLACK,      //color 
+            circlez,                 // Circle z
+            i,                       // (1~4). Qual eixo?
+            j,                       // n Qual ponto?
+            &res_x, &res_y, &res_z,  //return vector
+            TRUE );                 // Do not draw
+
+        // c
+        if(i==1){
+            recty1 = (int) res_y;  //top 
+        }
+        // e
+        if(i==2){
+            rectx1 = (int) res_x;  //left
+        }
+        // b
+        if(i==3){
+            recty2 = (int) res_y;  //bottom 
+        }
+        // d
+        if(i==4){
+            rectx2 = (int) res_x;  //right
+        }
+    };
+
+// Draw a not filled rectangle.
+// IN: window, (left/top), (right/bottom), color.
+    grLineRect4 ( 
+        window,
+        rectx1, recty1,    //top/left 
+        rectx2, recty2,    //right/bottom
+        COLOR_RED );
+}
+
+
 //worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
@@ -1220,6 +1300,10 @@ void demoTriangle(void)
         //#test: draw a rectangle
         // IN: window, (left/top), (right/bottom), color.
         //grLineRect4(dw, -8,8, 12,-12, COLOR_WHITE );
+        
+        //#test: Draw a not filled rectangle, 
+        // based on the radius of a circle.
+        __draw_rect_based_on_circle(dw);
         
         demoFlushSurface(dw);                 // flush surface
         for(j=0; j<800; j++){ rtl_yield(); }  // wait
