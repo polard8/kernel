@@ -718,6 +718,8 @@ static void __draw_rect_based_on_circle(struct gws_window_d *window)
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
 
+    int UseBMP=TRUE;
+
     // object window
     struct gws_window_d *ow;
     ow = NULL;
@@ -755,7 +757,6 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         GRCOLOR_LIGHTBLACK,  //color 
         model_z );   // z 
 
-
 /*
  // head com line tracker
     int res_x=0; int res_y=0; int res_z=0;
@@ -772,6 +773,32 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         &res_x, &res_y, &res_z,               //return vector
         TRUE );  //draw
 */
+
+
+//------------
+// #test: put a bmp texture.
+/*
+    int bmp_res_x=0;
+    int bmp_res_y=0;
+    if(UseBMP==TRUE)
+    {
+        __transform_from_viewspace_to_screespace(
+            &bmp_res_x, &bmp_res_y,
+            model_x + 0, model_y + 12, model_z,
+            TRUE,  // left hand
+            ow->left + (ow->width /2),
+            ow->top  + (ow->height /2) );
+        //#bugbug: Respect the screen limits.
+        // IN: id,x,y
+        if ( bmp_res_x>0 && bmp_res_x<800 && 
+             bmp_res_y>0 && bmp_res_y<600)
+        {
+            gwssrv_display_system_icon( (int) 1, bmp_res_x, bmp_res_y );
+        }
+    }
+*/
+//------------
+
 
 // eyes
     if ( CatModel.eyesVisible == TRUE )

@@ -452,6 +452,16 @@ struct gr_bitmap_d
 // ===========================================
 //
 
+
+
+int 
+__transform_from_viewspace_to_screespace(
+    int *res_x,
+    int *res_y,
+    int _x, int _y, int _z,
+    int left_hand,
+    int _hotspotx, int _hotspoty );
+
 // matrix
 
 /*

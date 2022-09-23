@@ -118,14 +118,6 @@ static unsigned long HotSpotY=0;
 //static unsigned long WindowHotSpotY=0;
 
 
-static int 
-__transform_from_viewspace_to_screespace(
-    int *res_x,
-    int *res_y,
-    int _x, int _y, int _z,
-    int left_hand,
-    int _hotspotx, int _hotspoty );
-    
 // =============================
 
 /*
@@ -886,7 +878,7 @@ gwsDepthRange(
 // OUT: 
 // Return the 2D screen coordinates in res_x and res_y.
 
-static int 
+int 
 __transform_from_viewspace_to_screespace(
     int *res_x,
     int *res_y,

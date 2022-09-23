@@ -15,6 +15,12 @@ struct cat_model_d
     int eyesVisible;
     int whiskersVisible;
     int mouthVisible;
+
+    unsigned int head_color;
+    unsigned int eye_color;
+    unsigned int whisker_color;
+    unsigned int mouth_color;
+
     // ...
 };
 struct cat_model_d CatModel;

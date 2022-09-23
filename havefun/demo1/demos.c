@@ -631,6 +631,11 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
     CatModel.eyesVisible     = eyes;
     CatModel.whiskersVisible = whiskers;
     CatModel.mouthVisible    = mouth;
+
+    CatModel.head_color    = COLOR_YELLOW;
+    CatModel.eye_color     = COLOR_BLUE;
+    CatModel.whisker_color = COLOR_WHITE;
+    CatModel.mouth_color   = COLOR_RED;
 }
 
 
@@ -638,7 +643,7 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
 
-    // object window
+// Object window.
     struct gws_window_d *ow;
     ow = NULL;
     //#todo
@@ -647,7 +652,6 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
        if(__demo_window->magic==1234)
         ow = __demo_window;
     }
-
 
 
 // model
@@ -672,9 +676,8 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         model_x + 0,    //x
         model_y + 12,   //y
         25,   //r
-        GRCOLOR_LIGHTBLACK,  //color 
-        model_z );   // z 
-
+        CatModel.head_color,     //color 
+        model_z );      // z 
 
 /*
  // head com line tracker
@@ -685,7 +688,7 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         model_x + 0,    //x
         model_y + 12,   //y
         25,   //r
-        GRCOLOR_LIGHTBLACK,  //color 
+        CatModel.head_color,  //color 
         model_z,             //z
         4,                   // (1~4). Qual eixo?
         1,                   //n
@@ -701,14 +704,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             eye1_x, 
             eye1_y, 
             eye_radius, 
-            GRCOLOR_LIGHTBLACK, 
+            CatModel.eye_color, 
             model_z );  //z 
         plotCircleZ ( 
             ow,
             eye2_x, 
             eye2_y, 
             eye_radius, 
-            GRCOLOR_LIGHTBLACK, 
+            CatModel.eye_color, 
             model_z );  //z 
     }
 
@@ -719,34 +722,34 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             ow,
             model_x -40, model_y +8, model_z, 
             model_x -4,  model_y +5, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
         plotLine3d ( 
             ow,
             model_x -40, model_y +5, model_z, 
             model_x -4,  model_y +4, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
         plotLine3d ( 
             ow,
             model_x -40, model_y +2, model_z, 
             model_x -4,  model_y +3, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
 
         // =
         plotLine3d ( 
             ow,
             model_x + 4,  model_y +5, model_z, 
             model_x + 40, model_y +8, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
         plotLine3d ( 
             ow,
             model_x + 4,  model_y +4, model_z, 
             model_x + 40, model_y +5, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
         plotLine3d ( 
             ow,
             model_x + 4,  model_y +3, model_z, 
             model_x + 40, model_y +2, model_z, 
-            GRCOLOR_LIGHTBLACK); 
+            CatModel.whisker_color); 
     }
 
 // mouth
@@ -756,7 +759,7 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             ow,
             model_x -10, model_y -2, model_z, 
             model_x +10, model_y -2, model_z, 
-             GRCOLOR_LIGHTBLACK); 
+            CatModel.mouth_color); 
 
        unveil_camera ( model_x, model_y, model_z );
        //unveil_camera ( res_x, res_y, res_z );
@@ -813,7 +816,8 @@ void demoCat (void)
         for (i=0; i<scale_max; i++)
         {
             validate_background();                 //begin paint
-            demoClearSurface(dw,GRCOLOR_LIGHTCYAN);   // Clear surface
+            //demoClearSurface(dw,GRCOLOR_LIGHTCYAN);   // Clear surface
+            demoClearSurface(dw,COLOR_BLACK);
             // IN: eye scale, x,y,z
             __draw_cat(1,0,0,i);
             demoFlushSurface(dw);

@@ -542,15 +542,11 @@ bmpDisplayBMP (
     xLimit = 800;
     yLimit = 600;
 
-// #debug:
-    //gwssrv_debug_print ("bmpDisplayBMP:\n");
-
-// Limits.
-    if ( x > xLimit || 
-         y > yLimit )
+// Limits
+    if ( x > xLimit || y > yLimit )
     {
-        gwssrv_debug_print ("bmpDisplayBMP: Limits \n");
-        printf             ("bmpDisplayBMP: Limits \n");
+        gwssrv_debug_print ("bmpDisplayBMP: Limits\n");
+        printf             ("bmpDisplayBMP: Limits\n");
         goto fail;
     }
 
@@ -558,8 +554,8 @@ bmpDisplayBMP (
 // Testar validade do endereço.
     if ( address == 0 )
     {
-        gwssrv_debug_print ("bmpDisplayBMP: address fail \n");
-        printf             ("bmpDisplayBMP: address fail \n");
+        gwssrv_debug_print ("bmpDisplayBMP: address fail\n");
+        printf             ("bmpDisplayBMP: address fail\n");
         goto fail;
     }
 
@@ -999,8 +995,8 @@ done:
     return 0;
 
 fail:
-    gwssrv_debug_print ("bmpDisplayBMP: Fail \n");
-    printf             ("bmpDisplayBMP: Fail \n");
+    gwssrv_debug_print ("bmpDisplayBMP: Fail\n");
+    printf             ("bmpDisplayBMP: Fail\n");
     return (int) 1;
     //return (int) -1;
 }
@@ -1135,23 +1131,19 @@ gwssrv_display_system_icon (
     unsigned long x, 
     unsigned long y )
 {
-
     int RefreshScreen= FALSE;
 
-    // Shared memory
-    // Um endereço compartilhado onde o ícone
-    // foi carregado pelo kernel.
-
+// Shared memory
+// Um endereço compartilhado onde o ícone
+// foi carregado pelo kernel.
     char *sm_buffer;
 
 // #todo: 
 // limits for x and y.
-
     unsigned long bmp_x = (x & 0xFFFF);
     unsigned long bmp_y = (y & 0xFFFF);
 
 // Get buffer address.
-
     sm_buffer = (char *) __get_system_icon(index);
     //sm_buffer = __get_system_icon(2);
     // ...
@@ -1186,7 +1178,7 @@ gwssrv_display_system_icon (
         gws_show_backbuffer();
         
         //return -1;
-        while(1);
+        while(1){}
     }
 
 // Check BM header. Again.
