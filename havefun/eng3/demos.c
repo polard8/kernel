@@ -32,7 +32,7 @@ static int __r[4][4] = {
 */
 
 
-static void __setupCatModel(int eyes, int whiskers, int mouth );
+
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
 
 
@@ -49,9 +49,18 @@ __create_demo_window (
 //======================
 
 
+void gr_embedded_setup(void)
+{
+    __setupCatModel(TRUE,TRUE,TRUE);
+}
 
-struct gws_window_d *
-__create_demo_window (
+void gr_embedded_draw(void)
+{
+    demoCat();
+}
+
+
+struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
     unsigned long width,
@@ -547,7 +556,8 @@ void demoFlushSurface(struct gws_window_d *clipping_window)
         0, 0, 320, 200 );
 }
 
-static void __setupCatModel(int eyes, int whiskers, int mouth )
+
+void __setupCatModel(int eyes, int whiskers, int mouth )
 {
     CatModel.eyesVisible     = eyes;
     CatModel.whiskersVisible = whiskers;

@@ -83,7 +83,7 @@ WS_INCLUDES_LOCAL = .
 # Objects
 #
 
-myObjects = crt0.o main.o rtl.o \
+myObjects = main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
@@ -166,10 +166,13 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 
 
 gws-link:
-	$(LD) $(user_ldflags) -o GAME2.BIN $(myObjects)
+	#$(LD) $(user_ldflags) -o GAME1.BIN $(myObjects)
+	$(LD) -r -o eng3.o $(myObjects)
 finalize:
-	cp GAME2.BIN  ../bin
+	#cp GAME1.BIN  ../bin
 clean:
+	#-rm *.o
+	#-rm GAME1.BIN 
+clean2:
 	-rm *.o
-	-rm GAME2.BIN 
 	

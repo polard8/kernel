@@ -3350,10 +3350,8 @@ static int InitHot(void)
         current_mode == GRAMADO_P1 ||
         current_mode == GRAMADO_HOME)
     {
-         demoModel1();
-         
+         //demoModel1();
          //demo34567();
-         
          //demos_startup_animation(1); //sa
          //demos_startup_animation(2); //fred0
          //demos_startup_animation(3); //fred1
@@ -3362,15 +3360,15 @@ static int InitHot(void)
          //demos_startup_animation(6);
          //demos_startup_animation(7);  //curve
          //demos_startup_animation(8);
-         demos_startup_animation(9);  //cat
-         demos_startup_animation(10); //triangle
+         //demos_startup_animation(9);  //cat
+         //demos_startup_animation(10); //triangle
          //demos_startup_animation(11);
          //demos_startup_animation(12);
          //demos_startup_animation(13);
          //demos_startup_animation(14);  //polygon
          //demos_startup_animation(15);
          // again
-         wm_Update_TaskBar("Welcome :)",TRUE);
+         //wm_Update_TaskBar("Welcome :)",TRUE);
     }
 
 // ok, no errors.
@@ -3801,12 +3799,16 @@ static int on_execute(void)
     window_server->status = STATUS_RUNNING;
     window_server->initialized = TRUE;
 
+    gr_setup();
+
     while (running == TRUE){
 
         if (IsTimeToQuit == TRUE){
             break;
         };
-        
+
+        gr_draw();
+
         // Messages
         // read only one valid message from 
         // thread's message queue.
@@ -3894,7 +3896,7 @@ static inline void __outb(uint16_t port, uint8_t val)
 
 
 // main: entry point
-int main (int argc, char **argv)
+int eng4_main (int argc, char **argv)
 {
     int Status=-1;
 

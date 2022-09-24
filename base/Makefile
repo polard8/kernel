@@ -228,10 +228,12 @@ exposed-tier:
 	-sudo cp ../gui/beige/bin/CMDLINE.BIN      control/disk/
 	-sudo cp ../gui/attitude/bin/BROWSER.BIN   control/disk/
 #havefun
-	-sudo cp ../havefun/bin/DEMO1.BIN   control/disk/
-	-sudo cp ../havefun/bin/DEMO2.BIN   control/disk/
-	-sudo cp ../havefun/bin/GAME1.BIN   control/disk/
-	-sudo cp ../havefun/bin/GAME2.BIN   control/disk/
+#todo: Add the games and demos, not the engines.
+	-sudo cp ../havefun/bin/*.BIN   control/disk/
+#	-sudo cp ../havefun/bin/DEMO1.BIN   control/disk/
+#	-sudo cp ../havefun/bin/DEMO2.BIN   control/disk/
+#	-sudo cp ../havefun/bin/GAME1.BIN   control/disk/
+#	-sudo cp ../havefun/bin/GAME2.BIN   control/disk/
 	
 #===================================================
 #::2

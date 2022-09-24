@@ -15,6 +15,12 @@ struct cat_model_d
     int eyesVisible;
     int whiskersVisible;
     int mouthVisible;
+
+    unsigned int head_color;
+    unsigned int eye_color;
+    unsigned int whisker_color;
+    unsigned int mouth_color;
+
     // ...
 };
 struct cat_model_d CatModel;
@@ -23,6 +29,17 @@ struct cat_model_d CatModel;
 //
 // == Prototypes ===============
 //
+
+// This functions belongs to the demo.c file in other project.
+void gr_setup(void);
+void gr_draw(void);
+
+void gr_embedded_setup(void);
+void gr_embedded_draw(void);
+
+
+// #this is the default demo called by main.
+void __setupCatModel(int eyes, int whiskers, int mouth );
 
 void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color);
 void demoFlushSurface(struct gws_window_d *clipping_window);

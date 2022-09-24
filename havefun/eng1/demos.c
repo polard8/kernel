@@ -30,10 +30,7 @@ static int __r[4][4] = {
         };
 */
 
-
-static void __setupCatModel(int eyes, int whiskers, int mouth );
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
-
 
 static void __draw_demo_curve1(int position, int model_z);
 
@@ -49,6 +46,18 @@ __create_demo_window (
 void __change_triangle( struct gr_triangle_d *triangle, int direction );
 
 //======================
+
+
+
+void gr_embedded_setup(void)
+{
+    __setupCatModel(TRUE,TRUE,TRUE);
+}
+
+void gr_embedded_draw(void)
+{
+    demoCat();
+}
 
 
 void __change_triangle( struct gr_triangle_d *triangle, int direction )
@@ -639,7 +648,8 @@ void demoFlushSurface(struct gws_window_d *clipping_window)
         0, 0, 320, 200 );
 }
 
-static void __setupCatModel(int eyes, int whiskers, int mouth )
+// global
+void __setupCatModel(int eyes, int whiskers, int mouth )
 {
     CatModel.eyesVisible     = eyes;
     CatModel.whiskersVisible = whiskers;
@@ -652,7 +662,6 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
 }
 
 
-//worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
 // Distance changes the color.

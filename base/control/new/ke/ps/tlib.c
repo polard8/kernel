@@ -18,10 +18,9 @@
 
 void *sys_get_message(unsigned long ubuf)
 {
-    struct thread_d *t;
-    struct msg_d *m;
-
     unsigned long *message_address = (unsigned long *) ubuf;
+    register struct thread_d *t;
+    register struct msg_d *m;
 
 // buffer
 // #todo: Check some other invalid address.
@@ -131,10 +130,9 @@ void *sys_get_message2(
     int index, 
     int restart)
 {
-    struct thread_d *t;
-    struct msg_d *m;
-
     unsigned long *message_address = (unsigned long *) ubuf;
+    register struct thread_d *t;
+    register struct msg_d *m;
 
 // buffer
 // #todo: Check some other invalid address.

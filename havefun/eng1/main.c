@@ -3350,7 +3350,7 @@ static int InitHot(void)
         current_mode == GRAMADO_P1 ||
         current_mode == GRAMADO_HOME)
     {
-         demoModel1();
+         //demoModel1();
          //demo34567();
          //demos_startup_animation(1); //sa
          //demos_startup_animation(2); //fred0
@@ -3368,7 +3368,7 @@ static int InitHot(void)
          //demos_startup_animation(14);  //polygon
          //demos_startup_animation(15); //polygon
          // again
-         wm_Update_TaskBar("Welcome :)",TRUE);
+         //wm_Update_TaskBar("Welcome :)",TRUE);
     }
 
 // ok, no errors.
@@ -3799,11 +3799,19 @@ static int on_execute(void)
     window_server->status = STATUS_RUNNING;
     window_server->initialized = TRUE;
 
+    // Set up the scene
+    // This function belongs to the demo.c file in other project.
+    gr_setup();
+
     while (running == TRUE){
 
         if (IsTimeToQuit == TRUE){
             break;
         };
+
+        // draw the scene.
+        // This function belongs to the demo.c file in other project.
+        gr_draw();
         
         // Messages
         // read only one valid message from 
@@ -3892,7 +3900,7 @@ static inline void __outb(uint16_t port, uint8_t val)
 
 
 // main: entry point
-int main (int argc, char **argv)
+int eng1_main (int argc, char **argv)
 {
     int Status=-1;
 

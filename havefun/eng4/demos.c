@@ -32,10 +32,9 @@ static int __r[4][4] = {
 */
 
 
-static void __setupCatModel(int eyes, int whiskers, int mouth );
+
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
 
-static void __draw_rect_based_on_circle(struct gws_window_d *window);
 
 static void __draw_demo_curve1(int position, int model_z);
 
@@ -47,91 +46,23 @@ __create_demo_window (
     unsigned long top,
     unsigned long width,
     unsigned long height );
-
-void __change_triangle( struct gr_triangle_d *triangle, int direction );
-
 //======================
 
 
-void __change_triangle( struct gr_triangle_d *triangle, int direction )
+
+void gr_embedded_setup(void)
 {
-    long setx = 2;
-    long sety = 2;
-    long setz = 1;
-    long tx = 0;
-    long ty = 0;
-    long tz = 0;
+    __setupCatModel(TRUE,TRUE,TRUE);
+}
 
-
-    if ( (void*) triangle == NULL )
-        return;
-
-    if(triangle->initialized!=TRUE)
-        return;
-
-            // translation
-            //triangle->p[0].x++;
-            //triangle->p[1].x++;
-            //triangle->p[2].x++;
-
-            //random triangle
-            //srand(i);
-            //triangle->p[0].x = (int) ( rand() & 0x3F );
-            //triangle->p[1].x = (int) ( rand() & 0x3F );
-            //triangle->p[2].x = (int) ( rand() & 0x3F );
-            //triangle->p[0].y = (int) ( rand() & 0x3F );
-            //triangle->p[1].y = (int) ( rand() & 0x3F );
-            //triangle->p[2].y = (int) ( rand() & 0x3F );
-            //triangle->p[0].z = (int) ( rand() & 0x3F );
-            //triangle->p[1].z = (int) ( rand() & 0x3F );
-            //triangle->p[2].z = (int) ( rand() & 0x3F );
-
-
-    grInitializematrix0((long *) g_m4x4_buffer);
-
-    // add
-    setx = -1; sety = -1; setz = 0; // default
-    if (direction == 1){
-        setx = -1; sety = -1; setz = 0;
-    }
-    if (direction == 2){
-        setx = 1; sety = 1; setz = 0;
-    }
- 
-    grSetTranslation4x4(
-       (long *) g_m4x4_buffer, &setx, &sety, &setz );
-
-    tx = (long) (triangle->p[0].x & 0xFFFFFFFF);
-    ty = (long) (triangle->p[0].y & 0xFFFFFFFF);
-    tz = (long) (triangle->p[0].z & 0xFFFFFFFF);
-    grRot4x4(
-        (long *) g_m4x4_buffer, &tx, &ty, &tz );
-    triangle->p[0].x = (int) (tx & 0xFFFFFFFF);
-    triangle->p[0].y = (int) (ty & 0xFFFFFFFF);
-    triangle->p[0].z = (int) (tz & 0xFFFFFFFF);
-
-    tx = (long) (triangle->p[1].x & 0xFFFFFFFF);
-    ty = (long) (triangle->p[1].y & 0xFFFFFFFF);
-    tz = (long) (triangle->p[1].z & 0xFFFFFFFF);
-    grRot4x4(
-        (long *) g_m4x4_buffer, &tx, &ty, &tz );
-    triangle->p[1].x = (int) (tx & 0xFFFFFFFF);
-    triangle->p[1].y = (int) (ty & 0xFFFFFFFF);
-    triangle->p[1].z = (int) (tz & 0xFFFFFFFF);
-
-    tx = (long) (triangle->p[2].x & 0xFFFFFFFF);
-    ty = (long) (triangle->p[2].y & 0xFFFFFFFF);
-    tz = (long) (triangle->p[2].z & 0xFFFFFFFF);
-    grRot4x4(
-        (long *) g_m4x4_buffer, &tx, &ty, &tz );
-    triangle->p[2].x = (int) (tx & 0xFFFFFFFF);
-    triangle->p[2].y = (int) (ty & 0xFFFFFFFF);
-    triangle->p[2].z = (int) (tz & 0xFFFFFFFF);
+void gr_embedded_draw(void)
+{
+    demoCat();
 }
 
 
-struct gws_window_d *
-__create_demo_window (
+
+struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
     unsigned long width,
@@ -627,7 +558,8 @@ void demoFlushSurface(struct gws_window_d *clipping_window)
         0, 0, 320, 200 );
 }
 
-static void __setupCatModel(int eyes, int whiskers, int mouth )
+
+void __setupCatModel(int eyes, int whiskers, int mouth )
 {
     CatModel.eyesVisible     = eyes;
     CatModel.whiskersVisible = whiskers;
@@ -635,90 +567,9 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
 }
 
 
-static void __draw_rect_based_on_circle(struct gws_window_d *window)
-{
-// Draw a not filled rectangle,
-// based on the radius of a circle.
-
-    int r=25;
-
-// the final rect.
-    int rectx1=0;
-    int recty1=0;
-    int rectx2=0;
-    int recty2=0;
-
-    int circlex=0;
-    int circley=0;
-    int circlez=0;
- 
- 
-    if( (void*) window == NULL )
-        return;
-    if(window->magic!=1234)
-        return;
- 
-//
-// The circle. 
-// The line tracker.
-//
-
-// head com line tracker
-    int res_x=0; int res_y=0; int res_z=0;
-
-// qual eixo?
-    int i=1;  // iterate: 1~4.
-// qual ponto?
-    int j=1;
-
-    for(i=1; i<5; i++)
-    {
-        // IN: x,y,r,color,z, n, return xyz, draw.
-        plotCircleZLT0 ( 
-            window,                  // clipping window.
-            circlex + 0,             // Circle x
-            circley + 12,            // Circle y
-            r,                       // r
-            GRCOLOR_LIGHTBLACK,      //color 
-            circlez,                 // Circle z
-            i,                       // (1~4). Qual eixo?
-            j,                       // n Qual ponto?
-            &res_x, &res_y, &res_z,  //return vector
-            TRUE );                 // Do not draw
-
-        // c
-        if(i==1){
-            recty1 = (int) res_y;  //top 
-        }
-        // e
-        if(i==2){
-            rectx1 = (int) res_x;  //left
-        }
-        // b
-        if(i==3){
-            recty2 = (int) res_y;  //bottom 
-        }
-        // d
-        if(i==4){
-            rectx2 = (int) res_x;  //right
-        }
-    };
-
-// Draw a not filled rectangle.
-// IN: window, (left/top), (right/bottom), color.
-    grLineRect4 ( 
-        window,
-        rectx1, recty1,    //top/left 
-        rectx2, recty2,    //right/bottom
-        COLOR_RED );
-}
-
-
 //worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
-
-    int UseBMP=TRUE;
 
     // object window
     struct gws_window_d *ow;
@@ -746,8 +597,6 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 //---
 
 // head
-
-//original
 // IN: x,y,r,color,z
     plotCircleZ ( 
         ow,
@@ -756,49 +605,6 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         25,   //r
         GRCOLOR_LIGHTBLACK,  //color 
         model_z );   // z 
-
-/*
- // head com line tracker
-    int res_x=0; int res_y=0; int res_z=0;
-// IN: x,y,r,color,z, n, return xyz, draw.
-    plotCircleZLT0 ( 
-        ow,
-        model_x + 0,    //x
-        model_y + 12,   //y
-        25,   //r
-        GRCOLOR_LIGHTBLACK,  //color 
-        model_z,             //z
-        4,                   // (1~4). Qual eixo?
-        1,                   //n
-        &res_x, &res_y, &res_z,               //return vector
-        TRUE );  //draw
-*/
-
-
-//------------
-// #test: put a bmp texture.
-/*
-    int bmp_res_x=0;
-    int bmp_res_y=0;
-    if(UseBMP==TRUE)
-    {
-        __transform_from_viewspace_to_screespace(
-            &bmp_res_x, &bmp_res_y,
-            model_x + 0, model_y + 12, model_z,
-            TRUE,  // left hand
-            ow->left + (ow->width /2),
-            ow->top  + (ow->height /2) );
-        //#bugbug: Respect the screen limits.
-        // IN: id,x,y
-        if ( bmp_res_x>0 && bmp_res_x<800 && 
-             bmp_res_y>0 && bmp_res_y<600)
-        {
-            gwssrv_display_system_icon( (int) 1, bmp_res_x, bmp_res_y );
-        }
-    }
-*/
-//------------
-
 
 // eyes
     if ( CatModel.eyesVisible == TRUE )
@@ -864,9 +670,8 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             model_x -10, model_y -2, model_z, 
             model_x +10, model_y -2, model_z, 
              GRCOLOR_LIGHTBLACK); 
-
-       unveil_camera ( model_x, model_y, model_z );
-       //unveil_camera ( res_x, res_y, res_z );
+    
+        unveil_camera ( -10, -2, model_z );
     }
 //---
 }
@@ -913,6 +718,15 @@ void demoCat (void)
 // Setup model
 // eyes, whiskers, mouth
     __setupCatModel(TRUE,TRUE,TRUE);
+
+
+
+// #test
+// Testing fpu
+    //long r9 = (long) power4(9,3);
+    //printf("9^3 = %d\n",(long)r9);
+    //while(1){}
+
 
 // Loop
     while (count>0)
@@ -1254,6 +1068,7 @@ void demoTriangle(void)
 
     int line_size = 40;
 
+
 // Create the triangle.
     triangle = (void *) malloc( sizeof( struct gr_triangle_d ) );
     if ( (void*) triangle == NULL )
@@ -1261,26 +1076,6 @@ void demoTriangle(void)
     triangle->used = TRUE;
     triangle->magic = 1234;
     triangle->initialized = FALSE;
-
-/*
-//original
-// down
-    triangle->p[0].x = 0; 
-    triangle->p[0].y = 0;
-    triangle->p[0].z = 0;
-    triangle->p[0].color = COLOR_RED;
-// right
-    triangle->p[1].x = (line_size>>1); 
-    triangle->p[1].y = (line_size>>1);
-    triangle->p[1].z =  0;
-    triangle->p[1].color = COLOR_GREEN;
-// left
-    triangle->p[2].x = -(line_size>>1);
-    triangle->p[2].y =  (line_size>>1);
-    triangle->p[2].z =   0;
-    triangle->p[2].color = COLOR_BLUE;
-*/
-
 // down
     triangle->p[0].x = 0; 
     triangle->p[0].y = 0;
@@ -1299,121 +1094,30 @@ void demoTriangle(void)
 
     triangle->initialized = TRUE;
 
-
-    //grTriangleScale0(triangle,2); // bigger
-
     int i=0;
     int j=0;
-    int max = 400; //150;
-    int direction=1; //1 and 2.
+    int max = 150;
+    //int T=0;
 
     for(i=0; i<max; i++)
     {
-        demoClearSurface(dw,COLOR_BLACK);  // clear surface.
-        if( (i%40) == 0 )
-        {
-            if(direction == 1){
-                direction = 2;
-            }else if(direction == 2){
-                direction=1;
-            };
-        }
-        // Change the triangle values.
-        __change_triangle(triangle,direction);
-        
-        // #test: weak rasterization.
-        xxxFillTriangle0(dw,triangle);
-        
-        //#test: draw a rectangle
-        // IN: window, (left/top), (right/bottom), color.
-        //grLineRect4(dw, -8,8, 12,-12, COLOR_WHITE );
-        
-        //#test: Draw a not filled rectangle, 
-        // based on the radius of a circle.
-        __draw_rect_based_on_circle(dw);
-        
-        demoFlushSurface(dw);                 // flush surface
-        for(j=0; j<800; j++){ rtl_yield(); }  // wait
+        // clear
+        demoClearSurface(dw,COLOR_BLACK);
+        // Draw a lot of triangles.
+        //for(j=0; j<max; j++)
+        //{
+            // translation
+            triangle->p[0].x++;
+            triangle->p[1].x++;
+            triangle->p[2].x++;
+            xxxTriangleZ(dw,triangle);
+        //};
+
+        // flush surface
+        demoFlushSurface(dw);
+        rtl_yield();
+        //T++;
     };
-}
-
-//#todo:
-void from_vector_list ( unsigned long list_address, int n );
-void from_vector_list ( unsigned long list_address, int n )
-{
-// triangle support
-    int tt=0;
-    int count=0;
-    int Offset=0;
-    struct gr_triangle_d t;
-    struct gr_vec3D_d *tmpvec;
-
-    /*
-    //#ok: it's working
-    // #test: triangle
-    t.p[0].x = v0->x;
-    t.p[0].y = v0->y; 
-    t.p[0].z = v0->z;
-    t.p[0].color = COLOR_YELLOW; 
-    t.p[1].x = v1->x;
-    t.p[1].y = v1->y;
-    t.p[1].z = v1->z;
-    t.p[1].color = COLOR_YELLOW;
-    t.p[2].x = v2->x;
-    t.p[2].y = v2->y;
-    t.p[2].z = v2->z;
-    t.p[2].color = COLOR_YELLOW;
-    t.used = TRUE;
-    t.magic = 1234;
-    t.initialized = TRUE;
-    xxxTriangleZ1(__root_window, &t);
-    */
-
-/*
-    //maximo de vetores na lista,
-    //mas nem todos são válidos.
-    for(tt=0; tt<2; tt++)
-    {
-        count=0;
-        Offset = (tt*3);
-        if( Offset >= MaxVector){break;}
-        if( Offset >= p->n)     {break;}
-        tmpvec = (void*) vecList[Offset+0];
-        if ( (void*) tmpvec != NULL )
-        {
-            t.p[0].x = tmpvec->x;
-            t.p[0].y = tmpvec->y; 
-            t.p[0].z = tmpvec->z;
-            t.p[0].color = COLOR_YELLOW; 
-            count=1;
-        }
-        tmpvec = (void*) vecList[Offset+1];
-        if ( (void*) tmpvec != NULL )
-        {
-            t.p[1].x = tmpvec->x;
-            t.p[1].y = tmpvec->y; 
-            t.p[1].z = tmpvec->z;
-            t.p[1].color = COLOR_YELLOW; 
-            count=2;
-        }
-        tmpvec = (void*) vecList[Offset+2];
-        if ( (void*) tmpvec != NULL )
-        {
-            t.p[2].x = tmpvec->x;
-            t.p[2].y = tmpvec->y; 
-            t.p[2].z = tmpvec->z;
-            t.p[2].color = COLOR_YELLOW; 
-            count=3;
-        }
-        if(count==3){
-            t.used = TRUE;
-            t.magic = 1234;
-            t.initialized = TRUE;
-            xxxTriangleZ1(__root_window, &t);
-        }
-    };
-*/
-
 }
 
 // demo: polygon type polyline
@@ -1421,10 +1125,7 @@ void from_vector_list ( unsigned long list_address, int n )
 void demoPolygon(void)
 {
     struct gr_polygon_d *p;
-    
-    int MaxVector = 8;
-    
-    unsigned long vecList[MaxVector];
+    unsigned long vecList[8];
     
     struct gr_vec3D_d *v0;
     struct gr_vec3D_d *v1;
@@ -1448,15 +1149,15 @@ void demoPolygon(void)
     p->type = POLYGON_POLYLINE;
     
     // number of elements
+    
     p->n = 6;
-
     p->list_address = (void*) vecList;
 
 
 // clear vecList.
 // This is a local list.
 
-    for(i=0; i<MaxVector; i++){
+    for(i=0; i<8; i++){
         vecList[i] = 0;
     };
 
@@ -1485,7 +1186,6 @@ void demoPolygon(void)
     vecList[4] = (unsigned long) v4;
     vecList[5] = (unsigned long) v0;  //circular
 
-//------------------
 
 //
 // loop
@@ -1541,7 +1241,6 @@ void demoPolygon(void)
 
 // Draw
     xxxPolygonZ(p);
-
 // Show
     demoFlushSurface(NULL);  
     

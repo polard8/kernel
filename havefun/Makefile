@@ -7,11 +7,14 @@ all:
 	make -C libs/rtl
 	make -C libs/libgws
 	make -C libs/libgd
-	make -C demo1
-	make -C demo2
-	make -C game1
-	make -C game2
-	
+
+	make -C eng1
+	make -C eng2
+	make -C eng3
+	make -C eng4
+
+	make -C demos
+
 clean-all:
 	-rm -f libs/libgd/obj/*.o
 	-rm -f libs/libgws/obj/*.o

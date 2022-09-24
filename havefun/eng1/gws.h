@@ -187,6 +187,8 @@ unsigned long next_response[32];
 // prototypes =============================
 //
 
+int eng1_main (int argc, char **argv);
+
 void invalidate(void);
 void validate(void);
 int isdirty(void);

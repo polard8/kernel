@@ -354,12 +354,11 @@ rtl_post_system_message(
 
 int xxxScanApplicationQueue(void)
 {
-    int i=0;
+    register int i=0;
 
     for(i=0; i<32; i++){
         RTLEventBuffer[i] = 0;
     };
-
 
 // Get event from the thread's event queue.
 
@@ -423,7 +422,7 @@ int rtl_get_event(void)
 
 int xxxScanApplicationQueue2(int index, int restart)
 {
-    int i=0;
+    register int i=0;
 
     for(i=0; i<32; i++){
         RTLEventBuffer[i] = 0;
@@ -467,7 +466,11 @@ int xxxScanApplicationQueue2(int index, int restart)
 int rtl_get_event2(int index, int restart)
 {
     int Status = -1;
-    
+
+    if(index<0){
+        return (int) -1;
+    }
+
     // #todo: Com esse if podemos selecionar mais de um modelo 
     // para pegar input.
     // if( ....

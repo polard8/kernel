@@ -24,6 +24,16 @@ struct cat_model_d CatModel;
 // == Prototypes ===============
 //
 
+
+// This functions belongs to the demo module inside another project.
+void gr_setup(void);
+void gr_draw(void);
+
+
+void gr_embedded_setup(void);
+void gr_embedded_draw(void);
+
+
 void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color);
 void demoFlushSurface(struct gws_window_d *clipping_window);
 
@@ -48,6 +58,7 @@ void demoPolygon2(void);
 void demoCurve(void);
 
 // cat
+void __setupCatModel(int eyes, int whiskers, int mouth );
 void demoCat(void);
 
 void demoModel1(void);

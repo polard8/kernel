@@ -390,10 +390,10 @@ static int __CompareString(void)
 // Something is not working fine
 // when we put the name directly in the parameters field.
 // We need a pointer instead.
-    if( strncmp(prompt,"game1",5) == 0 )
+    if( strncmp(prompt,"demo3",5) == 0 )
     {
-        printf ("~ Game 1:\n");
-        rtl_clone_and_execute("game1.bin");
+        printf ("~ Demo 3:\n");
+        rtl_clone_and_execute("demo3.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
@@ -402,10 +402,10 @@ static int __CompareString(void)
 // Something is not working fine
 // when we put the name directly in the parameters field.
 // We need a pointer instead.
-    if( strncmp(prompt,"game2",5) == 0 )
+    if( strncmp(prompt,"demo4",5) == 0 )
     {
-        printf ("~ Game 2:\n");
-        rtl_clone_and_execute("game2.bin");
+        printf ("~ Demo 4:\n");
+        rtl_clone_and_execute("demo4.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }

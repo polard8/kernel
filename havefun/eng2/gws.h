@@ -17,8 +17,6 @@ extern int current_mode;
 #include <sys/socket.h>
 #include <rtl/gramado.h>
 
-//#test
-#include <math.h>
 
 #include "protocol.h"
 
@@ -188,6 +186,9 @@ unsigned long next_response[32];
 //
 // prototypes =============================
 //
+
+int eng2_main (int argc, char **argv);
+
 
 void invalidate(void);
 void validate(void);
