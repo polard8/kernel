@@ -4,10 +4,9 @@
 
 #include "gws.h"
 
+int gUseDemos = TRUE;
 struct gws_window_d *__demo_window;
 
-
-int gUseDemos = TRUE;
 
 // local
 /*
@@ -243,7 +242,7 @@ static void __draw_model1(int step, int target_axis)
     int row = h/scl; // numero de linhas
     //int floor_max=800/2;
     unsigned int floor_final_color = 0;
-    int l=0;
+    register int l=0;
     for (l=0; l<row; l++)
     {
         floorline.p[0].x = CurrentWorld->h1.x -(l*scl) -start_at;
@@ -528,6 +527,20 @@ void demoLines(void)
 }
 
 
+/*
+//#maybe
+void RendererReset(void);
+void RendererReset(void)
+{
+   if( (void*) __demo_window != NULL)
+   {
+       if(__demo_window->used==1234){
+           demoClearSurface(__demo_window,COLOR_BLACK);
+       }
+   }
+}
+*/
+
 // Start surface
 void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color)
 {
@@ -642,6 +655,8 @@ static void __setupCatModel(int eyes, int whiskers, int mouth )
 //worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
+// Distance changes the color.
+    unsigned int shininess=0;
 
 // Object window.
     struct gws_window_d *ow;
@@ -667,6 +682,17 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
     int eye_radius = (int) (1*eye_scale);
 //---
 
+
+    unsigned int _c = (unsigned int) model_z;
+    
+    // shine near and shine far
+    // the distance makes the model darker.
+    if(model_z > 100 && model_z < 200)
+    {
+        shininess = 
+            (unsigned int) (_c << 24 | _c << 16 | _c << 8 | _c);
+    }
+
 // head
 
 //original
@@ -676,7 +702,7 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
         model_x + 0,    //x
         model_y + 12,   //y
         25,   //r
-        CatModel.head_color,     //color 
+        CatModel.head_color - shininess,     //color 
         model_z );      // z 
 
 /*

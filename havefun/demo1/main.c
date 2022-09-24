@@ -3350,7 +3350,7 @@ static int InitHot(void)
         current_mode == GRAMADO_P1 ||
         current_mode == GRAMADO_HOME)
     {
-         //demoModel1();
+         demoModel1();
          //demo34567();
          //demos_startup_animation(1); //sa
          //demos_startup_animation(2); //fred0
@@ -3360,7 +3360,7 @@ static int InitHot(void)
          //demos_startup_animation(6);
          //demos_startup_animation(7);  //curve
          //demos_startup_animation(8);
-         demos_startup_animation(9);  //cat
+         //demos_startup_animation(9);  //cat
          //demos_startup_animation(10); //triangle
          //demos_startup_animation(11);
          //demos_startup_animation(12);

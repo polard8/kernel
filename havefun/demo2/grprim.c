@@ -3179,7 +3179,7 @@ plotEllipseRectZ (
  *    Lot of dots in the right place. (prime stuff)
  *    2020 - Created by Fred Nora. 
  */
-
+// 2D
 void noraDrawingStuff(void)
 {
     register int x=0;
@@ -3211,7 +3211,7 @@ void noraDrawingStuff(void)
  *    Lot of dots in the right place. (prime stuff)
  *    2020 - Created by Fred Nora. 
  */
-
+//3D
 void noraDrawingStuff3 (int x, int y, int z)
 {
     register int _x=0;
@@ -3229,7 +3229,7 @@ void noraDrawingStuff3 (int x, int y, int z)
             if ( _x != 0 )
             {
                 if ( _y % _x == 0 ){
-                    grPlot0 ( NULL, _z, _x, _y,COLOR_BLACK );
+                    grPlot0 ( NULL, _z, _x, _y, COLOR_BLACK );
                 }
             }
         };
@@ -3531,6 +3531,7 @@ int fib (int n)
 
     return (int) (a+b);
 } 
+
 
 /*
 // print fibonacci

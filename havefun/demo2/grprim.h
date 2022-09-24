@@ -820,7 +820,6 @@ gr_find_img_height_int (
 // This thing is very slow.
 int fib(int n);
 
-
 void gr_scale_vec( struct gr_vec3D_d *v, int scale );
 
 //

@@ -1685,15 +1685,30 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color )
 {
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+
+    register int dx=0;
+    register int dy=0;
+    register int dz=0;
+
+    register int sx=0;
+    register int sy=0;
+    register int sz=0;
+
+    dx = (int) abs(x1-x0);
+    sx = x0<x1 ? 1 : -1;
+
+    dy = (int) abs(y1-y0); 
+    sy = y0<y1 ? 1 : -1; 
+
+    dz = (int) abs(z1-z0); 
+    sz = z0<z1 ? 1 : -1; 
    
    //#bugbug: This macro is wrong?!
    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
 
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
+   register int dm=0;
+   dm = grMAX3(dx,dy,dz);
+   int i = dm;
 
     // x1 = y1 = z1 = dm/2; /* error offset */
  
@@ -1705,19 +1720,18 @@ plotLine3d (
 
         grPlot0 ( window, z0, x0, y0, color );
      
-        if (i-- == 0) { break; }
-        
+        if (i-- == 0){
+            break;
+        }
+
         x1 -= dx; 
-        if (x1 < 0) 
-        { x1 += dm; x0 += sx; }
-        
+        if (x1 < 0) { x1 += dm; x0 += sx; }
+
         y1 -= dy; 
-        if (y1 < 0) 
-        { y1 += dm; y0 += sy; }
+        if (y1 < 0) { y1 += dm; y0 += sy; }
         
         z1 -= dz; 
-        if (z1 < 0) 
-        { z1 += dm; z0 += sz; }
+        if (z1 < 0) { z1 += dm; z0 += sz; }
     };
 }
 
