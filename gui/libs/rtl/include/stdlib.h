@@ -206,20 +206,16 @@ void stdlib_die (char *str);
 
 void free (void *ptr);
 
+int rand(void);
+void srand(unsigned int seed);
 int random(void);
-//Returns a pseudo-random number in the range of 0 to RAND_MAX.
-int rand (void);
-//Alimenta a função rand.
-void srand (unsigned int seed);
 void srandom(unsigned int seed);
-
 
 
 //@todo: talvez essa função esteja declara erradamente em systemcall.
 //Obs: Essa rotina existe na API e funciona. Se ela faz parte da lib C
 // então ela deve sair de lá vir pra cá.
 int system (const char *command);
-
 
 
 //=================================

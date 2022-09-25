@@ -909,13 +909,6 @@ char *mktemp (char *template)
     return (char *) 0;
 }
 
-
-int random(void)
-{
-    return (int) rand();
-}
-
-
 // Generate a random number.
 int rand(void)
 {
@@ -926,6 +919,11 @@ int rand(void)
 void srand(unsigned int seed)
 {
     randseed = (unsigned int) seed;
+}
+
+int random(void)
+{
+    return (int) rand();
 }
 
 void srandom(unsigned int seed)
