@@ -134,6 +134,9 @@ libc-content:
 	gcc  -c  tty.c       $(CFLAGS) -I. -I include/ -o tty.o
 	gcc  -c  _split.c    $(CFLAGS) -I. -I include/ -o _split.o
 	gcc  -c  linkaddr.c  $(CFLAGS) -I. -I include/ -o linkaddr.o
+
+	gcc  -c  sched.c  $(CFLAGS) -I. -I include/ -o sched.o
+
 # ...
 
 
@@ -178,4 +181,8 @@ clean:
 	-rm *.o
 	-rm *.A
 	-rm *.SO
-	
+
+clean2:
+	-rm obj/*.o
+
+

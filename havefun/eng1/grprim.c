@@ -897,10 +897,20 @@ __transform_from_viewspace_to_screespace(
 
 // 3d
 // save parameters. (++)
-    int x  = (int) _x;  //1
-    int y  = (int) _y;  //2
+    int x  = (int) _x;    //1 ((800*_x)/600);
+    int y  = (int) _y;    //2
     //int x2 = (int) _y;  //3 #crazy
-    int z  = (int) _z;  //4
+    int z  = (int) _z;    //4
+
+/*
+//#test
+//---------------------
+     x = (800*_x/600);
+     if(z>0){
+         x = x/z;  y=y/z;
+     }
+//---------------------
+*/
 
 // The given hotspot.
 // The center os our surface.
@@ -1320,8 +1330,8 @@ grPlot0 (
 // 'CurrentCamera->CurrentProjection'
 // Clipping into the projection field.
 
-     int zNear =  0; 
-     int zFar  =  80;
+     int zNear = 0; 
+     int zFar  = 80;
 
      if ( (void*) CurrentProjection != NULL )
      {
@@ -1329,6 +1339,15 @@ grPlot0 (
           zFar  = (int) CurrentProjection->zFar;
      }
 
+// #bugbug
+// Devemos considerar o quão distante o objeto está
+// do near plane e não o tamanho do seu eixo z.
+// A distância que o objeto esta do near leva em consideração
+// os eixos do mundo e o tamanho do eixo z do objeto considera
+// os eixos do model view.
+
+// Here we're cutting in the 'model view',
+// but for now, model view and world view are the same.
      if (z < zNear)
          return 0;
      if (z >= zFar)
