@@ -19,6 +19,12 @@ clean-all:
 	-rm -f libs/libgd/obj/*.o
 	-rm -f libs/libgws/obj/*.o
 	-rm -f libs/rtl/obj/*.o
+
+	-rm eng1/*.o
+	-rm eng2/*.o
+	-rm eng3/*.o
+	-rm eng4/*.o
+
 	-rm bin/*.BIN
 	
 

@@ -2,22 +2,6 @@
 #include "../../eng1/gws.h"
 
 
-    int Lcount = 0;
-
-// model
-    int model_x =  0; //cat_x;
-    int model_y = 0; //cat_y;
-    int model_z =  0; //cat_z;
-// eyes
-    int eye_scale=1;
-    int eye1_x = 0;
-    int eye1_y = 0;
-    int eye2_x = 0;
-    int eye2_y = 0;
-    int eye_radius = 0;
-//---
-
-
 char *args[] = { 
     "nothing", 
     NULL 
@@ -44,7 +28,6 @@ void gr_setup(void)
     //printf("gr_setup:\n");
     //__setupCatModel(TRUE,TRUE,TRUE);
 
-// cat model
     Model.eyesVisible     = TRUE; //eyes;
     Model.whiskersVisible = TRUE; //whiskers;
     Model.mouthVisible    = TRUE; //mouth;
@@ -58,35 +41,35 @@ void gr_setup(void)
 // include inside the engine.
 void gr_draw(void)
 {
+    //printf("gr_draw:\n");
+    //demoCat();
 
-    //int Lcount = 0;
+    int Lcount = 0;
 
 // model
-    //int model_x = (int) 0; //cat_x;
-    //int model_y = (int) 0; //cat_y;
-    //int model_z = (int) 0; //cat_z;
+    int model_x = (int) 0; //cat_x;
+    int model_y = (int) 0; //cat_y;
+    int model_z = (int) 0; //cat_z;
 // eyes
-    //int eye_scale=1;
-    //int eye1_x = model_x -10;
-    //int eye1_y = model_y +20;
-    //int eye2_x = model_x +10;
-    //int eye2_y = model_y +20;
-    //int eye_radius = (int) (1*eye_scale);
+    int eye_scale=1;
+    int eye1_x = model_x -10;
+    int eye1_y = model_y +20;
+    int eye2_x = model_x +10;
+    int eye2_y = model_y +20;
+    int eye_radius = (int) (1*eye_scale);
 //---
 
 
 
-    //while(1)
-    //{
+    while(1)
+    {
         validate_background();
         demoClearSurface(NULL,COLOR_BLACK);
         //printf("draw\n");
         
-        if (Lcount>11)
-        {
-             Lcount=0;  //break;
-             model_x=0; model_y=0; model_y=0;
-        }
+        if(Lcount>8)
+           break;
+           
         //update model
         // model
         model_x += Lcount;  //cat_x;
@@ -183,17 +166,16 @@ void gr_draw(void)
         demoFlushSurface(NULL);
         
         Lcount++;
-    //};
+    };
 }
 
 int main(int argc, char **argv)
 {
+    // chama o main() da engine
+    //eng1_main();
+    
     printf("DEMO1.BIN: Initializing ...\n");
     eng1_main(1,args);
-
-// engine
-    engine_is_accepting_input(TRUE);
-    engine_is_accepting_connections(TRUE);
     
     return 0;
 }

@@ -107,6 +107,7 @@ extern int g_handler_flag;
 //see: gws.h
 struct gws_d  *window_server;
 
+static int IsAcceptingInput = FALSE;
 static int IsAcceptingConnections = FALSE;
 static int connection_status = 0;
 // Number of accepted requests.
@@ -3376,6 +3377,7 @@ static int InitHot(void)
 }
 
 
+
 /*
  * on_execute: 
  *     + Initializes the gws infrastructure.
@@ -3423,6 +3425,7 @@ static int on_execute(void)
     int CanRead = -1;
 
     IsTimeToQuit = FALSE;
+    IsAcceptingInput = TRUE;
     IsAcceptingConnections = TRUE;
     g_handler_flag = FALSE;  // The kernel can't use the handler.
 
@@ -3817,7 +3820,9 @@ static int on_execute(void)
         // read only one valid message from 
         // thread's message queue.
         // # This is very good. Only use this one.
-        wmInputReader();
+        if(IsAcceptingInput == TRUE){
+            wmInputReader();
+        }
 
         if (IsAcceptingConnections == TRUE)
         {
@@ -3897,6 +3902,16 @@ static inline void __outb(uint16_t port, uint8_t val)
     asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
 }
 */
+
+void engine_is_accepting_input(int option)
+{
+    IsAcceptingInput = (int) option;
+}
+
+void engine_is_accepting_connections(int option)
+{
+    IsAcceptingConnections = (int) option;
+}
 
 
 // main: entry point

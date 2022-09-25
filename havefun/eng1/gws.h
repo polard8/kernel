@@ -189,6 +189,9 @@ unsigned long next_response[32];
 
 int eng1_main (int argc, char **argv);
 
+void engine_is_accepting_input(int option);
+void engine_is_accepting_connections(int option);
+
 void invalidate(void);
 void validate(void);
 int isdirty(void);
