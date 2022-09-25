@@ -910,6 +910,30 @@ char *mktemp (char *template)
 }
 
 
+int random(void)
+{
+    return (int) rand();
+}
+
+
+// Generate a random number.
+int rand(void)
+{
+    return (int) ( randseed = randseed * 1234 + 5 );
+}
+
+// Seed rand.
+void srand(unsigned int seed)
+{
+    randseed = (unsigned int) seed;
+}
+
+void srandom(unsigned int seed)
+{
+    srand(seed);
+}
+
+
 /*
 // #todo
 // gerar número aleatório dentro de uma faixa.
@@ -921,25 +945,23 @@ int rtl_rand_in_a_range(int lim_inf, int lim_sup)
 */
 
 
-// Generate a random number.
-int rand(void)
+
+/*
+void _abort(void);
+void _abort(void)
 {
-    return (int) ( randseed = randseed * 1234 + 5 );
+    asm volatile("ud2");
+    __builtin_unreachable();
 }
-
-
-// Seed rand.
-void srand(unsigned int seed)
-{
-    randseed = (unsigned int) seed;
-}
-
+*/
 
 void abort(void)
 {
+    //_abort();
     exit(0);
     //exit(1);
 }
+
 
 void stdlib_die (char *str)
 {
@@ -1637,20 +1659,14 @@ char *getenv (const char *name)
     result = __findenv (name, &offset);
 	//rwlock_unlock(&__environ_lock);
 
-
-    debug_print ("getenv: done\n");
+    //debug_print ("getenv: done\n");
     return (char *) result;
 }
-
 
 //#todo
 int setenv (const char *name, const char *value, int overwrite)
 {
-    debug_print("setenv: [TODO]\n"); 
-
-    //
-    // name
-    //
+    //debug_print("setenv: [TODO]\n"); 
 
     if ( (void *) name == NULL )
     {
@@ -1696,8 +1712,30 @@ int unsetenv (const char *name)
 }
 
 
+// #todo
+int clearenv(void)
+{
+    //size_t environ_size = 0;
+    //for (; environ[environ_size]; ++environ_size) {
+    //    environ[environ_size] = NULL;
+    //}
+    //*environ = NULL;
+    
+    return 0;
+}
 
 
+/*
+int atoi2(char const* str);
+int atoi2(char const* str)
+{
+    long value = strtol(str, NULL, 10);
+    if (value > INT_MAX) {
+        return INT_MAX;
+    }
+    return value;
+}
+*/
 
 
 /*
@@ -2300,21 +2338,6 @@ int abs(int i)
 }
 */
 
-/*
-long int random()
-{
-    return rand();
-}
-*/
-
-/*
-void srandom(unsigned seed)
-{
-    srand(seed);
-}
-*/
-
-
 //serenity os
 /*
 int mkstemp(char* pattern)
@@ -2503,16 +2526,25 @@ int getpt(void)
     return -1; 
 }
 
+//static char const* __progname = NULL;
 
 const char	*getprogname(void)
 {
     debug_print("getprogname: [TODO]\n");
     return NULL;
+    //return __progname;
 }
 
 void setprogname(const char *progname)
 {
-    debug_print("setprogname: [TODO]\n");
+    //for (int i = strlen(progname) - 1; i >= 0; i--) {
+    //    if (progname[i] == '/') {
+    //        __progname = progname + i + 1;
+    //        return;
+    //    }
+    //}
+
+    //__progname = progname;
 }
 
 

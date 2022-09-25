@@ -101,8 +101,8 @@ typedef struct {
 
 //bsd-like
 //#define	RAND_MAX	0x7fffffff
-
 #define RAND_MAX  32767 
+
 
 
 //bsd stuff
@@ -119,8 +119,6 @@ void *stdlib_system_call (
 
 const char	*getprogname(void);
 void setprogname(const char *progname);
-
-
 
 // pseudo-terminal support.
 int posix_openpt (int flags);
@@ -139,24 +137,15 @@ char *ptsname (int fd);
 // argument specifies the number of bytes available in buf.
 int ptsname_r (int fd, char *buf, size_t buflen);
 
-
-
 int mkostemps(char *template, int suffixlen, int flags);
 
 int mkstemps(char *template, int suffixlen);
-
 int mkostemp(char *template, int flags);
-
 int mkstemp(char *template);
-
 long labs (long j);
 
-
 int atoi (const char *str);
-
 void itoa (int n, char s[]);
-
-
 
 
 // unix v7 - like.
@@ -174,7 +163,7 @@ char *getenv (const char *name);
 int setenv (const char *name, const char *value, int overwrite);
 int unsetenv (const char *name);
 
-
+int clearenv(void);
 
 
 
@@ -217,11 +206,13 @@ void stdlib_die (char *str);
 
 void free (void *ptr);
 
+int random(void);
 //Returns a pseudo-random number in the range of 0 to RAND_MAX.
 int rand (void);
-
 //Alimenta a função rand.
 void srand (unsigned int seed);
+void srandom(unsigned int seed);
+
 
 
 //@todo: talvez essa função esteja declara erradamente em systemcall.
@@ -275,9 +266,7 @@ qsort_r (
     void *arg 
     );
 
-
 int putenv(char *string);
-
 
 int abs( int j);
 
