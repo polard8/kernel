@@ -1,11 +1,12 @@
 
 // tty.c
 
-
 #include <kernel.h>  
 
-
 static int new_tty_index=0;
+
+// see: tty.h
+struct tty_d  CONSOLE_TTYS[8];
 
 
 /*
@@ -632,7 +633,7 @@ struct tty_d *tty_create(void)
         // file pointer
         // this file handles this tty object
         //isso sera tratado la em baixo.
-        //__tty->_fp
+        //__tty->fp
     
         // tty name
         // isso sera tratado la em baixo.
@@ -793,28 +794,18 @@ struct tty_d *tty_create(void)
     
     __file = (file *) kmalloc ( sizeof(file) );
 
-    if ( (void *) __file == NULL )
-    {
+    if ( (void *) __file == NULL ){
         panic ("tty_create: __file\n");
     }
 
     __file->used = TRUE;
     __file->magic = 1234;
-
-// Object type.
-
     __file->____object = ObjectTypeTTY;
-
     __file->isDevice = TRUE;
-
-
 // A estrutura de tty associada com esse arquivo.
     __file->tty = __tty;
-
 // Esse é o arquivo que aponta para essa estrutura.
-    __tty->_fp = __file;
-
-
+    __tty->fp = __file;
 // sync
     __file->sync.sender = -1;
     __file->sync.receiver = -1;

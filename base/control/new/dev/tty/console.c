@@ -45,6 +45,8 @@ static int saved_y=0;
 static void __ConsoleOutbyte (int c, int console_number);
 static void __test_path(void);
 
+static void __test_tty(void);
+
 //#todo: Use static modifier.
 void __local_ri (void);
 void csi_J (int par);
@@ -1338,8 +1340,27 @@ void DANGER_VGA_clear_screen(void)
     refresh_screen();
 }
 
+// Read and write from a tty device.
+static void __test_tty(void)
+{
+    char data0[8];
+    data0[0]='a';  data0[1]='b';  data0[2]='c';  data0[3]=0;
+    
+    char data1[8];
+    data1[0]='x';  data1[1]='y';  data1[2]='z';  data1[3]=0; //dirty
 
-// =====================================
+    if( (void*) KernelProcess == NULL)
+        return;
+    if(KernelProcess->magic!=1234)
+        return;
+
+    __tty_write(KernelProcess->tty,data0,3); //write
+    __tty_read (KernelProcess->tty,data1,3); //read
+    
+    printf("%c\n",data1[0]);
+    printf("%c\n",data1[1]);
+    printf("%c\n",data1[2]);
+}
 
 // Compare the strings that were
 // typed into the kernel virtual console.
@@ -1351,7 +1372,7 @@ int consoleCompareStrings(void)
     debug_print("consoleCompareStrings: \n");
     printf("\n");
 
-
+// mod0: Call the entrypoint of the module.
     if ( strncmp(prompt,"mod0",4) == 0 )
     {
         //mod0.bin entry point.
@@ -1533,12 +1554,13 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-
 // ========
 // 'thread'
     if ( strncmp( prompt, "thread", 6 ) == 0 )
     {
-        __test_thread();
+        //#bugbug: ring0 threads are a huge problem.
+        //avoid that for now.
+        //__test_thread();
         goto exit_cmp;
     }
 
@@ -1551,30 +1573,12 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-// ========
-// 'tty'
-    char data0[8];
-    data0[0]='a';
-    data0[1]='b';
-    data0[2]='c';
-    data0[3]=0;
-
-    char data1[8];
-    data1[0]='x';
-    data1[1]='y';
-    data1[2]='z';
-    data1[3]=0;
-
+// tty: Read and write from tty device.
     if ( strncmp( prompt, "tty", 3 ) == 0 )
     {
-        __tty_write(KernelProcess->tty,data0,3); //write
-        __tty_read (KernelProcess->tty,data1,3); //read
-        printf("%c\n",data1[0]);
-        printf("%c\n",data1[1]);
-        printf("%c\n",data1[2]);
+        __test_tty();
         goto exit_cmp;
     }
-
 
 // ========
 // 'wm'

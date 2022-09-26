@@ -418,8 +418,7 @@ void ps2mouse_initialize_device (void)
 // create file.
     file *fp;
     fp = (file *) kmalloc( sizeof(file) );
-    if ( (void *) fp == NULL )
-    {
+    if ( (void *) fp == NULL ){
         panic ("mouse: fp\n");
     }
     fp->used = TRUE;
@@ -551,10 +550,7 @@ void ps2mouse_initialize_device (void)
     zzz_mouse_write(0xF4);
     mouse_expect_ack(); // ACK
 
-//
 // #test
-//
-
 
 //++
 //=================================================
@@ -566,7 +562,6 @@ void ps2mouse_initialize_device (void)
 // device id.
 // Not initialzied,
     PS2Mouse.device_id = -1;
-
 
 //=============
 //__enable_wheel:    
@@ -596,7 +591,6 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 */
 
 // Pega o device id e faz configurações de wheel.
-
 
 // Get the device id for the first time.
     device_id = (int) __get_device_id();
@@ -704,11 +698,9 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
     mouse_expect_ack(); // ACK
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
-
     PS2Mouse.initialized = TRUE;
-    debug_print ("ps2mouse_initialize_device: done\n");
+    //debug_print ("ps2mouse_initialize_device: done\n");
 }
-
 
 // Called by irq12_MOUSE in mouse.c.
 // See: https://wiki.osdev.org/Mouse_Input
@@ -879,13 +871,12 @@ unsigned char zzz_mouse_read (void)
 
     debug_print ("zzz_mouse_read:\n");
 
-    debug_print ("[1]:\n");
+    //debug_print ("[1]:\n");
     prepare_for_input();
-
-    debug_print ("[2]:\n");
+    //debug_print ("[2]:\n");
     Value = (unsigned char) in8(0x60);
 
-    debug_print ("zzz_mouse_read: Done\n");
+    //debug_print ("zzz_mouse_read: Done\n");
     return (unsigned char) Value;
 }
 

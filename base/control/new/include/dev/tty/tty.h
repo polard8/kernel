@@ -11,8 +11,6 @@
 //#define DEVELOPER_TTYLINES_MAX 25    //25 
 //... 
 
-/* tty magic number */
-//#define TTY_MAGIC		0x5401
 #define TTY_MAGIC    1234
 
 //TTY_DRIVER_TYPE_SYSTEM
@@ -27,12 +25,10 @@
 #define TTY_TYPE_PTY        4000
 // ...
 
-
 // subtype
 #define TTY_SUBTYPE_PTY_MASTER   100
 #define TTY_SUBTYPE_PTY_SLAVE    200
 // ...
-
 
 //These bits are used in the flags field of the tty structure.
 #define TTY_THROTTLED         0	/* Call unthrottle() at threshold min */
@@ -54,10 +50,7 @@
 #define TTY_FLUSHING         19	/* Flushing to ldisc in progress */
 #define TTY_FLUSHPENDING     20	/* Queued buffer flush pending */
 
-//
 // Chars
-// 
-
 // Some special chars from termios
 // used in the tty.
 
@@ -67,10 +60,7 @@
 #define INTR_CHAR(tty)   ((tty)->termios.c_cc[VINTR])
 #define ERASE_CHAR(tty)  ((tty)->termios.c_cc[VERASE])
 
-//
 // Flags
-//
-
 // Some flags from termios
 // used in the tty.
 
@@ -121,15 +111,12 @@ struct ttybuffer_d *CurrentTTYBUFFER;
 struct tty_line_d
 {
     //int index;
-
     char CHARS[80];
     char ATTRIBUTES[80];  //Isso poderia ser unsigned long.	
-
-    // Início e fim da string dentro da linha. O resto é espaço.
+// Início e fim da string dentro da linha. O resto é espaço.
     int left;
     int right;
-
-    //Posição do cursor dentro da linha.
+//Posição do cursor dentro da linha.
     int pos;
 };
 
@@ -165,18 +152,13 @@ struct tty_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
+// File pointer:
 // The pipe fd, the socket fd, the read write operation.
-// #todo: use 'fp'.
-
-    file *_fp;    
-
+    file *fp;
 // In the TTYs table?
     int used;
     int magic;
-
     int index;
-
 // tty name
     char name[64];      // 
     size_t Name_len;    // len 
@@ -339,17 +321,13 @@ struct tty_d
     unsigned long cursor_right;    // margem direita dada em linhas
     unsigned long cursor_bottom;   // margem inferior dada em linhas
 
-    //
-    // == Connection ===========================
-    //
-    
-    // pty associa a tty 'to' com a tty 'from'
-    // master/slave.
+// Connections
+// pty associa a tty 'to' com a tty 'from'
+// master/slave.
 
-    // navigation
-    // ?? estamos pensando nisso.
     // struct tty_d *next;
 };
+
 
 //
 // == consoles ==================
@@ -365,8 +343,8 @@ extern int fg_console;
 #define CONSOLETTYS_COUNT_MAX    4
 //#define CONSOLETTYS_COUNT_MAX    8
 
-//static struct tty_d CONSOLE_TTYS[8];
-struct tty_d  CONSOLE_TTYS[8];
+// see: tty.c
+extern struct tty_d  CONSOLE_TTYS[8];
 
 
 // == prototypes ===============================================
@@ -424,29 +402,6 @@ tty_ioctl (
     unsigned long request, 
     unsigned long arg );
 
-
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

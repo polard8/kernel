@@ -60,8 +60,7 @@ void ps2kbd_initialize_device (void)
 // create file.
     file *fp;
     fp = (file *) kmalloc( sizeof(file) );
-    if ( (void *) fp == NULL )
-    {
+    if ( (void *) fp == NULL ){
         panic ("kbd: fp\n");
     }
     fp->used = TRUE;
@@ -78,9 +77,6 @@ void ps2kbd_initialize_device (void)
         NULL );        // Not a tty device. (not for now)
 //====================================
 
-
-
-
 // globals
     keyboard_init_lock_keys();
     keyboard_init_modifier_keys();
@@ -90,11 +86,9 @@ void ps2kbd_initialize_device (void)
     wait_then_write(I8042_STATUS, 0xae);
     keyboard_expect_ack();
 
-
     PS2Keyboard.initialized = TRUE;
-    debug_print ("ps2kbd_initialize_device: done\n");
+    //debug_print ("ps2kbd_initialize_device: done\n");
 }  
-
 
 
 /*
@@ -131,12 +125,9 @@ void DeviceInterface_PS2Keyboard(void)
 {
     unsigned char __raw = 0;
     unsigned char val = 0;
-
     static int __prefix=0;
-
     // Usado nos testes
     //struct process_d *p;
-
     // Usado pra checar se a foreground thread quer raw input.
     struct thread_d *t;
 
@@ -413,40 +404,29 @@ int get_shift_status (void)
 }
 
 
-/*
- * xxx_keyboard_read: 
- * 
- */
-
+// xxx_keyboard_read:
 // Esta função será usada para ler dados do teclado na 
 // porta 0x60, fora do IRQ1.
 
 uint8_t xxx_keyboard_read (void)
 {
-    kbdc_wait (0);
+    uint8_t Value=0;
 
-    uint8_t val = in8(0x60);
-    
+    kbdc_wait(0);
+    Value = in8(0x60);
     wait_ns(400);
-    
-    return (uint8_t) val;
+
+    return (uint8_t) Value;
 }
 
-
-/*
- * xxx_keyboard_write: 
- * 
- */
-
+// xxx_keyboard_write: 
 // Esta função será usada para escrever dados do teclado 
 // na porta 0x60, fora do IRQ1.
 
 void xxx_keyboard_write (uint8_t data)
 {
     kbdc_wait(1);
-
     out8 ( 0x60, data );
-
     wait_ns(400);
 }
 
@@ -459,7 +439,7 @@ void xxx_keyboard_write (uint8_t data)
 unsigned char zzz_keyboard_read (void)
 {
     prepare_for_input();
-    
+
     return (unsigned char) in8(0x60);
 }
 

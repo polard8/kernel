@@ -13,7 +13,6 @@
 int vt_init_module (void);
 int vt_init_module (void)
 {
-
     register int i=0;
 
     debug_print("vt_init_module:\n");
