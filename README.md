@@ -78,4 +78,4 @@ The source code uses the BSD license.
 
 # Quotes:
 > Oh boy, there is no spoon!
-
+> The beast hates science and the scientist.

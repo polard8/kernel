@@ -3610,6 +3610,8 @@ static int on_execute(void)
 // pois com uma lista muito grande de clientes
 // o servidor vai perder muito tempo no accept();
 // Pois nosso accept() ainda eh pouco eficiente.
+// SOMAXCONN is the default limit on backlog.
+// see: sys/socket.h
 
     listen(server_fd,4);
 

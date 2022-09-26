@@ -1,44 +1,32 @@
-/*
- * File: un.h
- * 
- *   Socket support for unix style. 
- */
 
-
+// sys/un.h
+// Socket support for unix style. 
 // PF_UNIX and PF_LOCAL address family. 
 // Used for local communication between programs 
 // running on the same computer.
 // See:
 // https://en.wikipedia.org/wiki/Berkeley_sockets
-
-// sys/un.h
-// Socket support for libc03.
-// ring3
 // 2020 - Created by Fred Nora.
 
-
 #ifndef ____UN_H
-#define ____UN_H
+#define ____UN_H    1
 
-
-//#test
+// #test
+#include <types.h>
 #include <sys/ansi.h>
 #include <netinet/in.h>
 
+#define UNIX_PATH_MAX  108
 
-#define UNIX_PATH_MAX 108
+// sockaddr_un:
+// Socket address, unix style.
 
-/*
- * sockaddr_un:
- *     Socket address, unix style.
- */
-
-struct sockaddr_un {
-
+struct sockaddr_un
+{
     //#bugbug
     //ps: It needs to be 16 bit.
 
-     uint16_t sun_family;
+    uint16_t sun_family;
     char sun_path[UNIX_PATH_MAX];
 };
 

@@ -5,39 +5,23 @@
 
 #include <sys/types.h>
 #include <errno.h>
-#include <sys/select.h>
-#include <sys/socket.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 #include <rtl/gramado.h> 
 
 
-//sortix style;
-/*
-#define FLAGS_MASK (SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK)
-#define TYPE_MASK (~FLAGS_MASK)
-#define FLAGS(x) ((x) & FLAGS_MASK)
-#define TYPE(x) ((x) & TYPE_MASK)
-*/
+static int __socket_pipe( int pipefd[2] );
 
 
-/*
- * socket:
- *     Create an endpoint for communication.
- */
+// -----------------
 
-/*
-  socket() creates an endpoint for communication and 
-  returns a file descriptor that refers to that endpoint.  
-  The file descriptor returned by a successful call will be the 
-  lowest-numbered file descriptor not currently open for the process. 
- */
 
-// Linux style.
+// socket:
+// Create an endpoint for communication.
 // See: http://man7.org/linux/man-pages/man2/socket.2.html
-
-//int socket ( int family, int type, int protocol ){
-
+// OUT: fd.
 int socket( int domain, int type, int protocol )
 {
     int value = -1;
@@ -48,21 +32,17 @@ int socket( int domain, int type, int protocol )
                   (unsigned long) domain, 
                   (unsigned long) type, 
                   (unsigned long) protocol );
-
     if (value<0)
     {
         errno = (-value);
         return (int) -1;
     }
 
-// OUT: fd.
     return (int) value;
 }
 
-
-//interna
-//int __socket_pipe ( int pipefd[2] );
-int __socket_pipe( int pipefd[2] )
+// Local worker.
+static int __socket_pipe( int pipefd[2] )
 {
     return (int) gramado_system_call ( 
                      247, 
@@ -72,17 +52,10 @@ int __socket_pipe( int pipefd[2] )
 }
 
 
-// socketpair - create a pair of connected sockets
-// POSIX.1-2001, POSIX.1-2008, 4.4BSD.  socketpair() first appeared in
-// 4.2BSD.  It is generally portable to/from non-BSD systems supporting
-// clones of the BSD socket layer (including System V variants).
-// #bugbug: Porque o termo pipe é usado ???
-
 int socketpair(int domain, int type, int protocol, int sv[2])
 {
     int fd = -1;
     int pipefd[2];
-
 
 // #bugbug
 // Only two types of family?
@@ -123,13 +96,6 @@ int gramado_socketpair (int fd[2])
 }
 */
 
-//  bind a name to a socket.
-// “assigning a name to a socket”.
-//  POSIX.1-2001, POSIX.1-2008, SVr4, 
-//  4.4BSD (bind() first appeared in 4.2BSD).
-
-// On success, zero is returned.  
-// On error, -1 is returned, and errno is set appropriately.
 
 int 
 bind ( 
@@ -139,7 +105,7 @@ bind (
 {
     int value = -1;
 
-    if(sockfd<0)
+    if (sockfd<0)
     {
         errno=EBADF;
         return (int) -1;
@@ -165,10 +131,6 @@ bind (
     return (int) value;
 }
 
-
-// listen:
-// On success, zero is returned.  
-// On error, -1 is returned, and errno is set appropriately.     
 
 int listen(int sockfd, int backlog)
 {
@@ -199,7 +161,12 @@ int listen(int sockfd, int backlog)
 
 // #todo
 // See: https://linux.die.net/man/2/accept4
-int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
+int 
+accept4 (
+    int sockfd, 
+    struct sockaddr *addr, 
+    socklen_t *addrlen, 
+    int flags)
 {
     errno = -1;
     printf ("accept4: [TODO] Not implemented yet\n");
@@ -207,25 +174,7 @@ int accept4 (int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags)
 }
 
 
-/*
-  The accept() system call is used with connection-based socket 
-  types (SOCK_STREAM, SOCK_SEQPACKET).  
-  It extracts the first connection request on the queue of 
-  pending connections for the listening socket, sockfd, 
-  creates a new connected socket, and returns a new file descriptor 
-  referring to that socket.  
-  The newly created socket is not in the listening state.  
-  The original socket sockfd is unaffected by this call.
-*/
-
-//  On success, these system calls return a nonnegative integer 
-//  that is a file descriptor for the accepted socket.  
-// On error, -1 is returned, errno is set appropriately, 
-// and addrlen is left unchanged.
-
-// #test
-// Created by Fred Nora.
-
+// Alternative. Not tested.
 int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
     int value = -1;
@@ -253,12 +202,7 @@ int accept2 (int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 }
 
 
-// accept
-// #todo: standard unix-like
-// This is the unix standard method.
-// Our major goal is to return the fd for the client socket file.
-// #bugbug: Work in progress.
-
+// OUT: fd.
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
     int value = -1;
@@ -287,14 +231,6 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
     return (int) value;
 }
 
-
-
-// POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD, 
-//(connect() first appeared in 4.2BSD).
-// initiate a connection on a socket
-
-// If the connection or binding succeeds, zero is returned.  
-// On error, -1 is returned, and errno is set appropriately.
 
 int 
 connect ( 
@@ -326,21 +262,12 @@ connect (
 }
 
 
-/*
- * shutdown:
- *     shut down part of a full-duplex connection    
- */
+// shutdown:
+// shut down part of a full-duplex connection.
 // See:
 // https://linux.die.net/man/3/shutdown
-// how: 
-// Muda as flags do arquivo. 
-// Alterando permissões de leitura ou escrita.
-// #todo
-// Deve existir uma rotina na libc que mude
-// as permissões de um arquivo. Então é ela que devemos
-// chamar agora e não uma system call.
 
-int shutdown( int sockfd, int how )
+int shutdown(int sockfd, int how)
 {
     int value = -1;
 
@@ -417,10 +344,7 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
 */             
 
 
-/*
- * send:
- * 
- */
+// send:
 
 ssize_t 
 send ( 
@@ -440,14 +364,14 @@ send (
         //(const void *) buf, (size_t) len, (int) flags,
         //(const struct sockaddr *) dest_addr, (socklen_t) addrlen );
 
-
     return (ssize_t) write ( sockfd, (const void *) buf, len );
 }
 
 
-//4.4BSD, SVr4, POSIX.1-2001.  
-//These interfaces first appeared in 4.2BSD.
-       
+// sendto:
+// 4.4BSD, SVr4, POSIX.1-2001.  
+// These interfaces first appeared in 4.2BSD.
+
 ssize_t 
 sendto ( 
     int sockfd, 
@@ -480,11 +404,7 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
 }
 
 
-/*
- * recv:
- * 
- */
-
+// recv:
 ssize_t 
 recv ( 
     int sockfd, 
@@ -556,8 +476,9 @@ getpeername (
 }
 
 
-//POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD 
-//(getsockname() first appeared in 4.2BSD).
+// getsockname:
+// POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD 
+// First appeared in 4.2BSD.
 
 int 
 getsockname ( 
@@ -591,9 +512,7 @@ getsockname (
 }
 
 
-//
-// ===========
-//
+// ===================================
 
 int inet_aton (const char *cp, struct in_addr *inp)
 {
@@ -601,13 +520,11 @@ int inet_aton (const char *cp, struct in_addr *inp)
     return -1;
 }
 
-
 in_addr_t inet_addr(const char *cp)
 {
     printf ("inet_addr: [TODO]\n");
     return (in_addr_t) 0;
 }
-
 
 in_addr_t inet_network(const char *cp)
 {
@@ -616,12 +533,9 @@ in_addr_t inet_network(const char *cp)
 }
 
 
-/*
- * Convert network-format internet address
- * to base 256 d.d.d.d representation.
- */
-
-/*const*/ 
+// inet_ntoa:
+// Convert network-format internet address
+// to base 256 d.d.d.d representation.
 
 char *inet_ntoa ( struct in_addr in ) 
 {
@@ -640,14 +554,12 @@ char *inet_ntoa ( struct in_addr in )
 }
 
 
-/*
- * Formulate an Internet address from network + host.  Used in
- * building addresses stored in the ifnet structure.
- */
- 
+// inet_makeaddr:
+// Formulate an Internet address from network + host.  Used in
+// building addresses stored in the ifnet structure.
+
 struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 {
-    
     in_addr_t addr;
     struct in_addr ret;
 
@@ -670,11 +582,10 @@ struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 }
 
 
-/*
- * Return the local network address portion of an
- * internet address; handles class a/b/c network
- * number formats.
- */
+// inet_lnaof:
+// Return the local network address portion of an
+// internet address; handles class a/b/c network number formats.
+
 in_addr_t inet_lnaof(struct in_addr in)
 {
     printf("inet_lnaof: [BUGBUG] Not implemented!\n");
@@ -693,16 +604,15 @@ in_addr_t inet_lnaof(struct in_addr in)
     */
 }
 
-/*
- * Return the network number from an internet
- * address; handles class a/b/c network #'s.
- */
+
+// inet_netof: 
+// Return the network number from an internet
+// address; handles class a/b/c network #'s.
 
 in_addr_t inet_netof (struct in_addr in)
 {
     printf("inet_netof: [BUGBUG] Not implemented!\n");
     return 0;
-
 
    /*
 	in_addr_t i = ntohl(in.s_addr);
@@ -753,7 +663,6 @@ setsockopt (
     return -1; 
 }
 
-
 int sendfd(int sockfd, int fd)
 {
     if(sockfd<0)
@@ -764,7 +673,6 @@ int sendfd(int sockfd, int fd)
  
     return -1; 
 }
-
 
 int recvfd(int sockfd)
 {
@@ -779,7 +687,7 @@ int recvfd(int sockfd)
 
 
 //
-// End.
+// End
 //
 
 
