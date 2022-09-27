@@ -1963,7 +1963,6 @@ xxxTriangleZ(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle )
 {
-
     if ( (void*) triangle == NULL ){
         return -1;
     }

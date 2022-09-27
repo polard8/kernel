@@ -26,6 +26,9 @@ char *args[] = {
 // Cat
 struct model_d
 {
+    int distance;
+    int r;
+
     int eyesVisible;
     int whiskersVisible;
     int mouthVisible;
@@ -43,6 +46,9 @@ void gr_setup(void)
 {
     //printf("gr_setup:\n");
     //__setupCatModel(TRUE,TRUE,TRUE);
+
+    Model.distance = 0;
+    Model.r = 25;
 
 // cat model
     Model.eyesVisible     = TRUE; //eyes;
@@ -75,7 +81,6 @@ void gr_draw(void)
 //---
 
 
-
     //while(1)
     //{
         validate_background();
@@ -89,9 +94,9 @@ void gr_draw(void)
         }
         //update model
         // model
-        model_x += Lcount;  //cat_x;
-        model_y += Lcount;  //cat_y;
-        model_z = 0;       //cat_z;
+        model_x =0; //+= Lcount;  //cat_x;
+        model_y =0; //+= Lcount;  //cat_y;
+        model_z =0; //+= Lcount; //= 0;       //cat_z;
         // eyes
         eye_scale=1;
         eye1_x = model_x -10;
@@ -105,7 +110,7 @@ void gr_draw(void)
             NULL,
             model_x +0,    //x
             model_y +12,   //y
-            25,   //r
+            Model.r,   //r
             Model.head_color,     //color 
             model_z );      // z 
 

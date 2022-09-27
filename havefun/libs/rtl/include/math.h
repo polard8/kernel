@@ -1,10 +1,13 @@
 
-
-
 //math.h 
 
 #ifndef  _MATH_H
 #define  _MATH_H  1
+
+
+// hehe
+#define GRAMADO_PI  3.14159265 
+
 
 union __float_u {
 	unsigned char __dummy[sizeof(float)];
@@ -60,7 +63,8 @@ union __long_double_u {
 #define	M_SQRT2		1.41421356237309504880	/* sqrt(2) */
 #define	M_SQRT1_2	0.70710678118654752440	/* 1/sqrt(2) */
 
-#define	MAXFLOAT	((float)3.40282346638528860e+38)
+#define MAXFLOAT    ((float)3.40282346638528860e+38)
+
 //extern int signgam;
 #endif /* _XOPEN_SOURCE || _NETBSD_SOURCE */
 
@@ -110,6 +114,8 @@ double ceil(double __x);
 double pow(double __x, double __y);
 double sqrt(double __x);
 
+double rsqrt(double  x);
+
 // -----------------------------
 // extra
 long power0(long x, unsigned int n);
@@ -117,6 +123,11 @@ long power1(long x, unsigned int n);
 long power2(long x, unsigned int y);
 float power3(float x, int y);
 double power4(double x, int y);
+
+//----------------
+float sinf(float arg);
+float cosf(float arg);
+float tanf(float arg);
 
 #endif    
 

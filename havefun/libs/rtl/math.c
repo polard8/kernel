@@ -18,7 +18,6 @@ double tan(double __x)
     return 0;
 }
 
-
 // Returns the arcsine of x.
 double asin(double __x)
 {
@@ -90,6 +89,13 @@ double sqrt(double __x)
         : "m"(__x) );
 //OUT:
     return (double) Value;
+}
+
+//#test
+//Computes the reciprocal of the square root of a number.
+double rsqrt(double  x)
+{
+    return (double) (1.0 / sqrt(x));
 }
 
  
@@ -200,5 +206,44 @@ double power4(double x, int y)
         };
     };
 }
+
+// -------------
+
+
+// -------------------------------
+
+// IN: angle
+float sinf(float arg)
+{
+    float ret = 0.0f;
+
+    asm(
+        "fsin"
+        : "=t"(ret)
+        : "0"(arg) );
+
+    return (float) ret;
+}
+
+
+// IN: angle
+float cosf(float arg)
+{
+    float ret= 0.0f;
+    asm(
+        "fcos"
+        : "=t"(ret)
+        : "0"(arg));
+    return (float) ret;
+}
+
+// IN: angle
+float tanf(float arg)
+{
+    return (float) __builtin_tan(arg);
+}
+
+
+
 
 

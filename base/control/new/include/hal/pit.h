@@ -28,7 +28,8 @@
 
 // #bugbug
 // Temos isso redefinido em sched.h
-#define HZ  100
+//#define HZ  100
+#define HZ  1000
 
 // see: pit.c
 // total ticks
