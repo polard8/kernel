@@ -10,6 +10,24 @@
 #define __GRPRIM_H   1
 
 
+#define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
+#define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
+
+#define grMIN3(x,y,z)    (x < y  ? (x < z ? x : z) : (y < z ? y : z))
+#define grMAX3(x,y,z)    ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
+
+
+/*
+#define MIN2(v0,v1) ((v0<v1)?v0:v1)
+#define MAX2(v0,v1) ((v0>v1)?v0:v1)
+#define MIN3(v0,v1,v2) ((v0<v1)?((v0<v2)?v0:v2):((v1<v2)?v1:v2))
+#define MAX3(v0,v1,v2) ((v0>v1)?((v0>v2)?v0:v2):((v1>v2)?v1:v2))
+*/
+
+//#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+
+
+
 // 2D integer point.
 struct gr_vec2D_d
 {
@@ -27,28 +45,7 @@ struct gr_vec3D_d
     unsigned int color;
 };
 
-/*
-// 2D long point.
-struct gr_vecL2D_d
-{
-    long x;
-    long y;
-    unsigned int color;
-};
-*/
 
-/*
-// 3D long point.
-struct gr_vecL3D_d
-{
-    long x;
-    long y;
-    long z;
-    unsigned int color;
-};
-*/
-
-/*
 // 2D float point.
 // #todo: Maybe in the future.
 struct gr_vecF2D_d
@@ -57,9 +54,9 @@ struct gr_vecF2D_d
     float y;
     unsigned int color;
 };
-*/
 
-/*
+
+
 // 3D float point.
 // #todo: Maybe in the future.
 struct gr_vecF3D_d
@@ -69,7 +66,6 @@ struct gr_vecF3D_d
     float z;
     unsigned int color;
 };
-*/
 
 // ---------------------------------------
 
@@ -90,6 +86,20 @@ struct gr_triangle_d
     struct gr_triangle_d *last;
     struct gr_triangle_d *next;
 };
+
+// float 3D triangle
+struct gr_triangleF3D_d
+{
+    int used;
+    int magic;
+    int initialized;
+    struct gr_vecF3D_d p[3];
+    // mesh support.
+    struct gr_triangleF3D_d *last;
+    struct gr_triangleF3D_d *next;
+};
+
+
 
 // 3D rectangle.
 struct gr_rectangle_d
@@ -117,6 +127,13 @@ struct gr_polygon_d
     int n;
 // List of vectors.
     void *list_address;
+};
+
+
+// float
+struct gr_mat4x4_d
+{
+    float m[4][4];  // = { 0 };
 };
 
 
@@ -422,28 +439,30 @@ multiply4(
     int mat2[4][4], 
     int res[4][4] );
 
+void 
+gr_MultiplyMatrixVector(
+    struct gr_vecF3D_d *i, 
+    struct gr_vecF3D_d *o, 
+    struct gr_mat4x4_d *m );
+
+
+int 
+gr_rotate_z(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime );
+
+int 
+gr_rotate_x(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime );
 
 //
 // ===========================================================
 //
-
-
-#define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
-#define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
-
-#define grMIN3(x,y,z)    (x < y  ? (x < z ? x : z) : (y < z ? y : z))
-#define grMAX3(x,y,z)    ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
-
-
-/*
-#define MIN2(v0,v1) ((v0<v1)?v0:v1)
-#define MAX2(v0,v1) ((v0>v1)?v0:v1)
-#define MIN3(v0,v1,v2) ((v0<v1)?((v0<v2)?v0:v2):((v1<v2)?v1:v2))
-#define MAX3(v0,v1,v2) ((v0>v1)?((v0>v2)?v0:v2):((v1>v2)?v1:v2))
-*/
-
-//#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-
 
 
 int grInit(void);
@@ -599,6 +618,11 @@ xxxTriangleZ(
     struct gr_triangle_d *triangle );
 
 int grTriangle( struct gr_triangle_d *triangle);
+
+int 
+plotTriangleF(
+    struct gws_window_d *window,
+    struct gr_triangleF3D_d *t );
 
 //
 // == polygon ===========================

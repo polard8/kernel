@@ -1991,7 +1991,6 @@ xxxTriangleZ(
     return 0;
 }
 
-
 int grTriangle( struct gr_triangle_d *triangle )
 {
     int Status=0;
@@ -2008,6 +2007,63 @@ int grTriangle( struct gr_triangle_d *triangle )
 }
 
 
+// IN: projected triangle.
+// float
+int 
+plotTriangleF(
+    struct gws_window_d *window,
+    struct gr_triangleF3D_d *t )
+{
+
+// Engine triangle structure.
+// Using 'int',
+    struct gr_triangle_d final_triangle;
+
+    unsigned long window_width = 800;
+    unsigned long window_height = 600;
+
+
+// Check the 'projected triangle'.
+    if((void*)t==0)
+        return -1;
+
+    long x0 = (long) (t->p[0].x * 0.5f * (float) window_width);
+    long y0 = (long) (t->p[0].y * 0.5f * (float) window_height);
+    long x1 = (long) (t->p[1].x * 0.5f * (float) window_width);
+    long y1 = (long) (t->p[1].y * 0.5f * (float) window_height);
+    long x2 = (long) (t->p[2].x * 0.5f * (float) window_width);
+    long y2 = (long) (t->p[2].y * 0.5f * (float) window_height);
+  
+    final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
+    final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
+    final_triangle.p[0].z = (int) 0;
+    final_triangle.p[0].color = COLOR_WHITE;
+    final_triangle.p[1].x = (int) ( x1 & 0xFFFFFFFF);
+    final_triangle.p[1].y = (int) ( y1 & 0xFFFFFFFF);
+    final_triangle.p[1].z = (int) 0;
+    final_triangle.p[1].color = COLOR_WHITE;
+    final_triangle.p[2].x = (int) ( x2 & 0xFFFFFFFF);
+    final_triangle.p[2].y = (int) ( y2 & 0xFFFFFFFF);
+    final_triangle.p[2].z = (int) 0;
+    final_triangle.p[2].color = COLOR_WHITE;
+
+    final_triangle.used = TRUE;
+    final_triangle.initialized = TRUE;
+
+
+    //#debug
+    //printf("x0=%d y0=%d | x1=%d y1=%d | x2=%d y2=%d \n",
+    //    final_triangle.p[0].x, final_triangle.p[0].y, 
+    //    final_triangle.p[1].x, final_triangle.p[1].y, 
+    //    final_triangle.p[2].x, final_triangle.p[2].y );
+
+    xxxTriangleZ( NULL, &final_triangle );
+
+    return 0;
+}
+
+
+//------------------
 
 // Polyline
 // O segundo ponto da linha 
@@ -2680,6 +2736,156 @@ void multiply4 (int mat1[4][4], int mat2[4][4], int res[4][4])
         };
     };
 }
+
+
+void 
+gr_MultiplyMatrixVector(
+    struct gr_vecF3D_d *i, 
+    struct gr_vecF3D_d *o, 
+    struct gr_mat4x4_d *m )
+{
+    o->x = 
+        i->x * m->m[0][0] + 
+        i->y * m->m[1][0] + 
+        i->z * m->m[2][0] + 
+        m->m[3][0];
+
+    o->y = 
+        i->x * m->m[0][1] + 
+        i->y * m->m[1][1] + 
+        i->z * m->m[2][1] + 
+        m->m[3][1];
+    
+    o->z = 
+        i->x * m->m[0][2] + 
+        i->y * m->m[1][2] + 
+        i->z * m->m[2][2] + 
+        m->m[3][2];
+
+    float w = 
+        i->x * m->m[0][3] + 
+        i->y * m->m[1][3] + 
+        i->z * m->m[2][3] + 
+        m->m[3][3];
+
+    if (w != 0.0f)
+    {
+        o->x /= w; 
+        o->y /= w; 
+        o->z /= w;
+    }
+}
+
+
+//--------------------------------------------------
+
+int 
+gr_rotate_z(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime )
+{
+    struct gr_mat4x4_d matRotZ; 
+
+    angle += 1.0f * fElapsedTime;
+
+// gerando a matriz de tranformação.
+// Rotation Z
+	matRotZ.m[0][0] =  cosf(angle);
+	matRotZ.m[0][1] =  sinf(angle);
+	matRotZ.m[1][0] = -sinf(angle);
+	matRotZ.m[1][1] =  cosf(angle);
+	matRotZ.m[2][2] = 1;
+	matRotZ.m[3][3] = 1;
+
+// ---------------------------------------------------
+
+    if( (void*) in_tri == NULL )
+        return -1;
+    if( (void*) out_tri == NULL )
+        return -1;
+
+
+    
+
+// rotação em z,
+// o output esta no triRotatedZ.
+// os 3 vetores foram modificados.
+//-----------------------------    
+// Rotate in Z-Axis
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[0], 
+        (struct gr_vecF3D_d *) &out_tri->p[0], 
+        &matRotZ);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[1], 
+        (struct gr_vecF3D_d *) &out_tri->p[1], 
+        &matRotZ);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[2], 
+        (struct gr_vecF3D_d *) &out_tri->p[2], 
+        &matRotZ);
+//-----------------------------    
+
+    return 0;
+}
+//--------------------------------------------------
+
+
+//--------------------------------------------------
+
+int 
+gr_rotate_x(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime )
+{
+    struct gr_mat4x4_d matRotX;
+
+    angle += 1.0f * fElapsedTime;
+
+// gerando a matriz de tranformação.
+// Rotation X
+	matRotX.m[0][0] = 1;
+	matRotX.m[1][1] =  cosf(angle * 0.5f);
+	matRotX.m[1][2] =  sinf(angle * 0.5f);
+	matRotX.m[2][1] = -sinf(angle * 0.5f);
+	matRotX.m[2][2] =  cosf(angle * 0.5f);
+	matRotX.m[3][3] = 1;
+
+// ---------------------------------------------------
+
+    if( (void*) in_tri == NULL )
+        return -1;
+    if( (void*) out_tri == NULL )
+        return -1;
+
+//-----------------------------    
+// Rotate in X-Axis
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[0], 
+        (struct gr_vecF3D_d *) &out_tri->p[0], 
+        &matRotX);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[1], 
+        (struct gr_vecF3D_d *) &out_tri->p[1], 
+        &matRotX);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[2], 
+        (struct gr_vecF3D_d *) &out_tri->p[2], 
+        &matRotX);
+//-----------------------------    
+
+    return 0;
+}
+//--------------------------------------------------
+
+
+
+
+
 
 
 int scalar_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
