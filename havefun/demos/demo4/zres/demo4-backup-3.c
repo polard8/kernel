@@ -10,9 +10,6 @@
 char *args[] = { "nothing", NULL };
 
 
-char obj_buffer[1024];
-
-
 //struct mesh meshCube;
 struct gr_mat4x4_d matProj;
 float fTheta;
@@ -125,134 +122,26 @@ int OnUserCreate(void)
 		};
 */
 
-// Projection Matrix
-	float fNear = 0.1f;
-	float fFar = 1000.0f;
-	float fFov = 90.0f;
+		// Projection Matrix
+		float fNear = 0.1f;
+		float fFar = 1000.0f;
+		float fFov = 90.0f;
 		
-    //float fAspectRatio = (float)ScreenHeight() / (float)ScreenWidth();
-	float fAspectRatio = (float) 800 / (float) 600;
+		//float fAspectRatio = (float)ScreenHeight() / (float)ScreenWidth();
+		float fAspectRatio = (float) 800 / (float) 600;
+		
+		//float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+		float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
-	//float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-	float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-
-	matProj.m[0][0] = fAspectRatio * fFovRad;
-	matProj.m[1][1] = fFovRad;
-	matProj.m[2][2] = fFar / (fFar - fNear);
-	matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
-	matProj.m[2][3] = 1.0f;
-	matProj.m[3][3] = 0.0f;
+		matProj.m[0][0] = fAspectRatio * fFovRad;
+		matProj.m[1][1] = fFovRad;
+		matProj.m[2][2] = fFar / (fFar - fNear);
+		matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+		matProj.m[2][3] = 1.0f;
+		matProj.m[3][3] = 0.0f;
 
     return 0;
 }
-
-// fake Wavefront File Format (.obj)
-void test_fake_obj(void)
-{
-    struct gr_vecF3D_d vecs[32];
-    int obj_vecs_counter=0;
-
-/*
-v -0.5 -0.5 0.5
-v 0.5 -0.5 0.5
-v -0.5 0.5 0.5
-v 0.5 0.5 0.5
-v -0.5 0.5 -0.5
-v 0.5 0.5 -0.5
-v -0.5 -0.5 -0.5
-v 0.5 -0.5 -0.5
-*/
-
-    vecs[1].x = -0.2;
-    vecs[1].y = -0.2;
-    vecs[1].z =  0.2;
-
-    vecs[2].x =  0.2;
-    vecs[2].y = -0.2;
-    vecs[2].z =  0.2;
-
-    vecs[3].x = -0.2;
-    vecs[3].y =  0.2;
-    vecs[3].z =  0.2;
-
-    vecs[4].x =  0.2;
-    vecs[4].y =  0.2;
-    vecs[4].z =  0.2;
-
-    vecs[5].x = -0.2;
-    vecs[5].y =  0.2;
-    vecs[5].z = -0.2;
-
-    vecs[6].x =  0.2;
-    vecs[6].y =  0.2;
-    vecs[6].z = -0.2;
-
-    vecs[7].x = -0.2;
-    vecs[7].y = -0.2;
-    vecs[7].z = -0.2;
-
-    vecs[8].x =  0.2;
-    vecs[8].y = -0.2;
-    vecs[8].z = -0.2;
-
-/*
-f 1 2 4
-f 1 4 3
-f 3 4 6
-f 3 6 5
-f 5 6 8
-f 5 8 7
-f 7 8 2
-f 7 2 1
-f 2 8 6
-f 2 6 4
-f 7 1 3
-f 7 3 5
-*/
-    int sequence[3*16];
-    sequence[0]  = 1; sequence[1]  = 2;  sequence[2] = 3;
-    sequence[3]  = 1; sequence[4]  = 4;  sequence[5] = 3;
-    sequence[6]  = 3; sequence[7]  = 4;  sequence[8] = 6;
-    sequence[9]  = 3; sequence[10] = 6; sequence[11] = 5;
-    sequence[12] = 5; sequence[13] = 6; sequence[14] = 8;
-    sequence[15] = 5; sequence[16] = 8; sequence[17] = 7;
-    sequence[18] = 7; sequence[19] = 8; sequence[20] = 2;
-    sequence[21] = 7; sequence[22] = 2; sequence[23] = 1;
-    sequence[24] = 2; sequence[25] = 8; sequence[26] = 6;
-    sequence[27] = 2; sequence[28] = 6; sequence[29] = 4;
-    sequence[30] = 7; sequence[31] = 1; sequence[32] = 3;
-    sequence[33] = 7; sequence[34] = 3; sequence[35] = 5;
-
-
-    struct gr_triangleF3D_d tri;
-
-    int i=0;
-    int j=0;
-    int off=0;
-    int v=0;
-    for(i=1; i<=8; i++)
-    {
-        off = (i-1)*3;
-        
-        v = sequence[off+0];
-        tri.p[0].x = vecs[v].x;
-        tri.p[0].y = vecs[v].y;
-        tri.p[0].z = vecs[v].z;
-        
-        v = sequence[off+1];
-        tri.p[1].x = vecs[v].x;
-        tri.p[1].y = vecs[v].y;
-        tri.p[1].z = vecs[v].z;
-
-        v = sequence[off+2];
-        tri.p[2].x = vecs[v].x;
-        tri.p[2].y = vecs[v].y;
-        tri.p[2].z = vecs[v].z;
-
-        plotTriangleF(NULL, &tri);
-    };
-}
-
 
 int OnUserUpdate(float fElapsedTime)
 { 
@@ -390,8 +279,6 @@ int OnUserUpdate(float fElapsedTime)
 
 
     plotTriangleF(NULL, &triProjected );
-    
-    //test_fake_obj();
 
     demoFlushSurface(NULL);
     rtl_yield();
@@ -424,16 +311,6 @@ int main(int argc, char **argv)
     // chama o main() da engine
     
     printf("DEMO4.BIN: Initializing ...\n");
-
-/*
-    FILE *fp;
-    fp = (FILE *) fopen("test1.obj", "a+");
-    int nreads=-1;
-    nreads = read( fp->_file, obj_buffer, 511 );
-    printf("%s\n",obj_buffer);
-    while(1){}
-*/
-
     eng4_main(1,args);
     
     return 0;
