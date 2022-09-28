@@ -209,18 +209,6 @@ int service_drain_input (void)
 }
 
 
-// #todo
-// Sleep if there is no message in the queue.
-void gwssrv_wait_message(void)
-{
-    // #todo
-    // block()
-    
-    // #using this one for now.
-    gwssrv_yield();
-}
-
-
 // refresh the whole screen.
 // #todo: move to view/
 void gws_show_backbuffer(void)
@@ -263,19 +251,15 @@ void gws_show_backbuffer(void)
     //debug_print("gws_show_backbuffer: done\n");
 }
 
-
 unsigned long gws_get_device_width(void)
 {
     return (unsigned long) __device_width;
 }
 
-
 unsigned long gws_get_device_height(void)
 {
     return (unsigned long) __device_height;
 }
-
-
 
 // #todo
 // actually we gotta trust in the graphics device library
@@ -287,32 +271,23 @@ int gwssrv_init_globals(void)
 {
     register int i=0;
 
-
 // Initializing the graphics device library.
 // see: libgd.c
-
     libgd_initialize();
 
-//
 // Gramado mode
-//
-
 // get gramado mode.
 // jail, p1, home, p2, castle ...
 // Check validation and panic if fail.
  
     current_mode = gwssrv_get_system_metrics(130);
 
-    if (current_mode < 0)
-    {
+    if (current_mode < 0){
         printf ("gwssrv_init_globals: [FAIL] current_mode\n");
         exit (1);
     }
 
-//
 // framebuffer and backbuffer.
-//
-
 // buffers
 // We need to find a better way to get these addresses,
 // maybe a library. (direct framebuffer library thing)
@@ -321,7 +296,6 @@ int gwssrv_init_globals(void)
 // #test:
 // We have the rtl included in this project,
 // let's give rtl a chance for now.
-
 // #todo
 // Is this call using the sc82 syscall ? or the sc80 ?
 // We need full access to the kernel structure.
@@ -377,16 +351,11 @@ int gwssrv_init_globals(void)
         exit(1);
     }
 
-
 // Flags for refresh
-
     refresh_device_screen_flag = FALSE;    
     refresh_valid_screen_flag = FALSE;
 
-
-// Color scheme
 // Color scheme: Humility
-
     gwssrv_initialize_color_schemes(ColorSchemeHumility);
     gwssrv_select_color_scheme(ColorSchemeHumility);
 
@@ -396,11 +365,8 @@ int gwssrv_init_globals(void)
 }
 
 
-/*
- * gwsInit:
- *     Initialize the server. 
- */
-
+// gwsInit:
+// Initialize the server. 
 // Called by initGraphics() in main.c
 
 int gwsInit(void)
@@ -524,14 +490,8 @@ int gwsInit(void)
     DeviceScreen->used  = TRUE;
     DeviceScreen->magic = 1234;
 
-// =================================================
-
 // -------------------
-
-//
 // Default dc.
-//
-
 // This is the default device context structure.
 
     // dc object
@@ -591,24 +551,16 @@ int gwsInit(void)
     gr_dc->initialized = TRUE;
 // -------------------
 
-
-    // font support.
+// font support.
     gwssrv_init_font();
-
-    // char support
+// char support
     gwssrv_init_char();
-
-    // windows
-    // Inicializamos algumas variáves ...
-    // as primeira janelas são criadas logo abaixo.
+// windows
+// Inicializamos algumas variáves ...
+// as primeira janelas são criadas logo abaixo.
     gwssrv_init_windows();    
 
-
-//
-// == gui structure ============================================
-//
-
-
+// gui structure
 // First level structure for the GUI.
 
     gui = (void *) malloc( sizeof( struct gui_d) );
@@ -659,12 +611,8 @@ int gwsInit(void)
         exit(1);
     }
 
-//
-// Let's start our z-order list;
-//
-
+// Let's start our z-order list
     last_window = NULL;
-
 
     //#debug
     //debug_print(" $ \n");
@@ -721,19 +669,17 @@ int gwsInit(void)
     gwssrv_show_backbuffer();
     //while(1){}
 
-    //debug_print("gwsInit: done\n");
-
     return 0;
 }
 
 
-// invalidate the frame.
+// Invalidate the whole frame.
 void invalidate(void)
 {
     dirty = TRUE;
 }
 
-// validate the frame.
+// Validate the whole frame.
 void validate(void)
 {
     dirty = FALSE;
@@ -745,16 +691,19 @@ int isdirty(void)
     return (int) dirty;
 }
 
+
 // invalidate all the background.
+// #bugbug: Use background_dirty ??
 void invalidate_background(void)
 {
-    // #bugbug: Use background_dirty ??
     background = TRUE;
+    //invalidate();
 }
 
 void validate_background(void)
 {
     background = FALSE;
+    //validate();
 }
 
 // Check the background validation.
@@ -763,27 +712,24 @@ int is_background_dirty(void)
     return (int) background;
 }
 
-
 void gwssrv_set_keyboard_focus(int window)
 {
-    if (window<0)
+    if (window<0){
         return;
+    }
     set_focus_by_id(window);
 }
 
-
 // Refresh the device screen
-// #todo: move to view/
 void refresh_screen(void)
 {
     refresh_device_screen();
 }
 
 // Refresh the device screen
-// #todo: move to view/
 void refresh_device_screen(void)
 {
-    debug_print ("refresh_device_screen:\n");
+    //debug_print ("refresh_device_screen:\n");
 
     gws_show_backbuffer();
     refresh_device_screen_flag = FALSE; // Invalidate.
@@ -794,8 +740,7 @@ void refresh_device_screen(void)
 // #todo: move to view/
 void refresh_valid_screen(void)
 {
-
-    debug_print ("refresh_valid_screen:\n");
+    //debug_print ("refresh_valid_screen:\n");
 
     if ( (void*) CurrentDisplay == NULL ){
         printf("refresh_valid_screen: [ERROR] CurrentDisplay\n");
@@ -856,16 +801,8 @@ copy_backbuffer (
 */
 
 
-
-
-
-
-/*
- * serverInit
- * 
- */
-
-// Is it used?
+// =======================
+// serverInit
 
 int serverInit (void)
 {
@@ -883,10 +820,7 @@ int serverInit (void)
 }
 
 
-
 //
 // End.
 //
-
-
 

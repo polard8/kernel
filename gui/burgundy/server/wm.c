@@ -38,22 +38,18 @@ struct gws_window_d *last_window;
 struct gws_window_d *top_window;     // z-order
 // -------------------------------------
 
-
 static const char *app1_string = "terminal.bin";
 static const char *app2_string = "editor.bin";
 static const char *app3_string = "browser.bin";
 static const char *app4_string = "fileman.bin";
 //static const char *app4_string = "cmdline.bin";
 
-
 static unsigned long last_input_jiffie=0;
-
 
 // global.
 // Permission:
 // TRUE = The kernel can use the handler.
 int g_handler_flag;
-
 
 // #todo
 // Input event
@@ -62,7 +58,6 @@ int g_handler_flag;
 // Calcular o delta.
 //unsigned long gMouseInputEventTime=0;
 //unsigned long gKeyboardInputEventTime=0;
-
 
 //#define DEFAULT_ALIVIO  16
 //static unsigned long alivio=DEFAULT_ALIVIO;
@@ -89,8 +84,6 @@ static int current_option=OPTION_NOTHING;
 
 // Quantos botões ja temos.
 static int tb_buttons_count=0;  
-//static int tb_fisrt_reponder = 0;
-
 static int tb_buttons[TB_BUTTONS_MAX];
 static int tb_buttons_status[TB_BUTTONS_MAX];
 
@@ -3830,46 +3823,36 @@ int wmSTDINInputReader(void)
 // precisam ficar em bibliotecas. Mas de uma
 // biblioteca pode existir no servidor, uma
 // pra cada tipo de sistema.
-// called by main.c
-
-int wmInputReader(void)
-{
-    int i=0;
-
 // vamos tentar 32 vezes,
 // pois nossa lista tem 32 ou 64 slots.
 // Se encontrarmos um evento, entao pegamos ele.
 // #bugbug: Isso eh um problema,
 // pois quando nao tiver mensagens na fila,
 // teremos que executar esse loop.
-
 // #todo
 // A mensagem de tecla pressionada
 // deve vir com a informação de quanto
 // tempo ela permaneceu pressionada.
-
 // processamos ate 32 input válidos.
 // isso deve ajudar quando movimentarmos o mouse.
-    
-    int __Status=-1;
+// Called by main.c
+
+int wmInputReader(void)
+{
+// Process all the messages in the queue, 
+// starting at the first message.
+// Disrespecting the circular input.
+
+    int __Status = -1;
+    register int i=0;
 
     for (i=0; i<=31; i++)
     {
-        //nao volte ao inicio da fila
-        if(i<31){
-            __Status = rtl_get_event2(i,FALSE);
-        }
-        //volte ao inicio da fila.
-        if(i==31){
-            __Status = rtl_get_event2(i,TRUE);
-        }
-        
-        // reset
-        //if (__Status!=TRUE){
-        //    __Status = rtl_get_event2(i,TRUE);
-        //    break;
-        //}
-        
+        // Não volte ao inicio da fila
+        if(i<31) { __Status = rtl_get_event2(i,FALSE); }
+        // Volte ao inicio da fila.
+        if(i==31){ __Status = rtl_get_event2(i,TRUE);  }
+
         // #todo
         // Se a mensagem for um input de teclado,
         // então enviamos a mensagem 

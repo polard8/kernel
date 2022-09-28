@@ -221,9 +221,9 @@ void demoCat (void)
             demoFlushSurface();                  // Flush surface
 
             // good for qemu,
-            //for (j=0; j<8; j++){ gwssrv_yield();}  // Delay
+            //for (j=0; j<8; j++){ rtl_yield();}  // Delay
             // good for kvm,
-            for (j=0; j<80; j++){ gwssrv_yield();}  // Delay
+            for (j=0; j<80; j++){ rtl_yield();}  // Delay
         };
         
         count--;
@@ -440,7 +440,7 @@ void demoPolygon(void)
     // Show
     demoFlushSurface();  
     
-    for (j=0; j<8; j++){ gwssrv_yield(); }
+    for (j=0; j<8; j++){ rtl_yield(); }
 
     };
     };   //while
@@ -585,7 +585,7 @@ void demoPolygon2(void)
     demoFlushSurface();  
     
     //delay
-    for (j=0; j<20; j++){ gwssrv_yield();}
+    for (j=0; j<20; j++){ rtl_yield();}
 
     };
     };   //while
@@ -674,7 +674,7 @@ void demoCurve(void)
         demoFlushSurface();          // flush surface
         
         // delay  
-        for (j=0; j<8; j++){ gwssrv_yield();}
+        for (j=0; j<8; j++){ rtl_yield();}
     };
     }
 }

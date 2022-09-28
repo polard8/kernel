@@ -80,6 +80,24 @@ See: https://wiki.osdev.org/Graphics_stack
 
 // Gramado Network Protocol 
 
+#define wsMSG_KEYDOWN     20
+#define wsMSG_KEYUP       21
+#define wsMSG_SYSKEYDOWN  22
+#define wsMSG_SYSKEYUP    23
+
+#define wsVK_F1    0x3B  //59    // No DOS é 0x170.  
+#define wsVK_F2    0x3C  //60 
+#define wsVK_F3    0x3D  //61 
+#define wsVK_F4    0x3E  //62 
+
+
+#define wsVK_RETURN    0x1C
+#define wsVK_TAB       0x0F
+
+#define wsCOLOR_BLACK    0x000000
+#define wsCOLOR_GRAY     0x808080 
+
+
 // #standard
 #define GNP_WID        0
 #define GNP_MESSAGE    1
@@ -111,6 +129,7 @@ struct initialization_d  Initialization;
 //see: gws.h
 struct gws_d  *window_server;
 
+static int IsAcceptingInput = FALSE;
 static int IsAcceptingConnections = FALSE;
 static int connection_status = 0;
 // Number of accepted requests.
@@ -269,16 +288,6 @@ void gwssrv_debug_print (char *string)
 }
 
 
-// #bugbug
-// delete this. we already have the library.
-int gwssrv_clone_and_execute ( char *name )
-{
-    printf("gwssrv_clone_and_execute: #deprecated\n");
-    return (int) -1;
-}
-
-
-// #delete
 // We can use the rtl or the library
 unsigned long gwssrv_get_system_metrics (int index)
 {
@@ -470,7 +479,7 @@ __again:
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
     if (n_writes<=0){
-        gwssrv_yield();
+        rtl_yield();
         goto __again;
     }
 
@@ -675,7 +684,7 @@ exit2:
     message_buffer[4] = 0;
     message_buffer[5] = 0;
 exit1:
-    gwssrv_yield();
+    rtl_yield();
 exit0:
 // Sync. Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
@@ -916,123 +925,14 @@ exit2:
     message_buffer[4] = 0;
     message_buffer[5] = 0;
 exit1:
-    //gwssrv_yield();
+    //rtl_yield();
 exit0:
     return;
 }
 
 
-
 /*
- //#test
-void ____get_system_message( unsigned long buffer );
-void ____get_system_message( unsigned long buffer )
-{
-    // Get message.
-    gwssrv_enter_critical_section();
-    gramado_system_call ( 111,
-            (unsigned long) buffer,
-            (unsigned long) buffer,
-            (unsigned long) buffer );
-    gwssrv_exit_critical_section();
-}
-*/
-
-
-#define wsMSG_KEYDOWN     20
-#define wsMSG_KEYUP       21
-#define wsMSG_SYSKEYDOWN  22
-#define wsMSG_SYSKEYUP    23
-
-#define wsVK_F1    0x3B  //59    // No DOS é 0x170.  
-#define wsVK_F2    0x3C  //60 
-#define wsVK_F3    0x3D  //61 
-#define wsVK_F4    0x3E  //62 
-
-
-#define wsVK_RETURN    0x1C
-#define wsVK_TAB       0x0F
-
-#define wsCOLOR_BLACK    0x000000
-#define wsCOLOR_GRAY     0x808080 
-
-
-
-int 
-wsInputProcedure ( 
-    struct gws_window_d *window, 
-    int msg, 
-    unsigned long long1, 
-    unsigned long long2 )
-{
-
-    switch (msg)
-    {
-        // 20 = MSG_KEYDOWN
-        case wsMSG_KEYDOWN:
-            switch (long1)
-            {
-
-                // [Enter] - Finalize the command line and compare.
-                case wsVK_RETURN:
-                    input('\0');
-                    //shellCompare();
-                    //asm("int $3");
-                    goto done;
-                    break; 
-
-                case wsVK_TAB: 
-                    printf("\t");
-                    goto done; 
-                    break;
-
-                // keyboard arrows
-                case 0x48: printf ("UP   \n"); goto done; break;
-                case 0x4B: printf ("LEFT \n"); goto done; break;
-                case 0x4D: printf ("RIGHT\n"); goto done; break;
-                case 0x50: printf ("DOWN \n"); goto done; break;
-
-                case 0x47: 
-                    printf ("HOME\n");
-                    goto done; 
-                    break;
-                    
-                case 0x4F: 
-                    printf ("END \n"); 
-                    goto done; 
-                    break;
-
-                //pageup pagedown
-                case 0x49: printf ("PAGEUP   \n"); goto done; break;
-                case 0x51: printf ("PAGEDOWN \n"); goto done; break;
-
-                // insert delete
-                case 0x52: printf ("INSERT\n"); goto done; break;
-                case 0x53: printf ("DELETE\n"); goto done; break;
-
-                default:
-                    input ( (unsigned long) long1 );  
-                    printf("%c",long1); fflush(stdout);
-                    break;
-            };
-            break;
-
-  // 22 = MSG_SYSKEYDOWN
-        case wsMSG_SYSKEYDOWN:
-            switch (long1)
-            {
-                case wsVK_F1: printf ("F1\n");  break;
-                case wsVK_F2: printf ("F2\n");  break;
-            };
-            break;
-    };
-
-done:
-    return 0;
-}
-
-
-/*
+ * ==============================
  * gwsProcedure:
  *     Main dialog.
  */
@@ -3427,6 +3327,7 @@ static int on_execute(void)
     int CanRead = -1;
 
     IsTimeToQuit = FALSE;
+    IsAcceptingInput = TRUE;
     IsAcceptingConnections = TRUE;
     g_handler_flag = FALSE;  // The kernel can't use the handler.
 
@@ -3839,15 +3740,14 @@ static int on_execute(void)
 
     while (running == TRUE){
 
-        if (IsTimeToQuit == TRUE){
-            break;
-        };
-        
-        // Messages
-        // read only one valid message from 
-        // thread's message queue.
-        // # This is very good. Only use this one.
-        wmInputReader();
+        if (IsTimeToQuit == TRUE){ break; };
+
+        // Process all the messages in the queue, 
+        // starting at the first message.
+        // Disrespecting the circular input.
+        if (IsAcceptingInput == TRUE){
+            wmInputReader();
+        }
 
         if (IsAcceptingConnections == TRUE)
         {
@@ -3906,13 +3806,6 @@ static int on_execute(void)
     return 0; 
 }
 
-
-// yield thread.
-// #todo: delete this. We already have the library routine.
-void gwssrv_yield(void)
-{
-    sc82(265,0,0,0);
-}
 
 void gwssrv_quit(void)
 {

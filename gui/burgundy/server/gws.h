@@ -213,7 +213,6 @@ int service_drain_input (void);
 
 void gwssrv_debug_print (char *string);
 
-int gwssrv_clone_and_execute ( char *name );
 unsigned long gwssrv_get_system_metrics (int index);
 
 void gwssrv_enter_critical_section (void);
@@ -234,8 +233,6 @@ int serverInit (void);
 
 void gws_show_backbuffer(void);
 int gwssrv_init_globals(void);
-void gwssrv_wait_message(void);
-void gwssrv_yield(void);
 void gwssrv_quit(void);
 
 //
