@@ -226,19 +226,19 @@ int OnUserUpdate3(float fElapsedTime)
         tri.p[0].x = vecs[v].x;
         tri.p[0].y = vecs[v].y;
         tri.p[0].z = vecs[v].z;
-        tri.p[0].color = COLOR_RED; 
+        tri.p[0].color = COLOR_WHITE;  //COLOR_RED; 
         
         v = sequence[off+1];
         tri.p[1].x = vecs[v].x;
         tri.p[1].y = vecs[v].y;
         tri.p[1].z = vecs[v].z;
-        tri.p[1].color = COLOR_GREEN;
+        tri.p[1].color = COLOR_WHITE;  // COLOR_GREEN;
 
         v = sequence[off+2];
         tri.p[2].x = vecs[v].x;
         tri.p[2].y = vecs[v].y;
         tri.p[2].z = vecs[v].z;
-        tri.p[2].color = COLOR_BLUE;
+        tri.p[2].color = COLOR_WHITE;  // COLOR_BLUE;
         
 
         //-----------------------------    
