@@ -10,7 +10,7 @@ EDITION_NAME  = Facilities
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 6
-VERSION_BUILD = 298
+VERSION_BUILD = 299
 # Compiling on gcc 11.2
 # Linking on ld 2.38
 
