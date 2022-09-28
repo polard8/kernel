@@ -1,10 +1,12 @@
 
+// math.h 
 
-
-//math.h 
 
 #ifndef  _MATH_H
 #define  _MATH_H  1
+
+// hehe
+#define GRAMADO_PI  3.14159265 
 
 union __float_u {
 	unsigned char __dummy[sizeof(float)];
@@ -117,6 +119,13 @@ long power1(long x, unsigned int n);
 long power2(long x, unsigned int y);
 float power3(float x, int y);
 double power4(double x, int y);
+
+//----------------
+float sinf(float arg);
+float cosf(float arg);
+float tanf(float arg);
+
+
 
 #endif    
 

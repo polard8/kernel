@@ -90,13 +90,10 @@ all-c:
 	cp $(LIBGWSOBJ)/gws.o .
 	cp $(LIBGWSOBJ)/rw.o .
 	
-	
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o GDM2.BIN $(myObjects)    
-
 finalize:
 	cp GDM2.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm GDM2.BIN 

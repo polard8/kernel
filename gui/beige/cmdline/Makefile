@@ -76,20 +76,19 @@ all-c:
 #test
 	cp $(LIBCOBJ)/math.o  .
 
+
 	cp $(LIBGWSOBJ)/connect.o  .
 	cp $(LIBGWSOBJ)/events.o  .
 	cp $(LIBGWSOBJ)/gws.o  .
 	cp $(LIBGWSOBJ)/rw.o  .
 	cp $(LIBGWSOBJ)/gr.o  .
 
-
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o CMDLINE.BIN $(myObjects)    
-
 finalize:
 	cp CMDLINE.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm CMDLINE.BIN 
-
+	
+	

@@ -100,7 +100,6 @@ struct gr_triangleF3D_d
 };
 
 
-
 // 3D rectangle.
 struct gr_rectangle_d
 {

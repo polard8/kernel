@@ -78,15 +78,11 @@ all-c:
 	cp $(LIBGWSOBJ)/rw.o .
 	cp $(LIBGWSOBJ)/gws.o .
 
-
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o TERMINAL.BIN $(myObjects)    
-
 finalize:
 	cp TERMINAL.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm TERMINAL.BIN 
-	
 	

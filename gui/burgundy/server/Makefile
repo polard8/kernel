@@ -129,9 +129,9 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	$(LD) -r -o archive_fx.o  grprim.o sprite.o demos.o 
 
 #extra
-	$(CC)  -c  xxxinput.c  $(CFLAGS) $(CINCLUDES) -o xxxinput.o
-	$(CC)  -c  font.c      $(CFLAGS) $(CINCLUDES) -o font.o
-	$(LD) -r -o archive_extra.o  xxxinput.o font.o 
+	$(CC)  -c grinput.c  $(CFLAGS) $(CINCLUDES) -o grinput.o
+	$(CC)  -c  font.c    $(CFLAGS) $(CINCLUDES) -o font.o
+	$(LD) -r -o archive_extra.o grinput.o font.o 
 
 	$(CC)  -c  menu.c  $(CFLAGS) $(CINCLUDES) -o menu.o
 	$(CC)  -c  wm.c    $(CFLAGS) $(CINCLUDES) -o wm.o

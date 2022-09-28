@@ -1,11 +1,4 @@
 
-	#todo
 
-	The application gws.bin will be a command to setup 
- the gwssrv.bin on the fly.
-
-
-	$ gws --shutdown
-	$ gws --start
-	... 
-
+    Using this application for testing the fpu support, 
+    the math library and the gr.c library.

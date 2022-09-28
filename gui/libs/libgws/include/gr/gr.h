@@ -16,8 +16,8 @@
 #define grMAX3(x,y,z)    ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
 
 
-// floar
-struct gr_vec3D_float_d
+// float
+struct gr_vecF3D_d
 {
     float x;
     float y;
@@ -26,6 +26,27 @@ struct gr_vec3D_float_d
 // For interpolation.
     unsigned int color;
 };
+
+// float 3D triangle
+struct gr_triangleF3D_d
+{
+    int used;
+    int magic;
+    int initialized;
+    struct gr_vecF3D_d p[3];
+    // mesh support.
+    struct gr_triangleF3D_d *last;
+    struct gr_triangleF3D_d *next;
+};
+
+// float
+struct gr_mat4x4_d
+{
+    float m[4][4];  // = { 0 };
+};
+
+
+
 
 // int
 struct gr_vec3D_d
@@ -136,6 +157,14 @@ interpolate_color(
     unsigned int fraction );
 
 unsigned int invert_color(unsigned int color);
+
+
+void 
+gr_MultiplyMatrixVector(
+    struct gr_vecF3D_d *i, 
+    struct gr_vecF3D_d *o, 
+    struct gr_mat4x4_d *m );
+
 
 
 // Plot a point using float.

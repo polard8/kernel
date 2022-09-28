@@ -77,13 +77,10 @@ all-c:
 	cp $(LIBGWSOBJ)/gws.o .
 	cp $(LIBGWSOBJ)/rw.o .
 	
-	
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o EDITOR.BIN $(myObjects)    
-
 finalize:
 	cp EDITOR.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm EDITOR.BIN 

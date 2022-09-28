@@ -35,7 +35,7 @@ extern int current_mode;
 
 #include "wt.h"
 #include "menu.h"
-#include "xxxinput.h"   //#test
+#include "grinput.h"   //#test
 #include "window.h"
 #include "bmp.h"
 

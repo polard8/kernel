@@ -79,15 +79,12 @@ all-c:
 	cp $(LIBGWSOBJ)/gws.o .
 	cp $(LIBGWSOBJ)/rw.o .
 	
-	
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o SETUP.BIN $(myObjects)    
-
 finalize:
 	cp SETUP.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm SETUP.BIN 
 	
-	
+

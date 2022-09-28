@@ -37,11 +37,12 @@ static unsigned long __savedHeight=0;
 //static unsigned long WindowHotSpotY=0;
 
 
-static void 
-__transform_from_modelspace_to_screespace(
-    int *res_x,
-    int *res_y,
-    int _x, int _y, int _z );
+static int 
+__transform_from_viewspace_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, int _z,
+    int left_hand,
+    int _hotspotx, int _hotspoty );
 
 static void __initializing_hotspot(void);
 
@@ -58,12 +59,11 @@ static void __initializing_hotspot(void)
 {
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-    __savedWidth  = w;
-    __savedHeight = h;
+    __savedWidth  = (w & 0xFFFFFFFF);
+    __savedHeight = (h & 0xFFFFFFFF);
     HotSpotX = (w>>1);
     HotSpotY = (h>>1);
 }
-
 
 //#todo: Explain it better.
 unsigned int 
@@ -100,120 +100,202 @@ unsigned int invert_color(unsigned int color)
 }
 
 
+void 
+gr_MultiplyMatrixVector(
+    struct gr_vecF3D_d *i, 
+    struct gr_vecF3D_d *o, 
+    struct gr_mat4x4_d *m )
+{
+    o->x = 
+        i->x * m->m[0][0] + 
+        i->y * m->m[1][0] + 
+        i->z * m->m[2][0] + 
+        m->m[3][0];
+
+    o->y = 
+        i->x * m->m[0][1] + 
+        i->y * m->m[1][1] + 
+        i->z * m->m[2][1] + 
+        m->m[3][1];
+    
+    o->z = 
+        i->x * m->m[0][2] + 
+        i->y * m->m[1][2] + 
+        i->z * m->m[2][2] + 
+        m->m[3][2];
+
+    float w = 
+        i->x * m->m[0][3] + 
+        i->y * m->m[1][3] + 
+        i->z * m->m[2][3] + 
+        m->m[3][3];
+
+    if (w != 0.0f)
+    {
+        o->x /= w; 
+        o->y /= w; 
+        o->z /= w;
+    }
+}
 
 
+// Transforme from the (x,y,z) coordinates of the 'view space'
+// to the (x,y) coordinates of the 2d screen space.
+// Hand-made. No matrix.
+// Using the left-hand style. The same found in Direct3D.
+// Not normalized screen.
+// Called by grPlot0().
+// (This is a not standard method).
+// (0,0) represents the top/left corner in a 2D screen.
+// The center of the screen in 2D is the hotspot.
+// (0,0,0) represents the center of the screen in 3D viewspace
+// (0,0,0) in 3D is also the hotspot.
+// OUT: 
+// Return the 2D screen coordinates in res_x and res_y.
 
-// worker: Used by grPlot0()
-// Transforma no 'world space' para o 'view port'.
-static void 
-__transform_from_modelspace_to_screespace(
-    int *res_x,
-    int *res_y,
-    int _x, int _y, int _z )
+static int 
+__transform_from_viewspace_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, int _z,
+    int left_hand,
+    int _hotspotx, int _hotspoty )
 {
 
-// save parameters.
-    int x = (int) _x;
-    int y = (int) _y;
-    int z = (int) _z;
+// 3d
+// save parameters. (++)
+    int x  = (int) _x;  //1
+    int y  = (int) _y;  //2
+    //int x2 = (int) _y;  //3 #crazy
+    int z  = (int) _z;  //4
 
+// The given hotspot.
+// The center os our surface.
+    int hotspotx = (int) (_hotspotx & 0xFFFFFFFF);
+    int hotspoty = (int) (_hotspoty & 0xFFFFFFFF);
+
+// 2d:
 // final result.
     int X=0;
     int Y=0;
-    //int Z=0;
-    int FixOrientation = TRUE;
 
-// final z
-    //Z = (int) z;
+    // Register z value into the z buffer.
+    //int RegisterZValue=FALSE;
 
-    // The world space.
-    // (HotSpotX,HotSpotY,0)
-    // This is the origin of the 'world space'.
-    // model space.
-    // Been the reference for all the 'object spaces'.
+// The world space.
+// (HotSpotX,HotSpotY,0)
+// This is the origin of the 'world space'.
+// model space.
+// Been the reference for all the 'object spaces'.
 
-// ========================
-// z negativo
-//  _
-//   |
-//
-    if (z < 0)
-    {
-        // z é módulo para todos os casos em que z é menor que 0.
-        z = abs(z);
 
-        // x positivo, para direita.
-        if (x >= 0 ){
-            X = (unsigned long) ( (unsigned long)HotSpotX + (unsigned long)x);
-        }
-        // x negativo, para esquerda.
-        if (x < 0 ){
-            x = abs(x); 
-            X = (unsigned long) ( (unsigned long)HotSpotX - (unsigned long)x );
-        }
+// ===================================================
+// X::
 
-        // y positivo, para cima.
-        if ( y >= 0 ){
-            Y = (unsigned long) ( (unsigned long)HotSpotY - (unsigned long)y );
-        }
-        // y negativo, para baixo
-        if ( y < 0 ){
-            y = abs(y);
-            Y = (unsigned long) ( (unsigned long) HotSpotY + (unsigned long) y );
-        }
-
-        if (FixOrientation == TRUE){
-            X = ( (unsigned long) X - (unsigned long) z );
-            Y = ( (unsigned long) Y + (unsigned long) z );
-        }
-        
-        //if (Draw == FALSE){ return -1; }
-        goto done;
-    }
-
-// ========================
+// --------------------
 // z maior ou igual a zero.
 //    |
 //    ----
 //
     if (z >= 0)
     {
-        // z é positivo para todos os casos onde z é maior igual a 0.
-        
         // x positivo, para direita.
         if (x >= 0 ){
-            X = (unsigned long) ( (unsigned long) HotSpotX + (unsigned long) x );
+            X = (int) ( hotspotx + x );
         }
         // x negativo, para esquerda.
-        if (x < 0 ){
-            x = abs(x);   
-            X = (unsigned long) ( (unsigned long)HotSpotX - (unsigned long)x  );
+        if (x < 0 ){ x = abs(x);   
+            X = (int) ( hotspotx - x );
         }
+        goto done;
+    }
 
-        // y positivo, para cima.
-        if ( y >= 0 ){
-            Y = (unsigned long) ( (unsigned long)HotSpotY - (unsigned long)y );
+// --------------------
+// z negativo
+//  _
+//   |
+//
+    if (z < 0)
+    {
+        // x positivo, para direita.
+        if (x >= 0){
+            X = (int) (hotspotx + x);
         }
-
-        // y negativo, para baixo
-        if ( y < 0 ){
-            y = abs(y);
-            Y = (unsigned long) ( (unsigned long)HotSpotY + (unsigned long)y );
+        // x negativo, para esquerda.
+        if (x < 0){  x = abs(x); 
+            X = (int) (hotspotx - x);
         }
-
-        if (FixOrientation == TRUE){
-            X = ( (unsigned long) X + (unsigned long) z );
-            Y = ( (unsigned long) Y - (unsigned long) z );
-        }
-        
-        //if (Draw == FALSE){ return -1; }
         goto done;
     }
 
 done:
+
+// ===================================================
+// Y::
+     // y positivo, para cima.
+     if ( y >= 0 ){
+         Y = (int) ( hotspoty - y );
+     }
+     // y negativo, para baixo
+     if ( y < 0 ){ y = abs(y);
+         Y = (int) ( hotspoty + y );
+     }
+
+// ===================================================
+// Z::
+// Posição canônica do eixo z.
+// Usado para projeção em 2D depois de feita
+// as transformações.
+
+    // LEFT-HAND
+    if (left_hand == TRUE)
+    {
+        // z é positivo para todos os casos 
+        // onde z é maior igual a 0.
+        if(z >= 0)
+        { 
+            X = (X + z);  //para direita
+            Y = (Y - z);  //para cima
+        }
+        // z é módulo para todos os casos 
+        // em que z é menor que 0.
+        if(z < 0){ z = abs(z);
+            X = (X - z);   // para esquerda
+            Y = (Y + z);   // para baixo
+        }
+    }
+
+    // RIGHT-HAND
+    if (left_hand != TRUE)
+    {
+        // z é positivo para todos os casos 
+        // onde z é maior igual a 0.
+        if(z >= 0)
+        { 
+            X = (X - z);  //para esquerda
+            Y = (Y + z);  //para baixo
+        }
+        // z é módulo para todos os casos 
+        // em que z é menor que 0.
+        if(z < 0){ z = abs(z);
+            X = (X + z);   // para esquerda
+            Y = (Y - z);   // para baixo
+        }
+    }
+
+
+
+// ===================================================
+// Return values:
+
+    // fail
+    if ( (void*) res_x == NULL ){ return (int) -1; }
+    if ( (void*) res_y == NULL ){ return (int) -1; }
+
     *res_x = (int) X;
     *res_y = (int) Y;
-    return;
+
+    // ok
+    return 0;
 }
 
 
@@ -291,10 +373,11 @@ gws_plot0Int3D (
     int res_x=0;
     int res_y=0;
 
-    __transform_from_modelspace_to_screespace( 
-        (int *) &res_x,
-        (int *) &res_y,
-        x,y,z );
+    __transform_from_viewspace_to_screespace(
+        (int *) &res_x, (int *) &res_y,
+        x,y,z,
+        TRUE,   //left hand?
+        HotSpotX, HotSpotY );
 
     X = (int) res_x;
     Y = (int) res_y;

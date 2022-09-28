@@ -201,4 +201,39 @@ double power4(double x, int y)
     };
 }
 
+// -------------------------------
+
+// IN: angle
+float sinf(float arg)
+{
+    float ret = 0.0f;
+
+    asm(
+        "fsin"
+        : "=t"(ret)
+        : "0"(arg) );
+
+    return (float) ret;
+}
+
+
+// IN: angle
+float cosf(float arg)
+{
+    float ret= 0.0f;
+    asm(
+        "fcos"
+        : "=t"(ret)
+        : "0"(arg));
+    return (float) ret;
+}
+
+// IN: angle
+float tanf(float arg)
+{
+    return (float) __builtin_tan(arg);
+}
+
+
+
 
