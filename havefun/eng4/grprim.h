@@ -574,7 +574,20 @@ void
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
     int x1, int y1, int z1, unsigned long color2, int flag );
-    
+
+
+int
+plotLine3dLT2 (
+    struct gws_window_d *window,
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1,
+    int *x2, int *y2, int *z2, 
+    int n,   // track this vector.
+    unsigned int color,
+    int draw );
+
+
+
 void 
 plotQuadBezierSeg ( 
     int x0, int y0, int z0, 
@@ -619,10 +632,18 @@ xxxTriangleZ(
 
 int grTriangle( struct gr_triangle_d *triangle);
 
+
+int 
+xxxFillTriangle0(
+    struct gws_window_d *window, 
+    struct gr_triangle_d *triangle );
+
+
 int 
 plotTriangleF(
     struct gws_window_d *window,
-    struct gr_triangleF3D_d *t );
+    struct gr_triangleF3D_d *t,
+    int fill );
 
 //
 // == polygon ===========================

@@ -1673,6 +1673,73 @@ plotLine3d2 (
 }
 
 
+// track a given vector.
+// OUT: the number of vectors in this line.
+int
+plotLine3dLT2 (
+    struct gws_window_d *window,
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1,
+    int *x2, int *y2, int *z2, 
+    int n,   // track this vector.
+    unsigned int color,
+    int draw )
+{
+    int ResultNumberOfVectors=0;
+
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+
+   //#bugbug: This macro is wrong?!
+   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
+   
+   int dm = grMAX3(dx,dy,dz);
+   register int i = dm;
+   ResultNumberOfVectors = (int) i;
+
+    // x1 = y1 = z1 = dm/2; /* error offset */
+ 
+    x1 = (dm >> 1);
+    y1 = x1;
+    z1 = x1;
+
+    for (;;) {
+
+        if(draw){
+            grPlot0 ( window, z0, x0, y0, color );
+        }
+        
+        //
+        if (i == n)
+        {
+            if ( (void*) x2 != NULL ){ *x2 = x0; }
+            if ( (void*) y2 != NULL ){ *y2 = y0; }
+            if ( (void*) z2 != NULL ){ *z2 = z0; }
+            // Do not break.
+        }
+
+        // End of line.
+        if (i == 0){
+            break;
+        }
+
+        x1 -= dx;
+        if (x1 < 0) { x1 += dm; x0 += sx; }
+        y1 -= dy; 
+        if (y1 < 0) { y1 += dm; y0 += sy; }
+        z1 -= dz;
+        if (z1 < 0) { z1 += dm; z0 += sz; }
+
+        i--;
+    };
+
+    return (int) ResultNumberOfVectors;
+}
+
+
+
+
 
 
 // IN:
@@ -2007,12 +2074,276 @@ int grTriangle( struct gr_triangle_d *triangle )
 }
 
 
+int 
+xxxFillTriangle0(
+    struct gws_window_d *window, 
+    struct gr_triangle_d *triangle )
+{
+    int tmpx=0;
+    int tmpy=0;
+
+    unsigned int solid_color=0;
+
+    if ( (void*) triangle == NULL ){
+        return -1;
+    }
+
+    if ( (void*) window == NULL ){
+        return -1;
+    }
+    if(window->magic != 1234)
+        return -1;
+
+// -------------------------------------------
+// Draws a not filled triangle.
+// 3d coordinates
+
+    plotLine3d (
+        window,
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+        triangle->p[1].color );
+    plotLine3d (
+        window,
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+        triangle->p[2].color );
+    plotLine3d (
+        window,
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+        triangle->p[0].color );
+    
+    solid_color = triangle->p[0].color;
+//-------------------------------------------
+
+    int i=0;
+    int res_lt0x=0;
+    int res_lt0y=0;
+    int res_lt0z=0;
+    int res_lt1x=0;
+    int res_lt1y=0;
+    int res_lt1z=0;
+
+    // Number of vectors.
+    int nov1=0;
+    int nov2=0;
+
+// #test
+// 3 'demãos' de tinta, porque pintar na diagonal
+// não fica tão perfeitinho quanto pintar na horizontal,
+// ou vertical.
+// Mas no futuro vamos criar alguma solução que 
+// pinte na horizontal pra ficar pefeitinho.
+
+
+//--------------------------------------------------
+// first time
+
+    // muitas vezes.
+    // mas quebra quando termina o retangulo.
+    for (i=0; i<1000; i++)
+    {
+        // track 0
+        // plot a line and track a given vector.
+        nov1 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+            &res_lt0x, &res_lt0y, &res_lt0z,
+            i,
+            COLOR_RED,
+            FALSE );  //do not draw
+
+        // track 1
+        nov2 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+            &res_lt1x, &res_lt1y, &res_lt1z,
+            i,
+            COLOR_RED,
+            FALSE );  // do not draw
+
+        if ( i >= nov1 || i >= nov2 )
+            break;
+            
+        // line cutting the two lines.
+        plotLine3d (
+           window,
+           res_lt0x, res_lt0y, res_lt0z, 
+           res_lt1x, res_lt1y, res_lt1z, 
+           solid_color );
+     };
+
+//--------------------------------------------------
+// second time
+
+    // muitas vezes.
+    // mas quebra quando termina o retangulo.
+    for (i=0; i<1000; i++)
+    {
+        // track 0
+        // plot a line and track a given vector.
+        nov1 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+            &res_lt0x, &res_lt0y, &res_lt0z,
+            i,
+            COLOR_RED,
+            FALSE );  //do not draw
+
+        // track 1
+        nov2 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+            &res_lt1x, &res_lt1y, &res_lt1z,
+            i,
+            COLOR_RED,
+            FALSE );  // do not draw
+
+        if ( i >= nov1 || i >= nov2 )
+            break;
+            
+        // line cutting the two lines.
+        plotLine3d (
+           window,
+           res_lt0x, res_lt0y, res_lt0z, 
+           res_lt1x, res_lt1y, res_lt1z, 
+           solid_color );
+     };
+
+//--------------------------------------------------
+// third time
+
+    // muitas vezes.
+    // mas quebra quando termina o retangulo.
+    for (i=0; i<1000; i++)
+    {
+        // track 0
+        // plot a line and track a given vector.
+        nov1 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
+            &res_lt0x, &res_lt0y, &res_lt0z,
+            i,
+            COLOR_RED,
+            FALSE );  //do not draw
+
+        // track 1
+        nov2 = (int) plotLine3dLT2 (
+            window,
+            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
+            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
+            &res_lt1x, &res_lt1y, &res_lt1z,
+            i,
+            COLOR_RED,
+            FALSE );  // do not draw
+
+        if ( i >= nov1 || i >= nov2 )
+            break;
+            
+        // line cutting the two lines.
+        plotLine3d (
+           window,
+           res_lt0x, res_lt0y, res_lt0z, 
+           res_lt1x, res_lt1y, res_lt1z, 
+           solid_color );
+     };
+
+
+
+/*
+//-------------------------------------------
+// deltas absolutos
+
+    // y
+    int d1 = triangle->p[0].y - triangle->p[1].y;
+    int abs_d1 = abs(d1);
+    int d2 = triangle->p[0].y - triangle->p[2].y;
+    int abs_d2 = abs(d2);
+    int abs_d1d2 = d1 + d2;
+    
+    // x
+    int d3 = triangle->p[0].x - triangle->p[1].x;
+    int abs_d3 = abs(d3);
+    int d4 = triangle->p[0].x - triangle->p[2].x;
+    int abs_d4 = abs(d4);
+    int abs_d3d4 = d3 + d4;
+
+    int tmp;
+    
+    // dy <= dx
+    if ( abs_d1d2 <= abs_d1d2 )
+    {
+        if (triangle->p[2].x < triangle->p[1].x)
+        {
+            tmp = triangle->p[2].x;
+            triangle->p[2].x = triangle->p[1].x;
+            triangle->p[1].x = tmp;
+        }
+        if (triangle->p[1].x < triangle->p[0].x)
+        {
+            tmp = triangle->p[1].x;
+            triangle->p[1].x = triangle->p[0].x;
+            triangle->p[0].x = tmp;
+        }
+
+        if (triangle->p[2].y < triangle->p[1].y)
+        {
+            tmp = triangle->p[2].y;
+            triangle->p[2].y = triangle->p[1].y;
+            triangle->p[1].y = tmp;
+        }
+        if (triangle->p[1].y < triangle->p[0].y)
+        {
+            tmp = triangle->p[1].y;
+            triangle->p[1].y = triangle->p[0].y;
+            triangle->p[0].y = tmp;
+        }
+
+        plotLine3d(
+            window,
+            triangle->p[0].x, triangle->p[0].y, 0,
+            triangle->p[1].x, triangle->p[1].y, 0,
+            COLOR_WHITE );
+
+        plotLine3d(
+            window,
+            triangle->p[1].x, triangle->p[1].y, 0,
+            triangle->p[2].x, triangle->p[2].y, 0,
+            COLOR_WHITE );
+
+        plotLine3d(
+            window,
+            triangle->p[2].x, triangle->p[2].y, 0,
+            triangle->p[0].x, triangle->p[0].y, 0,
+            COLOR_WHITE );
+            
+
+    }
+    else{
+    };
+*/
+
+
+    return 0;
+}
+
+
+
+
+
 // IN: projected triangle.
 // float
 int 
 plotTriangleF(
     struct gws_window_d *window,
-    struct gr_triangleF3D_d *t )
+    struct gr_triangleF3D_d *t,
+    int fill )
 {
 
 // Engine triangle structure.
@@ -2037,17 +2368,20 @@ plotTriangleF(
     final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
     final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
     final_triangle.p[0].z = (int) 0;
-    final_triangle.p[0].color = COLOR_WHITE;
+    final_triangle.p[0].color = t->p[0].color; //COLOR_WHITE;
+    
     final_triangle.p[1].x = (int) ( x1 & 0xFFFFFFFF);
     final_triangle.p[1].y = (int) ( y1 & 0xFFFFFFFF);
     final_triangle.p[1].z = (int) 0;
-    final_triangle.p[1].color = COLOR_WHITE;
+    final_triangle.p[1].color = t->p[1].color; // COLOR_WHITE;
+    
     final_triangle.p[2].x = (int) ( x2 & 0xFFFFFFFF);
     final_triangle.p[2].y = (int) ( y2 & 0xFFFFFFFF);
     final_triangle.p[2].z = (int) 0;
-    final_triangle.p[2].color = COLOR_WHITE;
+    final_triangle.p[2].color = t->p[2].color; // COLOR_WHITE;
 
     final_triangle.used = TRUE;
+    
     final_triangle.initialized = TRUE;
 
 
@@ -2057,7 +2391,18 @@ plotTriangleF(
     //    final_triangle.p[1].x, final_triangle.p[1].y, 
     //    final_triangle.p[2].x, final_triangle.p[2].y );
 
-    xxxTriangleZ( NULL, &final_triangle );
+
+    // Not filled.
+    // we dont need a valid window.
+    if(!fill){
+        xxxTriangleZ( window, &final_triangle );
+    }
+
+    // Filled
+    // We need a valid window.
+    if(fill){
+        xxxFillTriangle0( window, &final_triangle );
+    }
 
     return 0;
 }

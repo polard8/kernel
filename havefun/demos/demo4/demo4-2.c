@@ -149,7 +149,7 @@ int OnUserCreate(void)
 // fake Wavefront File Format (.obj)
 int OnUserUpdate3(float fElapsedTime)
 {
-    demoClearSurface(NULL,COLOR_BLACK);
+    demoClearSurface(NULL,COLOR_GREEN);
 
     struct gr_mat4x4_d matRotZ; 
     struct gr_mat4x4_d matRotX;
@@ -226,20 +226,16 @@ int OnUserUpdate3(float fElapsedTime)
         tri.p[0].x = vecs[v].x;
         tri.p[0].y = vecs[v].y;
         tri.p[0].z = vecs[v].z;
-        tri.p[0].color = COLOR_RED; 
         
         v = sequence[off+1];
         tri.p[1].x = vecs[v].x;
         tri.p[1].y = vecs[v].y;
         tri.p[1].z = vecs[v].z;
-        tri.p[1].color = COLOR_GREEN;
 
         v = sequence[off+2];
         tri.p[2].x = vecs[v].x;
         tri.p[2].y = vecs[v].y;
         tri.p[2].z = vecs[v].z;
-        tri.p[2].color = COLOR_BLUE;
-        
 
         //-----------------------------    
         // Rotate in Z-Axis
@@ -252,14 +248,7 @@ int OnUserUpdate3(float fElapsedTime)
         gr_MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
         gr_MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
 
-        triRotatedZX.p[0].color = tri.p[0].color;
-        triRotatedZX.p[1].color = tri.p[1].color;
-        triRotatedZX.p[2].color = tri.p[2].color;
-        
-        //We need a valid window, to use the rasterization features.
-        if( (void*) __root_window != NULL ){
-            plotTriangleF(__root_window, &triRotatedZX,FALSE);
-        }
+        plotTriangleF(NULL, &triRotatedZX);
     };
 
     demoFlushSurface(NULL);
@@ -271,7 +260,7 @@ int OnUserUpdate3(float fElapsedTime)
 
 int OnUserUpdate(float fElapsedTime)
 { 
-    demoClearSurface(NULL,COLOR_BLACK);
+    demoClearSurface(NULL,COLOR_RED);
 
 //------------------------------------------------
 // Rotação em x e y com base no elapsed time.
@@ -403,11 +392,9 @@ int OnUserUpdate(float fElapsedTime)
 //-----------------------------    
 
 
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
 
+    plotTriangleF(NULL, &triProjected );
+    
     //test_fake_obj();
 
     demoFlushSurface(NULL);
@@ -419,7 +406,7 @@ int OnUserUpdate(float fElapsedTime)
 
 int OnUserUpdate2(float fElapsedTime)
 {
-    demoClearSurface(NULL,COLOR_BLACK);
+    demoClearSurface(NULL,COLOR_GREEN);
 
     struct gr_mat4x4_d matRotZ; 
     fTheta += 1.0f * fElapsedTime;
@@ -460,11 +447,7 @@ int OnUserUpdate2(float fElapsedTime)
     triProjected.p[2].y = triRotatedZ.p[2].y;  
     triProjected.p[2].z = triRotatedZ.p[2].z;
 
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
-
+    plotTriangleF(NULL, &triProjected );
 
     demoFlushSurface(NULL);
     rtl_yield();

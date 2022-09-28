@@ -147,78 +147,90 @@ int OnUserCreate(void)
 }
 
 // fake Wavefront File Format (.obj)
-int OnUserUpdate3(float fElapsedTime)
+void test_fake_obj(void)
 {
-    demoClearSurface(NULL,COLOR_BLACK);
-
-    struct gr_mat4x4_d matRotZ; 
-    struct gr_mat4x4_d matRotX;
-    fTheta += 1.0f * fElapsedTime;
-// Rotation Z
-	matRotZ.m[0][0] =  cosf(fTheta);
-	matRotZ.m[0][1] =  sinf(fTheta);
-	matRotZ.m[1][0] = -sinf(fTheta);
-	matRotZ.m[1][1] =  cosf(fTheta);
-	matRotZ.m[2][2] = 1;
-	matRotZ.m[3][3] = 1;
-// Rotation X
-	matRotX.m[0][0] = 1;
-	matRotX.m[1][1] =  cosf(fTheta * 0.5f);
-	matRotX.m[1][2] =  sinf(fTheta * 0.5f);
-	matRotX.m[2][1] = -sinf(fTheta * 0.5f);
-	matRotX.m[2][2] =  cosf(fTheta * 0.5f);
-	matRotX.m[3][3] = 1;
-//------------------------------------------------
-
-// triangles
-    struct gr_triangleF3D_d tri;            // triângulo original.
-    struct gr_triangleF3D_d triRotatedZ; 
-    struct gr_triangleF3D_d triRotatedZX;
-    struct gr_triangleF3D_d triProjected;   // triangulo final, mostrado na tela.
-// vectors
     struct gr_vecF3D_d vecs[32];
+    int obj_vecs_counter=0;
 
+/*
+v -0.5 -0.5 0.5
+v 0.5 -0.5 0.5
+v -0.5 0.5 0.5
+v 0.5 0.5 0.5
+v -0.5 0.5 -0.5
+v 0.5 0.5 -0.5
+v -0.5 -0.5 -0.5
+v 0.5 -0.5 -0.5
+*/
 
-    // v -0.5  -0.5  0.5
-    vecs[1].x = -0.2;  vecs[1].y = -0.2;  vecs[1].z =  0.2;
-    // v 0.5  -0.5  0.5
-    vecs[2].x =  0.2;  vecs[2].y = -0.2;  vecs[2].z =  0.2;
-    //v -0.5  0.5  0.5
-    vecs[3].x = -0.2;  vecs[3].y =  0.2;  vecs[3].z =  0.2;
-    // v 0.5  0.5  0.5
-    vecs[4].x =  0.2;  vecs[4].y =  0.2;  vecs[4].z =  0.2;
-    //v -0.5  0.5  -0.5
-    vecs[5].x = -0.2;  vecs[5].y =  0.2;  vecs[5].z = -0.2;
-    // v 0.5  0.5  -0.5
-    vecs[6].x =  0.2;  vecs[6].y =  0.2;  vecs[6].z = -0.2;
-    // v -0.5  -0.5  -0.5
-    vecs[7].x = -0.2;  vecs[7].y = -0.2;  vecs[7].z = -0.2;
-    // v 0.5  -0.5  -0.5
-    vecs[8].x =  0.2;  vecs[8].y = -0.2;  vecs[8].z = -0.2;
+    vecs[1].x = -0.2;
+    vecs[1].y = -0.2;
+    vecs[1].z =  0.2;
 
+    vecs[2].x =  0.2;
+    vecs[2].y = -0.2;
+    vecs[2].z =  0.2;
+
+    vecs[3].x = -0.2;
+    vecs[3].y =  0.2;
+    vecs[3].z =  0.2;
+
+    vecs[4].x =  0.2;
+    vecs[4].y =  0.2;
+    vecs[4].z =  0.2;
+
+    vecs[5].x = -0.2;
+    vecs[5].y =  0.2;
+    vecs[5].z = -0.2;
+
+    vecs[6].x =  0.2;
+    vecs[6].y =  0.2;
+    vecs[6].z = -0.2;
+
+    vecs[7].x = -0.2;
+    vecs[7].y = -0.2;
+    vecs[7].z = -0.2;
+
+    vecs[8].x =  0.2;
+    vecs[8].y = -0.2;
+    vecs[8].z = -0.2;
+
+/*
+f 1 2 4
+f 1 4 3
+f 3 4 6
+f 3 6 5
+f 5 6 8
+f 5 8 7
+f 7 8 2
+f 7 2 1
+f 2 8 6
+f 2 6 4
+f 7 1 3
+f 7 3 5
+*/
     int sequence[3*16];
-    
-    sequence[0]  = 1; sequence[1]  = 2;  sequence[2] = 3; //f 1 2 4
-    sequence[3]  = 1; sequence[4]  = 4;  sequence[5] = 3; //f 1 4 3
-    sequence[6]  = 3; sequence[7]  = 4;  sequence[8] = 6; //f 3 4 6
-    sequence[9]  = 3; sequence[10] = 6; sequence[11] = 5; //f 3 6 5
-    sequence[12] = 5; sequence[13] = 6; sequence[14] = 8; //f 5 6 8
-    sequence[15] = 5; sequence[16] = 8; sequence[17] = 7; //f 5 8 7
-    sequence[18] = 7; sequence[19] = 8; sequence[20] = 2; //f 7 8 2
-    sequence[21] = 7; sequence[22] = 2; sequence[23] = 1; //f 7 2 1
-    sequence[24] = 2; sequence[25] = 8; sequence[26] = 6; //f 2 8 6
-    sequence[27] = 2; sequence[28] = 6; sequence[29] = 4; //f 2 6 4
-    sequence[30] = 7; sequence[31] = 1; sequence[32] = 3; //f 7 1 3
-    sequence[33] = 7; sequence[34] = 3; sequence[35] = 5; //f 7 3 5
+    sequence[0]  = 1; sequence[1]  = 2;  sequence[2] = 3;
+    sequence[3]  = 1; sequence[4]  = 4;  sequence[5] = 3;
+    sequence[6]  = 3; sequence[7]  = 4;  sequence[8] = 6;
+    sequence[9]  = 3; sequence[10] = 6; sequence[11] = 5;
+    sequence[12] = 5; sequence[13] = 6; sequence[14] = 8;
+    sequence[15] = 5; sequence[16] = 8; sequence[17] = 7;
+    sequence[18] = 7; sequence[19] = 8; sequence[20] = 2;
+    sequence[21] = 7; sequence[22] = 2; sequence[23] = 1;
+    sequence[24] = 2; sequence[25] = 8; sequence[26] = 6;
+    sequence[27] = 2; sequence[28] = 6; sequence[29] = 4;
+    sequence[30] = 7; sequence[31] = 1; sequence[32] = 3;
+    sequence[33] = 7; sequence[34] = 3; sequence[35] = 5;
 
-    //struct gr_triangleF3D_d tri;
+
+    struct gr_triangleF3D_d tri;
 
     int i=0;
     int j=0;
     int off=0;
     int v=0;
-    //for(i=1; i<=8; i++)
-    for(i=1; i<=12; i++)
+    for(i=1; i<=8; i++)
     {
         off = (i-1)*3;
         
@@ -226,52 +238,25 @@ int OnUserUpdate3(float fElapsedTime)
         tri.p[0].x = vecs[v].x;
         tri.p[0].y = vecs[v].y;
         tri.p[0].z = vecs[v].z;
-        tri.p[0].color = COLOR_RED; 
         
         v = sequence[off+1];
         tri.p[1].x = vecs[v].x;
         tri.p[1].y = vecs[v].y;
         tri.p[1].z = vecs[v].z;
-        tri.p[1].color = COLOR_GREEN;
 
         v = sequence[off+2];
         tri.p[2].x = vecs[v].x;
         tri.p[2].y = vecs[v].y;
         tri.p[2].z = vecs[v].z;
-        tri.p[2].color = COLOR_BLUE;
-        
 
-        //-----------------------------    
-        // Rotate in Z-Axis
-        gr_MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
-        gr_MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
-        gr_MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
-        //-----------------------------    
-        // Rotate in X-Axis
-        gr_MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0], &matRotX);
-        gr_MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
-        gr_MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
-
-        triRotatedZX.p[0].color = tri.p[0].color;
-        triRotatedZX.p[1].color = tri.p[1].color;
-        triRotatedZX.p[2].color = tri.p[2].color;
-        
-        //We need a valid window, to use the rasterization features.
-        if( (void*) __root_window != NULL ){
-            plotTriangleF(__root_window, &triRotatedZX,FALSE);
-        }
+        plotTriangleF(NULL, &tri);
     };
-
-    demoFlushSurface(NULL);
-    rtl_yield();
-    
-    return 0;
 }
 
 
 int OnUserUpdate(float fElapsedTime)
 { 
-    demoClearSurface(NULL,COLOR_BLACK);
+    demoClearSurface(NULL,COLOR_RED);
 
 //------------------------------------------------
 // Rotação em x e y com base no elapsed time.
@@ -403,11 +388,9 @@ int OnUserUpdate(float fElapsedTime)
 //-----------------------------    
 
 
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
 
+    plotTriangleF(NULL, &triProjected );
+    
     //test_fake_obj();
 
     demoFlushSurface(NULL);
@@ -419,7 +402,7 @@ int OnUserUpdate(float fElapsedTime)
 
 int OnUserUpdate2(float fElapsedTime)
 {
-    demoClearSurface(NULL,COLOR_BLACK);
+    demoClearSurface(NULL,COLOR_GREEN);
 
     struct gr_mat4x4_d matRotZ; 
     fTheta += 1.0f * fElapsedTime;
@@ -460,11 +443,7 @@ int OnUserUpdate2(float fElapsedTime)
     triProjected.p[2].y = triRotatedZ.p[2].y;  
     triProjected.p[2].z = triRotatedZ.p[2].z;
 
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
-
+    plotTriangleF(NULL, &triProjected );
 
     demoFlushSurface(NULL);
     rtl_yield();
@@ -488,10 +467,8 @@ void gr_draw(void)
 {
     //printf("gr_draw:\n");
     //demoCat();
-
     //OnUserUpdate(1);
-    //OnUserUpdate2(1);
-    OnUserUpdate3(0.02f);
+    OnUserUpdate2(1);
 }
 
 int main(int argc, char **argv)
