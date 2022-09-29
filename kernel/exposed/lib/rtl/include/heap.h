@@ -1,6 +1,5 @@
 /*
  * File: heap.h
- *
  * Descrição:
  *     O propósito desse header é dar suporte ao gerenciamento de
  * do heap que será usado para a alocação de memória para um programa
@@ -8,14 +7,12 @@
  *     Um suporte oferecido pela biblioteca libC99.
  *     Obs: O kernel poderá usar tanto o heap do processo quanto o heap 
  * do desktop ao qual o processo pertence.
- * 
  * History:
  *     2016 - Created by Fred Nora.
  */
 
 #ifndef __HEAP_H
 #define __HEAP_H  1
-
 
 
 //Contagem de heap.
@@ -46,13 +43,12 @@ void *Heap;
 
 
 //
-// *** HEAP ***
+// HEAP
 //
 
 #define HEAP_BUFFER_SIZE (32*1024)  // 32KB, provisório.
 
 static unsigned char HeapBuffer[HEAP_BUFFER_SIZE]; 
-
 
 
 /*
