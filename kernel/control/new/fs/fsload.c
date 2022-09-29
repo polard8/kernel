@@ -482,6 +482,8 @@ __found:
 // == Load cluster chain ================
 //
 
+    int nreads=0;   // number of clusters read.
+
 __loop_next_entry:
 
 // #todo
@@ -579,9 +581,25 @@ __loop_next_entry:
 // sem ter sido registrado na estrutura do processo kernel.
 
     if ( cluster == 0xFFFF || cluster == 0xFFF8 )
-    { 
+    {
+        nreads++;
+
+        // File size limit:
+        // We have a limit when allocating memory for an image. 
+        // See: alloc_memory_for_image_and_stack() in process.c.
+        // See: gramado/config.h
+        // bytes per sector = 512.
+        // sectors per cluster  = 1.
+
+        if( (nreads/2) > IMAGESIZE_LIMIT_IN_KB ){
+            panic("fsLoadFile: nreads\n");
+        }
+        
+        // 0=OK.
         return (unsigned long) 0; 
     }
+
+    nreads++;
 
     goto __loop_next_entry;
 

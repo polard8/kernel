@@ -2350,9 +2350,10 @@ plotTriangleF(
 // Using 'int',
     struct gr_triangle_d final_triangle;
 
-    unsigned long window_width = 800;
-    unsigned long window_height = 600;
-
+    //unsigned long window_width = 800;
+    //unsigned long window_height = 600;
+    unsigned long window_width = gws_get_device_width();
+    unsigned long window_height = gws_get_device_height();
 
 // Check the 'projected triangle'.
     if((void*)t==0)

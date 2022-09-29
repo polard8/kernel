@@ -1630,6 +1630,8 @@ int init_process_manager (void)
 
 int alloc_memory_for_image_and_stack( struct process_d *process )
 {
+// #bugbug: Limit 400KB.
+
     unsigned long __new_base=0;   // Image base.
     unsigned long __new_stack=0;  // App stack.
 
@@ -1691,8 +1693,9 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 // o allocador de páginas.
 // O slab allocator nos dar 1MB e o alocador d páginas
 // nos dara quantas páginas pedirmos. Mas ele é muito limitado ainda.
+// see: gramado/config.h
 
-    int imagesize_in_kb = 400;
+    int imagesize_in_kb = IMAGESIZE_LIMIT_IN_KB; //400;
     int number_of_pages_on_image=0;
     number_of_pages_on_image = (int) (imagesize_in_kb*1024)/4096;     // 
 
