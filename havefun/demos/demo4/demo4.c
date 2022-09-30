@@ -189,22 +189,14 @@ int DrawModel1(float fElapsedTime)
 // que é o que a camera vê, então teríamos valores negativos,
 // que não deviram aparecer na imagem final.
 
-    // v -0.5  -0.5  0.5
-    vecs[1].x = -0.2;  vecs[1].y = -0.2;  vecs[1].z =  0.2;
-    // v 0.5  -0.5  0.5
-    vecs[2].x =  0.2;  vecs[2].y = -0.2;  vecs[2].z =  0.2;
-    //v -0.5  0.5  0.5
-    vecs[3].x = -0.2;  vecs[3].y =  0.2;  vecs[3].z =  0.2;
-    // v 0.5  0.5  0.5
-    vecs[4].x =  0.2;  vecs[4].y =  0.2;  vecs[4].z =  0.2;
-    //v -0.5  0.5  -0.5
-    vecs[5].x = -0.2;  vecs[5].y =  0.2;  vecs[5].z = -0.2;
-    // v 0.5  0.5  -0.5
-    vecs[6].x =  0.2;  vecs[6].y =  0.2;  vecs[6].z = -0.2;
-    // v -0.5  -0.5  -0.5
-    vecs[7].x = -0.2;  vecs[7].y = -0.2;  vecs[7].z = -0.2;
-    // v 0.5  -0.5  -0.5
-    vecs[8].x =  0.2;  vecs[8].y = -0.2;  vecs[8].z = -0.2;
+    vecs[1].x = (float) -0.2f;  vecs[1].y = (float) -0.2f;  vecs[1].z = (float)  0.2f;
+    vecs[2].x = (float)  0.2f;  vecs[2].y = (float) -0.2f;  vecs[2].z = (float)  0.2f;
+    vecs[3].x = (float) -0.2f;  vecs[3].y = (float)  0.2f;  vecs[3].z = (float)  0.2f;
+    vecs[4].x = (float)  0.2f;  vecs[4].y = (float)  0.2f;  vecs[4].z = (float)  0.2f;
+    vecs[5].x = (float) -0.2f;  vecs[5].y = (float)  0.2f;  vecs[5].z = (float) -0.2f;
+    vecs[6].x = (float)  0.2f;  vecs[6].y = (float)  0.2f;  vecs[6].z = (float) -0.2f;
+    vecs[7].x = (float) -0.2f;  vecs[7].y = (float) -0.2f;  vecs[7].z = (float) -0.2f;
+    vecs[8].x = (float)  0.2f;  vecs[8].y = (float) -0.2f;  vecs[8].z = (float) -0.2f;
 
 
     int sequence[3*16];
