@@ -230,11 +230,7 @@ exposed-tier:
 #havefun
 #todo: Add the games and demos, not the engines.
 	-sudo cp ../havefun/bin/*.BIN   control/disk/
-#	-sudo cp ../havefun/bin/DEMO1.BIN   control/disk/
-#	-sudo cp ../havefun/bin/DEMO2.BIN   control/disk/
-#	-sudo cp ../havefun/bin/GAME1.BIN   control/disk/
-#	-sudo cp ../havefun/bin/GAME2.BIN   control/disk/
-	
+
 #===================================================
 #::2
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.

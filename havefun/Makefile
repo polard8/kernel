@@ -12,6 +12,8 @@ all:
 	make -C eng2
 	make -C eng3
 	make -C eng4
+# gramado game engine.
+	make -C eng5
 
 	make -C demos
 
@@ -24,6 +26,8 @@ clean-all:
 	-rm eng2/*.o
 	-rm eng3/*.o
 	-rm eng4/*.o
+
+	-rm eng5/*.o
 
 	-rm bin/*.BIN
 	

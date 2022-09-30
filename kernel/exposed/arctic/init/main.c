@@ -209,8 +209,6 @@ void callback1(void)
 }
 
 
-
-
 static int __CompareString(void)
 {
     int ret_val=-1;
@@ -410,7 +408,14 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
-
+// Gramado game engine
+    if( strncmp(prompt,"demo5",5) == 0 )
+    {
+        printf ("~ Demo 5:\n");
+        rtl_clone_and_execute("demo5.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
 
     // ...
 
