@@ -118,8 +118,7 @@ static unsigned long HotSpotY=0;
 
 static int 
 __transform_from_viewspace_to_screespace(
-    int *res_x,
-    int *res_y,
+    int *res_x, int *res_y,
     int _x, int _y, int _z,
     int left_hand,
     int _hotspotx, int _hotspoty );
@@ -814,12 +813,14 @@ gwsDepthRange(
 
 static int 
 __transform_from_viewspace_to_screespace(
-    int *res_x,
-    int *res_y,
+    int *res_x, int *res_y,
     int _x, int _y, int _z,
     int left_hand,
     int _hotspotx, int _hotspoty )
 {
+// #
+// The viewspace is the view considering 
+// the camera's point of view.
 
 // 3d
 // save parameters. (++)
@@ -2359,12 +2360,44 @@ plotTriangleF(
     if((void*)t==0)
         return -1;
 
-    long x0 = (long) (t->p[0].x * 0.5f * (float) window_width);
-    long y0 = (long) (t->p[0].y * 0.5f * (float) window_height);
-    long x1 = (long) (t->p[1].x * 0.5f * (float) window_width);
-    long y1 = (long) (t->p[1].y * 0.5f * (float) window_height);
-    long x2 = (long) (t->p[2].x * 0.5f * (float) window_width);
-    long y2 = (long) (t->p[2].y * 0.5f * (float) window_height);
+
+// Clipping in z
+
+    float znear = 0.01f;
+    float zfar  = 10.0f;
+
+    if (t->p[0].z < znear){ return 0; }
+    if (t->p[1].z < znear){ return 0; }
+    if (t->p[2].z < znear){ return 0; }
+    
+    if (t->p[0].z > zfar){ return 0; }
+    if (t->p[1].z > zfar){ return 0; }
+    if (t->p[2].z > zfar){ return 0; }
+
+// ficando menor conforma z aumenta.
+
+    if(t->p[0].z != 0.0f){
+        t->p[0].x = (t->p[0].x/t->p[0].z);  
+        t->p[0].y = (t->p[0].y/t->p[0].z);
+    }
+    if(t->p[1].z != 0.0f){
+        t->p[1].x = (t->p[1].x/t->p[1].z); 
+        t->p[1].y = (t->p[1].y/t->p[1].z);
+    }
+    if(t->p[2].z != 0.0f){
+        t->p[2].x = (t->p[2].x/t->p[2].z); 
+        t->p[2].y = (t->p[2].y/t->p[2].z);
+    }
+
+
+    float ar = (float)((float) window_height / (float) window_width );
+
+    long x0 = (long) (t->p[0].x *ar * 0.5f * (float) window_width);
+    long y0 = (long) (t->p[0].y     * 0.5f * (float) window_height);
+    long x1 = (long) (t->p[1].x *ar * 0.5f * (float) window_width);
+    long y1 = (long) (t->p[1].y     * 0.5f * (float) window_height);
+    long x2 = (long) (t->p[2].x *ar * 0.5f * (float) window_width);
+    long y2 = (long) (t->p[2].y     * 0.5f * (float) window_height);
   
     final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
     final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);

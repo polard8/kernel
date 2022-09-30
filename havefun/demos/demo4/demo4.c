@@ -16,7 +16,7 @@ char obj_buffer[1024];
 //struct mesh meshCube;
 struct gr_mat4x4_d matProj;
 float fTheta;
-
+float model_distance;
 
 /*
 struct vec3d
@@ -126,30 +126,34 @@ int OnUserCreate(void)
 */
 
 // Projection Matrix
-	float fNear = 0.1f;
-	float fFar = 1000.0f;
-	float fFov = 90.0f;
-		
+
+    float fNear = 0.1f;
+    float fFar  = 1000.0f;
+
+    float fFov = 90.0f;
+
+    float fAspectRatio = (float) 800 / (float) 600;
     //float fAspectRatio = (float)ScreenHeight() / (float)ScreenWidth();
-	float fAspectRatio = (float) 800 / (float) 600;
+ 
+    float fFovRad = 
+        1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+    //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
-	//float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-	float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
-
-	matProj.m[0][0] = fAspectRatio * fFovRad;
-	matProj.m[1][1] = fFovRad;
-	matProj.m[2][2] = fFar / (fFar - fNear);
-	matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
-	matProj.m[2][3] = 1.0f;
-	matProj.m[3][3] = 0.0f;
+    matProj.m[0][0] = fAspectRatio * fFovRad;
+    matProj.m[1][1] = fFovRad;
+    matProj.m[2][2] = fFar / (fFar - fNear);
+    matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+    matProj.m[2][3] = 1.0f;
+    matProj.m[3][3] = 0.0f;
 
     return 0;
 }
 
+
 // fake Wavefront File Format (.obj)
-int OnUserUpdate3(float fElapsedTime)
+int DrawModel1(float fElapsedTime)
 {
-    demoClearSurface(NULL,COLOR_BLACK);
+    //demoClearSurface(NULL,COLOR_BLACK);
 
     struct gr_mat4x4_d matRotZ; 
     struct gr_mat4x4_d matRotX;
@@ -179,6 +183,12 @@ int OnUserUpdate3(float fElapsedTime)
     struct gr_vecF3D_d vecs[32];
 
 
+// #bugbug
+// Isso foi projetado para estar dentro 
+// de um model space. Se usarmos num view space
+// que é o que a camera vê, então teríamos valores negativos,
+// que não deviram aparecer na imagem final.
+
     // v -0.5  -0.5  0.5
     vecs[1].x = -0.2;  vecs[1].y = -0.2;  vecs[1].z =  0.2;
     // v 0.5  -0.5  0.5
@@ -196,6 +206,7 @@ int OnUserUpdate3(float fElapsedTime)
     // v 0.5  -0.5  -0.5
     vecs[8].x =  0.2;  vecs[8].y = -0.2;  vecs[8].z = -0.2;
 
+
     int sequence[3*16];
     
     sequence[0]  = 1; sequence[1]  = 2;  sequence[2] = 3; //f 1 2 4
@@ -210,9 +221,7 @@ int OnUserUpdate3(float fElapsedTime)
     sequence[27] = 2; sequence[28] = 6; sequence[29] = 4; //f 2 6 4
     sequence[30] = 7; sequence[31] = 1; sequence[32] = 3; //f 7 1 3
     sequence[33] = 7; sequence[34] = 3; sequence[35] = 5; //f 7 3 5
-
-    //struct gr_triangleF3D_d tri;
-
+    
     int i=0;
     int j=0;
     int off=0;
@@ -240,7 +249,6 @@ int OnUserUpdate3(float fElapsedTime)
         tri.p[2].z = vecs[v].z;
         tri.p[2].color = COLOR_WHITE;  // COLOR_BLUE;
         
-
         //-----------------------------    
         // Rotate in Z-Axis
         gr_MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
@@ -255,32 +263,36 @@ int OnUserUpdate3(float fElapsedTime)
         triRotatedZX.p[0].color = tri.p[0].color;
         triRotatedZX.p[1].color = tri.p[1].color;
         triRotatedZX.p[2].color = tri.p[2].color;
-        
+
+
+        // Translate in z
+        model_distance = (float) (model_distance + 0.002f);
+        if(model_distance>10.0f)
+            model_distance = 0.8f;
+        triRotatedZX.p[0].z = triRotatedZX.p[0].z + model_distance; 
+        triRotatedZX.p[1].z = triRotatedZX.p[1].z + model_distance; 
+        triRotatedZX.p[2].z = triRotatedZX.p[2].z + model_distance; 
+
         //We need a valid window, to use the rasterization features.
         if( (void*) __root_window != NULL ){
             plotTriangleF(__root_window, &triRotatedZX,FALSE);
         }
     };
 
-    demoFlushSurface(NULL);
-    rtl_yield();
+    //demoFlushSurface(NULL);
+    //rtl_yield();
     
     return 0;
 }
 
+// fake Wavefront File Format (.obj)
+int DrawModel2(float fElapsedTime)
+{
+    //demoClearSurface(NULL,COLOR_BLACK);
 
-int OnUserUpdate(float fElapsedTime)
-{ 
-    demoClearSurface(NULL,COLOR_BLACK);
-
-//------------------------------------------------
-// Rotação em x e y com base no elapsed time.
-// Set up rotation matrices
     struct gr_mat4x4_d matRotZ; 
     struct gr_mat4x4_d matRotX;
     fTheta += 1.0f * fElapsedTime;
-    //fTheta += 0.2f * fElapsedTime;
-    
 // Rotation Z
 	matRotZ.m[0][0] =  cosf(fTheta);
 	matRotZ.m[0][1] =  sinf(fTheta);
@@ -297,185 +309,130 @@ int OnUserUpdate(float fElapsedTime)
 	matRotX.m[3][3] = 1;
 //------------------------------------------------
 
-
+// triangles
     struct gr_triangleF3D_d tri;            // triângulo original.
-    struct gr_triangleF3D_d triProjected;   // triangulo final, mostrado na tela.
-    struct gr_triangleF3D_d triTranslated;  //
     struct gr_triangleF3D_d triRotatedZ; 
     struct gr_triangleF3D_d triRotatedZX;
-
-// Triângulo original.
-    tri.p[0].x = 0.0f;  tri.p[0].y = 0.0f;  tri.p[0].z = 0.0f;
-    tri.p[1].x = 0.0f;  tri.p[1].y = 0.8f;  tri.p[1].z = 0.0f;
-    tri.p[2].x = 0.8f;  tri.p[2].y = 0.8f;  tri.p[2].z = 0.0f;
-
-/*
-//-------------------------------------------------------------
-// #test:
-// colocando o triangulo original, direto para ser projetado.
-    triProjected.p[0].x = tri.p[0].x; 
-    triProjected.p[0].y = tri.p[0].y;  
-    triProjected.p[0].z = tri.p[0].z;
-    triProjected.p[1].x = tri.p[1].x;  
-    triProjected.p[1].y = tri.p[1].y;  
-    triProjected.p[1].z = tri.p[1].z;
-    triProjected.p[2].x = tri.p[2].x;  
-    triProjected.p[2].y = tri.p[2].y;  
-    triProjected.p[2].z = tri.p[2].z;
-//-------------------------------------------------------------
-*/
-
-// rotação em z,
-// o output esta no triRotatedZ.
-// os 3 vetores foram modificados.
-//-----------------------------    
-// Rotate in Z-Axis
-    gr_MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
-    gr_MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
-    gr_MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
-//-----------------------------    
-
-/*
-// colocando para mostrar o triangulo depois
-// da rotação em z.
-    triProjected.p[0].x = triRotatedZ.p[0].x; 
-    triProjected.p[0].y = triRotatedZ.p[0].y;  
-    triProjected.p[0].z = triRotatedZ.p[0].z;
-    triProjected.p[1].x = triRotatedZ.p[1].x;  
-    triProjected.p[1].y = triRotatedZ.p[1].y;  
-    triProjected.p[1].z = triRotatedZ.p[1].z;
-    triProjected.p[2].x = triRotatedZ.p[2].x;  
-    triProjected.p[2].y = triRotatedZ.p[2].y;  
-    triProjected.p[2].z = triRotatedZ.p[2].z;
-*/
-
-
-// pegando o trangulo depois da rotação em z
-// e fazendo uma rotação em x também.
-//-----------------------------    
-// Rotate in X-Axis
-    gr_MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0], &matRotX);
-    gr_MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
-    gr_MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
-//-----------------------------    
-
-// colocando para mostrar o triangulo depois
-// da rotação em x.
-    triProjected.p[0].x = triRotatedZX.p[0].x; 
-    triProjected.p[0].y = triRotatedZX.p[0].y;  
-    triProjected.p[0].z = triRotatedZX.p[0].z;
-    triProjected.p[1].x = triRotatedZX.p[1].x;  
-    triProjected.p[1].y = triRotatedZX.p[1].y;  
-    triProjected.p[1].z = triRotatedZX.p[1].z;
-    triProjected.p[2].x = triRotatedZX.p[2].x;  
-    triProjected.p[2].y = triRotatedZX.p[2].y;  
-    triProjected.p[2].z = triRotatedZX.p[2].z;
-
-
-/*
-//-----------------------------    
-// Offset into the screen
-    triTranslated = triRotatedZX;
-    triTranslated.p[0].z = triRotatedZX.p[0].z + 3.0f;
-    triTranslated.p[1].z = triRotatedZX.p[1].z + 3.0f;
-    triTranslated.p[2].z = triRotatedZX.p[2].z + 3.0f;
-//-----------------------------    
-*/
-
-/*
-// No momento esse trabalho é feito por uma rotina
-// alternativa, dentro da engine.
-//-----------------------------    
-// Project triangles from 3D --> 2D
-    gr_MultiplyMatrixVector(&triTranslated.p[0], &triProjected.p[0], &matProj);
-    gr_MultiplyMatrixVector(&triTranslated.p[1], &triProjected.p[1], &matProj);
-    gr_MultiplyMatrixVector(&triTranslated.p[2], &triProjected.p[2], &matProj);
-//-----------------------------    
-*/
-
-
-//-----------------------------    
-// Scale into view
-// Aumenta 20%
-    //triProjected.p[0].x += 0.2f; triProjected.p[0].y += 0.2f;
-    //triProjected.p[1].x += 0.2f; triProjected.p[1].y += 0.2f;
-    //triProjected.p[2].x += 0.2f; triProjected.p[2].y += 0.2f;
-//-----------------------------    
-
-
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
-
-    //test_fake_obj();
-
-    demoFlushSurface(NULL);
-    rtl_yield();
-        
-    return 0;
-}
-//---------
-
-int OnUserUpdate2(float fElapsedTime)
-{
-    demoClearSurface(NULL,COLOR_BLACK);
-
-    struct gr_mat4x4_d matRotZ; 
-    fTheta += 1.0f * fElapsedTime;
-// Rotation Z
-	matRotZ.m[0][0] =  cosf(fTheta);
-	matRotZ.m[0][1] =  sinf(fTheta);
-	matRotZ.m[1][0] = -sinf(fTheta);
-	matRotZ.m[1][1] =  cosf(fTheta);
-	matRotZ.m[2][2] = 1;
-	matRotZ.m[3][3] = 1;
-
-    struct gr_triangleF3D_d tri;            // triângulo original.
-    struct gr_triangleF3D_d triRotatedZ; 
     struct gr_triangleF3D_d triProjected;   // triangulo final, mostrado na tela.
-
-// Triângulo original.
-    tri.p[0].x = 0.0f;  tri.p[0].y = 0.0f;  tri.p[0].z = 0.0f;
-    tri.p[1].x = 0.0f;  tri.p[1].y = 0.8f;  tri.p[1].z = 0.0f;
-    tri.p[2].x = 0.8f;  tri.p[2].y = 0.8f;  tri.p[2].z = 0.0f;
-
-// rotação em z,
-// o output esta no triRotatedZ.
-// os 3 vetores foram modificados.
-//-----------------------------    
-// Rotate in Z-Axis
-    gr_MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
-    gr_MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
-    gr_MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
-//-----------------------------    
-
-    triProjected.p[0].x = triRotatedZ.p[0].x; 
-    triProjected.p[0].y = triRotatedZ.p[0].y;  
-    triProjected.p[0].z = triRotatedZ.p[0].z;
-    triProjected.p[1].x = triRotatedZ.p[1].x;  
-    triProjected.p[1].y = triRotatedZ.p[1].y;  
-    triProjected.p[1].z = triRotatedZ.p[1].z;
-    triProjected.p[2].x = triRotatedZ.p[2].x;  
-    triProjected.p[2].y = triRotatedZ.p[2].y;  
-    triProjected.p[2].z = triRotatedZ.p[2].z;
-
-    //We need a valid window, to use the rasterization features.
-    if( (void*) __root_window != NULL ){
-        plotTriangleF(__root_window, &triProjected,FALSE);
-    }
+// vectors
+    struct gr_vecF3D_d vecs[32];
 
 
-    demoFlushSurface(NULL);
-    rtl_yield();
+// #bugbug
+// Isso foi projetado para estar dentro 
+// de um model space. Se usarmos num view space
+// que é o que a camera vê, então teríamos valores negativos,
+// que não deviram aparecer na imagem final.
 
+    // v -0.5  -0.5  0.5
+    vecs[1].x = -0.2;  vecs[1].y = -0.2;  vecs[1].z =  0.2;
+    // v 0.5  -0.5  0.5
+    vecs[2].x =  0.2;  vecs[2].y = -0.2;  vecs[2].z =  0.2;
+    //v -0.5  0.5  0.5
+    vecs[3].x = -0.2;  vecs[3].y =  0.2;  vecs[3].z =  0.2;
+    // v 0.5  0.5  0.5
+    vecs[4].x =  0.2;  vecs[4].y =  0.2;  vecs[4].z =  0.2;
+    //v -0.5  0.5  -0.5
+    vecs[5].x = -0.2;  vecs[5].y =  0.2;  vecs[5].z = -0.2;
+    // v 0.5  0.5  -0.5
+    vecs[6].x =  0.2;  vecs[6].y =  0.2;  vecs[6].z = -0.2;
+    // v -0.5  -0.5  -0.5
+    vecs[7].x = -0.2;  vecs[7].y = -0.2;  vecs[7].z = -0.2;
+    // v 0.5  -0.5  -0.5
+    vecs[8].x =  0.2;  vecs[8].y = -0.2;  vecs[8].z = -0.2;
+
+
+    int sequence[3*16];
+    
+    sequence[0]  = 1; sequence[1]  = 2;  sequence[2] = 3; //f 1 2 4
+    sequence[3]  = 1; sequence[4]  = 4;  sequence[5] = 3; //f 1 4 3
+    sequence[6]  = 3; sequence[7]  = 4;  sequence[8] = 6; //f 3 4 6
+    sequence[9]  = 3; sequence[10] = 6; sequence[11] = 5; //f 3 6 5
+    sequence[12] = 5; sequence[13] = 6; sequence[14] = 8; //f 5 6 8
+    sequence[15] = 5; sequence[16] = 8; sequence[17] = 7; //f 5 8 7
+    sequence[18] = 7; sequence[19] = 8; sequence[20] = 2; //f 7 8 2
+    sequence[21] = 7; sequence[22] = 2; sequence[23] = 1; //f 7 2 1
+    sequence[24] = 2; sequence[25] = 8; sequence[26] = 6; //f 2 8 6
+    sequence[27] = 2; sequence[28] = 6; sequence[29] = 4; //f 2 6 4
+    sequence[30] = 7; sequence[31] = 1; sequence[32] = 3; //f 7 1 3
+    sequence[33] = 7; sequence[34] = 3; sequence[35] = 5; //f 7 3 5
+    
+    int i=0;
+    int j=0;
+    int off=0;
+    int v=0;
+    //for(i=1; i<=8; i++)
+    for(i=1; i<=12; i++)
+    {
+        off = (i-1)*3;
+        
+        v = sequence[off+0];
+        tri.p[0].x = vecs[v].x;
+        tri.p[0].y = vecs[v].y;
+        tri.p[0].z = vecs[v].z;
+        tri.p[0].color = COLOR_WHITE;  //COLOR_RED; 
+        
+        v = sequence[off+1];
+        tri.p[1].x = vecs[v].x;
+        tri.p[1].y = vecs[v].y;
+        tri.p[1].z = vecs[v].z;
+        tri.p[1].color = COLOR_WHITE;  // COLOR_GREEN;
+
+        v = sequence[off+2];
+        tri.p[2].x = vecs[v].x;
+        tri.p[2].y = vecs[v].y;
+        tri.p[2].z = vecs[v].z;
+        tri.p[2].color = COLOR_WHITE;  // COLOR_BLUE;
+        
+        //-----------------------------    
+        // Rotate in Z-Axis
+        gr_MultiplyMatrixVector(&tri.p[0], &triRotatedZ.p[0], &matRotZ);
+        gr_MultiplyMatrixVector(&tri.p[1], &triRotatedZ.p[1], &matRotZ);
+        gr_MultiplyMatrixVector(&tri.p[2], &triRotatedZ.p[2], &matRotZ);
+        //-----------------------------    
+        // Rotate in X-Axis
+        gr_MultiplyMatrixVector(&triRotatedZ.p[0], &triRotatedZX.p[0], &matRotX);
+        gr_MultiplyMatrixVector(&triRotatedZ.p[1], &triRotatedZX.p[1], &matRotX);
+        gr_MultiplyMatrixVector(&triRotatedZ.p[2], &triRotatedZX.p[2], &matRotX);
+
+        triRotatedZX.p[0].color = tri.p[0].color;
+        triRotatedZX.p[1].color = tri.p[1].color;
+        triRotatedZX.p[2].color = tri.p[2].color;
+
+
+        // Translate in z
+        model_distance = (float) (model_distance + 0.002f);
+        if(model_distance>10.0f)
+            model_distance = 0.8f;
+        triRotatedZX.p[0].z = triRotatedZX.p[0].z + model_distance; 
+        triRotatedZX.p[1].z = triRotatedZX.p[1].z + model_distance; 
+        triRotatedZX.p[2].z = triRotatedZX.p[2].z + model_distance; 
+
+        //translate in x
+        triRotatedZX.p[0].x = triRotatedZX.p[0].x + 0.8f; 
+        triRotatedZX.p[1].x = triRotatedZX.p[1].x + 0.8f; 
+        triRotatedZX.p[2].x = triRotatedZX.p[2].x + 0.8f; 
+
+
+        //We need a valid window, to use the rasterization features.
+        if( (void*) __root_window != NULL ){
+            plotTriangleF(__root_window, &triRotatedZX,FALSE);
+        }
+    };
+
+    //demoFlushSurface(NULL);
+    //rtl_yield();
+    
     return 0;
 }
+
+
 
 
 // include inside the engine.
 void gr_setup(void)
 {
+    // #test
     //printf("gr_setup:\n");
     //__setupCatModel(TRUE,TRUE,TRUE);
     
@@ -486,13 +443,22 @@ void gr_setup(void)
 // include inside the engine.
 void gr_draw(void)
 {
+    demoClearSurface(NULL,COLOR_BLACK);
+    
+    //#tests
     //printf("gr_draw:\n");
     //demoCat();
-
     //OnUserUpdate(1);
     //OnUserUpdate2(1);
-    OnUserUpdate3(0.02f);
+
+//#draw model 1
+    DrawModel1(0.02f);
+//#draw model 2
+    DrawModel2(0.02f);
+
+    demoFlushSurface(NULL);
 }
+
 
 int main(int argc, char **argv)
 {

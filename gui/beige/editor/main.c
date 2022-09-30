@@ -269,11 +269,12 @@ editorProcedure(
         if( event_window == addressbar_window ||
             event_window == client_window )
         {
-            printf("editor.bin: MSG_MOUSERELEASED\n");
+            //printf("editor.bin: MSG_MOUSERELEASED\n");
             //gws_redraw_window(fd, event_window, TRUE);
             
             if(event_window == client_window)
             {
+                // Refresh?
                 gws_draw_char (
                     (int) fd,              // fd
                     (int) event_window,    // wid
