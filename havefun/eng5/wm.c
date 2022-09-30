@@ -3930,27 +3930,29 @@ int wmInputReader(void)
 
             //cut
             if( RTLEventBuffer[1] == GWS_Cut )
-            { printf("ws: cut\n"); return 0; }
+            { printf("wm.c: cut\n"); return 0; }
 
-            //copy (ok)
-            // Copy or kill?
+            // [control + c]
+            // copy (ok)
+            // Quit the program.
             if( RTLEventBuffer[1] == GWS_Copy )
             { 
-                printf("ws: copy\n"); 
+                printf("wm.c: control + c\n"); 
+                gramado_terminate();
                 return 0;
             }
 
             //paste (ok)
             if( RTLEventBuffer[1] == GWS_Paste )
-            { printf("ws: paste\n"); return 0; }
+            { printf("wm.c: paste\n"); return 0; }
 
             //undo
             if( RTLEventBuffer[1] == GWS_Undo )
-            { printf("ws: undo\n"); return 0; }
+            { printf("wm.c: undo\n"); return 0; }
 
             //select all: control+a
             if( RTLEventBuffer[1] == GWS_SelectAll )
-            { printf("ws: select all\n"); return 0; }
+            { printf("wm.c: select all\n"); return 0; }
 
             //find: control+f
             if( RTLEventBuffer[1] == GWS_Find )

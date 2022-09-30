@@ -3806,7 +3806,7 @@ static int on_execute(void)
 
         if (IsTimeToQuit == TRUE){
             break;
-        };
+        }
 
         // Called in another project.
         gramado_update();
@@ -3855,6 +3855,11 @@ static int on_execute(void)
 
     if (IsTimeToQuit != TRUE){
         debug_print ("gwssrv: [ERROR] Invalid IsTimeToQuit\n");
+    }
+
+
+    if (IsTimeToQuit == TRUE){
+        printf("main.c: Quit the engine :)\n");
     }
 
 // #todo
@@ -3949,6 +3954,16 @@ int gramado_initialize(int argc, char **argv)
 
     return 0;
 }
+
+
+// #todo: maybe we can have some parameters here.
+void gramado_terminate(void)
+{
+//#todo:
+// clean up all the mess before finishing the program.
+    IsTimeToQuit = TRUE;
+}
+
 
 //
 // End

@@ -191,6 +191,7 @@ unsigned long next_response[32];
 
 // see: main.c
 int gramado_initialize (int argc, char **argv);
+void gramado_terminate(void);
 
 // These functions belong to another module
 // inside another project.
