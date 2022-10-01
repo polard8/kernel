@@ -111,17 +111,48 @@
 static unsigned long HotSpotX=0;
 static unsigned long HotSpotY=0;
 
-// Window hotspot.
-//static unsigned long WindowHotSpotX=0;
-//static unsigned long WindowHotSpotY=0;
+struct gr_mat4x4_d matProj;
+
+int 
+grInitializeProjection(
+    float znear, 
+    float zfar, 
+    float fov,
+    unsigned long width,
+    unsigned long height )
+{
+
+// Projection Matrix
+
+    float fNear = (float) znear;  //0.1f;
+    float fFar  = (float) zfar;   //1000.0f;
+    float fFov = (float) fov;     //90.0f;
+
+// fail
+    if(height == 0.0f)
+        return -1;
+
+    float fAspectRatio = (float) width / (float) height;
+    //float fAspectRatio = (float) 800 / (float) 600;
+    //float fAspectRatio = (float)ScreenHeight() / (float)ScreenWidth();
+ 
+    float fFovRad = 
+        1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+    //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
+
+    matProj.m[0][0] = fAspectRatio * fFovRad;
+    matProj.m[1][1] = fFovRad;
+    matProj.m[2][2] = fFar / (fFar - fNear);
+    matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
+    matProj.m[2][3] = 1.0f;
+    matProj.m[3][3] = 0.0f;
+
+    return 0;
+}
 
 
-static int 
-__transform_from_viewspace_to_screespace(
-    int *res_x, int *res_y,
-    int _x, int _y, int _z,
-    int left_hand,
-    int _hotspotx, int _hotspoty );
+
+
     
 // =============================
 
@@ -165,6 +196,18 @@ int grInit (void)
 // Change the view for the current projection.
 
     gwssrv_debug_print ("grInit: projection\n");
+
+
+// #test
+// Initialize projection matrix.
+    // IN: znear, zfar, fov, width, height
+    grInitializeProjection( 
+        (float) 0.01f, 
+        (float) 1000.0f, 
+        (float) 90.0f,
+        (unsigned long) (deviceWidth & 0xFFFFFFFF),
+        (unsigned long) (deviceHeight & 0xFFFFFFFF) );
+
     projection_initialize();
     // Changing the view for the current projection.
     gr_depth_range(CurrentProjection,0,40);
@@ -813,7 +856,7 @@ gwsDepthRange(
 
 // z in 45 degree.
 // Isso é uma projeção quando z esta inclinado em 45 graus.
-static int 
+int 
 __transform_from_viewspace_to_screespace(
     int *res_x, int *res_y,
     int _x, int _y, int _z,

@@ -471,6 +471,24 @@ int grInit(void);
 // projection
 //
 
+//extern struct gr_mat4x4_d matProj;
+
+// alternative.
+int 
+__transform_from_viewspace_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, int _z,
+    int left_hand,
+    int _hotspotx, int _hotspoty );
+    
+int 
+grInitializeProjection(
+    float znear, 
+    float zfar, 
+    float fov,
+    unsigned long width,
+    unsigned long height );
+
 int projection_initialize(void);
 
 int gr_depth_range(struct gr_projection_d *projection, int near, int far);
