@@ -258,7 +258,7 @@ gr_display_sprite(
                 //gr_dc->height );
             break;
         case SPRITE_CIRCLE:
-            plotCircleZ ( 
+            grCircle3 ( 
                 NULL,
                 (int) (x + sprite->x1),           // xm 
                 (int) (y + sprite->y1),           // ym 
@@ -267,8 +267,8 @@ gr_display_sprite(
                 (int) (z + sprite->z1) );         // z 
             break;
         case SPRITE_ELLIPSE:
-            //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-            //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+            //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
+            //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
             break;
         //bitmap file?
         case SPRITE_BITMAP:

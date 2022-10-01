@@ -1533,10 +1533,7 @@ rectBackbufferDrawRectangle (
 
     // ok: It's working
     rectBackbufferDrawRectangle0(
-        x,
-        y,
-        width,
-        height,
+        x, y, width, height,
         color,
         fill,
         rop_flags,

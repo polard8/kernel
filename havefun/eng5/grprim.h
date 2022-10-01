@@ -536,6 +536,14 @@ gr_dc_plot0(
     int x,
     int y );
 
+
+int 
+grPlot2D ( 
+    unsigned int color, 
+    int x, 
+    int y,
+    unsigned long rop );
+
 // Point. 
 int 
 grPlot0 (
@@ -625,7 +633,7 @@ int serviceGrRectangle(void);
 //
 
 int 
-xxxTriangleZ(
+grTriangle3(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle );
 
@@ -667,6 +675,7 @@ int serviceGrCubeZ(void);
 // == Circle ===========================
 //
 
+// 2D
 void 
 plotCircle(
     int xm, 
@@ -674,8 +683,9 @@ plotCircle(
     int r, 
     unsigned int color );
 
+// 3D
 void 
-plotCircleZ ( 
+grCircle3 ( 
     struct gws_window_d *window,
     int xm, 
     int ym, 
@@ -687,19 +697,21 @@ plotCircleZ (
 // == Ellipse ====================================
 //
 
+// 2D
 void 
-plotEllipseRect(
+grEllipse(
     int x0, 
     int y0, 
     int x1, 
     int y1, 
-    unsigned long color );
+    unsigned int color );
 
+// 3D
 void 
-plotEllipseRectZ (
+grEllipse3 (
     int x0, int y0, 
     int x1, int y1, 
-    unsigned long color,
+    unsigned int color,
     int z );
 
 

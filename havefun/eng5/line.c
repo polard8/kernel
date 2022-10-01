@@ -170,9 +170,7 @@ void test_draw_line2(void)
  *     Draw a horizontal line on backbuffer. 
  */
 
-// It's using the ring3 routine.
-
-void 
+int
 grBackbufferDrawHorizontalLine ( 
     unsigned long x1,
     unsigned long y, 
@@ -182,34 +180,33 @@ grBackbufferDrawHorizontalLine (
     unsigned long __x1 = (unsigned long) x1;
     unsigned long __x2 = (unsigned long) x2;
     unsigned long __y  = (unsigned long) y;
-    
-    //debug_print("Line\n");
-    
+
+    unsigned long rop=0;
+
+  
     if (__x1 > __x2){
         debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
-        return;
+        return -1;
     }
 
+
+// #todo:
+// Limit given by the device context.
     if (__x2 > 800){
         debug_print("grBackbufferDrawHorizontalLine: __x2 > 800\n");
-        return;
+        return -1;
     }
 
-// It's using the ring3 routine.
-
+// loop:
+// IN: color, x, y, rop
     while (__x1 < __x2)
     {
-        // IN: color, x, y, rop
-        grBackBufferPutpixel( 
-            color, 
-            __x1, 
-            __y,
-            (unsigned long) 0 );
-        
+        grPlot2D( color, __x1, __y, rop );
         __x1++;  
     };
 
-    //debug_print("Line done\n");
+// Return the number of pixels.
+    return (int) __x1;
 }
 
 

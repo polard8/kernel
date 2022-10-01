@@ -346,7 +346,7 @@ int unveil_world(void)
     CurrentWorld->vp1.x = (CurrentWorld->h1.x + CurrentWorld->h2.x)/2;
     CurrentWorld->vp1.y = (CurrentWorld->h1.y + CurrentWorld->h2.y)/2;
     CurrentWorld->vp1.z = CurrentWorld->h1.z;
-    plotCircleZ ( 
+    grCircle3 ( 
         ow,
         CurrentWorld->vp1.x,    //x
         CurrentWorld->vp1.y,    //y
@@ -451,7 +451,7 @@ unveil_camera(
 // --------------------------------
 // draw the camera (circle)
     // camera circle
-    plotCircleZ ( 
+    grCircle3 ( 
         ow,
         CurrentCamera->position.x,  //x
         CurrentCamera->position.y,  //y
@@ -459,7 +459,7 @@ unveil_camera(
         COLOR_RED,  //color 
         0 );   // z 
     //upview. (small circle).
-    plotCircleZ ( 
+    grCircle3 ( 
         ow,
         CurrentCamera->upview.x,    //x
         CurrentCamera->upview.y,  //y
@@ -811,6 +811,8 @@ gwsDepthRange(
 // OUT: 
 // Return the 2D screen coordinates in res_x and res_y.
 
+// z in 45 degree.
+// Isso é uma projeção quando z esta inclinado em 45 graus.
 static int 
 __transform_from_viewspace_to_screespace(
     int *res_x, int *res_y,
@@ -1063,6 +1065,19 @@ gr_dc_plot0(
 
     return 0;
 }
+
+
+// Plot a pixel using the top/left coordinates. (0,0).
+int 
+grPlot2D ( 
+    unsigned int color, 
+    int x, 
+    int y,
+    unsigned long rop )
+{
+    return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
+}
+
 
 
 /*
@@ -1323,8 +1338,10 @@ grPlot0 (
     // o hotspot da tela.
     if (UseClipping==FALSE)
     {
+       // # O z é inclinado.
         __transform_from_viewspace_to_screespace( 
-            (int *) &X, (int *) &Y, x, y, z,
+            (int *) &X, (int *) &Y, 
+            x, y, z,
             UseLeftHand,
             HotSpotX, HotSpotY ); 
     }
@@ -2027,7 +2044,7 @@ xxxDeflateCubeZ (
 
 // Triangle
 int 
-xxxTriangleZ(
+grTriangle3(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle )
 {
@@ -2069,7 +2086,7 @@ int grTriangle( struct gr_triangle_d *triangle )
     // #todo
     // something
   
-    Status = (int) xxxTriangleZ(NULL,triangle);
+    Status = (int) grTriangle3(NULL,triangle);
     
     return Status;
 }
@@ -2429,7 +2446,7 @@ plotTriangleF(
     // Not filled.
     // we dont need a valid window.
     if(!fill){
-        xxxTriangleZ( window, &final_triangle );
+        grTriangle3( window, &final_triangle );
     }
 
     // Filled
@@ -2817,7 +2834,7 @@ plotCircle (
 
 // ?? what means 'm' ???
 void 
-plotCircleZ ( 
+grCircle3 ( 
     struct gws_window_d *window,
     int xm, 
     int ym, 
@@ -2918,11 +2935,12 @@ void uVGA::fillEllipse(int x0, int y0, int x1, int y1, int color)
 //Ellipse
 //This program example plots an ellipse inside a specified rectangle.
 
+// 2D
 void 
-plotEllipseRect (
+grEllipse (
     int x0, int y0, 
     int x1, int y1, 
-    unsigned long color )
+    unsigned int color )
 {
 
    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
@@ -2959,10 +2977,10 @@ plotEllipseRect (
 
 
 void 
-plotEllipseRectZ (
+grEllipse3 (
     int x0, int y0, 
     int x1, int y1, 
-    unsigned long color,
+    unsigned int color,
     int z )
 {
 

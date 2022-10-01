@@ -1799,12 +1799,14 @@ void *CreateWindow (
         if( WindowManager.initialized == TRUE)
         {
             // 1 = Tiling mode.
-            // Do tamanho da área de trabalho.
+            // Fit into the working area.
             if(WindowManager.mode == 1)
             {
-                x=0;
-                y=0;
-                //#bugbug: Confiando nos valores.
+                // #bugbug: 
+                // Estamos confiando nos valores.
+                
+                x      = WindowManager.wa_left;
+                y      = WindowManager.wa_top;
                 width  = WindowManager.wa_width;
                 height = WindowManager.wa_height;
             }

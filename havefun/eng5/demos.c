@@ -314,7 +314,7 @@ static void __draw_model1(int step, int target_axis)
         wheely = CurrentWorld->center.y;
         wheelz = CurrentWorld->center.z+i;
     }
-    plotCircleZ ( 
+    grCircle3 ( 
         ow,
         wheelx, wheely, wheelr,
         GRCOLOR_LIGHTBLACK, 
@@ -610,7 +610,7 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 
 // head
 // IN: x,y,r,color,z
-    plotCircleZ ( 
+    grCircle3 ( 
         ow,
         model_x + 0,    //x
         model_y + 12,   //y
@@ -621,14 +621,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 // eyes
     if ( CatModel.eyesVisible == TRUE )
     {
-        plotCircleZ ( 
+        grCircle3 ( 
             ow,
             eye1_x, 
             eye1_y, 
             eye_radius, 
             GRCOLOR_LIGHTBLACK, 
             model_z );  //z 
-        plotCircleZ ( 
+        grCircle3 ( 
             ow,
             eye2_x, 
             eye2_y, 
@@ -824,7 +824,7 @@ void demoFred0(void)
             (i%7) == 0 )
         {
             noraDrawingStuff3 (-i,-i,0);
-            plotCircleZ ( 
+            grCircle3 ( 
                 NULL,
                 -i % 55,    // x 
                 -i % 55,    // y
@@ -841,14 +841,14 @@ void demoFred0(void)
 
 
 
-        //plotCircleZ ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
         //cool
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
         //igual o de cima.
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-        //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
+        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
             
         //rtl_invalidate_screen();
     };
@@ -868,15 +868,15 @@ void demoFred1(void)
         //rectangle(8,8,i,i,COLOR_BLUE);
         //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
         //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //plotCircleZ ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //plotCircleZ ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
+        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
         //cool
-        plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
         //igual o de cima.
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-        //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
+        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
   
     refresh_screen();
@@ -897,25 +897,25 @@ void demoFred2(void)
         //rectangle(8,8,i,i,COLOR_BLUE);
         //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
         //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //plotCircleZ ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //plotCircleZ ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
+        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
+        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
         //cool
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
             
         //IN: x,y,r,color,z
-        plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
+        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
             
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
             
         //igual o de cima.
-        //plotCircleZ ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //plotCircleZ ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //plotEllipseRect ( i, i, i*5, i*5, COLOR_BLUE);
-        //plotEllipseRectZ ( i%20, i%20, i, i, COLOR_BLUE,i%20);
+        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
+        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
+        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
+        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
     };
     refresh_screen();
 }
@@ -1122,7 +1122,7 @@ void demoTriangle(void)
             triangle->p[0].x++;
             triangle->p[1].x++;
             triangle->p[2].x++;
-            xxxTriangleZ(dw,triangle);
+            grTriangle3(dw,triangle);
         //};
 
         // flush surface

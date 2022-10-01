@@ -24,12 +24,7 @@ void test_draw_line(void);
 void test_draw_line2(void);
 
 
-/* 
- * lineBackbufferDrawHorizontalLine:
- *     Draw a horizontal line on backbuffer. 
- */
-
-void 
+int
 grBackbufferDrawHorizontalLine ( 
     unsigned long x1,
     unsigned long y, 

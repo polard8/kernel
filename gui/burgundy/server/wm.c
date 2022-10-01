@@ -1983,10 +1983,11 @@ static void __Tile(void)
     //    cnt=4;
     //}
 
-    unsigned long Left=0;
-    unsigned long Top=0;
-    unsigned long Width=0;
-    unsigned long Height=0;
+// Initializing
+    unsigned long Left   = WindowManager.wa_left;
+    unsigned long Top    = WindowManager.wa_top;
+    unsigned long Width  = WindowManager.wa_width;
+    unsigned long Height = WindowManager.wa_height;
 
     unsigned long l2=0;
     unsigned long t2=0;
