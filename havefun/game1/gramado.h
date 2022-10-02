@@ -190,13 +190,13 @@ unsigned long next_response[32];
 //
 
 // see: main.c
-int gramado_initialize (int argc, char **argv);
+int main (int argc, char **argv);
 void gramado_terminate(void);
 
 // These functions belong to another module
 // inside another project.
-void gramado_setup(void);
-void gramado_update(void);
+//void gramado_setup(void);
+//void gramado_update(void);
 void gramado_clear_surface(struct gws_window_d *clipping_window, unsigned int color);
 void gramado_flush_surface(struct gws_window_d *clipping_window);
 

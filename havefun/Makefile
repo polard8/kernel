@@ -9,16 +9,14 @@ all:
 	make -C libs/libgd
 
 # gramado game engine.
-	make -C eng5
-
-	make -C demos
+	make -C game1
 
 clean-all:
 	-rm -f libs/libgd/obj/*.o
 	-rm -f libs/libgws/obj/*.o
 	-rm -f libs/rtl/obj/*.o
 
-	-rm eng5/*.o
+	-rm game1/*.o
 
 	-rm bin/*.BIN
 	

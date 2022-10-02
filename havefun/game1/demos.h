@@ -59,6 +59,9 @@ void demoCat(void);
 
 void demoModel1(void);
 
+void demoFlyingCubeSetup(void);
+void demoFlyingCube(void);
+
 #endif    
 
 

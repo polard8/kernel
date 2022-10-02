@@ -3799,8 +3799,8 @@ static int on_execute(void)
     window_server->status = STATUS_RUNNING;
     window_server->initialized = TRUE;
 
-    // Called in another project.
-    gramado_setup();
+    // see: demo.c
+    demoFlyingCubeSetup();
 
     while (running == TRUE){
 
@@ -3808,8 +3808,8 @@ static int on_execute(void)
             break;
         }
 
-        // Called in another project.
-        gramado_update();
+        // see: demo.c
+        demoFlyingCube();
 
         // Messages
         // read only one valid message from 
@@ -3905,7 +3905,7 @@ static inline void __outb(uint16_t port, uint8_t val)
 // Gramado ga,e engine.
 // main: entry point
 // see: gramado.h
-int gramado_initialize(int argc, char **argv)
+int main(int argc, char **argv)
 {
     int Status=-1;
 
