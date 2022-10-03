@@ -3,7 +3,7 @@
 
 -----------------------
 Launching the vm:
-Type ./run or ./runkvm to start the vm.
+    Go to kernel/ folder and type './run' or './runkvm'	
 
 -----------------------
 Boot interface:
@@ -20,10 +20,8 @@ Init process interface:
 see: gramado/base/exposed/arctic/init/
 You can type:
     wsq   - Initialize the Desktop environment.
-    demo1 - Start demo 1.
-    demo2 - Start demo 2.
-    demo3 - Start demo 3.
-    demo4 - Start demo 4.
+    game1 - Start demo 1.
+    game2 - Start demo 2.
     cls   - Clear the screen.
 
 

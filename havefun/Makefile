@@ -10,6 +10,7 @@ all:
 
 # gramado game engine.
 	make -C game1
+	make -C game2
 
 clean-all:
 	-rm -f libs/libgd/obj/*.o
@@ -17,6 +18,7 @@ clean-all:
 	-rm -f libs/rtl/obj/*.o
 
 	-rm game1/*.o
+	-rm game2/*.o
 
 	-rm bin/*.BIN
 	

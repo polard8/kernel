@@ -372,6 +372,14 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
+    if( strncmp(prompt,"game2",5) == 0 )
+    {
+        printf ("~ Game 2:\n");
+        rtl_clone_and_execute("game2.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
+
 
 // ----------------------------------------
 
