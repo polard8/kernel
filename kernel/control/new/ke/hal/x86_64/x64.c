@@ -3,12 +3,10 @@
 
 #include <kernel.h>    
 
+// See: unit1hw.asm
+extern void DisableSSE(void);
+extern void EnableSSE(void);
 
-// FPU
-// To initialize the x87 FPU, 
-// set CR0.MP and CR0.NE, 
-// clear CR0.EM and CR0.TS, and 
-// execute FNINIT. 
 
 
 /*
@@ -677,50 +675,73 @@ void get_cpu_intel_parameters (void)
 }
 
 
+// FPU state
+// When the FPU is configured, 
+// the only thing left to do is to initialize its registers 
+// to their proper states. FNINIT will reset 
+// the user-visible part of the FPU stack. 
+// see:
+// https://wiki.osdev.org/FPU
 void x64_init_fpu (void) 
 {
     asm volatile ("fninit");
 }
 
 
-// See: unit1hw.asm
-extern void DisableSSE(void);
-extern void EnableSSE(void);
 
-
+// Initialize fpu support and enable SSE.
+// Long mode demands that SSE and SSE2 are available, and 
+// compilers are free to use the SSE registers instead of 
+// the old FPU registers for floating point operations. 
+// This means that your kernel will need to have SSE enabled 
+// before using any floating point operations.
+// see:
+// https://wiki.osdev.org/FPU
 int x64_init_fpu_support(void)
 {
-    if( (void*) processor == NULL )
-    {
-        printf("fail: processor\n");
+
+// Structure validation.
+    if( (void*) processor == NULL ){
+        printf("x64_init_fpu_support: processor\n");
         return -1;
     }
 
-    if( processor->hasX87FPU != TRUE )
-    {
-        printf("fail: processor->hasX87FPU\n");
+// has SSE
+    if( processor->hasSSE != TRUE ){
+        printf("x64_init_fpu_support: hasSSE\n");
         return -1;
     }
 
-    if( processor->hasSSE != TRUE )
-    {
-        printf("fail: processor->hasSSE\n");
+// has SSE2
+    if( processor->hasSSE2 != TRUE ){
+        printf("x64_init_fpu_support: hasSSE2\n");
         return -1;
     }
 
-    if( processor->hasSSE2 != TRUE )
-    {
-        printf("fail: processor->hasSSE2\n");
+// has SSE3
+    if( processor->hasSSE3 != TRUE ){
+        printf("x64_init_fpu_support: hasSSE3\n");
         return -1;
     }
 
-    if( processor->hasSSE3 != TRUE )
-    {
-        printf("fail: processor->hasSSE3\n");
+
+// has x87fpu
+// Check the FPU bit in CPUID.
+    if( processor->hasX87FPU != TRUE ){
+        printf("x64_init_fpu_support: hasX87FPU\n");
         return -1;
     }
 
+
+// Enable SSE.
+// Clear TS bit in cr0.
+// see: arch/x86_64/entrance/hw/hw1.asm
+    EnableSSE();
+
+// ??
 // Enable
+// Set OSFXSR and OSXMMEXCPT in cr4.
+// Clear EM and Set MP in cr0.
 
     asm volatile (
         " movq %%cr4, %%rax;  "
@@ -732,13 +753,16 @@ int x64_init_fpu_support(void)
         " orw $0x2, %%ax;     "    /*Set MP*/
         " movq %%rax, %%cr0;  " :: );
 
+
+// Initialize fpu support.
+// simply call 'fninit' instruction.
     x64_init_fpu();
-    EnableSSE();
-    
+ 
     return 0;
 }
 
 
+// Set the FPU control word:
 // These functions can be used with GCC (or TCC) 
 // to perform some FPU operations without 
 // resorting to dedicated assembly.

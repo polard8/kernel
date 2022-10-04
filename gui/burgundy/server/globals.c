@@ -10,6 +10,7 @@ char *screen_number;
 // struct gws_host_d  Hostinfo;
 
 int current_mode=0;
+int gUseCallback=TRUE;
 
 // #ordem
 // hardware, software

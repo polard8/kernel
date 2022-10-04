@@ -7,10 +7,7 @@
 bin/
     ...
 ----------------
-demo1/ and demo2/ 
-    No float or double.
-----------------
-game1/ and game2/
-    Trying to use float and double stuff.
-    see: math.c
- 
+game2/
+    It's working fine on qemu and virtualbox.
+    Sometimes it fails on kvm. ( Something is not working when using float variables).
+    

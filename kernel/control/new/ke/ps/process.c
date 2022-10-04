@@ -1711,6 +1711,10 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
         panic ("alloc_memory_for_image_and_stack: __new_base\n");
     }
 
+// Clear only 400KB
+    memset( (void*) __new_base, 0, (imagesize_in_kb*1024) );
+    
+
 // ==================================================
 
 

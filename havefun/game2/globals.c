@@ -14,6 +14,7 @@ char *screen_number;
 int current_mode=0;
 
 int gUseLeftHand=TRUE;
+int gUseCallback=TRUE;
 
 // #ordem
 // hardware, software

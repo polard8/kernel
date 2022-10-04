@@ -3435,12 +3435,17 @@ static int on_execute(void)
 // Setup callback
 // Pra isso o ws precisa estar registrado.
     //printf("WS: Register callback\n");
-    sc82(
-        44000,
-        (unsigned long) &callback1,
-        (unsigned long) &callback1,
-        (unsigned long) &callback1 );
 
+    if (gUseCallback == TRUE)
+    {
+        sc82(
+            44000,
+            (unsigned long) &callback1,
+            (unsigned long) &callback1,
+            (unsigned long) &callback1 );
+
+    }
+    
     Initialization.setup_callback_checkpoint = TRUE;
 
 // ===============================================
@@ -3826,6 +3831,12 @@ static inline void __outb(uint16_t port, uint8_t val)
 int main (int argc, char **argv)
 {
     int Status=-1;
+
+// Callback support.
+// O callback tem feito o refresh de muita coisa.
+// Ficar sem ele afeta muito a interface.
+// Mas isso esta aqui para testes.
+    gUseCallback = TRUE;
 
     Initialization.current_phase = 0;
     Initialization.ws_struct_checkpoint = FALSE;

@@ -6,6 +6,8 @@
 #define __GWSSRV_GLOBALS_H   1
 
 
+extern int gUseCallback;
+
 
 struct initialization_d
 {

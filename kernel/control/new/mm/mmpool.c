@@ -341,7 +341,7 @@ tryAgain:
 // livres para alocação.
 // Nosso limite é 512 páginas, pois so temos 2mb de pool.
 
-// #todo: change to 'int number_of_pages'.
+// #todo: change to 'ssize_t number_of_pages'.
 void *allocPages (int size)
 {
 
@@ -526,10 +526,8 @@ fail:
 }
 
 
-/*
- * initializeFramesAlloc:
- *     Inicializa o framepool. 
- */
+// initializeFramesAlloc:
+// Inicializa o framepool. 
 
 void initializeFramesAlloc (void)
 {
@@ -548,31 +546,24 @@ void initializeFramesAlloc (void)
         pageAllocList[__slot] = (unsigned long) 0;
     };
 
-//
 // Criando o primeiro para testes.
-//
-
 // #bugbug
 // Talvez seja desnecessário criar essa entrada.
 
-    p = (void *) kmalloc ( sizeof( struct page_d ) );
+    p = (void *) kmalloc( sizeof( struct page_d ) );
 
-    if (p == NULL)
-    {
+    if ( (void*) p == NULL){
         debug_print ("initializeFramesAlloc:\n");
         panic       ("initializeFramesAlloc:\n");
     }
 
     p->id = 0;
-
     p->used = TRUE;
     p->magic = 1234;
-
     p->free = TRUE;  //free
     p->next = NULL; 
     // ...
 
-    pageAllocList[0] = ( unsigned long ) p; 
+    pageAllocList[0] = (unsigned long) p;
 }
-
 

@@ -1759,25 +1759,23 @@ static void __initialize_pagedpool2(void)
     }
 
 //----
-
+// a1
     NewPagedPool.a1_va = 
         (unsigned long) g_extraheap2_va;
     NewPagedPool.Free[0] = TRUE;
-
+// a2
     NewPagedPool.a2_va = 
         (unsigned long) (g_extraheap2_va + (1024*1024) );
     NewPagedPool.Free[1] = TRUE;
-
 //----
-
+// b1
     NewPagedPool.b1_va = 
         (unsigned long) g_extraheap3_va;
     NewPagedPool.Free[2] = TRUE;
-
+// b2
     NewPagedPool.b2_va = 
         (unsigned long) (g_extraheap3_va + (1024*1024) );
     NewPagedPool.Free[3] = TRUE;
-
 //----
 
     NewPagedPool.initialized = TRUE;
