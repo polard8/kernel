@@ -59,6 +59,7 @@ void demoCat(void);
 
 void demoModel1(void);
 
+void FlyingCubeMove(int left_right, float value);
 void demoFlyingCubeSetup(void);
 void demoFlyingCube(void);
 

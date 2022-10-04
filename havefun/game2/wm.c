@@ -3964,28 +3964,30 @@ int wmInputReader(void)
             if( RTLEventBuffer[1] == GWS_ControlArrowRight )
             {
               //printf("ws: Control right\n"); 
-              dock_active_window(2);
+              //dock_active_window(2);
+              FlyingCubeMove(2,(float) 0.08f);
               return 0; 
             }
             //Control arrow up
             if( RTLEventBuffer[1] == GWS_ControlArrowUp )
             {
               //printf("ws: Control up\n"); 
-              dock_active_window(1);
+              //dock_active_window(1);
               return 0; 
             }
             //Control arrow down
             if( RTLEventBuffer[1] == GWS_ControlArrowDown )
             {
               //printf("ws: Control down\n");
-              dock_active_window(3);
+              //dock_active_window(3);
               return 0;
             }
             //Control arrow left
             if( RTLEventBuffer[1] == GWS_ControlArrowLeft )
             { 
               //printf("ws: Control left\n");
-              dock_active_window(4); 
+              //dock_active_window(4); 
+              FlyingCubeMove(1,(float) 0.08f);
               return 0; 
             }
 

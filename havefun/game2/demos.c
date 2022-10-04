@@ -15,6 +15,10 @@ float fTheta = 0.0f;
 float model_initial_distance = 0.0f;
 float model_distance = 0.0f;
 
+// left or right
+float model_move = 0.0f;
+
+
 // local
 /*
 static int __projection4x4[4][4] = { 
@@ -57,6 +61,7 @@ void drawFlyingCube(float fElapsedTime);
 
 
 //======================
+
 
 void drawFlyingCube(float fElapsedTime)
 {
@@ -126,6 +131,7 @@ void drawFlyingCube(float fElapsedTime)
     int off=0;
     int v=0;
 
+
     for(i=1; i<=12; i++)
     {
         off = (i-1)*3;
@@ -184,12 +190,23 @@ void drawFlyingCube(float fElapsedTime)
             model_distance); 
 
         // Translate in x.
-        triRotatedZX.p[0].x = triRotatedZX.p[0].x + 0.8f; 
-        triRotatedZX.p[1].x = triRotatedZX.p[1].x + 0.8f; 
-        triRotatedZX.p[2].x = triRotatedZX.p[2].x + 0.8f; 
+        // left or right
+
+        triRotatedZX.p[0].x = 
+            (float) (triRotatedZX.p[0].x + model_move); 
+        triRotatedZX.p[1].x = 
+            (float) (triRotatedZX.p[1].x + model_move); 
+        triRotatedZX.p[2].x = 
+            (float) (triRotatedZX.p[2].x + model_move); 
+
+        //triRotatedZX.p[0].x = triRotatedZX.p[0].x + 0.8f; 
+        //triRotatedZX.p[1].x = triRotatedZX.p[1].x + 0.8f; 
+        //triRotatedZX.p[2].x = triRotatedZX.p[2].x + 0.8f; 
+
 
         //We need a valid window, to use the rasterization features.
-        if( (void*) __root_window != NULL ){
+        if( (void*) __root_window != NULL )
+        {
             plotTriangleF(__root_window, &triRotatedZX,FALSE);
         }
     };
@@ -1647,6 +1664,17 @@ void demoCurve(void)
     }
 }
 
+// control + arrow key
+void FlyingCubeMove(int left_right, float value)
+{
+    // left
+    if(left_right == 1)
+        model_move = (float) (model_move - value); 
+    // right
+    if(left_right == 2)
+        model_move = (float) (model_move + value); 
+}
+
 
 void demoFlyingCubeSetup(void)
 {
@@ -1654,6 +1682,9 @@ void demoFlyingCubeSetup(void)
 
     model_initial_distance = (float) 1.0f;
     model_distance = (float) 0.0f;
+
+// left or right
+    model_move = (float) 0.0f;
 }
 
 void demoFlyingCube(void)
