@@ -2142,18 +2142,20 @@ xxxFillTriangle0(
 {
     int tmpx=0;
     int tmpy=0;
-
     unsigned int solid_color=0;
+
+
+    if ( (void*) window == NULL ){
+        return -1;
+    }
+    if (window->magic != 1234){
+        return -1;
+    }
 
     if ( (void*) triangle == NULL ){
         return -1;
     }
 
-    if ( (void*) window == NULL ){
-        return -1;
-    }
-    if(window->magic != 1234)
-        return -1;
 
 // -------------------------------------------
 // Draws a not filled triangle.
@@ -2411,20 +2413,22 @@ plotTriangleF(
 // Using 'int',
     struct gr_triangle_d final_triangle;
 
+
+// #test
     //unsigned long window_width = 800;
     //unsigned long window_height = 600;
     unsigned long window_width = gws_get_device_width();
     unsigned long window_height = gws_get_device_height();
 
 // Check the 'projected triangle'.
-    if((void*)t==0)
+    if ((void*)t == NULL){
         return -1;
-
+    }
 
 // Clipping in z
 
-    float znear = 0.01f;
-    float zfar  = 10.0f;
+    float znear = (float) 0.01f;
+    float zfar  = (float) 10.0f;
 
     if (t->p[0].z < znear){ return 0; }
     if (t->p[1].z < znear){ return 0; }
@@ -2436,21 +2440,24 @@ plotTriangleF(
 
 // ficando menor conforma z aumenta.
 
-    if(t->p[0].z != 0.0f){
-        t->p[0].x = (t->p[0].x/t->p[0].z);  
-        t->p[0].y = (t->p[0].y/t->p[0].z);
+    if(t->p[0].z != 0.0f)
+    {
+        t->p[0].x = (float) (t->p[0].x/t->p[0].z);  
+        t->p[0].y = (float) (t->p[0].y/t->p[0].z);
     }
-    if(t->p[1].z != 0.0f){
-        t->p[1].x = (t->p[1].x/t->p[1].z); 
-        t->p[1].y = (t->p[1].y/t->p[1].z);
+    if(t->p[1].z != 0.0f)
+    {
+        t->p[1].x = (float) (t->p[1].x/t->p[1].z); 
+        t->p[1].y = (float) (t->p[1].y/t->p[1].z);
     }
-    if(t->p[2].z != 0.0f){
-        t->p[2].x = (t->p[2].x/t->p[2].z); 
-        t->p[2].y = (t->p[2].y/t->p[2].z);
+    if(t->p[2].z != 0.0f)
+    {
+        t->p[2].x = (float) (t->p[2].x/t->p[2].z); 
+        t->p[2].y = (float) (t->p[2].y/t->p[2].z);
     }
 
-
-    float ar = (float)((float) window_height / (float) window_width );
+    float ar = 
+        (float)((float) window_height / (float) window_width );
 
     long x0 = (long) (t->p[0].x *ar * 0.5f * (float) window_width);
     long y0 = (long) (t->p[0].y     * 0.5f * (float) window_height);
@@ -2510,13 +2517,11 @@ plotTriangleF(
 int xxxPolygonZ ( struct gr_polygon_d *polygon )
 {
     int i=0;
-    
     int NumberOfElements=0;
     int Max = 32;
 
     // list of polygon pointers.
     unsigned long *list = (unsigned long *) polygon->list_address;
-
 
     // two vectors to create a line.
     struct gr_vec3D_d *v1;
@@ -3185,34 +3190,38 @@ gr_MultiplyMatrixVector(
     struct gr_mat4x4_d *m )
 {
     o->x = 
+        (float) (
         i->x * m->m[0][0] + 
         i->y * m->m[1][0] + 
         i->z * m->m[2][0] + 
-        m->m[3][0];
+        m->m[3][0] );
 
     o->y = 
+        (float) (
         i->x * m->m[0][1] + 
         i->y * m->m[1][1] + 
         i->z * m->m[2][1] + 
-        m->m[3][1];
+        m->m[3][1] );
     
     o->z = 
+        (float) (
         i->x * m->m[0][2] + 
         i->y * m->m[1][2] + 
         i->z * m->m[2][2] + 
-        m->m[3][2];
+        m->m[3][2] );
 
     float w = 
+        (float) (
         i->x * m->m[0][3] + 
         i->y * m->m[1][3] + 
         i->z * m->m[2][3] + 
-        m->m[3][3];
+        m->m[3][3] );
 
     if (w != 0.0f)
     {
-        o->x /= w; 
-        o->y /= w; 
-        o->z /= w;
+        o->x = (float) (o->x / w); 
+        o->y = (float) (o->y / w); 
+        o->z = (float) (o->z / w);
     }
 }
 

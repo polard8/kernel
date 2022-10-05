@@ -27,6 +27,7 @@ extern char *display_number;
 extern char *screen_number;
 
 extern int gUseLeftHand;
+extern int gUseCallback;
 
 // ============================
 // Modes.

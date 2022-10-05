@@ -3529,11 +3529,16 @@ static int on_execute(void)
 // Setup callback
 // Pra isso o ws precisa estar registrado.
     //printf("WS: Register callback\n");
-    sc82(
-        44000,
-        (unsigned long) &callback1,
-        (unsigned long) &callback1,
-        (unsigned long) &callback1 );
+
+    if( gUseCallback == TRUE )
+    {
+        sc82(
+            44000,
+            (unsigned long) &callback1,
+            (unsigned long) &callback1,
+            (unsigned long) &callback1 );
+    }
+
 
 // #todo
 // Daqui pra frente é conexão com cliente.
@@ -3909,21 +3914,14 @@ int main(int argc, char **argv)
 {
     int Status=-1;
 
-    // ##
-    // Sincronizaçao provisoria.
-    // Vamos precisar disso antes de tudo;
-    // vamos pegar a que foi criada pelo primeiro cliente.
-    // ele cria no começo da rotina.
-    // Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
-    
-    /*
-    while(1)
-    {
-        __saved_sync_id = sc82 (10005,0,0,0);
-        if( __saved_sync_id > 0 && __saved_sync_id < 1024 )
-            break;
-    };
-    */
+// Callback support.
+// We can't use callback here in this project,
+// because the callback are not saving and restoring
+// the fpu context.
+
+    //gUseCallback = TRUE;
+    gUseCallback = FALSE;
+   
 
 //0 = Time to quit.
 

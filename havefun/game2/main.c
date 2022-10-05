@@ -3915,7 +3915,12 @@ int main(int argc, char **argv)
     int Status=-1;
 
 // Callback support.
-    gUseCallback = TRUE;
+// We can't use callback here in this project,
+// because the callback are not saving and restoring
+// the fpu context.
+
+    //gUseCallback = TRUE;
+    gUseCallback = FALSE;
    
 
 //0 = Time to quit.
