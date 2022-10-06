@@ -322,6 +322,28 @@ struct gr_projection_d
 struct gr_projection_d  *CurrentProjection;
 
 
+// Using float
+struct gr_projectionF_d
+{
+    int initialized;
+
+    float znear;
+    float zfar;
+    float fov;
+    
+    float ar;  //aspect ratio
+    unsigned long width;
+    unsigned long height;
+    
+    float scale_factor;
+    
+    //#todo: hotspot
+
+    //struct gr_mat4x4_d *projection_matrix;
+};
+extern struct gr_projectionF_d  CurrentProjectionF;
+
+
 //================================================
 
 // Camera
@@ -353,6 +375,28 @@ struct gr_camera_d
 };
 
 struct gr_camera_d  *CurrentCamera;
+
+
+// Camera
+struct gr_cameraF_d
+{
+    //int used;
+    //int magic;
+    int initialized;
+
+// EYE: Position of the camera.
+    struct gr_vecF3D_d position;
+
+// UP: Orientation.
+    struct gr_vecF3D_d upview;
+// AT: target point.
+// The object distance.
+// Consider znear and zfar. 
+// This way we know the if the model 
+// is becoming bigger or smaller.
+    struct gr_vecF3D_d lookat;
+};
+extern struct gr_cameraF_d  CurrentCameraF;
 
 
 struct gr_world_d
@@ -487,7 +531,8 @@ grInitializeProjection(
     float zfar, 
     float fov,
     unsigned long width,
-    unsigned long height );
+    unsigned long height,
+    float scalefactor );
 
 int projection_initialize(void);
 
@@ -517,6 +562,7 @@ int world_initialize(void);
 //
 
 int camera_initialize(void);
+int cameraF_initialize(void);
 
 // three vectors:
 // position vector, up vector and look at vector.

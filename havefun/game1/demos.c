@@ -19,6 +19,13 @@ float model_distance = 0.0f;
 float model_move = 0.0f;
 
 
+struct cube_model_d
+{
+    struct gr_vecF3D_d vecs[32];
+};
+struct cube_model_d  Cube1;
+
+
 
 // local
 /*
@@ -68,7 +75,7 @@ void drawFlyingCube(float fElapsedTime)
 {
 
 // Vectors
-    struct gr_vecF3D_d vecs[32];
+    //struct gr_vecF3D_d vecs[32];
 // Matrices
     struct gr_mat4x4_d  matRotZ; 
     struct gr_mat4x4_d  matRotX;
@@ -89,18 +96,15 @@ void drawFlyingCube(float fElapsedTime)
 // Initialize vectors.
     for (i=0; i<32; i++)
     {
-        vecs[i].x = (float) 0.0f;
-        vecs[i].y = (float) 0.0f;
-        vecs[i].z = (float) 0.0f;
+        Cube1.vecs[i].x = (float) 0.0f;
+        Cube1.vecs[i].y = (float) 0.0f;
+        Cube1.vecs[i].z = (float) 0.0f;
     };
 
 // Initialize 4x4 matrices.
 // see: gprim.h
-    //int x[3][4];
-    for (i=0; i<4; i++)
-    {
-        for (j=0; j<4; j++)
-        {
+    for (i=0; i<4; i++){
+        for (j=0; j<4; j++){
             matRotZ.m[i][j] = (float) 0.0f;
             matRotX.m[i][j] = (float) 0.0f;
         };
@@ -108,7 +112,7 @@ void drawFlyingCube(float fElapsedTime)
 
 // ---------
 
-// BUilding the transformation matrices.
+// Building the transformation matrices.
 
     fTheta = (float) (fTheta + 1.0f * fElapsedTime);
     //fTheta += 1.0f * fElapsedTime;
@@ -136,17 +140,17 @@ void drawFlyingCube(float fElapsedTime)
 // que é o que a camera vê, então teríamos valores negativos,
 // que não deviram aparecer na imagem final.
 
-    vecs[1].x = (float) -0.2f;  vecs[1].y = (float) -0.2f;  vecs[1].z = (float)  0.2f;
-    vecs[2].x = (float)  0.2f;  vecs[2].y = (float) -0.2f;  vecs[2].z = (float)  0.2f;
-    vecs[3].x = (float) -0.2f;  vecs[3].y = (float)  0.2f;  vecs[3].z = (float)  0.2f;
-    vecs[4].x = (float)  0.2f;  vecs[4].y = (float)  0.2f;  vecs[4].z = (float)  0.2f;
-    vecs[5].x = (float) -0.2f;  vecs[5].y = (float)  0.2f;  vecs[5].z = (float) -0.2f;
-    vecs[6].x = (float)  0.2f;  vecs[6].y = (float)  0.2f;  vecs[6].z = (float) -0.2f;
-    vecs[7].x = (float) -0.2f;  vecs[7].y = (float) -0.2f;  vecs[7].z = (float) -0.2f;
-    vecs[8].x = (float)  0.2f;  vecs[8].y = (float) -0.2f;  vecs[8].z = (float) -0.2f;
+    Cube1.vecs[1].x = (float) -0.2f;  Cube1.vecs[1].y = (float) -0.2f;  Cube1.vecs[1].z = (float)  0.2f;
+    Cube1.vecs[2].x = (float)  0.2f;  Cube1.vecs[2].y = (float) -0.2f;  Cube1.vecs[2].z = (float)  0.2f;
+    Cube1.vecs[3].x = (float) -0.2f;  Cube1.vecs[3].y = (float)  0.2f;  Cube1.vecs[3].z = (float)  0.2f;
+    Cube1.vecs[4].x = (float)  0.2f;  Cube1.vecs[4].y = (float)  0.2f;  Cube1.vecs[4].z = (float)  0.2f;
+    Cube1.vecs[5].x = (float) -0.2f;  Cube1.vecs[5].y = (float)  0.2f;  Cube1.vecs[5].z = (float) -0.2f;
+    Cube1.vecs[6].x = (float)  0.2f;  Cube1.vecs[6].y = (float)  0.2f;  Cube1.vecs[6].z = (float) -0.2f;
+    Cube1.vecs[7].x = (float) -0.2f;  Cube1.vecs[7].y = (float) -0.2f;  Cube1.vecs[7].z = (float) -0.2f;
+    Cube1.vecs[8].x = (float)  0.2f;  Cube1.vecs[8].y = (float) -0.2f;  Cube1.vecs[8].z = (float) -0.2f;
 
-    
-    sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 3; //f 1 2 4
+// 12 faces
+    sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 4; //f 1 2 4
     sequence[3]  = (int) 1; sequence[4]  = (int) 4;  sequence[5] = (int) 3; //f 1 4 3
     sequence[6]  = (int) 3; sequence[7]  = (int) 4;  sequence[8] = (int) 6; //f 3 4 6
     sequence[9]  = (int) 3; sequence[10] = (int) 6; sequence[11] = (int) 5; //f 3 6 5
@@ -164,7 +168,7 @@ void drawFlyingCube(float fElapsedTime)
     int colors[32];
 
     colors[0] = GRCOLOR_LIGHTYELLOW;
-    colors[1] = GRCOLOR_DARKBLACK;
+    colors[1] = GRCOLOR_LIGHTMAGENTA;
     colors[2] = GRCOLOR_DARKBLUE;
     colors[3] = GRCOLOR_DARKGREEN;
     colors[4] = GRCOLOR_DARKRED;
@@ -185,25 +189,25 @@ void drawFlyingCube(float fElapsedTime)
         off = (int) ((i-1)*3);
         
         v = (int) sequence[off+0];
-        tri.p[0].x = (float) vecs[v].x;
-        tri.p[0].y = (float) vecs[v].y;
-        tri.p[0].z = (float) vecs[v].z;
+        tri.p[0].x = (float) Cube1.vecs[v].x;
+        tri.p[0].y = (float) Cube1.vecs[v].y;
+        tri.p[0].z = (float) Cube1.vecs[v].z;
         tri.p[0].color = COLOR_PINK;
         if(i >= 1 && i < 12){
             tri.p[0].color = colors[i-1]; //COLOR_BLUE;  
         }
         v = (int) sequence[off+1];
-        tri.p[1].x = (float) vecs[v].x;
-        tri.p[1].y = (float) vecs[v].y;
-        tri.p[1].z = (float) vecs[v].z;
+        tri.p[1].x = (float) Cube1.vecs[v].x;
+        tri.p[1].y = (float) Cube1.vecs[v].y;
+        tri.p[1].z = (float) Cube1.vecs[v].z;
         tri.p[1].color = COLOR_WHITE;  // COLOR_GREEN;
 
         v = (int) sequence[off+2];
-        tri.p[2].x = (float) vecs[v].x;
-        tri.p[2].y = (float) vecs[v].y;
-        tri.p[2].z = (float) vecs[v].z;
+        tri.p[2].x = (float) Cube1.vecs[v].x;
+        tri.p[2].y = (float) Cube1.vecs[v].y;
+        tri.p[2].z = (float) Cube1.vecs[v].z;
         tri.p[2].color = COLOR_WHITE;  // COLOR_BLUE;
-        
+
         //-----------------------------    
         // Rotate in Z-Axis
         gr_MultiplyMatrixVector(
@@ -275,36 +279,68 @@ void drawFlyingCube(float fElapsedTime)
         triRotatedZX.p[2].x = 
             (float) (triRotatedZX.p[2].x + model_move); 
 
-        
-        //int n = 
-        //    ( (triRotatedZX.p[1].z - triRotatedZX.p[0].z ) *
-        //      (triRotatedZX.p[2].z - triRotatedZX.p[0].z ) );
-        //if(n>0){cull=TRUE;}
+
+        //----------------------------------------------------
+        // Use Cross-Product to get surface normal
+        struct gr_vecF3D_d normal; 
+        struct gr_vecF3D_d line1; 
+        struct gr_vecF3D_d line2;
+
+        line1.x = (float) triRotatedZX.p[1].x - triRotatedZX.p[0].x;
+        line1.y = (float) triRotatedZX.p[1].y - triRotatedZX.p[0].y;
+        line1.z = (float) triRotatedZX.p[1].z - triRotatedZX.p[0].z;
+
+        line2.x = (float) triRotatedZX.p[2].x - triRotatedZX.p[0].x;
+        line2.y = (float) triRotatedZX.p[2].y - triRotatedZX.p[0].y;
+        line2.z = (float) triRotatedZX.p[2].z - triRotatedZX.p[0].z;
+
+        normal.x = (float) (line1.y * line2.z - line1.z * line2.y);
+        normal.y = (float) (line1.z * line2.x - line1.x * line2.z);
+        normal.z = (float) (line1.x * line2.y - line1.y * line2.x);
+
+        // It's normally normal to normalise the normal
+        float l = 
+            (float) sqrt( (double)
+                        ( normal.x*normal.x + 
+                          normal.y*normal.y + 
+                          normal.z*normal.z) );
+
+        normal.x = (float) (normal.x/l); 
+        normal.y = (float) (normal.y/l); 
+        normal.z = (float) (normal.z/l);
+
+        //#ok
+        //if ( (float) normal.z <  0.0f){ cull=FALSE;}  //pinta
+        //if ( (float) normal.z >= 0.0f){ cull=TRUE; }  //não pinta
+
+        // #test
+        // Considering the camera position.
+        if (CurrentCameraF.initialized == FALSE){ return; }
+        float tmp = 
+             (float) (
+             normal.x * (triRotatedZX.p[0].x - CurrentCameraF.position.x) + 
+             normal.y * (triRotatedZX.p[0].y - CurrentCameraF.position.y) +
+             normal.z * (triRotatedZX.p[0].z - CurrentCameraF.position.z) );
+        if( (float) tmp <  0.0f){ cull=FALSE; }
+        if( (float) tmp >= 0.0f){ cull=TRUE;  }
+        //----------------------------------------------------
 
         // We need a valid window, 
         // to use the rasterization features.
+        // #test: Testing rasterization.
+        // #todo: Return the number of changed pixels.
+        int fill_triangle = TRUE;
         if ( (void*) __root_window != NULL )
         {
-            // #test: Testing rasterization.
-            // #todo: Return the number of changed pixels.
-            if(cull==FALSE)
-            {
-                // fill
+            if (cull==FALSE){
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
                     (struct gr_triangleF3D_d *) &triRotatedZX,
-                    TRUE );  // fill
-
-                // do not fill
-                //plotTriangleF(
-                //    (struct gws_window_d *) __root_window, 
-                //    (struct gr_triangleF3D_d *) &triRotatedZX,
-                //    FALSE );  
+                    fill_triangle ); 
             }
         }
     };
 }
-
 
 
 void gr_embedded_setup(void)

@@ -7,6 +7,12 @@
 
 #include "gramado.h"
 
+
+// The projection structure.
+// see grprim.h
+struct gr_projectionF_d  CurrentProjectionF;
+struct gr_cameraF_d  CurrentCameraF;
+
 // Swap two bytes
 #define ____SWAP(x,y) do { (x)=(x)^(y); (y)=(x)^(y); (x)=(x)^(y); } while(0)
 
@@ -122,7 +128,8 @@ grInitializeProjection(
     float zfar, 
     float fov,
     unsigned long width,
-    unsigned long height )
+    unsigned long height,
+    float scalefactor )
 {
 
 // Projection Matrix
@@ -131,24 +138,46 @@ grInitializeProjection(
     float fFar  = (float) zfar;   //1000.0f;
     float fFov = (float) fov;     //90.0f;
 
+    CurrentProjectionF.initialized = FALSE;
+
+    CurrentProjectionF.znear = (float) znear;
+    CurrentProjectionF.zfar  = (float) zfar;
+    CurrentProjectionF.fov   = (float) fov;
+    
+    // % da tela.
+    if ( (float) scalefactor <= 0.0f ){
+        scalefactor = (float) 0.5f;   // default
+    }
+    CurrentProjectionF.scale_factor = (float) scalefactor;
+
 // fail
-    if(height == 0.0f)
+// Division by '0'.
+    if(height == 0){
         return -1;
+    }
 
     float fAspectRatio = (float) width / (float) height;
     //float fAspectRatio = (float) 800 / (float) 600;
     //float fAspectRatio = (float)ScreenHeight() / (float)ScreenWidth();
- 
+
+    CurrentProjectionF.width = (unsigned long) (width & 0xFFFFFFFF);
+    CurrentProjectionF.height = (unsigned long) (height & 0xFFFFFFFF);
+    CurrentProjectionF.ar = (float) fAspectRatio;
+
+//?
     float fFovRad = 
         1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
     //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
-    matProj.m[0][0] = fAspectRatio * fFovRad;
-    matProj.m[1][1] = fFovRad;
-    matProj.m[2][2] = fFar / (fFar - fNear);
-    matProj.m[3][2] = (-fFar * fNear) / (fFar - fNear);
-    matProj.m[2][3] = 1.0f;
-    matProj.m[3][3] = 0.0f;
+    matProj.m[0][0] = (float) (fAspectRatio * fFovRad);
+    matProj.m[1][1] = (float) fFovRad;
+    matProj.m[2][2] = (float) (fFar / (fFar - fNear));
+    matProj.m[3][2] = (float) ((-fFar * fNear) / (fFar - fNear));
+    matProj.m[2][3] = (float) 1.0f;
+    matProj.m[3][3] = (float) 0.0f;
+
+
+    CurrentProjectionF.initialized = TRUE;
 
     return 0;
 }
@@ -202,15 +231,19 @@ int grInit (void)
 
 
 // #test
-// Initialize projection matrix.
-    // IN: znear, zfar, fov, width, height
+// Initialize projection matrix. 
+// Using float.
+// IN: znear, zfar, fov, width, height. % of the screen.
+
     grInitializeProjection( 
         (float) 0.01f, 
         (float) 1000.0f, 
         (float) 90.0f,
         (unsigned long) (deviceWidth & 0xFFFFFFFF),
-        (unsigned long) (deviceHeight & 0xFFFFFFFF) );
+        (unsigned long) (deviceHeight & 0xFFFFFFFF),
+        (float) 0.5f ); 
 
+// using int.
     projection_initialize();
     // Changing the view for the current projection.
     gr_depth_range(CurrentProjection,0,40);
@@ -226,6 +259,7 @@ int grInit (void)
 
     gwssrv_debug_print ("grInit: camera\n");
     camera_initialize();
+    cameraF_initialize();
     
     //camera ( 
     //    -40, -40, 0,     // position vector
@@ -310,6 +344,29 @@ int camera_initialize(void)
 
     CurrentCamera->initialized = TRUE;
 
+    return 0;
+}
+
+int cameraF_initialize(void)
+{
+    CurrentCameraF.initialized = FALSE;
+    
+    // position
+    CurrentCameraF.position.x = (float) 0.0f;
+    CurrentCameraF.position.y = (float) 0.0f;
+    CurrentCameraF.position.z = (float) 0.0f;
+
+    // upview
+    CurrentCameraF.upview.x = (float) 0.0f;
+    CurrentCameraF.upview.y = (float) 0.5f;   //#####up
+    CurrentCameraF.upview.z = (float) 0.0f;
+
+    // lookat. target point origin.
+    CurrentCameraF.lookat.x = (float) 0.0f;
+    CurrentCameraF.lookat.y = (float) 0.0f;
+    CurrentCameraF.lookat.z = (float) 0.0f;
+
+    CurrentCameraF.initialized = TRUE;
     return 0;
 }
 
@@ -2382,21 +2439,46 @@ plotTriangleF(
     struct gr_triangle_d final_triangle;
 
 
+    if (CurrentProjectionF.initialized != TRUE){
+        printf("plotTriangleF: CurrentProjectionF\n");
+        return -1;
+    }
+
 // #test
     //unsigned long window_width = 800;
     //unsigned long window_height = 600;
-    unsigned long window_width = gws_get_device_width();
-    unsigned long window_height = gws_get_device_height();
+    //unsigned long window_width = gws_get_device_width();
+    //unsigned long window_height = gws_get_device_height();
 
 // Check the 'projected triangle'.
     if ((void*)t == NULL){
         return -1;
     }
 
-// Clipping in z
+//
+// parameters
+//
 
-    float znear = (float) 0.01f;
-    float zfar  = (float) 10.0f;
+    float znear = (float) 0.01f;  //default
+    float zfar  = (float) 10.0f;  //default
+    unsigned long window_width  = 200;
+    unsigned long window_height = 200;
+    float ar = (float) 1.0f;      //default
+    float scale_factor = (float) 0.5f; // % da tela.
+
+    if (CurrentProjectionF.initialized == TRUE)
+    {
+        znear = (float) CurrentProjectionF.znear;
+        zfar  = (float) CurrentProjectionF.zfar;
+        window_width  = (unsigned long) CurrentProjectionF.width;
+        window_height = (unsigned long) CurrentProjectionF.height;
+        ar = 
+            (float)((float) window_height / (float) window_width );
+        //#todo: hotspot
+        scale_factor = (float) CurrentProjectionF.scale_factor;
+    }
+
+// Clipping in z
 
     if (t->p[0].z < znear){ return 0; }
     if (t->p[1].z < znear){ return 0; }
@@ -2406,7 +2488,8 @@ plotTriangleF(
     if (t->p[1].z > zfar){ return 0; }
     if (t->p[2].z > zfar){ return 0; }
 
-// ficando menor conforma z aumenta.
+// #test
+// Ficando menor conforma z aumenta.
 
     if(t->p[0].z != 0.0f)
     {
@@ -2424,15 +2507,16 @@ plotTriangleF(
         t->p[2].y = (float) (t->p[2].y/t->p[2].z);
     }
 
-    float ar = 
-        (float)((float) window_height / (float) window_width );
 
-    long x0 = (long) (t->p[0].x *ar * 0.5f * (float) window_width);
-    long y0 = (long) (t->p[0].y     * 0.5f * (float) window_height);
-    long x1 = (long) (t->p[1].x *ar * 0.5f * (float) window_width);
-    long y1 = (long) (t->p[1].y     * 0.5f * (float) window_height);
-    long x2 = (long) (t->p[2].x *ar * 0.5f * (float) window_width);
-    long y2 = (long) (t->p[2].y     * 0.5f * (float) window_height);
+// scale
+// Ajustando à tela.
+
+    long x0 = (long) (t->p[0].x *ar * scale_factor * (float) window_width);
+    long y0 = (long) (t->p[0].y     * scale_factor * (float) window_height);
+    long x1 = (long) (t->p[1].x *ar * scale_factor * (float) window_width);
+    long y1 = (long) (t->p[1].y     * scale_factor * (float) window_height);
+    long x2 = (long) (t->p[2].x *ar * scale_factor * (float) window_width);
+    long y2 = (long) (t->p[2].y     * scale_factor * (float) window_height);
   
     final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
     final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
