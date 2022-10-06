@@ -658,6 +658,13 @@ grTriangle3(
 int grTriangle( struct gr_triangle_d *triangle);
 
 
+void 
+fillTriangle(
+    int x1, int y1,
+    int x2, int y2,
+    int x3, int y3, 
+    unsigned int c);
+
 int 
 xxxFillTriangle0(
     struct gws_window_d *window, 

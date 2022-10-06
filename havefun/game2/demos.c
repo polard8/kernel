@@ -161,16 +161,37 @@ void drawFlyingCube(float fElapsedTime)
 
 // 1~12
 
+    int colors[32];
+
+    colors[0] = GRCOLOR_LIGHTYELLOW;
+    colors[1] = GRCOLOR_DARKBLACK;
+    colors[2] = GRCOLOR_DARKBLUE;
+    colors[3] = GRCOLOR_DARKGREEN;
+    colors[4] = GRCOLOR_DARKRED;
+    colors[5] = GRCOLOR_DARKCYAN;
+    colors[6] = GRCOLOR_DARKMAGENTA;
+    colors[7] = GRCOLOR_DARKYELLOW;
+    colors[8] = GRCOLOR_DARKWHITE;
+    colors[9] = GRCOLOR_LIGHTBLACK;
+    colors[10] = GRCOLOR_LIGHTBLUE;
+    colors[11] = GRCOLOR_LIGHTGREEN;
+
+    int cull=FALSE;
+
     for (i=1; i<=12; i++)
     {
+        cull=FALSE;
+
         off = (int) ((i-1)*3);
         
         v = (int) sequence[off+0];
         tri.p[0].x = (float) vecs[v].x;
         tri.p[0].y = (float) vecs[v].y;
         tri.p[0].z = (float) vecs[v].z;
-        tri.p[0].color = COLOR_WHITE;  //COLOR_RED; 
-        
+        tri.p[0].color = COLOR_PINK;
+        if(i >= 1 && i < 12){
+            tri.p[0].color = colors[i-1]; //COLOR_BLUE;  
+        }
         v = (int) sequence[off+1];
         tri.p[1].x = (float) vecs[v].x;
         tri.p[1].y = (float) vecs[v].y;
@@ -254,15 +275,32 @@ void drawFlyingCube(float fElapsedTime)
         triRotatedZX.p[2].x = 
             (float) (triRotatedZX.p[2].x + model_move); 
 
+        
+        //int n = 
+        //    ( (triRotatedZX.p[1].z - triRotatedZX.p[0].z ) *
+        //      (triRotatedZX.p[2].z - triRotatedZX.p[0].z ) );
+        //if(n>0){cull=TRUE;}
+
         // We need a valid window, 
         // to use the rasterization features.
         if ( (void*) __root_window != NULL )
         {
+
+            //#test
+            //testing rasterization.
+            if(cull==FALSE){
+                plotTriangleF(
+                    (struct gws_window_d *) __root_window, 
+                    (struct gr_triangleF3D_d *) &triRotatedZX,
+                    TRUE );  // fill
+            }
+            
+            // #ok
             // Plot a triangle using float elements.
-            plotTriangleF(
-                (struct gws_window_d *) __root_window, 
-                (struct gr_triangleF3D_d *) &triRotatedZX,
-                FALSE );  // do not flush
+            //plotTriangleF(
+            //    (struct gws_window_d *) __root_window, 
+            //    (struct gr_triangleF3D_d *) &triRotatedZX,
+            //    FALSE );  
         }
     };
 }
