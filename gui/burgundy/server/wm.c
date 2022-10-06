@@ -4066,7 +4066,7 @@ void wm_exit_fullscreen_mode(int tile)
 
 // yellow bar. (rectangle not window)
 // developer status.
-void yellow_status( char *string )
+void yellowstatus0(char *string,int refresh)
 {
     //methods. get with the w.s., not with the system.
     unsigned long w = gws_get_device_width();
@@ -4094,7 +4094,7 @@ void yellow_status( char *string )
     //}
 
 
-    debug_print ("yellow_status:\n");
+    //debug_print ("yellow_status:\n");
     
     //#todo
     //if ( (void*) string == NULL ){ return; }
@@ -4140,15 +4140,24 @@ void yellow_status( char *string )
     
     // Mostra o retângulo.
      
-    if (bar_size == 0)
+    if (bar_size == 0){
         bar_size = 32;
- 
-    gws_refresh_rectangle(
-        aw->left +2, aw->top +2,bar_size,24);
+    }
 
-    //debug_print ("yellow_status: done\n");
+    if(refresh){
+        gws_refresh_rectangle(
+            (aw->left +2), (aw->top +2), bar_size, 24 );
+    }
 }
 
+
+void yellow_status(char *string)
+{
+    if( (void*)string==NULL ){
+        return;
+    }
+    yellowstatus0(string,TRUE);
+}
 
 
 int 

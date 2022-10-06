@@ -2089,6 +2089,7 @@ xxxDeflateCubeZ (
 
 
 // Triangle
+// #todo: return pixel counter.
 int 
 grTriangle3(
     struct gws_window_d *window, 
@@ -2142,7 +2143,7 @@ int grTriangle( struct gr_triangle_d *triangle )
 // Fill a triangle - Bresenham method
 // Original from http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
 void 
-fillTriangle(
+fillTriangle0(
     int x1, int y1,
     int x2, int y2,
     int x3, int y3, 
@@ -2318,270 +2319,53 @@ fillTriangle(
 //-----------------
 
 
-
+//#todo: return pixel counter.
 int 
-xxxFillTriangle0(
+fillTriangle(
     struct gws_window_d *window, 
-    struct gr_triangle_d *triangle )
+    struct gr_triangle_d *triangle,
+    int hotspotx, int hotspoty )
 {
-    int tmpx=0;
-    int tmpy=0;
-    unsigned int solid_color=0;
 
+    int X0=0; int Y0=0;
+    int X1=0; int Y1=0;
+    int X2=0; int Y2=0;
 
-    if ( (void*) window == NULL ){
-        return -1;
-    }
-    if (window->magic != 1234){
-        return -1;
-    }
+    //if( (void*) window == NULL )
+        //return 0;
 
-    if ( (void*) triangle == NULL ){
-        return -1;
-    }
+    if( (void*) triangle == NULL )
+        return 0;
 
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X0, (int *) &Y0, 
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
 
-// -------------------------------------------
-// Draws a not filled triangle.
-// 3d coordinates
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X1, (int *) &Y1, 
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
 
-    plotLine3d (
-        window,
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[1].color );
-    plotLine3d (
-        window,
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[2].color );
-    plotLine3d (
-        window,
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[0].color );
-    
-    solid_color = triangle->p[0].color;
-//-------------------------------------------
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X2, (int *) &Y2, 
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
 
-    int i=0;
-    int res_lt0x=0;
-    int res_lt0y=0;
-    int res_lt0z=0;
-    int res_lt1x=0;
-    int res_lt1y=0;
-    int res_lt1z=0;
+// Draw
 
-    // Number of vectors.
-    int nov1=0;
-    int nov2=0;
+    fillTriangle0( 
+        (int) (X0 & 0xFFFFFFFF), (int) (Y0 & 0xFFFFFFFF),
+        (int) (X1 & 0xFFFFFFFF), (int) (Y1 & 0xFFFFFFFF),
+        (int) (X2 & 0xFFFFFFFF), (int) (Y2 & 0xFFFFFFFF),
+        (unsigned int) triangle->p[0].color );
 
-// #test
-// 3 'demãos' de tinta, porque pintar na diagonal
-// não fica tão perfeitinho quanto pintar na horizontal,
-// ou vertical.
-// Mas no futuro vamos criar alguma solução que 
-// pinte na horizontal pra ficar pefeitinho.
-
-
-//--------------------------------------------------
-// first time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-//--------------------------------------------------
-// second time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-//--------------------------------------------------
-// third time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-
-
-/*
-//-------------------------------------------
-// deltas absolutos
-
-    // y
-    int d1 = triangle->p[0].y - triangle->p[1].y;
-    int abs_d1 = abs(d1);
-    int d2 = triangle->p[0].y - triangle->p[2].y;
-    int abs_d2 = abs(d2);
-    int abs_d1d2 = d1 + d2;
-    
-    // x
-    int d3 = triangle->p[0].x - triangle->p[1].x;
-    int abs_d3 = abs(d3);
-    int d4 = triangle->p[0].x - triangle->p[2].x;
-    int abs_d4 = abs(d4);
-    int abs_d3d4 = d3 + d4;
-
-    int tmp;
-    
-    // dy <= dx
-    if ( abs_d1d2 <= abs_d1d2 )
-    {
-        if (triangle->p[2].x < triangle->p[1].x)
-        {
-            tmp = triangle->p[2].x;
-            triangle->p[2].x = triangle->p[1].x;
-            triangle->p[1].x = tmp;
-        }
-        if (triangle->p[1].x < triangle->p[0].x)
-        {
-            tmp = triangle->p[1].x;
-            triangle->p[1].x = triangle->p[0].x;
-            triangle->p[0].x = tmp;
-        }
-
-        if (triangle->p[2].y < triangle->p[1].y)
-        {
-            tmp = triangle->p[2].y;
-            triangle->p[2].y = triangle->p[1].y;
-            triangle->p[1].y = tmp;
-        }
-        if (triangle->p[1].y < triangle->p[0].y)
-        {
-            tmp = triangle->p[1].y;
-            triangle->p[1].y = triangle->p[0].y;
-            triangle->p[0].y = tmp;
-        }
-
-        plotLine3d(
-            window,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            COLOR_WHITE );
-            
-
-    }
-    else{
-    };
-*/
-
-
+//#todo: return pixel counter.
     return 0;
 }
-
-
-
 
 
 // IN: projected triangle.
@@ -2679,58 +2463,22 @@ plotTriangleF(
 
     // Not filled.
     // we dont need a valid window.
-    if(!fill){
-        grTriangle3( window, &final_triangle );
+    // #todo: return pixel counter.
+    if (!fill){
+        return (int) grTriangle3( window, &final_triangle );
     }
 
-
-
-// Filled
-// We need a valid window.
-
-    int X0=0;
-    int Y0=0;
-    int X1=0;
-    int Y1=0;
-    int X2=0;
-    int Y2=0;
-
-    __transform_from_viewspace_to_screespace( 
-        (int *) &X0, (int *) &Y0, 
-        final_triangle.p[0].x, final_triangle.p[0].y, final_triangle.p[0].z,
-        TRUE, //UseLeftHand,
-        HotSpotX, HotSpotY ); 
-
-    __transform_from_viewspace_to_screespace( 
-        (int *) &X1, (int *) &Y1, 
-        final_triangle.p[1].x, final_triangle.p[1].y, final_triangle.p[1].z,
-        TRUE, //UseLeftHand,
-        HotSpotX, HotSpotY ); 
-
-    __transform_from_viewspace_to_screespace( 
-        (int *) &X2, (int *) &Y2, 
-        final_triangle.p[2].x, final_triangle.p[2].y, final_triangle.p[2].z,
-        TRUE, //UseLeftHand,
-        HotSpotX, HotSpotY ); 
-
-
-    if(fill)
-    {
-
-        //#ok
-        //xxxFillTriangle0( window, &final_triangle );
-        
-        //#test
-        fillTriangle( 
-            (int) (X0 & 0xFFFFFFFF), 
-            (int) (Y0 & 0xFFFFFFFF),
-            (int) (X1 & 0xFFFFFFFF), 
-            (int) (Y1 & 0xFFFFFFFF),
-            (int) (X2 & 0xFFFFFFFF), 
-            (int) (Y2 & 0xFFFFFFFF),
-            (unsigned int) final_triangle.p[0].color );
+    // Filled
+    // We need a valid window.
+    // #todo: return pixel counter.
+    if (fill){
+        return (int) fillTriangle( 
+                         window, 
+                         &final_triangle, 
+                         HotSpotX, HotSpotY );
     }
 
+// #todo: return pixel counter.
     return 0;
 }
 

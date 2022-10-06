@@ -7,6 +7,9 @@
 
 #include "gramado.h"
 
+// Swap two bytes
+#define ____SWAP(x,y) do { (x)=(x)^(y); (y)=(x)^(y); (x)=(x)^(y); } while(0)
+
 // See:
 // https://wiki.osdev.org/3D_Renderer_Basics
 // http://members.chello.at/easyfilter/bresenham.html
@@ -2086,6 +2089,7 @@ xxxDeflateCubeZ (
 
 
 // Triangle
+// #todo: return pixel counter.
 int 
 grTriangle3(
     struct gws_window_d *window, 
@@ -2134,270 +2138,234 @@ int grTriangle( struct gr_triangle_d *triangle )
     return Status;
 }
 
+//---------------------
 
-int 
-xxxFillTriangle0(
-    struct gws_window_d *window, 
-    struct gr_triangle_d *triangle )
+// Fill a triangle - Bresenham method
+// Original from http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+void 
+fillTriangle0(
+    int x1, int y1,
+    int x2, int y2,
+    int x3, int y3, 
+    unsigned int c)
 {
-    int tmpx=0;
-    int tmpy=0;
-    unsigned int solid_color=0;
 
+	int t1x,t2x,y,minx,maxx,t1xp,t2xp;
+	int changed1 = FALSE;
+	int  changed2 = FALSE;
+	int signx1,signx2,dx1,dy1,dx2,dy2;
+	int e1, e2;
 
-    if ( (void*) window == NULL ){
-        return -1;
-    }
-    if (window->magic != 1234){
-        return -1;
-    }
+// Sort vertices
+	if (y1>y2) { ____SWAP(y1,y2); ____SWAP(x1,x2); }
+	if (y1>y3) { ____SWAP(y1,y3); ____SWAP(x1,x3); }
+	if (y2>y3) { ____SWAP(y2,y3); ____SWAP(x2,x3); }
 
-    if ( (void*) triangle == NULL ){
-        return -1;
-    }
+	t1x=t2x=x1; y=y1;   // Starting points
 
+	dx1 = (int)(x2 - x1);
+	if(dx1<0) { dx1=-dx1; signx1=-1; } else { signx1=1; }
+	dy1 = (int)(y2 - y1);
+ 
+	dx2 = (int)(x3 - x1); 
+	if(dx2<0) { dx2=-dx2; signx2=-1; } else { signx2=1; }
+	dy2 = (int)(y3 - y1);
+	
+	if (dy1 > dx1) {   // swap values
+        ____SWAP(dx1,dy1);
+		changed1 = TRUE;
+	}
+	if (dy2 > dx2) {   // swap values
+        ____SWAP(dy2,dx2);
+		changed2 = TRUE;
+	}
 
-// -------------------------------------------
-// Draws a not filled triangle.
-// 3d coordinates
-
-    plotLine3d (
-        window,
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[1].color );
-    plotLine3d (
-        window,
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[2].color );
-    plotLine3d (
-        window,
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-        triangle->p[0].color );
-    
-    solid_color = triangle->p[0].color;
-//-------------------------------------------
+	e2 = (int)(dx2>>1);
+    // Flat top, just process the second half
+    if(y1==y2)
+        goto next;
+    e1 = (int)(dx1>>1);
 
     int i=0;
-    int res_lt0x=0;
-    int res_lt0y=0;
-    int res_lt0z=0;
-    int res_lt1x=0;
-    int res_lt1y=0;
-    int res_lt1z=0;
-
-    // Number of vectors.
-    int nov1=0;
-    int nov2=0;
-
-// #test
-// 3 'demãos' de tinta, porque pintar na diagonal
-// não fica tão perfeitinho quanto pintar na horizontal,
-// ou vertical.
-// Mas no futuro vamos criar alguma solução que 
-// pinte na horizontal pra ficar pefeitinho.
-
-
-//--------------------------------------------------
-// first time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
+    for (i=0; i<dx1;)
     {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
+		t1xp=0; t2xp=0;
+		if(t1x<t2x) { minx=t1x; maxx=t2x; }
+		else		{ minx=t2x; maxx=t1x; }
+        // process first line until y value is about to change
+		while(i<dx1) 
+		{
+			i++;			
+			e1 += dy1;
+	   	   	while (e1 >= dx1) 
+	   	   	{
+				e1 -= dx1;
+   	   	   	    if (changed1) 
+   	   	   	        t1xp=signx1;//t1x += signx1;
+				else 
+				    goto next1;
+			}
+			if (changed1) 
+			    break;
+			else 
+			    t1x += signx1;
+		}
+	// Move line
+	next1:
+        // process second line until y value is about to change
+		while (1) {
+			e2 += dy2;		
+			while (e2 >= dx2) {
+				e2 -= dx2;
+				if (changed2) t2xp=signx2;//t2x += signx2;
+				else          goto next2;
+			}
+			if (changed2)     break;
+			else              t2x += signx2;
+		}
+	next2:
+		if(minx>t1x) minx=t1x; if(minx>t2x) minx=t2x;
+		if(maxx<t1x) maxx=t1x; if(maxx<t2x) maxx=t2x;
 
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-//--------------------------------------------------
-// second time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-//--------------------------------------------------
-// third time
-
-    // muitas vezes.
-    // mas quebra quando termina o retangulo.
-    for (i=0; i<1000; i++)
-    {
-        // track 0
-        // plot a line and track a given vector.
-        nov1 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
-            &res_lt0x, &res_lt0y, &res_lt0z,
-            i,
-            COLOR_RED,
-            FALSE );  //do not draw
-
-        // track 1
-        nov2 = (int) plotLine3dLT2 (
-            window,
-            triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
-            triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
-            &res_lt1x, &res_lt1y, &res_lt1z,
-            i,
-            COLOR_RED,
-            FALSE );  // do not draw
-
-        if ( i >= nov1 || i >= nov2 )
-            break;
-            
-        // line cutting the two lines.
-        plotLine3d (
-           window,
-           res_lt0x, res_lt0y, res_lt0z, 
-           res_lt1x, res_lt1y, res_lt1z, 
-           solid_color );
-     };
-
-
-
-/*
-//-------------------------------------------
-// deltas absolutos
-
-    // y
-    int d1 = triangle->p[0].y - triangle->p[1].y;
-    int abs_d1 = abs(d1);
-    int d2 = triangle->p[0].y - triangle->p[2].y;
-    int abs_d2 = abs(d2);
-    int abs_d1d2 = d1 + d2;
-    
-    // x
-    int d3 = triangle->p[0].x - triangle->p[1].x;
-    int abs_d3 = abs(d3);
-    int d4 = triangle->p[0].x - triangle->p[2].x;
-    int abs_d4 = abs(d4);
-    int abs_d3d4 = d3 + d4;
-
-    int tmp;
-    
-    // dy <= dx
-    if ( abs_d1d2 <= abs_d1d2 )
-    {
-        if (triangle->p[2].x < triangle->p[1].x)
-        {
-            tmp = triangle->p[2].x;
-            triangle->p[2].x = triangle->p[1].x;
-            triangle->p[1].x = tmp;
-        }
-        if (triangle->p[1].x < triangle->p[0].x)
-        {
-            tmp = triangle->p[1].x;
-            triangle->p[1].x = triangle->p[0].x;
-            triangle->p[0].x = tmp;
-        }
-
-        if (triangle->p[2].y < triangle->p[1].y)
-        {
-            tmp = triangle->p[2].y;
-            triangle->p[2].y = triangle->p[1].y;
-            triangle->p[1].y = tmp;
-        }
-        if (triangle->p[1].y < triangle->p[0].y)
-        {
-            tmp = triangle->p[1].y;
-            triangle->p[1].y = triangle->p[0].y;
-            triangle->p[0].y = tmp;
-        }
-
-        plotLine3d(
-            window,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[1].x, triangle->p[1].y, 0,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            COLOR_WHITE );
-
-        plotLine3d(
-            window,
-            triangle->p[2].x, triangle->p[2].y, 0,
-            triangle->p[0].x, triangle->p[0].y, 0,
-            COLOR_WHITE );
-            
-
-    }
-    else{
+	   	// Draw line from min to max points found on the y
+	   	//lcd_hline(minx, maxx, y);    
+        grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        //plotLine3d (
+        //    NULL,
+        //    (minx & 0xFF), (y & 0xFF) , 0, 
+        //    (maxx & 0xFF), (y & 0xFF), 0, 
+        //    c);
+		
+		// Now increase y
+		if(!changed1) t1x += signx1;
+		t1x+=t1xp;
+		if(!changed2) t2x += signx2;
+		t2x+=t2xp;
+    	y += 1;
+		if(y==y2) break;
+		
     };
-*/
+    
+    next:
+	// Second half
+	dx1 = (int)(x3 - x2); 
+	if(dx1<0) { dx1=-dx1; signx1=-1; } else { signx1=1; }
+	dy1 = (int)(y3 - y2);
+	t1x=x2;
+ 
+	if (dy1 > dx1) {   // swap values
+        ____SWAP(dy1,dx1);
+		changed1 = TRUE;
+	}else{ 
+	    changed1=FALSE;
+	}
+	
+	e1 = (int)(dx1>>1);
 
 
+    int ii=0;
+    for (ii = 0; ii<=dx1; ii++)
+    {
+		t1xp=0; t2xp=0;
+		if(t1x<t2x) { minx=t1x; maxx=t2x; }
+		else		{ minx=t2x; maxx=t1x; }
+	    // process first line until y value is about to change
+		while(ii<dx1) {
+    		e1 += dy1;
+	   	   	while (e1 >= dx1) {
+				e1 -= dx1;
+   	   	   	   	if (changed1) { t1xp=signx1; break; }//t1x += signx1;
+				else          goto next3;
+			}
+			if (changed1) break;
+			else   	   	  t1x += signx1;
+			if(ii<dx1) ii++;
+		}
+	next3:
+        // process second line until y value is about to change
+		while (t2x!=x3) {
+			e2 += dy2;
+	   	   	while (e2 >= dx2) {
+				e2 -= dx2;
+				if(changed2) t2xp=signx2;
+				else          goto next4;
+			}
+			if (changed2)     break;
+			else              t2x += signx2;
+		}	   	   
+	next4:
+
+		if(minx>t1x) minx=t1x; if(minx>t2x) minx=t2x;
+		if(maxx<t1x) maxx=t1x; if(maxx<t2x) maxx=t2x;
+
+	   	// Draw line from min to max points found on the y
+        //lcd_hline(minx, maxx, y);
+        grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        //plotLine3d (
+        //    NULL,
+        //    (minx & 0xFF), (y & 0xFF) , 0, 
+        //    (maxx & 0xFF), (y & 0xFF), 0, 
+        //    c);
+            
+		// Now increase y
+		if(!changed1) t1x += signx1;
+		t1x+=t1xp;
+		if(!changed2) t2x += signx2;
+		t2x+=t2xp;
+    	y += 1;
+		if(y>y3) return;
+    };
+}
+//-----------------
+
+
+//#todo: return pixel counter.
+int 
+fillTriangle(
+    struct gws_window_d *window, 
+    struct gr_triangle_d *triangle,
+    int hotspotx, int hotspoty )
+{
+
+    int X0=0; int Y0=0;
+    int X1=0; int Y1=0;
+    int X2=0; int Y2=0;
+
+    //if( (void*) window == NULL )
+        //return 0;
+
+    if( (void*) triangle == NULL )
+        return 0;
+
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X0, (int *) &Y0, 
+        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
+
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X1, (int *) &Y1, 
+        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
+
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X2, (int *) &Y2, 
+        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
+        TRUE, //UseLeftHand,
+        hotspotx, hotspoty ); 
+
+// Draw
+
+    fillTriangle0( 
+        (int) (X0 & 0xFFFFFFFF), (int) (Y0 & 0xFFFFFFFF),
+        (int) (X1 & 0xFFFFFFFF), (int) (Y1 & 0xFFFFFFFF),
+        (int) (X2 & 0xFFFFFFFF), (int) (Y2 & 0xFFFFFFFF),
+        (unsigned int) triangle->p[0].color );
+
+//#todo: return pixel counter.
     return 0;
 }
-
-
-
 
 
 // IN: projected triangle.
@@ -2495,16 +2463,22 @@ plotTriangleF(
 
     // Not filled.
     // we dont need a valid window.
-    if(!fill){
-        grTriangle3( window, &final_triangle );
+    // #todo: return pixel counter.
+    if (!fill){
+        return (int) grTriangle3( window, &final_triangle );
     }
 
     // Filled
     // We need a valid window.
-    if(fill){
-        xxxFillTriangle0( window, &final_triangle );
+    // #todo: return pixel counter.
+    if (fill){
+        return (int) fillTriangle( 
+                         window, 
+                         &final_triangle, 
+                         HotSpotX, HotSpotY );
     }
 
+// #todo: return pixel counter.
     return 0;
 }
 

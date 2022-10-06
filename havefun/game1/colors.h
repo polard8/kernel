@@ -62,7 +62,7 @@ F
 #define GRCOLOR_LIGHTCYAN     0x44FFFF  // level 4: light cyan
 #define GRCOLOR_LIGHTMAGENTA  0xFF44FF  // level 5: light magenta
 #define GRCOLOR_LIGHTYELLOW   0xFFFF44  // level 6: light yellow
-#define GRCOLOR_LIGHTWHITE    0xFFFFFF   // level 7: light white
+#define GRCOLOR_LIGHTWHITE    0xFFFFFF  // level 7: light white
 //-------
 
 // #todo: We can define a default transparent color,

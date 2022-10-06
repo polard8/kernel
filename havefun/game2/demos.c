@@ -285,22 +285,22 @@ void drawFlyingCube(float fElapsedTime)
         // to use the rasterization features.
         if ( (void*) __root_window != NULL )
         {
-
-            //#test
-            //testing rasterization.
-            if(cull==FALSE){
+            // #test: Testing rasterization.
+            // #todo: Return the number of changed pixels.
+            if(cull==FALSE)
+            {
+                // fill
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
                     (struct gr_triangleF3D_d *) &triRotatedZX,
                     TRUE );  // fill
+
+                // do not fill
+                //plotTriangleF(
+                //    (struct gws_window_d *) __root_window, 
+                //    (struct gr_triangleF3D_d *) &triRotatedZX,
+                //    FALSE );  
             }
-            
-            // #ok
-            // Plot a triangle using float elements.
-            //plotTriangleF(
-            //    (struct gws_window_d *) __root_window, 
-            //    (struct gr_triangleF3D_d *) &triRotatedZX,
-            //    FALSE );  
         }
     };
 }
@@ -1779,6 +1779,7 @@ void demoFlyingCube(void)
 {
     gramado_clear_surface(NULL,COLOR_BLACK);
     drawFlyingCube( (float) 0.02f );
+    //yellowstatus0("test",FALSE);  //draw but don't refresh
     gramado_flush_surface(NULL);
 }
 

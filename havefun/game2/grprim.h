@@ -659,16 +659,17 @@ int grTriangle( struct gr_triangle_d *triangle);
 
 
 void 
-fillTriangle(
+fillTriangle0(
     int x1, int y1,
     int x2, int y2,
     int x3, int y3, 
     unsigned int c);
 
 int 
-xxxFillTriangle0(
+fillTriangle(
     struct gws_window_d *window, 
-    struct gr_triangle_d *triangle );
+    struct gr_triangle_d *triangle,
+    int hotspotx, int hotspoty );
 
 
 int 

@@ -1309,7 +1309,10 @@ int wmInputReader(void);
 void wm_Update_TaskBar( char *string, int flush );
 
 void wmInitializeGlobals(void);
-void yellow_status( char *string );
+
+
+void yellowstatus0(char *string, int refresh);
+void yellow_status(char *string);
 
 int 
 is_within2 ( 
