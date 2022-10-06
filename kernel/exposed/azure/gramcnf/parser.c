@@ -523,83 +523,75 @@ int parse_number (int olen){
 // return (int) (1+2);
 // return function();
 // return (int) function();
-int parse_return (int token){
 
-    int c;
+int parse_return (int token)
+{
+    int c=0;
+    int running = 1;
+    int State = 1;
+    int open = 0;
+    unsigned long eval_ret;
+    char buffer[32];
+    //char *buffer;
 
-	int running = 1;
-	int State = 1;
-	int open = 0;
-	unsigned long eval_ret;
-	char buffer[32];
-	//char *buffer;
+// #debug
+    printf ("parse_return: Initializing ...\n");
 
-
-	//debug
-	printf ("parse_return: Initializing ...\n");	
-	
-	// Se entramos errado.
-    if ( token != TOKENKEYWORD || keyword_found != KWRETURN ){
+// Se entramos errado.
+    if ( token != TOKENKEYWORD || 
+         keyword_found != KWRETURN )
+    {
         printf ("parse_return: Can't initialize return statement\n");
         exit (1);
     }
 
+// #obs:
+// Isso significa que o token atual é uma keyword 'return'.
+// Se a próxima keyword for um ';' então não temos uma expressão.
 
-	// #obs:
-	// Isso significa que o token atual é uma keyword 'return'.
- 	// Se a próxima keyword for um ';' então não temos uma expressão.	
- 		
- 		
-    //
-    // Eval.
-    //
+// Eval
 
-    eval_ret = (unsigned long) tree_eval ();
-
-
-    // itoa
-     itoa ( (int) eval_ret, buffer );
- 
-    
+    eval_ret = (unsigned long) tree_eval();
+// itoa
+    itoa ( (int) eval_ret, buffer );
     // ??
-	//buffer = (char *) itoa ( (int) eval_ret);
+    //buffer = (char *) itoa ( (int) eval_ret);
 
-    //
-    // Output
-    //
+//
+// Output
+//
 
     // emit_return();
-    strcat ( TEXT,";[RETURN]\n");
-    strcat ( TEXT,"  mov eax, ");
-    strcat ( TEXT, buffer );
-    strcat ( TEXT,"\n  ret \n\n");
+    //strcat ( TEXT,";[RETURN]\n");
+    //strcat ( TEXT,"  mov eax, ");
+    //strcat ( TEXT, buffer );
+    //strcat ( TEXT,"\n  ret \n\n");
 
-	//strcat ( outfile,"  mov eax, ");
-	//strcat ( outfile, buffer );
-	//strcat ( outfile,"\n  ret \n\n");
+    //strcat ( outfile,"  mov eax, ");
+    //strcat ( outfile, buffer );
+    //strcat ( outfile,"\n  ret \n\n");
 
-
-	//o ultimo token em um return statement foi ';'
-	//vamos conferir
+// O ultimo token em um return statement foi ';'
+// vamos conferir
     if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
     {
-		//printf("; OK ");
-		c = TOKENSEPARATOR;
-		return c;
-	}	
+        printf("parse_return: ';' found\n");
+        c = TOKENSEPARATOR;
+        return c;
+    }
 
-    //
-    // ** Debug hang
-    //
-    
-	//#debug
-	printf ("parse_return: debug *hang");
-	while(1){}
-	
-	//#obs 
-	//supendemos todo o resto abaixo por enquanto.
-	
-    /*	
+//
+// Debug hang
+//
+
+// #debug
+    printf ("parse_return: #breakpoint: ';' not found!\n");
+    while(1){}
+
+//#obs 
+//supendemos todo o resto abaixo por enquanto.
+
+/*
 	while (running)
 	{
 		c = yylex ();
@@ -821,24 +813,17 @@ do_separator:
 			//while(1){}		
 	};
 
-    */	
-	
-done:		
+*/
 
+done:
    return c;
 }
 
 
+unsigned long parse_sizeof ( int token )
+{
+    unsigned long Result = 0;
 
-
-
-
-
-
-unsigned long parse_sizeof ( int token ){
-	
-	unsigned long Result = 0;
-	
     int c = token;	
 	
 	if ( c != TOKENKEYWORD )
@@ -1613,23 +1598,17 @@ expression_exit:
 
 
 
-/*
- ************************************************************************
- * parse:
- *     Função principal.
- *     Pegando tokens com o lexer e fazendo coisas ...
- */
- 
-int parse (void){
+// parse:
+// Função principal.
+// Pegando tokens com o lexer e fazendo coisas ...
 
+int parse(void)
+{
     int running = 1;
-
     register int token=0;
-
     int i=0;
 
-
-    //Se entramos em um desses corpos.
+// Se entramos em um desses corpos.
     int braces_inside = 0;
     int parentheses_inside = 0;
     int square_brackets_inside = 0;
@@ -1638,22 +1617,17 @@ int parse (void){
     int While_Result = -1;
     //...
 
-    // steps;
-    int State = 1;
+// Steps
+    int State=1;
 
+// size?
+    size_t size=0;
 
-	//
-	// size ??
-	//
-    size_t size;
-     
-    // #bugbug
-    // Tentando encontrar o tamanho do arquivo via fseek/ftell.
-
-     // #bugbug
-     // Esse tratamento de size está suspenso,
-     // pois não conseguimos calcular o tamanho do
-     // arquivo.
+// #bugbug
+// Tentando encontrar o tamanho do arquivo via fseek/ftell.
+// #bugbug
+// Esse tratamento de size está suspenso,
+// pois não conseguimos calcular o tamanho do arquivo.
 
     //++
     //===============================
@@ -1671,11 +1645,7 @@ int parse (void){
     //====================
     //--
 
-
-    //
-    // Initial message.
-    //
-    
+// Initial message.
     printf ("parse: Initializing ...\n");
 
 
@@ -2191,16 +2161,18 @@ int parse (void){
 						
 						break;
 						
-					
-					// Estamos dentro do corpo da função e não encontramos uma keyword.
-					// Mas não tem problema caso não exista keywords dentro dos parenteses
-					// ou dentro das chaves.	
-					default:
-					    if ( parentheses_inside > 0 ){
-						    printf ("State3: bugbug searching for keyword inside parentheses \n");
-						    State = 1;
-						    exit(1);
-					    }
+
+                    // Estamos dentro do corpo da função e 
+                    // não encontramos uma keyword.
+                    // Mas não tem problema caso não exista keywords 
+                    // dentro dos parenteses
+                    // ou dentro das chaves.
+                    default:
+                        if ( parentheses_inside > 0 ){
+                            printf ("State3: Searching for keyword inside parentheses \n");
+                            State=1;
+                            exit(1);
+                        }
 						//#obs: Não é errado procurar keywords dentro das chaves.
 						//Já que não encontramos então vamos fechar a chave se possível.
 					    if ( braces_inside > 0 ){
@@ -2303,16 +2275,12 @@ int parse (void){
 
 debug_output:
 
-
-    // Incluindo no arquivo de output os segmentos.
-    
+// Incluindo no arquivo de output os segmentos.
     strcat ( outfile, TEXT );
     strcat ( outfile, DATA );
     strcat ( outfile, BSS );
 
-
-	// Exibimos o arquivo de output.
-
+// Exibimos o arquivo de output.
     printf ("\n");
     printf ("---------------------------------------\n");    
     printf ("OUTPUT FILE:\n");
@@ -2399,15 +2367,15 @@ int parserInit (void){
 }
 
 
+// Called by compiler().
 int parser(void)
 {
     int Status = -1;
 
-    debug_print ("parser:\n");
+    //debug_print ("parser:\n");
 
-//initialize	
+// Initialize
     Status = (int) parserInit();
-
 //parse it
     Status = (int) parse();
     printf ("parser: parse() returned %d\n", Status); 

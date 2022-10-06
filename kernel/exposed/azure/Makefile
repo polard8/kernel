@@ -17,3 +17,7 @@ all:
 	make -C ./false
 	make -C ./true
 
+	make -C ./gramcnf
+	
+
+

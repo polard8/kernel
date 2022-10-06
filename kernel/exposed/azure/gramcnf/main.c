@@ -1,22 +1,14 @@
-/*
- * File: main.c
- *     Main file for 32bit app.
- *
- */
 
-
+// main.c
+// c-like interpreter.
+// Ported from Gramado 32bit.
+// 2022 - Fred Nora
 
 #include "gramcnf.h"
 
-
 //#define __VERSION__ "0.1"
 
-
-#ifndef __COPYRIGHT__
-char copyright[] = "Copyright (c) Fred Nora.\n\
- All rights reserved.\n";
-#endif 
-
+//const char copyright[] = "Copyright (c) Fred Nora";
 
 /* While POSIX defines isblank(), it's not ANSI C. */
 //#define IS_BLANK(c) ((c) == ' ' || (c) == '\t')
@@ -28,13 +20,12 @@ char program_name[] = "[Default program name]";
 // Specification for gramc.
 char *standard_spec = "%{%{CC} -c %{I} -o %{O}}";
 
-
 char *compiler_name;
 
-//procurar os marcadores no arquivo intermediário 
-//pegamos um arquivo intermediário e separamos cada um dos 
-//elementos, colocando seus ponteiros em um vetor.
-//A cada passo do offset comparamos uma palavra.
+// Procura os marcadores no arquivo intermediário 
+// pegamos um arquivo intermediário e separamos cada um dos 
+// elementos, colocando seus ponteiros em um vetor.
+// A cada passo do offset comparamos uma palavra.
 char **create_tokenlist( char *s );
 
 // Imprime todas as strings de um vetor de ponteiros.
@@ -44,7 +35,6 @@ void fncc_print_tokenList ( char *token_list[], char *separator );
 //inicializando as variáveis e buffers.
 //int gramccInitialize();
 
-void usage (char **argv);
 
 
 //static int running = 1;
@@ -60,8 +50,10 @@ int no_output;
 //static unsigned char dest_msg[512];
 
 void editorClearScreen(void); 
-
 void debugShowStat(void);
+
+static void usage(char **argv);
+// =====================================================
 
 
 /* Cancelada */
@@ -385,10 +377,10 @@ void fncc_print_tokenList ( char *token_list[], char *separator ){
 		printf("%s", token_list[i]);
 		printf("%s", separator);
     }
-	
+
 fail:
 done:
-    return;	
+    return;
 }
 
 
@@ -402,22 +394,17 @@ int is_letter(char c)
 */
 
 
-/*
- **************************************
- * gramcInitialize:
- *     Inicializa variáveis globais.
- */
+// gramcInitialize:
+// Inicializa variáveis globais.
 
-int gramcInitialize (void){
-
+int gramcInitialize (void)
+{
     int Status = 0;
     int i=0;
 
-
     printf ("gramcInitialize: Initializing ...\n");
 
-
-	// Clear buffers
+// Clear buffers
 
     for ( i=0; i<INFILE_SIZE; i++ ){
         infile[i] = '\0';
@@ -425,17 +412,13 @@ int gramcInitialize (void){
     sprintf (infile, "; ======================== \n");
     strcat (infile,  "; Initializing infile ...\n\n");
 
-
     for ( i=0; i<OUTFILE_SIZE; i++ ){
         outfile[i] = '\0';
     }
     sprintf (outfile, "; ======================== \n" );
     strcat (outfile,  ";Initializing outfile ...\n\n");
 
-
-
-    // text, data, bss
-
+// text, data, bss
 
     sprintf (TEXT, "; ======================== \n" );
     strcat (TEXT,  "; Initializing TEXT buffer \n");
@@ -449,8 +432,7 @@ int gramcInitialize (void){
     strcat (BSS,  "; Initializing BSS buffer \n");
     strcat (BSS,  "segment .bss \n");
 
-
-	//table.
+// Table.
 
 //contador para não estourar a lista. 
     keyword_count = 0;  
@@ -459,12 +441,12 @@ int gramcInitialize (void){
     constant_count = 0; 
     string_count = 0; 
     separator_count = 0; 
-    special_count = 0;	
-	//...
-	
-	
-//usado pelo lexar pra saber qual lugar na lista 
-//colocar o lexeme.
+    special_count = 0;
+    // ...
+
+// Usado pelo lexar pra saber 
+// qual lugar na lista colocar o lexeme.
+
     current_keyword = 0; 
     current_identifier = 0; 
     current_keyword = 0; 
@@ -473,17 +455,13 @@ int gramcInitialize (void){
     current_separator = 0; 
     current_special = 0;
 
-	
-	//
-	// ## program ##
-	//
-	
-	program.name = program_name;
-	program.function_count;
-	program.function_list = NULL;
+// ## program ##
 
+    program.name = program_name;
+    program.function_count;
+    program.function_list = NULL;
 
-	//...
+    //...
 
     printf ("gramcInitialize: done\n");
 
@@ -520,9 +498,9 @@ void mainTestingCTYPE()
 
 
 
-//mostra as estatísticas para o desenvolvedor.
-void debugShowStat (void){
-	
+// Mostra as estatísticas para o desenvolvedor.
+void debugShowStat (void)
+{
 	printf("debugShowStat:\n\n");
 	
 	printf("name: %s\n", program.name );
@@ -561,73 +539,66 @@ void debugShowStat (void){
         //nothing		
 	};
 
-	
-#ifdef LEXER_VERBOSE	
-	printf("number of liner: %d \n",lexer_lineno);
-	printf("first line: %d \n",lexer_firstline);
-	printf("last line: %d \n",lexer_lastline);
-	printf("token count: %d \n",lexer_token_count);	
-#endif	
-	
-#ifdef PARSER_VERBOSE	
-	printf("infile_size: %d bytes \n",infile_size);
-    printf("outfile_size: %d bytes \n",outfile_size);	
-#endif	
-	
+#ifdef LEXER_VERBOSE
+    printf("number of liner: %d \n",lexer_lineno);
+    printf("first line: %d \n",lexer_firstline);
+    printf("last line: %d \n",lexer_lastline);
+    printf("token count: %d \n",lexer_token_count);
+#endif
+
+#ifdef PARSER_VERBOSE
+    printf("infile_size: %d bytes \n",infile_size);
+    printf("outfile_size: %d bytes \n",outfile_size);
+#endif
+
 }
 
 
-/*
- ********************************
- * main:
- *     Main function. 
- *     The entry point is is crt0.o.
- */
+int main ( int argc, char *argv[] )
+{
 
-int main ( int argc, char *argv[] ){
-
-    // Input
+// Input
     FILE *fp;
-    
-    // Output file for compiler.
+// Output file for compiler.
     FILE *____O;
 
     register int i;
     char *filename;
 
+// Output string.
+    char *o;
 
-    // Output string.
-    char *o;	
-
-	//switches
-    
+// Switches 
     int flagA = 0;
     int flagB = 0;
     int flagC = 0;
     int flagD = 0;
-
     int flagString1 = 0;
     int flagString2 = 0;
     int flagString3 = 0;
     int flagString4 = 0;
-
     int flagX = 0;
     int flagY = 0;
     int flagZ = 0;
-
     int flagR = 0;
     int flagS = 0;
     int flagT = 0;
 
+// Carregamos o arquivo num buffer em ring0.
+// getc() precisa ler os dados em stdin
+// #bugbug: 
+// Se o buffer for maior que isso, read() falha.
+    char __buf[1024];
+    int nreads=0;
+
+
 // Initializing
-    debug_print ("gramcnf: Initializing ...\n");  
+    //debug_print ("gramcnf: Initializing ...\n");  
     printf ("\n");
     printf ("main: Initializing ..\n");
 
-   
-    // Inicializa variáveis globais.
-    gramcInitialize ();
-
+// Inicializa variáveis globais.
+    gramcInitialize();
 
     //printf ("*breakpoint");
     //while (1){}
@@ -645,37 +616,30 @@ int main ( int argc, char *argv[] ){
 
 #ifdef GRAMC_VERBOSE
     printf ("argc=%d \n", argc );
-
-    for ( i=0; i < argc; i++ )
-        printf ("arg %d = %s \n", i, argv[i] );
+    for ( i=0; i < argc; i++ ){
+        printf("arg %d = %s \n", i, argv[i] );
+    };
 #endif 
-
 
 // flags.
 // Comparando os argumentos para acionar as flags.
 
-    for ( i=0; i < argc; i++ )
-    {
-        if ( strcmp( argv[i], "-a") == 0 ){
-            printf ("## %d flag a ##\n",i);
-        }
+    for ( i=0; i < argc; i++ ){
 
-        if ( strcmp( argv[i], "-b") == 0 ){
-            printf("## %d flag b ##\n",i);
-        }
-
-        if ( strcmp( argv[i], "-s") == 0 ){
-            printf("## %d flag -s ##\n",i);
-            asm_flag = 1;
-        }
-
-        //...
+    if ( strcmp( argv[i], "-a") == 0 ){
+        printf ("## %d flag a ##\n",i);
+    }
+    if ( strcmp( argv[i], "-b") == 0 ){
+        printf("## %d flag b ##\n",i);
+    }
+    if ( strcmp( argv[i], "-s") == 0 ){
+        printf("## %d flag -s ##\n",i);
+        asm_flag = 1;
+    }
+    //...
     };
 
-//
 // # Arquivo de entrada #
-//
-
 // #bugbug
 // lembrando que não podemos mais usar os elementos
 // da estrutura em user mode.
@@ -683,31 +647,27 @@ int main ( int argc, char *argv[] ){
 // podemos copiar o conteúdo do arquivo para um buffer aqui no programa
 // através de fread, mas fread está disponível apenas na libc03.
 
-    // Carregamos o arquivo num buffer em ring0.
-    // getc() precisa ler os dados em stdin
-    // #bugbug: Se o buffer for maior que isso, read() falha!
-    char __buf[1024];
-    int nreads = 0;
+// Open
+    //printf ("\n");
+    printf("Calling fopen()    :)\n");
+    //while(1){}
 
+    fp = fopen((char *) argv[2], "rb");
 
-    fp = fopen ( (char *) argv[2], "rb" );
-
-    if ( fp == NULL )
-    {
-        printf ("main: Couldn't open the input file \n");
+    if ( fp == NULL ){
+        printf("main.c: Couldn't open the input file\n");
         usage(argv);
-        exit (1);
+        exit(1);
+    }
 
-    }else{
+// Input file.
+// para que getc leia desse arquivo que carregamos.
 
-         // Input file.
-         // para que getc leia desse arquivo que carregamos.
-         stdin = fp;
-         finput = fp;
+    stdin = fp;
+    finput = fp;
  
-        
-        //#debug
-        // Esse while está aqui para visualizarmos o arquivo carregado.
+//#debug
+// Esse while está aqui para visualizarmos o arquivo carregado.
         
         //int c;
         //while(1)
@@ -720,22 +680,15 @@ int main ( int argc, char *argv[] ){
         //}
         //fflush(stdout);
         //while(1){}
-    };
 
 
+// Compiler
+// It returns a pointer to the output file.
 
-
-    //
-    // Compiler.
-    //
-    
-    // It returns a pointer to the output file.
-        
     printf (">>>> main: Calling compiler\n");
-    ____O = (FILE *) compiler ();   
+    ____O = (FILE *) compiler();   
     printf (">>>> main: compiler returned \n");
-    debug_print (">>>> main: compiler returned \n");
-
+    //debug_print (">>>> main: compiler returned \n");
 
     //#debug
     //printf ("*breakpoint");
@@ -752,27 +705,25 @@ int main ( int argc, char *argv[] ){
 	
 //out:
     
-	//if ( asm_flag == 1 )
-	//{
+    //if ( asm_flag == 1 )
+    //{
         //printf ("===============================\n");
         //printf ("OUTPUT: \n %s \n", outfile );   //array usado por strcat
         //printf ("===============================\n");
-	//}
+    //}
 
-
-	//#debug suspensa por enquanto.
-	//debugShowStat();
+//#debug suspensa por enquanto.
+    //debugShowStat();
 
     printf("\n");
     printf ("main: done \n.");
-    
-    debug_print ("gramcnf: Done\n");    
-    
+    //debug_print ("gramcnf: Done\n");    
+
     return 0;
 }
 
 
-void usage (char **argv)
+static void usage(char **argv)
 {
     printf ("\n");
     printf ("====================\n");

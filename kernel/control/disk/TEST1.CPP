@@ -1,7 +1,9 @@
 int main () 
 {
-    printf ("Hi\n");
-    return 0;
+    //int test;
+    //printf ("Hi\n");
+    return 1;
+    //return;
 }
 
 

@@ -200,6 +200,7 @@ exposed-tier:
 	-sudo cp exposed/azure/bin/TASCII.BIN    control/disk/
 	-sudo cp exposed/azure/bin/FALSE.BIN     control/disk/
 	-sudo cp exposed/azure/bin/TRUE.BIN      control/disk/
+	-sudo cp exposed/azure/bin/GRAMCNF.BIN   control/disk/
 	#...
 
 #========================================

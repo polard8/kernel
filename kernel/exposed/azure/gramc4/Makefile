@@ -87,19 +87,14 @@ all-c:
 	
 	cp $(LIBCOBJ)/wait.o .
 
-	cp $(APIOBJ)/api.o      .
-
-
+#bugbug
+	cp $(APIOBJ)/api.o  .
 
 jackpot-link:
 	ld -m elf_i386 -T ../link.ld -o GRAMC4.BIN $(myObjects)    
-	
-
 finalize:
 	cp GRAMC4.BIN ../bin 
-
 clean:
 	-rm *.o
 	-rm GRAMC4.BIN 
-	
 	

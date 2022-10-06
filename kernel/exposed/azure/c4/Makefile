@@ -70,22 +70,15 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o  .
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
-	
-	cp $(APIOBJ)/api.o      .
 
-
+#bugbug
+	cp $(APIOBJ)/api.o  .
 
 jackpot-link:
 	ld -m elf_i386 -T ../link.ld -o C4.BIN $(myObjects)    
-	
-	
-
 finalize:
 	cp C4.BIN ../bin 
-
 clean:
 	-rm *.o
 	-rm C4.BIN 
-	
-	
 	

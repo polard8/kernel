@@ -1,11 +1,8 @@
 /*
  * File: tree.c 
- *
  * tbst - calculando expressões. isso deu meio certo.
- *     ...
  */
- 
- 
+
 //
 // Includes.
 // 
@@ -189,12 +186,12 @@ struct node* insert ( struct node* node, int key ){
      //4+3 - 2*5 = 12
 
 
-int bst_main (void){
-
+int bst_main(void)
+{
     buffer_offset = 0;
 
-	struct node *root = NULL; 
-	
+    struct node *root = NULL; 
+
 	int i;
 	int buffer1[32];
 	int buffer2[32];
@@ -207,13 +204,11 @@ int bst_main (void){
 	//VAMOS FAZER ELE GLOBAL PARA SER PREENCHIDO PELOS TOKENS.
 	
     //int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?' };	
-	
-	int c;
 
+    int c=0;
 
     printf ("bst_main:\n");
     printf ("for\n");
-
 
 	//colocamos nos buffers em ordem.
 	for ( i=0; (c = exp_buffer[i]) != '?'; i++ )		
@@ -304,20 +299,20 @@ int bst_main (void){
     // ??
 	// print inoder traversal of the BST 
 	// inorder(root); 
-		
-	printf("\n\n em ordem: ");
-	exibirEmOrdem(root);
-	
-	printf("\n\n pre ordem: ");
-	exibirPreOrdem(root);
-	
-	printf("\n\n pos ordem: ");
-	exibirPosOrdem(root);
 
-	printf("\n\n");
-	
-	return 0; 
-}; 
+    printf("\n\n em ordem: ");
+    exibirEmOrdem(root);
+
+    printf("\n\n pre ordem: ");
+    exibirPreOrdem(root);
+
+    printf("\n\n pos ordem: ");
+    exibirPosOrdem(root);
+
+    printf("\n\n");
+
+    return 0; 
+} 
 
 
 //===============================================================================
@@ -470,10 +465,10 @@ int testtest_main (void){
 }
 
 
-//calcula a expressão e retorna o valor;
+// Calcula a expressão e retorna o valor.
 
-unsigned long tree_eval (void){
-
+unsigned long tree_eval(void)
+{
 
 	//#todo:
 	//prepara o buffer contendo a expressão em ordem. 
@@ -490,44 +485,49 @@ unsigned long tree_eval (void){
 	//vamos copiar a função no parser que pega os tokens de expressões.
 	//mas por enquanto só os operadores básicos.
 	
-	//===================================================
-	
-	
-	int running = 1;
-	int State = 1;
-	int c;
-	
-	while (running == 1)
-	{
-	    c = yylex ();
+//===================================================
 
-		if ( c == TOKENEOF )
-		{
+    int running = 1;
+    int State = 1;
+    int c=0;
+
+    printf ("tree_eval: Initializing...\n");
+
+    while (running == 1)
+    {
+        c = yylex();
+
+        if ( c == TOKENEOF ){
             printf ("tree_eval: #error EOF in line %d\n", lineno);
-            exit (1);			
-		}  
-		
-		if ( c == TOKENSEPARATOR )
-		{
-			if ( strncmp ( (char *) real_token_buffer, ";", 1 ) == 0  )
-			{
-			    goto done;	
-			}
-		}
-		
-		switch (State)   
-	    {
-			//números
+            exit (1);
+        }
+
+        // ';' was found. 
+        // End of statement.
+        if ( c == TOKENSEPARATOR )
+        {
+            if ( strncmp ( (char *) real_token_buffer, ";", 1 ) == 0  )
+            {
+                printf("tree_eval: ';' was found!\n");
+                goto done;
+            }
+        }
+
+        switch (State)   
+        {
+            //números
             case 1:
-			    switch(c)
-				{
-					//números ou separadores
-				    case TOKENCONSTANT:
-                        exp_buffer[exp_offset] = (int) atoi (real_token_buffer);
-						exp_offset++;
-						State = 2; //depois de um número espera-se um operador ou um separador.
-						break;	
-					
+                switch (c)
+                {
+                    // Números ou separadores.
+                    case TOKENCONSTANT:
+                        exp_buffer[exp_offset] = (int) atoi(real_token_buffer);
+                        exp_offset++;
+                        // Depois de um número espera-se 
+                        // um operador ou um separador.
+                        State=2; 
+                        break;
+
 					// ; separador no caso de return void.
 					//para quando a expressão é depois do return.
 					case TOKENSEPARATOR:
@@ -543,53 +543,51 @@ unsigned long tree_eval (void){
 					//temos que tratar as aberturas e fechamentos (),{}	
 					
 				    default:
-					    printf("tree_eval: State1 default");
+					    printf("tree_eval: State1 default\n");
 						exit(1);
 					    break;
 				}
 			    break;
 
-			//operadores 	
+           // Operadores ou separadores.
             case 2:
- 		        switch (c)
-				{
-                    case '+':
-                    case '-':
-                    case '*':
-					case '/':
-					case '&':
-                    case '|':
-                    case '<':
-                    case '>':
+                switch (c)
+                {
+                    // Operadores
+                    case '+':  case '-':  case '*':  case '/':
+                    case '&':  case '|':
+                    case '<':  case '>':
                     case '%':
                     case '^':
                     case '!':
                     case '=':
                         exp_buffer[exp_offset] = (int) c;
-						exp_offset++;
-						State = 1; //depois do operador esperamos um número ou um separador ')' ou finalizador provisório ?.
-						break;
+                        exp_offset++;
+                        // Depois do operador esperamos 
+                        // um número ou um separador ')' ou 
+                        // finalizador provisório?.
+                        State=1; 
+                        break;
 
-					//')' provisório para terminar a expressão,
-                    //daí incluimos o finalizador provisório '?'					
-                    case TOKENSEPARATOR:						
+                    //')' provisório para terminar a expressão,
+                    //daí incluimos o finalizador provisório '?'
+                    case TOKENSEPARATOR:
+				        // ')'
 				        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
 						{
                             exp_buffer[exp_offset] = (int) '?';
 						    exp_offset++;
-                            //
                             // ## DONE !! ##
-                            //
                             goto do_bst;							
 						}
-						
+
+                        // ';'
 				        if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
 						{
+                            printf("tree_eval: ';' was found\n");
                             exp_buffer[exp_offset] = (int) '?';
 						    exp_offset++;
-                            //
                             // ## DONE !! ##
-                            //
                             goto do_bst;							
 						}
 					    break;						
@@ -609,32 +607,35 @@ unsigned long tree_eval (void){
 	int v; //#bugbug estamo lidando somente com dígitos de 0 à 9.
 	
 do_bst:
-    //#debug
-	//visualizando o buffer
+
+    printf("tree_eval: do_bst\n");
+
+// #debug
+// Visualizando o buffer.
+
     for(j=0; j<32; j++)
     {
-		v = exp_buffer[j];
-		
-		if ( v>= 0 && v<= 9 )
-		{
-		    printf("%d", exp_buffer[j]);	
-		}else{
-			printf("%c", exp_buffer[j]);
-		}
-	}
-	
-	//#debug 
-	//hang
+        v = exp_buffer[j];
+
+        if ( v>= 0 && v<= 9 ){
+            printf("exp_buffer: %d", exp_buffer[j]);
+        }else{
+            printf("exp_buffer: %c", exp_buffer[j]);
+        }
+    };
+
+//#debug 
+//hang
     //printf("do_bst: *debug breakpoint");
-	//while(1){}    
-	
-	//==================================================
-	//inicializa árvore binária.
-	//ela pega uma expressão que está em um buffer e 
-	//prepara o buffer POS_BUFFER para eval usar.
-	
-	bst_main(); 
-    
+    //while(1){}    
+
+//==================================================
+// Inicializa árvore binária.
+// ela pega uma expressão que está em um buffer e 
+// prepara o buffer POS_BUFFER para eval usar.
+
+    bst_main(); 
+
 	//#debug
 	//ok funcionou
 	//printf ("\n tree_eval: result={%d} \n", eval ( (int*) &POS_BUFFER[0] ) );   	
@@ -644,14 +645,13 @@ do_bst:
     //printf("*debug breakpoint");
 	//while(1){}    
 	
-	
-	unsigned long ret_val;
-	ret_val = (unsigned long) eval ( (int *) &POS_BUFFER[0] ); 
-	
+
+    unsigned long ret_val;
+    ret_val = (unsigned long) eval ( (int *) &POS_BUFFER[0] ); 
+
 	printf("result: %d\n",ret_val);
-	
+
 	return (ret_val); 
-	
 done:
     return (ret_val);
 }
