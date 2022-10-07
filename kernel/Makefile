@@ -136,6 +136,11 @@ control-tier:
 	-I control/boot/vd/fat/ \
 	-o GRAMADO.VHD 
 
+# Create backup for mbr.
+	$(Q) $(NASM) control/boot/vd/fat/stage1.asm \
+	-I control/boot/vd/fat/ \
+	-o MBR0.BIN
+	sudo cp MBR0.BIN  control/disk/
 
 # ::Build BM.BIN.
 	$(Q) $(MAKE) -C control/boot/x86/bm/ 

@@ -1,25 +1,20 @@
+
 // License: GPL-2.0
 // c4.c - C in four functions
-
 // #todo
 // This is the original code.
 // We will not change it.
 // See the project gramc4.
-
 // char, int, and pointer types
 // if, while, return, and expression statements
 // just enough features to allow self-compilation and a bit more
-
 // Written by Robert Swierczek
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <unistd.h>
 #include <fcntl.h>
-
 
 
 //#define int long long
@@ -56,9 +51,10 @@ enum { CHAR, INT, PTR };
 // identifier offsets (since we can't create an ident struct)
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
+
 void next(void)
 {
-  char *pp;
+    char *pp;
 
   while (tk = *p) {
     ++p;
@@ -142,9 +138,10 @@ void next(void)
   }
 }
 
+
 void expr(int lev)
 {
-  int t, *d;
+    int t, *d;
 
   if (!tk) { printf("%d: unexpected eof in expression\n", line); exit(-1); }
   else if (tk == Num) { *++e = IMM; *++e = ival; next(); ty = INT; }
@@ -292,9 +289,11 @@ void expr(int lev)
   }
 }
 
+
 void stmt(void)
 {
-  int *a, *b;
+    int *a; 
+    int *b;
 
   if (tk == If) {
     next();
@@ -355,18 +354,27 @@ int main (int argc, char **argv)
 
   printf ("c4: Initializing ...\n");
 
-  --argc; ++argv;
+  --argc; 
+  ++argv;
+  
   if (argc > 0 && **argv == '-' && (*argv)[1] == 's') { src = 1;   --argc; ++argv; }
   if (argc > 0 && **argv == '-' && (*argv)[1] == 'd') { debug = 1; --argc; ++argv; }
-  if (argc < 1) { printf("usage: c4 [-s] [-d] file ...\n"); return -1; }
 
-  if ((fd = open(*argv, 0, 0)) < 0) { 
-    printf("could not open(%s)\n", *argv); 
-    return -1; 
-  }
+    if (argc < 1){
+        printf("usage: c4 [-s] [-d] file ...\n");
+        return -1; 
+    }
 
-  //poolsz = 256*1024; // arbitrary size
-  poolsz = 512;
+// Open
+
+    if ((fd = open(*argv, 0, 0)) < 0)
+    { 
+        printf("c4.bin: Could not open(%s)\n", *argv); 
+        return -1; 
+    }
+
+//poolsz = 256*1024; // arbitrary size
+    poolsz = 512;
   
   if (!(sym = malloc(poolsz)))    { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
   if (!(le = e = malloc(poolsz))) { printf("could not malloc(%d) text area  \n", poolsz); return -1; }
@@ -389,7 +397,7 @@ int main (int argc, char **argv)
   p[i] = 0;
   close(fd);
 
-  // parse declarations
+// parse declarations
   line = 1;
   next();
   while (tk) {
@@ -484,10 +492,15 @@ int main (int argc, char **argv)
     next();
   }
 
-  if (!(pc = (int *)idmain[Val])) { printf("main() not defined\n"); return -1; }
-  if (src) return 0;
+    if (!(pc = (int *)idmain[Val]))
+    {
+        printf("main() not defined\n");
+        return -1;
+    }
+    if (src)
+        return 0;
 
-  // setup stack
+// setup stack
   bp = sp = (int *)((int)sp + poolsz);
   *--sp = EXIT; // call exit if main returns
   *--sp = PSH; t = sp;
@@ -550,9 +563,9 @@ int main (int argc, char **argv)
     else { printf("unknown instruction = %d! cycle = %d\n", i, cycle); return -1; }
   }
 
-  printf ("c4: done\n");
-  
-  return 0;
+    printf ("c4.bin: done\n");
+
+    return 0;
 }
 
 //

@@ -1,8 +1,7 @@
-/*
- * File: lexer.c
- * 2018 - Created by Fred Nora.
- *        Based on gcc 0.9.
- */
+
+// lexer.c
+// Inspired on gcc 0.9.
+// 2018 - Created by Fred Nora.
 
 #include "gramcnf.h"
 
@@ -94,26 +93,26 @@ int check_newline ()
 
 
 // Skipping white spaces.
-
-int skip_white_space (void){
-    
-    register int c;
-    register int inside;
+int skip_white_space (void)
+{
+    register int c=0;
+    register int inside=0;
 
 begin:
 
     c = getc (finput);
-    
-    printf("%c ",c); //#debug
+
+// #debug
+    printf("%c ",c); 
 
     for (;;)
     {
         switch (c)
         {
-			// ## spaces ##	
-			//se encontramos um espaço, pegamos o próximo e saímos do switch 
-			//para reentrarmos no switch
-                
+            // ## spaces ##
+            // Se encontramos um espaço, 
+            // pegamos o próximo e saímos do switch 
+            // para reentrarmos no for.
             case ' ':
             case '\t':
             case '\f':
@@ -122,45 +121,40 @@ begin:
                 c = getc(finput);
                 break;
 
-			// ## new lines ##	
-
+            // ## new lines ##
             case '\n':
-               lineno++;
-				//próximo.
-                c = getc (finput);
+                lineno++;
+                //próximo.
+                c = getc(finput);
                 break;
 
-			// ## comments ##
-			// '/' 
-			//(#importante: Isso pode ser a primeira barra do comentário ou uma divisão.)
-                
+            // ## comments ##
+            // '/' 
+            // #importante: Isso pode ser a 
+            // primeira barra do comentário ou uma divisão.
             case '/':
+                c = getc(finput);
                 
-                c = getc (finput);
-                
-				//#### inicia um comentário de uma linha ####
-				//Aqui encontramos a segunda barra de dias consecutivas.
-				//single line comments.
-                
+                //#### inicia um comentário de uma linha ####
+                //Aqui encontramos a segunda barra de dias consecutivas.
+                //single line comments.
                 if ( c == '/' )
                 {
                     while (1)
                     {
                         c = getc (finput);
 
-						//quando alinha acabar,
-						//apenas saímos do switch
-				        //sairemos com '\n'
-						//??? e se chegarmos ao fim do arquivo ??? #todo
-						
+                        //quando alinha acabar,
+                        //apenas saímos do switch
+                        //sairemos com '\n'
+                        //??? e se chegarmos ao fim do arquivo ??? #todo
                         // Acho que isso só sai do while.
                         if (c == '\n'){
                             break;
                         }
-                        
                         // ?
                     };
-					//isso sai do switch
+                    //isso sai do switch
                     break;
                 };
 
@@ -183,19 +177,19 @@ begin:
                         if (c == '*')
                         {
 
-						    //sequência de **************
-                            
-		                    while (c == '*')
-		                        c = getc (finput);
+                            //sequência
+                            while (c == '*')
+                                c = getc (finput);
 
-		                    //se logo em seguida do * tiver uma barra /.
+                            // se logo em seguida da sequencia
+                            // de astetiscos tiver uma barra.
                             if (c == '/')
                             {
-							    //fim do comentário  
-							    //sai do while ... com alguma coisa em c.
+                                //fim do comentário  
+                                //sai do while ... com alguma coisa em c.
 		                        inside = 0;
-								
-		                        //c = getc(finput);							     
+
+		                        //c = getc(finput);
 							    //break; //sai do while.
 								
 								//begin: ??
@@ -233,12 +227,10 @@ begin:
 							//isso são letras do comentário.
 							//continuaremos dentro do while(inside)
 							//??#bugbug: mas até quando ??
-                            //temos que contar ou confiar no EOF.	
+                            //temos que contar ou confiar no EOF.
                             
-                            c = getc (finput);
+                            c = getc(finput);
                         };
-                        
-						//nothing;
                     };
                 };
 
@@ -284,39 +276,34 @@ begin:
 
 
 /*
- ***************************
  * yylex:
  *     Pega o próximo token.
  *     copiando do gcc 0.9
  */
- 
-int yylex (void){
 
-    register int c;
+int yylex(void)
+{
+    register int c=0;
     register char *p;
-    register int value;
-
-    register int c1;
-    register int number_length = 0;
+    register int value=0;
+    register int c1=0;
+    register int number_length=0;
 
 again:
 
-    //Pega um char da stream de entrada.
+// Pega um char da stream de entrada.
+    c = skip_white_space();
 
-    c = skip_white_space ();
-    
     switch (c)
     {
         case 0:
         case EOF:
             printf ("yylex: EOF\n");
-            
             eofno++;  
             value = TOKENEOF;
-
-		    //#test
-		    return (value);
-		    break;
+            //#test
+            return (value);
+            break;
 
         case 'A':
         case 'B':
@@ -374,40 +361,34 @@ again:
 
             p = token_buffer;
 
+            //#todo: limite tamanho do buffer
             while (1)
             {
-
-				//@todo: limite tamanho do buffer
-
-			    //coloca no buffer.
-			    *p = c;
-			    p++;
-
-                c = getc (finput);
-
-				//Se não for identificador, finalize o buffer.
-				//Devolve o que não batia com a comparação do while.
-
+                // Coloca no buffer.
+                *p = c;
+                 // Incrementa buffer.
+                p++;
+                // Pega
+                c = getc(finput);
+                // Se não for identificador, finalize o buffer.
+                // Devolve o que não batia com a comparação do while.
                 if ( ( isalnum(c) == 0 ) && (c != '_') )
                 {
                     *p = 0;
-
-                    ungetc ( c, finput );
-
+                    ungetc( c, finput );
                     goto id_ok;
                 }
             };
 
             id_ok:
+            // Temos um identificador.
+            value = TOKENIDENTIFIER;
 
-			//Temos um identificador.
-			value = TOKENIDENTIFIER;
-			
-			// ?? Reserved ??
-			// Determinamos que era um identificador,
-			// Mas vamos ver se ele é uma palavra reservada.
-			// As palavras reservadas podem ser modificadores, tipos
-			// ou palavras chave.
+            // Reserved?
+            // Determinamos que era um identificador,
+            // mas vamos ver se ele é uma palavra reservada.
+            // As palavras reservadas podem ser modificadores, tipos
+            // ou palavras chave.
 
             if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
             {
@@ -595,19 +576,16 @@ again:
 
             p = token_buffer;
 
-            if ( c == '0' )
-            {
-
-				//coloca no buffer.
+            if ( c == '0' ){
+                // Coloca no buffer.
                 *p = c;
                 p++;
+                c = getc(finput);
 
-                c = getc (finput);
-                
                 if ( c == 'x' || c == 'X' )
                 {
-					//base = 16;
-					//*p++ = c; //coloca o x.
+                    //base = 16;
+                    //*p++ = c; //coloca o x.
 
                      *p = c;
                      p++;
@@ -616,7 +594,7 @@ again:
                     {
                         c = getc (finput);
 
-						// Se o próximo não for um digito hexadecimal. 
+                        // Se o próximo não for um digito hexadecimal. 
                         if ( isxdigit (c) == 0 )
                         {
                             *p = 0;
@@ -631,7 +609,7 @@ again:
                             goto constant_done;
                         }
 
-						//coloca se é hexa.
+                        //coloca se é hexa.
                         *p = c;
                         p++;
                     };
@@ -642,7 +620,8 @@ again:
                 exit (1);
 
             }else{
-				//base = 10.
+
+                //base = 10.
 
                 *p++ = c; 
                 
@@ -670,17 +649,15 @@ again:
                 }
             };
 
-			constant_done:
+            constant_done:
             break;
-	
+
         //String
         case '\"':
         {
-            c = getc (finput);
-            
+            c = getc(finput);
             p = token_buffer;
-
-			//coloca no token_buffer.
+            //coloca no token_buffer.
             while (c != '\"')
             {
 	            //if (c == '\\')
@@ -699,29 +676,25 @@ again:
 	                *p++ = c;
 
 	            //skipnewline:
-	                c = getc (finput);
+	                c = getc(finput);
 	        };//while
 
-			//finaliza a string
-	        *p++ = 0;
+            //finaliza a string
+            *p++ = 0;
 
-	        //yylval.ttype = build_string (p - token_buffer, token_buffer);
-	        //TREE_TYPE (yylval.ttype) = char_array_type_node;
+            //yylval.ttype = build_string (p - token_buffer, token_buffer);
+            //TREE_TYPE (yylval.ttype) = char_array_type_node;
 
-			//avisa que é uma string ... ela vai estar no token_buffer.
-	        //value = STRING; 
-			value = TOKENSTRING;
-			
-			break;
-        };	
-		
-        //separators (){}[],.;:?
-        case '(':
-        case ')':
-        case '{':
-        case '}':
-        case '[':
-        case ']':
+            // Avisa que é uma string
+            // Ela vai estar no token_buffer.
+            value = TOKENSTRING;
+            break;
+        };
+
+        // Separators: (){}[],.;:?
+        case '(':  case ')':
+        case '{':  case '}':
+        case '[':  case ']':
         case ',':
         case '.':
         case ';':
@@ -734,17 +707,13 @@ again:
             break;
 
 
-		//usadas em expressões matemáticas, 
-		//#todo: não mudar isso.
-        //@todo: talvez se enviarmos esses chars para o buffer ajude no debug.		
-        case '+':
-        case '-':
+        //usadas em expressões matemáticas, 
+        //#todo: não mudar isso.
+        //@todo: talvez se enviarmos esses chars para o buffer ajude no debug.
+        case '+':  case '-':  case '*':  case '/':
+        case '<':  case '>':
         case '&':
         case '|':
-        case '<':
-        case '>':
-        case '*':
-        case '/':
         case '%':
         case '^':
         case '!':
@@ -752,118 +721,77 @@ again:
         {
             combine:
 
-	        switch (c)
-	        {
-                case '+':
-	                lexer_code = PLUS_EXPR; 
-					break;
-					
-                case '-':
-	                lexer_code = MINUS_EXPR; 
-					break;
-					
-                case '&':
-	                lexer_code = BIT_AND_EXPR; 
-					break;
-					
-                case '|':
-	                lexer_code = BIT_IOR_EXPR; 
-					break;
+            switch (c)
+            {
+                // '+-*/'
+                case '+':  lexer_code = PLUS_EXPR;       break;
+                case '-':  lexer_code = MINUS_EXPR;      break;
+                case '*':  lexer_code = MULT_EXPR;       break;
+                case '/':  lexer_code = TRUNC_DIV_EXPR;  break;
 
-                case '*':
-	                lexer_code = MULT_EXPR; 
-					break;
+                case '&':  lexer_code = BIT_AND_EXPR;     break;
+                case '|':  lexer_code = BIT_IOR_EXPR;     break;
+                case '%':  lexer_code = TRUNC_MOD_EXPR;   break;
+                case '^':  lexer_code = BIT_XOR_EXPR;     break;
 
-                case '/':
-	                lexer_code = TRUNC_DIV_EXPR; 
-					break;
+                // ?
+                case LSHIFT:  lexer_code = LSHIFT_EXPR;  break;
+                case RSHIFT:  lexer_code = RSHIFT_EXPR;  break;
 
-                case '%':
-                    lexer_code = TRUNC_MOD_EXPR; 
-					break;
+                case '<':  lexer_code = LT_EXPR;  break;
+                case '>':  lexer_code = GT_EXPR;  break;
+            }
 
-                case '^':
-	                lexer_code = BIT_XOR_EXPR; 
-					break;
+            c1 = getc (finput);
 
-                case LSHIFT:
-	                lexer_code = LSHIFT_EXPR; 
-					break;
-
-	            case RSHIFT:
-	               lexer_code = RSHIFT_EXPR; 
-					break;
-					
-                case '<':
-	                lexer_code = LT_EXPR; 
-					break;
-					
-                case '>':
-	                lexer_code = GT_EXPR; 
-					break;
-	        }	
-
-	        c1 = getc (finput);
-			
-	        if (c1 == '=')
-	        {
-	            switch (c)
-	            {
+            if (c1 == '=')
+            {
+                switch (c)
+                {
                     case '<':
-		                value = ARITHCOMPARE; 
-						lexer_code = LE_EXPR; 
-						goto done;
+                        value = ARITHCOMPARE; 
+                        lexer_code = LE_EXPR; 
+                        goto done;
                     case '>':
-		                value = ARITHCOMPARE; 
-						lexer_code = GE_EXPR; 
-						goto done;
+                        value = ARITHCOMPARE; 
+                        lexer_code = GE_EXPR; 
+                        goto done;
                     case '!':
-		                value = EQCOMPARE; 
-						lexer_code = NE_EXPR; 
-						goto done;
+                        value = EQCOMPARE; 
+                        lexer_code = NE_EXPR; 
+                        goto done;
                     case '=':
-		                value = EQCOMPARE; 
-						lexer_code = EQ_EXPR; 
-						goto done;
-	            }
-				
-	            value = ASSIGN; 
-				goto done;
-				
-	        }else if (c == c1){
-				
-	                switch (c)
-	                {
-	                    case '+':
-	                        value = PLUSPLUS; 
-						    goto done;
-                        case '-':
-	                        value = MINUSMINUS; 
-							goto done;
-                        case '&':
-	                        value = ANDAND; 
-							goto done;
-                        case '|':
-	                        value = OROR; 
-							goto done;
-                        case '<':
-	                        c = LSHIFT;
-	                        goto combine;
-                        case '>':
-	                        c = RSHIFT;
-	                        goto combine;
-	                }
-					
+                        value = EQCOMPARE; 
+                        lexer_code = EQ_EXPR; 
+                        goto done;
+                };
+
+                // ?
+                value = ASSIGN; 
+                goto done;
+
+            }else if (c == c1){
+
+                switch (c)
+                {
+                    case '+':  value = PLUSPLUS;    goto done;
+                    case '-':  value = MINUSMINUS;  goto done;
+                    case '&':  value = ANDAND;      goto done;
+                    case '|':  value = OROR;        goto done;
+                    
+                    case '<':  c = LSHIFT;  goto combine;
+                    case '>':  c = RSHIFT;  goto combine;
+                };
+
             }else if ((c == '-') && (c1 == '>')) {
-				
-		         value = POINTSAT; 
-				 goto done; 
-		    }
-	        
-			ungetc (c1, finput);
+                value = POINTSAT; 
+                goto done; 
+            }
+
+            ungetc (c1, finput);
 
             if ((c == '<') || (c == '>'))
-	            value = ARITHCOMPARE;
+                value = ARITHCOMPARE;
                 else value = c;
                 goto done;
         };
@@ -873,10 +801,8 @@ again:
     
     }; //switch
 
-    
 done:
-    
-    return (value);
+    return (int) value;
 }
 
 

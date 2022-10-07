@@ -1,22 +1,13 @@
+
 // License: GPL-2.0
-
-/*
- * File: gramc4.c
- *
- *    gramc4 is a c-like interpreter for Animal operating system.
- *    It's based on c4, Written by Robert Swierczek I guess.
- */
-
-
+// File: gramc4.c
+// gramc4 is a c-like interpreter for Gramado.
+// It's based on c4, Written by Robert Swierczek I guess.
 // c4.c - C in four functions
-
-
 // char, int, and pointer types
 // if, while, return, and expression statements
 // just enough features to allow self-compilation and a bit more
 // Written by Robert Swierczek
-
-
 // fetch, decode and execute instructions.
 
 
@@ -53,11 +44,6 @@ int debug;    // print executed instructions
 int line;     // current line number
 
 
-
-
-
-
-
 // tokens and classes (operators last and in precedence order)
 enum {
   Num = 128, Fun, Sys, Glo, Loc, Id,
@@ -86,11 +72,11 @@ enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 // next
 // Is it the lexer ?
 
-void next (void){
+void next (void)
+{
+    char *pp;
 
-  char *pp;
-
-  while (tk = *p) {
+    while (tk = *p) {
     
     ++p;
     
@@ -203,9 +189,9 @@ void next (void){
 
 
 // expr
-void expr (int lev){
-
-  int t, *d;
+void expr (int lev)
+{
+    int t, *d;
 
 
   // Nothing| NUM | '"'  
@@ -422,8 +408,8 @@ void expr (int lev){
 }
 
 
-void stmt (void){
-
+void stmt (void)
+{
     int *a, *b;
 
     
@@ -503,22 +489,14 @@ void stmt (void){
 }
 
 
-
-/*
- *******************************
- * MAIN:
- *
- */
-
-int main (int argc, char **argv){
-
-
+int main (int argc, char **argv)
+{
     int fd, bt, ty, poolsz, *idmain;
     int i, *t;    // temps
 
-    //
-    // vm registers.
-    //
+//
+// vm registers.
+//
 
     //int *pc, *sp, *bp, a, cycle;    // vm registers
     int *register_pc;
@@ -526,7 +504,6 @@ int main (int argc, char **argv){
     int *register_bp;
     int register_a;
     int register_cycle;
-
 
 
     printf ("gramc4: Initializing ...\n");

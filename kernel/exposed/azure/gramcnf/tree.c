@@ -1,89 +1,76 @@
-/*
- * File: tree.c 
- * tbst - calculando expressões. isso deu meio certo.
- */
 
-//
-// Includes.
-// 
- 
+// tree.c 
+// tbst - calculando expressões. 
+// isso deu meio certo.
+
 #include "gramcnf.h"
 
 //#importante
-//#expressão em ordem!!!
+//#expressão em ordem!
 //os tokens serão colocados aqui como uma expressão em ordem.
 int exp_buffer[32];
 int exp_offset = 0;
 
-//===============================================================================
+//====================================================================
 
 //buffer pra fazer conta usando pos order
 int POS_BUFFER[32];
 
 int buffer_offset = 0;
 
-//===============================================================================
-
-
-
- 
-//
-//  ## STACK ##
-//
+//====================================================================
 
 struct stack
 {
-	int top;
+    int top;
     int items[32];
 };
 
 
-
 struct node 
 { 
-	int key; 
-	struct node *left, *right; 
+    int key; 
+    struct node *left; 
+    struct node *right; 
 }; 
 
 
-int my_isdigit (char ch){
-	
+int my_isdigit(char ch)
+{
     return ( ch >= '0' && ch <= '9' );
 }
 
-
 // A utility function to create a new BST node 
-struct node *newNode (int item){
-	
-	struct node *temp = (struct node *)malloc ( sizeof(struct node) );
-    
-	//#todo: check validation
-	
-	temp->key = item; 
-	temp->left = temp->right = NULL;
-	
-	return temp; 
-}; 
+struct node *newNode (int item)
+{
+    struct node *temp = (struct node *) malloc( sizeof(struct node) );
+ 
+//#todo: check validation
+
+    temp->key = item; 
+    temp->left = temp->right = NULL;
+
+    return temp; 
+}
 
 
 // A utility function to do inorder traversal of BST 
-void inorder (struct node *root){
-	
+void inorder (struct node *root)
+{
 	if (root != NULL) 
 	{ 
 		inorder(root->left); 
 		printf("%d \n", root->key); 
 		inorder(root->right); 
 	} 
-}; 
-
+}
 
 //Em ordem  a+b
 //desce até o último pela esquerda, não havendo esquerda vai pra direita.
-void exibirEmOrdem (struct node *root){
-	
+void exibirEmOrdem (struct node *root)
+{
     if (root != NULL)
-	{
+    {
 		//visita a esquerda do próximo
 		//só retorna no último então printf funciona 
 		//mostrando o conteúdo do último 
@@ -94,13 +81,12 @@ void exibirEmOrdem (struct node *root){
         
 		exibirEmOrdem (root->right);
     }
-};
-
+}
 
 
 //Pré-ordem  +ab
-void exibirPreOrdem (struct node *root){
-    
+void exibirPreOrdem (struct node *root)
+{
 	if (root != NULL)
 	{
         //imprime o conteúdo
@@ -110,12 +96,12 @@ void exibirPreOrdem (struct node *root){
         exibirPreOrdem(root->left);
         exibirPreOrdem(root->right);
     }
-};
+}
 
 
 //Pós-ordem ab+
-void exibirPosOrdem (struct node *root){
-	
+void exibirPosOrdem (struct node *root)
+{
 	//#importante
 	//exibe em níveis. de baixo para cima.
     
@@ -142,12 +128,12 @@ void exibirPosOrdem (struct node *root){
 		POS_BUFFER[buffer_offset] = (int) (root->key + '0');
 		buffer_offset++;
     };
-};
+}
 
 
-/* A utility function to insert a new node with given key in BST */
-struct node* insert ( struct node* node, int key ){
-	
+// An utility function to insert a new node with given key in BST.
+struct node* insert ( struct node* node, int key )
+{
 	/* If the tree is empty, return a new node */
 	if (node == NULL) 
         return newNode(key); 
@@ -158,14 +144,12 @@ struct node* insert ( struct node* node, int key ){
 	else if (key > node->key) 
 		node->right = insert(node->right, key); 
 
-	/* return the (unchanged) node pointer */
+/* return the (unchanged) node pointer */
 	return node; 
 } 
 
 
-
 /*
- *********************************************************
  * bst_main:
  * 
  */
@@ -192,26 +176,26 @@ int bst_main(void)
 
     struct node *root = NULL; 
 
-	int i;
-	int buffer1[32];
-	int buffer2[32];
-	
-	int buffer1_offset = 0;
-	int buffer2_offset = 0;
-	
-	//#IMPORTANTE:
-	//ESSE É O BUFFER USADO PARA COLOCAR A EXPRESSÃO EM ORDEM 
-	//VAMOS FAZER ELE GLOBAL PARA SER PREENCHIDO PELOS TOKENS.
-	
-    //int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?' };	
+    int i=0;
+    int buffer1[32];
+    int buffer2[32];
+    int buffer1_offset=0;
+    int buffer2_offset=0;
+
+//#IMPORTANTE:
+//ESSE É O BUFFER USADO PARA COLOCAR A EXPRESSÃO EM ORDEM 
+//VAMOS FAZER ELE GLOBAL PARA SER PREENCHIDO PELOS TOKENS.
+
+    //int exp[] = { 4, '+', 3, '-', 2, '*', 5, '?' };
 
     int c=0;
 
     printf ("bst_main:\n");
     printf ("for\n");
 
-	//colocamos nos buffers em ordem.
-	for ( i=0; (c = exp_buffer[i]) != '?'; i++ )		
+// Colocamos nos buffers em ordem.
+
+    for ( i=0; (c = exp_buffer[i]) != '?'; i++ )
     {
 		if ( c>= 0 && c<= 9 )
 		{
@@ -229,24 +213,20 @@ int bst_main(void)
 			buffer2_offset++;
         }
     };
-	
-	
-	//
-	//visualizar os buffer,
-	//pra depois nmanipular eles.
+
+//visualizar os buffer,
+//pra depois nmanipular eles.
+
 	buffer1[buffer1_offset] = (int) '?';
 	buffer2[buffer2_offset] = (int) '?';
-	
-	//==========================================================================
-	// #todo: NESSA HORA TEM QUE AJUSTAR A PRECEDÊNCIA DOS OPERADORES ## 
-	// 
-	//
-	
-	//inserindo root.
-	root = insert ( root, '?' ); 
-	
 
-	//operadores +-*
+//==========================================================================
+// #todo: NESSA HORA TEM QUE AJUSTAR A PRECEDÊNCIA DOS OPERADORES ## 
+
+//inserindo root.
+    root = insert ( root, '?' ); 
+
+//operadores +-*
 	for ( i=0; (c = buffer2[i]) != '?'; i++ )
 	{
 		//if ( c>= 0 && c<= 9 )
@@ -259,9 +239,9 @@ int bst_main(void)
 	}
 	
     buffer1_offset--;//ajustando par ao último válido 
-	
+
 	//for ( i=0; (c = buffer1[i]) != '?'; i++ )
-	for ( i=buffer1_offset; (c = buffer1[i]); i-- )	
+	for ( i=buffer1_offset; (c = buffer1[i]); i-- )
 	{
 		c = buffer1[i];//redundante
 		
@@ -315,13 +295,11 @@ int bst_main(void)
 } 
 
 
-//===============================================================================
+//====================================================================
 
-
-void push ( struct stack *s, int x ){
-	
-    if ( s->top > 32 )
-    {
+void push ( struct stack *s, int x )
+{
+    if ( s->top > 32 ){
 		printf("Stack Overflow !\n");
         return;
 		
@@ -329,11 +307,10 @@ void push ( struct stack *s, int x ){
 		
 		s->items[ ++s->top ] = x;
     }
-};
+}
 
-
-int pop (struct stack *s){
-	
+int pop (struct stack *s)
+{
     if ( s->top == -1)
 	{
 		printf("Stack Underflow !\n");
@@ -343,13 +320,12 @@ int pop (struct stack *s){
 		
 		return ( s->items[ s->top-- ] );
     };
-};
+}
 
-
-int oper(char c,int opnd1,int opnd2){
-	
+int oper(char c,int opnd1,int opnd2)
+{
     switch (c)
-    {	
+    {
 		//case '*': 
         case 90:  		
 		    return (opnd1*opnd2);
@@ -374,23 +350,22 @@ int oper(char c,int opnd1,int opnd2){
 		    printf("oper: Invalid operator! %d\n", c);
 			return 0;
     };
-};
+}
 
-
-int eval ( int *str ){
-	
-    int i;
+int eval ( int *str )
+{
+    int i=0;
     int opnd1, opnd2, val;
-	char c;
-	
-	struct stack stk;
-    
-	stk.top = -1;
-	
-    printf("\n eval:\n");	
-	
+    char c=0;
+
+    struct stack stk;
+
+    stk.top = -1;
+
+    printf("\n eval:\n");
+
     //for ( i=0; (c = str[i]) != '?'; i++ )
-    for ( i=0; (c = str[i]) != 111; i++ )		
+    for ( i=0; (c = str[i]) != 111; i++ )
     {
 		if ( c>='0' && c<='9' )
 		{
@@ -410,24 +385,23 @@ int eval ( int *str ){
 			push ( &stk, val );
         }
     }
-	
-	//o resultado é o que sobrou na pilha
+
+//o resultado é o que sobrou na pilha
     return ( pop(&stk) );
 }
 
 
 /*
- ==================================================================================
- * iNICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
+=================================
+ * INICIALIZAÇÃO GENÉRICA PARA TESTE DE APLICATIVO.
  * ##imortante: provavelmente essa rotina não é usada.
  */
 
-int testtest_main (void){
-
-
+int testtest_main (void)
+{
 	printf ("testtest_main: Not used ??");
 	while(1){}
-	
+
 	/*
 
 	int i;	
@@ -590,22 +564,19 @@ unsigned long tree_eval(void)
                             // ## DONE !! ##
                             goto do_bst;							
 						}
-					    break;						
+					    break;
 				} 
 			    break;
-				
+
 		    default:
 			    printf("tree_eval: #error State2 default \n");
 			    break;
-        };		
-		
-    };		
-	
-	
-	
-	int j;
-	int v; //#bugbug estamo lidando somente com dígitos de 0 à 9.
-	
+        };
+    };
+
+    int j;
+    int v; //#bugbug estamos lidando somente com dígitos de 0 à 9.
+
 do_bst:
 
     printf("tree_eval: do_bst\n");
@@ -644,14 +615,13 @@ do_bst:
 	//hang
     //printf("*debug breakpoint");
 	//while(1){}    
-	
 
     unsigned long ret_val;
     ret_val = (unsigned long) eval ( (int *) &POS_BUFFER[0] ); 
 
-	printf("result: %d\n",ret_val);
+    printf("result: %d\n",ret_val);
 
-	return (ret_val); 
+    return (ret_val); 
 done:
     return (ret_val);
 }
