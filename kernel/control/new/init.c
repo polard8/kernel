@@ -112,7 +112,8 @@ static unsigned long KernelImage_BSS_Size=0;
 // Someone is setting this variable from another document.
 // Change the name.
 // See: head_64.asm.
-unsigned long magic;
+unsigned long magic=0;
+unsigned long saved_bootblock_base=0;
 
 // virtual = physical.
 #define BootBlockVA    0x0000000000090000

@@ -298,7 +298,7 @@ StartLoader:
 
 ; A parte em C salta para cá depois da inicializaçao,
 ; para enfim saltarmos para o kernel.
-; See: pages.c
+; Called by SetUpPaging() in pages.c.
 
 global _go_to_kernel
 _go_to_kernel:
@@ -348,18 +348,16 @@ _go_to_kernel:
 ; #todo: 
 ; Vamos precisa passar o 'Gramado mode',
 ; muita coisa no sistema depende disso.
-
 ; Isso funciona na maq real.
-
 ; Jump to the 64bit code in KERNEL.BIN.
 ; It will change the game and we will enter in 64bit long mode.
 ; See: _kernel_begin in: 
-; new/entrance/warden/unit0/x86_64/head_64.asm
+; x86_64/entrance/head_64.asm
 
-    ;xor eax, eax
-    ;xor ebx, ebx
-    ;xor ecx, ecx
-    mov edx, dword 1234
+    xor eax, eax
+    mov ebx, dword 0x00090000  ; boot block address.
+    xor ecx, ecx 
+    mov edx, dword 1234        ; signature.
 
     jmp GDT64.Code:0x30001000
 

@@ -2,7 +2,6 @@
 ; head_64.asm
 ; Kernel entry point.
 
-
 %include "header/header1.inc"
 
 ; segment .head_x86_64
@@ -11,6 +10,7 @@ __HEAD
 [bits 64]
 
 ; See: init.c
+extern _saved_bootblock_base
 extern _magic
 extern _kmain
 
@@ -38,7 +38,6 @@ extern _system_state
 ; Do a proper 64-bit jump. Should not be needed as the ...
 ; jmp EARLY_GDT64.Code:0x30001000 in the boot loader would have sent us ...
 ; out of compatibility mode and into 64-bit mode.
-
 ; The function _go_to_kernel jumps here
 ; from head.s in BL.BIN.
 
@@ -49,6 +48,14 @@ extern _hal_reboot
 extern _refresh_screen
 ;extern _kernel_gc
 ; ...
+
+; ----------------------------------------
+; Kernel entry point
+; IN:
+; eax = 0
+; ebx = 0x00090000 (boot block address)
+; ecx = 0
+; edx = 1234       (signature)
 
 global _kernel_begin 
 _kernel_begin:
@@ -77,7 +84,12 @@ align 4
 ; We can save some values just for debug purpose.
 
 START:
+
+; Save the bootblock address.
+    mov dword [_saved_bootblock_base], ebx
+; Save the signature.
     mov dword [_magic], edx
+
     ; ...
 
 ; Clear some registers.

@@ -165,7 +165,7 @@ control-tier:
 	sudo cp control/newm0/MOD0.BIN  control/disk/
 
 # Install BMPs
-	sudo cp control/data/themes/field/*.BMP  control/disk/
+	sudo cp control/data/themes/537/*.BMP  control/disk/
 #...
 
 

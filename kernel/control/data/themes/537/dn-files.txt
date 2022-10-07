@@ -1,0 +1,12 @@
+
+
+	The system will load these files:
+
+	APP.BMP
+	BMP1.BMP
+	CURSOR.BMP
+	FILE.BMP
+	FOLDER.BMP
+	MOUSE.BMP
+	TERMINAL.BMP
+
