@@ -15,13 +15,12 @@
 #define SPRITE_POLYLINE   3
 #define SPRITE_TRIANGLE   4  
 #define SPRITE_RECTANGLE  5
-#define SPRITE_CIRCLE      6
-#define SPRITE_ELLIPSE     7
-#define SPRITE_BITMAP      8   // raw array of bytes.
-#define SPRITE_POLYGON     9   // 
-#define SPRITE_MESH        10  // 
+#define SPRITE_CIRCLE     6
+#define SPRITE_ELLIPSE    7
+#define SPRITE_BITMAP     8   // raw array of bytes.
+#define SPRITE_POLYGON    9   // 
+#define SPRITE_MESH       10  // 
 // ...
-
 
 struct gws_sprite_d
 {
@@ -43,12 +42,10 @@ struct gws_sprite_d
     struct gws_window_d *window;
 // ==================================
 
-
 //  shape
     int type;
 
     unsigned long flags;
-
 
 // color for raw objects.
     unsigned int color;
@@ -84,7 +81,6 @@ struct gws_sprite_d
     int z3;
     unsigned int color3;
 
-    
 // circle support
     int r;  // radius
     int a;  // angle

@@ -34,10 +34,12 @@ int gr_display_sprite_list( struct gws_sprite_d *root )
         Result++;
         
         tmp = (struct gws_sprite_d *) tmp->next;
-        if ( (void*) tmp == NULL )
+        if ( (void*) tmp == NULL ){
             break;
-        if ( tmp->magic!=1234)
+        }
+        if ( tmp->magic!=1234){
             break;
+        }
     };
 
 // The number of elements in the list.
@@ -64,10 +66,12 @@ int gr_sprite_cnt_list( struct gws_sprite_d *root )
         Result++;
         
         tmp = (struct gws_sprite_d *) tmp->next;
-        if ( (void*) tmp == NULL )
+        if ( (void*) tmp == NULL ){
             break;
-        if ( tmp->magic!=1234)
+        }
+        if (tmp->magic!=1234){
             break;
+        }
     };
 
 // The number of elements in the list.
@@ -179,21 +183,28 @@ gr_display_sprite(
     int x3=0;  int y3=0;  int z3=0;
     
 // dc
-    if( (void*) dc == NULL )
+
+    if( (void*) dc == NULL ){
         return -1;
-    if(dc->magic !=1234)
+    }
+    if(dc->magic != 1234){
         return -1;
-    if(dc->initialized != TRUE)
+    }
+    if(dc->initialized != TRUE){
         return -1;
+    }
 
 // sprite
-    if( (void*) sprite == NULL )
-        return -1;
-    if(sprite->magic !=1234)
-        return -1;
-    if(sprite->initialized != TRUE)
-        return -1;
 
+    if( (void*) sprite == NULL ){
+        return -1;
+    }
+    if(sprite->magic !=1234){
+        return -1;
+    }
+    if(sprite->initialized != TRUE){
+        return -1;
+    }
 
 // draw
 
@@ -300,8 +311,6 @@ gr_display_sprite(
  *     sprite_list - linked list of sprite structures.
  *     list_size   - how many elements in the list.
  */
-
-
 // Display a list of sprites (elments)
 // given a display structure.
 
@@ -321,7 +330,6 @@ PlotSprite3D (
     int i=0;
     int number_of_elements = sprite_list_size;
     int Max = SPRITE_MAX_NUMBER;
-
 
 
     //
@@ -403,16 +411,13 @@ PlotSprite3D (
 
     };
     
-        if ( just_one == TRUE ){  break;  }
+        if (just_one == TRUE){ break; }
     };
 
+// #todo
+// Restaura para o padrao os elemento da estrutura display.
+// device context
 
-    // #todo
-    // Restaura para o padrao os elemento da estrutura display.
-    // device context
-    
-    gwssrv_debug_print("PlotSprite3D: done \n");
-    
     return 0;
 }
 

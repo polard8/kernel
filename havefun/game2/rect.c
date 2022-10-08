@@ -1441,7 +1441,6 @@ rectBackbufferDrawRectangle0 (
              rop_flags );
          rect.dirty = TRUE;
          goto done;
-         //return;
     }
 
 //===============================================================
@@ -1512,7 +1511,6 @@ rectBackbufferDrawRectangle0 (
     rect.dirty = TRUE;
 
 done:
-    //debug_print("rectBackbufferDrawRectangle0: done\n");
     return;
 }
 

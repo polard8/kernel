@@ -3543,8 +3543,9 @@ wmProcedure(
             redraw_window_by_id(tb_buttons[0],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app1_string);
-            tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
             tb_buttons_status[0] = TRUE;
+            wm_Update_TaskBar("F1",FALSE);
             return 0;
         }
         if(long1 == VK_F2){
@@ -3556,8 +3557,9 @@ wmProcedure(
             //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app2_string);
-            tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
             tb_buttons_status[1] = TRUE;
+            wm_Update_TaskBar("F2",FALSE);
             return 0;
         }
         if(long1 == VK_F3){
@@ -3568,8 +3570,9 @@ wmProcedure(
             redraw_window_by_id(tb_buttons[2],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app3_string);
-            tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
             tb_buttons_status[2] = TRUE;
+            wm_Update_TaskBar("F3",FALSE);
             return 0;
         }
         if(long1 == VK_F4){
@@ -3580,11 +3583,12 @@ wmProcedure(
             redraw_window_by_id(tb_buttons[3],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app4_string);
-            tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
             tb_buttons_status[3] = TRUE;
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
             // comp_config_use_mouse = TRUE;
+            wm_Update_TaskBar("F4",FALSE);
             return 0;
         }
 
@@ -3937,7 +3941,7 @@ int wmInputReader(void)
             // Quit the program.
             if( RTLEventBuffer[1] == GWS_Copy )
             { 
-                printf("wm.c: control + c\n"); 
+                //printf("wm.c: control + c\n"); 
                 gramado_terminate();
                 return 0;
             }
@@ -6346,19 +6350,16 @@ void wm_Update_TaskBar( char *string, int flush )
     //redraw_window(__taskbar_startmenu_button_window,TRUE);
 
 // Redraw, all the valid buttons in the list.
-    int i=0;
+    register int i=0;
     int wid=0;
-    for(i=0; i<TB_BUTTONS_MAX; i++)
+    for (i=0; i<TB_BUTTONS_MAX; i++)
     {
-        if(tb_buttons[i] != 0)
-        {
+        if(tb_buttons[i] != 0){
             wid = (int) tb_buttons[i];
-            
             redraw_window_by_id(wid,TRUE);
             __draw_button_mark_by_wid(wid,i);
         }
     };
-
 
 
 // String

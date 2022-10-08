@@ -7,7 +7,9 @@
 struct gws_window_d *__demo_window;
 
 int gUseDemos = TRUE;
-
+static int game_update_taskbar=TRUE;
+static int frames=0;
+static int hits=0;
 
 // #bugbug:
 // Essa inicialização não funciona, ela se perde?
@@ -50,16 +52,11 @@ static int __r[4][4] = {
 */
 
 
-
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
-
-
 static void __draw_demo_curve1(int position, int model_z);
-
 static void __draw_model1(int step, int target_axis);
 
-struct gws_window_d *
-__create_demo_window (
+struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
     unsigned long width,
@@ -67,12 +64,11 @@ __create_demo_window (
 
 void drawFlyingCube(float fElapsedTime);
 
-
 //======================
-
 
 void drawFlyingCube(float fElapsedTime)
 {
+    char string0[16];
 
 // Vectors
     //struct gr_vecF3D_d vecs[32];
@@ -250,8 +246,13 @@ void drawFlyingCube(float fElapsedTime)
         // Restart distance
         if (model_distance > 10.0f){
             model_distance = (float) 0.8f;
+            //hits++;
+            //memset(string0,0,16);  //clear
+            //itoa(hits,string0);
+            //wm_Update_TaskBar((char *)string0,FALSE);
+            wm_Update_TaskBar("hit",FALSE);
         }
-        
+
         triRotatedZX.p[0].z =
             (float) (
             triRotatedZX.p[0].z + 
@@ -364,8 +365,11 @@ struct gws_window_d *__create_demo_window (
 
     struct gws_window_d *w;
 
-    if( (void*) __root_window == NULL )
+    if( (void*) __root_window == NULL ){
         return NULL;
+    }
+
+// Create window.
 
     w = 
         (struct gws_window_d *) CreateWindow ( 
@@ -380,13 +384,11 @@ struct gws_window_d *__create_demo_window (
                                     COLOR_BLACK );
 
 
-    if ( (void *) w == NULL )
-    {
+    if ( (void *) w == NULL ){
         return NULL;
     }
 
-    if ( w->used != TRUE || 
-         w->magic != 1234 )
+    if ( w->used != TRUE ||  w->magic != 1234 )
     {
         return NULL;
     }
@@ -406,7 +408,6 @@ struct gws_window_d *__create_demo_window (
 
 static void __draw_model1(int step, int target_axis)
 {
-
     // object window
     struct gws_window_d *ow;
     ow = NULL;
@@ -759,8 +760,26 @@ void gramado_clear_surface(struct gws_window_d *clipping_window, unsigned int co
     demoClearSurface(clipping_window,color);
 }
 
+// Start surface.
+// only the working area.
+void demoClearWA(unsigned int color)
+{
+// IN: l,t,w,h,color,fill,rop
+    rectBackbufferDrawRectangle ( 
+           WindowManager.wa_left, 
+           WindowManager.wa_top, 
+           WindowManager.wa_width, 
+           WindowManager.wa_height, 
+           color, 
+           1,   //fill 
+           0 ); //rop
+}
+
 // Start surface
-void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color)
+void 
+demoClearSurface(
+    struct gws_window_d *clipping_window, 
+    unsigned int color)
 {
     // #todo
     // We can do this for more resolutions. 
@@ -806,7 +825,8 @@ void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color)
 
     unsigned int fail_color = COLOR_RED;
 
-// Limpa em mostra na resolução 320x200
+// Limpa na resolução 320x200
+// IN: l,t,w,h,color,fill,rop
     rectBackbufferDrawRectangle ( 
            0, 0, 320, 200, 
            fail_color, 1, 0 );
@@ -875,23 +895,23 @@ void __setupCatModel(int eyes, int whiskers, int mouth )
 //worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
-
     // object window
     struct gws_window_d *ow;
     ow = NULL;
     //#todo
     // use the demo window if it is possible
-    if( (void*) __demo_window != NULL ){
-       if(__demo_window->magic==1234)
-        ow = __demo_window;
+    if( (void*) __demo_window != NULL )
+    {
+       if (__demo_window->magic==1234){
+           ow = __demo_window;
+       }
     }
-
-
 
 // model
     int model_x = (int) cat_x;
     int model_y = (int) cat_y;
     int model_z = (int) cat_z;
+    int model_radius = 25;
 
 // eyes
     int eye1_x = model_x -10;
@@ -902,14 +922,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 //---
 
 // head
-// IN: x,y,r,color,z
+// IN: window,x,y,r,color,z
     grCircle3 ( 
         ow,
-        model_x + 0,    //x
-        model_y + 12,   //y
-        25,   //r
-        GRCOLOR_LIGHTBLACK,  //color 
-        model_z );   // z 
+        model_x + 0,
+        model_y + 12,
+        model_radius,
+        GRCOLOR_LIGHTBLACK,
+        model_z );
 
 // eyes
     if ( CatModel.eyesVisible == TRUE )
@@ -920,14 +940,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             eye1_y, 
             eye_radius, 
             GRCOLOR_LIGHTBLACK, 
-            model_z );  //z 
+            model_z );
         grCircle3 ( 
             ow,
             eye2_x, 
             eye2_y, 
             eye_radius, 
             GRCOLOR_LIGHTBLACK, 
-            model_z );  //z 
+            model_z );
     }
 
 // whiskers
@@ -986,10 +1006,8 @@ void demoCat (void)
 {
     register int i=0;
     int j=0;
-
     int count = 8;
     int scale_max = 100;
-
 
 // ---------------
 // Create a demo window
@@ -998,39 +1016,27 @@ void demoCat (void)
     dw = (struct gws_window_d *) __create_demo_window(8,8,200,140);
     if( (void*) dw != NULL )
     {
-       if(dw->magic==1234)
-       {
+       if(dw->magic==1234){
            __demo_window = dw;
        }
     }
-
-
-
 //---------------------
 
-// depth cliping
-    gr_depth_range(
-        CurrentProjection,   // projection
-        0,                   // zNear
-        100 );               // zFar
+// depth clipping
+// IN: projection, znear, zfar.
+    gr_depth_range( CurrentProjection, 0, 100 );
 
 // The camera for the cat.
+// 'int' values.
+// IN: Position vector, upview vector, lookat vector.
     camera ( 
-        0, 0, 0,   // position vector
-        0, 0, 0,     // upview vector
-        0, 0, 0 );   // lookat vector
+        0,0,0,
+        0,0,0,
+        0,0,0 );
 
 // Setup model
-// eyes, whiskers, mouth
+// IN: eyes, whiskers, mouth
     __setupCatModel(TRUE,TRUE,TRUE);
-
-
-
-// #test
-// Testing fpu
-    //long r9 = (long) power4(9,3);
-    //printf("9^3 = %d\n",(long)r9);
-    //while(1){}
 
 
 // Loop
@@ -1059,301 +1065,9 @@ void demoCat (void)
 }
 
 
-void demoLine1(void)
-{
-
-    // #bugbug
-    // Needs to be a square ?
-
-    if (current_mode != GRAMADO_JAIL)
-        return;
-
-    //int width = getWidth();
-    //int height = getHeight();
-    int width  = 200/2;  //320/2;
-    int height = 200/2;
-
-    int x1 = 0, y1 = 0,
-        x2 = 0, y2 = height;
-    
-    while (y1 < height) {
-        //g.drawLine(x1, y1, x2, y2);
-        plotLine3d ( NULL, x1,y1,0, x2,y2,0, COLOR_WHITE); 
-            y1+=8;                 //You should modify this if
-            x2+=8;                 //it's not an equal square (like 250x250)
-    };
-
-    demoFlushSurface(NULL);  
-}
-
-
-
-void demo34567(void)
-{
-    int i=0;
-    for(i=0; i<1001; i++)
-    {
-        //IN: window, z, x, y, color
-        grPlot0 ( NULL, 0, i, i%2, COLOR_WHITE );
-    };
-}
-
-//
-// == fred demo ========================================
-//
-
-
-void demoFred0(void)
-{
-    register int i=0;
-
-    for (i=0; i<100; i++)
-    {
-
-        if( (i%3) == 0 ||
-            (i%4) == 0 ||
-            (i%5) == 0 ||
-            (i%6) == 0 ||
-            (i%7) == 0 )
-        {
-            noraDrawingStuff3 (-i,-i,0);
-            grCircle3 ( 
-                NULL,
-                -i % 55,    // x 
-                -i % 55,    // y
-                i % 55,     // r
-                COLOR_GREEN, 
-                i % 55);    // z
-        }
-        
-        //noraDrawingStuff3 (i,i,0);
-
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-
-
-
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-            
-        //rtl_invalidate_screen();
-    };
-
-    refresh_screen();
-}
-
-
-void demoFred1(void)
-{
-    register int i=0;
-
-    for (i=0; i<100; i++){
-    
-        //noraDrawingStuff3 (i,i,0);
-        noraDrawingStuff3 (-i,-i,0);
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-  
-    refresh_screen();
-}
-
-
-void demoFred2(void)
-{
-    register int i=0;
-
-    if(current_mode != GRAMADO_HOME)
-        return;
-
-    for (i=1; i< (800-600); i++){
-
-        //noraDrawingStuff3 (i,i,0);
-        noraDrawingStuff3 (-i,-i,0);
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-            
-        //IN: x,y,r,color,z
-        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
-            
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
-            
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-    refresh_screen();
-}
-
-
-// demo
-// start up animation
-// matrix multiplication
-// #testing:
-// Sometimes it fails.
-void demoSA1(void)
-{
-    return;
-/*
-    int useClippingWindow = FALSE;
-    //int useClippingWindow = TRUE;
-
-//++
-//=================
-    struct gws_window_d *w;
-    int wid=-1;
-
-    if ( useClippingWindow == TRUE )
-    {
-        w = (struct gws_window_d *) CreateWindow ( 
-                                    WT_SIMPLE, 
-                                    0,  //style
-                                    1,  //status
-                                    1,  //view
-                                    "demoSA1", 
-                                    100, 120, 100, 100, 
-                                    __root_window, 0, 
-                                    COLOR_PINK, COLOR_YELLOW ); 
-    
-        if ( (void*) w == NULL ){
-            printf ("demoSA1: w\n");
-            //useClippingWindow = FALSE;
-            return;
-        }
-        
-        wid = RegisterWindow(w);
-
-        if (wid<0){
-            printf ("demoSA1: wid\n");
-            //useClippingWindow = FALSE;
-            return;
-        }
-
-        gws_show_window_rect(w);
-    }
-//=================
-//--
-
-
-    register int i=0;
-
-    // To store result
-    int res[4][4];  
-
-    int mat1[4][4] = {  { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { -5, -5, 0, 0 },
-                       {  5, -5, 0, 0 },
-                       {  5,  5, 0, 0 },
-                       { -5,  5, 0, 0 } };
-    
-
-        
-    
-    if (current_mode != GRAMADO_JAIL){
-        return;
-    }
-    
-
-    int count=8;    
-
-// loop
-    while ( count>0 )
-    {
-
-        for (i=0; i<8; i++){
-
-           demoClearSurface(NULL,COLOR_BLACK);
-             
-            // Plot four dots.
-            // z,x,y
-            if ( useClippingWindow == TRUE){
-            grPlot0 ( w, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( w, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( w, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( w, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-            }
-
-            // NO clipping window
-            if ( useClippingWindow == FALSE){
-            grPlot0 ( NULL, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-            }
-          
-            // New projection matrix.
-            
-            projection4x4[0][0] = i%5;
-            projection4x4[0][1] = 0;
-            // projection4x4[0][2] = 0;
-            // projection4x4[0][3] = 0;
-
-            projection4x4[1][0] = 0;
-            projection4x4[1][1] = i%5;
-            // projection4x4[1][2] = 0;
-            // projection4x4[1][3] = 0;
-
-            projection4x4[2][0] = 0;
-            projection4x4[2][1] = 0;
-            // projection4x4[2][2] = 0;
-            // projection4x4[2][3] = 0;
-       
-            projection4x4[3][0] = i%5;
-            projection4x4[3][1] = i%5;
-            // projection4x4[3][2] = 0;
-            // projection4x4[3][3] = 0;
-  
-            // transform
-            multiply4 ( projection4x4, mat2, res );
-
-            // Refresh and yield.
-            demoFlushSurface(NULL);
-            
-            gwssrv_yield();
-            gwssrv_yield();
-            // ...
-        };
-        
-        count--;
-    };
-*/
-}
-
-
 void demoTriangle(void)
 {
+
 // ---------------
 // Create a demo window
     struct gws_window_d *dw;
@@ -1361,14 +1075,12 @@ void demoTriangle(void)
     dw = (struct gws_window_d *) __create_demo_window(8,8,200,140);
     if( (void*) dw != NULL )
     {
-       if(dw->magic==1234)
-       {
+       if(dw->magic==1234){
            __demo_window = dw;
        }
     }
-
-
 //------------------------------------------
+
     struct gr_triangle_d *triangle;
 
     int line_size = 40;
@@ -1444,23 +1156,21 @@ void demoPolygon(void)
     int TranslationOffset=0;
     int j=0;
 
-    // structure
-
+// Structure
     p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
-    if((void*)p==NULL){return;}
-    
-    // polygon type
-    
-    p->type = POLYGON_POLYLINE;
-    
-    // number of elements
-    
-    p->n = 6;
-    p->list_address = (void*) vecList;
+    if ((void*)p==NULL){
+        return;
+    }
 
+// polygon type
+    p->type = POLYGON_POLYLINE;
+// number of elements
+    p->n = 6;
 
 // clear vecList.
 // This is a local list.
+
+    p->list_address = (void*) vecList;
 
     for(i=0; i<8; i++){
         vecList[i] = 0;
@@ -1491,11 +1201,7 @@ void demoPolygon(void)
     vecList[4] = (unsigned long) v4;
     vecList[5] = (unsigned long) v0;  //circular
 
-
-//
 // loop
-//
-
 // animation loop.
 
     int times=0;
@@ -1553,9 +1259,6 @@ void demoPolygon(void)
 
     };
     };   //while
-
-    //gwssrv_debug_print("DONE\n");
-    //printf ("DONE\n");
 }
 
 
@@ -1576,31 +1279,29 @@ void demoPolygon2(void)
     int TranslationOffset=0;
     int j=0;
 
-    // structure
+// structure
 
     p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
-    if((void*)p==NULL){return;}
-    
-    // polygon type
-    
+    if((void*)p==NULL){
+        return;
+    }
+
+// polygon type
     p->type = POLYGON_POLYPOINT;
     //p->type = POLYGON_POLYLINE;
-    
-    // number of elements
-    
+// number of elements
     p->n = 6;
+
+// clear vecList.
+// This is a local list.
+
     p->list_address = (void*) vecList;
-
-
-    // clear vecList.
-    // This is a local list.
 
     for(i=0; i<8; i++){
         vecList[i] = 0;
     };
 
-
-    // Creating some points.
+// Creating some points.
 
     v0 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
     if((void*)v0==NULL){return;}
@@ -1624,11 +1325,7 @@ void demoPolygon2(void)
     vecList[4] = (unsigned long) v4;
     vecList[5] = (unsigned long) v0;  //circular
 
-
-//
 // loop
-//
-
 // animation loop
 
     int times=0;
@@ -1677,11 +1374,7 @@ void demoPolygon2(void)
     v4->z = 0;
     v4->color = COLOR_WHITE;
 
-    //gwssrv_debug_print("calling xxxPolygonZ\n");
-
-
-    // Draw
-
+// Draw
 
     //p->type = POLYGON_POLYPOINT;
     //xxxPolygonZ(p);
@@ -1698,31 +1391,29 @@ void demoPolygon2(void)
 
     };
     };   //while
-
-    //gwssrv_debug_print("DONE\n");
-    //printf ("DONE\n");
 }
+
 
 // IN: ?
 static void __draw_demo_curve1(int position, int model_z)
 {
-
-    int yOffset = position + position;
-    
+    int yOffset = (position + position);
     //int modelz = 0;
     int modelz = (int) model_z;
 
-    // line
-    //a variaçao de y2 me pareceu certa.
-    //IN: ??
+// line
+// a variaçao de y2 me pareceu certa.
+// IN: ??
+    
     plotQuadBezierSeg ( 
         0,   0,  modelz,          //x0, y0, z0, //ponto inicial
         40,  40, modelz,          //x1, y1, z1, //?
        100,  20+yOffset, modelz,  //x2, y2, z2, //ponto final
        GRCOLOR_LIGHTBLACK );
 
-    //string! char by char
-    //IN: x,y,color,c,z
+// String! char by char.
+// IN: x,y,color,c,z
+
     plotCharBackbufferDrawcharTransparentZ ( 
         40+ (8*0), 
         20+yOffset, 
@@ -1753,18 +1444,15 @@ static void __draw_demo_curve1(int position, int model_z)
         GRCOLOR_LIGHTRED, 'O', modelz );
 }
 
-// curva e string.
+// Curva e string.
 void demoCurve(void)
 {
     register int i=0;
     register int j=0;
-
     int count=8;
 
-    gr_depth_range(
-        CurrentProjection,
-        0,      //near
-        100 );  //far
+    // IN: ?, near, far
+    gr_depth_range( CurrentProjection, 0, 100 );
 
 // loop
 
@@ -1790,7 +1478,8 @@ void demoCurve(void)
     }
 }
 
-// control + arrow key
+
+// Control + arrow key
 void FlyingCubeMove(int left_right, float value)
 {
     // left
@@ -1804,6 +1493,10 @@ void FlyingCubeMove(int left_right, float value)
 
 void demoFlyingCubeSetup(void)
 {
+    demoClearWA(COLOR_BLACK);
+    wm_Update_TaskBar("Hello",TRUE);
+    game_update_taskbar = FALSE;
+
     fTheta = (float) 0.0f;
     model_initial_distance = (float) 1.0f;
     model_distance = (float) 0.0f;
@@ -1813,41 +1506,17 @@ void demoFlyingCubeSetup(void)
 
 void demoFlyingCube(void)
 {
-    gramado_clear_surface(NULL,COLOR_BLACK);
+
+    frames++;
+
+    //gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
+    demoClearWA(COLOR_BLACK);                    //clear surface
     drawFlyingCube( (float) 0.02f );
     //yellowstatus0("test",FALSE);  //draw but don't refresh
+    //if(game_update_taskbar){
+    //    wm_Update_TaskBar("53$",FALSE); //redraw, but not refresh
+    //    game_update_taskbar = FALSE;
+    //}
     gramado_flush_surface(NULL);
 }
-
-
-// Rotina usada para rodar rotinas demo na inicializaçao.
-// Seleciona a rotina demo a ser executada.
-void demos_startup_animation(int i)
-{
-    switch (i){
-    case 1: demoSA1();  break;
-    case 2: demoFred0();  break;
-    case 3: demoFred1();  break;
-    case 4: demoFred2();  break;
-    case 5:
-        break;
-    case 6:
-        break;
-    case 7: demoCurve();  break;
-    case 8:
-        break;
-    case 9: demoCat();  break;
-    case 10: demoTriangle();  break;
-    case 11:
-        break;
-    case 12: demoLine1();  break;
-    case 13:  
-        break;
-    case 14: demoPolygon();  break; 
-    case 15: demoPolygon2();  break;
-    default:
-        break;
-    };
-}
-
 
