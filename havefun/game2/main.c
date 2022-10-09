@@ -3937,8 +3937,8 @@ void gramado_terminate(void)
 //#todo:
 // clean up all the mess before finishing the program.
     IsTimeToQuit = TRUE;
-    wm_Update_TaskBar("Exit",TRUE);
-    demoCat();
+    //wm_Update_TaskBar("Exit",TRUE);
+    //demoCat();
 }
 
 

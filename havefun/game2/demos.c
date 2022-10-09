@@ -250,7 +250,7 @@ void drawFlyingCube(float fElapsedTime)
             //memset(string0,0,16);  //clear
             //itoa(hits,string0);
             //wm_Update_TaskBar((char *)string0,FALSE);
-            wm_Update_TaskBar("hit",FALSE);
+            //wm_Update_TaskBar("hit",FALSE);
         }
 
         triRotatedZX.p[0].z =
@@ -294,6 +294,7 @@ void drawFlyingCube(float fElapsedTime)
         line2.x = (float) triRotatedZX.p[2].x - triRotatedZX.p[0].x;
         line2.y = (float) triRotatedZX.p[2].y - triRotatedZX.p[0].y;
         line2.z = (float) triRotatedZX.p[2].z - triRotatedZX.p[0].z;
+
 
         normal.x = (float) (line1.y * line2.z - line1.z * line2.y);
         normal.y = (float) (line1.z * line2.x - line1.x * line2.z);
@@ -1493,8 +1494,8 @@ void FlyingCubeMove(int left_right, float value)
 
 void demoFlyingCubeSetup(void)
 {
-    demoClearWA(COLOR_BLACK);
-    wm_Update_TaskBar("Hello",TRUE);
+    //demoClearWA(COLOR_BLACK);
+    //wm_Update_TaskBar("Hello",TRUE);
     game_update_taskbar = FALSE;
 
     fTheta = (float) 0.0f;
@@ -1509,8 +1510,8 @@ void demoFlyingCube(void)
 
     frames++;
 
-    //gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
-    demoClearWA(COLOR_BLACK);                    //clear surface
+    //demoClearWA(COLOR_BLACK);                //clear surface
+    gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
     drawFlyingCube( (float) 0.02f );
     //yellowstatus0("test",FALSE);  //draw but don't refresh
     //if(game_update_taskbar){
