@@ -1908,9 +1908,116 @@ rectangle_from_two_points (
 }
 
 
+void drawRectangleF(struct gr_rectangleF3D_d *rectangle)
+{
+    // 'int' values
+    struct gr_rectangle_d r;
+
+    if((void*)rectangle==NULL)
+        return;
+
+//
+// parameters
+//
+
+    float znear = (float) 0.01f;  //default
+    float zfar  = (float) 10.0f;  //default
+    unsigned long window_width  = 200;
+    unsigned long window_height = 200;
+    float ar = (float) 1.0f;      //default
+    float scale_factor = (float) 0.5f; // % da tela.
+
+    if (CurrentProjectionF.initialized == TRUE)
+    {
+        znear = (float) CurrentProjectionF.znear;
+        zfar  = (float) CurrentProjectionF.zfar;
+        window_width  = (unsigned long) CurrentProjectionF.width;
+        window_height = (unsigned long) CurrentProjectionF.height;
+        ar = 
+            (float)((float) window_height / (float) window_width );
+        //#todo: hotspot
+        scale_factor = (float) CurrentProjectionF.scale_factor;
+    }
+
+// --------
+
+// Clipping in z
+
+    if (rectangle->p[0].z < znear){ return; }
+    if (rectangle->p[1].z < znear){ return; }
+    if (rectangle->p[2].z < znear){ return; }
+    if (rectangle->p[3].z < znear){ return; }
+
+    if (rectangle->p[0].z > zfar){ return; }
+    if (rectangle->p[1].z > zfar){ return; }
+    if (rectangle->p[2].z > zfar){ return; }
+    if (rectangle->p[3].z > zfar){ return; }
+
+// #test
+// Ficando menor conforma z aumenta.
+
+    if(rectangle->p[0].z != 0.0f)
+    {
+        rectangle->p[0].x = (float) (rectangle->p[0].x/rectangle->p[0].z);  
+        rectangle->p[0].y = (float) (rectangle->p[0].y/rectangle->p[0].z);
+    }
+    if(rectangle->p[1].z != 0.0f)
+    {
+        rectangle->p[1].x = (float) (rectangle->p[1].x/rectangle->p[1].z);  
+        rectangle->p[1].y = (float) (rectangle->p[1].y/rectangle->p[1].z);
+    }
+    if(rectangle->p[2].z != 0.0f)
+    {
+        rectangle->p[2].x = (float) (rectangle->p[2].x/rectangle->p[2].z);  
+        rectangle->p[2].y = (float) (rectangle->p[2].y/rectangle->p[2].z);
+    }
+    if(rectangle->p[3].z != 0.0f)
+    {
+        rectangle->p[3].x = (float) (rectangle->p[3].x/rectangle->p[3].z);  
+        rectangle->p[3].y = (float) (rectangle->p[3].y/rectangle->p[3].z);
+    }
+//---------
+
+// scale
+// Ajustando à tela.
+
+    long x0 = (long) (rectangle->p[0].x *ar * scale_factor * (float) window_width);
+    long y0 = (long) (rectangle->p[0].y     * scale_factor * (float) window_height);
+    long x1 = (long) (rectangle->p[1].x *ar * scale_factor * (float) window_width);
+    long y1 = (long) (rectangle->p[1].y     * scale_factor * (float) window_height);
+    long x2 = (long) (rectangle->p[2].x *ar * scale_factor * (float) window_width);
+    long y2 = (long) (rectangle->p[2].y     * scale_factor * (float) window_height);
+    long x3 = (long) (rectangle->p[3].x *ar * scale_factor * (float) window_width);
+    long y3 = (long) (rectangle->p[3].y     * scale_factor * (float) window_height);
+
+    r.p[0].x = (int) ( x0 & 0xFFFFFFFF);
+    r.p[0].y = (int) ( y0 & 0xFFFFFFFF);
+    r.p[0].z = (int) 0;
+    r.p[0].color = rectangle->p[0].color; //COLOR_WHITE;
+    
+    r.p[1].x = (int) ( x1 & 0xFFFFFFFF);
+    r.p[1].y = (int) ( y1 & 0xFFFFFFFF);
+    r.p[1].z = (int) 0;
+    r.p[1].color = rectangle->p[1].color; // COLOR_WHITE;
+    
+    r.p[2].x = (int) ( x2 & 0xFFFFFFFF);
+    r.p[2].y = (int) ( y2 & 0xFFFFFFFF);
+    r.p[2].z = (int) 0;
+    r.p[2].color = rectangle->p[2].color; // COLOR_WHITE;
+
+    r.p[3].x = (int) ( x3 & 0xFFFFFFFF);
+    r.p[3].y = (int) ( y3 & 0xFFFFFFFF);
+    r.p[3].z = (int) 0;
+    r.p[3].color = rectangle->p[3].color; // COLOR_WHITE;
+
+//---------------------------------
+    __rectangleZZ( (struct gr_rectangle_d *) &r );
+}
+
+
 // worker
 // 4 3d lines, not filled.
-void __rectangleZZ ( struct gr_rectangle_d *rect )
+void __rectangleZZ(struct gr_rectangle_d *rect)
 {
     if ( (void*) rect == NULL ){
         return;

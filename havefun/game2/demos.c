@@ -64,7 +64,37 @@ struct gws_window_d *__create_demo_window (
 
 void drawFlyingCube(float fElapsedTime);
 
+void drawRectangle0(float modelz);
+
 //======================
+
+
+void drawRectangle0(float modelz)
+{
+    struct gr_rectangleF3D_d r;
+    
+    r.p[0].x = (float) -0.02f;  
+    r.p[0].y = (float)  0.02f;  
+    r.p[0].z = (float) modelz;  
+    r.p[0].color = COLOR_WHITE;
+    
+    r.p[1].x = (float)  0.02f;  
+    r.p[1].y = (float)  0.02f;  
+    r.p[1].z = (float) modelz;  
+    r.p[1].color = COLOR_WHITE;
+    
+    r.p[2].x = (float)  0.02f;  
+    r.p[2].y = (float) -0.02f;  
+    r.p[2].z = (float) modelz;  
+    r.p[2].color = COLOR_WHITE;
+    
+    r.p[3].x = (float) -0.02f;  
+    r.p[3].y = (float) -0.02f;  
+    r.p[3].z = (float) modelz;  
+    r.p[3].color = COLOR_WHITE;
+    
+    drawRectangleF( (struct gr_rectangleF3D_d *) &r );
+}
 
 void drawFlyingCube(float fElapsedTime)
 {
@@ -80,7 +110,7 @@ void drawFlyingCube(float fElapsedTime)
     struct gr_triangleF3D_d  triRotatedZ; 
     struct gr_triangleF3D_d  triRotatedZX;
 
-    int sequence[3*16];
+    int sequence[3*16];  //cube
 
     register int i=0;  //loop
     int j=0;
@@ -158,7 +188,7 @@ void drawFlyingCube(float fElapsedTime)
     sequence[27] = (int) 2; sequence[28] = (int) 6; sequence[29] = (int) 4; //f 2 6 4
     sequence[30] = (int) 7; sequence[31] = (int) 1; sequence[32] = (int) 3; //f 7 1 3
     sequence[33] = (int) 7; sequence[34] = (int) 3; sequence[35] = (int) 5; //f 7 3 5
-
+   
 // 1~12
 
     int colors[32];
@@ -177,6 +207,12 @@ void drawFlyingCube(float fElapsedTime)
     colors[11] = GRCOLOR_LIGHTGREEN;
 
     int cull=FALSE;
+
+// ---------
+// draw a rectangle
+   drawRectangle0((float) 0.08f);
+        
+// draw a cube
 
     for (i=1; i<=12; i++)
     {
