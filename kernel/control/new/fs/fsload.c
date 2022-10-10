@@ -55,26 +55,21 @@ static int __check_address_validation( unsigned long address )
  *    1=fail 
  *    0=ok.
  */
-
 // #bugbug
 // Essa rotina somente consegue pegar o tamanho do arquivo
 // se o arquivo estiver no diretório raiz.
 // #todo: Criar uma rotina para pegar o tamanho do arquivo em 
 // qualquer diretório.
-
 // #obs
 // Rotina específica para FAT16.
 // Podemos mudar o nome para fsFat16LoadFile().
 // Ou fs_Fat16_SFN_LoadFile()
-
 // #bugbug
 // This routine is nor respecting the number of entries
 // in the diretory. It is using the limit of the root dir
 // for all the directories, 512 entries.
-
 // #todo
 // Maybe we need to use a structure for that set of parameters.
-
 // #todo
 // is dir_address virtual or physical?
 // Change this name to dir_pa or dir_va.
@@ -92,24 +87,18 @@ fsLoadFile (
     int i=0;
     int SavedDirEntry = 0;
     unsigned short next=0;
-
     int is_valid=FALSE;
-
 // #todo: 
 // Rever. Número máximo de entradas.
 // #bugbug: 
 // Esse eh o numero de entradas no diretorio raiz.
-
     unsigned long DirEntries = (unsigned long) (dir_entries & 0xFFFF);
     unsigned long MaxEntries = (unsigned long) FAT16_ROOT_ENTRIES;
-
 // Address: Where to load the file.
     unsigned long Buffer      = (unsigned long) buffer;
-
 // Size: maximum buffer size in size.
     unsigned long BufferSizeInBytes = 
         (unsigned long) (buffer_size_in_bytes & 0xFFFFFFFF);
-
     unsigned long z=0;  //Deslocamento do rootdir 
     unsigned long n=0;  //Deslocamento no nome.
 
@@ -120,34 +109,27 @@ fsLoadFile (
     char tmpName[256];
     size_t FileNameSize = 0;
     unsigned long FileSize = 0;
-
     //int IsDirectory;
-
 // Cluster inicial
     unsigned short cluster=0; 
-
 // ?? 
 // Primeiro setor do cluster.
     unsigned long S=0;  
-
 // Usado junto com o endereço do arquivo.
     unsigned long SectorSize = SECTOR_SIZE;
-
 // Sectors per cluster.
     int Spc=0;
+
 
     // #debug:
     debug_print ("fsLoadFile:\n");
     //printf      ("fsLoadFile:\n");
 
-
 // Fat address and dir address.
 // Vectors of 'short'
-
     if ( fat_address == 0 ){
         panic("fsLoadFile: [FAIL] fat_address\n");
     }
-
     if ( dir_address == 0 ){
         panic("fsLoadFile: [FAIL] dir_address\n");
     }
@@ -158,15 +140,11 @@ fsLoadFile (
 
 // #debug
 // We only support one address for now.
-
     if ( fat_address != VOLUME1_FAT_ADDRESS ){
         panic("fsLoadFile: Not valid fat address\n");
     }
 
-//
 // Initialize variables.
-//
-
     /*
     if (____IsCdRom) {
         SectorSize = 2048;
@@ -174,7 +152,6 @@ fsLoadFile (
         SectorSize = SECTOR_SIZE;
     }
     */
- 
 // ...
 
 
@@ -184,8 +161,7 @@ fsLoadFile (
 // For now, this is the limit of the rootdir.
 
     //if ( MaxEntries == 0 || MaxEntries >= FAT16_ROOT_ENTRIES )
-    if ( MaxEntries != FAT16_ROOT_ENTRIES )
-    {
+    if ( MaxEntries != FAT16_ROOT_ENTRIES ){
         panic ("fsLoadFile: MaxEntries limits\n");
     }
 
@@ -193,7 +169,8 @@ fsLoadFile (
         panic ("fsLoadFile: DirEntries\n");
     }
 
-// #test: Used only for debug. 512 entries in rootdir.
+// #test: 
+// Used only for debug. 512 entries in rootdir.
     if (DirEntries != MaxEntries){
         panic ("fsLoadFile: [DEBUG] DirEntries IS LESS THE 512\n");
     }
@@ -206,7 +183,6 @@ fsLoadFile (
         panic("fsLoadFile: BufferSizeInBytes = 0\n");
     }
 
-
     if ( BufferSizeInBytes > (512*4096) ){
         panic("fsLoadFile: BufferSizeInBytes limits\n");
     }
@@ -218,21 +194,19 @@ fsLoadFile (
 //    máximo de entradas.
 // ...
 
-
 // Root file system for the boot disk.
 
     if ( (void *) root == NULL ){
         panic ("fsLoadFile: root\n");
     }
 
-    if ( root->used != TRUE || 
-         root->magic != 1234)
+    if ( root->used != TRUE || root->magic != 1234)
     {
         panic ("fsLoadFile: root validation\n");
     }
 
-    // Sectors Per Cluster.
-    // #todo: We need a max limit.
+// Sectors Per Cluster.
+// #todo: We need a max limit.
     Spc = (int) root->spc;
     if (Spc <= 0){
         panic ("fsLoadFile: Spc\n");
@@ -243,13 +217,11 @@ fsLoadFile (
 // #bugbug: 
 // Devemos ver o número de entradas no diretório corrente.
 // Por enquanto so aceitamos 512.
-    if ( root->dir_entries != MaxEntries )
-    {
+    if ( root->dir_entries != MaxEntries ){
         panic ("fsLoadFile: root->dir_entries\n"); 
     }
 
     // ...
-
 
 // Continua ... 
 // Pegar mais informações sobre o sistema de arquivos.
@@ -291,10 +263,7 @@ fsLoadFile (
          goto fail;
     }
 
-//
 // File size
-//
-
 // #bugbug
 // Pegar o tamanho do arquivo e comparar com o limite do buffer.
 // #bugbug: 
@@ -339,14 +308,8 @@ fsLoadFile (
     //{
     //}
 
-//
 // Search dirent
-//
-
-//
 // Compare
-//
-
 // #bugbug
 // #todo:
 // Para a variável 'max' estamos considerando o número de
@@ -354,7 +317,6 @@ fsLoadFile (
 // o número de entradas no diretório atual.
 // >> Para isso vamos precisar de uma estrutura de diretório
 // >> talvez a mesma usada em arquivos. (file)
-
 // Descrição da rotina:
 // Procura o arquivo no diretório raiz.
 // Se a entrada não for vazia.
@@ -366,7 +328,7 @@ fsLoadFile (
 // (32/2) próxima entrada! (16 words) 512 vezes!
 
     i=0; 
-    while ( i < MaxEntries )
+    while (i<MaxEntries)
     {
         // Se a entrada não começar com a short '0x0000'.
         if ( __dir[z] != 0x0000 )
@@ -378,7 +340,7 @@ fsLoadFile (
 
             Status = strncmp( file_name, tmpName, FileNameSize );
 
-            if ( Status == 0 )
+            if (Status == 0)
             {
                 SavedDirEntry = i; 
                 goto __found;
@@ -391,15 +353,13 @@ fsLoadFile (
 // Not found.
 // Saiu do while. 
 // O arquivo não foi encontrado.
-
-//notFound:
+//__notFound:
     debug_print ("fsLoadFile: File not found\n");
     printf      ("fsLoadFile 1: %s not found\n", file_name );  
     goto fail;
 
 // Found.
 // O arquivo foi encontrado.
-
 __found:
 
     // #debug
@@ -407,10 +367,7 @@ __found:
     // refresh_screen();
     // while(1){}
 
-//
 // Cluster
-//
-
 // Get the initial cluster. 
 // Check cluster Limits.
 // (word). 
@@ -436,19 +393,16 @@ __found:
 // ========================================
 // FAT
 // Carrega fat na memória.
-
 // #bugbug: 
 // Não devemos carregar a FAT na memória toda vez que 
 // formos carregar um arquivo. 
 // Talvez ela deva ficar sempre na memória.
 // Precisamos de estruturas para volumes que nos dê esse 
 // tipo de informação
-
 // #todo
 // precisamos de uma estrutura que nos diga o tamanho
 // da FAT para o volume que estamos atuando.
 // Aliás, qual é o volume?
-
 //loadFAT:
 // 246?
 
@@ -548,16 +502,8 @@ __loop_next_entry:
 // Ver se o cluster carregado era o último cluster do arquivo.
 // Vai para próxima entrada na FAT.
 // See: read_r.c
-
 // #bugbug
-// Vector overflow ?
-
-    read_lba ( 
-        Buffer, 
-        ( VOLUME1_DATAAREA_LBA + cluster -2 ) ); 
-
-    Buffer = (unsigned long) (Buffer + SectorSize); 
-
+// Vector overflow?
 // #todo
 // #important
 // Check this value against a vector limit.
@@ -569,8 +515,24 @@ __loop_next_entry:
         panic("fsLoadFile: fat[] vector overflow.\n");
     }
 
+// Read disk.
+
+    read_lba ( 
+        Buffer, 
+        ( VOLUME1_DATAAREA_LBA + cluster -2 ) ); 
+
+// Update buffer pointer.
+    Buffer = (unsigned long) (Buffer + SectorSize); 
+
+// Update cluster.
     next = (unsigned short) fat[cluster];
     cluster = (unsigned short) (next & 0xFFFF);
+
+// #todo:
+// We found a bad cluster.
+    if (cluster==0xFFF7){
+        panic("fsLoadFile: Bad cluster\n");
+    }
 
 // ?? done
 // ?? message  

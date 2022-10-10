@@ -7,7 +7,6 @@
 //see: fs.h
 struct filesystem_d  *root;
 
-
 // gcc -Wall Defined but not used!
 static char *____root_name = "/";
 
@@ -15,9 +14,7 @@ static char *____root_name = "/";
 int fat_cache_saved=FALSE;
 int fat_cache_loaded=FALSE;
 
-
 struct cwd_d  CWD;
-
 
 //char search_path[?];
 unsigned long search_path_dir_address=0;
@@ -1428,9 +1425,6 @@ fail2:
 }
 
 
-//#??? isso não pertence à fcntl.c ?
-//SVr4,  4.3BSD,  POSIX.1-2001. 
-
 // Syscall 16.
 // #bugbug
 // Precisamos de um endereço em ring 3
@@ -1439,6 +1433,8 @@ fail2:
 // #obs:
 // vamos retornar o indice da tabela de arquivos abertos 
 // do processo atual.
+// #? isso não pertence à fcntl.c?
+// SVr4,  4.3BSD,  POSIX.1-2001. 
 // OUT: fd.
 
 int 
@@ -5221,13 +5217,10 @@ sys_read_file_from_disk (
 {
     int __ret = -1;
     int Status = -1;
-
     file  *__file;
     size_t FileSize = -1;
-
     struct process_d *p;
     int __slot = -1;  // ofd.
-
     void *buff;
 
     // debug_print ("sys_read_file_from_disk: $\n");

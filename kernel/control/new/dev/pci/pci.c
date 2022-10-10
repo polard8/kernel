@@ -516,31 +516,28 @@ pciCheckVendor (
  * Obs: 
  *     Essa rotina está incompleta.
  */
+// PCI - Pega informações da PCI.
+// As informaçoes serao salvas em uma lista e usadas depois.
+// por isso temos que sondar agora.
 
-int init_pci (void)
+int init_pci(void)
 {
     register int i=0;
     int Status = 0;
     int Max = PCI_DEVICE_LIST_SIZE; 
     unsigned long data=0;
 
+    debug_print("init_pci: [FIXME]\n");
 
     g_driver_pci_initialized = (int) FALSE; 
     pci_supported = FALSE;
 
-    debug_print ("init_pci: [FIXME]\n");
-
-
-//
-// Supported ?
-//
-
 // ++
 // Is PCI supported ?
-    
+
     out32 ( 0xCF8, 0x80000000 );
     io_delay();
-    
+
     data = (unsigned long) in32(0xCF8);
     io_delay();
 
@@ -595,8 +592,6 @@ int init_pci (void)
     // ...
 
     g_driver_pci_initialized = (int) TRUE; 
-
-    //printf("Done\n");
 
     return (int) Status; 
 }

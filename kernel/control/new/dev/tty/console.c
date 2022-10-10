@@ -1555,6 +1555,13 @@ int consoleCompareStrings(void)
     }
 
 // ========
+// 'beep'
+    if ( strncmp( prompt, "beep", 4 ) == 0 ){
+        hal_test_speaker();
+        goto exit_cmp;
+    }
+
+// ========
 // 'thread'
     if ( strncmp( prompt, "thread", 6 ) == 0 )
     {

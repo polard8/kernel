@@ -3,19 +3,13 @@
 
 #include <kernel.h>    
 
-
 // global
 unsigned long sys_time_hz=0;
-
 static char *default_user_name = DEFAULT_USERNAME;
 
 static void __a_soft_place_to_fall(void);
 
-
-//
 // ====================================
-//
-
 
 /*
  * doGetSystemMetrics:
@@ -80,26 +74,24 @@ unsigned long doGetSystemMetrics(int index)
 
         case 9:
             return (unsigned long) gSavedBPP;
-            break;    
+            break;
 
-        //
         // screen buffers
-        //
 
         // lfb pa
         case 10:
             return (unsigned long) g_frontbuffer_pa;
-            break;        
+            break;
 
         // lfb va
         case 11:
             return (unsigned long) g_frontbuffer_va;
-            break;        
+            break;
 
         // main backbuffer va
         case 12:
             return (unsigned long) g_backbuffer_va;
-            break;                   
+            break;
 
         //20
         // mouse x    
@@ -117,10 +109,8 @@ unsigned long doGetSystemMetrics(int index)
             panic ("doGetSystemMetrics: SM_GETMOUSEY #todo\n");
             break;
 
-        //
         // Ram support
-        //
-      
+
         // base memory
         case 30:
             return (unsigned long) memorysizeBaseMemory;
@@ -130,150 +120,134 @@ unsigned long doGetSystemMetrics(int index)
         case 31:
             return (unsigned long) memorysizeOtherMemory;
             break;
-            
-            
+
         // extended memory
         case 32:
             return (unsigned long) memorysizeExtendedMemory;
             break;
-            
+
         // total = base + other + extended 
         case 33:
             return (unsigned long) memorysizeTotal;
-            break;                    
+            break;
 
         // used
         case 34:
             return (unsigned long) memorysizeUsed;
-            break;  
-        
+            break;
+
         // free   
         case 35:
             return (unsigned long) memorysizeFree;
             break;  
-            
-         //
+
          // Kernel Heap support.
-         //   
 
         case 40:
             return (unsigned long) kernel_heap_start;
-            break;  
-            
+            break;
+
         case 41:
             return (unsigned long) kernel_heap_end;
-            break;  
-            
+            break;
+
         case 42:
             return (unsigned long) g_available_heap;
-            break; 
-            
-         //
+            break;
+
          // Kernel Stack support.
-         //   
-            
+
         case 50:
             return (unsigned long) kernel_stack_start;
-            break; 
+            break;
 
         case 51:
             return (unsigned long) kernel_stack_end;
-            break; 
-            
+            break;
+
         case 52:
             return (unsigned long) kernel_stack_start_pa;
             break; 
 
-
-        //
-        // used memory support
-        //
+        // Used memory support
 
         case 60:
             return (unsigned long) mm_used_ring0_area;
-            break;   
+            break;
 
         case 61:
             return (unsigned long) mm_used_ring3_area;
-            break;   
+            break;
 
         case 62:
             return (unsigned long) mm_used_backbuffer;
-            break;   
+            break;
 
         case 63:
             return (unsigned long) mm_used_pagedpool;
-            break;   
+            break;
 
         case 64:
             return (unsigned long) mm_used_heappool;
-            break;   
+            break;
 
         case 65:
             return (unsigned long) mm_used_extraheap1;
-            break;   
-            
+            break;
+
         case 66:
             return (unsigned long) mm_used_extraheap2 ;
-            break;   
-            
+            break;
+
         case 67:
             return (unsigned long) mm_used_extraheap3;
-            break; 
-            
+            break;
 
-        //
         // Dispatch critéria.
-        //
-        
+
         case 70:
             return (unsigned long) DispatchCountBlock->SelectIdleCount;
-            break;               
+            break;
 
         case 71:
             return (unsigned long) DispatchCountBlock->SelectInitializedCount;
-            break;   
-            
+            break;
+
         case 72:
             return (unsigned long) DispatchCountBlock->SelectNextCount;
-            break;                         
+            break;
 
         case 73:
             return (unsigned long) DispatchCountBlock->SelectCurrentCount;
-            break;   
-            
+            break;
+
         case 74:
             return (unsigned long) DispatchCountBlock->SelectAnyCount;
-            break;   
-            
+            break;
+
         case 75:
             return (unsigned long) DispatchCountBlock->SelectIdealCount;
-            break;   
-            
+            break;
+
         case 76:
             return (unsigned long) DispatchCountBlock->SelectDispatcherQueueCount;
-            break;               
-   
+            break;
 
-
-        // system type. by memory size;
+        // System type by memory size;
         case 90:
             return (unsigned long) g_mm_system_type;
-            break;  
-            
-        //
+            break;
+
         // Profiler ... (reservar vários números.)
-        //
-        
-                      
+
         case 100:
             return (unsigned long) g_profiler_ints_irq0;
-            break;              
+            break;
 
         case 101:
             return (unsigned long) g_profiler_ints_irq1;
-            break;              
-            
+            break;
+
         case 102:
             return (unsigned long) g_profiler_ints_irq2;
             break; 
@@ -284,56 +258,52 @@ unsigned long doGetSystemMetrics(int index)
 
         case 104:
             return (unsigned long) g_profiler_ints_irq4;
-            break;              
+            break;
 
         case 105:
             return (unsigned long) g_profiler_ints_irq5;
-            break;              
-            
+            break;
+
         case 106:
             return (unsigned long) g_profiler_ints_irq6;
             break;              
-            
-            
+
         case 107:
             return (unsigned long) g_profiler_ints_irq7;
-            break;              
+            break;
 
         case 108:
             return (unsigned long) g_profiler_ints_irq8;
-            break;              
+            break;
 
         case 109:
             return (unsigned long) g_profiler_ints_irq9;
-            break;              
-            
+            break;
+
         case 110:
             return (unsigned long) g_profiler_ints_irq10;
-            break;              
-            
-            
+            break;
+
         case 111:
             return (unsigned long) g_profiler_ints_irq11;
-            break; 
+            break;
 
         case 112:
             return (unsigned long) g_profiler_ints_irq12;
-            break; 
+            break;
 
         case 113:
             return (unsigned long) g_profiler_ints_irq13;
-            break; 
-            
+            break;
+
         case 114:
             return (unsigned long) g_profiler_ints_irq14;
-            break; 
-            
-            
+            break;
+
         case 115:
             return (unsigned long) g_profiler_ints_irq15;
-            break; 
-            
-          
+            break;
+
         // Interrupção de serviços do sistema.
         case 117:
             return (unsigned long) g_profiler_ints_gde_services;
@@ -341,7 +311,7 @@ unsigned long doGetSystemMetrics(int index)
 
        // PIT
        // See: hal/pit.h
-       
+
        // jiffies.
        // total ticks
        case 118:  return (unsigned long) jiffies;  break;
@@ -419,14 +389,14 @@ unsigned long doGetSystemMetrics(int index)
            //refresh_screen();
            return (unsigned long) WindowServer_initialized; 
            break;
-        
+
 // is quemu
         case 300:
             return (unsigned long) isQEMU();
             break;
 
         // ...
-                
+
         default:
             goto done;
             break;
@@ -450,16 +420,15 @@ static void __a_soft_place_to_fall(void)
 // The kernel hangs.
 void die(void)
 {
-    if( Initialization.serial_log == TRUE ){
+    if (Initialization.serial_log == TRUE){
         PROGRESS("die:\n");
     }
-
-    if( Initialization.console_log == TRUE ){
+    if (Initialization.console_log == TRUE){
         printf("die: System Halted\n");
         refresh_screen();
     }
-
     __a_soft_place_to_fall();
+
     die();
 }
 
@@ -468,7 +437,6 @@ void die(void)
  * doSetupVersion:
  *     Setup version info.     
  */
-
 // See:
 // config/version.h
 // config/u.h
@@ -530,64 +498,34 @@ void doSetupVersion(void)
  *     Archtecture (independent) inicialization. 
  */
 // called by I_Init().
-// OUT: return TRUE if its ok.
-
-int init_executive(void)
-{
-    int Status = FALSE;
-
-    Initialization.executive_checkpoint = FALSE;
-
-    debug_print ("init_executive:\n");
-
-#ifdef KERNEL_VERBOSE
-    printf ("EXECUTIVE:\n");
-#endif
-
-
-// PCI
-// PCI - Pega informações da PCI.
-// As informaçoes serao salvas em uma lista e usadas depois.
-// por isso temos que sondar agora.
-
-    init_pci();
-
-// CMOS
-// CLOCK - Pega informações de Hora e Data.
-
-    init_clock();
-
-    // ...
-
+// Probe PCI devices.
+// see: /dev/pci/
+// Initialize rtc support.
+// see: /hal/x86_64/rtc.c 
+// Initialize ATA support.
 // #importante: 
-// Só depois de inicializarmos o ata 'e que podemos carregar 
-// alguma coisa.
-
+// Só depois de inicializarmos o ata é que 
+// podemos carregar algum arquivo.
 // #importante
 // Nessa hora ja temos as estruturas de disk e volume inicializadas.
 // entao as estruturas usadas pelo driver ata, pode
 // se registrar em disk ou volume.
+// see: /dev/ata/atainit.c
+// OUT: return TRUE if its ok.
 
-    debug_print ("init_executive: ataDialog\n");
+int init_executive(void)
+{
+// Initialize pci, rtc and ata.
+
+    int Status = FALSE;
+
+    debug_print ("init_executive:\n");
+    Initialization.executive_checkpoint = FALSE;
+    init_pci();
+    init_rtc();
     ataDialog ( 1, FORCEPIO, FORCEPIO );
-
-	// ??
-	// configura a tabela do kernel de funções exportadas
-	// e tabela de ponteiros para tabelas dos outros programas em 
-	// kernel mode.
-    // Status = (int) executive_config_exported_functions();
-
-	//Continua ...
-    
-	// #todo: 
-	// Checar a validade de 'Initialization' ??
-
-	//#debug
-	//printf("Done!\n");
-
     Initialization.executive_checkpoint = TRUE;
 
-    return (int) TRUE;
+    return TRUE;
 }
-
 

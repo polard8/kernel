@@ -18,12 +18,8 @@ extern void asm_reboot (void);
 // not used?
 // processors count
 int processors_count=0;
-
 // see: hal.h
 unsigned long g_machine_type=0;
-
-
-// --------------------
 // main processor support.
 // See: cpu.h
 struct UPProcessorBlock_d  UPProcessorBlock;
@@ -52,9 +48,6 @@ void hal_mp_idle(void)
 }
 */
 
-
-
-
 void hal_set_machine_type ( unsigned long type )
 {
     g_machine_type = (unsigned long) type;
@@ -66,20 +59,15 @@ unsigned long hal_get_machine_type (void)
 }
 
 
-
-/*
- * hal_reboot:
- *     O hal é a camada mis próxima do hardware, não há tratamento nenhum
- * para fazer, somente chamar o reboot via teclado. 
- * em headlib.s 
- */
+// hal_reboot:
+// O hal é a camada mis próxima do hardware, 
+// não há tratamento para fazer, somente chamar o reboot via teclado. 
 
 void hal_reboot(void)
 {
     debug_print("hal_reboot:\n");
 
     switch (system_state ){
-
     // Normal situations
     case SYSTEM_BOOTING:
     case SYSTEM_REBOOT:
@@ -93,7 +81,7 @@ void hal_reboot(void)
     debug_print("Calling asm_reboot\n");
     asm_reboot(); 
 
-    x_panic ("hal_reboot:\n");
+    x_panic("hal_reboot:\n");
 }    
 
 
@@ -148,10 +136,11 @@ void hal_shutdown (void)
     x_panic ("hal_shutdown");
 }
 
+
 // Monitor vertical sync.
-void hal_vsync (void)
+// See: vsync.c
+void hal_vsync(void)
 {
-    // See: vsync.c
     vsync();
 }
 
@@ -186,52 +175,43 @@ void ____Beep_tone (int freq){
 // OUT 
 // Play sound using built in speaker
 
-void hal_speaker_on (void){
+void hal_speaker_on(void)
+{
+// Play the sound using the PC speaker.
 
     uint8_t tmp=0;
-
-    //And play the sound using the PC speaker
-
-    tmp = in8 (0x61);
-
+    tmp = in8(0x61);
     if (tmp != (tmp | 3))
     {
-        out8 (0x61, tmp | 3);
+        out8(0x61, tmp | 3);
     }
 }
 
 
 // Speaker OFF
 // IN
-// make it shutup
 void hal_speaker_off (void)
 {
-    uint8_t tmp = in8(0x61) & 0xFC;
+// make it shutup.
 
+    uint8_t tmp=0; 
+    tmp = in8(0x61) & 0xFC;
     out8 (0x61, tmp);
 }
  
-
+// Testing speaker.
 // Beep.
-void hal_test_speaker (void){
-
+void hal_test_speaker(void)
+{
     int i=0;
 
     debug_print ("Testing speaker ...\n");
 
-    //++
-    hal_speaker_on ();
-    
-    for( i=0; i<49000; i++)
-    {
-        // Nothing
-    }
-
-    hal_speaker_off ();
-    //--
+// beep, wait and stop.
+    hal_speaker_on();
+    for(i=0; i<80000; i++){};
+    hal_speaker_off();
 } 
-
-
 
 
 /*

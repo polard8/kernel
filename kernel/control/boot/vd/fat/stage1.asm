@@ -558,11 +558,11 @@ Step9_FLY:
     RETF
 
 
-;; ======================================================
-;;  PARTITION TABLE 
-;; ======================================================
-;; http://cars.car.coocan.jp/misc/chs2lba.html
-;; https://en.wikipedia.org/wiki/Partition_type
+; ======================================================
+;  PARTITION TABLE 
+; ======================================================
+; http://cars.car.coocan.jp/misc/chs2lba.html
+; https://en.wikipedia.org/wiki/Partition_type
 ; bios = limits: h=4, c=3FF, s=A
 ; vhd = CHS=963/4/17
 
@@ -570,6 +570,12 @@ Step9_FLY:
 ; Colocando a partition table no lugar certo. 
 ; (0x1BE).
     TIMES 446-($-$$) DB 0 
+
+; 446  16  Partition table entry 1.
+; 462  16  Partition table entry 2.
+; 478  16  Partition table entry 3.
+; 494  16  Partition table entry 4.
+; 510  2   0xAA55. Indicates this is a valid MBR.
 
 ; Partition 0. 
 P0:
