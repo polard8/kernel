@@ -26,8 +26,6 @@ struct cat_model_d CatModel;
 // == Prototypes ===============
 //
 
-void gr_embedded_setup(void);
-void gr_embedded_draw(void);
 
 void demoClearWA(unsigned int color);
 void 
@@ -53,6 +51,7 @@ void demoCat(void);
 
 void demoModel1(void);
 
+// flying cube
 void FlyingCubeMove(int left_right, float value);
 void demoFlyingCubeSetup(void);
 void demoFlyingCube(void);
