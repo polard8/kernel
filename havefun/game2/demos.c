@@ -321,8 +321,8 @@ void drawFlyingCube(float fElapsedTime)
              normal.x * (triRotatedZX.p[0].x - CurrentCameraF.position.x) + 
              normal.y * (triRotatedZX.p[0].y - CurrentCameraF.position.y) +
              normal.z * (triRotatedZX.p[0].z - CurrentCameraF.position.z) );
-        if( (float) tmp <  0.0f){ cull=FALSE; }
-        if( (float) tmp >= 0.0f){ cull=TRUE;  }
+        if( (float) tmp <  0.0f){ cull=FALSE; }  //paint
+        if( (float) tmp >= 0.0f){ cull=TRUE;  }  //do not paint
         //----------------------------------------------------
 
         // We need a valid window, 
@@ -1469,6 +1469,8 @@ void demoCurve(void)
 // Control + arrow key
 void FlyingCubeMove(int left_right, float value)
 {
+
+// Move model
     // left
     if(left_right == 1){
         Cube1.model_move = (float) (Cube1.model_move - value); 
@@ -1477,6 +1479,18 @@ void FlyingCubeMove(int left_right, float value)
     if(left_right == 2){
         Cube1.model_move = (float) (Cube1.model_move + value); 
     }
+
+/*
+// Move camera
+    // left
+    if(left_right == 1){
+        CurrentCameraF.position.x = (float) (CurrentCameraF.position.x - value); 
+    }
+    // right
+    if(left_right == 2){
+        CurrentCameraF.position.x = (float) (CurrentCameraF.position.x + value); 
+    }
+*/
 }
 
 
