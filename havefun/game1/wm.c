@@ -3173,19 +3173,15 @@ wmProcedure(
     case GWS_Create:
         printf("wmProcedure: [1] GWS_Create\n");
         break;
-
     case GWS_Destroy:
         printf("wmProcedure: [2] GWS_Destroy\n");
         break;
-
     case GWS_Move:
         printf("wmProcedure: [3] GWS_Move\n");
         break;
-
     case GWS_Size: //get size?
         printf("wmProcedure: [4] GWS_Size\n");
         break;
-
     case GWS_Resize: //set size ?
         printf("wmProcedure: [5] GWS_Resize\n");
         break;
@@ -3199,55 +3195,42 @@ wmProcedure(
             //exit(0);
         }
         break;
-
     case GWS_Paint:
         printf("wmProcedure: [8] GWS_Paint\n");
         break;
-
     case GWS_SetFocus: // set focus
         printf("wmProcedure: [9] GWS_SetFocus\n");
         break;
-
     case GWS_KillFocus: //kill focus
         printf("wmProcedure: [10] GWS_KillFocus\n");
         break;
-
     case GWS_Activate:
         printf("wmProcedure: [11] GWS_Activate\n");
         break;
-
     case GWS_ShowWindow:
         printf("wmProcedure: [12] GWS_ShowWindow\n");
         break;
-
     case GWS_SetCursor:
         printf("wmProcedure: [13] GWS_SetCursor\n");
         break;
-
     case GWS_Hide:
         printf("wmProcedure: [14] GWS_Hide\n");
         break;
-
     case GWS_Maximize:
         printf("wmProcedure: [15] GWS_Maximize\n");
         break;
-
     case GWS_Restore:
         printf("wmProcedure: [16] GWS_Restore\n");
         break;
-
     case GWS_ShowDefault:
         printf("wmProcedure: [17] GWS_ShowDefault\n");
         break;
-
     case GWS_SetFocus2:
         printf("wmProcedure: [18] GWS_SetFocus2\n");
         break;
-
     case GWS_GetFocus2:
         printf("wmProcedure: [19] GWS_GetFocus2\n");
         break;
-
 
 // #todo
 // Esse eh o momento de exibirmos o cursor do mouse,
@@ -3482,34 +3465,34 @@ wmProcedure(
     case GWS_SysKeyDown:
         if(long1 == VK_F1){
             // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[0],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[0],TRUE);
+            //if(tb_buttons_status[0] == TRUE)
+            //    return 0;
+            //set_status_by_id(tb_buttons[0],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[0],TRUE);
             return 0;
         }
         if(long1 == VK_F2){
             // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[1],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[1],TRUE);
+            //if(tb_buttons_status[1] == TRUE)
+            //    return 0;
+            //set_status_by_id(tb_buttons[1],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[1],TRUE);
             return 0;
         }
         if(long1 == VK_F3){
             // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[2],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[2],TRUE);
+            //if(tb_buttons_status[2] == TRUE)
+            //    return 0;
+            //set_status_by_id(tb_buttons[2],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[2],TRUE);
             return 0;
         }
         if(long1 == VK_F4){
             // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[3],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[3],TRUE);
+            //if(tb_buttons_status[3] == TRUE)
+            //    return 0;
+            //set_status_by_id(tb_buttons[3],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[3],TRUE);
             return 0;
         }
         
@@ -3537,81 +3520,85 @@ wmProcedure(
     case GWS_SysKeyUp:
         if(long1 == VK_F1){
             // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[0], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[0],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app1_string);
-            tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[0] = TRUE;
+            //if(tb_buttons_status[0] == TRUE)
+            //    return 0;
+            //set_status_by_id( tb_buttons[0], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[0],TRUE);
+            //memset(name_buffer,0,64-1);
+            //strcpy(name_buffer,app1_string);
+            //tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_buttons_status[0] = TRUE;
+            //wm_Update_TaskBar("F1",FALSE);
             return 0;
         }
         if(long1 == VK_F2){
             // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[1], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[1],TRUE);
+            //if(tb_buttons_status[1] == TRUE)
+            //    return 0;
+            //set_status_by_id( tb_buttons[1], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[1],TRUE);
             //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app2_string);
-            tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[1] = TRUE;
+            //memset(name_buffer,0,64-1);
+            //strcpy(name_buffer,app2_string);
+            //tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_buttons_status[1] = TRUE;
+            //wm_Update_TaskBar("F2",FALSE);
             return 0;
         }
         if(long1 == VK_F3){
             // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[2], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[2],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app3_string);
-            tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[2] = TRUE;
+            //if(tb_buttons_status[2] == TRUE)
+            //    return 0;
+            //set_status_by_id( tb_buttons[2], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[2],TRUE);
+            //memset(name_buffer,0,64-1);
+            //strcpy(name_buffer,app3_string);
+            //tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_buttons_status[2] = TRUE;
+            //wm_Update_TaskBar("F3",FALSE);
             return 0;
         }
         if(long1 == VK_F4){
             // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[3], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[3],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app4_string);
-            tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[3] = TRUE;
+            //if(tb_buttons_status[3] == TRUE)
+            //    return 0;
+            //set_status_by_id( tb_buttons[3], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[3],TRUE);
+            //memset(name_buffer,0,64-1);
+            //strcpy(name_buffer,app4_string);
+            //tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            //tb_buttons_status[3] = TRUE;
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
             // comp_config_use_mouse = TRUE;
+            //wm_Update_TaskBar("F4",FALSE);
             return 0;
         }
 
         // update desktop
         if (long1 == VK_F5)
         {
-            set_status_by_id(tb_buttons[0],BS_RELEASED);
-            set_status_by_id(tb_buttons[1],BS_RELEASED);
-            set_status_by_id(tb_buttons[2],BS_RELEASED);
-            set_status_by_id(tb_buttons[3],BS_RELEASED);
-            WindowManager.is_fullscreen = FALSE;
-            wm_update_desktop(TRUE);
+            //set_status_by_id(tb_buttons[0],BS_RELEASED);
+            //set_status_by_id(tb_buttons[1],BS_RELEASED);
+            //set_status_by_id(tb_buttons[2],BS_RELEASED);
+            //set_status_by_id(tb_buttons[3],BS_RELEASED);
+            //WindowManager.is_fullscreen = FALSE;
+            //wm_update_desktop(TRUE);
             return 0;
         }
 
         //=====
         if(long1==VK_F6){
             // Enter fullscreen mode.
-            if (WindowManager.is_fullscreen != TRUE){
-                wm_enter_fullscreen_mode();
-                return 0;
-            }
+            //if (WindowManager.is_fullscreen != TRUE){
+            //    wm_enter_fullscreen_mode();
+            //    return 0;
+            //}
             // Exit fullscreen mode.
-            if (WindowManager.is_fullscreen == TRUE){
-                wm_exit_fullscreen_mode(TRUE);
-                return 0;
-            }
+            //if (WindowManager.is_fullscreen == TRUE){
+            //    wm_exit_fullscreen_mode(TRUE);
+            //    return 0;
+            //}
             return 0;
         }
         
@@ -3937,7 +3924,7 @@ int wmInputReader(void)
             // Quit the program.
             if( RTLEventBuffer[1] == GWS_Copy )
             { 
-                printf("wm.c: control + c\n"); 
+                //printf("wm.c: control + c\n"); 
                 gramado_terminate();
                 return 0;
             }
@@ -3965,7 +3952,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control right\n"); 
               //dock_active_window(2);
-              FlyingCubeMove(2,(float) 0.08f);
+              //IN: cube number, position, amount
+              FlyingCubeMove(0,2,(float) 0.08f);
               return 0; 
             }
             //Control arrow up
@@ -3986,8 +3974,9 @@ int wmInputReader(void)
             if( RTLEventBuffer[1] == GWS_ControlArrowLeft )
             { 
               //printf("ws: Control left\n");
-              //dock_active_window(4); 
-              FlyingCubeMove(1,(float) 0.08f);
+              //dock_active_window(4);
+              //IN: cube number, position, amount 
+              FlyingCubeMove(0,1,(float) 0.08f);
               return 0; 
             }
 
@@ -6346,19 +6335,16 @@ void wm_Update_TaskBar( char *string, int flush )
     //redraw_window(__taskbar_startmenu_button_window,TRUE);
 
 // Redraw, all the valid buttons in the list.
-    int i=0;
+    register int i=0;
     int wid=0;
-    for(i=0; i<TB_BUTTONS_MAX; i++)
+    for (i=0; i<TB_BUTTONS_MAX; i++)
     {
-        if(tb_buttons[i] != 0)
-        {
+        if(tb_buttons[i] != 0){
             wid = (int) tb_buttons[i];
-            
             redraw_window_by_id(wid,TRUE);
             __draw_button_mark_by_wid(wid,i);
         }
     };
-
 
 
 // String

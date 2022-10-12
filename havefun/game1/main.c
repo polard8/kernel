@@ -2011,23 +2011,16 @@ serviceAsyncCommand (void)
     // print Hello.
     case 3:
         gwssrv_debug_print ("serviceAsyncCommand: [3] hello\n");
-        printf("HELLO\n");
-        //exit(0);
-        //return 0;
+        printf("Hello!\n");
         goto done;
         break;
 
     // Demos:
     // See: demos.c
     case 4:
-        gwssrv_debug_print ("serviceAsyncCommand: [4] \n");
-        if (current_mode == GRAMADO_JAIL)
-        {
-            gwssrv_debug_print("serviceAsyncCommand: [request 4] demo\n"); 
-            demos_startup_animation(subrequest_id);
-            gwssrv_show_backbuffer();
-            //return 0;
-            goto done;
+        gwssrv_debug_print ("serviceAsyncCommand: [4]\n");
+        if (current_mode == GRAMADO_JAIL){
+            demoCat();
         }
         goto done;
         break;
@@ -3351,22 +3344,6 @@ static int InitHot(void)
         current_mode == GRAMADO_HOME)
     {
          //demoModel1();
-         //demo34567();
-         //demos_startup_animation(1); //sa
-         //demos_startup_animation(2); //fred0
-         //demos_startup_animation(3); //fred1
-         //demos_startup_animation(4); //fred2
-         //demos_startup_animation(5);
-         //demos_startup_animation(6);
-         //demos_startup_animation(7);  //curve
-         //demos_startup_animation(8);
-         //demos_startup_animation(9);  //cat
-         //demos_startup_animation(10); //triangle
-         //demos_startup_animation(11);
-         //demos_startup_animation(12);
-         //demos_startup_animation(13);
-         //demos_startup_animation(14);  //polygon
-         //demos_startup_animation(15);
          // again
          //wm_Update_TaskBar("Welcome :)",TRUE);
     }
@@ -3864,7 +3841,7 @@ static int on_execute(void)
 
 
     if (IsTimeToQuit == TRUE){
-        printf("main.c: Quit the engine :)\n");
+        //printf("main.c: Quit the engine :)\n");
     }
 
 // #todo
@@ -3929,8 +3906,8 @@ int main(int argc, char **argv)
 
     if(Status == 0)
     {
-        gwssrv_debug_print ("GWSSRV.BIN: exit(0)\n");
-        printf             ("GWSSRV.BIN: exit(0)\n");
+        //gwssrv_debug_print ("GWSSRV.BIN: exit(0)\n");
+        //printf             ("GWSSRV.BIN: exit(0)\n");
         // #bugbug
         // The thread state didn't change.
         // We are still in RUNNING state.
@@ -3960,6 +3937,8 @@ void gramado_terminate(void)
 //#todo:
 // clean up all the mess before finishing the program.
     IsTimeToQuit = TRUE;
+    //wm_Update_TaskBar("Exit",TRUE);
+    //demoCat();
 }
 
 

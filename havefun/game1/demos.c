@@ -7,24 +7,33 @@
 struct gws_window_d *__demo_window;
 
 int gUseDemos = TRUE;
+static int game_update_taskbar=TRUE;
+static int frames=0;
+static int hits=0;
 
 
-// #bugbug:
-// Essa inicialização não funciona, ela se perde?
-// see: demoFlyingCubeSetup()
-float fTheta = 0.0f;
-float model_initial_distance = 0.0f;
-float model_distance = 0.0f;
-// left or right
-float model_move = 0.0f;
-
+//float cube_x[8];
+//float cube_y[8];
 
 struct cube_model_d
 {
-    struct gr_vecF3D_d vecs[32];
-};
-struct cube_model_d  Cube1;
+    float fThetaAngle;
 
+    struct gr_vecF3D_d vecs[32];
+    int colors[32];
+
+// left or right
+    float model_move;
+
+    float model_initial_distance;
+    float model_distance;
+};
+//struct cube_model_d  Cube1;
+//struct cube_model_d *cube;
+
+//#define CUBE_MAX  4
+#define CUBE_MAX  8
+unsigned long cubes[CUBE_MAX];
 
 
 // local
@@ -50,32 +59,58 @@ static int __r[4][4] = {
 */
 
 
-
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
-
-
 static void __draw_demo_curve1(int position, int model_z);
-
 static void __draw_model1(int step, int target_axis);
 
-struct gws_window_d *
-__create_demo_window (
+struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
     unsigned long width,
     unsigned long height );
 
-void drawFlyingCube(float fElapsedTime);
 
+static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime);
+
+void drawRectangle0(float modelz);
 
 //======================
 
 
-void drawFlyingCube(float fElapsedTime)
+void drawRectangle0(float modelz)
 {
+    struct gr_rectangleF3D_d r;
+    
+    r.p[0].x = (float) -0.02f;  
+    r.p[0].y = (float)  0.02f;  
+    r.p[0].z = (float) modelz;  
+    r.p[0].color = COLOR_WHITE;
+    
+    r.p[1].x = (float)  0.02f;  
+    r.p[1].y = (float)  0.02f;  
+    r.p[1].z = (float) modelz;  
+    r.p[1].color = COLOR_WHITE;
+    
+    r.p[2].x = (float)  0.02f;  
+    r.p[2].y = (float) -0.02f;  
+    r.p[2].z = (float) modelz;  
+    r.p[2].color = COLOR_WHITE;
+    
+    r.p[3].x = (float) -0.02f;  
+    r.p[3].y = (float) -0.02f;  
+    r.p[3].z = (float) modelz;  
+    r.p[3].color = COLOR_WHITE;
+    
+    drawRectangleF( (struct gr_rectangleF3D_d *) &r );
+}
 
-// Vectors
-    //struct gr_vecF3D_d vecs[32];
+
+// Draw the cube.
+// Elapsed time means the amount of time between two events.
+static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
+{
+    char string0[16];
+
 // Matrices
     struct gr_mat4x4_d  matRotZ; 
     struct gr_mat4x4_d  matRotX;
@@ -84,22 +119,14 @@ void drawFlyingCube(float fElapsedTime)
     struct gr_triangleF3D_d  triRotatedZ; 
     struct gr_triangleF3D_d  triRotatedZX;
 
-    int sequence[3*16];
+    int sequence[3*16];  //cube
+    int cull=FALSE;
 
     register int i=0;  //loop
     int j=0;
     int off=0;
     int v=0;
-
 // ---------
-
-// Initialize vectors.
-    for (i=0; i<32; i++)
-    {
-        Cube1.vecs[i].x = (float) 0.0f;
-        Cube1.vecs[i].y = (float) 0.0f;
-        Cube1.vecs[i].z = (float) 0.0f;
-    };
 
 // Initialize 4x4 matrices.
 // see: gprim.h
@@ -112,75 +139,56 @@ void drawFlyingCube(float fElapsedTime)
 
 // ---------
 
+    if( (void*) cube == NULL ){
+        return;
+    }
+
 // Building the transformation matrices.
 
-    fTheta = (float) (fTheta + 1.0f * fElapsedTime);
-    //fTheta += 1.0f * fElapsedTime;
+    cube->fThetaAngle = (float) (cube->fThetaAngle + fElapsedTime);
+    //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
 // Rotation Z
-	matRotZ.m[0][0] = (float) cosf(fTheta);
-	matRotZ.m[0][1] = (float) -sinf(fTheta);
-	matRotZ.m[1][0] = (float) sinf(fTheta);
-	matRotZ.m[1][1] = (float) cosf(fTheta);
+	matRotZ.m[0][0] = (float) cosf(cube->fThetaAngle);
+	matRotZ.m[0][1] = (float) -sinf(cube->fThetaAngle);
+	matRotZ.m[1][0] = (float) sinf(cube->fThetaAngle);
+	matRotZ.m[1][1] = (float) cosf(cube->fThetaAngle);
 	matRotZ.m[2][2] = (float) 1.0f;
 	matRotZ.m[3][3] = (float) 1.0f;
 // Rotation X
 	matRotX.m[0][0] = (float) 1.0f;
-	matRotX.m[1][1] = (float) cosf(fTheta * 0.5f);
-	matRotX.m[1][2] = (float) -sinf(fTheta * 0.5f);
-	matRotX.m[2][1] = (float) sinf(fTheta * 0.5f);
-	matRotX.m[2][2] = (float) cosf(fTheta * 0.5f);
+	matRotX.m[1][1] = (float) cosf(cube->fThetaAngle * 0.5f);
+	matRotX.m[1][2] = (float) -sinf(cube->fThetaAngle * 0.5f);
+	matRotX.m[2][1] = (float) sinf(cube->fThetaAngle * 0.5f);
+	matRotX.m[2][2] = (float) cosf(cube->fThetaAngle * 0.5f);
 	matRotX.m[3][3] = (float) 1.0f;
 //------------------------------------------------
 
-
-// #bugbug
-// Isso foi projetado para estar dentro 
-// de um model space. Se usarmos num view space
-// que é o que a camera vê, então teríamos valores negativos,
-// que não deviram aparecer na imagem final.
-
-    Cube1.vecs[1].x = (float) -0.2f;  Cube1.vecs[1].y = (float) -0.2f;  Cube1.vecs[1].z = (float)  0.2f;
-    Cube1.vecs[2].x = (float)  0.2f;  Cube1.vecs[2].y = (float) -0.2f;  Cube1.vecs[2].z = (float)  0.2f;
-    Cube1.vecs[3].x = (float) -0.2f;  Cube1.vecs[3].y = (float)  0.2f;  Cube1.vecs[3].z = (float)  0.2f;
-    Cube1.vecs[4].x = (float)  0.2f;  Cube1.vecs[4].y = (float)  0.2f;  Cube1.vecs[4].z = (float)  0.2f;
-    Cube1.vecs[5].x = (float) -0.2f;  Cube1.vecs[5].y = (float)  0.2f;  Cube1.vecs[5].z = (float) -0.2f;
-    Cube1.vecs[6].x = (float)  0.2f;  Cube1.vecs[6].y = (float)  0.2f;  Cube1.vecs[6].z = (float) -0.2f;
-    Cube1.vecs[7].x = (float) -0.2f;  Cube1.vecs[7].y = (float) -0.2f;  Cube1.vecs[7].z = (float) -0.2f;
-    Cube1.vecs[8].x = (float)  0.2f;  Cube1.vecs[8].y = (float) -0.2f;  Cube1.vecs[8].z = (float) -0.2f;
-
 // 12 faces
-    sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 4; //f 1 2 4
-    sequence[3]  = (int) 1; sequence[4]  = (int) 4;  sequence[5] = (int) 3; //f 1 4 3
-    sequence[6]  = (int) 3; sequence[7]  = (int) 4;  sequence[8] = (int) 6; //f 3 4 6
-    sequence[9]  = (int) 3; sequence[10] = (int) 6; sequence[11] = (int) 5; //f 3 6 5
-    sequence[12] = (int) 5; sequence[13] = (int) 6; sequence[14] = (int) 8; //f 5 6 8
-    sequence[15] = (int) 5; sequence[16] = (int) 8; sequence[17] = (int) 7; //f 5 8 7
-    sequence[18] = (int) 7; sequence[19] = (int) 8; sequence[20] = (int) 2; //f 7 8 2
-    sequence[21] = (int) 7; sequence[22] = (int) 2; sequence[23] = (int) 1; //f 7 2 1
-    sequence[24] = (int) 2; sequence[25] = (int) 8; sequence[26] = (int) 6; //f 2 8 6
-    sequence[27] = (int) 2; sequence[28] = (int) 6; sequence[29] = (int) 4; //f 2 6 4
-    sequence[30] = (int) 7; sequence[31] = (int) 1; sequence[32] = (int) 3; //f 7 1 3
-    sequence[33] = (int) 7; sequence[34] = (int) 3; sequence[35] = (int) 5; //f 7 3 5
+// Order: north, top, south, bottom, east, west.
+// clockwise
+    sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 4; //f 1 2 4 // north bottom  n
+    sequence[3]  = (int) 1; sequence[4]  = (int) 4;  sequence[5] = (int) 3; //f 1 4 3 // north top     n
+    sequence[6]  = (int) 3; sequence[7]  = (int) 4;  sequence[8] = (int) 6; //f 3 4 6 // top right     s
+    sequence[9]  = (int) 3; sequence[10] = (int) 6; sequence[11] = (int) 5; //f 3 6 5 // top left      s   
+    sequence[12] = (int) 5; sequence[13] = (int) 6; sequence[14] = (int) 8; //f 5 6 8 // south right   s
+    sequence[15] = (int) 5; sequence[16] = (int) 8; sequence[17] = (int) 7; //f 5 8 7 // south left    s
+    sequence[18] = (int) 7; sequence[19] = (int) 8; sequence[20] = (int) 2; //f 7 8 2 // bottom right  n
+    sequence[21] = (int) 7; sequence[22] = (int) 2; sequence[23] = (int) 1; //f 7 2 1 // bottom left   n
+    sequence[24] = (int) 2; sequence[25] = (int) 8; sequence[26] = (int) 6; //f 2 8 6 // east bottom   s
+    sequence[27] = (int) 2; sequence[28] = (int) 6; sequence[29] = (int) 4; //f 2 6 4 // east top      n  
+    sequence[30] = (int) 7; sequence[31] = (int) 1; sequence[32] = (int) 3; //f 7 1 3 // west bottom   n
+    sequence[33] = (int) 7; sequence[34] = (int) 3; sequence[35] = (int) 5; //f 7 3 5 // west top      s 
 
-// 1~12
+// ---------
+// #test
+// draw a rectangle
+   //drawRectangle0((float) 0.08f);
 
-    int colors[32];
+// ---------
+// draw a cube
 
-    colors[0] = GRCOLOR_LIGHTYELLOW;
-    colors[1] = GRCOLOR_LIGHTMAGENTA;
-    colors[2] = GRCOLOR_DARKBLUE;
-    colors[3] = GRCOLOR_DARKGREEN;
-    colors[4] = GRCOLOR_DARKRED;
-    colors[5] = GRCOLOR_DARKCYAN;
-    colors[6] = GRCOLOR_DARKMAGENTA;
-    colors[7] = GRCOLOR_DARKYELLOW;
-    colors[8] = GRCOLOR_DARKWHITE;
-    colors[9] = GRCOLOR_LIGHTBLACK;
-    colors[10] = GRCOLOR_LIGHTBLUE;
-    colors[11] = GRCOLOR_LIGHTGREEN;
-
-    int cull=FALSE;
+    //cull=FALSE;
 
     for (i=1; i<=12; i++)
     {
@@ -189,24 +197,24 @@ void drawFlyingCube(float fElapsedTime)
         off = (int) ((i-1)*3);
         
         v = (int) sequence[off+0];
-        tri.p[0].x = (float) Cube1.vecs[v].x;
-        tri.p[0].y = (float) Cube1.vecs[v].y;
-        tri.p[0].z = (float) Cube1.vecs[v].z;
+        tri.p[0].x = (float) cube->vecs[v].x;
+        tri.p[0].y = (float) cube->vecs[v].y;
+        tri.p[0].z = (float) cube->vecs[v].z;
         tri.p[0].color = COLOR_PINK;
         if(i >= 1 && i < 12){
-            tri.p[0].color = colors[i-1]; //COLOR_BLUE;  
+            tri.p[0].color = cube->colors[i-1];  // rectangle color
         }
         v = (int) sequence[off+1];
-        tri.p[1].x = (float) Cube1.vecs[v].x;
-        tri.p[1].y = (float) Cube1.vecs[v].y;
-        tri.p[1].z = (float) Cube1.vecs[v].z;
-        tri.p[1].color = COLOR_WHITE;  // COLOR_GREEN;
+        tri.p[1].x = (float) cube->vecs[v].x;
+        tri.p[1].y = (float) cube->vecs[v].y;
+        tri.p[1].z = (float) cube->vecs[v].z;
+        tri.p[1].color = COLOR_WHITE;  // not used
 
         v = (int) sequence[off+2];
-        tri.p[2].x = (float) Cube1.vecs[v].x;
-        tri.p[2].y = (float) Cube1.vecs[v].y;
-        tri.p[2].z = (float) Cube1.vecs[v].z;
-        tri.p[2].color = COLOR_WHITE;  // COLOR_BLUE;
+        tri.p[2].x = (float) cube->vecs[v].x;
+        tri.p[2].y = (float) cube->vecs[v].y;
+        tri.p[2].z = (float) cube->vecs[v].z;
+        tri.p[2].color = COLOR_WHITE;  // not used
 
         //-----------------------------    
         // Rotate in Z-Axis
@@ -246,38 +254,43 @@ void drawFlyingCube(float fElapsedTime)
         // Translate in z.
 
         // Increment distance
-        model_distance = (float) (model_distance + 0.002f);
+        cube->model_distance = (float) (cube->model_distance + 0.002f);
         // Restart distance
-        if (model_distance > 10.0f){
-            model_distance = (float) 0.8f;
+        if (cube->model_distance > 10.0f){
+            cube->model_distance = (float) 0.8f;
+            //hits++;
+            //memset(string0,0,16);  //clear
+            //itoa(hits,string0);
+            //wm_Update_TaskBar((char *)string0,FALSE);
+            //wm_Update_TaskBar("hit",FALSE);
         }
-        
+
         triRotatedZX.p[0].z =
             (float) (
             triRotatedZX.p[0].z + 
-            model_initial_distance +
-            model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
         triRotatedZX.p[1].z = 
             (float) (
             triRotatedZX.p[1].z + 
-            model_initial_distance +
-            model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
 
         triRotatedZX.p[2].z = 
             (float) (
             triRotatedZX.p[2].z + 
-            model_initial_distance +
-            model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
 
         // Translate in x.
         // left or right
 
         triRotatedZX.p[0].x = 
-            (float) (triRotatedZX.p[0].x + model_move); 
+            (float) (triRotatedZX.p[0].x + cube->model_move); 
         triRotatedZX.p[1].x = 
-            (float) (triRotatedZX.p[1].x + model_move); 
+            (float) (triRotatedZX.p[1].x + cube->model_move); 
         triRotatedZX.p[2].x = 
-            (float) (triRotatedZX.p[2].x + model_move); 
+            (float) (triRotatedZX.p[2].x + cube->model_move); 
 
 
         //----------------------------------------------------
@@ -321,8 +334,8 @@ void drawFlyingCube(float fElapsedTime)
              normal.x * (triRotatedZX.p[0].x - CurrentCameraF.position.x) + 
              normal.y * (triRotatedZX.p[0].y - CurrentCameraF.position.y) +
              normal.z * (triRotatedZX.p[0].z - CurrentCameraF.position.z) );
-        if( (float) tmp <  0.0f){ cull=FALSE; }
-        if( (float) tmp >= 0.0f){ cull=TRUE;  }
+        if( (float) tmp <  0.0f){ cull=FALSE; }  //paint
+        if( (float) tmp >= 0.0f){ cull=TRUE;  }  //do not paint
         //----------------------------------------------------
 
         // We need a valid window, 
@@ -343,18 +356,6 @@ void drawFlyingCube(float fElapsedTime)
 }
 
 
-void gr_embedded_setup(void)
-{
-    __setupCatModel(TRUE,TRUE,TRUE);
-}
-
-void gr_embedded_draw(void)
-{
-    demoCat();
-}
-
-
-
 struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
@@ -364,8 +365,11 @@ struct gws_window_d *__create_demo_window (
 
     struct gws_window_d *w;
 
-    if( (void*) __root_window == NULL )
+    if( (void*) __root_window == NULL ){
         return NULL;
+    }
+
+// Create window.
 
     w = 
         (struct gws_window_d *) CreateWindow ( 
@@ -380,13 +384,11 @@ struct gws_window_d *__create_demo_window (
                                     COLOR_BLACK );
 
 
-    if ( (void *) w == NULL )
-    {
+    if ( (void *) w == NULL ){
         return NULL;
     }
 
-    if ( w->used != TRUE || 
-         w->magic != 1234 )
+    if ( w->used != TRUE ||  w->magic != 1234 )
     {
         return NULL;
     }
@@ -406,7 +408,6 @@ struct gws_window_d *__create_demo_window (
 
 static void __draw_model1(int step, int target_axis)
 {
-
     // object window
     struct gws_window_d *ow;
     ow = NULL;
@@ -759,8 +760,26 @@ void gramado_clear_surface(struct gws_window_d *clipping_window, unsigned int co
     demoClearSurface(clipping_window,color);
 }
 
+// Start surface.
+// only the working area.
+void demoClearWA(unsigned int color)
+{
+// IN: l,t,w,h,color,fill,rop
+    rectBackbufferDrawRectangle ( 
+           WindowManager.wa_left, 
+           WindowManager.wa_top, 
+           WindowManager.wa_width, 
+           WindowManager.wa_height, 
+           color, 
+           1,   //fill 
+           0 ); //rop
+}
+
 // Start surface
-void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color)
+void 
+demoClearSurface(
+    struct gws_window_d *clipping_window, 
+    unsigned int color)
 {
     // #todo
     // We can do this for more resolutions. 
@@ -806,7 +825,8 @@ void demoClearSurface(struct gws_window_d *clipping_window, unsigned int color)
 
     unsigned int fail_color = COLOR_RED;
 
-// Limpa em mostra na resolução 320x200
+// Limpa na resolução 320x200
+// IN: l,t,w,h,color,fill,rop
     rectBackbufferDrawRectangle ( 
            0, 0, 320, 200, 
            fail_color, 1, 0 );
@@ -875,23 +895,23 @@ void __setupCatModel(int eyes, int whiskers, int mouth )
 //worker
 static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 {
-
     // object window
     struct gws_window_d *ow;
     ow = NULL;
     //#todo
     // use the demo window if it is possible
-    if( (void*) __demo_window != NULL ){
-       if(__demo_window->magic==1234)
-        ow = __demo_window;
+    if( (void*) __demo_window != NULL )
+    {
+       if (__demo_window->magic==1234){
+           ow = __demo_window;
+       }
     }
-
-
 
 // model
     int model_x = (int) cat_x;
     int model_y = (int) cat_y;
     int model_z = (int) cat_z;
+    int model_radius = 25;
 
 // eyes
     int eye1_x = model_x -10;
@@ -902,14 +922,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
 //---
 
 // head
-// IN: x,y,r,color,z
+// IN: window,x,y,r,color,z
     grCircle3 ( 
         ow,
-        model_x + 0,    //x
-        model_y + 12,   //y
-        25,   //r
-        GRCOLOR_LIGHTBLACK,  //color 
-        model_z );   // z 
+        model_x + 0,
+        model_y + 12,
+        model_radius,
+        GRCOLOR_LIGHTBLACK,
+        model_z );
 
 // eyes
     if ( CatModel.eyesVisible == TRUE )
@@ -920,14 +940,14 @@ static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
             eye1_y, 
             eye_radius, 
             GRCOLOR_LIGHTBLACK, 
-            model_z );  //z 
+            model_z );
         grCircle3 ( 
             ow,
             eye2_x, 
             eye2_y, 
             eye_radius, 
             GRCOLOR_LIGHTBLACK, 
-            model_z );  //z 
+            model_z );
     }
 
 // whiskers
@@ -986,10 +1006,8 @@ void demoCat (void)
 {
     register int i=0;
     int j=0;
-
     int count = 8;
     int scale_max = 100;
-
 
 // ---------------
 // Create a demo window
@@ -998,39 +1016,27 @@ void demoCat (void)
     dw = (struct gws_window_d *) __create_demo_window(8,8,200,140);
     if( (void*) dw != NULL )
     {
-       if(dw->magic==1234)
-       {
+       if(dw->magic==1234){
            __demo_window = dw;
        }
     }
-
-
-
 //---------------------
 
-// depth cliping
-    gr_depth_range(
-        CurrentProjection,   // projection
-        0,                   // zNear
-        100 );               // zFar
+// depth clipping
+// IN: projection, znear, zfar.
+    gr_depth_range( CurrentProjection, 0, 100 );
 
 // The camera for the cat.
+// 'int' values.
+// IN: Position vector, upview vector, lookat vector.
     camera ( 
-        0, 0, 0,   // position vector
-        0, 0, 0,     // upview vector
-        0, 0, 0 );   // lookat vector
+        0,0,0,
+        0,0,0,
+        0,0,0 );
 
 // Setup model
-// eyes, whiskers, mouth
+// IN: eyes, whiskers, mouth
     __setupCatModel(TRUE,TRUE,TRUE);
-
-
-
-// #test
-// Testing fpu
-    //long r9 = (long) power4(9,3);
-    //printf("9^3 = %d\n",(long)r9);
-    //while(1){}
 
 
 // Loop
@@ -1059,301 +1065,9 @@ void demoCat (void)
 }
 
 
-void demoLine1(void)
-{
-
-    // #bugbug
-    // Needs to be a square ?
-
-    if (current_mode != GRAMADO_JAIL)
-        return;
-
-    //int width = getWidth();
-    //int height = getHeight();
-    int width  = 200/2;  //320/2;
-    int height = 200/2;
-
-    int x1 = 0, y1 = 0,
-        x2 = 0, y2 = height;
-    
-    while (y1 < height) {
-        //g.drawLine(x1, y1, x2, y2);
-        plotLine3d ( NULL, x1,y1,0, x2,y2,0, COLOR_WHITE); 
-            y1+=8;                 //You should modify this if
-            x2+=8;                 //it's not an equal square (like 250x250)
-    };
-
-    demoFlushSurface(NULL);  
-}
-
-
-
-void demo34567(void)
-{
-    int i=0;
-    for(i=0; i<1001; i++)
-    {
-        //IN: window, z, x, y, color
-        grPlot0 ( NULL, 0, i, i%2, COLOR_WHITE );
-    };
-}
-
-//
-// == fred demo ========================================
-//
-
-
-void demoFred0(void)
-{
-    register int i=0;
-
-    for (i=0; i<100; i++)
-    {
-
-        if( (i%3) == 0 ||
-            (i%4) == 0 ||
-            (i%5) == 0 ||
-            (i%6) == 0 ||
-            (i%7) == 0 )
-        {
-            noraDrawingStuff3 (-i,-i,0);
-            grCircle3 ( 
-                NULL,
-                -i % 55,    // x 
-                -i % 55,    // y
-                i % 55,     // r
-                COLOR_GREEN, 
-                i % 55);    // z
-        }
-        
-        //noraDrawingStuff3 (i,i,0);
-
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-
-
-
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-            
-        //rtl_invalidate_screen();
-    };
-
-    refresh_screen();
-}
-
-
-void demoFred1(void)
-{
-    register int i=0;
-
-    for (i=0; i<100; i++){
-    
-        //noraDrawingStuff3 (i,i,0);
-        noraDrawingStuff3 (-i,-i,0);
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-  
-    refresh_screen();
-}
-
-
-void demoFred2(void)
-{
-    register int i=0;
-
-    if(current_mode != GRAMADO_HOME)
-        return;
-
-    for (i=1; i< (800-600); i++){
-
-        //noraDrawingStuff3 (i,i,0);
-        noraDrawingStuff3 (-i,-i,0);
-        //rectangle(8,8,i,i,COLOR_BLUE);
-        //rectangleZ(i,i,i+20,i+20,COLOR_BLUE,i);
-        //plotCircle ( -i % 20, -i % 20, i%20, COLOR_GREEN);
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);  //save this
-        //grCircle3 ( NULL,-i % 20, -i % 20, i % 20, COLOR_GREEN, i % 20);   //save this
-        //cool
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % fib(20), COLOR_GREEN, i % fib(20) );
-            
-        //IN: x,y,r,color,z
-        grCircle3 ( NULL,-i % fib(20), -i % fib(20), i % (1024-768), COLOR_RED, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/5), COLOR_BLUE, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/7), COLOR_YELLOW, i % fib(20) );
-            
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/), COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i %  fib(20/3), COLOR_YELLOW, i % fib(20) );
-            
-        //igual o de cima.
-        //grCircle3 ( NULL,-i % fib(20), -i % fib(20), i, COLOR_GREEN, i % fib(20) );
-        //grCircle3 ( NULL,-i % fib(7), -i % fib(7), i % fib(7), COLOR_GREEN, i % fib(7) );
-        //grEllipse ( i, i, i*5, i*5, COLOR_BLUE);
-        //grEllipse3 ( i%20, i%20, i, i, COLOR_BLUE,i%20);
-    };
-    refresh_screen();
-}
-
-
-// demo
-// start up animation
-// matrix multiplication
-// #testing:
-// Sometimes it fails.
-void demoSA1(void)
-{
-    return;
-/*
-    int useClippingWindow = FALSE;
-    //int useClippingWindow = TRUE;
-
-//++
-//=================
-    struct gws_window_d *w;
-    int wid=-1;
-
-    if ( useClippingWindow == TRUE )
-    {
-        w = (struct gws_window_d *) CreateWindow ( 
-                                    WT_SIMPLE, 
-                                    0,  //style
-                                    1,  //status
-                                    1,  //view
-                                    "demoSA1", 
-                                    100, 120, 100, 100, 
-                                    __root_window, 0, 
-                                    COLOR_PINK, COLOR_YELLOW ); 
-    
-        if ( (void*) w == NULL ){
-            printf ("demoSA1: w\n");
-            //useClippingWindow = FALSE;
-            return;
-        }
-        
-        wid = RegisterWindow(w);
-
-        if (wid<0){
-            printf ("demoSA1: wid\n");
-            //useClippingWindow = FALSE;
-            return;
-        }
-
-        gws_show_window_rect(w);
-    }
-//=================
-//--
-
-
-    register int i=0;
-
-    // To store result
-    int res[4][4];  
-
-    int mat1[4][4] = {  { 1, 1, 1, 1 },
-                        { 2, 2, 2, 2 },
-                        { 3, 3, 3, 3 },
-                        { 4, 4, 4, 4 } };
- 
-    int mat2[4][4] = { { -5, -5, 0, 0 },
-                       {  5, -5, 0, 0 },
-                       {  5,  5, 0, 0 },
-                       { -5,  5, 0, 0 } };
-    
-
-        
-    
-    if (current_mode != GRAMADO_JAIL){
-        return;
-    }
-    
-
-    int count=8;    
-
-// loop
-    while ( count>0 )
-    {
-
-        for (i=0; i<8; i++){
-
-           demoClearSurface(NULL,COLOR_BLACK);
-             
-            // Plot four dots.
-            // z,x,y
-            if ( useClippingWindow == TRUE){
-            grPlot0 ( w, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( w, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( w, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( w, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-            }
-
-            // NO clipping window
-            if ( useClippingWindow == FALSE){
-            grPlot0 ( NULL, res[0][2], res[0][0], res[0][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[1][2], res[1][0], res[1][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[2][2], res[2][0], res[2][1], COLOR_WHITE); 
-            grPlot0 ( NULL, res[3][2], res[3][0], res[3][1], COLOR_WHITE); 
-            }
-          
-            // New projection matrix.
-            
-            projection4x4[0][0] = i%5;
-            projection4x4[0][1] = 0;
-            // projection4x4[0][2] = 0;
-            // projection4x4[0][3] = 0;
-
-            projection4x4[1][0] = 0;
-            projection4x4[1][1] = i%5;
-            // projection4x4[1][2] = 0;
-            // projection4x4[1][3] = 0;
-
-            projection4x4[2][0] = 0;
-            projection4x4[2][1] = 0;
-            // projection4x4[2][2] = 0;
-            // projection4x4[2][3] = 0;
-       
-            projection4x4[3][0] = i%5;
-            projection4x4[3][1] = i%5;
-            // projection4x4[3][2] = 0;
-            // projection4x4[3][3] = 0;
-  
-            // transform
-            multiply4 ( projection4x4, mat2, res );
-
-            // Refresh and yield.
-            demoFlushSurface(NULL);
-            
-            gwssrv_yield();
-            gwssrv_yield();
-            // ...
-        };
-        
-        count--;
-    };
-*/
-}
-
-
 void demoTriangle(void)
 {
+
 // ---------------
 // Create a demo window
     struct gws_window_d *dw;
@@ -1361,14 +1075,12 @@ void demoTriangle(void)
     dw = (struct gws_window_d *) __create_demo_window(8,8,200,140);
     if( (void*) dw != NULL )
     {
-       if(dw->magic==1234)
-       {
+       if(dw->magic==1234){
            __demo_window = dw;
        }
     }
-
-
 //------------------------------------------
+
     struct gr_triangle_d *triangle;
 
     int line_size = 40;
@@ -1444,23 +1156,21 @@ void demoPolygon(void)
     int TranslationOffset=0;
     int j=0;
 
-    // structure
-
+// Structure
     p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
-    if((void*)p==NULL){return;}
-    
-    // polygon type
-    
-    p->type = POLYGON_POLYLINE;
-    
-    // number of elements
-    
-    p->n = 6;
-    p->list_address = (void*) vecList;
+    if ((void*)p==NULL){
+        return;
+    }
 
+// polygon type
+    p->type = POLYGON_POLYLINE;
+// number of elements
+    p->n = 6;
 
 // clear vecList.
 // This is a local list.
+
+    p->list_address = (void*) vecList;
 
     for(i=0; i<8; i++){
         vecList[i] = 0;
@@ -1491,11 +1201,7 @@ void demoPolygon(void)
     vecList[4] = (unsigned long) v4;
     vecList[5] = (unsigned long) v0;  //circular
 
-
-//
 // loop
-//
-
 // animation loop.
 
     int times=0;
@@ -1553,9 +1259,6 @@ void demoPolygon(void)
 
     };
     };   //while
-
-    //gwssrv_debug_print("DONE\n");
-    //printf ("DONE\n");
 }
 
 
@@ -1576,31 +1279,29 @@ void demoPolygon2(void)
     int TranslationOffset=0;
     int j=0;
 
-    // structure
+// structure
 
     p = (struct gr_polygon_d *) malloc( sizeof( struct gr_polygon_d ) );
-    if((void*)p==NULL){return;}
-    
-    // polygon type
-    
+    if((void*)p==NULL){
+        return;
+    }
+
+// polygon type
     p->type = POLYGON_POLYPOINT;
     //p->type = POLYGON_POLYLINE;
-    
-    // number of elements
-    
+// number of elements
     p->n = 6;
+
+// clear vecList.
+// This is a local list.
+
     p->list_address = (void*) vecList;
-
-
-    // clear vecList.
-    // This is a local list.
 
     for(i=0; i<8; i++){
         vecList[i] = 0;
     };
 
-
-    // Creating some points.
+// Creating some points.
 
     v0 = (struct gr_vec3D_d *) malloc( sizeof( struct gr_vec3D_d ) );
     if((void*)v0==NULL){return;}
@@ -1624,11 +1325,7 @@ void demoPolygon2(void)
     vecList[4] = (unsigned long) v4;
     vecList[5] = (unsigned long) v0;  //circular
 
-
-//
 // loop
-//
-
 // animation loop
 
     int times=0;
@@ -1677,11 +1374,7 @@ void demoPolygon2(void)
     v4->z = 0;
     v4->color = COLOR_WHITE;
 
-    //gwssrv_debug_print("calling xxxPolygonZ\n");
-
-
-    // Draw
-
+// Draw
 
     //p->type = POLYGON_POLYPOINT;
     //xxxPolygonZ(p);
@@ -1698,31 +1391,29 @@ void demoPolygon2(void)
 
     };
     };   //while
-
-    //gwssrv_debug_print("DONE\n");
-    //printf ("DONE\n");
 }
+
 
 // IN: ?
 static void __draw_demo_curve1(int position, int model_z)
 {
-
-    int yOffset = position + position;
-    
+    int yOffset = (position + position);
     //int modelz = 0;
     int modelz = (int) model_z;
 
-    // line
-    //a variaçao de y2 me pareceu certa.
-    //IN: ??
+// line
+// a variaçao de y2 me pareceu certa.
+// IN: ??
+    
     plotQuadBezierSeg ( 
         0,   0,  modelz,          //x0, y0, z0, //ponto inicial
         40,  40, modelz,          //x1, y1, z1, //?
        100,  20+yOffset, modelz,  //x2, y2, z2, //ponto final
        GRCOLOR_LIGHTBLACK );
 
-    //string! char by char
-    //IN: x,y,color,c,z
+// String! char by char.
+// IN: x,y,color,c,z
+
     plotCharBackbufferDrawcharTransparentZ ( 
         40+ (8*0), 
         20+yOffset, 
@@ -1753,18 +1444,15 @@ static void __draw_demo_curve1(int position, int model_z)
         GRCOLOR_LIGHTRED, 'O', modelz );
 }
 
-// curva e string.
+// Curva e string.
 void demoCurve(void)
 {
     register int i=0;
     register int j=0;
-
     int count=8;
 
-    gr_depth_range(
-        CurrentProjection,
-        0,      //near
-        100 );  //far
+    // IN: ?, near, far
+    gr_depth_range( CurrentProjection, 0, 100 );
 
 // loop
 
@@ -1790,64 +1478,175 @@ void demoCurve(void)
     }
 }
 
-// control + arrow key
-void FlyingCubeMove(int left_right, float value)
+
+// Control + arrow key
+void FlyingCubeMove(int number, int left_right, float value)
 {
+    struct cube_model_d *cube;
+
+
+    if(number<0)
+        return;
+    if(number>=CUBE_MAX)
+        return;
+
+    cube = (struct cube_model_d *) cubes[number];
+    if( (void*) cube == NULL )
+        return;
+
+// Move model
     // left
-    if(left_right == 1)
-        model_move = (float) (model_move - value); 
+    if(left_right == 1){
+        cube->model_move = (float) (cube->model_move - value); 
+    }
     // right
-    if(left_right == 2)
-        model_move = (float) (model_move + value); 
+    if(left_right == 2){
+        cube->model_move = (float) (cube->model_move + value); 
+    }
+
+/*
+// Move camera
+    // left
+    if(left_right == 1){
+        CurrentCameraF.position.x = (float) (CurrentCameraF.position.x - value); 
+    }
+    // right
+    if(left_right == 2){
+        CurrentCameraF.position.x = (float) (CurrentCameraF.position.x + value); 
+    }
+*/
 }
 
-
+// called by the engine
 void demoFlyingCubeSetup(void)
 {
-    fTheta = (float) 0.0f;
-    model_initial_distance = (float) 1.0f;
-    model_distance = (float) 0.0f;
-// left or right
-    model_move = (float) 0.0f;
+
+// first cube
+    struct cube_model_d *cube;
+
+//----------------
+// Cube1
+    register int i=0;
+
+
+/*
+    for (i=0; i<8; i++){
+        cube_x[i] = (float) 0.0f;
+        cube_y[i] = (float) 0.0f;
+    };
+*/
+
+// Clear the list.
+    for (i=0; i<CUBE_MAX; i++){
+        cubes[i] = (unsigned long) 0;
+    };
+
+
+    int count=0;
+    
+    for (count=0; count<CUBE_MAX; count++)
+    {
+        cube = (void*) malloc( sizeof( struct cube_model_d ) );
+        if( (void*) cube == NULL ){
+            printf("cube\n");
+            exit(1);
+        }
+
+        cube->fThetaAngle = (float) 0.0f;
+        
+        cube->model_initial_distance = (float) 1.0f;
+        cube->model_distance = (float) 0.0f;
+
+        // left or right
+        //cube->model_move = (float) 0.0f;
+        cube->model_move = (float) -1.5f + (float) 0.4f * (float) count;
+
+        // Initialize vectors.
+        for (i=0; i<32; i++)
+        {
+             cube->vecs[i].x = (float) 0.0f;
+             cube->vecs[i].y = (float) 0.0f;
+             cube->vecs[i].z = (float) 0.0f;
+        };
+
+        cube->vecs[1].x = (float) -0.2f;  cube->vecs[1].y = (float) -0.2f;  cube->vecs[1].z = (float) 0.2f;
+        cube->vecs[2].x = (float)  0.2f;  cube->vecs[2].y = (float) -0.2f;  cube->vecs[2].z = (float) 0.2f;
+        cube->vecs[3].x = (float) -0.2f;  cube->vecs[3].y = (float)  0.2f;  cube->vecs[3].z = (float) 0.2f;
+        cube->vecs[4].x = (float)  0.2f;  cube->vecs[4].y = (float)  0.2f;  cube->vecs[4].z = (float) 0.2f;
+
+        cube->vecs[5].x = (float) -0.2f;  cube->vecs[5].y = (float)  0.2f;  cube->vecs[5].z = (float) -0.2f;
+        cube->vecs[6].x = (float)  0.2f;  cube->vecs[6].y = (float)  0.2f;  cube->vecs[6].z = (float) -0.2f;
+        cube->vecs[7].x = (float) -0.2f;  cube->vecs[7].y = (float) -0.2f;  cube->vecs[7].z = (float) -0.2f;
+        cube->vecs[8].x = (float)  0.2f;  cube->vecs[8].y = (float) -0.2f;  cube->vecs[8].z = (float) -0.2f;
+
+        cube->colors[0] = GRCOLOR_LIGHTYELLOW;
+        cube->colors[1] = GRCOLOR_LIGHTMAGENTA;
+        cube->colors[2] = GRCOLOR_DARKBLUE;
+        cube->colors[3] = GRCOLOR_DARKGREEN;
+        cube->colors[4] = GRCOLOR_DARKRED;
+        cube->colors[5] = GRCOLOR_DARKCYAN;
+        cube->colors[6] = GRCOLOR_DARKMAGENTA;
+        cube->colors[7] = GRCOLOR_DARKYELLOW;
+        cube->colors[8] = GRCOLOR_DARKWHITE;
+        cube->colors[9] = GRCOLOR_LIGHTBLACK;
+        cube->colors[10] = GRCOLOR_LIGHTBLUE;
+        cube->colors[11] = GRCOLOR_LIGHTGREEN;
+
+        // Save the cube pointer.
+        cubes[count] = (unsigned long) cube;
+    };
+
+//----------------
+// Taskbar
+    //demoClearWA(COLOR_BLACK);
+    //wm_Update_TaskBar("Hello",TRUE);
+    game_update_taskbar = FALSE;
 }
 
+// called by the engine
 void demoFlyingCube(void)
 {
-    gramado_clear_surface(NULL,COLOR_BLACK);
-    drawFlyingCube( (float) 0.02f );
+    struct cube_model_d *tmp_cube;
+
+    //float time = 0.02f;
+    //float time = 0.04f;
+    float time = 0.08f;
+
+    frames++;
+
+    //demoClearWA(COLOR_BLACK);                //clear surface
+    gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
+
+// Draw all the cubes.
+    int n=0;
+    while(1){
+
+        if(n>=CUBE_MAX){
+            break;
+        }
+
+        tmp_cube = (struct cube_model_d *) cubes[n];
+        if ( (void*) tmp_cube == NULL ){
+            //printf("tmp_cube\n");
+            //exit(1);
+            break;
+        }
+
+        //IN: cube number, direction, amount
+        //FlyingCubeMove( n, 1, (float) 0.01f );
+
+        drawFlyingCube( 
+            (struct cube_model_d *) tmp_cube,
+            (float) time );
+
+        n++;
+    };
+
     //yellowstatus0("test",FALSE);  //draw but don't refresh
+    //if(game_update_taskbar){
+    //    wm_Update_TaskBar("53$",FALSE); //redraw, but not refresh
+    //    game_update_taskbar = FALSE;
+    //}
     gramado_flush_surface(NULL);
 }
-
-
-// Rotina usada para rodar rotinas demo na inicializaçao.
-// Seleciona a rotina demo a ser executada.
-void demos_startup_animation(int i)
-{
-    switch (i){
-    case 1: demoSA1();  break;
-    case 2: demoFred0();  break;
-    case 3: demoFred1();  break;
-    case 4: demoFred2();  break;
-    case 5:
-        break;
-    case 6:
-        break;
-    case 7: demoCurve();  break;
-    case 8:
-        break;
-    case 9: demoCat();  break;
-    case 10: demoTriangle();  break;
-    case 11:
-        break;
-    case 12: demoLine1();  break;
-    case 13:  
-        break;
-    case 14: demoPolygon();  break; 
-    case 15: demoPolygon2();  break;
-    default:
-        break;
-    };
-}
-
 

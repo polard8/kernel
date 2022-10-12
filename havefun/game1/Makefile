@@ -163,6 +163,7 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	cp $(LIBCOBJ)/math.o .
 	cp $(LIBGDOBJ)/libgd.o .
 
+
 gws-link:
 	$(LD) $(user_ldflags) -o GAME1.BIN $(myObjects)
 	#$(LD) -r -o gramado.o $(myObjects)

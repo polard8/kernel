@@ -109,6 +109,17 @@ struct gr_rectangle_d
     struct gr_rectangle_d *next;
 };
 
+// 3D rectangle. float falues.
+struct gr_rectangleF3D_d
+{
+    struct gr_vecF3D_d p[4];
+    // mesh support.
+    struct gr_rectangleF3D_d *last;
+    struct gr_rectangleF3D_d *next;
+};
+
+
+
 // Cube
 struct gr_cube_d
 {
@@ -676,7 +687,7 @@ rectangle_from_two_points (
     int right, int bottom,
     unsigned int color );
 
-
+void drawRectangleF(struct gr_rectangleF3D_d *rectangle);
 void __rectangleZZ( struct gr_rectangle_d *rect );
 int grRectangle( struct gr_rectangle_d *rect );
 
