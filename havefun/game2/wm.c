@@ -3952,7 +3952,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control right\n"); 
               //dock_active_window(2);
-              FlyingCubeMove(2,(float) 0.08f);
+              //IN: cube number, position, amount
+              FlyingCubeMove(0,2,(float) 0.08f);
               return 0; 
             }
             //Control arrow up
@@ -3973,8 +3974,9 @@ int wmInputReader(void)
             if( RTLEventBuffer[1] == GWS_ControlArrowLeft )
             { 
               //printf("ws: Control left\n");
-              //dock_active_window(4); 
-              FlyingCubeMove(1,(float) 0.08f);
+              //dock_active_window(4);
+              //IN: cube number, position, amount 
+              FlyingCubeMove(0,1,(float) 0.08f);
               return 0; 
             }
 

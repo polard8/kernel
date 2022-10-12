@@ -12,6 +12,9 @@ static int frames=0;
 static int hits=0;
 
 
+//float cube_x[8];
+//float cube_y[8];
+
 struct cube_model_d
 {
     float fThetaAngle;
@@ -25,7 +28,12 @@ struct cube_model_d
     float model_initial_distance;
     float model_distance;
 };
-struct cube_model_d  Cube1;
+//struct cube_model_d  Cube1;
+//struct cube_model_d *cube;
+
+//#define CUBE_MAX  4
+#define CUBE_MAX  8
+unsigned long cubes[CUBE_MAX];
 
 
 // local
@@ -61,7 +69,8 @@ struct gws_window_d *__create_demo_window (
     unsigned long width,
     unsigned long height );
 
-void drawFlyingCube(float fElapsedTime);
+
+static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime);
 
 void drawRectangle0(float modelz);
 
@@ -98,7 +107,7 @@ void drawRectangle0(float modelz)
 
 // Draw the cube.
 // Elapsed time means the amount of time between two events.
-void drawFlyingCube(float fElapsedTime)
+static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
 {
     char string0[16];
 
@@ -130,24 +139,28 @@ void drawFlyingCube(float fElapsedTime)
 
 // ---------
 
+    if( (void*) cube == NULL ){
+        return;
+    }
+
 // Building the transformation matrices.
 
-    Cube1.fThetaAngle = (float) (Cube1.fThetaAngle + fElapsedTime);
-    //Cube1.fThetaAngle = (float) (Cube1.fThetaAngle + 1.0f * fElapsedTime);
+    cube->fThetaAngle = (float) (cube->fThetaAngle + fElapsedTime);
+    //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
 // Rotation Z
-	matRotZ.m[0][0] = (float) cosf(Cube1.fThetaAngle);
-	matRotZ.m[0][1] = (float) -sinf(Cube1.fThetaAngle);
-	matRotZ.m[1][0] = (float) sinf(Cube1.fThetaAngle);
-	matRotZ.m[1][1] = (float) cosf(Cube1.fThetaAngle);
+	matRotZ.m[0][0] = (float) cosf(cube->fThetaAngle);
+	matRotZ.m[0][1] = (float) -sinf(cube->fThetaAngle);
+	matRotZ.m[1][0] = (float) sinf(cube->fThetaAngle);
+	matRotZ.m[1][1] = (float) cosf(cube->fThetaAngle);
 	matRotZ.m[2][2] = (float) 1.0f;
 	matRotZ.m[3][3] = (float) 1.0f;
 // Rotation X
 	matRotX.m[0][0] = (float) 1.0f;
-	matRotX.m[1][1] = (float) cosf(Cube1.fThetaAngle * 0.5f);
-	matRotX.m[1][2] = (float) -sinf(Cube1.fThetaAngle * 0.5f);
-	matRotX.m[2][1] = (float) sinf(Cube1.fThetaAngle * 0.5f);
-	matRotX.m[2][2] = (float) cosf(Cube1.fThetaAngle * 0.5f);
+	matRotX.m[1][1] = (float) cosf(cube->fThetaAngle * 0.5f);
+	matRotX.m[1][2] = (float) -sinf(cube->fThetaAngle * 0.5f);
+	matRotX.m[2][1] = (float) sinf(cube->fThetaAngle * 0.5f);
+	matRotX.m[2][2] = (float) cosf(cube->fThetaAngle * 0.5f);
 	matRotX.m[3][3] = (float) 1.0f;
 //------------------------------------------------
 
@@ -184,23 +197,23 @@ void drawFlyingCube(float fElapsedTime)
         off = (int) ((i-1)*3);
         
         v = (int) sequence[off+0];
-        tri.p[0].x = (float) Cube1.vecs[v].x;
-        tri.p[0].y = (float) Cube1.vecs[v].y;
-        tri.p[0].z = (float) Cube1.vecs[v].z;
+        tri.p[0].x = (float) cube->vecs[v].x;
+        tri.p[0].y = (float) cube->vecs[v].y;
+        tri.p[0].z = (float) cube->vecs[v].z;
         tri.p[0].color = COLOR_PINK;
         if(i >= 1 && i < 12){
-            tri.p[0].color = Cube1.colors[i-1];  // rectangle color
+            tri.p[0].color = cube->colors[i-1];  // rectangle color
         }
         v = (int) sequence[off+1];
-        tri.p[1].x = (float) Cube1.vecs[v].x;
-        tri.p[1].y = (float) Cube1.vecs[v].y;
-        tri.p[1].z = (float) Cube1.vecs[v].z;
+        tri.p[1].x = (float) cube->vecs[v].x;
+        tri.p[1].y = (float) cube->vecs[v].y;
+        tri.p[1].z = (float) cube->vecs[v].z;
         tri.p[1].color = COLOR_WHITE;  // not used
 
         v = (int) sequence[off+2];
-        tri.p[2].x = (float) Cube1.vecs[v].x;
-        tri.p[2].y = (float) Cube1.vecs[v].y;
-        tri.p[2].z = (float) Cube1.vecs[v].z;
+        tri.p[2].x = (float) cube->vecs[v].x;
+        tri.p[2].y = (float) cube->vecs[v].y;
+        tri.p[2].z = (float) cube->vecs[v].z;
         tri.p[2].color = COLOR_WHITE;  // not used
 
         //-----------------------------    
@@ -241,10 +254,10 @@ void drawFlyingCube(float fElapsedTime)
         // Translate in z.
 
         // Increment distance
-        Cube1.model_distance = (float) (Cube1.model_distance + 0.002f);
+        cube->model_distance = (float) (cube->model_distance + 0.002f);
         // Restart distance
-        if (Cube1.model_distance > 10.0f){
-            Cube1.model_distance = (float) 0.8f;
+        if (cube->model_distance > 10.0f){
+            cube->model_distance = (float) 0.8f;
             //hits++;
             //memset(string0,0,16);  //clear
             //itoa(hits,string0);
@@ -255,29 +268,29 @@ void drawFlyingCube(float fElapsedTime)
         triRotatedZX.p[0].z =
             (float) (
             triRotatedZX.p[0].z + 
-            Cube1.model_initial_distance +
-            Cube1.model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
         triRotatedZX.p[1].z = 
             (float) (
             triRotatedZX.p[1].z + 
-            Cube1.model_initial_distance +
-            Cube1.model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
 
         triRotatedZX.p[2].z = 
             (float) (
             triRotatedZX.p[2].z + 
-            Cube1.model_initial_distance +
-            Cube1.model_distance ); 
+            cube->model_initial_distance +
+            cube->model_distance ); 
 
         // Translate in x.
         // left or right
 
         triRotatedZX.p[0].x = 
-            (float) (triRotatedZX.p[0].x + Cube1.model_move); 
+            (float) (triRotatedZX.p[0].x + cube->model_move); 
         triRotatedZX.p[1].x = 
-            (float) (triRotatedZX.p[1].x + Cube1.model_move); 
+            (float) (triRotatedZX.p[1].x + cube->model_move); 
         triRotatedZX.p[2].x = 
-            (float) (triRotatedZX.p[2].x + Cube1.model_move); 
+            (float) (triRotatedZX.p[2].x + cube->model_move); 
 
 
         //----------------------------------------------------
@@ -1467,17 +1480,28 @@ void demoCurve(void)
 
 
 // Control + arrow key
-void FlyingCubeMove(int left_right, float value)
+void FlyingCubeMove(int number, int left_right, float value)
 {
+    struct cube_model_d *cube;
+
+
+    if(number<0)
+        return;
+    if(number>=CUBE_MAX)
+        return;
+
+    cube = (struct cube_model_d *) cubes[number];
+    if( (void*) cube == NULL )
+        return;
 
 // Move model
     // left
     if(left_right == 1){
-        Cube1.model_move = (float) (Cube1.model_move - value); 
+        cube->model_move = (float) (cube->model_move - value); 
     }
     // right
     if(left_right == 2){
-        Cube1.model_move = (float) (Cube1.model_move + value); 
+        cube->model_move = (float) (cube->model_move + value); 
     }
 
 /*
@@ -1493,49 +1517,84 @@ void FlyingCubeMove(int left_right, float value)
 */
 }
 
-
+// called by the engine
 void demoFlyingCubeSetup(void)
 {
+
+// first cube
+    struct cube_model_d *cube;
 
 //----------------
 // Cube1
     register int i=0;
 
-    Cube1.fThetaAngle = (float) 0.0f;
-    Cube1.model_initial_distance = (float) 1.0f;
-    Cube1.model_distance = (float) 0.0f;
-    Cube1.model_move = (float) 0.0f;// left or right
 
-// Initialize vectors.
-    for (i=0; i<32; i++)
-    {
-        Cube1.vecs[i].x = (float) 0.0f;
-        Cube1.vecs[i].y = (float) 0.0f;
-        Cube1.vecs[i].z = (float) 0.0f;
+/*
+    for (i=0; i<8; i++){
+        cube_x[i] = (float) 0.0f;
+        cube_y[i] = (float) 0.0f;
+    };
+*/
+
+// Clear the list.
+    for (i=0; i<CUBE_MAX; i++){
+        cubes[i] = (unsigned long) 0;
     };
 
-    Cube1.vecs[1].x = (float) -0.2f;  Cube1.vecs[1].y = (float) -0.2f;  Cube1.vecs[1].z = (float) 0.2f;
-    Cube1.vecs[2].x = (float)  0.2f;  Cube1.vecs[2].y = (float) -0.2f;  Cube1.vecs[2].z = (float) 0.2f;
-    Cube1.vecs[3].x = (float) -0.2f;  Cube1.vecs[3].y = (float)  0.2f;  Cube1.vecs[3].z = (float) 0.2f;
-    Cube1.vecs[4].x = (float)  0.2f;  Cube1.vecs[4].y = (float)  0.2f;  Cube1.vecs[4].z = (float) 0.2f;
 
-    Cube1.vecs[5].x = (float) -0.2f;  Cube1.vecs[5].y = (float)  0.2f;  Cube1.vecs[5].z = (float) -0.2f;
-    Cube1.vecs[6].x = (float)  0.2f;  Cube1.vecs[6].y = (float)  0.2f;  Cube1.vecs[6].z = (float) -0.2f;
-    Cube1.vecs[7].x = (float) -0.2f;  Cube1.vecs[7].y = (float) -0.2f;  Cube1.vecs[7].z = (float) -0.2f;
-    Cube1.vecs[8].x = (float)  0.2f;  Cube1.vecs[8].y = (float) -0.2f;  Cube1.vecs[8].z = (float) -0.2f;
+    int count=0;
+    
+    for (count=0; count<CUBE_MAX; count++)
+    {
+        cube = (void*) malloc( sizeof( struct cube_model_d ) );
+        if( (void*) cube == NULL ){
+            printf("cube\n");
+            exit(1);
+        }
 
-    Cube1.colors[0] = GRCOLOR_LIGHTYELLOW;
-    Cube1.colors[1] = GRCOLOR_LIGHTMAGENTA;
-    Cube1.colors[2] = GRCOLOR_DARKBLUE;
-    Cube1.colors[3] = GRCOLOR_DARKGREEN;
-    Cube1.colors[4] = GRCOLOR_DARKRED;
-    Cube1.colors[5] = GRCOLOR_DARKCYAN;
-    Cube1.colors[6] = GRCOLOR_DARKMAGENTA;
-    Cube1.colors[7] = GRCOLOR_DARKYELLOW;
-    Cube1.colors[8] = GRCOLOR_DARKWHITE;
-    Cube1.colors[9] = GRCOLOR_LIGHTBLACK;
-    Cube1.colors[10] = GRCOLOR_LIGHTBLUE;
-    Cube1.colors[11] = GRCOLOR_LIGHTGREEN;
+        cube->fThetaAngle = (float) 0.0f;
+        
+        cube->model_initial_distance = (float) 1.0f;
+        cube->model_distance = (float) 0.0f;
+
+        // left or right
+        //cube->model_move = (float) 0.0f;
+        cube->model_move = (float) -1.5f + (float) 0.4f * (float) count;
+
+        // Initialize vectors.
+        for (i=0; i<32; i++)
+        {
+             cube->vecs[i].x = (float) 0.0f;
+             cube->vecs[i].y = (float) 0.0f;
+             cube->vecs[i].z = (float) 0.0f;
+        };
+
+        cube->vecs[1].x = (float) -0.2f;  cube->vecs[1].y = (float) -0.2f;  cube->vecs[1].z = (float) 0.2f;
+        cube->vecs[2].x = (float)  0.2f;  cube->vecs[2].y = (float) -0.2f;  cube->vecs[2].z = (float) 0.2f;
+        cube->vecs[3].x = (float) -0.2f;  cube->vecs[3].y = (float)  0.2f;  cube->vecs[3].z = (float) 0.2f;
+        cube->vecs[4].x = (float)  0.2f;  cube->vecs[4].y = (float)  0.2f;  cube->vecs[4].z = (float) 0.2f;
+
+        cube->vecs[5].x = (float) -0.2f;  cube->vecs[5].y = (float)  0.2f;  cube->vecs[5].z = (float) -0.2f;
+        cube->vecs[6].x = (float)  0.2f;  cube->vecs[6].y = (float)  0.2f;  cube->vecs[6].z = (float) -0.2f;
+        cube->vecs[7].x = (float) -0.2f;  cube->vecs[7].y = (float) -0.2f;  cube->vecs[7].z = (float) -0.2f;
+        cube->vecs[8].x = (float)  0.2f;  cube->vecs[8].y = (float) -0.2f;  cube->vecs[8].z = (float) -0.2f;
+
+        cube->colors[0] = GRCOLOR_LIGHTYELLOW;
+        cube->colors[1] = GRCOLOR_LIGHTMAGENTA;
+        cube->colors[2] = GRCOLOR_DARKBLUE;
+        cube->colors[3] = GRCOLOR_DARKGREEN;
+        cube->colors[4] = GRCOLOR_DARKRED;
+        cube->colors[5] = GRCOLOR_DARKCYAN;
+        cube->colors[6] = GRCOLOR_DARKMAGENTA;
+        cube->colors[7] = GRCOLOR_DARKYELLOW;
+        cube->colors[8] = GRCOLOR_DARKWHITE;
+        cube->colors[9] = GRCOLOR_LIGHTBLACK;
+        cube->colors[10] = GRCOLOR_LIGHTBLUE;
+        cube->colors[11] = GRCOLOR_LIGHTGREEN;
+
+        // Save the cube pointer.
+        cubes[count] = (unsigned long) cube;
+    };
 
 //----------------
 // Taskbar
@@ -1544,8 +1603,11 @@ void demoFlyingCubeSetup(void)
     game_update_taskbar = FALSE;
 }
 
+// called by the engine
 void demoFlyingCube(void)
 {
+    struct cube_model_d *tmp_cube;
+
     //float time = 0.02f;
     //float time = 0.04f;
     float time = 0.08f;
@@ -1554,7 +1616,32 @@ void demoFlyingCube(void)
 
     //demoClearWA(COLOR_BLACK);                //clear surface
     gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
-    drawFlyingCube( (float) time );
+
+// Draw all the cubes.
+    int n=0;
+    while(1){
+
+        if(n>=CUBE_MAX){
+            break;
+        }
+
+        tmp_cube = (struct cube_model_d *) cubes[n];
+        if ( (void*) tmp_cube == NULL ){
+            //printf("tmp_cube\n");
+            //exit(1);
+            break;
+        }
+
+        //IN: cube number, direction, amount
+        //FlyingCubeMove( n, 1, (float) 0.01f );
+
+        drawFlyingCube( 
+            (struct cube_model_d *) tmp_cube,
+            (float) time );
+
+        n++;
+    };
+
     //yellowstatus0("test",FALSE);  //draw but don't refresh
     //if(game_update_taskbar){
     //    wm_Update_TaskBar("53$",FALSE); //redraw, but not refresh
