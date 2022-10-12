@@ -500,15 +500,23 @@ gr_MultiplyMatrixVector(
     struct gr_mat4x4_d *m );
 
 
+
 int 
-gr_rotate_z(
+gr_rotate_x(
     struct gr_triangleF3D_d *in_tri,
     struct gr_triangleF3D_d *out_tri,   // rotated 
     float angle, 
     float fElapsedTime );
 
 int 
-gr_rotate_x(
+gr_rotate_y(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime );
+
+int 
+gr_rotate_z(
     struct gr_triangleF3D_d *in_tri,
     struct gr_triangleF3D_d *out_tri,   // rotated 
     float angle, 

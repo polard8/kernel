@@ -3382,6 +3382,7 @@ gr_MultiplyMatrixVector(
         i->z * m->m[2][3] + 
         m->m[3][3] );
 
+// Normalization.
     if (w != 0.0f)
     {
         o->x = (float) (o->x / w); 
@@ -3392,63 +3393,7 @@ gr_MultiplyMatrixVector(
 
 
 //--------------------------------------------------
-
-int 
-gr_rotate_z(
-    struct gr_triangleF3D_d *in_tri,
-    struct gr_triangleF3D_d *out_tri,   // rotated 
-    float angle, 
-    float fElapsedTime )
-{
-    struct gr_mat4x4_d matRotZ; 
-
-    angle += 1.0f * fElapsedTime;
-
-// gerando a matriz de tranformação.
-// Rotation Z
-	matRotZ.m[0][0] =  cosf(angle);
-	matRotZ.m[0][1] =  sinf(angle);
-	matRotZ.m[1][0] = -sinf(angle);
-	matRotZ.m[1][1] =  cosf(angle);
-	matRotZ.m[2][2] = 1;
-	matRotZ.m[3][3] = 1;
-
-// ---------------------------------------------------
-
-    if( (void*) in_tri == NULL )
-        return -1;
-    if( (void*) out_tri == NULL )
-        return -1;
-
-
-    
-
-// rotação em z,
-// o output esta no triRotatedZ.
-// os 3 vetores foram modificados.
-//-----------------------------    
-// Rotate in Z-Axis
-    gr_MultiplyMatrixVector(
-        (struct gr_vecF3D_d *) &in_tri->p[0], 
-        (struct gr_vecF3D_d *) &out_tri->p[0], 
-        &matRotZ);
-    gr_MultiplyMatrixVector(
-        (struct gr_vecF3D_d *) &in_tri->p[1], 
-        (struct gr_vecF3D_d *) &out_tri->p[1], 
-        &matRotZ);
-    gr_MultiplyMatrixVector(
-        (struct gr_vecF3D_d *) &in_tri->p[2], 
-        (struct gr_vecF3D_d *) &out_tri->p[2], 
-        &matRotZ);
-//-----------------------------    
-
-    return 0;
-}
-//--------------------------------------------------
-
-
-//--------------------------------------------------
-
+// Rotate in x
 int 
 gr_rotate_x(
     struct gr_triangleF3D_d *in_tri,
@@ -3458,16 +3403,17 @@ gr_rotate_x(
 {
     struct gr_mat4x4_d matRotX;
 
-    angle += 1.0f * fElapsedTime;
+    //angle += 1.0f * fElapsedTime;
+    angle = (float) angle * (float) fElapsedTime;
 
 // gerando a matriz de tranformação.
 // Rotation X
-	matRotX.m[0][0] = 1;
-	matRotX.m[1][1] =  cosf(angle * 0.5f);
-	matRotX.m[1][2] =  sinf(angle * 0.5f);
-	matRotX.m[2][1] = -sinf(angle * 0.5f);
-	matRotX.m[2][2] =  cosf(angle * 0.5f);
-	matRotX.m[3][3] = 1;
+    matRotX.m[0][0] = (float) 1.0f;
+    matRotX.m[1][1] =  cosf(angle * 0.5f); //why 0.5f?
+    matRotX.m[1][2] =  -sinf(angle * 0.5f);
+    matRotX.m[2][1] = sinf(angle * 0.5f);
+    matRotX.m[2][2] =  cosf(angle * 0.5f);
+    matRotX.m[3][3] = (float) 1.0f;
 
 // ---------------------------------------------------
 
@@ -3496,9 +3442,110 @@ gr_rotate_x(
 }
 //--------------------------------------------------
 
+//--------------------------------------------------
+// Rotate in y
+int 
+gr_rotate_y(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime )
+{
+    struct gr_mat4x4_d matRotY;
+
+    //angle += 1.0f * fElapsedTime;
+    angle = (float) angle * (float) fElapsedTime;
+
+// gerando a matriz de tranformação.
+// Rotation Y
+    matRotY.m[0][0] = cosf(angle);
+    matRotY.m[0][2] = sinf(angle);
+    matRotY.m[1][1] = (float) 1.0f;
+    matRotY.m[2][0] = -sinf(angle);
+    matRotY.m[2][2] = cosf(angle);
+    matRotY.m[3][3] = (float) 1.0f;
+
+// ---------------------------------------------------
+
+    if( (void*) in_tri == NULL )
+        return -1;
+    if( (void*) out_tri == NULL )
+        return -1;
+
+//-----------------------------    
+// Rotate in Y-Axis
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[0], 
+        (struct gr_vecF3D_d *) &out_tri->p[0], 
+        &matRotY);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[1], 
+        (struct gr_vecF3D_d *) &out_tri->p[1], 
+        &matRotY);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[2], 
+        (struct gr_vecF3D_d *) &out_tri->p[2], 
+        &matRotY);
+//-----------------------------    
+
+    return 0;
+}
+//--------------------------------------------------
 
 
 
+//--------------------------------------------------
+// Rotate in z
+int 
+gr_rotate_z(
+    struct gr_triangleF3D_d *in_tri,
+    struct gr_triangleF3D_d *out_tri,   // rotated 
+    float angle, 
+    float fElapsedTime )
+{
+    struct gr_mat4x4_d matRotZ; 
+
+    //angle += 1.0f * fElapsedTime;
+    angle = (float) angle * (float) fElapsedTime;
+
+// gerando a matriz de tranformação.
+// Rotation Z
+	matRotZ.m[0][0] =  cosf(angle);
+	matRotZ.m[0][1] =  -sinf(angle);
+	matRotZ.m[1][0] = sinf(angle);
+	matRotZ.m[1][1] =  cosf(angle);
+	matRotZ.m[2][2] = (float) 1.0f;
+	matRotZ.m[3][3] = (float) 1.0f;
+
+// ---------------------------------------------------
+
+    if( (void*) in_tri == NULL )
+        return -1;
+    if( (void*) out_tri == NULL )
+        return -1;
+
+// rotação em z,
+// o output esta no triRotatedZ.
+// os 3 vetores foram modificados.
+//-----------------------------    
+// Rotate in Z-Axis
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[0], 
+        (struct gr_vecF3D_d *) &out_tri->p[0], 
+        &matRotZ);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[1], 
+        (struct gr_vecF3D_d *) &out_tri->p[1], 
+        &matRotZ);
+    gr_MultiplyMatrixVector(
+        (struct gr_vecF3D_d *) &in_tri->p[2], 
+        (struct gr_vecF3D_d *) &out_tri->p[2], 
+        &matRotZ);
+//-----------------------------    
+
+    return 0;
+}
+//--------------------------------------------------
 
 
 
