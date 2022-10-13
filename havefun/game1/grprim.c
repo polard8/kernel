@@ -164,7 +164,8 @@ grInitializeProjection(
     CurrentProjectionF.height = (unsigned long) (height & 0xFFFFFFFF);
     CurrentProjectionF.ar = (float) fAspectRatio;
 
-//?
+    // fov in radient.
+    // 1/tan(fov/2)
     float fFovRad = 
         1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
     //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
@@ -1181,6 +1182,44 @@ grPlot2D (
     return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
 }
 
+/*
+//#credits: templeos
+//this rotine is cool
+BOOL GrBlot(CDC *dc,int x,int y,CDC *img);
+BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
+{
+    int j,k,k1,w1,h1,w2,h2;
+  if (x<0)
+    w1=-x;
+  else
+    w1=0;
+  if (y<0)
+    h1=-y;
+  else
+    h1=0;
+  w2=img->width;
+  h2=img->height;
+  if (x+w2>dc->width)
+    w2=dc->width-x;
+  if (y+h2>dc->height)
+    h2=dc->height-y;
+  if (w1<w2 && w2<=img->width && h1<h2 && h2<=img->height) {
+    k = h1   *img ->width_internal+w1;
+    k1=(h1+y)*dc->width_internal+x+w1;
+    for (j=h1;j<h2;j++) 
+    {
+        memcpy(
+            dc->body+k1,
+            img->body+k,
+            w2-w1);
+        k +=img->width_internal;
+        k1+=dc->width_internal;
+    }
+    return TRUE;
+  } else
+    return FALSE;
+}
+*/
 
 
 /*
@@ -2313,10 +2352,9 @@ fillTriangle0(
     int x3, int y3, 
     unsigned int c)
 {
-
 	int t1x,t2x,y,minx,maxx,t1xp,t2xp;
-	int changed1 = FALSE;
-	int  changed2 = FALSE;
+    int changed1 = FALSE;
+    int changed2 = FALSE;
 	int signx1,signx2,dx1,dy1,dx2,dy2;
 	int e1, e2;
 
@@ -2462,7 +2500,7 @@ fillTriangle0(
 		if(minx>t1x) minx=t1x; if(minx>t2x) minx=t2x;
 		if(maxx<t1x) maxx=t1x; if(maxx<t2x) maxx=t2x;
 
-	   	// Draw line from min to max points found on the y
+        // Draw line from min to max points found on the y
         //lcd_hline(minx, maxx, y);
         grBackbufferDrawHorizontalLine(minx,y,maxx,c);
         //plotLine3d (
@@ -2498,8 +2536,9 @@ fillTriangle(
     //if( (void*) window == NULL )
         //return 0;
 
-    if( (void*) triangle == NULL )
-        return 0;
+    if ( (void*) triangle == NULL ){
+        return -1;
+    }
 
     __transform_from_viewspace_to_screespace( 
         (int *) &X0, (int *) &Y0, 
@@ -2544,7 +2583,6 @@ plotTriangleF(
 // Engine triangle structure.
 // Using 'int',
     struct gr_triangle_d final_triangle;
-
 
     if (CurrentProjectionF.initialized != TRUE){
         printf("plotTriangleF: CurrentProjectionF\n");
@@ -3492,8 +3530,6 @@ gr_rotate_y(
 }
 //--------------------------------------------------
 
-
-
 //--------------------------------------------------
 // Rotate in z
 int 
@@ -3548,8 +3584,41 @@ gr_rotate_z(
 //--------------------------------------------------
 
 
+struct gr_vecF3D_d *grVectorCrossProduct(
+    struct gr_vecF3D_d *v1, 
+    struct gr_vecF3D_d *v2 )
+{
+//#todo: Not tested yet.
 
-int scalar_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
+    struct gr_vecF3D_d vRes;
+
+    vRes.x = (float) (v1->y * v2->z - v1->z * v2->y);
+    vRes.y = (float) (v1->z * v2->x - v1->x * v2->z);
+    vRes.z = (float) (v1->x * v2->y - v1->y * v2->x);
+
+    return (struct gr_vecF3D_d *) &vRes;
+}
+
+float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 )
+{
+// Dot product.
+// The dot product describe the 
+// relationship between two vectors.
+// Positive: Same direction
+// negative: Opposite direction
+// 0:        Perpendicular.
+
+// Fake perpendicular.
+    if( (void*) v1 == NULL ){ return (float) 0.0f; }
+    if( (void*) v2 == NULL ){ return (float) 0.0f; }
+
+    return (float) ( v1->x * v2->x + 
+                     v1->y * v2->y + 
+                     v1->z * v2->z );
+}
+
+// dot product
+int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
 {
 // Dot product.
 // The dot product describe the 

@@ -112,17 +112,22 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
     char string0[16];
 
 // Matrices
-    struct gr_mat4x4_d  matRotZ; 
     struct gr_mat4x4_d  matRotX;
+    struct gr_mat4x4_d  matRotY;
+    struct gr_mat4x4_d  matRotZ; 
+
 // Triangles
     struct gr_triangleF3D_d  tri;            // triângulo original.
-    struct gr_triangleF3D_d  triRotatedZ; 
-    struct gr_triangleF3D_d  triRotatedZX;
+    struct gr_triangleF3D_d  triRotatedX; 
+    struct gr_triangleF3D_d  triRotatedXY;
+    struct gr_triangleF3D_d  triRotatedXYZ;
 
     int sequence[3*16];  //cube
     int cull=FALSE;
 
     register int i=0;  //loop
+    int nTriangles=12;
+
     int j=0;
     int off=0;
     int v=0;
@@ -148,14 +153,9 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
     cube->fThetaAngle = (float) (cube->fThetaAngle + fElapsedTime);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
-// Rotation Z
-	matRotZ.m[0][0] = (float) cosf(cube->fThetaAngle);
-	matRotZ.m[0][1] = (float) -sinf(cube->fThetaAngle);
-	matRotZ.m[1][0] = (float) sinf(cube->fThetaAngle);
-	matRotZ.m[1][1] = (float) cosf(cube->fThetaAngle);
-	matRotZ.m[2][2] = (float) 1.0f;
-	matRotZ.m[3][3] = (float) 1.0f;
+//------------------------------------------------
 // Rotation X
+// counter-clockwise
 	matRotX.m[0][0] = (float) 1.0f;
 	matRotX.m[1][1] = (float) cosf(cube->fThetaAngle * 0.5f);
 	matRotX.m[1][2] = (float) -sinf(cube->fThetaAngle * 0.5f);
@@ -163,8 +163,25 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
 	matRotX.m[2][2] = (float) cosf(cube->fThetaAngle * 0.5f);
 	matRotX.m[3][3] = (float) 1.0f;
 //------------------------------------------------
+// Rotation Y
+// counter-clockwise
+    matRotY.m[0][0] = cosf(0.0f);//(cube->fThetaAngle * 0.5f);
+    matRotY.m[0][2] = sinf(0.0f);//(cube->fThetaAngle * 0.5f);
+    matRotY.m[1][1] = (float) 1.0f;
+    matRotY.m[2][0] = -sinf(0.0f);//(cube->fThetaAngle * 0.5f);
+    matRotY.m[2][2] = cosf(0.0f);//(cube->fThetaAngle * 0.5f);
+    matRotY.m[3][3] = (float) 1.0f;
+//------------------------------------------------
+// Rotation Z
+// counter-clockwise
+	matRotZ.m[0][0] = (float) cosf(0.0f);//(cube->fThetaAngle);
+	matRotZ.m[0][1] = (float) -sinf(0.0f);//(cube->fThetaAngle);
+	matRotZ.m[1][0] = (float) sinf(0.0f);//(cube->fThetaAngle);
+	matRotZ.m[1][1] = (float) cosf(0.0f);//(cube->fThetaAngle);
+	matRotZ.m[2][2] = (float) 1.0f;
+	matRotZ.m[3][3] = (float) 1.0f;
 
-// 12 faces
+// 12 triangles.
 // Order: north, top, south, bottom, east, west.
 // clockwise
     sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 4; //f 1 2 4 // north bottom  n
@@ -190,7 +207,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
 
     //cull=FALSE;
 
-    for (i=1; i<=12; i++)
+    for (i=1; i <= nTriangles; i++)
     {
         cull=FALSE;
 
@@ -216,39 +233,56 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
         tri.p[2].z = (float) cube->vecs[v].z;
         tri.p[2].color = COLOR_WHITE;  // not used
 
-        //-----------------------------    
-        // Rotate in Z-Axis
-        gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &tri.p[0], 
-            (struct gr_vecF3D_d *) &triRotatedZ.p[0], 
-            (struct gr_mat4x4_d *) &matRotZ);
-        gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &tri.p[1], 
-            (struct gr_vecF3D_d *) &triRotatedZ.p[1], 
-            (struct gr_mat4x4_d *) &matRotZ);
-        gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &tri.p[2], 
-            (struct gr_vecF3D_d *) &triRotatedZ.p[2], 
-            (struct gr_mat4x4_d *) &matRotZ);
+
         //-----------------------------    
         // Rotate in X-Axis
         gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &triRotatedZ.p[0], 
-            (struct gr_vecF3D_d *) &triRotatedZX.p[0], 
+            (struct gr_vecF3D_d *) &tri.p[0], 
+            (struct gr_vecF3D_d *) &triRotatedX.p[0], 
             (struct gr_mat4x4_d *) &matRotX);
         gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &triRotatedZ.p[1], 
-            (struct gr_vecF3D_d *) &triRotatedZX.p[1], 
+            (struct gr_vecF3D_d *) &tri.p[1], 
+            (struct gr_vecF3D_d *) &triRotatedX.p[1], 
             (struct gr_mat4x4_d *) &matRotX);
         gr_MultiplyMatrixVector(
-            (struct gr_vecF3D_d *) &triRotatedZ.p[2], 
-            (struct gr_vecF3D_d *) &triRotatedZX.p[2], 
+            (struct gr_vecF3D_d *) &tri.p[2], 
+            (struct gr_vecF3D_d *) &triRotatedX.p[2], 
             (struct gr_mat4x4_d *) &matRotX);
 
+        //-----------------------------    
+        // Rotate in Y-Axis
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedX.p[0], 
+            (struct gr_vecF3D_d *) &triRotatedXY.p[0], 
+            (struct gr_mat4x4_d *) &matRotY);
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedX.p[1], 
+            (struct gr_vecF3D_d *) &triRotatedXY.p[1], 
+            (struct gr_mat4x4_d *) &matRotY);
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedX.p[2], 
+            (struct gr_vecF3D_d *) &triRotatedXY.p[2], 
+            (struct gr_mat4x4_d *) &matRotY);
 
-        triRotatedZX.p[0].color = tri.p[0].color;
-        triRotatedZX.p[1].color = tri.p[1].color;
-        triRotatedZX.p[2].color = tri.p[2].color;
+        //-----------------------------    
+        // Rotate in Z-Axis
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedXY.p[0], 
+            (struct gr_vecF3D_d *) &triRotatedXYZ.p[0], 
+            (struct gr_mat4x4_d *) &matRotZ);
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedXY.p[1], 
+            (struct gr_vecF3D_d *) &triRotatedXYZ.p[1], 
+            (struct gr_mat4x4_d *) &matRotZ);
+        gr_MultiplyMatrixVector(
+            (struct gr_vecF3D_d *) &triRotatedXY.p[2], 
+            (struct gr_vecF3D_d *) &triRotatedXYZ.p[2], 
+            (struct gr_mat4x4_d *) &matRotZ);
+
+
+        triRotatedXYZ.p[0].color = tri.p[0].color;
+        triRotatedXYZ.p[1].color = tri.p[1].color;
+        triRotatedXYZ.p[2].color = tri.p[2].color;
 
 
         // Translate in z.
@@ -265,32 +299,32 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
             //wm_Update_TaskBar("hit",FALSE);
         }
 
-        triRotatedZX.p[0].z =
+        triRotatedXYZ.p[0].z =
             (float) (
-            triRotatedZX.p[0].z + 
+            triRotatedXYZ.p[0].z + 
             cube->model_initial_distance +
             cube->model_distance ); 
-        triRotatedZX.p[1].z = 
+        triRotatedXYZ.p[1].z = 
             (float) (
-            triRotatedZX.p[1].z + 
+            triRotatedXYZ.p[1].z + 
             cube->model_initial_distance +
             cube->model_distance ); 
 
-        triRotatedZX.p[2].z = 
+        triRotatedXYZ.p[2].z = 
             (float) (
-            triRotatedZX.p[2].z + 
+            triRotatedXYZ.p[2].z + 
             cube->model_initial_distance +
             cube->model_distance ); 
 
         // Translate in x.
         // left or right
 
-        triRotatedZX.p[0].x = 
-            (float) (triRotatedZX.p[0].x + cube->model_move); 
-        triRotatedZX.p[1].x = 
-            (float) (triRotatedZX.p[1].x + cube->model_move); 
-        triRotatedZX.p[2].x = 
-            (float) (triRotatedZX.p[2].x + cube->model_move); 
+        triRotatedXYZ.p[0].x = 
+            (float) (triRotatedXYZ.p[0].x + cube->model_move); 
+        triRotatedXYZ.p[1].x = 
+            (float) (triRotatedXYZ.p[1].x + cube->model_move); 
+        triRotatedXYZ.p[2].x = 
+            (float) (triRotatedXYZ.p[2].x + cube->model_move); 
 
 
         //----------------------------------------------------
@@ -299,13 +333,13 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
         struct gr_vecF3D_d line1; 
         struct gr_vecF3D_d line2;
 
-        line1.x = (float) triRotatedZX.p[1].x - triRotatedZX.p[0].x;
-        line1.y = (float) triRotatedZX.p[1].y - triRotatedZX.p[0].y;
-        line1.z = (float) triRotatedZX.p[1].z - triRotatedZX.p[0].z;
+        line1.x = (float) triRotatedXYZ.p[1].x - triRotatedXYZ.p[0].x;
+        line1.y = (float) triRotatedXYZ.p[1].y - triRotatedXYZ.p[0].y;
+        line1.z = (float) triRotatedXYZ.p[1].z - triRotatedXYZ.p[0].z;
 
-        line2.x = (float) triRotatedZX.p[2].x - triRotatedZX.p[0].x;
-        line2.y = (float) triRotatedZX.p[2].y - triRotatedZX.p[0].y;
-        line2.z = (float) triRotatedZX.p[2].z - triRotatedZX.p[0].z;
+        line2.x = (float) triRotatedXYZ.p[2].x - triRotatedXYZ.p[0].x;
+        line2.y = (float) triRotatedXYZ.p[2].y - triRotatedXYZ.p[0].y;
+        line2.z = (float) triRotatedXYZ.p[2].z - triRotatedXYZ.p[0].z;
 
         normal.x = (float) (line1.y * line2.z - line1.z * line2.y);
         normal.y = (float) (line1.z * line2.x - line1.x * line2.z);
@@ -331,9 +365,9 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
         if (CurrentCameraF.initialized == FALSE){ return; }
         float tmp = 
              (float) (
-             normal.x * (triRotatedZX.p[0].x - CurrentCameraF.position.x) + 
-             normal.y * (triRotatedZX.p[0].y - CurrentCameraF.position.y) +
-             normal.z * (triRotatedZX.p[0].z - CurrentCameraF.position.z) );
+             normal.x * (triRotatedXYZ.p[0].x - CurrentCameraF.position.x) + 
+             normal.y * (triRotatedXYZ.p[0].y - CurrentCameraF.position.y) +
+             normal.z * (triRotatedXYZ.p[0].z - CurrentCameraF.position.z) );
         if( (float) tmp <  0.0f){ cull=FALSE; }  //paint
         if( (float) tmp >= 0.0f){ cull=TRUE;  }  //do not paint
         //----------------------------------------------------
@@ -348,7 +382,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
             if (cull==FALSE){
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
-                    (struct gr_triangleF3D_d *) &triRotatedZX,
+                    (struct gr_triangleF3D_d *) &triRotatedXYZ,
                     fill_triangle ); 
             }
         }

@@ -180,15 +180,21 @@ grBackbufferDrawHorizontalLine (
     unsigned long __x1 = (unsigned long) x1;
     unsigned long __x2 = (unsigned long) x2;
     unsigned long __y  = (unsigned long) y;
-
     unsigned long rop=0;
 
-  
+    //if (__x1<0){
+    //    __x1=0;
+    //}
+
+    //if (y<0){
+    //    y=0;
+    //}
+
+
     if (__x1 > __x2){
         debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
         return -1;
     }
-
 
 // #todo:
 // Limit given by the device context.

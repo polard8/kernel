@@ -811,8 +811,12 @@ grEllipse3 (
 void noraDrawingStuff(void);
 void noraDrawingStuff3(int x, int y, int z);
 
+struct gr_vecF3D_d *grVectorCrossProduct(
+    struct gr_vecF3D_d *v1, 
+    struct gr_vecF3D_d *v2 );
 
-int scalar_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 );
+float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 );
+int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 );
 
 int gr_discriminant_int(int a, int b, int c);
 
