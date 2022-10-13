@@ -2267,6 +2267,88 @@ off_t tell(int fildes)
 }
 
 
+/*
+// #crecits: templeos.
+// Not tested.
+int FSize(FILE *f);
+int FSize(FILE *f)
+{
+    int res=0;
+    int original=0; 
+    
+    original = ftell(f);
+    fseek(f,0,SEEK_END);
+    res=ftell(f);
+    fseek(f,original,SEEK_SET);
+
+    return (int) res;
+}
+*/
+
+/*
+// #crecits: templeos.
+// Not tested.
+int Bt(int bit_num, char *bit_field);
+int Bt(int bit_num, char *bit_field)
+{
+    bit_field += bit_num>>3;
+    bit_num &= 7;
+    
+    return (*bit_field & (1<<bit_num)) ? 1 : 0;
+}
+*/
+
+/*
+// #crecits: templeos.
+// Not tested.
+int Bts(int bit_num, char *bit_field);
+int Bts(int bit_num, char *bit_field)
+{
+    int res=0;
+    
+    bit_field += bit_num>>3;
+    bit_num &= 7;
+    res = *bit_field & (1<<bit_num);
+    *bit_field |= (1<<bit_num);
+
+    return (res) ? 1 : 0;
+}
+*/
+
+/*
+// #crecits: templeos.
+// Not tested.
+int BFieldExtDWORD(char *src, int pos, int bits);
+int BFieldExtDWORD(char *src, int pos, int bits)
+{
+  int i=0;
+  int res=0;
+
+    for (i=0; i<bits; i++)
+    {
+        if (Bt(pos+i,src)){
+            Bts(i,(BYTE *)&res);
+        }
+    };
+
+    return (int) res;
+}
+*/
+
+
+/*
+I64 HasLower(U8 *src);
+I64 HasLower(U8 *src)
+{
+    I64 ch;
+    while (ch = *src++)
+        if ('a' <= ch <= 'z')
+            return TRUE;
+    return FALSE;
+}
+*/
+
+
 int access(const char *pathname, int mode)
 {
     debug_print ("access: [TODO]\n");

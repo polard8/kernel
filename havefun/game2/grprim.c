@@ -1181,6 +1181,44 @@ grPlot2D (
     return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
 }
 
+/*
+//#credits: templeos
+//this rotine is cool
+BOOL GrBlot(CDC *dc,int x,int y,CDC *img);
+BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
+{
+    int j,k,k1,w1,h1,w2,h2;
+  if (x<0)
+    w1=-x;
+  else
+    w1=0;
+  if (y<0)
+    h1=-y;
+  else
+    h1=0;
+  w2=img->width;
+  h2=img->height;
+  if (x+w2>dc->width)
+    w2=dc->width-x;
+  if (y+h2>dc->height)
+    h2=dc->height-y;
+  if (w1<w2 && w2<=img->width && h1<h2 && h2<=img->height) {
+    k = h1   *img ->width_internal+w1;
+    k1=(h1+y)*dc->width_internal+x+w1;
+    for (j=h1;j<h2;j++) 
+    {
+        memcpy(
+            dc->body+k1,
+            img->body+k,
+            w2-w1);
+        k +=img->width_internal;
+        k1+=dc->width_internal;
+    }
+    return TRUE;
+  } else
+    return FALSE;
+}
+*/
 
 
 /*
