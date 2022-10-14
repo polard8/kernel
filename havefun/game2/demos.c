@@ -345,7 +345,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
         normal.y = (float) (line1.z * line2.x - line1.x * line2.z);
         normal.z = (float) (line1.x * line2.y - line1.y * line2.x);
 
-        // It's normally normal to normalise the normal
+        // It's normally normal to normalise the normal.
         float l = 
             (float) sqrt( (double)
                         ( normal.x*normal.x + 
@@ -376,10 +376,23 @@ static void drawFlyingCube(struct cube_model_d *cube, float fElapsedTime)
         // to use the rasterization features.
         // #test: Testing rasterization.
         // #todo: Return the number of changed pixels.
+        // Nesse momento os valores dos vetores ainda não
+        // estão grandes o bastante para usarmos
+        // uma rotina 2D de rasterização.
+        // Isso será feito pela rotina de contrução de triangulos.
         int fill_triangle = TRUE;
         if ( (void*) __root_window != NULL )
         {
-            if (cull==FALSE){
+            if (cull==FALSE)
+            {
+                // The 'image space'.
+                // Our image space is not 1:1:1
+                // It's something like 2:2:1000
+                // No z normalization
+                // #bugbug
+                // We have a scale factor do x and y.
+                // But we do not have a scale factor for z.
+                // So, z can be any vallur between 0.01f and 1000.0f.
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
                     (struct gr_triangleF3D_d *) &triRotatedXYZ,
