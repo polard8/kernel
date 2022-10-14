@@ -83,11 +83,8 @@ grBackBufferPutpixel (
     int y,
     unsigned long rop )
 {
-    if(x<0)
-        return -1;
-    if(y<0)
-        return -1;
-
+    if (x<0){ return -1; }
+    if (y<0){ return -1; }
     // IN: color, x, y, rop, target buffer.
     return (int) fb_BackBufferPutpixel( 
                      color, x, y, rop, 
@@ -108,7 +105,6 @@ grBackBufferPutpixel2 (
 {
     if (x<0){ return -1; }
     if (y<0){ return -1; }
-
 // Service number 6.
     return (int) gramado_system_call ( 6, color, x, y );
 }
@@ -118,33 +114,25 @@ grBackBufferPutpixel2 (
  * fb_BackBufferPutpixel:
  *     Put pixel in the device screen.
  */
-
 // #??
 // Usando o endereço virtual do backbuffer
 // Será que está mapeado ???
 // Está em ring 3 ??? ou ring 0???
-
 // Pinta um pixel no backbuffer.
 // O buffer tem o tamanho da janela do dispositivo.
 // A origem está em top/left.
-
 // #bugbug
 // #todo
 // Precismos considerar o limite do backbuffer.
 // Então teremos um Offset máximo.
-
 // #todo
 // Check some flags, just like rasterizations.
 // We will need a lot of parameters in this kind of function
 // Including the address of the backbuffer.
-
-
 // Clipping against the device limits
-
 // #todo
 // rop_flags   ... raster operations
 // See the same routine in the kernel side.
-
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).
 
@@ -182,7 +170,6 @@ fb_BackBufferPutpixel (
     // raster operation. rasterization.
     // unsigned long rop;
 
-
 // 2MB limit
 // Our buffer size.
 // 2mb is the limit for 64bit full pagetable.
@@ -190,7 +177,6 @@ fb_BackBufferPutpixel (
 //MaxOffset = (int) (1024*10124*4);
 //MaxOffset = (int) 0x00400000;
     MaxOffset = (int) 0x00200000;
-
 
     char b, g, r, a;
     b = (color & 0xFF);
@@ -201,11 +187,7 @@ fb_BackBufferPutpixel (
     // 3 = 24 bpp
     int bytes_count=0;
 
-
-//
 // Clipping
-//
-
 // Clipping against the device limits
 
     if (x<0){ goto fail; }
@@ -213,15 +195,11 @@ fb_BackBufferPutpixel (
     if ( x >= deviceWidth ) { goto fail; }
     if ( y >= deviceHeight ){ goto fail; }
 
-
 // Purify
     x = ( x & 0xFFFF);
     y = ( y & 0xFFFF);
 
-//
 // bpp
-//
-
 // #danger
 // Esse valor foi herdado do bootloader.
 
@@ -241,14 +219,16 @@ fb_BackBufferPutpixel (
 
     //width = (int) libgd_SavedX; 
 
-
 // unsigned long
 // Nao pode ser maior que 2MB.
 // Que eh o tamanho do buffer que temos ate agora.
     unsigned long pitch=0; 
 
-    if (bytes_count!=3 && bytes_count!=4 )
+    if ( bytes_count != 3 && 
+         bytes_count != 4 )
+    {
         return -1;
+    }
 
     if (bytes_count==3)
     {
@@ -284,17 +264,21 @@ fb_BackBufferPutpixel (
     // #todo
     // Para não termos problemas com o offset, temos que checar
     // os limites de x e y.
-//
-// Backbuffer limit
-//
 
+// Backbuffer limit
 // #bugbug
 // Escrever fora do backbuffer pode gerar PF.
-
 // #todo
 // The rop_flags will give us some informations.
 // the lsb is the operation code.
 // See the same routine in the kernel side.
+
+
+
+// #todo:
+// rop operations 
+// Copy the same already did before in other parts
+// of the system.
 
 
 /*

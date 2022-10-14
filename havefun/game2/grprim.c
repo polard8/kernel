@@ -177,18 +177,13 @@ grInitializeProjection(
     matProj.m[2][3] = (float) 1.0f;
     matProj.m[3][3] = (float) 0.0f;
 
-
     CurrentProjectionF.initialized = TRUE;
 
     return 0;
 }
 
 
-
-
-    
 // =============================
-
 /*
  * grInit:
  *     Initialize the 3d support.
@@ -209,8 +204,8 @@ int grInit (void)
 
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
-        gwssrv_debug_print ("grInit: [FAIL] w h\n");
-        printf             ("grInit: [FAIL] w h\n");
+        gwssrv_debug_print ("grInit: w h\n");
+        printf             ("grInit: w h\n");
         exit(1);
     }
 
@@ -222,15 +217,9 @@ int grInit (void)
     HotSpotX = (deviceWidth>>1);
     HotSpotY = (deviceHeight>>1);
 
-
-
 // == Projection =========
 // Initialize the current projection.
 // Change the view for the current projection.
-
-    gwssrv_debug_print ("grInit: projection\n");
-
-
 // #test
 // Initialize projection matrix. 
 // Using float.
@@ -249,7 +238,6 @@ int grInit (void)
     // Changing the view for the current projection.
     gr_depth_range(CurrentProjection,0,40);
 
-
 // == world
     world_initialize();
 
@@ -258,7 +246,7 @@ int grInit (void)
 // Change some attributes for the current camera.
 // The projection is a field in the camera's structure.
 
-    gwssrv_debug_print ("grInit: camera\n");
+    //gwssrv_debug_print ("grInit: camera\n");
     camera_initialize();
     cameraF_initialize();
     
@@ -274,7 +262,7 @@ int grInit (void)
 
     // ...
 
-    gwssrv_debug_print ("grInit: done\n");
+    //gwssrv_debug_print ("grInit: done\n");
     return 0;
 }
 
@@ -512,7 +500,6 @@ unveil_camera(
        if(__demo_window->magic==1234)
         ow = __demo_window;
     }
-
 
     struct gr_ray_d r;
 
@@ -1182,52 +1169,11 @@ grPlot2D (
     return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
 }
 
-/*
-//#credits: templeos
-//this rotine is cool
-BOOL GrBlot(CDC *dc,int x,int y,CDC *img);
-BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
-{
-    int j,k,k1,w1,h1,w2,h2;
-  if (x<0)
-    w1=-x;
-  else
-    w1=0;
-  if (y<0)
-    h1=-y;
-  else
-    h1=0;
-  w2=img->width;
-  h2=img->height;
-  if (x+w2>dc->width)
-    w2=dc->width-x;
-  if (y+h2>dc->height)
-    h2=dc->height-y;
-  if (w1<w2 && w2<=img->width && h1<h2 && h2<=img->height) {
-    k = h1   *img ->width_internal+w1;
-    k1=(h1+y)*dc->width_internal+x+w1;
-    for (j=h1;j<h2;j++) 
-    {
-        memcpy(
-            dc->body+k1,
-            img->body+k,
-            w2-w1);
-        k +=img->width_internal;
-        k1+=dc->width_internal;
-    }
-    return TRUE;
-  } else
-    return FALSE;
-}
-*/
-
 
 /*
- ******************************* 
  * grPlot0:
  *      plot pixel.
  *      Viewport Transformation.
- * 
  *      Low level routine.
  *      Origin at center of the device screen. 
  *      #todo: Plot into a 'normalized' 2d rater screen. 
@@ -1236,14 +1182,11 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
  * History:
  *      2020 - Created by Fred Nora.
  */
-
 // Ortographic view volume.
-
 // Transformation:
 // Estamos tranformando de um 'object space' com origem 
 // no centro da tela para um viewport que ocupa a tela toda, 
 // com origem no canto superior esquerdo.
-
 // left hand orientation
 // z+ on top/right corner.
 // We use:
@@ -1251,18 +1194,14 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
 // LHS is clockwise (CW).
 // Same as Microsoft Direct3D.
 // See: https://en.wikipedia.org/wiki/Direct3D
-
 // window ?
 // Essa rotina pode pintar em qualquer posição 
 // da tela do dispositivo. 
 // Com origem no centro da tela.
-
 // Aceitamos valores negativos e positivos.
 // O limite máximo será modular.
-
 // 3D fullscreen, origin in center.
 // ==================================================
-//
 // O 'object space' esta no centro da tela. (0,0,0). 
 // Essa rotina plota o pixel considerando o viewport com 
 // a origem no canto superior esquerdo da tela. (0,0).
@@ -1272,7 +1211,6 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
 // Por enquanto tanto o 'object space' quanto o 'world space'
 // estão no centro da tela, em (0,0,0), e o viewport
 // é o proprio raster que compreende a tela toda.
-
 // Screen Coordinate System - 
 // This 2D coordinate system refers to the physical coordinates 
 // of the pixels on the computer screen, based on 
@@ -1285,36 +1223,27 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
 // within a single screen window.
 // See:
 // https://www.cs.uic.edu/~jbell/CourseNotes/ComputerGraphics/Coordinates.html
-//
-
-
 // #important
 // The main goal here is transforming
 // the ortographic view volume into
 // a canonical view volume, without 
 // using matrices operations.
 // See: https://www.youtube.com/watch?v=U0_ONQQ5ZNM
-
-
 // #todo
 // Qual dc estamos usando.
 // Se os argumentos não indicarem um, então devemos usar
 // o dc default.
-
 // #todo
 // Devemos interagir com as rotinas de janela
 // e transformarmos tudo em uma coisa só.
 // E as rotinas de janela são rotinas 2d,
 // mas pode levar em conta apenas o dc padrão
 // ou outro destinado a pintar em lugares especificos.
-
 // #bugbug
 // Não sei se essa coisa da transformação está certa,
 // mas é divertido.
 // O z-buffer no dc ou na janela vai nos ajudar a decidirmos
 // se devemos ou não pintar o pixel, para economizarmos pixels.
-
-
 // #
 // Not standard ortographic projection.
 // Once the camera is positioned and oriented, 
@@ -1329,7 +1258,6 @@ BOOL GrBlot(CDC *dc,int x,int y,CDC *img)
 // of the scene and cannot be seen.
 // see:
 // https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_BasicsTheory.html
-
 // IN:
 // clipping window near: Near window.
 // clipping window far: Far window.
@@ -1356,6 +1284,7 @@ grPlot0 (
     // Final 2D screen coordenates.
     int X=0;
     int Y=0;
+    unsigned long rop = 0;  //#todo
 
     // Draw flag.
     int Draw = TRUE;
@@ -1367,15 +1296,14 @@ grPlot0 (
     struct gws_window_d *w;
     int UseClipping = FALSE;
 
+    int hotspotx=0;
+    int hotspoty=0;
 
     int UseLeftHand = gUseLeftHand;
     //UseLeftHand = TRUE;   //LEFT HAND
     //UseLeftHand = FALSE;  //RIGHT HAND
 
-//
 // Device screen structure
-//
-
 // See: screen.h
 
     // #debug
@@ -1392,7 +1320,6 @@ grPlot0 (
 //gui->screen
 
 
-
 //-------------------------------------
 // tmp: zNear zFar
 // Clipping z
@@ -1400,8 +1327,8 @@ grPlot0 (
 // 'CurrentCamera->CurrentProjection'
 // Clipping into the projection field.
 
-     int zNear =  0; 
-     int zFar  =  80;
+     int zNear = 0; 
+     int zFar  = 80;
 
      if ( (void*) CurrentProjection != NULL )
      {
@@ -1422,29 +1349,23 @@ grPlot0 (
 // We need a z-buffer or (depth buffer)
 // it is used to depth testing.
 // it discards some unnecessary covered plots. 
-    
 // Normalized Device Coordinates (NDC)
 // We are using or own ndc style.
 // Maybe it is different for diferent systems.
-    
 //      +y  +z
 // -x   +   +x
 // -z   -y
-    
 // We use:
 // Left-hand System (LHS) 
 // LHS is clockwise (CW).
 // Same as Microsoft Direct3D.
 // See: https://en.wikipedia.org/wiki/Direct3D
-    
 // Another way is:
 // Right-Hand Coordinate System (RHS).
 // RHS is counter-clockwise (CCW).
 
-//
-// The clipping window.
-//
 
+// The clipping window.
 // #todo
 // If the clipping window is invalid, 
 // so we're gonna use the root window.
@@ -1452,12 +1373,9 @@ grPlot0 (
 // Maybe we need to use the device context structure,
 // or something like that.
 
-    //#test: dangeours
-    //clipping_window = __root_window;
-
     if ( (void*) clipping_window != NULL )
     {
-        if ( clipping_window->used  == TRUE && 
+        if ( clipping_window->used == TRUE && 
              clipping_window->magic == 1234 )
         {
             UseClipping = TRUE;
@@ -1480,28 +1398,28 @@ grPlot0 (
     // o hotspot da tela.
     if (UseClipping==FALSE)
     {
-       // # O z é inclinado.
-        __transform_from_viewspace_to_screespace( 
-            (int *) &X, (int *) &Y, 
-            x, y, z,
-            UseLeftHand,
-            HotSpotX, HotSpotY ); 
+       hotspotx = HotSpotX;
+       hotspoty = HotSpotY;
     }
 
     // Se temos uma clipping window válida,
     // então usamos o hot spot dela.
+    //#todo: precisamos de variaveis de hotspot dentro da estrutura
+    // de janela ... o hotspot não fica no centro da janela
+    // e sim no centro da área de cliente da janela.
+    // o dc atual deve ser a área de cliente da janela.
     if (UseClipping==TRUE)
     {
-        //#todo: precisamos de variaveis de hotspot dentro da estrutura
-        // de janela ... o hotspot não fica no centro da janela
-        // e sim no centro da área de cliente da janela.
-        // o dc atual deve ser a área de cliente da janela.
-        __transform_from_viewspace_to_screespace( 
-            (int *) &X, (int *) &Y, x, y, z,
-            UseLeftHand,
-            w->left + (w->width /2), 
-            w->top  + (w->height /2) ); 
+        hotspotx = w->left + (w->width /2);
+        hotspoty = w->top  + (w->height /2);
     }
+
+// transform
+    __transform_from_viewspace_to_screespace( 
+        (int *) &X, (int *) &Y, 
+        x, y, z,
+        UseLeftHand,
+        hotspotx, hotspoty ); 
 
 
 // Draw and clipping.
@@ -1509,8 +1427,9 @@ grPlot0 (
 // Talvez possamos retornar '0'
 // se a flag indicar que não precisava desenhar.
 
-    if (Draw != TRUE)
+    if (Draw != TRUE){
         return -1;
+    }
 
 // #todo: 
 // We need to check the window limits
@@ -1523,7 +1442,6 @@ grPlot0 (
 
     if (X<0){ return -1; }
     if (Y<0){ return -1; }
-
 
 // fake depth buffer:
 
@@ -1565,29 +1483,28 @@ grPlot0 (
         // Plot pixel into the raster.
         // The origin is top/left of the viewport. (0,0).
         // IN: color, x, y, rop
-        if ( UseClipping == FALSE )
-        {
-            // #todo
-            // O rop pode vir do dc.
-            grBackBufferPutpixel( (unsigned int) color, X, Y, 0 ); 
-            return 0;
+        // #todo
+        // O rop pode vir do dc.
+        if (UseClipping == FALSE){
+            return (int) grBackBufferPutpixel( 
+                             (unsigned int) color, X, Y, rop );
         }
 
         // Se temos uma janela válida.
         // Plot pixel into the raster.
         // The origin is top/left of the viewport. (0,0).
         // IN: color, x, y, rop
-        if ( UseClipping == TRUE )
+        // #todo
+        // O rop pode vir do dc.
+        // Esta dentro da janela.
+        if (UseClipping == TRUE)
         {
-            // Esta dentro da janela.
             if ( X >= w->left && X <= w->right &&
                  Y >= w->top  && Y <= w->bottom )
-                 {
-                     // #todo
-                     // O rop pode vir do dc.
-                     grBackBufferPutpixel((unsigned int) color, X, Y, 0 ); 
-                     return 0;
-                 }
+            {
+                return (int) grBackBufferPutpixel(
+                                (unsigned int) color, X, Y, rop ); 
+            }
         }
 
         // #todo
@@ -1598,7 +1515,7 @@ grPlot0 (
         //    depth_buffer[ offset ] = Z;
         //}
             
-        return 0;
+        return 0; //#todo '-1'
     }
 
 // Fail 
@@ -1610,9 +1527,7 @@ grPlot0 (
 int 
 grPlot1 ( 
     struct gws_window_d *clipping_window,   
-    int x, 
-    int y, 
-    int z, 
+    int x, int y, int z, 
     unsigned int color,
     unsigned long flags )
 {
@@ -1630,8 +1545,8 @@ grPlot1 (
     int fNoZBuffer = FALSE;
     // ...
 
-    // No graphics effects;
-    if ( flags == 0 )
+// No graphics effects
+    if (flags == 0)
     {
         xValue = x;
         yValue = y;
@@ -1668,43 +1583,35 @@ PlotPixel:
 
 // #todo
 // See: gwsProcedure(), service 2040 in main.c
-
-int serviceGrPlot0 (void){
-
+int serviceGrPlot0(void)
+{
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-
     unsigned long x=0;
     unsigned long y=0;
     unsigned long z=0;
-    unsigned long color=0;
+    unsigned int color=COLOR_PINK;
 
-    gwssrv_debug_print("serviceGrPlot0: [TODO] \n");
+    //gwssrv_debug_print("serviceGrPlot0: [TODO] \n");
 
-
-    // =================================
-    
-    // Arguments:
-    // Sempre começa do 10 para rotinas 3D.
+// =================================
+// Arguments:
+// Sempre começa do 10 para rotinas 3D.
     
     x      = message_address[10];
     y      = message_address[11];
     z      = message_address[12]; 
     color  = message_address[13];
-    
-    
-    // =================================
+// =================================
 
-
-    // #todo:
-    // pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
-    // Acho que esse serviço nao retorna uma mensagem ao cliente.
+// #todo:
+// pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
+// Acho que esse serviço nao retorna uma mensagem ao cliente.
     
-    grPlot0 ( NULL, (int) z, (int) x, (int) y, (unsigned long) color );
-
-    return 0;
+    return (int) grPlot0( 
+                     NULL, 
+                     (int) z, (int) x, (int) y, 
+                     (unsigned int) color );
 }
-
-
 
 
 /*
@@ -1713,23 +1620,22 @@ void plotLine(int x0, int y0, int x1, int y1)
 {
     int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
     int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1;
-    int err = dx+dy, e2;                                  // error value e_xy 
+    int err = dx+dy, e2;                       // error value e_xy 
 
-    for (;;) {                                                  // loop 
+    for (;;) {                                 // loop 
         setPixel(x0,y0);
         e2 = 2*err;
-        if (e2 >= dy) {                                       // e_xy+e_x > 0
+        if (e2 >= dy) {                        // e_xy+e_x > 0
             if (x0 == x1) break;
             err += dy; x0 += sx;
         }
-        if (e2 <= dx) {                                // e_xy+e_y < 0 
+        if (e2 <= dx) {                        // e_xy+e_y < 0 
             if (y0 == y1) break;
             err += dx; y0 += sy;
         }
     }
 }
 */
-
 
 
 /*
@@ -1746,26 +1652,24 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color )
 {
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1;
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1;
 
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
-   //#bugbug: This macro is wrong?!
-   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
+/* maximum difference */
+    int dm = grMAX3(dx,dy,dz);
+    register int i = dm;
 
-    // x1 = y1 = z1 = dm/2; /* error offset */
- 
+/* error offset */
+    // x1 = y1 = z1 = dm/2; 
+
     x1 = (dm >> 1);
     y1 = x1;
     z1 = x1;
 
-    for (;;) {
-
-        grPlot0 ( window, z0, x0, y0, color );
+    for (;;)
+    {
+        grPlot0( window, z0, x0, y0, color );
      
         if (i-- == 0) { break; }
         
@@ -1793,19 +1697,17 @@ plotLine3d2 (
     int x1, int y1, int z1, unsigned long color2, 
     int flag )
 {
-
     int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
     int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
     int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
-    //#bugbug: This macro is wrong?!
-    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
+
+/* maximum difference */
     int dm = grMAX3(dx,dy,dz);
     register int i = dm;
-   
-    // x1 = y1 = z1 = dm/2; /* error offset */
- 
+
+/* error offset */
+    // x1 = y1 = z1 = dm/2; 
+
     x1 = (dm >> 1);
     y1 = x1;
     z1 = x1;
@@ -1815,17 +1717,15 @@ plotLine3d2 (
 
     flag=0;
 
-
-//
 // Loop 
-//
 
-    for (;;) {  
-
+    for (;;)
+    {
         grPlot0 ( NULL, z0, x0, y0, color1 );
-        //grPlot0 ( NULL, z0, x0, y0, color2 );
       
-        if (i-- == 0) break;
+        if (i-- == 0){ 
+            break;
+        }
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
         y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
         z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
@@ -1897,11 +1797,6 @@ plotLine3dLT2 (
     return (int) ResultNumberOfVectors;
 }
 
-
-
-
-
-
 // IN:
 // The upper-left corner
 // lower-right corner. 
@@ -1952,8 +1847,9 @@ void drawRectangleF(struct gr_rectangleF3D_d *rectangle)
     // 'int' values
     struct gr_rectangle_d r;
 
-    if((void*)rectangle==NULL)
+    if ((void*)rectangle==NULL){
         return;
+    }
 
 //
 // parameters
@@ -2352,70 +2248,88 @@ fillTriangle0(
     int x3, int y3, 
     unsigned int c)
 {
-	int t1x,t2x,y,minx,maxx,t1xp,t2xp;
+    int t1x=0;
+    int t2x=0;
+    int y=0;
+    int minx=0;
+    int maxx=0;
+    int t1xp=0;
+    int t2xp=0;
     int changed1 = FALSE;
     int changed2 = FALSE;
-	int signx1,signx2,dx1,dy1,dx2,dy2;
-	int e1, e2;
+    int signx1=0;
+    int signx2=0;
+    int dx1=0;
+    int dy1=0;
+    int dx2=0;
+    int dy2=0;
+    int e1=0; 
+    int e2=0;
 
 // Sort vertices
-	if (y1>y2) { ____SWAP(y1,y2); ____SWAP(x1,x2); }
-	if (y1>y3) { ____SWAP(y1,y3); ____SWAP(x1,x3); }
-	if (y2>y3) { ____SWAP(y2,y3); ____SWAP(x2,x3); }
+    if (y1>y2) { ____SWAP(y1,y2); ____SWAP(x1,x2); }
+    if (y1>y3) { ____SWAP(y1,y3); ____SWAP(x1,x3); }
+    if (y2>y3) { ____SWAP(y2,y3); ____SWAP(x2,x3); }
 
-	t1x=t2x=x1; y=y1;   // Starting points
+// Starting points
+    t1x = t2x = x1; 
+    y=y1; 
 
-	dx1 = (int)(x2 - x1);
-	if(dx1<0) { dx1=-dx1; signx1=-1; } else { signx1=1; }
-	dy1 = (int)(y2 - y1);
+    dx1 = (int)(x2 - x1);
+    if(dx1<0) { dx1=-dx1; signx1=-1; } else { signx1=1; }
+    dy1 = (int)(y2 - y1);
  
-	dx2 = (int)(x3 - x1); 
-	if(dx2<0) { dx2=-dx2; signx2=-1; } else { signx2=1; }
-	dy2 = (int)(y3 - y1);
-	
-	if (dy1 > dx1) {   // swap values
-        ____SWAP(dx1,dy1);
-		changed1 = TRUE;
-	}
-	if (dy2 > dx2) {   // swap values
-        ____SWAP(dy2,dx2);
-		changed2 = TRUE;
-	}
+    dx2 = (int)(x3 - x1); 
+    if(dx2<0) { dx2=-dx2; signx2=-1; } else { signx2=1; }
+    dy2 = (int)(y3 - y1);
 
-	e2 = (int)(dx2>>1);
-    // Flat top, just process the second half
-    if(y1==y2)
+// swap values
+    if (dy1 > dx1){  ____SWAP(dx1,dy1);  changed1 = TRUE;  }
+    if (dy2 > dx2){  ____SWAP(dy2,dx2);  changed2 = TRUE;  }
+
+    e2 = (int)(dx2>>1);
+
+// Flat top, just process the second half.
+    if (y1==y2){
         goto next;
+    }
+    
     e1 = (int)(dx1>>1);
 
-    int i=0;
+    register int i=0;
     for (i=0; i<dx1;)
     {
-		t1xp=0; t2xp=0;
-		if(t1x<t2x) { minx=t1x; maxx=t2x; }
-		else		{ minx=t2x; maxx=t1x; }
-        // process first line until y value is about to change
-		while(i<dx1) 
+        t1xp=0; t2xp=0;
+        if(t1x<t2x) { minx=t1x; maxx=t2x; }
+        else        { minx=t2x; maxx=t1x; }
+
+        // Process first line until 
+        // y value is about to change.
+        while (i<dx1) 
+        {
+            i++;
+            e1 += dy1;
+            while (e1 >= dx1) 
+            {
+                e1 -= dx1;
+                if (changed1) 
+                    t1xp=signx1;//t1x += signx1;
+                else 
+                    goto next1;
+            };
+
+            if (changed1) 
+                break;
+            else 
+                t1x += signx1;
+        };
+
+    // Move line
+    next1:
+        // Process second line 
+        // until y value is about to change
+		while (1)
 		{
-			i++;			
-			e1 += dy1;
-	   	   	while (e1 >= dx1) 
-	   	   	{
-				e1 -= dx1;
-   	   	   	    if (changed1) 
-   	   	   	        t1xp=signx1;//t1x += signx1;
-				else 
-				    goto next1;
-			}
-			if (changed1) 
-			    break;
-			else 
-			    t1x += signx1;
-		}
-	// Move line
-	next1:
-        // process second line until y value is about to change
-		while (1) {
 			e2 += dy2;		
 			while (e2 >= dx2) {
 				e2 -= dx2;
@@ -2424,68 +2338,82 @@ fillTriangle0(
 			}
 			if (changed2)     break;
 			else              t2x += signx2;
-		}
-	next2:
-		if(minx>t1x) minx=t1x; if(minx>t2x) minx=t2x;
-		if(maxx<t1x) maxx=t1x; if(maxx<t2x) maxx=t2x;
+		};
 
-	   	// Draw line from min to max points found on the y
-	   	//lcd_hline(minx, maxx, y);    
+    next2:
+        
+        if(minx>t1x) minx=t1x; 
+        if(minx>t2x) minx=t2x;
+        
+        if(maxx<t1x) maxx=t1x; 
+        if(maxx<t2x) maxx=t2x;
+
+        // Draw line from min to max points found on the y
         grBackbufferDrawHorizontalLine(minx,y,maxx,c);
-        //plotLine3d (
-        //    NULL,
-        //    (minx & 0xFF), (y & 0xFF) , 0, 
-        //    (maxx & 0xFF), (y & 0xFF), 0, 
-        //    c);
-		
-		// Now increase y
-		if(!changed1) t1x += signx1;
-		t1x+=t1xp;
-		if(!changed2) t2x += signx2;
-		t2x+=t2xp;
-    	y += 1;
-		if(y==y2) break;
-		
+
+        // Now increase y
+        if(!changed1){ t1x += signx1; }
+        t1x += t1xp;
+        if(!changed2){ t2x += signx2; }
+        t2x+=t2xp;
+        
+        y += 1;
+        
+        if(y==y2)
+            break;
     };
-    
+
+// --------------------------------------------
+// Second half
+
     next:
-	// Second half
-	dx1 = (int)(x3 - x2); 
-	if(dx1<0) { dx1=-dx1; signx1=-1; } else { signx1=1; }
-	dy1 = (int)(y3 - y2);
-	t1x=x2;
- 
-	if (dy1 > dx1) {   // swap values
+
+    dx1 = (int)(x3 - x2); 
+    if(dx1<0){ 
+        dx1=-dx1; 
+        signx1=-1; 
+    }else{ 
+        signx1=1; 
+    }
+    
+    dy1 = (int)(y3 - y2);
+    t1x=x2;
+
+// swap values
+    if (dy1 > dx1){
         ____SWAP(dy1,dx1);
-		changed1 = TRUE;
-	}else{ 
-	    changed1=FALSE;
-	}
-	
-	e1 = (int)(dx1>>1);
+        changed1 = TRUE;
+    }else{ 
+        changed1=FALSE;
+    }
 
+    e1 = (int)(dx1>>1);
 
-    int ii=0;
+    register int ii=0;
     for (ii = 0; ii<=dx1; ii++)
     {
 		t1xp=0; t2xp=0;
 		if(t1x<t2x) { minx=t1x; maxx=t2x; }
 		else		{ minx=t2x; maxx=t1x; }
 	    // process first line until y value is about to change
-		while(ii<dx1) {
-    		e1 += dy1;
-	   	   	while (e1 >= dx1) {
-				e1 -= dx1;
-   	   	   	   	if (changed1) { t1xp=signx1; break; }//t1x += signx1;
-				else          goto next3;
-			}
+        while(ii<dx1)
+        {
+            e1 += dy1;
+            while (e1 >= dx1)
+            {
+                e1 -= dx1;
+                if (changed1) { t1xp=signx1; break; }//t1x += signx1;
+                else goto next3;
+            };
 			if (changed1) break;
-			else   	   	  t1x += signx1;
-			if(ii<dx1) ii++;
-		}
+			else t1x += signx1;
+            if(ii<dx1)
+                ii++;
+        };
 	next3:
         // process second line until y value is about to change
-		while (t2x!=x3) {
+        while (t2x!=x3) 
+        {
 			e2 += dy2;
 	   	   	while (e2 >= dx2) {
 				e2 -= dx2;
@@ -2494,28 +2422,26 @@ fillTriangle0(
 			}
 			if (changed2)     break;
 			else              t2x += signx2;
-		}	   	   
+        };   
 	next4:
 
-		if(minx>t1x) minx=t1x; if(minx>t2x) minx=t2x;
-		if(maxx<t1x) maxx=t1x; if(maxx<t2x) maxx=t2x;
+        if(minx>t1x) minx=t1x; 
+        if(minx>t2x) minx=t2x;
+
+        if(maxx<t1x) maxx=t1x; 
+        if(maxx<t2x) maxx=t2x;
 
         // Draw line from min to max points found on the y
-        //lcd_hline(minx, maxx, y);
         grBackbufferDrawHorizontalLine(minx,y,maxx,c);
-        //plotLine3d (
-        //    NULL,
-        //    (minx & 0xFF), (y & 0xFF) , 0, 
-        //    (maxx & 0xFF), (y & 0xFF), 0, 
-        //    c);
-            
-		// Now increase y
-		if(!changed1) t1x += signx1;
+
+        // Now increase y
+		if(!changed1) { t1x += signx1; }
 		t1x+=t1xp;
-		if(!changed2) t2x += signx2;
+		if(!changed2) { t2x += signx2; }
 		t2x+=t2xp;
-    	y += 1;
-		if(y>y3) return;
+        y += 1;
+        if(y>y3)
+            return;
     };
 }
 //-----------------
