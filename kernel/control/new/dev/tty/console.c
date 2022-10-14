@@ -1362,6 +1362,7 @@ static void __test_tty(void)
     printf("%c\n",data1[2]);
 }
 
+
 // Compare the strings that were
 // typed into the kernel virtual console.
 int consoleCompareStrings(void)
@@ -1380,6 +1381,13 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// dir:
+// List the files in a given directory.
+    if ( strncmp(prompt,"dir",3) == 0 )
+    { 
+        fsList("[");  // root dir. Same as '/'.
+        goto exit_cmp;
+    }
 
     if ( strncmp(prompt,"vga-cls",7) == 0 )
     { 

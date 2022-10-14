@@ -12,7 +12,6 @@
 extern unsigned long fs_buffers[FS_N_BUFFERS];
 
 
-
 // The dev/ directory entry.
 struct dev_dir_entry_d
 {
@@ -126,9 +125,6 @@ extern struct cwd_d  CWD;
 #define  FS_TYPE_EXT2   1005
 // No more types. 
 
-
-
-
 // short.
 //#define FS_I386_IMAGE  0x014C
 
@@ -164,7 +160,6 @@ extern int fat_cache_loaded;
 // See:
 // https://en.wikipedia.org/wiki/PATH_(variable)
 // ...
-
 // #importante
 // + Quando uma função para eecutar uma programa é chamada
 // o kernel deve tomar suas decisões sobre qual diretório
@@ -173,8 +168,6 @@ extern int fat_cache_loaded;
 // Então o kernel pode começar procurando em /BIN/ e /USER/BIN/.
 // O kernel só vai procurar no cwd se o pathname desejado começar
 // explicitamente com "./". 
-
-
 // Multics originated the idea of a search path. 
 // The early Unix shell only looked for program names in /bin, 
 // but by Version 3 Unix the directory was too large and /usr/bin, 
@@ -211,7 +204,6 @@ extern unsigned short file_cluster_list[1024];
  * History:
  *     2014 - Created by Fred Nora.
  */
-
 //suporte ao diretório alvo que desejamos acessar.
 //com base em um pathname passado via argumento.
 
@@ -260,9 +252,6 @@ struct softlink_d
 };
 
 
-
-
- 
 /*
  * dir_d:
  *     Estrutura para diretório de arquivo.
@@ -286,21 +275,15 @@ struct dir_d
 
 // número de bytes em uma entrada.
     int entry_size_in_bytes;
-
 // número total de bytes no diretório.
     int totalentries_size_in_bytes;
-
     int number_of_entries;
-
 // Númetro máximo de arquivos em um diretório.
     int fileMax;
-
 // Número total de arquivos presentes no diretório.
     int fileTotal;
-
 // Endereço onde o arquivo foi carregado.
     unsigned long address;
-
 // flag, se esta ou nao na memoria.
     int inMemory;
 
@@ -393,17 +376,16 @@ extern struct filesystem_d  *root;
 
 struct file_context_d
 {
-    //
-    // security
-    //
-    
+
+// security
+
     pid_t pid;
     uid_t uid;
     gid_t gid;
 
-    //
-    // storage
-    //
+//
+// storage
+//
 
     //#todo
     // Em que disco o arquivo esta.
@@ -482,8 +464,6 @@ int sys_sleep_if_socket_is_empty(int fd);
 
 // ========
 
-
-
 int get_free_slots_in_the_file_table(void);
 int get_free_slots_in_the_inode_table(void);
 
@@ -496,13 +476,10 @@ unsigned long fs_count_path_levels (unsigned char *path);
 void *get_file(int Index);
 void set_file( void *file, int Index);
 
-
 int fsInit (void);
 int fat16Init (void);
 void fs_init_structures (void);
 void fs_init_fat (void);
-
-// ==
 
 void file_close (file *_file);
 size_t file_get_len(file *_file);
@@ -548,20 +525,26 @@ fatLoadCluster (
     unsigned long sector, 
     unsigned long address, 
     unsigned long spc );
-    
-void fs_load_fat(unsigned long fat_address, unsigned long fat_lba, size_t fat_size);
+
+void 
+fs_load_fat(
+    unsigned long fat_address, 
+    unsigned long fat_lba, 
+    size_t fat_size );
 
 void 
 fs_load_metafile (
     unsigned long buffer, 
     unsigned long first_lba, 
     unsigned long size );
-    
-void fs_load_rootdir(unsigned long root_address, unsigned long root_lba, size_t root_size);
 
-// ====
+void 
+fs_load_rootdir(
+    unsigned long root_address, 
+    unsigned long root_lba, 
+    size_t root_size );
 
-void write_lba ( unsigned long address, unsigned long lba );
+void write_lba( unsigned long address, unsigned long lba );
 
 void 
 fatWriteCluster ( 
@@ -580,22 +563,20 @@ fs_save_rootdir (
     unsigned long root_address, 
     unsigned long root_lba, 
     size_t root_size );
-    
-// ===
 
 unsigned long 
 fsGetFileSize ( 
     unsigned char *file_name, 
     unsigned long dir_address );
 
-void fsUpdateWorkingDiretoryString ( char *string );
+void fsUpdateWorkingDiretoryString (char *string);
 void fs_fat16_cache_not_saved(void);
-void fs_fntos ( char *name );
-int fs_get_free_fd_from_pid (int pid);
-int fs_initialize_process_cwd ( int pid, char *string );
+void fs_fntos(char *name);
+int fs_get_free_fd_from_pid (pid_t pid);
+int fs_initialize_process_cwd ( pid_t pid, char *string );
+void fs_pathname_backup ( pid_t pid, int n );
+int fs_print_process_cwd (pid_t pid);
 
-void fs_pathname_backup ( int pid, int n );
-int fs_print_process_cwd (int pid);
 void fs_show_file_info (file *f);
 void fs_show_file_table(void);
 void fs_show_inode_info (struct inode_d *i);
@@ -603,16 +584,13 @@ void fs_show_inode_table(void);
 void fs_show_root_fs_info(void);
 void sys_pwd (void);
 
-
-// ======
-
 int 
 search_in_dir ( 
     const char *file_name, 
     unsigned long dir_address );
 
 int search_in_root ( const char *file_name );
-unsigned short fs_find_n_empty_entries ( int n );
+unsigned short fs_find_n_empty_entries(int n);
 
 int 
 findEmptyDirectoryEntry ( 
@@ -622,8 +600,6 @@ findEmptyDirectoryEntry (
 int fsSearchFile (const char *file_name);
 unsigned short fs_find_empty_entry ( char *fat_address );
 int search_path_in_the_inode_table( const char *path );
-
-// =====
 
 int
 fsSaveFile ( 
@@ -656,10 +632,7 @@ void set_global_open_file ( void *file, int Index );
 void *get_global_open_file (int Index);
 void sys_cd_command ( const char *string );
 
-
-//
 // From fsload.c
-//
 
 unsigned long 
 fsLoadFile ( 
@@ -684,8 +657,6 @@ fs_load_path (
 int fsLoadFileFromCurrentTargetDir (void);
 
 int fs_load_image( const char *filename, unsigned long image_va );
-
-// --------------
 
 #endif    
 

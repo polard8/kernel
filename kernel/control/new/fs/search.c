@@ -318,8 +318,9 @@ findEmptyDirectoryEntry (
 // The entry size is 32 bytes.
     for ( i=0; i<number_of_entries; i++ )
     {
-        if ( dir[j] == 0 ){ return (int) i; }
-
+        if ( dir[j] == 0 ){
+            return (int) i; 
+        }
         j = (j+32);
     };
 

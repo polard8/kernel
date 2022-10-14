@@ -60,36 +60,27 @@ int file_read_buffer ( file *f, char *buffer, int len )
 {
     char *p;
     int local_len=0;
-    
+
     p = buffer;
 
-    
 // #test
     local_len = (int) (len & 0xFFFF);
-
-//
-// Parameters validation
-//
 
 // Check file
     if ( (void *) f == NULL ){
         printf ("file_read_buffer: file\n");
         goto fail;
     }
-
 // Check buffer
     if ( (void *) p == NULL ){
         printf ("file_read_buffer: p\n");
         goto fail;
     }
-
 // Chech len
     if ( local_len > BUFSIZ ){
         printf ("file_read_buffer: local_len > BUFSIZ\n");
         goto fail;
     }
-
-//=======================================
 
     if ( f->used != TRUE || f->magic != 1234 )
     {
@@ -110,11 +101,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
     */
 
 //=======================================
-
-//
 // Copy!
-//
-
 // #todo
 // nao podemos ler mais que o limite do arquivo.
 // A próxima leitura precisa ser depois dessa.
@@ -2613,21 +2600,19 @@ void *get_file (int Index)
 }
 
 
-/*
- * set_file:
- *     Put the pointer in the list, given the index.
- */
-// na lista de arquivos do kernel.
+// set_file:
+// Put the pointer in the list, given the index.
+// Na lista de arquivos do kernel.
+
 void set_file ( void *file, int Index )
 {
-
     if (Index < 0){
         // ?? todo: message
         return;
     }
 
-	// #todo:
-	// Limite m�ximo da lista.
+// #todo:
+// Limite máximo da lista.
 
 	// Structure.
 
@@ -2949,7 +2934,7 @@ int fat16Init (void)
     fs_init_fat();
 
 // done
-    debug_print ("fat16Init: done\n");
+    //debug_print ("fat16Init: done\n");
     return 0;
 }
 
@@ -3234,9 +3219,9 @@ int file_truncate ( file *_file, size_t len)
 // is address virtual or physical?
 // Change this name to pa or va.
 
-int fsCheckELFFile ( unsigned long address )
+int fsCheckELFFile(unsigned long address)
 {
-    if( address == 0 ){
+    if(address == 0){
         return 0;
     }
 
@@ -3246,13 +3231,12 @@ int fsCheckELFFile ( unsigned long address )
 
 /*
  * fsFAT16ListFiles:
- *     Mostra os nomes dos arquivos de um diret�rio.
+ *     Mostra os nomes dos arquivos de um diretório.
  *     Sistema de arquivos fat16.
  * IN:
- *     dir_address = Ponteiro para um endere�o de mem�ria 
- *                   onde foi carregado o diret�rio. 
+ * dir_address = Ponteiro para 
+ * um endereço de memória onde foi carregado o diretório. 
  */
-
 // #todo
 // is dir_address virtual or physical?
 // Change this name to dir_pa or dir_va.
@@ -3295,16 +3279,15 @@ fsFAT16ListFiles (
     //        dir_name );
             
 // Number of entries.
-    if ( number_of_entries <= 0 ){
-        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries\n");
+    if (number_of_entries <= 0){
+        debug_print ("fsFAT16ListFiles: number_of_entries\n");
         goto fail;
     }
 
 // #bugbug
 // Number of entries.
-    if ( number_of_entries >= 512 )
-    {
-        debug_print ("fsFAT16ListFiles: [FAIL] number_of_entries is too big\n");
+    if (number_of_entries > 512){
+        debug_print ("fsFAT16ListFiles: number_of_entries is too big\n");
         goto fail;
     }
 
@@ -3327,7 +3310,7 @@ fsFAT16ListFiles (
              
              NameString[11] = 0;  //finalize string
              
-             printf ("%s\n", NameString );
+             printf("%s\n", NameString );
         } 
 
         // (32/2) proxima entrada! 
@@ -3569,19 +3552,16 @@ int fsInitTargetDir (unsigned long dir_address, char *dir_name)
 }
 
 
-/*
- * fsList
- *     Ring 0 routine to list files.
- */
-
+// fsList
+// Ring 0 routine to list files.
 // #todo
 // Use 'pathname'.
+// #shortcut: '[' 
 
-int fsList ( const char *dir_name )
+int fsList(const char *dir_name)
 {
     int Absolute = FALSE;
     int i=0;
-
 
     debug_print ("fsList:\n");
 
@@ -3607,16 +3587,26 @@ int fsList ( const char *dir_name )
     current_target_dir.name[i] = '\0';
 
 
-// #shortcut
-// '[' 
-// #todo: Document this feature.
+// The root directory.
+// #shortcut: '[' 
+// #todo: Explain it.
+// Open the dirname '/'.
 
-    if ( dir_name[0] == '[' && dir_name[1] == 0 )
+// #test: Default in root.
+    current_target_dir.current_dir_address = 
+        VOLUME1_ROOTDIR_ADDRESS;
+    current_target_dir.name[0] = '/';
+    current_target_dir.name[1] = '\0'; 
+
+    if ( dir_name[0] == '[' && 
+         dir_name[1] == 0 )
     {
-        debug_print ("fsList: root\n");
+        //debug_print ("fsList: root\n");
         Absolute = TRUE;
 
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+        current_target_dir.current_dir_address = 
+            VOLUME1_ROOTDIR_ADDRESS;
+        
         // Clear the whole buffer.
         for ( i=0; i<11; i++ ){
             current_target_dir.name[i] = '\0';
@@ -3627,23 +3617,20 @@ int fsList ( const char *dir_name )
     }
 
 
-    // #bugbug
-    // We are using the current directory address,
-    // not the directory provide by the user.
-    
-    // #todo
-    // Set up the current dir address, based on the
-    // name provided by the user.
+// #bugbug
+// We are using the current directory address,
+// not the directory provide by the user.
+// #todo
+// Set up the current dir address, based on the
+// name provided by the user.
 
-    //
-    // == current_target_dir ====================
-    //
+//
+// == current_target_dir ====================
+//
 
-    // directory address.
-    
-    if ( current_target_dir.current_dir_address == 0 )
-    {
-        debug_print ("fsList: [FAIL] current_target_dir.current_dir_address \n");
+// directory address.
+    if (current_target_dir.current_dir_address == 0){
+        debug_print ("fsList: current_target_dir.current_dir_address\n");
         goto fail;
     }
     
@@ -3657,12 +3644,20 @@ int fsList ( const char *dir_name )
 // name, dir address, number of entries;
 // No return value.
 
+    // Well, the root dir has 512 entries.
+    int n=256;
+    if ( current_target_dir.current_dir_address == 
+         VOLUME1_ROOTDIR_ADDRESS )
+    {
+        n=512;
+    }
+
     fsFAT16ListFiles ( 
         (const char *)     current_target_dir.name,
         (unsigned short *) current_target_dir.current_dir_address, 
-        256 );
+        (int) n );
 
-    debug_print ("fsList: done\n");
+    //debug_print ("fsList: done\n");
     return 0;
 
 fail:
@@ -3674,8 +3669,9 @@ fail:
 
 /*
  * fsListFiles:
- *     Lista os arquivos em um diret�rio, dados os �ndices de disco, 
- * volume e diret�rio.
+ *     Lista os arquivos em um diretório, 
+ * dados os índices de disco, 
+ * volume e diretório.
  */
 // #bugbug
 // Do not list this in ring0.
@@ -3686,6 +3682,7 @@ fsListFiles (
     int volume_id, 
     int directory_id )
 {
+// #todo: Incomplete routine.
 
     // #todo: 
     // Checar mais limites.
@@ -3724,28 +3721,21 @@ done:
 }
 
 
-/*
- * fsGetFileSize: 
- * 
- */
-
+// fsGetFileSize: 
 // #bugbug: Isso dá problemas na máquina real.
 // Essa rotina é chamada pela função fopen, por isso precisamos dela.
 // Pega o tamanho de um arquivo que está no diretório raiz.
 // #todo: 
-// Podemos alterar para pegar de um arquivo que esteja no diretório alvo.
-
+// Podemos alterar para pegar de um arquivo 
+// que esteja no diretório alvo.
 // #todo:
 // Antes de carregar um arquivo o sistema de arquivos
 // precisa preencher uma estrutura com informações sobre ele. 
 // se já existir um registro é melhor.
-
 // #bugbug
 // Estamos com problemas na string do nome.
-
 // #bugbug
 // Loading the root dir everytime.
-
 // #todo
 // is dir_address virtual or physical?
 // Change this name to dir_pa or dir_va.
@@ -3755,7 +3745,6 @@ fsGetFileSize (
     unsigned char *file_name, 
     unsigned long dir_address )
 {
-
     unsigned long FileSize=0;    // 64bit
     unsigned int intFileSize=0;  // 32bit
     
@@ -3772,10 +3761,10 @@ fsGetFileSize (
 
     int Spc=0;
 
-	// #importante:
-	// Poderíamos usar malloc ou alocador de páginas ??
-	// #todo: 
-	// Devemos carregar o diretório alvo.
+// #importante:
+// Poderíamos usar malloc ou alocador de páginas ??
+// #todo: 
+// Devemos carregar o diretório alvo.
 
     unsigned short *Dir = (unsigned short *) dir_address;//VOLUME1_ROOTDIR_ADDRESS;
 
@@ -3788,9 +3777,7 @@ fsGetFileSize (
 	//via argumento.
     //...
 
-
     debug_print ("fsRootDirGetFileSize: $\n");
-
 
     if ( (void*) file_name == NULL ){
         printk("fsRootDirGetFileSize: [ERROR] file_name\n");
@@ -3802,26 +3789,22 @@ fsGetFileSize (
         goto fail;
     }
 
-
     if (dir_address == 0){
         printk("fsRootDirGetFileSize: [ERROR] dir_address\n");
         goto fail;
     }
 
+// Lock ??.
 
-	// Lock ??.
-	
 	//taskswitch_lock();
 	//scheduler_lock();	
 
-		
-	//	
-	// ## ROOT ##
-    //
-    
-    
+//
+// ## ROOT ##
+//
+
 //loadRoot:
-	
+
 	//Carrega o diretório raiz na memória.
 	
 //#ifdef KERNEL_VERBOSE	
@@ -3857,16 +3840,14 @@ fsGetFileSize (
             32 );
     }
 
-	//#todo:
-	//precisamos na verdade carregarmos o diretório corrente.
-	
-	// Continua ... 
-	// Pegar mais informações sobre o sistema de arquivos.
-	
-	//#obs
-	//Checa se é válida a estrutura do sistema de arquivos.
-    //A intenção é obtermos a quantidade de entradas no diretório raiz.
-	//#bugbug: Mas isso deveria ser feito para o diretório atual.
+//#todo:
+//precisamos na verdade carregarmos o diretório corrente.
+// Continua ... 
+// Pegar mais informações sobre o sistema de arquivos.
+//#obs
+//Checa se é válida a estrutura do sistema de arquivos.
+//A intenção é obtermos a quantidade de entradas no diretório raiz.
+//#bugbug: Mas isso deveria ser feito para o diretório atual.
 
 //
 // == root filesystem structure ===============================
@@ -3894,11 +3875,10 @@ fsGetFileSize (
         // ...
     };
 
+//
+// file name
+//
 
-    //
-    // file name
-    //
-    
     //#debug
     //vamos mostrar a string.
     //printf ("fsGetFileSize: file_name={%s}\n", file_name);
@@ -3920,13 +3900,8 @@ fsGetFileSize (
 	
 //search_file:
 
-
-//
 // file name limit.
-//
-
-// Se o tamanho da string falhou
-// vamos ajustar.
+// Se o tamanho da string falhou, vamos ajustar.
 
     size_t szFileName = (size_t) strlen(file_name); 
 
@@ -4015,11 +3990,9 @@ found:
 
 /*
  * fsUpdateWorkingDiretoryString:
- * 
  *     +Atualiza o pathname na estrutura do processo atual.
  *     +Atualiza o pathname na string global. 
  */ 
-
 // Used by the service 175, cd command.
 
 void fsUpdateWorkingDiretoryString ( char *string )
@@ -4034,9 +4007,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
     tmp = string;
     string_size = sizeof(string);
 
-
     pid_t current_process = (pid_t) get_current_process();
-
 
     // Initialized ?
     if ( CWD.initialized != TRUE )
@@ -4168,9 +4139,9 @@ int fs_save_fat16_cache(void)
 // #bugbug
 // const char * tornaria esse endereço em apenas leitura.
 
-void fs_fntos ( char *name )
+void fs_fntos(char *name)
 {
-    int i  = 0;
+    int i = 0;
     int ns = 0;
 
     char ext[4];
@@ -4259,7 +4230,7 @@ CompleteWithSpaces:
 // Pega um fd na lista de arquivos do processo, dado o PID.
 // Objects[i]
 
-int fs_get_free_fd_from_pid (int pid)
+int fs_get_free_fd_from_pid (pid_t pid)
 {
     struct process_d *p;
     int __slot=0;
@@ -4272,10 +4243,8 @@ int fs_get_free_fd_from_pid (int pid)
 // #bugbug
 // Check limit
 
-//
-// Process.
-//
-  
+// Process
+
     p = (struct process_d *) processList[pid];
     if ( (void *) p == NULL ){
         debug_print ("fs_get_free_fd_from_pid: p\n");
@@ -4293,7 +4262,7 @@ int fs_get_free_fd_from_pid (int pid)
          if ( p->Objects[__slot] == 0 ){ return (int) __slot; }
     };
 
-// fail.
+// fail
     return -1;
 }
 
@@ -4306,7 +4275,7 @@ int fs_get_free_fd_from_pid (int pid)
 // handle return value ...
 // What functions is calling us?
 
-int fs_initialize_process_cwd ( int pid, char *string )
+int fs_initialize_process_cwd ( pid_t pid, char *string )
 {
     struct process_d *p;
     int i=0;
@@ -4361,10 +4330,9 @@ int fs_initialize_process_cwd ( int pid, char *string )
  *     #obs: O PID costuma ser do processo atual mesmo. 
  *     Credits: bash 1.05 
  */
-
 // #todo: Describe 'n'.
 
-void fs_pathname_backup ( int pid, int n )
+void fs_pathname_backup ( pid_t pid, int n )
 {
     struct process_d *p;
     int i=0;
@@ -4429,10 +4397,9 @@ void fs_pathname_backup ( int pid, int n )
  *     Cada processo tem seu proprio pwd.
  *     Essa rotina mostra o pathname usado pelo processo. 
  */
-
 // this is used by the pwd command. service 170.
 
-int fs_print_process_cwd (int pid)
+int fs_print_process_cwd(pid_t pid)
 {
     struct process_d *p;
 
@@ -4655,7 +4622,6 @@ fsSaveFile (
     char *file_address,
     char flag )  
 {
-
     int Status = 0;
 
     unsigned long i = 0; 
@@ -4679,9 +4645,8 @@ fsSaveFile (
     debug_print ("fsSaveFile:\n");
     //printf      ("fsSaveFile:\n");
 
+// Updating fat address and dir address.
 
-    // Updating fat address and dir address.
-    
     if ( fat_address == 0 ){
         panic("fsSaveFile: [FAIL] fat_address\n");
     }
@@ -4693,13 +4658,11 @@ fsSaveFile (
     unsigned short *fat   = (unsigned short *) fat_address; //VOLUME1_FAT_ADDRESS;
     unsigned short *__dir = (unsigned short *) dir_address; //VOLUME1_ROOTDIR_ADDRESS;
 
-
-    // #debug
-    // We only support one address for now.
+// #debug
+// We only support one address for now.
     if ( fat_address != VOLUME1_FAT_ADDRESS ){
         panic("fsSaveFile: [FIXME] We only support ONE fat address for now!\n");
     }
-
 
     if ( (void *) file_name == NULL )
     {
@@ -4715,10 +4678,9 @@ fsSaveFile (
         goto fail;
     }
 
+// #bugbug
+// Esse endereço eh valido?
 
-    // #bugbug
-    // Esse endereço eh valido ?
-    
     /*
     printf ("name address = %x \n", &file_name );
     printf ("name    = %s \n", file_name ); 
@@ -4762,8 +4724,8 @@ fsSaveFile (
 
 //SearchEmptyEntries:
  
-	// #bugbug
-	// Obs: Esse limite é improvisado.
+// #bugbug
+// Obs: Esse limite é improvisado.
 
     while ( i < CLUSTERS_TO_SAVE_MAX )
     {
@@ -5016,12 +4978,9 @@ save_file:
         // #debug.
         printf ("fsSaveFile: [DEBUG] next={%x}\n", next);
 
-        if ( next == 0xFFF8 ){
-
+        if (next == 0xFFF8){
             next = fat16ClustersToSave[i-1];
-            
             fat[next] = 0xFFF8;
-
             goto do_save_dir_and_fat;
 
         // Se não é assinatura ainda.
@@ -5038,9 +4997,9 @@ save_file:
             //printf("write_lba\n");
             //refresh_screen();
 
-            disk_ata_wait_irq ();
+            disk_ata_wait_irq();
 
-            //grava - aqui next esta certo!!!
+            //grava - Aqui next esta certo!
             //write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );
             ataWriteSector ( 
                 (unsigned long) address, 
@@ -5105,9 +5064,10 @@ do_save_dir_and_fat:
 // Sinalizando que o cache de fat precisa ser salvo.
     fs_fat16_cache_not_saved();
 
-    debug_print ("fsSaveFile: done\n");
-    printf      ("fsSaveFile: done\n");
+    //debug_print ("fsSaveFile: done\n");
+    //printf      ("fsSaveFile: done\n");
     refresh_screen();
+
     return 0;
 
 fail:
@@ -5174,18 +5134,16 @@ sys_write_file_to_disk (
     //taskswitch_unlock ();
     //--
 
-    debug_print ("sys_write_file_to_disk: done\n");
-    
+    //debug_print ("sys_write_file_to_disk: done\n");
+
     return (int) __ret;
 }
-
 
 
 /*
  * sys_read_file_from_disk: 
  *     This is called by sys_open().
  */
-
 // usada por open()
 // tem que retornar o fd e colocar o ponteiro na lista de arquivos
 // abertos.
@@ -5232,7 +5190,6 @@ sys_read_file_from_disk (
     if (*file_name == 0){
         return (int) (-EINVAL);
     }
-
 
 // Convertendo o formato do nome do arquivo.    
 // >>> "12345678XYZ"
