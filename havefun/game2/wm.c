@@ -3953,7 +3953,7 @@ int wmInputReader(void)
               //printf("ws: Control right\n"); 
               //dock_active_window(2);
               //IN: cube number, position, amount
-              FlyingCubeMove(0,2,(float) 0.08f);
+              FlyingCubeMove(0,2,(float) 0.08f); //right
               return 0; 
             }
             //Control arrow up
@@ -3961,6 +3961,7 @@ int wmInputReader(void)
             {
               //printf("ws: Control up\n"); 
               //dock_active_window(1);
+              FlyingCubeMove(0,3,(float) 0.08f); //front
               return 0; 
             }
             //Control arrow down
@@ -3968,6 +3969,7 @@ int wmInputReader(void)
             {
               //printf("ws: Control down\n");
               //dock_active_window(3);
+              FlyingCubeMove(0,4,(float) 0.08f); //back
               return 0;
             }
             //Control arrow left
@@ -3976,7 +3978,7 @@ int wmInputReader(void)
               //printf("ws: Control left\n");
               //dock_active_window(4);
               //IN: cube number, position, amount 
-              FlyingCubeMove(0,1,(float) 0.08f);
+              FlyingCubeMove(0,1,(float) 0.08f);  //left
               return 0; 
             }
 

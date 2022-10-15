@@ -164,17 +164,32 @@ grInitializeProjection(
     CurrentProjectionF.height = (unsigned long) (height & 0xFFFFFFFF);
     CurrentProjectionF.ar = (float) fAspectRatio;
 
+
+    // :::: The fov scaling factor. ::::
+    // Quanto menor for o angulo, maior será o objeto.
     // fov in radient.
     // 1/tan(fov/2)
     float fFovRad = 
         1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
     //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
 
+    // #bugbug
+    // Actually this is our scale factor for x and y,
+    // but this value is not working fine.
+    // Se we are using somethig between 0.01f and 2.0f.
+    //CurrentProjectionF.scale_factor = fFovRad;
+
+    // afx
     matProj.m[0][0] = (float) (fAspectRatio * fFovRad);
+    // fy
     matProj.m[1][1] = (float) fFovRad;
+    // #todo: Here we are normalizing the z values.
+    // The purpose is using values in a range of 0~1.
     matProj.m[2][2] = (float) (fFar / (fFar - fNear));
-    matProj.m[3][2] = (float) ((-fFar * fNear) / (fFar - fNear));
+    //#bugbug: Talvez os 2 abaixo estão invertidos.
     matProj.m[2][3] = (float) 1.0f;
+    matProj.m[3][2] = (float) ((-fFar * fNear) / (fFar - fNear));
+    
     matProj.m[3][3] = (float) 0.0f;
 
     CurrentProjectionF.initialized = TRUE;
@@ -2526,28 +2541,60 @@ plotTriangleF(
         return -1;
     }
 
+
 //
-// parameters
+// Projection parameters.
+// No matrix.
 //
 
+    // z
     float znear = (float) 0.01f;  //default
     float zfar  = (float) 10.0f;  //default
+    // ar
     unsigned long window_width  = 200;
     unsigned long window_height = 200;
     float ar = (float) 1.0f;      //default
-    float scale_factor = (float) 0.5f; // % da tela.
-
+    // scaling factor.
+    // % da tela.
+    // fov scale factor = 1/( tan(a/2) )
+    // x=afx and y=fy
+    float scale_factor = (float) 0.5f;   //default
+ 
     if (CurrentProjectionF.initialized == TRUE)
     {
         znear = (float) CurrentProjectionF.znear;
         zfar  = (float) CurrentProjectionF.zfar;
+        
         window_width  = (unsigned long) CurrentProjectionF.width;
         window_height = (unsigned long) CurrentProjectionF.height;
+        
         ar = 
             (float)((float) window_height / (float) window_width );
+        
+        // scale factor
         //#todo: hotspot
+        // 0.5f
         scale_factor = (float) CurrentProjectionF.scale_factor;
     }
+
+// #todo
+// Well, z needs to be between 0 and 1.
+// the scale factor for z is s.
+// z = (sz - sznear)
+
+// #bugbug
+// somente depois de aplicarmos o scale factor
+// é que podemos realizar o clipping.
+
+// #bugbug
+// We have a scale factor do x and y.
+// But we do not have a scale factor for z.
+// So, z can be any vallur between 0.01f and 1000.0f.
+
+// The 'image space'.
+// Our image space is not 1:1:1
+// It's something like 2:2:1000
+// No z normalization
 
 // Clipping in z
 
@@ -2581,6 +2628,44 @@ plotTriangleF(
 
 // scale
 // Ajustando à tela.
+// x=afx  y=fx
+// So, we're using the 0.5f for scale factor,
+// but we gotta use 1/(tan(a/2))
+
+
+    //#test
+    // tan(45)=1
+    // tan(90/2)=1
+    //scale_factor = (float) ( 1.0f/tanf(90.0f*0.5f)/2.0f);
+    //scale_factor = (float) (1/tanf(45.0f/2.0f));
+    //scale_factor = (float) (1/tanf(80.0f * 0.5f / 180.0f * 3.14159f));
+
+// Se o scale_factor for 0.5f o valor será
+// metade da tela.
+// então -1 +1 preenche a tela toda.
+
+// Quanto menor for campo de visão, 
+// maior sera o scale factor e maior sera o objeto.
+// Quanto maior for o campo de visão,
+// menor sera o scale factor e menor sera o objeto.
+
+    //#test
+    //scale_factor = 0.1f;  // fov grande, scale factor pequeno, objeto pequeno
+    //scale_factor = 0.5f;  // fov medio, scale factor medio, objeto normal
+    //scale_factor = 1.0f;  // fov pequeno, scale factor grande, objeto grande
+
+    //#test
+    //scale_factor = 0.01f;  // very small.
+    //scale_factor = 2.0f;
+
+// #tmp
+// Scale factor limits
+    if( (float) scale_factor < 0.01f ){
+        scale_factor = (float) 0.01f;
+    }
+    if( (float) scale_factor > 2.00f ){
+        scale_factor = (float) 2.00f;
+    }
 
     long x0 = (long) (t->p[0].x *ar * scale_factor * (float) window_width);
     long y0 = (long) (t->p[0].y     * scale_factor * (float) window_height);

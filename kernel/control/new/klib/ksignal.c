@@ -1,5 +1,5 @@
 
-// signal.c
+// ksignal.c
 
 #include <kernel.h>    
 

@@ -1,19 +1,12 @@
-/*
- * File: ctype.c
- *
- * Kernel mode C library for Gramado.
- *
- * History:
- *     2018 - Created by Fred Nora.
- *     2018 - Linux style. 
- */
 
+// kctype.c
+// 2018 - Created by Fred Nora.
+//      - Linux-style. 
+// see: kctype.h
 
 #include <kernel.h>
 
-
-//Linux style;
-
+// Linux style
 const unsigned char _ctype[] = {
 
   _C, _C, _C, _C, _C, _C, _C, _C,                       /* 0-7 */
@@ -43,8 +36,43 @@ const unsigned char _ctype[] = {
 
 };
 
+// #ugly
+inline int isdigit(int c)
+{
+    return '0' <= c && c <= '9';
+}
+
+inline unsigned char __tolower(unsigned char c)
+{
+	if (isupper(c))
+		c -= 'A'-'a';
+	return c;
+}
+
+inline unsigned char __toupper(unsigned char c)
+{
+	if (islower(c))
+		c -= 'a'-'A';
+	return c;
+}
+
+
+// Fast implementation of tolower() for internal usage. 
+// Do not use in your code.
+inline char _tolower(const char c)
+{
+    return c | 0x20;
+}
+
+// Fast check for octal digit.
+inline int isodigit(const char c)
+{
+    return c >= '0' && c <= '7';
+}
+
+
 
 //
-// End.
+// End
 //
 
