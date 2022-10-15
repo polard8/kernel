@@ -13,9 +13,10 @@ This repository has the source code for:
 
     Gramado (c) is a 64bit multithreaded operating system.
 
-## Screenshot
+## Screenshots
 
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-1.png)
+![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-2.png)
 
 ## Kernel features.
 
