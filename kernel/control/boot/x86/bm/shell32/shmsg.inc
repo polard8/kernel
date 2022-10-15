@@ -10,82 +10,64 @@
 ; Variáveis:
 ; ==========
 
-
+; =============================================
 ; Struct.
 ;     Estrtura de strings aleatórias para suporte ao shell 
 ;     do boot manager. 
 
-
 SHELL:
-
 .prompt_string:
     db 'bm-shell', 0
-
 .prompt_string_separator1:
     db ':', 0
-
 .prompt_string_separator2:
     db '>', 0
-
-;Separador1.
 .separador1:
     db '>', 0 
-
 ;Em que volume está o Shell.
 .volume:
     db 0
-
 ;Em que diretório está o Shell.
 .directory:
     db 0
-
-
 ; =============================================
 
 
-;Prompt:   
-;Endereço da string no novo prompt.   
-new_prompt:  dd 0 
- 
-   
+; Prompt:   
+; Endereço da string no novo prompt.   
+new_prompt: dd 0 
 
 ;Flag:
 ;Se vai mudar o nome de um arquivo.
 ;O que fazer com o arquivo? ... Salvar, Abrir.
-file_flag db 0 
+file_flag: db 0 
 
 ;
-; Command strings.
+; -- Command strings --------
 ;
 
-; #todo: 
-; Incluir configurações de inicialização, como as do menu16.
-
-;Inicialização.
-
-reboot_string     db   'reboot', 0    ;Reinicia o sistema.
-shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.
-make_boot_string  db 'makeboot', 0    ;Cria inicialização padrão. 
-; ...
-
-;; gramado modes.
-;; commands:
-boot_string            db  'boot', 0    ;Inicia com a configuração atual. 
+; Gramado modes.
 bootjail_string        db  'bootjail', 0
 bootp1_string          db  'bootp1', 0
 boothome_string        db  'boothome', 0
 bootp2_string          db  'bootp2', 0
 bootcastle_string      db  'bootcastle', 0
 bootcalifornia_string  db  'bootcali', 0
-;bootcalifornia2_string  db  'bootcali2', 0
-;;...
+; Simple boot command.
+boot_string  db  'boot', 0 
 
+; #todo: 
+; Incluir configurações de inicialização, como as do menu16.
+
+;Inicialização.
+reboot_string     db   'reboot', 0    ;Reinicia o sistema.
+shutdown_string   db 'shutdown', 0    ;Desliga a máquina via APM.
+make_boot_string  db 'makeboot', 0    ;Cria inicialização padrão. 
+; ...
 
 ;Operações com dispositivos.
-
 ;Visualiza as informaçções sobre um disco.
 hd_string          db    'disk', 0     
-
 ;Visualiza as informações sobre uma partição 
 particao_string    db    'part', 0    
 
@@ -103,11 +85,9 @@ delete_dir_string   db  'dd', 0     ;Delete dir.
 
 ;Change dir. (Change current working dir.)
 change_dir_string  db    'cd', 0     
-
 print_workingdir_string   db 'pwd', 0  ;pwd (print working directory) 
 ls_string                 db 'ls', 0   ;ls lista os arquivos.
 ; ...
-
 
 ;Outros.
 help_string           db        'help', 0
@@ -167,21 +147,16 @@ shellmsg_splash:
     db 'version ', BOOTMANAGER_VER, 13, 10,
     db 13, 10, 0  
 
-
-;;
-;; Prompt
-;;
-
-prompt:              db 'BM/>', 0       ;Prompt padrão.
-msg_shell_prompt:    db 'BM/>', 0
+; prompt string:
+; Not used.
+prompt:              db 'BM: ', 0
+msg_shell_prompt:    db 'BM: ', 0
 
 prompt_change_file:  db 'filename=', 0  ;Para declarar o nome do arquivo.
-
 
 ;Volume support.
 system_volume_string db 'VOLUME0 VOL',0
 ;...
-
 
 ;File support.
 appextension:  db '.app', 0
@@ -205,7 +180,6 @@ dir1_fullname:       db 'BOOT.DIR',0
 dir1_slash_string:         db '/boot',0
 dir1_upper_slash_string:   db '/BOOT',0
 ;...
-
 
 ; File operation.
 msg_file_op0 db "Default operation on file", 13, 10 ,0

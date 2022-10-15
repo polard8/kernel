@@ -75,8 +75,9 @@ os_command_line:
     ;mov ebx, 0x00FFFFFF
     ;mov [os_Font_Color], ebx
 
-;Input.
-;Limit the input to 250 characters.
+; Input.
+; Limit the input to 250 characters.
+; This buffer has 1024 bytes.
 
     mov edi, cli_temp_string
     mov ecx, 250
@@ -89,15 +90,15 @@ os_command_line:
 ; O contador indica quantos caracteres foram armazenados.
 
 .newLine:
-    call os_print_newline    
+    call os_print_newline
     jecxz os_command_line    ;;Loop
 
 ; Remove extra spaces.
 ; 'os_string_parse' stores the number of words in ECX.
 .extraSpaces:
-	mov esi, edi
-	call os_string_parse
-	jecxz os_command_line    ;;Loop 
+    mov esi, edi
+    call os_string_parse
+    jecxz os_command_line    ;;Loop 
 
 ; Store the number of words in the string.
 ; Salva o número de palavras digitadas.
@@ -256,7 +257,6 @@ os_command_line:
     call os_string_compare
     jc dir
 
-
 ; =========
 ; 'ver'
 ; Show version info.
@@ -272,7 +272,6 @@ os_command_line:
     mov edi, exit_string
     call os_string_compare
     jc exit
-
 
 ; =========
 ; 'disk'
@@ -290,7 +289,6 @@ os_command_line:
     call os_string_compare
     jc shellcallsPartitionTest
     ;jc particao_test
-
 
 ; =========
 ;'mode1'
@@ -327,7 +325,6 @@ os_command_line:
 ; Obs:
 ; Se a palavra digitada não for uma das palavras reservadas 
 ; testadas acima, pode ser edição de arquivos.
-
 ; Checando flags relativas à operações em arquivos.
 
     cmp byte [file_flag], 1 
@@ -343,157 +340,125 @@ os_command_line:
     cmp byte [file_flag], 6 
     je .not_app
 
-;; Foi confirmado que se trata mesmo de um app.
-;; Se não for nenhuma das palavras reservadas, nem edição de algum 
-;; arquivo, então abre um app, '.app'. Para isso muda a flag para 7.
-;; Que indica executar app.
+; Foi confirmado que se trata mesmo de um app.
+; Se não for nenhuma das palavras reservadas, nem edição de algum 
+; arquivo, então abre um app, '.app'. Para isso muda a flag para 7.
+; Que indica executar app.
 
 .is_app:
     mov byte[file_flag], 7
     jmp .checkFS
 
-;; ?? E agora ???
-;; bugbug, deveria ter alguma coisa aqui,
-;; algum jmp ???
+; ?? E agora ???
+; bugbug, deveria ter alguma coisa aqui,
+; algum jmp ???
 
 .not_app:
     nop
 
 .checkFS:
-	
-	; At this point it is not one of the built-in CLI functions. 
-	; Prepare to check the filesystem.
-	
-	;Check for a '.' in the string.
-	;If there was a '.' then a suffix is present.
-	mov al, '.'
-	call os_string_find_char
-	cmp eax, 0
-	jne full_name
 
-	; No suffix was present, so we add the default application suffix 
-	; of ".app"
-	
-	; @todo: Adicionar extensão.
-	
-	; Calculando o tamanho.
-	; If the string is longer than 8 chars we can't add a suffix.
+; At this point it is not one of the built-in CLI functions. 
+; Prepare to check the filesystem.
+; Check for a '.' in the string.
+; If there was a '.' then a suffix is present.
 
-	call os_string_length
-	cmp ecx, 8
-	jg shellcallsFail    ;; shell\shellcalls.inc.
-	;jg fail             ;; shell\shellcalls.inc.
-	
-    ;
-	; Opções de operações com arquivo e diretórios:
-	;
+    mov al, '.'
+    call os_string_find_char
+    cmp eax, 0
+    jne full_name
 
-	;Opção 1, Open file. 
+; No suffix was present, so we add the default application suffix 
+; of ".app"
+; #todo: Adicionar extensão.
+; Calculando o tamanho.
+; If the string is longer than 8 chars we can't add a suffix.
+
+    call os_string_length
+    cmp ecx, 8
+    jg shellcallsFail    ;; shell\shellcalls.inc.
+    ;jg fail             ;; shell\shellcalls.inc.
+
+; Opções de operações com arquivo e diretórios:
+
+; Opção 1, Open file. 
     cmp byte [file_flag], 1
-    je	full_name
-
-	;Opção 2, Create file.
+    je full_name
+; Opção 2, Create file.
     cmp byte [file_flag], 2
-    je	full_name
-
-	;Opção 3, Delete file.
+    je full_name
+; Opção 3, Delete file.
     cmp byte [file_flag], 3
-    je	full_name
-
-	;Opção 4, Open dir.
+    je full_name
+; Opção 4, Open dir.
     cmp byte [file_flag], 4
-    je	add_ext_dir
-
-	;Opção 5, Create dir.
+    je add_ext_dir
+; Opção 5, Create dir.
     cmp byte [file_flag], 5
-    je	add_ext_dir
-
-	;Opção 6, Delete dir.
+    je add_ext_dir
+; Opção 6, Delete dir.
     cmp byte [file_flag], 6
-    je	add_ext_dir
-	
-	;Opção 7, Open app.
+    je add_ext_dir
+; Opção 7, Open app.
     cmp byte [file_flag], 7
-    je	add_ext_app
-
-	;??
+    je add_ext_app
+;?
     jmp full_name
 
-	
-	;
-	; Adicionando extenção ao nome do arquivo.
-	;
-	
-;Adiciona extenção '.dir'.
+; Adicionando extenção ao nome do arquivo.
+
+; Adiciona extenção '.dir'.
 add_ext_dir:
-
-	mov edi, cli_command_string
-	mov esi, dirextension        ;.DIR.
-	call os_string_append		 ;Append the extension to the command string.
+    mov edi, cli_command_string
+    mov esi, dirextension    ; .DIR.
+    call os_string_append    ; Append the extension to the command string.
     jmp full_name
-	
-	
-;Adiciona extenção '.app'.
+; Adiciona extenção '.app'.
 add_ext_app:
+    mov edi, cli_command_string
+    mov esi, appextension    ; .app.
+    call os_string_append    ; Append the extension to the command string.
+    jmp full_name
 
-	mov edi, cli_command_string
-	mov esi, appextension        ;.app.
-	call os_string_append		 ;Append the extension to the command string.
-	jmp full_name
-	
-	;
-	; Ver a operação de arquivo escolhida.
-	;
-	
+; Ver a operação de arquivo escolhida.
+
 full_name:
 ver_operacao_escolhida:
-    
-	;Opção 1, Open file. 
+
+; Opção 1, Open file. 
     cmp byte [file_flag], 1
     je open_file_op
-
-	;Opção 2, Create file.
+; Opção 2, Create file.
     cmp byte [file_flag], 2
     je new_file_op
-
-	;Opção 3, Delete file.
+; Opção 3, Delete file.
     cmp byte [file_flag], 3
     je delete_file_op
-
-	;Opção 4, Open dir.
+; Opção 4, Open dir.
     cmp byte [file_flag], 4
     je open_dir_op
-
-	;Opção 5, Create dir.
+; Opção 5, Create dir.
     cmp byte [file_flag], 5
     je new_dir_op
-
-	;Opção 6, Delete dir.
+; Opção 6, Delete dir.
     cmp byte [file_flag], 6
     je default_op
-
-	;Opção 7, Open app.
+; Opção 7, Open app.
     cmp byte [file_flag], 7
-    je open_app_op	
-    
-	jmp default_op
-	
-	;
-	; A operação em arquivo foi negligenciada.
-	;
+    je open_app_op
 
-;Opção 0. Default	
-default_op:	
-	mov esi, msg_file_op0
-	call os_output
-	
-	;@todo: Read file.
+; A operação em arquivo foi negligenciada.
+    jmp default_op
+
+;Opção 0. Default
+default_op:
+    mov esi, msg_file_op0
+    call os_output
+    ;#todo: Read file.
     ;mov eax, cli_command_string
-	;call fat16_read_file	
-	
-	mov byte [file_flag], 0    ;Restaura o prompt.	
-	jmp os_command_line
-	
+    ;call fat16_read_file
+    mov byte [file_flag], 0    ; Restaura o prompt.
+    jmp os_command_line
 
 ;Opção 1, Open file.
 open_file_op:
@@ -575,10 +540,8 @@ os_command_line_ret:
 ; shellInit:
 ;     Interface para chamar o início do Shell do Boot Manager.
 ;     Obs: O Essa rotina pode receber algum argumento.
-; IN:
-;     Nothing.
-; OUT:
-;     Nothing.
+; IN:   Nothing.
+; OUT:  Nothing.
 ; #bugbug
 ; We need to initialize the i8042 when we enter 
 ; in the 32bit protected mode environment.
@@ -595,7 +558,6 @@ shellInit:
     in al, 0x60
     in al, 0x60
     in al, 0x60
-
     in al, 0x60
     in al, 0x60
     in al, 0x60
@@ -609,7 +571,7 @@ shellInit:
 ; shellPrintShellVersion:
 ;     Print shell version.
 ; Called by startShellLoop in start.inc
-; See: stage3/shell/shcalls.inc
+; See: shcalls.inc
     
 shellPrintShellVersion:
     call print_ver

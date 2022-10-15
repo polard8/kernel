@@ -114,20 +114,17 @@
 
 
 /*
-    #bugbug
-    
-    0x00007E00 - 0x0009FFFF - Unused" 
-    This is not entirely true. 
-    The range that is guaranteed to be free 
-    is 0x00007E00 - 0x0007FFFF. 
-    Above that range you will have the EBDA 
-    (usually at 0x0009FC00 - 0x0009FFFF, 
-     but I've seen it at 0x00096C00 and 
-     other locations as well) and 
-     potentially some BIOS code. 
-     Some BIOSes have PXE boot code in this range. 
-     A conservative approach is to avoid everything above 0x00080000. 
- */
+#bugbug
+0x00007E00 - 0x0009FFFF - Unused" 
+This is not entirely true. 
+The range that is guaranteed to be free is 0x00007E00 - 0x0007FFFF. 
+Above that range you will have the 
+EBDA (usually at 0x0009FC00 - 0x0009FFFF, 
+but I've seen it at 0x00096C00 and other locations as well) and 
+potentially some BIOS code. 
+Some BIOSes have PXE boot code in this range. 
+A conservative approach is to avoid everything above 0x00080000. 
+*/
 
 //
 // == 512 KB ==================================================
@@ -135,13 +132,11 @@
 
 // #todo
 // Tem espaço sobrando aqui ??
-
 // #todo
 // Deveria ter uma área de memória de onde pegaríamos 
 // as pagetables que precisamos, em ordem,
 // podendo contar um numero mínimo e máximo de pagetables
 // no sistema.
-
 
 // 0x0008F000 Tabela para mapear a parte mais baixa da memória física. Começa em 0.
 // 0x0008E000 Tabela para mapear a memória usada pela imagem do kernel. Começa em 0x100000.
@@ -207,31 +202,47 @@
 //
 
 // #bugbug
-//  Em 0x00090000 costumava ter uma pilha.
+// Em 0x00090000 costumava ter uma pilha.
+// Se o boot ou o kernel usou essa área para pilha,
+// então poderemos ter perdido algum valor 
+// colocado aí pelo BIOS.
 
 // O endereço físico e virtual do boot block são o mesmo.
 // Boot block size?
 #define BOOTBLOCK_PA  0x0000000000090000
 
-// pml4, pdpt, pd for kernel process.
+// Page Map Level N.
+// pd, pdpt, pml4 for the kernel process.
 // Lembrando que a parte das flags precisa ser '000'
 
-#define KERNEL_PD_PA    0x000000000009A000
-#define KERNEL_PDPT_PA  0x000000000009B000
-#define KERNEL_PML4_PA  0x000000000009C000
+#define KERNEL_PD_PA    0x000000000009A000  //pml2
+#define KERNEL_PDPT_PA  0x000000000009B000  //pml3
+#define KERNEL_PML4_PA  0x000000000009C000  //pml4
 
+/*
+ Older computers typically uses 1 KiB from 0x9FC00 - 0x9FFFF, 
+ modern firmware can be found using significantly more. 
+ You can determine the size of the EBDA by 
+ using BIOS function INT 12h, or by examining 
+ the word at 0x413 in the BDA (see below). 
+ Both of those methods will tell you how much conventional memory 
+ is usable before the EBDA.
+ Credits: https://wiki.osdev.org/Memory_Map_(x86)
+ */
 
 // #bugbug
 // EBDA address is found here.
 // 0x9FC00
 
 // #bugbug
-// Temos uma pilha aqui ??
-// eh possivel, temos espaço.
-// 0x0009FFF0 ??
+// Temos uma pilha aqui?
+// O boot loader sujou essa área colocando uma pilha aí?
+// 0x0009FFF0
 
-//#bugbug
-//See: basetier/boot/x86/bm/sysvar32.inc
+// #bugbug
+// BM.BIN is using the range 0x00090000 ~ 0x0009FFF0.
+// So, the kernel simply can't trust in values found here.
+// See: bm/sysvar32.inc
 
 //
 // == 640 KB ==================================================

@@ -4,92 +4,62 @@
 ;     Rotinas para atender algumas chamadas do Boot Manager.
 ; 2015 - Created.
 
+; =============================================
+exit:
+    jmp do_boot
 
 ;===============================================================
 ; do_boot:
-;      Iniciaremos o modo gráfico padrão.
-;      Chamaremos uma rotina que volta para o modo real, 
-;      muda o modo de vídeo e 
-;      inicializa a GUI.
-;      See: stage3/pm.inc 
-
-exit:
-    nop;
-
-; =============================================
-
+; Iniciaremos o modo gráfico padrão.
+; Chamaremos uma rotina que volta para o modo real, 
+; muda o modo de vídeo e inicializa a GUI.
+; See: stage3/pm.inc 
 do_boot:
+; Default to 800x600.
 
 ; 320x200
     ;jmp do_gramado_mode_jail
-
 ; 640x480
     ;jmp do_gramado_mode_p1
-
 ; 800x600
     jmp do_gramado_mode_home
-
 ; 1024x768
     ;jmp do_gramado_mode_p2
-
 ; ??
     ;jmp do_gramado_mode_castle
-    
     jmp do_boot
-
 ; =============================================
 
+;===============================================================
+; Trampoline:
+; Start a gui mode given its number.
 ; See: stage3/pm.inc 
 do_gramado_mode_jail:
     mov byte [META$FILE.GRAMADO_MODE], 0x00
     jmp rmStartGUI
-    jmp $
-
-; See: stage3/pm.inc 
 do_gramado_mode_p1:
     mov byte [META$FILE.GRAMADO_MODE], 0x01
     jmp rmStartGUI
-    jmp $
-
-; See: stage3/pm.inc 
 do_gramado_mode_home:
     mov byte [META$FILE.GRAMADO_MODE], 0x02
     jmp rmStartGUI
-    jmp $
-
-; See: stage3/pm.inc 
 do_gramado_mode_p2:
     mov byte [META$FILE.GRAMADO_MODE], 0x03
     jmp rmStartGUI
-    jmp $
-
-; See: stage3/pm.inc 
 do_gramado_mode_castle:
     mov byte [META$FILE.GRAMADO_MODE], 0x04
     jmp rmStartGUI
-    jmp $
-
-; See: stage3/pm.inc 
 do_gramado_mode_california:
     mov byte [META$FILE.GRAMADO_MODE], 0x05
     jmp rmStartGUI
-    jmp $
-    
-
-
 ;===============================================================
-; do_shutdown:
-;     Desliga a maquina via APM.
-;      Chamaremos uma rotina que volta para o modo real, 
-; e efetua o desligamento com a int 0x15.
-;++
 
+;==============================================================
+; do_shutdown:
+; Come back to real mode and 
+; shutdown the machine via APM, using int 0x15.
 do_shutdown:
     jmp rmShutdown
-    jmp $
-;--
-
-
 
 ;==============================================================
 ; do_mount_volume:
@@ -165,19 +135,13 @@ debug:
 ;     Torna permanente as alterações de 
 ;     inicialização e partições.
 ;++
-
 do_save:
-
     ;pushad
-	
-	;Torna permanente as alterações de inicialização.
-	;call blconfig_salvar_alteracoes   
-	
-	;Torna permanente as alterações nas partições.
-	;call fs32_save_current_partition  
-	
-	;popad
-
+    ;Torna permanente as alterações de inicialização.
+    ;call blconfig_salvar_alteracoes   
+    ;Torna permanente as alterações nas partições.
+    ;call fs32_save_current_partition  
+    ;popad
     jmp os_command_line
 ;--
 
@@ -188,25 +152,22 @@ do_save:
 ;++	
 
 do_formatdisk:
-	;pushad
-	;call format_disk
-	;popad
-	jmp os_command_line	
+    ;pushad
+    ;call format_disk
+    ;popad
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_make_boot:
 ;     Cria diretórios e arquivos para Boot.
 ;++
-
 do_make_boot:  
-	;pushad
-	;call make_boot
-	;popad
-	jmp os_command_line
+    ;pushad
+    ;call make_boot
+    ;popad
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_install:
@@ -214,134 +175,113 @@ do_make_boot:
 ;     de uma lba para outra.
 ;     (da area reservada(lba 1024) para o sistema de arquivos.)
 ;++
-
 do_install:
-	
-	;#suspensa !
-	
-	;call install_bootloader ; instala o bootloader.	
-	;mov eax, file1_string 	
-	;call installer      ;executa o installer	
-	jmp os_command_line
+    ;#suspensa!
+    ;call install_bootloader ; instala o bootloader.
+    ;mov eax, file1_string 
+    ;call installer      ;executa o installer
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_set_modo1:
 ;     Configura modo1.
 ;++
-
 do_set_modo1:
     push eax
     call blconfig_set_modo1
-	mov eax, dword 1
+    mov eax, dword 1
     call blconfig_alterar_status_bm16
     pop eax
-	jmp os_command_line
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_set_modo2:
 ;     Configura modo2.
 ;++
-
 do_set_modo2:
     push eax
-	call blconfig_set_modo2
-	mov eax, dword 1
+    call blconfig_set_modo2
+    mov eax, dword 1
     call blconfig_alterar_status_bm16
     pop eax
-	jmp os_command_line
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_set_modo3:
 ;     Configura modo3.
 ;++
-
 do_set_modo3:
     push eax
-	call blconfig_set_modo3
-	mov eax, dword 1
+    call blconfig_set_modo3
+    mov eax, dword 1
     call blconfig_alterar_status_bm16
     pop eax
-	jmp os_command_line
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_set_modo4:
 ;     Configura modo4.
 ;++
-
 do_set_modo4:
     push eax
     call blconfig_set_modo4
-	mov eax, dword 1
+    mov eax, dword 1
     call blconfig_alterar_status_bm16
     pop eax
-	jmp os_command_line
+    jmp os_command_line
 ;--
-
 
 ;==============================================================
 ; do_set_v0:
 ; Configura volume 0.
-
 do_set_v0:
     push eax
     mov eax, VOLUME.p0_name
     call set_volume_atual
     pop eax
-	ret
+    ret
 ;--
-
 
 ;==============================================================
 ; do_set_v1:
 ; Configura volume 1.
-
 do_set_v1:
     push eax
     mov eax, VOLUME.p1_name
     call set_volume_atual
     pop eax
-	ret
+    ret
 ;--
-
 
 ;==============================================================
 ; do_set_v2:
 ; Configura volume 2.
-
 do_set_v2:
     push eax
     mov eax, VOLUME.p2_name
     call set_volume_atual
     pop eax
-	ret
+    ret
 ;--
-
 
 ;==============================================================
 ; do_set_v3:
 ; Configura volume 3.
-
 do_set_v3:
     push eax
     mov eax, VOLUME.p3_name
     call set_volume_atual
     pop eax
-	ret
+    ret
 ;--
-
 
 ;==============================================================
 ; do_openfile:
 ;     Abre um arquivo.
-
 do_openfile:
     mov byte[file_flag], 1
     jmp os_command_line
@@ -353,74 +293,58 @@ do_openfile:
 ;++
 
 do_makefile:
-	mov byte[file_flag], 2
-	jmp os_command_line
+    mov byte[file_flag], 2
+    jmp os_command_line
 ;--
 
 ;==============================================================
 ; do_deletefile: 
 ;     Deleta um arquivo.
 ;++
-
 do_deletefile:
-	mov byte[file_flag], 3
-	jmp os_command_line
+    mov byte[file_flag], 3
+    jmp os_command_line
 ;--
-	
-	
+
 ;==============================================================
 ; do_opendir:
 ;     Abre um diretório.
 ;++
-
 do_opendir:
-	mov byte[file_flag], 4
-	jmp os_command_line
-;--	
-	
-	
+    mov byte[file_flag], 4
+    jmp os_command_line
+;--
+
 ;==============================================================
 ; do_makedir:
 ;     Cria um diretório.
-;++	
-
+;++
 do_makedir:
-	mov byte[file_flag], 5
-	jmp os_command_line
+    mov byte[file_flag], 5
+    jmp os_command_line
 ;--
-	
-	
+
 ;==============================================================
 ; do_deletedir:
 ;    Deleta um diretório.
 ;++
-
 do_deletedir:
-	mov byte[file_flag], 6
-	jmp os_command_line
-;--	
+    mov byte[file_flag], 6
+    jmp os_command_line
+;--
 
-	
 ;==============================================================
 ; do_changedir:
 ;      Muda o diretório atual.
-	
 do_changedir:
-    ;;Nothing for now!
-	jmp os_command_line	
-	
-	
-;==============================================================
-; ls:
-;     lista os arquivos.
-;     (Apresentação no estilo unix.
-
-;;Nothing for now!
-	
-ls:
-    ;jmp dir
     jmp os_command_line
 
+;==============================================================
+; ls:
+; lista os arquivos.
+; Apresentação no estilo unix.
+ls:
+    jmp os_command_line
 
 ;==============================================================
 ; dir:
@@ -430,7 +354,6 @@ ls:
 ; See: 
 ; fs32.inc
 ;++
-
 dir:
     ;call os_screen_clear 
     ;call reset_cursor
@@ -438,49 +361,42 @@ dir:
     jmp os_command_line
 ;--
 
-
 ;----------------------------------
 ; do_seleciona_d0:
 ;     Seleciona disco 0.
 ;++ 
-
 do_seleciona_d0:
     push eax
-	mov eax, dword 0
-	call fs32_select_current_disk
-	pop eax
-	jmp os_command_line
+    mov eax, dword 0
+    call fs32_select_current_disk
+    pop eax
+    jmp os_command_line
 ;--
-	
-	
+
 ;-----------------------------------
 ; do_seleciona_d1:
 ;     Seleciona disco 1.
 ;++ 
-
 do_seleciona_d1:
     push eax
-	mov eax, dword 1
-	call fs32_select_current_disk
-	pop eax
-	jmp os_command_line
+    mov eax, dword 1
+    call fs32_select_current_disk
+    pop eax
+    jmp os_command_line
 ;--
-	
-	
+
 ;------------------------------------
 ; do_seleciona_d2:
 ;     Seleciona disco 2.
 ;++ 
-
 do_seleciona_d2:
     push eax
-	mov eax, dword 2
-	call fs32_select_current_disk
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 2
+    call fs32_select_current_disk
+    pop eax
+    jmp os_command_line
+;--
+
 ;-------------------------------------
 ; do_seleciona_d3:
 ;     Seleciona disco 3.
@@ -488,118 +404,99 @@ do_seleciona_d2:
 
 do_seleciona_d3:
     push eax
-	mov eax, dword 3
-	call fs32_select_current_disk
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 3
+    call fs32_select_current_disk
+    pop eax
+    jmp os_command_line
+;--
+
 ;-------------------------------------
 ; do_seleciona_p0:
 ;     Seleciona partição 0.
 ;++
-
 do_seleciona_p0:
     push eax
-	mov eax, dword 0
-	call fs32_select_current_partition
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 0
+    call fs32_select_current_partition
+    pop eax
+    jmp os_command_line
+;--
+
 ;-------------------------------------
 ; do_seleciona_p1:
 ;     Seleciona partição 1.
-;++	
-
+;++
 do_seleciona_p1:
     push eax
-	mov eax, dword 1
-	call fs32_select_current_partition
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 1
+    call fs32_select_current_partition
+    pop eax
+    jmp os_command_line
+;--
+
 ;--------------------------------------
 ; do_seleciona_p2:
 ;     Seleciona partição 2.
-;++ 	
-
+;++ 
 do_seleciona_p2:
     push eax
-	mov eax, dword 2
-	call fs32_select_current_partition
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 2
+    call fs32_select_current_partition
+    pop eax
+    jmp os_command_line
+;--
+
 ;--------------------------------------
 ; do_seleciona_p3:
 ;     Seleciona partição 3.
-;++	
-
+;++
 do_seleciona_p3:
     push eax
-	mov eax, dword 3
-	call fs32_select_current_partition
-	pop eax
-	jmp os_command_line
-;--	
-	
-	
+    mov eax, dword 3
+    call fs32_select_current_partition
+    pop eax
+    jmp os_command_line
+;--
+
 ;----------------------------------------
 ; do_ativar:
 ;     Ativa a partição atual.
 ;++
-
 do_ativar:
     call fs32_ativar_particao_atual
-	jmp os_command_line
-;--	
-	
-	
+    jmp os_command_line
+;--
+
 ;----------------------------------------
 ; do_desativar:
 ;     Desativa a partição atual.
-;++	
-
+;++
 do_desativar:
     call fs32_desativar_particao_atual
-	jmp os_command_line
-;--	
-	
-	
+    jmp os_command_line
+;--
 
-;;================================================
+;----------------------------------------
 ; hd_test:
 ;     Exibir informações sobre um disco
 ;     Testando operações de disco.
 ;++
-
 hd_test:
-	pushad
-	
-	;call os_screen_clear
+    pushad
+    ;call os_screen_clear
     ;call reset_cursor
-	
-	; msm/include/hardware.inc
-    call hardware_show_currentdisk_info    ;mostrar_parametros_do_disco_atual
-	
-	popad
-	jmp os_command_line
+; hardware.inc
+; mostrar_parametros_do_disco_atual
+    call hardware_show_currentdisk_info 
+    popad
+    jmp os_command_line
 ;--
 
-
-;====================================================
+;----------------------------------------
 ; shellcallsPartitionTest:
 ;     Exibir informações sobre uma partição.
 ;     Testa qual particão está ativa.
-;++	
-
+;++
 shellcallsPartitionTest:
     nop
 particao_test:
@@ -621,21 +518,17 @@ particao_test:
     jmp os_command_line
 ;--
 
-
 ;--------------------------------
 ; print_help:
 ;     Mostra mensagem de ajuda.
 ;++
-
 print_help:
-
     ;pushad
     push esi
     mov esi, help_text
     call os_output
     pop esi
     ;popad
-
     jmp os_command_line
 ;--
 
@@ -674,39 +567,26 @@ print_ver:
 fail:
     nop
 shellcallsFail:
-	push esi
-	mov esi, not_found_msg
-	call os_output
-	pop esi
-	jmp os_command_line
+    push esi
+    mov esi, not_found_msg
+    call os_output
+    pop esi
+    jmp os_command_line
 ;--
 
+; #deprecated.
+;os_bmfs_file_list:
+;    ret 
 
-;-------------------------------------- 
-; os_bmfs_file_list:
-;     Generate a list of files on disk.
-; IN:	EDI = location to store list.
-; OUT:	EDI = pointer to end of list.
-;++
-    ;#Cancelada!
-	
-os_bmfs_file_list:
-	ret 
-;--
-
-;--------------------------------------
-; testzone: ?? 
-;++
-    ;#Cancelada!
-	
+; #deprecated.
 testzone:
-	jmp os_command_line
+    jmp os_command_line
 ;--
 
 ;; debug messages
 debug_message_fixme2_loading_sector:  
-    db "[FIXME]: loading sector on real machine ?", 13, 10, 0
-    
+    db "[FIXME]: Loading sector on real machine?", 13, 10, 0
+
 ;
 ; End.
 ;
