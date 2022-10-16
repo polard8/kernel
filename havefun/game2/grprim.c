@@ -919,6 +919,9 @@ gwsDepthRange(
 
 // z in 45 degree.
 // Isso é uma projeção quando z esta inclinado em 45 graus.
+// #
+// Trasformation for Cavalier Oblique Drawings.
+// It uses full depth.
 int 
 __transform_from_viewspace_to_screespace(
     int *res_x, int *res_y,
@@ -929,6 +932,7 @@ __transform_from_viewspace_to_screespace(
 // #
 // The viewspace is the view considering 
 // the camera's point of view.
+
 
 // 3d
 // save parameters. (++)
@@ -1052,7 +1056,6 @@ done:
     }
 
 
-
 // ===================================================
 // Return values:
 
@@ -1068,7 +1071,7 @@ done:
 }
 
 
-void gr_dc_extents_init( struct dc_d *dc )
+void gr_dc_extents_init(struct dc_d *dc)
 {
     if ( (void*) dc == NULL )
         return;
@@ -1083,8 +1086,7 @@ void gr_dc_extents_init( struct dc_d *dc )
     dc->max_y = ULONG_MAX;
 }
 
-
-int gr_dc_refresh_screen( struct dc_d *dc )
+int gr_dc_refresh_screen(struct dc_d *dc)
 {
 
     if ( (void*) dc != NULL )
@@ -1660,20 +1662,22 @@ void plotLine(int x0, int y0, int x1, int y1)
 // The algorithm could be extended to three (or more) dimensions.
 // #todo: color is unsigned int.
 
-void 
+int 
 plotLine3d (
     struct gws_window_d *window,
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
     unsigned int color )
 {
+    int npixels=0;  // Number of pixels changed.
+    
     int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
     int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1;
     int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1;
 
 /* maximum difference */
     int dm = grMAX3(dx,dy,dz);
-    register int i = dm;
+    register int i=dm;
 
 /* error offset */
     // x1 = y1 = z1 = dm/2; 
@@ -1685,6 +1689,7 @@ plotLine3d (
     for (;;)
     {
         grPlot0( window, z0, x0, y0, color );
+        npixels++;
      
         if (i-- == 0) { break; }
         
@@ -1700,6 +1705,8 @@ plotLine3d (
         if (z1 < 0) 
         { z1 += dm; z0 += sz; }
     };
+    
+    return (int) npixels;
 }
 
 
@@ -2209,8 +2216,10 @@ grTriangle3(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle )
 {
+    int npixels=0;  // Number of pixels changed.
+
     if ( (void*) triangle == NULL ){
-        return -1;
+        return (int) npixels;
     }
 
 // Draw:
@@ -2218,51 +2227,53 @@ grTriangle3(
 // sentido horario, 
 // começando pelo ponto de cima.
 
-    plotLine3d (
+    npixels += plotLine3d (
         window,
         triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
         triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
         triangle->p[1].color );
-    plotLine3d (
+    npixels += plotLine3d (
         window,
         triangle->p[1].x, triangle->p[1].y, triangle->p[1].z, 
         triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
         triangle->p[2].color );
-    plotLine3d (
+    npixels += plotLine3d (
         window,
         triangle->p[2].x, triangle->p[2].y, triangle->p[2].z, 
         triangle->p[0].x, triangle->p[0].y, triangle->p[0].z, 
         triangle->p[0].color );
 
-    return 0;
+    return (int) npixels;
 }
 
-int grTriangle( struct gr_triangle_d *triangle )
+int grTriangle(struct gr_triangle_d *triangle)
 {
-    int Status=0;
+    int npixels=0;  // Number of pixels changed.
     
-    if ( (void*) triangle == NULL )
-        return -1;
+    if ( (void*) triangle == NULL ){
+        return (int) npixels;
+    }
 
-    // #todo
-    // something
+// #todo
+// something
   
-    Status = (int) grTriangle3(NULL,triangle);
-    
-    return Status;
-}
+    npixels += grTriangle3(NULL,triangle);
 
+    return (int) npixels;
+}
 //---------------------
 
 // Fill a triangle - Bresenham method
 // Original from http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
-void 
+int 
 fillTriangle0(
     int x1, int y1,
     int x2, int y2,
     int x3, int y3, 
     unsigned int c)
 {
+    int npixels=0;  // Number of pixels changed.
+
     int t1x=0;
     int t2x=0;
     int y=0;
@@ -2364,7 +2375,8 @@ fillTriangle0(
         if(maxx<t2x) maxx=t2x;
 
         // Draw line from min to max points found on the y
-        grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        // #todo: return the number of pixels changed.
+        npixels += grBackbufferDrawHorizontalLine(minx,y,maxx,c);
 
         // Now increase y
         if(!changed1){ t1x += signx1; }
@@ -2374,8 +2386,9 @@ fillTriangle0(
         
         y += 1;
         
-        if(y==y2)
+        if(y==y2){
             break;
+        }
     };
 
 // --------------------------------------------
@@ -2397,7 +2410,7 @@ fillTriangle0(
 // swap values
     if (dy1 > dx1){
         ____SWAP(dy1,dx1);
-        changed1 = TRUE;
+        changed1=TRUE;
     }else{ 
         changed1=FALSE;
     }
@@ -2447,17 +2460,21 @@ fillTriangle0(
         if(maxx<t2x) maxx=t2x;
 
         // Draw line from min to max points found on the y
-        grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        // #todo: return the number of pixels changed.
+        npixels += grBackbufferDrawHorizontalLine(minx,y,maxx,c);
 
         // Now increase y
-		if(!changed1) { t1x += signx1; }
-		t1x+=t1xp;
-		if(!changed2) { t2x += signx2; }
-		t2x+=t2xp;
+        if(!changed1) { t1x += signx1; }
+        t1x+=t1xp;
+        if(!changed2) { t2x += signx2; }
+        t2x+=t2xp;
         y += 1;
-        if(y>y3)
-            return;
+        if (y>y3){
+            return (int) npixels;
+        }
     };
+    
+    return (int) npixels;
 }
 //-----------------
 
@@ -2469,6 +2486,7 @@ fillTriangle(
     struct gr_triangle_d *triangle,
     int hotspotx, int hotspoty )
 {
+    int npixels=0;  // Number of pixels changed.
 
     int X0=0; int Y0=0;
     int X1=0; int Y1=0;
@@ -2478,8 +2496,13 @@ fillTriangle(
         //return 0;
 
     if ( (void*) triangle == NULL ){
-        return -1;
+        return (int) npixels;
     }
+
+
+// #
+// Trasformation for Cavalier Oblique Drawings.
+// It uses full depth.
 
     __transform_from_viewspace_to_screespace( 
         (int *) &X0, (int *) &Y0, 
@@ -2499,16 +2522,21 @@ fillTriangle(
         TRUE, //UseLeftHand,
         hotspotx, hotspoty ); 
 
+
+    unsigned int color = triangle->p[0].color;
+
 // Draw
+// Cavalier Oblique Drawings.
+// The transformation was made before.
 
-    fillTriangle0( 
-        (int) (X0 & 0xFFFFFFFF), (int) (Y0 & 0xFFFFFFFF),
-        (int) (X1 & 0xFFFFFFFF), (int) (Y1 & 0xFFFFFFFF),
-        (int) (X2 & 0xFFFFFFFF), (int) (Y2 & 0xFFFFFFFF),
-        (unsigned int) triangle->p[0].color );
+    npixels += fillTriangle0( 
+                   (int) (X0 & 0xFFFFFFFF), (int) (Y0 & 0xFFFFFFFF),
+                   (int) (X1 & 0xFFFFFFFF), (int) (Y1 & 0xFFFFFFFF),
+                   (int) (X2 & 0xFFFFFFFF), (int) (Y2 & 0xFFFFFFFF),
+                   (unsigned int) color );
 
-//#todo: return pixel counter.
-    return 0;
+// Return pixel counter.
+    return (int) npixels;
 }
 
 
@@ -2520,14 +2548,17 @@ plotTriangleF(
     struct gr_triangleF3D_d *t,
     int fill )
 {
+    int npixels=0;  // Number of pixels changed.
 
 // Engine triangle structure.
 // Using 'int',
     struct gr_triangle_d final_triangle;
 
-    if (CurrentProjectionF.initialized != TRUE){
+    if (CurrentProjectionF.initialized != TRUE)
+    {
+        //#debug
         printf("plotTriangleF: CurrentProjectionF\n");
-        return -1;
+        return (int) npixels;
     }
 
 // #test
@@ -2538,14 +2569,11 @@ plotTriangleF(
 
 // Check the 'projected triangle'.
     if ((void*)t == NULL){
-        return -1;
+        return (int) npixels;
     }
 
-
-//
 // Projection parameters.
 // No matrix.
-//
 
     // z
     float znear = (float) 0.01f;  //default
@@ -2690,9 +2718,7 @@ plotTriangleF(
     final_triangle.p[2].color = t->p[2].color; // COLOR_WHITE;
 
     final_triangle.used = TRUE;
-    
     final_triangle.initialized = TRUE;
-
 
     //#debug
     //printf("x0=%d y0=%d | x1=%d y1=%d | x2=%d y2=%d \n",
@@ -2700,29 +2726,26 @@ plotTriangleF(
     //    final_triangle.p[1].x, final_triangle.p[1].y, 
     //    final_triangle.p[2].x, final_triangle.p[2].y );
 
-
-    // Not filled.
-    // we dont need a valid window.
-    // #todo: return pixel counter.
-    if (!fill){
-        return (int) grTriangle3( window, &final_triangle );
-    }
-
-    // Filled
-    // We need a valid window.
-    // #todo: return pixel counter.
-    if (fill){
-        return (int) fillTriangle( 
-                         window, 
-                         &final_triangle, 
-                         HotSpotX, HotSpotY );
-    }
-
+// Not filled.
+// we dont need a valid window.
 // #todo: return pixel counter.
-    return 0;
+    if (!fill){
+        npixels += grTriangle3( window, &final_triangle );
+    }
+
+// Filled
+// We need a valid window.
+// #todo: return pixel counter.
+    if (fill){
+        npixels += fillTriangle( 
+                       window, 
+                       &final_triangle, 
+                       HotSpotX, HotSpotY );
+    }
+
+// Return pixel counter.
+    return (int) npixels;
 }
-
-
 //------------------
 
 // Polyline

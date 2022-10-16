@@ -650,7 +650,7 @@ int serviceGrPlot0(void);
 // == Line ==============================================
 //
 
-void 
+int 
 plotLine3d (
     struct gws_window_d *window,
     int x0, int y0, int z0, 
@@ -723,7 +723,7 @@ grTriangle3(
 int grTriangle( struct gr_triangle_d *triangle);
 
 
-void 
+int 
 fillTriangle0(
     int x1, int y1,
     int x2, int y2,

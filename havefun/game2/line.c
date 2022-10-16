@@ -169,7 +169,7 @@ void test_draw_line2(void)
  * grBackbufferDrawHorizontalLine:
  *     Draw a horizontal line on backbuffer. 
  */
-
+// #todo: return the number of pixels changed.
 int
 grBackbufferDrawHorizontalLine ( 
     unsigned long x1,
@@ -177,6 +177,7 @@ grBackbufferDrawHorizontalLine (
     unsigned long x2,  
     unsigned int color )
 {
+    int npixels=0;  // Number of pixels changed.
     unsigned long __x1 = (unsigned long) x1;
     unsigned long __x2 = (unsigned long) x2;
     unsigned long __y  = (unsigned long) y;
@@ -190,29 +191,29 @@ grBackbufferDrawHorizontalLine (
     //    y=0;
     //}
 
-
     if (__x1 > __x2){
         debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
-        return -1;
+        return (int) npixels;
     }
 
 // #todo:
 // Limit given by the device context.
     if (__x2 > 800){
         debug_print("grBackbufferDrawHorizontalLine: __x2 > 800\n");
-        return -1;
+        return (int) npixels;
     }
+
+    npixels = (int) (__x2 - __x1);
 
 // loop:
 // IN: color, x, y, rop
-    while (__x1 < __x2)
-    {
+    while (__x1 < __x2){
         grPlot2D( color, __x1, __y, rop );
-        __x1++;  
+        __x1++;
     };
 
-// Return the number of pixels.
-    return (int) __x1;
+// Return the number of pixels changed.
+    return (int) npixels;
 }
 
 
