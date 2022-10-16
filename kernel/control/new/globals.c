@@ -53,6 +53,8 @@ int g_platform_type = PFT_64BIT;
 // System type.
 int g_system_type = SYSTEM_TYPE_NULL;
 
+// see: smp_probe() in x64.c
+unsigned int g_processor_count=0;
 
 // Logon.
 int g_logged=FALSE;

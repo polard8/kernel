@@ -870,8 +870,6 @@ void x64_load_pml4_table(unsigned long phy_addr)
 }
 
 
-
-
 // If the MP Floating Point Structure 
 // can't be found in this area, 
 // then the area between 0xF0000 and 0xFFFFF should be searched. 
@@ -881,8 +879,8 @@ void smp_probe(void)
 {
     int i=0;
 
+    printf("\n");
     printf("smp_probe:\n");
-
 
 // At this point we gotta have a lot of information
 // in the structure 'processor'.
@@ -923,10 +921,10 @@ void smp_probe(void)
 
     unsigned char *p;
 
-    unsigned char c1;
-    unsigned char c2;
-    unsigned char c3;
-    unsigned char c4;
+    unsigned char c1=0;
+    unsigned char c2=0;
+    unsigned char c3=0;
+    unsigned char c4=0;
 
 // base
 // between 0xF0000 and 0xFFFFF.
@@ -938,7 +936,7 @@ void smp_probe(void)
     static int mp_found = FALSE;
 
     int max = (0xFFFFF - ebda_address);
-    for(i=0; i<max; i++)
+    for (i=0; i<max; i++)
     {
         c1 = p[i];
         c2 = p[i+1];
@@ -956,11 +954,14 @@ void smp_probe(void)
         }
     }
 
-    if(mp_found!=TRUE){
-        printf("MP table wasn't found!\n");
+    if (mp_found != TRUE){
+        printf("smp_probe: MP table wasn't found!\n");
         refresh_screen();
         return;
     } 
+
+// ==============================================
+// MPTable
 
 // base + offset.
 // This is the base of the structure.
@@ -968,52 +969,51 @@ void smp_probe(void)
 // basetier/new/include/hal/mp.h
 
     unsigned long table_address = (ebda_address + i);
-
     MPTable = (struct mp_floating_pointer_structure *) table_address;
 
-// Print table.
-
+// ---------------------------------------------
+// Print table info
 
 // signature
     printf("Signature: %c %c %c %c\n",
         MPTable->signature[0],
         MPTable->signature[1],
         MPTable->signature[2],
-        MPTable->signature[3]);
+        MPTable->signature[3] );
 
 // configuration table
     //32bit address.
     unsigned long configurationtable_address = 
         (unsigned long) (MPTable->configuration_table & 0xFFFFFFFF);
 
-    printf("Configuration table address %x\n",
+    printf("Configuration table address: {%x}\n",
         configurationtable_address);
 
-// lenght
-// n*16 bytes
-    printf("lenght %d \n",MPTable->length);
+// lenght: n*16 bytes
+    printf("Lenght: {%d}\n", MPTable->length);
 
-// revision
-// 1.x
-    printf("revision %d \n",
-        MPTable->mp_specification_revision);
+// revision: 1.x
+    printf("Revision: {%d}\n", MPTable->mp_specification_revision);
 
-//checksum
-    printf("checksum %d \n",MPTable->checksum);
-// default configuration flag.
-    printf("default_configuration %d \n",MPTable->default_configuration);
-//  features.
-    printf("features %d \n",MPTable->features);
+// checksum
+    printf("Checksum: {%d}\n", MPTable->checksum);
 
+// Default configuration flag.
+    printf("Default configuration flag: {%d}\n",
+        MPTable->default_configuration );
+
+// Features
+
+    printf("Features: {%d}\n", MPTable->features);
     if( MPTable->features & (1 << 7) ){
-         printf("The IMCR is present and PIC mode is being used\n");
+         printf("The IMCR is present and PIC mode is being used.\n");
     }
-
     if( (MPTable->features & (1 << 7)) == 0 ){
          printf("Using the virtual wire mode.\n");
     }
 
 // ==============================================
+// MPConfigurationTable
 
     MPConfigurationTable = 
         (struct mp_configuration_table *) configurationtable_address;
@@ -1023,53 +1023,96 @@ void smp_probe(void)
         MPConfigurationTable->signature[0],
         MPConfigurationTable->signature[1],
         MPConfigurationTable->signature[2],
-        MPConfigurationTable->signature[3]);
-
-    //int i=0;
+        MPConfigurationTable->signature[3] );
 
     char oemid_string[8+1];
     char productid_string[12+1];
 
-    for(i=0; i<8; i++)
+    for (i=0; i<8; i++){
         oemid_string[i] = MPConfigurationTable->oem_id[i];
-    oemid_string[8]=0;
+    };
+    oemid_string[8]=0;  // finish
 
-    for(i=0; i<12; i++)
+    for (i=0; i<12; i++){
         productid_string[i] = MPConfigurationTable->product_id[i];
-    productid_string[12]=0;
+    };
+    productid_string[12]=0;  // finish
 
 // intel: OEM00000 PROD00000000
-    printf("oem id: %s\n",oemid_string);
-    printf("product id: %s\n",productid_string);
+    printf("OEM id: {%s}\n",oemid_string);
+    printf("Product ID: {%s}\n",productid_string);
 
-    printf("lapic address: %x\n",
+    printf("lapic address: {%x}\n",
         MPConfigurationTable->lapic_address );
+
+// Initialize lapic.
 
 // See:
 // apic.c
+
     lapic_initializing( 
         (unsigned long) MPConfigurationTable->lapic_address );
 
+// =======================================================
+// Entries
+// ACPI processor, Local APIC.
 
-// entries ===================================
+// Logo abaixo da configuration table
+// começa uma sequência de entradas de tamanhos diferentes.
+// Se a entrada for para descrever um processador, então 
+// a entrada tem 20 bytes, caso contrario tem 8 bytes.
+// see: mp.h
 
 // The address of the first entry.
     unsigned long entry_base = 
-    (unsigned long) ( configurationtable_address + sizeof( struct mp_configuration_table ) );
+    (unsigned long) ( configurationtable_address + 
+                      sizeof( struct mp_configuration_table ) );
 
-    // tmp 
+
+/*
+entry info:
+Description | Type | Length | Comments
+Processor  |     0 |     20 | One entry per processor.
+Bus        |     1 |      8 | One entry per bus.
+I/O APIC   |     2 |      8 | One entry per I/O APIC.
+I/O 
+Interrupt 
+Assignment |     3 |      8 | One entry per bus interrupt source.
+Local 
+Interrupt 
+Assignment |     4 |      8 | One entry per system interrupt source.
+*/
+
+
+// Estrutura para entradas que descrevem um processador.
+// Processor = type 0.
+
     struct entry_processor *e;
 
-    // How many entries?
-    for(i=0; i<4; i++)
+// This routine gets the number of processors.
+// #todo:
+// We can create a method for that routine.
+// Register this number into the global data.
+    unsigned int NumberOfProcessors=0;
+
+// How many entries?
+    for (i=0; i<4; i++)
     {
+        // tracing
+        printf (":::: Entry %d: \n",i);
+        
         e = (struct entry_processor *) entry_base;
         
-        if(e->type != 0)
+        if(e->type == 0){
+            NumberOfProcessors += 1;
+        }
+
+        // It's not a processor.
+        if (e->type != 0)
         {
-            printf("#test: Not a processor entry\n");
-            refresh_screen();
-            return;
+            printf("smp_probe: Not a processor entry {%d}\n",
+                e->type );
+            goto done;
         }
 
         printf("local_apic_id %d\n",e->local_apic_id);
@@ -1080,7 +1123,7 @@ void smp_probe(void)
         }
 
         if( e->flags & (1<<1) ){
-            printf("The processor is a bootstrap processor\n");
+            printf("smp_probe: The processor is a BSP\n");
         }
         
         printf ("stepping: %d\n",(e->signature & 0x00F));
@@ -1088,14 +1131,19 @@ void smp_probe(void)
         printf ("  family: %d\n",((e->signature & 0xF00) >> 8) );
 
         // Next entry
+        // Each processor entry has 20 bytes.
+        // The other types has 8 bytes.
         entry_base = (unsigned long) (entry_base + 20);
     };
 
+done:
+    g_processor_count = 
+        (unsigned int) NumberOfProcessors;
+    
+    printf("Processor count: {%d}\n",NumberOfProcessors);
     printf("smp_probe: done\n");
     refresh_screen();
+// #debug
+    //while(1){}
 }
-
-
-
-
 

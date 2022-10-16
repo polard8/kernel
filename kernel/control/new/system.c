@@ -345,7 +345,10 @@ unsigned long doGetSystemMetrics(int index)
            return (unsigned long) current_thread;   
            break;
 
-       //case 150:  break;
+       // return the number of processors.
+       case 150:  
+           return (unsigned long) (g_processor_count & 0xFFFFFFFF);
+           break;
        //case 151:  break;
 
         // 200 ~ 2xx window server info.

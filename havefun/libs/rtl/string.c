@@ -801,8 +801,32 @@ void *memcpy64 ( void *v_dst, const void *v_src, unsigned long n )
 }
 
 
+/*
+// Copia uma quantidade de bytes e finaliza a string.
+char *strcpy2(char *dst, const char *src, int length);
+char *strcpy2(char *dst, const char *src, int length)
+{
+    if ( (void*) dst == NULL )
+        return NULL;
+
+    if ( (void*) src == NULL )
+        return NULL;
+
+    char *end = (src + length);
+
+    while (src < end){
+        *dst++ = (char) *src++;
+    };
+
+    *dst++ = '\0';
+    
+    return (char *) dst;
+}
+*/
+
+
 // Copy a string. 
-char *strcpy ( char *to, const char *from )
+char *strcpy(char *to, const char *from)
 {
     register int i=0;
 

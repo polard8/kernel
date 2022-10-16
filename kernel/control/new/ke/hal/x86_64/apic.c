@@ -234,7 +234,6 @@ void lapic_initializing(unsigned long lapic_pa)
 	//// All cpus use logical id 1
 	//*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
 
-
     //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
 
     // #test
@@ -278,7 +277,6 @@ int has_apic (void)
    unsigned int ebx=0;
    unsigned int ecx=0;
    unsigned int edx=0;
-
 
 // #bugbug
 // Do we have cpuid support?

@@ -420,6 +420,8 @@ typedef enum {
 extern int g_system_type;
 
 
+extern unsigned int g_processor_count;
+
 //
 // == current ======================================================
 //
