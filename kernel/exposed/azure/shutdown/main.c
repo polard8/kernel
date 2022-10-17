@@ -1,8 +1,5 @@
-
-// main.c
 // 'shutdown' command for Gramado.
 
-// rtl
 #include <rtl/gramado.h>
 #include <stddef.h>
 #include <ctype.h>
@@ -10,9 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-// libio
 #include <libio.h>
-
 
 // #test
 // Finding the size of a disk.
@@ -34,19 +29,24 @@
 #define Device_Control  2
 
 
+#define is_qemu  rtl_is_qemu
+
+
 //
 // private functions: prototypes ==============
 //
 
 static void __serial_write_char (unsigned char data);
 static void test_disk_size(void);
-static int is_qemu(void);
+
 
 
 // Vai escrever em uma porta ja inicializada pelo kernel.
 static void __serial_write_char (unsigned char data) 
 {
-    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0);
+    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0)
+    {
+    };
 
     libio_outport8 ( 0x3F8, (unsigned char) data );
 }
@@ -75,8 +75,9 @@ static void test_disk_size(void)
         (unsigned char) (Dev << 4) + (1 << 6) ); 
 
 // Test device is ready to do comand.
-    while (libio_inport8(d+Status) &  DRDY == 0);
-
+    while (libio_inport8(d+Status) &  DRDY == 0)
+    {
+    };
 
     if (LBA48 != 0)
     {
@@ -112,7 +113,9 @@ static void test_disk_size(void)
             0xF8 ); 
         
         // wait command completed
-        while (libio_inport8 (d+Status) &  BSY != 0);
+        while (libio_inport8 (d+Status) &  BSY != 0)
+        {
+        };
 
         Max_LBA  = (unsigned long )libio_inport8(d+LBA_Low);
         Max_LBA += (unsigned long )libio_inport8(d+LBA_Mid)  << 8;
@@ -120,21 +123,10 @@ static void test_disk_size(void)
 
         Max_LBA += ((unsigned long )libio_inport8(d+Device) & 0xF) <<24;
     }
-    
-    
+
     printf ("Size {%d}\n",Max_LBA);
 }
 
-
-static int is_qemu(void)
-{
-    int isQEMU=-1;
-    isQEMU = (int) rtl_get_system_metrics(300);
-    //isVirtualBox = rtl_get_system_metrics(?);
-    //isBochs      = rtl_get_system_metrics(?);
-
-    return (int) (isQEMU & 0xFFFFFFFF);
-}
 
 // main:
 // #test

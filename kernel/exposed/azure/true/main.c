@@ -1,19 +1,10 @@
-/*
- * File: main.c
- *     return TRUE;
- */
+// Returning TRUE.
 
-// rtl
 #include <types.h>
 #include <stdio.h>
 
-int main ( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
     return (int) TRUE;
 }
-
-//
-// End.
-//
-
 

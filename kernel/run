@@ -1,4 +1,5 @@
 #!/bin/sh
+# Running Gramado OS on qemu.
 
 	echo "~~~~>"
 	

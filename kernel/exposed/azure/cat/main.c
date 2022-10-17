@@ -1,8 +1,6 @@
-
 // 'cat' command for Gramado.
 // 2022 - Fred Nora.
 
-// rtl
 #include <rtl/gramado.h>
 #include <types.h>
 #include <stddef.h>
@@ -13,30 +11,23 @@
 #include <fcntl.h>
 #include <errno.h>
 
-
 int main ( int argc, char *argv[] )
 {
     FILE *fp;
     char buffer[1024];
     //char buffer[2048];
-
     int fd=-1;
-
 // Counters.
     register int nreads = 0;
     register int nwrites = 0;
-
     size_t size=0;
-    
     //int fdInput = -1;
     //int fdOutput = -1;
-    
     //int i=0;
     //int Max = argc;
     //char *p;
-    
-    printf("CAT.BIN: argc %d | argv[1] %s\n", 
-        argc, argv[1] );
+
+    printf("CAT.BIN: argc %d | argv[1] %s\n", argc, argv[1] );
 
     // pula o primeiro porque eh o nome do programa.
     

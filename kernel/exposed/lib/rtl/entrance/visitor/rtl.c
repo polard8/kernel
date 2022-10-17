@@ -613,6 +613,18 @@ unsigned long rtl_get_system_metrics (int index)
 }
 
 
+int rtl_is_qemu(void)
+{
+    int isQEMU=-1;
+    isQEMU = (int) rtl_get_system_metrics(300);
+    //isVirtualBox = rtl_get_system_metrics(?);
+    //isBochs      = rtl_get_system_metrics(?);
+
+    return (int) (isQEMU & 0xFFFFFFFF);
+}
+
+
+
 pid_t rtl_current_process(void)
 {
     return (int) rtl_get_system_metrics(140);

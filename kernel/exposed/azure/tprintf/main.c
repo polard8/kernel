@@ -1,14 +1,11 @@
-
 // TPRINTF.BIN
 // Testing libc functions.
 
-// rtl
 #include <ctype.h> 
 #include <types.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-
 
 static int printf_test(void);
 
@@ -24,7 +21,6 @@ static int printf_test(void);
  *   printf.c:214: warning: spurious trailing `%' in format
  * this line is testing an invalid % at the end of the format string.
  * this should display (on 32bit int machine) :
- *
  * Hello world!
  * printf test
  * (null) is null pointer
@@ -45,7 +41,6 @@ static int printf_test(void);
  * -3: -3   left justif.
  * -3:   -3 right justif.
  */
-
 //testando 
 //não tradicional, mas funciona.
 
@@ -54,14 +49,11 @@ static int printf_test(void)
     int mi;
     int i=5;
     unsigned int bs = sizeof(int) * 8;
-
     char *np = 0;
     char *ptr = "Hello world!";
     char buf[128];
 
-
     mi = (1 << (bs-1)) + 1;
-
 
 // Hello
 	printf(":: %s\n", ptr);
@@ -88,7 +80,6 @@ static int printf_test(void)
 	printf("\n");
 
 //=================
-
     // We still do not have support for this.
 
 /*
@@ -130,10 +121,6 @@ int main (int argc, char *argv[])
 
     printf("TPRINTF.BIN: Done");
     fflush(stdout);
-
-    while(1){
-        //
-    };
 
     return 0;
 }

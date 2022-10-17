@@ -1,26 +1,21 @@
 
+// gramado.h
+// The main header file for the rtl.
 // gramado system calls.
-
 // #bugbug: It is not properly stub routines,
 // used by shared libraries. It's is o.s. dependent routines.
 // We need to change the name of this document, and change
 // the name in ALL apllications.
-//
-
 
 #ifndef __GRAMADO_CALL
-#define __GRAMADO_CALL 1
-
-
+#define __GRAMADO_CALL  1
 
 #include <types.h>
 #include <sys/types.h>
 #include <stddef.h>
-
 #include <pthread.h>
 
-
-// Modes.
+// Gramado modes.
 #define GRAMADO_JAIL        0x00
 #define GRAMADO_P1          0x01
 #define GRAMADO_HOME        0x02
@@ -29,25 +24,17 @@
 #define GRAMADO_CALIFORNIA  0x05
 // ...
 
-
-
-// usado em 'file sync'
+// Used in 'file sync'
 #define ACTION_NULL       0
 #define ACTION_REQUEST    1000
 #define ACTION_REPLY      2000
 #define ACTION_EVENT      3000
 #define ACTION_ERROR      4000
-
-#define SYNC_REQUEST_SET_ACTION 1
-#define SYNC_REQUEST_GET_ACTION 2
+#define SYNC_REQUEST_SET_ACTION  1
+#define SYNC_REQUEST_GET_ACTION  2
 // ...
 
-
 // #define RTL_ABS(X)    (((X) < 0) ? (-(X)) : (X))
-
-
-
-
 
 //
 // == prototypes =============================================
@@ -213,11 +200,11 @@ rtl_draw_text (
     
 void rtl_show_backbuffer (void);
 
-
 unsigned long rtl_get_system_message(unsigned long message_buffer);
 unsigned long rtl_post_system_message( int tid, unsigned long message_buffer );
 
-unsigned long rtl_get_system_metrics (int index);
+unsigned long rtl_get_system_metrics(int index);
+int rtl_is_qemu(void);
 
 unsigned long rtl_jiffies(void);
 unsigned long rtl_memory_size_in_kb(void);
