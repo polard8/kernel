@@ -33,6 +33,7 @@
 #define ETHERNET_HEADER_LENGHT  14  
 
 // Ethernet header
+// #todo: Nove this to e1000.h
 struct e1000_ether_header_d 
 {
 // MAC
@@ -47,13 +48,14 @@ struct e1000_ether_header_d
 //see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
 
-
-
 int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
-
-
 unsigned long gE1000InputTime=0;
+
+
+//
+// =======================================
+//
 
 
 // NIC device handler.
@@ -91,7 +93,6 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa);
 static void
 __e1000_enable_interrupt(struct intel_nic_info_d *nic_info);
 
-
 static int __e1000_reset_controller(void);
 static void __e1000_setup_irq (int irq_line);
 
@@ -99,24 +100,23 @@ static void __e1000_setup_irq (int irq_line);
 // =====================
 //
 
+// Read from memory mapped register.
 static uint32_t 
 __E1000ReadCommand ( 
     struct intel_nic_info_d *d, 
     uint16_t addr )
 {
-
-// Read from memory mapped register.
     return *( (volatile unsigned int *) (d->mem_base + addr));
 }
 
+
+// Write to memory mapped register.
 static void 
 __E1000WriteCommand ( 
     struct intel_nic_info_d *d, 
     uint16_t addr, 
     uint32_t val )
 {
-
-// Write to memory mapped register.
     *( (volatile unsigned int *)(d->mem_base + addr)) = val;
 }
 
@@ -128,9 +128,8 @@ __E1000ReadEEPROM (
 {
     uint32_t data=0;
 
-
-    // #todo
-    // Check the pointer validation.
+// #todo
+// Check the pointer validation.
 
     //if ( (void*) d == NULL )
         //return 0;
@@ -273,49 +272,49 @@ static int __e1000_reset_controller(void)
 
 	//unsigned char *base_address = (unsigned char *) currentNIC->mem_base;
 	//unsigned long *base_address32 = (unsigned long *) currentNIC->mem_base;	
-		
-	//
-	//===========================================
-	//
-	
+
 //
-//    ## TX ##
+// ===========================================
+//
+
+//
+//  ## TX ##
 //
     //printf("[1]:\n");
 
-    // And alloc the phys/virt address of the transmit buffer
-    // tx_descs_phys conterá o endereço físico e
-    // legacy_tx_descs conterá o endereço virtual.
+// And alloc the phys/virt address of the transmit buffer
+// tx_descs_phys conterá o endereço físico e
+// legacy_tx_descs conterá o endereço virtual.
+// IN:  size, return virtual address.
+// OUT: physical address
 
-    // IN:  size, return virtual address.
-    // OUT: physical address
-
-    unsigned long tx_address = (unsigned long) &currentNIC->legacy_tx_descs;
+    unsigned long tx_address = 
+        (unsigned long) &currentNIC->legacy_tx_descs;
 
     //printf("tx_address=%x\n",tx_address);
         
     currentNIC->tx_descs_phys = 
         (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
-    if ( currentNIC->tx_descs_phys == 0 ){
+    if (currentNIC->tx_descs_phys == 0){
         panic ("__e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
     }
 
     //printf("[2]:\n");
 
 // tx
+    unsigned long txaddress=0;
 
     for ( i=0; i < 8; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
         // alocamos memória para o buffer, 
         // salvamos o endereço físico do buffer e 
-        // obtemos o endereço virtual do buffer.		
-
+        // obtemos o endereço virtual do buffer.
         // IN:  size, return virtual address.
         // OUT: physical address
         
-        unsigned long txaddress = 
+        txaddress = 
             (unsigned long) __E1000AllocCont ( 
                  0x3000, 
                  (unsigned long *) &currentNIC->tx_descs_virt[i] );
@@ -374,6 +373,7 @@ static int __e1000_reset_controller(void)
     //printf("[4]:\n");
 
 // rx
+    unsigned long rxaddress=0;
 
     for ( i=0; i < 32; i++ ) 
     {
@@ -381,7 +381,7 @@ static int __e1000_reset_controller(void)
         // IN:  size, return virtual address.
         // OUT: physical address
 
-        unsigned long rxaddress = 
+        rxaddress = 
             (unsigned long) __E1000AllocCont ( 
                 0x3000, 
                 (unsigned long *) &currentNIC->rx_descs_virt[i] );
@@ -450,14 +450,13 @@ static int __e1000_reset_controller(void)
    //#define E1000_ICRXDMTC 0x04120  /* Interrupt Cause Rx Descriptor Minimum Threshold Count */
    //#define E1000_ICRXOC   0x04124  /* Interrupt Cause Receiver Overrun Count */  
 
-
    // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXT0;
    //(*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXO;
    // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXDMT0;
    // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXSEQ;
    // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_LSC;	
 
-	//E1000WriteCommand(currentNIC, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
+    //E1000WriteCommand(currentNIC, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
 
     //printf("[6]:\n");
 
@@ -617,8 +616,8 @@ static int __e1000_reset_controller(void)
 // #bugbug
 // Called by pciHandleDevice.
 
-//o assembly tem que pegar aqui.
-uint8_t nic_idt_entry_new_number;
+// O assembly tem que pegar aqui.
+uint8_t nic_idt_entry_new_number=0;
 //na verdade o assembly esta usando outro endereço
 //uint32_t nic_idt_entry_new_address;
 unsigned long nic_idt_entry_new_address=0; //global
@@ -891,9 +890,7 @@ e1000_init_nic (
 
     currentNIC->used = TRUE;
     currentNIC->magic = 1234;
-
     currentNIC->interrupt_count = 0;
-
     currentNIC->pci = (struct pci_device_d *) pci_device;
 
 // #bugbug: Using 32bit address?
@@ -910,10 +907,7 @@ e1000_init_nic (
 // Device status.
     currentNIC->DeviceStatus = base_address[0x8];
 
-//
-// ## EEPROM ##
-//
-
+// EEPROM
 // False:
 // Como ainda não sabemos, vamos dizer que não.
     currentNIC->eeprom = 0; 
@@ -932,12 +926,11 @@ e1000_init_nic (
         }
     };
 
-//
-// ## MAC ##
-//
-
+// MAC
 // Let's read the MAC Address!
 
+    uint32_t tmp=0;
+    
     // We can use the EEPROM!
     if (currentNIC->eeprom == 1) 
     {
@@ -945,7 +938,7 @@ e1000_init_nic (
         //refresh_screen();
         //while(1){}
  
-        uint32_t tmp = __E1000ReadEEPROM ( currentNIC, 0 );
+        tmp = __E1000ReadEEPROM ( currentNIC, 0 );
         currentNIC->mac_address[0] = (uint8_t)(tmp & 0xFF);
         currentNIC->mac_address[1] = (uint8_t)(tmp >> 8);
 
@@ -1004,7 +997,8 @@ e1000_init_nic (
     unsigned char irq_line = 
         (unsigned char) pciGetInterruptLine(bus,dev);
     printf ("Done irqline %d\n",irq_line);
-    refresh_screen();
+    
+    //refresh_screen();
 
     __e1000_setup_irq(irq_line);
 
@@ -1014,9 +1008,9 @@ e1000_init_nic (
     e1000_interrupt_flag = TRUE;
 
     //printf ("e1000_init_nic: Test #breakpoint\n");
-    //refresh_screen();
+    refresh_screen();
     //while(1){ asm("hlt"); }
-    
+
 // 0 = no errors
     return 0;
 }

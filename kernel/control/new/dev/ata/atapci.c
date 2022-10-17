@@ -1,9 +1,7 @@
 
 // atapci.c
 
-
 #include <kernel.h>
-
 
 // #todo:
 // Checar se temos uma lista dessa no suporte a PCI.
@@ -29,7 +27,6 @@ const char *pci_classes[] = {
     "Data acquisition and signal processing",
     [255]="Unknown"
 };
-
 
 
 
@@ -81,7 +78,7 @@ diskWritePCIConfigAddr (
  *      -1 = error (#bugbug, pois o tipo de retorno eh unsigned int)
  */
 
-uint32_t diskPCIScanDevice ( int class )
+uint32_t diskPCIScanDevice(int class)
 {
     int bus=0;
     int dev=0;
@@ -89,15 +86,13 @@ uint32_t diskPCIScanDevice ( int class )
 
 // #bugbug 
 // Usando -1 para unsigned int. 
-
     uint32_t data = -1;
 
-//#ifdef KERNEL_VERBOSE
+    // #debug
     //printf ("diskPCIScanDevice:\n");
     //refresh_screen ();
-//#endif
 
-// Probe.
+// Probe
 
     for ( bus=0; bus < 256; bus++ )
     {
@@ -111,19 +106,15 @@ uint32_t diskPCIScanDevice ( int class )
                 
                 if ( ( data >> 24 & 0xff ) == class )
                 {
-
-//#ifdef KERNEL_VERBOSE
-//                    printf ("Detected PCI device: %s \n", 
-//                        pci_classes[class] );
-//#endif 
-                    // Done !
-
+                    // #debug
+                    // printf ("Detected PCI device: %s\n", 
+                    //     pci_classes[class] );
+                    // Done
                     return (uint32_t) ( fun + (dev*8) + (bus*32) );
                 }
             };
         };
     };
-
 
 // Fail
     printf ("diskPCIScanDevice: PCI device NOT detected\n");
@@ -132,6 +123,8 @@ uint32_t diskPCIScanDevice ( int class )
 //isso e' lento
     //refresh_screen();
 
+// #bugbug 
+// Usando -1 para unsigned int. 
     return (uint32_t) (-1);
 }
 
@@ -144,17 +137,15 @@ uint32_t diskPCIScanDevice ( int class )
 // Nessa rotina:
 // + Encontra o tipo de driver, ser é IDE, RAID, AHCI ou Desconhecido.
 
-int atapciConfigurationSpace ( struct pci_device_d *D )
+int atapciConfigurationSpace(struct pci_device_d *D)
 {
     uint32_t data=0;
 
 // A estrutura ainda nao foi configurada.
     ata.used = FALSE;
     ata.magic = 0;
-
 // #type: FAIL
     ata.chip_control_type = ATA_UNKNOWN_CONTROLLER;
-
 
 // Check parameters.
 
@@ -277,10 +268,9 @@ int atapciConfigurationSpace ( struct pci_device_d *D )
 
         // #type: (ATA RAID).
         ata.chip_control_type = ATA_RAID_CONTROLLER;
-              
         printf ("atapciConfigurationSpace: ATA RAID not supported\n");
         goto fail;
-  
+
 //
 //  # ACHI
 //
@@ -342,10 +332,8 @@ int atapciConfigurationSpace ( struct pci_device_d *D )
 
 // ====
     }else{
-        
-        // #type: FAIL
+        // #type: Unknown controller.
         ata.chip_control_type = ATA_UNKNOWN_CONTROLLER;
-        
         printf("atapciConfigurationSpace: Mass Storage Device NOT supported\n");
         goto fail;
     };
@@ -400,10 +388,9 @@ int atapciConfigurationSpace ( struct pci_device_d *D )
     return (int) PCI_MSG_SUCCESSFUL;
 
 fail:
-    refresh_screen();
-
     ata.used = FALSE;
     ata.magic = 0;
+    refresh_screen();
     return (int) PCI_MSG_ERROR;
 }
 

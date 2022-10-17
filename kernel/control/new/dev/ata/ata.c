@@ -36,7 +36,6 @@ static uint32_t __next_sd_id = 0;
 // == Private functions: prototypes ==============
 //
 
-
 static void __local_io_delay (void);
 static void __ata_pio_read ( void *buffer, int bytes );
 static void __ata_pio_write ( void *buffer, int bytes );
@@ -137,7 +136,8 @@ void ata_cmd_write (int cmd_val)
 
 void ata_soft_reset (void)
 {
-    unsigned char data = (unsigned char) in8( ata.ctrl_block_base_address );
+    unsigned char data = 
+        (unsigned char) in8( ata.ctrl_block_base_address );
 
     out8( 
         (unsigned short) ata.ctrl_block_base_address, 
@@ -336,35 +336,28 @@ ata_ioctl (
 // FORCEPIO = 1234
 // Called by ataDialog in atainit.c
 
-int ata_initialize ( int ataflag )
+int ata_initialize (int ataflag)
 {
     int Status = -1;  //error
     int Value = -1;
-
     // iterator.
     int iPortNumber=0;
-
     unsigned char bus=0;
     unsigned char dev=0;
     unsigned char fun=0;
 
+    debug_print("ata_initialize: todo\n");
 
-    debug_print("ata_initialize: todo \n");
-
-    // Setup interrupt breaker.
+// Setup interrupt breaker.
     //debug_print("ata_initialize: Turn on interrupt breaker\n");
     __breaker_ata1_initialized = FALSE;
     __breaker_ata2_initialized = FALSE;
-
 
 // A estrutura ainda nao foi configurada.
     ata.used = FALSE;
     ata.magic = 0;
 
-//
 // ======================================
-//
-
 // #importante 
 // HACK HACK
 // Usando as definições feitas em config.h
@@ -376,7 +369,6 @@ int ata_initialize ( int ataflag )
 // #todo
 // Poderemos mudar o atual conforme nossa intenção
 // de acessarmos outros discos.
-
 // See: config.h
 
     unsigned int boottime_ideport_index = __IDE_PORT;
@@ -384,10 +376,7 @@ int ata_initialize ( int ataflag )
 
     ata_set_boottime_ide_port_index(boottime_ideport_index);
     ata_set_current_ide_port_index(current_ideport_index);
-
-//
 // ============================================
-//
 
 // ??
 // Configurando flags do driver.
@@ -448,13 +437,12 @@ int ata_initialize ( int ataflag )
     Value = 
         (unsigned long) atapciConfigurationSpace( (struct pci_device_d*) PCIDeviceATA );
 
-    if ( Value == PCI_MSG_ERROR )
+    if (Value == PCI_MSG_ERROR)
     {
         printk ("ata_initialize: Error Driver [%x]\n", Value );
         Status = (int) -1;
         goto fail;
     }
-
 
 // Explicando:
 // Aqui estamos pegando nas BARs o número das portas.
@@ -506,57 +494,47 @@ int ata_initialize ( int ataflag )
     }
 
 // Que tipo de controlador?
-
+// A rotina atapciConfigurationSpace() configurou
+// a estrutura 'ata' com o tipo de controlador encontrado.
 
 // ==============================================
-// Se for IDE.
+// IDE controller type.
 
     // Type
-    if ( ata.chip_control_type == ATA_IDE_CONTROLLER ){
+    if (ata.chip_control_type == ATA_IDE_CONTROLLER){
 
         //Soft Reset, defina IRQ
         out8(
             (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF),
             0xff );
-        
         out8( 
             (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
             0xff );
-        
         out8( 
             (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF), 
             0x00 );
-        
         out8( 
             (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
             0x00 );
-
         // ??
         ata_record_dev     = 0xff;
         ata_record_channel = 0xff;
 
-//#ifdef KERNEL_VERBOSE
         //printf ("Initializing IDE Mass Storage device ...\n");
         //refresh_screen ();
-//#endif    
 
-        //
         // As estruturas de disco serão colocadas em uma lista encadeada.
-        
         
         //#deprecated
         //ide_mass_storage_initialize();
 
-        //
         // ready_queue_dev
-        //
-
         // Vamos trabalhar na lista de dispositivos.
         // Iniciando a lista.
         // ata_device_d structure.
 
         ready_queue_dev = 
-            ( struct ata_device_d * ) kmalloc ( sizeof(struct ata_device_d) );
+            (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
 
         if ( (void*) ready_queue_dev == NULL ){
             printf("ata_initialize: ready_queue_dev\n");
@@ -564,10 +542,7 @@ int ata_initialize ( int ataflag )
             goto fail;
         }
 
-        //
         // current_sd
-        //
-
         // Initialize the head of the list.
         // Not used.
         // There is a loop to reinitialize the
@@ -584,8 +559,8 @@ int ata_initialize ( int ataflag )
         current_sd->next = NULL;
 
         // #bugbug
-        // Is this a buffer ? For what ?
-        // Is this buffer enough ?
+        // Is this a buffer? For what?
+        // Is this buffer enough?
 
         ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
 
@@ -620,42 +595,49 @@ int ata_initialize ( int ataflag )
 
 
 // ==============================================
-// Agora se for AHCI.
+// RAID controller.
 
-    if ( ata.chip_control_type == ATA_RAID_CONTROLLER )
+    if (ata.chip_control_type == ATA_RAID_CONTROLLER)
     {
+        Status = (int) -1;
         printf("ata_initialize: RAID not supported yet\n");
-        Status = (int) -1;
         goto fail;
     }
 
 // ==============================================
-// Agora se for AHCI.
+// AHCI controller type.
+// #todo:
+// On qemu: Feature '-s -machine q35' uses ahci.
+// It emulates ICH9 not I440FX.
+// see: https://wiki.qemu.org/Features/Q35
 
-    if ( ata.chip_control_type == ATA_AHCI_CONTROLLER )
+    if (ata.chip_control_type == ATA_AHCI_CONTROLLER)
     {
+        Status = (int) -1;
         printf("ata_initialize: AHCI not supported yet\n");
-        Status = (int) -1;
         goto fail;
     }
 
+// ==============================================
+// Unknown controller type.
 
-// Controlador de tipo invalido?
-    if ( ata.chip_control_type == ATA_UNKNOWN_CONTROLLER )
+    if (ata.chip_control_type == ATA_UNKNOWN_CONTROLLER)
     {
+        Status = (int) -1;
         printf("ata_initialize: Unknown controller type\n");
-        return -1;
+        goto fail;
     }
 
 // ==============================================
-// Nem IDE nem AHCI.
+// Nem IDE, nem RAID, nem AHCI.
 
-    printf("ata_initialize: IDE and AHCI not found\n");
     Status = (int) -1;
+    printf("ata_initialize: IDE, AHCI or RAID were not found\n");
 
 fail:
     printf ("ata_initialize: fail\n");
     return -1;
+    //return (int) Status;
 
 done:
 // Setup interrupt breaker.
@@ -679,7 +661,7 @@ done:
 // 0    = PATA ou SATA
 // 0x80 = ATAPI ou SATAPI
 
-int ide_identify_device ( uint8_t nport )
+int ide_identify_device (uint8_t nport)
 {
     // Signature bytes.
     unsigned char sig_byte_1=0xFF;
