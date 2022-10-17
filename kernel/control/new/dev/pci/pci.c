@@ -21,14 +21,11 @@
 //#define PCI_BAR_XXX_INDICATOR 3   //11b (Indefinido)
 
 
-//
-// Internal
-//
-
 int pci_supported=FALSE;
 int pciListOffset=0;
 //...
 
+static void __is_pci_supported(void);
 
 //========================================
 // pci_classes2:
@@ -122,23 +119,20 @@ pciConfigReadByte (
 
 // Retorno armazenado na porta de status.
     unsigned char Ret=0;
-
 // Montando uma unsigned int. (32 bits)
 // Bus, Device and Function.
-
     unsigned int ibus  = (unsigned int) bus; 
     unsigned int islot = (unsigned int) slot; 
     unsigned int ifunc = (unsigned int) func; 
 
 // O endereço a ser montado e enviado para porta 0xCF8.
 // 32bit
-    unsigned int address = 0;
-
-    // #todo: 
-    // Filtros de tamanho máximo.
-
+// #todo: 
+// Filtros de tamanho máximo?
 // Create configuration address.
 // 32bit
+
+    unsigned int address=0;
     address = (unsigned int) ((ibus  << 16) | (islot << 11) | (ifunc <<  8) | (offset & 0xfc) | ((unsigned int) 0x80000000) );
 
 // sendComand:
@@ -202,13 +196,11 @@ pciConfigReadWord (
 
 // O endereço a ser montado e enviado para porta 0xCF8.
 // 32bit
-    unsigned int address = 0;
-
 // #todo: 
 // Filtros de tamanho máximo.
-
 // Create configuration address.
 // 32bit
+    unsigned int address = 0;
     address = (unsigned int) ((ibus << 16) | (islot << 11) | (ifunc << 8) | (offset & 0xfc) | ((unsigned int)0x80000000));
 
 // sendComand:
@@ -261,12 +253,10 @@ pciConfigReadDWord (
 
 // O endereço a ser montado e enviado para porta 0xCF8.
 // 32bit
-    unsigned int address = 0;
- 
-    // #todo: 
-    // Filtros de tamanho máximo.
-
+// #todo: 
+// Filtros de tamanho máximo.
 // Create configuration address.
+    unsigned int address = 0;
     address = (unsigned int) ((ibus << 16) | (islot << 11) | (ifunc << 8) | (offset & 0xfc) | ((unsigned int)0x80000000));
 
 // sendComand:
@@ -322,7 +312,6 @@ pciGetBAR (
     unsigned char slot, 
     int number )
 {
-
     unsigned int BAR=0;
 
 // #todo: 
@@ -336,39 +325,45 @@ pciGetBAR (
 
     switch (number){
     case 0:
-        BAR = (unsigned int) pciConfigReadDWord ( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS0 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord ( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS0 );
         goto done;
         break;
     case 1:
-        BAR = (unsigned int) pciConfigReadDWord ( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS1 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord ( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS1 );
         goto done;
         break;
     case 2:
-        BAR = (unsigned int) pciConfigReadDWord ( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS2 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord ( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS2 );
         goto done;
         break;
     case 3:
-        BAR = (unsigned int) pciConfigReadDWord ( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS3 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord ( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS3 );
         goto done;
         break;
     case 4:
-        BAR = (unsigned int) pciConfigReadDWord ( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS4 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord ( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS4 );
         goto done;
         break;
     case 5:
-        BAR = (unsigned int) pciConfigReadDWord( 
-                                 bus, slot, 0, 
-                                 PCI_OFFSET_BASEADDRESS5 );
+        BAR = 
+            (unsigned int) pciConfigReadDWord( 
+                               bus, slot, 0, 
+                               PCI_OFFSET_BASEADDRESS5 );
         goto done;
         break;
     default:
@@ -382,11 +377,8 @@ done:
 }
 
 
-/*
- * pciGetClassCode:
- *     Get class code, offset 0x0B.  
- */
-
+// pciGetClassCode:
+// Get class code, offset 0x0B.  
 // #todo: 
 // Nesse momento não há nenhuma busca por fuction.
 
@@ -400,11 +392,7 @@ pciGetClassCode (
 }
 
 
-/*
- * pciGetHeaderType:
- * 
- */
-
+// pciGetHeaderType:
 // #todo: 
 // Nesse momento não há nenhuma busca por fuction.
 
@@ -469,11 +457,8 @@ pciGetSubClass (
 }
 
 
-/*
- * pciCheckDevice:
- *     Check device, offset 2. 
- */
-
+// pciCheckDevice:
+// Check device, offset 2. 
 // #todo: 
 // Nesse momento não há nenhume busca por fuction. 
 // Device.
@@ -488,11 +473,8 @@ pciCheckDevice (
 }
 
 
-/*
- * pciCheckVendor:
- *     Check vendor, offset 0. 
- */
-
+// pciCheckVendor:
+// Check vendor, offset 0. 
 // #todo: 
 // Nesse momento não há nenhume busca por fuction.
 // Vendor.
@@ -504,6 +486,32 @@ pciCheckVendor (
 {
     return (unsigned short) pciConfigReadWord ( 
                                 bus, slot, 0, PCI_OFFSET_VENDORID );
+}
+
+
+static void __is_pci_supported(void)
+{
+    unsigned long data=0;
+
+// ++
+// Is PCI supported?
+// #todo:
+// Fazer alguma coisa pra esse caso.
+// Talvez seja um 386 ou 486 sem suporte a PCI.
+// Talvez ISA.
+// STATUS_NOT_SUPPORTED
+// Can we live with no pci support. Maybe ISA.
+
+    pci_supported = FALSE;
+    out32 ( 0xCF8, 0x80000000 );
+    io_delay();
+    data = (unsigned long) in32(0xCF8);
+    io_delay();
+    if (data != 0x80000000){
+        panic ("__is_pci_supported: PCI not supported\n");
+    }
+    pci_supported = TRUE;
+// --
 }
 
 
@@ -525,36 +533,13 @@ int init_pci(void)
     register int i=0;
     int Status = 0;
     int Max = PCI_DEVICE_LIST_SIZE; 
-    unsigned long data=0;
 
     debug_print("init_pci: [FIXME]\n");
 
     g_driver_pci_initialized = (int) FALSE; 
-    pci_supported = FALSE;
 
-// ++
-// Is PCI supported ?
-
-    out32 ( 0xCF8, 0x80000000 );
-    io_delay();
-
-    data = (unsigned long) in32(0xCF8);
-    io_delay();
-
-// #todo:
-// Fazer alguma coisa pra esse caso.
-// Talvez seja um 386 ou 486 sem suporte a PCI.
-// Talvez ISA.
-
-// STATUS_NOT_SUPPORTED
-// Can we live with no pci support. Maybe ISA.
-
-    if ( data != 0x80000000 ){
-        panic ("init_pci: PCI not supported\n");
-    }
-    pci_supported = TRUE;
-// --
-
+// Is PCI supported?
+    __is_pci_supported();
 
 // #todo: 
 // Colocar esse status na estrutura platform->pci_supported.
@@ -574,15 +559,11 @@ int init_pci(void)
     };
     pciListOffset = 0;
 
-//
-// Devices
-//
 
+// Devices
 // Encontrar os dispositivos PCI e salvar as informações sobre eles
 // em suas respectivas estruturas.
 // See: pciscan.c
-
-    //debug_print ("init_pci: [TODO] Call pci_setup_devices() \n");
     
     Status = (int) pci_setup_devices();
     if (Status != 0){

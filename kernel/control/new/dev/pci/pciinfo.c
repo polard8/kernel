@@ -40,18 +40,16 @@ static const char* pci_class_strings[] = {
 /*
  * pciInfo:
  *     Mostra as informações salvas nas estruturas da 
- * lista de dispositivos. 
- *
+ * lista de dispositivos.
  * 0x2668  82801FB (ICH6) High Definition Audio Controller 0x8086 Intel.
  * 0x2829  Intel(R) ICH8M SATA AHCI Controller 0x8086 Intel.
  * 0x1237  PCI & Memory 0x8086 Intel.
  * ...
  */
-
 // Uma lista com no máximo 32 ponteiros para estrutura 
 // de dispositivo pci.
 
-int pciInfo (void)
+int pciInfo(void)
 {
     struct pci_device_d *D;
     int i=0;
@@ -86,32 +84,40 @@ int pciInfo (void)
  *     Apenas um dispositivo.
  */
 
-int pciShowDeviceInfo (int number)
+int pciShowDeviceInfo(int number)
 {
-    struct pci_device_d  *D;
+    struct pci_device_d *D;
 
 // Limits
 // Pega um ponteiro de estrutura na lista.
 
-    if (number < 0 || number >= PCI_DEVICE_LIST_SIZE)
+    if ( number < 0 || 
+         number >= PCI_DEVICE_LIST_SIZE)
     {
-        debug_print("pciShowDeviceInfo: number\n");
-        return -1;
-    }else{
+        goto fail;
+    }
 
-        D = (void *) pcideviceList[number];
+// Get the number.
+    D = (void *) pcideviceList[number];
 
-        if ( (void *) D != NULL )
-        {
-            if ( D->used == TRUE && D->magic == 1234 )
-            {
-                printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x} \n",
-                    D->Vendor, D->Device, D->classCode, D->irq_line );
-            }
-        }
-    };
+    if ( (void *) D == NULL )
+        goto fail;
 
+    if (D->used != TRUE)
+        goto fail;
+
+    if (D->magic != 1234)
+        goto fail;
+
+// print
+    printf ("Vend={%x} Dev={%x} ClassCode={%x} IntLine={%x}\n",
+        D->Vendor, D->Device, D->classCode, D->irq_line );
+
+// done
     return 0;
+
+fail:
+    return -1;
 }
 
 

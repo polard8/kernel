@@ -30,7 +30,7 @@ int pci_setup_devices (void)
     register int funcCount=0;
 
 
-    debug_print ("pci_setup_devices: [TODO] \n");
+    debug_print ("pci_setup_devices: [TODO]\n");
 
     // Bus
     for ( i=0; i < PCI_MAX_BUSES; i++ )
@@ -38,7 +38,7 @@ int pci_setup_devices (void)
         // Device
         for ( j=0; j < PCI_MAX_DEVICES; j++ )
         {
-             // Valid device ?
+            // Valid device ?
             Vendor = (unsigned short) pciCheckVendor(i,j);
 
             if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
@@ -68,12 +68,8 @@ int pci_setup_devices (void)
 
     //#debug
     //printf("Detecting PCI Devices completes..\n");
-
     //refresh_screen();
     //while(1){}
-
-    //serial debug
-    debug_print ("pci_setup_devices: Done\n");
 
     return 0; 
 }
@@ -81,8 +77,8 @@ int pci_setup_devices (void)
 
 /*
  * scan_pci_device_list:
- *     Procurar na lista de dispositivos por um dispositivo de determinados 
- * vendor e device.
+ * Procurar na lista de dispositivos 
+ * por um dispositivo de determinados vendor e device.
  */
 
 struct pci_device_d *scan_pci_device_list ( 
@@ -90,9 +86,7 @@ struct pci_device_d *scan_pci_device_list (
     unsigned short device )
 {
     struct pci_device_d *D;
-
     register int i=0;
-
 
 // #bugbug
 // Nossa lista só tem 32 slots por enquanto.
@@ -119,17 +113,16 @@ struct pci_device_d *scan_pci_device_list (
 
 /*
  * scan_pci_device_list2:
- *     Procurar na lista de dispositivos por um dispositivo de determinada 
- * classe e subclasse.
+ * Procurar na lista de dispositivos 
+ * por um dispositivo de determinada classe e subclasse.
  */
 
 struct pci_device_d *scan_pci_device_list2 ( 
     unsigned char class, 
     unsigned char subclass )
 {
-
     struct pci_device_d *D;
-    int i=0;
+    register int i=0;
 
 // #bugbug
 // Nossa lista só tem 32 slots por enquanto.
@@ -155,7 +148,7 @@ struct pci_device_d *scan_pci_device_list2 (
 
 
 //
-// End.
+// End
 //
 
 
