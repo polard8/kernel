@@ -60,8 +60,7 @@ vhd-copy-files \
 vhd-unmount \
 clean    
 
-
-# Giving permitions to run ./run
+# Giving permitions to run.
 	chmod 755 ./run
 	chmod 755 ./runkvm
 	
