@@ -1086,8 +1086,7 @@ static void *__extra_services (
 }
 
 
-// unit2: Do the job.
-// 0x80 ?
+// Handler for the interrupt 0x80.
 void *sci0 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -1096,7 +1095,6 @@ void *sci0 (
 {
     struct process_d  *p;
     struct thread_d  *t;
-
 
     unsigned long *message_address = (unsigned long *) arg2;
 
@@ -2044,8 +2042,7 @@ done:
 }
 
 
-// unit2: Do the job.
-// 0x81 ?
+// Handler for the interrupt 0x81.
 void *sci1 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -2056,8 +2053,6 @@ void *sci1 (
     debug_print ("sci1: [TODO]\n");
 
     pid_t current_process = (pid_t) get_current_process();
-
-
 
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci1_cpl;
@@ -2114,8 +2109,7 @@ void *sci1 (
 }
 
 
-// unit2: Do the job.
-// 0x82 ?
+// Handler for the interrupt 0x82.
 void *sci2 ( 
     unsigned long number, 
     unsigned long arg2, 
@@ -2155,8 +2149,6 @@ void *sci2 (
     if(cpl == 3){
         // ok
     }
-
-
 
 
     // debug_print("sci2: [TODO]\n");
@@ -2226,8 +2218,8 @@ void *sci2 (
         return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
     }
 
-// sys_read
-// See: sys.c
+// read() implementation.
+// See: fs.c
     if ( number == 18 ){
         //debug_print("sci2: [18] read\n");
         return (void *) sys_read ( 
@@ -2236,8 +2228,8 @@ void *sci2 (
                             (int)          arg4 );
     }
 
-// sys_write
-// See: sys.c
+// write() implementation.
+// See: fs.c
     if ( number == 19 ){
         //debug_print("sci2: [19] write\n");
         return (void *) sys_write ( 
