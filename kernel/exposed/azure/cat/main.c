@@ -72,6 +72,7 @@ int main ( int argc, char *argv[] )
         //nreads = read( fileno(fp), buffer, sizeof(buffer) );
         //nreads = read( fileno(fp), buffer,  );  //#bugbug: Defined limitation
         nreads = read( fd, buffer, 511 );  //512 is the limit in kernel?
+        //nreads = read( fd, buffer, 1024 );
         if (nreads <= 0)
         {
             printf ("cat: read fail\n");
