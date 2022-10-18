@@ -49,7 +49,7 @@ static int __check_address_validation( unsigned long address )
  *     dir_addresss = Directory address.
  *     dir_entries  = Number of entries in the given directory.
  *     file_name    = File name.
- *     buffer = Where to load the file. The buffer.
+ *     buffer = Where to load the file. The pre-allocated buffer.
  *     buffer_size_in_bytes = Maximum buffer size.
  * OUT: 
  *    1=fail 
@@ -95,7 +95,7 @@ fsLoadFile (
     unsigned long DirEntries = (unsigned long) (dir_entries & 0xFFFF);
     unsigned long MaxEntries = (unsigned long) FAT16_ROOT_ENTRIES;
 // Address: Where to load the file.
-    unsigned long Buffer      = (unsigned long) buffer;
+    unsigned long Buffer = (unsigned long) buffer;
 // Size: maximum buffer size in size.
     unsigned long BufferSizeInBytes = 
         (unsigned long) (buffer_size_in_bytes & 0xFFFFFFFF);
@@ -175,14 +175,13 @@ fsLoadFile (
         panic ("fsLoadFile: [DEBUG] DirEntries IS LESS THE 512\n");
     }
 
-
+// The pre-allocated buffer.
 // Buffer size in bytes
 // Max = 512 pages.
 
     if ( BufferSizeInBytes == 0 ){
         panic("fsLoadFile: BufferSizeInBytes = 0\n");
     }
-
     if ( BufferSizeInBytes > (512*4096) ){
         panic("fsLoadFile: BufferSizeInBytes limits\n");
     }

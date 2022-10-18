@@ -3,10 +3,8 @@
 
 #include <kernel.h>
 
-
 // Task switching support.
 extern void turn_task_switch_on (void);
-
 extern void x64_clear_nt_flag (void);
 
 // private
@@ -29,18 +27,12 @@ static int InitialProcessInitialized = FALSE;
 // == Private functions: Prototypes ========
 //
 
-static int I_init (void);
+static int I_init(void);
 static int I_x64CreateKernelProcess(void);
-static int I_x64CreateInitialProcess (void);
-
+static int I_x64CreateInitialProcess(void);
 static int I_x64CreateTID0(void);
-
-
-
-
+static int __load_initbin_image(void);
 // =========================================
-
-
 
 
 /*
@@ -54,41 +46,31 @@ void x64init_load_pml4_table(unsigned long phy_addr)
 */
 
 
-// Create a process for the first ring3 client, called GWS.BIN.
-// + Carrega a imagem do primeiro processo que vai rodar em user mode.
-// + Configura sua estrutura de processo.
-// + Configura sua estrutura de thraed.
-// Não passa o comando para o processo.
-
-static int I_x64CreateInitialProcess(void)
+//local
+static int __load_initbin_image(void)
 {
-// This is a ring 3 process.
+    int Status = -1;
+
     char *ImageName = "INIT    BIN";
     char *PathName = "/INIT.BIN";
     char *PathName2 = "/GRAMADO/INIT.BIN";
 
-
-    // The virtual address for the base of the image.
-    // ps: We are using the kernel page directories now,
-    // this way but we're gonna clone the kernel pages
-    // when creating the init process.
-    // #define CONTROLTHREAD_BASE        0x00200000
-    // See: x64gva.h
+// The virtual address for the base of the image.
+// ps: We are using the kernel page directories now,
+// this way but we're gonna clone the kernel pages
+// when creating the init process.
+// #define CONTROLTHREAD_BASE        0x00200000
+// See: x64gva.h
+// #bugbug:
+// Por que esse endereço está disponível para uso?
+// Por que não precisamos alocar memoria para esse processo?
+// Porque estamos usando 512 páginas?
+// Talvez seja porque a gerência de memória
+// reservou esse espaço de 2mb para o primeiro processo em ring3
+// na hora de mapear as regiões principais da memória ram.
 
     unsigned long ImageAddress = 
         (unsigned long) CONTROLTHREAD_BASE;
-
-    int fileret = -1;
-
-// #debug
-    //debug_print ("I_x64CreateInitialProcess: \n");
-    //printf      ("I_x64CreateInitialProcess:\n");
-    //refresh_screen();
-
-    if ( system_state != SYSTEM_BOOTING ){
-        printf ("I_x64CreateInitialProcess: system_state\n");    
-        return FALSE;
-    }
 
 //
 // Load image GWS.BIN
@@ -109,20 +91,28 @@ static int I_x64CreateInitialProcess(void)
 
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
+/*
+ *    It loads a file into the memory.
+ * IN:
+ *     fat_address  = FAT address.
+ *     dir_addresss = Directory address.
+ *     dir_entries  = Number of entries in the given directory.
+ *     file_name    = File name.
+ *     buffer = Where to load the file. The pre-allocated buffer.
+ *     buffer_size_in_bytes = Maximum buffer size.
+ * OUT: 
+ *    1=fail 
+ *    0=ok.
+ */
 
-    fileret = 
+    Status = 
         (unsigned long) fsLoadFile( 
                             VOLUME1_FAT_ADDRESS, 
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,    //#bugbug: number of entries.
                             ImageName, 
-                            (unsigned long) ImageAddress,
-                            BUGBUG_IMAGE_SIZE_LIMIT );
-    if (fileret != 0)
-    {
-        printf ("I_x64CreateInitialProcess: Coldn't load INIT.BIN \n");
-        return FALSE;
-    }
+                            (unsigned long) ImageAddress,  // buffer
+                            BUGBUG_IMAGE_SIZE_LIMIT );     // buffer limits
 
 /*
     // #bugbug
@@ -131,18 +121,51 @@ static int I_x64CreateInitialProcess(void)
     // Estamos passando o tamanho do buffer definido,
     // mas a rotina ignora.
     
-    fileret = (int) fs_load_path ( 
+    Status = (int) fs_load_path ( 
                        (const char*) PathName, 
                        (unsigned long) ImageAddress,
                        (unsigned long) BUGBUG_IMAGE_SIZE_LIMIT ); 
+*/
 
-    if (fileret<0)
+// OUT: 
+//    1=fail 
+//    0=ok.
+
+    return (int) Status;
+}
+
+
+// Load INIT.BIN.
+// Create a process for the first ring3 process.
+// + Carrega a imagem do primeiro processo que vai rodar em user mode.
+// + Configura sua estrutura de processo.
+// + Configura sua estrutura de thraed.
+// Não passa o comando para o processo.
+
+static int I_x64CreateInitialProcess(void)
+{
+// This is a ring 3 process.
+// It loads the first ring3 program, the INIT.BIN.
+
+// #debug
+    //debug_print ("I_x64CreateInitialProcess: \n");
+    //printf      ("I_x64CreateInitialProcess:\n");
+    //refresh_screen();
+
+    InitialProcessInitialized = FALSE;
+
+    if ( system_state != SYSTEM_BOOTING ){
+        printf ("I_x64CreateInitialProcess: system_state\n");    
+        return FALSE;
+    }
+    
+    int ret0 = -1;
+    ret0 = (int) __load_initbin_image();
+    if (ret0 != 0)
     {
         printf ("I_x64CreateInitialProcess: Coldn't load INIT.BIN \n");
         return FALSE;
     }
-*/
-
 
 // Creating init process.
 // > Cria um diretório que é clone do diretório do kernel base 

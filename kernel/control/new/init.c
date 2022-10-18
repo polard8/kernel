@@ -1,6 +1,5 @@
 
 // init.c
-// (Next Ten)
 
 // This file contains the kernel_main function,
 // called by START in 
