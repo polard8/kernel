@@ -30,40 +30,6 @@
 #include <rtl/gramado.h> 
 
 
-// Global.
-int __libc_tty_id=0;
-unsigned long g_cursor_x=0;
-unsigned long g_cursor_y=0;
-unsigned long g_char_attrib=0;
-unsigned long g_columns=0;
-unsigned long g_rows=0;
-int g_using_gui=0;
-
-// Global
-// prompt support.
-
-char prompt[PROMPT_MAX_DEFAULT]; 
-char prompt_out[PROMPT_MAX_DEFAULT]; 
-char prompt_err[PROMPT_MAX_DEFAULT]; 
-
-//char prompt_text[] = "$ ";
-//...
-
-int prompt_pos=0;
-int prompt_max=0;
-int prompt_status=0;
-
-// Globals
-// standard streams support.
-
-FILE *stdin;
-FILE *stdout;
-FILE *stderr;
-
-unsigned long Streams[NUMBER_OF_FILES];
-
-
-
 #define  SYSTEMCALL_READ_LBA    1
 #define  SYSTEMCALL_WRITE_LBA   2
 #define  SYSTEMCALL_READ_FILE   3
@@ -77,6 +43,36 @@ unsigned long Streams[NUMBER_OF_FILES];
 #define VK_TAB        0x0F 
 
 
+// Globals
+int __libc_tty_id=0;
+unsigned long g_cursor_x=0;
+unsigned long g_cursor_y=0;
+unsigned long g_char_attrib=0;
+unsigned long g_columns=0;
+unsigned long g_rows=0;
+int g_using_gui=0;
+
+// Global
+// prompt support.
+char prompt[PROMPT_MAX_DEFAULT]; 
+char prompt_out[PROMPT_MAX_DEFAULT]; 
+char prompt_err[PROMPT_MAX_DEFAULT]; 
+
+//char prompt_text[] = "$ ";
+//...
+
+int prompt_pos=0;
+int prompt_max=0;
+int prompt_status=0;
+
+// Globals
+// standard streams support.
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+
+unsigned long Streams[NUMBER_OF_FILES];
+
 // The main environment.
 // crt0.c will setup this.
 char **environ;
@@ -87,15 +83,13 @@ char **environ;
 static int __libc_output_mode=0;
 static int terminal___PID=0;
 
-
 //
 // =========================================================
 //
 
-
 //++
 // Internas.
-// estamos falando do posicionamento do cursor dentro da janela 
+// Estamos falando do posicionamento do cursor dentro da janela 
 // e não dentro do terminal. 
 void stdioSetCursor( unsigned long x, unsigned long y );
 unsigned long stdioGetCursorX(void); 
@@ -120,12 +114,11 @@ char *out_char(char *dst,char ch)
 }
 */
 
-
 // stdio_atoi:
 // Talvez isso possa ir para o topo do 
 // arquivo para servir mais funções.
 
-int stdio_atoi (char *s)
+int stdio_atoi(char *s)
 {
     int rv=0; 
     char sign=0;
@@ -301,9 +294,11 @@ FILE *__make_FILE (int fd)
 int remove (const char *pathname)
 {
     debug_print ("remove: [TODO] It removes a file from the file system\n");
+    if( (void*) pathname == NULL){
+        return -1;
+    }
     return (int) (-1);
 }
-
 
 // Adapted from unix v32.
 // Not tested yet.
@@ -316,7 +311,7 @@ _strout (
     int fillch )
 {
 
-   //#todo: filtros.
+//#todo: filtros.
 
     while (adjust < 0)
     {
@@ -358,32 +353,25 @@ int fflush_all(void)
 // Ao menos que seja explicitamente chamado alguma rotina
 // dizendo que eh pra salvar no disco ... sync.
 // Eh um tipo de commit. Um comprometimento.
-
 // Note that fflush() only flushes the user space buffers 
 // provided by the C library. To ensure that the data is 
 // physically stored on disk the kernel buffers must be flushed too. 
-
 // The contents of the stream buffer are written 
 // to the underlying file or device and the buffer is discarded.
-
 // A call to fflush negates the effect of any prior 
 // call to ungetc for the stream. The stream remains open after the call.
-
 // ms-commit
 // The commit-to-disk feature of the run-time library 
 // lets you ensure that critical data is written directly to disk 
 // rather than to the operating-system buffers.
-
 // The fflush() function ensures that data has been written 
 // to the kernel buffer pools from your application's buffer 
 // (either for a single file, or for all output files if you use fflush(0) or fflush(NULL)).
-
 // If a file is open, can write and is buffered,
 // so we flush the ring3 buffer. It will send the data
 // to the file in ring0.
 // + if the stream is a console device, so the data will be show in the screen
 // + if it is a regular file, so it will be saved into the disk, i guess (commit)
-
 // See:
 // sync, syncfs - commit buffer cache to disk.
 // sync() causes all buffered modifications to file metadata and 
@@ -396,10 +384,8 @@ int fflush_all(void)
 // that has been fetched from the underlying file, 
 // but has not been consumed by the application.  
 // The open status  of the stream is unaffected.
-
 // See:
 // for sync(), see unistd.c
-
 // IN:
 // NULL is ok.
 // NULL will flush all the streams in the table[].
@@ -407,8 +393,7 @@ int fflush_all(void)
 
 int fflush (FILE *stream)
 {
-    if ( (void*) stream == NULL )
-    {
+    if ( (void*) stream == NULL ){
         return (int) fflush_all();
     }
     return (int) __fflush(stream);
@@ -428,11 +413,9 @@ int __fflush (FILE *stream)
     // FIXME: fflush(NULL) should flush all open output streams.
     //ASSERT(stream);
 
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         return (int) fflush_all();
     }
-
 
     // #todo
     // Not buffered. 
@@ -444,18 +427,14 @@ int __fflush (FILE *stream)
 	//if (!(stream->flags & _IOWRITE))
 		//return (0);
 
-
     //if ( !stream->_w )
         //return 0;
 
-
 // Have an invalid ring3 buffer.
-    if ( (void *) stream->_base == NULL )
-    {
+    if ( (void *) stream->_base == NULL ){
         debug_print( "__fflush: [ERROR] Invalid ring3 buffer\n");
         return (int) (-1);
     } 
-
 
 // The 'write offset' is the number of bytes to write.
 // So, it can't be '0' or negative.
@@ -466,34 +445,27 @@ int __fflush (FILE *stream)
 
     Count = (size_t) stream->_w;
 
-    if ( Count <= 0 )
-    { 
+    if (Count <= 0)
+    {
         stream->_p = stream->_base;
-        stream->_w = 0;  // ajust.
+        stream->_w = 0;    // ajust.
         //stream->_r = 0;  // ajust.
 
         // #debug
         debug_print ( "__fflush: [FAIL] _w\n");
-        
-        return 0; // OK.
+
+        return 0;  // OK.
         //return (int) (-1);
-    } 
-
-
-//
-// == Write =============
-//
+    }
 
 // #todo: 
 // This is the desired way.
 // Nesse teste escreveremos em stdout. Seu descritor indicará
-// que é um dispositivo do tipo console. O kernel escreverá no 
-// console 0.  
+// que é um dispositivo do tipo console. O kernel escreverá no console 0.  
 
-    if ( Count > BUFSIZ ){
+    if (Count > BUFSIZ){
         Count=BUFSIZ;
     }
-
 
 //
 // Write
@@ -520,9 +492,9 @@ int __fflush (FILE *stream)
         return EOF;
     }
 
-    // #todo
-    // Something is wrong
-    if ( nwrite != Count )
+// #todo
+// Something is wrong
+    if (nwrite != Count)
     {
         debug_print("__fflush: [DEBUG] nwrite != Count\n");
 
@@ -549,7 +521,6 @@ int __fflush (FILE *stream)
 // == Root 1 =================
 //
 
-
 // Buffer fill.
 // Precisamos pegar o conteúdo do arquivo que está em ring0 e
 // colocar no buffer em ring3 para o __getc pegar um byte.
@@ -559,55 +530,41 @@ int ____bfill (FILE *stream)
 {
     int n_read = 0;
 
-
-// Pointer validation
-
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         debug_print ("____bfill: [FAIL] struct \n");
         printf      ("____bfill: [FAIL] struct \n");
         return (int) (-1);
     }
 
 // Check buffer size
-
     if ( stream->_lbfsize != BUFSIZ )
     {
-        debug_print ("____bfill: [FAIL.DEBUG] _lbfsize \n");
-        printf      ("____bfill: [FAIL.DEBUG] _lbfsize %d *hang\n",
+        debug_print ("____bfill: [FAIL] _lbfsize \n");
+        printf      ("____bfill: [FAIL] _lbfsize %d\n",
             stream->_lbfsize);
 
         stream->_cnt = 0; 
-        
+
         // #debug
         // provisorio
-        exit(1); 
-        
+        exit(1);
         //return EOF;
     }
     // ...
 
-
-//
-// == Read file ============================
-//
-
-
+// Read file
 // #importante:
 // Colocaremos no offset e não na base. 
 // Pois esse é o local onde __getc vai pegar.
 // Só podemos colocar o quanto ainda cabe no buffer.
  
 // O tamanho do buffer menos o quanto ja foi consumido.
-
     //size_t how_much = ( stream->_lbfsize - (stream->_p - stream->_base) );
 
 // cnt deve ser 0, pois ____bfill foi chamado
 // quando o buffer acabou. então vamos encher o buffer novamente
 // e atualizarmos o cnt.
-
     //size_t how_much = stream->_lbfsize;
-
     //if ( how_much <= 0 || how_much > BUFSIZ )
     //{
     //    debug_print ("____bfill: [BUGBUG] buffer fail\n");
@@ -642,21 +599,18 @@ int ____bfill (FILE *stream)
     //                   stream->_p,
     //                   stream->_cnt );
     //}
-    
-    n_read = (int) read ( 
-                       fileno(stream), 
-                       stream->_p,
-                       BUFSIZ );
 
-    if ( n_read < 0  ){
+    n_read = (int) read ( fileno(stream), stream->_p, BUFSIZ );
+
+    if (n_read < 0){
         stream->_fsize = 0;
-        stream->_cnt = (BUFSIZ);
+        stream->_cnt = BUFSIZ;
         return EOF;
     }
     
-    if ( n_read == 0 ){
+    if (n_read == 0){
         stream->_fsize = 0;
-        stream->_cnt = (BUFSIZ);
+        stream->_cnt = BUFSIZ;
         return EOF;
     }
 
@@ -670,7 +624,6 @@ int ____bfill (FILE *stream)
         stream->_r = 0;
         return BUFSIZ;
     }
-
 
 // Update
 // Number of available characters in buffer.
@@ -691,10 +644,7 @@ int ____bfill (FILE *stream)
 }
 
 
-/*
- * __getc:
- * 
- */
+// __getc:
 // #todo:
 // #importante
 // Se tem alguma coisa no buffer em ring3 a gente pega,
@@ -705,19 +655,15 @@ int ____bfill (FILE *stream)
 // Então:
 // + Se acabou nosso buffer em ring3, enchemos o buffer novamente.
 // + Se não acabou então pegamos um byte no buffer.
-// Isso vale para arquivos craidos com fopen cujo buffer
-// ja começa vazio.
+// Isso vale para arquivos craidos com fopen cujo buffer ja começa vazio.
+// Vamos ler do buffer da stream, em ring3.
 
-int __getc ( FILE *stream )
+int __getc(FILE *stream)
 {
     int ch = 0;
     int nreads = 0;
 
-// What?
-// Vamos ler do buffer da stream, em ring3.
-
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         debug_print ("__getc: [FAIL] stream \n");
         printf      ("__getc: [FAIL] stream \n");
         return EOF;
@@ -727,30 +673,28 @@ int __getc ( FILE *stream )
     // if (!(stream->flags & _IOREAD))
         //return (EOF);
 
+// have ungotten?
+// Pegamos o ungotten.
+// não mexemos nos contadores.
+// Do NOT have forgotten!
+// Pega o char no posicionamento absoluto do arquivo.
+// Ajust file.
+// Return the char.
 
-    // have ungotten ?
-    // Pegamos o ungotten.
-    // não mexemos nos contadores.
     if ( stream->have_ungotten == TRUE )
     {
         ch = (int) stream->ungotten;
         stream->have_ungotten = FALSE;
         return (int) ch;
-    
-    // Do NOT have forgotten!
-    // Pega o char no posicionamento absoluto do arquivo.
-    // Ajust file.
-    // Return the char.
     }
 
 // Se o ponteiro de leitura for inválido.
 // Não podemos acessar um ponteiro nulo ... 
 // no caso endereço.
 
-    if ( (void*) stream->_p == NULL )
-    {
-        debug_print ("__getc: [BUGBUG] invalid stream->_p\n");
-        printf      ("__getc: [BUGBUG] invalid stream->_p\n");
+    if ( (void*) stream->_p == NULL ){
+        debug_print ("__getc: Invalid stream->_p\n");
+        printf      ("__getc: Invalid stream->_p\n");
         return EOF;
     }
 
@@ -763,11 +707,9 @@ int __getc ( FILE *stream )
     {
 
         ch = (int) *stream->_p;
-
         stream->_p++;
         stream->_r++;
         stream->_cnt--;
-
         return (int) ch;
     }
 
@@ -790,15 +732,14 @@ int __getc ( FILE *stream )
         nreads = (int) ____bfill(stream);
 
         // Falhou. Não conseguimos ler.
+        // nada no buffer local.
         if (nreads <= 0)
         {
-            // nada no buffer local.
             stream->_fsize = 0;
             stream->_cnt = BUFSIZ; //temos todo o espaço disponível.
             stream->_p = stream->_base;
             stream->_w = 0;  
-            stream->_r = 0;
-            
+            stream->_r = 0;    
             return EOF;
         }
 
@@ -807,46 +748,34 @@ int __getc ( FILE *stream )
         // #importante: Eles foram colocados no offset e não na base.
         // Atualiza.
         // Retorna o buffer que pegamos do buffer em ring3.
-        
-        if (nreads > BUFSIZ)
+        if (nreads > BUFSIZ){
             nreads = BUFSIZ;
-        
-        // Se nosso buffer tem alguma coisa.
-        if( nreads > 0 )
-        {
-            // Os elementos da estrutura foram configurados por ____bfill.
-            
-            // O ponteiro está na base. Vamos ler o primeiro byte.
-            ch = (int) *stream->_p;
+        }
 
+        // Se nosso buffer tem alguma coisa.
+        // Os elementos da estrutura foram configurados por ____bfill.
+        // O ponteiro está na base. Vamos ler o primeiro byte.
+        if (nreads > 0)
+        {
+            ch = (int) *stream->_p;
             stream->_p++;    // incrementamos o ponteiro
             stream->_r++;    // incrementamos o offset de leitura.
             stream->_cnt--;
-
             return (int) (ch & 0xFF);
         }
 
         // Algo deu errado.
         // Vamos para o fim do buffer
-        // para que ele seja cheio novamente.
-        
+        // para que ele seja cheio novamente.        
         stream->_cnt = 0;
         stream->_w = BUFSIZ;  // o escritor eta no fim do arquivo.
         stream->_r = BUFSIZ;  // o leitor eta no fim do arquivo.
-
         return EOF;
     }
 
-
-//
 // == Read ring3 buffer ====================
-//
-
-
 // Ok. 
 // Vamos ler o buffer, porque ele não está vazio.
-
-
 // #bugbug
 // FAIL!
 
@@ -904,12 +833,10 @@ int __putc (int ch, FILE *stream)
 // Se chegamos ao fim do arquivo.
     if (stream->_w >= BUFSIZ)
     {
-        debug_print("__putc: [BUGBUG] Overflow 2\n");
-        printf     ("__putc: [BUGBUG] Overflow 2\n");
-        
+        debug_print("__putc: Overflow 2\n");
+        printf     ("__putc: Overflow 2\n");
         stream->_cnt = 0;
         fflush (stream);
-
         return (int) ch;
     }
 
@@ -918,12 +845,10 @@ int __putc (int ch, FILE *stream)
 // Se o char que colocamos no buffer é um '\n'.
 // Então vamos enviar o buffer para o kernel
 
-    if ( ch == '\n' )
-    { 
+    if (ch == '\n'){ 
         fflush(stream);
         return (int) ch;
     }
-
 
     //if (stream->eof || stream->error)
         //return EOF;
@@ -944,15 +869,13 @@ int putc (int ch, FILE *stream){
 
 // don't change it
 // See: unix v7
-int fgetc ( FILE *stream )
-{
+int fgetc ( FILE *stream ){
     return (int) getc(stream);
 }
 
 // don't change it
 // See: unix v7
-int fputc ( int ch, FILE *stream )
-{
+int fputc ( int ch, FILE *stream ){
     return (int) putc(ch,stream);
 }
 
@@ -981,9 +904,9 @@ int putchar (int ch){
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
 
-char *gets (char *s)
+char *gets(char *s)
 {
-    register int c;
+    register int c=0;
     register char *cs;
 
     cs = s;
@@ -997,39 +920,32 @@ char *gets (char *s)
     return (s);
 }
 
-
-int puts (const char *s)
+int puts(const char *s)
 {
     register int c=0;
-
-    while (c = *s++)
-    {
+    while (c = *s++){
         putchar(c);
     };
-    
     return (int) putchar('\n');
 }
-
 
 //
 // Root 4
 //
 
 //s n iop
-char *fgets (char *s, int size, FILE *stream)
+char *fgets(char *s, int size, FILE *stream)
 {
-    //int c=0;
-    register int c;
+    register int c=0;
     register char *cs;
-
     cs = s;
-    
+
     // Maior ou igual a 0.
     while ( --size > 0 && 
             (c = getc(stream)) >= 0 ) 
     {
         *cs++ = c;
-        
+
         if (c=='\n'){ break; }
     };
 
@@ -1127,8 +1043,7 @@ int fclose (FILE *stream)
     
     debug_print ("fclose: [FIXME]\n");
 
-    if ( (void *) stream == NULL )
-    {  
+    if ( (void *) stream == NULL ){
         return EOF;  
     }
 
@@ -1228,12 +1143,8 @@ FILE *fopen ( const char *filename, const char *mode )
         //ASSERT_NOT_REACHED();
     };
 
-//
 // Open
-//
-
-// See:
-// fcntl.c
+// See: fcntl.c
 
     fd = open (filename, flags, oflags);  
     if (fd < 0){
@@ -1242,7 +1153,6 @@ FILE *fopen ( const char *filename, const char *mode )
     }
 
 // Stream
-
     __stream = (FILE *) malloc ( sizeof(FILE) );
     if ( (void *) __stream == NULL ){
         printf ("fopen: __stream fail\n");
@@ -1251,13 +1161,11 @@ FILE *fopen ( const char *filename, const char *mode )
     memset( __stream, 0, sizeof(struct _iobuf) );
 
 // Descriptor
-
     __stream->_file = fd;
 
 
 // ==============================
 // Buffer
-
 // #importante:
 // Dessa forma fopen não permite que os aplicativos
 // leiam o conteúdo do arquivo no buffer.
@@ -1279,7 +1187,6 @@ FILE *fopen ( const char *filename, const char *mode )
      }
 
 // Reset buffer pointer.
-
     __stream->_p = __stream->_base; 
 
     __stream->_lbfsize = BUFSIZ;
@@ -1288,20 +1195,16 @@ FILE *fopen ( const char *filename, const char *mode )
     __stream->_w = 0;
 
 // ==============================
-
 // Flags
     __stream->_flags = flags;
-
 // File name.
 // Saving the name in ring3.
     __stream->_tmpfname = (char *) strdup(filename);
-
 //done:
-    __stream->used  = TRUE;
+    __stream->used = TRUE;
     __stream->magic = 1234;
     return (FILE *) __stream;
 }
-
 
 /*
  * fopen2:
@@ -1346,18 +1249,19 @@ FILE *fopen2 ( const char *filename, const char *mode )
     */
     
     
-    //
-    // size
-    //
+//
+// size
+//
     
     stdio_fntos( (char *) filename);
     
-    // get file size
-    size_t s = (size_t) gramado_system_call ( 178, 
+// get file size
+    size_t s = (size_t) gramado_system_call ( 
+                            178, 
                             (unsigned long) filename,
                             0,
                             0 );
-    
+
     // #bugbug
     // 1MB
     if ( s <= 0 || s > (1024*1024) )
@@ -1366,36 +1270,32 @@ FILE *fopen2 ( const char *filename, const char *mode )
         return NULL;
     }
     
-    // endereço desejando.
-    // ring 3.
-    unsigned long address = (unsigned long) malloc(s);
-    
-    if (address == 0)
-    {
+// endereço desejando.
+// ring 3.
+    unsigned long address = (unsigned long) malloc(s);    
+    if (address == 0){
         printf ("fopen2: address\n");
         return NULL;
     }
 
-
-    // load the file into the address.
-    // Vai retornar o fd.
-
+// load the file into the address.
+// Vai retornar o fd.
     
     //IN: service, name, address, 0, 0 
-    fd = (int) gramado_system_call ( 3, 
-                  (unsigned long) filename, 
-                  (unsigned long) address,  
-                  0 );
+    fd = (int) gramado_system_call ( 
+                   3, 
+                   (unsigned long) filename, 
+                   (unsigned long) address,  
+                   0 );
 
     if (fd < 0){
         printf ("fopen2: Couldn't load the file\n");
         return NULL;
     }
 
-
-    //
-    // _flags
-    //
+//
+// _flags
+//
 
     // #todo
 	//__stream->_flags &= ~(_IOREAD|_IOWRT);
@@ -1407,25 +1307,18 @@ FILE *fopen2 ( const char *filename, const char *mode )
         __stream->_flags |= _IOREAD;
     };
 
-
-    // #todo    
-    // Isso deve ser o retorno de open() ou creat()
-    // Me parece que a chamada acima também retorna o fd.
-    
+// #todo    
+// Isso deve ser o retorno de open() ou creat()
+// Me parece que a chamada acima também retorna o fd.
     __stream->_file = fd; 
-
 // ===================
 // Buffer
-
     __stream->_base = (unsigned char *) address; 
     __stream->_p = __stream->_base;
-
     __stream->_lbfsize = (int) s;
     __stream->_cnt = __stream->_lbfsize;
 
-
-    // retornar a stream que criamos aqui. 
-    
+// retornar a stream que criamos aqui.
     return (FILE *) __stream;
 }
 
@@ -1440,31 +1333,25 @@ FILE *fopen2 ( const char *filename, const char *mode )
  *            Se estamos ou full screen ou não.
  */
 
-void scroll (void){
-
+void scroll (void)
+{
     //loop
     register unsigned short i=0;
     register unsigned short j=0;
-
-
 	//Início da tela.
     unsigned short *p1 = (unsigned short *) SCREEN_START;
-
 	//Início da segunda linha.
     unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
 
-
-
-	// Linhas.
-	// Usa o valor default se passar dos limites.
+// Linhas.
+// Usa o valor default se passar dos limites.
 
     if ( g_rows == 0 || g_rows >= SCREEN_MAX_HEIGHT )
     {
         g_rows = SCREEN_HEIGHT;
     }
 
-
-	// 24 vezes.
+// 24 vezes.
 
     for ( i=0; i < g_rows -1; i++ )
     {
@@ -1499,10 +1386,8 @@ void scroll (void){
         }
     };
 
-
-	// Limpando a última linha.
-
-	// modo gráfico.
+// Limpando a última linha.
+// modo gráfico.
 
     if (g_using_gui == 1)
     {
@@ -1542,51 +1427,41 @@ void clearerr (FILE* stream)
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 {
     void *data;
-
     int nreads = 0;
     int number_of_bytes = -1;
-
 // Initialize local variable.
     data = ptr;
 
-    if ( (void *) data == NULL )
-    {
+    if ( (void *) data == NULL ){
         printf ("fread: ptr \n");
         return (size_t) -1;
     }
 
-    if ( size <= 0 )
-    {
+    if (size <= 0){
         printf ("fread: size \n");
         return (size_t) -1;
     }
 
-    // Quantidade inválida.
-    if ( n <= 0 )
-    {
+// Quantidade inválida.
+    if (n <= 0){
         printf ("fread: n \n");
         return (size_t) -1;
     }
-    
-    // Se não temos o ponteiro, então não teremos o fd
-    // para usarmos em read().
-    if ( (void *) fp == NULL )
-    {
+
+// Se não temos o ponteiro, então não teremos o fd
+// para usarmos em read().
+    if ( (void *) fp == NULL ){
         printf ("fread: fp \n");
         return (size_t) -1;
     }
 
-    // buffer size
-    size_t _max = sizeof(data);
-    
-    if (_max <= 0)
-    {
+// buffer size
+    size_t _max = sizeof(data);    
+    if (_max <= 0){
         printf("fread: [DEBUG] buffer size <= 0 \n");
         return (size_t) -1;
     }
-
-    if (_max > BUFSIZ)
-    {
+    if (_max > BUFSIZ){
         printf("fread: [DEBUG] buffer size\n");
         _max = BUFSIZ;
     }
@@ -1642,25 +1517,21 @@ fwrite (
     int nwrite = 0;
     int number_of_bytes = -1;
 
-
 // Pointer validation.
     if ( (void *) ptr == NULL ){
         printf ("fwrite: ptr \n");
         goto error0;
     }
-
 // Tamanho do elemento dado em bytes.
     if ( size <= 0 ){
         printf ("fwrite: size \n");
         goto error0;
     }
-
 // Quantidade de elementos.
     if ( n <= 0 ){
         printf ("fwrite: n \n");
         goto error0;
     }
-
 // File pointer
 // Se não temos o ponteiro, então não teremos o fd
 // para usarmos em read().
@@ -1668,17 +1539,15 @@ fwrite (
         printf ("fwrite: fp \n");
         goto error0;
     }
-
 // ====================================
-
-    // Calculando a quantidade de bytes.
+// Calculando a quantidade de bytes.
     number_of_bytes = (size * n);
     
     size_t _max = sizeof(ptr);
     
-    if ( number_of_bytes > _max )
+    if ( number_of_bytes > _max ){
         number_of_bytes = _max;
-
+    }
 
 //
 // Write
@@ -1687,29 +1556,23 @@ fwrite (
     //nwrite = write( fileno(fp), ptr, sizeof(ptr) );
     //nwrite = write ( fileno(fp), ptr, n );
     nwrite = write ( fileno(fp), ptr, number_of_bytes );
-
 // Se não conseguimos escrever.
-    if (nwrite <= 0)
-    {
+    if (nwrite <= 0){
         printf ("fwrite: write() fail \n");
         goto error1;
     }
-
 // Se escrevemos menos do que desejavamos.
     if (nwrite < number_of_bytes)
     {
         printf ("fwrite: write() less than desired \n");
         goto error1;
     }
-
 //done:
     return (size_t) nwrite; 
-
 // Se já temos um ponteiro de arquivo válido.
 error1:
     fp->_flags |= _IOERR;
     // ...
-
 // Ainda não sabemos se o ponteiro de arquivo é válido.
 error0:
     return (size_t) EOF;   
@@ -1720,93 +1583,83 @@ error0:
 // quando ele sobre flush.
 int prompt_putchar ( int c, int con_id )
 {
-
-    if ( con_id < 0 )
+    if ( con_id < 0 ){
         return -1;
-    
-    if ( con_id >= 4 )
+    }
+    if ( con_id >= 4 ){
         return -1;
+    }
 
+// #todo: 
+// Overflow do prompt[]
 
-   //#todo: overflow do prompt[]
-
-    // ??
-    //eol
+// ??
+//eol
     if ( c != '\n' ){
         input ( (unsigned long) c );
         return c;
     }
-
-    // se \n
+// se \n
     if ( c == '\n' ){
        prompt_flush (con_id);
     }
-
-    // ??
-    // #bugbug: We need a return here.
+// ??
+// #bugbug: We need a return here.
     return 0;  //??
 } 
 
 
-
-int prompt_put_string ( char *string )
+int prompt_put_string (char *string)
 {
-    if ( (void *) string == NULL )
+    if ( (void *) string == NULL ){
         return -1;
-
+    }
     sprintf(prompt,(const char *) string);
     return 0;
 }
 
-
 int prompt_strcat (char *string)
 {
-    if ( (void *) string == NULL )
+    if ( (void *) string == NULL ){
         return -1;
-
+    }
     strcat(prompt,(const char *) string);
     return 0;
 }
 
-
-int prompt_flush ( int con_id )
+int prompt_flush (int con_id)
 {
-    size_t len;
+    size_t len=0;
 
-    if ( con_id < 0 )
+    if ( con_id < 0 ){
         return -1;
-    
-    if ( con_id >= 4 )
+    }
+    if ( con_id >= 4 ){
         return -1;
+    }
 
-    //finaliza.
+//finaliza.
     input ('\0'); 
     len = strlen( (const char *) prompt );  
-
     gramado_system_call ( 66, (unsigned long) prompt, con_id, len );  
-    prompt_clean ();
-    
+    prompt_clean();
+
     return 0; 
 }
 
-
+// Linpando o buffer de entrada.
 void prompt_clean (void)
 {
-    int i=0;
-
-// Linpando o buffer de entrada.
-
+    register int i=0;
     for ( i=0; i<PROMPT_MAX_DEFAULT; i++ )
     {
         prompt[i] = (char) '\0';
-    }
-
+    };
     prompt[0] = (char) '\0';
     prompt_pos = 0;
     prompt_status = 0;
     prompt_max = PROMPT_MAX_DEFAULT;  
 }
-
 
 /*
  ****************************************************************
@@ -1832,12 +1685,11 @@ prints (
     int width, 
     int pad )
 {
-	
     register int pc = 0, padchar = ' ';
 
-    
-	// filtro: e se width for menor que 0??
-	
+// filtro: 
+// E se width for menor que 0?
+
 	//if(width < 0){
 	//	return (int) 1;
 	//}
@@ -1851,8 +1703,7 @@ prints (
 		if(len >= width) width = 0;
 		else width -= len;
 		if(pad & PAD_ZERO) padchar = '0';
-	};
-
+	}
 
     if ( !(pad & PAD_RIGHT) )
     {
@@ -1863,13 +1714,11 @@ prints (
         };
     }
 
-
     for ( ; *string ; ++string )
     {
         printchar (out, *string);
         ++pc;
     };
-
 
     for ( ; width > 0; --width )
     {
@@ -1882,7 +1731,6 @@ prints (
 
 
 /*
- ***************************************
  * printi:
  *     used by printf.
  */
@@ -1947,21 +1795,17 @@ printi (
     return pc + prints(out, s, width, pad);
 }
 
-
 /*
- *****************************************
  * print:
  *     Used by printf.
  */
 
-int print ( char **out, int *varg ){
-
+int print ( char **out, int *varg )
+{
     register int width, pad;
     register int pc = 0;
     register char *format = (char *) (*varg++);
-
     char scr[2];
-
 
     for ( ; *format != 0; format++ ) 
     {
@@ -2058,12 +1902,10 @@ int print ( char **out, int *varg ){
  *     Imprime uma string formatada.
  *     Assuming sizeof(void *) == sizeof(int).
  * Obs: Temos uma chamada ao sistema para cada caractere.
- * 
  * Obs: Se passássemos apenas o ponteiro da string para o kernel pintá-la,
  * não estariamos usando o printf da biblioteca em user mode e sim 
  * a printf do kernel.
  */
- 
 // Padrão não tradicional, mas funciona. 
 
 /*
@@ -2076,18 +1918,15 @@ int printf3 ( const char *format, ... )
 */
 
 
-
-
 //======================
-//#todo: poderia se chamar l2hex?
+// #todo: poderia se chamar l2hex?
 void 
 kinguio_i2hex_versao2(
     unsigned long val, 
     char* dest, 
     int len)
 {
-
-    char* cp;
+    char *cp;
     int i=0; 
     int x=0;
     unsigned long n=0;
@@ -2108,12 +1947,12 @@ kinguio_i2hex_versao2(
 		x = n & 0xF;
 		n >>= 4;
 		*--cp = x + ((x > 9) ? 'A' - 10 : '0');
-	}
-    
+	};
+
 	dest[len]='\0';
 
 	cp = &dest[0];
-	for(i=0; i < len;i++) {
+	for (i=0; i < len;i++) {
 	
 		if(*cp == '0') {
 			cp++;
@@ -2123,7 +1962,7 @@ kinguio_i2hex_versao2(
 			 break;
 		}
 			
-	}
+	};
 
 	cp = &dest[0];
 	n = strlen(cp);
@@ -2140,9 +1979,7 @@ kinguio_i2hex(
     char *dest, 
     int len )
 {
-
     char* cp;
-
     int i=0; 
     int x=0;
     unsigned n=0;
@@ -2155,7 +1992,6 @@ kinguio_i2hex(
         *cp = '\0';
         return;
     }
-
 
 // error
     if(len<0)
@@ -2206,9 +2042,7 @@ kinguio_l2hex(
     char *dest, 
     int len )
 {
-
     char* cp;
-
     int i=0; 
     int x=0;
     unsigned n=0;
@@ -2221,7 +2055,6 @@ kinguio_l2hex(
         *cp = '\0';
         return;
     }
-
 
 // error
     if(len<0)
@@ -2269,8 +2102,6 @@ kinguio_l2hex(
         0, 
         16-n );   //64bit
 }
-
-
 
 
 //local
@@ -2324,10 +2155,8 @@ char *kinguio_utoa(
 
 char *kinguio_itoa (int val, char *str) 
 {
-
 	char* valuestring = (char*) str;
 	int value = val;
-
 	int min_flag;
   	char swap, *p;
  	min_flag = 0;
@@ -2367,18 +2196,16 @@ char *kinguio_itoa (int val, char *str)
 int kinguio_printf(const char *fmt, ...)
 {
     int ret=0;
-
     char buf[256];
+
     memset(buf,0,256); 
 
     va_list ap;
     va_start (ap, fmt);
-
     ret = kinguio_vsprintf(buf, fmt, ap);
-
     va_end (ap);
 
-    // Print
+// Print
     kinguio_puts(buf);
 
     return (int) ret;
@@ -2392,10 +2219,8 @@ int printf(const char *fmt, ...)
 
     va_list ap;
     va_start (ap, fmt);
-
     memset(print_buffer, 0, 1024); 
     ret = (int) kinguio_vsprintf(print_buffer, fmt, ap);
-
     va_end (ap);
 
 // Print and return.
@@ -2404,19 +2229,14 @@ int printf(const char *fmt, ...)
 }
 
 
-
 void kinguio_puts(const char* str)
 {
     register int i=0;
-
     if (!str){
         return;
     }
-
     size_t StringLen = (size_t) strlen(str);
-
-    for (i=0; i<StringLen; i++)
-    {
+    for (i=0; i<StringLen; i++){
         putchar( str[i] );
     };
 }
@@ -2426,15 +2246,11 @@ static char *_vsputs_r(char *dest, char *src)
 {
     unsigned char *usrc  = (unsigned char *) src;
     unsigned char *udest = (unsigned char *) dest;
-
-    while ( *usrc ) 
-    { 
+    while (*usrc){
         *udest++ = *usrc++; 
     };
-
     return (char * ) udest;
 }
-
 
 int 
 kinguio_vsprintf( 
@@ -2442,36 +2258,25 @@ kinguio_vsprintf(
     const char *fmt, 
     va_list ap )
 {
-
-    int index=0;
-
-
+    register int index=0;
 // Char/String support.
-
     char c=0;  //c
     char *s;   //s
-
     char *str_tmp = str;
     char _c_r[] = "\0\0";
     char buffer[256];
-
-
 // d|i|x
     int   d=0;
     long ld=0;  //signed long
-    
 // u
     //unsigned char u=0;
     unsigned int   u=0;
     unsigned long lu=0;
-
-
 // 64bit Format Specifier
     int type64bit = FALSE;
 
 // loop
-
-    while (fmt[index])
+    while ( fmt[index] )
     {
         switch (fmt[index]){
         
@@ -2572,27 +2377,18 @@ kinguio_vsprintf(
 // Return size ?
     return (int) ((long)str_tmp - (long)str);
 }
-
-
 //=============================================================
-
-
-
-
-
 
 //
 //=============================================================
 //
 
 // usada na printf2
-void printf_atoi (int value, char* valuestring){
-
-    int min_flag;
+void printf_atoi (int value, char* valuestring)
+{
+    int min_flag=0;
     char swap, *p;
-
-    min_flag = 0;
-
+    //min_flag = 0;
 
     if (0 > value)
     {
@@ -2602,7 +2398,6 @@ void printf_atoi (int value, char* valuestring){
     }
 
     p = valuestring;
-
 
     do {
 
@@ -2618,9 +2413,7 @@ void printf_atoi (int value, char* valuestring){
         ++*valuestring;
     }
 
-
     *p-- = '\0';
-
 
     while (p > valuestring)
     {
@@ -2629,22 +2422,18 @@ void printf_atoi (int value, char* valuestring){
         *valuestring++ = *p;
         
         *p-- = swap;
-    }
+    };
 }
 
-
 // Usada na printf2
-void printf_i2hex (uint32_t val, char *dest, int len){
-
+void printf_i2hex (uint32_t val, char *dest, int len)
+{
     char *cp;
-
     char x=0;
     uint32_t n=0;
 
-
     n = val;
     cp = &dest[len];
-
 
     while (cp > dest)
     {
@@ -2753,18 +2542,15 @@ int printf2 ( const char *format, ... )
 //
 
 //find next line
-char *stdio_nextline ( char *string ){
-
+char *stdio_nextline (char *string)
+{
     char *p;
 
-
     p = (char *) strchr (string, '\n');
-
 
     if (p==NULL){ return (p); }
 
     ++p;
-
 
     // Não há próxima linha    
     if (*p=='\0')
@@ -2777,18 +2563,15 @@ char *stdio_nextline ( char *string ){
 
 
 //next line sprintf
-int nlsprintf ( char *out, const char *format, ... ){
-
+int nlsprintf ( char *out, const char *format, ... )
+{
     char *tmp;
 
-
     tmp = (char *) stdio_nextline (out);
-
     if (tmp == NULL ){
         // ?? message
         return -1;
     }
-
     register int *varg = (int *)(&format);
 
     return (int) print( &tmp, varg );
@@ -2803,8 +2586,7 @@ int nlsprintf ( char *out, const char *format, ... ){
  * @todo: ??
  * Em caso de sucesso, a função retorna o número de caracteres 
  * da string formatada. Em caso de erro, um valor negativo é retornado.
- */
- 
+ */ 
 //opção 
 //int sprintf(char *str, const char *format, ...) ?? 
 
@@ -2828,21 +2610,17 @@ void printchar ( char **str, int c )
 }
 
 
-
 // Setup libc mode.
-void libc_set_output_mode (int mode){
-
-
+void libc_set_output_mode (int mode)
+{
     switch (mode)
     { 
 		case LIBC_DRAW_MODE:
 			__libc_output_mode = mode;
 			break;
-
 		case LIBC_NORMAL_MODE:
 			__libc_output_mode = mode;
 			break;
-
         default:
             __libc_output_mode = LIBC_DRAW_MODE;
             printf ("libc_set_output_mode: fail\n");
@@ -2851,26 +2629,22 @@ void libc_set_output_mode (int mode){
 }
 
 
-
 /*
  **********
  * outbyte:
  * @todo: Colocar no buffer de arquivo.
  * #obs: essa função chamará _outbyte.
- *
- * #importante: Não me lebro se o kernel efetua o refresh do char 
- * nesse caso.
+ * #importante: 
+ * Não me lebro se o kernel efetua o refresh do char nesse caso.
  */
  
-void outbyte (int c){
-
-    // Copy.
+void outbyte (int c)
+{
+// Copy.
     register int Ch=c;
-
     static char prev = 0;
 
-	// spaces.
-
+// spaces
     if ( Ch <  ' '  && 
          Ch != '\r' && 
          Ch != '\n' && 
@@ -2880,18 +2654,16 @@ void outbyte (int c){
         return;
     }
 
-
-	//#testando.
-	//nada para imprimir.
-	//?? onde fica o tratamento de backspace.??
+//#testando.
+//nada para imprimir.
+//?? onde fica o tratamento de backspace.??
 	//if( c == '\b' )
     //{
 	//	return;
 	//}
 
-
-	// carriege return 
-	// Volta ao início da linha.
+// carriege return 
+// Volta ao início da linha.
     if ( Ch == '\r' )
     {
         g_cursor_x = 0;
@@ -2899,8 +2671,7 @@ void outbyte (int c){
         return;  
     }
 
-
-	//Próxima linha e não início da linha.   
+//Próxima linha e não início da linha.   
     if ( Ch == '\n' && prev != '\r' ) 
     {
         g_cursor_y++; 
@@ -2909,8 +2680,7 @@ void outbyte (int c){
         return;
     }
 
-
-    //Próxima linha e início da linha. 	   
+//Próxima linha e início da linha. 	   
     if ( Ch == '\n' && prev == '\r' ) 
     {
         g_cursor_y++;  
@@ -2918,9 +2688,8 @@ void outbyte (int c){
         return;
     }
 
-
-	//Tab.
-	//@todo: Criar a var -> 'g_tab_size'.
+//Tab
+//@todo: Criar a var -> 'g_tab_size'.
     if ( Ch == '\t' )  
     {
         g_cursor_x += (4);    
@@ -2928,10 +2697,9 @@ void outbyte (int c){
         return;   
     }
 
-
-	//Space 
-	//#todo:
-	// ?? talvez devêssemos imprimir o caractere espaço. ??    
+//Space 
+//#todo:
+// ?? talvez devêssemos imprimir o caractere espaço. ??    
     if ( Ch == ' ' )  
     {
         g_cursor_x++; 
@@ -2939,8 +2707,7 @@ void outbyte (int c){
         return; 
     }
 
-
-    //Delete. 
+//Delete
     if ( Ch == 8 )  
     {
         g_cursor_x--; 
@@ -2948,24 +2715,20 @@ void outbyte (int c){
         return; 
     }
 
-    // Filtra as dimensões da janela onde esta pintando.
+// Filtra as dimensões da janela onde esta pintando.
  
 //checkLimits:
 
-	//
-	// Colunas.
-	//
-
-	//Definindo a largura que usaremos.
-	//A largura precisa ser maior que '0' e menor que o limite máximo.
-	//Obs: @todo: Essa rotina de definição pode ir para o momento da inicialização
-	//da biblioteca. Ela contunua aqui porque está funcionando como um filtro.
+//Colunas
+//Definindo a largura que usaremos.
+//A largura precisa ser maior que '0' e menor que o limite máximo.
+//Obs: @todo: Essa rotina de definição pode ir para o momento da inicialização
+//da biblioteca. Ela contunua aqui porque está funcionando como um filtro.
 
     if ( g_columns == 0 || g_columns >= SCREEN_MAX_WIDTH )
     {
         g_columns = COLUMNS;
     }
-
 
 	//O cursor não pode ultrapassar a largura definida.
     if ( g_cursor_x > g_columns )
@@ -2977,35 +2740,31 @@ void outbyte (int c){
         g_cursor_x++;    
     };
 
+// Linhas
 
-	// Linhas.
-	
-	//Definindo a altura que usaremos.
-	//A altura precisa ser maior que '0' e menor que o limite máximo.
+//Definindo a altura que usaremos.
+//A altura precisa ser maior que '0' e menor que o limite máximo.
     if ( g_rows == 0 || g_rows >= SCREEN_MAX_HEIGHT )
     {
         g_rows = ROWS;
     }
 
-    //O cursor não pode ultrapassar a altura definida.
-	//se ultrapassar, chamaremos o scroll.
-	//Obs: O scroll ainda não está implementado.
-	//O scroll será feito depois que implementarmos o array de ponteiros
-	//para estruturas de linha.
+//O cursor não pode ultrapassar a altura definida.
+//se ultrapassar, chamaremos o scroll.
+//Obs: O scroll ainda não está implementado.
+//O scroll será feito depois que implementarmos o array de ponteiros
+//para estruturas de linha.
 	
     if ( g_cursor_y > g_rows )
     { 
         scroll();
-
         g_cursor_x = 0;             //O cursor deve fica na primeira coluna.
         g_cursor_y = (g_rows-1);    //O cursor deve ficar na última linha.
     }
 
-    // Imprime os caracteres normais.
-
+// Imprime os caracteres normais.
     _outbyte (Ch);
-
-	//Atualisa o prev.
+//Atualisa o prev.
     prev = Ch; 
 }
 
@@ -3013,34 +2772,32 @@ void outbyte (int c){
 /*
  ***********************************
  * _outbyte:
- *     Just output a byte on the screen.
- *
- *     Obs: A função não se preocupa com o cursor.
- *          Essa rotina está preparada somente par ao modo gráfico.
- *          Talvez usaremos um selecionador de modo.   
- *
+ * Just output a byte on the screen.
+ * Obs: 
+ * A função não se preocupa com o cursor.
+ * Essa rotina está preparada somente par ao modo gráfico.
+ * Talvez usaremos um selecionador de modo.   
  * #obs: 
  * #importante: Não me lebro se o kernel efetua o refresh do char 
  * nesse caso.
  */
+// #obs: 
+// Tamanho do char constante = 8. 
+// O que queremos é usar uma variável.
 
-	// #obs: 
-	// Tamanho do char constante = 8. 
-	// O que queremos é usar uma variável.
-
-void _outbyte ( int c )
+void _outbyte (int c)
 {
 
-	// #bugbug
-	// Essa funçao nao 'e usada ... NAO funciona.
-	// printf usa outra coisa (65).
-	// #bugbug: size = 8
+// #bugbug
+// Essa funçao nao 'e usada ... NAO funciona.
+// printf usa outra coisa (65).
+// #bugbug: size = 8
 
-    gramado_system_call ( 7, 
+    gramado_system_call ( 
+        7, 
         (8 * g_cursor_x), 
         (8 * g_cursor_y), 
         (unsigned long) c ); 
-
 
     //if ( (void *) stdout == NULL )
        //return;
@@ -3048,7 +2805,6 @@ void _outbyte ( int c )
 	//#todo
 	//putc ( ch, stdout );
 }
-
 
 
 /*
@@ -3061,50 +2817,43 @@ int gramado_input ( const char *string, va_list arglist )
 */
 
 
-
 /*
  ************************************************************
  * input:
  *     Include the given chars into a string named 'prompt[]'.
  */
-
 // #bugbug: 
 // Deveríamos considerar o posicionamento dentro do arquivo.
 // Dentro da stream.
-
 // Isso eh chamado pelo shell pra construir uma linha de comandos
 // com as teclas digitadas.
 // Serve para construir uma string.
-
 // ??
 // E esse retorno ??
 
-unsigned long input ( unsigned long ch )
+unsigned long input (unsigned long ch)
 {
-    // Convert.
+// Convert
     char c = (char) ch;
 
-    // Ajust prompt max.
+// Ajust prompt max.
     if ( prompt_max == 0 || prompt_max >= PROMPT_MAX_DEFAULT )
     {
         prompt_max = PROMPT_MAX_DEFAULT;
     }
 
-	//Filtra limite.
-	//retornar 1??
+//Filtra limite.
+//retornar 1??
 
-    if ( prompt_pos > prompt_max )
-    {
+    if ( prompt_pos > prompt_max ){
         printf ("input: [FAIL] Full buffer!\n");
         return (unsigned long) 0;   
     }
 
-
-    // Trata caractere digitado.
-
-    // #obs: 
-    // Não deve ser trabalho de input() atualizar
-    // o cursor do console. Ele somente atua sobre o buffer em ring3.
+// Trata caractere digitado.
+// #obs: 
+// Não deve ser trabalho de input() atualizar
+// o cursor do console. Ele somente atua sobre o buffer em ring3.
 
     switch (c){
 
@@ -3157,13 +2906,8 @@ unsigned long input ( unsigned long ch )
     return (unsigned long) 0;
 
 input_done:
-
     return VK_RETURN;
 }
-
-
-
-
 
 
 /*
@@ -3190,7 +2934,6 @@ int fprintf(FILE *fp, const char *fmt, ...)
  ********************************
  * fprintf:     
  */
-
 // #bugbug
 // We just have the pointer for a structure.
 // The file was loaded in ring0 by fopen(), using open()
@@ -3199,12 +2942,9 @@ int fprintf(FILE *fp, const char *fmt, ...)
 
 int fprintf ( FILE *stream, const char *format, ... )
 {
-
     debug_print ("fprintf: [FIXME]\n");
-
     
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
        debug_print ("fprintf: stream\n");
        return EOF;
     }
@@ -3238,45 +2978,40 @@ void nputs (char *cp, int len)
     int i = len;
     char *str;
 
-    // nao podemos escrever no endereço 0.
-    if ( (void*) cp == NULL )
-    {
+// nao podemos escrever no endereço 0.
+    if ( (void*) cp == NULL ){
         return;
     }
 
-    if ( len < 0 )
-    {
+    if ( len < 0 ){
         return;
     }
 
-    for (str = cp; i; str++, i--)
+    for ( str=cp; i; str++, i-- )
     {
         putchar ( (int) *str);
-    }
+    };
 }
 
 
 /*uClib style*/
-	/* 
-	 * Strictly speaking, this implementation is incorrect as the number
-	 * of chars gets can read should be unlimited.  However, I can't
-	 * imagine anyone wanting to gets() into a buffer bigger than INT_MAX.
-	 *
-	 * Besides, this function is inherently unsafe and shouldn't be used.
-	 */
+/* 
+ * Strictly speaking, this implementation is incorrect as the number
+ * of chars gets can read should be unlimited.  However, I can't
+ * imagine anyone wanting to gets() into a buffer bigger than INT_MAX.
+ * Besides, this function is inherently unsafe and shouldn't be used.
+ */
 /* This is an UNSAFE function! */
 
 char *uclib_gets (char *str) 
 {
 
-    // nao podemos usr o endereço '0'.
-    if ( (void *) str == NULL )
-    {
+// nao podemos usr o endereço '0'.
+    if ( (void *) str == NULL ){
        return (char *) 0;
     }
 
-    if ( (void *) stdin == NULL )
-    {
+    if ( (void *) stdin == NULL ){
        return (char *) 0;
     }
 
@@ -3356,23 +3091,18 @@ ssize_t getline(char** lineptr, size_t* n, FILE* stream)
 */
 
 
-
-
 /*
  *********************************
  * ungetc:
  */
-
-
 // #todo:
 // #importante:
 // Se recolocarmos alguma coisa com o ungetc(),
 // então e getc() deve checar se antes temos um unget
 // se tiver deve pega-lo, so depois fazer seu trabalho.
 
-int ungetc ( int c, FILE *stream ){
-
-
+int ungetc ( int c, FILE *stream )
+{
     if (c == EOF){
         return EOF;
     }
@@ -3395,19 +3125,14 @@ int ungetc ( int c, FILE *stream ){
 
         // Mudando.
         stream->have_ungotten = TRUE;
-    
         // Salva.
         stream->ungotten = c;
-    
         stream->eof = FALSE;
-        
         return (int) c;
     };
 
     return EOF;
 }
-
-
 
 
 /*linux - klibc style*/
@@ -3419,22 +3144,16 @@ static __inline__ off_t ftell(FILE *__f)
 }
 */
 
-
-
 // Deixaremos o kernel manipular a estrutura.
 // This function returns the current file position of the stream stream. 
 
 long ftell (FILE *stream)
 {
-    int fd=-1;
-    
+    int fd=-1;    
     int offset=0;
     long file_pos=0;
-    
     int rCount=0;
-    
-    
-    
+
     if ( (void *) stream == NULL ){
         debug_print ("ftell: stream\n");
         return 0;
@@ -3486,8 +3205,8 @@ long ftell (FILE *stream)
  *     Gets the file id.
  *     The kernel gets this value from the stream struct.
  */
-int fileno ( FILE *stream ){
-
+int fileno ( FILE *stream )
+{
     //assert(stream);
  
     if ( (void *) stream == NULL ){
@@ -3500,10 +3219,9 @@ int fileno ( FILE *stream ){
 
 /*linux klibc style.*/
 // Isso vai ler no arquivo que está em ring0.
-int linux_fgetc (FILE *f){
-
+int linux_fgetc (FILE *f)
+{
     unsigned char ch=0;
-
   
     if ( (void *) f == NULL ){
        return EOF;
@@ -3513,13 +3231,11 @@ int linux_fgetc (FILE *f){
 }
 
 
-
 /*uClib style*/
-char *fgets2 (char *s, int count, FILE *fp){
-
+char *fgets2 (char *s, int count, FILE *fp)
+{
     char *p;
     int ch=0;
-
 
     p = s;
 
@@ -3527,8 +3243,7 @@ char *fgets2 (char *s, int count, FILE *fp){
        return (char *) 0;
     }
 
-
-    // Guard against count arg == INT_MIN. 
+// Guard against count arg == INT_MIN. 
     while (count-- > 1) 
     {
         ch = getc (fp);
@@ -3552,7 +3267,6 @@ char *fgets2 (char *s, int count, FILE *fp){
 }
 
 
-
 /*
  ********************************
  * fputs2: 
@@ -3560,21 +3274,16 @@ char *fgets2 (char *s, int count, FILE *fp){
 
 int fputs2 ( const char *str, FILE *stream )
 {
-
     if ( (void *) stream == NULL ){ return EOF; }
-
-    // ugly.
+// ugly
     for (; *str; ++str) 
     {
         int rc = putc (*str, stream);
 
         if (rc == EOF){ return EOF; }
     }
-
     return 1;
 }
-
-
 
 
 /*
@@ -3582,17 +3291,15 @@ int fputs2 ( const char *str, FILE *stream )
  * gets:
  *     gets() devolve um ponteiro para string
  */
-
 // #todo
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
 
-char *gets2 (char *s){
-
+char *gets2 (char *s)
+{
     char *p;
     int ch=0;
     int t = 0;
-
 
 	//printf("gets:\n");
 
@@ -3648,11 +3355,8 @@ done:
  ***********************
  * puts:
  */
-
 // #bugbug
-// isso deve escrever no arquivo, assim como
-// tudo em libc.
-
+// isso deve escrever no arquivo, assim como tudo em libc.
 // ??
 
 int puts2 ( const char *str )
@@ -3661,21 +3365,19 @@ int puts2 ( const char *str )
 }
 
 
-
-
 /*
  *************************************
  * getchar2:
- *       O kernel pega no stdin que é a fila do teclado.
- *       Isso funciona.
+ * O kernel pega no stdin que é a fila do teclado.
+ * Isso funciona.
  */
 
-int getchar2 (void){
-
+int getchar2 (void)
+{
     int Ret=0;
 
-	// #todo: 
-	// ? Já temos uma função para essa chamada ? 137.
+// #todo: 
+// ? Já temos uma função para essa chamada ? 137.
 
 Loop:
     Ret = (int) gramado_system_call ( 137, 0, 0, 0 ); 
@@ -3765,18 +3467,14 @@ int feof(FILE *fp)
  * feof:
  */
 
-int feof ( FILE *stream )
+int feof (FILE *stream)
 {
     //assert(stream);
-
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         return EOF;
     }
-
     return (int) stream->eof;
 }
-
 
 /*
  //This function clears the end-of-file and error indicators for the stream stream. 
@@ -3796,17 +3494,13 @@ void clearerr(FILE *fp)
  * ferror:
  */
 
-int ferror ( FILE *stream )
+int ferror (FILE *stream)
 {
-
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
        return EOF;
     }
-
     return (int) stream->error;
 }
-
 
 /*linux - klibc style*/
 /*
@@ -3828,13 +3522,14 @@ static __inline__ int fseek(FILE *__f, off_t __o, int __w)
  *     offset argument is the position that you want to seek to,
  *     and whence is what that offset is relative to.
  */
-
 // The fseek function is used to change the file position of the stream stream. 
-
+ 
 int fseek ( FILE *stream, long offset, int whence )
 {
-    off_t off=0;
+// #bugbug:
+// This function is not working yet.
 
+    off_t off=0;
 
     //debug_print ("fseek: TODO. Not implemented yet\n");
     //return -1;
@@ -3852,15 +3547,15 @@ int fseek ( FILE *stream, long offset, int whence )
     return 0;
     */
     
-    if ( (void*) stream == NULL )
-    {
+    if ( (void*) stream == NULL ){
         debug_print ("fseek: stream \n");
         return -1;
     }
  
+ // lseek
+ // #bugbug:
+ // This function is not working yet.
 
-    // lseek
-    
     off = lseek ( fileno(stream), offset, whence );
     
     if (off < 0)
@@ -3888,22 +3583,18 @@ int fseek ( FILE *stream, long offset, int whence )
 }
 
 
-
-
 /*linux klibc style*/
 // Isso vai escrever no arquivo que está em ring0.
-int linux_fputc (int c, FILE *f){
-
+int linux_fputc (int c, FILE *f)
+{
     unsigned char ch = c;
 
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
        return EOF;
     }
 
     return fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
 }
-
 
 
 /*
@@ -3935,17 +3626,16 @@ ssize_t getline (char **lineptr, size_t *n, FILE *stream)
 */
 
 
-
 // interna
 // #todo: criar essa rotina na libc.
 void debug_print (char *string)
 {
-    gramado_system_call ( 289, 
+    gramado_system_call ( 
+        289, 
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
 }
-
 
 
 /*
@@ -3954,7 +3644,6 @@ void debug_print (char *string)
  *     estamos falando do posicionamento do cursor dentro da janela
  *     e não dentro do terminal.
  */
-
 //34 - set cursor.
 
 void stdioSetCursor ( unsigned long x, unsigned long y )
@@ -3993,9 +3682,8 @@ unsigned long stdioGetCursorY (void)
 // scanf support (start)
 //======================================================================
 
-
-int scanf ( const char *fmt, ... ){
-
+int scanf ( const char *fmt, ... )
+{
     va_list ap;
     va_start (ap, fmt);
 
@@ -4116,7 +3804,6 @@ int scanf ( const char *fmt, ... ){
         };//switch
     };
 
-
    //va_end (ap);
    
    return 0;
@@ -4124,7 +3811,6 @@ int scanf ( const char *fmt, ... ){
 //======================================================================
 // scanf support (end)
 //======================================================================
-
 
 
 /*
@@ -4201,7 +3887,6 @@ int sscanf ( const char *str, const char *format, ... )
  * to the University of California by American Telephone and Telegraph
  * Co. or Unix System Laboratories, Inc. and are reproduced herein with
  * the permission of UNIX System Laboratories, Inc.
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -4213,7 +3898,6 @@ int sscanf ( const char *str, const char *format, ... )
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -4225,7 +3909,6 @@ int sscanf ( const char *str, const char *format, ... )
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
  *	@(#)subr_prf.c	8.3 (Berkeley) 1/21/94
  */
 
@@ -4263,13 +3946,12 @@ char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 static size_t stdio_strlen (const char *s)
 {
-    size_t l = 0;
-
-    while (*s++){  l++;  }
-
+    size_t l=0;
+    while (*s++){
+        l++;
+    };
     return l;
 }
-
 
 /* Max number conversion buffer length: 
  a u_quad_t in base 2, plus NUL byte. */
@@ -4292,15 +3974,12 @@ static char *ksprintn (
     int *lenp, 
     int upper )
 {
-
     char *p, c;
-
 
     p = nbuf;
 
 	//*p = ' ';
 	*p = 0;
-
 
     do {
         c = hex2ascii (num % base);
@@ -4322,33 +4001,24 @@ static char *ksprintn (
  *******************************************************
  * kvprintf:
  *     Scaled down version of printf(3).
- *
  * Two additional formats:
  *     The format %b is supported to decode error registers.
  *     Its usage is:
- *
  *	printf("reg=%bn", regval, "*");
- *
  * where  is the output base expressed as a control character, e.g.
  * 10 gives octal; 20 gives hex.  Each arg is a sequence of characters,
  * the first of which gives the bit number to be inspected (origin 1), and
  * the next characters (up to a control character, i.e. a character <= 32),
  * give the name of the register.  Thus:
- *
  *	kvprintf("reg=%bn", 3, "102BITTWO1BITONEn");
- *
  * would produce output:
- *
  *	reg=3
- *
  * XXX:  %D  -- Hexdump, takes pointer and separator string:
  *		("%6D", ptr, ":")   -> XX:XX:XX:XX:XX:XX
  *		("%*D", len, ptr, " " -> XX XX XX XX ...
  */
-
 // #bugbug
-// Passing a function via argument is not a good thing for 
-// our compiler.
+// Passing a function via argument is not a good thing for our compiler.
 
 int 
 kvprintf ( 
@@ -4361,7 +4031,6 @@ kvprintf (
     
     //#define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
     #define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
-
 
 	char nbuf[MAXNBUF];
 	char *d;
@@ -4385,18 +4054,16 @@ kvprintf (
         d = NULL;
     };
 
-
     if (fmt == NULL){
         fmt = "(fmt null)n";
     }
-
 
     if (radix < 2 || radix > 36)
     {
         radix = 10;
     }
 
-    // loop
+// loop
     
     for (;;){
 
@@ -4828,7 +4495,6 @@ int printf ( const char *fmt, ... ){
  * printf_draw:
  *     http://www.pagetable.com/?p=298
  */
-
 // Nessa versão a rotina pintará na tela ao invés de
 // colocar o char no arquivos.
 // para isso ela configura o modo de output, voltando ao normal
@@ -4836,14 +4502,13 @@ int printf ( const char *fmt, ... ){
 // >> Essa rotina é usada para debug no caso de não termos acesso
 // a rotinas da api ou do x-server para pintura na tela.
 
-
-int printf_draw ( const char *fmt, ... ){
-	
-	//Habilita o modo draw.
+int printf_draw ( const char *fmt, ... )
+{
+//Habilita o modo draw.
 	libc_set_output_mode ( LIBC_DRAW_MODE );
 	
-	// #todo
-	// Talvez usar semáforo aqui.
+// #todo
+// Talvez usar semáforo aqui.
 	
 	va_list ap;
 	va_start(ap, fmt);
@@ -4860,16 +4525,12 @@ int printf_draw ( const char *fmt, ... ){
 	//#todo.
 	va_end (ap);
 	
-	
-	//reabilita o modo normal. Onde os caracteres serão colocados 
-	//no stdout.
+//reabilita o modo normal. Onde os caracteres serão colocados 
+//no stdout.
 	libc_set_output_mode ( LIBC_NORMAL_MODE );
 
     return 0;
 }
-
-
-
 
 
 /*glibc style*/
@@ -5032,17 +4693,14 @@ int stderr_printf (const char *format, ... )
 
 void perror (const char *str)
 {
-	// #todo
-	// Maybe we need to use stderr output;
-
-    // Vamos imprimir a string se ela for válida.
-    if ( (void *) str != NULL )
-    {
+// #todo
+// Maybe we need to use stderr output;
+// Vamos imprimir a string se ela for válida.
+    if ( (void *) str != NULL ){
         printf ("Error: %s, ",str);
     }
-
-    //#bugbug
-    //There is a list of strings for errors.
+//#bugbug
+//There is a list of strings for errors.
     printf ("The last error number is {%d} [TODO].\n",errno);
     //printf ("The last is: {%s}.\n",errno_list[errno]);
 }
@@ -5054,10 +4712,12 @@ void perror (const char *str)
 
 void rewind (FILE *stream)
 {
+// #bugbug
+// This function calls lseek() and lseek() is not working yet.
+
     int fd=-1;
 
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         printf ("rewind: [FAIL] stream\n");
         return;
     }
@@ -5114,9 +4774,10 @@ void rewind (FILE *stream)
     stream->_cnt = 0;    
     //stream->_cnt = stream->_lbfsize;
 
+// #bugbug
+// This function calls lseek() and lseek() is not working yet.
     lseek(fd,0,0);
 }
-
 
 
 /*
@@ -5170,10 +4831,8 @@ static void sized_buffer_putch(char*& bufptr, char ch)
 
 
 
-
 /*
  * snprintf:
- * 
  *     #todo
  */
 
@@ -5183,7 +4842,6 @@ int snprintf ( char *str, size_t count, const char *fmt, ... )
     va_start (ap, fmt);
 
     size_t ret=0;
-
 
     debug_print ("snprintf: [TODO]\n");
 
@@ -5206,15 +4864,13 @@ int snprintf ( char *str, size_t count, const char *fmt, ... )
 // inicializa o fluxo padrão para o processo.
 int stdio_initialize_standard_streams (void)
 {
-
-   debug_print("stdio_initialize_standard_streams: [FIXME] What is this?\n");
-
-    return (int) gramado_system_call ( 700, 
+    debug_print("stdio_initialize_standard_streams: [FIXME] What is this?\n");
+    return (int) gramado_system_call ( 
+                     700, 
                      (unsigned long) stdin, 
                      (unsigned long) stdout, 
                      (unsigned long) stderr ); 
 }
-
 
 
 // wtf ... it looks so cool!
@@ -5240,10 +4896,6 @@ file *file_purpose (file *f)
 	}
 }
 */
-
-
-
-
 
 
 /*credits: bsd*/
@@ -5418,13 +5070,12 @@ int libcStartTerminal (void)
 void setbuf (FILE *stream, char *buf)
 {
     debug_print ("setbuf: [FIXME]\n");
-
-    if ( (void*) stream == NULL )
+    if ( (void*) stream == NULL ){
         return;
-
-    if ( (void*) buf == NULL )
+    }
+    if ( (void*) buf == NULL ){
         return;
-
+    }
     setvbuf (stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }
 
@@ -5444,7 +5095,6 @@ void setbuf_test1 (FILE *stream, char *buf)
 */
 
 
-
 //If buf is a null pointer, this function makes stream unbuffered. 
 //Otherwise, it makes stream fully buffered using buf as the buffer. 
 //The size argument specifies the length of buf.
@@ -5453,25 +5103,21 @@ void setbuf_test1 (FILE *stream, char *buf)
 
 void setbuffer (FILE *stream, char *buf, size_t size)
 {
-
     if ( (void *) stream == NULL ){
        debug_print ("setbuffer: stream\n");
        return;
     }
-
     if ( (void *) buf == NULL ){
        debug_print ("setbuffer: buf\n");
        return;
     }
-    
-    // todo: size.
-
-    gramado_system_call ( 611, 
+// todo: size.
+    gramado_system_call ( 
+        611, 
         (unsigned long) stream, 
         (unsigned long) buf, 
         (unsigned long) size ); 
 }
-
 
 //This function makes stream be line buffered, and allocates the buffer for you.
 //This function is provided for compatibility with old BSD code. 
@@ -5580,25 +5226,26 @@ setvbuf (
 
 unsigned int filesize (FILE *fp)
 {
-    unsigned int ret = 0;
+// #bugbug
+// fseek() and rewind() are not working.
+
+    unsigned int ret=0;
 
     if (!fp){ 
         debug_print ("filesize: [FAIL] fp\n");
         return 0;
     }
 
-    fseek (fp, 0, SEEK_END);
-
-    ret = (unsigned int) ftell(fp);
-
-    rewind (fp);
+    fseek (fp, 0, SEEK_END);         //#bugbug
+    ret = (unsigned int) ftell(fp);  //#bugbug
+    rewind (fp);                     //#bugbug
 
     return ret;
 }
 
 
-char *fileread (FILE *fp){
-
+char *fileread (FILE *fp)
+{
     unsigned int buffer_size = 0;
     char *buff;
     
@@ -5607,6 +5254,7 @@ char *fileread (FILE *fp){
         return (char *) 0;
     }
 
+    // #bugbug
     buffer_size = filesize(fp);
 
     buff = (char *) malloc (buffer_size);
@@ -6039,8 +5687,6 @@ char *tmpnam (char *s)
 }
 
 
-
-
 //tmpnam_r() is a nonstandard extension that is 
 //also available on a few other systems.
 char *tmpnam_r (char *s)
@@ -6091,12 +5737,11 @@ FILE *stdio_make_file( int fd, const char *mode )
 {
     FILE *__file;
 
-
     // #todo
     
-    //
-    // given fd.
-    //
+//
+// given fd.
+//
 
     //if (fd<0){
     //    printf("stdio_make_file: [FAIL] not valid fd\n");
@@ -6112,23 +5757,14 @@ FILE *stdio_make_file( int fd, const char *mode )
         return NULL;
     }    
  
-
-    __file->used  = TRUE;
+    __file->used = TRUE;
     __file->magic = 1234;
- 
     __file->_cnt = 0;
 
-    
-    //
-    // given fd
-    //
-
+// given fd
     __file->_file = fd;
-
-
-    // flags
+// flags
     __file->_flags = 0;
-
 
     /*
     switch (*mode) {
@@ -6159,12 +5795,9 @@ FILE *stdio_make_file( int fd, const char *mode )
 
     //__file->_tmpfname = (char *) strdup(filename);
 
-    __file->_base = NULL;    // ??
-
-    
+    __file->_base = NULL;    // ??   
     __file->_r = 0;
     __file->_w = 0;
-
    
     //#todo: Initializa structure.
     //...
@@ -6184,10 +5817,8 @@ FILE *fdopen (int fd, const char *mode)
         printf("fdopen: [FAIL] not valid fd\n");
         return NULL;
     }
-
     return (FILE *) stdio_make_file( fd, (const char *) mode);
 }
-
 
 
 /*
@@ -6195,7 +5826,6 @@ FILE *fdopen (int fd, const char *mode)
  * freopen:
  * 
  */
-
 /*
     cool!!
     The freopen() function opens the file whose name 
@@ -6245,16 +5875,12 @@ FILE *fopencookie(void *cookie, const char *mode,
 */
 
 
-
-
 FILE *open_memstream (char **ptr, size_t *sizeloc)
 {
     debug_print ("open_memstream: TODO: \n");
 	return (FILE *) 0;
 }
 
-
-    
 
 FILE *open_wmemstream (wchar_t **ptr, size_t *sizeloc)
 {
@@ -6263,13 +5889,11 @@ FILE *open_wmemstream (wchar_t **ptr, size_t *sizeloc)
 }
 
 
-
 FILE *fmemopen (void *buf, size_t size, const char *mode)
 {
     debug_print ("fmemopen: TODO: \n");
 	return (FILE *) 0;
 }
-
 
 
 /*
@@ -6286,7 +5910,6 @@ int fgetpos(FILE* stream, fpos_t* pos)
     return 0;
 } 
 */
-
 
 int fgetpos (FILE *stream, fpos_t *pos )
 {
@@ -6320,21 +5943,21 @@ int fgetpos (FILE *stream, fpos_t *pos )
 
 int fsetpos (FILE *stream, const fpos_t *pos)
 {
+// #bugbug
+// fseek() is not working.
     if ( (void *) stream == NULL ){
         printf("fsetpos: [FAIL] stream\n");
         return EOF;
     }
-
     return (int) fseek (stream, (long) *pos, SEEK_SET);
 }
 
 
-int fpurge (FILE *stream){
-
+int fpurge (FILE *stream)
+{
     debug_print ("fpurge: [TODO] \n");
     
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         return EOF;
     }
  
@@ -6348,10 +5971,10 @@ void  __fpurge (FILE *stream)
 {
     debug_print ("__fpurge: TODO: \n");
 
-    if ( (void *) stream == NULL )
+    if ( (void *) stream == NULL ){
        return;
+    }
 }
-
 
 //ctermid - get controlling terminal name
 //POSIX.1-2001, POSIX.1-2008, Svr4.
@@ -6367,7 +5990,6 @@ char *ctermid (char *s)
  *     Inicializa stdio para usar o fluxo padrão.
  *     O retorno deve ser (int) e falhar caso dê algo errado.
  */
-
 // This routine ws called by crt0() in crt0.c
 // #bugbug
 // Essa estrutura lida com elementos de estrutura em ring3.
@@ -6394,7 +6016,6 @@ void stdioInitialize(void)
 // três arquivos herdados do processo pai.
 // ?? Não sei se o processo init também terá um fluxo herdado.
 
-
     // Buffers para as estruturas.
     //unsigned char buffer0[BUFSIZ];
     //unsigned char buffer1[BUFSIZ];
@@ -6418,7 +6039,6 @@ void stdioInitialize(void)
 // #bugbug
 // Se essa inicializaçao falhar, nao temos como mostrar
 // mensagens de erro.
-
 
 // Os aplicativos precisam de uma estrutura clinet-side
 // para gerenciarem o fluxo de dados dos arquivos,
@@ -6459,9 +6079,6 @@ void stdioInitialize(void)
         exit(1);
     }
     memset( stderr, 0, sizeof(struct _iobuf) );
-
-
-
 
 //
 // Buffers
@@ -6526,7 +6143,6 @@ void stdioInitialize(void)
 // #bugbug:
 // Vamos usar o modo draw até implementarmos o modo normal.
 
-
 // Normal mode:
 // Os caracteres são colocados em stdout.
     //__libc_output_mode = LIBC_NORMAL_MODE;
@@ -6567,14 +6183,10 @@ void stdioInitialize(void)
 
 // ok
 // This is the tty of this process.
-
     __libc_tty_id = (int) gramado_system_call ( 266, getpid(), 0, 0 ); 
-
-
 // Clear prompt[] buffer.
     prompt_clean();
-
-    debug_print ("stdioInitialize: done\n");
+    //debug_print ("stdioInitialize: done\n");
 }
 
 
