@@ -9,13 +9,11 @@
 #define INPUT_MODE_MULTIPLE_LINES    1
 int g_inputmode;
 
-
 #define REVERSE_ATTRIB  0x70
 #define PAD_RIGHT  1
 #define PAD_ZERO   2
 
-
-/* the following should be enough for 32 bit int */
+// The following should be enough for 32 bit int.
 #define PRINT_BUF_LEN  12
 
 //
@@ -23,7 +21,7 @@ int g_inputmode;
 //
 
 // #importante
-// Esses ser�o os valores de refer�ncia
+// Esses serão os valores de referência
 // para todos os projetos.
 
 #define  __SLBF 0x0001    /* line buffered */
@@ -52,17 +50,12 @@ int g_inputmode;
 #define	_IOLBF	1		// setvbuf should set line buffered 
 #define	_IONBF	2		// setvbuf should set unbuffered 
 
+// See: limits.h
 #define	BUFSIZ	1024	// size of buffer used by setbuf
 */
 
-// See:
-// gramado/limits.h
+// See: limits.h
 #define EOF    GRAMADO_EOF
-
-//#define SEEK_SET   0
-//#define SEEK_CUR   1
-//#define SEEK_END   2
-
 
 //enum FileFlags {_F_READ = 0x0001, _F_WRIT = 0x0002, _F_RDWR = 0x0003, _F_ERR = 0x0010, _F_EOF = 0x0020, _F_BIN = 0x0040};
 
@@ -114,30 +107,33 @@ int g_inputmode;
 #define  _IOFBF  4096    //Full buffer (uma p�gina)
 */
 
-/*bsd-like*/
-#define _IOFBF  0		// setvbuf should set fully buffered 
-#define _IOLBF  1		// setvbuf should set line buffered 
-#define _IONBF  2		// setvbuf should set unbuffered 
+// bsd-like
+#define _IOFBF  0  // setvbuf should set fully buffered 
+#define _IOLBF  1  // setvbuf should set line buffered 
+#define _IONBF  2  // setvbuf should set unbuffered 
 
-// See:
-// gramado/limits.h
+// See:  limits.h
 #define BUFSIZ  GRAMADO_BUFSIZ 
 
 
-/* It moves file pointer position to the beginning of the file. */
 #ifndef SEEK_SET
 #define SEEK_SET  0
 #endif
 
-/* It moves file pointer position to given location. */
 #ifndef SEEK_CUR
 #define SEEK_CUR  1
 #endif
 
-/*  It moves file pointer position to the end of file. */
 #ifndef SEEK_END
 #define SEEK_END  2
 #endif
+
+// Clear the file buffer
+// and set the postition at the start of the file.
+#ifndef GRAMADO_SEEK_CLEAR
+#define GRAMADO_SEEK_CLEAR  1000
+#endif
+
 
 // #define  TMP_MAX    32767
 // #define  L_tmpnam    1024    /* XXX must be == PATH_MAX */
@@ -310,48 +306,31 @@ unsigned long syncList[SYNC_COUNT_MAX];
 
 struct file_d
 {
-
-    //
-    // == Identification =============
-    //
-
-    // Indica qual tipo de objeto esse arquivo representa.
-    // See: 0globals/gobject.h
     object_type_t ____object;
-
-    //index int the global file table??
-
     int used;
     int magic;
-  
     char *_tmpfname;  
 
-    //
-    // == (1) storage ========
-    //
-    
-    /*
-     #todo
-    unsigned long size_in_image;    //KB
-    unsigned long size_in_memory;   //KB
-    */
-    
-    // The buffer. The box.
-
-	//Current position of file pointer (absolute address).
-    unsigned char *_p;    
-
-	// read space left for getc()
+// Endereço base do buffer.
+    unsigned char *_base;
+// Ponteiro de trabalho.
+// Current position of file pointer (absolute address).
+// Next character position from/to here in buffer
+    unsigned char *_p;
+// Read space left for getc()
     int _r;
-
-	// write space left for putc()
+// Write space left for putc()
     int _w;
-
-	// the buffer (at least 1 byte, if !NULL)
-    struct __sbuf _bf;
-
-	// 0 or -_bf._size, for inline putc 
+// The buffer size,
+// 0 or -_bf._size, for inline putc 
     int _lbfsize;
+// #todo: file size.
+    //int _fsize;
+// Number of available characters in buffer.
+    int   _cnt;
+
+// The buffer (at least 1 byte, if !NULL)
+    struct __sbuf _bf;
 
     // Operations 
     // #todo: Please, do not use virtual functions for now!
@@ -360,6 +339,7 @@ struct file_d
     // cookie passed to io functions
     void *_cookie; 
 
+    short _flags;
 
     //file extension 
     struct __sbuf _ext;
@@ -381,12 +361,7 @@ struct file_d
     int _blksize;       // stat.st_blksize (may be != _bf._size) 
     fpos_t _offset;     // current lseek offset 		
 
-	// old stuff
-	// isso pertence a estrutura no formato antigo
-	// e os elementos ainda est�o presentes em v�rias rotinas.
-	//No futuro vamos deletar isso. (Talvez n�o.)
-    int   _cnt;
-    unsigned char *_base;    
+
     int   _charbuf;
    // =============================
 
@@ -400,12 +375,6 @@ struct file_d
 // para arquivos como socket, tty, buffer ... etc.
 
     struct kstdio_sync_d  sync;
-
-
-
-	// flags, below; this FILE is free if 0 	
-	// Flags (see FileFlags). the state of the stream
-    short _flags;
 
     // Contador de descritores de arquivo que usam essa mesma estrutura.
     // we need to synchronize the readers.
@@ -436,10 +405,8 @@ struct file_d
 	// UNIX System file descriptor
     short _file;
 
-
     struct inode_d   *inode;
     struct socket_d  *socket;
-
 
     //pipe ??
     
@@ -450,12 +417,10 @@ struct file_d
     // A estrutura de arquivos aponta para a tabela de inodes.
     int inodetable_index;
 
-
-    // =============================
-    
-    // #bugbug
-    // Identificador do primeiro processo à abrir o arquivo
-    // ou o processo que tem as permissões.
+// =============================
+// #bugbug
+// Identificador do primeiro processo à abrir o arquivo
+// ou o processo que tem as permissões.
 
     pid_t pid;  // Process
     uid_t uid;  // User 
@@ -469,7 +434,6 @@ struct file_d
     struct tty_d  *tty;
 
     int iopl;
-
 
     // #deprecated
     //int (*_close) __P((void *));

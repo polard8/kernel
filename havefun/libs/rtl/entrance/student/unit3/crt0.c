@@ -299,6 +299,14 @@ e o crt0 do driver, não ativa.
     asm volatile ("int $199");
 
 
+// Depois de lido o stdin e colocada acmdline no buffer local,
+// então é hora de apagarmos os arquivo, para que outro
+// programa consiga usar o arquivo.
+// tambem atualizaremos a estrutura em ring3.
+    lseek( fileno(stdin), 0, 1000);
+    rewind(stdin);
+
+
     main_ret = (int) main(token_count,tokenList);
 
     switch (main_ret){

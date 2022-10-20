@@ -47,15 +47,15 @@ int printf_draw ( const char *fmt, ... );
 //setup libc mode
 void libc_set_output_mode ( int mode );
 
-	
-	
-#ifdef	_BSD_SIZE_T_
-typedef	_BSD_SIZE_T_	size_t;
-#undef	_BSD_SIZE_T_
+
+#ifdef _BSD_SIZE_T_
+typedef _BSD_SIZE_T_  size_t;
+#undef _BSD_SIZE_T_
 #endif
-#ifdef	_BSD_SSIZE_T_
-typedef	_BSD_SSIZE_T_	ssize_t;
-#undef	_BSD_SSIZE_T_
+
+#ifdef _BSD_SSIZE_T_
+typedef _BSD_SSIZE_T_  ssize_t;
+#undef _BSD_SSIZE_T_
 #endif
 
 #if defined(_POSIX_C_SOURCE)
@@ -66,13 +66,10 @@ typedef __va_list va_list;
 #endif
 
 
-
-
-/*bsd-like*/
-#define	_IOFBF	0		// setvbuf should set fully buffered 
-#define	_IOLBF	1		// setvbuf should set line buffered 
-#define	_IONBF	2		// setvbuf should set unbuffered 
-
+// bsd-like
+#define _IOFBF  0  // setvbuf should set fully buffered 
+#define _IOLBF  1  // setvbuf should set line buffered 
+#define _IONBF  2  // setvbuf should set unbuffered 
 
 //
 // bsd style.
@@ -100,7 +97,6 @@ typedef __va_list va_list;
 #define	__SALC	0x4000		/* allocate string space dynamically */
 
 
-
 typedef char *stdio_va_list; 
 
  
@@ -111,17 +107,16 @@ typedef char *stdio_va_list;
  
 
 /*  
-"flags" bits definitions
-*/
+ "flags" bits definitions
+ */
 
 
-/* Flags for the iobuf structure  */
+// Flags for the iobuf structure.
 #define _IOREAD  1
-#define _IOWRT	 2
-#define _IORW	 0x0080
+#define _IOWRT   2
+#define _IORW    0x0080
 
-
-// standard stream file descriptors.
+// Standard stream file descriptors.
 #define STDIN_FILENO   0
 #define STDOUT_FILENO  1
 #define STDERR_FILENO  2
@@ -150,13 +145,11 @@ typedef char *stdio_va_list;
 #define SMALL_BUFSIZ  512
 #define BUFSIZ        1024
 
-
-/* Returned by various functions on end of file condition or error. */
+// Returned by various functions on 
+// end of file condition or error.
 #ifndef EOF
 #define EOF (-1)
 #endif
-
-
 
 // System V/ANSI C; 
 // this is the wrong way to do this, do *not* use these.
@@ -170,16 +163,16 @@ typedef char *stdio_va_list;
 //bsd-like
 /* Always ensure that this is consistent with <limits.h> */
 //#ifndef TMP_MAX
-//#define TMP_MAX			308915776	/* Legacy */
+//#define TMP_MAX  308915776	/* Legacy */
 //#endif
 
-#define TMP_MAX 32767
-
+#define TMP_MAX  32767
 
 #define _IOMYBUF  0x0008  /* stdio malloc()'d buffer */
 #define _IOEOF    0x0010  /* EOF reached on read */
 #define _IOERR    0x0020  /* I/O error from system */
 #define _IOSTRG   0x0040  /* Strange or no file descriptor */
+
 
 #ifdef __POSIX__
 #define _IOAPPEND  0x0200
@@ -190,31 +183,27 @@ typedef char *stdio_va_list;
 // Always ensure that these are consistent 
 // with <fcntl.h> and <unistd.h>! 
 
-//SEEK_SET  
-//The new position is equal to offset bytes from the beginning of the file
-//SEEK_CUR  
-//The new position is equal to offset bytes from the current read position in the file
-//SEEK_END  
-//The new position is equal to offset bytes from the end of the file 
-//Isso cause confusao. Vai para alem do fim ou para antes do fim ?
-//Me parece que para alem do fim do arquivo. para expandi-lo.
-
 
 #ifndef SEEK_SET
-#define SEEK_SET    0
+#define SEEK_SET  0
 #endif
 
 #ifndef SEEK_CUR
-#define SEEK_CUR    1
+#define SEEK_CUR  1
 #endif
 
-//  set file offset to EOF plus offset
 #ifndef SEEK_END
-#define SEEK_END    2
+#define SEEK_END  2
+#endif
+
+// Clear the file buffer
+// and set the postition at the start of the file.
+#ifndef GRAMADO_SEEK_CLEAR
+#define GRAMADO_SEEK_CLEAR  1000
 #endif
 
 
-/*      
+/* 
  * This is fairly grotesque, 
  * but pure ANSI code must not inspect the innards 
  * of an fpos_t anyway.  The library internally uses off_t,
@@ -244,8 +233,7 @@ typedef __gramado_off_t  fpos_t;
 // ??
 // apple?
 // Define for new stdio with functions.
-// #define	_FSTDIO			
-
+// #define	_FSTDIO
 
 
 // =======================================================
@@ -260,27 +248,18 @@ typedef __gramado_off_t  fpos_t;
 
 #include <libio/file.h>
 
-
 // =======================================================
-
-
 // The symbolic constant L_ctermid is the maximum number of
 // characters in the returned pathname.
 // Required by POSIX.
-
 #define  L_ctermid  255   
-
 
 // The macro L_cuserid is an integer constant that indicates 
 // how long an array you might need to store a username. 
 // Required by POSIX.
-
 #define  L_cuserid  255   
 
-
-
- //=====================================================
- 
+//=====================================================
 
 // Virtual address for vga memory ?
 // VA=0x800000 = PA=0x000B8000.

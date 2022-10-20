@@ -213,17 +213,17 @@ static int __CompareString(void)
 {
     int ret_val=-1;
     char *c;
-    c = prompt;
 // Generic file support.
     int fd= -1;
     FILE *fp;
  
- 
+// Primeira letra do prompt.
+    c = prompt;
     if ( *c == '\0' ){
         goto exit_cmp;
     }
-    
-    //LF
+
+//LF
     printf("\n");
 
 
@@ -387,13 +387,13 @@ static int __CompareString(void)
     printf ("Command not found, type help for more commands\n");
 
 exit_cmp:
-    if(isTimeToQuit==TRUE){
+    if(isTimeToQuit==TRUE)
+    {
         return 0;
     }
     initPrompt();
     return 0;
 }
-
 
 
 static int __server_loop(void)
@@ -477,7 +477,8 @@ int main( int argc, char **argv)
             break;
         }
         C = (int) fgetc(stdin);
-        if( C == __VK_RETURN ){
+        if( C == __VK_RETURN )
+        {
             __CompareString();
         }
         if( C >= 0x20 && C <= 0x7F )
@@ -485,7 +486,7 @@ int main( int argc, char **argv)
             printf("%c",C);
             fflush(stdout);
 
-            input(C);
+            input(C);  // coloca no prompt.
         }
     };
 

@@ -877,28 +877,25 @@ int k_ungetc ( int c, file *f )
 }
 
 
-long k_ftell (file *f)
+long k_ftell(file *f)
 {
     if ( (void *) f == NULL ){
         return EOF;
     }
-
     return (long) (f->_p - f->_base);
 }
 
-
-// k_fileno: Return the fd.
-int k_fileno ( file *f )
+// Return the fd.
+int k_fileno(file *f)
 {
     if ( (void *) f == NULL ){
         return EOF;
     }
-
     return (int) f->_file;  
 }
 
 
-int k_fgetc (file *f)
+int k_fgetc(file *f)
 {
     int ch=0;
 
@@ -907,12 +904,12 @@ int k_fgetc (file *f)
         goto fail;
     }
 
-		 //(--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
-		
-		//#fim.
-		//cnt decrementou e chegou a zero.
-		//Não há mais caracteres disponíveis entre 
-		//stream->_ptr e o tamanho do buffer.
+    //(--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
+
+//#fim.
+//cnt decrementou e chegou a zero.
+//Não há mais caracteres disponíveis entre 
+    //stream->_ptr e o tamanho do buffer.
 		
 		/*
 		if ( stream->_cnt <= 0 )
@@ -998,54 +995,112 @@ int k_ferror ( file *f )
 }
 
 
-/*
- * k_fseek:
- *     offset argument is the position that you want to seek to,
- *     and whence is what that offset is relative to.
- */
-
+// k_fseek:
+// offset argument is the position that you want to seek to,
+// and whence is what that offset is relative to.
 // #todo
-// IN??
-
+// Checar limites do offset.
+// #dictioonary-ptbr: whence=deonde
+// #todo
+// IN:
 int k_fseek ( file *f, long offset, int whence )
 {
+    register int i=0;
+    char *p;
 
     if ( (void *) f == NULL ){
         debug_print ("k_fseek: f\n");
         goto fail;
     }
 
-// #todo
-// Checar limites do offset.
+    if (whence<0){
+        goto fail;
+    }
 
-// #dictioonary-ptbr: whence=deonde
-
+// #see: kstdio.h
     switch (whence){
 
+
+// Não podemos aceitar valores negativos,
+// pois ultrapassa o inicio do arquivo.
+// Não podemos colocar o ponteiro de leitura
+// depois do fim do arquivo.
+// Não mexe no offset de escrita.
+// continuaremos a escrever de onde paramos.
+// Atualiza o offset de leitura.
+// A quantidade de bytes disponíveis
+// continua a mesma, pois não incluímos ou retiramos 
+// dados de dentro do buffer.
+// O ponteiro de trabalho para refletir a próxima
+// leitura. mas não precisa isso, pois o offset é relativo à base.
     case SEEK_SET:
-        f->_p = (f->_base + offset); 
+        if(offset<0){
+            offset=0;
+        }
+        if( offset > f->_cnt ){
+            offset = f->_cnt;
+        }
         f->_r = offset;
-        f->_w = offset;
-        f->_cnt = (f->_lbfsize - offset);
+        f->_p = (f->_base + offset); 
         goto done;
         break;
 
+// Levando em consideração o ponteiro de trabalho atual,
+// vamos mudar o offset e reposicionar o ponteiro de trabalho.
+// Não mexe no offset de escrita.
+// continuaremos a escrever de onde paramos.
+// A quantidade de bytes disponíveis
+// continua a mesma, pois não incluímos ou retiramos 
+// dados de dentro do buffer.
+// Atualiza o offset de leitura.
+// mas agora em relação ao ponteiro de trabalho e 
+// não em relação ao ponteiro da base.
+// temos que respeitar a quantidade disponivel.
     case SEEK_CUR:
+        if( offset > f->_cnt ){
+            offset = f->_cnt;
+        }
         f->_p = (f->_p + offset);
         f->_r = (f->_p - f->_base);
-        f->_w = (f->_p - f->_base);
-        f->_cnt = (f->_cnt - offset); 
         goto done;
         break;
 
+// #todo: 
+// For now we can't accept positive values.
+// porque vai ultrapassar o fim do arquivo.
+// não vamos mexer no ponteiro de escrita,
+// Vamos continuar escrevendo de onde paramos,
+// pois nenhuma informação foi incluida ou retirada do arquivo.
+// Não vamos mexer na quantidade de bytes disponível no buffer,
+// pois não estamos incluindo informação no buffer.
     case SEEK_END:
-        f->_p = ((f->_base + f->_lbfsize) + offset); 
+        if(offset>0){
+            offset=0;
+        }
+        f->_p = f->_base +  (f->_lbfsize + offset);
         f->_r = ( f->_lbfsize + offset );
-        f->_w = ( f->_lbfsize + offset );
-        f->_cnt = 0;
         goto done;
         break;
 
+// #see: kstdio.h
+// BUFSIZ is the minimum for a valid buffer.
+// Lets clear only the first part of the buffer.
+    case GRAMADO_SEEK_CLEAR:
+        p = f->_base;
+        //#test
+        for (i=0; i<BUFSIZ; i++)
+        {
+           *p = 0;
+           p++; 
+        };
+        f->_p = f->_base;
+        f->_r = 0;
+        f->_w = 0;
+        f->_cnt = f->_lbfsize;
+        goto done;
+        break;
+
+// Default
     default:
         //printf ("default:\n");
         goto fail;

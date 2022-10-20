@@ -27,7 +27,22 @@ int main ( int argc, char *argv[] )
     //int Max = argc;
     //char *p;
 
-    printf("CAT.BIN: argc %d | argv[1] %s\n", argc, argv[1] );
+    printf("CAT.BIN: argc %d | argv[0] %s | argv[1] %s\n", 
+        argc,       // quantos argumentos 
+        argv[0],    // CAT.BIN
+        argv[1] );  // FILE.TXT
+
+    if( argc <= 0 ){
+        printf("cat: No args\n");
+        exit(1);
+    }
+
+    if( argc == 1 ){
+        printf("cat: We need mor args\n");
+        //call usage()
+        exit(1);
+    }
+
 
     // pula o primeiro porque eh o nome do programa.
     
@@ -68,6 +83,8 @@ int main ( int argc, char *argv[] )
         // Read
         
         //printf("fd %d \n",fileno(fp) );
+        
+        lseek(fd,0,SEEK_SET);
         
         //nreads = read( fileno(fp), buffer, sizeof(buffer) );
         //nreads = read( fileno(fp), buffer,  );  //#bugbug: Defined limitation

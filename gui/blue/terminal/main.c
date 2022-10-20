@@ -492,7 +492,6 @@ static void __try_execute(int fd)
     prompt[511]=0;
     write(fileno(stdin), prompt, 512);
 
-
     //rtl_clone_and_execute(filename_buffer);
     //rtl_clone_and_execute(prompt);
     //rtl_clone_and_execute("shutdown.bin");
@@ -2442,19 +2441,28 @@ int __input_STDIN(int fd)
 
 // O kernel seleciona qual será 
 // o arquivo para teclado ps2.
-
     gramado_system_call(
         8002,
         fileno(new_stdin),
         0,
         0 );
 
+
 // Poisiona no início do arquivo.
+// #bugbug: Se fizermos isso, 
+// então leremos novamente o que ja foi colocado.
+
+    // not standard.
+    // volta ao inicio do arquivo em ring0, depois de ter apagado
+    // o arquivo.
+    // GRAMADO_SEEK_CLEAR
+    lseek( fileno(new_stdin), 0, 1000);
+    // atualiza as coisas em ring3 e ring0.
     rewind(new_stdin);
 
 // relax
-    rtl_yield();
-    
+    //rtl_yield();
+
     while (1){
         
         if (isUsingEmbeddedShell == FALSE){
@@ -2812,7 +2820,7 @@ int main ( int argc, char *argv[] )
     terminalTerminal();
 
 // Inicializando prompt[].
-    input('\n');
+    //input('\n');
     input('\0');
 
 //
@@ -2878,9 +2886,8 @@ int main ( int argc, char *argv[] )
 // stdin é um 'regular file'
     InputStatus = __input_STDIN(client_fd);
 
-     // estavamos lendo em stdin, e vamos começar a ler em stderr
-     // sem mandarmos o kernel enviar o input para stderr
-
+// estavamos lendo em stdin, e vamos começar a ler em stderr
+// sem mandarmos o kernel enviar o input para stderr
     if( InputStatus == 0 )
     {
 

@@ -701,7 +701,6 @@ static void *__extra_services (
                             (int)   arg4 );
     }
 
-
     if (number == 640)
     {
         if(current_thread != INIT_TID){return NULL;}

@@ -1,6 +1,5 @@
-
-// File: __stdio.h
-// baixo nível usado por stdio.h
+// File: file.h
+// Baixo nível usado por stdio.h
 // Somente definições, estruturas e funções de baixo nível
 // envolvendo arquivos. (FILE) streams. 
 // As funções devem começar com '__'  ou com '__file' 
@@ -32,8 +31,8 @@
 // #define TMP_MAX 	32767
 
 
-#define NUMBER_OF_FILES (32)
 #define GRAMADO_NUMBER_OF_FILES (32)
+#define NUMBER_OF_FILES  GRAMADO_NUMBER_OF_FILES
 
 
 // =========================================================
@@ -81,46 +80,38 @@ struct _iobuf
 {
     int used;
     int magic;
-
+    char *_tmpfname;
 // Pointer to the base of the file. 
 // Sometimes used as a buffer pointer.
     unsigned char *_base;    
-
 // current position in (some) buffer
 // Current position of file pointer (absolute address).
     unsigned char *_p;
-
 // read space left for getc()
     int _r;
-
 // write space left for putc()
     int _w;
-
+// Buffer size.
+    int _lbfsize;  
 // The size of the file. 
 // Tem que ser menor que o buffer.
 // BUFSIZ - _cnt.
     int _fsize;
-
 // Quantidade de bytes disponiveis no buffer.
 // Number of available characters in buffer.
 // Isso também representa o tamanho do arquivo,
 // pois quando incluimos bytes no arquivo, então
 // Essa quantidade diminue.
     int _cnt;
-
 // flags, below; this FILE is free if 0 
 // Flags (see FileFlags). the state of the stream
     short _flags;
-
 // fileno, if Unix descriptor, else -1
 // UNIX System file descriptor
     short _file;
 
 // the buffer (at least 1 byte, if !NULL)
     struct __sbuf _bf;
-
-// 0 or -_bf._size, for inline putc 
-    int _lbfsize;  
 
 // operations - (bsd-like) 
 // #todo: olhar __P em sys/cdefs.h
@@ -153,7 +144,6 @@ struct _iobuf
     fpos_t _offset;    // current lseek offset 
 
     int   _charbuf;   
-    char *_tmpfname;
 
     int eof;
     int error;

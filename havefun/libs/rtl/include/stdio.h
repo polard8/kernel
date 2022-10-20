@@ -41,21 +41,19 @@ extern int __libc_tty_id;
 #define LIBC_DRAW_MODE 2
 // ...
 
-//printf using draw mode.
+// printf using draw mode.
 int printf_draw ( const char *fmt, ... );
-
-//setup libc mode
+// setup libc mode
 void libc_set_output_mode ( int mode );
 
-	
-	
-#ifdef	_BSD_SIZE_T_
-typedef	_BSD_SIZE_T_	size_t;
-#undef	_BSD_SIZE_T_
+#ifdef _BSD_SIZE_T_
+typedef _BSD_SIZE_T_  size_t;
+#undef _BSD_SIZE_T_
 #endif
-#ifdef	_BSD_SSIZE_T_
-typedef	_BSD_SSIZE_T_	ssize_t;
-#undef	_BSD_SSIZE_T_
+
+#ifdef _BSD_SSIZE_T_
+typedef _BSD_SSIZE_T_  ssize_t;
+#undef _BSD_SSIZE_T_
 #endif
 
 #if defined(_POSIX_C_SOURCE)
@@ -66,12 +64,10 @@ typedef __va_list va_list;
 #endif
 
 
-
-
-/*bsd-like*/
-#define	_IOFBF	0		// setvbuf should set fully buffered 
-#define	_IOLBF	1		// setvbuf should set line buffered 
-#define	_IONBF	2		// setvbuf should set unbuffered 
+// bsd-like
+#define _IOFBF  0  // setvbuf should set fully buffered 
+#define _IOLBF  1  // setvbuf should set line buffered 
+#define _IONBF  2  // setvbuf should set unbuffered 
 
 
 //
@@ -190,31 +186,27 @@ typedef char *stdio_va_list;
 // Always ensure that these are consistent 
 // with <fcntl.h> and <unistd.h>! 
 
-//SEEK_SET  
-//The new position is equal to offset bytes from the beginning of the file
-//SEEK_CUR  
-//The new position is equal to offset bytes from the current read position in the file
-//SEEK_END  
-//The new position is equal to offset bytes from the end of the file 
-//Isso cause confusao. Vai para alem do fim ou para antes do fim ?
-//Me parece que para alem do fim do arquivo. para expandi-lo.
-
-
 #ifndef SEEK_SET
-#define SEEK_SET    0
+#define SEEK_SET  0
 #endif
 
 #ifndef SEEK_CUR
-#define SEEK_CUR    1
+#define SEEK_CUR  1
 #endif
 
-//  set file offset to EOF plus offset
 #ifndef SEEK_END
-#define SEEK_END    2
+#define SEEK_END  2
+#endif
+
+// Clear the file buffer
+// and set the postition at the start of the file.
+#ifndef GRAMADO_SEEK_CLEAR
+#define GRAMADO_SEEK_CLEAR  1000
 #endif
 
 
-/*      
+
+/*
  * This is fairly grotesque, 
  * but pure ANSI code must not inspect the innards 
  * of an fpos_t anyway.  The library internally uses off_t,
@@ -244,8 +236,7 @@ typedef __gramado_off_t  fpos_t;
 // ??
 // apple?
 // Define for new stdio with functions.
-// #define	_FSTDIO			
-
+// #define _FSTDIO
 
 
 // =======================================================
@@ -263,24 +254,16 @@ typedef __gramado_off_t  fpos_t;
 
 // =======================================================
 
-
 // The symbolic constant L_ctermid is the maximum number of
 // characters in the returned pathname.
 // Required by POSIX.
-
-#define  L_ctermid  255   
-
-
+#define L_ctermid  255   
 // The macro L_cuserid is an integer constant that indicates 
 // how long an array you might need to store a username. 
 // Required by POSIX.
+#define L_cuserid  255   
 
-#define  L_cuserid  255   
-
-
-
- //=====================================================
- 
+//=====================================================
 
 // Virtual address for vga memory ?
 // VA=0x800000 = PA=0x000B8000.
@@ -303,7 +286,6 @@ typedef __gramado_off_t  fpos_t;
 // Lines and coluns
 #define SCREEN_MAX_HEIGHT 256
 #define SCREEN_MAX_WIDTH  256
-
 
 #define REVERSE_ATTRIB 0x70
 
@@ -351,7 +333,6 @@ extern unsigned long g_rows;
 extern int g_using_gui; 
 
 
-
 //===========================================
 
 //
@@ -374,8 +355,6 @@ extern int prompt_pos;
 extern int prompt_max;
 extern int prompt_status;
 
-
-
 // =========================================
 
 
@@ -385,16 +364,12 @@ extern int prompt_status;
 
 //=======================
 // fileno
-
-#define  __sfileno(_stream)  ((_stream)->_file)
-#define   __fileno(_stream)  ((_stream)->_file)
-
+#define __sfileno(_stream)  ((_stream)->_file)
+#define  __fileno(_stream)  ((_stream)->_file)
 #define  facility_fileno(_stream)  ((_stream)->_file)
-
 
 //=======================
 // feof
-
 #define  __sfeof(p)     (((p)->_flags & __SEOF) != 0)
 #define  __bsd_feof(p)  (((p)->_flags & __SEOF) != 0)
 
@@ -404,7 +379,6 @@ extern int prompt_status;
 
 //=======================
 // ferror
-
 #define  __sferror(p)   (((p)->_flags & __SERR) != 0)
 
 #define  bsd_ferror(p)       __sferror(p)
@@ -412,7 +386,6 @@ extern int prompt_status;
 
 //=======================
 // clearerr
-
 #define  __sclearerr(p)  ((void)((p)->_flags &= ~(__SERR|__SEOF)))
 
 #define  bsd_clearerr(p)       __sclearerr(p)
@@ -438,7 +411,6 @@ extern int prompt_status;
 #define facility_getc(__stream)   fgetc(__stream)
 #define facility_getchar()   fgetc(stdin)
 
-
 #define facility__sfeof(p)      (((p)->_flags & __SEOF) != 0)
 #define facility__sferror(p)    (((p)->_flags & __SERR) != 0)
 #define facility__sclearerr(p)  ((void)((p)->_flags &= ~(__SERR|__SEOF)))
@@ -450,11 +422,9 @@ extern int prompt_status;
 // Prototypes.
 //===========================================
 
-
 //
 // ==== low level ====
 //
-
 
 //
 // Root 1.
@@ -501,12 +471,8 @@ int fputs ( const char *s, FILE *stream );
 int getw (FILE *stream);
 int putw (int w, FILE *stream);
 
-
-
 // Serial port debug.
 void debug_print (char *string);
-
-
 
 void clearerr (FILE* stream);
 
@@ -533,35 +499,25 @@ char *tempnam (const char *dir, const char *pfx);
 char *tmpnam_r (char *s);
 char *tmpnam (char *s);
 
-
-
 //int vfscanf (FILE *stream, const char *format, va_list ap);
 //int vsscanf (const char *str, const char *format, va_list ap);
 //int vscanf (const char *format, va_list ap);
 //int vsnprintf (char *str, size_t size, const char *format, va_list ap);
 
-
 //
 //  vsprintf and print
 //
-
 
 // Just for fun :^) 
 //int Wirzenius_Torvalds_vsprintf (char *buf, const char *fmt, va_list args);
 //int Torvalds_printf (const char *fmt, ...);
 
-
-
-
 //int vdprintf (int fd, const char *format, va_list ap); 
 
 //int dprintf (int fd, const char *format, ...);
 
-
-
 unsigned int filesize (FILE * fp);
 char * fileread (FILE * fp);
-
 
 // remove - remove a file or directory 
 // On success, zero is returned. On error, -1 is returned, and 
@@ -570,8 +526,7 @@ char * fileread (FILE * fp);
 int remove (const char *pathname); 
 
 int fileno ( FILE *stream );
- 
- 
+
 // 
 // File Operations
 // 
@@ -580,11 +535,9 @@ FILE *fopen ( const char *filename, const char *mode );
 FILE *fopen2 ( const char *filename, const char *mode ); 
 int fclose (FILE *stream); 
 
-
 //
 // Normal output.
 //
-
 
 void nputs (char *cp, int len);
 
@@ -624,8 +577,6 @@ void perror (const char *str);
 
 //int stdout_printf (const char *format, ...);
 //int stderr_printf (const char *format, ...);
-
-
 
 
 //
@@ -693,7 +644,6 @@ void rewind (FILE *stream);
 unsigned long input (unsigned long ch);
 
 
-
 //
 // Formatted Input
 //
@@ -750,13 +700,10 @@ int prompt_flush ( int con_id );
 void prompt_clean (void);
 
 
-
 //
 // Direct Input and Output Functions
 //
- 
- 
- 
+
 //
 // File Positioning Functions
 //
@@ -812,18 +759,17 @@ _strout (
 int unix_get (int ifile); 
 
 //
-// initialization
+// Initialization
 //
-
-int libcStartTerminal (void);
-
-/*Inicialização da biblioteca*/
-void stdioInitialize(void);
 
 void stdio_fntos (char *name);
+int libcStartTerminal(void);
+// Inicialização da biblioteca.
+void stdioInitialize(void);
 
-#endif    //__STDIO_H__
+#endif    
 
 //
-// End.
+// End
 //
+

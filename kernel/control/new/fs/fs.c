@@ -59,12 +59,13 @@ unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 int file_read_buffer ( file *f, char *buffer, int len )
 {
     char *p;
-    int local_len=0;
+
+    int Count=0;
 
     p = buffer;
 
 // #test
-    local_len = (int) (len & 0xFFFF);
+    Count = (int) (len & 0xFFFF);
 
 // Check file
     if ( (void *) f == NULL ){
@@ -76,9 +77,15 @@ int file_read_buffer ( file *f, char *buffer, int len )
         printf ("file_read_buffer: p\n");
         goto fail;
     }
+// nada para ler.
+    if (Count <= 0){
+         printf ("file_read_buffer: Count <= 0\n");
+         goto fail;
+    }
 // Chech len
-    if ( local_len > BUFSIZ ){
-        printf ("file_read_buffer: local_len > BUFSIZ\n");
+// #bugbug: Isso é provisório
+    if ( Count > BUFSIZ ){
+        printf ("file_read_buffer: Count > BUFSIZ\n");
         goto fail;
     }
 
@@ -114,9 +121,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // But i can still read.
     if ( f->____object == ObjectTypeSocket )
     {    
-        memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
+        memcpy ( (void *) buffer, (const void *) f->_base, Count ); 
         f->_flags |= __SWR;
-        return local_len;
+        return Count;
     }
 
 // =================================
@@ -126,9 +133,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // But i can still read.
     if ( f->____object == ObjectTypePipe )
     {
-        memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
+        memcpy ( (void *) buffer, (const void *) f->_base, Count ); 
         f->_flags |= __SWR;
-        return local_len;
+        return Count;
     }
 
 
@@ -147,12 +154,13 @@ int file_read_buffer ( file *f, char *buffer, int len )
         }
 
         // Se o tamanho do buffer for maior que o padrão.
+        // #todo: O buffer pdoerá ser maior que isso no futuro.
         if ( f->_lbfsize > BUFSIZ ){
             printf ("file_read_buffer: _lbfsize\n");
             goto fail;
         }
 
-        // ler no início do arquivo.
+        // Não podemos ler antes do início do arquivo.
         if ( f->_r < 0 )
         {
             f->_r = 0;
@@ -160,7 +168,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
             goto fail;
         }
         
-        // nao leremos depois do fim do arquivo.
+        // Nao leremos depois do fim do arquivo.
         if ( f->_r > f->_lbfsize )
         {
             //#debug: provisorio
@@ -182,12 +190,11 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // #bugbug: mas talvez isso não seja assim para pipe.
         if ( f->_r > f->_w )
         {
-
+            // EOF
             printf ("file_read_buffer: f->_r > f->_w\n");
-            goto fail;
+            //goto fail;
 
-            debug_print("file_read_buffer: f->_r > f->_w\n");
-            
+            //debug_print("file_read_buffer: f->_r > f->_w\n");
             f->_r = f->_w;
             
             //faremos o ajuste logo abaixo.
@@ -199,30 +206,21 @@ int file_read_buffer ( file *f, char *buffer, int len )
 
             //return 0;
         }
-    
-        if (local_len <= 0 )
-        {
-            printf ("file_read_buffer: local_len <= 0 :)FIRST\n");
-            goto fail;
-
-            //f->_flags = __SWR;
-            return -1;
-        }
         
         // Se a quantidade que desejamos ler
         // é maior que o espaço que temos.
-        if( local_len > f->_lbfsize )
+        if( Count > f->_lbfsize )
         {
 
-            printf ("file_read_buffer: local_len > f->_lbfsize\n");
-            goto fail;
+            //printf ("file_read_buffer: Count > f->_lbfsize\n");
+            //goto fail;
 
             //printf ("file_read_buffer: [FAIL] local_len limits\n");
             //goto fail;
         
             //#test #bugbug
             // leia tudo então. hahaha
-            local_len = (f->_lbfsize - 1);
+            Count = (f->_lbfsize - 1);
         }
  
  
@@ -230,16 +228,18 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // que o que nos resta da buffer,
         // então vamos ler apenas o resto do buffer.
         
-        // so podemos ler ate o limite de espaço que temos no buffer.
-        if(local_len > f->_cnt)
+        // So podemos ler ate limite de bytes disponíveis 
+        // no buffer.
+        if (Count > f->_cnt)
         {
             //printf ("file_read_buffer: local_len > f->_cnt\n");
             //goto fail;
 
-            local_len = f->_cnt;
+            Count = f->_cnt;
         }
  
-       int delta = (f->_w - f->_r);
+        // 
+        int delta = (f->_w - f->_r);
                 
         // nada para ler.
         // pois o ponteiro de escrita e o de leitura sao iguais,
@@ -259,11 +259,12 @@ int file_read_buffer ( file *f, char *buffer, int len )
         
         // Se queremos ler mais do que foi escrito.
         // entao vamos ler apenas o que foi escrito.
-        if ( local_len > delta )
-        { 
-            local_len = delta;
+        if (Count > delta)
+        {
+            Count = delta;
         }
 
+        // Atualizando o ponteiro de trabalho.
         // Vamos ler daqui.
         // A partir do offset de leitura.
         f->_p = (f->_base + f->_r);
@@ -272,9 +273,9 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // read
         
         //#debug
-        if (local_len <= 0 )
+        if (Count <= 0 )
         {
-            printf ("file_read_buffer: local_len <= 0 SECOND\n");
+            printf ("file_read_buffer: Count <= 0 SECOND\n");
             goto fail;
 
             //printf("local_len\n");
@@ -283,23 +284,27 @@ int file_read_buffer ( file *f, char *buffer, int len )
         }
         
         //---
-        memcpy ( (void *) buffer, (const void *) f->_p, local_len ); 
+        memcpy ( (void *) buffer, (const void *) f->_p, Count ); 
         
-        //atualizamos o ponteiro de escrita
-        f->_p = (f->_p + local_len);
+        // Atualizamos o ponteiro de trabalho
+        f->_p = (f->_p + Count);
 
-        // atualizamos o offset de escrita.
-        f->_r = (f->_r + local_len);
+        // Atualizamos o offset de leitura.
+        // Ele é usado em relação à base.
+        // #bugbug: Talvez essa leitura e escrita devesse ser em relação
+        // ao ponteiro de trabalho.
+        f->_r = (f->_r + Count);
 
-        if ( f->_r > f->_w )
+        if ( f->_r > f->_w ){
             f->_r = f->_w;
+        }
 
         // You also can write now.
         // But i can still read.
         f->_flags |= __SWR;
         f->sync.can_write = TRUE;
 
-        return (int) local_len;
+        return (int) Count;
     }
 
 
