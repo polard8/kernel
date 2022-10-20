@@ -110,11 +110,11 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // =================================
 // Socket:
 // Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
+// You also can write now.
+// But i can still read.
     if ( f->____object == ObjectTypeSocket )
     {    
         memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
-        // You also can write now.
-        // But i can still read.
         f->_flags |= __SWR;
         return local_len;
     }
@@ -122,11 +122,11 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // =================================
 // Pipe:
 // Não concatenaremos
+// You also can write now.
+// But i can still read.
     if ( f->____object == ObjectTypePipe )
     {
         memcpy ( (void *) buffer, (const void *) f->_base, local_len ); 
-        // You also can write now.
-        // But i can still read.
         f->_flags |= __SWR;
         return local_len;
     }
@@ -296,7 +296,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
 
         // You also can write now.
         // But i can still read.
-        f->_flags = __SWR;
+        f->_flags |= __SWR;
         f->sync.can_write = TRUE;
 
         return (int) local_len;
