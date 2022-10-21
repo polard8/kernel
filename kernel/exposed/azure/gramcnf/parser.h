@@ -1,208 +1,182 @@
-/*
- * File: parser.h
- */
- 
+
+// parser.h
+
+#ifndef __PARSER_H
+#define __PARSER_H    1
 
 // #test
 //#define gramc_skip_blanks(p)     {while (*(p) == ' ') { (p)++; }}
 //#define gramc_skip_nonblanks(p)  {while (*(p) && *(p) != ' ') { (p)++; }}
 
 
-//Espiada, olhadinha.
-int peekSymbol;
-int peekChar; 
-
-//
+// Espiada, olhadinha.
 // #importante
 // esquema
 // Um símbolo vam seguido de um char.
 // a ação depende dessa combinação.
 // peekSymbol >>> peekChar
-//
+extern int peekSymbol;
+extern int peekChar; 
  
-char function_main_buffer[512];
+extern char function_main_buffer[512];
 
-
-//item da expressão matemática.
+// Item da expressão matemática.
 struct exp_item_d
 {
-	int id;
-	int type;
-	int tree;      //left middle right
-	char *name;
-	struct exp_d *exp;   //a qual expressão o item pertence.	
+    int id;
+    int type;
+    int tree;      //left middle right
+    char *name;
+    struct exp_d *exp;   //a qual expressão o item pertence.	
 };
 
-
-//uma expressão matemática
+// Uma expressão matemática
 struct exp_d
 {
-	int id;
-	int type;
-	char *name;
-	char **stmt;	//qual statment ela pertence.
-	
-	int item_count;  //contagem dos items da expressão matemática.
-	struct exp_item_d *item_list;  //lista de itens.
+    int id;
+    int type;
+    char *name;
+    char **stmt;     // Qual statment ela pertence.
+    int item_count;  // Contagem dos items da expressão matemática.
+    struct exp_item_d *item_list;  //Lista de itens.
 };
 
-
-//um statement
+// Um statement
 struct stmt_d
 {
-	int id;
-	int type;
-	int tree;      //left middle right
-	char *name;
-	char **stmt;   //todos os itens do statment
-	
-	
-	int exp_count;           //quantas expressões existem no statment.
-	struct exp_d *exp_list;  //lista de expressões
+    int id;
+    int type;
+    int tree;                // Left middle right
+    char *name;
+    char **stmt;             // Todos os itens do statment
+    int exp_count;           // Quantas expressões existem no statment.
+    struct exp_d *exp_list;  // Lista de expressões
 };
-
 
 struct body_d
 {
     int id;
-	
-	//quantos itens tem na lista.
-	//cada item é um statement
-	int stmt_count;
-	
-    //corpo da função (lista de statments)
+// Quantos itens tem na lista.
+// Cada item é um statement
+    int stmt_count;
+// Corpo da função (lista de statments)
     struct stmt_d *stmt_list;
 };
 
-
-
 struct header_d
 {
-    //header da função ( modificador0, modificador1, tipo, símbolo)
+// Header da função ( modificador0, modificador1, tipo, símbolo)
     char **h0;
-
-    //header da função (argumentos)
-    char **h1;	
+// Header da função (argumentos)
+    char **h1;
 };
 
- 
- // modifier0, modifier1, type, identifier
+// modifier0, modifier1, type, identifier
 // indexando o header da função com base 
 // na lista com todos os tokens do programa.
 struct function_h0
 {
-    int	modifier0_token_index;
-    int	modifier1_token_index;	
-    int	type_token_index;
-    int	identifier_token_index;	
+    int modifier0_token_index;
+    int modifier1_token_index;
+    int type_token_index;
+    int identifier_token_index;
 };
 
-
-//função
+// Function
 struct function_d
 {
     int used;
     int magic;
-    
-	//identificador da função para
-	//organização da compilação.
+// Identificador da função para organização da compilação.
     int id; 
-	
-	//indiciando elemnentos.
-	// modifier0, modifier1, type, identifier
-	struct function_h0 *h0;
-
+// Indiciando elemnentos.
+// modifier0, modifier1, type, identifier
+    struct function_h0 *h0;
     struct header_d *header;
-	
-	struct body_d *body;
-	
-};
-struct function_d *function_main;
- 
+    struct body_d *body;
 
-/*
- *******************************
- * program_d:
- *     Estrutura para gerenciar o programa.
- *
- */
+    //struct function_d *next;
+};
+struct function_d  *function_main;
+
+
+// Estrutura para gerenciar o programa.
 struct program_d
 {
-	char *name;
-	
-	//todos os tokens do programa.
+    char *name;
+// Todos os tokens do programa.
     char **h0;
-
-	//quantas funções existem no programa.
+// Quantas funções existem no programa.
     int function_count;
-	
-	struct function_d *function_list;
-};
-struct program_d program;
 
+    struct function_d *function_list;
+};
+struct program_d  program;
+// #todo: Maybe use this one.
+//struct program_d  Program;
 
 /* frw[i] is index in rw of the first word whose length is i. */
-//Credits: GCC 0.9
+// Credits: GCC 0.9
 
 static char frw[10] = { 
     0, 
-	0, 
-	0,    // i=2 significa que o índice 0 é a primeira palavra com 2 letras.
-	2,    // i=3 significa que o índice 2 é a primeira palavra com 3 letras.
-	5,    // i=4 significa que o índice 5 é a primeira palavra com 4 letras.
-	13,   // i=5 significa que o índice 13 é a primeira palavra com 5 letras. 
-	19,   // ...
-	27, 
-	29, 
-	33 
+    0, 
+    0,    // i=2 significa que o índice 0 é a primeira palavra com 2 letras.
+    2,    // i=3 significa que o índice 2 é a primeira palavra com 3 letras.
+    5,    // i=4 significa que o índice 5 é a primeira palavra com 4 letras.
+    13,   // i=5 significa que o índice 13 é a primeira palavra com 5 letras. 
+    19,   // ...
+    27, 
+    29, 
+    33 
 };
 
-  //
-  // ## reserved words ##
-  //
+//
+// ## reserved words ##
+//
   
-//Obs: Indexadas pelo comprimento.  
- //Credits: GCC 0.9 
+// Obs: Indexadas pelo comprimento.  
+// Credits: GCC 0.9 
 static char *rw[] = { 
     "if", 
-	"do", 
-	"int", 
-	"for", 
-	"asm",
+    "do", 
+    "int", 
+    "for", 
+    "asm",
     "case", 
-	"char", 
-	"auto", 
-	"goto", 
-	"else", 
-	"long", 
-	"void", 
-	"enum",
+    "char", 
+    "auto", 
+    "goto", 
+    "else", 
+    "long", 
+    "void", 
+    "enum",
     "float", 
-	"short", 
-	"union", 
-	"break", 
-	"while", 
-	"const",
+    "short", 
+    "union", 
+    "break", 
+    "while", 
+    "const",
     "double", 
-	"static", 
-	"extern", 
-	"struct", 
-	"return", 
-	"sizeof", 
-	"switch", 
-	"signed",
+    "static", 
+    "extern", 
+    "struct", 
+    "return", 
+    "sizeof", 
+    "switch", 
+    "signed",
     "typedef", 
-	"default",
+    "default",
     "unsigned", 
-	"continue", 
-	"register", 
-	"volatile" 
+    "continue", 
+    "register", 
+    "volatile" 
 };
 
 
-
-/* Different name spaces for symbols.  Looking up a symbol specifies
-   a namespace and ignores symbol definitions in other name spaces.
+/* 
+ Different name spaces for symbols.  Looking up a symbol specifies
+ a namespace and ignores symbol definitions in other name spaces.
 
    VAR_NAMESPACE is the usual namespace.
    In C, this contains variables, function names, typedef names
@@ -213,23 +187,26 @@ static char *rw[] = {
    it produces a symbol named `foo' in the STRUCT_NAMESPACE.
 
    LABEL_NAMESPACE may be used for names of labels (for gotos);
-   currently it is not used and labels are not recorded at all.  */
+   currently it is not used and labels are not recorded at all.
+*/
 
-/* For a non-global symbol allocated statically,
+/*
+   For a non-global symbol allocated statically,
    the correct core address cannot be determined by the compiler.
    The compiler puts an index number into the symbol's value field.
    This index number can be matched with the "desc" field of
-   an entry in the loader symbol table.  */
+   an entry in the loader symbol table.
+*/
+
 
 /*
 enum namespace
 {
     UNDEF_NAMESPACE, 
-	VAR_NAMESPACE,        // variable, function, typedef
-	STRUCT_NAMESPACE,     // struct, union, enum
-	LABEL_NAMESPACE,      // labels
+    VAR_NAMESPACE,        // variable, function, typedef
+    STRUCT_NAMESPACE,     // struct, union, enum
+    LABEL_NAMESPACE,      // labels
 };
-
 */
 
 // ??
@@ -240,41 +217,40 @@ enum namespace
 Credits: GCC 0.9
 static short rtoken[] = { 
     IF, 
-	DO, 
-	TYPESPEC, 
-	FOR, 
-	ASM,
+    DO, 
+    TYPESPEC, 
+    FOR, 
+    ASM,
     CASE, 
-	TYPESPEC, 
-	SCSPEC, 
-	GOTO, 
-	ELSE, 
-	TYPESPEC, 
-	TYPESPEC, 
-	ENUM,
     TYPESPEC, 
-	TYPESPEC, 
-	UNION, 
-	BREAK, 
-	WHILE, 
-	TYPEMOD,
-    TYPESPEC, 
-	SCSPEC, 
-	SCSPEC, 
-	STRUCT, 
-	RETURN, 
-	SIZEOF, 
-	SWITCH, 
-	TYPESPEC,
     SCSPEC, 
-	DEFAULT,
+    GOTO, 
+    ELSE, 
     TYPESPEC, 
-	CONTINUE, 
-	SCSPEC, 
-	TYPEMOD 
+    TYPESPEC, 
+    ENUM,
+    TYPESPEC, 
+    TYPESPEC, 
+    UNION, 
+    BREAK, 
+    WHILE, 
+    TYPEMOD,
+    TYPESPEC, 
+    SCSPEC, 
+    SCSPEC, 
+    STRUCT, 
+    RETURN, 
+    SIZEOF, 
+    SWITCH, 
+    TYPESPEC,
+    SCSPEC, 
+    DEFAULT,
+    TYPESPEC, 
+    CONTINUE, 
+    SCSPEC, 
+    TYPEMOD 
 };
 */
-
 
 /*
  Credits: GCC 0.9
@@ -320,64 +296,51 @@ enum rid
 /* 
 static enum rid rid[] = { 
     NORID, 
-	NORID, 
-	RID_INT, 
-	NORID, 
-	NORID,
     NORID, 
-	RID_CHAR, 
-	RID_AUTO, 
-	NORID, 
-	NORID, 
-	RID_LONG, 
-	RID_VOID, 
-	NORID,
+    RID_INT, 
+    NORID, 
+    NORID,
+    NORID, 
+    RID_CHAR, 
+    RID_AUTO, 
+    NORID, 
+    NORID, 
+    RID_LONG, 
+    RID_VOID, 
+    NORID,
     RID_FLOAT, 
-	RID_SHORT, 
-	NORID, 
-	NORID, 
-	NORID, 
-	RID_CONST,
+    RID_SHORT, 
+    NORID, 
+    NORID, 
+    NORID, 
+    RID_CONST,
     RID_DOUBLE, 
-	RID_STATIC, 
-	RID_EXTERN, 
-	NORID, 
-	NORID, 
-	NORID, 
-	NORID, 
-	RID_SIGNED,
+    RID_STATIC, 
+    RID_EXTERN, 
+    NORID, 
+    NORID, 
+    NORID, 
+    NORID, 
+    RID_SIGNED,
     RID_TYPEDEF, 
-	NORID,
+    NORID,
     RID_UNSIGNED, 
-	NORID, 
-	RID_REGISTER, 
-	RID_VOLATILE 
+    NORID, 
+    RID_REGISTER, 
+    RID_VOLATILE 
 };
 */
 
-
-
-int parse(void);
-
-
-// Vamos inicializar o parser.
-int parserInit(void);
-
-
-//int parserCreateMain( char **list );
-
-
-//parse uma função.
-//void parseFunction( char *s );
-
-
-//int parserMain();
-
+//
+// -- Prototypes --------
+//
 
 int parser(void);
+int parse(void);
+//int parserCreateMain( char **list );
+//parse uma função.
+//void parseFunction( char *s );
+//int parserMain();
 
-
-
-
-
+#endif    
 

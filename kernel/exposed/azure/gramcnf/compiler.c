@@ -16,7 +16,6 @@ FILE *compiler (void)
     int lexer_return = -1;
     int parser_return = -1;
 
-    //debug_print ("compiler:\n");
     printf ("compiler: Initializing ...\n");
 
 // Just initializing the lexer.

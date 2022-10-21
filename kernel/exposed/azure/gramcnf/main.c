@@ -53,6 +53,9 @@ void editorClearScreen(void);
 void debugShowStat(void);
 
 static void usage(char **argv);
+
+static int gramcInitialize(void);
+
 // =====================================================
 
 
@@ -397,12 +400,12 @@ int is_letter(char c)
 // gramcInitialize:
 // Inicializa variáveis globais.
 
-int gramcInitialize (void)
+static int gramcInitialize(void)
 {
     int Status = 0;
-    int i=0;
+    register int i=0;
 
-    printf ("gramcInitialize: Initializing ...\n");
+    printf ("gramcInitialize:\n");
 
 // Clear buffers
 
@@ -463,7 +466,7 @@ int gramcInitialize (void)
 
     //...
 
-    printf ("gramcInitialize: done\n");
+    //printf ("gramcInitialize: done\n");
 
     return (int) Status;
 }

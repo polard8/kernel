@@ -5,16 +5,29 @@
 
 #include "gramcnf.h"
 
+// Espiada, olhadinha.
+// #importante
+// esquema
+// Um símbolo vam seguido de um char.
+// a ação depende dessa combinação.
+// peekSymbol >>> peekChar
+int peekSymbol=0;
+int peekChar=0;
+
+char function_main_buffer[512];
 char save_symbol[32];
 
 
-int parse_function ( int token );
-
-
 //
+// -- Private: Prototypes --------
+//
+
+static int parserInit(void);
+
+// Functions
+static int parse_function(int token);
+
 // Statements
-//
-
 int parse_asm ( int token );
 int parse_do ( int token );
 int parse_for ( int token );
@@ -25,27 +38,19 @@ unsigned long parse_sizeof ( int token );
 int parse_while ( int token );
 //...
 
-
-//
 // Expression
-//
-
 unsigned long parse_expression ( int token );
 
-
-
-
-//
 // Emit
+static void emit_label(void);
+static void emit_function(void);
+
+
+//
+// -------------------------------------
 //
 
-void emit_label(void);
-void emit_function(void);
-
-
-
-
-void emit_label(void)
+static void emit_label(void)
 {
     strcat (TEXT,";[LABEL]\n");
     strcat (TEXT,"segment .text\n");
@@ -54,7 +59,7 @@ void emit_label(void)
     strcat (TEXT,":\n");
 }
 
-void emit_function(void)
+static void emit_function(void)
 {
     strcat (TEXT,";[FUNCTION] (\n");
     strcat (TEXT,"segment .text \n");
@@ -65,15 +70,13 @@ void emit_function(void)
 
 
 // Parse function.
-int parse_function (int token)
+static int parse_function(int token)
 {
-	
-	int c;
-	int running = 1;
-	int State = 1;
-	
-	
-//#ifdef PARSER_FUNCTION_VERBOSE	
+    int c;
+    int running = 1;
+    int State = 1;
+
+//#ifdef PARSER_FUNCTION_VERBOSE
 	//debug
 	//printf("parse_function: Initializing ...\n");	
 //#endif	
@@ -1653,7 +1656,6 @@ int parse(void)
 
     while (running == 1)
     {
-
         token = yylex();
     
         // EOF: 
@@ -2292,94 +2294,63 @@ debug_output:
     goto parse_exit;
 
 hang:
-
     printf ("parse: *hang\n");   
     while (1){ asm ("pause"); };
-
-
 syntax:
-
     printf ("parse: Systax error in line %d \n", lineno );
     exit (1);
-
-
-
 parse_exit:
-
     printf ("parse: done\n");
     return 0;
 }
 
 
-
-
-/*
- ***********************************
- * parserInit:
- *     Initializing parser.
- */
-
-int parserInit (void){
-
-
+// parserInit:
+// Initializing parser.
+static int parserInit(void)
+{
     register int i=0;
 
-	
-//#ifdef GRAMC_VERBOSE	
     printf ("parserInit:\n");
-//#endif		
-	
-	//infile_size = 0;
-	//outfile_size = 0;
-	
-    //stack support
-	stack_flag = 0;
-	stack_count = 0;
-	stack_index = 0;
-	
- 
-	for ( i=0; i<8; i++ )
-		id[i] = 0;
-	
-	for ( i=0; i<8; i++ )
-		constant[i] = 0;
-	
-	for ( i=0; i<8; i++ )
-		return_info[i] = 0;
 
-	for ( i=0; i<512; i++ )
-		stack[i] = 0;
-	
-	//...
-	
-	//esses endereços vão depender do arquivo de configuração do 
-	//linker ...
-	//#test: default em 0.
-    
+    //infile_size = 0;
+    //outfile_size = 0;
+
+// Stack support
+    stack_flag = 0;
+    stack_count = 0;
+    stack_index = 0;
+
+    for ( i=0; i<8; i++ )  { id[i] = 0;          };
+    for ( i=0; i<8; i++ )  { constant[i] = 0;    };
+    for ( i=0; i<8; i++ )  { return_info[i] = 0; };
+    for ( i=0; i<512; i++ ){ stack[i] = 0;       };
+    //...
+
+// Esses endereços vão depender do arquivo 
+// de configuração do linker ...
+// #test: default em 0.
     program_header_address = 0;
     program_text_address = 1*100;
     program_data_address = 2*100;
-    program_bss_address  = 3*100;	
-	
-	//...
-	
-	return 0;
-}
+    program_bss_address  = 3*100;
+    //...
 
+    return 0;
+}
 
 // Called by compiler().
 int parser(void)
 {
     int Status = -1;
-
-    //debug_print ("parser:\n");
-
+    printf ("\n");
+    printf ("---------------------------------------\n");    
+    printf("parser:\n");
 // Initialize
     Status = (int) parserInit();
 //parse it
     Status = (int) parse();
     printf ("parser: parse() returned %d\n", Status); 
-    
     return 0;
 }
 

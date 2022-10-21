@@ -1,4 +1,11 @@
 
+// gdef.h
+
+
+#ifndef __GDEF_H
+#define __GDEF_H    1
+
+
 #define LSH_TOK_DELIM " \t\r\n\a" 
 #define SPACE " "
 #define TOKENLIST_MAX_DEFAULT 80
@@ -121,21 +128,6 @@ struct temp_file
 struct temp_file *temp_file_queue;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif    
 
 

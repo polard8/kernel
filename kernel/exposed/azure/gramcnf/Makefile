@@ -54,8 +54,7 @@ LIBCOBJ   = ../../lib/rtl/obj
 
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdlib.o stdio.o string.o unistd.o termios.o ioctl.o fcntl.o \
-lexer.o parser.o tree.o compiler.o    
-
+globals.o lexer.o parser.o tree.o compiler.o    
 
 .PHONY: all all-c gramcc-link finalize clean
 
@@ -85,6 +84,7 @@ all-c:
 	#cp $(APIOBJ)/api.o      .
 
 # from gramc
+	gcc  -c  globals.c   -I $(LIBC) $(CFLAGS) -o globals.o
 	gcc  -c  lexer.c     -I $(LIBC) $(CFLAGS) -o lexer.o
 	gcc  -c  parser.c    -I $(LIBC) $(CFLAGS) -o parser.o
 	gcc  -c  tree.c      -I $(LIBC) $(CFLAGS) -o tree.o

@@ -1,112 +1,120 @@
 
+// token.h
 
+#ifndef __TOKEN.H
+#define __TOKEN.H    1
 
-//Enumeração dos tipos de tokens.
+// Enumeração dos tipos de tokens.
 typedef enum {
-	TOKENNULL,
-	TOKENEOF,
-    TOKENKEYWORD,      // int while void. (reserveds)
-	TOKENIDENTIFIER,   // var1, total ...
-	TOKENCONSTANT,     // 10 20 0x1234 ...
-	TOKENSTRING,       // "this is a string"
-	TOKENOPERATOR,     // math. + - * / % | & ^ =
-	TOKENSEPARATOR,    // separadores (){}[],.;:? ...
-	TOKENSPECIAL,       // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
-	TOKENQUALIFIER,  // static volatile ...
-	TOKENMODIFIER,   // signed unsigned ...
+
+    TOKENNULL,
+    TOKENEOF,
+    TOKENKEYWORD,     // int while void. (reserveds)
+    TOKENIDENTIFIER,  // var1, total ...
+    TOKENCONSTANT,    // 10 20 0x1234 ...
+    TOKENSTRING,      // "this is a string"
+    TOKENOPERATOR,    // math. + - * / % | & ^ =
+    TOKENSEPARATOR,   // separadores (){}[],.;:? ...
+    TOKENSPECIAL,     // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
+    TOKENQUALIFIER,   // static volatile ...
+    TOKENMODIFIER,    // signed unsigned ...
     TOKENTYPE,
     ARITHCOMPARE,
-	EQCOMPARE,
-	ASSIGN,    // =
-	PLUSPLUS,
-	MINUSMINUS,
-	ANDAND,
-	OROR,
-	LSHIFT,
-	RSHIFT,
-	POINTSAT
-	
+    EQCOMPARE,
+    ASSIGN,           // =
+    PLUSPLUS,
+    MINUSMINUS,
+    ANDAND,
+    OROR,
+    LSHIFT,
+    RSHIFT,
+    POINTSAT
+
 }token_t;
 
-
-
-//Enumeração dos tipos de tokens.
+// Enumeração dos tipos de tokens.
 typedef enum {
-	TNULL,
+
+    TNULL,
     TINT,
-	TVOID,
-	TCHAR,
-	TSHORT,
-	TLONG
-	//...
+    TVOID,
+    TCHAR,
+    TSHORT,
+    TLONG
+    //...
+
 }types_t;
 
-//Enumeração dos modificadores.
+// Enumeração dos modificadores.
 typedef enum {
-	MNULL,
+
+    MNULL,
     MSIGNED,
-	MUNSIGNED
-	//...
+    MUNSIGNED
+    //...
+
 }modifiers_t;
 
-//Enumeração dos qualificadores.
+// Enumeração dos qualificadores.
 typedef enum {
-	QNULL,
+
+    QNULL,
     QVOLATILE,
-	QSTATIC
-	//...
+    QSTATIC
+    //...
+
 }qualifiers_t;
  
-
+// Keywords
 typedef enum {
-	KWNULL,
+
+    KWNULL,
     KWASM,
-	KWGOTO,
-	KWRETURN,
-	KWCONTINUE,
-	KWDEFAULT,
-	KWCASE,
-	KWSWITCH,
-	KWFOR,
-	KWDO,
-	KWWHILE,
-	KWELSE,
-	KWIF,
-	KWUNION,
-	KWSTRUCT,
-	KWENUM,
-	KWSIZEOF,
-	KWVOLATILE,
-	KWINLINE,
-	KWSTATIC,
-	KWDEF,          //não faz parte da linguagem c
-	KWVAR           //não faz parte da linguagem c 
-	
-	//...
+    KWGOTO,
+    KWRETURN,
+    KWCONTINUE,
+    KWDEFAULT,
+    KWCASE,
+    KWSWITCH,
+    KWFOR,
+    KWDO,
+    KWWHILE,
+    KWELSE,
+    KWIF,
+    KWUNION,
+    KWSTRUCT,
+    KWENUM,
+    KWSIZEOF,
+    KWVOLATILE,
+    KWINLINE,
+    KWSTATIC,
+    KWDEF,          //não faz parte da linguagem c
+    KWVAR           //não faz parte da linguagem c 
+    // ...
+
 }keywords_t;
 
 
-
-//String s passadas para o parser.
-#define	TOKENNULL_STRING        "N"
+// String s passadas para o parser.
+#define TOKENNULL_STRING        "N"
 #define TOKENKEYWORD_STRING     "KW"   // int while void.
-#define	TOKENIDENTIFIER_STRING  "ID"   // var1, total ...
-#define	TOKENCONSTANT_STRING    "C"    // 10 20 0x1234 ...
-#define	TOKENSTRING_STRING      "ST"   // "this is a string"
-#define	TOKENOPERATOR_STRING    "OP"   // math. + - * / % | & ^
-#define	TOKENSEPARATOR_STRING   "SEP"  // separadores (){}[],.;:? ...
-#define	TOKENSPECIAL_STRING     "SP"   // O resto. " ' $ # & <= >= -= += ! && || ...
+#define TOKENIDENTIFIER_STRING  "ID"   // var1, total ...
+#define TOKENCONSTANT_STRING    "C"    // 10 20 0x1234 ...
+#define TOKENSTRING_STRING      "ST"   // "this is a string"
+#define TOKENOPERATOR_STRING    "OP"   // math. + - * / % | & ^
+#define TOKENSEPARATOR_STRING   "SEP"  // separadores (){}[],.;:? ...
+#define TOKENSPECIAL_STRING     "SP"   // O resto. " ' $ # & <= >= -= += ! && || ...
 
+
+//
+// -- Lists --------
+// 
 
 #define TLIMIT 80
 
-//
-// ## LISTAS ##
-// 
-
-//Uma pilha para todos os tokens.
+// Uma pilha para todos os tokens.
 char *TOKENLIST[TLIMIT];
- 
+
 //Essas listas são pilhas para diferentes tipos de tokens. 
 char *KEYWORDLIST[TLIMIT]; 
 char *IDENTIFIERLIST[TLIMIT]; 
@@ -117,9 +125,8 @@ char *SPECIALLIST[TLIMIT];
  
 
 //
-// ## CONTADORES ##
+// -- Counters --------
 // 
- 
 
 //contador para não estourar a lista. 
 int keyword_count; 
@@ -501,9 +508,7 @@ struct type_d
 {
     int used;
     int magic;
-
     int id;
-
     int type;
     char *string;    // String que representa o tipo.
 };
@@ -515,26 +520,6 @@ unsigned long functionList[FUNCTION_COUNT_MAX];
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif    
 
 

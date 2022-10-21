@@ -4,10 +4,6 @@
  *  2018 - Created by Fred Nora.
  */
 
-// Config and debug support.
-#include "config.h"
-#include "debug.h"
-
 // rtl
 #include <types.h>
 #include <ctype.h>
@@ -18,11 +14,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// libcore
-// #deprecated
-//#include <api.h>
-
-// gramc 
+// Local
+#include "config.h"
+#include "debug.h"
+#include "globals.h"
 #include "gdef.h"
 #include "token.h"
 #include "lexer.h"
@@ -31,9 +26,5 @@
 #include "compiler.h" 
 
 
-//
-// Prototypes ===========================================
-//
 
-int gramcInitialize (void);
 

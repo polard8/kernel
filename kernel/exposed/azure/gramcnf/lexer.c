@@ -6,6 +6,70 @@
 #include "gramcnf.h"
 
 
+int eofno=0;
+
+// Line support
+int lineno=0;        // Current line number.
+int lexer_lineno=0;  // Total numbe rof lines.
+int lexer_firstline=0;
+int lexer_lastline=0;
+int lexer_token_count=0;
+
+int number_of_tokens=0;  // Total number of tokens.
+
+int lexer_code=0;
+int current_token=0;  // The class of the curent token.
+
+// When some element was found.
+int directive_fould=0;
+int type_found=0;
+int modifier_found=0;
+int qualifier_found=0;
+int keyword_found=0;
+int constant_type_found=0;
+int constant_base_found=0;
+int return_found=0;
+int main_found=0;
+
+
+//
+// Return support
+//
+
+// Tipo de retorno da função.
+int function_return_type=0;
+// Tipo de retorno da função main.
+int main_return_type=0;
+
+// Índices na lista de tokens.
+int return_index=0;   // Índice para a posição na lista onde está o retorno.
+int next_index=0;     //índice do próximo token na lista de tokens.
+int current_index=0;
+
+// Flag para o tratamento da string dentro do asm inline.
+// \" marcando início e fim de string.
+int string_flag=0;
+
+//tipo que foi encontrado.
+int current_type=0;
+
+//()
+int parentheses_start=0;
+int parentheses_end=0;
+int parentheses_count=0;
+//{}
+int brace_start=0;
+int brace_end=0;
+int brace_count=0;
+
+
+//
+// -- Prototypes --------
+//
+
+static int lexerInit(void);
+static int skip_white_space(void);
+
 //#### supensa ###
 /*
 int check_newline ()
@@ -93,17 +157,16 @@ int check_newline ()
 
 
 // Skipping white spaces.
-int skip_white_space (void)
+static int skip_white_space(void)
 {
     register int c=0;
     register int inside=0;
 
 begin:
-
     c = getc (finput);
 
 // #debug
-    printf("%c ",c); 
+    //printf("%c ",c); 
 
     for (;;)
     {
@@ -811,45 +874,39 @@ done:
  *     Inicializando o lexer.
  */
 
-int lexerInit (void)
+static int lexerInit(void)
 {
-    int i=0;
+    register int i=0;
 
-    printf ("lexerInit: Initializing ...\n");
+    printf("lexerInit:\n");
 
-	//number_of_tokens = 0;
-	//current_token = 0;
-	//next_index = 0;
-	
-	// ## line support ##
-	
-	//arquivos de texto começa com a linha 1.
-	lineno = 1;
-	//lexer_lineno = 0;
-	lexer_firstline = 1;
-	//lexer_lastline = 0;
+    //number_of_tokens = 0;
+    //current_token = 0;
+    //next_index = 0;
 
-//eof++
-    eofno = 0;
+// Line support
 
+// Arquivos de texto começa com a linha 1.
+    lineno = 1;
+    //lexer_lineno = 0;
+    lexer_firstline = 1;
+    //lexer_lastline = 0;
+
+    eofno = 0;  // eof++
     lexer_code = 0;
-
     maxtoken = MAXTOKEN;
 
-// Clear buffer.
+// Clear buffer
+    for ( i=0; i<MAXTOKEN; i++ ){
+        real_token_buffer[i] = (char) '\0';
+    };
 
-	for ( i=0; i<MAXTOKEN; i++ )
-	{
-	    real_token_buffer[i] = (char) '\0';	
-	}
+    token_buffer = &real_token_buffer[0]; 
 
-	token_buffer = &real_token_buffer[0]; 
+    sprintf ( real_token_buffer, "uninitialized-token-string" );
 
-	sprintf ( real_token_buffer, "uninitialized-token-string" );
+    //...
 
-	//...
-
-//done:
     return 0;
 }
 
@@ -858,9 +915,10 @@ int lexer (void)
 {
     int Status = -1;
 
-    debug_print ("lexer:\n");
-    
-    Status = (int) lexerInit ();
+    printf ("\n");
+    printf ("---------------------------------------\n");    
+    printf("lexer:\n");
+    Status = (int) lexerInit();
 
     return (int) Status;
 }
@@ -887,7 +945,7 @@ int check_subseq ( int c, int a, int b )
 */
 
 
-void error (char *msg)
+void error(char *msg)
 {
     printf ("error: %s\n", msg );
 }
