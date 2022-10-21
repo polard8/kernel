@@ -1,17 +1,13 @@
-/*
- * File: fs.h 
- * History:
- *     2015 - Created by Fred Nora.
- */
 
+// fs.h
+// Boot loader fs support.
+// 2015 - Created by Fred Nora.
 
 #ifndef ___FS_H
 #define ___FS_H    1
 
-
 #define SECTOR_SIZE    512 
 //#define SECTOR_SIZE    4096  // New standard
-
 
 //
 // Cluster Meaning
@@ -45,29 +41,21 @@
 // Status de carregamento.
 // Se o diret�rio raiz j� est� carregado na mem�ria.
 // Se a FAT j� est� carregada na mem�ria.
-
 extern int g_fat16_root_status;
 extern int g_fat16_fat_status;
-
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
 extern int g_file_system_type;
-
 // Buffer para salvar uma entrada de diretorio.
 // @todo: Tamanho da entrada? Desperdicio?
 extern char buffer_dir_entry[512];
-
 // Lista de clusters em um arquivo.
 // @todo: Tamanho de arquivos?
 extern unsigned short file_cluster_list[1024];
 
-/*
- * partition_table_d:
- *     Structure for partition table.
- * @todo:    
- *     Na verdade essa � uma estrutura para um entrada na tabela de 
- * parti��es do MBR.
- */ 
 
+// #bugbug
+// Actually this is a structure for 
+// a partition table entry.
 struct partition_table_d
 {
     unsigned char boot_indicator;    //80h, active.
@@ -109,7 +97,6 @@ fatLoadCluster (
     unsigned long address, 
      unsigned long spc );
 
- 
 //
 // Loading files.
 //
@@ -126,11 +113,11 @@ fsLoadFile (
     unsigned long file_address, 
     unsigned long dir_address );
 
-unsigned long path_count (unsigned char *path);
-
 // Esse é o endereço do arquivo, 
 // que é o último nível do path.
 int load_path ( unsigned char *path, unsigned long address );
+
+int path_count(const char *path);
 
 unsigned long fsSearchFile(unsigned char *name);
 

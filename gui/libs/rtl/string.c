@@ -1963,6 +1963,20 @@ char *strrev(char *str)
 }
 
 
+/*
+void trim_newline (char *path);
+void trim_newline (char *path)
+{
+    char *end = path + strlen(path) - 1;
+    while (*end == '\n')
+    {
+        *end = '\0';
+        end--;
+    };
+}
+*/
+
+
 //
 // End.
 //

@@ -19,6 +19,24 @@ char  machine[]  Name of the hardware type on which the system is running.
 // See:
 // https://man7.org/linux/man-pages/man2/uname.2.html
 
+/*
+static int is_64_kernel(void);
+static int is_64_kernel(void)
+{
+    struct utsname un;
+    int res=FALSE;
+
+    if (uname (&un) < 0){
+        return -1;
+    }
+    if (strcmp (un.machine, "x86_64") == 0){
+        res=TRUE;
+    }
+    return (int) res;
+}
+*/
+
+
 int main (int argc, char **argv)
 {
 

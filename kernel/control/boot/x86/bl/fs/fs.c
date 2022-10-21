@@ -28,22 +28,20 @@
 
 int g_fat16_root_status=0;
 int g_fat16_fat_status=0;
-
 int g_file_system_type=0;
 
 // Buffer para salvar uma entrada de diretorio.
-// @todo: Tamanho da entrada? Desperdicio?
-
+// #todo: 
+// Tamanho da entrada? Desperdicio?
 char buffer_dir_entry[512];
 
 // Lista de clusters em um arquivo.
-// @todo: Tamanho de arquivos?
-
+// #todo: 
+// Tamanho de arquivos?
 unsigned short file_cluster_list[1024];
 
-//see: fs.h
+// see: fs.h
 struct partition_table_d  partition;
-
 
 
 /*
@@ -59,7 +57,6 @@ int fs_load_file ( unsigned char *file_name, unsigned long file_address )
 
 */
 
-
 /*
  * fs_search_file:
  *    Procura por um nome de arquivo no diretório raiz.
@@ -68,30 +65,28 @@ int fs_load_file ( unsigned char *file_name, unsigned long file_address )
 /*
 int fs_search_file(unsigned char *file_name)
 {
-	return (int) 0;
+    return (int) 0;
 }
 */
-
 
 /*
 /// Checks if the sector loaded in user_data is a Fat16 boot sector
 unsigned short is_FAT16()
 {
     char* label="FAT16";
-    
-	unsigned short res;
+
+    unsigned short res;
     res = memcmp( label, user_data+0x36, 5);  // Compares with label in FAT16 Boot
     if(res)
-    {	
-	    return 0;
-    }		
-	else
-    {	
-		return 1;
-	}
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 */
-
 
 /*
  * fatClustToSect:
@@ -115,7 +110,6 @@ fatClustToSect (
  * fatLoadCluster:
  *     Load a cluster full of data 
  */
-
 // Começa do primeiro setor do cluster.
 // SECTOR_SIZE = 512;
 
@@ -429,12 +423,9 @@ unsigned short fs_find_empty_entry ()
     return 0;
 }
 
-
-
 // #deprecated
-void fs_install ()
+void fs_install()
 {
-	//return;   //@todo: Instala o bootmanager no disco.
 }
 
 
@@ -467,8 +458,8 @@ fsLoadFile (
 {
     int Status = 0;
 
-    unsigned long i = 0;
-    unsigned long j = 0;
+    unsigned long i=0;
+    unsigned long j=0;
     unsigned short next=0;
 
     //dir support.
@@ -726,30 +717,27 @@ done:
 // =========================
 // path count
 // Credits: Sirius OS.
-
-unsigned long path_count (unsigned char *path)
+int path_count(const char *path)
 {
-    unsigned long Value = 0;
+    int result=0;
 
-    int i=0;
-    int max = (80*25);
-
+    register int i=0;
+    int max = (int) (80*25);
 
     if ( (void*) path == NULL ){
-        printf ("path_count: [FAIL] path\n");
+        printf ("path_count: path\n");
+        return 0;
     }
-
     if (*path == 0){
-        printf ("path_count: [FAIL] *path\n");
+        printf ("path_count: *path\n");
+        return 0;
     }
-
-    for ( i=0; i < max; i++ )
-    {
-        if (path[i] == '/') {  Value++;  }
-        if (path[i] == '\0'){  break;  }
+    for ( i=0; i<max; i++ ){
+        if (path[i] == '\0'){ break; }
+        if (path[i] == '/') { result++; }
     };
 
-    return (unsigned long) Value;
+    return (int) result;
 }
 
 
@@ -790,12 +778,13 @@ int load_path ( unsigned char *path, unsigned long address )
     void *__file_buffer;
 
     int level=0;
-    unsigned long n_levels = 0;
-    int l=0;
 
-    //
-    // Checks.
-    //
+    int l=0;
+    int n_levels=0;
+
+//
+// Checks
+//
     
     //====================
     // path
@@ -820,9 +809,9 @@ int load_path ( unsigned char *path, unsigned long address )
 
     p = path;
 
-    n_levels = path_count(path);
+    n_levels = (int) path_count(path);
     
-    if(n_levels==0){
+    if(n_levels<=0){
         printf ("bl-load_path: n_levels\n");
         goto fail;
         //abort ();
@@ -830,8 +819,8 @@ int load_path ( unsigned char *path, unsigned long address )
 
     level = 0;
 
-    //====================
-    // address
+//====================
+// address
 
     if (address == 0){
         printf ("bl-load_path: address\n");
