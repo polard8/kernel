@@ -676,7 +676,9 @@ int mysprintf(char *buf, const char *fmt, ...);
 // ===================================
 void kinguio_i2hex(unsigned int val, char* dest, int len);
 char *kinguio_itoa (int val, char *str);
-static char *_vsputs_r(char *dest, char *src);
+
+
+
 int kinguio_vsprintf(char * str,const char * fmt, va_list ap);
 void kinguio_puts(const char* str);
 int kinguio_printf(const char *fmt, ...);

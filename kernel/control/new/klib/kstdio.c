@@ -7,6 +7,18 @@
 #define HEX_LEN  8
 #define ____INT_MAX  2147483647
 
+static void __clear_prompt_buffers(void);
+
+static void __initialize_file_table(void);
+static void __initialize_inode_table(void);
+
+static void __initialize_stdin(void);
+static void __initialize_stdout(void);
+static void __initialize_stderr(void);
+
+static void __initialize_virtual_consoles(void);
+
+static char *_vsputs_r(char *dest, char *src);
 
 // service 8002
 // IN: fd for the new stdin
@@ -192,7 +204,6 @@ fail:
  * em seguida enviá-lo para a tela.
  * Essa rotina é chamada pelas funções: /print/printi/prints.
  */
-
 // #importante
 // Se a string existe colocamos nela,
 // caso contrário imprimimos no backbuffer.
@@ -201,7 +212,6 @@ fail:
 // stream de output, como stdout.
 // Ativaremos a rotina de mostrar na tela só no momento em que 
 // encontramos um fim de linha.
-
 // IN:
 //     **str // #dangerdanger
 //     c
@@ -623,15 +633,11 @@ kinguio_i2hex(
 
 char *kinguio_itoa (int val, char *str) 
 {
-
-// Parameters.
     int value = val;
     char *valuestring = (char *) str;
-
     int min_flag=0;
     char swap=0; 
     char *p;
-
 
     if (0 > value)
     {
@@ -645,7 +651,6 @@ char *kinguio_itoa (int val, char *str)
          *p++ = (char) (value % 10) + '0';
          value /= 10;
     } while (value);
-
 
     if (min_flag != 0)
     {
@@ -685,19 +690,14 @@ kinguio_vsprintf(
     const char *fmt, 
     va_list ap )
 {
-
-// parameter
     char *str_tmp = str;
-
     int index=0;
     unsigned char u=0;
     int d=0;
-
     char c=0; 
     char *s;
     char buffer[256];
     char _c_r[] = "\0\0";
-
 
     while ( fmt[index] )
     {
@@ -760,12 +760,13 @@ kinguio_vsprintf(
 void kinguio_puts(const char* str)
 {
     register int i=0;
+    size_t StringLen=0;
 
     if (!str){
         return;
     }
 
-    size_t StringLen = (size_t) strlen(str);
+    StringLen = (size_t) strlen(str);
 
     for (i=0; i<StringLen; i++)
     {
@@ -782,7 +783,6 @@ int kinguio_printf(const char *fmt, ...)
     static char print_buffer[1024];
     int ret=0;
 
-
 // If the virtual console isn't full initialized yet.
     if( Initialization.console_log != TRUE ){
         return -1;
@@ -790,27 +790,23 @@ int kinguio_printf(const char *fmt, ...)
 
 //----------
     va_list ap;
-    va_start (ap, fmt);
-
+    va_start(ap, fmt);
     memset(print_buffer, 0, 1024); 
     ret = kinguio_vsprintf(print_buffer, fmt, ap);
-
-    va_end (ap);
+    va_end(ap);
 //-----------
 
 // Print and return.
     kinguio_puts(print_buffer);
     return (int) ret;
 }
-
 // ===================================
 
-
-int kputs ( const char *str )
+int kputs(const char *str)
 {
-    if ( (void *) str == NULL )
+    if ( (void *) str == NULL ){
         return -1;
-
+    }
     return (int) printk ("%s",str);
     //return (int) printf ("%s",str);
 }
@@ -825,7 +821,6 @@ int kputs ( const char *str )
  * but instead of being printed, the content is stored 
  * as a C string in the buffer pointed by str.
  */
-
 // #suspensa
 // Essa implementação foi feita para 32bit e não funciona
 // por inteiro em long mode.
@@ -845,7 +840,6 @@ int mysprintf(char *buf, const char *fmt, ...)
     int i=0;
 
 // Write the fmt format string to the buffer buf 
-
     va_list args;
     va_start(args, fmt);
     i = kinguio_vsprintf(buf, fmt, args);
@@ -985,7 +979,7 @@ int k_feof ( file *f )
 }
 
 
-int k_ferror ( file *f )
+int k_ferror(file *f)
 {
     if ( (void *) f == NULL ){
         return EOF;
@@ -1220,7 +1214,7 @@ int k_fputc ( int ch, file *f )
 
 int k_fscanf (file *f, const char *format, ... )
 {
-    panic ("k_fscanf: #todo");
+    panic ("k_fscanf: #todo\n");
     return -1;
 }
 
@@ -1256,7 +1250,7 @@ int vfprintf(file *stream, const char *format, va_list ap)
 */
 
 
-void k_rewind ( file *f )
+void k_rewind(file *f)
 {
     //fseek (f, 0L, SEEK_SET);
 
@@ -1271,52 +1265,43 @@ void k_rewind ( file *f )
 // Change f->magic to 4321.
 int k_fclose (file *f)
 {
-
-    if ( (void *) f == NULL )
+    if ( (void *) f == NULL ){
         return EOF;
-
-    if (f->used != TRUE)
+    }
+    if (f->used != TRUE){
         return EOF;
-
-    if (f->magic != 1234)
+    }
+    if (f->magic != 1234){
         return EOF;
-
+    }
     f->used = TRUE;
-    f->magic = 4321;  // Inverted.
-
+// Inverted.
+    f->magic = 4321;
     return 0;
 }
 
 
 int k_fputs ( const char *str, file *f )
 {
-    int Size = 0;
-
+    int Size=0;
 
     if ( (void *) f == NULL ){
         return (int) (-1);
-    } else {
-        Size = (int) strlen (str);
+    } 
 
-        if ( Size > f->_cnt ){ return (int) (-1); }
+    Size = (int) strlen (str);
+    if ( Size > f->_cnt ){
+        return (int) (-1);
+    }
+    f->_cnt = (int) (f->_cnt - Size);
+    sprintf ( f->_p, str );
+    f->_p = (f->_p + Size);
 
-        f->_cnt = (int) (f->_cnt - Size);
-
-        sprintf ( f->_p, str );
-
-        f->_p = (f->_p + Size);
-
-        return 0;
-    };
-
-    return (int) (-1);
+    return 0;
 }
 
 
-/*
- * k_setbuf:
- * 
- */
+// k_setbuf:
 // see: 
 // https://linux.die.net/man/3/setvbuf
 
@@ -1327,12 +1312,10 @@ void k_setbuf (file *f, char *buf)
         return;
     }
 
-
     if ( (void *) buf == NULL ){
         debug_print("k_setbuf: buf\n");
         return;
     }
-
 
 //#todo
 //se o buffer é válido.
@@ -1355,20 +1338,12 @@ void k_setbuf (file *f, char *buf)
     // f->_p = f->_bf._base
     
     // ??stream->cnt = 0;
-    
-    
-    // #todo
-    // Setup all the buffer elements.
-    
-    // ...
-    
+
+// #todo
+// Setup all the buffer elements.
+// ...
 }
 
-
-/*
- * k_setbuffer:
- * 
- */
 
 void k_setbuffer (file *f, char *buf, size_t size)
 {
@@ -1422,10 +1397,11 @@ void k_setbuffer (file *f, char *buf, size_t size)
 
 void k_setlinebuf (file *f)
 {
-    printf ("k_setlinebuf: [TODO] \n");
+    printf ("k_setlinebuf: #todo\n");
 
-    if ( (void *) f == NULL )
+    if ( (void *) f == NULL ){
         return;
+    }
 }
 
 
@@ -1482,7 +1458,7 @@ regularfile_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
-    debug_print ("regularfile_ioctl: [TODO]\n");
+    debug_print ("regularfile_ioctl: #todo\n");
 
     if ( fd < 0 || fd >= OPEN_MAX )
     {
@@ -1493,8 +1469,7 @@ regularfile_ioctl (
 }
 
 
-// local
-void __initialize_stdin(void)
+static void __initialize_stdin(void)
 {
     int slot=-1;
 
@@ -1508,11 +1483,9 @@ void __initialize_stdin(void)
         x_panic("__initialize_stdin: slot");
     }
     stdin = (file *) file_table[slot];
-
     if ( (void*) stdin == NULL ){
         x_panic("__initialize_stdin: stdin");
     }
-    
     stdin->filetable_index = slot;
 
 // fd
@@ -1555,7 +1528,8 @@ void __initialize_stdin(void)
         x_panic("__initialize_stdin: [FAIL] stdin inode struct\n");
     }
     stdin->inode->filestruct_counter = 1; //inicialize
-    
+
+// Copy the name
     memcpy ( 
         (void *)      stdin->inode->path, 
         (const void*) stdin->_tmpfname, 
@@ -1566,8 +1540,7 @@ void __initialize_stdin(void)
 }
 
 
-// local
-void __initialize_stdout(void)
+static void __initialize_stdout(void)
 {
     int slot=-1;
 
@@ -1581,11 +1554,9 @@ void __initialize_stdout(void)
         x_panic("__initialize_stdout: slot");
     }
     stdout = (file *) file_table[slot];
-
     if ( (void*) stdout == NULL ){
         x_panic("__initialize_stdout: stdout");
     }
-
     stdout->filetable_index = slot;
 
 // fd
@@ -1634,6 +1605,7 @@ void __initialize_stdout(void)
     }
     stdout->inode->filestruct_counter = 1; //inicialize
 
+// Copy the name
     memcpy( 
         (void*)       stdout->inode->path, 
         (const void*) stdout->_tmpfname, 
@@ -1643,9 +1615,7 @@ void __initialize_stdout(void)
     stdout->magic = 1234;
 }
 
-
-// local
-void __initialize_stderr(void)
+static void __initialize_stderr(void)
 {
     int slot = -1;
 
@@ -1659,11 +1629,9 @@ void __initialize_stderr(void)
         x_panic("__initialize_stderr: slot");
     }
     stderr = (file *) file_table[slot];
-
     if ( (void*) stderr == NULL ){
         x_panic("__initialize_stderr: stderr");
     }
-
     stderr->filetable_index = slot;
 
 // fd
@@ -1703,7 +1671,8 @@ void __initialize_stderr(void)
         x_panic("__initialize_stderr: stderr inode struct\n");
     }
     stderr->inode->filestruct_counter = 1; //inicialize
-    //copy the name.
+
+// Copy the name
     memcpy ( 
         (void*)       stderr->inode->path, 
         (const void*) stderr->_tmpfname, 
@@ -1714,16 +1683,14 @@ void __initialize_stderr(void)
 }
 
 
-// Local.
 // Os buffers dos arquivos acima.
 // prompt[]
 // Esses prompts são usados como arquivos.
 // São buffers para as streams.
 // See: kstdio.h
-
-void __clear_prompt_buffers(void)
+static void __clear_prompt_buffers(void)
 {
-    int i=0;
+    register int i=0;
 
     for ( i=0; i<PROMPT_SIZE; i++ )
     {
@@ -1736,14 +1703,11 @@ void __clear_prompt_buffers(void)
     prompt_pos = 0;
 }
 
-
-// local
-// Create n files and put the pointer into the
-// file table.
-void __initialize_file_table(void)
+// Create n files and put the pointer into the file table.
+static void __initialize_file_table(void)
 {
+    register int i=0;
     file *tmp;
-    int i=0;
 
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
@@ -1768,13 +1732,12 @@ void __initialize_file_table(void)
 }
 
 
-// local
 // Create n inodes and put the pointers
 // into the inode table.
-void __initialize_inode_table(void)
+static void __initialize_inode_table(void)
 {
-    struct inode_d *tmp_inode;    
-    int i=0;
+    register int i=0;
+    struct inode_d *tmp_inode;
 
     for (i=0; i<32; i++)
     {
@@ -1796,7 +1759,6 @@ void __initialize_inode_table(void)
 }
 
 
-// Local
 // #??
 // Maybe we are doing this for the second time.
 // Configurando o cursor para todos os consoles.
@@ -1810,9 +1772,9 @@ void __initialize_inode_table(void)
 // See console.c
 // Vamos refazer de forma personalizada.
 
-void __initialize_virtual_consoles(void)
+static void __initialize_virtual_consoles(void)
 {
-    int i=0;
+    register int i=0;
     int cWidth=0;
     int cHeight=0;
 

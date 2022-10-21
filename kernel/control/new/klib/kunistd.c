@@ -10,32 +10,31 @@
 // suporte a rotina da libc.
 // #todo: How many bytes we can copy into the buffer.
 // We need a parameter for that.
-int __gethostname (char *buffer){
-
+int __gethostname (char *buffer)
+{
     char *hostname_buffer = (char *) buffer;
+    int size=0;
 
 // Invalid buffer
-    if( (void*) buffer == NULL )
+    if( (void*) buffer == NULL ){
         return -1;
-
-
-//Estrutura default para informações sobre o host.
-//host.h
-
+    }
+// Estrutura default para informações sobre o host.
+// see: host.h
     if ( (void *) HostInfo == NULL ){
         printf ("__gethostname: HostInfo\n");
         //refresh_screen();
         return (int) -1;
     }
-
 // Copy 64 bytes.
     strcpy ( 
         hostname_buffer, 
         (const char *) HostInfo->__hostname );
+// Get the size.
+    size = (int) HostInfo->hostName_len;
 
-    return (int) HostInfo->hostName_len;
+    return (int) size;
 }
-
 
 // Host name
 // #todo

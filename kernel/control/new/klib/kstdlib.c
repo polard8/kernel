@@ -36,22 +36,18 @@ int abs(int j)
 int __ptsname (int fd, char *buf, size_t buflen)
 {
      char *ptsname_buffer = (char *) buf;
-
      char test_str[50] = "__ptsname: test string";
 
 // #todo: fd
 
-    if ( (void*) buf == NULL )
-    {
+    if ( (void*) buf == NULL ){
         return (int) (-EINVAL);
     }
-
-    // 64 bytes limit
+// 64 bytes limit
     strcpy ( ptsname_buffer, (const char *) test_str );
-    
-    // Lá na lib em ring3 a rotina retorna para o app o 
-    // ponteiro para o buffer
-    return 0;  //ok
+// Lá na lib em ring3 a rotina retorna 
+// para o app o ponteiro para o buffer
+    return 0;
 }
 
 
@@ -63,10 +59,8 @@ void *slab_alloc (size_t size)
 */
 
 
-/* 
- * kmalloc:
- *     Standard kmalloc function. 
- */
+// kmalloc:
+// Standard kmalloc function.
 // Alocar memória no heap do kernel.
 // See: memory.c
 
@@ -74,7 +68,6 @@ void *kmalloc(size_t size)
 {
     void *ptr;
     unsigned long new_size = ( unsigned long) size;
-
 
 // Se devemos ou não incremetar o contador de uso.
     int IncrementUsageCounter=TRUE; //P->allocated_memory
@@ -84,7 +77,6 @@ void *kmalloc(size_t size)
         IncrementUsageCounter=FALSE;
     if(process->magic!=1234)
         IncrementUsageCounter=FALSE;
-
 
     if ( size < 0 ){
         debug_print ("kmalloc: size\n");
@@ -138,13 +130,11 @@ void kfree (void *ptr)
     
     // ps/x86/memory.c
     FreeHeap (ptr);
-}    
+}
 
 
-/*
- * kcalloc: 
- * Alloca e preenche com zero.
- */
+// kcalloc: 
+// Alloca e preenche com zero.
 
 void *kcalloc(size_t count, size_t size)
 {
