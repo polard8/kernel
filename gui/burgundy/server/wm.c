@@ -7,7 +7,7 @@
 
 #include "gws.h"
 
-extern int comp_config_use_mouse;
+extern int gUseMouse;
 
 // Global main structure.
 // Not a pointer.
@@ -2993,39 +2993,50 @@ wmPostMessage(
 // da barra de tarefas.
 void __probe_tb_button_hover(long long1, long long2)
 {
-    int Status=0;
-    int i=0;
- 
-    struct gws_window_d *tmp_window_button;
-    
-    for(i=0; i<4; i++){
-    
-        // pega um ponteiro da lista
-        tmp_window_button = (struct gws_window_d *) tb_windows[i];
-        
-        // checa a validade do ponteiro.
-        if ( (void*) tmp_window_button != NULL )
-        {
-            //paranoia
-            if(tmp_window_button->magic == 1234)
-            {
-                Status = is_within(
-                    (struct gws_window_d *) tmp_window_button,
-                    long1, long2 );
-                    
-                if(Status==FALSE){ mouse_hover=NULL; }
+// Probe taskbar buttons.
+// Well. Not valid in fullscreen.
 
-                if(Status==TRUE)
-                {
-                    yellow_status("oops");
-                    //rtl_reboot();
-                    // Register the hover window.
-                    mouse_hover = (void*) tmp_window_button;
-                    //ok.
-                    return;
-                }
+    int Status=0;
+    register int i=0;
+    int max=4; // We have 4 buttons in the taskbar.
+    struct gws_window_d *w;  // The window for a button.
+
+    if(WindowManager.initialized!=TRUE){
+        return;
+    }
+    if(WindowManager.is_fullscreen==TRUE){
+        return;
+    }
+
+// No more hover window.
+    mouse_hover=NULL;
+
+    for (i=0; i<max; i++){
+
+    // Get a pointer for a window.
+    w = (struct gws_window_d *) tb_windows[i];
+    // If this is a valid pointer.
+    if ( (void*) w != NULL )
+    {
+        // Paranoia
+        if (w->magic == 1234)
+        {
+            // Is the pointer inside this window?
+            Status = is_within(
+                         (struct gws_window_d *) w, long1, long2 );
+            // Yes it is!
+            if (Status==TRUE)
+            {
+                // Register the hover window.
+                mouse_hover = (void*) w;
+                // #debug
+                yellow_status("oops");
+                //rtl_reboot();
+                // ok, done.
+                return;
             }
         }
+    }
     };
 }
 
@@ -3050,7 +3061,7 @@ void __probe_activewindow_hover(long long1, long long2)
     int Status = -1;
 
     // global
-    ____mouse_hover=NULL; 
+    mouse_hover=NULL; 
 
     Status = is_within(
                  (struct gws_window_d *) aw,
@@ -3063,7 +3074,7 @@ void __probe_activewindow_hover(long long1, long long2)
         //rtl_reboot();
 
         // Register the hover window.
-        ____mouse_hover = aw; 
+        mouse_hover = aw; 
     }
 }
 */
@@ -3081,14 +3092,13 @@ wmProcedure(
     unsigned long long1,
     unsigned long long2 )
 {
-    char name_buffer[64];
-
     int Status=FALSE;
     unsigned long r=0;
-    //active window id
+    char name_buffer[64];
+// Active window id.
     int aw_wid = -1;
 
-// #debug
+    // #debug
     //printf("wmProcedure: w=? m=%d l1=%d l2=%d\n", 
         //msg, long1, long2 );
 
@@ -3118,25 +3128,19 @@ wmProcedure(
     case GWS_Create:
         printf("wmProcedure: [1] GWS_Create\n");
         break;
-
     case GWS_Destroy:
         printf("wmProcedure: [2] GWS_Destroy\n");
         break;
-
     case GWS_Move:
         printf("wmProcedure: [3] GWS_Move\n");
         break;
-
     case GWS_Size: //get size?
         printf("wmProcedure: [4] GWS_Size\n");
         break;
-
     case GWS_Resize: //set size ?
         printf("wmProcedure: [5] GWS_Resize\n");
         break;
-
     // ...
-
     case GWS_Close:
         printf("wmProcedure: [7] GWS_Close\n");
         if (long1==0){
@@ -3144,59 +3148,45 @@ wmProcedure(
             //exit(0);
         }
         break;
-
     case GWS_Paint:
         printf("wmProcedure: [8] GWS_Paint\n");
         break;
-
     case GWS_SetFocus: // set focus
         printf("wmProcedure: [9] GWS_SetFocus\n");
         break;
-
     case GWS_KillFocus: //kill focus
         printf("wmProcedure: [10] GWS_KillFocus\n");
         break;
-
     case GWS_Activate:
         printf("wmProcedure: [11] GWS_Activate\n");
         break;
-
     case GWS_ShowWindow:
         printf("wmProcedure: [12] GWS_ShowWindow\n");
         break;
-
     case GWS_SetCursor:
         printf("wmProcedure: [13] GWS_SetCursor\n");
         break;
-
     case GWS_Hide:
         printf("wmProcedure: [14] GWS_Hide\n");
         break;
-
     case GWS_Maximize:
         printf("wmProcedure: [15] GWS_Maximize\n");
         break;
-
     case GWS_Restore:
         printf("wmProcedure: [16] GWS_Restore\n");
         break;
-
     case GWS_ShowDefault:
         printf("wmProcedure: [17] GWS_ShowDefault\n");
         break;
-
     case GWS_SetFocus2:
         printf("wmProcedure: [18] GWS_SetFocus2\n");
         break;
-
     case GWS_GetFocus2:
         printf("wmProcedure: [19] GWS_GetFocus2\n");
         break;
 
-
 // #todo
-// Esse eh o momento de exibirmos o cursor do mouse,
-// e nao no kernel como estamos fazendo.
+// Esse eh o momento de exibirmos o cursor do mouse.
 // Precisamos fazer refresh para apagar o cursor antigo
 // depois pintarmos o cursor novo direto no lfb.
 // Mas nao temos aqui a rotina de pintarmos direto no
@@ -3229,6 +3219,7 @@ wmProcedure(
 
         // Em qual botão o mouse esta passando por cima.
         // lembrando: o botao esta dentro de outra janela.
+        // Probe taskbar buttons.
         __probe_tb_button_hover(long1,long2);
 
 
@@ -3297,6 +3288,7 @@ wmProcedure(
     case GWS_MouseReleased:
 
         printf("RELEASED\n");
+        //wm_Update_TaskBar("RELEASED",TRUE);
         
         // button number
         //if(long1==1){ yellow_status("R1"); }
@@ -3530,7 +3522,7 @@ wmProcedure(
             tb_buttons_status[3] = TRUE;
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
-            // comp_config_use_mouse = TRUE;
+            // gUseMouse = TRUE;
             return 0;
         }
 
@@ -3943,7 +3935,7 @@ int wmInputReader(void)
             // Via shift + f12
             if( RTLEventBuffer[1] == 88112 )
             {
-                comp_config_use_mouse = TRUE;
+                gUseMouse = TRUE;
                 wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
 
                 //printf ("server: [88112]\n");
@@ -3961,14 +3953,21 @@ int wmInputReader(void)
                  RTLEventBuffer[1] == GWS_MousePressed ||
                  RTLEventBuffer[1] == GWS_MouseReleased )
             {
-                if (comp_config_use_mouse == TRUE){
-                g_handler_flag = TRUE;
-                wmHandler( 
-                    0,
-                    RTLEventBuffer[1],
-                    RTLEventBuffer[2],
-                    RTLEventBuffer[3] );
-                g_handler_flag = FALSE;
+                if (gUseMouse == TRUE)
+                {
+                    //g_handler_flag = TRUE;
+                    //wmHandler( 
+                    //    0,
+                    //    RTLEventBuffer[1],
+                    //    RTLEventBuffer[2],
+                    //    RTLEventBuffer[3] );
+                    //g_handler_flag = FALSE;
+
+                    return (unsigned long) wmProcedure(
+                        NULL,  //(struct gws_window_d *) 0,
+                        (int) (RTLEventBuffer[1] & 0xFFFFFFFF),
+                        (unsigned long) RTLEventBuffer[2],
+                        (unsigned long) RTLEventBuffer[3] ); 
                 }
             }
             

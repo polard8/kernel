@@ -187,7 +187,8 @@ char *mktemp (char *template);
 // alloc
 //
 
-void *malloc (size_t size);
+void *gramado_malloc(size_t size);
+void *malloc(size_t size);
 void *xmalloc ( size_t size );
 void *xmemdup (void const *p, size_t s);
 char *xstrdup(char const *string);
@@ -208,28 +209,17 @@ void abort(void);
 void stdlib_die (char *str);
 
 
-
-
-
-/*
- * free:
- *     Libera a memória alocada por malloc. */
-
-void free (void *ptr);
+void gramado_free(void *ptr);
+void free(void *ptr);
 
 //Returns a pseudo-random number in the range of 0 to RAND_MAX.
 int rand (void);
-
 //Alimenta a função rand.
 void srand (unsigned int seed);
-
-
 //@todo: talvez essa função esteja declara erradamente em systemcall.
 //Obs: Essa rotina existe na API e funciona. Se ela faz parte da lib C
 // então ela deve sair de lá vir pra cá.
 int system (const char *command);
-
-
 
 //=================================
 

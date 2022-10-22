@@ -330,44 +330,47 @@ static void on_mouse_event(int event_type, long x, long y)
     long in_y=0;
 
 // Error. Nothing to do.
-    if(event_type<0)
-        return;
-
-    w = (struct gws_window_d *) get_focus();
-    
-    if( (void*) w==NULL )
-    {
+    if(event_type<0){
         return;
     }
+
+    w = (struct gws_window_d *) get_focus();
+    if( (void*) w==NULL ){
+        return;
+    }
+    //if(w->magic!=1234){
+    //    return;
+    //}
 
     //#todo
     //if(w->magic != 1234)
         //return;
 
-    if( x >= w->left &&
-        x <= w->right &&
-        y >= w->top &&
-        y <= w->bottom )
+    if( x >= w->left && x <= w->right &&
+        y >= w->top  && y <= w->bottom )
     {
 // data
+
+        // Single event
         w->single_event.wid   = w->id;
         w->single_event.msg   = event_type;
         w->single_event.long1 = x - w->left;
         w->single_event.long2 = y - w->top;
         w->single_event.has_event = TRUE;
 
-
         // ---------------
+        // Event list
         int Tail = (int) w->ev_tail;
         w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
         w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
         w->ev_long1[Tail] = (unsigned long) x - w->left; 
         w->ev_long2[Tail] = (unsigned long) y - w->top;
         w->ev_tail++;
-        if(w->ev_tail>=32)
+        if(w->ev_tail>=32){
             w->ev_tail=0;
-            return;
         }
+        return;
+    }
 //fail
     w->single_event.has_event = FALSE;
 }
@@ -3233,8 +3236,6 @@ wmProcedure(
         break;
 
 // #todo
-// Esse eh o momento de exibirmos o cursor do mouse,
-// e nao no kernel como estamos fazendo.
 // Precisamos fazer refresh para apagar o cursor antigo
 // depois pintarmos o cursor novo direto no lfb.
 // Mas nao temos aqui a rotina de pintarmos direto no
@@ -3869,7 +3870,9 @@ int wmSTDINInputReader(void)
 
 int wmInputReader(void)
 {
-    int i=0;
+    register int i=0;
+
+    //unsigned long jiffies = rtl_jiffies();
 
 // vamos tentar 32 vezes,
 // pois nossa lista tem 32 ou 64 slots.

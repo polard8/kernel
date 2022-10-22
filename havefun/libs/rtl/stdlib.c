@@ -4,7 +4,6 @@
  *     2016 - Created by Fred Nora.
  */
 
-
 #include <types.h>
 #include <errno.h>
 #include <stddef.h>
@@ -973,6 +972,15 @@ void *rtl_malloc ( size_t size )
 }
 
 
+void *gramado_malloc(size_t size)
+{
+    if(size == 0){
+        size=1;
+    }
+    return (void*) malloc(size);
+}
+
+
 /*
  * malloc:
  *     Aloca memória para um programa em user mode. 
@@ -1131,6 +1139,14 @@ void *realloc ( void *start, size_t newsize )
 
 //fail.
    return NULL;
+}
+
+
+
+void gramado_free(void *ptr)
+{
+    if( (void*) ptr != NULL )
+        free(ptr);
 }
 
 

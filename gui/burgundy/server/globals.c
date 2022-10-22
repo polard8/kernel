@@ -12,6 +12,8 @@ char *screen_number;
 int current_mode=0;
 int gUseCallback=TRUE;
 
+int gUseMouse = FALSE;
+
 // #ordem
 // hardware, software
 unsigned long  ____BACKBUFFER_VA=0;

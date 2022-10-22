@@ -1,12 +1,8 @@
 
 // comp.c
 
-
 // window server routines.
 #include "gws.h"
-
-//global
-int comp_config_use_mouse = FALSE;
 
 extern struct gws_window_d *mouse_hover;
 
@@ -157,8 +153,9 @@ void compose(void)
 // remember: we're using 15 fps refresh,
 // we can change this in the kernel.
 
-    if(comp_config_use_mouse == TRUE)
+    if(gUseMouse == TRUE){
         __display_mouse_cursor();
+    }
 
 // Validate the frame.
     validate_background();
@@ -189,8 +186,8 @@ void comp_initialize_mouse(void)
     __mouse_initialized = TRUE; 
 
 // CONFIG:
-    //comp_config_use_mouse = TRUE;
-    comp_config_use_mouse = FALSE;
+    //gUseMouse = TRUE;
+    gUseMouse = FALSE;
 }
 
 // global

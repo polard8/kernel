@@ -1,9 +1,6 @@
 
-/*
- * File: rtl.c 
- * Created by Fred Nora.
- */
-
+// rtl.c 
+// Created by Fred Nora.
 
 #include <stdio.h>
 #include <types.h> 

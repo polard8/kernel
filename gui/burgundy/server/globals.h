@@ -8,6 +8,7 @@
 
 extern int gUseCallback;
 
+extern int gUseMouse;
 
 struct initialization_d
 {
