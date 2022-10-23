@@ -59,7 +59,6 @@ unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 int file_read_buffer ( file *f, char *buffer, int len )
 {
     char *p;
-
     int Count=0;
 
     p = buffer;
@@ -84,10 +83,19 @@ int file_read_buffer ( file *f, char *buffer, int len )
     }
 // Chech len
 // #bugbug: Isso é provisório
-    if ( Count > BUFSIZ ){
-        printf ("file_read_buffer: Count > BUFSIZ\n");
+// A quantidade que desejamos ler é menor que o tamanho do buffer.
+// Estamos lendo do início do arquivo?
+
+    if ( Count > f->_lbfsize ){
+        printf ("file_read_buffer: Count > f->_lbfsize\n");
         goto fail;
     }
+
+    //if ( Count > f->_fsize ){
+        //printf ("file_read_buffer: Count > f->_fsize\n");
+    //    Count = f->_fsize;
+    //    goto fail;
+    //}
 
     if ( f->used != TRUE || f->magic != 1234 )
     {
@@ -146,7 +154,6 @@ int file_read_buffer ( file *f, char *buffer, int len )
          f->____object == ObjectTypeTTY  ||
          f->____object == ObjectTypeIoBuffer)
     {
-
         // Se o buffer tem tamanho 0.
         if ( f->_lbfsize <= 0 ){
             printf ("file_read_buffer: _lbfsize is 0\n");
@@ -155,8 +162,14 @@ int file_read_buffer ( file *f, char *buffer, int len )
 
         // Se o tamanho do buffer for maior que o padrão.
         // #todo: O buffer pdoerá ser maior que isso no futuro.
-        if ( f->_lbfsize > BUFSIZ ){
-            printf ("file_read_buffer: _lbfsize\n");
+        //if ( f->_lbfsize > BUFSIZ ){
+        //    printf ("file_read_buffer: _lbfsize\n");
+        //    goto fail;
+        //}
+        
+        // #test: Limite provisorio
+        if (f->_lbfsize > (8*1024)){
+            printf ("file_read_buffer: _lbfsize bigger than 8KB\n");
             goto fail;
         }
 
@@ -204,11 +217,12 @@ int file_read_buffer ( file *f, char *buffer, int len )
             // But i can still read.
             //f->_flags = __SWR;
 
-            //return 0;
+            return 0;
         }
         
         // Se a quantidade que desejamos ler
         // é maior que o espaço que temos.
+        // # Isso ja foi feito logo acima.
         if( Count > f->_lbfsize )
         {
 
@@ -228,15 +242,17 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // que o que nos resta da buffer,
         // então vamos ler apenas o resto do buffer.
         
+        // #bugbug: Isso esta errado. #delete
+        
         // So podemos ler ate limite de bytes disponíveis 
         // no buffer.
-        if (Count > f->_cnt)
-        {
+        //if (Count > f->_cnt)
+        //{
             //printf ("file_read_buffer: local_len > f->_cnt\n");
             //goto fail;
 
-            Count = f->_cnt;
-        }
+            //Count = f->_cnt;
+        //}
  
         // 
         int delta = (f->_w - f->_r);
@@ -245,7 +261,8 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // pois o ponteiro de escrita e o de leitura sao iguais,
         if( delta == 0 )
         {
-            // 0 bytes lidos,
+            // 0 bytes lidos
+            //printf ("delta=0\n");
             return 0;
         }
  
@@ -1498,6 +1515,8 @@ sys_open (
     }
 
 // fd
+    // #debug
+    // refresh_screen();
     return (int) value;
 }
 
@@ -5355,9 +5374,12 @@ __OK:
 
     //__file->_tmpfname = NULL;
 
+    __file->_fsize = 0;
     __file->_lbfsize = BUFSIZ;
 
-    // inicializando apenas.
+// Inicializando apenas.
+// #bugbug: Isso é provisório. 
+// Caso contrário teremos problemas pra ler.
     __file->_r = 0;
     __file->_w = 0;
     __file->_cnt = BUFSIZ;  // anda temos bastante espaço. todo o buffer
@@ -5391,6 +5413,9 @@ __OK:
         printf ("sys_read_file_from_disk: __file->_base\n");
         goto fail;
     }
+    
+    //#test provisório
+    __file->_lbfsize = BUFSIZ;
 
 // #debug
     //printf ("FILE_AGAIN={%s}\n",file_name);
@@ -5411,6 +5436,14 @@ __OK:
     }
 
 
+//
+// #test
+// Structure field for file size.
+//
+
+    __file->_fsize = (int) FileSize;
+
+
 // Limits.
     //if ( FileSize < __file->_lbfsize )
     //{ 
@@ -5426,12 +5459,13 @@ __OK:
 
         // #debug
         printf("sys_read_file_from_disk: [todo] File size out of limits\n");
-        printf("Size {%d}\n",FileSize);
-        goto fail;
+        //printf("Size {%d}\n",FileSize);
+        //goto fail;
 
         // #bugbug: Provisório.
         // Limite - 1MB.
-        if (FileSize > 1024*1024)
+        //if (FileSize > 1024*1024)
+        if (FileSize > 8*1024)  //8KB
         {
             printf ("sys_read_file_from_disk: File size out of limits\n");
             printf ("%d bytes \n",FileSize);
@@ -5440,7 +5474,9 @@ __OK:
         }
         
         // Allocate new buffer.
-        __file->_base = (char *) kmalloc(FileSize);
+        // The buffer must to be bigger than the file size.
+        size_t buflen = FileSize+8;
+        __file->_base = (char *) kmalloc(buflen);
         
         if ( (void *) __file->_base == NULL ){
             printf ("sys_read_file_from_disk: Couldn't create a new buffer\n");
@@ -5449,7 +5485,7 @@ __OK:
         }
  
         // Temos um novo buffer size.
-        __file->_lbfsize = (int) FileSize;
+        __file->_lbfsize = (int) buflen;
     }
 
 // #paranoia.
@@ -5477,31 +5513,38 @@ __OK:
 // Offsets
 // Atualizando os offsets que foram apenas inicializados.
 
-    // vamos ler do começo do arquivo.
+// #importante
+// Não poderemos ler se r e w forem iguais.
+// vamos ler do começo do arquivo.
     __file->_r = 0;
 
-
+// #importante
 // O ponteiro de escrita mudou 
 // pois escrevemos um arquivo inteiro no buffer.
-
-    __file->_w = FileSize;
-
+    //__file->_w = FileSize;
+    __file->_w = __file->_fsize;
+    
 // #bugbug
 
-    if ( FileSize >= BUFSIZ )
+    //if ( FileSize >= BUFSIZ )
+    if (__file->_fsize >= __file->_lbfsize)
     {
         printf ("sys_read_file_from_disk: the file is larger than the buffer \n");
         refresh_screen();
-
+        
+        __file->_r = __file->_lbfsize;
+        __file->_w = __file->_lbfsize;
         __file->_cnt = 0;
     }
 
 // Agora temos menos espaço no buffer.
-    __file->_cnt = ( BUFSIZ - FileSize );
-
+    //__file->_cnt = ( BUFSIZ - FileSize );
+    __file->_cnt = ( __file->_lbfsize - __file->_fsize );
 
 // Load.
 // Load the file into the memory.
+ 
+    //printf("Load ....\n");
  
     Status = 
         (int) fsLoadFile ( 
@@ -5516,6 +5559,8 @@ __OK:
         printf ("sys_read_file_from_disk: fsLoadFile fail\n");
         goto fail;
     }
+
+    //printf("Loaded ....\n");
 
 // #bugbug
 // Agora é a hora de atualizarmos as tabelas ....
@@ -5558,6 +5603,26 @@ __OK:
           __file->_p = __file->_base;
     //}
 
+
+// Pointer.
+    __file->_p = __file->_base;
+
+// Offsets
+// Atualizando os offsets que foram apenas inicializados.
+
+// #importante
+// Não poderemos ler se r e w forem iguais.
+// vamos ler do começo do arquivo.
+    __file->_r = 0;
+
+// #importante
+// O ponteiro de escrita mudou 
+// pois escrevemos um arquivo inteiro no buffer.
+    //__file->_w = FileSize;
+    __file->_w = __file->_fsize;
+
+
+    __file->_cnt = ( __file->_lbfsize - __file->_fsize );
 
 // The file is opened in append mode. 
 // O offset fica no fim do arquivo.
@@ -5612,7 +5677,7 @@ __OK:
 // Pois essa rotina eh usada por open();
 
 done:
-    debug_print("sys_read_file_from_disk: done\n");
+    //debug_print("sys_read_file_from_disk: done\n");
     return (int) __file->_file;
 
 fail:

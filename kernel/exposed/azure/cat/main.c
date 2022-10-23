@@ -14,8 +14,10 @@
 int main ( int argc, char *argv[] )
 {
     FILE *fp;
-    char buffer[1024];
-    //char buffer[2048];
+    int bufsize = (4*1024);  //4KB
+    //char buffer[1024];
+    char buffer[bufsize];
+    
     int fd=-1;
 // Counters.
     register int nreads = 0;
@@ -78,18 +80,28 @@ int main ( int argc, char *argv[] )
         // Deveriamos pegar o tamanho do arquivo e ler somente o 
         // tamanho do arquivo e nao o buffer todo. ??
 
-        
-        // #fail: Not working
         // Read
         
         //printf("fd %d \n",fileno(fp) );
+
+        // Get file size.
+        //fseek (fp, 0, SEEK_END);
+        //int size = ftell (fp);
+        //fseek (fp, 0, SEEK_SET);
+        //printf (">> size %d \n",size);
         
-        lseek(fd,0,SEEK_SET);
+        //#todo: Create ltell()
+        
+        lseek(fd,0,SEEK_SET);  //do inicio
+        //lseek(fd,200,SEEK_SET);    // do meio
+        
+        //#todo
+        // Precisamos saber o tamanho do arquivo.
         
         //nreads = read( fileno(fp), buffer, sizeof(buffer) );
         //nreads = read( fileno(fp), buffer,  );  //#bugbug: Defined limitation
-        nreads = read( fd, buffer, 511 );  //512 is the limit in kernel?
-        //nreads = read( fd, buffer, 1024 );
+        nreads = read( fd, buffer, 511 );  
+        //nreads = read( fd, buffer, 1500 );
         if (nreads <= 0)
         {
             printf ("cat: read fail\n");

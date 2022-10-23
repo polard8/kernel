@@ -3868,11 +3868,16 @@ int wmSTDINInputReader(void)
 // pra cada tipo de sistema.
 // called by main.c
 
+
 int wmInputReader(void)
 {
     register int i=0;
 
     //unsigned long jiffies = rtl_jiffies();
+    //unsigned long ms = (unsigned long) jiffies/1000;
+    //float value = (float) ms * 0.0002f; 
+    //FlyingCubeMove(0,2,(float) 0.08f);
+    //FlyingCubeMove(0,2,(float) value);
 
 // vamos tentar 32 vezes,
 // pois nossa lista tem 32 ou 64 slots.
