@@ -1,7 +1,5 @@
-/*
- * File: termios.c 
- * 
- */
+
+// termios.c 
 
 #include <stddef.h>
 #include <types.h>
@@ -20,10 +18,8 @@ int tcgetwinsize(int fd, struct winsize *ws)
 }
 */
 
-
 // Get attributes.
 // #maybe: TIOCGETA? TTY_GETS?
-
 int tcgetattr(int fd, struct termios *termios_p)
 {
     int value=-1;

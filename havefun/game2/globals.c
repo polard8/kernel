@@ -16,6 +16,8 @@ int current_mode=0;
 int gUseLeftHand=TRUE;
 int gUseCallback=TRUE;
 
+unsigned long starting_tick=0;
+
 // #ordem
 // hardware, software
 unsigned long  ____BACKBUFFER_VA=0;

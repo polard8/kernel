@@ -953,7 +953,8 @@ exit0:
 // + Set property: Probably setting a property of an object.
 // + Disconnect:
 // ...
-
+// See:
+// globals.h
 // OUT
 // <0 : error 
 
@@ -971,12 +972,6 @@ gwsProcedure (
     // #debug
     //debug_print ("gwssrv: gwsProcedure\n");
     
-    //#debug
-    //return 0;
-
-    // See:
-    // globals.h
-
     switch (msg){
 
     // If we received the message GWS_Quit and
@@ -1113,7 +1108,6 @@ gwsProcedure (
 
     // ...
 
-
     // Disconnect.
     // shutdown.
     // Um cliente quer se desconectar.
@@ -1128,7 +1122,6 @@ gwsProcedure (
         //NoReply = FALSE;      // #todo
         break;
 
-
     // Refresh rectangle ... 
     // See: wm.c
     case GWS_RefreshRectangle:
@@ -1136,7 +1129,6 @@ gwsProcedure (
         serviceRefreshRectangle();
         NoReply = FALSE;
         break;
-
 
     // ?? #bugbug: The client only sends requests.
     // GWS_GetSendEvent
@@ -1152,7 +1144,7 @@ gwsProcedure (
         serviceNextEvent();
         NoReply = FALSE; // Yes. We need a reply.
         break;
-
+    
     // See: grprim.c
     case GWS_GrPlot0:  
         gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
@@ -1161,42 +1153,28 @@ gwsProcedure (
         break;
 
     //#deprecated
-    // See: grprim.c
     case GWS_GrCubeZ:  
-        //gwssrv_debug_print ("gwssrv: [2041] serviceGrCubeZ\n");
-        //serviceGrCubeZ();  
-        NoReply = FALSE;
-        break;
-
-    //#deprecated
-    // See: grprim.c
     case GWS_GrRectangle:  
-        //gwssrv_debug_print ("gwssrv: [2042] serviceGrRectangle\n");
-        //serviceGrRectangle();  
         NoReply = FALSE;
         break;
 
-    // #todo
-    // Segue serviços graficos 3d.
-    // ...
-
-    // #test
-    // async command: 
+    // 2222: Async command 
+    // Do not send a reply.
     case GWS_AsyncCommand:
-        gwssrv_debug_print ("gwssrv: [2222] calling serviceAsyncCommand\n");
-                  //printf ("gwssrv: [2222] calling serviceAsyncCommand\n");
+        gwssrv_debug_print ("gwssrv: GWS_AsyncCommand\n");
+                  //printf ("gwssrv: GWS_AsyncCommand\n");
         serviceAsyncCommand();
-        NoReply = TRUE;         // Do not send a reply.
+        NoReply = TRUE;
         break;
 
     case GWS_PutClientMessage:
-        gwssrv_debug_print ("gwssrv: [GWS_PutClientMessage]\n");
+        gwssrv_debug_print ("gwssrv: GWS_PutClientMessage\n");
         servicePutClientMessage();
         NoReply = TRUE;
         break;
 
     case GWS_GetClientMessage:
-        gwssrv_debug_print ("gwssrv: [GWS_GetClientMessage]\n");
+        gwssrv_debug_print ("gwssrv: GWS_GetClientMessage\n");
         serviceGetClientMessage();
         NoReply = FALSE;
         break;
@@ -1212,12 +1190,9 @@ gwsProcedure (
         NoReply = FALSE;   // YES, send the response with the data.
         break;
 
-
-// #test
+// Service 9099:
 // Clone and execute a process, given the image name.
-// 9099
     case GWS_CloneAndExecute:
-        printf("9099\n");
         serviceCloneAndExecute();
         NoReply = TRUE;
         return 0;
@@ -1240,7 +1215,6 @@ gwsProcedure (
 static void initBackground(void)
 {
     int WindowId = -1;
-
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
@@ -1318,8 +1292,7 @@ static void initBackground(void)
 // See: 
 // gws.c
 
-    if (current_mode == GRAMADO_JAIL)
-    {
+    if (current_mode == GRAMADO_JAIL){
         gwssrv_debug_print ("gwssrv: initBackground: Calling refresh_screen\n");
         //refresh_screen();
     }
@@ -1368,13 +1341,11 @@ static int initGraphics(void)
 
 // Create root window.
 // Create and update the taskbar window.
-
     initBackground();
 // IN: height
     //create_taskbar(100);
     create_taskbar(40);  
     wm_Update_TaskBar("Welcome!",TRUE);
-
 
 //#debug
     //gws_show_backbuffer();
@@ -1408,11 +1379,9 @@ static int initGraphics(void)
     //printf ("initGraphics: Calling grInit() \n");
     grInit();
 
-
 //#debug
     //gws_show_backbuffer();
     //while(1){}
-
 
     // #debug
     //gwssrv_debug_print ("initGraphics: :)\n");

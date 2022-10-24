@@ -20,28 +20,22 @@ struct cube_model_d
     float fThetaAngle;
     struct gr_vecF3D_d vecs[32];
     int colors[32];
-
     float hposition;  //horisontal position
     float vposition;  //vertical position
-    
     float model_initial_distance;
     float model_distance;
-    
     float a;  //acceletarion
     float v;  //velocity
     float t;  //time
 };
 
-
 // The terrain is a cube
 // The index 0.
 struct cube_model_d *terrain;
 
-
 //#define CUBE_MAX  4
 #define CUBE_MAX  8
 unsigned long cubes[CUBE_MAX];
-
 
 // local
 /*
@@ -76,39 +70,36 @@ struct gws_window_d *__create_demo_window (
     unsigned long width,
     unsigned long height );
 
-
 static void drawTerrain(struct cube_model_d *cube, float fElapsedTime);
 static void drawFlyingCube(struct cube_model_d *cube, float vel);
-
 void drawRectangle0(float modelz);
-
 //======================
 
 
 void drawRectangle0(float modelz)
 {
     struct gr_rectangleF3D_d r;
-    
+
     r.p[0].x = (float) -0.02f;  
     r.p[0].y = (float)  0.02f;  
     r.p[0].z = (float) modelz;  
     r.p[0].color = COLOR_WHITE;
-    
+
     r.p[1].x = (float)  0.02f;  
     r.p[1].y = (float)  0.02f;  
     r.p[1].z = (float) modelz;  
     r.p[1].color = COLOR_WHITE;
-    
+
     r.p[2].x = (float)  0.02f;  
     r.p[2].y = (float) -0.02f;  
     r.p[2].z = (float) modelz;  
     r.p[2].color = COLOR_WHITE;
-    
+
     r.p[3].x = (float) -0.02f;  
     r.p[3].y = (float) -0.02f;  
     r.p[3].z = (float) modelz;  
     r.p[3].color = COLOR_WHITE;
-    
+
     drawRectangleF( (struct gr_rectangleF3D_d *) &r );
 }
 
@@ -116,12 +107,10 @@ void drawRectangle0(float modelz)
 static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
 {
     char string0[16];
-
 // Matrices
     struct gr_mat4x4_d  matRotX;
     struct gr_mat4x4_d  matRotY;
     struct gr_mat4x4_d  matRotZ; 
-
 // Triangles
     struct gr_triangleF3D_d  tri;            // triângulo original.
     struct gr_triangleF3D_d  triRotatedX; 
@@ -130,15 +119,13 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
 
     int sequence[3*16];  //cube
     int cull=FALSE;
-
     register int i=0;  //loop
     int nTriangles=12;
-
     int j=0;
     int off=0;
     int v=0;
-// ---------
 
+// ---------
 // Initialize 4x4 matrices.
 // see: gprim.h
     for (i=0; i<4; i++){
@@ -149,13 +136,11 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
     };
 
 // ---------
-
     if( (void*) cube == NULL ){
         return;
     }
 
 // Building the transformation matrices.
-
     //cube->fThetaAngle = (float) (cube->fThetaAngle + fElapsedTime);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
@@ -420,12 +405,10 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
 static void drawFlyingCube(struct cube_model_d *cube, float vel)
 {
     char string0[16];
-
 // Matrices
     struct gr_mat4x4_d  matRotX;
     struct gr_mat4x4_d  matRotY;
     struct gr_mat4x4_d  matRotZ; 
-
 // Triangles
     struct gr_triangleF3D_d  tri;            // triângulo original.
     struct gr_triangleF3D_d  triRotatedX; 
@@ -434,10 +417,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 
     int sequence[3*16];  //cube
     int cull=FALSE;
-
     register int i=0;  //loop
     int nTriangles=12;
-
     int j=0;
     int off=0;
     int v=0;
@@ -745,14 +726,12 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     };
 }
 
-
 struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
     unsigned long width,
     unsigned long height )
 {
-
     struct gws_window_d *w;
 
     if( (void*) __root_window == NULL ){
@@ -773,11 +752,9 @@ struct gws_window_d *__create_demo_window (
                                     COLOR_BLACK, 
                                     COLOR_BLACK );
 
-
     if ( (void *) w == NULL ){
         return NULL;
     }
-
     if ( w->used != TRUE ||  w->magic != 1234 )
     {
         return NULL;
@@ -786,11 +763,9 @@ struct gws_window_d *__create_demo_window (
 // Register the window.
     int WindowId= -1;
     WindowId = (int) RegisterWindow(w);
-    if (WindowId<0)
-    {
+    if (WindowId<0){
          return NULL;
     }
-
 // ok
     return (struct gws_window_d *)  w;
 }
@@ -807,7 +782,6 @@ static void __draw_model1(int step, int target_axis)
        if(__demo_window->magic==1234)
         ow = __demo_window;
     }
-
 
     //int gd = DETECT; 
     int gd = 0;
@@ -1878,7 +1852,6 @@ void FlyingCubeMove(int number, int direction, float value)
         return;
     if(number>=CUBE_MAX)
         return;
-
     cube = (struct cube_model_d *) cubes[number];
     if( (void*) cube == NULL )
         return;
@@ -1918,14 +1891,10 @@ void FlyingCubeMove(int number, int direction, float value)
 // called by the engine
 void demoFlyingCubeSetup(void)
 {
-
 // first cube
     struct cube_model_d *cube;
-
-//----------------
 // Cube1
     register int i=0;
-
 
 /*
     for (i=0; i<8; i++){
@@ -1938,7 +1907,6 @@ void demoFlyingCubeSetup(void)
     for (i=0; i<CUBE_MAX; i++){
         cubes[i] = (unsigned long) 0;
     };
-
 
     int count=0;
     int rand1=0;
@@ -2045,8 +2013,6 @@ void demoFlyingCubeSetup(void)
         terrain->a = (float) 1.0f;
         terrain->v = (float) 0.0001f;
         terrain->t = (float) 0.0001f;  //0.01f;
-
-
     }
 
 //----------------
@@ -2064,12 +2030,10 @@ void demoFlyingCube(void)
     //float time = 0.04f;
     //float time = 0.08f;
     //float vel = 0.08f;
-
     frames++;
 
     //demoClearWA(COLOR_BLACK);                //clear surface
     gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
-
     drawTerrain(terrain,0.0f);
 
 // Draw all the cubes.

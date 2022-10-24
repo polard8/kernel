@@ -3868,17 +3868,24 @@ int wmSTDINInputReader(void)
 // pra cada tipo de sistema.
 // called by main.c
 
-
 int wmInputReader(void)
 {
     register int i=0;
 
-    //unsigned long jiffies = rtl_jiffies();
-    //unsigned long ms = (unsigned long) jiffies/1000;
-    //float value = (float) ms * 0.0002f; 
+    // Ticks since boottime.
+    //unsigned long now = rtl_jiffies();
+    //unsigned long d = now - starting_tick;      //tempo percorrido em ms.
+    //unsigned long sec = (unsigned long) d/1000; //tempo percorrido em sec.
+    //float value = (float) sec * 0.0002f; 
     //FlyingCubeMove(0,2,(float) 0.08f);
     //FlyingCubeMove(0,2,(float) value);
-
+    //char secbuf[32];
+    //itoa(secbuf,(int)sec);
+    //srand(now);
+    //unsigned long r = (unsigned long) (rand() % 320);
+    //float value = (float) r * 0.0002f;
+    //FlyingCubeMove(1,2,(float) value);
+    
 // vamos tentar 32 vezes,
 // pois nossa lista tem 32 ou 64 slots.
 // Se encontrarmos um evento, entao pegamos ele.

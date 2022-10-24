@@ -92,18 +92,19 @@ int main ( int argc, char *argv[] )
         
         //#todo: Create ltell()
         
-        lseek(fd,0,SEEK_SET);  //do inicio
-        //lseek(fd,200,SEEK_SET);    // do meio
+        lseek(fd,0,SEEK_SET);     // do inicio #ok
+        //lseek(fd,80*4,SEEK_SET);  // do meio #ok
+        //lseek(fd,0,SEEK_CUR);     // de onde estavamos. #testing
+        //lseek(fd,0,SEEK_END);       // do fim.
         
-        //#todo
+        // #todo
         // Precisamos saber o tamanho do arquivo.
         
         //nreads = read( fileno(fp), buffer, sizeof(buffer) );
         //nreads = read( fileno(fp), buffer,  );  //#bugbug: Defined limitation
         nreads = read( fd, buffer, 511 );  
         //nreads = read( fd, buffer, 1500 );
-        if (nreads <= 0)
-        {
+        if (nreads <= 0){
             printf ("cat: read fail\n");
             //exit (-1);
         }

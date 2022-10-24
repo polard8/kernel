@@ -3898,7 +3898,9 @@ int main(int argc, char **argv)
 
     //gUseCallback = TRUE;
     gUseCallback = FALSE;
-   
+
+// Stating time.
+    starting_tick = (unsigned long) rtl_jiffies();
 
 //0 = Time to quit.
 

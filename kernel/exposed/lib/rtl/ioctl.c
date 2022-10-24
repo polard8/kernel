@@ -1,5 +1,7 @@
 
 // ioctl.c
+// ioctl:
+// See: http://man7.org/linux/man-pages/man2/ioctl.2.html
 
 #include <errno.h>
 #include <sys/ioctl.h>
@@ -7,9 +9,6 @@
 #include <stdio.h>
 #include <rtl/gramado.h>
 
-
-// ioctl:
-// See: http://man7.org/linux/man-pages/man2/ioctl.2.html
 /*
   The ioctl() system call manipulates the 
   underlying device parameters of special files.  
@@ -39,19 +38,15 @@ int ioctl(int fd, unsigned long request, ...)
     va_list ap;
     va_start(ap,request);
     unsigned arg = va_arg(ap, unsigned long);
-
 // Syscall 8000.
-
     value = 
         (int) sc82( 
                   8000,
                   (unsigned long) fd,
                   (unsigned long) request,
                   (unsigned long) arg );
-
     va_end (ap);
 //--
-
     if (value < 0){
         errno = (-value);
         return (int) (-1);

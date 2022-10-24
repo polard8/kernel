@@ -433,29 +433,24 @@ int __fflush(FILE *stream)
         return (int) fflush_all();
     }
 
-
     // #todo
     // Not buffered. 
-	// if (stream->_flags & _IONBF)
-		//return (0);
+    // if (stream->_flags & _IONBF)
+        //return (0);
 
     // #todo
     // Not writable. 
-	//if (!(stream->flags & _IOWRITE))
-		//return (0);
-
+    //if (!(stream->flags & _IOWRITE))
+        //return (0);
 
     //if ( !stream->_w )
         //return 0;
 
-
 // Have an invalid ring3 buffer.
-    if ( (void *) stream->_base == NULL )
-    {
-        debug_print( "__fflush: [ERROR] Invalid ring3 buffer\n");
+    if ( (void *) stream->_base == NULL ){
+        debug_print( "__fflush: _base\n");
         return (int) (-1);
     } 
-
 
 // The 'write offset' is the number of bytes to write.
 // So, it can't be '0' or negative.
@@ -463,37 +458,28 @@ int __fflush(FILE *stream)
 // Return '0' if there is nothing to flush.
 
     //Count = stream->_ptr - stream->_base;
-
     Count = (size_t) stream->_w;
 
-    if ( Count <= 0 )
-    { 
+    if (Count <= 0){
         stream->_p = stream->_base;
         stream->_w = 0;  // ajust.
         //stream->_r = 0;  // ajust.
-
         // #debug
         debug_print ( "__fflush: [FAIL] _w\n");
-        
         return 0; // OK.
         //return (int) (-1);
     } 
 
-
-//
-// == Write =============
-//
-
+// Write
 // #todo: 
 // This is the desired way.
 // Nesse teste escreveremos em stdout. Seu descritor indicará
-// que é um dispositivo do tipo console. O kernel escreverá no 
-// console 0.  
+// que é um dispositivo do tipo console. 
+// O kernel escreverá no console 0.  
 
     if ( Count > BUFSIZ ){
         Count=BUFSIZ;
     }
-
 
 //
 // Write
@@ -505,31 +491,24 @@ int __fflush(FILE *stream)
 //    nwrite = __write ( fileno(stream), stream->_base, Count );
 //#endif
 
-    if (nwrite <= 0)
-    {
+    if (nwrite <= 0){
         printf ("__fflush: [FAIL] nwrite\n");
-
         // Ajust to the next flush.
         stream->_p = stream->_base;
         stream->_w = 0;
-         
         // #todo
         // stream->_flags |= _IOERROR; 
         // stream->error = errno;
-
         return EOF;
     }
 
-    // #todo
-    // Something is wrong
-    if ( nwrite != Count )
-    {
+// #todo
+// Something is wrong
+    if (nwrite != Count){
         debug_print("__fflush: [DEBUG] nwrite != Count\n");
-
         // #todo
         // stream->_flags |= _IOERROR; 
         // stream->error = errno;
-        
         // #todo
         //return -1;
     }
@@ -555,12 +534,9 @@ int __fflush(FILE *stream)
 // colocar no buffer em ring3 para o __getc pegar um byte.
 // OUT: nreads. (quantos bytes foram lidos.)
 
-int ____bfill (FILE *stream)
+int ____bfill(FILE *stream)
 {
-    int n_read = 0;
-
-
-// Pointer validation
+    int n_read=0;
 
     if ( (void *) stream == NULL )
     {
@@ -568,25 +544,19 @@ int ____bfill (FILE *stream)
         printf      ("____bfill: [FAIL] struct \n");
         return (int) (-1);
     }
-
 // Check buffer size
-
     if ( stream->_lbfsize != BUFSIZ )
     {
         debug_print ("____bfill: [FAIL.DEBUG] _lbfsize \n");
         printf      ("____bfill: [FAIL.DEBUG] _lbfsize %d *hang\n",
             stream->_lbfsize);
-
         stream->_cnt = 0; 
-        
         // #debug
         // provisorio
-        exit(1); 
-        
+        exit(1);
         //return EOF;
     }
-    // ...
-
+// ...
 
 //
 // == Read file ============================
@@ -620,16 +590,12 @@ int ____bfill (FILE *stream)
 // #importante
 // Se o buffer acabou é porque o ponteiro se deslocou até o fim.
 // Temos que reiniciar.
-
     stream->_cnt = (BUFSIZ-1);
     stream->_p = stream->_base;
     stream->_w = 0;
     stream->_r = 0;
 
-//
 // Read
-//
-
 // cnt tem a quantidade disponível para leitura.
 // Read vai ler, la no kernel, a partir da última posição.
 // A intenção dessa rotina é reencher o buffer em ring3,
@@ -643,24 +609,22 @@ int ____bfill (FILE *stream)
     //                   stream->_cnt );
     //}
     
-    n_read = (int) read ( 
-                       fileno(stream), 
-                       stream->_p,
-                       BUFSIZ );
-
-    if ( n_read < 0  ){
+    n_read = 
+        (int) read ( 
+                  fileno(stream), 
+                  stream->_p,
+                  BUFSIZ );
+    if (n_read < 0 ){
         stream->_fsize = 0;
         stream->_cnt = (BUFSIZ);
         return EOF;
     }
-    
-    if ( n_read == 0 ){
+    if (n_read == 0){
         stream->_fsize = 0;
         stream->_cnt = (BUFSIZ);
         return EOF;
     }
-
-    // enchemos o buffer
+// Now, the buffer is full.
     if ( n_read >= (BUFSIZ-1) )
     {
         stream->_fsize = BUFSIZ;
@@ -671,25 +635,21 @@ int ____bfill (FILE *stream)
         return BUFSIZ;
     }
 
-
 // Update
 // Number of available characters in buffer.
 // >>> O buffer deve ser do tamanho da quantidade
 // de bytes lidos la no kernel
 // se a quantidade estiver dentro dos limites padrões.
-
     stream->_fsize = n_read;
     stream->_cnt = (stream->_lbfsize - n_read);
     stream->_p = stream->_base;
     stream->_w = 0;
     stream->_r = 0;
-
-//done:
+// done:
 // Retornamos a quantidade disponível para leitura.
 // Isso será usado por __getc.
     return (int) n_read;
 }
-
 
 /*
  * __getc:
@@ -708,35 +668,30 @@ int ____bfill (FILE *stream)
 // Isso vale para arquivos craidos com fopen cujo buffer
 // ja começa vazio.
 
-int __getc ( FILE *stream )
+int __getc(FILE *stream)
 {
-    int ch = 0;
-    int nreads = 0;
+    int ch=0;
+    int nreads=0;
 
-// What?
 // Vamos ler do buffer da stream, em ring3.
-
-    if ( (void *) stream == NULL )
-    {
-        debug_print ("__getc: [FAIL] stream \n");
-        printf      ("__getc: [FAIL] stream \n");
+    if ( (void *) stream == NULL ){
+        debug_print ("__getc: stream\n");
+        printf      ("__getc: stream\n");
         return EOF;
     }
 
-    // File is not readable.
+// File is not readable.
     // if (!(stream->flags & _IOREAD))
         //return (EOF);
 
-
-    // have ungotten ?
-    // Pegamos o ungotten.
-    // não mexemos nos contadores.
+// have ungotten ?
+// Pegamos o ungotten.
+// Não mexemos nos contadores.
     if ( stream->have_ungotten == TRUE )
     {
         ch = (int) stream->ungotten;
         stream->have_ungotten = FALSE;
         return (int) ch;
-    
     // Do NOT have forgotten!
     // Pega o char no posicionamento absoluto do arquivo.
     // Ajust file.
@@ -746,28 +701,22 @@ int __getc ( FILE *stream )
 // Se o ponteiro de leitura for inválido.
 // Não podemos acessar um ponteiro nulo ... 
 // no caso endereço.
-
-    if ( (void*) stream->_p == NULL )
-    {
-        debug_print ("__getc: [BUGBUG] invalid stream->_p\n");
-        printf      ("__getc: [BUGBUG] invalid stream->_p\n");
+    if ( (void*) stream->_p == NULL ){
+        debug_print ("__getc: Invalid _p\n");
+        printf      ("__getc: Invalid _p\n");
         return EOF;
     }
 
 // Se a quantidade de bytes restantes no buffer for
-// maior que zero e menor que
-
+// maior que zero e menor que...
     if ( stream->_cnt > 0 && 
          stream->_cnt <= BUFSIZ && 
          stream->_r < stream->_fsize )
     {
-
         ch = (int) *stream->_p;
-
         stream->_p++;
         stream->_r++;
         stream->_cnt--;
-
         return (int) ch;
     }
 
@@ -784,21 +733,17 @@ int __getc ( FILE *stream )
 
     if ( stream->_cnt <= 0 || stream->_r >= stream->_fsize )
     {
-        //debug_print("__getc: [DEBUG] ring3 buffer is empty\n");
-
+        // debug_print("__getc: [DEBUG] ring3 buffer is empty\n");
         // Coloque bytes no buffer dessa stream.
         nreads = (int) ____bfill(stream);
-
         // Falhou. Não conseguimos ler.
-        if (nreads <= 0)
-        {
-            // nada no buffer local.
+        // Nada no buffer local.
+        if (nreads <= 0){
             stream->_fsize = 0;
             stream->_cnt = BUFSIZ; //temos todo o espaço disponível.
             stream->_p = stream->_base;
-            stream->_w = 0;  
-            stream->_r = 0;
-            
+            stream->_w=0;  
+            stream->_r=0;
             return EOF;
         }
 
@@ -807,61 +752,39 @@ int __getc ( FILE *stream )
         // #importante: Eles foram colocados no offset e não na base.
         // Atualiza.
         // Retorna o buffer que pegamos do buffer em ring3.
-        
-        if (nreads > BUFSIZ)
+        if (nreads > BUFSIZ){
             nreads = BUFSIZ;
-        
+        }
         // Se nosso buffer tem alguma coisa.
-        if( nreads > 0 )
-        {
-            // Os elementos da estrutura foram configurados por ____bfill.
-            
-            // O ponteiro está na base. Vamos ler o primeiro byte.
+        // Os elementos da estrutura foram configurados por ____bfill.
+        // O ponteiro está na base. Vamos ler o primeiro byte.
+        // Incrementamos o ponteiro.
+        // Incrementamos o offset de leitura.
+        if(nreads > 0){
             ch = (int) *stream->_p;
-
-            stream->_p++;    // incrementamos o ponteiro
-            stream->_r++;    // incrementamos o offset de leitura.
+            stream->_p++;
+            stream->_r++;
             stream->_cnt--;
-
             return (int) (ch & 0xFF);
         }
-
         // Algo deu errado.
         // Vamos para o fim do buffer
         // para que ele seja cheio novamente.
-        
+        // O escritor e o leitor estão no fim do arquivo.
         stream->_cnt = 0;
-        stream->_w = BUFSIZ;  // o escritor eta no fim do arquivo.
-        stream->_r = BUFSIZ;  // o leitor eta no fim do arquivo.
-
+        stream->_w = BUFSIZ;
+        stream->_r = BUFSIZ;
         return EOF;
     }
 
-
-//
-// == Read ring3 buffer ====================
-//
-
-
-// Ok. 
-// Vamos ler o buffer, porque ele não está vazio.
-
-
-// #bugbug
-// FAIL!
-
-    debug_print ("__getc: [BUGBUG] Unexpected return\n");
-    printf      ("__getc: [BUGBUG] Unexpected return\n");
-
+// Fail
+    debug_print ("__getc: Unexpected return\n");
+    printf      ("__getc: Unexpected return\n");
     return EOF;
 }
 
 
-/*
- * __putc:
- * 
- */
-
+// __putc:
 int __putc (int ch, FILE *stream)
 {
 
@@ -871,20 +794,17 @@ int __putc (int ch, FILE *stream)
     //assert (stream);
     //assert (stream->_w < stream->_lbfsize);
     
-    if ( (void *) stream == NULL )
-    {
-       debug_print("__putc: [FAIL] stream \n");
-       printf     ("__putc: [FAIL] stream \n");
+    if ( (void *) stream == NULL ){
+       debug_print("__putc: stream\n");
+       printf     ("__putc: stream\n");
        return -1;
     } 
 
     //#bugbug
     // O buffer precisa já estar inicializado.
     
-// Se nosso ponteiro de escrita é maior que
-// o tamanho do buffer.
+// Se nosso ponteiro de escrita é maior que o tamanho do buffer.
 // Não podemos escrever além do buffer.
-//
 
     //if (stream->_w > stream->_lbfsize)
     if (stream->_w >= BUFSIZ)
@@ -897,7 +817,6 @@ int __putc (int ch, FILE *stream)
 
 // Coloca no buffer.
 // Incrementa o offset de escrita.
-
     stream->_base[stream->_w] = ch;
     stream->_w++;
 
@@ -917,13 +836,10 @@ int __putc (int ch, FILE *stream)
 
 // Se o char que colocamos no buffer é um '\n'.
 // Então vamos enviar o buffer para o kernel
-
-    if ( ch == '\n' )
-    { 
+    if (ch == '\n'){ 
         fflush(stream);
         return (int) ch;
     }
-
 
     //if (stream->eof || stream->error)
         //return EOF;
@@ -931,10 +847,9 @@ int __putc (int ch, FILE *stream)
     return (int) ch;
 }
 
-
-// don't change it
+// Don't change it.
 int getc(FILE *stream){
-    return (int) __getc (stream);
+    return (int) __getc(stream);
 }
 
 // don't change it
@@ -3464,67 +3379,51 @@ long ftell(FILE *stream)
 }
 
 
-/*
- * fileno: 
- *     Gets the file id.
- *     The kernel gets this value from the stream struct.
- */
 
+// fileno: 
+// Gets the file id.
+// The kernel gets this value from the stream struct.
 int fileno(FILE *stream)
 {
-
-    //assert(stream);
- 
     if ( (void *) stream == NULL ){
        return EOF; 
-    }
-  
+    } 
     return (int) stream->_file;
 }
 
-
-/*linux klibc style.*/
+// linux klibc style.
 // Isso vai ler no arquivo que está em ring0.
-int linux_fgetc (FILE *f){
-
-    unsigned char ch=0;
-
-  
+int linux_fgetc(FILE *f)
+{
+    int ch=0;
     if ( (void *) f == NULL ){
        return EOF;
     }
-
     return ( fread (&ch, 1, 1, f) == 1) ? (int) ch : EOF;
 }
 
-
-
-/*uClib style*/
-char *fgets2 (char *s, int count, FILE *fp){
-
+// uClib-style
+char *fgets2(char *s, int count, FILE *fp)
+{
     char *p;
     int ch=0;
-
-
     p = s;
 
     if ( (void *) fp == NULL ){
        return (char *) 0;
     }
-
-
-    // Guard against count arg == INT_MIN. 
+// Guard against count arg == INT_MIN. 
     while (count-- > 1) 
     {
         ch = getc (fp);
-
-        if (ch == EOF){ break; }
-
+        if (ch == EOF){
+            break;
+        }
         *p++ = ch;
-
-        if (ch == '\n') { break; }
+        if (ch == '\n'){
+            break;
+        }
     };
-
 
     if ( ferror(fp) || (s == p) ) 
     {
@@ -3536,16 +3435,9 @@ char *fgets2 (char *s, int count, FILE *fp){
     return (char *) s;
 }
 
-
-
-/*
- ********************************
- * fputs2: 
- */
-
+// fputs2: 
 int fputs2 ( const char *str, FILE *stream )
 {
-
     if ( (void *) stream == NULL ){ return EOF; }
 
     // ugly.
@@ -3559,38 +3451,23 @@ int fputs2 ( const char *str, FILE *stream )
     return 1;
 }
 
-
-
-
-/*
- *********************************
- * gets:
- *     gets() devolve um ponteiro para string
- */
-
+// gets2:
+// gets2() devolve um ponteiro para string.
 // #todo
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
-
-char *gets2 (char *s){
-
+char *gets2(char *s)
+{
     char *p;
     int ch=0;
-    int t = 0;
-
-
-	//printf("gets:\n");
-
-    //salva
+    int t=0;
     p = s; 
+    //printf("gets:\n");
 
-    while (1)
-    {
+    while (1){
         ch = (int) getchar();
-
         if ( ch != -1 )
         {
-
             switch (ch) 
             {
                 /* termina a string */
@@ -3628,39 +3505,27 @@ done:
     return (char *) p;
 }
 
-
-/*
- ***********************
- * puts:
- */
-
+// puts2:
 // #bugbug
 // isso deve escrever no arquivo, assim como
 // tudo em libc.
-
-// ??
-
-int puts2 ( const char *str )
+int puts2(const char *str)
 {
-    return (int) printf ("%s",str);
+    if( (void*) str == NULL ){
+        return -1;
+    }
+    return (int) printf("%s",str);
 }
 
-
-
-
-/*
- *************************************
- * getchar2:
- *       O kernel pega no stdin que é a fila do teclado.
- *       Isso funciona.
- */
-
-int getchar2 (void){
-
+// getchar2:
+// O kernel pega no stdin que é a fila do teclado.
+// Isso funciona.
+int getchar2(void)
+{
     int Ret=0;
 
-	// #todo: 
-	// ? Já temos uma função para essa chamada ? 137.
+// #todo: 
+// ? Já temos uma função para essa chamada ? 137.
 
 Loop:
     Ret = (int) gramado_system_call ( 137, 0, 0, 0 ); 
@@ -3739,7 +3604,6 @@ int feof2(FILE *fp)
 {
     if ( (void *) fp == NULL )
        return EOF;
-
     return fp->mode & __MODE_EOF;
 }
 */
@@ -3747,14 +3611,11 @@ int feof2(FILE *fp)
 
 int feof(FILE *stream)
 {
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         return EOF;
     }
-
     return (int) stream->eof;
 }
-
 
 /*
  //This function clears the end-of-file and error indicators for the stream stream. 
@@ -3771,11 +3632,9 @@ void clearerr(FILE *fp)
 
 int ferror(FILE *stream)
 {
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
        return EOF;
     }
-
     return (int) stream->error;
 }
 
@@ -3792,91 +3651,55 @@ static __inline__ int fseek(FILE *__f, off_t __o, int __w)
   return (lseek(fileno(__f), __o, __w) == (off_t)-1) ? -1 : 0;
 }
 */
-	
-	
-/*
- **************************************
- * fseek:
- *     offset argument is the position that you want to seek to,
- *     and whence is what that offset is relative to.
- */
 
-// The fseek function is used to change the file position of the stream stream. 
 
-int fseek ( FILE *stream, long offset, int whence )
+// fseek:
+// The 'offset' argument is the position that you want to seek to,
+// and 'whence' is what that offset is relative to.
+// The fseek function is used to change 
+// the file position of the stream stream. 
+int fseek( FILE *stream, long offset, int whence )
 {
     off_t off=0;
-
-
-    //debug_print ("fseek: TODO. Not implemented yet\n");
-    //return -1;
     
-	/*
-    assert(stream);
-    fflush(stream);
-    off_t off = lseek(stream->fd, offset, whence);
-    if (off < 0)
-        return off;
-    stream->eof = false;
-    stream->error = 0;
-    stream->have_ungotten = false;
-    stream->ungotten = 0;
-    return 0;
-    */
-    
-    if ( (void*) stream == NULL )
-    {
-        debug_print ("fseek: stream \n");
+    if ( (void*) stream == NULL ){
+        printf ("fseek: stream\n");
         return -1;
-    }
- 
-
-    // lseek
-    
-    off = lseek ( fileno(stream), offset, whence );
-    
-    if (off < 0)
-    {
-        debug_print ("fseek: lseek fail \n");
+    }   
+    off = lseek( fileno(stream), offset, whence );
+    if (off<0){
+        printf ("fseek: lseek fail\n");
         return off;
     }
 
-    // local
+// #todo
+// local
     
     // Not the end.
     // stream->_flags &= ~_IOEOF;
     // stream->eof = FALSE;
-        
     // We do not know what is the next operation.
     // if (stream->_flags & _IORW)
     //     stream->_flags &= ~(_IOWRT|_IOREAD);
-
     // stream->error = 0;
 
     stream->have_ungotten = FALSE;
     stream->ungotten = 0;
-
     return off;
 }
 
-
-
-
-/*linux klibc style*/
+// linux klibc style
 // Isso vai escrever no arquivo que está em ring0.
-int linux_fputc (int c, FILE *f){
+int linux_fputc(int c, FILE *f)
+{
+    int ch = c;
 
-    unsigned char ch = c;
-
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
        return EOF;
     }
 
-    return fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
+    return fwrite(&ch, 1, 1, f) == 1 ? (int) ch : EOF;
 }
-
-
 
 /*
  * #todo: Implementar isso.
@@ -3907,55 +3730,43 @@ ssize_t getline (char **lineptr, size_t *n, FILE *stream)
 */
 
 
-
 // interna
 // #todo: criar essa rotina na libc.
 void debug_print (char *string)
 {
-    gramado_system_call ( 289, 
+    if( (void*) string == NULL ){
+        return;
+    }
+    gramado_system_call ( 
+        289, 
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
 }
 
-
-
-/*
- ********************************
- * stdioSetCursor:
- *     estamos falando do posicionamento do cursor dentro da janela
- *     e não dentro do terminal.
- */
-
-//34 - set cursor.
-
+// stdioSetCursor:
+// Estamos falando do posicionamento do cursor dentro da janela
+// e não dentro do terminal.
+// 34 - set cursor.
 void stdioSetCursor ( unsigned long x, unsigned long y )
 {
     gramado_system_call ( 34, x, y, 0 );
 }
 
-
-/*
- * stdioGetCursorX:
- *     Get cursor x. 
- *     estamos falando do posicionamento do cursor dentro da janela
- *     e não dentro do terminal.
- */ 
-
+// stdioGetCursorX:
+// Get cursor x. 
+// estamos falando do posicionamento do cursor dentro da janela
+// e não dentro do terminal.
 unsigned long stdioGetCursorX (void)
 {
     return (unsigned long) gramado_system_call ( 240, 0, 0, 0 );
 }
 
-
-/*
- * stdioGetCursorY:
- *     Get cursor y.
- *     estamos falando do posicionamento do cursor dentro da janela
- *     e não dentro do terminal. 
- */
-
-unsigned long stdioGetCursorY (void)
+// stdioGetCursorY:
+// Get cursor y.
+// estamos falando do posicionamento do cursor dentro da janela
+// e não dentro do terminal. 
+unsigned long stdioGetCursorY(void)
 {
     return (unsigned long) gramado_system_call ( 241, 0, 0, 0 );
 }
@@ -3965,35 +3776,25 @@ unsigned long stdioGetCursorY (void)
 // scanf support (start)
 //======================================================================
 
-
-int scanf ( const char *fmt, ... ){
-
+int scanf ( const char *fmt, ... )
+{
     va_list ap;
     va_start (ap, fmt);
 
     int d;
     char *s;
-
 	//%c
     int ch=0;
-
 	//usado em %d
     int *i;
     char tmp[80];
-
-
 	//o char.
     int c=0;
-
     char *cp;
-
     char *t;
-
     int nread=0;
+
     int size = (int) stdio_strlen (fmt);
-
-    nread = 0;
-
 
     while (*fmt){
 
@@ -4088,7 +3889,6 @@ int scanf ( const char *fmt, ... ){
         };//switch
     };
 
-
    //va_end (ap);
    
    return 0;
@@ -4113,15 +3913,13 @@ int scanf ( const char *fmt, ... ){
 
 int sscanf ( const char *str, const char *format, ... )
 {
+    const char *start = str;
+
     va_list args;
     va_start(args, format);
 
-    const char *start = str;
-
-
     for ( ; *format != '\0'; format++ )
     {
-
         if ( *format == '%' && format[1] == 'd' ){
 
             // #bugbug
@@ -4235,18 +4033,16 @@ char const hex2ascii_data[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 static size_t stdio_strlen (const char *s)
 {
-    size_t l = 0;
-
-    while (*s++){  l++;  }
-
-    return l;
+    register size_t len=0;
+    while (*s++){
+        len++;
+    };
+    return (size_t) len;
 }
 
-
-/* Max number conversion buffer length: 
- a u_quad_t in base 2, plus NUL byte. */
+// Max number conversion buffer length: 
+// a u_quad_t in base 2, plus NUL byte.
 #define MAXNBUF  (sizeof(intmax_t) * NBBY + 1)
-
 
 /*
  * ksprintn:
@@ -4264,12 +4060,8 @@ static char *ksprintn (
     int *lenp, 
     int upper )
 {
-
     char *p, c;
-
-
     p = nbuf;
-
 	//*p = ' ';
 	*p = 0;
 
@@ -4294,34 +4086,25 @@ static char *ksprintn (
  *******************************************************
  * kvprintf:
  *     Scaled down version of printf(3).
- *
  * Two additional formats:
  *     The format %b is supported to decode error registers.
  *     Its usage is:
- *
  *	printf("reg=%bn", regval, "*");
- *
  * where  is the output base expressed as a control character, e.g.
  * 10 gives octal; 20 gives hex.  Each arg is a sequence of characters,
  * the first of which gives the bit number to be inspected (origin 1), and
  * the next characters (up to a control character, i.e. a character <= 32),
  * give the name of the register.  Thus:
- *
  *	kvprintf("reg=%bn", 3, "102BITTWO1BITONEn");
- *
  * would produce output:
- *
  *	reg=3
- *
  * XXX:  %D  -- Hexdump, takes pointer and separator string:
  *		("%6D", ptr, ":")   -> XX:XX:XX:XX:XX:XX
  *		("%*D", len, ptr, " " -> XX XX XX XX ...
  */
-
 // #bugbug
 // Passing a function via argument is not a good thing for 
 // our compiler.
-
 int 
 kvprintf ( 
     char const *fmt, 
@@ -4333,7 +4116,6 @@ kvprintf (
     
     //#define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
     #define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
-
 
 	char nbuf[MAXNBUF];
 	char *d;
@@ -4748,15 +4530,12 @@ kvprintf (
 #undef PCHAR
 }
 
-
-static void xxxputchar ( int c, void *arg )
+static void xxxputchar( int c, void *arg )
 {
-	/* add your putchar here */
-	
-	//printf("%c",c);
+    /* add your putchar here */
+    //printf("%c",c);
     putchar( (int) c );
 }
-
 
 /*
  *===========================================
@@ -5001,24 +4780,20 @@ int stderr_printf (const char *format, ... )
 // the last error encountered during a call to a system or library
 // function.
 // See: http://man7.org/linux/man-pages/man3/perror.3.html
+// #todo
+// Maybe we need to use stderr output.
 
-void perror (const char *str)
+void perror(const char *str)
 {
-	// #todo
-	// Maybe we need to use stderr output;
-
-    // Vamos imprimir a string se ela for válida.
-    if ( (void *) str != NULL )
-    {
+// Vamos imprimir a string se ela for válida.
+    if ( (void *) str != NULL ){
         printf ("Error: %s, ",str);
     }
-
-    //#bugbug
-    //There is a list of strings for errors.
-    printf ("The last error number is {%d} [TODO].\n",errno);
+//#bugbug
+//There is a list of strings for errors.
+    printf ("The last error number is {%d} [TODO].\n", errno );
     //printf ("The last is: {%s}.\n",errno_list[errno]);
 }
-
 
 // Reiniciamos a estrutura na biblioteca e
 // chamamos lseek para o kernel modar o ponteiro
@@ -5141,34 +4916,26 @@ static void sized_buffer_putch(char*& bufptr, char ch)
 */
 
 
-
-
 /*
  * snprintf:
- * 
  *     #todo
  */
-
 int snprintf ( char *str, size_t count, const char *fmt, ... )
 {
-    va_list ap;
-    va_start (ap, fmt);
-
     size_t ret=0;
 
-
+    va_list ap;
+    va_start (ap, fmt);
     debug_print ("snprintf: [TODO]\n");
-
-    if ( count <= 0 )
+    if (count <= 0){
         return EOF;
-
+    }
 
 	//#todo 
 	//Isso parece fácil
 	//ret = vsnprintf(str, count, fmt, ap);
 
-
-    va_end (ap);
+    va_end(ap);
     
     return ret;
 }
@@ -5178,16 +4945,14 @@ int snprintf ( char *str, size_t count, const char *fmt, ... )
 // inicializa o fluxo padrão para o processo.
 int stdio_initialize_standard_streams (void)
 {
-
    debug_print("stdio_initialize_standard_streams: [FIXME] What is this?\n");
 
-    return (int) gramado_system_call ( 700, 
+    return (int) gramado_system_call ( 
+                     700, 
                      (unsigned long) stdin, 
                      (unsigned long) stdout, 
                      (unsigned long) stderr ); 
 }
-
-
 
 // wtf ... it looks so cool!
 /*
@@ -5212,10 +4977,6 @@ file *file_purpose (file *f)
 	}
 }
 */
-
-
-
-
 
 
 /*credits: bsd*/
@@ -5340,7 +5101,6 @@ _fwalk(int (*function)(FILE *))
 
 int libcStartTerminal (void)
 {
-
     debug_print ("libcStartTerminal: [DEPRECATED]\n");
 
     /*
@@ -5391,12 +5151,12 @@ void setbuf (FILE *stream, char *buf)
 {
     debug_print ("setbuf: [FIXME]\n");
 
-    if ( (void*) stream == NULL )
+    if ( (void*) stream == NULL ){
         return;
-
-    if ( (void*) buf == NULL )
+    }
+    if ( (void*) buf == NULL ){
         return;
-
+    }
     setvbuf (stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }
 
@@ -5416,7 +5176,6 @@ void setbuf_test1 (FILE *stream, char *buf)
 */
 
 
-
 //If buf is a null pointer, this function makes stream unbuffered. 
 //Otherwise, it makes stream fully buffered using buf as the buffer. 
 //The size argument specifies the length of buf.
@@ -5425,40 +5184,37 @@ void setbuf_test1 (FILE *stream, char *buf)
 
 void setbuffer (FILE *stream, char *buf, size_t size)
 {
-
     if ( (void *) stream == NULL ){
        debug_print ("setbuffer: stream\n");
        return;
     }
-
     if ( (void *) buf == NULL ){
        debug_print ("setbuffer: buf\n");
        return;
     }
     
-    // todo: size.
-
-    gramado_system_call ( 611, 
+// todo: size.
+    gramado_system_call ( 
+        611, 
         (unsigned long) stream, 
         (unsigned long) buf, 
         (unsigned long) size ); 
 }
 
-
-//This function makes stream be line buffered, and allocates the buffer for you.
-//This function is provided for compatibility with old BSD code. 
-//Use setvbuf instead. 
-
-void setlinebuf (FILE *stream)
+// This function makes stream be line buffered, and 
+// allocates the buffer for you.
+// This function is provided for compatibility with old BSD code. 
+// Use setvbuf instead. 
+void setlinebuf(FILE *stream)
 {
     debug_print ("setlinebuf: [FIXME]\n");
     setvbuf (stream, (char *) 0, _IOLBF, 0);
 }
 
-
-//The setvbuf() function may be used on any open stream to change its buffer.
-//If the argument buf is NULL, only the mode is affected; 
-//a new buffer will be allocated on the next read or write operation. 
+// The setvbuf() function may be used on any open stream 
+// to change its buffer.
+// If the argument buf is NULL, only the mode is affected; 
+// a new buffer will be allocated on the next read or write operation. 
 // See: https://linux.die.net/man/3/setvbuf
 
 int 
@@ -5468,8 +5224,6 @@ setvbuf (
     int mode, 
     size_t size )
 {
-
-    // stream
     if ( (void *) stream == NULL ){
        debug_print ("setvbuf: stream\n");
        return -1;
@@ -5551,6 +5305,8 @@ setvbuf (
 
 
 // Get filesize using fseek.
+// #todo: Create rtl_filesize.
+// We can create a similar function using lseek and ltell.
 unsigned int filesize(FILE *fp)
 {
     unsigned int ret=0;
@@ -5559,36 +5315,29 @@ unsigned int filesize(FILE *fp)
         debug_print ("filesize: [FAIL] fp\n");
         return 0;
     }
-
     fseek(fp, 0, SEEK_END);
-
     ret = (unsigned int) ftell(fp);
-
     rewind(fp);
 
     return (unsigned int) ret;
 }
 
-
-char *fileread (FILE *fp){
-
-    unsigned int buffer_size = 0;
+char *fileread (FILE *fp)
+{
+    unsigned int buffer_size=0;
     char *buff;
-    
+
     if (!fp){ 
         debug_print ("fileread: fp\n");
         return (char *) 0;
     }
 
     buffer_size = filesize(fp);
-
     buff = (char *) malloc (buffer_size);
-    
     if (!buff){ 
         debug_print ("fileread: [FAIL] buff\n");
         return (char *) 0;
     }
-
 
     fread (buff, sizeof(char), buffer_size, fp);
 
@@ -5600,7 +5349,7 @@ char *fileread (FILE *fp){
 int dprintf (int fd, const char *format, ...)
 { 
     debug_print ("dprintf: [TODO]\n");
-	return -1; 
+    return -1; 
 }
 */
 
@@ -5608,30 +5357,29 @@ int dprintf (int fd, const char *format, ...)
 int vdprintf (int fd, const char *format, va_list ap)
 { 
     debug_print ("vdprintf: [TODO]\n");
-	return -1; 
+    return -1; 
 }
 */
-
 
 //
 //==================================================================
 //
 
 /* we use this so that we can do without the ctype library */
-#define __is_digit(c)	((c) >= '0' && (c) <= '9')
+#define __is_digit(c)  ((c) >= '0' && (c) <= '9')
 
 static int skip_atoi(const char **s)
 {
-    int i=0;
+    register int int_value=0;
 
+// #ugly
     while (__is_digit(**s))
     {
-        i = i*10 + *((*s)++) - '0';
+        int_value = (int) int_value*10 + *((*s)++) - '0';
     };
 
-    return i;
+    return (int) int_value;
 }
-
 
 #define ZEROPAD   1  /* pad with zero */
 #define SIGN      2  /* unsigned/signed long */
@@ -5642,7 +5390,8 @@ static int skip_atoi(const char **s)
 #define SMALL    64  /* use 'abcdef' instead of 'ABCDEF' */
 
 
-// oh Jeess ? x86 stuff.
+// #ugly
+// oh Jeess? x86 stuff.
 #define do_div(n,base) ({ \
 int __res; \
 __asm__("divl %4":"=a" (n),"=d" (__res):"0" (n),"1" (0),"r" (base)); \
@@ -5657,11 +5406,9 @@ static char *number (
     int precision, 
     int type )
 {
-    
     char c, sign, tmp[36];
     const char *digits="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     int i=0;
-
 
     if (type&SMALL) digits="0123456789abcdefghijklmnopqrstuvwxyz";
     if (type&LEFT) type &= ~ZEROPAD;
@@ -5870,25 +5617,21 @@ Wirzenius_Torvalds_vsprintf (
 
     *str = '\0';
 
-
     return (int) (str-buf);
 }
 */
 
-
-
 // It's used by printf ?
 //static char __printbuf[1024];
-
 
 // It was taken from linux 0.01. gpl
 // It works yet.
 // Just for fun. :^) 
 
 /*
+// just for fun
 int Torvalds_printf (const char *fmt, ...)
 {
-
     va_list args;
     va_start(args, fmt);
 
@@ -5925,7 +5668,6 @@ int Torvalds_printf (const char *fmt, ...)
 }
 */
 
-
 //
 //==================================================================
 //
@@ -5943,7 +5685,6 @@ vsnprintf (
 }
 */
 
-
 /*
 int vscanf (const char *format, va_list ap)
 { 
@@ -5951,7 +5692,6 @@ int vscanf (const char *format, va_list ap)
     return -1; 
 }
 */
-
 
 /*
 int 
@@ -5986,142 +5726,105 @@ vfscanf (
 */
 
 
+// #todo:
+// steps:
+// + Salva um arquivo vazio com nome randômico.
+// + Abre esse arquivo com open.
+// + Cria uma stream para esse fd.
 FILE *tmpfile (void)
 {
     debug_print ("tmpfile: [TODO]\n");
-
-    // steps:
-    // + Salva um arquivo vazio com nome randômico.
-    // + Abre esse arquivo com open.
-    // + Cria uma stream para esse fd.
-
     return (FILE *) 0;
 }
 
-
-//tmpnam(): 
-//SVr4, 4.3BSD, C89, C99, POSIX.1-2001.  
-//POSIX.1-2008 marks tmpnam() as obsolete.
-char *tmpnam (char *s)
+// tmpnam(): 
+// SVr4, 4.3BSD, C89, C99, POSIX.1-2001.  
+// POSIX.1-2008 marks tmpnam() as obsolete.
+char *tmpnam(char *s)
 {
     debug_print ("tmpnam: [TODO]\n");
-
-    //if ( (void*) s == NULL ){}
-
+    if ( (void*) s == NULL ){
+        return NULL;
+    }
     return NULL; 
 }
 
-
-
-
-//tmpnam_r() is a nonstandard extension that is 
-//also available on a few other systems.
+// tmpnam_r() is a nonstandard extension that is 
+// also available on a few other systems.
 char *tmpnam_r (char *s)
 {
     debug_print ("tmpnam_r: [TODO]\n");
-
-    //if ( (void*) s == NULL ){}
-
+    if ( (void*) s == NULL ){
+        return NULL;
+    }
     return NULL; 
 }
-
 
 char *tempnam (const char *dir, const char *pfx)
 {
     debug_print ("tempnam: [TODO]\n"); 
-
-    //if ( (void*) dir == NULL ){}
- 
+    if ( (void*) dir == NULL ){
+        return NULL;
+    }
+    if ( (void*) pfx == NULL ){
+        return NULL;
+    }
     return NULL; 
 }
 
-
-
 /*
  ERRORS  for tmpfile();
-
-       EACCES Search permission denied for directory in file's path prefix.
-
-       EEXIST Unable to generate a unique filename.
-
-       EINTR  The call was interrupted by a signal; see signal(7).
-
-       EMFILE The per-process limit on the number of open file descriptors
-              has been reached.
-
-       ENFILE The system-wide limit on the total number of open files has
-              been reached.
-
-       ENOSPC There was no room in the directory to add the new filename.
-
-       EROFS  Read-only filesystem.
+ EACCES Search permission denied for directory in file's path prefix.
+ EEXIST Unable to generate a unique filename.
+ EINTR  The call was interrupted by a signal; see signal(7).
+ EMFILE The per-process limit on the number of open file descriptors
+        has been reached.
+ ENFILE The system-wide limit on the total number of open files has
+        been reached.
+ ENOSPC There was no room in the directory to add the new filename.
+ EROFS  Read-only filesystem.
  */
-
 // helper function
-
 // IN: valid fd, mode
+
 FILE *stdio_make_file( int fd, const char *mode )
 {
     FILE *__file;
 
-
-    // #todo
-    
-    //
-    // given fd.
-    //
-
-    //if (fd<0){
-    //    printf("stdio_make_file: [FAIL] not valid fd\n");
-    //    return NULL;
-    //}
-
-
+    if (fd<0){
+        return NULL;
+    }
     __file = (FILE *) malloc ( sizeof(FILE) );
-
-    if ( (void *) __file == NULL )
-    {
-        // debug_print(...)
+    if ( (void *) __file == NULL ){
+        printf("stdio_make_file: __file\n");
         return NULL;
     }    
- 
 
-    __file->used  = TRUE;
+    __file->used = TRUE;
     __file->magic = 1234;
- 
     __file->_cnt = 0;
-
-    
-    //
-    // given fd
-    //
-
+// given fd
     __file->_file = fd;
-
-
-    // flags
+// flags
     __file->_flags = 0;
 
+// Mode:
 
     /*
     switch (*mode) {
-
     case 'r':
         __file->_flags |= _IOREAD;
         break;
-
     case 'a':
         lseek(fd, 0L, 2);
         //No break
     case 'w':
         __file->_flags |= _IOWRT;
         break;
-
     default:
         return(NULL);
     }
     */
-
 
     /*
 	if (mode[1] == '+') {
@@ -6130,15 +5833,13 @@ FILE *stdio_make_file( int fd, const char *mode )
 	}
     */
 
+// Name
     //__file->_tmpfname = (char *) strdup(filename);
-
-    __file->_base = NULL;    // ??
-
-    
+// Buffer
+    __file->_base = NULL;  //?    
     __file->_r = 0;
     __file->_w = 0;
 
-   
     //#todo: Initializa structure.
     //...
 
@@ -6149,23 +5850,22 @@ FILE *stdio_make_file( int fd, const char *mode )
 // #test
 // Cria uma nova stream para o fd.
 // O fd foi obtido anteriormente
-
 // IN: valid fd, mode
 FILE *fdopen (int fd, const char *mode)
 {
     if (fd<0){
-        printf("fdopen: [FAIL] not valid fd\n");
+        //printf("fdopen: Invalid fd\n");
         return NULL;
     }
-
+    if( (void*) mode == NULL ){
+        return NULL;
+    }
     return (FILE *) stdio_make_file( fd, (const char *) mode);
 }
-
 
 /*
  * freopen:
  */
-
 /*
     cool!!
     The freopen() function opens the file whose name 
@@ -6202,7 +5902,6 @@ FILE *freopen (
 }
 
 
-
 /* #todo it needs 'cookie_io_functions_t'
 FILE *fopencookie(void *cookie, const char *mode,
                          cookie_io_functions_t io_funcs);
@@ -6214,32 +5913,25 @@ FILE *fopencookie(void *cookie, const char *mode,
 }
 */
 
-
-
-
 FILE *open_memstream (char **ptr, size_t *sizeloc)
 {
     debug_print ("open_memstream: TODO: \n");
-	return (FILE *) 0;
+    return (FILE *) 0;
 }
 
-
-    
 
 FILE *open_wmemstream (wchar_t **ptr, size_t *sizeloc)
 {
     debug_print ("open_wmemstream: TODO: \n");
-	return (FILE *) 0;
+    return (FILE *) 0;
 }
-
 
 
 FILE *fmemopen (void *buf, size_t size, const char *mode)
 {
     debug_print ("fmemopen: TODO: \n");
-	return (FILE *) 0;
+    return (FILE *) 0;
 }
-
 
 
 /*
@@ -6257,47 +5949,30 @@ int fgetpos(FILE* stream, fpos_t* pos)
 } 
 */
 
-
-int fgetpos (FILE *stream, fpos_t *pos )
+int fgetpos(FILE *stream, fpos_t *pos )
 {
-
-    // #todo
-    /*
-    if ( !__validfp(stream) )
-    {
-        errno = EINVAL;
-        return EOF;
-    }
-    */
-
-
-    if ( (void *) stream == NULL )
-    {
-       printf("fgetpos: [FAIL] stream\n");
+    if ( (void *) stream == NULL ){
+       //printf("fgetpos: [FAIL] stream\n");
        return EOF;
     }
-    
+
     *pos = ftell(stream);
 
-    if (*pos < 0L)
-    {
+    if (*pos < 0L){
         return (-1);
     }
  
     return 0;
 }
 
-
 int fsetpos (FILE *stream, const fpos_t *pos)
 {
     if ( (void *) stream == NULL ){
-        printf("fsetpos: [FAIL] stream\n");
+        //printf("fsetpos: [FAIL] stream\n");
         return EOF;
     }
-
     return (int) fseek (stream, (long) *pos, SEEK_SET);
 }
-
 
 int fpurge (FILE *stream){
 
@@ -6339,7 +6014,6 @@ char *ctermid (char *s)
  *     Inicializa stdio para usar o fluxo padrão.
  *     O retorno deve ser (int) e falhar caso dê algo errado.
  */
-
 // This routine is called by crt0() in crt0.c
 // #bugbug
 // Essa estrutura lida com elementos de estrutura em ring3.
@@ -6352,13 +6026,13 @@ char *ctermid (char *s)
 // E o heap ??
 // Em que momento foi inicializado o heap do processo? 
 // crt0 chamou libcInitRT antes de chamar essa função.
-// See: stdlib/stdlib.c
-// See: crts/crt0.c
+// See: stdlib.c
+// See: crt0.c
 
 void stdioInitialize(void)
 {
-    int status = 0;
-    int i=0;
+    //int status = 0;
+    //int i=0;
 
 // #bugbug
 // Isso deve estar errado.
@@ -6424,15 +6098,12 @@ void stdioInitialize(void)
 // stderr
     debug_print ("stdioInitialize: [3] stderr\n");  
     stderr = (FILE *) malloc( sizeof(FILE) );
-    if( (void*) stderr == NULL )
-    {
+    if( (void*) stderr == NULL ){
         debug_print ("stdioInitialize: stderr fail\n");
         //printf ("stdioInitialize: stderr fail\n");
         exit(1);
     }
     memset( stderr, 0, sizeof(struct _iobuf) );
-
-
 
 
 //
@@ -6545,8 +6216,7 @@ void stdioInitialize(void)
 
 // Clear prompt[] buffer.
     prompt_clean();
-
-    debug_print ("stdioInitialize: done\n");
+    //debug_print ("stdioInitialize: done\n");
 }
 
 

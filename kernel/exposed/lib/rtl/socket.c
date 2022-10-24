@@ -1,8 +1,5 @@
-/*
- * File: socket.c
- *
- */
 
+// socket.c
 // See: 
 // http://man7.org/linux/man-pages/man2/socket.2.html
 
@@ -14,15 +11,13 @@
 #include <unistd.h>
 #include <rtl/gramado.h> 
 
-
-//sortix style;
+//sortix style.
 /*
 #define FLAGS_MASK (SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK)
 #define TYPE_MASK (~FLAGS_MASK)
 #define FLAGS(x) ((x) & FLAGS_MASK)
 #define TYPE(x) ((x) & TYPE_MASK)
 */
-
 
 /*
  * socket:
@@ -51,12 +46,10 @@ int socket ( int domain, int type, int protocol )
                (unsigned long) type, 
                (unsigned long) protocol );
 
-    if (value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
-
 // OUT: fd.
     return (int) value;
 }
