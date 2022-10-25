@@ -17,7 +17,6 @@ struct tty_d  CONSOLE_TTYS[8];
  *     buffer = Buffer.
  *     nr     = How many bytes.
  */
-
 // Called by tty_read.
 
 int 
@@ -26,43 +25,32 @@ __tty_read (
     char *buffer, 
     int nr )
 {
-
     char *b;
     b = buffer;
 
-
-    //panic("__tty_read: [TODO] this is a work in progress");
+// #debug
     printf("__tty_read:\n");
-
 // tty structure.
-
     if ( (void *) tty == NULL ){
         printf ("__tty_read: tty\n");
-        return -1;
+        goto fail;
     }
-
     if ( tty->used != TRUE || tty->magic != 1234 )
     {
         printf ("__tty_read: tty validation\n");
-        return -1;
+        goto fail;
     }
-
-
 // buffer
     if ( (char *) buffer == NULL ){
          panic ("__tty_read: invalid buffer \n");
     }
-
 // nr
-    if ( nr <= 0 ){
+    if (nr <= 0){
         printf ("__tty_read: nr \n");
-        refresh_screen();
-        return -1;
+        goto fail;
     }
-
     //if ( tty->stopped == TRUE )
         //return -1;
-
 // Queue 
 // A leitura nas filas vai depender do modo
 // configurado.
@@ -78,7 +66,6 @@ __tty_read (
     int i=0;
     char data[TTY_BUF_SIZE];
     char c=0;
-    
     int rbytes=nr;
     
     if (rbytes<=0){
@@ -90,7 +77,7 @@ __tty_read (
         rbytes=TTY_BUF_SIZE;
     }
 
-    while ( rbytes > 0 )
+    while (rbytes > 0)
     {
         // Empty
         // Isso acontece também quando a fila esta vazia.
@@ -100,7 +87,7 @@ __tty_read (
             return 0;
         }
 
-        // acabou a fila.
+        // Acabou a fila.
         if ( tty->raw_queue.tail > TTY_BUF_SIZE )
         {
             printf("__tty_read: tty->raw_queue.tail > TTY_BUF_SIZE\n");
@@ -109,20 +96,17 @@ __tty_read (
 
         // get one char
         c = tty->raw_queue.buf[ tty->raw_queue.tail ];
-    
         // avança na fila
         tty->raw_queue.tail++;
-    
         data[i] = c;
         i++;
-            
         rbytes--;
-        if(rbytes<=0)
+        if (rbytes<=0){
             break;
+        }
     };
 
 // Quantidade de bytes no buffer local.
-
     if ( i <= 0 ){
         printf("__tty_read: i <= 0\n");
         return 0;
@@ -132,10 +116,7 @@ __tty_read (
         i=TTY_BUF_SIZE;
     }
 
-//
 // Send
-//
-
 // Copiando os bytes de nosso buffer local para
 // o buffer de usuário.
 
@@ -144,12 +125,13 @@ __tty_read (
         (const void *) data, 
         i ); 
 
-
 //#debug
-    printf("__tty_read: done\n");
-
+    //printf("__tty_read: done\n");
 // Retornamos a quantidade de bytes que tinha em nosso buffer local.
-    return (int) i; 
+    return (int) i;
+fail:
+    refresh_screen();
+    return -1;
 }
 
 
@@ -161,7 +143,6 @@ __tty_read (
  *     buffer = Buffer.
  *     nr     = How many bytes.
  */
-
 // #bugbug
 // ?? Why
 // We are sending a message to a process.
@@ -175,34 +156,25 @@ __tty_write (
     char *b;
     b = buffer;
 
-
     printf("__tty_write:\n");
-    //panic("__tty_write: [TODO] this is a work in progress");
-
-
 // tty
-
     if ( (void *) tty == NULL ){
         debug_print ("__tty_write: tty\n");
-        return -1;
+        goto fail;
     }
-
     if ( tty->used != TRUE || tty->magic != 1234 )
     {
         printf ("__tty_write: tty validation\n");
-        return -1;
+        goto fail;
     }
-
 // buffer
     if ( (char *) buffer == NULL ){
-         panic ("__tty_write: invalid buffer \n");
+         panic ("__tty_write: invalid buffer\n");
     }
-
 // nr
     if ( nr <= 0 ){
-        printf ("__tty_write: nr \n");
-        refresh_screen();
-        return -1;
+        printf ("__tty_write: nr\n");
+        goto fail;
     }
 
     //if ( tty->stopped == TRUE )
@@ -230,23 +202,18 @@ __tty_write (
         return 0;
     }
 
-    // não se pode escrever mais que o limite.
+// não se pode escrever mais que o limite.
     if (wbytes>TTY_BUF_SIZE){
         wbytes=TTY_BUF_SIZE;
     }
 
-
-//
 // Receive
-//
-
 // Copiando bytes do buffer do usuário para nosso buffer local.
 
     memcpy ( 
         (void *) data, 
         (const void *) b, 
         wbytes ); 
-
 
 //buffer local
     i=0;
@@ -261,38 +228,34 @@ __tty_write (
 
         //pega um char do buffer local
         c = data[i];
-        
         // grava um char na fila do tty
         tty->raw_queue.buf[ tty->raw_queue.head ] = c;
-        
         //avança na fila
         tty->raw_queue.head++;
-        
         // Incrementa a quantidade que foi gravada.
         i++;
-        
-        // Qauntos faltam.
+        // Quantos faltam.
         wbytes--;
-        if(wbytes<=0)
+        if (wbytes<=0){
             break;
+        }
     };
 
 done:
-
 //#debug
     printf("__tty_write: done\n");
-
 // quantidade de bytes que gravamos na tty
     if ( i <= 0 ){
         return 0;
     }
-
     if ( i > TTY_BUF_SIZE ){
         i=TTY_BUF_SIZE;
     }
-
 // Retornamos a quantidade que gravamos na fila da tty.
-    return (int) i; 
+    return (int) i;
+fail:
+    refresh_screen();
+    return -1;
 }
 
 
@@ -493,22 +456,13 @@ tty_write (
 }
 
 
-/*
- * tty_reset_termios: 
- *    Reset termios in a given tty.
- */
-
+// tty_reset_termios: 
+// Reset termios in a given tty.
 // See: ttydef.h
 // #todo: use int as return.
 
-void tty_reset_termios ( struct tty_d *tty )
+void tty_reset_termios(struct tty_d *tty)
 {
-
-// #todo: 
-// Limits messages
-
-// tty
-
     if ( (void *) tty == NULL ){
         debug_print("tty_reset_termios: tty\n");
         return;
@@ -580,168 +534,126 @@ void tty_reset_termios ( struct tty_d *tty )
 struct tty_d *tty_create(void)
 {
     file *__file;
-
     struct tty_d  *__tty;
-
     char __tmpname[64];
-    int i=0;
-
+    register int i=0;
 
     debug_print ("tty_create: [FIXME] \n");
 
-
     __tty = (struct tty_d *) kmalloc( sizeof(struct tty_d) );
-    
-    if ( (void *) __tty == NULL )
-    {
+    if ( (void *) __tty == NULL ){
         panic ("tty_create: __tty\n");   
     }
-
     memset( __tty, 0, sizeof(struct tty_d) );
 
     __tty->objectType = ObjectTypeTTY;
     __tty->objectClass = ObjectClassKernelObjects;
-
     __tty->used = TRUE;
     __tty->magic = 1234;
 
-//
 // Index
-//
-
     __tty->index = (int) (new_tty_index & 0xFFFF);
     new_tty_index++;
-
-
-    // No thread for now.
-    // ?? What thread we need to use here?
+// No thread for now.
+// ?? What thread we need to use here?
     __tty->control = NULL;
-
-    // No user logged yet.
+// No user logged yet.
     __tty->user_info = NULL;
-
-        // #bugbug
-        // Security stuff.
-        // Maybe it will change when a user login into a terminal.
-        // Nao sei se essas estruturas estao prontas para isso nesse momento
-        // ou se esses ponteiros sao nulos.
+// #bugbug
+// Security stuff.
+// Maybe it will change when a user login into a terminal.
+// Nao sei se essas estruturas estao prontas para isso nesse momento
+// ou se esses ponteiros sao nulos.
     __tty->user_session = NULL;  // CurrentUserSession;
     __tty->room         = NULL;  // CurrentRoom;
     __tty->desktop      = NULL;  // CurrentDesktop;
 
-
-        // file pointer
-        // this file handles this tty object
-        //isso sera tratado la em baixo.
+// file pointer
+// this file handles this tty object
+// isso sera tratado la em baixo.
         //__tty->fp
-    
-        // tty name
-        // isso sera tratado la em baixo.
+// tty name
+// isso sera tratado la em baixo.
         //__tty->name[?] 
     __tty->Name_len = 0;  //initialized
-
-        //#todo: Indice do dispositivo.
-        // __tty->device = 0;   // initialized.
-
+//#todo: Indice do dispositivo.
+    // __tty->device = 0;   // initialized.
     __tty->driver = NULL;  //driver struct
     __tty->ldisc  = NULL;  //line discipline struct
-
 // termios struct (not a pointer)
     tty_reset_termios(__tty);
-
 // process group.
     __tty->gid = current_group;
-
-        // ??
-        // Quantos processos estao usando essa tty.
+// ??
+// Quantos processos estao usando essa tty.
     __tty->pid_count=0;
-
     __tty->type = 0;
     __tty->subtype = 0;
-        
     __tty->flags = 0;
-
 // not stopped
     __tty->stopped = FALSE;
-
-        // process
-        // __tty->process = KernelProcess;
-    
-        // thread
-        // __tty->thread  = ?
-
-        // Qual terminal virtual esta usando essa tty.
+// process
+    // __tty->process = KernelProcess;
+// thread
+    // __tty->thread  = ?
+// Qual terminal virtual esta usando essa tty.
     __tty->virtual_terminal_pid = 0;
+// Window.
+// When we are using the kgws.
+    //__tty->window = NULL;
 
-        // Window.
-        // When we are using the kgws.
-        //__tty->window = NULL;
-
-
-//
 // == buffers ===========================
-//
 
 // YES, We are using buffer.
     __tty->nobuffers = FALSE;
 
 // queues
 
-
 // raw queue
     __tty->raw_queue.cnt = 0;
     __tty->raw_queue.head = 0;
     __tty->raw_queue.tail = 0;
     for(i=0; i<TTY_BUF_SIZE; i++){ __tty->raw_queue.buf[i] = 0; }
-
 // canonical queue
     __tty->canonical_queue.cnt = 0;
     __tty->canonical_queue.head = 0;
     __tty->canonical_queue.tail = 0;
     for(i=0; i<TTY_BUF_SIZE; i++){ __tty->canonical_queue.buf[i] = 0; }
-
 // output queue
     __tty->output_queue.cnt = 0;
     __tty->output_queue.head = 0;
     __tty->output_queue.tail = 0;
     for(i=0; i<TTY_BUF_SIZE; i++){ __tty->output_queue.buf[i] = 0; }
 
+// system metrics.
 
-        // system metrics.
-        
-        // cursor dimentions in pixels.
-        // #bugbug: determined.
-    __tty->cursor_width_in_pixels  = 8;
+// cursor dimentions in pixels.
+// #bugbug: determined.
+    __tty->cursor_width_in_pixels = 8;
     __tty->cursor_height_in_pixels = 8;
-
 //#todo
 // it needs to be 'unsigned int'
     __tty->bg_color = COLOR_BLACK;
     __tty->fg_color = COLOR_WHITE;
-        
-    // cursor position in chars.
+// cursor position in chars.
     __tty->cursor_x = 0;
     __tty->cursor_y = 0;
-        
-    // cursor margin.
+// cursor margin.
     __tty->cursor_left = 0;
     __tty->cursor_top  = 0;
-        
-        // cursor limits.
+
+// #bugbug: Constant cursor size.
+// cursor limits.
     __tty->cursor_right  = 0+(gSavedX/8) -1;  // (screen width / char width)
     __tty->cursor_bottom = 0+(gSavedY/8) -1;  // (screen height/ char height)
-    
 
-        // #bugbug
-        // Temos que completar as estruturas.
-        // São muitos elementos ...
+// #bugbug
+// Temos que completar as estruturas.
+// São muitos elementos ...
+// ...
 
-
-        // ...
-
-       // goto __ok_register;
-        //return (struct tty_d *) __tty;
-
+    // goto __ok_register;
+    //return (struct tty_d *) __tty;
 
     //panic ("tty_create: Crazy error!\n");
     //return NULL;
@@ -753,47 +665,37 @@ struct tty_d *tty_create(void)
         panic("tty_create: __tty\n");
     }
 
-
-// mount point. pathname.
+// mount point. 
+// pathname.
 
 // #test
 // Isso é o ponto de montagem.
-
     int Index = (int) (__tty->index & 0xFFFF);
-
-    // clear buffer
+// clear buffer
     memset( __tmpname, 0, 64 );
-
     sprintf ( 
-        (char *) &__tmpname[0], 
+        __tmpname,  //(char *) &__tmpname[0], 
         "/TTY%d", 
         Index );
 
     //size_t NameSize = (size_t) strlen(__tmpname);
 // ----
 
-
     char *newname = (char *) kmalloc(64);
-
-    if ( (void*) newname == NULL )
-    {
+    if ( (void*) newname == NULL ){
         panic("tty_create: newname\n");
     }
-    // clear buffer
+// clear buffer
     memset( newname, 0, 64 );
     strcpy(newname,__tmpname);
 
-//
 // File pointer.
-//
-
 // Agora registra o dispositivo pci na lista genérica
 // de dispositivos.
 // #importante: 
 // Ele precisa de um arquivo 'file'.
     
     __file = (file *) kmalloc ( sizeof(file) );
-
     if ( (void *) __file == NULL ){
         panic ("tty_create: __file\n");
     }
@@ -823,10 +725,9 @@ struct tty_d *tty_create(void)
     //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
     //strcpy (?,__file->_tmpfname);
 
-
-    // #todo
-    // precisamos pegar um slot livre na lista de objetos abertos pelo processo.
-    // O indice da tty é fd do arquivo que aponta para a tty.
+// #todo
+// precisamos pegar um slot livre na lista de objetos abertos pelo processo.
+// O indice da tty é fd do arquivo que aponta para a tty.
     //__tty->index = __file->_file;
     //__tty->index = -1;
 
@@ -847,8 +748,6 @@ struct tty_d *tty_create(void)
         __tty );  // tty device
 
 // ==========================================
-
-
 
 // last check.
     if ( (void *) __tty == NULL ){
@@ -887,17 +786,13 @@ void tty_start (struct tty_d *tty)
         debug_print("tty_start: tty\n");
         return;
     }
-
 // Se não está parada.
-    if (tty->stopped == FALSE)
-    {
+    if (tty->stopped == FALSE){
         //debug_print("tty_start: not stopped\n");
         return;
     }
-
     tty->stopped = FALSE;
 }
-
 
 void tty_stop (struct tty_d *tty)
 {
@@ -905,40 +800,31 @@ void tty_stop (struct tty_d *tty)
         debug_print("tty_stop: tty\n");
         return;
     }
-
 // Se ela já está parada.
-    if (tty->stopped == TRUE)
-    {
+    if (tty->stopped == TRUE){
         //debug_print("tty_stop: already stopped\n");
         return;
     }
-
     tty->stopped = TRUE;
 }
 
 // #todo: 
-int tty_delete ( struct tty_d *tty )
+int tty_delete (struct tty_d *tty)
 {
-
 // Nothing to do.
     if ( (void *) tty == NULL ){
         debug_print ("tty_delete: tty\n");
         //debug_print("...");
         return -1;
     }
-
     //#bugbug: fast way
     //free (tty);
-
-    //reusar
+//reusar
     tty->magic = 216;
     tty_stop(tty);
-
     // ...
-
     return 0;
 }
-
 
 // Copia a estrutura de termios
 // para o aplicativo em ring3 poder ler.
@@ -948,20 +834,16 @@ tty_gets (
     struct tty_d *tty, 
     struct termios *termiosp )
 {
-
     if ( (void *) tty == NULL ){
         debug_print("tty_gets: [FAIL] tty\n");
         return -1;
     }
-
     if ( (void *) termiosp == NULL ){
         debug_print("tty_gets: [FAIL] termiosp\n");
         return -1;
     }
-
 // Copia a estrutura term da tty na estrutura de termios 
 // que está em ring3.
-
     memcpy ( 
         termiosp, 
         &tty->termios, 
@@ -980,20 +862,17 @@ tty_sets (
 {
     int ret = -1;
 
-
     if ( (void *) tty == NULL ){
         debug_print("tty_sets: [FAIL] tty\n");
         return -1;
     }
-
-    if(tty->magic != 1234)
+    if(tty->magic != 1234){
         return -1;
-
+    }
     if (options < 0){
         debug_print("tty_sets: [FAIL] options\n");
         return -1;
     }
-
     if ( (void *) termiosp == NULL ){
         debug_print("tty_sets: [FAIL] termiosp\n");
         return -1;
@@ -1003,13 +882,11 @@ tty_sets (
 
     switch (options){
 
-    // Now. The change occurs immediately. 
+// Now. The change occurs immediately. 
     case TCSANOW:
         memcpy ( &tty->termios, termiosp, sizeof(struct termios) );
         break;
-
     // ...
-
     default:
         debug_print ("tty_sets: [FAIL] default\n");
         //ret = -EINVAL;
@@ -1024,18 +901,13 @@ tty_sets (
 int tty_init_module (void)
 {
     // Nothing for now!
-
     debug_print ("tty_init_module:\n");
     // ...
     return 0;
 }
 
 
-/*
- * tty_ioctl:
- * 
- */
- 
+// tty_ioctl:
 // Pegaremos a estrutura de tty.
 // Dado o fd, pegaremos um arquivo que é um objeto tty.
 // Esse arquivo traz um ponteiro para a estrutura tty.
@@ -1059,7 +931,6 @@ tty_ioctl (
 
     debug_print ("tty_ioctl: TODO\n");
 
-
     if ( fd < 0 || fd >= OPEN_MAX )
     {
         return (int) (-EBADF);
@@ -1079,27 +950,21 @@ tty_ioctl (
     }
 
 // process
-
     p = ( struct process_d * ) processList[current_process];
-    
     if ( (void *) p == NULL ){
         debug_print ("tty_ioctl: [FAIL] p\n");
         return -1;
     }
-
     if(p->magic != 1234){
         return -1;
     }
 
 // file. (Object).
-
     f = (file*) p->Objects[fd];
-    
     if ( (void *) f == NULL ){
         debug_print ("tty_ioctl: [FAIL] f\n"); 
         return -1;
     }
-
     if(f->magic != 1234){
         return -1;
     }
@@ -1114,14 +979,13 @@ tty_ioctl (
         tty = f->tty;
     };
 
-
 // The command!
 
-    int xxxi=0;
+    //int xxxi=0;
 
     switch (request){
 
-    // Get termios.
+// Get termios.
     case TCGETS:
         debug_print ("tty_ioctl: TCGETS\n");
         if ( (void*) arg == NULL ){
@@ -1129,8 +993,7 @@ tty_ioctl (
         }
         return (int) tty_gets ( tty, (struct termios *) arg );
         break;
-
-    // Set termios.
+// Set termios.
     case TCSETS:
         debug_print ("tty_ioctl: TCSETS\n");
         if ( (void*) arg == NULL ){
@@ -1139,41 +1002,34 @@ tty_ioctl (
         return (int) tty_sets ( 
                          tty, TCSANOW, (struct termios *) arg );
         break;
-
-    // ??
-    // Discards data written to the object referred to by fd .
+// ??
+// Discards data written to the object referred to by fd .
     case TCFLSH:
         debug_print ("tty_ioctl: TCFLSH [TODO]\n");
         return -1;
         break;
-
     case TCIFLUSH:
         debug_print ("tty_ioctl: TCIFLUSH [TODO]\n");
         return -1;
         break;
-
     case TCOFLUSH:
         debug_print ("tty_ioctl: TCOFLUSH [TODO]\n");
         return -1;
         break;
-
     case TCIOFLUSH:
         debug_print ("tty_ioctl: TCIOFLUSH [TODO]\n");
         return -1;
         break;
-
-    // Set termio.   
+// Set termio.   
     case TCGETA:
          debug_print ("tty_ioctl: TCGETA [TODO]\n");
          return -1;
          break;
-
-    // Get termio.
+// Get termio.
     case TCSETA:
          debug_print ("tty_ioctl: TCSETA [TODO]\n");
          return -1;
          break;
-
 
     // TCSETSF, TCSETSW, , TCSETAF, TCSETAW, , TCSBRK
     // TCXONC
@@ -1182,7 +1038,7 @@ tty_ioctl (
     // TIOCINQ, TIOCSTI, TIOCMGET, TIOCMBIS, TIOCMBIC, TIOCMSET,
     // TIOCGSOFTCAR, TIOCSSOFTCAR
 
-    //CLEAN
+//CLEAN
     case 900:
         //tty->_rbuffer->_w = 0;
         //tty->_rbuffer->_r = 0;

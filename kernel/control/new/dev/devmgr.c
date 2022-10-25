@@ -1,9 +1,7 @@
 
 // devmgr.c
 
-
 #include <kernel.h>  
-
 
 // Lista de placas de rede.
 // #todo:
@@ -13,8 +11,6 @@
 // tipo generico, esse ponteiro contera um ponteiro
 // para uma estrutura de dispositivo nic de marca especifica.
 unsigned long nicList[8]; 
-
-
 
 // Search a name into the device list.
 // Used by sys_open();
@@ -26,7 +22,7 @@ unsigned long nicList[8];
 
 file *devmgr_search_in_dev_list(char *path)
 {
-    int i=0;
+    register int i=0;
     size_t PathSize=0;
     struct device_d *tmp_dev;
     void *p;
@@ -60,7 +56,7 @@ file *devmgr_search_in_dev_list(char *path)
                         printf ("Device found!\n");
                         refresh_screen();
 
-                        return (file *) tmp_dev->__file;
+                        return (file *) tmp_dev->_fp;
                     }
                 }
             }
@@ -70,24 +66,20 @@ file *devmgr_search_in_dev_list(char *path)
     return NULL;
 }
 
-
 // Initialize the list.
 int devmgr_init_device_list(void)
 {
     register int i=0;
 
-    debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
+    //debug_print ("devmgr_init_device_list: Initializing the mount table. deviceList[].\n");
+    debug_print ("devmgr_init_device_list:\n");
 
-    for (i=0; i<DEVICE_LIST_MAX; i++)
-    {
+    for (i=0; i<DEVICE_LIST_MAX; i++){
         deviceList[i] = 0;
     };
-
     //...
-    
     return 0;
 }
-
 
 // Show device list.
 void devmgr_show_device_list(int object_type)
@@ -96,22 +88,19 @@ void devmgr_show_device_list(int object_type)
     struct device_d  *d;
     register int i=0;
 
-    printf ("\n devmgr_show_device_list: \n");
+    printf("\n");
+    printf ("devmgr_show_device_list:\n");
 
     for (i=0; i<DEVICE_LIST_MAX; ++i)
     {
         // Get the device structure.
-
         d = ( struct device_d *) deviceList[i];
-
         if ( (void *) d != NULL )
         {
-            //dispositivo válido.
-            if ( d->used  == TRUE && 
-                 d->magic == 1234 )
+            // Valid device.
+            if ( d->used  == TRUE && d->magic == 1234 )
             {
-
-                fp = (file *) d->__file;
+                fp = (file *) d->_fp;
 
                 if( (void*) fp != NULL )
                 {
@@ -134,98 +123,72 @@ void devmgr_show_device_list(int object_type)
                     }
                 }
             }
-            
             //printf (".");
         }
     };
-
+// Done. 
+// Show all the strings.
     printf ("Done\n");
     refresh_screen();
 }
 
-
-/*
- * init_device_manager:
- * 
- */
-
+// init_device_manager:
 // Called by init() in init.c.
 void init_device_manager (void)
 {
     debug_print ("init_device_manager:\n");
- 
     devmgr_init_device_list();
-
     // ...
 }
 
 // OUT: 
 // A pointer to a void mounted device.
 // Retorna um ponteiro de estrutura do tipo dispositivo.
-
-struct device_d *devmgr_device_object (void){
-
+struct device_d *devmgr_device_object (void)
+{
     struct device_d  *d;
-    int i=0;
+    register int i=0;
     unsigned long __tmp=0;
-
     char __noname[] = "no-name";
 
-
-    // Procura um slot vazio.
+// Procura um slot vazio.
 
     for (i=0; i<DEVICE_LIST_MAX; i++)
     {
+         // List of pointers.
          __tmp = (unsigned long) deviceList[i];
-    
-         // slot livre.
-         // unsigned long
-         if ( __tmp == 0 ) 
+         if (__tmp == 0) 
          {
-            //
-            // Device structure.
-            //
-
-            // #bugbug
-            // Maybe it will spend a lot of memory.
-
+             // Device structure.
+             // #bugbug
+             // Maybe it will spend a lot of memory.
              d = (struct device_d *) kmalloc ( sizeof (struct device_d) );
-             
-             // #debug
+             // #fatal
              if ( (void *) d == NULL ){
                  panic ("devmgr_device_object: [ERROR] d\n"); 
              }
-             
              memset( d, 0, sizeof(struct device_d) );
-
-             d->used  = TRUE;
+             d->used = TRUE;
              d->magic = 1234;
              d->index = i;
-
              //#todo
              //d->name 
              d->name[0] = 'x';
              d->name[1] = 0;
-             
-             //
              // ...
-             //
-
              // Save and return.
-
              deviceList[i] = (unsigned long) d;
-
              return (struct device_d *) d;
          }
     };
-
-    // fail
+// fail
     panic ("devmgr_device_object: [FAIL] Overflow!\n");
     return NULL;
 }
 
 // ==============
-// registrando um dispositivo dado o ponteiro para o arquivo
+// devmgr_register_device:
+// Registrando um dispositivo dado o ponteiro para o arquivo
 // que representa seu objeto.
 // #todo: 
 // Tem vários argumentos.
@@ -233,14 +196,14 @@ struct device_d *devmgr_device_object (void){
 // This is called by pciHandleDevice() in pci.c to register
 // every found device and for the ps2 devices initialization.
 // The pcidevice argument is null in this case.
-
 // #todo
 // #bugbug
 // Essa rotina tem um parametro para ponteiro de estrutura
 // de dispositivo pci.
 // #todo: precisamos de uma rotina similar, para registrar
-// qualquer tipo de dispositivo e associar um arquivo
-// a ele.
+// qualquer tipo de dispositivo e associar um arquivo a ele.
+// IN:
+// fp, pathname, class, type, pcidevice?, ttydevice?
 
 int 
 devmgr_register_device ( 
@@ -251,100 +214,73 @@ devmgr_register_device (
     struct pci_device_d *pci_device,
     struct tty_d *tty_device )
 {
-
     struct device_d *d;
     int id= -1;
-
-    // mount point
-    char __tmp_mount_point[64];
+// mount point
+    int PathSize = 64;  // Pathname size.
+    char buf[PathSize];
     char *new_mount_point;
-
 
     debug_print ("devmgr_register_device:\n");
 
-
-    new_mount_point = (char *) kmalloc(64);
-    
-    if ( (void*) new_mount_point == NULL )
-    {
+    new_mount_point = (char *) kmalloc(PathSize);
+    if ( (void*) new_mount_point == NULL ){
         panic ("devmgr_register_device: new_mount_point\n");
     }
 
 // =======================
 // FILE. Device object.
-
-    if ( (void *) f == NULL )
-    {
-        panic ("devmgr_register_device: [FAIL] f \n");
+    if ( (void *) f == NULL ){
+        panic ("devmgr_register_device: f\n");
     }
-
     if ( f->used != TRUE || f->magic != 1234 ){
-        panic("devmgr_register_device: f validation \n");
+        panic("devmgr_register_device: f validation\n");
     }
-
     if ( f->isDevice != TRUE ){
-        panic ("devmgr_register_device: This file is NOT a device!\n");
+        panic ("devmgr_register_device: This file is NOT a device\n");
     }
-
 // =======================
 // Device structure. 
 // (It is NOT the pci device struct)
-
-    d = (struct device_d *) devmgr_device_object();
-        
-    if ( (void *) d == NULL )
-    {
-        panic ("devmgr_register_device: d. Couldn't create device object\n");
+    d = (struct device_d *) devmgr_device_object();        
+    if ( (void *) d == NULL ){
+        panic ("devmgr_register_device: d\n");
     }
-
-    if ( d->used != TRUE || d->magic != 1234 )
-    {
-        panic ("devmgr_register_device: d validation \n");
+    if ( d->used != TRUE || d->magic != 1234 ){
+        panic ("devmgr_register_device: d validation\n");
     }
-
 // id
     id = d->index;
-    if ( id < 0 || id >= DEVICE_LIST_MAX )
-    {
-        panic ("devmgr_register_device: id limits \n");
+    if ( id < 0 || id >= DEVICE_LIST_MAX ){
+        panic ("devmgr_register_device: id\n");
     }
-
 // file
 // The file pointer.
-
-    if( (void*) f == NULL ){
-        panic ("devmgr_register_device: f\n");
-    }
-
-    d->__file  = (file *) f;
-
+    //if( (void*) f == NULL ){
+    //    panic ("devmgr_register_device: f\n");
+    //}
+// Save the file pointer.
+    d->_fp  = (file *) f;
 // Device structure.
     f->device = (struct device_d *) d;
-
 // Device index into the deviceList[].
     f->deviceId = d->index; 
-
     d->__class = class;
     d->type    = type;
-
 
 // name
 
     // clear buffer
-    memset( __tmp_mount_point, 0, 64 );
-
+    memset( buf, 0, PathSize );
 
     // Se um nome não foi indicado.
     if( (void*) name == NULL )
     {
         sprintf ( 
-            (char *) &__tmp_mount_point[0], 
+            buf,  //(char *) &buf[0], 
             "/DEV%d", 
             id );
-            
-        strcpy(
-            new_mount_point,
-            __tmp_mount_point );
+        strcpy( new_mount_point, buf );
     }
 
     size_t NameSize=0;
@@ -353,24 +289,19 @@ devmgr_register_device (
     if( (void*) name != NULL )
     {
         NameSize = (size_t) strlen(name);
-        if( NameSize >= 64)
+        if(NameSize >= PathSize){
             panic("devmgr_register_device: NameSize");
-        
+        }
         sprintf ( 
-            (char *) &__tmp_mount_point[0], 
+            buf,  //(char *) &__tmp_mount_point[0], 
             name );
             
-        strcpy(
-            new_mount_point,
-            __tmp_mount_point );
-
+        strcpy( new_mount_point, buf );
     }
 
 // /dev/tty0
     d->mount_point = (char *) new_mount_point; 
-
-
-   
+  
     // DEV_8086_8086
     //d->name ??
     
@@ -378,29 +309,11 @@ devmgr_register_device (
     //d->name[0] = 'x';
     d->name[0] = 0;
 
-
 // pci device
     d->pci_device = (struct pci_device_d *) pci_device;
-
 // tty device
     d->tty = (struct tty_d *) tty_device;
- 
-
     // ...
-
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

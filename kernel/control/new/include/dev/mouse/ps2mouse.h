@@ -69,21 +69,14 @@
 #define  MOUSE_X_OVERFLOW     0x40
 #define  MOUSE_Y_OVERFLOW     0x80
 
-// =====================================================
-
 // mouse info.
-// This is gonna be used by PS2 structure in ps2.h
 struct ps2_mouse_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
     file *fp;
-
     int device_id;
-
     int initialized;
-
     unsigned int resolution;
     unsigned int sample_rate;
 
@@ -99,15 +92,12 @@ struct ps2_mouse_d
     int has_wheel;
     int has_five_buttons;
 };
-
 //#todo
 // If we have only one mouse device.
 struct ps2_mouse_d  PS2Mouse;
 
-
 extern unsigned long g_mousepointer_width;
 extern unsigned long g_mousepointer_height;
-
 
 // Estado dos botões do mouse
 extern int mouse_button_1; 
@@ -119,9 +109,6 @@ extern int old_mouse_button_2;
 extern int old_mouse_button_3;
 // Se ouve alguma modificação no estado dos botões.
 extern int mouse_button_action;
-
-//--
-//=========================================================
 
 //
 // == prototypes =====================

@@ -4,6 +4,8 @@
 // ring0, kernel base.
 // Created by Fred Nora.
 
+#include <kernel.h>
+
 /*
  #todo
  enable mouse?
@@ -15,34 +17,11 @@
     }
 */
 
-#include <kernel.h>
-
-
-
-// Screen width and height
-extern unsigned long SavedX; 
-extern unsigned long SavedY;
-
-// packet
-static unsigned char mouse_packet_data = 0;  // flags
-static char mouse_packet_x = 0;              // delta x
-static char mouse_packet_y = 0;              // delta y
-static char mouse_packet_scroll = 0;         // z
-
-// packet support
-static int mouse_stage = 0;  // stages.
-static char buffer_mouse[4];
-
-// mouse buttons support
-unsigned int mbuttons_old_state[5];
-
-
-static long mouse_x=0;
-static long mouse_y=0;
-static long saved_mouse_x=0;
-static long saved_mouse_y=0;
-
-static int ps2_mouse_moving=0;
+#define I8042_STATUS 0x64
+#define I8042_BUFFER_FULL 0x01
+#define I8042_WHICH_BUFFER 0x20
+#define I8042_KEYBOARD_BUFFER 0x00
+#define I8042_MOUSE_BUFFER    0x20
 
 // Flags in the first byte.
 #define MOUSE_FLAGS_Y_OVERFLOW     0x80
@@ -82,6 +61,29 @@ static int ps2_mouse_moving=0;
 // #define PS2MOUSE_INTELLIMOUSE_ID 0x03
 // ...
 
+// Screen width and height
+extern unsigned long SavedX; 
+extern unsigned long SavedY;
+
+// packet
+static unsigned char mouse_packet_data = 0;  // flags
+static char mouse_packet_x = 0;              // delta x
+static char mouse_packet_y = 0;              // delta y
+static char mouse_packet_scroll = 0;         // z
+
+// packet support
+static int mouse_stage = 0;  // stages.
+static char buffer_mouse[4];
+
+// mouse buttons support
+unsigned int mbuttons_old_state[5];
+
+static long mouse_x=0;
+static long mouse_y=0;
+static long saved_mouse_x=0;
+static long saved_mouse_y=0;
+
+static int ps2_mouse_moving=0;
 
 static void __ps2mouse_parse_data_packet(void);
 static void __initialize_mouse_position(void);
@@ -92,20 +94,16 @@ static void __initialize_mouse_position(void)
 {
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
     deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
     deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
-    if (deviceWidth==0 || deviceHeight==0)
-    {
+    if (deviceWidth==0 || deviceHeight==0){
         panic("initialize_mouse_position: w h\n");
     }
-
     mouse_x = (long) (deviceWidth >> 1);
     mouse_y = (long) (deviceHeight >> 1);
     saved_mouse_x = (long) mouse_x;
     saved_mouse_y = (long) mouse_x;
 }
-
 
 // #deprecated!
 // local worker
@@ -113,19 +111,15 @@ static void __initialize_mouse_position(void)
 // Not used for now.
 void __update_mouse (void)
 {
-
 // O primeiro byte comtém um monte de flags.
 // O segundo byte comtém o delta x
 // O terceiro byte comtém o delta y
-
     unsigned char Flags=0;
     char DeltaX=0;
     char DeltaY=0;
-    
     Flags  = (mouse_packet_data & 0xFF);
     DeltaX = (mouse_packet_x & 0xFF);
     DeltaY = (mouse_packet_y & 0xFF);
-
 
 //======== X ==========
 // Testando o sinal de x.
@@ -176,7 +170,6 @@ quit:
     return;
 }
 
-
 // local worker
 // This routine is gonna parse the packet and give us
 // an updated x and y values.
@@ -193,15 +186,12 @@ static void __ps2mouse_parse_data_packet(void)
 // Sign support.
     int x_sign=FALSE;
     int y_sign=FALSE;
-
 // The current buttons state.
     unsigned int mbuttons_current_state[5];
-
 // Button changes.
     int button0_changed=FALSE;
     int button1_changed=FALSE;
     int button2_changed=FALSE;
-
     int Status=-1;
 
 // Save the old values of x and y.
@@ -241,13 +231,9 @@ static void __ps2mouse_parse_data_packet(void)
         return;
     }
 
-//
 // Final x and y positions.
-//
-
     mouse_x = (long) (mouse_x + mouse_packet_x);
     mouse_y = (long) (mouse_y - mouse_packet_y);
-
     mouse_x = (long) (mouse_x & 0x000003FF );
     mouse_y = (long) (mouse_y & 0x000003FF );
 
@@ -300,7 +286,6 @@ static void __ps2mouse_parse_data_packet(void)
 
 // Call the event handler.
 // Was it pressed or released?
-
 
 // 1 (left)
 // The button 0 changed the state.
@@ -376,14 +361,11 @@ int __get_device_id(void)
 {
     zzz_mouse_write (PS2MOUSE_GET_DEVICE_ID);
     mouse_expect_ack();
-    
     return (int) zzz_mouse_read(); 
 }
 
-
 // ps2mouse_initialize_device:
 //     Initialize the device.
-
 /*
 0xFF ResetMouse reset
 0xFE ResendFor serial communications errors
@@ -400,14 +382,14 @@ int __get_device_id(void)
 0xE7 Set Scaling 2:1Accelerationmode
 0xE6 Set Scaling 1:1Linear mode
 */
-
 // #todo: 
 // We need a file structure and the function ps2mouse_ioctl();
 
-void ps2mouse_initialize_device (void)
+void ps2mouse_initialize_device(void)
 {
     unsigned char status=0;
     unsigned char device_id=0;
+    file *fp;
 
     debug_print ("ps2mouse_initialize_device:\n");
     PS2Mouse.initialized = FALSE;
@@ -416,23 +398,23 @@ void ps2mouse_initialize_device (void)
 // #test
 // register device
 // create file.
-    file *fp;
     fp = (file *) kmalloc( sizeof(file) );
     if ( (void *) fp == NULL ){
-        panic ("mouse: fp\n");
+        panic ("ps2-mouse: fp\n");
     }
     fp->used = TRUE;
     fp->magic = 1234;
     fp->____object = ObjectTypeFile;
     fp->isDevice = TRUE;
-    //#todo: Initialize the file structure ... buffer ...
+
+// #todo: 
+// Initialize the file structure ... buffer ...
+// IN:
+// fp, pathname, class, type, pcidevice?, ttydevice?
     devmgr_register_device ( 
         (file *) fp, 
-        "/DEV/MOUSE0",        // pathname 
-        0,             // class (char, block, network) #todo
-        1,             // type (pci, legacy)    #todo
-        NULL,          // Not a pci device.
-        NULL );        // Not a tty device. (not for now)
+        "/DEV/MOUSE0",
+        0, 1, NULL, NULL );
 //====================================
 
 // pointer.
@@ -749,18 +731,12 @@ void DeviceInterface_PS2Mouse(void)
 
 // =============================================
 // #test
-#define I8042_STATUS 0x64
-#define I8042_BUFFER_FULL 0x01
-#define I8042_WHICH_BUFFER 0x20
-#define I8042_KEYBOARD_BUFFER 0x00
-#define I8042_MOUSE_BUFFER    0x20
-
 // Get status
     unsigned char status = in8(I8042_STATUS);
-
 // buffer full?
-    if (!(status & I8042_BUFFER_FULL))
+    if (!(status & I8042_BUFFER_FULL)){
         return;
+    }
 // which device?
 // Is it a mouse device?
 // Return if it is not a mouse device.

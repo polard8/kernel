@@ -7,14 +7,8 @@
 #include <kernel.h>
 
 unsigned long gPS2MouseInputTime=0;
-
-static unsigned long ps2mouse_watchdog_jiffies=0;
-
 unsigned long g_mousepointer_width=0;
 unsigned long g_mousepointer_height=0;
-
-
-
 // Estado dos botões do mouse
 int mouse_button_1=FALSE;
 int mouse_button_2=FALSE;
@@ -26,7 +20,9 @@ int old_mouse_button_3=FALSE;
 // Se ouve alguma modificação no estado dos botões.
 int mouse_button_action=FALSE;
 
+static unsigned long ps2mouse_watchdog_jiffies=0;
 
+// ==============
 
 unsigned long ps2mouse_get_last_wd_jiffies(void)
 {
@@ -37,27 +33,19 @@ unsigned long ps2mouse_get_last_wd_jiffies(void)
 __VOID_IRQ 
 irq12_MOUSE (void)
 {
-
-    gPS2MouseInputTime = (unsigned long) jiffies;
-
-    // If ps2 mouse isn't initialized yet.
+// If ps2 mouse isn't initialized yet.
     if ( PS2.mouse_initialized != TRUE ){
         in8(0x60);
         return;
     }
-
-//
+// Time
+    gPS2MouseInputTime = (unsigned long) jiffies;
 // Watchdog
-// 
-
     ps2mouse_watchdog_jiffies = (unsigned long) jiffies;
-
-
 // Disable keyboard port.
 // Call the main routine.
 // Reanable keyboard port.
 // See: ps2mouse.c
-
     wait_then_write(0x64,0xAD);
     DeviceInterface_PS2Mouse();
     wait_then_write(0x64,0xAE);
