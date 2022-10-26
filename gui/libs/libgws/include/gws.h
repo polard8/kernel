@@ -70,10 +70,8 @@
 // ==== Version ====
 //
 
-
 #define GWS_LIB_PROTOCOL           0
 #define GWS_LIB_PROTOCOL_REVISION  1
-
 
 struct libgws_version_d
 {
@@ -84,22 +82,16 @@ struct libgws_version_d
 // Version struct.
 //struct libgws_version_d libgwsVersion;
 
-
 // See: gws.c
 extern struct libgws_version_d libgwsVersion;
 
-
-
-
 //
-// =============== TOP ========================
+// == TOP ========================
 //
-
 
 // #todo
 // Na parte mais baixa desse documento devem ficar as abstraçẽos.
 // Elas serão as rotinas de mais alto nível e devem começar com gws_
-
 
 // System call.
 
@@ -109,13 +101,10 @@ void *gws_system_call (
     unsigned long c, 
     unsigned long d );
 
-
 void gws_debug_print (char *string);
-
 
 // Initialize the library.
 int gws_initialize_library (void);
-
 
 // Services.
 // Dialog with the library
@@ -127,7 +116,6 @@ void *gws_services (
     unsigned long arg3,
     unsigned long arg4 );
 
-
 // Send message to a process.                     
 int
 gws_send_message_to_process ( 
@@ -136,7 +124,6 @@ gws_send_message_to_process (
     int message,
     unsigned long long1,
     unsigned long long2 );
-
 
 // Send message to a thread.
 int 
@@ -147,16 +134,9 @@ gws_send_message_to_thread (
     unsigned long long1,
     unsigned long long2 ); 
 
-
-
-
 //
 // == 2d ==============================================
 //
-
-
-
-
 
 // Draw a char.
 int 
@@ -185,7 +165,6 @@ gws_redraw_window (
     int window, 
     unsigned long flags );
 
-
 // The server will return the info about one given window.
 struct gws_window_info_d *gws_query_window(
     int fd,
@@ -204,7 +183,6 @@ struct gws_event_d *gws_get_next_event(int fd, struct gws_event_d *event);
 // Refresh a window.
 int gws_refresh_window (int fd, int window );
 
-
 int
 gws_refresh_retangle ( 
     int fd,
@@ -212,7 +190,6 @@ gws_refresh_retangle (
     unsigned long top, 
     unsigned long width, 
     unsigned long height );
-
 
 // Change window position.
 int 
@@ -230,8 +207,7 @@ gws_resize_window (
     unsigned long w, 
     unsigned long h );
 
-
-// atualiza o retângulo da surface da thread.
+// Atualiza o retângulo da surface da thread.
 void 
 setup_surface_retangle ( 
     unsigned long left, 
@@ -259,11 +235,12 @@ gws_create_window (
     unsigned long width,       //7, Largura da janela.
     unsigned long height,      //8, Altura da janela.
     int parentwindow,          //9, Endereço da estrutura da janela mãe.
-    unsigned long style,        //10, Ambiente.( Está no desktop, barra, cliente ...)
-    unsigned int clientcolor, //11, Cor da área de cliente
-    unsigned int color );     //12, Color (bg) (para janela simples).
+    unsigned long style,       //10, Ambiente.( Está no desktop, barra, cliente ...)
+    unsigned int clientcolor,  //11, Cor da área de cliente
+    unsigned int color );      //12, Color (bg) (para janela simples).
 
 void gws_reboot(int fd);
+void gws_shutdown(int fd);
 void gws_update_desktop(int fd);
 // #test 
 // Load a file given a path.
@@ -276,16 +253,12 @@ gws_load_path (
 
 // Yield the current thread.
 void gws_yield(void);
-
 // Refresh the background and yield the current thread.
 void gws_refresh_yield (int fd);
-
 // Refresh a given window and yield the current thread.
 void gws_refresh_yield2 (int fd, int window);
-
 // Yield the current thread n times.
 void gws_yield_n_times (unsigned long n);
-
 
 void *gws_create_thread ( 
     unsigned long init_eip, 
@@ -306,17 +279,13 @@ gws_clone_and_execute2 (
     unsigned long arg4,
     char *string );
 
-
-
 unsigned long gws_get_system_metrics (int index);
-
 
 void gws_enter_critical_section(void);
 void gws_exit_critical_section(void);
 
 int gws_create_empty_file ( char *file_name );
 int gws_create_empty_directory ( char *dir_name );
-
 
 // menu
 struct gws_menu_d *gws_create_menu (
@@ -337,12 +306,10 @@ struct gws_menu_item_d *gws_create_menu_item (
     int id,
     struct gws_menu_d *menu);
 
-
 // get next event.
 // the window server return the next event
 // from the queue of a client.
 struct gws_event_d *gws_next_event (int fd);
-
 
 // Send event.
 // It is gonna be used by the window manager to send 
@@ -356,7 +323,6 @@ gws_send_event (
     struct gws_event_d *event );
 
 unsigned int gws_explode_byte_32 (unsigned char data);
-
 
 void
 gws_async_command ( 
@@ -375,7 +341,6 @@ gws_async_command2 (
     unsigned long data3,
     unsigned long data4 );
 
-
 void gws_set_focus(int fd, int window);
 
 void gws_send_wm_magic( int fd, int pid );
@@ -386,7 +351,6 @@ void gws_send_wm_magic( int fd, int pid );
 int application_start(void);
 void application_end(void);
 // ==========================
-
 
 int gws_enable_input_method(int method);
 
@@ -399,10 +363,6 @@ gws_default_procedure (
     unsigned long long2 );
 
 //
-// End.
+// End
 //
-
-
-
-
 

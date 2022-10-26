@@ -325,16 +325,14 @@ int main( int argc, char *argv[] )
 
     //debug_print ("EDITOR.BIN: Initializing\n");
 
-
 /*
 // #test
 // OK!
     int i=0;
-	for (i = 1; i < argc; i++)
-		if (strcmp("--test--", argv[i]) == 0)
-			printf("TEST\n");
+    for (i = 1; i < argc; i++)
+        if (strcmp("--test--", argv[i]) == 0)
+            printf("TEST\n");
 */
-
 
 // global: Cursor
     cursor_x = 0;
@@ -348,8 +346,7 @@ int main( int argc, char *argv[] )
     Display = 
         (struct gws_display_d *) gws_open_display("display:name.0");
 
-    if ( (void*) Display == NULL )
-    {
+    if ( (void*) Display == NULL ){
         debug_print ("editor: Couldn't open display\n");
         printf      ("editor: Couldn't open display\n");
         exit(1);
@@ -357,8 +354,7 @@ int main( int argc, char *argv[] )
 
     client_fd = (int) Display->fd;
 
-    if ( client_fd <= 0 )
-    {
+    if (client_fd <= 0){
         debug_print ("editor: bad fd\n");
         printf      ("editor: bad fd\n");
         exit(1);
@@ -378,7 +374,7 @@ int main( int argc, char *argv[] )
     unsigned long w_width  = (w>>1);
     unsigned long w_height = (h - 100); //(h>>1);
 
-// original
+// Original
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
 

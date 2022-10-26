@@ -3,10 +3,8 @@
  *     Simple virtual terminal.
  *     2021 - Created by Fred Nora.
  */
-
 // #test
 // For now it has a small embedded command line interpreter.
-
 // The POSIX terminal interface.
 // Raw or Canonical?
 // See:
@@ -14,12 +12,9 @@
 // https://en.wikipedia.org/wiki/POSIX_terminal_interface
 // https://en.wikipedia.org/wiki/Computer_terminal
 // ...
-
 // Connecting via AF_INET.
-
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
- 
 /*
     To make a process a TCP server, 
     you need to follow the steps given below −
@@ -32,7 +27,6 @@
     This call typically blocks until a client connects with the server.
     Send and receive data using the read() and write() system calls.
 */ 
-
 // See:
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
@@ -41,20 +35,12 @@
 // ...
 
 //#include <ctype.h>
-
 // #todo:
 // We need to change the name of this document??
 #include "noraterm.h"
-
 // #test:
 // Testing ioctl()
 #include <termios.h>
-
-
-// The man structure.
-// see: terminal.h
-struct terminal_d  Terminal;
-
 
 
 // network ports.
@@ -62,39 +48,32 @@ struct terminal_d  Terminal;
 #define PORTS_NS 4041
 #define PORTS_FS 4042
 // ...
-
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
-
+// The main structure.
+// see: terminal.h
+struct terminal_d  Terminal;
 FILE *__terminal_input_fp;
-
 // color
 static unsigned int bg_color = COLOR_BLACK;
 static unsigned int fg_color = COLOR_WHITE;
 static unsigned int prompt_color = COLOR_GREEN;
-
 // cursor
 static int cursor_x = 0;
 static int cursor_y = 0;
-
 // Embedded shell
 // We are using the embedded shell.
 static int isUsingEmbeddedShell=TRUE;
-
-// Windows:
+// Windows
 static int main_window=0;
 static int terminal_window=0;
-
 // #todo: #maybe:
 // Fazer estrutura para gerenciar a sequencia.
 static int __sequence_status = 0;
 
-
 //
 // == Private functions: Prototypes ==============
 //
-
-
 
 static void terminalTerminal (void);
 static void terminalInitWindowPosition(void);
@@ -102,18 +81,15 @@ static void terminalInitWindowSizes(void);
 static void terminalInitWindowLimits (void);
 static void terminalInitSystemMetrics (void);
 
-
 static void __on_return_key_pressed(int fd);
 static void compareStrings(int fd);
 static void __try_execute(int fd);
 static void doPrompt(int fd);
 
-
 static void clear_terminal_client_window(int fd);
 static void __send_to_child (void);
 static void __test_winfo(int fd, int wid);
 
-static void __shutdown_via_ws(int fd);
 static void __test_message(void);
 
 //====================================================
@@ -168,15 +144,6 @@ static void __test_message(void)
     };
 }
 
-// shutdown via ws.
-// the window server lauches the shutdown.bin process.
-static void __shutdown_via_ws(int fd)
-{
-    if(fd<0){
-        return;
-    }
-    gws_async_command(fd,22,0,0);
-}
 
 // Clear
 // Redraw the client window.
@@ -582,9 +549,9 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"poweroff",8) == 0 )
-    {
-        __shutdown_via_ws(fd);
+// Poweroff via ws.
+    if( strncmp(prompt,"poweroff",8) == 0 ){
+        gws_shutdown(fd);
         goto exit_cmp;
     }
 
@@ -2506,16 +2473,13 @@ int main ( int argc, char *argv[] )
 
     int client_fd = -1;
 
-
+    Terminal.initialized = FALSE;
     debug_print ("terminal: Initializing\n");
 
 // Device info
 // #todo: Check for 'zero'.
-
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
-    Terminal.initialized = FALSE;
 
 // Cursor
     cursor_x = 0;
@@ -2531,12 +2495,7 @@ int main ( int argc, char *argv[] )
 
     __sequence_status = 0;
 
-//
 // socket
-// 
-
-    // #debug
-    //printf ("terminal: Creating socket\n");
 
     //client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
     client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
@@ -2546,8 +2505,6 @@ int main ( int argc, char *argv[] )
        printf      ("terminal: Couldn't create socket\n");
        exit(1);
     }
-
-
 
 // Saving the fd in the main struct.
     Terminal.client_fd = client_fd;
@@ -2559,19 +2516,14 @@ int main ( int argc, char *argv[] )
 
     //while(1){}
 
-//
 // connect
-// 
-
 // Nessa hora colocamos no accept um fd.
 // então o servidor escreverá em nosso arquivo.
-
     //printf ("terminal: Connecting to ws via inet ...\n");
 
     int con_status = -1;
 
     while (1){
-
         con_status = (int) connect(client_fd, (void *) &addr_in, sizeof(addr_in));
 
         if ( con_status < 0 ){ 
@@ -2675,32 +2627,25 @@ int main ( int argc, char *argv[] )
         main_window,   // The app window.
         (struct gws_window_info_d *) wi );
 
-    if(wi->used != TRUE)
-    {
+    if(wi->used != TRUE){
         printf("terminal: wi->used\n");
         while(1){}
     }
-    if(wi->magic!=1234)
-    {
+    if(wi->magic!=1234){
         printf("terminal: wi->magic\n");
         while(1){}
     }
 
-
-
 // Setting new values for the client window.
 
-
     // nao pode ser maior que o dispositivo
-    if( wi->cr_left >= w)
-    {
+    if( wi->cr_left >= w){
         printf("terminal: wi->cr_left\n");
         while(1){}
     }
 
     // nao pode ser maior que o dispositivo
-    if(wi->cr_top >= h)
-    {
+    if(wi->cr_top >= h){
         printf("terminal: wi->cr_top\n");
         while(1){}
     }
@@ -2746,7 +2691,6 @@ int main ( int argc, char *argv[] )
         while(1){}
     }
 
-
 // Saving the window id.
     Terminal.client_window_id = terminal_window;
 
@@ -2757,13 +2701,10 @@ int main ( int argc, char *argv[] )
     Terminal.top  = 0;
     //Terminal.left = wLeft;  //0;
     //Terminal.top  = wTop;   //0;
-
 // Width and height
-
-    // In pixels.
+// In pixels.
     Terminal.width = wWidth;
     Terminal.height = wHeight;
-
 // In chars.
     Terminal.width_in_chars  = (unsigned long)((wWidth/8)  & 0xFFFF);
     Terminal.height_in_chars = (unsigned long)((wHeight/8) & 0xFFFF);
@@ -2811,7 +2752,6 @@ int main ( int argc, char *argv[] )
     __wlMaxColumns = DEFAULT_MAX_COLUMNS;
     __wlMaxRows    = DEFAULT_MAX_ROWS;
 
-
 // Initializations
 // #important:
 // We will call this function
@@ -2834,7 +2774,6 @@ int main ( int argc, char *argv[] )
 // Write something in the standard stream and call shell.bin.
 
     // test_standard_stream(client_fd);
-
 
 // ============================================
 // focus
@@ -2881,7 +2820,6 @@ int main ( int argc, char *argv[] )
 // ele é um console e só esta aceitando saída por enquanto.
     //InputStatus = __input_STDOUT(client_fd);
 
-
 // from stdin
 // stdin é um 'regular file'
     InputStatus = __input_STDIN(client_fd);
@@ -2907,49 +2845,37 @@ int main ( int argc, char *argv[] )
 //exit:
     debug_print ("terminal: bye\n"); 
     printf      ("terminal: bye\n");
-    
-    while(1){}
+
+    while(1){
+    };
 
     return 0;
 }
 
 
-/*
- * terminalTerminal:
- *     Constructor.
- *     Não emite mensagens.
- */
-
+// terminalTerminal:
+// Não emite mensagens.
 // #bugbug
 // essas configurações são configurações de janela,
 // então estão mais para terminal do que para shell.
 
-
-static void terminalTerminal (void)
+static void terminalTerminal(void)
 {
     int i=0;
     int j=0;
 
-// Internas.
-    //shellStatus = 0;
-    //shellError = 0;
-
-// Initialize colors.
     bg_color = COLOR_BLACK;
     fg_color = COLOR_WHITE;
-
     cursor_x=0;
     cursor_y=0;
-
     prompt_color = COLOR_GREEN;
-
+    //shellStatus = 0;
+    //shellError = 0;
 
 // Inicializando as estruturas de linha.
 // Inicializamos com espaços.
 // Limpa o buffer de linhas onde os caracteres são colocados.
-    
     terminalClearBuffer();
-
 // Deve ser pequena, clara e centralizada.
 // Para ficar mais rápido.
 // #importante:
@@ -2957,57 +2883,41 @@ static void terminalTerminal (void)
 // retornadas pelo sistema.
 // Usar o get system metrics para pegar o 
 // tamanho da tela.
-
 //inicializa as metricas do sistema.
     terminalInitSystemMetrics();
-
 //inicializa os limites da janela.
     terminalInitWindowLimits();
-
 //inicia o tamanho da janela.
     terminalInitWindowSizes();
-
 //inicializar a posição da janela.
     terminalInitWindowPosition();
- 
 // initialize visible area.
 // #todo: criar função para isso
 // É melhor que seja pequena por enquanto pra não ativar
 // o scroll do kernel e só usar o scroll desse terminal.
-
     //textTopRow = 0;
     //textBottomRow = 24;
     //terminalNewVisibleArea ( 0, 19);
-
     //...
-
 // Obs:
 // prompt[] - Aqui ficam as digitações. 
-
-	//shellBufferMaxColumns = DEFAULT_BUFFER_MAX_COLUMNS;
-	//shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
-	
-	//buffersize = (shellBufferMaxColumns * shellBufferMaxRows);
-	
-
-//
+    //shellBufferMaxColumns = DEFAULT_BUFFER_MAX_COLUMNS;
+    //shellBufferMaxRows    = DEFAULT_BUFFER_MAX_ROWS;
+    //buffersize = (shellBufferMaxColumns * shellBufferMaxRows);
 // #todo: 
 // E o fluxo padrão. Quem configurou os arquivos ???
 // o kernel configuroru???
-//
-
     //...
-
 
 	//for ( i=0; i<WORKINGDIRECTORY_STRING_MAX; i++ ){
 	//	current_workingdiretory_string[i] = (char) '\0';
 	//};
-	
+
     //sprintf ( current_workingdiretory_string, 
-	//    SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
-	
+    //    SHELL_UNKNOWNWORKINGDIRECTORY_STRING );    
+
 	//...
-	
+
 //done:
 
     //ShellFlag = SHELLFLAG_COMMANDLINE;
@@ -3028,23 +2938,18 @@ static void terminalTerminal (void)
 
 static void terminalInitSystemMetrics(void)
 {
-
 // Screen width and height.
     smScreenWidth = gws_get_system_metrics(1);
-    smScreenHeight = gws_get_system_metrics(2); 
-
+    smScreenHeight = gws_get_system_metrics(2);
 // Cursor width and height.
     smCursorWidth = gws_get_system_metrics(3);
     smCursorHeight = gws_get_system_metrics(4);
-
 // Mouse pointer width and height.
     smMousePointerWidth = gws_get_system_metrics(5);
     smMousePointerHeight = gws_get_system_metrics(6);
-
 // Char width and height.
     smCharWidth = gws_get_system_metrics(7);
     smCharHeight = gws_get_system_metrics(8);
-
 
 //#todo:
 //vertical scroll size
@@ -3061,8 +2966,7 @@ static void terminalInitSystemMetrics(void)
     //InitSystemMetricsStatus = TRUE;
 } 
 
-
-static void terminalInitWindowLimits (void)
+static void terminalInitWindowLimits(void)
 {
 
 // #todo
@@ -3075,34 +2979,30 @@ static void terminalInitWindowLimits (void)
 	    terminalInitSystemMetrics ();
 	}
 	*/
-	
-    //
-    // ## Window limits ##
-    //
-	
-	// problemas; 
+
+//
+// ## Window limits ##
+//
+
+// problemas; 
 	//if ( smScreenWidth == 0 || smScreenHeight )
 	//{
-	//	 printf ...
+	//    printf ...
 	//}
-
 
 // Fullscreen support.
     wlFullScreenLeft = 0;
     wlFullScreenTop  = 0;
     wlFullScreenWidth  = smScreenWidth;
     wlFullScreenHeight = smScreenHeight;
-
-//Limite de tamanho da janela.
+// Limite de tamanho da janela.
     wlMinWindowWidth  = (smCharWidth * 80);
     wlMinWindowHeight = (smCharWidth * 25);
     wlMaxWindowWidth  = wlFullScreenWidth;
     wlMaxWindowHeight = wlFullScreenHeight;
-
 // Quantidade de linhas e colunas na área de cliente.
     wlMinColumns = 80;
     wlMinRows = 1;
-
 // Dado em quantidade de linhas.
     textMinWheelDelta = 1;  //mínimo que se pode rolar o texto
     textMaxWheelDelta = 4;  //máximo que se pode rolar o texto	
@@ -3113,7 +3013,6 @@ static void terminalInitWindowLimits (void)
 
 static void terminalInitWindowSizes(void)
 {
-
     if (Terminal.initialized != TRUE ){
         printf("terminalInitWindowSizes: Terminal.initialized\n");
         exit(1);
@@ -3124,23 +3023,19 @@ static void terminalInitWindowSizes(void)
 //
 
     //wsWindowWidth = wlMinWindowWidth;
-    //wsWindowHeight = wlMinWindowHeight;	
+    //wsWindowHeight = wlMinWindowHeight;
 
 // Tamanho da janela do shell com base nos limites 
 // que ja foram configurados.
-
     wsWindowWidth  = Terminal.width;
     wsWindowHeight = Terminal.height;
-
     if ( wsWindowWidth < wlMinWindowWidth ){
         wsWindowWidth = wlMinWindowWidth;
     }
-
     if ( wsWindowHeight < wlMinWindowHeight ){
         wsWindowHeight = wlMinWindowHeight;
     }
 }
-
 
 static void terminalInitWindowPosition(void)
 {
@@ -3148,7 +3043,6 @@ static void terminalInitWindowPosition(void)
         printf("terminalInitWindowPosition: Terminal.initialized\n");
         exit(1);
     }
-
 // Window position
     wpWindowLeft = Terminal.left;
     wpWindowTop  = Terminal.top;
@@ -3156,12 +3050,7 @@ static void terminalInitWindowPosition(void)
     //wpWindowTop = (unsigned long) ( (smScreenHeight - wsWindowHeight)/2 );  	
 }
 
-
 //
-// End.
+// End
 //
-
-
-
-
 

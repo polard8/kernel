@@ -262,6 +262,7 @@ static void run_selected_option(void)
 }
 
 
+// #todo: explain it
 static unsigned long 
 on_keyboard_event(
     int msg,
@@ -277,14 +278,11 @@ on_keyboard_event(
     //if(!w){ w=get_active(); }
     
     w = (void*) keyboard_owner;
-    
-    if ( (void*) w == NULL )
-    {
+    if ( (void*) w == NULL ){
         printf("on_keyboard_event: w\n");
         return 0;
     }
-    if (w->magic!=1234)
-    {
+    if (w->magic!=1234){
         printf("on_keyboard_event: w magic\n");
         return 0;
     }
@@ -3828,6 +3826,13 @@ int wmSTDINInputReader(void)
 // tempo ela permaneceu pressionada.
 // processamos ate 32 input válidos.
 // isso deve ajudar quando movimentarmos o mouse.
+// #importante:
+// Se o servidor for portado para outro sistema
+// então precisamos converter o formato do eventro
+// entregue pelo sistema operacional, em um formato
+// que o servidor consegue entender.
+// Por enquanto o servidor entende o formato de eventos
+// entregues pelo gramado.
 // Called by main.c
 
 int wmInputReader(void)
@@ -3838,6 +3843,10 @@ int wmInputReader(void)
 
     int __Status = -1;
     register int i=0;
+
+// see: event.h
+    struct gws_event_d e;
+
 
     for (i=0; i<=31; i++)
     {
@@ -3855,74 +3864,111 @@ int wmInputReader(void)
         
         if(__Status==TRUE)
         {
+            // #test
+            e.msg   = (int)           RTLEventBuffer[1];
+            e.long1 = (unsigned long) RTLEventBuffer[2];
+            e.long2 = (unsigned long) RTLEventBuffer[3];
 
-            //cut
-            if( RTLEventBuffer[1] == GWS_Cut )
-            { printf("ws: cut\n"); return 0; }
+            // MOUSE events
+            // Calling procedure.
+            if ( e.msg == GWS_MouseMove || 
+                 e.msg == GWS_MousePressed ||
+                 e.msg == GWS_MouseReleased )
+            {
+                // If the mouse is enabled.
+                // #todo: return if gUseMouse=FALSE.
+                if (gUseMouse == TRUE)
+                {
+                    //return (unsigned long) wmProcedure(
+                    wmProcedure(
+                        NULL,
+                        (int) e.msg,
+                        (unsigned long) e.long1,
+                        (unsigned long) e.long2 ); 
+                }
+                //return 0;
+            }
 
-            //copy (ok)
+            // keyboard
+            // mensagens desse tipo
+            // devem ir para a janela com o foco de entrada.
+            if ( e.msg == GWS_KeyDown ||
+                 e.msg == GWS_SysKeyDown ||
+                 e.msg == GWS_SysKeyUp )
+            {
+                // Print char into the keyboard window.
+                on_keyboard_event( 
+                    (int) e.msg, 
+                    (unsigned long) e.long1, 
+                    (unsigned long) e.long2 );
+                //return 0;
+            }
+
+            // Arrows
+
+            // #todo: 
+            // We also can use 'keydown' and check the vk.
+            // Control arrow right
+            if(e.msg == GWS_ControlArrowRight)
+            {
+                //printf("ws: Control right\n"); 
+                dock_active_window(2);
+                //return 0; 
+            }
+            // Control arrow up
+            if(e.msg == GWS_ControlArrowUp)
+            {
+                //printf("ws: Control up\n"); 
+                dock_active_window(1);
+                //return 0; 
+            }
+            // Control arrow down
+            if(e.msg == GWS_ControlArrowDown)
+            {
+                //printf("ws: Control down\n");
+                dock_active_window(3);
+                //return 0;
+            }
+            //  Control arrow left
+            if(e.msg == GWS_ControlArrowLeft)
+            {
+                //printf("ws: Control left\n");
+                dock_active_window(4); 
+                //return 0; 
+            }
+
+
+            // Gui events?
+
+            // cut (control+x)?
+            if(e.msg == GWS_Cut)
+            { printf("ws: cut :)\n"); return 0; }
+            // copy (ok)
             // Copy or kill?
-            if( RTLEventBuffer[1] == GWS_Copy )
+            if(e.msg == GWS_Copy)
             { printf("ws: copy\n"); return 0; }
-
-            //paste (ok)
-            if( RTLEventBuffer[1] == GWS_Paste )
+            // paste (ok)
+            if(e.msg == GWS_Paste)
             { printf("ws: paste\n"); return 0; }
-
-            //undo
-            if( RTLEventBuffer[1] == GWS_Undo )
+            // undo
+            if(e.msg == GWS_Undo)
             { printf("ws: undo\n"); return 0; }
-
-            //select all: control+a
-            if( RTLEventBuffer[1] == GWS_SelectAll )
+            // select all: control+a
+            if(e.msg == GWS_SelectAll)
             { printf("ws: select all\n"); return 0; }
-
-            //find: control+f
-            if( RTLEventBuffer[1] == GWS_Find )
+            // find: control+f
+            if(e.msg == GWS_Find)
             { printf("ws: find\n"); return 0; }
-
-            // #todo: we also can use 'keydown' and check the vk.
-
-            //Control arrow right
-            if( RTLEventBuffer[1] == GWS_ControlArrowRight )
-            {
-              //printf("ws: Control right\n"); 
-              dock_active_window(2);
-              return 0; 
-            }
-            //Control arrow up
-            if( RTLEventBuffer[1] == GWS_ControlArrowUp )
-            {
-              //printf("ws: Control up\n"); 
-              dock_active_window(1);
-              return 0; 
-            }
-            //Control arrow down
-            if( RTLEventBuffer[1] == GWS_ControlArrowDown )
-            {
-              //printf("ws: Control down\n");
-              dock_active_window(3);
-              return 0;
-            }
-            //Control arrow left
-            if( RTLEventBuffer[1] == GWS_ControlArrowLeft )
-            { 
-              //printf("ws: Control left\n");
-              dock_active_window(4); 
-              return 0; 
-            }
-
             // Save: [control + s]
             // criar, ativar ou desativar o menu.
             // #todo: We need a new name.
             // see: menu.c
-            if( RTLEventBuffer[1] == GWS_Save )
+            if(e.msg == GWS_Save)
             {
-                 //printf("ws: save\n"); 
-                 on_menu();
-                 return 0; 
+                //printf("ws: save\n"); 
+                on_menu();
+                return 0; 
             }
-
 
             // Via alt + f4
             // qemu intercepts this combination.
@@ -3933,68 +3979,14 @@ int wmInputReader(void)
             
             // #tests
             // Via shift + f12
-            if( RTLEventBuffer[1] == 88112 )
+            if(e.msg == 88112)
             {
                 gUseMouse = TRUE;
                 wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
-
                 //printf ("server: [88112]\n");
                 //__switch_focus();
                 //wm_update_desktop(TRUE); //ok.
-                //wm_reboot();
-                
-                //demos_startup_animation(7);
-                
                 return 0;
-            }
-
-            //#test: MOUSE events
-            if ( RTLEventBuffer[1] == GWS_MouseMove || 
-                 RTLEventBuffer[1] == GWS_MousePressed ||
-                 RTLEventBuffer[1] == GWS_MouseReleased )
-            {
-                if (gUseMouse == TRUE)
-                {
-                    //g_handler_flag = TRUE;
-                    //wmHandler( 
-                    //    0,
-                    //    RTLEventBuffer[1],
-                    //    RTLEventBuffer[2],
-                    //    RTLEventBuffer[3] );
-                    //g_handler_flag = FALSE;
-
-                    return (unsigned long) wmProcedure(
-                        NULL,  //(struct gws_window_d *) 0,
-                        (int) (RTLEventBuffer[1] & 0xFFFFFFFF),
-                        (unsigned long) RTLEventBuffer[2],
-                        (unsigned long) RTLEventBuffer[3] ); 
-                }
-            }
-            
-            
-            // todo: get time for diagnoses. (jiffies)
-            // mensagens desse tipo
-            // devem ir para a janela com o foco de entrada.
-            if (RTLEventBuffer[1] == GWS_KeyDown ||
-                RTLEventBuffer[1] == GWS_SysKeyDown ||
-                RTLEventBuffer[1] == GWS_SysKeyUp )
-            {
-
-            //#test
-            //#good very good!
-            //wmGetLastInputJiffie(TRUE);
-            //printf("tick: %d\n",last_input_jiffie);
-            
-            // See: wm.c
-            // IN: wid, msg_code, long1, long2
-
-                g_handler_flag = TRUE;
-                wmHandler( 
-                    0,    // #todo window with focus.
-                    RTLEventBuffer[1],
-                    RTLEventBuffer[2],
-                    RTLEventBuffer[3] );
-                g_handler_flag = FALSE;
             }
         }
     };
