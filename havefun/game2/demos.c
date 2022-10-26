@@ -209,7 +209,7 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
         tri.p[0].y = (float) cube->vecs[v].y;
         tri.p[0].z = (float) cube->vecs[v].z;
         tri.p[0].color = COLOR_PINK;
-        if(i >= 1 && i < 12){
+        if(i >= 1 && i <= 12){
             tri.p[0].color = cube->colors[i-1];  // rectangle color
         }
         v = (int) sequence[off+1];
@@ -368,6 +368,7 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
              normal.z * (triRotatedXYZ.p[0].z - CurrentCameraF.position.z) );
         if( (float) tmp <  0.0f){ cull=FALSE; }  //paint
         if( (float) tmp >= 0.0f){ cull=TRUE;  }  //do not paint
+        //cull=FALSE;
         //----------------------------------------------------
 
         // We need a valid window, 
@@ -457,12 +458,12 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 //------------------------------------------------
 // Rotation X
 // counter-clockwise
-	matRotX.m[0][0] = (float) 1.0f;
-	matRotX.m[1][1] = (float) cosf(cube->fThetaAngle * 0.5f);
-	matRotX.m[1][2] = (float) -sinf(cube->fThetaAngle * 0.5f);
-	matRotX.m[2][1] = (float) sinf(cube->fThetaAngle * 0.5f);
-	matRotX.m[2][2] = (float) cosf(cube->fThetaAngle * 0.5f);
-	matRotX.m[3][3] = (float) 1.0f;
+    matRotX.m[0][0] = (float) 1.0f;
+    matRotX.m[1][1] = (float) cosf(cube->fThetaAngle * 0.5f);
+    matRotX.m[1][2] = (float) -sinf(cube->fThetaAngle * 0.5f);
+    matRotX.m[2][1] = (float) sinf(cube->fThetaAngle * 0.5f);
+    matRotX.m[2][2] = (float) cosf(cube->fThetaAngle * 0.5f);
+    matRotX.m[3][3] = (float) 1.0f;
 //------------------------------------------------
 // Rotation Y
 // counter-clockwise
@@ -475,12 +476,12 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 //------------------------------------------------
 // Rotation Z
 // counter-clockwise
-	matRotZ.m[0][0] = (float) cosf(0.0f);//(cube->fThetaAngle);
-	matRotZ.m[0][1] = (float) -sinf(0.0f);//(cube->fThetaAngle);
-	matRotZ.m[1][0] = (float) sinf(0.0f);//(cube->fThetaAngle);
-	matRotZ.m[1][1] = (float) cosf(0.0f);//(cube->fThetaAngle);
-	matRotZ.m[2][2] = (float) 1.0f;
-	matRotZ.m[3][3] = (float) 1.0f;
+    matRotZ.m[0][0] = (float) cosf(0.0f);//(cube->fThetaAngle);
+    matRotZ.m[0][1] = (float) -sinf(0.0f);//(cube->fThetaAngle);
+    matRotZ.m[1][0] = (float) sinf(0.0f);//(cube->fThetaAngle);
+    matRotZ.m[1][1] = (float) cosf(0.0f);//(cube->fThetaAngle);
+    matRotZ.m[2][2] = (float) 1.0f;
+    matRotZ.m[3][3] = (float) 1.0f;
 
 // 12 triangles.
 // Order: north, top, south, bottom, east, west.
@@ -519,7 +520,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         tri.p[0].y = (float) cube->vecs[v].y;
         tri.p[0].z = (float) cube->vecs[v].z;
         tri.p[0].color = COLOR_PINK;
-        if(i >= 1 && i < 12){
+        if(i >= 1 && i <= 12){
             tri.p[0].color = cube->colors[i-1];  // rectangle color
         }
         v = (int) sequence[off+1];
@@ -1958,7 +1959,6 @@ void demoFlyingCubeSetup(void)
         cube->colors[10] = GRCOLOR_LIGHTBLUE;
         cube->colors[11] = GRCOLOR_LIGHTGREEN;
 
-
         cube->model_initial_distance = (float) 8.0f;
         cube->model_distance = (float) 0.0f;
 
@@ -1980,16 +1980,18 @@ void demoFlyingCubeSetup(void)
         cubes[count] = (unsigned long) cube;
     };
 
+// Terrain
+
     if ( (void*) terrain != NULL )
     {
-        terrain->vecs[1].x = (float) -8.0f;  terrain->vecs[1].y = (float) -0.1f;  terrain->vecs[1].z = (float) 1.8f;
-        terrain->vecs[2].x = (float)  8.0f;  terrain->vecs[2].y = (float) -0.1f;  terrain->vecs[2].z = (float) 1.8f;
-        terrain->vecs[3].x = (float) -8.0f;  terrain->vecs[3].y = (float)  0.1f;  terrain->vecs[3].z = (float) 1.8f;
-        terrain->vecs[4].x = (float)  8.0f;  terrain->vecs[4].y = (float)  0.1f;  terrain->vecs[4].z = (float) 1.8f;
-        terrain->vecs[5].x = (float) -8.0f;  terrain->vecs[5].y = (float)  0.1f;  terrain->vecs[5].z = (float) -1.8f;
-        terrain->vecs[6].x = (float)  8.0f;  terrain->vecs[6].y = (float)  0.1f;  terrain->vecs[6].z = (float) -1.8f;
-        terrain->vecs[7].x = (float) -8.0f;  terrain->vecs[7].y = (float) -0.1f;  terrain->vecs[7].z = (float) -1.8f;
-        terrain->vecs[8].x = (float)  8.0f;  terrain->vecs[8].y = (float) -0.1f;  terrain->vecs[8].z = (float) -1.8f;
+        terrain->vecs[1].x = (float) -80.0f;  terrain->vecs[1].y = (float) -0.12f;  terrain->vecs[1].z = (float) 8.0f;
+        terrain->vecs[2].x = (float)  80.0f;  terrain->vecs[2].y = (float) -0.12f;  terrain->vecs[2].z = (float) 8.0f;
+        terrain->vecs[3].x = (float) -80.0f;  terrain->vecs[3].y = (float)  0.12f;  terrain->vecs[3].z = (float) 8.0f;
+        terrain->vecs[4].x = (float)  80.0f;  terrain->vecs[4].y = (float)  0.12f;  terrain->vecs[4].z = (float) 8.0f;
+        terrain->vecs[5].x = (float) -80.0f;  terrain->vecs[5].y = (float)  0.12f;  terrain->vecs[5].z = (float) -0.8f;
+        terrain->vecs[6].x = (float)  80.0f;  terrain->vecs[6].y = (float)  0.12f;  terrain->vecs[6].z = (float) -0.8f;
+        terrain->vecs[7].x = (float) -80.0f;  terrain->vecs[7].y = (float) -0.12f;  terrain->vecs[7].z = (float) -0.8f;
+        terrain->vecs[8].x = (float)  80.0f;  terrain->vecs[8].y = (float) -0.12f;  terrain->vecs[8].z = (float) -0.8f;
         //terrain->model_initial_distance = (float) 8.0f;
         //terrain->model_distance = (float) 0.0f;
         
@@ -2006,6 +2008,8 @@ void demoFlyingCubeSetup(void)
         terrain->colors[10] = GRCOLOR_DARKWHITE;
         terrain->colors[11] = GRCOLOR_DARKWHITE;
 
+        terrain->model_initial_distance = (float) 4.0f;//8.0f;
+        terrain->model_distance = (float) 0.0f;
 
         terrain->hposition = (float)  0.0f;
         terrain->vposition = (float) -3.0f;
@@ -2022,6 +2026,8 @@ void demoFlyingCubeSetup(void)
     game_update_taskbar = FALSE;
 }
 
+unsigned long deltaTick=0;
+
 // called by the engine
 void demoFlyingCube(void)
 {
@@ -2030,15 +2036,18 @@ void demoFlyingCube(void)
     //float time = 0.04f;
     //float time = 0.08f;
     //float vel = 0.08f;
-    frames++;
 
+    unsigned long beginTick = rtl_jiffies();
+
+// Clear canvas.
     //demoClearWA(COLOR_BLACK);                //clear surface
     gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
+
+// Draw terrain.
     drawTerrain(terrain,0.0f);
 
 // Draw all the cubes.
-    //int n=0;
-    int n=1; // terrain =0
+    register int n=1; // terrain =0
     while(1){
 
         if(n>=CUBE_MAX){
@@ -2082,6 +2091,26 @@ void demoFlyingCube(void)
     //    wm_Update_TaskBar("53$",FALSE); //redraw, but not refresh
     //    game_update_taskbar = FALSE;
     //}
+
+    unsigned long endTick = rtl_jiffies();
+    deltaTick += endTick - beginTick;
+// New frame.
+    frames++;
+
+// Ja se passou 1 segundo?
+    static char buf_fps[64];
+    if(deltaTick>1000)
+    {
+        memset(buf_fps,0,64);
+        itoa(frames,buf_fps);
+            strcat(buf_fps," FPS");
+        deltaTick=0;
+        frames=0;
+    }
+
+// Draw yellow bar.
+    yellowstatus0(buf_fps,FALSE);
+// Flush the backbuffer into the framebuffer.
     gramado_flush_surface(NULL);
 }
 

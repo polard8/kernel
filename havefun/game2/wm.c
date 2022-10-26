@@ -3880,7 +3880,7 @@ int wmInputReader(void)
     //FlyingCubeMove(0,2,(float) 0.08f);
     //FlyingCubeMove(0,2,(float) value);
     //char secbuf[32];
-    //itoa(secbuf,(int)sec);
+    //itoa(sec,secbuf);
     //srand(now);
     //unsigned long r = (unsigned long) (rand() % 320);
     //float value = (float) r * 0.0002f;
@@ -3960,7 +3960,8 @@ int wmInputReader(void)
             if( RTLEventBuffer[1] == GWS_Find )
             { printf("ws: find\n"); return 0; }
 
-            // #todo: we also can use 'keydown' and check the vk.
+            // #todo: 
+            // we also can use 'keydown' and check the vk.
 
             //Control arrow right
             if( RTLEventBuffer[1] == GWS_ControlArrowRight )
@@ -3968,7 +3969,8 @@ int wmInputReader(void)
               //printf("ws: Control right\n"); 
               //dock_active_window(2);
               //IN: cube number, position, amount
-              FlyingCubeMove(0,2,(float) 0.08f); //right
+              //FlyingCubeMove(0,2,(float) 0.08f); //right
+              FlyingCubeMove(0,1,(float) 0.08f);  //left
               return 0; 
             }
             //Control arrow up
@@ -3976,7 +3978,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control up\n"); 
               //dock_active_window(1);
-              FlyingCubeMove(0,3,(float) 0.08f); //front
+              //FlyingCubeMove(0,3,(float) 0.08f); //front
+              FlyingCubeMove(0,4,(float) 0.08f); //back
               return 0; 
             }
             //Control arrow down
@@ -3984,7 +3987,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control down\n");
               //dock_active_window(3);
-              FlyingCubeMove(0,4,(float) 0.08f); //back
+              //FlyingCubeMove(0,4,(float) 0.08f); //back
+              FlyingCubeMove(0,3,(float) 0.08f); //front
               return 0;
             }
             //Control arrow left
@@ -3993,9 +3997,11 @@ int wmInputReader(void)
               //printf("ws: Control left\n");
               //dock_active_window(4);
               //IN: cube number, position, amount 
-              FlyingCubeMove(0,1,(float) 0.08f);  //left
+              //FlyingCubeMove(0,1,(float) 0.08f);  //left
+              FlyingCubeMove(0,2,(float) 0.08f); //right
               return 0; 
             }
+
 
             // Save: [control + s]
             if( RTLEventBuffer[1] == GWS_Save )

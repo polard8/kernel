@@ -2356,7 +2356,7 @@ fillTriangle0(
         // until y value is about to change
 		while (1)
 		{
-			e2 += dy2;		
+			e2 += dy2;
 			while (e2 >= dx2) {
 				e2 -= dx2;
 				if (changed2) t2xp=signx2;//t2x += signx2;
@@ -2367,12 +2367,15 @@ fillTriangle0(
 		};
 
     next2:
-        
+
         if(minx>t1x) minx=t1x; 
         if(minx>t2x) minx=t2x;
         
         if(maxx<t1x) maxx=t1x; 
         if(maxx<t2x) maxx=t2x;
+        
+        // #test
+        //if(minx<0) minx=0; 
 
         // Draw line from min to max points found on the y
         // #todo: return the number of pixels changed.
@@ -2398,7 +2401,7 @@ fillTriangle0(
 
     dx1 = (int)(x3 - x2); 
     if(dx1<0){ 
-        dx1=-dx1; 
+        dx1 = -dx1; 
         signx1=-1; 
     }else{ 
         signx1=1; 
@@ -2418,12 +2421,13 @@ fillTriangle0(
     e1 = (int)(dx1>>1);
 
     register int ii=0;
-    for (ii = 0; ii<=dx1; ii++)
+    for (ii=0; ii<=dx1; ii++)
     {
-		t1xp=0; t2xp=0;
-		if(t1x<t2x) { minx=t1x; maxx=t2x; }
-		else		{ minx=t2x; maxx=t1x; }
-	    // process first line until y value is about to change
+        t1xp=0; 
+        t2xp=0;
+        if(t1x<t2x) { minx=t1x; maxx=t2x; }
+        else        { minx=t2x; maxx=t1x; }
+        // process first line until y value is about to change
         while(ii<dx1)
         {
             e1 += dy1;
@@ -2461,6 +2465,7 @@ fillTriangle0(
 
         // Draw line from min to max points found on the y
         // #todo: return the number of pixels changed.
+        // see: line.c
         npixels += grBackbufferDrawHorizontalLine(minx,y,maxx,c);
 
         // Now increase y
