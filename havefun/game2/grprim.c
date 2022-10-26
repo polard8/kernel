@@ -1656,8 +1656,18 @@ void plotLine(int x0, int y0, int x1, int y1)
 
 
 /*
- * plotLine3d:  
- */
+// #todo
+// Not tested yet.
+// linear interpolation
+float lerpF( float x1, float x2, float factor );
+float lerpF( float x1, float x2, float factor )
+{
+    return (float) ( x1 + ((float)(x2-x1) * (float) factor));
+}
+*/
+
+
+// plotLine3d:
 // Bresenham in 3D
 // The algorithm could be extended to three (or more) dimensions.
 // #todo: color is unsigned int.
@@ -1712,7 +1722,8 @@ plotLine3d (
 
 // #todo
 // plot line given two colors.
-// interpolation ?
+// interpolation?
+// #todo: Change the color type to 'unsigned int'.
 void 
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
