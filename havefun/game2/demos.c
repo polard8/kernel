@@ -10,6 +10,8 @@ int gUseDemos = TRUE;
 static int game_update_taskbar=TRUE;
 static int frames=0;
 static int hits=0;
+unsigned long deltaTick=0;
+unsigned long sec=0;
 
 
 //float cube_x[8];
@@ -24,9 +26,13 @@ struct cube_model_d
     float vposition;  //vertical position
     float model_initial_distance;
     float model_distance;
-    float a;  //acceletarion
-    float v;  //velocity
-    float t;  //time
+
+// Acceletarion: How fast the velocity changes.
+    float a;
+// Velocity:
+    float v;
+// Time:
+    float t;
 };
 
 // The terrain is a cube
@@ -106,6 +112,8 @@ void drawRectangle0(float modelz)
 
 static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
 {
+// No rotation. Small translation in positive z.
+
     char string0[16];
 // Matrices
     struct gr_mat4x4_d  matRotX;
@@ -141,6 +149,7 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
     }
 
 // Building the transformation matrices.
+// O angulo muda com o passar do tempo.
     //cube->fThetaAngle = (float) (cube->fThetaAngle + fElapsedTime);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
@@ -1896,6 +1905,9 @@ void demoFlyingCubeSetup(void)
     struct cube_model_d *cube;
 // Cube1
     register int i=0;
+    
+    deltaTick=0;
+    sec=0;
 
 /*
     for (i=0; i<8; i++){
@@ -1972,10 +1984,16 @@ void demoFlyingCubeSetup(void)
 
         cube->vposition = (float) 0.0f;
         
-        cube->a = (float) 1.0f;
-        cube->v = (float) 0.01f;
-        cube->t = (float) 0.08f + (float) 0.01f * (float) count;  //0.08f;
-        
+        // Initializing.
+        // Cada cubo tem uma aceleração diferente.
+        // Então, com o passar do tempo,
+        // cada cubo tera um incremento diferente
+        // na sua velocidade.
+        cube->v = (float) count * 0.00001f;
+        cube->t = (float) 1.0f;
+        cube->a = (float) cube->v / cube->t;
+        // v = a*t;
+
         // Save the cube pointer.
         cubes[count] = (unsigned long) cube;
     };
@@ -2014,9 +2032,11 @@ void demoFlyingCubeSetup(void)
         terrain->hposition = (float)  0.0f;
         terrain->vposition = (float) -3.0f;
 
-        terrain->a = (float) 1.0f;
+        // Initializing.
+        //terrain->a = (float) 1.0f;
         terrain->v = (float) 0.0001f;
         terrain->t = (float) 0.0001f;  //0.01f;
+        terrain->a = (float) terrain->v / terrain->t;
     }
 
 //----------------
@@ -2026,17 +2046,12 @@ void demoFlyingCubeSetup(void)
     game_update_taskbar = FALSE;
 }
 
-unsigned long deltaTick=0;
-
 // called by the engine
 void demoFlyingCube(void)
 {
     struct cube_model_d *tmp_cube;
-    //float time = 0.02f;
-    //float time = 0.04f;
-    //float time = 0.08f;
-    //float vel = 0.08f;
 
+// Begin time.
     unsigned long beginTick = rtl_jiffies();
 
 // Clear canvas.
@@ -2044,6 +2059,7 @@ void demoFlyingCube(void)
     gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
 
 // Draw terrain.
+// No rotation. Small translation in positive z.
     drawTerrain(terrain,0.0f);
 
 // Draw all the cubes.
@@ -2067,15 +2083,13 @@ void demoFlyingCube(void)
         if( tmp_cube != NULL )
         {
 
-            // Accelearate!
-            // incrementa a aceleração
-            tmp_cube->a = tmp_cube->a + (float) n * 0.01f;
-            if( tmp_cube->a >= 4.0f )
-                tmp_cube->a = 4.0f;
-
-            //vel = (float) tmp_cube->t; 
-            //vel = (float) tmp_cube->t * 1.0f;  
-            //vel = (float) tmp_cube->t * tmp_cube->a;
+            // Acceletarion: How fast the velocity changes.
+            // Each cube has it's own acceleration.
+            // Cada cubo tem uma aceleração diferente.
+            // Então, com o passar do tempo,
+            // cada cubo tera um incremento diferente
+            // na sua velocidade.
+            tmp_cube->t = (float) tmp_cube->t + (float) sec * 0.1f;  
             tmp_cube->v = (float) tmp_cube->t * tmp_cube->a;  
             
             drawFlyingCube( 
@@ -2101,6 +2115,7 @@ void demoFlyingCube(void)
     static char buf_fps[64];
     if(deltaTick>1000)
     {
+        sec++; // New second.
         memset(buf_fps,0,64);
         itoa(frames,buf_fps);
             strcat(buf_fps," FPS");
