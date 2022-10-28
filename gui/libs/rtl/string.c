@@ -312,15 +312,11 @@ void *memsetw (void *dst, int val, size_t count)
     return (void *) dst;
 }
 
-
-/*
- * memcmp:
- *     Compare memory regions.
- */
+// memcmp:
+// Compare memory regions.
 
 int memcmp (const void *s1, const void *s2, size_t n)
 {
-
     if (n != 0) 
     {
         const unsigned char *p1 = s1, *p2 = s2;
@@ -345,11 +341,10 @@ int memcmp (const void *s1, const void *s2, size_t n)
  * PUBLIC: #endif
  */
 
-char *strdup (const char *str){
-
+char *strdup (const char *str)
+{
     char *copy;
     size_t len=0;
-
 
     //if ( (void*) s == NULL )
        //return (char *) 0;
@@ -505,6 +500,26 @@ char *strrchr (const char *p, int ch)
 }
 
 
+void rtl_reverse(char s[])
+{
+    char c=0;
+    register int i=0; 
+    register int j=0;
+    int Size = strlen(s)-1;
+
+    for ( 
+        i=0, j=Size; 
+        i<j; 
+        i++, j--) 
+    {
+        c = s[i];
+        
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+
 //#todo
 //definido em inttypes.h
 intmax_t strtoimax (const char *str, char **endptr, int base)
@@ -512,7 +527,6 @@ intmax_t strtoimax (const char *str, char **endptr, int base)
     debug_print ("strtoimax: [TODO]\n");
     return 0;
 }
-
 
 //#todo
 //definido em inttypes.h

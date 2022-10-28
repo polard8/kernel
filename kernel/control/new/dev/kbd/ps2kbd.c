@@ -270,6 +270,7 @@ NormalByte:
 // We don't need this.
 // The routine bellow is always posting 
 // to the windows server.
+// see: tty/kgwm.c
 // IN: tid, scancode, prefix.
        wmKeyEvent( 
            (unsigned char) __raw,

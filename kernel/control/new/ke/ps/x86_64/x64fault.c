@@ -89,8 +89,16 @@ static int __kill_process(void)
 
 // Called by 'all_faults:' in unit1hw.asm.
 
-void faults (unsigned long number)
+void faults(unsigned long number)
 {
+
+// Get the pagefault address.
+// #todo: Not tested.
+    //unsigned long address=0;
+    //if(number==14){
+    //    asm volatile ("movq %%cr2, %0":"=r"(address):);
+    //}
+
     //struct process_d *CurrentProcess;
     //struct thread_d  *CurrentThread;
 
