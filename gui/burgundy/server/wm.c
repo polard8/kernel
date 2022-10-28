@@ -2689,28 +2689,26 @@ wm_draw_char_into_the_window(
     unsigned char ascii = (unsigned char) ch;
     int is_control=FALSE;
 
-
 // Invalid window
     if( (void*)window == NULL)
         return;
     if(window->magic!=1234)
         return;
-
 // Invalid char
     if (ch<0){
         return;
     }
 
-// It's a control.
-// We can't print a control char.
-// See:
-// https://en.wikipedia.org/wiki/Control_character
-    if ( ascii < '\x20' || ascii == 0177 )
-    {
-        is_control=TRUE;
-    }
+    //#debug
+    //if(ascii == 'M'){
+    //    printf("M: %d\n",ascii);
+    //}
 
-// Invalid char
+/*
+// #bugbug
+// Com essa rotina ficamos impedidos de imprimirmos
+// algumas letras maiúsculas, pois elas possuem o mesmo
+// scancode que esses arrows.
 // UP, LEFT, RIGHT, DOWN
 // #todo
 // Update input pointer for this window.
@@ -2727,7 +2725,7 @@ wm_draw_char_into_the_window(
         if(ch==0x50){ window->ip_y++; }
         return;
     }
-
+*/
 
 // Backspace
 // (control=0x0E)
@@ -2762,6 +2760,25 @@ wm_draw_char_into_the_window(
         return;
     }
 
+
+// Not printable.
+// 32~127
+// A=41h | a=61H
+// Control character or non-printing character (NPC).
+// see:
+// https://en.wikipedia.org/wiki/Control_character
+// https://en.wikipedia.org/wiki/ASCII#Printable_characters
+
+    // Not printable
+    if (ascii < 0x20 || ascii >= 0x7F )
+    {
+        // Control char
+        if(ascii < 0x20 || ascii == 0x7F ){
+            is_control = TRUE;
+        }
+        return;
+    }
+
 // string
    _string[0] = (unsigned char) ch;
    _string[1] = 0;
@@ -2786,14 +2803,7 @@ wm_draw_char_into_the_window(
         return;
     }
 
-    // Not printable.
-    if (ascii < 0x20 || ascii > 0x7F )
-    {
-        return;
-    }
-
 // Editbox
-
 // Printable chars.
 // Print the char into an window 
 // of type Editbox.
@@ -2811,12 +2821,14 @@ wm_draw_char_into_the_window(
         
         // Draw char
         // #bugbug: Maybe we need to use draw_char??();
+        // see: dtext.c
+        //if(ascii=='M'){printf("M: calling dtextDrawText\n");}
         dtextDrawText ( 
             (struct gws_window_d *) window,
             (window->ip_x*8), 
             (window->ip_y*8), 
             (unsigned int) color, 
-            (unsigned char *) &_string[0] );
+            (unsigned char *) _string );  //&_string[0] );
 
         // Refresh rectangle
         // x,y,w,h

@@ -829,20 +829,15 @@ void console_scroll (int console_number)
 
 void console_outbyte (int c, int console_number)
 {
-// Arguments.
     register int Ch = c;
     int n = (int) console_number;
-
     static char prev=0;
-
 // char support.
-
     unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
     unsigned long __cHeight = gwsGetCurrentFontCharHeight();
 
     // #debug
     // debug_print ("console_outbyte:\n");
-
 
     // #todo: Check overflow.
     //if (n<0)
@@ -1095,16 +1090,13 @@ draw:
 
 static void __ConsoleOutbyte (int c, int console_number)
 {
-// Arguments.
     register int Ch = c;
     int n = (int) console_number;
-
     int cWidth = get_char_width();
     int cHeight = get_char_height();
 
     // #debug
     // debug_print ("__ConsoleOutbyte:\n");
-
 
     // #todo: Check verflow
     //if (n < 0)

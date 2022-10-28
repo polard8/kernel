@@ -9,9 +9,7 @@
  * grDrawString:
  *     Draw a string on the screen. 
  */
-
 // No clipping
-
 void 
 grDrawString ( 
     unsigned long x,
@@ -19,20 +17,22 @@ grDrawString (
     unsigned int color,
     unsigned char *string )
 {
-
     int Index=0;
-
     //#bugbug:  Determinando
     int cWidth = 8;   
-	//int cWidth = get_char_width ();
-	//int cHeight = get_char_height ();
+    //int cWidth = get_char_width ();
+    //int cHeight = get_char_height ();
 
+    if( (void*) string == NULL )
+        return;
+    if( *string==0 )
+        return;
 
-	//if ( cWidth == 0 || cHeight == 0 )
-    if ( cWidth == 0 )
-    {
+// #fail
+// Char width
+    //if ( cWidth == 0 || cHeight == 0 )
+    if (cWidth == 0){
         //panic ("grDrawString: cWidth");
-    
         //#debug
         //gde_message_box (3, "xxx","dtext-draw_string: cWidth");
         printf ("grDrawString: cWidth\n");
@@ -43,12 +43,15 @@ grDrawString (
     //for ( Index=0; Index<size; Index++ )
 
 // Draw
+// see: char.c
 
     for ( Index=0; string[Index] != 0; Index++ )
     {
         grBackbufferDrawCharTransparent ( 
-            x, y, 
-            (unsigned int) color, string[Index] );
+            x, 
+            y, 
+            (unsigned int) color, 
+            string[Index] );
 
         // gradient
         //if( string_flags & ? ){
@@ -62,16 +65,13 @@ grDrawString (
     };
 }
 
-
 /* 
  * dtextDrawText:
  *     Draw text on a window.
- *
  * #test: 
  *     Como opção, se nenhuma janela for especificada, 
  *     então pintaremos na janela principal.
  */
-
 void 
 dtextDrawText ( 
     struct gws_window_d *window,
@@ -80,12 +80,15 @@ dtextDrawText (
     unsigned int color,
     unsigned char *string )
 { 
-
     struct gws_window_d * __w;
-
 
     __w = (struct gws_window_d *) gui->screen_window;
 
+
+    if( (void*) string == NULL )
+        return;
+    if( *string==0 )
+        return;
 
     if ( (void *) window == NULL ){
 

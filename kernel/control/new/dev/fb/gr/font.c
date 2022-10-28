@@ -1,20 +1,20 @@
 
 // font.c
+// ring0
 
 #include <kernel.h>
-
 
 // #todo: 
 // We need a global structure for font support.
 
 int gwsInitializeDefaultKernelFont(void)
 {
+// BIOS 8x8 font.
+
     gwsSetCurrentFontAddress(BIOSFONT8X8);
     gwsSetCurrentFontCharWidth(8);
     gwsSetCurrentFontCharHeight(8);
-    
     gfontSize = FONT8X8;
-
     return 0;
 }
 
@@ -28,7 +28,6 @@ void gwsSetCurrentFontCharWidth (int width)
 {
     set_char_width (width);
 }
-
 
 int gwsGetCurrentFontCharHeight (void)
 {
@@ -51,21 +50,19 @@ void gwsSetCurrentFontAddress ( unsigned long address )
 }
 
 
-/* 
- * gwsInstallFont:
- *     Carregando e instalando uma fonte dado o nome. 
- */
-
-int gwsInstallFont ( char *file_name )
+// gwsInstallFont:
+// Carregando e instalando uma fonte dado o nome.
+int gwsInstallFont (char *file_name)
 {
+// Load a font from the disk.
+
     unsigned long fileret=0;
 
-	// #todo #bugbug
-	// Rever esse tamanho.
+// #todo #bugbug
+// Rever esse tamanho.
 
     unsigned long tmp_size = (8*4096);
-    void *font_buffer = (void *) allocPages (8);
-
+    void *font_buffer = (void *) allocPages(8);
 
     if ( (void *) file_name == NULL ){
         panic ("gwsInstallFont: file_name\n");

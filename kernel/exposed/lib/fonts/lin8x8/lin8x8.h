@@ -8,7 +8,6 @@
 
 
 #define FONTDATAMAX 2048
-
 static unsigned char fontdata_8x8[FONTDATAMAX] = {
 
 	/* 0 0x00 '^@' */

@@ -2697,7 +2697,6 @@ wm_draw_char_into_the_window(
     unsigned char ascii = (unsigned char) ch;
     int is_control=FALSE;
 
-
 // Invalid window
     if( (void*)window == NULL)
         return;
@@ -2709,15 +2708,12 @@ wm_draw_char_into_the_window(
         return;
     }
 
-// It's a control.
-// We can't print a control char.
-// See:
-// https://en.wikipedia.org/wiki/Control_character
-    if ( ascii < '\x20' || ascii == 0177 )
-    {
-        is_control=TRUE;
-    }
 
+/*
+// #bugbug
+// Com essa rotina ficamos impedidos de imprimirmos
+// algumas letras maiúsculas, pois elas possuem o mesmo
+// scancode que esses arrows.
 // Invalid char
 // UP, LEFT, RIGHT, DOWN
 // #todo
@@ -2735,7 +2731,7 @@ wm_draw_char_into_the_window(
         if(ch==0x50){ window->ip_y++; }
         return;
     }
-
+*/
 
 // Backspace
 // (control=0x0E)
@@ -2770,6 +2766,25 @@ wm_draw_char_into_the_window(
         return;
     }
 
+// Not printable.
+// 32~127
+// A=41h | a=61H
+// Control character or non-printing character (NPC).
+// see:
+// https://en.wikipedia.org/wiki/Control_character
+// https://en.wikipedia.org/wiki/ASCII#Printable_characters
+
+    // Not printable
+    if (ascii < 0x20 || ascii >= 0x7F )
+    {
+        // Control char
+        if(ascii < 0x20 || ascii == 0x7F ){
+            is_control = TRUE;
+        }
+        return;
+    }
+
+
 // string
    _string[0] = (unsigned char) ch;
    _string[1] = 0;
@@ -2794,14 +2809,7 @@ wm_draw_char_into_the_window(
         return;
     }
 
-    // Not printable.
-    if (ascii < 0x20 || ascii > 0x7F )
-    {
-        return;
-    }
-
 // Editbox
-
 // Printable chars.
 // Print the char into an window 
 // of type Editbox.

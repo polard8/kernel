@@ -269,9 +269,11 @@ extern unsigned long gSavedBPP;
 #include "dev/fb/gr/graphics.h"
 // Serial port. (COM).
 #include "dev/tty/serial.h"
+
 // ps2 - i8042
 #include "dev/kbd/vk.h"
 #include "dev/kbd/kbdabnt2.h"
+#include "dev/kbd/kbdmap.h"
 #include "dev/kbd/keyboard.h"
 #include "dev/kbd/ps2kbd.h"
 #include "dev/mouse/mouse.h"

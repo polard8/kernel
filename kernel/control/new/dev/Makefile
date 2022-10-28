@@ -87,7 +87,7 @@ xpixel.o line.o rect.o bg.o \
 font.o char.o text.o \
 graphics.o \
 e1000.o \
-i8042.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
+i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 console.o vt.o kgwm.o    
 
 all:
@@ -125,6 +125,7 @@ all:
 	$(CC) -c fb/gr/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
 
 # kbd
+	$(CC) -c kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
 	$(CC) -c kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
 	$(CC) -c kbd/ps2kbd.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ps2kbd.o
 

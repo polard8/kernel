@@ -181,16 +181,15 @@ int charGetCharHeight (void)
 
 
 /*
- *****************************************
  * charBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */
-
 // #bugbug
 // Nessa função estamos usando globais.
 // Talvez devamos pegá-las antes e não 
 // referenciá-las diretamente.
+// Called by grDrawString().
 
 void 
 grBackbufferDrawCharTransparent ( 
@@ -199,17 +198,13 @@ grBackbufferDrawCharTransparent (
     unsigned int color, 
     unsigned long c )
 {
-
     //loop
     register int y2=0;
     register int x2=0;
-
     char *work_char;
     unsigned char bit_mask = 0x80;
-
     //int CharWidth;
     //int CharHeight;
-
 
 /*
  Get the font pointer.
@@ -228,64 +223,62 @@ grBackbufferDrawCharTransparent (
         //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
         //gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
         //gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
-
-		// #debug
-		// Estamos parando para testes.
-
+        // #debug
+        // Estamos parando para testes.
         printf ("grBackbufferDrawCharTransparent : Initialization fail\n");
         while(1){}
     }
 
-    // #todo: 
-    // Criar essas variáveis e definições.
+// #todo: 
+// Criar essas variáveis e definições.
 
+/*
     switch (gfontSize){
 
-		//case FONT8X8:
-	        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
-		    //gcharWidth = 8;
-		    //gcharHeight = 8;
-		    //set_char_width(8);
-			//set_char_height(8);
-			//break;
-		
-		//case FONT8X16:
-	        //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
-		    //gcharWidth = 8;
-		    //gcharHeight = 16;
-		    //set_char_width(8);
-			//set_char_height(16);			
-		    //break;
-		 
-		//#todo: 
-		//Criar opções
-		//...
-		
-		// #importante:
-		// #BUGBUG
-		// Se não temos um tamanho selecionado então teremos 
-		// que usar o tamanho padrão.
-		
-        default:
-		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		    
-			//set_char_width(8);
-			//set_char_height(8);	
-            //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+    //case FONT8X8:
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //getFontAddress(...)
+        //gcharWidth = 8;
+        //gcharHeight = 8;
+        //set_char_width(8);
+        //set_char_height(8);
+        //break;
+    //case FONT8X16:
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X16;    //getFontAddress(...)
+        //gcharWidth = 8;
+        //gcharHeight = 16;
+        //set_char_width(8);
+        //set_char_height(16);
+        //break;
+ 
+    //#todo: 
+    //Criar opções
+    //...
+    // #importante:
+    // #BUGBUG
+    // Se não temos um tamanho selecionado então teremos 
+    // que usar o tamanho padrão.
 
-            break;
+    default:
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+        //set_char_width(8);
+        //set_char_height(8);
+        //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
+        break;
     };
+*/
 
 // O caractere sendo trabalhado.
+
+    //int ascii = (int) (c & 0xFF);
+    //if(ascii == 'M'){
+    //    printf("M: %d\n",ascii);
+    //}
+
 
     work_char = 
         (void *) gws_currentfont_address + (c * gcharHeight);
 
-
-//
-// Draw char.
-//
-
+// Draw char
 // Put pixel using the ring3 routine.
 // See: bitblt.c
 

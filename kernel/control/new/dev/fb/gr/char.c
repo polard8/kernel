@@ -1,7 +1,7 @@
 
+// char.c
 
 #include <kernel.h>
-
 
 
 void set_char_width ( int width )
@@ -9,18 +9,15 @@ void set_char_width ( int width )
     gcharWidth = (int) width;
 }
 
-
 void set_char_height (int height)
 {
     gcharHeight = (int) height;
 }
 
-
 int get_char_width (void)
 {
     return (int) gcharWidth;
 }
-
 
 int get_char_height (void)
 {
@@ -33,6 +30,7 @@ int get_char_height (void)
  *     Desenha um caractere e pinta o pano de fundo.
  *     >> no backbuffer.
  */ 
+// Called by __ConsoleOutbyte in console.c
 
 void 
 d_draw_char ( 
@@ -49,19 +47,16 @@ d_draw_char (
     // The mask.
     unsigned char bit_mask = 0x80;
 
-
-	/*
-	 * Get the font pointer.
-	 *
-	 * @todo:
-	 *     usar variavel g8x8fontAddress.
-	 *     + Criar e usar uma estrutura para fonte.
-	 *     + Usar o ponteiro para a fonte atual que foi carregada.
-	 *     + Criar um switch para o tamanho da fonte.
-	 *     isso deveria estar na inicializa��o do m�dulo char.
-	 *     ...
-	 */
-
+/*
+ * Get the font pointer.
+ * @todo:
+ *     usar variavel g8x8fontAddress.
+ *     + Criar e usar uma estrutura para fonte.
+ *     + Usar o ponteiro para a fonte atual que foi carregada.
+ *     + Criar um switch para o tamanho da fonte.
+ *     isso deveria estar na inicializa��o do m�dulo char.
+ *     ...
+ */
 
 // Default:
 //     Testando o uso de uma fonte default no caso de erro.
@@ -71,7 +66,6 @@ d_draw_char (
 // Definido em: ws.h
 // Trying to use the ROM BIOS font 
 // if we do not have loadable one.
-
 
     // default: BIOS font.
     if ( gws_currentfont_address == 0 ){
