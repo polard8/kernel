@@ -6,6 +6,7 @@
 #define ____KERNEL_CONFIG_H    1
 
 
+#define USE_SERIALDEBUG    0
 #define USE_E1000    0
 // ...
 
@@ -156,22 +157,16 @@ sixth..     ide5, usually PCI, probed
 
 //Cria o processo shell e sua thread de controle.
 #define ENTRY_CREATE_SHELL   
-
 //Cria o processo taskman e sua thread de controle.
 #define ENTRY_CREATE_TASKMAN 
-
-
 //Cria uma thread para o processo kernel, que irá rodar em ring0.
 #define ENTRY_CREATE_KERNELTHREAD_RING0
-
 
 //==========================================
 // modes
 
 //Se usaremos os processos do x server ou apenas o init.
 #define ENTRY_GRAMADO_CORE  
-
-
 
 //====================================================
 //    ######## more ... ########

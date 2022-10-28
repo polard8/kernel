@@ -360,9 +360,13 @@ int kmain(int arch_type)
 // Setup debug mode.
 // Enable the usage of the serial debug.
 // It is not initialized yet.
-
-    //enable_serial_debug();
+// #see: debug.c
+    
     disable_serial_debug();
+
+    if (USE_SERIALDEBUG == 1){
+        enable_serial_debug();
+    }
 
 //
 // Presence level

@@ -1580,10 +1580,27 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// ========
 // tty: Read and write from tty device.
     if ( strncmp( prompt, "tty", 3 ) == 0 )
     {
         __test_tty();
+        goto exit_cmp;
+    }
+
+// ========
+// serial: show info
+    if ( strncmp( prompt, "serial", 6 ) == 0 )
+    {
+        //#todo: Only com1 for now.
+        printf("com1.divisor:       %d\n",
+            SerialPortInfo.com1.divisor);
+        printf("com1.divisorLoByte: %d\n",
+            SerialPortInfo.com1.divisorLoByte);
+        printf("com1.divisorHiByte: %d\n",
+            SerialPortInfo.com1.divisorHiByte);
+        printf("com1.baudrate:      %d\n",
+            SerialPortInfo.com1.baudrate);
         goto exit_cmp;
     }
 

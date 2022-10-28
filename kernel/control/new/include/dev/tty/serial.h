@@ -24,6 +24,32 @@
 #define DLL             0       /*  Divisor Latch Low         */
 #define DLH             1       /*  Divisor latch High        */
 
+
+
+struct serial_port_d
+{
+    int initialized;
+
+    uint16_t port_number;
+    uint16_t divisor;
+    char divisorLoByte;
+    char divisorHiByte;
+    unsigned long baudrate;  //115200/divisor
+    
+    //#todo ...
+};
+
+struct serial_port_info_d
+{
+    int initialized;
+    struct serial_port_d com1;
+    struct serial_port_d com2;
+    struct serial_port_d com3;
+    struct serial_port_d com4;
+};
+//see: serial.c
+extern struct serial_port_info_d SerialPortInfo;
+
 //
 // == prototypes ==============================================
 //
@@ -33,8 +59,7 @@ void serial2_handler (void);
 void serial3_handler (void);
 void serial4_handler (void);
 
-int serial_init_port ( uint16_t port );
-int serial_init (void);
+int serial_init(void);
 
 char serial_read_char (unsigned int port);
 void serial_write_char (unsigned int port, char data);
