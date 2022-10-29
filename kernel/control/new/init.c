@@ -396,9 +396,6 @@ int kmain(int arch_type)
 
 // ==================
 
-
-
-
 // Preinit
     preinit();
 

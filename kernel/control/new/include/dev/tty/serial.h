@@ -25,6 +25,7 @@
 #define DLH             1       /*  Divisor latch High        */
 
 
+#define SERIAL_DEV_FREQ  115200
 
 struct serial_port_d
 {
@@ -35,7 +36,7 @@ struct serial_port_d
     char divisorLoByte;
     char divisorHiByte;
     unsigned long baudrate;  //115200/divisor
-    
+    unsigned long dev_freq;  //115200
     //#todo ...
 };
 

@@ -1,8 +1,7 @@
 
-
-	gui/    - (A) Window server and clients. (DE).
-	havefun - (D) Games 
-	kernel/   - (E) Boot loader, kernel and commands. 
+	gui/    - (A) Gramado Window System. (Window server and clients). (DE).
+	havefun - (D) Games.
+	kernel/ - (E) Boot loader, kernel and commands. 
 
 Build:
     Type 'make'

@@ -26,10 +26,23 @@
 // Counting variables support.
 //
 
-// #bugbug
-// Temos isso redefinido em sched.h
-//#define HZ  100
-#define HZ  1000
+#define PIT_DEV_FREQ  1193182
+#define PIT_HZ  DEFAULT_PIT_FREQ
+#define HZ  PIT_HZ
+
+// Tranca
+// #define LATCH (1193182/HZ)
+
+struct pit_info_d
+{
+    int initialized;
+    unsigned int dev_freq;        //1193180
+    unsigned int clocks_per_sec;  //hz
+    unsigned int period;
+};
+//see: pit.c
+extern struct pit_info_d  PITInfo;
+
 
 // see: pit.c
 // total ticks

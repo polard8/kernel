@@ -4,6 +4,7 @@
 // write command and read status.
 // Created by Nelson Cole.
 // A lot of changes by Fred Nora.
+// Suporte à controladora IDE.
 
 #include <kernel.h>  
 
@@ -23,12 +24,6 @@ unsigned long ATA_BAR4=0;  // Legacy Bus Master Base Address
 unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Address
 
 
-/* 
- * Obs:
- * O que segue são rotinas de suporte ao controlador IDE.
- */
-
-
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
 
@@ -36,11 +31,11 @@ static uint32_t __next_sd_id = 0;
 // == Private functions: prototypes ==============
 //
 
-static void __local_io_delay (void);
-static void __ata_pio_read ( void *buffer, int bytes );
-static void __ata_pio_write ( void *buffer, int bytes );
+static void __local_io_delay(void);
+static void __ata_pio_read( void *buffer, int bytes );
+static void __ata_pio_write( void *buffer, int bytes );
 static unsigned char __ata_config_structure(char nport);
-static void __set_ata_addr (int channel);
+static void __set_ata_addr(int channel);
 
 // =======================================================
 
@@ -48,16 +43,13 @@ static void __local_io_delay (void)
 {
     asm ("xorl %%eax, %%eax" ::);
     asm ("outb %%al, $0x80"  ::);
-    return;
 }
 
 // low level worker
-static void __ata_pio_read ( void *buffer, int bytes )
-{
-
 // #todo:
 // avoid this for compatibility with another compiler.
-
+static void __ata_pio_read ( void *buffer, int bytes )
+{
     asm volatile  (\
         "cld;\
         rep; insw"::"D"(buffer),\
@@ -66,12 +58,10 @@ static void __ata_pio_read ( void *buffer, int bytes )
 }
 
 // low level worker
-static void __ata_pio_write ( void *buffer, int bytes )
-{
-
 // #todo:
 // avoid this for compatibility with another compiler.
-
+static void __ata_pio_write ( void *buffer, int bytes )
+{
     asm volatile  (\
         "cld;\
         rep; outsw"::"S"(buffer),\
@@ -80,29 +70,26 @@ static void __ata_pio_write ( void *buffer, int bytes )
 }
 
 // Global
-void ata_wait (int val)
+void ata_wait(int val)
 {
-    if ( val <= 100 )
-    {
+    if (val <= 100){
         val = 400;
     }
 
-    val = ( val/100 );
+    val = (int) (val/100);
 
     while (val--){
         io_delay();
     };
 }
 
-
 // Global
 // Forces a 400 ns delay.
 // Waste some time.
-void ata_delay (void)
+void ata_delay(void)
 {
-    int i=0;
-
-    for (i=0; i < 5; i++){
+    long it=0;
+    for (it=0; it<5; it++){
         __local_io_delay();
     };
 }
@@ -112,8 +99,7 @@ void ata_delay (void)
 // Lê o status de um disco determinado, se os valores na estrutura 
 // estiverem certos.
 // #todo: return type.
-
-unsigned char ata_status_read (void)
+unsigned char ata_status_read(void)
 {
     return in8( ata.cmd_block_base_address + ATA_REG_STATUS );
 }
@@ -128,13 +114,10 @@ void ata_cmd_write (int cmd_val)
         (unsigned short) ((ata.cmd_block_base_address + ATA_REG_CMD) & 0xFFFF), 
         (unsigned char) (cmd_val & 0xFF) );
 
-// #todo
-// Esperamos 400ns
     ata_wait(400);  
 }
 
-
-void ata_soft_reset (void)
+void ata_soft_reset(void)
 {
     unsigned char data = 
         (unsigned char) in8( ata.ctrl_block_base_address );
@@ -149,51 +132,55 @@ void ata_soft_reset (void)
 }
 
 
-unsigned char ata_wait_drq (void)
+unsigned char ata_wait_drq(void)
 {
-    while (!(ata_status_read() & ATA_SR_DRQ))
-        if ( ata_status_read() & ATA_SR_ERR )
+// #todo: Simplify this routine.
+    while ( !(ata_status_read() & ATA_SR_DRQ) )
+    {
+        if ( ata_status_read() & ATA_SR_ERR ){
             return 1;
-
+        }
+    };
     return 0;
-} 
-
+}
 
 unsigned char ata_wait_no_drq (void)
 {
-
+// #todo: Simplify this routine.
     while ( ata_status_read() & ATA_SR_DRQ )
-        if ( ata_status_read() & ATA_SR_ERR )
+    {
+        if ( ata_status_read() & ATA_SR_ERR ){
             return 1;
-
+        }
+    };
     return 0;
 }
-
 
 unsigned char ata_wait_busy (void)
 {
-
+// #todo: Simplify this routine.
     while (!(ata_status_read() & ATA_SR_BSY ))
-        if ( ata_status_read() & ATA_SR_ERR )
+    {
+        if ( ata_status_read() & ATA_SR_ERR ){
             return 1;
-
+        }
+    };
     return 0;
 }
 
-
-// TODO: 
+// #todo: 
 // Ao configurar os bits BUSY e DRQ devemos verificar retornos de erros.
-
 unsigned char ata_wait_not_busy (void)
 {
-
+// #todo: Simplify this routine.
     while ( ata_status_read() & ATA_SR_BSY )
-        if ( ata_status_read() & ATA_SR_ERR )
+    {
+        if ( ata_status_read() & ATA_SR_ERR ){
             return 1;
-
+        }
+    };
     return 0;
 }
-
 
 // local worker
 static void __set_ata_addr (int channel)
@@ -277,12 +264,15 @@ static unsigned char __ata_config_structure (char nport)
 }
 
 // atapi_pio_read:
-
-inline void atapi_pio_read ( void *buffer, uint32_t bytes )
-{
-
 // #todo
 // Avoid this for compatibility with another compiler.
+inline void atapi_pio_read ( void *buffer, uint32_t bytes )
+{
+// No checks!
+// #todo: Port number via parameter.
+
+    if(bytes == 0)
+        return;
 
     asm volatile  (\
         "cld;\
@@ -291,38 +281,39 @@ inline void atapi_pio_read ( void *buffer, uint32_t bytes )
         "c"(bytes/2) );
 }
 
-
 void ata_set_boottime_ide_port_index(unsigned int port_index)
 {
     g_boottime_ide_port_index = (int) port_index;
 }
-
 
 int ata_get_boottime_ide_port_index(void)
 {
     return (int) g_boottime_ide_port_index;
 }
 
-
 void ata_set_current_ide_port_index(unsigned int port_index)
 {
     g_current_ide_port_index = (int) port_index;
 }
-
 
 int ata_get_current_ide_port_index(void)
 {
     return (int) g_current_ide_port_index;
 }
 
-
+// #todo ioctl
 int 
 ata_ioctl ( 
     int fd, 
     unsigned long request, 
     unsigned long arg )
 {
-    debug_print("ata_ioctl: [TODO] \n");
+    debug_print("ata_ioctl: #todo\n");
+
+    if(fd<0){
+        return -1;
+    }
+
     return -1;
 }
 
@@ -352,7 +343,6 @@ int ata_initialize (int ataflag)
     //debug_print("ata_initialize: Turn on interrupt breaker\n");
     __breaker_ata1_initialized = FALSE;
     __breaker_ata2_initialized = FALSE;
-
 // A estrutura ainda nao foi configurada.
     ata.used = FALSE;
     ata.magic = 0;
@@ -412,15 +402,14 @@ int ata_initialize (int ataflag)
                                     (unsigned char) PCI_SUBCLASS_IDE );
 
     if ( (void *) PCIDeviceATA == NULL ){
-        printf("ata_initialize: PCIDeviceATA\n");
+        printk("ata_initialize: PCIDeviceATA\n");
         Status = (int) -1;
         goto fail;
     }
 
-    if ( PCIDeviceATA->used != TRUE || 
-         PCIDeviceATA->magic != 1234 )
+    if ( PCIDeviceATA->used != TRUE || PCIDeviceATA->magic != 1234 )
     {
-        printf("ata_initialize: PCIDeviceATA validation\n");
+        printk ("ata_initialize: PCIDeviceATA validation\n");
         Status = (int) -1;
         goto fail;
     }
@@ -486,11 +475,10 @@ int ata_initialize (int ataflag)
 // >> Isso acontece  logo acima quando chamamos
 // a funçao atapciConfigurationSpace()
 
-    if ( ata.used != TRUE || 
-         ata.magic != 1234 )
+    if ( ata.used != TRUE || ata.magic != 1234 )
     {
-        printf("ata_initialize: ata structure validation\n");
-        return -1;
+        printk("ata_initialize: ata structure validation\n");
+        goto fail;
     }
 
 // Que tipo de controlador?
@@ -561,11 +549,8 @@ int ata_initialize (int ataflag)
         // #bugbug
         // Is this a buffer? For what?
         // Is this buffer enough?
-
         ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
-
-        if ( (void *) ata_identify_dev_buf == NULL )
-        {
+        if ( (void *) ata_identify_dev_buf == NULL ){
             printf ("ata_initialize: ata_identify_dev_buf\n");
             Status = (int) -1;
             goto fail;
@@ -573,10 +558,8 @@ int ata_initialize (int ataflag)
 
         // Sondando dispositivos e imprimindo na tela.
         // As primeiras quatro portas do controlador IDE. 
-
         // #todo
-        // Create a constant for 'max'. 
-        
+        // Create a constant for 'max'.
         // We're gonna create the structure for each 
         // of the devices.
         
@@ -597,10 +580,9 @@ int ata_initialize (int ataflag)
 // ==============================================
 // RAID controller.
 
-    if (ata.chip_control_type == ATA_RAID_CONTROLLER)
-    {
-        Status = (int) -1;
+    if (ata.chip_control_type == ATA_RAID_CONTROLLER){
         printf("ata_initialize: RAID not supported yet\n");
+        Status = (int) -1;
         goto fail;
     }
 
@@ -611,20 +593,18 @@ int ata_initialize (int ataflag)
 // It emulates ICH9 not I440FX.
 // see: https://wiki.qemu.org/Features/Q35
 
-    if (ata.chip_control_type == ATA_AHCI_CONTROLLER)
-    {
-        Status = (int) -1;
+    if (ata.chip_control_type == ATA_AHCI_CONTROLLER){
         printf("ata_initialize: AHCI not supported yet\n");
+        Status = (int) -1;
         goto fail;
     }
 
 // ==============================================
 // Unknown controller type.
 
-    if (ata.chip_control_type == ATA_UNKNOWN_CONTROLLER)
-    {
-        Status = (int) -1;
+    if (ata.chip_control_type == ATA_UNKNOWN_CONTROLLER){
         printf("ata_initialize: Unknown controller type\n");
+        Status = (int) -1;
         goto fail;
     }
 
@@ -666,12 +646,9 @@ int ide_identify_device (uint8_t nport)
     // Signature bytes.
     unsigned char sig_byte_1=0xFF;
     unsigned char sig_byte_2=0xFF;
-
-    struct disk_d  *disk;
-    char name_buffer[32];
-
     unsigned char status=0;
-
+    char name_buffer[32];
+    struct disk_d  *disk;
 
     debug_print("ide_identify_device: \n");
 
@@ -679,7 +656,6 @@ int ide_identify_device (uint8_t nport)
 // What is the limit?
 // The limit here is 4.
 // See: ide.h
-
     if(nport >= 4){
         panic("ide_identify_device: nport\n");
     }
@@ -687,7 +663,6 @@ int ide_identify_device (uint8_t nport)
 // #todo:
 // Rever esse assert. 
 // Precisamos de uma mensagem de erro aqui.
-
     __ata_config_structure(nport);
 
 // ??
@@ -695,9 +670,7 @@ int ide_identify_device (uint8_t nport)
 // Sem unidade conectada ao barramento
 // #todo
 // Precisamos de uma mensagem aqui.
-
-    if ( ata_status_read() == 0xFF )
-    {
+    if ( ata_status_read() == 0xFF ){
         debug_print("ide_identify_device: ata_status_read()\n");
         goto fail;
     }
@@ -707,18 +680,15 @@ int ide_identify_device (uint8_t nport)
 // Se estamos escrevendo em uma porta de input/output
 // então temos que nos certificar que esses valores 
 // são válidos.
-
 //Reset?
     out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7-0
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15-8
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
 
-
 // Select device
 // #todo:
 // Review the data sent to the port.
-
     out8( 
         (unsigned short) ( ata.cmd_block_base_address + ATA_REG_DEVSEL), 
         (unsigned char) 0xE0 | ata.dev_num << 4 );
@@ -727,13 +697,9 @@ int ide_identify_device (uint8_t nport)
 // Solicitando informações sobre o disco.
 //
 
-
-    
 // cmd
     ata_wait (400);
-
     debug_print("ide_identify_device: ATA_CMD_IDENTIFY_DEVICE\n");
-
     ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
     ata_wait (400);
 
@@ -743,8 +709,6 @@ int ide_identify_device (uint8_t nport)
 // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
 // Melhor seria fazermos polling
 // Sem unidade no canal.
-
-
 
     debug_print("ide_identify_device: ata_status_read()\n");
 

@@ -1483,6 +1483,16 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+    if ( strncmp( prompt, "pit", 3 ) == 0 )
+    {
+        // #debug
+        printf("Dev freq: %d | Clocks per sec: %d HZ| Period: %d\n",
+            PITInfo.dev_freq,
+            PITInfo.clocks_per_sec,
+            PITInfo.period );
+        goto exit_cmp;
+    }
+
 // ========
 // 'help'
     if ( strncmp( prompt, "help", 4 ) == 0 ){

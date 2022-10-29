@@ -62,6 +62,8 @@ Bits         Usage
 
 #include <kernel.h>  
 
+// see: pit.h
+struct pit_info_d  PITInfo;
 
 // total ticks
 unsigned long jiffies=0;
@@ -120,32 +122,23 @@ static int timerTimer(void);
 
 // =============================
 
-// Constructor
-// Main globals.
+
 static int timerTimer(void)
 {
-
-// total ticks
+// Total ticks
     jiffies = 0;
-
-// por quantos segundos o sistema esta rodando
+// Por quantos segundos o sistema esta rodando
 // jiffies/sys_time_hz
     seconds = 0; 
-
 // Por quantos ms o sistema esta rodando.
     sys_time_ms = 0; 
-
-// pit frequency
+// Pit frequency
     sys_time_hz = 0;
-
     UpdateScreenFlag = FALSE;
-
 // Profiler
     profiler_ticks_count = 0;
     profiler_ticks_limit = PROFILER_TICKS_DEFAULT_LIMIT;
-
     // ...
-
     return 0;
 }
 
@@ -155,7 +148,6 @@ static int timerTimer(void)
  *     Chama o handler do kernel que está no kernel base.
  * #todo: Observar alguns procedimentos antes de chamar a rotina.
  */
-
 // Called by:
 // _irq0 in hw.asm
 // It is up to the interrupt service routine to reset the latch. 
@@ -329,44 +321,52 @@ Bits         Usage
 
 
 // VT8237
-// Compativel com intel 8254
-void timerInit8253 ( unsigned int freq )
+// Compativel com Intel 8254.
+// IN> frequence in HZ.
+// see: pit.h
+void timerInit8253 (unsigned int freq)
 {
-    unsigned int clocks_per_sec = (unsigned int) (freq & 0xFFFFFFFF);
-
+    unsigned int clocks_per_sec = 0;
 // para 1.1 MHz
 // The counter counts down to zero, then 
 // sends a hardware interrupt (IRQ 0) to the CPU.
 // 3579545/3
+    unsigned int period = 0;
 
-    unsigned int period = (unsigned int) ( (1193182) / clocks_per_sec );
-
-    // #debug
-    //printf("Period %d\n",period);
-    //refresh_screen();
-    //while(1){}
-
+    PITInfo.initialized = FALSE;
+    clocks_per_sec = (unsigned int) (freq & 0xFFFFFFFF);
+    if(clocks_per_sec==0){
+        x_panic("timerInit8253:");
+    }
+    PITInfo.clocks_per_sec = clocks_per_sec;
+    // latch
+    period = (unsigned int) ( PIT_DEV_FREQ / clocks_per_sec );
+    PITInfo.dev_freq = (unsigned int) PIT_DEV_FREQ;
+    PITInfo.period = period;
 
 // 0x36
 // 00 | 11 | 011 | 0
 // Channel 0 | word | square wave generator | 16bit binary
-
     out8 ( 0x43, (unsigned char) 0x36 );
     io_delay();
-
 // LSB
-    out8 ( 0x40, (unsigned char) (period & 0xFF) ); 
+    out8 ( 0x40, (unsigned char)(period & 0xFF) ); 
     io_delay();
-
 // MSB
     out8 ( 0x40, (unsigned char)(period >> 8) & 0xFF );
     io_delay();
-
 // GLOBAL VARIABLE.
-    sys_time_hz = (unsigned long) (freq & 0xFFFFFFFF);
+    set_systime_hz(freq);
+    PITInfo.initialized = TRUE;
+
+    // #debug
+    //printf("Dev freq: %d | Clocks per sec: %d HZ| Period: %d\n",
+    //    PITInfo.dev_freq,
+    //    PITInfo.clocks_per_sec,
+    //    PITInfo.period );
+    //refresh_screen();
+    //while(1){}
 }
-
-
 
 // set_timeout: #todo 
 void set_timeout ( unsigned long ticks )
@@ -536,58 +536,44 @@ void sleep (unsigned long ms)
 
 int timerInit (void)
 {
+
+    panic("timerInit: #deprecated");
+    return 0;
+/*
     int i=0;
 
     // g_driver_timer_initialized = FALSE;
-
 // Breaker
     __breaker_timer_initialized = FALSE;
-
-
     timerTimer();
-
     for ( i=0; i<32; i++ ){
         timerList[i] = (unsigned long) 0;
     }
-
-
     // timerLock = 0;
-
     //set handler.
-   
-    //
     // @todo: Habilitar esse configuração pois é mais precisa.
-    //
-   
     //config frequências...
     //@todo: Isso poderia ser por último.
     //?? Isso pertence a i386 ??
     //?? Quais máquinas possuem esse controlador ??
-    
 // #importante
 // Começaremos com 100 HZ
 // Mas o timer poderá ser atualizado por chamada.
 // e isso irá atualizar a variável que inicializamos agora.
-
     timerInit8253(HZ);
-
 // #todo:
 // alocar memoria para a estrutura do timer.
 // inicializar algumas variaveis do timer.
 // por enquanto estamos usando variaveis globais.
 // ?? Não se se ja foi configurado o timer.
 // ou devemos chamr init_8253() agora. ou depois.
-
     //timerCountSeconds = 0;
-
 // Quantum
     set_current_quantum (QUANTUM_MIN);
     set_next_quantum (QUANTUM_MIN);
     set_quantum (QUANTUM_MIN);
-
 // Timeout 
     set_timeout(0);
-
 // Whatchdogs
 // Initializing whatchdogs.
 // Eles serão zerados pelas interrupções dos dipositivos e
@@ -597,16 +583,12 @@ int timerInit (void)
     ____whatchdog_ps2_keyboard = 0;
     ____whatchdog_ps2_mouse = 0;
     //...
-
-
-	//Continua...
-
 // breaker
     __breaker_timer_initialized = TRUE;
-
 // Done
     g_driver_timer_initialized = TRUE;
     return 0;
+*/
 }
 
 
@@ -618,13 +600,13 @@ int timerInit (void)
  *     Porém ainda existe uma inicialização feita em Assembly
  * quando o kernel é inicialazado.
  */
+// Called by hal.c
 
 int early_timer_init (void)
 {
-    int i=0;
+    register int i=0;
 
     //g_driver_timer_initialized = FALSE;
-
 // Breaker
     __breaker_timer_initialized = FALSE;
 
@@ -634,28 +616,19 @@ int early_timer_init (void)
         timerList[i] = (unsigned long) 0;
     };
 
-
-//
 // == Hz ============================================
-//
-
 // Setup the controller.
 // Let's setup the variable sys_time_hz.
 // And setup the controler.
 // We can use the default variable. 
 // See: config.h
-
-    set_systime_hz(DEFAULT_PIT_FREQ);
-    timerInit8253 (DEFAULT_PIT_FREQ);
-
+    timerInit8253(HZ);
 // Quantum
     set_current_quantum (QUANTUM_MIN);
     set_next_quantum (QUANTUM_MIN);
     set_quantum (QUANTUM_MIN);
-
 // Timeout 
     set_timeout(0);
-
 // Whatchdogs
 // Initializing whatchdogs.
 // Eles serão zerados pelas interrupções dos dipositivos e
@@ -664,12 +637,9 @@ int early_timer_init (void)
     ____whatchdog_ps2_keyboard = 0;
     ____whatchdog_ps2_mouse = 0;
     //...
-
     // Continua...
-
 // Breaker
     __breaker_timer_initialized = TRUE;
-
 // Done
     g_driver_timer_initialized = TRUE;
     return 0;

@@ -32,17 +32,6 @@ struct scheduler_info_d
 extern struct scheduler_info_d  SchedulerInfo;
 
 
-// Hz padrão. 100Hz. 
-// Uma interrupção a cada 10ms.
-// #bugbug: Isso ja esta definido em coisas do pit.
-//#define HZ  100
-#define HZ  1000
-
-// Tranca
-// #define LATCH (1193180/HZ)
-
-// Tranca
-// #define LATCH (1193180/HZ)
 
 // Tipos diferentes de scheduler. 
 // Usado pelo desenvolvedor.

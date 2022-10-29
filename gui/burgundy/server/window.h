@@ -566,19 +566,15 @@ struct gws_window_d
 // We need to review that list of flags.
 // We already using some flags.
     unsigned long style;
-
 // Uma janela de aplicativo
 // poderá ter janelas de aplicativo dentro de sua área de cliente.
     int multiple;
-
 // Used to invalidate the rectangle.
 // If the window is dirty, so the whole window rectangle
 // needs to be flushed into the framebuffer.
     int dirty;
-
 // FAST FLAG. Essa será a flag de ativa ou não. (decidindo isso)
     int active;
-
 // Se tem o foco de entrada ou não.
 // Isso faz a janela ser pintada ou repintada 
 // contendo o indicador de foco.
@@ -601,7 +597,10 @@ struct gws_window_d
 
 // Hierarquia. 
 // parent->level + 1;
-// Não é z-order.
+// Não é z-order?
+// Criamos a janela sempre um level acima do level da sua parent.
+// Is the index in a list o childs?
+// The top-level windows are exactly the direct subwindows of the root window.
     int level;
 
 // #todo: use this when

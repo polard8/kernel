@@ -486,11 +486,6 @@ void I_x64ExecuteInitialProcess (void)
     //taskswitch_lock();
     //scheduler_lock();
 
-// timer.
-
-    // timerInit8253 ( HZ );
-    // timerInit8253 ( 800 );
-    // timerInit8253 ( 900 );
 
 // Setup cr3.
 // This is a Physical address.

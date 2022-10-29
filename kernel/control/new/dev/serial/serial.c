@@ -64,8 +64,10 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
         SerialPortInfo.com1.divisor = (uint16_t) divisorShort;
         SerialPortInfo.com1.divisorLoByte = (char) divisorLoByte;
         SerialPortInfo.com1.divisorHiByte = (char) divisorHiByte;
+        SerialPortInfo.com1.dev_freq = SERIAL_DEV_FREQ; //115200
         if(divisorShort>0){
-            SerialPortInfo.com1.baudrate = (unsigned long) (115200/divisorShort);
+            SerialPortInfo.com1.baudrate = 
+                (unsigned long) (SERIAL_DEV_FREQ/divisorShort);
         }
     }
     //#test
@@ -75,8 +77,10 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
         SerialPortInfo.com2.divisor = (uint16_t) divisorShort;
         SerialPortInfo.com2.divisorLoByte = (char) divisorLoByte;
         SerialPortInfo.com2.divisorHiByte = (char) divisorHiByte;
+        SerialPortInfo.com2.dev_freq = SERIAL_DEV_FREQ; //115200
         if(divisorShort>0){
-            SerialPortInfo.com2.baudrate = (unsigned long) (115200/divisorShort);
+            SerialPortInfo.com2.baudrate = 
+                (unsigned long) (SERIAL_DEV_FREQ/divisorShort);
         }
     }
     //#test
@@ -86,8 +90,10 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
         SerialPortInfo.com3.divisor = (uint16_t) divisorShort;
         SerialPortInfo.com3.divisorLoByte = (char) divisorLoByte;
         SerialPortInfo.com3.divisorHiByte = (char) divisorHiByte;
+        SerialPortInfo.com3.dev_freq = SERIAL_DEV_FREQ; //115200
         if(divisorShort>0){
-            SerialPortInfo.com3.baudrate = (unsigned long) (115200/divisorShort);
+            SerialPortInfo.com3.baudrate = 
+                (unsigned long) (SERIAL_DEV_FREQ/divisorShort);
         }
     }
     //#test
@@ -97,11 +103,12 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
         SerialPortInfo.com4.divisor = (uint16_t) divisorShort;
         SerialPortInfo.com4.divisorLoByte = (char) divisorLoByte;
         SerialPortInfo.com4.divisorHiByte = (char) divisorHiByte;
+        SerialPortInfo.com4.dev_freq = SERIAL_DEV_FREQ; //115200
         if(divisorShort>0){
-            SerialPortInfo.com4.baudrate = (unsigned long) (115200/divisorShort);
+            SerialPortInfo.com4.baudrate = 
+                (unsigned long) (SERIAL_DEV_FREQ/divisorShort);
         }
     }
-
 
 // Se não é alguma das bases possiveis.
 // #todo: Existem máquinas com mais do que 4 portas seriais?
