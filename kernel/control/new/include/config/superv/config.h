@@ -11,7 +11,7 @@
 // ...
 
 //
-// ## IMPORNTANTE ##
+// ## IMPORTANTE ##
 //
 
 //TEM QUE CONFIGURAR O BL TAMBÉM
