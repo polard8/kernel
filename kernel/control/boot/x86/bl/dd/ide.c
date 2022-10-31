@@ -1,22 +1,38 @@
 /*
- * File: ide.c
+ * ide.c
  * IDE/AHCI support.
  * History:
  *     2017 - Ported from Sirius OS, BSD-2-Clause License.
  *     This driver was created by Nelson Cole for Sirius OS.
  *     2021 - Some new changes by Fred Nora.
  */
-
 // #todo:
 // Rever a tipagem.
 // Usar os nomes tradicionais para os tipos.
-
 // Obs: 
 // O foco está na lista de discos. 
 // diskList
 
 
 #include <bootloader.h>
+
+// pci support
+// #bugbug
+// No macros, please
+#define CONFIG_ADDR(bus,device,fn,offset)\
+                       (\
+                       (((uint32_t)(bus)    & 0xff) << 16)|\
+                       (((uint32_t)(device) & 0x3f) << 11)|\
+                       (((uint32_t)(fn)     & 0x07) <<  8)|\
+                       ( (uint32_t)(offset) & 0xfc)|0x80000000 )
+
+
+#define PCI_PORT_ADDR  0xCF8
+#define PCI_PORT_DATA  0xCFC
+#define DISK1  1
+#define DISK2  2
+#define DISK3  3
+#define DISK4  4
 
 
 //
@@ -31,11 +47,9 @@ struct dev_nport  dev_nport;
 struct ata_pci  ata_pci;
 struct ata  ata;
 
-
 _u16 *ata_identify_dev_buf;
 _u8 ata_record_dev=0;
 _u8 ata_record_channel=0;
-
 
 int g_current_ide_channel=0;
 int g_current_ide_device=0;
@@ -45,13 +59,9 @@ struct ide_ports_d  ide_ports[4];
 
 unsigned long ide_handler_address=0;
 
-
 //see: ide.h
 struct ide_channel_d  idechannelList[8];
 struct ide_d  IDE;
-
-
-
 
 // A unidade atualmente selecionada.
 st_dev_t *current_dev;
@@ -62,7 +72,6 @@ st_dev_t *ready_queue_dev;
 // O próximo ID de unidade disponível. 
 uint32_t  dev_next_pid = 0;
 
-
 _u8 *dma_addr;
 
 const char *dev_type[] = {
@@ -70,21 +79,9 @@ const char *dev_type[] = {
     "ATAPI"
 };
 
-
-
-#define PCI_PORT_ADDR  0xCF8
-#define PCI_PORT_DATA  0xCFC
-
-#define DISK1  1
-#define DISK2  2
-#define DISK3  3
-#define DISK4  4
-
-
 // IRQ support.
 //static _u32 ata_irq_invoked = 1; 
 static _u32 ata_irq_invoked = 0;
-
 
 static const char *ata_sub_class_code_register_strings[] = {
     "Unknown",
@@ -97,12 +94,12 @@ static const char *ata_sub_class_code_register_strings[] = {
 };
 
 // base address 
-static _u32 ATA_BAR0;    // Primary Command Block Base Address
-static _u32 ATA_BAR1;    // Primary Control Block Base Address
-static _u32 ATA_BAR2;    // Secondary Command Block Base Address
-static _u32 ATA_BAR3;    // Secondary Control Block Base Address
-static _u32 ATA_BAR4;    // Legacy Bus Master Base Address
-static _u32 ATA_BAR5;    // AHCI Base Address / SATA Index Data Pair Base Address
+static _u32 ATA_BAR0=0;    // Primary Command Block Base Address
+static _u32 ATA_BAR1=0;    // Primary Control Block Base Address
+static _u32 ATA_BAR2=0;    // Secondary Command Block Base Address
+static _u32 ATA_BAR3=0;    // Secondary Control Block Base Address
+static _u32 ATA_BAR4=0;    // Legacy Bus Master Base Address
+static _u32 ATA_BAR5=0;    // AHCI Base Address / SATA Index Data Pair Base Address
 
 
 //=======================
@@ -139,7 +136,6 @@ static inline void __atapi_pio_read ( void *buffer, uint32_t bytes )
 }
 
 // ====================
-
 
 
 int disk_get_ata_irq_invoked()
@@ -335,12 +331,9 @@ _u8 __ata_assert_dever (char nport)
 }
 
 
-// ide_identify_device:
-
-int ide_identify_device ( uint8_t nport )
+int ide_identify_device(uint8_t nport)
 {
     _u8 status=0;
-
 // Signature bytes
     _u8 sigbyte1=0;
     _u8 sigbyte2=0;
@@ -351,21 +344,16 @@ int ide_identify_device ( uint8_t nport )
 
     __ata_assert_dever(nport);
 
-	// Ponto flutuante
-	// Sem unidade conectada ao barramento
-
- 
+// Sem unidade conectada ao barramento 
     if ( ata_status_read() == 0xff )
     {
         return (int) -1;
     }
 
-
     out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, 0 );      // LBA 7-0
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, 0 );      // LBA 15-8
     out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, 0 );      // LBA 23-16
-
 
     // Select device.
     out8 ( 
@@ -550,7 +538,6 @@ void set_ata_addr (int channel)
 
 void ide_mass_storage_initialize()
 {
-
     int port=0;
 
 //
@@ -602,135 +589,118 @@ void ide_mass_storage_initialize()
  *    Obtendo informações sobre um dos dispositivos.
  */
 
-int ide_dev_init (char port){
-
+int ide_dev_init (char port)
+{
     int data=0;
-
     st_dev_t *new_dev;
 
-
-    // Storage device structure.
-    
+// Storage device structure.
     new_dev = ( struct st_dev * ) malloc ( sizeof( struct st_dev) );
-    
-    if ( (void *) new_dev ==  NULL )
-    {
+    if ( (void *) new_dev ==  NULL ){
         printf ("ide_dev_init: [FAIL] struct\n");
         die();
     }
 
+    data = (int) ide_identify_device(port);
 
-    data = (int) ide_identify_device (port);
-
-    if ( data == -1 )
-    {
+    if (data == -1){
         printf ("ide_dev_init: [FAIL] ide_identify_device fail\n");
         return (int) 1;
     }
 
+// ========================
+// Unidades ATA.
+    if (data == 0){
 
-    if ( data == 0 )
-    {
-        // Unidades ATA.
+        new_dev->dev_type = 
+            (ata_identify_dev_buf[0] &0x8000)?    0xffff: ATA_DEVICE_TYPE;
+        new_dev->dev_access = 
+            (ata_identify_dev_buf[83]&0x0400)? ATA_LBA48: ATA_LBA28;
 
-        new_dev->dev_type   = (ata_identify_dev_buf[0] &0x8000)? 0xffff: ATA_DEVICE_TYPE;
-        new_dev->dev_access = (ata_identify_dev_buf[83]&0x0400)? ATA_LBA48: ATA_LBA28;
-        
-		if(ATAFlag == FORCEPIO)
-		{
-			//com esse só funciona em pio
-		    new_dev->dev_modo_transfere = 0;	
-		}else{
-		    //com esse pode funcionar em dma
-		    new_dev->dev_modo_transfere = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        if (ATAFlag == FORCEPIO){
+            //com esse só funciona em pio
+            new_dev->dev_modo_transfere = 0;
+        }else{
+            //com esse pode funcionar em dma
+            new_dev->dev_modo_transfere = 
+                (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
         };
 
-        new_dev->dev_total_num_sector   = ata_identify_dev_buf[60];
-        new_dev->dev_total_num_sector  += ata_identify_dev_buf[61];
+        new_dev->dev_total_num_sector  = ata_identify_dev_buf[60];
+        new_dev->dev_total_num_sector += ata_identify_dev_buf[61];
 
         new_dev->dev_byte_per_sector = 512;
-		
+
         new_dev->dev_total_num_sector_lba48  = ata_identify_dev_buf[100];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[101];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[102];
         new_dev->dev_total_num_sector_lba48 += ata_identify_dev_buf[103];
-		
+
         new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 512);
 
-        
-    }else if( data == 0x80 )
-          {
+// ========================
+// Unidades ATAPI.
+    }else if(data == 0x80){
 
-              // Unidades ATAPI.
+        new_dev->dev_type = 
+              (ata_identify_dev_buf[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
 
-              new_dev->dev_type = (ata_identify_dev_buf[0]&0x8000)? ATAPI_DEVICE_TYPE: 0xffff;
-              
-			  new_dev->dev_access = ATA_LBA28;
-              
-			  if(ATAFlag == FORCEPIO)
-			  {
-                  //com esse só funciona em pio 				  
-			      new_dev->dev_modo_transfere = 0; 
-			  }else{
-			      //com esse pode funcionar em dma
-			      new_dev->dev_modo_transfere = (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
-              };
+        new_dev->dev_access = ATA_LBA28;
 
-			  new_dev->dev_total_num_sector  = 0;
-              new_dev->dev_total_num_sector += 0;
-              
-			  new_dev->dev_byte_per_sector = 2048; 
-              
-			  new_dev->dev_total_num_sector_lba48  = 0;
-              new_dev->dev_total_num_sector_lba48 += 0;
-              new_dev->dev_total_num_sector_lba48 += 0;
-              new_dev->dev_total_num_sector_lba48 += 0;
-              
-			  new_dev->dev_size = (new_dev->dev_total_num_sector_lba48 * 2048);
+        if (ATAFlag == FORCEPIO){
+            // com esse só funciona em pio  
+            new_dev->dev_modo_transfere = 0; 
+        }else{
+            //com esse pode funcionar em dma
+            new_dev->dev_modo_transfere = 
+                (ata_identify_dev_buf[49]&0x0100)? ATA_DMA_MODO: ATA_PIO_MODO;
+        };
 
-          }else{
-              printf ("ide_dev_init: [FAIL] Invalid device?\n");
-              return (int) 1;
-          };
+        new_dev->dev_total_num_sector  = 0;
+        new_dev->dev_total_num_sector += 0;
 
-    //Dados em comum.
+        new_dev->dev_byte_per_sector = 2048; 
 
+        new_dev->dev_total_num_sector_lba48  = 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+        new_dev->dev_total_num_sector_lba48 += 0;
+
+        new_dev->dev_size = 
+            (new_dev->dev_total_num_sector_lba48 * 2048);
+
+// ========================
+// Invalid type.
+    }else{
+        printf ("ide_dev_init: [FAIL] Invalid device?\n");
+        return (int) 1;
+    };
+
+//Dados em comum.
     new_dev->dev_id      = dev_next_pid++;
     new_dev->dev_num     = ata.dev_num;
     new_dev->dev_channel = ata.channel;
     new_dev->dev_nport   = port;
 
-
-//
 // port
-//
 
-    switch ( port ){
-
-        case 0:  
-            // Message
-            dev_nport.dev0 = 0x81;
-            break;
-
-        case 1:
-            // Message
-            dev_nport.dev1 = 0x82;
-            break;
-
-        case 2:
-            // Message
-            dev_nport.dev2 = 0x83;
-            break;
-
-        case 3:
-            // Message
-            dev_nport.dev3 = 0x84;
-            break;
-
-        default: 
-            // Message
-            printf ("ide_dev_init: [FAIL] Invalid port?\n");
-            break; 
+    switch (port){
+    case 0:  
+        dev_nport.dev0 = 0x81;
+        break;
+    case 1:
+        dev_nport.dev1 = 0x82;
+        break;
+    case 2:
+        dev_nport.dev2 = 0x83;
+        break;
+    case 3:
+        dev_nport.dev3 = 0x84;
+        break;
+    default: 
+        // Message
+        printf ("ide_dev_init: [FAIL] Invalid port?\n");
+        break; 
     };
 
 
@@ -742,34 +712,28 @@ int ide_dev_init (char port){
 
     new_dev->next = NULL;
 
-
 // Queue
 // Add no fim da lista (ready_queue_dev).
 
     st_dev_t *tmp_dev; 
 
-    tmp_dev = ( struct st_dev * ) ready_queue_dev;
-
+    tmp_dev = (struct st_dev *) ready_queue_dev;
     if ( (void*) tmp_dev == NULL ){
         printf ("ide_dev_init: [FAIL] tmp_dev\n");
         die();
     }
 
-    while ( tmp_dev->next )
-    {
+    while (tmp_dev->next){
         tmp_dev = tmp_dev->next;
     };
-    
     tmp_dev->next = new_dev;
 
     return 0;
 }
 
 
-/*
- * dev_switch:
- *     ?? Porque esse tipo ??
- */
+// dev_switch:
+// Porque esse tipo?
 
 static inline void dev_switch (void)
 {
@@ -843,15 +807,12 @@ int nport_ajuste ( char nport )
 
     while ( nport != getnport_dev() )
     {
-
-        if ( i == 4 ){ 
+        if (i == 4){ 
             return (int) 1; 
         }
-        
         dev_switch ();
         i++;
     };
-
 
     if ( getnport_dev() == -1 )
     { 
@@ -882,44 +843,44 @@ static inline void ata_set_device_and_sector (
 
         // Mode LBA28
         case 28:
-	        out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, count );   // Sector Count 7:0
-	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, addr );		 // LBA 7-0   
-	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, addr >> 8 );   // LBA 15-8
-	        out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, addr >> 16 );  // LBA 23-16
-            
-			// Modo LBA active, Select device, and LBA 27-24
+            out8 ( ata.cmd_block_base_address + ATA_REG_SECCOUNT, count );   // Sector Count 7:0
+            out8 ( ata.cmd_block_base_address + ATA_REG_LBA0, addr );        // LBA 7-0   
+            out8 ( ata.cmd_block_base_address + ATA_REG_LBA1, addr >> 8 );   // LBA 15-8
+            out8 ( ata.cmd_block_base_address + ATA_REG_LBA2, addr >> 16 );  // LBA 23-16
+
+            // Modo LBA active, Select device, and LBA 27-24
             out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL, 
-			    0x40 | (ata.dev_num << 4) | (addr >> 24 &0x0f) );
+                0x40 | (ata.dev_num << 4) | (addr >> 24 &0x0f) );
      
-			// Verifique se e a mesma unidade para não esperar pelos 400ns.
-			
+            // Verifique se e a mesma unidade para não esperar pelos 400ns.
+
             if ( ata_record_dev != ata.dev_num && 
-			     ata_record_channel != ata.channel )
-			{
+                 ata_record_channel != ata.channel )
+            {
                 ata_wait(400);
                 
-				//verifique erro
+                //verifique erro
                 ata_record_dev = ata.dev_num;
                 ata_record_channel  = ata.channel;
-			};
+            }
             break;
 
-		//Mode LBA48
+        //Mode LBA48
         case 48:
-            
-            out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,0);	      // Sector Count 15:8
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr >> 24);  // LBA 31-24   
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 32);  // LBA 39-32
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 40);  // LBA 47-40
-	        out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,count);   // Sector Count 7:0
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr);		  // LBA 7-0   
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);   // LBA 15-8
-	        out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);  // LBA 23-16
-            
-			out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL,
-			    0x40 | ata.dev_num << 4 );   // Modo LBA active, Select device,        
-            
-			// Verifique se e a mesma unidade para não esperar pelos 400ns.
+
+            out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,0);       // Sector Count 15:8
+            out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr >> 24);  // LBA 31-24   
+            out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 32);  // LBA 39-32
+            out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 40);  // LBA 47-40
+            out8( ata.cmd_block_base_address + ATA_REG_SECCOUNT,count);   // Sector Count 7:0
+            out8( ata.cmd_block_base_address + ATA_REG_LBA0,addr);        // LBA 7-0   
+            out8( ata.cmd_block_base_address + ATA_REG_LBA1,addr >> 8);   // LBA 15-8
+            out8( ata.cmd_block_base_address + ATA_REG_LBA2,addr >> 16);  // LBA 23-16
+
+            out8 ( ata.cmd_block_base_address + ATA_REG_DEVSEL,
+                0x40 | ata.dev_num << 4 );   // Modo LBA active, Select device,        
+
+            // Verifique se e a mesma unidade para não esperar pelos 400ns.
             if ( ata_record_dev     != ata.dev_num && 
                  ata_record_channel != ata.channel )
             {
@@ -957,10 +918,8 @@ static inline void ata_set_device_and_sector (
 #define dma_bus_read    0
 #define dma_bus_write   1
 
-
 // Status dma
 #define ide_dma_sr_err     0x02
-
 
 // Registros bus master base address
 #define ide_dma_reg_cmd     0x00
@@ -998,7 +957,6 @@ ide_dma_data (
 {
     _u8 data=0;
     uint32_t phy=0;
-
 
 // @todo: 
 // Check limits.
@@ -1066,7 +1024,7 @@ void ide_dma_start ()
 
 void ide_dma_stop ()
 {
-    _u8 Data = 0;
+    _u8 Data=0;
     
     Data = in8 ( ata.bus_master_base_address + ide_dma_reg_cmd );  
     out8( 
@@ -1077,14 +1035,7 @@ void ide_dma_stop ()
     out8( 
         ata.bus_master_base_address + ide_dma_reg_status, 
         Data & ~6);
-
-// #todo: 
-// Deletar retorno.
-
-done:
-    return;
 }
-
 
 // DMA read status.
 int ide_dma_read_status ()
@@ -1095,24 +1046,10 @@ int ide_dma_read_status ()
 }
 
 
-
-//
 // pci support
-//
-
-// #bugbug
-// No macros, please
-
-#define CONFIG_ADDR(bus,device,fn,offset)\
-                       (\
-                       (((uint32_t)(bus)    & 0xff) << 16)|\
-                       (((uint32_t)(device) & 0x3f) << 11)|\
-                       (((uint32_t)(fn)     & 0x07) <<  8)|\
-                       ( (uint32_t)(offset) & 0xfc)|0x80000000 )
 
 // #todo:
 // Checar se temos uma lista dessa no suporte a PCI.
-
 // #bugbug
 // That 'Unknown' thing in the bottom of the list.
 
@@ -1248,12 +1185,11 @@ diskATAPCIConfigurationSpace (
     if ( ata_pci.classe == 1 && ata_pci.subclasse == 1 )
     {
         // IDE
-		//#debug
+        //#debug
         //printf (">>> IDE \n");
-        //refresh_screen();		
+        //refresh_screen();
         //while(1){}
-		//refresh_screen();
-		//refresh_screen();
+        //refresh_screen();
 
         ata.chip_control_type = ATA_IDE_CONTROLLER; 
 
@@ -1308,26 +1244,21 @@ diskATAPCIConfigurationSpace (
     }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
           {
               //RAID
-		      //printf (">>> RAID \n");
-		      //#debug
-		      //refresh_screen();
-		      //while(1){}
-		      //refresh_screen();
-		      //refresh_screen();
-		
+              //printf (">>> RAID \n");
+              //#debug
+              //refresh_screen();
+              //while(1){}
+              //refresh_screen();
+
               ata.chip_control_type = ATA_RAID_CONTROLLER;
-			  
-//#ifdef KERNEL_VERBOSE              
-			  printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+ 
+              printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                   ata_sub_class_code_register_strings[ata.chip_control_type], 
-				  ata_pci.prog_if,
-				  ata_pci.revision_id );
-//#endif
-    
-			  // Em avaliacao
+                  ata_pci.prog_if,
+                  ata_pci.revision_id );
+
+              // Em avaliacao
               return PCI_MSG_AVALIABLE;
-			  
-			  
 
 //
 //  ## ACHI ##  SATA
@@ -1335,24 +1266,20 @@ diskATAPCIConfigurationSpace (
 
           }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 6 )
                 {
-					// ACHI
-		            //#debug
-		            //printf (">>> SATA \n");
-		            //while(1){}
-		            //refresh_screen();
-		            //refresh_screen();
-		            //refresh_screen();
+                    // ACHI
+                    //#debug
+                    //printf (">>> SATA \n");
+                    //while(1){}
+                    //refresh_screen();
 
                     ata.chip_control_type = ATA_AHCI_CONTROLLER;
-       
+
                     // Compatibilidade e nativo, primary.
                     data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
                     if ( data & 0x200 )
                     { 
                         diskWritePCIConfigAddr ( 
-                            bus, 
-                            dev, 
-                            fun, 
+                            bus, dev, fun, 
                             8, 
                             data | 0x100 ); 
                     }        
@@ -1362,14 +1289,12 @@ diskATAPCIConfigurationSpace (
                     if ( data & 0x800 )
                     { 
                         diskWritePCIConfigAddr ( 
-                            bus, 
-                            dev, 
-                            fun, 
+                            bus, dev, fun, 
                             8, 
                             data | 0x400 ); 
                     }
 
-		            // ??
+                    // ??
                     data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
                     if ( data & 0x8000 ) 
                     {    
@@ -1386,12 +1311,10 @@ diskATAPCIConfigurationSpace (
                     data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
                     diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
 
-//#ifdef KERNEL_VERBOSE
                     printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
                         ata_sub_class_code_register_strings[ata.chip_control_type], 
                         ata_pci.prog_if,
                         ata_pci.revision_id );
-//#endif
 
                 // Ok
 
@@ -1415,28 +1338,21 @@ diskATAPCIConfigurationSpace (
 
 // ========================
 // BARs
-
     ata_pci.bar0 = diskReadPCIConfigAddr( bus, dev, fun, 0x10 );
     ata_pci.bar1 = diskReadPCIConfigAddr( bus, dev, fun, 0x14 );
     ata_pci.bar2 = diskReadPCIConfigAddr( bus, dev, fun, 0x18 );
     ata_pci.bar3 = diskReadPCIConfigAddr( bus, dev, fun, 0x1C );
     ata_pci.bar4 = diskReadPCIConfigAddr( bus, dev, fun, 0x20 );
     ata_pci.bar5 = diskReadPCIConfigAddr( bus, dev, fun, 0x24 );
-
 // ========================
 // Interrupt
-
     data = diskReadPCIConfigAddr( bus, dev, fun, 0x3C );
-
     ata_pci.interrupt_line = data      & 0xff;
     ata_pci.interrupt_pin  = data >> 8 & 0xff;
 
-
 // ========================
 // PCI command and status.
-
     data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
-
     ata_pci.command = data       & 0xffff; 
     ata_pci.status  = data >> 16 & 0xffff;
 
@@ -1488,13 +1404,6 @@ uint32_t diskPCIScanDevice (int class)
     int bus=0; 
     int dev=0; 
     int fun=0;
-
-
-//#ifdef KERNEL_VERBOSE
-    //printf ("diskPCIScanDevice:\n");
-    //refresh_screen ();
-//#endif
-
 
 // =============
 // Probe
@@ -1608,13 +1517,11 @@ int diskATAInitialize (int ataflag)
     }
 
 // PCI:  b,d,f
-
     bus = ( data >> 8 & 0xff );
     dev = ( data >> 3 & 31 );
     fun = ( data      & 7 );
 
-// Vamos saber mais sobre o dispositivo enconrtado. 
-
+// Vamos saber mais sobre o dispositivo enconrtado.
     data = (_u32) diskATAPCIConfigurationSpace ( bus, dev, fun );
 
     // Error.
@@ -1818,23 +1725,19 @@ done:
  * diskATAIRQHandler1
  *     irq 14 handler
  */
-
 void diskATAIRQHandler1 ()
 {
     ata_irq_invoked = 1;  
 }
 
-
 /*
  * diskATAIRQHandler2
  *     irq 15 handler
- */
- 
+ */ 
 void diskATAIRQHandler2 ()
 {
     ata_irq_invoked = 1;   
 }
-
 
 
 /*
@@ -1842,7 +1745,6 @@ void diskATAIRQHandler2 ()
  *     Mostrar as informações obtidas na 
  * inicializações do controlador.
  */
-
 void show_ide_info ()
 {
     int i=0;
@@ -1886,13 +1788,11 @@ void show_ide_info ()
 
 	// Estrutura 'atapi'
 	// Qual lista ??
-	
 
 	// Estrutura 'st_dev'
-	// Estão na lista 'ready_queue_dev'	
-	
+	// Estão na lista 'ready_queue_dev'
 
-   //...
+    //...
 }
 
 
@@ -1915,7 +1815,6 @@ int disk_ata_wait_irq ()
 
     while (!ata_irq_invoked)
     {
-
         data = ata_status_read();
 
         // #bugbug: Review this code.
@@ -1925,29 +1824,23 @@ int disk_ata_wait_irq ()
             return (int) -1;
         }
 
-		//ns
-        if (tmp--)  //??
-		{
-			ata_wait (100);
-        
-		}else{
-			
+        //ns
+        if (tmp--){
+            ata_wait (100);
+        }else{
             //ok por tempo esperado.
             ata_irq_invoked = 0;
-
             return (int) 0x80;
         };
     };
  
 // ok por status da interrupção.
     ata_irq_invoked = 0;
-
 // ok 
     return 0;
 }
 
-
 //
-// End.
+// End
 //
 

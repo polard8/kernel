@@ -43,10 +43,8 @@
 #define WINDOW_COUNT_MAX  1024
 unsigned long windowList[WINDOW_COUNT_MAX];
 
-
 unsigned long gScreenWidth=0;
 unsigned long gScreenHeight=0;
-
 
 //
 // windows
@@ -58,16 +56,10 @@ static int addressbar_window = 0;
 static int client_window = 0;
 static int savebutton_window = 0;
 
-
-
-
 // #todo
 // int button_list[8];
 
-//
 // cursor
-//
-
 static int cursor_x = 0;
 static int cursor_y = 0;
 static int cursor_x_max = 0;
@@ -75,11 +67,7 @@ static int cursor_y_max = 0;
 
 static int blink_status=FALSE;
 
-
-//
 // tmp input pointer.
-//
-
 // #todo
 // we will copy all the iput support from the other editor.
 // for now we will use this tmp right here.
@@ -95,7 +83,6 @@ int tmp_ip_y=8;
 #define PORTS_NS 4041
 #define PORTS_FS 4042
 // ...
-
 
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
@@ -118,14 +105,14 @@ static int editor_init_globals(void);
 
 static void update_clients(int fd)
 {
-    if (fd<0)
+    if (fd<0){
         return;
+    }
 
 //#todo: test buttons validation.
     gws_redraw_window(fd, addressbar_window, TRUE);
     gws_redraw_window(fd, savebutton_window, TRUE);
     gws_redraw_window(fd, client_window,     TRUE);
-
 //#test
     gws_set_focus(fd,client_window);
 }
@@ -141,14 +128,12 @@ static int editor_init_globals(void)
 
 static int editor_init_windows(void)
 {
-    int i=0;
+    register int i=0;
     for (i=0; i<WINDOW_COUNT_MAX; i++){
         windowList[i] = 0;
     };
-    
     return 0;
 }
-
 
 //char *hello = "Hello there!\n";
 
@@ -607,10 +592,8 @@ int main( int argc, char *argv[] )
         }
     };
 
-
 // HANG
-    while(1)
-    {
+    while(1){
         rtl_yield();
     };
 

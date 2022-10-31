@@ -2760,6 +2760,14 @@ wm_draw_char_into_the_window(
         return;
     }
 
+// [Enter]
+    if (ch == VK_RETURN)
+    {
+        window->ip_x = 0;
+        window->ip_y++;
+        return;
+    }
+
 
 // Not printable.
 // 32~127
