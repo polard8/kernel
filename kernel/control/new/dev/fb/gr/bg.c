@@ -27,6 +27,9 @@ void backgroundDraw (unsigned int color)
 // Cursor.
 // #bugbug: This routine is not working at this time.
     set_up_cursor(0,0);
+
+//#debug
+    //debug_print ("backgroundDraw: done\n");
 }
 
 

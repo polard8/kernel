@@ -278,47 +278,43 @@ static int booting_end(int arch_type)
 
 static void preinit_Globals(int arch_type)
 {
-// Initializing the global spinlock.
-
-    __spinlock_ipc = TRUE;
-
-// IO Control
-
-    IOControl.useTTY = FALSE;        // Model not implemented yet.
-    IOControl.useEventQueue = TRUE;  // The current model.
-    IOControl.initialized = TRUE;    // IO system initialized.
 
 // Scheduler policies
 // Early initialization.
 // See: 
 // sched.h, sched.c.
-
     SchedulerInfo.policy = SCHED_RR;
     SchedulerInfo.flags  = (unsigned long) 0;
+
+// Initializing the global spinlock.
+    __spinlock_ipc = TRUE;
+
+// IO Control
+    IOControl.useTTY = FALSE;        // Model not implemented yet.
+    IOControl.useEventQueue = TRUE;  // The current model.
+    IOControl.initialized = TRUE;    // IO system initialized.
 
     // ...
 }
 
-
+// see: serial.c
 static void preinit_Serial(void)
 {
-// #todo: Check status.
-    serial_init();
+    int Status=FALSE;
+    Status = serial_init();
+    if(Status!=TRUE){
+        //#bugbug
+        //Oh boy!, We can't use the serial debug.
+    }
     debug_print("preinit_Serial: Initialized\n");
 }
-
 
 static void preinit_OutputSupport(void)
 {
     PROGRESS("preinit_OutputSupport:\n");
 
-// Virtual Console.
-// See: user/console.c
-    //debug_print ("preinit_OutputSupport:\n");
-
 // O refresh ainda não funciona, 
 // precisamos calcular se a quantidade mapeada é suficiente.
-
     refresh_screen_enabled = FALSE;
 
 // As estruturas de console sao estruturas de tty,
@@ -326,7 +322,6 @@ static void preinit_OutputSupport(void)
 // por isso podem ser chamadas nesse momento.
 // #test
 // We need to test it better.
-
     PROGRESS("preinit_OutputSupport: VirtualConsole_initialize\n");
     VirtualConsole_initialize();
 
@@ -361,9 +356,7 @@ int kmain(int arch_type)
 // Enable the usage of the serial debug.
 // It is not initialized yet.
 // #see: debug.c
-    
     disable_serial_debug();
-
     if (USE_SERIALDEBUG == 1){
         enable_serial_debug();
     }
@@ -451,7 +444,6 @@ int kmain(int arch_type)
 // We have another BootBlock structure in info.h
 static int preinit_SetupBootblock(void)
 {
-// ---------------------------
 
 // Magic
 // #bugbug: Explain it better.
@@ -466,32 +458,26 @@ static int preinit_SetupBootblock(void)
 // lfb
 // Esse endereço virtual foi configurado pelo bootloader.
 // Ainda não configuramos a paginação no kernel.
-
     unsigned long *fb = (unsigned long *) FRONTBUFFER_VA; 
     fb[0] = 0x00FFFFFF;
 
 // Check magic
 // Paint a white screen if magic is ok.
-// Paint a colored screen if magic is not ok.
-    int i=0;
-
+// Paint a 'colored' screen if magic is not ok.
+    register int i=0;
 // WHITE
-    if ( bootMagic == 1234 )
-    {
-        //for (i=0; i<320; i++)
-        for (i=0; i<320*50; i++)
-        {
-            fb[i] = 0xFFFFFFFFFFFFFFFF;
-        };
+    if (bootMagic == 1234){
+        for (i=0; i<320*32; i++){ fb[i] = 0xFFFFFFFFFFFFFFFF; };
+    }
+// COLORED
+    if (bootMagic != 1234){
+        for (i=0; i<320*32; i++){ fb[i] = 0xFF00FFFFFFF00FFF; };
+        //#debug
+        //while(1){}
     }
 
-// COLORED
-    if ( bootMagic != 1234 )
-    {
-        for (i=0; i<320*50; i++){
-            fb[i] = 0xFF00FFFFFFF00FFF;
-        };
-    }
+    //#debug
+    //while(1){}
 
 // Boot block (local structure)
 // Saving the boot block
@@ -511,7 +497,6 @@ static int preinit_SetupBootblock(void)
 // Gramado mode.
 // Gramado mode. (jail, p1, home ...)
 // Save global variable.
-
     current_mode = (unsigned long) xBootBlock.gramado_mode;
 
     // ...
@@ -519,11 +504,16 @@ static int preinit_SetupBootblock(void)
 // resolution
 // global variables.
 // See: kernel.h
-
     gSavedLFB = (unsigned long) xBootBlock.lfb_pa;
     gSavedX   = (unsigned long) xBootBlock.deviceWidth;
     gSavedY   = (unsigned long) xBootBlock.deviceHeight;
     gSavedBPP = (unsigned long) xBootBlock.bpp;
+
+// #todo
+// Setup the real boot block structure at gdef.h
+
+// Set up private variables in screen.c
+    screenSetSize (gSavedX,gSavedY);
 
 // Memory support.
 
@@ -533,42 +523,6 @@ static int preinit_SetupBootblock(void)
 // Memory size in KB.
     blSavedPhysicalMemoryInKB = (blSavedLastValidAddress / 1024);
 
-// #todo
-// Setup the real boot block structure at gdef.h
-// BootBlock
-
-    screenSetSize (gSavedX,gSavedY);
-
-
-// teste para a máquina real.
-// preto
-
-/*
-    //if ( xBootBlock.deviceWidth == 320 )
-    //{
-        for (i=0; i< 320*25; i++)
-        {
-            fb[i] = 0;
-        };
-    //}
-
-*/
-    // # ======== DEBUG =============
-    // #todo
-    // The initialization in the real machine
-    // crashes here for the resolution 320x200
-    // gramado mode: jail
-
-
-//#debug
-// Let's print some BLACK over the WHITE BAR.
-    //while(1){}
-
-// ========= funciona ate aqui na maq real ========================
-
-
-
-// ----------------------------------------------
     return 0;
 }
 
@@ -576,7 +530,6 @@ static int preinit_SetupBootblock(void)
 static int preinit(void)
 {
     system_state = SYSTEM_PREINIT;
-
 
 // Checkpoints
     Initialization.phase1_checkpoint = FALSE;
@@ -619,20 +572,19 @@ static int booting_begin(int arch_type)
 {
     int Status = (-1);
 
+// #IMPORTAT: 
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+
     system_state = SYSTEM_BOOTING;
 
     PROGRESS("booting_begin:\n");
-
     printf("booting_begin:\n");
 
 // boot info
     if (xBootBlock.initialized != TRUE){
         panic ("booting_begin: xBootBlock.initialized\n");
     }
-
-// #IMPORTAT: 
-// We do not have all the runtime support yet.
-// We can't use printf yet.
 
 // =================================================
 // Show some basic info.
@@ -662,8 +614,7 @@ static int booting_begin(int arch_type)
     //refresh_screen();
 
 // Video support
-// See: drivers/video/video.c
-
+// See: video.c
 
     //#breakpoint: BLACK ON WHITE.
     //ok, funcionou na maq real no modo jail, provavelmente 320x200.
@@ -849,7 +800,6 @@ static int booting_begin(int arch_type)
     }
 
 // Show gramado mode.
-
     printf ("gramadomode:%d\n",current_mode);
 
     switch (current_mode){
@@ -858,16 +808,23 @@ static int booting_begin(int arch_type)
     case GRAMADO_JAIL:
     case GRAMADO_P1:
     case GRAMADO_HOME:
+        // OK
         break;
 // #temp
 // Unsupported gramado mode. (yet)
     case GRAMADO_P2:
     case GRAMADO_CASTLE:
     case GRAMADO_CALIFORNIA:
+        // #bugbug: panic and x_panic are not working at this point.
+        debug_print("booting_begin: Unsupported gramado mode\n");
         panic("booting_begin: Unsupported gramado mode\n");
+        //x_panic("x");
+        //die();
         break;
 // Undefined gramado mode.
     default:
+        // #bugbug: panic and x_panic are not working at this point.
+        debug_print("booting_begin: Undefined gramado mode\n");
         panic("booting_begin: Undefined gramado mode\n");
         break;
     }
@@ -875,7 +832,7 @@ static int booting_begin(int arch_type)
 // Breakpoint
     //refresh_screen();
     //while(1){}
-    
+
 // ================================================
 
 // #todo

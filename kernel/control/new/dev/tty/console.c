@@ -2358,25 +2358,20 @@ void csi_at (int nr, int console_number)
     };
 }
 
-
-
-// main routine.
-// called by main.c
-
+// Intialize the support for virtual consoles.
+// Called by preinit_OutputSupport in main.c
+// #todo: Explain it better.
+// We have 4 preallocated tty structures for virtual consoles.
 int VirtualConsole_initialize(void)
 {
     register int i=0;
 
-// No shell for now.
+// No embedded shell for now.
 // No input in prompt[].
-
     ShellFlag = FALSE;
 
 // Virtual Console:
 // The kernel only have four virtual consoles.
-
-    //struct tty_d *tmp_tty;
-
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
         console_init_virtual_console(i);
@@ -2397,25 +2392,13 @@ int VirtualConsole_initialize(void)
 // Setup foreground console.
     jobcontrol_switch_console(0);
 
-
-
-
-// Obs: 
-// O video já foi inicializado em main.c.
-// Isso atualiza a estrutura de console do console atual.
-
-// BANNER !
-// Welcome message. (Poderia ser um banner.) ??
-
-// Cursor:
+// Cursor for the current console.
 // See: system.c
-
     set_up_cursor(0,0);
 
 // #hackhack
 // Esse trabalho não nos pertence, pertence ao stdio,
 // mas funciona.
-
     stdio_terminalmode_flag = TRUE;
     stdio_verbosemode_flag = TRUE;
 

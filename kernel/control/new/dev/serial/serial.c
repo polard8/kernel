@@ -150,10 +150,11 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
 // We can't use serial debug. It's because the serial port support
 // is not working yet. :)
 // # We don't have debug messages in this routine.
-
+// Called by preinit_Serial() in main.c
+// OUT: TRUE or FALSE.
 int serial_init(void)
 {
-    int Status = -1;
+    int Status = FALSE;
     uint16_t DefaultDivisor = 3;  // 115200/3 = 38400;
 
     Initialization.serial_log = FALSE;
@@ -165,19 +166,19 @@ int serial_init(void)
 
     Status = serial_init_port(COM1_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return -1;
+        return FALSE;
     }
     Status = serial_init_port(COM2_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return -1;
+        return FALSE;
     }
     Status = serial_init_port(COM3_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return -1;
+        return FALSE;
     }
     Status = serial_init_port(COM4_PORT,DefaultDivisor);
     if (Status != TRUE){
-        return -1;
+        return FALSE;
     }
 
     //__breaker_com1_initialized = 1;
@@ -186,9 +187,8 @@ int serial_init(void)
     //__breaker_com4_initialized = 1;
 
     Initialization.serial_log = TRUE;
-    return 0;
+    return TRUE;
 }
-
 
 // serial_write_char:
 // NOT tested yet.

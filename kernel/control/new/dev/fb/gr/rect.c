@@ -72,6 +72,7 @@ __drawrectangle0(
     unsigned long Height = (height & 0xFFFF);
     unsigned int Color   = color;
 
+
 // Invalid argument
     if (back_or_front != 1 && 
         back_or_front != 2 )
@@ -87,7 +88,6 @@ __drawrectangle0(
 
     struct rect_d  Rect;
     struct rect_d  ClippingRect;
-
 
 // flag
     int UseClipping = TRUE;
@@ -127,19 +127,18 @@ __drawrectangle0(
 // #debug
 // Provisório
 
-    if ( ClippingRect.width > 800 )
-       panic("__drawrectangle0: width");
-
-    if ( ClippingRect.height > 600 )
-       panic("__drawrectangle0: height");
-
-
-    if ( ClippingRect.right > 800 )
-       panic("__drawrectangle0: right");
-
-    if ( ClippingRect.bottom > 600 )
-       panic("__drawrectangle0: bottom");
-
+    if ( ClippingRect.width > 800 ){
+        panic("__drawrectangle0: width\n");
+    }
+    if ( ClippingRect.height > 600 ){
+        panic("__drawrectangle0: height\n");
+    }
+    if ( ClippingRect.right > 800 ){
+        panic("__drawrectangle0: right\n");
+    }
+    if ( ClippingRect.bottom > 600 ){
+        panic("__drawrectangle0: bottom\n");
+    }
 
 //
 // == Target rectangle ================
@@ -164,14 +163,13 @@ __drawrectangle0(
 // Clipping
 //
 
-	// Limits.
-	
-	// #todo: 
-	// Repensar os limites para uma janela.
-	// Uma janela poderá ser maior que as dimensões de um dispositivo.
-	// mas não poderá ser maior que as dimensões do backbuffer.
-	// Ou seja: O dedicated buffer de uma janela deve ser menor que
-	// o backbuffer.
+// Limits.
+// #todo: 
+// Repensar os limites para uma janela.
+// Uma janela poderá ser maior que as dimensões de um dispositivo.
+// mas não poderá ser maior que as dimensões do backbuffer.
+// Ou seja: 
+// O dedicated buffer de uma janela deve ser menor que o backbuffer.
 
     //if ( Rect.right  > gSavedX ){  Rect.right  = gSavedX;  }
     //if ( Rect.bottom > gSavedY ){  Rect.bottom = gSavedY;  }
@@ -181,30 +179,24 @@ __drawrectangle0(
     if ( Rect.right  > ClippingRect.right  ){ Rect.right  = ClippingRect.right;  }
     if ( Rect.bottom > ClippingRect.bottom ){ Rect.bottom = ClippingRect.bottom; }
 
-//
 // Draw
-//
+// Draw lines on backbuffer.
 
-    // Draw lines on backbuffer.
+    //#provisório
+    if ( internal_height > 600 ){
+       panic("__drawrectangle0: internal_height\n");
+    }
 
-    if ( internal_height > 600 )
-       panic("__drawrectangle0: internal_height");
-
-//
 // Paint
-//
-
 // Paint lines.
 // Incrementa a linha a ser pintada.
 // See: line.c
-
 // IN:
 // 1=backbuffer
 // 2=frontbuffer
 
     while (1)
     {
-
         // 1=backbuffer
         if( back_or_front == 1 ){
             backbuffer_draw_horizontal_line ( 
@@ -242,10 +234,7 @@ __drawrectangle0(
 // Sujo de tinta.
 
     Rect.dirty = TRUE;
-
-    //debug_print("__drawrectangle0: Done\n");
 }
-
 
 // Service 9: 
 // Draw a rectangle into the backbuffer.

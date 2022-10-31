@@ -16,9 +16,8 @@ static unsigned long screen_bpp=0;
 static unsigned long screen_pitch=0;
 //...
 
-
 // Qual é o endereço virtual do início de uma dada linha da tela?
-unsigned long screen_scanline_va( int scanline )
+unsigned long screen_scanline_va(int scanline)
 {
     unsigned long scanline_va=0;
     unsigned long start = FRONTBUFFER_VA;
