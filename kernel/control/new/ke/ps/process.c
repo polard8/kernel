@@ -32,12 +32,7 @@ pid_t criticalsection_pid;
 // PRIVATE
 static pid_t __current_pid = (pid_t) (-1);  //fail
 
-
-
 static pid_t caller_process_id=0;
-
-
-
 
 
 //
@@ -50,8 +45,10 @@ static pid_t caller_process_id=0;
 int __spinlock_ipc=0;
 //...
 
+//==============================================
 
-void set_current_process( pid_t pid )
+
+void set_current_process(pid_t pid)
 {
     __current_pid = (pid_t) pid;
 }
@@ -92,15 +89,16 @@ struct process_d *get_current_process_pointer(void)
         //panic ("get_current_process_pointer: magic\n");
         return NULL;
     }
-    
+
     return (struct process_d *) p;
 }
 
 
-// #todo: Observar metodos melhores para distribuir as informações.
+// #todo: 
+// Observar metodos melhores para distribuir as informações.
 // Unix-like coloca as informações emum arquivo para ser lido
 // pelos aplicativos.
-unsigned long get_process_stats ( pid_t pid, int index )
+unsigned long get_process_stats(pid_t pid, int index)
 {
     struct process_d *p;
 
@@ -110,11 +108,9 @@ unsigned long get_process_stats ( pid_t pid, int index )
     }
 
     p = (void *) processList[pid];
-
     if ( (void *) p == NULL ){
         return 0;
     } 
-
     if (p->magic!=1234){
         return 0;
     } 
@@ -236,11 +232,9 @@ int getprocessname ( pid_t pid, char *buffer )
     }
  
     p = (struct process_d *) processList[pid]; 
-
     if ( (void *) p == NULL ){
         goto fail;
     }
-
     if ( p->used != TRUE || p->magic != 1234 )
     {
         goto fail;
@@ -287,12 +281,10 @@ copy_process_struct(
     struct process_d *p1,
     struct process_d *p2 )
 {
-    struct process_d  *Process1;
-    struct process_d  *Process2;
-
+    struct process_d *Process1;
+    struct process_d *Process2;
     int Status=0;
     int i=0;
-
 
 // #todo
 // Childs personality first of all.
@@ -360,10 +352,8 @@ copy_process_struct(
 // Object.
     Process2->objectType  = Process1->objectType;
     Process2->objectClass = Process1->objectClass;
-
     Process2->base_priority = (unsigned long) CloneBasePriority;
     Process2->priority      = (unsigned long) ClonePriority;
-
 
 // O clone não inicializa na seção crítica, pois senão teríamos
 // dois processos na sessão crítica.
@@ -388,15 +378,11 @@ copy_process_struct(
 // validation.
     Process2->used  = Process1->used;
     Process2->magic = Process1->magic;
-
 // State of process
-    Process2->state = Process1->state;  
-
+    Process2->state = Process1->state;
 // Plano de execução.
     Process2->plane = Process1->plane;
-
     //Process->name_address = NULL;
-
     Process2->framepoolListHead = Process1->framepoolListHead;
 
 //
@@ -561,15 +547,12 @@ copy_process_struct(
 // #todo: 
 // Checar as características desses arquivos.
 // # Todo processo esta usando o mesmo fluxo.
-
     Process2->Objects[0] = (unsigned long) stdin;
     Process2->Objects[1] = (unsigned long) stdout;
     Process2->Objects[2] = (unsigned long) stderr;
 
-//
 // ========================
 // Thread de controle
-//
 
 // Vamos clonar a thread de controle do processo pai.
 // obs:
@@ -593,7 +576,6 @@ copy_process_struct(
 //?? herda a lista de threads ??
     Process2->threadListHead = Process1->threadListHead;
     Process2->zombieChildListHead = Process1->zombieChildListHead;
-
 // Not in use at the moment.
     Process2->dialog_address = Process1->dialog_address;
 
@@ -609,15 +591,13 @@ copy_process_struct(
     // panic()
     // debug_print ("copy_process_struct: [FIXME] No slot for tty\n");
  
-__OK:
+//__OK:
     Process2->exit_code = Process1->exit_code;
     Process2->prev = Process1->prev; 
     Process2->next = Process1->next; 
     //Status = 0;
     return (int) 0;
-
 // Fail
-
 fail:
     Status = 1;  //-1 ??
     printf ("copy_process_struct: Fail\n");
@@ -630,13 +610,12 @@ fail:
  *     Cria uma estrutura do tipo processo, mas não inicializada.
  *     #todo: Criar a mesma rotina para threads e janelas.
  */
-
 // OUT:
 // Pointer to a new structure.
 // NULL if it fails.
 
-struct process_d *processObject (void){
-
+struct process_d *processObject(void)
+{
     struct process_d  *Tmp;
 
     Tmp = (void *) kmalloc( sizeof(struct process_d) );
@@ -657,7 +636,6 @@ struct process_d *processObject (void){
  *     Pegar um slot vazio na lista de processos.
  *     +Isso pode ser usado para clonar um processo.
  */
-
 // Começaremos a busca onde começa o range de IDs 
 // de processos de usuário.
 // Se encontramos um slot vazio, retornaremos o índice.
@@ -669,23 +647,18 @@ pid_t getNewPID (void)
 // gpid.h
 
     // GRAMADO_PID_BASE = GRAMADO_PID_KERNEL = 0.
-    
+
     int i = GRAMADO_PID_BASE;
-    
     //register int i=10;
-    
-    struct process_d  *p;
 
-    while ( i < PROCESS_COUNT_MAX )
-    {
+    struct process_d *p;
+
+    while (i < PROCESS_COUNT_MAX){
         p = (struct process_d *) processList[i];
-
-        if ( (void *) p == NULL )
-        { 
+        if ( (void *) p == NULL ){ 
             // return the new pid.
             return (pid_t) i; 
         }
-        
         i++;
     };
 
@@ -701,23 +674,20 @@ pid_t getNewPID (void)
  *     @todo: repensar os valores de retorno. 
  * system call (servi�o 88.)
  */
-
-int processTesting (int pid){
-
+// #todo: Change the type to 'pid_t'.
+int processTesting (int pid)
+{
     struct process_d  *P;
-
     P = (void *) processList[pid];
-
     if ( (void *) P == NULL ){
         return 0;
     }else{
-        if ( P->used == 1 && P->magic == 1234 ){ return (int) 1234; }
+        if ( P->used == TRUE && P->magic == 1234 ){
+            return (int) 1234; 
+        }
     };
-
     return 0;
 }
-
-
 
 /*
  * processSendSignal:
@@ -727,17 +697,16 @@ int processTesting (int pid){
  *     @todo: Rotinas envolvendo sinais devem ir para outro arquivo.
  */
 
-int processSendSignal (struct process_d *p, unsigned long signal){
-	
+int processSendSignal (struct process_d *p, unsigned long signal)
+{
 	//SIGNAL_COUNT_MAX
-	
+
 	//Limit
     //if(signal >= 32){
 	//	return 1;
 	//}
 
-    if (signal == 0)
-    {
+    if (signal == 0){
         return 1;
     }
 
@@ -755,11 +724,10 @@ int processSendSignal (struct process_d *p, unsigned long signal){
     }
 
 	//...
-	
+
 //fail:
     return 1;
 }
-
 
 /*
  * init_processes:
@@ -767,7 +735,6 @@ int processSendSignal (struct process_d *p, unsigned long signal){
  *    #todo: rever esse nome, pois na verdade estamos 
  * inicializando variaveis usadas no gerenciamento de processo.
  */
-
 // Called by init_microkernel in mk.c
 
 void init_processes (void)
@@ -831,10 +798,9 @@ void close_all_processes(void)
     };
 }
 
-
 // Worker for create_process.
 // Do not check parameters validation.
-void ps_initialize_process_common_elements( struct process_d *p )
+void ps_initialize_process_common_elements(struct process_d *p)
 {
     register int i=0;
 
@@ -855,44 +821,32 @@ void ps_initialize_process_common_elements( struct process_d *p )
 
 // The control thread.
     p->control = NULL;
-
 // List of threads.
     p->threadListHead = NULL;
-
-// Absolute pathname and relative pathname. 
-
+// Absolute pathname and relative pathname.
     p->file_root = (file *) 0;
     p->file_cwd  = (file *) 0;
     p->inode_root = (struct inode_d *) 0;
     p->inode_cwd  = (struct inode_d *) 0;
 
-
 // Memory usage in bytes.
 // Increment when the process call an allocator.
-
     p->allocated_memory = 0;
-
     p->private_memory_size=0;
     p->shared_memory_size=0;
     p->workingset_size=0;
     p->workingset_peak_size=0;
 
-
-
 // wait4pid: 
 // O processo esta esperando um processo filho fechar.
 // Esse � o PID do processo que ele est� esperando fechar.
-
     p->wait4pid = (pid_t) 0;
-
 // Número de processos filhos.
     p->nchildren = 0;
-
     p->zombieChildListHead = NULL;
     p->exit_code = 0;
 
 // ==========
-
 // Standard stream.
 // See: 
 // kstdio.c for the streams initialization.
@@ -962,16 +916,11 @@ struct process_d *create_process (
 {
     struct process_d  *Process;
     pid_t PID = -1;
-
     // Para a entrada vazia no array de processos.
-    struct process_d *EmptyEntry; 
-
+    struct process_d *EmptyEntry;
     unsigned long BasePriority=0;
     unsigned long Priority=0;
-
-
     int Personality = personality;
-
 
     debug_print ("create_process: #todo\n");
     printf      ("create_process: #todo\n");
@@ -982,11 +931,9 @@ struct process_d *create_process (
     if( (void*) room == NULL ){
         debug_print ("create_process: [FIXME] room parameter is NULL\n");
     }
-    
     if( (void*) desktop == NULL ){
         debug_print ("create_process: [FIXME] desktop parameter is NULL\n");
     }
-    
     if( (void*) window == NULL ){
         debug_print ("create_process: [FIXME] window parameter is NULL\n");
     }
@@ -997,15 +944,12 @@ struct process_d *create_process (
     if( base_address == 0 ){
         panic ("create_process: [ERROR] base_address\n");
     }
-
     if( ppid < 0 ){
         panic ("create_process: [ERROR] ppid\n");
     }
-  
     if( (void*) name == NULL ){
         panic ("create_process: [ERROR] name\n");
     }
-  
     if( *name == 0 ){
         panic ("create_process: [ERROR] *name\n");
     }
@@ -1042,26 +986,17 @@ struct process_d *create_process (
     BasePriority = (unsigned long) priority; 
     Priority     = (unsigned long) priority;
 
-//
 // Process
-//
-
     Process = (void *) kmalloc( sizeof(struct process_d) );
-
     if ( (void *) Process == NULL ){
         panic ("create_process: Process\n");
     }
-
     memset( Process, 0, sizeof(struct process_d) );
 
-
     Process->personality = (int) Personality;
-
     Process->exit_in_progress = FALSE;
-
     Process->base_priority = BasePriority;
     Process->priority = Priority;
-
 
 //get_next:
 
@@ -1091,13 +1026,10 @@ struct process_d *create_process (
 // Worker
 // Initializing the elements common for 
 // all types of processes.
-
     ps_initialize_process_common_elements( (struct process_d *) Process );
-
     //Process->objectType  = ObjectTypeProcess;
     //Process->objectClass = ObjectClassKernelObjects;
 
- 
 // cpl
     Process->cpl = (unsigned int) cpl;
 
@@ -1108,8 +1040,6 @@ struct process_d *create_process (
 // Qual é o privilágio padrão?
 // weak protection!
     Process->rflags_iopl = (unsigned int) 3;  //weak protection 
-
-
 
     // Not a protected process!
     Process->_protected = 0;
@@ -1134,19 +1064,14 @@ struct process_d *create_process (
     //Error.
     //Process->error = 0;
 
-//
 // Name
-//
 
-    //Name.
     Process->name = (char *) name; //@todo: usar esse.
     //Process->cmd = NULL;  //nome curto que serve de comando.
-    //Process->pathname = NULL;
- 
+    //Process->pathname = NULL; 
     //#test
     //64 bytes max.
-    strcpy ( Process->__processname, (const char *) name); 
-
+    strcpy ( Process->__processname, (const char *) name);
     Process->processName_len = sizeof(Process->__processname);
 
     //Process->terminal =
@@ -1435,81 +1360,59 @@ struct process_d *create_process (
 // Para isso ela deve ser configurada na inicializa��o do gws,
 // antes da cria��o dos processo.
 
-//
 // Security
-//
-
     Process->usession = CurrentUserSession;  // Current.
     Process->room     = room;                // Passado via argumento.
     Process->desktop  = desktop;             // Passado via argumento.
-
-//
 // Navigation
-//
     Process->prev = NULL; 
     Process->next = NULL; 
-
 // Register
 // List
 // Coloca o processo criado na lista de processos.
-
     processList[PID] = (unsigned long) Process;
-
 // #todo
-
     // last_created = PID;
-    
     Process->state = INITIALIZED;
-
 // Validation.
-
     Process->used  = TRUE;
     Process->magic = PROCESS_MAGIC;
-
 // #debug
-
     debug_print ("create_process: done\n");
-    printf      ("create_process: done\n");
-
+    //printf      ("create_process: done\n");
     // ok
     return (void *) Process;
-
 // Fail
-
 fail:
     //Process = NULL;
     refresh_screen();
     return NULL;
 }
 
-
-unsigned long GetProcessPML4_PA ( struct process_d *process )
+unsigned long GetProcessPML4_PA (struct process_d *process)
 {
     if( (void *) process != NULL )
     {
         //@todo: checar used e magic.
         return (unsigned long) process->pml4_PA;
     }
-
-    // fail
+// fail
     return (unsigned long) 0;
 }
 
-unsigned long GetProcessPML4_VA ( struct process_d *process )
+unsigned long GetProcessPML4_VA (struct process_d *process)
 {
     if( (void *) process != NULL )
     {
         //@todo: checar used e magic.
         return (unsigned long) process->pml4_VA;
     }
-
-    // fail
+// fail
     return (unsigned long) 0;
 }
 
-
 // VA, I guess.
-unsigned long GetProcessHeapStart ( pid_t pid )
+unsigned long GetProcessHeapStart (pid_t pid)
 {
     struct process_d  *process;
 
@@ -1519,7 +1422,6 @@ unsigned long GetProcessHeapStart ( pid_t pid )
     //refresh_screen();
 
 // pid.
-
     if ( pid < GRAMADO_PID_BASE || 
          pid >= PROCESS_COUNT_MAX )
     {
@@ -1528,25 +1430,19 @@ unsigned long GetProcessHeapStart ( pid_t pid )
     }
 
 // process structure.
-
     process = (struct process_d *) processList[pid];
-
     if ( (void *) process == NULL ){
         debug_print ("process\n");
         goto fail;
     }
-
-   if ( process->used != TRUE || 
-        process->magic != 1234 )
+   if ( process->used != TRUE || process->magic != 1234 )
    {
        debug_print ("process validation\n");
        goto fail;
    }
-
 // OUT: 
 // The start address of the heap of a process.
     return (unsigned long) process->HeapStart;
-
 fail:
     debug_print ("GetProcessHeapStart: fail\n");
     panic       ("GetProcessHeapStart: fail\n");
@@ -1579,6 +1475,7 @@ int get_caller_process_id (void)
     return (int) caller_process_id;
 }
 
+//#todo: use 'pid_t'.
 void set_caller_process_id (int pid)
 {
     caller_process_id = (int) pid;
@@ -1628,7 +1525,7 @@ int init_process_manager (void)
 // Na verdade não estamos mais copiando e 
 // sim criando um endereçamento novo.
 
-int alloc_memory_for_image_and_stack( struct process_d *process )
+int alloc_memory_for_image_and_stack(struct process_d *process)
 {
 // #bugbug: Limit 400KB.
 
@@ -1705,19 +1602,12 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
     if (__new_base == 0){
         __new_base = (unsigned long) allocPages(number_of_pages_on_image); 
     }
-
 // Check!
     if (__new_base == 0){
         panic ("alloc_memory_for_image_and_stack: __new_base\n");
     }
-
 // Clear only 400KB
     memset( (void*) __new_base, 0, (imagesize_in_kb*1024) );
-    
-
-// ==================================================
-
-
 
 // ==================================================
 
@@ -1859,6 +1749,7 @@ int alloc_memory_for_image_and_stack( struct process_d *process )
 // Service 227
 // Entering critical section.
 // Close gate. Turn it FALSE.
+// #todo: use 'pid_t'.
 
 void process_close_gate(int pid)
 {
@@ -1923,16 +1814,16 @@ void process_open_gate (int pid)
 file *process_get_file_from_pid ( pid_t pid, int fd )
 {
     struct process_d *p;
-    file *fp;
+    //file *fp;
 
 // #todo: max limit
 
-    if ( pid < 0){
+    if (pid < 0){
         return NULL;
     }
 
-    // Get process pointer.
-    p = (struct process_d *) processList[ pid ];
+// Get process pointer.
+    p = (struct process_d *) processList[pid];
 
     //#todo: Check process validation.
 
@@ -1942,10 +1833,10 @@ file *process_get_file_from_pid ( pid_t pid, int fd )
         return NULL;
     }
 
-    // Get fp from list of open files.
-    // #bugbug: Overflow.
+// Get fp from list of open files.
+// #bugbug: Overflow.
     
-    return ( file * ) p->Objects[fd];  
+    return (file *) p->Objects[fd];  
 }
 
 
@@ -1953,9 +1844,8 @@ file *process_get_file_from_pid ( pid_t pid, int fd )
 // the fd represents a index in the object list of the
 // current process.
 //#todo: IN: pid, fd
-file *process_get_file ( int fd )
+file *process_get_file (int fd)
 {
-
     pid_t current_process = (pid_t) get_current_process();
 
 // #todo: max limit
@@ -1974,7 +1864,7 @@ file *process_get_file ( int fd )
 int process_get_tty (int pid)
 {
     // Usada para debug.
-  
+
     struct process_d *p;
     struct tty_d *tty;
 
@@ -1994,11 +1884,8 @@ int process_get_tty (int pid)
     }
 
 // Get the private tty.
-
-    tty = p->tty;    
-
-    if ( (void *) tty == NULL )
-    {
+    tty = p->tty;
+    if ( (void *) tty == NULL ){
         debug_print ("process_get_tty: tty fail\n");
         //printf ("tty fail\n");
         //refresh_screen();
@@ -2024,21 +1911,18 @@ int process_get_tty (int pid)
 struct process_d *create_and_initialize_process_object(void)
 {
     pid_t NewPID = (pid_t) (-1);  //fail
-
     struct process_d  *new_process;
     register int i=0;
 
-// process structure.
-
+// Process structure.
     new_process = (struct process_d *) processObject();
-    if ( (void *) new_process == NULL )
-    {
+    if ( (void *) new_process == NULL ){
         debug_print ("create_and_initialize_process_object: [FAIL] new_process\n");
         printf      ("create_and_initialize_process_object: [FAIL] new_process\n");
         goto fail;
     }
-    
-    //no personality yet
+
+//no personality yet
     new_process->personality = 0;
 
 // Get PID.
@@ -2066,29 +1950,20 @@ struct process_d *create_and_initialize_process_object(void)
 
 // Initializing the process structure.
 // Saving the process pointer in the list.
-
     new_process->pid = (pid_t) NewPID;  // :)
-
     new_process->uid = (uid_t) current_user;
     new_process->gid = (gid_t) current_group;
     new_process->syscalls_counter = 0;
 
-
 // tty
 //++
     new_process->tty = ( struct tty_d *) tty_create();
-
-    if ( (void *) new_process->tty == NULL )
-    {
+    if ( (void *) new_process->tty == NULL ){
          panic ("create_and_initialize_process_object: Couldn't create TTY\n");
     }
-    
+
     tty_start(new_process->tty);
 //--
-
-
-
-
 
 // #bugbug
 // #todo

@@ -40,6 +40,17 @@
 // Internal
 #include <editor.h>
 
+//
+// == ports ====================================
+//
+
+#define PORTS_WS 4040
+#define PORTS_NS 4041
+#define PORTS_FS 4042
+// ...
+#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+
+
 #define WINDOW_COUNT_MAX  1024
 unsigned long windowList[WINDOW_COUNT_MAX];
 
@@ -75,18 +86,6 @@ static int blink_status=FALSE;
 int tmp_ip_x=8;
 int tmp_ip_y=8;
 
-//
-// == ports ====================================
-//
-
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
-// ...
-
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-
-
 //prototype
 static int 
 editorProcedure(
@@ -108,6 +107,8 @@ static void update_clients(int fd)
     if (fd<0){
         return;
     }
+
+// #todo: We need a list o clients. maybe clients[i]
 
 //#todo: test buttons validation.
     gws_redraw_window(fd, addressbar_window, TRUE);
@@ -157,6 +158,10 @@ editorDrawChar(
     int fd,
     int ch)
 {
+// #:
+// The server is printing the char if the
+// window with focus is an editbox.
+
     int pos_x=0;
     int pos_y=0;
 
@@ -206,6 +211,11 @@ editorSetCursor(
     int x,
     int y )
 {
+// #:
+// The server is printing the char if the
+// window with focus is an editbox.
+// So, we need to tell the ws to change the cursor position.
+
     if (cursor_x >= 0 && 
         cursor_x < cursor_x_max)
     {

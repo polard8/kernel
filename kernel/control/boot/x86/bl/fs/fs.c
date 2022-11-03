@@ -441,15 +441,14 @@ void fs_relood_dir (unsigned long id)
 
 /*
  * fsLoadFile:
- *     Carrega um arquivo na memória. (#fat16)
- *     O Boot Loader utiliza essa rotina para carregar os arquivos 
+ * Carrega um arquivo na memória. (#fat16)
+ * O Boot Loader utiliza essa rotina para carregar os arquivos 
  * do sistema.
- * @todo:
- *     +A libC chama essa função atravez de open(...).
- *     +Mudar o tipo de retorno para 'int'.
- *     +...
+ * #todo:
+ * +A libC chama essa função atravez de open(...).
+ * +Mudar o tipo de retorno para 'int'.
  */
- 
+
 int 
 fsLoadFile ( 
     unsigned char *name, 
@@ -457,18 +456,15 @@ fsLoadFile (
     unsigned long dir_address )
 {
     int Status = 0;
-
-    unsigned long i=0;
-    unsigned long j=0;
+    //unsigned long i=0;
+    //unsigned long j=0;
     unsigned short next=0;
-
     //dir support.
     //unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
     unsigned short *dir = (unsigned short *) dir_address;
-
     unsigned long max = 512;    //Número máximo de entradas no root dir.
     unsigned long z = 0;        //Deslocamento no diretório raiz.
-    unsigned long n = 0;        //Deslocamento no nome.
+    //unsigned long n = 0;        //Deslocamento no nome.
     char name_x[13];
 
 // FAT support.
@@ -565,7 +561,7 @@ fsLoadFile (
 // =======================
 // not found
 // Se o arquivo não for encontrado.
-file_not_found:
+// file_not_found:
     printf ("fsLoadFile: [FAIL] File not found\n"); 
     goto fail;
 

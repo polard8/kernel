@@ -53,7 +53,6 @@ void mouse_at(void)
 }
 
 
-
 long comp_get_mouse_x_position(void)
 {
     return (long) __new_mouse_x;

@@ -1142,18 +1142,16 @@ void xxxxIRQ0_DEBUG_MESSAGE(void)
     debug_print ("xxxxIRQ0_DEBUG_MESSAGE:\n");
     //xxxDrawString("TICK\n");
     //console_outbyte('x',fg_console);
-    
     //printf ("k\n");
     //refresh_screen();
 }
 
 
 // #deprecated
-//#See: kernel.h and hw.asm
+// #See: kernel.h and hw.asm
 void xxxxIRQ1_DEBUG_MESSAGE(void)
 {
     debug_print ("xxxxIRQ1_DEBUG_MESSAGE:\n");
-    
     printf ("k");
     refresh_screen();
 }

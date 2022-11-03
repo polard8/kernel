@@ -35,13 +35,10 @@
 #include <sys/socket.h>
 #include <packet.h>
 #include <rtl/gramado.h>
-
 // The client-side library.
 #include <gws.h>
-
 // Internal
 #include <editor.h>
-
 
 //
 // windows
@@ -52,19 +49,13 @@ static int main_window = 0;
 static int addressbar_window = 0;
 static int client_window = 0;
 
-
 static int rebootbutton_window = 0;  //first button
 static int confirmbutton_window = 0;  //second button
-
-
 
 // #todo
 // int button_list[8];
 
-//
 // cursor
-//
-
 static int cursor_x = 0;
 static int cursor_y = 0;
 static int cursor_x_max = 0;
@@ -72,15 +63,10 @@ static int cursor_y_max = 0;
 
 static int blink_status=FALSE;
 
-
-//
 // tmp input pointer.
-//
-
 // #todo
 // we will copy all the iput support from the other editor.
 // for now we will use this tmp right here.
-
 int tmp_ip_x=8;
 int tmp_ip_y=8;
 
@@ -93,13 +79,12 @@ int tmp_ip_y=8;
 #define PORTS_FS 4042
 // ...
 
-
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
 //prototype
 static int 
-editorProcedure(
+gdmProcedure(
     int fd, 
     int event_window, 
     int event_type, 
@@ -131,18 +116,12 @@ int fileman_init_globals(void)
 
 int fileman_init_windows(void)
 {
-    int i=0;
-
-    //gws_debug_print("fileman_init_windows:\n");
-    
-    for (i=0; i<WINDOW_COUNT_MAX; i++)
-    {
+    register int i=0;
+    for (i=0; i<WINDOW_COUNT_MAX; i++){
         windowList[i] = 0;
     };
-    
     return 0;
 }
-
 
 //char *hello = "Hello there!\n";
 
@@ -231,7 +210,7 @@ editorSetCursor(
 
 // local
 static int 
-editorProcedure(
+gdmProcedure(
     int fd, 
     int event_window, 
     int event_type, 
@@ -331,7 +310,6 @@ int main( int argc, char *argv[] )
 			printf("TEST\n");
 */
 
-
 // global: Cursor
     cursor_x = 0;
     cursor_y = 0;
@@ -362,7 +340,6 @@ int main( int argc, char *argv[] )
 
 // =====================================================
 
-
 // Device info
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
@@ -386,8 +363,6 @@ int main( int argc, char *argv[] )
     unsigned long w_width  = (w>>1);
     unsigned long w_height = (h>>1);
 
-
-
 // original
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
@@ -408,12 +383,11 @@ int main( int argc, char *argv[] )
 // @media
 // Se a tela for pequena demais para os dias de hoje. hahaha
 
-    if ( w == 320 )
+    if (w == 320)
     {
         //posicionamento
         viewwindowx = 0;
         viewwindowy = 0;
-
         // dimensoes
         w_width = w;
         w_height = h;
@@ -477,7 +451,7 @@ int main( int argc, char *argv[] )
                   24,                     //h
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( addressbar_window < 0 )
+    if (addressbar_window < 0)
     {
         debug_print("editor: addressbar_window fail\n");
     }
@@ -679,16 +653,14 @@ int main( int argc, char *argv[] )
         {
             if( e->used == TRUE && e->magic == 1234 )
             {
-                editorProcedure(
+                gdmProcedure(
                     client_fd, e->window, e->type, e->long1, e->long2 );
             }
         }
     };
 
-
 // HANG
-    while(1)
-    {
+    while(1){
         rtl_yield();
     };
 
@@ -706,7 +678,7 @@ int main( int argc, char *argv[] )
     while (1){
         C=fgetc(stdin);
         if(C>0){
-            editorProcedure( 
+            gdmProcedure( 
                 client_fd,     // socket
                 NULL,          // opaque window object
                 MSG_KEYDOWN,   // message code
@@ -732,7 +704,7 @@ int main( int argc, char *argv[] )
     while (1){
         if ( rtl_get_event() == TRUE )
         {  
-            editorProcedure( 
+            gdmProcedure( 
                 client_fd,
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 

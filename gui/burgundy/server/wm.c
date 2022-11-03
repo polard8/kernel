@@ -308,17 +308,15 @@ static void on_mouse_event(int event_type, long x, long y)
 {
 // Window with focus.
     struct gws_window_d *w;
-    long in_x=0;
-    long in_y=0;
+    unsigned long in_x=0;
+    unsigned long in_y=0;
 
 // Error. Nothing to do.
     if(event_type<0)
         return;
 
     w = (struct gws_window_d *) get_focus();
-    
-    if( (void*) w==NULL )
-    {
+    if( (void*) w==NULL ){
         return;
     }
 
@@ -326,25 +324,39 @@ static void on_mouse_event(int event_type, long x, long y)
     //if(w->magic != 1234)
         //return;
 
+// Is it inside the window with focus?
     if( x >= w->left &&
         x <= w->right &&
         y >= w->top &&
         y <= w->bottom )
     {
-// data
-        w->single_event.wid   = w->id;
-        w->single_event.msg   = event_type;
-        w->single_event.long1 = x - w->left;
-        w->single_event.long2 = y - w->top;
-        w->single_event.has_event = TRUE;
+        // Values inside the window.
+        in_x = (unsigned long) (x - w->left);
+        in_y = (unsigned long) (y - w->top);
 
+        // Change the input pointer
+        // inside the window with focus.
+        if (w->type == WT_EDITBOX_MULTIPLE_LINES)
+        {
+            if(in_x>0)
+                w->ip_x = in_x/8;
+            if(in_y>0)
+                w->ip_y = in_y/8;
+        }
+
+// data
+        w->single_event.wid   = (int) w->id;
+        w->single_event.msg   = (int) event_type;
+        w->single_event.long1 = (unsigned long) in_x;  //x - w->left;
+        w->single_event.long2 = (unsigned long) in_y;  //y - w->top;
+        w->single_event.has_event = TRUE;
 
         // ---------------
         int Tail = (int) w->ev_tail;
         w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
         w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
-        w->ev_long1[Tail] = (unsigned long) x - w->left; 
-        w->ev_long2[Tail] = (unsigned long) y - w->top;
+        w->ev_long1[Tail] = (unsigned long) in_x;  //x - w->left; 
+        w->ev_long2[Tail] = (unsigned long) in_y;  //y - w->top;
         w->ev_tail++;
         if(w->ev_tail>=32)
             w->ev_tail=0;

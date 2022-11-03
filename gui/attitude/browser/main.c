@@ -23,7 +23,6 @@
 #define PORTS_FS 4042
 // ...
 
-
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
 
@@ -36,7 +35,6 @@ struct sockaddr_in addr = {
     .sin_addr   = IP(192, 168, 1, 79),
 };
 */
-
 
 static int __main_window = -1;
 static int __addressbar_window = -1;
@@ -79,7 +77,7 @@ browserProcedure(
         return -1;
     }
 
-    switch(event_type){
+    switch (event_type){
 
     // Evento de teste.
     case 1000:
@@ -89,6 +87,23 @@ browserProcedure(
             gws_redraw_window(fd,__client_window,TRUE);
             return 0;
         }
+        break;
+
+    //36
+    case MSG_MOUSERELEASED:
+        if( event_window == __client_window )
+        {
+                // Refresh?
+                gws_draw_char (
+                    (int) fd,              // fd
+                    (int) event_window,    // wid
+                    (unsigned long) long1, // left
+                    (unsigned long) long2, // top
+                    (unsigned long) COLOR_BLACK,
+                    (unsigned long) '.' );
+            return 0;
+        }
+        return 0;
         break;
 
     case MSG_PAINT:
@@ -118,12 +133,10 @@ int main( int argc, char *argv[] )
     int client_fd = -1;
 
 // Porta para o Window Server 'ws' em gramado_ports[].
-
     struct sockaddr_in addr_in;
     addr_in.sin_family      = AF_INET;
     addr_in.sin_port        = PORTS_WS;   
     addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
-
 
     debug_print ("browser: Initializing ...\n");
 
@@ -201,15 +214,12 @@ int main( int argc, char *argv[] )
                   0x0000,  
                   COLOR_GRAY, COLOR_GRAY );
 
-    if ( main_window < 0 )
-    {
+    if (main_window < 0){
         debug_print("browser: main_window fail\n"); 
         exit(1);
     }
-
-    // Save globally.
-    if ( main_window > 0 )
-    {
+// Save globally.
+    if (main_window > 0){
         __main_window = main_window;
     }
 
@@ -229,8 +239,7 @@ int main( int argc, char *argv[] )
                   main_window,  
                   0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( addressbar_window < 0 )
-    {
+    if (addressbar_window < 0){
         debug_print("browser: addressbar_window fail\n"); 
     }
 
@@ -245,7 +254,6 @@ int main( int argc, char *argv[] )
             "https://github.com/frednora");
     }
 
-
 // ===================
 // button
     button = 
@@ -258,12 +266,11 @@ int main( int argc, char *argv[] )
                   24,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( button < 0 ) 
+    if (button < 0)
         debug_print("browser: button fail\n"); 
 
     if(button>0)
         __button_window=button;
-
 
 // ===================
 // client window (White)
@@ -277,14 +284,12 @@ int main( int argc, char *argv[] )
                   w_height -4 -24 -4 -4,
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( client_window < 0 )             
+    if (client_window < 0)
         debug_print("browser: client_window fail\n"); 
 
-    if ( client_window > 0 )
-    {
+    if (client_window > 0){
         // Save globally.
         __client_window = client_window;
- 
         gws_draw_text (
             (int) client_fd,      // fd
             (int) client_window,  // window id
@@ -297,29 +302,19 @@ int main( int argc, char *argv[] )
 // Refresh
     gws_refresh_window( client_fd, main_window );
 
-
 // ============================================
 // focus
-// Editbox!
-// #bugbug: It's not working!
-
+// Set focus on addressbar window.
+//    gws_async_command(
+//        client_fd, 9, addressbar_window, addressbar_window );
+// Set focus on client window.
     gws_async_command(
-         client_fd,
-         9,             // set focus
-         addressbar_window,
-         addressbar_window );
-
+        client_fd, 9, client_window, client_window );
 // =======================================================
 
 //
 // Loop
 //
-
-
-//HANG:
-    //while(1){}
-
-    // This event routine is working fine.
 
 // #test
 // pegando um evento com o ws.
@@ -353,7 +348,6 @@ int main( int argc, char *argv[] )
             }
         }
     };
-
 
 //HANG:
     while(1){

@@ -1,7 +1,4 @@
-/*
- * File: signal.c
- *
- */
+// signal.c
 
 #include <types.h>
 #include <sys/types.h>
@@ -11,7 +8,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <rtl/gramado.h> 
-
 
 const char *sys_siglist[NSIG] = {
 

@@ -61,23 +61,19 @@
 unsigned long savedW=0;
 unsigned long savedH=0;
 
-
-
-int game_status;
+int game_status=0;
 
 // area de jogo
-int game_window;
-int game_width;
-int game_height;
-int player_x;
-int player_y;
-int prize_x;
-int prize_y;
-
+int game_window=0;
+int game_width=0;
+int game_height=0;
+int player_x=0;
+int player_y=0;
+int prize_x=0;
+int prize_y=0;
 
 // barra de status
-int status_window;
-
+int status_window=0;
 
 //
 // == Private functions: prototypes ====================
@@ -127,10 +123,8 @@ static int gws(void)
     addrlen = sizeof(addr);
 //==============================
 
-    
     int client_fd = -1;
-    
-    
+
     //gws_debug_print ("-------------------------\n"); 
     //printf          ("-------------------------\n"); 
     gws_debug_print ("gws.bin: Initializing\n");
@@ -154,14 +148,11 @@ static int gws(void)
        exit(1);  //#bugbug Cuidado.
     }
 
-    //
-    // Connect
-    //
-
-    // Nessa hora colocamos no accept um fd.
-    // então o servidor escreverá em nosso arquivo.
-    // Tentando nos conectar ao endereço indicado na estrutura
-    // Como o domínio é AF_GRAMADO, então o endereço é "w","s".
+// Connect
+// Nessa hora colocamos no accept um fd.
+// então o servidor escreverá em nosso arquivo.
+// Tentando nos conectar ao endereço indicado na estrutura
+// Como o domínio é AF_GRAMADO, então o endereço é "w", "s".
 
     //printf ("gws: Trying to connect to the address 'ws' ...\n");      
 
@@ -178,17 +169,15 @@ static int gws(void)
     return (int) client_fd;
 }
 
-
 static void doPrompt(int fd)
 {
-    int i=0;
+    register int i=0;
 
-
-    if(fd<0)
+    if(fd<0){
         return;
+    }
 
-    // Clean prompt buffer.
-    
+// Clean prompt buffer.
     for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
     
     prompt[0] = (char) '\0';
@@ -210,14 +199,10 @@ static void doPrompt(int fd)
 
 static void compareStrings(int fd)
 {
-
     unsigned long message_buffer[8];
     int init_tid=-1;
 
     printf("\n");
-
-    
-
 
     if ( strncmp(prompt,"test",4) == 0 )
     {
