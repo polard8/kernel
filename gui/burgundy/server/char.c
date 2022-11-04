@@ -21,9 +21,7 @@ DrawBorder(
 {
     register int i=0;
     register int j=0;
-
     int CharSize = 8;
-
 
     l = (l&0xFFFF);
     r = (r&0xFFFF);
@@ -124,8 +122,6 @@ DrawBorder(
          grBackbufferDrawCharTransparent( r,         i+j, COLOR_BLUE, CH_DBL_VERT );
          j+=4;
       };
-
-      
     };
 }
 

@@ -44,13 +44,6 @@
 
 // ===============================================================
 
-
-
-
-
-
-
-
 // The window manager global structure.
 struct gws_windowmanager_d
 {
@@ -61,8 +54,8 @@ struct gws_windowmanager_d
 // 2: overlapped.
 // ...
     int mode;
-    
-    // 1= vertical 0=horizontal
+
+// 1= vertical 0=horizontal
     int vertical;
 
 // The Working area.
@@ -71,9 +64,8 @@ struct gws_windowmanager_d
     int wa_top;
     int wa_width;
     int wa_height;
-
     // ...
-    
+
     unsigned long frame_counter;
     //unsigned long jiffies;
     int fps;
@@ -83,18 +75,16 @@ struct gws_windowmanager_d
 
 // Custom backgrounc color.
     unsigned int custom_background_color;
+
     int has_custom_background_color;
 
 // Wallpaper
     int has_wallpaper;
-
 // Theme support
 // TRUE = Using a loadable theme.
 // FALSE = We are not using any theme at all.
     int has_theme;
-
     // ...
-
 // Window stack
 // Quando uma janela foi invalidada, significa que ela foi pintada e que
 // precisa receber o refesh, mas também pode significar
@@ -145,10 +135,6 @@ extern struct gws_windowmanager_d  WindowManager;
 #define WM_MODE_TILED       1
 #define WM_MODE_OVERLAPPED  2
 #define WM_MODE_MONO        3
-
-// ======
-
-
 
 // ======
 
@@ -209,7 +195,6 @@ void wmInitializeStructure(void);
 #define WS_HSCROLLBAR   0x1000
 #define WS_VSCROLLBAR   0x2000
 
-
 // window status
 #define WINDOW_STATUS_ACTIVE       1
 #define WINDOW_STATUS_INACTIVE     0
@@ -226,7 +211,6 @@ void wmInitializeStructure(void);
 #define WINDOW_REALATIONSHIPSTATUS_ZAXIS_BOTTOM   6000
 //...
 
-
 // #todo: Podemos colocar isso em outro lugar?
 // Contagem de janelas existentes.
 // precisa ser inicializada.
@@ -235,7 +219,6 @@ unsigned long windows_count;
 // ...
 
 int show_fps_window;
-
 
 /*
  * gws_button_d:
@@ -389,18 +372,18 @@ typedef enum {
     gws_WindowClassComboBox,
     gws_WindowClassEditBox,
     gws_WindowClassListBox,
-	gws_WindowClassScrollBar,
-	gws_WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
-	gws_WindowClassMenu,
-	gws_WindowClassDesktopWindow,
-	gws_WindowClassDialogBox,
-	gws_WindowClassMessageBox,
-	gws_WindowClassTaskSwitchWindow,
-	gws_WindowClassIcons,
-	gws_WindowClassControl,   //??
+    gws_WindowClassScrollBar,
+    gws_WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
+    gws_WindowClassMenu,
+    gws_WindowClassDesktopWindow,
+    gws_WindowClassDialogBox,
+    gws_WindowClassMessageBox,
+    gws_WindowClassTaskSwitchWindow,
+    gws_WindowClassIcons,
+    gws_WindowClassControl,   //??
     gws_WindowClassDialog,
     gws_WindowClassInfo,
-    //...	
+    //...
 }gws_kernel_window_classes_t;
 
 //classes de janelas controladas pelos servidores.
@@ -529,7 +512,6 @@ struct windowframe_d
  * gws_window_d:
  *     The window structure.
  */
-
 // #todo
 // Se uma janela tiver o id da thread ao qual ela pertence
 // então podemos colocar ela em foreground quando a janela
@@ -1071,9 +1053,7 @@ struct gws_window_d
 
     // ...
 
-//
 // Actions
-//
 
     int draw;
     int redraw;
@@ -1162,7 +1142,6 @@ extern unsigned long windowList[WINDOW_COUNT_MAX];
 #define BOTTOM_WINDOW 0
 // ...
 
-
 unsigned long zList[ZORDER_MAX];
 
 //
@@ -1190,15 +1169,12 @@ struct gws_surface_d
     unsigned long width;
     unsigned long height;
 
-    // Só depois de inicializada os valores da janela são validos.
+// Só depois de inicializada os valores da janela são validos.
     int initialized;
-
     int dirty;
-    
     int locked;
-    
     // ...
-    
+
     struct gws_surface_d *next;
 };
 struct gws_surface_d *rootSurface;
@@ -1303,7 +1279,6 @@ int wmInputReader(void);
 void wm_Update_TaskBar( char *string, int flush );
 
 void wmInitializeGlobals(void);
-
 
 void yellowstatus0(char *string,int refresh);
 void yellow_status(char *string);
@@ -1542,7 +1517,7 @@ void *doCreateWindow (
     unsigned long style,
     unsigned long status, 
     unsigned long view, 
-    char *windowname, 
+    char *title, 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -1562,7 +1537,7 @@ void *CreateWindow (
     unsigned long style, 
     unsigned long status, 
     unsigned long view, 
-    char *windowname, 
+    char *title, 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -1634,9 +1609,7 @@ void gwsWindowUnlock (struct gws_window_d *window);
 int gwsDefineInitialRootWindow ( struct gws_window_d *window );
 int gwssrv_init_windows(void);
 
-
 #endif    
-
 
 
 //

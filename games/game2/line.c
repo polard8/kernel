@@ -187,7 +187,6 @@ grBackbufferDrawHorizontalLine (
     int __x1 = (int) (x1 & 0xFFFFFFFF);  //x min
     int __x2 = (int) (x2 & 0xFFFFFFFF);  //x max
     int __y  = (int) ( y & 0xFFFFFFFF);  // y
-
     unsigned long rop=0;
 
     unsigned long deviceWidth  = gws_get_device_width();

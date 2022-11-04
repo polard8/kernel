@@ -179,37 +179,53 @@ grBackbufferDrawHorizontalLine (
     unsigned long x2,  
     unsigned int color )
 {
-    unsigned long __x1 = (unsigned long) x1;
-    unsigned long __x2 = (unsigned long) x2;
-    unsigned long __y  = (unsigned long) y;
-    
+    unsigned int __x1 = (unsigned int) (x1 & 0xFFFFFFFF);
+    unsigned int __x2 = (unsigned int) (x2 & 0xFFFFFFFF);
+    unsigned int __y  = (unsigned int) (y  & 0xFFFFFFFF);
+    unsigned long __rop = 0;
+
     //debug_print("Line\n");
-    
+
+    unsigned long deviceWidth  = gws_get_device_width();
+    //unsigned long deviceHeight = gws_get_device_height();
+    int w = (int) (deviceWidth & 0xFFFFFFFF);
+
+    if(__x1<0)
+        return;
+
+    if(__x2<0)
+        return;
+
+    if(__y<0)
+        return;
+
+    //if (__x2 > 800){
+    //    debug_print("grBackbufferDrawHorizontalLine: __x2 > 800\n");
+    //    return;
+    //}
+
+    if(__x2 >= w){
+        __x2 = w-1;
+    }
+
     if (__x1 > __x2){
         debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
         return;
     }
 
-    if (__x2 > 800){
-        debug_print("grBackbufferDrawHorizontalLine: __x2 > 800\n");
-        return;
-    }
-
 // It's using the ring3 routine.
+// IN: color, x, y, rop
+// see: libgd.c
 
-    while (__x1 < __x2)
-    {
-        // IN: color, x, y, rop
+    while (__x1 < __x2){
         grBackBufferPutpixel( 
-            color, 
-            __x1, 
-            __y,
-            (unsigned long) 0 );
+            (unsigned int) color, 
+            (int) __x1, 
+            (int) __y,
+            (unsigned long) __rop );
         
         __x1++;  
     };
-
-    //debug_print("Line done\n");
 }
 
 

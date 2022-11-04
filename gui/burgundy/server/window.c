@@ -192,8 +192,7 @@ void *xxxCreateSurfaceWindow(
                      (unsigned long) &message_buffer[0], 
                      (unsigned long) &message_buffer[0] );
 
-    if ( (void *) wObjectPointer == NULL )
-    {
+    if ( (void *) wObjectPointer == NULL ){
         gwssrv_debug_print ("xxxCreateSurfaceWindow: [FAIL] wObjectPointer\n");
         return NULL;  
     }
@@ -217,24 +216,18 @@ struct gws_surface_d *xxxCreateSurface(
     struct gws_surface_d *surface;
     void *surfaceWindowObject;
 
-//
 // surface
-//
 
     surface = 
         (struct gws_surface_d *) malloc ( sizeof( struct gws_surface_d ) );
 
-    if ( (void*) surface == NULL )
-    {
+    if ( (void*) surface == NULL ){
         //todo: message
         return NULL;
     }
-
     surface->initialized = FALSE;
 
-//
 // window
-//
 
     surfaceWindowObject = 
         (void *) xxxCreateSurfaceWindow ( 
@@ -242,15 +235,12 @@ struct gws_surface_d *xxxCreateSurface(
                      left, top, width, height, 
                      0, 0, COLOR_BLACK, COLOR_BLACK );  
 
-    if ( (void*) surfaceWindowObject == NULL )
-    {
+    if ( (void*) surfaceWindowObject == NULL ){
         //todo: message
         return NULL;
     }
-    
-//
+
 // structure
-//
 
     surface->window_object = (void *) surfaceWindowObject;
 
@@ -277,7 +267,6 @@ static struct gws_window_d *__create_window_object(void)
     struct gws_window_d *window;
 
     window = (void *) malloc( sizeof(struct gws_window_d) );
-
     if ( (void *) window == NULL )
     {
         // #fixme
@@ -290,9 +279,7 @@ static struct gws_window_d *__create_window_object(void)
         // We need to return.
         //return NULL; 
     }
-
     memset( window, 0, sizeof(struct gws_window_d) );
-
     window->used = TRUE;
     window->magic = 1234;
 
@@ -346,7 +333,7 @@ void *doCreateWindow (
     unsigned long style,
     unsigned long status, 
     unsigned long view, 
-    char *windowname, 
+    char *title, 
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -613,9 +600,9 @@ void *doCreateWindow (
     if ( (void*) window == NULL ){
         return NULL;
     }
+
     window->type = (unsigned long) type;
     window->style = (unsigned long) style;  // A lot of flags
-
 // buffers
     window->dedicated_buf = NULL;
     window->back_buf = NULL;
@@ -624,18 +611,13 @@ void *doCreateWindow (
     //window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
     //window->BackBuffer = (void *) g_backbuffer_va;
     //window->FrontBuffer = (void *) g_frontbuffer_pa;
-
-
 // Device contexts
 // #todo:
 // We can create our own device contexts.
     window->window_dc = NULL;
     window->client_dc = NULL;
-
-
     window->is_solid = (int) is_solid;
     window->rop = (unsigned long) rop_flags;
-
     window->status = (int) (status & 0xFFFFFFFF );
     window->view   = (int) view;
     window->focus  = FALSE;
@@ -643,7 +625,7 @@ void *doCreateWindow (
     window->locked = FALSE;
 
 // Event queue.
-    int e=0;
+    register int e=0;
     for(e=0; e<32; e++){
         window->ev_wid[e]=0;
         window->ev_msg[e]=0;
@@ -679,18 +661,18 @@ void *doCreateWindow (
 
 // Id.
 // We will get an id when we register the window.
-
     window->id = -1;
 
+// ===================================
 // Title: Just a pointer.
-    if ( (void*) windowname != NULL ){
-        if(*windowname != 0){
-            window->name = (char *) windowname;
+    if ( (void*) title != NULL ){
+        if(*title != 0){
+            window->name = (char *) title;
         }
-        if(*windowname == 0){
+        if(*title == 0){
             window->name = (char *) default_window_name;
         }
-    }else if ( (void*) windowname == NULL ){
+    }else if ( (void*) title == NULL ){
         window->name = (char *) default_window_name;
     };
 
@@ -1585,7 +1567,8 @@ void *doCreateWindow (
         };
 
         // Label support.
-        size_t tmp_size = (size_t) strlen ( (const char *) windowname );
+        size_t tmp_size = 
+            (size_t) strlen( (const char *) window->name );
         if (tmp_size>64){
             tmp_size=64;
         }
@@ -1645,10 +1628,8 @@ void *doCreateWindow (
 // Invalidate the window.
 // #todo: Only if it is not minimized.
     window->dirty = TRUE;
-
 // Return the pointer.
     return (void *) window;
-
 fail:
     debug_print ("doCreateWindow:\n");
     return NULL;
@@ -1668,20 +1649,18 @@ fail:
 // Não podemos usar a estrutura de janela da api.
 // #todo: change name to 'const char *'
 // Called by serviceCreateWindow() in main.c.
-
 // #test
 // Uma janela que é cliente, será criada
 // com deslocamento relativo à area de cliente.
 // Para criar janelas filhas com deslocamento relativo
 // a janela do aplicativo, tem que ativar uma flag.
 
-
 void *CreateWindow ( 
     unsigned long type, 
     unsigned long style,
     unsigned long status, 
     unsigned long view, 
-    char *windowname,    // title 
+    char *title,
     unsigned long x, 
     unsigned long y, 
     unsigned long width, 
@@ -1692,47 +1671,43 @@ void *CreateWindow (
     unsigned int client_color ) 
 {
    struct gws_window_d  *__w;
-   
-// #test:
-// rop
    unsigned long __rop_flags=0;
-
 // This function is able to create some few 
 // kinds of windows for now:
 // overlapped, editbox, button and simple.
-
     int ValidType=FALSE;
 
-    //gwssrv_debug_print ("------------- CreateWindow: :)\n");
-
-//
-// name
-//
+    //gwssrv_debug_print ("CreateWindow:\n");
 
 // =================
+// name
 // Duplicate
-    char *name_local_copy;
-    name_local_copy = (void*) malloc(256);
-    if( (void*) name_local_copy == NULL){
+    char *_name;
+    _name = (void*) malloc(256);
+    if( (void*) _name == NULL){
         return NULL;
     }
-    memset(name_local_copy,0,256);
-    strcpy(name_local_copy,windowname);
+    memset(_name,0,256);
+    if( (void*) title != NULL ){
+        strcpy(_name,title);
+    }
+    if( (void*) title == NULL ){
+        strcpy(_name,"No title");
+    }
 // =================
-
 
 // See:
 // config.h, main.c
     if (config_use_transparency==TRUE)
     {
         __rop_flags = 1;       // or
-        //__rop_flags = 2;         // and
-        //__rop_flags = 3;       // xor
-        //__rop_flags = 4;       // nand
+        //__rop_flags = 2;     // and
+        //__rop_flags = 3;     // xor
+        //__rop_flags = 4;     // nand
         //__rop_flags = 10;    // less red
         //__rop_flags = 12;    // blue
-        //__rop_flags = 20;      // gray 
-        //__rop_flags = 21;      // no red
+        //__rop_flags = 20;    // gray 
+        //__rop_flags = 21;    // no red
     }
 
 // #todo: 
@@ -1750,44 +1725,33 @@ void *CreateWindow (
     case WT_SIMPLE:      ValidType=TRUE; break;
     };
 
-    if ( ValidType == FALSE )
-    {
+    if (ValidType == FALSE){
         gwssrv_debug_print ("CreateWindow: Invalid type\n");
         goto fail;
-        //return NULL;
     }
-
 
 //1. Começamos criando uma janela simples
 //2. depois criamos o frame. que decide se vai ter barra de títulos ou nao.
-    
-    /*
-    __w = (void *) CreateWindow ( type, status, view, (char *) windowname, 
-                           x, y, width, height, 
-                           (struct window_d *) pWindow, desktopid, clientcolor, color );  
-    */
-    
 // No caso dos tipos com moldura então criaremos em duas etapas.
 // no futuro todas serão criadas em duas etapas e 
 // CreateWindow será mais imples.
-    
+
 // #todo
 // Check parent window validation.
 // APPLICATION window uses the screen margins for relative positions.
     //if ( (void*) pWindow == NULL ){}
-    
+
 // #todo
 // check window name validation.
     //if ( (void*) windowname == NULL ){}
     //if ( *windowname == 0 ){}
-
 
 // ============================
 // Types with frame.
 
 //====
 // Overlapped
-    if ( type == WT_OVERLAPPED )
+    if (type == WT_OVERLAPPED)
     {
         //gwssrv_debug_print ("CreateWindow: WT_OVERLAPPED\n");
         
@@ -1817,18 +1781,16 @@ void *CreateWindow (
 
         __w = 
             (void *) doCreateWindow ( 
-                         WT_SIMPLE, style, status, view, (char *) name_local_copy,
+                         WT_SIMPLE, style, status, view, (char *) _name,
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
                          frame_color, client_color, 
                          (unsigned long) __rop_flags ); 
 
-         if ( (void *) __w == NULL )
-         {
-             gwssrv_debug_print ("CreateWindow: doCreateWindow fail \n");
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
              goto fail;
-             //return NULL;
          }
 
         // Pintamos simples, mas a tipagem será overlapped.
@@ -1857,18 +1819,16 @@ void *CreateWindow (
 
         __w = 
             (void *) doCreateWindow ( 
-                         WT_SIMPLE, 0, status, view, (char *) name_local_copy, 
+                         WT_SIMPLE, 0, status, view, (char *) _name, 
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
                          frame_color, client_color, 
                          (unsigned long) __rop_flags ); 
 
-         if ( (void *) __w == NULL )
-         {
-             gwssrv_debug_print ("CreateWindow: doCreateWindow fail \n");
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
              goto fail;
-             //return NULL;
          }
 
         //pintamos simples, mas a tipagem será  overlapped
@@ -1896,18 +1856,16 @@ void *CreateWindow (
 
         __w = 
             (void *) doCreateWindow ( 
-                         WT_BUTTON, 0, status, view, (char *) name_local_copy, 
+                         WT_BUTTON, 0, status, view, (char *) _name, 
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
                          frame_color, client_color, 
                          (unsigned long) __rop_flags );
 
-         if ( (void *) __w == NULL )
-         {
-             gwssrv_debug_print ("CreateWindow: doCreateWindow fail \n");
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
              goto fail;
-             //return NULL;
          }
 
         //pintamos simples, mas a tipagem será  overlapped
@@ -1927,33 +1885,28 @@ void *CreateWindow (
         
         __w = 
             (void *) doCreateWindow ( 
-                         WT_SIMPLE, 0, status, view, (char *) name_local_copy,
+                         WT_SIMPLE, 0, status, view, (char *) _name,
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
                          frame_color, client_color, 
                          (unsigned long) __rop_flags );  
 
-         if ( (void *) __w == NULL )
-         {
-             gwssrv_debug_print ("CreateWindow: doCreateWindow fail \n");
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
              goto fail;
-             //return NULL;
          }
 
         __w->type = WT_SIMPLE;
         __w->locked = FALSE;
 
         goto draw_frame;
-        //return (void *) __w;
     }
 
 //type_fail:
-
-    gwssrv_debug_print ("CreateWindow: [FAIL] type \n");
+    gwssrv_debug_print ("CreateWindow: [FAIL] type\n");
     goto fail;
-    //return NULL;
-    
+
 //
 // == Draw frame ===============================
 //
@@ -1968,12 +1921,12 @@ draw_frame:
     //gwssrv_debug_print ("CreateWindow: draw_frame \n");
     
     if ( (void*) __w == NULL ){
-        gwssrv_debug_print ("CreateWindow.draw_frame: __w \n");
+        gwssrv_debug_print ("CreateWindow.draw_frame: __w\n");
         goto fail;
     }
 
     if (__w->magic != 1234){
-        gwssrv_debug_print ("CreateWindow.draw_frame: __w->magic \n");
+        gwssrv_debug_print ("CreateWindow.draw_frame: __w->magic\n");
         goto fail;
     }
 
@@ -1986,6 +1939,11 @@ draw_frame:
 // Nessa hora essa rotina podera criar a barra de títulos.
 // o wm poderá chamar a rotina de criar frame.
 // See: wm.c
+// IN: 
+// parent window, target window,
+// border size, border color1, border color2, bordercolor3,
+// ornament color1, ornament color2, 
+// style.
 
     if ( type == WT_OVERLAPPED || 
          type == WT_EDITBOX || 
@@ -1993,12 +1951,6 @@ draw_frame:
          type == WT_BUTTON )
     {
         if ( (void*) __w != NULL ){
-
-        // IN: 
-        // parent window, target window,
-        // border size, border color1, border color2, bordercolor3,
-        // ornament color1, ornament color2, 
-        // style.
         wmCreateWindowFrame ( 
             (struct gws_window_d *) pWindow,
             (struct gws_window_d *) __w, 
@@ -2053,15 +2005,11 @@ draw_frame:
         __w->level = 0;
     }
 
-    // ===============
-
+// ===============
 // Unlock the window
     __w->locked = FALSE;
 // Invalidate the window rectangle.
     __w->dirty = TRUE;
-
-//done:
-    //gwssrv_debug_print ("CreateWindow: done\n");
     return (void *) __w;
 fail:
     gwssrv_debug_print ("CreateWindow: FAIL\n");
@@ -2080,12 +2028,10 @@ fail:
  
 int RegisterWindow(struct gws_window_d *window)
 {
-    register int __slot=0;
-    
+    register int Slot=0;
     struct gws_window_d *tmp; 
 
-    if ( (void *) window == NULL )
-    {
+    if ( (void *) window == NULL ){
         //gws_debug_print ("RegisterWindow: window struct\n");
         return (int) -1;
     }
@@ -2097,23 +2043,19 @@ int RegisterWindow(struct gws_window_d *window)
     windows_count++;
 
     if ( windows_count >= WINDOW_COUNT_MAX ){
-        //gws_debug_print ("RegisterWindow: Limits\n");
         printf ("RegisterWindow: Limits\n");
         return -1;
     }
 
 // Search for empty slot
-    for (__slot=0; __slot<1024; ++__slot)
+    for (Slot=0; Slot<1024; ++Slot)
     {
-        tmp = (struct gws_window_d *) windowList[__slot];
-
+        tmp = (struct gws_window_d *) windowList[Slot];
         // Found!
-        if ( (void *) tmp == NULL )
-        {
-            windowList[__slot] = (unsigned long) window; 
-            window->id = (int) __slot;
-            
-            return (int) __slot;
+        if ( (void *) tmp == NULL ){
+            windowList[Slot] = (unsigned long) window; 
+            window->id = (int) Slot;
+            return (int) Slot;
         }
     };
 

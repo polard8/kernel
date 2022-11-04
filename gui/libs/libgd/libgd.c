@@ -72,7 +72,6 @@ int libgd_initialize(void)
 }
 
 
-
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).
 // #todo: Include 'rop' argument.
@@ -83,15 +82,11 @@ grBackBufferPutpixel (
     int y,
     unsigned long rop )
 {
-    if(x<0)
-        return -1;
-    if(y<0)
-        return -1;
-
-    // IN: color, x, y, rop, target buffer.
+    if(x<0){ return -1; }
+    if(y<0){ return -1; }
+// IN: color, x, y, rop, target buffer.
     return (int) fb_BackBufferPutpixel( 
-                     color, x, y, rop, 
-                     libgd_BACKBUFFER_VA );
+                     color, x, y, rop, libgd_BACKBUFFER_VA );
 }
 
 // ## putpixel: 
@@ -108,7 +103,6 @@ grBackBufferPutpixel2 (
 {
     if (x<0){ return -1; }
     if (y<0){ return -1; }
-
 // Service number 6.
     return (int) gramado_system_call ( 6, color, x, y );
 }
@@ -118,36 +112,27 @@ grBackBufferPutpixel2 (
  * fb_BackBufferPutpixel:
  *     Put pixel in the device screen.
  */
-
 // #??
 // Usando o endereço virtual do backbuffer
 // Será que está mapeado ???
 // Está em ring 3 ??? ou ring 0???
-
 // Pinta um pixel no backbuffer.
 // O buffer tem o tamanho da janela do dispositivo.
 // A origem está em top/left.
-
 // #bugbug
 // #todo
 // Precismos considerar o limite do backbuffer.
 // Então teremos um Offset máximo.
-
 // #todo
 // Check some flags, just like rasterizations.
 // We will need a lot of parameters in this kind of function
 // Including the address of the backbuffer.
-
-
 // Clipping against the device limits
-
 // #todo
 // rop_flags   ... raster operations
 // See the same routine in the kernel side.
-
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).
-
 // #todo:
 // rop operations 
 // Copy the same already did before in other parts
@@ -182,7 +167,6 @@ fb_BackBufferPutpixel (
     // raster operation. rasterization.
     // unsigned long rop;
 
-
 // 2MB limit
 // Our buffer size.
 // 2mb is the limit for 64bit full pagetable.
@@ -190,7 +174,6 @@ fb_BackBufferPutpixel (
 //MaxOffset = (int) (1024*10124*4);
 //MaxOffset = (int) 0x00400000;
     MaxOffset = (int) 0x00200000;
-
 
     char b, g, r, a;
     b = (color & 0xFF);
@@ -201,11 +184,7 @@ fb_BackBufferPutpixel (
     // 3 = 24 bpp
     int bytes_count=0;
 
-
-//
 // Clipping
-//
-
 // Clipping against the device limits
 
     if (x<0){ goto fail; }
@@ -213,15 +192,11 @@ fb_BackBufferPutpixel (
     if ( x >= deviceWidth ) { goto fail; }
     if ( y >= deviceHeight ){ goto fail; }
 
-
 // Purify
     x = ( x & 0xFFFF);
     y = ( y & 0xFFFF);
 
-//
 // bpp
-//
-
 // #danger
 // Esse valor foi herdado do bootloader.
 
@@ -238,9 +213,7 @@ fb_BackBufferPutpixel (
 
 // #importante
 // Pegamos a largura do dispositivo.
-
     //width = (int) libgd_SavedX; 
-
 
 // unsigned long
 // Nao pode ser maior que 2MB.
@@ -318,24 +291,17 @@ fb_BackBufferPutpixel (
 // == Record ==============================
 //
 
-//
 // BGR and A
-//
-
     where[Offset]    = b;
     where[Offset +1] = g;
     where[Offset +2] = r;
-    if ( libgd_SavedBPP == 32 ){ where[Offset +3] = a; };
-
-    //debug_print("Pixel done\n");
-    
+    if ( libgd_SavedBPP == 32 ){
+        where[Offset +3] = a; 
+    };
     return 0;
-
 fail:
-    //debug_print("Pixel fail\n");
     return -1;
 }
-
 
 /*
  * putpixel0:
@@ -368,7 +334,6 @@ putpixel0 (
     char g=0;
     char r=0;
     char a=0;
-
 // The first byte:
 // #todo: Create defines for these operations.
 // 0 ~ FF
@@ -456,21 +421,16 @@ putpixel0 (
     g2 = where[offset +1];
     r2 = where[offset +2];
     if (bpp == 32){ a2 = where[offset +3]; };
-
-
 // ------------------------------------------
 // A cor transformada.
 // A cor a ser gravada.
     unsigned char b3, g3, r3, a3;
-
-
 // ------------
 // 0 = Sem modificação
 // A cor a ser registrada é a mesma enviada por argumento.
     if (Operation == 0){
         r3=r;  g3=g;  b3=b;  a3=a;
     }
-
 // ------------
 // 1 = or
     if (Operation == 1)
@@ -480,7 +440,6 @@ putpixel0 (
         b3 = (b2 | b);
         a3 = a2;
     }
-
 // ------------
 // 2 = and
     if (Operation == 2)
@@ -490,7 +449,6 @@ putpixel0 (
         b3 = (b2 & b);
         a3 = a2;
     }
-
 // ------------
 // 3 = xor
     if (Operation == 3)
@@ -500,7 +458,6 @@ putpixel0 (
         b3 = (b2 ^ b);
         a3 = a2;
     }
-
 // ------------
 // 10 - red
     if (Operation == 10)
@@ -510,7 +467,6 @@ putpixel0 (
         b3 = b2; 
         a3 = a2;
     }
-
 // ------------
 // 11 - green
     if (Operation == 11)
@@ -520,7 +476,6 @@ putpixel0 (
         b3 = b2; 
         a3 = a2;
     }
-
 // ------------
 // 12 - blue
     if (Operation == 12)
@@ -530,7 +485,6 @@ putpixel0 (
         b3 = (b2 & 0xFE); 
         a3 = a2;
     }
-
 // ------------
 // 20 - gray
     if (Operation == 20)
@@ -540,7 +494,6 @@ putpixel0 (
         b3 = (b2 & 0x80);
         a3 = a2;
     }
-
 // ------------
 // 21 - gray
     if (Operation == 21)
@@ -577,7 +530,6 @@ putpixel0 (
 // 
 
 // BGR and A
-
     where[offset]    = b3;
     where[offset +1] = g3;
     where[offset +2] = r3;
@@ -679,7 +631,6 @@ unsigned int grBackBufferGetPixelColor( int x, int y )
 
 // Paint.
 // Set bytes of ColorBuffer.
-
     c[0] = b; 
     c[1] = g;
     c[2] = r;
