@@ -663,7 +663,7 @@ long ftell (FILE *stream);
 
 char *uclib_gets (char *str); 
 
-
+char *fgetln(FILE *stream, size_t *len);
 
 //--save
 int getchar2 (void);

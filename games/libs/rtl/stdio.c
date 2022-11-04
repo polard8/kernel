@@ -3575,24 +3575,18 @@ int fputs2 ( const char *str, FILE *stream )
 }
 
 
-
-
 /*
- *********************************
  * gets:
  *     gets() devolve um ponteiro para string
  */
-
 // #todo
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
-
-char *gets2 (char *s){
-
+char *gets2 (char *s)
+{
     char *p;
     int ch=0;
     int t = 0;
-
 
 	//printf("gets:\n");
 
@@ -3619,11 +3613,11 @@ char *gets2 (char *s){
                 case VK_BACKSPACE:
                     if(t > 0){  t--;  };
                     break;
-            
-			    default:
+
+                default:
                     //s[t] = (char) ch;
-					//t++;
-					break;
+                    //t++;
+                    break;
             };
 
             //ok
@@ -3644,15 +3638,23 @@ done:
 }
 
 
+char *fgetln(FILE *stream, size_t *len)
+{
+    printf("fgetln: #todo\n");
+
+    if( (void*) stream == NULL )
+        return NULL;
+
+    return NULL;
+}
+
+
 /*
- ***********************
  * puts:
  */
-
 // #bugbug
 // isso deve escrever no arquivo, assim como
 // tudo em libc.
-
 // ??
 
 int puts2 ( const char *str )
