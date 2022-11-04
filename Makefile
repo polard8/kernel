@@ -2,18 +2,18 @@
 # Build Gramado OS.
 
 PHONY := all
-all: step1-gui step2-havefun step3-kernel
+all: step1-games step2-gui step3-kernel
 	@echo "Done"
 
-#A15
-PHONY := step1-gui
-step1-gui:
-	make -C  gui
-
 #D8
-PHONY := step2-havefun
-step2-havefun:
-	make -C  havefun
+PHONY := step1-games
+step1-games:
+	make -C  games
+
+#A15
+PHONY := step2-gui
+step2-gui:
+	make -C  gui
 
 #E25
 PHONY := step3-kernel
@@ -26,8 +26,8 @@ clean-all:
 	-rm gui/beige/bin/*.BIN
 	-rm gui/blue/bin/*.BIN
 	-rm gui/burgundy/bin/*.BIN
-# In havefun/
-	-rm havefun/bin/*.BIN
+# In games/
+	-rm games/bin/*.BIN
 # In kernel/
 	-rm kernel/control/new/KERNEL.BIN
 	-rm kernel/control/newm0/MOD0.BIN

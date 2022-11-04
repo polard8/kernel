@@ -6,13 +6,11 @@
 
 #include <kernel.h>
 
-
 // How many buffers.
 // #define E1000_NUM_TX_DESC 8
 // #define E1000_NUM_RX_DESC 32
 #define SEND_BUFFER_MAX       8
 #define RECEIVE_BUFFER_MAX   32
-
 
 // little endian
 #define ToNetByteOrder16(v)   ((v >> 8) | (v << 8))
@@ -22,8 +20,6 @@
 
 //extra
 #define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
-
-
 
 //
 // == Ethernet ==============================================
@@ -52,11 +48,9 @@ int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
 unsigned long gE1000InputTime=0;
 
-
 //
 // =======================================
 //
-
 
 // NIC device handler.
 static void DeviceInterface_e1000(void);
@@ -139,26 +133,25 @@ __E1000ReadEEPROM (
 	//#debug
 	//printf("E1000ReadEEPROM:\n");
 
-    // Yes :)	
+    // Yes :)
     if (d->eeprom == 1) {
         __E1000WriteCommand ( d, 0x14, 1 | (addr << 8) );
 
         //#bugbug
-		//#obs: loop		
+        //#obs: loop
         while (( (data = __E1000ReadCommand ( d, 0x14)) & 0x10 ) != 0x10 );
 
-	// Nope ...
+    // Nope ...
     } else {
         __E1000WriteCommand ( d, 0x14, 1 | (addr << 2) );
 
-		//#bugbug
-		//#obs: loop
+        //#bugbug
+        //#obs: loop
         while (( (data = __E1000ReadCommand(d, 0x14)) & 0x01 ) != 0x01 );
     };
 
     return (data >> 16) & 0xFFFF; 
 }
-
 
 /*
  * E1000AllocCont: ??
@@ -760,10 +753,8 @@ e1000_init_nic (
 // +usar if else.
 
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
-
     Vendor = (unsigned short) (data       & 0xffff);
     Device = (unsigned short) (data >> 16 & 0xffff);
-
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
         debug_print ("e1000_init_nic: [FAIL] Device not found\n");
@@ -771,10 +762,8 @@ e1000_init_nic (
         // #bugbug: Maybe only return.
         return (int) (-1);
     }
-
-// #debug
-    printf ("Vendor=%x ",   (data       & 0xffff) );
-    printf ("Device=%x \n", (data >> 16 & 0xffff) );
+    // #debug
+    printf ("Vendor=%x | Device=%x \n", Vendor, Device );
 
 // pci_device structure.
 // pci device struct

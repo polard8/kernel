@@ -10,9 +10,9 @@ EDITION_NAME  = Facilities
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 6
-VERSION_BUILD = 300
-# Compiling on gcc 11.3.0
-# Linking on ld 2.38
+VERSION_BUILD = 301
+# Compiling on gcc 12.2.0
+# Linking on ld 2.39
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
@@ -232,9 +232,9 @@ exposed-tier:
 	-sudo cp ../gui/beige/bin/FILEMAN.BIN      control/disk/
 	-sudo cp ../gui/beige/bin/CMDLINE.BIN      control/disk/
 	-sudo cp ../gui/attitude/bin/BROWSER.BIN   control/disk/
-#havefun
+#games
 #todo: Add the games and demos, not the engines.
-	-sudo cp ../havefun/bin/*.BIN   control/disk/
+	-sudo cp ../games/bin/*.BIN   control/disk/
 
 #===================================================
 #::2
