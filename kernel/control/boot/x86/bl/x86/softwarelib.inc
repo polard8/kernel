@@ -1,20 +1,11 @@
-;
+
 ; File: softwarelib.inc
-;
 ; Descrição:
 ;     Rotinas de apoio para rotinas de software em software.inc.
-;
 ; 2015 - Created by Fred Nora.
-;
 
-
-;;
-;; #bugbug
-;; Muda o nome do arquivo para o formato 8.3
-;; swlib.asm
-;;
-
-
+; #bugbug
+; Muda o nome do arquivo para o formato 8.3
 ;
 ; Funções importadas.
 ;
@@ -27,11 +18,9 @@ SOFTWARELIB_BACKBUFFER EQU   (0x1000000 - 0x800000)
 
 ;---------------------------------------------
 ; _my_buffer_load_bitmap_16x16 
-;
 ;    Decodifica um bitmap 16x16 e coloca em um buffer.
 ;    Obs: Talvez seja agradável carregar um bitmat na inicialização.
-;         Mudar o nome para softwarelibLoadOnBufferBitmap16x16:. 
-;
+;         Mudar o nome para softwarelibLoadOnBufferBitmap16x16:.
 ; a = endreço da imagem 
 ; b = x
 ; c = y 
@@ -41,22 +30,19 @@ SOFTWARELIB_BACKBUFFER EQU   (0x1000000 - 0x800000)
 global _my_buffer_load_bitmap_16x16     
 _my_buffer_load_bitmap_16x16:
 ;softwarelibLoadOnBufferBitmap16x16
-   
-  
+
     mov dword [.endereco], eax
     mov dword [.x],        ebx
     mov dword [.y],        ecx
 
-    ;
-    ;Origem.   
-	
-	;eax contem o inicio do bmp.
+;Origem.   
+
+    ;eax contem o inicio do bmp.
     add eax, dword 036h    ;Adiciona o offset da area de dados do bmp.	
     mov esi, eax           ;Início da area de dados da imagem.
 
-	;
-	;Destino.
-	
+;Destino.
+
 	;Calcula x.
 	mov eax, ebx        ;Pega x.
 	mov ebx, dword 3    ;4 ;3 bytes por pixel.
@@ -83,16 +69,14 @@ _my_buffer_load_bitmap_16x16:
 	;'eax', Contém a posição '|____' .... (baixo/esquerda) da imagem.
 	
 	mov edi, eax
-	
-	;
+
 	;A sincronização é feita antes de chamar essa função.
-	;
-	
 	;call _vsync
-	
+
     mov ecx, dword 16    ;Quantidade de linhas.
-	;Draw.
-.pinta_bmp:	
+
+;Draw
+.pinta_bmp:
 	;Pega uma linha.
     movq  mm0, [esi]        ; 2 primeiros pixels.      
 	movq  mm1, [esi+8]    
@@ -122,14 +106,13 @@ _my_buffer_load_bitmap_16x16:
 	sub eax, dword 800*3    ;640*3 ;1024*4 ;640*4 ;adiciona pixels.
 	mov edi, eax
 	
-	loop .pinta_bmp	
+	loop .pinta_bmp
 	emms               ;Isso é necessário.
 	ret
-;Nothing.	
+;Nothing.
 .endereco: dd 0
 .x: dd 0
 .y: dd 0
-
 
 
 ;==========================================
@@ -137,44 +120,40 @@ _my_buffer_load_bitmap_16x16:
 ;     Pinta um background diretamente na memória de video.  
 ;     ( #teste Não é recomendado escrever na memoria de video 
 ;       sem sincronizar o retraço vertical) 
-;
 ; @todo:
 ;     Está escrevendo diretamente na memória de vídeo. No endereço do LFB 
 ; passado pelo bootmanager via argumento.
 ;     É necessário criar uma um endreço lógico para o endereço físico
 ;do LFB.
-;
 ; IN:
 ;     EAX = COR
-;
-
 ;; r_background:
 
 global _background
 _background:
-    ;nop		
+    ;nop
 .fade_screen: 
  
 	pushad
 	
 	;eax (cor)
-	mov byte [.a], al	 ;a
+	mov byte [.a], al    ;a
 	shr eax, 8
-	mov byte [.r], al	 ;r
+	mov byte [.r], al    ;r
 	shr eax, 8
 	mov byte [.g], al    ;g
 	shr eax, 8
-	mov byte [.b], al    ;b	
-	
-	; Direto.
-    call _vsync    ;Vertical sync.	
+	mov byte [.b], al    ;b
 
-	;LFB.
+; Direto.
+    call _vsync    ;Vertical sync.
+
+;LFB.
     mov edx, DWORD [_g_lbf_pa]    ;; Endereço físico do LFB. Passado pelo BM. 
     mov edi, edx
-	
+
 	;Contador de linhas
-	mov ebx, dword 600    ;número de linhas.	    
+	mov ebx, dword 600    ;número de linhas.
 .bg_newline:     	
 	;Contador de pixel por linha.
     mov ecx, dword (800*3)    ;(800*3). (800 pixel por linha, 3 bytes por pixel.).	
@@ -200,11 +179,10 @@ _background:
 .b db 0
 .a db 0
 
-
 ;----------------------------------------------
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no buffer. 
-;
+
 global _gui_buffer_putpixel
 _gui_buffer_putpixel:
 
@@ -216,26 +194,26 @@ _gui_buffer_putpixel:
     ;@todo: Isso é um ajuste provisório.
 	mov dword [.cor], eax    ;Salva cor.
 	mov dword [.x],   ebx    ;Salva x.
-	mov dword [.y],   ecx    ;Salva y.		
+	mov dword [.y],   ecx    ;Salva y.
     mov eax, dword [.x]
-	mov ebx, dword [.y]      ;Coloca y em ebx.	 	
+	mov ebx, dword [.y]      ;Coloca y em ebx.
 	mov ecx, dword [.cor]    ;Coloca a cor em ecx.
-	
+
 	;ecx (cor)
-	mov byte [.a], cl	 ;a
+	mov byte [.a], cl    ;a
 	shr ecx, 8
-	mov byte [.r], cl	 ;r
+	mov byte [.r], cl    ;r
 	shr ecx, 8
 	mov byte [.g], cl    ;g
 	shr ecx, 8
 	mov byte [.b], cl    ;b
-	
-	;Segmento ES, poderia ser 0x10. ??
-	push eax
-	mov ax, 0x10
-	mov es, ax
+
+;Segmento ES, poderia ser 0x10.??
+    push eax
+    mov ax, 0x10
+    mov es, ax
     pop eax
-    
+
 	imul ebx, (800*3)           
     
 	;eax*3
@@ -277,7 +255,6 @@ _gui_buffer_putpixel:
 .g     db 0
 .b     db 0
 .a     db 0
-
 
 
 ;;==================================================================
@@ -348,49 +325,45 @@ write_char:
 	
 	;#manda um char pra memoria de video
 	mov [ebx], byte al
-	shr ebx, 1	
+	shr ebx, 1
 	inc ebx
-	
+
 	cmp ebx, dword 2000
 	jb ._1f
 	mov ebx, dword 0
-._1f:	
-    mov dword [scr_loc], ebx	
+._1f:
+    mov dword [scr_loc], ebx
 	pop eax
 	pop ebx
 	pop gs
-	ret	
-	
-	
+	ret
 
-;Reboot.	
+
+;Reboot.
 global _softwarelibReboot
 _softwarelibReboot:
     ; Wait for an empty Input Buffer
 	in al, 0x64
-	test al, 00000010b		
+	test al, 00000010b
 	jne _asm_shut_down
 	; Send the reboot call to the keyboard controller
 	mov al, 0xFE
-	out 0x64, al			
+	out 0x64, al
 	jmp _asm_shut_down
 	jmp $
 
 
-	
 ;--------------------------------------------
 ; _asm_shut_down:
 ;     Rotina de reboot.
 ;     Obs: Substituida por _softwarelibReboot. 
 ;     @todo: Deletar isso.
-;            
-;
+
 global _asm_shut_down
 _asm_shut_down:
     jmp _softwarelibReboot
     jmp $
-	
-	
+
 ;
 ; End.
 ;

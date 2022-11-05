@@ -57,11 +57,6 @@ extern int current_mode;
 #include "demos.h"
 
 
-//
-// model
-//
-
-// # data model
 #include "packet.h"
 
 
@@ -112,17 +107,14 @@ struct engine_d
 extern struct engine_d  Engine;
 
 
-//
 // MAIN STRUCTURE
-//
-
 // This is the main data structure for the window server.
 
 struct gws_d 
 {
     int initialized;
 
-    // The name of the window server.
+// The name of the window server.
     char name[64];
     char edition_name[64];
 
@@ -131,25 +123,24 @@ struct gws_d
     unsigned long version_major;
     unsigned long version_minor;
 
-    // fd
+// fd
     int socket;
 
-    // flag: When to quit the window server.
+// flag: When to quit the window server.
     int quit;
 
 // window server status
     int status;
 
-    // sinaliza que registramos o servidor no sistema.
+// sinaliza que registramos o servidor no sistema.
     int registration_status;
     int graphics_initialization_status;
     // ...
-    
-    // Se devemos ou não lançar o primeiro cliente.
+
+// Se devemos ou não lançar o primeiro cliente.
     int launch_first_client;
 
-    // graphics engine 
-
+// graphics engine 
     struct engine_d *engine;
     
     // os info.
@@ -167,14 +158,13 @@ extern struct gws_d  *window_server;
 //
 
 
-
 //
 // == buffer ===============================================
 //
 
 // O buffer para  as mensagens recebidas via socket.
-#define MSG_BUFFER_SIZE 512
-char __buffer[MSG_BUFFER_SIZE];   
+#define MSG_BUFFER_SIZE  512
+char __buffer[MSG_BUFFER_SIZE];
 
 // Esses valores serão enviados como 
 // resposta ao serviço atual.

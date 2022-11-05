@@ -1,14 +1,9 @@
-/*
- * File: wt.h
- * 
- * 
- *     This header should be included by including "gws.h".
- */
 
+// File: wt.h
+// This header should be included by including "gws.h".
 
 #ifndef __LIBGWS_WT_H
 #define __LIBGWS_WT_H    1
-
 
 // 
 // == Window Types ==

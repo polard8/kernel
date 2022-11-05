@@ -8,9 +8,7 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
-
 
 // local
 // inline?
@@ -18,7 +16,6 @@ void load_pml4_table(void *phy_addr)
 {
     asm volatile (" movl %0, %%cr3 " :: "r" (phy_addr) );
 }
-
 
 // local
 // inline?
@@ -38,7 +35,6 @@ void page_enable()
                    " orl $0x80000000, %%eax; "
                    " movl %%eax, %%cr0       " :: );
 }
-
 
 /*
  * SetUpPaging:
@@ -72,7 +68,6 @@ void page_enable()
  * gerenciamento um user mode.
  * History:
  *     2015 - Created by Fred Nora.
- *     ...
  */
 
 // Called by OS_Loader_Main in main.c
@@ -90,10 +85,8 @@ int SetUpPaging()
 // Antes cada entrada era de 4 bytes, agora é de 8 bytes.
 // Nesse caso a tabela continua do mesmo tamanho, mas agora com 512 entradas de 8
 
-//
 // (Phase 1) 
 // Endereços da memória físicas acessíveis em Kernel Mode.
-//
 
 //
 // Kernel.

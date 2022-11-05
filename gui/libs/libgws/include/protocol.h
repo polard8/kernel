@@ -40,7 +40,6 @@
 #define GWS_GrRectangle           2042
 #define GWS_AsyncCommand          2222
 
-
 #define GWS_DrainInput            8080
 
 //#todo
@@ -58,7 +57,6 @@
 #define GWS_GetWindowInfo   9093
 
 // ...
-
 
 #endif    
 

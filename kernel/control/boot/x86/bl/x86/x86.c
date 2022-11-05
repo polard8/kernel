@@ -13,46 +13,35 @@
 #include <bootloader.h>
 
 
-/*
- * enable:
- *     Habilita as interrupções. 
- */ 
-
-void enable ()
+// enable:
+// Habilita as interrupções. 
+void enable()
 {
     asm (" sti ");
 }
 
-
-/*
- * disable:
- *     Desabilita as interrupções.  
- */ 
-
-void disable ()
+// disable:
+// Desabilita as interrupções.
+void disable()
 {
     asm (" cli ");
 }
 
-
-void stopCpu ()
+void stopCpu()
 {
     asm ( " cli \n\t" 
           " hlt ");
 }
 
-
-void intReturn (){
-
+void intReturn()
+{
     asm (" iret ");
 }
 
-
-void farReturn (){
-
+void farReturn()
+{
     asm (" lret ");
 }
-
 
 // #todo: 
 // Rever isso.
@@ -63,7 +52,6 @@ int getFlags (int variable)
          : "=r" (variable) );
 }
 
-
 // #todo: 
 // Rever isso.
 int setFlags (int variable)
@@ -73,53 +61,43 @@ int setFlags (int variable)
           : : "r" (variable) );
 }
 
-
-
-
 int Push (int value)
 {
     //__asm ("pushl %0" : : "r" (value) : "%esp" );
 }
-
 
 int Pop (int variable)
 {
     //__asm ("popl %0" : "=r" (variable) : : "%esp" );
 }
 
-
-void pushRegs ()
+void pushRegs()
 {
     //__asm ("pushal" : : : "%esp");
 }
 
-
-void popRegs ()
+void popRegs()
 {
     //__asm ("popal" : : : "%esp");
 }
 
-
-void pushFlags (){
-
+void pushFlags()
+{
     //__asm ("pushfl" : : : "%esp" );
 }
 
-
-void popFlags (){
-
+void popFlags()
+{
     //__asm ("popfl" : : : "%esp" );
 }
 
-
-int getStackPointer (int addr){
-
+int getStackPointer (int addr)
+{
     asm (" movl %%esp, %0" : "=r" (addr) );
 }
 
-
-int setStackPointer (int addr){
-
+int setStackPointer (int addr)
+{
     //__asm ("movl %0, %%esp" : : "r" (addr) : "%esp" );
 }
 
@@ -130,7 +108,6 @@ int setStackPointer (int addr){
 //is identified by a 32-bit integer. MSRs are 64-bit wide. 
 //The presence of MSRs on your processor is 
 //indicated by CPUID.01h:EDX[bit 5].
-
 
 const unsigned long CPUID_FLAG_MSR = (1 << 5);
  
@@ -145,7 +122,6 @@ int cpuHasMSR (void)
     return (int) (d & CPUID_FLAG_MSR);
 }
 
-
 void 
 cpuGetMSR ( 
     unsigned long msr, 
@@ -154,7 +130,6 @@ cpuGetMSR (
 {
     asm volatile ("rdmsr" : "=a"(*lo), "=d"(*hi) : "c"(msr));
 }
-
 
 void 
 cpuSetMSR ( 
@@ -166,6 +141,6 @@ cpuSetMSR (
 }
 
 //
-// End.
+// End
 //
 

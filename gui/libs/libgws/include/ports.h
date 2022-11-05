@@ -1,14 +1,8 @@
-/*
- * 
- * 
- *     This header should be included by including "gws.h".
- */
 
+// This header should be included by including "gws.h".
 
 #ifndef __LIBGWS_PORTS_H
-#define __LIBGWS_PORTS_H  1
-
-
+#define __LIBGWS_PORTS_H   1
 
 //
 // == ports ====================================
@@ -19,7 +13,7 @@
 //#define PORTS_FS 4042
 // ...
 
-#define DUMMMMMYTHINGPORTS 1111
+#define DUMMMMMYTHINGPORTS  1111
 
 #endif    
 

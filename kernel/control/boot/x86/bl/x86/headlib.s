@@ -1,13 +1,10 @@
 ;
 ; File: headlib.s 
-;
 ; Descrição:
 ;     Biblioteca que complementa o arquivo head.s.
 ;     (tss, ldt, stacks).
-;
 ; OBS: O boot loader não trabalha com tss. Está aqui só por simetria.
-;
-; Versão 1.0, 2015~2016.
+; 2015~2016.
 ;
  
 ;
@@ -19,48 +16,48 @@ extern _task0
 ;
 ; Variáveis internas.
 ;
-	
+
 current:       dd 0 ;current.
 scr_loc:       dd 0 ;Coisa da memória de video.
 bl_video_mode: db 0 
 bl_lfb:        db 0  
-	
-;	
+
+;
 ;tss0
-dd 0	
-tss0:		
+dd 0
+tss0:
 	dd 0                ;/* back link */
 	dd stack0_krn_ptr   ;/* esp0, ss0 */
 	dd 0x10
 	dd 0, 0             ;/* esp1, ss1 */
-	dd 0,0              ;/* esp2, ss2 */				
-	dd 0                ;/* cr3 */			
-	dd task0            ;/* eip */			
-	dd 0x200            ;/* eflags */		
-	dd 0, 0, 0, 0       ;/* eax, ecx, edx, ebx */	
+	dd 0,0              ;/* esp2, ss2 */
+	dd 0                ;/* cr3 */
+	dd task0            ;/* eip */
+	dd 0x200            ;/* eflags */
+	dd 0, 0, 0, 0       ;/* eax, ecx, edx, ebx */
 	dd stack0_ptr       ;/* esp, ebp, esi, edi */
 	dd 0
 	dd 0
 	dd 0
 	;/* es, cs, ss, ds, fs, gs */
-	dd DATA_SEL, 0x20, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL		
-	dd LDT0_SEL         ;/* ldt */			
+	dd DATA_SEL, 0x20, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL
+	dd LDT0_SEL         ;/* ldt */
     dd  0x8000000       ;/* trace bitmap */
-	
+
 ;
 ; tss1
 dd 0
-tss1: 			           
-	dd 0                      ;/* back link */	    
+tss1: 
+	dd 0                      ;/* back link */
 	dd stack1_krn_ptr         ;/* esp0, ss0 */
-	dd 0x10		             
+	dd 0x10
 	dd 0                      ;/* esp1, ss1 */
-	dd 0			              
+	dd 0
 	dd 0                      ;/* esp2, ss2 */
-	dd 0				               
-	dd 0                      ;/* cr3 */			                
-	dd task1                  ;/* eip */			                
-	dd 0x200                  ;/* eflags */		            
+	dd 0
+	dd 0                      ;/* cr3 */
+	dd task1                  ;/* eip */
+	dd 0x200                  ;/* eflags */
 	dd 0                      ;/* eax, ecx, edx, ebx */
 	dd 0
 	dd 0
@@ -68,11 +65,11 @@ tss1:
 	dd stack1_ptr             ;/* esp, ebp, esi, edi */ 
 	dd 0
 	dd 0
-	dd 0	
+	dd 0
     ;/* es, cs, ss, ds, fs, gs */
-	dd DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL			             
-	dd LDT1_SEL              ;/* ldt */			             
-    dd 0x8000000             ;/* trace bitmap */	
+	dd DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL, DATA_SEL
+	dd LDT1_SEL              ;/* ldt */
+    dd 0x8000000             ;/* trace bitmap */
 ;
 ;fim das tsss.
 ;
@@ -101,36 +98,35 @@ ldt1:
 ; Pilha principal.
 ;
     ;times 256 db 0
-	;times 256 db 0
+    ;times 256 db 0
 stack_ptr:
     dd stack_ptr
-	dw 0x10
-	
+    dw 0x10
+
 ;
 ; Pilha 0.
 ;
     ;times 256 db 0
-	;times 256 db 0
+    ;times 256 db 0
 stack0_krn_ptr:
     dd 0
-	
+
 ;
 ; Pilha 1.
-;	
+;
     ;times 256 db 0
-	;times 256 db 0	
+    ;times 256 db 0
 stack1_krn_ptr:
-    dd 0		
-	
-	
+    dd 0
+
 ;
 ; Pilha x.  
 ;
     ;times 256 db 0
     ;times 256 db 0
 stack0_ptr:
-	dd 0
-	
+    dd 0
+
 ;
 ; Pilha y.  
 ;
@@ -147,8 +143,8 @@ stack1_ptr:
 	;times 256 db 0
 global _task0_stack
 _task0_stack:
-    dd 0	
-	
+    dd 0
+
 ;
 ; Pilha da task1. 
 ;
@@ -168,11 +164,10 @@ _task2_stack:
     dd 0
 
 
-;
 ; Tasks: 
 ; Obs: Boot Loader não usa tasks.
 ;      Acho que isso é usado apenas para configurar tss.
-;
+
 
 ;#
 ;# Task 0, 1, 2.
@@ -180,61 +175,57 @@ task0:
 task1:
 ;task2:
     nop ;Canceladas.
-	jmp task1
-
-
+    jmp task1
 
 ;--------------------
 ; setup_gdt:
 ;     Carrega gdtr.
-;
+
 setup_gdt:
     lgdt [GDT_register]
     ret
 
-
 ;------------------------------
 ; setup_idt:
 ;     Configura a IDT.
-;
+
 setup_idt:
     pushad
     mov edx, unhandled_int 
-	
-	mov eax, dword 0x00080000    ;Selector = 0x0008 = cs.	
-	mov ax, dx		             ;Uma parte do endereço.
-	mov dx, word 0x8E00	         ;Interrupt gate - dpl=0, present.
+
+	mov eax, dword 0x00080000    ;Selector = 0x0008 = cs.
+	mov ax, dx                   ;Uma parte do endereço.
+	mov dx, word 0x8E00          ;Interrupt gate - dpl=0, present.
 	mov edi, dword idt
-    ;Nothing.	
+    ;Nothing.
     mov ecx, dword 256
-rp_sidt:	
+rp_sidt:
 	mov dword [edi+0], eax
 	mov dword [edi+4], edx
-	
-	add  edi, dword 8	
+
+	add  edi, dword 8
 	dec ecx
-	jne rp_sidt	
-	;lidt [IDT_register]	
+	jne rp_sidt
+	;lidt [IDT_register]
 	popad
 	ret
-	
 
 ;-------------------------------------
 ; _setup_idt_vector:
 ;     Configura um vetor da idt.
-;
 ; IN:
 ; eax = ;endereço.
 ; ebx = ;numero do vetor.
-;
+
 global _setup_idt_vector
 _setup_idt_vector:
+
     cli
-	pushad
+    pushad
 
     mov dword [.address], eax    ;Endereço.
     mov dword [.number], ebx     ;Número do vetor.
-	
+
 	;calcula o deslocamaneto
 	mov eax, dword 8
 	mov ebx, dword [.number]
@@ -247,16 +238,16 @@ _setup_idt_vector:
 	
 	mov edx, dword [.address] ;unhandled_int ;ignore_int       ;lea edx, ignore_int
 	
-	mov eax, dword 0x00080000  ;/* selector = 0x0008 = cs */	
-	mov ax, dx		           ;uma parte do endereço
-	mov dx, word 0x8E00	       ;/* interrupt gate - dpl=0, present */
+	mov eax, dword 0x00080000  ;/* selector = 0x0008 = cs */
+	mov ax, dx                 ;uma parte do endereço
+	mov dx, word 0x8E00        ;/* interrupt gate - dpl=0, present */
 	
 	;coloca o vetor na idt
 	mov dword [edi+0], eax
 	mov dword [edi+4], edx
-	
- 	;recarrega a nova idt
-	;lidt [IDT_register]	
+
+	;recarrega a nova idt
+	;lidt [IDT_register]
 	
 	popad
 	sti
@@ -266,11 +257,10 @@ _setup_idt_vector:
 .number: dd 0
 
 
-
 ;----------------------------------------------
 ; setup_faults:
 ;     Configura todos vetores da idt para faults.
-;	
+
 setup_faults:
     
 	push eax
@@ -327,7 +317,7 @@ setup_faults:
 	;#12 - stack
 	mov eax, dword _fault_STACK
 	mov ebx, dword 12
-	call _setup_idt_vector		
+	call _setup_idt_vector
 	;#13 - general protection
 	mov eax, dword _fault_GP
 	mov ebx, dword 13
@@ -408,56 +398,53 @@ setup_faults:
 .done:
 	pop ebx
 	pop eax
-	ret	
-	
-	
+	ret
+
 ;---------------------------------
 ; setup_vectors:
 ;     Configura alguns vetores da idt.
-;	
+
 setup_vectors:
-  	
+
 	push eax
 	push ebx 
-	
-	;teclado
+
+;teclado
 	mov eax, dword  _irq1
 	mov ebx, dword 33
 	call _setup_idt_vector
 
-    ;int 200 - sistema
+;int 200 - sistema
 	mov eax, dword _int200
 	mov ebx, dword 200
 	call _setup_idt_vector
-   
-	;213 - executa nova tarefa
+
+;213 - executa nova tarefa
 	mov eax,  dword _int213
 	mov ebx, dword 213 ;0xd5
-	call _setup_idt_vector	
-	
-	;
-	; timer - iniciamos um timer provisório, depois o Kemain() inicia o definitivo.
-	;
+	call _setup_idt_vector
+
+;
+; timer - 
+; iniciamos um timer provisório, depois o Kemain() inicia o definitivo.
+;
 	;mov eax,  dword _irq0         ;será inicializado em c. 
 	mov eax,  dword _timer_test    ;provisório.
 	mov ebx, dword 32
-	call _setup_idt_vector	
+	call _setup_idt_vector
 	
 	pop ebx
 	pop eax
-	ret	
-	
-	
-	
+	ret
+
 ;---------------------
-; set_base:	
-;
+; set_base:
 ; in: 
 ;     eax = logic addr. 
 ;     ebx = base addr. 
 ;     ecx = table addr. 
 ;     edi = descriptors offset.
-;
+
 set_base:
 	add eax, ebx
 	add edi, ecx
@@ -469,7 +456,6 @@ set_base:
 	mov [edi +7],  ah
 	ror eax, 16
 	ret
-
 
 ;
 ; End.

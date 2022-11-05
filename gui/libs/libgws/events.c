@@ -1,5 +1,5 @@
 
-
+// events.c
 
 // libc03
 #include <types.h>
@@ -17,9 +17,7 @@
 #include "include/connect.h"  
 #include "include/gws.h"  
 
-
 char __gws_events_message_buffer[512];
-
 
 // get next event.
 // the window server return the next event
@@ -27,9 +25,6 @@ char __gws_events_message_buffer[512];
 
 struct gws_event_d *gws_next_event(int fd)
 {
-
-    //
-    
     gws_debug_print ("gws_next_event: [TODO]\n"); 
 
     return (struct gws_event_d *) 0;

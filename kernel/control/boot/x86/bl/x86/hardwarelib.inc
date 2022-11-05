@@ -1,15 +1,11 @@
 ;
 ; File: hardwarelib.inc
-;
 ; Descrição:
 ;     Rotinas de apoio às rotinas em hardware.inc.
-;
 ; Histórico:
-;     Versão 1.0, 2015~2016.
-;
+; 2015~2016.
  
- 
-; 
+
 ; IDE ports:
 ; =========
 ; 1F0 (Read and Write): Data Register
@@ -23,10 +19,9 @@
 ; 1F7 (Read): Status Register
 ; 1F7 (Write): Command Register
 ; 3F6 (Read): Alternate Status Register
-; 3F6 (Write): Device Control Register	
-; 
+; 3F6 (Write): Device Control Register 
 
-	
+
 [BITS 32]  
 
 
@@ -38,34 +33,30 @@
 global _hd_buffer
 _hd_buffer:
     dd 0
-	
+
 global _hd_lba
 _hd_lba: 
     dd 0
 
 
-
 ;--------------------------
 ; _test_write:
 ;     Testando escrever no disco. #funcionou.
-;
+
 global _test_write
 _test_write:
     mov eax, dword 0x0E00
-	mov ebx, dword 1020
+    mov ebx, dword 1020
     call hd0_write_sector
     ret
-	
-	
+
 ;-----------------------------------------
 ; _os_read_sector:
-;
 ;    Lê um setor do HD IDE.
-;
 ;    bugbug: limpando a tela.
 ;    +a função reset nao apresenta o bug. 
 ;    +testando hd0_read_sector.
-;
+
 global _os_read_sector
 _os_read_sector:
     
@@ -87,8 +78,8 @@ _os_read_sector:
 	xor ecx, ecx 
 	mov cl, 1
 	mov edi, dword [_hd_buffer]      
-	call ata_lba_read		
-	
+	call ata_lba_read
+
 	pop ebx
 	pop eax
 	ret
@@ -96,13 +87,14 @@ _os_read_sector:
 ;-----------------------
 ; _os_write_sector:
 ;     Escreve um setor no disco.
-;
+
 global _os_write_sector
 _os_write_sector:
+
     push eax
-	push ebx
+    push ebx
  
-	;mov byte [0xb8000], byte 'r'
+    ;mov byte [0xb8000], byte 'r'
     ;mov byte [0xb8001], byte 9
     
 	;call _reset_ide0
@@ -127,29 +119,23 @@ _os_write_sector:
 	mov cl, 1
 	mov edi, dword [_hd_buffer]      
 	call ata_lba_write
-	
-	
-	
+
 	pop ebx
 	pop eax
 	ret
-	
-	
-	
-	
-;=============================================================================
+
+
+;==================================================================
 ; ATA read sectors (LBA mode) 
-;
 ; @param EAX Logical Block Address of sector
 ; @param CL  Number of sectors to read
 ; @param RDI The address of buffer to put data obtained from disk
-;
 ; @return None
-;=============================================================================
-;;isso é bem rápido.
+;==================================================================
+
 ata_lba_read:
-    
-	pushf
+
+    pushf
     and eax, 0x0FFFFFFF
     push eax
     push ebx
@@ -206,18 +192,15 @@ ata_lba_read:
     pop ebx
     pop eax
     popf
-    ret	
-	
-	
-;=============================================================================
-; ATA write sectors (LBA mode) 
-;
+    ret
+
+;====================================================================
+; ATA write sectors (LBA mode)
 ; @param EAX Logical Block Address of sector
 ; @param CL  Number of sectors to write
 ; @param RDI The address of data to write to the disk
-;
 ; @return None
-;=============================================================================
+;====================================================================
  
 ata_lba_write:
     pushf
@@ -278,20 +261,12 @@ ata_lba_write:
     pop eax
     popf
     ret
-	
-	
-	
-	
-
-	
 
 ;------------------------------------------
 ; hd0_read_sector:
-;
 ;    Lê um setor do HD, IDE.
 ;    BUG BUG: limpando a tela quando usa 
 ;             máquina virtual da oracle.
-;
 ; eax - endereço
 ; ebx - lba
 ; ecx - null
@@ -307,8 +282,8 @@ HD_LBA: DD 0
 hd0_read_sector:
 
     ;PUSH EBP
-	;MOV  EBP, ESP
-    
+    ;MOV  EBP, ESP
+
 	;PUSHFD
 	;PUSHA
 	
@@ -397,30 +372,29 @@ hd0_read_sector:
 	;call Small_Delay
 	;POPA
 	;POPFD
-	;POP EBP	 
-	RET
+	;POP EBP
 
+    RET
 
 ;----------------------------------------
 ; hd0_write_sector:
 ;     Escreve no hd.
-;
 ; eax - endereço
 ; ebx - lba
 ; ecx - null
 ; edx - null
-;
+
 hd0_write_sector:
 
     ;PUSH EBP
-	;MOV  EBP, ESP
-    
+    ;MOV  EBP, ESP
+
 	;PUSHFD
 	;PUSHA
 	
 	;CLI
 
-	;;SALVA 	
+	;;SALVA 
 	;MOV DWORD [HD_BUFFER], EAX
   	
 	;;LOW
@@ -491,43 +465,43 @@ hd0_write_sector:
 	;pop ecx 
 	;pop eax
 	
-    ;call hd_wait     ;@todo: Usar wait. 	
+    ;call hd_wait     ;@todo: Usar wait. 
 	
 	;call Small_Delay  
 	;call Small_Delay
 	;call Small_Delay
 	;call Small_Delay
-	;call Small_Delay	
+	;call Small_Delay
 	
 	
 	;POPA
 	;POPFD
 	;POP EBP
-	RET
 
+    RET
 
 ;-----------------
 ;hd_wait: 
 ;    Hard Disk Wait Function.
-; 
+
 hd_wait: 
     cli 
     mov dx,1F7h 
-waitloop:  
-    ;Delay.
-	in al, dx 
+waitloop:
+    ;Delay
     in al, dx 
-	in al, dx 
-	in al, dx 
-	cmp al,50h 
+    in al, dx 
+    in al, dx 
+    in al, dx 
+    cmp al, 50h 
     je waitok 
-	cmp al,0 
+    cmp al, 0 
     je waitok 
-	jmp waitloop
+    jmp waitloop
 waitok: 
     sti 
     ret 
-	
+
 ;-------------------------------------
 ; _reset_ide0:
 ;     Reset IDE.
@@ -535,24 +509,22 @@ waitok:
 global _reset_ide0
 _reset_ide0:
     mov dl, byte 0
-	call IDE_RESET_DISK
-	ret	
+    call IDE_RESET_DISK
+    ret
 ;Reseta o ide0 master.
 init_ide0_master:
     mov dl, byte 0
-	call IDE_RESET_DISK
-	ret
+    call IDE_RESET_DISK
+    ret
 
-	
 ;----------------------------------------
 ; IDE_RESET_DISK:
 ;     Reset IDE.
-;
 ;   dl = Drive (0=master,1=slave).
-;
-;   Note: Some disks will respond to the reset command 
-;         if the other is given it.
-;
+; Note: 
+; Some disks will respond to the reset command 
+; if the other is given it.
+
 IDE_RESET_DISK:
     ;Nothing.
 	and dl, 01           ;isolate bit 0
@@ -598,21 +570,17 @@ commanddone db 0    ;Command done flag.
 commandok   db 0    ;Command completed properly flag.	
 
 
-
 ;-----------------------------
 delay_do_fred:
     out 0x80, al
-	dec ecx
-	jnz delay_do_fred
-	ret
-	
-
-
+    dec ecx
+    jnz delay_do_fred
+    ret
 
 ;--------------------------------------------
 ; Small_Delay:
 ;     Delay usado no driver de hdd.                                     
-;
+
 Small_Delay:
     push ecx
     mov  ecx, 0xfffff
@@ -629,17 +597,16 @@ BusyDelay3a:
     loop BusyDelay3a
     pop ecx
     ret
-	
-	
-;
+
+
 ; hardwarelibInit:
 ;     Initializing the lib.
-;	
+
 ;hardwarelibInit:
 ;    nop
-;	ret
-;
-	
+;    ret
+
+
 ;
 ; End
 ;

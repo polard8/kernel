@@ -32,17 +32,14 @@ int ____gws_client_fd;        // socket fd
 char ____gws_io_buffer[512];  // buffer
 
 
-/*
- * gws_connect:
- * 
- */
 
+// gws_connect:
 // #todo
 // Return the fd.
 // OUT: newfd = Ok.  0 = fail.
 
-int gws_connect (void){
-
+int gws_connect (void)
+{
     int fd=0;
     int Status=0;
 
@@ -51,11 +48,7 @@ int gws_connect (void){
     addr.sa_data[0] = 'w';
     addr.sa_data[1] = 's';
 
-
-//
 // socket
-//
-
 // Create the socket.
 
     // #debug
@@ -141,17 +134,10 @@ void gws_set_desktop_id(int desktop_id)
     __gws__desktop__id = desktop_id;
 }
 
-
-/*
- ***************************************** 
- * gws_initialize_connection:
- * 
- */
-
+// gws_initialize_connection:
 int gws_initialize_connection (void)
 {
     unsigned long Value=0;
-
 
 // Pega o id do desktop atual.
 // ?? Ou o qual o processo pertence?
@@ -163,14 +149,14 @@ int gws_initialize_connection (void)
     // #todo        
     }
 
-
 // Get ws PID for a given desktop.
 
-     Value = (unsigned long) gws_system_call ( 
-                 512,
-                 (unsigned long) __gws__desktop__id,
-                 (unsigned long) __gws__desktop__id,
-                 (unsigned long) __gws__desktop__id );    
+     Value = 
+         (unsigned long) gws_system_call ( 
+             512,
+             (unsigned long) __gws__desktop__id,
+             (unsigned long) __gws__desktop__id,
+             (unsigned long) __gws__desktop__id );    
 
     __ws__pid = (int) (Value & 0xFFFFFFFF);
 
@@ -210,5 +196,6 @@ int gws_initialize_connection (void)
 unsigned long gws_get_message_buffer (void)
 {
     return (unsigned long) &____gws_io_buffer[0];
+    //return (unsigned long) ____gws_io_buffer;
 }
 

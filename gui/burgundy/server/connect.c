@@ -87,7 +87,6 @@ int register_ws(void)
     // flag.
     __ws_registered = TRUE;
 
-
     Initialization.register_ws_checkpoint = TRUE;
 
     // O = OK.

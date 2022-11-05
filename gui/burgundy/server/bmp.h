@@ -15,17 +15,13 @@
 #define  BMP_CHANGE_COLOR_TRANSPARENT  1000
 #define  BMP_CHANGE_COLOR_SUBSTITUTE   2000
 //...
-  
- 
+
 //flag que avisa que dve haver alguma mudança nas cores. 
-int bmp_change_color_flag; 
- 
+int bmp_change_color_flag;
 //salva-se aqui uma cor para substituir outra. 
 unsigned long bmp_substitute_color; 
- 
 //cor selecionada para ser substituída ou ignorada. 
-unsigned long bmp_selected_color; 
-
+unsigned long bmp_selected_color;
 
 //
 // ## BMP support ##
@@ -56,8 +52,8 @@ struct gws_bmp_infoheader_d
     unsigned int  bmpSize;           /* Size of info header */
     unsigned int  bmpWidth;          /* Width of image */
     unsigned int  bmpHeight;         /* Height of image */
-    unsigned short bmpPlanes;         /* Number of color planes */
-    unsigned short bmpBitCount;       /* Number of bits per pixel */
+    unsigned short bmpPlanes;        /* Number of color planes */
+    unsigned short bmpBitCount;      /* Number of bits per pixel */
     unsigned int  bmpCompression;    /* Type of compression to use */
     unsigned int  bmpSizeImage;      /* Size of image data */
     unsigned int  bmpXPelsPerMeter;  /* X pixels per meter */
@@ -65,16 +61,14 @@ struct gws_bmp_infoheader_d
     unsigned int  bmpClrUsed;        /* Number of colors used */
     unsigned int  bmpClrImportant;   /* Number of important colors */
 };
- 
 
 //
-// Pointer.
+// Pointer
 //
 
 char *gwssrv_bmp_cursor_pointer;
 char *gwssrv_bmp_mouse_pointer;
 // ...
-
 
 /*
  * bmpDisplayBMP:
@@ -93,7 +87,6 @@ bmpDisplayBMP (
 
 //void __test_load_bmp2(void);
 int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y );
-
 
 //
 // End.

@@ -1,18 +1,13 @@
-/*
- * File: gws_pack.h
- * 
- *     This header should be included by including "gws.h".
- */
 
+// File: gws_pack.h
+// This header should be included by including "gws.h".
 
 #ifndef __LIBGWS_GWS_PACK_H
 #define __LIBGWS_GWS_PACK_H  1
 
-
 // Socket packets.
 // Usados na troca de mensagens via socket.
 
- 
 // # Podemos usar esse esquema em todos os servidores.
 // então isso deverá ir para bibliotecas.
 // Isso foi baseado nos tipos de pacotes usados pelo
@@ -40,7 +35,6 @@
 #define GWS_SERVER_PACKET_TYPE_REPLY      1001 
 #define GWS_SERVER_PACKET_TYPE_EVENT      1002
 #define GWS_SERVER_PACKET_TYPE_ERROR      1003
-
 
 #endif  
 

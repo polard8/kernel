@@ -1,8 +1,6 @@
-/*
- * File: wm.h
- *     This header should be included by including "gws.h".
- */
 
+// File: wm.h
+// This header should be included by including "gws.h".
 
 #ifndef  __LIBGWS_WM_H
 #define  __LIBGWS_WM_H    1
@@ -10,7 +8,6 @@
 // #todo:
 // Its a good choice using hexa instead of integer.
 // We need to change it in the whole system.
-
 
 // window messages.
 // 
@@ -40,13 +37,11 @@
 #define GWS_SETFOCUS2     18
 #define GWS_GETFOCUS2     19
 
-
 // keyboard (20-29)
 #define MSG_KEYDOWN       20
 #define MSG_KEYUP         21
 #define MSG_SYSKEYDOWN    22
 #define MSG_SYSKEYUP      23
-
 
 // mouse (30 - 39)
 // Tem uma lista de eventos de mouse em events.h
@@ -69,9 +64,7 @@
 //#define MSG_MOUSEMOVEBYOFFSET
 //#define MSG_MOUSEMOVETOELEMENT
 
-
 //outros (40 - ...)
-
 
 #define MSG_COMMAND       40
 
@@ -109,7 +102,6 @@
 // O driver de network está notificando um processo em ring3.
 #define MSG_NETWORK_NOTIFY_PROCESS 56
 
-
 // mouse support: 
 // continuação ...
 #define MSG_MOUSE_DOUBLECLICKED   60
@@ -117,11 +109,8 @@
 #define MSG_MOUSE_DROP            62
 //...
 
-
 //  terminal commands
 #define MSG_TERMINALCOMMAND      100
-
-
 
 //
 // Socket messages
@@ -162,7 +151,6 @@
 
 // Quit the process if it's possible.
 #define MSG_GWS_QUIT    4080
-
 
 // drain input 8080
 // switch focus 9090

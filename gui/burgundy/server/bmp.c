@@ -18,14 +18,11 @@
 
 #include "gws.h"
 
-
 // 4bpp support.
 static int nibble_count_16colors = 0;
-
 // Usados temporariamente por cada uma das exibições.
 struct gws_bmp_header_d     __Local_bh;
 struct gws_bmp_infoheader_d __Local_bi;
-
 
 //
 // Private
@@ -1123,11 +1120,10 @@ bmpDisplayCursorBMP (
  *     Get an address to a shared memory buffer
  * where there is an icon previously loaded by the kernel.
  */
-
 // Called by gwssrv_display_system_icon.
-
 // O kernel vai retornar NULL se for fora do limite.
 // limits=(1~5)
+
 static void *__get_system_icon (int n)
 {
 
@@ -1143,12 +1139,7 @@ static void *__get_system_icon (int n)
 }
 
 
-/*
- * gwssrv_display_system_icon:
- * 
- * 
- */
- 
+// gwssrv_display_system_icon:
 // Called by createwDrawFrame on createw.c
 // >> Called by wmCreateWindowFrame in wm.c
 
@@ -1158,31 +1149,22 @@ gwssrv_display_system_icon (
     unsigned long x, 
     unsigned long y )
 {
-
     int RefreshScreen= FALSE;
-
-    // Shared memory
-    // Um endereço compartilhado onde o ícone
-    // foi carregado pelo kernel.
-
+// Shared memory
+// Um endereço compartilhado onde o ícone
+// foi carregado pelo kernel.
     char *sm_buffer;
-
 // #todo: 
 // limits for x and y.
-
     unsigned long bmp_x = (x & 0xFFFF);
     unsigned long bmp_y = (y & 0xFFFF);
 
 // Get buffer address.
-
     sm_buffer = (char *) __get_system_icon(index);
     //sm_buffer = __get_system_icon(2);
     // ...
 
-//
 // check
-//
-
 // Check pointer validation
 
     if ( (void *) sm_buffer == NULL ){
@@ -1195,21 +1177,17 @@ gwssrv_display_system_icon (
     if ( sm_buffer[0] != 'B' || sm_buffer[1] != 'M' )
     {
         // #debug
-
         gwssrv_debug_print ("gwssrv_display_system_icon: [FAIL] header\n");
         printf             ("gwssrv_display_system_icon: [FAIL] header\n");
-
         printf ("gwssrv_display_system_icon: %c %c\n", 
-            &sm_buffer[0], 
-            &sm_buffer[1] );
-
+            &sm_buffer[0], &sm_buffer[1] );
 
         // #debug
         // Show the whole screen if fail
         gws_show_backbuffer();
         
         //return -1;
-        while(1);
+        while(1){}
     }
 
 // Check BM header. Again.
@@ -1231,13 +1209,13 @@ gwssrv_display_system_icon (
 
         //gde_display_bmp((char *)sm_buffer, (unsigned long) 80, (unsigned long) 80); 
     }
-    
+
      //#debug
      //printf("gwssrv_display_system_icon: *hang2\n");
      
-     // #bugbug #todo
-     // We need to use the routine to refresh the rectangle.
-     
+// #bugbug #todo
+// We need to use the routine to refresh the rectangle.
+
      if (RefreshScreen == TRUE){
          invalidate_surface_retangle();
          //gws_show_backbuffer();
@@ -1245,7 +1223,6 @@ gwssrv_display_system_icon (
 
      return 0;
 }
-
 
 //
 // End.

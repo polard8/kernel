@@ -126,7 +126,7 @@ inflate_rect (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     rect->left   -= cx;
     rect->top    -= cy;
     rect->right  += cx;
@@ -152,7 +152,6 @@ copy_inflate_rect (
     if ( (void*) rectSrc == NULL ){
         return;
     }
-
 
     // inflate and copy.
     // todo: fazer isso em duas etapas.
@@ -181,7 +180,7 @@ offset_rect (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     //offset rect
     rect->left   += cx;
     rect->top    += cy;
@@ -265,12 +264,12 @@ int is_rect_null( struct gws_rect_d *rect )
     if ( (void*) rect == NULL ){
         return -1;
     }
-    
+
     if (rect->width == 0 && rect->height == 0 )
     {
         return TRUE;
     }
-    
+
     return FALSE;
 }
 
@@ -305,7 +304,7 @@ int is_rect_dirty( struct gws_rect_d *rect )
     if ( rect->dirty == TRUE  ){
         return (int) TRUE;
     }
-    
+
     //false
     return FALSE;
 }
@@ -340,7 +339,7 @@ rect_contains_horizontally (
     if ( (void*) rect == NULL ){
         return -1;
     }
-    
+
     // ta dentro
     if ( x >= rect->left &&
          x <= rect->right )
@@ -361,7 +360,7 @@ rect_set_left (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     rect->left = value;
 }
 
@@ -373,7 +372,7 @@ rect_set_top (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     rect->top = value;
 }
 
@@ -385,7 +384,7 @@ rect_set_right (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     rect->right = value;
 }
 
@@ -397,7 +396,7 @@ rect_set_bottom (
     if ( (void*) rect == NULL ){
         return;
     }
-    
+
     rect->bottom = value;
 }
 
@@ -413,20 +412,15 @@ static void *__rect_memcpy32 (
     unsigned long c )
 {
 
-    // Copiaremos 32bit por vez.
-
+// Copiaremos 32bit por vez.
     unsigned int *src = (unsigned int *) v_src;
     unsigned int *dst = (unsigned int *) v_dst;
-
     register unsigned long Copy = c;
+    //const char *src = v_src;
+    //char *dst = v_dst;
 
-	//const char *src = v_src;
-	//char *dst = v_dst;
-
-
-    /* Simple, byte oriented memcpy. */
-    while (Copy--)
-    {
+// Simple, byte oriented memcpy.
+    while (Copy--){
         *dst++ = *src++;
     };
 
@@ -564,7 +558,6 @@ __refresh_rectangle0 (
     // = 3; 24bpp
     int bytes_count=0;
 
-
     int FirstLine = (int) (y & 0xFFFF);
 
     //int UseVSync = FALSE;
@@ -622,12 +615,10 @@ __refresh_rectangle0 (
 //(line_size * bytes_count) é o número de bytes por linha. 
     rectangle_pitch = (unsigned int) (bytes_count * line_size);
 
-
 // #atenção.
 //offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
     offset = (unsigned int) ( (Y*screen_pitch) + (bytes_count*X) );
-
 
     dest = (void *)       (dest + offset); 
     src  = (const void *) (src  + offset); 
@@ -829,7 +820,6 @@ gws_refresh_rectangle (
     ScreenWidth  = (ScreenWidth  & 0xFFFF );
     ScreenHeight = (ScreenHeight & 0xFFFF );
 
-
 // Internal
 
     line_size = (unsigned int) (width  & 0xFFFF); 
@@ -953,8 +943,6 @@ gws_refresh_rectangle (
         }while(i<lines);
         */
     }
-
-    //debug_print("gws_refresh_rectangle: done :)\n");
 }
 
 
@@ -994,8 +982,6 @@ frontbuffer_draw_rectangle(
         rop_flags,
         2 );      // back or front.
 }
-
-
 
 
 /* 
@@ -1071,11 +1057,7 @@ __drawrectangle0(
         return;
     }
 
-
-//
 // Clipping rectangle
-//
-
 // #todo
 // It need to be a blobal thing.
 // We need to handle the surfaces used by 
@@ -1088,7 +1070,6 @@ __drawrectangle0(
 
     ClippingRect.right  = (ClippingRect.left + ClippingRect.width);
     ClippingRect.bottom = (ClippingRect.top + ClippingRect.height);
-
 
 // #debug
 // Provisório
@@ -1107,7 +1088,7 @@ __drawrectangle0(
         gwssrv_debug_print("__drawrectangle0: right");
         return;
     }
-    
+
     if ( ClippingRect.bottom > 600 ){
         gwssrv_debug_print("__drawrectangle0: bottom");
         return;
@@ -1154,11 +1135,7 @@ __drawrectangle0(
     if ( Rect.right  > ClippingRect.right  ){  Rect.right  = ClippingRect.right;  }
     if ( Rect.bottom > ClippingRect.bottom ){  Rect.bottom = ClippingRect.bottom; }
 
-
-//
 // Draw
-//
-
 // Draw lines on backbuffer.
 
     if ( internal_height > 600 ){
@@ -1219,10 +1196,9 @@ __drawrectangle0(
 
 
 /*
- * rectBackbufferDrawRectangle: (API)
+ * rectBackbufferDrawRectangle0: (API)
  *     Draw a rectangle on backbuffer. 
  */
-
 // #todo
 // At this moment, no structure ware invalidated.
 // So, the caller needs to specify a rect structure,
@@ -1280,20 +1256,17 @@ rectBackbufferDrawRectangle0 (
         return; 
     }
 
-
 // set values
-
     rect.left   =  (unsigned long) (x      & 0xFFFF);
     rect.top    =  (unsigned long) (y      & 0xFFFF);
     rect.width  =  (unsigned long) (width  & 0xFFFF);
     rect.height =  (unsigned long) (height & 0xFFFF);
 
-//Margins.
+//Margins
     rect.right  = (unsigned long) (rect.left + rect.width);
     rect.bottom = (unsigned long) (rect.top  + rect.height); 
 
     rect.bg_color = (unsigned int)(color & 0xFFFFFF);
-
 
 //
 // Fail
@@ -1512,7 +1485,6 @@ rectBackbufferDrawRectangle0 (
     rect.dirty = TRUE;
 
 done:
-    //debug_print("rectBackbufferDrawRectangle0: done\n");
     return;
 }
 
