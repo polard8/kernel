@@ -1769,10 +1769,13 @@ void *CreateWindow (
                 // #bugbug: 
                 // Estamos confiando nos valores.
                 
+                /*
+                 //#suspended #debug
                 x      = WindowManager.wa_left;
                 y      = WindowManager.wa_top;
                 width  = WindowManager.wa_width;
                 height = WindowManager.wa_height;
+                */
             }
         }
 
