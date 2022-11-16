@@ -166,7 +166,7 @@ struct tty_d
     int initialized;
 
 //
-// == (1) storage ========
+// == Storage ========
 //
 
 // The buffer. The box.
@@ -190,7 +190,7 @@ struct tty_d
     struct tty_queue output_queue;     // Output buffer.
 
 //
-// == (2) synchronization ========
+// == Synchronization ========
 //
 
 // Flag para sincronizaçao de leitura e escrita de eventos.
@@ -204,20 +204,41 @@ struct tty_d
     
     //int lock;
 
-// Owner process.
-    struct process_d *process;
+//
+// == Security ============================================
+//
 
 // #todo: Process group?
     //int pgrp;
 
+// process group.
+// Usando quanto tiver uma interrupção de tty.
+// Quais processos estão no mesmo grupo quanto tiver a interrupção.
+// Vamos sinalizá-los.
+    gid_t gid;
+// ??
+// Quantos processos estao usando essa tty.
+    int pid_count;
+
+// Owner process.
+    struct process_d *process;
 // #todo: merge?
 // Thread de input.
     struct thread_d *thread;
 // Control thread;
     struct thread_d *control;
 
+// What is the user logged in this terminal?
+// see: user.h
+    struct user_info_d *user_info;
+// Security: user session, room, desktop.
+    struct usession_d  *user_session;
+    struct room_d      *room;
+    struct desktop_d   *desktop;
+// ===================================================
+
 //
-// == (3) transmition ========
+// == transmition ========
 //
 
 //linked socket?
@@ -237,32 +258,6 @@ struct tty_d
 
 // termios
     struct termios termios;
-
-//
-// == Security ============================================
-//
-
-// What is the user logged in this terminal?
-    struct user_info_d *user_info;
-
-// Security?
-// user session, room, desktop;
-    struct usession_d  *user_session;
-    struct room_d      *room;
-    struct desktop_d   *desktop;
-// ===================================================
-
-// process group.
-// Usando quanto tiver uma interrupção de tty.
-// Quais processos estão no mesmo grupo quanto tiver a interrupção.
-// Vamos sinalizá-los.
-    gid_t gid;
-
-// ??
-// Quantos processos estao usando essa tty.
-    int pid_count;
-//=========================
-
 
 //
 // ==  properties ========================

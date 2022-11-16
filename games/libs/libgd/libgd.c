@@ -36,15 +36,13 @@ static unsigned long libgd_device_bpp=0;
 // Initialize the library.
 int libgd_initialize(void)
 {
-
     libgd_current_mode = gwssrv_get_system_metrics(130);
-
     if (libgd_current_mode < 0){
         printf ("libgd_initialize: [FAIL] libgd_current_mode\n");
-        exit (1);
+        exit(1);
     }
 
-// buffers
+// Buffers
     libgd_FRONTBUFFER_VA = (unsigned long) rtl_get_system_metrics(11);
     libgd_BACKBUFFER_VA  = (unsigned long) rtl_get_system_metrics(12);
 // Screen
@@ -56,7 +54,6 @@ int libgd_initialize(void)
     libgd_SavedY   = (unsigned long) libgd_device_height;
     libgd_SavedBPP = (unsigned long) libgd_device_bpp; 
 
-
     if ( libgd_device_width == 0 || 
          libgd_device_height == 0 || 
          libgd_device_bpp == 0 || 
@@ -64,14 +61,11 @@ int libgd_initialize(void)
          libgd_BACKBUFFER_VA == 0 )
     {
         printf ("libgd_initialize: [FAIL] Screen properties\n");
-        exit (1);
+        exit(1);
     }
-
 
     return 0;
 }
-
-
 
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).

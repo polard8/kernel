@@ -16,6 +16,21 @@
 #define UEM_CHANGE_COLORS      3
 // ...
 
+// Se há um usuário configurado 
+// conforme registrado em arquivo de configuração.
+// int userconfig_Status;
+
+
+// see: user.h
+struct user_info_d *RootUser;       // Super user
+struct user_info_d *CurrentUser;    // Current user
+
+// see: user.c
+// user list:
+// root user is the user '0'.
+unsigned long userList[USER_COUNT_MAX];
+
+
 
 int GetCurrentGroupId (void)
 {
@@ -56,7 +71,6 @@ int __getusername (char *buffer)
 {
     char *login_buffer = (char *) buffer;
 
-
     if ( (void*) buffer == NULL ){
         debug_print ("__getusername: [FAIL] buffer\n");
         return -1;
@@ -65,7 +79,7 @@ int __getusername (char *buffer)
 //Estrutura default para informações sobre o host.
 //host.h
 
-    if ( (void *) CurrentUser== NULL ){
+    if ( (void *) CurrentUser == NULL ){
         printf ("__getusername: CurrentUser\n");
         return (int) -1; 
     }else{
@@ -79,16 +93,12 @@ int __getusername (char *buffer)
     return (int) -1;
 }
 
-/*
- * __setusername: 
- *
- */
-
+// __setusername:
 // O novo nome está no buffer passado via argumento.
 // Ele tem o limite de 64 bytes.
 // Vamos colocar ele na estrutura de usuário.
 
-int __setusername ( const char *new_username )
+int __setusername(const char *new_username)
 {
     if ( (void*) new_username == NULL ){
         debug_print ("__setusername: [FAIL] new_username\n");
@@ -125,11 +135,11 @@ int __setusername ( const char *new_username )
  * configuração dentro da pasta.
  */
 
-void *CreateUser ( char *name, int type )
+struct user_info_d *CreateUser( char *name, int type )
 {
-    struct user_info_d  *New;
+    struct user_info_d *New;
     int Index = 0;
-    int i=0;
+    register int i=0;
 
 // #bugbug
 // We don't wanna kill the initialization 
@@ -192,28 +202,24 @@ void *CreateUser ( char *name, int type )
         // Proibindo tudo.
         for (i=0; i<128; i++){ New->permissions[i]=0; };
 
-	    //Inicializa tokens. (rever)
-	    //New->k_token = KERNEL_TOKEN_NULL;
-	    //New->e_token = EXECUTIVE_TOKEN_NULL;
-	    //New->m_token = MICROKERNEL_TOKEN_NULL;
-	    //New->h_token = HAL_TOKEN_NULL;
-		
-	    //...
+        //Inicializa tokens. (rever)
+        //New->k_token = KERNEL_TOKEN_NULL;
+        //New->e_token = EXECUTIVE_TOKEN_NULL;
+        //New->m_token = MICROKERNEL_TOKEN_NULL;
+        //New->h_token = HAL_TOKEN_NULL;
+        //...
     };
 
-
-    // Procurando uma entrada livre na lista.
+// Procurando uma entrada livre na lista.
     while ( Index < USER_COUNT_MAX )
     {
         if ( (void *) userList[Index] == NULL )
         {
             // User Id. 
-            New->userId = Index; 
-
+            New->userId = Index;
             userList[Index] = (unsigned long) New;
-
-            // printf("CreateUser: Done.\n"); 
-            return (void *) New;
+            // printf("CreateUser: Done.\n");
+            return (struct user_info_d *) New;
         }
 
         Index++;
@@ -230,7 +236,6 @@ fail:
 
 int User_initialize(void)
 {
-
     debug_print("User_initialize:\n");
 
     current_user = 0;
@@ -243,7 +248,6 @@ int User_initialize(void)
 // Initialize user info structure
     printf ("User_initialize: init_user_info\n");
     //init_user_info ();   
-
 
 //
 // Security
@@ -263,28 +267,7 @@ int User_initialize(void)
     printf ("User_initialize: initializing desktop\n");   
     init_desktop();
 
-    debug_print("User_initialize: done\n");
+    //debug_print("User_initialize: done\n");
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

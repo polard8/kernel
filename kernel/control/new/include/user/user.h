@@ -1,5 +1,5 @@
 
-
+// user.h
 
 #ifndef ____USER_H
 #define ____USER_H    1
@@ -141,8 +141,6 @@ typedef enum {
 }mouse_events_t; 
 
 
-
-
 // mouse stuff
 // #todo: move to another place.
 
@@ -175,21 +173,8 @@ typedef enum {
 //int onMouseWhell();
 //int onScroll();
 
-
-
-/*
- * ?? Se há um usuário configurado conforme registrado em arquivo de configuração.
- */ 
-int userconfig_Status;
- 
- 
-
-/*
- ***************************************************
- * user_info_d:
- *     Estrutura para perfil de usuário do computador.
- */ 
-
+// user_info_d:
+// Estrutura para perfil de usuário do computador. 
 // #test
 // This is used in the terminal structure to handle user sessions.
 // logon stuff.
@@ -198,100 +183,82 @@ struct user_info_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
     int userId;
     int used;
     int magic;
 
-    //
-    // == Security ============================================
-    //
+// Security
+// User session, room (window station) and desktop.    
 
-    // Section, window station and desktop.    
     struct usession_d *usession;
     int usessionId;
-    
-    struct room_d     *room;
+    struct room_d *room;
     int roomId;
-    
-    struct desktop_d  *desktop;
+    struct desktop_d *desktop;
     int desktopId;
-    // ===================================================
 
     //??
     char *path;             // '/root/user/(name)'
-    
+
     char __username[64];    // HOSTNAME_BUFFER_SIZE
     size_t userName_len;    // len 
-    
-    
-    
-    // Indica quais os tipos de objetos permitidos para esse usuário.
-    // See: globals/gobject.h
+
+// Indica quais os tipos de objetos permitidos para esse usuário.
+// See: gobject.h
     int permissions[128];
 
-	//
-	// Bancos de Dados 
-	//
-
+// Bancos de Dados 
 	//struct bank_d *kdb;         //O banco de dados do processo kernel.	
 	//struct bank_d *gdbListHead; //Lista de bancos de contas conjuntas.
 	//struct bank_d *ldbListHead; //Lista de bancos de contas particulares.
 
-	
 	//Tempo da sessão de uso.
 	//start time.
 	//unsigned long StartTime;
 	//end time.
     //unsigned long EndTime;
 
-    
-    // em qual console virtual iniciamos a sessão.
+// Em qual console virtual iniciamos a sessão.
     int virtualconsoleId;
 
-    
-	// Em qual console virtual iniciamos a sessão?
-	// F1 ~ F7 ...
-	//struct virtual_console_d *virtual_console;
- 
-    //=========================
+// Em qual console virtual iniciamos a sessão?
+// F1 ~ F7 ...
+    //struct virtual_console_d *virtual_console;
+//=========================
 
-
-    // user type.
+// user type.
     user_type_t userType;
 
+//#importante:
+//Olhe as explicações logo acima.
+    //user_display_mode_t display_mode;
 
-	//#importante:
-	//Olhe as explicações logo acima.
-	//user_display_mode_t display_mode;
-	
-	//
-	// TOKENs de acesso à recursos do kernel. @todo: Rever.
-	//
-	
+//
+// TOKENs de acesso à recursos do kernel. @todo: Rever.
+//
+
 	//kernel_token_t       k_token;    //Kernel.
 	//executive_token_t    e_token;    //Executive.
 	//microkernel_token_t  m_token;    //Microkenrel.
 	//hal_token_t          h_token;    //Hal.
-	
-	//
-	// todo: tipo, tamanho ... 
-	//
-		
-    // Continua...
-    
-    // navigation.
-    struct user_info_d  *Next;
+
+//
+// todo: tipo, tamanho ... 
+//
+
+// Continua...
+
+// navigation.
+    struct user_info_d *next;
 }; 
 
-struct user_info_d *RootUser;       // Super user
-struct user_info_d *CurrentUser;    // Current user
-
+// see: userenv.c
+extern struct user_info_d *RootUser;       // Super user
+extern struct user_info_d *CurrentUser;    // Current user
+// see: userenv.c
 // user list:
 // root user is the user '0'.
-unsigned long userList[USER_COUNT_MAX];
-
-
+extern unsigned long userList[USER_COUNT_MAX];
 
 //
 // == prototypes ====================
@@ -301,12 +268,10 @@ int GetCurrentGroupId (void);
 int GetCurrentUserId (void);
 void SetCurrentUserId (int user_id);
 int is_superuser(void);
-int __getusername (char *buffer);
-int __setusername ( const char *new_username );
-void *CreateUser ( char *name, int type );
-
+int __getusername(char *buffer);
+int __setusername(const char *new_username);
+struct user_info_d *CreateUser( char *name, int type );
 int User_initialize(void);
-
 
 #endif    
 
