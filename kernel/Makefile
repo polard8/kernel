@@ -31,23 +31,20 @@ PYTHON3 = python3
 # Config
 #
 
-# use verbose
-ifndef CONFIG_USE_VERBOSE
-    CONFIG_USE_VERBOSE = 1
-endif
-
-# ========
-
 # verbose
+# Quiet compilation or not.
+ifndef CONFIG_USE_VERBOSE
+	CONFIG_USE_VERBOSE = 1
+endif
+
 ifeq ($(CONFIG_USE_VERBOSE),1)
-    Q =
+	Q =
 else
-    Q = @
+	Q = @
 endif
 
 
-
-# ===== Start ====
+# == Start ====
 
 PHONY := all
 
@@ -117,7 +114,7 @@ exposed-tier
 
 #1
 control-tier:
-	@echo ":: Building VHD, bootloaders and kernel image."
+	@echo ":: [control-tier] Building VHD, bootloaders and kernel image."
 
 # options: 
 # main.asm and main2.asm
@@ -131,35 +128,35 @@ control-tier:
 
 
 # Create the VHD.
-	$(Q) $(NASM) control/boot/vd/fat/main.asm \
+	$(Q)$(NASM) control/boot/vd/fat/main.asm \
 	-I control/boot/vd/fat/ \
 	-o GRAMADO.VHD 
 
 # Create backup for mbr.
-	$(Q) $(NASM) control/boot/vd/fat/stage1.asm \
+	$(Q)$(NASM) control/boot/vd/fat/stage1.asm \
 	-I control/boot/vd/fat/ \
 	-o MBR0.BIN
 	sudo cp MBR0.BIN  control/disk/
 
 # ::Build BM.BIN.
-	$(Q) $(MAKE) -C control/boot/x86/bm/ 
+	$(Q)$(MAKE) -C control/boot/x86/bm/ 
 # Copy to the target folder.
 	sudo cp control/boot/x86/bin/BM.BIN  control/disk/
 
 # ::Build BL.BIN.
-	$(Q) $(MAKE) -C control/boot/x86/bl/ 
+	$(Q)$(MAKE) -C control/boot/x86/bl/ 
 # Copy to the target folder.
 	sudo cp control/boot/x86/bin/BL.BIN  control/disk/
 
 
 # ::Build kernel image.
-	$(Q) $(MAKE) -C control/new/
+	$(Q)$(MAKE) -C control/new/
 # Copy to the target folder.
 	sudo cp control/new/KERNEL.BIN  control/disk/GRAMADO
 
 
 # ::Build the ring0 module image.
-	$(Q) $(MAKE) -C control/newm0/
+	$(Q)$(MAKE) -C control/newm0/
 # Copy the ring0 module image.
 	sudo cp control/newm0/MOD0.BIN  control/disk/
 
@@ -167,10 +164,11 @@ control-tier:
 	sudo cp control/data/themes/537/*.BMP  control/disk/
 #...
 
+	@echo "~control-tier"
 
 #2
 exposed-tier:
-	@echo ":: Building libraries and network server."
+	@echo ":: [exposed-tier] Building libraries and network server."
 
 #========================================
 # ::Build libraries.
@@ -236,6 +234,7 @@ exposed-tier:
 #todo: Add the games and demos, not the engines.
 	-sudo cp ../games/bin/*.BIN   control/disk/
 
+	@echo "~exposed-tier"
 #===================================================
 #::2
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.
@@ -293,7 +292,7 @@ danger-install-sdb:
 # Main files.
 clean:
 	-rm *.o
-	@echo ":)"
+	@echo "~clean"
 
 clean-all: clean
 
@@ -329,7 +328,7 @@ clean-all: clean
 	-rm exposed/lib/libio01/obj/*.o
 	-rm exposed/lib/rtl/obj/*.o
 
-	@echo "Done ?"
+	@echo "~clean-all"
 
 usage:
 	@echo "Building everything:"

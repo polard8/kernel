@@ -24,6 +24,25 @@ PYTHON3	= python3
 RUBY	= ruby
 
 
+#
+# Config
+#
+
+# verbose
+# Quiet compilation or not.
+ifndef CONFIG_USE_VERBOSE
+	CONFIG_USE_VERBOSE = 0
+endif
+
+ifeq ($(CONFIG_USE_VERBOSE),1)
+	Q =
+else
+	Q = @
+endif
+
+
+
+
 # test: gramado 64bit
 # See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
 CFLAGS := \
@@ -125,7 +144,7 @@ clean
 # The entrance \o/
 # The x86 head of the monster.
 kernel-header:
-	@echo "Compiling: Compiling kernel header ..."
+	@echo "Compiling: Compiling kernel header..."
 
 # Head
 # head_64.o
@@ -162,23 +181,23 @@ kernel-header:
 
 # ring0 libc.
 # klib/
-	$(Q) $(MAKE) -C klib/
+	$(MAKE) -C klib/
 
 kernel-content:
 	@echo "Compiling: Compiling kernel content ..."
-	$(Q) $(MAKE) -C dev/
-	$(Q) $(MAKE) -C fs/
-	$(Q) $(MAKE) -C ke/
-	$(Q) $(MAKE) -C mm/
-	$(Q) $(MAKE) -C net/
+	$(MAKE) -C dev/
+	$(MAKE) -C fs/
+	$(MAKE) -C ke/
+	$(MAKE) -C mm/
+	$(MAKE) -C net/
 kernel-footer:
 	@echo "Compiling: Compiling kernel footer ..."
-	$(Q) $(MAKE) -C user/
+	$(MAKE) -C user/
 	# ...
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
 	$(LD) $(LDFLAGS) -T arch/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
 clean:
 	rm -rf *.o   
-
+	@echo "~clean"
 
