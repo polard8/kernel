@@ -7,7 +7,8 @@
 // Usado na rotina de carregamento de arquivo.
 // #bugbug: Isso não é desperdício?
 // um arquivo só pode ter 1024 indices?
-unsigned short file_cluster_list[1024]; 
+#define MAX_CLUSTERS  1024
+unsigned short file_cluster_list[MAX_CLUSTERS]; 
 
 
 /*
@@ -273,7 +274,7 @@ unsigned short fs_find_n_empty_entries (int n)
         //empty = (unsigned short) fs_find_empty_entry(?);
 
         // Preenche a lista de entradas vazias.
-        if ( empty != 0 && empty < 1024 ){
+        if ( empty != 0 && empty < MAX_CLUSTERS ){
 
             file_cluster_list[l] = (unsigned short) empty;
             l++;
@@ -328,33 +329,24 @@ fail:
     return (int) (-1);
 }
 
+
 /*
  * fsSearchFile:
  *    Procura por um arquivo no diretório raiz de uma partição.
  *    Com o diretório raiz já carregado na memória.
- *
  * @todo: 
  *    Atender à especificações diferentes de sistemas de arquivos, como:
  *    +Tamanho do cluster
  *    +Tamanho do disco
  *    +Tipo de sistema de arquivos. (nao por enquanto)
- *    +...
  */
-
 // #todo
 // Include 'dir address' as parameter.
-
 // only on root dir.
-
 //int fsSearchFile( const char *name ) 
 int fsSearchFile (const char *file_name)
 {
     debug_print ("fsSearchFile:\n");
-    
-    // #todo
-    // Well, here we can search on different places 
-    // using search_in_dir(,);
-
     return (int) search_in_root(file_name);
 }
 
@@ -363,10 +355,9 @@ int fsSearchFile (const char *file_name)
  *     Encontrar uma entrada vazia na fat.
  *     @todo: Isso pe importante:
  */
-
-	//@todo:
-	//encontrar uma entrada vazia na fat.
-	//fornecer o endereço da fat na memória.
+//@todo:
+//encontrar uma entrada vazia na fat.
+//fornecer o endereço da fat na memória.
 
 unsigned short fs_find_empty_entry ( char *fat_address )
 {

@@ -1,27 +1,21 @@
 /*
  * File: unistd.h
- *
  *     Standard symbolic constants and types.
- *
  * History:
  *     2018 - Created by Fred Nora.
  *     2020 - New functions.
  */
- 
 
 #ifndef _UNISTD_H
-#define _UNISTD_H 
-
+#define _UNISTD_H    1
 
 #include <sys/types.h>
-
 
 // The <unistd.h> header shall declare the following external variables:
 
 extern char **environ;
 extern char  *optarg;
 extern int    opterr, optind, optopt;
-
 
 
 /*

@@ -1,9 +1,8 @@
 
 // time.h
 
-
-#ifndef	_TIME_H_
-#define	_TIME_H_
+#ifndef _TIME_H_
+#define _TIME_H_  1
 
 /*
  * A structure for storing all kinds of useful information about the
@@ -24,13 +23,10 @@ struct tm
 				 * -1 don't know */
 };
 
-
-typedef long time_t; 
-typedef	long clock_t;
-
+typedef long  time_t; 
+typedef long  clock_t;
 
 time_t time(time_t *timer);
-
 
 #endif	/* Not _TIME_H_ */
 

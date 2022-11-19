@@ -1,73 +1,56 @@
-/*
- * Arquivo: types.h 
- * Descrição:
- *     Define tipos de variáveis.
- *     Obs: System types. 
- */
 
+// ktypes.h
 
-#ifndef ____TYPES_H
-#define ____TYPES_H    1 
+#ifndef ____KTYPES_H
+#define ____KTYPES_H    1 
 
-
+#define TRUE  1
+#define FALSE  0
 #define NULL ((void *)0)
- 
-#define FALSE 0
-#define TRUE 1
 
-/* Void */
-typedef void VOID; 
+// VOID
+typedef void  VOID; 
+// It will help us to find the IRQ handlers.
+typedef void  __VOID_IRQ; 
 
+// Basics
+typedef char   CHAR;   //  8bit
+typedef short  SHORT;  // 16bit
+typedef int    INT;    // 32bit
+typedef long   LONG;   // 64bit
 
+// Unsigned Basics
+typedef unsigned char   UCHAR;   //  8bit
+typedef unsigned short  USHORT;  // 16bit
+typedef unsigned int    UINT;    // 32bit
+typedef unsigned long   ULONG;   // 64bit
 
-// It will help us to find the irq handlers.
-typedef void __VOID_IRQ; 
-
-
-/* Basics */
-typedef char  CHAR;     //  8bit
-typedef short SHORT;    // 16bit
-typedef int   INT;      // 32bit
-typedef long  LONG;     // 64bit
-
-
-/* Unsigned Basics */
-typedef unsigned char  UCHAR;     //  8bit
-typedef unsigned short USHORT;    // 16bit
-typedef unsigned int   UINT;      // 32bit
-typedef unsigned long  ULONG;     // 64bit
-
-/* sysv - unix system v */
+// sysv - unix system v
 typedef unsigned char   unchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;
 typedef unsigned long   ulong;
 // extra
-// //typedef unsigned char   uchar;
+//typedef unsigned char   uchar;
 
-
-/* bsd */
+//bsd
 typedef unsigned char   u_char;
 typedef unsigned short  u_short;
 typedef unsigned int    u_int;
 typedef unsigned long   u_long;
 
 
-/* bsd - Basic integral types. */ 
-typedef char             int8_t;
+// Integers
+typedef char   int8_t;
+typedef short  int16_t;
+typedef int    int32_t;
+typedef long   int64_t;
+
+// Unsigned Integers
 typedef unsigned char   uint8_t;
-typedef short            int16_t;
 typedef unsigned short  uint16_t;
-typedef int              int32_t;
 typedef unsigned int    uint32_t;
-
-// #todo
-//typedef long             int64_t;
-//typedef unsigned long    uint64_t;
-//typedef unsigned long    u_int64_t;
-
-//typedef	long long		  int64_t;
-//typedef	unsigned long long	u_int64_t;
+typedef unsigned long   uint64_t;
 
 
 /* Windows CE virtual address */
@@ -144,19 +127,29 @@ typedef  int  tid_t;
 //
 
 // See: exec_elf.h
-typedef  signed char         __int8_t;
-typedef  unsigned char       __uint8_t;
-typedef  short               __int16_t;
-typedef  unsigned short      __uint16_t;
-typedef  int                 __int32_t;
-typedef  unsigned int        __uint32_t;
-//typedef  long long           __int64_t;
-//typedef  unsigned long long  __uint64_t;
-//...
+
+typedef signed char    __int8_t;
+typedef unsigned char  __uint8_t;
+typedef signed short    __int16_t;
+typedef unsigned short  __uint16_t;
+typedef signed int    __int32_t;
+typedef unsigned int  __uint32_t;
+typedef signed long    __int64_t;
+typedef unsigned long  __uint64_t;
+
+// BSD-style unsigned bits types.
+typedef __uint8_t   u_int8_t;
+typedef __uint16_t  u_int16_t;
+typedef __uint32_t  u_int32_t;
+typedef __uint64_t  u_int64_t;
+
+typedef unsigned char   u8;
+typedef unsigned short  u16;
+typedef unsigned int    u32;
+typedef unsigned long   u64;
 
 
-#endif    //____TYPES_H
-
+#endif    
 
 
 //
