@@ -65,6 +65,7 @@ static int cursor_y = 0;
 // We are using the embedded shell.
 static int isUsingEmbeddedShell=TRUE;
 // Windows
+struct gws_window_info_d *wi;  // Window info for the main window.
 static int main_window=0;
 static int terminal_window=0;
 // #todo: #maybe:
@@ -75,11 +76,11 @@ static int __sequence_status = 0;
 // == Private functions: Prototypes ==============
 //
 
-static void terminalTerminal (void);
+static void terminalTerminal(void);
 static void terminalInitWindowPosition(void);
 static void terminalInitWindowSizes(void);
-static void terminalInitWindowLimits (void);
-static void terminalInitSystemMetrics (void);
+static void terminalInitWindowLimits(void);
+static void terminalInitSystemMetrics(void);
 
 static void __on_return_key_pressed(int fd);
 static void compareStrings(int fd);
@@ -91,6 +92,9 @@ static void __send_to_child (void);
 static void __test_winfo(int fd, int wid);
 
 static void __test_message(void);
+
+static void __winmax(int fd);
+static void __winmin(int fd);
 
 //====================================================
 
@@ -144,32 +148,31 @@ static void __test_message(void)
     };
 }
 
-
-// Clear
-// Redraw the client window.
+// Redraw and refresh the client window.
 // Setup the cursor position.
+// #todo: Maybe we need to get the window info again.
 static void clear_terminal_client_window(int fd)
 {
+    int wid = Terminal.client_window_id;
+
     if (fd<0){
         return;
     }
-    gws_redraw_window(
-        fd,
-        Terminal.client_window_id,
-        TRUE );
+// Redraw and refresh the window.
+    gws_redraw_window( fd, wid, TRUE );
+// Update cursor.
     cursor_x = Terminal.left;
     cursor_y = Terminal.top;
 }
 
-
-// local
-// maximize application window.
+// Maximize application window.
 // #bugbug: Covering the taskbar.
 // #todo: Isso pode virar uma função na biblioteca.
 // mas podemos deixar o window server fazer isso.
-void __winmax(int fd)
+static void __winmax(int fd)
 {
-    int Window = (int) Terminal.main_window_id;
+    int wid        = (int) Terminal.main_window_id;
+    int client_wid = (int) Terminal.client_window_id;
 
     unsigned long w=rtl_get_system_metrics(1);
     unsigned long h=rtl_get_system_metrics(2);
@@ -181,28 +184,55 @@ void __winmax(int fd)
         return;
     }
 // Change position, resize and redraw the window.
-    gws_change_window_position(fd,Window,0,0);
-    gws_resize_window(fd, Window, w, h );
-    gws_redraw_window(fd, Window, TRUE );
+    gws_change_window_position(fd,wid,0,0);
+    gws_resize_window(fd, wid, w, h );
+    gws_redraw_window(fd, wid, TRUE );
+
+//---------------
+
+// get the info for the main window.
+// change the position of the terminal window.
+// its because the client are also changed.
+// Get window info:
+// IN: fd, wid, window info structure.
+    gws_get_window_info(
+        fd, 
+        wid,
+        (struct gws_window_info_d *) wi );
+    if (wi->used != TRUE){ return; }
+    if (wi->magic!=1234) { return; }
+
+// Show info:
+// Frame: l,t,w,h
+    //printf("Frame info: l=%d t=%d w=%d h=%d\n",
+    //    wi->left, wi->top, wi->width, wi->height );
+// Client rectangle: l,t,w,h
+    //printf("Client rectangle info: l=%d t=%d w=%d h=%d\n",
+    //    wi->cr_left, wi->cr_top, wi->cr_width, wi->cr_height );
+
+// The terminal window. (client area)
+// Change position, resize and redraw the window.
+    gws_change_window_position(fd,client_wid,wi->cr_left,wi->cr_top);
+    gws_resize_window(fd, client_wid, wi->cr_width, wi->cr_height );
+    gws_redraw_window(fd, client_wid, TRUE );
 }
 
-
-// local
-// maximize application window.
+// Minimize application window.
 // #bugbug: Covering the taskbar.
 // #todo: Isso pode virar uma função na biblioteca.
 // mas podemos deixar o window server fazer isso.
-void __winmin(int fd)
+static void __winmin(int fd)
 {
-    int Window = (int) Terminal.main_window_id;
+    int wid        = (int) Terminal.main_window_id;
+    int client_wid = (int) Terminal.client_window_id;
 
     unsigned long w=rtl_get_system_metrics(1);
     unsigned long h=rtl_get_system_metrics(2);
                   h=h-40;
 
 // resize
-    unsigned long w_width=0;
-    unsigned long w_height=0;
+    unsigned long w_width=100;
+    unsigned long w_height=100;
     if(w>100){w_width=100;}
     if(h>100){w_height=100;}
 
@@ -210,9 +240,37 @@ void __winmin(int fd)
         return;
     }
 // Change position, resize and redraw the window.
-    gws_change_window_position(fd,Window,0,0);
-    gws_resize_window( fd, Window, w_width, w_height );
-    gws_redraw_window( fd, Window, TRUE );
+    gws_change_window_position(fd,wid,0,0);
+    gws_resize_window( fd, wid, w_width, w_height );
+    gws_redraw_window( fd, wid, TRUE );
+
+//---------------
+
+// get the info for the main window.
+// change the position of the terminal window.
+// its because the client are also changed.
+// Get window info:
+// IN: fd, wid, window info structure.
+    gws_get_window_info(
+        fd, 
+        wid,
+        (struct gws_window_info_d *) wi );
+    if (wi->used != TRUE){ return; }
+    if (wi->magic!=1234) { return; }
+
+// Show info:
+// Frame: l,t,w,h
+    //printf("Frame info: l=%d t=%d w=%d h=%d\n",
+    //    wi->left, wi->top, wi->width, wi->height );
+// Client rectangle: l,t,w,h
+    //printf("Client rectangle info: l=%d t=%d w=%d h=%d\n",
+    //    wi->cr_left, wi->cr_top, wi->cr_width, wi->cr_height );
+
+// The terminal window. (client area)
+// Change position, resize and redraw the window.
+    gws_change_window_position(fd,client_wid,wi->cr_left,wi->cr_top);
+    gws_resize_window(fd, client_wid, wi->cr_width, wi->cr_height );
+    gws_redraw_window(fd, client_wid, TRUE );
 }
 
 // local
@@ -252,13 +310,13 @@ void __test_gws(int fd)
 // Comand 'w-main'.
 static void __test_winfo(int fd, int wid)
 {
-    struct gws_window_info_d *wi;
+    struct gws_window_info_d *Info;
 
     if(fd<0) { return; }
     if(wid<0){ return; }
 
-    wi = (void*) malloc( sizeof( struct gws_window_info_d ) );
-    if( (void*) wi == NULL ){
+    Info = (void*) malloc( sizeof( struct gws_window_info_d ) );
+    if( (void*) Info == NULL ){
         return;
     }
 
@@ -267,17 +325,17 @@ static void __test_winfo(int fd, int wid)
     gws_get_window_info(
         fd, 
         wid,
-        (struct gws_window_info_d *) wi );
-    if (wi->used != TRUE){ return; }
-    if (wi->magic!=1234) { return; }
+        (struct gws_window_info_d *) Info );
+    if (Info->used != TRUE){ return; }
+    if (Info->magic!=1234) { return; }
 
 // Show info:
 // Frame: l,t,w,h
     printf("Frame info: l=%d t=%d w=%d h=%d\n",
-        wi->left, wi->top, wi->width, wi->height );
+        Info->left, Info->top, Info->width, Info->height );
 // Client rectangle: l,t,w,h
     printf("Client rectangle info: l=%d t=%d w=%d h=%d\n",
-        wi->cr_left, wi->cr_top, wi->cr_width, wi->cr_height );
+        Info->cr_left, Info->cr_top, Info->cr_width, Info->cr_height );
 }
 
 
@@ -518,9 +576,7 @@ static void compareStrings(int fd)
         return;
     }
 
-
-    if( strncmp(prompt,"msg",3) == 0 )
-    {
+    if( strncmp(prompt,"msg",3) == 0 ){
         __test_message();
         goto exit_cmp;
     }
@@ -535,16 +591,13 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-
-    if( strncmp(prompt,"int3",4) == 0 )
-    {
+    if( strncmp(prompt,"int3",4) == 0 ){
         do_int3();
         goto exit_cmp;
     }
 
     //gp fault
-    if( strncmp(prompt,"cli",3) == 0 )
-    {
+    if( strncmp(prompt,"cli",3) == 0 ){
         do_cli();
         goto exit_cmp;
     }
@@ -573,48 +626,41 @@ static void compareStrings(int fd)
         goto exit_cmp; 
     }
 
-    // Get window info: main window
-    // IN: fd, wid
-    if ( strncmp(prompt,"w-main",6) == 0 )
-    {
+// Get window info: main window
+// IN: fd, wid
+    if ( strncmp(prompt,"w-main",6) == 0 ){
         __test_winfo( fd, main_window );
         goto exit_cmp;
     }
 
-    // Get window info: terminal window
-    // Terminal.client_window_id
-    // IN: fd, wid
-    if ( strncmp(prompt,"w-terminal",10) == 0 )
-    {
+// Get window info: terminal window
+// Terminal.client_window_id
+// IN: fd, wid
+    if ( strncmp(prompt,"w-terminal",10) == 0 ){
         __test_winfo( fd, terminal_window );
         goto exit_cmp;
     }
 
-
-    if ( strncmp(prompt,"tputstring",10) == 0 )
-    {
+    if ( strncmp(prompt,"tputstring",10) == 0 ){
         __test_escapesequence(fd);
         goto exit_cmp;
     }
-    
-    if ( strncmp(prompt,"tputc",5) == 0 )
-    {
-        //It works.
+
+    if ( strncmp(prompt,"tputc",5) == 0 ){
         tputc(fd, Terminal.client_window_id, 'x', 1);
         goto exit_cmp;
     }
 
-    // Quit 'ws'.
-    if ( strncmp(prompt,"ws-quit",7) == 0 )
-    {
+// Quit 'ws'.
+    if ( strncmp(prompt,"ws-quit",7) == 0 ){
         //gws_async_command(fd,88,0,0);  //ok
         goto exit_cmp;
     }
 
-    //testing ioctl
+// Testing ioctl
     if( strncmp(prompt,"ioctl",5) == 0 )
     {
-        printf ("~ioctl: tests ...\n");
+        printf ("~ioctl: Tests...\n");
 
         // flush
         //ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // input
@@ -638,36 +684,32 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-    if ( strncmp(prompt,"winmax",6) == 0 )
-    {
+    if ( strncmp(prompt,"winmax",6) == 0 ){
         __winmax(fd);
         clear_terminal_client_window(fd);
         goto exit_cmp;
     }
 
-    if ( strncmp(prompt,"winmin",6) == 0 )
-    {
+    if ( strncmp(prompt,"winmin",6) == 0 ){
         __winmin(fd);
         //clear_terminal_client_window(fd);
         goto exit_cmp;
     }
 
-    //#test: testando serviços diversos.
-    if ( strncmp(prompt,"window",6) == 0 )
-    {
+// #test: 
+// Testando serviços diversos.
+    if ( strncmp(prompt,"window",6) == 0 ){
         __test_gws(fd);
         goto exit_cmp;
     }
 
-    // #test: Update all the windows in the desktop.
-    if ( strncmp(prompt,"desktop",7) == 0 )
-    {
+// #test: 
+// Update all the windows in the desktop.
+    if ( strncmp(prompt,"desktop",7) == 0 ){
         gws_update_desktop(fd);
         goto exit_cmp;
     }
 
-
-// =============
 // 'help'
     if ( strncmp(prompt,"help",4) == 0 )
     {
@@ -703,22 +745,18 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-// =============
 // 'reboot'
 // reboot via ws.
-    if ( strncmp(prompt,"reboot",6) == 0 )
-    {
+    if ( strncmp(prompt,"reboot",6) == 0 ){
         gws_reboot(fd);
         goto exit_cmp;
     }
 
-// =============
 // 'cls'
     if ( strncmp(prompt,"cls",3) == 0 ){
         clear_terminal_client_window(fd);
         goto exit_cmp;
     }
-
 
 // =============
 // 't1'
@@ -770,7 +808,6 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-
 //
 // Not a reserved word.
 //
@@ -781,10 +818,9 @@ exit_cmp:
     return;
 }
 
-
 static void doPrompt(int fd)
 {
-    int i=0;
+    register int i=0;
 
     if(fd<0){
         return;
@@ -807,9 +843,7 @@ static void doPrompt(int fd)
     cursor_x = 0;
     cursor_y++;
 
-
 // Refresh client window.
-
     int wid = Terminal.client_window_id;
     if(wid < 0){
         return;
@@ -2614,10 +2648,11 @@ int main ( int argc, char *argv[] )
 // the window size and position.
 // We need to get these new values.
 
-    struct gws_window_info_d *wi;
+    // #test: Now it's a global thing.
+    //struct gws_window_info_d *wi;
+    
     wi = (void*) malloc( sizeof( struct gws_window_info_d ) );
-    if( (void*) wi == NULL )
-    {
+    if( (void*) wi == NULL ){
         printf("terminal: wi\n");
         while(1){}
     }

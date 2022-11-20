@@ -2547,34 +2547,26 @@ int serviceDrawChar (void)
     return 0;
 }
 
-
-
-static
-int serviceChangeWindowPosition(void)
+static int serviceChangeWindowPosition(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-
     struct gws_window_d *window;
     int window_id = -1;
-    
     unsigned long x = 0;
     unsigned long y = 0;
 
     // #debug
     gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
 
-
-    // Get
-    
+// Get
     window_id = message_address[0];  //wid
     // msg
     x         = message_address[2];  
     y         = message_address[3];  
 
-
-    //
-    // Window ID
-    //
+//
+// Window ID
+//
    
     // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
@@ -2591,8 +2583,7 @@ int serviceChangeWindowPosition(void)
         return -1;
     }
 
-    if ( window->used != TRUE || 
-         window->magic != 1234 ){
+    if ( window->used != TRUE || window->magic != 1234 ){
         gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition validation\n");
         return -1;
     }
@@ -2601,6 +2592,7 @@ int serviceChangeWindowPosition(void)
     //if (window == __root_window)
         //return -1;
 
+// see: wm.c
     gwssrv_change_window_position ( 
         (struct gws_window_d *) window, 
         (unsigned long) x, 

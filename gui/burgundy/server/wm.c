@@ -5660,11 +5660,25 @@ gws_resize_window (
         // continuar a mesma;
         if( window->type == WT_OVERLAPPED )
         {
-            if( (void*) window->titlebar != NULL )
+            // titlebar
+            if ( (void*) window->titlebar != NULL )
             {
                 window->titlebar->width = 
                     (window->width - window->border_size - window->border_size );
             }
+
+            // client area . (rectangle).
+
+            // width
+            // menos bordas laterais
+            window->rcClient.width = 
+                (unsigned long) (window->width -2 -2 );
+            // height
+            // menos bordas superior e inferior
+            // menos a barra de tarefas.
+            //#bugbug: e se a janela for menor que 32?
+            window->rcClient.height = 
+                (unsigned long) (window->height -2 -32 -2); 
         }
     }
 
@@ -5701,21 +5715,19 @@ void reset_zorder(void)
      };
 }
 
-
-/*
- * gws_change_window_position:
- *     Muda os valores do posicionamento da janela.
- */
-
+// gwssrv_change_window_position:
+// Muda os valores do posicionamento da janela.
+// #todo: Podemos mudar o nome para wm_change_window_position().
 int 
 gwssrv_change_window_position ( 
     struct gws_window_d *window, 
     unsigned long x, 
     unsigned long y )
 {
-    // #??
-    // Isso deve mudar apenas o deslocamento em relacao
-    // a margem e nao a margem ?
+
+// #??
+// Isso deve mudar apenas o deslocamento em relacao
+// a margem e nao a margem ?
 
     if ( (void *) window == NULL ){
         gwssrv_debug_print("gwssrv_change_window_position: window\n");
@@ -5736,19 +5748,29 @@ gwssrv_change_window_position (
         window->top  = (unsigned long) y;
     }
     */
-    
+
+
+// #bugbug #todo
+// Temos que checar a validade da parent.
+
     window->x = x;
     window->y = y;
-    window->left = (window->parent->left + window->x); 
-    window->top  = (window->parent->top  + window->y); 
+    //if ( (void*) window->parent == NULL ){ return; };
+    window->left = (window->parent->left + window->x);
+    window->top  = (window->parent->top  + window->y);
 
-    // Muda tambem as posiçoes da titlebar.
+// Se overlapped:
+// Muda também as posições da titlebar.
+// Muda também as posições do área de cliente.
     if( window->type == WT_OVERLAPPED )
     {
+        // Title bar window.
         if( (void*) window->titlebar != NULL )
         {
-            window->titlebar->left = ( window->left + window->border_size );
-            window->titlebar->top  = ( window->top  + window->border_size );
+            window->titlebar->left = 
+                ( window->left + window->border_size );
+            window->titlebar->top = 
+                ( window->top  + window->border_size );
         
             //if (window->titlebar->Controls.initialized == TRUE)
             //{
@@ -5756,6 +5778,22 @@ gwssrv_change_window_position (
                 // change position of the controls.
             //}
         }
+
+        // client area . (rectangle).
+
+        // left
+        window->rcClient.left = (unsigned long) 2;  // + borda da esq
+        // top
+        window->rcClient.top = (unsigned long) 2+32;
+        // width
+        // menos bordas laterais
+        window->rcClient.width = 
+            (unsigned long) (window->width -2 -2 );
+        // height
+        // menos bordas superior e inferior
+        // menos a barra de tarefas.
+        window->rcClient.height = 
+            (unsigned long) (window->height -2 -32 -2); 
     }
 
 // #bugbug
