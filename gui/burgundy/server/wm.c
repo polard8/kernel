@@ -11,6 +11,7 @@ extern int gUseMouse;
 
 // Global main structure.
 // Not a pointer.
+// See: window.h
 struct gws_windowmanager_d  WindowManager;
 
 // -------------------------------------
@@ -640,7 +641,12 @@ void wmInitializeStructure(void)
             WindowManager.taskbar = (struct gws_window_d *) taskbar_window;
         }
     }
-    
+
+// fullscreen support.
+    WindowManager.is_fullscreen = FALSE;
+    //WindowManager.is_fullscreen = TRUE;
+    WindowManager.fullscreen_window = NULL;
+
     //WindowManager.box1 = NULL;
     //WindowManager.box2 = NULL;
     //WindowManager.tray1 = NULL;
@@ -655,9 +661,6 @@ void wmInitializeStructure(void)
     WindowManager.wa_top    = 0;
     WindowManager.wa_width  = 0;
     WindowManager.wa_height = 0;
-
-    WindowManager.is_fullscreen = FALSE;
-    //WindowManager.is_fullscreen = TRUE;
 
 // Default background color.
     __set_default_background_color(WM_DEFAULT_BACKGROUND_COLOR);
@@ -1948,14 +1951,15 @@ static void __Tile(void)
     int c=0;
     int i=0;
 
-    if (CONFIG_USE_TILE != 1)
-        return;
-
-    if (current_mode == GRAMADO_JAIL)
-        return;
-
 // Nothing to do.
-    if( WindowManager.initialized != TRUE ){
+
+    if (CONFIG_USE_TILE != 1){
+        return;
+    }
+    if (current_mode == GRAMADO_JAIL){
+        return;
+    }
+    if (WindowManager.initialized != TRUE){
         return;
     }
 
@@ -2019,7 +2023,7 @@ static void __Tile(void)
         if(WindowManager.mode == WM_MODE_TILED)
         {
             // Horizontal
-            if( WindowManager.vertical==FALSE)
+            if(WindowManager.vertical==FALSE)
             {
                 // for titlebar color support.
                 // not the active window.
@@ -2084,7 +2088,7 @@ static void __Tile(void)
             }
 
             // Vertical.
-            if( WindowManager.vertical==TRUE)
+            if(WindowManager.vertical==TRUE)
             {
                 //#todo:
                 //w->height = WindowManager.wa_height; 
@@ -2116,9 +2120,7 @@ void wm_update_window_by_id(int wid)
         return;  
 
     w = (struct gws_window_d *) windowList[wid];
-
-    if((void*)w==NULL){ return; }
-
+    if ( (void*)w==NULL )  { return; }
     if ( w->used != TRUE ) { return; }
     if ( w->magic != 1234 ){ return; }
 
@@ -2176,7 +2178,7 @@ void wm_update_window_by_id(int wid)
     redraw_window(w,FALSE);
     invalidate_window(w);
 
-    // paint the childs of the window with focus.
+// Paint the childs of the window with focus.
     on_update_window(GWS_Paint);
 
 //#todo: string
@@ -2186,7 +2188,7 @@ void wm_update_window_by_id(int wid)
 
 void wm_update_active_window(void)
 {
-    if( (void*) active_window == NULL )
+    if ( (void*) active_window == NULL )
         return;
     if (active_window->magic != 1234)
         return;
@@ -2201,13 +2203,13 @@ void wm_update_active_window(void)
 // com uma estrutura de cliente. 
 // Somente janelas overlapped serao consideradas clientes
 // por essa rotina.
-// Isso sera chamado de dentro do serviço 
-// que cria janelas.
+// Isso sera chamado de dentro do serviço que cria janelas.
 
-int wmManageWindow( struct gws_window_d *w )
+int wmManageWindow(struct gws_window_d *w)
 {
     struct gws_client_d *c;
-    int i=0;
+    struct gws_client_d *tmp;
+    register int i=0;
 
     //yellow_status("wmMan:");
     
@@ -2230,8 +2232,9 @@ int wmManageWindow( struct gws_window_d *w )
     c->w = w->width;
     c->h = w->height;
 
-    for(i=0; i<4; i++)
+    for (i=0; i<4; i++){
         c->tags[i] = TRUE;
+    };
 
     c->pid = w->client_pid;
     c->tid = w->client_tid;
@@ -2240,14 +2243,9 @@ int wmManageWindow( struct gws_window_d *w )
     c->magic = 1234;
 
 // coloca na lista
-
-    struct gws_client_d *tmp;
-    
     tmp = (struct gws_client_d *) first_client;
-    
     if( (void*) tmp == NULL )
         goto fail;
-    
     if( tmp->magic != 1234 )
         goto fail;
     
@@ -4058,20 +4056,28 @@ void wm_change_bg_color(unsigned int color, int tile, int fullscreen)
 
 void wm_enter_fullscreen_mode(void)
 {
+    struct gws_window_d *w;
+
     if (WindowManager.initialized!=TRUE)
         return;
 
-// Se temos a última.
-    if ( (void*) last_window != NULL ){
+// Last window.
+    w = (struct gws_window_d *) last_window;
+    if ( (void*) w != NULL ){
         WindowManager.is_fullscreen = TRUE;
-        wm_update_window_by_id(last_window->id);
+        WindowManager.fullscreen_window = 
+            (struct gws_window_d *) w;
+        wm_update_window_by_id(w->id);
         return;
     }
 
-// Usaremos a primeira então.
-    if ( (void*) first_window != NULL ){
+// First window.
+    w = (struct gws_window_d *) first_window;
+    if ( (void*) w != NULL ){
         WindowManager.is_fullscreen = TRUE;
-        wm_update_window_by_id(first_window->id);
+        WindowManager.fullscreen_window = 
+            (struct gws_window_d *) w;
+        wm_update_window_by_id(w->id);
         return;
     }
 }
