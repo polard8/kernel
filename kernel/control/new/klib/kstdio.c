@@ -7,6 +7,39 @@
 #define HEX_LEN  8
 #define ____INT_MAX  2147483647
 
+//
+// File pointers.
+//
+
+// Standard stream.
+// Initialized by kstdio_initialize() in kstdio.c
+file *stdin;
+file *stdout;
+file *stderr;
+
+// VFS
+// Not initialized yet.
+file *vfs_fp;
+
+// Rootdir for bootvolume and systemvolume.
+// Initialized by fsInit() in fs.c
+file *volume1_rootdir_fp;
+file *volume2_rootdir_fp;
+
+//...
+
+// 0
+//Pipe para a rotina execve particular 
+//usada no no init do ambiente Gramado Core.
+file *pipe_gramadocore_init_execve;
+
+// 1
+//Pipe usado pela rotina execve.
+file *pipe_execve;
+
+
+
+
 static void __clear_prompt_buffers(void);
 
 static void __initialize_file_table(void);

@@ -690,6 +690,9 @@ static int booting_begin(int arch_type)
     refresh_screen_enabled = FALSE;
     screen_size_in_kb = 0;
 
+// #bugbug
+// Para os outros casos o pitch será '0'.
+
     if ( xBootBlock.bpp == 24 || 
          xBootBlock.bpp == 32 )
     {

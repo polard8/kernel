@@ -45,6 +45,11 @@ static pid_t caller_process_id=0;
 int __spinlock_ipc=0;
 //...
 
+
+struct process_d  *KernelProcess;  // Base kernel.
+struct process_d  *InitProcess;    // Init process.
+
+
 //==============================================
 
 
@@ -283,8 +288,9 @@ copy_process_struct(
 {
     struct process_d *Process1;
     struct process_d *Process2;
+    file *__f;
     int Status=0;
-    int i=0;
+    register int i=0;
 
 // #todo
 // Childs personality first of all.
@@ -359,20 +365,20 @@ copy_process_struct(
 // dois processos na sessão crítica.
     Process2->_critical = 0;
 
-// Identificadores.
+// Identificadores
 
     Process2->pid  = (pid_t) p2->pid;         // PID.  O pid do clone.
     Process2->ppid = (pid_t) Process1->pid;   // PPID. O parent do clone é o pid do pai. 
-    
-    Process2->uid  = (uid_t) Process1->uid;   // UID. 
-    Process2->euid = (uid_t) Process1->euid;  // EUID. 
-    Process2->ruid = (uid_t) Process1->ruid;  // RUID. 
-    Process2->suid = (uid_t) Process1->suid;  // SUID. 
-    
-    Process2->gid  = (gid_t) Process1->gid;   // GID. 
-    Process2->egid = (gid_t) Process1->egid;  // EGID. 
-    Process2->rgid = (gid_t) Process1->rgid;  // RGID. 
-    Process2->sgid = (gid_t) Process1->sgid;  // SGID. 
+
+    Process2->uid  = (uid_t) Process1->uid;   // UID
+    Process2->euid = (uid_t) Process1->euid;  // EUID 
+    Process2->ruid = (uid_t) Process1->ruid;  // RUID 
+    Process2->suid = (uid_t) Process1->suid;  // SUID 
+
+    Process2->gid  = (gid_t) Process1->gid;   // GID
+    Process2->egid = (gid_t) Process1->egid;  // EGID 
+    Process2->rgid = (gid_t) Process1->rgid;  // RGID 
+    Process2->sgid = (gid_t) Process1->sgid;  // SGID 
     Process2->pgrp = Process1->pgrp;
 
 // validation.
@@ -525,8 +531,6 @@ copy_process_struct(
 // Imagine um processo que fechou um dos três arquivos e agora
 // vamos clonar sem o fluxo padrão em ordem.
 
-    file *__f;
-
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
         // Copy
@@ -616,20 +620,16 @@ fail:
 
 struct process_d *processObject(void)
 {
-    struct process_d  *Tmp;
-
-    Tmp = (void *) kmalloc( sizeof(struct process_d) );
-    if ( (void *) Tmp == NULL ){
+    struct process_d *p;
+    p = (void *) kmalloc( sizeof(struct process_d) );
+    if ( (void *) p == NULL ){
         return NULL;
     }
-
 // #todo
 // Maybe we can clean up the structure
 // or initialize some basic elements.
-
-    return (struct process_d *) Tmp;
+    return (struct process_d *) p;
 }
-
 
 /*
  * getNewPID:

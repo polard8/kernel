@@ -1427,31 +1427,25 @@ void exit_current_thread(void)
  *     Clona uma thread.
  *     Usado no suporte a fork e execução de novos processos.
  */
-
 // OUT:
 // Pointer for the clone.
 
-struct thread_d *copy_thread_struct ( struct thread_d *thread )
+struct thread_d *copy_thread_struct(struct thread_d *thread)
 {
-    struct thread_d  *father;
-    struct thread_d  *clone;
-
+    struct thread_d *father;
+    struct thread_d *clone;
     // Counters
     int w=0;
     int q=0;
 
-
     debug_print("copy_thread_struct:\n");
-
 
     // A thread que vai ser copiada.
     father = thread;
     if ( (void *) father == NULL ){
         panic ("copy_thread_struct: father\n");
     }
-
-    if(father->magic!=1234)
-    {
+    if(father->magic!=1234){
         debug_print("copy_thread_struct: father validation\n");
               panic("copy_thread_struct: father validation\n");
     }
@@ -1854,7 +1848,7 @@ struct thread_d *copy_thread_struct ( struct thread_d *thread )
 	while(1){}
 */
 
-    debug_print("copy_thread_struct: done\n");
+    //debug_print("copy_thread_struct: done\n");
     
 // Returning the pointer for the clone.
 

@@ -24,24 +24,23 @@ int g_inputmode;
 // Esses serão os valores de referência
 // para todos os projetos.
 
-#define  __SLBF 0x0001    /* line buffered */
-#define  __SNBF 0x0002    /* unbuffered */
-#define  __SRD  0x0004    /* OK to read */
-#define  __SWR  0x0008    /* OK to write */
+#define __SLBF  0x0001    /* line buffered */
+#define __SNBF  0x0002    /* unbuffered */
+#define __SRD   0x0004    /* OK to read */
+#define __SWR   0x0008    /* OK to write */
 
 /* RD and WR are never simultaneously asserted */
-#define  __SRW  0x0010    /* open for reading & writing */
-#define  __SEOF 0x0020    /* found EOF */
-#define  __SERR 0x0040    /* found error */
-#define  __SMBF 0x0080    /* _buf is from malloc */
-#define  __SAPP 0x0100    /* fdopen()ed in append mode */
-#define  __SSTR 0x0200    /* this is an sprintf/snprintf string */
-#define  __SOPT 0x0400    /* do fseek() optimization */
-#define  __SNPT 0x0800    /* do not do fseek() optimization */
-#define  __SOFF 0x1000    /* set iff _offset is in fact correct */
-#define  __SMOD 0x2000    /* true => fgetln modified _p text */
-#define  __SALC 0x4000    /* allocate string space dynamically */
-
+#define __SRW   0x0010    /* open for reading & writing */
+#define __SEOF  0x0020    /* found EOF */
+#define __SERR  0x0040    /* found error */
+#define __SMBF  0x0080    /* _buf is from malloc */
+#define __SAPP  0x0100    /* fdopen()ed in append mode */
+#define __SSTR  0x0200    /* this is an sprintf/snprintf string */
+#define __SOPT  0x0400    /* do fseek() optimization */
+#define __SNPT  0x0800    /* do not do fseek() optimization */
+#define __SOFF  0x1000    /* set iff _offset is in fact correct */
+#define __SMOD  0x2000    /* true => fgetln modified _p text */
+#define __SALC  0x4000    /* allocate string space dynamically */
 
 
 /*
@@ -299,7 +298,7 @@ unsigned long syncList[SYNC_COUNT_MAX];
 //
 
 /*
- * FILE:
+ * file_d:
  *     File structure.
  *     ring 0.
  */
@@ -324,22 +323,15 @@ struct file_d
 // The buffer size,
 // 0 or -_bf._size, for inline putc 
     int _lbfsize;
-
 // #todo: file size.
 // #test
     int _fsize;
-
 // Number of available characters in buffer.
     int   _cnt;
-
 // The buffer (at least 1 byte, if !NULL)
     struct __sbuf _bf;
 
-    // Operations 
-    // #todo: Please, do not use virtual functions for now!
-    // See: __P in sys/cdefs.h
-    
-    // cookie passed to io functions
+// cookie passed to io functions
     void *_cookie; 
 
     short _flags;
@@ -347,8 +339,8 @@ struct file_d
     //file extension 
     struct __sbuf _ext;
 
-	// separate buffer for long sequences of ungetc() 
-	// saved _p when _p is doing ungetc data 
+// separate buffer for long sequences of ungetc() 
+// saved _p when _p is doing ungetc data 
     unsigned char *_up;
     // saved _r when _r is counting ungetc data
     int _ur;
@@ -357,13 +349,12 @@ struct file_d
     unsigned char _ubuf[3];   // guarantee an ungetc() buffer 
     unsigned char _nbuf[1];   // guarantee a getc() buffer 	
 
-    //separate buffer for fgetln() when line crosses buffer boundary 
-    struct __sbuf _lb;	// buffer for fgetln() 
+// Separate buffer for fgetln() when line crosses buffer boundary 
+    struct __sbuf _lb;  // buffer for fgetln() 
 
-	//Unix stdio files get aligned to block boundaries on fseek() 
-    int _blksize;       // stat.st_blksize (may be != _bf._size) 
-    fpos_t _offset;     // current lseek offset 		
-
+// Unix stdio files get aligned to block boundaries on fseek() 
+    int _blksize;    // stat.st_blksize (may be != _bf._size) 
+    fpos_t _offset;  // current lseek offset
 
     int   _charbuf;
    // =============================
@@ -379,17 +370,17 @@ struct file_d
 
     struct kstdio_sync_d  sync;
 
-    // Contador de descritores de arquivo que usam essa mesma estrutura.
-    // we need to synchronize the readers.
+// Contador de descritores de arquivo que usam essa mesma estrutura.
+// we need to synchronize the readers.
     int fd_counter;
 
-    // Que thread está esperando por
-    // alguma operação no arquivo.
-    // pode ser um socket, um pipe.
-    // >>> a thread pode esperar quando quer ler mais está vazio.
-    // pode esperar quando quer escrever mas ta cheio.
-    // ?? pode esperar por escrita ??
-    // >> acorda quem estava esperando pra escrever.
+// Que thread está esperando por
+// alguma operação no arquivo.
+// pode ser um socket, um pipe.
+// >>> a thread pode esperar quando quer ler mais está vazio.
+// pode esperar quando quer escrever mas ta cheio.
+// ?? pode esperar por escrita ??
+// >> acorda quem estava esperando pra escrever.
     //struct thread_d *thread_waiting; 
     int tid_waiting;
     int socket_buffer_full;
@@ -404,17 +395,18 @@ struct file_d
 
     // The file it self is the transmitions agent.
 
-	// fileno, if Unix descriptor, else -1
-	// UNIX System file descriptor
+// fileno, if Unix descriptor, else -1
+// UNIX System file descriptor
+// #bugbug: use 'int'.
     short _file;
 
     struct inode_d   *inode;
     struct socket_d  *socket;
 
     //pipe ??
-    
-    // A estrutura de arquivos aponta para tabela global de 
-    // arquivos abertos.
+
+// A estrutura de arquivos aponta para tabela global de 
+// arquivos abertos.
     int filetable_index;
 
     // A estrutura de arquivos aponta para a tabela de inodes.
@@ -438,6 +430,10 @@ struct file_d
 
     int iopl;
 
+// Operations 
+// #todo: Please, do not use virtual functions for now!
+    // See: __P in sys/cdefs.h
+
     // #deprecated
     //int (*_close) __P((void *));
     //int (*_read)  __P((void *, char *, int));
@@ -451,20 +447,15 @@ struct file_d
 // TRUE = Yes, it is a device.
 // Se for um dispositivo, então a estrutura abaixo deve ser usada.
 // #todo: change to 'is_device'
-
     int isDevice;
-
 // Índice na lista deviceList[]
 // #bugbug: Esse indice deve estar contido na
 // estrutura apontada logo abaixo.
-
     int deviceId;
-
 // #importante
 // A estrutura do dispositivo associado à esse arquivo.
 // Abrindo esse arquivo, se ele for um objeto do tipo
 // dispositivo, ent~ao io_control vai poder configura-lo
-
     struct device_d  *device;
 };
 
@@ -473,28 +464,26 @@ typedef struct file_d  file;
 
 //-----------------------------------------------
 
-//
-// file table.
-//
-
-// file pointers.
+// File pointers.
+// see: kstdio.c
 
 // Standard stream.
 // Initialized by kstdio_initialize() in kstdio.c
-file *stdin;
-file *stdout;
-file *stderr;
-
+extern file *stdin;
+extern file *stdout;
+extern file *stderr;
 // VFS
 // Not initialized yet.
-file *vfs_fp;
-
+extern file *vfs_fp;
 // Rootdir for bootvolume and systemvolume.
 // Initialized by fsInit() in fs.c
-file *volume1_rootdir_fp;
-file *volume2_rootdir_fp;
-
+extern file *volume1_rootdir_fp;
+extern file *volume2_rootdir_fp;
 //...
+
+//
+// file table.
+//
  
 unsigned long file_table[NUMBER_OF_FILES]; 
 
@@ -519,15 +508,14 @@ int kstdio_standard_streams_initialized;
 // 0
 //Pipe para a rotina execve particular 
 //usada no no init do ambiente Gramado Core.
-file *pipe_gramadocore_init_execve;
-
+extern file *pipe_gramadocore_init_execve;
 // 1
 //Pipe usado pela rotina execve.
-file *pipe_execve;
+extern file *pipe_execve;
 
 //Continua ...
 
-#define NUMBER_OF_PIPES 8
+#define NUMBER_OF_PIPES  8
 unsigned long Pipes[NUMBER_OF_PIPES];
 
 // ========================================================
@@ -591,16 +579,6 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 //#define __sputc(x, p) fputc(x, p)
 
 
-
-/*
- * Diret�rios onde a pesquisa deve ser feita.
- * Isso � configur�vel.
- * 
- */
-
-//unsigned long Search[9]; 
-
-
 //
 // == prototypes ============================
 //
@@ -638,20 +616,6 @@ printi (
     int letbase );
 
 int print ( char **out, int *varg );
-
-
-//
-// == printk ===============================================
-//
-
-//https://en.wikipedia.org/wiki/Printk
-
-//#define  printf printk
-//#define kprintf printk
-
-#define printf   kinguio_printf
-#define printk   kinguio_printf
-#define sprintf  mysprintf
 
 //=============================================
 
@@ -712,6 +676,19 @@ regularfile_ioctl (
     unsigned long arg );
 
 int kstdio_initialize (void);
+
+
+//
+// == printk ===============================================
+//
+
+//https://en.wikipedia.org/wiki/Printk
+//#define  printf printk
+//#define kprintf printk
+#define printf   kinguio_printf
+#define printk   kinguio_printf
+#define sprintf  mysprintf
+
 
 #endif    
 

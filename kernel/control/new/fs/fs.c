@@ -603,13 +603,12 @@ sys_read (
     if (ubuf_len > count )
         ubuf_len = count;
 
-    //#fixme
-    if (ubuf_len > 512)
-    {
+// #fixme: The buffer is too small.
+
+    if (ubuf_len > 512){
         debug_print ("sys_read: [FIXME] limiting ubuf_len \n");
         //ubuf_len = 512;
     }
-
 
 //
 // File

@@ -421,8 +421,6 @@ struct process_d
 // de p�ginas usadas por esse processo.
 // #obs: A lista � grande. Ent�o devemos fazer apenas um ponteiro para 
 // ela, ou colocarmos um ponteiro de estrutura head de uma lista encadeada.
-// #importante: esssa estrutura tem que ser simples. Com poucos elementos.
-// Poderemos usar essas informa��es para clonar o processo.
 
 // Base da imagem do processo.
 // Tamanho da imagem do processo.
@@ -703,13 +701,6 @@ struct process_d
 
 // ===================================================
 
-// The search paths for a process.
-// It's a list of pointer to strings.
-// Each string has a path for a different directory.
-// #bugbug: I don't wanna see a double pointer here.
-
-    //char **search_paths;
-
 // @todo:
 // Outros:
 //tempo de cpu.
@@ -727,8 +718,7 @@ struct process_d
 
 // wait4pid: 
 // O processo esta esperando um processo filho fechar.
-// Esse � o PID do processo que ele est� esperando fechar.
-
+// Esse é o PID do processo que ele está esperando fechar.
     pid_t wait4pid;
 
 // Número de processos filhos.
@@ -805,24 +795,14 @@ struct process_d
     struct process_d  *next;
 };
 
-struct process_d  *KernelProcess;  // Base kernel.
-struct process_d  *InitProcess;    // Init process.
-
-
-/*
- *    processList:
- *        Tabela de processos.
- * 
- *    **** LONG-TERM SCHEDULER FOR PROCESSES ****
- *
- *     Essa � a thread job list, ou job queue.
- *     Armazena todos os processos do sistema.
- *     os que est�o residentes na memoria ram e as que n�o est�o.
- */ 
+// see: process.c
+extern struct process_d  *KernelProcess;  // Base kernel.
+extern struct process_d  *InitProcess;    // Init process.
 
 // Max number of processes.
 #define  PROCESS_COUNT_MAX  1024 
 
+// Process table.
 unsigned long processList[PROCESS_COUNT_MAX];
 
 
@@ -853,13 +833,16 @@ copy_process_struct(
     struct process_d *p1,
     struct process_d *p2 );
 
-pid_t copy_process ( const char *filename, pid_t pid, unsigned long clone_flags );
+pid_t 
+copy_process( 
+    const char *filename, 
+    pid_t pid, 
+    unsigned long clone_flags );
 
 //==============
 // plib.c
 void show_currentprocess_info (void);
 void show_process_information (void);
-
 
 unsigned long get_process_stats ( pid_t pid, int index );
 
@@ -870,7 +853,6 @@ pid_t getNewPID (void);
 int processTesting (int pid);
 int processSendSignal (struct process_d *p, unsigned long signal);
 void init_processes (void);
-
 
 void close_all_processes(void);
 
@@ -895,10 +877,10 @@ struct process_d *create_process (
 
 // ===
 
-unsigned long GetProcessPML4_PA ( struct process_d *process );
-unsigned long GetProcessPML4_VA ( struct process_d *process );
+unsigned long GetProcessPML4_PA(struct process_d *process);
+unsigned long GetProcessPML4_VA(struct process_d *process);
 
-unsigned long GetProcessHeapStart ( pid_t pid );
+unsigned long GetProcessHeapStart(pid_t pid);
 
 void 
 SetProcessPML4_VA ( 
@@ -910,13 +892,12 @@ SetProcessPML4_PA (
     struct process_d *process, 
     unsigned long pa );
 
-
 int get_caller_process_id (void);
 void set_caller_process_id (int pid);
 
 int init_process_manager (void);
 
-int alloc_memory_for_image_and_stack ( struct process_d *process );
+int alloc_memory_for_image_and_stack(struct process_d *process);
 
 // Critical section
 #define __GATE_CLOSED    0
@@ -932,23 +913,6 @@ int process_get_tty (int pid);
 // Create and initialize a process structure.
 struct process_d *create_and_initialize_process_object(void);
 
-
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
