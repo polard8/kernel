@@ -1185,7 +1185,7 @@ void *sci0 (
 // Marcamos no processo nossa intenção de fechar.
 // Marcamos na thread de controle nossa intenção de fechar.
 // #todo: as outras threads do processo.
-    if (number == SYS_EXIT )
+    if (number == SYS_EXIT)
     {
         debug_print("sci0: SYS_EXIT\n");
         p->exit_in_progress = TRUE;
@@ -1233,14 +1233,11 @@ void *sci0 (
     // desktopID = (int) get_current_desktop_id ();
 
 
+// Extra services
 
-// extra services
-
-    if ( number > 256 ){
+    if (number>256){
         return (void *) __extra_services(number,arg2,arg3,arg4);
-        return NULL;
     }
-
 
 // Switch
 
@@ -1404,8 +1401,8 @@ void *sci0 (
                                 (int)          arg4 );  
             break;
 
-        // BUFFERS  20 21 22 23 
- 
+        // Buffers support: 20~23 
+        // Windows support: 24~28
  
         // 33 - free number.
 
@@ -1416,8 +1413,9 @@ void *sci0 (
                 (unsigned long) arg2, 
                 (unsigned long) arg3 );
             return NULL;
-            break; 
+            break;
 
+        // 35 - free number.
         // ...
 
         // 38 - get host name  
@@ -1451,18 +1449,16 @@ void *sci0 (
             return (void *) sys_create_empty_file( (char *) arg2 );
             break;
 
-        // 44 -Create an empty directory.
+        // 44 - Create an empty directory.
         // See: fs.c
         case 44:
             return (void *) sys_create_empty_directory ( (char *) arg2 );
             break;
 
-
         // 45 - livre
         // usar para manipulação de arquivo ou diretório.
-        
-        
-        // 46 ~ 49 (usar para cpu support)
+
+        // 46 ~ 48 (usar para cpu support)
 
 
         // 47 - livre
@@ -1472,21 +1468,18 @@ void *sci0 (
             return NULL;
             break;
 
-
         // 48 - livre
 
         // 49 - livre
         // Show system info
         // See: sys.c
         case 49:
-            sys_show_system_info ((int) arg2);
+            sys_show_system_info((int) arg2);
             return NULL;
             break;
 
-
-        // A lot of window services.
         // ...
-
+        
         // 65
         // Put a char in the current virtual console.
         // see: console.c
@@ -1590,19 +1583,18 @@ void *sci0 (
             break;
 
 
-
-		//80 Show current process info.
-		//#todo: Mostrar em uma janela pr�pria.
-		//#todo: Devemos chamar uma fun��o que mostre informa��es 
-		//apenas do processo atual. 
+        // 80 - Show current process info.
+        // #todo: Mostrar em uma janela própria.
+        // #todo: Devemos chamar uma função que 
+        // mostre informações apenas do processo atual. 
         case SYS_CURRENTPROCESSINFO:
             show_currentprocess_info();
             return NULL;
             break;
 
-
         // 81
-        // See: sci/sys/sys.c
+        // Get parent process id.
+        // See: sys.c
         case SYS_GETPPID: 
             return (void *) sys_getppid();
             break;
@@ -1614,7 +1606,7 @@ void *sci0 (
             break;
 
         // 83
-        // Suporte � chamada da libc waitpid(...).
+        // Suporte a chamada da libc waitpid(...).
         // schedi.c
         // #todo.
         // TID, PID 
@@ -1654,13 +1646,18 @@ void *sci0 (
             return (void *) processTesting (arg2);
             break;
 
-        // free: 91 92 93
+        // ------------------
+        // 90~99 Reservado para thread support
 
         // 94
         case SYS_STARTTHREAD:
             debug_print("sci0: SYS_STARTTHREAD\n");
             return (void *) newos_start_thread ( (struct thread_d *) arg2 );
             break;
+
+        // ------------------
+
+        // 100~109: free
 
         // 110
         // Use 'int'
@@ -1691,7 +1688,7 @@ void *sci0 (
             return (void *) sys_post_message_to_tid( (int) arg2, (unsigned long) arg3 );
             break;
 
-        // ...
+        // 113~119: free
 
         // 120
         // Get a message given the index.
@@ -1702,12 +1699,11 @@ void *sci0 (
                 (unsigned long) &message_address[0], arg3, arg4 );
             break;
 
-
-		// 124	 (teste)
-		// Defered system procedure call.
-		// #todo: 
-		// Precisamos armazenasr os argumentos em algum lugar.
-		// #bugbug: Precisamos criar um request.
+        // 124 (teste)
+        // Defered system procedure call.
+        // #todo: 
+        // Precisamos armazenasr os argumentos em algum lugar.
+        // #bugbug: Precisamos criar um request.
         case 124:
             kernel_request = KR_DEFERED_SYSTEMPROCEDURE;
             return NULL;
@@ -1746,10 +1742,11 @@ void *sci0 (
             return NULL;
             break;
 
+        // 128~131: free
 
         // 132 - d_draw_char
         // Desenha um caractere e pinta o pano de fundo.
-        // #todo: We do not hae an api routine yet.
+        // #todo: We do not have an api routine yet.
         // IN: x, y, c, fg color, bg color
         case 132: 
             d_draw_char(
@@ -1773,8 +1770,7 @@ void *sci0 (
             return NULL;
             break;
 
-        // 135 - livre.
-        // 136 - livre.
+        // 134~136: free
 
         // 137 - #deprecated.
         case SYS_GETCH:
@@ -1782,40 +1778,41 @@ void *sci0 (
             return NULL;
             break;
 
-        // 138 - get key state.
+        // 138 - Get key state.
         // IN: vk.
         case 138:
-            return (void *) keyboardGetKeyState ( (unsigned char) arg2 );
+            return (void *) keyboardGetKeyState( (unsigned char) arg2 );
             break;
 
+
+        // 150~156 User and group support.
 
         // 152 - get uid
         case SYS_GETCURRENTUSERID:  
             return (void *) current_user; 
             break;
-
-        // 153
-
         // 154 - get gid
         case SYS_GETCURRENTGROUPID: 
             return (void *) current_group; 
             break;
 
+        // 157~159: Security
 
         // 157 - get user session id
         case SYS_GETCURRENTUSERSESSION:
             return (void *) current_usersession; 
             break;
-
         // 158 - get room id (window station)
         case SYS_GETCURRENTWINDOWSTATION:
             return (void *) current_room;  
             break;
-
         // 159 - get desktop id
         case SYS_GETCURRENTDESKTOP:
             return (void *) current_desktop; 
             break;
+
+        // ----------------
+        // 160~169: Reserved to network support.
 
         // 161
         // get socket IP
@@ -1843,13 +1840,7 @@ void *sci0 (
             break;
 
 
-        // 164 - livre. 
-        // socket stuff
-        // case 165:  break;
-        // socket stuff
-        // case 166:  break;
-        // 167 - livre.
-
+        // ----------------
 
         // 170 - command 'pwd'.
         // Cada processo tem seu proprio pwd.
@@ -1881,15 +1872,14 @@ void *sci0 (
             break;
 
         // 173
-        // Lista arquivos de um diret�rio, dado o n�mero do disco,
-        // o numero do volume e o n�mero do diret�rio,
+        // Lista arquivos de um diretório, dado o número do disco,
+        // o numero do volume e o número do diretório,
         // args in: disk id, volume id, directory id
         // See: fs.c
         case SYS_LISTFILES:
             fsListFiles ( arg2, arg3, arg4 );  
             return NULL;
             break;
-
 
         // 174
         case SYS_SEARCHFILE:
@@ -1912,7 +1902,7 @@ void *sci0 (
             break;
 
         // 176
-        // Remove n nomes de diret�rio do pathname do processo 
+        // Remove n nomes de diretório do pathname do processo 
         // indicado no argumento.
         // Copia o nome para a string global.
         case 176:
@@ -1939,6 +1929,8 @@ void *sci0 (
             return (void *) sys_get_file_size ( (unsigned char *) arg2 );
             break;
 
+        //----------
+        // 180~189: memory support.
 
         // 184
         // Pega o endereço do heap do processo dado seu id.
@@ -1947,6 +1939,15 @@ void *sci0 (
             debug_print("sci0: [184]\n");
             return (void *) GetProcessHeapStart ( (int) arg2 );
             break;
+
+        //----------
+        
+        // 190~199: free
+        // 200~209: free
+
+        //----------
+
+        // 210~219: terminal/virtual console support.
 
         //211
         case SYS_GETCURRENTTERMINAL:
@@ -1958,7 +1959,9 @@ void *sci0 (
             current_terminal = (int) arg2;
             break;
 
-        // 223 - get sys time info.
+        //----------
+
+        // 223 - Get sys time info.
         // informaçoes variadas sobre o sys time.
         case 223:
             return (void *) get_systime_info ( (int) arg2 );
@@ -1997,29 +2000,25 @@ void *sci0 (
             return NULL;
             break;
 
-
-		// 232 - livre
-		// 233 - livre
-		// 234 - livre 
-		// 235 - livre
-
-        // tty ... 236 237 238 239.
+        //---------------------
+        // 230~239: Reserved for tty support.
 
         // 236 - get tty id
         case 236:
             return (void *) current_tty;
             break;
 
+        //---------------------
+        
+        // 240~249: Reserved for text editing support.
+        
         // 240, 241
-        case SYS_GETCURSORX:  return (void *) get_cursor_x();  break;
-        case SYS_GETCURSORY:  return (void *) get_cursor_y();  break;
-
+        case SYS_GETCURSORX:  return (void *) get_cursor_x(); break;
+        case SYS_GETCURSORY:  return (void *) get_cursor_y(); break;
         // ...
-
 
         // =====================================
         // (250 ~ 255) - Info support.
-
 
         // 250
         case SYS_GETSYSTEMMETRICS:

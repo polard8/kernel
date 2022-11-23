@@ -431,7 +431,6 @@ void die(void)
         refresh_screen();
     }
     __a_soft_place_to_fall();
-
     die();
 }
 
@@ -498,7 +497,7 @@ void doSetupVersion(void)
 /*
  * init_executive:
  *     Initialize the kernel executive.
- *     Archtecture (independent) inicialization. 
+ *     Architecture (independent) inicialization. 
  */
 // called by I_Init().
 // Probe PCI devices.
