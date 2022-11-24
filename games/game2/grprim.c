@@ -277,7 +277,6 @@ int grInit (void)
 
     // ...
 
-    //gwssrv_debug_print ("grInit: done\n");
     return 0;
 }
 
@@ -371,6 +370,7 @@ int cameraF_initialize(void)
     CurrentCameraF.lookat.z = (float) 0.0f;
 
     CurrentCameraF.initialized = TRUE;
+
     return 0;
 }
 
@@ -2034,10 +2034,8 @@ void __rectangleZZ(struct gr_rectangle_d *rect)
          0 );
 }
 
-
-int grRectangle( struct gr_rectangle_d *rect )
+int grRectangle(struct gr_rectangle_d *rect)
 {
-
     if( (void*) rect == NULL )
         return -1;
 
@@ -2570,9 +2568,7 @@ plotTriangleF(
 // Using 'int',
     struct gr_triangle_d final_triangle;
 
-    if (CurrentProjectionF.initialized != TRUE)
-    {
-        //#debug
+    if (CurrentProjectionF.initialized != TRUE){
         printf("plotTriangleF: CurrentProjectionF\n");
         return (int) npixels;
     }
@@ -2608,10 +2604,10 @@ plotTriangleF(
     {
         znear = (float) CurrentProjectionF.znear;
         zfar  = (float) CurrentProjectionF.zfar;
-        
+
         window_width  = (unsigned long) CurrentProjectionF.width;
         window_height = (unsigned long) CurrentProjectionF.height;
-        
+
         ar = 
             (float)((float) window_height / (float) window_width );
         
@@ -2651,24 +2647,42 @@ plotTriangleF(
     if (t->p[2].z > zfar){ return 0; }
 
 // #test
-// Ficando menor conforma z aumenta.
+// Ficando menor conforme z aumenta.
 
-    if(t->p[0].z != 0.0f)
+    if (t->p[0].z != 0.0f)
     {
-        t->p[0].x = (float) (t->p[0].x/t->p[0].z);  
+        t->p[0].x = (float) (t->p[0].x/t->p[0].z);
         t->p[0].y = (float) (t->p[0].y/t->p[0].z);
     }
-    if(t->p[1].z != 0.0f)
+    if (t->p[1].z != 0.0f)
     {
-        t->p[1].x = (float) (t->p[1].x/t->p[1].z); 
+        t->p[1].x = (float) (t->p[1].x/t->p[1].z);
         t->p[1].y = (float) (t->p[1].y/t->p[1].z);
     }
-    if(t->p[2].z != 0.0f)
+    if (t->p[2].z != 0.0f)
     {
-        t->p[2].x = (float) (t->p[2].x/t->p[2].z); 
+        t->p[2].x = (float) (t->p[2].x/t->p[2].z);
         t->p[2].y = (float) (t->p[2].y/t->p[2].z);
     }
 
+/*
+ //#wrong?
+    if (t->p[0].z != 0.0f)
+    {
+        t->p[0].x = (float) (t->p[0].x / t->p[0].z * tanf(45.5f/2) );
+        t->p[0].y = (float) (t->p[0].y / t->p[0].z * tanf(45.5f/2));
+    } 
+    if (t->p[1].z != 0.0f)
+    {
+        t->p[1].x = (float) (t->p[1].x/t->p[1].z * tanf(45.5f/2));
+        t->p[1].y = (float) (t->p[1].y/t->p[1].z * tanf(45.5f/2));
+    }
+    if (t->p[2].z != 0.0f)
+    {
+        t->p[2].x = (float) (t->p[2].x/t->p[2].z * tanf(45.5f/2));
+        t->p[2].y = (float) (t->p[2].y/t->p[2].z * tanf(45.5f/2));
+    }
+*/
 
 // scale
 // Ajustando à tela.
@@ -4386,13 +4400,12 @@ interpolate_color(
 unsigned int invert_color(unsigned int color)
 {
     unsigned int Color = (unsigned int) (color ^ 0x00FFFFFF);
-
     return (unsigned int) Color;
 }
 
 
 //
-// End.
+// End
 //
 
 

@@ -2,8 +2,8 @@
 
 	This is a funny plane.
 	A place for games, tests and hacks.
-	
-----------------	
+
+----------------
 bin/
     ...
 ----------------
