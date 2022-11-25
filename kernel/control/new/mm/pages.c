@@ -624,33 +624,28 @@ static void mmSetupMemoryUsage(void)
  * I_initialize_frame_table:
  *     Frame table to handle a pool of page frames.
  */
-
 // See:
 // x64mm.h
 
-int I_initialize_frame_table (void)
+int I_initialize_frame_table(void)
 {
     int i=0;
 
     debug_print("I_initialize_frame_table:\n");
 
 // Clear
+    FT.initialized = FALSE;
     FT.used  = FALSE;
     FT.magic = 0;
-    FT.initialized = FALSE;
-
 
 //
-// ==============================================================================
+// ===================================================================
 //
-
 
 // #important
 // Vamos configurar a frame table de acordo com o total de memória RAM.
 // 'memorysizeTotal' is the ram size in KB.
 // Configura apenas o início e o fim.
-// O resto da tabela será configurado pela função
-// I_initialize_frame_table() 
 // Start:
 // FRAME_TABLE_START_PA
 // This is the start of the table.
@@ -660,29 +655,19 @@ int I_initialize_frame_table (void)
 // This is the end of the table.
 // See:
 // x64gpa.h
-
-    debug_print ("I_initialize_frame_table: Setup FT\n");
-
 // Setup the start of the table.
 // It's always the same.
 // We need at least 256 MB.
 // The system with 256MB has no FT.
 // We need more them this to have a FT.
-
-// ===================
-// Start
-    FT.start_pa = __128MB_MARK_PA;
-    //FT.start_pa = __256MB_MARK_PA;
-    //FT.start_pa = __512MB_MARK_PA;
-    //FT.start_pa = __1GB_MARK_PA;
-
-// ===================
-// End
-// (Uninitialized)
 // It will depend on the size of the RAM.
 // This routine will find this value.
-    FT.end_pa = 0;
 
+    debug_print ("I_initialize_frame_table: Setup FT\n");
+
+// Default start and end values.
+    FT.start_pa = __128MB_MARK_PA;
+    FT.end_pa   = __128MB_MARK_PA;
 
 // =================================================
 // Size in KB.
@@ -748,39 +733,39 @@ int I_initialize_frame_table (void)
 
 //#bugbug: x_panic is not available yet.
 
-    if ( memorysizeTotal < (250*1024) )
-    {
+    if ( memorysizeTotal < (250*1024) ){
         debug_print ("I_initialize_frame_table: [PANIC] The system has less than 250MB of available RAM\n");
         x_panic     ("I_initialize_frame_table: less than 250MB \n");
     }
 
-// Não é menor que 250MB
-// __256MB_MARK_PA?
-    FT.end_pa = (unsigned long)(250*1024*1024);
+// Não é menor que 250MB.
+// 250*1024*1024 = 268435456 = 0x10000000.
+    FT.end_pa = (unsigned long) __256MB_MARK_PA;
 
 //============================================================
-
-//
 // Initializing all the other elements of the frame table.
-//
-
 initialize_frame_table:
 
 // #bugbug
 // Slow. Use a define for this value.
+// 250*1024*1024 = 268435456 = 0x10000000.
 
-    if ( FT.end_pa < (250*1024*1024) )
-    {
-        debug_print ("I_initialize_frame_table: [PANIC] less than 250MB.\n");
-        //#todo: panic
+    if ( FT.end_pa < __256MB_MARK_PA ){
+        debug_print ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA\n");
+         x_panic    ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA");
     }
 
+    if ( FT.end_pa < FT.start_pa ){
+        debug_print ("I_initialize_frame_table: FT.end_pa < FT.start_pa\n");
+         x_panic    ("I_initialize_frame_table: FT.end_pa < FT.start_pa");
+    }
 
 // Total size in KB.
-    mm_used_frame_table = (unsigned long)((FT.end_pa - FT.start_pa)/1024);
+    mm_used_frame_table = 
+        (unsigned long)((FT.end_pa - FT.start_pa)/1024);
 
 //
-// ==============================================================================
+// ====================================================================
 //
 
     if( FT.start_pa == 0 ){
@@ -793,32 +778,21 @@ initialize_frame_table:
          x_panic    ("I_initialize_frame_table: FT.end_pa\n");
     }
 
-
 // Size in bytes.
 // Size in KB.
 // Size in MB.
-
     FT.size_in_bytes = (unsigned long) (FT.end_pa - FT.start_pa);
     FT.size_in_kb    = (unsigned long) (FT.size_in_bytes/1024);
     FT.size_in_mb    = (unsigned long) (FT.size_in_kb/1024);
 
-
 // Size in frames.
 // Each frame has 4096 bytes. 
 // This is because each page has 4096 bytes.
-
     FT.size_in_frames = (unsigned long) (FT.size_in_bytes/4096);
-
     FT.number_of_system_frames = (unsigned long) FT_NUMBER_OF_SYSTEM_FRAMES;
     FT.number_of_user_frames   = (unsigned long) FT_NUMBER_OF_USER_FRAMES;
-
 // Número de frames gerenciados por essa estrutura.
     FT.number_of_used_frames = (unsigned long) FT_TOTAL_FRAMES;
-
-// Número de frames que sobraram na área alocável
-// e que poder ser usados por outro componente do sistema.
-    FT.number_of_reserved_frames = (unsigned long) (FT.size_in_frames - FT.number_of_used_frames);
-
 
 // O número de frames contidos na área alocável
 // não pode ser menor que a quantidade de frames gerenciados por
@@ -829,14 +803,17 @@ initialize_frame_table:
         x_panic    ("I_initialize_frame_table: FT.size_in_frames\n");
     }
 
-//done:
+// Número de frames que sobraram na área alocável
+// e que poder ser usados por outro componente do sistema.
+    FT.number_of_reserved_frames = 
+        (unsigned long) (FT.size_in_frames - FT.number_of_used_frames);
+
     FT.used = TRUE;
     FT.magic = 1234;
     FT.initialized = TRUE;
-    debug_print("I_initialize_frame_table: done\n");
+
     return 0;
 }
-
 
 // Checar se a estrutura de página é nula
 // This is very ugly
@@ -844,7 +821,6 @@ int pEmpty (struct page_d *p)
 {
     return (p == NULL) ? TRUE : FALSE;
 }
-
 
 // Selecionar a página como livre.
 void freePage (struct page_d *p)
@@ -1295,7 +1271,6 @@ mm_fill_page_table(
     unsigned long region_2mb_pa,
     unsigned long flags )
 {
-
     register int i=0;
     unsigned long *dir = (unsigned long *) directory_va;
     unsigned long *pt  = (unsigned long *) pt_va;
@@ -1424,12 +1399,11 @@ static void __initialize_ring0area(void)
 // kernel_address_pa: 
 // Início da memória RAM.
     unsigned long kerneladdress_pa = (unsigned long) SYSTEM_ORIGIN;
-      
+
     g_ring0area_va = (unsigned long) RING0AREA_VA;
-      
-        
-    mm_used_ring0_area = (1024 * 1);  //1mb, pois seremos sobrepostos pela imagem do kernel.  
-    // mm_used_ring0_area = (1024 * 2);  
+
+// 1MB, pois seremos sobrepostos pela imagem do kernel.  
+    mm_used_ring0_area = (1024 * 1);  
 
     // kernel_address_pa = 0h;
     // (0fis = 0virt)
@@ -1459,7 +1433,7 @@ static void __initialize_ring0area(void)
         (unsigned long) KERNEL_PD_PA,       // pd 
         (int) PD_ENTRY_RING0AREA,           // entry
         (unsigned long) &pt_ring0area[0],   // pt
-        (unsigned long) kerneladdress_pa,  // region base
+        (unsigned long) kerneladdress_pa,   // region base
         (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 }
 
@@ -1609,9 +1583,8 @@ static void __initialize_frontbuffer(void)
     unsigned long framebuffer_pa = (unsigned long) SMALL_frontbuffer_pa;
     
     g_frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
-    
-    
-    mm_used_lfb = (1024 * 2);  
+
+    mm_used_lfb = (1024 * 2);
 
 // framebuffer_pa = Endereço físico do lfb.
 // 0x????pys = 0x30200000virt
@@ -1676,10 +1649,9 @@ static void __initialize_backbuffer(void)
 // This is the right place: see: x64gpa.h
     unsigned long backbuffer_pa = (unsigned long) SMALL_backbuffer_pa; 
 
-
     g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
 
-    mm_used_backbuffer = (1024 * 2);  
+    mm_used_backbuffer = (1024 * 2);
 
 // backbuffer_pa = 0x01000000pys
 // 16mb mark.
@@ -1720,7 +1692,6 @@ static void __initialize_pagedpool(void)
     unsigned long *pt_pagedpool = (unsigned long *) PAGETABLE_PAGEDPOOL;
     unsigned long pagedpool_pa = (unsigned long) SMALL_pagedpool_pa;
 
-
 // Esse é o endereço virtual do início do pool de pageframes.
 // #bugbug: O paged pool so tem 2mb, veja pages.c
 // então só podemos mapear 2*1024*1024/4096 páginas.
@@ -1730,7 +1701,6 @@ static void __initialize_pagedpool(void)
     mm_used_pagedpool = (1024 * 2);  //2mb 
 
 // mapeando 2mb de memória em ring3 para o pagedpool.
-
 // IN:
 // Endereço virtual do diretório de páginas.
 // Índice da entrada no diretório indicado.
@@ -1740,10 +1710,10 @@ static void __initialize_pagedpool(void)
 // e na entrada do diretório de páginas.
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,         // pd 
-        (int) PD_ENTRY_PAGEDPOOL,            // entry
-        (unsigned long) &pt_pagedpool[0],    // pt
-        (unsigned long) pagedpool_pa,  // region base 
+        (unsigned long) KERNEL_PD_PA,      // pd 
+        (int) PD_ENTRY_PAGEDPOOL,          // entry
+        (unsigned long) &pt_pagedpool[0],  // pt
+        (unsigned long) pagedpool_pa,      // region base 
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 }
 
@@ -1791,7 +1761,6 @@ void *slab_1MB_allocator(void)
     if (NewPagedPool.initialized != TRUE)
         return NULL;
 
-
 // Se devemos ou não incremetar o contador de uso.
     int IncrementUsageCounter=TRUE; //P->allocated_memory
     struct process_d *process;
@@ -1800,8 +1769,6 @@ void *slab_1MB_allocator(void)
         IncrementUsageCounter=FALSE;
     if(process->magic!=1234)
         IncrementUsageCounter=FALSE;
-
-
 
 // procure um livre.
     
@@ -1840,7 +1807,6 @@ void *slab_1MB_allocator(void)
     
     return NULL;
 }
-
 
 
 // local worker
@@ -1882,14 +1848,12 @@ static void __initialize_heappool(void)
 // e na entrada do diretório de páginas.
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,       // pd 
-        (int) PD_ENTRY_HEAPPOOL,            // entry
-        (unsigned long) &pt_heappool[0],    // pt
-        (unsigned long) heappool_pa,  // region base
+        (unsigned long) KERNEL_PD_PA,     // pd 
+        (int) PD_ENTRY_HEAPPOOL,          // entry
+        (unsigned long) &pt_heappool[0],  // pt
+        (unsigned long) heappool_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 }
-
-
 
 // ====================================================================
 // 2mb, ring0, start = 0x30A00000.
@@ -1901,14 +1865,9 @@ static void __initialize_heappool(void)
 static void __initialize_extraheap1(void)
 {
     unsigned long *pt_extraheap1 = (unsigned long *) PAGETABLE_EXTRAHEAP1;
-
     unsigned long extraheap1_pa = (unsigned long) SMALL_extraheap1_pa;
-
     g_extraheap1_va = (unsigned long) EXTRAHEAP1_VA; //0x30A00000;
-
-
-    mm_used_extraheap1 = (1024 * 2); 
-
+    mm_used_extraheap1 = (1024 * 2);
     g_extraheap1_size = (1024 * 2); 
 
 // IN:
@@ -1920,15 +1879,14 @@ static void __initialize_extraheap1(void)
 // e na entrada do diretório de páginas.
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,          // pd 
-        (int) PD_ENTRY_EXTRAHEAP1,             // entry
-        (unsigned long) &pt_extraheap1[0],     // pt
-        (unsigned long) extraheap1_pa,         // region base
+        (unsigned long) KERNEL_PD_PA,       // pd 
+        (int) PD_ENTRY_EXTRAHEAP1,          // entry
+        (unsigned long) &pt_extraheap1[0],  // pt
+        (unsigned long) extraheap1_pa,      // region base
         (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 
     g_extraheap1_initialized = TRUE;
 }
-
 
 // 2mb, ring0, start = 0x30C00000.
 // local worker
@@ -1975,16 +1933,15 @@ static void __initialize_extraheap3(void)
     g_extraheap3_size = (1024 * 2);  
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,          // pd 
-        (int) PD_ENTRY_EXTRAHEAP3,             // entry
-        (unsigned long) &pt_extraheap3[0],     // pt
-        (unsigned long) extraheap3_pa,   // region base
+        (unsigned long) KERNEL_PD_PA,       // pd 
+        (int) PD_ENTRY_EXTRAHEAP3,          // entry
+        (unsigned long) &pt_extraheap3[0],  // pt
+        (unsigned long) extraheap3_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
         //(unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 
     g_extraheap3_initialized = TRUE;
 }
-
 
 // PAGE TABLES.
 // Vamos criar algumas pagetables e apontá-las
@@ -2003,12 +1960,8 @@ static void __initialize_extraheap3(void)
 
 static void mmInitializeKernelPageTables(void)
 {
-
 // Install some pagetables into the 
 // kernel pae directory 0.
-
-    //debug_print ("mmInitializeKernelPageTables:\n");
-
 
 // Entry 0   | va=0          | Ring 0 area.
     __initialize_ring0area();
@@ -2042,20 +1995,12 @@ static void mmInitializeKernelPageTables(void)
 
     // ...
 
-
-//
 // New paged pool
-//
-
 // Criado com dois blocos consecutivos de 2mb cada,
 // previamente alocados.
 
     __initialize_pagedpool2();
-    
-    //debug_print ("mmInitializeKernelPageTables: tables done\n");
-    //printf ("mmInitializeKernelPageTables: tables done\n");
 }
-
 
 // ======================================
 // mmSetUpPaging:
@@ -2068,7 +2013,6 @@ static void mmInitializeKernelPageTables(void)
 int mmSetUpPaging(void)
 {
     register unsigned int i=0;
-
 
     //if( serial_debug == TRUE )
         debug_print("mmSetUpPaging:\n");
@@ -2375,10 +2319,10 @@ void pages_print_video_info(void)
 {
 // Video info
     printf("\n\n");
-    
+
     printf ("FrontbufferPA={%x} FrontbufferVA={%x} \n", 
         SMALL_frontbuffer_pa, 
-        g_frontbuffer_va );  
+        g_frontbuffer_va );
 
    printf ("BackbufferPA={%x}  BackbufferVA={%x} \n", 
         SMALL_backbuffer_pa, 

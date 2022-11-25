@@ -7,13 +7,12 @@ static void *__pageObject(void);
 static int __firstSlotForAList(int size);
 
 /*
- * page:
+ * __pageObject:
  * Cria uma estrutura de página.
  * Procura um slot vazio para registrar ela.
  * Inicializa a estrutura.
  * Retorna o ponteiro da estrutura criada.
  */
-
 // OUT:
 // Retorna o ponteiro de estrutura.
 
@@ -21,9 +20,6 @@ static void *__pageObject(void)
 {
     struct page_d *New;
     int __slot = 0;
-
-
-    //debug_print ("page:\n");
 
 // Vamos procurar um slot vazio.
 
