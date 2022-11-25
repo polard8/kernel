@@ -251,11 +251,6 @@ int current_special;
 #define TOKEN_DEFINE "define"
 #define TOKEN_TYPEDEF "typedef"
 
-
-
-
-
-
 #define TOKEN_GOTO "goto"
 
 //...
@@ -263,7 +258,6 @@ int current_special;
 //identifiers
 #define TOKEN_MAIN "main"
 //...
-
 
 //constants.
 #define TOKEN_ZERO   "0"
@@ -469,20 +463,18 @@ int return_info[8];
 //...
 
 
-
 // Variables.
-typedef struct variable_d variable_t;
 struct variable_d
 {
     int used;
-    int magic;    
+    int magic;
 };
-
+typedef struct variable_d  variable_t;
 
 // Symbols.
 // símbolos tipados.
 // funções e variáveis.
-typedef struct symbol_d sysmbol_t;
+
 struct symbol_d
 {
     int used;
@@ -493,17 +485,16 @@ struct symbol_d
     int type;      // função ou variável ou protótipo ou extern.
     char *string;  // void, int, xxx, y ...
 
-
-    //caso o simbolo seja uma função;
+//caso o simbolo seja uma função;
     struct function_d *function;
 
-    //caso o símbolo seja uma variável.
+//caso o símbolo seja uma variável.
     struct variable_d *variable;
 };
+typedef struct symbol_d  sysmbol_t;
 
 
 // Types.
-typedef struct type_d type_t;
 struct type_d
 {
     int used;
@@ -512,12 +503,11 @@ struct type_d
     int type;
     char *string;    // String que representa o tipo.
 };
+typedef struct type_d  type_t;
 
-
-#define FUNCTION_COUNT_MAX 32
+#define FUNCTION_COUNT_MAX  32
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
-
 
 
 #endif    

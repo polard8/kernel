@@ -49,12 +49,13 @@ int no_output;
 //static unsigned char *dest_envp[] = { "-sujo", NULL };
 //static unsigned char dest_msg[512];
 
-void editorClearScreen(void); 
-void debugShowStat(void);
-
-static void usage(char **argv);
 
 static int gramcInitialize(void);
+static void usage(char **argv);
+static void debugShowStat(void);
+void editorClearScreen(void); 
+
+
 
 // =====================================================
 
@@ -500,62 +501,21 @@ void mainTestingCTYPE()
 */
 
 
-
 // Mostra as estatísticas para o desenvolvedor.
-void debugShowStat (void)
+static void debugShowStat(void)
 {
-	printf("debugShowStat:\n\n");
-	
-	printf("name: %s\n", program.name );
-	printf("function count : %d\n", program.function_count );
-	printf("list handle : %x\n", program.function_list );
-	
-	
-	if( (void *) function_main == NULL )
-	{
-		printf("debugShowStat: function_main struct \n");
-		return;
-	
-	} else {
-		
-        if ( function_main->used != 1 || function_main->magic != 1234 )
-        {
-		    printf("function_main: validation \n");
-		    return;
-			
-		} else {
-			
-			printf("main id: %d \n", function_main->id );
-		    
-			//...
-			
-			if( (void *) function_main->h0 ==  NULL )
-			{
-				printf("function_main: h0 \n");
-			}else{
-				
-				printf("h0 type %d \n",function_main->h0->type_token_index);
-				printf("h0 identifier %d \n",function_main->h0->identifier_token_index);
-			};
-			//nothing
-		};			
-        //nothing		
-	};
+//#ifdef LEXER_VERBOSE
+    printf("number of liner: {%d}\n",lexer_lineno);
+    printf("first line:      {%d}\n",lexer_firstline);
+    printf("last line:       {%d}\n",lexer_lastline);
+    printf("token count:     {%d}\n",lexer_token_count);
+//#endif
 
-#ifdef LEXER_VERBOSE
-    printf("number of liner: %d \n",lexer_lineno);
-    printf("first line: %d \n",lexer_firstline);
-    printf("last line: %d \n",lexer_lastline);
-    printf("token count: %d \n",lexer_token_count);
-#endif
-
-#ifdef PARSER_VERBOSE
-    printf("infile_size: %d bytes \n",infile_size);
-    printf("outfile_size: %d bytes \n",outfile_size);
-#endif
-
+//#ifdef PARSER_VERBOSE
+    printf("infile_size:     {%d bytes}\n",infile_size);
+    printf("outfile_size:    {%d bytes}\n",outfile_size);
+//#endif
 }
-
 
 int main ( int argc, char *argv[] )
 {
@@ -593,7 +553,8 @@ int main ( int argc, char *argv[] )
 // Se o buffer for maior que isso, read() falha.
     char __buf[1024];
     int nreads=0;
-
+    
+    int ShowStats = FALSE;  //#bugbug
 
 // Initializing
     //debug_print ("gramcnf: Initializing ...\n");  
@@ -684,43 +645,32 @@ int main ( int argc, char *argv[] )
         //fflush(stdout);
         //while(1){}
 
+//=====================================
 
 // Compiler
-// It returns a pointer to the output file.
+// Routine:
+// + Initialize the lexer.
+// + Parse the tokens.
+// + Return a pointer to the output file.
 
-    printf (">>>> main: Calling compiler\n");
+    printf ("main: Calling compiler\n");
     ____O = (FILE *) compiler();   
-    printf (">>>> main: compiler returned \n");
-    //debug_print (">>>> main: compiler returned \n");
-
-    //#debug
-    //printf ("*breakpoint");
-    //while (1){} 
-    
-
-//exit_default:
-
-	//#importante
-	//mostra o asm
-	//isso dependerá da flag -s
-	
-    // More ...   
-	
-//out:
-    
-    //if ( asm_flag == 1 )
-    //{
-        //printf ("===============================\n");
-        //printf ("OUTPUT: \n %s \n", outfile );   //array usado por strcat
-        //printf ("===============================\n");
-    //}
-
-//#debug suspensa por enquanto.
-    //debugShowStat();
+    printf ("main: compiler returned \n");
 
     printf("\n");
-    printf ("main: done \n.");
-    //debug_print ("gramcnf: Done\n");    
+    printf ("main: Done.\n");
+
+//==========================================
+
+    printf("\n");
+    printf("==========================================\n");
+    
+    //if(ShowStats)
+        debugShowStat();
+
+    //#debug
+    //printf ("breakpoint");
+    //while (1){} 
 
     return 0;
 }

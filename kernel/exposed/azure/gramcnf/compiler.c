@@ -1,5 +1,5 @@
 
-// compiler.h 
+// compiler.c 
 // Aqui ficará o compilador, 
 // que transformará a linguagem intermediária em assembly.
 // Bom, como ainda não temos linguagem intermediária,
@@ -13,6 +13,11 @@
 // OUT: The output pointer.
 FILE *compiler (void)
 {
+// Routine:
+// + Initialize the lexer.
+// + Parse the tokens.
+// + Return a pointer to the output file.
+
     int lexer_return = -1;
     int parser_return = -1;
 
@@ -31,7 +36,7 @@ FILE *compiler (void)
 // Nesse momento ja temos um arquivo de output.
 // more ...
 
-    printf ("compiler: $$$$$$$$ Done\n");
+    printf ("compiler: Done\n");
 
 // Returning the output.
     return (FILE *) stdout;
