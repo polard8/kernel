@@ -7,438 +7,78 @@
 #include "gramcnf.h"
 
 //#define __VERSION__ "0.1"
-
 //const char copyright[] = "Copyright (c) Fred Nora";
-
-/* While POSIX defines isblank(), it's not ANSI C. */
-//#define IS_BLANK(c) ((c) == ' ' || (c) == '\t')
 
 //default name.
 char program_name[] = "[Default program name]";
-
-// #important
-// Specification for gramc.
-char *standard_spec = "%{%{CC} -c %{I} -o %{O}}";
-
 char *compiler_name;
-
-// Procura os marcadores no arquivo intermediário 
-// pegamos um arquivo intermediário e separamos cada um dos 
-// elementos, colocando seus ponteiros em um vetor.
-// A cada passo do offset comparamos uma palavra.
-char **create_tokenlist( char *s );
-
-// Imprime todas as strings de um vetor de ponteiros.
-// Isso vai ser usado pelo echo.
-void fncc_print_tokenList ( char *token_list[], char *separator );
-
-//inicializando as variáveis e buffers.
-//int gramccInitialize();
-
-
-
 //static int running = 1;
 int running = 1;
-
-
 //Para o caso de não precisarmos produzir 
 //nenhum arquivo de output. 
 int no_output;
 
-//static char *dest_argv[] = { "-sujo0","-sujo1","-sujo2",NULL };
-//static unsigned char *dest_envp[] = { "-sujo", NULL };
-//static unsigned char dest_msg[512];
-
-
-static int gramcInitialize(void);
-static void usage(char **argv);
-static void debugShowStat(void);
-void editorClearScreen(void); 
-
+/* While POSIX defines isblank(), it's not ANSI C. */
+//#define IS_BLANK(c) ((c) == ' ' || (c) == '\t')
+// #important
+// Specification for gramc.
+//char *standard_spec = "%{%{CC} -c %{I} -o %{O}}";
 
 
 // =====================================================
-
-
-/* Cancelada */
-/*
-int gramc_main ()
-{
-    //cancelada, foi para crt0.	
-}
-*/
-
+static int gramcnf_initialize(void);
+static void usage(char **argv);
+static void debugShowStat(void);
+// =====================================================
 
 /*
- ********************************************
- * mainTextEditor:
- *     O editor de textos.
- * In this fuction:
- *     Initializes crt.
- *     Initializes stdio.
- */
- 
-//#bugbug
-//vamos cancelar isso já que temos um main() 
- 
-int mainTextEditor ( int argc, char *argv[] ){
-	
-	int ch;
-	FILE *fp;
-    int char_count = 0;	
-	
-	
-#ifdef GRAMC_VERBOSE
-	printf("\n");
-	printf("Initializing Text Editor:\n");
-	printf("mainTextEditor:  ## argv={%s} ##  \n",
-	    &argv[0] );
-#endif	
-	
-	//
-	// ## vamos repetir o que dá certo ...
-	//
-	
-	//vamos passar mais coisas via registrador.
-	
-	//ok
-	//foi passado ao crt0 via registrador
-	//printf("argc={%d}\n", argc ); 
-	
-	//foi passado ao crt0 via memória compartilhada.
-	//printf("argvAddress={%x}\n", &argv[0] ); //endereço.
-	
-	
-	//unsigned char* buf = (unsigned char*) (0x401000 - 0x100) ;
-	//printf("argvString={%s}\n" ,  &argv[0] );
-	//printf("argvString={%s}\n" , &buf[0] );
-	
-	//printf("argv={%s}\n", &argv[2] );
-	
-	
-    //stdlib
-	//inicializando o suporte a alocação dinâmica de memória.
-	libcInitRT();
-
-	//stdio
-	//inicializando o suporte ao fluxo padrão.
-    stdioInitialize();	
-	
-
-//
-// ## screen ##
-//
-
-// #bugbug
-// We don't need this thing.
-
-    //gde_begin_paint ();
-    editorClearScreen (); 
-    //gde_end_paint ();
-
-//
-// Testing file support.
-//
-
-
-file:
-
-#ifdef GRAMC_VERBOSE
-    printf("\n");
-    printf("\n");
-    printf("Loading file ...\n");
-#endif
-
-
-	//Page fault:
-	//
-    //fp = (FILE *) fopen( "init.txt", "r+");
-    //fp = fopen("init.txt","rb");
-
-    //fp = fopen("test1.txt","rb");	
-
-    fp = fopen ( (char*) &argv[0],"rb");
-
-    if (fp == NULL){
-        printf("fopen fail\n");
-        goto fail;
-
-    }else{
-
-
-#ifdef GRAMC_VERBOSE			
-        printf(".\n");		
-        printf("..\n");		
-        printf("...\n");
-#endif 
-
-		// Exibe o arquivo.
-        printf("%s",fp->_base);	
-
-
-#ifdef GRAMC_VERBOSE	        
-		printf("...\n");
-        printf("..\n");		
-        printf(".\n");		
-#endif
-
-
-#ifdef GRAMC_VERBOSE	
-		printf("\n");
-		printf("Typing a text ...\n");
-#endif
-
-Mainloop:
-
-        while(running)
-        {
-            ch = (int) getchar ();
-            
-            if (ch == -1){
-                // printf("EOF reached! ?? \n");
-                asm ("pause");
-            }
-
-            if (ch != -1){
-
-                printf ("%c",ch);
- 
-                //switch(ch)
-                //{
-			        //quit
-			    //    case 'q':
-			    //        goto hang;
-				//        break;				 
-		        //};		   
-             }
-        };
-
-		//saiu.
-        printf(".\n");		
-        printf(".\n");		
-        printf(".\n");
-        goto done;
-   };
-
-
-
-fail:
-    printf("fail.\n");
-
-done:
-    running = 0;
-    printf("Exiting editor ...\n");
-    printf("done.\n");
-
-    while(1){
-        asm ("pause");
-        exit(0);
-    };
-
-
-    // Never reach this.	
-    
-    return 0;
-}
-
-
-/*
- *     Limpar a tela deletar isso
- */
-
-void editorClearScreen (void){
-	
-    int lin, col;    
-
-	// @todo:
-	//system( "cls" ); // calls the cls command.
-	
-
-    // #todo
-    // Set cursor at the beggining!
-
-//cursor.
-    //gde_set_cursor ( 0, 0 );
-
-	//
-	// Tamanho da tela. 80x25
-	//
-
-	//linhas.
-    for ( lin=0; lin < ((600/8)-1); lin++)
-    {
-		col = 0;
-		
-		//#todo
-		//Set cursor at the given position.
-
-		//gde_set_cursor (col,lin);
-		
-		//colunas.
-		for( col=0; col < ((800/8)-1); col++)
-		{
-			printf("%c",' ');
-	    }
-	};
-
-//#todo
-//Set cursor at the given position.
-
-    //gde_set_cursor (0,2);
-}
-
-
-
-//procurar os marcadores no arquivo intermediário 
-//pegamos um arquivo intermediário e separamos cada um dos 
-//elementos, colocando seus ponteiros em um vetor.
-//A cada passo do offset comparamos uma palavra.
-//#define create_tokenlist_DELIM " \t\r\n\a" 
-#define create_tokenlist_DELIM " " 
-char **create_tokenlist ( char *s ) {
-	
-//criando o ambiente.
-	//transferindo os ponteiros do vetor para o ambiente.
-	
-	char **Ret;
-	char *tokenList[TOKENLIST_MAX_DEFAULT];
-	char *token;
-	int z;
-	register int token_count;
-	
-	Ret = (char **) tokenList;
-	
-	tokenList[0] = strtok( s, create_tokenlist_DELIM);
-	
- 	//salva a primeira palavra digitada.
-	token = (char *) tokenList[0];
- 
-
-	int index=0;                                  
-    while( token != NULL )
-	{
-        // Coloca na lista.
-        //salva a primeira palavra digitada.
-		tokenList[index] = token;
-
-		//#debug
-		//Mostra
-        //printf("shellCompare: %s \n", tokenList[i] );
-        //refresh_screen();
-		
-		token = strtok( NULL, create_tokenlist_DELIM );
-		
-		// Incrementa o índice da lista
-        index++;
-		
-		//salvando a contagem.
-		token_count = index;
-    }; 
-
-	//Finalizando a lista.
-    tokenList[index] = NULL;		
-	
-	
-	//goto done;
-		
-done:	
-	//fncc_print_tokenList(tokenList, "/");
-	
-	number_of_tokens = (int) token_count;
-	lexer_token_count = (int) token_count;  
-	
-    return (char **) Ret;	
-}
-
-
-// Imprime todas as strings de um vetor de ponteiros.
-// Isso vai ser usado pelo echo.
-void fncc_print_tokenList ( char *token_list[], char *separator ){
-	
-	char *token;
-	
-	token = (char *) token_list[0];
-	
-	if( token == NULL )
-	    goto fail;
-	
-	
-	//token = (char *) tokenList[i];
-		
-	//	if( token == NULL ){
-			
-    int i;
-	for( i=0; i,128; i++ )
-    {
-		token = (char *) token_list[i];
-
-	    if( token == NULL )
-	        goto done;
-		
-		//if( strncmp( (char*) token_list[i], "echo", 4 ) == 0 )
-		//    continue;	
-		
-		printf("%s", token_list[i]);
-		printf("%s", separator);
-    }
-
-fail:
-done:
-    return;
-}
-
-
-/*
-int is_letter(char c) ;
+int is_letter(char c);
 int is_letter(char c) 
 {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-
 }
 */
 
 
-// gramcInitialize:
-// Inicializa variáveis globais.
-
-static int gramcInitialize(void)
+// gramcnf_initialize:
+// Initialize global variables.
+static int gramcnf_initialize(void)
 {
     int Status = 0;
     register int i=0;
 
-    printf ("gramcInitialize:\n");
+    printf ("gramcnf_initialize:\n");
 
+//
 // Clear buffers
+//
 
+// Clear infile and outfile buffers.
     for ( i=0; i<INFILE_SIZE; i++ ){
         infile[i] = '\0';
-    }
+    };
     sprintf (infile, "; ======================== \n");
-    strcat (infile,  "; Initializing infile ...\n\n");
-
+    strcat (infile,  "; Initializing infile ...  \n\n");
     for ( i=0; i<OUTFILE_SIZE; i++ ){
         outfile[i] = '\0';
-    }
-    sprintf (outfile, "; ======================== \n" );
-    strcat (outfile,  ";Initializing outfile ...\n\n");
+    };
+    sprintf (outfile, "; ========================\n");
+    strcat (outfile,  ";Initializing outfile ... \n\n");
 
-// text, data, bss
-
-    sprintf (TEXT, "; ======================== \n" );
-    strcat (TEXT,  "; Initializing TEXT buffer \n");
-    strcat (TEXT,  "segment .text \n");
-    
-    sprintf (DATA, "; ======================== \n" );
-    strcat (DATA,  "; Initializing DATA buffer \n");
-    strcat (DATA,  "segment .data \n");
-    
-    sprintf (BSS, "; ======================== \n" );
-    strcat (BSS,  "; Initializing BSS buffer \n");
-    strcat (BSS,  "segment .bss \n");
+// Clear text, data, bss buffers.
+    sprintf (TEXT, "; ======================== \n");
+    strcat  (TEXT, "; Initializing TEXT buffer \n");
+    strcat  (TEXT, "segment .text              \n");
+    sprintf (DATA, "; ======================== \n");
+    strcat  (DATA, "; Initializing DATA buffer \n");
+    strcat  (DATA, "segment .data              \n");
+    sprintf (BSS,  "; ======================== \n");
+    strcat  (BSS,  "; Initializing BSS buffer  \n");
+    strcat  (BSS,  "segment .bss               \n");
 
 // Table.
 
-//contador para não estourar a lista. 
+// Contador para não estourar a lista. 
     keyword_count = 0;  
     identifier_count = 0; 
     keyword_count = 0; 
@@ -459,47 +99,15 @@ static int gramcInitialize(void)
     current_separator = 0; 
     current_special = 0;
 
-// ## program ##
+// The 'program' structure.
 
     program.name = program_name;
     program.function_count;
     program.function_list = NULL;
-
     //...
-
-    //printf ("gramcInitialize: done\n");
 
     return (int) Status;
 }
-
-
-//testing ctype support
-/*
-void mainTestingCTYPE()
-{
-    int var1 = 'h';
-    int var2 = '2';
-    
-    printf("Testing ctype.h\n");
-   
-    if( isdigit(var1) ) 
-    {
-        printf("var1 = |%c| is a digit\n", var1 );
-    }else{
-        printf("var1 = |%c| is not a digit\n", var1 );
-    };
-   
-    if( isdigit(var2) ) 
-	{
-        printf("var2 = |%c| is a digit\n", var2 );
-    }else{
-        printf("var2 = |%c| is not a digit\n", var2 );
-    };
-
-    // More ...
-};
-*/
-
 
 // Mostra as estatísticas para o desenvolvedor.
 static void debugShowStat(void)
@@ -516,6 +124,10 @@ static void debugShowStat(void)
     printf("outfile_size:    {%d bytes}\n",outfile_size);
 //#endif
 }
+
+//
+// main:
+//
 
 int main ( int argc, char *argv[] )
 {
@@ -562,7 +174,7 @@ int main ( int argc, char *argv[] )
     printf ("main: Initializing ..\n");
 
 // Inicializa variáveis globais.
-    gramcInitialize();
+    gramcnf_initialize();
 
     //printf ("*breakpoint");
     //while (1){}
@@ -657,9 +269,6 @@ int main ( int argc, char *argv[] )
     ____O = (FILE *) compiler();   
     printf ("main: compiler returned \n");
 
-    printf("\n");
-    printf ("main: Done.\n");
-
 //==========================================
 
     printf("\n");
@@ -671,6 +280,9 @@ int main ( int argc, char *argv[] )
     //#debug
     //printf ("breakpoint");
     //while (1){} 
+
+    printf("\n");
+    printf ("main: Done.\n");
 
     return 0;
 }
@@ -684,7 +296,6 @@ static void usage(char **argv)
         argv[0], 
         __VERSION__ );
 }
-
 
 //
 // End.
