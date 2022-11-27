@@ -1,11 +1,10 @@
 
-//criado para compatibilidade. 
+// fcntl.h
 
 #ifndef _FCNTL_H
-#define _FCNTL_H
+#define _FCNTL_H    1
 
-
-#include <sys/types.h>  
+#include <sys/types.h>
 
 /* These values are used for cmd in fcntl().  POSIX Table 6-1.  */
 #define F_DUPFD            0	/* duplicate file descriptor */
@@ -27,7 +26,6 @@
 #define F_UNLCK            3	/* unlock */
 
 
-
 //
 // O_
 //
@@ -38,12 +36,12 @@
 
 
 /* File access modes for open() and fcntl().  POSIX Table 6-6. */
-#define O_RDONLY           0	/* open(name, O_RDONLY) opens read only */
-#define O_WRONLY           1	/* open(name, O_WRONLY) opens write only */
-#define O_RDWR             2	/* open(name, O_RDWR) opens read/write */
+#define O_RDONLY    0  /* open(name, O_RDONLY) opens read only */
+#define O_WRONLY    1  /* open(name, O_WRONLY) opens write only */
+#define O_RDWR      2  /* open(name, O_RDWR) opens read/write */
 
 /* Mask for use with file access modes.  POSIX Table 6-7. */
-#define O_ACCMODE         03	/* mask for file access modes */
+#define O_ACCMODE    03  /* mask for file access modes */
 
 // #define	O_NONBLOCK	0x00000004	/* no delay */
 // #define	O_APPEND	0x00000008	/* set append mode */
@@ -59,10 +57,10 @@
 
 
 /* Oflag values for open().  POSIX Table 6-4. */
-#define O_CREAT        00100	/* creat file if it doesn't exist */
-#define O_EXCL         00200	/* exclusive use flag */
-#define O_NOCTTY       00400	/* do not assign a controlling terminal */
-#define O_TRUNC        01000	/* truncate flag */
+#define O_CREAT     00100  /* creat file if it doesn't exist */
+#define O_EXCL      00200  /* exclusive use flag */
+#define O_NOCTTY    00400  /* do not assign a controlling terminal */
+#define O_TRUNC     01000  /* truncate flag */
 
 /* File status flags for open() and fcntl().  POSIX Table 6-5. */
 #define O_APPEND       02000	/* set append mode */
@@ -107,32 +105,26 @@
 #define S_IRWXO (S_IRWXG >> 3) 
 */
 
-
-
-
-
-
 /* Struct used for locking.  POSIX Table 6-8. */
-
-struct flock {
-
+struct flock 
+{
     short l_type;    // type: F_RDLCK, F_WRLCK, or F_UNLCK 
     short l_whence;  // flag for starting offset 
     off_t l_start;   // relative offset in bytes 
     off_t l_len;     // size; if 0, then until EOF 
     pid_t l_pid;     // process id of the locks' owner 
-
 };
 
+// =====================================
 
+int fallocate(int fd, int mode, off_t offset, off_t len);
+int posix_fallocate(int fd, off_t offset, off_t len);
 
-int fcntl ( int fd, int cmd, ... );
+int fcntl(int fd, int cmd, ...);
+int openat(int dirfd, const char *pathname, int flags);
+int open(const char *pathname, int flags, mode_t mode);
+int creat(const char *pathname, mode_t mode);
 
-int openat (int dirfd, const char *pathname, int flags);
-
-int open (const char *pathname, int flags, mode_t mode);
-
-int creat (const char *pathname, mode_t mode);
 
 
 

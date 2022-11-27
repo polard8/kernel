@@ -17,6 +17,20 @@
 #include <stdio.h>
 #include <rtl/gramado.h>
 
+// gnu stuff?
+int fallocate(int fd, int mode, off_t offset, off_t len)
+{
+    printf("fallocate: #todo\n");
+    //if(fd<0){}
+    return -1;
+}
+
+int posix_fallocate(int fd, off_t offset, off_t len)
+{
+    printf("posix_fallocate: #todo\n");
+    //if(fd<0){}
+    return -1;
+}
 
 // fcntl - manipulate file descriptor.
 // Duplicating a file descriptor
@@ -233,12 +247,9 @@ int flock(int fd, int mode)
 }
 */
 
-
 /*
  * flock:
- * 
  */
- 
 // #todo: It's a wrapper.
 // Lock operation using fcntl()
 // See: sys/file.h
@@ -254,7 +265,6 @@ int flock (int fd, int operation)
 
     return -1;
 }
-
 
 //
 // End.

@@ -10,7 +10,6 @@
  *     2015 - Created by Fred Nora.
  *     2020 - New functions.
  */
-
 // See:
 // http://kirste.userpage.fu-berlin.de/chemnet/use/info/libc/libc_7.html 
 
@@ -4693,15 +4692,11 @@ int stderr_printf (const char *format, ... )
 */
 
 
-
 /*
  * perror:
- *
  */
-
 // #todo:
 // Oh Jees..., this function deserves a little bit of respect.
-
 // The perror() function produces a message on standard error describing
 // the last error encountered during a call to a system or library
 // function.
@@ -4715,8 +4710,9 @@ void perror (const char *str)
     if ( (void *) str != NULL ){
         printf ("Error: %s, ",str);
     }
-//#bugbug
-//There is a list of strings for errors.
+// #bugbug
+// There is a list of strings for errors.
+// We gotta fill this list with string before using it.
     printf ("The last error number is {%d} [TODO].\n",errno);
     //printf ("The last is: {%s}.\n",errno_list[errno]);
 }
