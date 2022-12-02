@@ -1,7 +1,6 @@
 
 // gramado.h
 
-
 // Process and threads priorities.
 
 //

@@ -134,8 +134,10 @@ static int __init_heap(void)
 // Isso precisa ser um ponteiro em uma região em ring3
 // compartilhada com esse processo.
 
-    unsigned char *heaptest = (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
-    if ( (void*) heaptest == NULL ){
+    unsigned char *heaptest = 
+        (unsigned char *) gramado_system_call ( 184, thisprocess_id, 0, 0 );
+    if ( (void*) heaptest == NULL )
+    {
         debug_print ("__init_heap: [FAIL] heaptest \n");
         goto fail;
     }
@@ -145,7 +147,6 @@ static int __init_heap(void)
 // Temos que usar uma chamada que pegue o tamanho do heap do processo.
 // Pois somente o processo init tem 2mb de heap, usando o extra heap 1.
 // Os outros processo possuem apenas 128 KB de heap.
-
 // Precisamos de uma chamada que pega o 'heap size'
 // e o heap size deve estar na estrutura do processo.
 
@@ -524,29 +525,22 @@ heapSetLibcHeap (
     heapList[2] = (unsigned long) 0;
     // ...
 
-
-	//Contagem? ainda em zero.?!
+    //Contagem? ainda em zero.?!
 }
 
 
-
 /*
- ****************************
  * heapAllocateMemory:
  *     Aloca memória no heap do kernel.
- *
- * *IMPORTANTE: 
+ * IMPORTANTE: 
  * Aloca BLOCOS de memória dentro do heap do processo Kernel.
- *
- * Obs: A estrutura usada aqui é salva onde ??
- *
+ * Obs: A estrutura usada aqui é salva onde?
  * @todo: 
  *     Ao fim dessa rotina, os valores da estrutura devem ser armazenas no 
  * header, lá onde foi alocado espaço para o header, assim tem-se informações 
  * sobre o header alocado.
  *  A estrutura header do heap, é uma estrutura e deve ficar antes da 
  *  área desejada. partes={header,client,footer}.
- *
  * 2015 - Created.
  * sep 2016 - Revision.
  * ...
@@ -558,12 +552,10 @@ unsigned long heapAllocateMemory (unsigned long size)
 {
     struct mmblock_d  *Current;
 
-
     debug_print ("heapAllocateMemory: $\n");
 
-
     //debug_print ("heapAllocateMemory: [1]\n");
-	// Se não há heap disponível, não há muito o que fazer.
+    // Se não há heap disponível, não há muito o que fazer.
 
 	// Available heap.
     if ( g_available_heap == 0 )
@@ -866,7 +858,7 @@ unsigned long FreeHeap ( unsigned long size )
  *     Inicializa o gerenciamento em user mode de memória virtual
  * para a biblioteca libC99.
  * Obs: 
- * *IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
+ * IMPORTANTE: Essa rotina deve ser chamada entes que a biblioteca
  * C seja usada. 
  */
 // This routine ws called by crt0() in crt0.c
@@ -978,17 +970,14 @@ void stdlib_die (char *str)
 }
 
 
-
-void *rtl_malloc ( size_t size )
+void *rtl_malloc(size_t size)
 {
-    if(size<0){
+    if (size<0){
         return NULL;
     }
-
-    if(size==0){
+    if (size==0){
         size++;
     }
-
     return (void *) malloc(size);
 }
 
@@ -1087,7 +1076,6 @@ void *xmemdup (void const *p, size_t s)
 {
     void *ptr;
 
-
     if( (void*) p == NULL ){
         stdlib_die ("xmemdup: [FAIL] p\n");
     }
@@ -1127,7 +1115,6 @@ char *xstrdup(char const *string)
     
     return (char *) xmemdup (string,Size);
 }
-
 
 
 void *realloc ( void *start, size_t newsize )

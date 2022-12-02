@@ -1,7 +1,5 @@
-/*
- * File: termios.c 
- * 
- */
+
+// termios.c 
 
 #include <stddef.h>
 #include <types.h>

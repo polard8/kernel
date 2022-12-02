@@ -82,6 +82,18 @@ char **environ;
 static int __libc_output_mode=0;
 static int terminal___PID=0;
 
+/*
+// #todo
+const char *errno_list[32] = {
+
+    "error 0",
+    "error 1",
+    "error 2",
+    // ...
+
+};
+*/
+
 //
 // =========================================================
 //
