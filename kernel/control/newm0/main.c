@@ -55,7 +55,7 @@ int module_print( char *string )
 int module_main(int reason)
 {
 
-// The kernel entry point.
+// The kernel static entry point.
 // #bugbug: It's not safe.
 // We need a random address.
 

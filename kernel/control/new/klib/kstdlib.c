@@ -6,15 +6,21 @@
 
 static int __randseed = 1234;
 
-//Alimenta a função rand.
-//void srand(unsigned int seed)
-//{};
+// --------------------------
 
+static void *__kmalloc_impl(size_t size, int clear);
 
-/* rand: 
- * Gera um número inteiro semi-randômico. 
- */
+// --------------------------
 
+// ring0 srand:
+// Alimenta a função rand.
+void srand(unsigned int seed)
+{
+    __randseed = (unsigned int) seed;
+}
+
+// ring0 rand: 
+// Gera um número inteiro semi-randômico. 
 int rand(void)
 {
     int extra = (int) (jiffies & 0xFFFFFFFF);
@@ -59,6 +65,21 @@ void *slab_alloc (size_t size)
 */
 
 
+// kmalloc implementation.
+// IN: Clear or not the allocated memory.
+static void *__kmalloc_impl(size_t size, int clear)
+{
+    void *ptr;
+    ptr = (void *) heapAllocateMemory(size);
+    if (clear==TRUE){
+        if( (void*) ptr != NULL ){
+            memset(ptr, 0, size);
+        }
+    }
+    return (void*) ptr;
+}
+
+
 // kmalloc:
 // Standard kmalloc function.
 // Alocar memória no heap do kernel.
@@ -87,9 +108,10 @@ void *kmalloc(size_t size)
         new_size=1;
     }
 
-    ptr = (void *) heapAllocateMemory(new_size);
-    if ( (void *) ptr == NULL )
-    {
+    //ptr = (void *) heapAllocateMemory(new_size);
+    ptr = (void *) __kmalloc_impl(new_size,FALSE);
+    
+    if ( (void *) ptr == NULL ){
         debug_print ("kmalloc: ptr\n");
         return NULL;
     }
@@ -144,12 +166,14 @@ void *kcalloc(size_t count, size_t size)
     if(count <= 0){
         new_size = (1*size);
     }
-    ptr = (void*) kmalloc(new_size);
-    if ( (void*) ptr != NULL ){
-        memset(ptr, 0, new_size);
-    }
 
-    return (void*) ptr;
+    //ptr = (void*) kmalloc(new_size);
+    //if ( (void*) ptr != NULL ){
+    //    memset(ptr, 0, new_size);
+    //}
+    //return (void*) ptr;
+
+    return (void*) __kmalloc_impl(new_size,TRUE);
 }
 
 

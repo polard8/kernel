@@ -734,23 +734,21 @@ unsigned long get_cursor_y (void)
 
 void console_scroll (int console_number)
 {
+    register int i=0;
     // Salvar cursor
     unsigned long OldX=0;
     unsigned long OldY=0;
-
     // Salvar limites
     unsigned long OldLeft=0;
     unsigned long OldTop=0;
     unsigned long OldRight=0;
     unsigned long OldBottom=0;
 
-    register int i=0;
-
     // debug_print ("console_scroll: #todo #fixme\n");
 
-    if ( VideoBlock.useGui != TRUE ){
-        debug_print ("console_scroll: no GUI\n");
-        panic       ("console_scroll: no GUI\n");
+    if (VideoBlock.useGui != TRUE){
+        debug_print("console_scroll: no GUI\n");
+        panic      ("console_scroll: no GUI\n");
     }
 
     if ( console_number < 0 || 
@@ -878,9 +876,8 @@ void console_outbyte (int c, int console_number)
     //Opção  
     //switch ?? 
 
-
     // form feed - Nova tela.
-    if ( Ch == '\f' )
+    if (Ch == '\f')
     {
         CONSOLE_TTYS[n].cursor_y = CONSOLE_TTYS[n].cursor_top;
         CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
@@ -985,7 +982,7 @@ void console_outbyte (int c, int console_number)
     //};
 
 // Apenas voltar ao início da linha.
-    if ( Ch == '\r' )
+    if (Ch == '\r')
     {
         CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
         prev = Ch;
@@ -998,7 +995,7 @@ void console_outbyte (int c, int console_number)
 // mas como todos os bits do char na fonte estão desligados, 
 // então não pinta coisa alguma.
 
-    if ( Ch == 0x20 )  
+    if (Ch == 0x20)
     {
         CONSOLE_TTYS[n].cursor_x++;
         prev = Ch;
@@ -1008,18 +1005,16 @@ void console_outbyte (int c, int console_number)
 // Backspace
 
     //if ( Ch == '\b' )
-    if ( Ch == 0x8 )
+    if (Ch == 0x8)
     {
         CONSOLE_TTYS[n].cursor_x--; 
         prev = Ch;
         return;
     }
 
-
 //
 // == Limits ====
 //
-
 
 //
 // Collision.
@@ -1223,7 +1218,7 @@ void console_putchar ( int c, int console_number )
 
 // Coloca no prompt[] para ser comarado.
 // Talvez o prompt também seja o buffer de stdin
-int consoleInputChar( int c )
+int consoleInputChar(int c)
 {
     unsigned long ascii=0;
     ascii = (unsigned long) (c & 0xFF);
@@ -1241,9 +1236,9 @@ void __test_process(void)
 {
     struct process_d *p;
 
-    // Wrapper
-    // Only ring3 for now.
-    // See: sys.c
+// Wrapper
+// Only ring3 for now.
+// See: sys.c
     p = (void*) sys_create_process ( 
             NULL, NULL, NULL,       // room, desktop, window
             0,                      // Reserved
@@ -1252,7 +1247,7 @@ void __test_process(void)
             "no-name",              // name
             RING3 );                // iopl 
 
-    if( (void*)p==NULL ){
+    if ( (void*)p==NULL ){
         printf("p fail\n");
         return;
     }
@@ -1274,6 +1269,10 @@ void __test_process(void)
 
 void __test_thread(void)
 {
+
+// #bugbug: ring0 threads are a huge problem.
+// Avoid that for now.
+
     struct thread_d *t;
 
     t = 
@@ -1366,46 +1365,42 @@ int consoleCompareStrings(void)
     printf("\n");
 
 // mod0: Call the entrypoint of the module.
-    if ( strncmp(prompt,"mod0",4) == 0 )
-    {
-        //mod0.bin entry point.
+// mod0.bin entry point.
+    if ( strncmp(prompt,"mod0",4) == 0 ){
         caller((unsigned long) 0x30A01000); 
         goto exit_cmp;
     }
 
 // dir:
 // List the files in a given directory.
-    if ( strncmp(prompt,"dir",3) == 0 )
-    { 
-        fsList("[");  // root dir. Same as '/'.
+// root dir. Same as '/'.
+    if ( strncmp(prompt,"dir",3) == 0 ){
+        fsList("[");
         goto exit_cmp;
     }
 
+// Testing vga stuff.
     if ( strncmp(prompt,"vga-cls",7) == 0 )
     { 
         //DANGER_VGA_clear_screen();
         goto exit_cmp;
     }
 
-    if ( strncmp(prompt,"mm1",3) == 0 )
-    {
-        //IN: max index
+// mm1: Show paged memory list.
+// IN: max index.
+    if ( strncmp(prompt,"mm1",3) == 0 ){
         showPagedMemoryList(512); 
         goto exit_cmp;
     }
 
-
-// ========
-// exit
-// Exit the kernel console.
-    if ( strncmp(prompt,"exit",4) == 0 )
-    {
+// exit: Exit the embedded kernel console.
+    if ( strncmp(prompt,"exit",4) == 0 ){
         exit_kernel_console(); 
         goto exit_cmp;
     }
 
 // #note
-// The is already doing that in the initialization.
+// We already did that in the kernel initialization.
     if ( strncmp(prompt,"fpu",3) == 0 )
     {
         printf("Initialize fpu support\n");
@@ -1417,7 +1412,8 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-    // See: x64.c
+// smp:
+// See: x64.c
     if ( strncmp( prompt, "smp", 3 ) == 0 )
     {
         // #suspended
@@ -1428,8 +1424,8 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-    // disk
-    // See: ata.c
+// disk: Show some disk information.
+// See: ata.c
     if ( strncmp( prompt, "disk", 4 ) == 0 ){
         printf("disk: Show ide info:\n");
         ata_show_device_list_info();
@@ -1438,15 +1434,15 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"volume",6) == 0 )
-    {
+// volume: Show some volume information.
+    if ( strncmp(prompt,"volume",6) == 0 ){
         volume_show_info();
         goto exit_cmp;
     }
 
-
-// device list
-    if( strncmp(prompt,"device",6) == 0 )
+// device: Device list.
+// Show tty devices, pci devices and devices with regular file.
+    if ( strncmp(prompt,"device",6) == 0 )
     {
         printf("tty devices:\n");
         devmgr_show_device_list(ObjectTypeTTY);
@@ -1458,16 +1454,13 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-
-// ========
-// 'about'
+// about:
     if ( strncmp( prompt, "about", 5 ) == 0 ){
         printf("About: The kernel console\n");
         goto exit_cmp;
     }
 
-// ========
-// 'cls'
+// cls:
     if ( strncmp( prompt, "cls", 3 ) == 0 )
     {
         //backgroundDraw(COLOR_BLACK);
@@ -1476,58 +1469,50 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-// ========
-// 'cpu'
+// cpu: Display cpu info.
     if ( strncmp( prompt, "cpu", 3 ) == 0 ){
         x64_info();
         goto exit_cmp;
     }
 
+// pit: Display PIT info.
     if ( strncmp( prompt, "pit", 3 ) == 0 )
     {
-        // #debug
-        printf("Dev freq: %d | Clocks per sec: %d HZ| Period: %d\n",
+        printf("Dev freq: %d | Clocks per sec: %d HZ | Period: %d\n",
             PITInfo.dev_freq,
             PITInfo.clocks_per_sec,
             PITInfo.period );
         goto exit_cmp;
     }
 
-// ========
-// 'help'
+// help:
     if ( strncmp( prompt, "help", 4 ) == 0 ){
-        printf("Commands: about, help, reboot, ...\n");
+        printf("Commands: about, help, reboot, cpu, memory, ...\n");
         goto exit_cmp;
     }
 
-// ========
-// 'memory'
+// memory:
     if ( strncmp( prompt, "memory", 6 ) == 0 ){
         memoryShowMemoryInfo();
         goto exit_cmp;
     }
 
-// ========
-// 'path'
-    if ( strncmp(prompt,"path",4) == 0 )
-    {
-        // #test: This test will allocate some pages
-        // for the buffer where we are gonna load the file.
+// path:
+// Test the use of 'pathnames' with multiple levels.
+// #test: This test will allocate some pages
+// for the buffer where we are gonna load the file.
+    if ( strncmp(prompt,"path",4) == 0 ){
         __test_path();
         goto exit_cmp;
     }
 
-// ========
-// 'process'
-    if ( strncmp( prompt, "process", 7 ) == 0 )
-    {
+// process:
+    if ( strncmp( prompt, "process", 7 ) == 0 ){
         __test_process();
         goto exit_cmp;
     }
 
-
-// ========
-// 'ps2'
+// ps2-qemu:
 // Testing the full initialization of ps2 interface.
 // This is a work in progress.
 // See: dev/i8042.c
@@ -1542,6 +1527,7 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// ps2-kvm: Initializze the ps2 support when running on kvm.
 // #bugbug
 // The initialization is not working on kvm.
     if ( strncmp( prompt, "ps2-kvm", 7 ) == 0 )
@@ -1556,33 +1542,28 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-
-// ========
-// 'reboot'
+// reboot:
     if ( strncmp( prompt, "reboot", 6 ) == 0 ){
         hal_reboot();
         goto exit_cmp;
     }
 
-// ========
-// 'beep'
+// beep:
     if ( strncmp( prompt, "beep", 4 ) == 0 ){
         hal_test_speaker();
         goto exit_cmp;
     }
 
-// ========
-// 'thread'
-    if ( strncmp( prompt, "thread", 6 ) == 0 )
-    {
-        //#bugbug: ring0 threads are a huge problem.
-        //avoid that for now.
+// thread:
+// #bugbug: ring0 threads are a huge problem.
+// Avoid that for now.
+
+    if ( strncmp( prompt, "thread", 6 ) == 0 ){
         //__test_thread();
         goto exit_cmp;
     }
 
-// ========
-// 'time'
+// time:
     if ( strncmp( prompt, "time", 4 ) == 0 )
     {
         printf ("Init stime %d\n",InitThread->stime);
@@ -1590,16 +1571,15 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-// ========
 // tty: Read and write from tty device.
-    if ( strncmp( prompt, "tty", 3 ) == 0 )
-    {
+    if ( strncmp( prompt, "tty", 3 ) == 0 ){
         __test_tty();
         goto exit_cmp;
     }
 
-// ========
-// serial: show info
+// serial: Display serial support info.
+// #todo: Only com1 for now.
+// But we can get information for all the 4 ports.
     if ( strncmp( prompt, "serial", 6 ) == 0 )
     {
         //#todo: Only com1 for now.
@@ -1644,8 +1624,7 @@ int consoleCompareStrings(void)
     }
 
 // ========
-// 'close'
-// msg:
+// close: Sending a MSG_CLOSE messsage to the init thread.
     if ( strncmp(prompt,"close",5) == 0 )
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
@@ -1660,8 +1639,7 @@ int consoleCompareStrings(void)
     }
 
 // ========
-// 'app1'
-// msg:
+// app1: Sending a MSG_COMMAND/4001 messsage to the init thread.
     if ( strncmp(prompt,"app1",4) == 0 )
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
@@ -1678,8 +1656,7 @@ int consoleCompareStrings(void)
     }
 
 // ========
-// 'app2'
-// msg:
+// app2: Sending a MSG_COMMAND/4002 messsage to the init thread.
     if ( strncmp(prompt,"app2",4) == 0 )
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
@@ -1696,8 +1673,7 @@ int consoleCompareStrings(void)
     }
 
 // ========
-// 'app3'
-// msg:
+// app3: Sending a MSG_COMMAND/4003 messsage to the init thread.
     if ( strncmp(prompt,"app3",4) == 0 )
     {
         if( (void*) InitThread == NULL ){goto exit_cmp;}
@@ -1715,7 +1691,7 @@ int consoleCompareStrings(void)
     }
 
 //
-// Invalid
+// Invalid command.
 //
 
     printf("\n");
@@ -1730,34 +1706,27 @@ done:
 }
 
 
-/*
- * consolePrompt:
- *     Inicializa o prompt.
- */
+// consolePrompt:
+// Inicializa o prompt.
 // Clean prompt buffer.
 // Print the prompt string.
- 
-void consolePrompt (void)
+void consolePrompt(void)
 {
     register int i=0;
-    
     for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ 
         prompt[i] = (char) '\0'; 
     };
-
     prompt[0] = (char) '\0';
     prompt_pos    = 0;
     prompt_status = 0;
     prompt_max    = PROMPT_MAX_DEFAULT;  
-
     printf("\n");
     printf("$ ");
-
     refresh_screen();
     //invalidate_screen();
 }
 
-
+// __console_write:
 // No escape sequence support.
 ssize_t 
 __console_write ( 
@@ -1817,6 +1786,7 @@ fail:
 }
 
 
+// console_read:
 // #todo
 // Isso é importante.
 // Pegar input na estrutura de console do kernel.
@@ -1831,16 +1801,12 @@ console_read (
     return -1;  //todo
 }
 
-
-/*
- * console_write:
- * 
- */
+// console_write:
 // Called by sys_write() in sys.c.
 // Tem escape sequence
 // console number, buffer, size.
-
 // IN: 
+
 ssize_t 
 console_write ( 
     int console_number, 
@@ -2233,10 +2199,10 @@ void __respond (int console_number)
 // https://en.wikipedia.org/wiki/Control_character
 // https://en.wikipedia.org/wiki/C0_and_C1_control_codes#Device_control
 
-void __local_insert_char ( int console_number )
+void __local_insert_char(int console_number)
 {
-
-    if(console_number<0){
+// #todo: max limit
+    if (console_number<0){
         return;
     }
 
@@ -2275,13 +2241,10 @@ void __local_insert_char ( int console_number )
 }
 
 
-
 void __local_delete_char(int console_number)
 {
-
 // #todo: max limit
-
-    if(console_number<0){
+    if (console_number<0){
         return;
     }
 
@@ -2308,13 +2271,12 @@ void __local_delete_char(int console_number)
 
 void csi_P (int nr, int console_number)
 {
-
+// #todo: max limit
     if (console_number<0){
         return;
     }
 
-    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
-    {
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
     } else {
         
@@ -2335,13 +2297,12 @@ void csi_P (int nr, int console_number)
 
 void csi_at (int nr, int console_number)
 {
-
-    if( console_number<0){
+// #todo: max limit
+    if ( console_number<0){
         return;
     }
 
-    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 )
-    {
+    if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
     }else {
         
@@ -2423,13 +2384,9 @@ void console_banner(unsigned long banner_flags)
     refresh_screen();
 }
 
-
-/*
- * console_ioctl:
- * 
- */
+// console_ioctl:
 // Podemos mudar as características de um console.
-
+// #bugbug: fd and fg_console needs to be the same?
 int 
 console_ioctl ( 
     int fd, 
@@ -2448,7 +2405,6 @@ console_ioctl (
         debug_print ("console_ioctl: fg_console\n");
         return -1;
     }
-
 
     switch (request){
 
@@ -2541,7 +2497,7 @@ console_ioctl (
 // Change this name. 
 // Do not use stream in the base kernel.
 
-void REFRESH_STREAM ( file *f )
+void REFRESH_STREAM(file *f)
 {
     int i=0;
     int j=0;
@@ -2601,7 +2557,7 @@ void REFRESH_STREAM ( file *f )
 }
 
 
-// Clear console.
+// Clear a console witha a given color.
 int clear_console (unsigned int color, int console_number)
 {
     if ( VideoBlock.useGui != TRUE ){
