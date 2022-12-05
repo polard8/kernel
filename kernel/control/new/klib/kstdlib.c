@@ -8,7 +8,7 @@ static int __randseed = 1234;
 
 // --------------------------
 
-static void *__kmalloc_impl(size_t size, int clear);
+static void *__kmalloc_impl(size_t size, int clean);
 
 // --------------------------
 
@@ -67,11 +67,11 @@ void *slab_alloc (size_t size)
 
 // kmalloc implementation.
 // IN: Clear or not the allocated memory.
-static void *__kmalloc_impl(size_t size, int clear)
+static void *__kmalloc_impl(size_t size, int clean)
 {
     void *ptr;
     ptr = (void *) heapAllocateMemory(size);
-    if (clear==TRUE){
+    if (clean==TRUE){
         if( (void*) ptr != NULL ){
             memset(ptr, 0, size);
         }
