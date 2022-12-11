@@ -1,8 +1,5 @@
-/*
- * connect.c
- * 
- */
 
+// connect.c
 // Os códigos da libgws podem usar as funções desse módulo
 // pra se conectarem com o Window Server.
 
@@ -22,15 +19,13 @@
 #include "include/connect.h"  
 #include "include/gws.h"  
 
-
-int __gws__desktop__id;
-int __ws__pid;
+int __gws__desktop__id=0;
+int __ws__pid=0;
 int ____gws_connected = 0;
 
 // For read and write functions.
-int ____gws_client_fd;        // socket fd
+int ____gws_client_fd=0;      // socket fd
 char ____gws_io_buffer[512];  // buffer
-
 
 
 // gws_connect:
@@ -38,7 +33,7 @@ char ____gws_io_buffer[512];  // buffer
 // Return the fd.
 // OUT: newfd = Ok.  0 = fail.
 
-int gws_connect (void)
+int gws_connect(void)
 {
     int fd=0;
     int Status=0;
@@ -53,23 +48,21 @@ int gws_connect (void)
 
     // #debug
     printf ("libgws-gws_connect: Creating socket\n");
-
-    fd = socket ( 8000, SOCK_STREAM, 0 );
-
+    fd = socket( 8000, SOCK_STREAM, 0 );
     if ( fd < 0 ){
        gws_debug_print ("libgws-gws_connect: Couldn't create socket\n");
        goto fail;
     }
 
-//
 // connect
-//
 
-    Status = connect ( fd, 
-                 (struct sockaddr *) &addr, 
-                  sizeof(addr) );
+    Status = 
+        connect ( 
+            fd, 
+            (struct sockaddr *) &addr, 
+            sizeof(addr) );
 
-    if ( Status < 0 ){ 
+    if (Status < 0){ 
         gws_debug_print ("libgws-gws_connect: Connection Failed\n"); 
         close(fd);
         goto fail;
@@ -92,37 +85,32 @@ fail:
 //#todo
 /*
 // Disconnect from server.
-void gws_disconnect ( int fd );
-void gws_disconnect ( int fd )
+void gws_disconnect (int fd);
+void gws_disconnect (int fd)
 {
     close(fd);
 }
 */
 
-
 int gws_get_connect_status(void)
 {
-    return ____gws_connected;
+    return (int) ____gws_connected;
 }
-
 
 void gws_set_connect_status(int status)
 {
-    ____gws_connected = status;
+    ____gws_connected = (int) status;
 }
-
 
 int gws_get_client_fd(void)
 {
     return (int) ____gws_client_fd;
 }
 
-
 void gws_set_client_fd(int client_id)
 {
-    ____gws_client_fd = client_id;
+    ____gws_client_fd = (int) client_id;
 }
-
 
 int gws_get_desktop_id(void)
 {
@@ -131,11 +119,11 @@ int gws_get_desktop_id(void)
 
 void gws_set_desktop_id(int desktop_id)
 {
-    __gws__desktop__id = desktop_id;
+    __gws__desktop__id = (int) desktop_id;
 }
 
 // gws_initialize_connection:
-int gws_initialize_connection (void)
+int gws_initialize_connection(void)
 {
     unsigned long Value=0;
 

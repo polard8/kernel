@@ -16,10 +16,15 @@
 #define rgbWhite    0xFFFFFF 
 
 // Blue
-#define COLOR_BLUE1        0x067AB5
-#define COLOR_BLUE2CYAN    0x1BA1E2
-#define COLOR_BLUE3COBALT  0x0050EF
-#define COLOR_BLUE4INDIGO  0x6A00FF
+#define COLOR_BLUE1        0x00067AB5
+#define COLOR_BLUE2CYAN    0x001BA1E2
+#define COLOR_BLUE3COBALT  0x000050EF
+#define COLOR_BLUE4INDIGO  0x006A00FF
+
+// Blue
+#define BLUE1000   0x002D89EF
+#define BLUE1001   0x000277BD
+#define SKYBLUE    0x00A6CAF0
 
 // Gray
 #define xCOLOR_BLACK  0x000000  //preto
@@ -50,7 +55,7 @@
 //5%    #0d0d0d
 //0%    #000000
 
-// w2k system colors
+// w2k-like system colors.
 #define COLOR_TEST_0  0x8080FF  // COLOR_BACKGROUND
 #define COLOR_TEST_1  0x80FFFF  // COLOR_APPWORKSPACE, MDIWINDOW 
 #define COLOR_TEST_2  0x80FF80  // COLOR_WINDOW, CLIENT
@@ -371,15 +376,10 @@
 #define COLOR_KERNEL_BACKGROUND COLOR_BLUE
 
 // Window 1000
-#define WINDOW1000 0xF5DEB3
-
-// Blue
-#define BLUE1000   0x2d89ef
-#define BLUE1001   0x0277bd
-#define SKYBLUE    0xA6CAF0
+#define WINDOW1000 0x00F5DEB3
 
 // White
-#define SOFT_WHITE  0xFFFBF0
+#define SOFT_WHITE  0x00FFFBF0
 
 #endif    
 

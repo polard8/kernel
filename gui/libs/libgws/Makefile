@@ -3,15 +3,11 @@
 # 2020 - Created by Fred Nora.
 # todo: Link all togheter in a single object file .o.
 
-
-VERSION = 0
-PATCHLEVEL = 0
-SUBLEVEL = 0
-EXTRAVERSION =
-#NAME = libgws - Client-side library for gws window server.
-
-#todo:
-#We need to simplify these flags
+VERSION_MAJOR = 0
+VERSION_MINOR = 0
+VERSION_BUILD = 0
+# Compiling on gcc 12.2.0
+# Linking on ld 2.39
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -28,25 +24,18 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 LIBS = -I.  -I ../rtl/include/
 
 
 .PHONY: all all-c finalize clean
-
 all: all-c finalize clean
 	@echo "Ok?"
-
 all-c:
-
 	gcc -c gws.c      $(CFLAGS) $(LIBS) -o gws.o
-
 	gcc -c connect.c  $(CFLAGS) $(LIBS) -o connect.o
 	gcc -c events.c   $(CFLAGS) $(LIBS) -o events.o
 	gcc -c gr.c       $(CFLAGS) $(LIBS) -o gr.o
 	gcc -c rw.c       $(CFLAGS) $(LIBS) -o rw.o
-
-
 finalize:
 	-mkdir obj/
 	-cp *.o obj/

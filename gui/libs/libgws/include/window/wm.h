@@ -1,5 +1,5 @@
 
-// File: wm.h
+// wm.h
 // This header should be included by including "gws.h".
 
 #ifndef  __LIBGWS_WM_H
@@ -45,6 +45,7 @@
 
 // mouse (30 - 39)
 // Tem uma lista de eventos de mouse em events.h
+
 #define MSG_MOUSEKEYDOWN  30
 #define MSG_MOUSEKEYUP    31
 
@@ -81,19 +82,19 @@
 
 // ??
 // Quando um comando é enviado para o console 
-// ele será atendido pelo módulo /sm no procedimento de janela do sistema.
-// Todas as mensagens de console serão atencidas pelo procedimento de janela 
-// nessa mensagem.
+// ele será atendido pelo módulo /sm no 
+// procedimento de janela do sistema.
+// Todas as mensagens de console serão atencidas 
+// pelo procedimento de janela nessa mensagem.
 
-#define MSG_CONSOLE_COMMAND  49
-#define MSG_CONSOLE_SHUTDOWN 50
-#define MSG_CONSOLE_REBOOT   51
+#define MSG_CONSOLE_COMMAND   49
+#define MSG_CONSOLE_SHUTDOWN  50
+#define MSG_CONSOLE_REBOOT    51
 
-#define MSG_DEVELOPER        52
+#define MSG_DEVELOPER  52
 
 // Timer timeout.
 #define MSG_TIMER    53
-
 
 // O servidor de rede se comunica com o processo.
 #define MSG_AF_INET       54
@@ -143,11 +144,9 @@
 #define MSG_GWS_CLIENTEVENT       2030
 #define MSG_GWS_NEXTEVENT         2031
 
-
 // The buffer has a protocol starting in the 5th long.
 // buffer[4] = ethernet header.
 #define MSG_GWS_PROTOCOL          3000   
-
 
 // Quit the process if it's possible.
 #define MSG_GWS_QUIT    4080
@@ -160,6 +159,4 @@
 // ...
 
 #endif    
-
-
 

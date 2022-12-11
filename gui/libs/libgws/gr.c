@@ -7,7 +7,6 @@
 // For now we are sending requests for each
 // single pixel.
 
-
 // rtl
 #include <types.h>
 #include <stdio.h>
@@ -36,6 +35,7 @@ static unsigned long __savedHeight=0;
 //static unsigned long WindowHotSpotX=0;
 //static unsigned long WindowHotSpotY=0;
 
+// ====================
 
 static int 
 __transform_from_viewspace_to_screespace(
@@ -47,7 +47,6 @@ __transform_from_viewspace_to_screespace(
 static void __initializing_hotspot(void);
 
 // ====================
-
 
 int gr_initialize(void)
 {
@@ -85,12 +84,10 @@ interpolate_color(
         (unsigned int) (    
         (unsigned int) ( (r2 - r1) * fraction + r1 ) << 16 | 
         (unsigned int) ( (g2 - g1) * fraction + g1 ) <<  8 | 
-        (unsigned int) ( (b2 - b1) * fraction + b1 )
-    );
-    
+        (unsigned int) ( (b2 - b1) * fraction + b1 ) );
+
     return (unsigned int) final_color;
 }
-
 
 unsigned int invert_color(unsigned int color)
 {
@@ -457,7 +454,6 @@ plotLine3d2 (
     int flag,
     unsigned long rop )
 {
-
     int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
     int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
     int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
