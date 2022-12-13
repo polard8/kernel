@@ -41,23 +41,25 @@ This repository has the source code for:
 
 ## Fred's compilation on Linux.
 ```
-    Host machine: Ubuntu 20.04.3 LTS
-    Linux 5.15.0-41-generic x86_64
-    gcc (Ubuntu) 11.2.0 
-    GNU ld (GNU Binutils for Ubuntu) 2.38
-    NASM version 2.15.05
+    Host machine: Ubuntu 22.10
+    Linux 5.19.0-23-generic x86_64
+    gcc (Ubuntu) 12.2.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.39
+    NASM version 2.25.05
 ```
 
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/admin/docs/build.md)
+> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/kernel/admin/docs/build.md)
 
 ## Testing
 
+```bash
+$ make
+$ cd kernel
+$ ./run
 ```
-	$ ./run
-	$ make qemu-test
-```
+
 
 The old versions were tested for a long period of time on my 
 real machine. A Gigabyte/Intel Core 2 Duo/Chipset VIA.

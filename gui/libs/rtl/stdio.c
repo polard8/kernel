@@ -458,15 +458,12 @@ int __fflush (FILE *stream)
 
     Count = (size_t) stream->_w;
 
-    if (Count <= 0)
-    {
+    if (Count <= 0){
         stream->_p = stream->_base;
         stream->_w = 0;    // ajust.
         //stream->_r = 0;  // ajust.
-
         // #debug
         debug_print ( "__fflush: [FAIL] _w\n");
-
         return 0;  // OK.
         //return (int) (-1);
     }
@@ -490,31 +487,24 @@ int __fflush (FILE *stream)
 //    nwrite = __write ( fileno(stream), stream->_base, Count );
 //#endif
 
-    if (nwrite <= 0)
-    {
+    if (nwrite <= 0){
         printf ("__fflush: [FAIL] nwrite\n");
-
         // Ajust to the next flush.
         stream->_p = stream->_base;
         stream->_w = 0;
-         
         // #todo
         // stream->_flags |= _IOERROR; 
         // stream->error = errno;
-
         return EOF;
     }
 
 // #todo
 // Something is wrong
-    if (nwrite != Count)
-    {
+    if (nwrite != Count){
         debug_print("__fflush: [DEBUG] nwrite != Count\n");
-
         // #todo
         // stream->_flags |= _IOERROR; 
         // stream->error = errno;
-        
         // #todo
         //return -1;
     }
@@ -526,6 +516,7 @@ int __fflush (FILE *stream)
     //stream->eof = 0;
     //stream->have_ungotten = false;
     //stream->ungotten = 0;
+
     return 0;
 }
 
@@ -550,19 +541,17 @@ int ____bfill (FILE *stream)
     }
 
 // Check buffer size
-    if ( stream->_lbfsize != BUFSIZ )
-    {
+    if (stream->_lbfsize != BUFSIZ){
         debug_print ("____bfill: [FAIL] _lbfsize \n");
         printf      ("____bfill: [FAIL] _lbfsize %d\n",
             stream->_lbfsize);
-
-        stream->_cnt = 0; 
-
+        stream->_cnt = 0;
         // #debug
         // provisorio
         exit(1);
         //return EOF;
     }
+
     // ...
 
 // Read file
@@ -628,8 +617,7 @@ int ____bfill (FILE *stream)
     }
 
     // enchemos o buffer
-    if ( n_read >= (BUFSIZ-1) )
-    {
+    if ( n_read >= (BUFSIZ-1) ){
         stream->_fsize = BUFSIZ;
         stream->_cnt = 0;
         stream->_p = stream->_base;
@@ -731,10 +719,8 @@ int __getc(FILE *stream)
         ch = (int) *stream->_p;
         stream->_p++;
         stream->_r++;
-        
         // Diminui a quantidade de bytes restantes no buffer em ring3.
-        stream->_cnt--;  
-        
+        stream->_cnt--;
         return (int) ch;
     }
 
@@ -911,8 +897,6 @@ int fputc ( int ch, FILE *stream ){
     return (int) putc(ch,stream);
 }
 
-
-
 //
 // Root 2
 //
@@ -926,7 +910,6 @@ int getchar (void){
 int putchar (int ch){
     return (int) putc ( (int) ch, stdout );
 }
-
 
 //
 // Root 3
@@ -977,26 +960,26 @@ char *fgets(char *s, int size, FILE *stream)
             (c = getc(stream)) >= 0 ) 
     {
         *cs++ = c;
-
-        if (c=='\n'){ break; }
+        if (c == '\n'){
+            break;
+        }
     };
 
-    // Nesse momento, acabou o size, ou
-    // encontramos um '\n'.
-    
-    // Se o último char for EOF
-    // e não pegamos char algum. 
-    if ( c<0 && cs==s ) { return NULL; }
-    
-    // Finalizamos a string construída.
+// Nesse momento, acabou o size, ou
+// encontramos um '\n'.
+// Se o último char for EOF
+// e não pegamos char algum. 
+    if ( c<0 && cs==s ){
+        return NULL;
+    }
+// Finalizamos a string construída.
     *cs++ = '\0';
 
     return (s);
 }
 
-
 //s iop
-int fputs ( const char *s, FILE *stream )
+int fputs( const char *s, FILE *stream )
 {
     register int c=0;
     register int r=0;
@@ -1029,11 +1012,9 @@ int getw (FILE *stream)
 	//if (stream->_flags&_IOEOF)
 		//return(-1);
 
-
     if (stream->eof == 1 ){
         return EOF;
     }
-
 
     return (i | (getc(stream)<<8));
 }
@@ -1053,12 +1034,9 @@ int putw (int w, FILE *stream)
     return 0;
 }
 
-
-/*
- * fclose:
- *     Close a file.
- *     If work, return 0. 
- */
+// fclose:
+// Close a file.
+// If work, return 0.
 // #todo
 // fclose() takes a stream, flushes it, and closes it.
 // linux klibc style
@@ -1140,8 +1118,7 @@ FILE *fopen ( const char *filename, const char *mode )
 // his argument must be supplied when
 //          O_CREAT or O_TMPFILE is specified in flags;
 
-    int oflags=0;     
-
+    int oflags=0;
 
     // #todo
     // Check filename validation
@@ -1206,27 +1183,21 @@ FILE *fopen ( const char *filename, const char *mode )
 
     __stream->_base = (char *) malloc(BUFSIZ);
 
-    if ( (void *) __stream->_base == NULL )
-    {
+    if ( (void *) __stream->_base == NULL ){
         debug_print("fopen: stream buffer fail\n");
         printf     ("fopen: stream buffer fail\n");
-
         // #todo
         // Temos que liberar a memoria da estrutura.
         //free(__stream);
-
         return NULL;
      }
 
-// Reset buffer pointer.
-    __stream->_p = __stream->_base; 
-
+// Buffer
+    __stream->_p = __stream->_base;
     __stream->_lbfsize = BUFSIZ;
     __stream->_cnt     = BUFSIZ;
     __stream->_r = 0;
     __stream->_w = 0;
-
-// ==============================
 // Flags
     __stream->_flags = flags;
 // File name.
@@ -1312,13 +1283,13 @@ FILE *fopen2 ( const char *filename, const char *mode )
 
 // load the file into the address.
 // Vai retornar o fd.
-    
-    //IN: service, name, address, 0, 0 
-    fd = (int) gramado_system_call ( 
-                   3, 
-                   (unsigned long) filename, 
-                   (unsigned long) address,  
-                   0 );
+// IN: service, name, address, 0, 0 
+    fd = 
+        (int) gramado_system_call ( 
+                  3, 
+                  (unsigned long) filename, 
+                  (unsigned long) address,  
+                  0 );
 
     if (fd < 0){
         printf ("fopen2: Couldn't load the file\n");
@@ -1342,18 +1313,15 @@ FILE *fopen2 ( const char *filename, const char *mode )
 // #todo    
 // Isso deve ser o retorno de open() ou creat()
 // Me parece que a chamada acima também retorna o fd.
-    __stream->_file = fd; 
-// ===================
+    __stream->_file = fd;
 // Buffer
     __stream->_base = (unsigned char *) address; 
     __stream->_p = __stream->_base;
     __stream->_lbfsize = (int) s;
     __stream->_cnt = __stream->_lbfsize;
-
-// retornar a stream que criamos aqui.
+// Retornar a stream que criamos aqui.
     return (FILE *) __stream;
 }
-
 
 /*
  * scroll:
@@ -1367,13 +1335,14 @@ FILE *fopen2 ( const char *filename, const char *mode )
 
 void scroll (void)
 {
-    //loop
+    // loop
     register unsigned short i=0;
     register unsigned short j=0;
-	//Início da tela.
+// Início da tela.
     unsigned short *p1 = (unsigned short *) SCREEN_START;
-	//Início da segunda linha.
-    unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
+// Início da segunda linha.
+    unsigned short *p2 = 
+        (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
 
 // Linhas.
 // Usa o valor default se passar dos limites.
@@ -1387,10 +1356,8 @@ void scroll (void)
 
     for ( i=0; i < g_rows -1; i++ )
     {
-	    //80 vezes.
-		
-		//Se a variável nao foi inicializada, usar valor default.
-        
+        //80 vezes
+        //Se a variável nao foi inicializada, usar valor default.
         if (g_columns == 0 || g_columns >= SCREEN_MAX_WIDTH)
         { 
             g_columns = SCREEN_WIDTH;
@@ -1404,12 +1371,9 @@ void scroll (void)
 		//    };
 		//};
 
-
-		// modo gráfico.
-
+        // modo gráfico.
         if (g_using_gui == 1)
         {
-
             for ( j=0; j < g_columns; j++ )
             {
                 //*p1++ = *p2++;
@@ -1436,16 +1400,12 @@ void clearerr(FILE* stream)
     if ( (void *) stream == NULL ){
         return;
     }
-
     //stream->_flags &= ~(_IOERR|_IOEOF);
     stream->eof = FALSE;
     stream->error = 0;
 }
 
-
-/*
- * fread:
- */
+// fread:
 // #importante
 // Ler uma certa quantidade de chars de uma stream e coloca-los no buffer.
 // Isso vai ser usado pelo terminal por exemplo.
@@ -1458,12 +1418,12 @@ void clearerr(FILE* stream)
 
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 {
+    size_t nreads=0;
     void *data;
-    int nreads = 0;
     int number_of_bytes = -1;
+
 // Initialize local variable.
     data = ptr;
-
     if ( (void *) data == NULL ){
         printf ("fread: ptr \n");
         return (size_t) -1;
@@ -1503,22 +1463,20 @@ size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 //
 
     if ( number_of_bytes >= _max ){
-        nreads = read ( fileno(fp), data, _max );
+        nreads = read( fileno(fp), data, _max );
     }else{
-        nreads = read ( fileno(fp), data, number_of_bytes );
+        nreads = read( fileno(fp), data, number_of_bytes );
     };
 
-    if (nreads <= 0)
-    {
-        printf ("fread: read() fail \n");
+    if (nreads <= 0){
+        printf ("fread: read() fail\n");
         fp->_flags |= _IOERR;
         return (size_t) -1;   
     }
 
     // menos do que desejavamos.
-    if (nreads < number_of_bytes)
-    {
-        printf ("fread: read() fail. Less than desired \n");
+    if (nreads < number_of_bytes){
+        printf ("fread: read() fail. Less than desired\n");
         fp->_flags |= _IOERR;
         return (size_t) -1;   
     }
@@ -1546,7 +1504,7 @@ fwrite (
     size_t n, 
     FILE *fp )
 {
-    int nwrite = 0;
+    size_t nwrite=0;
     int number_of_bytes = -1;
 
 // Pointer validation.
@@ -1555,29 +1513,29 @@ fwrite (
         goto error0;
     }
 // Tamanho do elemento dado em bytes.
-    if ( size <= 0 ){
-        printf ("fwrite: size \n");
+    if (size <= 0){
+        printf("fwrite: size\n");
         goto error0;
     }
 // Quantidade de elementos.
-    if ( n <= 0 ){
-        printf ("fwrite: n \n");
+    if (n <= 0){
+        printf("fwrite: n\n");
         goto error0;
     }
 // File pointer
 // Se não temos o ponteiro, então não teremos o fd
 // para usarmos em read().
     if ( (void *) fp == NULL ){
-        printf ("fwrite: fp \n");
+        printf ("fwrite: fp\n");
         goto error0;
     }
 // ====================================
 // Calculando a quantidade de bytes.
     number_of_bytes = (size * n);
-    
+
     size_t _max = sizeof(ptr);
-    
-    if ( number_of_bytes > _max ){
+
+    if (number_of_bytes > _max){
         number_of_bytes = _max;
     }
 
@@ -1590,13 +1548,12 @@ fwrite (
     nwrite = write ( fileno(fp), ptr, number_of_bytes );
 // Se não conseguimos escrever.
     if (nwrite <= 0){
-        printf ("fwrite: write() fail \n");
+        printf ("fwrite: write() fail\n");
         goto error1;
     }
 // Se escrevemos menos do que desejavamos.
-    if (nwrite < number_of_bytes)
-    {
-        printf ("fwrite: write() less than desired \n");
+    if (nwrite < number_of_bytes){
+        printf ("fwrite: write() less than desired\n");
         goto error1;
     }
 //done:
@@ -1663,10 +1620,10 @@ int prompt_flush (int con_id)
 {
     size_t len=0;
 
-    if ( con_id < 0 ){
+    if (con_id < 0){
         return -1;
     }
-    if ( con_id >= 4 ){
+    if (con_id >= 4){
         return -1;
     }
 
@@ -1676,7 +1633,7 @@ int prompt_flush (int con_id)
     gramado_system_call ( 66, (unsigned long) prompt, con_id, len );  
     prompt_clean();
 
-    return 0; 
+    return 0;
 }
 
 // Linpando o buffer de entrada.
@@ -1703,9 +1660,7 @@ void prompt_clean (void)
 /*
  **********************************************************************
  * prints:
- *
  */
- 
 // #bubgug:
 // Esses argumentos podem estar fora dos padrões.
 // Mas a implementação feita pelo altor é assim mesmo. 
@@ -1725,17 +1680,17 @@ prints (
 	//if(width < 0){
 	//	return (int) 1;
 	//}
-	
-	if ( width > 0 ) 
-	{
-	    register int len = 0;
-		register const char *ptr;
-		
-		for(ptr = string; *ptr; ++ptr) ++len;
-		if(len >= width) width = 0;
-		else width -= len;
-		if(pad & PAD_ZERO) padchar = '0';
-	}
+
+    if (width > 0) 
+    {
+        register int len = 0;
+        register const char *ptr;
+
+        for(ptr = string; *ptr; ++ptr) ++len;
+        if(len >= width) width = 0;
+        else width -= len;
+        if(pad & PAD_ZERO) padchar = '0';
+    }
 
     if ( !(pad & PAD_RIGHT) )
     {
@@ -1958,12 +1913,12 @@ kinguio_i2hex_versao2(
     char* dest, 
     int len)
 {
+    register int i=0; 
     char *cp;
-    int i=0; 
     int x=0;
     unsigned long n=0;
 
-    if(val == 0)
+    if (val == 0)
     {
         cp = &dest[0];
         *cp++ = '0';
@@ -1971,34 +1926,35 @@ kinguio_i2hex_versao2(
         return;
     }
 
+    n = val;
+    cp = &dest[len];
+    while (cp > dest)
+    {
+        x = n & 0xF;
+        n >>= 4;
+        *--cp = x + ((x > 9) ? 'A' - 10 : '0');
+    };
 
-	n = val;
-	cp = &dest[len];
-	while (cp > dest)
-	{
-		x = n & 0xF;
-		n >>= 4;
-		*--cp = x + ((x > 9) ? 'A' - 10 : '0');
-	};
+    dest[len]='\0';
 
-	dest[len]='\0';
+    cp = &dest[0];
+    for (i=0; i<len; i++)
+    {
+        if (*cp == '0'){
+            cp++;
+        }else{
+            strcpy(dest,cp);
+            break;
+        };
+    };
 
-	cp = &dest[0];
-	for (i=0; i < len;i++) {
-	
-		if(*cp == '0') {
-			cp++;
-		}
-		else {
-			strcpy(dest,cp);
-			 break;
-		}
-			
-	};
+    cp = &dest[0];
+    n = strlen(cp);
 
-	cp = &dest[0];
-	n = strlen(cp);
-	memset(dest + n,0,len-n);
+    memset(
+        dest+n,
+        0,
+        len-n );
 }
 
 //=============================================================
@@ -2011,8 +1967,8 @@ kinguio_i2hex(
     char *dest, 
     int len )
 {
+    register int i=0; 
     char* cp;
-    int i=0; 
     int x=0;
     unsigned n=0;
 
@@ -2026,7 +1982,7 @@ kinguio_i2hex(
     }
 
 // error
-    if(len<0)
+    if (len<0)
         return;
 
 // #todo
@@ -2049,8 +2005,7 @@ kinguio_i2hex(
     cp = &dest[0];
     for (i=0; i<len; i++)
     {
-        if (*cp == '0') 
-        {
+        if (*cp == '0'){
             cp++;
         }else{
             strcpy(dest,cp);
@@ -2062,11 +2017,10 @@ kinguio_i2hex(
     n = strlen(cp);
 
     memset( 
-        dest + n, 
-        0, 
+        dest+n, 
+        0,
         8-n );   //32bit
 }
-
 
 void 
 kinguio_l2hex( 
@@ -2074,8 +2028,8 @@ kinguio_l2hex(
     char *dest, 
     int len )
 {
+    register int i=0; 
     char* cp;
-    int i=0; 
     int x=0;
     unsigned n=0;
 
@@ -2089,7 +2043,7 @@ kinguio_l2hex(
     }
 
 // error
-    if(len<0)
+    if (len<0)
         return;
 
 // #todo
@@ -2112,8 +2066,7 @@ kinguio_l2hex(
     cp = &dest[0];
     for (i=0; i<len; i++)
     {
-        if (*cp == '0') 
-        {
+        if (*cp == '0'){
             cp++;
         }else{
             strcpy(dest,cp);
@@ -2130,11 +2083,10 @@ kinguio_l2hex(
     //    8-n );
 
     memset( 
-        dest + n, 
+        dest+n, 
         0, 
         16-n );   //64bit
 }
-
 
 //local
 static char *__utoa_r (unsigned long val, char *str)
@@ -2173,7 +2125,6 @@ char *kinguio_utoa(
 {
     char *cp = (char *) dst;
     unsigned long lu = (unsigned long)val;
-
 
     if(radix == 16)
         kinguio_i2hex_versao2(lu, cp, 16);
@@ -2262,7 +2213,6 @@ int printf(const char *fmt, ...)
     return (int) ret;
 }
 
-
 void kinguio_puts(const char* str)
 {
     register int i=0;
@@ -2275,7 +2225,7 @@ void kinguio_puts(const char* str)
     };
 }
 
-
+// #local
 static char *_vsputs_r(char *dest, char *src)
 {
     unsigned char *usrc  = (unsigned char *) src;
@@ -2414,7 +2364,7 @@ kinguio_vsprintf(
 //=============================================================
 
 //
-//=============================================================
+// =============================================================
 //
 
 // usada na printf2
@@ -2586,23 +2536,22 @@ char *stdio_nextline (char *string)
 
     ++p;
 
-    // Não há próxima linha    
-    if (*p=='\0')
-    { 
+// Não há próxima linha    
+    if (*p=='\0'){ 
         return (NULL);
-
-    // Retorna o ponteiro para a próxima linha. 
-    } else { return (p); };
+// Retorna o ponteiro para a próxima linha. 
+    }else{
+        return (p);
+    };
 }
 
-
-//next line sprintf
+// next line sprintf
 int nlsprintf ( char *out, const char *format, ... )
 {
     char *tmp;
 
-    tmp = (char *) stdio_nextline (out);
-    if (tmp == NULL ){
+    tmp = (char *) stdio_nextline(out);
+    if (tmp == NULL){
         // ?? message
         return -1;
     }
@@ -2610,7 +2559,6 @@ int nlsprintf ( char *out, const char *format, ... )
 
     return (int) print( &tmp, varg );
 }
-
 
 /*
  *****************************************************************
@@ -2637,31 +2585,27 @@ void printchar ( char **str, int c )
     if (str) 
     {
         **str = c;
-
         ++(*str);
-
     } else (void) putchar(c);
 }
 
 
 // Setup libc mode.
-void libc_set_output_mode (int mode)
+void libc_set_output_mode(int mode)
 {
-    switch (mode)
-    { 
-		case LIBC_DRAW_MODE:
-			__libc_output_mode = mode;
-			break;
-		case LIBC_NORMAL_MODE:
-			__libc_output_mode = mode;
-			break;
-        default:
-            __libc_output_mode = LIBC_DRAW_MODE;
-            printf ("libc_set_output_mode: fail\n");
-            break;
+    switch (mode){
+    case LIBC_DRAW_MODE:
+        __libc_output_mode = mode;
+        break;
+    case LIBC_NORMAL_MODE:
+        __libc_output_mode = mode;
+        break;
+    default:
+        __libc_output_mode = LIBC_DRAW_MODE;
+        printf ("libc_set_output_mode: fail\n");
+        break;
     };
 }
-
 
 /*
  **********
@@ -2977,7 +2921,8 @@ int fprintf(FILE *fp, const char *fmt, ...)
 int fprintf ( FILE *stream, const char *format, ... )
 {
     debug_print ("fprintf: [FIXME]\n");
-    
+         printf ("fprintf: [FIXME]\n");
+
     if ( (void *) stream == NULL ){
        debug_print ("fprintf: stream\n");
        return EOF;
@@ -3009,7 +2954,7 @@ int fprintf ( FILE *stream, const char *format, ... )
 //Credits: Sombra OS.
 void nputs (char *cp, int len)
 {
-    register int i = len;
+    register int i=len;
     char *str;
 
 // nao podemos escrever no endereço 0.
