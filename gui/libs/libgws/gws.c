@@ -3402,16 +3402,12 @@ void gws_close_display(struct gws_display_d *display)
         gws_debug_print("gws_close_display: display\n");
         return;
     }
-
     display->used = FALSE;
     display->magic = 0;
-
     // ??
     // close(display->fd);
-
     display = NULL;
 }
-
 
 // Change the current display for this library.
 int gws_set_current_display(struct gws_display_d *display)
@@ -3437,7 +3433,7 @@ void gws_display_exit(struct gws_display_d *display)
     if ( (void*) display == NULL ){
         return;
     }
-    if (display->magic!=1234){
+    if (display->magic != 1234){
         return;
     }
     display->running = FALSE;

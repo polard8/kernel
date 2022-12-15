@@ -14,9 +14,7 @@
 
 #define __IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
-
 #include "protocol.h"
-
 
 //
 // window
@@ -65,9 +63,8 @@
 
 // ...
 
-
 //
-// ==== Version ====
+// == Version ====
 //
 
 #define GWS_LIB_PROTOCOL           0

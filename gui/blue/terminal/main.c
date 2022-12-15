@@ -42,11 +42,10 @@
 // Testing ioctl()
 #include <termios.h>
 
-
 // network ports.
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
 // ...
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
@@ -110,11 +109,10 @@ static void __test_message(void)
     message_buffer[1] = (unsigned long) 44888;  // message code
     message_buffer[2] = (unsigned long) 1234;
     message_buffer[3] = (unsigned long) 5678;
-
 // receiver
     message_buffer[4] = 0;  //init tid
 // sender
-    message_buffer[5] = 0; //?
+    message_buffer[5] = 0;  //?
 
     unsigned long MessageBuffer = 
         (unsigned long) &message_buffer[0];
@@ -284,25 +282,18 @@ void __test_gws(int fd)
     if(fd<0){
         return;
     }
-
     gws_change_window_position(fd,Window,0,0);
-
     gws_resize_window(
         fd, Window, 400, 400);
-
     //gws_refresh_window(fd,Window); //#bugbug
-
     //text
     //gws_draw_text(fd,Window,0,0,COLOR_RED,"This is a string");
-
 //redraw and refresh.
     gws_redraw_window(
          fd, Window, TRUE );
 //redraw and not refresh.
     //gws_redraw_window(
          //fd, Window, FALSE );
-
-
     //text
     //gws_draw_text(fd,Window,0,0,COLOR_RED,"This is a string");
 }
@@ -319,7 +310,6 @@ static void __test_winfo(int fd, int wid)
     if( (void*) Info == NULL ){
         return;
     }
-
 // Get window info:
 // IN: fd, wid, window info structure.
     gws_get_window_info(
@@ -328,7 +318,6 @@ static void __test_winfo(int fd, int wid)
         (struct gws_window_info_d *) Info );
     if (Info->used != TRUE){ return; }
     if (Info->magic!=1234) { return; }
-
 // Show info:
 // Frame: l,t,w,h
     printf("Frame info: l=%d t=%d w=%d h=%d\n",
@@ -376,6 +365,10 @@ static inline void do_cli(void)
 // try execute the filename in the prompt.
 static void __try_execute(int fd)
 {
+    if(fd<0){
+        return;
+    }
+
 // Empty buffer
    if( *prompt == 0 ){
        goto fail;
@@ -434,11 +427,12 @@ static void __try_execute(int fd)
 //#todo
 //Create a method.
 //int rtl_get_first_word_in_a_string(char *buffer_pointer, char *string);
- 
+
+    register int ii=0;
     char filename_buffer[12]; //8+3+1
     char *p;
-    p=prompt;
-    int ii=0;
+    p = prompt;
+
     while(1)
     {
         // Se tem tamanho o suficiente ou sobra.
@@ -2494,35 +2488,30 @@ int __input_STDIN(int fd)
 
 int main ( int argc, char *argv[] )
 {
-
-// ====
-    //porta para o Window Server 'ws' em gramado_ports[]
-    struct sockaddr_in addr_in;
-    addr_in.sin_family = AF_INET;
-    
-    // Connecting to the window server in this machine.
-    addr_in.sin_port = PORTS_WS;
-    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
-// ====
-
     int client_fd = -1;
 
-    Terminal.initialized = FALSE;
+    struct sockaddr_in addr_in;
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port = PORTS_WS;
+    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+
     debug_print ("terminal: Initializing\n");
+
+    Terminal.initialized = FALSE;
 
 // Device info
 // #todo: Check for 'zero'.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
 
-// Cursor
-    cursor_x = 0;
-    cursor_y = 0;
-
 // Process info
     Terminal.pid = getpid();
     Terminal.uid = getuid();
     Terminal.gid = getgid();
+
+// Cursor
+    cursor_x = 0;
+    cursor_y = 0;
 
     //setreuid(-1, -1);
     //setpgrp(0, getpid());
@@ -2530,16 +2519,14 @@ int main ( int argc, char *argv[] )
     __sequence_status = 0;
 
 // socket
+    // Terminal.client_fd = -1;
 
-    //client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    if ( client_fd < 0 )
-    {
+    client_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    if (client_fd<0){
        debug_print ("terminal: Couldn't create socket\n");
        printf      ("terminal: Couldn't create socket\n");
        exit(1);
     }
-
 // Saving the fd in the main struct.
     Terminal.client_fd = client_fd;
     //...
@@ -2557,21 +2544,23 @@ int main ( int argc, char *argv[] )
 
     int con_status = -1;
 
-    while (1){
-        con_status = (int) connect(client_fd, (void *) &addr_in, sizeof(addr_in));
+    while (1)
+    {
+        con_status = 
+            (int) connect(client_fd, (void *) &addr_in, sizeof(addr_in));
+        
+        if (con_status < 0){
 
-        if ( con_status < 0 ){ 
-            
+            debug_print ("terminal: Connection Failed \n");
+            printf      ("terminal: Connection Failed \n");
+
             // Nesse caso a conexao pode ter sido recusada 
             // porque o servidor tem clentes demais.
             // Vamos esperar para sempre?
             if( con_status == ECONNREFUSED )
                 rtl_yield();
 
-            debug_print ("terminal: Connection Failed \n");
-            printf      ("terminal: Connection Failed \n");
-
-        }else{ 
+        }else{
             break; 
         };
     };

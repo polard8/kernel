@@ -24,7 +24,6 @@
 unsigned long gScreenWidth=0;
 unsigned long gScreenHeight=0;
 
-
 // ==================================================
 // Windows
 
@@ -58,23 +57,16 @@ static int Client_window = 0;
 int gMaxIndex = NUMBER_OF_WINDOWS;
 int windows[NUMBER_OF_WINDOWS];
 
-
-//
-// == ports ====================================
-//
-
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
+// Ports
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
 // ...
 
 // JAIL,P1 ...
-int current_mode;
-
-
+static int current_mode=0;
 
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
-
 
 // ================
 
@@ -86,10 +78,10 @@ filemanProcedure(
     unsigned long long1,
     unsigned long long2 );
 
-static void barPrompt (void);
+static void barPrompt(void);
 static int fileman_init_globals(void);
 static int fileman_init_windows(void);
-static int barInputChar( int c );
+static int barInputChar(int c);
 static int barCompareStrings(void);
 
 // ================
@@ -97,28 +89,20 @@ static int barCompareStrings(void);
 static int fileman_init_globals(void)
 {
     gws_debug_print("fileman_init_globals:\n");
-    
     gScreenWidth  = gws_get_system_metrics(1);
     gScreenHeight = gws_get_system_metrics(2);
-
     //...
-    
     return 0;
 }
-
 
 static int fileman_init_windows(void)
 {
     register int i=0;
-
-    for (i=0; i<WINDOW_COUNT_MAX; i++)
-    {
+    for (i=0; i<WINDOW_COUNT_MAX; i++){
         windowList[i] = 0;
     };
-
     return 0;
 }
-
 
 //char *hello = "Hello there!\n";
 /*
@@ -132,11 +116,10 @@ struct sockaddr_in addr = {
 
 static int barCompareStrings(void)
 {
-    //debug_print("barCompareStrings: \n");
-
     char c=0;
-    
     c = (char) prompt[0];
+
+    //debug_print("barCompareStrings: \n");
 
 // =============================
 // Emergency 
@@ -191,13 +174,13 @@ done:
 
 static void barPrompt (void)
 {
-    int i=0;
+    register int i=0;
 
 // Clean prompt[] buffer.
 // This is a buffer inside the libc.
-
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
-
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
+        prompt[i] = (char) '\0';
+    };
     prompt[0] = (char) '\0';
     prompt_pos    = 0;
     prompt_status = 0;
@@ -219,16 +202,13 @@ static void barPrompt (void)
 
 // Coloca no prompt[] para ser comarado.
 // Talvez o prompt também seja o buffer de stdin
-static int barInputChar( int c )
+static int barInputChar(int c)
 {
     unsigned long ascii=0;
-    
     ascii = (unsigned long) (c & 0xFF);
 
     return (int) input(ascii);
 }
-
-
 
 static int 
 filemanProcedure(
@@ -238,11 +218,9 @@ filemanProcedure(
     unsigned long long1,
     unsigned long long2 )
 {
-
     if (fd<0){
         return (int) -1;
     }
-
     if (msg<0){
         return (int) -1;
     }
@@ -328,7 +306,7 @@ int main ( int argc, char *argv[] )
 
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
-    addr_in.sin_port   = PORTS_WS;
+    addr_in.sin_port = PORTS_WS;
     addr_in.sin_addr.s_addr = IP(127,0,0,1);
 
     debug_print ("fileman: Initializing ...\n");
@@ -336,44 +314,28 @@ int main ( int argc, char *argv[] )
 // dc
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
 // Gramado mode.
     current_mode = rtl_get_system_metrics(130);
-
 // #debug
     //printf ("The current mode is %d\n",current_mode);
     //exit(0);
 
-//
 // socket
-// 
-
-// #debug
-    //printf ("fileman: Creating socket\n");
-
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    if ( client_fd < 0 ){
+    client_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    if (client_fd<0){
         printf ("fileman: Couldn't create socket\n");
         exit(1);
     }
 
-//
 // connect
-// 
-
 // Nessa hora colocamos no accept um fd.
 // então o servidor escreverá em nosso arquivo.
-
-    //printf ("fileman: Connecting to ws via inet ...\n");
-
     while (1){
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){
+        if (connect(client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){
             gws_debug_print("fileman: Connection Failed \n");
             printf         ("fileman: Connection Failed \n");
         }else{ break; }; 
     };
-
-
 
 //
 // == Main window ==============
@@ -383,7 +345,6 @@ int main ( int argc, char *argv[] )
     unsigned long wHeight = (h - 100);
     unsigned long wLeft   = (w - wWidth)  >> 1;
     unsigned long wTop    = (h - wHeight) >> 1;
-
     // #hackhack
     unsigned long titlebarHeight = 32;
 
@@ -395,7 +356,6 @@ int main ( int argc, char *argv[] )
         wWidth  = w;
         wHeight = (h-40);
     }
-
 
 // main window
 // Locked and maximized.
@@ -411,7 +371,7 @@ int main ( int argc, char *argv[] )
                   0x8008,
                   COLOR_GRAY, COLOR_GRAY );
 
-    if ( Main_window < 0 ){
+    if (Main_window < 0){
         debug_print("fileman: Main_window fail\n");
         printf     ("fileman: Main_window fail\n");
         exit(1);
@@ -423,37 +383,32 @@ int main ( int argc, char *argv[] )
 
 // Como nossa janela mãe é overlapped,
 // então estamos relativos a sua área de cliente.
-
     unsigned long header_w_width = wWidth -2 -2;
     unsigned long header_w_height = 2 +24 +2;
 
+// Container for editbox and button.
     Header_window = 
         (int) gws_create_window ( 
                   client_fd,
                   WT_SIMPLE, 1, 1,"HeaderWin",
                   2,  //left pad
                   2,  //top  pad
-                  header_w_width,       //width 
-                  header_w_height,           //height
+                  header_w_width,   //width 
+                  header_w_height,  //height
                   Main_window, 0, 
                   xCOLOR_GRAY7, xCOLOR_GRAY7 );
 
-    if ( Header_window < 0 ){
+    if (Header_window<0){
         debug_print("fileman: Header_window fail\n"); 
         printf     ("fileman: Header_window fail\n"); 
         exit(1);
     }
 
-
 //
 // == Address bar =========================
 //
 
-// #bugbug
-// The window server needs to fix the client area.
-// So 0,0 needs to mean the top/left of the client area.
-// address bar
-
+// Editbox.
     addressbar_window = 
         (int) gws_create_window ( 
                   client_fd,
@@ -463,7 +418,7 @@ int main ( int argc, char *argv[] )
                   (header_w_width -2 -2 -2 -24 -2), 
                   24,
                   Header_window, 0, 
-                  COLOR_YELLOW, COLOR_YELLOW );
+                  COLOR_EDITBOX, COLOR_EDITBOX );
 
     if ( addressbar_window < 0 ){
         debug_print("fileman: addressbar_window fail\n"); 
@@ -471,13 +426,12 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-
 //
 // == Button =========================================
 //
 
-    // [>]
-    // button
+// [>]
+// button
     button = 
         (int) gws_create_window ( 
                   client_fd,
@@ -489,7 +443,7 @@ int main ( int argc, char *argv[] )
                   Header_window, 0, 
                   COLOR_GRAY, COLOR_GRAY );
 
-    if ( button < 0 ){
+    if (button < 0){
         debug_print("fileman: button fail\n"); 
         printf     ("fileman: button fail\n"); 
         exit(1);
@@ -517,14 +471,13 @@ int main ( int argc, char *argv[] )
                   mwLeft, mwTop, mwWidth, mwHeight, 
                   Main_window, 
                   0, 
-                  COLOR_BLUE, COLOR_BLUE );
+                  COLOR_BLUE2CYAN, COLOR_BLUE2CYAN );
 
-    if ( Menu_window < 0 ){
+    if (Menu_window<0){
         debug_print("fileman: Menu_window fail\n"); 
         printf     ("fileman: Menu_window fail\n"); 
         exit(1);
     }
-
 
 //
 // == Logo_window ============================
@@ -541,17 +494,16 @@ int main ( int argc, char *argv[] )
                   WT_SIMPLE, 1, 1,"LogoWin",
                   lwLeft, lwTop, lwWidth, lwHeight, 
                   Menu_window, 0, 
-                  COLOR_BLUE2CYAN, COLOR_BLUE2CYAN );
+                  COLOR_BLUE, COLOR_BLUE );
 
-    if ( Logo_window < 0 ){
+    if (Logo_window<0){
         debug_print("fileman: Logo_window fail\n"); 
         printf     ("fileman: Logo_window fail\n"); 
         exit(1);
     }
 
-
 // [/] button
-    if ( Logo_window > 0 )
+    if (Logo_window>0)
     {
         lw_button1 = 
             (int) gws_create_window ( 
@@ -562,7 +514,7 @@ int main ( int argc, char *argv[] )
                       0, 
                       COLOR_WHITE, COLOR_WHITE );
     }
-    if ( lw_button1 < 0 ){
+    if (lw_button1<0){
         debug_print("fileman: lw_button1 fail\n"); 
     }
 
@@ -660,13 +612,13 @@ int main ( int argc, char *argv[] )
 // == Client window =====================================
 //
 
+// This is a container for the menu ítens.
 // metade direita da tela.
 // #todo: precisamos pegar as dimensões da área de cliente.
 // Estamos relativos á area de cliente da janela mãe.
 
-    unsigned long cwLeft = (wWidth/4);
-    unsigned long cwTop  = mwTop; //40;
-    
+    unsigned long cwLeft   = (wWidth/4);
+    unsigned long cwTop    = mwTop; //40;
     unsigned long cwWidth  = (wWidth - cwLeft -4);
     unsigned long cwHeight = mwHeight; //(wHeight - cwTop -4 -titlebarHeight);
 
@@ -681,7 +633,7 @@ int main ( int argc, char *argv[] )
                   COLOR_WHITE, 
                   COLOR_WHITE );
 
-    if ( Client_window < 0 ){
+    if (Client_window<0){
         debug_print("fileman: Client_window fail\n"); 
     }
 
@@ -691,11 +643,10 @@ int main ( int argc, char *argv[] )
 
 // Items
 
-    int index=0;
+    register int index=0;
     gMaxIndex = NUMBER_OF_WINDOWS;
 
-    if (current_mode==GRAMADO_JAIL)
-    {
+    if (current_mode==GRAMADO_JAIL){
         gMaxIndex=3;
     }
 
@@ -709,9 +660,10 @@ int main ( int argc, char *argv[] )
     for (index=0; index<gMaxIndex; index++)
     {
         ItemColor=COLOR_WHITE;
-        if( (index % 2) != 0 )
+        if ( (index % 2) != 0 ){
             ItemColor = COLOR_GRAY;
-        
+        }
+
         windows[index] = 
             (int) gws_create_window ( 
                       client_fd,
@@ -741,7 +693,6 @@ int main ( int argc, char *argv[] )
 // =============================================================
 //
 
-
 // dir entries
 
     int e=0;
@@ -757,7 +708,6 @@ int main ( int argc, char *argv[] )
         8, (e*16), COLOR_BLACK, "FAKEFILE.TXT");
     }
     */
-
 
 // ============================================
 // focus
@@ -823,23 +773,16 @@ int main ( int argc, char *argv[] )
         }
     };
 
-
-    while(1){}
+// force hang
+    while(1){
+    };
 
     debug_print ("fileman: bye\n"); 
     printf      ("fileman: bye\n");
     return 0;
 }
 
-
 //
-// End.
+// End
 //
-
-
-
-
-
-
-
 

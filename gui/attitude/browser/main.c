@@ -18,9 +18,9 @@
 #include <gws.h>
 
 // network ports.
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
 // ...
 
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
@@ -132,27 +132,24 @@ int main( int argc, char *argv[] )
 {
     int client_fd = -1;
 
-// Porta para o Window Server 'ws' em gramado_ports[].
     struct sockaddr_in addr_in;
-    addr_in.sin_family      = AF_INET;
-    addr_in.sin_port        = PORTS_WS;   
-    addr_in.sin_addr.s_addr = IP(192, 168, 1, 112); 
+    addr_in.sin_family = AF_INET;
+    addr_in.sin_port = PORTS_WS;   
+    addr_in.sin_addr.s_addr = IP(127,0,0,1);
 
     debug_print ("browser: Initializing ...\n");
 
 // Device info.
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
     if ( w == 0 || h == 0 ){
         printf ("browser: w h \n");
         exit(1);
     }
 
 // socket
-
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    if ( client_fd < 0 ){
+    client_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    if (client_fd<0){
        printf ("browser: Couldn't create socket\n");
        exit(1);
     }
@@ -162,12 +159,11 @@ int main( int argc, char *argv[] )
 // Então o servidor escreverá em nosso arquivo.
 
     while (TRUE){
-        if (connect (client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
+        if (connect(client_fd, (void *) &addr_in, sizeof(addr_in)) < 0){ 
             debug_print("browser: Connection Failed \n"); 
             printf     ("browser: Connection Failed \n"); 
         }else{ break; }; 
     };
-
 
 // ==============================================
 
@@ -182,23 +178,19 @@ int main( int argc, char *argv[] )
 
 // A janela é a metade da tela.
     unsigned long w_width  = (w/2);
-    unsigned long w_height = (h/2); 
-
+    unsigned long w_height = (h/2);
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 );
 
-
-    if ( w == 320 )
+    if (w == 320)
     {
         // dimensoes
         w_width  = w;
         w_height = h;
-        
         // posicionamento
         viewwindowx = 0;
         viewwindowy = 0;
     }
-
 
 // ===================
 // main window

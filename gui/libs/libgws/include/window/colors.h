@@ -255,6 +255,7 @@
 
 // Special
 #define COLOR_WINDOW              0x00FFFFFF
+#define COLOR_EDITBOX  COLOR_WINDOW
 #define COLOR_BLACK               0x000000
 #define COLOR_WHITE               0xFFFFFF 
 #define COLOR_RED                 0xFF0000 
