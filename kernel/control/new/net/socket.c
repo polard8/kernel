@@ -32,18 +32,15 @@ static pid_t gramado_ports[GRAMADO_PORT_MAX];
 
 struct socket_d *create_socket_object(void)
 {
-    struct socket_d  *s;
-    int i=0;
+    register int i=0;
+    struct socket_d *s;
 
+// Create and clean the structure.
     s = (void *) kmalloc ( sizeof( struct socket_d ) );
-    if ( (void *) s ==  NULL )
-    {
-        printf ( "create_socket_object: s \n");
-        refresh_screen();
-        return NULL;
+    if ( (void *) s ==  NULL ){
+        printf ( "create_socket_object: s\n");
+        goto fail;
     }
-
-// Clear the structure.
     memset( s, 0, sizeof(struct socket_d) );
 
     //s->objectType =
@@ -59,14 +56,12 @@ struct socket_d *create_socket_object(void)
     s->family = 0;
     s->type = 0;
     s->protocol = 0;
-
     s->ip = (unsigned int) 0;
     s->port =  (unsigned short) 0;
 
     // #todo
     //s->ip_ipv4 = (unsigned int) 0;
     //s->ip_ipv6 = (unsigned long) 0;
-
 
 // Initializing pointers.
 // We don't want this kinda crash in the real machine.
@@ -76,35 +71,26 @@ struct socket_d *create_socket_object(void)
 
     s->conn = (struct socket_d *) 0;
 
-// The counter.
+// The counter
     s->connections_count = 0;
 
-    //int i=0;
-    for(i=0; i<32; i++){
+    for (i=0; i<32; i++){
         s->pending_connections[i]=0;
     };
     s->backlog_head = 0;   //sai
     s->backlog_tail = 0;   //entra
     s->backlog_max = 4;
 
-
 // Not yet.
 // listen() will set this flag.
     s->AcceptingConnections = FALSE;
-
 // The socket needs to be initialized 
 // in the disconnected state.
-
     s->state = SS_UNCONNECTED;
-
-
 // #bugbug
 // It tells us that write() will copy 
 // the data to the connected socket.
-
     s->conn_copy = TRUE;  //YES, copy!
-
-
 // The server finds a place in the server_process->Objects[i].
     s->clientfd_on_server = -1;
 
@@ -113,32 +99,31 @@ struct socket_d *create_socket_object(void)
     // ...
 
     s->flags = 0;
-
     s->used = TRUE;
     s->magic = 1234;
 
     return (struct socket_d *) s;
+
+fail:
+    refresh_screen();
+    return NULL;
 }
 
-
-unsigned long getSocketIP ( struct socket_d *socket )
-{
-    if ( (void *) socket ==  NULL ){
-        return 0;
-    } 
-
-    return (unsigned long) socket->ip; 
-}
-
-unsigned long getSocketPort ( struct socket_d *socket )
+unsigned long getSocketIP(struct socket_d *socket)
 {
     if ( (void *) socket ==  NULL ){
         return 0;
     }
-
-    return (unsigned long) socket->port; 
+    return (unsigned long) socket->ip; 
 }
 
+unsigned long getSocketPort(struct socket_d *socket)
+{
+    if ( (void *) socket ==  NULL ){
+        return 0;
+    }
+    return (unsigned long) socket->port; 
+}
 
 // Get the pointer for the socket structure 
 // given the fd.
@@ -147,7 +132,6 @@ struct socket_d *get_socket_from_fd (int fd)
     struct process_d *p;
     file *_file;
 
-
     if (fd<0 || fd>=OPEN_MAX)
     {
         //msg
@@ -155,35 +139,26 @@ struct socket_d *get_socket_from_fd (int fd)
     }
 
 // process
-
     pid_t current_process = (pid_t) get_current_process();    
-
     p = (struct process_d *) processList[current_process];
-    
-    if ( (void *) p == NULL)
-    {
+    if ( (void *) p == NULL){
         return (struct socket_d *) 0;
     }
 
 // The file.
-
     _file = (file *) p->Objects[fd];    
-    
     if ( (void *) _file == NULL){
         return (struct socket_d *) 0;
     }
 
 // The structure.
 // Get the pointer for the socket structure given the fd.
-
     return (struct socket_d *) _file->socket;
 }
 
-
-
 // Show the private socket for a process.
-void show_socket_for_a_process (pid_t pid){
-
+void show_socket_for_a_process (pid_t pid)
+{
     struct process_d  *p;
     struct socket_d   *s;
 
@@ -195,40 +170,33 @@ void show_socket_for_a_process (pid_t pid){
         goto fail;
     }
 
-    p = (struct process_d *) processList[pid];
+// process
 
+    p = (struct process_d *) processList[pid];
     if ( (void *) p == NULL ){
         printf("p\n");
         goto fail;
+    }
+    if ( p->used != TRUE || p->magic != 1234 ){
+        printf("p validation\n");
+        goto fail;
+    }
 
-    }else{
-        if ( p->used != 1 || p->magic != 1234 ){
-            printf("Process validation\n");
-            goto fail;
-        }
-        //ok
-    };
-    
-    
-    //Pega o ponteiro para a estrutura privada de soquete.
+// Socket struture.
+// Pega o ponteiro para a estrutura privada de soquete.
     s = (struct socket_d *) p->priv;
-    
     if ( (void *) s == NULL ){
         printf("s\n");
         goto fail;
+    }
+    if ( s->used != TRUE || s->magic != 1234 ){
+        printf ("s validation\n");
+        goto fail;
+    }
 
-    }else{
-        if ( s->used != 1 || s->magic != 1234 ){
-            printf ("socket validation\n");
-            goto fail;
-        }
-    };
-
-//
 // Show
-//
-      
-    // sockaddr structure.  
+// sockaddr structure.  
+
     printf ("family %d \n",s->addr.sa_family);
     printf ("data %s   \n",s->addr.sa_data);
     //printf ("",s->);
@@ -263,9 +231,8 @@ socket_gramado (
 // essa estrutura der arquivo.
 // Retornaremos seu fd.
     file *_file;
-
     struct process_d *Process;
-    int i=0;
+    register int i=0;
     int __slot = -1;
 
     debug_print ("socket_gramado:\n");
@@ -274,35 +241,34 @@ socket_gramado (
         debug_print ("socket_gramado: sock\n");
         goto fail;
     }
-
     if (sock->magic!=1234){
         debug_print ("socket_gramado: sock validation\n");
         goto fail;
     }
-
     if (family != AF_GRAMADO){
         debug_print ("socket_gramado: family\n");
         goto fail;
     }
 
-
-    // #todo
-    // Check current_process ?
-
 // Process.
+// #todo
+// Check 'current_process'?
+// #todo: max.
+
+    //if ( current_process < 0 || 
+    //     current_process >= PROCESS_COUNT_MAX )
+    //{
+    //}
 
     Process = (void *) processList[current_process];
-
     if ( (void *) Process == NULL ){
-        printf("socket_gramado: [FAIL] Process\n");
+        printf("socket_gramado: Process\n");
         goto fail;
-    }else{
-        if ( Process->used != TRUE || Process->magic != 1234 ){
-            printf("socket_gramado: [FAIL] Process validation\n");
-            goto fail;
-        }
-        //ok
-    };
+    }
+    if ( Process->used != TRUE || Process->magic != 1234 ){
+        printf("socket_gramado: Process validation\n");
+        goto fail;
+    }
 
 //#todo
 //temos que criar uma rotina que procure slots em Process->Objects[]
@@ -324,14 +290,13 @@ socket_gramado (
     {
         if ( Process->Objects[i] == 0 )
         { 
-            __slot = i; 
+            __slot = i;
             break; 
         }
     };
 
 // Check slot validation. 
-    if ( __slot == -1 )
-    {
+    if ( __slot == -1 ){
         printf ("socket_gramado: [FAIL] No free slots\n");
         goto fail;
     }
@@ -342,39 +307,28 @@ socket_gramado (
     
     //char *buff = (char *) newPage ();
     char *buff = (char *) kmalloc(BUFSIZ);
-
-    if ( (void *) buff == NULL )
-    {
+    if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
-
         debug_print ("socket_gramado: [FAIL] Buffer allocation fail\n");
         printf      ("socket_gramado: [FAIL] Buffer allocation fail\n");
         goto fail;
     }
-
 
 //
 // File
 //
 
     _file = (void *) kmalloc ( sizeof(file) );
-
-    if ( (void *) _file == NULL  )
-    {
+    if ( (void *) _file == NULL  ){
         //Process->Objects[__slot] = (unsigned long) 0;
-        
         debug_print ("socket_gramado: [FAIL] _file fail\n");
         printf      ("socket_gramado: [FAIL] _file fail\n");
         goto fail;
     }
     memset( _file, 0, sizeof(struct file_d) );
 
-
 // Object type
-
     _file->____object = ObjectTypeSocket;
-
-    //panic("$$$$");
 
     _file->pid = (pid_t) current_process;
     _file->uid = (uid_t) current_user;
@@ -409,17 +363,14 @@ socket_gramado (
 // Buffer
 //
 
-    _file->_base    = buff;
-    _file->_p       = buff;
+    _file->_base = buff;
+    _file->_p    = buff;
     _file->_lbfsize = BUFSIZ;
-
 // Quanto falta
     _file->_cnt = _file->_lbfsize;
-
  // Offsets
     _file->_r = 0;
     _file->_w = 0;
-
 // Status do buffer do socket.
     _file->socket_buffer_full = 0;  
 
@@ -444,10 +395,10 @@ socket_gramado (
 // Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
 
-    _file->used  = TRUE;
+    _file->used = TRUE;
     _file->magic = 1234;
 
-    debug_print ("socket_gramado: done\n");
+    // debug_print ("socket_gramado: done\n");
 
 // ok.
 // Retornamos o fd na lista de arquivos abertos pelo processo.
@@ -473,49 +424,46 @@ socket_inet (
     int protocol )
 {
     file *_file;
-
     struct process_d *Process;
-    int i=0;
+    register int i=0;
     int __slot = -1;
 
     pid_t current_process = (pid_t) get_current_process();
-
 
     if ( (void*) sock == NULL ){
         debug_print ("socket_inet: sock\n");
         goto fail;
     }
-
     if (sock->magic!=1234){
         debug_print ("socket_inet: sock validation\n");
         goto fail;
     }
-
     if (family != AF_INET){
         debug_print ("socket_inet: family\n");
         goto fail;
     }
 
-
+// Process.
 // #todo
-// Check index validation.
+// Check 'current_process'?
+// #todo: max.
 
-// Process
+    //if ( current_process < 0 || 
+    //     current_process >= PROCESS_COUNT_MAX )
+    //{
+    //}
 
     Process = (void *) processList[current_process];
-
     if ( (void *) Process == NULL ){
         printf("socket_inet: Process\n");
         goto fail;
     }
-
     if ( Process->used != TRUE || 
          Process->magic != 1234 )
     {
         printf("socket_inet: validation\n");
         goto fail;
     }
-
 
 //#todo
 //temos que criar uma rotina que procure slots em Process->Streams[]
@@ -525,10 +473,10 @@ socket_inet (
     // process_find_empty_stream_slot ( struct process_d *process );
 
 // #improvisando
-	// 0, 1, 2 são reservados para o fluxo padrão.
-	// Como ainda não temos rotinas par ao fluxo padrão,
-	// pode ser que peguemos os índices reservados.
-	// Para evitar, começaremos depois deles.
+// 0, 1, 2 são reservados para o fluxo padrão.
+// Como ainda não temos rotinas par ao fluxo padrão,
+// pode ser que peguemos os índices reservados.
+// Para evitar, começaremos depois deles.
     
     __slot=-1;
     //for ( i=3; i< NUMBER_OF_FILES; i++ )
@@ -541,9 +489,8 @@ socket_inet (
         }
     };
 
-// Fail.
-    if ( __slot == -1 )
-    {
+// Fail
+    if ( __slot == -1 ){
         printf ("socket_inet: No free slots\n");
         goto fail;
     }
@@ -554,11 +501,8 @@ socket_inet (
 
     char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
-
-    if ( (void *) buff == NULL )
-    {
+    if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
-
         debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
         printf      ("socket_inet: [FAIL] Buffer allocation fail\n");
         goto fail;
@@ -569,22 +513,15 @@ socket_inet (
 //
 
     _file = (void *) kmalloc( sizeof(file) );
-
-    if ( (void *) _file == NULL  )
-    {
+    if ( (void *) _file == NULL  ){
         //Process->Objects[__slot] = (unsigned long) 0;
-        
         printf ("socket_inet: _file fail\n");
         goto fail;
-
     }
+// Clear the structure.
+    memset( _file, 0, sizeof(struct file_d) );
 
-// Clear
-    memset( 
-        _file, 
-        0, 
-        sizeof(struct file_d) );
-
+// #todo: Fazer isso somente no fim da rotina.
     _file->used = TRUE;
     _file->magic = 1234;
 
@@ -594,6 +531,7 @@ socket_inet (
     _file->____object = ObjectTypeSocket;
 
 // sync
+
     _file->sync.sender = -1;
     _file->sync.receiver = -1;
     _file->sync.action = ACTION_NULL;
@@ -607,28 +545,26 @@ socket_inet (
     _file->sync.block_on_read_empty = TRUE;
 
     _file->sync.block_on_write = TRUE;
-    _file->sync.block_on_write_full = TRUE;     
+    _file->sync.block_on_write_full = TRUE;
 
-    _file->sync.lock = FALSE;   
+    _file->sync.lock = FALSE;
 
 // flags 
     _file->_flags = __SWR;
 // No name for now.
     _file->_tmpfname = NULL;
-    //_file->_tmpfname = "socket";       
+    //_file->_tmpfname = "socket";
 
-// Buffer.
+// Buffer support:
+
     _file->_base    = buff;
     _file->_p       = buff;
-    _file->_lbfsize = BUFSIZ; 
-
-// Quanto falta.
-    _file->_cnt = _file->_lbfsize;        
-
+    _file->_lbfsize = BUFSIZ;
+// Quanto falta
+    _file->_cnt = _file->_lbfsize;
     _file->_r = 0;
     _file->_w = 0;
-
-    _file->socket_buffer_full = 0;  
+    _file->socket_buffer_full = 0;
 
     _file->socket = sock;
 
@@ -659,16 +595,13 @@ fail:
 }
 
 // Initialize socket list.
-int socket_init (void)
+int socket_init(void)
 {
-    int i=0;
-
+    register int i=0;
     for (i=0; i<32; i++){
         socketList[i] = (unsigned long) 0;
     };
-
     socket_initialize_gramado_ports();
-
     // ...
 
     return 0;
@@ -676,14 +609,13 @@ int socket_init (void)
 
 int socket_initialize_gramado_ports(void)
 {
-    int i=0;
+    register int i=0;
     for (i=0; i<GRAMADO_PORT_MAX; i++)
     {
         gramado_ports[i] = 0;
     };
     return 0;
 }
-
 
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 {
@@ -697,31 +629,24 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
         return (int) (-EBADF);
     }
 
-    // process
-
+// process
     pid_t current_process = (pid_t) get_current_process();
-
     p = (void*) processList[current_process];
-
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print("socket_ioctl: [FAIL] p\n");
         return -1;
     }
 
-    // file
-    
-    f = (file *) p->Objects[fd];
+// file
 
+    f = (file *) p->Objects[fd];
     if ( (void *) f == NULL ){
         debug_print("socket_ioctl: [FAIL] f\n");
         return -1;
     }
-    
 // #bugbug
 // Se eh uma chamada vinda de ring3, entao nao conseguira
 // acessar a estrutura ... problemas com registrador de segmentos.
-
     if (f->used != TRUE || f->magic != 1234 )
     {
         panic("socket_ioctl: validation\n");
@@ -787,7 +712,6 @@ int socket_write ( unsigned int fd, char *buf, int count )
     return -1;
 }
 
-
 pid_t socket_get_gramado_port (int port)
 {
     //port
@@ -833,69 +757,55 @@ socket_unix (
     int protocol )
 {
     file *_file;
-
     struct process_d *Process;
-    int i=0;
+    register int i=0;
     int __slot = -1;
 
-    //#todo
-    //check sock arg.
+//#todo
+//check sock arg.
 
     debug_print ("socket_unix:\n");
 
-
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( (void*) sock == NULL )
-    {
+    if ( (void*) sock == NULL ){
         debug_print ("socket_unix: sock\n");
         goto fail;
     }
-
     if (sock->magic!=1234){
         debug_print ("socket_unix: sock validation\n");
         goto fail;
     }
-
-    if (family != AF_UNIX)
-    {
+    if (family != AF_UNIX){
         debug_print ("socket_unix: family\n");
         goto fail;
     }
 
-
-    // Process.
-    //#todo: check pid validation
+// Process.
+//#todo: check pid validation
 
     Process = (void *) processList[current_process];
-
-    if ( (void *) Process == NULL )
-    {
+    if ( (void *) Process == NULL ){
         printf("socket_unix: Process\n");
         goto fail;
 
-    }else{
+    }
+    if ( Process->used != TRUE || Process->magic != 1234 ){
+        printf("socket_unix: Process validation\n");
+        goto fail;
+    }
 
-        if ( Process->used != 1 || Process->magic != 1234 ){
-            printf("socket_unix: validation\n");
-            goto fail;
-        }
-        //ok
-    };
+// #todo
+// Temos que criar uma rotina que procure slots em Process->Streams[]
+// e colocarmos em process.c
+// essa é afunção que estamos criando.
+// process_find_empty_stream_slot ( struct process_d *process );
 
-
-
-	//#todo
-	//temos que criar uma rotina que procure slots em Process->Streams[]
-	//e colocarmos em process.c
-	//essa é afunção que estamos criando.
-	// process_find_empty_stream_slot ( struct process_d *process );
-
-	// #improvisando
-	// 0, 1, 2 são reservados para o fluxo padrão.
-	// Como ainda não temos rotinas par ao fluxo padrão,
-	// pode ser que peguemos os índices reservados.
-	// Para evitar, começaremos depois deles.
+// #improvisando
+// 0, 1, 2 são reservados para o fluxo padrão.
+// Como ainda não temos rotinas par ao fluxo padrão,
+// pode ser que peguemos os índices reservados.
+// Para evitar, começaremos depois deles.
 
     __slot = -1;
     // Reserva um slot.
@@ -910,119 +820,105 @@ socket_unix (
     };
 
 // Check slot validation. 
-    if ( __slot == -1 )
-    {
+    if ( __slot == -1 ){
         printf ("socket_unix: No free slots\n");
         goto fail;
     }
 
-
-    //
-    // == Buffer ================
-    //
+//
+// == Buffer ================
+//
 
     char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
-
-    if ( (void *) buff == NULL )
-    {
+    if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
-        
         debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
         printf      ("socket_unix: [FAIL] Buffer allocation fail\n");
         goto fail;
     }
 
-
-	//
-	// File.
-	//
+//
+// File
+//
 
     _file = (void *) kmalloc( sizeof(file) );
-
-    if ( (void *) _file == NULL  )
-    {
+    if ( (void *) _file == NULL  ){
         //Process->Objects[__slot] = (unsigned long) 0;
-        
         printf ("socket_unix: _file fail\n");
         goto fail;
+    }
+    memset( _file, 0, sizeof(struct file_d) );
 
-    }else{
+// #todo: Podemos adiar isso para o fim da rotina.
+    _file->used = TRUE;
+    _file->magic = 1234;
 
-        memset( _file, 0, sizeof(struct file_d) );
+    _file->pid = (pid_t) current_process;
+    _file->uid = (uid_t) current_user;
+    _file->gid = (gid_t) current_group;
+    _file->____object = ObjectTypeSocket;
+
+// sync
+
+    _file->sync.sender = -1;
+    _file->sync.receiver = -1;
+    _file->sync.action = ACTION_NULL;
+    _file->sync.can_read = TRUE;
+    _file->sync.can_write = TRUE;
+    _file->sync.can_execute = FALSE;
+    _file->sync.can_accept = TRUE;
+    _file->sync.can_connect = TRUE;
+
+    _file->sync.block_on_read = FALSE;
+    _file->sync.block_on_read_empty = TRUE;
+
+    _file->sync.block_on_write = TRUE;
+    _file->sync.block_on_write_full = TRUE;
         
-        _file->used = 1;
-        _file->magic = 1234;
-        _file->pid = (pid_t) current_process;
-        _file->uid = (uid_t) current_user;
-        _file->gid = (gid_t) current_group;
-        _file->____object = ObjectTypeSocket;
+    _file->sync.lock = FALSE;
 
-        // sync
-        _file->sync.sender = -1;
-        _file->sync.receiver = -1;
-        _file->sync.action = ACTION_NULL;
-        _file->sync.can_read = TRUE;
-        _file->sync.can_write = TRUE;
-        _file->sync.can_execute = FALSE;
-        _file->sync.can_accept = TRUE;
-        _file->sync.can_connect = TRUE;
+    _file->_flags = __SWR;
 
-        _file->sync.block_on_read = FALSE;
-        _file->sync.block_on_read_empty = TRUE;
+// No name for now.
+// #bugbug: 
+// unix sockets has names.
+// it's like a normal fs pathname.
 
-        _file->sync.block_on_write = TRUE;
-        _file->sync.block_on_write_full = TRUE;
-        
-        _file->sync.lock = FALSE;
+    _file->_tmpfname = NULL;
+    //_file->_tmpfname = "/tmp/socketXXX";    
 
-        _file->_flags = __SWR;
-        
-        // No name for now.
-        // #bugbug: 
-        // unix sockets has names.
-        // it's like a normal fs pathname.
+// Buffer
 
-        _file->_tmpfname = NULL;
-        //_file->_tmpfname = "/tmp/socketXXX";    
+    _file->_base = buff;
+    _file->_p    = buff;
+    _file->_lbfsize = BUFSIZ; 
+// Quanto falta
+    _file->_cnt = _file->_lbfsize;
+    _file->_r = 0;
+    _file->_w = 0;
+    _file->socket_buffer_full = 0;  
 
+    _file->socket = sock;
 
-        // Buffer.
-        _file->_base = buff;
-        _file->_p    = buff;
-        _file->_lbfsize = BUFSIZ; 
+// O arquivo do soquete, o buffer?
+    sock->private_file = (file *) _file; 
 
-        // Quanto falta.
-        _file->_cnt = _file->_lbfsize;
+// Salvamos o ponteira para estrutura de soquete
+// na estrutura de processo do processo atual.
+    Process->priv = (void *) sock;
 
-        _file->_r = 0;
-        _file->_w = 0;
+// fd.
+    _file->_file = __slot;
 
+//Colocando na lista de arquivos abertos no processo.
+    Process->Objects[__slot] = (unsigned long) _file;
 
-        _file->socket_buffer_full = 0;  
+    //debug_print ("socket_unix: done\n");
 
-        _file->socket = sock;
-        
-        // O arquivo do soquete, o buffer ?
-        sock->private_file = (file *) _file; 
-
-        // Salvamos o ponteira para estrutura de soquete
-        // na estrutura de processo do processo atual.
-        Process->priv = (void *) sock;
-
-
-        // fd.
-        _file->_file = __slot;
-
-        //Colocando na lista de arquivos abertos no processo.
-        Process->Objects[__slot] = (unsigned long) _file;
-
-         debug_print ("socket_unix: done\n");
-         
-        //ok.
-        // Retornamos o fd na lista de arquivos abertos pelo processo.
-        return (int) __slot;
-    };
+    //ok.
+    // Retornamos o fd na lista de arquivos abertos pelo processo.
+    return (int) __slot;
 
 fail:
     debug_print ("socket_unix: fail\n");
@@ -1072,22 +968,17 @@ sys_accept (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
-
 // Server process.
     struct process_d *sProcess;
-
 // Server socket and client socket.
     struct socket_d *sSocket;
     struct socket_d *cSocket;
-
 // Files for the server and client sockets.
     file *sFile;
     file *cFile;   //#todo
-
 // File descriptors for the server and client sockets.
     int fdServer = -1;
     int fdClient = -1;
-
 // Iterator for the pending connections queue.
     int i=0;
 
@@ -1421,20 +1312,16 @@ fail:
     return -1;
 }
 
-
 /*
- ********************************
  * sys_bind:
  *    When a socket is created with socket(), it exists in a 
  *    name space (address family) but has no address assigned to it. 
  *    bind() assigns the address specified by addr to the socket 
  *    referred to by the file descriptor sockfd.
  */
-
 // bind() is typically used on the server side, and 
 // associates a socket with a socket address structure, 
 // i.e. a specified local IP address and a port number.
-
 // See:
 // https://man7.org/linux/man-pages/man2/bind.2.html
 
@@ -1447,8 +1334,7 @@ sys_bind (
     struct process_d  *p;   // Process
     struct file_d     *f;   // File
     struct socket_d   *s;   // Socket
-
-    int i=0;
+    register int i=0;
     int Verbose=FALSE;
 
     // #debug
@@ -1471,9 +1357,7 @@ sys_bind (
     }
 
 // Check addr structure.
-
-    if ( (void *) addr == NULL )
-    {
+    if ( (void *) addr == NULL ){
         debug_print ("sys_bind: addr fail\n");
         printf      ("sys_bind: addr fail\n");
         goto fail;
@@ -1483,9 +1367,7 @@ sys_bind (
 // #todo: check pid validation.
 
     p = (struct process_d *) processList[current_process];
- 
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_bind: p fail\n");
         printf      ("sys_bind: p fail\n");
         goto fail;
@@ -1495,9 +1377,7 @@ sys_bind (
 // O objeto do tipo socket.
 
     f = (file *) p->Objects[sockfd];
-
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         debug_print ("sys_bind: f fail\n");
         printf      ("sys_bind: f fail\n");
         goto fail;
@@ -1512,11 +1392,8 @@ sys_bind (
 
 // socket
 // A estrutura de socket associada ao objeto do tipo socket.
-
     s = (struct socket_d *) f->socket;
-
-    if ( (void *) s == NULL )
-    {
+    if ( (void *) s == NULL ){
         debug_print ("sys_bind: s fail\n");
         printf      ("sys_bind: s fail\n");
         goto fail; 
@@ -2053,7 +1930,7 @@ sys_connect (
 // presente na estrutura do processo servidor.
 
     int __slot=-1;  //fail
-    int ii=0;
+    register int ii=0;
     //for (__slot=0; __slot<32; __slot++)
     for (ii=3; ii<31; ii++)
     {
@@ -2200,12 +2077,10 @@ sys_getsockname (
     struct sockaddr *addr, 
     socklen_t *addrlen )
 {
-
-    // Process, file and socket.
+// Process, file and socket.
     struct process_d  *p;
     struct file_d     *f;
     struct socket_d   *s;
-
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -2216,67 +2091,56 @@ sys_getsockname (
         return -1;
     }
 
-    // process
-    p = (struct process_d *) processList[current_process];
- 
+// process
+    p = (struct process_d *) processList[current_process]; 
     if ( (void *) p == NULL ){
         printf ("sys_getsockname: p fail\n");
         refresh_screen();
         return -1;
     }
 
-
-    // file
+// file
     f = (file *) p->Objects[sockfd];
-
     if ( (void *) f == NULL ){
         printf ("sys_getsockname: f fail\n");
         refresh_screen();
         return -1;
     }
-    
- 
-    //socket
-    s = (struct socket_d *) p->priv;
 
+//socket
+    s = (struct socket_d *) p->priv;
     if ( (void *) s == NULL ){
         printf ("sys_getsockname: s fail\n");
         refresh_screen();
         return -1;
     }
 
-
-    //addr 
-    
-    // Usando a estrutura que nos foi passada.
+// addr
+// Usando a estrutura que nos foi passada.
     if ( (void *) addr == NULL ){
         printf ("sys_getsockname: addr fail\n");
         refresh_screen();
         return -1;
     }
 
-
-    // Everything is ok.
-    // So now we need to include the 'name' into the socket structure
-    // respecting the socket's family.
-    int n = 0;
+// Everything is ok.
+// So now we need to include the 'name' into the socket structure
+// respecting the socket's family.
+    register int n = 0;
     
     if (s->addr.sa_family == AF_GRAMADO)
     {
         // Binding the name to the socket.
         printf ("sys_getsockname: Getting the name and the size\n");
-        
         addrlen[0] = n;
-        
         // Always 14.
-        for(n=0; n<14; n++){
+        for (n=0; n<14; n++){
             addr->sa_data[n] = s->addr.sa_data[n];
-        }
-
+        };
         debug_print ("sys_getsockname: copy ok\n");
         return 0;
     }
-    
+
     // #todo
     // More families.
     //if ( ...
@@ -2287,7 +2151,6 @@ sys_getsockname (
     printf ("sys_getsockname: process %d ; family %d ; len %d \n", 
         current_process, addr->sa_family, addrlen  );
  
-     
     printf ("sys_getsockname: fail\n");
     refresh_screen();
     return -1;
@@ -2371,36 +2234,27 @@ int sys_listen (int sockfd, int backlog)
 //
 
 // process
-
     p = (struct process_d *) processList[current_process];
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_listen: p fail\n");
         printf      ("sys_listen: p fail\n");
         goto fail;
     }
 
-
 // file 
 // sender's file
 // Objeto do tipo socket.
-
     f = (file *) p->Objects[sockfd];
-
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         debug_print ("sys_listen: f fail\n");
         printf      ("sys_listen: f fail\n");
         goto fail;
     }
 
 // Is it a socket object?
-
     int IsSocket = -1;
-
     IsSocket = (int) is_socket((file *)f);
-    if(IsSocket != TRUE)
-    {
+    if(IsSocket != TRUE){
         debug_print ("sys_listen: f is not a socket\n");
         printf      ("sys_listen: f is not a socket\n");
         goto fail;
@@ -2415,10 +2269,8 @@ int sys_listen (int sockfd, int backlog)
 // socket structure in the senders file.
 
     //s = (struct socket_d *) p->priv; 
-    s = (struct socket_d *) f->socket; 
-
-    if ( (void *) s == NULL )
-    {
+    s = (struct socket_d *) f->socket;
+    if ( (void *) s == NULL ){
         debug_print ("sys_listen: s fail\n");
         printf      ("sys_listen: s fail\n");
         goto fail;
@@ -2460,19 +2312,14 @@ int sys_socket_shutdown (int socket, int how)
     // desconectar dois sockets.
     // mas nao destruir o socket ...
 
-
-    // The current process.
+// The current process.
     struct process_d *p;
-
-    // The file indicated by the fd.
+// The file indicated by the fd.
     file *f;
-    
-    // The socket structure for the file.
+// The socket structure for the file.
     struct socket_d *s;
-
-    // Is this file a socket object?
+// Is this file a socket object?
     int IsSocketObject = -1;
-
 
     debug_print ("sys_socket_shutdown: [TODO]\n");
     //printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
@@ -2487,60 +2334,48 @@ int sys_socket_shutdown (int socket, int how)
     }
 
 // Process
-
     pid_t current_process = (pid_t) get_current_process();
-
     p = (struct process_d *) processList[current_process];
- 
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_socket_shutdown: p fail\n");
         printf      ("sys_socket_shutdown: p fail\n");
         goto fail;
     }
- 
-    //
-    // File
-    //
- 
-    // sender's file
-    // Objeto do tipo socket.
-    
-    f = (file *) p->Objects[socket];
 
+//
+// File
+//
+ 
+// sender's file
+// Objeto do tipo socket.
+
+    f = (file *) p->Objects[socket];
     if ( (void *) f == NULL ){
         debug_print ("sys_socket_shutdown: f fail\n");
         printf      ("sys_socket_shutdown: f fail\n");
         goto fail;
     }
 
-    // Is this file a socket object?
-    
-    IsSocketObject = is_socket ((file *)f);
-    
+// Is this file a socket object?
+    IsSocketObject = is_socket((file *)f);
     if (IsSocketObject != 1){
         debug_print ("sys_socket_shutdown: f is not a socket\n");
         printf      ("sys_socket_shutdown: f is not a socket\n");
         goto fail;
     }
 
-    //
-    // Socket
-    //
+//
+// Socket
+//
 
-    // Yes, This is a socket object.
-    // Let's get the socket structure associated with the file.
-    // Let's simply change the flag for this socket.
-
-    s = (struct socket_d *) f->socket;   
-
-    if ( (void *) s == NULL )
-    {
+// Yes, This is a socket object.
+// Let's get the socket structure associated with the file.
+// Let's simply change the flag for this socket.
+    s = (struct socket_d *) f->socket;
+    if ( (void *) s == NULL ){
         debug_print ("sys_socket_shutdown: s fail\n");
         printf      ("sys_socket_shutdown: s fail\n");
         goto fail;
-    
-    
     // permanece conectado, mas usaremos outro da fila.
     }else{
         s->state = 216; 
@@ -2570,32 +2405,25 @@ update_socket (
     };
 }
 
-
 /*
  *  sys_socket:
  *       Essa é função oferece suporte à função socket da libc.
  *       Estamos na klibc dentro do kernel base.
  */
-
 // The function socket() creates an endpoint for communication and 
 // returns a file descriptor for the socket.
-
 // socket() creates a new socket of a certain type, 
 // identified by an integer number, and allocates system resources to it.
-
 //libc socket interface.
 //See: https://www.gnu.org/software/libc/manual/html_node/Sockets.html
-
 // #example:
 // tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
 // udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
 // raw_socket = socket(AF_INET, SOCK_RAW, protocol);
-
 // #todo
 // Fazer um switch para tratar os vários tipos.
 // Se o protocolo for '0', então precisamos encontrar o 
 // protocolo adequado.
-
 // OUT:
 //     fd if ok.
 //     -1 if it fails.
@@ -2636,7 +2464,6 @@ int sys_socket ( int family, int type, int protocol )
     //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
     //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
 
-
     // Current process.
     struct process_d  *p;  
 
@@ -2644,9 +2471,7 @@ int sys_socket ( int family, int type, int protocol )
     unsigned long ip    = 0x00000000;
     unsigned short port = 0x0000;
 
-
     int Verbose = FALSE;
-
 
     pid_t current_process = (pid_t) get_current_process();
     
@@ -2662,7 +2487,6 @@ int sys_socket ( int family, int type, int protocol )
         refresh_screen();
     }
     */
-
 
     debug_print ("sys_socket:\n");
 
@@ -2706,11 +2530,8 @@ int sys_socket ( int family, int type, int protocol )
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
     }
-
     p = (struct process_d *) processList[current_process];
-     
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_socket: p fail\n");
         panic       ("sys_socket: p fail\n");
     }
@@ -2724,25 +2545,19 @@ int sys_socket ( int family, int type, int protocol )
 // This functions need to create the object and need to have this switch
 // for different families. create_socket( family, type, protocol)
 // it returns the socket structure pointer.
-
 // Criamos um socket vazio.
 // IN: ip and port.
-
     __socket = (struct socket_d *) create_socket_object();
-
-    if ( (void *) __socket == NULL )
-    {
+    if ( (void *) __socket == NULL ){
         debug_print ("sys_socket: [FAIL] __socket \n");
         printf      ("sys_socket: [FAIL] __socket \n");
         goto fail;
     }
 
-
 // #bugbug
 // The private socket of a process.
 // This is not good. 
 // Some process will create more than one socket?
-
     p->priv = (struct socket_d *) __socket;
 
 // family, type and protocol.
@@ -2814,8 +2629,6 @@ fail:
     return (int) (-1);
 }
 
-
-
 // Os dois são arquivos no mesmo processo. O processo atual.
 int
 sock_socketpair ( 
@@ -2824,14 +2637,12 @@ sock_socketpair (
     int protocol, 
     int usockvec[2] )
 {
-
     int fd1 = -1; 
     int fd2 = -1;
     struct socket_d *sock1;
     struct socket_d *sock2;
 
-
-    // ===============
+// ===============
     fd1 = sys_socket(family,type,protocol);
     sock1 = get_socket_from_fd(fd1);
     if( (void*) sock1 == NULL){
@@ -2839,7 +2650,7 @@ sock_socketpair (
         return -1;
     }
 
-    // ===============
+// ===============
     fd2 = sys_socket(family,type,protocol);
     sock2 = get_socket_from_fd(fd2);    
     if( (void*) sock2 == NULL){
@@ -2847,8 +2658,8 @@ sock_socketpair (
         return -1;
     }
 
-    // #todo
-    // Antes é preciso verificar a área de memória.
+// #todo
+// Antes é preciso verificar a área de memória.
 
     usockvec[0] = fd1;
     usockvec[1] = fd2;
@@ -2877,8 +2688,7 @@ socket_dialog (
         return 0;
     }
 
-
-	// número do serviço.
+// número do serviço.
 
     switch (number)
     {
@@ -2910,86 +2720,6 @@ socket_dialog (
 }
 
 //
-// End.
+// End
 //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

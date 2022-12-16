@@ -40,9 +40,6 @@ network_handle_arp(
 }
 
 
-
-
-
 // Colocar um buffer numa lista de buffers.
 // Vamos copiar o pacote para alguma fila de buffers.
 // A rotina de decodificar o pacote pegará o
@@ -58,17 +55,16 @@ int network_buffer_in( void *buffer, int len )
     void *dst_buffer;
     int tail=0;
 
-
-    // check args
+// check args
 
     if ( (void*) buffer == NULL ){
         panic ("network_buffer_in: buffer\n");
     }
 
-    // #todo
-    // Veja na configuração do dispositivo, que o buffer 
-    // configurado para o hardware é de 0x3000 bytes.
-    if(len>1500){
+// #todo
+// Veja na configuração do dispositivo, que o buffer 
+// configurado para o hardware é de 0x3000 bytes.
+    if (len>1500){
         debug_print("network_buffer_in: [FIXME] len\n");
         len = 1500;
         //return -1;
@@ -148,10 +144,9 @@ int network_buffer_out ( void *buffer, int len )
     void *src_buffer;
     int head=0;
 
-
     debug_print("network_buffer_out:\n");
 
-    // check args
+// check args
 
     if ( (void*) buffer == NULL ){
         panic ("network_buffer_out: [FAIL] buffer\n");
@@ -214,23 +209,19 @@ int network_buffer_out ( void *buffer, int len )
    return -1;
 }
 
-
 void networkSetstatus (int status)
 {
     if ( status < 0 || status > 1 )
     {
         return;
     }
-
     network_status = (int) status;
 }
-
 
 int networkGetStatus (void)
 {
     return (int) network_status;
 }
-
 
 /*
  * networkInit: 
@@ -247,12 +238,12 @@ int networkGetStatus (void)
 
 int networkInit (void)
 {
+    register int i=0;
     void *tmp_buffer_address;
-    int i=0;
 
     debug_print ("networkInit: [TODO] [FIXME]\n");
- 
- // Status.
+
+// Status
     networkSetstatus(FALSE);
 
 // =====================================================
@@ -322,7 +313,8 @@ int networkInit (void)
 
     debug_print ("networkInit: HostInfo \n");
 
-    HostInfo = (struct host_info_d *) kmalloc( sizeof( struct host_info_d ) ); 
+    HostInfo = 
+        (struct host_info_d *) kmalloc( sizeof( struct host_info_d ) ); 
     if ( (void *) HostInfo == NULL ){
         panic("networkInit: HostInfo\n");
     }
@@ -341,25 +333,22 @@ int networkInit (void)
     }
 
 // Version
-
     HostInfo->hostVersion = NULL;
 
 // #todo
 // Call some helpers to get these values.
 // Maybe the init process needs to setup these values.
 // It's because these values are found in files.
-
     HostInfo->hostVersionMajor    = 0;
     HostInfo->hostVersionMinor    = 0; 
     HostInfo->hostVersionRevision = 0;
 
 // #todo
 // Where is this information?
-    HostInfo->hostArchitecture    = 0; 
+    HostInfo->hostArchitecture = 0; 
 
-    HostInfo->used  = TRUE;
+    HostInfo->used = TRUE;
     HostInfo->magic = 1234;
-
 
 //
 // == Socket =============================================
@@ -375,9 +364,7 @@ int networkInit (void)
     if ( (void *) LocalHostHTTPSocket == NULL ){
         panic ("networkInit: Couldn't create LocalHostHTTPSocket\n");
     }
-
     CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
- 
 
 // Initializes the socket list.
     socket_init();
@@ -388,8 +375,4 @@ int networkInit (void)
     debug_print ("networkInit: done\n");
     return 0;
 }
-
-
-
-
 
