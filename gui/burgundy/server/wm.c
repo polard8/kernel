@@ -1584,7 +1584,7 @@ wmCreateWindowFrame (
             // IN: index, left, top
             // see: bmp.c
 
-            if( useIcon == TRUE )
+            if (useIcon == TRUE)
             {
                 window->titlebarHasIcon = TRUE;
                 gwssrv_display_system_icon( 

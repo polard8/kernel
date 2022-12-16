@@ -1,33 +1,30 @@
-/*
- * File: bmp.h
- *    Header para rotinas de BMP.
- * History:
- *    2015 - Created by Fred Nora.
- *           24bpp support. 
- *    2018 - 4bpp, 8bpp, 32bpp support.
- */
+
+// bmp.h
+// BMP file support.
  
- 
-/* "MB" */ 
-#define BMP_TYPE 0x4D42        
- 
-#define  BMP_CHANGE_COLOR_NULL  0
-#define  BMP_CHANGE_COLOR_TRANSPARENT  1000
-#define  BMP_CHANGE_COLOR_SUBSTITUTE   2000
+// Signature. "MB".
+#define BMP_TYPE  0x4D42
+
+#define BMP_DEFAULT_ZOOM_FACTOR  8
+
+// Flag
+#define BMP_CHANGE_COLOR_NULL  0
+#define BMP_CHANGE_COLOR_TRANSPARENT  1000
+#define BMP_CHANGE_COLOR_SUBSTITUTE   2000
 //...
 
-//flag que avisa que dve haver alguma mudança nas cores. 
-int bmp_change_color_flag;
-//salva-se aqui uma cor para substituir outra. 
-unsigned long bmp_substitute_color; 
-//cor selecionada para ser substituída ou ignorada. 
-unsigned long bmp_selected_color;
+// Color support:
+// see: bmp.c
+extern int bmp_change_color_flag;
+extern unsigned int bmp_selected_color;
+extern unsigned int bmp_substitute_color; 
+
 
 //
 // ## BMP support ##
 //
 
-#define GWS_BMP_TYPE  0x4D42    /* "MB" */
+#define GWS_BMP_TYPE  BMP_TYPE
 
 //OFFSETS
 #define GWS_BMP_OFFSET_WIDTH      18

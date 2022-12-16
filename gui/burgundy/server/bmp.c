@@ -18,11 +18,25 @@
 
 #include "gws.h"
 
+
+//
+// Color support
+//
+
+// Flag que avisa que deve haver alguma mudança nas cores. 
+// see: bmp.h
+int bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
+// Cor selecionada para ser substituída ou ignorada. 
+unsigned int bmp_selected_color=0;
+// Salva-se aqui uma cor para substituir outra. 
+unsigned int bmp_substitute_color=0; 
+
+
 // 4bpp support.
 static int nibble_count_16colors = 0;
 // Usados temporariamente por cada uma das exibições.
-struct gws_bmp_header_d     __Local_bh;
-struct gws_bmp_infoheader_d __Local_bi;
+struct gws_bmp_header_d      __Local_bh;
+struct gws_bmp_infoheader_d  __Local_bi;
 
 //
 // Private
@@ -383,7 +397,7 @@ bmpDirectDisplayBMP (
 				case BMP_CHANGE_COLOR_SUBSTITUTE:
 				    if ( color == bmp_selected_color )
 					{	 
-						lfb_putpixel ( (unsigned long) bmp_substitute_color, 
+						lfb_putpixel ( (unsigned int) bmp_substitute_color, 
 			                (unsigned long) left, 
 						    (unsigned long) bottom, 
 						     0 );
@@ -461,27 +475,31 @@ fail:
  *     @todo: Criar defines para esses deslocamentos.
  */
 // Paint into the backbuffer, but refresh after that.
-
+// OUT: 0=ok | -1=fail.
 int 
 bmpDisplayBMP ( 
     char *address, 
     unsigned long x, 
     unsigned long y )
 {
-
 // Endereço base do BMP que foi carregado na memoria
     unsigned char *bmp = (unsigned char *) address;
 
-    if ((void*)bmp==NULL){
-        return -1;
+// The address validation
+    if ((void*)address==NULL){
+        goto fail;
     }
 
     //struct gws_bmp_header_d      *bh;
     //struct gws_bmp_infoheader_d  *bi;
 
-//#todo: inicializar.
-    int i, j, base, offset;
-    unsigned int left, top, bottom;
+    register int i=0;
+    register int j=0;
+    int base=0;
+    int offset=0;
+    unsigned int left=0; 
+    unsigned int top=0; 
+    unsigned int bottom=0;
 
 // Zoom support.
 // It is working.
@@ -489,7 +507,7 @@ bmpDisplayBMP (
 // and accept some function parameters for that effect.
 
     int useZoom=FALSE;
-    int ZoomFactor=8;
+    int ZoomFactor = BMP_DEFAULT_ZOOM_FACTOR;
     int iwZoom=0;
     int ihZoom=0;
 
@@ -515,6 +533,7 @@ bmpDisplayBMP (
     unsigned char *palette_index = (unsigned char *) &pal_address;
 
 
+
 // Limits
 
 // #todo: 
@@ -538,13 +557,11 @@ bmpDisplayBMP (
 
 // #todo:
 // Testar validade do endereço.
-    if ( address == 0 )
-    {
-        gwssrv_debug_print ("bmpDisplayBMP: address fail \n");
-        printf             ("bmpDisplayBMP: address fail \n");
+    if (address == 0){
+        gwssrv_debug_print ("bmpDisplayBMP: address\n");
+        printf             ("bmpDisplayBMP: address\n");
         goto fail;
     }
-
 
 //
 // struct for Info header
@@ -693,45 +710,36 @@ bmpDisplayBMP (
 //32    - 32 bpp (True color, RGB)
 //320   - 32 bpp (True color, RGBA)	
 
-    switch ( __Local_bi.bmpBitCount )
-    {
-
+    switch ( __Local_bi.bmpBitCount ){
     // ??
     //case 1:  base = (0x36 + 0x40); break;
-
     // ??
     //case 2: base = (0x36 + 0x40); break;
-
     // 4 bytes pra cada cor, 16 cores. Total 64 bytes.
     case 4:  
         base = (0x36 + 0x40); 
         //gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 4\n"); 
         break; 
-
     // 4 bytes pra cada cor, 256 cores. Total 1024 bytes.
     case 8:  
         base = (0x36 + 0x400); 
         //gwssrv_debug_print ("bmpDisplayBMP: bmpBitCount 8\n"); 
         break;
-
     // #todo: Onde fica a base??
     case 16:
         base = 0x36;
         //gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 16\n"); 
         break;
-
     // #todo: Onde fica a base??
     case 24:
         base = 0x36;
         //gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 24\n"); 
         break;
-
     // #todo: Onde fica a base??
     case 32:
         base = 0x36;
         //gwssrv_debug_print ("bmpDisplayBMP: [FIXME] bmpBitCount 32\n"); 
         break;
-
     // #bugbug
     // We need to abort.
     default:  
@@ -849,7 +857,10 @@ bmpDisplayBMP (
                 base = base + 4;    
             }
 
+            //
             // Put pixel.
+            //
+            
             // Nesse momento ja temos a cor selecionada 
             // no formato 0xaarrggbb ... 
             // Agora se a flag de mascara estiver selecionada,
@@ -864,7 +875,9 @@ bmpDisplayBMP (
                 // diferente da cor selecionada.
 
                 case BMP_CHANGE_COLOR_TRANSPARENT:
-                    if ( color != bmp_selected_color )
+                    // Só pintamos se a cor atual for diferente
+                    // da cor selecionada.
+                    if (color != bmp_selected_color)
                     {
                         // Zoom support.
                         if (useZoom==FALSE)
@@ -903,77 +916,42 @@ bmpDisplayBMP (
                 // Mas se a cor atual for diferente da cor selecionada,
                 // pintamos normalmente a cor atual.
                 case BMP_CHANGE_COLOR_SUBSTITUTE:
-                    if ( color == bmp_selected_color )
-                    {
+                    // Substituímos se for igual
+                    if (color == bmp_selected_color){
                         // IN: color, x, y, rop
                         grBackBufferPutpixel ( 
                             (unsigned int) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
                             (unsigned long) 0 );
-
-                        // old?
-                        //my_buffer_put_pixel ( (unsigned long) bmp_substitute_color, 
-                        //    (unsigned long) left, 
-                        //    (unsigned long) bottom, 
-                        //     0 );
- 
-                        // old?
-                        //backbuffer_putpixel ( (unsigned long) bmp_substitute_color, 
-                        //    (unsigned long) left, 
-                        //    (unsigned long) bottom, 
-                        //     0 );
-
-                    }else{
-
+                    }
+                    // Não substituímos se for diferente.
+                    // #bugbug
+                    // #todo: Usar a cor atual e não a substituta.
+                    if (color != bmp_selected_color){
                         // IN: color, x, y, rop
                         grBackBufferPutpixel ( 
-                            (unsigned int) bmp_substitute_color, 
+                            (unsigned int) color, //bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
                             (unsigned long) 0 );
-
-                        // old?
-                        //my_buffer_put_pixel( (unsigned long) color, 
-                        //    (unsigned long) left, 
-                        //    (unsigned long) bottom, 
-                        //    0 );
-
-                        // old?
-                        //backbuffer_putpixel ( (unsigned long) color, 
-                        //    (unsigned long) left, 
-                        //    (unsigned long) bottom, 
-                        //    0 );
                     }; 
                     break;
 
                 // ...
 
-                // 0 and default
+                // 0 and default.
                 // Pintamos normalmente a cor atual.
-
+                // #bugbug #todo:
+                // Usar a cor atual e não a substituta.
                 case BMP_CHANGE_COLOR_NULL:
                 default:
-
                     // IN: color, x,y,rop
                     grBackBufferPutpixel( 
-                        (unsigned int) bmp_substitute_color, 
+                        (unsigned int) color, //bmp_substitute_color, 
                         (unsigned long) left, 
                         (unsigned long) bottom,
                         (unsigned long) 0 );
-
-                    // old?
-                    //my_buffer_put_pixel( (unsigned long) color, 
-                    //    (unsigned long) left, 
-                    //    (unsigned long) bottom, 
-                    //    0 );
-
-                    // old?
-                    //backbuffer_putpixel ( (unsigned long) color, 
-                    //    (unsigned long) left, 
-                    //    (unsigned long) bottom, 
-                    //    0 );
-
                     break;
             };
 
@@ -986,7 +964,6 @@ bmpDisplayBMP (
         bottom = (bottom-1);
         left = x;
     };
-
 
 // ## test palette 
     //int p;
@@ -1019,12 +996,10 @@ done:
     return 0;
 
 fail:
-    gwssrv_debug_print ("bmpDisplayBMP: Fail \n");
-    printf             ("bmpDisplayBMP: Fail \n");
-    return (int) 1;
-    //return (int) -1;
+    gwssrv_debug_print ("bmpDisplayBMP: fail\n");
+    printf             ("bmpDisplayBMP: fail\n");
+    return (int) -1;
 }
-
 
 // mostra no lfb
 // levando em consideraçao tratamento de transparencia.
@@ -1190,8 +1165,13 @@ gwssrv_display_system_icon (
         while(1){}
     }
 
-// Check BM header. Again.
+//
+// Draw the BMP image
+//
 
+    int draw_status=-1;
+
+// Check BM header. Again.
     if ( sm_buffer[0] == 'B' && sm_buffer[1] == 'M' )
     {
         // #flags
@@ -1199,15 +1179,15 @@ gwssrv_display_system_icon (
         //bmp_change_color_flag = BMP_CHANGE_COLOR_SUBSTITUTE;
         //bmp_change_color_flag = BMP_CHANGE_COLOR_NULL;
         bmp_selected_color = COLOR_WHITE;
-
         // Paint into the backbuffer, but refresh after that.
-        
-        bmpDisplayBMP( 
-            (char *) sm_buffer, 
-            (unsigned long) bmp_x, 
-            (unsigned long) bmp_y ); 
-
-        //gde_display_bmp((char *)sm_buffer, (unsigned long) 80, (unsigned long) 80); 
+        draw_status = 
+            (int) bmpDisplayBMP( 
+                (char *) sm_buffer, 
+                (unsigned long) bmp_x, 
+                (unsigned long) bmp_y ); 
+        if (draw_status<0){
+            //#todo: error message.
+        } 
     }
 
      //#debug
