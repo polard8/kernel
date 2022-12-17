@@ -83,9 +83,8 @@ __assert(const char *file, int line, const char *failedexpr)
 enum {
     DIAGASSERT_ABORT   =  1<<0,
     DIAGASSERT_STDERR  =  1<<1,
-    DIAGASSERT_SYSLOG  =  1<<2
+    DIAGASSERT_SYSLOG  =  1<<2 
 };
-
 
 static int diagassert_flags = -1;
 

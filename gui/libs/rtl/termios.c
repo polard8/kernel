@@ -184,8 +184,7 @@ int tcflow (int fd, int action)
 // Make raw
 void cfmakeraw (struct termios *termios_p)
 {
-    if ( (void *) termios_p == NULL )
-    {
+    if ( (void *) termios_p == NULL ){
         debug_print ("cfmakeraw: termios_p\n");
         errno = EINVAL;
         return;

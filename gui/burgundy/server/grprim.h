@@ -1,10 +1,6 @@
-/*
- * File: grprim.h 
- *     Header for primitives.
- * History:
- *     2020 - Created by Fred Nora.
- */
 
+// grprim.h 
+// Header for primitives.
 
 #ifndef __GRPRIM_H
 #define __GRPRIM_H   1
@@ -20,8 +16,6 @@
 #define MAX3(v0,v1,v2) ((v0>v1)?((v0>v2)?v0:v2):((v1>v2)?v1:v2))
 */
 //#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-
-
 
 // 2D integer vector.
 struct gr_vec2D_d
@@ -74,7 +68,6 @@ struct gr_cube_d
 
 struct gr_polygon_d 
 {
-
 // type: POLYLINE, POLYPOINT
     int type;
 // number of elements.
@@ -94,7 +87,6 @@ struct gr_polygon_d
 // a vector with a starting point.
 struct gr_ray_d
 {
-
 // Type of ray.
 // primary ray, reflection ray, shadow ray.
     int type;
@@ -111,7 +103,7 @@ struct gr_ray_d
     // 0 = starting point
     // 1 = vector
     struct gr_vec3D_d p[2];
-    
+
     // Distance between the starting point and
     // the target.
     int distance;
@@ -213,25 +205,19 @@ struct gr_camera_d
 struct gr_camera_d  *CurrentCamera;
 
 
-
 // array of chars.
 struct gr_bitmap_d
 {
     int type;
-    
     unsigned long width;
     unsigned long height;
-
 // 64 falgs.
     unsigned long flags;
-
     unsigned int color;
-
-// Translation.
+// Translation
     int x;
     int y;
     int z;
-
 // buffer
     char *body;
 };
@@ -243,7 +229,6 @@ struct gr_bitmap_d
 //
 // ===========================================================
 //
-
 
 int grInit(void);
 
@@ -259,7 +244,6 @@ camera (
     int x, int y, int z,
     int xUp, int yUp, int zUp,
     int xLookAt, int yLookAt, int zLookAt );
-
 
 int projection_initialize(void);
 
@@ -280,7 +264,6 @@ gwsViewport(
     int width, 
     int height);
 
-
 // Point. 
 // #todo: maybe we can ues the structure dc.
 int 
@@ -291,7 +274,6 @@ grPlot0 (
     int y, 
     unsigned int color,
     unsigned long rop );
-
 
 int 
 grPlot1 ( 
@@ -304,7 +286,6 @@ grPlot1 (
 
 int serviceGrPlot0(void);
 
-
 //
 // == Line ==============================================
 //
@@ -314,7 +295,6 @@ plotLine3d (
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
     unsigned int color );
-
 
 // plot line given two colors.
 // interpolation ?
@@ -333,13 +313,11 @@ plotQuadBezierSeg (
 // == rectangle =======================================
 //
 
-
 void
 rectangle_from_two_points (
     int left, int top, 
     int right, int bottom,
     unsigned int color );
-
 
 void __rectangleZZ( struct gr_rectangle_d *rect );
 int grRectangle( struct gr_rectangle_d *rect );
@@ -350,27 +328,21 @@ rectangle_ras3D (
     int right, int bottom, int z1,
     unsigned int color );
 
-
 //sevice 2042
 int serviceGrRectangle(void);
-
-
 
 //
 // == triangle ==========================
 //
 
 int xxxTriangleZ ( struct gr_triangle_d *triangle );
-
 int grTriangle( struct gr_triangle_d *triangle);
 
 //
 // == polygon ===========================
 //
 
-int xxxPolygonZ ( struct gr_polygon_d *polygon );
-
-
+int xxxPolygonZ(struct gr_polygon_d *polygon);
 
 //
 // == Cube ============================
@@ -378,13 +350,9 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon );
 
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
-
-int xxxDrawCubeZ ( struct gr_cube_d *cube );
-
+int xxxDrawCubeZ(struct gr_cube_d *cube);
 //sevice 2041
 int serviceGrCubeZ(void);
-
-
 
 //
 // == Circle ===========================
@@ -405,7 +373,6 @@ plotCircleZ (
     unsigned int color, 
     int z );
 
-
 //
 // == Ellipse ====================================
 //
@@ -425,11 +392,9 @@ plotEllipseRectZ (
     unsigned long color,
     int z );
 
-
 // Fibonacci Series using Recursion 
 // #todo: Create fib_int and fib_long
 int fib(int n);
-
 
 //
 // == Char ========================================
@@ -442,7 +407,6 @@ plotCharBackbufferDrawcharTransparent (
     unsigned long color, 
     unsigned long c );
 
-
 void 
 plotCharBackbufferDrawcharTransparentZ ( 
     unsigned long x, 
@@ -451,7 +415,6 @@ plotCharBackbufferDrawcharTransparentZ (
     unsigned long c,
     int z );
 
-
 // substitui cor no lfb
 void grDCMono (
     struct gws_display_d *dc,
@@ -459,17 +422,14 @@ void grDCMono (
     unsigned char subpixel_true_color,    //I64 true_color=0,
     unsigned char subpixel_false_color );  //I64 false_color=COLOR_MONO)
 
-
 // substitui cor no lfb
 void grDCColorChg ( 
     struct gws_display_d *dc,
     unsigned char subpixel_src_color,
     unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
 
-
 // Pixel
 int servicepixelBackBufferPutpixel (void);
-
 
 // interpolation
 unsigned int 
@@ -481,8 +441,4 @@ interpolate_color(
 unsigned int invert_color(unsigned int color);
 
 #endif    
-
-
-
-
 

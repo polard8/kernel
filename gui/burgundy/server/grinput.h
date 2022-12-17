@@ -1,4 +1,5 @@
 
+// grinput.h
 
 #ifndef XXXINPUT_H
 #define XXXINPUT_H    1

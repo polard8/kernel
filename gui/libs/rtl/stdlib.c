@@ -1,9 +1,6 @@
-/*
- * File: stdlib.c
- *     Standard library.
- *     2016 - Created by Fred Nora.
- */
 
+// stdlib.c
+// Standard library.
 
 #include <types.h>
 #include <errno.h>
@@ -21,7 +18,6 @@
 #include <strings.h>
 #include <rtl/gramado.h> 
 
-
 static unsigned int randseed=0;
 static unsigned long mmblockCount=0;
 
@@ -38,55 +34,41 @@ static unsigned long mm_prev_pointer=0;  // Endereço da úntima estrutura aloca
 // == Private functions: Prototypes ================================
 //
 
-static int stdlib_strncmp ( char *s1, char *s2, int len );
+static int stdlib_strncmp( char *s1, char *s2, int len );
 static int __init_mm(void);
 static int __init_heap(void);
-static char *__findenv ( const char *name, int *offset );
-
+static char *__findenv( const char *name, int *offset );
 
 // ================================================
 
-/*
- * local
- * stdlib_strncmp:
- *     Compara duas strings.
- */
-
+// #local
+// stdlib_strncmp:
+// Compara duas strings.
 static int stdlib_strncmp ( char *s1, char *s2, int len )
 {
-    int n = len;
-
-    while ( n > 0 )
-    {
+    register int n=0;
+    n = (int) len;
+    while (n>0){
         n--;
-        
         // Return 1.
-        if ( *s1 != *s2 )
-        { 
+        if ( *s1 != *s2 ){
             return (int) 1; 
-        };
-
+        }
         *s1++; 
         *s2++;
     };
-
     // Return 2.
     if ( *s1 != '\0' || *s2 != '\0' )
     {
         return (int) 2;
     }
-
 // Return 0.
     return 0;
 }
 
-
-/*
- * __init_heap:
- *     Iniciar a gerência de Heap na libC. 
- *     See: heap.h
- */
-
+// __init_heap:
+// Iniciar a gerência de Heap na libC. 
+// See: heap.h
 static int __init_heap(void)
 {
     int i=0;
@@ -96,8 +78,6 @@ static int __init_heap(void)
 
     unsigned long Max = (unsigned long) ( (HEAP_BUFFER_SIZE) -1 );
 
-
-	
 	//HEAP_START = (unsigned long) &HeapBuffer[0];
 	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
 	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
@@ -274,17 +254,14 @@ fail:
 }
 
 
-/*
- * __init_mm:
- *   Inicializa o memory manager.
- * Obs: 
- * Essa é uma função local.
- */
+// #local
+// __init_mm:
+// Inicializa o memory manager.
 
-static int __init_mm (void)
+static int __init_mm(void)
 {
+    register int i=0;
     int Status = 0;
-    int i=0;
 
     //#debug
     debug_print ("__init_mm:\n");
@@ -292,49 +269,35 @@ static int __init_mm (void)
 // @todo: 
 // Inicializar algumas variáveis globais.
 // Chamar os construtores para inicializar o básico.
-
-	// @todo: 
-	// Clear BSS.
-	// Criar mmClearBSS()
-
+// @todo: 
+// Clear BSS.
+// Criar mmClearBSS()
 
 // Heap
-
     Status = (int) __init_heap();
-
-    if ( Status != 0 )
-    {
+    if (Status != 0){
         debug_print ("__init_mm: [FAIL] __init_heap\n");
         //printf      ("__init_mm: [FAIL] __init_heap\n");
         return (int) 1;
     }
 
-
 // Lista de blocos de memória dentro do heap.
-
     i=0;
-
-    while ( i < MMBLOCK_COUNT_MAX )
-    {
+    while (i<MMBLOCK_COUNT_MAX){
         mmblockList[i] = (unsigned long) 0;
         i++;
     };
 
-
 //Primeiro Bloco.
-
     //current_mmblock = (void *) NULL;
-	
-	//#importante:
-	//#inicializando o índice la lista de ponteiros 
-	//par estruturas de alocação.
-	//#bugbug: temos que inicializar isso no kernel também.
 
+// #importante:
+// #inicializando o índice la lista de ponteiros 
+// par estruturas de alocação.
+// #bugbug: temos que inicializar isso no kernel também.
     mmblockCount = 0;
 
-	//
-	// Continua...
-	//
+// Continua...
 
     //#debug
     debug_print ("__init_mm: done\n");
@@ -343,12 +306,9 @@ static int __init_mm (void)
     return (int) Status;
 }
 
-
-/*
- * __findenv:
- *     Interna de suporte à getenv. 
- *     Credits: apple open source.
- */
+// __findenv:
+// Interna de suporte à getenv. 
+// Credits: apple open source.
 
 static char *__findenv ( const char *name, int *offset )
 {
@@ -356,12 +316,14 @@ static char *__findenv ( const char *name, int *offset )
     const char *np;
     char **p, *c;  //??
 
+    register int i=0;
+    int fail;
+
 
     if ( (void *) name == NULL ){
         printf ("__findenv: name NULL\n");
         return (char *) 0;
     }
-
 
     if ( (char **) environ == 0 ){
         printf ("__findenv: environ is 0\n");
@@ -377,91 +339,70 @@ static char *__findenv ( const char *name, int *offset )
     //printf (">>> len  %d \n", len);
     //return (char *) 0;
 
-    int fail;
-    int i;
-
     for ( p = environ; (c = *p) != NULL; ++p )
     {
-        
         //#obs: isso funcionou mostrando a primeira string do environ.
         //return c + len + 1;
-        
         fail = 0;
-        
         for (i=0; i<len; i++)
         {
-			 //se um deles for diferente.
+             //se um deles for diferente.
              //se todos forem iguais, fail continua sendo 0.
              if ( c[i] != name[i] )
                  fail = 1;
-        }
+        };
  
         //if ( strncmp ( c, (char *) name, len ) == 0 && c[len] == '=' ) 
         //if ( strncmp2 ( (const char *) c, (const char *) name, len ) == 0 && c[len] == '=' ) 
         
         
         //if ( c[0] == name[0] && c[len] == '=' )  //ok
-        if (fail == 0)
-        {
+        if (fail == 0){
             *offset = p - environ;
-
             // OK.
             return c + len + 1;
-        };
+        }
     };
-
 
     *offset = p - environ;
 
-
-	printf ("__findenv: overflow\n");
+    printf ("__findenv: overflow\n");
 
 //done:
     return (char *) 0;
-	//return NULL;
+    //return NULL;
 }
-
-
-
-
 
 /*
 unsigned long heap_set_new_handler( unsigned long address );
 unsigned long heap_set_new_handler( unsigned long address )
 {
     unsigned long Old;
-
     Old = kernel_heap_start;
-    
     kernel_heap_start = address;
-
     return (Old);
 };
 */
 
-
-
-unsigned long rtGetHeapStart (void)
+unsigned long rtGetHeapStart(void)
 {
     return (unsigned long) heap_start;
 }
 
-unsigned long rtGetHeapEnd (void)
+unsigned long rtGetHeapEnd(void)
 {
     return (unsigned long) heap_end;
 }
 
-unsigned long rtGetHeapPointer (void)
+unsigned long rtGetHeapPointer(void)
 {
     return (unsigned long) g_heap_pointer;
 }
 
-
-unsigned long rtGetAvailableHeap (void)
+unsigned long rtGetAvailableHeap(void)
 {
     return (unsigned long) g_available_heap;
 }
-
 
 /*
  * heapSetLibcHeap:
@@ -477,8 +418,7 @@ heapSetLibcHeap (
 {
     struct heap_d *h; 
 
-
-	// Check limits.
+// Check limits.
 
     if (HeapStart == 0){
         debug_print("heapSetLibcHeap: HeapStart\n");
@@ -490,8 +430,7 @@ heapSetLibcHeap (
         return;
     }
 
-
-	// start, end, pointer, available.    
+// start, end, pointer, available.    
 
     heap_start = (unsigned long) HeapStart; 
     heap_end   = (unsigned long) (HeapStart + HeapSize);
@@ -499,35 +438,29 @@ heapSetLibcHeap (
     g_heap_pointer = (unsigned long) heap_start;            
     g_available_heap  = (unsigned long) (heap_end - heap_start); 
 
-	//A estrutura fica no início do heap.??!!
+// A estrutura fica no início do heap.??!!
     h = (void *) heap_start;
-	
-	//Configurando a estrutura.
+
+// Configurando a estrutura.
     h->HeapStart = (unsigned long) heap_start;   
     h->HeapEnd   = (unsigned long) heap_end;
 
     h->HeapPointer = (unsigned long) g_heap_pointer;      
     h->AvailableHeap = (unsigned long) g_available_heap; 
-	
-	
-	// Configura o ponteiro global em heap.h.
-	
+
+// Configura o ponteiro global em heap.h.
     Heap = (void *) h;
-	
-	// Lista de heaps.
-	
-    // Configuração inicial da lista de heaps. 
-    // Só temos 'um' ainda.
-    // Configura o primeiro heap da stdlib.
-    
+
+// Lista de heaps.
+// Configuração inicial da lista de heaps. 
+// Só temos 'um' ainda.
+// Configura o primeiro heap da stdlib.
     heapList[0] = (unsigned long) Heap; 
     heapList[1] = (unsigned long) 0;
     heapList[2] = (unsigned long) 0;
     // ...
-
     //Contagem? ainda em zero.?!
 }
-
 
 /*
  * heapAllocateMemory:
@@ -545,7 +478,6 @@ heapSetLibcHeap (
  * sep 2016 - Revision.
  * ...
  */
-
 // Called by malloc.
 
 unsigned long heapAllocateMemory (unsigned long size)
@@ -557,16 +489,16 @@ unsigned long heapAllocateMemory (unsigned long size)
     //debug_print ("heapAllocateMemory: [1]\n");
     // Se não há heap disponível, não há muito o que fazer.
 
-	// Available heap.
-    if ( g_available_heap == 0 )
+// Available heap.
+    if (g_available_heap == 0)
     {
-		// @todo: Tentar crescer o heap para atender o size requisitado.
-		
-		//try_grow_heap() ...
-		
-		//
-		// @todo: Aqui poderia parar o sistema e mostrar essa mensagem.
-		//
+        // @todo: 
+        // Tentar crescer o heap para atender o size requisitado.
+
+        //try_grow_heap() ...
+
+        // @todo: 
+        // Aqui poderia parar o sistema e mostrar essa mensagem.
 
         debug_print ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
         printf      ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
@@ -576,14 +508,12 @@ unsigned long heapAllocateMemory (unsigned long size)
         //while(1){};
     }
 
-
     //debug_print ("heapAllocateMemory: [2]\n");
 
     // Size limits. (Min, max).
 
-	//Se o tamanho desejado é igual a zero.
-    if ( size == 0 )
-    {
+// Se o tamanho desejado é igual a zero.
+    if (size == 0){
         debug_print ("heapAllocateMemory: [ERROR] size=0 \n");
         printf      ("heapAllocateMemory: [ERROR] size=0 \n");
         //refresh_screen();
@@ -592,26 +522,21 @@ unsigned long heapAllocateMemory (unsigned long size)
 
     //debug_print ("heapAllocateMemory: [3]\n");
 
-    // Se o tamanho desejado é maior ou igual ao espaço disponível.
-    // #todo: 
-    // Tentar crescer o heap para atender o size requisitado.
+// Se o tamanho desejado é maior ou igual ao espaço disponível.
+// #todo: 
+// Tentar crescer o heap para atender o size requisitado.
 
-    if ( size >= g_available_heap )
-    {
+    if (size >= g_available_heap){
         debug_print ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
         printf      ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
         //refresh_screen();
-        
         return (unsigned long) 0;
     }
 
-
-    // Salvando o tamanho desejado.
-    
+// Salvando o tamanho desejado.
     last_size = (unsigned long) size;
 
 // Contador de blocos.
-
     //debug_print ("heapAllocateMemory: [4] loop\n");
 
 try_again:
@@ -647,13 +572,12 @@ try_again:
 // Identificadores
 //
 
-	// O Header do header do bloco é o inicio da estrutura que o define. (hã???)
-
-	// Pointer Limits. 
-	// (Não vamos querer um heap pointer fora dos limites do heap)
-
-	// Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
-	// devemos usar o último válido que provavelmente está nos limites.
+// O Header do header do bloco 
+// é o inicio da estrutura que o define. (hã???)
+// Pointer Limits. 
+// (Não vamos querer um heap pointer fora dos limites do heap)
+// Se o 'g_heap_pointer' atual esta fora dos limites do heap, então 
+// devemos usar o último válido que provavelmente está nos limites.
 
     //debug_print ("heapAllocateMemory: [5]\n");
 
@@ -669,42 +593,35 @@ try_again:
         {
             debug_print ("heapAllocateMemory: [ERROR] last valid heap pointer limits\n");
             printf      ("heapAllocateMemory: [ERROR] last valid heap pointer limits");
-		    //printf("*lib hang, (fatal error)\n");
-			//refresh_screen();
-		    //while(1){}
+            //printf("*lib hang, (fatal error)\n");
+            //refresh_screen();
+            //while(1){}
             return 0;
         }
 
-		//Havendo um last heap pointer válido.
-		//?? isso não faz sentido.
-
+        //Havendo um last heap pointer válido.
+        //?? isso não faz sentido.
         g_heap_pointer = (unsigned long) (last_valid + last_size);
 
         goto try_again;
     }
 
-	// Agora temos um 'g_heap_pointer' válido, salvaremos ele.
-	// 'last_valid' NÃO é global. Fica nesse arquivo.
-
+// Agora temos um 'g_heap_pointer' válido, salvaremos ele.
+// 'last_valid' NÃO é global. Fica nesse arquivo.
     last_valid = (unsigned long) g_heap_pointer;
 
-	//
-	// Criando um bloco.
-	//
-	
-
-	// Estrutura mmblock_d interna.
-	// Configurando a estrutura para o bloco atual.
-	
-
-	// Obs: A estutura deverá ficar lá no espaço reservado para o header. 
-	// (antes da area alocada).
+// Criando um bloco.
+// Estrutura mmblock_d interna.
+// Configurando a estrutura para o bloco atual.
+// Obs: 
+// A estutura deverá ficar lá no espaço reservado para o header. 
+// (antes da area alocada).
 
     //debug_print ("heapAllocateMemory: [6]\n");
 
-    //O endereço do ponteiro da estrutura será o pointer do heap.
-    
-    Current = (void *) g_heap_pointer;    
+// O endereço do ponteiro da estrutura será o pointer do heap.
+
+    Current = (void *) g_heap_pointer;
 
     if ( (void *) Current != NULL )
     {
@@ -721,69 +638,65 @@ try_again:
         // Tamanho do header. TAMANHO DA STRUCT.
         // #bugbug: Porque nao usamos sizeof( struct mmblock_d ) ?
         // See: mm.h
-        Current->headerSize = MMBLOCK_HEADER_SIZE;           
-        
+        Current->headerSize = MMBLOCK_HEADER_SIZE;
+
         Current->Id    = mmblockCount;    //Id do mmblock.
         Current->Used  = 1;               //Flag, 'sendo Usado' ou 'livre'.
         Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
         Current->Free  = 0;               //not free.
         // Continua ...
 
-
 //
 // Mensuradores. (tamanhos) (@todo:)
 //
 
-	    // @todo:
-	    // Tamanho da área reservada para o cliente.
-	    // userareaSize = (request size + unused bytes)
-	    // Zera unused bytes, já que não foi calculado.
+        // @todo:
+        // Tamanho da área reservada para o cliente.
+        // userareaSize = (request size + unused bytes)
+        // Zera unused bytes, já que não foi calculado.
 
-	    // User Area base:
-	    // Onde começa a área solicitada. Isso fica logo depois do header.
-	
-	    Current->userArea = (unsigned long) Current->Header + Current->headerSize;    
+        // User Area base:
+        // Onde começa a área solicitada. Isso fica logo depois do header.
+        Current->userArea = 
+            (unsigned long) (Current->Header + Current->headerSize);
 
-	    // Footer:
-        // O footer começa no 'endereço do início da área de cliente' + 'o tamanho dela'.
-	    // O footer é o fim dessa alocação e início da próxima.
-	
-	    Current->Footer = (unsigned long) Current->userArea + size;
-	
-	    // Heap pointer. 
-	    //     Atualiza o endereço onde vai ser a próxima alocação.
-	
-	    //if ( Current->Footer < HEAP_START){
-	    //    Current->Used = 0;                //Flag, 'sendo Usado' ou 'livre'.
-	    //    Current->Magic = 0;            //Magic number. Ver se não está corrompido.	    
-	    //	goto try_again;	
-	    //}
-	
-        
-		//
-		// Obs: O limite da contagem de blocos foi checado acima.
-		//
-		
-	    // Coloca o ponteiro na lista de blocos.
-	
-	    mmblockList[mmblockCount] = (unsigned long) Current;
-	
-		// Salva o ponteiro do bloco usado como 'prévio'.
-	    // Obs: 'mm_prev_pointer' não é global, fica nesse arquivo.
-		
-		mm_prev_pointer  = (unsigned long) g_heap_pointer; 
-	
-		// *IMPORTANTE.
-	    // Atualiza o ponteiro. Deve ser onde termina o último bloco 
-		// configurado.
-		
-		g_heap_pointer = (unsigned long) Current->Footer;
+        // Footer:
+        // O footer começa no 'endereço do 
+        // início da área de cliente' + 'o tamanho dela'.
+        // O footer é o fim dessa alocação e início da próxima.
+        Current->Footer = 
+            (unsigned long) (Current->userArea + size);
 
-	
-	    // Available heap:
-	    // Calcula o valor de heap disponível para as próximas alocações.
-	
-	    g_available_heap = (unsigned long) g_available_heap - (Current->Footer - Current->Header);
+        // Heap pointer. 
+        //     Atualiza o endereço onde vai ser a próxima alocação.
+
+        //if ( Current->Footer < HEAP_START){
+        //    Current->Used = 0;     // Flag, 'sendo Usado' ou 'livre'.
+        //    Current->Magic = 0;    // Magic number. Ver se não está corrompido.    
+        //    goto try_again;
+        //}
+
+        // Obs: 
+        // O limite da contagem de blocos foi checado acima.
+
+        // Coloca o ponteiro na lista de blocos.
+
+        mmblockList[mmblockCount] = (unsigned long) Current;
+
+        // Salva o ponteiro do bloco usado como 'prévio'.
+        // Obs: 'mm_prev_pointer' não é global, fica nesse arquivo.
+
+        mm_prev_pointer  = (unsigned long) g_heap_pointer;
+
+        // #importante
+        // Atualiza o ponteiro. 
+        // Deve ser onde termina o último bloco configurado.
+        g_heap_pointer = (unsigned long) Current->Footer;
+
+        // Available heap:
+        // Calcula o valor de heap disponível para as próximas alocações.
+        g_available_heap = 
+            (unsigned long) g_available_heap - (Current->Footer - Current->Header);
 
         //debug_print ("heapAllocateMemory: done\n");
 
@@ -792,7 +705,7 @@ try_again:
 
         return (unsigned long) Current->userArea;
 
-		//Nothing.
+        // Nothing.
 
     // Se o ponteiro da estrutura de mmblock for inválido.
     }else{
@@ -801,19 +714,17 @@ try_again:
         return (unsigned long) 0;
     };
 
+// #todo: 
+// Checar novamente aqui o heap disponível. 
+// Se esgotou, tentar crescer.
+// #importante
+// #todo:
+// Colocar o conteúdo da estrutura no lugar alocado para o header.
+// O header conterá informações sobre o heap.
 
-	// @todo: 
-	// Checar novamente aqui o heap disponível. Se esgotou, tentar crescer.
-	
+    // errado #bugbug.
+    //Prev = (void*) mm_prev_pointer;
 
-    //IMPORTANTE
-	// @todo:
-	// Colocar o conteúdo da estrutura no lugar alocado para o header.
-	//O header conterá informações sobre o heap.
-	
-	// errado #bugbug.
-	//Prev = (void*) mm_prev_pointer;
-	
 	//if( (void*) Prev != NULL)
 	//{
 	 //   if( Prev->Used == 1 && 
@@ -822,17 +733,15 @@ try_again:
 	//	{
 	//	    Current->Prev = (void*) Prev;
     //        Prev->Next = (void*) Current;
-	//	};		
+	//	};
 	//};
 	//
-
 
 // Se falhamos, retorna 0. Que equivalerá à NULL.
 fail:
     debug_print ("heapAllocateMemory: Fail\n");
     return (unsigned long) 0;
 }
-
 
 
 /*
@@ -847,9 +756,12 @@ fail:
  * @todo: FAZER IGUAL O DO KERNEL.
  */
  
-unsigned long FreeHeap ( unsigned long size )
+unsigned long FreeHeap (unsigned long size)
 {
-    return (unsigned long) g_heap_pointer;    //#suspensa! @todo:
+    // #suspensa 
+    // #todo
+
+    return (unsigned long) g_heap_pointer;
 }
 
 
@@ -866,25 +778,18 @@ unsigned long FreeHeap ( unsigned long size )
 int libcInitRT (void)
 {
     int Status = -1;
-
     // #debug
     debug_print ("libcInitRT:\n");
-
     Status = (int) __init_mm();
-
-    if ( Status != 0 ){
+    if (Status != 0){
         debug_print ("libcInitRT: [FAIL] __init_mm\n");
         return (int) 1; 
     }
-
     //...
-
     //#debug
     debug_print ("libcInitRT: done\n");
-
     return 0;
 }
-
 
 //
 // -----------------
@@ -892,19 +797,11 @@ int libcInitRT (void)
 //
 
 
-
-
-//#todo
-char *mktemp (char *template)
+// #todo
+char *mktemp(char *template)
 {
     debug_print ("mktemp: [TODO]\n");
     return (char *) 0;
-}
-
-// Generate a random number.
-int rand(void)
-{
-    return (int) ( randseed = randseed * 1234 + 5 );
 }
 
 // Seed rand.
@@ -913,8 +810,14 @@ void srand(unsigned int seed)
     randseed = (unsigned int) seed;
 }
 
-int random(void)
+// Generate a random number.
+int rand(void)
 {
+    randseed = (randseed * 1234 + 5);
+    return (int) randseed;
+}
+
+int random(void){
     return (int) rand();
 }
 
@@ -922,7 +825,6 @@ void srandom(unsigned int seed)
 {
     srand(seed);
 }
-
 
 /*
 // #todo
@@ -933,8 +835,6 @@ int rtl_rand_in_a_range(int lim_inf, int lim_sup)
     return (int) (lim_inf + (rand() % lim_sup));
 }
 */
-
-
 
 /*
 void _abort(void);
@@ -952,8 +852,7 @@ void abort(void)
     //exit(1);
 }
 
-
-void stdlib_die (char *str)
+void stdlib_die(char *str)
 {
     debug_print("stdlib_die:\n");
 
@@ -969,7 +868,6 @@ void stdlib_die (char *str)
     abort();
 }
 
-
 void *rtl_malloc(size_t size)
 {
     if (size<0){
@@ -980,7 +878,6 @@ void *rtl_malloc(size_t size)
     }
     return (void *) malloc(size);
 }
-
 
 /*
  * malloc:
@@ -1020,11 +917,11 @@ void *malloc(size_t size)
 
     //debug_print ("malloc:\n");
 
-    if ( size < 0 ){
+    if (size < 0){
         debug_print ("malloc: size\n");
         return NULL; 
     }
-    if ( size == 0 ){ 
+    if (size == 0){ 
         new_size = 1;
     }
 
@@ -1217,7 +1114,7 @@ fail:
 done:	
 */
 
-   return;  
+   return;
 }
 
 
@@ -1225,7 +1122,7 @@ done:
 void *calloc(size_t num, size_t size);
 void *calloc(size_t num, size_t size)
 {
-	return zmalloc(num*size);
+    return zmalloc(num*size);
 }
 */
 
@@ -1234,7 +1131,7 @@ void *rtl_calloc (size_t count, size_t size)
 {
     size_t t = (count*size);
 
-    if(t == 0)
+    if (t == 0)
     {
         count=1;
         size=1;
@@ -1243,18 +1140,15 @@ void *rtl_calloc (size_t count, size_t size)
     return (void *) calloc(count,size);
 }
 
-
-/*
- * calloc: 
- *     Aloca e preenche com zero. 
- */
+// calloc: 
+// Aloca e preenche com zero.
  
 void *calloc (size_t count, size_t size)
 {
     void *ptr;
     size_t new_size = (size_t) (count * size);
 
-    if(count <= 0){
+    if (count <= 0){
         new_size = (1*size);
     }
     ptr = (void*) malloc(new_size);
@@ -1264,7 +1158,6 @@ void *calloc (size_t count, size_t size)
 
     return (void*) ptr;
 }
-
 
 void *xcalloc (size_t count, size_t size)
 {
@@ -1286,18 +1179,14 @@ void *xcalloc (size_t count, size_t size)
 
 void *xzalloc (size_t n)
 {
-    if(n<=0){
+    if (n<=0){
         n=1;
     }
     return (void *) xcalloc(n,1);
 }
 
-
-/*
- * zmalloc:
- *     Alloca memória e zera o conteúdo. 
- */
-
+// zmalloc:
+// Alloca memória e zera o conteúdo. 
 void *zmalloc (size_t size)
 {
     void *ptr;
@@ -1320,243 +1209,226 @@ void *zmalloc (size_t size)
     return NULL;
 }
 
-
-/*
- * system:
- *     chama um comando com base em uma cmdline.
- */
-
+// system:
+// chama um comando com base em uma cmdline.
 // #todo
 // No implemented yet.
-
 // #todo
 // Call the shell application?
 
-int system ( const char *command )
+int system (const char *command)
 {
-   
-    // @todo: Checar se comando é válido, se os primeiros caracteres
-	//        são espaço. Ou talvez somente compare, sem tratar o argumento.	
 
-	
-	//@todo:
-	// Criar rotina para pular os caracteres em branco no início do comando.
-	
-	//@todo: version, ...
-	
+// #todo: 
+// Checar se comando é válido, se os primeiros caracteres
+// são espaço. Ou talvez somente compare, sem tratar o argumento.
+// #todo:
+// Criar rotina para pular os caracteres em branco no início do comando.
+// #todo: version, ...
+// OBS: 
+// ESSES SÃO OS COMANDOS DO SISTEMA, USADOS POR TODOS OS PROGRAMAS
+// QUE INCLUIREM A LIBC. 
 
-	//OBS: ESSES SÃO OS COMANDOS DO SISTEMA, USADOS POR TODOS OS PROGRAMAS
-	//     QUE INCLUIREM A LIBC. 
-
-	
-	//test - Exibe uma string somente para teste.
-	if ( stdlib_strncmp ( (char *) command, "test", 4 ) == 0 )
-	{
-	    printf("system: Testing commands ...\n");
-		goto exit;
-	}
+// test - Exibe uma string somente para teste.
+    if ( stdlib_strncmp ( (char *) command, "test", 4 ) == 0 )
+    {
+        printf("system: Testing commands ...\n");
+        goto exit;
+    }
   
-	//ls - List files in a folder.
-	if ( stdlib_strncmp ( (char *) command, "ls", 2 ) == 0 )
-	{
-	    printf("system: @todo: ls ...\n");
-		goto exit;
-	}
-	
-	//makeboot - Cria arquivos e diretórios principais.
-	if ( stdlib_strncmp ( (char *) command, "makeboot", 8 ) == 0 )
-	{
-	    printf("system: @todo: makeboot ...\n");
-		
-		//ret_value = fs_makeboot();
-		//if(ret_value != 0){
-		//    printf("shell: makeboot fail!");
-		//};
+// ls - List files in a folder.
+    if ( stdlib_strncmp ( (char *) command, "ls", 2 ) == 0 )
+    {
+        printf("system: @todo: ls ...\n");
         goto exit;
     }
 
-	//format.
-	if ( stdlib_strncmp ( (char *) command, "format", 6 ) == 0 )
-	{
-	    printf("system: @todo: format ...\n");
-		//fs_format(); 
+// makeboot - Cria arquivos e diretórios principais.
+    if ( stdlib_strncmp ( (char *) command, "makeboot", 8 ) == 0 )
+    {
+        printf("system: @todo: makeboot ...\n");
+        //ret_value = fs_makeboot();
+        //if(ret_value != 0){
+        //    printf("shell: makeboot fail!");
+        //};
         goto exit;
     }
 
-	//debug.
-	if ( stdlib_strncmp ( (char *) command, "debug", 5 ) == 0 )
-	{
-	    printf("system: @todo: debug ...\n");
+// format.
+    if ( stdlib_strncmp ( (char *) command, "format", 6 ) == 0 )
+    {
+        printf("system: @todo: format ...\n");
+        //fs_format(); 
         goto exit;
     }
 
-    //dir.
-	if ( stdlib_strncmp ( (char *) command, "dir", 3 ) == 0 )
-	{
-	    printf("system: @todo: dir ...\n");
-		//fs_show_dir(0); 
+// debug.
+    if ( stdlib_strncmp ( (char *) command, "debug", 5 ) == 0 )
+    {
+        printf("system: @todo: debug ...\n");
         goto exit;
     }
 
-	//newfile.
-	if ( stdlib_strncmp ( (char *) command, "newfile", 7 ) == 0 )
-	{
-	    printf("system: ~newfile - Create empty file.\n");
-		//fs_create_file( "novo    txt", 0);
+// dir.
+    if ( stdlib_strncmp ( (char *) command, "dir", 3 ) == 0 )
+    {
+        printf("system: @todo: dir ...\n");
+        //fs_show_dir(0); 
         goto exit;
     }
 
-	//newdir.
-	if ( stdlib_strncmp ( (char *) command, "newdir", 7 ) == 0 )
-	{
-	    printf("system: ~newdir - Create empty folder.\n");
-		//fs_create_dir( "novo    dir", 0);
+// newfile.
+    if ( stdlib_strncmp ( (char *) command, "newfile", 7 ) == 0 )
+    {
+        printf("system: ~newfile - Create empty file.\n");
+        //fs_create_file( "novo    txt", 0);
         goto exit;
     }
 
-    //mbr - Testa mbr.
+// newdir.
+    if ( stdlib_strncmp ( (char *) command, "newdir", 7 ) == 0 )
+    {
+        printf("system: ~newdir - Create empty folder.\n");
+        //fs_create_dir( "novo    dir", 0);
+        goto exit;
+    }
+
+// mbr - Testa mbr.
     if ( stdlib_strncmp ( (char *) command, "mbr", 3 ) == 0 )
-	{
-	    printf("system: ~mbr\n");
-		//testa_mbr();
-		goto exit;
+    {
+        printf("system: ~mbr\n");
+        //testa_mbr();
+        goto exit;
     }
 
-    //root - Testa diretório /root.
+// root - Testa diretório /root.
     if ( stdlib_strncmp ( (char *) command, "root", 4 ) == 0 )
-	{
-	    printf("system: ~/root\n");
-		//testa_root();
-		goto exit;
+    {
+        printf("system: ~/root\n");
+        //testa_root();
+        goto exit;
     }
 
-	//start.
+// start.
     if ( stdlib_strncmp ( (char *) command, "start", 5 ) == 0 )
-	{
-	    printf("~start\n");
-		goto exit;
+    {
+        printf("~start\n");
+        goto exit;
     }
 
-	//help.
+// help.
     if ( stdlib_strncmp ( (char *) command, "help", 4 ) == 0 )
-	{
-		//printf(help_string);
-		//print_help();
-		goto exit;
+    {
+        //printf(help_string);
+        //print_help();
+        goto exit;
     }
 
-	//cls.
+// cls.
     if ( stdlib_strncmp ( (char *) command, "cls", 3 ) == 0 )
-	{
-	    //black
-	    //api_clear_screen(0);
-        goto exit;
-	};
-	
-	//save.
-	if ( stdlib_strncmp ( (char *) command, "save", 4 ) == 0 )
-	{
-	    printf("system: ~save root\n");
+    {
+        //black
+        //api_clear_screen(0);
         goto exit;
     }
 
-	//install.
-	//muda um arquivo da area de transferencia para 
-	//o sistema de arquivos...
-	if ( stdlib_strncmp ( (char *) command, "install", 7 ) == 0 )
-	{
-	    printf("system: ~install\n");
-		//fs_install();
+// save.
+    if ( stdlib_strncmp ( (char *) command, "save", 4 ) == 0 )
+    {
+        printf("system: ~save root\n");
         goto exit;
     }
 
-	//boot - Inicia o sistema.
-	if ( stdlib_strncmp ( (char *) command, "boot", 4 ) == 0 )
-	{
-	    printf("system: ~boot\n");
-		//boot();
+// install.
+// muda um arquivo da area de transferencia para 
+// o sistema de arquivos...
+    if ( stdlib_strncmp ( (char *) command, "install", 7 ) == 0 )
+    {
+        printf("system: ~install\n");
+        //fs_install();
         goto exit;
     }
 
-	//service
-	if ( stdlib_strncmp ( (char *) command, "service", 7 ) == 0 )
-	{
-	    printf("system: ~service - rotina de servicos do kernel base\n");
-		//test_services();
+// boot - Inicia o sistema.
+    if ( stdlib_strncmp ( (char *) command, "boot", 4 ) == 0 )
+    {
+        printf("system: ~boot\n");
+        //boot();
         goto exit;
     }
 
-	//slots - slots de processos ou threads.
-	if ( stdlib_strncmp ( (char *) command, "slots", 5 ) == 0 )
-	{
-	    printf("system: ~slots - mostra slots \n");
-		//mostra_slots();
+// service
+    if ( stdlib_strncmp ( (char *) command, "service", 7 ) == 0 )
+    {
+        printf("system: ~service\n");
+        //test_services();
         goto exit;
     }
 
-    //
-    // Continua ...
-    //
-	
-	//exit - Exit the current program
+// slots - slots de processos ou threads.
+    if ( stdlib_strncmp ( (char *) command, "slots", 5 ) == 0 )
+    {
+        printf("system: ~slots - mostra slots \n");
+        //mostra_slots();
+        goto exit;
+    }
+
+// Continua ...
+
+// exit - Exit the current program
     if ( stdlib_strncmp ( (char *) command, "exit", 4 ) == 0 )
-	{
-		//exit(exit_code);
-		//exit(0);
-		printf ("#todo: ~exit");
-		goto fail;
-    }
-
-	
-    //reboot.
-	if ( stdlib_strncmp ( (char *) command, "reboot", 6 ) == 0 )
-	{
-        
-		//stdlib_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
-		//    (unsigned long) 0 );		
-		
-		gramado_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
-		    (unsigned long) 0 );				
-		
-		//apiReboot(); 
-		goto fail;
-    }
-
-	//shutdown.
-    if ( stdlib_strncmp ( (char *) command, "shutdown", 8 ) == 0 )
-	{
-		//apiShutDown();
+    {
+        //exit(exit_code);
+        //exit(0);
+        printf ("#todo: ~exit");
         goto fail;
     }
 
+// reboot.
+    if ( stdlib_strncmp ( (char *) command, "reboot", 6 ) == 0 )
+    {
+        //stdlib_system_call ( 110, (unsigned long) 0, (unsigned long) 0, 
+        //    (unsigned long) 0 );
+
+        gramado_system_call ( 
+            110, 
+            (unsigned long) 0, 
+            (unsigned long) 0, 
+            (unsigned long) 0 );
+
+        //apiReboot(); 
+        goto fail;
+    }
+
+// shutdown.
+    if ( stdlib_strncmp ( (char *) command, "shutdown", 8 ) == 0 )
+    {
+        //apiShutDown();
+        goto fail;
+    }
 
 // #todo
 // Call the shell application?
+// #todo: exec
+//:default
+    printf("system: Unknown command!\n");
 
-	
-	//@todo: exec
-	
-    //:default
-	printf("system: Unknown command!\n");
-	
-	//
-	// o que devemos fazer aqui é pegar o nome digitado e comparar
-	// com o nome dos arquivos do diretório do sistema. se encontrado,
-	// devemos carregar e executar.
-	//
+// o que devemos fazer aqui é pegar o nome digitado e comparar
+// com o nome dos arquivos do diretório do sistema. se encontrado,
+// devemos carregar e executar.
 
 // Fail. Palavra não reservada.	
 fail:
 	printf("system: FAIL!\n");
     return (int) 1;
 
-//@todo: Esse exit como variavel local precisa mudar de nome	
-//       para não confundir com a função exit de sair do processo.
-//       uma opção é usar 'done:'. 
+// #todo: 
+// Esse exit como variavel local precisa mudar de nome
+// para não confundir com a função exit de sair do processo.
+// uma opção é usar 'done:'. 
 exit:    
     return (int) 0;
 }
-
 
 /*
  *	s1 is either name, or name=value
@@ -1578,20 +1450,17 @@ char *nvmatch ( char *s1, char *s2 )
     return NULL;
 }
 
-
 //unix v7
-char *v7_getenv ( char *name )
+char *v7_getenv(char *name)
 {
     register char **p = environ;
     register char *v;
 
-
     while (*p != NULL)
-		if ((v = nvmatch(name, *p++)) != NULL)
-			return(v);
+        if ((v = nvmatch(name, *p++)) != NULL)
+            return(v);
     return(NULL);
 }
-
 
 /*
 void bak2for(char *str);
@@ -1609,11 +1478,8 @@ void bak2for(char *str)
 }
 */
 
-
-/*
- * getenv:
- *     Credits: Apple open source.
- */
+// getenv:
+// Credits: Apple open source.
 
 char *getenv (const char *name)
 {
@@ -1622,7 +1488,7 @@ char *getenv (const char *name)
 
     debug_print ("getenv:\n");
 
-	//_DIAGASSERT(name != NULL);
+    //_DIAGASSERT(name != NULL);
 
     //printf ("getenv2: %s \n", (const char *) name);
     //return NULL;
@@ -1639,10 +1505,9 @@ char *getenv (const char *name)
         return (char *) 0;
     }
 
-
-	//rwlock_rdlock(&__environ_lock);
+    //rwlock_rdlock(&__environ_lock);
     result = __findenv (name, &offset);
-	//rwlock_unlock(&__environ_lock);
+    //rwlock_unlock(&__environ_lock);
 
     //debug_print ("getenv: done\n");
     return (char *) result;
@@ -1653,41 +1518,33 @@ int setenv (const char *name, const char *value, int overwrite)
 {
     //debug_print("setenv: [TODO]\n"); 
 
-    if ( (void *) name == NULL )
-    {
+    if ( (void *) name == NULL ){
         debug_print ("setenv: [FAIL] name\n");
         return -1;
     }
 
-    if (*name == 0)
-    {
+    if (*name == 0){
         debug_print ("setenv: [FAIL] *name\n");
         return -1;
     }
 
+//
+// value
+//
 
-    //
-    // value
-    //
-
-    if ( (void *) value == NULL )
-    {
+    if ( (void *) value == NULL ){
         debug_print ("setenv: [FAIL] value\n");
         return -1;
     }
 
-    if (*value == 0)
-    {
+    if (*value == 0){
         debug_print ("setenv: [FAIL] *value\n");
         return -1;
     }
 
-
-    // #todo:   ...
-
+// #todo: ...
     return (int) (-1);
 }
-
 
 //#todo
 int unsetenv (const char *name)
@@ -1695,7 +1552,6 @@ int unsetenv (const char *name)
     debug_print("unsetenv: [TODO]\n"); 
     return (int) (-1);
 }
-
 
 // #todo
 int clearenv(void)
@@ -1709,7 +1565,6 @@ int clearenv(void)
     return 0;
 }
 
-
 /*
 int atoi2(char const* str);
 int atoi2(char const* str)
@@ -1722,12 +1577,8 @@ int atoi2(char const* str)
 }
 */
 
-
-/*
- * atoi: 
- */
-
-int atoi (const char *str)
+// atoi:
+int atoi(const char *str)
 {
     int rv=0; 
     char sign = 0;
@@ -1800,31 +1651,27 @@ char *itoa (int i)
 };
 */
 
-
-/* 
- reverse:  
-     reverse string s in place 
-*/
-
+// reverse:  
+// reverse string s in place 
 void reverse (char s[])
 {
-     int i, j;
-     char c=0;
+    register int i=0; 
+    int j=0;
+    char c=0;
+
+    for ( i=0, j = strlen(s)-1; 
+          i<j; 
+          i++, j-- )
+    {
+        c = s[i];
  
-     for (i = 0, j = strlen(s)-1; i<j; i++, j--)
-     {
-         c = s[i];
-         
-         s[i] = s[j];
-         s[j] = c;
-     };
+        s[i] = s[j];
+        s[j] = c;
+    };
 }
 
-
-/* 
- itoa:  
- convert n to characters in s 
- */
+// itoa:  
+// convert n to characters in s.
 
 void itoa (int n, char s[])
 {
@@ -1835,27 +1682,24 @@ void itoa (int n, char s[])
         n = -n;          /* make n positive */
     i = 0;
     
-    do {       /* generate digits in reverse order */
-         s[i++] = n % 10 + '0';   /* get next digit */
+    do {                         /* generate digits in reverse order */
+         s[i++] = n % 10 + '0';  /* get next digit */
     } while ((n /= 10) > 0);     /* delete it */
      
-	if (sign < 0)
-         s[i++] = '-';
-     s[i] = '\0';
+    if (sign < 0)
+        s[i++] = '-';
+    s[i] = '\0';
 
-
-     reverse (s);
- }
-
+     reverse(s);
+}
 
 /*
 double atof (const char *ascii);
 double atof (const char *ascii)
 {
-	return (strtod(ascii, NULL));
+    return (strtod(ascii, NULL));
 }
 */
-
 
 /*
 double
@@ -1948,9 +1792,9 @@ strtod (char *str, char **ptr)
 // ok.
 int abs(int j)
 {
-    return (j < 0 ? -j : j);
+    int result = (int) (j < 0 ? -j : j);
+    return (int) result;
 }
-
 
 /*
 int rtl_abs(int i);
@@ -2033,8 +1877,6 @@ void d_common(BYTE *buf,DWORD count,bool memory)  //Hex Dump
   }
 }
 */
-
-
 
 //================================================
 
@@ -2212,13 +2054,11 @@ void abort()
 */
 
 
-
-long labs (long j)
+long labs(long j)
 {
-    return (j < 0 ? -j : j);
+    long result = (long) (j < 0 ? -j : j);
+    return (long) result;
 }
-
-
 
 //mkstemp(): 4.3BSD, POSIX.1-2001.
 int mkstemp(char *template)
@@ -2226,7 +2066,6 @@ int mkstemp(char *template)
     debug_print("mktemp: [TODO]\n"); 
     return -1; 
 }
-
 
 //mkostemp() and mkostemps(): are glibc extensions.
 int mkostemp(char *template, int flags)
@@ -2242,17 +2081,12 @@ int mkstemps(char *template, int suffixlen)
     return -1; 
 }
 
-
-
 //mkostemp() and mkostemps(): are glibc extensions.
 int mkostemps(char *template, int suffixlen, int flags)
 { 
     debug_print("mkostemps: [TODO]\n"); 
     return -1; 
 }
-
-
-
 
 /*
 static char ptsname_buf[32];
@@ -2264,7 +2098,6 @@ char* ptsname(int fd)
 }
 */
 
-
 // ptsname():
 // POSIX.1-2001, POSIX.1-2008.
 //ptsname() is part of the UNIX 98 pseudoterminal support.
@@ -2274,18 +2107,16 @@ char *ptsname(int fd)
 {
     debug_print("ptsname: [TODO]\n"); 
 
-    if(fd<0)
+    if (fd<0)
     {
         errno = EBADF;
         return NULL;
     }
-    
+
     //#todo
-    
+
     return NULL; 
 }
-
-
 
 //ptsname_r() is a Linux extension, that is proposed for inclusion in
 //the next major revision of POSIX.1
@@ -2383,9 +2214,6 @@ ldiv_t ldiv(long num, long den)
 }
 */
 
-
-
-
 //posix_openpt - open a pseudoterminal device 
 //posix_openpt() is part of the UNIX 98 pseudoterminal support.
 //This function is specified in POSIX.1-2001. 
@@ -2394,7 +2222,6 @@ int posix_openpt (int flags)
     debug_print("posix_openpt: [FIXME]\n"); 
     return (int) open ("/dev/ptmx", flags, 0);
 }
-
 
 //grantpt - grant access to the slave pseudoterminal 
 //POSIX.1-2001. 
@@ -2412,8 +2239,6 @@ int grantpt(int fd)
 
     return -1; 
 }
-
-
 
 //POSIX.1-2001. 
 //unlockpt - unlock a pseudoterminal master/slave pair 
@@ -2435,22 +2260,21 @@ int unlockpt(int fd)
 int gramado_unlockpt(int fd);
 int gramado_unlockpt(int fd)
 {
-	int unlock = 0;
+    int unlock = 0;
     if(fd<0)
     {
         errno = EBADF;
         return -1;
     }
-	return ioctl(fd, TIOCSPTLCK, &unlock);
+    return ioctl(fd, TIOCSPTLCK, &unlock);
 }
 */
-
 
 /*
 uint32_t bswap_32(uint32_t x);
 uint32_t bswap_32(uint32_t x)
 {
-	return x>>24 | x>>16&0xff00 | x<<16&0xff0000 | x<<24;
+    return x>>24 | x>>16&0xff00 | x<<16&0xff0000 | x<<24;
 }
 */
 
@@ -2497,12 +2321,6 @@ char *dirname(char *s)
 }
 */
 
-
-
-
-
-
-
 //getpt - open the pseudoterminal master (PTM) 
 //getpt() is glibc-specific; use posix_openpt(3) instead. 
 int getpt(void)
@@ -2513,7 +2331,7 @@ int getpt(void)
 
 //static char const* __progname = NULL;
 
-const char	*getprogname(void)
+const char *getprogname(void)
 {
     debug_print("getprogname: [TODO]\n");
     return NULL;
@@ -2602,12 +2420,7 @@ int putenv(char *string)
     return (int) rval;
 }
 
-
 //
-// End.
+// End
 //
-
-
-
-
 

@@ -16,13 +16,8 @@
   ioctl() requests. 
  */
 
-
-/*
- * ioctl:
- */
-
-//See: http://man7.org/linux/man-pages/man2/ioctl.2.html
-
+// ioctl:
+// See: http://man7.org/linux/man-pages/man2/ioctl.2.html
 /*
     EBADF  fd is not a valid file descriptor.
     EFAULT argp references an inaccessible memory area.

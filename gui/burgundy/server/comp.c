@@ -19,7 +19,7 @@ static long __new_mouse_x=0;
 static long __new_mouse_y=0;
 static int __mouse_initialized = FALSE;
 
-
+static void draw_mouse_pointer(void);
 
 // Onde esta o mouse? em que janela?
 // simple implementation.
@@ -27,9 +27,9 @@ static int __mouse_initialized = FALSE;
 
 void mouse_at(void)
 {
-    int i=0;
+    register int i=0;
     struct gws_window_d *w;
-    for(i=0; i<WINDOW_COUNT_MAX; i++)
+    for (i=0; i<WINDOW_COUNT_MAX; i++)
     {
         w = (void*) windowList[i];
         if ( (void*) w != NULL )
@@ -44,7 +44,7 @@ void mouse_at(void)
                     if (w != __root_window)
                     {
                         mouse_hover = (void *) w;
-                        redraw_window(w,TRUE);
+                        //redraw_window(w,TRUE);
                     }
                 }
             }
@@ -52,16 +52,28 @@ void mouse_at(void)
     };
 }
 
-
 long comp_get_mouse_x_position(void)
 {
     return (long) __new_mouse_x;
 }
 
-
 long comp_get_mouse_y_position(void)
 {
     return (long) __new_mouse_y;
+}
+
+static void draw_mouse_pointer(void)
+{
+// #todo: 
+// print directly into the lfb.
+// DRAW
+    frontbuffer_draw_rectangle( 
+        (unsigned long) __new_mouse_x, 
+        (unsigned long) __new_mouse_y, 
+        (unsigned long) 8, 
+        (unsigned long) 8, 
+        COLOR_YELLOW, 
+        0 );
 }
 
 // + Apaga o cursor antigo, copiando o conteudo do backbuffer
@@ -100,17 +112,7 @@ void __display_mouse_cursor(void)
     __old_mouse_x = __new_mouse_x;
     __old_mouse_y = __new_mouse_y;
 
-
-// #todo: 
-// print directly into the lfb.
-// DRAW
-    frontbuffer_draw_rectangle( 
-        (unsigned long) __new_mouse_x, 
-        (unsigned long) __new_mouse_y, 
-        (unsigned long) 8, 
-        (unsigned long) 8, 
-        COLOR_YELLOW, 
-        0 );
+    draw_mouse_pointer();
 //------        
 }
 
@@ -130,9 +132,7 @@ void compose(void)
 // Backgroud
 // If the background is marked as dirty, 
 // we flush it, validate it, show the cursor and return.
-
     Dirty = (int) is_background_dirty();
-
     if (Dirty == TRUE){
         gws_show_backbuffer();
         validate_background();  
@@ -162,7 +162,6 @@ void compose(void)
 // fps
     //__update_fps();
 }
-
 
 // global
 void comp_initialize_mouse(void)
@@ -210,10 +209,4 @@ void comp_set_mouse_position(long x, long y)
     __new_mouse_x = (long) x;
     __new_mouse_y = (long) y;
 }
-
-
-
-
-
-
 
