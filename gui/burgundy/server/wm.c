@@ -3058,7 +3058,7 @@ void __probe_tb_button_hover(long long1, long long2)
                 // Register the hover window.
                 mouse_hover = (void*) w;
                 // #debug
-                yellow_status("oops");
+                // yellow_status("oops");
                 //rtl_reboot();
                 // ok, done.
                 return;
@@ -3227,7 +3227,7 @@ wmProcedure(
 
         //printf("MOVE\n");
 
-        // The compositor is doing this job at the
+        // The compositor is doing this job
         // and of it's routine. See: comp.c
         comp_set_mouse_position(long1,long2);
         
@@ -3282,7 +3282,15 @@ wmProcedure(
     // A partir dai os eventos devem ir para essa janela.
     case GWS_MousePressed:
     
+        //#debug
         //printf("PRESSED\n");
+
+        // safety first.
+        // mouse_hover validation
+        if ( (void*) mouse_hover == NULL )
+            return -1;
+        if (mouse_hover->magic!=1234)
+            return -1;
     
         // button number
         //if(long1==1){ yellow_status("P1"); }
@@ -3290,16 +3298,39 @@ wmProcedure(
         //if(long1==3){ yellow_status("P3"); }
 
         // Em qual botão da taskbar?
-        //if(mousehover_window == tb_buttons[0] ||
-        //   mousehover_window == tb_buttons[1] ||
-        //   mousehover_window == tb_buttons[2] ||
-        //   mousehover_window == tb_buttons[3] )
-        //{ 
-        //    set_status_by_id(mousehover_window,BS_PRESSED);
-        //    redraw_window_by_id(mousehover_window,TRUE);
-        //    return 0;
-        //}
-        
+        // Se for igual à um dos botões da tb.
+        if( mouse_hover->id == tb_buttons[0] ||
+            mouse_hover->id == tb_buttons[1] ||
+            mouse_hover->id == tb_buttons[2] ||
+            mouse_hover->id == tb_buttons[3] )
+        {
+            if (mouse_hover->id == tb_buttons[0])
+            {
+                if(tb_buttons_status[0] == TRUE)
+                return 0;
+            }
+            if (mouse_hover->id == tb_buttons[1])
+            {
+                if(tb_buttons_status[1] == TRUE)
+                return 0;
+            }
+            if (mouse_hover->id == tb_buttons[2])
+            {
+                if(tb_buttons_status[2] == TRUE)
+                return 0;
+            }
+            if (mouse_hover->id == tb_buttons[3])
+            {
+                if(tb_buttons_status[3] == TRUE)
+                return 0;
+            }
+
+            set_status_by_id(mouse_hover->id,BS_PRESSED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return 0;
+        }
+
+        // #todo #maybe
         // Clicamos e o ponteiro esta sobre a janela ativa.
         //aw_wid = (int) get_active_window();
         //if( mousehover_window == aw_wid )
@@ -3315,7 +3346,9 @@ wmProcedure(
     // 36
     case GWS_MouseReleased:
 
-        printf("RELEASED\n");
+        //#debug
+        //printf("RELEASED\n");
+
         //wm_Update_TaskBar("RELEASED",TRUE);
         
         // button number
@@ -3323,12 +3356,22 @@ wmProcedure(
         //if(long1==2){ yellow_status("R2"); }
         //if(long1==3){ yellow_status("R3"); }
 
-        // Post it to the app.
+        // Post it to the client. (app).
+        // When the mouse is on any position in the screen.
         on_mouse_event( 
             GWS_MouseReleased,              // event type
             comp_get_mouse_x_position(),    // current cursor x
             comp_get_mouse_y_position() );  // current cursor y
+
+        // When the mouse is hover a tb button.
         
+        // safety first.
+        // mouse_hover validation
+        if ( (void*) mouse_hover == NULL )
+            return -1;
+        if (mouse_hover->magic!=1234)
+            return -1;
+
         //if(long1==1){ yellow_status("R1"); }
         //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
         //if(long1==1){ 
@@ -3341,69 +3384,69 @@ wmProcedure(
         //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
 
         //tb_button[0]
-        //if(mousehover_window == tb_buttons[0])
-        //{
+        if(mouse_hover->id == tb_buttons[0])
+        {
             // ja esta rodando.
-        //    if(tb_buttons_status[0] == TRUE)
-        //        return 0;
-        //    set_status_by_id(mousehover_window,BS_RELEASED);
-        //    redraw_window_by_id(mousehover_window,TRUE);
+            if(tb_buttons_status[0] == TRUE)
+                return 0;
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
             //create_main_menu(8,8);
             //wm_update_active_window();
             //current_option = OPTION_MINIMIZE;
             //yellow_status("0: Min");
-       //     tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
-       //     tb_buttons_status[0] = TRUE;
-       //     return 0;
-       // }
+            //tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
+            tb_buttons_status[0] = TRUE;
+            return 0;
+        }
 
         //tb_button[1]
-        //if(mousehover_window == tb_buttons[1])
-        //{
+        if(mouse_hover->id == tb_buttons[1])
+        {
             // ja esta rodando.
-        //    if(tb_buttons_status[1] == TRUE)
-        //        return 0;
-        //    set_status_by_id(mousehover_window,BS_RELEASED);
-        //    redraw_window_by_id(mousehover_window,TRUE);
+            if(tb_buttons_status[1] == TRUE)
+                return 0;
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
             //current_option = OPTION_MAXIMIZE;
             //yellow_status("1: Max");
-        //    tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
-        //    tb_buttons_status[1] = TRUE;
-        //    return 0;
-        //}
+            //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
+            tb_buttons_status[1] = TRUE;
+            return 0;
+        }
 
         //tb_button[2]
-        //if(mousehover_window == tb_buttons[2])
-        //{
+        if(mouse_hover->id == tb_buttons[2])
+        {
             // ja esta rodando.
-        //    if(tb_buttons_status[2] == TRUE)
-        //        return 0;
-        //    set_status_by_id(mousehover_window,BS_RELEASED);
-        //    redraw_window_by_id(mousehover_window,TRUE);
+            if(tb_buttons_status[2] == TRUE)
+                return 0;
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
             //current_option = OPTION_CLOSE;
             //yellow_status("2: Close");
-        //    tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
-        //    tb_buttons_status[2] = TRUE;
-        //    return 0;
-        //}
+            //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
+            tb_buttons_status[2] = TRUE;
+            return 0;
+        }
 
         //tb_button[3]
-        //if(mousehover_window == tb_buttons[3])
-        //{
+        if(mouse_hover->id == tb_buttons[3])
+        {
             // ja esta rodando.
-        //    if(tb_buttons_status[3] == TRUE)
-        //        return 0;
-        //    set_status_by_id(mousehover_window,BS_RELEASED);
-        //    redraw_window_by_id(mousehover_window,TRUE);
+            if(tb_buttons_status[3] == TRUE)
+                return 0;
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
             //yellow_status("3: OK");
             //run_selected_option();
-        //    tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
-        //    tb_buttons_status[3] = TRUE;
+            //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
+            tb_buttons_status[3] = TRUE;
             // mostra o cliente se ele faz parte da tag 3.
             //show_client(first_client->next,3);
             //show_client_list(3);  //#todo: notworking
-        //    return 0;
-        //}
+            return 0;
+        }
 
         return 0;
         break;

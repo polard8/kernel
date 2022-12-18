@@ -3342,15 +3342,15 @@ struct gws_display_d *gws_open_display(char *display_name)
 
 // (2)
 // Create the socket file.
-    client_fd = socket ( AF_INET, SOCK_STREAM, 0 );
-    if ( client_fd < 0 ){
+    client_fd = socket( AF_INET, SOCK_STREAM, 0 );
+    if (client_fd<0){
        printf ("gws_open_display: Couldn't create socket\n");
        return NULL;
     }
 
 // #todo: Colocar isso no fim da rotina.
-    Display->used = TRUE;
-    Display->magic = 1234;
+    //Display->used = TRUE;
+    //Display->magic = 1234;
 
     Display->fd        = client_fd;
     Display->lock      = FALSE;
@@ -3382,17 +3382,14 @@ struct gws_display_d *gws_open_display(char *display_name)
 
 // Flag
     Display->connected = TRUE;
-
-    //#todo
-    //Display->used = TRUE;
-    //Display->magic = 1234;
+    Display->used = TRUE;
+    Display->magic = 1234;
 
 // Current display.
     gws_set_current_display(Display);
 // Return the display structure pointer.
     return (struct gws_display_d *) Display;
 }
-
 
 void gws_close_display(struct gws_display_d *display)
 {

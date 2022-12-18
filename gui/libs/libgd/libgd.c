@@ -36,12 +36,10 @@ static unsigned long libgd_device_bpp=0;
 // Initialize the library.
 int libgd_initialize(void)
 {
-
     libgd_current_mode = gwssrv_get_system_metrics(130);
-
     if (libgd_current_mode < 0){
         printf ("libgd_initialize: [FAIL] libgd_current_mode\n");
-        exit (1);
+        exit(1);
     }
 
 // buffers
@@ -56,7 +54,6 @@ int libgd_initialize(void)
     libgd_SavedY   = (unsigned long) libgd_device_height;
     libgd_SavedBPP = (unsigned long) libgd_device_bpp; 
 
-
     if ( libgd_device_width == 0 || 
          libgd_device_height == 0 || 
          libgd_device_bpp == 0 || 
@@ -64,13 +61,11 @@ int libgd_initialize(void)
          libgd_BACKBUFFER_VA == 0 )
     {
         printf ("libgd_initialize: [FAIL] Screen properties\n");
-        exit (1);
+        exit(1);
     }
-
 
     return 0;
 }
-
 
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).
@@ -157,14 +152,11 @@ fb_BackBufferPutpixel (
     // #todo
     // Precismos considerar o limite do backbuffer.
     // Então teremos um Offset máximo.
-
     unsigned long tmpOffset=0;
     unsigned long MaxOffset=0;
-
     int Offset=0;
-    
-    // #todo
-    // raster operation. rasterization.
+// #todo
+// raster operation. rasterization.
     // unsigned long rop;
 
 // 2MB limit
@@ -186,12 +178,10 @@ fb_BackBufferPutpixel (
 
 // Clipping
 // Clipping against the device limits
-
     if (x<0){ goto fail; }
     if (y<0){ goto fail; }
     if ( x >= deviceWidth ) { goto fail; }
     if ( y >= deviceHeight ){ goto fail; }
-
 // Purify
     x = ( x & 0xFFFF);
     y = ( y & 0xFFFF);
@@ -223,19 +213,17 @@ fb_BackBufferPutpixel (
     if (bytes_count!=3 && bytes_count!=4 )
         return -1;
 
-    if (bytes_count==3)
-    {
+    if (bytes_count==3){
         pitch = (unsigned long) (deviceWidth*bytes_count);
         tmpOffset = (unsigned long) ( (pitch*y) + (x*bytes_count) );
     }
 
-    if (bytes_count==4)
-    {
+    if (bytes_count==4){
         pitch = (unsigned long) (deviceWidth<<2);
         tmpOffset = (unsigned long) ( (pitch*y) + (x<<2) );
     }
 
-    if( tmpOffset >= MaxOffset )
+    if ( tmpOffset >= MaxOffset )
     {
         debug_print ("fb_BackBufferPutpixel: [ERROR] backbuffer limits > Max\n"); 
         return -1;
@@ -250,25 +238,24 @@ fb_BackBufferPutpixel (
         //goto fail;
     }
 
-    // int. menor que 4MB
+// int. menor que 4MB
     Offset = (int) tmpOffset;
 
-    // #bugbug
-    // #todo
-    // Para não termos problemas com o offset, temos que checar
-    // os limites de x e y.
+// #bugbug
+// #todo
+// Para não termos problemas com o offset, temos que checar
+// os limites de x e y.
+
 //
 // Backbuffer limit
 //
 
 // #bugbug
 // Escrever fora do backbuffer pode gerar PF.
-
 // #todo
 // The rop_flags will give us some informations.
 // the lsb is the operation code.
 // See the same routine in the kernel side.
-
 
 /*
 //
@@ -295,9 +282,9 @@ fb_BackBufferPutpixel (
     where[Offset]    = b;
     where[Offset +1] = g;
     where[Offset +2] = r;
-    if ( libgd_SavedBPP == 32 ){
+    if (libgd_SavedBPP == 32){
         where[Offset +3] = a; 
-    };
+    }
     return 0;
 fail:
     return -1;
@@ -353,8 +340,7 @@ putpixel0 (
 // Buffer address validation.
 // The address where we're gonna put the data into.
 // #todo: It needs to be a valid ring3 address.
-    if (buffer_va == 0)
-    {
+    if (buffer_va == 0){
         //panic("putpixel0: buffer_va\n");
         gwssrv_debug_print("putpixel0: buffer_va\n");
         return;
@@ -407,7 +393,6 @@ putpixel0 (
     //if (bytes_count==2){
     //    offset = (int) ( ((width<<1)*y) + (x<<1) );
     //}
-
 
 //
 // == Modify ==============================
@@ -524,7 +509,6 @@ putpixel0 (
     }
 */
 
-
 //
 // == Register =====================
 // 
@@ -536,7 +520,6 @@ putpixel0 (
     if (bpp == 32){ where[offset +3] = a3; };
 }
 
-
 void 
 backbuffer_putpixel ( 
     unsigned int  _color,
@@ -545,7 +528,6 @@ backbuffer_putpixel (
     unsigned long _rop_flags )
 {
     unsigned long buffer = (unsigned long) libgd_BACKBUFFER_VA;
-
 // Putpixel at the given buffer address.
     putpixel0(
         _color,
@@ -564,7 +546,6 @@ frontbuffer_putpixel (
     unsigned long _rop_flags )
 {
     unsigned long buffer = (unsigned long) libgd_FRONTBUFFER_VA;
-
 // Putpixel at the given buffer address.
     putpixel0(
         _color,
@@ -574,14 +555,12 @@ frontbuffer_putpixel (
         buffer );
 }
 
-
 //============
 
 // Get the color value given the position.
 unsigned int grBackBufferGetPixelColor( int x, int y )
 {
     unsigned char *where = (unsigned char *) libgd_BACKBUFFER_VA;
-
 // 3 = 24 bpp
     int bytes_count=0;
 
@@ -589,16 +568,13 @@ unsigned int grBackBufferGetPixelColor( int x, int y )
 // Essa funçao eta errada,
 // precisamos passar o ponteiro para o retorno via parametro
 // e o retorno da funçao deve ser int, pra indicar sucesso ou nao.
-
     if (x<0){ return 0; }
     if (y<0){ return 0; }
 
 // bpp
 // #danger
 // Esse valor foi herdado do bootloader.
-
     switch (libgd_SavedBPP){
-
     case 32:  bytes_count = 4;  break;
     case 24:  bytes_count = 3;  break;
     //case 16:  bytes_count = 2;  break;
@@ -612,38 +588,30 @@ unsigned int grBackBufferGetPixelColor( int x, int y )
 // #importante
 // Pegamos a largura do dispositivo.
     int width = (int) libgd_SavedX;
-
 // Offset
     int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
-
 // bgra
     char b, g, r, a;
-
 // Get bytes.
     b = where[offset];
     g = where[offset +1];
     r = where[offset +2];
-    if ( libgd_SavedBPP == 32 ){ a = where[offset +3]; };
-
+    if ( libgd_SavedBPP == 32 ){
+        a = where[offset +3];
+    };
 // The buffer.
     unsigned int ColorBuffer=0;
     unsigned char *c = (unsigned char *) &ColorBuffer;
 
 // Paint.
 // Set bytes of ColorBuffer.
-    c[0] = b; 
-    c[1] = g;
-    c[2] = r;
-    c[3] = a;
+    c[0] = b;  c[1] = g;  c[2] = r;  c[3] = a;
 
 // Return the color value.
     return (unsigned int) ColorBuffer;
 }
 
-
 //
 // End
 //
-
-
 
