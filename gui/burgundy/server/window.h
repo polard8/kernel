@@ -230,27 +230,21 @@ struct gws_button_d
 {
     //object_type_t   objectType;
     //object_class_t  objectClass;
-
     int used;
     int magic;
-
 // ??
 // Ordem dos botões que pertencam à mesma janela.
 // A qual janela o botão pertence.
 // Esse índice pode trabalhar junto com 
 // a lista encadeada de 'next'.
-
-    //int index;	
+    //int index;
     struct gws_window_d *window; 
-    
-	// label
-	// #todo: mudar o tipo para (char *)
+// label
+// #todo: mudar o tipo para (char *)
     unsigned char *string; 
-
-	// Estilo de design.
-	// 3D, flat ...
+// Estilo de design.
+// 3D, flat ...
     int style;
-
 //button states:
 //1. Default
 //2. Focus
@@ -258,38 +252,30 @@ struct gws_button_d
 //4. Disabled
 //5. Hover and Active
     int state;
-
 //Check Boxes
 //Group Boxes
 //Push Buttons
 //Radio Buttons
     int type;
-
     int selected;
-
 // Border color
 // Isso é para o caso do estilo 3D.
 // Ou para causar alguns efito em outros estilos.
     unsigned long border1;
     unsigned long border2;
-
 // Deslocamento em relação ao left da janela
 // Deslocamento em relação ao top da janela
     unsigned long x;    
     unsigned long y;   
     unsigned long width; 
     unsigned long height;
-
 // #todo: Use unsigned int.
 // Background color.
     unsigned long color;
-
 //More?
 //...
-
     struct gws_button_d *Next;  
 };
-
 
 
 /*
@@ -300,18 +286,14 @@ struct gws_button_d
 
 struct gws_rect_d 
 {
-	//object_type_t objectType;
-	//object_class_t objectClass;
-
+    //object_type_t objectType;
+    //object_class_t objectClass;
     int used;
     int magic;
-
 // Invalidate rectangle.
 // When invalidated it needs to be flushed into the framebuffer.
     int dirty;
-
     int flag;
-
 //estilo de design
     int style;
 // Filled or not.
@@ -326,18 +308,13 @@ struct gws_rect_d
     unsigned long top;
     unsigned long right;
     unsigned long bottom;
-
     unsigned long width;
     unsigned long height;
-
     unsigned int bg_color;
-
     int is_solid;
     unsigned long rop;
-
 // Essa é  ajanela à qual o retângulo pertence.
     struct gws_window_d *window;   //mudar. #todo
-
     struct gws_rect_d *next;
 };
 
@@ -389,48 +366,36 @@ typedef enum {
 //classes de janelas controladas pelos servidores.
 typedef enum {
     gws_WindowClassServerWindow,
-    //...	
+    //...
 }gws_server_window_classes_t;
-
 
 
 //estrutura para window class
 struct gws_window_class_d
 {
-	
-	//Que tipo de window class.
-	// do sistema, dos processos ...
-    //tipo de classe.
-	
+// Que tipo de window class.
+// do sistema, dos processos ...
+// tipo de classe.
     gws_wc_t windowClass; 
-
-	//1
-    gws_client_window_classes_t	clientClass;
-	
-	//2
-    gws_kernel_window_classes_t	kernelClass;
-	
-	//3
-    gws_server_window_classes_t	serverClass;
-	
-	//Endereço do procedimento de janela.
-	//(eip da thread primcipal do app)
+//1
+    gws_client_window_classes_t clientClass;
+//2
+    gws_kernel_window_classes_t kernelClass;
+//3
+    gws_server_window_classes_t serverClass;
+// Endereço do procedimento de janela.
+// (eip da thread primcipal do app)
     unsigned long procedure;
-    
     // ...
 };
 
-
 // Input pointer device type.
 typedef enum {
-
     IP_DEVICE_NULL,
     IP_DEVICE_KEYBOARD,
     IP_DEVICE_MOUSE
     // ... 
 } gws_ip_device_t;
-
-
 
 // The controls for a given window.
 // w.Controls->minimize
@@ -530,7 +495,6 @@ struct gws_window_d
     struct windowcontrols_d  Controls;
 // Single event
     struct gws_event_d  single_event;
-    //struct gws_event_d  *single_event;
 // Event list.
     int ev_head;
     int ev_tail;
@@ -721,8 +685,11 @@ struct gws_window_d
 // Rectangles
 //
 
-    struct gws_rect_d  rcWindow;  // The frame's rectangle.
-    struct gws_rect_d  rcClient;  // The Client area.
+// The frame's rectangle.
+    struct gws_rect_d  rcWindow;
+// The Client area.
+// This is the viewport for some applications, just like browsers.
+    struct gws_rect_d  rcClient;
 
     // Os componentes dessa janela.
     struct gws_rect_d  *rects;
