@@ -42,9 +42,6 @@ typedef unsigned long  pt_entry_t;
 #define PAGE_GET_TAB(addr)  (((unsigned)(addr) >> 12) & 0x3FF)
 
 
-
-
-
 /*
  Obs: 
  lfb é um objeto.

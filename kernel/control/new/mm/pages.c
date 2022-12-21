@@ -619,17 +619,14 @@ static void mmSetupMemoryUsage(void)
 
 }
 
-
-/*
- * I_initialize_frame_table:
- *     Frame table to handle a pool of page frames.
- */
-// See:
-// x64mm.h
+// I_initialize_frame_table:
+// Frame table to handle a pool of page frames.
+// Vamos configurar a frame table de acordo com o total de memória RAM.
+// See: x64mm.h
 
 int I_initialize_frame_table(void)
 {
-    int i=0;
+    //int i=0;
 
     debug_print("I_initialize_frame_table:\n");
 
@@ -675,63 +672,51 @@ int I_initialize_frame_table(void)
 // Então temos mais memória do que precisamos
 // e a frame table será limitada à marca de 1GB.
 
-    if ( memorysizeTotal >= (1024*1024)  )
-    {
+    if ( memorysizeTotal >= (1024*1024) ){
         FT.end_pa = __1GB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 1GB or more\n");
         goto initialize_frame_table;
     }
 
-
 // =================================================
 // Size in KB.
 // Se a RAM for maior ou igual à 512MB.
 
-    if ( memorysizeTotal >= (512*1024) )
-    {
+    if ( memorysizeTotal >= (512*1024) ){
         FT.end_pa = __512MB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 512MB or more\n");
         goto initialize_frame_table;
     } 
 
-
 // =================================================
 // Size in KB.
 // Se a RAM for maior ou igual à 256MB.
 
-    if ( memorysizeTotal >= (256*1024) )
-    {
+    if ( memorysizeTotal >= (256*1024) ){
         FT.end_pa = __256MB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 256MB or more\n");
         goto initialize_frame_table;
     } 
 
-
 // =================================================
 // Error:
 // Size in KB.
 // Se a RAM for menor que 256MB.
-
 // #bugbug
 // Nossa rotina que calcula o tamanho da memória RAM
 // nos entrga um valor que é um pouco menos que o
 // total disponível.
 // Porque ele não testa o último mega.
-
 // The available ram is less than 256.
     if ( memorysizeTotal < (256*1024) ){
         debug_print ("I_initialize_frame_table: [ALERT] memorysizeTotal is less than 256MB\n");
     }
 
-//
-// Danger !
-//
-
+// Danger!
 // The available RAM is almost 256MB
 // Its because we a 256MB card,
 // But the boot loader did not check the last mb.
-
-//#bugbug: x_panic is not available yet.
+// #bugbug: x_panic is not available yet.
 
     if ( memorysizeTotal < (250*1024) ){
         debug_print ("I_initialize_frame_table: [PANIC] The system has less than 250MB of available RAM\n");
@@ -750,12 +735,11 @@ initialize_frame_table:
 // Slow. Use a define for this value.
 // 250*1024*1024 = 268435456 = 0x10000000.
 
-    if ( FT.end_pa < __256MB_MARK_PA ){
+    if (FT.end_pa < __256MB_MARK_PA){
         debug_print ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA\n");
          x_panic    ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA");
     }
-
-    if ( FT.end_pa < FT.start_pa ){
+    if (FT.end_pa < FT.start_pa){
         debug_print ("I_initialize_frame_table: FT.end_pa < FT.start_pa\n");
          x_panic    ("I_initialize_frame_table: FT.end_pa < FT.start_pa");
     }
@@ -768,12 +752,12 @@ initialize_frame_table:
 // ====================================================================
 //
 
-    if( FT.start_pa == 0 ){
+    if (FT.start_pa == 0){
          debug_print("I_initialize_frame_table: FT.start_pa\n");
          x_panic    ("I_initialize_frame_table: FT.start_pa\n");
     }
 
-    if( FT.end_pa == 0 ){
+    if (FT.end_pa == 0){
          debug_print("I_initialize_frame_table: FT.end_pa\n");
          x_panic    ("I_initialize_frame_table: FT.end_pa\n");
     }
@@ -781,24 +765,31 @@ initialize_frame_table:
 // Size in bytes.
 // Size in KB.
 // Size in MB.
-    FT.size_in_bytes = (unsigned long) (FT.end_pa - FT.start_pa);
-    FT.size_in_kb    = (unsigned long) (FT.size_in_bytes/1024);
-    FT.size_in_mb    = (unsigned long) (FT.size_in_kb/1024);
+    FT.size_in_bytes = 
+        (unsigned long) (FT.end_pa - FT.start_pa);
+    FT.size_in_kb = 
+        (unsigned long) (FT.size_in_bytes/1024);
+    FT.size_in_mb = 
+        (unsigned long) (FT.size_in_kb/1024);
 
 // Size in frames.
 // Each frame has 4096 bytes. 
 // This is because each page has 4096 bytes.
-    FT.size_in_frames = (unsigned long) (FT.size_in_bytes/4096);
-    FT.number_of_system_frames = (unsigned long) FT_NUMBER_OF_SYSTEM_FRAMES;
-    FT.number_of_user_frames   = (unsigned long) FT_NUMBER_OF_USER_FRAMES;
+    FT.size_in_frames = 
+        (unsigned long) (FT.size_in_bytes/4096);
+    FT.number_of_system_frames = 
+        (unsigned long) FT_NUMBER_OF_SYSTEM_FRAMES;
+    FT.number_of_user_frames = 
+        (unsigned long) FT_NUMBER_OF_USER_FRAMES;
 // Número de frames gerenciados por essa estrutura.
-    FT.number_of_used_frames = (unsigned long) FT_TOTAL_FRAMES;
+    FT.number_of_used_frames = 
+        (unsigned long) FT_TOTAL_FRAMES;
 
 // O número de frames contidos na área alocável
-// não pode ser menor que a quantidade de frames gerenciados por
-// essa estrutura.
+// não pode ser menor que a quantidade de frames 
+// gerenciados por essa estrutura.
 
-    if ( FT.size_in_frames < FT.number_of_used_frames ){
+    if (FT.size_in_frames < FT.number_of_used_frames){
         debug_print("I_initialize_frame_table: FT.size_in_frames\n");
         x_panic    ("I_initialize_frame_table: FT.size_in_frames\n");
     }
@@ -813,6 +804,16 @@ initialize_frame_table:
     FT.initialized = TRUE;
 
     return 0;
+}
+
+unsigned long mmGetFTStartPA(void)
+{
+    return (unsigned long) FT.start_pa;
+}
+
+unsigned long mmGetFTEndPA(void)
+{
+    return (unsigned long) FT.end_pa;
 }
 
 // Checar se a estrutura de página é nula
@@ -878,8 +879,7 @@ __virtual_to_physical (
     //refresh_screen();
     //while(1){}
 
-
-    if ( virtual_address == 0 ){
+    if (virtual_address == 0){
         debug_print ("__virtual_to_physical: [?] virtual_address == 0 \n");
     }
 
@@ -893,7 +893,6 @@ __virtual_to_physical (
 
     unsigned long tmp=0;
     unsigned long address=0;
-
 
     //printf ("a=%d b=%d d=%d t=%d o=%d \n",a,b,d,t,o);
     //refresh_screen();
@@ -926,7 +925,7 @@ __virtual_to_physical (
 // de pml4 e pdpt ... mas depois vamos usar todas.
 
     // #hackhack
-    if ( a != 0 ){
+    if (a != 0){
         printf ("__virtual_to_physical: [TODO] a != 0 \n");
         refresh_screen();
         while(1){}
@@ -934,7 +933,7 @@ __virtual_to_physical (
     }
 
     // #hackhack
-    if ( b != 0 ){
+    if (b != 0){
         printf ("__virtual_to_physical: [TODO] b != 0 \n");
         refresh_screen();
         while(1){}
@@ -956,7 +955,6 @@ __virtual_to_physical (
 
     // Temos o pdpt junto com suas flags.
     tmp = (unsigned long) pml4VA[a];
-
 
 // ==============================
 // page directory pointer table.
@@ -1051,20 +1049,16 @@ void pages_calc_mem (void)
     refresh_screen();
 }
 
-
-
-// 64bit ?
 // local
 // Precisa ser um endereço físico.
-
+// 64bit?
 void load_pml4_table(void *phy_addr)
 {
     asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
 
-
-// inline?
 // PAE and PGE
+// inline?
 void enable_pae(void)
 {
     // PAE and PGE
@@ -1081,9 +1075,6 @@ void page_enable(void)
                   " orl $0x80000000, %%eax; "
                   " movq %%rax, %%cr0       " :: );
 }
-
-
-
 
 /*
 // 8 pagetables
@@ -1238,27 +1229,20 @@ mm_fill_n_pagetables(
 */
 
 
-
 // ---------------------------
-
+// mm_fill_page_table:
 // Cria uma page table com 512 entradas
 // para uma região de 2mb e configura uma
 // determinada entrada no diretório de páginas indicado.
-//
 // IN:
-//
 // directory_va: 
 //     Endereço virtual do diretório de páginas.
-//
 // directory_entry: 
 //     Índice da entrada no diretório indicado.
-//
 // pt_va:
 //     Endereço virtual da tabela de páginas.
-//
 // region_2mb_pa: 
 //     Endereço físico da região de 2MB que queremos mapear.
-//
 // flags:
 //     As flags usadas em todas as entradas da pagetable
 //     e na entrada do diretório de páginas.
@@ -1290,8 +1274,10 @@ mm_fill_page_table(
     };
 
 // Create a directory entry in the given index.
-    dir[directory_entry] = (unsigned long) pt_va;  //&pt[0];
-    dir[directory_entry] = (unsigned long) (dir[directory_entry] | flags);
+    dir[directory_entry] = 
+        (unsigned long) pt_va;  //&pt[0];
+    dir[directory_entry] = 
+        (unsigned long) (dir[directory_entry] | flags);
 
     return 0;
 }
@@ -1320,8 +1306,6 @@ void __initialize_ram_usage_varables(void)
     mm_used_extraheap3 = 0; 
     mm_used_frame_table = 0;
 }
-
-
 
 void __initialize_default_physical_regions(void)
 {
@@ -2004,10 +1988,9 @@ static void mmInitializeKernelPageTables(void)
 
 // ======================================
 // mmSetUpPaging:
-//     Mapping the static system areas.
-//     Main routine.
-//     Initalizing the paging support.
-// Called by init_runtime in runtime.c
+// Main routine.
+// Initalizing the paging support.
+// Mapping the static system areas.
 // Called by mmInit() in mminit.c
 
 int mmSetUpPaging(void)
@@ -2053,7 +2036,6 @@ int mmSetUpPaging(void)
 
     gKernelPML4Address = (unsigned long) KERNEL_PML4_VA;
 
-
 // See: x64gva.h
 
     // level 4: 0x000000000009C000
@@ -2064,7 +2046,6 @@ int mmSetUpPaging(void)
     unsigned long *kernel_pd0   = (unsigned long *) KERNEL_PD_PA;
     // level 1
     // A lot of page tables in level 1.
-
 
 //
 // Saving the data

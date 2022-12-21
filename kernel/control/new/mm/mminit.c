@@ -305,12 +305,9 @@ void memory_destroy_heap (struct heap_d *heap)
 }
 
 
-/*
- * mmInit:
- *   Inicializa o memory manager.
- */
-// Called by:
-// init_runtime in runtime.c
+// mmInit:
+// Inicializa o memory manager.
+// Called by __init_runtime() in runtime.c
 // Init Memory Manager for x64:
 // Heap, Stack, Pages, mmblocks, memory sizes, memory zones ...
 
@@ -321,21 +318,19 @@ int mmInit(void)
 
     debug_print("mmInit: [TODO] [FIXME]\n");
 
-// @todo: 
+// #todo: 
 // Inicializar algumas variáveis globais.
 // Chamar os construtores para inicializar o básico.
-// @todo: 
+// #todo: 
 // Clear BSS.
 // Criar mmClearBSS()
 
 // heap and stack
-
     Status = (int) __init_heap();
     if (Status != 0){
         debug_print("mmInit: [FAIL] Heap\n");
         goto fail;
     }
-
     Status = (int) __init_stack();
     if (Status != 0){
         debug_print ("mmInit: [FAIL] Stack\n");
@@ -438,12 +433,19 @@ int mmInit(void)
 
 // Mapping all the static system areas.
 // See: pages.c
-    mmSetUpPaging();
+    int PagingStatus=-1;
+    PagingStatus = (int) mmSetUpPaging();
+    if(PagingStatus<0){
+        x_panic("mmInit: Paging");
+    }
 
 done:
-    debug_print("mmInit: done\n");
+
+    //#debug
+    //debug_print("mmInit: done\n");
     //refresh_screen();
     //while(1){}
+
     return 0;
 
 fail:

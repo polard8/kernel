@@ -1093,7 +1093,14 @@ void *CloneKernelPD0(void);
 void *CloneKernelPML4 (void);
 void *clone_pml4 ( unsigned long pml4_va );
 
+//
+// Frame table support.
+//
+
 int I_initialize_frame_table(void);
+unsigned long mmGetFTStartPA(void);
+unsigned long mmGetFTEndPA(void);
+
 
 int pEmpty (struct page_d *p);
 void freePage (struct page_d *p);
