@@ -2,7 +2,7 @@
 # Running Gramado OS on kvm.
 
 	echo "~~~~>"
-	
+
 	qemu-system-x86_64 -hda GRAMADO.VHD \
 	-m 256 \
 	-smp 2 \

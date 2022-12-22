@@ -9,19 +9,31 @@
     NASM version 2.25.05
 ```
 
+## Linux dependencies
+
+**Debian / Ubuntu**
+```console
+sudo apt install build-essential nasm make qemu-system-x86 qemu-system-gui qemu-utils 
+```
+
 ## Build on Linux
 
-```bash
+```console
 $ make
 $ cd kernel
 $ ./run
 ```
 
-## Linux dependencies
+The command 'make' will compile the GramadoOS and install the files 
+into the 'gramado/kernel/control/disk' directory. It will also build 
+a disk image into the 'gramado/kernel' directory, called GRAMADO.VHD.
 
-**Debian / Ubuntu**
-```bash
-sudo apt install build-essential make qemu-system-i386 qemu-utils nasm
-```
+After that, You can go inside the directory 'gramado/kernel' and 
+run the disk image using the command './run' or the command './runkvm'. 
+You also can run the disk image using the Virtualbox.
+
+To clean the mess you can use the command 'make clean-all' inside
+the directories 'gramado/' and 'gramado/kernel'. 
+
 
 
