@@ -68,7 +68,7 @@ Please, give us some feedback.
 
 ## Documentation
 
-> See the [docs](https://github.com/frednora/gramado/tree/main/admin/docs).
+> See the [docs](https://github.com/frednora/gramado/tree/master/kernel/admin/docs).
 
 ## Author
 
