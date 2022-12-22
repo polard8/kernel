@@ -6,7 +6,7 @@
 Build:
     Type 'make'
 Clear the mess:
-    Go into the folder and type 'make clean-all'
+    Go into the 'kernel' directory and type 'make clean-all'
 Running:
     Go to kernel/ folder and type './run' or './runkvm'	
     

@@ -1,0 +1,12 @@
+
+
+	The kernel directory is the place for building main 
+components of the system.
+	There are two main subdirectories here, control/ and exposed/.
+
+	control/ is the place where we build the ring 0 part 
+of the system. The disk image, the boot loader and the kernel base.
+
+	exposed/ is the place where we build the ring 3 
+main part of the system. The init process and the unix-like commands.
+
