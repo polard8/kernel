@@ -28,15 +28,15 @@
 #include <spawn.h>
 #include <rtl/gramado.h> 
 
-#define  UNISTD_SYSTEMCALL_FORK     71  
-#define  UNISTD_SYSTEMCALL_EXIT     70
-#define  UNISTD_SYSTEMCALL_GETPID   85
-#define  UNISTD_SYSTEMCALL_GETPPID  81
-//#define	UNISTD_SYSTEMCALL_GETGID ??
+#define UNISTD_SYSTEMCALL_FORK     71  
+#define UNISTD_SYSTEMCALL_EXIT     70
+#define UNISTD_SYSTEMCALL_GETPID   85
+#define UNISTD_SYSTEMCALL_GETPPID  81
+//#define UNISTD_SYSTEMCALL_GETGID ??
 // ...
 
 //
-// Error.
+// Error
 //
 
 // Global thing. Don't use 'static'.
@@ -110,7 +110,11 @@ int tcsetpgrp(int fd, pid_t pgid)
 // #todo
 // Testar essa rotina usando a variável **environ. 
 
-char *__execv_environ[] = { NULL, NULL, NULL };
+char *__execv_environ[] = { 
+    NULL, 
+    NULL, 
+    NULL 
+};
 
 int execv(const char *path, char *const argv[])
 {
@@ -168,7 +172,8 @@ ssize_t read_tty (int fd, const void *buf, size_t count)
         return -1;
     }
     
-    return (ssize_t) gramado_system_call ( 272, 
+    return (ssize_t) gramado_system_call ( 
+                         272, 
                          (unsigned long) fd,      // dispositivo.
                          (unsigned long) buf, 
                          (unsigned long) count ); 
@@ -184,14 +189,12 @@ ssize_t write_tty (int fd, const void *buf, size_t count)
         return -1;
     }
 
-    return (ssize_t) gramado_system_call ( 273, 
+    return (ssize_t) gramado_system_call ( 
+                         273, 
                          (unsigned long) fd,      // dispositivo.
                          (unsigned long) buf, 
                          (unsigned long) count ); 
 }
-
-
-
 
 // read on virtual console!
 // range: 0 ~ 3
@@ -203,13 +206,13 @@ ssize_t read_VC (int fd, const void *buf, size_t count)
         return -1;
     }
 
-    return (ssize_t) gramado_system_call ( 262, 
+    return (ssize_t) gramado_system_call ( 
+                         262, 
                          (unsigned long) fd,      // dispositivo.
                          (unsigned long) buf, 
                          (unsigned long) count ); 
 
 }
-
 
 // write on virtual console!
 // range: 0 ~ 3
@@ -221,7 +224,8 @@ ssize_t write_VC (int fd, const void *buf, size_t count)
         return -1;
     }
 
-    return (ssize_t) gramado_system_call ( 263, 
+    return (ssize_t) gramado_system_call ( 
+                         263, 
                          (unsigned long) fd,      // dispositivo.
                          (unsigned long) buf, 
                          (unsigned long) count ); 
@@ -296,7 +300,12 @@ ssize_t write(int fd, const void *buf, size_t count)
 }
 
 
-ssize_t pread (int fd, void *buf, size_t count, off_t offset)
+ssize_t 
+pread(
+    int fd, 
+    void *buf, 
+    size_t count, 
+    off_t offset )
 {
     debug_print ("pread: [TODO]\n");
 
@@ -341,7 +350,6 @@ pwrite (
     size_t count, 
     off_t offset )
 {
-
     debug_print ("pwrite: [TODO]\n");
 
     if (fd<0){
@@ -493,9 +501,7 @@ int setuid(uid_t uid)
 // SYSTEMCALL_SETCURRENTUSERID
 
     value = (uid_t) gramado_system_call ( 151, 0, 0, 0 );
-
-    if(value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1; 
     }
@@ -534,10 +540,9 @@ int setgid(gid_t gid)
 }
 gid_t getgid (void)
 {
-	//SYSTEMCALL_GETCURRENTGROUPID
+    //SYSTEMCALL_GETCURRENTGROUPID
     return (gid_t) gramado_system_call ( 154, 0, 0, 0 );
 }
-
 
 // ===============================
 // euid
@@ -609,7 +614,6 @@ foreground process group on the terminal associated to fd,
 which must be the controlling terminal of the calling process. 
 See: https://linux.die.net/man/3/tcsetpgrp
 */
-
 // #??
 // Why the return type is pid_t?
 // gid_t?
@@ -628,9 +632,7 @@ pid_t tcgetpgrp(int fd)
 // work in ring0 to implement this.
 
     value = (pid_t) ioctl(fd, TIOCGPGRP, &s);
-
-    if (value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (pid_t) (-1);
     }
@@ -669,7 +671,6 @@ int tcsetpgrp(int fd, pid_t pgrp)
 // work in ring0 to implement this.
     
     value = (int) ioctl(fd, TIOCSPGRP, &s);
-
     if (value<0){
         errno = (-value);
         return (int) -1;
@@ -713,13 +714,11 @@ pid_t getpgid(pid_t pid)
 }
 
 
-
 /*
  There is differente versions of these routines.
  See:
  https://man7.org/linux/man-pages/man2/getpgrp.2.html 
  */
-
 
 
 /* System V version */
@@ -967,47 +966,40 @@ int setpriority (int which, id_t who, int prio)
 }
 
 
-/*
- * nice:
- *     Change process priority.
- */
-
+// nice:
+// Change process priority.
 // #todo:
 // It looks very wasy to implement.
 
-int nice (int inc)
+int nice(int inc)
 {
     debug_print ("nice: [TODO]\n");
     return -1;    //#todo
 
-    //#todo
-    /*
+//#todo
+
+/*
     int prio;
-	errno = 0;
-	prio = getpriority(PRIO_PROCESS, 0);
-	if (prio == -1 && errno)
-		return -1;
-	if (setpriority(PRIO_PROCESS, 0, prio + incr) == -1) {
-		if (errno == EACCES)
-			errno = EPERM;
-		return -1;
-	}
-	return getpriority(PRIO_PROCESS, 0);
-	*/
+    errno = 0;
+    prio = getpriority(PRIO_PROCESS, 0);
+    if (prio == -1 && errno)
+        return -1;
+    if (setpriority(PRIO_PROCESS, 0, prio + incr) == -1) {
+        if (errno == EACCES)
+            errno = EPERM;
+        return -1;
+    }
+    return getpriority(PRIO_PROCESS, 0);
+*/
+
 }
 
 
-/*
- * pause:
- *
- */
-
-int pause (void)
+int pause(void)
 {
     debug_print ("pause: [TODO]\n");
     return -1; //#todo
 }
-
 
 int mkdir(const char *pathname, mode_t mode)
 {
@@ -1045,8 +1037,7 @@ int mkdir(const char *pathname, mode_t mode)
     return (int) value;
 }
 
-
-int rmdir (const char *pathname)
+int rmdir(const char *pathname)
 {
     debug_print ("rmdir: [TODO]\n");
 
@@ -1061,7 +1052,6 @@ int rmdir (const char *pathname)
         errno=EINVAL;
         return -1;
     }
-
 
     return -1; //#todo
 }
@@ -1108,7 +1098,6 @@ int unlink (const char *pathname)
         return -1;
     }
 
-
     // ...
     
     return (int) (-1);
@@ -1147,8 +1136,7 @@ int munlock (const void *addr, size_t len)
         return -1;
     }
 
-    if (len<0)
-    {
+    if (len<0){
         errno = EINVAL;
         return -1;
     }
@@ -1159,27 +1147,24 @@ int munlock (const void *addr, size_t len)
 }
 
 
-int mlockall (int flags)
+int mlockall(int flags)
 {
     debug_print ("mlockall: [TODO]\n");
     return -1; //#todo
 }
 
-
-int munlockall (void)
+int munlockall(void)
 {
     debug_print ("munlockall: [TODO]\n");
     return -1; //#todo
 }
 
-
 // #??  name?
-long sysconf (int name)
+long sysconf(int name)
 {
     debug_print ("sysconf: [TODO]\n");
     return -1; //#todo
 }
-
 
 // ==========================
 // sync - salva no disco.
@@ -1215,8 +1200,7 @@ int syncfs(int fd)
 {
     debug_print ("syncfs: [TODO]\n");
 
-    if (fd<0)
-    {
+    if (fd<0){
         debug_print ("syncfs: fd\n");
         errno = EBADF;
         return -1;
@@ -1227,10 +1211,7 @@ int syncfs(int fd)
     return -1;
 }
 
-
-/*
- * fsync:
- */
+// fsync:
 // Isso salva no disco o buffer que esta em ring0 .
 // fsync: synchronize a file's in-core state with storage device
 // fflsush: flush a stream
@@ -1251,8 +1232,7 @@ int fsync(int fd)
 {
     debug_print ("fsync: [TODO]\n");
     
-    if (fd<0)
-    {
+    if (fd<0){
         errno=EBADF;
         return -1;
     }    
@@ -1262,19 +1242,15 @@ int fsync(int fd)
     return -1;    //#todo
 }
 
-
-/*
- * fdatasync:
- */
+// fdatasync:
 // fdatasync() is also available to write out just the changes made 
 // to the data in the file, and not necessarily the file's related metadata.
 
-int fdatasync (int fd)
+int fdatasync(int fd)
 {
     debug_print ("fdatasync: [TODO]\n");
 
-    if (fd<0)
-    {
+    if (fd<0){
         errno = EBADF;
         return -1;
     }    
@@ -1315,15 +1291,14 @@ int close(int fd)
     return (int) value;
 }
 
-
 int pipe2 ( int pipefd[2], int flags )
 {
-    return (int) gramado_system_call ( 247, 
+    return (int) gramado_system_call ( 
+                     247, 
                      (unsigned long) pipefd, 
                      (unsigned long) flags, 
                      (unsigned long) 0 );
 }
-
 
 int pipe(int pipefd[2])
 {
@@ -1337,25 +1312,23 @@ int pipe(int pipefd[2])
     return (int) value;
 }
 
-
 long fpathconf (int fildes, int name)
 {
     debug_print ("fpathconf: [TODO]\n");
     return -1;
 }
 
-
 long pathconf (const char *pathname, int name)
 {
     debug_print ("pathconf: [TODO]\n");
 
-    if( (void*) pathname == NULL )
+    if ( (void*) pathname == NULL )
     {
         errno=EINVAL;
         return -1;
     }
     
-    if(*pathname == 0)
+    if (*pathname == 0)
     {
         errno=EINVAL;
         return -1;
@@ -1392,15 +1365,14 @@ int gethostname (char *name, size_t len)
 {
     int value = -1;
 
-    if( (void*) name == NULL )
+    if ( (void*) name == NULL )
     {
         printf ("gethostname: buffer fail\n");
         errno=EINVAL;
         return -1;
     }
 
-    if(len<0)
-    {
+    if (len<0){
         printf ("gethostname: len fail\n");
         errno=EINVAL;
         return -1;
@@ -1429,20 +1401,19 @@ int sethostname (const char *name, size_t len)
 {
     int value=-1;
 
-    if( (void*) name == NULL )
+    if ( (void*) name == NULL )
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(*name == 0)
+    if (*name == 0)
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(len<0)
-    {
+    if (len<0){
         errno=EINVAL;
         return -1;
     }
@@ -1453,7 +1424,7 @@ int sethostname (const char *name, size_t len)
                   (unsigned long) name,
                   (unsigned long) name,
                   (unsigned long) name );
-    if(value<0){
+    if (value<0){
         errno = (-value);
         return -1;
     }
@@ -1504,13 +1475,13 @@ int setlogin (const char *name)
 {
     int value=-1;
 
-    if( (void*) name == NULL )
+    if ( (void*) name == NULL )
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(*name == 0)
+    if (*name == 0)
     {
         errno=EINVAL;
         return -1;
@@ -1522,8 +1493,7 @@ int setlogin (const char *name)
                   (unsigned long) name,
                   (unsigned long) name,
                   (unsigned long) name );
-    if(value<0)
-    {
+    if (value<0){
         errno=(-value);
         return -1;
     }
@@ -1532,10 +1502,7 @@ int setlogin (const char *name)
 }
 
 
-/*
- * getusername 
- * 
- */
+// getusername 
 // #todo
 // usar  setlogin 
 int getusername (char *name, size_t len)
@@ -1565,17 +1532,16 @@ int getusername (char *name, size_t len)
                   (unsigned long) name,
                   (unsigned long) name );
 
-    if( value<0 ){
+    if (value<0){
         errno = (-value);
         return -1;
     }
 
-    if( value > HOST_NAME_MAX )
-    {
+    if (value > HOST_NAME_MAX){
         return -1;
     }
 
-    if ( value > len ){
+    if (value > len){
         value = len;
     }
 
@@ -1593,20 +1559,19 @@ int setusername (const char *name, size_t len)
     size_t __name_len = 0;
     int value = -1;
 
-    if( (void*) name == NULL )
+    if ( (void*) name == NULL )
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(*name == 0)
+    if (*name == 0)
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(len<0)
-    {
+    if (len<0){
         errno=EINVAL;
         return -1;
     }
@@ -1622,9 +1587,8 @@ int setusername (const char *name, size_t len)
         return -1;
     }
 
-    // Tamanho indicado pelo aplicativo.
-    if ( __name_len > len )
-    {
+// Tamanho indicado pelo aplicativo.
+    if (__name_len > len){
         printf ("setusername: len\n");
         errno = EINVAL;
         return -1;     
@@ -1637,12 +1601,11 @@ int setusername (const char *name, size_t len)
                   (unsigned long) name,
                   (unsigned long) name );
 
-    if(value<0)
-    {
+    if (value<0){
         errno = (-value);
         return -1;
     }
-    
+
     return (int) value;
 }
 
@@ -1659,7 +1622,6 @@ int setusername (const char *name, size_t len)
 // então o buffer para esse nome deve ficar aqui na libc em ring3
 // Onde o app pode ler.
 // Chamremos o kernel e diremos, coloque o nome aqui nesse buffer.
-
 // char __ttyname_buffer[64];
 
 char *ttyname (int fd)
@@ -1667,20 +1629,13 @@ char *ttyname (int fd)
     static char buf[PATH_MAX];
     int rv=0;
     
-    if (fd<0)
-    {
+    if (fd<0){
         errno=EBADF;
         return NULL;
     }
-
     rv = (int) ttyname_r (fd, buf, sizeof(buf));
-
-// ??
-// #bugbug
-// #todo: Explain it better.
-    if (rv != 0)
-    {
-        errno = rv;
+    if (rv < 0){
+        errno = (-rv);
         return NULL;
     }
 
@@ -1696,27 +1651,23 @@ int ttyname_r(int fd, char *buf, size_t buflen)
 { 
     debug_print ("ttyname_r: [TODO]\n");
     
-    if ( fd<0 )
-    {
+    if (fd<0){
         errno=EBADF;
         return -1;
     }
 
-    if( (void*) buf == NULL )
+    if ( (void*) buf == NULL )
     {
         errno=EINVAL;
         return -1;
     }
 
-    if(buflen<0)
-    {
+    if (buflen<0){
         errno=EINVAL;
         return -1;
     }
 
-    
-    if(buflen >= PATH_MAX)
-    {
+    if (buflen >= PATH_MAX){
         errno=EINVAL;
         return -1;
     }
@@ -1738,7 +1689,6 @@ int ttyslot (void)
    return -1;
 }
 */
-
 
 
 /*
@@ -1765,7 +1715,7 @@ int isatty (int fd)
     int Ret=-1;
     struct termios  t;
 
-    if(fd<0){
+    if (fd<0){
         errno=EBADF;
         return -1;
     }
@@ -1791,14 +1741,13 @@ int isatty (int fd)
 int isatty(int fd);
 int isatty(int fd)
 {
-	struct termios tmp;
+    struct termios tmp;
 
-	if (ioctl(fd,TCGETS,&tmp)<0)
-		return (0);
-	return 1;
+    if (ioctl(fd,TCGETS,&tmp)<0)
+        return (0);
+    return 1;
 }
 */
-
 
 int 
 getopt (
@@ -1808,14 +1757,12 @@ getopt (
 {
     debug_print ("getopt: [TODO]\n");
 
-    if(argc<0)
-    {
+    if (argc<0){
         errno=EINVAL;
         return -1;
     }
 
-    if( (void*) optstring == NULL )
-    {
+    if ( (void*) optstring == NULL ){
         errno=EINVAL;
         return -1;
     }
@@ -1844,7 +1791,7 @@ int fstat(int fd, struct stat *buf)
                   (unsigned long) buf,
                   (unsigned long) buf );
 
-    if(value<0){
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
@@ -1875,23 +1822,16 @@ int stat(const char *path, struct stat *buf)
     }
 
 // Open
-
     _fd = (int) open (path, 0, 0);
-    
-    if (_fd<0)
-    {
+    if (_fd<0){
         errno = EBADF;
         return -1;
     }
 
 // fstat
-
     value = (int) fstat(_fd,buf);
-
     close(_fd);
-
-    if (value<0)
-    {
+    if (value<0){
         errno = (-value);
         return (int) -1;
     }
@@ -1905,14 +1845,12 @@ int lstat(const char *path, struct stat *buf)
 {
     debug_print ("lstat: [TODO]\n");
 
-    if ( (void*) path == NULL )
-    {
+    if ( (void*) path == NULL ){
         errno = EINVAL;
         return -1;
     }
 
-    if ( *path == 0 )
-    {
+    if ( *path == 0 ){
         errno = EINVAL;
         return -1;
     }
@@ -1943,23 +1881,20 @@ unsigned int alarm (unsigned int seconds)
                               0 );
 }
 
-
-int brk (void *addr)
+int brk(void *addr)
 {
     debug_print ("brk: [TODO]\n");
     return -1;
 }
-
 
 //#todo: definir o tipo intptr_t
 /*
 void *sbrk(intptr_t increment);
 void *sbrk(intptr_t increment)
 {
-	return NULL;
+    return NULL;
 }
 */
-
 
 // #todo
 // This function use the variable 'environ'.
@@ -2016,21 +1951,16 @@ int chown(const char *pathname, uid_t owner, gid_t group)
 int fchown(int fd, uid_t owner, gid_t group)
 {
     debug_print ("fchown: [TODO]\n");
-    
-    if(fd<0)
-    {
+
+    if (fd<0){
         errno = EBADF;
         return -1;
     }
-
-    if(owner<0)
-    {
+    if (owner<0){
         errno = EINVAL;
         return -1;
     }
-
-    if(group<0)
-    {
+    if (group<0){
         errno = EINVAL;
         return -1;
     }
@@ -2039,12 +1969,10 @@ int fchown(int fd, uid_t owner, gid_t group)
     return -1; 
 }
 
-
 // Maybe it is easy.
 int lchown(const char *pathname, uid_t owner, gid_t group)
 {
     debug_print ("lchown: [TODO]\n");
-
 
     if ( (void*) pathname == NULL ){
         errno = EINVAL;
@@ -2058,7 +1986,7 @@ int lchown(const char *pathname, uid_t owner, gid_t group)
         errno = EINVAL;
         return (-1);
     }
-    if(group<0){
+    if (group<0){
         errno = EINVAL;
         return (-1);
     }
@@ -2106,12 +2034,11 @@ int fchdir(int fd)
 {
     debug_print ("fchdir: [TODO]\n");
 
-    if(fd<0)
-    {
+    if (fd<0){
         errno = EBADF;
         return -1;
     }
-    
+
     return -1; 
 }
    
@@ -2123,7 +2050,6 @@ unsigned int sleep(unsigned int seconds)
     return -1;
 }
 
-
 // ??
 // todo
 // exit deveria ser o wrapper para _exit ?
@@ -2133,7 +2059,6 @@ void _exit(int status)
     debug_print ("_exit: [error=O]\n");
     exit(0);
 }
-
 
 void swab_w (const short *from, short *to, ssize_t n)
 {
@@ -2288,9 +2213,9 @@ int access(const char *pathname, int mode)
         return (int) -1;
     }
 
-	// #todo
-	//struct stat foo;
-	//return ( stat(pathname, &foo) );
+// #todo
+    //struct stat foo;
+    //return ( stat(pathname, &foo) );
 
     return -1;
 }
@@ -2349,7 +2274,6 @@ int getsuf (char s[])
 }
 */
 
-
 /*
 void setsuf (char s[]);
 void setsuf (char s[])
@@ -2359,32 +2283,31 @@ void setsuf (char s[])
 }
 */
 
-
 /*
 int nodup ( char *l[], char s[]);
-int nodup ( char *l[], char s[]){
-	
-	char *t, *os, c;
+int nodup ( char *l[], char s[])
+{
+    char *t, *os, c;
 
-	os = s;
-	
-	while (t = *l++)
-	{
-		s = os;
-		while(c = *s++)
-			if (c != *t++) goto ll;
-		if (*t++ == '\0') return (0);
+    os = s;
+
+    while (t = *l++)
+    {
+        s = os;
+        while(c = *s++)
+            if (c != *t++) goto ll;
+        if (*t++ == '\0') return (0);
 ll:;
-	}
-	return (1);
+    }
+    return (1);
 }
 */
 
 
 /*
-//???
-char *nxtarg ( int ap, int	ac, char **av );
-char *nxtarg ( int ap, int	ac, char **av )
+//?
+char *nxtarg ( int ap, int ac, char **av );
+char *nxtarg ( int ap, int ac, char **av )
 {
     if (ap>ac)
         return ( 0*ap++ );
@@ -2401,10 +2324,8 @@ int tio ( int a, int f)
 
 // Open:
 
-    a = open (a,f);
-
-    if (a>=0)
-    {
+    a = open(a,f);
+    if (a>=0){
         close(a);
         return (1);
     }
@@ -2493,14 +2414,11 @@ l:
 int unix_getlin ( char s[] )
 {
     int ch, i;
-
-	i = 0;
-
+    i = 0;
 
 l:
     if ( (ch=getc())=='\0' ) 
         return(1);
-
 
 	if (ch != ':') 
 	{
@@ -2529,11 +2447,10 @@ l:
 */
 
 
-
 /*
 void printn ( int n, int b);
-void printn ( int n, int b){
-	
+void printn ( int n, int b)
+{
 	//extern putchar;
 	//auto a;
     int a;
@@ -2570,12 +2487,10 @@ int amatch (char *s, char *p);
 int amatch (char *s, char *p)
 {
     int c, cc, ok, lc, scc;
+    scc = *s;
+    lc = 077777;
 
-	scc = *s;
-	
-	lc = 077777;
-	
-	switch (c = *p) {
+    switch (c = *p) {
 
 	case '[':
 		ok = 0;
@@ -2662,30 +2577,26 @@ loop:
 char *copy (char *s1);
 char *copy (char *s1)
 {
-	char *ts;
-
-	ts = string;
-	while(*string++ = *s1++);
-	return(ts);
+    char *ts;
+    ts = string;
+    while(*string++ = *s1++);
+    return(ts);
 }
 */
 
 /*
 // concatenate
 char *cat ( char *s1, char *s2);
-char *cat ( char *s1, char *s2){
-	
-	char *ts;
-
-	ts = string;
-	while(*string++ = *s1++);
-	string--;
-	while(*string++ = *s2++);
-	return(ts);
+char *cat ( char *s1, char *s2)
+{
+    char *ts;
+    ts = string;
+    while(*string++ = *s1++);
+    string--;
+    while(*string++ = *s2++);
+    return(ts);
 }
 */
-
-
 
 /*
 int __dup ( char **l, char s[] );
@@ -2696,19 +2607,18 @@ int __dup ( char **l, char s[] )
 
     while (t = *l++) 
     {
-		s = os;
-		
-		while (c = *s++)
-			if (c != *t++)
-				break;
-		if (*t++ == '\0') 
-			return (1);
+        s = os;
+
+        while (c = *s++)
+            if (c != *t++)
+                break;
+        if (*t++ == '\0') 
+            return (1);
     };
 
     return (0);
 }
 */
-
 
 // #deprecated?
 pid_t 
@@ -2765,7 +2675,7 @@ unsigned char *StrFirstOcc(
         return (unsigned char *) (src-1);
     }else{
         return NULL;
-    }
+    };
 }
 
 
@@ -2821,7 +2731,7 @@ posix_spawn (
 
     debug_print ("posix_spawn: [FIXME] It's a work in progress.\n"); 
 
-    if( (void*) path == NULL ){
+    if ( (void*) path == NULL ){
         errno=EINVAL;
         return -1;
     }
@@ -2855,7 +2765,6 @@ posix_spawnp (
     debug_print ("posix_spawn: [FIXME] It's a work in progress.\n"); 
     return (int) gramado_system_call ( 900, (unsigned long) file, 0, 0 );
 }
-
 
 
 /*
@@ -3014,8 +2923,7 @@ spawnveg(
         return -1;
     }
 
-    if(pgid<0)
-    {
+    if (pgid<0){
         errno=EINVAL;
         return -1;
     }
@@ -3027,8 +2935,7 @@ spawnveg(
                   0, 
                   0 );
 
-    if (value<0)
-    {
+    if (value<0){
        errno=(-value);
        return -1;
     }
@@ -3048,8 +2955,6 @@ int getdtablesize(void)
 
 
 //
-// End.
+// End
 //
-
-
 
