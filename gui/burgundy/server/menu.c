@@ -5,16 +5,16 @@
 
 int is_menu_active=FALSE;
 
-
-// chamado na hora de inicializar ou finaliza o menu.
+// Chamado na hora de inicializar ou finaliza o menu.
 int on_menu(void)
 {
 
     if ( (void*)__root_window == NULL )
         return -1;
 
-    if (__root_window->magic != 1234)
+    if (__root_window->magic != 1234){
         return -1;
+    }
 
 // cria o menu
 // Se não tem o context menu. Então cria.

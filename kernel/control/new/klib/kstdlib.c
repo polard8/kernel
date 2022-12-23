@@ -32,7 +32,6 @@ int rand(void)
 int abs(int j)
 {
     int Value = (int) (j<0 ? -j : j);
-
     return (int) Value;
 }
 
@@ -56,14 +55,12 @@ int __ptsname (int fd, char *buf, size_t buflen)
     return 0;
 }
 
-
 /*
  // See: https://en.wikipedia.org/wiki/Slab_allocation
 void *slab_alloc (size_t size);
 void *slab_alloc (size_t size)
 {}
 */
-
 
 // kmalloc implementation.
 // IN: Clear or not the allocated memory.
@@ -79,7 +76,6 @@ static void *__kmalloc_impl(size_t size, int clean)
     return (void*) ptr;
 }
 
-
 // kmalloc:
 // Standard kmalloc function.
 // Alocar memória no heap do kernel.
@@ -93,24 +89,28 @@ void *kmalloc(size_t size)
 // Se devemos ou não incremetar o contador de uso.
     int IncrementUsageCounter=TRUE; //P->allocated_memory
     struct process_d *process;
-    process = (void*) get_current_process_pointer();
-    if( (void*) process == NULL )
-        IncrementUsageCounter=FALSE;
-    if(process->magic!=1234)
-        IncrementUsageCounter=FALSE;
 
-    if ( size < 0 ){
+// Process structure
+    process = (void*) get_current_process_pointer();
+    if ( (void*) process == NULL ){
+        IncrementUsageCounter=FALSE;
+    }
+    if (process->magic!=1234){
+        IncrementUsageCounter=FALSE;
+    }
+
+    if (size < 0){
         debug_print ("kmalloc: size\n");
         return NULL;
     }
-    if ( size == 0 ){
+    if (size == 0){
         debug_print ("kmalloc: size ajust\n");
         new_size=1;
     }
 
+// Allocation.
     //ptr = (void *) heapAllocateMemory(new_size);
     ptr = (void *) __kmalloc_impl(new_size,FALSE);
-    
     if ( (void *) ptr == NULL ){
         debug_print ("kmalloc: ptr\n");
         return NULL;
@@ -118,13 +118,13 @@ void *kmalloc(size_t size)
 
     if (IncrementUsageCounter==TRUE)
     {
-        if ( (void*) process != NULL )
+        if ( (void*) process != NULL ){
             process->allocated_memory += new_size;
+        }
     }
 
     return (void *) ptr;
 }
-
 
 /*
  * kfree:
@@ -163,7 +163,7 @@ void *kcalloc(size_t count, size_t size)
     void *ptr;
     size_t new_size = (size_t) (count * size);
 
-    if(count <= 0){
+    if (count <= 0){
         new_size = (1*size);
     }
 
@@ -175,5 +175,4 @@ void *kcalloc(size_t count, size_t size)
 
     return (void*) __kmalloc_impl(new_size,TRUE);
 }
-
 

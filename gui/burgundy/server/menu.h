@@ -1,7 +1,6 @@
 
 // menu.h
 
-
 #ifndef GWS_MENU_H
 #define GWS_MENU_H    1
 
@@ -11,48 +10,38 @@
 
 extern int is_menu_active;
 
+// menu item
 struct gwssrv_menu_item_d
 {
     struct gws_window_d *window;
-
     int id;
     int selected;
-    
     unsigned long x;
     unsigned long y;
     unsigned long width;
     unsigned long height;
     unsigned int color;
-
     struct gwssrv_menu_item_d *next;
 };
-
 
 // menu
 struct gwssrv_menu_d
 {
-    struct gws_window_d  *window;
-    struct gws_window_d  *parent;
-
+    struct gws_window_d *window;
+    struct gws_window_d *parent;
 // TRUE = the menu procedure is running at the moment.
     int in_use;
-
     unsigned long x;
     unsigned long y;
     unsigned long width;
     unsigned long height;
-
     unsigned int color;
-    
-    int highlight; //item em destaque
-    
-    //list
+    int highlight;  //Item em destaque
+// list
     int itens_count;
     struct gwssrv_menu_item_d *list;
-
     //struct gwssrv_menu_d *next;
 };
-
 
 //
 // == Prototypes ==============================================

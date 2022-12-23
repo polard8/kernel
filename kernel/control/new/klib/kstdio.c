@@ -39,60 +39,56 @@ file *pipe_execve;
 
 
 
-
 static void __clear_prompt_buffers(void);
-
 static void __initialize_file_table(void);
 static void __initialize_inode_table(void);
-
 static void __initialize_stdin(void);
 static void __initialize_stdout(void);
 static void __initialize_stderr(void);
-
 static void __initialize_virtual_consoles(void);
-
 static char *_vsputs_r(char *dest, char *src);
+
+// ---------------------------
 
 // service 8002
 // IN: fd for the new stdin
 // OUT: TRUE or FALSE.
-
 int sys_setup_stdin(int stdin_fd)
 {
     struct process_d *p;
     file *f;
 
+    if (stdin_fd < 0 || stdin_fd >= 32){
+        return FALSE;
+    }
+
+// pid
     pid_t current_process = (pid_t) get_current_process();
-
-    if( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
         return FALSE;
-
+// structure
     p = (struct process_d *) processList[current_process];
-
-    if ( (void*)p==NULL )
+    if ( (void*)p==NULL ){
         return FALSE;
-
-    if(p->used != TRUE)
+    }
+    if (p->used != TRUE){
         return FALSE;
-
-    if(p->magic != 1234)
+    }
+    if (p->magic != 1234){
         return FALSE;
+    }
 
-
-    if(stdin_fd < 0 || stdin_fd >= 32)
-        return FALSE;
-
+// structure
     f = (file *) p->Objects[stdin_fd];
-
-    if ( (void*)f==NULL )
+    if ( (void*)f==NULL ){
         return FALSE;
-
-    if(f->used != TRUE)
+    }
+    if (f->used != TRUE){
         return FALSE;
-
-    if(f->magic != 1234)
+    }
+    if (f->magic != 1234){
         return FALSE;
-
+    }
 
 // The new stdin.
     stdin = (file *) f;
@@ -128,10 +124,10 @@ int is_virtual_console(file *f)
 
 // Kernel size version of the
 // standard input() libc function.
-unsigned long kinput ( unsigned long ch )
+unsigned long kinput(unsigned long ch)
 {
-    int i=0;
     char c = (char) ch;
+    register int i=0;
 
 // Input mode.
 // #bugbug:
@@ -180,7 +176,7 @@ unsigned long kinput ( unsigned long ch )
             prompt[prompt_pos] = (char )'\0'; //end of line.
             //#todo: ?? ldiscCompare();
             // o compare está no aplicativo.
-            for(i=0; i<PROMPT_MAX_DEFAULT; i++)
+            for (i=0; i<PROMPT_MAX_DEFAULT; i++)
             {
                 prompt[i]     = (char) '\0';
                 prompt_out[i] = (char) '\0';
@@ -283,7 +279,6 @@ void putchar_K(void)
  * somente depois é que o caractere será enviado para a tela.
  *     Essa rotina é chamada pelas funções: /printchar/input/.
  */
-
 // Para virtual consoles.
 // Em tty/console.c
 
@@ -294,14 +289,12 @@ int putchar (int ch)
 // Maybe we can filter the printable chars
 // for the console font.
 
-    if(ch<0){
+    if (ch<0){
         return (int)(-1);
     }
-
-    if(fg_console<0){
+    if (fg_console<0){
         return (int)(-1);
     }
-
     console_outbyte ( ch, fg_console );
 
     return (int) ch;
@@ -309,7 +302,7 @@ int putchar (int ch)
 
 
 /*
- *  ==== Segue aqui o suporte a função 'printf' ====
+ *  == Segue aqui o suporte a função 'printf' ====
  *
  * #obs:
  * Em user mode temos uma modelo mais tradicional de printf,
@@ -393,17 +386,13 @@ printi (
     int pad, 
     int letbase )
 {
-
     char print_buf[PRINT_BUF_LEN];
-    
     register char *s;
     register int t, neg = 0, pc = 0;
-    
-    // loop
+// loop
     register unsigned int u = i;
 
-
-    if ( i == 0 ){
+    if (i == 0){
         print_buf[0] = '0';
         print_buf[1] = '\0';
         return (int) prints (out, print_buf, width, pad);
@@ -418,9 +407,7 @@ printi (
     }
 
     s = ( print_buf + ( PRINT_BUF_LEN -1 ) );
-
     *s = '\0';
-
 
     while (u)
     {
@@ -454,10 +441,8 @@ printi (
 }
 
 
-/*
- * print:
- *     Rotina de suporta a printf.
- */
+// print:
+// Rotina de suporta a printf.
 // #bugbug
 // E se essa rotina for chamada com o primeiro argumento nulo?
 // vai escrever na IVT ?
@@ -572,7 +557,6 @@ int print ( char **out, int *varg )
  * Em user mode temos uma modelo mais tradicional de printf,
  * talvez seja bom implementa-lo aqui tambem.
  */
-
 // #bugbug
 // #todo:
 // Devemos tentar usar o mesmo printf implementado na libc
@@ -618,10 +602,9 @@ kinguio_i2hex(
     int len )
 {
     char *cp;
-    int i=0; 
+    register int i=0;
     int x=0;
-    unsigned n;  //??
-
+    unsigned n=0;  //??
 
     if (val == 0)
     {
@@ -647,14 +630,14 @@ kinguio_i2hex(
 
     cp = &dest[0];
 
-    for (i=0; i < len; i++)
+    for (i=0; i<len; i++)
     {
-        if (*cp == '0') {
+        if (*cp == '0'){
             cp++;
-        }else {
+        }else{
             strcpy (dest,cp);
             break;
-        }
+        };
     }
 
     cp = &dest[0];
@@ -662,7 +645,6 @@ kinguio_i2hex(
 
     memset( (dest+n), 0, (8-n) );
 }
-
 
 char *kinguio_itoa (int val, char *str) 
 {
@@ -715,7 +697,6 @@ static char *_vsputs_r(char *dest, char *src)
 
     return (char *) udest;
 }
-
 
 int 
 kinguio_vsprintf(
@@ -798,15 +779,11 @@ void kinguio_puts(const char* str)
     if (!str){
         return;
     }
-
     StringLen = (size_t) strlen(str);
-
-    for (i=0; i<StringLen; i++)
-    {
+    for (i=0; i<StringLen; i++){
         putchar( str[i] );
     };
 }
-
 
 // printf
 // Credits: Nelson Cole. Project Sirius/Kinguio.
@@ -887,7 +864,6 @@ int k_ungetc ( int c, file *f )
     if (c == EOF){ 
         return (int) c;
     }
-
     if ( (void *) f == NULL ){
         return EOF;
     }
@@ -1039,7 +1015,6 @@ int k_fseek ( file *f, long offset, int whence )
         debug_print ("k_fseek: f\n");
         goto fail;
     }
-
     if (whence<0){
         goto fail;
     }
@@ -1174,14 +1149,11 @@ int __swbuf (int c, file *fp)
 */
 
 
-int k_fputc ( int ch, file *f )
+int k_fputc( int ch, file *f )
 {
-    //debug_print ("k_fputc:\n");
 
 // Pointer validation
-
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         debug_print ("k_fputc: f\n");
         panic       ("k_fputc: f\n");
         return EOF;
@@ -1194,35 +1166,24 @@ int k_fputc ( int ch, file *f )
     {
         // Write it into the buffer.
         sprintf ( f->_p, "%c", ch);
-
         // Update the pointer.
         f->_p++;
-
         // Update the offset for the writer.
         f->_w++;
-
         // Update the counter.
         // How many bytes the buffer still have?
-        
         f->_cnt--;
- 
         // The buffer is full.
         // #todo: What we need to do now?
-        if ( f->_cnt <= 0 )
-        {
+        if ( f->_cnt <= 0 ){
             debug_print ("k_fputc: [DEBUG] _cnt\n");
             panic       ("k_fputc: [DEBUG] _cnt\n");
-            
             f->_cnt = 0;
-            
             return EOF;
         }
-
         f->_flags |= __SRD;  //pode ler.
-
         return (int) ch;  
     }
-
 
 // Atualizar as flags quando o buffer está cheio.
 // se o buffer está cheio.
@@ -1251,7 +1212,6 @@ int k_fscanf (file *f, const char *format, ... )
     return -1;
 }
 
-
 /*
 int vfprintf ( file *stream, const char *format, stdio_va_list argptr );
 int vfprintf ( file *stream, const char *format, stdio_va_list argptr )
@@ -1259,11 +1219,7 @@ int vfprintf ( file *stream, const char *format, stdio_va_list argptr )
 }
 */
 
-
-/*
- * Writes format output of a stdarg argument list to a file.
- */
-
+//Writes format output of a stdarg argument list to a file.
 /* 
 int vfprintf(file *stream, const char *format, va_list ap);
 int vfprintf(file *stream, const char *format, va_list ap)
@@ -1313,7 +1269,6 @@ int k_fclose (file *f)
     return 0;
 }
 
-
 int k_fputs ( const char *str, file *f )
 {
     int Size=0;
@@ -1337,14 +1292,12 @@ int k_fputs ( const char *str, file *f )
 // k_setbuf:
 // see: 
 // https://linux.die.net/man/3/setvbuf
-
 void k_setbuf (file *f, char *buf)
 {
     if ( (void *) f == NULL ){
         debug_print("k_setbuf: f\n");
         return;
     }
-
     if ( (void *) buf == NULL ){
         debug_print("k_setbuf: buf\n");
         return;
@@ -1362,21 +1315,17 @@ void k_setbuf (file *f, char *buf)
     //}
 
 // Udate stream.
-
     f->_bf._base = buf;
     //stream->_lbfsize = size;        
     // ?? stream->bufmode = mode;
-
     f->_p = buf;
     // f->_p = f->_bf._base
-    
-    // ??stream->cnt = 0;
+    // f->cnt = 0;
 
 // #todo
 // Setup all the buffer elements.
 // ...
 }
-
 
 void k_setbuffer (file *f, char *buf, size_t size)
 {
@@ -1389,7 +1338,6 @@ void k_setbuffer (file *f, char *buf, size_t size)
         return;
     }
 
-
     if ( (void *) buf == NULL ){
         debug_print("k_setbuffer: buf\n");
         return;
@@ -1397,8 +1345,7 @@ void k_setbuffer (file *f, char *buf, size_t size)
     */
 
 
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         // #todo
         // Maybe we need a message here.
         return;
@@ -1420,7 +1367,6 @@ void k_setbuffer (file *f, char *buf, size_t size)
         f->_bf._base = buf;
         f->_lbfsize = size;        
         // ?? stream->bufmode = mode;
-
         f->_p = buf;
         // ??stream->cnt = 0;
         //...
@@ -1448,8 +1394,7 @@ k_setvbuf (
     size_t size )
 {
 
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         // MSG ?
         return -1;
 
@@ -1724,7 +1669,6 @@ static void __initialize_stderr(void)
 static void __clear_prompt_buffers(void)
 {
     register int i=0;
-
     for ( i=0; i<PROMPT_SIZE; i++ )
     {
         prompt[i]     = (char) '\0';
@@ -1732,7 +1676,6 @@ static void __clear_prompt_buffers(void)
         prompt_out[i] = (char) '\0';
         prompt_err[i] = (char) '\0';
     };
-
     prompt_pos = 0;
 }
 
@@ -1745,7 +1688,6 @@ static void __initialize_file_table(void)
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
         tmp = (void*) kmalloc(sizeof(file));
-        
         if ((void*)tmp==NULL){
            x_panic("__initialize_file_table: tmp\n");
         }
@@ -1756,10 +1698,8 @@ static void __initialize_file_table(void)
         tmp->fd_counter = 0;
         tmp->_tmpfname = NULL;
         //...
-
         tmp->used = TRUE;
         tmp->magic = 1234;
- 
         file_table[i] = (unsigned long) tmp; 
     };
 }
@@ -1783,10 +1723,8 @@ static void __initialize_inode_table(void)
         tmp_inode->filestruct_counter = 0;
         tmp_inode->path[0] = 0;
         //...
-
         tmp_inode->used = TRUE;
         tmp_inode->magic = 1234;
-
         inode_table[i] = (unsigned long) tmp_inode; 
     };
 }
@@ -1837,14 +1775,12 @@ static void __initialize_virtual_consoles(void)
         // Cursor.
         CONSOLE_TTYS[i].cursor_x = 0;
         CONSOLE_TTYS[i].cursor_y = 0;
-        
         // dc: Full screen
         CONSOLE_TTYS[i].fullscreen_flag = TRUE;
         CONSOLE_TTYS[i].cursor_left   = 0;
         CONSOLE_TTYS[i].cursor_top    = 0;
         CONSOLE_TTYS[i].cursor_right  = (gSavedX/cWidth);
         CONSOLE_TTYS[i].cursor_bottom = (gSavedY/cHeight);
-        
         //Let's use the standard colors.
         //CONSOLE_TTYS[i].bg_color = COLOR_BLACK;
         //CONSOLE_TTYS[i].fg_color = COLOR_WHITE;
@@ -1853,7 +1789,7 @@ static void __initialize_virtual_consoles(void)
 // The foreground console.
     jobcontrol_switch_console(0);
 
-    // #test
+// #test
     //set_up_cursor(0,1);
     //console_outbyte('x',fg_console);
     //refresh_screen();
@@ -1878,7 +1814,6 @@ static void __initialize_virtual_consoles(void)
 // #bugbug: Talvez seja possível criar essas estruturas
 // em memória compartilhada, usado o alocaro apropriado.
 // kmalloc com certeza e ring0.
-
 // In this routine:
 // + Initializing the structures for stdin, stdout and stderr
 
@@ -1914,7 +1849,6 @@ int kstdio_initialize (void)
     __initialize_file_table();
     __initialize_inode_table();
 
-
 // Initializing the file pointers
 // stdio, stdout and stderr.
 // See: kstdio.h
@@ -1934,7 +1868,6 @@ int kstdio_initialize (void)
 // #bugbug
 // Estamos fazendo isso pela segunda vez.
 // A primeira foi em kmain.
-
     Background_initialize(COLOR_KERNEL_BACKGROUND);
 
 // done

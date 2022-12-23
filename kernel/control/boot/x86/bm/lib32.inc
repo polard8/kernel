@@ -9,7 +9,6 @@
 ; History:
 ;     2015 - Created by Fred Nora.
 
-
 LIB32_BACKBUFFER EQU  (0x1000000 - 0x800000)
 
 ;
@@ -18,7 +17,6 @@ LIB32_BACKBUFFER EQU  (0x1000000 - 0x800000)
 
 TotalMemoryMB: dd 0
 ; ...
-
 
 ;; ==============================
 ;; lib32PrintChar:
@@ -33,86 +31,66 @@ TotalMemoryMB: dd 0
 ;; obs: 
 ;; x e y serao ignorados
 ;; e o char sera pintado nas cordenadas do 'cursor'.
-
 lib32PrintChar:
-
     push eax
     push ebx
     push ecx
     push edx
-
 ;salva color e char.
     mov dword [.color], eax 
     mov byte [.char], dl  
     ;; ...
-
 ; ??
 ; Pega a coordenada x.
 ; Me parece que temos vari�veis para posi��o de cursor.
-
     mov eax, dword [g_cursor_x]
-
 ; Se estivermos no fim da linha.
-
     cmp eax, dword 80
     jge .nextLine
 
-	;;@todo:
-	;; �ltima linha ??
+;;@todo:
+;; �ltima linha ??
 	;mov eax, dword [g_cursor_y]
 	;cmp eax, dword 25
 	;jge .??
-	
-	;; CARRIAGE RETURN.
+
+; CARRIAGE RETURN.
     cmp dl, byte 13    
     je .CR
-	
-	;; LINE FEED.
+; LINE FEED.
     cmp dl, byte 10    
     je .LF
-
-	;;...
-	
-	;; n�o muda de linha
+;...
+; n�o muda de linha
 .thisLine:
-
-	;; x
-	;;calcula deslocamento na linha
-	;; Me parece que temos vari�veis para posi��o de cursor.
-	
-	;; #bugbug
-	;; Precisamos de uma vari�vel para as dimen��es do char.
-
+; x
+;calcula deslocamento na linha
+; Me parece que temos vari�veis para posi��o de cursor.
+; #bugbug
+; Precisamos de uma vari�vel para as dimen��es do char.
     mov eax, dword [g_cursor_x]
-    mov ebx, 8                   ;; tamanho da largura do char dada em bits
-    mul ebx                        ;; multiplica, o resultado vai para eax.
-    mov dword [.x], eax    ;; deslocamento em pixel na horizontal.
-
+    mov ebx, 8           ; tamanho da largura do char dada em bits
+    mul ebx              ; multiplica, o resultado vai para eax.
+    mov dword [.x], eax  ; deslocamento em pixel na horizontal.
 
     mov eax, dword [g_cursor_y]
     mov ebx, 8 
     mul ebx 
-    mov dword [.y], eax      ;; deslocamento em pixel na vertical.
-
-	;desenha o pixel dadas as coordenadas.
+    mov dword [.y], eax  ; deslocamento em pixel na vertical.
+; desenha o pixel dadas as coordenadas.
 .PutPixel:
-
     ; a =  cor (rrggbbaa)
     ; b =  x
     ; c =  y
     ; d =  Char.
-
     mov eax, dword [.color]
     mov ebx, dword [.x]
     mov ecx, dword [.y]
     xor edx, edx
     mov dl, byte [.char]
-
     call _my_buffer_char_blt
 
-
-    ;; Incrementa o cursor depois de imprimir o char.
-
+; Incrementa o cursor depois de imprimir o char.
     push eax 
     mov eax, dword [g_cursor_x]
     inc eax 
@@ -120,38 +98,29 @@ lib32PrintChar:
     pop eax
     jmp .done
 
-
-;Quando o caractere ultrapassar o tamanho da linha
-;devemos desenhar o caractere no in�cio da p�roxima linha.
+; Quando o caractere ultrapassar o tamanho da linha
+; devemos desenhar o caractere no in�cio da p�roxima linha.
 .nextLine:
     ;Volta ao come�o da linha.
     mov dword [g_cursor_x], 0
-
-	;Pr�xima linha.
-
+;Próxima linha.
     mov eax, dword [g_cursor_y]
     inc eax 
     mov dword [g_cursor_y], eax
-
-	;Agora que estamos na linha certa, devemos calcular
-	;legando em conta o tamanho do caractere.
-
+; Agora que estamos na linha certa, devemos calcular
+; legando em conta o tamanho do caractere.
     jmp .thisLine
-
-.CR:	
-    ;Volta ao come�o da linha.
+.CR:
+; Volta ao começo da linha.
     mov dword [g_cursor_x], 0
     jmp .done 
-
-  ;;muda de linha..
+; Muda de linha.
 .LF:
-
-    ;Pr�xima linha.
+; Próxima linha.
     mov eax, dword [g_cursor_y]
     inc eax 
     mov dword [g_cursor_y], eax 
     jmp .done
-
 .done:
     pop edx 
     pop ecx 
@@ -165,14 +134,12 @@ lib32PrintChar:
 .char: db 0
 ;;--
 
-
 ; =================================
 ; lib32PrintString:
 ;     Imprime uma string na tela em modo gr�fico.
 ; Um ponteiro para string deve estar em alguma registrador.
 ; ESI = string
 ; ; a =  cor (rrggbbaa)
-;
 
 lib32PrintString:
 
@@ -181,13 +148,10 @@ lib32PrintString:
     cmp eax, 0
     jne .notBlack
 
-
 ; Muda a cor, para n�o mistura com o fundo preto.
 ; Outra cor, n�o preto.
-
 .colorBlack:
-    mov eax, 0x00FF0000 
-
+    mov eax, 0x00FF0000
 ;; Salva color.
 .notBlack:
     mov dword [.color], eax 
@@ -195,23 +159,18 @@ lib32PrintString:
     push ebx
     push ecx 
     push edx 
-
 .nextChar:
     lodsb
     or al, al
     jz .done
-
-    ; a =  cor (rrggbbaa)
-    ; b =  x
-    ; c =  y
-    ; d =  Char.
-
-    mov dl, al                 ;;char 
-    mov eax, dword [.color]    ;;color 
+; a =  cor (rrggbbaa)
+; b =  x
+; c =  y
+; d =  Char.
+    mov dl, al               ;char 
+    mov eax, dword [.color]  ;color 
     call lib32PrintChar
-
     jmp .nextChar
-
 .done:
     pop edx
     pop ecx
@@ -222,7 +181,6 @@ lib32PrintString:
 
 .color: dd 0
 .char: db 0
-
 
 
 ; lib32Putpixel:
@@ -273,7 +231,6 @@ lib32SetLFBAddress:
     call Set_LFB_Address
     ret
 
-
 lib32GetLFBAddress:
     call Get_LFB_Address
     ret
@@ -288,7 +245,7 @@ lib32SetupIDT:
 
 ; Continua...
 
-; ##########################
+
 ; _gui_buffer_putpixel:
 ;     Coloca um pixel no Back Buffer.
 ; a =  cor (rrggbbaa)
@@ -298,20 +255,16 @@ lib32SetupIDT:
 
 global _gui_buffer_putpixel
 _gui_buffer_putpixel:
-
     push es
     push ecx
-
-   ;ajuste provisorio ...
+; ajuste provisorio ...
     mov dword [.cor], eax    ;salva cor.
     mov dword [.x],   ebx    ;salva x.
     mov dword [.y],   ecx    ;salva y.
     mov eax, dword [.x]
     mov ebx, dword [.y]      ;coloca y em ebx.
     mov ecx, dword [.cor]    ;coloca a cor em ecx.
-
-	;ecx (cor) (rrggbbaa)
-
+; ecx (cor) (rrggbbaa)
     mov byte [.a], cl    ;a.
     shr ecx, 8
     mov byte [.r], cl    ;b.
@@ -319,14 +272,11 @@ _gui_buffer_putpixel:
     mov byte [.g], cl    ;g.
     shr ecx, 8
     mov byte [.b], cl    ;r.
-
-
-	;segmento ES ... poderia ser 0x10
+; segmento ES ... poderia ser 0x10
     push eax
     mov ax, 0x10
     mov es, ax
     pop eax 
-
 
 	;;#test
 	
@@ -353,16 +303,13 @@ _gui_buffer_putpixel:
 
     cmp byte [BootBlock.bpp], 32
     je .bpp32
-
     cmp byte [BootBlock.bpp], 24
     je .bpp24
 
-
-	;;#bugbug
-	;;fail
-	;;precisamos de uma mensagem aqui
-	;;ativaremos o default, que 'e 24.
-
+; #bugbug
+; fail
+; precisamos de uma mensagem aqui
+; ativaremos o default, que 'e 24.
     jmp $
 
 .bpp32:
@@ -373,7 +320,6 @@ _gui_buffer_putpixel:
     mul ecx
     add eax, ebx               ;Adiciona ebx.
     jmp .bppOK
-
 .bpp24:
     imul ebx, [BootBlock.x]    ;800 ;1024
     imul ebx, dword 3          ;[BootBlock.bpp] ;3
@@ -382,25 +328,18 @@ _gui_buffer_putpixel:
     mul ecx
     add eax, ebx               ;Adiciona ebx.
     jmp .bppOK
-
 .bppOK:
-
-	;edi = x*3 + (y*y multiplier)
-
+;edi = x*3 + (y*y multiplier)
     mov  edi, eax    
-
-	;(base) buffer 1 
-	;0x01000000 ??
-	;endere�o fisico do backbuffer ;[ModeInfo_PhysBasePtr]
-	;(deslocamento)
-
+;(base) buffer 1 
+;0x01000000 ??
+;endere�o fisico do backbuffer ;[ModeInfo_PhysBasePtr]
+;(deslocamento)
     mov ecx, dword LIB32_BACKBUFFER   
     add edi, ecx 
-
 ; #bugbug
 ; Temos que enviar 4 bytes se for 32bpp.
 ; Precisamos da vari�vel que indique o bpp.
-
     cmp byte [BootBlock.bpp], 32
     je .bpp32RGB
     cmp byte [BootBlock.bpp], 24
@@ -428,8 +367,6 @@ _gui_buffer_putpixel:
 .b db 0
 .a db 0
 
-
-; ########################
 ; _gui_direct_putpixel:
 ;     Coloca um pixel direto no LFB.
 ; a =  cor (rrggbbaa)
@@ -439,20 +376,16 @@ _gui_buffer_putpixel:
 
 global _gui_direct_putpixel
 _gui_direct_putpixel:
-
     push  es
     push  ecx
-
-    ; Ajuste provisorio.
+; Ajuste provisorio.
     mov dword [.cor], eax    ;salva cor.
     mov dword [.x],   ebx    ;salva x.
     mov dword [.y],   ecx    ;salva y.
     mov eax, dword [.x]
     mov ebx, dword [.y]      ;coloca y em ebx.
     mov ecx, dword [.cor]    ;coloca a cor em ecx.
-
-	;ecx (cor) (rrggbbaa)
-
+;ecx (cor) (rrggbbaa)
     mov byte [.a], cl    ;a.
     shr ecx, 8
     mov byte [.r], cl    ;b.
@@ -460,8 +393,7 @@ _gui_direct_putpixel:
     mov byte [.g], cl    ;g.
     shr ecx, 8
     mov byte [.b], cl    ;r.
-
-	;segmento ES ... poderia ser 0x10
+;segmento ES ... poderia ser 0x10
     push eax
     mov ax, 0x10
     mov es, ax
@@ -472,7 +404,6 @@ _gui_direct_putpixel:
 ; #bugbug
 ; Isso é válido apenas para alguns modos de vídeo.
 ; 24bpp
-
     imul ebx, 800*3    ;640*3
 
     ;eax*3
@@ -484,7 +415,7 @@ _gui_direct_putpixel:
 
 	;mov eax, ecx       ;[MenColor] ; eax = color
 
-	;(base) buffer 1   
+;(base) buffer 1   
     mov ecx, dword [ModeInfo_PhysBasePtr]
     add edi, ecx     ;(deslocamento)
 
@@ -546,7 +477,6 @@ draw_horizontal_line:
 .y: dd 0
 .color: dd 0
 
-
 ;-------------------------
 ; draw_rect:
 ;     Desenha um retângulo.
@@ -555,9 +485,7 @@ draw_horizontal_line:
 ; c = y1
 ; d = y2
 ; edi = color (rrggbbaa)
-
 draw_rect:
-
     pushad
     mov dword [.x1],    eax    ;x1
     mov dword [.x2],    ebx    ;x2
@@ -675,21 +603,17 @@ DoLoop:
 global _background
 _background:
 .fade_screen:
-
     ;call _vsync ; Sincroniza o retra�o vertical.
-
     pushad
-
 ;COR. 
     mov al, byte 0x00
     mov byte [.a], al    ;a
     mov al, byte 0x00 
-    mov byte [.r], al     ;r
+    mov byte [.r], al    ;r
     mov al, byte 0x0e
     mov byte [.g], al    ;g
     mov al, byte 0xfe
     mov byte [.b], al    ;b
-
 ;LFB
 	;mov edx, DWORD [ModeInfo_PhysBasePtr]
 
@@ -903,7 +827,6 @@ set_base:
 
 ;------------------------------------
 ; init_prompt:
-
 init_prompt:
     push eax
     xor eax, eax
@@ -917,7 +840,6 @@ init_prompt:
 ; set_scr_loc:
 ;     Configura o deslocamento dentro da tela.
 ; in: eax 
-
 set_scr_loc:
     mov dword [scr_loc], eax
     ret
@@ -947,7 +869,6 @@ get_cursor_y:
 ;-------------------------------
 ; write_char:
 ;     Write a char in text mode.
-
 write_char:
 
     push eax
@@ -972,7 +893,6 @@ write_char:
     pop ebx
     pop eax
     RET
-
 
 ;-------------------------------
 ; DisplayMessage32:
