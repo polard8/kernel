@@ -30,7 +30,7 @@ floating pointer structure.
 
 // See
 // https://pdos.csail.mit.edu/6.828/2008/readings/ia32/MPspec.pdf
-
+// https://wiki.osdev.org/Symmetric_Multiprocessing
 struct mp_floating_pointer_structure 
 {
 
@@ -55,27 +55,36 @@ struct mp_floating_pointer_structure
     uint8_t checksum; 
 
 // If this is not zero then configuration_table should be 
-// ignored and a default configuration should be loaded instead    
+// ignored and a default configuration should be loaded instead.
     uint8_t default_configuration; 
 
 // Few feature bytes.
 // If bit 7 is set then 
 // the IMCR is present and PIC mode is being used, otherwise 
 // virtual wire mode is; 
-// all other bits are reserved
+// all other bits are reserved.
     uint32_t features; 
 };
 struct mp_floating_pointer_structure *MPTable;
 
 
+// See:
+// https://wiki.osdev.org/Symmetric_Multiprocessing
 struct mp_configuration_table 
 {
-    char signature[4]; // "PCMP"
+// "PCMP"
+    char signature[4];
     uint16_t length;
     uint8_t mp_specification_revision;
-    uint8_t checksum; // Again, the byte should be all bytes in the table add up to 0
+// Again, the byte should be all bytes in the table add up to 0.
+    uint8_t checksum;
+
+// OEM ID STRING
     char oem_id[8];
+
+// PRODUCT ID STRING
     char product_id[12];
+
     uint32_t oem_table;
     uint16_t oem_table_size;
     uint16_t entry_count; // This value represents how many entries are following this table
@@ -118,7 +127,12 @@ Assignment |     4 |      8 | One entry per system interrupt source.
 //# size: 20 bytes
 struct entry_processor 
 {
-    uint8_t type; // Always 0
+// #todo:
+// apic stuff. Move the structure to apic.h?
+
+// Always 0 for 'processor'.
+    uint8_t type; 
+
     uint8_t local_apic_id;
     uint8_t local_apic_version;
 
@@ -156,7 +170,7 @@ struct entry_io_apic
 //
 
 // See: x64.c
-void smp_probe(void);
+int smp_probe(void);
 
 #endif   
 

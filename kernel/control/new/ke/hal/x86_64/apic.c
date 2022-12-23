@@ -55,9 +55,9 @@
 static unsigned int local_apic_read_command(unsigned short addr);
 static void local_apic_write_command(unsigned short addr,unsigned int val);
 
-//#test
 static unsigned int local_apic_get_id(void);
 static unsigned int local_apic_get_version(void);
+static void local_apic_eoi(void);
 
 // apic stuffs for x86.
 static inline void imcr_pic_to_apic (void);
@@ -97,15 +97,16 @@ static void local_apic_write_command(unsigned short addr,unsigned int val)
     *( (volatile unsigned int *)(LAPIC.lapic_va + addr)) = val;
 }
 
-
-//#test
+// Get local apic id.
+// see: https://wiki.osdev.org/APIC#Local_APIC_registers
 static unsigned int local_apic_get_id(void)
 {
 // bits 24~31 for pentium 4 and later.
     return (unsigned int) (local_apic_read_command(LAPIC_APIC_ID) >> 24) & 0xFF;
 }
 
-//#test
+// Get local apic version.
+// see: https://wiki.osdev.org/APIC#Local_APIC_registers
 static unsigned int local_apic_get_version(void)
 {
 // bits: 0~7 for Integrated APIC.
@@ -113,6 +114,38 @@ static unsigned int local_apic_get_version(void)
     return (unsigned int) (local_apic_read_command(LAPIC_APIC_VERSION) & 0xFF);
 }
 
+// #todo
+// Not tested yet.
+// EOI
+// EOI Register
+// Write to the register with offset 0xB0 
+// using the value 0 to signal an end of interrupt. 
+// A non-zero value may cause a general protection fault.
+static void local_apic_eoi(void)
+{
+    local_apic_write_command(
+        (unsigned short) 0xB0,
+        (unsigned int) 0 );
+}
+
+// Spurious Interrupt Vector Register
+// Set the Spurious Interrupt Vector Register bit 8 to 
+// start receiving interrupts.
+// The offset is 0xF0. 
+// The low byte contains the number of the spurious interrupt. 
+// As noted above, you should probably set this to 0xFF. 
+// To enable the APIC, set bit 8 (or 0x100) of this register. 
+// If bit 12 is set then EOI messages will not be broadcast. 
+// All the other bits are currently reserved.
+
+/*
+static void local_apic_set_spurious_interrupt(void);
+static void local_apic_set_spurious_interrupt(void)
+{
+    // #todo:
+    // write_reg(0xF0, ReadRegister(0xF0) | 0x100);
+}
+*/
 
 // =========
 
@@ -225,30 +258,38 @@ void lapic_initializing(unsigned long lapic_pa)
     asm ("movq %rax, %cr3");
 
 //=====================================
-	// Destination Format Register (DFR)
-	// Value after reset, flat mode
-	// depois de invalidar o pic?
-	//*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0xFFFFFFFF; 
 
-	// Logical Destination Register (LDR)
-	//// All cpus use logical id 1
-	//*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
+// Check values into the registers:
+// see: 
+// https://wiki.osdev.org/APIC#Local_APIC_registers
 
-    //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
-
-    // #test
+// ---------------
+// ID
     int localid = (int) local_apic_get_id();
     printf("localid: %d\n",(localid & 0xFF));
+    LAPIC.local_id = (int) (localid & 0xFF);
 
-    // #test
-    // 8bits
-    // 10H~15H
+// ---------------
+// Version
+// 8bits
+// 10H~15H
     int localversion = (int) local_apic_get_version();
     printf("localversion: %xH\n", (localversion & 0xFF));
+    LAPIC.local_version = (int) (localversion & 0xFF);
+
+//=====================================
+// Destination Format Register (DFR)
+// Value after reset, flat mode
+// depois de invalidar o pic?
+    //*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0xFFFFFFFF; 
+// Logical Destination Register (LDR)
+// All cpus use logical id 1
+    //*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
+    //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
+
 
     LAPIC.initialized = TRUE;
 }
-
 
 
 //

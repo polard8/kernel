@@ -1148,7 +1148,7 @@ void init_globals (void)
 // Called by x64main in x64init.c
 // OUT: TRUE if it is ok.
 
-static int I_init (void)
+static int I_init(void)
 {
     int Status = FALSE;
     unsigned char ProcessorType=0;
@@ -1429,8 +1429,8 @@ static int I_init (void)
 
     processor->Type = (int) ProcessorType;
 
-
-    int fpu_status = -1;   // fail
+    int fpu_status = -1;     // fail
+    int smp_status = FALSE;  // fail
 
     switch (ProcessorType){
     case Processor_INTEL:  
@@ -1438,7 +1438,7 @@ static int I_init (void)
         x64_init_intel();   
         //init_amd(); 
         fpu_status = (int) x64_init_fpu_support();
-        if(fpu_status<0){
+        if (fpu_status<0){
             printf("I_init: [FAIL] FPU Initialization fail\n");
             return FALSE;
         }
@@ -1447,7 +1447,15 @@ static int I_init (void)
         // Testando a inicializaçao do lapic.
         // Tentando ler o id e a versao.
         // See: x64.c
-        smp_probe();
+        smp_status = (int) smp_probe();
+        if (smp_status!=TRUE){
+            printf("I_init: [FAIL] SMP probe fail\n");
+            //return FALSE;
+        
+            //#debug
+            //refresh_screen();
+            //while(1){}
+        }
 
         //#breakpoint
         //printf("#breakpoint in I_init()\n");

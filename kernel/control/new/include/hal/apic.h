@@ -43,9 +43,13 @@ losethos os - Adam1a.HPP.
 // #todo: Vamos precisar de um endereço virtual para acessarmos isso.
 */
 
+// BDA base address.
+#define BDA_BASE  0x040E
+// MP signature. "_MP_".
+#define MP_SIG  0x5F504D5F
 
 // Base physical address.
-#define LAPIC_BASE    0xFEE00000
+#define LAPIC_BASE  0xFEE00000
 
 // Offsets:
 #define LAPIC_APIC_ID                0x020
@@ -133,35 +137,31 @@ See: apple opensource
 */
 
 
-// #test
 // The base address by which each processor accesses
 // its local APIC.
 struct lapic_info_d
 {
     int initialized;
-
     unsigned long lapic_va;
     unsigned long lapic_pa; 
     int entry;  // pagedirectory entry.
+
+    int local_id;
+    int local_version;
 };
 struct lapic_info_d  LAPIC;
 
 
 // =======================
 
-
 void lapic_initializing(unsigned long lapic_pa);
-
-
 // Check presence of apic.
 int has_apic (void);
-
 void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
 
 
 #endif    //____APIC_H
-
 
 //
 // End.
