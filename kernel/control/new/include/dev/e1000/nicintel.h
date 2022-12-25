@@ -86,6 +86,9 @@ struct intel_nic_info_d
     uint16_t io_base;
     uint32_t mem_base;    // #bugbug:  32bit address?
 
+// Estrutura de descritores e 
+// arrays de ponteiros de buffers.
+
 // rx
     struct legacy_rx_desc *legacy_rx_descs; //rx ring virtual address
     unsigned long rx_descs_virt[32];
@@ -125,11 +128,6 @@ extern int e1000_interrupt_flag;
 extern int e1000_irq_count;
 
 
-
-
-
-
-
 //
 // == Prototypes ========
 //
@@ -142,7 +140,4 @@ e1000_init_nic (
     struct pci_device_d *pci_device );
 
 #endif    
-
-
-
 

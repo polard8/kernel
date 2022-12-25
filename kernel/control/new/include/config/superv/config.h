@@ -101,23 +101,18 @@ sixth..     ide5, usually PCI, probed
 */
 
 
-
 #define DEFAULT_PIT_FREQ  1000
-
 
 // Where are the types defines?
 // See:
 // core/init.c
-	// 5 	Start the system normally with appropriate 
-	// display manager (with GUI) 	
-	// Same as runlevel 3 + display manager.
-	// Full multi-user graphical mode. 
+// 5 Start the system normally with appropriate 
+// display manager (with GUI) 
+// Same as runlevel 3 + display manager.
+// Full multi-user graphical mode. 
 
-
-// #define DEFAULT_RUNLEVEL 0
-#define DEFAULT_RUNLEVEL 5
-
-
+// #define DEFAULT_RUNLEVEL  0
+#define DEFAULT_RUNLEVEL  5
 
 #define FRED_VHD_32MB
 
@@ -125,7 +120,7 @@ sixth..     ide5, usually PCI, probed
 #define VHD_32MB_CHS { 862, 4, 19,  0 }  
 //#define VHD_32MB_CHS { 0x35E, 0x4, 0x13, 0 }  
 #else 
-#error "must define vhd"	
+#error "must define vhd"
 #endif
 
 
@@ -175,9 +170,7 @@ sixth..     ide5, usually PCI, probed
 //Essa flag aciona a rotina que vai checar o máximo de 
 //configurações e inicializações válidas.
 
-#define ENTRY_DEBUG_CHECK_VALIDATIONS 1
-
-
+#define ENTRY_DEBUG_CHECK_VALIDATIONS  1
 
 
 //
@@ -199,17 +192,14 @@ sixth..     ide5, usually PCI, probed
 #define ENTRY_VERBOSE  1
 
 //Esses quatro são as camadas principais.
-#define HAL_VERBOSE    1
-#define PS_VERBOSE     1
-#define EXECVE_VERBOSE 1  
-#define GWS_VERBOSE    1
-
-
+#define HAL_VERBOSE     1
+#define PS_VERBOSE      1
+#define EXECVE_VERBOSE  1
+#define GWS_VERBOSE     1
 
 // Permite que várias mensagens secundárias 
 // sejam enviadas para a porta serial.
-#define SERIAL_DEBUG_VERBOSE 1
-
+#define SERIAL_DEBUG_VERBOSE  1
 
 //
 // ## breack points ##

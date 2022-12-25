@@ -9,6 +9,9 @@
 // 1 - initialized
 int network_status=FALSE; 
 
+// Essa flag poderia ir para dentro da estrutura acima,
+int ____network_late_flag=0;
+
 // Status para notificações.
 // Podemos ou não notificar os processo sobre os eventos de rede.
 // O shell vai habilitar essa notificação no momento em que
@@ -18,6 +21,9 @@ int notification_status=FALSE;
 // Usado por esse módulo.
 file *____network_file;
 
+
+// See: network.h
+struct network_buffer_d  NETWORK_BUFFER;
 
 // handle ipv4 package
 // Called by all the embedded nic device drivers.
@@ -52,11 +58,13 @@ network_handle_arp(
 
 int network_buffer_in( void *buffer, int len )
 {
+// Coloca o conteúdo dentro de um dos buffers de aplicativos.
+// Não pertence à dispositivo.
+
     void *dst_buffer;
     int tail=0;
 
-// check args
-
+// Check args
     if ( (void*) buffer == NULL ){
         panic ("network_buffer_in: buffer\n");
     }
@@ -82,52 +90,48 @@ int network_buffer_in( void *buffer, int len )
         NETWORK_BUFFER.receive_tail=0;
     }
 
-	// #todo
-	// MTU: maximim transmition unit.
-	// For ethernet is 1500 bytes.
-	
+// #todo
+// MTU: maximim transmition unit.
+// For ethernet is 1500 bytes.
     //printf ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
-
-    if (tail<0){
+// Fail
+// Limits.
+    if (tail < 0 || tail >= 32){
         return -1;
     }
 
-
-    // Pega o destination buffer.
-    if (tail<32)
+// Check buffer status.
+// Se o buffer está cheio é porque ele não foi consumido.
+// Vamos sobrepor?
+    int buffer_status = NETWORK_BUFFER.receive_status[tail];
+    if (buffer_status == TRUE)
     {
-        // Se o buffer está cheio é porque ele não foi consumido.
-        // Vamos sobrepor ?
-        if ( NETWORK_BUFFER.receive_status[tail] == TRUE )
-        {
-            // #bugbug
-            // #todo: Podemos criar um contador de vezes que isso acontece.
-            
-            //
-            // Isso acontece frequentemente.
-            //
-            
-            // panic ("network_buffer_in: [TEST] Not responding ...\n");
-            //printf ("network_buffer_in: [FIXME] Can't write. This buffer is full.\n");
-            //refresh_screen();
-        }
-
-        dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
-       
-        if ((void*)dst_buffer != NULL){
-            memcpy( dst_buffer, buffer, len);
-        }        
-    
-        // Avisamos que esse buffer está cheio.
-        NETWORK_BUFFER.receive_status[tail] = TRUE;
-        
-        //printf("network_buffer_in: ok\n");
-        //refresh_screen();
-        return 0;//ok
+        // #bugbug
+        // #todo: Podemos criar um contador de vezes que isso acontece.
+        // Isso acontece frequentemente.
+        // panic ("network_buffer_in: [TEST] Not responding ...\n");
+        // printf ("network_buffer_in: [FIXME] Can't write. This buffer is full.\n");
+        // refresh_screen();
     }
 
+// Pega o destination buffer.
+    dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
+
+// Copy
+    if ((void*)dst_buffer != NULL){
+        memcpy( dst_buffer, buffer, len);
+    }
+
+// Avisamos que esse buffer está cheio.
+    NETWORK_BUFFER.receive_status[tail] = TRUE;
+
+    //printf("network_buffer_in: ok\n");
+    //refresh_screen();
+    return 0;//ok
+
+fail:
     return -1;
 }
 
@@ -141,22 +145,24 @@ int network_buffer_in( void *buffer, int len )
 
 int network_buffer_out ( void *buffer, int len )
 {
+// Retira o conteúdo de dentro de um dos buffers de aplicativos.
+// Não pertence à dispositivo.
+
     void *src_buffer;
     int head=0;
 
     debug_print("network_buffer_out:\n");
 
 // check args
-
     if ( (void*) buffer == NULL ){
         panic ("network_buffer_out: [FAIL] buffer\n");
     }
 
-    // #bugbug:
-    // Isso pode ser maior se considerarmos todos os headers.
-    // #todo
-    // Veja na configuração do dispositivo, que o buffer 
-    // configurado para o hardware é de 0x3000 bytes.
+// #bugbug:
+// Isso pode ser maior se considerarmos todos os headers.
+// #todo
+// Veja na configuração do dispositivo, que o buffer 
+// configurado para o hardware é de 0x3000 bytes.
     if (len>1500){
         debug_print("network_buffer_out: [FIXME] len\n");
         len=1500;
@@ -166,46 +172,41 @@ int network_buffer_out ( void *buffer, int len )
     if (NETWORK_BUFFER.initialized != TRUE){
         panic ("network_buffer_out: Shared buffers not initialized\n");
     }
-    
-    // Vamos pegar um numero de buffer para enviarmos o pacote.
-    // o kernel vai retirar do head ... 
-    // o que foi colocado pelo aplicativo em tail.
 
+// Vamos pegar um numero de buffer para enviarmos o pacote.
+// o kernel vai retirar do head ... 
+// o que foi colocado pelo aplicativo em tail.
     head = (int) NETWORK_BUFFER.send_head;
 
-    // circula.
+// circula.
     NETWORK_BUFFER.send_head++;
     if (NETWORK_BUFFER.send_head >= 8)
         NETWORK_BUFFER.send_head=0;
 
 
-	// #todo
-	// MTU: maximim transmition unit.
-	// For ethernet is 1500 bytes.
-	
+// #todo
+// MTU: maximim transmition unit.
+// For ethernet is 1500 bytes.
     //printf ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
-        
-    if(head<0){
+    if (head<0 || head >= 8){
         return -1;
     }
 
-    // Pega o destination buffer.
-    if (head<8)
-    {
-        src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
-       
-        // Aqui pode estar errado.
-        if ((void*)src_buffer != NULL){
-            memcpy( buffer, src_buffer, len );
-        } 
+// Pega o destination buffer.
+    src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
 
-        //printf("network_buffer_in: ok\n");
-        //refresh_screen();
-        return 0;//ok
-    }
+// Copy
+    if ((void*)src_buffer != NULL){
+        memcpy( buffer, src_buffer, len );
+    } 
 
+    //printf("network_buffer_in: ok\n");
+    //refresh_screen();
+    return 0;//ok
+    
+fail:
    return -1;
 }
 
@@ -232,7 +233,7 @@ int networkGetStatus (void)
  * Create a default socket structure for localhost. 
  * CurrentSocket = LocalHostHTTPSocket
  */ 
-// Called by init() in init.c.
+// Called by I_init() in x64init.c.
 // #fixme
 // Provavelmente esse alocador ainda nao funciona.
 
@@ -260,57 +261,43 @@ int networkInit (void)
 // We will create 32 buffers to receive data and
 // 8 buffers to send data.
 
-    debug_print ("networkInit: [FIXME] Initializing buffers for the NIC controller.\n");
-
-    // #fixme
-    // Provavelmente esse alocador ainda nao funciona.
+// #fixme
+// Provavelmente esse alocador ainda nao funciona.
 
     NETWORK_BUFFER.initialized = FALSE;
 
 // =====================================
 // receive buffers
-
-    for (i=0; i<32; i++)
-    {
+    for (i=0; i<32; i++){
         tmp_buffer_address = (void*) newPage();
-        
         if ((void *)tmp_buffer_address == NULL){
             panic("networkInit: [FAIL] receive tmp_buffer_address\n");
         }
         NETWORK_BUFFER.receive_buffer[i] = (unsigned long) tmp_buffer_address;
         NETWORK_BUFFER.receive_status[i] = FALSE;  //EMPTY
     };
-    NETWORK_BUFFER.receive_tail =0;
-    NETWORK_BUFFER.receive_head =0;
-
+    NETWORK_BUFFER.receive_tail=0;
+    NETWORK_BUFFER.receive_head=0;
 // ========================================
 // send buffers
-
-    for (i=0; i<8; i++)
-    {
+    for (i=0; i<8; i++){
         tmp_buffer_address = (void*) newPage();
-        
         if((void *)tmp_buffer_address == NULL){
             panic("networkInit: [FAIL] send tmp_buffer_address\n");
         }
         NETWORK_BUFFER.send_buffer[i] = (unsigned long) tmp_buffer_address;
         NETWORK_BUFFER.send_status[i] = FALSE;  //EMPTY 
     };
-    NETWORK_BUFFER.send_tail =0;
-    NETWORK_BUFFER.send_head =0;
-
+    NETWORK_BUFFER.send_tail=0;
+    NETWORK_BUFFER.send_head=0;
 // =====================================
 
 // flag
     NETWORK_BUFFER.initialized = TRUE;
 
 // =====================================
-
-
-// =====================================
 // Host info struct. 
-// See: include/rtl/net/host.h
-
+// See: host.h
     debug_print ("networkInit: HostInfo \n");
 
     HostInfo = 
@@ -372,7 +359,7 @@ int networkInit (void)
 // Status
     networkSetstatus(TRUE);
 
-    debug_print ("networkInit: done\n");
+    //debug_print ("networkInit: done\n");
     return 0;
 }
 

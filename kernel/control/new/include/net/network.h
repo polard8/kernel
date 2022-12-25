@@ -34,52 +34,36 @@
 struct network_device_d 
 {
     int id;
-	
-	void *priv; //??
-
-	char *dev_name;
-
+    void *priv; //??
+    char *dev_name;
     unsigned char ipv4_address[4];
     unsigned char mac_address[6];
-
-	//virtual
-	//Nope!
-	//Void (*send)(PVoid, UIntPtr, PUInt8);
+    //virtual
+    //Nope!
+    //Void (*send)(PVoid, UIntPtr, PUInt8);
 };
 */
 
+
 struct network_buffer_d
 {
-
     int initialized;
-
-//
 // Receive
-//
-
     int receive_tail;
     int receive_head;
     unsigned long receive_buffer[32];
-
-    // #test
-    // O status de cada buffer, se ele está vazio ou não.
+// O status de cada buffer, se ele está vazio ou não.
     int receive_status[32];
-
-
-//
 // Send
-//
-
     int send_tail;
     int send_head;
     unsigned long send_buffer[8];
-
-    // #test
-    // O status de cada buffer, se ele está vazio ou não.
+// O status de cada buffer, se ele está vazio ou não.
     int send_status[8];
 };
 
-struct network_buffer_d  NETWORK_BUFFER;
+// See: network.c
+extern struct network_buffer_d  NETWORK_BUFFER;
 
 
 /*
@@ -113,7 +97,7 @@ struct network_info_d
 //struct network_info_d *Network;
 
 // Essa flag poderia ir para dentro da estrutura acima,
-int ____network_late_flag;
+extern int ____network_late_flag;
 
 
 //
@@ -130,36 +114,12 @@ network_handle_arp(
     const unsigned char *buffer, 
     ssize_t size );
 
-
 int network_buffer_in( void *buffer, int len );
-int network_buffer_out ( void *buffer, int len );
-void networkSetstatus (int status);
-int networkGetStatus (void);
-
+int network_buffer_out( void *buffer, int len );
+void networkSetstatus(int status);
+int networkGetStatus(void);
 // #fixme
 int networkInit (void);
 
-
-
-#endif  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif    
 

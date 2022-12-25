@@ -281,11 +281,15 @@ static int __e1000_reset_controller(void)
 // IN:  size, return virtual address.
 // OUT: physical address
 
-    unsigned long tx_address = 
-        (unsigned long) &currentNIC->legacy_tx_descs;
+    //unsigned long tx_address = 
+    //    (unsigned long) &currentNIC->legacy_tx_descs; //#wrong
+    unsigned long tx_address=0; //#bugbug not used
 
     //printf("tx_address=%x\n",tx_address);
-        
+ 
+// Vamos alocar memória e pagarmos seu endereço físico.
+// Retorna um endereço virtual em tx_address e 
+// o físico no retorno da função.
     currentNIC->tx_descs_phys = 
         (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
@@ -296,9 +300,10 @@ static int __e1000_reset_controller(void)
     //printf("[2]:\n");
 
 // tx
-    unsigned long txaddress=0;
+// tmp physical address.
+    unsigned long tmp_txaddress_pa=0;
 
-    for ( i=0; i < 8; i++ ) 
+    for ( i=0; i<8; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
         // alocamos memória para o buffer, 
@@ -306,14 +311,20 @@ static int __e1000_reset_controller(void)
         // obtemos o endereço virtual do buffer.
         // IN:  size, return virtual address.
         // OUT: physical address
-        
-        txaddress = 
+        // Vamos alocar memória e pegar seu endereço físico.
+        // 8 buffers para envio.
+        // O endereço virtual fica salvo no array de ponteiros.
+        tmp_txaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
                  0x3000, 
                  (unsigned long *) &currentNIC->tx_descs_virt[i] );
         
-        currentNIC->legacy_tx_descs[i].addr  = (unsigned int) txaddress;
-        currentNIC->legacy_tx_descs[i].addr2 = (unsigned int) (txaddress>>32);
+        if (tmp_txaddress_pa == 0){
+            panic("__e1000_reset_controller: tmp_txaddress_pa\n");
+        }
+        
+        currentNIC->legacy_tx_descs[i].addr  = (unsigned int) tmp_txaddress_pa;
+        currentNIC->legacy_tx_descs[i].addr2 = (unsigned int) (tmp_txaddress_pa>>32);
 
         if (currentNIC->legacy_tx_descs[i].addr == 0){
             panic ("__e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
@@ -366,21 +377,28 @@ static int __e1000_reset_controller(void)
     //printf("[4]:\n");
 
 // rx
-    unsigned long rxaddress=0;
+// tmp physical address.
+    unsigned long tmp_rxaddress_pa=0;
 
-    for ( i=0; i < 32; i++ ) 
+    for ( i=0; i<32; i++ ) 
     {
         // Alloc the phys/virt address of this transmit desc
         // IN:  size, return virtual address.
         // OUT: physical address
-
-        rxaddress = 
+        // vamos alocar memória e retornar o endereço físico.
+        // 32 buffers para recebimento.
+        // O endereço virtual fica salvo no array de ponteiros.
+        tmp_rxaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
                 0x3000, 
                 (unsigned long *) &currentNIC->rx_descs_virt[i] );
-        
-        currentNIC->legacy_rx_descs[i].addr  = (unsigned int) rxaddress;
-        currentNIC->legacy_rx_descs[i].addr2 = (unsigned int) (rxaddress>>32);
+
+        if (tmp_rxaddress_pa == 0){
+            panic("__e1000_reset_controller: tmp_rxaddress_pa\n");
+        }
+
+        currentNIC->legacy_rx_descs[i].addr  = (unsigned int) tmp_rxaddress_pa;
+        currentNIC->legacy_rx_descs[i].addr2 = (unsigned int) (tmp_rxaddress_pa>>32);
 
         // Buffer null.
         if (currentNIC->legacy_rx_descs[i].addr == 0){
@@ -403,7 +421,7 @@ static int __e1000_reset_controller(void)
     //printf("[5]:\n");
 
 // Clear Multicast Table Array (MTA).
-    for (i=0; i < 128; i++){
+    for (i=0; i<128; i++){
         __E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
     };
 
@@ -794,8 +812,7 @@ e1000_init_nic (
 // +usar if else.
 // já fizemos essa checagem antes.
 
-    if ( pci_device->Vendor != 0x8086 || 
-         pci_device->Device != 0x100E )
+    if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
     {
         panic ("e1000_init_nic: 82540EM not found\n");
         // #bugbug: Maybe only return.
@@ -859,8 +876,12 @@ e1000_init_nic (
 
 // Endereço base.
 // Preparando a mesma base de duas maneiras.
-    unsigned char *base_address   = (unsigned char *) virt_address;
-    unsigned long *base_address32 = (unsigned long *) virt_address;
+//char
+    unsigned char *base_address = 
+        (unsigned char *) virt_address;
+//#bugbug 64bit address
+    unsigned long *base_address32 = 
+        (unsigned long *) virt_address; 
 
 //
 // == NIC =========================
@@ -884,7 +905,11 @@ e1000_init_nic (
 
 // #bugbug: Using 32bit address?
 // Salvando o endereço para outras rotinas usarem.
-    currentNIC->registers_base_address = (unsigned long) &base_address[0];
+
+// #bugbug: Using a 64bit address.
+    currentNIC->registers_base_address = 
+        (unsigned long) &base_address[0];
+// #bugbug: Using a 32bit address.
     currentNIC->mem_base = (uint32_t) &base_address[0];
 
     currentNIC->use_io = 0; //False;
@@ -893,7 +918,9 @@ e1000_init_nic (
 // Get info.
 //
 
+
 // Device status.
+// # usando array de bytes.
     currentNIC->DeviceStatus = base_address[0x8];
 
 // EEPROM
@@ -947,6 +974,7 @@ e1000_init_nic (
         //while(1){}
 
         // MAC - pegando o mac nos registradores.
+        // # usando array de bytes.
         currentNIC->mac_address[0] = base_address[ 0x5400 + 0 ];
         currentNIC->mac_address[1] = base_address[ 0x5400 + 1 ];
         currentNIC->mac_address[2] = base_address[ 0x5400 + 2 ];
@@ -1124,7 +1152,7 @@ static void DeviceInterface_e1000(void)
              old = currentNIC->rx_cur;
              len = currentNIC->legacy_rx_descs[old].length;
 
-             //#test: Apenas pegando o buffer para usarmos logo adinate.
+             //#test: Apenas pegando o buffer para usarmos logo adiante.
              buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
 
             //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
