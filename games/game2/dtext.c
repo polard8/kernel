@@ -5,11 +5,9 @@
 
 #include "gramado.h"
 
-/* 
- * grDrawString:
- *     Draw a string on the screen. 
- */
 
+// grDrawString:
+// Draw a string on the screen.
 // No clipping
 
 void 
@@ -19,20 +17,16 @@ grDrawString (
     unsigned int color,
     unsigned char *string )
 {
-
-    int Index=0;
-
-    //#bugbug:  Determinando
+    register int Index=0;
+//#bugbug:  Determinando
     int cWidth = 8;   
-	//int cWidth = get_char_width ();
-	//int cHeight = get_char_height ();
+    //int cWidth = get_char_width();
+    //int cHeight = get_char_height();
 
-
-	//if ( cWidth == 0 || cHeight == 0 )
+    //if ( cWidth == 0 || cHeight == 0 )
     if ( cWidth == 0 )
     {
         //panic ("grDrawString: cWidth");
-    
         //#debug
         //gde_message_box (3, "xxx","dtext-draw_string: cWidth");
         printf ("grDrawString: cWidth\n");
@@ -66,7 +60,6 @@ grDrawString (
 /* 
  * dtextDrawText:
  *     Draw text on a window.
- *
  * #test: 
  *     Como opção, se nenhuma janela for especificada, 
  *     então pintaremos na janela principal.
@@ -80,9 +73,7 @@ dtextDrawText (
     unsigned int color,
     unsigned char *string )
 { 
-
     struct gws_window_d * __w;
-
 
     __w = (struct gws_window_d *) gui->screen_window;
 

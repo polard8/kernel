@@ -526,9 +526,7 @@ gr_rotate_z(
 // ===========================================================
 //
 
-
 int grInit(void);
-
 
 //
 // projection
@@ -572,8 +570,6 @@ gwsViewport(
     int width, 
     int height);
 
-
-
 int world_initialize(void);
 
 //
@@ -598,8 +594,6 @@ int
 unveil_camera(
     int model_x, int model_y, int model_z );
 
-
-
 int 
 gr_set_ray_info(
     struct gr_ray_d *r,
@@ -618,7 +612,6 @@ gr_dc_plot0(
     struct dc_d *dc,
     int x,
     int y );
-
 
 int 
 grPlot2D ( 
@@ -645,7 +638,6 @@ grPlot1 (
 
 int serviceGrPlot0(void);
 
-
 //
 // == Line ==============================================
 //
@@ -657,14 +649,12 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color );
 
-
 // plot line given two colors.
 // interpolation ?
 void 
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
     int x1, int y1, int z1, unsigned long color2, int flag );
-
 
 int
 plotLine3dLT2 (
@@ -676,8 +666,6 @@ plotLine3dLT2 (
     unsigned int color,
     int draw );
 
-
-
 void 
 plotQuadBezierSeg ( 
     int x0, int y0, int z0, 
@@ -687,7 +675,6 @@ plotQuadBezierSeg (
 //
 // == rectangle =======================================
 //
-
 
 void
 rectangle_from_two_points (
@@ -705,11 +692,8 @@ rectangle_ras3D (
     int right, int bottom, int z1,
     unsigned int color );
 
-
 //sevice 2042
 int serviceGrRectangle(void);
-
-
 
 //
 // == triangle ==========================
@@ -721,7 +705,6 @@ grTriangle3(
     struct gr_triangle_d *triangle );
 
 int grTriangle( struct gr_triangle_d *triangle);
-
 
 int 
 fillTriangle0(
@@ -736,7 +719,6 @@ fillTriangle(
     struct gr_triangle_d *triangle,
     int hotspotx, int hotspoty );
 
-
 int 
 plotTriangleF(
     struct gws_window_d *window,
@@ -749,16 +731,13 @@ plotTriangleF(
 
 int xxxPolygonZ ( struct gr_polygon_d *polygon );
 
-
 //
 // == Cube ============================
 //
 
-int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
-int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
-
-int xxxDrawCubeZ ( struct gr_cube_d *cube );
-
+int xxxInflateCubeZ( struct gr_cube_d *cube, int value );
+int xxxDeflateCubeZ( struct gr_cube_d *cube, int value );
+int xxxDrawCubeZ( struct gr_cube_d *cube );
 //sevice 2041
 int serviceGrCubeZ(void);
 
@@ -805,7 +784,6 @@ grEllipse3 (
     unsigned int color,
     int z );
 
-
 // Fred Nora's algo. 
 // Prime stuff.
 void noraDrawingStuff(void);
@@ -820,12 +798,10 @@ int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 );
 
 int gr_discriminant_int(int a, int b, int c);
 
-
 int gr_triangle_area_int (int base, int height);
 
 int gr_magic_volume (int x, int y, int z);
 int gr_magic_area (int x, int y, int z);
-
 
 int 
 gr_find_obj_height_int ( 
@@ -841,7 +817,6 @@ gr_find_img_height_int (
 // #todo: Create fib_int and fib_long
 // This thing is very slow.
 int fib(int n);
-
 
 void gr_scale_vec( struct gr_vec3D_d *v, int scale );
 
@@ -871,7 +846,6 @@ void grDCMono (
     unsigned char subpixel_true_color,    //I64 true_color=0,
     unsigned char subpixel_false_color );  //I64 false_color=COLOR_MONO)
 
-
 // substitui cor no lfb
 void grDCColorChg ( 
     struct gws_display_d *dc,
@@ -891,8 +865,4 @@ interpolate_color(
 unsigned int invert_color(unsigned int color);
 
 #endif    
-
-
-
-
 

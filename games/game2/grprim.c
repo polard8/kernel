@@ -30,7 +30,10 @@ struct gr_cameraF_d  CurrentCameraF;
 // Viewport is a rectangular display area 
 // on the application window, which is measured 
 // in screen's coordinates 
-// (in pixels, with origin at the top-left corner). A viewport defines the size and shape of the display area to map the projected scene captured by the camera onto the application window. 
+// (in pixels, with origin at the top-left corner). 
+// A viewport defines the size and shape of the display 
+// area to map the projected scene captured by 
+// the camera onto the application window. 
 // It may or may not occupy the entire screen.
 // Viewport 3d:
 // Então o viewpoint agora possui 3 coordenadas.
@@ -43,22 +46,17 @@ struct gr_cameraF_d  CurrentCameraF;
 // Each object (or model or avatar) in a 3D scene 
 // is typically drawn in its own coordinate system, 
 // known as its model space (or local space, or object space). 
-// See: https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_BasicsTheory.html
+// See: 
+// https://www3.ntu.edu.sg/home/ehchua/programming/opengl/CG_BasicsTheory.html
 // =============================
-
-
 // #todo
 // Create some configuration globals here
 // int gUseSomething = TRUE;
 // int gUseRaytracing = TRUE;
 // ...
-
-
-// ====
 /*
  * Transformations: 
  *     Ex: Scaling, translation and rotation ...
- * 
  */
 
 // translation
@@ -212,7 +210,7 @@ grInitializeProjection(
 
 int grInit (void)
 {
-    unsigned long deviceWidth  = gws_get_device_width();
+    unsigned long deviceWidth = gws_get_device_width();
     unsigned long deviceHeight = gws_get_device_height();
 
     gwssrv_debug_print ("grInit:\n");
@@ -553,7 +551,6 @@ unveil_camera(
     CurrentCamera->lookat.y = model_y;
     CurrentCamera->lookat.z = model_z;
 
-
 // --------------------------------
 // draw the camera (circle)
     // camera circle
@@ -561,17 +558,17 @@ unveil_camera(
         ow,
         CurrentCamera->position.x,  //x
         CurrentCamera->position.y,  //y
-        8,        //r
+        8,          //r
         COLOR_RED,  //color 
-        0 );   // z 
+        0 );        //z 
     //upview. (small circle).
     grCircle3 ( 
         ow,
-        CurrentCamera->upview.x,    //x
+        CurrentCamera->upview.x,  //x
         CurrentCamera->upview.y,  //y
-        4,        //r
-        COLOR_RED,  //color 
-        0 );   // z 
+        4,                        //r
+        COLOR_RED,                //color 
+        0 );                      //z 
 
 // ---------------
 // origin
@@ -618,7 +615,6 @@ unveil_camera(
         r.p[RAY_TARGET].x,  r.p[RAY_TARGET].y, r.p[RAY_TARGET].z, 
         r.p[0].color ); 
 
-
     return 0;
 }
 
@@ -631,27 +627,26 @@ gr_set_ray_info(
     struct gr_vec3D_d *direction )
 {
 
-    if( (void*) r == NULL )
+    if ( (void*) r == NULL ){
         return -1;
-    if (r->magic != 1234)
+    }
+    if (r->magic != 1234){
         return -1;
+    }
 
     if( (void*) origin == NULL )
         return -1;
     if( (void*) direction == NULL )
         return -1;
 
-
 // origin
     r->p[0].x = (int) origin->x;
     r->p[0].y = (int) origin->y;
     r->p[0].z = (int) origin->z;
-
 // direction
     r->p[1].x = (int) direction->x;
     r->p[1].y = (int) direction->y;
     r->p[1].z = (int) direction->z;
-
 // ok
     return 0;
 }
@@ -659,23 +654,21 @@ gr_set_ray_info(
 
 int gr_reset_ray_info(struct gr_ray_d *r)
 {
-    if( (void*) r == NULL )
+    if ( (void*) r == NULL ){
         return -1;
-    if (r->magic != 1234)
+    }
+    if (r->magic != 1234){
         return -1;
+    }
 
     r->type = 0;
-
 // origin
     r->p[0].x = 0;  r->p[0].y = 0;  r->p[0].z = 0;
 // direction
     r->p[1].x = 0;  r->p[1].y = 0;  r->p[1].z = 0;
-
     r->distance = 0;
-
     r->used = TRUE;
     r->magic = 1234;
-
 // ok
     return 0;
 }
@@ -684,10 +677,11 @@ int gr_reset_ray_info(struct gr_ray_d *r)
 struct gr_ray_d *ray_object(void)
 {
     struct gr_ray_d *tmp;
-    
+
     tmp = (struct gr_ray_d *) malloc( sizeof(struct gr_ray_d) );
-    if ( (void*) tmp == NULL )
+    if ( (void*) tmp == NULL ){
         return NULL;
+    }
     tmp->used = TRUE;
     tmp->magic = 1234;
 
@@ -696,7 +690,6 @@ struct gr_ray_d *ray_object(void)
 
     return (struct gr_ray_d *) tmp;
 }
-
 
 // d<0: (negative) "Raiz de número negativo em Baskara"
 // d=0: (null)     duas raizes reais iguais.
@@ -727,30 +720,23 @@ int projection_initialize(void)
     CurrentProjection = 
         (void *) malloc ( sizeof( struct gr_projection_d ) );
     
-    if ( (void*) CurrentProjection == NULL )
-    {
+    if ( (void*) CurrentProjection == NULL ){
         printf("projection_initialize: CurrentProjection\n");
         exit(1);
     }
 
-    if( (void*) gr_dc == NULL)
-    {
+    if ( (void*) gr_dc == NULL){
         printf("projection_initialize: gr_dc\n");
         exit(1);
     }
-    
-    if (gr_dc->initialized != TRUE)
-    {
+    if (gr_dc->initialized != TRUE){
         printf("projection_initialize: gr_dc->initialized\n");
         exit(1);
     }
 
     // Use the default dc.
     CurrentProjection->dc = gr_dc;
-
-
     CurrentProjection->initialized = FALSE;
-
     // #todo: Perspective or orthogonal
     CurrentProjection->type = 1; 
 
@@ -777,8 +763,6 @@ int projection_initialize(void)
     CurrentProjection->zFar   = gr_dc->zfar;
     CurrentProjection->zRange = gr_dc->zrange;
 
-
-
     //CurrentProjection->angle_of_view = ?;
     //CurrentProjection->ar = ?;
     //CurrentProjection->frustrum_apex = ?;
@@ -788,9 +772,8 @@ int projection_initialize(void)
     
     CurrentProjection->used = TRUE;
     CurrentProjection->magic = 1234;
-
     CurrentProjection->initialized = TRUE;
- 
+
     return 0;
 }
 
@@ -811,7 +794,6 @@ int view (struct gr_projection_d *projection, int near, int far)
         printf("view: projection\n");
         return -1;
     }
-
     if (projection->initialized != TRUE){
         printf("view: initialized\n");
         return -1;
@@ -824,7 +806,6 @@ int view (struct gr_projection_d *projection, int near, int far)
 
     return 0;
 }
-
 
 
 /*
@@ -932,7 +913,6 @@ __transform_from_viewspace_to_screespace(
 // #
 // The viewspace is the view considering 
 // the camera's point of view.
-
 
 // 3d
 // save parameters. (++)
@@ -1073,13 +1053,14 @@ done:
 
 void gr_dc_extents_init(struct dc_d *dc)
 {
-    if ( (void*) dc == NULL )
+    if ( (void*) dc == NULL ){
         return;
-    if (dc->magic != 1234)
+    }
+    if (dc->magic != 1234){
         return;
+    }
 
     //dc->flags |= DCF_RECORD_EXTENTS;
-
     dc->min_x = ULONG_MIN;
     dc->max_x = ULONG_MAX;
     dc->min_y = ULONG_MIN;
@@ -1088,34 +1069,34 @@ void gr_dc_extents_init(struct dc_d *dc)
 
 int gr_dc_refresh_screen(struct dc_d *dc)
 {
-
-    if ( (void*) dc != NULL )
-    {
-        if (dc->magic == 1234)
-        {
-            if( dc->initialized == TRUE )
-            {
-                gws_refresh_rectangle(
-                    dc->left, 
-                    dc->top, 
-                    dc->width, 
-                    dc->height );
-
-                return 0;
-            }
-        }
+    if ( (void*) dc == NULL ){
+        return -1;
+    }
+    if (dc->magic != 1234){
+        return -1;
+    }
+    if (dc->initialized != TRUE){
+        return -1;
     }
 
-    return -1;
-}
+// Refresh
+    gws_refresh_rectangle(
+        dc->left, dc->top, dc->width, dc->height );
 
+    return 0;
+}
 
 int gr_dc_fill( struct dc_d *dc, unsigned int bg_color )
 {
-    if ( (void*) dc == NULL )
+    if ( (void*) dc == NULL ){
         return -1;
-    if (dc->magic != 1234)
+    }
+    if (dc->magic != 1234){
         return -1;
+    }
+    //if (dc->initialized != TRUE){
+    //    return -1;
+    //}
 
     dc->bg_color = (unsigned int) bg_color;
 
@@ -1143,24 +1124,25 @@ gr_dc_plot0(
 {
 // Print a pixel with the color in the given dc.
 // No clipping window.
-    if ( (void*) dc == NULL )
+    if ( (void*) dc == NULL ){
         return -1;
-    if (dc->magic != 1234)
+    }
+    if (dc->magic != 1234){
         return -1;
-    if (dc->initialized != TRUE)
+    }
+    if (dc->initialized != TRUE){
         return -1;
-
+    }
 
     if (x<0)
         return -1;
-
     if (y<0)
         return -1;
 
-    unsigned long color = dc->color;
+    unsigned int color = (unsigned int) dc->color;
     unsigned long finalx = (unsigned long) (x & 0xFFFFFFFF);
     unsigned long finaly = (unsigned long) (y & 0xFFFFFFFF);
-    unsigned long rop = dc->rop;
+    unsigned long rop = (unsigned long) dc->rop;
 
     finalx += dc->left;
     finaly += dc->top;
@@ -1324,8 +1306,7 @@ grPlot0 (
 // See: screen.h
 
     // #debug
-    if ( (void *) DeviceScreen == NULL )
-    {
+    if ( (void *) DeviceScreen == NULL ){
         Draw = FALSE;
         printf("grPlot0: DeviceScreen\n");
         exit(1);
@@ -1335,7 +1316,6 @@ grPlot0 (
 // precisamos checar algumas globais, como HotSpotX e HotSpotY.
 // Usaremos a janela chamada screen se nenhuma outra foi indicada.
 //gui->screen
-
 
 //-------------------------------------
 // tmp: zNear zFar
@@ -1347,19 +1327,16 @@ grPlot0 (
      int zNear = 0; 
      int zFar  = 80;
 
-     if ( (void*) CurrentProjection != NULL )
-     {
+     if ( (void*) CurrentProjection != NULL ){
           zNear = (int) CurrentProjection->zNear;
           zFar  = (int) CurrentProjection->zFar;
      }
-
      if (z < zNear)
          return 0;
      if (z >= zFar)
          return 0;
 
 //-------------------------------------
-
 
 //-------------------------------------
 // #todo
@@ -1410,23 +1387,21 @@ grPlot0 (
 // #todo:
 // Podemos usar o hotspot do dc pra fazermos a transformações.
 
-    // Como não temos uma janela,
-    // então fazemos a transformação usando
-    // o hotspot da tela.
-    if (UseClipping==FALSE)
-    {
+// Como não temos uma janela,
+// então fazemos a transformação usando o hotspot da tela.
+    if (UseClipping==FALSE){
        hotspotx = HotSpotX;
        hotspoty = HotSpotY;
     }
 
-    // Se temos uma clipping window válida,
-    // então usamos o hot spot dela.
-    //#todo: precisamos de variaveis de hotspot dentro da estrutura
-    // de janela ... o hotspot não fica no centro da janela
-    // e sim no centro da área de cliente da janela.
-    // o dc atual deve ser a área de cliente da janela.
-    if (UseClipping==TRUE)
-    {
+// Se temos uma clipping window válida,
+// então usamos o hot spot dela.
+// #todo: 
+// Precisamos de variaveis de hotspot dentro da estrutura de janela ... 
+// o hotspot não fica no centro da janela
+// e sim no centro da área de cliente da janela.
+// o dc atual deve ser a área de cliente da janela.
+    if (UseClipping==TRUE){
         hotspotx = w->left + (w->width /2);
         hotspoty = w->top  + (w->height /2);
     }
@@ -1438,12 +1413,10 @@ grPlot0 (
         UseLeftHand,
         hotspotx, hotspoty ); 
 
-
 // Draw and clipping.
 // #todo
 // Talvez possamos retornar '0'
 // se a flag indicar que não precisava desenhar.
-
     if (Draw != TRUE){
         return -1;
     }
@@ -1451,9 +1424,7 @@ grPlot0 (
 // #todo: 
 // We need to check the window limits
 // if we are drawing inside a given window.
-
 // Checking the device screen limits.
-
 // #bugbug
 // Já fizemos isso logo acima?
 
@@ -1486,9 +1457,7 @@ grPlot0 (
     if ( 0 <= X < DeviceScreen->width && 
          0 <= Y < DeviceScreen->height )
     {
-
-        if ( UsingAlphaBlending == TRUE )
-        {
+        if ( UsingAlphaBlending == TRUE ){
             // #todo
             // Get the color and modify it.
             //color = get??()
@@ -1557,7 +1526,6 @@ grPlot1 (
     int zValue = 0;
     unsigned int colorValue=0;
 
-
     int fBlack=FALSE;  // black pixel
     int fNoZBuffer = FALSE;
     // ...
@@ -1610,15 +1578,12 @@ int serviceGrPlot0(void)
 
     //gwssrv_debug_print("serviceGrPlot0: [TODO] \n");
 
-// =================================
 // Arguments:
-// Sempre começa do 10 para rotinas 3D.
-    
+// Sempre começa do 10 para rotinas 3D.    
     x      = message_address[10];
     y      = message_address[11];
     z      = message_address[12]; 
     color  = message_address[13];
-// =================================
 
 // #todo:
 // pegar os argumentos no buffer e chamar a rotina de plotagem de pixel.
@@ -2363,17 +2328,17 @@ fillTriangle0(
     next1:
         // Process second line 
         // until y value is about to change
-		while (1)
-		{
-			e2 += dy2;
-			while (e2 >= dx2) {
-				e2 -= dx2;
-				if (changed2) t2xp=signx2;//t2x += signx2;
-				else          goto next2;
-			}
-			if (changed2)     break;
-			else              t2x += signx2;
-		};
+        while (1)
+        {
+            e2 += dy2;
+            while (e2 >= dx2) {
+                e2 -= dx2;
+                if (changed2) t2xp=signx2;  //t2x += signx2;
+                else          goto next2;
+            };
+            if (changed2) break;
+            else          t2x += signx2;
+        };
 
     next2:
 
@@ -2409,13 +2374,13 @@ fillTriangle0(
     next:
 
     dx1 = (int)(x3 - x2); 
-    if(dx1<0){ 
+    if (dx1<0){ 
         dx1 = -dx1; 
         signx1=-1; 
     }else{ 
         signx1=1; 
-    }
-    
+    };
+
     dy1 = (int)(y3 - y2);
     t1x=x2;
 
@@ -2425,7 +2390,7 @@ fillTriangle0(
         changed1=TRUE;
     }else{ 
         changed1=FALSE;
-    }
+    };
 
     e1 = (int)(dx1>>1);
 
@@ -2446,25 +2411,25 @@ fillTriangle0(
                 if (changed1) { t1xp=signx1; break; }//t1x += signx1;
                 else goto next3;
             };
-			if (changed1) break;
-			else t1x += signx1;
-            if(ii<dx1)
+            if (changed1) break;
+            else          t1x += signx1;
+            if (ii<dx1)
                 ii++;
         };
-	next3:
+    next3:
         // process second line until y value is about to change
         while (t2x!=x3) 
         {
-			e2 += dy2;
-	   	   	while (e2 >= dx2) {
-				e2 -= dx2;
-				if(changed2) t2xp=signx2;
-				else          goto next4;
-			}
-			if (changed2)     break;
-			else              t2x += signx2;
-        };   
-	next4:
+            e2 += dy2;
+            while (e2 >= dx2) {
+                e2 -= dx2;
+                if(changed2) t2xp=signx2;
+                else          goto next4;
+            };
+            if (changed2)  break;
+            else           t2x += signx2;
+        };
+    next4:
 
         if(minx>t1x) minx=t1x; 
         if(minx>t2x) minx=t2x;
@@ -2487,11 +2452,9 @@ fillTriangle0(
             return (int) npixels;
         }
     };
-    
+
     return (int) npixels;
 }
-//-----------------
-
 
 //#todo: return pixel counter.
 int 
@@ -2512,7 +2475,6 @@ fillTriangle(
     if ( (void*) triangle == NULL ){
         return (int) npixels;
     }
-
 
 // #
 // Trasformation for Cavalier Oblique Drawings.
@@ -2535,7 +2497,6 @@ fillTriangle(
         triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
         TRUE, //UseLeftHand,
         hotspotx, hotspoty ); 
-
 
     unsigned int color = triangle->p[0].color;
 
@@ -2796,29 +2757,21 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon )
 
     int PolygonType=0;
 
-
-
-    // structure
-
+// structure
     if ( (void*) polygon == NULL ){
         goto fail;
     }
-
-    // list
- 
+// list 
     if ( (void*) list == NULL ){
         goto fail;
     }
-
-    // number of elements
-
+// number of elements
     NumberOfElements = polygon->n;
-
-    if ( NumberOfElements > Max ){
+    if (NumberOfElements > Max){
         goto fail;
     }
 
-    // polygon type
+// polygon type
 
     PolygonType = polygon->type;
 
@@ -2830,8 +2783,7 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon )
         break;
     };
 
-
-    // Draw polypoint
+// Draw polypoint
 do_polypoint:
 
     // #todo
@@ -2851,7 +2803,7 @@ do_polypoint:
     };
     return 0;
 
-    // Draw polyline
+// Draw polyline
 do_polyline:
 
     for ( i=0; i<NumberOfElements; i++ )
@@ -2885,8 +2837,6 @@ fail:
     return -1;
 }
 
-
-
 // #test
 // >>>> wired cube <<<< 
 // "with ugly rasterization in some of the fazes"
@@ -2898,7 +2848,6 @@ fail:
 // #todo
 // We can create a function only for wired cube, 
 // and another one for cube with some kind of rasterization.
-
 
 int xxxDrawCubeZ ( struct gr_cube_d *cube )
 {
@@ -3073,8 +3022,6 @@ int xxxDrawCubeZ ( struct gr_cube_d *cube )
     return 0;
 }
 
-
-
 // sevice 2041
 // Called by gwsProcedure.
 int serviceGrCubeZ(void)
@@ -3083,15 +3030,12 @@ int serviceGrCubeZ(void)
     return -1;
 }
 
-
 // sevice 2042
 int serviceGrRectangle(void)
 {
     //#deprecated
     return -1;
 }
-
-
 
 //Circle
 //This is an implementation of the circle algorithm.
@@ -3112,7 +3056,6 @@ plotCircle (
    
     int y = 0;
     int err = (2-(2*r));
-
 
     do {
       
@@ -3159,7 +3102,7 @@ grCircle3 (
 {
 
     /* II. Quadrant */ 
-   //int x = -r, y = 0, err = 2-2*r; 
+    //int x = -r, y = 0, err = 2-2*r; 
    
     //loop
     register int x = -r;
@@ -3203,21 +3146,21 @@ grCircle3 (
  //credits: uVGA
 void __fillCircle(int xm, int ym, int r, int color)
 {
-	int x, y;
+    int x, y;
 
-	for (y = -r; y <= r; y++)
-	{
-		for (x = -r; x <= r; x++)
-		{
-			if ((x * x) + (y * y) <= (r * r))
-			{
-				drawHLine(ym + y, xm + x, xm - x, color);
-				if(y != 0)
-					drawHLine(ym - y, xm + x, xm - x, color);
-				break;
-			}
-		}
-	}
+    for (y = -r; y <= r; y++)
+    {
+        for (x = -r; x <= r; x++)
+        {
+            if ((x * x) + (y * y) <= (r * r))
+            {
+                drawHLine(ym + y, xm + x, xm - x, color);
+                if(y != 0)
+                    drawHLine(ym - y, xm + x, xm - x, color);
+                break;
+            }
+        };
+    };
 }
 */
 
@@ -3257,7 +3200,6 @@ grEllipse (
     int x1, int y1, 
     unsigned int color )
 {
-
    int a = abs(x1-x0), b = abs(y1-y0), b1 = b&1; /* values of diameter */
    long dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
    long err = dx+dy+b1*a*a, e2; /* error of 1.step */
@@ -3266,7 +3208,6 @@ grEllipse (
    if (y0 > y1) y0 = y1; /* .. exchange them */
    y0 += (b+1)/2; y1 = y0-b1;   /* starting pixel */
    a *= 8*a; b1 = 8*b*b;
-
 
     do {
        grPlot0 ( NULL, 0, x1, y0, color);  //   I. Quadrant
@@ -3349,16 +3290,13 @@ void noraDrawingStuff(void)
     {
         for (y=0; y<SavedY; y++)
         {
-            if ( x != 0 )
-            {
-                if ( (y % x) == 0 )
-                {
-                    // IN: color, x, y,rop
+            if ( x != 0 ){
+                if ( (y % x) == 0 ){
+                    // IN: color, x, y, rop
                     grBackBufferPutpixel(color,x,y,0); 
                 }
             }
         };
-        
         if ( x >= SavedY ) { break; }
     };
 }
@@ -3391,7 +3329,6 @@ void noraDrawingStuff3 (int x, int y, int z)
                 }
             }
         };
-        
         if ( _x >= limitY) { break; }
     };
 }
@@ -3493,7 +3430,6 @@ gr_MultiplyMatrixVector(
     }
 }
 
-
 //--------------------------------------------------
 // Rotate in x
 int 
@@ -3538,7 +3474,6 @@ gr_rotate_x(
         (struct gr_vecF3D_d *) &in_tri->p[2], 
         (struct gr_vecF3D_d *) &out_tri->p[2], 
         &matRotX);
-//-----------------------------    
 
     return 0;
 }
@@ -3568,7 +3503,6 @@ gr_rotate_y(
     matRotY.m[3][3] = (float) 1.0f;
 
 // ---------------------------------------------------
-
     if( (void*) in_tri == NULL )
         return -1;
     if( (void*) out_tri == NULL )
@@ -3588,7 +3522,6 @@ gr_rotate_y(
         (struct gr_vecF3D_d *) &in_tri->p[2], 
         (struct gr_vecF3D_d *) &out_tri->p[2], 
         &matRotY);
-//-----------------------------    
 
     return 0;
 }
@@ -3618,7 +3551,6 @@ gr_rotate_z(
 	matRotZ.m[3][3] = (float) 1.0f;
 
 // ---------------------------------------------------
-
     if( (void*) in_tri == NULL )
         return -1;
     if( (void*) out_tri == NULL )
@@ -3710,12 +3642,10 @@ int gr_triangle_area_int (int base, int height)
     return (int) ((base*height) >> 1);
 }
 
-
 int gr_magic_volume (int x, int y, int z)
 {
     return (int) (x*y*z);
 }
-
 
 int gr_magic_area (int x, int y, int z)
 {
@@ -3726,7 +3656,6 @@ int gr_magic_area (int x, int y, int z)
 
     return (int) area;
 }
-
 
 int 
 gr_find_obj_height_int ( 
@@ -3799,9 +3728,6 @@ gr_find_img_height_int (
     return 0; //ok
 }
 
-
-
-
 // Fibonacci Series using Recursion 
 // ??: slow.
 int fib (int n)
@@ -3853,13 +3779,11 @@ void gr_scale_vec( struct gr_vec3D_d *v, int scale )
 }
 
 
-
 /*
  * plotCharBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */
-
 // #bugbug
 // Nessa função estamos usando globais.
 // Talvez devamos pegá-las antes e não 
@@ -3884,35 +3808,32 @@ plotCharBackbufferDrawcharTransparent (
     //int CharHeight;
 
 
-    /*
-	 * Get the font pointer.
-	 *
-	 * @todo:
-     *     usar variavel g8x8fontAddress.
-	 *     + Criar e usar uma estrutura para fonte.
-	 *     + Usar o ponteiro para a fonte atual que foi carregada.
-	 *     + Criar um switch para o tamanho da fonte.
-	 *     isso deveria estar na inicialização do módulo char.
-	 *     ...
-	 */
+/*
+ * Get the font pointer.
+ * #todo:
+ *     usar variavel g8x8fontAddress.
+ *     + Criar e usar uma estrutura para fonte.
+ *     + Usar o ponteiro para a fonte atual que foi carregada.
+ *     + Criar um switch para o tamanho da fonte.
+ *     isso deveria estar na inicialização do módulo char.
+ */
 
     if ( gws_currentfont_address == 0 || 
          gcharWidth <= 0 || 
          gcharHeight <= 0 )
     {
-	    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		//gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
-		//gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
-		
-		// #debug
-		// Estamos parando para testes.
-		
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;  //ROM bios.
+        //gcharWidth = DEFAULT_CHAR_WIDTH;    //8.
+        //gcharHeight = DEFAULT_CHAR_HEIGHT;  //8.
+        // #debug
+        // Estamos parando para testes.
         printf ("gws_drawchar_transparent : Initialization fail\n");
-        while(1){}
+        while(1){
+        }
     }
 
-    // #todo: 
-    // Criar essas variáveis e definições.
+// #todo: 
+// Criar essas variáveis e definições.
 
     switch (gfontSize){
 
@@ -3929,7 +3850,7 @@ plotCharBackbufferDrawcharTransparent (
 		    //gcharWidth = 8;
 		    //gcharHeight = 16;
 		    //set_char_width(8);
-			//set_char_height(16);			
+			//set_char_height(16);
 		    //break;
 		 
 		//#todo: 
@@ -3942,12 +3863,10 @@ plotCharBackbufferDrawcharTransparent (
 		// que usar o tamanho padrão.
 		
         default:
-		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		    
-			//set_char_width(8);
-			//set_char_height(8);	
+            //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
+            //set_char_width(8);
+            //set_char_height(8);
             //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
-
             break;
     };
 
@@ -3956,17 +3875,13 @@ plotCharBackbufferDrawcharTransparent (
         (void *) gws_currentfont_address + (c * gcharHeight);
 
 // Draw
-
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
         bit_mask = 0x80;
-
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
-
            // Put pixel. 
             if ( ( *work_char & bit_mask ) ){
- 
                 // IN: z,x,y,color.
                 grPlot0 ( NULL, 0, x + x2, y, color ); 
             }
@@ -3974,7 +3889,6 @@ plotCharBackbufferDrawcharTransparent (
             // Rotate bitmask.
             bit_mask = (bit_mask >> 1);  
         };
-
         // Próxima linha da 8 linhas do caractere.
         y++; 
         work_char++; 
@@ -3987,12 +3901,10 @@ plotCharBackbufferDrawcharTransparent (
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */
-
 // #bugbug
 // Nessa função estamos usando globais.
 // Talvez devamos pegá-las antes e não 
 // referenciá-las diretamente.
-
 // root surface?
 
 void 
@@ -4003,19 +3915,16 @@ plotCharBackbufferDrawcharTransparentZ (
     unsigned long c,
     int z )
 {
-
     char *work_char;
     unsigned char bit_mask = 0x80;
-
     int x2=0;
     int y2=0;
-
     //int CharWidth;
     //int CharHeight;
 
 /*
  * Get the font pointer.
- * @todo:
+ * #todo:
  *     usar variavel g8x8fontAddress.
  *     + Criar e usar uma estrutura para fonte.
  *     + Usar o ponteiro para a fonte atual que foi carregada.
@@ -4027,19 +3936,17 @@ plotCharBackbufferDrawcharTransparentZ (
          gcharWidth <= 0 || 
          gcharHeight <= 0 )
     {
-	    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		//gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
-		//gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
-		
-		// #debug
-		// Estamos parando para testes.
-
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;  //ROM bios.
+        //gcharWidth = DEFAULT_CHAR_WIDTH;    //8.
+        //gcharHeight = DEFAULT_CHAR_HEIGHT;  //8.
+        // #debug
+        // Estamos parando para testes.
         printf ("gws_drawchar_transparent : Initialization fail\n");
         while(1){}
     }
 
-    // #todo: 
-    // Criar essas variáveis e definições.
+// #todo: 
+// Criar essas variáveis e definições.
 
     switch (gfontSize){
 
@@ -4056,7 +3963,7 @@ plotCharBackbufferDrawcharTransparentZ (
 		    //gcharWidth = 8;
 		    //gcharHeight = 16;
 		    //set_char_width(8);
-			//set_char_height(16);			
+			//set_char_height(16);
 		    //break;
 		 
 		//#todo: 
@@ -4070,9 +3977,9 @@ plotCharBackbufferDrawcharTransparentZ (
 		
         default:
 		    //gws_currentfont_address = (unsigned long) BIOSFONT8X8;    //ROM bios.
-		    
+
 			//set_char_width(8);
-			//set_char_height(8);	
+			//set_char_height(8);
             //gfontSize = FONT8X8;  //#todo: fução para configurar isso.
 
             break;
@@ -4095,15 +4002,12 @@ plotCharBackbufferDrawcharTransparentZ (
 
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
-
            // Put pixel. 
-            if ( ( *work_char & bit_mask ) )
-            {
+            if ( ( *work_char & bit_mask ) ){
                 // começa do fim
                 // IN: z,x,y,color.
                 grPlot0 ( NULL, z, x + x2, (y + gcharWidth), color ); 
             }
-
             // Rotate bitmask.
             bit_mask = (bit_mask >> 1);  
         };
@@ -4123,27 +4027,19 @@ void grDCMono (
     unsigned char subpixel_true_color,    //I64 true_color=0,
     unsigned char subpixel_false_color )  //I64 false_color=COLOR_MONO)
 {
-
     int i=0;
     unsigned char *dst;
-
     struct gws_screen_d *Screen;
 
+    // printf ("grDCMono:\n");
 
-    printf ("grDCMono:\n");
-
-
-//
 // Device context
-//
 
     if ( (void *) dc == NULL ){
         printf ("dc\n");
         return;
     }
-
-    if (dc->used != TRUE || dc->magic != 1234 )
-    {
+    if (dc->used != TRUE || dc->magic != 1234 ){
         printf ("dc validation\n");
         return;
     }
@@ -4163,7 +4059,6 @@ void grDCMono (
         printf ("Screen validation\n");
         return;
     }
-
 
     // 3 BPP
     if (Screen->bpp == 24) {
@@ -4201,20 +4096,18 @@ void grDCColorChg (
 
     int i=0;
     unsigned char *dst;
-
     struct gws_screen_d *Screen;
 
-
-    printf ("grDCColorChg:\n");
+    //printf ("grDCColorChg:\n");
 
 // Device context
 
-    if ( (void *) dc == NULL )
+    if ( (void *) dc == NULL ){
         return;
-
-    if (dc->used != 1 || dc->magic != 1234 )
-        return;    
-
+    }
+    if (dc->used != 1 || dc->magic != 1234 ){
+        return;
+    }
 
 //
 // Screen
@@ -4222,18 +4115,18 @@ void grDCColorChg (
 
     Screen = dc->device_screen;
 
-    if ( (void*) Screen == NULL )
+    if ( (void*) Screen == NULL ){
         return;
-
-    if (Screen->used != 1 || Screen->magic != 1234 )
-        return;    
-
+    }
+    if (Screen->used != 1 || Screen->magic != 1234 ){
+        return;
+    }
 
     if (Screen->bpp == 24) {    
         
         dst = (unsigned char *) Screen->frontbuffer;
         i = (int) (Screen->height * Screen->pitch);
-        
+
         while (i--){
             
             if (*dst == subpixel_src_color){
@@ -4244,7 +4137,6 @@ void grDCColorChg (
         };
     }
 }
-
 
 // Bézier curve
 // This program example plots a quadratic Bézier curve 
@@ -4323,7 +4215,7 @@ plotQuadBezierSeg (
     
     }
 
-    /* plot remaining part to end */
+/* plot remaining part to end */
     //plotLine(x0,y0, x2,y2);   
     plotLine3d (
         NULL,
@@ -4377,7 +4269,6 @@ interpolate_color(
     unsigned int fraction )
 {
     unsigned int final_color=0;
-
     unsigned char r1 = (unsigned char) (color1 >> 16) & 0xff;
     unsigned char r2 = (unsigned char) (color2 >> 16) & 0xff;
     unsigned char g1 = (unsigned char) (color1 >> 8) & 0xff;
@@ -4402,7 +4293,6 @@ unsigned int invert_color(unsigned int color)
     unsigned int Color = (unsigned int) (color ^ 0x00FFFFFF);
     return (unsigned int) Color;
 }
-
 
 //
 // End
