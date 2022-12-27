@@ -47,7 +47,9 @@ static char *__findenv( const char *name, int *offset );
 static int stdlib_strncmp ( char *s1, char *s2, int len )
 {
     register int n=0;
+
     n = (int) len;
+
     while (n>0){
         n--;
         // Return 1.
@@ -81,13 +83,11 @@ static int __init_heap(void)
 	//HEAP_START = (unsigned long) &HeapBuffer[0];
 	//HEAP_END   = (unsigned long) &HeapBuffer[Max];
 	//HEAP_SIZE  = (unsigned long) (HEAP_END - HEAP_START); 
-	
-	
+
 	//VAMOS PEGAR O ENDEREÇO DO BUFFER DESSE PROCESSO.
-	
+
 	//int thisprocess_id = (int) stdlib_system_call ( 85, 0, 0, 0); 
 	//unsigned char *heaptest = (unsigned char *) stdlib_system_call ( 184, thisprocess_id, 0, 0 );	
-
 
 //
 // Current process
@@ -175,10 +175,8 @@ static int __init_heap(void)
 
 // ================================
 
-
-	//Test. (Cria e inicializa uma estrutura)
-	//heapSetLibcHeap(HEAP_START,HEAP_SIZE);
-
+//Test. (Cria e inicializa uma estrutura)
+    //heapSetLibcHeap(HEAP_START,HEAP_SIZE);
 
 // #important:
 // Último heap pointer válido.
@@ -223,7 +221,6 @@ static int __init_heap(void)
         heapList[i] = (unsigned long) 0;
         i++;
     };
-
 
     //KernelHeap = (void*) x??;
 
@@ -319,7 +316,6 @@ static char *__findenv ( const char *name, int *offset )
     register int i=0;
     int fail;
 
-
     if ( (void *) name == NULL ){
         printf ("__findenv: name NULL\n");
         return (char *) 0;
@@ -330,8 +326,7 @@ static char *__findenv ( const char *name, int *offset )
         return (char *) 0;
     }
 
-
-    // Tamanho da string do argumento.
+// Tamanho da string do argumento.
     for (np = name; *np && *np != '='; ++np){ continue; };
 
     len = (size_t) (np - name);
