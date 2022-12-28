@@ -220,19 +220,19 @@ exposed-tier:
 #bugbug: This GWS.BIN client has some special calls.
 #do not use it for tests here.
 
-#gui
-	-sudo cp ../gui/burgundy/bin/GWSSRV.BIN    control/disk/
-	#-sudo cp ../gui/burgundy/bin/GWS.BIN      control/disk/
-	-sudo cp ../gui/burgundy/bin/GDM.BIN       control/disk/
-	-sudo cp ../gui/burgundy/bin/GDM2.BIN      control/disk/
-	-sudo cp ../gui/blue/bin/TERMINAL.BIN      control/disk/
-	-sudo cp ../gui/beige/bin/EDITOR.BIN       control/disk/
-	-sudo cp ../gui/beige/bin/FILEMAN.BIN      control/disk/
-	-sudo cp ../gui/beige/bin/CMDLINE.BIN      control/disk/
-	-sudo cp ../gui/attitude/bin/BROWSER.BIN   control/disk/
-#games
+#gramland
+	-sudo cp ../gramland/burgundy/bin/GWSSRV.BIN    control/disk/
+	#-sudo cp ../gramland/burgundy/bin/GWS.BIN      control/disk/
+	-sudo cp ../gramland/burgundy/bin/GDM.BIN       control/disk/
+	-sudo cp ../gramland/burgundy/bin/GDM2.BIN      control/disk/
+	-sudo cp ../gramland/blue/bin/TERMINAL.BIN      control/disk/
+	-sudo cp ../gramland/beige/bin/EDITOR.BIN       control/disk/
+	-sudo cp ../gramland/beige/bin/FILEMAN.BIN      control/disk/
+	-sudo cp ../gramland/beige/bin/CMDLINE.BIN      control/disk/
+	-sudo cp ../gramland/attitude/bin/BROWSER.BIN   control/disk/
+#meta
 #todo: Add the games and demos, not the engines.
-	-sudo cp ../games/bin/*.BIN   control/disk/
+	-sudo cp ../meta/bin/*.BIN   control/disk/
 
 	@echo "~exposed-tier"
 #===================================================

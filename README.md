@@ -56,10 +56,9 @@ This repository has the source code for:
 
 ```bash
 $ make
-$ cd kernel
+$ cd base
 $ ./run
 ```
-
 
 The old versions were tested for a long period of time on my 
 real machine. A Gigabyte/Intel Core 2 Duo/Chipset VIA.

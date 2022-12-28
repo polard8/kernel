@@ -47,6 +47,8 @@ This repository has the source code for:
 ## Testing
 
 ```
+	$ make
+	$ cd base
 	$ ./run
 	$ make qemu-test
 ```

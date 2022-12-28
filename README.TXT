@@ -1,12 +1,12 @@
 
-    games   - (D) Games.
-    gui/    - (A) Gramado Window System. (Window server and clients). (DE).
-    kernel/ - (E) Boot loader, kernel and commands. 
+    meta      - (D) Games.
+    gramland/ - (A) Gramado Window System. (Window server and clients). (DE).
+    base/     - (E) Boot loader, kernel and commands. 
 
 Build:
     Type 'make'
 Clear the mess:
     Go into the 'kernel' directory and type 'make clean-all'
 Running:
-    Go to kernel/ folder and type './run' or './runkvm'	
+    Go into the base/ folder and type './run' or './runkvm'
     
