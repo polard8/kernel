@@ -1,17 +1,16 @@
 
+// packet.h
+
 #ifndef __PACKET__
-#define __PACKET__
+#define __PACKET__    1
 
-
- // Socket packets.
- // Usados na troca de mensgens via socket.
- 
+// Socket packets.
+// Usados na troca de mensgens via socket.
 // # Podemos usar esse esquema em todos os servidores.
 // então isso deverá ir para bibliotecas.
 // Isso foi baseado nos tipos de pacotes usados pelo
 // x window server.
 // See: https://en.wikipedia.org/wiki/X_Window_System_protocols_and_architecture
-
 /*
     Request: 
         the client requests information from the server or 
@@ -29,16 +28,10 @@
     request may not be sent immediately. 
  */
 
-#define SERVER_PACKET_TYPE_REQUEST    1000 
-#define SERVER_PACKET_TYPE_REPLY      1001 
-#define SERVER_PACKET_TYPE_EVENT      1002
-#define SERVER_PACKET_TYPE_ERROR      1003
-
+#define SERVER_PACKET_TYPE_REQUEST  1000 
+#define SERVER_PACKET_TYPE_REPLY    1001 
+#define SERVER_PACKET_TYPE_EVENT    1002
+#define SERVER_PACKET_TYPE_ERROR    1003
 
 #endif  
 
-
-
-
-
- 

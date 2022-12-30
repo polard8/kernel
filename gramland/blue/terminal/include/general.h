@@ -1,10 +1,9 @@
-/* 
- general.h 
- -- defines that everybody likes to use. 
- */
+
+// general.h 
+// -- defines that everybody likes to use.
 
 #ifndef _GENERAL_
-#define _GENERAL_
+#define _GENERAL_    1
 
 //#ifndef NULL
 //#define NULL 0x0
@@ -50,4 +49,7 @@
 
 //typedef sighandler SigHandler ();
 
-#endif  /* _GENERAL_ */
+#endif    
+
+
+

@@ -271,14 +271,16 @@ on_keyboard_event(
     unsigned long long2 )
 {
     struct gws_window_d *w;
+    unsigned long Result=0;
+
+    if (msg<0){
+        return 0;
+    }
 
 // Window with focus.
-    //w = (struct gws_window_d *) get_focus();
-    
-    //#maybe
-    //if(!w){ w=get_active(); }
-    
-    w = (void*) keyboard_owner;
+// keyboard_owner
+    //w = (void*) keyboard_owner;
+    w = (struct gws_window_d *) get_focus();
     if ( (void*) w == NULL ){
         printf("on_keyboard_event: w\n");
         return 0;
@@ -288,14 +290,14 @@ on_keyboard_event(
         return 0;
     }
 
-    //keyboard_owner = (void*) w;
-    //WindowManager
+    Result = 
+        (unsigned long) wmProcedure(
+                            (struct gws_window_d *) w,
+                            (int) msg,
+                            (unsigned long) long1,
+                            (unsigned long) long2 ); 
 
-    return (unsigned long) wmProcedure(
-                               (struct gws_window_d *) w,
-                               (int) msg,
-                               (unsigned long) long1,
-                               (unsigned long) long2 ); 
+    return (unsigned long) Result;
 }
 
 
@@ -311,25 +313,27 @@ static void on_mouse_event(int event_type, long x, long y)
     struct gws_window_d *w;
     unsigned long in_x=0;
     unsigned long in_y=0;
+    register int Tail=0;
 
 // Error. Nothing to do.
-    if(event_type<0)
-        return;
-
-    w = (struct gws_window_d *) get_focus();
-    if( (void*) w==NULL ){
+    if (event_type<0){
         return;
     }
 
-    //#todo
-    //if(w->magic != 1234)
-        //return;
+    w = (struct gws_window_d *) get_focus();
+    if ( (void*) w==NULL ){
+        return;
+    }
+    if (w->magic!=1234){
+        printf("on_mouse_event: w magic\n");
+        return;
+    }
 
 // Is it inside the window with focus?
-    if( x >= w->left &&
-        x <= w->right &&
-        y >= w->top &&
-        y <= w->bottom )
+    if ( x >= w->left &&
+         x <= w->right &&
+         y >= w->top &&
+         y <= w->bottom )
     {
         // Values inside the window.
         in_x = (unsigned long) (x - w->left);
@@ -339,10 +343,12 @@ static void on_mouse_event(int event_type, long x, long y)
         // inside the window with focus.
         if (w->type == WT_EDITBOX_MULTIPLE_LINES)
         {
-            if(in_x>0)
-                w->ip_x = in_x/8;
-            if(in_y>0)
-                w->ip_y = in_y/8;
+            if (in_x>0){
+                w->ip_x = (in_x/8);
+            }
+            if (in_y>0){
+                w->ip_y = (in_y/8);
+            }
         }
 
 // data
@@ -353,16 +359,18 @@ static void on_mouse_event(int event_type, long x, long y)
         w->single_event.has_event = TRUE;
 
         // ---------------
-        int Tail = (int) w->ev_tail;
+        Tail = (int) w->ev_tail;
         w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
         w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
         w->ev_long1[Tail] = (unsigned long) in_x;  //x - w->left; 
         w->ev_long2[Tail] = (unsigned long) in_y;  //y - w->top;
         w->ev_tail++;
-        if(w->ev_tail>=32)
+        if (w->ev_tail>=32){
             w->ev_tail=0;
-            return;
         }
+
+        return;
+    }
 //fail
     w->single_event.has_event = FALSE;
 }
@@ -375,9 +383,10 @@ static void on_update_window(int event_type)
 {
 // Window with focus.
     struct gws_window_d *w;
+    register int Tail=0;
 
 // Error. Nothing to do.
-    if(event_type<0){
+    if (event_type<0){
         return;
     }
 
@@ -398,7 +407,7 @@ static void on_update_window(int event_type)
     w->single_event.has_event = TRUE;
 
 // ---------------
-    int Tail = (int) w->ev_tail;
+    Tail = (int) w->ev_tail;
     w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
     w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
     w->ev_long1[Tail] = (unsigned long) 0; 
@@ -414,32 +423,37 @@ int control_action(int msg, unsigned long long1)
 {
     struct gws_window_d *aw;
     struct gws_window_d *w;
-
     int minimize_wid =-1;
     int maximize_wid =-1;
     int close_wid=-1;
 
-    if(msg<0)
+    if (msg<0){
         return -1;
+    }
 
 // -----------------------
-// overlapped window
+// Overlapped window
     aw = (void*) get_active_window();
-    if ( (void*) aw == NULL )
+    if ( (void*) aw == NULL ){
         return -1;
-    if(aw->magic!=1234)
+    }
+    if (aw->magic!=1234){
         return -1;
+    }
 
 // -----------------------
 // titlebar
     w = (void*) aw->titlebar;
-    if ( (void*) w == NULL )
+    if ( (void*) w == NULL ){
         return -1;
-    if(w->magic!=1234)
+    }
+    if (w->magic!=1234){
         return -1;
+    }
 
-    if (w->Controls.initialized != TRUE)
+    if (w->Controls.initialized != TRUE){
         return -1;
+    }
 
 // Get IDs.
     minimize_wid = (int) w->Controls.minimize_wid;
@@ -448,22 +462,19 @@ int control_action(int msg, unsigned long long1)
     
     switch (msg){
     case GWS_SysKeyDown:
-        if(long1==VK_F9)
-        {
+        if (long1==VK_F9){
             //printf("F9\n");
             set_status_by_id(minimize_wid,BS_PRESSED);
             redraw_window_by_id(minimize_wid,TRUE);
             return 0;
         }
-        if(long1==VK_F10)
-        {
+        if (long1==VK_F10){
             //printf("F10\n");
             set_status_by_id(maximize_wid,BS_PRESSED);
             redraw_window_by_id(maximize_wid,TRUE);
             return 0;
         }
-        if(long1==VK_F11)
-        {
+        if (long1==VK_F11){
             //printf("F11\n");
             set_status_by_id(close_wid,BS_PRESSED);
             redraw_window_by_id(close_wid,TRUE);
@@ -472,22 +483,19 @@ int control_action(int msg, unsigned long long1)
         return 0;
         break;
     case GWS_SysKeyUp:
-        if(long1==VK_F9)
-        {
+        if (long1==VK_F9){
             //printf("F9\n");
             set_status_by_id(minimize_wid,BS_RELEASED);
             redraw_window_by_id(minimize_wid,TRUE);
             return 0;
         }
-        if(long1==VK_F10)
-        {
+        if (long1==VK_F10){
             //printf("F10\n");
             set_status_by_id(maximize_wid,BS_RELEASED);
             redraw_window_by_id(maximize_wid,TRUE);
             return 0;
         }
-        if(long1==VK_F11)
-        {
+        if (long1==VK_F11){
             //printf("F11\n");
             set_status_by_id(close_wid,BS_RELEASED);
             redraw_window_by_id(close_wid,TRUE);
@@ -501,75 +509,79 @@ int control_action(int msg, unsigned long long1)
     return -1;
 }
 
-
 void show_client( struct gws_client_d *c, int tag )
 {
-    if( (void*) c == NULL )
+    if ( (void*) c == NULL ){
         return;
-    if(c->magic!=1234)
+    }
+    if (c->magic!=1234){
         return;
+    }
 
-    if(tag<0)
+    if (tag<0){
         return;
-    if(tag >= 4)
+    }
+    if (tag >= 4){
         return;
+    }
 
 // This client doesn't belong to this tag.
-    if( c->tags[tag] != TRUE )
+    if ( c->tags[tag] != TRUE ){
         return;
+    }
 
-
-    if(c->window < 0)
+    if (c->window < 0){
         return;
-    if(c->window >= WINDOW_COUNT_MAX)
+    }
+    if (c->window >= WINDOW_COUNT_MAX){
         return;
+    }
 
 // Show
-    if(c->window == WT_OVERLAPPED)
+    if (c->window == WT_OVERLAPPED){
         redraw_window_by_id(c->window,TRUE);
+    }
 
 // Show next.
     //show_client(c->next,tag);
 }
 
-
- //#todo: notworking
+//#todo: networking
 void show_client_list(int tag)
 {
     struct gws_client_d *c;
-    
+
     c = (struct gws_client_d *) first_client;
-    
-    while(1)
-    {
-        if( (void*) c == NULL )
+    while (1){
+        if ( (void*) c == NULL ){
             break;
-            
-        if( (void*) c != NULL )
+        }
+        if ( (void*) c != NULL ){
             show_client(c,tag);
-        
+        }
         c = (struct gws_client_d *) c->next;
     };
 }
 
-
- //#todo: not teste yet
+//#todo: Not teste yet.
 struct gws_client_d *wintoclient(int window)
 {
     struct gws_client_d *c;
-    int i=0;
+    //int i=0;
 
-    if(window<0)
+    if (window<0){
         return NULL;
-    if(window>=WINDOW_COUNT_MAX)
+    }
+    if (window>=WINDOW_COUNT_MAX){
         return NULL;
-    
+    }
+
     c = (struct gws_client_d *) first_client;
-    while( (void*) c != NULL )
+    while ( (void*) c != NULL )
     {
-        if(c->magic == 1234 )
+        if (c->magic == 1234)
         {
-            if( c->window == window ){
+            if (c->window == window){
                 return (struct gws_client_d *) c;
             }
         }
@@ -623,7 +635,6 @@ void wmInitializeStructure(void)
 // orientation
     WindowManager.vertical = FALSE;   // horizontal. default
     //WindowManager.vertical = TRUE;
-
 // How many frames until now.
     WindowManager.frame_counter = 0;
     WindowManager.fps = 0;
@@ -632,13 +643,15 @@ void wmInitializeStructure(void)
     WindowManager.root = NULL;
     if ( (void*) __root_window != NULL ){
         if ( __root_window->magic == 1234 ){
-            WindowManager.root = (struct gws_window_d *) __root_window;
+            WindowManager.root = 
+                (struct gws_window_d *) __root_window;
         }
     }
     WindowManager.taskbar = NULL;
     if ( (void*) taskbar_window != NULL ){
         if ( taskbar_window->magic == 1234 ){
-            WindowManager.taskbar = (struct gws_window_d *) taskbar_window;
+            WindowManager.taskbar = 
+                (struct gws_window_d *) taskbar_window;
         }
     }
 
@@ -794,11 +807,10 @@ __draw_button_borders(
     unsigned int color2_light,
     unsigned int outer_color )
 {
-
-    // #test
-    // size in pizels de apenas 1/3 de todo o size.
+// #test
+// Size in pizels de apenas 1/3 de todo o size.
     unsigned long BorderSize = 1;
-    // Isso deve ser o total.
+// Isso deve ser o total.
     //window->border_size = ?
 
     //debug_print("__draw_button_borders:\n");
@@ -968,19 +980,19 @@ void do_create_controls(struct gws_window_d *window)
         //gwssrv_debug_print ("xx: minimize fail \n");
         return;
     }
-    if(minimize->magic!=1234)
+    if (minimize->magic!=1234){
         return;
-    
+    }
+
     minimize->type = WT_BUTTON;
     minimize->isMinimizeControl = TRUE;
-    
+
     id = RegisterWindow(minimize);
     if (id<0){
         gwssrv_debug_print ("xxx: Couldn't register minimize\n");
         return;
     }
     window->Controls.minimize_wid = (int) id;
-
 
 // ================================================
     LastLeft = window->width - (2*PaddingWidth) - (ButtonWidth*2);
@@ -999,8 +1011,9 @@ void do_create_controls(struct gws_window_d *window)
         //gwssrv_debug_print ("xx: maximize fail \n");
         return;
     }
-    if(maximize->magic!=1234)
+    if (maximize->magic!=1234){
         return;
+    }
 
     maximize->type = WT_BUTTON;
     maximize->isMaximizeControl = TRUE;
@@ -1018,7 +1031,7 @@ void do_create_controls(struct gws_window_d *window)
     close = 
         (struct gws_window_d *) CreateWindow ( 
             WT_BUTTON, 0, 1, 1, 
-            "X",  //string  
+            "X",       //string  
             LastLeft,  //l 
             Top,       //t 
             ButtonWidth, 
@@ -1029,8 +1042,9 @@ void do_create_controls(struct gws_window_d *window)
         //gwssrv_debug_print ("xx: close fail \n");
         return;
     }
-    if(close->magic!=1234)
+    if (close->magic!=1234){
         return;
+    }
 
     close->type = WT_BUTTON;
     close->isCloseControl = TRUE;
@@ -1055,13 +1069,13 @@ __draw_window_border(
     struct gws_window_d *parent, 
     struct gws_window_d *window )
 {
-    //debug_print("__draw_window_border:\n");
 
-    if ( (void*) parent == NULL )
+    if ( (void*) parent == NULL ){
         return;
-
-    if ( (void*) window == NULL )
+    }
+    if ( (void*) window == NULL ){
         return;
+    }
 
 // Editbox
     if ( window->type == WT_EDITBOX || 
@@ -1174,18 +1188,14 @@ __draw_window_border(
         //window->top    += window->border_size;
         //window->right  -= window->border_size;
         //window->bottom -= window->border_size;
-
     }
 }
 
 
 /*
  * wmCreateWindowFrame:
- * 
  */
-
 // Called by CreateWindow in createw.c
-
 // #importante:
 // Essa rotina será chamada depois que criarmos uma janela básica,
 // mas só para alguns tipos de janelas, pois nem todos os tipos 
@@ -1200,7 +1210,6 @@ __draw_window_border(
 // Estilo do frame:
 // Dependendo do estilo do frame, podemos ou nao criar a caption bar.
 // Por exemplo: Uma editbox tem um frame mas não tem uma caption bar.
-
 // IN:
 // parent = parent window ??
 // window = The window where to build the frame.
@@ -1209,7 +1218,6 @@ __draw_window_border(
 // width
 // height
 // style = Estilo do frame.
-
 // OUT:
 // 0   = ok, no erros;
 // < 0 = not ok. something is wrong.
@@ -1239,34 +1247,25 @@ wmCreateWindowFrame (
 // x,y,width,height 
 // não estão sendo usados.
 
-
 // Overlapped.
 // Janela de aplicativos.
 
 // Title bar and status bar.
     struct gws_window_d  *tbWindow;
     struct gws_window_d  *sbWindow;
-
     int id=-1;  //usado pra registrar janelas filhas.
-
     int Type=0;
-
-
 // Border size
     unsigned long BorderSize = (border_size & 0xFFFF);
-
 // Border color
     unsigned int BorderColor1 = border_color1;  // top/left
     unsigned int BorderColor2 = border_color2;  // right/bottom
     unsigned int BorderColor3 = border_color3;
-
 // Ornament color
     unsigned int OrnamentColor1 = ornament_color1;
     unsigned int OrnamentColor2 = ornament_color2;
-
 // Title bar height
     unsigned long TitleBarHeight = METRICS_TITLEBAR_DEFAULT_HEIGHT;
-
 // Title bar color.
     unsigned int TitleBarColor = COLOR_BLUE1;   // Light blue (Um pouco fosco) 
     //unsigned long TitleBarColor = 0x001473E6;  // Claro.  
@@ -1277,9 +1276,6 @@ wmCreateWindowFrame (
     //unsigned long Y = (y & 0xFFFF);
     //unsigned long Width = (width & 0xFFFF);
     //unsigned long Height = (height & 0xFFFF);
-
-// #debug
-    //gwssrv_debug_print ("wmCreateWindowFrame:\n");
 
 // #todo
 // Se estamos minimizados ou a janela mãe está minimizada,
@@ -1294,26 +1290,25 @@ wmCreateWindowFrame (
 // check parent
 
     if ( (void*) parent == NULL ){
-        gwssrv_debug_print ("wmCreateWindowFrame: [FAIL] parent\n");
+        //gwssrv_debug_print ("wmCreateWindowFrame: [FAIL] parent\n");
         return -1;
     }
 
-    if (parent->used != TRUE || parent->magic != 1234)
+    if (parent->used != TRUE || parent->magic != 1234){
         return -1;
+    }
 
 // check window
-
     if ( (void*) window == NULL ){
-        gwssrv_debug_print ("wmCreateWindowFrame: [FAIL] window\n");
+        //gwssrv_debug_print ("wmCreateWindowFrame: [FAIL] window\n");
         return -1;
     }
-
-    if (window->used != TRUE || window->magic != 1234)
+    if (window->used != TRUE || window->magic != 1234){
         return -1;
+    }
 
 // #bugbug
 // Estamos mascarando pois os valores anda corrompendo.
-
     window->left   = (window->left   & 0xFFFF);
     window->top    = (window->top    & 0xFFFF);
     window->width  = (window->width  & 0xFFFF);
@@ -1362,7 +1357,7 @@ wmCreateWindowFrame (
     //default: break;
     };
 
-    if ( useFrame == FALSE ){
+    if (useFrame == FALSE){
         gwssrv_debug_print ("wmCreateWindowFrame: [ERROR] This type does not use a frame.\n");
         return -1;
     }
@@ -1385,7 +1380,7 @@ wmCreateWindowFrame (
         // ou criar uma rotina para mudar as caracteristicas da borda.
          
         // Se tiver o foco.
-        if ( window->focus == TRUE ){
+        if (window->focus == TRUE){
             BorderColor1 = COLOR_BLUE;
             BorderColor2 = COLOR_BLUE;
             BorderSize = 2;
@@ -1446,7 +1441,7 @@ wmCreateWindowFrame (
         // It also has a border style.
 
         // Se tiver o foco.
-        if ( window->focus == TRUE ){
+        if (window->focus == TRUE){
             BorderColor1 = COLOR_BLUE1;
             BorderColor2 = COLOR_BLUE1;
         }else{
@@ -1571,7 +1566,6 @@ wmCreateWindowFrame (
             // à janela é consistente por questão de estilo.
             // See: bmp.c
             // IN: index, left, top.
-
             window->titlebarHasIcon = FALSE;
             
             // Icon ID:
@@ -1583,9 +1577,7 @@ wmCreateWindowFrame (
             // and display it directly into the framebuffer. 
             // IN: index, left, top
             // see: bmp.c
-
-            if (useIcon == TRUE)
-            {
+            if (useIcon == TRUE){
                 window->titlebarHasIcon = TRUE;
                 gwssrv_display_system_icon( 
                     (int) window->frame.titlebar_icon_id, 
@@ -1640,8 +1632,7 @@ wmCreateWindowFrame (
 
             unsigned long sbTop = 0;
             unsigned long sbWidth = 8;
-            if ( (void*) window->parent != NULL )
-            {
+            if ( (void*) window->parent != NULL ){
                 sbTop = 
                 (unsigned long) (window->rcClient.height - window->statusbar_height);
                 sbWidth = 
@@ -1696,31 +1687,26 @@ wmCreateWindowFrame (
     //button
     if (Type == WT_BUTTON)
     {
-        gwssrv_debug_print ("wmCreateWindowFrame: [TODO] frame for button\n");
-        
+        //gwssrv_debug_print ("wmCreateWindowFrame: [TODO] frame for button\n");
         //todo frame or not
-        //just like the edit box.   
-        
+        //just like the edit box.
         // ok     
         return 0;
     }
 
-// ===============================================
-
     return 0;
 }
 
-
 void wm_flush_rectangle(struct gws_rect_d *rect)
 {
-    if( (void*) rect == NULL )
+    if ( (void*) rect == NULL ){
         return;
-    if(rect->magic!=1234)
+    }
+    if (rect->magic!=1234){
         return;
-
+    }
     gwssrv_refresh_this_rect(rect);
 }
-
 
 // Change the root window color and reboot.
 void wm_reboot(void)
@@ -1750,7 +1736,6 @@ void wm_flush_screen(void)
     gwssrv_show_backbuffer();
 }
 
-
 // Refresh screen via kernel.
 // Copy the backbuffer in the frontbuffer(lfb).
 // #??
@@ -1777,7 +1762,6 @@ wmCompose(
     compose();
 }
 
-
 /*
 // Marca como 'dirty' todas as janelas filhas,
 // dai o compositor faz o trabalho de exibir na tela.
@@ -1791,7 +1775,6 @@ void refresh_subwidnows( struct gws_window_d *w )
 /*
  * wmRefreshDirtyRectangles: 
  */
-
 // Called by compose().
 // O compositor deve ser chamado para compor um frame 
 // logo após uma intervenção do painter, que reaje às
@@ -1883,25 +1866,20 @@ void wmRefreshDirtyRectangles(void)
         {
             if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
-                if ( tmp->dirty == TRUE )
+                if (tmp->dirty == TRUE)
                 {
                     //Wrappers
                     //wm_flush_window(tmp);       //checking parameters
                     //gws_show_window_rect(tmp);  //checking parameters and invalidate.
-
                     // Direct, no checks.
                     gws_refresh_rectangle ( 
                         tmp->left, tmp->top, tmp->width, tmp->height ); 
-
                     validate_window(tmp);
                 }
             }
         }
     };
-
-// =======================
 }
-
 
 // #bugbug
 // This name is wrong.
@@ -1914,20 +1892,23 @@ void flush_frame(void)
 
 static void animate_window( struct gws_window_d *window )
 {
-    int i=0;
-    
-    if( (void*) window == __root_window)
+    register int i=0;
+
+    if ( (void*) window == __root_window){
         return;
-    if(window->magic!=1234)
+    }
+    if (window->magic!=1234){
         return;
+    }
     
     for (i=0; i<800; i++)
     {
-         if( (window->left - 1) == 0)
+         if ( (window->left - 1) == 0){
              return;
-         if( (window->top - 1) == 0)
+         }
+         if ( (window->top - 1) == 0){
              return;
-
+         }
          gwssrv_change_window_position(
               window, 
               window->left -1, 
@@ -2009,8 +1990,9 @@ static void __Tile(void)
 
     i=0;
 
-    if (cnt<=0)
+    if (cnt<=0){
         return;
+    }
 
     while ((void*)w != NULL)
     {
@@ -2022,7 +2004,7 @@ static void __Tile(void)
         if (WindowManager.mode == WM_MODE_TILED)
         {
             // Horizontal
-            if(WindowManager.vertical==FALSE)
+            if (WindowManager.vertical==FALSE)
             {
                 // for titlebar color support.
                 // not the active window.
@@ -2087,7 +2069,7 @@ static void __Tile(void)
             }
 
             // Vertical.
-            if(WindowManager.vertical==TRUE)
+            if (WindowManager.vertical==TRUE)
             {
                 //#todo:
                 //w->height = WindowManager.wa_height; 
@@ -2102,7 +2084,6 @@ static void __Tile(void)
     };
 }
 
-
 // #todo
 // Explain it better.
 void wm_update_window_by_id(int wid)
@@ -2115,10 +2096,13 @@ void wm_update_window_by_id(int wid)
     //redraw_window(__root_window,TRUE);
 
 // wid
-    if(wid<0)
+    if (wid<0){
         return;
-    if(wid>=WINDOW_COUNT_MAX)
-        return;  
+    }
+    if (wid>=WINDOW_COUNT_MAX){
+        return;
+    }
+
 // Window structure
     w = (struct gws_window_d *) windowList[wid];
     if ( (void*)w==NULL )  { return; }
@@ -2129,14 +2113,15 @@ void wm_update_window_by_id(int wid)
         return;
     }
 
-    // #test
-    // Empilhando verticalmente.
-    if( WindowManager.initialized != TRUE )
+// #test
+// Empilhando verticalmente.
+    if ( WindowManager.initialized != TRUE ){
         return;
+    }
 
-// tiled mode.
+// Tiled mode.
 // Esses metodos irao atualizar tambem os valores da barra de titulos.
-    if(WindowManager.mode == WM_MODE_TILED){
+    if (WindowManager.mode == WM_MODE_TILED){
         gwssrv_change_window_position(w,0,0);
         gws_resize_window(
             w,
@@ -2184,15 +2169,18 @@ void wm_update_window_by_id(int wid)
 
 void wm_update_active_window(void)
 {
-    if ( (void*) active_window == NULL )
+    int wid=-1;
+    if ( (void*) active_window == NULL ){
         return;
-    if (active_window->magic != 1234)
+    }
+    if (active_window->magic != 1234){
         return;
-
-    wm_update_window_by_id( (int) active_window->id );
+    }
+    wid = (int) active_window->id;
+    wm_update_window_by_id(wid);
 }
 
-// vamos gerenciar a janela de cliente
+// Vamos gerenciar a janela de cliente
 // recentemente criada.
 // Precisamos associar essa estrutura de janela
 // com uma estrutura de cliente. 
@@ -2206,67 +2194,72 @@ int wmManageWindow(struct gws_window_d *w)
     struct gws_client_d *tmp;
     register int i=0;
 
-    //yellow_status("wmMan:");
-    
-    if( (void*) w == NULL )
-        goto fail;
-    if(w->magic != 1234)
-        goto fail;
-    if(w->type != WT_OVERLAPPED)
-        goto fail;
 
-    if( (void*) first_client == NULL )
+    if ( (void*) w == NULL ){
         goto fail;
+    }
+    if (w->magic != 1234){
+        goto fail;
+    }
 
+    if (w->type != WT_OVERLAPPED){
+        goto fail;
+    }
+
+    if ( (void*) first_client == NULL ){
+        goto fail;
+    }
+
+// Client structure
     c = (void *) malloc( sizeof( struct gws_client_d ) );
-    if( (void*) c == NULL )
+    if ( (void*) c == NULL ){
         goto fail;
+    }
 
     c->l = w->left;
     c->t = w->top;
     c->w = w->width;
     c->h = w->height;
-
     for (i=0; i<4; i++){
         c->tags[i] = TRUE;
     };
-
     c->pid = w->client_pid;
     c->tid = w->client_tid;
-
     c->used = TRUE;
     c->magic = 1234;
 
-// coloca na lista
+// Insert it into the list.
+
     tmp = (struct gws_client_d *) first_client;
-    if( (void*) tmp == NULL )
+    if ( (void*) tmp == NULL ){
         goto fail;
-    if( tmp->magic != 1234 )
+    }
+    if (tmp->magic != 1234){
         goto fail;
-    
-    while(1){
-        // found
-        if( (void*) tmp->next == NULL )
+    }
+
+    while (1){
+        // Found
+        if ( (void*) tmp->next == NULL ){
             break;
-        // next
+        }
+        // Next
         tmp = (struct gws_client_d *) tmp->next; 
     };
 
-    if( tmp->magic != 1234 )
+    if ( tmp->magic != 1234 ){
         goto fail;
+    }
 
     tmp->next = (struct gws_client_d *) c;
 
-    //yellow_status("done");
     return 0;
 
 fail:
     yellow_status("wmManageWindow");
     printf("wmManageWindow: fail\n");
     return -1;
-    //while(1){}
 }
-
 
 // Repinta todas as janelas seguindo a ordem da lista
 // que está em last_window.
@@ -2302,32 +2295,29 @@ void wm_update_desktop(int tile)
         invalidate_window(__root_window);
         return; 
     }
-    if (w->magic!=1234)
+    if (w->magic!=1234){
         return;
+    }
 
 // This is the last valid for now.
     l = (struct gws_window_d *) w;
 
     while(1){
 
-        if((void*)w==NULL){ 
+        if ((void*)w==NULL){ 
             break; 
         }
 
         if ( (void*) w != NULL )
         {
             // Only overlapped windows.
-            if (w->type == WT_OVERLAPPED)
-            {
+            if (w->type == WT_OVERLAPPED){
                 // This is the last valid for now.
                 l = (struct gws_window_d *) w;
-                
                 // Redraw, but do no show it.
                 redraw_window(w,FALSE);
-
                 // paint the childs of the window with focus.
                 on_update_window(GWS_Paint);
-                
                 //invalidate_window(w);
             }
         }
@@ -2414,11 +2404,11 @@ struct gws_window_d *get_focus(void)
     struct gws_window_d *w;
 
     w = (struct gws_window_d *) keyboard_owner;
-    if( (void*)w==NULL ){
+    if ( (void*)w==NULL ){
         return NULL;
     }
-    if(w->used!=TRUE) { return NULL; }
-    if(w->magic!=1234){ return NULL; }
+    if (w->used!=TRUE) { return NULL; }
+    if (w->magic!=1234){ return NULL; }
 
     return (struct gws_window_d *) w; 
 }
@@ -2428,10 +2418,12 @@ void set_status_by_id( int wid, int status )
     struct gws_window_d *w;
 
 // wid
-    if(wid<0)
+    if (wid<0){
         return;
-    if(wid>=WINDOW_COUNT_MAX)
-        return;  
+    }
+    if (wid>=WINDOW_COUNT_MAX){
+        return;
+    }
 // Window structure
     w = (struct gws_window_d *) windowList[wid];
     if ((void*)w==NULL){
@@ -2449,10 +2441,13 @@ void set_focus_by_id(int wid)
     struct gws_window_d *w;
 
 // wid
-    if(wid<0)
+    if (wid<0){
         return;
-    if(wid>=WINDOW_COUNT_MAX)
-        return;  
+    }
+    if (wid >= WINDOW_COUNT_MAX){
+        return;
+    }
+
 // Window structure
     w = (struct gws_window_d *) windowList[wid];
     if ((void*)w==NULL){
@@ -2476,7 +2471,7 @@ struct gws_window_d *get_first_window(void)
 
 void set_last_window( struct gws_window_d *window )
 {
-    if( (void*) window == NULL ){
+    if ( (void*) window == NULL ){
          return;
     }
     if (window->magic!=1234){ return; }
@@ -2492,35 +2487,41 @@ struct gws_window_d *get_last_window(void)
 void activate_first_window(void)
 {
 // Structure validation
-    if( (void*) first_window == NULL )
+    if ( (void*) first_window == NULL ){
         return;
-    if (first_window->used != TRUE)
+    }
+    if (first_window->used != TRUE){
         return;
-    if (first_window->magic != 1234)
+    }
+    if (first_window->magic != 1234){
         return;
+    }
 // Type validation
-    if (first_window->type != WT_OVERLAPPED)
+    if (first_window->type != WT_OVERLAPPED){
         return;
-// Set.
+    }
+// Set
     set_active_window(first_window);
 }
 
 void activate_last_window(void)
 {
 // Structure validation
-    if( (void*) last_window == NULL )
+    if ( (void*) last_window == NULL ){
         return;
+    }
     if (last_window->used != TRUE) { return; }
     if (last_window->magic != 1234){ return; }
 // Type validation
-    if (last_window->type != WT_OVERLAPPED)
+    if (last_window->type != WT_OVERLAPPED){
         return;
+    }
 // Set
     set_active_window(last_window);
 }
 
 // The list starts with first_window.
-void wm_add_window_into_the_list( struct gws_window_d *window )
+void wm_add_window_into_the_list(struct gws_window_d *window)
 {
     struct gws_window_d  *Next;
 
@@ -2530,12 +2531,15 @@ void wm_add_window_into_the_list( struct gws_window_d *window )
 // ========================
 
 // Structure validation
-    if( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
-    if (window->used != TRUE)
+    }
+    if (window->used != TRUE){
         return;
-    if (window->magic != 1234)
+    }
+    if (window->magic != 1234){
         return;
+    }
 // Type validation
     if (window->type != WT_OVERLAPPED){
         return;
@@ -2544,17 +2548,16 @@ void wm_add_window_into_the_list( struct gws_window_d *window )
 // =====================================
 // Se não existe uma 'primeira da fila'.
 // Então somos a primeira e a última.
-    if( (void*) first_window == NULL )
-    {
+    if ( (void*) first_window == NULL ){
         first_window = window;
-        last_window  = window;
+        last_window = window;
         goto done;
     }
 
 // Invalid first window.
     if ( first_window->magic != 1234 ){
         first_window = window;
-        last_window  = window;
+        last_window = window;
         goto done;
     }
 
@@ -2569,11 +2572,10 @@ void wm_add_window_into_the_list( struct gws_window_d *window )
     Next->next  = (struct gws_window_d *) window;
 
 done:
-    last_window  = (struct gws_window_d *) window;
+    last_window = (struct gws_window_d *) window;
     window->next = NULL;
     set_active_window(window);
 }
-
 
 // not tested yet
 void wm_remove_window_from_list_and_kill( struct gws_window_d *window)
@@ -2581,37 +2583,37 @@ void wm_remove_window_from_list_and_kill( struct gws_window_d *window)
     struct gws_window_d *w;
     struct gws_window_d *pick_this_one;
 
-    if( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
+    }
 
     w = (struct gws_window_d *) first_window;
-
-    if( (void*) w == NULL )
+    if ( (void*) w == NULL ){
         return;
+    }
 
     while(1)
     {
-        if( (void*) w == NULL )
+        if ( (void*) w == NULL ){
             break;
+        }
 
-        if(w==window)
+        if (w == window)
         {
-            // remove
+            // Remove
             pick_this_one = (struct gws_window_d *) w;
-            
             // Glue the list.
             w = w->next;
-            
             // Kill
             pick_this_one->used = FALSE;
             pick_this_one->magic = 0;
             pick_this_one = NULL;
             break;
         }
+
         w = w->next;
     };
 }
-
 
 // ====================
 
@@ -2651,7 +2653,6 @@ DEC	HEX	CHARACTER
 31	1F	UNIT SEPARATOR (US) DOWN ARROW
 */
 
-
 void 
 wm_draw_char_into_the_window(
     struct gws_window_d *window, 
@@ -2665,10 +2666,12 @@ wm_draw_char_into_the_window(
     int is_control=FALSE;
 
 // Invalid window
-    if ((void*)window == NULL)
+    if ((void*)window == NULL){
         return;
-    if (window->magic != 1234)
+    }
+    if (window->magic != 1234){
         return;
+    }
 // Invalid char
     if (ch<0){
         return;
@@ -2718,15 +2721,14 @@ wm_draw_char_into_the_window(
 // TAB
 // (control=0x0F)
 // O ALT esta pressionado?
-    if (ch == VK_TAB)
+    if (ch==VK_TAB)
     {
         window->ip_x += 8;
         //#todo limits
         if (window->ip_x >= window->width_in_chars)
         {
             window->ip_x = 0;
-            if (window->type == WT_EDITBOX_MULTIPLE_LINES)
-            {
+            if (window->type == WT_EDITBOX_MULTIPLE_LINES){
                 window->ip_y++;
                 //#todo
                 //if(window->ip_y >= window->height_in_bytes)
@@ -2743,7 +2745,6 @@ wm_draw_char_into_the_window(
         return;
     }
 
-
 // Not printable.
 // 32~127
 // A=41h | a=61H
@@ -2756,7 +2757,7 @@ wm_draw_char_into_the_window(
     if (ascii < 0x20 || ascii >= 0x7F )
     {
         // Control char
-        if(ascii < 0x20 || ascii == 0x7F ){
+        if (ascii < 0x20 || ascii == 0x7F ){
             is_control = TRUE;
         }
         return;
@@ -2767,11 +2768,11 @@ wm_draw_char_into_the_window(
    _string[1] = 0;
 
 // types
-    if( window->type == WT_OVERLAPPED ){ return; }
-    if( window->type == WT_SCROLLBAR ) { return; }
-    if( window->type == WT_STATUSBAR ) { return; }
-    if( window->type == WT_CHECKBOX )  { return; }
-    if( window->type == WT_BUTTON )    { return; }
+    if (window->type == WT_OVERLAPPED){ return; }
+    if (window->type == WT_SCROLLBAR) { return; }
+    if (window->type == WT_STATUSBAR) { return; }
+    if (window->type == WT_CHECKBOX)  { return; }
+    if (window->type == WT_BUTTON)    { return; }
     // ...
 
 // #todo
@@ -2987,10 +2988,10 @@ void __probe_tb_button_hover(long long1, long long2)
     int max=4; // We have 4 buttons in the taskbar.
     struct gws_window_d *w;  // The window for a button.
 
-    if(WindowManager.initialized!=TRUE){
+    if (WindowManager.initialized!=TRUE){
         return;
     }
-    if(WindowManager.is_fullscreen==TRUE){
+    if (WindowManager.is_fullscreen==TRUE){
         return;
     }
 
@@ -3644,7 +3645,7 @@ wmHandler(
 // #debug
 //    debug_print ("wmHandler:-----------------------------\n");
 
-   if( g_handler_flag != TRUE ){
+   if (g_handler_flag != TRUE){
        return 0;
    }
 
@@ -3723,13 +3724,10 @@ wmHandler(
 // ==============================================
 
 // Data
-
     long1 = (unsigned long) arg3_rdx;
     long2 = (unsigned long) arg4_rcx;
 
-//
 // Calling wmProcedure()
-//
 
     switch (msg){
 
@@ -3788,14 +3786,13 @@ done:
 
 unsigned long wmGetLastInputJiffie(int update)
 {
-    if(update==TRUE){
+    if (update==TRUE){
         last_input_jiffie = (unsigned long) rtl_jiffies();
     }
     return (unsigned long) last_input_jiffie;
 }
 
-
-// read n bytes from stdin
+// Read n bytes from stdin
 int wmSTDINInputReader(void)
 {
     size_t nreads=0;
@@ -3814,8 +3811,8 @@ int wmSTDINInputReader(void)
     {
             g_handler_flag = TRUE;
             wmHandler( 
-                0,             // window pointer
-                GWS_KeyDown,   // msg code
+                0,            // window pointer
+                GWS_KeyDown,  // msg code
                 buffer[i],    // long1
                 buffer[i] );  // long2
             g_handler_flag = FALSE;
@@ -3887,7 +3884,7 @@ int wmInputReader(void)
         // Mensagens de outro tipo 
         // podem ir para outras janelas.
         
-        if(__Status==TRUE)
+        if (__Status==TRUE)
         {
             // #test
             e.msg   = (int)           RTLEventBuffer[1];
@@ -4019,21 +4016,21 @@ int wmInputReader(void)
     return 0;
 }
 
-
 void wm_change_bg_color(unsigned int color, int tile, int fullscreen)
 {
 // Change the custon background color.
     __set_custom_background_color(color);
 
-    if ( (void*) __root_window == NULL )
+    if ( (void*) __root_window == NULL ){
         return;
-    if (__root_window->magic!=1234)
+    }
+    if (__root_window->magic!=1234){
         return;
-
+    }
 // Change
     __root_window->bg_color = (unsigned int) color;
 
-// Validate.
+// Validate
     if (fullscreen){
         wm_exit_fullscreen_mode(tile);
         return;
@@ -4051,10 +4048,11 @@ void wm_enter_fullscreen_mode(void)
 {
     struct gws_window_d *w;
 
-    if (WindowManager.initialized!=TRUE)
+    if (WindowManager.initialized != TRUE){
         return;
+    }
 
-// Last window.
+// Last window
     w = (struct gws_window_d *) last_window;
     if ( (void*) w != NULL ){
         WindowManager.is_fullscreen = TRUE;
@@ -4064,7 +4062,7 @@ void wm_enter_fullscreen_mode(void)
         return;
     }
 
-// First window.
+// First window
     w = (struct gws_window_d *) first_window;
     if ( (void*) w != NULL ){
         WindowManager.is_fullscreen = TRUE;
@@ -4077,35 +4075,32 @@ void wm_enter_fullscreen_mode(void)
 
 void wm_exit_fullscreen_mode(int tile)
 {
-    if (WindowManager.initialized!=TRUE)
+    if (WindowManager.initialized != TRUE){
         return;
-
+    }
     WindowManager.is_fullscreen = FALSE;
     wm_update_desktop(tile);
 }
-
 
 // yellow bar. (rectangle not window)
 // developer status.
 void yellowstatus0(char *string,int refresh)
 {
-    //methods. get with the w.s., not with the system.
+// methods. get with the w.s., not with the system.
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
-
     unsigned long offset_string1 = 8;  //( 8*1 );
     unsigned long offset_string2 = ( 8*5 );
     unsigned long bar_size = w;
-
     struct gws_window_d *aw;
 
 // Validation
     //aw = (struct gws_window_d *) windowList[active_window];
     aw = (void*) active_window;
-    if( (void*) aw == NULL ){
+    if ( (void*) aw == NULL ){
         return;
     }
-    if(aw->magic!=1234){
+    if (aw->magic!=1234){
         return;
     }
 
@@ -4169,15 +4164,13 @@ void yellowstatus0(char *string,int refresh)
     }
 }
 
-
 void yellow_status(char *string)
 {
-    if( (void*)string==NULL ){
+    if ( (void*)string==NULL ){
         return;
     }
     yellowstatus0(string,TRUE);
 }
-
 
 int 
 is_within2 ( 
@@ -4192,8 +4185,9 @@ is_within2 (
 // E se a janela tem janela mae?
 
 // window validation
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return FALSE;
+    }
     if ( window->used != TRUE && window->magic != 1234 ){
         return FALSE;
     }
@@ -4203,8 +4197,9 @@ is_within2 (
 // pw
 // The parent window.
     pw = window->parent;
-    if ( (void*) pw == NULL )
+    if ( (void*) pw == NULL ){
         return FALSE;
+    }
     if ( pw->used != TRUE && pw->magic != 1234 ){
         return FALSE;
     }
@@ -4212,8 +4207,9 @@ is_within2 (
 // w
 // The window itself
     w = window;
-    if ( (void*) w == NULL )
+    if ( (void*) w == NULL ){
         return FALSE;
+    }
     if ( w->used != TRUE && w->magic != 1234 ){
         return FALSE;
     }

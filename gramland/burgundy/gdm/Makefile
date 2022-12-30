@@ -1,10 +1,8 @@
 
 #gdm2 - gramado display manager.
 #gui style.
-
 #history:
 #2019 - Created by Fred Nora.
-
 #todo:
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
@@ -33,32 +31,23 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 LIBC      = ../../libs/rtl/include/
 LIBCOBJ   = ../../libs/rtl/obj
-
 LIBGWS    = ../../libs/libgws/include/
 LIBGWSOBJ = ../../libs/libgws/obj
 
-
-#
 # Objects
-#
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o \
 ioctl.o socket.o \
 gws.o connect.o events.o rw.o    
 
-
 .PHONY: all all-c hello-link finalize clean
 
 all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -I include/ -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
@@ -74,7 +63,6 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
-
 
 	cp $(LIBGWSOBJ)/connect.o .
 	cp $(LIBGWSOBJ)/events.o .

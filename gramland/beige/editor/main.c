@@ -33,20 +33,20 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <packet.h>
 #include <rtl/gramado.h>
 // The client-side library.
 #include <gws.h>
 // Internal
+#include <packet.h>
 #include <editor.h>
 
 //
 // == ports ====================================
 //
 
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
 // ...
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 

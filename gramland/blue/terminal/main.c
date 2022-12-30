@@ -47,7 +47,7 @@
 #define PORTS_NS  4041
 #define PORTS_FS  4042
 // ...
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
+#define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
 // The main structure.
 // see: terminal.h
@@ -97,7 +97,6 @@ static void __winmin(int fd);
 
 //====================================================
 
-
 // #test
 // We sent the message 44888 to the init process
 // and we got the same message back as a response.
@@ -135,11 +134,10 @@ static void __test_message(void)
     {
         if ( rtl_get_event() == TRUE )
         {
-            if  ( RTLEventBuffer[1] == 44888 )
-            {
+            if  ( RTLEventBuffer[1] == 44888 ){
                 printf("terminal.bin: 44888 received | sender=%d receiver=%d\n",
-                  RTLEventBuffer[8],   //sender (the caller)
-                  RTLEventBuffer[9] ); //receiver
+                    RTLEventBuffer[8],   //sender (the caller)
+                    RTLEventBuffer[9] ); //receiver
                 break;
             }
         }
@@ -361,7 +359,6 @@ static inline void do_cli(void)
     asm ("cli");
 }
 
-
 // try execute the filename in the prompt.
 static void __try_execute(int fd)
 {
@@ -414,7 +411,6 @@ static void __try_execute(int fd)
 */
 
 // ==================================
-
 
 //
 // Get filename
@@ -497,13 +493,10 @@ static void __try_execute(int fd)
         }
     }
 
-//
 // clone and execute
-//
 
     if (isInvalidExt == TRUE)
         goto fail;
-
 
 // cmdline:
 // Only if the name is a valid name.
@@ -1283,7 +1276,6 @@ void __test_escapesequence(int fd)
     tputstring(fd, "done :)\n");
 }
 
-
 void tputstring( int fd, char *s )
 {
     size_t StringSize=0;
@@ -1302,7 +1294,6 @@ void tputstring( int fd, char *s )
     if(StringSize>=32)
         return;
 
-
 // Initialize escape sequence steps.
     __sequence_status=0;
 
@@ -1316,10 +1307,8 @@ void tputstring( int fd, char *s )
  * tputc:
  *     Draw a char into the client window.
  */
-
 // #todo
 // See-github: tlvince/st.c
-
 // #Atenção: 
 // A libc do app foi configurada dinamicamente
 // para que printf coloque chars no arquivo. Mas 
@@ -1442,11 +1431,8 @@ tputc (
     //??
     //if(iofd != -1) {}
 
- 
-    //
-    // #importante
-    // Se não é controle é string ou escape sequence.
-    //
+// #importante
+// Se não é controle é string ou escape sequence.
 
 /*
     //string normal
@@ -1483,7 +1469,6 @@ tputc (
     }
 */
 
-
 //==============================
 // Se uma sequencia foi finalizada, ou nunca foi inicializada.
 
@@ -1497,9 +1482,6 @@ tputc (
             return;
         }
     }
-
-
-
 
 // ===========================
 // Se o char eh um control code.
@@ -1865,10 +1847,6 @@ tputc (
     // ...
 }
 
-
-
-
-
 // # terminal stuff
 // Insere um caractere sentro do buffer.
 
@@ -1877,7 +1855,6 @@ terminalGetCharXY (
     unsigned long x, 
     unsigned long y )
 {
-
     if ( x >= __wlMaxColumns || y >= __wlMaxRows )
     {
         return;
@@ -1896,7 +1873,6 @@ terminalInsertCharXY (
     unsigned long y, 
     char c )
 {
-
     if ( x >= __wlMaxColumns || y >= __wlMaxRows )
     {
         return;
@@ -1906,7 +1882,6 @@ terminalInsertCharXY (
     LINES[y].ATTRIBUTES[x] = 7;
 }
 
-
 // # terminal stuff
 static void save_cur (void)
 {
@@ -1914,15 +1889,12 @@ static void save_cur (void)
     textSavedRow = cursor_y;
 }
 
-
 // # terminal stuff
 static void restore_cur (void)
 {
     cursor_x = textSavedCol;
     cursor_y = textSavedRow;
 }
-
-
 
 // terminalClearBuffer:
 // Limpa o buffer da tela.

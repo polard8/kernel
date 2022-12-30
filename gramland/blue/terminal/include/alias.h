@@ -1,33 +1,28 @@
-/* alias.h -- structure definitions. */
 
+// alias.h -- structure definitions.
 
 #ifndef _ALIAS_
-#define _ALIAS_
-
+#define _ALIAS_    1
 
 #ifndef whitespace
 #define whitespace(c) (((c) == ' ') || ((c) == '\t'))
 #endif
 
-
 #ifndef savestring
 #define savestring(x) (char *)strcpy (xmalloc (1 + strlen (x)), (x))
 #endif
 
-
-typedef struct assoc_d assoc_t;
-typedef struct assoc_d ASSOC;
 struct assoc_d 
 {
     char *name;
     char *value;
 };
-
+typedef struct assoc_d  assoc_t;
+typedef struct assoc_d  ASSOC;
 
 //#ifndef NULL
 //#define NULL 0x0
 //#endif
-
 
 /* The list of known aliases. */
 //extern ASSOC **aliases;
@@ -50,4 +45,5 @@ struct assoc_d
 /* Return a new line, with any aliases substituted. */
 //extern char *alias_substitute ();
 
-#endif  /* _ALIAS_ */
+#endif    
+

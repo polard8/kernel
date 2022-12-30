@@ -1,10 +1,10 @@
-/*
- * File: gwm.h 
- *     Main header file for the gwm.
- *     It uses the libgws library.
- */
 
-#define xxxNOTHINGFORNOW    1234
+// editor.h
 
+#ifndef __EDITOR_H
+#define __EDITOR_H    1
 
+#define xxxNOTHINGFORNOW  1234
+
+#endif    
 

@@ -1,8 +1,11 @@
 
+// packet.h
 
- // Socket packets.
- // Usados na troca de mensgens via socket.
- 
+#ifndef __PACKET_H
+#define __PACKET_H    1
+
+// Socket packets.
+// Usados na troca de mensgens via socket.
 // # Podemos usar esse esquema em todos os servidores.
 // então isso deverá ir para bibliotecas.
 // Isso foi baseado nos tipos de pacotes usados pelo
@@ -26,12 +29,10 @@
     request may not be sent immediately. 
  */
 
-#define SERVER_PACKET_TYPE_REQUEST    1000 
-#define SERVER_PACKET_TYPE_REPLY      1001 
-#define SERVER_PACKET_TYPE_EVENT      1002
-#define SERVER_PACKET_TYPE_ERROR      1003
+#define SERVER_PACKET_TYPE_REQUEST  1000 
+#define SERVER_PACKET_TYPE_REPLY    1001 
+#define SERVER_PACKET_TYPE_EVENT    1002
+#define SERVER_PACKET_TYPE_ERROR    1003
 
+#endif    
 
-
-
- 

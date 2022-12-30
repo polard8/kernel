@@ -3,14 +3,10 @@
  *    Client side application for Gramado Window Server.
  *    Using socket to connect with gws.
  *    AF_GRAMADO family.
- * History:
- *     2020 - Created by Fred Nora.
  */
-
 // ##
 // This is a test.
 // This code is a mess.
-
 // #todo
 // This is gonna be a command line interpreter application.
 // It will looks like the old gdeshell application.
@@ -20,7 +16,6 @@
 // goal: Identity purpose.
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
- 
 /*
     To make a process a TCP server, you need to follow the steps given below −
     Create a socket with the socket() system call.
@@ -32,21 +27,17 @@
     This call typically blocks until a client connects with the server.
     Send and receive data using the read() and write() system calls.
 */ 
-
 // See:
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
- 
 
 // rtl
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <math.h>
-
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -137,12 +128,10 @@ static int gws(void)
     // #debug
     //printf ("gws: Creating socket\n");
 
-    // Create a socket. 
-    // AF_GRAMADO = 8000
+// Create a socket. 
+// AF_GRAMADO = 8000
     client_fd = socket ( AF_GRAMADO, SOCK_STREAM, 0 );
-    
-    if ( client_fd < 0 )
-    {
+    if (client_fd<0){
        gws_debug_print ("gws: [FAIL] Couldn't create socket\n");
        printf          ("gws: [FAIL] Couldn't create socket\n");
        exit(1);  //#bugbug Cuidado.
@@ -187,7 +176,7 @@ static void doPrompt(int fd)
 
     // Prompt
     printf("\n");
-    printf("cmdline: Type something\n");
+    printf("gdm2: Type something\n");
     printf("$ ");
     fflush(stdout);
 
@@ -216,14 +205,12 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-
     if ( strncmp(prompt,"ascii",5) == 0 )
     {
          //not working
          //print_ascii_table(fd);
          goto exit_cmp;
     }
-
 
     if ( strncmp(prompt,"reboot",6) == 0 )
     {
@@ -278,9 +265,7 @@ cmdlineProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
-
     int f12Status = -1;
-
 
     if(msg<=0){
         return (-1);
@@ -289,25 +274,24 @@ cmdlineProcedure (
     switch (msg){
 
         case MSG_CLOSE:
-            printf("cmdline.bin: Closing...\n");
+            printf("gdm2.bin: Closing...\n");
             exit(0);
             break;
         
         case MSG_COMMAND:
-            printf("cmdline.bin: MSG_COMMAND %d \n",long1);
+            printf("gdm2.bin: MSG_COMMAND %d \n",long1);
             switch(long1){
             case 4001:  //app1
-            printf("cmdline.bin: 4001\n");
+            printf("gdm2.bin: 4001\n");
             gws_clone_and_execute("browser.bin");  break;
             case 4002:  //app2
-            printf("cmdline.bin: 4002\n");
+            printf("gdm2.bin: 4002\n");
             gws_clone_and_execute("editor.bin");  break;
             case 4003:  //app3
-            printf("cmdline.bin: 4003\n");
+            printf("gdm2.bin: 4003\n");
             gws_clone_and_execute("terminal.bin");  break;
             };
             break;
-
 
         // 20 = MSG_KEYDOWN
         case MSG_KEYDOWN:
@@ -428,26 +412,21 @@ cmdlineProcedure (
             break;
     };
 
-    // ok
-    // retorna TRUE quando o diálogo chamado 
-    // consumiu o evento passado à ele.
-
+// ok
+// retorna TRUE quando o diálogo chamado 
+// consumiu o evento passado à ele.
 done:
     //check_victory(fd);
     return 0;
     //return (int) gws_default_procedure(fd,0,msg,long1,long2);
 }
 
-
-
-
-
-
 void init_cursor(int fd)
 {
-    player_x = game_width >> 1;
-    player_y = game_height >> 1;
-
+    if(fd<0)
+        return;
+    player_x = (game_width >> 1);
+    player_y = (game_height >> 1);
     gws_draw_char ( 
         fd, 
         game_window, 
@@ -459,9 +438,10 @@ void init_cursor(int fd)
 
 void init_prize(int fd)
 {
+    if(fd<0)
+        return;
     prize_x = (rand() % 50) << 3;
     prize_y = (rand() % 50) << 3;
-
     gws_draw_char ( 
         fd, 
         game_window, 
@@ -471,22 +451,20 @@ void init_prize(int fd)
         '+' );
 }
 
-
-//
 // initialize 'game' support.
-//
-
 int gameInitialize(int fd,unsigned long w, unsigned long h)
 {
-
     game_status = FALSE;
+
+    if(fd<0)
+        return;
 
     init_cursor(fd);
     init_prize(fd);
 
-    // Test
-    // O refresh da tela faz à cada letra, 
-    // faz as letras aparecerem lentamente.
+// Test
+// O refresh da tela faz à cada letra, 
+// faz as letras aparecerem lentamente.
 
     gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_BLUE, 127 );
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_BLUE, 127 );
@@ -494,12 +472,11 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
     gws_draw_char ( fd, status_window, (w/30)  * 2, (8), COLOR_YELLOW, '0' );
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, '0' );
 
-
     gws_draw_text(
         fd, status_window,
         (w/30)  * 6, 8, COLOR_YELLOW, "cmdline:");
 
-    /*
+/*
     gws_draw_char ( fd, status_window, (w/30)  * 6, (8), COLOR_YELLOW, 'G' );
     gws_draw_char ( fd, status_window, (w/30)  * 7, (8), COLOR_YELLOW, 'R' );
     gws_draw_char ( fd, status_window, (w/30)  * 8, (8), COLOR_YELLOW, 'A' );
@@ -507,18 +484,16 @@ int gameInitialize(int fd,unsigned long w, unsigned long h)
     gws_draw_char ( fd, status_window, (w/30) * 10, (8), COLOR_YELLOW, 'A' );
     gws_draw_char ( fd, status_window, (w/30) * 11, (8), COLOR_YELLOW, 'D' );
     gws_draw_char ( fd, status_window, (w/30) * 12, (8), COLOR_YELLOW, 'O' );
-    */
+ */
 
     //gws_draw_char ( fd, status_window, (w/30)  * 12, (8), COLOR_YELLOW, 127 );
-    
+
     //...
-    
-    
+
     game_status = TRUE;
 
     return 0;
 }
-
 
 static void 
 updateStatusBar(
@@ -539,20 +514,22 @@ updateStatusBar(
     gws_draw_char ( fd, status_window, (w/30)  * 3, (8), COLOR_YELLOW, second_number );
 }
 
-
 static void print_ascii_table(int fd)
 {
-    int i=0;
+    register int i=0;
     int line=0;
-    
+
     printf("ascii: :)\n");
 
     gws_redraw_window(fd,game_window,TRUE);
     //#define SYSTEMCALL_SETCURSOR  34
     gramado_system_call ( 34, 2, 2, 0 );
 
-    if(fd<0){return;}
-    for(i=0; i<256; i++)
+    if (fd<0){
+        return;
+    }
+
+    for (i=0; i<256; i++)
     {
         gws_draw_char ( 
             fd, 
@@ -560,20 +537,19 @@ static void print_ascii_table(int fd)
             i*8,  //x 
             (8*line),  //y
             COLOR_YELLOW, i );
-        
-        if(i%10)line++;
+
+        if (i%10){
+            line++;
+        }
     };
 }
-
 
 //==========================================
 // Main
 
 int main ( int argc, char *argv[] )
 {
-
 // #config
-
     int ShowCube = FALSE;
     int launchChild = TRUE;
     // ...
@@ -614,19 +590,15 @@ int main ( int argc, char *argv[] )
     //    gramado_system_call(897,0,0,0);
     //}
 
-
 //================================
-   
 // Connection.
 // Only connect. Nothing more.
 // Create socket and call connect()
 
     client_fd = (int) gws();
-
-    if ( client_fd < 0 )
-    {
-         gws_debug_print ("cmdline.bin: gws() fail\n");
-         printf          ("cmdline.bin: gws() fail\n");
+    if (client_fd < 0){
+         gws_debug_print ("gdm2.bin: gws() fail\n");
+         printf          ("gdm2.bin: gws() fail\n");
          exit(1);
     }
 
@@ -634,11 +606,9 @@ int main ( int argc, char *argv[] )
     //printf(":: Entering CMDLINE.BIN pid{%d} fd{%d}\n",
         //getpid(), client_fd);
     //while(1){}
-
-
 //========================================
 
-    /*
+/*
     char buf[32];
     while (1)
     {
@@ -664,19 +634,14 @@ int main ( int argc, char *argv[] )
         //    main_window, 
         //    w/3, 8, COLOR_RED, 'C' );
     }
-    //================
-    */
-
+*/
 
 //========================================
-
 // Device info
-
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
     if ( w == 0 || h == 0 ){
-        printf ("cmdline.bin: w h \n");
+        printf ("gdm2.bin: w h \n");
         exit(1);
     }
 
@@ -685,7 +650,6 @@ int main ( int argc, char *argv[] )
     savedW      = (w & 0xFFFF);
     savedH      = (h & 0xFFFF);
 
-
     //ok
     //rtl_show_heap_info();
 
@@ -693,9 +657,6 @@ int main ( int argc, char *argv[] )
     //gws_async_command(client_fd,3,0,0);  // Hello
     //gws_async_command(client_fd,5,0,0);  // Draw black rectangle.
     //}
-
-
-
 
 // #debug
 // ok
@@ -709,21 +670,19 @@ int main ( int argc, char *argv[] )
 // Window
 //
 
-
 // ===========================
-    gws_debug_print ("cmdline.bin: 1 Creating main window \n");
-    //printf          ("cmdline.bin: Creating main window \n");
+    //gws_debug_print ("gdm2.bin: 1 Creating main window \n");
+    //printf          ("gdm2.bin: Creating main window \n");
 
     main_window = 
         (int) gws_create_window (
                   client_fd,
-                  WT_SIMPLE, 1, 1, "cmdline",
+                  WT_SIMPLE, 1, 1, "gdm2",
                   0, 0, w, h-40,
                   0, 0, COLOR_GRAY, COLOR_GRAY);
 
-    if (main_window<0)
-    {
-        printf ("cmdline.bin: main_window\n");
+    if (main_window<0){
+        printf ("gdm2.bin: main_window\n");
         exit(1);
     }
     game_window = main_window;
@@ -746,17 +705,16 @@ int main ( int argc, char *argv[] )
 
 // barra azul no topo.
 //===============================
-    gws_debug_print ("cmdline.bin:  Creating  window \n");
-    //printf          ("cmdline.bin: Creating main window \n");
+    //gws_debug_print ("gdm2.bin:  Creating  window \n");
+    //printf          ("gdm2.bin: Creating main window \n");
     int tmp1 = -1;
     tmp1 = (int) gws_create_window (
                      client_fd,
                      WT_SIMPLE, 1, 1, "status",
                      0, 0, w, 24,
                      0, 0, COLOR_BLUE, COLOR_BLUE );
-    if (tmp1<0)
-    {
-        printf ("cmdline.bin: tmp1\n");
+    if (tmp1<0){
+        printf ("gdm2.bin: tmp1\n");
         exit(1);
     }
     status_window = tmp1;
@@ -776,10 +734,9 @@ int main ( int argc, char *argv[] )
 //===================
 // Drawing a char just for fun,not for profit.
 
-    gws_debug_print ("cmdline.bin: 2 Drawing a char \n");
-    //printf          ("cmdline.bin: Drawing a char \n");
-    if(status_window>0)
-    {
+    //gws_debug_print ("gdm2.bin: 2 Drawing a char \n");
+    //printf          ("gdm2.bin: Drawing a char \n");
+    if (status_window>0){
         gws_draw_char ( 
             client_fd, 
             status_window, 
@@ -787,16 +744,12 @@ int main ( int argc, char *argv[] )
     }
 //====================   
 
-
     // #debug
     //gws_refresh_window (client_fd, tmp1);
     //asm ("int $3");
 
-    
-    /*
-    //
-    // == stdin ===================================================
-    //
+/*
+// == stdin ===================================================
     char evBuf[32];
     int ev_nreads=0;
     unsigned long lMessage[8];
@@ -817,10 +770,8 @@ int main ( int argc, char *argv[] )
         gws_draw_char ( client_fd, main_window, 
         32, 8, COLOR_RED, 'I' );
     };
-    // ============================================================
-    */
-    
-    
+// ============================================================
+*/
 
     // Create a little window in the top left corner.
     //gws_create_window (client_fd,
@@ -833,8 +784,7 @@ int main ( int argc, char *argv[] )
     //gws_draw_char ( client_fd, 0, 
         //16, 8, COLOR_RED, 'C' );
 
-
-    /*
+/*
     gws_debug_print ("gws.bin: 3 Testing Plot0 4x\n");
     printf          ("gws.bin: 3 Testing Plot0 4x\n");
 
@@ -844,17 +794,16 @@ int main ( int argc, char *argv[] )
     gws_plot0 ( client_fd,  50,  50, 0, COLOR_GREEN );
     gws_plot0 ( client_fd,  50, -50, 0, COLOR_BLUE );
     gws_plot0 ( client_fd, -50, -50, 0, COLOR_YELLOW );
-    */
+*/
 
 //
 // == cube ==================================
 //
 
-    // #maybe
-    // The custon status bar?
-    // Maybe the custon status bar can be a window.
-
-    gws_debug_print ("cmdline.bin: 4 Testing Plot cube \n");
+// #maybe
+// The custon status bar?
+// Maybe the custon status bar can be a window.
+    //gws_debug_print ("cmdline.bin: 4 Testing Plot cube \n");
     //printf        ("cmdline.bin: 4 Testing Plot cube \n");
 
 
@@ -863,31 +812,25 @@ int main ( int argc, char *argv[] )
     int backRight  =   (w/8);
     int backTop    = (60);
     int backBottom = (10);
-
 // front
     int frontLeft   = (-(w/8)); 
     int frontRight  =   (w/8);
     int frontTop    = -(10);
     int frontBottom = -(60);
-
 // z ?
     int zTest = 0;
-    
     int north_color = COLOR_RED;
     int south_color = COLOR_BLUE;
 
+//
+// Loop
+//
 
     gws_debug_print("LOOP:\n");
     //printf ("LOOP:\n");
 
-
-    //
-    // Loop
-    //
-
     // #test
     //gws_refresh_window (client_fd, main_window);
-        
 
 //
 // Game
@@ -896,17 +839,13 @@ int main ( int argc, char *argv[] )
 // ??
 // What is this?
 // Is this a prototype, a test?
-
     gameInitialize(client_fd,w,h);
     //testASCIITable(client_fd,w,h);
-
 
 // #test
 // Setup the flag to show or not the fps window.
 // Request number 6.
-
     //gws_async_command(client_fd,6,FALSE,0);
-
 
 //
 // Refresh
@@ -915,7 +854,6 @@ int main ( int argc, char *argv[] )
 // #test
 // nem precisa ja que todas as rotinas que criam as janelas 
 // estao mostrando as janelas.
-
     gws_refresh_window (client_fd, main_window);
 
 
@@ -927,13 +865,10 @@ int main ( int argc, char *argv[] )
 // Podemos nesse momento ler alguma configuração
 // que nos diga qual interface devemos inicializar.
 
-    if(launchChild == TRUE)
-    {
+    if (launchChild == TRUE){
         gws_redraw_window(client_fd,game_window,0);
-        
         // Interface 1: File manager.
         //gws_clone_and_execute("fileman.bin");
-
         // Interface 1: Test app.
         //gws_clone_and_execute("editor.bin");
     }
@@ -942,29 +877,21 @@ int main ( int argc, char *argv[] )
 // Input
 //
 
-    
-    // Enable input method number 1.
-    // Event queue in the current thread.
-
+// Enable input method number 1.
+// Event queue in the current thread.
     //gws_enable_input_method(1);
-
-    //=================================
-
 
 // =================================
 // Focus
 
-
 // set focus
     rtl_focus_on_this_thread();
-
 // set focus
     gws_async_command(
          client_fd,
          9,             // set focus
          game_window,
          game_window );
-
 //
 // Banner
 //
@@ -972,7 +899,7 @@ int main ( int argc, char *argv[] )
 // Set cursor position.
     gramado_system_call ( 34, 2, 2, 0 );
 
-    printf ("cmdline.bin: Gramado OS\n");
+    printf ("gdm2.bin: Gramado OS\n");
 
 /*
 //#tests
@@ -986,10 +913,6 @@ int main ( int argc, char *argv[] )
     printf ("#test lX: %lX \n",0x1000ABCDDCBA0001); //
     // ...
 */
-
-
-
-
 
 // ===============================
 // Testing fpu
@@ -1011,9 +934,6 @@ int main ( int argc, char *argv[] )
     printf("sqrt of 81 = {%d}\n",(unsigned int)square_root);
 
 // ===============================
-
-
-
 // #test
 // Getting 2mb shared memory surface.
 // ring3.
@@ -1022,26 +942,20 @@ int main ( int argc, char *argv[] )
     ptr = (void*) rtl_shm_get_2mb_surface();
     if( (void*) ptr != NULL )
         printf("surface address: %x\n",ptr);
-
-
 // ===============================
-
-
 
 // Show prompt.
     doPrompt(client_fd);
 
-    // Podemos chamar mais de um diálogo
-    // Retorna TRUE quando o diálogo chamado 
-    // consumiu o evento passado à ele.
-    // Nesse caso chamados 'continue;'
-    // Caso contrário podemos chamar outros diálogos.
+// Podemos chamar mais de um diálogo
+// Retorna TRUE quando o diálogo chamado 
+// consumiu o evento passado à ele.
+// Nesse caso chamados 'continue;'
+// Caso contrário podemos chamar outros diálogos.
 
     while (1){
-        if ( rtl_get_event() == TRUE )
-        {
+        if ( rtl_get_event() == TRUE ){
             //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
-
             cmdlineProcedure ( 
                 client_fd,
                 (void*) RTLEventBuffer[0], 
@@ -1063,11 +977,12 @@ int main ( int argc, char *argv[] )
     //gws_debug_print ("gws: Pinging\n");
     //gws_async_command(client_fd,2,0,0);
 
+    while(1){
+    }
 
-    while(1){}
     // ...
 
-    /*
+/*
     unsigned long event_buffer[8];
     // Event loop
     while (TRUE)
@@ -1091,21 +1006,16 @@ int main ( int argc, char *argv[] )
             gws_async_command(client_fd,1,0,0);
         }
     };
-    */
- 
-    // exit
-    gws_debug_print ("cmdline: bye :) \n");
+*/
+
+// exit
+    gws_debug_print ("gdm2: bye\n");
     exit(0);
-    
+
     return 0;
 }
 
-
-
 //
-// End.
+// End
 //
-
-
-
 

@@ -5,31 +5,28 @@
 #include <kernel.h>
 
 
-//#test
-void x64_info (void)
+void x64_info(void)
 {
     show_cpu_intel_parameters();
 }
 
-
 /*
  * show_cpu_intel_parameters:
  *     Mostra os parametros da CPU intel.
- * @todo: 
+ * #todo: 
  *     Colocar em janela. 
  *     Criar funções: TerminalShowCPUIntelParameters()
  *                    ShowCPUIntelParameters()
  */
 
-void show_cpu_intel_parameters (void)
+void show_cpu_intel_parameters(void)
 {
     printf("\nx64 CPU Info:\n\n");
-
 
 // #todo
 // Check the pointer validation?
 
-    if( (void*) processor == NULL )
+    if ( (void*) processor == NULL )
         panic("show_cpu_intel_parameters: processor\n");
 
 // Vendor and brand.
@@ -102,7 +99,6 @@ void show_cpu_intel_parameters (void)
     
     //printf("     Memory Size: {%d}\n",(unsigned long) processor->MemorySize);
 
-
 // apic
     if (processor->hasAPIC == TRUE){
         printf("It has APIC\n");
@@ -128,7 +124,6 @@ void show_cpu_intel_parameters (void)
     }
 
 
-
 // LAPIC
     if(LAPIC.initialized == TRUE){
         printf("LAPIC.lapic_pa %x \n",LAPIC.lapic_pa);
@@ -140,7 +135,6 @@ void show_cpu_intel_parameters (void)
 
     // Continua ...
 
-
 // Show
 // #obs:
 // Como não usamos janelas no kernel, 
@@ -149,7 +143,6 @@ void show_cpu_intel_parameters (void)
     refresh_screen();
 }
 
-
 //
-// End.
+// End
 //

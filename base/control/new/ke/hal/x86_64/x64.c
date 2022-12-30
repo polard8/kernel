@@ -7,8 +7,6 @@
 extern void DisableSSE(void);
 extern void EnableSSE(void);
 
-
-
 /*
  // 8259 isa irqs
 unsigned char isa_irqs[16] = {
@@ -17,13 +15,11 @@ unsigned char isa_irqs[16] = {
 };
 */
 
-
 /*
  * x64_init_gdt:
  *     It creates a TSS and sets up some entries in the GDT.
  *     See: x86gdt.h
  */
-
 // Called by I_x64main in init.c.
 // See: head_64.asm
 
@@ -188,10 +184,7 @@ set_gdt_entry (
     unsigned char db,   //Sz 
     unsigned char g )
 {
-
-
-    if ( (void*) sd == NULL )
-    {
+    if ( (void*) sd == NULL ){
         debug_print ("[x64] set_gdt_entry: sd\n");
         panic       ("[x64] set_gdt_entry: sd\n");
     }
@@ -218,28 +211,23 @@ set_gdt_entry (
     sd->g    = (g   & 1);  // (1)
 }
 
-
-
 // ======================
-
 
 void
 tss_init ( 
     struct tss_d *tss, 
     void *stack_address )
 {
-
-    if ( (void *) tss == NULL )
-    {
+    if ( (void *) tss == NULL ){
         debug_print ("[x64] tss_init:\n");
         panic       ("[x64] tss_init:\n");
     }
 
-    // Clean.
+// Clean
     memset ( tss, 0, sizeof *tss );
 
-    //ring 0 stack
-    tss->rsp0 = (unsigned long) stack_address;  // va ?? 
+// ring 0 stack
+    tss->rsp0 = (unsigned long) stack_address;  // va?? 
 
     //#debug
     //printf ("Stack %x\n", stack_address);
@@ -247,9 +235,8 @@ tss_init (
     //while(1){}
 }
 
-
 // # not tested yet
-void x64_load_ltr (int tr)
+void x64_load_ltr(int tr)
 {
     asm volatile ( \
         " movw %w0, %%ax; \
@@ -259,12 +246,9 @@ void x64_load_ltr (int tr)
 
 // ==========================
 
-
-
 /*
  * get_cpu_intel_parameters:
  *     Pega os parâmetros da cpu x64 através da instrução cpuid.
- *
  * Vendor               = 0.
  * Apic ??              = 1.
  * Number of cores      = 4.
@@ -273,24 +257,22 @@ void x64_load_ltr (int tr)
  * L2 cache information = 0x80000006.(Extended L2 Cache Features)
  * core per die         = 0x80000008.
  */
-
 // #todo:
 // apic
 // The CPUID.01h:EDX[bit 9] flag 
 // specifies whether a CPU has a built-in local APIC. 
-
 // According to the Intel CPUID application note, 
 // we should first check the Vendor ID String for "GenuineIntel" 
 // before taking out information, such as 
 // the Processor Signature, Processor Feature Flags, etc. 
 
-void get_cpu_intel_parameters (void)
+void get_cpu_intel_parameters(void)
 {
-    unsigned long eax=0; 
-    unsigned long ebx=0; 
+    unsigned long eax=0;
+    unsigned long ebx=0;
     unsigned long ecx=0;
     unsigned long edx=0;
-    unsigned long name[32];
+    unsigned long buffer[8];
     int MASK_LSB_8 = 0xFF;
 
     //debug_print ("get_cpu_intel_parameters: [FIXME]\n");
@@ -305,10 +287,10 @@ void get_cpu_intel_parameters (void)
 // edx = Identification String (part 2)
 
     cpuid ( 0, eax, ebx, ecx, edx ); 
-    name[0] = ebx;
-    name[1] = edx;
-    name[2] = ecx;
-    name[3] = 0;
+    buffer[0] = ebx;
+    buffer[1] = edx;
+    buffer[2] = ecx;
+    buffer[3] = 0;
 
     processor->Vendor[0] = ebx;
     processor->Vendor[1] = edx;
@@ -325,7 +307,6 @@ void get_cpu_intel_parameters (void)
     {
         hal_set_machine_type(Processor_INTEL);
     }
-
 
 //========================================
 // EAX=1: Processor Info and Feature Bits
@@ -419,17 +400,14 @@ void get_cpu_intel_parameters (void)
     //processor->xx = (unsigned long)((ebx >> 9) & 0x0001);
     //... 
 
-
 // ecx e edx:
 // Feature Information 
-
 
 // ecx
 
 // SSE3 - bit 0.
     processor->hasSSE3 = 
         (unsigned long)( ecx & 0x0001);
-
 
 // edx:
 
@@ -459,7 +437,6 @@ void get_cpu_intel_parameters (void)
 // Specifies whether a CPU has a built-in local APIC. 
     processor->hasAPIC = 
         (unsigned long)((edx >> 9) & 0x0001);
-
 
 // MTRR Memory Type Range Registers
     processor->hasMTRR = 
@@ -491,189 +468,186 @@ void get_cpu_intel_parameters (void)
     processor->hasSSE2 = 
         (unsigned long)((edx >> 26) & 0x0001);
 
-
 // HTT - hyper-threading technology
     processor->hasHTT = 
         (unsigned long)((edx >> 28) & 0x0001);
 
     // ...
 
-
-
 //========================================
 // EAX=2: Cache and TLB Descriptor information
-    
+
     // ...
-    
-    //========================================
-    // EAX=3: Processor Serial Number
-    
-	//Serial number ???
-	//cpuid( 3, eax, ebx, ecx, edx );
 
+//========================================
+// EAX=3: Processor Serial Number
 
-    //========================================
-    // EAX=4 and EAX=Bh: Intel thread/core and cache topology
-    
-	//Check number of cores.
-	//cpuid( 4, eax, ebx, ecx, edx );
+//Serial number ???
+    //cpuid( 3, eax, ebx, ecx, edx );
 
+//========================================
+// EAX=4 and EAX=Bh: Intel thread/core and cache topology
 
+//Check number of cores.
+    //cpuid( 4, eax, ebx, ecx, edx );
 
-    //========================================
+//========================================
     // EAX=6: Thermal and power management
-    
 
-    //========================================
+//========================================
     // EAX=7, ECX=0: Extended Features
     // EAX=7, ECX=1: Extended Features
-    
 
-    // ==========================================================
-    // hypervisor level 4000_0000h
+// ============================================
+// hypervisor level 4000_0000h
     cpuid ( 0x40000000, eax, ebx, ecx, edx );
     processor->hvName[0] = ebx;
     processor->hvName[1] = ecx;
     processor->hvName[2] = edx;
     processor->hvName[3] = 0;
 
+//========================================
+// EAX=80000000h: Get Highest Extended Function Implemented
 
-
-    //========================================
-    // EAX=80000000h: Get Highest Extended Function Implemented
-
-    // Max feature id.
+// Max feature id.
     cpuid ( 0x80000000, eax, ebx, ecx, edx);
-    name[0] = eax;  //Maximum meaningful value of InfoType for extended function CPUID information.
-    name[1] = ebx;  //reserved
-    name[2] = ecx;  //reserved
-    name[3] = edx;  //reserved
-    name[4] = 0; 
+    buffer[0] = eax;  //Maximum meaningful value of InfoType for extended function CPUID information.
+    buffer[1] = ebx;  //reserved
+    buffer[2] = ecx;  //reserved
+    buffer[3] = edx;  //reserved
+    buffer[4] = 0; 
     processor->MaxFeatureId = (unsigned long)(eax & MASK_LSB_8);
     //printf("Max feature id ={%d}\n", (unsigned long) processor->MaxFeatureId);
 
+//========================================
+// EAX=80000001h: Extended Processor Info and Feature Bits
 
-    //========================================
-    // EAX=80000001h: Extended Processor Info and Feature Bits
-    
-    //========================================
-    // EAX=80000002h,80000003h,80000004h: Processor Brand String
-    
-    /*name part 1*/
+//========================================
+// EAX=80000002h,80000003h,80000004h: Processor Brand String
+
+/*name part 1*/
     cpuid ( 0x80000002, eax, ebx, ecx, edx);
-    name[0] = eax;  //Processor Brand String
-    name[1] = ebx;  //Processor Brand String
-    name[2] = ecx;  //Processor Brand String
-    name[3] = edx;  //Processor Brand String
-    name[4] = 0;
+    buffer[0] = eax;  //Processor Brand String
+    buffer[1] = ebx;  //Processor Brand String
+    buffer[2] = ecx;  //Processor Brand String
+    buffer[3] = edx;  //Processor Brand String
+    buffer[4] = 0;
     //salva na estrutura.
     processor->BrandName[0] = eax;
     processor->BrandName[1] = ebx;
     processor->BrandName[2] = ecx;
     processor->BrandName[3] = edx;
-	//printf("CPU={%s", &name[0]);
-	//printf("%s",&name[0]);		
+    //printf("CPU={%s", &buffer[0]);
+    //printf("%s",&buffer[0]);
 
-   /*name part 2*/
+/*name part 2*/
     cpuid ( 0x80000003, eax, ebx, ecx, edx);
-    name[0] = eax;  //Processor Brand String, continued
-    name[1] = ebx;  //Processor Brand String, continued
-    name[2] = ecx;  //Processor Brand String, continued
-    name[3] = edx;  //Processor Brand String, continued
-    name[4] = 0;
-	//salva na estrutura.	
+    buffer[0] = eax;  //Processor Brand String, continued
+    buffer[1] = ebx;  //Processor Brand String, continued
+    buffer[2] = ecx;  //Processor Brand String, continued
+    buffer[3] = edx;  //Processor Brand String, continued
+    buffer[4] = 0;
+    //salva na estrutura.
     processor->BrandName[4] = eax;
     processor->BrandName[5] = ebx;
     processor->BrandName[6] = ecx;
     processor->BrandName[7] = edx;
-	//printf("%s",&name[0]);
+    //printf("%s",&buffer[0]);
 
-   /*name part 3*/
+/*name part 3*/
     cpuid ( 0x80000004, eax, ebx, ecx, edx);
-    name[0] = eax; //Processor Brand String, continued
-    name[1] = ebx; //Processor Brand String, continued
-    name[2] = ecx; //Processor Brand String, continued
-    name[3] = edx; //Processor Brand String, continued
-    name[4] = 0;
-	//salva na estrutura.	
+    buffer[0] = eax; //Processor Brand String, continued
+    buffer[1] = ebx; //Processor Brand String, continued
+    buffer[2] = ecx; //Processor Brand String, continued
+    buffer[3] = edx; //Processor Brand String, continued
+    buffer[4] = 0;
+    // Salva na estrutura.
     processor->BrandName[8]  = eax;
     processor->BrandName[9]  = ebx;
     processor->BrandName[10] = ecx;
     processor->BrandName[11] = edx;
-	//printf("%s}\n",&name[0]);	
+    //printf("%s}\n",&buffer[0]);
 
+//========================================
+// EAX=80000005h: L1 Cache and TLB Identifiers
 
-    //========================================
-    // EAX=80000005h: L1 Cache and TLB Identifiers
+//========================================
+// EAX=80000006h: Extended L2 Cache Features
 
-
-
-
-    //========================================
-    // EAX=80000006h: Extended L2 Cache Features
- 
-    // pegamos logo acima.
-    if ( processor->MaxFeatureId < 6)
-    {
+// Pegamos logo acima.
+    if (processor->MaxFeatureId < 6){
         debug_print ("get_cpu_intel_parameters: Cache Extended Feature not supported\n");
         //printf("Cache Extended Feature not supported\n");
         //goto done;
-        return;
+        return;  // Why?
     }
 
-    /*
-     * L2 cache information (Intel)
-     *
-     * EAX Reserved
-     * EBX Reserved
-     * ECX Bits:  
-     *     Bits 0-7: Cache Line Size.
-     *     Bits 12-15: L2 Associativity.
-     *     Bits 16-31: Cache size in 1K units.   
-     * EDX Reserved
-     */
+/*
+ * L2 cache information (Intel)
+ * EAX Reserved
+ * EBX Reserved
+ * ECX Bits:  
+ *     Bits 0-7: Cache Line Size.
+ *     Bits 12-15: L2 Associativity.
+ *     Bits 16-31: Cache size in 1K units.   
+ * EDX Reserved
+ */
 
     cpuid ( 0x80000006, eax, ebx, ecx, edx );
-    name[0] = eax;
-    name[1] = ebx;
-    name[2] = ecx;
-    name[3] = edx;
-    name[4] = 0;
-    processor->L2LineSize      = (unsigned long)( ecx        & 0x00FF); //Bits 0-7: Cache Line Size.
-    processor->L2Associativity = (unsigned long)((ecx >> 12) & 0x000F);	//Bits 12-15: L2 Associativity.
-    processor->L2Cachesize     = (unsigned long)((ecx >> 16) & 0xFFFF); //Bits 16-31: Cache size in 1K units.
-	//printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);	
-	//printf("L2Cachesize={%d KB}\n",(unsigned long) processor->L2Cachesize);
+    buffer[0] = eax;
+    buffer[1] = ebx;
+    buffer[2] = ecx;
+    buffer[3] = edx;
+    buffer[4] = 0;
 
+// Bits 0-7: Cache Line Size.
+    processor->L2LineSize = 
+        (unsigned long)(ecx & 0x00FF);  
 
-    //========================================
-    // EAX=80000007h: Advanced Power Management Information
+// Bits 12-15: L2 Associativity.
+    processor->L2Associativity = 
+        (unsigned long)((ecx >> 12) & 0x000F);
 
+// Bits 16-31: Cache size in 1K units.
+    processor->L2Cachesize = 
+        (unsigned long)((ecx >> 16) & 0xFFFF);
 
+    //printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);
 
-    //========================================
-    //EAX=80000008h: 
-    //Virtual and Physical address Sizes	
-    //Returns largest virtual and physical address sizes.
+    //printf("L2Cachesize={%d KB}\n",(unsigned long) processor->L2Cachesize);
 
-    /*
-     * Virtual and physical memory sizes.
-     */
+//========================================
+// EAX=80000007h: Advanced Power Management Information
+
+//========================================
+// EAX=80000008h: 
+// Virtual and Physical address Sizes
+// Returns largest virtual and physical address sizes.
+
+/*
+ * Virtual and physical memory sizes.
+ */
 
     cpuid ( 0x80000008, eax, ebx, ecx, edx );
-    name[0] = eax;    //Virtual and physical memory sizes.
-    name[1] = ebx;    //reserved
-    name[2] = ecx;    //reserved
-    name[3] = edx;    //reserved
-    name[4] = 0;
-    processor->Physical_Address_Size = (unsigned long) ( eax       & 0x00FF); //7-0
-    processor->Virtual_Address_Size  = (unsigned long) ((eax >> 8) & 0x00FF); //15-8	
+    buffer[0] = eax;    //Virtual and physical memory sizes.
+    buffer[1] = ebx;    //reserved
+    buffer[2] = ecx;    //reserved
+    buffer[3] = edx;    //reserved
+    buffer[4] = 0;
+
+// 7-0
+    processor->Physical_Address_Size = 
+        (unsigned long) ( eax & 0x00FF);
+
+// 15-8
+    processor->Virtual_Address_Size = 
+        (unsigned long) ((eax >> 8) & 0x00FF);
+
     //printf("Physical_Address_Size={%d}\n",(unsigned long) processor->Physical_Address_Size);
     //printf("Virtual_Address_Size={%d}\n", (unsigned long) processor->Virtual_Address_Size);
 
     //...
 }
-
 
 // FPU state
 // When the FPU is configured, 
@@ -687,8 +661,6 @@ void x64_init_fpu (void)
     asm volatile ("fninit");
 }
 
-
-
 // Initialize fpu support and enable SSE.
 // Long mode demands that SSE and SSE2 are available, and 
 // compilers are free to use the SSE registers instead of 
@@ -699,39 +671,39 @@ void x64_init_fpu (void)
 // https://wiki.osdev.org/FPU
 int x64_init_fpu_support(void)
 {
+// + Enable SSE support.
+// + Initialize fpu support.
 
-// Structure validation.
-    if( (void*) processor == NULL ){
+// Structure validation
+    if ( (void*) processor == NULL ){
         printf("x64_init_fpu_support: processor\n");
         return -1;
     }
 
 // has SSE
-    if( processor->hasSSE != TRUE ){
+    if (processor->hasSSE != TRUE){
         printf("x64_init_fpu_support: hasSSE\n");
         return -1;
     }
 
 // has SSE2
-    if( processor->hasSSE2 != TRUE ){
+    if (processor->hasSSE2 != TRUE){
         printf("x64_init_fpu_support: hasSSE2\n");
         return -1;
     }
 
 // has SSE3
-    if( processor->hasSSE3 != TRUE ){
+    if (processor->hasSSE3 != TRUE){
         printf("x64_init_fpu_support: hasSSE3\n");
         return -1;
     }
 
-
 // has x87fpu
 // Check the FPU bit in CPUID.
-    if( processor->hasX87FPU != TRUE ){
+    if (processor->hasX87FPU != TRUE){
         printf("x64_init_fpu_support: hasX87FPU\n");
         return -1;
     }
-
 
 // Enable SSE.
 // Clear TS bit in cr0.
@@ -753,14 +725,12 @@ int x64_init_fpu_support(void)
         " orw $0x2, %%ax;     "    /*Set MP*/
         " movq %%rax, %%cr0;  " :: );
 
-
 // Initialize fpu support.
 // simply call 'fninit' instruction.
     x64_init_fpu();
  
     return 0;
 }
-
 
 // Set the FPU control word:
 // These functions can be used with GCC (or TCC) 
@@ -785,31 +755,26 @@ void x64_enable_interrupts (void)
     asm ("sti");
 }
 
-
 void x64_iretq (void)
 {
     asm ("iretq");
 }
-
 
 void x64_iret (void)
 {
     asm ("iret");
 }
 
-
 void x64_lret (void)
 {
     asm ("lret");
 }
-
 
 void x64_cli_hlt(void)
 {
     asm (" cli \n \t "); 
     asm (" hlt \n \t ");
 }
-
 
 void x64_stop_cpu (void)
 {
@@ -823,7 +788,9 @@ void x64_stop_cpu (void)
 
 void x64_enable_cache (void)
 {
-    /*
+    // #danger
+
+/*
     uint32_t cr0 = 0; 
     unsigned long cr0 = 0; //use this one ??
 
@@ -833,11 +800,10 @@ void x64_enable_cache (void)
     cr0 &= ~CPUX64_CR0_NW;
     
     asm volatile ("mov %[cr0], %%cr0" :: [cr0] "r" (cr0) );
-    */
+ */
 }
 
-// Called by init_architecture_dependent() on core/init.c
-
+// Called by init_architecture_dependent() on init.c
 int x64_init_intel (void)
 {
     //debug_print ("[x64] x64_init_intel:");
@@ -852,8 +818,8 @@ int x64_init_intel (void)
     
     //x64_enable_cache();
 
-    // Get info.
-    // See: x86.c
+// Get info.
+// See: x86.c
     get_cpu_intel_parameters();
 
     // ...
@@ -861,14 +827,12 @@ int x64_init_intel (void)
     return 0;
 }
 
-
 void x64_load_pml4_table(unsigned long phy_addr)
 {
     //debug_print("x64_load_pml4_table: DANGER\n");
 
-    asm volatile ("movq %0,%%cr3"::"r"(phy_addr));
+    asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
-
 
 // If the MP Floating Point Structure 
 // To use these tables, the MP Floating Point Structure 

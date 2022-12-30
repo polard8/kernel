@@ -14,12 +14,27 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <packet.h>
 // The client-side library
 #include <gws.h>
 // Local
+#include <packet.h>
 #include <fileman.h>
 
+// Ports
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
+// ...
+#define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
+
+/*
+struct sockaddr_in addr = {
+    .sin_family = AF_INET,
+    .sin_port   = 7548, 
+    .sin_addr   = IP(192, 168, 1, 79),
+};
+*/
+//char *hello = "Hello there!\n";
 
 unsigned long gScreenWidth=0;
 unsigned long gScreenHeight=0;
@@ -35,7 +50,6 @@ static int Main_window = 0;
 static int Header_window = 0;
 static int addressbar_window = 0;
 static int button = 0;
-
 // :: The menu window
 // That one at the left side.
 static int Menu_window = 0;
@@ -47,7 +61,6 @@ static int lw_button1 = 0;
 //static int nw_button1 = 0;
 //static int nw_button2 = 0;
 //static int nw_button3 = 0;
-
 // :: Client window
 static int Client_window = 0;
 // ============================================
@@ -57,16 +70,9 @@ static int Client_window = 0;
 int gMaxIndex = NUMBER_OF_WINDOWS;
 int windows[NUMBER_OF_WINDOWS];
 
-// Ports
-#define PORTS_WS  4040
-#define PORTS_NS  4041
-#define PORTS_FS  4042
-// ...
-
 // JAIL,P1 ...
 static int current_mode=0;
 
-#define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
 // ================
 
@@ -104,16 +110,6 @@ static int fileman_init_windows(void)
     return 0;
 }
 
-//char *hello = "Hello there!\n";
-/*
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-struct sockaddr_in addr = {
-    .sin_family = AF_INET,
-    .sin_port   = 7548, 
-    .sin_addr   = IP(192, 168, 1, 79),
-};
-*/
-
 static int barCompareStrings(void)
 {
     char c=0;
@@ -124,7 +120,6 @@ static int barCompareStrings(void)
 // =============================
 // Emergency 
 
-
 // reboot
     if(c=='q'){
         rtl_reboot();
@@ -133,19 +128,15 @@ static int barCompareStrings(void)
 // 
     if(c=='1')
         rtl_clone_and_execute("browser.bin");
-
 //
     if(c=='2')
         rtl_clone_and_execute("editor.bin");
-
 //
     if(c=='3')
         rtl_clone_and_execute("logon.bin");
-
 //
     if(c=='4')
         rtl_clone_and_execute("terminal.bin");
-
 
 /*
 // reboot
@@ -171,7 +162,6 @@ done:
     return 0;
 }
 
-
 static void barPrompt (void)
 {
     register int i=0;
@@ -193,7 +183,7 @@ static void barPrompt (void)
     // Prompt
     //printf("\n");
     //printf("$ ");
-    
+
     //invalidate_screen();
     //refresh_screen();
 
@@ -302,15 +292,15 @@ filemanProcedure(
 
 int main ( int argc, char *argv[] )
 {
-    int client_fd = -1;
-
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
     addr_in.sin_port = PORTS_WS;
     addr_in.sin_addr.s_addr = IP(127,0,0,1);
 
+    int client_fd = -1;
+
     debug_print ("fileman: Initializing ...\n");
-    
+
 // dc
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
@@ -483,9 +473,9 @@ int main ( int argc, char *argv[] )
 // == Logo_window ============================
 //
 
-    unsigned long lwLeft   = 0;
-    unsigned long lwTop    = 0;
-    unsigned long lwWidth  = mwWidth;
+    unsigned long lwLeft = 0;
+    unsigned long lwTop = 0;
+    unsigned long lwWidth = mwWidth;
     unsigned long lwHeight = 40;
 
     Logo_window = 
@@ -622,7 +612,7 @@ int main ( int argc, char *argv[] )
     unsigned long cwWidth  = (wWidth - cwLeft -4);
     unsigned long cwHeight = mwHeight; //(wHeight - cwTop -4 -titlebarHeight);
 
-    // client window (White)
+// client window (White)
     Client_window = 
         (int) gws_create_window ( 
                   client_fd,

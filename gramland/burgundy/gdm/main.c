@@ -33,29 +33,53 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <packet.h>
 #include <rtl/gramado.h>
 // The client-side library.
 #include <gws.h>
+
 // Internal
-#include <editor.h>
+#include <packet.h>
+#include <gdm.h>
 
 //
-// windows
+// == ports ====================================
 //
 
-// globally
+#define PORTS_WS  4040
+#define PORTS_NS  4041
+#define PORTS_FS  4042
+// ...
+
+#define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
+
+/*
+struct sockaddr_in addr = {
+    .sin_family = AF_INET,
+    .sin_port   = 7548, 
+    .sin_addr   = IP(192, 168, 1, 79),
+};
+*/
+
+//char *hello = "Hello there!\n";
+
+unsigned long gScreenWidth=0;
+unsigned long gScreenHeight=0;
+
+
+//
+// Windows
+//
+
 static int main_window = 0;
 static int addressbar_window = 0;
 static int client_window = 0;
-
-static int rebootbutton_window = 0;  //first button
+static int rebootbutton_window = 0;   //first button
 static int confirmbutton_window = 0;  //second button
 
 // #todo
 // int button_list[8];
 
-// cursor
+// Cursor
 static int cursor_x = 0;
 static int cursor_y = 0;
 static int cursor_x_max = 0;
@@ -70,17 +94,7 @@ static int blink_status=FALSE;
 int tmp_ip_x=8;
 int tmp_ip_y=8;
 
-//
-// == ports ====================================
-//
-
-#define PORTS_WS 4040
-#define PORTS_NS 4041
-#define PORTS_FS 4042
-// ...
-
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-
+// ========
 
 //prototype
 static int 
@@ -93,16 +107,15 @@ gdmProcedure(
 
 static void update_clients(int fd);
 
-// ============
+// ========
 
 static void update_clients(int fd)
 {
     gws_redraw_window(fd, addressbar_window, TRUE);
     gws_redraw_window(fd, rebootbutton_window, TRUE);
     gws_redraw_window(fd, confirmbutton_window, TRUE);
-    gws_redraw_window(fd, client_window,     TRUE);
+    gws_redraw_window(fd, client_window, TRUE);
 }
-
 
 int fileman_init_globals(void)
 {
@@ -113,7 +126,6 @@ int fileman_init_globals(void)
     return 0;
 }
 
-
 int fileman_init_windows(void)
 {
     register int i=0;
@@ -123,59 +135,43 @@ int fileman_init_windows(void)
     return 0;
 }
 
-//char *hello = "Hello there!\n";
-
-/*
-#define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
-struct sockaddr_in addr = {
-    .sin_family = AF_INET,
-    .sin_port   = 7548, 
-    .sin_addr   = IP(192, 168, 1, 79),
-};
-*/
-
-
 // Quem deveria fazer isso seria o window server
 // escrevendo na janela com foco de entrada 
 // e com as características de edição configuradas pra ela.
 // Ou ainda uma biblioteca client-side.
 
-void 
-editorDrawChar( 
-    int fd,
-    int ch)
+void editorDrawChar(int fd, int ch)
 {
     int pos_x=0;
     int pos_y=0;
 
+    if(fd<0)
+        return;
+
 // Get saved value
     pos_x = (int) (cursor_x & 0xFFFF);
     pos_y = (int) (cursor_y & 0xFFFF);
-
-    if ( pos_x < 0 ){ pos_x = 0; }
-    if ( pos_y < 0 ){ pos_y = 0; }
-
+    if (pos_x < 0){
+        pos_x = 0;
+    }
+    if (pos_y < 0){
+        pos_y = 0;
+    }
 // End of line
-    if ( pos_x >= cursor_x_max )
-    {
+    if (pos_x >= cursor_x_max){
         pos_x = 0;
         pos_y++;
     }
-
 // Last line
 // #todo: scroll
-    if ( pos_y >= cursor_y_max )
-    {
-        pos_y = cursor_y_max-1;
+    if (pos_y >= cursor_y_max){
+        pos_y = (cursor_y_max - 1);
     }
-
 // Save cursor
     cursor_x = pos_x;
     cursor_y = pos_y;
-
 // Draw
 // Calling the window server for drawing the char.
-
     gws_draw_char ( 
         fd, 
         client_window, 
@@ -183,16 +179,11 @@ editorDrawChar(
         (cursor_y*8), 
         COLOR_BLACK, 
         ch );
-
-    // increment
+// Increment
     cursor_x++;
 }
 
-
-void
-editorSetCursor( 
-    int x,
-    int y )
+void editorSetCursor( int x,int y )
 {
     if (cursor_x >= 0 && 
         cursor_x < cursor_x_max)
@@ -207,8 +198,6 @@ editorSetCursor(
     }
 }
 
-
-// local
 static int 
 gdmProcedure(
     int fd, 
@@ -217,13 +206,15 @@ gdmProcedure(
     unsigned long long1, 
     unsigned long long2 )
 {
-    if(fd<0)
+    if (fd<0){
         return -1;
-    if(event_window<0)
+    }
+    if (event_window<0){
         return -1;
-    if(event_type<0)
+    }
+    if (event_type<0){
         return -1;
-
+    }
 
     switch(event_type){
 
@@ -239,28 +230,24 @@ gdmProcedure(
             event_window == client_window )
         {
             //gws_redraw_window(fd, event_window, TRUE);
-            
-            if(event_window == client_window)
-            {
+            // IN: fd, wid, left, top, color, char.
+            if (event_window == client_window){
                 gws_draw_char (
-                    (int) fd,              // fd
-                    (int) event_window,    // wid
-                    (unsigned long) long1, // left
-                    (unsigned long) long2, // top
+                    (int) fd,
+                    (int) event_window,
+                    (unsigned long) long1,
+                    (unsigned long) long2,
                     (unsigned long) COLOR_BLACK,
                     (unsigned long) '.' );
             }
             return 0;
         }
-
-        if(event_window == rebootbutton_window ){
+        if (event_window == rebootbutton_window){
             printf("~ reboot button clicked\n");
         }
-
-        if(event_window == confirmbutton_window ){
+        if (event_window == confirmbutton_window){
             printf("~ confirm button clicked\n");
         }
-        
         return 0;
         break;
 
@@ -268,15 +255,13 @@ gdmProcedure(
     case MSG_PAINT:
         // If the event window is the main window, so
         // redraw everyone.
-        if( event_window == main_window )
-        {
+        if (event_window == main_window){
             update_clients(fd);
             //gws_redraw_window(fd, addressbar_window, TRUE);
             //gws_redraw_window(fd, rebootbutton_window, TRUE);
             //gws_redraw_window(fd, client_window,     TRUE);
             return 0;
         }
-
         break;
 
     //case MSG_KEYDOWN:
@@ -298,21 +283,21 @@ int main( int argc, char *argv[] )
 {
     struct gws_display_d *Display;
     int client_fd = -1;
+    int fTest=FALSE;
 
-    //debug_print ("EDITOR.BIN: Initializing\n");
-
-/*
 // #test
 // OK!
-    int i=0;
-	for (i = 1; i < argc; i++)
-		if (strcmp("--test--", argv[i]) == 0)
-			printf("TEST\n");
-*/
+    register int i=0;
+    for (i=1; i<argc; i++){
+        if (strcmp("--test", argv[i]) == 0){
+            printf("flag: TEST\n");
+            fTest=TRUE;
+        }
+    };
 
 // global: Cursor
-    cursor_x = 0;
-    cursor_y = 0;
+    cursor_x=0;
+    cursor_y=0;
 
 // ============================
 // Open display.
@@ -322,35 +307,30 @@ int main( int argc, char *argv[] )
     Display = 
         (struct gws_display_d *) gws_open_display("display:name.0");
 
-    if ( (void*) Display == NULL )
-    {
-        debug_print ("editor: Couldn't open display\n");
-        printf      ("editor: Couldn't open display\n");
+    if ( (void*) Display == NULL ){
+        debug_print ("gdm: Couldn't open display\n");
+        printf      ("gdm: Couldn't open display\n");
         exit(1);
     }
 
+// fd
     client_fd = (int) Display->fd;
-
-    if ( client_fd <= 0 )
-    {
-        debug_print ("editor: bad fd\n");
-        printf      ("editor: bad fd\n");
+    if (client_fd <= 0){
+        debug_print ("gdm: bad fd\n");
+        printf      ("gdm: bad fd\n");
         exit(1);
     }
 
 // =====================================================
-
 // Device info
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);
-
     if ( w == 0 || h == 0 ){
-        printf ("editor: w h \n");
+        printf ("gdm: w h\n");
         exit(1);
     }
 
 // Tamanho da janela.
-
 // #
 // Isso depende do modo em que o window manager esta operando.
 // No modo 1, janelas do tipo overlapped
@@ -362,7 +342,6 @@ int main( int argc, char *argv[] )
     //unsigned long w_height = (h - 100); //(h>>1);
     unsigned long w_width  = (w>>1);
     unsigned long w_height = (h>>1);
-
 // original
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
@@ -418,9 +397,8 @@ int main( int argc, char *argv[] )
                   COLOR_RED,   // #todo: client bg. Not implemented. 
                   COLOR_GRAY );
 
-    if ( main_window < 0 )
-    {
-        debug_print("Editor: main_window fail\n"); 
+    if (main_window<0){
+        debug_print("gdm: main_window\n"); 
         exit(1);
     }
 
@@ -451,14 +429,11 @@ int main( int argc, char *argv[] )
                   24,                     //h
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if (addressbar_window < 0)
-    {
-        debug_print("editor: addressbar_window fail\n");
+    if (addressbar_window<0){
+        debug_print("gdm: addressbar_window fail\n");
     }
-
 // Text inside the address bar.
-    if ( addressbar_window > 0 )
-    {
+    if (addressbar_window>0){
         gws_draw_text (
             (int) client_fd,            // fd,
             (int) addressbar_window,    // window id,
@@ -482,11 +457,9 @@ int main( int argc, char *argv[] )
                   24,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( rebootbutton_window < 0 )
-    {
+    if (rebootbutton_window<0){
         debug_print("editor: rebootbutton_window fail\n"); 
     }
-
 
 // -------------------------------
 //  The second line of elements.
@@ -507,18 +480,14 @@ int main( int argc, char *argv[] )
 // Client window (White)
 // Inside the mainwindow.
 // Lembre-se que temos uma status bar.
-
 // left:
     unsigned long cw_left = (( w_width/8 )*2) + 20; //4;
-
 // top:
 // Title bar + address bar.
     unsigned long cw_top = (4 +(24) +4); //(32 +4 +(24) +4);
-
 // width:
 // Width - borders.
     unsigned long cw_width = (( w_width/8 )*2);//( w_width -4 -4);
-
 // height:
 // Height - topbar - addressbar - borders - statusbar 
 // #bugbug:
@@ -538,9 +507,8 @@ int main( int argc, char *argv[] )
                   cw_height,
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if ( client_window < 0 )
-    {
-        debug_print("editor: client_window fail\n"); 
+    if (client_window<0){
+        debug_print("gdm: client_window\n"); 
     }
 
 // first button
@@ -557,11 +525,9 @@ int main( int argc, char *argv[] )
                   24,                  //h
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if ( confirmbutton_window < 0 )
-    {
-        debug_print("editor: confirmbutton_window fail\n"); 
+    if (confirmbutton_window<0){
+        debug_print("gdm: confirmbutton_window\n");
     }
-
 
 /*
     int t=0;
@@ -606,7 +572,7 @@ int main( int argc, char *argv[] )
 // Setting the input focus on a given window.
 // Input
 // #focus
-// Well, the editor.bin application is not receiving
+// Well, the gdm.bin application is not receiving
 // the input ... so, i guess the window server
 // is printing the chars into the window with focus.
 
@@ -615,7 +581,6 @@ int main( int argc, char *argv[] )
          9,             // set focus
          client_window,
          client_window );
-
 
 //
 // Event loop
@@ -649,10 +614,8 @@ int main( int argc, char *argv[] )
                                    client_fd, 
                                    (struct gws_event_d *) &lEvent );
 
-        if( (void *) e != NULL )
-        {
-            if( e->used == TRUE && e->magic == 1234 )
-            {
+        if ( (void *) e != NULL ){
+            if ( e->used == TRUE && e->magic == 1234 ){
                 gdmProcedure(
                     client_fd, e->window, e->type, e->long1, e->long2 );
             }
@@ -690,7 +653,6 @@ int main( int argc, char *argv[] )
 
 //==============================================
 
-
 //
 // loop
 //
@@ -716,18 +678,12 @@ int main( int argc, char *argv[] )
 //=================================
 */
 
+// #importante
+// Se não usarmos o loop acima, então podemos pegar
+// as mensagens do sistema....
+// O ws pode mandar mensagens de sistema para o wm registrado.
 
-
-
-
-    // #importante
-    // Se não usarmos o loop acima, então podemos pegar
-    // as mensagens do sistema....
-    // O ws pode mandar mensagens de sistema para o
-    // wm registrado.
-
-
-    /*
+/*
     struct gws_event_d *Event;
      
     for(;;){
@@ -747,26 +703,16 @@ int main( int argc, char *argv[] )
            gws_debug_print("editor: Not valid event!\n");
         };
     };
-    */
-
+*/
 
 // exit
     //close (client_fd);
-    debug_print ("editor: bye\n"); 
-    printf      ("editor: bye\n");
-
+    debug_print ("gdm: bye\n");
+    printf      ("gdm: bye\n");
     return 0;
 }
 
-
 //
-// End.
+// End
 //
-
-
-
-
-
-
-
 

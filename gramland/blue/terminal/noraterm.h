@@ -1,8 +1,6 @@
 
-/*
- * File: noraterm.h
- *     The main header for the terminal.bin
- */
+// noraterm.h
+// The main header for the terminal.bin
 
 // rtl
 #include <types.h>
@@ -16,7 +14,6 @@
 #include <sys/socket.h>
 #include <rtl/gramado.h>
 
-
 // terminal project includes.
 #include <compiler.h>
 #include <globals.h>
@@ -29,8 +26,6 @@
 #include <packet.h>
 #include <terminal.h>
 
-
 // Client-side library.
 #include <gws.h>
-
 

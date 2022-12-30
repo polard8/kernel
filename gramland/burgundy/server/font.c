@@ -4,7 +4,6 @@
 
 #include "gws.h"
 
-
 int gfontSize=0;
 // As fontes usadas pelo servidor gws.
 unsigned long gws_currentfont_address=0;  // fonte atual.
@@ -14,7 +13,6 @@ unsigned long g8x16fontAddress=0;         // ??
 unsigned long g9x14fontAddress=0;         // 9x14,80×25,MDA, Hercules
 unsigned long g9x16fontAddress=0;         // 9x16,80×25,VGA
 //unsigned long gws_eye_sprite_address=0;
-
 
 
 static void __initialize_lt8x8_font(void);

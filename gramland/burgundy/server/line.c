@@ -18,7 +18,7 @@ plotLineRect4 (
     plotLine3d ( x1,y2,0, x1,y1,0, color );
 }
 
-//#bugbug: use unsigned int for 'color'.
+// #bugbug: Use unsigned int for 'color'.
 void 
 plotLineRectZ ( 
     int x1, int y1, int z1, 
@@ -41,16 +41,15 @@ testLines (
 {
    int dx = x2-x1;
    int dy = y2-y1;
-     
-  plotLine3d(   x1,  y1-dy, 0,   x1+dx, y1   , 0, color);
-  plotLine3d(x1+dx,     y1, 0,     x1, y1+dy , 0, color);
-  plotLine3d(   x1,  y1+dy, 0,  x1-dx, y1    , 0, color);
-  plotLine3d(x1-dx,     y1, 0,     x1, y1-dy , 0, color);
+
+    plotLine3d(   x1,  y1-dy, 0,   x1+dx, y1   , 0, color);
+    plotLine3d(x1+dx,     y1, 0,     x1, y1+dy , 0, color);
+    plotLine3d(   x1,  y1+dy, 0,  x1-dx, y1    , 0, color);
+    plotLine3d(x1-dx,     y1, 0,     x1, y1-dy , 0, color);
 }
 
-
-//#bugbug: use unsigned int for 'color'.
-//ok triangulo invertido.
+// #bugbug: use unsigned int for 'color'.
+// OK triangulo invertido.
 void 
 testLinesZ ( 
     int x1, int y1, int z1, 
@@ -66,13 +65,12 @@ testLinesZ (
     plotLine3d (x1-dx,     y1, z1,     x1, y1-dy , z2, color);
 }
 
-
 // ...
-//dx = x2 − x1
-//dy = y2 − y1
-//for x from x1 to x2 do
-//    y = y1 + dy × (x − x1) / dx
-//    plot(x, y)
+// dx = x2 − x1
+// dy = y2 − y1
+// for x from x1 to x2 do
+//     y = y1 + dy × (x − x1) / dx
+// plot(x, y)
 // See: https://en.wikipedia.org/wiki/Line_drawing_algorithm
 
 void
@@ -88,57 +86,50 @@ A_naive_line_drawing_algorithm(
     unsigned long dx =  (x2 - x1);
     unsigned long dy =  (y2 - y1);
 
-    for ( x = x1; x < x2; x++ )
+    for ( x=x1; x < x2; x++ )
     {
          // ugly
          y = (y1 + dy * (x - x1) / dx);
-         
          // IN: color, x, y, rop
          grBackBufferPutpixel(color,x,y,0);
     }; 
 }
 
-
-//test1
+// Test1
 void test_draw_line(void)
 {
-    register int g=0;
+    register int i=0;
 
-    for( g=0; g<400; g++ )
-    {
-            A_naive_line_drawing_algorithm ( 
-                8, 750,                 //x1,x2
-                8, (50 + (g*4)) ,       //y1,y2
-                COLOR_YELLOW );
-     };
-
+    for ( i=0; i<400; i++ ){
+        A_naive_line_drawing_algorithm ( 
+            8, 750,              // x1,x2
+            8, (50 + (i*4)) ,    // y1,y2
+            COLOR_YELLOW );
+    };
     gwssrv_show_backbuffer();
 }
 
-
-// test2
+// Test2
 // illusion
 void test_draw_line2(void)
 {
-    register int g=0;
-    
+    register int i=0;
     unsigned long vertex1[2];
-    unsigned long vertex2[2]; 
-
+    unsigned long vertex2[2];
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
-    // #todo
-    // Check the w h validation.
+// #todo
+// Check the w h validation.
 
     // horizontal
-    for ( g=0; g<h; g=g+10 )
+    for ( i=0; i<h; i=i+10 )
     {
             vertex1[0]=0;  //x1
-            vertex1[1]=g;  //y1
+            vertex1[1]=i;  //y1
 
-            vertex2[0]=g;  //x2
-            vertex2[1]=g;  //y2
+            vertex2[0]=i;  //x2
+            vertex2[1]=i;  //y2
             
             A_naive_line_drawing_algorithm ( 
                 vertex1[0], vertex2[0],   //x1,x2
@@ -147,13 +138,13 @@ void test_draw_line2(void)
      };
 
     // horizontal
-    for ( g=0; g<h; g=g+10 )
+    for ( i=0; i<h; i=i+10 )
     {
-            vertex1[0]=g;  //x1
-            vertex1[1]=g;  //y1
+            vertex1[0]=i;  //x1
+            vertex1[1]=i;  //y1
 
             vertex2[0]=w;  //x2
-            vertex2[1]=g;  //y2
+            vertex2[1]=i;  //y2
             
             A_naive_line_drawing_algorithm ( 
                 vertex1[0], vertex2[0],   //x1,x2
