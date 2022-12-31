@@ -9,11 +9,14 @@
 // Internal
 #define SYS_SOCKET_IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
+
 // globals
 // see: socket.h
 struct socket_d  *CurrentSocket;
 struct socket_d  *LocalHostHTTPSocket;
 // ...
+
+unsigned long socketList[SOCKET_COUNT_MAX];
 
 
 // private:
@@ -29,11 +32,10 @@ static pid_t gramado_ports[GRAMADO_PORT_MAX];
  *     Every process has its own socket structure.
  *     The status is: NOT CONNECTED.
  */
-
 struct socket_d *create_socket_object(void)
 {
-    register int i=0;
     struct socket_d *s;
+    register int i=0;
 
 // Create and clean the structure.
     s = (void *) kmalloc ( sizeof( struct socket_d ) );
@@ -56,19 +58,16 @@ struct socket_d *create_socket_object(void)
     s->family = 0;
     s->type = 0;
     s->protocol = 0;
-    s->ip = (unsigned int) 0;
-    s->port =  (unsigned short) 0;
 
-    // #todo
-    //s->ip_ipv4 = (unsigned int) 0;
-    //s->ip_ipv6 = (unsigned long) 0;
+    s->ip_ipv4 = (unsigned int) 0;
+    s->ip_ipv6 = (unsigned long) 0;
+    s->port =  (unsigned short) 0;
 
 // Initializing pointers.
 // We don't want this kinda crash in the real machine.
-        
+
 // Connection ponter.
 // Its a pointer to another socket. Is it?
-
     s->conn = (struct socket_d *) 0;
 
 // The counter
@@ -109,31 +108,49 @@ fail:
     return NULL;
 }
 
-unsigned long getSocketIP(struct socket_d *socket)
+unsigned int getSocketIPV4(struct socket_d *socket)
 {
     if ( (void *) socket ==  NULL ){
         return 0;
     }
-    return (unsigned long) socket->ip; 
+    if (socket->magic!=1234){
+        return 0;
+    }
+    return (unsigned int) socket->ip_ipv4; 
 }
 
-unsigned long getSocketPort(struct socket_d *socket)
+unsigned long getSocketIPV6(struct socket_d *socket)
 {
     if ( (void *) socket ==  NULL ){
         return 0;
     }
-    return (unsigned long) socket->port; 
+    if (socket->magic!=1234){
+        return 0;
+    }
+    return (unsigned long) socket->ip_ipv6; 
+}
+
+unsigned short getSocketPort(struct socket_d *socket)
+{
+    if ( (void *) socket ==  NULL ){
+        return 0;
+    }
+    if (socket->magic!=1234){
+        return 0;
+    }
+    return (unsigned short) socket->port; 
 }
 
 // Get the pointer for the socket structure 
 // given the fd.
+// OUT: Returning a pointer for a 
+// ring0 socket structure.
 struct socket_d *get_socket_from_fd (int fd)
 {
     struct process_d *p;
     file *_file;
 
-    if (fd<0 || fd>=OPEN_MAX)
-    {
+    if (fd<0 || fd>=OPEN_MAX){
         //msg
         return (struct socket_d *) 0;
     }
@@ -142,18 +159,23 @@ struct socket_d *get_socket_from_fd (int fd)
     pid_t current_process = (pid_t) get_current_process();    
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL){
-        return (struct socket_d *) 0;
+        goto fail;
     }
 
 // The file.
-    _file = (file *) p->Objects[fd];    
+    _file = (file *) p->Objects[fd];
     if ( (void *) _file == NULL){
-        return (struct socket_d *) 0;
+        goto fail;
+    }
+    if (_file->magic!=1234){
+        goto fail;
     }
 
 // The structure.
 // Get the pointer for the socket structure given the fd.
     return (struct socket_d *) _file->socket;
+fail:
+    return (struct socket_d *) 0;
 }
 
 // Show the private socket for a process.
@@ -164,8 +186,7 @@ void show_socket_for_a_process (pid_t pid)
 
     printf ("Socket info for pid %d: \n", pid);
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX)
-    {
+    if (pid<0 || pid >= PROCESS_COUNT_MAX){
         printf ("pid limits\n");
         goto fail;
     }
@@ -458,10 +479,8 @@ socket_inet (
         printf("socket_inet: Process\n");
         goto fail;
     }
-    if ( Process->used != TRUE || 
-         Process->magic != 1234 )
-    {
-        printf("socket_inet: validation\n");
+    if ( Process->used != TRUE || Process->magic != 1234 ){
+        printf("socket_inet: Process validation\n");
         goto fail;
     }
 
@@ -521,10 +540,6 @@ socket_inet (
 // Clear the structure.
     memset( _file, 0, sizeof(struct file_d) );
 
-// #todo: Fazer isso somente no fim da rotina.
-    _file->used = TRUE;
-    _file->magic = 1234;
-
     _file->pid = (pid_t) current_process;
     _file->uid = (uid_t) current_user;
     _file->gid = (gid_t) current_group;
@@ -578,6 +593,9 @@ socket_inet (
 // fd
     _file->_file = __slot;
 
+    _file->used = TRUE;
+    _file->magic = 1234;
+
 // Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
 
@@ -603,15 +621,13 @@ int socket_init(void)
     };
     socket_initialize_gramado_ports();
     // ...
-
     return 0;
 }
 
 int socket_initialize_gramado_ports(void)
 {
     register int i=0;
-    for (i=0; i<GRAMADO_PORT_MAX; i++)
-    {
+    for (i=0; i<GRAMADO_PORT_MAX; i++){
         gramado_ports[i] = 0;
     };
     return 0;
@@ -624,8 +640,7 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     debug_print ("socket_ioctl: TODO\n");
 
-    if (fd < 0 || fd >= OPEN_MAX)
-    {
+    if (fd < 0 || fd >= OPEN_MAX){
         return (int) (-EBADF);
     }
 
@@ -671,11 +686,11 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
             f->sync.sender = (pid_t) arg;
             return 0;
             break;
-        
+
         case 4001:
             return (int) f->sync.sender;
             break;
-        
+
         case 4002:
             return (int) f->sync.can_read;
             break;
@@ -698,13 +713,11 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
     return -1;
 }
 
-
 int socket_read ( unsigned int fd, char *buf, int count )
 {
     debug_print ("socket_read:[TODO]\n");
     return -1;
 }
-
 
 int socket_write ( unsigned int fd, char *buf, int count )
 {
@@ -714,12 +727,12 @@ int socket_write ( unsigned int fd, char *buf, int count )
 
 pid_t socket_get_gramado_port (int port)
 {
-    //port
+//port
     if ( port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return (pid_t) -1;
     }
-    
+
     return (pid_t) gramado_ports[port];
 }
 
@@ -727,19 +740,19 @@ pid_t socket_get_gramado_port (int port)
 // Usados apenas na famíla AF_GRAMADO.
 int socket_set_gramado_port (int port, pid_t pid)
 {
-    //port
+//port
     if ( port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
     }
 
-    //pid
-    //todo: max
+//pid
+//todo: max
     if (pid<0){
         debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
-    }       
-    
+    }
+
     gramado_ports[port] = (pid_t) pid;
 
     return 0;
@@ -980,7 +993,7 @@ sys_accept (
     int fdServer = -1;
     int fdClient = -1;
 // Iterator for the pending connections queue.
-    int i=0;
+    register int i=0;
 
     // #debug
     // debug_print ("sys_accept:\n");
@@ -1000,9 +1013,7 @@ sys_accept (
 // na lista de conexões pendentes.
 
     fdServer = sockfd;
-
-    if ( fdServer < 0 || fdServer >= OPEN_MAX )
-    {
+    if ( fdServer < 0 || fdServer >= OPEN_MAX ){
         debug_print ("sys_accept: [FAIL] fdServer\n");
         return (int) (-EINVAL);
     }
@@ -1024,7 +1035,7 @@ sys_accept (
 
 // The accept() was called by the server.
 
-    if( current_process < 0  || current_process >= PROCESS_COUNT_MAX )
+    if ( current_process < 0  || current_process >= PROCESS_COUNT_MAX )
     {
         debug_print ("sys_accept: [FAIL] current_process\n");
         printf      ("sys_accept: [FAIL] current_process\n");
@@ -1200,7 +1211,6 @@ sys_accept (
 // selecionar um da fila de conexoes pendentes. 
 // ele tambem esta em um dos slots e no slot 31.
 
-
 // Se o socket ja está conectado ou 
 // esta esperando para se conectar.
 
@@ -1222,24 +1232,27 @@ sys_accept (
         // circula
         
         sSocket->backlog_head++;
-        if( sSocket->backlog_head >= sSocket->backlog_max )
+        if ( sSocket->backlog_head >= sSocket->backlog_max ){
             sSocket->backlog_head=0;
-        i=sSocket->backlog_head;
+        }
+        i = sSocket->backlog_head;
         
-        if( i<0 || i >= sSocket->backlog_max ){
+        if ( i<0 || i >= sSocket->backlog_max ){
             panic("sys_accept: i is out of limits.\n");
         }
-        
-        while( i <= sSocket->backlog_max )
+
+        // Probe for a valid pointer.
+        while ( i <= sSocket->backlog_max )
         {
-            // Get pointer.
-            cSocket = (struct socket_d *) sSocket->pending_connections[i];
-            if( (void*) cSocket != NULL )
+            cSocket = 
+                (struct socket_d *) sSocket->pending_connections[i];
+            if ( (void*) cSocket != NULL ){
                 break;
+            }
             // next
             i++;
         };
-        
+
         // Not valid Client socket
         if ( (void*) cSocket == NULL )
         {
@@ -1262,7 +1275,7 @@ sys_accept (
 
             // Na verdade o magic indica que eh 
             // uma conexao pendente.
-            if( cSocket->magic_string[0] == 'C')
+            if ( cSocket->magic_string[0] == 'C')
             {
                 //debug_print("MAGIC C\n");
                 //printf ("magic: %s\m",cSocket->magic_string);
@@ -1281,7 +1294,7 @@ sys_accept (
             // Essa é a estrutura de processo do servidor.
             // Essa é a lista de arquivos abertos pelo processo.
             //sProcess->Objects[ sProcess->_client_sock_fd ] = cFile;
-            sProcess->Objects[ 31 ] = (unsigned long) cFile;  //last
+            sProcess->Objects[31] = (unsigned long) cFile;  //last
             cFile->_file = 31;
             
             //debug_print ("sys_accept: done\n");
@@ -2393,29 +2406,29 @@ fail:
 int 
 update_socket ( 
     struct socket_d *socket, 
-    unsigned long ip, 
+    unsigned int ip_ipv4, 
     unsigned short port )
 {
     if ( (void *) socket ==  NULL ){
-        return (int) 1;
-    }else{
-        socket->ip   = (unsigned long)  ip;
-        socket->port = (unsigned short) port;
-        return 0;
-    };
+        return (int) -1;
+    }
+    socket->ip_ipv4 = (unsigned int)  ip_ipv4;
+    socket->port = (unsigned short) port;
+    return 0;
 }
 
 /*
- *  sys_socket:
- *       Essa é função oferece suporte à função socket da libc.
- *       Estamos na klibc dentro do kernel base.
+ * sys_socket:
+ * This is the socket() function implementation.
+ * Estamos na klibc dentro do kernel base.
  */
 // The function socket() creates an endpoint for communication and 
 // returns a file descriptor for the socket.
 // socket() creates a new socket of a certain type, 
-// identified by an integer number, and allocates system resources to it.
-//libc socket interface.
-//See: https://www.gnu.org/software/libc/manual/html_node/Sockets.html
+// identified by an integer number, and 
+// allocates system resources to it.
+// See: 
+// https://www.gnu.org/software/libc/manual/html_node/Sockets.html
 // #example:
 // tcp_socket = socket(AF_INET, SOCK_STREAM, 0);
 // udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -2435,9 +2448,19 @@ int sys_socket ( int family, int type, int protocol )
     // call create_socket(...)
     // it will return a pointer.
 
-    // Socket structure.
+// Socket structure.
     struct socket_d  *__socket;
-
+// Current process.
+    struct process_d  *p;
+// ip:port. 
+// Used in the socket struture.
+    unsigned int _ipv4 = 
+        (unsigned int) 0x00000000;
+    unsigned long _ipv6 = 
+        (unsigned long) 0x0000000000000000;
+    unsigned short port = 
+        (unsigned short) 0x0000;
+    int Verbose = FALSE;
 
 //
 // Address types:
@@ -2446,12 +2469,11 @@ int sys_socket ( int family, int type, int protocol )
 // ====================
 // type 1:
 // Socket address structure.
-    // Usado em AF_GRAMADO
+// Usado em AF_GRAMADO
     struct sockaddr  addr;
     addr.sa_family  = family;
     addr.sa_data[0] = 'x'; 
     addr.sa_data[1] = 'x';
-
 
 // ====================
 // type 2:
@@ -2463,15 +2485,6 @@ int sys_socket ( int family, int type, int protocol )
     addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
     //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
     //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
-
-    // Current process.
-    struct process_d  *p;  
-
-    // ip:port used in the socket struture.
-    unsigned long ip    = 0x00000000;
-    unsigned short port = 0x0000;
-
-    int Verbose = FALSE;
 
     pid_t current_process = (pid_t) get_current_process();
     
@@ -2494,7 +2507,7 @@ int sys_socket ( int family, int type, int protocol )
 // Filters
 
     if (family < 0){
-        debug_print ("sys_socket: [FAIL] family not supported\n");
+        debug_print ("sys_socket: family not supported\n");
         return (int) (-EINVAL);
     }
 
@@ -2502,10 +2515,9 @@ int sys_socket ( int family, int type, int protocol )
          type != SOCK_DGRAM  &&
          type != SOCK_RAW)
     {
-        debug_print ("sys_socket: [FAIL] type not supported\n");
+        debug_print ("sys_socket: type not supported\n");
         return (int) (-EINVAL);
     }
-
 
 // #todo
 // We are accepting only the gramado native protocol for the sockets.
@@ -2515,25 +2527,31 @@ int sys_socket ( int family, int type, int protocol )
 // is not in the payload. This is a plain for the future. #todo.
 // 0 = GRAMADO NATIVE PROTOCOL.
     if (protocol < 0){
-        debug_print ("sys_socket: [FAIL] protocol not supported\n");
+        debug_print ("sys_socket: protocol not supported\n");
         return (int) (-EINVAL);
     }
-//#debug
+
+// #debug
+// '0' is the only valid value for now.
     if( protocol != 0){
         panic ("sys_socket: protocol not supported yet.\n");
     }
 
-// Current process.
-
+// Current pid.
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX)
     {
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
     }
+
+// Process structure.
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
-        debug_print ("sys_socket: p fail\n");
-        panic       ("sys_socket: p fail\n");
+        debug_print ("sys_socket: p\n");
+        panic       ("sys_socket: p\n");
+    }
+    if (p->magic!=1234){
+        panic ("sys_socket: p validation\n");
     }
 
 //
@@ -2549,16 +2567,10 @@ int sys_socket ( int family, int type, int protocol )
 // IN: ip and port.
     __socket = (struct socket_d *) create_socket_object();
     if ( (void *) __socket == NULL ){
-        debug_print ("sys_socket: [FAIL] __socket \n");
-        printf      ("sys_socket: [FAIL] __socket \n");
+        debug_print ("sys_socket: __socket\n");
+        printf      ("sys_socket: __socket\n");
         goto fail;
     }
-
-// #bugbug
-// The private socket of a process.
-// This is not good. 
-// Some process will create more than one socket?
-    p->priv = (struct socket_d *) __socket;
 
 // family, type and protocol.
     __socket->family   = family;
@@ -2567,13 +2579,21 @@ int sys_socket ( int family, int type, int protocol )
 
 // ip:port
 // Initialized with '0'.
-    __socket->ip   = ip;  //ipv4
-    __socket->port = port;
+    __socket->ip_ipv4 = (unsigned int) _ipv4;
+    __socket->ip_ipv6 = (unsigned long) _ipv6;
+    __socket->port = 
+        (unsigned short) port;
 
 // pid, uid, gid.
     __socket->pid = (pid_t) current_process;
     __socket->uid = (uid_t) current_user;
     __socket->gid = (gid_t) current_group;
+
+// #bugbug
+// Set the private socket of a process.
+// This is not good. 
+// Some process will create more than one socket?
+    p->priv = (struct socket_d *) __socket;
 
 // Create socket file.
 // #importante

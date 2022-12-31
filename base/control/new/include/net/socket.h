@@ -493,7 +493,7 @@ struct sockcred {
 
 /*
  * socket_d:
- *     Socket struct.
+ *     Socket structure.
  */
 
 struct socket_d
@@ -524,23 +524,20 @@ struct socket_d
     int connection_type;
 
 // ip and port.
-    unsigned int ip;
+    unsigned int ip_ipv4;
+    unsigned long ip_ipv6;
     unsigned short port;
-
-    //unsigned int ip_ipv4;
-    //unsigned long ip_ipv6;
-
 
 // The list of pending connections.
 // Updated by listen().
 
-
     int connections_count;
 
+// List of sockets.
     int backlog_max;
     int backlog_head;
     int backlog_tail;
-    unsigned long pending_connections[32];  //list of sockets.
+    unsigned long pending_connections[32];
 
 // Em que posiçao o ponteiro do socket de cliente esta
 // dentro da fila de conecxoes pendentes no socket do servidor.
@@ -559,33 +556,31 @@ struct socket_d
 // Current connection?
     struct socket_d  *conn;
 
-
-    // flag
-    // write() copy the data to the connected socket.
+// flag
+// write() copy the data to the connected socket.
     int conn_copy; 
-    
 
-    // The server finds a place in the server_process->Objects[i].
+// The server finds a place in the server_process->Objects[i].
     int clientfd_on_server;
     
 // ====================================
 
-    // Nosso arquivo.
-    // Eh o objeto socket ??
+// Nosso arquivo.
+// Eh o objeto socket??
     file *private_file;
 
-    //testing
+// testing
     char magic_string[8];
 
-    //se ele está ou não aceitando conexões. ...
-    //...
+// se ele está ou não aceitando conexões. ...
+//...
     unsigned short flags; 
 
-    // usada em endereços AF_GRAMADO
+// usada em endereços AF_GRAMADO
     struct sockaddr addr;
 
-    // usada em endereços AF_INET
-    // Where is it defined?
+// usada em endereços AF_INET
+// Where is it defined?
     struct sockaddr_in addr_in; 
 };
 
@@ -594,23 +589,21 @@ extern struct socket_d  *CurrentSocket;
 extern struct socket_d  *LocalHostHTTPSocket;
 // ...
 
-
 // #todo:
 // Refazer esse limite proviório.
 #define SOCKET_COUNT_MAX  32
 
-unsigned long socketList[SOCKET_COUNT_MAX];
-
+extern unsigned long socketList[SOCKET_COUNT_MAX];
 
 //
 // == prototypes =========================
 //
 
 struct socket_d *create_socket_object (void);
-unsigned long getSocketIP ( struct socket_d *socket );
-unsigned long getSocketPort ( struct socket_d *socket );
+unsigned int getSocketIPV4(struct socket_d *socket);
+unsigned long getSocketIPV6(struct socket_d *socket);
+unsigned short getSocketPort(struct socket_d *socket);
 struct socket_d *get_socket_from_fd (int fd);
-
 void show_socket_for_a_process (pid_t pid);
 
 int 
@@ -676,7 +669,7 @@ int sys_socket_shutdown (int socket, int how);
 int 
 update_socket ( 
     struct socket_d *socket, 
-    unsigned long ip, 
+    unsigned int ip_ipv4, 
     unsigned short port );
 
 int sys_socket ( int family, int type, int protocol );

@@ -169,12 +169,16 @@ static void __enter_debug_mode(void);
 
 // ================================
 
-// setup stdin
+// Setup stdin file.
+// Clean the buffer.
+// Set the offset position.
+// See: kstdio.c
 static int __setup_cmdline(void)
 {
     char cmdline[64];
 
     memset(cmdline, 0, 64);  
+    cmdline[63]=0;
 
     if ( (void*) stdin == NULL ){
         return -1;
@@ -182,19 +186,11 @@ static int __setup_cmdline(void)
     if (stdin->magic!=1234){
         return -1;
     }
-
-// The string.
-    //mysprintf(cmdline,"Hello from kernel");
-    cmdline[63]=0;
-
-// rewind. 
-// See: kstdio.c
-// a leitura começa do início do arquivo.
+// Rewind.
     k_fseek( stdin, 0, SEEK_SET );
-
-// Write
+// Clean
     file_write_buffer( stdin, cmdline, 64 );
-
+    k_fseek( stdin, 0, SEEK_SET );
     return 0;
 }
 

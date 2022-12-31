@@ -1818,7 +1818,7 @@ void *sci0 (
         // get socket IP
         // Gramado API socket support. (not libc)
         case 161:
-            return (void *) getSocketIP ( (struct socket_d *) arg2 );
+            return (void *) getSocketIPV4 ( (struct socket_d *) arg2 );
             break;
 
         // 162
@@ -1835,8 +1835,8 @@ void *sci0 (
         case 163:
             return (void *) update_socket ( 
                                 (struct socket_d *) arg2, 
-                                (unsigned long)     arg3, 
-                                (unsigned short)    arg4 );
+                                (unsigned int)      (arg3 & 0xFFFFFFFF), 
+                                (unsigned short)    (arg4 & 0xFFFF) );
             break;
 
 
