@@ -168,12 +168,11 @@ static int __feedSTDIN( unsigned long ch )
     char Data = (char) (ch & 0xFF);
     char ch_buffer[2];
 
-    if( (void*) stdin == NULL ){
+    if ( (void*) stdin == NULL ){
         goto fail;
     }
-
-    if(stdin->used != TRUE) { return -1; }
-    if(stdin->magic != 1234){ return -1; }
+    if (stdin->used != TRUE) { return -1; }
+    if (stdin->magic != 1234){ return -1; }
 
 // Can write.
     stdin->sync.can_write = TRUE;
@@ -296,7 +295,7 @@ void kgwm_early_kernel_console(void)
 
     while(1){
         // exit loop
-        if( ShellFlag == FALSE )
+        if (ShellFlag == FALSE)
         {
             // mandamos uma mensagem para o ws, para atualizar o desktop.
             if(gUseWMCallbacks==TRUE){
@@ -348,16 +347,13 @@ wmProcedure (
     unsigned long long2 )
 {
     int Status = -1;
-    int UseSTDIN=TRUE;      // Input model
+    int UseSTDIN=TRUE;  // Input model
     char ch_buffer[2];  // char string.
     char buffer[128];   // string buffer
-
     unsigned long tmp_value=0;
 
     //debug_print("wmProcedure:\n");
-    
     sprintf (buffer,"My \x1b[8C string!\n"); 
-
 
 // ===================================
 // Control:
@@ -458,49 +454,49 @@ wmProcedure (
             if ( ShellFlag != TRUE )
             {
 
-                if ( ctrl_status == TRUE && long1 == 'x')
+                if (ctrl_status == TRUE && long1 == 'x')
                 { 
                     //printf("CUT\n"); refresh_screen(); 
                     post_message_to_ws( NULL, MSG_CUT, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 'c')
+                if (ctrl_status == TRUE && long1 == 'c')
                 { 
                     //printf("COPY\n"); refresh_screen(); 
                     post_message_to_ws( NULL, MSG_COPY, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 'v')
+                if (ctrl_status == TRUE && long1 == 'v')
                 {
                     //printf("PASTE\n"); refresh_screen();
                     post_message_to_ws( NULL, MSG_PASTE, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 'z')
+                if (ctrl_status == TRUE && long1 == 'z')
                 {
                     //printf("UNDO\n"); refresh_screen();
                     post_message_to_ws( NULL, MSG_UNDO, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 'a')
+                if (ctrl_status == TRUE && long1 == 'a')
                 {
                     //printf("SELECT ALL\n"); refresh_screen();
                     post_message_to_ws( NULL, MSG_SELECT_ALL, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 'f')
+                if (ctrl_status == TRUE && long1 == 'f')
                 {
                     //printf("FIND\n"); refresh_screen();
                     post_message_to_ws( NULL, MSG_FIND, long1, long2 );
                     return 0;
                 }
 
-                if ( ctrl_status == TRUE && long1 == 's')
+                if (ctrl_status == TRUE && long1 == 's')
                 {
                     //printf("SAVE\n"); refresh_screen();
                     post_message_to_ws( NULL, MSG_SAVE, long1, long2 );
@@ -515,7 +511,7 @@ wmProcedure (
                 //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
                 // #test
                 // Write into stdin
-                if ( UseSTDIN == TRUE )
+                if (UseSTDIN == TRUE)
                 {
                     //debug_print ("wmProcedure: Writing into stdin ...\n");
                     //stdin->sync.can_write = TRUE;
@@ -530,8 +526,6 @@ wmProcedure (
             break;
         };
         break;
-
-
 
 // ==============
 // msg:
@@ -635,7 +629,7 @@ wmProcedure (
                 if (ctrl_status == TRUE){
                     
                     // kill fg thread if it is possible.
-                    if( shift_status == TRUE){
+                    if ( shift_status == TRUE){
                         // #todo: see: tlib.c 
                         // kill_thread(foreground_thread)
                         return 0;
@@ -799,7 +793,6 @@ wmProcedure (
             default:
                 // nothing
                 return 0;
-            
             }
 
 // ==============
@@ -818,7 +811,6 @@ fail:
     refresh_screen();
     return -1;
 }
-
 
 //private
 static int 
@@ -1061,8 +1053,9 @@ wmKeyEvent(
     //if ( Keyboard_RawByte == 0 )
         //return -1;
 
-    if ( Keyboard_RawByte == 0xFF )
+    if (Keyboard_RawByte == 0xFF){
         return -1;
+    }
 
 // #todo
 // The last byte was a prefix
@@ -1073,7 +1066,6 @@ wmKeyEvent(
 // The last byte was a prefix
     //if(__has_e1_prefix == 1 )
         //goto GotE1;
-
 
 //
 // Debug
@@ -1120,7 +1112,6 @@ wmKeyEvent(
     //int isDown=0;
     //isDown = !(Keyboard_RawByte & 0x80);
 
-
 // ================================================
 //key_released:
 
@@ -1128,9 +1119,7 @@ wmKeyEvent(
     if ( (Keyboard_RawByte & 0x80) != 0 )
     {
         // Break = TRUE;
-        
         // Desativando o bit de paridade caso esteja ligado.
-
         Keyboard_ScanCode = Keyboard_RawByte;
         Keyboard_ScanCode &= KEYBOARD_KEY_MASK;
 
@@ -1241,11 +1230,9 @@ wmKeyEvent(
             // ...
         }
 
-
         // Nothing.
         goto done;
     }// FI
-
 
 // ================================================
 // key_pressed:
@@ -1441,13 +1428,13 @@ wmKeyEvent(
 
 done:
 
-    Event_LongRawByte = (unsigned long) ( Keyboard_RawByte & 0x000000FF );
+    Event_LongRawByte = 
+        (unsigned long) ( Keyboard_RawByte & 0x000000FF );
 
 // Não tem virtual key '0'.
     if (Event_LongASCIICode == 0){
         return -1;
     }
-
 
 // ------------------------------------
 // It is a extended keyboard key.
@@ -1458,10 +1445,9 @@ done:
                 (int) Event_Message, 
                 (unsigned long) Event_LongASCIICode,
                 (unsigned long) Event_LongRawByte );
-        
+
         return 0;
     }
-
 
 // #todo
 // A sistema precisa ter uma flag
@@ -1470,7 +1456,6 @@ done:
 // do dispositivo de teclado, determinando
 // que tipo de recurso de processamento
 // de input estará disponível.
-
 
 // #todo
 // Check 'control + alt + del'.
@@ -1503,10 +1488,9 @@ done:
 
     //char ch_buffer[2];
 
-
 // ==================================
 // Coloca no arquivo stdin.
-// Envia para a thread de controle do window server.        
+// Envia para a thread de controle do window server.
 // Colocamos no arquivo somente se não estivermos
 // no modo console.
 
@@ -1561,17 +1545,14 @@ done:
 // It can use the kernel's virtual console or
 // send the event to the loadable window server.
 // See: kgwm.c
-
 // ##
 // Acho que esses são os aceleradores de teclado.
 // Então essa rotina somente será chamada se 
 // os aceleradores de teclado estiverem habilitados.
-
 // #todo
 // precisamos de uma flag que indique que isso deve ser feito.
 
     int __Status=-1;
-
 
 // Quando devemos processar internamente?
 // + Somente quando uma tecla de controle estiver acionada.
@@ -1580,7 +1561,6 @@ done:
 // processar algumas combinações. Mas o sistema deve
 // sim processar algumas combinações, independente dos aplicativos.
 // Como a chamada aos consoles do kernel ou control+alt+del.
-
 
     // ShellFlag == TRUE
     __Status = 
@@ -1627,17 +1607,15 @@ wmMouseEvent(
     //static long old_y=0;
 
 // data:
-    unsigned long button_number = (unsigned long) (long1 & 0xFFFF);
+    unsigned long button_number = 
+        (unsigned long) (long1 & 0xFFFF);
     //unsigned long ? = long2;
 
-
-    unsigned long deviceWidth  = (unsigned long) screenGetWidth();
+    unsigned long deviceWidth = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
     deviceWidth  = (unsigned long) (deviceWidth & 0xFFFF);
     deviceHeight = (unsigned long) (deviceHeight & 0xFFFF);
-    if (deviceWidth==0 || deviceHeight==0)
-    {
+    if (deviceWidth==0 || deviceHeight==0){
         panic("wmMouseEvent: w h\n");
     }
 
@@ -1690,8 +1668,8 @@ wmMouseEvent(
 
     if (event_id == MSG_MOUSEMOVE)
     {
-        if ( long1 < 1 ){ long1=1; }
-        if ( long2 < 1 ){ long2=1; }
+        if (long1 < 1){ long1=1; }
+        if (long2 < 1){ long2=1; }
         if ( long1 >= deviceWidth ) { long1 = (deviceWidth-1);  }
         if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
 
@@ -1717,11 +1695,9 @@ int init_gramado (void)
     return TRUE;
 }
 
-
 // windowLoadGramadoIcons:
 // Carrega alguns ícones do sistema.
 // It's a part of the window system's initialization.
-
 int windowLoadGramadoIcons(void)
 {
     unsigned long fRet=0;
@@ -1729,9 +1705,9 @@ int windowLoadGramadoIcons(void)
 	//#debug
 	//printf("windowLoadGramadoIcons:\n");
 
-	//
-	//  ## Icon support ##
-	//
+//
+//  ## Icon support ##
+//
 
 //iconSupport:
 
@@ -1740,7 +1716,6 @@ int windowLoadGramadoIcons(void)
 	// ## size ##
 	// Vamos carregar ícones pequenos.
 	//@todo checar a validade dos ponteiros.
-
 
     // #bugbug
     // Size determinado, mas não sabemos o tamanho dos ícones.
@@ -1852,7 +1827,6 @@ int windowLoadGramadoIcons(void)
     return 0;
 }
 
-
 // Get a shared buffer to a system icon.
 // it is gonna be used by the window server.
 // It is a pre allocated buffer containg an bmp icon loaded at it.
@@ -1877,10 +1851,6 @@ void *ui_get_system_icon(int n)
     return NULL;
 }
 
-
-
-// =========================
-
 unsigned long get_update_screen_frequency(void)
 {
     return (unsigned long) flush_fps;
@@ -1888,8 +1858,8 @@ unsigned long get_update_screen_frequency(void)
 
 void set_update_screen_frequency(unsigned long fps)
 {
-    if(fps==0){fps=1;};
-    if(fps>=1000){fps=1000;};
+    if (fps==0)   { fps=1; };
+    if (fps>=1000){ fps=1000; };
 
 // See: sched.h
     flush_fps = (unsigned long) (fps&0xFFFF);
@@ -1905,34 +1875,30 @@ unsigned long get_presence_level(void)
 
 void set_presence_level(unsigned long value)
 {
-    if(value==0){ value=1; }
-    if(value>1000){ value=1000; }
+    if (value==0)  { value=1; }
+    if (value>1000){ value=1000; }
     presence_level = value;
 }
-
 
 // Called by task_switch
 void schedulerUpdateScreen(void)
 {
-    int i=0;
+    register int i=0;
     struct thread_d *TmpThread;
 
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         debug_print ("schedulerUpdateScreen: w h\n");
         panic       ("schedulerUpdateScreen: w h\n");
     }
 
 // Atualizado pelo timer.
-    if( UpdateScreenFlag != TRUE )
+    if ( UpdateScreenFlag != TRUE )
         return;
 
     deviceWidth  = (deviceWidth & 0xFFFF);
     deviceHeight = (deviceHeight & 0xFFFF);
-
 
 // ============================
 // Redraw and flush stuff.
@@ -2047,15 +2013,4 @@ void schedulerUpdateScreen(void)
 // Atualizado pelo timer.
     UpdateScreenFlag = FALSE;
 }
-
-
-
-
-
-
-
-
-
-
-
 

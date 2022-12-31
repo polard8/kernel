@@ -14,8 +14,6 @@ tid_t active_thread=0;     // This thread will receive the input.
 tid_t next_thread=0;       // next user mode thread.
 // ------
 
-
-
 // Ponteiro para a idle thread atual
 // Sempre que mudar a idle thread devemos usar esse ponteiro
 // para mostrar qual será a nova idle thread.
@@ -56,11 +54,13 @@ __ps_setup_x64_context (
 //===================
 
 // worker
-static void __ps_initialize_thread_common_elements( struct thread_d *t )
+static void 
+__ps_initialize_thread_common_elements(struct thread_d *t)
 {
     register int i=0;
+    struct msg_d  *tmp;
 
-    t->objectType  = ObjectTypeThread;
+    t->objectType = ObjectTypeThread;
     t->objectClass = ObjectClassKernelObjects;
 
 //
@@ -83,9 +83,6 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
 // Devemos adiar inicialização desses elementos relativos 
 // a mensagens.
 
-
-
-
 // ======================
 
 // For the msg_d structure.
@@ -97,14 +94,12 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
     t->MsgQueueTail = 0;
 
 // Create all the 32 pointers.
-    struct msg_d  *tmp;
-
     for ( i=0; i<32; ++i )
     {
         tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
-        if( (void*) tmp == NULL )
+        if ( (void*) tmp == NULL ){
             panic("__ps_initialize_thread_common_elements: tmp");
-    
+        }
         tmp->window = NULL;
         tmp->msg = 0;
         tmp->long1 = 0;
@@ -117,18 +112,15 @@ static void __ps_initialize_thread_common_elements( struct thread_d *t )
         
         // Coloca o ponteiro que criamos na lista de ponteiros.
         t->MsgQueue[i] = (unsigned long) tmp;
-    }
+    };
 // ===================================
 
 // Signal support
-
 // #remember: t->signal |= 1<<(signal-1);
     t->signal = 0;
     t->umask = 0;
-
     t->exit_code = 0;
-
-    return;
+    //return;
 }
 
 // =======================================
@@ -144,10 +136,9 @@ __ps_setup_x64_context (
     unsigned long init_rip )
 {
 
-
 // cpl
 
-    if (cpl != RING0 && cpl != RING3 ){
+    if (cpl != RING0 && cpl != RING3){
         panic ("__ps_setup_x64_context: Invalid cpl\n");
     }
 
@@ -157,19 +148,15 @@ __ps_setup_x64_context (
 // == Context support =============================================
 //
 
-    // (Machine dependent)
-    // We need a worker routine for that thing.
-
-    // #todo
-    // A stack frame vai depender do iopl.
-      
-    // Stack frame.
-    // #todo: Usar uma estrutura de contexto.
-    // ss (0x20 | 3)
-    // cs (0x18 | 3)
-    // rflags for ring3: (0x3200).
-    
-    
+// (Machine dependent)
+// We need a worker routine for that thing.
+// #todo
+// A stack frame vai depender do iopl.
+// Stack frame.
+// #todo: Usar uma estrutura de contexto.
+// ss (0x20 | 3)
+// cs (0x18 | 3)
+// rflags for ring3: (0x3200).
 
     // ring 0
     if ( t->cpl == RING0 )
@@ -239,12 +226,9 @@ __ps_setup_x64_context (
 
     //Thread->tss = current_tss;
 
-// ===============================================
-
-    // The context is not saved.
+// The context is not saved.
     t->saved = FALSE;
-
-    return;
+    //return;
 }
 
 // helper
@@ -253,8 +237,7 @@ unsigned long GetThreadStats( int tid, int index )
 {
     struct thread_d *t;
 
-// Invalid index.
-
+// Invalid index
     if (index<0){
         return 0;
     }
@@ -267,7 +250,6 @@ unsigned long GetThreadStats( int tid, int index )
     }
 
     t = (void *) threadList[tid];
-
     if ( (void *) t == NULL ){
         return 0; 
     }
@@ -399,27 +381,22 @@ int getthreadname ( int tid, char *buffer )
     char *name_buffer = (char *) buffer;
 
 // Buffer
-
     if ( (void*) buffer == NULL ){
         goto fail;
     }
 
 // Thread
-
     if ( tid<0 || tid >= THREAD_COUNT_MAX )
     {
         goto fail;
     }
 
+// Structure
     t = (struct thread_d *) threadList[tid]; 
-
     if ( (void *) t == NULL ){
         goto fail;
     }
-
-    if ( t->used != TRUE || 
-         t->magic != 1234 )
-    {
+    if ( t->used != TRUE || t->magic != 1234 ){
         goto fail;
     }
 
@@ -435,7 +412,6 @@ int getthreadname ( int tid, char *buffer )
 fail:
     return (int) (-1);
 }
-
 
 /*
  * FindReadyThread:
@@ -468,7 +444,6 @@ void *FindReadyThread(void)
     return NULL;
 }
 
-
 // Get State 
 // (Zero e' tipo NULL?).
 int GetThreadState (struct thread_d *thread)
@@ -477,10 +452,8 @@ int GetThreadState (struct thread_d *thread)
         // Message
         return 0;   //#bugbug: This is a valid state.
     }
-
     return (int) thread->state;
 }
-
 
 // Get Type
 // (Zero e' tipo NULL?).
@@ -491,11 +464,9 @@ int GetThreadType (struct thread_d *thread)
         //Message
         return 0;   // #bugbug: This is a valid type.
         //return -1;
-    }
-  
+    }  
     return (int) thread->type;
 }
-
 
 /*
  * init_threads:
@@ -503,7 +474,6 @@ int GetThreadType (struct thread_d *thread)
  *     Inicializa as estruturas e vari�veis 
  *     que lidam com threads.
  */
-
 // Called by init_microkernel in mk.c
 
 int init_threads(void)
@@ -514,26 +484,31 @@ int init_threads(void)
 
 // Globais
     current_thread=0;  //tid.
-
-    //ProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
-    UPProcessorBlock.threads_counter = (int) 0;  //N�mero de threads no processador.
+// Número de threads no processador.
+    //ProcessorBlock.threads_counter = 0;
+    UPProcessorBlock.threads_counter = (int) 0;
 
 // #todo: outdated.
-    old = 0;                                   //?
-    forkid = 0;                                //
-    task_count = (unsigned long) 0;            //Zera o contador de tarefas criadas.
+    old = 0;                         //?
+    forkid = 0;                      //
+    task_count = (unsigned long) 0;  //Zera o contador de tarefas criadas.
    //...
 
 // #todo: 
-// Porque essas vari�veis usam o termo 'task'?
-//        task � sinonimo de process.
+// Porque essas variáveis usam o termo 'task'?
+// task é sinonimo de process.
 
-	//Vari�veis usadas na inicializa��o de uma nova tarefa.	
-	start_new_task_status  = (unsigned long) 0;    //Se h� uma nova tarefa.
-	start_new_task_id = (int) 0;                   //Id d� nova tarefa.
-	start_new_task_address = (unsigned long) 0;    //Endere�o da nova tarefa.
-	
-	//@todo: H� mais vari�veis para serem inicializadas??!!
+// Variáveis usadas na inicialização de uma nova tarefa.
+
+// Se há uma nova tarefa.
+    start_new_task_status  = (unsigned long) 0;
+// Id dá nova tarefa.
+    start_new_task_id = (int) 0;
+//Endereção da nova tarefa.
+    start_new_task_address = (unsigned long) 0;
+
+// #todo: 
+// Há mais variáveis para serem inicializadas??!!
 
 //
 // Clear thread lists.
@@ -541,7 +516,7 @@ int init_threads(void)
 
 // normal threads
     i=0;
-    while ( i < THREAD_COUNT_MAX ){
+    while (i < THREAD_COUNT_MAX){
         threadList[i] = (unsigned long) 0; 
         i++;
     };
@@ -578,8 +553,7 @@ void *GetThreadByTID (int tid)
 {
     struct thread_d *t;
 
-    if (tid < 0 || 
-        tid >= THREAD_COUNT_MAX )
+    if (tid < 0 || tid >= THREAD_COUNT_MAX)
     {
         return NULL;
     }
@@ -589,21 +563,17 @@ void *GetThreadByTID (int tid)
     return (void *) t;
 }
 
-
 // GetCurrentThread:
 //     Retorna o endereço da estrutura da thread atual.
-
 void *GetCurrentThread(void)
 {
     return (void*) GetThreadByTID(current_thread);
 }
 
-
 void *GetForegroundThread(void)
 {
     return (void*) GetThreadByTID(foreground_thread);
 }
-
 
 void *GetWSThread(void)
 {
@@ -614,7 +584,6 @@ void *GetWSThread(void)
     tid = (int) WindowServerInfo.tid;
     return (void*) GetThreadByTID(tid);
 }
-
 
 /*
  * SelectForExecution:
@@ -631,7 +600,7 @@ void *GetWSThread(void)
  * MOVIMENTO 1, (Initialized --> Standby).
  */
 
-void SelectForExecution ( struct thread_d *Thread )
+void SelectForExecution (struct thread_d *Thread)
 {
     if ( (void *) Thread == NULL){
         debug_print ("SelectForExecution: Thread fail\n");
@@ -650,7 +619,6 @@ void SelectForExecution ( struct thread_d *Thread )
 // não pode entrar em standby.
 
 //setState:
-
 
 //
 // MOVIMENT 1, (Initialized --> Standby).
@@ -673,7 +641,7 @@ void SelectForExecution ( struct thread_d *Thread )
 void thread_show_profiler_info (void)
 {
     struct thread_d *thread;
-    int i=0;
+    register int i=0;
 
     printf ("\n");
 
@@ -706,7 +674,7 @@ thread_get_profiler_percentage (struct thread_d *thread)
         panic ("thread_get_profiler_percentage: thread\n");
     }
  
-    return ( unsigned long ) thread->profiler_percentage_running;
+    return (unsigned long) thread->profiler_percentage_running;
 }
 
 // threads
@@ -722,20 +690,17 @@ void show_thread_information (void)
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
     if ( (void *) Idle != NULL )
     {
-        if (Idle->magic == 1234)
-        {
+        if (Idle->magic == 1234){
             printf ("Idle->tid = %d\n", Idle->tid );
         }
     }
-
 
 // =================================
 // Current thread
     Current = (void *) GetCurrentThread();
     if ( (void *) Current != NULL )
     {
-        if (Current->magic == 1234)
-        {
+        if (Current->magic == 1234){
             printf ("Current->tid   = %d\n", Current->tid );
             printf ("current_thread = %d\n", current_thread );
         }
@@ -750,7 +715,6 @@ void show_thread_information (void)
     refresh_screen();
 }
 
-
 // ??
 // Chamada pelo timer.c
 int thread_profiler(int service)
@@ -758,10 +722,10 @@ int thread_profiler(int service)
     struct thread_d  *Idle;
     struct thread_d  *__current;
     struct thread_d  *__tmp;
-    int i=0;
+    register int i=0;
     unsigned long __total = 0; //todas inclusive idle.
-    
-    // safety
+
+// safety
     if ( service < 0 )
     {
        // msg?
@@ -775,25 +739,18 @@ int thread_profiler(int service)
     if (Idle->magic != 1234){
         panic("thread_profiler: Idle validation\n");
     }
-   
 
-//
 // Current thread
-//
-
     __current = (struct thread_d *) GetCurrentThread();
-
     if ( (void *) __current == NULL ){
         panic ("thread_profiler: __current\n");
     }
-
     if (__current->magic != 1234){
         panic ("thread_profiler: __current validation\n");
     }
 
     //unsigned long __total_ticks;
     //__total_ticks = (unsigned long) get_systime_totalticks();
-
 
 // Service
 
@@ -849,7 +806,7 @@ int thread_profiler(int service)
             break;
 
         //...
-        
+
         default:
             break;
     };
@@ -859,7 +816,6 @@ int thread_profiler(int service)
 
     return -1;
 }
-
 
 /*
  * create_thread:
@@ -880,7 +836,6 @@ int thread_profiler(int service)
  * 2015 - Created by Fred Nora.
  * 2021 - 64bit version
  */
-
 // #todo
 // Incluir o 'ring' como parâmetro.
 // Isso vai ajudar a função decidir quais seletores de segmento usar.
@@ -904,17 +859,14 @@ struct thread_d *create_thread (
 {
     struct process_d *Process;
     struct thread_d  *Thread;
-
 // Empty slot
     struct thread_d *Empty;
-
     pid_t ProcessID = -1;
-
 // Counter
 // see: thread.h
     int i = (int) USER_THRESHOLD_TID;
-
     int Personality = personality;
+    struct rect_d *r;
 
 // #debug
     debug_print ("create_thread: #todo\n");
@@ -955,25 +907,23 @@ struct thread_d *create_thread (
     }
 
 // name
-    if( (void*) name == NULL ){
+    if ( (void*) name == NULL ){
         panic ("create_thread: [ERROR] name\n");
     }
-    if( *name == 0 ){
+    if ( *name == 0 ){
         panic ("create_thread: [ERROR] *name\n");
     }
-
 // cpl
-    if( cpl != RING0 && cpl != RING3 ){
+    if ( cpl != RING0 && cpl != RING3 ){
         panic ("create_thread: [ERROR] Invalid cpl\n");
     }
 
 //======================================
 // Limits da thread atual.
 // #bugbug: 
-// N�o sei pra que isso. 
-// Pois a thread atual n�o importa.
+// Não sei pra que isso. 
+// Pois a thread atual não importa.
 // @todo: deletar isso. 
-
 
     if ( current_thread < 0 || 
          current_thread >= THREAD_COUNT_MAX )
@@ -1009,10 +959,10 @@ struct thread_d *create_thread (
     if ( (void *) Process == NULL ){
         panic ("create_thread: Process\n");
     }
-    if ( Process->used != TRUE  ){
+    if (Process->used != TRUE){
         panic ("create_thread: Process->used\n");
     }
-    if ( Process->magic != 1234 ){
+    if (Process->magic != 1234){
         panic ("create_thread: Process->magic\n");
     }
 
@@ -1065,13 +1015,10 @@ struct thread_d *create_thread (
     Thread->base_priority = (unsigned long) PRIORITY_SYSTEM;  //static
     Thread->priority      = (unsigned long) PRIORITY_SYSTEM;  //dynamic
 
-
     Thread->plane = FOREGROUND_THREAD;
 
 // ==============
 // Surface rectangle.
-
-    struct rect_d *r;
 
     r = (struct rect_d *) kmalloc ( sizeof(struct rect_d) );
     if ( (void*) r == NULL ){
@@ -1085,11 +1032,8 @@ struct thread_d *create_thread (
     r->used = TRUE;
     r->magic = 1234;
     Thread->surface_rect = r;
+
 // ==============
-
-
-// =====================
-
 // local worker
 // Initializing the common basic elements.
     __ps_initialize_thread_common_elements( (struct thread_d *) Thread );
@@ -1204,7 +1148,6 @@ try_next_slot:
 
 // ===================================
 
-
 // @todo: 
 // Essa parte � dependente da arquitetura i386.
 // Poder� ir pra outro arquivo.
@@ -1225,7 +1168,6 @@ try_next_slot:
 
     //if( init_stack == 0 ){ ... }
     //if( init_eip == 0 ){ ... }
-
 
 //
 // == Context support ================
@@ -1265,7 +1207,6 @@ try_next_slot:
             (unsigned long) init_rip );
     }
 
-
 //cpu.
     //Thread->cpuID = 0;
     //Thread->confined = 0;
@@ -1275,7 +1216,6 @@ try_next_slot:
 //ServiceTable ..
 //Ticks ...
 //DeadLine ... 
-
 
     //Thread->PreviousMode  //ring???
     //Thread->idealprocessornumber
@@ -1347,7 +1287,6 @@ try_next_slot:
     return (void *) Thread;
 }
 
-
 /*
  * exit_thread:
  *     Exit a thread.
@@ -1379,6 +1318,7 @@ void exit_thread (int tid)
     if ( Idle->magic != 1234 ){
         panic ("exit_thread: Idle validation\n");
     }
+
     if ( tid == Idle->tid ){
         panic ("exit_thread: We can't kill the Idle thread!\n");
     }
@@ -1394,7 +1334,7 @@ void exit_thread (int tid)
         printf ("exit_thread: Thread doesn't exist\n");
         goto fail;
     }
-    if ( Thread->magic != 1234 ){
+    if (Thread->magic != 1234){
             printf ("exit_thread: Thread validation \n");
             goto fail;
     }
@@ -1414,13 +1354,11 @@ fail:
     return;
 }
 
-
 // exit current thread.
 void exit_current_thread(void)
 {
     exit_thread(current_thread);
 }
-
 
 /*
  * copy_thread_struct:
@@ -1445,37 +1383,34 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     if ( (void *) father == NULL ){
         panic ("copy_thread_struct: father\n");
     }
-    if(father->magic!=1234){
+    if (father->magic!=1234){
         debug_print("copy_thread_struct: father validation\n");
               panic("copy_thread_struct: father validation\n");
     }
 
-
-    // #todo
-    // Aqui, na hora de criar o nome, vamos dar
-    // um nome personalizado pra não ficar tudo igual.
+// #todo
+// Aqui, na hora de criar o nome, vamos dar
+// um nome personalizado pra não ficar tudo igual.
     //char new_name[32];
 
-    // IN: 
-    // room, desktop, window,
-    // initial eip, initial stack, 
-    // pid, thread name.
-    
-    // #bugbug
-    // Bad parameters,
-    // eip and stack are '0'
-    // This way the routine will fail.
-    
-    // Como isso eh uma rotina de clonagem entao podemos usar
-    // os valores atuais da thread original
+// IN: 
+// room, desktop, window,
+// initial eip, initial stack, 
+// pid, thread name.
+
+// #bugbug
+// Bad parameters,
+// eip and stack are '0'
+// This way the routine will fail.
+
+// Como isso eh uma rotina de clonagem entao podemos usar
+// os valores atuais da thread original
     // thread->eip
     // thread->esp
-    
-    // #todo:We need a better name
-    // use a buffer for that
+
+// #todo:We need a better name
+// use a buffer for that
     // char nameBuffer[32];
-
-
 
 // #bugbug
 // Não podemos herdar o rip e o rsp.
@@ -1494,8 +1429,8 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     }
     */
 
-    // #bugbug
-    // Conferir quem é o pai owner pid dessa thread.
+// #bugbug
+// Conferir quem é o pai owner pid dessa thread.
 
     //father->ownerPID or current_process ??
 
@@ -1505,11 +1440,10 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     unsigned int father_cpl = (unsigned int) father->cpl;
     int father_personality = (int) father->personality;
 
-    if(father_cpl != RING3)
+    if (father_cpl != RING3)
         panic("copy_thread_struct: father_cpl!=RING3\n");
 
-
-    if(father_personality != PERSONALITY_GRAMADO &&
+    if (father_personality != PERSONALITY_GRAMADO &&
        father_personality != PERSONALITY_GWS )
     {
         debug_print("copy_thread_struct: father_personality\n");
@@ -1529,14 +1463,11 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
                                 father_personality );
 
 // The copy.
-    if ( (void *) clone == NULL )
-    {
+    if ( (void *) clone == NULL ){
         debug_print ("copy_thread_struct: clone\n");
         panic       ("copy_thread_struct: clone\n");
     }
-
-    if(clone->magic!=1234)
-    {
+    if (clone->magic!=1234){
         debug_print ("copy_thread_struct: clone validation\n");
         panic       ("copy_thread_struct: clone validation\n");
     }
@@ -1559,14 +1490,10 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 
     ClonedThread = clone;
 
-
 // Type, base priority and priority.
-
     clone->type  = father->type; 
-
     clone->base_priority = father->base_priority; 
     clone->priority      = father->priority;
-
 
 //
 // Input
@@ -1584,14 +1511,14 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // ou ela pode rodar e falhar por n�o esta pronta,
 // vamos testar op��es.
 
-    // Começando com o clone bloqueada ...
-    // Mas isso será mudado pela função que chamou essa.
-    // obs: Isso funcionou.
+// Começando com o clone bloqueada ...
+// Mas isso será mudado pela função que chamou essa.
+// obs: Isso funcionou.
     clone->state = BLOCKED;  
 
 //Apenas Initialized, pois a fun��o SelectForExecution
 //seleciona uma thread para a execu��o colocando ela no
-//state Standby.	
+//state Standby.
 
 // #todo: 
 // ISSO DEVERIA VIR POR ARGUMENTO
@@ -1605,17 +1532,16 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // for now we can only copy threads in ring 3.
 
     unsigned int clone_cpl = (unsigned int) clone->cpl;
-    if(clone_cpl != RING3)
+    if (clone_cpl != RING3){
         panic("copy_thread_struct: clone_cpl!=RING3\n");
-
-
-
+    }
 //
 // iopl
 //
-
-    clone->rflags_initial_iopl = (unsigned int) father->rflags_initial_iopl;
-    clone->rflags_current_iopl = (unsigned int) father->rflags_current_iopl;
+    clone->rflags_initial_iopl = 
+        (unsigned int) father->rflags_initial_iopl;
+    clone->rflags_current_iopl = 
+        (unsigned int) father->rflags_current_iopl;
 
 // #bugbug
 // For now we can only accept weak protection for threads in ring 3.
@@ -1627,7 +1553,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     //if ( clone->rflags_current_iopl != 3 ){
     //    panic ("copy_thread_struct: clone rflags_current_iopl\n");
     //}
-
 
 // Is the context saved or not?
     clone->saved = (int) father->saved;
@@ -1716,7 +1641,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // #todo
 // We gotta check all these values bellow.
 
-
 	// ss (0x20 | 3)
 	// cs (0x18 | 3)
 
@@ -1739,8 +1663,8 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
      int cpl=-1;
      cpl = (int) (clone->cs & 0xFF);
      cpl = (int) (cpl & 3);
-     
-     if(cpl != 3){
+
+     if (cpl != 3){
          panic("copy_thread_struct: cpl\n");
      }
 
@@ -1775,7 +1699,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     // #todo
 
     // clone->tss = thread->tss;
-
 
 	//cpu.
 	//Thread->cpuID = 0;
@@ -1840,10 +1763,8 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 /*
 	show_slot (thread->tid);
 	show_reg (thread->tid);
-
 	show_slot (clone->tid);
 	show_reg (clone->tid);
-	
 	refresh_screen();
 	while(1){}
 */
@@ -1858,6 +1779,4 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 //
 // End
 //
-
-
 

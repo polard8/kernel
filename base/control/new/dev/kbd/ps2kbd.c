@@ -38,10 +38,10 @@ static void keyboard_init_modifier_keys(void)
 
 // Alternate Graphic.
     //altgr_status = 0; //@todo
-    
+
 	// Function.
 	//fn_status = 0;  //@todo
-	
+
 	//...
 }
 
@@ -52,7 +52,6 @@ void ps2kbd_initialize_device (void)
 {
     debug_print ("ps2kbd_initialize_device:\n");
     PS2Keyboard.initialized = FALSE;
-
 
 //====================================
 // #test

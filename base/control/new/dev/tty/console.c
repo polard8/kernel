@@ -47,20 +47,19 @@ static void __test_path(void);
 
 static void __test_tty(void);
 
-//#todo: Use static modifier.
-void __local_ri (void);
-void csi_J (int par);
+// #todo: Use static modifier.
+void __local_ri(void);
+void csi_J(int par);
 void csi_K(int par);
 void csi_m(void);
-void csi_M ( int nr, int console_number );
-void csi_L (int nr, int console_number);
+void csi_M(int nr, int console_number);
+void csi_L(int nr, int console_number);
 
 // =======================
 
 static void __test_path(void)
 {
     int status = -1;
-
     //unsigned long tmp_size = (512*4096);    // 512*4096 = 2MB
     void *b; //= (void *) allocPages ( 512 );
 
@@ -70,7 +69,6 @@ static void __test_path(void)
 // #bugbug:
 // We have only few pre-allocated buffers,
 // so, we only can use four levels for now. (/../../../file.txt)
-
 
 // Valid shapes
     //char PathAddress[] = "/GRAMADO/TEST.BMP";
@@ -85,45 +83,41 @@ static void __test_path(void)
     //char PathAddress[] = "/GRAMADO///FOLDER/";
     //char PathAddress[] = "/GRAMADO/1234567812345456456/";
 
-
-    
 // =========================================
-
 // (32*4096) bytes
-
 
     //unsigned long BufferSize = (32*4096);
     //b = (void *) allocPages(32); 
 
-    // It is a simple text file.
-    // We don't need too much memory.
-    // #bugbug: The loader is not getting the file size
-    // from the fat entry.
+// It is a simple text file.
+// We don't need too much memory.
+// #bugbug: 
+// The loader is not getting the file size
+// from the fat entry.
     unsigned long BufferSize = (4096);  //One page!
     b = (void *) allocPages(1); 
 
- 
-    if( (void*) b == NULL )
-    {
+    if ( (void*) b == NULL ){
         printf("b fail\n");
         return;
     }
 
-    // IN: path, address, buffer size in bytes.
-    status = (int) fs_load_path ( 
-                       (const char*) PathAddress, 
-                       (unsigned long) b,
-                       (unsigned long) BufferSize ); 
-    if(status<0){
+// IN: path, address, buffer size in bytes.
+    status = 
+        (int) fs_load_path ( 
+                  (const char*) PathAddress, 
+                  (unsigned long) b,
+                  (unsigned long) BufferSize ); 
+    if (status<0){
         printf("__test_path: fs_load_path fail\n");
         return;
     }
-
-    if( (void*)b != NULL )
+    if ( (void*)b != NULL ){
         printf("OUTPUT:{%s}\n",b);
+    }
 }
 
-void __local_ri (void)
+void __local_ri(void)
 {
     //#todo
 }
@@ -142,20 +136,19 @@ __local_gotoxy (
 
 // Maior que o largura da linha.
     //if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
-    if ( new_x > CONSOLE_TTYS[console_number].cursor_right)
+    if (new_x > CONSOLE_TTYS[console_number].cursor_right)
     {
         return;
     }
 
 // Maior que a altura da coluna.
     //if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
-    if ( new_y > CONSOLE_TTYS[console_number].cursor_bottom)
+    if (new_y > CONSOLE_TTYS[console_number].cursor_bottom)
     {
         return;
     }
 
 // Set
-
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (new_x & 0xFFFFFFFF);
     CONSOLE_TTYS[console_number].cursor_y = 
@@ -184,11 +177,10 @@ void __local_restore_cur (int console_number)
 
 void __local_insert_line (int console_number)
 {
-    int oldtop    = 0;
+    int oldtop = 0;
     int oldbottom = 0;
 
-    if (console_number<0 || console_number >3)
-    {
+    if (console_number<0 || console_number >3){
         return;
     }
 
@@ -204,23 +196,22 @@ void __local_insert_line (int console_number)
     //if (console_number<0)
         //return;
 
-    if( CONSOLE_TTYS[console_number].fullscreen_flag == TRUE )
-    {
+    if (CONSOLE_TTYS[console_number].fullscreen_flag == TRUE){
         console_scroll(console_number);
     }
 
-    CONSOLE_TTYS[console_number].cursor_top    = oldtop;
+    CONSOLE_TTYS[console_number].cursor_top = oldtop;
     CONSOLE_TTYS[console_number].cursor_bottom = oldbottom;
 }
 
 void __local_delete_line(int console_number)
 {
     int n=0;
-    int oldtop    = 0;
+    int oldtop = 0;
     int oldbottom = 0;
 
 // #todo: max limit
-    if(console_number<0){
+    if (console_number<0){
         return;
     }
 
@@ -230,23 +221,23 @@ void __local_delete_line(int console_number)
     oldtop    = (int) CONSOLE_TTYS[n].cursor_top;
     oldbottom = (int) CONSOLE_TTYS[n].cursor_bottom;
 
-    CONSOLE_TTYS[n].cursor_top = (int) CONSOLE_TTYS[n].cursor_y;
+    CONSOLE_TTYS[n].cursor_top = 
+        (int) CONSOLE_TTYS[n].cursor_y;
 
-    //#bugbug: apontando para si mesmo.
+// #bugbug: apontando para si mesmo.
     //CONSOLE[n].cursor_bottom = CONSOLE[n].cursor_bottom;
 
 //#todo
     //scrup();
 
-    CONSOLE_TTYS[n].cursor_top    = oldtop;
+    CONSOLE_TTYS[n].cursor_top = oldtop;
     CONSOLE_TTYS[n].cursor_bottom = oldbottom;
 }
 
-
-void csi_J (int par)
+void csi_J(int par)
 {
 
-	/*
+/*
 	long count __asm__("cx");
 	long start __asm__("di");
 
@@ -266,23 +257,23 @@ void csi_J (int par)
 		default:
 			return;
 	}
-	__asm__("cld\n\t"
+
+    __asm__("cld\n\t"
 		"rep\n\t"
 		"stosw\n\t"
 		::"c" (count),
 		"D" (start),"a" (0x0720)
 		:"cx","di");
-		
-	*/
-}
 
+ */
+}
 
 // move to
 void csi_K(int par)
 {
-   /*
-	long count __asm__("cx");
-	long start __asm__("di");
+/*
+    long count __asm__("cx");
+    long start __asm__("di");
 
 	switch (par) {
 		case 0:	   //erase from cursor to end of line 
@@ -308,7 +299,7 @@ void csi_K(int par)
 		::"c" (count),
 		"D" (start),"a" (0x0720)
 		:"cx","di");
-   */
+ */
 }
 
 // Fim da escape sequence.
@@ -321,65 +312,56 @@ void csi_K(int par)
 
 void csi_m(void)
 {
-    int i=0;
+    register int i=0;
     int Ch=0;
 
-    // #bugbug
-    // Check 'npar'
+// #bugbug
+// Check 'npar'
 
     if (npar == 0){
         return;
     }
 
-    for (i=0; i <= npar; i++)
-    {
+    for (i=0; i <= npar; i++){
         Ch = (int) par[i];
-
         switch (Ch) {
-
         case 0:  attr=0x07;  break;
         case 1:  attr=0x0f;  break;
         case 4:  attr=0x0f;  break;
         case 7:  attr=0x70;  break;
         case 27: attr=0x07;  break;
         // default?
-
         };
     };
 }
 
-
 void csi_M ( int nr, int console_number )
 {
-
-    /*
-	if ( nr > CONSOLE_TTYS[console_number].cursor_height )
-		nr = CONSOLE_TTYS[console_number].cursor_height;
-	else if (!nr)
-		nr=1;
-	while (nr--)
-		__local_delete_line(console_number);
-    
-    */
+/*
+    if ( nr > CONSOLE_TTYS[console_number].cursor_height )
+        nr = CONSOLE_TTYS[console_number].cursor_height;
+    else if (!nr)
+        nr=1;
+    while (nr--)
+        __local_delete_line(console_number);
+*/
 }
 
 // move to
 void csi_L (int nr, int console_number)
 {
-   /*
+/*
 	if (nr > CONSOLE[console_number].cursor_height)
 		nr = CONSOLE[console_number].cursor_height;
 	else if (!nr)
 		nr=1;
 	while (nr--)
 		__local_insert_line(console_number);
-    */
+*/
 }
 
-
-
 //============================================
-// input:
+// console_interrupt:
 // called by devices that are not block devices.
 // probably keyboard and serial devices.
 // See: keyboard.c and serial.c
@@ -409,7 +391,7 @@ console_interrupt(
 // Maybe we can set the idle thread if it fail.
 // #todo: max limit
 
-    if ( TargetThreadTID < 0 ){
+    if (TargetThreadTID < 0){
         debug_print ("console_interrupt: [FAIL] TargetThreadTID\n");
         return;
     }
@@ -548,15 +530,14 @@ void console_init_virtual_console (int n)
     // When we are using the kgws.
     // CONSOLE_TTYS[ConsoleIndex].window = NULL;
 
+//
+// == buffers ===========================
+//
 
-    //
-    // == buffers ===========================
-    //
-
-    // #bugbug
-    // No buffers fo rthe virtual consoles.
-    // remember: 
-    // The virtual console is used only in the 'stdout' of a process.
+// #bugbug
+// No buffers fo rthe virtual consoles.
+// remember: 
+// The virtual console is used only in the 'stdout' of a process.
     CONSOLE_TTYS[ConsoleIndex].nobuffers = TRUE;   // No buffers.
     
     //#bugbug: buffer não á mais arquivo.
@@ -612,7 +593,6 @@ void console_init_virtual_console (int n)
     //CONSOLE_TTYS[ConsoleIndex]._rbuffer ...
     //CONSOLE_TTYS[ConsoleIndex]._cbuffer ...    
 
-
     CONSOLE_TTYS[ConsoleIndex].termios.c_lflag = ECHO;
 
     //CONSOLE_TTYS[ConsoleIndex].vc_mode = 0;
@@ -626,18 +606,15 @@ void console_init_virtual_console (int n)
 
 void console_set_current_virtual_console (int n)
 {
-    if (n == fg_console)
+    if (n == fg_console){
         return;
-
-    if ( n < 0 || n >= 4 )
-    {
+    }
+    if ( n < 0 || n >= 4 ){
         debug_print ("console_set_current_virtual_console: Limits\n");
         return;
     }
-
     fg_console = (int) n;
 }
-
 
 int console_get_current_virtual_console (void)
 {
@@ -655,15 +632,12 @@ int console_get_current_virtual_console (void)
 
 void jobcontrol_switch_console(int n)
 {
-    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX )
-    {
+    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX ){
         debug_print("jobcontrol_switch_console: Limits\n");
         return;
     }
-
     console_set_current_virtual_console(n);
 }
-
 
 /*
  * set_up_cursor:
@@ -705,7 +679,6 @@ void set_up_cursor2 ( int console_number, unsigned long x, unsigned long y )
     CONSOLE_TTYS[console_number].cursor_y = (unsigned long) y;
 }
 */
-
 
 /*
  * get_cursor_x:
@@ -777,8 +750,10 @@ void console_scroll (int console_number)
 
 // Cursor na ultima linha.
 // Para podermos limpa-la.
-    CONSOLE_TTYS[console_number].cursor_x =   CONSOLE_TTYS[console_number].cursor_left; 
-    CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom); 
+    CONSOLE_TTYS[console_number].cursor_x = 
+        CONSOLE_TTYS[console_number].cursor_left; 
+    CONSOLE_TTYS[console_number].cursor_y = 
+        CONSOLE_TTYS[console_number].cursor_bottom; 
 
 // Limpa a últime linha.
 // #bugbug: 
@@ -802,7 +777,8 @@ void console_scroll (int console_number)
     CONSOLE_TTYS[console_number].cursor_bottom = (OldBottom & 0xFFFF);
 
     CONSOLE_TTYS[console_number].cursor_x = 0; 
-    CONSOLE_TTYS[console_number].cursor_y = ( CONSOLE_TTYS[console_number].cursor_bottom -1); 
+    CONSOLE_TTYS[console_number].cursor_y = 
+        (CONSOLE_TTYS[console_number].cursor_bottom -1); 
 
 // #todo:
 // Essa flag permite que o taskswitch faça o refresh
@@ -813,7 +789,6 @@ void console_scroll (int console_number)
     //invalidate_screen();  //#bugbug not working
     refresh_screen();
 }
-
 
 /*
  * console_outbyte:
@@ -850,8 +825,7 @@ void console_outbyte (int c, int console_number)
         x_panic     ("console_outbyte: [FAIL] n\n");
     }
 
-    if ( __cWidth == 0 || __cHeight == 0 )
-    {
+    if ( __cWidth == 0 || __cHeight == 0 ){
         x_panic ("console_outbyte: [FAIL] char size\n");
     }
 
@@ -860,8 +834,7 @@ void console_outbyte (int c, int console_number)
 // Tem momento da inicialização em que esse array de estruturas
 // não funciona, e perdemos a configuração feita
 
-    if ( CONSOLE_TTYS[n].initialized != TRUE )
-    {
+    if (CONSOLE_TTYS[n].initialized != TRUE){
         //x_panic ("console_outbyte: CONSOLE_TTYS");
         debug_print ("console_outbyte: [BUGBUG] CONSOLE_TTYS not initialized\n");
         return;
@@ -1058,7 +1031,8 @@ void console_outbyte (int c, int console_number)
         }
 
         CONSOLE_TTYS[n].cursor_x = 0;  //CONSOLE_TTYS[n].cursor_left;
-        CONSOLE_TTYS[n].cursor_y = (CONSOLE_TTYS[n].cursor_bottom -1);
+        CONSOLE_TTYS[n].cursor_y = 
+            (CONSOLE_TTYS[n].cursor_bottom -1);
     }
 
 // Imprime os caracteres normais.
@@ -1070,7 +1044,6 @@ draw:
     __ConsoleOutbyte(Ch,n);
     prev = Ch;
 }
-
 
 // worker
 // __ConsoleOutbyte:
@@ -1116,9 +1089,7 @@ static void __ConsoleOutbyte (int c, int console_number)
 // Caso estejamos em modo texto.
 // Isso ainda não é suportado.
 
-    //if ( VideoBlock.useGui != TRUE )
-    if ( VideoBlock.useGui == FALSE )
-    {
+    if (VideoBlock.useGui != TRUE){
         debug_print ("__ConsoleOutbyte: kernel in text mode\n");
         x_panic     ("__ConsoleOutbyte: kernel in text mode\n");
     }
@@ -1133,13 +1104,13 @@ static void __ConsoleOutbyte (int c, int console_number)
 // Então essa flag não faz sentido.
 // See: char.c
 
-    if ( VideoBlock.useGui == TRUE )
+    if (VideoBlock.useGui == TRUE)
     {
         // ## NÃO TRANPARENTE ##
         // Se estamos no modo terminal então usaremos as cores 
         // configuradas na estrutura do terminal atual.
         // Branco no preto é um padrão para terminal.
-        if ( stdio_terminalmode_flag == 1 ){
+        if (stdio_terminalmode_flag == 1){
             d_draw_char ( 
                  (cWidth * CONSOLE_TTYS[n].cursor_x), 
                 (cHeight * CONSOLE_TTYS[n].cursor_y), 
@@ -1160,7 +1131,6 @@ static void __ConsoleOutbyte (int c, int console_number)
     }
 }
 
-
 /*
  * console_putchar:
  *     Put a char into the screen of a virtual console.
@@ -1180,8 +1150,7 @@ void console_putchar ( int c, int console_number )
     int cWidth = get_char_width();
     int cHeight = get_char_height();
 
-    if ( cWidth == 0 || cHeight == 0 )
-    {
+    if ( cWidth == 0 || cHeight == 0 ){
         panic ("console_putchar: char\n");
     }
 
@@ -1194,8 +1163,7 @@ void console_putchar ( int c, int console_number )
 // CONSOLETTYS_COUNT_MAX
 // See: tty.h
 
-    if ( console_number < 0 || console_number > 3 )
-    {
+    if ( console_number < 0 || console_number > 3 ){
         panic ("console_putchar: console_number\n");
     }
 
@@ -1285,7 +1253,7 @@ void __test_thread(void)
                                 RING0,
                                 PERSONALITY_GRAMADO ); 
 
-    if( (void*)t==NULL ){
+    if ( (void*)t==NULL ){
         printf("fail\n");
         return;
     }
@@ -1336,18 +1304,20 @@ static void __test_tty(void)
 {
     char data0[8];
     data0[0]='a';  data0[1]='b';  data0[2]='c';  data0[3]=0;
-    
+
     char data1[8];
     data1[0]='x';  data1[1]='y';  data1[2]='z';  data1[3]=0; //dirty
 
-    if( (void*) KernelProcess == NULL)
+    if ( (void*) KernelProcess == NULL ){
         return;
-    if(KernelProcess->magic!=1234)
+    }
+    if (KernelProcess->magic != 1234){
         return;
+    }
 
     __tty_write(KernelProcess->tty,data0,3); //write
     __tty_read (KernelProcess->tty,data1,3); //read
-    
+
     printf("%c\n",data1[0]);
     printf("%c\n",data1[1]);
     printf("%c\n",data1[2]);
@@ -1361,7 +1331,7 @@ int consoleCompareStrings(void)
     int status=0;
     int fpu_status = -1;
 
-    debug_print("consoleCompareStrings: \n");
+    //debug_print("consoleCompareStrings: \n");
     printf("\n");
 
 // mod0: Call the entrypoint of the module.
@@ -1380,8 +1350,7 @@ int consoleCompareStrings(void)
     }
 
 // Testing vga stuff.
-    if ( strncmp(prompt,"vga-cls",7) == 0 )
-    { 
+    if ( strncmp(prompt,"vga-cls",7) == 0 ){
         //DANGER_VGA_clear_screen();
         goto exit_cmp;
     }
@@ -1461,8 +1430,7 @@ int consoleCompareStrings(void)
     }
 
 // cls:
-    if ( strncmp( prompt, "cls", 3 ) == 0 )
-    {
+    if ( strncmp( prompt, "cls", 3 ) == 0 ){
         //backgroundDraw(COLOR_BLACK);
         backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
         set_up_cursor(1,1);
@@ -1476,8 +1444,7 @@ int consoleCompareStrings(void)
     }
 
 // pit: Display PIT info.
-    if ( strncmp( prompt, "pit", 3 ) == 0 )
-    {
+    if ( strncmp( prompt, "pit", 3 ) == 0 ){
         printf("Dev freq: %d | Clocks per sec: %d HZ | Period: %d\n",
             PITInfo.dev_freq,
             PITInfo.clocks_per_sec,
@@ -1602,8 +1569,9 @@ int consoleCompareStrings(void)
 
     if ( strncmp( prompt, "wm", 2 ) == 0 )
     {
-        if ( gUseWMCallbacks != TRUE )
+        if (gUseWMCallbacks != TRUE){
             goto exit_cmp;
+        }
 
         // See: swlib.asm
         // Setup parameters
@@ -1642,7 +1610,7 @@ int consoleCompareStrings(void)
 // app1: Sending a MSG_COMMAND/4001 messsage to the init thread.
     if ( strncmp(prompt,"app1",4) == 0 )
     {
-        if( (void*) InitThread == NULL ){goto exit_cmp;}
+        if ( (void*) InitThread == NULL ){ goto exit_cmp; }
         post_message_to_tid(
             (tid_t) 0,                // sender tid #todo
             (tid_t) InitThread->tid,  // receiver tid
@@ -1659,7 +1627,7 @@ int consoleCompareStrings(void)
 // app2: Sending a MSG_COMMAND/4002 messsage to the init thread.
     if ( strncmp(prompt,"app2",4) == 0 )
     {
-        if( (void*) InitThread == NULL ){goto exit_cmp;}
+        if ( (void*) InitThread == NULL ){ goto exit_cmp; }
         post_message_to_tid(
             (tid_t) 0,                 //sender tid #todo
             (tid_t) InitThread->tid,   //receiver tid
@@ -1676,7 +1644,7 @@ int consoleCompareStrings(void)
 // app3: Sending a MSG_COMMAND/4003 messsage to the init thread.
     if ( strncmp(prompt,"app3",4) == 0 )
     {
-        if( (void*) InitThread == NULL ){goto exit_cmp;}
+        if ( (void*) InitThread == NULL ){ goto exit_cmp; }
         //#todo: We do not have a sender tid yet.
         post_message_to_tid(
             (tid_t) 0,                // sender tid. (#todo)
@@ -1690,9 +1658,7 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
-//
-// Invalid command.
-//
+// Invalid command
 
     printf("\n");
     printf ("Error: Command not found!\n");
@@ -1705,7 +1671,6 @@ done:
     return 0;
 }
 
-
 // consolePrompt:
 // Inicializa o prompt.
 // Clean prompt buffer.
@@ -1717,9 +1682,9 @@ void consolePrompt(void)
         prompt[i] = (char) '\0'; 
     };
     prompt[0] = (char) '\0';
-    prompt_pos    = 0;
+    prompt_pos = 0;
     prompt_status = 0;
-    prompt_max    = PROMPT_MAX_DEFAULT;  
+    prompt_max = PROMPT_MAX_DEFAULT;  
     printf("\n");
     printf("$ ");
     refresh_screen();
@@ -1764,27 +1729,21 @@ __console_write (
     }
 // Max size.
     //if (count==0 || count > ?)
-    if(!count)
-    {
+    if (!count){
         printf ("__console_write: count\n");
         goto fail;
     }
 
-// ====================
 // Write string
-
     for (i=0; i<MaxSize; i++){
         console_putchar ( (int) data[i], (int) n );
     };
-
 // Return the counter.
     return (ssize_t) MaxSize;
-
 fail:
     refresh_screen();
     return (ssize_t) (-1);
 }
-
 
 // console_read:
 // #todo
@@ -1813,30 +1772,26 @@ console_write (
     const void *buf, 
     size_t count )
 {
-    // loop
-    int i=0;
-    
+// loop
+    register int i=0;
     char ch=0; 
     char *data = (char *) buf;
     size_t StringSize=0;
 
-
     //debug_print ("console_write: [test]\n");
 
-    // Console number
+// Console number
     if ( console_number < 0 || console_number > 3 )
     {
         printf ("console_write: [FAIL] console_number\n");
         goto fail;
     }
-
-    // Buffer
+// Buffer
     if ( (void *) buf == NULL ){
         printf ("console_write: buf\n");
         goto fail;
     }
-
-    // Count
+// Count
     if (!count){
         printf ("console_write: count\n");
         goto fail;
@@ -2184,8 +2139,7 @@ void __respond (int console_number)
         return;
     }
 
-    while (*p) {
-        
+    while (*p){
         //PUTCH(*p,tty->read_q);
         console_putchar ( (int) *p, console_number );
         p++;
@@ -2279,21 +2233,19 @@ void csi_P (int nr, int console_number)
     if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
     } else {
-        
-        if (!nr)
-        {
+        if (!nr){
             nr = 1;
         }
     };
 
-    if (nr<0)
+    if (nr<0){
         return;
+    }
 
     while (nr--){
         __local_delete_char(console_number);
     };
 }
-
 
 void csi_at (int nr, int console_number)
 {
@@ -2304,15 +2256,15 @@ void csi_at (int nr, int console_number)
 
     if (nr > CONSOLE_TTYS[console_number].cursor_right -1 ){
         nr = CONSOLE_TTYS[console_number].cursor_right -1 ;
-    }else {
-        
+    }else{
         if (!nr){
             nr=1;
         }
     };
 
-    if (nr<0)
+    if (nr<0){
         return;
+    }
 
     while (nr--){
         __local_insert_char(console_number);
@@ -2336,9 +2288,7 @@ int VirtualConsole_initialize(void)
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
         console_init_virtual_console(i);
-    
         //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
-        
         // Register tty device.
         //devmgr_register_device ( 
         //    (file *) __file, 
@@ -2347,7 +2297,6 @@ int VirtualConsole_initialize(void)
         //    1,                  // type (pci, legacy
         //    NULL,  // Not a pci device.
         //    tmp_tty );  // tty device
-
     };
 
 // Setup foreground console.
@@ -2395,13 +2344,11 @@ console_ioctl (
 {
     debug_print ("console_ioctl: TODO\n");
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
-    if (fg_console<0 || fg_console > 3)
-    {
+    if (fg_console<0 || fg_console > 3){
         debug_print ("console_ioctl: fg_console\n");
         return -1;
     }
@@ -2488,18 +2435,16 @@ console_ioctl (
 
 /*
  * REFRESH_STREAM:
- * 
  *     #IMPORTANTE
  *     REFRESH SOME GIVEN STREAM INTO TERMINAL CLIENT WINDOW !!
  */
-
 // #todo
 // Change this name. 
 // Do not use stream in the base kernel.
 
 void REFRESH_STREAM(file *f)
 {
-    int i=0;
+    register int i=0;
     int j=0;
     char *ptr;
 
@@ -2540,22 +2485,18 @@ void REFRESH_STREAM(file *f)
     for ( i=0; i<j; i++ )
     {
         printf ("%c", *ptr );
-
         // #bugbug
         // It is very wrong!
-        
         refresh_rectangle ( 
             (CONSOLE_TTYS[fg_console].cursor_x * cWidth), 
             (CONSOLE_TTYS[fg_console].cursor_y * cHeight),  
             cWidth, 
             cHeight );
-
         ptr++;
     };
     stdio_terminalmode_flag = FALSE; 
 //--
 }
-
 
 // Clear a console witha a given color.
 int clear_console (unsigned int color, int console_number)
@@ -2572,5 +2513,4 @@ int clear_console (unsigned int color, int console_number)
 
     return 0;
 }
-
 
