@@ -8,9 +8,7 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
-
 
 // PE file header support.
 //#define IMAGE_FILE_MACHINE_I386   0x014C  // x86
@@ -19,11 +17,8 @@
 //Continua...
 
 
-
 /*
-//
-// Progress bara support.
-//
+// Progress bar support.
 
 int total = 1000;
 int step = 0;
@@ -36,47 +31,34 @@ void updateProgressBar();
 */
 
 
-/* 
- * elfLoadKernelImage: 
- *     Carrega o KERNEL.BIN na memoria. 
- */
-
+// elfLoadKernelImage: 
+// Load KERNEL.BIN into the main memory.
 // Address.
 // pa = 0x00100000.
 // va = 0xC0000000.
-
-// Called by LandOSLoadKernelImage()
+// Called by newOSLoadKernelImage() in main.c
 
 int elfLoadKernelImage (const char *file_name)
 {
     int Status = -1;
-
     unsigned long kernel_pa = KERNEL_ADDRESS;
     unsigned long kernel_va = KERNEL_VA;
-
-    // Buffer.
-    // 0x00100000.
-
-    unsigned char *kernel = (unsigned char *) KERNEL_ADDRESS;      
-
-
-    // Path
+// Buffer. 0x00100000.
+    unsigned char *kernel = 
+        (unsigned char *) KERNEL_ADDRESS;      
+// Path
     char Path[64];
     char DefaultPath[64];
-
-    // Name.
-
+// Name
     char *kernel_name;
     kernel_name = file_name;
 
-
-    // Message.
+// Message
 
 #ifdef BL_VERBOSE
     printf ("elfLoadKernelImage: Loading %s .. PA=%x | VA=%x \n", 
         kernel_name, kernel_pa, kernel_va );
 #endif
-
 
 //
 // Load kernel image
@@ -87,7 +69,6 @@ int elfLoadKernelImage (const char *file_name)
     strcpy (Path, "/GRAMADO");
     strcat (Path, "/");
     strcat (Path, kernel_name );
-
 // Default pathname.
     strcpy (DefaultPath, "/GRAMADO/KERNEL.BIN");
 
@@ -95,21 +76,17 @@ int elfLoadKernelImage (const char *file_name)
 // Search the file in the /LANDOS/ and /BOOT/ subdirectories
 // of the boot partition.
 // See: fs.c
-
     Status = (int) load_path( Path, (unsigned long) kernel_pa );
-
 // Fail
 // Try default pathname.
-
-    if ( Status != 0 ){
-        // Try again
+    if (Status != 0){
+        // Try again.
         Status = (int) load_path( DefaultPath,(unsigned long) kernel_pa );
     }
-
-    // Fail.
-    if (Status != 0 ){
-        printf("elfLoadKernelImage: [FAIL] Couldn't load the kernel image\n");
-        goto fail;    
+// Fail again.
+    if (Status != 0){
+        printf("elfLoadKernelImage: Couldn't load the kernel image\n");
+        goto fail;
     }
 
 // Check signature.
@@ -119,7 +96,7 @@ int elfLoadKernelImage (const char *file_name)
     if ( kernel[0] != 0x7F || 
          kernel[1] != 'E' || kernel[2] != 'L' || kernel[3] != 'F' )
     {
-        printf ("elfLoadKernelImage: [FAIL] %s ELF image validation\n", 
+        printf ("elfLoadKernelImage: %s ELF image validation\n", 
             kernel_name ); 
         goto fail;
     }
@@ -147,31 +124,21 @@ int elfLoadKernelImage (const char *file_name)
          kernel[0x100A] != 0xAD || 
          kernel[0x100B] != 0x1B )
     {
-		//#debug
-		printf ("elfLoadKernelImage: [FAIL] 0x1BADB002 found!\n");
-		//refresh_screen();
-		//while(1){}
+        //#debug
+        printf ("elfLoadKernelImage: [FAIL] 0x1BADB002 found!\n");
+        //refresh_screen();
+        //while(1){}
     }
 
 // Continua ...
 
-//Done.
-//Kernel carregado.
-
-#ifdef BL_VERBOSE
-	printf("Done\n");
-	refresh_screen();
-#endif
-
-    //Status.
+// Done.
+// The kernel image was loaded.
 
     return 0; 
 
-    // =================================
-
-// Fail 
-// O Kernel n�o p�de ser carregado.
-
+// =================================
+// Fail: Couldn1t load the kernel image.
 fail:
     printf ("elfLoadKernelImage: Fail\n");
     refresh_screen();
@@ -182,23 +149,20 @@ fail:
 }
 
 
-
 /*
 // local
 // strlen:
 //     Tamanho de uma string.
-// 
 size_t blstrlen(const char *s)
-{	
+{
     size_t i = 0;
-	
-	for(i = 0; s[i] != '\0'; ++i){ 
-	; 
-	};
-	return ( (size_t) i );
+    for(i = 0; s[i] != '\0'; ++i)
+    {
+    ; 
+    };
+    return ( (size_t) i );
 };
 */
-
 
 /*
 // local
@@ -221,33 +185,33 @@ void DoProgress( char label[], int step, int total )
     //SetConsoleTextAttribute(  GetStdHandle( STD_OUTPUT_HANDLE ), FOREGROUND_GREEN );
     printf("%s[", label);
 
-    //fill progress bar with =
-	int i;
+//fill progress bar with =
+    int i;
     for( i = 0; i < pos; i++ ){
-		printf("%c", '=');
+        printf("%c", '=');
     };
-	
+
     //fill progress bar with spaces
     printf("% *c", width - pos + 1);
     printf("] %3d%%\r", percent);
 
-    //reset text color, only on Windows
+//reset text color, only on Windows
     //SetConsoleTextAttribute(  GetStdHandle( STD_OUTPUT_HANDLE ), 0x08 );
-	
-    return;	
+
+    return;
 };
 */
 
-
 /*
-void updateProgressBar(){
-	step+=1;    
-	DoProgress("Loading: ",step,total);	
-	refresh_screen();	
+void updateProgressBar()
+{
+    step += 1;
+    DoProgress("Loading: ",step,total);
+    refresh_screen();
 }
 */
 
 //
-// End.
+// End
 //
 

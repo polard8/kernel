@@ -217,7 +217,6 @@ static unsigned long init_testing_memory_size (int mb)
  *     It loads the kernel image at 0x00100000.
  *     The entry point is at 0x00101000.
  */ 
-
 // #todo
 // This way can chose the filename from a
 // configuration file.
@@ -225,15 +224,13 @@ static unsigned long init_testing_memory_size (int mb)
 // if the provide name fail.
 // This routine will build the pathname
 // to search in the default folder.
-// Called by BlMain().
+// Called by OS_Loader_Main().
 
 static int newOSLoadKernelImage(void)
 {
     int Status = -1;
-
 // Standard name.
 // #todo: Maybe we need some options, some config file.
-
     char *image_name = "KERNEL.BIN";
 
 // #bugbug
@@ -241,16 +238,20 @@ static int newOSLoadKernelImage(void)
 // para termos a change de inicializarmos o
 // rescue shell. Mas acontece que por enquanto
 // essa função aborta ao primeiro sinal de perigo.
+// See: loader.c
 
     Status = (int) elfLoadKernelImage(image_name);
-
-    if ( Status != 0 ){
+    if (Status<0){
         printf ("newOSLoadKernelImage: elfLoadKernelImage fail\n");
-        refresh_screen();
-        return (int) (-1);
+        goto fail;
     }
 
+    // OK
     return (int) Status;
+
+fail:
+    refresh_screen();
+    return (int) (-1);
 }
 
 /*
@@ -410,8 +411,7 @@ void OS_Loader_Main (void)
 // See: init.c
 
     Status = (int) init();
-
-    if (Status != 0 ){
+    if (Status != 0){
         // #todo
     }
 
@@ -491,7 +491,7 @@ void OS_Loader_Main (void)
 
     for ( i=0; i<max; i++ )
     {
-        if( &CLEARBASE[i] < __address )
+        if ( &CLEARBASE[i] < __address )
         {
             CLEARBASE[i] = (unsigned long) 0;
         }
@@ -612,9 +612,8 @@ void OS_Loader_Main (void)
     //refresh_screen();
 
     Status = newOSLoadKernelImage();
-
     if (Status<0){
-         printf("OS_Loader_Main: newOSLoadKernelImage fail. \n");
+         printf("OS_Loader_Main: newOSLoadKernelImage fail.\n");
          refresh_screen();
          while(1){
              asm("cli");
@@ -763,20 +762,15 @@ See: https://wiki.osdev.org/X86-64
 // Nao podemos chamar rotina alguma aqui,
 // somente retornar.
 // Pois os registradores estao bagunçados.
-    
 // Not reached
     while (1){
         asm("cli");
         asm("hlt");
     };
-
-    //return;
 }
-
 
 // BlAbort:
 // Rotina para abortar o bootloader em caso de erro grave.
-
 void BlAbort()
 {
 //@todo: 
@@ -789,10 +783,10 @@ void BlAbort()
 
 /*
  * BlKernelModuleMain:
- *     Se � o kernel que est� chamando o Boot Loader na forma de 
- * m�dulo do kernel em kernel mode.
+ *     Se é o kernel que está chamando o Boot Loader 
+ * na forma de módulo do kernel em kernel mode.
  */
- 
+
 void BlKernelModuleMain()
 {
     //printf ("BlKernelModuleMain: Boot Loader\n");
