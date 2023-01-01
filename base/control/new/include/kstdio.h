@@ -63,11 +63,9 @@ int g_inputmode;
 #define _IOERR    0x0020  /* I/O error from system */
 #define _IOSTRG   0x0040 /* Strange or no file descriptor */
 
-
 #define STDIN_FILENO   0
 #define STDOUT_FILENO  1
 #define STDERR_FILENO  2
-
 
 //The macro yields the maximum size array of characters that 
 //you must provide to hold a filename.

@@ -3,7 +3,6 @@
 
 #include <kernel.h>
 
-
 //see: fs.h
 struct filesystem_d  *root;
 
@@ -47,8 +46,6 @@ unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 //
 // == Private functions: Prototypes ===========
 //
-
-
 
 //=============================
 
@@ -121,15 +118,14 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // nao podemos ler mais que o limite do arquivo.
 // A próxima leitura precisa ser depois dessa.
 
-
 // =================================
 // Socket:
-// Se o arquivo é um socket, então não concatenaremos escrita ou leitura.
+// Se o arquivo é um socket, 
+// então não concatenaremos escrita ou leitura.
 // You also can write now.
 // But i can still read.
-    if ( f->____object == ObjectTypeSocket )
-    {    
-        memcpy ( (void *) buffer, (const void *) f->_base, Count ); 
+    if (f->____object == ObjectTypeSocket){
+        memcpy ( (void *) buffer, (const void *) f->_base, Count );
         f->_flags |= __SWR;
         return Count;
     }
@@ -139,13 +135,11 @@ int file_read_buffer ( file *f, char *buffer, int len )
 // Não concatenaremos
 // You also can write now.
 // But i can still read.
-    if ( f->____object == ObjectTypePipe )
-    {
-        memcpy ( (void *) buffer, (const void *) f->_base, Count ); 
+    if (f->____object == ObjectTypePipe){
+        memcpy ( (void *) buffer, (const void *) f->_base, Count );
         f->_flags |= __SWR;
         return Count;
     }
-
 
 // =================================
 // Regular file, tty, iobuffer.
@@ -155,7 +149,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
          f->____object == ObjectTypeIoBuffer)
     {
         // Se o buffer tem tamanho 0.
-        if ( f->_lbfsize <= 0 ){
+        if (f->_lbfsize <= 0){
             printf ("file_read_buffer: _lbfsize is 0\n");
             goto fail;
         }
@@ -166,7 +160,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
         //    printf ("file_read_buffer: _lbfsize\n");
         //    goto fail;
         //}
-        
+
         // #test: Limite provisorio
         if (f->_lbfsize > (8*1024)){
             printf ("file_read_buffer: _lbfsize bigger than 8KB\n");
@@ -174,28 +168,24 @@ int file_read_buffer ( file *f, char *buffer, int len )
         }
 
         // Não podemos ler antes do início do arquivo.
-        if ( f->_r < 0 )
-        {
+        if ( f->_r < 0 ){
             f->_r = 0;
             printf ("file_read_buffer: f->_r = 0\n");
             goto fail;
         }
-        
+
         // Nao leremos depois do fim do arquivo.
         if ( f->_r > f->_lbfsize )
         {
             //#debug: provisorio
             printf ("file_read_buffer: f->_r > f->_lbfsize\n");
             goto fail;
-
-            debug_print("file_read_buffer: f->_r > f->_lbfsize\n");
-
-            f->_r = f->_lbfsize;
-            f->_w = f->_lbfsize;
-            f->_p = (f->_base + f->_lbfsize);
-            f->_cnt = 0;
-
-            return EOF;
+            //debug_print("file_read_buffer: f->_r > f->_lbfsize\n");
+            //f->_r = f->_lbfsize;
+            //f->_w = f->_lbfsize;
+            //f->_p = (f->_base + f->_lbfsize);
+            //f->_cnt = 0;
+            //return EOF;
         }
 
         // Se o offset de leitura for maior que
@@ -206,24 +196,20 @@ int file_read_buffer ( file *f, char *buffer, int len )
             // EOF
             printf ("file_read_buffer: f->_r > f->_w\n");
             //goto fail;
-
             //debug_print("file_read_buffer: f->_r > f->_w\n");
             f->_r = f->_w;
-            
             //faremos o ajuste logo abaixo.
             //f->_p = (f->_base + f->_r);
-
             // You also can write now.
             // But i can still read.
             //f->_flags = __SWR;
-
             return 0;
         }
-        
+
         // Se a quantidade que desejamos ler
         // é maior que o espaço que temos.
         // # Isso ja foi feito logo acima.
-        if( Count > f->_lbfsize )
+        if (Count > f->_lbfsize)
         {
 
             //printf ("file_read_buffer: Count > f->_lbfsize\n");
@@ -236,31 +222,28 @@ int file_read_buffer ( file *f, char *buffer, int len )
             // leia tudo então. hahaha
             Count = (f->_lbfsize - 1);
         }
- 
- 
+
         // Se o tanto que queremos ler é maior
         // que o que nos resta da buffer,
         // então vamos ler apenas o resto do buffer.
-        
+
         // #bugbug: Isso esta errado. #delete
-        
+
         // So podemos ler ate limite de bytes disponíveis 
         // no buffer.
         //if (Count > f->_cnt)
         //{
             //printf ("file_read_buffer: local_len > f->_cnt\n");
             //goto fail;
-
             //Count = f->_cnt;
         //}
  
         // 
         int delta = (f->_w - f->_r);
-                
+
         // nada para ler.
         // pois o ponteiro de escrita e o de leitura sao iguais,
-        if( delta == 0 )
-        {
+        if (delta == 0){
             // 0 bytes lidos
             //printf ("delta=0\n");
             return 0;
@@ -270,14 +253,11 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // Se o tanto que queremos ler
         // é maior que o tanto que foi efetivamente escrito,
         // então leremos somente o que foi escrito.
-        
         // se a diferença entra o ponteiro de escrita e o ponteiro
         // de leitura for menor que a quantidade que queremos ler.
-        
         // Se queremos ler mais do que foi escrito.
         // entao vamos ler apenas o que foi escrito.
-        if (Count > delta)
-        {
+        if (Count > delta){
             Count = delta;
         }
 
@@ -286,23 +266,20 @@ int file_read_buffer ( file *f, char *buffer, int len )
         // A partir do offset de leitura.
         f->_p = (f->_base + f->_r);
 
-
         // read
-        
+
         //#debug
-        if (Count <= 0 )
-        {
+        if (Count <= 0){
             printf ("file_read_buffer: Count <= 0 SECOND\n");
             goto fail;
-
             //printf("local_len\n");
             //refresh_screen();
-            return -1;
+            //return -1;
         }
-        
+
         //---
         memcpy ( (void *) buffer, (const void *) f->_p, Count ); 
-        
+
         // Atualizamos o ponteiro de trabalho
         f->_p = (f->_p + Count);
 
@@ -324,19 +301,18 @@ int file_read_buffer ( file *f, char *buffer, int len )
         return (int) Count;
     }
 
-
 fail:
     refresh_screen ();
     return EOF;
 }
 
-
 /*
  * file_write_buffer: 
- *     Escreve no arquivo uma certa quantidade de caracteres de uma 
- *     dada string.
+ * Escreve no arquivo uma certa quantidade 
+ * de caracteres de uma dada string.
  */
-// Escreve no arquivo uma certa quantidade de caracteres de uma dada string 
+// Escreve no arquivo uma certa quantidade de caracteres 
+// de uma dada string.
 // It's called by sys_write.
 
 int 
@@ -346,16 +322,14 @@ file_write_buffer (
     int len )
 {
     char *p;
-
     p = string;
 
-    debug_print ("file_write_buffer:\n");
+    // debug_print ("file_write_buffer:\n");
 
     if ( (void *) f == NULL ){
-        printf ("file_write_buffer: file\n");
+        printf ("file_write_buffer: f\n");
         goto fail;
     }
-
     if ( (void *) p == NULL ){
         printf ("file_write_buffer: p\n");
         goto fail;
@@ -367,7 +341,6 @@ file_write_buffer (
         goto fail;
     }
 
-
 //
 // Copy!
 //
@@ -376,13 +349,13 @@ file_write_buffer (
 // Se o arquivo é um socket, então não concatenaremos 
 // escrita ou leitura.
     if ( f->____object == ObjectTypeSocket ){
-        memcpy ( (void *) f->_base, (const void *) string, len ); 
+        memcpy ( (void *) f->_base, (const void *) string, len );
         return len;
     }
 
 // não concatenaremos
     if ( f->____object == ObjectTypePipe ){
-        memcpy ( (void *) f->_base, (const void *) string, len ); 
+        memcpy ( (void *) f->_base, (const void *) string, len );
         return len;
     }
 
@@ -397,7 +370,6 @@ file_write_buffer (
 // Isso não significa que está no fim do buffer.
 // Nesse caso o aplicative deveria usar rewind() antes
 // para ter um ponteiro de escrita adequado.
-
 
     if ( f->____object == ObjectTypeFile ||     // regular file
          f->____object == ObjectTypeTTY  ||     // tty
@@ -423,25 +395,23 @@ file_write_buffer (
         }
 
         // Se o offset de escrita ultrapassa os limites.
-        if( f->_w >= BUFSIZ )
+        if ( f->_w >= BUFSIZ )
         {
             //#bugbug
             debug_print("file_write_buffer: f->_w >= BUFSIZ\n");
             printf     ("file_write_buffer: f->_w >= BUFSIZ\n");
-            
             f->_w = BUFSIZ; 
             f->_cnt = 0;
-
             return EOF;
         }
-        
+
         //if ( f->_w 
-    
+
         // recalculando quanto espaço temos.
         //f->_cnt = (f->_lbfsize - f->_w);
-    
+
         // Se a quantidade que temos ultrapassa os limites.
-        
+
         // fim do arquivo.
         if( f->_cnt < 0)
         {
@@ -451,23 +421,23 @@ file_write_buffer (
             f->_p = (f->_base + f->_w);
             return EOF;
         }
-        
+
         // inicio do arquivo
-        if( f->_cnt > f->_lbfsize )
+        if ( f->_cnt > f->_lbfsize )
         {
             printf ("file_write_buffer: _cnt\n");
-            
             f->_cnt = f->_lbfsize;
             f->_p = f->_base; 
             f->_w = 0;
             f->_r = 0;
         }
 
-        if( len < 0 )
+        if (len < 0){
             return -1;
+        }
 
         // Se o que desejamos escrever é maior que o espaço que temos.
-        if( len > f->_cnt )
+        if ( len > f->_cnt )
         {
             // Estamos no fim do arquivo
             if ( f->_cnt <= 0 )
@@ -478,10 +448,9 @@ file_write_buffer (
                 f->_cnt = 0; 
                 return -1;
             }
-            
+
             // Só podemos escrever esse tanto.
-            if ( f->_cnt > 0 )
-            {
+            if ( f->_cnt > 0 ){
                 len = f->_cnt; 
             }
         }
@@ -496,36 +465,35 @@ file_write_buffer (
             f->_cnt = ( f->_lbfsize - f->_w );
         }
 
-        // vamos escrever aqui.
+        // Vamos escrever aqui.
         f->_p = (f->_base + f->_w);
 
-        //escrevemos usando o ponteiro de escrita.
+        // Escrevemos usando o ponteiro de escrita.
         memcpy ( (void *) f->_p, (const void *) string, len ); 
     
-        //atualizamos o ponteiro de escrita
+        // Atualizamos o ponteiro de escrita
         f->_p = (f->_p + len);
 
-        // atualizamos o offset de escrita.
+        // Atualizamos o offset de escrita.
         f->_w = (f->_w + len);
     
-        //atualizamos o quanto nos falta.
+        // Atualizamos o quanto nos falta.
         f->_cnt = (f->_cnt - len);
         
         // You can read now.
         f->_flags = __SRD;
         f->sync.can_read = TRUE;
-        
-        debug_print ("file_write_buffer: ok, done\n");
-           
-        // retornamos a quantidade escrita no buffer.
-        return len;
+
+        //debug_print ("file_write_buffer: ok, done\n");
+
+        // Retornamos a quantidade escrita no buffer.
+        return (int) len;
     }
-    
-    // unknown type.
-    
+
+// Unknown type.
 fail:
     //printf ("file_write_buffer: fail\n");
-    refresh_screen ();
+    refresh_screen();
     return EOF;
 }
 
@@ -552,13 +520,12 @@ fail:
 ssize_t 
 sys_read (
     int fd,
-    char *ubuf,        //#todo: use 'void *'
-    size_t count )        //#todo: use 'size_t'.
+    char *ubuf,       //#todo: use 'void *'
+    size_t count )    //#todo: use 'size_t'.
 {
     file *__file;
     ssize_t nbytes=0;
-
-    struct socket_d  *s;
+    struct socket_d *s;
     int ubuf_len=0;
 
 // #bugbug
@@ -566,28 +533,22 @@ sys_read (
 // Deveria ser int?
 
 // fd
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (ssize_t) (-EBADF);
     }
-
-// buf
+// ubuf
 // todo: Checar a validade da região de memória.
-
     if ( (void *) ubuf == NULL ){
         return (ssize_t) (-EINVAL);
     }
-
 // count
     if (count < 0){ 
         return (ssize_t) (-EINVAL);
     }
-
-    // Nothing to do.
+// Nothing to do.
     if (count == 0){ 
         return 0; 
     }
-
 
 // Size of the buffer.
     ubuf_len = strlen( (const char *) ubuf );
@@ -598,15 +559,17 @@ sys_read (
         //debug_print ("sys_read: [FIXME] count too large\n");
     }
 
-//Se o buffer disponível é maior que a quantidade desejada
-//então não temos problemas, nem precisamos disso. 
-    if (ubuf_len > count )
+// Se o buffer disponível é maior que a quantidade desejada
+// então não temos problemas, nem precisamos disso. 
+    if (ubuf_len > count){
         ubuf_len = count;
+    }
 
-// #fixme: The buffer is too small.
+// #fixme: 
+// The buffer is too small.
 
     if (ubuf_len > 512){
-        debug_print ("sys_read: [FIXME] limiting ubuf_len \n");
+        debug_print ("sys_read: [FIXME] limiting ubuf_len\n");
         //ubuf_len = 512;
     }
 
@@ -618,16 +581,13 @@ sys_read (
 
     __file = (file *) get_file_from_fd(fd);
 
-    if ( (void *) __file == NULL )
-    {
+    if ( (void *) __file == NULL ){
         debug_print ("sys_read: __file not open\n");
         printf      ("sys_read: __file not open\n");
         goto fail; 
     }
 
-
-    if ( __file->sync.can_read != TRUE )
-    {
+    if (__file->sync.can_read != TRUE){
         debug_print ("sys_read: [PERMISSION] Can NOT read the file\n");
         printf      ("sys_read: [PERMISSION] Can NOT read the file\n");
         goto fail; 
@@ -646,25 +606,22 @@ sys_read (
     // #todo: Create thie element in the structure.
     // if( __file->is_directory == TRUE ){}
 
-
 //==========================================================
 // ::0
 // stdin
 
-    
-    if ( __file->_file == 0 ){
+    if (__file->_file == STDIN_FILENO){
         debug_print("sys_read: Reading from stdin\n");
         // Shortcut
         if ( __file->____object == ObjectTypeFile ){
             goto RegularFile;
         }
     }
-    
+
 //==========================================================
 // ::1
 // stdout
-
-    if ( __file->_file == 1 ){
+    if (__file->_file == STDOUT_FILENO){
         debug_print("sys_read: Reading from stdout\n");
         // Shortcut
         if ( __file->____object == ObjectTypeFile ){
@@ -676,14 +633,13 @@ sys_read (
 // ::2
 // stderr
 
-    if ( __file->_file == 2 ){
+    if (__file->_file == STDERR_FILENO){
         debug_print("sys_read: Reading from stderr\n");
         // Shortcut
         if ( __file->____object == ObjectTypeFile ){
             goto RegularFile;
         }
     }
-
 
 //
 // == Socket file ===========================================
@@ -744,18 +700,18 @@ sys_read (
         // le e acorda escritores.
         if (__file->socket_buffer_full == TRUE)
         {
-            if( __file->_flags & __SRD )
+            if (__file->_flags & __SRD)
             {
                 //debug_print ("sys_read: >>>> READ\n");
             
                 // read!
-                nbytes = (ssize_t) file_read_buffer ( 
-                                       (file *) __file, 
-                                       (char *) ubuf, 
-                                       (int) count );
-        
-                if (nbytes <= 0)
-                {
+                nbytes = 
+                    (ssize_t) file_read_buffer ( 
+                                  (file *) __file, 
+                                  (char *) ubuf, 
+                                  (int) count );
+
+                if (nbytes <= 0){
                     debug_print("sys_read: [FAIL] file_read_buffer fail when reading a socket \n");
                     //yield (current_thread);
                     goto fail;
@@ -764,17 +720,14 @@ sys_read (
                 // ok
                 if (nbytes > 0)
                 {
-                    debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
+                    //debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
                     __file->socket_buffer_full = FALSE;     // buffer vazio
-
                     __file->_flags &= ~__SRD;  // nao posso mais LER.            
                     __file->_flags |= __SWR;   // pode escrever também
-                
-                    debug_print("sys_read: WAKEUP WRITER\n");
+                    //debug_print("sys_read: WAKEUP WRITER\n");
                     do_thread_ready( __file->tid_waiting ); // acorda escritores.
                     __file->tid_waiting = -1;
-                    debug_print("sys_read:done\n");
-
+                    //debug_print("sys_read:done\n");
                     return (ssize_t) nbytes;                    // bytes escritos.
                 }
             }
@@ -843,37 +796,33 @@ RegularFile:
         // + Sinalize that another process can write.
         // #todo: wake the one that was waiting to write.
 
-        if ( __file->_flags & __SRD )
+        if (__file->_flags & __SRD)
         {
-
-            nbytes = (ssize_t) file_read_buffer ( 
-                                   (file *) __file, 
-                                   (char *) ubuf, 
-                                   (int) count );
+            nbytes = 
+                (ssize_t) file_read_buffer ( 
+                              (file *) __file, 
+                              (char *) ubuf, 
+                              (int) count );
  
-            if(nbytes<=0)
-            {
+            if (nbytes<=0){
                //yield (current_thread);
                goto fail;
             }
-            
+
             // Se conseguimos ler.
-            if ( nbytes>0 )
+            if (nbytes>0)
             {
                 //__file->_flags &= ~__SRD;  // nao posso mais LER.            
                 //__file->_flags |= __SWR;   // pode escrever também
-
                 // ok to write.
                 __file->_flags |= __SWR;
                 __file->sync.can_write = TRUE;
-        
                 // #test
                 // Acordar quem esperava por esse evento
                 //do_thread_ready( __file->tid_waiting );
-                
                 return (ssize_t) nbytes; 
             }
-        
+
             //Não conseguimos ler.
             //nada de errado, apenas espera.
             //do_thread_waiting (current_thread);
@@ -888,12 +837,10 @@ RegularFile:
         //return -1;
     }
 
-
 // ========================================
-// pseudo terminal multiplexer.
+// Pseudo terminal multiplexer.
 
-    if ( __file->____object == ObjectTypePTMX )
-    {
+    if (__file->____object == ObjectTypePTMX){
         printk ("sys_read: [TODO] trying to read a PTMX device file\n");
         refresh_screen();
         return 0;
@@ -902,8 +849,7 @@ RegularFile:
 // ========================================
 // pty () pseudo terminal.
 
-    if ( __file->____object == ObjectTypePTY )
-    {
+    if (__file->____object == ObjectTypePTY){
         printk ("sys_read: [TODO] trying to read a PTY device file\n");
         refresh_screen();
         return 0;
@@ -912,8 +858,7 @@ RegularFile:
 // ========================================
 // file system
 
-    if ( __file->____object == ObjectTypeFileSystem )
-    {
+    if (__file->____object == ObjectTypeFileSystem){
         printk ("sys_read: [TODO] trying to read a file system\n");
         refresh_screen();
         return 0;
@@ -922,17 +867,13 @@ RegularFile:
 // ========================================
 // See: pipe.c
 
-    if ( __file->____object == ObjectTypePipe )
-    {
+    if (__file->____object == ObjectTypePipe){
         return (ssize_t) sys_read_pipe ( (int) fd, (char *) ubuf, (int) count ); 
     }
 
+// ======================================================
     // ...
-    
-    // ======================================================
-    
     debug_print ("sys_read: [FAIL] Unknown object type\n");
-
 // ==========================================
 
 //
@@ -966,12 +907,10 @@ fail:
     return (ssize_t) (-1);
 }
 
-
 /*
  * sys_write:
  *     Implemantation of write() for libc.
  */
-
 // service 19.
 // Copiar um buffer para um arquivo dado o descritor.
 // Aqui devemos selecionar o dispositivo à escrever.
@@ -1009,35 +948,28 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 {
     file *__file;
     ssize_t nbytes=0;
-
-    struct socket_d  *s1;
-    struct socket_d  *s2;
-
+    struct socket_d *s1;
+    struct socket_d *s2;
     int ubuf_len=0;
     size_t ncopy=0;
 
     //debug_print("------------------------------------ W --\n");
     //debug_print("sys_write: :)\n");
 
-
 // fd
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (ssize_t) (-EBADF);
     }
-
 // ubuf
     if ( (void *) ubuf == NULL ){
         return (ssize_t) (-EINVAL);
     }
-
 // count
-    if ( count < 0 ){ 
+    if (count < 0){ 
         return (ssize_t) (-EINVAL);
     }
-
-    // Nothing to do.
-    if ( count == 0 ){ 
+// Nothing to do.
+    if (count == 0){ 
         return 0; 
     }
 
@@ -1060,16 +992,14 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         //debug_print ("sys_write: [FIXME] Ajusting ubuf_len\n");
     }
 
-    // #debug: 
-    // limits
-    // Um socket tem o tamanho de BUFSIZ.
-    
-    if (ubuf_len > 512 )
-    {
+// #debug: 
+// limits
+// Um socket tem o tamanho de BUFSIZ.
+
+    if (ubuf_len > 512){
         ubuf_len = 512;
         debug_print ("sys_write: [FIXME] Ajusting ubuf_len to 512\n");
     }
-
 
 //
 // __file
@@ -1095,14 +1025,13 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         goto fail;
     }
 
-    if ( __file->sync.can_write != TRUE )
-    {
+    if (__file->sync.can_write != TRUE){
         debug_print ("sys_write: [PERMISSION] Can NOT write the file\n");
         printf      ("sys_write: [PERMISSION] Can NOT write the file\n");
         goto fail; 
     }
 
-    /*
+/*
     // #todo
     // ainda nao inicializamos esse elemento.
     if( __file->is_writable == FALSE )
@@ -1110,18 +1039,18 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         debug_print ("sys_write: Not writable\n");
         return -1;
     }
-    */
+*/
 
-    //#todo: Create thie element in the structure.
+// #todo: 
+// Create thie element in the structure.
     //if( __file->is_directory == TRUE ){}
-
 
 // =======================================================
 // ::0
 // stdin
 // + Write on regular file.
 
-    if ( __file->_file == 0 )
+    if (__file->_file == STDIN_FILENO)
     {
         debug_print("sys_write: Writing into stdin\n");
         // If the file is a regular file.
@@ -1130,7 +1059,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
             goto RegularFile;
         }
     }
-    
 
 // =======================================================
 // ::1
@@ -1138,7 +1066,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // + Write on console.
 // + Write on regular file.
 
-    if ( __file->_file == 1 )
+    if (__file->_file == STDOUT_FILENO)
     {
         debug_print("sys_write: Writing into stdout\n");
         
@@ -1152,8 +1080,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         }
         // If the file is a regular file.
         // Shortcut
-        if ( __file->____object == ObjectTypeFile )
-        {
+        if (__file->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -1163,24 +1090,21 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // stderr
 // + Write on regular file.
 
-    if ( __file->_file == 2 )
+    if (__file->_file == STDERR_FILENO)
     {
         debug_print("sys_write: Writing into stderr\n");
         // Shortcut
-        if ( __file->____object == ObjectTypeFile )
-        {
+        if (__file->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
 
-
 //
 // == Sockets ===============================================
 //
-
     ncopy = count;
 
-// ==== Socket ===============================
+// == Socket ===============================
 // Descobrindo o soquete que devemos copiar.
 // Se o arquivo é do tipo socket, então devemos
 // saber onde está o buffer.
@@ -1189,7 +1113,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // accept deve retornar o fd do cliente, para que o servidor
 // construa uma lista de clientes.
 // Entao copiar sera uma opçao, gerenciada por uma flag.
-    
+
 // #bugbug
 // Nao podemos fazer a copia se os dois sockets 
 // estiverem com a conexao pendente.
@@ -1239,20 +1163,20 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         {
             // Se podemos escrever.
             // #todo: Ja fizemos isso logo acima.
-            if( __file->_flags & __SWR )
+            if ( __file->_flags & __SWR )
             {
                 //debug_print ("sys_write: >>>> WRITE\n");
                 __file->_flags = 0;
-            
+
                 // Write in the socket buffer.
-                nbytes = (ssize_t) file_write_buffer ( 
-                                       (file *) __file, 
-                                       (char *) ubuf, 
-                                       (int) count );
+                nbytes = 
+                    (ssize_t) file_write_buffer ( 
+                                  (file *) __file, 
+                                  (char *) ubuf, 
+                                  (int) count );
 
                 // fail
-                if (nbytes <= 0)
-                {
+                if (nbytes <= 0){
                     debug_print("sys_write: [FAIL] file_write_buffer couldn't write on socket \n");
                     //#todo: Isso pode afetar o desempenho.
                     yield (current_thread);
@@ -1292,7 +1216,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         panic("sys_write: Unexpected error when writing on socket\n");
     }
 
-
 //
 // Arquivos normais (regular)
 //
@@ -1300,8 +1223,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 RegularFile:
 
     // == Regular file =========================================
-
-
     // Tem que retonar o tanto de bytes escritos.
     // Escreve em uma stream uma certa quantidade de chars.
 
@@ -1318,10 +1239,11 @@ RegularFile:
         if (__file->_flags & __SWR)
         {
             // Regular file.
-            nbytes = (ssize_t) file_write_buffer ( 
-                                   (file *) __file, 
-                                   (char *) ubuf, 
-                                   (int) count );
+            nbytes = 
+                (ssize_t) file_write_buffer ( 
+                              (file *) __file, 
+                              (char *) ubuf, 
+                              (int) count );
 
             // Avisa que o arquivo não está mais no modo escrita,
             // que agora pode ler.
@@ -1334,60 +1256,47 @@ RegularFile:
             // então ele lerá também.
             // Atualizamos a flag e acordamos quem esperava pelo evento.
 
-            if (nbytes>0)
-            { 
+            if (nbytes>0){
                 __file->_flags = __SRD;
                 __file->sync.can_read = TRUE;
-                do_thread_ready( __file->tid_waiting );
-                
+                do_thread_ready(__file->tid_waiting);
                 return (ssize_t) nbytes;
             }
 
-            //suspenso.
+            // suspenso.
             // Não conseguimos escrever ... 
             // nada de errado, apenas esperaremos.
             //do_thread_waiting (current_thread);
             //__file->tid_waiting = current_thread;
             //__file->_flags |= __SWR;  //pode escrever.
             //scheduler();
-        
             debug_print ("sys_write: [FAIL] file_write_buffer fail!\n");
             return 0;
         }
  
         debug_print ("sys_write: [FAIL] Something is wrong!\n");
-        
         return (ssize_t) (-1);
     } //regular file.
 
-
 // ======================================================
-
-    //pseudo terminal multiplexer.
-    if ( __file->____object == ObjectTypePTMX )
-    {
+// Pseudo terminal multiplexer.
+    if (__file->____object == ObjectTypePTMX){
         printk ("sys_write: [TODO] trying to write a PTMX device file\n");
         refresh_screen();
         return 0;
     }
 
 // ======================================================
-
-    // pty () pseudo terminal.
-    if ( __file->____object == ObjectTypePTY )
-    {
+// pty () pseudo terminal.
+    if (__file->____object == ObjectTypePTY){
         printk ("sys_write: [TODO] trying to write a PTY device file\n");
         refresh_screen();
         return 0;
     }
 
 // ======================================================
-
-// ======================================================
-
-    // file system
-    if ( __file->____object == ObjectTypeFileSystem )
-    {
+// File system
+    if (__file->____object == ObjectTypeFileSystem){
         printk ("sys_write: [TODO] trying to write a file system\n");
         refresh_screen();
         return 0;
@@ -1397,14 +1306,11 @@ RegularFile:
 // pipe:
 // See: pipe.c
 
-    if ( __file->____object == ObjectTypePipe )
-    {
+    if ( __file->____object == ObjectTypePipe ){
         return (ssize_t) sys_write_pipe ( (int) fd, (char *) ubuf, (int) count ); 
     }
 
     // ...
-
-
 
 //==============================================
     debug_print ("sys_write: [FAIL] Unknown object type!\n");
@@ -1415,12 +1321,13 @@ fail:
     debug_print ("sys_write: [FAIL] Something is wrong!\n");
     // printf      ("sys_write: [FAIL] something is wrong!\n");
 fail2:
-    
+
     //invalidate_screen();
-    
-// #bugbug: Isso pode degradar o desempenho.
+
+// #bugbug: 
+// Isso pode degradar o desempenho.
     //refresh_screen();   
-    
+
     // Não conseguimos escrever ... 
     // Estamos com problemas 
     //do_thread_waiting (current_thread);
@@ -1431,7 +1338,6 @@ fail2:
 // fail. something is wrong!
     return (ssize_t) (-1);
 }
-
 
 // Syscall 16.
 // #bugbug
@@ -1460,7 +1366,6 @@ sys_open (
     if ( (void*) pathname == NULL ){
         return (int) (-EINVAL);
     }
-
     if ( *pathname == 0 ){
         return (int) (-EINVAL);
     }
@@ -1485,7 +1390,6 @@ sys_open (
             // Put it into the list inside the
             // current process structure
             // and return the fd.
-            
             printf("sys_open: #todo\n");
             refresh_screen();
             return -1;
@@ -1551,8 +1455,7 @@ int sys_close(int fd)
     */
 
 // Invalid fd
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
@@ -1567,14 +1470,11 @@ int sys_close(int fd)
     }
 
     p = (void *) processList[current_process];
-
     if ( (void *) p == NULL ){
         debug_print("sys_close: p\n");
         goto fail;
     }
-
-    if ( p->used != TRUE || p->magic != 1234 )
-    {
+    if ( p->used != TRUE || p->magic != 1234 ){
         debug_print("sys_close: p validation\n");
         goto fail;
     }
@@ -1583,19 +1483,14 @@ int sys_close(int fd)
 // The object is a file structure.
 
     object = (file *) p->Objects[fd];
-        
-    if ( (void *) object == NULL )
-    {
+    if ( (void *) object == NULL ){
         debug_print("sys_close: object\n");
         return (int) (-1);
     }
-
-    if ( object->used != TRUE || object->magic != 1234 )
-    {
+    if ( object->used != TRUE || object->magic != 1234 ){
         debug_print("sys_close: object validation\n");
         goto fail;
     }
-
 
 // What type of object?
 // socket, pipe, virtual console, tty, regular file ??
@@ -1658,7 +1553,7 @@ int sys_close(int fd)
     {
         debug_print("sys_close: [FIXME] trying to close a regular file\n");
         debug_print("sys_close: [FIXME] fsSaveFile\n");
-                
+
         // #fixme: buffer limit
         if (object->_lbfsize < 512)
         {  
@@ -1680,25 +1575,22 @@ int sys_close(int fd)
             (char)           0x20 );                 // flag ??
 
         object = NULL;
-        
+
         // ??
         p->Objects[fd] = (unsigned long) 0;
-        
+
         debug_print("sys_close: [FIXME] Done\n");
         return 0;
     }
 
-//
 // Object type not supported.
-//
-    
+
     debug_print("sys_close:[FAIL] Object type not supported yet \n");
 
 fail:
     debug_print("sys_close: [FAIL] \n");
     return (int) (-1);
 }
-
 
 // #todo: 
 // Rever esses argumentos.
@@ -1708,15 +1600,12 @@ fail:
 
 int sys_fcntl ( int fd, int cmd, unsigned long arg )
 {
-    debug_print ("sys_fcntl:\n");
+    debug_print ("sys_fcntl: #todo\n");
 
-
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
-
-    if ( cmd < 0 ){
+    if (cmd < 0){
         return (int) (-EINVAL);
     }
 
@@ -1811,10 +1700,6 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 }
 
 
-
-
-
-
 // helper
 // dado o fd, pegamos o ponteiro 
 // para estrutura de arquivo na lista de
@@ -1829,45 +1714,35 @@ file *get_file_from_fd(int fd)
 
     pid_t current_pid = (pid_t) get_current_process();
 
-    if( current_pid < 0 ||
-        current_pid >= PROCESS_COUNT_MAX )
+    if ( current_pid < 0 ||
+         current_pid >= PROCESS_COUNT_MAX )
     {
         // msg
         return NULL;
     }
 
     p = (struct process_d *) processList[current_pid];
-
-    if( (void*) p == NULL )
-    {
+    if ( (void*) p == NULL ){
         debug_print ("get_file_from_fd: p\n");
         panic       ("get_file_from_fd: p\n");
         //return NULL;
     }
-    
-    if(p->used != TRUE)
-    {
+    if (p->used != TRUE){
+        //msg
+        return NULL;
+    }
+    if (p->magic != 1234){
         //msg
         return NULL;
     }
 
-    if(p->magic != 1234)
-    {
-        //msg
-        return NULL;
-    }
-    
-
-    if (fd < 0 ||
-        fd >= 32)
-    {
+    if (fd < 0 || fd >= 32){
         //msg
         return NULL;
     }
 
     f = (file *) p->Objects[fd];
-
-    if( (void*) f == NULL )
+    if ( (void*) f == NULL )
     {
         //#debug
         printf("fd{%d} pid{%d}\n",fd,current_pid);
@@ -1888,8 +1763,7 @@ int sys_get_global_sync (int sync_id, int request)
 { 
     struct kstdio_sync_d *s;
 
-    if( sync_id < 0 ||
-        sync_id >= SYNC_COUNT_MAX )
+    if ( sync_id < 0 || sync_id >= SYNC_COUNT_MAX )
     {
        //message? panic?
        return -1;
@@ -1897,11 +1771,15 @@ int sys_get_global_sync (int sync_id, int request)
 
     s = (struct kstdio_sync_d *) syncList[sync_id];
     
-    if( request == SYNC_REQUEST_GET_ACTION )
+    if ( request == SYNC_REQUEST_GET_ACTION )
     {
+        if ( (void*) s == NULL ){
+            goto fail;
+        }
         return (int) s->action;
     }
 
+fail:
     return -1; 
 }
 
@@ -1912,19 +1790,21 @@ void sys_set_global_sync(int sync_id, int request, int data)
 {
     struct kstdio_sync_d *s;
 
-    if( sync_id < 0 ||
-        sync_id >= SYNC_COUNT_MAX )
+    if ( sync_id < 0 || sync_id >= SYNC_COUNT_MAX )
     {
        //message? panic?
        return;
     }
 
     s = (struct kstdio_sync_d *) syncList[sync_id];
-    
-    if( request == SYNC_REQUEST_SET_ACTION )
-        s->action = data;
-}
 
+    if ( request == SYNC_REQUEST_SET_ACTION )
+    {
+        if ( (void*) s != NULL ){
+            s->action = data;
+        }
+    }
+}
 
 // 10004
 // Create sync structure and
@@ -1937,22 +1817,21 @@ int sys_create_new_sync(void)
 {
     struct kstdio_sync_d *s;
     s = (struct kstdio_sync_d *) kmalloc( sizeof(struct kstdio_sync_d) );
-    if( (void*) s == NULL )
-        return -1;
+    if ( (void*) s == NULL ){
+        return (int) -1;
+    }
     s->used=TRUE;
     s->magic=1234;
     s->action = ACTION_NULL;
     sync_count++;
-    if( sync_count > 0 && 
-        sync_count < SYNC_COUNT_MAX )
+    if ( sync_count > 0 && sync_count < SYNC_COUNT_MAX )
     {
         syncList[sync_count] = (unsigned long) s;
         __saved_sync_id = (int) sync_count;
         return (int) sync_count;
     }
-    return -1;
+    return (int) -1;
 }
-
 
 // Get the id.
 // provisorio, para testes
@@ -2001,7 +1880,6 @@ int sys_get_file_sync (int fd, int request)
     }
 
     p = (void *) processList[current_process];
-
     if ( (void *) p == NULL ){
         debug_print("sys_get_file_sync: p\n");
         return (int) (-1);
@@ -2013,18 +1891,14 @@ int sys_get_file_sync (int fd, int request)
 // object
 
     object = (file *) p->Objects[fd];
-
     if ( (void*) object == NULL ){
         debug_print("sys_get_file_sync: [FAIL] object\n");
         return (int) (-1);
     }
-
-    if ( object->used != TRUE || object->magic != 1234 )
-    {
+    if ( object->used != TRUE || object->magic != 1234 ){
         debug_print("sys_get_file_sync: validation\n");
         return (int) (-1);
     }
-
 
     switch (request){
 
@@ -2075,9 +1949,8 @@ void sys_set_file_sync(int fd, int request, int data)
     }
     */
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
-        debug_print("sys_set_file_sync: [FAIL] fd\n");
+    if ( fd < 0 || fd >= OPEN_MAX ){
+        debug_print("sys_set_file_sync: fd\n");
         return;
     }
 
@@ -2089,13 +1962,10 @@ void sys_set_file_sync(int fd, int request, int data)
     }
 
     p = (void *) processList[current_process];
-
-    if ( (void *) p == NULL )
-    {
-        debug_print("sys_set_file_sync:  [FAIL] p\n");
+    if ( (void *) p == NULL ){
+        debug_print("sys_set_file_sync: p\n");
         return;
     }
-
     if (p->magic != 1234){
         return;
     }
@@ -2104,15 +1974,11 @@ void sys_set_file_sync(int fd, int request, int data)
 // Everything is a file.
 
     object = (file *) p->Objects[fd];
-
-    if ( (void*) object == NULL )
-    {
-        debug_print("sys_set_file_sync: [FAIL] object\n");
+    if ( (void*) object == NULL ){
+        debug_print("sys_set_file_sync: object\n");
         return;
     }
-
-    if ( object->used != TRUE || object->magic != 1234 )
-    {
+    if ( object->used != TRUE || object->magic != 1234 ){
         debug_print("sys_set_file_sync: validation\n");
         return;
     }
@@ -2125,16 +1991,16 @@ void sys_set_file_sync(int fd, int request, int data)
     case SYNC_REQUEST_SET_ACTION:
         object->sync.action = data;
         break;
-        
+
     // #test
     // reset
     // Now we can write
     case 216:
-        
+
         //#debug
         //printf("216:\n"); 
         //refresh_screen();
-        
+
         object->sync.action = 0;
         //object->_flags = (__SWR | __SRD); 
         object->_flags = __SWR;
@@ -2160,7 +2026,7 @@ void sys_set_file_sync(int fd, int request, int data)
         break;
 
     // ...
-        
+
     default:
         debug_print("sys_set_file_sync: [FAIL] Default request\n");
         return;
@@ -2170,16 +2036,13 @@ void sys_set_file_sync(int fd, int request, int data)
     // ...
 }
 
-
 // Get the device number in the dev_dir[] list
 // given the pathname.
 // ex: "/DEV/DEV1"
-
-int sys_get_device_number_by_path( char *path )
+int sys_get_device_number_by_path(char *path)
 {
-   return -1;
+    return -1;
 }
-
 
 // #test
 // #todo
@@ -2194,48 +2057,47 @@ int sys_open_device_by_number(int device_index)
 {
     struct process_d *p;
     file *fp;
-    int __slot=0;
-
+    register int __slot=0;
     int i = device_index;
 
-    if (i<0 || i>=32)
-    {
+    if (i<0 || i>=32){
         return (int) (-EINVAL);
     }
-
-    if(dev_dir[i].magic != 1234)
+    if (dev_dir[i].magic != 1234){
         return (int) -1;
-
-    if(dev_dir[i].initialized != TRUE)
+    }
+    if(dev_dir[i].initialized != TRUE){
         return (int) -1;
+    }
 
-// get file pointer.
+// Get file pointer.
     fp = (file*) dev_dir[i].fp;
-    
-    if( (void*) fp == NULL )
+    if ( (void*) fp == NULL ){
         return (int) -1;
+    }
+    
+    //#todo: validation?
 
 // put the pointer into the list.
 
     pid_t current_process = (pid_t) get_current_process();
 
     p = (struct process_d *) processList[current_process];
-
-    if ( (void *) p == NULL )
-    {
+    if ( (void *) p == NULL ){
         debug_print ("sys_open_device_by_number: p\n");
         return -1;
     }
-
     if ( p->used != TRUE || p->magic != 1234 ){
         debug_print ("sys_open_device_by_number: validation\n");
         return -1;
     }
 
-// Procurando um slot livre.
+// Probing for a free slot.
     for (__slot=0; __slot<32; __slot++)
     {
-         if ( p->Objects[__slot] == 0 ){ goto __OK; }
+         if ( p->Objects[__slot] == 0 ){
+             goto __OK;
+         }
     };
 
 // fail
@@ -2244,9 +2106,8 @@ int sys_open_device_by_number(int device_index)
 // Slot found.
 __OK:
 
-    if ( __slot < 0 || __slot >= 32 )
-    {
-        printf ("sys_open_device_by_number: Slot fail\n");
+    if ( __slot < 0 || __slot >= 32 ){
+        printf ("sys_open_device_by_number: __slot fail\n");
         refresh_screen();
         return (int) (-1);
     }
@@ -2254,10 +2115,9 @@ __OK:
 // save
     p->Objects[__slot] = (unsigned long) fp;
 
-// return fd.
+// Return fd.
     return (int) __slot;
 }
-
 
 // 178
 // Only root dir.
@@ -2266,24 +2126,23 @@ __OK:
 
 unsigned long sys_get_file_size(char *path)
 {
-    unsigned long Size=0;
+    unsigned long FileSize=0;
 
     if ( (void*) path == NULL ){
-        debug_print("sys_get_file_size: [FAIL] path\n");
+        debug_print("sys_get_file_size: path\n");
         return 0;
     }
-
     if ( *path == 0 ){
-        debug_print("sys_get_file_size: [FAIL] *path\n");
+        debug_print("sys_get_file_size: *path\n");
         return 0;
     }
 
-    Size = 
+    FileSize = 
     (unsigned long) fsGetFileSize ( 
                         (unsigned char *) path, 
                         (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
 
-    return (unsigned long) Size; 
+    return (unsigned long) FileSize; 
 }
 
 
@@ -2300,9 +2159,7 @@ int sys_sleep_if_socket_is_empty(int fd)
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( fd < 0 || 
-         fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
@@ -2316,97 +2173,91 @@ int sys_sleep_if_socket_is_empty(int fd)
     }
 
     p = (void *) processList[current_process];
-
     if ( (void *) p == NULL ){
         debug_print("sys_sleep_if_socket_is_empty: p\n");
         return (int) (-1);
-    }else{
-        
-        object = (file *) p->Objects[fd];
-        
-        // validation
-        if ( (void *) object == NULL ){
-            debug_print("sys_sleep_if_socket_is_empty: object\n");
-            return (int) (-1);
-        }else{
-            
-            //validation
-            if (object->used != 1 || object->magic != 1234 ){
-                debug_print("sys_sleep_if_socket_is_empty: calidation\n");
-                return -1;
-            }
-            
-            if ( object->____object != ObjectTypeSocket )
-            {
-                debug_print ("sys_sleep_if_socket_is_empty: [ERROR] only for sockets\n");
-                return -1;
-            }
-            
-            // TRUE or FALSE
-            //return (int) object->socket_buffer_full;   
-        
-           // sim esta vazio, nao pode ler;  retorna FALSE
-           if( object->socket_buffer_full == FALSE )
-           {
-               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can not read. sleeping\n");
-               object->_flags |= __SWR;                  // pode escrever
-               //todo: falg que nege a leitura.
-               object->tid_waiting = current_thread;     // thread atual dorme   
-               //do_thread_waiting (current_thread);
-               return FALSE;  // nao pode ler
-           }
-           
-           // O buffer esta cheio, pode ler. retorna TRUE
-           if( object->socket_buffer_full == TRUE )
-           {
-               debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can read\n");
-               object->_flags |= __SRD;
-               return TRUE;
-           }
-        };
-    };  
-    
+    }
+
+    if (p->magic != 1234){
+        return (int) (-1);
+    }
+
+// Object
+
+    object = (file *) p->Objects[fd];
+    if ( (void *) object == NULL ){
+        debug_print("sys_sleep_if_socket_is_empty: object\n");
+        return (int) (-1);
+    }
+    if (object->used != TRUE || object->magic != 1234 ){
+        debug_print("sys_sleep_if_socket_is_empty: object validation\n");
+        return -1;
+    }
+
+// Is it a socket object?
+    if ( object->____object != ObjectTypeSocket ){
+        debug_print ("sys_sleep_if_socket_is_empty: [ERROR] only for sockets\n");
+        return -1;
+    }
+
+    // TRUE or FALSE
+    //return (int) object->socket_buffer_full;   
+
+// Sim esta vazio, 
+// nao pode ler;  
+// retorna FALSE
+    if ( object->socket_buffer_full == FALSE )
+    {
+        debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can not read. sleeping\n");
+        object->_flags |= __SWR;                  // pode escrever
+        //todo: falg que nege a leitura.
+        object->tid_waiting = current_thread;     // thread atual dorme   
+        //do_thread_waiting (current_thread);
+        return FALSE;  // nao pode ler
+    }
+
+// O buffer esta cheio, pode ler. retorna TRUE
+    if ( object->socket_buffer_full == TRUE ){
+        debug_print("sys_sleep_if_socket_is_empty: Buffer is empty. we can read\n");
+        object->_flags |= __SRD;
+        return TRUE;
+    }
+
+    //#bugbug
     debug_print ("sys_sleep_if_socket_is_empty: [FAIL] Unexpected error \n");
     return -1;
 }
 
-
-
-
-//get free slots in the file_table[]
+// Get free slots in the file_table[].
 int get_free_slots_in_the_file_table(void)
 {
     file *tmp;
-    int i=0;
+    register int i=0;
 
     for (i=0; i<NUMBER_OF_FILES; i++)
     {
         tmp = (void*) file_table[i];
-        
         // Nenhum file descritor está usando essa estrutura.
         if (tmp->used == TRUE && 
             tmp->magic == 1234 && 
             tmp->fd_counter == 0)
         { 
-            return (int) i; 
+            return (int) i;
         }
     };
 
-    return -1;
+    return (int) -1;
 }
 
-
-//get free slots in the inode_table[]
+// Get free slots in the inode_table[].
 int get_free_slots_in_the_inode_table(void)
 {
     struct inode_d *tmp;
-    int i=0;
+    register int i=0;
 
-    
     for (i=0; i<32; i++)
     {
         tmp = (void*) inode_table[i];
-        
         // Se nenhum descritor de estrutura de arquivo 
         // está usando essa estrutura inode.
         if (tmp->used == TRUE && 
@@ -2417,9 +2268,8 @@ int get_free_slots_in_the_inode_table(void)
         }
     }
 
-    return -1;
+    return (int) -1;
 }
-
 
 // #todo: Describe this routine.
 // credits: hoppy os.
@@ -2430,19 +2280,18 @@ from_FAT_name (
     char *src, 
     char *dst )
 {
-
-    int i=0;
+    register int i=0;
     int j=0;
     int k=0;
 
-    // #todo: debug messages.
-    
+// #todo: 
+// debug messages.
+ 
     if ( (void *) src == NULL ){ return; }
     if ( (void *) dst == NULL ){ return; }
 
-    if (*src == 0){ return;}
-    if (*dst == 0){ return;}
-
+    if (*src == 0){ return; }
+    if (*dst == 0){ return; }
 
 // dirty
 // pra saber o tamanho do nome exluindo os espaços.
@@ -2457,12 +2306,11 @@ from_FAT_name (
 // j eh o tamanho do nome calculado anteriormente.
 // copia esse nome.
 
-    for( i=0; i<=j; i++ )
+    for ( i=0; i<=j; i++ )
     {
         dst[k++] = src[i];
     };
-    
-    
+
     if (*src != '.')
     {
         dst[k++] = '.';
@@ -2510,7 +2358,7 @@ to_FAT_name (
     char *src,
     char *dst )
 {
-    int i=0;
+    register int i=0;
     char *ptr;
 
     // Parent directory
@@ -2522,12 +2370,11 @@ to_FAT_name (
     } else if (!strcmp(src,".")) {
         strcpy(dst,src);
         i=1;
-    
+ 
     // Regular file.
     } else {
-        
-        ptr = src;
 
+        ptr = src;
         i=0;
         
         // Começamos com o nome.
@@ -2535,7 +2382,7 @@ to_FAT_name (
         {
             dst[i++] = *ptr++;
         };
-        
+
         // Completa com ' ' ate 8.
         while (i<8){ dst[i++] = 0x20; };
         
@@ -2547,14 +2394,15 @@ to_FAT_name (
         };
     };
 
-    // Completa com espaço ate o fim.
-    // 'i' indica o offset de onde devemos começar.
-    // Isso tambem vai completar com espaço quando a extensao
-    // tiver menos que 3 chars.
+// Completa com espaço ate o fim.
+// 'i' indica o offset de onde devemos começar.
+// Isso tambem vai completar com espaço quando a extensao
+// tiver menos que 3 chars.
 
-    while (i<11){ dst[i++] = 0x20; };
+    while (i<11){
+        dst[i++] = 0x20;
+    };
 }
-
 
 /*
  * get_filesystem_type:
@@ -2567,7 +2415,6 @@ int get_filesystem_type (void)
     return (int) g_currentvolume_filesystem_type;
 }
 
-
 /*
  * set_filesystem_type:
  *     Configura o tipo de sistema de arquivo.
@@ -2579,14 +2426,12 @@ void set_filesystem_type (int type)
     g_currentvolume_filesystem_type = (int) type;
 }
 
-
 // Counting path levels.
 // Credits: Sirius OS.
 // return 'int'?
 unsigned long fs_count_path_levels (unsigned char *path)
 {
     unsigned long Counter=0;
-
     register int i=0;
     int MaxChars = 2000;  //(80*25), 25 lines.
 
@@ -2602,7 +2447,6 @@ unsigned long fs_count_path_levels (unsigned char *path)
     return (unsigned long) Counter;
 }
 
-
 /*
  * get_file:
  *     Get the pointer given the index in file_table[].
@@ -2610,8 +2454,8 @@ unsigned long fs_count_path_levels (unsigned char *path)
 // na lista de arquivos do kernel.
 void *get_file (int Index)
 {
-	//Limits.
-	//@todo: max.
+//Limits.
+//#todo: max.
 
     if (Index < 0)
     {
@@ -2622,11 +2466,9 @@ void *get_file (int Index)
     return (void *) file_table[Index];
 }
 
-
 // set_file:
 // Put the pointer in the list, given the index.
 // Na lista de arquivos do kernel.
-
 void set_file ( void *file, int Index )
 {
     if (Index < 0){
@@ -2637,7 +2479,7 @@ void set_file ( void *file, int Index )
 // #todo:
 // Limite máximo da lista.
 
-	// Structure.
+// Structure.
 
     if ( (void *) file == NULL )
     {
@@ -2645,26 +2487,21 @@ void set_file ( void *file, int Index )
         return;
     }
 
-	// Include pointer in the list.
+// Include pointer in the list.
 
     file_table[Index] = (unsigned long) file;
 }
 
-
-
 int fs_initialize_dev_dir(void)
 {
-    int i=0;
+    register int i=0;
 
 // Clear the list
-    for(i=0; i<32; i++)
-    {
+    for (i=0; i<32; i++){
         dev_dir[i].used = FALSE;
         dev_dir[i].magic = FALSE;
         dev_dir[i].initialized = FALSE;
-        
         dev_dir[i].path[0] = 0;
-        
         dev_dir[i].fp = NULL;
     };
 
@@ -2697,7 +2534,7 @@ int fsInit (void)
 // Buffers for loading the directories while walking on a pathname
 // when loading a file.
 
-    int i=0;
+    register int i=0;
     //int max=8;  // Number of levels.
     int max = FS_N_BUFFERS;  // Number of levels.
     unsigned long addr=0;
@@ -2710,9 +2547,7 @@ int fsInit (void)
         }
         fs_buffers[i] = (unsigned long) addr;
     }
-    
-    
-    
+
 // Undefined fs!
     set_filesystem_type(FS_TYPE_NULL);
 
@@ -2732,7 +2567,6 @@ int fsInit (void)
 // Initializing the file pointers
 // volume1_rootdir_fp and volume2_rootdir_fp.
 // See: kstdio.h
-
 
 //
 // == volume1_rootdir ================================
@@ -2886,14 +2720,12 @@ int fsInit (void)
 // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
 
-    debug_print ("fsInit: done\n");
+    //debug_print ("fsInit: done\n");
     return 0;
 }
 
-
 int init_directory_facilities(void)
 {
-
     // '/'
     directory_facility_RootDir.dir_address = VOLUME1_ROOTDIR_ADDRESS;
     directory_facility_RootDir.dir_name[0] = '/';
@@ -2932,11 +2764,9 @@ int init_directory_facilities(void)
     directory_facility_usersDir.name_size = 0;
     directory_facility_usersDir.initialized = FALSE;
 
-
-    // ok
+// ok
     return 0;
 }
-
 
 // Called by fsInit inthis document.
 int fat16Init (void)
@@ -2972,7 +2802,6 @@ void fs_init_structures (void)
 
     debug_print ("fs_init_structures: [TODO]\n");
 
-
 //
 // root
 //
@@ -2995,7 +2824,6 @@ void fs_init_structures (void)
     root->magic = 1234;
     root->name = (char *) ____root_name;
 
-
 // #todo 
 // #bugbug   volume_vfs  ??
 
@@ -3012,7 +2840,7 @@ void fs_init_structures (void)
 
 // Save is in the 'storage' low level structure.
 
-    if( (void*) storage == NULL ){
+    if ( (void*) storage == NULL ){
          panic("fs_init_structures: storage");
     }
 
@@ -3025,13 +2853,10 @@ void fs_init_structures (void)
 
     debug_print ("fs_init_structures: Type\n");
 
-
-    // #bugbug
-    // Why do we have this information?
+// #bugbug
+// Why do we have this information?
     Type = (int) get_filesystem_type();
-
     Type = ( Type & 0xFFFF );
-
     if ( Type <= 0 ){
         panic ("fs_init_structures: [PANIC] Type\n");
     }else{
@@ -3100,7 +2925,6 @@ void fs_init_structures (void)
         break;
     };
 }
-
 
 // #todo
 // Change the return type to 'int' and
@@ -3228,8 +3052,6 @@ int file_truncate ( file *_file, size_t len)
     return -1;
 }
 
-
-
 // Check the signature in a elf header.
 // OUT:
 // 0 = OK. #todo: Isso poderia ser '1'.
@@ -3244,13 +3066,11 @@ int file_truncate ( file *_file, size_t len)
 
 int fsCheckELFFile(unsigned long address)
 {
-    if(address == 0){
+    if (address == 0){
         return 0;
     }
-
     return (int) elfCheckSignature(address);
 }
-
 
 /*
  * fsFAT16ListFiles:
@@ -3270,16 +3090,15 @@ fsFAT16ListFiles (
     unsigned short *dir_address, 
     int            number_of_entries )
 {
-
-    // iterator
-    int i=0;
-    // offset
+// Iterator
+    register int i=0;
+// Offset
     int j=0;  
-    // Max number of entries.
+// Max number of entries.
     int max = number_of_entries;
-    //8.3
+// 8.3
     char NameString[12];
-    // Buffer.
+// Buffer
     unsigned short *shortBuffer = (unsigned short *) dir_address;
     unsigned char  *charBuffer  = (unsigned char *)  dir_address;
 
@@ -3371,25 +3190,20 @@ void fsInitializeWorkingDiretoryString (void)
     // Buffer overflow!
 
     // vamos contar o tamanho da string que estamos construindo.
-    int string_count = 0;  
-    
-    //
+    int string_count = 0;
     int string_size = 0;
-    
     struct volume_d  *v;
-
     char volume_string[8];   
-
 
     debug_print ("fsInitializeWorkingDiretoryString:\n");
 
-    // See: 
-    // kernel/include/rtl/fs/fs.h
+// See: 
+// fs.h
 
     CWD.initialized = FALSE;
 
-    // volume string 
-    
+// volume string 
+
     volume_string[0] = 'v';
     volume_string[1] = 'o';
     volume_string[2] = 'l';
@@ -3398,7 +3212,6 @@ void fsInitializeWorkingDiretoryString (void)
     volume_string[5] = 'e';
     volume_string[6] = (char)( '1' + (char) current_volume - (char) 1 );
     volume_string[7] = '\0';
-
 
 	//'root:'
 	//  ## volume list ##
@@ -3420,7 +3233,6 @@ void fsInitializeWorkingDiretoryString (void)
     if ( current_volume < 0 ){
         panic ("fsInitializeWorkingDiretoryString: current_volume\n");
     }
-
 
     v = (struct volume_d *) volumeList[current_volume];
 
@@ -3490,7 +3302,6 @@ void fsInitializeWorkingDiretoryString (void)
         CWD.path, 
         FS_PATHNAME_SEPARATOR );
 
-
 //
 // Size
 //
@@ -3499,31 +3310,29 @@ void fsInitializeWorkingDiretoryString (void)
 
     CWD.path[31] = 0;
 
-    int size;
+    int size=0;
     size = strlen(CWD.path);
 
-    if (size > 31)
+    if (size > 31){
         size = 31;
+    }
 
     CWD.size = size;
 
 // More ?...
 
-    debug_print ("fsInitializeWorkingDiretoryString: done\n");
+    //debug_print ("fsInitializeWorkingDiretoryString: done\n");
 
 // See: 
-// kernel/include/rtl/fs/fs.h
+// fs.h
 
     CWD.initialized = TRUE;
 }
-
-
 
 /*
  * fsInitTargetDir:
  *     Para inicializarmos o sistema já com um alvo.
  */
-
 // #todo
 // is dir_address virtual or physical?
 // Change this name to dir_pa or dir_va.
@@ -3534,46 +3343,43 @@ void fsInitializeWorkingDiretoryString (void)
 
 int fsInitTargetDir (unsigned long dir_address, char *dir_name)
 {
-    int i=0;
+    register int i=0;
 
-    current_target_dir.used  = TRUE;
+    current_target_dir.used = TRUE;
     current_target_dir.magic = 1234;
-
     for ( i=0; i<11; i++ ){
         current_target_dir.name[i] = '\0';
     };
 
 // Dir address
-    if (dir_address == 0)
+    if (dir_address == 0){
         panic("fsInitTargetDir: dir_address\n");
-
+    }
     //current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-    current_target_dir.current_dir_address = (unsigned long) dir_address;
+    current_target_dir.current_dir_address = 
+        (unsigned long) dir_address;
 
 // Dir name
     
-    if ( (void*) dir_name == NULL )
+    if ( (void*) dir_name == NULL ){
         panic("fsInitTargetDir: dir_name\n");
-
-    if (*dir_name == 0)
+    }
+    if (*dir_name == 0){
         panic("fsInitTargetDir: *dir_name\n");
-
+    }
     //current_target_dir.name[0] = '/';
     //current_target_dir.name[1] = 0;
 
 // Limits: 
 // Copy 8 bytes only
-
     for ( i=0; i<8; i++ ){
         current_target_dir.name[i] = dir_name[i];
     };
-
 // done:
     current_target_dir.initialized = TRUE;
-    
+
     return 0;
 }
-
 
 // fsList
 // Ring 0 routine to list files.
@@ -3584,7 +3390,7 @@ int fsInitTargetDir (unsigned long dir_address, char *dir_name)
 int fsList(const char *dir_name)
 {
     int Absolute = FALSE;
-    int i=0;
+    register int i=0;
 
     debug_print ("fsList:\n");
 
@@ -3594,7 +3400,6 @@ int fsList(const char *dir_name)
         debug_print ("fsList: [FAIL] dir_name\n");
         goto fail;
     }
-
     if ( *dir_name == 0 ){
         debug_print ("fsList: [FAIL] *dir_name\n");
         goto fail;
@@ -3608,7 +3413,6 @@ int fsList(const char *dir_name)
         current_target_dir.name[i] = dir_name[i];
     };
     current_target_dir.name[i] = '\0';
-
 
 // The root directory.
 // #shortcut: '[' 
@@ -3660,7 +3464,6 @@ int fsList(const char *dir_name)
     // #bugbug
     // Missing string finalization.
     //printk ("fsList: current_target_dir.name = {%s}\n", current_target_dir.name);
-    
 
 // Listing ...
 // IN:
@@ -3688,7 +3491,6 @@ fail:
     refresh_screen();
     return -1;
 }
-
 
 /*
  * fsListFiles:
@@ -3731,8 +3533,9 @@ fsListFiles (
         goto done;
     }
 
-	// @todo: Suportar outros diret�rios.
-	// ...
+// #todo: 
+// Suportar outros diretórios.
+// ...
 
     goto done;
 
@@ -3742,7 +3545,6 @@ done:
     refresh_screen ();
     return;
 }
-
 
 // fsGetFileSize: 
 // #bugbug: Isso dá problemas na máquina real.
@@ -3770,8 +3572,8 @@ fsGetFileSize (
 {
     unsigned long FileSize=0;    // 64bit
     unsigned int intFileSize=0;  // 32bit
-    
-    int i=0;
+
+    register int i=0;
     unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
     unsigned long z = 0;       //Deslocamento do rootdir 
     unsigned long n = 0;       //Deslocamento no nome.
@@ -3788,17 +3590,18 @@ fsGetFileSize (
 // Poderíamos usar malloc ou alocador de páginas ??
 // #todo: 
 // Devemos carregar o diretório alvo.
+// VOLUME1_ROOTDIR_ADDRESS;
+    unsigned short *Dir = 
+        (unsigned short *) dir_address;
 
-    unsigned short *Dir = (unsigned short *) dir_address;//VOLUME1_ROOTDIR_ADDRESS;
-
-	// #todo: Devemos carregar o diretório atual.
-	//unsigned long current_dir_address = (unsigned long) Newpage();
-    //#todo: devemos checar se o endereço é válido.
+// #todo: Devemos carregar o diretório atual.
+//unsigned long current_dir_address = (unsigned long) Newpage();
+//#todo: devemos checar se o endereço é válido.
 	//unsigned short *current_dir = (unsigned short *) current_dir_address;	
-	// #todo: 
-	// devemos chamar uma função que carregue um diretório no endereço passado 
-	//via argumento.
-    //...
+// #todo: 
+// devemos chamar uma função que carregue um diretório no endereço passado 
+//via argumento.
+//...
 
     debug_print ("fsRootDirGetFileSize: $\n");
 
@@ -3832,17 +3635,15 @@ fsGetFileSize (
 	
 //#ifdef KERNEL_VERBOSE	
 	//printf ("fsRootDirGetFileSize: Loading root..\n"); 
-//#endif	
-	
-	//#bugbug
-    //pega o tamanho de um arquivo que está no diretório raiz.
-    //#todo: 
-    //podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
+//#endif
 
-
-    // #bugbug
-    // Estamos chamando isso toda vez que
-    // tentamos abrir um arquivo.
+//#bugbug
+//pega o tamanho de um arquivo que está no diretório raiz.
+//#todo: 
+//podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
+// #bugbug
+// Estamos chamando isso toda vez que
+// tentamos abrir um arquivo.
 
 // Carregando o diretório raiz.
 // #bugbug
@@ -3850,9 +3651,8 @@ fsGetFileSize (
 // e essa for a primeira vez que estamos carregando um arquivo.
 // #todo: FIXME
 
-    if(dir_address == VOLUME1_ROOTDIR_ADDRESS)
+    if (dir_address == VOLUME1_ROOTDIR_ADDRESS)
     {
-
         // #bugbug
         // We can not do this everytime this function
         // is called.
@@ -3905,31 +3705,26 @@ fsGetFileSize (
     //#debug
     //vamos mostrar a string.
     //printf ("fsGetFileSize: file_name={%s}\n", file_name);
-	
-	//Busca simples pelo arquivo no diretório raiz.
-	//todo: Essa busca pode ser uma rotina mais sofisticada. 
-	//Uma função auxiliar.
 
-	//Primero caractere da entrada:
-	//0 = entrada vazia.
-	//$ = entrada de arquivo deletado.
-	//outros ...
-	//ATENÇÃO:
-    //Na verdade a variável 'root' é do tipo short.	 
+//Busca simples pelo arquivo no diretório raiz.
+//todo: Essa busca pode ser uma rotina mais sofisticada. 
+//Uma função auxiliar.
+//Primero caractere da entrada:
+//0 = entrada vazia.
+//$ = entrada de arquivo deletado.
+//outros ...
+//ATENÇÃO:
+//Na verdade a variável 'root' é do tipo short.	 
 
+// Procura o arquivo no diretório raiz.
 
-
-	// Procura o arquivo no diretório raiz.
-	
 //search_file:
 
 // file name limit.
 // Se o tamanho da string falhou, vamos ajustar.
 
     size_t szFileName = (size_t) strlen(file_name); 
-
-    if ( szFileName > 11 )
-    {
+    if (szFileName > 11){
         printf ("fsRootDirGetFileSize: [FIXME] name size fail %d\n",
             szFileName );   
         szFileName = 11;
@@ -3939,21 +3734,19 @@ fsGetFileSize (
 // Copia o nome e termina incluindo o char 0.
 // Compara 11 caracteres do nome desejado, 
 // com o nome encontrado na entrada atual.
-
     i=0; 
-
-    while ( i < max )
+    while (i < max)
     {
         // Se a entrada não for vazia.
         if ( Dir[z] != 0 )
         {
             memcpy ( NameX, &Dir[z], szFileName );
             NameX[szFileName] = 0;
-
             CmpStatus = strncmp ( file_name, NameX, szFileName );
-
-            if ( CmpStatus == 0 ){ goto found; }
-            // Nothing.
+            if ( CmpStatus == 0 ){
+                goto found;
+            }
+            // Nothing
         }; 
 
         // Next entry.
@@ -3986,9 +3779,9 @@ found:
     // refresh_screen();
     // while(1){}
 
-    // #debug
-    // Pegando o tamanho do arquivo.
-    // Offsets: 28 29 30 31
+// #debug
+// Pegando o tamanho do arquivo.
+// Offsets: 28 29 30 31
 
     //FileSize = *(unsigned long*) (VOLUME1_ROOTDIR_ADDRESS + (z*2) + 28 );
     intFileSize = *(unsigned int *) (dir_address + (z*2) + 28 );
@@ -4022,7 +3815,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
 {
     struct process_d  *p;
     char *tmp;
-    int i=0; 
+    register int i=0; 
     int string_size = 0;
 
     debug_print ("fsUpdateWorkingDiretoryString:\n"); 
@@ -4116,7 +3909,7 @@ void fsUpdateWorkingDiretoryString ( char *string )
         }
     };
 
-    debug_print ("fsUpdateWorkingDiretoryString: done\n"); 
+    //debug_print ("fsUpdateWorkingDiretoryString: done\n"); 
 }
 
 // helper function to handle fat cache status.
@@ -4164,7 +3957,7 @@ int fs_save_fat16_cache(void)
 
 void fs_fntos(char *name)
 {
-    int i = 0;
+    int i=0;
     int ns = 0;
 
     char ext[4];
@@ -4249,14 +4042,12 @@ CompleteWithSpaces:
     *name = '\0';
 }
 
-
 // Pega um fd na lista de arquivos do processo, dado o PID.
 // Objects[i]
-
 int fs_get_free_fd_from_pid (pid_t pid)
 {
+    register int __slot=0;
     struct process_d *p;
-    int __slot=0;
 
     if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
         debug_print ("fs_get_free_fd_from_pid: [FAIL] pid\n");
@@ -4301,7 +4092,7 @@ int fs_get_free_fd_from_pid (pid_t pid)
 int fs_initialize_process_cwd ( pid_t pid, char *string )
 {
     struct process_d *p;
-    int i=0;
+    register int i=0;
 
     if (pid<0 || pid >= PROCESS_COUNT_MAX){
         debug_print ("fs_initialize_process_cwd: pid\n");
@@ -4358,7 +4149,7 @@ int fs_initialize_process_cwd ( pid_t pid, char *string )
 void fs_pathname_backup ( pid_t pid, int n )
 {
     struct process_d *p;
-    int i=0;
+    register int i=0;
 
 // CWD
     if ( CWD.initialized != TRUE ){
@@ -4499,16 +4290,16 @@ void fs_show_file_info (file *f)
 void fs_show_file_table(void)
 {
     file *f;
-    int i=0;
+    register int i=0;
 
     printf ("\nfile_table:\n");
     
     for (i=0; i<32; i++)
     {
         f = (file*) file_table[i];
-        
-        if( (void*)f != NULL )
+        if ( (void*)f != NULL ){
             fs_show_file_info(f);
+        }
     };
 
     refresh_screen();
