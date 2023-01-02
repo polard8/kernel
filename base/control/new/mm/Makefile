@@ -74,12 +74,10 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 # Everything is a file.
-OBJS = mminit.o mminfo.o mmpool.o pages.o    
-
+OBJS = mm.o mminfo.o mmpool.o pages.o    
 
 all:
-
-	$(CC) -c mminit.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminit.o
+	$(CC) -c mm.c      $(KERNEL_INCLUDE) $(CFLAGS) -o mm.o
 	$(CC) -c mminfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mminfo.o
 	$(CC) -c mmpool.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mmpool.o
 	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o

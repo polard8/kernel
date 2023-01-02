@@ -1362,6 +1362,14 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// mm2: show the blocks allocated by the kernel allocator.
+// inside the kernel heap.
+// IN: max index.
+    if ( strncmp(prompt,"mm2",3) == 0 ){
+        showMemoryBlocksForTheKernelAllocator(); 
+        goto exit_cmp;
+    }
+
 // exit: Exit the embedded kernel console.
     if ( strncmp(prompt,"exit",4) == 0 ){
         exit_kernel_console(); 

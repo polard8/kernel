@@ -285,20 +285,20 @@ void mmShowPML4EntryForAllProcesses (int entry_number)
 
 // Mostra as estruturas de pagina 
 // usadas para paginação no pagedpool.
+// Usada pelo alocador de páginas. 
+// shared ring3 memory?
 
 void showPagedMemoryList(int max)
 {
-    struct page_d  *p;
-    int i=0;
+    struct page_d *p;
+    register int i=0;
 
-
-    if (max < 0 || max > 512 )
-    {
+    if (max < 0 || max > 512){
         return;
     }
 
-    for ( i=0; i < max; i++ )
-    {  
+    for ( i=0; i<max; i++ )
+    {
         p = (void *) pageAllocList[i]; 
 
         if ( (void *) p != NULL )
@@ -323,7 +323,7 @@ void showPagedMemoryList(int max)
  * @todo: 
  *     Mostrar a memória usada pelos processos.
  *     Mostrar o quanto de memória o processo usa.
- *     *Importante: Esse tipo de rotina mereçe muita atenção
+ *     Importante: Esse tipo de rotina mereçe muita atenção
  * principalmente na fase inicial de construção do sistema.
  * Apresentar as informações em uma janela bem grande e 
  * chamar através do procedimento de janela do sistema é uma opção bem 
@@ -333,10 +333,14 @@ void showPagedMemoryList(int max)
  * refresh screen
  */
 
-void show_memory_structs(void)
+void showMemoryBlocksForTheKernelAllocator(void)
 {
-    struct mmblock_d  *B;
-    int i = 0;
+// Print the information for each valid memory block
+// in the ring0 kernel allocator.
+// This memory was allocated inside the main kernel heap.
+
+    struct mmblock_d *B;
+    register int i = 0;
 
 // Title.
     printf("Memory Block Information:\n");
@@ -359,22 +363,23 @@ void show_memory_structs(void)
         //Nothing.
     };
 
+// Quantos slots estão sendo usados?
+    printf ("used slots: %d/%d\n",
+        mmblockCount, MMBLOCK_COUNT_MAX );
 
-	// Aqui podemos aprentar informações sobre o heap.
-	// como tamanho, espaço disponível, ponteiro, à que processo ele 
-	// pertence.
-	// mas estamos lidando a estrtutura de mmblock_d, que é especial e meio 
-	// engessada.
-	
-	//More?!
+// Aqui podemos aprentar informações sobre o heap.
+// como tamanho, espaço disponível, ponteiro, à que processo ele 
+// pertence.
+// mas estamos lidando a estrtutura de mmblock_d, que é especial e meio 
+// engessada.
+
+    //More?!
 }  
-
 
 void testingPageAlloc (void)
 {
     // #todo
 }
-
 
 //
 // End.

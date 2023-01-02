@@ -402,17 +402,6 @@ typedef enum {
 */
 
 
-
-/*
- * mmblockCount:
- *     mm block support.
- *     Conta os blocos de mem�ria dentro de um heap.
- *     dentro do heap usado pelo kernel eu acho ?? 
- */
-// see: mminit.c
-extern unsigned long mmblockCount;
-
-
 /*
  * Kernel Stack suppport.
  */ 
@@ -575,11 +564,20 @@ struct mmblock_d
 
 struct mmblock_d  *current_mmblock;
 
+/*
+ * mmblockCount:
+ *     mm block support.
+ *     Conta os blocos de mem�ria dentro de um heap.
+ *     dentro do heap usado pelo kernel eu acho ?? 
+ */
+// see: mm.c
+extern unsigned long mmblockCount;
+
 // Lista de blocos. 
 // Lista de blocos de memória dentro de um heap.
 // #todo: Na verdade temos que usar lista encadeada. 
-
-unsigned long mmblockList[MMBLOCK_COUNT_MAX];  
+// see: mm.c
+extern unsigned long mmblockList[MMBLOCK_COUNT_MAX];  
 
 // -----------------------------------
 
@@ -1075,7 +1073,9 @@ void mmShowPML4EntryForAllProcesses (int entry_number);
 
 void showPagedMemoryList(int max);
 
-void show_memory_structs (void);
+
+void showMemoryBlocksForTheKernelAllocator(void);
+
 void testingPageAlloc (void);
 
 int kernel_gc (void);
