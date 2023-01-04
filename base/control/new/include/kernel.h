@@ -189,9 +189,9 @@ extern unsigned long gSavedBPP;
 #include "kioctls.h"
 #include "ktermios.h"
 #include "kttydef.h"
-#include "kpid.h"      // Globals. PIDs support.
 
-
+// Globals. PIDs support.
+#include "config/superv/kpid.h"
 
 // Memory management.
 #include "mm/x64gpa.h"

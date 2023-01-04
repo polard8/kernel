@@ -51,6 +51,10 @@
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
 
 
+static int file_status=FALSE;
+char file_buffer[512];
+
+
 #define WINDOW_COUNT_MAX  1024
 unsigned long windowList[WINDOW_COUNT_MAX];
 
@@ -99,6 +103,8 @@ static void update_clients(int fd);
 
 static int editor_init_windows(void);
 static int editor_init_globals(void);
+
+static void __test_load_file(int socket, int wid);
 
 // ============
 
@@ -267,7 +273,7 @@ editorProcedure(
             //printf("editor.bin: MSG_MOUSERELEASED\n");
             //gws_redraw_window(fd, event_window, TRUE);
             
-            if(event_window == client_window)
+            if (event_window == client_window)
             {
                 // Refresh?
                 gws_draw_char (
@@ -312,6 +318,55 @@ editorProcedure(
 }
 
 
+// #test
+// Working on routine to load a file
+// into the client area of the application window.
+static void __test_load_file(int socket, int wid)
+{
+// #
+// This is a work in progress!
+
+    int fd=-1;
+    char *name = "TEST1.CPP";
+
+    file_status = FALSE;
+
+    fd = open( (char*) name, 0, "a+" );
+    lseek(fd,0,SEEK_SET);
+    int nreads=0;
+    nreads = read(fd,file_buffer,511);
+    if (nreads>0)
+        file_status = TRUE;
+
+// socket
+    if(socket<0)
+        return;
+
+    if(wid<0)
+        return;
+
+    unsigned long x=0;
+    unsigned long y=0;
+
+    int i=0;
+    for (i=0; i<nreads; i++)
+    {
+        // Refresh?
+        gws_draw_char (
+            (int) socket,      // socket fd
+            (int) wid,         // wid
+            (unsigned long) x, // left
+            (unsigned long) y, // top
+            (unsigned long) COLOR_BLACK,
+            (unsigned long) '.' );  // char.
+       x++;
+       if(x>20)
+       {
+           x=0;
+           y++;
+       }
+    };
+}
 
 int main( int argc, char *argv[] )
 {

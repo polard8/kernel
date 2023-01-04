@@ -66,7 +66,7 @@ int main ( int argc, char *argv[] )
             //exit (-1);
         //}
 
-        fd = (int) open( (char *) argv[1],0, "a+" );
+        fd = (int) open( (char *) argv[1], 0, "a+" );
 
         //if (fd<0){
         //    return -1;

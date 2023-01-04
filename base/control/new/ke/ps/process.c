@@ -4,6 +4,25 @@
 #include <kernel.h>
 
 
+// See: kpid.h
+pid_t __gpidBoot=0;
+pid_t __gpidInclude=0;
+pid_t __gpidInit=0;
+pid_t __gpidInstall=0;
+pid_t __gpidLogoff=0;
+pid_t __gpidLogon=0;
+pid_t __gpidNetServer=0;
+pid_t __gpidNotificationServer=0;
+pid_t __gpidSCI=0;
+pid_t __gpidSecurityServer=0;
+pid_t __gpidSysIO=0;
+pid_t __gpidSysLib=0;
+pid_t __gpidSysMK=0;
+pid_t __gpidSysSM=0;
+pid_t __gpidWindowManager=0;
+pid_t __gpidWindowServer=0;
+
+
 // GLOBAL
 // ------
 // Process used by the console during the job control.
@@ -13,17 +32,16 @@
 // #todo
 // But we need to use the control thread of the foreground process
 // associated with the console TTY.
-pid_t foreground_process;
+pid_t foreground_process=0;
 // This is the process with the active thread.
-pid_t active_process;    
+pid_t active_process=0; 
 // [Processing time]
 // Only these can read the keyboard input.
 // Sometime it's the terminal.
 // It's child will read into a file.
 // See: ps/process.c
-pid_t criticalsection_pid;
+pid_t criticalsection_pid=0;
 // ------
-
 
 //
 // current pid
@@ -45,10 +63,8 @@ static pid_t caller_process_id=0;
 int __spinlock_ipc=0;
 //...
 
-
 struct process_d  *KernelProcess;  // Base kernel.
 struct process_d  *InitProcess;    // Init process.
-
 
 //==============================================
 
@@ -75,7 +91,7 @@ struct process_d *get_current_process_pointer(void)
 
 // so podemos chamar essa rotina depois que o kernel lançou
 // o primeiro thread.
-    if(system_state != SYSTEM_RUNNING){
+    if (system_state != SYSTEM_RUNNING){
         //panic("get_current_process_pointer: system_state\n");
         return NULL;
     }
@@ -107,8 +123,7 @@ unsigned long get_process_stats(pid_t pid, int index)
 {
     struct process_d *p;
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX)
-    {
+    if (pid<0 || pid >= PROCESS_COUNT_MAX){
         panic ("get_process_stats: pid \n");
     }
 
@@ -226,13 +241,11 @@ int getprocessname ( pid_t pid, char *buffer )
 // #todo
 // checar validade dos argumentos.
 
-    if (pid<0 || pid >= PROCESS_COUNT_MAX)
-    {
+    if (pid<0 || pid >= PROCESS_COUNT_MAX){
         goto fail;
     }
 
-    if ( (void*) buffer == NULL )
-    {
+    if ( (void*) buffer == NULL ){
         goto fail;
     }
  
@@ -240,13 +253,13 @@ int getprocessname ( pid_t pid, char *buffer )
     if ( (void *) p == NULL ){
         goto fail;
     }
-    if ( p->used != TRUE || p->magic != 1234 )
-    {
+    if ( p->used != TRUE || p->magic != 1234 ){
         goto fail;
     }
 
 // 64 bytes
-// #todo #bugbug: Check the lenght and use another copy function.
+// #todo #bugbug: 
+// Check the lenght and use another copy function.
     strcpy ( 
         name_buffer, 
         (const char *) p->__processname );  

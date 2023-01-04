@@ -331,53 +331,40 @@ grPlot0 (
     // #todo
     // This is a work in progress
 
-
     // Draw flag.
     int Draw = TRUE;
     int UseClipping = FALSE;
-
-
     int UsingDepthBuffer = FALSE;
-    
     int UsingAlphaBlending = FALSE;
-
-    // left hand orientation
-    // z+ on top/right corner.
-    
+// left hand orientation
+// z+ on top/right corner.
     int FixOrientation = TRUE;
 
+// #todo
+// We need a z-buffer or (depth buffer)
+// it is used to depth testing.
+// it discards some unnecessary covered plots. 
+// Normalized Device Coordinates (NDC)
+// We are using or own ndc style.
+// Maybe it is different for diferent systens.
+//      +y  +z
+// -x   +   +x
+// -z   -y
+// We use:
+// Left-hand System (LHS) 
+// LHS is clockwise (CW).
+// Same as Microsoft Direct3D.
+// See: https://en.wikipedia.org/wiki/Direct3D
+// Another way is:
+// Right-Hand Coordinate System (RHS).
+// RHS is counter-clockwise (CCW).
 
-
-    // #todo
-    // We need a z-buffer or (depth buffer)
-    // it is used to depth testing.
-    // it discards some unnecessary covered plots. 
-    
-    // Normalized Device Coordinates (NDC)
-    // We are using or own ndc style.
-    // Maybe it is different for diferent systens.
-    
-    //      +y  +z
-    // -x   +   +x
-    // -z   -y
-    
-    // We use:
-    // Left-hand System (LHS) 
-    // LHS is clockwise (CW).
-    // Same as Microsoft Direct3D.
-    // See: https://en.wikipedia.org/wiki/Direct3D
-    
-    // Another way is:
-    // Right-Hand Coordinate System (RHS).
-    // RHS is counter-clockwise (CCW).
-    
-    
     unsigned long zBaseX=0;
     unsigned long zBaseY=0;
 
-     // #bugbug
-     // Precisa ser 'int', nao podemos enviar 
-     // valores negativos para putpixel.
+// #bugbug
+// Precisa ser 'int', nao podemos enviar 
+// valores negativos para putpixel.
      int X=0;
      int Y=0;
 
@@ -410,29 +397,21 @@ grPlot0 (
     }
     */
 
-
-//
 // Device screen structure
-//
-
-    // See: screen.h
+// See: screen.h
 
     // #debug
-    if ( (void *) DeviceScreen == NULL )
-    {
+    if ( (void *) DeviceScreen == NULL ){
         Draw = FALSE;
         panic("grPlot0: DeviceScreen\n");
-        
         //exit(1);
     }
 
+// #todo
+// Precisamos checar algumas globais, como HotSpotX e HotSpotY.
 
-    // #todo
-    // precisamos checar algumas globais, como HotSpotX e HotSpotY.
-
-    // Usaremos a janela chamada screen se nenhuma outra foi indicada.
+// Usaremos a janela chamada screen se nenhuma outra foi indicada.
     //gui->screen
-
 
     // z negativo
     //  _
@@ -611,11 +590,8 @@ draw:
 }
 
 /*
- ************************************************ 
  * plotLine3d: 
- * 
  */
- 
 // Bresenham in 3D
 // The algorithm could be extended to three (or more) dimensions.
 
@@ -625,17 +601,15 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color )
 {
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
 
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
-   //#bugbug: This macro is wrong?!
-   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
+    //#bugbug: This macro is wrong?!
+    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
 
+    int dm = grMAX3(dx,dy,dz);
+    register int i = dm;
 
     // x1 = y1 = z1 = dm/2; /* error offset */
  
@@ -854,10 +828,8 @@ int KGWS_initialize(void)
 
 // Display
 
-    CurrentDisplay = (void *) kmalloc (sizeof(struct gws_display_d));
-    
-    if ( (void*) CurrentDisplay == NULL )
-    {
+    CurrentDisplay = (void *) kmalloc(sizeof(struct gws_display_d));
+    if ( (void*) CurrentDisplay == NULL ){
         debug_print("KGWS_initialize: [FAIL] CurrentDisplay\n");
         printf     ("KGWS_initialize: [FAIL] CurrentDisplay\n");
         die(); 
@@ -869,11 +841,9 @@ int KGWS_initialize(void)
     CurrentDisplay->magic = 1234; 
 
 // Screen
-    
-    DeviceScreen  = (void *) kmalloc (sizeof(struct gws_screen_d));
 
-    if ( (void*) DeviceScreen == NULL )
-    {
+    DeviceScreen  = (void *) kmalloc(sizeof(struct gws_screen_d));
+    if ( (void*) DeviceScreen == NULL ){
         debug_print("KGWS_initialize: [FAIL] DeviceScreen\n");
         printf     ("KGWS_initialize: [FAIL] DeviceScreen\n");
         die();
@@ -894,7 +864,8 @@ int KGWS_initialize(void)
 // #todo
 // Maybe we can check the validation of w h bpp.
 
-    DeviceScreen->pitch = ( gSavedX * (gSavedBPP/8) );
+    DeviceScreen->pitch = 
+        ( gSavedX * (gSavedBPP/8) );
 
 // #todo: 
 // Cuidado, não queremos divisão por zero.
@@ -931,8 +902,7 @@ int KGWS_initialize(void)
 // The device screen will be the valid screen for now.
 // Save the device screen in the diplay structure.
 
-    if ( (void *) CurrentDisplay != NULL )
-    {
+    if ( (void *) CurrentDisplay != NULL ){
         CurrentDisplay->device_screen = DeviceScreen;
         CurrentDisplay->valid_screen  = DeviceScreen;
     }
@@ -941,14 +911,11 @@ int KGWS_initialize(void)
     DeviceScreen->used = TRUE;
     DeviceScreen->magic = 1234;
 
-// =============
-// Graphics.
-
+// Graphics
     grInit();
 
 // Breakpoint
 // #debug
-
     //asm("int $3");
 
 //#todo
@@ -970,8 +937,7 @@ int kgwsRegisterWindowServer (pid_t pid)
         //panic();
 
     // ?? Where ??
-    if ( kgws_status != 1 )
-    {
+    if (kgws_status != 1){
         Status = 1;
         goto fail;
     }else{
@@ -987,33 +953,22 @@ done:
 }
 
 // Registrando o processo do window server.
-// See: gpid.h
-int register_ws_process ( pid_t pid )
+// See: kpid.h
+int register_ws_process(pid_t pid)
 {
-
-    if ( pid<0 || pid >= PROCESS_COUNT_MAX )
-    {
-        debug_print("register_ws_process: [FAIL] pid\n");
-        return -1;
+    if ( pid<0 || pid >= PROCESS_COUNT_MAX ){
+        debug_print("register_ws_process: pid\n");
+        return (int) -1;
     }
-
-    if ( __gpidWindowServer != 0 ){
-        debug_print("register_ws_process: [FAIL] __gpidWindowServer\n");
-        return -1;
+    if (__gpidWindowServer != 0){
+        debug_print("register_ws_process: __gpidWindowServer\n");
+        return (int) -1;
     }
-
     __gpidWindowServer = (pid_t) pid;
     return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
+//
+// End
+//
 

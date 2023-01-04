@@ -48,7 +48,7 @@ struct socket_d *create_socket_object(void)
     //s->objectType =
     //s->objectClass =
 
-    s->pid = (pid_t) get_current_process();  //current_process;
+    s->pid = (pid_t) get_current_process();
     s->uid = (uid_t) current_user;
     s->gid = (gid_t) current_group;
 
@@ -61,7 +61,7 @@ struct socket_d *create_socket_object(void)
 
     s->ip_ipv4 = (unsigned int) 0;
     s->ip_ipv6 = (unsigned long) 0;
-    s->port =  (unsigned short) 0;
+    s->port = (unsigned short) 0;
 
 // Initializing pointers.
 // We don't want this kinda crash in the real machine.
@@ -156,9 +156,12 @@ struct socket_d *get_socket_from_fd (int fd)
     }
 
 // process
-    pid_t current_process = (pid_t) get_current_process();    
+    pid_t current_process = (pid_t) get_current_process();
+    if (current_process<0 || current_process>=PROCESS_COUNT_MAX){
+        goto fail;
+    }
     p = (struct process_d *) processList[current_process];
-    if ( (void *) p == NULL){
+    if ( (void *) p == NULL ){
         goto fail;
     }
 
@@ -1362,8 +1365,7 @@ sys_bind (
     }
 
 // fd
-    if ( sockfd < 0 || sockfd >= OPEN_MAX )
-    {
+    if ( sockfd < 0 || sockfd >= OPEN_MAX ){
         debug_print ("sys_bind: sockfd fail\n");
         printf      ("sys_bind: sockfd fail\n");
         return (int) (-EINVAL);
@@ -1376,8 +1378,10 @@ sys_bind (
         goto fail;
     }
 
-// process
-// #todo: check pid validation.
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf("sys_bind: current_process\n");
+        goto fail;
+    }
 
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
@@ -1396,8 +1400,7 @@ sys_bind (
         goto fail;
     }
 
-    if ( is_socket(f) != TRUE )
-    {
+    if ( is_socket(f) != TRUE ){
         debug_print ("sys_bind: f is not a socket object\n");
         printf      ("sys_bind: f is not a socket object\n");
         goto fail;
@@ -1427,21 +1430,19 @@ sys_bind (
     if (s->addr.sa_family == AF_GRAMADO)
     {
         debug_print ("sys_bind: [AF_GRAMADO] Binding the name to the socket.\n");
-
         // Always 14.
-        for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
-
+        for (i=0; i<14; i++){
+            s->addr.sa_data[i] = addr->sa_data[i];
+        }; 
         // #debug
-        if(Verbose==TRUE){
-            printf ("sys_bind: process %d ; family %d ; len %d \n", 
+        if (Verbose==TRUE){
+            printf ("sys_bind: process %d | family %d | len %d\n", 
                 current_process, addr->sa_family, addrlen  );
         }
-        
         debug_print ("sys_bind: bind ok\n");
         return 0;
     }
 //--
-
 
 //++
 // AF_UNIX ou AF_LOCAL
@@ -1466,7 +1467,6 @@ sys_bind (
         return -1;    
     } 
 //--
-
 
 // #fail
 // A família é de um tipo não suportado.
@@ -1554,27 +1554,20 @@ sys_connect (
 // File.
     struct file_d *f;
 
-
 // #importante
 // No caso de endereços no estilo inet
 // vamos precisar de outra estrututura.
-    
     struct sockaddr_in *addr_in;
-
     int Verbose=FALSE;
-
-// Iterator used in the pending connections queue.
+// Used in the pending connections queue.
     int i=0;
 
-
     pid_t current_process = (pid_t) get_current_process();
-
 
     if (Verbose==TRUE){
         printf ("sys_connect: PID %d | Client socket fd %d | \n",
             current_process, client_socket_fd );
     }
-
 
 //
 // Client fd.
@@ -2173,7 +2166,8 @@ sys_getsockname (
 /*
  * sys_listen:
  *     É usado pra dizer que o servidor esta 
- * pronto para receber conecxões e a quantidade de cliente conectados.
+ * pronto para receber conecxões e 
+ * a quantidade de clientes que podem ser conectados.
  */
 // See:
 // https://man7.org/linux/man-pages/man2/listen.2.html
@@ -2196,7 +2190,7 @@ int sys_listen (int sockfd, int backlog)
     struct process_d  *p;
     file *f;
     struct socket_d  *s;
-    int n=0;
+    int Backlog=0;
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -2205,13 +2199,10 @@ int sys_listen (int sockfd, int backlog)
     //printf      ("sys_listen: [TODO] fd=%d backlog=%d\n",
         //sockfd, backlog);
 
-// sockfd: 
 // The fd of the server's socket.
-
-    if ( sockfd < 0 || sockfd >= OPEN_MAX )
-    {
-        debug_print ("sys_listen: [FAIL] fd\n");
-        printf      ("sys_listen: [FAIL] fd\n");
+    if ( sockfd < 0 || sockfd >= OPEN_MAX ){
+        debug_print ("sys_listen: sockfd\n");
+        printf      ("sys_listen: sockfd\n");
         return (int) (-EINVAL);
     }
 
@@ -2220,31 +2211,28 @@ int sys_listen (int sockfd, int backlog)
 // Wrong n. Ajusting to default.
 // It can't be bigger than the size of the array.
 // #todo: Use SOCKET_MAX_PENDING_CONNECTIONS
+    Backlog = backlog;
 
-    if ( backlog <= 0 ){ n=1; }
-
-    if( backlog >= 32 )
-    {
-        backlog=31;
-    }
-
-
+    if ( Backlog <= 0 ) { Backlog=1; }
+    if ( Backlog >= 32 ){ Backlog=31; }
 
 // We need to get the socket structure in the process structure.
 // We need to clean the list. Not here. when creating the socket.
 
-    /*
+/*
     //int i=0;
     //for(i=0; i<32; i++) { s->pending_connections[i] = 0;};
     // Updating the list support.
     //s->backlog_max = backlog;  //max
     //s->backlog_pos = 0;        //current 
-    */
+ */
 
-
-//
 // ==============================================
-//
+
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("sys_listen: current_process\n");
+        goto fail;
+    }
 
 // process
     p = (struct process_d *) processList[current_process];
@@ -2294,7 +2282,7 @@ int sys_listen (int sockfd, int backlog)
     }
 
 // Updating the socket structure.
-    s->backlog_max = backlog;
+    s->backlog_max = Backlog;
 // This server is accepting new connections.
     s->AcceptingConnections = TRUE;
     // ...
