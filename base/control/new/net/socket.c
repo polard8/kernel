@@ -78,7 +78,7 @@ struct socket_d *create_socket_object(void)
     };
     s->backlog_head = 0;   //sai
     s->backlog_tail = 0;   //entra
-    s->backlog_max = 4;
+    s->backlog_max = 4;    //default 
 
 // Not yet.
 // listen() will set this flag.
@@ -997,6 +997,7 @@ sys_accept (
     int fdClient = -1;
 // Iterator for the pending connections queue.
     register int i=0;
+    int Verbose=FALSE;
 
     // #debug
     // debug_print ("sys_accept:\n");
@@ -1032,30 +1033,22 @@ sys_accept (
         return (int) (-EINVAL);
     }
 
-//
 // Current process. (The server)
-//
-
 // The accept() was called by the server.
 
-    if ( current_process < 0  || current_process >= PROCESS_COUNT_MAX )
-    {
+    if ( current_process < 0  || current_process >= PROCESS_COUNT_MAX ){
         debug_print ("sys_accept: [FAIL] current_process\n");
         printf      ("sys_accept: [FAIL] current_process\n");
         goto fail;
     }
-
-// Server process.
-
+// Server process
     sProcess = (struct process_d *) processList[current_process];
-    if ( (void *) sProcess == NULL )
-    {
+    if ( (void *) sProcess == NULL ){
         debug_print ("sys_accept: [FAIL] sProcess\n");
         printf      ("sys_accept: [FAIL] sProcess\n");
         goto fail;
     }
-    if ( sProcess->used != TRUE || sProcess->magic != 1234 )
-    {
+    if ( sProcess->used != TRUE || sProcess->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sProcess validation\n");
         printf      ("sys_accept: [FAIL] sProcess validation\n");
         goto fail;
@@ -1066,30 +1059,23 @@ sys_accept (
 // The socket is a file and belongs to the process.
 
     sFile = (file *) sProcess->Objects[fdServer];
-    if ( (void *) sFile == NULL )
-    {
+    if ( (void *) sFile == NULL ){
         debug_print ("sys_accept: sFile fail\n");
         printf      ("sys_accept: sFile fail\n");
         goto fail;
     }
-    if ( sFile->used != TRUE || sFile->magic != 1234 )
-    {
+    if ( sFile->used != TRUE || sFile->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sFile validation\n");
         printf      ("sys_accept: [FAIL] sFile validation\n");
         goto fail;
     }
-
 // Is this file a socket?
-
-    if ( is_socket(sFile) != TRUE )
-    {
+    if ( is_socket(sFile) != TRUE ){
         debug_print ("sys_accept: sFile is not a socket object\n");
              printf ("sys_accept: sFile is not a socket object\n");
         goto fail;
     }
-
-    if (sFile->sync.can_accept != TRUE )
-    {
+    if (sFile->sync.can_accept != TRUE){
         debug_print ("sys_accept: sFile can NOT accept connections\n");
              printf ("sys_accept: sFile can NOT accept connections\n");
         goto fail;
@@ -1099,19 +1085,16 @@ sys_accept (
 // And check its validation.
 
     sSocket = (struct socket_d *) sFile->socket;
-    if ( (void *) sSocket == NULL )
-    {
+    if ( (void *) sSocket == NULL ){
         debug_print ("sys_accept: [FAIL] sSocket\n");
         printf      ("sys_accept: [FAIL] sSocket\n");
         goto fail;
     }
-    if ( sSocket->used != TRUE || sSocket->magic != 1234 )
-    {
+    if ( sSocket->used != TRUE || sSocket->magic != 1234 ){
         debug_print ("sys_accept: [FAIL] sSocket validation\n");
         printf      ("sys_accept: [FAIL] sSocket validation\n");
         goto fail;
     }
-
 
 // Isso significa que o cliente chamou connect antes mesmo 
 // do servidor chamar accept ??
@@ -1125,7 +1108,6 @@ sys_accept (
     }
     */
 
-
     /*
     // #test
     // The indicated socket need to be the same of the privete socket.
@@ -1137,14 +1119,12 @@ sys_accept (
     }
     */
 
-//
 // Socket ok!
-//
-
 // #todo
 // Essa funcao nos enviou o fd do socket do servidor.
 // Agora vamos olhar na lista de conexoes existentes nesse
 // socket e pegarmos um dos fd da lista. Em ordem round robing.
+// Esse fd será o socket do cliente.
 
     /*
     // get next!
@@ -1193,24 +1173,17 @@ sys_accept (
 
 // #test
 // Se a conexão do socket do servidor está pendente.
+// Pega um socket da lista de conexoes pendentes.
 // #bugbug
-// Devemos retornar o descritor do socket cliente e
-// não do socket do servidor.
-// Mas como existe cópia durante o write,
-// quando o servidor escrever em seu próprio socket
-// a mensagem vai ser copiada no cliente.
+// Devemos retornar o descritor do socket cliente.
 // #todo: Para devolver um descritor para o servidor,
-// então o socket do cliente deveria estar na lista de
+// então o socket do cliente deve estar na lista de
 // arquivos abertos pelo servidor.
-// obs: Por enquanto fica assim. Devolvemos o
-// descritor do proprio servidor. Mas ele está conectado e
-// o cliente receberá a mensagem.
-// #ok
-// Pega um socket da lista de conexoes incompletas.
+
 // #bugbug
-// A estado de SS_CONNECTING foi atribuido pelo connect.
-// Connect tam preconecta os sockets, isso eh ruim
-// pois podemos transmitir dados mesmo antes do accept
+// A estado de SS_CONNECTING foi atribuido pelo connect().
+// Se connect() preconectar os sockets, isso será ruim,
+// pois poderíamos transmitir dados mesmo antes do accept()
 // selecionar um da fila de conexoes pendentes. 
 // ele tambem esta em um dos slots e no slot 31.
 
@@ -1245,6 +1218,10 @@ sys_accept (
         }
 
         // Probe for a valid pointer.
+        // Ok 
+        // Vamos pegar o ponteiro para estrutura de socket do cliente.
+        // Isso foi colocado aqui na estrutura de socket do servidor
+        // pela função connect();
         while ( i <= sSocket->backlog_max )
         {
             cSocket = 
@@ -1257,8 +1234,7 @@ sys_accept (
         };
 
         // Not valid Client socket
-        if ( (void*) cSocket == NULL )
-        {
+        if ( (void*) cSocket == NULL ){
             debug_print ("sys_accept: [FAIL] cSocket\n");
             sSocket->state = SS_CONNECTING;  //anula.
             goto fail;
@@ -1306,7 +1282,15 @@ sys_accept (
             // Dessa forma o servido pode escrever nele
             // e o cliente poderá ler.
 
-            return (int) cFile->_file; 
+            if ( Verbose == TRUE ){
+                printf("sys_accept: Server's pid {%d}\n",current_process);
+                printf("sys_accept: Server's socket fd {%d}\n",sockfd);
+                printf("sys_accept: Breakpoint\n");
+                refresh_screen();
+                while(1){}
+            }
+
+            return (int) cFile->_file;  // 31 
         }
 
         //fail
@@ -1325,6 +1309,9 @@ fail:
     debug_print ("sys_accept: [FAIL] Something is wrong!\n");
     //printf    ("sys_accept: [FAIL] Something is wrong!\n");
     //refresh_screen();
+    if( Verbose == TRUE ){
+        refresh_screen();
+    }
     return -1;
 }
 
@@ -1542,68 +1529,48 @@ sys_connect (
 // Client process and server process.
     struct process_d *cProcess;
     struct process_d *sProcess;
-
     pid_t target_pid = (-1);  //fail
-
 // Client socket and server socket.
     struct socket_d *client_socket;
     struct socket_d *server_socket;
-    
     int client_socket_fd = -1;
-
 // File.
     struct file_d *f;
-
 // #importante
 // No caso de endereços no estilo inet
 // vamos precisar de outra estrututura.
     struct sockaddr_in *addr_in;
     int Verbose=FALSE;
-// Used in the pending connections queue.
-    int i=0;
 
     pid_t current_process = (pid_t) get_current_process();
 
     if (Verbose==TRUE){
-        printf ("sys_connect: PID %d | Client socket fd %d | \n",
-            current_process, client_socket_fd );
+        printf ("sys_connect: Client's pid {%d}\n", current_process );
+        printf ("sys_connect: Client's socket id {%d}\n", sockfd );
     }
 
-//
 // Client fd.
-// 
-
 // client_socket_fd é um soquete de quem quer se conectar.
 // O addr indica o alvo.
-
     client_socket_fd = sockfd;
-
-    if ( client_socket_fd < 0 || 
-         client_socket_fd >= OPEN_MAX )
-    {
-        debug_print ("sys_connect: [FAIL] client_socket_fd\n");
-        printf      ("sys_connect: [FAIL] client_socket_fd\n");
+    if ( client_socket_fd < 0 || client_socket_fd >= OPEN_MAX ){
+        debug_print ("sys_connect: client_socket_fd\n");
+        printf      ("sys_connect: client_socket_fd\n");
+        refresh_screen();
         return (int) (-EINVAL);
     }
 
-//
 // addr
-//
-
 // Usando a estrutura que nos foi passada.
-
     if ( (void *) addr == NULL ){
-        printf ("sys_connect: [FAIL] addr\n");
-        goto fail;
+        printf ("sys_connect: addr\n");
+        refresh_screen();
+        return (int) (-EINVAL);
     }
-
-
 // #todo: type.
 // da um problema na compilação.
     //addr_in = (?) addr;
-
     addr_in = addr;
-
 
 //  ==============
 
@@ -1617,7 +1584,6 @@ sys_connect (
 
     int ____in = TRUE;
 
-
 // #importante
 // opções de domínio se o endereço é no estilo unix. 
 // >>> sockaddr
@@ -1627,176 +1593,156 @@ sys_connect (
 
     switch (addr->sa_family){
 
-        // AF_GRAMADO = 8000
-        // Vamos obter o número do processo alvo dado o endereço.
-        // 32 ports only.
-        
-        case AF_GRAMADO:
-            debug_print ("sys_connect: AF_GRAMADO ok\n");
-            
-            // window server
-            if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' )
-            {
-                target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT]; 
-            }
+    // AF_GRAMADO = 8000
+    // Vamos obter o número do processo alvo dado o endereço.
+    // 32 ports only.
 
-            // network server
-            if ( addr->sa_data[0] == 'n' && addr->sa_data[1] == 's' )
-            { 
-                target_pid = (pid_t) gramado_ports[GRAMADO_NS_PORT]; 
-            }
+    case AF_GRAMADO:
+    // Trabalhando com string.
 
-            // file system server
-            if ( addr->sa_data[0] == 'f' && addr->sa_data[1] == 's' )
-            {   
-                target_pid = (pid_t) gramado_ports[GRAMADO_FS_PORT]; 
-            }
+        debug_print ("sys_connect: AF_GRAMADO ok\n");
 
-            // ...
+        // ws: Window server
+        if ( addr->sa_data[0] == 'w' && addr->sa_data[1] == 's' ){
+            target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT]; 
+        }
+        // ns: Network server
+        if ( addr->sa_data[0] == 'n' && addr->sa_data[1] == 's' ){ 
+            target_pid = (pid_t) gramado_ports[GRAMADO_NS_PORT]; 
+        }
+        // fs: File system server
+        if ( addr->sa_data[0] == 'f' && addr->sa_data[1] == 's' ){
+            target_pid = (pid_t) gramado_ports[GRAMADO_FS_PORT]; 
+        }
+        // ...
+        if ( target_pid<0 || target_pid >= PROCESS_COUNT_MAX ){
+            printf ("sys_connect: AF_GRAMADO target_pid\n");
+            goto fail;
+        }
+        if (Verbose==TRUE){
+            printf ("sys_connect: target pid %d \n", target_pid);
+        }
+        // Logo abaixo, não tente inet, pois somos AF_GRAMADO.
+        ____in = FALSE;
+        break;
 
-            if ( target_pid < 0 ){
-                debug_print ("sys_connect: [FAIL] target_pid \n");
-                goto fail;
-            }
+    //case AF_LOCAL:
+    case AF_UNIX:
+    // Trabalhando com pathname.
 
-            if (Verbose==TRUE){
-                printf ("sys_connect: target pid %d \n", target_pid);
-            }
-            
-            // não tente inet, somos af_gramado
-            ____in = FALSE;
-            break;
-        
         // #todo
         // Podemos usar isso no caso do  window server.
         // Pois se trata de uma conexão local.
-        
-        //case AF_LOCAL:
-        case AF_UNIX:
-            // Essa conexão local usa endereços no sistema de arquivos.
-            // #todo: Implementar isso.
-            debug_print ("sys_connect: [TODO] AF_UNIX \n");
-            //target_pid = -1;
-            // não tente inet, somos af_unix
-            ____in = FALSE;
-            goto fail;
-            break;
+        // Essa conexão local usa endereços no sistema de arquivos.
+        // #todo: Implementar isso.
+        debug_print ("sys_connect: AF_UNIX\n");
+        printf      ("sys_connect: AF_UNIX\n");
+        //target_pid = -1;
+        // não tente inet, somos af_unix
+        ____in = FALSE;
+        goto fail;
+        break;
     };
 
 
-// >>> sockaddr_in
+// Tentaremos com outro formato de endereço, o sockaddr_in.
+// Agora trabalharemos com IP e PORTA. Não mais com string
+// ou pathname.
 // Vamos pegar o pid do processo associado a determinada porta.
 // Para a família AF_INET.
 
-    if ( ____in == TRUE )
-    {
+    if (____in == TRUE){
 
-      // opções de domínio se o endereço é no estilo internet.
-      switch (addr_in->sin_family){
+    // Opções de domínio se o endereço é no estilo internet.
+    switch (addr_in->sin_family){
 
-        // Estamos usando inet em conexão local.
-        // Então precisamos usar localhost como ip.
-            
-        case AF_INET:
+    case AF_INET:
+    // Trabalhando com ip e porta.
+    // Estamos usando inet em conexão local.
+    // Então precisamos usar localhost como ip.
 
-            debug_print ("sys_connect: AF_INET\n");
-            //#debug
-            //printf("sys_connect: AF_INET port %d \n", 
-            //    addr_in->sin_port);
-     
-            // WS - 4040
-            // Se a porta for , então usaremos o pid do WS.
-            if (addr_in->sin_port == PORTS_WS)
-            {
-                target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT];
+        debug_print ("sys_connect: AF_INET\n");
+        //#debug
+        //printf("sys_connect: AF_INET port {%d}\n", addr_in->sin_port);
+ 
+        // WS - 4040
+        // Se a porta for , então usaremos o pid do WS.
+        if (addr_in->sin_port == PORTS_WS)
+        {
+            target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT];
+            if (Verbose==TRUE){
+                printf("sys_connect: [AF_INET] Connecting to the Window Server\n");
+                printf("sys_connect: IP {%x}\n", addr_in->sin_addr.s_addr );
+                printf("sys_connect: PORT {%d}\n", addr_in->sin_port);
+                refresh_screen();
+            }
+            break;
+        }
 
-                if(Verbose==TRUE){
-                printf ("sys_connect: Connecting to the Window Server on port %d ...\n",
-                    addr_in->sin_port);
-                printf("sys_connect: IP {%x}\n",
-                    addr_in->sin_addr.s_addr );
+        // NS - 4041
+        // Se a porta for , então usaremos o pid do NS.
+        if (addr_in->sin_port == PORTS_NS)
+        {
+            target_pid = (pid_t) gramado_ports[GRAMADO_NS_PORT]; 
+            if (Verbose==TRUE){
+                printf("sys_connect: [AF_INET] Connecting to the Network Server\n");
+                printf("sys_connect: IP {%x}\n", addr_in->sin_addr.s_addr );
+                printf("sys_connect: PORT {%d}\n", addr_in->sin_port);
                 refresh_screen();
                 }
-                break;
-            }
-
-            // NS - 4041
-            // Se a porta for , então usaremos o pid do NS.
-            if (addr_in->sin_port == PORTS_NS)
-            {
-                target_pid = (pid_t) gramado_ports[GRAMADO_NS_PORT]; 
-
-                if(Verbose==TRUE){
-                printf ("sys_connect: Connecting to the Network Server on port %d...\n",
-                    addr_in->sin_port);
-                printf("sys_connect: IP {%x}\n",
-                    addr_in->sin_addr.s_addr );
-                refresh_screen();
-                }
-                break;
-            }
-
-            // PORTS_FS
-
-            // 21 - FTP
-            if (addr_in->sin_port == 21)
-            {
-                printf("$$$$ FTP $$$$\n");
-                refresh_screen();
-                goto fail;
-            }
-
-            // 23 - Telnet
-            if (addr_in->sin_port == 23)
-            {
-                printf("$$$$ Telnet $$$$\n");
-                refresh_screen();
-                goto fail;
-            }
-
-            // 67 - DHCP
-            if (addr_in->sin_port == 67)
-            {
-                printf("$$$$ DHCP $$$$\n");
-                refresh_screen();
-                goto fail;
-            }
-            
-            // 80 - HTTP
-            if (addr_in->sin_port == 80)
-            {
-                printf("$$$$ HTTP $$$$\n");
-                refresh_screen();
-                goto fail;
-            }
-            
-
-            // 443 - HTTPS 
-            if (addr_in->sin_port == 443)
-            {
-                printf("$$$$ HTTPS $$$$\n");
-                refresh_screen();
-                goto fail;
-            }
-
-            
-            printf("sys_connect: [FAIL] Port not valid {%d}\n",
-                addr_in->sin_port);
-            
-            goto fail;
             break;
-             
-        //... 
-        
-        default:
-            debug_print("sys_connect: domain not supported\n");
-            printf("sys_connect: [FAIL] Family not supported! %d \n",
-                addr_in->sin_family);
-            goto fail;
-            break;
-      };
-    }
+        }
 
+        // PORTS_FS #todo
+
+        // 21 - FTP
+        if (addr_in->sin_port == 21){
+            printf("sys_connect: [21] FTP #todo\n");
+            goto fail;
+        }
+
+        // 23 - Telnet
+        if (addr_in->sin_port == 23){
+            printf("sys_connect: [23] Telnet #todo\n");
+            goto fail;
+        }
+
+        // 67 - DHCP
+        if (addr_in->sin_port == 67){
+            printf("sys_connect: [67] DHCP #todo\n");
+            goto fail;
+        }
+
+        // 80 - HTTP
+        if (addr_in->sin_port == 80){
+            printf("sys_connect: [80] HTTP #todo\n");
+            goto fail;
+        }
+
+        // 443 - HTTPS 
+        if (addr_in->sin_port == 443){
+            printf("sys_connect: [442] HTTPS #todo\n");
+            goto fail;
+        }
+
+        // #debug
+        printf("sys_connect: [FAIL] Port not valid {%d}\n",
+            addr_in->sin_port);
+
+        goto fail;
+        break;
+
+        //...
+
+    default:
+        debug_print("sys_connect: domain not supported\n");
+        printf("sys_connect: [FAIL] Family not supported {%d}\n",
+            addr_in->sin_family);
+        goto fail;
+        break;
+
+    };  // switch
+    }   // if
 
 // ====================================================================
 // Check
@@ -1811,11 +1757,13 @@ sys_connect (
 // Vamos obter o arquivo do tipo soquete
 // que pertence ao sender.
 
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("sys_connect: current_process\n");
+        goto fail;
+    }
 
 // sender's process structure.
-
     cProcess = (struct process_d *) processList[current_process];
- 
     if ( (void *) cProcess == NULL ){
         debug_print ("sys_connect: cProcess fail\n");
         printf      ("sys_connect: cProcess fail\n");
@@ -1825,7 +1773,6 @@ sys_connect (
 // #todo
 // Check structure validation
     // if (cProcess->magic ...
-
 
 // The client's socket file.
 // #bugbug
@@ -1843,14 +1790,13 @@ sys_connect (
 // E também não devemos permitir que isso aconteça na conexão local.
 
     f = (file *) cProcess->Objects[client_socket_fd];
-
     if ( (void *) f == NULL ){
         printf ("sys_connect: [FAIL] f. The client's socket\n");
         goto fail;
     }
 
 // Is it a socket??
-    
+
     int __is = -1;
     __is = is_socket((file *)f);
     if (__is != TRUE){
@@ -1876,7 +1822,6 @@ sys_connect (
 // Pega a estrutura de socket associada ao arquivo.
 
     client_socket = (struct socket_d *) f->socket;
-
     if ( (void *) client_socket == NULL ){
         printf ("sys_connect: [FAIL] client_socket\n");
         goto fail;
@@ -1904,12 +1849,11 @@ sys_connect (
 
 // target pid.
 // O pid do processo servidor.
-// pegamos logo acima na porta solicitada.
+// Pegamos o target_pid logo acima na porta solicitada.
 
-    if (target_pid<0)
-    {
-        debug_print ("sys_connect: [FAIL] target_pid\n");
-        printf      ("sys_connect: [FAIL] target_pid\n");
+    if (target_pid<0 || target_pid >= PROCESS_COUNT_MAX){
+        debug_print ("sys_connect: target_pid\n");
+        printf      ("sys_connect: target_pid\n");
         goto fail;
     }
 
@@ -1919,9 +1863,7 @@ sys_connect (
 // que é um servidor.
 
     sProcess = (struct process_d *) processList[target_pid];
-
-    if ( (void *) sProcess == NULL )
-    {
+    if ( (void *) sProcess == NULL ){
         debug_print ("sys_connect: sProcess fail\n");
         printf      ("sys_connect: sProcess fail\n");
         goto fail;
@@ -1931,30 +1873,26 @@ sys_connect (
 // Checar a validade da estrutura de processo.
     // if ( sProcess->magic != ...
 
-
 // Procurando um slot livre na lista de objetos abertos
 // presente na estrutura do processo servidor.
 
     int __slot=-1;  //fail
-    register int ii=0;
-    //for (__slot=0; __slot<32; __slot++)
-    for (ii=3; ii<31; ii++)
-    {
-         if ( sProcess->Objects[ii] == 0 )
-         {
-             __slot = ii;
-             goto __OK_new_slot; 
+    register int i=0;
+    for (i=3; i<31; i++){
+         if (sProcess->Objects[i] == 0){
+             __slot = i;
+             goto __OK_new_slot;
          }
     };
 
-// #fail: No more slots.
-
+// #fail: 
+// No more slots.
     panic ("sys_connect: [FIXME] We need a slot in the server\n");
 
 // ok
 __OK_new_slot:
 
-    if( __slot == -1){
+    if (__slot == -1){
         printf("sys_connect: no empty slor\n");
         goto fail;
     }
@@ -1964,15 +1902,12 @@ __OK_new_slot:
 // Dessa forma o alvo é o servidor.
 
     server_socket = (struct socket_d *) sProcess->priv;
-
-    if ( (void *) server_socket == NULL )
-    {
+    if ( (void *) server_socket == NULL ){
         printf ("sys_connect: [FAIL] server_socket\n");
         goto fail;
     }
 
 // Salvando o fd do socket do cliente.
-
     server_socket->clientfd_on_server = __slot;
     client_socket->clientfd_on_server = __slot;
 
@@ -1982,6 +1917,9 @@ __OK_new_slot:
 // o arquivo que representa o socket do cliente.
 // O arquivo de socket do cliente agora tem um fd
 // no processo servidor.
+// Nossa intenção aqui é usar um dos slots livres
+// encontrado em p->Objects[], mas por enquanto estamos usando 
+// apenas o slot número 31.
 
     //sProcess->Objects[__slot] = (unsigned long) f;  // no que encontramos
     sProcess->Objects[31] = (unsigned long) f;  // no 31.
@@ -1992,67 +1930,81 @@ __OK_new_slot:
 
 // #bugbug
 // connect() eh chamado somente uma vez pelo cliente.
-// a conexao deve ficar pendente e o accept
+// A conexao deve ficar pendente numa lista e o accept
 // seleciona uma delas.
-// #test: Pra começar vamos deixar apenas uma pendente
+// #test: 
+// Pra começar, vamos deixar apenas uma pendente
 // e o accept() selecionara ela.
 // #todo
 // Temos que colocar os pedidos de conexão em uma fila.
 // O tamanho dessa fila foi determinado pelo servidor
-// com a chamada listen. Mas podemos ter um tamanho padrão.
+// com a chamada listen(). Mas podemos ter um tamanho padrão.
 // Talvez tamanho 1 para começar.
+// Link:
 // Conectando o socket do processo alvo ao ponto de
-// conecção do processo cliente.
+// conexão do processo cliente.
 // Conectando o socket do cliente ao ponto de conecção do
 // processo servidor.
+// Flags:
+// State:
 // Acionando as flags que indicam a conecção.
 // Nesse momento poderíamos usar a flag SS_CONNECTING
 // e a rotina accept() mudaria para SS_CONNECTED. 
 // #bugbug
 // Nao podemos mudar o estado do servidor,
-// estamos apenas entrando na fila e implorando
-// para nos conectarmos.
-// Quem realizara a conexao sera o accept, pegando 
-// o cliente da fila de conexoes pendentes.
+// estamos apenas entrando na fila e implorando para nos conectarmos.
+// Quem realizara a conexão sera o accept(), 
+// pegando o cliente da fila de conexões pendentes.
 
-    // Connecting.
+// Linking:
+// Connecting
     client_socket->conn = server_socket;
     server_socket->conn = client_socket;
-
-    // State.
+// Flags:
+// State
     client_socket->state = SS_CONNECTING;
     server_socket->state = SS_CONNECTING;
-
-    // Magic signature.
+// Magic signature
     client_socket->magic_string[0] = 'C';
     client_socket->magic_string[1] = 0; 
 
 // #todo
-// Precisamos de uma lista de conexoes pendentes.
-// O cliente invocou a conexao apenas uma vez
+// Precisamos de uma lista de conexões pendentes.
+// O cliente invocou a conexão apenas uma vez
 // e precisa usar o servidor varias vezes
-// #obs: Isso funcionou. Vamos tentar com lista.
-// #ps: algumas implementacoes usam lista encadeada
-// de conexoes incompletas. 'server_socket->iconn'
-// #bugbug: essa lista deve ficar na estrutura de socket
-// e nao na estrutura de processo, dessa forma
-// o servidor pode ter mais de uma socket.
+// #obs: 
+// Isso funcionou. Vamos tentar com lista.
+// #obs: 
+// Algumas implementacões usam lista encadeada de conexões pendentes. 
+// 'server_socket->iconn'
+// #bugbug: 
+// Essa lista fica na estrutura de socket so servidor, 
+// dessa forma o servidor pode ter mais de uma socket?
 
     //server_socket->connections_count++;
     //if(server_socket->connections_count >= server_socket->backlog_max )
     //    return ECONNREFUSED;
 
 // circula
+
+    int BacklogTail = 0;
+
     server_socket->backlog_tail++;
-    if( server_socket->backlog_tail >= server_socket->backlog_max )
+    if ( server_socket->backlog_tail >= server_socket->backlog_max ){
         server_socket->backlog_tail = 0;
-    i=server_socket->backlog_tail;
+    }
+    BacklogTail = server_socket->backlog_tail;
 
 // coloca na fila.
-    server_socket->pending_connections[i] = (unsigned long) client_socket;
+// Coloca o ponteiro para estrutura de socket
+// na fila de conexões pendentes na estrutura do servidor.
+// Isso será usado pelo accept() para encontrar
+// a estrutura do socket do cliente.
+    server_socket->pending_connections[BacklogTail] = 
+        (unsigned long) client_socket;
 
 // Em que posiçao estamos na fila.
-    client_socket->client_backlog_pos = i;
+    client_socket->client_backlog_pos = BacklogTail;
 
 // #
 // O cliente está esperando que sua conexão seja aceita pelo servidor.
@@ -2066,13 +2018,21 @@ __OK_new_slot:
     //refresh_screen();
     //}
 
+    // #debug 
+    // #breakpoint
+    if (Verbose==TRUE){
+        printf("sys_connect: Breakpoint :)\n");
+        refresh_screen();
+        while(1){}
+    }
+
 //ok.
     return 0;
 
 fail:
     debug_print("sys_connect: Fail\n");
-    printf("sys_connect: Fail\n");
-    refresh_screen();
+    printf     ("sys_connect: Fail\n");
+    refresh_screen();  // #bugbug: Slow!
     return -1;
 }
 
