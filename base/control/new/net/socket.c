@@ -1721,7 +1721,7 @@ sys_connect (
 
         // 443 - HTTPS 
         if (addr_in->sin_port == 443){
-            printf("sys_connect: [442] HTTPS #todo\n");
+            printf("sys_connect: [443] HTTPS #todo\n");
             goto fail;
         }
 
