@@ -5,50 +5,38 @@
 #ifndef ____SOCKET_H
 #define ____SOCKET_H    1
 
-
-// Socket state.
+// Socket state
 #define SS_NULL           0
 #define SS_UNCONNECTED    1
 #define SS_CONNECTING     2
 #define SS_CONNECTED      3
 #define SS_DISCONNECTING  4
-
-// == ports ====================================
-
+// Ports
 #define PORTS_WS  4040
 #define PORTS_NS  4041
 #define PORTS_FS  4042
 #define PORTS_WM  4043
 // ...
 
-//
-// == gramado ports ===============================
-//
-
-
 //=====================================================
 //++
+// Gramado ports:
 // ports for local servers.
 // What pid is on each port.
 // It can be used to setup the main components of the system,
 // or maybe only the services in the gramado_ports.
 // AF_GRAMADO
 // ... gramado_ports[]
-
 // ...
-#define GRAMADO_WS_PORT  11  // window server.
-#define GRAMADO_WM_PORT  12  // window manager.
-#define GRAMADO_NS_PORT  14  // network server.
+#define GRAMADO_WS_PORT  11  // window server
+#define GRAMADO_WM_PORT  12  // window manager
+#define GRAMADO_NS_PORT  14  // network server
 #define GRAMADO_FS_PORT  16  // file system
 // ...
-#define GRAMADO_PORT_MAX 32
-
+#define GRAMADO_PORT_MAX  32
 //--
 //=====================================================
 
-//=====================================================
-
-// ...
 
 /*
 #ifndef sa_family_t
@@ -495,90 +483,69 @@ struct sockcred {
  * socket_d:
  *     Socket structure.
  */
-
 struct socket_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
     int used;
     int magic;
-
     int family;
     int type;
     int protocol;
-
 // process, user, group.
     pid_t pid;
     uid_t uid; 
     gid_t gid;
-
 // maybe
     //struct sockpeercred  peercred;
 
 //
-// == Connection ====================
+// == Connections ========
 //
 
 // 1=LOCAL | 2=REMOTE
     int connection_type;
-
 // ip and port.
     unsigned int ip_ipv4;
     unsigned long ip_ipv6;
     unsigned short port;
-
 // The list of pending connections.
 // Updated by listen().
-
     int connections_count;
-
 // List of sockets.
     int backlog_max;
     int backlog_head;
     int backlog_tail;
     unsigned long pending_connections[32];
-
 // Em que posiçao o ponteiro do socket de cliente esta
 // dentro da fila de conecxoes pendentes no socket do servidor.
     int client_backlog_pos;
-
 // It indicates that this socket is currently
 // accepting new connections.
 // Updated by listen().
     int AcceptingConnections;
-
-// State:
-//     SOCKET_CONNECTED, SOCKET_NOT_CONNECTED
+// State: 
+// SOCKET_CONNECTED, SOCKET_NOT_CONNECTED
     int state;   
-
 // link
 // Current connection?
     struct socket_d  *conn;
-
 // flag
 // write() copy the data to the connected socket.
     int conn_copy; 
-
 // The server finds a place in the server_process->Objects[i].
     int clientfd_on_server;
-    
 // ====================================
-
 // Nosso arquivo.
 // Eh o objeto socket??
     file *private_file;
-
 // testing
     char magic_string[8];
-
 // se ele está ou não aceitando conexões. ...
-//...
+// ...
     unsigned short flags; 
-
 // usada em endereços AF_GRAMADO
     struct sockaddr addr;
-
 // usada em endereços AF_INET
 // Where is it defined?
     struct sockaddr_in addr_in; 
@@ -599,12 +566,12 @@ extern unsigned long socketList[SOCKET_COUNT_MAX];
 // == prototypes =========================
 //
 
-struct socket_d *create_socket_object (void);
+struct socket_d *create_socket_object(void);
 unsigned int getSocketIPV4(struct socket_d *socket);
 unsigned long getSocketIPV6(struct socket_d *socket);
 unsigned short getSocketPort(struct socket_d *socket);
-struct socket_d *get_socket_from_fd (int fd);
-void show_socket_for_a_process (pid_t pid);
+struct socket_d *get_socket_from_fd(int fd);
+void show_socket_for_a_process(pid_t pid);
 
 int 
 socket_gramado ( 
@@ -622,14 +589,11 @@ socket_inet (
 
 int socket_init (void);
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg );
-
 int socket_read ( unsigned int fd, char *buf, int count );
 int socket_write ( unsigned int fd, char *buf, int count );
-
 // gramado ports.
 pid_t socket_get_gramado_port (int port);
 int socket_set_gramado_port (int port, pid_t pid);
-int socket_initialize_gramado_ports(void);
 
 int 
 socket_unix ( 
@@ -663,7 +627,6 @@ sys_getsockname (
     socklen_t *addrlen );
 
 int sys_listen (int sockfd, int backlog);
-
 int sys_socket_shutdown (int socket, int how);
 
 int 
@@ -689,10 +652,4 @@ socket_dialog (
     unsigned long arg4 );
 
 #endif    
-
-
-
-
-
-
 

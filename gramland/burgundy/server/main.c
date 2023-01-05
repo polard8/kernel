@@ -158,7 +158,7 @@ extern struct gws_window_d *mouse_owner;
 // Called by dispatcher().
 static int __send_response(int fd, int is_error);
 
-static int InitHot(void);
+static int initGUI(void);
 static int on_execute(void);
 static void dispacher(int fd);
 
@@ -212,24 +212,34 @@ static int serviceGetWindowInfo(void);
 static void serviceCloneAndExecute(void);
 
 // ===============================================
-
+// Callback support.
 static unsigned long callback_counter=0;
 
+//========================================================
+// The callback restorer.
 static inline void do_restorer(void);
 static inline void do_restorer(void)
 {
     asm ("int $198");
 }
+//========================================================
+
+//========================================================
+// Callback procedure.
 void callback1(void);
 void callback1(void)
 {
-    //printf("WS: Callback\n");
+    // #debug
+    // printf("WS: Callback\n");
+
     callback_counter++;
 
-    if ( (void*) window_server == NULL )
+    if ( (void*) window_server == NULL ){
         do_restorer();
-    if (window_server->initialized != TRUE)
+    }
+    if (window_server->initialized != TRUE){
         do_restorer();
+    }
 
 //#test1
     //if( (callback_counter % (16*4)) == 0 )
@@ -243,19 +253,18 @@ void callback1(void)
 // The kernel is not calling us 1000 times per second.
 // #todo: review fps.
 
+// gui
     if ( (void*) gui == NULL ){
         do_restorer();
     }
-
+// window server
     if ( (void*) window_server == NULL ){
         do_restorer();
     }
-
-    if (window_server->graphics_initialization_status != TRUE)
-    {
+    if (window_server->graphics_initialization_status != TRUE){
         do_restorer();
     }
-
+// window manager
     if (WindowManager.initialized != TRUE){
         do_restorer();
     }
@@ -268,10 +277,11 @@ void callback1(void)
     do_restorer();
 
 //fail
-    while(1){
+    while (1){
         printf("."); fflush(stdout);
     }
 }
+//========================================================
 
 // Print a simple string in the serial port.
 void gwssrv_debug_print (char *string)
@@ -2919,15 +2929,15 @@ static void __init_ws_structure(void)
 
 
 // ========================================
-// InitHot:
-//     Initialize the graphics interface.
+// initGUI:
+//     Initialize the graphics user interface.
 // Init Graphics:
 // Draw something.
 // Init ws infrastructure.
 // Initialize the '3D' graphics support.
 // Let's create the standard green background.
 
-static int InitHot(void)
+static int initGUI(void)
 {
     int graphics_status = -1;
 
@@ -2936,10 +2946,8 @@ static int InitHot(void)
 
     graphics_status = (int) initGraphics();
     if (graphics_status<0){
-        printf("InitHot: initGraphics failed\n");
-        return -1;
-        //while(1){}
-        //exit(1);
+        printf("initGUI: initGraphics failed\n");
+        return (int) -1;
     }
 
 //
@@ -2958,19 +2966,17 @@ static int InitHot(void)
 // Seleciona a animaçao.
 // Nao deve travar, deve ter timeout.
 
-    if (current_mode == GRAMADO_JAIL ||
-        current_mode == GRAMADO_P1 ||
-        current_mode == GRAMADO_HOME)
+    if ( current_mode == GRAMADO_JAIL ||
+         current_mode == GRAMADO_P1 ||
+         current_mode == GRAMADO_HOME )
     {
-
         // #todo
         // Keep the graphics routines
         // clean and simple in this server.
-
-         //demos_startup_animation(7);  //curve
-         //demos_startup_animation(9);  //cat
-         //// again
-         //wm_Update_TaskBar("Welcome :)",TRUE);
+        // demos_startup_animation(7);  //curve
+        // demos_startup_animation(9);  //cat
+        // again
+        // wm_Update_TaskBar("Welcome :)",TRUE);
     }
 
     Initialization.setup_graphics_interface_checkpoint = TRUE;
@@ -3008,26 +3014,24 @@ static int on_execute(void)
     addrlen = sizeof(server_address);
 //==================
 
-    int flagUseClient = FALSE;
-    //int flagUseClient = TRUE;
-    int UseCompositor = TRUE;  // #debug flags
-
-    // files.
+    int flagUseClient = FALSE;  // TRUE
+    int UseCompositor = TRUE;   // #debug flags
+// Files
     int server_fd = -1; 
     int newconn = -1;
     int curconn = -1;
-    
+// Status
     int bind_status = -1;
-    //int i=0;
     int _status = -1;
-
+// Buffer
     char buf[32];
     int CanRead = -1;
 
     IsTimeToQuit = FALSE;
     IsAcceptingInput = TRUE;
     IsAcceptingConnections = TRUE;
-    g_handler_flag = FALSE;  // The kernel can't use the handler.
+// The kernel can't use the handler.
+    g_handler_flag = FALSE;
 
 // ==========================================
 // Starting the initialization phases.
@@ -3036,15 +3040,13 @@ static int on_execute(void)
 // #test: Transparence.
     //gws_enable_transparence();
     gws_disable_transparence();
-
 // Window server structure
     __init_ws_structure();
-
 // Window manager
     wmInitializeGlobals();
     wmInitializeStructure();
 
-    /*
+/*
     FILE *input_fp;
     fflush(stdin);
     close(fileno(stdin));
@@ -3053,10 +3055,9 @@ static int on_execute(void)
         printf ("gwssrv: input_fp fail\n");
         exit(1);
     }
-    */
+ */
 
-
-    /*
+/*
     //#test
     char display[100];
     host_name    = "gramado";
@@ -3067,12 +3068,11 @@ static int on_execute(void)
     strcat(display, screen_number);
     printf("DISPLAY={%s}\n",display);
     while(1){}
-    */
+ */
 
-// invalidate the frame.
-// invalidate all the background.
+// Invalidate the frame.
+// Invalidate all the background.
 // See: gws.c
-
     invalidate();
     invalidate_background();
 
@@ -3085,7 +3085,6 @@ static int on_execute(void)
 
 // Initialize the client list support.
     initClientSupport();
-
 // The server is also a client.
     if ( (void*) serverClient == NULL ){
         printf ("ws: serverClient\n");
@@ -3122,12 +3121,12 @@ static int on_execute(void)
     window_server->registration_status = TRUE;
 
 
-// Setup callback
+// Setup callback.
+// Register this ring3 address as a callback.
+// The kernel is gonna run this code frequently.
 // Pra isso o ws precisa estar registrado.
-    //printf("WS: Register callback\n");
 
-    if (gUseCallback == TRUE)
-    {
+    if (gUseCallback == TRUE){
         sc82(
             44000,
             (unsigned long) &callback1,
@@ -3135,25 +3134,19 @@ static int on_execute(void)
             (unsigned long) &callback1 );
 
     }
-    
     Initialization.setup_callback_checkpoint = TRUE;
 
 // ===============================================
-
 // #todo
 // Daqui pra frente é conexão com cliente.
 // Lembrando que o servidor vai se conectar à mais de um cliente.
 // ...
-
 // #todo
 // Aqui nos podemos criar vários sockets que serão usados
 // pelo servidor.
 // ex: CreateWellKnownSockets ();
 
-
-// Socket:
-// + Creating the socket for the server.
-// + Saving the socket fd.
+// Creating a socket file and saving the fd.
     server_fd = (int) socket(AF_GRAMADO, SOCK_STREAM, 0);
     if (server_fd<0){
         gwssrv_debug_print ("gwssrv: Couldn't create the server socket\n");
@@ -3168,43 +3161,30 @@ static int on_execute(void)
 // The server itself has its own client structure.
     serverClient->fd      = (int) server_fd;
 
-    // #debug
+    // #debug Breakpoint.
     //printf ("fd: %d\n", serverClient->fd);
     //while(1){}
 
-// Bind:
-
+// Associate this address with the server's socket fd.
     bind_status = 
         (int) bind (
                   server_fd, 
                   (struct sockaddr *) &server_address, 
                   addrlen );
 
-    if (bind_status<0)
-    {
+    if (bind_status<0){
         gwssrv_debug_print ("gwssrv: [FATAL] Couldn't bind to the socket\n");
         printf             ("gwssrv: [FATAL] Couldn't bind to the socket\n");
         return -1;
-        //exit(1);
     }
 
-    // #debug
+    // #debug Breakpoint.
     //printf ("fd: %d\n", serverClient->fd);
     //while(1){}
 
-// Listen:
-// #todo
-// It will setup how many connection the kernel
-// is able to have in the list.
-// 5 clients in the list.
-// #bugbug
-// Isso afeta a velocidade do sistema,
-// pois com uma lista muito grande de clientes
-// o servidor vai perder muito tempo no accept();
-// Pois nosso accept() ainda eh pouco eficiente.
+// Setup how many pending connections.
 // SOMAXCONN is the default limit on backlog.
 // see: sys/socket.h
-
     listen(server_fd,4);
 
     Initialization.setup_connection_checkpoint = TRUE;
@@ -3213,6 +3193,7 @@ static int on_execute(void)
 // Init Hot
 // The graphics interface.
 // #todo: maybe a flag in the parameters.
+// #todo: Change this name.
 
 // This is the second phase of the initialization
 // The graphics infrastructure.
@@ -3220,10 +3201,10 @@ static int on_execute(void)
     Initialization.current_phase = 2;
 
     int graphics_status = -1;
-    graphics_status = (int) InitHot();
-    if(graphics_status<0){
-        printf("on_execute: InitHot failed\n");
-        return -1;
+    graphics_status = (int) initGUI();
+    if (graphics_status<0){
+        printf("on_execute: initGUI failed\n");
+        return (int) -1;
     }
 
 // ==================================================
@@ -3501,7 +3482,7 @@ static inline void __outb(uint16_t port, uint8_t val)
 }
 */
 
-// main: entry point
+// main: Entry point.
 int main (int argc, char **argv)
 {
     int Status=-1;
@@ -3549,18 +3530,12 @@ int main (int argc, char **argv)
         exit(0);
     }
 
-// fail
-// hang
-// Page fault when exiting ... 
-// #fixme
-
-    gwssrv_debug_print ("GWSSRV.BIN: Hang on exit\n");
-    printf             ("GWSSRV.BIN: Hang on exit\n");
-
-    while(1)
-    {
+// #todo
+// Unexpected fail.
+    gwssrv_debug_print("GWSSRV.BIN: Hang on exit\n");
+    printf            ("GWSSRV.BIN: Hang on exit\n");
+    while(1){
     };
-
     return 0;
 }
 

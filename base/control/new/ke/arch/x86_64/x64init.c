@@ -999,11 +999,10 @@ static int I_x64CreateTID0(void)
     return TRUE;
 }
 
-
-void init_globals (void)
+void init_globals(void)
 {
     int Status=FALSE;
-    int i=0;
+    //int i=0;
 
 //#ifdef EXECVE_VERBOSE
     //debug_print("init_globals:\n");
@@ -1064,35 +1063,25 @@ void init_globals (void)
 
 // Interrupção para serviços do sistema.
     g_profiler_ints_gde_services = 0;
-
 // User and group.
     current_user  = 0;
     current_group = 0;
-
 // Security layers.
 // user session, room(window station), desktop.
     current_usersession = (int) 0;
     current_room        = (int) 0;
     current_desktop     = (int) 0;
-
 // Process, Thread.
-// See: kernel.h
-    
+// See: kernel.h   
     foreground_process = (pid_t) 0;
     foreground_thread  = (int) 0;
-    
     //current_process    = (pid_t) 0;
     set_current_process(0);
     current_thread     = (int) 0;
 
-// Network
-// Initialize the ports table used by the socket infrastruture.
-    socket_initialize_gramado_ports();
-
 // The kernel request
 // See: request.c
     clear_request();
-
 
 //
 // == kgws ===========================================
@@ -1103,9 +1092,8 @@ void init_globals (void)
     //    panic("init_globals: No GUI\n");
     //}
 
-    // ===============================================
-    // Window support.
- 
+// ===============================================
+// Window support
     current_window    = (int) 0;  // Current Window.
     windows_count     = (int) 0;  // Window count.
     window_with_focus = (int) 0;  // Window with focus.
@@ -1135,11 +1123,9 @@ void init_globals (void)
 // FS type.
 // type 1, fat16.
 // #todo
-
     g_currentvolume_filesystem_type = FS_TYPE_FAT16;
     g_currentvolume_fatbits = (int) 16;
 }
-
 
 // ==============================
 // I_init:
@@ -1171,7 +1157,6 @@ static int I_init(void)
     PROGRESS("Kernel:2:1\n"); 
     //debug_print ("I_init: Globals\n");
     init_globals();
-
 
 // ===============================
 // Create the progress bar.

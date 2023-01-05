@@ -3,28 +3,26 @@
 // See:
 // https://en.wikipedia.org/wiki/Berkeley_sockets
 
-
 #include <kernel.h>  
 
 // Internal
 #define SYS_SOCKET_IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
-
 
 // globals
 // see: socket.h
 struct socket_d  *CurrentSocket;
 struct socket_d  *LocalHostHTTPSocket;
 // ...
-
 unsigned long socketList[SOCKET_COUNT_MAX];
-
-
 // private:
 // A small list of PIDs.
 // A server can register its PID here
 // telling the system that it is responsible for this kind of service.
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
 
+// ====================
+static int __socket_initialize_gramado_ports(void);
+// ====================
 
 /*
  * create_socket_object: 
@@ -613,27 +611,6 @@ fail:
     debug_print ("socket_inet: [FAIL]\n");
     refresh_screen();
     return (int) (-1);
-}
-
-// Initialize socket list.
-int socket_init(void)
-{
-    register int i=0;
-    for (i=0; i<32; i++){
-        socketList[i] = (unsigned long) 0;
-    };
-    socket_initialize_gramado_ports();
-    // ...
-    return 0;
-}
-
-int socket_initialize_gramado_ports(void)
-{
-    register int i=0;
-    for (i=0; i<GRAMADO_PORT_MAX; i++){
-        gramado_ports[i] = 0;
-    };
-    return 0;
 }
 
 int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
@@ -2684,6 +2661,28 @@ socket_dialog (
     };
 
     // Fail.
+    return 0;
+}
+
+static int __socket_initialize_gramado_ports(void)
+{
+    register int i=0;
+    for (i=0; i<GRAMADO_PORT_MAX; i++){
+        gramado_ports[i] = 0;
+    };
+    return 0;
+}
+
+// Initialize socket list.
+int socket_init(void)
+{
+    register int i=0;
+
+    for (i=0; i<32; i++){
+        socketList[i] = (unsigned long) 0;
+    };
+    __socket_initialize_gramado_ports();
+    // ...
     return 0;
 }
 

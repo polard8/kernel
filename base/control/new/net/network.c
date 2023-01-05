@@ -196,11 +196,10 @@ int network_buffer_out ( void *buffer, int len )
 
 // Pega o destination buffer.
     src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
-
 // Copy
     if ((void*)src_buffer != NULL){
         memcpy( buffer, src_buffer, len );
-    } 
+    }
 
     //printf("network_buffer_in: ok\n");
     //refresh_screen();
@@ -212,8 +211,7 @@ fail:
 
 void networkSetstatus (int status)
 {
-    if ( status < 0 || status > 1 )
-    {
+    if ( status < 0 || status > 1 ){
         return;
     }
     network_status = (int) status;
@@ -321,7 +319,6 @@ int networkInit (void)
 
 // Version
     HostInfo->hostVersion = NULL;
-
 // #todo
 // Call some helpers to get these values.
 // Maybe the init process needs to setup these values.
@@ -329,11 +326,9 @@ int networkInit (void)
     HostInfo->hostVersionMajor    = 0;
     HostInfo->hostVersionMinor    = 0; 
     HostInfo->hostVersionRevision = 0;
-
 // #todo
 // Where is this information?
-    HostInfo->hostArchitecture = 0; 
-
+    HostInfo->hostArchitecture = 0;
     HostInfo->used = TRUE;
     HostInfo->magic = 1234;
 
@@ -355,11 +350,9 @@ int networkInit (void)
 
 // Initializes the socket list.
     socket_init();
-
 // Status
     networkSetstatus(TRUE);
 
-    //debug_print ("networkInit: done\n");
     return 0;
 }
 
