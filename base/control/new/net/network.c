@@ -21,9 +21,10 @@ int notification_status=FALSE;
 // Usado por esse módulo.
 file *____network_file;
 
-
 // See: network.h
 struct network_buffer_d  NETWORK_BUFFER;
+
+// ====================================================
 
 // handle ipv4 package
 // Called by all the embedded nic device drivers.
@@ -46,23 +47,11 @@ network_handle_arp(
 }
 
 
-// Colocar um buffer numa lista de buffers.
-// Vamos copiar o pacote para alguma fila de buffers.
-// A rotina de decodificar o pacote pegará o
-// pacote em alguma fila de buffers.
-// len: 
-//     Tamanho do pacote. Temos que considerar limites.
-// buffer:
-//     Endereço do pacote.
-// Copiamos se o comprimento está no limite.
-
+// in: (Do buffer indicado para o buffer tail)
 int network_buffer_in( void *buffer, int len )
 {
-// Coloca o conteúdo dentro de um dos buffers de aplicativos.
-// Não pertence à dispositivo.
-
-    void *dst_buffer;
     int tail=0;
+    void *dst_buffer;
 
 // Check args
     if ( (void*) buffer == NULL ){
@@ -116,9 +105,8 @@ int network_buffer_in( void *buffer, int len )
         // refresh_screen();
     }
 
-// Pega o destination buffer.
+// Get the destination buffer.
     dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
-
 // Copy
     if ((void*)dst_buffer != NULL){
         memcpy( dst_buffer, buffer, len);
@@ -129,27 +117,18 @@ int network_buffer_in( void *buffer, int len )
 
     //printf("network_buffer_in: ok\n");
     //refresh_screen();
-    return 0;//ok
+    return 0;  //ok
 
 fail:
-    return -1;
+    return (int) -1;
 }
 
-// #importante
-// O kernel vai chamar essa rotina para que ela coloque o conteudo do
-// buffer no endereço de buffer indicado no argumento
-// o endereço do argumento será o endereço usado pelo controlador na hora do send.
-// Retirar um buffer de uma lista de buffers.
-// O gns chamará essa rotina e copiará um buffer para ring3, 
-// onde chamará as rotinas de protocolo.
 
+// out: (Do buffer head para o buffer indicado)
 int network_buffer_out ( void *buffer, int len )
 {
-// Retira o conteúdo de dentro de um dos buffers de aplicativos.
-// Não pertence à dispositivo.
-
-    void *src_buffer;
     int head=0;
+    void *src_buffer;
 
     debug_print("network_buffer_out:\n");
 
@@ -180,9 +159,9 @@ int network_buffer_out ( void *buffer, int len )
 
 // circula.
     NETWORK_BUFFER.send_head++;
-    if (NETWORK_BUFFER.send_head >= 8)
+    if (NETWORK_BUFFER.send_head >= 8){
         NETWORK_BUFFER.send_head=0;
-
+    }
 
 // #todo
 // MTU: maximim transmition unit.
@@ -194,7 +173,7 @@ int network_buffer_out ( void *buffer, int len )
         return -1;
     }
 
-// Pega o destination buffer.
+// Get the source buffer.
     src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
 // Copy
     if ((void*)src_buffer != NULL){
@@ -203,10 +182,10 @@ int network_buffer_out ( void *buffer, int len )
 
     //printf("network_buffer_in: ok\n");
     //refresh_screen();
-    return 0;//ok
+    return 0;  //ok
     
 fail:
-   return -1;
+   return (int) -1;
 }
 
 void networkSetstatus (int status)
@@ -253,7 +232,6 @@ int networkInit (void)
 // decodificar o buffer, caso contrário deve ignorar.
 
     ____network_late_flag=0;
-
 
 // buffers:
 // We will create 32 buffers to receive data and
@@ -332,15 +310,12 @@ int networkInit (void)
     HostInfo->used = TRUE;
     HostInfo->magic = 1234;
 
-//
-// == Socket =============================================
-//
-
+// Socket
 // Criando socket para local host porta 80;
 // Localhost (127.0.0.1):80 
 // Configurando soquete atual.
 
-    debug_print ("networkInit: LocalHostHTTPSocket \n");
+    debug_print ("networkInit: LocalHostHTTPSocket\n");
 
     LocalHostHTTPSocket = (struct socket_d *) create_socket_object();  
     if ( (void *) LocalHostHTTPSocket == NULL ){

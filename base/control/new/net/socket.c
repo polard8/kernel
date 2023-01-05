@@ -246,7 +246,6 @@ socket_gramado (
     int type, 
     int protocol )
 {
-    pid_t current_process = (pid_t) get_current_process();
 
 // Esse é o arquivo usado pelos aplicativos.
 // Uma estrutura de socket será associada à 
@@ -272,15 +271,17 @@ socket_gramado (
         goto fail;
     }
 
-// Process.
-// #todo
-// Check 'current_process'?
-// #todo: max.
+    sock->addr.sa_family  = family;
+    sock->addr.sa_data[0] = 'x'; 
+    sock->addr.sa_data[1] = 'x';
 
-    //if ( current_process < 0 || 
-    //     current_process >= PROCESS_COUNT_MAX )
-    //{
-    //}
+// Process
+
+    pid_t current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("socket_gramado: current_process\n");
+        goto fail;
+    }
 
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
@@ -450,8 +451,6 @@ socket_inet (
     register int i=0;
     int __slot = -1;
 
-    pid_t current_process = (pid_t) get_current_process();
-
     if ( (void*) sock == NULL ){
         debug_print ("socket_inet: sock\n");
         goto fail;
@@ -465,15 +464,17 @@ socket_inet (
         goto fail;
     }
 
-// Process.
-// #todo
-// Check 'current_process'?
-// #todo: max.
+    sock->addr_in.sin_family      = AF_INET;
+    sock->addr_in.sin_port        = 11369;  //??
+    sock->addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
 
-    //if ( current_process < 0 || 
-    //     current_process >= PROCESS_COUNT_MAX )
-    //{
-    //}
+// Process
+
+    pid_t current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("socket_inet: current_process\n");
+        goto fail;
+    }
 
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
@@ -759,8 +760,6 @@ socket_unix (
 
     debug_print ("socket_unix:\n");
 
-    pid_t current_process = (pid_t) get_current_process();
-
     if ( (void*) sock == NULL ){
         debug_print ("socket_unix: sock\n");
         goto fail;
@@ -774,8 +773,17 @@ socket_unix (
         goto fail;
     }
 
-// Process.
-//#todo: check pid validation
+    sock->addr.sa_family  = family;
+    sock->addr.sa_data[0] = 'x'; 
+    sock->addr.sa_data[1] = 'x';
+
+// Process
+
+    pid_t current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("socket_unix: current_process\n");
+        goto fail;
+    }
 
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
@@ -2374,9 +2382,9 @@ int sys_socket ( int family, int type, int protocol )
     // it will return a pointer.
 
 // Socket structure.
-    struct socket_d  *__socket;
+    struct socket_d *__socket;
 // Current process.
-    struct process_d  *p;
+    struct process_d *p;
 // ip:port. 
 // Used in the socket struture.
     unsigned int _ipv4 = 
@@ -2387,29 +2395,6 @@ int sys_socket ( int family, int type, int protocol )
         (unsigned short) 0x0000;
     int Verbose = FALSE;
 
-//
-// Address types:
-//
-
-// ====================
-// type 1:
-// Socket address structure.
-// Usado em AF_GRAMADO
-    struct sockaddr  addr;
-    addr.sa_family  = family;
-    addr.sa_data[0] = 'x'; 
-    addr.sa_data[1] = 'x';
-
-// ====================
-// type 2:
-// Internet style for inet.
-// Usado em AF_INET
-    struct sockaddr_in  addr_in;
-    addr_in.sin_family      = AF_INET;
-    addr_in.sin_port        = 11369;  //??
-    addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
-    //addr_in.sin_addr      = SYS_SOCKET_IP(192, 168, 1, 112); //errado
-    //addr_in->sin_addr.s_addr = inet_addr("127.0.0.1");  //todo: inet_addr see netbsd
 
     pid_t current_process = (pid_t) get_current_process();
     
@@ -2417,8 +2402,7 @@ int sys_socket ( int family, int type, int protocol )
     // Slow.
 
     /*
-    if ( Verbose == TRUE )
-    {
+    if ( Verbose == TRUE ){
         printf ("\n======================================\n");
         printf ("sys_socket: PID %d | family %d | type %d | protocol %d \n",
             current_process, family, type, protocol );
@@ -2427,7 +2411,6 @@ int sys_socket ( int family, int type, int protocol )
     */
 
     debug_print ("sys_socket:\n");
-
 
 // Filters
 
@@ -2463,8 +2446,7 @@ int sys_socket ( int family, int type, int protocol )
     }
 
 // Current pid.
-    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX)
-    {
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
     }
@@ -2479,10 +2461,7 @@ int sys_socket ( int family, int type, int protocol )
         panic ("sys_socket: p validation\n");
     }
 
-//
 // Socket structure.
-//
-
 // #todo:
 // Create a helper function to do this job.
 // This functions need to create the object and need to have this switch
@@ -2532,7 +2511,6 @@ int sys_socket ( int family, int type, int protocol )
     case AF_GRAMADO:
         debug_print ("sys_socket: AF_GRAMADO\n");
         __socket->connection_type = 1;  //local connection.
-        __socket->addr = addr;  // Address type used by AF_GRAMADO.
         return (int) socket_gramado ( (struct socket_d *) __socket, 
                          AF_GRAMADO, type, protocol );
         break;
@@ -2541,7 +2519,6 @@ int sys_socket ( int family, int type, int protocol )
     case AF_UNIX:
         debug_print ("sys_socket: AF_UNIX\n");
         __socket->connection_type = 1;  //local connection
-        __socket->addr = addr;  // Address type used by AF_UNIX.
         return (int) socket_unix ( (struct socket_d *) __socket, 
                          AF_UNIX, type, protocol );
         break;
@@ -2551,8 +2528,7 @@ int sys_socket ( int family, int type, int protocol )
     //para essa função, e usarmos outra estrutura.               
     case AF_INET:
         debug_print ("sys_socket: AF_INET\n");
-        //__socket->connection_type = ?;  //Is it really a remote connection?
-        __socket->addr_in = addr_in;  // Address type used by AF_INET.
+        __socket->connection_type = 0;//?;  //Is it really a remote connection?
         return (int) socket_inet ( (struct socket_d *) __socket, 
                          AF_INET, type, protocol );
         break;
