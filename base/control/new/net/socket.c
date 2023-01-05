@@ -246,11 +246,6 @@ socket_gramado (
     int type, 
     int protocol )
 {
-
-// Esse é o arquivo usado pelos aplicativos.
-// Uma estrutura de socket será associada à 
-// essa estrutura der arquivo.
-// Retornaremos seu fd.
     file *_file;
     struct process_d *Process;
     register int i=0;
@@ -324,10 +319,8 @@ socket_gramado (
         goto fail;
     }
 
-//
-// == Buffer ========================
-//
-    
+// Buffer
+
     //char *buff = (char *) newPage ();
     char *buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
@@ -337,9 +330,7 @@ socket_gramado (
         goto fail;
     }
 
-//
 // File
-//
 
     _file = (void *) kmalloc ( sizeof(file) );
     if ( (void *) _file == NULL  ){
@@ -380,11 +371,9 @@ socket_gramado (
     _file->_flags = __SWR;
 // No name for now.
     _file->_tmpfname = NULL;
-        //_file->_tmpfname = "socket";
+    //_file->_tmpfname = "socket";
 
-//
 // Buffer
-//
 
     _file->_base = buff;
     _file->_p    = buff;
@@ -395,39 +384,25 @@ socket_gramado (
     _file->_r = 0;
     _file->_w = 0;
 // Status do buffer do socket.
-    _file->socket_buffer_full = 0;  
-
+    _file->socket_buffer_full = 0;
 // Socket pointer
 // Associando a estrutura de socket à estrutura de arquivo.
     _file->socket = sock;
-
 // O arquivo do soquete, o buffer ?
     sock->private_file = (file *) _file; 
-
 // Socket pointer.
 // Salvamos o ponteira para estrutura de soquete
 // na estrutura de processo do processo atual.
     Process->priv = (void *) sock;
-
-//
 // fd
-//
-
     _file->_file = __slot;
-
 // Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
-
     _file->used = TRUE;
     _file->magic = 1234;
-
-    // debug_print ("socket_gramado: done\n");
-
 // ok.
 // Retornamos o fd na lista de arquivos abertos pelo processo.
-
     return (int) __slot;
-
 fail:
     debug_print ("socket_gramado: [FAIL]\n");
     refresh_screen();
@@ -516,12 +491,10 @@ socket_inet (
         goto fail;
     }
 
-//
-// == Buffer ==========================
-//
+// Buffer
 
-    char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
@@ -529,9 +502,7 @@ socket_inet (
         goto fail;
     }
 
-//
 // File
-//
 
     _file = (void *) kmalloc( sizeof(file) );
     if ( (void *) _file == NULL  ){
@@ -584,30 +555,20 @@ socket_inet (
     _file->socket_buffer_full = 0;
 
     _file->socket = sock;
-
 // O arquivo do soquete, o buffer ?
-    sock->private_file = (file *) _file; 
-
+    sock->private_file = (file *) _file;
 // Salvamos o ponteira para estrutura de soquete
 // na estrutura de processo do processo atual.
     Process->priv = (void *) sock;
-
 // fd
     _file->_file = __slot;
-
     _file->used = TRUE;
     _file->magic = 1234;
-
 // Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
-
-    //debug_print ("socket_inet: done\n");
-
 // ok
 // Retornamos o fd na lista de arquivos abertos pelo processo.
-
     return (int) __slot;
-
 fail:
     debug_print ("socket_inet: [FAIL]\n");
     refresh_screen();
@@ -634,17 +595,12 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
     }
 
 // file
-
     f = (file *) p->Objects[fd];
     if ( (void *) f == NULL ){
         debug_print("socket_ioctl: [FAIL] f\n");
         return -1;
     }
-// #bugbug
-// Se eh uma chamada vinda de ring3, entao nao conseguira
-// acessar a estrutura ... problemas com registrador de segmentos.
-    if (f->used != TRUE || f->magic != 1234 )
-    {
+    if (f->used != TRUE || f->magic != 1234 ){
         panic("socket_ioctl: validation\n");
     }
 
@@ -652,46 +608,47 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
 
     switch (request){
 
-        // #bugbug
-        // Nao conseguimos usar direito os elementos da estrutura
-        // Precisamos trabalhar na interrupçao do sistema,
-        // na coisa dos segmentos de dados ...
-        // Por causa do tipo de segmento, estamos escrevendo 
-        // ou lendo no lugar errado.
+    // #bugbug
+    // Nao conseguimos usar direito os elementos da estrutura
+    // Precisamos trabalhar na interrupçao do sistema,
+    // na coisa dos segmentos de dados ...
+    // Por causa do tipo de segmento, estamos escrevendo 
+    // ou lendo no lugar errado.
 
-        case 4000:
-            debug_print ("socket_ioctl: [4000]\n");
-            printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
-            refresh_screen();
-            // Is it a valid pid?
-            f->sync.sender = (pid_t) arg;
-            return 0;
-            break;
+    case 4000:
+        debug_print ("socket_ioctl: [4000]\n");
+        printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
+        refresh_screen();
+        // Is it a valid pid?
+        f->sync.sender = (pid_t) arg;
+        return 0;
+        break;
 
-        case 4001:
-            return (int) f->sync.sender;
-            break;
+    case 4001:
+        return (int) f->sync.sender;
+        break;
 
-        case 4002:
-            return (int) f->sync.can_read;
-            break;
+    case 4002:
+        return (int) f->sync.can_read;
+        break;
 
-        case 4003:
-            return (int) f->sync.can_write;
-            break;
+    case 4003:
+        return (int) f->sync.can_write;
+        break;
 
-        case 4004:
-            return (int) f->sync.can_execute;
-            break;
+    case 4004:
+        return (int) f->sync.can_execute;
+        break;
 
-        // ...
+    // ...
 
-        default:
-            return (int) (-EINVAL);
-            break;
+    default:
+        return (int) (-EINVAL);
+        break;
     };
 
-    return -1;
+fail:
+    return (int) -1;
 }
 
 int socket_read ( unsigned int fd, char *buf, int count )
@@ -708,12 +665,10 @@ int socket_write ( unsigned int fd, char *buf, int count )
 
 pid_t socket_get_gramado_port (int port)
 {
-//port
     if ( port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return (pid_t) -1;
     }
-
     return (pid_t) gramado_ports[port];
 }
 
@@ -721,19 +676,14 @@ pid_t socket_get_gramado_port (int port)
 // Usados apenas na famíla AF_GRAMADO.
 int socket_set_gramado_port (int port, pid_t pid)
 {
-//port
     if ( port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
     }
-
-//pid
-//todo: max
-    if (pid<0){
+    if (pid<0 || pid >= PROCESS_COUNT_MAX){
         debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
     }
-
     gramado_ports[port] = (pid_t) pid;
 
     return 0;
@@ -754,9 +704,6 @@ socket_unix (
     struct process_d *Process;
     register int i=0;
     int __slot = -1;
-
-//#todo
-//check sock arg.
 
     debug_print ("socket_unix:\n");
 
@@ -826,12 +773,10 @@ socket_unix (
         goto fail;
     }
 
-//
-// == Buffer ================
-//
+// Buffer
 
-    char *buff = (char *) kmalloc(BUFSIZ);
     //char *buff = (char *) newPage ();
+    char *buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
@@ -839,9 +784,7 @@ socket_unix (
         goto fail;
     }
 
-//
 // File
-//
 
     _file = (void *) kmalloc( sizeof(file) );
     if ( (void *) _file == NULL  ){
@@ -851,7 +794,8 @@ socket_unix (
     }
     memset( _file, 0, sizeof(struct file_d) );
 
-// #todo: Podemos adiar isso para o fim da rotina.
+// #todo: 
+// Podemos adiar isso para o fim da rotina.
     _file->used = TRUE;
     _file->magic = 1234;
 
@@ -885,7 +829,6 @@ socket_unix (
 // #bugbug: 
 // unix sockets has names.
 // it's like a normal fs pathname.
-
     _file->_tmpfname = NULL;
     //_file->_tmpfname = "/tmp/socketXXX";    
 
@@ -904,23 +847,16 @@ socket_unix (
 
 // O arquivo do soquete, o buffer?
     sock->private_file = (file *) _file; 
-
 // Salvamos o ponteira para estrutura de soquete
 // na estrutura de processo do processo atual.
     Process->priv = (void *) sock;
-
-// fd.
+// fd
     _file->_file = __slot;
-
 //Colocando na lista de arquivos abertos no processo.
     Process->Objects[__slot] = (unsigned long) _file;
-
-    //debug_print ("socket_unix: done\n");
-
-    //ok.
-    // Retornamos o fd na lista de arquivos abertos pelo processo.
+// ok.
+// Retornamos o fd na lista de arquivos abertos pelo processo.
     return (int) __slot;
-
 fail:
     debug_print ("socket_unix: fail\n");
     refresh_screen();
@@ -1387,10 +1323,7 @@ sys_bind (
         goto fail; 
     }
 
-//
 // family
-//
-
 // Everything is ok.
 // Binding the name to the socket.
 // So now we need to include the 'name' into the socket structure
@@ -1428,7 +1361,6 @@ sys_bind (
     }
 //--    
 
-
 //++
 // AF_INET
     if (s->addr.sa_family == AF_INET)
@@ -1442,19 +1374,15 @@ sys_bind (
 
 // #fail
 // A família é de um tipo não suportado.
-
     debug_print ("sys_bind: [FAIL] family not valid\n");
     printf      ("sys_bind: [FAIL] family not valid\n");
-
 // fail
-
 fail:
     debug_print ("sys_bind: [FAIL] Something is wrong!\n");
     printf      ("sys_bind: [FAIL] Something is wrong!\n");
     refresh_screen();
     return (int) (-1);
 }   
-
 
 /*
  * sys_connect:
@@ -1790,19 +1718,15 @@ sys_connect (
     }
 
 // This file doesn't accept connections.
-// #todo: 
-// This way we can reject connections before the server binds
-// with an address.
+// #todo:
+// This way we can reject connections before the server binds with an address.
 
     if (f->sync.can_connect != TRUE){
         printf ("sys_connect: [PERMISSION FAIL] Client doesn't accept connections.\n");
         goto fail;
     }
 
-//
 // Client socket structure
-//
-
 // Socket structure in the sender's file.
 // Pega a estrutura de socket associada ao arquivo.
 
@@ -1824,14 +1748,10 @@ sys_connect (
         goto fail;
     }
 
-//
-// == Server process ===============================
-//
-
+// Server process
 // #todo
 // O arquivo de socket do cliente 
 // precisa ter um fd no processo servidor.
-
 // target pid.
 // O pid do processo servidor.
 // Pegamos o target_pid logo acima na porta solicitada.
@@ -1909,10 +1829,7 @@ __OK_new_slot:
     //sProcess->Objects[__slot] = (unsigned long) f;  // no que encontramos
     sProcess->Objects[31] = (unsigned long) f;  // no 31.
 
-//
-// == Connecting! ======================================
-//
-
+// Connecting!
 // #bugbug
 // connect() eh chamado somente uma vez pelo cliente.
 // A conexao deve ficar pendente numa lista e o accept
@@ -2010,10 +1927,8 @@ __OK_new_slot:
         refresh_screen();
         while(1){}
     }
-
 //ok.
     return 0;
-
 fail:
     debug_print("sys_connect: Fail\n");
     printf     ("sys_connect: Fail\n");
@@ -2035,9 +1950,8 @@ sys_getsockname (
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if ( sockfd < 0 || sockfd >= OPEN_MAX )
-    {
-        printf ("sys_getsockname: [FAIL ]sockfd \n");
+    if ( sockfd < 0 || sockfd >= OPEN_MAX ){
+        printf ("sys_getsockname: [FAIL ] sockfd\n");
         refresh_screen();
         return -1;
     }
@@ -2102,9 +2016,10 @@ sys_getsockname (
     printf ("sys_getsockname: process %d ; family %d ; len %d \n", 
         current_process, addr->sa_family, addrlen  );
  
+ fail:
     printf ("sys_getsockname: fail\n");
     refresh_screen();
-    return -1;
+    return (int) -1;
 }
 
 
@@ -2200,7 +2115,7 @@ int sys_listen (int sockfd, int backlog)
 // Is it a socket object?
     int IsSocket = -1;
     IsSocket = (int) is_socket((file *)f);
-    if(IsSocket != TRUE){
+    if (IsSocket != TRUE){
         debug_print ("sys_listen: f is not a socket\n");
         printf      ("sys_listen: f is not a socket\n");
         goto fail;
@@ -2245,7 +2160,6 @@ fail:
     printf      ("sys_listen: [FAIL]\n");
     refresh_screen();
     //while(1){}
-    
     return -1;
 }
 
@@ -2271,9 +2185,8 @@ int sys_socket_shutdown (int socket, int how)
     //printf      ("sys_socket_shutdown: [TODO] fd=%d how=%d\n",
     //    socket, how );
 
-    // Invalid fd.
-    if ( socket < 0 || socket >= OPEN_MAX )
-    {
+// Invalid fd.
+    if ( socket < 0 || socket >= OPEN_MAX ){
         debug_print ("sys_socket_shutdown: [FAIL] fd\n");
         printf      ("sys_socket_shutdown: [FAIL] fd\n");
         return (int) (-EBADF);
@@ -2281,6 +2194,10 @@ int sys_socket_shutdown (int socket, int how)
 
 // Process
     pid_t current_process = (pid_t) get_current_process();
+    if (current_process < 0  || current_process >= PROCESS_COUNT_MAX){
+        printf      ("sys_socket_shutdown: p fail\n");
+        goto fail;        
+    }
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
         debug_print ("sys_socket_shutdown: p fail\n");
@@ -2288,10 +2205,7 @@ int sys_socket_shutdown (int socket, int how)
         goto fail;
     }
 
-//
 // File
-//
- 
 // sender's file
 // Objeto do tipo socket.
 
@@ -2310,10 +2224,7 @@ int sys_socket_shutdown (int socket, int how)
         goto fail;
     }
 
-//
 // Socket
-//
-
 // Yes, This is a socket object.
 // Let's get the socket structure associated with the file.
 // Let's simply change the flag for this socket.
@@ -2333,7 +2244,7 @@ int sys_socket_shutdown (int socket, int how)
 fail:
     debug_print ("sys_socket_shutdown: [FAIL]\n");
     printf      ("sys_socket_shutdown: [FAIL]\n");
-    return -1;
+    return (int) -1;
 }
 
 int 
@@ -2395,7 +2306,6 @@ int sys_socket ( int family, int type, int protocol )
         (unsigned short) 0x0000;
     int Verbose = FALSE;
 
-
     pid_t current_process = (pid_t) get_current_process();
     
     // #debug
@@ -2441,7 +2351,7 @@ int sys_socket ( int family, int type, int protocol )
 
 // #debug
 // '0' is the only valid value for now.
-    if( protocol != 0){
+    if ( protocol != 0){
         panic ("sys_socket: protocol not supported yet.\n");
     }
 
@@ -2450,7 +2360,6 @@ int sys_socket ( int family, int type, int protocol )
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
     }
-
 // Process structure.
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
@@ -2475,24 +2384,20 @@ int sys_socket ( int family, int type, int protocol )
         printf      ("sys_socket: __socket\n");
         goto fail;
     }
-
 // family, type and protocol.
     __socket->family   = family;
     __socket->type     = type;      // DATAGRAM or STREAM 
     __socket->protocol = protocol;
-
 // ip:port
 // Initialized with '0'.
     __socket->ip_ipv4 = (unsigned int) _ipv4;
     __socket->ip_ipv6 = (unsigned long) _ipv6;
     __socket->port = 
         (unsigned short) port;
-
 // pid, uid, gid.
     __socket->pid = (pid_t) current_process;
     __socket->uid = (uid_t) current_user;
     __socket->gid = (gid_t) current_group;
-
 // #bugbug
 // Set the private socket of a process.
 // This is not good. 
@@ -2570,7 +2475,6 @@ sock_socketpair (
         debug_print("sock_socketpair: sock1\n");
         return -1;
     }
-
 // ===============
     fd2 = sys_socket(family,type,protocol);
     sock2 = get_socket_from_fd(fd2);    
@@ -2578,10 +2482,8 @@ sock_socketpair (
         debug_print("sock_socketpair: sock2\n");
         return -1;
     }
-
 // #todo
 // Antes é preciso verificar a área de memória.
-
     usockvec[0] = fd1;
     usockvec[1] = fd2;
 

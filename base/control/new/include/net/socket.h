@@ -1,6 +1,6 @@
 
 // socket.h
-// suporte a socket dentro do kernel.
+// Header for socket implementation.
 
 #ifndef ____SOCKET_H
 #define ____SOCKET_H    1
@@ -188,7 +188,7 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define PF_RS232	AF_RS232
 #define PF_MAX		AF_MAX
 
-/* Maximum queue length specifiable by listen().  */
+// Maximum queue length specifiable by listen().
 //#define SOMAXCONN	128
 #define SOMAXCONN    32
 
@@ -220,7 +220,7 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define MSG_NOSIGNAL	0x4000	/* Do not generate SIGPIPE */
 #define MSG_MORE	0x8000	/* Sender will send more */
 
-#define MSG_EOF         MSG_FIN
+#define MSG_EOF  MSG_FIN
 
 #if defined(CONFIG_COMPAT)
 #define MSG_CMSG_COMPAT	0x80000000	/* This message needs 32 bit fixups */
@@ -282,9 +282,8 @@ struct mmsghdr {
 #define SOL_RXRPC	272
 
 
-/* IPX options */
+// IPX options
 #define IPX_TYPE	1
-
 
 
 /*
@@ -329,9 +328,9 @@ struct mmsghdr {
  * Types of socket shutdown(2).
  */
  
-#define  SHUT_RD      0    /* Disallow further receives. */
-#define  SHUT_WR      1    /* Disallow further sends. */
-#define  SHUT_RDWR    2    /* Disallow further sends/receives. */
+#define SHUT_RD    0    /* Disallow further receives. */
+#define SHUT_WR    1    /* Disallow further sends. */
+#define SHUT_RDWR  2    /* Disallow further sends/receives. */
 
 /* 
  * Read using getsockopt() with SOL_SOCKET, SO_PEERCRED 
@@ -366,30 +365,25 @@ struct	accept_filter_arg {
 };
 */
 
-
 /*
  * Level number for (get/set)sockopt() to apply to socket itself.
  */
 //#define	SOL_SOCKET	0xffff		/* options for socket level */
 
 
-// See:
-// http://alas.matf.bg.ac.rs/manuals/lspe/snode=25.html
-// not bsd.
 struct sockaddr 
 {
-    //unsigned char   sa_len;
-    unsigned short  sa_family;
-    char            sa_data[14];
+    unsigned short sa_family;
+    char           sa_data[14];
 };
-
 
 /*
  * Structure used by kernel to pass protocol
  * information in raw sockets.
  * bsd
  */
-struct sockproto {
+struct sockproto 
+{
     unsigned short sp_family;    // address family 
     unsigned short sp_protocol;  // protocol 
 };
@@ -544,11 +538,10 @@ struct socket_d
 // se ele está ou não aceitando conexões. ...
 // ...
     unsigned short flags; 
-// usada em endereços AF_GRAMADO
-    struct sockaddr addr;
-// usada em endereços AF_INET
-// Where is it defined?
-    struct sockaddr_in addr_in; 
+
+// Local structures for address.
+    struct sockaddr     addr;
+    struct sockaddr_in  addr_in; 
 };
 
 // see: socket.c

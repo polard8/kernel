@@ -1,4 +1,8 @@
+
 // 'shutdown' command for Gramado.
+// It shuts down the machine via i/o ports
+// if we are running on qemu.
+// Environment: ring 3 application.
 
 #include <rtl/gramado.h>
 #include <stddef.h>
@@ -28,7 +32,6 @@
 
 #define Device_Control  2
 
-
 #define is_qemu  rtl_is_qemu
 
 
@@ -39,7 +42,7 @@
 static void __serial_write_char (unsigned char data);
 static void test_disk_size(void);
 
-
+// ===================================
 
 // Vai escrever em uma porta ja inicializada pelo kernel.
 static void __serial_write_char (unsigned char data) 
@@ -168,7 +171,7 @@ int main ( int argc, char *argv[] )
 // In newer versions of QEMU, you can do shutdown with:
     isQEMU = (int) is_qemu();
     if (isQEMU == TRUE){
-        debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down \n");
+        debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down\n");
         libio_outport16(
             (unsigned short) 0x604, 
             (unsigned short) 0x2000 );
