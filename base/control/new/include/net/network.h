@@ -103,6 +103,14 @@ extern int ____network_late_flag;
 //
 // == Prototypes ====================
 //
+void 
+SendARP( 
+    int op,   //operation
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6] );
+
+void testNIC(void);
 
 void 
 network_handle_ipv4( 

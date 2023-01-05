@@ -1334,6 +1334,12 @@ int consoleCompareStrings(void)
     //debug_print("consoleCompareStrings: \n");
     printf("\n");
 
+// test nic
+    if ( strncmp(prompt,"test-nic",8) == 0 ){
+        testNIC();
+        goto exit_cmp;
+    }
+
 // mod0: Call the entrypoint of the module.
 // mod0.bin entry point.
     if ( strncmp(prompt,"mod0",4) == 0 ){

@@ -1042,23 +1042,27 @@ on_receiving (
         (struct e1000_ether_header_d *) buffer;
     uint16_t Type=0;
 
-
-    if ( (void*) buffer == NULL )
+    if ( (void*) buffer == NULL ){
         return;
-    if(size<0)
+    }
+    if (size<0){
         return;
+    }
 
- 
-    printf("\n");
-    printf("Ethernet Header\n");
+    // #debug
+    //printf("\n");
+    //printf("Ethernet Header\n");
 
-    if ( (void*) eth == NULL )
+    if ( (void*) eth == NULL ){
         return;
+    }
 
-    // Destination MAC
-    // Source MAC
-    // Protocol type.
+// #debug
+// Destination MAC
+// Source MAC
+// Protocol type.
 
+/*
     printf ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
         eth->dst[0], eth->dst[1], eth->dst[2], 
         eth->dst[3], eth->dst[4], eth->dst[5] );
@@ -1069,7 +1073,9 @@ on_receiving (
 
     printf ("   |-Ethertype           : %x \n",
         (unsigned short) eth->type);
-    
+*/
+
+
     Type = (uint16_t) e1000_FromNetByteOrder16(eth->type);
 
     switch ( (uint16_t) Type ){
@@ -1090,6 +1096,10 @@ on_receiving (
     case 0x880B:
         printf ("[0x880B]: PPP received\n");
         break;
+    default:
+        printf ("Default type\n");
+        break;
+        
     };
 
     refresh_screen();
@@ -1099,23 +1109,18 @@ on_receiving (
 static void DeviceInterface_e1000(void)
 {
     unsigned char *buffer;
-
     uint32_t status=0;
-
     uint32_t val=0;
     uint16_t old=0;
     uint32_t len=0;
-
 // The ethernet header.
     struct e1000_ether_header_d *eh;
     uint16_t Type=0;
 
 // Without this, the card may spam interrupts.
     __E1000WriteCommand( currentNIC, 0xD0, 1 );
-
 // Status
-    status = __E1000ReadCommand( currentNIC, 0xC0 ); 
-
+    status = __E1000ReadCommand( currentNIC, 0xC0 );
     // 0x04 - Linkup
     // Start link.
     if (status & 0x04){
