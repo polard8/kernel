@@ -33,204 +33,230 @@ SendARP(
     uint8_t target_ip[4], 
     uint8_t target_mac[6] )
 {
+    struct ether_header *eh;
+    struct ether_arp *h;
+    register int i=0;
+
+    // #debug
     printf("SendARP:\n");
     refresh_screen();
 
-    struct ether_header *eh;
-    struct ether_arp *h;
-    int i=0;
-
+// The structure for the INtel NIC device.
     if ( (void*) currentNIC == NULL ){
         printf ("SendARP: currentNIC fail\n");
-        return;
+        goto fail;
     }
 
-// Source IP.
-// Configurando a estrutura do dispositivo.
-// #bugbug
-// Estamos configurando a estrutura do dispositivo
-// Esse não é o momento de fazermos isso.
+// A given IP number for Gramado.
+// Saving it into the NIC structure.
 // 192.168.1.112
-// ip do gramado.
+
     currentNIC->ip_address[0] = source_ip[0];  //192;
     currentNIC->ip_address[1] = source_ip[1];  //168;
     currentNIC->ip_address[2] = source_ip[2];  //1;
     currentNIC->ip_address[3] = source_ip[3];  //112;
-    //...
 
 //==============================================
 // # ethernet header #
-//
-
     eh = (void *) kmalloc( sizeof(struct ether_header) );
     if ( (void *) eh == NULL){
         printf ("SendARP: eh struct fail\n");
-        return;
-    }else{
-		// Coloca na estrutura do ethernet header os seguintes valores: 
-		// > endere�o mac da origem.
-		// > endere�o mac do destion.
-		// O endere�o mac da origem est� na estrutura do controlador nic intel. 
-		// O endere�o mac do destino foi passado via argumento.
-        for ( i=0; i<6; i++){
-            eh->src[i] = currentNIC->mac_address[i];    // source
-            eh->dst[i] = target_mac[i];                 // dest. 
-        };
-        eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
-        //...
+        goto fail;
+    }
+// MAC
+// Save the source and the destination mac into the ethernet header.
+// The destination mac came via argument.
+    for ( i=0; i<ETH_ALEN; i++){
+        eh->mac_src[i] = (uint8_t) currentNIC->mac_address[i];
+        eh->mac_dst[i] = (uint8_t) target_mac[i];
     };
-
-
+// TYPE
+    eh->type = (uint16_t) ToNetByteOrder16(ETH_TYPE_ARP);
 
 //==============================================
 // # arp header #
-//
     h = (void *) kmalloc ( sizeof(struct  ether_arp) );
     if ( (void *) h == NULL){
         printf ("SendARP: struct h fail");
         return;
-    }else{
-		// Hardware type (HTYPE)   (00 01)
-		// Protocol type (PTYPE)   (08 00)
-		// Hardware address length (MAC)
-		// Protocol address length (IP)
-        h->type = 0x0100;
-        h->proto = 0x0008;
-        h->hlen = 6;
-        h->plen = 4;
-		// Operation (OPER) (dois bytes invertidos)
-        //invalid operation
-        if (op != ARP_OPC_REQUEST && op != ARP_OPC_REPLY ){
-            //#debug
-            panic ("SendARP: invalid operation");
-        }
-        h->op = ToNetByteOrder16(op);        
-        //h->op = ToNetByteOrder16(ARP_OPC_REPLY);
-        //h->op = ToNetByteOrder16(ARP_OPC_REQUEST);
+    }
 
-		// mac
-		// Configurando na estrutura de arp o endere�o mac de origem e destino.
-		// sender mac
-		// target mac
-		// O endere�o mac de origem pegamos na estrutura no nic intel.
-		// O endere�o mac de destino foi passado via argumento.
-        for ( i=0; i<6; i++ ){
-            h->arp_sha[i] = currentNIC->mac_address[i]; 
-            h->arp_tha[i] = target_mac[i]; 
-        };
+//
+// Header
+// see: arp.h
+//
 
-		// ip
-		// Configurando na estrutura de arp o endere�o do ip de origem e 
-		// o ip de destino.
-		// sender ip
-		// target ip
-		// Os endere�os foram passados via argumento.
-        for ( i=0; i<4; i++ ){
-            h->arp_spa[i] = source_ip[i]; 
-            h->arp_tpa[i] = target_ip[i]; 
-        };
-        //...
+// Hardware type (HTYPE)   (00 01)
+    h->type = (uint16_t) 0x0100;
+// Protocol type (PTYPE)   (08 00)
+    h->proto = (uint16_t) 0x0008;
+// Hardware address length (MAC)
+    h->hlen = (uint8_t) ETH_ALEN;
+// Protocol address length (IP)
+    h->plen = (uint8_t) 4;
+// Operation (OPER)
+// We only have two valid operation codes.
+    if ( op != ARP_OPC_REQUEST && 
+         op != ARP_OPC_REPLY )
+    {
+        panic("SendARP: Invalid operation code\n");
+    }
+    h->op = (uint16_t) ToNetByteOrder16(op);  // Invert the two bytes.
+
+//
+// Addresses
+//
+
+// MAC addresses
+// Hardware address
+    for ( i=0; i<ETH_ALEN; i++ ){
+        h->arp_sha[i] = (uint8_t) currentNIC->mac_address[i]; 
+        h->arp_tha[i] = (uint8_t) target_mac[i]; 
+    };
+// IP addresses
+// Protocol address
+    for ( i=0; i<4; i++ ){
+        h->arp_spa[i] = (uint8_t) source_ip[i]; 
+        h->arp_tpa[i] = (uint8_t) target_ip[i]; 
     };
 
-	//==================================
-	//#debug
-	//show arp
-	/*
-	printf("\n\n");
-	printf("[arp]\n\n");
-	printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
-	    h->type ,h->proto ,h->hlen ,h->plen ,h->op);
-	
-	printf("\n sender: mac ");
-	for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
-	printf("\n sender: ip ");
-	for( i=0; i<4; i++){ printf("%d ",h->arp_spa[i]); }
-	printf("\n target: mac ");
-	for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
-	printf("\n target: ip ");
-	for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
-	*/
-	//==================================
-
+//==================================
+// #debug
+// show arp header.
+/*
+    printf("\n\n");
+    printf("[arp]\n\n");
+    printf("type={%x} proto={%x} hlen={%d} plen={%d} op={%x} \n", 
+        h->type ,h->proto ,h->hlen ,h->plen ,h->op);
+    printf("\n sender: mac ");
+    for( i=0; i<6; i++){ printf("%x ",h->arp_sha[i]); }
+    printf("\n sender: ip ");
+    for( i=0; i<4; i++){ printf("%d ",h->arp_spa[i]); }
+    printf("\n target: mac ");
+    for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
+    printf("\n target: ip ");
+    for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
+*/
+//==================================
 
 //
-// === # BUFFER # =====
+// Buffer
 //
 
-// ??
-// Quem?
-// Estamos pegando o offset que nos levar ao endere�o do buffer.
-// Usaremos esse offset logo abaixo.
+// Set up the pointers for the copy.
+
+// Offset do endereço do buffer.
+// Estamos pegando o offset que nos leva ao endereço do buffer.
 // Pegamos esse offset na estrutura do controlador nic intel.
-    uint16_t old = currentNIC->tx_cur;
-// Copiando o pacote no buffer.
-// Pegando o endere�o virtual do buffer na estrutura do controlador 
-// nic intel. Para isso usamos o offset obtido logo acima.
+// see: nicintel.h
+
+// pega o tail antigo.
+    //unsigned long address = (currentNIC->registers_base_address + 0x3810); //head
+    unsigned long address = (currentNIC->registers_base_address + REG_TDT); // tail
+    unsigned int value32 = (uint16_t) *( (volatile unsigned int *) address );
+    currentNIC->tx_cur = (uint16_t) (value32 & 0xFFFF);
+    uint16_t buffer_index = (uint16_t) currentNIC->tx_cur;
+
+    //#debug
+    //printf ("buffer_index {%d}\n",buffer_index);
+
+// Get the buffer address based on its offset.
     unsigned char *buffer = 
-        (unsigned char *) currentNIC->tx_descs_virt[old];
-
-// #importante:
-// Preparando ponteiros para manipularmos as estruturas usadas no pacote.
+        (unsigned char *) currentNIC->tx_descs_virt[buffer_index];
+// Get the addresses for the headers.
     unsigned char *src_ethernet = (unsigned char *) eh;
-    unsigned char *src_arp = (unsigned char *) h;
+    unsigned char *src_arp      = (unsigned char *) h;
 
 //
-// Copy.
+// Copy
 //
 
-// Copiando as estruturas para o buffer.
-// >Copiando o header ethernet.
-// >Copiando o arp logo ap�s do header ethernet.
+// Copy the ethernet header into the buffer.
+// 14 bytes.
+    for (i=0; i<ETHERNET_HEADER_LENGHT;i++)
+    {
+        buffer[i] = (unsigned char) src_ethernet[i];
+    };
+// Copy the arp header into the buffer.
+// 28 bytes
+// It starts right after the ethernet header.
+    for (i=0; i<ARP_HEADER_LENGHT;i++)
+    {
+        buffer[ETHERNET_HEADER_LENGHT + i] = (unsigned char) src_arp[i]; 
+    };
 
-// ethernet, arp.
-    for (i=0; i<14;i++){ buffer[i]      = src_ethernet[i]; };
-    for (i=0; i<28;i++){ buffer[i + 14] = src_arp[i]; };
+// ======================
 
 // lenght:
 // Vamos configurar na estrutura do nic intel o tamanho do pacote.
-// Ethernet frame length = ethernet header (MAC + MAC + ethernet type) + ethernet data (ARP header)
-// O comprimento deve ser o tamanho do header ethernet + o tamanho do header arp.
-// 14 + 28;
-    currentNIC->legacy_tx_descs[old].length = 
-        ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
+// Ethernet frame length: 
+// O tamanho do header ethernet + o tamanho do header arp.
+// ethernet header (MAC + MAC + ethernet type) + 
+// ethernet data (ARP header)
+// ( 14 + 28 );
+// #bugbug:
+// Is this the payload size.
+    currentNIC->legacy_tx_descs[buffer_index].length = 
+        (uint16_t) ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
+    //currentNIC->legacy_tx_descs[buffer_index].length = 
+    //    (uint16_t) 8192;
 
-	//??
-	//cso
-	//currentNIC->legacy_tx_descs[0].cso
+// cso
+// Checksum offset.
+    //currentNIC->legacy_tx_descs[buffer_index].cso = ?;
 
-	//??
-	//cmd ok
-	//currentNIC->legacy_tx_descs[0].cmd = TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP;
-	//currentNIC->legacy_tx_descs[0].cmd = TDESC_EOP | TDESC_RS; //intel code
+// Primeiro zera o status,
+// depois envia o comando.
 
+// status
+// status and reserved.
+    currentNIC->legacy_tx_descs[buffer_index].status = (uint8_t) 0;
 
 // cmd
-    currentNIC->legacy_tx_descs[old].cmd = 0x1B;
-// status
-    currentNIC->legacy_tx_descs[old].status = 0;
-// Current TX.
-// Qual � o buffer atual para transmiss�o.
-    currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
+    currentNIC->legacy_tx_descs[buffer_index].cmd = 
+        (uint8_t) 0x1B;
+    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
+    //    (uint8_t) (TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP);
+    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
+    //    (uint8_t) (TDESC_EOP | TDESC_RS);  //intel code
+    // CMD_EOP | CMD_IFCS | CMD_RS;
 
-	//css
-	//currentNIC->legacy_tx_descs[0].css
+// css
+// Checksum start
+    //currentNIC->legacy_tx_descs[buffer_index].css = (uint8_t) 0;
 
-	//??
-	//special ?
-	//currentNIC->legacy_tx_descs[0].special
+// special
+    //currentNIC->legacy_tx_descs[buffer_index].special = (uint16_t) 0;
+
+// Update the current offset for the next transmission buffer.
+// We have 8 transmission buffers.
+    currentNIC->tx_cur = 
+        (uint16_t) ( currentNIC->tx_cur + 1 ) % 8;
 
 //
-// ==== # SEND # ======
+// Send
 //
 
 // #importante: 
-// Diga ao controlador qual é o índice do descritor a ser usado 
-// para transmitir dados.
-// TDH	= 0x3810,    /* Tx Descriptor Head */
-// TDT	= 0x3818,    /* Tx Descriptor Tail */
+// Diga ao controlador quais são os índices do descritor 
+// a serem usado para transmitir dados.
+// TDH = 0x3810,  /* Tx Descriptor Head */
+// TDT = 0x3818,  /* Tx Descriptor Tail */
+// ??
+// #todo
+// Por que estamos configurando somente o tail nesse momento?
+// O offset é um valor de 16 bits.
 
-    // *( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
-    *( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;
+    unsigned int head = (unsigned int) 0;  // The first one.
+    unsigned int tail = (unsigned int) (currentNIC->tx_cur & 0xFFFF);  // The last one.
+
+// TDH = 0x3810, Tx Descriptor Head.
+    //*( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDH)) = 
+    //    (unsigned int) head;
+
+// TDT = 0x3818, Tx Descriptor Tail.
+    *( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDT)) = 
+        (unsigned int) tail;
 
 // #debug
 // Colocamos essa mensagem antes de entrarmos no while.
@@ -246,31 +272,44 @@ SendARP(
 // Fica travado aqui at� que seja enviado?
 // Poderia ter um timemout?.
 
-    int t=0;
-    for (t=0; t< 25000;t++)
-    {
-         if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
-         {
-              debug_print ("SendARP: done [timeout]\n");
-              //printf ("Ok");
-              return;
-         }
-    };
-
-    //#todo
+// #todo
+// This is a method for wating.
+// Espera enquanto for 0.
+// #bugbug: Isso pode esperar para sempre.
+    
     /*
-    while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
+    while ( !(currentNIC->legacy_tx_descs[buffer_index].status & 0xFF) )
     {
         // Nothing.
     };
     */
 
-    //debug_print ("SendARP: fail timeout.\n");    
-    //debug_print ("SendARP: done\n");
-    //printf (">>>> fail timeout.\n");
 
-    printf("SendARP: done\n");
+// Waiting using a timeout.
+// Espera por um tempo pelo valor '1'.
+    int t=0;
+    int tmax = 500000; //50000;
+    uint8_t status = 0;
+    for (t=0; t<tmax;t++)
+    {
+         // Get status
+         status = (uint8_t) currentNIC->legacy_tx_descs[buffer_index].status;
+         // Check if the status value is '1'.
+         //if ( (status & 0xFF) == 1 )
+         if ( (status & 0xFF) != 0 )
+         {
+              printf ("SendARP: [status ok] Done\n");
+              refresh_screen();
+              return;
+         }
+    };
+    printf ("SendARP: [fail] Timeout\n");
+    // goto fail;
+
+
+fail:
     refresh_screen();
+    return;
 }
 
 

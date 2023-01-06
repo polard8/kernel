@@ -461,17 +461,17 @@ typedef	__uid_t		uid_t;		// user id
  * Socket credentials.
  */
 /* 
-struct sockcred {
-	pid_t	sc_pid;			// process id 
-	uid_t	sc_uid;			// real user id 
-	uid_t	sc_euid;		// effective user id 
-	gid_t	sc_gid;			// real group id 
-	gid_t	sc_egid;		// effective group id 
-	int	sc_ngroups;		    // number of supplemental groups 
-	gid_t	sc_groups[1];	// variable length 
+struct sockcred 
+{
+    pid_t sc_pid;        // process id 
+    uid_t sc_uid;        // real user id 
+    uid_t sc_euid;       // effective user id 
+    gid_t sc_gid;        // real group id 
+    gid_t sc_egid;       // effective group id 
+    int   sc_ngroups;    // number of supplemental groups 
+    gid_t sc_groups[1];  // variable length 
 };
 */
-
 
 /*
  * socket_d:

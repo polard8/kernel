@@ -11,6 +11,9 @@
 #define TDESC_CMD_IFCS  0x02 /* insert frame checksum (FCS) */
 #define TDESC_CMD_RS    0x08 /* requests status report */
 
+// Registers offsets:
+#define REG_TDH    0x3810  // Transmit Descriptor Head
+#define REG_TDT    0x3818  // Transmit Descriptor Tail
 
 
 // Transmit Descriptor
@@ -69,8 +72,9 @@ struct intel_nic_info_d
     int used;
     int magic;
 
-// Salvando o endereço base.
+// The base address for the registers.
     unsigned long registers_base_address;
+
     unsigned long DeviceControl;
     unsigned long DeviceStatus;
 
@@ -83,8 +87,7 @@ struct intel_nic_info_d
     int eeprom;
     int use_io;
 
-    uint16_t io_base;
-    uint32_t mem_base;    // #bugbug:  32bit address?
+    // uint16_t io_base;
 
 // Estrutura de descritores e 
 // arrays de ponteiros de buffers.
@@ -100,7 +103,7 @@ struct intel_nic_info_d
     unsigned long rx_descs_phys;  //rx ring physical address
     unsigned long tx_descs_phys;  //tx ring physical address
 
-    struct arp_cache_item_d arp_cache[32];
+    struct arp_cache_item_d  arp_cache[32];
 
 //pci device.
     struct pci_device_d *pci;

@@ -4,18 +4,22 @@
 #ifndef ____ARP_H
 #define ____ARP_H    1
 
-#define ARP_OPC_REQUEST  0x01
-#define ARP_OPC_REPLY    0x02
+// See: 
+// https://en.wikipedia.org/wiki/Address_Resolution_Protocol
+
+// Operation codes.
+#define ARP_OPC_REQUEST  0x0001
+#define ARP_OPC_REPLY    0x0002
 
 // ARP header length
-#define ARP_HEADER_LENGHT 28      
+#define ARP_HEADER_LENGHT  28
 
 // arp struct
-// ARP header.
-// #define ETH_ALEN 6 
-// See: https://en.wikipedia.org/wiki/Address_Resolution_Protocol
+struct ether_arp 
+{
 
-struct ether_arp {
+//====================
+//Header
 
     uint16_t  type;   // Hardware type (HTYPE)
     uint16_t  proto;  // Protocol type (PTYPE)
@@ -23,13 +27,17 @@ struct ether_arp {
     uint8_t   plen;   // Protocol address length 
     uint16_t  op;     // Operation (OPER)
 
-    // src
-    uint8_t arp_sha[6];  // sender hardware address mac 
-    uint8_t arp_spa[4];  // sender protocol address ip 
+//====================
+//Addresses
 
-    // dst
-    uint8_t arp_tha[6];  // target hardware address mac
-    uint8_t arp_tpa[4];  // target protocol address ip
+// src mac
+    uint8_t arp_sha[ETH_ALEN];  // Sender Hardware Address, mac 
+// src ip
+    uint8_t arp_spa[4];         // Sender Protocol Address, ip 
+// dst mac
+    uint8_t arp_tha[ETH_ALEN];  // Target Hardware Address, mac
+// dst ip
+    uint8_t arp_tpa[4];         // Target Protocol Address, ip
 
 } __attribute__((packed)); 
 

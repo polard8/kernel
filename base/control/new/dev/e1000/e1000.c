@@ -100,7 +100,9 @@ __E1000ReadCommand (
     struct intel_nic_info_d *d, 
     uint16_t addr )
 {
-    return *( (volatile unsigned int *) (d->mem_base + addr));
+    //if ( (void*) d == NULL ) { return 0; }
+    unsigned long address = (d->registers_base_address + addr);
+    return *( (volatile unsigned int *) address );
 }
 
 
@@ -111,9 +113,10 @@ __E1000WriteCommand (
     uint16_t addr, 
     uint32_t val )
 {
-    *( (volatile unsigned int *)(d->mem_base + addr)) = val;
+    //if ( (void*) d == NULL ) { return 0; }
+    unsigned long address = (d->registers_base_address + addr);
+    *( (volatile unsigned int *) address ) = val;
 }
-
 
 static uint32_t 
 __E1000ReadEEPROM ( 
@@ -230,6 +233,10 @@ __e1000_enable_interrupt(struct intel_nic_info_d *nic_info)
 // Reset the controller.
 static int __e1000_reset_controller(void)
 {
+// #todo:
+// Create two workers:
+// One to initialize rx and another one for tx.
+
     int i=0;
     //register int i=0;
 
@@ -252,10 +259,10 @@ static int __e1000_reset_controller(void)
 	//#todo: precisamos checar a validade dessa estrutura e do endereço.
 	
     //esse será o endereço oficial.
-    //currentNIC->mem_base
+    //currentNIC->registers_base_address
 
-    if ( currentNIC->mem_base == 0 ){
-        panic ("__e1000_reset_controller: [FAIL] currentNIC->mem_base\n");
+    if ( currentNIC->registers_base_address == 0 ){
+        panic ("__e1000_reset_controller: [FAIL] currentNIC->registers_base_address\n");
     }
 
 
@@ -263,8 +270,8 @@ static int __e1000_reset_controller(void)
 	//unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
 	//unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
 
-	//unsigned char *base_address = (unsigned char *) currentNIC->mem_base;
-	//unsigned long *base_address32 = (unsigned long *) currentNIC->mem_base;	
+	//unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
+	//unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
 
 //
 // ===========================================
@@ -357,9 +364,10 @@ static int __e1000_reset_controller(void)
 //=============================================
 //
 
-//
+
+
+//========================================
 //    ## RX ##
-//
 
 // And alloc the phys/virt address of the transmit buffer
 
@@ -475,6 +483,7 @@ static int __e1000_reset_controller(void)
      __e1000_enable_interrupt(currentNIC);
 
 
+// ===================================
 // ## RX ##
 // receive
 // Setup the (receive) ring registers.
@@ -492,8 +501,10 @@ static int __e1000_reset_controller(void)
 
 // Buffer
     __E1000WriteCommand (currentNIC, 0x2808, 512);    // 32*16
-    __E1000WriteCommand (currentNIC, 0x2810, 0);      // head
-    __E1000WriteCommand (currentNIC, 0x2818, 31);     // tail
+
+// head and tail para rx.
+    __E1000WriteCommand (currentNIC, 0x2810, 0);   // head
+    __E1000WriteCommand (currentNIC, 0x2818, 31);  // tail
 
 // receive control
 // RCTL = 0x0100, /* Receive Control */
@@ -505,6 +516,7 @@ static int __e1000_reset_controller(void)
 // RX Delay Timer Register
     //__E1000WriteCommand (currentNIC, 0x2820, 0);
 
+//========================================
 // ## TX ##
 //transmit
 //Setup the (transmit) ring registers.
@@ -524,8 +536,11 @@ static int __e1000_reset_controller(void)
 
 // Buffer
     __E1000WriteCommand (currentNIC, 0x3808, 128);  //8*16
+
+// Head and tail para tx.
     __E1000WriteCommand (currentNIC, 0x3810, 0);    //head
-    __E1000WriteCommand (currentNIC, 0x3818, 7);    //0);      //tail
+    __E1000WriteCommand (currentNIC, 0x3818, 7);    //tail
+
 
 	//#define E1000_TCTL     0x00400  /* TX Control - RW */
     //• CT = 0x0F (16d collision)
@@ -559,25 +574,57 @@ static int __e1000_reset_controller(void)
         0x3828, 
         (0x01000000 | 0x003F0000) );
 
+
+/*
+// 0x400
     __E1000WriteCommand ( 
         currentNIC, 
         0x400, 
-        ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) ); 
-
-    //?
-	//E1000WriteCommand(currentNIC, 0x400, 0x10400FA);  //TCTL	= 0x0400,	/* Transmit Control */
+        ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) );
+	//E1000WriteCommand(currentNIC, 0x400, 0x10400FA);  //TCTL	= 0x0400,	//Transmit Control 
 	//E1000WriteCommand(currentNIC, 0x400, 0x3003F0FA);
 	//E1000WriteCommand(currentNIC, 0x400, (1 << 1) | (1 << 3) );
- 
-    //• IPGT = 8
-    //• IPGR1 = 2
-    //• IPGR2 = 10
+*/
+
+
+#define TCTL_EN          (1 << 1)    // Transmit Enable
+#define TCTL_PSP         (1 << 3)    // Pad Short Packets
+#define TCTL_CT_SHIFT    4           // Collision Threshold
+#define TCTL_COLD_SHIFT  12          // Collision Distance
+#define TCTL_SWXOFF      (1 << 22)   // Software XOFF Transmission
+#define TCTL_RTLC        (1 << 24)   // Re-transmit on Late Collision
+
+    __E1000WriteCommand(
+        currentNIC, 
+        0x400,  
+        TCTL_EN
+        | TCTL_PSP
+        | (15 << TCTL_CT_SHIFT)
+        | (64 << TCTL_COLD_SHIFT)
+        | TCTL_RTLC);
+
+
+//=====================
+
+// 0x410
+// IPGT = 8
+// IPGR1 = 2
+// IPGR2 = 10
     //#define E1000_TIPG     0x00410  /* TX Inter-packet gap -RW */	
-    
+
+/*
     __E1000WriteCommand ( 
         currentNIC,
         0x410,
         (  0x0000000A | 0x00000008 | 0x00000002) ); 
+*/
+
+/*
+    __E1000WriteCommand (
+        currentNIC, 
+        0x410, 
+        0x0060200A );  
+*/
 
 // Talvez ja fizemos isso. 
 // Initialize the transmit descriptor registers (TDBAL, TDBAH, TDL, TDH, and TDT).
@@ -903,14 +950,10 @@ e1000_init_nic (
     currentNIC->interrupt_count = 0;
     currentNIC->pci = (struct pci_device_d *) pci_device;
 
-// #bugbug: Using 32bit address?
-// Salvando o endereço para outras rotinas usarem.
 
-// #bugbug: Using a 64bit address.
+// The base address for the registers.
     currentNIC->registers_base_address = 
         (unsigned long) &base_address[0];
-// #bugbug: Using a 32bit address.
-    currentNIC->mem_base = (uint32_t) &base_address[0];
 
     currentNIC->use_io = 0; //False;
 
