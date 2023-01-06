@@ -152,9 +152,9 @@ SendARP(
 
 // pega o tail antigo.
     //unsigned long address = (currentNIC->registers_base_address + 0x3810); //head
-    unsigned long address = (currentNIC->registers_base_address + REG_TDT); // tail
-    unsigned int value32 = (uint16_t) *( (volatile unsigned int *) address );
-    currentNIC->tx_cur = (uint16_t) (value32 & 0xFFFF);
+    //unsigned long address = (currentNIC->registers_base_address + REG_TDT); // tail
+    //unsigned int value32 = (uint16_t) *( (volatile unsigned int *) address );
+    //currentNIC->tx_cur = (uint16_t) (value32 & 0xFFFF);
     uint16_t buffer_index = (uint16_t) currentNIC->tx_cur;
 
     //#debug
@@ -212,9 +212,20 @@ SendARP(
 // status and reserved.
     currentNIC->legacy_tx_descs[buffer_index].status = (uint8_t) 0;
 
+
+#define CMD_EOP  (1 << 0)  // End of Packet
+#define CMD_IFCS (1 << 1)  // Insert FCS
+#define CMD_IC   (1 << 2)  // Insert Checksum
+#define CMD_RS   (1 << 3)  // Report Status
+#define CMD_RPS  (1 << 4)  // Report Packet Sent
+#define CMD_VLE  (1 << 6)  // VLAN Packet Enable
+#define CMD_IDE  (1 << 7)  // Interrupt Delay Enable
+
 // cmd
     currentNIC->legacy_tx_descs[buffer_index].cmd = 
         (uint8_t) 0x1B;
+    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
+    //    (uint8_t) (CMD_EOP | CMD_IFCS | CMD_RS);
     //currentNIC->legacy_tx_descs[buffer_index].cmd = 
     //    (uint8_t) (TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP);
     //currentNIC->legacy_tx_descs[buffer_index].cmd = 
@@ -258,6 +269,7 @@ SendARP(
     *( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDT)) = 
         (unsigned int) tail;
 
+
 // #debug
 // Colocamos essa mensagem antes de entrarmos no while.
 // Pois precisamos implementar algum contador no while para n�o
@@ -284,11 +296,11 @@ SendARP(
     };
     */
 
-
+/*
 // Waiting using a timeout.
 // Espera por um tempo pelo valor '1'.
     int t=0;
-    int tmax = 500000; //50000;
+    int tmax = 5000000; //50000;
     uint8_t status = 0;
     for (t=0; t<tmax;t++)
     {
@@ -305,7 +317,7 @@ SendARP(
     };
     printf ("SendARP: [fail] Timeout\n");
     // goto fail;
-
+*/
 
 fail:
     refresh_screen();

@@ -87,8 +87,12 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa);
 static void
 __e1000_enable_interrupt(struct intel_nic_info_d *nic_info);
 
-static int __e1000_reset_controller(void);
 static void __e1000_setup_irq (int irq_line);
+
+static void __initialize_tx_support(struct intel_nic_info_d *d);
+static void __initialize_rx_support(struct intel_nic_info_d *d);
+static int __e1000_reset_controller(struct intel_nic_info_d *d);
+
 
 //
 // =====================
@@ -227,59 +231,20 @@ __e1000_enable_interrupt(struct intel_nic_info_d *nic_info)
     //__E1000WriteCommand(nic_info, 0xD0, 0xFB);
     __E1000WriteCommand(nic_info, 0xD0, 0xff & ~4);  
     __E1000ReadCommand (nic_info, 0xC0);
-
+    printf("__e1000_enable_interrupt: done\n");
 }
 
-// Reset the controller.
-static int __e1000_reset_controller(void)
+static void __initialize_tx_support(struct intel_nic_info_d *d)
 {
-// #todo:
-// Create two workers:
-// One to initialize rx and another one for tx.
+// 00400h - Transmit Control Register
 
     int i=0;
-    //register int i=0;
 
-    debug_print ("__e1000_reset_controller:\n");
-    printf      ("__e1000_reset_controller:\n");
-    
-	//unsigned long tmp;
-	
-	//#debug
-	//printf("__e1000_reset_controller: Reseting controller ... \n");
-	
-	/*
-	if ( (void *) currentNIC ==  NULL )
-	{
-		printf("__e1000_reset_controller: currentNIC struct\n");
-	    return (int) 1;
-	}
-    */
 
-	//#todo: precisamos checar a validade dessa estrutura e do endereço.
-	
-    //esse será o endereço oficial.
-    //currentNIC->registers_base_address
-
-    if ( currentNIC->registers_base_address == 0 ){
-        panic ("__e1000_reset_controller: [FAIL] currentNIC->registers_base_address\n");
+    if ((void*) d == NULL ){
+        panic("__initialize_tx_support: d\n");
     }
 
-
-	//endereço base.
-	//unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
-	//unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
-
-	//unsigned char *base_address = (unsigned char *) currentNIC->registers_base_address;
-	//unsigned long *base_address32 = (unsigned long *) currentNIC->registers_base_address;	
-
-//
-// ===========================================
-//
-
-//
-//  ## TX ##
-//
     //printf("[1]:\n");
 
 // And alloc the phys/virt address of the transmit buffer
@@ -289,7 +254,7 @@ static int __e1000_reset_controller(void)
 // OUT: physical address
 
     //unsigned long tx_address = 
-    //    (unsigned long) &currentNIC->legacy_tx_descs; //#wrong
+    //    (unsigned long) &d->legacy_tx_descs; //#wrong
     unsigned long tx_address=0; //#bugbug not used
 
     //printf("tx_address=%x\n",tx_address);
@@ -297,11 +262,11 @@ static int __e1000_reset_controller(void)
 // Vamos alocar memória e pagarmos seu endereço físico.
 // Retorna um endereço virtual em tx_address e 
 // o físico no retorno da função.
-    currentNIC->tx_descs_phys = 
+    d->tx_descs_phys = 
         (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *) tx_address );
 
-    if (currentNIC->tx_descs_phys == 0){
-        panic ("__e1000_reset_controller: [FAIL] currentNIC->tx_descs_phys\n");
+    if (d->tx_descs_phys == 0){
+        panic ("__e1000_reset_controller: [FAIL] d->tx_descs_phys\n");
     }
 
     //printf("[2]:\n");
@@ -324,21 +289,21 @@ static int __e1000_reset_controller(void)
         tmp_txaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
                  0x3000, 
-                 (unsigned long *) &currentNIC->tx_descs_virt[i] );
+                 (unsigned long *) &d->tx_descs_virt[i] );
         
         if (tmp_txaddress_pa == 0){
             panic("__e1000_reset_controller: tmp_txaddress_pa\n");
         }
         
-        currentNIC->legacy_tx_descs[i].addr  = (unsigned int) tmp_txaddress_pa;
-        currentNIC->legacy_tx_descs[i].addr2 = (unsigned int) (tmp_txaddress_pa>>32);
+        d->legacy_tx_descs[i].addr  = (unsigned int) tmp_txaddress_pa;
+        d->legacy_tx_descs[i].addr2 = (unsigned int) (tmp_txaddress_pa>>32);
 
-        if (currentNIC->legacy_tx_descs[i].addr == 0){
-            panic ("__e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
+        if (d->legacy_tx_descs[i].addr == 0){
+            panic ("__e1000_reset_controller: [FAIL] d->legacy_tx_descs[i].addr\n");
         }
 
         // #test: Configurando o tamanho do buffer
-        currentNIC->legacy_tx_descs[i].length = 0x3000;
+        d->legacy_tx_descs[i].length = 0x3000;
 
         //cmd: bits
         //IDE VLE DEXT RSV RS IC IFCS EOP
@@ -351,170 +316,16 @@ static int __e1000_reset_controller(void)
         //IFCS (bit 1) - Insert FCS (CRC)
         //EOP (bit 0) - End of packet
 
-        currentNIC->legacy_tx_descs[i].cmd = 0;
-        currentNIC->legacy_tx_descs[i].status = 1;
+        d->legacy_tx_descs[i].cmd = 0;
+        d->legacy_tx_descs[i].status = 1;
     };
 
 //#debug 
 //Vamos imprimir os endereços usados pelos buffers para teste.	
     //for ( i=0; i < 8; i++ )
-    //    printf ("PA={%x} VA={%x} \n",currentNIC->legacy_tx_descs[i].addr, currentNIC->tx_descs_virt[i]);
+    //    printf ("PA={%x} VA={%x} \n",d->legacy_tx_descs[i].addr, d->tx_descs_virt[i]);
 
-//
-//=============================================
-//
-
-
-
-//========================================
-//    ## RX ##
-
-// And alloc the phys/virt address of the transmit buffer
-
-    //printf("[3]:\n");
-
-    currentNIC->rx_descs_phys = 
-        __E1000AllocCont (
-            0x1000, 
-            (unsigned long *)(&currentNIC->legacy_rx_descs));
-
-    if (currentNIC->rx_descs_phys == 0){
-        panic ("__e1000_reset_controller: [FAIL] currentNIC->rx_descs_phys\n");
-    }
-
-    //printf("[4]:\n");
-
-// rx
-// tmp physical address.
-    unsigned long tmp_rxaddress_pa=0;
-
-    for ( i=0; i<32; i++ ) 
-    {
-        // Alloc the phys/virt address of this transmit desc
-        // IN:  size, return virtual address.
-        // OUT: physical address
-        // vamos alocar memória e retornar o endereço físico.
-        // 32 buffers para recebimento.
-        // O endereço virtual fica salvo no array de ponteiros.
-        tmp_rxaddress_pa = 
-            (unsigned long) __E1000AllocCont ( 
-                0x3000, 
-                (unsigned long *) &currentNIC->rx_descs_virt[i] );
-
-        if (tmp_rxaddress_pa == 0){
-            panic("__e1000_reset_controller: tmp_rxaddress_pa\n");
-        }
-
-        currentNIC->legacy_rx_descs[i].addr  = (unsigned int) tmp_rxaddress_pa;
-        currentNIC->legacy_rx_descs[i].addr2 = (unsigned int) (tmp_rxaddress_pa>>32);
-
-        // Buffer null.
-        if (currentNIC->legacy_rx_descs[i].addr == 0){
-            panic ("__e1000_reset_controller: [FAIL] dev->rx_descs[i].addr\n");
-        }
-
-        // #test: Configurando o tamanho do buffer
-        currentNIC->legacy_rx_descs[i].length = 0x3000;
-        currentNIC->legacy_rx_descs[i].status = 0;
-    };
-
-//#debug 
-//Vamos imprimir os endereços edereços físicos dos buffers 
-//e os edereços virtuais dos descritores.
-    //for ( i=0; i < 32; i++ )
-    //    printf ("PA={%x} VA={%x} \n",currentNIC->legacy_rx_descs[i].addr, currentNIC->rx_descs_virt[i]);
-
-// ???
-
-    //printf("[5]:\n");
-
-// Clear Multicast Table Array (MTA).
-    for (i=0; i<128; i++){
-        __E1000WriteCommand ( currentNIC, 0x5200 + (i * 4), 0 );
-    };
-
-// #todo 
-// Initialize statistics registers.
-// E1000_REG_CRCERRS
-    //for (i = 0; i < 64; i++)
-    //    __E1000WriteCommand(currentNIC, 0x04000 + i * 4, 0);
-
-// Current.
-    currentNIC->rx_cur = 0;
-    currentNIC->tx_cur = 0;
-
-//irq #todo
-//#bugbug: fow now we're doing this in pci.c.
-    //PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, currentNIC );
-
-    /* Transmit Enable. */
-    //#define E1000_REG_TCTL_EN	(1 << 1)
-    /* Pad Short Packets. */
-    //#define E1000_REG_TCTL_PSP	(1 << 3)
-
-   //#define E1000_ICR      0x000C0  /* Interrupt Cause Read - R/clr */
-   //#define E1000_ITR      0x000C4  /* Interrupt Throttling Rate - RW */
-   //#define E1000_ICS      0x000C8  /* Interrupt Cause Set - WO */
-   //#define E1000_IMS      0x000D0  /* Interrupt Mask Set - RW */
-   //#define E1000_IMC      0x000D8  /* Interrupt Mask Clear - WO */
-   //#define E1000_IAM      0x000E0  /* Interrupt Acknowledge Auto Mask */	
-
-   // #define E1000_IAC      0x04100  /* Interrupt Assertion Count */
-   //#define E1000_ICRXPTC  0x04104  /* Interrupt Cause Rx Packet Timer Expire Count */
-   //#define E1000_ICRXATC  0x04108  /* Interrupt Cause Rx Absolute Timer Expire Count */
-   //#define E1000_ICTXPTC  0x0410C  /* Interrupt Cause Tx Packet Timer Expire Count */
-   //#define E1000_ICTXATC  0x04110  /* Interrupt Cause Tx Absolute Timer Expire Count */
-   //#define E1000_ICTXQEC  0x04118  /* Interrupt Cause Tx Queue Empty Count */
-   //#define E1000_ICTXQMTC 0x0411C  /* Interrupt Cause Tx Queue Minimum Threshold Count */
-   //#define E1000_ICRXDMTC 0x04120  /* Interrupt Cause Rx Descriptor Minimum Threshold Count */
-   //#define E1000_ICRXOC   0x04124  /* Interrupt Cause Receiver Overrun Count */  
-
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXT0;
-   //(*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXO;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXDMT0;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXSEQ;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_LSC;	
-
-    //E1000WriteCommand(currentNIC, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
-
-    //printf("[6]:\n");
-
-// Enable interrupts. (first time)
-     __e1000_enable_interrupt(currentNIC);
-
-
-// ===================================
-// ## RX ##
-// receive
-// Setup the (receive) ring registers.
-// Pass the physical address (and some other informations) of the receive buffer
-
-// Address: low and high.
-    __E1000WriteCommand (
-        currentNIC, 
-        0x2800, 
-        (unsigned int) currentNIC->rx_descs_phys );  // low
-    __E1000WriteCommand (
-        currentNIC, 
-        0x2804, 
-        (unsigned int) (currentNIC->rx_descs_phys >> 32) );                           // high 
-
-// Buffer
-    __E1000WriteCommand (currentNIC, 0x2808, 512);    // 32*16
-
-// head and tail para rx.
-    __E1000WriteCommand (currentNIC, 0x2810, 0);   // head
-    __E1000WriteCommand (currentNIC, 0x2818, 31);  // tail
-
-// receive control
-// RCTL = 0x0100, /* Receive Control */
-    __E1000WriteCommand (
-        currentNIC, 
-        0x100, 
-        0x602801E );  
-
-// RX Delay Timer Register
-    //__E1000WriteCommand (currentNIC, 0x2820, 0);
+    d->tx_cur = 0;
 
 //========================================
 // ## TX ##
@@ -526,20 +337,20 @@ static int __e1000_reset_controller(void)
 
     
     __E1000WriteCommand (
-        currentNIC, 
+        d, 
         0x3800, 
-        (unsigned int) currentNIC->tx_descs_phys );  //low (endereço do ring)
+        (unsigned int) d->tx_descs_phys );  //low (endereço do ring)
     __E1000WriteCommand (
-        currentNIC, 
+        d, 
         0x3804, 
-        (unsigned int) (currentNIC->tx_descs_phys >> 32) );                           //high
+        (unsigned int) (d->tx_descs_phys >> 32) );                           //high
 
 // Buffer
-    __E1000WriteCommand (currentNIC, 0x3808, 128);  //8*16
+    __E1000WriteCommand (d, 0x3808, 128);  //8*16
 
 // Head and tail para tx.
-    __E1000WriteCommand (currentNIC, 0x3810, 0);    //head
-    __E1000WriteCommand (currentNIC, 0x3818, 7);    //tail
+    __E1000WriteCommand (d, 0x3810, 0);    //head
+    __E1000WriteCommand (d, 0x3818, 7);    //tail
 
 
 	//#define E1000_TCTL     0x00400  /* TX Control - RW */
@@ -570,20 +381,22 @@ static int __e1000_reset_controller(void)
 	//#define E1000_TXDCTL   0x03828  /* TX Descriptor Control - RW */
 
     __E1000WriteCommand (
-        currentNIC, 
+        d, 
         0x3828, 
         (0x01000000 | 0x003F0000) );
+
+
 
 
 /*
 // 0x400
     __E1000WriteCommand ( 
-        currentNIC, 
+        d, 
         0x400, 
         ( 0x00000ff0 | 0x003ff000 | 0x00000008 | 0x00000002) );
-	//E1000WriteCommand(currentNIC, 0x400, 0x10400FA);  //TCTL	= 0x0400,	//Transmit Control 
-	//E1000WriteCommand(currentNIC, 0x400, 0x3003F0FA);
-	//E1000WriteCommand(currentNIC, 0x400, (1 << 1) | (1 << 3) );
+	//E1000WriteCommand(d, 0x400, 0x10400FA);  //TCTL	= 0x0400,	//Transmit Control 
+	//E1000WriteCommand(d, 0x400, 0x3003F0FA);
+	//E1000WriteCommand(d, 0x400, (1 << 1) | (1 << 3) );
 */
 
 
@@ -593,16 +406,22 @@ static int __e1000_reset_controller(void)
 #define TCTL_COLD_SHIFT  12          // Collision Distance
 #define TCTL_SWXOFF      (1 << 22)   // Software XOFF Transmission
 #define TCTL_RTLC        (1 << 24)   // Re-transmit on Late Collision
-
+/*
     __E1000WriteCommand(
-        currentNIC, 
+        d, 
         0x400,  
         TCTL_EN
         | TCTL_PSP
         | (15 << TCTL_CT_SHIFT)
         | (64 << TCTL_COLD_SHIFT)
         | TCTL_RTLC);
+*/
 
+// Transmit Control Register
+// bits  1010b
+    unsigned int val = __E1000ReadCommand (d, 0x400);
+    __E1000WriteCommand (d, 0x400, val | TCTL_EN | TCTL_PSP );
+    //__E1000WriteCommand (d, 0x400, val | 0x2 );
 
 //=====================
 
@@ -614,17 +433,17 @@ static int __e1000_reset_controller(void)
 
 /*
     __E1000WriteCommand ( 
-        currentNIC,
+        d,
         0x410,
         (  0x0000000A | 0x00000008 | 0x00000002) ); 
 */
 
-/*
+
     __E1000WriteCommand (
-        currentNIC, 
+        d, 
         0x410, 
         0x0060200A );  
-*/
+
 
 // Talvez ja fizemos isso. 
 // Initialize the transmit descriptor registers (TDBAL, TDBAH, TDL, TDH, and TDT).
@@ -640,24 +459,223 @@ static int __e1000_reset_controller(void)
 	//	  MAC_CONF_2_RX_EN);	
     
 	
-	//iow32(dev, TCTL, TCTL_EN);
+	//iow32(d, TCTL, TCTL_EN);
 	
 	//printf("nic_i8254x_reset: Done\n");
 	//refresh_screen();	
 	
 	//endereço físico  dos rings;
 	//printf("tx_ring_pa=%x rx_ring_pa=%x \n", 
-	//    currentNIC->rx_descs_phys, 
-	//	currentNIC->tx_descs_phys );
+	//    d->rx_descs_phys, 
+	//	d->tx_descs_phys );
 
-// Enable interrupts. (second time)
-     __e1000_enable_interrupt(currentNIC);
+}
+
+
+static void __initialize_rx_support(struct intel_nic_info_d *d)
+{
+// 00100h - Receive Control Register
+
+    int i=0;
+
+
+    if ((void*) d == NULL ){
+        panic("__initialize_rx_support: d\n");
+    }
+
+
+// And alloc the phys/virt address of the transmit buffer
+
+    //printf("[3]:\n");
+
+    d->rx_descs_phys = 
+        __E1000AllocCont (
+            0x1000, 
+            (unsigned long *)(&d->legacy_rx_descs));
+
+    if (d->rx_descs_phys == 0){
+        panic ("__e1000_reset_controller: [FAIL] d->rx_descs_phys\n");
+    }
+
+    //printf("[4]:\n");
+
+// rx
+// tmp physical address.
+    unsigned long tmp_rxaddress_pa=0;
+
+    for ( i=0; i<32; i++ ) 
+    {
+        // Alloc the phys/virt address of this transmit desc
+        // IN:  size, return virtual address.
+        // OUT: physical address
+        // vamos alocar memória e retornar o endereço físico.
+        // 32 buffers para recebimento.
+        // O endereço virtual fica salvo no array de ponteiros.
+        tmp_rxaddress_pa = 
+            (unsigned long) __E1000AllocCont ( 
+                0x3000, 
+                (unsigned long *) &d->rx_descs_virt[i] );
+
+        if (tmp_rxaddress_pa == 0){
+            panic("__e1000_reset_controller: tmp_rxaddress_pa\n");
+        }
+
+        d->legacy_rx_descs[i].addr  = (unsigned int) tmp_rxaddress_pa;
+        d->legacy_rx_descs[i].addr2 = (unsigned int) (tmp_rxaddress_pa>>32);
+
+        // Buffer null.
+        if (d->legacy_rx_descs[i].addr == 0){
+            panic ("__e1000_reset_controller: [FAIL] d->legacy_rx_descs[i].addr\n");
+        }
+
+        // #test: Configurando o tamanho do buffer
+        d->legacy_rx_descs[i].length = 0x3000;
+        d->legacy_rx_descs[i].status = 0;
+    };
+
+//#debug 
+//Vamos imprimir os endereços edereços físicos dos buffers 
+//e os edereços virtuais dos descritores.
+    //for ( i=0; i < 32; i++ )
+    //    printf ("PA={%x} VA={%x} \n",d->legacy_rx_descs[i].addr, d->rx_descs_virt[i]);
+
+    d->rx_cur = 0;
+
+
+// ===================================
+// ## RX ##
+// receive
+// Setup the (receive) ring registers.
+// Pass the physical address (and some other informations) of the receive buffer
+
+// Address: low and high.
+    __E1000WriteCommand (
+        d, 
+        0x2800, 
+        (unsigned int) d->rx_descs_phys );  // low
+    __E1000WriteCommand (
+        d, 
+        0x2804, 
+        (unsigned int) (d->rx_descs_phys >> 32) );                           // high 
+
+// Buffer
+    __E1000WriteCommand (d, 0x2808, 512);    // 32*16
+
+// head and tail para rx.
+    __E1000WriteCommand (d, 0x2810, 0);   // head
+    __E1000WriteCommand (d, 0x2818, 31);  // tail
+
+// receive control
+// RCTL = 0x0100, /* Receive Control */
+    __E1000WriteCommand (
+        d, 
+        0x100, 
+        0x602801E );  
+
+// RX Delay Timer Register
+    //__E1000WriteCommand (d, 0x2820, 0);
+
+}
+
+
+// Reset the controller.
+static int __e1000_reset_controller(struct intel_nic_info_d *d)
+{
+// #todo:
+// Create two workers:
+// One to initialize rx and another one for tx.
+
+    int i=0;
+    //register int i=0;
+
+    debug_print ("__e1000_reset_controller:\n");
+    printf      ("__e1000_reset_controller:\n");
+
+
+    if ( (void*) d == NULL ){
+        panic("__e1000_reset_controller: d\n");
+    }
+
+	//unsigned long tmp;
+
+	//#debug
+	//printf("__e1000_reset_controller: Reseting controller ... \n");
+	/*
+	if ( (void *) d ==  NULL ){
+		printf("__e1000_reset_controller: d struct\n");
+	    return (int) 1;
+	}
+    */
+
+// #todo: 
+// precisamos checar a validade dessa estrutura e do endereço.
+    //esse será o endereço oficial.
+    //d->registers_base_address
+    if ( d->registers_base_address == 0 ){
+        panic ("__e1000_reset_controller: [FAIL] d->registers_base_address\n");
+    }
+
+    __initialize_tx_support(d);
+    __initialize_rx_support(d);
+
+    //printf("[5]:\n");
+
+// Clear Multicast Table Array (MTA).
+    for (i=0; i<128; i++){
+        __E1000WriteCommand ( d, 0x5200 + (i * 4), 0 );
+    };
+
+// #todo 
+// Initialize statistics registers.
+// E1000_REG_CRCERRS
+    //for (i = 0; i < 64; i++)
+    //    __E1000WriteCommand(d, 0x04000 + i * 4, 0);
+
+//irq #todo
+//#bugbug: fow now we're doing this in pci.c.
+    //PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, d );
+
+    /* Transmit Enable. */
+    //#define E1000_REG_TCTL_EN	(1 << 1)
+    /* Pad Short Packets. */
+    //#define E1000_REG_TCTL_PSP	(1 << 3)
+
+   //#define E1000_ICR      0x000C0  /* Interrupt Cause Read - R/clr */
+   //#define E1000_ITR      0x000C4  /* Interrupt Throttling Rate - RW */
+   //#define E1000_ICS      0x000C8  /* Interrupt Cause Set - WO */
+   //#define E1000_IMS      0x000D0  /* Interrupt Mask Set - RW */
+   //#define E1000_IMC      0x000D8  /* Interrupt Mask Clear - WO */
+   //#define E1000_IAM      0x000E0  /* Interrupt Acknowledge Auto Mask */	
+
+   // #define E1000_IAC      0x04100  /* Interrupt Assertion Count */
+   //#define E1000_ICRXPTC  0x04104  /* Interrupt Cause Rx Packet Timer Expire Count */
+   //#define E1000_ICRXATC  0x04108  /* Interrupt Cause Rx Absolute Timer Expire Count */
+   //#define E1000_ICTXPTC  0x0410C  /* Interrupt Cause Tx Packet Timer Expire Count */
+   //#define E1000_ICTXATC  0x04110  /* Interrupt Cause Tx Absolute Timer Expire Count */
+   //#define E1000_ICTXQEC  0x04118  /* Interrupt Cause Tx Queue Empty Count */
+   //#define E1000_ICTXQMTC 0x0411C  /* Interrupt Cause Tx Queue Minimum Threshold Count */
+   //#define E1000_ICRXDMTC 0x04120  /* Interrupt Cause Rx Descriptor Minimum Threshold Count */
+   //#define E1000_ICRXOC   0x04124  /* Interrupt Cause Receiver Overrun Count */  
+
+   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXT0;
+   //(*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXO;
+   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXDMT0;
+   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXSEQ;
+   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_LSC;	
+
+    //E1000WriteCommand(d, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
+
+    //printf("[6]:\n");
+
+// Enable interrupts. (first time)
+     __e1000_enable_interrupt(d);
+
 
 // Linkup
 // (1 << 6)
 // #todo: Create a helper. 
-    unsigned int val = __E1000ReadCommand (currentNIC, 0);
-    __E1000WriteCommand (currentNIC, 0, val | 0x40);
+    unsigned int val = __E1000ReadCommand (d, 0);
+    __E1000WriteCommand (d, 0, val | 0x40);
 
     return 0;
 }
@@ -1063,7 +1081,7 @@ e1000_init_nic (
     __e1000_setup_irq(irq_line);
 
 // Reset the controller.
-    __e1000_reset_controller();
+    __e1000_reset_controller(currentNIC);
     
     e1000_interrupt_flag = TRUE;
 
@@ -1152,7 +1170,9 @@ on_receiving (
 static void DeviceInterface_e1000(void)
 {
     unsigned char *buffer;
+
     uint32_t status=0;
+
     uint32_t val=0;
     uint16_t old=0;
     uint32_t len=0;
@@ -1160,19 +1180,85 @@ static void DeviceInterface_e1000(void)
     struct e1000_ether_header_d *eh;
     uint16_t Type=0;
 
+// Interrupt Masks
+
+#define INTERRUPT_TXDW    (1 << 0)  // 0x01
+#define INTERRUPT_TXQE    (1 << 1)  // 0x02
+#define INTERRUPT_LSC     (1 << 2)  // 0x04
+#define INTERRUPT_RXSEQ   (1 << 3)  // 0x08
+
+#define INTERRUPT_RXDMT0  (1 << 4)  // 0x10
+                                    // 0x20
+#define INTERRUPT_RXO     (1 << 6)  // 0x40
+#define INTERRUPT_RXT0    (1 << 7)  // 0x80
+
+#define INTERRUPT_MDAC    (1 <<  9)  // 0x100
+#define INTERRUPT_RXCFG   (1 << 10)  // 0x200
+                                     // 0x400
+#define INTERRUPT_PHYINT  (1 << 12)  // 0x800
+
+                                     // 0x1000
+                                     // 0x2000
+#define INTERRUPT_TXD_LOW (1 << 15)  // 0x4000
+#define INTERRUPT_SRPD    (1 << 16)  // 0x8000
+
+
+// Status
+// 0xC0 - Interrupt Cause Read Register
+// ICR Register Bit Description
+// 0 - TXDW - Transmit Descriptor Written Back
+// 1 - TXQE - Transmit Queue Empty
+// 2 - LSC  - Link Status Change
+// 3 - RXSEQ - Receive Sequence Error
+// 4 - RXDMT0 - Receive Descriptor Minimum Threshold Reached
+// 6 - RXO - Receiver Overrun
+// 7 - RXT0 - Receiver Timer Interrupt
+// 9 - MDAC - MDI/O Access Complete
+// 10 - RXCFG - Receiving /C/ ordered sets
+// 12 - PHYINT - PHY Interrupt
+// 13 - GPI_SDP6 - General Purpose Interrupt on SDP6[2].
+// 14 - GPI_SDP7 - General Purpose Interrupt on SDP7[3].
+// 15 - TXD_LOW - Transmit Descriptor Low Threshold hit
+// 16 - SRPD - Small Receive Packet Detected
+
+// 0xD0 - Interrupt Mask Set/Read Register
 // Without this, the card may spam interrupts.
+// bit 0 - TXDW - Sets mask for Transmit Descriptor Written Back.
     __E1000WriteCommand( currentNIC, 0xD0, 1 );
+
 // Status
     status = __E1000ReadCommand( currentNIC, 0xC0 );
+    //__E1000WriteCommand( currentNIC, 0xC0, status );
+    //__E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
+
+    if (status == 0){
+        goto fail;
+    }
+
+    // 0x01 - transmit completed.
+    // INTERRUPT_TXDW
+    if ( status & 0x01 ){
+        printf ("DeviceInterface_e1000: Transmit completed\n");
+        goto done;
+
+    // 0x02
+    // INTERRUPT_TXQE
+    }else if(status & 0x02){
+        printf("DeviceInterface_e1000: Transmit queue empty!\n");
+        goto done;
+
     // 0x04 - Linkup
+    // INTERRUPT_LSC
     // Start link.
-    if (status & 0x04){
+    } else if (status & 0x04){
         printf ("DeviceInterface_e1000: Start link\n");
-        refresh_screen();
+        //refresh_screen();
         val = __E1000ReadCommand ( currentNIC, 0 );
         __E1000WriteCommand ( currentNIC, 0, val | 0x40 );
-        return;
+        goto done;
+    
     // 0x80 - Reveive.
+    // INTERRUPT_RXT0
     } else if (status & 0x80){
 
         //printf ("DeviceInterface_e1000: Receive\n");
@@ -1194,8 +1280,8 @@ static void DeviceInterface_e1000(void)
         // Todos os buffers de recebimento.
         // Olhamos um bit do status de todos os buffers.
         // Sairemos do while quando encontrarmos um buffer com o bit desativado.
-   
-        while ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
+  
+        if ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {
              old = currentNIC->rx_cur;
              len = currentNIC->legacy_rx_descs[old].length;
@@ -1213,8 +1299,9 @@ static void DeviceInterface_e1000(void)
             currentNIC->legacy_rx_descs[old].status = 0;
 
             // ?? Provavelmente seleciona o buffer antes de circular.
+            // #bugbug: devemos circular primeiro pra depois chamar essa rotina?
+            // RDT - Receive Descriptor Tail
             __E1000WriteCommand ( currentNIC, 0x2818, old );
-            
 
              // Se o bit de statos estava acionado, então copiamos esse
              // buffer para outro acessível pelos aplicativos.
@@ -1226,24 +1313,45 @@ static void DeviceInterface_e1000(void)
                  //printf("DeviceInterface_e1000: [DEBUG] iret\n");
                  //refresh_screen();
              //}  
-             
-             //#test buffer
-             if ( (void*) buffer != NULL )
-             {
-                 //eh = (void*) buffer;
-                 on_receiving ( 
-                     (const unsigned char*) buffer, 
-                     1500 );
-             }
-             
 
              // circula. (32 buffers)
              // Seleciona o próximo buffer.
-             currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
-            
-             return;
-        };
+             currentNIC->rx_cur = 
+                 (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
+
+             //#test buffer
+             //eh = (void*) buffer;
+             if ( (void*) buffer != NULL ){
+                 on_receiving ( (const unsigned char*) buffer, 1500 );
+             }
+
+        }
+        goto done;
+
+    // INTERRUPT_RXDMT0
+    }else if (status & 0x10){
+        printf("DeviceInterface_e1000: Good threshold!\n");
+        goto done;
+    // ??
+    // INTERRUPT_SRPD
+    }else if (status & 0x8000 ){
+        printf ("DeviceInterface_e1000: status = 0x8000\n");
+        goto done;
+    }else{
+        printf("DeviceInterface_e1000: Unknown interrupt: status={%x}\n",
+            status);   
+        goto done;
     };
+
+done:
+    // Clear all the bits.
+    // Write 1b, clear the bit.
+    __E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
+    refresh_screen();
+    return;
+fail:
+    refresh_screen();
+    return;
 }
 
 
