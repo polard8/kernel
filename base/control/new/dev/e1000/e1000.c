@@ -48,6 +48,9 @@ int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
 unsigned long gE1000InputTime=0;
 
+static unsigned long e1000_tx_counter=0;
+static unsigned long e1000_rx_counter=0;
+
 //
 // =======================================
 //
@@ -92,6 +95,70 @@ static void __e1000_setup_irq (int irq_line);
 static void __initialize_tx_support(struct intel_nic_info_d *d);
 static void __initialize_rx_support(struct intel_nic_info_d *d);
 static int __e1000_reset_controller(struct intel_nic_info_d *d);
+
+
+
+// =====================
+
+void 
+e1000_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    unsigned char *data );
+void 
+e1000_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    unsigned char *data )
+{
+
+// dev
+    struct intel_nic_info_d *d;
+    d = (struct intel_nic_info_d *) dev;
+
+    uint16_t old = d->tx_cur;
+
+    //StrCopyMemory(
+    //    (PUInt8)(dev->tx_descs_buffs[old]), 
+    //    data, 
+    //    len);
+    memcpy(
+        (void *) currentNIC->tx_descs_virt[old], 
+        (const void *) data, 
+        (size_t) len );
+
+// lenght
+    d->legacy_tx_descs[old].length = 
+        (uint16_t) len;
+
+// cmd
+    d->legacy_tx_descs[old].cmd = 
+        (uint8_t) 0x1B;
+
+// status
+    d->legacy_tx_descs[old].status = (uint8_t) 0;
+
+// Configura qual vai ser o proximo
+    d->tx_cur = (d->tx_cur + 1) % 8;
+    __E1000WriteCommand(
+        d, 
+        0x3818, 
+        d->tx_cur);
+
+// Espera no antigo
+    while ( !(d->legacy_tx_descs[old].status & 0xFF) )
+    {
+        // Nothing
+    };
+}
+
+
+void e1000_show_info(void)
+{
+    printf( "CounterS: TX={%d} RX={%d}\n",
+        e1000_tx_counter,
+        e1000_rx_counter );
+}
 
 
 //
@@ -1168,6 +1235,20 @@ on_receiving (
         return;
     }
 
+//
+// Option
+//
+
+// Push packet.
+// Maybe we can simply pash the packet into the circular queue.
+// Mayme we can change this queue and use a lined list.
+// Or create a queue support. We still don't have this.
+// Coloca em um dos buffers, 
+// de onde os aplicativos podem pegar depois.
+// see: network.c
+    //network_buffer_in ( (void *) buffer, (int) size );
+    //return;
+    
     // #debug
     //printf("\n");
     //printf("Ethernet Header\n");
@@ -1197,7 +1278,7 @@ on_receiving (
 
     Type = (uint16_t) e1000_FromNetByteOrder16(eth->type);
 
-    switch ( (uint16_t) Type ){
+    switch ((uint16_t) Type){
     case 0x0800:
         printf ("[0x0800]: IPV4 received\n");
         network_handle_ipv4(buffer,size);
@@ -1297,6 +1378,7 @@ static void DeviceInterface_e1000(void)
     // INTERRUPT_TXDW
     if ( status & 0x01 ){
         printf ("DeviceInterface_e1000: Transmit completed\n");
+        e1000_tx_counter++;
         goto done;
 
     // 0x02
@@ -1381,8 +1463,8 @@ static void DeviceInterface_e1000(void)
              //eh = (void*) buffer;
              if ( (void*) buffer != NULL ){
                  on_receiving ( (const unsigned char*) buffer, 1500 );
+                 e1000_rx_counter++;
              }
-
         }
         goto done;
 
@@ -1433,7 +1515,7 @@ fail:
 __VOID_IRQ 
 irq_E1000 (void)
 {
-    gE1000InputTime = (unsigned long) jiffies;  
+    gE1000InputTime = (unsigned long) jiffies;
     DeviceInterface_e1000();
 }
 

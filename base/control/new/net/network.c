@@ -24,10 +24,16 @@ file *____network_file;
 // See: network.h
 struct network_buffer_d  NETWORK_BUFFER;
 
+
+unsigned char broadcast_mac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+unsigned char gramado_default_ipv4[4] = { 192, 168, 1, 112 };
+unsigned char target_default_ipv4[4]  = { 192, 168, 1, 8 };
+unsigned char gateway_default_ipv4[4] = { 192, 168, 1, 1 };
+
 // ====================================================
 
 void 
-SendARP( 
+network_send_arp( 
     int op,   //operation
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
@@ -38,12 +44,12 @@ SendARP(
     register int i=0;
 
     // #debug
-    printf("SendARP:\n");
+    printf("network_send_arp:\n");
     refresh_screen();
 
 // The structure for the INtel NIC device.
     if ( (void*) currentNIC == NULL ){
-        printf ("SendARP: currentNIC fail\n");
+        printf ("network_send_arp: currentNIC fail\n");
         goto fail;
     }
 
@@ -60,7 +66,7 @@ SendARP(
 // # ethernet header #
     eh = (void *) kmalloc( sizeof(struct ether_header) );
     if ( (void *) eh == NULL){
-        printf ("SendARP: eh struct fail\n");
+        printf ("network_send_arp: eh struct fail\n");
         goto fail;
     }
 // MAC
@@ -77,7 +83,7 @@ SendARP(
 // # arp header #
     h = (void *) kmalloc ( sizeof(struct  ether_arp) );
     if ( (void *) h == NULL){
-        printf ("SendARP: struct h fail");
+        printf ("network_send_arp: struct h fail");
         return;
     }
 
@@ -99,7 +105,7 @@ SendARP(
     if ( op != ARP_OPC_REQUEST && 
          op != ARP_OPC_REPLY )
     {
-        panic("SendARP: Invalid operation code\n");
+        panic("network_send_arp: Invalid operation code\n");
     }
     h->op = (uint16_t) ToNetByteOrder16(op);  // Invert the two bytes.
 
@@ -274,8 +280,8 @@ SendARP(
 // Colocamos essa mensagem antes de entrarmos no while.
 // Pois precisamos implementar algum contador no while para n�o
 // ficarmos preso nele pra sempre.
-    //debug_print ("SendARP: Sending broadcast ARP. *debug *while\n");
-    //printf ("SendARP: Sending broadcast ARP. *debug *while\n");
+    //debug_print ("network_send_arp: Sending broadcast ARP. *debug *while\n");
+    //printf ("network_send_arp: Sending broadcast ARP. *debug *while\n");
     //refresh_screen ();
 
 // #perigo:
@@ -290,11 +296,13 @@ SendARP(
 // #bugbug: Isso pode esperar para sempre.
     
     /*
+    // #ok. It is working
     while ( !(currentNIC->legacy_tx_descs[buffer_index].status & 0xFF) )
     {
         // Nothing.
     };
     */
+    
 
 /*
 // Waiting using a timeout.
@@ -310,12 +318,12 @@ SendARP(
          //if ( (status & 0xFF) == 1 )
          if ( (status & 0xFF) != 0 )
          {
-              printf ("SendARP: [status ok] Done\n");
+              printf ("network_send_arp: [status ok] Done\n");
               refresh_screen();
               return;
          }
     };
-    printf ("SendARP: [fail] Timeout\n");
+    printf ("network_send_arp: [fail] Timeout\n");
     // goto fail;
 */
 
@@ -331,6 +339,7 @@ void testNIC(void)
     printf("testNIC:\n");
     refresh_screen();
 
+/*
     // Source = 192.168.1.112
     // Gramado.
     uint8_t source_ip_address[4];
@@ -338,15 +347,19 @@ void testNIC(void)
     source_ip_address[1] = 168;
     source_ip_address[2] = 1;   
     source_ip_address[3] = 112; 
+*/
 
-    // Target = 192.168.1.111
+/*
+    // Target = 192.168.1.8
     // Linux host.
     uint8_t target_ip_address[4];
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
     target_ip_address[3] = 8;  // Linux host machine.
+*/
 
+/*
     // MAC for broadcast.
     // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
     uint8_t target_mac_address[6];
@@ -356,14 +369,30 @@ void testNIC(void)
     target_mac_address[3] = 0xFF;
     target_mac_address[4] = 0xFF;
     target_mac_address[5] = 0xFF;
+*/
 
 
-    SendARP( 
+// Send ARP request to a Linus host.
+    network_send_arp( 
         ARP_OPC_REQUEST, 
-        source_ip_address,   // src ip 
-        target_ip_address,   // dst ip
-        target_mac_address   // target mac
+        gramado_default_ipv4,  // src ip 
+        target_default_ipv4,   // dst ip (Linux)
+        broadcast_mac          // target mac
         );
+
+/*
+// Send ARP request to the default gateway.
+    network_send_arp( 
+        ARP_OPC_REQUEST, 
+        gramado_default_ipv4,  // src ip 
+        gateway_default_ipv4,  // dst ip
+        broadcast_mac          // target mac
+        );
+*/
+
+// ...
+
+    e1000_show_info();
 
     printf("testNIC: done\n");
     refresh_screen();
@@ -371,20 +400,20 @@ void testNIC(void)
 
 // handle ipv4 package
 // Called by all the embedded nic device drivers.
+// IN:
+// buffer = The address after the ethernet header.
 void 
 network_handle_ipv4( 
     const unsigned char *buffer, 
     ssize_t size )
 {
     //printf("network_handle_ipv4: ==== IPV4 ====\n");
-
-// Coloca em um dos buffers, 
-// de onde os aplicativos podem pegar depois.
-    network_buffer_in ( (void *) buffer, (int) size );
 }
 
 // handle arp package
 // Called by all the embedded nic device drivers.
+// IN:
+// buffer = The address after the ethernet header.
 void 
 network_handle_arp( 
     const unsigned char *buffer, 
@@ -399,6 +428,8 @@ network_handle_arp(
 // um buffer que pode ser lido pelos aplicativos.
 int network_buffer_in( void *buffer, int len )
 {
+// Push packet.
+
     int tail=0;
     void *dst_buffer;
 
@@ -479,6 +510,8 @@ fail:
 // Daí os aplicativos interpretam os protocolos.
 int network_buffer_out ( void *buffer, int len )
 {
+// Pop packet.
+
     int head=0;
     void *src_buffer;
 

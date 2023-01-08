@@ -104,7 +104,7 @@ extern int ____network_late_flag;
 // == Prototypes ====================
 //
 void 
-SendARP( 
+network_send_arp( 
     int op,   //operation
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 

@@ -135,6 +135,8 @@ extern int e1000_irq_count;
 // == Prototypes ========
 //
 
+void e1000_show_info(void);
+
 int 
 e1000_init_nic ( 
     unsigned char bus, 
