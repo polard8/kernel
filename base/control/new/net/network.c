@@ -345,7 +345,7 @@ void testNIC(void)
     target_ip_address[0] = 192;
     target_ip_address[1] = 168;
     target_ip_address[2] = 1; 
-    target_ip_address[3] = 88; //105;//111; 
+    target_ip_address[3] = 8;  // Linux host machine.
 
     // MAC for broadcast.
     // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
