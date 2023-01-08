@@ -23,7 +23,6 @@
 
 #define ToNetByteOrder16(v)  ((v >> 8) | (v << 8))
 #define ToNetByteOrder32(v)  (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
-
 #define FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 #define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
 

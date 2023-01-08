@@ -137,6 +137,12 @@ extern int e1000_irq_count;
 
 void e1000_show_info(void);
 
+void 
+e1000_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    unsigned char *data );
+
 int 
 e1000_init_nic ( 
     unsigned char bus, 

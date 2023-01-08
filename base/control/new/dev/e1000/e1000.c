@@ -6,28 +6,33 @@
 
 #include <kernel.h>
 
+static int e1000_initialized = FALSE;
+
 // How many buffers.
 // #define E1000_NUM_TX_DESC 8
 // #define E1000_NUM_RX_DESC 32
 #define SEND_BUFFER_MAX       8
 #define RECEIVE_BUFFER_MAX   32
 
-// little endian
+/*
+// Little endian
 #define ToNetByteOrder16(v)   ((v >> 8) | (v << 8))
 #define ToNetByteOrder32(v)   (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
 #define FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 #define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
+*/
 
-//extra
-#define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
+// Extra
+// #define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
 
 //
 // == Ethernet ==============================================
 //
 
 // Ethernet header length
-#define ETHERNET_HEADER_LENGHT  14  
+// #define ETHERNET_HEADER_LENGHT  14  
 
+/*
 // Ethernet header
 // #todo: Nove this to e1000.h
 struct e1000_ether_header_d 
@@ -39,7 +44,7 @@ struct e1000_ether_header_d
     uint16_t type;
 
 } __attribute__((packed)); 
-
+*/
 
 //see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
@@ -100,11 +105,6 @@ static int __e1000_reset_controller(struct intel_nic_info_d *d);
 
 // =====================
 
-void 
-e1000_send(
-    struct intel_nic_info_d *dev, 
-    size_t len, 
-    unsigned char *data );
 void 
 e1000_send(
     struct intel_nic_info_d *dev, 
@@ -946,6 +946,8 @@ e1000_init_nic (
     unsigned short tmp16=0;
     uint32_t Val=0;
 
+    e1000_initialized = FALSE;
+
 // #debug
     debug_print ("e1000_init_nic:\n");
     printf      ("e1000_init_nic:\n");
@@ -1214,6 +1216,9 @@ e1000_init_nic (
     refresh_screen();
     //while(1){ asm("hlt"); }
 
+
+    e1000_initialized = TRUE;
+
 // 0 = no errors
     return 0;
 }
@@ -1224,8 +1229,8 @@ on_receiving (
     const unsigned char *buffer, 
     ssize_t size )
 {
-    struct e1000_ether_header_d *eth = 
-        (struct e1000_ether_header_d *) buffer;
+    struct ether_header *eth = 
+        (struct ether_header *) buffer;
     uint16_t Type=0;
 
     if ( (void*) buffer == NULL ){
@@ -1276,9 +1281,9 @@ on_receiving (
 */
 
 
-    Type = (uint16_t) e1000_FromNetByteOrder16(eth->type);
+    Type = (uint16_t) FromNetByteOrder16(eth->type);
 
-    switch ((uint16_t) Type){
+    switch (Type){
     case 0x0800:
         printf ("[0x0800]: IPV4 received\n");
         network_handle_ipv4(buffer,size);
@@ -1316,7 +1321,7 @@ static void DeviceInterface_e1000(void)
     uint16_t old=0;
     uint32_t len=0;
 // The ethernet header.
-    struct e1000_ether_header_d *eh;
+    struct ether_header *eh;
     uint16_t Type=0;
 
 // Interrupt Masks
@@ -1368,7 +1373,9 @@ static void DeviceInterface_e1000(void)
 // Status
     status = __E1000ReadCommand( currentNIC, 0xC0 );
     //__E1000WriteCommand( currentNIC, 0xC0, status );
-    //__E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
+
+// Clear all the bits.
+    __E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
 
     if (status == 0){
         goto fail;
@@ -1376,14 +1383,14 @@ static void DeviceInterface_e1000(void)
 
     // 0x01 - transmit completed.
     // INTERRUPT_TXDW
-    if ( status & 0x01 ){
+    if (status & 0x01){
         printf ("DeviceInterface_e1000: Transmit completed\n");
         e1000_tx_counter++;
         goto done;
 
     // 0x02
     // INTERRUPT_TXQE
-    }else if(status & 0x02){
+    } else if (status & 0x02){
         printf("DeviceInterface_e1000: Transmit queue empty!\n");
         goto done;
 
@@ -1469,12 +1476,12 @@ static void DeviceInterface_e1000(void)
         goto done;
 
     // INTERRUPT_RXDMT0
-    }else if (status & 0x10){
+    } else if (status & 0x10){
         printf("DeviceInterface_e1000: Good threshold!\n");
         goto done;
     // ??
     // INTERRUPT_SRPD
-    }else if (status & 0x8000 ){
+    } else if (status & 0x8000){
         printf ("DeviceInterface_e1000: status = 0x8000\n");
         goto done;
     }else{
@@ -1486,7 +1493,7 @@ static void DeviceInterface_e1000(void)
 done:
     // Clear all the bits.
     // Write 1b, clear the bit.
-    __E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
+    // __E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
     refresh_screen();
     return;
 fail:
@@ -1515,6 +1522,8 @@ fail:
 __VOID_IRQ 
 irq_E1000 (void)
 {
+    if (e1000_initialized!=TRUE)
+        return;
     gE1000InputTime = (unsigned long) jiffies;
     DeviceInterface_e1000();
 }

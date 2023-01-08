@@ -842,11 +842,26 @@ _irq10:
 
 extern _irq_E1000
 
+;;===============================================
+;;  interrupção 41. irq 9;
+
+; Capture context
+; see: unit0lib.asm
+;global _nic_handler2
+;_nic_handler2:
+;    jmp _nic_handler
+;==================
+
+
+; Capture context
 global _nic_handler
 _nic_handler:
-    
+
     cli
 
+    ;; Acumulator.
+    push rax
+   
     push rax
     push rbx
     push rcx
@@ -870,17 +885,24 @@ _nic_handler:
     push rsp
     pushfq
     cld
-    
+
+    ;xor rax, rax
+    ;mov ax, word 0x10 ;KERNEL_DS
+    ;mov ds, ax
+    ;mov es, ax
+    ;mov fs, ax
+    ;mov gs, ax ; Is it used ?
+    ;mov ss, ax ; Is it used ?
+
+; See: 
+
+    fxsave [__hw_fpu_buffer]
 
     call _irq_E1000
 
-    ; EOI: Order: Second, first.
-    mov al, 0x20
-    out 0xA0, al  
-    IODELAY  
-    out 0x20, al
-    IODELAY  
-    
+    fxrstor [__hw_fpu_buffer]
+
+
     popfq
     pop rsp
     pop gs
@@ -904,23 +926,23 @@ _nic_handler:
     pop rbx
     pop rax
 
+
+    ; EOI: Order: Second, first.
+    mov al, 0x20
+    out 0xA0, al  
+    IODELAY  
+    out 0x20, al
+    IODELAY  
+
+    
+    ;; The acumulator.
+    pop rax
+
     sti
     iretq
 
+;;===========================
 
-
-
-
-;;===============================================
-;;  interrupção 41. irq 9;
-
-; Capture context
-; see: unit0lib.asm
-global _nic_handler2
-_nic_handler2:
-    jmp _nic_handler
-
-;==================
 
 ;=======================================
 ; IRQ 11 - The Interrupt is left open for 
