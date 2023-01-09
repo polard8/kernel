@@ -66,17 +66,11 @@ struct intel_nic_info_d
     object_type_t objectType;
     object_class_t objectClass;
 
-// Validação da estrutura.
-// Se as flags estiverem acionadas, devemos procurar 
-// as informações na estrutura de dispositivo pci.
     int used;
     int magic;
 
 // The base address for the registers.
     unsigned long registers_base_address;
-
-    unsigned long DeviceControl;
-    unsigned long DeviceStatus;
 
     uint8_t mac_address[6];
     uint8_t ip_address[4];
@@ -84,11 +78,11 @@ struct intel_nic_info_d
     uint16_t rx_cur;
     uint16_t tx_cur;
 
-    int eeprom;
+    int has_eeprom;
+
+// i/o ports support.
     int use_io;
-
     // uint16_t io_base;
-
 
 // Estrutura de descritores 
 // Virtual address for the first descriptor.
