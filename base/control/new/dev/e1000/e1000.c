@@ -14,39 +14,8 @@ static int e1000_initialized = FALSE;
 #define SEND_BUFFER_MAX       8
 #define RECEIVE_BUFFER_MAX   32
 
-/*
-// Little endian
-#define ToNetByteOrder16(v)   ((v >> 8) | (v << 8))
-#define ToNetByteOrder32(v)   (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
-#define FromNetByteOrder16(v) ((v >> 8) | (v << 8))
-#define FromNetByteOrder32(v) (((v >> 24) & 0xFF) | ((v << 8) & 0xFF0000) | ((v >> 8) & 0xFF00) | ((v << 24) & 0xFF000000))
-*/
 
-// Extra
-// #define e1000_FromNetByteOrder16(v) ((v >> 8) | (v << 8))
-
-//
-// == Ethernet ==============================================
-//
-
-// Ethernet header length
-// #define ETHERNET_HEADER_LENGHT  14  
-
-/*
-// Ethernet header
-// #todo: Nove this to e1000.h
-struct e1000_ether_header_d 
-{
-// MAC
-    uint8_t dst[6];
-    uint8_t src[6];
-// Protocol type
-    uint16_t type;
-
-} __attribute__((packed)); 
-*/
-
-//see: nicintel.h
+// see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
 
 int e1000_interrupt_flag=0;
@@ -111,19 +80,20 @@ e1000_send(
     size_t len, 
     unsigned char *data )
 {
-
 // dev
     struct intel_nic_info_d *d;
     d = (struct intel_nic_info_d *) dev;
 
+    if ( (void*) d == NULL ){
+        printf("e1000_send: d\n");
+        goto fail;
+    }
+
     uint16_t old = d->tx_cur;
 
-    //StrCopyMemory(
-    //    (PUInt8)(dev->tx_descs_buffs[old]), 
-    //    data, 
-    //    len);
+    // Buffer, data, len
     memcpy(
-        (void *) currentNIC->tx_descs_virt[old], 
+        (void *) d->tx_buffers_virt[old], 
         (const void *) data, 
         (size_t) len );
 
@@ -150,6 +120,12 @@ e1000_send(
     {
         // Nothing
     };
+
+// done
+    return;
+fail:
+    refresh_screen();
+    return;
 }
 
 
@@ -328,14 +304,14 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 // Retorna um endereço virtual em tx_address e 
 // o físico no retorno da função.
 
-    uint32_t size_all_buffers = 
+    uint32_t size_all_desc = 
         (uint32_t) ((sizeof(struct legacy_tx_desc) * 8) + 16 );
 
     //d->tx_descs_phys = 
     //    (unsigned long) __E1000AllocCont ( 0x1000, (unsigned long *)(&d->legacy_tx_descs) );
     d->tx_descs_phys = 
         (unsigned long) __E1000AllocCont ( 
-               size_all_buffers, 
+               size_all_desc, 
                (unsigned long *)(&d->legacy_tx_descs) );
 
     if (d->tx_descs_phys == 0){
@@ -362,7 +338,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         tmp_txaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
                  0x3000, 
-                 (unsigned long *) &d->tx_descs_virt[i] );
+                 (unsigned long *) &d->tx_buffers_virt[i] );
         
         if (tmp_txaddress_pa == 0){
             panic("__e1000_reset_controller: tmp_txaddress_pa\n");
@@ -402,7 +378,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
             d->legacy_tx_descs[i].addr,
             d->legacy_tx_descs[i].addr2, 
-            d->tx_descs_virt[i] );
+            d->tx_buffers_virt[i] );
     };
     refresh_screen();
     while(1){}
@@ -588,7 +564,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 
 // And alloc the phys/virt address of the receive buffer.
 
-    uint32_t size_all_buffers = 
+    uint32_t size_all_desc = 
         (uint32_t) ((sizeof(struct legacy_rx_desc) * 32) + 16 );
   
     //d->rx_descs_phys = 
@@ -597,7 +573,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
     //        (unsigned long *)(&d->legacy_rx_descs));
     d->rx_descs_phys = 
         __E1000AllocCont (
-            size_all_buffers, 
+            size_all_desc, 
             (unsigned long *)(&d->legacy_rx_descs));
 
     if (d->rx_descs_phys == 0){
@@ -620,7 +596,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
         tmp_rxaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
                 0x3000, 
-                (unsigned long *) &d->rx_descs_virt[i] );
+                (unsigned long *) &d->rx_buffers_virt[i] );
 
         if (tmp_rxaddress_pa == 0){
             panic("__e1000_reset_controller: tmp_rxaddress_pa\n");
@@ -648,7 +624,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
         printf ("PA_LOW={%x} PA_HIGH={%x} VA={%x} \n",
             d->legacy_rx_descs[i].addr,
             d->legacy_rx_descs[i].addr2, 
-            d->rx_descs_virt[i] );
+            d->rx_buffers_virt[i] );
     };
     refresh_screen();
     while(1){}
@@ -1434,13 +1410,13 @@ static void DeviceInterface_e1000(void)
              len = currentNIC->legacy_rx_descs[old].length;
 
              //#test: Apenas pegando o buffer para usarmos logo adiante.
-             buffer = (unsigned char *) currentNIC->rx_descs_virt[old];
+             buffer = (unsigned char *) currentNIC->rx_buffers_virt[old];
 
             //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
             //chamaremos logo adiante, usando o buffer que pegamos acima.
 
             // Our Net layer should handle it
-            // NetHandlePacket(dev->ndev, len, (PUInt8)dev->rx_descs_virt[old]);
+            // NetHandlePacket(currentNIC->ndev, len, (PUInt8)currentNIC->rx_buffers_virt[old]);
 
             // zera.
             currentNIC->legacy_rx_descs[old].status = 0;

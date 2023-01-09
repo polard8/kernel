@@ -89,20 +89,21 @@ struct intel_nic_info_d
 
     // uint16_t io_base;
 
-// Estrutura de descritores e 
-// arrays de ponteiros de buffers.
 
-// rx
-    struct legacy_rx_desc *legacy_rx_descs; //rx ring virtual address
-    unsigned long rx_descs_virt[32];
-// tx
-    struct legacy_tx_desc *legacy_tx_descs; //tx ring virtual address
-    unsigned long tx_descs_virt[8];
+// Estrutura de descritores 
+// Virtual address for the first descriptor.
+    struct legacy_rx_desc *legacy_rx_descs;  // rx ring virtual address
+    struct legacy_tx_desc *legacy_tx_descs;  // tx ring virtual address
 
-// physical address.
-    unsigned long rx_descs_phys;  //rx ring physical address
-    unsigned long tx_descs_phys;  //tx ring physical address
+// Physical address of the first descriptor.
+    unsigned long rx_descs_phys;  // rx ring physical address
+    unsigned long tx_descs_phys;  // tx ring physical address
 
+// Arrays de ponteiros de buffers.
+    unsigned long rx_buffers_virt[32];
+    unsigned long tx_buffers_virt[8];
+
+// arp cache.
     struct arp_cache_item_d  arp_cache[32];
 
 //pci device.

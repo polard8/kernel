@@ -82,9 +82,9 @@ network_send_arp(
 //==============================================
 // # arp header #
     h = (void *) kmalloc ( sizeof(struct  ether_arp) );
-    if ( (void *) h == NULL){
+    if ( (void *) h == NULL ){
         printf ("network_send_arp: struct h fail");
-        return;
+        goto fail;
     }
 
 //
@@ -168,10 +168,16 @@ network_send_arp(
 
 // Get the buffer address based on its offset.
     unsigned char *buffer = 
-        (unsigned char *) currentNIC->tx_descs_virt[buffer_index];
+        (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
 // Get the addresses for the headers.
     unsigned char *src_ethernet = (unsigned char *) eh;
     unsigned char *src_arp      = (unsigned char *) h;
+
+
+    if ((void*) buffer == NULL){
+        printf("network_send_arp: buffer\n");
+        goto fail;
+    }
 
 //
 // Copy
@@ -179,15 +185,13 @@ network_send_arp(
 
 // Copy the ethernet header into the buffer.
 // 14 bytes.
-    for (i=0; i<ETHERNET_HEADER_LENGHT;i++)
-    {
+    for (i=0; i<ETHERNET_HEADER_LENGHT; i++){
         buffer[i] = (unsigned char) src_ethernet[i];
     };
 // Copy the arp header into the buffer.
 // 28 bytes
 // It starts right after the ethernet header.
-    for (i=0; i<ARP_HEADER_LENGHT;i++)
-    {
+    for (i=0; i<ARP_HEADER_LENGHT; i++){
         buffer[ETHERNET_HEADER_LENGHT + i] = (unsigned char) src_arp[i]; 
     };
 
@@ -267,6 +271,10 @@ network_send_arp(
     unsigned int head = (unsigned int) 0;  // The first one.
     unsigned int tail = (unsigned int) (currentNIC->tx_cur & 0xFFFF);  // The last one.
 
+
+// #todo
+// Call a worker for that routine.
+
 // TDH = 0x3810, Tx Descriptor Head.
     //*( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDH)) = 
     //    (unsigned int) head;
@@ -327,6 +335,10 @@ network_send_arp(
     // goto fail;
 */
 
+// done
+    refresh_screen();
+    return;
+
 fail:
     refresh_screen();
     return;
@@ -336,41 +348,9 @@ fail:
 // Test, called by the kernel console.
 void testNIC(void)
 {
+    // #debug
     printf("testNIC:\n");
     refresh_screen();
-
-/*
-    // Source = 192.168.1.112
-    // Gramado.
-    uint8_t source_ip_address[4];
-    source_ip_address[0] = 192;
-    source_ip_address[1] = 168;
-    source_ip_address[2] = 1;   
-    source_ip_address[3] = 112; 
-*/
-
-/*
-    // Target = 192.168.1.8
-    // Linux host.
-    uint8_t target_ip_address[4];
-    target_ip_address[0] = 192;
-    target_ip_address[1] = 168;
-    target_ip_address[2] = 1; 
-    target_ip_address[3] = 8;  // Linux host machine.
-*/
-
-/*
-    // MAC for broadcast.
-    // 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF.
-    uint8_t target_mac_address[6];
-    target_mac_address[0] = 0xFF;
-    target_mac_address[1] = 0xFF;
-    target_mac_address[2] = 0xFF;
-    target_mac_address[3] = 0xFF;
-    target_mac_address[4] = 0xFF;
-    target_mac_address[5] = 0xFF;
-*/
-
 
 // Send ARP request to a Linus host.
     network_send_arp( 
@@ -394,6 +374,7 @@ void testNIC(void)
 
     e1000_show_info();
 
+    // #debug
     printf("testNIC: done\n");
     refresh_screen();
 }
