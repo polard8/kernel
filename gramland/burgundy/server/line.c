@@ -113,6 +113,10 @@ void test_draw_line(void)
 // illusion
 void test_draw_line2(void)
 {
+// #bugbug
+// Explain it better.
+// Something is wrong here. We have 2 loops.
+
     register int i=0;
     unsigned long vertex1[2];
     unsigned long vertex2[2];
@@ -122,22 +126,18 @@ void test_draw_line2(void)
 // #todo
 // Check the w h validation.
 
-    // horizontal
     for ( i=0; i<h; i=i+10 )
     {
-            vertex1[0]=0;  //x1
-            vertex1[1]=i;  //y1
-
-            vertex2[0]=i;  //x2
-            vertex2[1]=i;  //y2
-            
-            A_naive_line_drawing_algorithm ( 
-                vertex1[0], vertex2[0],   //x1,x2
-                vertex1[1], vertex2[1],   //y1,y2
-                COLOR_YELLOW );
+        vertex1[0]=0;  //x1
+        vertex1[1]=i;  //y1
+        vertex2[0]=i;  //x2
+        vertex2[1]=i;  //y2
+        A_naive_line_drawing_algorithm ( 
+            vertex1[0], vertex2[0],   //x1,x2
+            vertex1[1], vertex2[1],   //y1,y2
+            COLOR_YELLOW );
      };
 
-    // horizontal
     for ( i=0; i<h; i=i+10 )
     {
             vertex1[0]=i;  //x1
@@ -152,6 +152,7 @@ void test_draw_line2(void)
                 COLOR_BLUE );
      };
 
+// #slow.
     gwssrv_show_backbuffer();
 }
 
@@ -233,13 +234,11 @@ backbuffer_draw_horizontal_line (
     unsigned int color,
     unsigned long rop_flags )
 {
-
 // #todo
 // Maybe we need checking some limits here.
     if (x1 > x2){
         return;
     }
-
 // IN: color, x, y, rop flags.
     while (x1 < x2){
         backbuffer_putpixel ( color, x1, y, rop_flags ); 
@@ -255,20 +254,17 @@ frontbuffer_draw_horizontal_line (
     unsigned int color,
     unsigned long rop_flags )
 {
-
 // #todo
 // Maybe we need checking some limits here.
     if (x1 > x2){
         return;
     }
-
 // IN: color, x, y, rop flags.
     while (x1 < x2){
         frontbuffer_putpixel ( color, x1, y, rop_flags );
         x1++;
     };
 }
-
 
 //
 // End

@@ -99,14 +99,13 @@ set_rect (
     unsigned long width,
     unsigned long height )
 {
-    if ( (void*) rect == NULL )
-    {
+    if ( (void*) rect == NULL ){
         return FALSE;
     }
-    
-    rect->left   = left;
-    rect->top    = top;
-    rect->width  = width;
+
+    rect->left = left;
+    rect->top = top;
+    rect->width = width;
     rect->height = height;
 
     // #text
@@ -136,7 +135,6 @@ inflate_rect (
     rect->height = (rect->bottom - rect->top);
 }
 
-
 // #todo: Explain
 void 
 copy_inflate_rect ( 
@@ -153,20 +151,19 @@ copy_inflate_rect (
         return;
     }
 
-    // inflate and copy.
-    // todo: fazer isso em duas etapas.
+// inflate and copy.
+// todo: fazer isso em duas etapas.
     rectDest->left   = rectSrc->left   -= cx;
     rectDest->top    = rectSrc->top    -= cy;
     rectDest->right  = rectSrc->right  += cx;
     rectDest->bottom = rectSrc->bottom += cy;
 
-    //update width and height
+// update width and height
     rectSrc->width   = (rectSrc->right   - rectSrc->left);
     rectSrc->height  = (rectSrc->bottom  - rectSrc->top);
     rectDest->width  = (rectDest->right  - rectDest->left);
     rectDest->height = (rectDest->bottom - rectDest->top);
 }
-
 
 // ??
 // #todo: Comment what is happening here.
@@ -181,13 +178,13 @@ offset_rect (
         return;
     }
 
-    //offset rect
+// offset rect
     rect->left   += cx;
     rect->top    += cy;
     rect->right  += cx;
     rect->bottom += cy;
 
-    //update width and height
+// update width and height
     rect->width  = (rect->right  - rect->left);
     rect->height = (rect->bottom - rect->top);
 }
@@ -209,19 +206,18 @@ copy_offset_rect (
         return;
     }
 
-    // offset and copy the rect.
+// offset and copy the rect.
     rectDest->left   = rectSrc->left   += cx;
     rectDest->top    = rectSrc->top    += cy;
     rectDest->right  = rectSrc->right  += cx;
     rectDest->bottom = rectSrc->bottom += cy;
 
-    //update width and height,
+// update width and height
     rectSrc->width   = (rectSrc->right  - rectSrc->left);
     rectSrc->height  = (rectSrc->bottom - rectSrc->top);
     rectDest->width  = (rectDest->right  - rectDest->left);
     rectDest->height = (rectDest->bottom - rectDest->top);
 }
-
 
 // ??
 // #todo: Comment what is happening here.
@@ -244,7 +240,7 @@ int rect_validate_size( struct gws_rect_d *rect )
     return TRUE;
 }
 
-int rect_validate_size2( struct gws_rect_d *rect )
+int rect_validate_size2(struct gws_rect_d *rect)
 {
     if ( (void*) rect == NULL ){
         return -1;
@@ -273,16 +269,13 @@ int is_rect_null( struct gws_rect_d *rect )
     return FALSE;
 }
 
-
-
-int is_rect_empty( struct gws_rect_d *rect )
+int is_rect_empty(struct gws_rect_d *rect)
 {
     if ( (void*) rect == NULL ){
-        return -1;
+        return (int) -1;
     }
 
-    if (rect->is_empty == TRUE)
-    {
+    if (rect->is_empty == TRUE){
         return (int) TRUE;
     }
  
@@ -290,18 +283,17 @@ int is_rect_empty( struct gws_rect_d *rect )
     return FALSE;
 }
 
-
 // ??
 // #todo: Comment what is happening here.
-int is_rect_dirty( struct gws_rect_d *rect )
+int is_rect_dirty(struct gws_rect_d *rect)
 {
     // Error!
     if ( (void*) rect == NULL ){
-        return -1;
+        return (int) -1;
     }
 
     // true
-    if ( rect->dirty == TRUE  ){
+    if (rect->dirty == TRUE){
         return (int) TRUE;
     }
 
@@ -316,7 +308,7 @@ rect_contains_vertically (
     unsigned long y ) 
 {
     if ( (void*) rect == NULL ){
-        return -1;
+        return (int) -1;
     }
 
     // ta dentro
@@ -337,7 +329,7 @@ rect_contains_horizontally (
     unsigned long x )
 {
     if ( (void*) rect == NULL ){
-        return -1;
+        return (int) -1;
     }
 
     // ta dentro
@@ -350,7 +342,6 @@ rect_contains_horizontally (
     // ta fora
     return FALSE;
 }
-
 
 void 
 rect_set_left ( 
@@ -400,11 +391,10 @@ rect_set_bottom (
     rect->bottom = value;
 }
 
-
 // #todo
 // Do not check the validation.
-// We need a prefix that tellus that we will no chack the validation
-// os the addresses
+// We need a prefix that tell us that 
+// we will no chack the validation os the addresses
 
 static void *__rect_memcpy32 ( 
     void *v_dst, 
@@ -434,11 +424,11 @@ static void *__rect_memcpy32 (
 // We are using a flag to guide us if we realy need to refresh 
 // the given rectangle.
 
-int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
+int gwssrv_refresh_this_rect (struct gws_rect_d *rect)
 {
     if ( (void*) rect == NULL ){ return -1; }
 
-    if ( rect->dirty != TRUE  ){ 
+    if (rect->dirty != TRUE){ 
         return -1; 
     }
 
@@ -450,7 +440,6 @@ int gwssrv_refresh_this_rect ( struct gws_rect_d *rect )
     return 0;
 }
 
-
 // Flush the rectangle into the framebuffer.
 int flush_rectangle(struct gws_rect_d *rect)
 {
@@ -460,11 +449,9 @@ int flush_rectangle(struct gws_rect_d *rect)
     return (int) gwssrv_refresh_this_rect(rect);
 }
 
-
 //======================================
 // Calling kgws in the kernel.
 // Using the kgws to draw the rectangle.
-
 // #todo
 // At this moment, no structure ware invalidated.
 // So, the caller needs to specify a rect structure,
@@ -515,14 +502,15 @@ setup_surface_rectangle (
         892, (unsigned long) &Buffer[0], 0, 0 );
 }
 
-
 void invalidate_surface_retangle (void)
 {
     gramado_system_call ( 893, 0, 0, 0 );
 }
 
-
 // Copy a rectangle.
+// #todo
+// IN:
+// l, t, w, h, dst address, src address.
 static void 
 __refresh_rectangle0 ( 
     unsigned long x, 
@@ -546,23 +534,18 @@ __refresh_rectangle0 (
     unsigned int line_size=0; 
     register int count=0; 
 
-    // Screen pitch.
-    // screen line size in pixels * bytes per pixel.
+// Screen pitch.
+// screen line size in pixels * bytes per pixel.
     unsigned int screen_pitch=0;  
-    // Rectangle pitch
-    // rectangle line size in pixels * bytes per pixel.
+// Rectangle pitch
+// rectangle line size in pixels * bytes per pixel.
     unsigned int rectangle_pitch=0;  
-
     unsigned int offset=0;
-
-    // = 3; 24bpp
+// = 3; 24bpp
     int bytes_count=0;
-
     int FirstLine = (int) (y & 0xFFFF);
-
     //int UseVSync = FALSE;
     int UseClipping = TRUE;
-
 
 //==========
 // dc
@@ -572,9 +555,7 @@ __refresh_rectangle0 (
     unsigned long deviceWidth  = (unsigned long) gws_get_device_width();
     unsigned long deviceHeight = (unsigned long) gws_get_device_height();
 
-
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         debug_print ("refresh_rectangle: w h\n");
         //panic       ("refresh_rectangle: w h\n");
         return;
@@ -583,7 +564,6 @@ __refresh_rectangle0 (
 //
 // Internal
 //
-
     unsigned long X = (unsigned long) (x & 0xFFFF);
     unsigned long Y = (unsigned long) (y & 0xFFFF);
 
@@ -592,14 +572,14 @@ __refresh_rectangle0 (
 
     switch (SavedBPP){
 
-        case 32:  bytes_count = 4;  break;
-        case 24:  bytes_count = 3;  break;
-        // ... #todo
-        
-        default:
-            //panic ("refresh_rectangle: SavedBPP\n");
-            return;
-            break;
+    case 32:  bytes_count = 4;  break;
+    case 24:  bytes_count = 3;  break;
+    // ... #todo
+
+    default:
+        //panic ("refresh_rectangle: SavedBPP\n");
+        return;
+        break;
     };
 
 //
@@ -608,7 +588,7 @@ __refresh_rectangle0 (
 
 // Screen pitch.
 // Screen line size in pixels plus bytes per pixel.
-    screen_pitch    = (unsigned int) (bytes_count * deviceWidth);
+    screen_pitch = (unsigned int) (bytes_count * deviceWidth);
 
 // Rectangle pitch.
 // rectangle line size in pixels * bytes per pixel.
@@ -643,7 +623,7 @@ __refresh_rectangle0 (
     {
         count = (rectangle_pitch>>3);
         for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
+            if (UseClipping == TRUE){
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
             memcpy64 ( (void *) dest, (const void *) src, count );
@@ -667,7 +647,7 @@ __refresh_rectangle0 (
     {
         count = (rectangle_pitch>>2);
         for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
+            if (UseClipping == TRUE){
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
             memcpy32 ( (void *) dest, (const void *) src, count );
@@ -688,7 +668,7 @@ __refresh_rectangle0 (
     if ( (rectangle_pitch % 4) != 0 )
     {
         for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
+            if (UseClipping == TRUE){
                 if ( (FirstLine + i) > deviceHeight ){ break; }
             }
             memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
@@ -699,11 +679,9 @@ __refresh_rectangle0 (
     }
 }
 
-
 //======================================
 // Calling kgws in the kernel.
 // Using the kgws to refresh the rectangle.
-
 static void 
 __refresh_rectangle_via_kgws ( 
     unsigned long x, 
@@ -722,7 +700,6 @@ __refresh_rectangle_via_kgws (
     gramado_system_call ( 
         10, (unsigned long) &Buffer[0], 0, 0 );
 }
-
 
 /*
  * gws_refresh_rectangle:
@@ -768,7 +745,6 @@ gws_refresh_rectangle (
 
     unsigned int offset=0;
 
-
 // 4 = 32bpp
 // 3 = 24bpp
     int bytes_count=0;
@@ -780,16 +756,13 @@ gws_refresh_rectangle (
     unsigned long Width  = (unsigned long) (width  & 0xFFFF);
     unsigned long Height = (unsigned long) (height & 0xFFFF);
 
-
 // Refresh in the kernel using the kgws.
 
-    if ( RefreshRectangleUsingKGWS == TRUE )
-    {
+    if (RefreshRectangleUsingKGWS == TRUE){
         //debug_print("gws_refresh_rectangle: Using R0\n");
         __refresh_rectangle_via_kgws(X,Y,Width,Height);
         return;
     }
-
 
 //
 // Refresh using the routine inside the ws.
@@ -803,25 +776,22 @@ gws_refresh_rectangle (
     unsigned long ScreenWidth  = (unsigned long) gws_get_device_width();
     unsigned long ScreenHeight = (unsigned long) gws_get_device_height();
 
-    if ( ScreenWidth == 0 )
-    {
+    if (ScreenWidth == 0){
         debug_print("gws_refresh_rectangle: [ERROR] ScreenWidth\n");
         printf     ("gws_refresh_rectangle: [ERROR] ScreenWidth\n");  
         exit(1);
     }
 
-    if ( ScreenHeight == 0 )
-    {
+    if (ScreenHeight == 0){
         debug_print("gws_refresh_rectangle: [ERROR] ScreenHeight\n");
         printf     ("gws_refresh_rectangle: [ERROR] ScreenHeight\n");  
         exit(1);
     }
 
-    ScreenWidth  = (ScreenWidth  & 0xFFFF );
-    ScreenHeight = (ScreenHeight & 0xFFFF );
+    ScreenWidth  = (ScreenWidth  & 0xFFFF);
+    ScreenHeight = (ScreenHeight & 0xFFFF);
 
 // Internal
-
     line_size = (unsigned int) (width  & 0xFFFF); 
     lines     = (unsigned int) (height & 0xFFFF);
 
@@ -830,7 +800,7 @@ gws_refresh_rectangle (
 // Não por enquanto. 
 // precisamos conhecer melhor nossos limites.
 
-    if ( Y >= ScreenHeight )
+    if (Y >= ScreenHeight)
     {
         debug_print("gws_refresh_rectangle: [ERROR]  Y > ScreenHeight\n");
         return;
@@ -859,54 +829,47 @@ gws_refresh_rectangle (
 
 // pitch - (largura da tela em bytes)
 // screen line size in pixels * bytes per pixel.
-
     pitch = (unsigned int) (bytes_count * ScreenWidth);
 
 // rectangle_pitch - (largura do retângulo em bytes)
 // rectangle line size in pixels * bytes per pixel.
-
     rectangle_pitch = (unsigned int) (bytes_count * line_size);
 
 // #atenção.
     //offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
 // 32bpp
-    if(bytes_count==4)
+    if (bytes_count==4){
         offset = (unsigned int) ( (Y*pitch) + (X<<2) );
-
+    }
 // 24bpp
-    if(bytes_count==3)
+    if (bytes_count==3){
         offset = (unsigned int) ( (Y*pitch) + (bytes_count*X) );
+    }
 
-    
-    dest = (void *)       (dest + offset);    
-    src  = (const void *) (src  + offset);    
-
+    dest = (void *)       (dest + offset);
+    src  = (const void *) (src  + offset);
 
 // #bugbug
 // Isso pode nos dar problemas.
 // ?? Isso ainda é necessário nos dias de hoje ??
-    //vsync ();	
+    //vsync ();
 
-	//(line_size * bytes_count) é o número de bytes por linha. 
+    //(line_size * bytes_count) é o número de bytes por linha. 
 
-//#importante
-//É bem mais rápido com múltiplos de 4.
+// #importante
+// É bem mais rápido com múltiplos de 4.
 
-
-    
-    // Se for divisível por 4.
-    // Copia uma linha ou um pouco mais caso não seja divisível por 4.
+// Se for divisível por 4.
+// Copia uma linha ou um pouco mais caso não seja divisível por 4.
     if ( (rectangle_pitch % 4) == 0 )
     {
         //debug_print("gws_refresh_rectangle: [1]\n");
     
         count = (rectangle_pitch / 4); 
 
-        for ( i=0; i < lines; i++ )
-        {
+        for ( i=0; i<lines; i++ ){
             __rect_memcpy32 ( (void *) dest, (const void *) src, count );
-            
             dest += pitch;
             src  += pitch;
         };
@@ -922,7 +885,7 @@ gws_refresh_rectangle (
         */
     }
 
-    // Se não for divisível por 4.
+// Se não for divisível por 4.
     if ( (rectangle_pitch % 4) != 0 )
     {
         //debug_print("gws_refresh_rectangle: [2]\n");
@@ -944,7 +907,6 @@ gws_refresh_rectangle (
         */
     }
 }
-
 
 void 
 backbuffer_draw_rectangle( 
@@ -1031,17 +993,12 @@ __drawrectangle0(
 
 //loop
     unsigned long internal_height = (unsigned long) Height;
-
 // #todo
 // Get the clipping window/rectangle.
-
     struct gws_rect_d  Rect;
     struct gws_rect_d  ClippingRect;
-
 // flag
     int UseClipping = TRUE;
-
-
 // dc: Clipping
 // Clipping support.
     //unsigned long deviceWidth  = (unsigned long) screenGetWidth();
@@ -1049,9 +1006,7 @@ __drawrectangle0(
     unsigned long deviceWidth = (unsigned long) gws_get_device_width();
     unsigned long deviceHeight = (unsigned long) gws_get_device_height();
 
-    
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         gwssrv_debug_print ("__drawrectangle0: [PANIC] w h\n");
         //panic       ("__drawrectangle0: [PANIC] w h\n");
         return;
@@ -1099,19 +1054,16 @@ __drawrectangle0(
 //
 
     Rect.bg_color = (unsigned int) Color;
-
-    // Dimensions
+// Dimensions
     Rect.x = 0;
     Rect.y = 0;
     Rect.width  = (Width  & 0xFFFF);
     Rect.height = (Height & 0xFFFF);
-
-    // Margins
+// Margins
     Rect.left   = (X & 0xFFFF);
     Rect.top    = (Y & 0xFFFF);
     Rect.right  = (unsigned long) (Rect.left + Rect.width);
     Rect.bottom = (unsigned long) (Rect.top  + Rect.height); 
-
 
 //
 // Clipping
@@ -1129,11 +1081,10 @@ __drawrectangle0(
     //if ( Rect.right  > SavedX ){  Rect.right  = SavedX;  }
     //if ( Rect.bottom > SavedY ){  Rect.bottom = SavedY;  }
 
-
-    if ( Rect.left   < ClippingRect.left   ){  Rect.left   = ClippingRect.left;   }
-    if ( Rect.top    < ClippingRect.top    ){  Rect.top    = ClippingRect.top;    }
-    if ( Rect.right  > ClippingRect.right  ){  Rect.right  = ClippingRect.right;  }
-    if ( Rect.bottom > ClippingRect.bottom ){  Rect.bottom = ClippingRect.bottom; }
+    if ( Rect.left   < ClippingRect.left   ){ Rect.left   = ClippingRect.left;   }
+    if ( Rect.top    < ClippingRect.top    ){ Rect.top    = ClippingRect.top;    }
+    if ( Rect.right  > ClippingRect.right  ){ Rect.right  = ClippingRect.right;  }
+    if ( Rect.bottom > ClippingRect.bottom ){ Rect.bottom = ClippingRect.bottom; }
 
 // Draw
 // Draw lines on backbuffer.
@@ -1153,47 +1104,42 @@ __drawrectangle0(
     while (1)
     {
         // 1=backbuffer
-        if( back_or_front == 1 ){
+        if ( back_or_front == 1 ){
             backbuffer_draw_horizontal_line ( 
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
         // 2=backbuffer
-        if( back_or_front == 2 ){
+        if ( back_or_front == 2 ){
             frontbuffer_draw_horizontal_line ( 
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
         Y++;
-        
+
         // #??
         // Porque podemos desejar escrever no backbuffer
         // um retângulo que ultrapasse a área do frontbuffer.
         
-        if ( UseClipping == TRUE )
+        if (UseClipping == TRUE)
         {
-            if ( Y > ClippingRect.bottom ){ break; };
+            if (Y > ClippingRect.bottom){
+                break;
+            };
         }
 
         // Decrementa o contador.
         internal_height--;
-        if (internal_height == 0)
+        if (internal_height == 0){
             break;
+        }
     };
-
 
 // ??
 // Send the rectangle to a list.
-
 // Invalidate
 // Sujo de tinta.
-
     Rect.dirty = TRUE;
-
-    //gwssrv_debug_print("__drawrectangle0: Done\n");
 }
-
-
-
 
 /*
  * rectBackbufferDrawRectangle0: (API)
@@ -1236,22 +1182,19 @@ rectBackbufferDrawRectangle0 (
     struct gws_rect_d rect;
 
     // debug_print("rectBackbufferDrawRectangle0: :(\n");
-    
-// device:
 
+// device:
     unsigned long device_w = (unsigned long) gws_get_device_width();
     unsigned long device_h = (unsigned long) gws_get_device_height();
     device_w = (unsigned long) (device_w & 0xFFFF);
     device_h = (unsigned long) (device_h & 0xFFFF);
 // #provisório
 // limites do dispositivo
-    if(device_w > 800)
-    {
+    if (device_w > 800){
         debug_print("rectBackbufferDrawRectangle0: [FAIL] device_w\n");
         return; 
     }
-    if(device_h > 600)
-    {
+    if (device_h > 600){
         debug_print("rectBackbufferDrawRectangle0: [FAIL] device_h\n");
         return; 
     }
@@ -1261,11 +1204,9 @@ rectBackbufferDrawRectangle0 (
     rect.top    =  (unsigned long) (y      & 0xFFFF);
     rect.width  =  (unsigned long) (width  & 0xFFFF);
     rect.height =  (unsigned long) (height & 0xFFFF);
-
 //Margins
     rect.right  = (unsigned long) (rect.left + rect.width);
     rect.bottom = (unsigned long) (rect.top  + rect.height); 
-
     rect.bg_color = (unsigned int)(color & 0xFFFFFF);
 
 //
@@ -1275,46 +1216,40 @@ rectBackbufferDrawRectangle0 (
 // #bugbug
 // O início não pode ser depois do fim.
 
-    if ( rect.left > rect.right )
-    { 
+    if (rect.left > rect.right)
+    {
         debug_print("rectBackbufferDrawRectangle0: [FAIL] left > right\n");
-        
         //#debug
         printf ("rectBackbufferDrawRectangle0: l:%d r:%d\n",
             rect.left,rect.right);
         exit(0);
-
         return; 
     }
     if ( rect.top > rect.bottom )
     { 
         debug_print("rectBackbufferDrawRectangle0: [FAIL] top  > bottom\n");
-
         //#debug
         printf ("rectBackbufferDrawRectangle0: t:%d b:%d\n",
             rect.top,rect.bottom);
         exit(0);
-
         return; 
     }
 
-
 // Clip
 
-    // se a largura for maior que largura do dispositivo.
+// se a largura for maior que largura do dispositivo.
     if ( rect.width > device_w ){
         rect.width = (unsigned long) device_w;
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.width > device_w\n");
         return;
     }
-    
-    // se a altura for maior que altura do dispositivo.
+
+// se a altura for maior que altura do dispositivo.
     if ( rect.height > device_h ){
         rect.height = (unsigned long) device_h;
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.height > device_h\n");
         return;
     }
-
 
 // limits
 // Se for maior que o espaço que sobre, 
@@ -1325,41 +1260,33 @@ rectBackbufferDrawRectangle0 (
         rect.width = (unsigned long) (device_w - rect.left);
         //debug_print("rectBackbufferDrawRectangle0: [AJUST] rect.width\n");
     }
-    
+
     if (rect.height > (device_h - rect.top) )
     {
         rect.height = (unsigned long) (device_h - rect.top);
         //debug_print("rectBackbufferDrawRectangle0: [AJUST] rect.height\n");
     }
 
-
-
 // check
-    if ( rect.right > device_w )
-    {
+    if ( rect.right > device_w ){
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.right > device_w\n");
         return;
     }
-    if ( rect.bottom > device_h )
-    {
+    if ( rect.bottom > device_h ){
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.bottom > device_h\n");
         return;
     }
 
-
 // empty
-
-    if ( fill == FALSE ){
+    if (fill == FALSE){
         rect.is_empty = TRUE;
     }
 
+/*
+// #todo
+// Desenhar as bordas com linhas
+// ou com retangulos
 
-    /*
-
-    // #todo
-    // Desenhar as bordas com linhas
-    // ou com retangulos
-   
     if (fill==0)
     {
             //  ____
@@ -1392,11 +1319,10 @@ rectBackbufferDrawRectangle0 (
           
         return;
     }
-    */
+*/
 
 // fill
-    
-    if ( fill == TRUE ){
+    if (fill == TRUE){
         rect.is_empty = FALSE;
     }
 
@@ -1405,7 +1331,7 @@ rectBackbufferDrawRectangle0 (
 // Draw lines on backbuffer.
 // Invalidate the rectangle.
 
-    if ( DrawRectangleUsingKGWS == TRUE )
+    if (DrawRectangleUsingKGWS == TRUE)
     {
          //debug_print("rectBackbufferDrawRectangle0: Using R0\n");
          __draw_rectangle_via_kgws (
@@ -1439,13 +1365,11 @@ rectBackbufferDrawRectangle0 (
 
 /*
 // Fail
-    if ( rect.left > rect.width  )
-    { 
+    if ( rect.left > rect.width  ){ 
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.left > rect.width\n");
         return; 
     }
-    if ( rect.top  > rect.height )
-    { 
+    if ( rect.top  > rect.height ){ 
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.top  > rect.height\n");
         return; 
     }
@@ -1460,34 +1384,29 @@ rectBackbufferDrawRectangle0 (
 // ===============================
 // Draw lines on backbuffer.
 // It's using the ws routine.
-
     unsigned long number_of_lines=0;
     number_of_lines = (unsigned long) rect.height;
 
 // #todo
 // Test this one for painting using the ring 3 ws.
 // backbuffer_draw_horizontal_line(...)
-
     while (number_of_lines--)
     {
-        
         if (rect.top >= rect.bottom){ break; }
         if (rect.top >= device_h)   { break; }
-        
+
         grBackbufferDrawHorizontalLine ( 
             rect.left, rect.top, rect.right, 
             (unsigned int) rect.bg_color );
-        
+
         rect.top++;
     };
 
 // Invalidate
     rect.dirty = TRUE;
-
 done:
     return;
 }
-
 
 void 
 rectBackbufferDrawRectangle ( 
@@ -1529,12 +1448,11 @@ rectBackbufferDrawRectangle (
     */
 }
 
-
 // #todo
 // The structure needs to have all the information
 // we need to redraw the given rectangle.
 // # not tested yet.
-int update_rectangle( struct gws_rect_d *rect )
+int update_rectangle(struct gws_rect_d *rect)
 {
     unsigned long Left=0;
     unsigned long Top=0;
@@ -1552,18 +1470,15 @@ int update_rectangle( struct gws_rect_d *rect )
     if (rect->magic != 1234){ return -1; }
 
 // Values
-
     Left   = (unsigned long) (rect->left   & 0xFFFF); 
     Top    = (unsigned long) (rect->top    & 0xFFFF); 
     Width  = (unsigned long) (rect->width  & 0xFFFF); 
     Height = (unsigned long) (rect->height & 0xFFFF); 
-
     Color = 
         (unsigned int) (rect->bg_color & 0xFFFFFFFF); 
 
 // Paint it into the backbuffer.
 // no return
-
     rectBackbufferDrawRectangle ( 
         (unsigned long) Left,     // left
         (unsigned long) Top,      // top
@@ -1572,13 +1487,10 @@ int update_rectangle( struct gws_rect_d *rect )
         (unsigned int) Color,     // color
         (int) TRUE,               // fill it?
         (unsigned long) 0 );      // rop_flags
-
 // Invalidate rectangle.
     rect->dirty = TRUE;
-
     return 0;
 }
-
 
 //
 // End

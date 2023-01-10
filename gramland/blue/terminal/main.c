@@ -2453,7 +2453,6 @@ int __input_STDIN(int fd)
 }
 
 
-
 //
 // Main
 //
@@ -2465,7 +2464,8 @@ int main ( int argc, char *argv[] )
     struct sockaddr_in addr_in;
     addr_in.sin_family = AF_INET;
     addr_in.sin_port = PORTS_WS;
-    addr_in.sin_addr.s_addr = IP(127,0,0,1); 
+    addr_in.sin_addr.s_addr = IP(127,0,0,1);    //ok
+    //addr_in.sin_addr.s_addr = IP(127,0,0,9);  //fail
 
     debug_print ("terminal: Initializing\n");
 
@@ -2516,21 +2516,20 @@ int main ( int argc, char *argv[] )
 
     int con_status = -1;
 
-    while (1)
-    {
+    while (1){
+
         con_status = 
             (int) connect(client_fd, (void *) &addr_in, sizeof(addr_in));
-        
+
         if (con_status < 0){
-
-            debug_print ("terminal: Connection Failed \n");
-            printf      ("terminal: Connection Failed \n");
-
+            debug_print ("terminal: Connection Failed\n");
+            printf      ("terminal: Connection Failed\n");
             // Nesse caso a conexao pode ter sido recusada 
             // porque o servidor tem clentes demais.
             // Vamos esperar para sempre?
-            if( con_status == ECONNREFUSED )
+            if (con_status == ECONNREFUSED){
                 rtl_yield();
+            }
 
         }else{
             break; 
@@ -2541,9 +2540,7 @@ int main ( int argc, char *argv[] )
     //int main_window = 0;
     //int terminal_window = 0;
 
-//
 // main window
-//
 
     unsigned long mwWidth  = (w >> 1);
     unsigned long mwHeight = (h >> 1); 
@@ -2551,10 +2548,7 @@ int main ( int argc, char *argv[] )
     unsigned long mwTop    = ( ( h - mwHeight) >> 1 );
     unsigned int mwColor   = COLOR_WINDOW;
 
-
-//
 // Client area window
-//
 
 // Set default
     unsigned long wLeft   = 2;   // por causa da borda.
@@ -2573,9 +2567,7 @@ int main ( int argc, char *argv[] )
 
 // ===================================================
 
-//
 // main window
-//
 
 // style: 
 // 0x0001=maximized | 0x0002=minimized | 0x0004=fullscreen
@@ -2592,18 +2584,13 @@ int main ( int argc, char *argv[] )
 
     Terminal.main_window_id = main_window;
 
-    if(main_window<0){
+    if (main_window<0){
         printf("terminal: fail on main_window\n");
         while(1){}
     }
 
-
 // ===================================================
-
-//
 // Client area window
-//
-
 // Let's get some values.
 // Remember: Maybe the window server changed
 // the window size and position.
@@ -2612,8 +2599,8 @@ int main ( int argc, char *argv[] )
     // #test: Now it's a global thing.
     //struct gws_window_info_d *wi;
     
-    wi = (void*) malloc( sizeof( struct gws_window_info_d ) );
-    if( (void*) wi == NULL ){
+    wi = (void*) malloc( sizeof(struct gws_window_info_d) );
+    if ( (void*) wi == NULL ){
         printf("terminal: wi\n");
         while(1){}
     }
@@ -2623,53 +2610,50 @@ int main ( int argc, char *argv[] )
         main_window,   // The app window.
         (struct gws_window_info_d *) wi );
 
-    if(wi->used != TRUE){
+    if (wi->used != TRUE){
         printf("terminal: wi->used\n");
         while(1){}
     }
-    if(wi->magic!=1234){
+    if (wi->magic != 1234){
         printf("terminal: wi->magic\n");
         while(1){}
     }
 
 // Setting new values for the client window.
 
-    // nao pode ser maior que o dispositivo
-    if( wi->cr_left >= w){
+// Não pode ser maior que o dispositivo.
+    if (wi->cr_left >= w){
         printf("terminal: wi->cr_left\n");
         while(1){}
     }
 
-    // nao pode ser maior que o dispositivo
-    if(wi->cr_top >= h){
+// Não pode ser maior que o dispositivo.
+    if (wi->cr_top >= h){
         printf("terminal: wi->cr_top\n");
         while(1){}
     }
 
-    // nao pode ser maior que o dispositivo
-    if(wi->cr_width == 0 || wi->cr_width > w)
-    {
+// Não pode ser maior que o dispositivo.
+    if (wi->cr_width == 0 || wi->cr_width > w){
         printf("terminal: wi->cr_width\n");
         while(1){}
     }
 
-    // nao pode ser maior que o dispositivo
-    if(wi->cr_height == 0 || wi->cr_height > h)
-    {
+// Não pode ser maior que o dispositivo.
+    if (wi->cr_height == 0 || wi->cr_height > h){
         printf("terminal: wi->height\n");
         while(1){}
     }
 
 // #danger
 // Let's get the values for the client area.
-
 // #
 // Quando a janela mãe é overlapped,
 // então o deslocamento é relativo à
 // área de cliente da janela mãe.
 // # 
 // Obtivemos as dimensões da área de cliente.
-// 
+
     wLeft   = 0;
     wTop    = 0;
     wWidth  = wi->cr_width;
@@ -2680,9 +2664,9 @@ int main ( int argc, char *argv[] )
                   client_fd,
                   WT_SIMPLE, 1, 1, "ter-client",
                   wLeft, wTop, wWidth, wHeight,
-                  main_window,0,COLOR_BLACK,COLOR_BLACK);
+                  main_window,0,COLOR_BLACK,COLOR_BLACK );
 
-    if(terminal_window<0){
+    if (terminal_window<0){
         printf("terminal: fail on terminal_window\n");
         while(1){}
     }
@@ -2702,8 +2686,10 @@ int main ( int argc, char *argv[] )
     Terminal.width = wWidth;
     Terminal.height = wHeight;
 // In chars.
-    Terminal.width_in_chars  = (unsigned long)((wWidth/8)  & 0xFFFF);
-    Terminal.height_in_chars = (unsigned long)((wHeight/8) & 0xFFFF);
+    Terminal.width_in_chars = 
+        (unsigned long)((wWidth/8) & 0xFFFF);
+    Terminal.height_in_chars = 
+        (unsigned long)((wHeight/8) & 0xFFFF);
 
     Terminal.initialized = TRUE;
 
@@ -2719,10 +2705,9 @@ int main ( int argc, char *argv[] )
 // Test 3
 //
 
-    /*
+/*
     __tmp_x = 40;
     __tmp_y = 40;
-
     // Testing draw a char in a window.
     terminal_drawchar_request (
         (int) client_fd,          //fd,
@@ -2731,15 +2716,12 @@ int main ( int argc, char *argv[] )
         (unsigned long) __tmp_y,  //top,
         (unsigned long) COLOR_RED,
         (unsigned long) 'X' );
-
     terminal_drawchar_response((int) client_fd);
-    */
-    
-   
+ */
+
     //#debug
     //hanging
     //while(1){}
-
 
 // Initialize globals.
 // #importante: 
@@ -2752,7 +2734,6 @@ int main ( int argc, char *argv[] )
 // #important:
 // We will call this function
 // only after having the Terminal structure initialized.
-
     terminalTerminal();
 
 // Inicializando prompt[].
@@ -2786,11 +2767,9 @@ int main ( int argc, char *argv[] )
 
     //rtl_focus_on_this_thread();
 
-
-
 /*
 //================
-//cls
+// cls
      gws_redraw_window(client_fd,Terminal.client_window_id,TRUE);
      //#define SYSTEMCALL_SETCURSOR  34
      gramado_system_call ( 34, 2, 2, 0 );
@@ -2802,15 +2781,13 @@ int main ( int argc, char *argv[] )
 
 // Input loop!
 // local routine.
-
     int InputStatus=-1;
 
-
-//from GRAMADO.TXT
-//ok, it is working.
+// from GRAMADO.TXT
+// ok, it is working.
     //InputStatus = __input_GRAMADOTXT(client_fd);
 
-//from stdout
+// from stdout
 // #bugbug
 // Isso esta falhando porque stdout não é um 'regular file'
 // ele é um console e só esta aceitando saída por enquanto.
@@ -2822,18 +2799,14 @@ int main ( int argc, char *argv[] )
 
 // estavamos lendo em stdin, e vamos começar a ler em stderr
 // sem mandarmos o kernel enviar o input para stderr
-    if( InputStatus == 0 )
+    if (InputStatus == 0)
     {
-
         //printf("TERMINAL: newloop\n");
-
-// from srderr
-// stderr é um 'regular file'
-// It's working.
-
-       // rebubina o arquivo de input.
+        // from srderr
+        // stderr é um 'regular file'
+        // It's working.
+        // rebubina o arquivo de input.
         //rewind(stdin);
-
         // agora vamos ler stderr
         InputStatus = __input_STDERR(client_fd);
     }
@@ -2847,7 +2820,6 @@ int main ( int argc, char *argv[] )
 
     return 0;
 }
-
 
 // terminalTerminal:
 // Não emite mensagens.
@@ -2917,20 +2889,19 @@ static void terminalTerminal(void)
 //done:
 
     //ShellFlag = SHELLFLAG_COMMANDLINE;
-	
-    //#bugbug
-	//Nossa referência é a moldura e não a área de cliente.
-	//@todo:usar a área de cliente como referência
-	//terminalSetCursor(0,0);
+
+// #bugbug
+// Nossa referência é a moldura e não a área de cliente.
+// #todo:usar a área de cliente como referência
+    //terminalSetCursor(0,0);
     //terminalSetCursor(0,4);
-    
-	//@todo
-	//tentando posicionar o cursor dentro da janela
-	//terminalSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
+
+// #todo
+// Tentando posicionar o cursor dentro da janela
+    //terminalSetCursor( (shell_info.main_window->left/8) , (shell_info.main_window->top/8));	
 
     //shellPrompt();
 }
-
 
 static void terminalInitSystemMetrics(void)
 {
@@ -2968,23 +2939,23 @@ static void terminalInitWindowLimits(void)
 // #todo
 // Tem variáveis aqui que não podem ser '0'.
 
-	//#todo: temos que criar essa variável.
-	/*
-	if (InitSystemMetricsStatus == 0)
-	{
-	    terminalInitSystemMetrics ();
-	}
-	*/
+// #todo: 
+// Temos que criar essa variável.
+/*
+    if (InitSystemMetricsStatus == 0){
+        terminalInitSystemMetrics();
+    }
+ */
 
 //
 // ## Window limits ##
 //
 
 // problemas; 
-	//if ( smScreenWidth == 0 || smScreenHeight )
-	//{
-	//    printf ...
-	//}
+    //if ( smScreenWidth == 0 || smScreenHeight )
+    //{
+    //    printf ...
+    //}
 
 // Fullscreen support.
     wlFullScreenLeft = 0;
@@ -3006,18 +2977,14 @@ static void terminalInitWindowLimits(void)
     //...
 }
 
-
 static void terminalInitWindowSizes(void)
 {
-    if (Terminal.initialized != TRUE ){
+    if (Terminal.initialized != TRUE){
         printf("terminalInitWindowSizes: Terminal.initialized\n");
         exit(1);
     }
 
-//
 //  ## Window size ##
-//
-
     //wsWindowWidth = wlMinWindowWidth;
     //wsWindowHeight = wlMinWindowHeight;
 
@@ -3035,7 +3002,7 @@ static void terminalInitWindowSizes(void)
 
 static void terminalInitWindowPosition(void)
 {
-    if (Terminal.initialized != TRUE ){
+    if (Terminal.initialized != TRUE){
         printf("terminalInitWindowPosition: Terminal.initialized\n");
         exit(1);
     }

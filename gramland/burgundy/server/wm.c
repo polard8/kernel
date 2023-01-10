@@ -77,11 +77,9 @@ int g_handler_flag;
 #define OPTION_CLOSE     3
 static int current_option=OPTION_NOTHING;
 
-
 //
 // tb buttons
 //
-
 
 // Quantos botões ja temos.
 static int tb_buttons_count=0;  
@@ -112,7 +110,6 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 
 #define WM_DEFAULT_BACKGROUND_COLOR   COLOR_GRAY
 
-
 static long old_x=0;
 static long old_y=0;
 
@@ -130,7 +127,6 @@ static unsigned long frames_count=0;
 static unsigned long ____old_time=0;
 static unsigned long ____new_time=0;
 
-
 //
 // private functions: prototypes ==========================
 //
@@ -141,7 +137,6 @@ wmProcedure(
     int msg,
     unsigned long long1,
     unsigned long long2 );
-
 
 static void animate_window( struct gws_window_d *window );
 static void __Tile(void);
@@ -159,9 +154,6 @@ int control_action(int msg, unsigned long long1);
 
 static void __draw_button_mark_by_wid( int wid, int button_number );
 
-
-
-
 // ===================
 // pinta um retangulo no botao
 // indicando que o app esta rodando.
@@ -170,16 +162,20 @@ static void __draw_button_mark_by_wid( int wid, int button_number )
     struct gws_window_d *w;
     
 //#todo: max limit
-    if( wid<0 )
+    if (wid<0){
         return;
-    if( button_number<0 || button_number > 3)
+    }
+    if ( button_number<0 || button_number>3 ){
         return;
-
+    }
+// Window
     w = (struct  gws_window_d *) windowList[wid];
-    if( (void*) w == NULL )
+    if ( (void*) w == NULL ){
         return;
-    if(w->magic!=1234)
+    }
+    if (w->magic!=1234){
         return;
+    }
 
 // Draw a small rectangle.
 // It means that this app was lauched.
@@ -197,7 +193,6 @@ static void __draw_button_mark_by_wid( int wid, int button_number )
     }
 }
 
-
 static void run_selected_option(void)
 {
     struct gws_window_d *w;
@@ -210,27 +205,25 @@ static void run_selected_option(void)
 
 // get active window
     //w = (struct gws_window_d *) windowList[active_window];
-
     w = (void*) active_window;
-    
-    if( (void*) w == NULL ){
+    if ( (void*) w == NULL ){
         current_option=OPTION_NOTHING;
         return;
     }
-    if(w->magic!=1234){
-        current_option=OPTION_NOTHING;
-        return;
-    }
-    if(w->type!=WT_OVERLAPPED){
+    if (w->magic!=1234){
         current_option=OPTION_NOTHING;
         return;
     }
 
+    if (w->type!=WT_OVERLAPPED){
+        current_option=OPTION_NOTHING;
+        return;
+    }
 
 // =============
 
-    // Clicked with option: 'nothing'.
-    if(current_option==OPTION_NOTHING)
+// Clicked with option: 'nothing'.
+    if (current_option==OPTION_NOTHING)
     {
         gwssrv_change_window_position(w,20,20);
         gws_resize_window(w,100,100);
@@ -239,15 +232,14 @@ static void run_selected_option(void)
         return;
     }
 
-
-    if(current_option==OPTION_MINIMIZE){
+    if (current_option==OPTION_MINIMIZE){
         gws_resize_window(w,100,100);
         redraw_window(w,TRUE);
         current_option=OPTION_NOTHING;
         return;
     }
-    
-    //#bugbug: e se a janela ativa for a root?
+
+//#bugbug: e se a janela ativa for a root?
     if(current_option==OPTION_MAXIMIZE)
     {
         //redraw_window_by_id(active_window,TRUE);
@@ -258,10 +250,8 @@ static void run_selected_option(void)
     if(current_option==OPTION_CLOSE){
     }
 
-
     current_option=OPTION_NOTHING;
 }
-
 
 // #todo: explain it
 static unsigned long 
@@ -299,7 +289,6 @@ on_keyboard_event(
 
     return (unsigned long) Result;
 }
-
 
 // Quando temos um evento de mouse,
 // vamos enviar esse evento para a
@@ -417,7 +406,6 @@ static void on_update_window(int event_type)
         w->ev_tail=0;
     }
 }
-
 
 int control_action(int msg, unsigned long long1)
 {
@@ -567,7 +555,6 @@ void show_client_list(int tag)
 struct gws_client_d *wintoclient(int window)
 {
     struct gws_client_d *c;
-    //int i=0;
 
     if (window<0){
         return NULL;
@@ -709,12 +696,11 @@ void __update_fps(void)
 // == time =========================================
 //
 
-    // #bugbug
-    // We have a HUGE problem here.
-    // We can't properly get the data inside the structures. 
-    // The value is not the same when we enter inside the kernel via
-    // keyboard interrupt or via system interrupt.
-
+// #bugbug
+// We have a HUGE problem here.
+// We can't properly get the data inside the structures. 
+// The value is not the same when we enter inside the kernel via
+// keyboard interrupt or via system interrupt.
 
 // get current time.
 
@@ -731,7 +717,6 @@ void __update_fps(void)
 
     ____old_time = ____new_time;
 
-
     fps = (1000/dt);
 
 // mostra 
@@ -744,7 +729,6 @@ void __update_fps(void)
     //}
 
     return;
-    
 
     //if(dt<8)
         //return;
@@ -757,10 +741,9 @@ void __update_fps(void)
     //__refresh_rate = __refresh_rate/1000;
     //printf ("@ %d %d %d \n",__refresh_rate, t_now, t_old);
 
-
-    //====================================
-    // fps++
-    // conta quantos frames. 
+//====================================
+// fps++
+// conta quantos frames. 
 
     // se passou um segundo.
     //if ( dt > 1000 )
@@ -788,7 +771,6 @@ void __update_fps(void)
 
     //debug_print ("__update_fps: done\n");
 }
-
 
 // WORKER
 // Paint button borders.
@@ -995,8 +977,9 @@ void do_create_controls(struct gws_window_d *window)
     window->Controls.minimize_wid = (int) id;
 
 // ================================================
-    LastLeft = window->width - (2*PaddingWidth) - (ButtonWidth*2);
-    
+    LastLeft = 
+        window->width - (2*PaddingWidth) - (ButtonWidth*2);
+
     maximize = 
         (struct gws_window_d *) CreateWindow ( 
             WT_BUTTON, 0, 1, 1, 

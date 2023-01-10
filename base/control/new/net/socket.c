@@ -5,6 +5,8 @@
 
 #include <kernel.h>  
 
+unsigned char localhost_ipv4[4] = { 127, 0, 0, 1 };
+
 // Internal
 #define SYS_SOCKET_IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
@@ -1020,25 +1022,23 @@ sys_accept (
 // Isso significa que o cliente chamou connect antes mesmo 
 // do servidor chamar accept ??
 
-    /*
-    if (sSocket->state == SS_CONNECTED) 
-    {
+/*
+    if (sSocket->state == SS_CONNECTED){
         printf("sys_accept: [FAIL] socket is already SS_CONNECTED\n");
         refresh_screen();
         return -1;
     }
-    */
+ */
 
-    /*
+/*
     // #test
     // The indicated socket need to be the same of the privete socket.
-    if( f->socket != s )
-    {
+    if (f->socket != s){
         //#debug Testing ...
         panic("sys_accept: [FIXME] Check the original socket in the process %d!",
             current_process);
     }
-    */
+ */
 
 // Socket ok!
 // #todo
@@ -1047,13 +1047,13 @@ sys_accept (
 // socket e pegarmos um dos fd da lista. Em ordem round robing.
 // Esse fd será o socket do cliente.
 
-    /*
+/*
     // get next!
     int i=0;
     int max=1;
     //max = s->backlog_max;
     return (int) s->pending_connections[ s->backlog_pos ];
-    */
+ */
 
 // O que segue abaixo eh um improviso,
 // ja que listen ainda nao funciona
@@ -1076,18 +1076,16 @@ sys_accept (
 // #bugbug
 // O socket do servidor precisa estar desconectado.
 // Pois cada accept eh cria uma nova conexao.
-    
-    /*
-    if ( sSocket->state == SS_CONNECTED )
-    {
+
+/*
+    if (sSocket->state == SS_CONNECTED){
         debug_print ("sys_accept: Already connected!\n");
         //printf      ("sys_accept: Already connected!\n");
         //refresh_screen();
         //return -1;
         return (int) fdServer;
     }
-    */
-
+ */
 
 // #todo
 // Na verdade precisamos pegar um da fila.
@@ -1127,13 +1125,11 @@ sys_accept (
         // nesse momento pegaremos um da lista seguindo uma ordem.
 
         // circula
-        
         sSocket->backlog_head++;
         if ( sSocket->backlog_head >= sSocket->backlog_max ){
             sSocket->backlog_head=0;
         }
         i = sSocket->backlog_head;
-        
         if ( i<0 || i >= sSocket->backlog_max ){
             panic("sys_accept: i is out of limits.\n");
         }
@@ -1166,7 +1162,7 @@ sys_accept (
         if ( (void *) cSocket != NULL )
         {
             // check validation
-            if( cSocket->used != TRUE || cSocket->magic != 1234 )
+            if ( cSocket->used != TRUE || cSocket->magic != 1234 )
             {
                 debug_print ("sys_accept: [FAIL] cSocket validation\n");
                 sSocket->state = SS_CONNECTING;  //anula.
@@ -1175,7 +1171,7 @@ sys_accept (
 
             // Na verdade o magic indica que eh 
             // uma conexao pendente.
-            if ( cSocket->magic_string[0] == 'C')
+            if ( cSocket->magic_string[0] == 'C' )
             {
                 //debug_print("MAGIC C\n");
                 //printf ("magic: %s\m",cSocket->magic_string);
@@ -1286,15 +1282,19 @@ sys_bind (
         goto fail;
     }
 
-    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         printf("sys_bind: current_process\n");
         goto fail;
     }
 
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
-        debug_print ("sys_bind: p fail\n");
-        printf      ("sys_bind: p fail\n");
+        debug_print ("sys_bind: p\n");
+        printf      ("sys_bind: p\n");
+        goto fail;
+    }
+    if (p->magic != 1234){
+        printf("sys_bind: p validation\n");
         goto fail;
     }
 
@@ -1335,7 +1335,7 @@ sys_bind (
     if (s->addr.sa_family == AF_GRAMADO)
     {
         debug_print ("sys_bind: [AF_GRAMADO] Binding the name to the socket.\n");
-        // Always 14.
+        // Copy. Always 14.
         for (i=0; i<14; i++){
             s->addr.sa_data[i] = addr->sa_data[i];
         }; 
@@ -1356,10 +1356,11 @@ sys_bind (
     {
         debug_print ("sys_bind: AF_UNIX not supported yet\n");
         printf      ("sys_bind: AF_UNIX not supported yet\n");
+        // Copy.
         //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;
     }
-//--    
+//--
 
 //++
 // AF_INET
@@ -1367,6 +1368,7 @@ sys_bind (
     {
         debug_print ("sys_bind: AF_INET not supported yet\n");
         printf      ("sys_bind: AF_INET not supported yet\n");
+        // Copy.
         //for (i=0; i<14; i++){ s->addr.sa_data[i] = addr->sa_data[i]; }; 
         return -1;    
     } 
@@ -1376,6 +1378,7 @@ sys_bind (
 // A família é de um tipo não suportado.
     debug_print ("sys_bind: [FAIL] family not valid\n");
     printf      ("sys_bind: [FAIL] family not valid\n");
+
 // fail
 fail:
     debug_print ("sys_bind: [FAIL] Something is wrong!\n");
@@ -1453,7 +1456,11 @@ sys_connect (
 // No caso de endereços no estilo inet
 // vamos precisar de outra estrututura.
     struct sockaddr_in *addr_in;
-    int Verbose=FALSE;
+    int Verbose = FALSE;
+
+    unsigned char *given_ip;
+// The client is trying to connect to to localhost.
+    int in_localhost = FALSE;
 
     pid_t current_process = (pid_t) get_current_process();
 
@@ -1577,17 +1584,47 @@ sys_connect (
         debug_print ("sys_connect: AF_INET\n");
         //#debug
         //printf("sys_connect: AF_INET port {%d}\n", addr_in->sin_port);
- 
+
+        // Is this the localhost ip address?
+        given_ip = &addr_in->sin_addr.s_addr;
+        // Yes, it is!.
+        // If not, so try to connect to a different machine.
+        if ( given_ip[3] == localhost_ipv4[0] &&
+             given_ip[2] == localhost_ipv4[1] &&
+             given_ip[1] == localhost_ipv4[2] &&
+             given_ip[0] == localhost_ipv4[3] )
+        {
+             in_localhost = TRUE;
+             // #debug
+             //printf("It's the localhost\n");
+             //refresh_screen();
+             //while(1){}
+        }
+        // No, it's not.
+        // Try to connect to a different machine.
+        if (in_localhost != TRUE){
+            // #todo
+        }
+
+        // Yes
+        // Check the port.
+        // This way we know what is the server's pid.
+
         // WS - 4040
         // Se a porta for , então usaremos o pid do WS.
         if (addr_in->sin_port == PORTS_WS)
         {
             target_pid = (pid_t) gramado_ports[GRAMADO_WS_PORT];
-            if (Verbose==TRUE){
+            if (Verbose==TRUE)
+            {
                 printf("sys_connect: [AF_INET] Connecting to the Window Server\n");
-                printf("sys_connect: IP {%x}\n", addr_in->sin_addr.s_addr );
-                printf("sys_connect: PORT {%d}\n", addr_in->sin_port);
+                printf("sys_connect: IP {%x}\n", 
+                    addr_in->sin_addr.s_addr );
+                printf("sys_connect: PORT {%d}\n", 
+                    addr_in->sin_port);
+                //#debug
                 refresh_screen();
+                //while(1){}
             }
             break;
         }
@@ -1662,6 +1699,16 @@ sys_connect (
 // Have a valid target_pid ?
 
 //__go:
+
+
+// #bugbug
+// Daqui pra frente só faz sentido continuarmos
+// se a intenção do cliente foi conectar-se com um servidor
+// dentro do localhost.
+    if (in_localhost != TRUE){
+        printf ("sys_connect: #todo Trying to connect to another machine\n");
+        goto fail;
+    }
 
 //
 // == Client process =============================
