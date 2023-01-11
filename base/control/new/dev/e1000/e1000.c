@@ -1230,11 +1230,17 @@ on_receiving (
     switch (Type){
     case 0x0800:
         printf ("[0x0800]: IPV4 received\n");
-        network_handle_ipv4(buffer,size);
+        //network_handle_ipv4(buffer,size);
+        network_handle_ipv4(
+            (buffer + ETHERNET_HEADER_LENGHT),
+            size );
         break;
     case 0x0806:
         printf ("[0x0806]: ARP received\n");
-        network_handle_arp(buffer,size);
+        //network_handle_arp(buffer,size);
+        network_handle_arp(
+            (buffer + ETHERNET_HEADER_LENGHT),
+            size );
         break;
     case 0x814C:
         printf ("[0x814C]: SNMP received\n");

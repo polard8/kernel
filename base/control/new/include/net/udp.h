@@ -1,11 +1,14 @@
 
+// udp.h
 
-#ifndef ____UCP_H
-#define ____UCP_H
+#ifndef __UDP_H
+#define __UDP_H    1
 
+struct udp_d
+{
+    int z;
+};
 
- // udp.h
- 
 
 #endif   
 

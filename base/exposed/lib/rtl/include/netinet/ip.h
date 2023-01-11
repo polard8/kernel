@@ -1,17 +1,15 @@
 
-
-   // todo
-
+// ip.h
 
 #ifndef _NETINET_IP_H_
-#define _NETINET_IP_H_
+#define _NETINET_IP_H_    1
 
 /*
  * Definitions for internet protocol version 4.
  * Per RFC 791, September 1981.
  */
-#define	IPVERSION	4
 
+#define IPVERSION    4
 
 /*
  * IP header.
@@ -45,7 +43,7 @@ struct ip
     u_int8_t  ip_ttl;		/* time to live */
     u_int8_t  ip_p;			/* protocol */
     u_int16_t ip_sum;		/* checksum */
-    
+
     /* source and dest address */
     struct in_addr ip_src, ip_dst; 
 

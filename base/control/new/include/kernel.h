@@ -305,12 +305,13 @@ extern unsigned long gSavedBPP;
 #include "dev/e1000/nicintel.h"
 #include "net/mac.h"
 #include "net/host.h"
-#include "net/ethernet.h"
-#include "net/arp.h"
-#include "net/udp.h"
-#include "net/tcp.h"
 #include "net/in.h"
 #include "net/un.h"
+#include "net/ethernet.h"
+#include "net/arp.h"
+#include "net/ip.h"
+#include "net/udp.h"
+#include "net/tcp.h"
 #include "net/nports.h"     //(network) Network Ports  (sw)
 #include "net/icmp.h" 
 #include "net/network.h"     //(network) Gerenciamento de rede.  

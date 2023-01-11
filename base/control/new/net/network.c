@@ -116,7 +116,7 @@ network_send_arp(
 // MAC addresses
 // Hardware address
     for ( i=0; i<ETH_ALEN; i++ ){
-        h->arp_sha[i] = (uint8_t) currentNIC->mac_address[i]; 
+        h->arp_sha[i] = (uint8_t) currentNIC->mac_address[i];  //my MAC
         h->arp_tha[i] = (uint8_t) target_mac[i]; 
     };
 // IP addresses
@@ -129,6 +129,7 @@ network_send_arp(
 //==================================
 // #debug
 // show arp header.
+
 /*
     printf("\n\n");
     printf("[arp]\n\n");
@@ -142,6 +143,8 @@ network_send_arp(
     for( i=0; i<6; i++){ printf("%x ",h->arp_tha[i]); }
     printf("\n target: ip ");
     for( i=0; i<4; i++){ printf("%d ",h->arp_tpa[i]); }
+    refresh_screen();
+    while(1){}
 */
 //==================================
 
@@ -388,7 +391,60 @@ network_handle_ipv4(
     const unsigned char *buffer, 
     ssize_t size )
 {
-    //printf("network_handle_ipv4: ==== IPV4 ====\n");
+    struct ip_d *ip;
+    ip = (struct ip_d *) buffer;
+
+    printf("network_handle_ipv4: ==== IP ====\n");
+
+    if ( (void*) ip == NULL ){
+        printf("network_handle_ipv4: ip\n");
+    }
+
+    unsigned char *src_ipv4 = 
+        (unsigned char *) &ip->ip_src.s_addr;
+    unsigned char *dst_ipv4 = 
+        (unsigned char *) &ip->ip_dst.s_addr;
+
+// Show data.
+// Bytes: Net-style.
+
+    uint8_t v_hl = (uint8_t) ip->v_hl;
+    uint8_t Version = (uint8_t) ((v_hl >> 4) & 0x0F);
+    uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);
+
+    printf("IP Version: {%x}\n", Version);
+    printf("Header lenght: {%x}\n", Lenght);
+
+    printf("Protocol: {%x}\n",ip->ip_p);
+
+    if (Version == 4)
+    {
+        if ( dst_ipv4[3] != 112 ||
+             dst_ipv4[2] != 1 ||
+             dst_ipv4[1] != 168 ||
+             dst_ipv4[0] != 192 )    // 0=192 ok
+        {
+            printf ("NOT TO ME!\n");
+            goto fail; 
+        }
+
+        printf ("TO ME!\n");
+        //printf("Src IPV4: {%x}\n", ip->ip_src.s_addr);
+        //printf("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
+        // destination
+        printf ("Src: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
+            src_ipv4[0], src_ipv4[1], src_ipv4[2], src_ipv4[3]);
+        printf ("Dst: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
+            dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3]);
+        refresh_screen();
+        while(1){}
+    }
+    refresh_screen();
+    return;
+
+fail:
+    refresh_screen();
+    return;
 }
 
 // handle arp package
@@ -400,7 +456,39 @@ network_handle_arp(
     const unsigned char *buffer, 
     ssize_t size )
 {
-    //printf("network_handle_arp: ==== ARP ====\n");
+
+    struct ether_arp *ar;
+    ar = (struct ether_arp *) buffer;
+
+    printf("network_handle_arp: ==== ARP ====\n");
+
+    if ( (void*) ar == NULL ){
+        printf("network_handle_arp: ar\n");
+    }
+
+// Show data.
+// Bytes: Net-style.
+    printf("Hardware type: {%x}\n",ar->type);
+    printf("Protocol type: {%x}\n",ar->proto);
+    printf("Hardware address lenght: {%x}\n",ar->hlen);
+    printf("Protocol address lenght: {%x}\n",ar->plen);
+    printf("op    {%x}\n",ar->op);
+
+// Operation
+    uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
+    
+    if (op==ARP_OPC_REQUEST){
+        printf("This is REQUEST\n");
+    } else if (op==ARP_OPC_REPLY){
+        printf("This is REPLY\n");
+    };
+
+    refresh_screen();
+    return;
+
+fail:
+    refresh_screen();
+    return;
 }
 
 // in: (Do buffer indicado para o buffer tail)
