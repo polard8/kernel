@@ -197,10 +197,16 @@ typedef enum {
 
 struct thread_d 
 {
-    object_type_t   objectType;
-    object_class_t  objectClass;
+    object_type_t objectType;
+    object_class_t objectClass;
     int used;
     int magic;
+// type:
+// (SYSTEM, INTERACTIVE, BATCH)
+    thread_type_t type;
+
+// Thread ID.
+    tid_t tid;
 
 // 1000=GRAMADO 1001=GWS
     int personality;
@@ -244,17 +250,9 @@ struct thread_d
 // Identifiers
 //
 
-// Thread ID.
-    tid_t tid;
-
 // Owner process
     struct process_d  *owner_process;
     pid_t owner_pid;
-
-// type: 
-// Tipo de tarefa.
-// (SYSTEM, INTERACTIVE, BATCH)
-    thread_type_t type;
 
 // ========================================================
 // ORDEM: 
@@ -547,37 +545,34 @@ struct thread_d
     unsigned long profiler_ticks_running;
     unsigned long profiler_last_ticks;
 
+// ORDEM: 
+// O que segue é referenciado com pouca frequencia.
 
-	// ORDEM: 
-	// O que segue é referenciado com pouca frequencia.
-	
-	//lista de arquivos ??
-	//fluxo padrão. stdio, stdout, stderr
+//lista de arquivos ??
+//fluxo padrão. stdio, stdout, stderr
 	//unsigned long iob[8];
     
-	//#bugbug: o vetor Stream[] conterá essas stream também.
-	//ponteiros para as streams do fluxo padrão.
-	//O processo tem streams ... Stream[] ...
-	//cada tread pode ter suas stream ... mesmo que herde streams 
-	//de processo ...
-	// ?? threads diferentes do mesmo processo podem atuar em streams 
-	// diferentes ??
+//#bugbug: o vetor Stream[] conterá essas stream também.
+//ponteiros para as streams do fluxo padrão.
+//O processo tem streams ... Stream[] ...
+//cada tread pode ter suas stream ... mesmo que herde streams 
+//de processo ...
+// ?? threads diferentes do mesmo processo podem atuar em streams 
+// diferentes ??
 	//unsigned long standard_streams[3];
 	//unsigned long Streams[8];
 
-	//Obs: Cada processo está atuando em um diretório,
-	// mas será cada thread precisa atuar em um diretório diferente??
-	//
-	//struct _iobuf *root;  // 4 root directory
-    //struct _iobuf *pwd;     // 5 (print working directory) 
-	//...
-
+//Obs: Cada processo está atuando em um diretório,
+// mas será cada thread precisa atuar em um diretório diferente??
+    //struct _iobuf *root;  // 4 root directory
+    //struct _iobuf *pwd;   // 5 (print working directory) 
+    //...
 
 //
 // == tty ==========================
 //
 
-    // ID da tty usada.
+// ID da tty usada.
     int tty_id;
 
 //
@@ -605,62 +600,54 @@ struct thread_d
 //
 // LIS - Local Input State
 //
-    
-    // #important
-    // Here we have some elements to handle the input events
-    // in this thread.
-    // + We have a block for single shot event.
-    // + We have a block for a queue of events.
-    // + We have a set of variables to handle the flow.
-    // ...
-    
-    // Keyboard input and window focus information:
-    // + Which window has keyboard focus?
-    // + Which window is active?
-    // + Which keys are considered pressed down?
-    // + The state of the caret.
-    
-    // Mouse cursor management information
-    // + Which window has mouse capture?
-    // + The shape of the mouse cursor?
-    // + The visibility of the mouse cursor.
 
-    // ...
- 
-    // #todo
-    // We don't need to have a window as an element in the event.
-    // We can include this window later when the app calls get_message().
-    // When the thread calls GetMessage(), 
-    // the keyboard event is removed from the queue and 
-    // assigned to the window that currently has input focus.
-
-    // #test
-    // Sending a message to the kernel.
-    // no queue.
-    // Flag avisando que tem nova mensagem.
-    // O kernel deve checar essa flag. Se ela estiver acionada,
-    // significa que o kernel deve processar essa mensagem.
-
+// #important
+// Here we have some elements to handle the input events
+// in this thread.
+// + We have a block for single shot event.
+// + We have a block for a queue of events.
+// + We have a set of variables to handle the flow.
+// ...
+// Keyboard input and window focus information:
+// + Which window has keyboard focus?
+// + Which window is active?
+// + Which keys are considered pressed down?
+// + The state of the caret.
+// Mouse cursor management information
+// + Which window has mouse capture?
+// + The shape of the mouse cursor?
+// + The visibility of the mouse cursor.
+// ...
+// #todo
+// We don't need to have a window as an element in the event.
+// We can include this window later when the app calls get_message().
+// When the thread calls GetMessage(), 
+// the keyboard event is removed from the queue and 
+// assigned to the window that currently has input focus.
+// #test
+// Sending a message to the kernel.
+// no queue.
+// Flag avisando que tem nova mensagem.
+// O kernel deve checar essa flag. Se ela estiver acionada,
+// significa que o kernel deve processar essa mensagem.
 
 //
 // == Event queue ===========================================
 //
 
-    // This is the event queue.
-    // It is used by the ring 3 processes.
-    // #todo: 
-    // We can put all these into a structure.
-
-    // Lists:
-    // window_list: pointer to window structure.
-    // msg_list:    event type.
-    // long1_list:  data 1
-    // long2_list:  data 2
-    // long3_list:  data 3
-    // long4_list:  data 4
-
-    // MAXEVENTS
-    // See: events.h
+// This is the event queue.
+// It is used by the ring 3 processes.
+// #todo: 
+// We can put all these into a structure.
+// Lists:
+// window_list: pointer to window structure.
+// msg_list:    event type.
+// long1_list:  data 1
+// long2_list:  data 2
+// long3_list:  data 3
+// long4_list:  data 4
+// MAXEVENTS
+// See: events.h
 
 // ====================================================
 // Message Queue
@@ -677,22 +664,15 @@ struct thread_d
 
     //unsigned long post_message_counter;
 
-
-// ------------------
-// Waiting for a child.
-
+// Waiting for a child:
 // id do processo que a thread está esperando morrer.
     int wait4pid;
 // id da thread que a thread está esperando morrer.
     int wait4tid;
-
-// ====================================
-
-// Signal support
+// Signal support:
     unsigned long signal;
     unsigned long umask;
-
-// Exit
+// Exit:
 // Reason to close the thread.
     int exit_code;
 
@@ -708,15 +688,15 @@ struct thread_d
 
     // struct x86_context_d  *context;
 
-	//stack frame;
+// stack frame;
     unsigned short ss;
     unsigned long  rsp;
     unsigned long  rflags;
     unsigned short cs;
-    unsigned long  rip;    //usado com o pd do processo
+    unsigned long  rip;    //usado com o pd do processo?
 
-	// para o kernel saltar para o novo processo.
-    unsigned long ring0_rip;  //usado com o pd do kernel
+// para o kernel saltar para o novo processo.
+    unsigned long ring0_rip;  //usado com o pd do kernel?
     unsigned long ripPA;
 
     unsigned short ds;
@@ -741,7 +721,7 @@ struct thread_d
     unsigned long r14;
     unsigned long r15;
 
-	//continua o contexto ...
+//continua o contexto ...
 
 //O endereço incial, para controle.
     unsigned long initial_rip;
@@ -761,15 +741,13 @@ struct thread_d
     //struct x64tss_d *tss;
 
 // Navigation
-    struct thread_d  *prev;
-    struct thread_d  *next;
+    struct thread_d *prev;
+    struct thread_d *next;
 };
-
 
 // See: thread.c
 extern struct thread_d  *InitThread;
 extern struct thread_d  *ClonedThread;
-
 // Linked lists
 // See: sched.c
 extern struct thread_d  *Conductor;
@@ -786,10 +764,8 @@ extern struct thread_d  *tmpConductor;
 // All the threads
 // see: thread.c
 extern unsigned long threadList[THREAD_COUNT_MAX];
-
 // Threads doing some kind of i/o operations.
 //unsigned long io_threadList[THREAD_COUNT_MAX];
-
 // Interactive threads.
 // Just like keyboard and windows with focus.
 //unsigned long interactive_threadList[THREAD_COUNT_MAX];
@@ -850,24 +826,23 @@ void threadi_power(
     struct thread_d *t, 
     unsigned long priority );
 
-void release(int tid);
+void release(tid_t tid);
 
 void SelectForExecution ( struct thread_d *Thread );
-
-void thread_show_profiler_info (void);
 
 unsigned long 
 thread_get_profiler_percentage (struct thread_d *thread);
 
 void show_thread_information (void);
 
+void thread_show_profiler_info(void);
 int thread_profiler(int service);
 
 //
 // Creation
 //
 
-struct thread_d *copy_thread_struct ( struct thread_d *thread );
+struct thread_d *copy_thread_struct (struct thread_d *thread);
 
 struct thread_d *create_thread ( 
     struct room_d     *room,

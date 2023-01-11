@@ -109,34 +109,27 @@ static void __service897(void)
 {
     struct thread_d *myThread; 
     struct rect_d r;
-
     unsigned int _Color=0;
+
 
 // Current thread
 // This routine only can be called by the 
 // init process. Its tid is INIT_TID.
-
-    if( current_thread != INIT_TID ){
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         return;
     }
-    if( current_thread < 0 || 
-        current_thread >= THREAD_COUNT_MAX )
-    {
+    if (current_thread != INIT_TID){
         return;
     }
-
 
     _Color = (unsigned int) (COLOR_GREEN + 0);
 
-// Configura o retângulo
-
+// Setup rectangle
     r.left = 0;
     r.top = 0;
     r.width = 24;
     r.height = 24;
-
     r.dirty = FALSE; 
-
     r.used = TRUE;
     r.magic = 1234;
 
@@ -154,23 +147,19 @@ static void __service897(void)
 
     r.dirty = TRUE;
 
+// Setup surface rectangle.
+
 //  Thread
-
     myThread = (struct thread_d *) threadList[current_thread];
-
+// Valid thread
     if ( (void*) myThread != NULL )
     {
-        if ( myThread->used == TRUE && 
-             myThread->magic == 1234 )
-        {
+        if ( myThread->used == TRUE && myThread->magic == 1234 ){
             myThread->surface_rect = (struct rect_d *) &r;
             return;
         }
     }
-
-    //return;
 }
-
 
 static void __setup_surface_rectangle(
     unsigned long left,
@@ -181,25 +170,21 @@ static void __setup_surface_rectangle(
     struct thread_d *t;
     struct rect_d *r;
 
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
-        return;
-    }
-
-    /*
-    // dc: Clippint
+/*
+// dc: Clippint
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-    
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         debug_print ("__setup_surface_rectangle: [PANIC] w h\n");
         panic       ("__setup_surface_rectangle: [PANIC] w h\n");
     }
-    */
+*/
 
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX ){
+        return;
+    }
 
+// structure
     t = (struct thread_d *) threadList[current_thread];
     if ( (void*) t == NULL ){ return; }
     if ( t->magic != 1234 ) { return; }
@@ -222,9 +207,7 @@ static void __invalidate_surface_rectangle(void)
     struct thread_d *t;
     struct rect_d *r;
 
-    if ( current_thread<0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+    if ( current_thread<0 || current_thread >= THREAD_COUNT_MAX ){
         return;
     }
 
@@ -259,26 +242,25 @@ static void __maximize_ws_priority(pid_t pid)
 
     pid_t current_process = (pid_t) get_current_process();
 
-    if (pid != current_process)
-    {
+    if (pid<=0 || pid >= PROCESS_COUNT_MAX){
+        return;
+    }
+    if (pid != current_process){
         debug_print ("__maximize_ws_priority: pid != current_process\n");
         panic       ("__maximize_ws_priority: pid != current_process\n");
     }
 
-    if(pid<=0 || pid >= PROCESS_COUNT_MAX)
-        return;
-
 // process
     p = (struct process_d *) processList[pid];
-    if((void*)p==NULL)
+    if ((void*)p==NULL)
         return;
-    if(p->used!=TRUE)
+    if (p->used!=TRUE)
         return;
-    if(p->magic!=1234)
+    if (p->magic!=1234)
         return;
 
     p->type = ProcessType;
-    
+
     p->base_priority = ProcessBasePriority;
     p->priority      = ProcessPriority;
 
@@ -305,28 +287,21 @@ static void *__extra_services (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-
     struct process_d *__p;
     struct process_d *__net_process;
-
     struct desktop_d *__desktop;
     //struct desktop_d *_Desktop;
-    
     struct window_d  *__window;
-
-	//generic file pointer
+//generic file pointer
     file *__fp;
-
-	//bmp file pointer.
+//bmp file pointer.
     file *__bmfp;
-
-
     unsigned long *message_address = (unsigned long *) arg2;
 
     pid_t current_process = (pid_t) get_current_process();
 
-    //Deprecated.
-    //Outro n�mero fará esse trabalhao.
+//Deprecated.
+//Outro n�mero fará esse trabalhao.
     if ( number == 260 ){
         return (void *) sys_read ( 
                             (unsigned int) arg2, 
@@ -334,8 +309,8 @@ static void *__extra_services (
                             (int)          arg4 );
     }
 
-    //Deprecated.
-    //Outro numero fará esse trabalho.
+//Deprecated.
+//Outro numero fará esse trabalho.
     if ( number == 261 ){
         return (void *) sys_write ( 
                             (unsigned int) arg2, 
@@ -343,21 +318,19 @@ static void *__extra_services (
                             (int)          arg4 );
     }
 
-    // read on virtual console!
-    // range: 0 ~ 3
-    // chamado por read_VC em ring3.
-    // IN: fd, buf, count
-
+// read on virtual console!
+// range: 0 ~ 3
+// chamado por read_VC em ring3.
+// IN: fd, buf, count
     if ( number == 262 ){
         return (void *) console_read ( (int) arg2, 
                             (const void *) arg3, (size_t) arg4 );
     }
 
-    // write on virtual console!
-    // range: 0 ~ 3
-    // chamado por write_VC em ring3.
-    // IN: fd, buf, count
-    
+// write on virtual console!
+// range: 0 ~ 3
+// chamado por write_VC em ring3.
+// IN: fd, buf, count
     if ( number == 263 ){
         return (void *) console_write ( (int) arg2, 
                             (const void *) arg3, (size_t) arg4 );
@@ -372,17 +345,16 @@ static void *__extra_services (
         return (void *) process_get_tty ( (int) arg2 );
     }
 
-
-    // Ligar duas tty, dados os pids dos processos que possuem as tty.
-    // tty/pty.c
-    // IN: master pid, slave pid.
+// Ligar duas tty, dados os pids dos processos que possuem as tty.
+// tty/pty.c
+// IN: master pid, slave pid.
     //if (number == 267){
     //    return (void *) pty_link_by_pid ( (int) arg2, (int) arg3 );
     //}
 
-    // Channel is a file descriptor in the file list 
-    // of the current process.
-    // IN: fd, buf, count.
+// Channel is a file descriptor in the file list 
+// of the current process.
+// IN: fd, buf, count.
     if (number == 272)
     {
            return (void *) tty_read ( 
@@ -391,9 +363,9 @@ static void *__extra_services (
                                (int)          arg4 );  // nr
     }
 
-    // Channel is a file descriptor in the file list 
-    // of the current process.
-    // IN: fd, buf, count.
+// Channel is a file descriptor in the file list 
+// of the current process.
+// IN: fd, buf, count.
     if (number == 273)
     {
         return (void *) tty_write ( 
@@ -402,19 +374,19 @@ static void *__extra_services (
                             (int)          arg4 );  // nr
     }
 
-    // Get current virtual console.
+// Get current virtual console.
     if (number == 277 ){
         return (void *) console_get_current_virtual_console();
     }
 
-    // Set current cirtual console.
-    // #todo: precisa de privilégio. 
+// Set current cirtual console.
+// #todo: precisa de privilégio. 
     if (number == 278 ){
         console_set_current_virtual_console ( (int) arg2 );
         return NULL;
     }
 
-    // Returns the current runlevel.
+// Returns the current runlevel.
     if ( number == 288 ){
         return (void *) newos_get_current_runlevel();
     }
@@ -429,43 +401,39 @@ static void *__extra_services (
         return (void *) newos_get_memory_size_mb();
     }
 
-    // #bugbug: cuidado.
-    // get boot info.
-    // See: info.c
-    // IN: index to select the info.
-    
+// #bugbug: cuidado.
+// get boot info.
+// See: info.c
+// IN: index to select the info.
     if ( number == 293 ){
         return (void *) info_get_boot_info ( (int) arg2 );
     }
 
-    // Inicializar ou reinicializar componentes do sistema
-    // depois da inicialização completa do kernel.
-    // Isso poderá ser chamado pelo init.bin, pelo shell
-    // ou qualquer outro.
-    // see: 
+// Inicializar ou reinicializar componentes do sistema
+// depois da inicialização completa do kernel.
+// Isso poderá ser chamado pelo init.bin, pelo shell
+// ou qualquer outro.
+// see: 
     if ( number == 350 ){
         printf("350:\n"); refresh_screen();
         return (void *) sys_initialize_component ((int) arg2);
     }
 
-
-    // 377 
-    // todo: implement uname() libc support.
-    // See: sys.c
+// 377 
+// todo: implement uname() libc support.
+// See: sys.c
     if ( number == 377 )
     {
         //printf ("__extra_services: [377] uname. [todo] \n");
         //invalidate_screen();
         //refresh_screen();
-
         sys_uname ( (struct utsname *) arg2 );        
         return NULL;
     }
 
-
-    // #bugbug
-    // It crashes the system.
-    // Clear the screen.
+// #bugbug
+// It crashes the system.
+// Clear the screen.
     if (number==390)
     {
         debug_print ("__extra_services: [390] :)\n");
@@ -473,9 +441,8 @@ static void *__extra_services (
         return NULL;
     }
 
-
-    // #bugbug
-    // Falha se tentamos pintar a tela toda.
+// #bugbug
+// Falha se tentamos pintar a tela toda.
     if (number==391)
     {
         //debug_print("__extra_services: [391]\n");
@@ -489,18 +456,14 @@ static void *__extra_services (
         return NULL;
     }
 
-
-
-    // 512 - Get ws PID for a given desktop.
-    // Pega o wm de um dado desktop.
-    // IN: Desktop structure pointer.
-    // OUT: pid
+// 512 - Get ws PID for a given desktop.
+// Pega o wm de um dado desktop.
+// IN: Desktop structure pointer.
+// OUT: pid
     if ( number == SYS_GET_WS_PID )
     {
         debug_print("__extra_services: SYS_GET_WS_PID\n");
-
         __desktop = ( struct desktop_d *) arg2;
-
         if ( (void *) __desktop != NULL )
         {
             if ( __desktop->used  == TRUE && 
@@ -512,7 +475,6 @@ static void *__extra_services (
         // It means pid=0.
         return NULL;
     }
-
 
 // 513
 // Register the ring3 window server.
@@ -596,10 +558,8 @@ static void *__extra_services (
         return NULL; //fail
     }    
 
-
-
-    // 514 - get wm PID for a given desktop
-    // IN: desktop
+// 514 - get wm PID for a given desktop
+// IN: desktop
     if ( number == SYS_GET_WM_PID )
     {
        debug_print("__extra_services: SYS_GET_WM_PID\n");
@@ -616,11 +576,9 @@ static void *__extra_services (
         return NULL; //#bugbug: Isso pode significar pid 0.
     }
 
-
-
-    // 515 - set wm PID for a given desktop
-    // Register a ring3 wm.
-    // IN: desktop, pid
+// 515 - set wm PID for a given desktop
+// Register a ring3 wm.
+// IN: desktop, pid
     if ( number == SYS_SET_WM_PID )
     {
        debug_print("__extra_services: SYS_SET_WM_PID\n");
@@ -643,17 +601,18 @@ static void *__extra_services (
         return NULL; //fail
     }
 
-    // #bugbug
-    // This is a ring0 pointer.
-    // A ring3 process can't handle this thing.
-    // Get current desktop
-    if (number == 519){  return (void *) CurrentDesktop; }
+// #bugbug
+// This is a ring0 pointer.
+// A ring3 process can't handle this thing.
+// Get current desktop
+    if (number == 519){
+        return (void *) CurrentDesktop;
+    }
 
-
-    // network server
-    // 521 - set ns PID for a given desktop
-    // Register a network server.
-    // gramado_ports[11] = ws_pid
+// network server
+// 521 - set ns PID for a given desktop
+// Register a network server.
+// gramado_ports[11] = ws_pid
 
     if ( number == 521 )
     {
@@ -675,25 +634,24 @@ static void *__extra_services (
         return NULL; //fail
     }    
 
-
-    // 600 - dup
+// 600 - dup
     if ( number == 600 ){
         return (void *) sys_dup( (int) arg2 );  
     }
 
-    // 601 - dup2
+// 601 - dup2
     if ( number == 601 ){
         return (void *) sys_dup2( (int) arg2, (int) arg3 );
     }
 
-    // 602 - dup3
+// 602 - dup3
     if ( number == 602 ){
         return (void *) sys_dup3( (int) arg2, (int) arg3, (int) arg4 );
     }
 
-    // 603 - lseek support.
-    // See: unistd.c
-    // IN: fd, offset, whence.
+// 603 - lseek support.
+// See: unistd.c
+// IN: fd, offset, whence.
     if ( number == 603 ){
         return (void *) sys_lseek ( 
                             (int)   arg2, 
@@ -747,74 +705,70 @@ static void *__extra_services (
         return (void *) profiler_percentage_idle_thread;
     }
 
-
-    //get host name
+// get host name
     if ( number == 801 ){
         return (void *) __gethostname ( (char *) arg2);
     }
 
-    //set host name
+// set host name
     if ( number == 802 ){
         return (void *) __sethostname ( (const char *) arg2); 
     }
 
-    //get user name
+// get user name
     if ( number == 803 ){
         return (void *) __getusername ( (char *) arg2);
     }
 
-    //set user name
+// set user name
     if ( number == 804 ){
         return (void *) __setusername ( (const char *) arg2); 
     }
 
-
-    // #todo
-    // supporting ptsname libc function
-    // get_ptsname
-    // #todo: Change the name to sys_ptsname()
-    // IN: fd do master, buffer em ring3 para o nome, buflen
-    //
+// #todo
+// supporting ptsname libc function
+// get_ptsname
+// #todo: Change the name to sys_ptsname()
+// IN: fd do master, buffer em ring3 para o nome, buflen.
     if ( number == 808 ){
         return (void *) __ptsname ( (int) arg2, 
                             (char *) arg3, (size_t) arg4  ); 
     }
-    
-    //#todo
-    //supporting ptsname_r libc function
-    // #todo: Change the name to sys_ptsname()
-    //IN: fd do master, buffer e buflen.
+
+//#todo
+//supporting ptsname_r libc function
+// #todo: Change the name to sys_ptsname()
+//IN: fd do master, buffer e buflen.
     if ( number == 809 ){
         return (void *) __ptsname ( (int) arg2, 
                             (char *) arg3, (size_t) arg4  ); 
     } 
 
-    // Get process stats given pid
-    // IN: pid, index
+// Get process stats given pid
+// IN: pid, index
     if ( number == 880 ){
        return (void *) get_process_stats ( (pid_t) arg2, (int) arg3 );
     }
 
-    // get thread stats given tid
-    // IN: tid, number
+// get thread stats given tid
+// IN: tid, number
     if ( number == 881 ){
         return (void *) GetThreadStats ( (int) arg2, (int) arg3 );
     }
 
-
-    // Get process name
-    // IN: PID, ubuffer.
+// Get process name
+// IN: PID, ubuffer.
     if ( number == 882 ){
         return (void *) getprocessname( (pid_t) arg2, (char *) arg3 );
     }
 
-    // Get thread name
+// Get thread name
     if ( number == 883 ){
         return (void *) getthreadname ( (int) arg2, (char *) arg3 );
     }
 
-    // alarm()
-    // See: sys.c
+// alarm()
+// See: sys.c
     if ( number == 884 ){
         return (unsigned long) sys_alarm( (unsigned long) arg2 );
     }
@@ -827,7 +781,7 @@ static void *__extra_services (
         return (void *) newos_alloc_shared_ring3_pages ( (pid_t) current_process, (int) arg2 );
     }
 
-    // Setup the thread's surface rectangle.
+// Setup the thread's surface rectangle.
     if ( number == 892 )
     {
         __setup_surface_rectangle( 
@@ -838,7 +792,7 @@ static void *__extra_services (
         return NULL;
     }
 
-    // Invalidate the thread's surface rectangle.
+// Invalidate the thread's surface rectangle.
     if ( number == 893 )
     {
         __invalidate_surface_rectangle();
@@ -847,7 +801,7 @@ static void *__extra_services (
 
     // 896,895 ... window stuff.
 
-    // Invalidate the whole screen
+// Invalidate the whole screen
     if ( number == 896 )
     {
         invalidate_screen();
@@ -855,16 +809,15 @@ static void *__extra_services (
         return NULL;
     }
 
-
-    // Create a rectangle.
-    // Testing compositor
-    if ( number == 897 )
+// Create a rectangle.
+// Testing compositor
+    if (number == 897)
     {
         __service897();
         return NULL;
     }
 
-    // Enable prompt
+// Enable prompt
     if ( number == 898 )
     {
         printf ("Prompt ON: Type something\n");
@@ -873,7 +826,7 @@ static void *__extra_services (
         return NULL;
     }
 
-    // Desable prompt
+// Desable prompt
     if ( number == 899 )
     {
         printf ("Prompt OFF: Bye\n");
@@ -882,33 +835,28 @@ static void *__extra_services (
         return NULL;
     }
 
-
-    // is it full ?
-    // See: sys.c
-    // IN: fd
-    // OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
+// is it full ?
+// See: sys.c
+// IN: fd
+// OUT: -1= error; FALSE= nao pode ler; TRUE= pode ler.
     if ( number == 913 ){
         return (void *) sys_sleep_if_socket_is_empty(arg2);
     }
 
-
-    // get screen window.
-    // #todo. checar validade
+// get screen window.
+// #todo. checar validade
     //if ( number == 955 ){  return (void *) gui->screen;  } 
     
     //if ( number == 956 ){  return (void *) gui->background; } 
-    
-    // get main window.
-    // #todo. checar validade
+
+// get main window.
+// #todo. checar validade
     //if ( number == 957 ){ return (void *) gui->main; }  
 
-
-
-    // 970 - Create request.
-    // A interrupção n�o conseguir� retornar para a mesma thread.
-    // Chamar� o scheduler por conta pr�pria;
-    // IN: reason, reason
-
+// 970 - Create request.
+// A interrupção n�o conseguir� retornar para a mesma thread.
+// Chamar� o scheduler por conta pr�pria;
+// IN: reason, reason
     if ( number == 970 )
     {
             create_request ( 
@@ -921,41 +869,38 @@ static void *__extra_services (
                 (int) 0,                 // msg  
                 (unsigned long) arg2,    // long1  
                 (unsigned long) arg3 );  // long2
-                
-		//wait_for_a_reason ( current_thread, (int) arg2 );
+
+        //wait_for_a_reason ( current_thread, (int) arg2 );
         return NULL;
     }
 
-
-     // api - load file (string ???)
-     // #todo: Tem que retornar algum identificador para a api.
-     // poderia ser um indice na tabela de arquivos abertos pelo processo.
-     // #todo: rever.
-     // See: kstdio.c
+// api - load file (string ???)
+// #todo: Tem que retornar algum identificador para a api.
+// poderia ser um indice na tabela de arquivos abertos pelo processo.
+// #todo: rever.
+// See: kstdio.c
     //if ( number == 4002 ){
     //    return (void *) k_fopen ( (const char *) arg2, "r+" );
     //}
 
-
-
-    // Show root files system info.
-    if ( number == 4444 ){
+// Show root files system info.
+    if ( number == 4444 )
+    {
         fs_show_root_fs_info();
         return NULL;
     }
 
     //7000 ~ 7020 for network sockets
 
-    // socket() 
-    // See: socket.c
-    // family, type, protocol
-
+// socket() 
+// See: socket.c
+// family, type, protocol
     if ( number == 7000 ){
         return (void *) sys_socket ( (int) arg2, (int) arg3, (int) arg4 );
     }
 
-    // connect()
-    // fd, sockaddr struct pointer, addr len.
+// connect()
+// fd, sockaddr struct pointer, addr len.
     if ( number == 7001 ){
         return (void *) sys_connect ( 
                             (int) arg2, 
@@ -963,11 +908,11 @@ static void *__extra_services (
                             (socklen_t) arg4 );
     }
 
-    // accept()
-    // This is the unix standard method.
-    // Our major goal is to return the fd for the client socket file.
-    // #bugbug: Work in progress.
-    // fd, sockaddr struct pointer, addr len pointer.
+// accept()
+// This is the unix standard method.
+// Our major goal is to return the fd for the client socket file.
+// #bugbug: Work in progress.
+// fd, sockaddr struct pointer, addr len pointer.
     if ( number == 7002 ){
         return (void *) sys_accept ( 
                             (int) arg2, 
@@ -975,17 +920,17 @@ static void *__extra_services (
                             (socklen_t *) arg4 ); 
     }
 
-    // bind()
-    // fd, sockaddr struct pointer, addr len.
+// bind()
+// fd, sockaddr struct pointer, addr len.
     if ( number == 7003 ){
         return (void *) sys_bind ( 
                             (int) arg2, 
                             (const struct sockaddr *) arg3,
                             (socklen_t) arg4 );
      }
-    
-    // listen()
-    // fd, backlog
+
+// listen()
+// fd, backlog
     if ( number == 7004 ){
         return (void *) sys_listen ( (int) arg2, (int) arg3 );  
     }
@@ -1012,18 +957,15 @@ static void *__extra_services (
         return NULL;
     }
 
-
-    // libc: shutdown() IN: fd, how
+// libc: shutdown() IN: fd, how
     if ( number == 7009 ){
         sys_socket_shutdown( (int) arg2, (int) arg3 );
         return NULL;
     }
 
-
-    // ioctl ()
-    // IN: fd, request, arg
-    // See: sys.c    
-    
+// ioctl ()
+// IN: fd, request, arg
+// See: sys.c
     if ( number == 8000 ){
         return (void *) sys_ioctl ( 
                             (int) arg2, 
@@ -1031,9 +973,8 @@ static void *__extra_services (
                             (unsigned long) arg4 );
     }
 
-
-    // fcntl()
-    // See: sys.c    
+// fcntl()
+// See: sys.c    
     if ( number == 8001 ){
         return (void *) sys_fcntl ( 
                             (int) arg2, 
@@ -1049,19 +990,17 @@ static void *__extra_services (
         return (void *) sys_setup_stdin((int) arg2);
     }
 
-
-    // test: pegando o endereço de um buffer de icone..
-    // queremos saber se ele eh compartilhado.
-    // shared_buffer_terminal_icon
-    // See: wm.c
+// test: pegando o endereço de um buffer de icone..
+// queremos saber se ele eh compartilhado.
+// shared_buffer_terminal_icon
+// See: wm.c
     if (number == 9100){
         return (void *) ui_get_system_icon ( (int) arg2 );
     }
 
     // ...
 
-
-    // #deprecated
+// #deprecated
     if ( number == 9999 ){
         panic("__extra_services: [9999] #deprecated\n");
     }
@@ -2153,26 +2092,22 @@ void *sci2 (
 
 // Profiling in the process structure.
 
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
-    {
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         panic("sci2: current_process\n");
     }
 
+// structure
     p = (struct process_d *) processList[current_process];
-
-    if ( (void*) p == NULL )
-    {
+    if ( (void*) p == NULL ){
         debug_print("sci2: p\n");
         panic("sci2: p\n");
     }
-
-    if ( p->used != TRUE || p->magic != 1234 )
-    {
+    if ( p->used != TRUE || p->magic != 1234 ){
         debug_print("sci2: p validation\n");
         panic("sci2: p validation\n");
     }
 
+// Personality
     if (p->personality != PERSONALITY_GRAMADO &&
         p->personality != PERSONALITY_GWS)
     {
@@ -2189,36 +2124,35 @@ void *sci2 (
 
 //set magic
 // #todo: This operation needs permition?
-
-    if ( number == 1 ){
+    if (number == 1){
         //CONSOLE_TTYS[fg_console].magic = arg2;
         return NULL;
     }
 
-    // Get magic
-    if ( number == 2 ){
+// Get magic
+    if (number == 2){
         return (void*) CONSOLE_TTYS[fg_console].magic;
     }
 
-    // Get system metrics
+// Get system metrics
     if (number == 3){
         return (void*) sys_get_system_metrics(arg2);
     }
 
-    if ( number == 4 ){
+    if (number == 4){
         debug_print("sci2: [4] ioctl\n");
         //return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
         return NULL;
     }
 
-    if ( number == 5 ){
+    if (number == 5){
         debug_print("sci2: [5] fcntl\n");
         return (void*) sys_fcntl ( (int) arg2, (int) arg3, (unsigned long) arg4 );
     }
 
 // read() implementation.
 // See: fs.c
-    if ( number == 18 ){
+    if (number == 18){
         //debug_print("sci2: [18] read\n");
         return (void *) sys_read ( 
                             (unsigned int) arg2, 
@@ -2228,7 +2162,7 @@ void *sci2 (
 
 // write() implementation.
 // See: fs.c
-    if ( number == 19 ){
+    if (number == 19){
         //debug_print("sci2: [19] write\n");
         return (void *) sys_write ( 
                             (unsigned int) arg2, 
@@ -2414,8 +2348,10 @@ void *sci2 (
         //t->signal |= 1<<(SIGKILL-1);
         
         foreground_thread = (int) arg2;
+        
+        // #deprecated
         // it will select the next input reponder.
-        set_input_responder_tid(foreground_thread);
+        // set_input_responder_tid(foreground_thread);
         return NULL;
     }
 
@@ -2485,15 +2421,15 @@ void *sci2 (
 // #bugbug
 // Where is the prototype?
 
-static void __servicePutChar ( int c )
+static void __servicePutChar(int c)
 {
-    if ( fg_console < 0 ){
-        // #todo: Message
+// Put char into the fg console.
+
+    if (fg_console < 0){
         return;
     }
     console_putchar ( (int) c, fg_console );
 }
-
 
 void newos_reboot(unsigned long reboot_flags)
 {
@@ -2530,10 +2466,9 @@ newos_register_ws_callbacks(
 
 unsigned long newos_get_system_metrics(int index)
 {
-    if(index<0){
+    if (index<0){
         return 0;
     }
-
     return (unsigned long) doGetSystemMetrics ( (int) index );
 }
 
@@ -2547,12 +2482,12 @@ pid_t newos_getpid(void)
 // MOVEMENT 1 (Initialized --> Standby).
 int newos_start_thread( struct thread_d *thread )
 {
+
+// structure
     if( (void*) thread == NULL )
         return (-1);
-
     if(thread->used != TRUE)
         return (-1);
-
     if(thread->magic != 1234)
         return (-1);
 
@@ -2560,24 +2495,20 @@ int newos_start_thread( struct thread_d *thread )
     return 0;
 }
 
-
 int newos_get_current_runlevel(void)
 {
     return (int) current_runlevel;
 }
 
-
 unsigned long newos_get_memory_size_mb(void)
 {
-    unsigned long __mm_size_mb=0;
-    
-    __mm_size_mb = (unsigned long) ( memorysizeTotal/0x400);
+    unsigned long __mm_size_mb = 
+        (unsigned long) (memorysizeTotal/0x400);
 
     return (unsigned long) __mm_size_mb;
 }
 
 // Usado pelo malloc em ring3.
-
 void *newos_alloc_shared_ring3_pages(pid_t pid, int number_of_bytes)
 {
     int number_of_pages=0;

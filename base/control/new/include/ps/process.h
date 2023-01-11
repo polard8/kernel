@@ -14,11 +14,9 @@ extern int copy_process_in_progress;
 #define PROCESS_MAGIC  1234
 
 
-
 #define PERSONALITY_GRAMADO  1000
 #define PERSONALITY_GWS      1001
 // ...
-
 
 // Processes:
 // Os processos BATCH são BACKGROUND.
@@ -124,17 +122,37 @@ typedef enum {
 
 struct process_d 
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
-
     int used;
     int magic;
+    process_type_t type;
+
+// process
+// PID, (Process Identification), 
+// PPID, (Parent Process Identification),
+    pid_t pid;
+    pid_t ppid;
+// group
+// GID, (Group Identification),
+    gid_t gid;
+    gid_t egid;
+    gid_t rgid;
+    gid_t sgid;
+// process group.
+    int pgrp;  // #todo: see: gid.
+// user
+// UID, (User Identification),
+    uid_t uid;
+    uid_t euid;
+    uid_t ruid;
+    uid_t suid;
 
     int personality;
     
     int exit_in_progress;
 
-    process_type_t type;
+
 
 // #todo
 // Usage, in percentage.
@@ -145,37 +163,12 @@ struct process_d
     //int disk_usage_in_percentage;
     //int network_usage_in_percentage;
 
-
 // Other process can't take some actions on this process 
 // if it is protected. ex: It can't be killed by another process.
     int _protected;
 
 // Open files.
     unsigned long Objects[64];
-
-// PID, (Process Identification), 
-// PPID, (Parent Process Identification),
-// UID, (User Identification),
-// GID, (Group Identification),
-
-    // process
-    pid_t  pid;
-    pid_t  ppid;
-    
-    // user
-    uid_t  uid;
-    uid_t  euid;
-    uid_t  ruid;
-    uid_t  suid;
-    
-    // group
-    gid_t  gid;
-    gid_t  egid;
-    gid_t  rgid;
-    gid_t  sgid;
-
-    //process group.
-    int pgrp;
 
 // State.
 // flag ?

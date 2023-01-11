@@ -69,8 +69,8 @@ __ps_initialize_thread_common_elements(struct thread_d *t)
 
     // Thread->wait4pid =
 
-    // loop
-    // Waiting reasons.
+// loop
+// Waiting reasons.
     // for ( i=0; i<8; ++i ){ t->wait_reason[i] = (int) 0; };
 
     t->flags = 0;
@@ -201,7 +201,7 @@ __ps_setup_x64_context (
 // Common
 //
 
-    // This is used by the control thread.
+// This is used by the control thread.
     t->initial_rip = (unsigned long) init_rip; 
 
     t->rax = 0;
@@ -212,9 +212,8 @@ __ps_setup_x64_context (
     t->rdi = 0;
     t->rbp = 0;
 
-    // We can save something here for control purpose.
-    // It can be used for the spawner.
-
+// We can save something here for control purpose.
+// It can be used for the spawner.
     t->r8 = 0;
     t->r9 = 0;
     t->r10 = 0;
@@ -228,7 +227,6 @@ __ps_setup_x64_context (
 
 // The context is not saved.
     t->saved = FALSE;
-    //return;
 }
 
 // helper
@@ -244,11 +242,11 @@ unsigned long GetThreadStats( int tid, int index )
 
 // Thread
 
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return 0;
     }
 
+// structure
     t = (void *) threadList[tid];
     if ( (void *) t == NULL ){
         return 0; 
@@ -385,9 +383,8 @@ int getthreadname ( int tid, char *buffer )
         goto fail;
     }
 
-// Thread
-    if ( tid<0 || tid >= THREAD_COUNT_MAX )
-    {
+// tid
+    if ( tid<0 || tid >= THREAD_COUNT_MAX ){
         goto fail;
     }
 
@@ -400,9 +397,7 @@ int getthreadname ( int tid, char *buffer )
         goto fail;
     }
 
-// Copy
-// 64 bytes
-
+// Copy 64 bytes
     strcpy(
         name_buffer, 
         (const char *) t->__threadname );       
@@ -553,13 +548,11 @@ void *GetThreadByTID (int tid)
 {
     struct thread_d *t;
 
-    if (tid < 0 || tid >= THREAD_COUNT_MAX)
-    {
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return NULL;
     }
 
     t = (void *) threadList[tid];
-
     return (void *) t;
 }
 
@@ -600,15 +593,19 @@ void *GetWSThread(void)
  * MOVIMENTO 1, (Initialized --> Standby).
  */
 
-void SelectForExecution (struct thread_d *Thread)
+void SelectForExecution(struct thread_d *Thread)
 {
     if ( (void *) Thread == NULL){
         debug_print ("SelectForExecution: Thread fail\n");
         return;
     }
 
+    //if ( (void*) Thread->magic != 1234 ){
+    //    debug_print ("SelectForExecution: Thread validation\n");
+    //    return;
+    //}
+
 // #todo
-// Validation ??
 // @todo: if initialized ---> Standby.
 // @todo: if zombie ---> Standby.
 // Talvez aqui seja necess�rio checar o estado da thread.
@@ -708,7 +705,6 @@ void show_thread_information (void)
 
 // Show all the slots
 // see: threadi.c
-
     show_slots(); 
 
     printf("Done\n");
@@ -940,10 +936,7 @@ struct thread_d *create_thread (
 // permitirmos que ele seja o dono da thread.
 
     ProcessID = (int) pid;
-
-    if( ProcessID < 0 || 
-        ProcessID >= PROCESS_COUNT_MAX )
-    {
+    if ( ProcessID < 0 || ProcessID >= PROCESS_COUNT_MAX ){
         //#bugbug: Isso pode ser um problemão.
         panic("create_thread: pid");
         //ProcessID = current_process;
@@ -1296,11 +1289,10 @@ try_next_slot:
  
 void exit_thread (int tid)
 {
-    struct thread_d  *Idle;
-    struct thread_d  *Thread;
+    struct thread_d *Idle;
+    struct thread_d *Thread;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
         debug_print ("exit_thread: tid\n");
         return;
     }
@@ -1372,7 +1364,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 {
     struct thread_d *father;
     struct thread_d *clone;
-    // Counters
+// Counters
     int w=0;
     int q=0;
 
@@ -1583,10 +1575,10 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 
     if ( clone->quantum_limit_min < QUANTUM_MIN ){ clone->quantum_limit_min = QUANTUM_MIN; }
     if ( clone->quantum_limit_max > QUANTUM_MAX ){ clone->quantum_limit_max = QUANTUM_MAX; }
-    
-	// runningCount - Tempo rodando antes de parar.
-	// readyCount - Tempo de espera para retomar a execução.
-	// blockedCount - Tempo bloqueada.
+
+// runningCount - Tempo rodando antes de parar.
+// readyCount - Tempo de espera para retomar a execução.
+// blockedCount - Tempo bloqueada.
 
     clone->standbyCount    = father->standbyCount;
 
@@ -1602,8 +1594,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     clone->blockedCount    = father->blockedCount; 
     clone->blocked_limit   = father->blocked_limit;
 
-    // Not used now. But it works fine.
-
+// Not used now. But it works fine.
     clone->ticks_remaining = father->ticks_remaining; 
 
     clone->initial_time_ms = father->initial_time_ms;
@@ -1611,7 +1602,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 
 // Signal
 // Sinais para threads.
-
     clone->signal = father->signal;
     clone->umask  = father->umask;
 
@@ -1644,18 +1634,14 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 	// ss (0x20 | 3)
 	// cs (0x18 | 3)
 
-//
 // Stack frame
-//
-
     clone->ss     = (unsigned short) (father->ss & 0xFFFF);    // RING 3.
     clone->rsp    = (unsigned long) father->rsp;   // wrong
     clone->rflags = (unsigned long) father->rflags;
     clone->cs     = (unsigned short) (father->cs & 0xFFFF);
     clone->rip    = (unsigned long) father->rip;   // wrong 
 
-//O endereço incial, para controle.
-
+// O endereço incial, para controle.
     clone->initial_rip = (unsigned long) father->initial_rip; 
 
 // check iopl
@@ -1697,10 +1683,9 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // TSS
 //
     // #todo
-
     // clone->tss = thread->tss;
 
-	//cpu.
+//cpu.
 	//Thread->cpuID = 0;
 	//Thread->confined = 0;
 	//Thread->CurrentProcessor = 0;
@@ -1715,7 +1700,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // Estamos usando o page directory do processo.
 // Page directory do processo ao qual a thread pertence.
 
-	//clone->DirectoryPA = thread->DirectoryPA; 
+    //clone->DirectoryPA = thread->DirectoryPA; 
     //clone->DirectoryVA = thread->DirectoryVA;
 
     //ServiceTable ..
@@ -1772,7 +1757,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     //debug_print("copy_thread_struct: done\n");
     
 // Returning the pointer for the clone.
-
     return (struct thread_d *) clone;
 }
 

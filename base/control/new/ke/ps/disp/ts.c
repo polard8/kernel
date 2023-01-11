@@ -29,11 +29,12 @@ static void cry(unsigned long flags);
 // ->preempted permitisse. 
 // talvez o certo seja ->preenptable.
 
-static void __on_finished_executing( struct thread_d *t )
+static void __on_finished_executing(struct thread_d *t)
 {
+
+// structure
     if ( (void*) t == NULL )
         panic("__on_finished_executing: t\n");
-
     if (t->magic!=1234)
         panic("__on_finished_executing: t magic\n");
 
@@ -50,22 +51,17 @@ static void __on_finished_executing( struct thread_d *t )
 // Preempt
 //
  
-    if ( t->state == RUNNING )
+    if (t->state == RUNNING)
     {
         t->state = READY;
         t->readyCount = 0;
     }
 
-//
 // Spawn thread 
-//
-
 // Check for a thread in standby.
 // In this case, this routine will not return.
 // See: schedi.c
-
     check_for_standby();   
-
 // ---------------------------------------------------------
 
 //
@@ -119,9 +115,6 @@ static void __on_finished_executing( struct thread_d *t )
 
     // ready_q[tail] = (unsigned long) t;
 
-
-
-
 //
 // == EXTRA ==========
 //
@@ -137,13 +130,10 @@ static void __on_finished_executing( struct thread_d *t )
     if (extra == TRUE)
     {
         //#debug
-        //debug_print (" X "); 
-
+        //debug_print (" X ");
         tsCallExtraRoutines();
-
         //KiRequest();
         //request();
-
         extra = FALSE;
     }
 
@@ -187,56 +177,36 @@ static void cry(unsigned long flags)
  *     return to _irq0.
  *     Called by KiTaskSwitch.
  */
-static void __task_switch (void)
+static void __task_switch(void)
 {
-
 // Current
-    struct process_d  *CurrentProcess;
-    struct thread_d   *CurrentThread;
-
+    struct process_d *CurrentProcess;
+    struct thread_d  *CurrentThread;
 // Target
-    struct process_d  *TargetProcess;
-    struct thread_d   *TargetThread;
-
-
+    struct process_d *TargetProcess;
+    struct thread_d  *TargetThread;
 // The owner of the current thread.
     pid_t owner_pid = (pid_t) (-1);  //fail
-
 // tmp tid
     //tid_t tmp_tid = -1;
-
-
 // =======================================================
 
 //
 // Current thread
 //
 
-// Check current thread limits.
-
-// index
-
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         panic ("ts: current_thread\n");
     }
 
 // structure
-
     CurrentThread = (void *) threadList[current_thread]; 
-
-    if ( (void *) CurrentThread == NULL )
-    {
+    if ( (void *) CurrentThread == NULL ){
         panic ("ts: CurrentThread\n");
     }
-
-    if ( CurrentThread->used != TRUE ||  
-         CurrentThread->magic != 1234 )
-    {
+    if ( CurrentThread->used != TRUE || CurrentThread->magic != 1234 ){
         panic ("ts: CurrentThread validation\n");
     }
-
 // =======================================================
 
 //
@@ -245,47 +215,35 @@ static void __task_switch (void)
 
 // The owner of the current thread.
 
-
 // pid
-
     owner_pid = (pid_t) CurrentThread->owner_pid;
-
-    if ( owner_pid < 0 ||
-         owner_pid >= PROCESS_COUNT_MAX )
-    {
+    if ( owner_pid < 0 || owner_pid >= PROCESS_COUNT_MAX ){
         panic ("ts: owner_pid\n");
     }
 
 // structure
-
     CurrentProcess = (void *) processList[owner_pid];
-
-    if ( (void *) CurrentProcess == NULL )
-    {
+    if ( (void *) CurrentProcess == NULL ){
         panic ("ts: CurrentProcess\n");
     }
-
-    if ( CurrentProcess->used != TRUE ||  
-         CurrentProcess->magic != 1234 )
-    {
+    if ( CurrentProcess->used != TRUE || CurrentProcess->magic != 1234 ){
         panic ("ts: CurrentProcess validation\n");
     }
 
 // check pid
-    if ( CurrentProcess->pid != owner_pid ){
-        panic("ts: CurrentProcess->pid != owner_pid \n");
+    if (CurrentProcess->pid != owner_pid){
+        panic("ts: CurrentProcess->pid != owner_pid\n");
     }
-
 
 //
 // Update the global variable.
 //
 
     //current_process = (pid_t) owner_pid;
-    set_current_process( owner_pid );
+    set_current_process(owner_pid);
 
 //
-//  == Conting =================================
+// == Conting =================================
 //
 
 // 1 second = 1000 milliseconds
@@ -295,11 +253,9 @@ static void __task_switch (void)
 // 1000/600 = 1.x ms quando em 600HZ.
 // x = 0 + (x ms); 
 
-
 // step: 
 // Quantas vezes ela já rodou no total.
-    CurrentThread->step++; 
-
+    CurrentThread->step++;
 // runningCount: 
 // Quanto tempo ela está rodando antes de parar.
     CurrentThread->runningCount++;
@@ -339,29 +295,21 @@ The remainder ??
     CurrentThread->runningCount_ms = 
         (unsigned long) CurrentThread->runningCount_ms + (DEFAULT_PIT_FREQ/sys_time_hz);
 
-
-//
-// == Locked ? ===============================
-//
-
+// Locked?
 // Taskswitch locked? 
 // Return without saving.
-
-    if ( task_switch_status == LOCKED )
-    {
+    if (task_switch_status == LOCKED){
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);
         debug_print ("ts: Locked $\n");
         return; 
     }
 
-
-// Unlocked?
+// Not Unlocked?
 // Nesse momento a thread atual sofre preempção por tempo
 // Em seguida tentamos selecionar outra thread.
 // Save the context.
 // Not unlocked?
-
-    if ( task_switch_status != UNLOCKED ){
+    if (task_switch_status != UNLOCKED){
         panic ("ts: task_switch_status != UNLOCKED\n");
     }
 
@@ -382,11 +330,9 @@ The remainder ??
 // para esse dado tick e saltarmos para o handler
 // de single shot configurado para esse timer.
 
-    //if( (jiffies % 16) == 0 )
-    //{
+    //if( (jiffies % 16) == 0 ){
         //spawn_test_signal();
     //}
-
 //=======================================================
 
 //
@@ -471,7 +417,7 @@ try_next:
 // #todo: Can we reintialize the kernel?
 // See: up.h and cpu.h
 
-    // No thread. 
+// No threads
     if (UPProcessorBlock.threads_counter == 0){
         panic("ts: No threads\n");
     }
@@ -487,10 +433,9 @@ try_next:
 // so we can use the mwait instruction. 
 // asm ("mwait"); 
 
-    // Only 1 thread.
-    // The Idle thread is gonna be the scheduler condutor.
-    if (UPProcessorBlock.threads_counter == 1)
-    {
+// Only 1 thread.
+// The Idle thread is gonna be the scheduler condutor.
+    if (UPProcessorBlock.threads_counter == 1){
         Conductor = (void *) UPProcessorBlock.IdleThread;
         goto go_ahead;
     }
@@ -514,13 +459,11 @@ try_next:
 // Isso é ruin quando tem poucas threads, mas não faz diferença
 // se o round for composto por muitas threads.
 
-    // End of round. Rebuild the round.
-    if ( (void *) Conductor->next == NULL )
-    {
+// End of round. Rebuild the round.
+    if ( (void *) Conductor->next == NULL ){
         current_thread = (tid_t) KiScheduler();
         goto go_ahead;
     }
-
 
 // Circular.
 // #critério
@@ -528,9 +471,8 @@ try_next:
 // a próxima da lista.
 // #BUGBUG: ISSO PODE SER UM >>> ELSE <<< DO IF ACIMA.
 
-    // Get the next thread in the linked list.
-    if ( (void *) Conductor->next != NULL )
-    {
+// Get the next thread in the linked list.
+    if ( (void *) Conductor->next != NULL ){
         Conductor = (void *) Conductor->next;
         goto go_ahead;
     }
@@ -567,24 +509,18 @@ go_ahead:
 // ou quando pegamos a próxima na lista.
 
     TargetThread = (void *) Conductor;
-
-    if ( (void *) TargetThread == NULL )
-    { 
+    if ( (void *) TargetThread == NULL ){
         debug_print ("ts: Struct ");
         current_thread = (tid_t) KiScheduler();
         goto try_next;
     }
-
-    if ( TargetThread->used != TRUE || 
-         TargetThread->magic != 1234 )
-    {
+    if ( TargetThread->used != TRUE || TargetThread->magic != 1234 ){
         debug_print ("ts: val ");
         current_thread = (tid_t) KiScheduler();
         goto try_next;
     }
-
-    if ( TargetThread->state != READY )
-    {
+// Not ready?
+    if (TargetThread->state != READY){
         debug_print ("ts: state ");
         current_thread = (tid_t) KiScheduler();
         goto try_next;
@@ -595,7 +531,6 @@ go_ahead:
 //
     
 // Current selected.
-
     current_thread = (int) TargetThread->tid;
     goto dispatch_current;
 
@@ -614,29 +549,30 @@ go_ahead:
 dispatch_current:
 
 // tid
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         panic ("ts-dispatch_current: current_thread\n");
     }
 
 // structure
     TargetThread = (void *) threadList[current_thread];
-
     if ( (void *) TargetThread == NULL ){
         panic ("ts-dispatch_current: TargetThread\n");
     }
-    if ( TargetThread->used  != TRUE || 
-         TargetThread->magic != 1234 || 
-         TargetThread->state != READY )
-    {
+    if ( TargetThread->used != TRUE || TargetThread->magic != 1234 ){
         panic ("ts-dispatch_current: validation\n");
     }
 
-// #todo
-    //UPProcessorBlock.CurrentThread = (struct thread_d *) TargetThread;
-    //UPProcessorBlock.NextThread    = (struct thread_d *) TargetThread->next;
-    
+// Not ready?
+    if (TargetThread->state != READY){
+        panic ("ts-dispatch_current: Not ready\n");
+    }
+
+    // #todo
+    //UPProcessorBlock.CurrentThread = 
+    //    (struct thread_d *) TargetThread;
+    //UPProcessorBlock.NextThread = 
+    //    (struct thread_d *) TargetThread->next;
+
 // Counters
 // Clean
 // The spawn routine will do something more.
@@ -652,26 +588,23 @@ dispatch_current:
     TargetThread->blockedCount = 0;
     TargetThread->blockedCount_ms = 0;
 
-// Base Priority:
-    if ( TargetThread->base_priority > PRIORITY_MAX ){
+// Base Priority
+    if (TargetThread->base_priority > PRIORITY_MAX){
         TargetThread->base_priority = PRIORITY_MAX;
     }
-
 // Priority
-    if ( TargetThread->priority > PRIORITY_MAX ){
+    if (TargetThread->priority > PRIORITY_MAX){
         TargetThread->priority = PRIORITY_MAX;
     }
-
-// Credits limit.
-    if ( TargetThread->quantum > QUANTUM_MAX)
-    {
+// Credits limit
+    if (TargetThread->quantum > QUANTUM_MAX){
         TargetThread->quantum = QUANTUM_MAX;
     }
 
 // Call dispatcher.
 // #bugbug
 // Talvez aqui devemos indicar que a current foi selecionada. 
-    IncrementDispatcherCount (SELECT_DISPATCHER_COUNT);
+    IncrementDispatcherCount(SELECT_DISPATCHER_COUNT);
 
 // MOVEMENT 4 (Ready --> Running).
     dispatcher(DISPATCHER_CURRENT); 
@@ -683,67 +616,51 @@ dispatch_current:
 // Owner PID.
 
     pid_t targetthread_OwnerPID = (pid_t) TargetThread->owner_pid;
-
     if ( targetthread_OwnerPID < 0 || 
          targetthread_OwnerPID >= THREAD_COUNT_MAX )
     {
-       printf ("ts: targetthread_OwnerPID ERROR \n", targetthread_OwnerPID );
+       printf ("ts: targetthread_OwnerPID ERROR\n", targetthread_OwnerPID );
        die();
     }
 
 // Target process 
-
-    TargetProcess = (void *) processList[ targetthread_OwnerPID ];
-
+    TargetProcess = (void *) processList[targetthread_OwnerPID];
     if ( (void *) TargetProcess == NULL ){
-        printf ("ts: TargetProcess %s struct fail \n", TargetProcess->name );
+        printf ("ts: TargetProcess %s struct fail\n", TargetProcess->name );
         die();
     }
-
-    if ( TargetProcess->used != TRUE || 
-         TargetProcess->magic != 1234 )
-    {
-        printf ("ts: TargetProcess %s validation \n", 
+    if ( TargetProcess->used != TRUE || TargetProcess->magic != 1234 ){
+        printf ("ts: TargetProcess %s validation\n", 
             TargetProcess->name );
         die();
     }
 
-    if( TargetProcess->pid != targetthread_OwnerPID )
-    {
+// pid
+    if (TargetProcess->pid != targetthread_OwnerPID){
         panic("ts: TargetProcess->pid != targetthread_OwnerPID\n");
     }
 
+// Set current process.
 // Update global variable.
 
     //current_process = (pid_t) TargetProcess->pid;
-    set_current_process (TargetProcess->pid);
-
+    set_current_process(TargetProcess->pid);
 
 // check pml4_PA
-
-    if ( (unsigned long) TargetProcess->pml4_PA == 0 )
-    {
+    if ( (unsigned long) TargetProcess->pml4_PA == 0 ){
         printf ("ts: Process %s pml4 fail\n", TargetProcess->name );
         die();
     }
 
-
 // #bugug
 // #todo
-
     // current_process_pagedirectory_address = (unsigned long) P->DirectoryPA;
     // ?? = (unsigned long) P->pml4_PA;
 
-//#ifdef TS_DEBUG
-//    debug_print ("ts: done $\n");
-//#endif 
-
     return;
-
 fail:
     panic ("ts: Unspected error\n");
 }
-
 
 /*
  * psTaskSwitch:
@@ -757,10 +674,8 @@ fail:
  * que configurará os registradores e executará a 
  * thread através do método iret.
  * #importante:
- * Na verdade, é uma interface pra uma rotina que 
- * faz tudo isso.
+ * Na verdade, é uma interface pra uma rotina que faz tudo isso.
  */
- 
 /*
 // @todo: Fazer alguma rotina antes aqui ?!
 // Obs: A qui poderemos criar rotinas que não lidem com a troca de 
@@ -772,7 +687,6 @@ fail:
 // >> ?? Na saída ??
 // ?? quem atualizou as variáveis de critério de escolha ??? o dispacher ??
 */
-
 // Called by:
 // irq0_TIMER in pit.c.
 // _irq0 in hw.asm. (old way?)
@@ -792,19 +706,13 @@ void psTaskSwitch(void)
 // não chamamos EOI.
 
     pid_t current_process = (pid_t) get_current_process();
-
-
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
-    {
-        printf ("psTaskSwitch: current_process %d", current_process );
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        printf ("psTaskSwitch: current_process %d", current_process);
         die();
     }
 
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
-        printf ("psTaskSwitch: current_thread %d", current_thread ); 
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
+        printf ("psTaskSwitch: current_thread %d", current_thread); 
         die();
     }
 
@@ -817,34 +725,28 @@ void psTaskSwitch(void)
     // Se estamos na thread do window server.
     if (current_process == ws_pid)
     {
-
         // Se o callback ja foi inicializado
         // por uma chamada do window server.
         if ( ws_callback_info.ready == TRUE )
         {
             //see: callback.c
             prepare_next_ws_callback();
-
             //no taskswitching
             return;
         }
     }
 
 // The task switching routine.
-
     __task_switch();
 }
-
 
 /*
  * get_task_status:
  *     Obtem o status do mecanismo de taskswitch.
  * @todo: Mudar o nome dessa função para taskswitchGetStatus();.
  */
-
 //#bugbug: Mudar para int.
-
-unsigned long get_task_status (void)
+unsigned long get_task_status(void)
 {
     return (unsigned long) task_switch_status;
 }
@@ -856,14 +758,11 @@ unsigned long get_task_status (void)
  * não ocorrerá a mudança.
  * @todo: Mudar o nome dessa função para taskswitchSetStatus(.);
  */ 
-
 // #bugbug: Mudar para int.
-
 void set_task_status( unsigned long status )
 {
     task_switch_status = (unsigned long) status;
 }
-
 
 void taskswitch_lock (void){
     task_switch_status = (unsigned long) LOCKED;
@@ -873,17 +772,14 @@ void taskswitch_unlock (void){
     task_switch_status = (unsigned long) UNLOCKED;
 }
 
-
 // Call extra routines scheduled to this moment.
 // called by task_switch.
 // #importante:
 // Checaremos por atividades extras que foram agendadas pelo 
 // mecanismo de request. Isso depois do contexto ter sido 
 // salvo e antes de selecionarmos a próxima thread.
-
 void tsCallExtraRoutines(void)
 {
-
     debug_print ("tsCallExtraRoutines: [FIXME] \n");
 
     // Kernel requests.

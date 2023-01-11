@@ -32,18 +32,15 @@ void *sys_get_message(unsigned long ubuf)
 // Thread
 // Essa é a thread que chamou esse serviço.
 
-    if(current_thread<0 ||
-       current_thread>=THREAD_COUNT_MAX)
-    {
+    if (current_thread<0 || current_thread>=THREAD_COUNT_MAX){
         return NULL;
     }
 
+// structure
     t = (void *) threadList[current_thread];
-
     if ( (void *) t == NULL ){
         panic ("sys_get_message: t\n");
     }
-
     if ( t->used != TRUE || t->magic != 1234 ){
         panic ("sys_get_message: t validation\n");
     }
@@ -53,35 +50,28 @@ void *sys_get_message(unsigned long ubuf)
 
 // Get the next head pointer.
     m = (struct msg_d *) t->MsgQueue[ t->MsgQueueHead ];
-
     if ( (void*) m == NULL ){
         goto fail0;
     }
-
-    if (m->used != TRUE || m->magic != 1234 )
-    {
+    if (m->used != TRUE || m->magic != 1234 ){
         goto fail0;
     }
 
 // Invalid message code
-    if( m->msg <= 0 ){
+    if ( m->msg <= 0 ){
         goto fail0;
     }
-
 // Get standard entries.
     message_address[0] = (unsigned long) m->window;
     message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
     message_address[2] = (unsigned long) m->long1;
     message_address[3] = (unsigned long) m->long2;
-
 // Get extra entries.
     message_address[4] = (unsigned long) m->long3;
     message_address[5] = (unsigned long) m->long4;
-
 // #test
     message_address[8] = (unsigned long) m->sender_tid;
     message_address[9] = (unsigned long) m->receiver_tid;
-
 
 // Buffer size:
 // 32 slots.
@@ -91,7 +81,6 @@ void *sys_get_message(unsigned long ubuf)
 
 // jiffies when gotten by the app.
     message_address[11] = (unsigned long) jiffies;
-
 
 // clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
@@ -103,20 +92,19 @@ void *sys_get_message(unsigned long ubuf)
     m->long3 = 0;
     m->long4 = 0;
 
-// ==================================
-
-done:
+// Done
 // Yes, We have a message.
 // round
     t->MsgQueueHead++;
     if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
-    return (void *) 1;
+    return (void *) 1;  //#bugbug
 
 fail0:
 // No message.
 // round
+    if ( (void*) t == NULL ){ return NULL; }
     t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    if (t->MsgQueueHead >= 31){ t->MsgQueueHead = 0; }
     return NULL;
 }
 
@@ -144,12 +132,11 @@ void *sys_get_message2(
 // Thread
 // Essa é a thread que chamou esse serviço.
 
-    if(current_thread<0 ||
-       current_thread>=THREAD_COUNT_MAX)
-    {
+    if (current_thread<0 || current_thread>=THREAD_COUNT_MAX){
         return NULL;
     }
 
+// Structure
     t = (void *) threadList[current_thread];
     if ( (void *) t == NULL ){
         panic ("sys_get_message2: t\n");
@@ -159,11 +146,9 @@ void *sys_get_message2(
     }
 
 // Get the index.
-
     if( index<0 || index >= 32){
         goto fail0;
     }
-
     t->MsgQueueHead = (int) (index & 0xFFFFFFFF);
 
 // ===========================================================
@@ -174,8 +159,7 @@ void *sys_get_message2(
     if ( (void*) m == NULL ){
         goto fail0;
     }
-    if (m->used != TRUE || m->magic != 1234)
-    {
+    if (m->used != TRUE || m->magic != 1234){
         goto fail0;
     }
 
@@ -183,17 +167,14 @@ void *sys_get_message2(
     if ( m->msg <= 0 ){
         goto fail0;
     }
-
 // Get standard entries.
     message_address[0] = (unsigned long) m->window;
     message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
     message_address[2] = (unsigned long) m->long1;
     message_address[3] = (unsigned long) m->long2;
-
 // Get extra entries.
     message_address[4] = (unsigned long) m->long3;
     message_address[5] = (unsigned long) m->long4;
-
 // #test
     message_address[8] = (unsigned long) m->sender_tid;
     message_address[9] = (unsigned long) m->receiver_tid;
@@ -219,8 +200,8 @@ void *sys_get_message2(
 
 // ==================================
 
+// Done
 // It is a valid thread pointer.
-done:
     if (restart==TRUE)
     {
         t->MsgQueueHead=0;
@@ -238,7 +219,7 @@ done:
 fail0:
 // No message.
 // round
-
+    if ( (void*) t == NULL ){ return NULL; }
     if (restart==TRUE)
     {
         if ( (void*) t != NULL ){
@@ -311,38 +292,34 @@ post_message_to_tid (
 
 // Target thread.
     struct thread_d *t;
-
+    struct msg_d *m;
+    int MessageCode=0;
 // TIDs
     tid_t src_tid = (tid_t) (sender_tid & 0xFFFF);
     tid_t dst_tid = (tid_t) (receiver_tid & 0xFFFF);
 
-    struct msg_d *m;
-    int MessageCode=0;
-
-
 // Message code.
     MessageCode = (int) (msg & 0xFFFFFFFF);
-    if( MessageCode<0 ){
+    if (MessageCode<0){
         return -1;
     }
 
-// Thread
-
-    if ( dst_tid < 0 || 
-         dst_tid >= THREAD_COUNT_MAX )
-    {
+// tid
+    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
         panic("post_message_to_tid: dst_tid\n");
         //goto fail;
     }
+// structure
     t = (struct thread_d *) threadList[dst_tid];
     if ( (void *) t == NULL ){
         panic ("post_message_to_tid: t \n");
     }
-    if ( t->used != 1 || t->magic != 1234 ){
+    if ( t->used != TRUE || t->magic != 1234 ){
         panic ("post_message_to_tid: t validation \n");
     }
-    if(dst_tid != t->tid){
-        panic("post_message_to_tid: dst_tid != t->tid");
+
+    if (dst_tid != t->tid){
+        panic("post_message_to_tid: dst_tid != t->tid\n");
     }
 
 // Reset the running count.
@@ -350,18 +327,16 @@ post_message_to_tid (
     t->runningCount = 0;
     t->runningCount_ms = 0;
 
-
 // Giving more credits to the receiver.
 // The receiver will lose this time in the scheduler.
 // The scheduler will balance the credits.
     t->quantum = (t->quantum + QUANTUM_BOOST);
 
-    if ( t->quantum > QUANTUM_MAX ){
+    if (t->quantum > QUANTUM_MAX){
         t->quantum = QUANTUM_MAX;
     }
 
 // Wake up the target thread?
-
     // wakeup_thread(t->tid);
 
 // #todo
@@ -374,19 +349,18 @@ post_message_to_tid (
 
 // Get the pointer for the next entry.
     m = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
-
-    if ( (void*) m == NULL )
+    if ( (void*) m == NULL ){
         panic ("post_message_to_tid: m\n");
-
-    if( m->used != TRUE || m->magic != 1234 )
-        panic ("post_message_to_tid: m validation \n");
+    }
+    if ( m->used != TRUE || m->magic != 1234 ){
+        panic ("post_message_to_tid: m validation\n");
+    }
 
     m->window = (struct window_d *) window;
     m->msg    = (int) (MessageCode & 0xFFFFFFFF);
     m->long1  = (unsigned long) long1;
     m->long2  = (unsigned long) long2;
 
-// #test
     m->long3 = (unsigned long) jiffies;
 
 // #test
@@ -404,16 +378,19 @@ post_message_to_tid (
     m->sender_tid   = (tid_t) src_tid; 
     m->receiver_tid = (tid_t) dst_tid;
 
-done:
+// Done
     t->MsgQueueTail++;
-    if ( t->MsgQueueTail >= 31 )
+    if (t->MsgQueueTail >= 31){
         t->MsgQueueTail = 0;
+    }
     return 0;
 
 fail0:
+    if ( (void*) t == NULL ){ return -1; }
     t->MsgQueueTail++;
-    if ( t->MsgQueueTail >= 31 )
+    if (t->MsgQueueTail >= 31){
         t->MsgQueueTail = 0;
+    }
     return -1;
 }
 
@@ -429,14 +406,12 @@ post_message_to_ws (
     tid_t src_tid = 0;   // sender tid #todo
     tid_t dst_tid = -1;  // receiver tid
 
-    if(WindowServerInfo.initialized != TRUE){
+    if (WindowServerInfo.initialized != TRUE){
         return -1;
     }
 
     dst_tid = (tid_t) WindowServerInfo.tid;
-
-    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX )
-    {
+    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
         return -1;
     }
 
@@ -472,13 +447,11 @@ post_message_to_foreground_thread (
 {
 
 // Paranoia.
-    if( foreground_thread < 0 || 
-        foreground_thread >= THREAD_COUNT_MAX )
-    {
+    if ( foreground_thread < 0 || foreground_thread >= THREAD_COUNT_MAX ){
         return -1;
     }
 
-    if(msg<0){
+    if (msg<0){
         return -1;
     }
 
@@ -504,18 +477,17 @@ sys_post_message_to_tid(
     tid_t dst_tid = (tid_t) tid;              // targt tid.
 
 // Invalid target tid.
-    if ( dst_tid < 0 || 
-         dst_tid >= THREAD_COUNT_MAX )
-    {
+    if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
         return 0;
     }
 
+// Message buffer
     if (message_buffer == 0){
         return 0;
     }
-
     unsigned long *buf = (unsigned long *) message_buffer;
 
+// Message code
     int MessageCode = (int) ( buf[1] & 0xFFFFFFFF );
 
 // Post message.
@@ -542,21 +514,19 @@ void show_slot(int tid)
 {
     struct thread_d  *t;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
         printf ("show_slot: tid\n");
         goto fail;
     }
 
+// structure
     t = (void *) threadList[tid];
-
     if ( (void *) t == NULL ){
         printf ("show_slot: t\n");
         goto fail;
     }
 
 // Show one slot
-
     printf ("\n");
     printf ("TID   PID   Per   pdPA  Prio  State Quan Jiffies initial_rip rflags   tName \n");
     printf ("====  ====  ====  ====  ====  ===== ==== ====    ==========  ======  =====   \n");
@@ -573,26 +543,21 @@ void show_slot(int tid)
         t->rflags,
         t->name_address );
 
-    //#test
     printf(":: stime{%d} utime{%d}\n",t->stime,t->utime);
 
-    if(t->tid == foreground_thread)
+    if (t->tid == foreground_thread)
         printf("[__FOREGROUND__]\n");
-
-    if(t->state == ZOMBIE)
+    if (t->state == ZOMBIE)
         printf("[__ZOMBIE__]\n");
-
-    if(t->state == DEAD)
+    if (t->state == DEAD)
         printf("[__DEAD__]\n");
 
     goto done;
-
 fail:
     printf ("Fail\n");
 done:
     return; 
 }
-
 
 // show_slots:
 // Show info about all threads.
@@ -603,21 +568,22 @@ void show_slots(void)
 {
     struct process_d  *p;
     struct thread_d   *t;
-    int i=0;
+    register int i=0;
 
     printf("\n");
     //printf("Thread info: jiffies{%d} sec{%d} min{%d}\n", 
         //jiffies, seconds, (seconds/60));
 
-    printf("Thread info: jiffies{%d} \n", jiffies );
-    printf("Threads running: %d\n",UPProcessorBlock.threads_counter);
-    printf("Foreground thread: {%d}\n",foreground_thread);
-
+    printf("Thread info: jiffies{%d}\n", 
+        jiffies );
+    printf("Threads running: %d\n", 
+        UPProcessorBlock.threads_counter );
+    printf("Foreground thread: {%d}\n",
+        foreground_thread );
 
     for ( i=0; i<THREAD_COUNT_MAX; i++ )
     {
         t = (void *) threadList[i];
-
         if ( (void *) t != NULL && 
              t->used  == 1 && 
              t->magic == 1234 )
@@ -644,35 +610,31 @@ void show_reg(int tid)
 {
     struct thread_d  *t;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
         printf("show_reg: fail\n");
         return;
     }
 
+// structure
     t = (void *) threadList[tid];
-
     if ( (void *) t == NULL ){
         printf ("show_reg: fail\n");
         return;
     } 
 
 // Show registers
-
     printf("\n");
-    printf("rflags=[%x] \n", 
+    printf("rflags=[%x]\n", 
         t->rflags);
-    printf("cs:rip=[%x:%x] ss:rsp=[%x:%x] \n", 
+    printf("cs:rip=[%x:%x] ss:rsp=[%x:%x]\n", 
         t->cs, t->rip, t->ss, t->rsp );
-    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x] \n",
+    printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
         t->ds, t->es, t->fs, t->gs );
-    printf("a=[%x] b=[%x] c=[%x] d=[%x] \n",
+    printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
         t->rax, t->rbx, t->rcx, t->rdx );
-
-    // r8~r12
-    // ...
+// r8~r12
+// ...
 }
-
 
 // set_thread_priority:
 // Muda a prioridade e o quantum de acordo com a prioridade.
@@ -688,46 +650,40 @@ set_thread_priority (
 {
 
     //unsigned long NewPriority = priority;
-    unsigned long OldPriority  = 0;
-
+    unsigned long OldPriority = 0;
     unsigned long BasePriority = 0;
 
-
 // Limits
-
-    if ( priority < PRIORITY_MIN )
-    {
+    if (priority < PRIORITY_MIN){
         priority=PRIORITY_MIN;
         return;
     }
-    if ( priority > PRIORITY_MAX )
-    {
+    if (priority > PRIORITY_MAX){
         priority=PRIORITY_MAX;
         return;
     }
 
 // Thread validation
-    if ( (void *) t == NULL )              { return; }
-    if ( t->used != 1 || t->magic != 1234 ){ return; }
+    if ( (void *) t == NULL )                 { return; }
+    if ( t->used != TRUE || t->magic != 1234 ){ return; }
 
 // Save old values.
     OldPriority  = t->priority;
     BasePriority = t->base_priority;
 
 // Se aprioridade solicitada for igual da prioridade atual.
-    if ( priority == OldPriority ){ return; }
+    if (priority == OldPriority){ return; }
 
 // Se a prioridade solicitada for menor que a prioridade basica.
-// #todo: Ent~ao poderiamos usar a prioridade basica.
-    if ( priority < BasePriority ){ return; }
+// #todo: Então poderiamos usar a prioridade basica.
+    if (priority < BasePriority){ return; }
 
 // Se a prioridade basica pertencer a classe de tempo real
 // nao podemos mudar a prioridade.
-    if ( BasePriority > PRIORITY_NORMAL ){ return; }
+    if (BasePriority > PRIORITY_NORMAL){ return; }
 
-// limits again
-    if ( priority > PRIORITY_MAX )
-    {
+// Limits again
+    if (priority > PRIORITY_MAX){
         t->priority = PRIORITY_MAX;
     }
 
@@ -735,31 +691,23 @@ set_thread_priority (
 // Set new quantum.
 // Se aprioridade solicitada for diferente da prioridade atual.
 // Tambem nao pode ser menor que a base.
-    if ( priority != OldPriority ){
+    if (priority != OldPriority){
         t->priority = priority;
     }
 
-//
-// Quantum
-//
-
+// Quantum:
 // Não mudaremos os creditos, somente a prioridade no escalonamento.
 // Não se preocupe.
 // O scheduler equilibra ao fim do round
-
 // Quantum fora dos limites.
 
-    if ( t->quantum < QUANTUM_MIN )
-    {
+    if (t->quantum < QUANTUM_MIN){
         t->quantum = QUANTUM_MIN;
     }
-
-    if ( t->quantum > QUANTUM_MAX )
-    {
+    if (t->quantum > QUANTUM_MAX){
         t->quantum = QUANTUM_MAX;
     }
 }
-
 
 // #suspenso
 // muda a prioridade para alem dos limites ... teste.
@@ -767,29 +715,25 @@ void threadi_power(
     struct thread_d *t, 
     unsigned long priority )
 {
+
+// structure
     if ( (void *) t == NULL ){ return; }
-   
-    if ( t->used != 1 || t->magic != 1234 )
-    {
+    if ( t->used != TRUE || t->magic != 1234 ){
         return;
     }
 
 // Priority
-
     t->priority = PRIORITY_MAX;
-    
-    // Aceita se tiver nos limites.
-    if( t->priority > PRIORITY_MIN &&
-        t->priority < PRIORITY_MAX )
+// Aceita se tiver nos limites.
+    if ( t->priority >= PRIORITY_MIN && 
+         t->priority <= PRIORITY_MAX )
     {
          t->priority = priority;
     }
 
 // Credits
-
     t->quantum = QUANTUM_MAX;
 }
-
 
 /*
  * release:
@@ -803,31 +747,14 @@ void threadi_power(
 // Não estamos selecionando ela para execução,
 // apenas estamos dizendo que ela está pronta para executar.
 
-void release(int tid)
+void release(tid_t tid)
 {
-    struct thread_d *Thread;
-
-
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
-        //  
-        return; 
+// Put the thread in the READY state.
+    if (tid<0 || tid>=THREAD_COUNT_MAX){
+        return;
     }
-
-    Thread = (void *) threadList[tid];
-
-    if ( (void *) Thread == NULL ){
-        return; 
-    }
-
-    if ( Thread->magic != THREAD_MAGIC )
-    {
-        return; 
-    }
-
-    Thread->state = READY;
+    do_thread_ready(tid);
 }
-
 
 void 
 SetThread_PML4PA ( 
@@ -843,7 +770,6 @@ SetThread_PML4PA (
 // #todo:
 // Aqui podemos checar a validade da estrutura,
 // antes de operarmos nela.
-
     thread->pml4_PA = (unsigned long) pa;
 }
 
@@ -889,14 +815,11 @@ void check_for_dead_thread_collector(void)
 
 void dead_thread_collector(void)
 {
-    register int i=0;  //loop
+    register int i=0;
+    struct thread_d *Target;
+    struct thread_d *Idle; 
 
-    struct thread_d  *Target;
-    struct thread_d  *Idle; 
-
-//
 // Check idle
-//
 
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
     if ( (void *) Idle == NULL ){
@@ -906,13 +829,10 @@ void dead_thread_collector(void)
         panic("dead_thread_collector: Idle validation\n");
     }
 
-
-// loop
 // Scan
 // Kill zombie
-//
 
-    for ( i=0; i < THREAD_COUNT_MAX; i++ )
+    for ( i=0; i<THREAD_COUNT_MAX; i++ )
     {
         Target = (void *) threadList[i];
 
@@ -1009,9 +929,8 @@ void kill_thread (int tid)
 void kill_all_threads(void)
 {
     register int i=0;
-    
-    // Start at '1'.
-    // Cant kill Idle thread.
+// Start at '1'.
+// Cant kill Idle thread.
     for ( i=1; i < THREAD_COUNT_MAX; ++i )
     { 
         kill_thread(i);
