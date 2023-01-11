@@ -25,28 +25,32 @@ __tty_read (
     char *buffer, 
     int nr )
 {
+    register int i=0;
+    char data[TTY_BUF_SIZE];
+    char c=0;
     char *b;
+
     b = buffer;
 
-// #debug
+    // #debug
     printf("__tty_read:\n");
+
 // tty structure.
     if ( (void *) tty == NULL ){
         printf ("__tty_read: tty\n");
         goto fail;
     }
-    if ( tty->used != TRUE || tty->magic != 1234 )
-    {
+    if ( tty->used != TRUE || tty->magic != 1234 ){
         printf ("__tty_read: tty validation\n");
         goto fail;
     }
 // buffer
     if ( (char *) buffer == NULL ){
-         panic ("__tty_read: invalid buffer \n");
+         panic ("__tty_read: Invalid buffer\n");
     }
 // nr
     if (nr <= 0){
-        printf ("__tty_read: nr \n");
+        printf ("__tty_read: nr\n");
         goto fail;
     }
     //if ( tty->stopped == TRUE )
@@ -63,11 +67,7 @@ __tty_read (
 // Isso tem o mesmo tamanho
 // da fila de tty.
 
-    int i=0;
-    char data[TTY_BUF_SIZE];
-    char c=0;
     int rbytes=nr;
-    
     if (rbytes<=0){
         return 0;
     }
@@ -81,15 +81,13 @@ __tty_read (
     {
         // Empty
         // Isso acontece também quando a fila esta vazia.
-        if ( tty->raw_queue.head == tty->raw_queue.tail )
-        {
+        if ( tty->raw_queue.head == tty->raw_queue.tail ){
             printf("__tty_read: tty->raw_queue.head == tty->raw_queue.tail\n");
             return 0;
         }
 
         // Acabou a fila.
-        if ( tty->raw_queue.tail > TTY_BUF_SIZE )
-        {
+        if ( tty->raw_queue.tail > TTY_BUF_SIZE ){
             printf("__tty_read: tty->raw_queue.tail > TTY_BUF_SIZE\n");
             return 0;
         }
@@ -112,28 +110,24 @@ __tty_read (
         return 0;
     }
 
-    if ( i > TTY_BUF_SIZE ){
-        i=TTY_BUF_SIZE;
+    if (i > TTY_BUF_SIZE){
+        i = TTY_BUF_SIZE;
     }
 
 // Send
 // Copiando os bytes de nosso buffer local para
 // o buffer de usuário.
+    memcpy( (void *) b, (const void *) data, i ); 
 
-    memcpy ( 
-        (void *) b, 
-        (const void *) data, 
-        i ); 
-
-//#debug
+    // #debug
     //printf("__tty_read: done\n");
+
 // Retornamos a quantidade de bytes que tinha em nosso buffer local.
     return (int) i;
 fail:
     refresh_screen();
-    return -1;
+    return (int) (-1);
 }
-
 
 /*
  * __tty_write:
@@ -153,26 +147,31 @@ __tty_write (
     char *buffer, 
     int nr )
 {
+    register int i=0;
+    char data[TTY_BUF_SIZE];
+    char c=0;
     char *b;
+
     b = buffer;
 
+    // #debug
     printf("__tty_write:\n");
+
 // tty
     if ( (void *) tty == NULL ){
         debug_print ("__tty_write: tty\n");
         goto fail;
     }
-    if ( tty->used != TRUE || tty->magic != 1234 )
-    {
+    if ( tty->used != TRUE || tty->magic != 1234 ){
         printf ("__tty_write: tty validation\n");
         goto fail;
     }
 // buffer
     if ( (char *) buffer == NULL ){
-         panic ("__tty_write: invalid buffer\n");
+         panic ("__tty_write: Invalid buffer\n");
     }
 // nr
-    if ( nr <= 0 ){
+    if (nr <= 0){
         printf ("__tty_write: nr\n");
         goto fail;
     }
@@ -192,12 +191,7 @@ __tty_write (
 // Isso tem o mesmo tamanho
 // da fila de tty.
 
-    int i=0;
-    char data[TTY_BUF_SIZE];
-    char c=0;
-    
     int wbytes=nr;
-    
     if (wbytes<=0){
         return 0;
     }
@@ -209,20 +203,15 @@ __tty_write (
 
 // Receive
 // Copiando bytes do buffer do usuário para nosso buffer local.
-
-    memcpy ( 
-        (void *) data, 
-        (const void *) b, 
-        wbytes ); 
+    memcpy( (void *) data, (const void *) b, wbytes ); 
 
 //buffer local
     i=0;
 
-    while ( wbytes > 0 )
+    while (wbytes > 0)
     {
-        // acabou a fila.
-        if ( tty->raw_queue.head >= TTY_BUF_SIZE )
-        {
+        // Acabou a fila.
+        if ( tty->raw_queue.head >= TTY_BUF_SIZE ){
             break;
         }
 
@@ -242,20 +231,22 @@ __tty_write (
     };
 
 done:
-//#debug
+    
+    //#debug
     printf("__tty_write: done\n");
-// quantidade de bytes que gravamos na tty
-    if ( i <= 0 ){
+
+// Quantidade de bytes que gravamos na tty
+    if (i <= 0){
         return 0;
     }
-    if ( i > TTY_BUF_SIZE ){
+    if (i > TTY_BUF_SIZE){
         i=TTY_BUF_SIZE;
     }
 // Retornamos a quantidade que gravamos na fila da tty.
     return (int) i;
 fail:
     refresh_screen();
-    return -1;
+    return (int) (-1);
 }
 
 
@@ -458,18 +449,17 @@ tty_write (
 
 // tty_reset_termios: 
 // Reset termios in a given tty.
-// See: ttydef.h
+// See: tty.h
 // #todo: use int as return.
 
-void tty_reset_termios(struct tty_d *tty)
+int tty_reset_termios(struct tty_d *tty)
 {
     if ( (void *) tty == NULL ){
-        debug_print("tty_reset_termios: tty\n");
-        return;
+        return (int) -1;
     }
 
-// #check
-// Is it a valid termios structure pointer?
+    // #test
+    // memset( &tty->termios, 0, sizeof(struct termios_d) );
 
     tty->termios.c_iflag = BRKINT | ICRNL | IXON;
     tty->termios.c_oflag = OPOST;
@@ -478,47 +468,48 @@ void tty_reset_termios(struct tty_d *tty)
     tty->termios.c_ispeed = B9600;
     tty->termios.c_ospeed = B9600;
 
-    // ^d
-    // 4 - (CEOF: <Ctrl>d or ASCII EOT)
+// ^d
+// 4 - (CEOF: <Ctrl>d or ASCII EOT)
     tty->termios.c_cc[VEOF] = CEOF;
 
-    // Bugbug overflow ??
-    // ? - 0xff  
-    // 2;  //BS
-    //tty->termios.c_cc[VEOL]   = CEOL; 
-    
-    // ^h
-    // (CERASE: <Ctrl>h or ASCII BS)
-    // 0x7f ??
-    // 8;  //BS
+// Bugbug overflow ??
+// ? - 0xff  
+// 2;  //BS
+    //tty->termios.c_cc[VEOL] = CEOL; 
+
+// ^h
+// (CERASE: <Ctrl>h or ASCII BS)
+// 0x7f ??
+// 8;  //BS
     tty->termios.c_cc[VERASE] = CERASE;
 
-    // ^c
-    // (CINTR: rubout or ASCII DEL)   
-    //3;  //EOI  
-    tty->termios.c_cc[VINTR]  = CINTR;
+// ^c
+// (CINTR: rubout or ASCII DEL)   
+// 3;  //EOI  
+    tty->termios.c_cc[VINTR] = CINTR;
 
-    // ^u
-    // (CKILL: <Ctrl>u or ASCII NAK)
-    // ? - 1;  //BS
-    tty->termios.c_cc[VKILL]  = CKILL;
+// ^u
+// (CKILL: <Ctrl>u or ASCII NAK)
+// ? - 1;  //BS
+    tty->termios.c_cc[VKILL] = CKILL;
 
-    // ^\
-    // (CQUIT: <Ctrl>\ or ASCII FS) 
-    // ? - 0x1C
-    //28; //FS
-    tty->termios.c_cc[VQUIT]  = CQUIT;
+// ^\
+// (CQUIT: <Ctrl>\ or ASCII FS) 
+// ? - 0x1C
+//28; //FS
+    tty->termios.c_cc[VQUIT] = CQUIT;
 
-    // ^z 
-    // (CSUSP: <Ctrl>z or ASCII SUB) 
-    //26; //BS
-    tty->termios.c_cc[VSUSP]  = CSUSP;   
+// ^z 
+// (CSUSP: <Ctrl>z or ASCII SUB) 
+// 26; //BS
+    tty->termios.c_cc[VSUSP] = CSUSP;   
 
 // #todo
     //tty->win_size.ws_col = 80;
     //tty->win_size.ws_row = 25;
-}
 
+    return 0;
+}
 
 /*
  * tty_create: 
@@ -540,6 +531,7 @@ struct tty_d *tty_create(void)
 
     debug_print ("tty_create: [FIXME] \n");
 
+// Create structure.
     __tty = (struct tty_d *) kmalloc( sizeof(struct tty_d) );
     if ( (void *) __tty == NULL ){
         panic ("tty_create: __tty\n");   
@@ -642,7 +634,8 @@ struct tty_d *tty_create(void)
     __tty->cursor_left = 0;
     __tty->cursor_top  = 0;
 
-// #bugbug: Constant cursor size.
+// #bugbug: 
+// Constant cursor size.
 // cursor limits.
     __tty->cursor_right  = 0+(gSavedX/8) -1;  // (screen width / char width)
     __tty->cursor_bottom = 0+(gSavedY/8) -1;  // (screen height/ char height)
@@ -673,10 +666,7 @@ struct tty_d *tty_create(void)
     int Index = (int) (__tty->index & 0xFFFF);
 // clear buffer
     memset( __tmpname, 0, 64 );
-    sprintf ( 
-        __tmpname,  //(char *) &__tmpname[0], 
-        "/TTY%d", 
-        Index );
+    sprintf ( __tmpname, "/TTY%d", Index );
 
     //size_t NameSize = (size_t) strlen(__tmpname);
 // ----
@@ -740,11 +730,11 @@ struct tty_d *tty_create(void)
 // See: devmgr.c
 
     devmgr_register_device ( 
-        (file *) __file, 
-        newname,            // pathname 
-        0,                  // class (char, block, network)
-        1,                  // type (pci, legacy
-        NULL,  // Not a pci device.
+        (file *) __file,  // file 
+        newname,          // pathname 
+        0,                // class (char, block, network)
+        1,                // type (pci, legacy
+        NULL,     // Not a pci device.
         __tty );  // tty device
 
 // ==========================================
@@ -766,6 +756,7 @@ struct tty_d *file_tty (file *f)
 {
     if ( (void *)f==NULL ){
         return (struct tty_d *) 0;
+        //return NULL;
     }
     return (struct tty_d *) f->tty;
 }
@@ -773,12 +764,14 @@ struct tty_d *file_tty (file *f)
 
 // #todo
 // flush the output buffer to the current virtual console.
-void tty_flush( struct tty_d *tty )
+void tty_flush(struct tty_d *tty)
 {
     // todo
     debug_print("tty_flush: [TODO]\n");
+    
+    if ( (void*) tty == NULL )
+        return;
 }
-
 
 void tty_start (struct tty_d *tty)
 {
@@ -832,7 +825,7 @@ int tty_delete (struct tty_d *tty)
 int 
 tty_gets ( 
     struct tty_d *tty, 
-    struct termios *termiosp )
+    struct termios_d *termiosp )
 {
     if ( (void *) tty == NULL ){
         debug_print("tty_gets: [FAIL] tty\n");
@@ -847,7 +840,7 @@ tty_gets (
     memcpy ( 
         termiosp, 
         &tty->termios, 
-        sizeof(struct termios) );
+        sizeof(struct termios_d) );
 
     return 0;
 }
@@ -858,7 +851,7 @@ int
 tty_sets ( 
     struct tty_d *tty, 
     int options, 
-    struct termios *termiosp )
+    struct termios_d *termiosp )
 {
     int ret = -1;
 
@@ -884,7 +877,7 @@ tty_sets (
 
 // Now. The change occurs immediately. 
     case TCSANOW:
-        memcpy ( &tty->termios, termiosp, sizeof(struct termios) );
+        memcpy ( &tty->termios, termiosp, sizeof(struct termios_d) );
         break;
     // ...
     default:
@@ -929,10 +922,10 @@ tty_ioctl (
     struct tty_d *tty;
     pid_t current_process = -1;
 
+
     debug_print ("tty_ioctl: TODO\n");
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
@@ -942,20 +935,17 @@ tty_ioctl (
 // um tty. Mas isso ja foi feito no wrapper sys_ioctl.
 
     current_process = (pid_t) get_current_process();
-
-    if (current_process < 0 ||
-        current_process >= PROCESS_COUNT_MAX)
-    { 
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){ 
         return -1;
     }
 
 // process
-    p = ( struct process_d * ) processList[current_process];
+    p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
-        debug_print ("tty_ioctl: [FAIL] p\n");
+        debug_print ("tty_ioctl: p\n");
         return -1;
     }
-    if(p->magic != 1234){
+    if (p->magic != 1234){
         return -1;
     }
 
@@ -965,23 +955,19 @@ tty_ioctl (
         debug_print ("tty_ioctl: [FAIL] f\n"); 
         return -1;
     }
-    if(f->magic != 1234){
+    if (f->magic != 1234){
         return -1;
     }
 
 // Is it a tty object?
 // Get tty struct!
-
     if (f->____object != ObjectTypeTTY){
         debug_print ("tty_ioctl: [FAIL] Not a tty file\n");
         return -1;
-    }else{
-        tty = f->tty;
-    };
+    }
+    tty = f->tty;
 
 // The command!
-
-    //int xxxi=0;
 
     switch (request){
 
@@ -991,7 +977,7 @@ tty_ioctl (
         if ( (void*) arg == NULL ){
             return (int) (-EINVAL);
         }
-        return (int) tty_gets ( tty, (struct termios *) arg );
+        return (int) tty_gets ( tty, (struct termios_d *) arg );
         break;
 // Set termios.
     case TCSETS:
@@ -1000,7 +986,7 @@ tty_ioctl (
             return (int) (-EINVAL);
         }
         return (int) tty_sets ( 
-                         tty, TCSANOW, (struct termios *) arg );
+                         tty, TCSANOW, (struct termios_d *) arg );
         break;
 // ??
 // Discards data written to the object referred to by fd .

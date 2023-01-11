@@ -16,7 +16,6 @@
 //sending signals (ou MSG_)
 // control functions.
 
-
 #ifndef _TERMIOS_H
 #define _TERMIOS_H    1
 
@@ -51,7 +50,7 @@ Macro: int NCCS
     The value of this macro is the number of elements in the c_cc array. 
 */
 
-
+// #todo: struct winsize_d
 struct winsize 
 {
     unsigned short ws_row;
@@ -86,6 +85,7 @@ struct winsize
 
 #define NCC  8
 
+// #todo: struct termio_d
 struct termio 
 {
     unsigned short c_iflag;  // input mode flags 
@@ -112,7 +112,8 @@ struct termio
 // Size of cc_c array, some extra space for extensions.
 #define NCCS  20
 
-struct termios 
+//struct termios 
+struct termios_d
 {
     tcflag_t c_iflag;      // input modes 
     tcflag_t c_oflag;      // output modes 
@@ -206,38 +207,36 @@ struct termios
 
 
 /* Optional actions for tcsetattr().  POSIX Sec. 7.2.1.2. */
-#define  TCSANOW    1  /* changes take effect immediately */
-#define  TCSADRAIN  2  /* changes take effect after output is done */
-#define  TCSAFLUSH  3  /* wait for output to finish and flush input */
+#define TCSANOW    1  /* changes take effect immediately */
+#define TCSADRAIN  2  /* changes take effect after output is done */
+#define TCSAFLUSH  3  /* wait for output to finish and flush input */
 
 //#if defined(_NETBSD_SOURCE)
-//#define TCSASOFT	0x10		/* flag - don't alter h.w. state */
+//#define TCSASOFT  0x10  /* flag - don't alter h.w. state */
 //#endif
-
 
 /* 
  * Queue_selector values for tcflush(). 
  * POSIX Sec. 7.2.2.2. 
  */
 
-/* flush accumulated input data */
-//flushes data received but not read. 
-#define  TCIFLUSH  1
-
-/* flush accumulated output data */
-//flushes data written but not transmitted. 
-#define  TCOFLUSH  2
-
-/* flush accumulated input and output data */
-//flushes both data received but not read, and data written but not transmitted. 
-#define  TCIOFLUSH  3
+// Flush accumulated input data.
+// Flushes data received, but not read.
+#define TCIFLUSH  1
+// Flush accumulated output data.
+// Flushes data written but not transmitted.
+#define TCOFLUSH  2
+// Flush accumulated input and output data.
+// Flushes both data received but not read, and 
+// data written but not transmitted.
+#define TCIOFLUSH  3
 
 
 /* Action values for tcflow().  POSIX Sec. 7.2.2.2. */
-#define  TCOOFF  1  /* suspend output */
-#define  TCOON   2  /* restart suspended output */
-#define  TCIOFF  3  /* transmit a STOP character on the line */
-#define  TCION   4  /* transmit a START character on the line */
+#define TCOOFF  1  /* suspend output */
+#define TCOON   2  /* restart suspended output */
+#define TCIOFF  3  /* transmit a STOP character on the line */
+#define TCION   4  /* transmit a START character on the line */
 
 
 /* modem lines */
@@ -258,18 +257,10 @@ struct termios
 #define TIOCM_LOOP	0x8000
 */
 
-#endif /* _TERMIOS_H */
+#endif    
 
 
 //
 // End.
 //
-
-
-
-
-
-
-
-
 

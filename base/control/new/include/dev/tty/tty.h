@@ -4,14 +4,11 @@
 #ifndef ____TTY_H
 #define ____TTY_H  1
 
+#define TTY_MAGIC  1234
+#define TTY_BUF_SIZE  1024
+
 #define TTYCHARS_COUNT_MAX  25    //80 
 #define TTYLINES_COUNT_MAX  25    //25 
-
-//#define DEVELOPER_TTYCHARS_MAX 25    //80
-//#define DEVELOPER_TTYLINES_MAX 25    //25 
-//... 
-
-#define TTY_MAGIC    1234
 
 //TTY_DRIVER_TYPE_SYSTEM
 //TTY_DRIVER_TYPE_CONSOLE
@@ -88,25 +85,20 @@
 #define O_LCUC(tty)   _O_FLAG((tty),OLCUC)
 
 
-#define TTY_BUF_SIZE  1024
-
-
 /*
 struct ttybuffer_d
 {
     int used;
     int magic;
-
-    // #importante:
-    // Usaremos um stream sem  nome para gerenciar a 
-    // área de memória que a tty precisa como buffer.
- 
+// #importante:
+// Usaremos um stream sem  nome para gerenciar a 
+// área de memória que a tty precisa como buffer.
     file *stream;
-
     struct ttybuffer_d *next;
 };
 struct ttybuffer_d *CurrentTTYBUFFER;
 */
+
 
 struct tty_line_d
 {
@@ -123,17 +115,15 @@ struct tty_line_d
 
 struct tty_queue 
 {
-    // Quantidade de bytes dentro do buffer.
-    // Se colocar mais isso aumenta, se retirarmos, isso diminui.
-    int cnt;
 
+// Quantidade de bytes dentro do buffer.
+// Se colocar mais isso aumenta, se retirarmos, isso diminui.
+    int cnt;
     unsigned long head;
     unsigned long tail;
-
-    // Vamos acordar as threads que estão nessa lista.
-    // é uma lista encadeada de processo esperando nesse tipo de fila.
+// Vamos acordar as threads que estão nessa lista.
+// é uma lista encadeada de processo esperando nesse tipo de fila.
     struct thread_d *thread_list;
-
     char buf[TTY_BUF_SIZE];
 };
 
@@ -257,7 +247,9 @@ struct tty_d
     struct ttyldisc_d *ldisc;
 
 // termios
-    struct termios termios;
+// see: ktermios.h
+    //struct termios termios;
+    struct termios_d  termios;
 
 //
 // ==  properties ========================
@@ -310,19 +302,19 @@ struct tty_d
 
     int fullscreen_flag;
 
-    // margin in chars.
-    unsigned long cursor_left;     // margem esquerda dada em linhas
-    unsigned long cursor_top;      // margem superior dada em linhas
-    unsigned long cursor_right;    // margem direita dada em linhas
-    unsigned long cursor_bottom;   // margem inferior dada em linhas
+// Margins:
+    unsigned long cursor_left;    // Left margin. In chars.
+    unsigned long cursor_top;     // Top margin. In lines.
+    unsigned long cursor_right;   // Right margin. In chars.
+    unsigned long cursor_bottom;  // Bottom margin. In lines.
 
-// Connections
-// pty associa a tty 'to' com a tty 'from'
+// Connections:
+// pty associa a tty 'to' com a tty 'from'.
 // master/slave.
 
-    // struct tty_d *next;
+// Navigation
+    //struct tty_d *next;
 };
-
 
 //
 // == consoles ==================
@@ -369,7 +361,8 @@ tty_write (
     char *buffer, 
     int n );
 
-void tty_reset_termios ( struct tty_d *tty );
+int tty_reset_termios (struct tty_d *tty);
+
 struct tty_d *tty_create(void);
 
 struct tty_d *file_tty (file *f);
@@ -381,13 +374,13 @@ void tty_stop (struct tty_d *tty);
 int 
 tty_gets ( 
     struct tty_d *tty, 
-    struct termios *termiosp );
+    struct termios_d *termiosp );
 
 int 
 tty_sets ( 
     struct tty_d *tty, 
     int options, 
-    struct termios *termiosp );
+    struct termios_d *termiosp );
 
 int tty_init_module (void);
 
