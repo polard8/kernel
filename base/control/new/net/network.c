@@ -387,6 +387,108 @@ void testNIC(void)
     refresh_screen();
 }
 
+void 
+network_on_receiving ( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+    struct ether_header *eth = 
+        (struct ether_header *) buffer;
+    uint16_t Type=0;
+
+    if ( (void*) buffer == NULL ){
+        return;
+    }
+    if (size<0){
+        return;
+    }
+
+//
+// Option
+//
+
+// Push packet.
+// Maybe we can simply pash the packet into the circular queue.
+// Mayme we can change this queue and use a lined list.
+// Or create a queue support. We still don't have this.
+// Coloca em um dos buffers, 
+// de onde os aplicativos podem pegar depois.
+// see: network.c
+
+    // #todo
+    // We need a configuration flag here.
+    // Telling that we need to push the packets into the queue
+    // instead of processing them.
+
+    //network_buffer_in ( (void *) buffer, (int) size );
+    //return;
+    
+    // #debug
+    //printf("\n");
+    //printf("Ethernet Header\n");
+
+    if ( (void*) eth == NULL ){
+        return;
+    }
+
+// #debug
+// Destination MAC
+// Source MAC
+// Protocol type.
+
+/*
+    printf ("   |-Destination Address : %x-%x-%x-%x-%x-%x \n", 
+        eth->dst[0], eth->dst[1], eth->dst[2], 
+        eth->dst[3], eth->dst[4], eth->dst[5] );
+
+    printf ("   |-Source Address      : %x-%x-%x-%x-%x-%x \n", 
+        eth->src[0], eth->src[1], eth->src[2], 
+        eth->src[3], eth->src[4], eth->src[5] );
+
+    printf ("   |-Ethertype           : %x \n",
+        (unsigned short) eth->type);
+*/
+
+
+    Type = (uint16_t) FromNetByteOrder16(eth->type);
+
+    switch (Type){
+    case 0x0800:
+        printf ("[0x0800]: IPV4 received\n");
+        //network_handle_ipv4(buffer,size);
+        network_handle_ipv4(
+            (buffer + ETHERNET_HEADER_LENGHT),
+            size );
+        break;
+    case 0x0806:
+        printf ("[0x0806]: ARP received\n");
+        //network_handle_arp(buffer,size);
+        network_handle_arp(
+            (buffer + ETHERNET_HEADER_LENGHT),
+            size );
+        break;
+    case 0x814C:
+        printf ("[0x814C]: SNMP received\n");
+        break;
+    case 0x86DD:
+        printf ("[0x86DD]: IPV6 received\n");
+        break;
+    case 0x880B:
+        printf ("[0x880B]: PPP received\n");
+        break;
+    default:
+        printf ("Default type\n");
+        break;
+        
+    };
+
+    refresh_screen();
+}
+
+
+
+
+
 // handle ipv4 package
 // Called by all the embedded nic device drivers.
 // IN:

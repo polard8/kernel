@@ -121,6 +121,12 @@ network_send_arp(
 
 void testNIC(void);
 
+// Handle package.
+void 
+network_on_receiving ( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 void 
 network_handle_ipv4( 
     const unsigned char *buffer, 
@@ -130,6 +136,7 @@ void
 network_handle_arp( 
     const unsigned char *buffer, 
     ssize_t size );
+
 
 int network_buffer_in( void *buffer, int len );
 int network_buffer_out( void *buffer, int len );
