@@ -1,13 +1,11 @@
 
+// fsload.c
 
 #include <kernel.h>
 
-
 int senda=1;
 
-
 static int __check_address_validation( unsigned long address );
-
 
 // WORKER
 // Called by fsLoadFile
@@ -19,7 +17,7 @@ static int __check_address_validation( unsigned long address );
 // OUT: 
 // TRUE = OK | FALSE = FAIL
 
-static int __check_address_validation( unsigned long address )
+static int __check_address_validation(unsigned long address)
 {
     int Status=TRUE;  //ok
 
@@ -84,11 +82,11 @@ fsLoadFile (
     unsigned long buffer_size_in_bytes )
 {
     int Status=-1;
-    int i=0;
+    register int i=0;
     int SavedDirEntry = 0;
     unsigned short next=0;
     int is_valid=FALSE;
-// #todo: 
+// #todo:
 // Rever. Número máximo de entradas.
 // #bugbug: 
 // Esse eh o numero de entradas no diretorio raiz.
@@ -127,14 +125,14 @@ fsLoadFile (
 
 // Fat address and dir address.
 // Vectors of 'short'
-    if ( fat_address == 0 ){
+    if (fat_address == 0){
         panic("fsLoadFile: [FAIL] fat_address\n");
     }
-    if ( dir_address == 0 ){
+    if (dir_address == 0){
         panic("fsLoadFile: [FAIL] dir_address\n");
     }
 
-// Addresses.
+// Addresses
     unsigned short *  fat = (unsigned short *) fat_address;
     unsigned short *__dir = (unsigned short *) dir_address;
 
@@ -198,9 +196,7 @@ fsLoadFile (
     if ( (void *) root == NULL ){
         panic ("fsLoadFile: root\n");
     }
-
-    if ( root->used != TRUE || root->magic != 1234)
-    {
+    if ( root->used != TRUE || root->magic != 1234){
         panic ("fsLoadFile: root validation\n");
     }
 
@@ -235,12 +231,10 @@ fsLoadFile (
 // Na verdade a variável 'root' é do tipo short.
 
 // file name
-
     if ( (void *) file_name == NULL ){
         printf ("fsLoadFile: file_name\n");
         goto fail;
     }
-
     if ( *file_name == 0 ){
         printf ("fsLoadFile: *file_name\n");
         goto fail;
@@ -252,9 +246,7 @@ fsLoadFile (
 
 // name size.
 // Se o tamanho da string falhar, vamos ajustar.
-
-    FileNameSize = (size_t) strlen (file_name); 
-
+    FileNameSize = (size_t) strlen(file_name);
     if ( FileNameSize > 11 ){
          printf ("fsLoadFile: Name size %d\n", FileNameSize ); 
          //FileNameSize = 11;
@@ -388,7 +380,6 @@ __found:
         goto fail;
     }
 
-
 // ========================================
 // FAT
 // Carrega fat na memória.
@@ -405,10 +396,7 @@ __found:
 //loadFAT:
 // 246?
 
-    fs_load_fat(
-        VOLUME1_FAT_ADDRESS,
-        VOLUME1_FAT_LBA,
-        246 );
+    fs_load_fat( VOLUME1_FAT_ADDRESS, VOLUME1_FAT_LBA, 246 );
 
 // Load clusters.
 // Carregar o arquivo, cluster por cluster.
@@ -443,9 +431,9 @@ __loop_next_entry:
 // Esse while é para o caso de termos mais de um setor por cluster.
 // Mas não é nosso caso até o momento.
 
-	/*
+/*
 	while(1)
-	{	
+	{
 	    //Calcula.
 		//Primeiro setor do cluster. 
 		S = fatClustToSect(cluster, Spc, VOLUME1_DATAAREA_LBA); 
@@ -461,7 +449,7 @@ __loop_next_entry:
 	    if(cluster == 0xFFFF || cluster == 0xFFF8){ goto done; };
 		//Nothing.
     };
-	*/
+ */
 
 
 // #todo
@@ -485,7 +473,7 @@ __loop_next_entry:
 // We can not load a file in the same core addresses.
 
     is_valid = (int) __check_address_validation( (unsigned long) Buffer );
-    if( is_valid != TRUE ){
+    if (is_valid != TRUE){
         panic ("fsLoadFile: Not a valid address\n");
     }
 
@@ -509,8 +497,7 @@ __loop_next_entry:
 // We already did that a single time before.
 // #bugbug: Não pode ser menor que 0, pois é unsigned short.
 
-    if ( cluster <= 0 || cluster > 0xFFF0 )
-    {
+    if ( cluster <= 0 || cluster > 0xFFF0 ){
         panic("fsLoadFile: fat[] vector overflow.\n");
     }
 
@@ -544,37 +531,28 @@ __loop_next_entry:
     if ( cluster == 0xFFFF || cluster == 0xFFF8 )
     {
         nreads++;
-
         // File size limit:
         // We have a limit when allocating memory for an image. 
         // See: alloc_memory_for_image_and_stack() in process.c.
         // See: gramado/config.h
         // bytes per sector = 512.
         // sectors per cluster  = 1.
-
         if( (nreads/2) > IMAGESIZE_LIMIT_IN_KB ){
             panic("fsLoadFile: nreads\n");
         }
-        
         // 0=OK.
         return (unsigned long) 0; 
     }
 
     nreads++;
-
     goto __loop_next_entry;
-
-// Fail
 
 fail:
     debug_print("fsLoadFile: [FAIL] \n");
     printf     ("fsLoadFile: [FAIL] file={%s}\n", file_name );
-    refresh_screen ();
+    refresh_screen();
     return (unsigned long) 1;
 }
-
-
-// -----------------
 
 // Not tested yet
 unsigned long 
@@ -592,7 +570,6 @@ fsLoadFile2 (
         debug_print("fsLoadFile2: file_name\n"); 
         return 0;
     }
-
     if (*file_name == 0){
         debug_print("fsLoadFile2: *file_name\n"); 
         return 0;
@@ -611,9 +588,6 @@ fsLoadFile2 (
                (unsigned long)   fc->file_address,
                (unsigned long)   fc->buffer_limit );
 }
-
-
-// ----------------
 
 /*
  * fs_load_path:
@@ -650,12 +624,11 @@ fs_load_path (
 {
 
 // Level iterator.
-    int l=0;
+    register int l=0;
 // Number of level in the give pathname.
     int n_levels = 0;
 // Char iterator.
     int i=0;
-
 
 // #todo
 // Work on that limit stuff.
@@ -665,19 +638,17 @@ fs_load_path (
 
     unsigned long MaxEntries = FAT16_ROOT_ENTRIES;  //512
 
-
-    // Fail. 
-    // Usado na função que carrega o arquivo.
+// Fail. 
+// Usado na função que carrega o arquivo.
     int Ret = -1;    
-        
+
     char name_buffer[12];
     unsigned char *p;
 
-    // Onde carregaremos o diretório.
+// Onde carregaremos o diretório.
     void *__src_buffer;
     void *__dst_buffer;
     void *__file_buffer;
-
 
 // Path
     if ( (void*) path == NULL ){
@@ -719,18 +690,16 @@ fs_load_path (
         panic ("fs_load_path: n_levels\n");
     }
 
-
 // #debug
     //printf ("fs_load_path: path with %d levels\n",n_levels);
 
 // Local pointer.
     p = path;
 
-
 // #bugbug
 // Overflow quando colocarmos um diretorio maior que o buffer.
 
-    // Primeiro src =  root address;
+// Primeiro src =  root address;
     __src_buffer = (void *) VOLUME1_ROOTDIR_ADDRESS;
     
 // Buffer size in bytes.
@@ -746,10 +715,8 @@ fs_load_path (
         panic ("fs_load_path: Not absolute pathname \n");
     }
 
-//
 // loop: 
 // Carregar n levels.
-//
 
     for (l=0; l<n_levels; l++)
     {
@@ -1075,87 +1042,83 @@ fail:
 // How many times this function is called ??
 // 4KB each time ?
 
-int fsLoadFileFromCurrentTargetDir (void)
+int fsLoadFileFromCurrentTargetDir(void)
 {
     int Ret = -1;
-    int i=0;
+    register int i=0;
     unsigned long new_address = 0;
 
 // #bugbug
 // 4KB
-
     unsigned long xxxTempFileSize = 4096;
 
     debug_print ("fsLoadFileFromCurrentTargetDir: [FIXME] Loading dir \n");
 
-	//#bugbug
-	//Isso 'e um limite para o tamanho do arquivo (apenas dir).
-	//precisamos expandir isso.
-	//aqui no m'aquimo o arquivo pode ter 4kb.
-	//acho ques estamos falando somente de diret'orio aqui.
+// #bugbug
+// Isso 'e um limite para o tamanho do arquivo (apenas dir).
+// precisamos expandir isso.
+// aqui no m'aquimo o arquivo pode ter 4kb.
+// acho ques estamos falando somente de diret'orio aqui.
 
 // #bugbug
 // too much allocation.
 // How many times this function is called ??
 // 4KB each time ?
 
-    new_address = (unsigned long) kmalloc ((size_t)xxxTempFileSize);
-
+    new_address = (unsigned long) kmalloc((size_t)xxxTempFileSize);
     if ( new_address == 0 ){
         debug_print ("fsLoadFileFromCurrentTargetDir: new_address\n");
         return -1;
     }
-
     current_target_dir.current_dir_address = (unsigned long) new_address;
 
-    // ??
-    // Se o endereço atual falhar, 
-    // resetamos ele e retornamos.
+// ??
+// Se o endereço atual falhar, 
+// resetamos ele e retornamos.
 
     if ( current_target_dir.current_dir_address == 0 ){
         debug_print ("fsLoadFileFromCurrentTargetDir: [FAIL] invalid address\n");
         goto fail;
     }
 
-	//#debug
-	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
-	//    current_target_dir.name, current_target_dir.current_dir_address );
+    //#debug
+    //printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) old_dir_addr=(%x) #debug \n",
+    //    current_target_dir.name, current_target_dir.current_dir_address );
 
-
-    //++
+//++
     //taskswitch_lock ();
     //scheduler_lock ();
-    Ret = (int) fsLoadFile ( 
-                    (unsigned long) VOLUME1_FAT_ADDRESS,                       // fat cache address
-                    (unsigned long) current_target_dir.current_dir_address,    // src dir address 
-                    (int) FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.          // number of entries.
-                    (const char *) current_target_dir.name,                 // file name 
-                    (unsigned long)   current_target_dir.current_dir_address,  // file address
-                    (unsigned long) xxxTempFileSize );                                    // #bugbug buffer limit 4KB.
+    Ret = 
+        (int) fsLoadFile ( 
+                  (unsigned long) VOLUME1_FAT_ADDRESS,                     // fat cache address
+                  (unsigned long) current_target_dir.current_dir_address,  // src dir address 
+                  (int) FAT16_ROOT_ENTRIES, //#bugbug: Number of entries.  // number of entries.
+                  (const char *) current_target_dir.name,                  // file name 
+                  (unsigned long)   current_target_dir.current_dir_address,  // file address
+                  (unsigned long) xxxTempFileSize );                                    // #bugbug buffer limit 4KB.
     //scheduler_unlock ();
     //taskswitch_unlock ();
-    //--
+//--
 
+    //#debug
+    //printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
+    //   current_target_dir.name, current_target_dir.current_dir_address );
 
-	//#debug
-	//printf ("fsLoadFileFromCurrentTargetDir: dir_name=(%s) new_dir_addr=(%x) #debug \n",
-	//   current_target_dir.name, current_target_dir.current_dir_address );
-
-    debug_print ("fsLoadFileFromCurrentTargetDir: done\n");
+    // debug_print ("fsLoadFileFromCurrentTargetDir: done\n");
     return (int) Ret;
 
 fail:
-    
-    // #todo
-    // debug message.
-    
-        current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
-        for ( i=0; i<11; i++ ){
-            current_target_dir.name[i] = '\0';
-        };
-        current_target_dir.name[0] = '/';
-        current_target_dir.name[1] = '\0';
-        return -1;
+
+// #todo
+// debug message.
+
+    current_target_dir.current_dir_address = VOLUME1_ROOTDIR_ADDRESS;
+    for ( i=0; i<11; i++ ){
+        current_target_dir.name[i] = '\0';
+    };
+    current_target_dir.name[0] = '/';
+    current_target_dir.name[1] = '\0';
+    return -1;
 }
 
 // ---------------

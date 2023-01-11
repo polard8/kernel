@@ -94,14 +94,13 @@ int file_read_buffer ( file *f, char *buffer, int len )
     //    goto fail;
     //}
 
-    if ( f->used != TRUE || f->magic != 1234 )
-    {
+    if ( f->used != TRUE || f->magic != 1234 ){
         printf ("file_read_buffer: [FAIL] f validation\n");
         goto fail;
     }
 
-    /*
-    // stdin
+/*
+// stdin
     if( f->_file == 0 )
     {
         if( f->_lbfsize != PROMPT_SIZE)
@@ -110,7 +109,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
            goto fail;
         }
     }
-    */
+ */
 
 //=======================================
 // Copy!
@@ -302,7 +301,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
     }
 
 fail:
-    refresh_screen ();
+    refresh_screen();
     return EOF;
 }
 
@@ -336,7 +335,7 @@ file_write_buffer (
     }
 
 // Tentando escrever mais do que cabe no arquivo.
-    if ( len >= BUFSIZ ){
+    if (len >= BUFSIZ){
         printf ("file_write_buffer: len > BUFSIZ\n");
         goto fail;
     }
@@ -413,7 +412,7 @@ file_write_buffer (
         // Se a quantidade que temos ultrapassa os limites.
 
         // fim do arquivo.
-        if( f->_cnt < 0)
+        if (f->_cnt < 0)
         {
             f->_cnt = 0;
             f->_w = f->_lbfsize;
@@ -953,7 +952,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
     int ubuf_len=0;
     size_t ncopy=0;
 
-    //debug_print("------------------------------------ W --\n");
     //debug_print("sys_write: :)\n");
 
 // fd
@@ -1069,7 +1067,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
     if (__file->_file == STDOUT_FILENO)
     {
         debug_print("sys_write: Writing into stdout\n");
-        
+
         // If the file is a console.
         if ( __file->____object == ObjectTypeVirtualConsole )
         {
@@ -1816,6 +1814,7 @@ static int __saved_sync_id=0;
 int sys_create_new_sync(void)
 {
     struct kstdio_sync_d *s;
+
     s = (struct kstdio_sync_d *) kmalloc( sizeof(struct kstdio_sync_d) );
     if ( (void*) s == NULL ){
         return (int) -1;
@@ -1858,23 +1857,22 @@ int sys_get_file_sync (int fd, int request)
     //#bugbug
     // Pensaremos nessa possibilidade.
 
-    /*
+/*
     if (fd == 0 || fd == 1 || fd == 2 )
     {
         debug_print("sys_close: [FIXME] We can't close the standard stream\n");
         // WHY NOT ???!!
         return (int) (-1);
     }
-    */
+ */
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
-    // == Process ================
+// == Process ================
 
-    if ( current_process < 0 ){
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         debug_print("sys_get_file_sync: current_process\n");
         return (int) (-1);
     }
@@ -1884,11 +1882,12 @@ int sys_get_file_sync (int fd, int request)
         debug_print("sys_get_file_sync: p\n");
         return (int) (-1);
     }
+    if (p->magic != 1234){
+        debug_print("sys_get_file_sync: p validation\n");
+        return (int) (-1);
+    }
 
-    // #todo
-    // check process validation
-
-// object
+// Object
 
     object = (file *) p->Objects[fd];
     if ( (void*) object == NULL ){
@@ -1901,29 +1900,24 @@ int sys_get_file_sync (int fd, int request)
     }
 
     switch (request){
-
     // get last action
     case SYNC_REQUEST_GET_ACTION:
         return (int) object->sync.action;
         break;
-
     //case ?:
         //break;
-
     // ...
-        
     default:
         debug_print("sys_get_file_sync: [FAIL] Default request\n");
         return (int) (-1);
         break;
     };
 
-    // ...
+// ...
 
 // ?? Why '0'?
     return 0;
 }
-
 
 // service 10006
 // #todo
@@ -1939,15 +1933,15 @@ void sys_set_file_sync(int fd, int request, int data)
     
     //#bugbug
     // Pensaremos nessa possibilidade.
-    
-    /*
+
+/*
     if (fd == 0 || fd == 1 || fd == 2 )
     {
         debug_print("sys_close: [FIXME] We can't close the standard stream\n");
         // WHY NOT ???!!
         return (int) (-1);
     }
-    */
+ */
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         debug_print("sys_set_file_sync: fd\n");
@@ -1956,8 +1950,8 @@ void sys_set_file_sync(int fd, int request, int data)
 
 // == Process ================
 
-    if ( current_process < 0 ){
-        debug_print("sys_set_file_sync: [FAIL] current_process\n");
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        debug_print("sys_set_file_sync: current_process\n");
         return;
     }
 
@@ -1967,6 +1961,7 @@ void sys_set_file_sync(int fd, int request, int data)
         return;
     }
     if (p->magic != 1234){
+        debug_print("sys_set_file_sync: p validation\n");
         return;
     }
 
@@ -2066,7 +2061,7 @@ int sys_open_device_by_number(int device_index)
     if (dev_dir[i].magic != 1234){
         return (int) -1;
     }
-    if(dev_dir[i].initialized != TRUE){
+    if (dev_dir[i].initialized != TRUE){
         return (int) -1;
     }
 
@@ -2075,12 +2070,16 @@ int sys_open_device_by_number(int device_index)
     if ( (void*) fp == NULL ){
         return (int) -1;
     }
-    
-    //#todo: validation?
+    if (fp->magic != 1234){
+        return (int) -1;
+    }
 
-// put the pointer into the list.
+// Put the pointer into the list.
 
     pid_t current_process = (pid_t) get_current_process();
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
+        return -1;
+    }
 
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
@@ -2158,26 +2157,21 @@ int sys_sleep_if_socket_is_empty(int fd)
     file *object;
 
     pid_t current_process = (pid_t) get_current_process();
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
+        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
+        return (int) (-1);
+    }
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
 // process
-
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
-    {
-        debug_print("sys_sleep_if_socket_is_empty: current_process\n");
-        return (int) (-1);
-    }
-
     p = (void *) processList[current_process];
     if ( (void *) p == NULL ){
         debug_print("sys_sleep_if_socket_is_empty: p\n");
         return (int) (-1);
     }
-
     if (p->magic != 1234){
         return (int) (-1);
     }
@@ -2223,7 +2217,8 @@ int sys_sleep_if_socket_is_empty(int fd)
         return TRUE;
     }
 
-    //#bugbug
+//#bugbug
+//Fail
     debug_print ("sys_sleep_if_socket_is_empty: [FAIL] Unexpected error \n");
     return -1;
 }
@@ -2406,10 +2401,9 @@ to_FAT_name (
 
 /*
  * get_filesystem_type:
- *     Pega o tipo de sistema de arquivos.
- *     ?? #bugbug: De qual volume ??  
+ * Pega o tipo de sistema de arquivos.
+ * ?? #bugbug: De qual volume ??  
  */
-
 int get_filesystem_type (void)
 {
     return (int) g_currentvolume_filesystem_type;
@@ -2523,21 +2517,18 @@ unsigned long fs_buffers[FS_N_BUFFERS];
 // Called by init() in init.c
 int fsInit (void)
 {
+    register int i=0;
     int slot = -1;
 
     debug_print ("fsInit: [TODO]\n");
-    
-//
-// Buffers
-//
 
+// Buffers
 // Buffers for loading the directories while walking on a pathname
 // when loading a file.
 
-    register int i=0;
-    //int max=8;  // Number of levels.
     int max = FS_N_BUFFERS;  // Number of levels.
     unsigned long addr=0;
+
     for (i=0; i<max; i++)
     {
         //addr = (unsigned long) allocPages(1);
@@ -2677,7 +2668,8 @@ int fsInit (void)
 // #todo: mudar para pipe_gramadocore_init_execve_fp
 // aloca memoria para a estrutura.
     
-    pipe_gramadocore_init_execve = (file *) kmalloc ( sizeof(file) );
+    pipe_gramadocore_init_execve = 
+        (file *) kmalloc( sizeof(file) );
 
     if ( (void *) pipe_gramadocore_init_execve == NULL ){
         panic ("fsInit: pipe_gramadocore_init_execve\n");
@@ -2720,51 +2712,44 @@ int fsInit (void)
 // Inicializa a estrutura de suporte ao target dir.
     fsInitTargetDir(VOLUME1_ROOTDIR_ADDRESS,"/");
 
-    //debug_print ("fsInit: done\n");
     return 0;
 }
 
 int init_directory_facilities(void)
 {
-    // '/'
+
+// '/'
     directory_facility_RootDir.dir_address = VOLUME1_ROOTDIR_ADDRESS;
     directory_facility_RootDir.dir_name[0] = '/';
     directory_facility_RootDir.dir_name[1] = 0;
     directory_facility_RootDir.name_size = 1;
     directory_facility_RootDir.initialized = TRUE;
-
-    // EFI/
+// EFI/
     directory_facility_EFIDir.dir_address = 0;
     directory_facility_EFIDir.dir_name[0] = 0;
     directory_facility_EFIDir.name_size = 0;
     directory_facility_EFIDir.initialized = FALSE;
-
-    // GRAMADO/
+// GRAMADO/
     directory_facility_GramadoDir.dir_address = 0;
     directory_facility_GramadoDir.dir_name[0] = 0;
     directory_facility_GramadoDir.name_size = 0;
     directory_facility_GramadoDir.initialized = FALSE;
-
-    // PROGRAMS/
+// PROGRAMS/
     directory_facility_ProgramsDir.dir_address = 0;
     directory_facility_ProgramsDir.dir_name[0] = 0;
     directory_facility_ProgramsDir.name_size = 0;
     directory_facility_ProgramsDir.initialized = FALSE;
-
-
-    // UBASE/
+// UBASE/
     directory_facility_ubaseDir.dir_address = 0;
     directory_facility_ubaseDir.dir_name[0] = 0;
     directory_facility_ubaseDir.name_size = 0;
     directory_facility_ubaseDir.initialized = FALSE;
-
-    // USERS/
+// USERS/
     directory_facility_usersDir.dir_address = 0;
     directory_facility_usersDir.dir_name[0] = 0;
     directory_facility_usersDir.name_size = 0;
     directory_facility_usersDir.initialized = FALSE;
 
-// ok
     return 0;
 }
 
@@ -2776,18 +2761,12 @@ int fat16Init (void)
 // Initializing the cache state.
     fat_cache_loaded = FAT_CACHE_NOT_LOADED;
     fat_cache_saved  = FAT_CACHE_NOT_SAVED;
-
-// Set type.
-    set_filesystem_type (FS_TYPE_FAT16);
-
-// Structures and fat.
-
-    // #todo
+// Set type
+    set_filesystem_type(FS_TYPE_FAT16);
+// Structures and fat
     fs_init_structures();
     fs_init_fat();
 
-// done
-    //debug_print ("fat16Init: done\n");
     return 0;
 }
 
@@ -2947,29 +2926,31 @@ void fs_init_fat (void)
 // Let's create the 'fat' structure.
 // See:
 
-    bootvolume_fat = (void *) kmalloc ( sizeof(struct fat_d) );
+    bootvolume_fat = 
+        (void *) kmalloc( sizeof(struct fat_d) );
 
     if ( (void *) bootvolume_fat == NULL ){
         panic ("fs_init_fat: bootvolume_fat\n");
     }
 
 // Populate it with some values found in the root structure.
-
     bootvolume_fat->initialized = FALSE;
 
 // ??
 // The same type of the root filesystem?
     bootvolume_fat->type = (int) root->type;
 
-    bootvolume_fat->fat_address = (unsigned long) root->fat_address; 
+    bootvolume_fat->fat_address = 
+        (unsigned long) root->fat_address; 
 
-    bootvolume_fat->fat_first_lba = (unsigned long) root->fat_first_lba;
-    bootvolume_fat->fat_last_lba  = (unsigned long) root->fat_last_lba;
+    bootvolume_fat->fat_first_lba = 
+        (unsigned long) root->fat_first_lba;
+    bootvolume_fat->fat_last_lba = 
+        (unsigned long) root->fat_last_lba;
 
     //bootvolume_fat->fat_size_in_sectors = (unsigned long) root->fat_size_in_sectors;
     //bootvolume_fat->size_in_bytes = 0;  // (bootvolume_fat->fat_size_in_sectors / 2), se sector=512.
     //bootvolume_fat->size_in_kb = 0;     // bootvolume_fat->size_in_bytes/1024
-    
 
 // #todo
 // Check this values.
@@ -3002,7 +2983,6 @@ void fs_init_fat (void)
     //return;
 }
 
-
 // #todo: use int return.
 void file_close (file *_file)
 {
@@ -3029,25 +3009,25 @@ size_t file_get_len(file *_file)
 //OUT: inode structure.
 struct inode_d *file_inode (file *f)
 {
-    if ( (void *)f==NULL )
-    {
+    if ( (void *)f==NULL ){
         return (struct inode_d *) 0;
+        //return NULL;
     }
 
     return (struct inode_d *) f->inode;
 }
 
-
 //??
-int file_truncate ( file *_file, size_t len)
+int file_truncate (file *_file, size_t len)
 {
     debug_print("file_truncate: todo\n");
 
-    if ( (void*) _file == NULL )
+    if ( (void*) _file == NULL ){
         return -1;
-
-    if(len<0)
+    }
+    if (len<0){
         return -1;
+    }
 
     return -1;
 }
@@ -3102,8 +3082,7 @@ fsFAT16ListFiles (
     unsigned short *shortBuffer = (unsigned short *) dir_address;
     unsigned char  *charBuffer  = (unsigned char *)  dir_address;
 
-    if ( (void *) dir_name == NULL )
-    {
+    if ( (void *) dir_name == NULL ){
         printf ("fsFAT16ListFiles: [FAIL] dir_name\n");
         goto fail;
     }
@@ -3144,14 +3123,14 @@ fsFAT16ListFiles (
              charBuffer[j] != FAT_DIRECTORY_ENTRY_FREE )
         {
              // #bugbug
-             
+
              memcpy( 
                  (char*) NameString, 
                  (const char *) &charBuffer[j],
                  11 );
-             
+
              NameString[11] = 0;  //finalize string
-             
+
              printf("%s\n", NameString );
         } 
 
@@ -3160,7 +3139,7 @@ fsFAT16ListFiles (
  
         //j += 16;  //short buffer  
           j += 32;  //char buffer
-        
+
         i++;  
     }; 
 
@@ -3528,7 +3507,6 @@ fsListFiles (
     if ( current_disk == 0 && current_volume == 0 && current_directory == 0 )
     {
         debug_print ("fsListFiles: [FIXME] current\n");
-        
         //vfsListFiles ();
         goto done;
     }
@@ -3621,9 +3599,8 @@ fsGetFileSize (
     }
 
 // Lock ??.
-
-	//taskswitch_lock();
-	//scheduler_lock();	
+    //taskswitch_lock();
+    //scheduler_lock();
 
 //
 // ## ROOT ##
@@ -3631,16 +3608,16 @@ fsGetFileSize (
 
 //loadRoot:
 
-	//Carrega o diretório raiz na memória.
-	
-//#ifdef KERNEL_VERBOSE	
-	//printf ("fsRootDirGetFileSize: Loading root..\n"); 
+//Carrega o diretório raiz na memória.
+
+//#ifdef KERNEL_VERBOSE
+    //printf ("fsRootDirGetFileSize: Loading root..\n"); 
 //#endif
 
-//#bugbug
-//pega o tamanho de um arquivo que está no diretório raiz.
-//#todo: 
-//podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
+// #bugbug
+// pega o tamanho de um arquivo que está no diretório raiz.
+// #todo: 
+// podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
 // #bugbug
 // Estamos chamando isso toda vez que
 // tentamos abrir um arquivo.
@@ -3663,14 +3640,15 @@ fsGetFileSize (
             32 );
     }
 
-//#todo:
-//precisamos na verdade carregarmos o diretório corrente.
+// #todo:
+// precisamos na verdade carregarmos o diretório corrente.
 // Continua ... 
 // Pegar mais informações sobre o sistema de arquivos.
-//#obs
-//Checa se é válida a estrutura do sistema de arquivos.
-//A intenção é obtermos a quantidade de entradas no diretório raiz.
-//#bugbug: Mas isso deveria ser feito para o diretório atual.
+// #obs
+// Checa se é válida a estrutura do sistema de arquivos.
+// A intenção é obtermos a quantidade de entradas no diretório raiz.
+// #bugbug: 
+// Mas isso deveria ser feito para o diretório atual.
 
 //
 // == root filesystem structure ===============================
@@ -3702,19 +3680,19 @@ fsGetFileSize (
 // file name
 //
 
-    //#debug
-    //vamos mostrar a string.
+// #debug
+// vamos mostrar a string.
     //printf ("fsGetFileSize: file_name={%s}\n", file_name);
 
-//Busca simples pelo arquivo no diretório raiz.
-//todo: Essa busca pode ser uma rotina mais sofisticada. 
-//Uma função auxiliar.
-//Primero caractere da entrada:
-//0 = entrada vazia.
-//$ = entrada de arquivo deletado.
-//outros ...
-//ATENÇÃO:
-//Na verdade a variável 'root' é do tipo short.	 
+// Busca simples pelo arquivo no diretório raiz.
+// todo: Essa busca pode ser uma rotina mais sofisticada. 
+// Uma função auxiliar.
+// Primero caractere da entrada:
+// 0 = entrada vazia.
+// $ = entrada de arquivo deletado.
+// outros ...
+// ATENÇÃO:
+// Na verdade a variável 'root' é do tipo short.
 
 // Procura o arquivo no diretório raiz.
 
@@ -3767,7 +3745,7 @@ fail:
     //if ( (void*) NameX != NULL )
         // printf ("fsRootDirGetFileSize: %s not found\n", NameX );
 
-    refresh_screen ();
+    refresh_screen();
     return (unsigned long) 0;
 
 // Found!
@@ -3825,36 +3803,34 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
     pid_t current_process = (pid_t) get_current_process();
 
-    // Initialized ?
-    if ( CWD.initialized != TRUE )
+// Initialized?
+    if (CWD.initialized != TRUE)
     {
         debug_print ("fsUpdateWorkingDiretoryString: [FAIL] CWD not initialized\n"); 
-        
         // #todo
         // Call the initialization routine.
-        
         return;
     }
 
-    // string
-
+// string
     if ( (void *) string == NULL ){
         debug_print ("fsUpdateWorkingDiretoryString: string\n"); 
         return;  
     }
-
     if (*string == 0){
         debug_print ("fsUpdateWorkingDiretoryString: *string\n"); 
         return;  
     }
-
-
     if (string_size <= 0){
         debug_print ("fsUpdateWorkingDiretoryString: [FAIL] string_size\n"); 
         return;  
     }
 
-    // Current process.
+// Current process.
+
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
+        panic ("fsUpdateWorkingDiretoryString: current_process\n");
+    }
 
     p = (struct process_d *) processList[current_process];
 
@@ -3918,7 +3894,6 @@ void fs_fat16_cache_not_saved(void)
     fat_cache_saved = FAT_CACHE_NOT_SAVED;
 }
 
-
 int fs_save_fat16_cache(void)
 {
     debug_print("fs_save_fat16_cache: Saving FAT cache\n");
@@ -3926,8 +3901,9 @@ int fs_save_fat16_cache(void)
     if (fat_cache_saved != FAT_CACHE_NOT_SAVED){
         return -1;
     }
-    // #todo: Change this name.
-    // see: dev/disk_w.c
+
+// #todo: Change this name.
+// see: dev/disk_w.c
     fs_save_fat(
         VOLUME1_FAT_ADDRESS,
         VOLUME1_FAT_LBA,
@@ -3959,14 +3935,13 @@ void fs_fntos(char *name)
 {
     int i=0;
     int ns = 0;
-
     char ext[4];
+
     ext[0] = 0;  ext[1] = 0;  ext[2] = 0;  ext[3] = 0;
 
     if ( (void*) name == NULL ){
         return;
     }
-
     if (*name == 0){
         return;
     }
@@ -3999,9 +3974,8 @@ void fs_fntos(char *name)
 
     //if ( name[0] == '.' && ns < 8 )
 
-    // Aqui name[0] é o ponto.
-    // Então constrói a extensão colocando
-    // as letras na extensão.
+// Aqui name[0] é o ponto.
+// Então constrói a extensão colocando as letras na extensão.
 
     for ( i=0; i < 3 && name[i+1]; i++ )
     {
@@ -4011,14 +3985,12 @@ void fs_fntos(char *name)
         //    name[i+1] -= 0x20;
 
         //ext[i] = name[i+1];
-    
 
         //#testando
         //Se não for letra então não colocamos no buffer de extensão;
         if ( name[i+1] >= 'a' && name[i+1] <= 'z' )
         {
             name[i+1] -= 0x20;
-
             ext[i] = name[i+1];
         }
     };
@@ -4054,17 +4026,12 @@ int fs_get_free_fd_from_pid (pid_t pid)
         return -1;
     }
 
-// #bugbug
-// Check limit
-
-// Process
-
     p = (struct process_d *) processList[pid];
     if ( (void *) p == NULL ){
         debug_print ("fs_get_free_fd_from_pid: p\n");
         return -1;
     }
-    if ( p->used != 1 || p->magic != 1234 ){
+    if ( p->used != TRUE || p->magic != 1234 ){
         debug_print ("fs_get_free_fd_from_pid: p validation\n");
         return -1;
     }
@@ -4227,7 +4194,6 @@ int fs_print_process_cwd(pid_t pid)
     }
 
 // Process
-
     p = (struct process_d *) processList[pid];
 
     if ( (void *) p == NULL ){
@@ -4270,8 +4236,7 @@ int fs_print_process_cwd(pid_t pid)
 
 void fs_show_file_info (file *f)
 {
-    if ((void*)f==NULL)
-    {
+    if ((void*)f==NULL){
         debug_print("fs_show_file_info: fail\n");
         return;
     }
@@ -4285,7 +4250,6 @@ void fs_show_file_info (file *f)
         }
     }
 }
-
 
 void fs_show_file_table(void)
 {
@@ -4307,8 +4271,7 @@ void fs_show_file_table(void)
 
 void fs_show_inode_info (struct inode_d *i)
 {
-    if ( (void *) i == NULL )
-    {
+    if ( (void *) i == NULL ){
         debug_print("fs_show_inode_info: fail\n");
         return;
     }
@@ -4380,30 +4343,21 @@ done:
     return;
 }
 
-
 // sys_pwd -  Service 170.
-void sys_pwd (void)
+void sys_pwd(void)
 {
-    // #todo: Check overflow.
-
     pid_t current_process = (pid_t) get_current_process();
-
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
-    {
+    if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         panic ("sys_pwd: [FAIL] current_process\n");
     }
-
     fs_print_process_cwd (current_process);
 }
-
 
 /*
  * fsSaveFile:
  *     Salva um arquivo no disco.
  *     Somente no diretório raiz.
  */
-
 // It was called by sys_write_file() in fs.c.
 // It was called by sys_read_file when the file does not exist.
 // #obs
@@ -4446,14 +4400,12 @@ fsSaveFile (
     unsigned short next=0;
     unsigned short sector=0;
 
-    // Directory entry buffer.
+// Directory entry buffer.
     char DirEntry[32];
-
-    //Entry size in words.
+//Entry size in words.
     int EntrySize = 0;
     int Offset = 0;
     int FreeIndex = -1;
-
 
     // #debug:
     debug_print ("fsSaveFile:\n");
@@ -4461,32 +4413,35 @@ fsSaveFile (
 
 // Updating fat address and dir address.
 
-    if ( fat_address == 0 ){
-        panic("fsSaveFile: [FAIL] fat_address\n");
+    if (fat_address == 0){
+        panic("fsSaveFile: fat_address\n");
+    }
+    if (dir_address == 0){
+        panic("fsSaveFile: dir_address\n");
     }
 
-    if ( dir_address == 0 ){
-        panic("fsSaveFile: [FAIL] dir_address\n");
-    }
-
-    unsigned short *fat   = (unsigned short *) fat_address; //VOLUME1_FAT_ADDRESS;
-    unsigned short *__dir = (unsigned short *) dir_address; //VOLUME1_ROOTDIR_ADDRESS;
+// VOLUME1_FAT_ADDRESS
+    unsigned short *fat = 
+        (unsigned short *) fat_address;
+// VOLUME1_ROOTDIR_ADDRESS
+    unsigned short *__dir = 
+        (unsigned short *) dir_address;
 
 // #debug
+// #todo
 // We only support one address for now.
-    if ( fat_address != VOLUME1_FAT_ADDRESS ){
+
+    if (fat_address != VOLUME1_FAT_ADDRESS){
         panic("fsSaveFile: [FIXME] We only support ONE fat address for now!\n");
     }
 
-    if ( (void *) file_name == NULL )
-    {
+    if ( (void *) file_name == NULL ){
         debug_print ("fsSaveFile: [ERROR] file_name\n");
         printf      ("fsSaveFile: [ERROR] file_name\n"); 
         goto fail;
     }
 
-    if ( *file_name == 0 )
-    {
+    if ( *file_name == 0 ){
         debug_print ("fsSaveFile: [ERROR] *file_name\n");
         printf      ("fsSaveFile: [ERROR] *file_name\n"); 
         goto fail;
@@ -4495,7 +4450,7 @@ fsSaveFile (
 // #bugbug
 // Esse endereço eh valido?
 
-    /*
+/*
     printf ("name address = %x \n", &file_name );
     printf ("name    = %s \n", file_name ); 
     printf ("size    = %d \n", file_size );       // Size in sectors.
@@ -4503,7 +4458,7 @@ fsSaveFile (
     printf ("address = %x \n", file_address );
     printf ("flag    = %x \n", flag );
     printf ("entries = %d \n", dir_entries );
-    */
+ */
 
     if ( dir_entries == 0 || dir_entries > FAT16_ROOT_ENTRIES )
     {
@@ -4527,7 +4482,7 @@ fsSaveFile (
 
 // Load root dir and FAT.
     fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
-    fs_load_fat(VOLUME1_FAT_ADDRESS,VOLUME1_FAT_LBA,246);
+    fs_load_fat( VOLUME1_FAT_ADDRESS, VOLUME1_FAT_LBA, 246 );
 
 // Procurando cluster livre na fat.
 // Nesse momento construimos uma lista de clusters livres.
@@ -4555,8 +4510,7 @@ fsSaveFile (
             // Se der certo, saímos do loop.
             // #bugbug: Esse size deve ter um limite.
             // file_size = file size in sectors, (clusters??)
-            if (file_size == 0)
-            {
+            if (file_size == 0){
                 fat16ClustersToSave[j] = (unsigned short) 0xfff8; 
                 goto save_file;
             }
@@ -4585,7 +4539,6 @@ out_of_range:
     printf ("fsSaveFile: No free cluster \n");
     goto fail;
 
-
     // #debug
     //refresh_screen();
     //while(1){ asm("hlt"); }
@@ -4595,38 +4548,37 @@ out_of_range:
 // Salva o arquivo.
 // O arquivo tem na lista todos os clusters que ele precisa.
 
-    //
-    // Save!
-    // 
+//
+// Save!
+// 
 
 save_file:
 
     //#debug
     //printf("fsSaveFile: save_file: \n"); 
     //refresh_screen();
-  
-    // Início da lista.
+
+// Início da lista.
     i = 0; 
 
-    //
-    // Size limits.
-    //
+//
+// Size limits.
+//
 
-    // #bugbug
-    // Limite máximo improvisado.
-    // 2KB.
+// #bugbug
+// Limite máximo improvisado.
+// 2KB.
 
-    j = (512*4); 
+    j = (512*4);
 
-    // Pegamos o primeiro da lista.
+// Pegamos o primeiro da lista.
     first = fat16ClustersToSave[i];
 
-	// #debug
-	// printf("first={%x}\n",first);
+    // #debug
+    // printf("first={%x}\n",first);
 
-    // Create directory entry
-    // Name/ext 8.3
-
+// Create directory entry
+// Name/ext 8.3
     DirEntry[0]  = (char) file_name[0];
     DirEntry[1]  = (char) file_name[1];
     DirEntry[2]  = (char) file_name[2];
@@ -4639,51 +4591,48 @@ save_file:
     DirEntry[9]  = (char) file_name[9];
     DirEntry[10] = (char) file_name[10];
 
-    // Flag. (attributes ?)
-    //====================
-    // 0x01: read only
-    // 0x02: hidden
-    // 0x04: system
-    // 0x08: volume label
-    // 0x10: * Directory
-    // 0x20: * Archive
- 
+// Flag. (attributes ?)
+// 0x01: read only
+// 0x02: hidden
+// 0x04: system
+// 0x08: volume label
+// 0x10: * Directory
+// 0x20: * Archive
     DirEntry[11] = flag; 
 
-    // Reserved.
+// Reserved
     DirEntry[12] = 0; 
-    // Creation time. 14 15 16
-    DirEntry[13] = 0x08;  
-    DirEntry[14] = 0x08;  
+// Creation time. 14 15 16
+    DirEntry[13] = 0x08;
+    DirEntry[14] = 0x08;
     DirEntry[15] = 0xb6;
-    // Creation date.
-    DirEntry[16] = 0xb6; 
+// Creation date
+    DirEntry[16] = 0xb6;
     DirEntry[17] = 0x4c;
-    // Access date.
+// Access date
     DirEntry[18] = 0xb8;
     DirEntry[19] = 0x4c;
 
-	// ??
-	// First cluster. 
-	// 0 para fat12 ou 16
+// ??
+// First cluster. 
+// 0 para fat12 ou 16
     DirEntry[20] = 0;
     DirEntry[21] = 0;
 
-    // Modifield time.
+// Modifield time
     DirEntry[22] = 0xa8;
     DirEntry[23] = 0x49;
-    // Modifield date.
+// Modifield date
     DirEntry[24] = 0xb8;
     DirEntry[25] = 0x4c;
 
-    // First cluster. Low word.
-    // 0x1A and 0x1B
-    DirEntry[26] = (char) (first); 
-    DirEntry[27] = (char) (first >> 8); 
+// First cluster. Low word.
+// 0x1A and 0x1B
+    DirEntry[26] = (char) (first);
+    DirEntry[27] = (char) (first >> 8);
 
-    // size_in_bytes - File size in bytes.
-    // 4 bytes: (28,29,30,31)
-
+// size_in_bytes - File size in bytes.
+// 4 bytes: (28,29,30,31)
     DirEntry[28] = (char) size_in_bytes;
     size_in_bytes = (size_in_bytes >> 8);
     DirEntry[29] = (char) size_in_bytes;
@@ -4733,7 +4682,7 @@ save_file:
     EntrySize = (FAT16_ENTRY_SIZE/2);
     Offset = (int) ( FreeIndex * EntrySize );
 
-    // FAT16_DIRENTRY_SIZE = 32
+// FAT16_DIRENTRY_SIZE = 32
     memcpy ( &__dir[Offset], DirEntry, 32 );
 
 // reset
@@ -4741,14 +4690,14 @@ save_file:
 
 //resetIDE:
 
-	//#debug
-	//printf("fsSaveFile: reset and while\n"); 
+    //#debug
+    //printf("fsSaveFile: reset and while\n"); 
     //refresh_screen();
 
-	//reset_ide0 ();
-	
-	// ## Save ##
-    // Vamos ao salvamento propriamente dito.
+    //reset_ide0 ();
+
+// ## Save ##
+// Vamos ao salvamento propriamente dito.
 
     i=0; 
 
@@ -4757,27 +4706,22 @@ save_file:
 
     unsigned long address = (unsigned long) file_address;
 
-//
-// Save!
-//
-    
+// Save!  
 // Saving the file into the disk.
 // Cluster by cluster.
 
 //SavingFile:
 
-    // Routine:
-    // +Pega um conteúdo da lista.
-    // +Encontrada a assinatura na lista!
-    // ...
+// Routine:
+// +Pega um conteúdo da lista.
+// +Encontrada a assinatura na lista!
+// ...
 
-    // #bugbug
-    // E se o primeiro for um marcador de fim de arquivo?
-
+// #bugbug
+// E se o primeiro for um marcador de fim de arquivo?
     //next = list[0];
     //if (next == 0xFFF8)
         //what??
-
 
 // Loop
 // Pegamos o atual na lista.
@@ -4821,7 +4765,7 @@ save_file:
                 0, 
                 0 );
 
-            address += 512; 
+            address += 512;
         }; 
 
         //Próximo valor da lista.
@@ -4843,8 +4787,7 @@ save_file:
         // ??
     };
 
-    // FAIL
-
+// FAIL
     debug_print ("fsSaveFile: Loop fail\n");
     goto fail;
    
@@ -4878,6 +4821,7 @@ do_save_dir_and_fat:
 // Sinalizando que o cache de fat precisa ser salvo.
     fs_fat16_cache_not_saved();
 
+    // #debug
     //debug_print ("fsSaveFile: done\n");
     //printf      ("fsSaveFile: done\n");
     refresh_screen();
@@ -4891,7 +4835,6 @@ fail:
     return (int) 1;
 
 }
-
 
 /*
  * sys_write_file_to_disk:
@@ -4917,19 +4860,15 @@ sys_write_file_to_disk (
 
     debug_print ("sys_write_file_to_disk:\n");
 
-
-    if ( (void*) file_name == NULL )
-    {
+    if ( (void*) file_name == NULL ){
+        return (int) (-EINVAL);
+    }
+    if ( *file_name == 0 ){
         return (int) (-EINVAL);
     }
 
-    if ( *file_name == 0 )
-    {
-        return (int) (-EINVAL);
-    }
-
-    //++
-    // See: sci/fs/write.c
+//++
+// See: sci/fs/write.c
     //taskswitch_lock ();
     //scheduler_lock ();
 
@@ -4938,17 +4877,15 @@ sys_write_file_to_disk (
                   VOLUME1_FAT_ADDRESS, 
                   VOLUME1_ROOTDIR_ADDRESS, 
                   FAT16_ROOT_ENTRIES,
-                  (char *) file_name,    
-                  (unsigned long) file_size,       
-                  (unsigned long) size_in_bytes,  
-                  (char *) file_address,          
-                  (char) flag );                  
+                  (char *) file_name,
+                  (unsigned long) file_size,
+                  (unsigned long) size_in_bytes,
+                  (char *) file_address,
+                  (char) flag );
 
     //scheduler_unlock ();
     //taskswitch_unlock ();
-    //--
-
-    //debug_print ("sys_write_file_to_disk: done\n");
+//--
 
     return (int) __ret;
 }
@@ -5090,7 +5027,6 @@ __go:
 // Process
 
     p = (struct process_d *) get_current_process_pointer();
-
     if ( (void *) p == NULL ){
         printf("sys_read_file_from_disk: p\n");
         goto fail;
@@ -5483,23 +5419,18 @@ fail:
 int sys_create_empty_file( char *file_name )
 {
     int __ret = -1;
-
     //char *FileName;
     //FileName = (char *) file_name;
-
 // #bugbug: 
 // We need a buffer in another place.
 // #todo: Allocate space for a new file.
     char buffer[512];
     //char *buf;
-
 // How many bytes.
     int FileSizeInBytes = 512;
-
 // How many sectors.
 // (FileSizeInBytes/512)
     int NumberOfSectors = 1;
-
 
     debug_print ("sys_create_empty_file:\n");
 
@@ -5558,19 +5489,14 @@ int sys_create_empty_directory ( char *dir_name )
 
     debug_print ("sys_create_empty_directory:\n");
 
-    if ( (void*) dir_name == NULL )
-    {
+    if ( (void*) dir_name == NULL ){
         return (int) (-EINVAL);
     }
-
-    if ( *dir_name == 0 )
-    {
+    if ( *dir_name == 0 ){
         return (int) (-EINVAL);
     }
-
 
     fs_fntos ( (char *) dir_name );
-
 
 // See: write.c
 // 0x10 = directory. 
@@ -5585,8 +5511,7 @@ int sys_create_empty_directory ( char *dir_name )
                   (char *)         &buffer[0], 
                   (char)           0x10 ); 
 
-    if (__ret<0)
-    {
+    if (__ret<0){
         debug_print("sys_create_empty_directory: fail\n");
         return -1;
     }
@@ -5596,7 +5521,6 @@ int sys_create_empty_directory ( char *dir_name )
 
     return (int) __ret;
 }
-
 
 void set_global_open_file ( void *file, int Index )
 {
@@ -5645,20 +5569,18 @@ void *get_global_open_file (int Index)
 // ou usamos o cwd do processo ou
 // o diretorio raiz para paths absolutos.
 
-void sys_cd_command ( const char *string )
+void sys_cd_command (const char *string)
 {
-    int i=0;
+    //int i=0;
 
     if ( (void*) string == NULL ){
         debug_print("sys_cd_command: string\n");
         return;
     }
-
     if ( *string == 0 ){
         debug_print("sys_cd_command: *string\n");
         return;
     }
-
 
 // Reset global structure and cwd on process structure.
 

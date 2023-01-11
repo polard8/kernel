@@ -41,9 +41,9 @@ search_in_dir (
 {
     int Status = -1;
 // Deslocamento do dir.
-    unsigned long i=0;
+    register int i=0;
 // Deslocamento no nome.
-    unsigned long j=0;
+    int j=0;
 // Número máximo de entradas no diretório.
 // #todo: O número de entradas poderia ser passado via argumento.
     unsigned long NumberOfEntries = 512;
@@ -130,8 +130,6 @@ search_in_dir (
 //---------------------------
 
 
-
-
 /*
 // hack hack
     if (stringSize != 11 ){
@@ -210,23 +208,20 @@ fail:
     return (int) -1;
 }
 
-
-int search_in_root ( const char *file_name )
+int search_in_root (const char *file_name)
 {
     if ( (void*) file_name == NULL ){
         debug_print ("search_in_root: [ERROR] file_name\n");
         return -1;
     }
-
     if ( *file_name == 0 ){
         debug_print ("search_in_root: [ERROR] *file_name\n");
         return -1;
     }
 
-    // IN: filename, dir address
+// IN: filename, dir address
     return (int) search_in_dir ( file_name, VOLUME1_ROOTDIR_ADDRESS );
 }
-
 
 /*
  * fs_find_n_empty_entries:
@@ -309,7 +304,7 @@ findEmptyDirectoryEntry (
     unsigned long dir_address, 
     int number_of_entries )
 {
-    int i=0;
+    register int i=0;
     int j=0;
     unsigned char *dir = (unsigned char *) dir_address;
 
