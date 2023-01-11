@@ -25,8 +25,10 @@ file *____network_file;
 struct network_buffer_d  NETWORK_BUFFER;
 
 struct host_info_d *HostInfo;
-
 struct network_info_d *CurrentNetwork;
+
+char *default_network_name_string = "default-network-name";
+char *default_network_version_string = "0.0.0";
 
 unsigned char broadcast_mac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 unsigned char gramado_default_ipv4[4] = { 192, 168, 1, 112 };
@@ -698,13 +700,22 @@ int networkInit (void)
     if ( (void*) ni == NULL ){
         panic("networkInit: ni\n");
     }
-    ni->used = TRUE;
-    ni->magic = 1234;
     ni->id = 0;
     ni->version_major = 0x0000;
     ni->version_minor = 0x0000;
     ni->version_revision = 0x0000;
+    
     // ...
+
+    ni->name_string = (void*) default_network_name_string;
+    ni->name_string_size = (size_t) strlen(default_network_name_string);
+
+    ni->version_string = (void*) default_network_version_string;
+    ni->version_string_size = (size_t) strlen(default_network_version_string);
+
+    ni->next = NULL;
+    ni->used = TRUE;
+    ni->magic = 1234;
     ni->initialized = FALSE;
     CurrentNetwork = (struct network_info_d *) ni;
 
