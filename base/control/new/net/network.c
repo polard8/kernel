@@ -24,6 +24,9 @@ file *____network_file;
 // See: network.h
 struct network_buffer_d  NETWORK_BUFFER;
 
+struct host_info_d *HostInfo;
+
+struct network_info_d *CurrentNetwork;
 
 unsigned char broadcast_mac[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 unsigned char gramado_default_ipv4[4] = { 192, 168, 1, 112 };
@@ -687,6 +690,26 @@ int networkInit (void)
 
     ____network_late_flag=0;
 
+
+//======================================
+
+    struct network_info_d *ni;
+    ni = (void*) kmalloc( sizeof( struct network_info_d ) );
+    if ( (void*) ni == NULL ){
+        panic("networkInit: ni\n");
+    }
+    ni->used = TRUE;
+    ni->magic = 1234;
+    ni->id = 0;
+    ni->version_major = 0x0000;
+    ni->version_minor = 0x0000;
+    ni->version_revision = 0x0000;
+    // ...
+    ni->initialized = FALSE;
+    CurrentNetwork = (struct network_info_d *) ni;
+
+//======================================
+
 // buffers:
 // We will create 32 buffers to receive data and
 // 8 buffers to send data.
@@ -763,6 +786,8 @@ int networkInit (void)
     HostInfo->hostArchitecture = 0;
     HostInfo->used = TRUE;
     HostInfo->magic = 1234;
+
+    CurrentNetwork->host_info = (void*) HostInfo;
 
 // Socket
 // Criando socket para local host porta 80;

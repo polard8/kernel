@@ -9,7 +9,6 @@
 #define ____HOST_H    1
 
 
-
 /*
    exemplo
    
@@ -127,7 +126,7 @@ struct host_info_d
     // ...
 };
 
-struct host_info_d  *HostInfo;
+extern struct host_info_d *HostInfo;
 //...
 
 #endif    

@@ -74,26 +74,36 @@ struct network_info_d
 {
     int used;
     int magic;
+
+// Número identificador da rede.
     int id;
 
-    int networkIdentifier;  // Número identificador da rede.
-    char *networkName;      // Nome da rede.
-    char *networkVersion;   // String mostrando a versão. ex: (1.1.1234)
-    unsigned short networkVersionMajor;
-    unsigned short networkVersionMinor; 
-    unsigned short networkVersionRevision;
+    int initialized;
 
-	//adaptador de rede.
-	//struct intel_nic_info_d *nic;
-	
-	//user ??
-	//struct user_info_d *networkUserinfo;
-	
-	//..
+// Strings
+
+// Nome da rede.
+    char *name_string;
+    size_t name_string_size;
+// String mostrando a versão. ex: (1.1.1234)
+    char *version_string;
+    size_t version_string_size;
+
+// Values
+    unsigned short version_major;
+    unsigned short version_minor; 
+    unsigned short version_revision;
+
+//adaptador de rede.
+    //struct intel_nic_info_d *nic_info;
+
+    // struct user_info_d *user_info;
+    struct host_info_d *host_info;
+    //..
 
     struct network_info_d *next;
 };
-//struct network_info_d *Network;
+extern struct network_info_d *CurrentNetwork;
 
 // Essa flag poderia ir para dentro da estrutura acima,
 extern int ____network_late_flag;
