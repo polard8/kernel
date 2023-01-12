@@ -20,12 +20,9 @@ static unsigned long e1000_rx_counter=0;
 
 // =======================================
 
-
 static void __e1000_receive(void);
-
 // NIC device handler.
 static void DeviceInterface_e1000(void);
-
 
 static uint32_t 
 __E1000ReadCommand ( 
@@ -57,76 +54,6 @@ static int __e1000_reset_controller(struct intel_nic_info_d *d);
 static void __e1000_linkup(struct intel_nic_info_d *d);
 
 // =====================
-
-void 
-e1000_send(
-    struct intel_nic_info_d *dev, 
-    size_t len, 
-    const char *data )
-{
-    uint16_t old=0;
-// dev
-    struct intel_nic_info_d *d;
-    d = (struct intel_nic_info_d *) dev;
-
-// device structure
-    if ( (void*) d == NULL ){
-        printf("e1000_send: d\n");
-        goto fail;
-    }
-    if (d->magic != 1234){
-        printf("e1000_send: d validation\n");
-        goto fail;
-    }
-
-// len
-    if (len <= 0)
-        panic("e1000_send: len=0\n");
-    // #test
-    // 8192 
-    if (len > E1000_DEFAULT_BUFFER_SIZE)
-        panic("e1000_send: len\n");
-
-// current descriptor
-    old = d->tx_cur;
-    if (old >= SEND_BUFFER_MAX){
-        panic("e1000_send: old\n");
-    }
-
-// Usando o ponteiro virtual de 64bit.
-// Buffer, data, len
-    memcpy(
-        (void *) d->tx_buffers_virt[old],  // device buffer 
-        (const void *) data,               // application buffer (read only)
-        (size_t) len );
-
-// lenght
-// #todo:
-// What is the correct size when sending?
-    d->legacy_tx_descs[old].length = (uint16_t) len;
-// cmd
-// CMD_EOP | CMD_IFCS | CMD_RS;
-    d->legacy_tx_descs[old].cmd = (uint8_t) 0x1B;
-// status
-    d->legacy_tx_descs[old].status = (uint8_t) 0;
-
-// Configura qual vai ser o proximo
-    d->tx_cur = (uint16_t) ((d->tx_cur + 1) % 8);
-    __E1000WriteCommand( d, 0x3818, d->tx_cur );
-
-// Espera no antigo
-// #hang
-    while ( !(d->legacy_tx_descs[old].status & 0xFF) )
-    {
-        // Nothing
-    };
-
-// done
-    return;
-fail:
-    refresh_screen();
-    return;
-}
 
 void e1000_show_info(void)
 {
@@ -1128,6 +1055,76 @@ e1000_init_nic (
 
 // 0 = no errors
     return 0;
+}
+
+void 
+e1000_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    const char *data )
+{
+    uint16_t old=0;
+// dev
+    struct intel_nic_info_d *d;
+    d = (struct intel_nic_info_d *) dev;
+
+// device structure
+    if ( (void*) d == NULL ){
+        printf("e1000_send: d\n");
+        goto fail;
+    }
+    if (d->magic != 1234){
+        printf("e1000_send: d validation\n");
+        goto fail;
+    }
+
+// len
+    if (len <= 0)
+        panic("e1000_send: len=0\n");
+    // #test
+    // 8192 
+    if (len > E1000_DEFAULT_BUFFER_SIZE)
+        panic("e1000_send: len\n");
+
+// current descriptor
+    old = d->tx_cur;
+    if (old >= SEND_BUFFER_MAX){
+        panic("e1000_send: old\n");
+    }
+
+// Usando o ponteiro virtual de 64bit.
+// Buffer, data, len
+    memcpy(
+        (void *) d->tx_buffers_virt[old],  // device buffer 
+        (const void *) data,               // application buffer (read only)
+        (size_t) len );
+
+// lenght
+// #todo:
+// What is the correct size when sending?
+    d->legacy_tx_descs[old].length = (uint16_t) len;
+// cmd
+// CMD_EOP | CMD_IFCS | CMD_RS;
+    d->legacy_tx_descs[old].cmd = (uint8_t) 0x1B;
+// status
+    d->legacy_tx_descs[old].status = (uint8_t) 0;
+
+// Configura qual vai ser o proximo
+    d->tx_cur = (uint16_t) ((d->tx_cur + 1) % 8);
+    __E1000WriteCommand( d, 0x3818, d->tx_cur );
+
+// Espera no antigo
+// #hang
+    while ( !(d->legacy_tx_descs[old].status & 0xFF) )
+    {
+        // Nothing
+    };
+
+// done
+    return;
+fail:
+    refresh_screen();
+    return;
 }
 
 static void __e1000_receive(void)
