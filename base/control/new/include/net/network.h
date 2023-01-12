@@ -119,6 +119,9 @@ network_send_arp(
     uint8_t target_ip[4], 
     uint8_t target_mac[6] );
 
+
+void network_send_arp_reply(void);
+void network_send_arp_request(void);
 void testNIC(void);
 
 // Handle package.

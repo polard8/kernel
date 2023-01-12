@@ -1,5 +1,7 @@
 
 // network.c
+// Network layer. (IP)
+// Transport layer. (TCP/UDP/...)
 
 #include <kernel.h>
 
@@ -204,146 +206,21 @@ network_send_arp(
     };
 
 // ======================
+// Sending via e1000 api.
 
-// lenght:
-// Vamos configurar na estrutura do nic intel o tamanho do pacote.
-// Ethernet frame length: 
-// O tamanho do header ethernet + o tamanho do header arp.
-// ethernet header (MAC + MAC + ethernet type) + 
-// ethernet data (ARP header)
-// ( 14 + 28 );
-// #bugbug:
-// Is this the payload size.
-    currentNIC->legacy_tx_descs[buffer_index].length = 
-        (uint16_t) ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
-    //currentNIC->legacy_tx_descs[buffer_index].length = 
-    //    (uint16_t) 8192;
-
-// cso
-// Checksum offset.
-    //currentNIC->legacy_tx_descs[buffer_index].cso = ?;
-
-// Primeiro zera o status,
-// depois envia o comando.
-
-// status
-// status and reserved.
-    currentNIC->legacy_tx_descs[buffer_index].status = (uint8_t) 0;
-
-
-#define CMD_EOP  (1 << 0)  // End of Packet
-#define CMD_IFCS (1 << 1)  // Insert FCS
-#define CMD_IC   (1 << 2)  // Insert Checksum
-#define CMD_RS   (1 << 3)  // Report Status
-#define CMD_RPS  (1 << 4)  // Report Packet Sent
-#define CMD_VLE  (1 << 6)  // VLAN Packet Enable
-#define CMD_IDE  (1 << 7)  // Interrupt Delay Enable
-
-// cmd
-    currentNIC->legacy_tx_descs[buffer_index].cmd = 
-        (uint8_t) 0x1B;
-    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
-    //    (uint8_t) (CMD_EOP | CMD_IFCS | CMD_RS);
-    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
-    //    (uint8_t) (TDESC_CMD_IFCS | TDESC_CMD_RS | TDESC_CMD_EOP);
-    //currentNIC->legacy_tx_descs[buffer_index].cmd = 
-    //    (uint8_t) (TDESC_EOP | TDESC_RS);  //intel code
-    // CMD_EOP | CMD_IFCS | CMD_RS;
-
-// css
-// Checksum start
-    //currentNIC->legacy_tx_descs[buffer_index].css = (uint8_t) 0;
-
-// special
-    //currentNIC->legacy_tx_descs[buffer_index].special = (uint16_t) 0;
-
-// Update the current offset for the next transmission buffer.
-// We have 8 transmission buffers.
-    currentNIC->tx_cur = 
-        (uint16_t) ( currentNIC->tx_cur + 1 ) % 8;
-
-//
-// Send
-//
-
-// #importante: 
-// Diga ao controlador quais são os índices do descritor 
-// a serem usado para transmitir dados.
-// TDH = 0x3810,  /* Tx Descriptor Head */
-// TDT = 0x3818,  /* Tx Descriptor Tail */
-// ??
-// #todo
-// Por que estamos configurando somente o tail nesse momento?
-// O offset é um valor de 16 bits.
-
-    unsigned int head = (unsigned int) 0;  // The first one.
-    unsigned int tail = (unsigned int) (currentNIC->tx_cur & 0xFFFF);  // The last one.
-
-
-// #todo
-// Call a worker for that routine.
-
-// TDH = 0x3810, Tx Descriptor Head.
-    //*( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDH)) = 
-    //    (unsigned int) head;
-
-// TDT = 0x3818, Tx Descriptor Tail.
-    *( (volatile unsigned int *)(currentNIC->registers_base_address + REG_TDT)) = 
-        (unsigned int) tail;
-
-
-// #debug
-// Colocamos essa mensagem antes de entrarmos no while.
-// Pois precisamos implementar algum contador no while para n�o
-// ficarmos preso nele pra sempre.
-    //debug_print ("network_send_arp: Sending broadcast ARP. *debug *while\n");
-    //printf ("network_send_arp: Sending broadcast ARP. *debug *while\n");
-    //refresh_screen ();
-
-// #perigo:
-// Status.
-// Checamos o status do buffer old pra ver se ele foi enviado.
-// Fica travado aqui at� que seja enviado?
-// Poderia ter um timemout?.
-
-// #todo
-// This is a method for wating.
-// Espera enquanto for 0.
-// #bugbug: Isso pode esperar para sempre.
-    
-    /*
-    // #ok. It is working
-    while ( !(currentNIC->legacy_tx_descs[buffer_index].status & 0xFF) )
-    {
-        // Nothing.
-    };
-    */
-    
+    e1000_send(
+        currentNIC,
+        ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT ),
+        buffer );
 
 /*
-// Waiting using a timeout.
-// Espera por um tempo pelo valor '1'.
-    int t=0;
-    int tmax = 5000000; //50000;
-    uint8_t status = 0;
-    for (t=0; t<tmax;t++)
-    {
-         // Get status
-         status = (uint8_t) currentNIC->legacy_tx_descs[buffer_index].status;
-         // Check if the status value is '1'.
-         //if ( (status & 0xFF) == 1 )
-         if ( (status & 0xFF) != 0 )
-         {
-              printf ("network_send_arp: [status ok] Done\n");
-              refresh_screen();
-              return;
-         }
-    };
-    printf ("network_send_arp: [fail] Timeout\n");
-    // goto fail;
+    // not good.
+    e1000_send(
+        currentNIC,
+        ( ARP_HEADER_LENGHT ),
+        buffer );
 */
 
-// done
     refresh_screen();
     return;
 
@@ -353,13 +230,11 @@ fail:
 }
 
 
-// Test, called by the kernel console.
-void testNIC(void)
-{
-    // #debug
-    printf("testNIC:\n");
-    refresh_screen();
 
+
+
+void network_send_arp_request(void)
+{
 // Send ARP request to a Linus host.
     network_send_arp( 
         ARP_OPC_REQUEST, 
@@ -367,17 +242,32 @@ void testNIC(void)
         target_default_ipv4,   // dst ip (Linux)
         broadcast_mac          // target mac
         );
+}
 
-/*
-// Send ARP request to the default gateway.
+void network_send_arp_reply(void)
+{
+// Send ARP request to a Linus host.
+
+// #bugbug
+// Sending reply to broadcast
+
     network_send_arp( 
-        ARP_OPC_REQUEST, 
+        ARP_OPC_REPLY, 
         gramado_default_ipv4,  // src ip 
-        gateway_default_ipv4,  // dst ip
+        target_default_ipv4,   // dst ip (Linux)
         broadcast_mac          // target mac
         );
-*/
+}
 
+// Test, called by the kernel console.
+void testNIC(void)
+{
+    // #debug
+    printf("testNIC:\n");
+    refresh_screen();
+
+    network_send_arp_request();
+    
 // ...
 
     e1000_show_info();
@@ -455,14 +345,12 @@ network_on_receiving (
     switch (Type){
     case 0x0800:
         printf ("[0x0800]: IPV4 received\n");
-        //network_handle_ipv4(buffer,size);
         network_handle_ipv4(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
         break;
     case 0x0806:
         printf ("[0x0806]: ARP received\n");
-        //network_handle_arp(buffer,size);
         network_handle_arp(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
@@ -479,7 +367,6 @@ network_on_receiving (
     default:
         printf ("Default type\n");
         break;
-        
     };
 
     refresh_screen();
@@ -517,37 +404,57 @@ network_handle_ipv4(
 
     uint8_t v_hl = (uint8_t) ip->v_hl;
     uint8_t Version = (uint8_t) ((v_hl >> 4) & 0x0F);
-    uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);
+    uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);  // Header lenght. 5=20bytes.
 
-    printf("IP Version: {%x}\n", Version);
-    printf("Header lenght: {%x}\n", Lenght);
+    printf("IP Version: {%d}\n", Version);
+    printf("Header lenght: {%d}\n", Lenght);
+
+    if (Version!=4){
+        printf("Not version 4\n");
+        goto fail;
+    }
+
+// Total lenght (16bits)
+// (IP + (TCP + data)) given in bytes.
+// 20~65535
+    printf("Total lenght: {%d}\n",ip->ip_len);
+
+    if (ip->ip_len < 20 || ip->ip_len > 65535){
+        //#debug
+        panic("Bad total lenght\n");
+    }
 
     printf("Protocol: {%x}\n",ip->ip_p);
 
-    if (Version == 4)
-    {
-        if ( dst_ipv4[3] != 112 ||
-             dst_ipv4[2] != 1 ||
-             dst_ipv4[1] != 168 ||
-             dst_ipv4[0] != 192 )    // 0=192 ok
-        {
-            printf ("NOT TO ME!\n");
-            goto fail; 
-        }
-
-        printf ("TO ME!\n");
-        //printf("Src IPV4: {%x}\n", ip->ip_src.s_addr);
-        //printf("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
-        // destination
-        printf ("Src: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
-            src_ipv4[0], src_ipv4[1], src_ipv4[2], src_ipv4[3]);
-        printf ("Dst: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
-            dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3]);
-        refresh_screen();
-        while(1){}
+    if (ip->ip_p == 1){
+        printf("ICMP Protocol\n");
     }
+
+// ---------------
+// Not to me.
+    if ( dst_ipv4[3] != 112 ||
+         dst_ipv4[2] != 1 ||
+         dst_ipv4[1] != 168 ||
+         dst_ipv4[0] != 192 )
+    {
+        printf ("NOT TO ME!\n");
+        goto fail; 
+    }
+
+// ---------------
+// To me.
+    printf ("TO ME!\n");
+    //printf("Src IPV4: {%x}\n", ip->ip_src.s_addr);
+    //printf("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
+    // destination
+    printf ("Src: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
+        src_ipv4[0], src_ipv4[1], src_ipv4[2], src_ipv4[3]);
+    printf ("Dst: 0={%d} | 1={%d} | 2={%d} | 3={%d}\n",
+        dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3]);
+
+    // hang
     refresh_screen();
-    return;
+    while(1){}
 
 fail:
     refresh_screen();
@@ -586,6 +493,9 @@ network_handle_arp(
     
     if (op==ARP_OPC_REQUEST){
         printf("This is REQUEST\n");
+        //sending a reply, only for the linux host.  x.x.x.8
+        //printf("Sending reply to linux host\n");
+        //network_send_arp_reply();
     } else if (op==ARP_OPC_REPLY){
         printf("This is REPLY\n");
     };

@@ -81,6 +81,11 @@ e1000_send(
 
     old = d->tx_cur;
 
+
+    //#test
+    if(len > 8192)
+        panic("e1000_send: len\n");
+
     // Buffer, data, len
     memcpy(
         (void *) d->tx_buffers_virt[old], 
@@ -88,6 +93,8 @@ e1000_send(
         (size_t) len );
 
 // lenght
+// #todo:
+// What is the correct size when sending?
     d->legacy_tx_descs[old].length = (uint16_t) len;
 // cmd
     d->legacy_tx_descs[old].cmd = (uint8_t) 0x1B;
@@ -145,6 +152,8 @@ __E1000WriteCommand (
     unsigned long address = (d->registers_base_address + addr);
     *( (volatile unsigned int *) address ) = val;
 }
+
+//----------
 
 static uint32_t 
 __E1000ReadEEPROM ( 

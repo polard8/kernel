@@ -12,39 +12,56 @@
 #define IP_MF  0x2000			/* more fragments flag */
 #define IP_OFFMASK  0x1fff		/* mask for fragmenting bits */
 
-#define IP_MAXPACKET	65535		/* maximum packet size */
-#define IP_MINFRAGSIZE	69		/* minumum size that can be fraged */
 
+#define IP_MINFRAGSIZE  69     /* minumum size that can be fraged */
+#define IP_MAXPACKET    65535  /* maximum packet size */
+
+// Lenght = 20 bytes
 struct ip_d
 {
 
-// Version and Header lenght.
+// - Version (4bits)
+// - IHL (4bits). Lenght of the header in chuncks of 4 bytes. 
     u_int8_t v_hl;
 
-//#if BYTE_ORDER == LITTLE_ENDIAN
-    //unsigned int ip_hl:4,		/* header length */
-    //             ip_v:4;		/* version */
-//#endif
-//#if BYTE_ORDER == BIG_ENDIAN
-//    unsigned int ip_v:4,		/* version */
-//                 ip_hl:4;		/* header length */
-//#endif
+// Type of service (8bits)
+// - Differentiated Services Code Point (6bits)
+// - Explicit Congestion Notification (2bits)
+    u_int8_t ip_tos;
 
-    u_int8_t  ip_tos;  /* type of service */
-    u_int16_t ip_len;  /* total length */
-    u_int16_t ip_id;   /* identification */
-    u_int16_t ip_off;  /* fragment offset field */
+// Total lenght (16bits)
+// (IP + (TCP + data)) given in bytes.
+// 20~65535
+    u_int16_t ip_len;
 
-    u_int8_t  ip_ttl;  /* time to live */
-    u_int8_t  ip_p;    /* protocol */
-    u_int16_t ip_sum;  /* checksum */
+// Identification (16bits)
+// When the message is large and we have a lot of packets.
+// Actually they are 'fragments' of a packet.
+    u_int16_t ip_id;
+
+// Flags (3bits) (Do we have fragments?)
+// Fragment offset (13bits) (fragment position)
+    u_int16_t ip_off;
+
+// Time to live (8bits)
+// Counter 
+    u_int8_t ip_ttl;
+
+// Protocol (8bits)
+    u_int8_t ip_p;
+
+// Checksum (16bits)
+// Only the header.
+    u_int16_t ip_sum;
 
 // Source and dest address.
 // Address in network byte order.
 // See: net/in.h 
-    struct in_addr  ip_src;
-    struct in_addr  ip_dst; 
+    struct in_addr  ip_src;  //(32bits)
+    struct in_addr  ip_dst;  //(32bits) 
 
+// Optional if IHL > 5.
+// 0~320 bits.
 };
 
 #endif   
