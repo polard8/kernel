@@ -20,9 +20,11 @@ static unsigned long e1000_rx_counter=0;
 
 // =======================================
 
+
+static void __e1000_receive(void);
+
 // NIC device handler.
 static void DeviceInterface_e1000(void);
-
 
 
 static uint32_t 
@@ -1128,8 +1130,7 @@ e1000_init_nic (
     return 0;
 }
 
-static void e1000_receive(void);
-static void e1000_receive(void)
+static void __e1000_receive(void)
 {
     unsigned char *buffer;
     uint16_t old=0;
@@ -1147,7 +1148,7 @@ static void e1000_receive(void)
         old = currentNIC->rx_cur;
         
         if (old >= RECEIVE_BUFFER_MAX){
-            panic("DeviceInterface_e1000: [receive] old\n");
+            panic("__e1000_receive: [receive] old\n");
         }
         
         // Lenght.
@@ -1202,11 +1203,13 @@ static void e1000_receive(void)
 static void DeviceInterface_e1000(void)
 {
     uint32_t InterruptCause=0;
-    /*
-    unsigned char *buffer;
-    uint16_t old=0;
-    uint32_t len=0;
-    */
+
+// The current nic
+    if ( (void*) currentNIC == NULL )
+        panic("DeviceInterface_e1000: currentNIC\n");
+    if (currentNIC->magic != 1234)
+        panic("DeviceInterface_e1000: currentNIC validation\n");
+
 // Status
 // 0xC0 - Interrupt Cause Read Register
 // ICR Register Bit Description
@@ -1265,102 +1268,25 @@ static void DeviceInterface_e1000(void)
         printf ("DeviceInterface_e1000: Start link\n");
         __e1000_linkup(currentNIC);
         goto done;
-    
+
     // 0x80 - Reveive.
     // INTERRUPT_RXT0
-    // #todo: Create a worker for this.
     } else if (InterruptCause & 0x80){
-
-        // Worker
-        e1000_receive();
-
         //printf ("DeviceInterface_e1000: Receive\n");
-        //refresh_screen();
-
-        // #lock
-        // see: pciHandleDevice in pci.c
-
-        //if (e1000_interrupt_flag == FALSE)
-        //{
-        //    printf("DeviceInterface_e1000: LOCKED\n");
-        //    refresh_screen();
-        //    return;
-        //}
-
-        // #todo
-        // Esse sequência está funcionando. Não mudar.
-        // Precisamos entender ela melhor.
-        // Todos os buffers de recebimento.
-        // Olhamos um bit do status de todos os buffers.
-        // Sairemos do while quando encontrarmos um buffer com o bit desativado.
-        /*
-        if ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
-        {
-             old = currentNIC->rx_cur;
-             if (old >= RECEIVE_BUFFER_MAX){
-                 panic("DeviceInterface_e1000: [receive] old\n");
-             }
-             // Lenght.
-             // #check the limits.
-             len = currentNIC->legacy_rx_descs[old].length;
-
-             //#test: Apenas pegando o buffer para usarmos logo adiante.
-             // 64bit virtual address.
-             buffer = (unsigned char *) currentNIC->rx_buffers_virt[old];
-
-            //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
-            //chamaremos logo adiante, usando o buffer que pegamos acima.
-
-            // Our Net layer should handle it
-            // NetHandlePacket(currentNIC->ndev, len, (PUInt8)currentNIC->rx_buffers_virt[old]);
-
-            // zera.
-            currentNIC->legacy_rx_descs[old].status = 0;
-
-            // ?? Provavelmente seleciona o buffer antes de circular.
-            // #bugbug: devemos circular primeiro pra depois chamar essa rotina?
-            // RDT - Receive Descriptor Tail
-            __E1000WriteCommand ( currentNIC, 0x2818, old );
-
-             // Se o bit de statos estava acionado, então copiamos esse
-             // buffer para outro acessível pelos aplicativos.
-             
-             // Envia para o buffer do gramado.
-             //if (____network_late_flag == TRUE)
-             //{
-                 //network_buffer_in ( (void *) buffer, (int) len );
-                 //printf("DeviceInterface_e1000: [DEBUG] iret\n");
-                 //refresh_screen();
-             //}  
-
-             // circula. (32 buffers)
-             // Seleciona o próximo buffer.
-             currentNIC->rx_cur = 
-                 (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
-
-             //#test buffer
-             //eh = (void*) buffer;
-             if ( (void*) buffer != NULL )
-             {
-                 //network_on_receiving ( (const unsigned char*) buffer, 1500 );
-                 network_on_receiving ( (const unsigned char*) buffer, len );
-                 e1000_rx_counter++;
-             }
-        }
-        */
-        
-        
+        __e1000_receive();
         goto done;
 
     // INTERRUPT_RXDMT0
     } else if (InterruptCause & 0x10){
         printf("DeviceInterface_e1000: Good threshold!\n");
         goto done;
+
     // ??
     // INTERRUPT_SRPD
     } else if (InterruptCause & 0x8000){
         printf ("DeviceInterface_e1000: status = 0x8000\n");
         goto done;
+
     }else{
         printf("DeviceInterface_e1000: Unknown interrupt cause: {%x}\n",
             InterruptCause);   
