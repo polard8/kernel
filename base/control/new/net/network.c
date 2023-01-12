@@ -289,7 +289,14 @@ network_on_receiving (
     if ( (void*) buffer == NULL ){
         return;
     }
-    if (size<0){
+
+    if (size <= 0){
+        printf("network_on_receiving: size<=0\n");
+        return;
+    }
+    // 8192
+    if (size > E1000_DEFAULT_BUFFER_SIZE){
+        printf("network_on_receiving: size>8192\n");
         return;
     }
 

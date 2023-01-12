@@ -8,13 +8,6 @@
 
 static int e1000_initialized = FALSE;
 
-// How many buffers.
-// #define E1000_NUM_TX_DESC 8
-// #define E1000_NUM_RX_DESC 32
-#define SEND_BUFFER_MAX       8
-#define RECEIVE_BUFFER_MAX   32
-
-
 // see: nicintel.h
 struct intel_nic_info_d  *currentNIC;
 
@@ -67,29 +60,42 @@ void
 e1000_send(
     struct intel_nic_info_d *dev, 
     size_t len, 
-    unsigned char *data )
+    const char *data )
 {
     uint16_t old=0;
 // dev
     struct intel_nic_info_d *d;
     d = (struct intel_nic_info_d *) dev;
 
+// device structure
     if ( (void*) d == NULL ){
         printf("e1000_send: d\n");
         goto fail;
     }
+    if (d->magic != 1234){
+        printf("e1000_send: d validation\n");
+        goto fail;
+    }
 
-    old = d->tx_cur;
-
-
-    //#test
-    if(len > 8192)
+// len
+    if (len <= 0)
+        panic("e1000_send: len=0\n");
+    // #test
+    // 8192 
+    if (len > E1000_DEFAULT_BUFFER_SIZE)
         panic("e1000_send: len\n");
 
-    // Buffer, data, len
+// current descriptor
+    old = d->tx_cur;
+    if (old >= SEND_BUFFER_MAX){
+        panic("e1000_send: old\n");
+    }
+
+// Usando o ponteiro virtual de 64bit.
+// Buffer, data, len
     memcpy(
-        (void *) d->tx_buffers_virt[old], 
-        (const void *) data, 
+        (void *) d->tx_buffers_virt[old],  // device buffer 
+        (const void *) data,               // application buffer (read only)
         (size_t) len );
 
 // lenght
@@ -97,6 +103,7 @@ e1000_send(
 // What is the correct size when sending?
     d->legacy_tx_descs[old].length = (uint16_t) len;
 // cmd
+// CMD_EOP | CMD_IFCS | CMD_RS;
     d->legacy_tx_descs[old].cmd = (uint8_t) 0x1B;
 // status
     d->legacy_tx_descs[old].status = (uint8_t) 0;
@@ -348,7 +355,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         // O endereço virtual fica salvo no array de ponteiros.
         tmp_txaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
-                 0x3000, 
+                 E1000_DEFAULT_BUFFER_SIZE, 
                  (unsigned long *) &d->tx_buffers_virt[i] );
         
         if (tmp_txaddress_pa == 0){
@@ -356,6 +363,9 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
         }
         
         // Buffer (PA)
+        // A estrutura contém um ponteiro físico para o bufffer.
+        // Em duas partes de 32bit.
+        // Mas d->tx_buffers_virt[i] contém o ponteiro virtual de 64bit.
         d->legacy_tx_descs[i].addr  = (unsigned int) tmp_txaddress_pa;
         d->legacy_tx_descs[i].addr2 = (unsigned int) (tmp_txaddress_pa>>32);
         if (d->legacy_tx_descs[i].addr == 0){
@@ -364,7 +374,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 
         // #test: 
         // Configurando o tamanho do buffer
-        d->legacy_tx_descs[i].length = 0x3000;
+        d->legacy_tx_descs[i].length = E1000_DEFAULT_BUFFER_SIZE;
 
         //cmd: bits
         //IDE VLE DEXT RSV RS IC IFCS EOP
@@ -603,7 +613,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
         // O endereço virtual fica salvo no array de ponteiros.
         tmp_rxaddress_pa = 
             (unsigned long) __E1000AllocCont ( 
-                0x3000, 
+                E1000_DEFAULT_BUFFER_SIZE, 
                 (unsigned long *) &d->rx_buffers_virt[i] );
 
         if (tmp_rxaddress_pa == 0){
@@ -611,6 +621,9 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
         }
 
         // Buffer (PA)
+        // A estrutura contém um ponteiro físico para o bufffer.
+        // Em duas partes de 32bit.
+        // Mas d->rx_buffers_virt[i] contém o ponteiro virtual de 64bit.
         d->legacy_rx_descs[i].addr  = (unsigned int) tmp_rxaddress_pa;
         d->legacy_rx_descs[i].addr2 = (unsigned int) (tmp_rxaddress_pa>>32);
         if (d->legacy_rx_descs[i].addr == 0){
@@ -619,7 +632,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 
         // #test: 
         // Configurando o tamanho do buffer
-        d->legacy_rx_descs[i].length = 0x3000;
+        d->legacy_rx_descs[i].length = E1000_DEFAULT_BUFFER_SIZE;
         d->legacy_rx_descs[i].status = 0;
     };
 
@@ -1115,42 +1128,85 @@ e1000_init_nic (
     return 0;
 }
 
+static void e1000_receive(void);
+static void e1000_receive(void)
+{
+    unsigned char *buffer;
+    uint16_t old=0;
+    uint32_t len=0;
+
+    if ( (void*) currentNIC == NULL )
+        return;
+    if (currentNIC->magic != 1234)
+        return;
+
+// #maybe a while
+
+    if ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
+    {
+        old = currentNIC->rx_cur;
+        
+        if (old >= RECEIVE_BUFFER_MAX){
+            panic("DeviceInterface_e1000: [receive] old\n");
+        }
+        
+        // Lenght.
+        // #check the limits.
+        len = currentNIC->legacy_rx_descs[old].length;
+
+        //#test: Apenas pegando o buffer para usarmos logo adiante.
+        // 64bit virtual address.
+        buffer = (unsigned char *) currentNIC->rx_buffers_virt[old];
+
+        //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
+        //chamaremos logo adiante, usando o buffer que pegamos acima.
+
+        // Our Net layer should handle it
+        // NetHandlePacket(currentNIC->ndev, len, (PUInt8)currentNIC->rx_buffers_virt[old]);
+
+        // zera.
+        currentNIC->legacy_rx_descs[old].status = 0;
+
+        // ?? Provavelmente seleciona o buffer antes de circular.
+        // #bugbug: devemos circular primeiro pra depois chamar essa rotina?
+        // RDT - Receive Descriptor Tail
+        __E1000WriteCommand ( currentNIC, 0x2818, old );
+
+        // Se o bit de statos estava acionado, então copiamos esse
+        // buffer para outro acessível pelos aplicativos.
+             
+        // Envia para o buffer do gramado.
+        //if (____network_late_flag == TRUE)
+        //{
+             //network_buffer_in ( (void *) buffer, (int) len );
+             //printf("DeviceInterface_e1000: [DEBUG] iret\n");
+             //refresh_screen();
+        //}  
+
+        // circula. (32 buffers)
+        // Seleciona o próximo buffer.
+        currentNIC->rx_cur = 
+            (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
+
+        //#test buffer
+        //eh = (void*) buffer;
+        if ( (void*) buffer != NULL )
+        {
+            //network_on_receiving ( (const unsigned char*) buffer, 1500 );
+            network_on_receiving ( (const unsigned char*) buffer, len );
+            e1000_rx_counter++;
+        }
+    }
+}
+
 static void DeviceInterface_e1000(void)
 {
     uint32_t InterruptCause=0;
-
+    /*
     unsigned char *buffer;
-
-    uint32_t val=0;
     uint16_t old=0;
     uint32_t len=0;
-// The ethernet header.
-    struct ether_header *eh;
-    uint16_t Type=0;
-
-// Interrupt Masks
-
-#define INTERRUPT_TXDW    (1 << 0)  // 0x01
-#define INTERRUPT_TXQE    (1 << 1)  // 0x02
-#define INTERRUPT_LSC     (1 << 2)  // 0x04
-#define INTERRUPT_RXSEQ   (1 << 3)  // 0x08
-
-#define INTERRUPT_RXDMT0  (1 << 4)  // 0x10
-                                    // 0x20
-#define INTERRUPT_RXO     (1 << 6)  // 0x40
-#define INTERRUPT_RXT0    (1 << 7)  // 0x80
-
-#define INTERRUPT_MDAC    (1 <<  9)  // 0x100
-#define INTERRUPT_RXCFG   (1 << 10)  // 0x200
-                                     // 0x400
-#define INTERRUPT_PHYINT  (1 << 12)  // 0x800
-
-                                     // 0x1000
-                                     // 0x2000
-#define INTERRUPT_TXD_LOW (1 << 15)  // 0x4000
-#define INTERRUPT_SRPD    (1 << 16)  // 0x8000
-
-
+    */
 // Status
 // 0xC0 - Interrupt Cause Read Register
 // ICR Register Bit Description
@@ -1212,7 +1268,11 @@ static void DeviceInterface_e1000(void)
     
     // 0x80 - Reveive.
     // INTERRUPT_RXT0
+    // #todo: Create a worker for this.
     } else if (InterruptCause & 0x80){
+
+        // Worker
+        e1000_receive();
 
         //printf ("DeviceInterface_e1000: Receive\n");
         //refresh_screen();
@@ -1233,13 +1293,19 @@ static void DeviceInterface_e1000(void)
         // Todos os buffers de recebimento.
         // Olhamos um bit do status de todos os buffers.
         // Sairemos do while quando encontrarmos um buffer com o bit desativado.
-  
+        /*
         if ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
         {
              old = currentNIC->rx_cur;
+             if (old >= RECEIVE_BUFFER_MAX){
+                 panic("DeviceInterface_e1000: [receive] old\n");
+             }
+             // Lenght.
+             // #check the limits.
              len = currentNIC->legacy_rx_descs[old].length;
 
              //#test: Apenas pegando o buffer para usarmos logo adiante.
+             // 64bit virtual address.
              buffer = (unsigned char *) currentNIC->rx_buffers_virt[old];
 
             //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
@@ -1276,10 +1342,14 @@ static void DeviceInterface_e1000(void)
              //eh = (void*) buffer;
              if ( (void*) buffer != NULL )
              {
-                 network_on_receiving ( (const unsigned char*) buffer, 1500 );
+                 //network_on_receiving ( (const unsigned char*) buffer, 1500 );
+                 network_on_receiving ( (const unsigned char*) buffer, len );
                  e1000_rx_counter++;
              }
         }
+        */
+        
+        
         goto done;
 
     // INTERRUPT_RXDMT0
