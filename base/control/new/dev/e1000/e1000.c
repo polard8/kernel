@@ -684,10 +684,6 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 // Reset the controller.
 static int __e1000_reset_controller(struct intel_nic_info_d *d)
 {
-// #todo:
-// Create two workers:
-// One to initialize rx and another one for tx.
-
     register int i=0;
     uint32_t value=0;
 
@@ -695,78 +691,25 @@ static int __e1000_reset_controller(struct intel_nic_info_d *d)
     debug_print ("__e1000_reset_controller:\n");
     printf      ("__e1000_reset_controller:\n");
 
+// structure
     if ( (void*) d == NULL ){
         panic("__e1000_reset_controller: d\n");
     }
 
-// #todo: 
-// precisamos checar a validade dessa estrutura e do endereço.
-    //esse será o endereço oficial.
-    //d->registers_base_address
+// base address
     if ( d->registers_base_address == 0 ){
-        panic ("__e1000_reset_controller: [FAIL] d->registers_base_address\n");
+        panic ("__e1000_reset_controller: d->registers_base_address\n");
     }
 
 // Clear Multicast Table Array (MTA).
     for (i=0; i<128; i++){
         __E1000WriteCommand ( d, 0x5200 + (i * 4), 0 );
     };
-// Enable interrupt
-// IMS - Interrupt Mask Set/Read
-    __E1000WriteCommand (d, 0xD0, 0x1F6DC);
-// Drag register. ICR - Read interrupt cause.
-    value = (uint32_t) __E1000ReadCommand (d, 0xC0);
 
     __initialize_tx_support(d);
     __initialize_rx_support(d);
-
-// #todo 
-// Initialize statistics registers.
-// E1000_REG_CRCERRS
-    //for (i = 0; i < 64; i++)
-    //    __E1000WriteCommand(d, 0x04000 + i * 4, 0);
-
-//irq #todo
-//#bugbug: fow now we're doing this in pci.c.
-    //PCIRegisterIRQHandler ( bus, dev, fun, (unsigned long) E1000Handler, d );
-
-    /* Transmit Enable. */
-    //#define E1000_REG_TCTL_EN	(1 << 1)
-    /* Pad Short Packets. */
-    //#define E1000_REG_TCTL_PSP	(1 << 3)
-
-   //#define E1000_ICR      0x000C0  /* Interrupt Cause Read - R/clr */
-   //#define E1000_ITR      0x000C4  /* Interrupt Throttling Rate - RW */
-   //#define E1000_ICS      0x000C8  /* Interrupt Cause Set - WO */
-   //#define E1000_IMS      0x000D0  /* Interrupt Mask Set - RW */
-   //#define E1000_IMC      0x000D8  /* Interrupt Mask Clear - WO */
-   //#define E1000_IAM      0x000E0  /* Interrupt Acknowledge Auto Mask */	
-
-   // #define E1000_IAC      0x04100  /* Interrupt Assertion Count */
-   //#define E1000_ICRXPTC  0x04104  /* Interrupt Cause Rx Packet Timer Expire Count */
-   //#define E1000_ICRXATC  0x04108  /* Interrupt Cause Rx Absolute Timer Expire Count */
-   //#define E1000_ICTXPTC  0x0410C  /* Interrupt Cause Tx Packet Timer Expire Count */
-   //#define E1000_ICTXATC  0x04110  /* Interrupt Cause Tx Absolute Timer Expire Count */
-   //#define E1000_ICTXQEC  0x04118  /* Interrupt Cause Tx Queue Empty Count */
-   //#define E1000_ICTXQMTC 0x0411C  /* Interrupt Cause Tx Queue Minimum Threshold Count */
-   //#define E1000_ICRXDMTC 0x04120  /* Interrupt Cause Rx Descriptor Minimum Threshold Count */
-   //#define E1000_ICRXOC   0x04124  /* Interrupt Cause Receiver Overrun Count */  
-
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXT0;
-   //(*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXO;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXDMT0;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_RXSEQ;
-   // (*((uint32_t *) (start + E1000_IMS))) |= E1000_IMS_LSC;	
-
-    //E1000WriteCommand(d, 0xD0, E1000_IMS_RXT0 | E1000_IMS_RXO );
-
-    //printf("[6]:\n");
-
-// Enable interrupts. (second time)
-     __e1000_enable_interrupt(d);
-
-// Linkup
     __e1000_linkup(d);
+    __e1000_enable_interrupt(d);
 
     return 0;
 }
