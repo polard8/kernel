@@ -54,7 +54,6 @@ extern struct gws_window_d  *taskbar_startmenu_button_window;
 extern struct gws_window_d *first_window;
 extern struct gws_window_d *last_window;
 
-
 static const char *default_window_name = "Untitled window";
 
 //
@@ -63,11 +62,9 @@ static const char *default_window_name = "Untitled window";
 
 static struct gws_window_d *__create_window_object(void);
 
-
 //
 // =====================================
 //
-
 
 void gws_enable_transparence(void)
 {
@@ -78,7 +75,6 @@ void gws_disable_transparence(void)
 {
     config_use_transparency=FALSE;
 }
-
 
 // #todo
 // Essas rotina serão chamada pelo request assincrono sem resposta.
@@ -114,7 +110,6 @@ void useFrame( int value )
     gUseFrame = FALSE;
 }
 */
-
 
 /*
  * xxxCreateSurfaceWindow: 
@@ -154,18 +149,16 @@ void *xxxCreateSurfaceWindow(
     unsigned long color )      //12, Color (bg) (para janela simples).
 { 
 
-    // opaque
-    // A ring0 structure pointer.
+// opaque
+// A ring0 structure pointer.
     void *wObjectPointer;
-    
-	// Enviando tudo via argumento.
-	// Esse método dá a possibilidade de enviarmos ainda 
-	// mais argumentos. 
-	// #importante: Isso está funcionado, Vamos fazer assim e 
-	// não do jeito antigo.
 
+// Enviando tudo via argumento.
+// Esse método dá a possibilidade de enviarmos ainda 
+// mais argumentos. 
+// #importante: Isso está funcionado, Vamos fazer assim e 
+// não do jeito antigo.
 	unsigned long message_buffer[12];
-
 
     gwssrv_debug_print ("xxxCreateSurfaceWindow: \n");
 
@@ -203,7 +196,6 @@ void *xxxCreateSurfaceWindow(
 
     return (void *) wObjectPointer;    
 }
-
 
 // not tested yet
 struct gws_surface_d *xxxCreateSurface( 
@@ -261,23 +253,14 @@ struct gws_surface_d *xxxCreateSurface(
     return (struct gws_surface_d *) surface;
 }
 
-
+// Create window structure.
 static struct gws_window_d *__create_window_object(void)
 {
     struct gws_window_d *window;
 
     window = (void *) malloc( sizeof(struct gws_window_d) );
-    if ( (void *) window == NULL )
-    {
-        // #fixme
-        debug_print ("__create_window_object: [ERROR] window\n");
-        printf      ("__create_window_object: [ERROR] window\n");
-        // #debug
-        gwssrv_show_backbuffer();
-        while(1){}
-        // #todo 
-        // We need to return.
-        //return NULL; 
+    if ( (void *) window == NULL ){
+        return NULL;
     }
     memset( window, 0, sizeof(struct gws_window_d) );
     window->used = TRUE;
@@ -285,7 +268,6 @@ static struct gws_window_d *__create_window_object(void)
 
     return (struct gws_window_d *) window;
 }
-
 
 /*
  * doCreateWindow:  
@@ -355,7 +337,6 @@ void *doCreateWindow (
 // Obs: 
 // Podemos ir usando apenas um estilo padrão por enquanto.
 
-
 // #todo:
 // Receberemos isso via parametro de função.
 // Default is FALSE.
@@ -371,13 +352,13 @@ void *doCreateWindow (
 // A title bar é criadas pela função
 // que cria o frame.
 
-    // Title bar buttons. [v] [^] [X] 
+// Title bar buttons. [v] [^] [X] 
     int MinimizeButton = FALSE;
     int MaximizeButton = FALSE;
     int CloseButton    = FALSE;
     // ...
 
-    // Items.
+// Items.
     int Background    = FALSE;
     int ClientArea    = FALSE;
     int Shadow        = FALSE;
@@ -387,17 +368,16 @@ void *doCreateWindow (
     int Border        = FALSE;  // usado no edit box.
     // ...
 
-    // Desktop support.
+// Desktop support.
     int ParentWindowDesktopId;    //Id do desktop da parent window.
     int WindowDesktopId;          //Id do desktop da janela a ser criada.
 
-
-    //controle de janela
+// Controle de janela
     struct gws_window_d *windowButton1;  // minimize
     struct gws_window_d *windowButton2;  // maximize
     struct gws_window_d *windowButton3;  // close
 
-    // botões na barra de rolagem.
+// Botões na barra de rolagem.
     struct gws_window_d *windowButton4;
     struct gws_window_d *windowButton5;
     struct gws_window_d *windowButton6;
@@ -413,14 +393,10 @@ void *doCreateWindow (
 // The client rectangle.
 // Isso é uma estrutura local para gerenciarmos o retangulo
 // da área de cliente.
-// Depois temos que copiar os valores para window->rcClient 
+// Depois temos que copiar os valores para window->rcClient
+    struct gws_rect_d  clientRect;
 
-    struct gws_rect_d   clientRect;
-
-//
 // Border
-//
-
 // #
 // Improvisando uma largura de borda.
 // Talvez devamos receber isso via parâmetros.
@@ -433,13 +409,12 @@ void *doCreateWindow (
 // Device context
     unsigned long deviceLeft   = 0;
     unsigned long deviceTop    = 0;
-    unsigned long deviceWidth  = (__device_width  & 0xFFFF );
-    unsigned long deviceHeight = (__device_height & 0xFFFF );
+    unsigned long deviceWidth  = (__device_width  & 0xFFFF);
+    unsigned long deviceHeight = (__device_height & 0xFFFF);
 
 // Position and dimension.
-// passado via argumento.
-// left, top, width, height
-
+// Passado via argumento.
+// left, top, width, height.
     unsigned long WindowX = (unsigned long) (x & 0xFFFF);
     unsigned long WindowY = (unsigned long) (y & 0xFFFF);
     unsigned long WindowWidth  = (unsigned long) (width  & 0xFFFF);
@@ -478,11 +453,10 @@ void *doCreateWindow (
 
     //debug_print ("doCreateWindow:\n");
 
-
     int is_solid = TRUE;
-    if (rop_flags != 0)
+    if (rop_flags != 0){
         is_solid = FALSE;
-
+    }
 
 //
 // style
@@ -494,34 +468,33 @@ void *doCreateWindow (
 
 // Maximized
 // WS_MAXIMIZED
-    if ( style & 0x0001 ){
+    if (style & 0x0001){
         Fullscreen = FALSE;
         Minimized = FALSE;
         Maximized = TRUE;  //:)
     }
 // Minimized
 // WS_MINIMIZED
-    if ( style & 0x0002 ){
+    if (style & 0x0002){
         Fullscreen = FALSE;
         Maximized = FALSE;
         Minimized = TRUE;  //:)
     }
 // Fullscreen
 // WS_FULLSCREEN
-    if ( style & 0x0004 ){
+    if (style & 0x0004){
         Maximized = FALSE;
         Minimized = FALSE;
         Fullscreen = TRUE;  //:)
     }
 
-
-//salvar para depois restaurar os valores originais no fim da rotina.
+// Salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
 	//unsigned long saveTop;
 	
 // Desktop:
-// @todo: Configurar desktop antes de tudo. 
-// @todo: Quando criamos uma janela temos de definir que ela
+// #todo: Configurar desktop antes de tudo. 
+// #todo: Quando criamos uma janela temos de definir que ela
 // pertence ao desktop atual se não for enviado por argumento 
 // o desktop que desejamos que a janela pertença.
 // O argumento onde:
@@ -533,23 +506,22 @@ void *doCreateWindow (
 // um frame, então as dimensões da janela serão as dimensões do retângulo
 // que forma a janela. Talvez chamado de Client Area.
 
-
 // Parent window.
 // Se a parent window enviada por argumento for inválida, 
 // então usaremos a janela gui->screen. ?? 
 // Talvez o certo fosse retornar com erro.
 // ?? Qual deve ser a janela mãe ? Limites ?
-// @todo: devemos checar used e magic da janela mãe.
+// #todo: devemos checar used e magic da janela mãe.
 // #bugbug: 
 // E quando formos criar a gui->screen, quem será a janela mãe?
 
-	/*
+/*
 	if ( (void *) pWindow == NULL ){
 		Parent = (void *) gui->screen;
 	} else {
 		Parent = (void *) pWindow;
 	};
-    */
+ */
 
 // Devemos checar se a janela está no mesmo desktop 
 // que a ajnela mãe.
@@ -568,7 +540,7 @@ void *doCreateWindow (
 	//}
 
 
-// @todo: A atualização da contagem de janela deve ficar aqui,
+// #todo: A atualização da contagem de janela deve ficar aqui,
 // mas me parece que está em outro lugar, ou não tem. ainda.
 // @todo: Se essa não for uma janela filha, então temos que resetar 
 // as informações sobre a janela mãe. porque não procedem.	
@@ -578,22 +550,16 @@ void *doCreateWindow (
 // Importante: 
 // Checando se o esquema de cores está funcionando.
 
-	/*
-	if ( (void *) CurrentColorScheme == NULL ){
-		
+/*
+	if ( (void *) CurrentColorScheme == NULL ){		
 		panic ("CreateWindow: CurrentColorScheme");
-		
 	}else{
-		
-		if ( CurrentColorScheme->used != 1 || 
-		     CurrentColorScheme->magic != 1234 )
-		{
+		if ( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
 		    panic ("CreateWindow: CurrentColorScheme validation");
 		}
-
-		//Nothing.
+		// Nothing
 	}
-    */
+ */
 
 // Create the window object.
     window = (struct gws_window_d *) __create_window_object();
@@ -618,15 +584,15 @@ void *doCreateWindow (
     window->client_dc = NULL;
     window->is_solid = (int) is_solid;
     window->rop = (unsigned long) rop_flags;
-    window->status = (int) (status & 0xFFFFFFFF );
+    window->status = (int) (status & 0xFFFFFFFF);
     window->view   = (int) view;
     window->focus  = FALSE;
     window->dirty  = FALSE;  // Validate
     window->locked = FALSE;
 
-// Event queue.
+// Event queue
     register int e=0;
-    for(e=0; e<32; e++){
+    for (e=0; e<32; e++){
         window->ev_wid[e]=0;
         window->ev_msg[e]=0;
         window->ev_long1[e]=0;
@@ -659,20 +625,20 @@ void *doCreateWindow (
     window->ip_pixel_y = 0;
 // ===================================
 
-// Id.
+// Id
 // We will get an id when we register the window.
     window->id = -1;
 
 // ===================================
 // Title: Just a pointer.
     if ( (void*) title != NULL ){
-        if(*title != 0){
+        if (*title != 0){
             window->name = (char *) title;
         }
-        if(*title == 0){
+        if (*title == 0){
             window->name = (char *) default_window_name;
         }
-    }else if ( (void*) title == NULL ){
+    } else if ( (void*) title == NULL ){
         window->name = (char *) default_window_name;
     };
 
@@ -707,31 +673,29 @@ void *doCreateWindow (
 // ?? Devemos definir quais são os status possíveis da janela.
 
     // Active 
-    if ( window->status == WINDOW_STATUS_ACTIVE )
+    if (window->status == WINDOW_STATUS_ACTIVE)
     { 
         set_active_window(window); 
-        
         //window->active = WINDOW_STATUS_ACTIVE;
         //window->status = (unsigned long) WINDOW_STATUS_ACTIVE;
-        window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
-    
+        window->relationship_status = 
+            (unsigned long) WINDOW_REALATIONSHIPSTATUS_FOREGROUND; 
         //#todo
         //window->z = 0;  //z_order_get_free_slot()
         //...
     }
 
     // Inactive
-    if ( status == WINDOW_STATUS_INACTIVE )
+    if (status == WINDOW_STATUS_INACTIVE)
     { 
         //window->active = WINDOW_STATUS_INACTIVE;
         //window->status = (unsigned long) WINDOW_STATUS_INACTIVE;
-        window->relationship_status = (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
-   
+        window->relationship_status = 
+            (unsigned long) WINDOW_REALATIONSHIPSTATUS_BACKGROUND;
         //todo
         //window->z = 0; //z_order_get_free_slot()
         //...
     }
-
 
 //
 // == Margins and dimensions ======================
@@ -740,7 +704,7 @@ void *doCreateWindow (
 // #todo:
 // Se for uma janela filha o posicionamento deve ser somado às margens 
 // da área de cliente da janela que será a janela mãe.
-// #bugbug @todo 
+// #bugbug #todo 
 // Esses valores de dimensões recebidos via argumento na verdade 
 // devem ser os valores para a janela, sem contar o frame, que 
 // inclui as bordas e a barra de títulos.
@@ -750,30 +714,30 @@ void *doCreateWindow (
     window->width  = (unsigned long) (WindowWidth  & 0xFFFF);
     window->height = (unsigned long) (WindowHeight & 0xFFFF);
 
-// Maximized ?
+// Maximized?
     if (Maximized == TRUE)
     {
         window->left   = deviceLeft;
         window->top    = deviceTop;
         window->width  = deviceWidth;
-        //#todo: Nesse momento temos que ter a altura da barra 
-        //registrada em estrutura.
-        window->height = (deviceHeight - 40); //menos a barra
+        // #todo: Nesse momento temos que ter a altura da barra 
+        // registrada em estrutura.
+        window->height = (deviceHeight - 40);  //menos a barra
     }
 
 // Fullscreen
     if (Fullscreen == TRUE)
     {
-        window->left   = 0;//fullWindowX;
-        window->top    = 0;//fullWindowY;
+        window->left   = 0;  //fullWindowX;
+        window->top    = 0;  //fullWindowY;
         window->width  = deviceWidth;
         window->height = deviceHeight; 
     }
 
     window->width_in_chars  = 
-        (unsigned long) (window->width / 8);  //>>3
+        (unsigned long) (window->width / 8);   //>>3
     window->height_in_chars = 
-        (unsigned long) (window->height / 8); //>>3
+        (unsigned long) (window->height / 8);  //>>3
 
 // =================================
 
@@ -812,25 +776,23 @@ void *doCreateWindow (
 // se formos overlapped e tivermos uma. 
 // Ou modificar o top depois de criarmos a barra de títulos.
 
-
 // left
     clientRect.left = (unsigned long) 2;  // + borda da esq
 // top
     clientRect.top  = (unsigned long) 2;  // + borda superior 
-    // borda + barra.
+// borda + barra.
     if (window->type == WT_OVERLAPPED){
         clientRect.top  = (unsigned long) 2+32;
     }
 // width
 // menos bordas laterais
     clientRect.width  = 
-        (unsigned long) (window->width -2 -2 );
+        (unsigned long) (window->width -2 -2);
 // height
 // menos bordas superior e inferior
     // menos a barra de tarefas.
     clientRect.height = 
         (unsigned long) (window->height -2 -32 -2); 
-
 
 // If we have scrollbars.
 // #todo: Diminuimos as dimensões se o style
@@ -859,7 +821,6 @@ void *doCreateWindow (
 // Margens.
 // Deslocando em relaçao a janela mae.
 
-
 // We don't have a parent wiindow.
 // If this is the first of all windows.
     window->left = WindowX;
@@ -867,19 +828,17 @@ void *doCreateWindow (
 
 // If we have a parent window.
 // parent + arguments
-    if ( (void*) window->parent != NULL)
+    if ( (void*) window->parent != NULL )
     {
         // Sempre é relativo à janela mãe.
         window->left = (window->parent->left + WindowX); 
         window->top  = (window->parent->top  + WindowY);
-        
         // Se a janela mãe é overlapped,
         // então também é relativo à janela de cliente.
         // Pois é o lugar padrão para criar janelas cliente.
         // Isso só não será válido, se uma flag especial 
         // permitir criar uma janela fora da área de cliente.
-        if (window->parent->type == WT_OVERLAPPED)
-        {
+        if (window->parent->type == WT_OVERLAPPED){
             window->left += window->parent->rcClient.left;
             window->top  += window->parent->rcClient.top;
         }
@@ -890,20 +849,17 @@ void *doCreateWindow (
     window->bottom = (unsigned long) ( window->top  + window->height ); 
 //--
 
-
 // Maximized
 // #bugbug
 // max and full aren't the same thing.
 // #todo: use the working area structure.
-    if ( Maximized == TRUE )
-    {
+    if (Maximized == TRUE){
         window->left = deviceLeft;
         window->top  = deviceTop;
     }
 
 // Fullscreen
-    if ( Fullscreen == TRUE )
-    {
+    if (Fullscreen == TRUE){
         window->left = deviceLeft;
         window->top  = deviceTop;
     }
@@ -926,11 +882,11 @@ void *doCreateWindow (
     window->bg_color            = (unsigned int) frame_color;
     window->clientrect_bg_color = (unsigned int) client_color;
 
-//@todo: As outras características do cursor.
-//Características.
+// #todo: As outras características do cursor.
+// Características.
 
-//Estrutura para cursor.
-//todo
+// Estrutura para cursor.
+// todo
     //window->cursor = NULL;
 
 // #todo: 
@@ -940,7 +896,8 @@ void *doCreateWindow (
 
     //window->cursor = (void*) malloc( sizeof(struct cursor_d) );
 
-    //@@todo: Criar uma função: Inicializarcursor(struct cursor_d *cursor).
+// #todo: 
+// Criar uma função: Inicializarcursor(struct cursor_d *cursor).
     //if(window->cursor != NULL)
     //{
     //    window->cursor->objectType = ObjectTypeCursor;
@@ -951,8 +908,7 @@ void *doCreateWindow (
     //	window->cursor->imagePathName = NULL;
     //window->cursor->cursorFile = ??; //@todo: Difícil definir o tipo.
     //	window->cursor->cursorType = cursorTypeDefault;
-    //};
-
+    //}
 
 //Barras.
 //As flags que representam a presença de cada uma das barras
@@ -962,11 +918,7 @@ void *doCreateWindow (
 // The child list
     window->child_list = NULL;
 
-
-//
 // Client window 
-//
-
 // (#importante)
 // Client window support.
 // Obs: A área de cliente será um retângulo e não uma janela.
@@ -986,19 +938,14 @@ void *doCreateWindow (
 
     window->terminal_used = (int) 0;
     window->terminal_magic = (int) 0;
-
     //#suspenso
     //window->terminal_tab   = (int) 0;
-
     //window->terminal_left = (unsigned long) 0;
     //window->terminal_top = (unsigned long) 0;
     //window->terminal_width = (unsigned long) 0;
     //window->terminal_height = (unsigned long) 0;
 
-//
 // Desktop support
-//
-
     //window->desktop = (void*) Desktop; //configurado anteriormente.
     //window->desktop_id = Desktop->id;  //@todo: verificar elemento.
 
@@ -1007,14 +954,12 @@ void *doCreateWindow (
     window->isButton  = 0;
     window->isEditBox = 0;
 
-
 // Context menu: right click
 // ou clicando no icone.
-    window->contextmenu  = NULL;
+    window->contextmenu = NULL;
 
-// menu na menubar.
-    window->barMenu      = NULL;
-
+// menu na menubar
+    window->barMenu = NULL;
 
 // Selected menu item.
 // Caso a janela seja um ítem de menu.
@@ -1023,26 +968,19 @@ void *doCreateWindow (
     // window->text = NULL; 
 
 // Actions
-    window->draw   = FALSE;      //@todo: Cuidado com isso.
+    window->draw   = FALSE;  // #todo: Cuidado com isso.
     window->redraw = FALSE;
-    window->show   = TRUE; //Inicialmente presumimos que precisamos mostrar essa janela.
+    window->show   = TRUE;   // Inicialmente presumimos que precisamos mostrar essa janela.
+
     // Continua ...
-
-
-// Abaixo, elementos referenciados com menor frequência.
 
     //window->desktop = NULL; //@todo: Definir à qual desktop a janela perence.
     //window->process = NULL; //@todo: Definir à qual processo a janela perence.
 
-// Linked list.
-
+// Linked list
     //window->linkedlist = NULL;
 
-//
 // Navigation
-//
-
-// Prev e next.
     window->prev = (void *) Parent;
     window->next = NULL;
 
@@ -1264,33 +1202,30 @@ void *doCreateWindow (
 // estiver disponível.
 // Talvez antes de retornarmos nesse caso seja necessário configurar 
 // mais elementos da estrutura.
-//#bugbug
-//se estamos contruindo a janela, então ela não foi registrada 
-//não podemos checar as coisas na estrutura ainda,
-//mas a estrutura ja existe a algumas coisas foram inicializadas.
+// #bugbug
+// se estamos contruindo a janela, então ela não foi registrada 
+// não podemos checar as coisas na estrutura ainda,
+// mas a estrutura ja existe a algumas coisas foram inicializadas.
 // #importante
 // Pois retornaremos no caso de janelas minimizadas.
 // Provavelmente isso foi usado quando criamos janelas 
 // de referência na inicialização da GUI.(root)
 
-    /*
+/*
     Minimized = 0;
     Minimized = (int) is_window_minimized (window);
-
-    if ( Minimized == 1 )
+    if (Minimized == 1)
     {
         //window->draw = 1; //Devemos pintála no buffer dedicado.
         window->show = 0;
         window->redraw = 0;
         //...
-
         //@todo: Não retornar. 
         //como teste estamos retornando.
-
         goto done;
         //return (void *) window;
     }
-     */
+ */
 
 // #todo: 
 // Maximized ?
@@ -1307,7 +1242,7 @@ void *doCreateWindow (
 // Não conseguimos pintar janelas simples além do height da janela gui->main
 // para janelas overlapped funciona.
 
-    /*
+/*
     Maximized = 0;
     Maximized = (int) is_window_maximized (window);
 
@@ -1346,8 +1281,7 @@ void *doCreateWindow (
         refresh_screen ();
         while (1){}
     }
-    */
-
+ */
 
 // =================================
 // #Shadow
@@ -1417,7 +1351,6 @@ void *doCreateWindow (
         // foi pressionado ou não.
         // ...
     }
-
 
 // ===============================================
 // ## Background ##
@@ -1498,8 +1431,7 @@ void *doCreateWindow (
     //#debug
     //asm ("int $3");
 
-// ===================
-// Client area rectangle.
+// Client area rectangle
 
     if (ClientArea == TRUE){
         window->rcClient.left   = (unsigned long) window->left;
@@ -1559,8 +1491,8 @@ void *doCreateWindow (
             default: 
                 buttonFocus = FALSE;
                 buttonSelected = FALSE;
-                buttonBorderColor1       = COLOR_WHITE;  // left/top
-                buttonBorderColor2       = xCOLOR_GRAY3; // right/bottom
+                buttonBorderColor1       = COLOR_WHITE;   // left/top
+                buttonBorderColor2       = xCOLOR_GRAY3;  // right/bottom
                 buttonBorderColor2_light = xCOLOR_GRAY5;
                 buttonBorder_outercolor  = COLOR_BLACK;
                 break;
@@ -1602,14 +1534,12 @@ void *doCreateWindow (
                 (unsigned int) buttonBorder_outercolor );
 
             // Button label
-
             if (buttonSelected == TRUE){
                 grDrawString ( 
                     (window->left) +offset, 
                     (window->top)  +8, 
                     COLOR_WHITE, window->name );
             }
-
             if (buttonSelected == FALSE){
                 grDrawString ( 
                     (window->left) +offset,  
@@ -1631,10 +1561,9 @@ void *doCreateWindow (
 // Return the pointer.
     return (void *) window;
 fail:
-    debug_print ("doCreateWindow:\n");
+    debug_print ("doCreateWindow: Fail\n");
     return NULL;
 }
-
 
 /*
  * CreateWindow:
@@ -1714,15 +1643,13 @@ void *CreateWindow (
 // Colocar mascara nos valores passados via parâmetro.
 
     switch (type){
-    case WT_OVERLAPPED:  ValidType=TRUE; break;
-    case WT_EDITBOX:
-        ValidType=TRUE; 
+    case WT_OVERLAPPED:
+    case WT_EDITBOX: 
+    case WT_EDITBOX_MULTIPLE_LINES:
+    case WT_BUTTON:
+    case WT_SIMPLE:
+        ValidType=TRUE;
         break;
-    case WT_EDITBOX_MULTIPLE_LINES:  
-        ValidType=TRUE; 
-        break;
-    case WT_BUTTON:      ValidType=TRUE; break;
-    case WT_SIMPLE:      ValidType=TRUE; break;
     };
 
     if (ValidType == FALSE){
@@ -1730,8 +1657,8 @@ void *CreateWindow (
         goto fail;
     }
 
-//1. Começamos criando uma janela simples
-//2. depois criamos o frame. que decide se vai ter barra de títulos ou nao.
+// 1. Começamos criando uma janela simples
+// 2. depois criamos o frame. que decide se vai ter barra de títulos ou nao.
 // No caso dos tipos com moldura então criaremos em duas etapas.
 // no futuro todas serão criadas em duas etapas e 
 // CreateWindow será mais imples.
@@ -1760,15 +1687,14 @@ void *CreateWindow (
         // o modo de operação do window manager.
         // pode ser assincrono.
         
-        if( WindowManager.initialized == TRUE)
+        if (WindowManager.initialized == TRUE)
         {
             // 1 = Tiling mode.
             // Fit into the working area.
-            if(WindowManager.mode == 1)
+            if (WindowManager.mode == 1)
             {
                 // #bugbug: 
-                // Estamos confiando nos valores.
-                
+                // Estamos confiando nos valores. 
                 /*
                  //#suspended #debug
                 x      = WindowManager.wa_left;
@@ -1817,8 +1743,8 @@ void *CreateWindow (
 
         //if ( (void*) pWindow == NULL ){ return NULL; }
 
-        if ( width < EDITBOX_MIN_WIDTH )  { width=EDITBOX_MIN_WIDTH; }
-        if ( height < EDITBOX_MIN_HEIGHT ){ height=EDITBOX_MIN_HEIGHT; }
+        if (width < EDITBOX_MIN_WIDTH)  { width=EDITBOX_MIN_WIDTH; }
+        if (height < EDITBOX_MIN_HEIGHT){ height=EDITBOX_MIN_HEIGHT; }
 
         __w = 
             (void *) doCreateWindow ( 
@@ -1845,17 +1771,17 @@ void *CreateWindow (
 // It does not exist by itself. 
 // It needs a parent window.
 
-//====
+// =======
 // button
 // Podemos usar o esquema padrão de cores ...
-    if ( type == WT_BUTTON )
+    if (type == WT_BUTTON)
     {
         //gwssrv_debug_print ("CreateWindow: WT_BUTTON \n");
       
         //if ( (void*) pWindow == NULL ){ return NULL; }
 
-        if ( width < BUTTON_MIN_WIDTH )  { width=BUTTON_MIN_WIDTH; }
-        if ( height < BUTTON_MIN_HEIGHT ){ height=BUTTON_MIN_HEIGHT; }
+        if (width < BUTTON_MIN_WIDTH)  { width=BUTTON_MIN_WIDTH; }
+        if (height < BUTTON_MIN_HEIGHT){ height=BUTTON_MIN_HEIGHT; }
 
         __w = 
             (void *) doCreateWindow ( 
@@ -1871,7 +1797,7 @@ void *CreateWindow (
              goto fail;
          }
 
-        //pintamos simples, mas a tipagem será  overlapped
+        // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_BUTTON;
         __w->locked = FALSE;
         goto draw_frame;
@@ -1882,10 +1808,10 @@ void *CreateWindow (
 
 //====
 //simple
-    if ( type == WT_SIMPLE )
+    if (type == WT_SIMPLE)
     {
         //gwssrv_debug_print ("CreateWindow: WT_SIMPLE \n");
-        
+
         __w = 
             (void *) doCreateWindow ( 
                          WT_SIMPLE, 0, status, view, (char *) _name,
@@ -1902,7 +1828,6 @@ void *CreateWindow (
 
         __w->type = WT_SIMPLE;
         __w->locked = FALSE;
-
         goto draw_frame;
     }
 
@@ -1920,20 +1845,17 @@ void *CreateWindow (
 // como as bordas de um editbox.
 
 draw_frame:
-
     //gwssrv_debug_print ("CreateWindow: draw_frame \n");
-    
     if ( (void*) __w == NULL ){
         gwssrv_debug_print ("CreateWindow.draw_frame: __w\n");
         goto fail;
     }
-
     if (__w->magic != 1234){
         gwssrv_debug_print ("CreateWindow.draw_frame: __w->magic\n");
         goto fail;
     }
 
-// #IMPORTANTE
+// #importante:
 // DESENHA O FRAME DOS TIPOS QUE PRECISAM DE FRAME.
 // OVERLAPED, EDITBOX, CHECKBOX ...
 
@@ -1967,44 +1889,32 @@ draw_frame:
         }
     }
 
-//
 // z order for overlapped.
-//
-
-    // Quando criamos uma overlapped, ela deve vicar no topo da pilha.
-    if ( type == WT_OVERLAPPED )
+// Quando criamos uma overlapped, ela deve vicar no topo da pilha.
+    if (type == WT_OVERLAPPED)
     {
         // #bugbug
         // refaz a lista de zorder...
         // somente com overlalled
         //reset_zorder();
-        
         // #bugbug isso nao eh bom.
         //invalidate parent, if present
         //invalidate_window(__w->parent);
-
         // coloca a nova janela no topo.
         __w->zIndex = ZORDER_TOP;
         zList[ZORDER_TOP] = (unsigned long) __w;
     }
 
-
 // ===============
 
-//
 // level
-//
-
 // #test
     //gwssrv_debug_print ("CreateWindow.draw_frame: level stuff \n");    
 
-    if ( (void*) pWindow != NULL )
-    {
+    if ( (void*) pWindow != NULL ){
         __w->level = (pWindow->level + 1);
     }
-
-    if ( (void*) pWindow == NULL )
-    {
+    if ( (void*) pWindow == NULL ){
         __w->level = 0;
     }
 
@@ -2015,10 +1925,9 @@ draw_frame:
     __w->dirty = TRUE;
     return (void *) __w;
 fail:
-    gwssrv_debug_print ("CreateWindow: FAIL\n");
+    gwssrv_debug_print ("CreateWindow: Fail\n");
     return NULL;
 }
-
 
 /*
  * RegisterWindow: 
