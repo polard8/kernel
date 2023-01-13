@@ -1,0 +1,5 @@
+
+
+	The kernel has an embedded ring0 shell.
+	See: new/dev/tty/console.c
+

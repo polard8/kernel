@@ -1437,6 +1437,13 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// pci:
+    if ( strncmp( prompt, "pci", 3 ) == 0 ){
+        printf("~pci:\n");
+        pciInfo();
+        goto exit_cmp;
+    }
+
 // about:
     if ( strncmp( prompt, "about", 5 ) == 0 ){
         printf("About: The kernel console\n");

@@ -3,13 +3,10 @@
 
 #include <kernel.h>  
 
-
-//
-// Class strings.
-//
-
+// Class strings
 // Obs: 
 // Parece que outra forma de lista é mais apropriado.
+
 static const char* pci_class_strings[] = {
 	"Unknow",                              //0x00 (Pre 2.0 device)
 	"Mass Storage Controller",             //0x01
@@ -52,10 +49,10 @@ static const char* pci_class_strings[] = {
 int pciInfo(void)
 {
     struct pci_device_d *D;
-    int i=0;
+    register int i=0;
     int Max = PCI_DEVICE_LIST_SIZE;
 
-    printf ("pciInfo: \n");
+    printf ("pciInfo:\n");
 
     for ( i=0; i<Max; i++ )
     {
@@ -64,7 +61,8 @@ int pciInfo(void)
         {
             if ( D->used == TRUE && D->magic == 1234 )
             {
-                printf ("\n [%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
+                printf ("\n");
+                printf ("[%d/%d/%d] Vend=%x Dev=%x Class=%s SubClass=%x iLine=%d iPin=%d \n",
                     D->bus, D->dev , D->func,
                     D->Vendor, D->Device, 
                     pci_class_strings[ D->classCode ], D->subclass, 

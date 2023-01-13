@@ -28,12 +28,13 @@ struct device_d
     char name[64];
     size_t Name_len;    
     // #todo: merge.
-// class: char, block, network
-    int __class;
+
 // struct more complete, with a lot of information.
     struct device_class_d *_class; 
+// class: char, block, network
+    unsigned char __class;
 // pci, legacy ...
-    int type;
+    unsigned char __type;
 
 //
 // == (1) storage ========
@@ -173,8 +174,8 @@ int
 devmgr_register_device ( 
     file *f, 
     char *name,
-    int class, 
-    int type,
+    unsigned char dev_class, 
+    unsigned char dev_type,
     struct pci_device_d *pci_device,
     struct tty_d *tty_device );
 

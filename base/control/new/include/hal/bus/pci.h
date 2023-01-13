@@ -13,7 +13,7 @@ The following field descriptions are common to all Header Types:
 Device ID: 
 Identifies the particular device. 
 Where valid IDs are allocated by the vendor.
-		   
+
 Vendor ID: 
 Identifies the manufacturer of the device. 
 Where valid IDs are allocated by PCI-SIG to ensure uniqueness and 
@@ -630,30 +630,28 @@ struct pci_device_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
     int id;
-    int used;   
-    int magic;   
+    int used;
+    int magic;
 
     char *name;
 
-	//unsigned long flag;   
+    //unsigned long flag;   
     //unsigned long error;  
-	
-	// Status do dispositivo.
-	//int device_status;
-	//char *device_status_string;
-	
-	//
-	// @todo: Completar com os elementos que faltam.
-	//        Seguindo a ordem padrão.
-	
-	
-	//Salvar também qual bus o device pertence.	
-	//Localização do dispositivo.
+
+    // Status do dispositivo.
+    //int device_status;
+    //char *device_status_string;
+
+// #todo: 
+// Completar com os elementos que faltam.
+// Seguindo a ordem padrão.
+
+// Salvar também qual bus o device pertence.
+// Localização do dispositivo.
 
     unsigned char bus;
-    unsigned char dev;   
+    unsigned char dev;
     unsigned char func;
 
     unsigned short Device;

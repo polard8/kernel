@@ -3,7 +3,8 @@
 
 #include <kernel.h>  
 
-
+// Encontrar os dispositivos PCI e salvar as informações sobre eles
+// em suas respectivas estruturas.
 int pci_setup_devices (void)
 {
 
@@ -38,9 +39,9 @@ int pci_setup_devices (void)
         // Device
         for ( j=0; j < PCI_MAX_DEVICES; j++ )
         {
-            // Valid device ?
             Vendor = (unsigned short) pciCheckVendor(i,j);
 
+            // If this is a valid vendor, check all the functions.
             if ( Vendor != 0 && Vendor != PCI_INVALID_VENDORID )
             {
                 //#debug
@@ -48,19 +49,16 @@ int pci_setup_devices (void)
 
                 // Multifunction?
                 // Se o bit 7 estiver acionado, então é multifunction.
-
                 HeaderType = pciGetHeaderType(i,j);
+                funcCount = 
+                    (HeaderType & PCI_TYPE_MULTIFUNC) ? PCI_MAX_FUNCTIONS : 1;
 
-                funcCount = HeaderType & PCI_TYPE_MULTIFUNC ? PCI_MAX_FUNCTIONS : 1;
-
-                // Function.
+                // Functions.
                 // Handle device info.
                 // See: pci.c
-
-                for ( k=0; k<funcCount; k++ )
-                {
+                for ( k=0; k<funcCount; k++ ){
                     pciHandleDevice(i,j,k); 
-                }; 
+                };
             };
         };    // Device for.
     };    // Bus for.

@@ -91,20 +91,20 @@ void devmgr_show_device_list(int object_type)
     printf("\n");
     printf ("devmgr_show_device_list:\n");
 
+// Get the structure pointer and
+// show the info if it's a valid device structure.
+
     for (i=0; i<DEVICE_LIST_MAX; ++i)
     {
-        // Get the device structure.
         d = ( struct device_d *) deviceList[i];
         if ( (void *) d != NULL )
         {
-            // Valid device.
             if ( d->used  == TRUE && d->magic == 1234 )
             {
                 fp = (file *) d->_fp;
-
-                if( (void*) fp != NULL )
+                if ( (void*) fp != NULL )
                 {
-                    if( fp->____object == object_type )
+                    if (fp->____object == object_type)
                     {
 
                         //#debug
@@ -117,7 +117,7 @@ void devmgr_show_device_list(int object_type)
                         printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
                             d->index, 
                             d->__class, 
-                            d->type, 
+                            d->__type, 
                             d->name,
                             d->mount_point );  //#todo
                     }
@@ -209,8 +209,8 @@ int
 devmgr_register_device ( 
     file *f, 
     char *name,
-    int class, 
-    int type,
+    unsigned char dev_class, 
+    unsigned char dev_type,
     struct pci_device_d *pci_device,
     struct tty_d *tty_device )
 {
@@ -265,8 +265,8 @@ devmgr_register_device (
     f->device = (struct device_d *) d;
 // Device index into the deviceList[].
     f->deviceId = d->index; 
-    d->__class = class;
-    d->type    = type;
+    d->__class = (unsigned char) dev_class;
+    d->__type  = (unsigned char) dev_type;
 
 // name
 
