@@ -563,6 +563,14 @@ static void compareStrings(int fd)
         return;
     }
 
+
+// exit: Exit the terminal application.
+    if( strncmp(prompt,"exit",4) == 0 ){
+        printf("~exit: Exit the terminal application\n");
+        exit(0);
+        goto exit_cmp;
+    }
+
     if( strncmp(prompt,"msg",3) == 0 ){
         __test_message();
         goto exit_cmp;
