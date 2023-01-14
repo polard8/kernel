@@ -66,6 +66,7 @@ _kernel_begin:
 
 ; ----------------------
 ; header data area:
+; Exporting ...
     nop                ; Nop
     DB '__GRAMADO__'   ; Signature
     DQ _die            ; symbol 0:
@@ -255,20 +256,21 @@ START:
 ; See:
 ; https://wiki.osdev.org/CPU_Registers_x86-64
 
-; Debug registers:
-; DR0 ~ DR7
-; Debug registers.
-; Disable break points.
+;--------------------------------------
 ; Debug registers:
 ; DR0 ~ DR7
 ; Debug registers.
 ; Disable break points.
 
-    ; #illegal ?
-    ;xor eax, eax
-    ;mov dr2, eax
-    ;mov dr7, eax
-    ;; ...
+; DR0~DR3
+; Contain linear addresses of up to 4 breakpoints. 
+; If paging is enabled, they are translated to physical addresses.
+
+; DR6
+; It permits the debugger to determine 
+; which debug conditions have occurred.
+
+;--------------------------------------
 
 ; Use the calling convention for this compiler.
 ; rdi

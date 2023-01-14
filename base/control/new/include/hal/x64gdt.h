@@ -80,7 +80,6 @@
  * NetBSD style.
  * #obs: Podemos fazer listas de segmentos que formem gdts.
  */
-
 // See:
 // https://wiki.osdev.org/Global_Descriptor_Table
 // https://github.com/torvalds/linux/blob/master/arch/x86/include/asm/desc_defs.h
@@ -97,7 +96,6 @@ struct segment_descriptor_d
 
 // 16 bits
     unsigned long base_23_16 :8;
-
     unsigned long type :4;  //segment type
     unsigned long s    :1;  //s
     unsigned long dpl  :2;  //segment descriptor priority level 
@@ -105,12 +103,10 @@ struct segment_descriptor_d
 
 // 16 bits
     unsigned long limit_19_16 :4;
-
     unsigned long avl :1;
     unsigned long l   :1;
     unsigned long db  :1;
     unsigned long g   :1;
-
     unsigned long base_31_24 :8;
 
 } __attribute__((packed));

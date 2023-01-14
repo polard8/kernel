@@ -47,32 +47,29 @@ tss1:
 tss1_end:
 
 
-;; ==================================
-;; Limpar a flag nt em rflags
-;; e dar refresh na pipeline. #todo
-;; Isso evita taskswitching via hardware quando em 32bit.
+; ==================================
+; Limpar a flag nt em rflags
+; e dar refresh na pipeline. #todo
+; Isso evita taskswitching via hardware quando em 32bit.
 
 global _x64_clear_nt_flag
 _x64_clear_nt_flag:
-    
-    ; Salvando o que vamos usar.
+; Clear Nested Task bit in RFLAGS.
+; bit 14 - NT, Nested task flag.
+
     push rax
     push rbx
-    
-    ; pegando as flags.
+
     pushfq
     pop rax
-    
     mov rbx, 0x0000000000004000
     not rbx
     and rax, rbx
-    
     push rax
     popfq
-    
+
     pop rbx
     pop rax
-    
     ret
 
 
@@ -102,11 +99,10 @@ _gdt_flush:
 ;     preenche todos os vetores, 
 ;     apontando para um só endereço. 'unhandled_int'.
 ;     See: sw.asm
-;; called by xxxhead.asm
+;     called by xxxhead.asm
+;     See: sw.asm
 
 setup_idt:
-
-;     See: sw.asm
 
     ;pushad
     push rax
@@ -221,16 +217,13 @@ d_offset_63_32: dd 0
 ;;====================================
 
 
-
-
-;;==================================================================
+; =============================================================
 ; _setup_system_interrupt: 
-;    Configura um vetor da IDT para a interrupção do sistema. 
-;    O endereço do ISR e o número do vetor são passados via argumento.
+; Configura um vetor da IDT para a interrupção do sistema. 
+; O endereço do ISR e o número do vetor são passados via argumento.
 ; IN:
 ;    rax = endereço. (callback)(endereço do handler)
 ;    rbx = número do vetor (0x80).(número da interrupção.)
-;
 
 global _setup_system_interrupt
 _setup_system_interrupt:
@@ -240,43 +233,36 @@ _setup_system_interrupt:
     push rcx
     push rdx
 
-    ; Endereço e índice na tabela.
+; Endereço e índice na tabela.
+    mov qword [d__address], rax  ; Endereço. 64bit
+    mov qword  [d__number], rbx  ; Número do vetor.
 
-    mov qword [d__address], rax    ;endereço. 64bit
-    mov qword  [d__number], rbx    ;número do vetor.
-
-    ; Calcula o deslocamaneto
+; Calcula o deslocamento.
     xor rax, rax
     mov rax, qword  16
     mov rbx, qword [d__number]
     mul rbx
     ; O resuldado está em rax.
+; Adiciona o deslocamento à base rdi.
+; A base é o início da idt.
+; lembra? O resultado estava em rax.
+    mov rdi, qword _idt
+    add rdi, rax
 
-    ; Adiciona o deslocamento à base rdi.
-    ; A base é o início da idt.
-    mov rdi, qword _idt               
-    add rdi, rax   ; lembra? O resultado estava em rax.
+; Agora rdi contém o endereço de memória
+; dentro da idt, onde desejamos contruir a entrada.
 
-    ; Agora rdi contém o endereço de memória
-    ; dentro da idt, onde desejamos contruir a entrada.
-
-;
 ; Lidando com o endereço.
-;
-
-    ; Salva o endereço de 64bit em rdx.
+; Salva o endereço de 64bit em rdx.
     mov rdx, qword [d__address] 
-
-    ; low 16 
+; low 16 
     mov rax, rdx 
     mov word  [address_offset_15_0],  ax
- 
-    ; high 16
+; high 16
     mov rax, rdx
     shr rax, 16
     mov word  [address_offset_31_16], ax
-
-    ; high 32
+; high 32
     mov rax, rdx
     shr rax, 32
     mov dword [address_offset_63_32], eax
@@ -291,37 +277,33 @@ _setup_system_interrupt:
 ; #bugbug
 ; Checar o que representa esse seletor.
 
-    ;==========================
-    ; Primeiros 32 bits. 
-    ; (offset low and selector)
+;==========================
+; Primeiros 32 bits. 
+; (offset low and selector)
     xor rax, rax
-    mov eax, dword 0x00080000     ; Step1: selector = 0x0008 = cs  na parte alta.
-    mov ax, word  [address_offset_15_0] ; Step2: uma parte do endereço na parte baixa (16 bits)
-    mov dword [rdi+0], eax   
-
-    ;=========================================
-    ; segundos 32 bit.
+    mov eax, dword 0x00080000            ; Step1: selector = 0x0008 = cs  na parte alta.
+    mov ax, word  [address_offset_15_0]  ; Step2: uma parte do endereço na parte baixa (16 bits)
+    mov dword [rdi+0], eax
+;=========================================
+; segundos 32 bit.
     xor rax, rax
     mov ax, word [address_offset_31_16]
     shl rax, 16
     mov ax, word 0xEE00
-    mov dword [rdi+4], eax   
-
-    ;=========================================
-    ; terceiros 32 bit.
+    mov dword [rdi+4], eax
+;=========================================
+; terceiros 32 bit.
     xor rax, rax
     mov eax, dword [address_offset_63_32]
     mov dword [rdi+8], eax
-
-    ;=========================================
-    ; quartos 32 bit.
+;=========================================
+; quartos 32 bit.
     xor rax, rax
     mov dword [rdi+12], eax
+;-----------------
 
-   ;-----------------
-
-    ; Do not load.
-    ;recarrega a nova idt
+; Do not load.
+; recarrega a nova idt
     ;lidt [IDT_register]
 
     pop rdx
@@ -330,7 +312,6 @@ _setup_system_interrupt:
     pop rax
 
     ret
-
 d__address:  dq 0
 d__number:   dq 0
 ;Offset address used in the function above.
@@ -338,8 +319,6 @@ address_offset_15_0:  dw 0
 address_offset_31_16: dw 0
 address_offset_63_32: dd 0
 ;;--
-
-
 
 ;=============================================
 ; setup_faults:
@@ -493,13 +472,9 @@ setup_vectors:
     push rax
     push rbx 
 
-
 ; 32 - Timer.
-; Iniciamos um timer provisório, 
-;depois iniciaremos o definitivo.
-;See: _turn_task_switch_on in  unit3hw.asm.
+; Iniciamos um timer provisório, depois iniciaremos o definitivo.
     mov rax,  qword unhandled_irq
-    ;mov rax,  qword  _irq0 
     mov rbx,  qword 32
     call _setup_system_interrupt
 
@@ -510,15 +485,14 @@ setup_vectors:
     call _setup_system_interrupt
 
 ; 40 - Clock, rtc.
-    mov rax,  qword unhandled_irq ; _irq8
+    mov rax,  qword unhandled_irq
     mov rbx,  qword 40
     call _setup_system_interrupt
 
-;fake nic
-    ;mov rax,  qword _nic_handler
+; fake nic
+    ;mov rax,  qword unhandled_irq
     ;mov rbx,  qword 41
     ;call _setup_system_interrupt
-
 
 ; 44 - PS2 Mouse.
 ; See: unit1hw.asm
@@ -527,12 +501,14 @@ setup_vectors:
     call _setup_system_interrupt
 
 ; 46 - ide
-    mov rax,  qword unhandled_irq ; _irq14 
+; irq 14
+    mov rax,  qword unhandled_irq
     mov rbx,  qword 46
     call _setup_system_interrupt
 
 ; 47 - ide
-    mov rax,  qword unhandled_irq ; _irq15 
+; irq 15
+    mov rax,  qword unhandled_irq
     mov rbx,  qword 47
     call _setup_system_interrupt
 
@@ -558,26 +534,30 @@ setup_vectors:
     mov rax,  qword _int130
     mov rbx,  qword 130
     call _setup_system_interrupt  
+; ...
 
-    ;; ...
-
-
-;;========================
-;; callback restorer.
-;; temos que terminal a rotina do timer e
-;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+;========================
+; The callback restorer.
+; It is called by the ring 3 application
+; after the callback routine ends. Delivering the control back
+; to the kernel.
+; #
+; Temos que terminar a rotina do timer e
+; retornarmos para ring 3 com o contexto o último contexto salvo.
+; #todo
+; Explain it better.
 
     mov rax,  qword callback_restorer
     mov rbx,  qword 198
     call _setup_system_interrupt  
 
-;; =====================
-
+; =====================
 ; Uma interrupção para habilitar as interrupções mascaráveis.
 ; quem usará isso será a thread primária do processo init.
 ; apenas uma vez.
+; It also drop the iop to ring 0.
 ; See: sw.asm
-    
+
     mov rax,  qword _int199
     mov rbx,  qword 199
     call _setup_system_interrupt  
@@ -591,22 +571,18 @@ setup_vectors:
 
 
 ;;=================================================
-;;     # NIC #
-;;
+;; # NIC #
 ;; O kernel chma isso provisoriamente para criar uma entrada
-;; na idt para o nic intel.
-;;
-;; #bugbug: isso está em nicintel.c , mas precisa ser global para que todos 
-;; possam usar.
+;; na idt para o nic Intel.
+;; #bugbug: isso está em nicintel.c, 
+;; mas precisa ser global para que todos possam usar.
 ;; talvez em kernel.h
 ;; isso funcionou, tentar configurar outras interupções com isso.
-;;
 
 ;; Isso foi declarado em nicintel.c
 ;;pegaremos o valor 41 e o endereço do handler.
 extern _nic_idt_entry_new_number
 ;extern _nic_idt_entry_new_address
-
 extern _IDT_register
 
 global _asm_nic_create_new_idt_entry
@@ -614,7 +590,7 @@ _asm_nic_create_new_idt_entry:
 
     push rax
     push rbx
-    
+
     xor rax, rax
     xor rbx, rbx
 
@@ -630,19 +606,16 @@ _asm_nic_create_new_idt_entry:
 ;; #bugbug: na virtualbox é 9 mas no qemu é 11.
     ;mov rbx, qword [_nic_idt_entry_new_number]
     mov rbx, qword 41 ;32+9
-    
+
     call _setup_system_interrupt
 
-;;#test: Não sei se precisa carregar novamente.
-;;ok, sem problemas.
+;; #test: 
+;; Não sei se precisa carregar novamente.
+;; ok, sem problemas.
     lidt [_IDT_register] 
-
     pop rbx
     pop rax
-
     ret 
-
-
 
 ; #test:
 ;Other atomic hardware primitives:
@@ -659,5 +632,4 @@ _asm_nic_create_new_idt_entry:
 ;    ret
 ;__spinlock_test: dq 0
 ;
-
 

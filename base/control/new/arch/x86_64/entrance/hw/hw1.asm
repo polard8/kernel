@@ -1,5 +1,5 @@
 
-; unit1hw.asm
+; hw1.asm
 ; This file handles the traps for the x86_64 processors.
 
 
@@ -29,6 +29,30 @@ _EnableSSE:
     pop rax
     ret
 
+;================================
+; Advanced Vector Extensions is a SIMD (Single Instruction, Multiple Data) 
+; instruction set introduced by Intel in 2011.
+; AVX is enabled by setting bit 2 of the XCR0 register. 
+; Bit 1 of XCR0 must also be set (indicating SSE support).
+; See: 
+; https://wiki.osdev.org/SSE
+; https://en.wikipedia.org/wiki/AVX-512
+global _x64_enable_avx
+_x64_enable_avx:
+
+    push rax
+    push rcx
+    push rdx
+
+    xor rcx, rcx
+    xgetbv     ; Load XCR0 register
+    or eax, 7  ; Set AVX, SSE, X87 bits
+    xsetbv     ; Save back to XCR0
+
+    pop rdx
+    pop rcx
+    pop rax
+    ret
 
 ;;=====================================================
 ;;  ## TIMER ##
@@ -842,26 +866,17 @@ _irq10:
 
 extern _irq_E1000
 
-;;===============================================
-;;  interrupção 41. irq 9;
-
-; Capture context
-; see: unit0lib.asm
-;global _nic_handler2
-;_nic_handler2:
-;    jmp _nic_handler
-;==================
-
-
+;===============================================
+;  interrupção 41. irq 9
 ; Capture context
 global _nic_handler
 _nic_handler:
 
     cli
 
-    ;; Acumulator.
+; Acumulator
     push rax
-   
+
     push rax
     push rbx
     push rcx
@@ -929,19 +944,17 @@ _nic_handler:
 
     ; EOI: Order: Second, first.
     mov al, 0x20
-    out 0xA0, al  
+    out 0xA0, al
     IODELAY  
     out 0x20, al
-    IODELAY  
+    IODELAY
 
-    
     ;; The acumulator.
     pop rax
 
     sti
     iretq
-
-;;===========================
+;===========================
 
 
 ;=======================================
@@ -1408,27 +1421,17 @@ _irq15:
 extern _faults
 
 unhandled_irq:
-
     cli
     push rax
-
-
-    ;#debug
-    ;call _faults
-
     mov al, 0x20
-    
     out 0xA0, al
     IODELAY  
     IODELAY  
-    
     out 0x20, al
     IODELAY
     IODELAY  
-
     pop rax
     sti 
-
     iretq
 ;--
 

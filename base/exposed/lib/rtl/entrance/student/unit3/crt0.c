@@ -294,6 +294,10 @@ por exemplo: o crt0 do aplicativo ativa a proteçao
 e o crt0 do driver, não ativa.
 */
 
+// The IOPL defines the minimum CPL required to 
+// directly access I/O ports and to 
+// execute I/O Sensitive Instructions (IN, INS, OUT, OUTS, CLI, STI). 
+
     asm volatile ("int $199");
 
 // Depois de lido o stdin e colocada acmdline no buffer local,

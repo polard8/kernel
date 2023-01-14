@@ -32,19 +32,19 @@ int x64_init_gdt(void)
 
     // debug_print ("[x64] x64_init_gdt: [DANGER] \n");
 
-// #danger
-// limpando gdt.
-
-    memset(
-        &xxx_gdt[GNULL_SEL],
-        0,
-        sizeof(struct segment_descriptor_d)*32 );
+// Clean the GDT. #danger
+    unsigned long GDT_Base = (unsigned long) &xxx_gdt[GNULL_SEL];
+    size_t        GDT_NumberOfEntries = DESCRIPTOR_COUNT_MAX;  //32 
+    size_t        GDT_Size = 
+        (size_t) (sizeof(struct segment_descriptor_d) * GDT_NumberOfEntries);
+    memset( GDT_Base, 0, GDT_Size );
 
 // IN: 
 // (entry address, limit, base, type, s, dpl, p, avl, l, db, g)
 
 // null
-    set_gdt_entry ( &xxx_gdt[GNULL_SEL], 
+    set_gdt_entry ( 
+        &xxx_gdt[GNULL_SEL], 
         0,0,0,0,0,0,0,0,0,0);
 
 // ring 0
@@ -111,27 +111,37 @@ int x64_init_gdt(void)
 // Save current tss.
 // Create gdt entry for the tss. (two entries)
 
-    tss = (void *) kmalloc ( sizeof(struct tss_d) );
-
+    tss = (void *) kmalloc( sizeof(struct tss_d) );
     if ( (void *) tss == NULL ){
-        debug_print ("[x64] x64_init_gdt: \n");
-              panic ("[x64] x64_init_gdt: \n");
+        debug_print ("[x64] x64_init_gdt:\n");
+              panic ("[x64] x64_init_gdt:\n");
     }
 
+// Initializing the tss structure,
+// given the ring0 stack pointer.
     tss_init ( 
         (struct tss_d *) tss,  // tss 
         (void *) &rsp0Stack    // ring 0 stack address
         );
 
-    CurrentTSS = tss;
+    // tss, dpl 3
+    // Two entries.
+    set_gdt_entry( 
+        &xxx_gdt[GTSS_SEL], 
+        sizeof(struct tss_d) - 1, 
+        (unsigned long) tss, 
+        0x9,0,3,1,0,0,0,1);
+    set_gdt_entry( 
+        &xxx_gdt[GTSS_CONT_SEL], 
+        (unsigned long) tss >> 32,
+        (unsigned long) tss >> 48,
+        0,0,0,0,0,0,0,0);
 
-    set_gdt_entry ( &xxx_gdt[GTSS_SEL], 
-        sizeof( struct tss_d ) - 1, (unsigned long) tss,0x9,0,3,1,0,0,0,1); //tss dpl 3
-    set_gdt_entry ( &xxx_gdt[GTSS_CONT_SEL], 
-        (unsigned long) tss >> 32, (unsigned long) tss >> 48,0,0,0,0,0,0,0,0);
+    CurrentTSS = tss;
+    //CurrentTSS = (struct tss_d *) tss;
 
 //
-// Load GDT.
+// Load GDT
 //
 
 // Limit and base.
@@ -151,20 +161,13 @@ int x64_init_gdt(void)
 // #todo
 // print gdt entries.
 
-//
-// Load tr   [DANGER]
-//
 
-// Load TR.
+// Load TR. #danger
 // 0x2B = (0x28+3).
-// #bugbug
-// Falha quando carregamos isso.
-
     x64_load_ltr(0x2B);
 
     return 0;
 }
-
 
 // Set segment.
 // Probably stolen from minix or netbsd.
@@ -225,8 +228,12 @@ tss_init (
 
 // Clean
     memset ( tss, 0, sizeof *tss );
+    //memset ( tss, 0, sizeof(struct tts_d) ); //#todo
 
 // ring 0 stack
+    //#todo
+    //if ( stack_address == 0 )
+    //    panic("tss_init: stack_address\n");
     tss->rsp0 = (unsigned long) stack_address;  // va?? 
 
     //#debug
@@ -586,10 +593,10 @@ void get_cpu_intel_parameters(void)
  * L2 cache information (Intel)
  * EAX Reserved
  * EBX Reserved
- * ECX Bits:  
+ * ECX Bits:
  *     Bits 0-7: Cache Line Size.
  *     Bits 12-15: L2 Associativity.
- *     Bits 16-31: Cache size in 1K units.   
+ *     Bits 16-31: Cache size in 1K units.
  * EDX Reserved
  */
 
@@ -602,7 +609,7 @@ void get_cpu_intel_parameters(void)
 
 // Bits 0-7: Cache Line Size.
     processor->L2LineSize = 
-        (unsigned long)(ecx & 0x00FF);  
+        (unsigned long)(ecx & 0x00FF);
 
 // Bits 12-15: L2 Associativity.
     processor->L2Associativity = 
@@ -613,8 +620,7 @@ void get_cpu_intel_parameters(void)
         (unsigned long)((ecx >> 16) & 0xFFFF);
 
     //printf("L2LineSize={%d Byte}\n",(unsigned long) processor->L2LineSize);
-
-    //printf("L2Cachesize={%d KB}\n",(unsigned long) processor->L2Cachesize);
+    //printf("L2Cachesize={%d KB} \n",(unsigned long) processor->L2Cachesize);
 
 //========================================
 // EAX=80000007h: Advanced Power Management Information
@@ -741,7 +747,6 @@ void fpu_load_control_word(const uint16_t control)
     asm volatile ("fldcw %0;"::"m"(control)); 
 }
 
-
 // x64 disable interrupts.
 // maybe inline.
 void x64_disable_interrupts (void)
@@ -781,6 +786,13 @@ void x64_stop_cpu (void)
     x64_cli_hlt();
 }
 
+/*
+inline void __invalidate_cache_flush(void);
+inline void __invalidate_cache_flush(void)
+{
+    asm ("wbinvd");
+}
+*/
 
 // Enable cache.
 // credits: barrelfish.

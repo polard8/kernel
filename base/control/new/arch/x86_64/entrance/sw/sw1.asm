@@ -1,5 +1,5 @@
 
-; sw.asm
+; sw1.asm
 ; This file handles syscall for x86_64 processors.
 ; 0x80, 0x81, 0x82
 
@@ -81,13 +81,12 @@ _int128:
     and rax, 3
     mov qword [_sci0_cpl], rax
 
-
     fxsave [__sw_local_fpu_buffer]
 
     call _sci0
 
+; ---------------
     fxrstor [__sw_local_fpu_buffer]
-
     mov qword [.int128Ret], rax 
 
     popfq
@@ -157,7 +156,8 @@ extern _sci1_cpl
 global _int129
 _int129:
 
-; #todo: Maybe we can save the stack frame.
+; #todo: 
+; Maybe we can save the stack frame.
 
     pop qword [.int129_rip]
     pop qword [.int129_cs]
@@ -212,9 +212,8 @@ _int129:
 
     call _sci1
 
+;-----------------------
     fxrstor [__sw_local_fpu_buffer]
-
-
     mov qword [.int129Ret], rax 
 
     popfq
@@ -272,7 +271,6 @@ _int129:
 ;
 ;     #todo: 
 ;     Maybe we can receive more values using more registers.
-;
 ;;-----
 
 ;extern _xxxxINT130_DEBUG_MESSAGE
@@ -337,9 +335,8 @@ _int130:
 
     call _sci2
 
+; ----------------------
     fxrstor [__sw_local_fpu_buffer]
-
-
     mov qword [.int130Ret], rax 
 
     popfq
@@ -391,25 +388,36 @@ _int130:
     
     
 
-
-
+; ----------------------------------------------
 ; int 199
-; This is called only from the init process in user mode.
 ; It will enable the interrupts and the taskswitching
 ; for the first time.
+; It is because the kernel goes to the init process
+; with the interrupts disabled. ;)
+; This is called only from the init process in user mode.
 ; see: INIT.BIN.
+; #
+; I guess all the processes in ring 3 are calling this routine.
 
 global _int199
 _int199:
+; Enable the interrupts.
+; 9 -IF, Interrupt enable flag
+; Changing the iopl.
+; bits 12-13 - IOPL, I/O privilege level.
+; We drop the minimum iopl level to ring 0,
+; so, this way only a process with cpl 0
+; is able to use instructions like in, out, cli, sti.
+
     pop qword [.frameRIP]
     pop qword [.frameCS]
     pop qword [.frameRFLAGS]
 
-; iopl 3
-    ;mov qword [.frameRFLAGS], 0x0000000000003200
 ; iopl 0
     mov qword [.frameRFLAGS], 0x0000000000000200
-    
+; iopl 3
+    ;mov qword [.frameRFLAGS], 0x0000000000003200
+
     push qword [.frameRFLAGS]
     push qword [.frameCS]
     push qword [.frameRIP]
