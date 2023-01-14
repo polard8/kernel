@@ -45,8 +45,10 @@
  
 struct rtc_d
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
+    int used;
+    int magic;
 
     unsigned long flag;
     unsigned long error;
@@ -59,23 +61,20 @@ struct rtc_d
     unsigned long Month;
     unsigned long Year;
 };
-struct rtc_d  *Rtc;
-struct rtc_d  *rtc;
 
+extern struct rtc_d *rtc;
 
 //
 // == prototypes =======================
 //
-
-void DeviceInterface_RTC(void);
-int init_rtc(void);
 
 unsigned long read_cmos_bcd(unsigned reg);
 unsigned long get_date(void);
 unsigned long get_time(void);
 unsigned short rtcGetBaseMemory(void);
 unsigned short rtcGetExtendedMemory(void);
-void *get_cmos_info(void);
+
+int init_rtc(void);
 
 #endif    
 
