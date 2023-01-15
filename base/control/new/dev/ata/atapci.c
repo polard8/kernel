@@ -69,7 +69,7 @@ diskWritePCIConfigAddr (
 /*
  * diskPCIScanDevice:
  *     Busca um dispositivo de acordo com a classe.  
- *     Esta função deve retornar uma varia'vel contendo: 
+ *     Esta função deve retornar uma variável contendo: 
  *     + O número de barramento, 
  *     + o dispositivo e  
  *     + a função.
@@ -133,7 +133,6 @@ uint32_t diskPCIScanDevice(int class)
  * atapciConfigurationSpace:
  *     Espaço de configuraçao PCI Mass Storage.
  */
-
 // Nessa rotina:
 // + Encontra o tipo de driver, ser é IDE, RAID, AHCI ou Desconhecido.
 
@@ -153,10 +152,7 @@ int atapciConfigurationSpace(struct pci_device_d *D)
         printf ("atapciConfigurationSpace: D struct\n");
         goto fail;
     }
-
-    if ( D->used != TRUE || 
-         D->magic != 1234 )
-    {
+    if ( D->used != TRUE || D->magic != 1234 ){
         printf ("atapciConfigurationSpace: D validation\n");
         goto fail;
     }
@@ -174,14 +170,13 @@ int atapciConfigurationSpace(struct pci_device_d *D)
 //#endif
 
 
-    /*
-    if ( D->Vendor == 0x1106 && D->Device == 0x0591 )
-    {
+/*
+    if ( D->Vendor == 0x1106 && D->Device == 0x0591 ){
         kprintf ("VIA disk found\n");
     } else if (D->Vendor == 0x1106 && D->Device == 0x0591){
         // ...
     };
-    */
+ */
 
 // Obtendo informações.
 // Classe code, programming interface, revision id.
@@ -206,8 +201,8 @@ int atapciConfigurationSpace(struct pci_device_d *D)
 // == #IDE ========
 //
 
-
 // ====
+    // 1:1 = IDE
     if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_IDE ){
 
         // #type: (IDE).
@@ -264,6 +259,7 @@ int atapciConfigurationSpace(struct pci_device_d *D)
 // pois não daremos suporte à IDE RAID.
 
 // ====
+    // 1:4 = RAID
     }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_RAID ){
 
         // #type: (ATA RAID).
@@ -280,6 +276,7 @@ int atapciConfigurationSpace(struct pci_device_d *D)
 // para esse tipo de controlador.
 
 // ====
+    // 1:6 = SATA
     }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_SATA ){
 
         // #type (ACHI)
@@ -322,15 +319,14 @@ int atapciConfigurationSpace(struct pci_device_d *D)
 //#endif
 
 
-//
+// ====
 // No type
-//
-
 // Fail!
 // O tipo de dispositivo de armazenaento de massa 
 // não é suportado.
 
-// ====
+    // Fail
+    // ?:? = Class/subclass not supported.
     }else{
         // #type: Unknown controller.
         ata.chip_control_type = ATA_UNKNOWN_CONTROLLER;

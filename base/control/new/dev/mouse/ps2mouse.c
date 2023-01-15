@@ -411,10 +411,16 @@ void ps2mouse_initialize_device(void)
 // Initialize the file structure ... buffer ...
 // IN:
 // fp, pathname, class, type, pcidevice?, ttydevice?
+
+// #test
+// Registrando o dispositivo.
     devmgr_register_device ( 
         (file *) fp, 
-        "/DEV/MOUSE0",
-        0, 1, NULL, NULL );
+        "/DEV/MOUSE0",       // pathname 
+        DEVICE_CLASS_CHAR,   // class (char, block, network)
+        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
+        NULL,                // Not a pci device.
+        NULL );              // Not a tty device. (not for now)
 //====================================
 
 // pointer.
@@ -681,7 +687,6 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
     PS2Mouse.initialized = TRUE;
-    //debug_print ("ps2mouse_initialize_device: done\n");
 }
 
 // Called by irq12_MOUSE in mouse.c.

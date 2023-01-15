@@ -396,7 +396,7 @@ wmProcedure (
         // O ws mandará mensagens para a thread associa
         // à janela com foco de entrada.
             
-        if ( ShellFlag!=TRUE ){
+        if (ShellFlag!=TRUE){
             //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
         }
 
@@ -451,61 +451,49 @@ wmProcedure (
             // NO, we're not using the kernel console.
             // Pois não queremos que algum aplicativo imprima na tela
             // enquanto o console virtual está imprimindo.
-            if ( ShellFlag != TRUE )
+            if (ShellFlag != TRUE)
             {
-
-                if (ctrl_status == TRUE && long1 == 'x')
-                { 
-                    //printf("CUT\n"); refresh_screen(); 
-                    post_message_to_ws( NULL, MSG_CUT, long1, long2 );
-                    return 0;
-                }
-
-                if (ctrl_status == TRUE && long1 == 'c')
-                { 
-                    //printf("COPY\n"); refresh_screen(); 
+                if (ctrl_status == TRUE && long1 == 'c'){
                     post_message_to_ws( NULL, MSG_COPY, long1, long2 );
                     return 0;
                 }
 
-                if (ctrl_status == TRUE && long1 == 'v')
-                {
-                    //printf("PASTE\n"); refresh_screen();
+                if (ctrl_status == TRUE && long1 == 'v'){
                     post_message_to_ws( NULL, MSG_PASTE, long1, long2 );
                     return 0;
                 }
 
-                if (ctrl_status == TRUE && long1 == 'z')
-                {
-                    //printf("UNDO\n"); refresh_screen();
+                if (ctrl_status == TRUE && long1 == 'x'){
+                    post_message_to_ws( NULL, MSG_CUT, long1, long2 );
+                    return 0;
+                }
+
+                if (ctrl_status == TRUE && long1 == 'z'){
                     post_message_to_ws( NULL, MSG_UNDO, long1, long2 );
                     return 0;
                 }
 
-                if (ctrl_status == TRUE && long1 == 'a')
-                {
-                    //printf("SELECT ALL\n"); refresh_screen();
+                if (ctrl_status == TRUE && long1 == 'a'){
                     post_message_to_ws( NULL, MSG_SELECT_ALL, long1, long2 );
                     return 0;
                 }
 
-                if (ctrl_status == TRUE && long1 == 'f')
-                {
-                    //printf("FIND\n"); refresh_screen();
+                if (ctrl_status == TRUE && long1 == 'f'){
                     post_message_to_ws( NULL, MSG_FIND, long1, long2 );
                     return 0;
                 }
 
-                if (ctrl_status == TRUE && long1 == 's')
-                {
-                    //printf("SAVE\n"); refresh_screen();
+                if (ctrl_status == TRUE && long1 == 's'){
                     post_message_to_ws( NULL, MSG_SAVE, long1, long2 );
                     return 0;
                 }
- 
-                
-                // Enviando combinação de shift + tecla de digitaçao.
-                post_message_to_ws( NULL, msg, long1,long2 );
+
+                // ...
+
+                // No caso da combinação não ter sido tratada na rotina acima.
+                // Enviamos combinação de [shift + tecla] de digitaçao.
+                post_message_to_ws( NULL, msg, long1, long2 );
+                // return 0;
 
                 // Send it to the window server.
                 //wmSendInputToWindowManager(0,MSG_KEYDOWN,long1,long2);
@@ -560,7 +548,8 @@ wmProcedure (
         
     case MSG_SYSKEYDOWN:
 
-        // Esse procedimento é para combinações de teclas.
+        // #??
+        // Não enviamos mensagem caso não seja combinação?
         if( shift_status != TRUE &&
             ctrl_status != TRUE &&
             alt_status != TRUE )
@@ -715,8 +704,8 @@ wmProcedure (
                 break;
 
             case VK_F9:
+                // Enter ring0 embedded shell.
                 if (ctrl_status == TRUE){
-                    // Enter ring0 embedded shell.
                     __enter_embedded_shell(FALSE);
                     return 0;
                 }
@@ -735,8 +724,8 @@ wmProcedure (
                 break;
 
             case VK_F10:
+                // Exit ring0 embedded shell.
                 if (ctrl_status == TRUE){
-                    // Exit ring0 embedded shell.
                     __exit_embedded_shell();
                     return 0;
                 }
@@ -754,8 +743,8 @@ wmProcedure (
                 break;
 
             case VK_F11:
+                // Mostra informaçoes sobre as threads.
                 if (ctrl_status == TRUE){
-                    // Mostra informaçoes sobre as threads.
                     show_slots();
                     return 0;
                 }
@@ -770,19 +759,17 @@ wmProcedure (
                 break;
 
             case VK_F12:
+                // Mostra informaçoes sobre os processos.
                 if (ctrl_status == TRUE){
-                    // Mostra informaçoes sobre os processos.
                     show_process_information();
                     return 0;
                 }
                 if (alt_status == TRUE){
                     //post_message_to_ws( NULL, (int) 77112,0, 0 );
                 }
-                // #test
-                // SHIFT + F12
-                // Switch focus?
-                // Posting messages to the window server.
-                // Into the control thread's queue,
+
+                // [SHIFT + F12]
+                // Update desktop and show the mouse pointer.
                 // IN: window, msg code, data1, data2.
                 if (shift_status == TRUE){
                     post_message_to_ws( NULL, (int) 88112,0, 0 );
@@ -796,8 +783,6 @@ wmProcedure (
             }
 
 // ==============
-// msg:
-// default
     default:
         return -1;
         break;
@@ -1232,7 +1217,7 @@ wmKeyEvent(
 
         // Nothing.
         goto done;
-    }// FI
+    }
 
 // ================================================
 // key_pressed:
@@ -1241,7 +1226,7 @@ wmKeyEvent(
     if ( (Keyboard_RawByte & 0x80) == 0 ) 
     {
         // Break = FALSE;
-        
+
         Keyboard_ScanCode = Keyboard_RawByte;
         Keyboard_ScanCode &= KEYBOARD_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
@@ -1408,20 +1393,17 @@ wmKeyEvent(
             // se pressionamos teclas de sistema como capslock desligado
             if (capslock_status == TRUE || shift_status == TRUE)
             { Event_LongASCIICode = shift_abnt2[Keyboard_ScanCode]; goto done; }
-            
             // ...
         }
-
-        // Nothing.
+        // Nothing
         goto done;
-        
-    } // FI
+    }
 
 //
 // == Dispatch ====
 //
 
-// Done.
+// Done
 // Para finalizar, vamos enviar a mensagem para fila certa.
 // Fixing the rawbyte to fit in the message arg.
 // See: kgwm.c
@@ -1429,7 +1411,7 @@ wmKeyEvent(
 done:
 
     Event_LongRawByte = 
-        (unsigned long) ( Keyboard_RawByte & 0x000000FF );
+        (unsigned long) (Keyboard_RawByte & 0x000000FF);
 
 // Não tem virtual key '0'.
     if (Event_LongASCIICode == 0){
@@ -1500,16 +1482,16 @@ done:
         // Somente ascii.
         // #todo: Nesse caso da pra enviar os primeiros ascii
         // que representam comandos.
-        if ( Event_Message == MSG_KEYDOWN )
+        if (Event_Message == MSG_KEYDOWN)
         {
             // Se uma tecla de controle estiver acionada,
             // então não mandamos o evento para o arquivo,
             // pois vamos chamar o procedimento local e
             // considerarmos a combinação de teclas, 
             // antes de enviarmos o evento.
-            if( alt_status != TRUE && 
-                ctrl_status != TRUE && 
-                shift_status != TRUE )
+            if ( alt_status != TRUE && 
+                 ctrl_status != TRUE && 
+                 shift_status != TRUE )
             {
                 __feedSTDIN( (unsigned long) Event_LongASCIICode );
             }
@@ -1523,9 +1505,9 @@ done:
         // considerarmos a combinação de teclas, 
         // antes de enviarmos o evento.
         // O estado de capslock não importa aqui.
-        if( alt_status != TRUE && 
-            ctrl_status != TRUE && 
-            shift_status != TRUE )
+        if ( alt_status != TRUE && 
+             ctrl_status != TRUE && 
+             shift_status != TRUE )
         {
             post_message_to_ws(
                 NULL, 
@@ -1573,7 +1555,6 @@ done:
     return (int) __Status;
     //return 0;
 }
-
 
 // ----------------------------------------------
 // wmMouseEvent:
@@ -1705,25 +1686,18 @@ int windowLoadGramadoIcons(void)
 	//#debug
 	//printf("windowLoadGramadoIcons:\n");
 
-//
-//  ## Icon support ##
-//
-
+// ## Icon support ##
 //iconSupport:
-
-	// Carregando alguns ícones básicos usados pelo sistema.
-
-	// ## size ##
-	// Vamos carregar ícones pequenos.
-	//@todo checar a validade dos ponteiros.
-
-    // #bugbug
-    // Size determinado, mas não sabemos o tamanho dos ícones.
-
-    // 4 pages.
-    // 16 KB ? Is it enough ?
-    // Sim, os ícones que estamos usam possuem no máximo 2KB.
-    // See: base/
+// Carregando alguns ícones básicos usados pelo sistema.
+// ## size ##
+// Vamos carregar ícones pequenos.
+//@todo checar a validade dos ponteiros.
+// #bugbug
+// Size determinado, mas não sabemos o tamanho dos ícones.
+// 4 pages.
+// 16 KB ? Is it enough ?
+// Sim, os ícones que estamos usam possuem no máximo 2KB.
+// See: base/
 
     unsigned long tmp_size = (4*4096);
 
@@ -1863,8 +1837,7 @@ void set_update_screen_frequency(unsigned long fps)
 
 // See: sched.h
     flush_fps = (unsigned long) (fps&0xFFFF);
-
-    presence_level = (unsigned long)(1000/flush_fps);
+    presence_level = (unsigned long) (1000/flush_fps);
     presence_level = (unsigned long) (presence_level & 0xFFFF);
 }
 
@@ -1894,8 +1867,9 @@ void schedulerUpdateScreen(void)
     }
 
 // Atualizado pelo timer.
-    if ( UpdateScreenFlag != TRUE )
+    if (UpdateScreenFlag != TRUE){
         return;
+    }
 
     deviceWidth  = (deviceWidth & 0xFFFF);
     deviceHeight = (deviceHeight & 0xFFFF);
@@ -1907,31 +1881,25 @@ void schedulerUpdateScreen(void)
 // at gwssrv.bin
 // 9091 = message code for calling the compositor.
 
-    if( gUseWMCallbacks == TRUE){
+    if (gUseWMCallbacks == TRUE){
         //wmSendInputToWindowManager(0,9091,0,0);
     }
 
 // ============================
-
-    // Precisamos apenas validar todos retangulos
-    // porque fizemos refresh da tela toda.
+// Precisamos apenas validar todos retangulos
+// porque fizemos refresh da tela toda.
     
     int validate_all= FALSE;
 
-//
 // Flush the whole screen and exit.
-//
-
 // The whole screen is invalidated.
-    if ( screen_is_dirty == TRUE )
+    if (screen_is_dirty == TRUE)
     {
         refresh_screen();
         validate_all = TRUE;
-        
         // Validate the screen
         screen_is_dirty = FALSE;
     }
-
 
 /*
 //=========================
@@ -1948,9 +1916,7 @@ void schedulerUpdateScreen(void)
 */
 
 
-//
 // Flush a list of dirty surfaces.
-//
 
     for ( i=0; i < THREAD_COUNT_MAX; ++i )
     {
@@ -1967,8 +1933,8 @@ void schedulerUpdateScreen(void)
                 
                 if ( (void *) TmpThread->surface_rect != NULL )
                 {
-                    if( TmpThread->surface_rect->used == TRUE && 
-                        TmpThread->surface_rect->magic == 1234 )
+                    if ( TmpThread->surface_rect->used == TRUE && 
+                         TmpThread->surface_rect->magic == 1234 )
                     {
                         // Como fizemos refresh da tela toda,
                         // então precisamos validar todos os retângulos.
@@ -1980,15 +1946,14 @@ void schedulerUpdateScreen(void)
                         // Se uma surface está suja de tinta.
                         // Precisamos copiar para o framebuffer.
 
-
-                        if( TmpThread->surface_rect->dirty == TRUE )
+                        if ( TmpThread->surface_rect->dirty == TRUE )
                         {
                             refresh_rectangle ( 
                                 TmpThread->surface_rect->left, 
                                 TmpThread->surface_rect->top, 
                                 TmpThread->surface_rect->width, 
                                 TmpThread->surface_rect->height );
-                            
+
                             // Validate the surface. (Rectangle)
                             TmpThread->surface_rect->dirty = FALSE;
                         }
@@ -1998,7 +1963,6 @@ void schedulerUpdateScreen(void)
             }
         }
     };
-    
 
 // Chamamos o 3d demo do kernel.
 // See: kgws.c
@@ -2008,7 +1972,6 @@ void schedulerUpdateScreen(void)
         //demo0();
         DemoFlag=FALSE;
     }
-
 
 // Atualizado pelo timer.
     UpdateScreenFlag = FALSE;

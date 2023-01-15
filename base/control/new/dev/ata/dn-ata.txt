@@ -1,0 +1,10 @@
+
+
+	#todo
+	Me parece que em nenhum momento na rotina de inicialização
+	o dispositivo foi registrado, como acontece na sondagem dos 
+	outros dispositivos pci.
+
+	Precisa registrar na estrutura de dispositivos e na
+	lista de dispositivos. Colocando informações como
+	a classe do dispositivo. (char, block, network). No caso, block.

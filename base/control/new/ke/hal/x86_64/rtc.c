@@ -112,15 +112,15 @@ unsigned short rtcGetBaseMemory (void)
     unsigned char lowmem=0;
     unsigned char highmem=0;
 
-    //Low. (Low base memory byte)
+// Low. (Low base memory byte)
     out8(0x70, RTC_LOWBYTE_BASEMEMORY);
     lowmem = in8(0x71);
-    
-    //High. (High base memory byte)
+// High. (High base memory byte)
     out8(0x70, RTC_HIGHBYTE_BASEMEMORY);
     highmem = in8(0x71);
-
-    //Total.
+// Total.
+// #bugbug 
+// #todo: Write a better code here.
     total = lowmem | highmem << 8;
 
     return (unsigned short) total;
@@ -164,11 +164,9 @@ unsigned short rtcGetExtendedMemory(void)
 // Low. (Low extended memory byte)
     out8 (0x70, RTC_LOWBYTE_EXTENDEDMEMORY);
     lowmem = in8(0x71);
-
 // High. (High extended memory byte)
     out8 (0x70, RTC_HIGHBYTE_EXTENDEDMEMORY);
     highmem = in8(0x71);
-
 // Total.
 // #bugbug 
 // #todo: Write a better code here.

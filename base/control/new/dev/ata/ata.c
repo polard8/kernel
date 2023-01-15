@@ -228,28 +228,24 @@ static unsigned char __ata_config_structure (char nport)
 // todo
 // filtrar limits.
 
+    // 0~3
     switch (nport){
-
     case 0:
-        ata.channel = ATA_PRIMARY; //0;  // primary
-        ata.dev_num = ATA_MASTER;  //0;  // not slave ATA_MASTER
+        ata.channel = ATA_PRIMARY;    //0;  // primary
+        ata.dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
         break;
-
     case 1: 
-        ata.channel = ATA_PRIMARY; //0;  // primary
-        ata.dev_num = ATA_SLAVE;   //1;  // slave    ATA_SLAVE
+        ata.channel = ATA_PRIMARY;    //0;  // primary
+        ata.dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
         break;
-
     case 2:
         ata.channel = ATA_SECONDARY;  //1;  // secondary
         ata.dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
         break;
-
     case 3:
         ata.channel = ATA_SECONDARY;  //1;  // secondary
         ata.dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
         break;
-
     default:
         // panic ?
         printk ("Port %d not used\n", nport );
@@ -257,7 +253,7 @@ static unsigned char __ata_config_structure (char nport)
         break;
     };
 
-    // local worker.
+// local worker.
     __set_ata_addr (ata.channel);
 
     return 0;
@@ -271,8 +267,9 @@ inline void atapi_pio_read ( void *buffer, uint32_t bytes )
 // No checks!
 // #todo: Port number via parameter.
 
-    if(bytes == 0)
+    if (bytes == 0){
         return;
+    }
 
     asm volatile  (\
         "cld;\
@@ -329,6 +326,19 @@ ata_ioctl (
 
 int ata_initialize (int ataflag)
 {
+
+/*
+	#todo
+	Me parece que em nenhum momento na rotina de inicialização
+	o dispositivo foi registrado, como acontece na sondagem dos 
+	outros dispositivos pci.
+
+	Precisa registrar na estrutura de dispositivos e na
+	lista de dispositivos. Colocando informações como
+	a classe do dispositivo. (char, block, network). No caso, block.
+*/
+
+
     int Status = -1;  //error
     int Value = -1;
     // iterator.
@@ -449,7 +459,7 @@ int ata_initialize (int ataflag)
 // BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
 
     ATA_BAR0_PRIMARY_COMMAND_PORT   = ( PCIDeviceATA->BAR0 & ~7 ) + ATA_IDE_BAR0_PRIMARY_COMMAND   * ( !PCIDeviceATA->BAR0 );
-    ATA_BAR1_PRIMARY_CONTROL_PORT   = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1_PRIMARY_CONTROL   * ( !PCIDeviceATA->BAR1 );       
+    ATA_BAR1_PRIMARY_CONTROL_PORT   = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1_PRIMARY_CONTROL   * ( !PCIDeviceATA->BAR1 );
     ATA_BAR2_SECONDARY_COMMAND_PORT = ( PCIDeviceATA->BAR2 & ~7 ) + ATA_IDE_BAR2_SECONDARY_COMMAND * ( !PCIDeviceATA->BAR2 );
     ATA_BAR3_SECONDARY_CONTROL_PORT = ( PCIDeviceATA->BAR3 & ~3 ) + ATA_IDE_BAR3_SECONDARY_CONTROL * ( !PCIDeviceATA->BAR3 );
 
@@ -457,12 +467,15 @@ int ata_initialize (int ataflag)
     ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5            * ( !PCIDeviceATA->BAR5 );
 
 // Colocando nas estruturas.
-    ide_ports[0].base_port = (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
-    ide_ports[1].base_port = (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT   & 0xFFFF);
-    ide_ports[2].base_port = (unsigned short) (ATA_BAR2_SECONDARY_COMMAND_PORT & 0xFFFF);
-    ide_ports[3].base_port = (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF);
+    ide_ports[0].base_port = 
+        (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
+    ide_ports[1].base_port = 
+        (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT   & 0xFFFF);
+    ide_ports[2].base_port = 
+        (unsigned short) (ATA_BAR2_SECONDARY_COMMAND_PORT & 0xFFFF);
+    ide_ports[3].base_port = 
+        (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF);
     // Tem ainda a porta do dma na bar4.
-
 
 //
 // De acordo com o tipo.
@@ -475,8 +488,7 @@ int ata_initialize (int ataflag)
 // >> Isso acontece  logo acima quando chamamos
 // a funçao atapciConfigurationSpace()
 
-    if ( ata.used != TRUE || ata.magic != 1234 )
-    {
+    if ( ata.used != TRUE || ata.magic != 1234 ){
         printk("ata_initialize: ata structure validation\n");
         goto fail;
     }
@@ -725,17 +737,17 @@ int ide_identify_device (uint8_t nport)
 // https://wiki.osdev.org/ATA_PIO_Mode
 // https://wiki.osdev.org/PCI_IDE_Controller
 
-    /*
+/*
     // #exemplo:
     // get the "signature bytes" 
-    unsigned cl=inb(ctrl->base + REG_CYL_LO);	
+    unsigned cl=inb(ctrl->base + REG_CYL_LO);
     unsigned ch=inb(ctrl->base + REG_CYL_HI);
     differentiate ATA, ATAPI, SATA and SATAPI 
     if (cl==0x14 && ch==0xEB) return ATADEV_PATAPI;
     if (cl==0x69 && ch==0x96) return ATADEV_SATAPI;
     if (cl==0 && ch == 0) return ATADEV_PATA;
     if (cl==0x3c && ch==0xc3) return ATADEV_SATA;
-    */
+ */
 
 // Saving.
     // lba1 = in8( ata.cmd_block_base_address + ATA_REG_LBA1 );
@@ -744,15 +756,10 @@ int ide_identify_device (uint8_t nport)
     // REG_CYL_LO = 4
     // REG_CYL_HI = 5
 
-//
-// SIGNATURE:
+// Signature:
 // Getting signature bytes.
-//
-
     sig_byte_1 = in8( ata.cmd_block_base_address + 4 );
     sig_byte_2 = in8( ata.cmd_block_base_address + 5 );
-
-
 
 // #todo
 // In this moment we're trying to find 
@@ -788,7 +795,6 @@ int ide_identify_device (uint8_t nport)
 // Cylinder High Register 
 // (LBAhi) Partial Disk Sector address.
 #define ATA_REG_LBA2      0x05
-
 */
 
 // See:
@@ -805,7 +811,6 @@ int ide_identify_device (uint8_t nport)
 #define Device          6
 #define Status          7
 #define Command         7
-
     unsigned long Max_LBA=0;
     unsigned int port = (ata.cmd_block_base_address & 0xFFFF);
 */    
@@ -814,7 +819,6 @@ int ide_identify_device (uint8_t nport)
 //Isso foi chamado logo acima.
     //out8(port+Command, 0xF8);  //READ NATIVE MAX ADDRESS
     //out8(port+Command, 0xEC);  //ATA_CMD_IDENTIFY_DEVICE
-
 
 // Wait 
     //while ( in8(port+Status) &  BSY != 0)
@@ -844,8 +848,7 @@ int ide_identify_device (uint8_t nport)
     // usando nessa função.
 
     //debug_print("ide_identify_device: hdd_ata_pio_read()\n");
-  
-    
+
 /*
     hdd_ata_pio_read ( 
         (unsigned int) nport, 
@@ -860,7 +863,6 @@ int ide_identify_device (uint8_t nport)
     ata_wait_not_busy();
     ata_wait_no_drq();
 */
-
 
 /*  
     //#todo: 60 se for words e 120 se for bytes.

@@ -25,11 +25,8 @@ int pci_setup_devices (void)
 
     unsigned char i=0;
     unsigned char j=0;
-    
-    // inside loop
     unsigned char k=0;
     register int funcCount=0;
-
 
     debug_print ("pci_setup_devices: [TODO]\n");
 
@@ -71,7 +68,6 @@ int pci_setup_devices (void)
 
     return 0; 
 }
-
 
 /*
  * scan_pci_device_list:
@@ -143,7 +139,6 @@ struct pci_device_d *scan_pci_device_list2 (
 
     return NULL;
 }
-
 
 //
 // End

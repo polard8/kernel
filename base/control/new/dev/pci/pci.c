@@ -617,9 +617,9 @@ pciHandleDevice (
     uint32_t data=0;
 
 // char, block, network
-    unsigned char __class=0;
-    unsigned char __subclass=0;
-    unsigned char __type=0;
+    unsigned char __device_class=0;  // Not defined yet.
+// pci, legacy
+    unsigned char __device_type = DEVICE_TYPE_PCI;
 
     unsigned char _irq_line=0;
     unsigned char _irq_pin=0;
@@ -688,11 +688,10 @@ pciHandleDevice (
     data = 
         (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
 
-// Class and subclass
-    __class      = (unsigned char) (data >> 24) & 0xFF;
-    __subclass   = (unsigned char) (data >> 16) & 0xFF;
-    D->classCode = (unsigned char) __class;
-    D->subclass  = (unsigned char) __subclass;
+
+// PCI Class and subclass
+    D->classCode = (unsigned char) (data >> 24) & 0xFF;
+    D->subclass  = (unsigned char) (data >> 16) & 0xFF;
 
 // #bugbug: 
 // #test
@@ -741,18 +740,22 @@ pciHandleDevice (
 // nvidia
     if (D->Vendor == 0x10DE){
         debug_print ("pciHandleDevice: [TODO] nvidia device found\n");
+        __device_class = DEVICE_CLASS_CHAR;
     }
 // VIA
     if ( D->Vendor == 0x1106 || D->Vendor == 0x1412 ){
         debug_print ("pciHandleDevice: [TODO] VIA device found\n");
+        __device_class = DEVICE_CLASS_CHAR;
     }
 // realtek
     if ( D->Vendor == 0x10EC || D->Vendor == 0x0BDA ){
         debug_print ("pciHandleDevice: [TODO] realtek device found\n");
+        __device_class = DEVICE_CLASS_CHAR;
     }
 // logitec
     if (D->Vendor == 0x046D){
         debug_print ("pciHandleDevice: [TODO] logitec device found\n");
+        __device_class = DEVICE_CLASS_CHAR;
     }
 
     // ...
@@ -763,9 +766,12 @@ pciHandleDevice (
 // see: e1000.c
 // Class 3.
 
-// Network device:
+// Network device: (Class 3)
     if (D->classCode == PCI_CLASSCODE_NETWORK)
     {
+        // Network device
+        __device_class = DEVICE_CLASS_NETWORK;
+
         //--------------
         // e1000
         if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )
@@ -817,6 +823,7 @@ pciHandleDevice (
 
     if (D->classCode == PCI_CLASSCODE_SERIALBUS)
     {
+        __device_class = DEVICE_CLASS_CHAR;
         if ( (D->Vendor == 0x8086) && (D->Device == 0x7000 ) )
         {
             debug_print ("0x8086:0x7000 found\n");
@@ -927,15 +934,13 @@ pciHandleDevice (
 // file structure, device name, class (char,block,network).
 // type (pci, legacy), pci device structure, tty driver struct.
 
-    __type = (unsigned char) 1;
-
     devmgr_register_device ( 
-        (file *) __file, 
-        newname,            // pathname.
-        (unsigned char) __class, 
-        (unsigned char) __type, 
-        (struct pci_device_d *) D,  // It's a pci device.
-        NULL );                     // It's not a tty device.
+        (file *) __file,                 // file
+        newname,                         // pathname.
+        (unsigned char) __device_class,  // char | block | network
+        (unsigned char) __device_type,   // pci  | legacy
+        (struct pci_device_d *) D,       // It's a pci device.
+        NULL );                          // It's not a tty device.
 
 // 0 = No error.
     return 0;

@@ -66,14 +66,18 @@ void ps2kbd_initialize_device (void)
     fp->magic = 1234;
     fp->____object = ObjectTypeFile;
     fp->isDevice = TRUE;
-    //#todo: Initialize the file structure ... buffer ...
+
+// #todo: Initialize the file structure ... buffer ...
+
+// #test
+// Registrando o dispositivo.
     devmgr_register_device ( 
         (file *) fp, 
-        "/DEV/KBD0",        // pathname 
-        0,             // class (char, block, network) #todo
-        1,             // type (pci, legacy)    #todo
-        NULL,          // Not a pci device.
-        NULL );        // Not a tty device. (not for now)
+        "/DEV/KBD0",         // pathname 
+        DEVICE_CLASS_CHAR,   // class (char, block, network)
+        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
+        NULL,                // Not a pci device.
+        NULL );              // Not a tty device. (not for now)
 //====================================
 
 // globals
@@ -81,14 +85,12 @@ void ps2kbd_initialize_device (void)
     keyboard_init_modifier_keys();
     // ...
 
-// enable keyboard port
+// Enable keyboard port
     wait_then_write(I8042_STATUS, 0xae);
     keyboard_expect_ack();
 
     PS2Keyboard.initialized = TRUE;
-    //debug_print ("ps2kbd_initialize_device: done\n");
 }  
-
 
 /*
  * DeviceInterface_PS2Keyboard: 
@@ -301,19 +303,17 @@ void keyboardDisable (void)
 
 // keyboardEnable:
 //     Enable keyboard.
-
 void keyboardEnable (void)
 {
+
     // #bugbug
     // Dizem que isso pode travar o sistema.
 
-	// Wait for bit 1 of status reg to be zero.
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting Enable command.
     while ( ( in8 (0x64) & 2) != 0 )
     {
-		//Nothing.
     };
-
-	//Send code for setting Enable command.
     out8 (0x60,0xF4);
     //sleep(100);
 }
@@ -323,34 +323,29 @@ void keyboardEnable (void)
  *     Set keyboard flags.
  *     ED = Set led.
  */
-
 void keyboard_set_leds (char flag)
 {
     //#todo: Filtro.
 
-    // Wait for bit 1 of status reg to be zero.
+// Wait for bit 1 of status reg to be zero.
+// Send code for setting the flag.
     while ( ( in8 (0x64) & 2) != 0 )
     {
-        // Nothing.
     };
-    // Send code for setting the flag.
     out8 (0x60,0xED); 
     sleep (100);
 
-
-    // Wait for bit 1 of status reg to be zero.
+// Wait for bit 1 of status reg to be zero.
+// Send flag. 
     while ( ( in8 (0x64) & 2) != 0 )
     {
-        // Nothing.
     };
-    // Send flag. 
     out8 (0x60,flag);
     sleep (100);
 
-    // #todo: Mudar o status.
+// #todo: Mudar o status.
     // switch(flag){}
 }
-
 
 // keyboardGetKeyState:
 // Pega o status das teclas de modificação.
@@ -359,7 +354,7 @@ unsigned long keyboardGetKeyState(int vk)
     unsigned long State=0;
     int Lvk = (int) (vk & 0xFF);
 
-    if(Lvk<0){
+    if (Lvk<0){
         return 0;
     }
 
@@ -384,7 +379,6 @@ unsigned long keyboardGetKeyState(int vk)
     return (unsigned long) (State & 0xFFFFFFFF);
 }
 
-
 // Get alt Status.
 int get_alt_status (void)
 {
@@ -402,7 +396,6 @@ int get_shift_status (void)
 {
     return (int) shift_status;
 }
-
 
 // xxx_keyboard_read:
 // Esta função será usada para ler dados do teclado na 

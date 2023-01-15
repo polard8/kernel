@@ -1425,6 +1425,7 @@ int consoleCompareStrings(void)
 
 // device: Device list.
 // Show tty devices, pci devices and devices with regular file.
+// See: devmgr.c
     if ( strncmp(prompt,"device",6) == 0 )
     {
         printf("tty devices:\n");

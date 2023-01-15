@@ -6,6 +6,15 @@
 
 extern unsigned long nicList[8]; 
 
+// unix-like
+#define DEVICE_CLASS_CHAR     1
+#define DEVICE_CLASS_BLOCK    2
+#define DEVICE_CLASS_NETWORK  3
+
+//#test
+#define DEVICE_TYPE_PCI  1
+#define DEVICE_TYPE_LEGACY  2  //ISA?
+
 // struct more complete, with a lot of information.
 struct device_class_d 
 {
@@ -29,8 +38,14 @@ struct device_d
     size_t Name_len;    
     // #todo: merge.
 
+// #todo: good for pci devices?
 // struct more complete, with a lot of information.
     struct device_class_d *_class; 
+    
+//
+// Device class
+//
+
 // class: char, block, network
     unsigned char __class;
 // pci, legacy ...
@@ -121,8 +136,8 @@ struct device_d  *PS2MouseDevice;
 // NUMBER_OF_FILES
 #define DEVICE_LIST_MAX    512
 
-unsigned long deviceList[DEVICE_LIST_MAX];    
-
+// see: devmgr.c
+extern unsigned long deviceList[DEVICE_LIST_MAX];
 
 //
 // == Objects ======================
@@ -135,7 +150,6 @@ file *PS2KeyboardDeviceObject;
 file *PS2MouseDeviceObject;
 // ...
 
-
 //
 // == ttys ======================
 //
@@ -146,7 +160,6 @@ file *PS2MouseDeviceObject;
 struct tty_d *PS2KeyboardDeviceTTY;
 struct tty_d *PS2MouseDeviceTTY;
 // ...
-
 
 //
 // == tty drivers ======================

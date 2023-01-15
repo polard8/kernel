@@ -1162,6 +1162,8 @@ diskATAPCIConfigurationSpace (
 //#endif
 
 
+// ======================================================
+
 // Obtendo informações.
 // Classe code, programming interface, revision id.
 // Salvando informações.
@@ -1182,8 +1184,9 @@ diskATAPCIConfigurationSpace (
 //  ## IDE ##
 //
 
-    if ( ata_pci.classe == 1 && ata_pci.subclasse == 1 )
-    {
+    // 1:1 = IDE
+    if ( ata_pci.classe == 1 && ata_pci.subclasse == 1 ){
+
         // IDE
         //#debug
         //printf (">>> IDE \n");
@@ -1195,8 +1198,8 @@ diskATAPCIConfigurationSpace (
 
         // Compatibilidade e nativo, primary.
         data  = diskReadPCIConfigAddr( bus, dev, fun, 8 );
-        if ( data & 0x200 )
-        { 
+        if (data & 0x200)
+        {
             diskWritePCIConfigAddr ( 
                 bus, dev, fun, 
                 8, (data | 0x100) ); 
@@ -1204,7 +1207,7 @@ diskATAPCIConfigurationSpace (
 
         // Compatibilidade e nativo, secundary.
         data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
-        if ( data & 0x800 )
+        if (data & 0x800)
         { 
             diskWritePCIConfigAddr ( 
                 bus, dev, fun, 
@@ -1212,15 +1215,14 @@ diskATAPCIConfigurationSpace (
         }
 
         data = diskReadPCIConfigAddr( bus, dev, fun, 8 );
-        if ( data & 0x8000 )
+        if (data & 0x8000)
         {
             // Bus Master Enable
             data = diskReadPCIConfigAddr(bus,dev,fun,4);
             diskWritePCIConfigAddr(bus,dev,fun,4,data | 0x4);
         } 
 
-
-	    // Habilitar interrupcao (INTx#)
+        // Habilitar interrupcao (INTx#)
         data = diskReadPCIConfigAddr( bus, dev, fun, 4 );
         diskWritePCIConfigAddr( bus, dev, fun, 4, data & ~0x400);
 
@@ -1241,88 +1243,90 @@ diskATAPCIConfigurationSpace (
 //
 //  ## RAID ##
 //
-    }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 4 )
-          {
-              //RAID
-              //printf (">>> RAID \n");
-              //#debug
-              //refresh_screen();
-              //while(1){}
-              //refresh_screen();
 
-              ata.chip_control_type = ATA_RAID_CONTROLLER;
+    // 1:4 = RAID
+    }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 4 ){
+
+        // RAID
+        //printf (">>> RAID \n");
+        //#debug
+        //refresh_screen();
+        //while(1){}
+        //refresh_screen();
+
+        ata.chip_control_type = ATA_RAID_CONTROLLER;
  
-              printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-                  ata_sub_class_code_register_strings[ata.chip_control_type], 
-                  ata_pci.prog_if,
-                  ata_pci.revision_id );
+        printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+            ata_sub_class_code_register_strings[ata.chip_control_type], 
+            ata_pci.prog_if,
+            ata_pci.revision_id );
 
-              // Em avaliacao
-              return PCI_MSG_AVALIABLE;
+        // Em avaliacao
+        return PCI_MSG_AVALIABLE;
 
 //
 //  ## ACHI ##  SATA
 //
 
-          }else if ( ata_pci.classe == 1 && ata_pci.subclasse == 6 )
-                {
-                    // ACHI
-                    //#debug
-                    //printf (">>> SATA \n");
-                    //while(1){}
-                    //refresh_screen();
+    // 1:6 = SATA
+    } else if ( ata_pci.classe == 1 && ata_pci.subclasse == 6 ){
 
-                    ata.chip_control_type = ATA_AHCI_CONTROLLER;
+        // ACHI
+        //#debug
+        //printf (">>> SATA \n");
+        //while(1){}
+        //refresh_screen();
 
-                    // Compatibilidade e nativo, primary.
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-                    if ( data & 0x200 )
-                    { 
-                        diskWritePCIConfigAddr ( 
-                            bus, dev, fun, 
-                            8, 
-                            data | 0x100 ); 
-                    }        
+        ata.chip_control_type = ATA_AHCI_CONTROLLER;
 
-                    // Compatibilidade e nativo, secundary.
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-                    if ( data & 0x800 )
-                    { 
-                        diskWritePCIConfigAddr ( 
-                            bus, dev, fun, 
-                            8, 
-                            data | 0x400 ); 
-                    }
+        // Compatibilidade e nativo, primary.
+        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        if (data & 0x200)
+        {
+            diskWritePCIConfigAddr ( 
+                bus, dev, fun, 
+                8, data | 0x100 ); 
+        }
 
-                    // ??
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-                    if ( data & 0x8000 ) 
-                    {    
-                        // Bus Master Enable.
-                        data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-                        diskWritePCIConfigAddr ( bus, dev, fun, 4, data | 0x4 );
-                    } 
+        // Compatibilidade e nativo, secundary.
+        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        if (data & 0x800)
+        {
+            diskWritePCIConfigAddr ( 
+                bus, dev, fun, 
+                8, data | 0x400 ); 
+        }
 
-                    // IDE Decode Enable
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 0x40 );
-                    diskWritePCIConfigAddr ( bus, dev, fun, 0x40, data | 0x80008000 );
+        // ??
+        data = diskReadPCIConfigAddr ( bus, dev, fun, 8 );
+        if (data & 0x8000) 
+        {
+            // Bus Master Enable.
+            data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
+            diskWritePCIConfigAddr ( bus, dev, fun, 4, data | 0x4 );
+        } 
 
-                    // Habilitar interrupcao (INTx#)
-                    data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
-                    diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
+        // IDE Decode Enable
+        data = diskReadPCIConfigAddr ( bus, dev, fun, 0x40 );
+        diskWritePCIConfigAddr ( bus, dev, fun, 0x40, data | 0x80008000 );
 
-                    printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-                        ata_sub_class_code_register_strings[ata.chip_control_type], 
-                        ata_pci.prog_if,
-                        ata_pci.revision_id );
+        // Habilitar interrupcao (INTx#)
+        data = diskReadPCIConfigAddr ( bus, dev, fun, 4 );
+        diskWritePCIConfigAddr ( bus, dev, fun, 4, data & ~0x400);
 
-                // Ok
+        printf("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
+            ata_sub_class_code_register_strings[ata.chip_control_type], 
+            ata_pci.prog_if,
+            ata_pci.revision_id );
 
-                } else {
-                    // Panic
-                    printf ("diskATAPCIConfigurationSpace: [FAIL] DRIVER BLOCK!");
-                    die();
-                };
+    // Fail
+    // ?:? = Class/subclass not supported.
+    } else {
+        // #panic
+        printf ("diskATAPCIConfigurationSpace: [bl/dd/ide.c]\n");
+        printf ("class/subclass not supported\n\n");
+        die();
+    };
 
 // #obs:
 // Nesse momento já sabemos se é IDE, RAID, AHCI.

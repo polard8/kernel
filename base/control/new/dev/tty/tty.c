@@ -105,7 +105,7 @@ __tty_read (
     };
 
 // Quantidade de bytes no buffer local.
-    if ( i <= 0 ){
+    if (i <= 0){
         printf("__tty_read: i <= 0\n");
         return 0;
     }
@@ -255,7 +255,6 @@ fail:
  *     Ler uma certa quantidade de bytes, 
  * da tty para o buffer indicado no argumento.
  */
-
 // #todo
 // O aplicativo ou servidor poderia chamar essa rotina
 // se ele tiver o fd do dispositivo tty onde o teclado esta
@@ -276,13 +275,10 @@ tty_read (
 
     debug_print ("tty_read: [FIXME]\n");
 
-
     pid_t current_process = (pid_t) get_current_process();
 
 // fd
-
-    if ( fd < 0 || fd > 31 )
-    {
+    if ( fd < 0 || fd > 31 ){
         return (int) (-EBADF);
     }
 
@@ -298,36 +294,31 @@ tty_read (
 // Vamos pegar o ponteiro de estrutura
 // do processo que chamou essa funçao
 
-    if(current_process<0 ||
-       current_process >= PROCESS_COUNT_MAX)
-    {
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         return -1;
     }
-
     p = (struct process_d *) processList[current_process];
-
     if ((void*) p == NULL){
         debug_print("tty_read: p\n");
         return -1;
     }
-
-    if(p->magic != 1234)
+    if (p->magic != 1234){
         return -1;
+    }
 
 // file
 // The object
 
     f = (file *) p->Objects[fd];
-
     if ((void*) f == NULL){
         debug_print("tty_read: f\n");
         return -1;
     }
-
-    if(f->magic != 1234)
+    if (f->magic != 1234){
         return -1;
+    }
 
-    if( f->____object != ObjectTypeTTY ){
+    if ( f->____object != ObjectTypeTTY ){
         debug_print("tty_read: ____object\n");
         return -1;
     }
@@ -336,17 +327,15 @@ tty_read (
 // Pega a tty representada pelo arquivo.
 
     __tty = (struct tty_d *) f->tty;
-    
     if ( (void*) __tty == NULL ){
         debug_print("tty_read: __tty\n");
         return -1;
     }
-
-    //if(__tty->magic != 1234)
-        //return -1;
+    // #todo
+    // if(__tty->magic != 1234)
+    //     return -1;
 
 // Read from tty device.
-
      return (int) __tty_read ( 
                       (struct tty_d *) __tty, 
                       (char *) buffer, 
@@ -372,8 +361,7 @@ tty_write (
     pid_t current_process = (pid_t) get_current_process();
 
 // fd
-    if ( fd < 0 || fd > 31 )
-    {
+    if ( fd < 0 || fd > 31 ){
         return (int) (-EBADF);
     }
 
@@ -392,34 +380,29 @@ tty_write (
 // que chamou essa funçao, dentro da lista global
 // de ponteiros de processos.
 
-    if(current_process<0 ||
-       current_process >= PROCESS_COUNT_MAX)
-    {
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         return -1;
     }
-
     p = (struct process_d *) processList[current_process];
-
     if ((void*) p == NULL){
         debug_print("tty_write: p\n");
         return -1;
     }
-
-    if(p->magic != 1234)
+    if (p->magic != 1234){
        return 1;
+    }
 
 // file
-
     f = (file *) p->Objects[fd];
-
     if ((void*) f == NULL){
         debug_print("tty_write: f\n");
         return -1;
     }
-
-    if(f->magic != 1234)
+    if (f->magic != 1234){
         return -1;
+    }
 
+// Object tty.
     if ( f->____object != ObjectTypeTTY ){
         debug_print("tty_write: ____object\n");
         return -1;
@@ -427,25 +410,21 @@ tty_write (
 
 // tty
 // Pega a tty representada pelo arquivo.
-
     __tty = (struct tty_d *) f->tty;
-    
     if ( (void*) __tty == NULL ){
         debug_print("tty_write: __tty\n");
         return -1;
     }
+    // #todo
+    // if(__tty->magic != 1234)
+    //     return -1;
 
-     //if(__tty->magic != 1234)
-         //return -1;
-
-// Read tty.
-
+// Read tty
     return (int) __tty_write ( 
                      (struct tty_d *) __tty, 
                      (char *) buffer, 
                      (int) n );
 }
-
 
 // tty_reset_termios: 
 // Reset termios in a given tty.
@@ -730,12 +709,12 @@ struct tty_d *tty_create(void)
 // See: devmgr.c
 
     devmgr_register_device ( 
-        (file *) __file,  // file 
-        newname,          // pathname 
-        0,                // class (char, block, network)
-        1,                // type (pci, legacy
-        NULL,     // Not a pci device.
-        __tty );  // tty device
+        (file *) __file,     // file 
+        newname,             // pathname 
+        DEVICE_CLASS_CHAR,   // class (char, block, network)
+        DEVICE_TYPE_LEGACY,  // type (pci, legacy)
+        NULL,                // Not a pci device.
+        __tty );             // This is a tty device.
 
 // ==========================================
 
@@ -748,10 +727,8 @@ struct tty_d *tty_create(void)
     return (struct tty_d *) __tty;
 }
 
-
 // file to tty.
 // OUT: tty pointer.
-
 struct tty_d *file_tty (file *f)
 {
     if ( (void *)f==NULL ){
@@ -760,7 +737,6 @@ struct tty_d *file_tty (file *f)
     }
     return (struct tty_d *) f->tty;
 }
-
 
 // #todo
 // flush the output buffer to the current virtual console.
@@ -859,9 +835,10 @@ tty_sets (
         debug_print("tty_sets: [FAIL] tty\n");
         return -1;
     }
-    if(tty->magic != 1234){
+    if (tty->magic != 1234){
         return -1;
     }
+
     if (options < 0){
         debug_print("tty_sets: [FAIL] options\n");
         return -1;
@@ -898,7 +875,6 @@ int tty_init_module (void)
     // ...
     return 0;
 }
-
 
 // tty_ioctl:
 // Pegaremos a estrutura de tty.

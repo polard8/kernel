@@ -3,6 +3,10 @@
 
 #include <kernel.h>  
 
+
+unsigned long deviceList[DEVICE_LIST_MAX];
+
+
 // Lista de placas de rede.
 // #todo:
 // O valor máximo precisa ser definido. 
@@ -27,7 +31,7 @@ file *devmgr_search_in_dev_list(char *path)
     struct device_d *tmp_dev;
     void *p;
 
-    if( (void*) path == NULL ){
+    if ( (void*) path == NULL ){
         return NULL;
     }
 
@@ -55,7 +59,6 @@ file *devmgr_search_in_dev_list(char *path)
                         // #debug
                         printf ("Device found!\n");
                         refresh_screen();
-
                         return (file *) tmp_dev->_fp;
                     }
                 }
@@ -116,8 +119,8 @@ void devmgr_show_device_list(int object_type)
                         //#todo: more ...
                         printf ( "id=%d class=%d type=%d name={%s} mount_point={%s} \n", 
                             d->index, 
-                            d->__class, 
-                            d->__type, 
+                            d->__class,  // char | block | network
+                            d->__type,   // pci  | legacy
                             d->name,
                             d->mount_point );  //#todo
                     }
@@ -274,41 +277,32 @@ devmgr_register_device (
     memset( buf, 0, PathSize );
 
     // Se um nome não foi indicado.
-    if( (void*) name == NULL )
+    if ( (void*) name == NULL )
     {
-        sprintf ( 
-            buf,  //(char *) &buf[0], 
-            "/DEV%d", 
-            id );
+        sprintf ( buf, "/DEV%d", id );
         strcpy( new_mount_point, buf );
     }
 
     size_t NameSize=0;
  
     // Se um nome foi indicado.
-    if( (void*) name != NULL )
+    if ( (void*) name != NULL )
     {
         NameSize = (size_t) strlen(name);
-        if(NameSize >= PathSize){
+        if (NameSize >= PathSize){
             panic("devmgr_register_device: NameSize");
         }
-        sprintf ( 
-            buf,  //(char *) &__tmp_mount_point[0], 
-            name );
-            
+        sprintf ( buf, name );
         strcpy( new_mount_point, buf );
     }
 
 // /dev/tty0
-    d->mount_point = (char *) new_mount_point; 
-  
+    d->mount_point = (char *) new_mount_point;
     // DEV_8086_8086
     //d->name ??
-    
     //#todo
     //d->name[0] = 'x';
     d->name[0] = 0;
-
 // pci device
     d->pci_device = (struct pci_device_d *) pci_device;
 // tty device
