@@ -152,7 +152,8 @@ static void do_launch_de(void)
 {
     int ret_val=-1;
 
-    printf ("~WSQ\n");
+    printf ("Launching GUI\n");
+
     ret_val = (int) rtl_clone_and_execute(app1_name);
     if (ret_val<=0){
         printf("Couldn't clone\n");
@@ -341,27 +342,18 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 // Initialize the window server and quit the command line.
-/*
     if ( strncmp(prompt,"wsq",3) == 0 ){
         printf ("~WSQ\n");
-        ret_val = (int) rtl_clone_and_execute(app1_name);
-        if (ret_val<=0){
-            printf("Couldn't clone\n");
-        }
-        //printf("pid=%d\n",ret_val);
-        isTimeToQuit = TRUE;
-        goto exit_cmp;
-    }
-*/
-    if ( strncmp(prompt,"wsq",3) == 0 ){
         do_launch_de();
         goto exit_cmp;
     }
     if ( strncmp(prompt,"boot",4) == 0 ){
+        printf ("~BOOT\n");
         do_launch_de();
         goto exit_cmp;
     }
     if ( strncmp(prompt,"gramado",7) == 0 ){
+        printf ("~GRAMADO\n");
         do_launch_de();
         goto exit_cmp;
     }

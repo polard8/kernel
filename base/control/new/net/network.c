@@ -208,18 +208,11 @@ network_send_arp(
 // ======================
 // Sending via e1000 api.
 
-    e1000_send(
-        currentNIC,
-        ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT ),
-        buffer );
+    // 14 + 28 = 42
+    ssize_t ARP_TOTAL_SIZE = 
+        ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
 
-/*
-    // not good.
-    e1000_send(
-        currentNIC,
-        ( ARP_HEADER_LENGHT ),
-        buffer );
-*/
+    e1000_send( currentNIC, ARP_TOTAL_SIZE, buffer );
 
     refresh_screen();
     return;
@@ -350,27 +343,27 @@ network_on_receiving (
     Type = (uint16_t) FromNetByteOrder16(eth->type);
 
     switch (Type){
-    case 0x0800:
+    case ETHERTYPE_IPv4: //0x0800:
         printf ("[0x0800]: IPV4 received\n");
         network_handle_ipv4(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
         break;
-    case 0x0806:
+    case ETHERTYPE_ARP:  //0x0806:
         printf ("[0x0806]: ARP received\n");
         network_handle_arp(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
         break;
-    case 0x814C:
-        printf ("[0x814C]: SNMP received\n");
-        break;
-    case 0x86DD:
+    //case 0x814C:
+    //    printf ("[0x814C]: SNMP received\n");
+    //    break;
+    case ETHERTYPE_IPv6: //0x86DD:
         printf ("[0x86DD]: IPV6 received\n");
         break;
-    case 0x880B:
-        printf ("[0x880B]: PPP received\n");
-        break;
+    //case 0x880B:
+    //    printf ("[0x880B]: PPP received\n");
+    //    break;
     default:
         printf ("Default type\n");
         break;
@@ -393,12 +386,17 @@ network_handle_ipv4(
     ssize_t size )
 {
     struct ip_d *ip;
+// The protocol for the payload.
+    uint8_t Protocol=0;
+
     ip = (struct ip_d *) buffer;
+
 
     printf("network_handle_ipv4: ==== IP ====\n");
 
     if ( (void*) ip == NULL ){
         printf("network_handle_ipv4: ip\n");
+        goto fail;
     }
 
     unsigned char *src_ipv4 = 
@@ -431,10 +429,29 @@ network_handle_ipv4(
         panic("Bad total lenght\n");
     }
 
-    printf("Protocol: {%x}\n",ip->ip_p);
 
-    if (ip->ip_p == 1){
+// List of IP protocol numbers
+// See:
+// https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
+
+    Protocol = (uint8_t) ip->ip_p;
+    printf("Protocol: {%x}\n",Protocol);
+
+// 0x01 -  1 - ICMP - Internet Control Message Protocol
+// 0x06 -  6 - TCP  - Transmission Control Protocol
+// 0x11 - 17 - UDP  - User Datagram Protocol
+
+// ping?
+    if (Protocol == PROTOCOL_IP_ICMP){
         printf("ICMP Protocol\n");
+    }
+// TCP
+    if (Protocol == PROTOCOL_IP_TCP){
+        printf("TCP Protocol\n");
+    }
+// UCP
+    if (Protocol == PROTOCOL_IP_UDP){
+        printf("UDP Protocol\n");
     }
 
 // ---------------
@@ -460,6 +477,7 @@ network_handle_ipv4(
         dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3]);
 
     // hang
+    printf ("network_handle_ipv4: #breakpoint :)\n");
     refresh_screen();
     while(1){}
 
@@ -477,7 +495,6 @@ network_handle_arp(
     const unsigned char *buffer, 
     ssize_t size )
 {
-
     struct ether_arp *ar;
     ar = (struct ether_arp *) buffer;
 
@@ -485,6 +502,7 @@ network_handle_arp(
 
     if ( (void*) ar == NULL ){
         printf("network_handle_arp: ar\n");
+        goto fail;
     }
 
 // Show data.

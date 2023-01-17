@@ -6,6 +6,11 @@
 
 #define IPVERSION    4
 
+#define PROTOCOL_IP_ICMP  1
+#define PROTOCOL_IP_TCP   6
+#define PROTOCOL_IP_UDP   11
+
+
 #define IP_RF  0x8000			/* reserved fragment flag */
 #define IP_EF  0x8000			/* evil flag, per RFC 3514 */
 #define IP_DF  0x4000			/* dont fragment flag */
@@ -15,6 +20,8 @@
 
 #define IP_MINFRAGSIZE  69     /* minumum size that can be fraged */
 #define IP_MAXPACKET    65535  /* maximum packet size */
+
+#define IP_HEADER_LENGHT  20
 
 // Lenght = 20 bytes
 struct ip_d

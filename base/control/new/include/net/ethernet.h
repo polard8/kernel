@@ -70,6 +70,22 @@ EtherType values for some notable protocols[8] EtherType 	Protocol
 // MAC address lenght. 
 #define ETH_ALEN  6  /* Size of Ethernet address */
 
+
+// See: 
+// https://en.wikipedia.org/wiki/EtherType
+#define ETH_TYPE_IP    0x0800  
+#define ETH_TYPE_IPV4  0x0800  
+#define ETH_TYPE_ARP   0x0806
+#define ETH_TYPE_IPV6  0x86DD
+// ...
+
+#define ETHERTYPE_IPv4 0x0800
+#define ETHERTYPE_IPV4 0x0800
+#define ETHERTYPE_ARP  0x0806
+#define ETHERTYPE_IPv6 0x86DD
+// ...
+
+
 // Ethernet header length
 #define ETHERNET_HEADER_LENGHT  14
 
@@ -78,7 +94,7 @@ struct ether_header
 {
     uint8_t mac_dst[ETH_ALEN];  // destination mac
     uint8_t mac_src[ETH_ALEN];  // source mac
-    uint16_t type;       // type
+    uint16_t type;              // type of protocol: ARP/IP ...
 } __attribute__((packed)); 
 
 

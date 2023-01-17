@@ -10,15 +10,6 @@
 // packet format
 // Ethernet IPv4 TCP/UDP DATA FCS
 
-// See: 
-// https://en.wikipedia.org/wiki/EtherType
-#define ETH_TYPE_IP    0x0800  
-#define ETH_TYPE_IPV4  0x0800  
-#define ETH_TYPE_ARP   0x0806
-#define ETH_TYPE_IPV6  0x86DD
-// ...
-
-
 // little endian ?
 
 #define ToNetByteOrder16(v)  ((v >> 8) | (v << 8))
