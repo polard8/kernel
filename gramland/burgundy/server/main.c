@@ -283,6 +283,25 @@ void callback1(void)
 }
 //========================================================
 
+// This way the module is able to know
+// if the server is accepting input or not.
+int is_accepting_input(void)
+{
+    return (int) IsAcceptingInput;
+}
+
+// This way a module is able to deactivating the input
+// temporarilly while he is very busy
+// with a heavy drawing routine. Just like updating the desktop.
+void set_input_status(int is_accepting)
+{
+    if (is_accepting != TRUE && is_accepting != FALSE)
+        return;
+
+    IsAcceptingInput = (int) is_accepting;
+}
+
+
 // Print a simple string in the serial port.
 void gwssrv_debug_print (char *string)
 {
@@ -1032,6 +1051,10 @@ gwsProcedure (
     case GWS_CreateWindow:
         gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
         serviceCreateWindow(client_fd);
+        // #test
+        // Handle incoming inputs right after a huge service routine.
+        if ( is_accepting_input() == TRUE )
+            wmInputReader();
         NoReply = FALSE;   // We need to return the window id.
         break; 
 
@@ -1069,6 +1092,10 @@ gwsProcedure (
     case GWS_RefreshWindow:
         gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
         serviceRefreshWindow();
+        // #test
+        // Handle incoming inputs right after a huge service routine.
+        if ( is_accepting_input() == TRUE )
+            wmInputReader();
         //NoReply = FALSE;
         NoReply = TRUE;    // syncronous
         break;
@@ -1077,6 +1104,10 @@ gwsProcedure (
      case GWS_RedrawWindow:
          gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
          serviceRedrawWindow();
+        // #test
+        // Handle incoming inputs right after a huge service routine.
+        if ( is_accepting_input() == TRUE )
+            wmInputReader();
          //NoReply = FALSE;
          NoReply = TRUE;    // syncronous
          break;
@@ -1120,6 +1151,10 @@ gwsProcedure (
 
     case GWS_RefreshScreen:
         gws_show_backbuffer();
+        // #test
+        // Handle incoming inputs right after a huge service routine.
+        if ( is_accepting_input() == TRUE )
+            wmInputReader();
         //NoReply = FALSE;      // #todo
         break;
 
@@ -1128,6 +1163,10 @@ gwsProcedure (
     case GWS_RefreshRectangle:
         gwssrv_debug_print ("gwssrv: [2021] serviceRefreshRectangle\n");
         serviceRefreshRectangle();
+        // #test
+        // Handle incoming inputs right after a huge service routine.
+        if ( is_accepting_input() == TRUE )
+            wmInputReader();
         NoReply = FALSE;
         break;
 

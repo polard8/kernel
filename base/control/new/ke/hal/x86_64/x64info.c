@@ -7,6 +7,11 @@
 
 void x64_info(void)
 {
+    printf("\n");
+    printf("x64 CPU Info:\n");
+    printf("\n");
+    printf("Number of processors: {%d}\n", g_processor_count);
+
     show_cpu_intel_parameters();
 }
 
@@ -21,7 +26,8 @@ void x64_info(void)
 
 void show_cpu_intel_parameters(void)
 {
-    printf("\nx64 CPU Info:\n\n");
+
+    printf("\n");
 
 // #todo
 // Check the pointer validation?

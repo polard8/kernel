@@ -1026,6 +1026,13 @@ void init_globals(void)
     //debug_print("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
     //printf     ("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
 
+//
+// SMP
+//
+    g_smp_initialized = FALSE;
+    g_processor_count = 0;
+
+
 // ===================
 // Vamos atrasar configuração de janela 
 // em favor de configuração de mensagem

@@ -1,4 +1,6 @@
+
     The kernel process:
+
     This is the process for the kernel image itself, called
     KERNEL.BIN. But this process also has another image
     called MOD0.BIN, found in prestier/init/modr0.

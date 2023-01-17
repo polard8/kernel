@@ -330,11 +330,11 @@ int main( int argc, char *argv[] )
         e = (struct gws_event_d *) gws_get_next_event(
                 client_fd, 
                 (struct gws_event_d *) &lEvent );
-        
-        if( (void *) e != NULL )
+
+        if ( (void *) e != NULL )
         {
             //if( e->used == TRUE && e->magic == 1234 )
-            if(e->magic == 1234){
+            if (e->magic == 1234){
                 browserProcedure(
                     client_fd, e->window, e->type, e->long1, e->long2 );
             }

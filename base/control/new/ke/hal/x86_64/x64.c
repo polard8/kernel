@@ -313,6 +313,7 @@ void get_cpu_intel_parameters(void)
          ecx == CPUID_VENDOR_INTEL_3 )
     {
         hal_set_machine_type(Processor_INTEL);
+        g_processor_count = 1;
     }
 
 //========================================
@@ -882,6 +883,8 @@ int smp_probe(void)
 
     printf("smp_probe:\n");
 
+    g_smp_initialized = FALSE;
+
 // At this point we gotta have a lot of information
 // in the structure 'processor'.
     if ( (void*) processor == NULL ){
@@ -1166,6 +1169,8 @@ Assignment |     4 |      8 | One entry per system interrupt source.
         EntryCount = 32;
     }
 
+    g_processor_count = NumberOfProcessors;
+
     for (i=0; i<EntryCount; i++)
     {
         // tracing
@@ -1187,12 +1192,9 @@ Assignment |     4 |      8 | One entry per system interrupt source.
         }
 
         // apic id.
-        printf("local_apic_id %d\n",
-            e->local_apic_id);
-        
+        printf("local_apic_id %d\n", e->local_apic_id);
         // apic version
-        printf("local_apic_version %d\n",
-            e->local_apic_version);
+        printf("local_apic_version %d\n", e->local_apic_version);
 
         // Flags:
         // If bit 0 is clear then the processor must be ignored.
@@ -1223,16 +1225,19 @@ done:
     g_processor_count = 
         (unsigned int) NumberOfProcessors;
     
-    printf("Processor count: {%d}\n",NumberOfProcessors);
+    printf("Processor count: {%d}\n",g_processor_count);
     printf("smp_probe: done\n");
 
     // #debug
     refresh_screen();
     //while(1){}
 
+    // g_smp_initialized = TRUE;
     return TRUE;
 fail:
     refresh_screen();
+
+    g_smp_initialized = FALSE;
     return FALSE;
 }
 

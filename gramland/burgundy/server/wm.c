@@ -2256,10 +2256,13 @@ void wm_update_desktop(int tile)
 // #test
 // Starting with the first window of the list,
 // create a stack o windows in the top/left corner of the screen.
-    if (tile){
+    if (tile)
+    {
         //#todo: Maybe we use an argument here. A set of flags.
         if (WindowManager.mode == WM_MODE_TILED)
+        {
             __Tile();
+        }
     }
 
 // Redraw root window, but do not shot it yet.
@@ -3547,20 +3550,30 @@ wmProcedure(
             set_status_by_id(tb_buttons[2],BS_RELEASED);
             set_status_by_id(tb_buttons[3],BS_RELEASED);
             WindowManager.is_fullscreen = FALSE;
+            
+            //set_input_status(FALSE);
             wm_update_desktop(TRUE);
+            //set_input_status(TRUE);
+            
             return 0;
         }
 
         //=====
         if(long1==VK_F6){
             // Enter fullscreen mode.
-            if (WindowManager.is_fullscreen != TRUE){
+            if (WindowManager.is_fullscreen != TRUE)
+            {
+                //set_input_status(FALSE);
                 wm_enter_fullscreen_mode();
+                //set_input_status(TRUE);
                 return 0;
             }
             // Exit fullscreen mode.
-            if (WindowManager.is_fullscreen == TRUE){
+            if (WindowManager.is_fullscreen == TRUE)
+            {
+                //set_input_status(FALSE);
                 wm_exit_fullscreen_mode(TRUE);
+                //set_input_status(TRUE);
                 return 0;
             }
             return 0;

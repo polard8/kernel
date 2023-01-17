@@ -424,6 +424,7 @@ extern int g_system_type;
 
 
 extern unsigned int g_processor_count;
+extern int g_smp_initialized;
 
 //
 // == current ======================================================

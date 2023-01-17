@@ -30,9 +30,8 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
+LIBC    = ../../lib/rtl/include/
+LIBCOBJ = ../../lib/rtl/obj
 
 #
 # Objects
