@@ -14,10 +14,13 @@
 //#include <fcntl.h>
 
 
+#define __COLOR_BLUE   0x000000FF
+#define __COLOR_WHITE  0x00FFFFFF
+
 #define __VK_RETURN    0x1C
 #define __VK_TAB       0x0F
 
-#define __MSG_COMMAND       40
+#define __MSG_COMMAND  40
 
 
 static isTimeToQuit = FALSE;
@@ -46,6 +49,8 @@ static int __server_loop(void);
 static void initPrompt(void);
 static int __CompareString(void);
 
+static void do_help(void);
+static void do_launch_de(void);
 
 // ====================
 
@@ -132,21 +137,46 @@ __Procedure (
     return 0;
 }
 
+static void do_help(void)
+{
+    printf ("\n");
+    printf ("HELP:\n");
+    printf ("Commands: help, wsq, nsq, reboot, shutdown ...\n");
+// Launch the DE, Desktop Environment.
+// See: gramland/
+    printf ("'wsq': Launch the GUI\n");
+    printf("[control + f9] to open the kernel console\n");
+}
+
+static void do_launch_de(void)
+{
+    int ret_val=-1;
+
+    printf ("~WSQ\n");
+    ret_val = (int) rtl_clone_and_execute(app1_name);
+    if (ret_val<=0){
+        printf("Couldn't clone\n");
+    }
+    //printf("pid=%d\n",ret_val);
+// Quit the command line.
+    isTimeToQuit = TRUE;
+}
 
 static void initPrompt(void)
 {
-    int i=0;
+    register int i=0;
 
-    // Clean prompt buffer.
-    
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
-    
+// Clean prompt buffer.
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
+        prompt[i] = (char) '\0';
+    };
+
     prompt[0] = (char) '\0';
     prompt_pos    = 0;
     prompt_status = 0;
     prompt_max    = PROMPT_MAX_DEFAULT;  
 
-    // Prompt
+// Prompt
     printf("\n");
     putc('$',stdout);
     putc(' ',stdout);
@@ -154,16 +184,13 @@ static void initPrompt(void)
 }
 
 
-//#todo: Create a function in rtl for this.
+// Clear the background of the current virtual console.
+// #todo: 
+// Create a function in rtl for this.
 static void do_clear_console(void)
 {
-
-#define __COLOR_BLUE     0x000000FF
-#define __COLOR_WHITE    0x00FFFFFF
-
-    // Change the console color.
+// Change the console color.
     //ioctl(1,440, 0x0011DD11);
-
 // White on blue.
 // Clear the background of the fg console.
      sc82( 8003,__COLOR_BLUE,0,0 );
@@ -186,7 +213,6 @@ static inline void do_sti(void)
 {
     asm ("sti");
 }
-
 
 static inline void do_hlt(void)
 {
@@ -222,10 +248,8 @@ static int __CompareString(void)
     if ( *c == '\0' ){
         goto exit_cmp;
     }
-
 //LF
     printf("\n");
-
 
 //testando callback
 //o kernel tem que retornar para a funçao indicada.
@@ -238,8 +262,7 @@ static int __CompareString(void)
     //    goto exit_cmp;
     //}
 
-
-    if( strncmp(prompt,"t1",2) == 0 )
+    if ( strncmp(prompt,"t1",2) == 0 )
     {
         //creat("saved1.txt",0);
         //fd = open("saved1.txt",0,0);
@@ -254,68 +277,55 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"cls",3) == 0 )
-    {
+    if ( strncmp(prompt,"cls",3) == 0 ){
         do_clear_console();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"int3",4) == 0 )
-    {
+    if ( strncmp(prompt,"int3",4) == 0 ){
         do_int3();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"cli",3) == 0 )
-    {
+    if ( strncmp(prompt,"cli",3) == 0 ){
         do_cli();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"sti",3) == 0 )
-    {
+    if ( strncmp(prompt,"sti",3) == 0 ){
         do_sti();
         goto exit_cmp;
     }
 
-    // gp fault
-    if( strncmp(prompt,"hlt",3) == 0 )
-    {
+// hlt:
+// gp fault
+    if ( strncmp(prompt,"hlt",3) == 0 ){
         do_hlt();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"quit",4) == 0 )
-    {
+    if ( strncmp(prompt,"quit",4) == 0 ){
         isTimeToQuit=TRUE;
         goto exit_cmp;
     }
 
-
-    if( strncmp(prompt,"about",5) == 0 )
-    {
-        printf ("INIT.BIN: This is the first user application.\n");
+    if ( strncmp(prompt,"about",5) == 0 ){
+        printf ("INIT.BIN: This is the first user application\n");
         goto exit_cmp;
     }
 
-    
-    if( strncmp(prompt,"help",4) == 0 )
-    {
-        printf ("HELP:\n");
-        printf ("Commands: help, wsq, nsq, reboot, shutdown ...\n");
-        printf("[control + f9] to open the kernel console\n");
+    if ( strncmp(prompt,"help",4) == 0 ){
+        do_help();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"reboot",6) == 0 )
-    {
+    if ( strncmp(prompt,"reboot",6) == 0 ){
         printf ("REBOOT\n");
         rtl_reboot();
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"shutdown",8) == 0 )
-    {
+    if ( strncmp(prompt,"shutdown",8) == 0 ){
         printf ("SHUTDOWN\n");
         rtl_clone_and_execute("shutdown.bin");
         goto exit_cmp;
@@ -323,14 +333,16 @@ static int __CompareString(void)
 
 //==============================
 // Window Server:
-    if( strncmp(prompt,"ws",2) == 0 )
-    {
+
+// Initialize the window server.
+    if ( strncmp(prompt,"ws",2) == 0 ){
         //printf ("~WS\n");
         //rtl_clone_and_execute("gwssrv.bin");
         goto exit_cmp;
     }
-    if( strncmp(prompt,"wsq",3) == 0 )
-    {
+// Initialize the window server and quit the command line.
+/*
+    if ( strncmp(prompt,"wsq",3) == 0 ){
         printf ("~WSQ\n");
         ret_val = (int) rtl_clone_and_execute(app1_name);
         if (ret_val<=0){
@@ -340,61 +352,71 @@ static int __CompareString(void)
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
+*/
+    if ( strncmp(prompt,"wsq",3) == 0 ){
+        do_launch_de();
+        goto exit_cmp;
+    }
+    if ( strncmp(prompt,"boot",4) == 0 ){
+        do_launch_de();
+        goto exit_cmp;
+    }
+    if ( strncmp(prompt,"gramado",7) == 0 ){
+        do_launch_de();
+        goto exit_cmp;
+    }
 
 //==============================
 // Network Server:
-    if( strncmp(prompt,"ns",2) == 0 )
-    {
+
+// Initialize the network server.
+    if ( strncmp(prompt,"ns",2) == 0 ){
         //printf ("~NS\n");
         //rtl_clone_and_execute("gnssrv.bin");
         goto exit_cmp;
     }
-    if( strncmp(prompt,"nsq",3) == 0 )
-    {
+// Initialize the network server and quit the command line.
+    if( strncmp(prompt,"nsq",3) == 0 ){
         printf ("~NSQ\n");
         rtl_clone_and_execute(app3_name);
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
 
+//
+// 3D stuff
+//
 
 // #todo
 // Something is not working fine
 // when we put the name directly in the parameters field.
 // We need a pointer instead.
-// see: havefun/
+// see: meta/
 
-    if( strncmp(prompt,"game1",5) == 0 )
-    {
+    if ( strncmp(prompt,"game1",5) == 0 ){
         printf ("~ Game 1:\n");
         rtl_clone_and_execute("game1.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
-
-    if( strncmp(prompt,"game2",5) == 0 )
-    {
+    if ( strncmp(prompt,"game2",5) == 0 ){
         printf ("~ Game 2:\n");
         rtl_clone_and_execute("game2.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
 
-
 // ----------------------------------------
 
-
-    printf ("Command not found, type help for more commands\n");
+    printf ("Command not found, type 'help' for more commands\n");
 
 exit_cmp:
-    if(isTimeToQuit==TRUE)
-    {
+    if (isTimeToQuit==TRUE){
         return 0;
     }
     initPrompt();
     return 0;
 }
-
 
 static int __server_loop(void)
 {
