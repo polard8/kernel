@@ -2317,6 +2317,10 @@ serviceCreateWindow (int client_fd)
         // Atualiza a barra de tarefas,
         // notificando a criaçao dessa janela.
         wm_Update_TaskBar((char *) w_name,TRUE);
+
+        // #test
+        // Activate
+        //set_active_window(Window);
     }
 
 // Save the tid of the client.

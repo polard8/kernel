@@ -272,7 +272,7 @@ editorProcedure(
         {
             //printf("editor.bin: MSG_MOUSERELEASED\n");
             //gws_redraw_window(fd, event_window, TRUE);
-            
+
             if (event_window == client_window)
             {
                 // Refresh?
@@ -284,6 +284,7 @@ editorProcedure(
                     (unsigned long) COLOR_BLACK,
                     (unsigned long) '.' );
             }
+            
             return 0;
         }
 

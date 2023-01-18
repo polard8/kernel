@@ -149,6 +149,8 @@ on_keyboard_event(
     unsigned long long2 );
 static void on_mouse_event(int event_type, long x, long y);
 static void on_update_window(int event_type);
+static void on_mouse_pressed(void);
+static void on_mouse_released(void);
 
 int control_action(int msg, unsigned long long1);
 
@@ -291,13 +293,21 @@ on_keyboard_event(
 }
 
 // Quando temos um evento de mouse,
-// vamos enviar esse evento para a
-// janela com o foco de entrada.
+// vamos enviar esse evento para a janela com o foco de entrada.
 // Os aplicativos estao recebendo
 // os eventos enviados para as janelas com o foco de entrada.
 
 static void on_mouse_event(int event_type, long x, long y)
 {
+// #bugbug
+// Estamos considerando apenas os eventos que acontecem 
+// dentro da janela com foco de entrada.
+// Na verdade a janela com foco de entrada se refere a
+// foco de entrada de input de teclado.
+// #test
+// Isso muda o input pointer no caso de 'mouse released'
+// dentro de janela do tipo 'edit box' e a janela estiver com foco.
+
 // Window with focus.
     struct gws_window_d *w;
     unsigned long in_x=0;
@@ -309,6 +319,7 @@ static void on_mouse_event(int event_type, long x, long y)
         return;
     }
 
+// Window with focus
     w = (struct gws_window_d *) get_focus();
     if ( (void*) w==NULL ){
         return;
@@ -317,6 +328,13 @@ static void on_mouse_event(int event_type, long x, long y)
         printf("on_mouse_event: w magic\n");
         return;
     }
+
+
+// ---------------
+// #test
+// Set focus if we are editbox and we do not have the focus yet.
+
+// ---------------
 
 // Is it inside the window with focus?
     if ( x >= w->left &&
@@ -330,13 +348,23 @@ static void on_mouse_event(int event_type, long x, long y)
 
         // Change the input pointer
         // inside the window with focus.
-        if (w->type == WT_EDITBOX_MULTIPLE_LINES)
+        if ( w->type == WT_EDITBOX || 
+             w->type == WT_EDITBOX_MULTIPLE_LINES)
         {
-            if (in_x>0){
-                w->ip_x = (in_x/8);
-            }
-            if (in_y>0){
-                w->ip_y = (in_y/8);
+            // Se o evento for released,
+            // então mudamos o input pointer.
+            if (event_type == GWS_MouseReleased)
+            {
+                if (in_x>0){
+                    w->ip_x = (int) (in_x/8);
+                }
+                if (in_y>0){
+                    w->ip_y = (int) (in_y/8);
+                }
+                
+                //#test
+                //We already have the focus
+                //set_focus(w);
             }
         }
 
@@ -362,6 +390,198 @@ static void on_mouse_event(int event_type, long x, long y)
     }
 //fail
     w->single_event.has_event = FALSE;
+}
+
+
+static void on_mouse_pressed(void)
+{
+// #todo
+// When the mouse was pressed over en editbox window.
+// So, set the focus?
+
+// Validating the window mouse_over.
+    if ( (void*) mouse_hover == NULL ){
+        return;
+    }
+    if (mouse_hover->magic!=1234){
+        return;
+    }
+
+    // button number
+    //if(long1==1){ yellow_status("P1"); }
+    //if(long1==2){ yellow_status("P2"); }
+    //if(long1==3){ yellow_status("P3"); }
+
+// Em qual botão da taskbar?
+// Se for igual à um dos botões da tb.
+    if( mouse_hover->id == tb_buttons[0] ||
+        mouse_hover->id == tb_buttons[1] ||
+        mouse_hover->id == tb_buttons[2] ||
+        mouse_hover->id == tb_buttons[3] )
+    {
+
+        if (mouse_hover->id == tb_buttons[0])
+        {
+            if(tb_buttons_status[0] == TRUE)
+                return;
+        }
+        
+        if (mouse_hover->id == tb_buttons[1])
+        {
+            if(tb_buttons_status[1] == TRUE)
+                return;
+        }
+
+        if (mouse_hover->id == tb_buttons[2])
+        {
+            if(tb_buttons_status[2] == TRUE)
+                return;
+        }
+
+        if (mouse_hover->id == tb_buttons[3])
+        {
+            if(tb_buttons_status[3] == TRUE)
+                return;
+        }
+
+        // Redraw the button
+        set_status_by_id(mouse_hover->id,BS_PRESSED);
+        redraw_window_by_id(mouse_hover->id,TRUE);
+        return;
+    }
+
+    // #todo #maybe
+    // Clicamos e o ponteiro esta sobre a janela ativa.
+    //aw_wid = (int) get_active_window();
+    //if( mousehover_window == aw_wid )
+    //{
+        //wm_update_window_by_id(aw_wid);
+        //redraw_window_by_id(mousehover_window,TRUE);
+        //return;
+    //}
+
+//----------------
+
+// #test
+// The mouse is over an editbox window.
+    /*
+    if ( mouse_hover->type == WT_EDITBOX || 
+         mouse_hover->type == WT_EDITBOX_MULTIPLE_LINES )
+    {
+        set_focus(mouse_hover);
+        redraw_window(mouse_hover,TRUE);
+    }
+    */
+}
+
+
+static void on_mouse_released(void)
+{
+
+    //wm_Update_TaskBar("RELEASED",TRUE);
+
+    // button number
+    //if(long1==1){ yellow_status("R1"); }
+    //if(long1==2){ yellow_status("R2"); }
+    //if(long1==3){ yellow_status("R3"); }
+
+// Post it to the client. (app).
+// When the mouse is on any position in the screen.
+// #bugbug
+// Essa rotina envia a mensagem apenas se o mouse
+// estiver dentro da janela com foco de entrada.
+
+    on_mouse_event( 
+        GWS_MouseReleased,              // event type
+        comp_get_mouse_x_position(),    // current cursor x
+        comp_get_mouse_y_position() );  // current cursor y
+
+// When the mouse is hover a tb button.
+
+    // safety first.
+    // mouse_hover validation
+
+    if ( (void*) mouse_hover == NULL )
+        return;
+    if (mouse_hover->magic!=1234)
+        return;
+
+    //if(long1==1){ yellow_status("R1"); }
+    //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
+    //if(long1==1){ 
+        //yellow_status("R1"); 
+        //create_main_menu(8,8);
+        //return; 
+    //}
+    //if(long1==3){ yellow_status("R3"); return 0; }
+    //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
+    //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
+
+
+//tb_button[0]
+    if(mouse_hover->id == tb_buttons[0])
+    {
+        // ja esta rodando.
+        if(tb_buttons_status[0] == TRUE)
+            return;
+        set_status_by_id(mouse_hover->id,BS_RELEASED);
+        redraw_window_by_id(mouse_hover->id,TRUE);
+        //create_main_menu(8,8);
+        //wm_update_active_window();
+        //current_option = OPTION_MINIMIZE;
+        //yellow_status("0: Min");
+        //tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
+        tb_buttons_status[0] = TRUE;
+        return;
+    }
+
+//tb_button[1]
+    if(mouse_hover->id == tb_buttons[1])
+    {
+        // ja esta rodando.
+        if(tb_buttons_status[1] == TRUE)
+            return;
+        set_status_by_id(mouse_hover->id,BS_RELEASED);
+        redraw_window_by_id(mouse_hover->id,TRUE);
+        //current_option = OPTION_MAXIMIZE;
+        //yellow_status("1: Max");
+        //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
+        tb_buttons_status[1] = TRUE;
+        return;
+    }
+
+//tb_button[2]
+    if(mouse_hover->id == tb_buttons[2])
+    {
+        // ja esta rodando.
+        if(tb_buttons_status[2] == TRUE)
+            return;
+        set_status_by_id(mouse_hover->id,BS_RELEASED);
+        redraw_window_by_id(mouse_hover->id,TRUE);
+        //current_option = OPTION_CLOSE;
+        //yellow_status("2: Close");
+        //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
+        tb_buttons_status[2] = TRUE;
+        return;
+    }
+
+//tb_button[3]
+    if(mouse_hover->id == tb_buttons[3])
+    {
+        // ja esta rodando.
+        if(tb_buttons_status[3] == TRUE)
+            return;
+        set_status_by_id(mouse_hover->id,BS_RELEASED);
+        redraw_window_by_id(mouse_hover->id,TRUE);
+        //yellow_status("3: OK");
+        //run_selected_option();
+        //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
+        tb_buttons_status[3] = TRUE;
+        // mostra o cliente se ele faz parte da tag 3.
+        //show_client(first_client->next,3);
+        //show_client_list(3);  //#todo: notworking
+        return;
+    }
 }
 
 
@@ -2343,6 +2563,24 @@ void set_focus(struct gws_window_d *window)
     if ( window->used != TRUE ) { return; }
     if ( window->magic != 1234 ){ return; }
 
+// #test
+// parent
+// Activate the parent window if it is an application window.
+// #bugbug
+// E no caso de termos filhos e netos do tipo overlapped?
+    struct gws_window_d *p;
+    p = (struct gws_window_d *) window->parent;
+    if ( (void*) p != NULL )
+    {
+        if (p->magic == 1234)
+        {
+            if (p->type == WT_OVERLAPPED){
+                set_active_window(p);
+            }
+        }
+    }
+
+
 // #todo
 // Pegar a antiga janela com o foco de entra.
 // ela deve perder o foco de entrada.
@@ -3172,43 +3410,36 @@ wmProcedure(
 
         //printf("MOVE\n");
 
-        // The compositor is doing this job
-        // and of it's routine. See: comp.c
+        // The compositor is doing its job,
+        // painting the pointer in the right position.
+        // Lets update the position. See: comp.c
         comp_set_mouse_position(long1,long2);
-        
-        //------
-        //#dangerdanger
-        //#todo: show the backbuffer
-        //gws_refresh_rectangle(old_x,old_y,8,8);
-        //old_x = long1;
-        //old_y = long2;
-        //#todo: print directly into the lfb.
-        //frontbuffer_draw_rectangle( 
-        //    long1, long2, 8, 8, COLOR_YELLOW, 0 );
-        //------        
 
         // Esta passando sobre a janela ativa.
         //__probe_activewindow_hover(long1,long2);
 
+        // Update the 'mouse_hover' pointer.
+        // But probing only for the buttons in the taskbar.
         // Em qual botão o mouse esta passando por cima.
         // lembrando: o botao esta dentro de outra janela.
         // Probe taskbar buttons.
         __probe_tb_button_hover(long1,long2);
 
-
         //========
-        //o ponteiro do mouse esta dentro do main menu?
+        // #test
+        // O ponteiro do mouse esta dentro do main menu?
+        // Nesse caso, chame o procedimento de menu.
         if ( (void*)__root_window != NULL )
         {
-            if( (void*)__root_window->contextmenu != NULL )
+            if ( (void*)__root_window->contextmenu != NULL )
             {
-                if( __root_window->contextmenu->in_use == TRUE )
+                if ( __root_window->contextmenu->in_use == TRUE )
                 {
                     // Call the main menu dialog.
                     // see: menu.c
                     menuProcedure(
                         NULL,
-                        (int) msg,
+                        (int) msg,  // Why?
                         (unsigned long) long1,
                         (unsigned long) long2 );
 
@@ -3221,190 +3452,33 @@ wmProcedure(
         return 0;
         break;
 
-    // # Esse é o momento em que estabelecemos qual é a 
-    // janela que possui o mouse.
-    // De acordo com a posição do ponteiro na tela.
-    // A partir dai os eventos devem ir para essa janela.
+// # Esse é o momento em que estabelecemos qual é a 
+// janela que possui o mouse.
+// De acordo com a posição do ponteiro na tela.
+// A partir dai os eventos devem ir para essa janela.
     case GWS_MousePressed:
-    
         //#debug
         //printf("PRESSED\n");
-
-        // safety first.
-        // mouse_hover validation
-        if ( (void*) mouse_hover == NULL )
-            return -1;
-        if (mouse_hover->magic!=1234)
-            return -1;
-    
-        // button number
-        //if(long1==1){ yellow_status("P1"); }
-        //if(long1==2){ yellow_status("P2"); }
-        //if(long1==3){ yellow_status("P3"); }
-
-        // Em qual botão da taskbar?
-        // Se for igual à um dos botões da tb.
-        if( mouse_hover->id == tb_buttons[0] ||
-            mouse_hover->id == tb_buttons[1] ||
-            mouse_hover->id == tb_buttons[2] ||
-            mouse_hover->id == tb_buttons[3] )
-        {
-            if (mouse_hover->id == tb_buttons[0])
-            {
-                if(tb_buttons_status[0] == TRUE)
-                return 0;
-            }
-            if (mouse_hover->id == tb_buttons[1])
-            {
-                if(tb_buttons_status[1] == TRUE)
-                return 0;
-            }
-            if (mouse_hover->id == tb_buttons[2])
-            {
-                if(tb_buttons_status[2] == TRUE)
-                return 0;
-            }
-            if (mouse_hover->id == tb_buttons[3])
-            {
-                if(tb_buttons_status[3] == TRUE)
-                return 0;
-            }
-
-            set_status_by_id(mouse_hover->id,BS_PRESSED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
-            return 0;
-        }
-
-        // #todo #maybe
-        // Clicamos e o ponteiro esta sobre a janela ativa.
-        //aw_wid = (int) get_active_window();
-        //if( mousehover_window == aw_wid )
-        //{
-            //wm_update_window_by_id(aw_wid);
-            //redraw_window_by_id(mousehover_window,TRUE);
-            //return 0;
-        //}
-        
+        on_mouse_pressed();
         return 0;
         break;
 
     // 36
     case GWS_MouseReleased:
-
         //#debug
         //printf("RELEASED\n");
-
-        //wm_Update_TaskBar("RELEASED",TRUE);
-        
-        // button number
-        //if(long1==1){ yellow_status("R1"); }
-        //if(long1==2){ yellow_status("R2"); }
-        //if(long1==3){ yellow_status("R3"); }
-
-        // Post it to the client. (app).
-        // When the mouse is on any position in the screen.
-        on_mouse_event( 
-            GWS_MouseReleased,              // event type
-            comp_get_mouse_x_position(),    // current cursor x
-            comp_get_mouse_y_position() );  // current cursor y
-
-        // When the mouse is hover a tb button.
-        
-        // safety first.
-        // mouse_hover validation
-        if ( (void*) mouse_hover == NULL )
-            return -1;
-        if (mouse_hover->magic!=1234)
-            return -1;
-
-        //if(long1==1){ yellow_status("R1"); }
-        //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
-        //if(long1==1){ 
-            //yellow_status("R1"); 
-            //create_main_menu(8,8);
-            //return 0; 
-        //}
-        //if(long1==3){ yellow_status("R3"); return 0; }
-        //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
-        //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
-
-        //tb_button[0]
-        if(mouse_hover->id == tb_buttons[0])
-        {
-            // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
-            //create_main_menu(8,8);
-            //wm_update_active_window();
-            //current_option = OPTION_MINIMIZE;
-            //yellow_status("0: Min");
-            //tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
-            tb_buttons_status[0] = TRUE;
-            return 0;
-        }
-
-        //tb_button[1]
-        if(mouse_hover->id == tb_buttons[1])
-        {
-            // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
-            //current_option = OPTION_MAXIMIZE;
-            //yellow_status("1: Max");
-            //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
-            tb_buttons_status[1] = TRUE;
-            return 0;
-        }
-
-        //tb_button[2]
-        if(mouse_hover->id == tb_buttons[2])
-        {
-            // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
-            //current_option = OPTION_CLOSE;
-            //yellow_status("2: Close");
-            //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
-            tb_buttons_status[2] = TRUE;
-            return 0;
-        }
-
-        //tb_button[3]
-        if(mouse_hover->id == tb_buttons[3])
-        {
-            // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
-            //yellow_status("3: OK");
-            //run_selected_option();
-            //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
-            tb_buttons_status[3] = TRUE;
-            // mostra o cliente se ele faz parte da tag 3.
-            //show_client(first_client->next,3);
-            //show_client_list(3);  //#todo: notworking
-            return 0;
-        }
-
+        on_mouse_released();
         return 0;
         break;
 
-
-    // #bugbug
-    // Quando imprimir na tela e quando enviar para o cliente?
-    // Uma flag deve indicar se o sistema deve ou nao imprimir 
-    // previamente o char.
-    // Caixas de edição podem deixar todo o trabalho
-    // de teclas de digitação para o sistema, liberando o aplicativo
-    // desse tipo de tarefa. Mas editores de texto querem 
-    // processar cada tecla digitada.
+// #bugbug
+// Quando imprimir na tela e quando enviar para o cliente?
+// Uma flag deve indicar se o sistema deve ou nao imprimir 
+// previamente o char.
+// Caixas de edição podem deixar todo o trabalho
+// de teclas de digitação para o sistema, liberando o aplicativo
+// desse tipo de tarefa. Mas editores de texto querem 
+// processar cada tecla digitada.
 
     case GWS_KeyDown:
         // Imprime o char na janela indicada.
@@ -3934,6 +4008,7 @@ int wmInputReader(void)
                 //return 0; 
             }
             // Control arrow up
+            // #todo: maximize window.
             if(e.msg == GWS_ControlArrowUp)
             {
                 //printf("ws: Control up\n"); 
@@ -3941,6 +4016,8 @@ int wmInputReader(void)
                 //return 0; 
             }
             // Control arrow down
+            // #todo: Restore window.
+            // or put the window into the center of the screen.
             if(e.msg == GWS_ControlArrowDown)
             {
                 //printf("ws: Control down\n");
@@ -5356,9 +5433,10 @@ int gwsDefineInitialRootWindow (struct gws_window_d *window)
     return 0;
 }
 
-
 int dock_active_window(int position)
 {
+// Dock the active window into a given corner.
+
     struct gws_window_d *w;
     
     //int wid=-1;
@@ -5370,16 +5448,24 @@ int dock_active_window(int position)
     //w = (struct gws_window_d *) windowList[wid];
 
 // Structure validation
+// #todo: Use a worker. 
+// Create one if we dont have it yet.
     w = (void*) active_window;
-    if ( (void*) w == NULL )
+    if ( (void*) w == NULL ){
         return -1;
-    if (w->magic!=1234)
+    }
+    if (w->magic!=1234){
         return -1;
+    }
 
-    if (w == __root_window)
+// Can't be the root.
+    if (w == __root_window){
         return -1;
-    if (w == taskbar_window)
+    }
+// Can't be the taskbar.
+    if (w == taskbar_window){
         return -1;
+    }
 // Dock
     dock_window(w,position);
     return 0;
@@ -5387,38 +5473,81 @@ int dock_active_window(int position)
 
 int dock_window( struct gws_window_d *window, int position )
 {
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
+// Dock a given window into a given corner.
+// Not valid in fullscreen mode.
+
+
+// todo
+// Use the working area, not the device area.
+    //unsigned long w = gws_get_device_width();
+    //unsigned long h = gws_get_device_height();
+    //#test
+    //Using the working area
+    unsigned long w = WindowManager.wa_width;
+    unsigned long h = WindowManager.wa_height;
 
     if ( w==0 || h==0 ){
         return -1;
     }
 
-// Strudture validation
-    if ( (void*) window == NULL )
-        return -1;
-    if (window->magic!=1234)
-        return -1;
+// #bugbug
+// Validate the max value.
 
-    if (window == __root_window)
+// Can't dock a window in fullscreen mode.
+    if (WindowManager.is_fullscreen == TRUE){
         return -1;
-    if (window == taskbar_window)
+    }
+
+// Structure validation
+    if ( (void*) window == NULL ){
         return -1;
+    }
+    if (window->magic!=1234){
+        return -1;
+    }
+
+// Can't be the root.
+    if (window == __root_window){
+        return -1;
+    }
+// Can't be the active window.
+    if (window == taskbar_window){
+        return -1;
+    }
+
+
+//
+// Window type
+//
+
+    if (window->type == WT_BUTTON){
+        return -1;
+    }
+
 
     switch (position){
-        case 1:  //top
+
+        // top
+        // #todo: maximize in this case
+        case 1:
             gwssrv_change_window_position( window, 0, 0); 
-            gws_resize_window( window, w, h>>1 );
+            gws_resize_window( window, w, h );
+            //gws_resize_window( window, w, h>>1 );
             break;
-        case 2:  //right
+        //right
+        case 2:
             gwssrv_change_window_position( window, (w>>1), 0); 
             gws_resize_window( window, (w>>1)-4, h-4 );
             break;
-        case 3:  //bottom
-            gwssrv_change_window_position( window, 0, h>>1); 
+        //bottom
+        //#todo: restore or put it in the center.
+        case 3:
+            gwssrv_change_window_position( window, 0, h>>2); 
+            //gwssrv_change_window_position( window, 0, h>>1); 
             gws_resize_window( window, w, h>>1 );
             break;
-        case 4:  //left
+        //left
+        case 4:
             gwssrv_change_window_position( window, 0, 0); 
             gws_resize_window( window, (w>>1)-4, h-4 );
             break;
@@ -5439,13 +5568,16 @@ struct gws_window_d *get_active_window (void)
 
 void set_active_window (struct gws_window_d *window)
 {
-    if (window == active_window)
+    if (window == active_window){
         return;
+    }
 
-    if ( (void*) window == NULL )
+    if ( (void*) window == NULL ){
         return;
-    if (window->magic!=1234)
+    }
+    if (window->magic!=1234){
         return;
+    }
 
     active_window = (void*) window;
 }

@@ -54,6 +54,7 @@ browserProcedure(
     unsigned long long1, 
     unsigned long long2 );
 
+static int do_event_loop(int fd);
 
 // ====================================
 
@@ -91,18 +92,22 @@ browserProcedure(
 
     //36
     case MSG_MOUSERELEASED:
-        if( event_window == __client_window )
+        
+         // #test
+         // We are in the browser.
+        if ( event_window == __client_window )
         {
-                // Refresh?
-                gws_draw_char (
-                    (int) fd,              // fd
-                    (int) event_window,    // wid
-                    (unsigned long) long1, // left
-                    (unsigned long) long2, // top
-                    (unsigned long) COLOR_BLACK,
-                    (unsigned long) '.' );
+            // Refresh?
+            gws_draw_char (
+                (int) fd,              // fd
+                (int) event_window,    // wid
+                (unsigned long) long1, // left
+                (unsigned long) long2, // top
+                (unsigned long) COLOR_BLACK,
+                (unsigned long) '.' );
             return 0;
         }
+        
         return 0;
         break;
 
@@ -127,6 +132,50 @@ browserProcedure(
 }
 
 
+static int do_event_loop(int fd)
+{
+    if(fd<0)
+        return -1;
+
+// #test
+// pegando um evento com o ws.
+// See: libgws/
+
+    struct gws_event_d lEvent;
+    lEvent.used = FALSE;
+    lEvent.magic = 0;
+    lEvent.type = 0;
+    lEvent.long1 = 0;
+    lEvent.long2 = 0;
+
+    struct gws_event_d *e;
+
+// loop
+// Call the local window procedure 
+// if a valid event was found.
+
+    while (1)
+    {
+        //if (isTimeToQuit == TRUE)
+            //break;
+
+        e = (struct gws_event_d *) gws_get_next_event(
+                fd, 
+                (struct gws_event_d *) &lEvent );
+
+        if ( (void *) e != NULL )
+        {
+            //if( e->used == TRUE && e->magic == 1234 )
+            if (e->magic == 1234){
+                browserProcedure( 
+                    fd, e->window, e->type, e->long1, e->long2 );
+            }
+        }
+    };
+
+// Exit application withou error.
+    return 0;
+}
 
 int main( int argc, char *argv[] )
 {
@@ -210,7 +259,7 @@ int main( int argc, char *argv[] )
         debug_print("browser: main_window fail\n"); 
         exit(1);
     }
-// Save globally.
+// Save globally
     if (main_window > 0){
         __main_window = main_window;
     }
@@ -218,7 +267,7 @@ int main( int argc, char *argv[] )
 // ===================
 // address bar
 // #todo: set focus.
-//se a janela mae for overlapped,
+// Se a janela mae for overlapped,
 // entao seremos relativos à sua áre de cliente.
     addressbar_window = 
         (int) gws_create_window (
@@ -304,62 +353,12 @@ int main( int argc, char *argv[] )
         client_fd, 9, client_window, client_window );
 // =======================================================
 
-//
-// Loop
-//
+// Call the event loop.
 
-// #test
-// pegando um evento com o ws.
-// See: libgws/
-
-    struct gws_event_d lEvent;
-    lEvent.used = FALSE;
-    lEvent.magic = 0;
-    lEvent.type = 0;
-    lEvent.long1 = 0;
-    lEvent.long2 = 0;
-
-    struct gws_event_d *e;
-
-// loop
-// Call the local window procedure 
-// if a valid event was found.
-
-    while (1)
-    {
-        e = (struct gws_event_d *) gws_get_next_event(
-                client_fd, 
-                (struct gws_event_d *) &lEvent );
-
-        if ( (void *) e != NULL )
-        {
-            //if( e->used == TRUE && e->magic == 1234 )
-            if (e->magic == 1234){
-                browserProcedure(
-                    client_fd, e->window, e->type, e->long1, e->long2 );
-            }
-        }
-    };
-
-//HANG:
-    while(1){
-    };
-
-    debug_print ("browser: bye\n"); 
-    printf      ("browser: bye\n");
-
-    return 0;
+    return (int) do_event_loop(client_fd);
 }
 
-
 //
-// End.
+// End
 //
-
-
-
-
-
-
-
 

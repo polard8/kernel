@@ -194,18 +194,14 @@ void comp_set_mouse_position(long x, long y)
 {
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
-
     if( x<0 ){ x=0; }
     if( y<0 ){ y=0; }
-
     if( x>w ){
          x=w;
     }
-
     if( y>h){
         y=h;
     }
-
     __new_mouse_x = (long) x;
     __new_mouse_y = (long) y;
 }
