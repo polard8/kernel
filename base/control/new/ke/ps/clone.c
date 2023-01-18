@@ -343,10 +343,7 @@ do_clone:
 // pid
 
     child_pid = (pid_t) child_process->pid;
-
-    if ( child_pid < 0 || 
-         child_pid >= PROCESS_COUNT_MAX )
-    {
+    if ( child_pid < 0 || child_pid >= PROCESS_COUNT_MAX ){
         panic("copy_process: child_pid limits\n");
     }
 
@@ -523,20 +520,17 @@ do_clone:
     //refresh_screen();
     //while(1){}
 
-
 //
 // child thread.
 //
 
-//
 // Copy parent thread structure.
-//
 
     debug_print ("copy_process: [3] Copying thread structure\n");
 // see: thread.c
 
     child_thread = 
-        (struct thread_d *) copy_thread_struct( parent_thread );
+        (struct thread_d *) copy_thread_struct(parent_thread);
 
     if ( (void *) child_thread == NULL ){
         panic ("copy_process: [FAIL] copy_thread_struct \n");
@@ -682,13 +676,10 @@ do_clone:
 // checar um endereço usando a tabela de paginas do kernel
 // esta errado.
 
-
-    Status = (int) fsCheckELFFile ( (unsigned long) child_process->Image );
-
-    if ( Status < 0 )
-    {
-        debug_print ("copy_process: [FAIL] ELF fail \n");
-        printf      ("copy_process: [FAIL] ELF fail \n");
+    Status = (int) fsCheckELFFile( (unsigned long) child_process->Image );
+    if (Status < 0){
+        debug_print ("copy_process: [FAIL] ELF fail\n");
+        printf      ("copy_process: [FAIL] ELF fail\n");
         goto fail;
     }
 

@@ -1112,11 +1112,7 @@ virtual_to_physical (
     unsigned long virtual_address, 
     unsigned long pml4_va );
 
-// Worker
-unsigned long 
-__virtual_to_physical ( 
-    unsigned long virtual_address, 
-    unsigned long pml4_va );
+int mm_is_page_aligned_va(unsigned long va);
 
 // #todo
 void pages_calc_mem (void);

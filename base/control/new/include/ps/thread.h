@@ -512,6 +512,9 @@ struct thread_d
     unsigned long blocked_limit;
 
 
+// How many times it was scheduled.
+    unsigned long scheduledCount;
+
 // Zombie ?
 
 

@@ -102,6 +102,12 @@ static void __initialize_extraheap3(void);
 
 static void mmSetupMemoryUsage(void);
 
+// Local worker
+static unsigned long 
+__virtual_to_physical ( 
+    unsigned long virtual_address, 
+    unsigned long pml4_va );
+
 // ==================================================
 
 // Vamos criar uma pagetable com 512 entradas
@@ -850,22 +856,8 @@ void notfreePage (struct page_d *p)
     if ( p->used == 1 && p->magic == 1234 ){ p->free = 0; }
 }
 
-
-// IN:
-// virtual_address
-// pml4_va
-
-unsigned long 
-virtual_to_physical ( 
-    unsigned long virtual_address, 
-    unsigned long pml4_va ) 
-{
-    return (unsigned long) __virtual_to_physical (virtual_address,pml4_va);
-}
-
-
 // Worker
-unsigned long 
+static unsigned long 
 __virtual_to_physical ( 
     unsigned long virtual_address, 
     unsigned long pml4_va ) 
@@ -994,6 +986,26 @@ __virtual_to_physical (
     return (unsigned long) (address + o);
 }
 
+// IN:
+// virtual_address
+// pml4_va
+
+unsigned long 
+virtual_to_physical ( 
+    unsigned long virtual_address, 
+    unsigned long pml4_va ) 
+{
+    return (unsigned long) __virtual_to_physical (virtual_address,pml4_va);
+}
+
+// Esta alinhado à página.
+int mm_is_page_aligned_va(unsigned long va)
+{
+    if ( (va & 0xFFF) == 0 ){
+        return TRUE;
+    }
+    return FALSE;
+}
 
 // #todo
 void pages_calc_mem (void)

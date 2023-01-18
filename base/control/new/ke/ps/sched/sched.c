@@ -97,13 +97,10 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // um dado processador para escalonar para ele.
 
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
-
     if ( (void*) Idle == NULL ){
         panic ("__scheduler_rr: Idle\n");
     }
-    if ( Idle->used != TRUE || 
-         Idle->magic != 1234 )
-    {
+    if ( Idle->used != TRUE || Idle->magic != 1234 ){
         panic ("__scheduler_rr: Idle validation\n");
     }
     // Estabiliza a idle thread.
@@ -126,7 +123,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
         panic ("__scheduler_rr: FirstTID\n");
     }
 
-    if ( Idle != InitThread ){
+    if (Idle != InitThread){
         panic ("__scheduler_rr: Idle != InitThread\n");
     }
 
@@ -170,6 +167,9 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Initialize counters.
                 TmpThread->runningCount = 0;
                 TmpThread->runningCount_ms = 0;
+                
+                // How many times it was scheduled.
+                TmpThread->scheduledCount++;
 
                 // Checa se temos problemas com a prioridade base.
                 // Estabiliza.
@@ -339,12 +339,10 @@ tid_t scheduler(void)
     struct thread_d *Idle;
 
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
-
     if ( (void *) Idle == NULL ){
         panic("scheduler: Idle\n");
     }
-
-    if ( Idle->magic != 1234 ){
+    if (Idle->magic != 1234){
         panic("scheduler: Idle validation\n");
     }
 

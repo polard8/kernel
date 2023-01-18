@@ -1133,6 +1133,9 @@ try_next_slot:
     Thread->blockedCount  = 0; 
     Thread->blocked_limit = QUANTUM_MAX;
 
+// How many times it was scheduled.
+    Thread->scheduledCount=0;
+
 // Not used now. But it works fine.
     Thread->ticks_remaining = 1000; 
 
@@ -1570,29 +1573,36 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     clone->quantum_limit_min = father->quantum_limit_min;
     clone->quantum_limit_max = father->quantum_limit_max;
 
-    if ( clone->quantum < QUANTUM_MIN ){ clone->quantum = QUANTUM_MIN; }
-    if ( clone->quantum > QUANTUM_MAX ){ clone->quantum = QUANTUM_MAX; }
+    if (clone->quantum < QUANTUM_MIN){ clone->quantum = QUANTUM_MIN; }
+    if (clone->quantum > QUANTUM_MAX){ clone->quantum = QUANTUM_MAX; }
 
-    if ( clone->quantum_limit_min < QUANTUM_MIN ){ clone->quantum_limit_min = QUANTUM_MIN; }
-    if ( clone->quantum_limit_max > QUANTUM_MAX ){ clone->quantum_limit_max = QUANTUM_MAX; }
+    if (clone->quantum_limit_min < QUANTUM_MIN){
+        clone->quantum_limit_min = QUANTUM_MIN;
+    }
+    if (clone->quantum_limit_max > QUANTUM_MAX){
+        clone->quantum_limit_max = QUANTUM_MAX;
+    }
+
+// --------------------------
+
+    clone->standbyCount = 0;
 
 // runningCount - Tempo rodando antes de parar.
+    clone->runningCount = 0;
+    clone->runningCount_ms = 0;
+
 // readyCount - Tempo de espera para retomar a execução.
+    clone->readyCount = 0; 
+    clone->ready_limit = father->ready_limit;
+
+    clone->waitingCount = 0;
+    clone->waiting_limit = father->waiting_limit;
+
 // blockedCount - Tempo bloqueada.
+    clone->blockedCount = 0;
+    clone->blocked_limit = father->blocked_limit;
 
-    clone->standbyCount    = father->standbyCount;
-
-    clone->runningCount    = father->runningCount; 
-    clone->runningCount_ms = father->runningCount_ms;
-
-    clone->readyCount      = father->readyCount; 
-    clone->ready_limit     = father->ready_limit;
-
-    clone->waitingCount    = father->waitingCount;
-    clone->waiting_limit   = father->waiting_limit;
-
-    clone->blockedCount    = father->blockedCount; 
-    clone->blocked_limit   = father->blocked_limit;
+    clone->scheduledCount = 0; 
 
 // Not used now. But it works fine.
     clone->ticks_remaining = father->ticks_remaining; 
@@ -1600,10 +1610,12 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     clone->initial_time_ms = father->initial_time_ms;
     clone->total_time_ms   = father->total_time_ms;
 
+// --------------------------
+
 // Signal
 // Sinais para threads.
     clone->signal = father->signal;
-    clone->umask  = father->umask;
+    clone->umask = father->umask;
 
 // #todo: 
 // Essa parte � dependente da arquitetura i386.
