@@ -1,8 +1,8 @@
 
 // arp.h
 
-#ifndef ____ARP_H
-#define ____ARP_H    1
+#ifndef __NET_ARP_H 
+#define __NET_ARP_H    1
 
 // See: 
 // https://en.wikipedia.org/wiki/Address_Resolution_Protocol

@@ -1,6 +1,15 @@
 #D8 - Facility III
-#havefun 
+#meta
+# Games
 #codename: "Because the biggest challenge for the creator is boredom" - (T. Davis)
+
+PRODUCT_NAME  = Gramado Games
+EDITION_NAME  = ?
+
+VERSION_MAJOR = ?
+VERSION_MINOR = ?
+VERSION_BUILD = ?
+
 
 PHONY := all
 all:

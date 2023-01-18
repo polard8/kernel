@@ -2,8 +2,8 @@
 // socket.h
 // Header for socket implementation.
 
-#ifndef ____SOCKET_H
-#define ____SOCKET_H    1
+#ifndef __NET_SOCKET_H
+#define __NET_SOCKET_H    1
 
 // Socket state
 #define SS_NULL           0

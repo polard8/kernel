@@ -1,8 +1,8 @@
 
 // mm.h
 
-#ifndef ____MM_H
-#define ____MM_H    1
+#ifndef __MM_MM_H
+#define __MM_MM_H    1
 
 // Size support.
 #define KB  (1024)

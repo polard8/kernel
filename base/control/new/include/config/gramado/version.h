@@ -41,16 +41,17 @@
 // Maybe we will delete all these defines here.
 
 #define VERSION_MAJOR     1
-#define VERSION_MINOR     5
+#define VERSION_MINOR     6
 #define VERSION_BUILD     0
 
-#define VERSION_STRING    "1.5"
+#define VERSION_STRING    "1.6"
 #define RELEASE_STRING    "dev-release"
 
 // Version macro
 #define VER10    0x0100
 #define VER11    0x0101
-#define VER13    0x0105
+#define VER13    0x0103
+#define VER16    0x0106
 #define VER20    0x0200
 
 #endif

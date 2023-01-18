@@ -1,9 +1,8 @@
 
 // sched.h
 
-#ifndef __SCHED_H
-#define __SCHED_H    1
-
+#ifndef __PS_SCHED_H
+#define __PS_SCHED_H    1
 
 //#define NR_TASKS ??
 //#define FIRST_TASK ?

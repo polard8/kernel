@@ -15,7 +15,7 @@ This repository has the source code for:
 
     Gramado Kernel - base/
     Gramado DE     - gramland/
-    Gramado ?      - meta/
+    Gramado Games  - meta/
 
 
 ## Screenshots
@@ -57,12 +57,19 @@ This repository has the source code for:
 
 > See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/admin/docs/build.md)
 
-## Testing
+## Building and running on vm
 
 ```bash
 $ make
 $ cd base
 $ ./run
+```
+
+## Clean up the mess
+
+```bash
+$ cd base
+$ make clean-all
 ```
 
 The old versions were tested for a long period of time on my 

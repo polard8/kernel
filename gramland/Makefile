@@ -1,14 +1,13 @@
-
 #A - Facility II
-#gui
+#gramland
+# Gramado DE
 
-PRODUCT_NAME  = GWS
-EDITION_NAME  = Wild and Students
+PRODUCT_NAME  = Gramado DE
+EDITION_NAME  = GUI
 
 VERSION_MAJOR = ?
 VERSION_MINOR = ?
 VERSION_BUILD = ?
-
 
 all:
 

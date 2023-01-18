@@ -1,8 +1,8 @@
 
 // ip.h
 
-#ifndef __IP_H
-#define __IP_H    1
+#ifndef __NET_IP_H
+#define __NET_IP_H    1
 
 #define IPVERSION    4
 

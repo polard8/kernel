@@ -1,11 +1,23 @@
 // File: utsname.h
 
-#ifndef __UTSNAME_H
-#define __UTSNAME_H    1
+#ifndef __GRAMADO_UTSNAME_H
+#define __GRAMADO_UTSNAME_H    1
+
+
+#ifndef UTS_SYSNAME
+#define UTS_SYSNAME  "Gramado"
+#endif
+
+#ifndef UTS_NODENAME
+#define UTS_NODENAME  "(node-name)"
+#endif
+
+#ifndef UTS_DOMAINNAME
+#define UTS_DOMAINNAME  "(domain-name)"
+#endif
 
 
 #define _UTSNAME_LENGTH  65
-
 
 /* Structure describing the system and machine.  */
 

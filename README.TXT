@@ -3,7 +3,7 @@ Product names:
 
     Gramado Kernel - base/
     Gramado DE     - gramland/
-    Gramado ?      - meta/
+    Gramado Games  - meta/
 
 --------------------------------------
     base/     - (E) Boot loader, kernel and commands. 
@@ -12,8 +12,8 @@ Product names:
 --------------------------------------
 Build:
     Type 'make'
-Clear the mess:
-    Go into the 'kernel' directory and type 'make clean-all'
+Clean up the mess:
+    Go into the 'base/' directory and type 'make clean-all'
 Running:
     Go into the base/ folder and type './run' or './runkvm'
 --------------------------------------

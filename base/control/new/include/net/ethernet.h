@@ -1,8 +1,9 @@
 
 // ethernet.h
 
-#ifndef ____ETHERNET_H
-#define ____ETHERNET_H   1
+
+#ifndef __NET_ETHERNET_H 
+#define __NET_ETHERNET_H   1
 
 // See: 
 // https://en.wikipedia.org/wiki/EtherType

@@ -148,7 +148,9 @@ extern unsigned long gSavedBPP;
 #include "config/gramado/version.h"    // Product. 
 #include "config/gramado/u.h"          // User
 #include "config/gramado/system.h"
-#include "config/gramado/utsname.h"
+
+// ==================================
+#include "gramado/utsname.h"
 
 // ==================================
 // Kernel configuration.
@@ -379,8 +381,7 @@ extern unsigned long gSavedBPP;
 // by the ring3 apps via system call.
 // This is the last #include. :^)
 
-#include "syscall.h"
-#include "sys.h"
+#include "gramado/syscalls.h"
 
 #include "newos.h"
 

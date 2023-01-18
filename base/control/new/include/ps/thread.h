@@ -1,9 +1,8 @@
 
 // thread.h
 
-#ifndef __THREAD_H
-#define __THREAD_H    1
-
+#ifndef __PS_THREAD_H
+#define __PS_THREAD_H    1
 
 // =================================
 // System threads: (canonical)

@@ -1,8 +1,8 @@
 
 // udp.h
 
-#ifndef __UDP_H
-#define __UDP_H    1
+#ifndef __NET_UDP_H
+#define __NET_UDP_H    1
 
 struct udp_d
 {

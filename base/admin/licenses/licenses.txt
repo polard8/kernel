@@ -1,0 +1,7 @@
+
+
+    This folder is a place for the licenses 
+    used by the whole system.
+    
+    Each file is gonna have its own license indicator.
+    The license it self is gonna be here.

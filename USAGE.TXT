@@ -2,12 +2,20 @@
     Guidelines for system initialization.
 
 -----------------------
+Building the system:
+    Type 'make'
+
+-----------------------
+Clean up the mess:
+    Go to base/ folder and type 'make clean-all'
+
+-----------------------
 Launching the vm:
-    Go to kernel/ folder and type './run' or './runkvm'	
+    Go to base/ folder and type './run' or './runkvm' 
 
 -----------------------
 Boot interface:
-see: gramado/base/control/boot/x86/bm/shell32/
+see: base/control/boot/x86/bm/shell32/
 You can type: 
     bootjail for 320x200 resolution. 
     bootp1  for 640x480 resolution.
@@ -17,7 +25,7 @@ You can type:
 
 -----------------------
 Init process interface:
-see: gramado/base/exposed/arctic/init/
+see: base/exposed/arctic/init/
 You can type:
     wsq   - Initialize the Desktop environment.
     game1 - Start demo 1.

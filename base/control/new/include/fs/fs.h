@@ -1,9 +1,8 @@
 
 // fs.h
 
-#ifndef ____FS_H
-#define ____FS_H    1
-
+#ifndef __FS_FS_H
+#define __FS_FS_H    1
 
 // Buffers to walk on a pathname,
 // loading until 8 directories.

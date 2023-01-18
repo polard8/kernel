@@ -1,9 +1,8 @@
 
 // tcp.h 
 
-#ifndef ____TCP_H
-#define ____TCP_H    1
-
+#ifndef __NET_TCP_H
+#define __NET_TCP_H    1
 
 // Control flags:
 #define TCP_ACK  16

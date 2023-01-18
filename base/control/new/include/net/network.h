@@ -1,8 +1,8 @@
 
 // network.h
 
-#ifndef ____NETWORK_H
-#define ____NETWORK_H    1
+#ifndef __NET_NETWORK_H
+#define __NET_NETWORK_H    1
 
 // >> The register at offset 0x00 is the "IOADDR" window. 
 // >> The register at offset 0x04 is the "IODATA" window. 

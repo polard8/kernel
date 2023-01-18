@@ -1,9 +1,8 @@
 
 // u.h
 
-#ifndef ____U_H
-#define ____U_H   1
-
+#ifndef __CONFIG_GRAMADO_U_H 
+#define __CONFIG_GRAMADO_U_H   1
 
 //
 // utsname
@@ -26,9 +25,9 @@
 #define DOMAIN_NAME     "domain-name"
 
 // system
-#define SYSTEM_VERSION_MAJOR    VERSION_MAJOR
-#define SYSTEM_VERSION_MINOR    VERSION_MINOR
-#define SYSTEM_VERSION_BUILD    VERSION_BUILD
+#define SYSTEM_VERSION_MAJOR  VERSION_MAJOR
+#define SYSTEM_VERSION_MINOR  VERSION_MINOR
+#define SYSTEM_VERSION_BUILD  VERSION_BUILD
 
 // User
 #define DEFAULT_USERNAME  "anon"

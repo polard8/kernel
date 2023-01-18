@@ -1,8 +1,8 @@
 
 // process.h
 
-#ifndef __PROCESS_H
-#define __PROCESS_H    1
+#ifndef __PS_PROCESS_H
+#define __PS_PROCESS_H    1
 
 
 extern int copy_process_in_progress;
