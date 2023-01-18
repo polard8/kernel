@@ -3,6 +3,17 @@
 
 #include <kernel.h>
 
+// Buffers for 8 directories. Each one with 512 entries.
+// 32*512 = 16384
+// 16KB
+// 16384/4096 = 4 pages.
+// ------------------
+// with 8 pages we have 8 directories for 1024 entries each dir.
+
+//unsigned long fs_buffers[8];
+unsigned long fs_buffers[FS_N_BUFFERS];
+
+
 //see: fs.h
 struct filesystem_d  *root;
 
@@ -1379,7 +1390,8 @@ sys_open (
 // See: devmgr.c
 
     fp = (file *) devmgr_search_in_dev_list(pathname);
-
+    // Yes, we have a valid pointer 
+    // found in the table.
     if ( (void*) fp != NULL )
     {
         if (fp->isDevice == TRUE)
@@ -1388,7 +1400,7 @@ sys_open (
             // Put it into the list inside the
             // current process structure
             // and return the fd.
-            printf("sys_open: #todo\n");
+            printf("sys_open: #todo isDevice!\n");
             refresh_screen();
             return -1;
         }
@@ -1679,18 +1691,15 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 }
 
 
-
 // Called by sc82 in sci.c
 // Enquanto sys_ioctl eh chamada pelos applicativos,
 // io_ioctl eh chamada pelas rotinas dentro do kernel.
 // See: drivers/io.c
-
 int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 {
     debug_print ("sys_ioctl: [FIXME] \n");
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
@@ -1711,14 +1720,9 @@ file *get_file_from_fd(int fd)
     file *f;              // object
 
     pid_t current_pid = (pid_t) get_current_process();
-
-    if ( current_pid < 0 ||
-         current_pid >= PROCESS_COUNT_MAX )
-    {
-        // msg
+    if ( current_pid < 0 || current_pid >= PROCESS_COUNT_MAX ){
         return NULL;
     }
-
     p = (struct process_d *) processList[current_pid];
     if ( (void*) p == NULL ){
         debug_print ("get_file_from_fd: p\n");
@@ -1726,32 +1730,31 @@ file *get_file_from_fd(int fd)
         //return NULL;
     }
     if (p->used != TRUE){
-        //msg
         return NULL;
     }
     if (p->magic != 1234){
-        //msg
         return NULL;
     }
 
     if (fd < 0 || fd >= 32){
-        //msg
-        return NULL;
+        goto fail;
     }
-
     f = (file *) p->Objects[fd];
-    if ( (void*) f == NULL )
-    {
+    if ( (void*) f == NULL ){
         //#debug
-        printf("fd{%d} pid{%d}\n",fd,current_pid);
+        //printf("fd{%d} pid{%d}\n",fd,current_pid);
         //printf("entry0: %x\n", p->Objects[0]);
         //printf("entry1: %x\n", p->Objects[1]);
         //printf("entry2: %x\n", p->Objects[2]);
         //printf("entry3: %x\n", p->Objects[3]);
         //printf("entry4: %x\n", p->Objects[4]);
+        goto fail;
     }
 
     return (file *) f;
+fail:
+    refresh_screen();
+    return NULL;
 }
 
 // 10003
@@ -2503,16 +2506,7 @@ int fs_initialize_dev_dir(void)
 }
 
 
-// Buffers for 8 directories. Each one with 512 entries.
-// 32*512 = 16384
-// 16KB
-// 16384/4096 = 4 pages.
-// ------------------
-// with 8 pages we have 8 directories for 1024 entries each dir.
-
-//unsigned long fs_buffers[8];
-unsigned long fs_buffers[FS_N_BUFFERS];
-
+// ------------------------------
 // fsInit:
 // Called by init() in init.c
 int fsInit (void)
@@ -2835,8 +2829,8 @@ void fs_init_structures (void)
 // #bugbug
 // Why do we have this information?
     Type = (int) get_filesystem_type();
-    Type = ( Type & 0xFFFF );
-    if ( Type <= 0 ){
+    Type = (Type & 0xFFFF);
+    if (Type <= 0){
         panic ("fs_init_structures: [PANIC] Type\n");
     }else{
         root->type = (int) Type;
@@ -2875,7 +2869,6 @@ void fs_init_structures (void)
         //root->dataarea_last_lba = 0;  //#todo
         //root->dataarea_size_in_sectors = 0;  //#todo
  
-
         //root->fs_first_lba = 0;  //#todo
         
         //#todo (dataarea + dataarea size)?
@@ -2884,17 +2877,16 @@ void fs_init_structures (void)
         //(mbrsize + reserved + rootdirsize + fat1size + fat2size +dataareasize)
         //root->fs_size_in_sectors = 0;
 
-
         // Root dir.
             
         // Number of entries in the root dir.
         // #bugbug: Specific for fat16.
         root->dir_entries = FAT16_ROOT_ENTRIES;
-            
+
         // Size of the entry in bytes.
         // #bugbug: Specific for fat16.
         root->entry_size = FAT16_ENTRY_SIZE;
-       
+
         // ...
         break;
 
@@ -3123,16 +3115,13 @@ fsFAT16ListFiles (
              charBuffer[j] != FAT_DIRECTORY_ENTRY_FREE )
         {
              // #bugbug
-
              memcpy( 
                  (char*) NameString, 
                  (const char *) &charBuffer[j],
                  11 );
-
              NameString[11] = 0;  //finalize string
-
              printf("%s\n", NameString );
-        } 
+        }
 
         // (32/2) proxima entrada! 
         // (16 words) 512 vezes!
@@ -4496,7 +4485,7 @@ fsSaveFile (
 // #bugbug
 // Obs: Esse limite é improvisado.
 
-    while ( i < CLUSTERS_TO_SAVE_MAX )
+    while (i < CLUSTERS_TO_SAVE_MAX)
     {
         //procurando cluster livre na fat.
         //@todo:isso poderia ser uma função.
@@ -4548,9 +4537,7 @@ out_of_range:
 // Salva o arquivo.
 // O arquivo tem na lista todos os clusters que ele precisa.
 
-//
 // Save!
-// 
 
 save_file:
 
@@ -4561,9 +4548,7 @@ save_file:
 // Início da lista.
     i = 0; 
 
-//
 // Size limits.
-//
 
 // #bugbug
 // Limite máximo improvisado.
@@ -4777,8 +4762,7 @@ save_file:
 
         // #bugbug
         // Limite provisorio.
-        if (i > 16)
-        {
+        if (i > 16){
             debug_print ("fsSaveFile: [FIXME] write sectors limit\n");
             printf      ("fsSaveFile: [FIXME] write sectors limit\n");
             goto fail;
@@ -4829,11 +4813,11 @@ do_save_dir_and_fat:
     return 0;
 
 fail:
-    debug_print ("fsSaveFile: [FAIL]\n");
-    printf      ("fsSaveFile: [FAIL]\n");
+    debug_print ("fsSaveFile: Fail\n");
+    printf      ("fsSaveFile: Fail\n");
     refresh_screen ();
-    return (int) 1;
-
+    return (int) 1;  // Why 1?
+    //return -1;
 }
 
 /*
@@ -4988,8 +4972,9 @@ sys_read_file_from_disk (
          {
              debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
 
+             // #todo:
+             // Define the default value for this case.
              buff = (void*) kmalloc(1024);
-             
              if ((void*)buff==NULL){
                  printf("sys_read_file_from_disk: buff\n");
                  goto fail;
@@ -5008,10 +4993,9 @@ sys_read_file_from_disk (
                            (char *) buff,         // buffer ?
                            (char) 0x20 );         // flag 
               //--
-              
+
               // Ok
-              if (__ret == 0)
-              {
+              if (__ret == 0){
                   debug_print("sys_read_file_from_disk: Created new file\n");
                   //refresh_screen();
                   goto __go;
@@ -5025,7 +5009,6 @@ sys_read_file_from_disk (
 __go:
 
 // Process
-
     p = (struct process_d *) get_current_process_pointer();
     if ( (void *) p == NULL ){
         printf("sys_read_file_from_disk: p\n");
@@ -5050,25 +5033,22 @@ __go:
 // Slot found.
 __OK:
 
-    if ( __slot < 0 || __slot >= 32 )
-    {
+    if ( __slot < 0 || __slot >= 32 ){
         printf ("sys_read_file_from_disk: Slot fail\n");
         goto fail;
     }
 
 // File struct
-
     __file = (file *) kmalloc( sizeof(file) );
-    
     if ( (void *) __file == NULL ){
         printf ("sys_read_file_from_disk: __file\n");
         goto fail;
     }
 
-// initialize.
+// Initialize.
     __file->used = TRUE;
     __file->magic = 1234;
-    __file->pid = (pid_t) p->pid; //current_process;
+    __file->pid = (pid_t) p->pid;  //current_process;
     __file->uid = (uid_t) current_user;
     __file->gid = (gid_t) current_group;
 
@@ -5081,7 +5061,6 @@ __OK:
 // Why are we using this type here?
 
     __file->____object = ObjectTypeFile;
-
 
 // ==================
 // #todo #bubug
@@ -5134,7 +5113,6 @@ __OK:
 // open() precisa alocar outro buffer.
 
     __file->_base = (char *) kmalloc(BUFSIZ);
-    
     if ( (void *) __file->_base == NULL ){
         printf ("sys_read_file_from_disk: __file->_base\n");
         goto fail;
@@ -5161,18 +5139,12 @@ __OK:
         goto fail;
     }
 
-
-//
 // #test
 // Structure field for file size.
-//
-
     __file->_fsize = (int) FileSize;
 
-
 // Limits.
-    //if ( FileSize < __file->_lbfsize )
-    //{ 
+    //if ( FileSize < __file->_lbfsize ){ 
     //    FileSize = __file->_lbfsize; 
     //}
 
@@ -5182,7 +5154,6 @@ __OK:
 
     if (FileSize >= __file->_lbfsize)
     {
-
         // #debug
         printf("sys_read_file_from_disk: [todo] File size out of limits\n");
         //printf("Size {%d}\n",FileSize);
@@ -5257,7 +5228,6 @@ __OK:
     {
         printf ("sys_read_file_from_disk: the file is larger than the buffer \n");
         refresh_screen();
-        
         __file->_r = __file->_lbfsize;
         __file->_w = __file->_lbfsize;
         __file->_cnt = 0;
@@ -5265,11 +5235,12 @@ __OK:
 
 // Agora temos menos espaço no buffer.
     //__file->_cnt = ( BUFSIZ - FileSize );
-    __file->_cnt = ( __file->_lbfsize - __file->_fsize );
+    __file->_cnt = 
+        ( __file->_lbfsize - __file->_fsize );
 
 // Load.
 // Load the file into the memory.
- 
+
     //printf("Load ....\n");
  
     Status = 
@@ -5329,8 +5300,7 @@ __OK:
           __file->_p = __file->_base;
     //}
 
-
-// Pointer.
+// Pointer
     __file->_p = __file->_base;
 
 // Offsets
@@ -5347,32 +5317,28 @@ __OK:
     //__file->_w = FileSize;
     __file->_w = __file->_fsize;
 
-
-    __file->_cnt = ( __file->_lbfsize - __file->_fsize );
+    __file->_cnt = 
+        ( __file->_lbfsize - __file->_fsize );
 
 // The file is opened in append mode. 
 // O offset fica no fim do arquivo.
-    if ( mode & O_APPEND)        
-    { 
+    if (mode & O_APPEND){
         debug_print ("sys_read_file_from_disk: O_APPEND\n");
         //__file->_p = __file->_base + s;
     }
 
-    if ( mode & O_ASYNC )        
-    { 
+    if (mode & O_ASYNC){
          debug_print ("sys_read_file_from_disk: O_ASYNC\n");
     }
 
-    /* 
+/* 
     // Enable the close-on-exec flag for the new file descriptor.
-    if ( mode & O_CLOEXEC )        
-    { 
+    if ( mode & O_CLOEXEC ){ 
          debug_print ("sys_read_file: O_CLOEXEC\n");
     }
-    */
+ */
 
-
-    if ( mode & O_CREAT ){
+    if (mode & O_CREAT){
          debug_print ("sys_read_file_from_disk: O_CREAT\n");
     }
 
@@ -5386,11 +5352,9 @@ __OK:
     // ok to write
     //__file->_flags = (__file->_flags | __SWR);
 
-
 // Salva o ponteiro de estrutura de arquivo.  
 // Ja checamos fd.
     p->Objects[__slot] = (unsigned long) __file;
-
 
     //#debug
     //printf ("process name: %s\n",p->__processname);
@@ -5398,19 +5362,14 @@ __OK:
     //printf("sys_read_file_from_disk-OUTPUT: %s \n",__file->_base);
     //refresh_screen();
 
-// Done.
+done:
 // Vamos retornar o fd.
 // Pois essa rotina eh usada por open();
-
-done:
-    //debug_print("sys_read_file_from_disk: done\n");
     return (int) __file->_file;
-
 fail:
     refresh_screen();
     return -1;
 }
-
 
 // ==============================
 // Service 43
