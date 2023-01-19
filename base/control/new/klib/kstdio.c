@@ -1019,9 +1019,22 @@ int k_fseek ( file *f, long offset, int whence )
         goto fail;
     }
 
-// #see: kstdio.h
-    switch (whence){
 
+/*
+SEEK_SET
+    The file offset is set to offset bytes.
+SEEK_CUR
+    The file offset is set to its current location plus offset bytes.
+SEEK_END
+    The file offset is set to the size of the file 'plus' offset bytes.
+    (#danger: It goes beyond!)
+*/
+
+// Partindo 'de onde'?
+// #see: 
+// kstdio.h
+// https://man7.org/linux/man-pages/man2/lseek.2.html
+    switch (whence){
 
 // Não podemos aceitar valores negativos,
 // pois ultrapassa o inicio do arquivo.
@@ -1042,7 +1055,7 @@ int k_fseek ( file *f, long offset, int whence )
         if( offset > f->_cnt ){
             offset = f->_cnt;
         }
-        // read and write devem começar do 0.
+        // Read and write devem começar de (base + offset).
         f->_r = offset;
         f->_w = offset;
         f->_p = (f->_base + offset); 
@@ -1067,8 +1080,10 @@ int k_fseek ( file *f, long offset, int whence )
         if( offset > f->_cnt ){
             offset = f->_cnt;
         }
+        // Read and write devem começar de (current + offset).
         f->_p = (f->_p + offset);
         f->_r = (f->_p - f->_base);
+        f->_w = (f->_p - f->_base);
         goto done;
         break;
 
@@ -1084,8 +1099,20 @@ int k_fseek ( file *f, long offset, int whence )
         if(offset>0){
             offset=0;
         }
-        f->_p = f->_base +  (f->_lbfsize + offset);
-        f->_r = ( f->_lbfsize + offset );
+        // Read and write devem começar de (end of file + offset).
+        // Estamos falando do fim do arquivo e não do fim do buffer.
+        // #bugbug: 
+        // O arquivo não pode ser maior que o buffer disponível pra ele.
+        if ( f->_fsize > f->_lbfsize ){
+            panic("k_fseek: #todo f->_fsize > f->_lbfsize\n"); 
+        }
+        if ( (f->_fsize + offset) > f->_lbfsize ){
+            panic("k_fseek: #todo (f->_fsize + offset) > f->_lbfsize\n");
+        } 
+        f->_r = (f->_fsize + offset);
+        f->_w = (f->_fsize + offset);
+        f->_p = 
+            ( f->_base + (f->_fsize + offset) );
         goto done;
         break;
 
@@ -1106,6 +1133,11 @@ int k_fseek ( file *f, long offset, int whence )
         f->_cnt = f->_lbfsize;
         goto done;
         break;
+    
+    //case SEEK_DATA:
+    //    break;
+    //case SEEK_HOLE:
+    //    break;
 
 // Default
     default:

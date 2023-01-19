@@ -84,6 +84,10 @@ long pathconf (const char *pathname, int name)
     return -1;
 } 
 
+
+// lseek - reposition read/write file offset
+// See:
+// https://man7.org/linux/man-pages/man2/lseek.2.html
 // #todo:
 // IN: ??
 // OUT: ??
@@ -101,6 +105,11 @@ off_t sys_lseek (int fd, off_t offset, int whence)
 //#todo
     //if(offset<0)
         //return (off_t) (-EINVAL);
+
+
+    if (whence<0){
+        return (off_t) -EINVAL;
+    }
 
 // pid
     pid_t current_process = (pid_t) get_current_process();
@@ -122,17 +131,29 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     f = (file *) p->Objects[fd];
     if ( (void *) f == NULL ){
         debug_print("sys_lseek: f\n");
-        return -1; 
+        return -1;  // (off_t) (-EBADF); 
     }
     if (f->magic!=1234){
-        return -1;
+        return -1;  // (off_t) (-EBADF);
     }
+
+
+// #todo
+// Check if it is a pipe, socket or fifo.
+// '-ESPIPE' fd is associated with a pipe, socket, or FIFO.
 
 // fseek
 // See: kstdio.c
     k_fseek ( (file *) f, (long) offset, (int) whence );
 
-    return (off_t) ( f->_p - f->_base );
+    if ( f->_p < f->_base ){
+        panic("sys_lseek: #fixme f->_p < f->_base\n");
+    }
+
+    off_t FinalResult = 
+        (off_t) ( f->_p - f->_base );
+
+    return (off_t) FinalResult;
 }
 
 //
