@@ -301,6 +301,25 @@ int main ( int argc, char *argv[] )
 
     debug_print ("fileman: Initializing ...\n");
 
+//
+// Testing parameters
+//
+
+    int fA = FALSE;  //FAKE FLAG
+    int i=0;
+    // percorre todos os argumentos
+    for (i=0; i<argc; i++)
+    {
+       // Se em algum momento a flag for '-a'.
+        if ( strncmp( argv[i], "-a", 2 ) == 0 ){
+            fA = TRUE;
+        }
+    };
+    if(fA==TRUE){
+        printf("fileman: #test flag '-a'\n");
+        //exit(0);
+    }
+
 // dc
     unsigned long w = gws_get_system_metrics(1);
     unsigned long h = gws_get_system_metrics(2);

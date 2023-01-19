@@ -4727,8 +4727,7 @@ void rewind (FILE *stream)
         return;
     }
 
-// do!
-
+// In ring3
     stream->_p = stream->_base;
     stream->_w = 0;
     stream->_r = 0;
@@ -4740,12 +4739,21 @@ void rewind (FILE *stream)
 // Vamos ajustar isso aqui tambem.
 
 // Não há bytes no buffer da libc
+// #bugbug
+// Isso deve ser o tamanho do buffer.
+// pois é o contador de bytes restantes.
     stream->_cnt = 0;    
     //stream->_cnt = stream->_lbfsize;
 
 // #bugbug
 // This function calls lseek() and lseek() is not working yet.
-    lseek(fd,0,0);
+// rewind in ring0
+    //lseek(fd,0,0);
+    off_t v = lseek(fd,0,SEEK_SET);
+    //if(v!=0){
+    //    printf("Testing lseek: fail\n");
+    //    asm ("int $3");
+    //}
 }
 
 

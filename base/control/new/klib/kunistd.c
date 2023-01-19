@@ -104,16 +104,17 @@ off_t sys_lseek (int fd, off_t offset, int whence)
 
 // pid
     pid_t current_process = (pid_t) get_current_process();
-
-// #todo:
-// Check limits?
-    //if (current_process<0)
-        //return -1;
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
+        return -1;
+    }
 
 // Process structure.
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
         debug_print("sys_lseek: p\n");
+        return -1;
+    }
+    if (p->magic!=1234){
         return -1;
     }
 
@@ -123,15 +124,15 @@ off_t sys_lseek (int fd, off_t offset, int whence)
         debug_print("sys_lseek: f\n");
         return -1; 
     }
-
-//#todo
-//validation
+    if (f->magic!=1234){
+        return -1;
+    }
 
 // fseek
 // See: kstdio.c
     k_fseek ( (file *) f, (long) offset, (int) whence );
 
-    return (off_t) ( f->_p - f->_base ); 
+    return (off_t) ( f->_p - f->_base );
 }
 
 //

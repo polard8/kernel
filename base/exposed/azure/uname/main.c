@@ -2,6 +2,8 @@
 // UNAME.BIN
 // 2022 - Fred Nora.
 
+#include <types.h>
+//#include <stddef.h>
 #include <stdio.h>
 #include <sys/utsname.h>
 
@@ -40,10 +42,44 @@ int main (int argc, char **argv)
 // The kernel will put the strings here. I guess.
     struct utsname  un;
 
+
+    int fRelease=FALSE;
+
 // #todo: 
 // Get parametes.
 
     uname(&un);
+
+    // #debug
+    printf("argc: {%d}\n",argc);
+
+// get flags
+    int i=0;
+    for (i=0; i<argc; i++)
+    {
+        //printf("%d: %s\n",i, argv[i]);
+
+        // Se em algum momento a flag for '-r'.
+        if ( strncmp( argv[i], "-r", 2 ) == 0 )
+        {
+            fRelease = TRUE;
+        }
+    };
+
+
+
+//
+// Show only the release. (testing flags)
+//
+
+    if(fRelease==TRUE){
+        printf ("kernel release: %s\n",un.release);
+        return 0;
+    }
+
+//
+// Show all
+//
 
     printf ("\n");
 // Kernel info

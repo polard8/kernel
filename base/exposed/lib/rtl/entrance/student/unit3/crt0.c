@@ -20,7 +20,6 @@ extern int main ( int argc, char *argv[] );
 #define SPACE  " "
 #define TOKENLIST_MAX_DEFAULT  80
 
-
 //static const unsigned int something=1234;
 
 const char *argv[] = { 
@@ -217,6 +216,10 @@ int crt0 (unsigned long rdi)
 // rewind
     //rewind(stdin);
 
+// O que tinha no buffer do arquivo antes da leitura.
+    //if ( (void*) stdin->_base != NULL )
+    //    printf("PRE-READ: {%s}\n",stdin->_base);
+
 // Copy
     int n=0;
     n = read(
@@ -226,12 +229,12 @@ int crt0 (unsigned long rdi)
 // finzalize
    buffer[511] = 0;
 
-    //if(n<=0){
-        //#bugbug: We can't do this
-        //stdout = stderr;
-        //printf("crt0.c: n<=0");
-        //fflush(stdout);
-    //}
+
+// O que tem no buffer do arquivo depois da leitura.
+    //if ( (void*) stdin->_base != NULL )
+    //    printf("POST-READ: {%s}\n",stdin->_base);
+
+    //printf("buffer[]: {%s}\n",buffer);
 
 /*
     // from shared buffer
@@ -241,6 +244,17 @@ int crt0 (unsigned long rdi)
     shared_buffer[511]=0;
 */
 // ===================================================
+
+
+    //#debug
+    //printf("%s\n",buffer);
+    //while(1){}
+
+/*
+    size_t string_len=0;
+    string_len = strlen(buffer);
+    buffer[string_len] = 0; //finaliza
+*/
 
 //
 // Tokenizing.
@@ -300,7 +314,7 @@ e o crt0 do driver, não ativa.
 
     asm volatile ("int $199");
 
-// Depois de lido o stdin e colocada acmdline no buffer local,
+// Depois de lido o stdin e colocada a cmdline no buffer local,
 // então é hora de apagarmos os arquivo, para que outro
 // programa consiga usar o arquivo.
 // tambem atualizaremos a estrutura em ring3.

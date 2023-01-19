@@ -498,11 +498,35 @@ static void __try_execute(int fd)
     if (isInvalidExt == TRUE)
         goto fail;
 
+
+//#todo
+// Tem que limpar o buffer do arquivo em ring0, 
+// antes de escrever no arquivo.
+
 // cmdline:
 // Only if the name is a valid name.
     rewind(stdin);
+    //off_t v=-1;
+    //v=lseek( fileno(stdin), 0, SEEK_SET );
+    //if (v!=0){
+    //    printf("testing lseek: %d\n",v);
+    //    asm("int $3");
+    //}
+
     prompt[511]=0;
+
+    // #debug
+    // OK!
+    //printf("promt: {%s}\n",prompt);
+    //asm ("int $3");
+
+    // #bugbug: A cmdline ja estava dentro do arquivo
+    // antes de escrevermos. Isso porque pegamos mensagens de
+    // teclado de dentro do sdtin.
+    // Tambem significa que rewind() não funcionou.
+    //write(fileno(stdin), "dirty", 5);
     write(fileno(stdin), prompt, 512);
+
 
     //rtl_clone_and_execute(filename_buffer);
     //rtl_clone_and_execute(prompt);
@@ -2194,7 +2218,11 @@ terminalProcedure (
             // Draw the char using the window server.
             // tputc() uses escape sequence.
             default:
-                if( isUsingEmbeddedShell == TRUE ){  input(long1);  }
+                // Coloca na cmdline
+                if ( isUsingEmbeddedShell == TRUE ){
+                    input(long1);
+                }
+                // Exibe na área de cliente.
                 tputc(
                     (int) fd, 
                     (int) Terminal.client_window_id, 

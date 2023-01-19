@@ -649,8 +649,10 @@ static void *__extra_services (
         return (void *) sys_dup3( (int) arg2, (int) arg3, (int) arg4 );
     }
 
+
+
 // 603 - lseek support.
-// See: unistd.c
+// See: klib/kunistd.c
 // IN: fd, offset, whence.
     if ( number == 603 ){
         return (void *) sys_lseek ( 
@@ -658,6 +660,8 @@ static void *__extra_services (
                             (off_t) arg3, 
                             (int)   arg4 );
     }
+
+
 
     if (number == 640)
     {
@@ -1097,15 +1101,11 @@ void *sci0 (
     }
 
     p = (struct process_d *) processList[current_process];
-
-    if ( (void*) p == NULL )
-    {
+    if ( (void*) p == NULL ){
         debug_print("sci0: p\n");
         panic("sci0: p\n");
     }
-
-    if ( p->used != TRUE || p->magic != 1234 )
-    {
+    if ( p->used != TRUE || p->magic != 1234 ){
         debug_print("sci0: p validation\n");
         panic("sci0: p validation\n");
     }

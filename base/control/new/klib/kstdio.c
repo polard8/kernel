@@ -1042,8 +1042,13 @@ int k_fseek ( file *f, long offset, int whence )
         if( offset > f->_cnt ){
             offset = f->_cnt;
         }
+        // read and write devem começar do 0.
         f->_r = offset;
+        f->_w = offset;
         f->_p = (f->_base + offset); 
+        //printf("offset: %d\n",offset);
+        //refresh_screen();
+        //while(1){}
         goto done;
         break;
 
