@@ -5330,7 +5330,7 @@ struct gws_window_d *wmCreateRootWindow(void)
     unsigned long width  = (unsigned long) (__device_width  & 0xFFFF );
     unsigned long height = (unsigned long) (__device_height & 0xFFFF );
 
-    if (__device_width == 0 || __device_height == 0 ){
+    if (__device_width == 0 || __device_height == 0){
         debug_print("wmCreateRootWindow: w h\n");
         printf     ("wmCreateRootWindow: w h\n");
         exit(1);

@@ -376,14 +376,11 @@ int gwsInit(void)
 //
 
     CurrentDisplay = (void *) malloc (sizeof(struct gws_display_d));
-
-    if ( (void*) CurrentDisplay == NULL )
-    {
+    if ( (void*) CurrentDisplay == NULL ){
         debug_print("gwsInit: [FAIL] CurrentDisplay\n");
         printf     ("gwsInit: [FAIL] CurrentDisplay\n");
         exit(1); 
     }
-
     memset( CurrentDisplay, 0, sizeof(struct gws_display_d) );
 
     CurrentDisplay->id = 0;
@@ -393,20 +390,16 @@ int gwsInit(void)
     //...
 // ===================================================
 
-
 //
 // == Screen ===============================================
 //
 
     DeviceScreen  = (void *) malloc (sizeof(struct gws_screen_d));
-
-    if ( (void*) DeviceScreen == NULL )
-    {
+    if ( (void*) DeviceScreen == NULL ){
         debug_print("gwsInit: [FAIL] DeviceScreen\n");
         printf     ("gwsInit: [FAIL] DeviceScreen\n");
         exit(1);
     }
-
     memset( DeviceScreen, 0, sizeof(struct gws_screen_d) );
 
     DeviceScreen->id = 0; 
@@ -421,17 +414,16 @@ int gwsInit(void)
     DeviceScreen->height = (unsigned long) SavedY;
     DeviceScreen->bpp    = (unsigned long) SavedBPP;
 
-    DeviceScreen->pitch  =  (unsigned long) ( SavedX * SavedBPP );
+    DeviceScreen->pitch =
+        (unsigned long) ( SavedX * SavedBPP );
 
 // Checks
 
-    if( DeviceScreen->pitch == 0 )
-    {
+    if (DeviceScreen->pitch == 0){
         debug_print("gwsInit: [FAIL] DeviceScreen->pitch \n");
         printf     ("gwsInit: [FAIL] DeviceScreen->pitch \n");
         exit(1);
     }
-
 
 // #todo: 
 // Cuidado, não queremos divisão por zero.
@@ -449,13 +441,11 @@ int gwsInit(void)
     DeviceScreen->backbuffer  = (void *) ____BACKBUFFER_VA;
     DeviceScreen->frontbuffer = (void *) ____FRONTBUFFER_VA;
 
-
 // Hotspot
 // Center of the screen
 
     DeviceScreen->hotspot_x = ( DeviceScreen->width  >> 1 );
     DeviceScreen->hotspot_y = ( DeviceScreen->height >> 1 );
-
 
 // The new limits 
 // when the origin is the center of the screen.
@@ -469,14 +459,13 @@ int gwsInit(void)
 // The device screen will be the valid screen for now.
 // Save the device screen in the diplay structure.
 
-    if ( (void *) CurrentDisplay != NULL )
-    {
+    if ( (void *) CurrentDisplay != NULL ){
         CurrentDisplay->device_screen = DeviceScreen;
         CurrentDisplay->valid_screen  = DeviceScreen;
     }
 
 // Validation
-    DeviceScreen->used  = TRUE;
+    DeviceScreen->used = TRUE;
     DeviceScreen->magic = 1234;
 
 // -------------------
@@ -530,8 +519,8 @@ int gwsInit(void)
 
     // clear the pallete stuff
     // #todo: put some colors here.
-    int pi=0;
-    for(pi=0; pi<16; pi++){
+    register int pi=0;
+    for (pi=0; pi<16; pi++){
         gr_dc->palette[pi] = 0;
     }
 
@@ -553,50 +542,39 @@ int gwsInit(void)
 // First level structure for the GUI.
 
     gui = (void *) malloc( sizeof( struct gui_d) );
-
-    if ( (void *) gui == NULL )
-    {
+    if ( (void *) gui == NULL ){
         debug_print("gwsInit: gui\n");
         printf     ("gwsInit: gui\n");
         exit(1);
     }
-
     memset( gui, 0, sizeof(struct gui_d) );
-
 
 //
 // == Root window ===============================================
 //
 
 // See:
-// createw.c
+// wm.c
 
     struct gws_window_d  *tmpRootWindow;
     
     tmpRootWindow = (struct gws_window_d *) wmCreateRootWindow();
-
-    if ( (void*) tmpRootWindow == NULL)
-    {
+    if ( (void*) tmpRootWindow == NULL){
         debug_print("gwsInit: tmpRootWindow\n");
         printf     ("gwsInit: tmpRootWindow\n");
         exit(1);
     }
-
-    if ( tmpRootWindow->used != TRUE || tmpRootWindow->magic != 1234 )
-    {
+    if ( tmpRootWindow->used != TRUE || tmpRootWindow->magic != 1234 ){
         debug_print("gwsInit: tmpRootWindow validation\n");
         printf     ("gwsInit: tmpRootWindow validation\n");
         exit(1);
     }
 
 // Register
-    //int root_wid = RegisterWindow(__root_window);
-    int root_wid = RegisterWindow(tmpRootWindow);
-    
-    if (root_wid<0)
-    {
-        debug_print ("gwsInit: Couldn't register rootwindow\n");
-        printf      ("gwsInit: Couldn't register rootwindow\n");
+    wid_t root_wid = RegisterWindow(tmpRootWindow);
+    if (root_wid<0 || root_wid >= WINDOW_COUNT_MAX){
+        debug_print ("gwsInit: Couldn't register tmpRootWindow\n");
+        printf      ("gwsInit: Couldn't register tmpRootWindow\n");
         exit(1);
     }
 
@@ -620,41 +598,31 @@ int gwsInit(void)
 
 // gui structure.
 
-    if ( (void*) gui == NULL )
-    {
+    if ( (void*) gui == NULL ){
         debug_print ("gwsInit: gui\n");
         printf      ("gwsInit: gui\n");
         exit(1);
     }
 
-    if ( (void *) gui != NULL )
-    {
+    if ( (void *) gui != NULL ){
         gui->_display      = (struct gws_display_d *) CurrentDisplay;
         gui->_screen       = (struct gws_screen_d *)  DeviceScreen;
         gui->screen_window = (struct gws_window_d *)  tmpRootWindow;
         gui->main_window   = (struct gws_window_d *)  tmpRootWindow;
     }
 
-// #todo
-    if ( (void*) gui->screen_window != NULL )
-    {
+// Display a string in the background.
+    if ( (void*) gui->screen_window != NULL ){
         dtextDrawText ( 
             (struct gws_window_d *) gui->screen_window,
             8, 8, COLOR_RED, "gwsInit: Graphics ok" );
-
-        //dtextDrawText ( 
-            //(struct gws_window_d *) gui->screen_window,
-            //8, 8, COLOR_RED, "Graphics ok" );
     }
 
-// The kernel side will flush the surface rectangle 
-// into the framebuffer.
-
-    // invalidate_surface_retangle();
-
-// #debug
+//#debug
 // Let's see the messages above.
-
+    //refresh_screen();
+    //exit(0);
+    // invalidate_surface_retangle();
     gwssrv_show_backbuffer();
     //while(1){}
 

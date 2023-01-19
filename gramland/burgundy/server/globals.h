@@ -32,7 +32,6 @@ struct initialization_d
 extern struct initialization_d  Initialization;
 
 
-
 // Host Operating System
 #define OS_OTHER    0
 #define OS_NATIVE   1
@@ -45,7 +44,6 @@ extern struct initialization_d  Initialization;
 #define VM_VMWARE      2
 #define VM_QEMU        3
 #define VM_VIRTUALBOX  4
-
 
 // =========================
 // h:d.s

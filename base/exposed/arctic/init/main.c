@@ -34,6 +34,15 @@ static const char *app2_name = "gws.bin";
 static const char *app3_name = "gnssrv.bin";
 static const char *app4_name = "gns.bin";
 
+
+// Flags:
+// --dm - Launches the default Display Manager.
+// -?   - ...
+// -?   - ...
+static const char *cmdline1 = "gwnsrv -1 -2 -3";
+//static const char *cmdline1 = "gwnsrv -1 -2 -3 --dm";
+// ...
+
 // private functions: prototypes;
 
 // local
@@ -153,6 +162,16 @@ static void do_launch_de(void)
     int ret_val=-1;
 
     printf ("Launching GUI\n");
+
+
+//-----
+// #test
+// Sending cmdline via stdin
+
+    rewind(stdin);
+    write( fileno(stdin), cmdline1, strlen(cmdline1) );
+
+//-----
 
     ret_val = (int) rtl_clone_and_execute(app1_name);
     if (ret_val<=0){

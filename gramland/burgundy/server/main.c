@@ -159,7 +159,7 @@ extern struct gws_window_d *mouse_owner;
 static int __send_response(int fd, int is_error);
 
 static int initGUI(void);
-static int on_execute(void);
+static int on_execute(int dm);
 static void dispacher(int fd);
 
 static void __init_ws_structure(void);
@@ -3045,7 +3045,7 @@ static int initGUI(void)
  *       message found in the sockeck we readed.
  */
 
-static int on_execute(void)
+static int on_execute(int dm)
 {
 //==================
     struct sockaddr server_address;
@@ -3320,12 +3320,18 @@ static int on_execute(void)
 // Client
 //
 
+/*
     if ( flagUseClient == TRUE )
     {
         //debug_print ("gwssrc: Calling client $\n");
         //rtl_clone_and_execute("terminal.bin");
     }
+*/
 
+// Launches the default Display Manager
+    if(dm==TRUE){
+        rtl_clone_and_execute("gdm.bin");
+    }
 
 //
 // =======================================
@@ -3466,24 +3472,20 @@ static int on_execute(void)
                  dispacher(newconn);
              }
 
-            //if (newconn <= 0)
-            //{
+            //if (newconn <= 0){
                 //gwssrv_debug_print("gwssrv: accept returned FAIL\n");
             //}
 
             //#debug
-            if ( newconn == ____saved_server_fd )
-            {
+            if ( newconn == ____saved_server_fd ){
                 printf("GWSSRV.BIN: newconn == ____saved_server_fd\n");
                 while(1){}
             }
-            
             //close(newconn);
         }
 
         // Not accpeting
-        //if (IsAcceptingConnections == FALSE)
-        //{
+        //if (IsAcceptingConnections == FALSE){
             //close(newconn);
         //}
     };
@@ -3528,6 +3530,49 @@ static inline void __outb(uint16_t port, uint8_t val)
 int main (int argc, char **argv)
 {
     int Status=-1;
+    register int i=0;
+
+// #test: Flags
+    int f1= FALSE;
+    int f2= FALSE;
+    int f3= FALSE;
+    int f4= FALSE;
+    int fDisplayManager=FALSE;
+
+    if (argc>0)
+    {
+        for (i=0; i<argc; i++)
+        {
+            //printf("%d: {%s}\n",i,argv[i]);
+
+            if ( strncmp( argv[i], "-1", 2 ) == 0 )
+                f1=TRUE;
+            if ( strncmp( argv[i], "-2", 2 ) == 0 )
+                f2=TRUE;
+            if ( strncmp( argv[i], "-3", 2 ) == 0 )
+                f3=TRUE;
+            if ( strncmp( argv[i], "-4", 2 ) == 0 )
+                f4=TRUE;
+
+            // Launches the default Display Manager.
+            if ( strncmp( argv[i], "--dm", 4 ) == 0 )
+                fDisplayManager=TRUE;
+        };
+    }
+
+    if (f1 == TRUE)
+        printf("F1\n");
+    if (f2 == TRUE)
+        printf("F2\n");
+    if (f3 == TRUE)
+        printf("F3\n");
+    if (f4 == TRUE)
+        printf("F4\n");
+    if (fDisplayManager == TRUE)
+        printf("fDisplayManager\n");
+
+    //exit(0);
+
 
 // Callback support.
 // O callback tem feito o refresh de muita coisa.
@@ -3550,18 +3595,18 @@ int main (int argc, char **argv)
     // vamos pegar a que foi criada pelo primeiro cliente.
     // ele cria no começo da rotina.
     // Dai usaremos essa id por enquanto, pois o sistema so tem ela ainda.
-    
-    /*
-    while(1)
-    {
+
+/*
+    while(1){
         __saved_sync_id = sc82 (10005,0,0,0);
         if( __saved_sync_id > 0 && __saved_sync_id < 1024 )
             break;
     };
-    */
+ */
+
 
 //0 = Time to quit.
-    Status = (int) on_execute();
+    Status = (int) on_execute(fDisplayManager);
     if (Status == 0){
         gwssrv_debug_print ("GWSSRV.BIN: exit(0)\n");
         printf             ("GWSSRV.BIN: exit(0)\n");
