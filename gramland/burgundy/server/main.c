@@ -2079,10 +2079,15 @@ serviceCreateWindow (int client_fd)
     gReq r;
 // Iterator.
     register int i=0;
+
+// The window been created.
     struct gws_window_d *Window;
+    wid_t wid = (-1);
+
+// The parent window.
     struct gws_window_d *Parent;
-    int pw=0;
-    int id = -1;
+    wid_t pwid = (-1);
+
 // Arguments
     unsigned long x=0;
     unsigned long y=0;
@@ -2091,10 +2096,10 @@ serviceCreateWindow (int client_fd)
     unsigned int color=0;
     unsigned long type=0;
 // Device context
-    unsigned long deviceLeft   = 0;
-    unsigned long deviceTop    = 0;
-    unsigned long deviceWidth  = (__device_width  & 0xFFFF );
-    unsigned long deviceHeight = (__device_height & 0xFFFF );
+    unsigned long deviceLeft = 0;
+    unsigned long deviceTop = 0;
+    unsigned long deviceWidth  = (__device_width  & 0xFFFF);
+    unsigned long deviceHeight = (__device_height & 0xFFFF);
 // tid da control thread do cliente.
     int ClientPID = -1;
     int ClientTID = -1;
@@ -2117,6 +2122,8 @@ serviceCreateWindow (int client_fd)
     r.ul2  = message_address[2];
     r.ul3  = message_address[3];
 // l,t,w,h
+// These are the outer values.
+// Including the border if it has one.
     r.ul4 = message_address[4];
     r.ul5 = message_address[5];
     r.ul6 = message_address[6];
@@ -2135,7 +2142,7 @@ serviceCreateWindow (int client_fd)
     type = (unsigned long) (r.ul9 & 0xFFFF);
 // Parent window ID.
     r.ul10 = message_address[10]; 
-    pw = (int) (r.ul10 & 0xFFFF);
+    pwid = (int) (r.ul10 & 0xFFFF);
 // Style
 // #test
     r.ul11 = message_address[11];  
@@ -2186,59 +2193,50 @@ serviceCreateWindow (int client_fd)
     //while(1){}
 //===================
 
-// Limits
-// Parent window id.
-    if (pw<0 || pw>=WINDOW_COUNT_MAX){
-        gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
-        pw=0;
-        printf("pw\n");
+
+// --------------------------------
+
+//
+// Parent window
+//
+
+// id limits.
+    if (pwid<0 || pwid>=WINDOW_COUNT_MAX){
+        pwid=0;
+        printf("serviceCreateWindow: pwid\n");
+        exit(1);
+    }
+// Structure pointer
+    Parent = (struct gws_window_d *) windowList[pwid];
+    if ( (void*) Parent == NULL ){
+        printf("serviceCreateWindow: Parent\n");
+        exit(1);
+    }
+    if (Parent->magic != 1234){
+        printf("serviceCreateWindow: Parent validation\n");
         exit(1);
     }
 
-// Get parent window structure pointer.
-    Parent = (struct gws_window_d *) windowList[pw];
-
-// #bugbug
-// Ajuste improvisado
-
-    if ( (void *) Parent == NULL )
-    {
-        gwssrv_debug_print ("serviceCreateWindow: parent window struct fail\n");
-        
-        
-        // #bugbug
-        // #todo: panic here.
-        if ( (void*) gui == NULL )
-        {
-            gwssrv_debug_print ("serviceCreateWindow: gui fail\n");
-            //exit(1);
-        }
-        
-        //if ( (void*) gui != NULL ) )
-        //{
-        //    Parent = gui->screen_window;
-        //}
-        
-        //  #bugbug
-        //  This is a test.
-        printf("Parent\n");
-        exit(1); 
-    }
+// --------------------------------
 
 // Draw
 // See: window.c
 
+// #todo
+// What is the border size?
+
     Window = 
         (struct gws_window_d *) CreateWindow ( 
-                                    type, 
+                                    type,      // type
                                     my_style,  // style
                                     1,         // status 
                                     1,         // view
                                     r.data,    // name
-                                    x, y, w, h, 
-                                    Parent, 0, 
-                                    frame_color, 
-                                    client_color ); 
+                                    x, y, w, h,  // l,t,w,h 
+                                    (struct gws_window_d *) Parent,  // parent struct pointer 
+                                    0,               // ?? desktop id
+                                    frame_color,     // frame color.
+                                    client_color );  // client area color.
 
     if ( (void *) Window == NULL ){
        gwssrv_debug_print ("gwssrv: CreateWindow fail\n");
@@ -2248,8 +2246,9 @@ serviceCreateWindow (int client_fd)
     }
 
 // Register window
-    id = RegisterWindow(Window);
-    if (id<0){
+    wid = RegisterWindow(Window);
+    if (wid<0 || wid>=WINDOW_COUNT_MAX)
+    {
         gwssrv_debug_print ("gwssrv: serviceCreateWindow Couldn't register window\n");
         next_response[1] = 0;  // msg code.
         goto fail;
@@ -2336,10 +2335,10 @@ serviceCreateWindow (int client_fd)
 
 // Building the next response.
 // It will be sent in the socket loop.
-    next_response[0] = (unsigned long) id;        // window
-    next_response[1] = SERVER_PACKET_TYPE_REPLY;  // msg code
-    next_response[2] = 0;
-    next_response[3] = 0;
+    next_response[0] = (unsigned long) (wid & 0xFFFFFFFF);  // wid
+    next_response[1] = SERVER_PACKET_TYPE_REPLY;            // msg code
+    next_response[2] = 0;  //#todo: Maybe we can send aditional info here.
+    next_response[3] = 0;  //#todo: Maybe we can send aditional info here.
 
 // Show
 // Invalidate rectangle

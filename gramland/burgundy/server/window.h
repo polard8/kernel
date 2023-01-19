@@ -9,6 +9,9 @@
 
 #include "event.h"
 
+typedef int  __wid_t;
+typedef int  wid_t;
+
 
 // ===============================================================
 

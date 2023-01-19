@@ -1725,6 +1725,8 @@ __gws_createwindow_request (
     message_buffer[2] = 0;
     message_buffer[3] = 0;
 // l,t,w,h
+// These are the outer values.
+// Including the border if it has one.
     message_buffer[4] = (unsigned long)(left   & 0xFFFF);
     message_buffer[5] = (unsigned long)(top    & 0xFFFF);
     message_buffer[6] = (unsigned long)(width  & 0xFFFF);
@@ -1734,7 +1736,7 @@ __gws_createwindow_request (
 // type
     message_buffer[9] = (unsigned long)(type & 0xFFFF);
 // parent window id.
-    message_buffer[10] = parent; 
+    message_buffer[10] = parent;
 // #test
 // style
 // 0x0001 maximized
