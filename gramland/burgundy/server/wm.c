@@ -4765,6 +4765,34 @@ int redraw_window_by_id(int wid, unsigned long flags)
     return 0;
 }
 
+// Clear the window
+// Repaint it using the default background color.
+// Only valid for WT_SIMPLE.
+// #todo
+// A transparent window inherits its parent's background 
+// for this operation.
+int clear_window_by_id(int wid, unsigned long flags)
+{
+    struct gws_window_d *w;
+
+// wid
+    if (wid<0 || wid>=WINDOW_COUNT_MAX)
+        return -1;
+// structure validation
+    w = (void*) windowList[wid];
+    if( (void*) w == NULL )
+        return -1;
+    if(w->magic!=1234)
+        return -1;
+
+    if (w->type != WT_SIMPLE)
+        return -1;
+
+    redraw_window(w,flags);
+    return 0;
+}
+
+
 // Here we're gonna redraw the given window
 // and invalidate it.
 int 

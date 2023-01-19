@@ -100,12 +100,16 @@ void __display_mouse_cursor(void)
 //#todo: show the backbuffer
 // APAGA
 
-    // So apagaremos se houve algum movimento.
+// Apaga
+// So apagaremos se houve algum movimento.
     //if( __old_mouse_x != __new_mouse_x ||
     //    __old_mouse_y != __new_mouse_y )
     //{
-        gws_refresh_rectangle( 
-            __old_mouse_x, __old_mouse_y, 8, 8 );
+        //gws_refresh_rectangle( 
+        //    __old_mouse_x, __old_mouse_y, 8, 8 );
+       gws_refresh_rectangle( 
+            __old_mouse_x, __old_mouse_y, 10, 10 );
+
     //}
 
 // save

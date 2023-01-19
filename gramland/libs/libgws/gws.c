@@ -131,7 +131,7 @@ __gws_createwindow_request (
     unsigned long style,
     unsigned long parent,
     char *name );
-static int __gws_createwindow_response(int fd);
+static wid_t __gws_createwindow_response(int fd);
 
 // == refresh rectangle
 static int 
@@ -1803,7 +1803,7 @@ __gws_createwindow_request (
 // Mas como sabemos que é um soquete,
 // então sabemos que é possível ler.
 
-static int __gws_createwindow_response(int fd)
+static wid_t __gws_createwindow_response(int fd)
 {
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
@@ -1812,7 +1812,7 @@ static int __gws_createwindow_response(int fd)
     //gws_debug_print ("__gws_createwindow_response: rd\n");
 
     if (fd<0){
-        return (int) -1;
+        return (wid_t) -1;
     }
 
 // Read
@@ -1829,7 +1829,7 @@ static int __gws_createwindow_response(int fd)
 // and we will not be able to write into the socket.
 
     if (n_reads <= 0){
-        return (int) -1;
+        return (wid_t) -1;
     }
 
 // The response message
@@ -1838,26 +1838,25 @@ static int __gws_createwindow_response(int fd)
 // A mensagem que esperamos nesse caso é GWS_SERVER_PACKET_TYPE_REPLY.
 // Porque estamos esperando resposta de um request.
 
-    int wid = (int) message_buffer[0];
+    wid_t wid = (int) message_buffer[0];
     int msg = (int) message_buffer[1];
 
     switch (msg){
     // reply
     case GWS_SERVER_PACKET_TYPE_REPLY: 
-        return (int) wid;
+        return (wid_t) wid;
         break;
     // error
     case GWS_SERVER_PACKET_TYPE_REQUEST:
     case GWS_SERVER_PACKET_TYPE_EVENT:
     case GWS_SERVER_PACKET_TYPE_ERROR:
     default:
-        return -1;
+        return (wid_t) -1;
         break;
     };
 fail:
-    return -1;
+    return (wid_t) -1;
 }
-
 
 //
 // == Functions ===================================
@@ -2443,16 +2442,16 @@ struct gws_window_info_d *gws_get_window_info(
 // It is not working.
 // The window server can not get the window number.
 
-int gws_refresh_window (int fd, int window )
+int gws_refresh_window (int fd, wid_t wid )
 {
     int value=0;
     int req_status=-1;
 
-    if (fd<0)    { return (int) -1; }
-    if (window<0){ return (int) -1; }
+    if (fd<0) { return (int) -1; }
+    if (wid<0){ return (int) -1; }
 
 // Request
-    req_status = (int) __gws_refresh_window_request(fd,window);
+    req_status = (int) __gws_refresh_window_request(fd,wid);
     if (req_status<=0){
         return (int) -1;
     }
@@ -2562,7 +2561,7 @@ void gws_invalidate_window(int fd,int wid)
  */
 // OUT: wid
 
-int
+wid_t
 gws_create_window ( 
     int fd,
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
@@ -2579,14 +2578,14 @@ gws_create_window (
     unsigned int color )       //12, Color (bg) (para janela simples).
 {
     int value=0;
-    int wid = -1;
+    wid_t wid = -1;
     char *Name;
     int req_status=-1;
 
     //gws_debug_print("gws_create_window:\n");
 
     if (fd<0){
-        return (int) -1;
+        return (wid_t) -1;
     }
 
 //#bugbug: parentwindow?
@@ -2613,7 +2612,7 @@ gws_create_window (
                   fd, x, y, width, height, 
                   color, type, style, parentwindow, Name );
     if (req_status<=0){
-        return (int) -1;
+        return (wid_t) -1;
     }
 
     //ok set the sync
@@ -2637,15 +2636,15 @@ gws_create_window (
 
         if (value == ACTION_REQUEST){ rtl_yield(); }
         if (value == ACTION_REPLY ) { break; }
-        if (value == ACTION_ERROR ) { return -1; }
+        if (value == ACTION_ERROR ) { return (wid_t) -1; }
         //if (value == ACTION_NULL )  { return -1; }  // no reply
     };
 
 // A sincronização nos diz que já temos um reply.
 // Simply read the file.
-    wid = (int) __gws_createwindow_response(fd); 
+    wid = (wid_t) __gws_createwindow_response(fd); 
 
-    return (int) wid;
+    return (wid_t) wid;
 }
 
 // Yield current thread.
@@ -3126,13 +3125,26 @@ int gws_create_empty_directory (char *dir_name)
 
 // Set focus
 // async request.
-void gws_set_focus(int fd, int window)
+void gws_set_focus(int fd, wid_t wid)
 {
-    if (fd<0)    { return; }
-    if (window<0){ return; }
+    if (fd<0) { return; }
+    if (wid<0){ return; }
 // IN: fd, request, sub-request, data.
-    gws_async_command( fd, 9, 0, window );
+    gws_async_command( fd, 9, 0, wid );
 }
+
+// Clear the window
+// Repaint it using the default background color.
+// Only valid for WT_SIMPLE.
+// async request.
+void gws_clear_window(int fd, wid_t wid)
+{
+    if (fd<0) { return; }
+    if (wid<0){ return; }
+// IN: fd, request, sub-request, data.
+    gws_async_command( fd, 14, 0, wid );
+}
+
 
 // Send async request.
 // No response.

@@ -1982,12 +1982,22 @@ serviceAsyncCommand (void)
         goto done;
         break;
 
+    // data=wid
     case 13:
         invalidate_window_by_id(data);
         //return 0;
         goto done;
         break;
-    
+
+// Clear the window
+// Repaint it using the default background color.
+    case 14:
+        // #todo data = wid
+        //printf("14: wid={%d}\n",data);
+        clear_window_by_id(data,TRUE);
+        goto done;
+        break;
+
 // poweroff
 // qemu only
     case 22:

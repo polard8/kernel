@@ -823,7 +823,11 @@ static void compareStrings(int fd)
         //printf ("M=%d\n",rtl_get_system_metrics(120) ); // variável de time
         //printf ("M=%d\n",rtl_get_system_metrics(1) );
         //printf ("M=%d\n",rtl_get_system_metrics(2) );
-        
+
+        // Clear the window
+        // Repaint it using the default background color.
+        gws_clear_window(fd,Terminal.client_window_id);
+
         goto exit_cmp;
     }
 

@@ -5,6 +5,10 @@
  *     2020 -  Created by Fred Nora.
  */
 
+typedef int  __wid_t;
+typedef int wid_t;
+
+
 // internal
 // used only by the lib
 #define __PORTS_WS  4040
@@ -178,7 +182,7 @@ struct gws_window_info_d *gws_get_window_info(
 struct gws_event_d *gws_get_next_event(int fd, struct gws_event_d *event);
 
 // Refresh a window.
-int gws_refresh_window (int fd, int window );
+int gws_refresh_window (int fd, wid_t wid );
 
 int
 gws_refresh_retangle ( 
@@ -220,7 +224,7 @@ void invalidate_surface_retangle (void);
 void gws_invalidate_window(int fd,int wid);
 
 // Create a window.
-int
+wid_t
 gws_create_window ( 
     int fd,
     unsigned long type,        //1, Tipo de janela (popup,normal,...)
@@ -338,7 +342,8 @@ gws_async_command2 (
     unsigned long data3,
     unsigned long data4 );
 
-void gws_set_focus(int fd, int window);
+void gws_set_focus(int fd, wid_t wid);
+void gws_clear_window(int fd, wid_t wid);
 
 void gws_send_wm_magic( int fd, int pid );
 
