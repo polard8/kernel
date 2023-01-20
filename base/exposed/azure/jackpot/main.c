@@ -1,14 +1,12 @@
 /*
  * # Jackpot Game #
- *
  * Portando para o sistema operacional Gramado 0.4
  * Portando para a linguagem C.
  * Original: Dev C++.
  * This version: Fred Nora.
  * 2018.
  */
- 
- 
+
 #include <stddef.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -16,25 +14,26 @@
 #include <string.h>
 #include <time.h>
 
+// #for syscalls.
+#include <rtl/gramado.h>
 
 int  i, j, life, maxrand;
 int c;
-
 
 // String do número digitado.
 char number[16]; 
 
 
-void Start ();
-void GetResults ();
-int jackpot_main ();
-
-
+//-----------------
+void GetResults(void);
+void Start(void);
+int jackpot_main(void);
 //int jackpot_atoi (char * s);
+//-----------------
 
 
-void Start (){
-	
+void Start(void)
+{
     i = 0;
     j = 0;
     life = 0;
@@ -100,9 +99,10 @@ selected:
             
         case 'Q':    
         case 'q':
-            exit (0);
+            //exit(0);
+            while(1){}
             break;
-            
+
 		default : 
 		    maxrand = 15;
 		    //exit(0);
@@ -122,10 +122,10 @@ selected:
     GetResults ();
 }
 
+void GetResults(void)
+{
 
-void GetResults (){
-	
-	// if player has no more life then he lose
+// if player has no more life then he lose
     if ( life <= 0 )
     {	
         printf ("You lose !\n\n");
@@ -238,18 +238,17 @@ int jackpot_atoi (char * s){
 
 
 /*
- *******************************************
  * jackpot_main:
  *     Initialize the game.
  */
+int jackpot_main(void)
+{
 
-int jackpot_main (){
-	
-    // stdlib
-	// inicializando o suporte a alocação dinâmica de memória.
-	//stdio
-	//inicializando o suporte ao fluxo padrão.
-	
+// stdlib
+// inicializando o suporte a alocação dinâmica de memória.
+//stdio
+//inicializando o suporte ao fluxo padrão.
+
 	//#cancelado. Porque o crt0.o faz isso.
 	//libcInitRT ();
 	//stdioInitialize ();		
@@ -264,41 +263,42 @@ int jackpot_main (){
 	return 0;
 }
 
+
 /*
  * main:
  *     Entry point. 
  */
-
 // ??
 // Qual janela tem o foco de entrada ?
 // A disciplina de linha precisa disso para encontrar
 // a thread que receberá mensagem.
-	
-int main ( int argc, char *argv[] ){
+int main ( int argc, char *argv[] )
+{
+    int code = 0;
 
-	int code = 0;
-	
 	printf ("\n");
 	printf ("####################################################\n");
 	  puts ("################## JackPot #########################\n");
 	printf ("####################################################\n");
-	printf ("\n");	
-	
-	
-	code = (int) jackpot_main ();
-	
+	printf ("\n");
+
+	code = (int) jackpot_main();
+
 	switch (code) 
 	{
 	    
         case 0:
-            exit (0);
+            //exit(0);
             break;	
 
 		default:	
-		    exit (code);
+		    //exit(code);
 			break;	
 	};
-	
+
+
+    while(1){}
+
 	return -1;
 }
 

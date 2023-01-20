@@ -1,8 +1,6 @@
 # cat for gde
-
 #history:
 #2019 - Created by Fred Nora.
-
 
 VERSION = 0
 PATCHLEVEL = 0
@@ -10,46 +8,54 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = cat
 
-#todo:
-#We need to simplify these flags
+# usermode cross compiler flags.
+CFLAGS = -Wall
+#CFLAGS += -O3
+CFLAGS += -Wundef
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wno-uninitialized
+CFLAGS += -Wno-format-security
+CFLAGS += -Wno-trigraphs
+CFLAGS += -Werror=strict-prototypes
+CFLAGS += -Werror=implicit-function-declaration
+CFLAGS += -Werror=return-type
+CFLAGS += -std=gnu89
+CFLAGS += -m64
+CFLAGS += -s
+CFLAGS += -static
+CFLAGS += -fcommon
+CFLAGS += -fgnu89-inline
+CFLAGS += -finline-functions
+CFLAGS += -fshort-wchar
+CFLAGS += -ffreestanding
+CFLAGS += -fleading-underscore
+CFLAGS += -fstrict-overflow
+CFLAGS += -nostdlib
+CFLAGS += -nodefaultlibs
+CFLAGS += -nostdinc
+CFLAGS += -fno-builtin
+CFLAGS += -fno-stack-protector
+CFLAGS += -fno-strict-aliasing
+CFLAGS += -fno-PIE
+CFLAGS += -fno-pie
+CFLAGS += -fno-omit-frame-pointer
+CFLAGS += -fno-optimize-sibling-calls    
 
-CFLAGS = -m32 \
-	--std=gnu89 \
-	-nodefaultlibs \
-	-nostdinc \
-	-nostdlib \
-	-static \
-	-fgnu89-inline \
-	-ffreestanding \
-	-fno-builtin \
-	-fno-pie \
-	-no-pie \
-	-fno-stack-protector \
-	-s
-	
-	
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
 
+LIBC      = ../../lib/rtl/include/
+LIBCOBJ   = ../../lib/rtl/obj
 
-	##
-	## Objects
-	##
-
-myObjects = crt0.o main.o \
+# Objects
+myObjects = crt0.o rtl.o main.o \
 ctype.o \
 stdio.o \
 stdlib.o \
 string.o \
 time.o \
 unistd.o \
+fcntl.o \
 termios.o \
-ioctl.o \
-stubs.o
-
-
+ioctl.o    
 
 
 .PHONY: all all-c cat-link finalize clean
@@ -58,12 +64,10 @@ all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 all-c:
-
 	cp $(LIBCOBJ)/crt0.o  .
-	cp $(LIBCOBJ)/stubs.o  .
+	cp $(LIBCOBJ)/rtl.o  .
 	
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
@@ -72,18 +76,17 @@ all-c:
 	cp $(LIBCOBJ)/time.o    .
 	cp $(LIBCOBJ)/unistd.o  .
 
+	cp $(LIBCOBJ)/fcntl.o  .
+
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 
-	
 cat-link:
-	ld -m elf_i386 -T ../link.ld -o SH7.BIN $(myObjects) -Map map.s
-
+	ld -m elf_x86_64 -T ../link.ld -o SH7.BIN $(myObjects)    
 finalize:
 	cp SH7.BIN  ../../bin
-
 clean:
 	-rm *.o
 	-rm SH7.BIN 
 	
-	
+

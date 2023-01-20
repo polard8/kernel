@@ -52,7 +52,14 @@ enum { CHAR, INT, PTR };
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
 
-void next(void)
+
+static void expr(int lev);
+static void next(void);
+static void stmt(void);
+
+// -----------------------------
+
+static void next(void)
 {
     char *pp;
 
@@ -139,7 +146,7 @@ void next(void)
 }
 
 
-void expr(int lev)
+static void expr(int lev)
 {
     int t, *d;
 
@@ -290,7 +297,7 @@ void expr(int lev)
 }
 
 
-void stmt(void)
+static void stmt(void)
 {
     int *a; 
     int *b;

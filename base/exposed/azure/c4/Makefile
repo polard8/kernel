@@ -9,33 +9,47 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = c4
 
+# usermode cross compiler flags.
+CFLAGS = -Wall
+#CFLAGS += -O3
+CFLAGS += -Wundef
+CFLAGS += -Wmissing-prototypes
+CFLAGS += -Wno-uninitialized
+CFLAGS += -Wno-format-security
+CFLAGS += -Wno-trigraphs
+CFLAGS += -Werror=strict-prototypes
+CFLAGS += -Werror=implicit-function-declaration
+CFLAGS += -Werror=return-type
+CFLAGS += -std=gnu89
+CFLAGS += -m64
+CFLAGS += -s
+CFLAGS += -static
+CFLAGS += -fcommon
+CFLAGS += -fgnu89-inline
+CFLAGS += -finline-functions
+CFLAGS += -fshort-wchar
+CFLAGS += -ffreestanding
+CFLAGS += -fleading-underscore
+CFLAGS += -fstrict-overflow
+CFLAGS += -nostdlib
+CFLAGS += -nodefaultlibs
+CFLAGS += -nostdinc
+CFLAGS += -fno-builtin
+CFLAGS += -fno-stack-protector
+CFLAGS += -fno-strict-aliasing
+CFLAGS += -fno-PIE
+CFLAGS += -fno-pie
+CFLAGS += -fno-omit-frame-pointer
+CFLAGS += -fno-optimize-sibling-calls    
 
-CFLAGS = -m32 \
-	-std=gnu89 \
-	-nodefaultlibs \
-	-nostdinc \
-	-nostdlib \
-	-static \
-	-fgnu89-inline \
-	-ffreestanding \
-	-fno-builtin \
-	-fno-pie \
-	-fleading-underscore \
-	-fno-stack-protector \
-	-s \
-	-Werror=strict-prototypes    
-	
 
-LIBC    = ../../../landlib/rtl/include/
-LIBCOBJ = ../../../landlib/rtl/obj
-API02   = ../libcore/include/
-APIOBJ  = ../libcore/obj
+LIBC      = ../../lib/rtl/include/
+LIBCOBJ   = ../../lib/rtl/obj
+
 
 # Objects
-
 myObjects = crt0.o c4.o \
 ctype.o stdio.o stdlib.o string.o time.o \
-api.o \
 unistd.o strtol.o strtoul.o fscanf.o fcntl.o termios.o ioctl.o \
 rtl.o    
 
@@ -47,7 +61,7 @@ all: c4.o all-c jackpot-link finalize clean
 	@echo "Ok?"
 
 c4.o:
-	gcc  -c  c4.c  -Wall     $(CFLAGS) -I $(LIBC) -I $(API02) -o c4.o
+	gcc  -c  c4.c $(CFLAGS) -I $(LIBC) -o c4.o
 
 all-c:
 
@@ -72,10 +86,10 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 
 #bugbug
-	cp $(APIOBJ)/api.o  .
+#	cp $(APIOBJ)/api.o  .
 
 jackpot-link:
-	ld -m elf_i386 -T ../link.ld -o C4.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o C4.BIN $(myObjects)    
 finalize:
 	cp C4.BIN ../bin 
 clean:

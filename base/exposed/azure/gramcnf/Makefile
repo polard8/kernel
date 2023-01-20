@@ -45,8 +45,6 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 
-
-
 LIBC      = ../../lib/rtl/include/
 LIBCOBJ   = ../../lib/rtl/obj
 

@@ -1,9 +1,5 @@
-
-//
 // File: sh7.c
 // Credits: Levos7 OS
-//
-
 
 //#include <stdint.h>
 #include <stdlib.h>
@@ -13,19 +9,17 @@
 #include <string.h>
 #include <sys/wait.h>
 
-
 //#ifndef MAC_HACK
 #include <sys/utsname.h>
 //#endif
 
+// #syscalls
+#include <rtl/gramado.h>
+
 
 #define STRCMP(c, s, n) strlen(c) == n && strncmp(c, s, n)
 
-
 char *the_prompt = "sh7 $ ";
-
-
-
 
 /*
 void
@@ -86,14 +80,13 @@ process_cmd(char *b)
 
 
 
-
 int main (int argc, char **argv)
 {
     char cmdbuf[128];
-    int i = 0;
-    int ret;
+    register int i=0;
+    int ret=0;
 
-    /* TODO: tty set raw mode */
+/* TODO: tty set raw mode */
 
     memset(cmdbuf, 0, 128);
     printf("There are %d args\n", argc);
@@ -156,8 +149,4 @@ read_more:
         goto prompt;
     }
 }
-
-
-
-
 

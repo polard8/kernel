@@ -68,11 +68,16 @@ enum { TYPE_CHAR, TYPE_INT, TYPE_PTR };
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
 
+static void expr(int lev);
+static void next(void);
+static void stmt(void);
+
+// -------------------------------------
+
 
 // next
 // Is it the lexer ?
-
-void next (void)
+static void next(void)
 {
     char *pp;
 
@@ -186,13 +191,10 @@ void next (void)
   }; //while
 }
 
-
-
 // expr
-void expr (int lev)
+static void expr(int lev)
 {
     int t, *d;
-
 
   // Nothing| NUM | '"'  
   if (!tk) { printf("%d: unexpected eof in expression\n", line); exit(-1); }
@@ -408,11 +410,10 @@ void expr (int lev)
 }
 
 
-void stmt (void)
+static void stmt(void)
 {
     int *a, *b;
 
-    
     // IF
     if (tk == If){
 
@@ -534,21 +535,15 @@ int main (int argc, char **argv)
         printf("could not open(%s)\n", *argv); return -1; 
     }
 
-
-    //
-    // alloc size
-    //
-
-    // arbitrary size
-
+// alloc size
+// arbitrary size
     // poolsz = (256*1024);    
     // poolsz = (2*1024);
     poolsz = 512;
-    
-    
-    // Buffer.
-    // sym, le, data, sp
-    
+
+// Buffer.
+// sym, le, data, sp
+
     if (!(sym = malloc(poolsz))) 
     { printf("could not malloc(%d) symbol area\n", poolsz); return -1; }
     
@@ -572,18 +567,19 @@ int main (int argc, char **argv)
     p = "char else enum if int return sizeof while "
         "open run read close printf malloc free memset memcmp exit void main";
 
-    
-    // add keywords to symbol table
-    // Do Char até o While.
+
+// add keywords to symbol table
+// Do Char até o While.
+
     i = Char; 
     while (i <= While) 
     { 
         next(); 
         id[Tk] = i++; 
     }; 
-    
-    // add library to symbol table
-    // Do OPEN até o EXIT.
+
+// add library to symbol table
+// Do OPEN até o EXIT.
     i = OPEN; 
     while (i <= EXIT) 
     { 
@@ -593,34 +589,31 @@ int main (int argc, char **argv)
         id[Type]  = TYPE_INT; 
         id[Val]   = i++; 
     };
-    
-    
-    //
-    // void main ...
-    //
+
+//
+// void main ...
+//
   
-    // handle 'void' type
+// handle 'void' type
     next(); 
     id[Tk] = Char; 
 
-
-    // keep track of 'main'
+// keep track of 'main'
     next(); 
     idmain = id; 
 
-    //
-    // malloc
-    //
+//
+// malloc
+//
 
     printf("poolsz = { %d bytes } \n",poolsz);
 
     if (!(lp = p = malloc(poolsz))) 
     { printf("could not malloc(%d) source area\n", poolsz); return -1; }
 
-
-    //
-    // Read!
-    //
+//
+// Read!
+//
 
     debug_print("gramc4: Read the file\n");
 
@@ -634,9 +627,9 @@ int main (int argc, char **argv)
     p[i] = 0;
     close (fd);
 
-    //
-    // Parse declarations
-    //
+//
+// Parse declarations
+//
 
     line = 1;
     

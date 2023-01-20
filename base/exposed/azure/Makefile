@@ -19,5 +19,4 @@ all:
 
 	make -C ./gramcnf
 	
-
-
+#make -C ./gramc4
