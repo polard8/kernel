@@ -1451,10 +1451,7 @@ int sys_close(int fd)
 
 // Process
 // #todo: There is a helper for that small routine.
-
-    if ( current_process < 0 || 
-         current_process >= PROCESS_COUNT_MAX )
-    {
+    if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print("sys_close: current_process\n");
         goto fail;
     }
@@ -1513,15 +1510,14 @@ int sys_close(int fd)
 
 // ====================================================
 // virtual console.
-    if ( object->____object == ObjectTypeVirtualConsole )
-    {
+    if (object->____object == ObjectTypeVirtualConsole){
         debug_print("sys_close: Trying to close a virtual console object\n");
         return 0;
     }
 
 // =====================================================
 // tty
-    if ( object->____object == ObjectTypeTTY )
+    if (object->____object == ObjectTypeTTY)
     {
         debug_print("sys_close: Trying to close a tty object\n");
         object = NULL;
@@ -1574,9 +1570,7 @@ int sys_close(int fd)
     }
 
 // Object type not supported.
-
     debug_print("sys_close:[FAIL] Object type not supported yet \n");
-
 fail:
     debug_print("sys_close: [FAIL] \n");
     return (int) (-1);
@@ -1696,8 +1690,11 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 // Prototype in rtl/sci/sys.h
 file *get_file_from_fd(int fd)
 {
+
+// File pointer.
+    file *fp;
+
     struct process_d *p;  // current process
-    file *f;              // object
 
     pid_t current_pid = (pid_t) get_current_process();
     if ( current_pid < 0 || current_pid >= PROCESS_COUNT_MAX ){
@@ -1719,8 +1716,8 @@ file *get_file_from_fd(int fd)
     if (fd < 0 || fd >= 32){
         goto fail;
     }
-    f = (file *) p->Objects[fd];
-    if ( (void*) f == NULL ){
+    fp = (file *) p->Objects[fd];
+    if ( (void*) fp == NULL ){
         //#debug
         //printf("fd{%d} pid{%d}\n",fd,current_pid);
         //printf("entry0: %x\n", p->Objects[0]);
@@ -1731,7 +1728,7 @@ file *get_file_from_fd(int fd)
         goto fail;
     }
 
-    return (file *) f;
+    return (file *) fp;
 fail:
     refresh_screen();
     return NULL;
