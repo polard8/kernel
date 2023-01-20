@@ -3327,7 +3327,10 @@ void gws_send_wm_magic( int fd, int pid )
 // + (3) Connect to the window server.
 // IN: #todo: Explain it better.
 // hostname:number.screen_number
-
+// #todo
+// It opens a display device ... 
+// A device to control the screen access.
+// 
 struct gws_display_d *gws_open_display(char *display_name)
 {
     struct gws_display_d *Display;
@@ -3342,6 +3345,14 @@ struct gws_display_d *gws_open_display(char *display_name)
     addr_in.sin_addr.s_addr = __IP(127,0,0,1);
     int addrlen=0;
     addrlen = sizeof(addr_in);
+
+
+// #todo
+// Open the display device
+// and set the fd for the device for future 
+// display configurations.
+    // Display->_device_fd = ?
+
 
 // (1)
 // Create the display structure.

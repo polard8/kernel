@@ -1,6 +1,5 @@
 /*
  * File: display.h 
- * 
  *     Display structure support.
  *     This header should be included by including "gws.h".
  */
@@ -13,6 +12,9 @@
 // Podemos ter um buffer de request dentro da estrutura de display.
 // Isso é melhor que um buffer global solto,
 // Dessa forma cada display pode ter seus próprios buffers.
+// #todo
+// Handle the access for the display device.
+// The kernel needs to gice us one fd, for future configurations.
 
 struct gws_display_d
 {
@@ -24,8 +26,11 @@ struct gws_display_d
     // #test
     //"host:display" string used on this connect
     char *display_name;
-    
-    int fd;    // Network socket. 
+
+    //int _device_fd;
+
+// Network socket. 
+    int fd;
     int lock;  // is someone in critical section?  
  
     int connected;
@@ -33,9 +38,9 @@ struct gws_display_d
     int running;
 
     //#test
-    //char *buffer;		//Output buffer starting address. 
-    //char *bufptr;		//Output buffer index pointer. 
-    //char *bufmax;		//Output buffer maximum+1 address. 
+    //char *buffer;  //Output buffer starting address. 
+    //char *bufptr;  //Output buffer index pointer. 
+    //char *bufmax;  //Output buffer maximum+1 address. 
     
     //#test
     //only one screen for now.
