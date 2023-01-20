@@ -40,7 +40,7 @@ int main ( int argc, char *argv[] )
     }
 
     if( argc == 1 ){
-        printf("cat: We need mor args\n");
+        printf("cat: We need more args\n");
         //call usage()
         exit(1);
     }
@@ -92,7 +92,7 @@ int main ( int argc, char *argv[] )
         
         //#todo: Create ltell()
         
-        lseek(fd,0,SEEK_SET);     // do inicio #ok
+        //lseek(fd,0,SEEK_SET);     // do inicio #ok
         //lseek(fd,80*4,SEEK_SET);  // do meio #ok
         //lseek(fd,0,SEEK_CUR);     // de onde estavamos. #testing
         //lseek(fd,0,SEEK_END);       // do fim.
@@ -130,20 +130,16 @@ int main ( int argc, char *argv[] )
         // Write
         // Write on stdout.
         nwrites = write ( 1, buffer, sizeof(buffer) );
-        if (nwrites <= 0)
-        {
+        if (nwrites <= 0){
             printf ("cat: write fail\n");
             //exit(-1);
         }
 
         //fprintf(stdout,buffer);
         //fflush(stdout);
-        
         //printf("OUTPUT: %s \n",buffer);
-
         // close() ??
         // vai salvar ??
-
    // };
 
     return 0;

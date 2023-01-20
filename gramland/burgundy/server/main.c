@@ -1053,8 +1053,8 @@ gwsProcedure (
         serviceCreateWindow(client_fd);
         // #test
         // Handle incoming inputs right after a huge service routine.
-        if ( is_accepting_input() == TRUE )
-            wmInputReader();
+        //if ( is_accepting_input() == TRUE )
+        //    wmInputReader();
         NoReply = FALSE;   // We need to return the window id.
         break; 
 
@@ -1094,8 +1094,8 @@ gwsProcedure (
         serviceRefreshWindow();
         // #test
         // Handle incoming inputs right after a huge service routine.
-        if ( is_accepting_input() == TRUE )
-            wmInputReader();
+        //if ( is_accepting_input() == TRUE )
+        //    wmInputReader();
         //NoReply = FALSE;
         NoReply = TRUE;    // syncronous
         break;
@@ -1106,8 +1106,8 @@ gwsProcedure (
          serviceRedrawWindow();
         // #test
         // Handle incoming inputs right after a huge service routine.
-        if ( is_accepting_input() == TRUE )
-            wmInputReader();
+        //if ( is_accepting_input() == TRUE )
+         //   wmInputReader();
          //NoReply = FALSE;
          NoReply = TRUE;    // syncronous
          break;
@@ -1153,8 +1153,8 @@ gwsProcedure (
         gws_show_backbuffer();
         // #test
         // Handle incoming inputs right after a huge service routine.
-        if ( is_accepting_input() == TRUE )
-            wmInputReader();
+        //if ( is_accepting_input() == TRUE )
+        //    wmInputReader();
         //NoReply = FALSE;      // #todo
         break;
 
@@ -1165,8 +1165,8 @@ gwsProcedure (
         serviceRefreshRectangle();
         // #test
         // Handle incoming inputs right after a huge service routine.
-        if ( is_accepting_input() == TRUE )
-            wmInputReader();
+        //if ( is_accepting_input() == TRUE )
+        //    wmInputReader();
         NoReply = FALSE;
         break;
 
