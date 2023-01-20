@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <heap.h>
 #include <sys/socket.h>
-#include <rtl/gramado.h>   
+#include <rtl/gramado.h>
+
 #include "include/gns.h"
 
 
@@ -19,7 +20,6 @@ char __gns_buffer[SIZE_DONT_CHANGE];
 static int __gns_hello_request(int fd);
 static int __gns_hello_response(int fd);
 //=================================
-
 
 // System call.
 // 0x80 System interrupt.
@@ -38,20 +38,18 @@ void *gns_system_call (
     return (void *) __Ret; 
 }
 
-
 // Debug vai serial port. (COM1)
 void gns_debug_print (char *string)
 {
-    if( (void*) string == NULL )
+    if ( (void*) string == NULL ){
         return;
-
+    }
     gns_system_call ( 
         289, 
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
 }
-
 
 // Yield this thread.
 void gns_yield(void)
@@ -64,7 +62,6 @@ void gns_yield(void)
 static int __gns_hello_request (int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gns_buffer[0];   
-
     int n_writes = 0;   // For sending requests.
     int i=0;
 

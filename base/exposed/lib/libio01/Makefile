@@ -2,7 +2,6 @@
 # History:
 # 2019 - Created by Fred Nora.
 
-
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
@@ -25,22 +24,16 @@ CFLAGS = -m64 \
 	-fno-stack-protector \
 	-s
 
-
-
 .PHONY: all all-c finalize clean
 
 all: all-c finalize clean
 	@echo "Ok?"
-
 all-c:
 	gcc  -c  libio.c $(CFLAGS) -I include/ -o libio.o 
-
 finalize:
 	-mkdir obj
 	-cp libio.o obj/
-
 clean:
 	-rm *.o
-
 
 

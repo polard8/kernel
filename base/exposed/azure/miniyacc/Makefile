@@ -82,16 +82,12 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o  .
 	cp $(LIBCOBJ)/strtol.o .
 
-
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o MINIYACC.BIN $(myObjects)    
-
 finalize:
 	cp MINIYACC.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm MINIYACC.BIN 
 	
-	
-	
+

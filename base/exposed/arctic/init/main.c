@@ -4,15 +4,14 @@
 // This is also a server.
 
 #include <types.h>
-#include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <rtl/gramado.h>
 
 //Used by creat()
 //#include <fcntl.h>
-
 
 #define __COLOR_BLUE   0x000000FF
 #define __COLOR_WHITE  0x00FFFFFF

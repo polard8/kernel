@@ -71,10 +71,8 @@ all-c:
 
 jackpot-link:
 	ld -m elf_x86_64 -T ../link.ld -o SHUTDOWN.BIN $(myObjects)    
-
 finalize:
 	cp SHUTDOWN.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm SHUTDOWN.BIN 

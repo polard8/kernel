@@ -1,17 +1,13 @@
 /*
  * File: gns_pack.h
- * 
- *     This header should be included by including "gns.h".
+ *     This header should be included by gns.h.
  */
-
 
 #ifndef __LIBGNS_GNS_PACK_H
 #define __LIBGNS_GNS_PACK_H  1
 
-
 // Socket packets.
 // Usados na troca de mensagens via socket.
-
  
 // # Podemos usar esse esquema em todos os servidores.
 // então isso deverá ir para bibliotecas.
@@ -40,7 +36,6 @@
 #define GNS_SERVER_PACKET_TYPE_REPLY      1001 
 #define GNS_SERVER_PACKET_TYPE_EVENT      1002
 #define GNS_SERVER_PACKET_TYPE_ERROR      1003
-
 
 #endif  
 

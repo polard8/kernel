@@ -7,16 +7,13 @@
  * History:
  *     2020 - Created by Fred Nora.
  */
-
 // See:
 // https://wiki.osdev.org/Message_Passing_Tutorial
 // https://wiki.osdev.org/Synchronization_Primitives
 // ...
-
 // Connecting via AF_INET.
 // tutorial example taken from. 
 // https://www.tutorialspoint.com/unix_sockets/socket_server_example.htm
-
 /*
     To make a process a TCP server, you need to follow the steps given below −
     Create a socket with the socket() system call.
@@ -29,7 +26,6 @@
     Send and receive data using the read() and write() system calls.
 */ 
 
-
 // rtl
 #include <types.h>
 #include <stdio.h>
@@ -40,9 +36,9 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <rtl/gramado.h>
+
 #include <packet.h>
 #include <gns.h>
-
 
 // Ports.
 #define PORTS_WS  4040
@@ -52,7 +48,6 @@
 
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
-
 /*
 // #test
 // gerar número aleatório dentro de uma faixa.
@@ -61,7 +56,6 @@ int gerar_numero(int lim_inf, int lim_sup)
     return (lim_inf + (rand() % lim_sup));
 }
 */
-
 
 /*
 #define IP(a, b, c, d) (a << 24 | b << 16 | c << 8 | d)
@@ -80,11 +74,9 @@ int main ( int argc, char *argv[] )
 {
 
 //========================
-    struct sockaddr_in server_address;
-    int addrlen;
-    
+    struct sockaddr_in  server_address;
+    int addrlen=0;
     server_address.sin_family = AF_INET;
-    
     // Connecting to the network server in this machine.
     server_address.sin_port        = PORTS_NS;       // htons(PORTS_NS);
     server_address.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
@@ -94,27 +86,17 @@ int main ( int argc, char *argv[] )
 
     int client_fd = -1;
 
-    //debug_print ("-------------------------\n");
     debug_print ("gns.bin: Initializing ...\n");
 
-
-//
 // Socket
-// 
-
     client_fd = (int) socket ( AF_INET, SOCK_STREAM, 0 );
-
-    if ( client_fd < 0 ){
+    if (client_fd < 0){
        //gws_debug_print ("gnst: Couldn't create socket\n");
        printf ("gns.bin: [FAIL] Couldn't create socket\n");
        exit(1);
     }
 
-
-//
 // Connect
-//
-
 // Nessa hora colocamos no accept um fd.
 // Então o servidor escreverá em nosso arquivo.
 
@@ -133,11 +115,7 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-
-//
-// Loop.
-//
-
+// Loop
 // See: 
 // libgns/
 
@@ -151,10 +129,9 @@ int main ( int argc, char *argv[] )
         // Send
         //printf("gns.bin: Send message\n");
         service_status = (int) gns_hello(client_fd);
-        if( service_status <= 0 ){
+        if ( service_status <= 0 ){
             printf("gns.bin: service failed\n");
         }
-        
         // Sleep
         //printf("gns.bin: Sleep\n");
         //gns_yield();
@@ -163,9 +140,7 @@ int main ( int argc, char *argv[] )
         gns_yield();
     };
 
-    
 // Not reached.
-
     close(client_fd);
     debug_print ("gns.bin: bye\n"); 
     printf      ("gns.bin: bye\n");

@@ -70,15 +70,11 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-	
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o SHOWFUN.BIN $(myObjects)    
-
 finalize:
 	cp SHOWFUN.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm SHOWFUN.BIN 
-	
 	

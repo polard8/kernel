@@ -71,10 +71,8 @@ all-c:
 
 jackpot-link:
 	ld -m elf_x86_64 -T ../link.ld -o REBOOT.BIN $(myObjects)    
-
 finalize:
 	cp REBOOT.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm REBOOT.BIN 

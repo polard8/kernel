@@ -68,15 +68,12 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-	
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o ECHO.BIN $(myObjects)    
-
 finalize:
 	cp ECHO.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm ECHO.BIN 
 	
-	
+

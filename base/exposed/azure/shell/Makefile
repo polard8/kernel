@@ -107,14 +107,10 @@ LIBIO    = ../../lib/libio01/include/
 LIBIOOBJ = ../../lib/libio01/obj
 
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o libio.o    
-
 
 
 .PHONY: all all-c cat-link finalize clean
@@ -124,9 +120,7 @@ all: main.o all-c cat-link finalize clean
 
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBIO) -o main.o
-
 all-c:
-
 	cp $(LIBCOBJ)/crt0.o  .
 	cp $(LIBCOBJ)/rtl.o  .
 	
@@ -140,18 +134,14 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
-	
 
 	cp $(LIBIOOBJ)/libio.o  .
 	
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o SHELL.BIN $(myObjects)    
-
 finalize:
 	cp SHELL.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm SHELL.BIN 
-	
 	

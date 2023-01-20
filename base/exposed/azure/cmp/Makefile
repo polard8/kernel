@@ -68,15 +68,11 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o CMP.BIN $(myObjects)    
-
 finalize:
 	cp CMP.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm CMP.BIN 
-	
 	

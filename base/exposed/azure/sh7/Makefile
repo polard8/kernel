@@ -84,7 +84,7 @@ all-c:
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o SH7.BIN $(myObjects)    
 finalize:
-	cp SH7.BIN  ../../bin
+	cp SH7.BIN  ../bin
 clean:
 	-rm *.o
 	-rm SH7.BIN 

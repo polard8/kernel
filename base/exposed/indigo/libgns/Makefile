@@ -2,16 +2,10 @@
 # Client-side library for gws window server.
 # 2020 - Created by Fred Nora.
 
-
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = libgws - Client-side library for gws window server.
-
-
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -36,19 +30,12 @@ LIBS = -I. -I ../../lib/rtl/include/
 
 all: all-c finalize clean
 	@echo "Ok?"
-
 all-c:
-
 	gcc -c gns.c  $(CFLAGS) $(LIBS) -o gns.o
-	#gcc -c connect.c  $(CFLAGS) $(LIBS) -o connect.o
-	#gcc -c events.c   $(CFLAGS) $(LIBS) -o events.o
-	#gcc -c rw.c       $(CFLAGS) $(LIBS) -o rw.o
-
 finalize:
 	-mkdir obj/
 	-cp *.o obj/
 clean:
 	-rm *.o
-	
 	
 

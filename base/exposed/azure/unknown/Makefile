@@ -31,15 +31,10 @@ CFLAGS = -m64 \
 LIBC     = ../../lib/rtl/include/
 LIBCOBJ  = ../../lib/rtl/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
 
 
 .PHONY: all all-c cat-link finalize clean
@@ -49,7 +44,6 @@ all: main.o all-c cat-link finalize clean
 
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
@@ -65,15 +59,10 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o UNKNOWN.BIN $(myObjects)  
-
 finalize:
 	cp UNKNOWN.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm UNKNOWN.BIN 
-
-	
