@@ -6,6 +6,17 @@
 #include "gramcnf.h"
 
 
+// ## current ##
+// Usado pelo lexer pra saber qual lugar na lista 
+// colocar o lexeme.
+int current_keyword=0;
+int current_identifier=0; 
+int current_constant=0;
+int current_string=0;
+int current_separator=0; 
+int current_special=0;
+
+
 int eofno=0;
 
 // Line support

@@ -1,13 +1,25 @@
 
+// lexer.h
+
 #ifndef __LEXER_H
 #define __LEXER_H    1
+
+
+// ## current ##
+// Usado pelo lexer pra saber qual lugar na lista 
+// colocar o lexeme.
+extern int current_keyword; 
+extern int current_identifier; 
+extern int current_constant; 
+extern int current_string; 
+extern int current_separator; 
+extern int current_special;
 
 //#bugbug: 
 //olexer vai usar esse porque a rotina no ctype pode estar com problema #todo 
 #define lexer_isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
 //#define isdigit(char) (char >= '0' && char <= '9')
 #define ENDFILE -1  /* token that represents end-of-file */
-
 
 // Lexer codes
 typedef enum {

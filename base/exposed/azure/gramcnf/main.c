@@ -6,6 +6,8 @@
 
 #include "gramcnf.h"
 
+
+
 //#define __VERSION__ "0.1"
 //const char copyright[] = "Copyright (c) Fred Nora";
 

@@ -1,8 +1,8 @@
 
 // token.h
 
-#ifndef __TOKEN.H
-#define __TOKEN.H    1
+#ifndef __TOKEN_H
+#define __TOKEN_H    1
 
 // Enumeração dos tipos de tokens.
 typedef enum {
@@ -122,34 +122,6 @@ char *CONSTANTLIST[TLIMIT];
 char *STRINGLIST[TLIMIT]; 
 char *SEPARATORLIST[TLIMIT]; 
 char *SPECIALLIST[TLIMIT]; 
- 
-
-//
-// -- Counters --------
-// 
-
-//contador para não estourar a lista. 
-int keyword_count; 
-int identifier_count; 
-int keyword_count; 
-int constant_count; 
-int string_count; 
-int separator_count; 
-int special_count;
-
-//
-// ## current ##
-//
-
-//usado pelo lexar pra saber qual lugar na lista 
-//colocar o lexeme.
-int current_keyword; 
-int current_identifier; 
-int current_keyword; 
-int current_constant; 
-int current_string; 
-int current_separator; 
-int current_special;
  
  
 
@@ -381,9 +353,6 @@ static	 while
 // expressões matemáticas.
 #define ID_INDEX 6   
 
-
-
-
 //...
 #define ID_CLASS_VAR       100
 #define ID_CLASS_STRING    101
@@ -393,13 +362,8 @@ static	 while
 #define ID_CLASS_LABEL     105
 //...
 
-//8 elementos que explicam o identificador.
-int id[8];
 
 //#obs lembrando que o identificador fica em outro buffer.
-
-
-
 
 
 //
@@ -422,36 +386,11 @@ int id[8];
 #define CONSTANT_BASE_DEC 10
 #define CONSTANT_BASE_HEX 16
 
-//elementos que explicam a constante.
-int constant[8];
-
-
-//salvando a string das constantes,
-//onde a constante será armazenada dependendo do tipo.
-char constant_byte[2];   //0xFF
-char constant_word[4];   //0xFFFF
-char constant_dword[8];  //0xFFFFFFFF
-
-//o que colocar antes dessa constante.
-//isso varia com a base
-char constant_before[2];
-
-//o que colocar depois dessa constante.
-//isso varia com a base
-char constant_aftes[2];
-
-
-
-
 
 //#TODO RETURN SUPPORT;
 
 #define RETURN_TOKEN 0
 #define RETURN_TYPE 1
-
-int return_info[8];
-
-
 
 
 #define SYMBOLTYPE_FUNCTION           1
@@ -506,8 +445,6 @@ struct type_d
 typedef struct type_d  type_t;
 
 #define FUNCTION_COUNT_MAX  32
-
-unsigned long functionList[FUNCTION_COUNT_MAX];
 
 
 #endif    

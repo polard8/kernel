@@ -6,6 +6,5 @@
 
 FILE *compiler (void);
 
-
 #endif    
 

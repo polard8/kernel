@@ -1,8 +1,8 @@
+
 // debug.h
 
 #ifndef __DEBUG_H
 #define __DEBUG_H    1
-
 
 // Verbose
 #define GRAMC_VERBOSE  1
@@ -27,6 +27,3 @@
 //#define PARSER_ASM_VERBOSE 1
 
 #endif    
-
-
-

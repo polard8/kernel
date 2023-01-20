@@ -5,6 +5,31 @@
 
 #include "gramcnf.h"
 
+
+// 8 elementos que explicam o identificador.
+int id[8];
+
+
+//elementos que explicam a constante.
+int constant[8];
+//salvando a string das constantes,
+//onde a constante será armazenada dependendo do tipo.
+char constant_byte[2];   //0xFF
+char constant_word[4];   //0xFFFF
+char constant_dword[8];  //0xFFFFFFFF
+//o que colocar antes dessa constante.
+//isso varia com a base
+char constant_before[2];
+//o que colocar depois dessa constante.
+//isso varia com a base
+char constant_aftes[2];
+
+
+int return_info[8];
+
+
+unsigned long functionList[FUNCTION_COUNT_MAX];
+
 // Espiada, olhadinha.
 // #importante
 // esquema
