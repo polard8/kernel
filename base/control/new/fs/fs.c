@@ -533,7 +533,10 @@ sys_read (
     char *ubuf,       //#todo: use 'void *'
     size_t count )    //#todo: use 'size_t'.
 {
-    file *__file;
+
+// File pointer.
+    file *fp;
+
     ssize_t nbytes=0;
     struct socket_d *s;
     int ubuf_len=0;
@@ -583,47 +586,40 @@ sys_read (
         //ubuf_len = 512;
     }
 
-//
 // File
-//
-
 // Get the object pointer.
-
-    __file = (file *) get_file_from_fd(fd);
-
-    if ( (void *) __file == NULL ){
-        debug_print ("sys_read: __file not open\n");
-        printf      ("sys_read: __file not open\n");
+    fp = (file *) get_file_from_fd(fd);
+    if ( (void *) fp == NULL ){
+        debug_print ("sys_read: fp not open\n");
+        printf      ("sys_read: fp not open\n");
         goto fail; 
     }
 
-    if (__file->sync.can_read != TRUE){
+    if (fp->sync.can_read != TRUE){
         debug_print ("sys_read: [PERMISSION] Can NOT read the file\n");
         printf      ("sys_read: [PERMISSION] Can NOT read the file\n");
         goto fail; 
     }
 
-    /*
+/*
     // #todo
     // ainda nao inicializamos esse elemento.
-    if( __file->is_readable == FALSE )
-    {
+    if( fp->is_readable == FALSE ){
         debug_print ("sys_read: Not readable\n");
         return -1;
     }
-    */
+*/
 
     // #todo: Create thie element in the structure.
-    // if( __file->is_directory == TRUE ){}
+    // if( fp->is_directory == TRUE ){}
 
 //==========================================================
 // ::0
 // stdin
-
-    if (__file->_file == STDIN_FILENO){
+    if (fp->_file == STDIN_FILENO){
         debug_print("sys_read: Reading from stdin\n");
         // Shortcut
-        if ( __file->____object == ObjectTypeFile ){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -631,10 +627,10 @@ sys_read (
 //==========================================================
 // ::1
 // stdout
-    if (__file->_file == STDOUT_FILENO){
+    if (fp->_file == STDOUT_FILENO){
         debug_print("sys_read: Reading from stdout\n");
         // Shortcut
-        if ( __file->____object == ObjectTypeFile ){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -642,11 +638,10 @@ sys_read (
 //==========================================================
 // ::2
 // stderr
-
-    if (__file->_file == STDERR_FILENO){
+    if (fp->_file == STDERR_FILENO){
         debug_print("sys_read: Reading from stderr\n");
         // Shortcut
-        if ( __file->____object == ObjectTypeFile ){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -660,12 +655,12 @@ sys_read (
 // #todo: 
 // Now we can call socket_read(...)
 
-    if ( __file->____object == ObjectTypeSocket )
+    if (fp->____object == ObjectTypeSocket)
     {
         // debug_print("sys_read: [DEBUG] Trying to read a socket object\n");
             
         // not reading yet
-        if ((__file->_flags & __SRD) == 0) 
+        if ((fp->_flags & __SRD) == 0) 
         {
             //debug_print("sys_read: [FAIL] flag __SRD \n");
             //yield (current_thread);
@@ -677,27 +672,27 @@ sys_read (
         // vazio? 
         // nao podemos ler.
         // acorda escritores e dorme.
-        if (__file->socket_buffer_full == FALSE)
+        if (fp->socket_buffer_full == FALSE)
         { 
             debug_print("sys_read: [FAIL] can't read an empty buffer\n");
             //goto fail;
             
             debug_print("sys_read: WAKEUP WRITER\n");
-            __file->_flags = 0;
-            __file->_flags |= __SWR;                  // pode escrever
-            do_thread_ready( __file->tid_waiting );   // acorda escritores. 
-            __file->tid_waiting = -1;
-            
-                    // #bugbug
-                    // Isso pode ser ruim pela natureza da chamada sys_read()
-                    // que vem de uma syscall que nao salvou o contexto.
-            
-            if (__file->sync.block_on_read_empty == TRUE )
+            fp->_flags = 0;
+            fp->_flags |= __SWR;                  // pode escrever
+            do_thread_ready( fp->tid_waiting );   // acorda escritores. 
+            fp->tid_waiting = -1;
+
+            // #bugbug
+            // Isso pode ser ruim pela natureza da chamada sys_read()
+            // que vem de uma syscall que nao salvou o contexto.
+
+            if (fp->sync.block_on_read_empty == TRUE )
             {
                 debug_print("sys_read: SLEEP READER\n");
                 panic("sys_read: [DEBUG] Couldn't read socket. Buffer not full\n");
 
-                __file->tid_waiting = current_thread;
+                fp->tid_waiting = current_thread;
                 //do_thread_waiting (current_thread);
                 yield (current_thread);
                 goto fail;
@@ -708,16 +703,16 @@ sys_read (
 
         // cheio? 
         // le e acorda escritores.
-        if (__file->socket_buffer_full == TRUE)
+        if (fp->socket_buffer_full == TRUE)
         {
-            if (__file->_flags & __SRD)
+            if (fp->_flags & __SRD)
             {
                 //debug_print ("sys_read: >>>> READ\n");
             
                 // read!
                 nbytes = 
                     (ssize_t) file_read_buffer ( 
-                                  (file *) __file, 
+                                  (file *) fp, 
                                   (char *) ubuf, 
                                   (int) count );
 
@@ -731,21 +726,20 @@ sys_read (
                 if (nbytes > 0)
                 {
                     //debug_print("sys_read: [DEBUG] lemos mais que 0 bytes em um socket.\n");
-                    __file->socket_buffer_full = FALSE;     // buffer vazio
-                    __file->_flags &= ~__SRD;  // nao posso mais LER.            
-                    __file->_flags |= __SWR;   // pode escrever também
+                    fp->socket_buffer_full = FALSE;     // buffer vazio
+                    fp->_flags &= ~__SRD;  // nao posso mais LER.            
+                    fp->_flags |= __SWR;   // pode escrever também
                     //debug_print("sys_read: WAKEUP WRITER\n");
-                    do_thread_ready( __file->tid_waiting ); // acorda escritores.
-                    __file->tid_waiting = -1;
+                    do_thread_ready( fp->tid_waiting );  // acorda escritores.
+                    fp->tid_waiting = -1;
                     //debug_print("sys_read:done\n");
-                    return (ssize_t) nbytes;                    // bytes escritos.
+                    return (ssize_t) nbytes;    // bytes escritos.
                 }
             }
         } 
 
         panic ("sys_read: Unexpected error when reading socket\n");
     }
-
 
 //
 // == Regular file ============================================
@@ -765,35 +759,35 @@ sys_read (
 
 RegularFile:
 
-    if ( __file->____object == ObjectTypeFile )
+    if (fp->____object == ObjectTypeFile)
     {
 
          //#debug
-         //if( __file->_file == 5)
+         //if( fp->_file == 5)
          //{
-         //    if ( (__file->_flags & __SRD) == 0 )
+         //    if ( (fp->_flags & __SRD) == 0 )
          //        printf("cant read\n");
-         //    if ( __file->_flags & __SRD )
+         //    if ( fp->_flags & __SRD )
          //        printf("can read\n");
-         //    printf("sys_read-OUTPUT 5: %s \n",__file->_base);
+         //    printf("sys_read-OUTPUT 5: %s \n",fp->_base);
          //    refresh_screen();
          //}
 
         //debug_print("sys_read: [DEBUG] Trying to read a regular file object\n");
         
         //Se não pode ler.
-        if ( (__file->_flags & __SRD) == 0 )
+        if ( (fp->_flags & __SRD) == 0 )
         {
             //debug_print("sys_read: [FLAGS] Can't read!\n");
         
             //Não conseguimos ler.
             //nada de errado, apenas espera.
             //do_thread_waiting (current_thread);
-            //__file->tid_waiting = current_thread;
-            //__file->_flags |= __SWR;  //pode escrever.
+            //fp->tid_waiting = current_thread;
+            //fp->_flags |= __SWR;  //pode escrever.
             //scheduler();
             
-            //printf("sys_read: __file->_flags & __SRD \n");
+            //printf("sys_read: fp->_flags & __SRD \n");
             //refresh_screen();
             
             goto fail;
@@ -806,11 +800,11 @@ RegularFile:
         // + Sinalize that another process can write.
         // #todo: wake the one that was waiting to write.
 
-        if (__file->_flags & __SRD)
+        if (fp->_flags & __SRD)
         {
             nbytes = 
                 (ssize_t) file_read_buffer ( 
-                              (file *) __file, 
+                              (file *) fp, 
                               (char *) ubuf, 
                               (int) count );
  
@@ -822,22 +816,22 @@ RegularFile:
             // Se conseguimos ler.
             if (nbytes>0)
             {
-                //__file->_flags &= ~__SRD;  // nao posso mais LER.            
-                //__file->_flags |= __SWR;   // pode escrever também
+                //fp->_flags &= ~__SRD;  // nao posso mais LER.            
+                //fp->_flags |= __SWR;   // pode escrever também
                 // ok to write.
-                __file->_flags |= __SWR;
-                __file->sync.can_write = TRUE;
+                fp->_flags |= __SWR;
+                fp->sync.can_write = TRUE;
                 // #test
                 // Acordar quem esperava por esse evento
-                //do_thread_ready( __file->tid_waiting );
+                //do_thread_ready( fp->tid_waiting );
                 return (ssize_t) nbytes; 
             }
 
             //Não conseguimos ler.
             //nada de errado, apenas espera.
             //do_thread_waiting (current_thread);
-            //__file->tid_waiting = current_thread;
-            //__file->_flags |= __SWR;  //pode escrever.
+            //fp->tid_waiting = current_thread;
+            //fp->_flags |= __SWR;  //pode escrever.
             //scheduler();
             return 0;
         }
@@ -850,7 +844,7 @@ RegularFile:
 // ========================================
 // Pseudo terminal multiplexer.
 
-    if (__file->____object == ObjectTypePTMX){
+    if (fp->____object == ObjectTypePTMX){
         printk ("sys_read: [TODO] trying to read a PTMX device file\n");
         refresh_screen();
         return 0;
@@ -859,7 +853,7 @@ RegularFile:
 // ========================================
 // pty () pseudo terminal.
 
-    if (__file->____object == ObjectTypePTY){
+    if (fp->____object == ObjectTypePTY){
         printk ("sys_read: [TODO] trying to read a PTY device file\n");
         refresh_screen();
         return 0;
@@ -868,7 +862,7 @@ RegularFile:
 // ========================================
 // file system
 
-    if (__file->____object == ObjectTypeFileSystem){
+    if (fp->____object == ObjectTypeFileSystem){
         printk ("sys_read: [TODO] trying to read a file system\n");
         refresh_screen();
         return 0;
@@ -877,7 +871,7 @@ RegularFile:
 // ========================================
 // See: pipe.c
 
-    if (__file->____object == ObjectTypePipe){
+    if (fp->____object == ObjectTypePipe){
         return (ssize_t) sys_read_pipe ( (int) fd, (char *) ubuf, (int) count ); 
     }
 
@@ -909,8 +903,8 @@ fail:
 
     //bloqueando, autorizando a escrita e reescalonando.
     //do_thread_waiting (current_thread);
-    //__file->tid_waiting = current_thread;
-    //__file->_flags |= __SWR;  //pode escrever      
+    //fp->tid_waiting = current_thread;
+    //fp->_flags |= __SWR;  //pode escrever      
     //scheduler();  //#bugbug: Isso é um teste  
 
 // Something is wrong!
@@ -956,7 +950,10 @@ fail:
 
 ssize_t sys_write (int fd, char *ubuf, size_t count)
 {
-    file *__file;
+
+// File pointer.
+    file *fp;
+
     ssize_t nbytes=0;
     struct socket_d *s1;
     struct socket_d *s2;
@@ -1010,19 +1007,15 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         debug_print ("sys_write: [FIXME] Ajusting ubuf_len to 512\n");
     }
 
-//
-// __file
-//
-
+// File
 // Get the object pointer from the list
 // in the process structure.
 
-    __file = (file *) get_file_from_fd(fd);
-    
-    if ( (void *) __file == NULL )
+    fp = (file *) get_file_from_fd(fd);
+    if ( (void *) fp == NULL )
     {
-        debug_print ("sys_write: __file not open\n");
-        printf      ("sys_write: __file not open #hang\n");
+        debug_print ("sys_write: fp not open\n");
+        printf      ("sys_write: fp not open #hang\n");
         //printf      ("fd{%d} pid{%d}\n",fd,current_process);
         //printf("entry0: %x\n", __P->Objects[0]);
         //printf("entry1: %x\n", __P->Objects[1]);
@@ -1034,17 +1027,16 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         goto fail;
     }
 
-    if (__file->sync.can_write != TRUE){
+    if (fp->sync.can_write != TRUE){
         debug_print ("sys_write: [PERMISSION] Can NOT write the file\n");
         printf      ("sys_write: [PERMISSION] Can NOT write the file\n");
         goto fail; 
     }
 
 /*
-    // #todo
-    // ainda nao inicializamos esse elemento.
-    if( __file->is_writable == FALSE )
-    {
+// #todo
+// ainda nao inicializamos esse elemento.
+    if( fp->is_writable == FALSE ){
         debug_print ("sys_write: Not writable\n");
         return -1;
     }
@@ -1052,19 +1044,18 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 
 // #todo: 
 // Create thie element in the structure.
-    //if( __file->is_directory == TRUE ){}
+    //if( fp->is_directory == TRUE ){}
 
 // =======================================================
 // ::0
 // stdin
 // + Write on regular file.
-
-    if (__file->_file == STDIN_FILENO)
+    if (fp->_file == STDIN_FILENO)
     {
         debug_print("sys_write: Writing into stdin\n");
         // If the file is a regular file.
         // Shortcut
-        if ( __file->____object == ObjectTypeFile ){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -1074,13 +1065,11 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // stdout
 // + Write on console.
 // + Write on regular file.
-
-    if (__file->_file == STDOUT_FILENO)
+    if (fp->_file == STDOUT_FILENO)
     {
         debug_print("sys_write: Writing into stdout\n");
-
         // If the file is a console.
-        if ( __file->____object == ObjectTypeVirtualConsole )
+        if ( fp->____object == ObjectTypeVirtualConsole )
         {
             return (int) console_write ( 
                              (int) fg_console, 
@@ -1089,21 +1078,20 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         }
         // If the file is a regular file.
         // Shortcut
-        if (__file->____object == ObjectTypeFile){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
 
 // =======================================================
-// ::2
+// ::2 
 // stderr
 // + Write on regular file.
-
-    if (__file->_file == STDERR_FILENO)
+    if (fp->_file == STDERR_FILENO)
     {
         debug_print("sys_write: Writing into stderr\n");
         // Shortcut
-        if (__file->____object == ObjectTypeFile){
+        if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
     }
@@ -1127,11 +1115,10 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // Nao podemos fazer a copia se os dois sockets 
 // estiverem com a conexao pendente.
 
-    if ( __file->____object == ObjectTypeSocket )
+    if ( fp->____object == ObjectTypeSocket )
     {
         // Can't write.
-        if ((__file->_flags & __SWR) == 0) 
-        {
+        if ((fp->_flags & __SWR) == 0){
             debug_print("sys_write: [FAIL] flag __SWR \n");
             //yield (current_thread);
             goto fail;
@@ -1144,20 +1131,18 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         // #todo: Indicação da quantidade de escritores.
         // Sendo assim, vamos dizer que também podem ler
         // caso existam leitores. Mas não pode mais escrever.
-        if ( __file->socket_buffer_full == TRUE )
+        if (fp->socket_buffer_full == TRUE)
         {
             debug_print("sys_write: [FAIL] can't write on a full buffer\n");
-
             debug_print("sys_write: WAKEUP READER\n");
-            __file->_flags = 0; // não pode mais escrever.
-            __file->_flags |= __SRD;                 // pode ler.
-            do_thread_ready( __file->tid_waiting );  // acorda leitores
-            __file->tid_waiting = -1;
-
-            if ( __file->sync.block_on_write_full == TRUE )
+            fp->_flags = 0; // não pode mais escrever.
+            fp->_flags |= __SRD;                 // pode ler.
+            do_thread_ready( fp->tid_waiting );  // acorda leitores
+            fp->tid_waiting = -1;
+            if (fp->sync.block_on_write_full == TRUE)
             {
                  debug_print("sys_write: SLEEP WRITER\n");
-                 __file->tid_waiting = current_thread;
+                 fp->tid_waiting = current_thread;
                  //do_thread_waiting(current_thread);
                  yield (current_thread);
                  goto fail;
@@ -1168,19 +1153,19 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 
         // Se o buffer não estiver cheio,
         // Então escreva e acorde os leitores.
-        if ( __file->socket_buffer_full == FALSE )
+        if (fp->socket_buffer_full == FALSE)
         {
             // Se podemos escrever.
             // #todo: Ja fizemos isso logo acima.
-            if ( __file->_flags & __SWR )
+            if ( fp->_flags & __SWR )
             {
                 //debug_print ("sys_write: >>>> WRITE\n");
-                __file->_flags = 0;
+                fp->_flags = 0;
 
                 // Write in the socket buffer.
                 nbytes = 
                     (ssize_t) file_write_buffer ( 
-                                  (file *) __file, 
+                                  (file *) fp, 
                                   (char *) ubuf, 
                                   (int) count );
 
@@ -1196,27 +1181,24 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
                 if (nbytes>0)
                 {
                     debug_print("sys_write: WAKEUP READER\n");
-                    __file->socket_buffer_full = TRUE;       // buffer cheio
-                    __file->_flags &= ~__SWR;                // nao posso mais ESCREVER.            
-                    __file->_flags |= __SRD;                 // pode ler 
-                    do_thread_ready( __file->tid_waiting );  // acorda leitores
-                    __file->tid_waiting = -1;
+                    fp->socket_buffer_full = TRUE;     // buffer cheio
+                    fp->_flags &= ~__SWR;              // nao posso mais ESCREVER.            
+                    fp->_flags |= __SRD;               // pode ler 
+                    do_thread_ready(fp->tid_waiting);  // acorda leitores
+                    fp->tid_waiting = -1;
                 
                     // #bugbug
                     // Isso pode ser ruim pela natureza da chamada sys_write()
                     // que vem de uma syscall que nao salvou o contexto.
-                    
-                    if ( __file->sync.block_on_write == TRUE )
+                    if (fp->sync.block_on_write == TRUE)
                     {
                         debug_print("sys_write: SLEEP WRITER\n");
-                        __file->tid_waiting = current_thread;
+                        fp->tid_waiting = current_thread;
                         //do_thread_waiting(current_thread);
                     }
-                    
                     // #bugbug: test ...
                     //  impedir que eu mesmo me leia.
                     //yield (current_thread);
-                    
                     return (ssize_t) nbytes;
                 }
             }
@@ -1231,26 +1213,25 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 
 RegularFile:
 
-    // == Regular file =========================================
-    // Tem que retonar o tanto de bytes escritos.
-    // Escreve em uma stream uma certa quantidade de chars.
+// == Regular file =========================================
+// Tem que retonar o tanto de bytes escritos.
+// Escreve em uma stream uma certa quantidade de chars.
 
-    if ( __file->____object == ObjectTypeFile )
+    if (fp->____object == ObjectTypeFile)
     {
         // Can't write.
-        if ( (__file->_flags & __SWR) == 0)
-        {
+        if ( (fp->_flags & __SWR) == 0){
              debug_print("sys_write: [FLAGS] Can't write!\n");
              return 0;
         }
 
         // Can write.
-        if (__file->_flags & __SWR)
+        if (fp->_flags & __SWR)
         {
             // Regular file.
             nbytes = 
                 (ssize_t) file_write_buffer ( 
-                              (file *) __file, 
+                              (file *) fp, 
                               (char *) ubuf, 
                               (int) count );
 
@@ -1266,9 +1247,9 @@ RegularFile:
             // Atualizamos a flag e acordamos quem esperava pelo evento.
 
             if (nbytes>0){
-                __file->_flags = __SRD;
-                __file->sync.can_read = TRUE;
-                do_thread_ready(__file->tid_waiting);
+                fp->_flags = __SRD;
+                fp->sync.can_read = TRUE;
+                do_thread_ready(fp->tid_waiting);
                 return (ssize_t) nbytes;
             }
 
@@ -1276,8 +1257,8 @@ RegularFile:
             // Não conseguimos escrever ... 
             // nada de errado, apenas esperaremos.
             //do_thread_waiting (current_thread);
-            //__file->tid_waiting = current_thread;
-            //__file->_flags |= __SWR;  //pode escrever.
+            //fp->tid_waiting = current_thread;
+            //fp->_flags |= __SWR;  //pode escrever.
             //scheduler();
             debug_print ("sys_write: [FAIL] file_write_buffer fail!\n");
             return 0;
@@ -1289,7 +1270,7 @@ RegularFile:
 
 // ======================================================
 // Pseudo terminal multiplexer.
-    if (__file->____object == ObjectTypePTMX){
+    if (fp->____object == ObjectTypePTMX){
         printk ("sys_write: [TODO] trying to write a PTMX device file\n");
         refresh_screen();
         return 0;
@@ -1297,7 +1278,7 @@ RegularFile:
 
 // ======================================================
 // pty () pseudo terminal.
-    if (__file->____object == ObjectTypePTY){
+    if (fp->____object == ObjectTypePTY){
         printk ("sys_write: [TODO] trying to write a PTY device file\n");
         refresh_screen();
         return 0;
@@ -1305,7 +1286,7 @@ RegularFile:
 
 // ======================================================
 // File system
-    if (__file->____object == ObjectTypeFileSystem){
+    if (fp->____object == ObjectTypeFileSystem){
         printk ("sys_write: [TODO] trying to write a file system\n");
         refresh_screen();
         return 0;
@@ -1314,8 +1295,7 @@ RegularFile:
 // ======================================================
 // pipe:
 // See: pipe.c
-
-    if ( __file->____object == ObjectTypePipe ){
+    if (fp->____object == ObjectTypePipe){
         return (ssize_t) sys_write_pipe ( (int) fd, (char *) ubuf, (int) count ); 
     }
 
@@ -1340,8 +1320,8 @@ fail2:
     // Não conseguimos escrever ... 
     // Estamos com problemas 
     //do_thread_waiting (current_thread);
-    //__file->tid_waiting = current_thread;
-    //__file->_flags |= __SWR;  //pode escrever.
+    //fp->tid_waiting = current_thread;
+    //fp->_flags |= __SWR;  //pode escrever.
     //scheduler();
 
 // fail. something is wrong!
@@ -4910,7 +4890,10 @@ sys_read_file_from_disk (
 {
     int __ret = -1;
     int Status = -1;
-    file  *__file;
+
+// File pointer.
+    file *fp;
+
     size_t FileSize = -1;
     struct process_d *p;
     int __slot = -1;  // ofd.
@@ -5039,18 +5022,18 @@ __OK:
     }
 
 // File struct
-    __file = (file *) kmalloc( sizeof(file) );
-    if ( (void *) __file == NULL ){
-        printf ("sys_read_file_from_disk: __file\n");
+    fp = (file *) kmalloc( sizeof(file) );
+    if ( (void *) fp == NULL ){
+        printf ("sys_read_file_from_disk: fp\n");
         goto fail;
     }
 
 // Initialize.
-    __file->used = TRUE;
-    __file->magic = 1234;
-    __file->pid = (pid_t) p->pid;  //current_process;
-    __file->uid = (uid_t) current_user;
-    __file->gid = (gid_t) current_group;
+    fp->used = TRUE;
+    fp->magic = 1234;
+    fp->pid = (pid_t) p->pid;  //current_process;
+    fp->uid = (uid_t) current_user;
+    fp->gid = (gid_t) current_group;
 
 // #bugbug [FIXME]
 // We need a type in read().
@@ -5060,7 +5043,7 @@ __OK:
 // is able to open any kind of file.
 // Why are we using this type here?
 
-    __file->____object = ObjectTypeFile;
+    fp->____object = ObjectTypeFile;
 
 // ==================
 // #todo #bubug
@@ -5068,32 +5051,32 @@ __OK:
 // As permissoes dependem do tipo de arquivo.
 
 // #bugbug: Let's do this for normal files for now.
-    __file->sync.can_read  = TRUE;
-    __file->sync.can_write = TRUE;
+    fp->sync.can_read  = TRUE;
+    fp->sync.can_write = TRUE;
 
-    __file->sync.action = ACTION_NULL;
+    fp->sync.action = ACTION_NULL;
         // ==================
 
 // #todo:
 // We need to get the name in the inode.
 
-    //__file->_tmpfname = NULL;
+    //fp->_tmpfname = NULL;
 
-    __file->_fsize = 0;
-    __file->_lbfsize = BUFSIZ;
+    fp->_fsize = 0;  // Isso é configurado logo abaixo.
+    fp->_lbfsize = BUFSIZ;
 
 // Inicializando apenas.
 // #bugbug: Isso é provisório. 
 // Caso contrário teremos problemas pra ler.
-    __file->_r = 0;
-    __file->_w = 0;
-    __file->_cnt = BUFSIZ;  // anda temos bastante espaço. todo o buffer
+    fp->_r = 0;
+    fp->_w = 0;
+    fp->_cnt = BUFSIZ;  // Anda temos bastante espaço. todo o buffer
 
 // #
 // This is gonna be the return value.
-    __file->_file = __slot;
+    fp->_file = __slot;
 
-    __file->fd_counter = 1; //inicializando. 
+    fp->fd_counter = 1;  //inicializando. 
 
 // #todo
 // Se ele não foi encontrado na lista de inodes
@@ -5112,14 +5095,13 @@ __OK:
 // #bugbug: open chama isso. E se o arquivo for maior que o buffer ?
 // open() precisa alocar outro buffer.
 
-    __file->_base = (char *) kmalloc(BUFSIZ);
-    if ( (void *) __file->_base == NULL ){
-        printf ("sys_read_file_from_disk: __file->_base\n");
+    fp->_base = (char *) kmalloc(BUFSIZ);
+    if ( (void *) fp->_base == NULL ){
+        printf ("sys_read_file_from_disk: fp->_base\n");
         goto fail;
     }
-    
     //#test provisório
-    __file->_lbfsize = BUFSIZ;
+    fp->_lbfsize = BUFSIZ;
 
 // #debug
     //printf ("FILE_AGAIN={%s}\n",file_name);
@@ -5138,21 +5120,22 @@ __OK:
         printf ("sys_read_file_from_disk: FileSize\n");
         goto fail;
     }
-
-// #test
 // Structure field for file size.
-    __file->_fsize = (int) FileSize;
+    fp->_fsize = (int) FileSize;
+
+// #bugbug
+// #importante
 
 // Limits.
-    //if ( FileSize < __file->_lbfsize ){ 
-    //    FileSize = __file->_lbfsize; 
+    //if ( FileSize < fp->_lbfsize ){ 
+    //    FileSize = fp->_lbfsize; 
     //}
 
 // Limits.
 // Se o arquivo for maior que buffer disponivel.
 // Podemos aumentar o buffer.
 
-    if (FileSize >= __file->_lbfsize)
+    if (FileSize >= fp->_lbfsize)
     {
         // #debug
         printf("sys_read_file_from_disk: [todo] File size out of limits\n");
@@ -5173,16 +5156,16 @@ __OK:
         // Allocate new buffer.
         // The buffer must to be bigger than the file size.
         size_t buflen = FileSize+8;
-        __file->_base = (char *) kmalloc(buflen);
+        fp->_base = (char *) kmalloc(buflen);
         
-        if ( (void *) __file->_base == NULL ){
+        if ( (void *) fp->_base == NULL ){
             printf ("sys_read_file_from_disk: Couldn't create a new buffer\n");
             refresh_screen();
             return -1;             
         }
  
         // Temos um novo buffer size.
-        __file->_lbfsize = (int) buflen;
+        fp->_lbfsize = (int) buflen;
     }
 
 // #paranoia.
@@ -5199,13 +5182,19 @@ __OK:
 // #paranoia.
 // Checando base novamente.
 
-    if ( (void *) __file->_base == NULL ){
-        printf("sys_read_file_from_disk: __file->_base (again)\n");
+    if ( (void *) fp->_base == NULL ){
+        printf("sys_read_file_from_disk: fp->_base (again)\n");
         goto fail;
     }
 
+//
+// #todo (Unix-like)
+// 
+
+// What is the unix-like standard for this initialization?
+
 // Pointer.
-    __file->_p = __file->_base;
+    fp->_p = fp->_base;
 
 // Offsets
 // Atualizando os offsets que foram apenas inicializados.
@@ -5213,50 +5202,46 @@ __OK:
 // #importante
 // Não poderemos ler se r e w forem iguais.
 // vamos ler do começo do arquivo.
-    __file->_r = 0;
+    fp->_r = 0;
 
 // #importante
 // O ponteiro de escrita mudou 
 // pois escrevemos um arquivo inteiro no buffer.
-    //__file->_w = FileSize;
-    __file->_w = __file->_fsize;
+    //fp->_w = FileSize;
+    fp->_w = fp->_fsize;
     
 // #bugbug
 
     //if ( FileSize >= BUFSIZ )
-    if (__file->_fsize >= __file->_lbfsize)
+    if (fp->_fsize >= fp->_lbfsize)
     {
-        printf ("sys_read_file_from_disk: the file is larger than the buffer \n");
+        printf ("sys_read_file_from_disk: the file is larger than the buffer\n");
         refresh_screen();
-        __file->_r = __file->_lbfsize;
-        __file->_w = __file->_lbfsize;
-        __file->_cnt = 0;
+        fp->_r = fp->_lbfsize;
+        fp->_w = fp->_lbfsize;
+        fp->_cnt = 0;
     }
 
 // Agora temos menos espaço no buffer.
-    //__file->_cnt = ( BUFSIZ - FileSize );
-    __file->_cnt = 
-        ( __file->_lbfsize - __file->_fsize );
+    //fp->_cnt = ( BUFSIZ - FileSize );
+    fp->_cnt = ( fp->_lbfsize - fp->_fsize );
 
 // Load.
 // Load the file into the memory.
-
     //printf("Load ....\n");
- 
     Status = 
         (int) fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
                   VOLUME1_ROOTDIR_ADDRESS, 
                   FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
                   file_name, 
-                  (unsigned long) __file->_base,
-                  __file->_lbfsize );
+                  (unsigned long) fp->_base,
+                  fp->_lbfsize );
 
     if (Status != 0){
         printf ("sys_read_file_from_disk: fsLoadFile fail\n");
         goto fail;
     }
-
     //printf("Loaded ....\n");
 
 // #bugbug
@@ -5297,11 +5282,11 @@ __OK:
     //if (mode == 0)
     //{
           debug_print ("sys_read_file_from_disk: default mode\n");
-          __file->_p = __file->_base;
+          fp->_p = fp->_base;
     //}
 
 // Pointer
-    __file->_p = __file->_base;
+    fp->_p = fp->_base;
 
 // Offsets
 // Atualizando os offsets que foram apenas inicializados.
@@ -5309,22 +5294,21 @@ __OK:
 // #importante
 // Não poderemos ler se r e w forem iguais.
 // vamos ler do começo do arquivo.
-    __file->_r = 0;
+    fp->_r = 0;
 
 // #importante
 // O ponteiro de escrita mudou 
 // pois escrevemos um arquivo inteiro no buffer.
-    //__file->_w = FileSize;
-    __file->_w = __file->_fsize;
+    //fp->_w = FileSize;
+    fp->_w = fp->_fsize;
 
-    __file->_cnt = 
-        ( __file->_lbfsize - __file->_fsize );
+    fp->_cnt = ( fp->_lbfsize - fp->_fsize );
 
 // The file is opened in append mode. 
 // O offset fica no fim do arquivo.
     if (mode & O_APPEND){
         debug_print ("sys_read_file_from_disk: O_APPEND\n");
-        //__file->_p = __file->_base + s;
+        //fp->_p = fp->_base + s;
     }
 
     if (mode & O_ASYNC){
@@ -5347,25 +5331,25 @@ __OK:
 // não poderá ler.
 
     // ok to read
-    __file->_flags = (__file->_flags | __SRD);
+    fp->_flags = (fp->_flags | __SRD);
 
     // ok to write
-    //__file->_flags = (__file->_flags | __SWR);
+    //fp->_flags = (fp->_flags | __SWR);
 
 // Salva o ponteiro de estrutura de arquivo.  
 // Ja checamos fd.
-    p->Objects[__slot] = (unsigned long) __file;
+    p->Objects[__slot] = (unsigned long) fp;
 
     //#debug
     //printf ("process name: %s\n",p->__processname);
-    //printf ("fd %d\n",__file->_file);
-    //printf("sys_read_file_from_disk-OUTPUT: %s \n",__file->_base);
+    //printf ("fd %d\n",fp->_file);
+    //printf("sys_read_file_from_disk-OUTPUT: %s \n",fp->_base);
     //refresh_screen();
 
 done:
 // Vamos retornar o fd.
 // Pois essa rotina eh usada por open();
-    return (int) __file->_file;
+    return (int) fp->_file;
 fail:
     refresh_screen();
     return -1;

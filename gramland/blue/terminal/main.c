@@ -155,7 +155,10 @@ static void clear_terminal_client_window(int fd)
         return;
     }
 // Redraw and refresh the window.
-    gws_redraw_window( fd, wid, TRUE );
+    //gws_redraw_window( fd, wid, TRUE );   //Slower?
+// Clear the window
+// Repaint it using the default background color.
+    gws_clear_window(fd,wid);  // Faster?
 // Update cursor.
     cursor_x = Terminal.left;
     cursor_y = Terminal.top;
@@ -229,7 +232,7 @@ static void __winmin(int fd)
 // resize
     unsigned long w_width=100;
     unsigned long w_height=100;
-    if(w>100){w_width=100;}
+    if(w>200){w_width=200;}
     if(h>100){w_height=100;}
 
     if (fd<0){
@@ -686,7 +689,7 @@ static void compareStrings(int fd)
         //ioctl ( STDOUT_FILENO, TCIFLUSH, 0 ); // console
         //ioctl ( STDERR_FILENO, TCIFLUSH, 0 ); // regular file
         //ioctl ( 4,             TCIFLUSH, 0 ); // invalid?
-        
+
         // invalid limits
         //ioctl ( -1, -1, 0 );
         //ioctl ( 33, -1, 0 );
