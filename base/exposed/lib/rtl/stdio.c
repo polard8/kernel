@@ -1110,9 +1110,8 @@ FILE *fopen ( const char *filename, const char *mode )
 
     int oflags=0;     
 
-
-    // #todo
-    // Check filename validation
+// #todo
+// Check filename validation
     
     //if ( (void*) filename == NULL ){}
     //if ( *filename == 0 ){}
@@ -1157,7 +1156,6 @@ FILE *fopen ( const char *filename, const char *mode )
     }
 
 // Stream
-
     __stream = (FILE *) malloc ( sizeof(FILE) );
     if ( (void *) __stream == NULL ){
         printf ("fopen: __stream fail\n");
@@ -1166,7 +1164,6 @@ FILE *fopen ( const char *filename, const char *mode )
     memset( __stream, 0, sizeof(struct _iobuf) );
 
 // Descriptor
-
     __stream->_file = fd;
 
 
@@ -1178,31 +1175,30 @@ FILE *fopen ( const char *filename, const char *mode )
 // leiam o conteúdo do arquivo no buffer.
 // Então o aplicativo terá que usar read pra ler 
 // o conteúdo no buffer em ring0.
-
     __stream->_base = (char *) malloc(BUFSIZ);
-
-    if ( (void *) __stream->_base == NULL )
-    {
+    if ( (void *) __stream->_base == NULL ){
         debug_print("fopen: stream buffer fail\n");
         printf     ("fopen: stream buffer fail\n");
-
         // #todo
         // Temos que liberar a memoria da estrutura.
         //free(__stream);
-
         return NULL;
      }
 
 // Reset buffer pointer.
-
     __stream->_p = __stream->_base; 
-
-    __stream->_lbfsize = BUFSIZ;
-    __stream->_cnt     = BUFSIZ;
     __stream->_r = 0;
     __stream->_w = 0;
 
-// ==============================
+    __stream->_lbfsize = BUFSIZ;
+// #bugbug
+// The size of the 'data' in ring 3?
+// it depends on how many bites was read.
+// So it needs to be initialized with 0.
+    //__stream->_fsize = BUFSIZ;
+    __stream->_fsize = 0;
+
+    __stream->_cnt = BUFSIZ;
 
 // Flags
     __stream->_flags = flags;
@@ -1235,14 +1231,12 @@ FILE *fopen2 ( const char *filename, const char *mode )
     int fd = -1;
 
     __stream = (FILE *) malloc( sizeof(FILE) );
-    
     if ( (void *) __stream == NULL ){
         printf("fopen2: __stream\n");
         return NULL;
     }
 
-
-    /*
+/*
     if(*mode == 'w')
         f = creat(filename, 0600);
     else if (*mode == 'a'){
@@ -1256,23 +1250,17 @@ FILE *fopen2 ( const char *filename, const char *mode )
 	    //f = open(filename, 0);
 	    //if (f < 0)
 		    //return(NULL);
-
     };
-    */
-    
-    
-    //
-    // size
-    //
-    
+*/
+
+// size
     stdio_fntos( (char *) filename);
-    
     // get file size
     size_t s = (size_t) gramado_system_call ( 178, 
                             (unsigned long) filename,
                             0,
                             0 );
-    
+
     // #bugbug
     // 1MB
     if ( s <= 0 || s > (1024*1024) )
@@ -1280,22 +1268,18 @@ FILE *fopen2 ( const char *filename, const char *mode )
         printf ("fopen2: size\n");
         return NULL;
     }
-    
-    // endereço desejando.
-    // ring 3.
+
+// endereço desejando.
+// ring 3.
     unsigned long address = (unsigned long) malloc(s);
-    
-    if (address == 0)
-    {
+    if (address == 0){
         printf ("fopen2: address\n");
         return NULL;
     }
 
+// load the file into the address.
+// Vai retornar o fd.
 
-    // load the file into the address.
-    // Vai retornar o fd.
-
-    
     //IN: service, name, address, 0, 0 
     fd = (int) gramado_system_call ( 3, 
                   (unsigned long) filename, 
@@ -1307,14 +1291,10 @@ FILE *fopen2 ( const char *filename, const char *mode )
         return NULL;
     }
 
-
-    //
-    // _flags
-    //
+// Flags
 
     // #todo
-	//__stream->_flags &= ~(_IOREAD|_IOWRT);
-
+    //__stream->_flags &= ~(_IOREAD|_IOWRT);
 
     if (*mode != 'r'){
         __stream->_flags |= _IOWRT;
@@ -1322,11 +1302,9 @@ FILE *fopen2 ( const char *filename, const char *mode )
         __stream->_flags |= _IOREAD;
     };
 
-
-    // #todo    
-    // Isso deve ser o retorno de open() ou creat()
-    // Me parece que a chamada acima também retorna o fd.
-    
+// #todo    
+// Isso deve ser o retorno de open() ou creat()
+// Me parece que a chamada acima também retorna o fd.
     __stream->_file = fd; 
 
 // ===================
@@ -1336,14 +1314,12 @@ FILE *fopen2 ( const char *filename, const char *mode )
     __stream->_p = __stream->_base;
 
     __stream->_lbfsize = (int) s;
+    //__stream->_fsize=0;
     __stream->_cnt = __stream->_lbfsize;
 
-
-    // retornar a stream que criamos aqui. 
-    
+// retornar a stream que criamos aqui.
     return (FILE *) __stream;
 }
-
 
 /*
  * scroll:
@@ -4767,15 +4743,11 @@ int stderr_printf (const char *format, ... )
 */
 
 
-
 /*
  * perror:
- *
  */
-
 // #todo:
 // Oh Jees..., this function deserves a little bit of respect.
-
 // The perror() function produces a message on standard error describing
 // the last error encountered during a call to a system or library
 // function.
@@ -4803,30 +4775,28 @@ void rewind (FILE *stream)
 {
     int fd=-1;
 
-    if ( (void *) stream == NULL )
-    {
+    if ( (void *) stream == NULL ){
         printf ("rewind: [FAIL] stream\n");
         return;
     }
-    
+
     // local
     //stream->_p = stream->_base;
 
     // #todo:
     // fflush(stream);
 
-    // Clear errors
-    // local.
+// Clear errors
+// local.
     //stream->_flags &= ~(_IOERR|_IOEOF);
 
-    // flags
+// flags
     // local
     //if (stream->_flags & _IORW)
     //    stream->_flags &= ~(_IOREAD|_IOWRT);
 
-
-    // #todo
-    // We need to do the same in the file.
+// #todo
+// We need to do the same in the file.
 
 	//unix 32V
 	//fflush(stream);
@@ -4845,8 +4815,7 @@ void rewind (FILE *stream)
         return;
     }
 
-// do!
-
+// Buffer
     stream->_p = stream->_base;
     stream->_w = 0;
     stream->_r = 0;
@@ -4857,13 +4826,15 @@ void rewind (FILE *stream)
 // O kernel ja esta fazendo isso.
 // Vamos ajustar isso aqui tambem.
 
-// Não há bytes no buffer da libc
-    stream->_cnt = 0;    
-    //stream->_cnt = stream->_lbfsize;
+    stream->_cnt = stream->_lbfsize;
 
-    lseek(fd,0,0);
+// rewind in ring0
+    off_t v = lseek(fd,0,SEEK_SET);
+    //if(v!=0){
+    //    printf("Testing lseek: fail\n");
+    //    asm ("int $3");
+    //}
 }
-
 
 
 /*
