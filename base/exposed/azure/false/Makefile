@@ -7,9 +7,6 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = cat
 
-#todo:
-#We need to simplify these flags
-
 CFLAGS = -m64 \
 	-std=gnu89 \
 	-nodefaultlibs \
@@ -29,26 +26,17 @@ CFLAGS = -m64 \
 LIBC     = ../../lib/rtl/include/
 LIBCOBJ  = ../../lib/rtl/obj
 
-
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o rtl.o    
-
-
 
 .PHONY: all all-c false-link finalize clean
 
 all: main.o all-c false-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
-
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
@@ -65,15 +53,11 @@ all-c:
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 
-
 false-link:
 	ld -m elf_x86_64 -T ../link.ld -o FALSE.BIN $(myObjects)    
-
 finalize:
 	cp FALSE.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm FALSE.BIN 
-	
 	

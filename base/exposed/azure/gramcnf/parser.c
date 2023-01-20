@@ -9,7 +9,6 @@
 // 8 elementos que explicam o identificador.
 int id[8];
 
-
 //elementos que explicam a constante.
 int constant[8];
 //salvando a string das constantes,
@@ -48,28 +47,22 @@ char save_symbol[32];
 //
 
 static int parserInit(void);
-
 // Functions
 static int parse_function(int token);
-
 // Statements
-int parse_asm ( int token );
-int parse_do ( int token );
-int parse_for ( int token );
-int parse_if ( int token );
-//int parse_number (int olen);
-int parse_return ( int token );
-unsigned long parse_sizeof ( int token );
-int parse_while ( int token );
-//...
-
+static int parse_asm(int token);
+static int parse_do(int token);
+static int parse_for(int token);
+static int parse_if(int token);
+static int parse_return(int token);
+static unsigned long parse_sizeof(int token);
+static int parse_while(int token);
+//static int parse_number(int olen);
 // Expression
-unsigned long parse_expression ( int token );
-
+static unsigned long parse_expression(int token);
 // Emit
 static void emit_label(void);
 static void emit_function(void);
-
 
 //
 // -------------------------------------
@@ -232,31 +225,23 @@ static int parse_function(int token)
 }
 
 // Parse asm statement.
-int parse_asm (int token)
+static int parse_asm(int token)
 {
     int c=0;
     int running = 1;
     int State = 1;
     int inside = 0;
 
-//#ifdef PARSER_ASM_VERBOSE
 	//debug
 	//printf("parse_asm: Initializing ...\n");
-//#endif
-
 
 // Se entramos errado.
     if (token != TOKENKEYWORD){
         printf ("parse_asm: token error\n");  exit(1);
     }
-    if (token == TOKENKEYWORD)
-    {
-
-//#ifdef PARSER_ASM_VERBOSE	
-//		printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
-//		    real_token_buffer, lineno );  
-//#endif
-
+    if (token == TOKENKEYWORD){
+        // printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
+        //     real_token_buffer, lineno );
     }
 
 //
@@ -270,10 +255,8 @@ int parse_asm (int token)
     if (c == TOKENSEPARATOR){
         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
         {
-//#ifdef PARSER_ASM_VERBOSE
-//			printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
-//			    real_token_buffer, lineno ); 
-//#endif
+            // printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
+            //     real_token_buffer, lineno ); 
             //ok
             inside = 1;
         }
@@ -329,7 +312,7 @@ error0:
 }
 
 // Parse do statement.
-int parse_do (int token)
+static int parse_do(int token)
 {
     printf("todo: parse_do in line %d\n", lineno );
     exit(1);
@@ -337,7 +320,7 @@ int parse_do (int token)
 }
 
 // Parse for statement.
-int parse_for ( int token )
+static int parse_for(int token)
 {
     printf ("todo: parse_for in line %d\n", lineno );
     exit(1);
@@ -345,14 +328,13 @@ int parse_for ( int token )
 }
 
 // Parse if statement.
-int parse_if (int token)
+static int parse_if(int token)
 {
     int c=0;
     int If_Result = -1;
-    unsigned long Exp_Result = 0;
+    unsigned long Exp_Result=0;
 
-    printf("todo: parse_if in line %d\n", 
-        lineno );
+    printf("todo: parse_if in line %d\n", lineno );
 
 // #todo
 // Conferir se o token do argumento é um if 
@@ -400,20 +382,19 @@ int parse_if (int token)
     return (int) If_Result;
 }
 
-
 // Parse number statement.
+// Literal?
 /*
-int parse_number (int olen)
+static int parse_number(int olen)
 {
     //pointer #todo	
     //register char *p = lexptr;
     register char *p = token_buffer;
-  
-  register long n = 0;
-  register int c;
-  register int base = 10;
-  register len = olen;
-  char *err_copy;
+    register long n = 0;
+    register int c;
+    register int base = 10;
+    register len = olen;
+    char *err_copy;
 
     //#todo função importada.
 	extern double atof ();
@@ -507,19 +488,18 @@ int parse_number (int olen)
 // return (int) (1+2);
 // return function();
 // return (int) function();
-
-int parse_return (int token)
+static int parse_return(int token)
 {
     int c=0;
     int running = 1;
     int State = 1;
     int open = 0;
-    unsigned long eval_ret;
+    unsigned long eval_ret=0;
     char buffer[32];
     //char *buffer;
 
 // #debug
-    printf ("parse_return: Initializing ...\n");
+    printf ("parse_return: Initializing...\n");
 
 // Se entramos errado.
     if ( token != TOKENKEYWORD || 
@@ -804,7 +784,7 @@ done:
 }
 
 // Parse 'sizeof' statement.
-unsigned long parse_sizeof(int token)
+static unsigned long parse_sizeof(int token)
 {
     unsigned long Result=0;
     int c = token;
@@ -818,9 +798,7 @@ unsigned long parse_sizeof(int token)
     while (running)
     {
         c = yylex(); 
-
         again:
-
         switch (State)
         {
             // State 1
@@ -912,14 +890,13 @@ done:
 }
 
 // Parse while statement.
-int parse_while (int token)
+static int parse_while(int token)
 {
     int c=0;
     int While_Result = -1;
-    unsigned long Exp_Result = 0;
+    unsigned long Exp_Result=0;
 
-    printf("todo: parse_while in line %d\n", 
-        lineno );
+    printf("todo: parse_while in line %d\n", lineno );
 
 // #todo
 // conferir se o token do argumento é um while
@@ -958,12 +935,10 @@ int parse_while (int token)
     return (int) While_Result;
 }
 
-
 // Parse expression.
 // Analizando uma expressão.
 // Temos a questão de predecessores para os operadores.
-
-unsigned long parse_expression(int token)
+static unsigned long parse_expression(int token)
 {
 
     //#todo tree
@@ -992,22 +967,14 @@ unsigned long parse_expression(int token)
         case TOKENSEPARATOR:
             if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
             {
-
-//#ifdef PARSER_EXPRESSION_VERBOSE
-//			    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
-//				    real_token_buffer, lineno ); 
-//#endif 
-
+                // printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+                //     real_token_buffer, lineno ); 
                 //State = 2;
             }
             break;
         default:
-
-//#ifdef PARSER_EXPRESSION_VERBOSE
-//           printf ("parse_expression: State 1 Missed '(' separator in line %d \n", 
-//			    lineno );
-//#endif
-
+            // printf ("parse_expression: State 1 Missed '(' separator in line %d \n", 
+            //     lineno );
             exit(1);
             break;
     }
@@ -2060,28 +2027,24 @@ int parse(void)
                         }
 
                         // STMT: while 
-                        if ( keyword_found == KWWHILE )
+                        if (keyword_found == KWWHILE)
                         {
-						    While_Result = (int) parse_while (TOKENKEYWORD);
-//#ifdef PARSER_VERBOSE								
-	//						printf("WHILE-RESULT={%d}\n",While_Result);
-//#endif	
-						
-							State = 1;
-							break;
+                            While_Result = (int) parse_while (TOKENKEYWORD);
+                            //  printf("WHILE-RESULT={%d}\n",While_Result);
+                            State = 1;
+                            break;
                         }
 
                         // STMT: asm
-                        if ( keyword_found == KWASM )
+                        if (keyword_found == KWASM)
                         {
-//#ifdef PARSER_VERBOSE
-	//				        printf ("State3: TOKENKEYWORD={%s} KWASM in line %d \n", 
-	//						    real_token_buffer, lineno );
-//#endif 
-							parse_asm (TOKENKEYWORD);
-							//recomeçamos
-							State = 1;
-						    break;
+                            //printf ("State3: TOKENKEYWORD={%s} KWASM in line %d \n", 
+                            //    real_token_buffer, lineno );
+                            parse_asm(TOKENKEYWORD);
+                            // load_asm();
+                            //recomeçamos
+                            State = 1;
+                            break;
                         }
 
                         //...

@@ -4,13 +4,11 @@
  * unix v7 ?
  */
 
-// rtl
 #include <stdio.h>
 
 int main( int argc, char *argv[] )
 {
     register FILE *f;
-
     register unsigned sum;
     register i, c;
     register long nbytes;
@@ -49,8 +47,7 @@ int main( int argc, char *argv[] )
 			//fprintf(stderr, "sum: read error on %s\n", argc>1?argv[i]:"-");
 		    printf("sum: read error on %s\n", argc>1?argv[i]:"-");
 		}
-		
-		
+
 		//printf("%05u%6ld", sum, (nbytes+BUFSIZ-1)/BUFSIZ);
 		printf("sum {%d | %d} \n", sum, (nbytes+BUFSIZ-1)/BUFSIZ);
 
@@ -58,8 +55,8 @@ int main( int argc, char *argv[] )
 			printf(" %s\n", argv[i]);
 		printf("\n");
 		fclose(f);
-		
-	} while (++i < argc);
+
+    } while (++i < argc);
 
     printf("done\n");
     exit(errflg);

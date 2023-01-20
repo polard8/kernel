@@ -24,14 +24,10 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 LIBC     = ../../lib/rtl/include/
 LIBCOBJ  = ../../lib/rtl/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o    
@@ -40,7 +36,6 @@ unistd.o termios.o ioctl.o fcntl.o rtl.o
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 all-c:
@@ -58,12 +53,9 @@ all-c:
 
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o UNAME.BIN $(myObjects)    
-
 finalize:
 	cp UNAME.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm UNAME.BIN 
 	
-

@@ -1,22 +1,34 @@
 
 all:
 
-	make -C ./shutdown
+# Machine
+	make -C shutdown
+	make -C reboot
+	make -C uname
 
-	make -C ./reboot
-	make -C ./vga1
+# Test return
+	make -C false
+	make -C true
 
-	make -C ./shell
-	make -C ./cat
-	make -C ./tprintf
-	make -C ./showfun
-	make -C ./uname
-	make -C ./cmp
-	make -C ./sum
-	make -C ./tascii
-	make -C ./false
-	make -C ./true
+# Test file
+	make -C cat
 
-	make -C ./gramcnf
+# Languages
+	make -C gramcnf
+	make -C c4
+	make -C gramc4
+	make -C miniyacc
+	make -C showfun
+
+# Shells
+	make -C shell
+	make -C sh7
 	
-#make -C ./gramc4
+# Outros
+	make -C cmp
+	make -C sum
+	make -C vga1
+	make -C tprintf
+	make -C tascii
+	make -C jackpot
+	

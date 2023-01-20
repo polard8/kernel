@@ -6,7 +6,6 @@
 // rtl
 #include <stdio.h>
 
-
 enum {
     RECT_T  = '-',  // Aresta do topo
     RECT_TR = '+', //  Vértice do canto superior direito
@@ -23,9 +22,6 @@ void putmchar(int c, int times);
 void printrect(int width, int height);
 
 
-
-
-
 int main(void)
 {
     printf("\n");
@@ -34,11 +30,10 @@ int main(void)
     return 0;
 }
 
-
 void printrect(int width, int height)
 {
-	int i=0;
-	
+    int i=0;
+
     for(i=0; i < height; i++){
         if(!i){
             putchar(RECT_TL);
@@ -65,3 +60,4 @@ void putmchar(int c, int times)
     for(i=0; i < times; i++)
         putchar(c);
 }
+

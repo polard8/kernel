@@ -1,12 +1,9 @@
 
 #history:
 #2019 - Created by Fred Nora.
-
 #todo:
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
-
-
 
 VERSION = 0
 PATCHLEVEL = 0
@@ -71,16 +68,11 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
 tascii-link:
 	ld -m elf_x86_64 -T ../link.ld -o TASCII.BIN $(myObjects)    
-
 finalize:
 	cp TASCII.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm TASCII.BIN 
 
-	
-	

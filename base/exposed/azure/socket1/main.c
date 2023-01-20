@@ -16,31 +16,30 @@ Send and receive data using the read() and write() system calls.
 */ 
  
 #include <types.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-
+#include <rtl/gramado.h>
 
 int main( int argc, char *argv[] )
 {
-   int sockfd, newsockfd, portno, clilen;
+   int sockfd=0;
+   int newsockfd=0; 
+   int portno,=0;
+   int clilen=0;
+   char buffer[512];
+   int n=0;
 
-   char buffer[256];
-
-   struct sockaddr_in cli_addr;
-
-   int n;
-   
+   struct sockaddr_in cli_addr;   
    printf("s1: Testing socket functions ...\n");
 
 // Create the socket
-
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
     if (sockfd < 0){
         printf ("s1: ERROR opening socket \n");
         exit(1);
@@ -103,14 +102,12 @@ int main( int argc, char *argv[] )
 /* Write a response to the client */
 
    n = write(newsockfd,"I got your message",18);
-   
    if (n < 0) {
       perror("ERROR writing to socket");
       exit(1);
    }
 
    printf("s1: done\n");
-      
    return 0;
 }
 

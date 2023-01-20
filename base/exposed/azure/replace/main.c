@@ -16,19 +16,12 @@ int main (int argc, char *argv[])
 
 // Replace
     status = replace(text, "um", "dois");
-
-    if(status<=0){
-    	printf ("fail\n");
-    	return -1;
+    if (status<=0){
+        printf ("fail\n");
+        return -1;
     }
-
     printf ("%s \n",text);
     //puts(text);
-
-    while(1)
-    {
-    };
-
     return 0;  
 }
 
@@ -38,14 +31,13 @@ static int replace(char *text, char *word, char *new)
     int sizew = strlen(word); 
     int sizen = strlen(new);
 
-//Onde está a primeira ocorrência.
+// Onde está a primeira ocorrência.
     start = strstr(text, word);
-
     if (!start)
         return 0;
 
 // #bugbug: Isso provavelmente falhou
-// Rever essa função na libc03.
+// Rever essa função na libc.
     strcpy(
         start +sizen, 
         start +sizew);

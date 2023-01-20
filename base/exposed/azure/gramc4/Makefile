@@ -12,9 +12,6 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = reboot
 
-#todo:
-#We need to simplify these flags
-
 # usermode cross compiler flags.
 CFLAGS = -Wall
 #CFLAGS += -O3

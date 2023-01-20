@@ -31,34 +31,22 @@ CFLAGS = -m64 \
 LIBC     = ../../lib/rtl/include/
 LIBCOBJ  = ../../lib/rtl/obj
 
-#deletar. this is very old
-API     = ../../../libcore/include/
-APIOBJ  = ../../../libcore/obj
-
-#
 # Objects
-#
-
-myObjects = crt0.o main.o \
+myObjects = crt0.o rtl.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
-unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
+unistd.o termios.o ioctl.o fcntl.o    
 
 
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
 main.o:
-	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-
+	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 all-c:
-
 	cp $(LIBCOBJ)/crt0.o  .
 	cp $(LIBCOBJ)/rtl.o  .
-	
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .
@@ -69,15 +57,12 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o REPLACE.BIN $(myObjects)    
-
 finalize:
 	cp REPLACE.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm REPLACE.BIN 
 	
-	
+

@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 
+
+void usage(void);
+
 /*
 char  sysname[]  Name of this implementation of the operating system. 
 char  release[]  Current release level of this implementation. 
@@ -36,64 +39,87 @@ static int is_64_kernel(void)
 }
 */
 
+/*
+Flags
+-a	Displays all information specified with the -m, -n, -r, -s, and -v flags. Cannot be used with the -x or -SName flag. If the -x flag is specified with the -a flag, the -x flag overrides it.
+-l	Displays the LAN network number.
+-m	Displays the machine ID number of the hardware running the system.
+-M	Displays the system model name. If the model name attribute does not exist, a null string is displayed.
+-n	Displays the name of the node. This may be a name the system is known by to a UUCP communications network.
+-r	Displays the release number of the operating system.
+-s	Displays the system name. This flag is on by default.
+-S Name	Sets the name of the node. This can be the UUCP communications network name for the system.
+-T Name	Sets the system name. This can be the UUCP communications network name for the system.
+-u	Displays the system ID number. If this attribute is not defined, the output is the same as the output displayed by uname -m.
+-v	Displays the operating system version.
+-x	Displays the information specified with the -a flag as well as the LAN network number, as specified by the -l flag.
+*/
+void usage(void)
+{
+    printf("usage: Fail\n");
+    exit(1);
+}
 
+// Main
 int main (int argc, char **argv)
 {
-// The kernel will put the strings here. I guess.
+// The kernel will put the strings here.
     struct utsname  un;
-
-
+    register int i=0;
+// Flags
+    int fAll=FALSE;
+    int fSysName=FALSE;
+    int fVersion=FALSE;
     int fRelease=FALSE;
+    int fMachine=FALSE;
+    int fNodeName=FALSE;
 
-// #todo: 
 // Get parametes.
-
-    uname(&un);
-
     // #debug
     printf("argc: {%d}\n",argc);
 
-// get flags
-    int i=0;
+// Nothing to parse
+    if(argc == 1){
+        goto display_info;
+    }
+
+// Get flags
     for (i=0; i<argc; i++)
     {
         //printf("%d: %s\n",i, argv[i]);
-
-        // Se em algum momento a flag for '-r'.
-        if ( strncmp( argv[i], "-r", 2 ) == 0 )
-        {
-            fRelease = TRUE;
-        }
+        // Se em algum momento a flag for '-?'.
+        if ( strncmp( argv[i], "-a", 2 ) == 0 ){ fAll = TRUE; }
+        if ( strncmp( argv[i], "-s", 2 ) == 0 ){ fSysName = TRUE; }
+        if ( strncmp( argv[i], "-r", 2 ) == 0 ){ fRelease = TRUE; }
+        if ( strncmp( argv[i], "-v", 2 ) == 0 ){ fVersion = TRUE; }
+        //if ( strncmp( argv[i], "-?", 2 ) == 0 ){ fMachine = TRUE; } //
+        if ( strncmp( argv[i], "-n", 2 ) == 0 ){ fNodeName = TRUE; }
+        //...
     };
 
+// Get kernel info
+    uname(&un);
 
+display_info:
 
-//
-// Show only the release. (testing flags)
-//
-
-    if(fRelease==TRUE){
-        printf ("kernel release: %s\n",un.release);
-        return 0;
+    if (fAll == TRUE)
+    {
+        fSysName=TRUE;
+        fVersion=TRUE;
+        fRelease=TRUE;
+        fMachine=TRUE;
+        fNodeName=TRUE;
     }
 
-//
-// Show all
-//
-
-    printf ("\n");
-// Kernel info
-    printf ("kernel name:    %s\n",un.sysname);  //kernel name.
-    printf ("kernel version: %s\n",un.version);  //kernel version.
-    printf ("kernel release: %s\n",un.release);  //kernel release name.
-// Machine info
-    printf ("machine name:   %s\n",un.machine);  //hw name.
-    printf ("host name:      %s\n",un.nodename); //node name in the network.
-// #todo: Domain name.
-
-    //while(1){
-    //};
+    if (fSysName==TRUE) { printf ("sysname:  %s\n", un.sysname  ); }
+    if (fVersion==TRUE) { printf ("version:  %s\n", un.version  ); }
+    if (fRelease==TRUE) { printf ("release:  %s\n", un.release  ); }
+    if (fMachine==TRUE) { printf ("machine:  %s\n", un.machine  ); }
+    if (fNodeName==TRUE){ printf ("nodename: %s\n", un.nodename ); }
         
     return 0;
+fail:
+    // usage(0);
+    return -1;
 }
 

@@ -31,49 +31,53 @@
  */
 
 #include <sys/cdefs.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <rtl/gramado.h>
 
 static void usage(void);
 
 
+static void usage(void)
+{
+    fprintf(stderr, "usage: tty [-s]\n");
+    exit(2);
+}
 
 int main(int argc, char **argv)
 {
-	int ch, sflag;
-	char *t;
+    int ch=0; 
+    int sflag=0;
+    char *t;
 
     sflag = 0;
 
     while ((ch = getopt(argc, argv, "s")) != -1)
     {
         switch ((char)ch){
+        case 's':
+            sflag = 1;
+            break;
+        case '?':
+        default:
+            usage();
+            /* NOTREACHED */
+        }
+    }
 
-		case 's':
-			sflag = 1;
-			break;
-            
-		case '?':
-		default:
-			usage();
-			/* NOTREACHED */
-		}
-	}
+    t = ttyname(STDIN_FILENO);
 
-	t = ttyname (STDIN_FILENO);
+    if (!sflag){
+        puts(t ? t : "Not a tty\n");
+    }
 
-	if (!sflag)
-		puts(t ? t : "not a tty");
-	exit(t ? 0 : 1);
-}
+    exit( t ?0 :1 );
 
-static void
-usage(void)
-{
-	fprintf(stderr, "usage: tty [-s]\n");
-	exit(2);
+    return 0;
 }
 
 
