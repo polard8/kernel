@@ -330,44 +330,47 @@ static void on_mouse_event(int event_type, long x, long y)
     long in_y=0;
 
 // Error. Nothing to do.
-    if(event_type<0)
-        return;
-
-    w = (struct gws_window_d *) get_focus();
-    
-    if( (void*) w==NULL )
-    {
+    if(event_type<0){
         return;
     }
+
+    w = (struct gws_window_d *) get_focus();
+    if( (void*) w==NULL ){
+        return;
+    }
+    //if(w->magic!=1234){
+    //    return;
+    //}
 
     //#todo
     //if(w->magic != 1234)
         //return;
 
-    if( x >= w->left &&
-        x <= w->right &&
-        y >= w->top &&
-        y <= w->bottom )
+    if( x >= w->left && x <= w->right &&
+        y >= w->top  && y <= w->bottom )
     {
 // data
+
+        // Single event
         w->single_event.wid   = w->id;
         w->single_event.msg   = event_type;
         w->single_event.long1 = x - w->left;
         w->single_event.long2 = y - w->top;
         w->single_event.has_event = TRUE;
 
-
         // ---------------
+        // Event list
         int Tail = (int) w->ev_tail;
         w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
         w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
         w->ev_long1[Tail] = (unsigned long) x - w->left; 
         w->ev_long2[Tail] = (unsigned long) y - w->top;
         w->ev_tail++;
-        if(w->ev_tail>=32)
+        if(w->ev_tail>=32){
             w->ev_tail=0;
-            return;
         }
+        return;
+    }
 //fail
     w->single_event.has_event = FALSE;
 }
@@ -2733,6 +2736,7 @@ wm_draw_char_into_the_window(
     }
 */
 
+
 // Backspace
 // (control=0x0E)
 // #todo: 
@@ -2783,7 +2787,6 @@ wm_draw_char_into_the_window(
         }
         return;
     }
-
 
 // string
    _string[0] = (unsigned char) ch;
@@ -3241,8 +3244,6 @@ wmProcedure(
         break;
 
 // #todo
-// Esse eh o momento de exibirmos o cursor do mouse,
-// e nao no kernel como estamos fazendo.
 // Precisamos fazer refresh para apagar o cursor antigo
 // depois pintarmos o cursor novo direto no lfb.
 // Mas nao temos aqui a rotina de pintarmos direto no
@@ -3877,8 +3878,22 @@ int wmSTDINInputReader(void)
 
 int wmInputReader(void)
 {
-    int i=0;
+    register int i=0;
 
+    // Ticks since boottime.
+    //unsigned long now = rtl_jiffies();
+    //unsigned long d = now - starting_tick;      //tempo percorrido em ms.
+    //unsigned long sec = (unsigned long) d/1000; //tempo percorrido em sec.
+    //float value = (float) sec * 0.0002f; 
+    //FlyingCubeMove(0,2,(float) 0.08f);
+    //FlyingCubeMove(0,2,(float) value);
+    //char secbuf[32];
+    //itoa(sec,secbuf);
+    //srand(now);
+    //unsigned long r = (unsigned long) (rand() % 320);
+    //float value = (float) r * 0.0002f;
+    //FlyingCubeMove(1,2,(float) value);
+    
 // vamos tentar 32 vezes,
 // pois nossa lista tem 32 ou 64 slots.
 // Se encontrarmos um evento, entao pegamos ele.
@@ -3953,7 +3968,8 @@ int wmInputReader(void)
             if( RTLEventBuffer[1] == GWS_Find )
             { printf("ws: find\n"); return 0; }
 
-            // #todo: we also can use 'keydown' and check the vk.
+            // #todo: 
+            // we also can use 'keydown' and check the vk.
 
             //Control arrow right
             if( RTLEventBuffer[1] == GWS_ControlArrowRight )
@@ -3961,7 +3977,8 @@ int wmInputReader(void)
               //printf("ws: Control right\n"); 
               //dock_active_window(2);
               //IN: cube number, position, amount
-              FlyingCubeMove(0,2,(float) 0.08f);
+              //FlyingCubeMove(0,2,(float) 0.08f); //right
+              FlyingCubeMove(0,1,(float) 0.08f);  //left
               return 0; 
             }
             //Control arrow up
@@ -3969,6 +3986,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control up\n"); 
               //dock_active_window(1);
+              //FlyingCubeMove(0,3,(float) 0.08f); //front
+              FlyingCubeMove(0,4,(float) 0.08f); //back
               return 0; 
             }
             //Control arrow down
@@ -3976,6 +3995,8 @@ int wmInputReader(void)
             {
               //printf("ws: Control down\n");
               //dock_active_window(3);
+              //FlyingCubeMove(0,4,(float) 0.08f); //back
+              FlyingCubeMove(0,3,(float) 0.08f); //front
               return 0;
             }
             //Control arrow left
@@ -3984,9 +4005,11 @@ int wmInputReader(void)
               //printf("ws: Control left\n");
               //dock_active_window(4);
               //IN: cube number, position, amount 
-              FlyingCubeMove(0,1,(float) 0.08f);
+              //FlyingCubeMove(0,1,(float) 0.08f);  //left
+              FlyingCubeMove(0,2,(float) 0.08f); //right
               return 0; 
             }
+
 
             // Save: [control + s]
             if( RTLEventBuffer[1] == GWS_Save )

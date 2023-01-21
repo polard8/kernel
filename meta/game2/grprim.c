@@ -248,26 +248,22 @@ int grInit (void)
 
 // using int.
     projection_initialize();
-    // Changing the view for the current projection.
+// Changing the view for the current projection.
     gr_depth_range(CurrentProjection,0,40);
-
-// == world
+// world
     world_initialize();
 
 // == Camera ==========
 // Initialize the current camera.
 // Change some attributes for the current camera.
 // The projection is a field in the camera's structure.
-
     //gwssrv_debug_print ("grInit: camera\n");
     camera_initialize();
     cameraF_initialize();
-    
     //camera ( 
     //    -40, -40, 0,     // position vector
     //    -40,  40, 0,     // upview vector
     //     10,  10, 10 );  // lookat vector
-
     camera ( 
         0, 0, 0,     // position vector
         0, 0, 0,     // upview vector
@@ -277,7 +273,6 @@ int grInit (void)
 
     return 0;
 }
-
 
 int world_initialize(void)
 {
@@ -314,28 +309,24 @@ int camera_initialize(void)
         printf("camera_initialize: fail\n");
         exit(1);
     }
-    
-    CurrentCamera->initialized = FALSE;
 
+    CurrentCamera->initialized = FALSE;
     CurrentCamera->used = TRUE;
     CurrentCamera->magic = 1234;
-
-    // position
+// Position
     CurrentCamera->position.x = 0;
     CurrentCamera->position.y = 0;
     CurrentCamera->position.z = 0;
-
-    // upview
+// Upview
     CurrentCamera->upview.x = 0;
     CurrentCamera->upview.y = 0;
     CurrentCamera->upview.z = 0;
-
-    // lookat. target point origin.
+// Lookat. (target point origin)
     CurrentCamera->lookat.x = 0;
     CurrentCamera->lookat.y = 0;
     CurrentCamera->lookat.z = 0;
-    
-    if( (void*) CurrentProjection != NULL )
+
+    if ( (void*) CurrentProjection != NULL )
     {
         if (CurrentProjection->initialized == TRUE){
             CurrentCamera->projection = 
@@ -344,31 +335,26 @@ int camera_initialize(void)
     }
 
     CurrentCamera->initialized = TRUE;
-
     return 0;
 }
 
 int cameraF_initialize(void)
 {
     CurrentCameraF.initialized = FALSE;
-    
-    // position
+// Position
     CurrentCameraF.position.x = (float) 0.0f;
     CurrentCameraF.position.y = (float) 0.0f;
     CurrentCameraF.position.z = (float) 0.0f;
-
-    // upview
+// Upview
     CurrentCameraF.upview.x = (float) 0.0f;
     CurrentCameraF.upview.y = (float) 0.5f;   //#####up
     CurrentCameraF.upview.z = (float) 0.0f;
-
-    // lookat. target point origin.
+// Lookat. (target point origin)
     CurrentCameraF.lookat.x = (float) 0.0f;
     CurrentCameraF.lookat.y = (float) 0.0f;
     CurrentCameraF.lookat.z = (float) 0.0f;
 
     CurrentCameraF.initialized = TRUE;
-
     return 0;
 }
 
@@ -378,7 +364,7 @@ camera (
     int xUp, int yUp, int zUp,
     int xLookAt, int yLookAt, int zLookAt )
 {
-        
+
     if ( (void*) CurrentCamera == NULL ){
         return -1;
     }
@@ -386,21 +372,16 @@ camera (
         return -1;
     }
 
-// ----------------
 // EYE:
 // position
     CurrentCamera->position.x = x;
     CurrentCamera->position.y = y;
     CurrentCamera->position.z = z;
-
-// ----------------
 // UP:
 // upview
     CurrentCamera->upview.x = xUp;
     CurrentCamera->upview.y = yUp;
     CurrentCamera->upview.z = zUp;
-
-// ----------------
 // AT:
 // lookat. target point origin.
     CurrentCamera->lookat.x = xLookAt;
@@ -413,8 +394,9 @@ camera (
 
 int unveil_world(void)
 {
-    // object window
+// object window
     struct gws_window_d *ow;
+
     ow = NULL;
     //#todo
     // use the demo window if it is possible
@@ -422,7 +404,6 @@ int unveil_world(void)
        if(__demo_window->magic==1234)
         ow = __demo_window;
     }
-
 
     if ( (void*) CurrentWorld == NULL )
         return -1;
@@ -458,7 +439,6 @@ int unveil_world(void)
         4,        //r
         COLOR_PURPLE,  //color 
         CurrentWorld->vp1.z );   // z 
-
 
 // ==========================
 // Draw the 3 axis
@@ -503,9 +483,10 @@ int
 unveil_camera(
     int model_x, int model_y, int model_z )
 {
-
-    // object window
+// object window
     struct gws_window_d *ow;
+    struct gr_ray_d r;
+
     ow = NULL;
     //#todo
     // use the demo window if it is possible
@@ -513,8 +494,6 @@ unveil_camera(
        if(__demo_window->magic==1234)
         ow = __demo_window;
     }
-
-    struct gr_ray_d r;
 
     r.used = TRUE;
     r.magic = 1234;
@@ -734,11 +713,12 @@ int projection_initialize(void)
         exit(1);
     }
 
-    // Use the default dc.
+// Use the default dc.
     CurrentProjection->dc = gr_dc;
     CurrentProjection->initialized = FALSE;
-    // #todo: Perspective or orthogonal
-    CurrentProjection->type = 1; 
+// #todo: 
+// Perspective or orthogonal.
+    CurrentProjection->type = 1;
 
 //
 // Orthographic projection plane
@@ -831,7 +811,7 @@ gr_clamp(
     vect->x = max(min_value, vect->x);
     vect->y = max(min_value, vect->y);
     vect->z = max(min_value, vect->z);
-        
+
     vect->x = min(max_value, vect->x);
     vect->y = min(max_value, vect->y);
     vect->z = min(max_value, vect->z);
@@ -864,7 +844,7 @@ gwsViewport(
         width=0;
 
     // ...
-    
+
     // #todo
     // call that routine.
     //projection_initialize(...)
@@ -939,7 +919,6 @@ __transform_from_viewspace_to_screespace(
 // This is the origin of the 'world space'.
 // model space.
 // Been the reference for all the 'object spaces'.
-
 
 // ===================================================
 // X::
@@ -1101,17 +1080,13 @@ int gr_dc_fill( struct dc_d *dc, unsigned int bg_color )
     dc->bg_color = (unsigned int) bg_color;
 
     rectBackbufferDrawRectangle ( 
-        dc->left, 
-        dc->top, 
-        dc->width,
-        dc->height, 
+        dc->left, dc->top, dc->width, dc->height, 
         dc->bg_color, 
         TRUE,           // fill
         dc->rop );
 
     return 0;
 }
-
 
 // plot point
 // 2d
@@ -1280,24 +1255,20 @@ grPlot0 (
 // #todo
 // This is a work in progress
 
-    // Final 2D screen coordenates.
+// Final 2D screen coordenates.
     int X=0;
     int Y=0;
     unsigned long rop = 0;  //#todo
-
-    // Draw flag.
+// Draw flag
     int Draw = TRUE;
-
     int UsingDepthBuffer = FALSE;
     int UsingAlphaBlending = FALSE;
-
 // clipping window support.
     struct gws_window_d *w;
     int UseClipping = FALSE;
-
+// Hotspot. (center?)
     int hotspotx=0;
     int hotspoty=0;
-
     int UseLeftHand = gUseLeftHand;
     //UseLeftHand = TRUE;   //LEFT HAND
     //UseLeftHand = FALSE;  //RIGHT HAND
@@ -1335,8 +1306,6 @@ grPlot0 (
          return 0;
      if (z >= zFar)
          return 0;
-
-//-------------------------------------
 
 //-------------------------------------
 // #todo
@@ -2144,8 +2113,7 @@ xxxDeflateCubeZ (
         return -1;
     }
 
-
-    // south points ==========================
+// south points ==========================
     cube->p[0].x = (cube->p[0].x + value);
     cube->p[0].y = (cube->p[0].y - value);
     cube->p[0].z = (cube->p[0].z + value);
@@ -2162,7 +2130,7 @@ xxxDeflateCubeZ (
     cube->p[3].y = (cube->p[3].y + value);
     cube->p[3].z = (cube->p[3].z + value);
 
-    // north points =========================
+// north points =========================
     cube->p[4].x = (cube->p[4].x + value);
     cube->p[4].y = (cube->p[4].y - value);
     cube->p[4].z = (cube->p[4].z - value);
@@ -2178,7 +2146,7 @@ xxxDeflateCubeZ (
     cube->p[7].x = (cube->p[7].x + value);
     cube->p[7].y = (cube->p[7].y + value);
     cube->p[7].z = (cube->p[7].z - value);
-       
+
     return 0;
 }
 
@@ -2246,7 +2214,8 @@ fillTriangle0(
     int x3, int y3, 
     unsigned int c)
 {
-    int npixels=0;  // Number of pixels changed.
+// Number of pixels changed.
+    int npixels=0;
 
     int t1x=0;
     int t2x=0;
@@ -3344,13 +3313,10 @@ matrix_multiply_2x3 (
     int mat2[2][3], 
     int res[2][3])
 {
-
     int N1 = 2;
     int N2 = 3;
-    
     int i, j, k;
-    
-    
+
     for (i = 0; i < N1; i++) 
     {
         for (j = 0; j < N2; j++) 
@@ -3372,20 +3338,18 @@ void multiply4 (int mat1[4][4], int mat2[4][4], int res[4][4])
     register int j=0; 
     register int k=0;
 
-    for (i = 0; i < 4; i++) 
+    for (i=0; i<4; i++) 
     {
-        for (j = 0; j < 4; j++) 
+        for (j=0; j<4; j++) 
         {
             res[i][j] = 0;
-            
             // slow
-            for (k = 0; k < 4; k++){
+            for (k=0; k<4; k++){
                 res[i][j] += mat1[i][k] * mat2[k][j];
             };
         };
     };
 }
-
 
 void 
 gr_MultiplyMatrixVector(
@@ -3477,9 +3441,7 @@ gr_rotate_x(
 
     return 0;
 }
-//--------------------------------------------------
 
-//--------------------------------------------------
 // Rotate in y
 int 
 gr_rotate_y(
@@ -3525,9 +3487,7 @@ gr_rotate_y(
 
     return 0;
 }
-//--------------------------------------------------
 
-//--------------------------------------------------
 // Rotate in z
 int 
 gr_rotate_z(
@@ -3573,11 +3533,10 @@ gr_rotate_z(
         (struct gr_vecF3D_d *) &in_tri->p[2], 
         (struct gr_vecF3D_d *) &out_tri->p[2], 
         &matRotZ);
-//-----------------------------    
 
     return 0;
 }
-//--------------------------------------------------
+
 
 
 struct gr_vecF3D_d *grVectorCrossProduct(
@@ -3767,11 +3726,11 @@ void __print_fib(int max)
 }
 */
 
-
 void gr_scale_vec( struct gr_vec3D_d *v, int scale )
 {
-    if( (void*) v == NULL )
+    if ( (void*) v == NULL ){
         return;
+    }
 
     v->x *= scale;
     v->y *= scale;
@@ -3796,17 +3755,13 @@ plotCharBackbufferDrawcharTransparent (
     unsigned long color, 
     unsigned long c )
 {
-
-    //loop
+//loop
     register int y2=0;
     register int x2=0;
-
     char *work_char;
     unsigned char bit_mask = 0x80;
-
     //int CharWidth;
     //int CharHeight;
-
 
 /*
  * Get the font pointer.
@@ -4085,15 +4040,12 @@ void grDCMono (
     }
 }
 
-
-
 // substitui cor no lfb
 void grDCColorChg ( 
     struct gws_display_d *dc,
     unsigned char subpixel_src_color,
     unsigned char subpixel_dst_color )  // dst_color=COLOR_TRANSPARENT )
 {
-
     int i=0;
     unsigned char *dst;
     struct gws_screen_d *Screen;
@@ -4161,7 +4113,6 @@ plotQuadBezierSeg (
     long err=0; 
     long cur = xx*sy-yy*sx;
 
-
     /* sign of gradient must not change */
     //assert(xx*sx <= 0 && yy*sy <= 0);  
 
@@ -4211,8 +4162,7 @@ plotQuadBezierSeg (
       if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
     
     } while (dy < dx );           /* gradient negates -> algorithm fails */
-    
-    
+
     }
 
 /* plot remaining part to end */
@@ -4290,6 +4240,7 @@ interpolate_color(
 //#todo: Explain it better.
 unsigned int invert_color(unsigned int color)
 {
+// Is the operator a '~0x0000'
     unsigned int Color = (unsigned int) (color ^ 0x00FFFFFF);
     return (unsigned int) Color;
 }

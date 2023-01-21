@@ -1,5 +1,10 @@
+/*
+# game2 - 3D game for Gramado OS.
+# This is also a server.
+# It's called by the init process.
+# 2022 - Created by Fred Nora.
+*/
 
-// GWSSRV.BIN
 // This is a ring0 display server and window manager.
 // It has the same PID of the kernel, 0.
 // #todo: 

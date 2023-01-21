@@ -1,10 +1,8 @@
 
-# gws - Gramado Window Server.
-# 2020 - Created by Fred Nora.
-
-# todo:
-# Os aplicativos em /init/core ainda usam PE, assim como o base kernel.
-# É desejável que isso mude.
+# game2 - 3D game for Gramado OS.
+# This is also a server.
+# It's called by the init process.
+# 2022 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 1

@@ -29,6 +29,8 @@ extern char *screen_number;
 extern int gUseLeftHand;
 extern int gUseCallback;
 
+extern unsigned long starting_tick;
+
 // ============================
 // Modes.
 #define GRAMADO_JAIL        0x00

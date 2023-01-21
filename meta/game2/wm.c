@@ -293,14 +293,11 @@ on_keyboard_event(
     //if(!w){ w=get_active(); }
     
     w = (void*) keyboard_owner;
-    
-    if ( (void*) w == NULL )
-    {
+    if ( (void*) w == NULL ){
         printf("on_keyboard_event: w\n");
         return 0;
     }
-    if (w->magic!=1234)
-    {
+    if (w->magic!=1234){
         printf("on_keyboard_event: w magic\n");
         return 0;
     }
@@ -565,7 +562,7 @@ void show_client_list(int tag)
 struct gws_client_d *wintoclient(int window)
 {
     struct gws_client_d *c;
-    int i=0;
+    //int i=0;
 
     if(window<0)
         return NULL;
@@ -630,7 +627,6 @@ void __init_wm_structure(void)
 // orientation
     WindowManager.vertical = FALSE;   // horizontal. default
     //WindowManager.vertical = TRUE;
-
 // How many frames until now.
     WindowManager.frame_counter = 0;
     WindowManager.fps = 0;
@@ -1442,7 +1438,7 @@ wmCreateWindowFrame (
         // Consistente para overlapped.
         BorderSize = METRICS_BORDER_SIZE;
         // ...
-        
+
         // #todo
         // The window structure has a element for border size
         // and a flag to indicate that border is used.
@@ -1566,10 +1562,7 @@ wmCreateWindowFrame (
                 TRUE,
                 0 );  // rop_flags no rop in this case?
 
-            //
             // Icon (Titlebar)
-            //
-
             // O posicionamento em relação
             // à janela é consistente por questão de estilo.
             // See: bmp.c
@@ -1587,7 +1580,7 @@ wmCreateWindowFrame (
             // IN: index, left, top
             // see: bmp.c
 
-            if( useIcon == TRUE )
+            if (useIcon == TRUE)
             {
                 window->titlebarHasIcon = TRUE;
                 gwssrv_display_system_icon( 
@@ -1596,22 +1589,16 @@ wmCreateWindowFrame (
                     (tbWindow->top  + METRICS_ICON_TOPPAD) );
             }
 
-            //
             // String (title bar)
-            //
-        
+
             window->titlebar_text_color = COLOR_WHITE;
-        
             // #todo
             // Temos que gerenciar o posicionamento da string.
-        
             // #bugbug: Use 'const char *'
             tbWindow->name = 
                 (char *) strdup( (const char *) window->name );
-        
             //#todo: validation
             //if ( (void*) tbWindow->name == NULL ){}
-        
             if (useTitleString == TRUE){
                 grDrawString ( 
                     ((tbWindow->left) + StringLeftPad), 
@@ -1619,7 +1606,6 @@ wmCreateWindowFrame (
                     COLOR_WHITE, 
                     tbWindow->name );
             }
-
         }  //--use title bar.
         // ooooooooooooooooooooooooooooooooooooooooooooooo
 
@@ -1629,10 +1615,8 @@ wmCreateWindowFrame (
         // atualizar o top da área de cliente.
         //window->rcClient.top += window->titlebar_height;
 
-        //
         // Status bar (bottom)
-        // 
-        
+
         // A janela overlapped tem statusbar.
         // Se for maximized ou fullscreen
         // #todo: Essa janela foi registrada?
@@ -1673,7 +1657,6 @@ wmCreateWindowFrame (
             // então devemos atualizar a altura da área de cliente.
             window->rcClient.height -= window->statusbar_height;
 
-            
             if ( (void *) sbWindow == NULL ){
                 gwssrv_debug_print ("wmCreateWindowFrame: sbWindow fail \n");
                 return -1;
@@ -1694,25 +1677,19 @@ wmCreateWindowFrame (
     }
 
 // ===============================================
-// button
+// Button
 
-    //button
-    if (Type == WT_BUTTON)
-    {
+    // Button
+    if (Type == WT_BUTTON){
         gwssrv_debug_print ("wmCreateWindowFrame: [TODO] frame for button\n");
-        
         //todo frame or not
-        //just like the edit box.   
-        
+        //just like the edit box.
         // ok     
         return 0;
     }
 
-// ===============================================
-
     return 0;
 }
-
 
 void wm_flush_rectangle(struct gws_rect_d *rect)
 {
@@ -1790,11 +1767,9 @@ void refresh_subwidnows( struct gws_window_d *w )
 }
 */
 
-
 /*
  * wmRefreshDirtyRectangles: 
  */
-
 // Called by compose().
 // O compositor deve ser chamado para compor um frame 
 // logo após uma intervenção do painter, que reaje às
@@ -1914,23 +1889,21 @@ void flush_frame(void)
     wm_flush_screen();
 }
 
-
-static void animate_window( struct gws_window_d *window )
+static void animate_window(struct gws_window_d *window)
 {
-    int i=0;
-    
+    register int i=0;
+
     if( (void*) window == __root_window)
         return;
     if(window->magic!=1234)
         return;
-    
+
     for (i=0; i<800; i++)
     {
          if( (window->left - 1) == 0)
              return;
          if( (window->top - 1) == 0)
              return;
-
          gwssrv_change_window_position(
               window, 
               window->left -1, 
@@ -1940,13 +1913,11 @@ static void animate_window( struct gws_window_d *window )
     };
 }
 
-
 // Starting with the first_window of the list,
 // create a stack of windows
 // This is the zorder.
 // #todo:
 // only application windows? overlapped.
-
 static void __Tile(void)
 {
     struct gws_window_d *w;

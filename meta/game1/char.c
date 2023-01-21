@@ -129,20 +129,14 @@ DrawBorder(
     };
 }
 
-
-
 int gwssrv_init_char(void)
 {
-
     //char
     gcharWidth  = 8;   //gde_get_system_metrics (7);
     gcharHeight = 8;   //gde_get_system_metrics (8);
-
     //...
-    
     return 0;
 }
-
 
 // Constrói um caractere transparente 8x8 no buffer.
 void 
@@ -155,38 +149,31 @@ charBackbufferCharBlt (
     grBackbufferDrawCharTransparent ( x, y, color, c );
 }
 
-
 void charSetCharWidth ( int width )
 {
     gcharWidth = (int) width;
 }
-
 
 void charSetCharHeight ( int height )
 {
     gcharHeight = (int) height;
 }
 
-
 int charGetCharWidth (void)
 {
     return (int) gcharWidth;
 }
-
 
 int charGetCharHeight (void)
 {
     return (int) gcharHeight;
 }
 
-
 /*
- *****************************************
  * charBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
  *     >> no backbuffer.
  */
-
 // #bugbug
 // Nessa função estamos usando globais.
 // Talvez devamos pegá-las antes e não 
@@ -199,17 +186,13 @@ grBackbufferDrawCharTransparent (
     unsigned int color, 
     unsigned long c )
 {
-
     //loop
     register int y2=0;
     register int x2=0;
-
     char *work_char;
     unsigned char bit_mask = 0x80;
-
     //int CharWidth;
     //int CharHeight;
-
 
 /*
  Get the font pointer.
@@ -229,8 +212,8 @@ grBackbufferDrawCharTransparent (
         //gcharWidth = DEFAULT_CHAR_WIDTH;               //8.
         //gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
 
-		// #debug
-		// Estamos parando para testes.
+        // #debug
+        // Estamos parando para testes.
 
         printf ("grBackbufferDrawCharTransparent : Initialization fail\n");
         while(1){}
@@ -282,10 +265,7 @@ grBackbufferDrawCharTransparent (
         (void *) gws_currentfont_address + (c * gcharHeight);
 
 
-//
-// Draw char.
-//
-
+// Draw char
 // Put pixel using the ring3 routine.
 // See: bitblt.c
 
@@ -435,7 +415,6 @@ grBackbufferDrawChar (
         work_char++; 
     };
 }
-
 
 //
 // End

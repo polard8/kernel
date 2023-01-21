@@ -1,6 +1,12 @@
 
+// dtext.h
 
-int dummydtext; 
+#ifndef __DTEXT_H
+#define __DTEXT_H    1
+
+int dummydtext;
 
 
+
+#endif    
 
