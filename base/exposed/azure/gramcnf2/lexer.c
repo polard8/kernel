@@ -78,7 +78,7 @@ int brace_count=0;
 // -- Prototypes --------
 //
 
-static int lexerInit(void);
+static int __lexerInit(void);
 static int skip_white_space(void);
 
 //#### supensa ###
@@ -885,11 +885,9 @@ done:
  *     Inicializando o lexer.
  */
 
-static int lexerInit(void)
+static int __lexerInit(void)
 {
     register int i=0;
-
-    printf("lexerInit:\n");
 
     //number_of_tokens = 0;
     //current_token = 0;
@@ -921,17 +919,10 @@ static int lexerInit(void)
     return 0;
 }
 
-
-int lexer (void)
+int lexer_initialize(void)
 {
-    int Status = -1;
-
-    printf ("\n");
-    printf ("---------------------------------------\n");    
-    printf("lexer:\n");
-    Status = (int) lexerInit();
-
-    return (int) Status;
+    printf ("parser_initialize:\n");
+    return (int) __lexerInit();
 }
 
 /*

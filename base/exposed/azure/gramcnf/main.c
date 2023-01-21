@@ -49,11 +49,9 @@ static int gramcnf_initialize(void)
     int Status = 0;
     register int i=0;
 
-    printf ("gramcnf_initialize:\n");
+    //printf ("gramcnf_initialize:\n");
 
-//
 // Clear buffers
-//
 
 // Clear infile and outfile buffers.
     for ( i=0; i<INFILE_SIZE; i++ ){
@@ -114,6 +112,9 @@ static int gramcnf_initialize(void)
 // Mostra as estatísticas para o desenvolvedor.
 static void debugShowStat(void)
 {
+    printf("\n");
+    printf("==========================================\n");
+
 //#ifdef LEXER_VERBOSE
     printf("number of liner: {%d}\n",lexer_lineno);
     printf("first line:      {%d}\n",lexer_firstline);
@@ -133,18 +134,14 @@ static void debugShowStat(void)
 
 int main ( int argc, char *argv[] )
 {
-
 // Input
     FILE *fp;
 // Output file for compiler.
     FILE *____O;
-
-    register int i;
+    register int i=0;
     char *filename;
-
 // Output string.
     char *o;
-
 // Switches 
     int flagA = 0;
     int flagB = 0;
@@ -161,19 +158,20 @@ int main ( int argc, char *argv[] )
     int flagS = 0;
     int flagT = 0;
 
+    int fShowStats = FALSE;  //#bugbug
+    int fDumpOutput = FALSE;  // Dump output file?
+
 // Carregamos o arquivo num buffer em ring0.
 // getc() precisa ler os dados em stdin
 // #bugbug: 
 // Se o buffer for maior que isso, read() falha.
     char __buf[1024];
     int nreads=0;
-    
-    int ShowStats = FALSE;  //#bugbug
 
 // Initializing
     //debug_print ("gramcnf: Initializing ...\n");  
-    printf ("\n");
-    printf ("main: Initializing ..\n");
+    //printf ("\n");
+    //printf ("main: Initializing ..\n");
 
 // Inicializa variáveis globais.
     gramcnf_initialize();
@@ -192,29 +190,30 @@ int main ( int argc, char *argv[] )
 // #debug 
 // Mostrando os argumentos. 
 
-#ifdef GRAMC_VERBOSE
-    printf ("argc=%d \n", argc );
-    for ( i=0; i < argc; i++ ){
-        printf("arg %d = %s \n", i, argv[i] );
-    };
-#endif 
+    //printf ("argc=%d \n", argc );
+    //for ( i=0; i < argc; i++ ){
+    //    printf("arg %d = %s \n", i, argv[i] );
+    //};
 
 // flags.
 // Comparando os argumentos para acionar as flags.
 
-    for ( i=0; i < argc; i++ ){
-
-    if ( strcmp( argv[i], "-a") == 0 ){
-        printf ("## %d flag a ##\n",i);
-    }
-    if ( strcmp( argv[i], "-b") == 0 ){
-        printf("## %d flag b ##\n",i);
-    }
-    if ( strcmp( argv[i], "-s") == 0 ){
-        printf("## %d flag -s ##\n",i);
-        asm_flag = 1;
-    }
-    //...
+    for ( i=0; i < argc; i++ )
+    {
+        if ( strncmp( argv[i], "-a", 2) == 0 ){
+        }
+        if ( strncmp( argv[i], "-b", 2) == 0 ){
+        }
+        if ( strncmp( argv[i], "-s", 2) == 0 ){
+            asm_flag = 1;
+        }
+        if ( strncmp( argv[i], "--stats", 7) == 0 ){
+            fShowStats = TRUE;
+        }
+        if ( strncmp( argv[i], "--dumpo", 7) == 0 ){
+            fDumpOutput = TRUE;
+        }
+        //...
     };
 
 // # Arquivo de entrada #
@@ -227,38 +226,34 @@ int main ( int argc, char *argv[] )
 
 // Open
     //printf ("\n");
-    printf("Calling fopen()    :)\n");
+    //printf("Calling fopen()    :)\n");
     //while(1){}
 
     fp = fopen((char *) argv[2], "rb");
-
     if ( fp == NULL ){
-        printf("main.c: Couldn't open the input file\n");
+        printf("gramcnf: Couldn't open the input file\n");
         usage(argv);
         exit(1);
     }
 
 // Input file.
 // para que getc leia desse arquivo que carregamos.
-
     stdin = fp;
     finput = fp;
  
 //#debug
 // Esse while está aqui para visualizarmos o arquivo carregado.
-        
-        //int c;
-        //while(1)
-        //{
-            //c=getc(stdin);
-            //if(c == EOF)
-                //break;
-                
-            //printf("%c",c);
-        //}
-        //fflush(stdout);
-        //while(1){}
 
+    //int c;
+    //while(1)
+    //{
+        //c=getc(stdin);
+        //if(c == EOF)
+            //break;
+        //printf("%c",c);
+    //}
+    //fflush(stdout);
+    //while(1){}
 //=====================================
 
 // Compiler
@@ -267,25 +262,18 @@ int main ( int argc, char *argv[] )
 // + Parse the tokens.
 // + Return a pointer to the output file.
 
-    printf ("main: Calling compiler\n");
-    ____O = (FILE *) compiler();   
-    printf ("main: compiler returned \n");
+    // IN: dump output file?
+    ____O = (FILE *) compiler(fDumpOutput);   
 
-//==========================================
+    //if ( (void*) ____O == NULL ){
+       //
+    //}
 
-    printf("\n");
-    printf("==========================================\n");
-    
-    //if(ShowStats)
+    if (fShowStats){
         debugShowStat();
+    }
 
-    //#debug
-    //printf ("breakpoint");
-    //while (1){} 
-
-    printf("\n");
-    printf ("main: Done.\n");
-
+    printf("Done :)\n");
     return 0;
 }
 

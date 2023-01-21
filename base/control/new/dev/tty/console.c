@@ -1183,6 +1183,21 @@ void console_putchar ( int c, int console_number )
     stdio_terminalmode_flag = FALSE; 
 }
 
+// Print consecutive spaces.
+void console_print_indent(int indent, int console_number)
+{
+    register int i=0;
+    const int Ch = ' ';
+
+    if (indent<0)
+        indent=0;
+    if (console_number<0)
+        return;
+    for (i=0; i<indent; i++){
+        console_putchar(Ch,console_number);
+    };
+}
+
 
 // Coloca no prompt[] para ser comarado.
 // Talvez o prompt também seja o buffer de stdin

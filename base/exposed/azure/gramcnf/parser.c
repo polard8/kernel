@@ -46,7 +46,7 @@ char save_symbol[32];
 // -- Private: Prototypes --------
 //
 
-static int parserInit(void);
+static int __parserInit(void);
 // Functions
 static int parse_function(int token);
 // Statements
@@ -1510,11 +1510,28 @@ expression_exit:
     return (unsigned long) Result;
 }
 
+
+void dump_output_file(void)
+{
+// Incluindo no arquivo de output os segmentos.
+    strcat ( outfile, TEXT );
+    strcat ( outfile, DATA );
+    strcat ( outfile, BSS );
+// Exibimos o arquivo de output.
+    printf ("\n");
+    printf ("--------------------------------\n");    
+    printf ("OUTPUT FILE:\n");
+    printf ("%s\n", outfile);
+    printf ("\n");
+    printf ("--------------------------------\n");
+    printf ("number of lines: %d \n", lineno );
+}
+
 // parse:
 // Função principal.
 // Pegando tokens com o lexer e fazendo coisas ...
 
-int parse(void)
+int parse(int dump_output)
 {
     int running = 1;
     register int token=0;
@@ -1554,10 +1571,9 @@ int parse(void)
     //--
 
 // Initial message.
-    printf ("parse: Initializing ...\n");
+    printf ("parse:\n");
 
-
-    // Vamos usar um while até que se encontre o fim do arquivo.
+// Vamos usar um while até que se encontre o fim do arquivo.
 
     while (running == 1)
     {
@@ -1565,8 +1581,7 @@ int parse(void)
     
         // EOF: 
         // O lexer nos disse que acabou.
-        if ( token == TOKENEOF )
-        {
+        if (token == TOKENEOF){
             printf ("parse: ~EOF\n");
             running = 0;
             break;
@@ -2147,6 +2162,11 @@ int parse(void)
 	//...
 
 debug_output:
+
+    if (dump_output)
+        dump_output_file();
+
+/*
 // Incluindo no arquivo de output os segmentos.
     strcat ( outfile, TEXT );
     strcat ( outfile, DATA );
@@ -2159,13 +2179,16 @@ debug_output:
     printf ("\n");
     printf ("--------------------------------\n");
     printf ("number of lines: %d \n", lineno );
+*/
     goto parse_exit;
+
 hang:
     printf ("parse: *hang\n");   
     while (1){ asm ("pause"); };
 syntax:
     printf ("parse: Systax error in line %d \n", lineno );
     exit (1);
+
 parse_exit:
     printf ("parse: done\n");
     return 0;
@@ -2173,11 +2196,9 @@ parse_exit:
 
 // parserInit:
 // Initializing parser.
-static int parserInit(void)
+static int __parserInit(void)
 {
     register int i=0;
-
-    printf ("parserInit:\n");
 
     //infile_size = 0;
     //outfile_size = 0;
@@ -2206,18 +2227,10 @@ static int parserInit(void)
 }
 
 // Called by compiler().
-int parser(void)
+int parser_initialize(void)
 {
-    int Status = -1;
-    printf ("\n");
-    printf ("-----------------------------------\n");
-    printf("parser:\n");
-// Initialize
-    Status = (int) parserInit();
-//parse it
-    Status = (int) parse();
-    printf ("parser: parse() returned %d\n", Status); 
-    return 0;
+    printf ("parser_initialize:\n");
+    return (int) __parserInit();
 }
 
 //

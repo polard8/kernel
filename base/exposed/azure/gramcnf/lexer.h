@@ -105,7 +105,7 @@ extern int brace_count;
 // -- Prototypes --------
 //
 
-int lexer(void);  // Initialize
+int lexer_initialize(void);  // Initialize
 int yylex(void);  // get stuff.
 void error(char *msg);
 
