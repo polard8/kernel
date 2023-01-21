@@ -18,7 +18,6 @@ all:
 # burgundy
 	make -C burgundy/server
 	make -C burgundy/client
-	make -C burgundy/gdm2
 	make -C burgundy/gdm
 # blue
 	make -C blue/terminal  

@@ -221,16 +221,21 @@ exposed-tier:
 #bugbug: This GWS.BIN client has some special calls.
 #do not use it for tests here.
 
+# This is not part of the exposed-tier
+# But its a de facto external content.
 #gramland
-	-sudo cp ../gramland/burgundy/bin/GWSSRV.BIN    control/disk/
-	#-sudo cp ../gramland/burgundy/bin/GWS.BIN      control/disk/
-	-sudo cp ../gramland/burgundy/bin/GDM.BIN       control/disk/
-	-sudo cp ../gramland/burgundy/bin/GDM2.BIN      control/disk/
-	-sudo cp ../gramland/blue/bin/TERMINAL.BIN      control/disk/
-	-sudo cp ../gramland/beige/bin/EDITOR.BIN       control/disk/
-	-sudo cp ../gramland/beige/bin/FILEMAN.BIN      control/disk/
-	-sudo cp ../gramland/beige/bin/CMDLINE.BIN      control/disk/
-	-sudo cp ../gramland/attitude/bin/BROWSER.BIN   control/disk/
+	-sudo cp ../gramland/burgundy/bin/GWSSRV.BIN   control/disk/
+	-sudo cp ../gramland/burgundy/bin/GWS.BIN      control/disk/
+	-sudo cp ../gramland/burgundy/bin/GDM.BIN      control/disk/
+	-sudo cp ../gramland/burgundy/bin/GDM2.BIN     control/disk/
+	-sudo cp ../gramland/blue/bin/TERMINAL.BIN     control/disk/
+	-sudo cp ../gramland/beige/bin/EDITOR.BIN      control/disk/
+	-sudo cp ../gramland/beige/bin/FILEMAN.BIN     control/disk/
+	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/
+	-sudo cp ../gramland/attitude/bin/BROWSER.BIN  control/disk/
+
+# This is not part of the exposed-tier
+# But its a de facto external content.
 #meta
 #todo: Add the games and demos, not the engines.
 	-sudo cp ../meta/bin/*.BIN   control/disk/

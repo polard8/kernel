@@ -1882,12 +1882,10 @@ serviceAsyncCommand (void)
     // See: demos.c
     case 4:
         gwssrv_debug_print ("serviceAsyncCommand: [4] \n");
-        if (current_mode == GRAMADO_JAIL)
-        {
+        if (current_mode == GRAMADO_JAIL){
             gwssrv_debug_print("serviceAsyncCommand: [request 4] demo\n"); 
             demos_startup_animation(subrequest_id);
             gwssrv_show_backbuffer();
-            //return 0;
             goto done;
         }
         goto done;
@@ -1897,8 +1895,7 @@ serviceAsyncCommand (void)
     // #bugbug: trava ...
     //case 5:
        //gwssrv_debug_print ("serviceAsyncCommand: [5] \n");
-       //if (current_mode == GRAMADO_JAIL)
-       //{
+       //if (current_mode == GRAMADO_JAIL){
            //rectBackbufferDrawRectangle ( 
            //    0, 0, 28, 8, COLOR_GREEN, TRUE,
            //    0 );  //rop_flags
@@ -1908,20 +1905,19 @@ serviceAsyncCommand (void)
 
     // Setup if we will show or not the 'fps window'.
     case 6:
-        gwssrv_debug_print ("serviceAsyncCommand: [6] \n");
+        gwssrv_debug_print ("serviceAsyncCommand: [6]\n");
         if( subrequest_id == TRUE ){ show_fps_window = TRUE;  goto done; }
         if( subrequest_id != TRUE ){ show_fps_window = FALSE; goto done; }
         //show_fps_window = FALSE;
         goto done;
         break;
 
-
     // Register wm pid
     // #suspended: o wm fica no ws por enquanto.
     case 7:
-        gwssrv_debug_print ("serviceAsyncCommand: [7] Register wm pid\n");
+        //gwssrv_debug_print ("serviceAsyncCommand: [7] Register wm pid\n");
         //printf ("serviceAsyncCommand: [7] [BREAKPOINT] Register wm pid\n");
-         ____saved_wm_magic_pid = (int) data;
+        //____saved_wm_magic_pid = (int) data;
         //exit(0);
         //return 0;
         goto done;
@@ -1932,12 +1928,12 @@ serviceAsyncCommand (void)
     // As mensages aqui interessam somente ao window manager
     // que esta dentro do window server.
     case 8:
-        gwssrv_debug_print ("serviceAsyncCommand: [8] \n");
-        printf ("serviceAsyncCommand: [8] \n");
-        if (subrequest_id = 1)
-        {
+        //gwssrv_debug_print ("serviceAsyncCommand: [8] \n");
+        //printf ("serviceAsyncCommand: [8] \n");
+        //if (subrequest_id = 1)
+        //{
             //exit(0);
-        }
+        //}
         goto done;
         break;
 
@@ -1948,7 +1944,6 @@ serviceAsyncCommand (void)
         set_focus_by_id( (int) data );
         goto done;
         break;
-
 
     // #test
     // drawing a rect using ring0 and ring3 routines.

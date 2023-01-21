@@ -41,10 +41,7 @@
 #include <packet.h>
 #include <gdm.h>
 
-//
-// == ports ====================================
-//
-
+// Ports
 #define PORTS_WS  4040
 #define PORTS_NS  4041
 #define PORTS_FS  4042
@@ -60,11 +57,8 @@ struct sockaddr_in addr = {
 };
 */
 
-//char *hello = "Hello there!\n";
-
 unsigned long gScreenWidth=0;
 unsigned long gScreenHeight=0;
-
 
 //
 // Windows
@@ -93,6 +87,8 @@ static int blink_status=FALSE;
 // for now we will use this tmp right here.
 int tmp_ip_x=8;
 int tmp_ip_y=8;
+
+//char *hello = "Hello there!\n";
 
 // ========
 
@@ -145,7 +141,7 @@ void editorDrawChar(int fd, int ch)
     int pos_x=0;
     int pos_y=0;
 
-    if(fd<0)
+    if (fd<0)
         return;
 
 // Get saved value
@@ -183,7 +179,7 @@ void editorDrawChar(int fd, int ch)
     cursor_x++;
 }
 
-void editorSetCursor( int x,int y )
+void editorSetCursor( int x, int y )
 {
     if (cursor_x >= 0 && 
         cursor_x < cursor_x_max)
@@ -216,7 +212,7 @@ gdmProcedure(
         return -1;
     }
 
-    switch(event_type){
+    switch (event_type){
 
     case 0:
         //#debug
@@ -226,8 +222,8 @@ gdmProcedure(
 
     //36
     case MSG_MOUSERELEASED:
-        if( event_window == addressbar_window ||
-            event_window == client_window )
+        if ( event_window == addressbar_window ||
+             event_window == client_window )
         {
             //gws_redraw_window(fd, event_window, TRUE);
             // IN: fd, wid, left, top, color, char.
@@ -283,17 +279,19 @@ int main( int argc, char *argv[] )
 {
     struct gws_display_d *Display;
     int client_fd = -1;
+    register int i=0;
     int fTest=FALSE;
 
 // #test
 // OK!
-    register int i=0;
-    for (i=1; i<argc; i++){
-        if (strcmp("--test", argv[i]) == 0){
+    for (i=1; i<argc; i++)
+    {
+        if ( strcmp("--test", argv[i]) == 0 ){
             printf("flag: TEST\n");
             fTest=TRUE;
         }
     };
+
 
 // global: Cursor
     cursor_x=0;
@@ -313,7 +311,7 @@ int main( int argc, char *argv[] )
         exit(1);
     }
 
-// fd
+// Socket fd.
     client_fd = (int) Display->fd;
     if (client_fd <= 0){
         debug_print ("gdm: bad fd\n");
@@ -398,7 +396,8 @@ int main( int argc, char *argv[] )
                   COLOR_GRAY );
 
     if (main_window<0){
-        debug_print("gdm: main_window\n"); 
+        debug_print("gdm: main_window\n");
+        printf("gdm: main_window\n");
         exit(1);
     }
 
@@ -435,10 +434,10 @@ int main( int argc, char *argv[] )
 // Text inside the address bar.
     if (addressbar_window>0){
         gws_draw_text (
-            (int) client_fd,            // fd,
-            (int) addressbar_window,    // window id,
-            (unsigned long) 8,          // left,
-            (unsigned long) 8,          // top,
+            (int) client_fd,            // fd
+            (int) addressbar_window,    // window id
+            (unsigned long) 8,          // left
+            (unsigned long) 8,          // top
             (unsigned long) COLOR_BLACK,
             "admin");
      }
@@ -467,8 +466,8 @@ int main( int argc, char *argv[] )
 // 'username:' text
 // Text inside the main window.
      gws_draw_text (
-        (int) client_fd,      // fd,
-        (int) main_window,    // window id,
+        (int) client_fd,      // fd
+        (int) main_window,    // window id
         (unsigned long)  2,
         (unsigned long)  4 +(24) +4 +(24/3), 
         (unsigned long) COLOR_BLACK,
@@ -501,10 +500,7 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_EDITBOX, 1, 1, "password-win",
-                  cw_left, 
-                  cw_top, 
-                  cw_width, 
-                  cw_height,
+                  cw_left, cw_top, cw_width, cw_height,
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
     if (client_window<0){
@@ -622,11 +618,12 @@ int main( int argc, char *argv[] )
         }
     };
 
+/*
 // HANG
     while(1){
         rtl_yield();
     };
-
+*/
 
 /*
     int C=0;
