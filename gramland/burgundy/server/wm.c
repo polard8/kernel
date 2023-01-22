@@ -267,8 +267,9 @@ on_keyboard_event(
     unsigned long long1,
     unsigned long long2 )
 {
-    struct gws_window_d *w;
+    struct gws_window_d *window;
     unsigned long Result=0;
+    char name_buffer[64];
 
     if (msg<0){
         return 0;
@@ -277,24 +278,225 @@ on_keyboard_event(
 // Window with focus.
 // keyboard_owner
     //w = (void*) keyboard_owner;
-    w = (struct gws_window_d *) get_focus();
-    if ( (void*) w == NULL ){
-        printf("on_keyboard_event: w\n");
+    window = (struct gws_window_d *) get_focus();
+    if ( (void*) window == NULL ){
+        printf("on_keyboard_event: window\n");
         return 0;
     }
-    if (w->magic!=1234){
-        printf("on_keyboard_event: w magic\n");
+    if (window->magic!=1234){
+        printf("on_keyboard_event: window magic\n");
         return 0;
     }
 
+/*
+//  Chamando o procedimento de janela
+// para processar eventos de teclado.
     Result = 
         (unsigned long) wmProcedure(
-                            (struct gws_window_d *) w,
+                            (struct gws_window_d *) window,
                             (int) msg,
                             (unsigned long) long1,
                             (unsigned long) long2 ); 
 
     return (unsigned long) Result;
+*/
+
+//================================
+
+    if( msg == GWS_KeyDown )
+    {
+        // Imprime o char na janela indicada.
+        // Essa é a janela com foco de entrada.
+        //if( pre_print === TRUE)
+        //wm_draw_char_into_the_window(window,(int)long1,COLOR_RED);
+        wm_draw_char_into_the_window(
+            window,
+            (int) long1,
+            xCOLOR_GRAY1 );
+        // Enfileirar a mensagem na fila de mensagens
+        // da janela com foco de entrada.
+        // O cliente vai querer ler isso.
+        // Na verdade estamos colocando na janela indicada
+        // via argumento ... penso que o caller selecionou
+        // a janela com foco.
+        wmPostMessage(
+            (struct gws_window_d *) window,
+            (int) msg,
+            (unsigned long) long1,
+            (unsigned long) long2);
+
+        return 0;
+    }
+
+//================================
+
+    if( msg == GWS_KeyUp )
+    {
+    }
+
+//================================
+    if( msg == GWS_SysKeyDown )
+    {
+        if(long1 == VK_F1){
+            // ja esta rodando.
+            if(tb_buttons_status[0] == TRUE)
+                return 0;
+            set_status_by_id(tb_buttons[0],BS_PRESSED);
+            redraw_window_by_id(tb_buttons[0],TRUE);
+            return 0;
+        }
+        if(long1 == VK_F2){
+            // ja esta rodando.
+            if(tb_buttons_status[1] == TRUE)
+                return 0;
+            set_status_by_id(tb_buttons[1],BS_PRESSED);
+            redraw_window_by_id(tb_buttons[1],TRUE);
+            return 0;
+        }
+        if(long1 == VK_F3){
+            // ja esta rodando.
+            if(tb_buttons_status[2] == TRUE)
+                return 0;
+            set_status_by_id(tb_buttons[2],BS_PRESSED);
+            redraw_window_by_id(tb_buttons[2],TRUE);
+            return 0;
+        }
+        if(long1 == VK_F4){
+            // ja esta rodando.
+            if(tb_buttons_status[3] == TRUE)
+                return 0;
+            set_status_by_id(tb_buttons[3],BS_PRESSED);
+            redraw_window_by_id(tb_buttons[3],TRUE);
+            return 0;
+        }
+        
+        if (long1 == VK_F9 || 
+            long1 == VK_F10 || 
+            long1 == VK_F11)
+        {
+            control_action(msg,long1);
+            return 0;
+        }
+
+        //printf("wmProcedure: [?] GWS_SysKeyDown\n");
+        // Enfileirar a mensagem na fila de mensagens
+        // da janela com foco de entrada.
+        // O cliente vai querer ler isso.
+        wmPostMessage(
+            (struct gws_window_d *) window,
+            (int)msg,
+            (unsigned long)long1,
+            (unsigned long)long2);
+        //wm_update_desktop(TRUE); // 
+        return 0;
+    }
+
+//================================
+    if( msg == GWS_SysKeyUp )
+    {
+   
+        if(long1 == VK_F1){
+            // ja esta rodando.
+            if(tb_buttons_status[0] == TRUE)
+                return 0;
+            set_status_by_id( tb_buttons[0], BS_RELEASED );
+            redraw_window_by_id(tb_buttons[0],TRUE);
+            memset(name_buffer,0,64-1);
+            strcpy(name_buffer,app1_string);
+            tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            tb_buttons_status[0] = TRUE;
+            return 0;
+        }
+        if(long1 == VK_F2){
+            // ja esta rodando.
+            if(tb_buttons_status[1] == TRUE)
+                return 0;
+            set_status_by_id( tb_buttons[1], BS_RELEASED );
+            redraw_window_by_id(tb_buttons[1],TRUE);
+            //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
+            memset(name_buffer,0,64-1);
+            strcpy(name_buffer,app2_string);
+            tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            tb_buttons_status[1] = TRUE;
+            return 0;
+        }
+        if(long1 == VK_F3){
+            // ja esta rodando.
+            if(tb_buttons_status[2] == TRUE)
+                return 0;
+            set_status_by_id( tb_buttons[2], BS_RELEASED );
+            redraw_window_by_id(tb_buttons[2],TRUE);
+            memset(name_buffer,0,64-1);
+            strcpy(name_buffer,app3_string);
+            tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            tb_buttons_status[2] = TRUE;
+            return 0;
+        }
+        if(long1 == VK_F4){
+            // ja esta rodando.
+            if(tb_buttons_status[3] == TRUE)
+                return 0;
+            set_status_by_id( tb_buttons[3], BS_RELEASED );
+            redraw_window_by_id(tb_buttons[3],TRUE);
+            memset(name_buffer,0,64-1);
+            strcpy(name_buffer,app4_string);
+            tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            tb_buttons_status[3] = TRUE;
+            // #test: ps2 full initialization.
+            // sc80(350,1,1,1);
+            // gUseMouse = TRUE;
+            return 0;
+        }
+
+        // update desktop
+        if (long1 == VK_F5)
+        {
+            set_status_by_id(tb_buttons[0],BS_RELEASED);
+            set_status_by_id(tb_buttons[1],BS_RELEASED);
+            set_status_by_id(tb_buttons[2],BS_RELEASED);
+            set_status_by_id(tb_buttons[3],BS_RELEASED);
+            WindowManager.is_fullscreen = FALSE;
+            
+            //set_input_status(FALSE);
+            wm_update_desktop(TRUE);
+            //set_input_status(TRUE);
+            
+            return 0;
+        }
+
+        //=====
+        if(long1==VK_F6){
+            // Enter fullscreen mode.
+            if (WindowManager.is_fullscreen != TRUE)
+            {
+                //set_input_status(FALSE);
+                wm_enter_fullscreen_mode();
+                //set_input_status(TRUE);
+                return 0;
+            }
+            // Exit fullscreen mode.
+            if (WindowManager.is_fullscreen == TRUE)
+            {
+                //set_input_status(FALSE);
+                wm_exit_fullscreen_mode(TRUE);
+                //set_input_status(TRUE);
+                return 0;
+            }
+            return 0;
+        }
+        
+        if (long1 == VK_F9 || 
+            long1 == VK_F10 || 
+            long1 == VK_F11)
+        {
+            control_action(msg,long1);
+            return 0;
+        }
+        
+        return 0;
+    }
+
+    return 0;
 }
 
 // Quando temos um evento de mouse,
@@ -338,6 +540,15 @@ on_mouse_event(
 
 // Move:
 // Process but do not send message for now.
+// #todo
+// Esse eh o momento de exibirmos o cursor do mouse.
+// Precisamos fazer refresh para apagar o cursor antigo
+// depois pintarmos o cursor novo direto no lfb.
+// Mas nao temos aqui a rotina de pintarmos direto no
+// lfb.
+// #todo: Trazer as rotinas de exibiçao de cursor
+// para ca, depois deixar de usar
+// as rotinas de pintura de cursor que estao no kernel.
     if (event_type == GWS_MouseMove)
     {
         //printf("MOVE\n");
@@ -346,9 +557,6 @@ on_mouse_event(
         // painting the pointer in the right position.
         // Lets update the position. See: comp.c
         comp_set_mouse_position(saved_x,saved_y);
-
-        // Esta passando sobre a janela ativa.
-        //__probe_activewindow_hover(long1,long2);
 
         // Update the 'mouse_hover' pointer.
         // But probing only for the buttons in the taskbar.
@@ -3426,47 +3634,6 @@ void __probe_window_hover(unsigned long long1, unsigned long long2)
 }
 
 
-
-
-/*
-// Se o mouse esta passando sobre a janela ativa.
-// que e' overlapped.
-void __probe_activewindow_hover(long long1, long long2)
-{
-    struct gws_window_d *aw;
-
-    int aw_wid = get_active_window();
-    if( aw_wid < 0 || aw_wid >= WINDOW_COUNT_MAX )
-        return;
-    aw = (struct gws_window_d *) windowList[aw_wid];
-    if( (void*) aw == NULL )
-        return;
-    if( aw->magic != 1234 )
-        return;
-
-    
-    int Status = -1;
-
-    // global
-    mouse_hover=NULL; 
-
-    Status = is_within(
-                 (struct gws_window_d *) aw,
-                 long1, 
-                 long2 );
-
-    if(Status==TRUE)
-    {
-        //yellow_status("oops");
-        //rtl_reboot();
-
-        // Register the hover window.
-        mouse_hover = aw; 
-    }
-}
-*/
-
-
 // Talvez precisaremos de mais parametros.
 // The keyboard input messages will affect
 // the window with focus.
@@ -3572,65 +3739,17 @@ wmProcedure(
         printf("wmProcedure: [19] GWS_GetFocus2\n");
         break;
 
+
 // #todo
-// Esse eh o momento de exibirmos o cursor do mouse.
-// Precisamos fazer refresh para apagar o cursor antigo
-// depois pintarmos o cursor novo direto no lfb.
-// Mas nao temos aqui a rotina de pintarmos direto no
-// lfb.
-// #todo: Trazer as rotinas de exibiçao de cursor
-// para ca, depois deixar de usar
-// as rotinas de pintura de cursor que estao no kernel.
+// Esse procedimento não gerencia mais os eventos de mouse.
+// see: on_mouse_event(...)
 
-    case GWS_MouseMove:
-
-        //printf("MOVE\n");
-
-        // The compositor is doing its job,
-        // painting the pointer in the right position.
-        // Lets update the position. See: comp.c
-        //comp_set_mouse_position(long1,long2);
-
-        // Esta passando sobre a janela ativa.
-        //__probe_activewindow_hover(long1,long2);
-
-        // Update the 'mouse_hover' pointer.
-        // But probing only for the buttons in the taskbar.
-        // Em qual botão o mouse esta passando por cima.
-        // lembrando: o botao esta dentro de outra janela.
-        // Probe taskbar buttons.
-        //__probe_tb_button_hover(long1,long2);
-
-        return 0;
-        break;
-
-// # Esse é o momento em que estabelecemos qual é a 
-// janela que possui o mouse.
-// De acordo com a posição do ponteiro na tela.
-// A partir dai os eventos devem ir para essa janela.
-    case GWS_MousePressed:
-        //#debug
-        //printf("PRESSED\n");
-        //on_mouse_pressed();
-        
-        //on_mouse_event( 
-        //    GWS_MousePressed,               // event type
-        //    comp_get_mouse_x_position(),    // current cursor x
-        //    comp_get_mouse_y_position() );  // current cursor y
-        return 0;
-        break;
-
-    // 36
-    case GWS_MouseReleased:
-        //#debug
-        //printf("RELEASED\n");
-        //on_mouse_released();
-        //on_mouse_event( 
-        //    GWS_MouseReleased,              // event type
-         //   comp_get_mouse_x_position(),    // current cursor x
-         //   comp_get_mouse_y_position() );  // current cursor y
-        return 0;
-        break;
+    //case GWS_MouseMove:
+    //    break;
+    //case GWS_MousePressed:
+    //    break;
+    //case GWS_MouseReleased:
+    //    break;
 
 // #bugbug
 // Quando imprimir na tela e quando enviar para o cliente?
@@ -3642,6 +3761,7 @@ wmProcedure(
 // processar cada tecla digitada.
 
     case GWS_KeyDown:
+        /*
         // Imprime o char na janela indicada.
         // Essa é a janela com foco de entrada.
         //if( pre_print === TRUE)
@@ -3663,12 +3783,15 @@ wmProcedure(
             (unsigned long) long2);
 
         return 0;
+        */
         break;
     
     //case GWS_KeyUp:
         //break;
 
     case GWS_SysKeyDown:
+    
+        /*
         if(long1 == VK_F1){
             // ja esta rodando.
             if(tb_buttons_status[0] == TRUE)
@@ -3721,9 +3844,14 @@ wmProcedure(
             (unsigned long)long2);
         //wm_update_desktop(TRUE); // 
         return 0;
+        
+        */
         break;
 
     case GWS_SysKeyUp:
+    
+        /*
+    
         if(long1 == VK_F1){
             // ja esta rodando.
             if(tb_buttons_status[0] == TRUE)
@@ -3823,6 +3951,9 @@ wmProcedure(
         }
         
         return 0;
+        
+        */
+        
         break;
 
     // 9090 - ( Shift + F12 )
@@ -4226,21 +4357,10 @@ int wmInputReader(void)
                  e.msg == GWS_MousePressed ||
                  e.msg == GWS_MouseReleased )
             {
-                // If the mouse is enabled.
-                // #todo: return if gUseMouse=FALSE.
-                //if (gUseMouse == TRUE)
-                //{
-                    on_mouse_event(
-                        (int) e.msg,
-                        (unsigned long) e.long1,
-                        (unsigned long) e.long2 ); 
-
-                    //wmProcedure(
-                    //    NULL,
-                    //    (int) e.msg,
-                    //    (unsigned long) e.long1,
-                    //    (unsigned long) e.long2 ); 
-                //}
+                on_mouse_event(
+                    (int) e.msg,
+                    (unsigned long) e.long1,
+                    (unsigned long) e.long2 ); 
             }
 
             // keyboard
@@ -4250,13 +4370,13 @@ int wmInputReader(void)
                  e.msg == GWS_SysKeyDown ||
                  e.msg == GWS_SysKeyUp )
             {
-                // Print char into the keyboard window.
+                // Print char into the keyboard owner window.
                 on_keyboard_event( 
                     (int) e.msg, 
                     (unsigned long) e.long1, 
                     (unsigned long) e.long2 );
             }
-            
+
             // Is it a combination?
             IsCombination = (int) is_combination(e.msg);
             if (IsCombination){
