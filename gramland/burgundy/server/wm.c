@@ -147,7 +147,7 @@ on_keyboard_event(
     int msg,
     unsigned long long1,
     unsigned long long2 );
-static void on_mouse_event(int event_type, long x, long y);
+static void on_mouse_event(int event_type, unsigned long x, unsigned long y);
 static void on_update_window(int event_type);
 static void on_mouse_pressed(void);
 static void on_mouse_released(void);
@@ -156,7 +156,12 @@ int control_action(int msg, unsigned long long1);
 
 static void __draw_button_mark_by_wid( int wid, int button_number );
 
-// ===================
+void __probe_tb_button_hover(unsigned long long1, unsigned long long2);
+void __probe_window_hover(unsigned long long1, unsigned long long2);
+
+// =====================================================
+
+
 // pinta um retangulo no botao
 // indicando que o app esta rodando.
 static void __draw_button_mark_by_wid( int wid, int button_number )
@@ -297,8 +302,13 @@ on_keyboard_event(
 // Os aplicativos estao recebendo
 // os eventos enviados para as janelas com o foco de entrada.
 
-static void on_mouse_event(int event_type, long x, long y)
+static void 
+on_mouse_event(
+    int event_type, 
+    unsigned long x, 
+    unsigned long y )
 {
+
 // #bugbug
 // Estamos considerando apenas os eventos que acontecem 
 // dentro da janela com foco de entrada.
@@ -310,18 +320,101 @@ static void on_mouse_event(int event_type, long x, long y)
 
 // Window with focus.
     struct gws_window_d *w;
+
+    unsigned long saved_x = x;
+    unsigned long saved_y = y;
     unsigned long in_x=0;
     unsigned long in_y=0;
+    
     register int Tail=0;
 
+    if (gUseMouse != TRUE)
+        return;
+
 // Error. Nothing to do.
-    if (event_type<0){
+    //if (event_type<0){
+    //    return;
+    //}
+
+// Move:
+// Process but do not send message for now.
+    if (event_type == GWS_MouseMove)
+    {
+        //printf("MOVE\n");
+
+        // The compositor is doing its job,
+        // painting the pointer in the right position.
+        // Lets update the position. See: comp.c
+        comp_set_mouse_position(saved_x,saved_y);
+
+        // Esta passando sobre a janela ativa.
+        //__probe_activewindow_hover(long1,long2);
+
+        // Update the 'mouse_hover' pointer.
+        // But probing only for the buttons in the taskbar.
+        // Em qual botão o mouse esta passando por cima.
+        // lembrando: o botao esta dentro de outra janela.
+        // Probe taskbar buttons.
+        __probe_tb_button_hover(saved_x,saved_y);
+        
+        __probe_window_hover(saved_x,saved_y);
+        
         return;
     }
 
+// Pressed:
+// Process but do not send message for now.
+    if (event_type == GWS_MousePressed)
+    {
+        on_mouse_pressed();
+        return;
+    }
+
+// Release:
+// Process and send message.
+    if (event_type == GWS_MouseReleased)
+    {
+        on_mouse_released();
+        goto send_message;
+    }
+
+//
+// Not valid event type
+//
+
+not_valid:
+    return;
+
+//
+// Send message
+//
+
+send_message:
+
+// Enviando a mensagem pra qualquer tipo de janela com o foco de teclado
+// não importa o tipo.
+// A janela precisa ser válida.
+// # Por enquanto somente mensagem to tipo 'release button'.
+
+    printf("send_message:\n");
+
 // Window with focus
-    w = (struct gws_window_d *) get_focus();
+// Keyboard owner
+
+
+// Isso atualiza a janela mousehover,
+// que é a janela que o mouse esta passando por cima
+// mas somente para alguns tipos ainda.
+// #todo: isso deve ser chamado no evento 'move'
+    //__probe_window_hover(x,y);
+
+// #todo: get mouse hover
+
+    //w = (struct gws_window_d *) get_focus();
+    w = (struct gws_window_d *) mouse_hover;
+
     if ( (void*) w==NULL ){
+        printf("on_mouse_event: w\n");
         return;
     }
     if (w->magic!=1234){
@@ -329,22 +422,27 @@ static void on_mouse_event(int event_type, long x, long y)
         return;
     }
 
+//
+// manda a mensagem para a hover
+//
 
-// ---------------
-// #test
-// Set focus if we are editbox and we do not have the focus yet.
-
-// ---------------
+// Pega os valores que foram configurados 
+// no último evento mouse move.
+    saved_x = comp_get_mouse_x_position();
+    saved_y = comp_get_mouse_y_position();
 
 // Is it inside the window with focus?
-    if ( x >= w->left &&
-         x <= w->right &&
-         y >= w->top &&
-         y <= w->bottom )
+    if ( saved_x >= w->left &&
+         saved_x <= w->right &&
+         saved_y >= w->top &&
+         saved_y <= w->bottom )
     {
+
+        printf("Inside mouse hover window :)\n");
+    
         // Values inside the window.
-        in_x = (unsigned long) (x - w->left);
-        in_y = (unsigned long) (y - w->top);
+        in_x = (unsigned long) (saved_x - w->left);
+        in_y = (unsigned long) (saved_y - w->top);
 
         // Change the input pointer
         // inside the window with focus.
@@ -388,6 +486,9 @@ static void on_mouse_event(int event_type, long x, long y)
 
         return;
     }
+ 
+    printf("Outside mouse hover window\n");
+
 //fail
     w->single_event.has_event = FALSE;
 }
@@ -491,10 +592,12 @@ static void on_mouse_released(void)
 // Essa rotina envia a mensagem apenas se o mouse
 // estiver dentro da janela com foco de entrada.
 
+/*
     on_mouse_event( 
         GWS_MouseReleased,              // event type
         comp_get_mouse_x_position(),    // current cursor x
         comp_get_mouse_y_position() );  // current cursor y
+*/
 
 // When the mouse is hover a tb button.
 
@@ -3202,7 +3305,7 @@ wmPostMessage(
 // local
 // Se o mouse esta passando sobre os botoes
 // da barra de tarefas.
-void __probe_tb_button_hover(long long1, long long2)
+void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
 {
 // Probe taskbar buttons.
 // Well. Not valid in fullscreen.
@@ -3220,7 +3323,8 @@ void __probe_tb_button_hover(long long1, long long2)
     }
 
 // No more hover window.
-    mouse_hover=NULL;
+// Não anule a hover ... continua a anterior.
+    //mouse_hover=NULL;
 
     for (i=0; i<max; i++){
 
@@ -3250,6 +3354,78 @@ void __probe_tb_button_hover(long long1, long long2)
     }
     };
 }
+
+
+// local
+// Se o mouse esta passando sobre alguma janela
+// do alguns tipos.
+void __probe_window_hover(unsigned long long1, unsigned long long2)
+{
+// Probe taskbar buttons.
+// Well. Not valid in fullscreen.
+
+    int Status=0;
+    register int i=0;
+    int max = WINDOW_COUNT_MAX; // We have 4 buttons in the taskbar.
+    struct gws_window_d *w;  // The window for a button.
+
+    if (WindowManager.initialized!=TRUE){
+        return;
+    }
+    if (WindowManager.is_fullscreen==TRUE){
+        return;
+    }
+
+    //printf("long1=%d long2=%d\n",long1, long2);
+
+// No more hover window.
+// Não anule a hover ... continua a anterior.
+//    mouse_hover=NULL;
+
+    for (i=0; i<max; i++){
+
+    // Get a pointer for a window.
+    //w = (struct gws_window_d *) tb_windows[i];
+    w = (struct gws_window_d *) windowList[i];
+
+    // If this is a valid pointer.
+    if ( (void*) w != NULL )
+    {
+        // Paranoia
+        if (w->magic == 1234)
+        {
+            if ( w->type == WT_EDITBOX_SINGLE_LINE ||
+                 w->type == WT_EDITBOX_MULTIPLE_LINES )
+            {
+                //printf ("Encontrada\n");
+                // Is the pointer inside this window?
+                Status = is_within(
+                             (struct gws_window_d *) w, long1, long2 );
+                // Yes it is!
+                if (Status==TRUE)
+                {
+                    // Register the hover window.
+                    mouse_hover = (void*) w;
+                    // #debug
+                    // yellow_status("oops");
+                    //rtl_reboot();
+                    // ok, done.
+                    
+                    //printf ("Dentro\n");
+                    return;
+                }
+                //printf ("Fora\n");
+                //printf("x=%d y=%d | w->l=%d w->t=%d \n",
+                //    long1, long2,
+                //    w->left, w->top );
+            }
+        }
+    }
+    };
+    //printf ("Not Found\n");
+}
+
+
 
 
 /*
@@ -3413,7 +3589,7 @@ wmProcedure(
         // The compositor is doing its job,
         // painting the pointer in the right position.
         // Lets update the position. See: comp.c
-        comp_set_mouse_position(long1,long2);
+        //comp_set_mouse_position(long1,long2);
 
         // Esta passando sobre a janela ativa.
         //__probe_activewindow_hover(long1,long2);
@@ -3423,32 +3599,8 @@ wmProcedure(
         // Em qual botão o mouse esta passando por cima.
         // lembrando: o botao esta dentro de outra janela.
         // Probe taskbar buttons.
-        __probe_tb_button_hover(long1,long2);
+        //__probe_tb_button_hover(long1,long2);
 
-        //========
-        // #test
-        // O ponteiro do mouse esta dentro do main menu?
-        // Nesse caso, chame o procedimento de menu.
-        if ( (void*)__root_window != NULL )
-        {
-            if ( (void*)__root_window->contextmenu != NULL )
-            {
-                if ( __root_window->contextmenu->in_use == TRUE )
-                {
-                    // Call the main menu dialog.
-                    // see: menu.c
-                    menuProcedure(
-                        NULL,
-                        (int) msg,  // Why?
-                        (unsigned long) long1,
-                        (unsigned long) long2 );
-
-                    return 0;
-                }
-            }
-        }
-        //========
-        
         return 0;
         break;
 
@@ -3459,7 +3611,12 @@ wmProcedure(
     case GWS_MousePressed:
         //#debug
         //printf("PRESSED\n");
-        on_mouse_pressed();
+        //on_mouse_pressed();
+        
+        //on_mouse_event( 
+        //    GWS_MousePressed,               // event type
+        //    comp_get_mouse_x_position(),    // current cursor x
+        //    comp_get_mouse_y_position() );  // current cursor y
         return 0;
         break;
 
@@ -3467,7 +3624,11 @@ wmProcedure(
     case GWS_MouseReleased:
         //#debug
         //printf("RELEASED\n");
-        on_mouse_released();
+        //on_mouse_released();
+        //on_mouse_event( 
+        //    GWS_MouseReleased,              // event type
+         //   comp_get_mouse_x_position(),    // current cursor x
+         //   comp_get_mouse_y_position() );  // current cursor y
         return 0;
         break;
 
@@ -3892,6 +4053,102 @@ int wmSTDINInputReader(void)
 }
 
 
+int on_combination(int msg_code);
+int on_combination(int msg_code)
+{
+    if (msg_code<0)
+        return -1;
+
+    if (msg_code == GWS_ControlArrowUp){
+        dock_active_window(1);
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowRight){
+        dock_active_window(2);
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowDown){
+        dock_active_window(3);
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowLeft){
+        dock_active_window(4); 
+        return 0;
+    }
+
+    if (msg_code == GWS_Cut)
+    {printf("ws: cut\n"); return 0;}
+
+    if (msg_code == GWS_Copy)
+    {printf("ws: copy\n"); return 0;}
+
+    if (msg_code == GWS_Paste)
+    {printf("ws: paste\n"); return 0;}
+
+    if (msg_code == GWS_Undo)
+    {printf("ws: undo\n"); return 0;}
+
+    if (msg_code == GWS_SelectAll)
+    {printf("ws: select all\n"); return 0;}
+
+    if (msg_code == GWS_Find)
+    {printf("ws: find\n"); return 0;}
+
+    if (msg_code == GWS_Save){
+        on_menu();  //#test
+        return 0;
+    }
+
+// #tests
+// Via shift + f12
+// + Enable mouse.
+// + Change bg color.
+    if (msg_code == 88112)
+    {
+        gUseMouse = TRUE;
+        wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
+
+        //printf ("server: [88112]\n");
+        //__switch_focus();
+        //wm_update_desktop(TRUE); //ok.
+
+        return 0;
+    }
+
+//OK
+    return -1;
+}
+
+int is_combination(int msg_code);
+int is_combination(int msg_code)
+{
+    if (msg_code<0)
+        return FALSE;
+
+    switch (msg_code){
+    case GWS_ControlArrowUp:
+    case GWS_ControlArrowRight:
+    case GWS_ControlArrowDown:
+    case GWS_ControlArrowLeft:
+    case GWS_Cut:
+    case GWS_Copy:
+    case GWS_Paste:
+    case GWS_Undo:
+    case GWS_SelectAll:
+    case GWS_Find:
+    case GWS_Save:
+    case 88112:
+        return TRUE;
+        break;
+    //...
+    default:
+        return FALSE;
+        break;
+    };
+
+    return FALSE;
+}
+
 // ------------------------------------------------
 // This is basically the low level input support 
 // for the Gramado OS when running the Gramado Window System.
@@ -3940,6 +4197,8 @@ int wmInputReader(void)
 // see: event.h
     struct gws_event_d e;
 
+    int IsCombination=FALSE;
+
     for (i=0; i<=31; i++)
     {
         // Não volte ao inicio da fila
@@ -3969,16 +4228,19 @@ int wmInputReader(void)
             {
                 // If the mouse is enabled.
                 // #todo: return if gUseMouse=FALSE.
-                if (gUseMouse == TRUE)
-                {
-                    //return (unsigned long) wmProcedure(
-                    wmProcedure(
-                        NULL,
+                //if (gUseMouse == TRUE)
+                //{
+                    on_mouse_event(
                         (int) e.msg,
                         (unsigned long) e.long1,
                         (unsigned long) e.long2 ); 
-                }
-                //return 0;
+
+                    //wmProcedure(
+                    //    NULL,
+                    //    (int) e.msg,
+                    //    (unsigned long) e.long1,
+                    //    (unsigned long) e.long2 ); 
+                //}
             }
 
             // keyboard
@@ -3993,95 +4255,12 @@ int wmInputReader(void)
                     (int) e.msg, 
                     (unsigned long) e.long1, 
                     (unsigned long) e.long2 );
-                //return 0;
             }
-
-            // Arrows
-
-            // #todo: 
-            // We also can use 'keydown' and check the vk.
-            // Control arrow right
-            if(e.msg == GWS_ControlArrowRight)
-            {
-                //printf("ws: Control right\n"); 
-                dock_active_window(2);
-                //return 0; 
-            }
-            // Control arrow up
-            // #todo: maximize window.
-            if(e.msg == GWS_ControlArrowUp)
-            {
-                //printf("ws: Control up\n"); 
-                dock_active_window(1);
-                //return 0; 
-            }
-            // Control arrow down
-            // #todo: Restore window.
-            // or put the window into the center of the screen.
-            if(e.msg == GWS_ControlArrowDown)
-            {
-                //printf("ws: Control down\n");
-                dock_active_window(3);
-                //return 0;
-            }
-            //  Control arrow left
-            if(e.msg == GWS_ControlArrowLeft)
-            {
-                //printf("ws: Control left\n");
-                dock_active_window(4); 
-                //return 0; 
-            }
-
-
-            // Gui events?
-
-            // cut (control+x)?
-            if(e.msg == GWS_Cut)
-            { printf("ws: cut :)\n"); return 0; }
-            // copy (ok)
-            // Copy or kill?
-            if(e.msg == GWS_Copy)
-            { printf("ws: copy\n"); return 0; }
-            // paste (ok)
-            if(e.msg == GWS_Paste)
-            { printf("ws: paste\n"); return 0; }
-            // undo
-            if(e.msg == GWS_Undo)
-            { printf("ws: undo\n"); return 0; }
-            // select all: control+a
-            if(e.msg == GWS_SelectAll)
-            { printf("ws: select all\n"); return 0; }
-            // find: control+f
-            if(e.msg == GWS_Find)
-            { printf("ws: find\n"); return 0; }
-            // Save: [control + s]
-            // criar, ativar ou desativar o menu.
-            // #todo: We need a new name.
-            // see: menu.c
-            if(e.msg == GWS_Save)
-            {
-                //printf("ws: save\n"); 
-                on_menu();
-                return 0; 
-            }
-
-            // Via alt + f4
-            // qemu intercepts this combination.
-            //if( RTLEventBuffer[1] == 77104 )
-            //{
-            //    return 0;
-            //}
             
-            // #tests
-            // Via shift + f12
-            if(e.msg == 88112)
-            {
-                gUseMouse = TRUE;
-                wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
-                //printf ("server: [88112]\n");
-                //__switch_focus();
-                //wm_update_desktop(TRUE); //ok.
-                return 0;
+            // Is it a combination?
+            IsCombination = (int) is_combination(e.msg);
+            if (IsCombination){
+                on_combination(e.msg);
             }
         }
     };

@@ -1985,11 +1985,12 @@ serviceAsyncCommand (void)
 
     // Set focus.
     case 9:
-        gwssrv_debug_print ("serviceAsyncCommand: [9] \n");
+        // gwssrv_debug_print ("serviceAsyncCommand: [9] \n");
         if (data<0){ goto done; }
         set_focus_by_id( (int) data );
         goto done;
         break;
+
 
     // #test
     // drawing a rect using ring0 and ring3 routines.

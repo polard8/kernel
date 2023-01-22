@@ -614,6 +614,8 @@ int main( int argc, char *argv[] )
          client_window );
 
 
+// ============================================
+
 //
 // Event loop
 //
