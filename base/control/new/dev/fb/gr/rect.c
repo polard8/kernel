@@ -311,7 +311,8 @@ __refresh_rectangle0 (
     unsigned long buffer_dest,
     unsigned long buffer_src )
 {
-    debug_print("__refresh_rectangle0: r0 :)\n");
+    //#debug
+    // debug_print("__refresh_rectangle0: (Ring 0)\n");
 
     //void *dest       = (void *)      FRONTBUFFER_ADDRESS;
     //const void *src  = (const void*) BACKBUFFER_ADDRESS;
@@ -324,29 +325,23 @@ __refresh_rectangle0 (
     unsigned int line_size=0; 
     register int count=0; 
 
-    // Screen pitch.
-    // screen line size in pixels * bytes per pixel.
+// Screen pitch.
+// screen line size in pixels * bytes per pixel.
     unsigned int screen_pitch=0;  
-    // Rectangle pitch
-    // rectangle line size in pixels * bytes per pixel.
+// Rectangle pitch
+// rectangle line size in pixels * bytes per pixel.
     unsigned int rectangle_pitch=0;  
-
     unsigned int offset=0;
-
-    // = 3; 24bpp
+// = 3; 24bpp
     int bytes_count=0;
-
     int FirstLine = (int) (y & 0xFFFF);
-
     //int UseVSync = FALSE;
     int UseClipping = TRUE;
-
 
 //==========
 // dc
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         debug_print ("refresh_rectangle: w h\n");
@@ -362,11 +357,9 @@ __refresh_rectangle0 (
     lines     = (unsigned int) (height & 0xFFFF);
 
     switch (gSavedBPP){
-
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
         // ... #todo
-        
         default:
             panic("refresh_rectangle: SavedBPP\n");
             break;
@@ -378,18 +371,20 @@ __refresh_rectangle0 (
 
 // Screen pitch.
 // Screen line size in pixels plus bytes per pixel.
-    screen_pitch    = (unsigned int) (bytes_count * deviceWidth);
+    screen_pitch = 
+        (unsigned int) (bytes_count * deviceWidth);
 
 // Rectangle pitch.
 // rectangle line size in pixels * bytes per pixel.
 //(line_size * bytes_count) é o número de bytes por linha. 
-    rectangle_pitch = (unsigned int) (bytes_count * line_size);
-
+    rectangle_pitch = 
+        (unsigned int) (bytes_count * line_size);
 
 // #atenção.
 //offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
 
-    offset = (unsigned int) ( (Y*screen_pitch) + (bytes_count*X) );
+    offset = 
+        (unsigned int) ( (Y*screen_pitch) + (bytes_count*X) );
 
     dest = (void *)       (dest + offset); 
     src  = (const void *) (src  + offset); 
@@ -448,7 +443,6 @@ __refresh_rectangle0 (
         return;
     }
 
-
 // ================================
 // Se não for divisível por 4. (slow)
 // Copy lines
@@ -470,7 +464,6 @@ __refresh_rectangle0 (
     }
 }
 
-
 // ??
 // A ideia aqui é efetuar o refresh de um retângulo 
 // que esteja em um dado buffer.
@@ -489,7 +482,6 @@ refresh_rectangle (
     unsigned long width, 
     unsigned long height )
 {
-
 
 // == FLASH ========
 // #todo: Create a global variable for this.
@@ -512,19 +504,14 @@ refresh_rectangle (
         BACKBUFFER_ADDRESS );  // src
 }
 
-
 /*
  * scroll_screen_rect:
  *     Scroll a rectangle. ?
  */
-
 // Helper function to scroll routine.
 // Called by console_scroll() in tty/console.c
-
-
 // Only for full screen console.
 // See flag.
-
 void scroll_screen_rect (void)
 {
     register unsigned int i=0;
@@ -535,21 +522,17 @@ void scroll_screen_rect (void)
 // Device info
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-
-    //int cWidth = get_char_width ();
-    int cHeight = get_char_height ();
-
+    //int cWidth = get_char_width();
+    int cHeight = get_char_height();
 // = 3; 
 //24bpp
     int bytes_count = 0;
-    
     int count = 0; 
 
     // #debug
     //debug_print ("scroll_screen_rect:\n");
 
-    if ( deviceWidth == 0 || deviceHeight == 0 )
-    {
+    if ( deviceWidth == 0 || deviceHeight == 0 ){
         debug_print ("scroll_screen_rect: [PANIC] w h\n");
         panic       ("scroll_screen_rect: [PANIC] w h\n");
     }
@@ -557,11 +540,9 @@ void scroll_screen_rect (void)
     // #debug
     //if(cHeight == 8)
         //debug_print("8\n");
-
     // #debug
     //if(cHeight == 16)
         //debug_print("16\n");
-
 
     line_size = (unsigned int) deviceWidth; 
     lines     = (unsigned int) deviceHeight;
@@ -589,13 +570,9 @@ void scroll_screen_rect (void)
     const void *Src = 
         (const void *) (BACKBUFFER_ADDRESS + SrcOffset);
 
-//
 // Copy
-//
-
 // #importante
 // É bem mais rápido com múltiplos de 4.
-
 // Se for divisível por 4.
 // Copia uma linha, quatro bytes de cada vez.  
         
@@ -604,20 +581,17 @@ void scroll_screen_rect (void)
         // #todo: Create a variable for 'pitch' and use streigh reduction
         count = ((line_size * bytes_count) / 4); 
         // count = (internal_pitch>>2);  // #todo: Use this one.
-
         for ( i=0; i < lines; i++ ){
             memcpy32 (Dest,Src,count);
             Src  += (deviceWidth * bytes_count);
             Dest += (deviceWidth * bytes_count);
         };
-
         return;
     }
 
-    // Se não for divisível por 4.
-    // Copia a linha, um bytes por vez.
-    // #todo: Podemos suprimir esse if e deixarmos ssomente o for.
-    
+// Se não for divisível por 4.
+// Copia a linha, um bytes por vez.
+// #todo: Podemos suprimir esse if e deixarmos ssomente o for.
     if ( ((line_size * bytes_count) % 4) != 0 )
     {
         for ( i=0; i < lines; i++ )
@@ -633,7 +607,6 @@ void scroll_screen_rect (void)
     }
 }
 
-
 // ??
 // Copiando ...
 // Destination is an Null pointer? 
@@ -647,7 +620,6 @@ static void *__rectStrCopyMemory32 (
     unsigned long *src, 
     int count ) 
 {
-
     register int i=0;
 
     // Yes
@@ -669,6 +641,4 @@ static void *__rectStrCopyMemory32 (
     return dest;
 }
 */
-
-
 

@@ -4442,6 +4442,12 @@ redraw_window (
     struct gws_window_d *window, 
     unsigned long flags )
 {
+
+// #todo
+// When redrawing an WT_OVERLAPPED window,
+// we can't redraw the frame if the window is in fullscreen mode.
+// In this case, we just redraw the client area.
+
     unsigned int __tmp_color = COLOR_WINDOW;
 
     //#debug
@@ -4669,6 +4675,7 @@ redraw_window (
                 if (window->parent->magic == 1234)
                 {
                     // Redraw titlebar for overlapped windows.
+                    // #todo: Not if the window is in fullscreen mode.
                     if (window->type == WT_OVERLAPPED)
                     {
                         if ( (void*) window->titlebar != NULL )

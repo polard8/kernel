@@ -3,7 +3,7 @@
  * Description: 
  *     Rotinas de tratamento de faults e exception para o Boot Loader em 
  * sistema 32bit para desktop.
- * Obs: Essa rotina pertence ao Boot Loader, que está em ring 0.
+ * Obs: Essa rotina pertence ao Boot Loader, que estï¿½ em ring 0.
  * 2015.
  */
 
@@ -11,13 +11,12 @@
 
 void faultsShowRegisters();
 
-
 /*
  * cpu_faults:
  *     Tratamento de faults do Boot Loader.
- *     Trata a fault de acordo com o número.
- * Obs: Isso pertence ao Boot Loader. Não há threads para serem fechadas.
- * @todo: Exibir as falhas de inicialização.
+ *     Trata a fault de acordo com o nï¿½mero.
+ * Obs: Isso pertence ao Boot Loader. Nï¿½o hï¿½ threads para serem fechadas.
+ * @todo: Exibir as falhas de inicializaï¿½ï¿½o.
  * 2015 - Created.
  */
 
@@ -28,7 +27,7 @@ void cpu_faults (unsigned long fault_number)
 
     printf("faults-cpu_faults: %d\n", fault_number );
 
-//se estamos testando a memória.
+//se estamos testando a memï¿½ria.
     if ( ____testing_memory_size_flag == 1 )
     {
         // global. See: gdef.h
@@ -43,7 +42,7 @@ void cpu_faults (unsigned long fault_number)
             }
     }
 
-// Mostra o erro de acordo com o número.
+// Mostra o erro de acordo com o nï¿½mero.
     switch (fault_number)
     {
 	    //EXCEPTION
@@ -78,17 +77,13 @@ void cpu_faults (unsigned long fault_number)
     };
 
 // More ?! 
-// Tratamento, informações.
+// Tratamento, informaï¿½ï¿½es.
 
 //done:
+    faultsShowRegisters();
+    die();
 
-    faultsShowRegisters ();
-    die ();
-
-//
-//  No return.
-//
-
+//  No return
 }
 
 void faultsShowRegisters()

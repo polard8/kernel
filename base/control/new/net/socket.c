@@ -920,6 +920,8 @@ sys_accept (
     int fdClient = -1;
 // Iterator for the pending connections queue.
     register int i=0;
+
+// #debug
     int Verbose=FALSE;
 
     // #debug
@@ -1151,8 +1153,12 @@ sys_accept (
         };
 
         // Not valid Client socket
-        if ( (void*) cSocket == NULL ){
-            debug_print ("sys_accept: [FAIL] cSocket\n");
+        if ( (void*) cSocket == NULL )
+        {
+            // #bugbug
+            // No clients yet?
+            // debug_print ("sys_accept: [FAIL] cSocket\n");
+            
             sSocket->state = SS_CONNECTING;  //anula.
             goto fail;
         }
@@ -1223,10 +1229,13 @@ sys_accept (
 // So we need a flag to indicate this status.
 
 fail:
-    debug_print ("sys_accept: [FAIL] Something is wrong!\n");
+
+    // #debug
+    //debug_print ("sys_accept: [FAIL] Something is wrong!\n");
     //printf    ("sys_accept: [FAIL] Something is wrong!\n");
     //refresh_screen();
-    if( Verbose == TRUE ){
+    
+    if (Verbose == TRUE){
         refresh_screen();
     }
     return -1;

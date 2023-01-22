@@ -999,8 +999,8 @@ void *malloc ( size_t size )
     void *ret;
     unsigned long s = ( unsigned long) size;
 
-
-    debug_print ("malloc:\n");
+    //#debug
+    //debug_print ("malloc:\n");
 
     if ( s < 0 ){
         debug_print ("malloc: size\n");
@@ -1009,35 +1009,31 @@ void *malloc ( size_t size )
 
     if ( s == 0 ){ s = 1; }
 
-    if ( UseLocalAllocator == TRUE ){
+// Use local allocator.
+    if (UseLocalAllocator == TRUE){
          ret = (void *) heapAllocateMemory(s);
     }
-
-    if ( UseLocalAllocator == FALSE ){
+// Use shared memory.
+    if (UseLocalAllocator == FALSE){
          ret = (void *) shAlloc(s);
     }
 
     if ( (void *) ret == NULL )
     {
         debug_print ("malloc: [FAIL] ret\n");
-
         //printf("malloc: falha ao alocar memoria!\n");
         //refresh_screen();
-
         return NULL;
     }
 
+/*
+    if((void*) ret < KERNEL_HEAP_START){
+        printf("malloc: falha ao alocar memoria! Limits\n");
+        refresh_screen();
+        return NULL;
+    }
+ */
 
-
-	/*
-	if((void*) ret < KERNEL_HEAP_START){
-	    printf("malloc: falha ao alocar memoria! Limits\n");
-		refresh_screen();
-		return NULL;		
-	};
-	*/
-
-//done:
     return (void *) ret; 
 }
 

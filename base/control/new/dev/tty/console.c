@@ -704,8 +704,7 @@ unsigned long get_cursor_y (void)
     return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
 }
 
-
-void console_scroll (int console_number)
+void console_scroll(int console_number)
 {
     register int i=0;
     // Salvar cursor
@@ -717,16 +716,12 @@ void console_scroll (int console_number)
     unsigned long OldRight=0;
     unsigned long OldBottom=0;
 
-    // debug_print ("console_scroll: #todo #fixme\n");
-
     if (VideoBlock.useGui != TRUE){
         debug_print("console_scroll: no GUI\n");
         panic      ("console_scroll: no GUI\n");
     }
 
-    if ( console_number < 0 || 
-         console_number >= CONSOLETTYS_COUNT_MAX )
-    {
+    if ( console_number < 0 || console_number >= CONSOLETTYS_COUNT_MAX ){
         panic ("console_scroll: console_number\n");
     }
 
@@ -867,14 +862,10 @@ void console_outbyte (int c, int console_number)
     {
         // #todo: 
         // Melhorar esse limite.
-        if ( CONSOLE_TTYS[n].cursor_y > (CONSOLE_TTYS[n].cursor_bottom) )
-        {
-            debug_print ("console_outbyte: scroll 1\n"); 
-            
+        if (CONSOLE_TTYS[n].cursor_y > CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
                  console_scroll(n);
             }
-
             CONSOLE_TTYS[n].cursor_y = ( CONSOLE_TTYS[n].cursor_bottom -1 );
             prev = Ch; 
         }else{
@@ -890,19 +881,15 @@ void console_outbyte (int c, int console_number)
 
     if ( Ch == '\n' && prev != '\r' ) 
     {
-        // se o line feed apareceu quando estamos na ultima linha
-        if ( CONSOLE_TTYS[n].cursor_y > (CONSOLE_TTYS[n].cursor_bottom) )
-        {
-            debug_print ("console_outbyte: scroll 2\n"); 
+        // Se o line feed apareceu quando estamos na ultima linha
+        if ( CONSOLE_TTYS[n].cursor_y > CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
                 console_scroll(n);
             }
-            
             CONSOLE_TTYS[n].cursor_y = (CONSOLE_TTYS[n].cursor_bottom -1);
             prev = Ch;
         }else{
             CONSOLE_TTYS[n].cursor_y++;
-
             // Retornaremos mesmo assim ao início da linha 
             // se estivermos imprimindo no terminal.
             if ( stdio_terminalmode_flag == 1 ){
@@ -913,7 +900,7 @@ void console_outbyte (int c, int console_number)
             // permite que a tela do kernel funcione igual a um 
             // terminal, imprimindo os printfs um abaixo do outro.
             // sempre reiniciando x.
-            if ( stdio_verbosemode_flag == 1 ){
+            if (stdio_verbosemode_flag == 1){
                 CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
             } 
 
@@ -1022,14 +1009,11 @@ void console_outbyte (int c, int console_number)
 // Tem um scroll logo acima que considera um valor
 // de limite diferente desse.
 
-    if ( CONSOLE_TTYS[n].cursor_y >= (CONSOLE_TTYS[n].cursor_bottom) )  
-    { 
-        debug_print ("console_outbyte: scroll 3\n"); 
-
+    if ( CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom)  
+    {
         if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
             console_scroll(n);
         }
-
         CONSOLE_TTYS[n].cursor_x = 0;  //CONSOLE_TTYS[n].cursor_left;
         CONSOLE_TTYS[n].cursor_y = 
             (CONSOLE_TTYS[n].cursor_bottom -1);

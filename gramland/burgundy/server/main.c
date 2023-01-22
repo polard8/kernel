@@ -616,7 +616,8 @@ static int __send_response(int fd, int type)
 // == Response ============================
 //
 
-    gwssrv_debug_print ("__send_response: Sending response ...\n");
+    // #debug
+    //gwssrv_debug_print ("__send_response: Sending response ...\n");
 
     // #todo:
     // while(1){...}
@@ -684,17 +685,23 @@ static int __send_response(int fd, int type)
 // Deveriamos fechar a conexao?
 // Deveriamos enviar um alerta
 
-    if (n_writes <= 0){
+    if (n_writes <= 0)
+    {
+        //#debug
         gwssrv_debug_print ("__send_response: response fail\n");
         printf             ("__send_response: Couldn't send reply\n");
+        
         //close(fd);
         Status=-1;
         goto exit2;
     }
 
 // YES, We sent a response.
-    if (n_writes > 0){
-        gwssrv_debug_print ("__send_response: Response sent\n");
+    if (n_writes > 0)
+    {
+        // #debug
+        // gwssrv_debug_print ("__send_response: Response sent\n");
+        
         Status=0;
         goto exit0;
     }
@@ -1049,7 +1056,10 @@ gwsProcedure (
     // Usará o buffer global
     // See: window.c
     case GWS_CreateWindow:
-        gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
+        
         serviceCreateWindow(client_fd);
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1073,7 +1083,10 @@ gwsProcedure (
     // Draw char
     // See: char.c
     case GWS_DrawChar:
-        gwssrv_debug_print ("gwssrv: [1004] serviceDrawChar\n");
+    
+        // #debug
+        //gwssrv_debug_print ("gwssrv: [1004] serviceDrawChar\n");
+        
         serviceDrawChar();
         //NoReply = FALSE;  // asyncronous
         NoReply = TRUE;   // syncronous
@@ -1082,7 +1095,10 @@ gwsProcedure (
 // Draw text
 // See: dtext.c
     case GWS_DrawText:
-        gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n");
+        
         serviceDrawText();
         //NoReply = FALSE;  // The client-side library is waiting for response.
         NoReply = TRUE;     // syncronous
@@ -1090,7 +1106,10 @@ gwsProcedure (
 
     // Refresh window
     case GWS_RefreshWindow:
-        gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [1006] serviceRefreshWindow\n");
+        
         serviceRefreshWindow();
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1102,7 +1121,10 @@ gwsProcedure (
 
      // Redraw window
      case GWS_RedrawWindow:
-         gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
+         
+         //#debug
+         //gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
+         
          serviceRedrawWindow();
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1114,13 +1136,19 @@ gwsProcedure (
 
     // Resize window
     case GWS_ResizeWindow:
-        gwssrv_debug_print ("gwssrv: [1008] serviceResizeWindow\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [1008] serviceResizeWindow\n");
+        
         serviceResizeWindow();
         NoReply = FALSE;
         break;
 
     case GWS_ChangeWindowPosition:
-        gwssrv_debug_print ("gwssrv: [1009] serviceChangeWindowPosition\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [1009] serviceChangeWindowPosition\n");
+        
         serviceChangeWindowPosition();
         NoReply = FALSE;
         break;
@@ -1161,7 +1189,10 @@ gwsProcedure (
     // Refresh rectangle ... 
     // See: wm.c
     case GWS_RefreshRectangle:
-        gwssrv_debug_print ("gwssrv: [2021] serviceRefreshRectangle\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [2021] serviceRefreshRectangle\n");
+        
         serviceRefreshRectangle();
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1180,14 +1211,17 @@ gwsProcedure (
 
 // The server will return an event from the its client's event queue.
     case GWS_GetNextEvent:
-        gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
+        
         serviceNextEvent();
         NoReply = FALSE; // Yes. We need a reply.
         break;
     
     // See: grprim.c
     case GWS_GrPlot0:  
-        gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
+        //gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
         serviceGrPlot0();  
         NoReply = FALSE;
         break;
@@ -1201,20 +1235,29 @@ gwsProcedure (
     // 2222: Async command 
     // Do not send a reply.
     case GWS_AsyncCommand:
-        gwssrv_debug_print ("gwssrv: GWS_AsyncCommand\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: GWS_AsyncCommand\n");
                   //printf ("gwssrv: GWS_AsyncCommand\n");
+        
         serviceAsyncCommand();
         NoReply = TRUE;
         break;
 
     case GWS_PutClientMessage:
-        gwssrv_debug_print ("gwssrv: GWS_PutClientMessage\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: GWS_PutClientMessage\n");
+        
         servicePutClientMessage();
         NoReply = TRUE;
         break;
 
     case GWS_GetClientMessage:
-        gwssrv_debug_print ("gwssrv: GWS_GetClientMessage\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: GWS_GetClientMessage\n");
+        
         serviceGetClientMessage();
         NoReply = FALSE;
         break;
@@ -1222,7 +1265,7 @@ gwsProcedure (
 // Let's get one event from the client's event queue.
 // Send it as a response.
     case GWS_DrainInput:
-        gwssrv_debug_print("gwssrv: gwsProcedure 8080\n");
+        //gwssrv_debug_print("gwssrv: gwsProcedure 8080\n");
         break;
 
     case GWS_GetWindowInfo:
@@ -1241,7 +1284,10 @@ gwsProcedure (
     // ...
 
     default:
-        gwssrv_debug_print ("gwssrv: Default message number\n");
+        
+        //#debug
+        //gwssrv_debug_print ("gwssrv: Default message number\n");
+        
         //printf ("msg=%d ",msg);
         // NoReply = TRUE; //#todo
         Status = -1;  // Not ok.
@@ -2465,7 +2511,7 @@ static int serviceChangeWindowPosition(void)
     unsigned long y = 0;
 
     // #debug
-    gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
+    //gwssrv_debug_print ("gwssrv: serviceChangeWindowPosition\n");
 
 // Get
     window_id = message_address[0];  //wid
@@ -2706,13 +2752,11 @@ serviceRefreshWindow(void)
 
     // #debug
     // gwssrv_debug_print ("serviceRefreshWindow:\n");
-    // asm("cli");
 
     // #todo
     // Check all the header.
 
 // wid
-
     window_id = (int) message_address[0];   
 // #extra
 // Special case.
@@ -2754,12 +2798,9 @@ serviceRefreshWindow(void)
     gws_show_window_rect(window);
 
 done:
-    //gwssrv_debug_print ("serviceRefreshWindow: done\n");
-    //asm("sti");
     return 0;
 fail:
     gwssrv_debug_print ("serviceRefreshWindow: fail\n");
-    //asm("sti");
     return -1;
 }
 

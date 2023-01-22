@@ -1,32 +1,27 @@
 /*
  * File: x86.c 
- * Descrição:
  *     Acesso ao hardware na arquitetura x86.
- * Ambiente:
  *    Boot Loader. BL.BIN. Ring 0.
  * Revision history:
  *     2005 - Created by Fred Nora.
  *     2019 - Revision.
  */
 
-
 #include <bootloader.h>
 
-
-// enable:
-// Habilita as interrupções. 
+// Enable interrupts
 void enable()
 {
     asm (" sti ");
 }
 
-// disable:
-// Desabilita as interrupções.
+// Disable interrupts
 void disable()
 {
     asm (" cli ");
 }
 
+// CLI/HLT
 void stopCpu()
 {
     asm ( " cli \n\t" 

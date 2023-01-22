@@ -4,33 +4,23 @@
 #include <bootloader.h>
 
 
-// malloc:
-// Simple malloc implementation. 
-
-void *malloc (size_t size)
+void *malloc(size_t size)
 {
     void *h;
     unsigned long s = ( unsigned long) size;
 
-    /* if s == 0, s = 1 */
-    //s = (s ? s : 1);
-
-    if ( s < 0 ){
+    if (s < 0){
         //#todo: Message
         return NULL;
     }
 
-    if ( s == 0 ){
+    if (s == 0){
         s=1;
-    };
+    }
 
-//Alocar memória no heap do kernel.
-
+// Alocar memória no heap do kernel.
     h = (void *) heapAllocateMemory(s);
-
-    if ( (void *) h == NULL )
-    {
-        //#todo: message
+    if ( (void *) h == NULL ){
         return NULL;
     }
 
@@ -67,7 +57,6 @@ void free (void *ptr)
 // memory.c
     FreeHeap (ptr);
 }
-
 
 //
 // End.

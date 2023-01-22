@@ -942,13 +942,13 @@ struct process_d *create_process (
 // check parameters
 
     if( (void*) room == NULL ){
-        debug_print ("create_process: [FIXME] room parameter is NULL\n");
+        //debug_print ("create_process: [FIXME] room parameter is NULL\n");
     }
     if( (void*) desktop == NULL ){
-        debug_print ("create_process: [FIXME] desktop parameter is NULL\n");
+        //debug_print ("create_process: [FIXME] desktop parameter is NULL\n");
     }
     if( (void*) window == NULL ){
-        debug_print ("create_process: [FIXME] window parameter is NULL\n");
+        //debug_print ("create_process: [FIXME] window parameter is NULL\n");
     }
 
 // #todo
@@ -1388,11 +1388,13 @@ struct process_d *create_process (
     // last_created = PID;
     Process->state = INITIALIZED;
 // Validation.
-    Process->used  = TRUE;
+    Process->used = TRUE;
     Process->magic = PROCESS_MAGIC;
-// #debug
-    debug_print ("create_process: done\n");
+
+    // #debug
+    //debug_print ("create_process: done\n");
     //printf      ("create_process: done\n");
+
     // ok
     return (void *) Process;
 // Fail

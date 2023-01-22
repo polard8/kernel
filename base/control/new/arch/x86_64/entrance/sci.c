@@ -8,9 +8,7 @@
 
 #include <kernel.h>  
 
-
 //#define SERVICE_NUMBER_MAX  255
-
 
 static unsigned long __default_syscall_counter=0;
 
@@ -779,10 +777,9 @@ static void *__extra_services (
 
 // 891
 // Allocate shared ring3 pages.
-    if ( number == 891 )
-    {
-        debug_print("__extra_services: 891\n");
-        return (void *) newos_alloc_shared_ring3_pages ( (pid_t) current_process, (int) arg2 );
+    if ( number == 891 ){
+        debug_print("__extra_services: 891, Allocate shared ring3 pages\n");
+        return (void *) newos_alloc_shared_ring3_pages( (pid_t) current_process, (int) arg2 );
     }
 
 // Setup the thread's surface rectangle.

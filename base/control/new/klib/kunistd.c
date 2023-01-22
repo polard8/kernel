@@ -96,7 +96,8 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     file *f;
     struct process_d *p;
 
-    debug_print("sys_lseek: [WORK IN PROGRESS]\n");
+    // #debug
+    // debug_print("sys_lseek: [WORK IN PROGRESS]\n");
 
     if (fd<0 || fd >= 32){
         return (off_t) (-EBADF);
@@ -105,7 +106,6 @@ off_t sys_lseek (int fd, off_t offset, int whence)
 //#todo
     //if(offset<0)
         //return (off_t) (-EINVAL);
-
 
     if (whence<0){
         return (off_t) -EINVAL;
@@ -136,7 +136,6 @@ off_t sys_lseek (int fd, off_t offset, int whence)
     if (f->magic!=1234){
         return -1;  // (off_t) (-EBADF);
     }
-
 
 // #todo
 // Check if it is a pipe, socket or fifo.

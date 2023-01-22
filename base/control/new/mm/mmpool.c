@@ -340,29 +340,23 @@ tryAgain:
 // #todo: change to 'ssize_t number_of_pages'.
 void *allocPages (int size)
 {
-
 // Esse é o endereço virtual do início do pool de pageframes.
 // #bugbug: O paged pool so tem 2mb, veja pages.c
 // então só podemos mapear 2*1024*1024/4096 páginas.
-
     unsigned long base = (unsigned long) g_pagedpool_va;
-
     void *final_va;
-
     int __slot=0;
-
-//página inicial da lista
+// Página inicial da lista
     struct page_d *Ret;   
-
     struct page_d *pageConductor;
     struct page_d *p;  //#todo: use page instead of p.
-
     unsigned long va=0;
     unsigned long pa=0;
     int Count=0;
     int __first_free_slot = -1;
 
-    debug_print ("allocPages:\n");
+    // #debug
+    //debug_print ("allocPages:\n");
 
 // Se devemos ou não incremetar o contador de uso.
     int IncrementUsageCounter=TRUE; //P->allocated_memory
@@ -373,16 +367,9 @@ void *allocPages (int size)
     if(process->magic!=1234)
         IncrementUsageCounter=FALSE;
 
-
-//
 // Checando limites.
-//
 
-//#ifdef PS_VERBOSE
-    //printf ("allocPages: Initializing ...\n");
-//#endif
-
-//problemas com o size.
+// Problemas com o size.
     if (size <= 0)
     {
         //size = 1;
@@ -424,15 +411,13 @@ void *allocPages (int size)
     __first_free_slot = (int) __firstSlotForAList(size);
 
     //if ( __first_free_slot < 0 )
-    if ( __first_free_slot == -1 )
-    {
+    if ( __first_free_slot == -1 ){
         debug_print ("allocPages: No more free slots\n");
         panic       ("allocPages: No more free slots\n");
     }
 
 // Procurar slot vazio.
 // Começamos a contar do frame logo após o condutor.
-
     for ( 
         __slot = __first_free_slot; 
         __slot < (__first_free_slot+size+1);
@@ -515,9 +500,12 @@ void *allocPages (int size)
     };
 
 fail:
+
+    // #debug
     debug_print ("allocPages: fail\n");
     //printf      ("allocPages: fail\n");
     panic       ("allocPages: fail\n");
+
     return NULL;
 }
 

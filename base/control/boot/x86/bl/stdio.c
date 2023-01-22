@@ -1,9 +1,8 @@
 /*
  * File: stdio.c 
- * Descrição:
  *     Rotinas de input/output.
  *     Biblioteca C do Boot Loader.
- *     Inclui rotinas gráficas no fim do arquivo.
+ *     Inclui rotinas grï¿½ficas no fim do arquivo.
  *     Inclui vsync.
  * 2015 - Created by Fred Nora.
  */
@@ -16,32 +15,24 @@ extern unsigned long SavedLFB;
 extern unsigned long SavedX;
 extern unsigned long SavedY;
 extern unsigned long SavedBPP; 
-
 // from assembly i guess.
 extern void my_buffer_load_bitmap_16x16();
 
-
-//
 // == Private functions: Prototypes ======================
-//
-
 static void _outbyte(int c);
 static void outbyte(int c);
-
 // ===================================
 
 
 // _outbyte: 
-// Coloca um char na tela. Com opções de modo de vídeo.
+// Coloca um char na tela. Com opï¿½ï¿½es de modo de vï¿½deo.
 // Called by outbyte().
-
 static void _outbyte (int c)
 {
     unsigned long i=0;
     unsigned long x=0;
     unsigned long y=0;
     char *vm = (char *) 0x000B8000;  
-
 // Char, attribute.
     char ch = (char) c;
     char ch_atributo = (char) g_char_attrib;
@@ -62,7 +53,7 @@ static void _outbyte (int c)
                 c );
             break;
         // ...
-        // modo gráfico vesa 640x480 24bpp, 8 pixel por caractere.
+        // modo grï¿½fico vesa 640x480 24bpp, 8 pixel por caractere.
         default:
             my_buffer_char_blt( 
                 (8*g_cursor_x), 
@@ -88,17 +79,14 @@ static void _outbyte (int c)
     }
 }
 
-
 // outbyte:
-// Trata o caractere antes de por na memória de video.
-
+// Trata o caractere antes de por na memï¿½ria de video.
 static void outbyte (int c)
 {
     register int Ch=c;      // Copy
     static char prev = 0;
 
-// Sendo menor que espaço, não pode ser 'tab,return,back...)    
-
+// Sendo menor que espaÃ§o, nÃ£o pode ser 'tab,return,back...
     if ( Ch <  ' '  && 
          Ch != '\r' && 
          Ch != '\n' && 
@@ -108,9 +96,9 @@ static void outbyte (int c)
         return;
     }
 
-// Sendo maior que 'espaço'. 
+// Sendo maior que 'espaï¿½o'. 
 
-// Volta ao início da linha.
+// Volta ao inï¿½cio da linha.
     if ( Ch == '\r' )
     {
         g_cursor_x = 0;
@@ -118,7 +106,7 @@ static void outbyte (int c)
         return;    
     }
  
-// Vai pra próxima linha e volta ao inicio da linha.    
+// Vai pra prï¿½xima linha e volta ao inicio da linha.    
     if ( Ch == '\n' && prev != '\r' )
     {
         g_cursor_y++;
@@ -158,32 +146,27 @@ static void outbyte (int c)
         return; 
     }
 
-/*
- *  Filtra as dimensões da janela onde esta pintando.
- */
+// Filtra as dimensÃ§Ãµes da janela onde esta pintando.
 
 // limite horizontal
-    if ( g_cursor_x > 80)  // 80 = g_coluna_max 
-    {
+// 80 = g_coluna_max 
+    if (g_cursor_x > 80)  {
         g_cursor_x = 0;
-        g_cursor_y++;  
-    
+        g_cursor_y++;
     }else{
-        g_cursor_x++;    //Incrementa coluna.                             
+        g_cursor_x++;                             
     };
 
 // Limite vertical. 
 // (@todo: Testando limite maior, ja que estamos em modo grafico.)
-    if ( g_cursor_y > 74 ) //25 = g_linha_max (50*8 pixels) 
-    { 
+//25 = g_linha_max (50*8 pixels) 
+    if (g_cursor_y > 74){
         scroll();
-        g_cursor_y = 74; //isso pode ir para dentro da função scroll().
+        g_cursor_y = 74;  //isso pode ir para dentro da funï¿½ï¿½o scroll().
     }
 
-// #importante:
 // Imprime os caracteres normais.
-
-    _outbyte (Ch);
+    _outbyte(Ch);
 
 // Atualisa o prev.
     prev = Ch;
@@ -192,7 +175,6 @@ static void outbyte (int c)
 
 // panic:
 // Message support for fatal error.
-
 void panic (const char *msg)
 {
     if ( (void*) msg != NULL )
@@ -201,26 +183,20 @@ void panic (const char *msg)
             printf ("BL.BIN: [PANIC] %s\n", msg );
         }
     }
-
     die();
 }
 
-
-/*
- * scroll:
- *   #bugbug: Is it for text mode?
- */
- 
+// scroll:
+// #bugbug: Is it for text mode? 
 void scroll (void)
 {
-    //loop
+//loop
     register unsigned short i=0;
     register unsigned short j=0;
-    // inicio da tela
+// inicio da tela
     unsigned short *p1 = (unsigned short *) ScreenStart;
-    // inicio da segunda linha
+// inicio da segunda linha
     unsigned short *p2 = (unsigned short *) (ScreenStart + 2 * SCREEN_WIDTH) ;
-
 
     // 24 vezes
     for (i=0; i < ROWS - 1; i++)
@@ -240,15 +216,10 @@ void scroll (void)
     };
 }
 
-
-/* 
- * bl_clear: 
- * Limpa a tela em text mode. 
- */
- 
+// bl_clear: 
+// Limpa a tela em text mode. 
 // #bugbug
-// Não usamos mas esse modo de vídeo. 
-
+// Nï¿½o usamos mas esse modo de vï¿½deo. 
 int bl_clear (int color)
 {
     register unsigned int i=0;
@@ -266,15 +237,11 @@ int bl_clear (int color)
     return 0; 
 }
 
-
-/*
- * kprintf:
- *     Imprime uma string em uma determinada linha. 
- *     @todo: Mudar para bl_print(...) 
- */
-
+// kprintf:
+// Imprime uma string em uma determinada linha. 
+// @todo: Mudar para bl_print(...) 
 // #bugbug
-// Não usamos mas esse modo de vídeo. 
+// Nï¿½o usamos mas esse modo de vï¿½deo. 
 
 // #deprecated
 
@@ -319,7 +286,7 @@ int kprintf ( char *message, unsigned int line, int color )
 /*
  * prints:
  *     Print string.
- *     Parte da função printf(). 
+ *     Parte da funï¿½ï¿½o printf(). 
  */
 
 static int prints ( 
@@ -371,7 +338,7 @@ done:
 
 /*
  * printi:
- *     Parte da função printf()
+ *     Parte da funï¿½ï¿½o printf()
  */
  
 static int printi ( 
@@ -383,21 +350,15 @@ static int printi (
    int pad, 
    int letbase )
 {
-
     char print_buf[PRINT_BUF_LEN];
-
     register char *s;
-    register int t, neg = 0, pc = 0;
-    
-    //loop
+    register int t, neg = 0, pc = 0;    
     register unsigned int u = i;
-
 
     if (i == 0)
     {
         print_buf[0] = '0';
         print_buf[1] = '\0';
-
         return prints (out, print_buf, width, pad);
     }
 
@@ -410,7 +371,6 @@ static int printi (
     }
 
     s = print_buf + PRINT_BUF_LEN-1;
-
     *s = '\0';
 
     while (u) 
@@ -441,7 +401,7 @@ done:
 
 /*
  * print:
- *     Parte da função printf()
+ *     Parte da funï¿½ï¿½o printf()
  */
 
 static int print (char **out, int *varg)
@@ -529,182 +489,64 @@ static int print (char **out, int *varg)
     return pc;
 }
 
-
-/*
- * printf:
- *     Função printf() da lib C.
- * Obs:
- *     Assuming sizeof(void *) == sizeof(int). 
- */
-
+// printf:
+// FunÃ§Ã£o printf() da lib C.
+// Assuming sizeof(void *) == sizeof(int). 
 // #todo
 // Change the name to blprintf()
-
 int printf ( const char *format, ... )
 {
+    register int *varg = (int *)(&format);
     // sincronisa.  
     // vsync();
-    
-    register int *varg = (int *)(&format);
-
     return print (0, varg);
 }
 
-
-/*
- * sprintf:
- *     Lib C.
- */
- 
 int sprintf (char *out, const char *format, ... )
 {
-    // vsync();
-
     register int *varg = (int *)(&format);
-
+    // vsync();
     return print (&out, varg);
 }
 
-
-/*
- * printchar:
- *     Print a char.
- */
-
+// printchar:
+// Print a char.
+// extern int putchar(int c);
 static void printchar (char **str, int c)
 {
-
-// extern int putchar(int c);
-
-    if (str) {
-
+    if (str){
         **str = c;
         ++(*str);
-
     } else { 
         putchar (c);
     };
 }
 
-
-
-/*
- * putchar:
- *     Put a char.
- */
-
+// putchar:
+// Put a char.
 int putchar (int ch)
 {
-    outbyte (ch);
-    return ch; 
+    outbyte(ch);
+    return (int) ch; 
 }
 
-
-/*
- * printf_main:
- *     Testando a função printf().
- *
- * if you compile this file with
- *   gcc -Wall $(YOUR_C_OPTIONS) -DTEST_PRINTF -c printf.c
- * you will get a normal warning:
- *   printf.c:214: warning: spurious trailing `%' in format
- * this line is testing an invalid % at the end of the format string.
- *
- * this should display (on 32bit int machine) :
- *
- * Hello world!
- * printf test
- * (null) is null pointer
- * 5 = 5
- * -2147483647 = - max int
- * char a = 'a'
- * hex ff = ff
- * hex 00 = 00
- * signed -3 = unsigned 4294967293 = hex fffffffd
- * 0 message(s)
- * 0 message(s) with %
- * justif: "left      "
- * justif: "     right"
- *  3: 0003 zero padded
- *  3: 3    left justif.
- *  3:    3 right justif.
- * -3: -003 zero padded
- * -3: -3   left justif.
- * -3:   -3 right justif.
- */
-
-
-int printf_main (void){
-	
-/*	
-	char *ptr = "Hello world!";
-	char *np = 0;
-	int i = 5;
-	unsigned int bs = sizeof(int)*8;
-	int mi;
-	char buf[80];
-
-	mi = (1 << (bs-1)) + 1;
-	
-	printf("%s\n", ptr);
-	printf("printf test\n");
-	printf("%s is null pointer\n", np);
-	printf("%d = 5\n", i);
-	printf("%d = - max int\n", mi);
-	printf("char %c = 'a'\n", 'a');
-	printf("hex %x = ff\n", 0xff);
-	printf("hex %02x = 00\n", 0);
-	printf("signed %d = unsigned %u = hex %x\n", -3, -3, -3);
-	printf("%d %s(s)%", 0, "message");
-	printf("\n");
-	printf("%d %s(s) with %%\n", 0, "message");
-	
-    sprintf(buf, "justif: \"%-10s\"\n", "left"); 
-    printf("%s", buf);
-	
-    sprintf(buf, "justif: \"%10s\"\n", "right"); 
-    printf("%s", buf);
-	
-    sprintf(buf, " 3: %04d zero padded\n", 3); 
-    printf("%s", buf);
-	
-    sprintf(buf, " 3: %-4d left justif.\n", 3); 
-    printf("%s", buf);
-	
-    sprintf(buf, " 3: %4d right justif.\n", 3); 
-    printf("%s", buf);
-	
-    sprintf(buf, "-3: %04d zero padded\n", -3); 
-    printf("%s", buf);
-	
-    sprintf(buf, "-3: %-4d left justif.\n", -3); 
-    printf("%s", buf);
-	
-    sprintf(buf, "-3: %4d right justif.\n", -3); 
-    printf("%s", buf);
-
-*/	
-
-//done:	
-	return 0;
+// Testing printf.
+// #deprecated.
+int printf_main(void)
+{
+	return -1;
 }
 
-
-/*
- * input:
- *     Coloca os caracteres digitados em uma string. 
- */
-
+// input:
+// Coloca os caracteres digitados em uma string. 
 unsigned long input (unsigned long ch)
 {
-
 //Converte.
 	char c = (char) ch;    
 
 //Filtra limite.
-	if (prompt_pos > 250)
-	{ 
-	    printf ("input: The command is too large");	
+	if (prompt_pos > 250){ 
+	    printf ("input: The command is too large\n");	
 	    return (unsigned long) 0; 
 	}
 
@@ -748,22 +590,14 @@ unsigned long input (unsigned long ch)
 			break;
 	};
 
-//Nothing.
 input_more:
     return 0;
-
-//Nothing.
 input_done:
     return KEY_RETURN;
-
 }
 
-
-/*
- * my_buffer_horizontal_line:
- *     Pinta uma linha horinzontal no Back Buffer. 
- */
-
+// my_buffer_horizontal_line:
+// Pinta uma linha horinzontal no Back Buffer. 
 void 
 my_buffer_horizontal_line ( 
     unsigned long x1,
@@ -771,13 +605,11 @@ my_buffer_horizontal_line (
     unsigned long x2, 
     unsigned long color )
 {
-    while (x1 < x2)
-    {
+    while (x1 < x2){
         my_buffer_put_pixel ( color, x1, y, 0 );
         x1++;  
     };
 }
-
 
 /*
  * my_buffer_put_pixel: 
@@ -803,14 +635,13 @@ my_buffer_put_pixel (
     //    : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
 //#Warning
-//suspenso, vamos tentar não usar o assembly
+//suspenso, vamos tentar nï¿½o usar o assembly
     //gui_buffer_putpixel(); 
     //return;
 
     //SOFTWARELIB_BACKBUFFER EQU (0x1000000 - 0x800000)
-    unsigned char *where = (unsigned char *) (0x1000000 - 0x800000); //0xC0800000;
+    unsigned char *where = (unsigned char *) (0x1000000 - 0x800000);  //0xC0800000;
     unsigned long color = (unsigned long) ax;
-
     char b, g, r, a;
 
 // Color.
@@ -822,14 +653,11 @@ my_buffer_put_pixel (
 // x and y.
     int x = (int) bx;
     int y = (int) cx;
-
 // = 3; 
 //24bpp
     int bytes_count=0;
 
-
     switch (SavedBPP){
-
     case 32:  bytes_count = 4;  break;
     case 24:  bytes_count = 3;  break;
     // ...
@@ -842,28 +670,19 @@ my_buffer_put_pixel (
 
 // #importante
 // Pegamos a largura do dispositivo.
-
     int width = (int) SavedX; 
-
 // Offset.
     int offset = (int) ( (bytes_count*width*y) + (bytes_count*x) );
 
-//
 // Plot the pixel.
-//
-
     where[offset]    = b;
     where[offset +1] = g;
     where[offset +2] = r;
     if ( SavedBPP == 32 ){ where[offset +3] = a; }
 }
 
-
-/*
- * my_buffer_char_blt:
- *     Draw a char using ROM's font. 
- */
-
+// my_buffer_char_blt:
+// Draw a char using ROM BIOS's font.
 void 
 my_buffer_char_blt ( 
     unsigned long x, 
@@ -874,12 +693,9 @@ my_buffer_char_blt (
     int x2=0; 
     int y2=0;
     unsigned char bit_mask = 0x80;
-
-    // Font address and char address.
+// Font address and char address.
     //char height = 8
-
     char *work_char = (char*) 0x000FFA6E + (c * 8);
-
 
     for ( y2=0; y2<8; y2++ )
     {
@@ -893,7 +709,7 @@ my_buffer_char_blt (
             bit_mask = ( bit_mask >> 1 );
         };
 
-        y++;          //Próxima linha.
+        y++;          //Prï¿½xima linha.
         work_char++;  //Incrementa 8 bits.
     };
 }
@@ -901,7 +717,7 @@ my_buffer_char_blt (
 
 /*
  * vsync: 
- *     Sincroniza a pintura com o retraço vertical.
+ *     Sincroniza a pintura com o retraï¿½o vertical.
  *     OBS: Talvez deva usar cli e sti 
  *     //#todo: Move this to another place, maybe fb device support.
  */
@@ -913,19 +729,14 @@ void vsync()
     // nothing.
     }while ( gui_inb(0x3DA) & 8 );
 
-
     // Wait until a new retrace has just begun.
     do {
     //nothing.
     } while( !(gui_inb(0x3DA) & 8) );
 }
 
-
-/*
- * gui_inb:
- *     Pega um byte na porta. 
- */
-
+// gui_inb:
+// Pega um byte na porta. 
 char gui_inb (int port)
 {
     char value=0;
@@ -940,35 +751,28 @@ char gui_inb (int port)
     return value;
 }
 
-
 /*
 void refresh_screen2();
 void refresh_screen2()
 {
     unsigned char *backbuffer  = (unsigned char *) (0x1000000 - 0x800000); 
     unsigned char *frontbuffer = (unsigned char *) g_lbf_pa; 
-
     int i=0;
     for(i=0; i<(800*600*6); i++)
         frontbuffer[i] = backbuffer[i];
 }
 */
 
-
-
 // color black
 // 800x600x32
 void clear_backbuffer(void)
 {
     int i=0;
-
     // Backbuffer address.
     // Is this a good address ?
     // almos 16MB mark?
-
     // #todo
     // We can use unsigned longs.
-
     unsigned char *backbuffer  = (unsigned char *) (0x1000000 - 0x800000); 
 
 // #bugbug
@@ -979,8 +783,6 @@ void clear_backbuffer(void)
         backbuffer[i] = 0;
     };
 }
-
-
 
 //#bugbug
 //@todo: Rever isso.
@@ -1010,11 +812,9 @@ unsigned long get_cursor_y ()
 /*
  * carrega_bitmap_16x16:
  *     Carrega um bitmap de 16x16.
- *     Põe bitmap no buffer.
- *
+ *     Pï¿½e bitmap no buffer.
  * @todo: Mudar o nome, colocar em outro arquivo.
- *
- * a - endereço da imagem. 
+ * a - endereï¿½o da imagem. 
  * b - x
  * c - y 
  * d - null
@@ -1033,13 +833,11 @@ carrega_bitmap_16x16 (
         : "a"(ax), "b"(bx), "c"(cx), "d"(dx) );
 
 // Coloca no buffer. 
-// Não precisa esperar o retraço vertical.
-
+// NÃ£o precisa esperar o retraÃ§o vertical.
     my_buffer_load_bitmap_16x16(); 
 }
 
-
 //
-// End.
+// End
 //
 

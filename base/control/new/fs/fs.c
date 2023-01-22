@@ -617,8 +617,6 @@ sys_read (
 // ::0
 // stdin
     if (fp->_file == STDIN_FILENO){
-        debug_print("sys_read: Reading from stdin\n");
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -628,8 +626,6 @@ sys_read (
 // ::1
 // stdout
     if (fp->_file == STDOUT_FILENO){
-        debug_print("sys_read: Reading from stdout\n");
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -639,8 +635,6 @@ sys_read (
 // ::2
 // stderr
     if (fp->_file == STDERR_FILENO){
-        debug_print("sys_read: Reading from stderr\n");
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -677,7 +671,9 @@ sys_read (
             debug_print("sys_read: [FAIL] can't read an empty buffer\n");
             //goto fail;
             
-            debug_print("sys_read: WAKEUP WRITER\n");
+            // #debug
+            // debug_print("sys_read: WAKEUP WRITER\n");
+            
             fp->_flags = 0;
             fp->_flags |= __SWR;                  // pode escrever
             do_thread_ready( fp->tid_waiting );   // acorda escritores. 
@@ -895,12 +891,13 @@ RegularFile:
 fail:
 
     // #debug
-    debug_print ("sys_read: [FAIL] something is wrong!\n");
-    
-//#bugbug: Isso pode degradar o desempenho.
-    // printf      ("sys_read: [FAIL] something is wrong!\n");
-    //refresh_screen();  
+    // debug_print ("sys_read: [FAIL] something is wrong!\n");
 
+// #bugbug: 
+// Isso pode degradar o desempenho.
+
+    // printf ("sys_read: [FAIL] something is wrong!\n");
+    //refresh_screen();  
     //bloqueando, autorizando a escrita e reescalonando.
     //do_thread_waiting (current_thread);
     //fp->tid_waiting = current_thread;
@@ -1052,9 +1049,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // + Write on regular file.
     if (fp->_file == STDIN_FILENO)
     {
-        debug_print("sys_write: Writing into stdin\n");
-        // If the file is a regular file.
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -1067,9 +1061,8 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // + Write on regular file.
     if (fp->_file == STDOUT_FILENO)
     {
-        debug_print("sys_write: Writing into stdout\n");
         // If the file is a console.
-        if ( fp->____object == ObjectTypeVirtualConsole )
+        if (fp->____object == ObjectTypeVirtualConsole)
         {
             return (int) console_write ( 
                              (int) fg_console, 
@@ -1077,7 +1070,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
                              (size_t) count );
         }
         // If the file is a regular file.
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -1089,8 +1081,6 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 // + Write on regular file.
     if (fp->_file == STDERR_FILENO)
     {
-        debug_print("sys_write: Writing into stderr\n");
-        // Shortcut
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
@@ -1133,15 +1123,20 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         // caso existam leitores. Mas não pode mais escrever.
         if (fp->socket_buffer_full == TRUE)
         {
+            
             debug_print("sys_write: [FAIL] can't write on a full buffer\n");
-            debug_print("sys_write: WAKEUP READER\n");
+            
+            //#debug
+            //debug_print("sys_write: WAKEUP READER\n");
+            
             fp->_flags = 0; // não pode mais escrever.
             fp->_flags |= __SRD;                 // pode ler.
             do_thread_ready( fp->tid_waiting );  // acorda leitores
             fp->tid_waiting = -1;
             if (fp->sync.block_on_write_full == TRUE)
             {
-                 debug_print("sys_write: SLEEP WRITER\n");
+                 //#debug
+                 //debug_print("sys_write: SLEEP WRITER\n");
                  fp->tid_waiting = current_thread;
                  //do_thread_waiting(current_thread);
                  yield (current_thread);
@@ -1180,7 +1175,9 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
                 // ok, write funcionou.
                 if (nbytes>0)
                 {
-                    debug_print("sys_write: WAKEUP READER\n");
+                    // #debug
+                    // debug_print("sys_write: WAKEUP READER\n");
+                    
                     fp->socket_buffer_full = TRUE;     // buffer cheio
                     fp->_flags &= ~__SWR;              // nao posso mais ESCREVER.            
                     fp->_flags |= __SRD;               // pode ler 
@@ -1192,7 +1189,9 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
                     // que vem de uma syscall que nao salvou o contexto.
                     if (fp->sync.block_on_write == TRUE)
                     {
-                        debug_print("sys_write: SLEEP WRITER\n");
+                        // #debug
+                        //debug_print("sys_write: SLEEP WRITER\n");
+                        
                         fp->tid_waiting = current_thread;
                         //do_thread_waiting(current_thread);
                     }
@@ -1306,9 +1305,11 @@ RegularFile:
 //==============================================
 
 fail:
+
     // #debug
-    debug_print ("sys_write: [FAIL] Something is wrong!\n");
+    // debug_print ("sys_write: [FAIL] Something is wrong!\n");
     // printf      ("sys_write: [FAIL] something is wrong!\n");
+
 fail2:
 
     //invalidate_screen();
@@ -1324,7 +1325,6 @@ fail2:
     //fp->_flags |= __SWR;  //pode escrever.
     //scheduler();
 
-// fail. something is wrong!
     return (ssize_t) (-1);
 }
 
