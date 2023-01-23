@@ -1,7 +1,7 @@
 
 // menu.c
 
-#include "gws.h"
+#include "gwsint.h"
 
 int is_menu_active=FALSE;
 

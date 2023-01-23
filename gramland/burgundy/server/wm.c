@@ -5,7 +5,7 @@
  *     2020 - Create by Fred Nora.
  */
 
-#include "gws.h"
+#include "gwsint.h"
 
 extern int gUseMouse;
 

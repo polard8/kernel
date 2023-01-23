@@ -71,7 +71,7 @@ See: https://wiki.osdev.org/Graphics_stack
 // This file is part of this project.
 // It is NOT a library.
 
-#include "gws.h"
+#include "gwsint.h"
 
 
 #define VERSION  "0.1"
@@ -177,39 +177,7 @@ static void initBackground(void);
 static void initClientSupport(void);
 static void initClientStruct( struct gws_client_d *c );
 
-// Line
-static int servicelineBackbufferDrawHorizontalLine (void);
-// Char
-// See: char.c
-static int serviceDrawChar(void);
-// Text
-static int serviceDrawText(void);
-// Rectangle
-static int serviceRefreshRectangle(void);
-// Window
-// See: window.c
-static int serviceCreateWindow (int client_fd);
-static int serviceChangeWindowPosition(void);
-static int serviceResizeWindow(void);
-static int serviceRedrawWindow(void);
-static int serviceRefreshWindow(void);
-// Button
-static int serviceDrawButton (void); 
-// When a client send us an event
-static int serviceClientEvent(void);
-// When a client get the next event from it's own queue.
-static int serviceNextEvent(void);
-// Get a message given the Index and the Restart flag.
-static int serviceNextEvent2(void);
-// See: main.c
-static int serviceAsyncCommand (void);
-static void serviceExitGWS(void);
-static int servicePutClientMessage(void);
-static int serviceGetClientMessage(void);
-// See: main.c
-static int serviceGetWindowInfo(void);
 
-static void serviceCloneAndExecute(void);
 
 // ===============================================
 // Callback support.
@@ -1056,10 +1024,8 @@ gwsProcedure (
     // Usará o buffer global
     // See: window.c
     case GWS_CreateWindow:
-        
         //#debug
         //gwssrv_debug_print ("gwssrv: [1001] serviceCreateWindow\n");
-        
         serviceCreateWindow(client_fd);
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1095,10 +1061,8 @@ gwsProcedure (
 // Draw text
 // See: dtext.c
     case GWS_DrawText:
-        
         //#debug
-        //gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n");
-        
+        //gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n"); 
         serviceDrawText();
         //NoReply = FALSE;  // The client-side library is waiting for response.
         NoReply = TRUE;     // syncronous
@@ -1121,10 +1085,8 @@ gwsProcedure (
 
      // Redraw window
      case GWS_RedrawWindow:
-         
          //#debug
          //gwssrv_debug_print ("gwssrv: [1007] serviceRedrawWindow\n");
-         
          serviceRedrawWindow();
         // #test
         // Handle incoming inputs right after a huge service routine.
@@ -1145,10 +1107,8 @@ gwsProcedure (
         break;
 
     case GWS_ChangeWindowPosition:
-        
         //#debug
         //gwssrv_debug_print ("gwssrv: [1009] serviceChangeWindowPosition\n");
-        
         serviceChangeWindowPosition();
         NoReply = FALSE;
         break;
@@ -1589,7 +1549,7 @@ void gwssrv_message_all_clients(void)
 
 // When a client sent us an event
 // ??? mas o cliente envia as coisas via request, ???
-static int serviceClientEvent(void)
+int serviceClientEvent(void)
 {
     // The buffer is a global variable.
     //unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -1604,7 +1564,7 @@ static int serviceClientEvent(void)
 // os eventos que estao na janela com o foco de entrada.
 // Mas talvez devamos pegar os eventos em todas as janelas
 // que pertencem ao cliente que chamou esse serviço.
-static int serviceNextEvent(void)
+int serviceNextEvent(void)
 {
 // Window with focus.
     struct gws_window_d *focus_w;
@@ -1654,7 +1614,7 @@ fail:
 // serviceNextEvent2:
 // Get a message given the Index and the Restart flag.
 // IN: long1=index, long2=restart index or not.
-static int serviceNextEvent2(void)
+int serviceNextEvent2(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 // Window with focus.
@@ -1732,7 +1692,7 @@ fail:
 // Query window info.
 // #todo: We can deliver more information yet.
 // IN: wid ...
-static int serviceGetWindowInfo(void)
+int serviceGetWindowInfo(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 // The request will give us the wid and the message code.
@@ -1800,7 +1760,6 @@ fail:
 
 // #todo
 // Close all the clients and close the server.
-static
 void serviceExitGWS(void)
 {
     printf ("serviceExitGWS: \n");
@@ -1815,7 +1774,6 @@ void serviceExitGWS(void)
 
 // #todo
 // Now we put messages only in the window structure's message queue.
-static
 int servicePutClientMessage(void)
 {
     debug_print("servicePutClientMessage: deprecated\n");
@@ -1825,7 +1783,6 @@ int servicePutClientMessage(void)
 
 // #todo
 // Now we get messages only in the window structure's message queue.
-static
 int serviceGetClientMessage(void)
 {
     debug_print("serviceGetClientMessage: deprecated\n");
@@ -1836,8 +1793,7 @@ int serviceGetClientMessage(void)
 // Async request.
 // No response.
 // #todo: Explain the arguments.
-static int 
-serviceAsyncCommand (void)
+int serviceAsyncCommand(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 
@@ -2122,8 +2078,7 @@ fail:
 // Receive the tid of the client in the request packet.
 // Save it as an argument of the window structure.
 
-static int 
-serviceCreateWindow (int client_fd)
+int serviceCreateWindow (int client_fd)
 {
 // The buffer is a global variable.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -2408,7 +2363,6 @@ fail:
 
 // Draw char.
 // Service 1004.
-static
 int serviceDrawChar (void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -2503,7 +2457,8 @@ int serviceDrawChar (void)
     return 0;
 }
 
-static int serviceChangeWindowPosition(void)
+
+int serviceChangeWindowPosition(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     struct gws_window_d *window;
@@ -2550,8 +2505,6 @@ static int serviceChangeWindowPosition(void)
     return 0;
 }
 
-
-static
 int serviceResizeWindow(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -2607,7 +2560,6 @@ int serviceResizeWindow(void)
 // #bugbug
 // Usaremos a função create window para desenhar botões.
 // #deletar !!!
-static
 int serviceDrawButton(void)
 {
     // Deprecated !!
@@ -2620,7 +2572,6 @@ int serviceDrawButton(void)
 // Redraw window.
 // It will invalidate the window, and it will need to be flushed
 // into the frame buffer.
-static
 int serviceRedrawWindow (void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
@@ -2690,8 +2641,7 @@ fail:
 
 // 2021
 // Flush a given area into the framebuffer.
-static int 
-serviceRefreshRectangle(void)
+int serviceRefreshRectangle(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     unsigned long left=0;
@@ -2739,8 +2689,7 @@ fail:
 // Flush a given window into the backbuffer.
 // #todo: Here we can simple mark this window as 'dirty'
 // and let the compositor do its job.
-static int 
-serviceRefreshWindow(void)
+int serviceRefreshWindow(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     struct gws_window_d *window;
@@ -2808,7 +2757,7 @@ fail:
 // #todo
 // Get the name of the image for a process to lauch.
 // IN: for arguments and a string.
-static void serviceCloneAndExecute(void)
+void serviceCloneAndExecute(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
 // ==================================
@@ -2828,8 +2777,7 @@ static void serviceCloneAndExecute(void)
 
 // Draw text.
 // Service 1005
-static int 
-serviceDrawText(void)
+int serviceDrawText(void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     struct gws_window_d  *window;
@@ -2942,7 +2890,7 @@ crazy_fail:
 }
 
 // O buffer é uma global nesse documento.
-static int 
+int 
 servicelineBackbufferDrawHorizontalLine (void)
 {
     unsigned long *message_address = (unsigned long *) &__buffer[0];

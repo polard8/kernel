@@ -18,7 +18,7 @@
 // atualizado. (rect)
 
 
-#include "gws.h"
+#include "gwsint.h"
 
 #define OVERLAPPED_MIN_WIDTH    80
 #define OVERLAPPED_MIN_HEIGHT   80

@@ -2,7 +2,7 @@
 // rect.c 
 // Rectangle support for gws.
 
-#include "gws.h"
+#include "gwsint.h"
 
 //
 // == private functions: prototypes ====================

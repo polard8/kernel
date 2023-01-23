@@ -1,14 +1,12 @@
 
+// client.h
 
 #ifndef ____CLIENT_H
 #define ____CLIENT_H    1
 
-
-
 // Nesse arquivo fica a estrutura de cliente.
 // Essa estrutura vai conter as informações
 // e características dos clientes.
-
 
 //
 // Current
@@ -21,7 +19,6 @@
 // instalado.
 
 int current_client;
-
 
 struct gws_client_d
 {

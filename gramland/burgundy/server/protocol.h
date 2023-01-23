@@ -6,10 +6,6 @@
 #ifndef __GWS_PROTOCOL_H
 #define __GWS_PROTOCOL_H    1
 
-// Current protocol version
-#define GWS_PROTOCOL  1
-
-
 // Um pacote tem o tamanho total de 512 bytes.
 #define sz_gPacket  (512)
 

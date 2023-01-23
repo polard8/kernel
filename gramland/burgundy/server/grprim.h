@@ -284,7 +284,6 @@ grPlot1 (
     unsigned int color,
     unsigned long flags );
 
-int serviceGrPlot0(void);
 
 //
 // == Line ==============================================
@@ -297,7 +296,7 @@ plotLine3d (
     unsigned int color );
 
 // plot line given two colors.
-// interpolation ?
+// interpolation?
 void 
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
@@ -328,8 +327,6 @@ rectangle_ras3D (
     int right, int bottom, int z1,
     unsigned int color );
 
-//sevice 2042
-int serviceGrRectangle(void);
 
 //
 // == triangle ==========================
@@ -351,8 +348,7 @@ int xxxPolygonZ(struct gr_polygon_d *polygon);
 int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDrawCubeZ(struct gr_cube_d *cube);
-//sevice 2041
-int serviceGrCubeZ(void);
+
 
 //
 // == Circle ===========================
@@ -427,9 +423,6 @@ void grDCColorChg (
     struct gws_display_d *dc,
     unsigned char subpixel_src_color,
     unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
-
-// Pixel
-int servicepixelBackBufferPutpixel (void);
 
 // interpolation
 unsigned int 

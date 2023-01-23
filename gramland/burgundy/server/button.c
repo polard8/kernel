@@ -3,7 +3,7 @@
  *     Create button.
  */
 
-#include "gws.h"
+#include "gwsint.h"
 
 /*
  * gws_draw_button:

@@ -15,9 +15,7 @@
  *            Ported from older versions in the system.
  */
 
-
-#include "gws.h"
-
+#include "gwsint.h"
 
 //
 // Color support

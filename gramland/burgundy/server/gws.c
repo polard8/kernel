@@ -5,8 +5,7 @@
  *     2019 - Created by Fred Nora.
  */
 
-// Window server routines.
-#include "gws.h"
+#include "gwsint.h"
 
 int dirty=0;
 int background=0;

@@ -5,7 +5,7 @@
 // This is the window server.
 // This is not the right place for this thing.
 
-#include "gws.h"
+#include "gwsint.h"
 
 int gUseDemos = TRUE;
 

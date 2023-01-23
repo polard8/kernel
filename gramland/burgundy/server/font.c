@@ -2,7 +2,7 @@
 // todo: 
 // the font support.
 
-#include "gws.h"
+#include "gwsint.h"
 
 int gfontSize=0;
 // As fontes usadas pelo servidor gws.

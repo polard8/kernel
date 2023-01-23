@@ -1,8 +1,8 @@
 
+// screen.h
+
 #ifndef ____SCREEN_H
 #define ____SCREEN_H    1
-
-
 
 int refresh_device_screen_flag;
 int refresh_valid_screen_flag;

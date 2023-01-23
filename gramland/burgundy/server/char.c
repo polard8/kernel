@@ -5,7 +5,7 @@
  *     2019 - Created by Fred Nora.
  */
 
-#include "gws.h"
+#include "gwsint.h"
 
 
 // Draw char support

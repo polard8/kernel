@@ -1,9 +1,7 @@
 
 // sprite.c
 
-#include "gws.h"
-
-
+#include "gwsint.h"
 
 /*
 // #todo
@@ -15,7 +13,6 @@ struct gws_sprite_d *create_sprite_point()
 struct gws_sprite_d *create_sprite_line()
 struct gws_sprite_d *create_sprite_circle()
 */
-
 
 /*
 //#todo

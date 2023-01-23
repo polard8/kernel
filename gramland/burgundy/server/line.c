@@ -2,7 +2,7 @@
 // line.c 
 // We are using the library libgd.o.
 
-#include "gws.h"
+#include "gwsint.h"
 
 
 //#bugbug: use unsigned int for 'color'.

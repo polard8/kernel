@@ -1,8 +1,7 @@
 
 // comp.c
 
-// window server routines.
-#include "gws.h"
+#include "gwsint.h"
 
 extern struct gws_window_d *mouse_hover;
 

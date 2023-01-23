@@ -63,8 +63,6 @@ struct gws_event_d
     //unsigned long long5;
     //unsigned long long6;
 
-
-
     //#test
     //int x, y;		/* pointer x, y coordinates in event window */
     //int x_root, y_root;	/* coordinates relative to root */

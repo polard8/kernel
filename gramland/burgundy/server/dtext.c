@@ -3,7 +3,7 @@
  *     Draw text routines.
  */
 
-#include "gws.h"
+#include "gwsint.h"
 
 /* 
  * grDrawString:
