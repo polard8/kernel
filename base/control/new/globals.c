@@ -98,6 +98,7 @@ int g_kernel_symbols_available=FALSE;
 // the callouts to GWSSRV.BIN are installed.
 int gUseWMCallbacks=FALSE;
 
+
 //#bugbug
 //move this to kernel (ring 0) crt support.
 //error support.

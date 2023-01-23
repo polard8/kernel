@@ -17,19 +17,25 @@ Launching the vm:
 Boot interface:
 see: base/control/boot/x86/bm/shell32/
 You can type: 
-    bootjail for 320x200 resolution. 
-    bootp1  for 640x480 resolution.
-    boothome or boot for 800x600 resolution.
-    bootp2 (not working)
-    bootcali (not working)
+
+    bootjail - for 320x200 resolution. 
+    bootp1   - for 640x480 resolution.
+    boothome - for 800x600 resolution.
+    bootp2   - for higher resolution. probably 1024x768 (not working)
+    bootcali - for higher resolution. (not working)
+
+    'boot' is the same of 'boothome'.
+    'bootcali' is gonna be for higher resolutions. 
 
 -----------------------
 Init process interface:
 see: base/exposed/arctic/init/
 You can type:
-    wsq   - Initialize the Desktop environment.
+
+    boot    - Initialize the Desktop Environment, (GUI).
+    gramado - Initialize the Desktop Environment, (GUI).
+    wsq     - Initialize the Desktop Environment, (GUI).
     game1 - Start demo 1.
     game2 - Start demo 2.
     cls   - Clear the screen.
-
 

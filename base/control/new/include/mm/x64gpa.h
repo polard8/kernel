@@ -3,6 +3,14 @@
 // Global declaration of static physical address 
 // used by the kernel.
 
+#ifndef ____GPA_H
+#define ____GPA_H  1
+
+
+//
+// == 0 KB ==================================================
+//
+
 /*
 0x00000000 - 0x000003FF - Real Mode Interrupt Vector Table
 0x00000400 - 0x000004FF - BIOS Data Area
@@ -16,14 +24,6 @@
 0x000C8000 - 0x000EFFFF - BIOS Shadow Area
 0x000F0000 - 0x000FFFFF - System BIOS
 */
-
-#ifndef ____GPA_H
-#define ____GPA_H  1
-
-
-//
-// == 0 KB ==================================================
-//
 
 // Primeiros 2 MB.
 #define SYSTEM_ORIGIN  0
@@ -336,7 +336,8 @@ A conservative approach is to avoid everything above 0x00080000.
 
       // ??
       // O que tem aqui?
-      // podemos reservar para extender a imagem do kernel?
+      // podemos reservar para extender a imagem do kernel,
+      // ou para algum módulo?
 
 //
 // == 4 MB ==================================================
@@ -344,9 +345,8 @@ A conservative approach is to avoid everything above 0x00080000.
 
       // ??
       // O que tem aqui?
-      // podemos reservar para extender a imagem do kernel?
-
-
+      // podemos reservar para extender a imagem do kernel,
+      // ou para algum módulo?
 
 //
 // == 8 MB ==================================================

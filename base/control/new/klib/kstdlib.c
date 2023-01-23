@@ -64,12 +64,16 @@ void *slab_alloc (size_t size)
 
 // kmalloc implementation.
 // IN: Clear or not the allocated memory.
+// See: mm/mm.c
 static void *__kmalloc_impl(size_t size, int clean)
 {
     void *ptr;
-    ptr = (void *) heapAllocateMemory(size);
+    unsigned long ul_size = (unsigned long) (size & 0xFFFFFFFF);
+
+// IN: (unsigned long) size.
+    ptr = (void *) heapAllocateMemory(ul_size);
     if (clean==TRUE){
-        if( (void*) ptr != NULL ){
+        if ( (void*) ptr != NULL ){
             memset(ptr, 0, size);
         }
     }
@@ -78,17 +82,15 @@ static void *__kmalloc_impl(size_t size, int clean)
 
 // kmalloc:
 // Standard kmalloc function.
-// Alocar memória no heap do kernel.
-// See: memory.c
-
+// Allocate memory into the kernel heap.
+// Virtually and physically contiguous.
 void *kmalloc(size_t size)
 {
     void *ptr;
-    unsigned long new_size = ( unsigned long) size;
-
-// Se devemos ou não incremetar o contador de uso.
-    int IncrementUsageCounter=TRUE; //P->allocated_memory
+    size_t _lsize = size;
     struct process_d *process;
+// Se devemos ou não incremetar o contador de uso.
+    int IncrementUsageCounter=TRUE;  //P->allocated_memory
 
 // Process structure
     process = (void*) get_current_process_pointer();
@@ -98,28 +100,35 @@ void *kmalloc(size_t size)
     if (process->magic!=1234){
         IncrementUsageCounter=FALSE;
     }
-
-    if (size < 0){
-        debug_print ("kmalloc: size\n");
+// size
+    if (_lsize < 0){
+        debug_print ("kmalloc: _lsize\n");
         return NULL;
     }
-    if (size == 0){
-        debug_print ("kmalloc: size ajust\n");
-        new_size=1;
+    if (_lsize == 0){
+        debug_print ("kmalloc: _lsize ajust\n");
+        _lsize=1;
     }
-
-// Allocation.
-    //ptr = (void *) heapAllocateMemory(new_size);
-    ptr = (void *) __kmalloc_impl(new_size,FALSE);
+// Allocate
+    ptr = (void *) __kmalloc_impl(_lsize,FALSE);
     if ( (void *) ptr == NULL ){
         debug_print ("kmalloc: ptr\n");
         return NULL;
     }
-
+// Increment the usage conter for each process.
     if (IncrementUsageCounter==TRUE)
     {
-        if ( (void*) process != NULL ){
-            process->allocated_memory += new_size;
+        if ( (void*) process != NULL )
+        {
+            if (process->magic == 1234)
+            {
+                // #todo:
+                // A estrutura de processo pode ter
+                // mais de um contador como esse,
+                // registrando os diferentes tipos de memória
+                // alocada pelo processo.
+                process->allocated_memory += _lsize;
+            }
         }
     }
 
@@ -142,16 +151,16 @@ void *kmalloc(size_t size)
  * desejamos que o GC libere os recurso. Em seguida devemos sinalizar 
  * no mmblock que libere o bloco para outras alocações.
  */
-
+// Virtually and physically contiguous.
+// See:
+// mm/mm.c
 void kfree (void *ptr)
 {
     if ( (void *) ptr == NULL ){
         debug_print ("kfree: ptr\n");
         return;
     }
-    
-    // ps/x86/memory.c
-    FreeHeap (ptr);
+    heapFreeMemory(ptr);
 }
 
 

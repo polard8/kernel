@@ -167,7 +167,8 @@ extern unsigned long gSavedBPP;
 #include "config/superv/request.h"
 #include "config/superv/info.h"    // last one?
 #include "config/superv/kinit.h"   // kernel initialization.
-#include "config/superv/debug.h"
+
+#include "gramado/debug.h"
 
 
 // klib: libc support.

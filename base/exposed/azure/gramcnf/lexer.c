@@ -16,7 +16,6 @@ int current_string=0;
 int current_separator=0; 
 int current_special=0;
 
-
 int eofno=0;
 
 // Line support
@@ -230,7 +229,7 @@ begin:
                     };
                     //isso sai do switch
                     break;
-                };
+                }
 
 				//#### inicia um comentário de múltiplas linhas ####
 				//#importante 
@@ -248,8 +247,7 @@ begin:
 
                     while (inside)
                     {
-                        if (c == '*')
-                        {
+                        if (c == '*'){
 
                             //sequência
                             while (c == '*')
@@ -276,20 +274,17 @@ begin:
 						// se vamos pular mudar de linha dentro do comentário.
                         }else if (c == '\n'){
 
-						        //precisamos contar.
-                                lineno++;
+						    //precisamos contar.
+                            lineno++;
+							//printf(" [LF2] ");
+                            c = getc (finput);
 							  
-							    //printf(" [LF2] ");
-                            
-                                c = getc (finput);
-							  
-					            //?? para onde vamos??
-								//precisamos continuar no while até encontrarmos a barra /. ou o *.
+					        //?? para onde vamos??
+							//precisamos continuar no while até encontrarmos a barra /. ou o *.
 								
                         }else if (c == EOF || c == '\0'){  
 
                             eofno++;
-
                             printf ("skip_white_space: unterminated comment in line %d", 
                                 lineno );
                             exit (1);
@@ -306,7 +301,7 @@ begin:
                             c = getc(finput);
                         };
                     };
-                };
+                }
 
 				// aqui depois da barra não emcontramos nem o '*' nem o '/'
                 // isso significa que estamos eliminando espaços dentro de uma expressão.
@@ -348,13 +343,10 @@ begin:
     }; // for
 }
 
-
 /*
  * yylex:
  *     Pega o próximo token.
- *     copiando do gcc 0.9
  */
-
 int yylex(void)
 {
     register int c=0;
@@ -672,14 +664,11 @@ again:
                         if ( isxdigit (c) == 0 )
                         {
                             *p = 0;
-
                              ungetc ( c, finput );
-
-						   //fim.
+						   //fim
 						    value = TOKENCONSTANT;
 							//constant_type_found = //#todo tem que contar. 
 							constant_base_found = CONSTANT_BASE_HEX;
-                            
                             goto constant_done;
                         }
 
@@ -706,21 +695,18 @@ again:
 					//se não é digito.
                     if ( isdigit( c ) == 0 )
                     {
-						//fim.
+						//fim
 						*p = 0;
-							
 						ungetc(c, finput);
-							
 						value = TOKENCONSTANT;
 						//constant_type_found = //#todo tem que contar. 
 						constant_base_found = CONSTANT_BASE_DEC;
-                        
                         goto constant_done;
                     }
 
 					//coloca o digito.
                     *p++ = c;
-                }
+                };
             };
 
             constant_done:
@@ -779,7 +765,6 @@ again:
             *p++ = 0;
             value = TOKENSEPARATOR;
             break;
-
 
         //usadas em expressões matemáticas, 
         //#todo: não mudar isso.
@@ -860,13 +845,13 @@ again:
             }else if ((c == '-') && (c1 == '>')) {
                 value = POINTSAT; 
                 goto done; 
-            }
+            };
 
             ungetc (c1, finput);
 
             if ((c == '<') || (c == '>'))
                 value = ARITHCOMPARE;
-                else value = c;
+            else value = c;
                 goto done;
         };
 
@@ -884,11 +869,9 @@ done:
  * lexerInit:
  *     Inicializando o lexer.
  */
-
 static int __lexerInit(void)
 {
     register int i=0;
-
     //number_of_tokens = 0;
     //current_token = 0;
     //next_index = 0;
@@ -911,11 +894,8 @@ static int __lexerInit(void)
     };
 
     token_buffer = &real_token_buffer[0]; 
-
     sprintf ( real_token_buffer, "uninitialized-token-string" );
-
     //...
-
     return 0;
 }
 
@@ -945,7 +925,6 @@ int check_subseq ( int c, int a, int b )
 	return (b);
 };
 */
-
 
 void error(char *msg)
 {

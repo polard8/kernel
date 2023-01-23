@@ -23,9 +23,7 @@ char constant_before[2];
 //isso varia com a base
 char constant_aftes[2];
 
-
 int return_info[8];
-
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
 
@@ -86,7 +84,6 @@ static void emit_function(void)
     strcat (TEXT,":\n");
 }
 
-
 // Parse function.
 static int parse_function(int token)
 {
@@ -111,11 +108,8 @@ static int parse_function(int token)
         id[ID_TOKEN] = TOKENIDENTIFIER;
         id[ID_STACK_OFFSET] = stack_index;
 
-//#ifdef PARSER_FUNCTION_VERBOSE
-	//	printf ("parse_function: TOKENIDENTIFIER={%s} in line %d\n", 
-	//	    real_token_buffer, lineno );
-//#endif
-
+	    //	printf ("parse_function: TOKENIDENTIFIER={%s} in line %d\n", 
+	    //	    real_token_buffer, lineno );
     }
 
     while (running)
@@ -133,12 +127,8 @@ static int parse_function(int token)
                     case TOKENSEPARATOR:
                         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
-
-//#ifdef PARSER_FUNCTION_VERBOSE
-	//					    printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
-	//						    real_token_buffer, lineno ); 
-//#endif
-
+                            // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+	                        //     real_token_buffer, lineno );
                             State=2;
                         }
                         break;
@@ -159,14 +149,10 @@ static int parse_function(int token)
                 {
                     // ')'
                     case TOKENSEPARATOR:
-                        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+                        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0 )
                         {
-
-//#ifdef PARSER_FUNCTION_VERBOSE
-	//					    printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
-	//						    real_token_buffer, lineno ); 
-//#endif
-
+	                        // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+	                        //    real_token_buffer, lineno ); 
                             State=3;
                         }
                         break;
@@ -193,14 +179,10 @@ static int parse_function(int token)
                     // ';'
                     // Terminamos o statement function.
                     case TOKENSEPARATOR:
-                        if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+                        if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
                         {
-
-//#ifdef PARSER_FUNCTION_VERBOSE
-	//					    printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
-	//						    real_token_buffer, lineno ); 
-//#endif
-
+	                        // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+	                        //     real_token_buffer, lineno ); 
                             return (int) TOKENSEPARATOR;
                         }
                         break;
@@ -273,7 +255,7 @@ static int parse_asm(int token)
     }
     if (c == TOKENSTRING)
     {
-        //if ( strncmp( (char *) real_token_buffer, "\"", 1 ) == 0  )
+        //if ( strncmp( (char *) real_token_buffer, "\"", 1 ) == 0 )
         //{
             //ok
             //inside = 1;
@@ -287,12 +269,12 @@ static int parse_asm(int token)
         c = yylex();
 
         //)
-        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0 )
         {
             inside = 0;
             c = yylex();
             // ;
-            if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+            if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
             {
                 // ok
                 return (int) c;
@@ -537,7 +519,7 @@ static int parse_return(int token)
 
 // O ultimo token em um return statement foi ';'
 // vamos conferir
-    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
     {
         printf("parse_return: ';' found\n");
         c = TOKENSEPARATOR;
@@ -820,34 +802,16 @@ static unsigned long parse_sizeof(int token)
 				printf("parse_sizeof: State 2\n");
 				//#todo modifier 
 				//if ...
-			    if ( c == TOKENTYPE )
+			    if (c == TOKENTYPE)
 				{
 					switch (type_found)
 					{
-						case TNULL:
-						    Result = sizeof(0);
-						    break;
-							
-						case TINT:
-						    Result = sizeof(int);
-							break;
-
-						case TVOID:
-						    Result = sizeof(void);
-						    break;
-
-						case TCHAR:
-						    Result = sizeof(char);
-						    break;
-
-						case TSHORT:
-						    Result = sizeof(short);
-						    break;
-							
-						case TLONG:
-						    Result = sizeof(long);
-                            break;
-
+						case TNULL:  Result = sizeof(0);      break;
+                        case TVOID:  Result = sizeof(void);   break;
+						case TCHAR:  Result = sizeof(char);   break;  //1
+						case TSHORT: Result = sizeof(short);  break;  //2
+                        case TINT:   Result = sizeof(int);    break;  //4
+						case TLONG:  Result = sizeof(long);   break;  //8
                         default:
                             printf("parse_sizeof: State 2 unexpected type found in line %d\n", 
                                 lineno);
@@ -855,7 +819,7 @@ static unsigned long parse_sizeof(int token)
                     }
                     State=3;
                     break;
-                };
+                }
 
                 printf("parse_sizeof: #TODO State 2 unexpected element on sizeof in line %d\n", 
                     lineno);
@@ -2199,10 +2163,8 @@ parse_exit:
 static int __parserInit(void)
 {
     register int i=0;
-
     //infile_size = 0;
     //outfile_size = 0;
-
 // Stack support
     stack_flag = 0;
     stack_count = 0;

@@ -1,12 +1,11 @@
 
 // debug.c
+// See: gramado/debug.h
 
 #include <kernel.h>
 
-
 // private
 static int __using_serial_debug = FALSE;
-
 
 //
 // Private functions: Prototypes.
@@ -14,7 +13,6 @@ static int __using_serial_debug = FALSE;
 
 static int __debug_check_inicialization(void);
 static int __debug_check_drivers(void);
-
 
 // ==============================
 
@@ -29,10 +27,7 @@ static int __debug_check_inicialization (void)
 {
     int Status = TRUE;
 
-//
 // Check phase
-//
-
     if (Initialization.current_phase != 3){
        Status = FALSE;
        printf ("__debug_check_inicialization: Initialization phase = {%d}\n",
@@ -136,31 +131,34 @@ void disable_serial_debug(void)
     __using_serial_debug = FALSE;
 }
 
-void debug_print ( char *data )
+
+void debug_print(char *data)
 {
+// Verbose via serial.
+
+    unsigned int SeriaPortIndex = COM1_PORT;
     register int i=0;
 
-// Are we using this debug method 
-// at this moment or not?
-
+// Are we using this debug method at this moment or not?
     int using_serial_debug = (int) is_using_serial_debug();
-
-    if ( using_serial_debug == FALSE ){
+    if (using_serial_debug == FALSE){
         return;
     }
 
 // Is it fully initialized?
-
-    if( Initialization.serial_log != TRUE ){
+    if (Initialization.serial_log != TRUE){
         return;
     }
 
+// Parameter validation
     if ( (void *) data == NULL ){ return; }
     if (*data == 0)             { return; }
 
+// Print string in a given serial port.
+// See: serial.c
     for ( i=0; data[i] != '\0'; i++ )
     {
-        serial_write_char ( COM1_PORT, data[i] );
+        serial_write_char( SeriaPortIndex, data[i] );
     };
 }
 
@@ -169,16 +167,19 @@ void debug_print ( char *data )
 // the main kernel initialization progress.
 // It will print into the serial port for now.
 
-void PROGRESS( char *string )
+void PROGRESS(char *string)
 {
-    if( Initialization.serial_log != TRUE )
-        return;
+// Verbose via serial.
 
-    if( (void*) string == NULL ){
+    if (Initialization.serial_log != TRUE){
         return;
     }
 
-    if(*string == 0){
+// Parameter validation
+    if ( (void*) string == NULL ){
+        return;
+    }
+    if (*string == 0){
         return;
     }
 

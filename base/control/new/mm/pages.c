@@ -1713,14 +1713,16 @@ static void __initialize_pagedpool(void)
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 }
 
-
+// #todo:
+// Explain it better.
+// This code manages the extraheaps 2 and 3,
+// creating buffers that are gonna be used by a slab allocator
+// called slab_1MB_allocator().
 static void __initialize_pagedpool2(void)
 {
     NewPagedPool.initialized = FALSE;
 
-    if ( g_extraheap2_va == 0 ||
-         g_extraheap3_va == 0 )
-    {
+    if ( g_extraheap2_va == 0 || g_extraheap3_va == 0 ){
         panic("__initialize_pagedpool2: address\n");
     }
 
@@ -1748,7 +1750,7 @@ static void __initialize_pagedpool2(void)
 }
 
 
-//global
+// global
 // Used by alloc_memory_for_image_and_stack() in process.c
 void *slab_1MB_allocator(void)
 {

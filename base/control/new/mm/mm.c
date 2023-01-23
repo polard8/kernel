@@ -9,6 +9,16 @@
 
 #include <kernel.h>
 
+// Kernel Heap support.
+unsigned long heapCount=0;          // Conta os heaps do sistema
+unsigned long kernel_heap_start=0;  // Start
+unsigned long kernel_heap_end=0;    // End
+unsigned long g_heap_pointer=0;     // Pointer
+unsigned long g_available_heap=0;   // Available
+
+unsigned long heapList[HEAP_COUNT_MAX];  
+
+
 // --------------------------------
 struct kernel_heap_d 
 {
@@ -286,24 +296,23 @@ fail:
     //return (int) -1;
 }
 
-
 int kernel_gc (void)
 {
+    panic ("kernel_gc: Unimplemented\n");
     return -1;
 }
 
-
-struct heap_d *memory_create_new_head ( 
+struct heap_d *memory_create_new_heap ( 
     unsigned long start_va, 
     unsigned long size )
 {
-     return NULL;  //#todo
+    panic ("memory_create_new_heap: Unimplemented\n");
+    return NULL;
 }
-
 
 void memory_destroy_heap (struct heap_d *heap)
 {
-    // #todo
+    panic ("memory_destroy_heap: Unimplemented\n");
 }
 
 
@@ -484,6 +493,8 @@ fail:
 
 unsigned long heapAllocateMemory (unsigned long size)
 {
+// This is a worker for kmalloc/__kmalloc_impl in kstdlib.c
+
     struct mmblock_d *Current;
 
     //pid_t current_process = (pid_t) get_current_process();
@@ -498,32 +509,21 @@ unsigned long heapAllocateMemory (unsigned long size)
 // Uma opção seria tentar almentar o heap, se isso for possível.
 
 // Available heap.
+// #todo: 
+// Tentar crescer o heap para atender o size requisitado.
+//try_grow_heap() ...
+// #todo: 
+// Aqui poderia parar o sistema e mostrar essa mensagem.
 
-    if (g_available_heap == 0)
-    {
-        // #todo: 
-        // Tentar crescer o heap para atender o size requisitado.
-        //try_grow_heap() ...
-        // #todo: 
-        // Aqui poderia parar o sistema e mostrar essa mensagem.
-        debug_print ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
-        printf ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
+    if (g_available_heap == 0){
+        debug_print ("heapAllocateMemory: g_available_heap={0}\n");
+        printf      ("heapAllocateMemory: g_available_heap={0}\n");
         goto fail;
     }
 
-// Size limits. (Min, max).
-// Se o tamanho desejado for igual a zero.
-// @todo: Aqui podemos converter o size para o tamanho mínimo.
-// não há problema nisso.
-
-    if (size == 0)
-    {
-        //size = 1;
-        debug_print("heapAllocateMemory: [FAIL] size={0}\n");
-        printf("heapAllocateMemory: [FAIL] size={0}\n");
-        refresh_screen();
-        //?? NULL seria o retorno para esse caso ??
-        return (unsigned long) g_heap_pointer;
+// Can't allocate 0 size.
+    if (size == 0){
+        size = 1;
     }
 
 // Se o tamanho desejado é maior ou 
@@ -750,14 +750,17 @@ fail:
 // Esse ponteiro indica o início da área alocada para uso.
 // Essa área fica logo após o header.
 // O tamanho do header é MMBLOCK_HEADER_SIZE.
-void FreeHeap (void *ptr)
+// A alocação de memória não é afetada por essa rotina,
+// ela continua do ponteiro onde parou.
+void heapFreeMemory(void *ptr)
 {
-    struct mmblock_d  *Header;
-    
+// This is a worker for kfree in kstdlib.c
+
+    struct mmblock_d *block_header;
 
 // validation
     if ( (void *) ptr == NULL ){
-        debug_print ("FreeHeap: [FAIL] ptr\n");
+        debug_print ("heapFreeMemory: ptr\n");
         return;
     }
 
@@ -765,7 +768,7 @@ void FreeHeap (void *ptr)
     if ( ptr < (void *) KERNEL_HEAP_START || 
          ptr >= (void *) KERNEL_HEAP_END )
     {
-        debug_print ("FreeHeap: [FAIL] ptr limits\n");
+        debug_print ("heapFreeMemory: ptr limits\n");
         return;
     }
 
@@ -775,59 +778,45 @@ void FreeHeap (void *ptr)
 
     unsigned long UserAreaStart = (unsigned long) ptr; 
 
-    Header = (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
+    block_header = 
+        (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
 
-    if ( (void *) Header == NULL ){
-        debug_print ("FreeHeap: [FAIL] Header\n");
+    if ( (void *) block_header == NULL ){
+        debug_print ("heapFreeMemory: block_header\n");
         return;
     }
-
-    if ( Header->Used != TRUE || 
-         Header->Magic != 1234 )
-    {
-        debug_print ("FreeHeap: [FAIL] Header validation\n");
+    if ( block_header->Used != TRUE || block_header->Magic != 1234 ){
+        debug_print ("heapFreeMemory: block_header validation\n");
         return;
     }
 
 // Apenas marcamos a estrutura como reusável,
 // pois agora ela esta no STOCK.
 
-    Header->Used = TRUE;   // still alive.
-    Header->Magic = 4321;  // reusable, stock
-    
-    // A alocação continua do ponteiro onde parou.
+    block_header->Used = TRUE;   // still alive.
+    block_header->Magic = 4321;  // reusable, stock
 }
 
-
-/*
- * get_process_heap_pointer:
- *     ?? Pega o 'heap pointer' do heap de um processo. ??
- */
-
-unsigned long get_process_heap_pointer (int pid)
+// get_process_heap_pointer:
+// ?? Pega o 'heap pointer' do heap de um processo. ??
+unsigned long get_process_heap_pointer (pid_t pid)
 {
-    struct process_d *P;
+    struct process_d *p;
     unsigned long heapLimit=0;
 
-// #todo: 
-// Limite máximo.
-
     if (pid < 0 || pid >= PROCESS_COUNT_MAX){
-        printf ("get_process_heap_pointer: pid fail\n");
+        printf ("get_process_heap_pointer: pid\n");
         goto fail;
     }
 
-// Process.
-
-    P = (void *) processList[pid];
-    if ( (void *) P == NULL ){
-        printf ("get_process_heap_pointer: struct fail\n");
+// Process
+    p = (void *) processList[pid];
+    if ( (void *) p == NULL ){
+        printf ("get_process_heap_pointer: p\n");
         goto fail;
     }
-
-// validation
-    if (P->used != TRUE || P->magic != 1234){
-        printf ("get_process_heap_pointer: struct validation\n");
+    if (p->used != TRUE || p->magic != 1234){
+        printf ("get_process_heap_pointer: p validation\n");
         goto fail;
     }
 
@@ -836,24 +825,19 @@ unsigned long get_process_heap_pointer (int pid)
 // É memória em ring3 compartilhada.
 // Mas tem processo em ring0. Onde fica o heap nesse caso?
 
-    heapLimit = (unsigned long) (P->HeapStart + P->HeapSize);
+    heapLimit = (unsigned long) (p->HeapStart + p->HeapSize);
 
-    if ( P->HeapPointer < P->HeapStart || 
-         P->HeapPointer >= heapLimit )
+    if ( p->HeapPointer < p->HeapStart || 
+         p->HeapPointer >= heapLimit )
     {
         printf ("get_process_heap_pointer: heapLimit\n");
         goto fail;
     }
 
-    //Retorna o heap pointer do processo. 
-    return (unsigned long) P->HeapPointer;
+// Retorna o heap pointer do processo. 
+    return (unsigned long) p->HeapPointer;
 
 fail:
-    //??
-    //refresh_screen();
     return (unsigned long) 0; 
 }
-
-
-
 

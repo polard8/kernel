@@ -123,9 +123,10 @@ static int serial_init_port(uint16_t port, uint16_t divisor)
 
 // #todo
 // Explain this routine.
+// See: tty/serial.h
 
 // Disable all interrupts
-    out8 (PortBase + 1, 0x00);  
+    out8 (PortBase + 1, 0x00);  // IER ?
 // Set baud rate.
 // Enable DLAB (set baud rate divisor)
     out8 (PortBase + LCR, 0x80);  
@@ -205,7 +206,6 @@ char serial_read_char(unsigned int port)
 
     return (char) in8(port);
 }
-
 
 // serial_write_char:
 void serial_write_char(unsigned int port, char data) 
