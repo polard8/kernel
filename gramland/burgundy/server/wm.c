@@ -50,7 +50,7 @@ static unsigned long last_input_jiffie=0;
 // global.
 // Permission:
 // TRUE = The kernel can use the handler.
-int g_handler_flag;
+int g_handler_flag=FALSE;
 
 // #todo
 // Input event
@@ -142,22 +142,36 @@ static void animate_window( struct gws_window_d *window );
 static void __Tile(void);
 static void run_selected_option(void);
 
+//
+// Keyboard
+//
+
 static unsigned long 
 on_keyboard_event(
     int msg,
     unsigned long long1,
     unsigned long long2 );
-static void on_mouse_event(int event_type, unsigned long x, unsigned long y);
+
+//
+// Mouse
+//
+
+static void 
+on_mouse_event(
+    int event_type, 
+    unsigned long x, 
+    unsigned long y );
+
 static void on_update_window(int event_type);
 static void on_mouse_pressed(void);
 static void on_mouse_released(void);
+void __probe_tb_button_hover(unsigned long long1, unsigned long long2);
+void __probe_window_hover(unsigned long long1, unsigned long long2);
+
 
 int control_action(int msg, unsigned long long1);
 
 static void __draw_button_mark_by_wid( int wid, int button_number );
-
-void __probe_tb_button_hover(unsigned long long1, unsigned long long2);
-void __probe_window_hover(unsigned long long1, unsigned long long2);
 
 // =====================================================
 
@@ -288,56 +302,34 @@ on_keyboard_event(
         return 0;
     }
 
-/*
-//  Chamando o procedimento de janela
-// para processar eventos de teclado.
-    Result = 
-        (unsigned long) wmProcedure(
-                            (struct gws_window_d *) window,
-                            (int) msg,
-                            (unsigned long) long1,
-                            (unsigned long) long2 ); 
-
-    return (unsigned long) Result;
-*/
 
 //================================
-
-    if( msg == GWS_KeyDown )
+    if (msg == GWS_KeyDown)
     {
-        // Imprime o char na janela indicada.
-        // Essa é a janela com foco de entrada.
-        //if( pre_print === TRUE)
-        //wm_draw_char_into_the_window(window,(int)long1,COLOR_RED);
+        // Print a char into the window with focus.
         wm_draw_char_into_the_window(
-            window,
-            (int) long1,
-            xCOLOR_GRAY1 );
-        // Enfileirar a mensagem na fila de mensagens
-        // da janela com foco de entrada.
-        // O cliente vai querer ler isso.
-        // Na verdade estamos colocando na janela indicada
-        // via argumento ... penso que o caller selecionou
-        // a janela com foco.
+            window, (int) long1, xCOLOR_GRAY1 );
+        // Enqueue a message into the queue that belongs
+        // to the window with focus.
+        // The client application is gonna get this message.
         wmPostMessage(
             (struct gws_window_d *) window,
             (int) msg,
             (unsigned long) long1,
             (unsigned long) long2);
-
         return 0;
     }
 
 //================================
-
-    if( msg == GWS_KeyUp )
+    if (msg == GWS_KeyUp)
     {
+        // Nothing for now.
     }
 
 //================================
-    if( msg == GWS_SysKeyDown )
+    if (msg == GWS_SysKeyDown)
     {
-        if(long1 == VK_F1){
+        if (long1 == VK_F1){
             // ja esta rodando.
             if(tb_buttons_status[0] == TRUE)
                 return 0;
@@ -345,7 +337,7 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[0],TRUE);
             return 0;
         }
-        if(long1 == VK_F2){
+        if (long1 == VK_F2){
             // ja esta rodando.
             if(tb_buttons_status[1] == TRUE)
                 return 0;
@@ -353,7 +345,7 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[1],TRUE);
             return 0;
         }
-        if(long1 == VK_F3){
+        if (long1 == VK_F3){
             // ja esta rodando.
             if(tb_buttons_status[2] == TRUE)
                 return 0;
@@ -361,7 +353,7 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[2],TRUE);
             return 0;
         }
-        if(long1 == VK_F4){
+        if (long1 == VK_F4){
             // ja esta rodando.
             if(tb_buttons_status[3] == TRUE)
                 return 0;
@@ -370,6 +362,7 @@ on_keyboard_event(
             return 0;
         }
         
+        // #todo: Explain it better.
         if (long1 == VK_F9 || 
             long1 == VK_F10 || 
             long1 == VK_F11)
@@ -392,10 +385,9 @@ on_keyboard_event(
     }
 
 //================================
-    if( msg == GWS_SysKeyUp )
+    if (msg == GWS_SysKeyUp)
     {
-   
-        if(long1 == VK_F1){
+        if (long1 == VK_F1){
             // ja esta rodando.
             if(tb_buttons_status[0] == TRUE)
                 return 0;
@@ -407,7 +399,7 @@ on_keyboard_event(
             tb_buttons_status[0] = TRUE;
             return 0;
         }
-        if(long1 == VK_F2){
+        if (long1 == VK_F2){
             // ja esta rodando.
             if(tb_buttons_status[1] == TRUE)
                 return 0;
@@ -420,7 +412,7 @@ on_keyboard_event(
             tb_buttons_status[1] = TRUE;
             return 0;
         }
-        if(long1 == VK_F3){
+        if (long1 == VK_F3){
             // ja esta rodando.
             if(tb_buttons_status[2] == TRUE)
                 return 0;
@@ -432,7 +424,7 @@ on_keyboard_event(
             tb_buttons_status[2] = TRUE;
             return 0;
         }
-        if(long1 == VK_F4){
+        if (long1 == VK_F4){
             // ja esta rodando.
             if(tb_buttons_status[3] == TRUE)
                 return 0;
@@ -465,7 +457,7 @@ on_keyboard_event(
         }
 
         //=====
-        if(long1==VK_F6){
+        if (long1==VK_F6){
             // Enter fullscreen mode.
             if (WindowManager.is_fullscreen != TRUE)
             {
@@ -485,6 +477,7 @@ on_keyboard_event(
             return 0;
         }
         
+        // #todo: Explai it better.
         if (long1 == VK_F9 || 
             long1 == VK_F10 || 
             long1 == VK_F11)
@@ -493,8 +486,12 @@ on_keyboard_event(
             return 0;
         }
         
+        // Nothing?
+        
         return 0;
     }
+
+// Not a valid msg
 
     return 0;
 }
@@ -511,14 +508,9 @@ on_mouse_event(
     unsigned long y )
 {
 
-// #bugbug
-// Estamos considerando apenas os eventos que acontecem 
-// dentro da janela com foco de entrada.
-// Na verdade a janela com foco de entrada se refere a
-// foco de entrada de input de teclado.
-// #test
-// Isso muda o input pointer no caso de 'mouse released'
-// dentro de janela do tipo 'edit box' e a janela estiver com foco.
+// Quando movemos o mouse, então atualizamos o ponteiro que indica
+// a janela mouse_hover. Esse ponteiro será usado para os eventos
+// de botão de mouse.
 
 // Window with focus.
     struct gws_window_d *w;
@@ -572,16 +564,14 @@ on_mouse_event(
 
 // Pressed:
 // Process but do not send message for now.
-    if (event_type == GWS_MousePressed)
-    {
+    if (event_type == GWS_MousePressed){
         on_mouse_pressed();
         return;
     }
 
 // Release:
 // Process and send message.
-    if (event_type == GWS_MouseReleased)
-    {
+    if (event_type == GWS_MouseReleased){
         on_mouse_released();
         goto send_message;
     }
@@ -599,28 +589,20 @@ not_valid:
 
 send_message:
 
-// Enviando a mensagem pra qualquer tipo de janela com o foco de teclado
-// não importa o tipo.
-// A janela precisa ser válida.
-// # Por enquanto somente mensagem to tipo 'release button'.
+// Enviamos o evento para a janela mouse_hover.
+// O aplicativo vai ler, caso ela seja a janela com 
+// foco de entrada.
+// #bugbug:
+// Na verdade o aplicativo precisa ler o evento que chega pra ele
+// e o evento conterá o id da janela em questão.
 
-    printf("send_message:\n");
+    // #debug
+    // printf("send_message:\n");
 
-// Window with focus
-// Keyboard owner
+// Get mouse hover
 
-
-// Isso atualiza a janela mousehover,
-// que é a janela que o mouse esta passando por cima
-// mas somente para alguns tipos ainda.
-// #todo: isso deve ser chamado no evento 'move'
-    //__probe_window_hover(x,y);
-
-// #todo: get mouse hover
-
-    //w = (struct gws_window_d *) get_focus();
-    w = (struct gws_window_d *) mouse_hover;
-
+    //w = (struct gws_window_d *) mouse_hover;
+    w = (struct gws_window_d *) get_mousehover();
     if ( (void*) w==NULL ){
         printf("on_mouse_event: w\n");
         return;
@@ -645,15 +627,15 @@ send_message:
          saved_y >= w->top &&
          saved_y <= w->bottom )
     {
-
-        printf("Inside mouse hover window :)\n");
+        // #debug
+        // printf("Inside mouse hover window :)\n");
     
         // Values inside the window.
         in_x = (unsigned long) (saved_x - w->left);
         in_y = (unsigned long) (saved_y - w->top);
 
         // Change the input pointer
-        // inside the window with focus.
+        // inside the window editbox.
         if ( w->type == WT_EDITBOX || 
              w->type == WT_EDITBOX_MULTIPLE_LINES)
         {
@@ -668,25 +650,31 @@ send_message:
                     w->ip_y = (int) (in_y/8);
                 }
                 
-                //#test
-                //We already have the focus
-                //set_focus(w);
+                // Se essa editbox não é a keyboard owner,
+                // então ela passa a ser.
+                if ( w != keyboard_owner )
+                {
+                    // #todo:
+                    // Nessa função podemos mudar algumas características da janela
+                    // antes de repintarmos.
+                    set_focus(w);
+                }
             }
         }
 
 // data
         w->single_event.wid   = (int) w->id;
         w->single_event.msg   = (int) event_type;
-        w->single_event.long1 = (unsigned long) in_x;  //x - w->left;
-        w->single_event.long2 = (unsigned long) in_y;  //y - w->top;
+        w->single_event.long1 = (unsigned long) in_x;
+        w->single_event.long2 = (unsigned long) in_y;
         w->single_event.has_event = TRUE;
 
         // ---------------
         Tail = (int) w->ev_tail;
         w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
         w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
-        w->ev_long1[Tail] = (unsigned long) in_x;  //x - w->left; 
-        w->ev_long2[Tail] = (unsigned long) in_y;  //y - w->top;
+        w->ev_long1[Tail] = (unsigned long) in_x;
+        w->ev_long2[Tail] = (unsigned long) in_y;
         w->ev_tail++;
         if (w->ev_tail>=32){
             w->ev_tail=0;
@@ -695,7 +683,9 @@ send_message:
         return;
     }
  
-    printf("Outside mouse hover window\n");
+    // #debug
+    // printf("Outside mouse hover window\n");
+
 
 //fail
     w->single_event.has_event = FALSE;
@@ -2857,6 +2847,15 @@ void wm_update_desktop(int tile)
     invalidate_window(__root_window);
 }
 
+
+/*
+//#todo
+struct gws_window_d *get_active(void);
+struct gws_window_d *get_active(void)
+{
+}
+*/
+
 // Set focus on a window.
 // This is the window that owns the keyboard input.
 // Change the foreground thread.
@@ -2865,10 +2864,10 @@ void wm_update_desktop(int tile)
 void set_focus(struct gws_window_d *window)
 {
 // A janela que ja tinha o foco de entrada.
-    struct gws_window_d *wOld;
+    //struct gws_window_d *wOld;
     int ClientTID = -1;
 
-    if( (void*) window == NULL ){
+    if ( (void*) window == NULL ){
         return;
     }
     if ( window->used != TRUE ) { return; }
@@ -2890,7 +2889,6 @@ void set_focus(struct gws_window_d *window)
             }
         }
     }
-
 
 // #todo
 // Pegar a antiga janela com o foco de entra.
@@ -2924,15 +2922,6 @@ void set_focus(struct gws_window_d *window)
     sc82 ( 10011, ClientTID, ClientTID, ClientTID );
 }
 
-
-/*
-//#todo
-struct gws_window_d *get_active(void);
-struct gws_window_d *get_active(void)
-{
-}
-*/
-
 // Pega o ponteiro da janela com foco de entrada.
 struct gws_window_d *get_focus(void)
 {
@@ -2947,6 +2936,36 @@ struct gws_window_d *get_focus(void)
 
     return (struct gws_window_d *) w; 
 }
+
+
+// O mouse está sobre essa janela.
+void set_mouseover(struct gws_window_d *window)
+{
+    if ( (void*) window == NULL ){
+        return;
+    }
+    if (window->used != TRUE) { return; }
+    if (window->magic != 1234){ return; }
+
+// O mouse está sobre essa janela.
+    mouse_hover = (void*) window;
+}
+
+// Pega o ponteiro da janela que o mouse esta sobre ela.
+struct gws_window_d *get_mousehover(void)
+{
+    struct gws_window_d *w;
+
+    w = (struct gws_window_d *) mouse_hover;
+    if ( (void*)w==NULL ){
+        return NULL;
+    }
+    if (w->used!=TRUE) { return NULL; }
+    if (w->magic!=1234){ return NULL; }
+
+    return (struct gws_window_d *) w; 
+}
+
 
 void set_status_by_id( int wid, int status )
 {
@@ -2968,7 +2987,7 @@ void set_status_by_id( int wid, int status )
     if (w->magic != 1234){ return; }
 
 // Set status
-    w->status = status;
+    w->status = (int) status;
 }
 
 void set_focus_by_id(int wid)
@@ -3194,9 +3213,11 @@ wm_draw_char_into_the_window(
     int ch,
     unsigned int color )
 {
+// We are painting only on 'editbox'.
+
 // draw char support.
     unsigned char _string[4];
-// Vamos checar se e' um controle ou outro tipo de char.
+// Vamos checar se é um controle ou outro tipo de char.
     unsigned char ascii = (unsigned char) ch;
     int is_control=FALSE;
 
@@ -3288,11 +3309,10 @@ wm_draw_char_into_the_window(
 // https://en.wikipedia.org/wiki/Control_character
 // https://en.wikipedia.org/wiki/ASCII#Printable_characters
 
-    // Not printable
-    if (ascii < 0x20 || ascii >= 0x7F )
+    if (ascii < 0x20 || ascii >= 0x7F)
     {
         // Control char
-        if (ascii < 0x20 || ascii == 0x7F ){
+        if (ascii < 0x20 || ascii == 0x7F){
             is_control = TRUE;
         }
         return;
@@ -3355,22 +3375,22 @@ wm_draw_char_into_the_window(
             8 );
 
         // Increment pointer.
-        // Se for maior que a quantidade
-        // de bytes (chars?) na janela.
+        // Se for maior que a quantidade de bytes (chars?) na janela.
         window->ip_x++;
-        if(window->ip_x >= window->width_in_chars)
+        if (window->ip_x >= window->width_in_chars)
         {
             window->ip_x=0;
             if (window->type == WT_EDITBOX_MULTIPLE_LINES)
             {    
                 window->ip_y++;
-                
+                // Última linha?
                 //if( window->ip_y > window->height_in_chars)
                 //     fail!
             }
         }
     }
 }
+
 
 /*
 //local worker
@@ -3530,9 +3550,7 @@ void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
         return;
     }
 
-// No more hover window.
-// Não anule a hover ... continua a anterior.
-    //mouse_hover=NULL;
+// Walk
 
     for (i=0; i<max; i++){
 
@@ -3541,28 +3559,21 @@ void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
     // If this is a valid pointer.
     if ( (void*) w != NULL )
     {
-        // Paranoia
         if (w->magic == 1234)
         {
             // Is the pointer inside this window?
-            Status = is_within(
-                         (struct gws_window_d *) w, long1, long2 );
-            // Yes it is!
+            // Registra nova mouse_hover se estiver dentro.
+            Status = is_within( (struct gws_window_d *) w, long1, long2 );
             if (Status==TRUE)
             {
-                // Register the hover window.
+                // set_mouseover(w);
                 mouse_hover = (void*) w;
-                // #debug
-                // yellow_status("oops");
-                //rtl_reboot();
-                // ok, done.
                 return;
             }
         }
     }
     };
 }
-
 
 // local
 // Se o mouse esta passando sobre alguma janela
@@ -3586,42 +3597,31 @@ void __probe_window_hover(unsigned long long1, unsigned long long2)
 
     //printf("long1=%d long2=%d\n",long1, long2);
 
-// No more hover window.
-// Não anule a hover ... continua a anterior.
-//    mouse_hover=NULL;
+// Walk
 
     for (i=0; i<max; i++){
 
     // Get a pointer for a window.
-    //w = (struct gws_window_d *) tb_windows[i];
     w = (struct gws_window_d *) windowList[i];
-
     // If this is a valid pointer.
     if ( (void*) w != NULL )
     {
-        // Paranoia
         if (w->magic == 1234)
         {
             if ( w->type == WT_EDITBOX_SINGLE_LINE ||
                  w->type == WT_EDITBOX_MULTIPLE_LINES )
             {
-                //printf ("Encontrada\n");
                 // Is the pointer inside this window?
-                Status = is_within(
-                             (struct gws_window_d *) w, long1, long2 );
-                // Yes it is!
+                // Registra nova mouse_hover se estiver dentro.
+                Status = is_within( (struct gws_window_d *) w, long1, long2 );
                 if (Status==TRUE)
                 {
-                    // Register the hover window.
+                    // set_mouseover(w);
                     mouse_hover = (void*) w;
-                    // #debug
-                    // yellow_status("oops");
-                    //rtl_reboot();
-                    // ok, done.
-                    
-                    //printf ("Dentro\n");
                     return;
                 }
+
+                //#debug
                 //printf ("Fora\n");
                 //printf("x=%d y=%d | w->l=%d w->t=%d \n",
                 //    long1, long2,
@@ -3633,12 +3633,10 @@ void __probe_window_hover(unsigned long long1, unsigned long long2)
     //printf ("Not Found\n");
 }
 
-
 // Talvez precisaremos de mais parametros.
 // The keyboard input messages will affect
 // the window with focus.
 // For the mouse input, the window has a NULL pointer.
-
 static unsigned long 
 wmProcedure(
     struct gws_window_d *window,
@@ -3741,7 +3739,7 @@ wmProcedure(
 
 
 // #todo
-// Esse procedimento não gerencia mais os eventos de mouse.
+// Esse procedimento não gerencia mais esses eventos de mouse.
 // see: on_mouse_event(...)
 
     //case GWS_MouseMove:
@@ -3751,219 +3749,23 @@ wmProcedure(
     //case GWS_MouseReleased:
     //    break;
 
-// #bugbug
-// Quando imprimir na tela e quando enviar para o cliente?
-// Uma flag deve indicar se o sistema deve ou nao imprimir 
-// previamente o char.
-// Caixas de edição podem deixar todo o trabalho
-// de teclas de digitação para o sistema, liberando o aplicativo
-// desse tipo de tarefa. Mas editores de texto querem 
-// processar cada tecla digitada.
+// #todo
+// Esse procedimento não gerencia mais esses eventos de teclado
+// see: on_keyboars_event(...)
 
-    case GWS_KeyDown:
-        /*
-        // Imprime o char na janela indicada.
-        // Essa é a janela com foco de entrada.
-        //if( pre_print === TRUE)
-        //wm_draw_char_into_the_window(window,(int)long1,COLOR_RED);
-        wm_draw_char_into_the_window(
-            window,
-            (int) long1,
-            xCOLOR_GRAY1 );
-        // Enfileirar a mensagem na fila de mensagens
-        // da janela com foco de entrada.
-        // O cliente vai querer ler isso.
-        // Na verdade estamos colocando na janela indicada
-        // via argumento ... penso que o caller selecionou
-        // a janela com foco.
-        wmPostMessage(
-            (struct gws_window_d *) window,
-            (int) msg,
-            (unsigned long) long1,
-            (unsigned long) long2);
-
-        return 0;
-        */
-        break;
-    
+    //case GWS_KeyDown:
+    //    break;
     //case GWS_KeyUp:
-        //break;
+    //    break;
+    //case GWS_SysKeyDown:
+    //    break;
+    //case GWS_SysKeyUp:
+    //    break;
 
-    case GWS_SysKeyDown:
-    
-        /*
-        if(long1 == VK_F1){
-            // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[0],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[0],TRUE);
-            return 0;
-        }
-        if(long1 == VK_F2){
-            // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[1],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[1],TRUE);
-            return 0;
-        }
-        if(long1 == VK_F3){
-            // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[2],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[2],TRUE);
-            return 0;
-        }
-        if(long1 == VK_F4){
-            // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
-            set_status_by_id(tb_buttons[3],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[3],TRUE);
-            return 0;
-        }
-        
-        if (long1 == VK_F9 || 
-            long1 == VK_F10 || 
-            long1 == VK_F11)
-        {
-            control_action(msg,long1);
-            return 0;
-        }
-
-        //printf("wmProcedure: [?] GWS_SysKeyDown\n");
-        // Enfileirar a mensagem na fila de mensagens
-        // da janela com foco de entrada.
-        // O cliente vai querer ler isso.
-        wmPostMessage(
-            (struct gws_window_d *) window,
-            (int)msg,
-            (unsigned long)long1,
-            (unsigned long)long2);
-        //wm_update_desktop(TRUE); // 
-        return 0;
-        
-        */
-        break;
-
-    case GWS_SysKeyUp:
-    
-        /*
-    
-        if(long1 == VK_F1){
-            // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[0], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[0],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app1_string);
-            tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[0] = TRUE;
-            return 0;
-        }
-        if(long1 == VK_F2){
-            // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[1], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[1],TRUE);
-            //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app2_string);
-            tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[1] = TRUE;
-            return 0;
-        }
-        if(long1 == VK_F3){
-            // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[2], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[2],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app3_string);
-            tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[2] = TRUE;
-            return 0;
-        }
-        if(long1 == VK_F4){
-            // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
-            set_status_by_id( tb_buttons[3], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[3],TRUE);
-            memset(name_buffer,0,64-1);
-            strcpy(name_buffer,app4_string);
-            tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[3] = TRUE;
-            // #test: ps2 full initialization.
-            // sc80(350,1,1,1);
-            // gUseMouse = TRUE;
-            return 0;
-        }
-
-        // update desktop
-        if (long1 == VK_F5)
-        {
-            set_status_by_id(tb_buttons[0],BS_RELEASED);
-            set_status_by_id(tb_buttons[1],BS_RELEASED);
-            set_status_by_id(tb_buttons[2],BS_RELEASED);
-            set_status_by_id(tb_buttons[3],BS_RELEASED);
-            WindowManager.is_fullscreen = FALSE;
-            
-            //set_input_status(FALSE);
-            wm_update_desktop(TRUE);
-            //set_input_status(TRUE);
-            
-            return 0;
-        }
-
-        //=====
-        if(long1==VK_F6){
-            // Enter fullscreen mode.
-            if (WindowManager.is_fullscreen != TRUE)
-            {
-                //set_input_status(FALSE);
-                wm_enter_fullscreen_mode();
-                //set_input_status(TRUE);
-                return 0;
-            }
-            // Exit fullscreen mode.
-            if (WindowManager.is_fullscreen == TRUE)
-            {
-                //set_input_status(FALSE);
-                wm_exit_fullscreen_mode(TRUE);
-                //set_input_status(TRUE);
-                return 0;
-            }
-            return 0;
-        }
-        
-        if (long1 == VK_F9 || 
-            long1 == VK_F10 || 
-            long1 == VK_F11)
-        {
-            control_action(msg,long1);
-            return 0;
-        }
-        
-        return 0;
-        
-        */
-        
-        break;
 
     // 9090 - ( Shift + F12 )
     case GWS_SwitchFocus:
-        //printf("Switch "); fflush(stdout);
         __switch_focus();
-        //printf("wmProcedure: [?] GWS_SwitchFocus\n");
-        //next = window->next;
-        //window->focus = TRUE;
-        //redraw_window(window,1);
         return 0;
         break;
 
@@ -4981,13 +4783,14 @@ redraw_window (
                         {
                             if (window->titlebar->magic == 1234 )
                             {
+                                // #bugbug Isso funciona para a janela mãe apenas.
                                 if (window->active == TRUE)
                                 {
                                     window->titlebar->bg_color = COLOR_BLUE1;
                                     window->titlebar_color = COLOR_BLUE1;
                                     window->titlebar_ornament_color = xCOLOR_BLACK;
                                 }
-
+                                // #bugbug Isso funciona para a janela mãe apenas.
                                 if (window->active == FALSE)
                                 {
                                     window->titlebar->bg_color = COLOR_GRAY;

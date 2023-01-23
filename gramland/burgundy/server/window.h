@@ -577,9 +577,10 @@ struct gws_window_d
 // Características dessa janela..
 //
 
-    // Estado: (Full,Maximized,Minimized...)
+// Estado: (Full,Maximized,Minimized...)
     int view; 
 
+// ?
     int status;
 
 //
@@ -1165,6 +1166,14 @@ void set_focus(struct gws_window_d *window);
 struct gws_window_d *get_focus(void);
 void __switch_focus(void);
 void set_focus_by_id( int wid );
+
+//
+// Mouse hover
+//
+
+void set_mouseover(struct gws_window_d *window);
+struct gws_window_d *get_mousehover(void);
+
 
 // transparence
 void gws_enable_transparence(void);
