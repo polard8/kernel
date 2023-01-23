@@ -9,6 +9,8 @@
 
 #include <kernel.h>
 
+
+// --------------------------------
 // Kernel Heap support.
 unsigned long heapCount=0;          // Conta os heaps do sistema
 unsigned long kernel_heap_start=0;  // Start
@@ -17,6 +19,53 @@ unsigned long g_heap_pointer=0;     // Pointer
 unsigned long g_available_heap=0;   // Available
 
 unsigned long heapList[HEAP_COUNT_MAX];  
+
+// --------------------------------
+unsigned long kernel_stack_end=0;       //va
+unsigned long kernel_stack_start=0;     //va
+unsigned long kernel_stack_start_pa=0;  //pa (endereço indicado na TSS).
+
+
+// For debug purpose.
+struct mmblock_d  *current_mmblock;
+
+
+// # Not used yet.
+unsigned long gPagedPollStart=0;
+unsigned long gPagedPollEnd=0;
+
+
+// ??
+// Número máximo de índices de framepool que 
+// serão usados nessa área de alocação de frames.
+// Uma certa quantidade de framepools serão usados
+// para alocação de frames para os processos. 
+// Durante a alocação sobre demanda, os frames usados 
+// virão dessa área de memória.
+int g_pageable_framepool_index_max=0;
+
+
+// frame pool atual.
+int g_current_framepool=0;
+// O indice do framepool da user space para qualquer tamanho de memória.
+int g_user_space_framepool_index=0;
+// O máximo de framepools possíveis dado o tamanho da memória física.
+unsigned long g_framepool_max=0;
+
+
+unsigned long g_kernel_paged_memory=0;
+unsigned long g_kernel_nonpaged_memory=0;
+
+
+// Salva o tipo de sistema baseado no tamanho da memória.
+// see: x64mm.h
+int g_mm_system_type = stNull;
+
+
+// Frametable struct.
+// see: x64mm.h
+struct frame_table_d  FT;
+
 
 
 // --------------------------------
@@ -638,9 +687,21 @@ try_again:
 // 0=not free 1=FREE (*SUPER IMPORTANTE)
 
     Current->Header = (unsigned long) g_heap_pointer; 
-    Current->headerSize = (unsigned long) MMBLOCK_HEADER_SIZE; 
+
+// 128
+// Actually, Header size = 112+4 = 116
+// Canonical.
+    unsigned long HeaderSize = sizeof(struct mmblock_d); 
+    //Current->headerSize = 
+    //    (unsigned long) MMBLOCK_HEADER_SIZE;  //#deprecated 
+
+    Current->headerSize = (unsigned long) HeaderSize; 
+
     Current->Id = (unsigned long) mmblockCount; 
-    Current->Free = 0;  // not free
+
+// Not free!
+    Current->Free = 0;
+
     // ...
     Current->Used = TRUE;
     Current->Magic = 1234;
@@ -755,6 +816,7 @@ fail:
 void heapFreeMemory(void *ptr)
 {
 // This is a worker for kfree in kstdlib.c
+// #todo: We can clean up the user area.
 
     struct mmblock_d *block_header;
 
@@ -777,9 +839,12 @@ void heapFreeMemory(void *ptr)
 // O ponteiro passado é o endereço da área de cliente.
 
     unsigned long UserAreaStart = (unsigned long) ptr; 
+    unsigned long BlockSize = sizeof( struct mmblock_d );
 
+    //block_header = 
+    //    (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE ); //#deprecated
     block_header = 
-        (void *) ( UserAreaStart - MMBLOCK_HEADER_SIZE );
+        (void *) ( UserAreaStart - BlockSize );
 
     if ( (void *) block_header == NULL ){
         debug_print ("heapFreeMemory: block_header\n");
@@ -790,9 +855,11 @@ void heapFreeMemory(void *ptr)
         return;
     }
 
+// It's free now.
+    //block_header->Free = 1;
+
 // Apenas marcamos a estrutura como reusável,
 // pois agora ela esta no STOCK.
-
     block_header->Used = TRUE;   // still alive.
     block_header->Magic = 4321;  // reusable, stock
 }
