@@ -1,4 +1,5 @@
 
+#browser.bin
 #history:
 #2019 - Created by Fred Nora.
 #todo:

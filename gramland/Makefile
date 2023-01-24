@@ -28,7 +28,8 @@ all:
 	make -C beige/setup
 # attitude
 	make -C attitude/browser
-
+	make -C attitude/docv
+	
 clean-all:
 
 	-rm -f attitude/bin/*.BIN

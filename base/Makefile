@@ -232,7 +232,9 @@ exposed-tier:
 	-sudo cp ../gramland/beige/bin/EDITOR.BIN      control/disk/
 	-sudo cp ../gramland/beige/bin/FILEMAN.BIN     control/disk/
 	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/
+
 	-sudo cp ../gramland/attitude/bin/BROWSER.BIN  control/disk/
+	-sudo cp ../gramland/attitude/bin/DOCV.BIN  control/disk/
 
 # This is not part of the exposed-tier
 # But its a de facto external content.
