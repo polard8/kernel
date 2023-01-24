@@ -217,6 +217,7 @@ exposed-tier:
 # ::
 	$(Q) $(MAKE) -C exposed/wog/
 	-sudo cp exposed/wog/bin/N9.BIN    control/disk/
+	-sudo cp exposed/wog/bin/N10.BIN   control/disk/
 
 #========================================
 	@echo ":: Copying Window server and clients."

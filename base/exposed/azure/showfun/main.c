@@ -20,17 +20,20 @@ int main (int argc, char **argv)
 
     printf("showfun.bin:\n");
 
+    if (argc != 2){
+        printf("argc fail\n");
+        exit(1);
+    }
+
 // Open a file.
-
     fp = (FILE *) fopen(argv[1], "a+");
-
     if (fp == NULL){
-       printf("\nFile unable to open");
+       printf("\n");
+       printf("File unable to open\n");
        return -1;
     }else{
        printf("File Opened to display function names:\n");
     };
-
 
     while (TRUE){
 
@@ -59,12 +62,13 @@ int main (int argc, char **argv)
         }else{ break; }
     };
 
-    printf("done. Closing the file.");
+    printf("done. Closing the file");
     fflush(stdout);
     fclose(fp);
 
     return 0;
 }
+
 
 
 /* To check if it is a function */

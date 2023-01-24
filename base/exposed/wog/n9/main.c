@@ -1,4 +1,6 @@
 
+// 2023 - Created by Fred Nora.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -51,7 +53,6 @@ int n9_get_next(void)
     token=0;
 
     x1=getc(stdin);
-    //x2=getc(stdin);
 
     if (x1==' ' || x1=='\t' || x1=='\n')
     {
