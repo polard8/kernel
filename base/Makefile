@@ -207,11 +207,16 @@ exposed-tier:
 	#...
 
 #========================================
-# ::Build network server.
+# ::
 	$(Q) $(MAKE) -C exposed/indigo/ 
 # Copy to the target folder.
 	-sudo cp exposed/indigo/bin/GNSSRV.BIN  control/disk/
 	-sudo cp exposed/indigo/bin/GNS.BIN     control/disk/
+
+#========================================
+# ::
+	$(Q) $(MAKE) -C exposed/wog/
+	-sudo cp exposed/wog/bin/N9.BIN    control/disk/
 
 #========================================
 	@echo ":: Copying Window server and clients."

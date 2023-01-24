@@ -41,7 +41,8 @@ int loc;      // local variable offset
 int src;      // print source and assembly flag
 int debug;    // print executed instructions
 
-int line;     // current line number
+// Current line number.
+int line=0;
 
 
 // tokens and classes (operators last and in precedence order)
@@ -51,7 +52,6 @@ enum {
   Assign, Cond, Lor, Lan, Or, Xor, And, Eq, Ne, Lt, Gt, Le, Ge, Shl, Shr, Add, Sub, Mul, Div, Mod, Inc, Dec, Brak
 };
 
-
 // opcodes
 enum { 
     LEA, IMM, JMP, JSR, BZ, BNZ, ENT, ADJ, LEV, LI, LC, SI, SC, PSH,
@@ -59,88 +59,125 @@ enum {
     OPEN, RUN, READ, CLOS, PRTF, MALC, FREE, MSET, MCMP, EXIT 
 };
 
-
 // types
 enum { TYPE_CHAR, TYPE_INT, TYPE_PTR };
-
 
 // identifier offsets (since we can't create an ident struct)
 enum { Tk, Hash, Name, Class, Type, Val, HClass, HType, HVal, Idsz };
 
 
+// -------------------------------------
 static void expr(int lev);
 static void next(void);
 static void stmt(void);
-
 // -------------------------------------
 
 
-// next
-// Is it the lexer ?
+// Lexer.
 static void next(void)
 {
     char *pp;
 
-    while (tk = *p) {
-    
-    ++p;
-    
-    // \n
-    if (tk == '\n') {
+// Pega e enquanto for positivo.
+// Vamos compará-lo com o sobsequente.
+    while (tk = *p){
 
-      if (src) {
-        printf("%d: %.*s", line, p - lp, lp); 
-        lp = p;
-        while (le < e) {
-          
-          printf ( 
-              "%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
-              "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
-              "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5] );
-              
-          if (*le <= ADJ) printf(" %d\n", *++le); else printf("\n");
-        };
-      }
-      
-      ++line;
+    // O subsequente.
+    ++p;
+
+    // \n
+    // Next line
+    if (tk == '\n'){
+
+        if (src)
+        {
+            printf("%d: %.*s", line, p-lp, lp ); 
+            lp = p;
+            while (le<e)
+            {
+                printf ( 
+                    "%8.4s", &"LEA ,IMM ,JMP ,JSR ,BZ  ,BNZ ,ENT ,ADJ ,LEV ,LI  ,LC  ,SI  ,SC  ,PSH ,"
+                    "OR  ,XOR ,AND ,EQ  ,NE  ,LT  ,GT  ,LE  ,GE  ,SHL ,SHR ,ADD ,SUB ,MUL ,DIV ,MOD ,"
+                    "OPEN,RUN,READ,CLOS,PRTF,MALC,FREE,MSET,MCMP,EXIT,"[*++le * 5] );
+                if (*le <= ADJ)
+                    printf(" %d\n", *++le);
+                else
+                    printf("\n");
+            };
+        }
+
+        ++line;
     
     // #
+    // preprocessor
     }
-    else if (tk == '#') {
-      while (*p != 0 && *p != '\n') ++p;
+    else if (tk == '#'){
+
+        while (*p != 0 && *p != '\n')
+            ++p;
     
-
     // a-z A-Z _
+    // Building identifier
     }
-    else if ((tk >= 'a' && tk <= 'z') || (tk >= 'A' && tk <= 'Z') || tk == '_') {
+    else if ( (tk >= 'a' && tk <= 'z') || 
+              (tk >= 'A' && tk <= 'Z') || 
+              tk == '_' ){
 
-      pp = p - 1;
-      while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p >= '0' && *p <= '9') || *p == '_')
-          tk = tk * 147 + *p++;
-      tk = (tk << 6) + (p - pp);
-      id = sym;
-      while (id[Tk])
-      {
-          if ( tk == id[Hash] && !memcmp((char *)id[Name], pp, p - pp) )
-          {  tk = id[Tk]; return; }
-          
-          id = id + Idsz;
-      }
-      id[Name] = (int)pp;
-      id[Hash] = tk;
-      tk = id[Tk] = Id;
-      return;
+        pp = p-1;
+        while ( (*p >= 'a' && *p <= 'z') || 
+                (*p >= 'A' && *p <= 'Z') || 
+                (*p >= '0' && *p <= '9') || 
+                *p == '_' )
+        {
+            tk = tk * 147 + *p++;  //?
+        };
+
+        tk = (tk << 6) + (p - pp);
+        id = sym;
+        while (id[Tk])
+        {
+            if ( tk == id[Hash] && 
+                 !memcmp((char *)id[Name], pp, p-pp) )
+            {  
+                tk = id[Tk]; 
+                return;
+            }
+            id = id + Idsz;
+        };
+        id[Name] = (int) pp;
+        id[Hash] = tk;
+        // Anunciação.
+        // O que somos.
+        tk = id[Tk] = Id;
+        return;
 
     // 0-9
+    // Building a literal
     }
     else if (tk >= '0' && tk <= '9') {
 
-      if (ival = tk - '0') { while (*p >= '0' && *p <= '9') ival = ival * 10 + *p++ - '0'; }
-      else if (*p == 'x' || *p == 'X') {
-        while ((tk = *++p) && ((tk >= '0' && tk <= '9') || (tk >= 'a' && tk <= 'f') || (tk >= 'A' && tk <= 'F')))
-          ival = ival * 16 + (tk & 15) + (tk >= 'A' ? 9 : 0);
-      }
-      else { while (*p >= '0' && *p <= '7') ival = ival * 8 + *p++ - '0'; }
+        if (ival = tk - '0') { 
+            while (*p >= '0' && *p <= '9') 
+                ival = ival * 10 + *p++ - '0';  //? 
+        } else if (*p == 'x' || *p == 'X') {
+            
+            while ( (
+                        tk = *++p
+                    ) && 
+                    (
+                        (tk >= '0' && tk <= '9') || 
+                        (tk >= 'a' && tk <= 'f') || 
+                        (tk >= 'A' && tk <= 'F') 
+                    )
+                  )
+            {
+                ival = ival * 16 + (tk & 15) + (tk >= 'A' ? 9 : 0); 
+            }
+
+        } else { 
+            while (*p >= '0' && *p <= '7') 
+                ival = ival * 8 + *p++ - '0'; 
+        };
       tk = Num;
       return;
     
@@ -148,47 +185,158 @@ static void next(void)
     }
     else if (tk == '/') {
 
+        // Se o subsequente for um '/', então temos um comentário.
         if (*p == '/') {
-            ++p; while (*p != 0 && *p != '\n') ++p;
+            ++p; 
+            // Ignora alguns subsequentes.
+            while (*p != 0 && *p != '\n')
+                ++p;
+        // Divisão
         } else {
-            tk = Div; return;
-        }
-
+            tk = Div; 
+            return;
+        };
 
     // (')single  (")double 
     }
     else if (tk == '\'' || tk == '"') {
 
-      pp = data;
-      while (*p != 0 && *p != tk) {
-        if ((ival = *p++) == '\\') {
-          if ((ival = *p++) == 'n') ival = '\n';
-        }
-        if (tk == '"') *data++ = ival;
-      }
-      ++p;
-      if (tk == '"') ival = (int)pp; else tk = Num;
-      return;
-    
+        pp = data;
+        
+        while (*p != 0 && *p != tk) 
+        {
+            if ((ival = *p++) == '\\') 
+            {
+                if ((ival = *p++) == 'n') 
+                    ival = '\n';
+            }
+            
+            if (tk == '"') 
+                *data++ = ival;
+        };
+        
+        ++p;
+        
+        if (tk == '"') 
+            ival = (int) pp; 
+        else 
+            tk = Num;
+        
+        return;
 
     // = + - ! < > | & ^% * [ ? ~; { } ( ) ] , : 
+
     }
-    else if (tk == '=') { if (*p == '=') { ++p; tk = Eq; } else tk = Assign; return; }
-    else if (tk == '+') { if (*p == '+') { ++p; tk = Inc; } else tk = Add;   return; }
-    else if (tk == '-') { if (*p == '-') { ++p; tk = Dec; } else tk = Sub;   return; }
-    else if (tk == '!') { if (*p == '=') { ++p; tk = Ne; } return; }
-    else if (tk == '<') { if (*p == '=') { ++p; tk = Le; } else if (*p == '<') { ++p; tk = Shl; } else tk = Lt; return; }
-    else if (tk == '>') { if (*p == '=') { ++p; tk = Ge; } else if (*p == '>') { ++p; tk = Shr; } else tk = Gt; return; }
-    else if (tk == '|') { if (*p == '|') { ++p; tk = Lor; } else tk = Or;  return; }
-    else if (tk == '&') { if (*p == '&') { ++p; tk = Lan; } else tk = And; return; }
-    else if (tk == '^') { tk = Xor;  return; }
-    else if (tk == '%') { tk = Mod;  return; }
-    else if (tk == '*') { tk = Mul;  return; }
-    else if (tk == '[') { tk = Brak; return; }
-    else if (tk == '?') { tk = Cond; return; }
-    else if (tk == '~' || tk == ';' || tk == '{' || tk == '}' || tk == '(' || tk == ')' || tk == ']' || tk == ',' || tk == ':') return;
-  
-  }; //while
+    else if (tk == '=') { 
+        if (*p == '=') { ++p; tk = Eq;  } else tk = Assign; return; 
+    }
+    else if (tk == '+') { 
+        
+        // 2: mas se o subsequente for um '+', então é incremento.
+        if (*p == '+') { 
+            ++p; 
+            tk = Inc; 
+        // 1: é uma adição
+        } else { 
+            tk = Add; 
+            return; 
+        } 
+    }
+    else if (tk == '-') { 
+        if (*p == '-') { 
+            ++p; 
+            tk = Dec;    //decrement
+        } else { 
+            tk = Sub;   // subtração
+            return; 
+        } 
+    }
+    else if (tk == '!') { 
+        if (*p == '=') { 
+            ++p; 
+            tk = Ne;  //not equal  
+        } 
+        return; 
+    }
+    else if (tk == '<') { 
+        if (*p == '=') { 
+            ++p; 
+            tk = Le;  
+        } else if (*p == '<') { 
+            ++p; 
+            tk = 
+            Shl; 
+        } else { 
+            tk = Lt;  // menor 
+            return; 
+        } 
+    
+    }
+    else if (tk == '>') { 
+        
+        if (*p == '=') { 
+            ++p; 
+            tk = Ge;   // maior igual  
+        } else if (*p == '>') { 
+            ++p; 
+            tk = Shr; // shift right
+        } else { 
+            tk = Gt;    // maior
+            return; 
+        } 
+    
+    }
+    else if (tk == '|') { 
+        if (*p == '|') { 
+            ++p; 
+            tk = Lor;   //logic or
+        } else { 
+            tk = Or;  
+            return; 
+        }
+    }
+    else if (tk == '&') { 
+        if (*p == '&'){ 
+            ++p; 
+            tk = Lan;   //logic and
+        }else{ 
+            tk = And; 
+            return;
+        }
+    }
+    else if (tk == '^') { 
+        tk = Xor;  
+        return; 
+    }
+    else if (tk == '%') { 
+        tk = Mod;
+        return; 
+    }
+    else if (tk == '*') { 
+        tk = Mul;  
+        return; 
+    }
+    else if (tk == '[') { 
+        tk = Brak; 
+        return; 
+    }
+    else if (tk == '?') {
+        tk = Cond; 
+        return; 
+    }
+    else if ( tk == '~' || 
+              tk == ';' || 
+              tk == '{' || 
+              tk == '}' || 
+              tk == '(' || 
+              tk == ')' || 
+              tk == ']' || 
+              tk == ',' || 
+              tk == ':' ){
+        return;
+    };
+
+    };  //while
 }
 
 // expr
