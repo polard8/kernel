@@ -250,9 +250,7 @@ rtl_load_path (
 
 ssize_t rtl_console_beep(void);
 
-
-int rtl_clone_and_execute ( char *name );
-
+int rtl_clone_and_execute(char *name);
 int rtl_spawn_process( const char *path );
 
 // get current thread
