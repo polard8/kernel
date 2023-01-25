@@ -14,8 +14,7 @@ int __ws_registered = -1;
 void *__ws_desktop;
 
 // Our PID.
-int __ws_pid;
-
+int __ws_pid=0;
 
 /*
  * register_ws:

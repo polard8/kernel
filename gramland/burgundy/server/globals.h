@@ -7,8 +7,30 @@
 
 
 extern int gUseCallback;
-
 extern int gUseMouse;
+
+
+//
+// == buffer ===============================================
+//
+
+// This is the buffer used when we receive 
+// requests via socket.
+// see: globals.c
+#define MSG_BUFFER_SIZE  512
+extern char __buffer[MSG_BUFFER_SIZE];
+
+// Esses valores serão enviados como 
+// resposta ao serviço atual.
+// Eles são configurados pelo dialogo na hora da 
+// prestação do serviço.
+// No início desse array fica o header.
+// see: globals.c
+#define NEXTRESPONSE_BUFFER_SIZE  32
+extern unsigned long next_response[32];
+
+//----------------------------------------
+
 
 struct initialization_d
 {

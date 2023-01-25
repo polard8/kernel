@@ -1,41 +1,14 @@
-/*
- * File: gns.h     todo: change to gnssrv.h 
- */
 
 
-// rtl
-#include <types.h>
-#include <sys/types.h>
-#include <sys/cdefs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/socket.h>
+// gns.h
+// The GNS protocol
 
-// gnssrv
-#include <vk.h>
+#ifndef __GNS_H
+#define __GNS_H    1
 
-// rtl
-#include <net/if_arp.h>
-#include <netinet/udp.h>
-#include <netinet/tcp.h>
+// Version 1.0
+#define GNS_PROTOCOL  1
 
-// for sync
-#include <rtl/gramado.h>
-
-// gnssrv
-#include <wm.h>
-#include <connect.h>
-#include <packet.h>
-#include <decode.h>
-#include <client.h>
-
-
-
-
-
-
-
-
+#endif    
 
 

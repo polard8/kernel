@@ -1,11 +1,9 @@
-/*
- * File: main.c
- *    Main file for the Gramado Network Server.
- *    History:
- *        2020 - Created by Fred Nora.
- */
+// main.c
+// GNSSRV.BIN
+// Gramado Network Server
+// 2020 - Created by Fred Nora.
 
-#include <gns.h>
+#include <gnsint.h>
 
 static int __saved_sync_id = -1;
 
@@ -40,23 +38,6 @@ static int ____saved_server_fd = -1;
 static int ____saved_current_client_fd = -1;
 // Flag: Send or not a reoply.
 static int NoReply = FALSE;
-
-// Buffer for the messages.
-
-#define GNS_BUFFER_SIZE  512
-
-char __buffer[GNS_BUFFER_SIZE];
-
-// Buffer
-// This is the buffer ussed for the next response.
-// Marsheling ...
-// Esses valores serão enviados como
-// resposta ao serviço atual.
-// Eles são configurados pelo dialogo na hora da
-// prestação do serviço.
-// No início desse array fica o header.
-
-unsigned long next_response[32];
 
 //
 // == Prototypes =========================
@@ -98,7 +79,8 @@ gns_send_error_response (int fd, int code, char *error_message)
 
 static void dispatch(int fd)
 {
-    unsigned long *message_buffer = (unsigned long *) &__buffer[0];
+    unsigned long *message_buffer = 
+        (unsigned long *) &__buffer[0];
     int n_reads = 0;     // For requests.
     int n_writes = 0;    // For responses.
 
@@ -185,11 +167,14 @@ static void dispatch(int fd)
         return;
     }
 
+// ==============================================
+
 //
-// Send
+// Send reply!
 //
 
-    char *m = (char *) (&__buffer[0] + 128);
+    //char *m = (char *) (&__buffer[0] + 128);
+    char *m = (char *) (__buffer + 128);
     sprintf( m, "GRAMADO 501 Not Implemented");
     //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
     //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
@@ -201,10 +186,9 @@ static void dispatch(int fd)
     message_buffer[2] = next_response[2];         // Return value (long1)
     message_buffer[3] = next_response[3];         // Return value (long2)
 
-    // #todo:
-    // Talvez aqui possamos usar alguma função chamada post_message().
+// #todo:
+// Talvez aqui possamos usar alguma função chamada post_message().
 
-// =====================
 // Sending the reply.
 
     n_writes = (int) write ( fd, __buffer, sizeof(__buffer) );
@@ -221,13 +205,13 @@ static void dispatch(int fd)
     message_buffer[2] = 0;
     message_buffer[3] = 0;
 
-// Cleaning
+// Cleaning the buffer for the response.
     register int c=0;
-    for(c=0; c<32; c++){
+    for (c=0; c<32; c++){
         next_response[c] = 0;
     };
 
-// set response
+// Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 }
 
@@ -301,7 +285,7 @@ gnsProcedure (
         case 1000:
             //printf ("\n");
             printf ("gnssrv: [1000] Hello from Gramado Network Server!\n");
-            //printf ("\n");
+            printf ("\n");
             NoReply = FALSE;
             return 0;
             break;
@@ -462,12 +446,7 @@ static int serviceInitializeNetwork(void)
     return 0;
 }
 
-
-/*
- * main:
- *     gns main routine.
- */
-
+// main:
 int main (int argc, char **argv)
 {
 
@@ -509,27 +488,29 @@ int main (int argc, char **argv)
             break;
     };
  */
-    
+
+// -------------------
+// Register
 // Register this process as the network server.
 // See: connect.c
     _status = (int) register_ns();
     if (_status<0){
-        printf ("gnssrv: Couldn't register the server \n");
-        exit(1);
+        printf ("gnssrv: Couldn't register the server\n");
+        goto fail;
     }
     debug_print ("gnssrv: Registration ok \n");
 
+// -------------------
 // socket
-
     server_fd = (int) socket (AF_GRAMADO, SOCK_STREAM, 0);
     if (server_fd<0){
         printf("gnssrv: [FAIL] Couldn't create the server socket\n");
-        exit(1);
+        goto fail;
     }
     ____saved_server_fd = server_fd;
 
+// -------------------
 // bind
-
     bind_status = 
         (int) bind (
                   server_fd, 
@@ -542,10 +523,11 @@ int main (int argc, char **argv)
     }
 
 // Calling child and wait.
-
     if (InitializeFirstClient==TRUE){
         rtl_clone_and_execute ("gns.bin");
     }
+
+// Wait
     for (i=0; i<11; i++){
         gnssrv_yield();
     };
@@ -577,7 +559,7 @@ int main (int argc, char **argv)
             debug_print ("gnssrv: [FAIL] Error on accept\n");
             gnssrv_yield(); 
         }else{
-            if(newconn == 31){
+            if (newconn == 31){
                 dispatch(newconn);
             }
         };
@@ -586,7 +568,12 @@ int main (int argc, char **argv)
 
     debug_print ("gnssrv: Bye\n");
          printf ("gnssrv: Bye\n");
-    return 0; 
+
+    return 0;
+
+fail:
+    exit(1);
+    return 1;
 }
 
 //

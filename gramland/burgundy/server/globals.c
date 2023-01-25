@@ -8,8 +8,29 @@
 char *host_name;
 char *display_number;
 char *screen_number;
-
 // struct gws_host_d  Hostinfo;
+
+
+//
+// == buffer ===============================================
+//
+
+
+// This is the buffer used when we receive 
+// requests via socket.
+// see: globals.h
+char __buffer[MSG_BUFFER_SIZE];
+
+// Esses valores serão enviados como 
+// resposta ao serviço atual.
+// Eles são configurados pelo dialogo na hora da 
+// prestação do serviço.
+// No início desse array fica o header.
+// see: globals.h
+unsigned long next_response[32];
+
+//----------------------------------------
+
 
 // See: screen.h
 int refresh_device_screen_flag=FALSE;

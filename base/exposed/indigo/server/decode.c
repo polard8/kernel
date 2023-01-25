@@ -1,31 +1,39 @@
 
+// decode.c
 
-#include <gns.h>
+#include <gnsint.h>
 
 
-uint8_t test_packet[] = 
-{
-    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* eth dest (broadcast) */
-    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* eth source */
-    0x08, 0x06, /* eth type */
+// ARP packet:
+// ETHERNET HEADER + ARP HEADER.
+uint8_t test_packet[] = {
+
+// ethernet
+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff,  /* eth dest (broadcast) */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56,  /* eth source */
+    0x08, 0x06,                          /* eth type */
+
+// arp
     0x00, 0x01, /* ARP htype */
     0x08, 0x00, /* ARP ptype */
     0x06, /* ARP hlen */
     0x04, /* ARP plen */
     0x00, 0x01, /* ARP opcode: ARP_REQUEST */
-    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* ARP hsrc */
-    169, 254, 13, 37, /* ARP psrc */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ARP hdst */
-    192, 168, 0, 137, /* ARP pdst */
+    0x52, 0x54, 0x00, 0x12, 0x34, 0x56, /* ARP hsrc */ //#todo
+    192, 168, 1, 112,                   /* ARP psrc */ //#todo
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* ARP hdst */ //#todo
+    192, 168, 1, 8,                     /* ARP pdst */ //#todo
 };
 
+// ========================================================
 
 void 
 print_ethernet_header( 
     const unsigned char *Buffer, 
     int Size )
 {
-    struct gnssrv_ether_header *eth = (struct gnssrv_ether_header *) Buffer;
+    struct gnssrv_ether_header *eth = 
+        (struct gnssrv_ether_header *) Buffer;
      
     //printf ("print_ethernet_header:\n");
     printf("\n");
@@ -46,70 +54,55 @@ print_ethernet_header(
         eth->src[5] );
     printf ("   |-Protocol            : %u \n",
         (unsigned short)eth->type);
-    //printf ("print_ethernet_header:done\n");
 }
 
 
-
-
-
-int gnssrv_decode_buffer ( unsigned long buffer_address ){
-
-    // Only the ethernet header.
+int gnssrv_decode_buffer(unsigned long buffer_address)
+{
+// Only the ethernet header.
     struct gnssrv_ether_header *eh;
-
 
     //#debug
     debug_print ("gnssrv_decode_buffer:\n");
     //printf ("network_decode_buffer:\n");
 
-
-    if ( buffer_address == 0 ){
+    if (buffer_address == 0){
         printf ("gnssrv_decode_buffer: buffer\n");
         return 1;
     }
-    
-	//
-	// ## eth header ##
-	//
-	
-	//ethernet header
-	//eh = (void *) &buffer[0];
-    eh = (void *) buffer_address;
 
+//
+// ## eth header ##
+//
+
+// ethernet header
+    //eh = (void *) &buffer[0];
+    eh = (void *) buffer_address;
     if ( (void *) eh == NULL ){
         printf ("gnssrv_decode_buffer: eh\n");
         //refresh_screen();
         return 1;
-
     }else{
 
-        print_ethernet_header((const unsigned char*) buffer_address, 1500);
+        print_ethernet_header(
+            (const unsigned char*) buffer_address, 
+            1500 );
 
         //printf("src: ");
         //for( i=0; i<6; i++)
-        //	printf("%x ",eh->src[i]);
+        //    printf("%x ",eh->src[i]);
 
         //printf("dst: ");
         //for( i=0; i<6; i++)
-        //	printf("%x ",eh->dst[i]);
+        //    printf("%x ",eh->dst[i]);
 
         //printf("type={%x} ",eh->type);
     };
 
-
-    // #importante
-    // Provavelmente o buffer seja enviado para um
-    // servidor de protocolos.
-    // Um servidor só para todos os protocolos.
-    // See: https://en.wikipedia.org/wiki/EtherType
-
     uint16_t type = gnssrv_FromNetByteOrder16(eh->type);
-    
-    switch ( (uint16_t) type)
+
+    switch ((uint16_t) type)
     {
-
-
         // ::: IPV4
         // 0x0800	Internet Protocol version 4 (IPv4)
         // Ok como test vamos notificar o processo atual
@@ -153,9 +146,7 @@ int gnssrv_decode_buffer ( unsigned long buffer_address ){
             printf ("SNMP received\n");
             return 0;
             break;
-            
-        
-            
+
         //::: IPV6
         //0x86DD	Internet Protocol Version 6 (IPv6)
         case 0x86DD:
@@ -180,64 +171,56 @@ int gnssrv_decode_buffer ( unsigned long buffer_address ){
         //0x8863	PPPoE, PPP Over Ethernet (Discovery Stage).
         //0x8864	PPPoE, PPP Over Ethernet (PPP Session Stage).
 
-		//::: DEFAULT
+        //::: DEFAULT
         // Error: Default package type.
         default:
-
             // #debug
             //printf ("UNKNOWN received\n");
             //refresh_screen ();
-
             // #debug
             //printf("default ethernet type\n");
             //refresh_screen();
             return 0;
             break;
-
     }
 
     return 1;
 }
 
 
-
-
-void
-gnssrv_send_packet(void)
+// ?
+void gnssrv_send_packet(void)
 {
     while(1){
         gramado_system_call( 891, 
-            (unsigned long)test_packet,   //buf
-            (unsigned long)1500,      //len
+            (unsigned long)test_packet,  //buf
+            (unsigned long)1500,         //len
             0);
     }    
 }
 
 
-
 void gnssrv_get_and_decode_buffer(void)
 {
-
     char buf[4096];
 
-    //pega o pacote
-    gramado_system_call( 890, 
-        (unsigned long)&buf[0],   //buf
-        (unsigned long)1500,      //len
+// Pega o pacote
+    gramado_system_call( 
+        890, 
+        (unsigned long) &buf[0],  //buf
+        (unsigned long) 1500,     //len
         0);
 
     //printf("[begin]%s[end]\n",buf);
-        
+
     //#test: OK
     //decodifica o pacote.
-    gnssrv_decode_buffer((unsigned long) &buf[0]);
+    //gnssrv_decode_buffer( (unsigned long) &buf[0] );
+    gnssrv_decode_buffer(buf);
 
-
-    //#test: OK. o led indica que esta enviando.
-    //envia um pacote
+// #test:
     //gnssrv_send_packet();
 }
-
 
 
 /*
@@ -267,6 +250,4 @@ void network_test_buffer(void)
     }
 }
 */
-
-
 
