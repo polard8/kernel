@@ -1,11 +1,12 @@
 
 // screen.h
 
-#ifndef ____SCREEN_H
-#define ____SCREEN_H    1
+#ifndef __OS_SCREEN_H
+#define __OS_SCREEN_H    1
 
-int refresh_device_screen_flag;
-int refresh_valid_screen_flag;
+// see: globals.c
+extern int refresh_device_screen_flag;
+extern int refresh_valid_screen_flag;
 
 struct gws_screen_d
 {

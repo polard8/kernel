@@ -11,15 +11,19 @@ char *screen_number;
 
 // struct gws_host_d  Hostinfo;
 
+// See: screen.h
+int refresh_device_screen_flag=FALSE;
+int refresh_valid_screen_flag=FALSE;
+
 int current_mode=0;
 int gUseCallback=TRUE;
 
-int gUseMouse = FALSE;
+int gUseMouse=FALSE;
 
 // #ordem
 // hardware, software
-unsigned long  ____BACKBUFFER_VA=0;
-unsigned long  ____FRONTBUFFER_VA=0;
+unsigned long ____BACKBUFFER_VA=0;
+unsigned long ____FRONTBUFFER_VA=0;
 // Saving
 unsigned long SavedBootBlock=0;
 unsigned long SavedLFB=0;   // #bugbug? VA ?
@@ -57,18 +61,4 @@ public BGREntry vga_palette4_gray[16] = {
     0x888888,0x999999,0xAAAAAA,0xBBBBBB,
     0xCCCCCC,0xDDDDDD,0xEEEEEE,0xFFFFFF };
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

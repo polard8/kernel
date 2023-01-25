@@ -382,10 +382,16 @@ int gwsInit(void)
     }
     memset( CurrentDisplay, 0, sizeof(struct gws_display_d) );
 
-    CurrentDisplay->id = 0;
-    CurrentDisplay->fd = 0;
     CurrentDisplay->used  = TRUE;
     CurrentDisplay->magic = 1234;
+    CurrentDisplay->id = 0;
+    
+    // Socket fd for connections.
+    CurrentDisplay->fd = 0;
+    // Device driver fd.
+    // For resolution configurations.
+    CurrentDisplay->device_fd = 0;
+
     //...
 // ===================================================
 

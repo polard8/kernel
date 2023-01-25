@@ -44,9 +44,9 @@ extern int current_mode;
 #include "bmp.h"
 
 // h:0.0
-#include "screen.h"   // X-like
-#include "display.h"  // X-like
-#include "host.h"     // X-like h:0.0
+#include "os/screen.h"   // X-like
+#include "os/display.h"  // X-like
+#include "os/host.h"     // X-like h:0.0
 
 // Teremos isso aqui no window server,
 // kgws é outro ws par ao ambiente de setup e tera 

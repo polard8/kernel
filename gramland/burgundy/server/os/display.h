@@ -1,9 +1,12 @@
 
 // display.h
 
-#ifndef ____DISPLAY_H
-#define ____DISPLAY_H    1
+#ifndef __OS_DISPLAY_H
+#define __OS_DISPLAY_H    1
 
+
+//
+//
 struct gws_display_d
 {
     int id;
@@ -13,7 +16,13 @@ struct gws_display_d
 //"host:display" string used on this connect
     char *display_name;
 
-    int fd;    // Network socket. 
+// Network socket.
+    int fd;
+// #todo
+// Display device fd.
+// For resolution configurations.
+    int device_fd;
+
     int lock;  // is someone in critical section?  
 
 // #todo

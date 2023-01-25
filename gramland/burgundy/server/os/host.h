@@ -1,6 +1,8 @@
 
-#ifndef ____HOST_H
-#define ____HOST_H    1
+// host.h
+
+#ifndef __OS_HOST_H
+#define __OS_HOST_H    1
 
 struct gws_host_d
 {
@@ -11,7 +13,6 @@ struct gws_host_d
     char name[256];
     // ...
 };
-
 
 #endif    
 
