@@ -559,7 +559,9 @@ on_mouse_event(
         // Em qual botão o mouse esta passando por cima.
         // lembrando: o botao esta dentro de outra janela.
         // Probe taskbar buttons.
-        __probe_tb_button_hover(saved_x,saved_y);
+        // #todo
+        // Delete. We don't need to call it anymore.
+        // __probe_tb_button_hover(saved_x,saved_y);
         
         __probe_window_hover(saved_x,saved_y);
         
@@ -3685,6 +3687,23 @@ __probe_window_hover(
                 Status = is_within( (struct gws_window_d *) w, long1, long2 );
                 if (Status==TRUE)
                 {
+                    // The old mouse over needs to comeback
+                    // to the normal state.
+                    // visual efect
+                    if ( (void*) mouse_hover != NULL )
+                    {
+                        if (mouse_hover->magic == 1234)
+                        {
+                            if (mouse_hover->type == WT_BUTTON)
+                            {
+                                mouse_hover->status = BS_DEFAULT;
+                                mouse_hover->bg_color = xCOLOR_GRAY5;
+                                redraw_window(mouse_hover,TRUE);
+                            }
+                        }
+                    }
+
+                    // The new mouse over.
                     // set_mouseover(w);
                     mouse_hover = (void*) w;
 
@@ -4757,10 +4776,12 @@ redraw_window (
                 break;
 
             case BS_HOVER:
-                border1 = COLOR_YELLOW;  //#test
-                border2 = COLOR_YELLOW;  //#test
+                //border1 = COLOR_YELLOW;  //#test
+                //border2 = COLOR_YELLOW;  //#test
+                border1 = COLOR_WHITE;    //GWS_COLOR_BUTTONHIGHLIGHT3;
+                border2 = xCOLOR_GRAY1;   //GWS_COLOR_BUTTONSHADOW3;
                 break;
-                    
+
             case BS_DISABLED:
                 border1 = COLOR_GRAY;
                 border2 = COLOR_GRAY;
