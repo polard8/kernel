@@ -63,13 +63,12 @@ int fcntl( int fd, int cmd, ... )
     va_list ap;
     va_start(ap, cmd);
     unsigned arg = va_arg(ap,int);
-
-    value = (int) sc82 ( 
-                    8001,
-                    (unsigned long) fd,
-                    (unsigned long) cmd,
-                    (unsigned long) arg );
-
+    value = 
+        (int) sc82 ( 
+                  8001,
+                  (unsigned long) fd,
+                  (unsigned long) cmd,
+                  (unsigned long) arg );
     va_end(ap);
 //--
 
@@ -82,7 +81,7 @@ int fcntl( int fd, int cmd, ... )
 }
 
 
-// openat - open a file relative to a directory file descriptor 
+// openat - Open a file relative to a directory file descriptor. 
 // See: https://linux.die.net/man/2/openat
 
 int openat(int dirfd, const char *pathname, int flags)
@@ -90,30 +89,31 @@ int openat(int dirfd, const char *pathname, int flags)
     int value = -1;
 
 // fd
-// The directory
-    if ( dirfd < 0 )
-    { 
+// The directory fd.
+    if (dirfd < 0){ 
         errno = EBADF;
         return (int) (-1);
     }
 
 // path
-    if ( (void *) pathname == NULL )
-    {
+    if ( (void *) pathname == NULL ){
         errno = EINVAL;
         return (int) (-1);
     }
 
-    // Carrega um arquivo dado o nome e um modo.
+// #todo
+// #bugbug
+// Check this syscall ... the argument dirfd.
 
-    value = (int) gramado_system_call ( 
-                      246, 
-                      (unsigned long) dirfd, 
-                      (unsigned long) pathname, 
-                      (unsigned long) flags ); 
+// Carrega um arquivo dado o nome e um modo.
+    value = 
+        (int) gramado_system_call ( 
+                  246, 
+                  (unsigned long) dirfd, 
+                  (unsigned long) pathname, 
+                  (unsigned long) flags ); 
 
-    if ( value < 0 )
-    {
+    if (value < 0){
         errno = (-value);
         return (int) (-1);
     }
@@ -121,10 +121,8 @@ int openat(int dirfd, const char *pathname, int flags)
     return (int) value;
 }
 
-
 // open();
 // Called by fopen().
-
 int open(const char *pathname, int flags, mode_t mode)
 {
     int value = -1;
@@ -214,10 +212,8 @@ int __open2(const char* path, int options, ...)
 */
 
 
-
 // creat:
 // Linux klibc style.
-
 int creat(const char *pathname, mode_t mode)
 {
     if ( (void*) pathname == NULL ){
@@ -262,6 +258,8 @@ int flock (int fd, int operation)
         errno = EBADF;
         return (int) (-1);
     }
+
+// #todo
 
     return -1;
 }

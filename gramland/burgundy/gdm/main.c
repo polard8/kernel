@@ -280,18 +280,24 @@ int main( int argc, char *argv[] )
     struct gws_display_d *Display;
     int client_fd = -1;
     register int i=0;
+// Flags
     int fTest=FALSE;
+    int fAll=FALSE;
 
 // #test
 // OK!
     for (i=1; i<argc; i++)
     {
-        if ( strcmp("--test", argv[i]) == 0 ){
+        if ( strncmp("-t", argv[i], 2) == 0 ){
             printf("flag: TEST\n");
             fTest=TRUE;
         }
+        if ( strncmp("-a", argv[i], 2) == 0 ){
+            printf("flag: All\n");
+            fAll=TRUE;
+        }
+        //...
     };
-
 
 // global: Cursor
     cursor_x=0;
@@ -343,6 +349,7 @@ int main( int argc, char *argv[] )
 // original
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
+
 
     // test1: Erro de posicionamento.
     //unsigned long viewwindowx = 580;
@@ -450,7 +457,7 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_BUTTON,1,1,"Reboot",
-                  (( w_width/8 )*6), 
+                  (( w_width/8 )*5), 
                   4,
                   (( w_width/8 )*2), 
                   24,
@@ -515,7 +522,7 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_BUTTON,1,1,"Confirm",
-                  (( w_width/8 )*6),   //l
+                  (( w_width/8 )*5),   //l
                   (4 +(24) +4),        //t
                   (( w_width/8 )*2),   //w
                   24,                  //h

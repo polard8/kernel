@@ -4,16 +4,15 @@
  * credits: minix 3
  */
 
-#include  <stdio.h>
-#include  <stdlib.h>
-#include  <ctype.h>
-#include  <stdarg.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdarg.h>
 
 //==================
 //#include  "loc_incl.h"
 
-#define	io_testflag(p,x)  ((p)->_flags & (x))
+#define io_testflag(p,x)  ((p)->_flags & (x))
 
 //#ifdef _ANSI
 //int _doprnt(const char *format, va_list ap, FILE *stream);
@@ -47,20 +46,18 @@ int _doscan (FILE * stream, const char *format, va_list ap);
 #define	FL_NOASSIGN    0x0800  /* do not assign (in scanf) */
 #define	FL_NOMORE      0x1000  /* all flags collected */
 
-
 //===================
-#if	_EM_WSIZE == _EM_PSIZE
-#define set_pointer(flags)				/* nothing */
-#elif	_EM_LSIZE == _EM_PSIZE
-#define set_pointer(flags)	(flags |= FL_LONG)
+#if _EM_WSIZE == _EM_PSIZE
+#define set_pointer(flags)  /* nothing */
+#elif _EM_LSIZE == _EM_PSIZE
+#define set_pointer(flags)  (flags |= FL_LONG)
 #else
 #error garbage pointer size
-#define set_pointer(flags)		/* compilation might continue */
+#define set_pointer(flags)  /* compilation might continue */
 #endif
 
-#define NUMLEN      512
-#define NR_CHARS    256
-
+#define NUMLEN    512
+#define NR_CHARS  256
 static char Xtable[NR_CHARS];
 static char inp_buf[NUMLEN];
 
@@ -126,14 +123,18 @@ static char *o_collect(
 		else break;
 	}
 
-	if (width && c != EOF) ungetc(c, stream);
-	if (type == 'i') base = 0;
+	if (width && c != EOF) 
+		ungetc(c, stream);
+	if (type == 'i') 
+		base = 0;
 	*basep = base;
 	*bufp = '\0';
+
 	return bufp - 1;
 }
 
-#ifndef	NOFLOAT
+
+#ifndef NOFLOAT
 /* The function f_collect() reads a string that has the format of a
  * floating-point number. The function returns as soon as a format-error
  * is encountered, leaving the offending character in the input. This means
@@ -203,8 +204,10 @@ static char *f_collect(
 		}
 	}
 
-	if (width && c != EOF) ungetc(c, stream);
+	if (width && c != EOF) 
+		ungetc(c, stream);
 	*bufp = '\0';
+
 	return bufp - 1;
 }
 #endif	/* NOFLOAT */
@@ -213,14 +216,15 @@ static char *f_collect(
 /*
  * the routine that does the scanning 
  */
-
 int 
 _doscan ( 
     register FILE *stream, 
     const char *format, 
     va_list ap )
 {
+
 	return -1;
+
 /*
     int done = 0;     // number of items done 
     int nrchars = 0;  // number of characters read 
@@ -513,10 +517,9 @@ int fscanf (FILE *stream, const char *format, ...)
 
     va_list ap;
     va_start(ap, format);
-
     //retval = _doscan (stream, format, ap);
-
     va_end(ap);
-    return retval;
+
+    return (int) retval;
 }
 

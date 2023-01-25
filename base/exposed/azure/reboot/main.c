@@ -1,4 +1,5 @@
 // 'reboot' command for Gramado.
+// Created by Fred Nora.
 
 // rtl
 #include <rtl/gramado.h>
@@ -8,16 +9,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
 // libio
 #include <libio.h>
 
-
-// isso eh uma rotina de test
+// Isso eh uma rotina de test
 // Vai escrever em uma porta ja inicializada pelo kernel.
-void serial_write_char (char data) 
+void serial_write_char(char data) 
 {
-    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0);
+    while (( libio_inport8(0x3F8 + 5) & 0x20 ) == 0)
+    {
+    }
 
     libio_outport8 (0x3F8, data);
 }
@@ -27,25 +28,17 @@ void serial_write_char (char data)
 // main
 //
 
-int main ( int argc, char *argv[] ){
-
+int main( int argc, char *argv[] )
+{
     char *env_host;
     char *env_user;
     unsigned char good=0;
 
-     //asm("int $3");
+    //gramado_system_call(65,'3',0,0);
+    //printf ("REBOOT.BIN: This is a test\n");
 
-    gramado_system_call(65,'3',0,0);
-    printf ("REBOOT.BIN: This is a test\n");
-
-    //while(1){}
-    //asm("int $3");
-
-
-
-
-   /*
-   //=================
+/*
+//=================
    // testing read() stdin
     char buf[32];
     int n;
@@ -58,23 +51,19 @@ int main ( int argc, char *argv[] ){
        if(n>0)
            printf(">>>>%c\n",buf[0]);
     }
-   //=================
-   */
+//=================
+ */
 
+// ==============================================
 
-    // ==============================================
-
-
-    // #test
-    // Testing shutdown in virtual machines.
-    // #todo:
-    // We can ask the system if we are in qemu or not.
-    // See: https://wiki.osdev.org/Shutdown
-
+// #test
+// Testing shutdown in virtual machines.
+// #todo:
+// We can ask the system if we are in qemu or not.
+// See: https://wiki.osdev.org/Shutdown
 
      //int isQEMU = FALSE;
      //isQEMU = rtl_get_system_metrics(300);
-
 
     // In Bochs, and older versions of QEMU(than 2.0), you can do the following:
     // outw(0xB004, 0x2000);
@@ -97,8 +86,8 @@ int main ( int argc, char *argv[] ){
     
     // ==============================================
 
-    //testing serial port
-    //ok isso funcionou.
+// Testing serial port.
+// ok isso funcionou.
     serial_write_char('r');
     serial_write_char('e');
     serial_write_char('b');
@@ -111,7 +100,6 @@ int main ( int argc, char *argv[] ){
     serial_write_char('.');
     serial_write_char('.');
     serial_write_char('.');
-
 
     puts        ("\n");
     printf      ("REBOOT.BIN: Rebooting ...\n");
@@ -167,9 +155,9 @@ via_rtl:
     debug_print("reboot.bin: Go!\n");
          printf("reboot.bin: Go!\n");
     rtl_reboot();
+
     exit(1);
-
     return (int) (-1);
+    // return 0;
 }
-
 

@@ -642,8 +642,8 @@ int strcasecmp (const char *s1, const char *s2){
  *   The `strncpy' function returns the value of `s1'.  [4.11.2.4]
  */
 
-char *strncpy (char *s1, const char *s2, size_t n){
-
+char *strncpy (char *s1, const char *s2, size_t n)
+{
     char *s = s1;
 
     while (n > 0 && *s2 != '\0')
@@ -670,30 +670,26 @@ char *strncpy (char *s1, const char *s2, size_t n){
 // See:
 // http://man7.org/linux/man-pages/man3/strcmp.3.html
 
-int strcmp (const char *s1, const char *s2){
-
+int strcmp (const char *s1, const char *s2)
+{
     register int i=0;
 
     for ( i=0; s1[i] == s2[i]; i++ )
     {
-        if ( s1[i] == '\0' ){  return 0;  }
+        if ( s1[i] == '\0' ){
+            return 0;
+        }
     };
 
     return (int) ( s1[i] - s2[i] );
 }
 
-
-
-/*
- * strncmp:
- * compare two strings
- */
-
+// strncmp:
+//  Compare two strings
 // See:
 // http://man7.org/linux/man-pages/man3/strcmp.3.html
-
-int strncmp (const char *s1, const char *s2, size_t n){
-
+int strncmp (const char *s1, const char *s2, size_t n)
+{
     while (n > 0)
     {
         n--;
@@ -704,7 +700,6 @@ int strncmp (const char *s1, const char *s2, size_t n){
         *s2++;
     };
 
-
     if ( *s1 != '\0' || *s2 != '\0' )
     {
         return (int) 2;
@@ -713,14 +708,12 @@ int strncmp (const char *s1, const char *s2, size_t n){
     return 0;
 }
 
-
-void *memset ( void *ptr, int value, int size )
+void *memset( void *ptr, int value, int size )
 {
     register int i=0;
 
     //if ( (void*) ptr == NULL )
        //return NULL;
-
 
     if ( ptr != NULL && size > 0 )
     {
@@ -740,7 +733,6 @@ void *memset ( void *ptr, int value, int size )
 void *memoryZeroMemory ( void *ptr, size_t cnt )
 {
     volatile char *vptr = (volatile char *) ptr;
-
 
     //if ( (void*) ptr == NULL )
        //return NULL;
@@ -782,7 +774,6 @@ void *memcpy (
     return (void *) v_dst;
 }
 
-
 void *memcpy32 ( void *v_dst, const void *v_src, unsigned long n )
 {
     register const int *src = (int *) v_src;
@@ -798,7 +789,6 @@ void *memcpy32 ( void *v_dst, const void *v_src, unsigned long n )
     return v_dst;
 }
 
-
 void *memcpy64 ( void *v_dst, const void *v_src, unsigned long n )
 {
     register const long *src = (long *) v_src;
@@ -813,7 +803,6 @@ void *memcpy64 ( void *v_dst, const void *v_src, unsigned long n )
 
     return v_dst;
 }
-
 
 // Copy a string. 
 char *strcpy ( char *to, const char *from )
@@ -845,7 +834,6 @@ char* strcpy(char* to, const char* from)
 }
 */
 
-
 // 8 bits.
 size_t strlcpy (char *dst, const char *src, size_t size)
 {
@@ -863,28 +851,26 @@ size_t strlcpy (char *dst, const char *src, size_t size)
         bytes++;
     };
 
-	// If size == 0 there is no space for a final null... 
-    if (size){  *q = '\0';  }
+// If size == 0 there is no space for a final null... 
+    if (size){
+        *q = '\0';
+    }
 
     return (size_t) bytes;
 }
 
-
-/*
- *************************
- * strcat:
- *     Concatenate strings. 
- */
-
-char *strcat ( char *to, const char *from ){
-
+// strcat:
+// Concatenate strings. 
+char *strcat ( char *to, const char *from )
+{
     char *ret = to;
 
     //if ( (void*) to == NULL )
        //return (char *) 0;
 
-
-    while ( *to ){  to += 1;  };
+    while ( *to ){
+        to += 1;
+    };
 
     strcpy ( to, from );
     
@@ -956,19 +942,15 @@ size_t strlcat (char *dst, const char *src, size_t size)
     return bytes;
 }
 
-
 char *strncat (char *dst, const char *src, size_t n)
 {
     char *q = strchr (dst, '\0');
-
     const char *p = src;
-
     //register char ch=0;
     char ch=0;
     
-    // #bugbug
-    // E se n for menor que zero?
-
+// #bugbug
+// E se n for menor que zero?
     while (n--)
     {
         //very ugly
@@ -1009,58 +991,41 @@ char *strcat2(char *s1, const char *s2)
 }
 */
 
-
-/* 
- * bcopy: Copia. 
- */
-
+// bcopy: 
 void bcopy ( char *from, char *to, int len )
 {
-
     //if ( (void*) from == NULL )
        //return;
 
     //if ( (void*) to == NULL )
        //return;
 
-	//if ( len < 0 )
-	//    return;
+    //if ( len < 0 )
+    //    return;
 
-    while ( len-- )
-    {
+    while (len--){
         *to++ = *from++; 
     };
 }
 
-
-/*
- *  bzero:
- *      zeros. 
- */
-
+// bzero:
 void  bzero ( char *cp, int len )
 {
-
     //if ( (void*) cp == NULL )
        //return;
 
     //if ( len < 0 )
     //    return;
 
-    while ( len-- )
-    { 
+    while (len--){
         *(cp + len) = 0; 
     };
 }
 
-
-/*
- * strlen:
- *     Get the size of a string.
- */ 
-
-size_t strlen (const char *s){
-
+// strlen:
+// Get the size of a string.
+size_t strlen (const char *s)
+{
     register size_t i=0;
 
     //if ( (void*) s == NULL )
@@ -1087,7 +1052,6 @@ size_t strnlen ( const char *s, size_t maxlen )
     const char *e;
     register size_t n=0;
 
-
     //if ( (void*) s == NULL )
        //return -1;
 
@@ -1099,19 +1063,17 @@ size_t strnlen ( const char *s, size_t maxlen )
 
     //# very ugly  shit
     for ( e=s, n=0; *e && n<maxlen; e++, n++ )
-    { 
-        ; 
+    {
     };
 
     return (size_t) n;
 }
 
-
+// ?
 char *strpbrk (const char *cs, const char *ct)
 {
     const char *sc1;
     const char *sc2;
-
 
     //if( (void*) cs == NULL )
         //return (char*) 0;
@@ -1146,13 +1108,12 @@ char *strpbrk (const char *cs, const char *ct)
  * Same semantics, slimmer shape. ;)
  */
 
-char *strsep (char **s, const char *ct){
-
+char *strsep (char **s, const char *ct)
+{
     char *sbegin = *s;
     char *end;
 
-    if (sbegin == NULL)
-    {
+    if (sbegin == NULL){
         return NULL;
     }
 
@@ -1305,8 +1266,6 @@ void *check_bytes8 (
     return NULL;
 }
 
-
-
 /**
  * strreplace - Replace all occurrences of character in string.
  * @s: The string to operate on.
@@ -1318,7 +1277,6 @@ void *check_bytes8 (
 
 char *strreplace (char *s, char old, char new)
 {
-
     //if( (void*) s == NULL ){
     //    return (char*) 0;
     //}
@@ -1327,17 +1285,13 @@ char *strreplace (char *s, char old, char new)
     for (; *s; ++s)
     {
         if (*s == old)
-        { 
+        {
             *s = new; 
         }
     };
 
     return (char *) s;
 }
-
-
-
-
 
 /*
  * strcspn:
@@ -1346,24 +1300,20 @@ char *strreplace (char *s, char old, char new)
  *     Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
 
-size_t strcspn ( const char *str, const char *reject ){
-
-    // The return.
+size_t strcspn ( const char *str, const char *reject )
+{
+// The return
     size_t Result=0;
-
-    // Iterators.
+// Iterators
     register int reject_length = 0;
     register int i=0;
-
     //bool matches = 0;
     int matches=0;
-
 
     while ( reject[reject_length] )
     {
         reject_length++;
     };
-
 
     for ( Result=0; Result=1; Result++ )
     {
@@ -1379,10 +1329,11 @@ size_t strcspn ( const char *str, const char *reject ){
             break;
         };
 
-        if ( matches ){  return (size_t) Result;  }
+        if (matches){
+            return (size_t) Result;
+        }
     };
 }
-
 
 /*
  * strspn:
@@ -1391,28 +1342,23 @@ size_t strcspn ( const char *str, const char *reject ){
  * Copyright (c) 2011, 2012 Jonas 'Sortie' Termansen.
  */
  
-size_t strspn ( const char *str, const char *accept ){
-
-    // The return
+size_t strspn ( const char *str, const char *accept )
+{
+// The return
     int result=0;
-
-    //iterators
+// Iterators
     register int accept_length = 0; 
     register int i=0;
-
     int matches = 0;
-
 
     //if( (void*) str == NULL )
         //return -1;
-
 
     while ( accept[accept_length] )
     {
         accept_length++;
     };
 
-    
     for ( result = 0; result = 1; result++ )
     {
         char c = str[result];
@@ -1435,60 +1381,47 @@ size_t strspn ( const char *str, const char *accept ){
     };
 }
 
-
 /*
- **************************************
  * strtok_r:
  *     Usada por strtok.
- *
  * Credits: 
  *     Apple. (Open Source)
  */
 
 char *strtok_r ( char *s, const char *delim, char **last )
 {
-
     char *spanp;
     char *tok;
-
     register int c=0; 
     register int sc=0;
 
-
     //#ugly
-
     if ( s == NULL && (s = *last) == NULL )
     {
         return NULL;
     }
 
-    // Skip (span) leading delimiters (s += strspn(s, delim), sort of).
-	
+// Skip (span) leading delimiters (s += strspn(s, delim), sort of).
 cont:
-    
     c = *s++;
 
     // #ugly
-    
     for ( spanp = (char *) delim; (sc = *spanp++) != 0; )
     {
         if (c == sc){  goto cont;  }
     };
 
-
-	// No non-delimiter characters. 
-    if ( c == 0 )
-    {
+// No non-delimiter characters. 
+    if (c == 0){
         *last = NULL;
-
         return NULL;
     }
 
     tok = s -1;
 
-    // Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
-    // Note that delim must have one NUL; we stop if we see that, too.
-	 
+// Scan token (scan for delimiters: s += strcspn(s, delim), sort of).
+// Note that delim must have one NUL; we stop if we see that, too.
+ 
     for (;;)
     {
         c = *s++;
@@ -1513,20 +1446,15 @@ cont:
             };
 
         } while( sc != 0 );
-        
-		//Nothing.
+
+    //Nothing.
 
     };
     // NOTREACHED 
 }
 
 
-/*
- *********************************************
- * strtok:
- *     strtok 
- */
-
+// strtok:
 char *strtok ( char *s, const char *delim )
 {
     static char *last;
@@ -1541,7 +1469,6 @@ char *strtok ( char *s, const char *delim )
 }
 
 
-
 /*
  * strchr:
  * linux style 
@@ -1551,7 +1478,6 @@ char *strtok ( char *s, const char *delim )
 
 char *strchr (const char *s, int c)
 {
-
     //if( (void*) s == NULL )
         //return (char *) 0;
 
@@ -1572,7 +1498,6 @@ void *memmove (void *dest, const void *src, size_t count)
 {
     char *tmp;
     const char *s;
-
 
     //if(count<0)
         //return NULL;
@@ -1599,23 +1524,21 @@ void *memmove (void *dest, const void *src, size_t count)
     return dest;
 }
 
-
-
 /*
  //linux style 
  * memscan - Find a character in an area of memory.
+ * IN:
  * @addr: The memory area
- * @c: The byte to search for
+ * @c:    The byte to search for
  * @size: The size of the area.
- *
- * returns the address of the first occurrence of @c, or 1 byte past
- * the area if @c is not found
+ * OUT:
+ *     Returns the address of the first occurrence 
+ * of @c, or 1 byte past the area if @c is not found
  */
- 
+
 void *memscan (void *addr, int c, size_t size)
 {
     unsigned char *p = addr;
-
 
     //if( (void*) addr == NULL ){
     //    return NULL;
@@ -1637,7 +1560,6 @@ void *memscan (void *addr, int c, size_t size)
     return (void *) p;
 }
 
-
 /**
  *linux style
  * strstr - Find the first substring in a %NUL terminated string
@@ -1649,7 +1571,6 @@ char *strstr (const char *s1, const char *s2)
 {
     register size_t l1=0; 
     register size_t l2=0;
-
 
     l2 = strlen(s2);
 
@@ -1675,8 +1596,6 @@ char *strstr (const char *s1, const char *s2)
     return NULL;
 }
 
-
-
 /*
  ** Concatenate two given string, creating a mark space at the beginning.
  ** Return the new string pointer.
@@ -1696,8 +1615,8 @@ static char *__strconc (char *l, char *r){
     }
 
     // Create mark space.
-    *s++ = 0; 			
-    
+    *s++ = 0;
+
     return strcat ( strcpy(s,l),r );
 }
 */
@@ -1727,54 +1646,46 @@ char *__strdup (char *l){
 }
 */
 
-
-
-char *index (const char *s, int c){
-
+// Retorna o endereço onde o char foi encontrado?
+// Primeira ocorrência.
+char *index (const char *s, int c)
+{
     do {
-
         if (*s == c){
             return (char *) (s);
         }
-
     } while (*s++);
 
     return (NULL);
 }
-
 
 char *rindex (const char *s, int c)
 {
     return (char *) strrchr(s,c);
 }
 
-
-
 /*
  * Transform src, storing the result in dst, such that
  * strcmp() on transformed strings returns what strcoll()
  * on the original untransformed strings would return.
  */
- 
 // Credits: apple open source 
 
 size_t strxfrm (char *dst, const char *src, size_t n)
 {
-    // The return.
+// The return.
     size_t srclen=0; 
-    
-    // work integer.
+// work integer.
     register size_t copysize=0;
 
-	// Since locales are unimplemented, this is just a copy.
-
+// Since locales are unimplemented, this is just a copy.
     srclen = strlen (src);
 
     if (n != 0)
     {
         copysize = srclen < n ? srclen : n - 1;
 
-		//(void) memcpy (dst, src, copysize);
+        //(void) memcpy (dst, src, copysize);
         memcpy (dst, src, copysize);
 
         dst[copysize] = 0;
@@ -1782,7 +1693,6 @@ size_t strxfrm (char *dst, const char *src, size_t n)
 
     return (size_t) srclen;
 }
-
 
 
 /*
@@ -1799,10 +1709,7 @@ size_t strxfrm(char* dest, const char* src, size_t n)
 }
 */
 
-
-
- 
- /*
+/*
  The swab() function copies n bytes from the array pointed to by from
  to the array pointed to by to, exchanging adjacent even and odd
  bytes.  This function is used to exchange data between machines that
@@ -1812,8 +1719,8 @@ size_t strxfrm(char* dest, const char* src, size_t n)
  */
 /*
 void swab (const void *from, void *to, size_t len);
-void swab (const void *from, void *to, size_t len){
-	
+void swab (const void *from, void *to, size_t len)
+{
 	register unsigned long temp;
 	register int n;
 	register char *fp, *tp;
@@ -1833,15 +1740,11 @@ void swab (const void *from, void *to, size_t len){
 }
 */
 
-
-
-
 char *strerror (int errnum)
 {
     debug_print ("strerror: [TODO]\n");
     return 0; 
 }
-
 
 /* XSI-compliant */
 int 
@@ -1853,8 +1756,7 @@ strerror_r (
     size_t tmp=0;
     char *msg = strerror(errnum);
   
-
-    if( (void*) buf == NULL ){
+    if ( (void*) buf == NULL ){
         return -1;
     }
 
@@ -1879,24 +1781,17 @@ char *strerror_r(int errnum, char *buf, size_t buflen)
 }
 */
 
-
-
-
 /*
 char *strerror_l(int errnum, locale_t locale);
 char *strerror_l(int errnum, locale_t locale)
 { return 0; }
 */
 
-
-
 char *strsignal (int sig)
 {
     debug_print ("strsignal: [TODO]\n");
     return 0; 
 }
-
-
 
 //#define tolower(c)	(isupper(c) ? c + 'a' - 'A' : c)
 //#define toupper(c)	(islower(c) ? c + 'A' - 'a' : c)
@@ -1923,14 +1818,17 @@ void strtoupper (char *src)
 }
 
 
+void rtl_string_to_upper (char *src)
+{
+    strtoupper(src);
+}
+
 /*
 // From unix. Not tested yet. hahaha
 int nodup (char *l[], char s[]);
 int nodup (char *l[], char s[])
 {
-
     char *t, *os, c;
-
     os = s;
 
 	while(t = *l++) 
@@ -1948,7 +1846,6 @@ ll:
     return (1);
 }
 */
-
 
 // #not tested.
 char *strrev(char *str)

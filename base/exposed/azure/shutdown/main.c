@@ -3,6 +3,7 @@
 // It shuts down the machine via i/o ports
 // if we are running on qemu.
 // Environment: ring 3 application.
+// Created by Fred Nora.
 
 #include <rtl/gramado.h>
 #include <stddef.h>
@@ -41,7 +42,8 @@
 
 static void __serial_write_char (unsigned char data);
 static void test_disk_size(void);
-
+void do_via_qemu(void);
+  
 // ===================================
 
 // Vai escrever em uma porta ja inicializada pelo kernel.
@@ -131,6 +133,14 @@ static void test_disk_size(void)
 }
 
 
+void do_via_qemu(void)
+{
+    debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down\n");
+    libio_outport16(
+        (unsigned short) 0x604, 
+        (unsigned short) 0x2000 );
+}
+
 // main:
 // #test
 // Testing shutdown in virtual machines.
@@ -165,16 +175,12 @@ int main ( int argc, char *argv[] )
     //int isBochs      = FALSE;
     
 
-
 // ==============================
 // qemu
 // In newer versions of QEMU, you can do shutdown with:
     isQEMU = (int) is_qemu();
     if (isQEMU == TRUE){
-        debug_print ("SHUTDOWN.BIN: [QEMU] Shutting down\n");
-        libio_outport16(
-            (unsigned short) 0x604, 
-            (unsigned short) 0x2000 );
+        do_via_qemu();
     }
 
 // =========================

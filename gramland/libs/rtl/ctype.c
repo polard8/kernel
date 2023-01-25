@@ -1,8 +1,6 @@
 /*
  * File: ctype.c
- *
  * User mode C library for Gramado.
- *
  * History:
  *     2018 - Created by Fred Nora.
  */
@@ -38,6 +36,6 @@ _L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,_L,      /* 224-239 */
 _L,_L,_L,_L,_L,_L,_L,_P,_L,_L,_L,_L,_L,_L,_L,_L };    /* 240-255 */
 
 //
-// End.
+// End
 //
 

@@ -36,7 +36,6 @@ double atan(double __x)
 }
 
 
-
 // It returns the 
 // integer value which is 
 // less than or equal to given number.
@@ -45,7 +44,6 @@ double floor(double __x)
 {
     return 0;
 }
-
 
 // It returns the 
 // smallest integer value 
@@ -207,7 +205,6 @@ double power4(double x, int y)
 float sinf(float arg)
 {
     float ret = 0.0f;
-
     asm(
         "fsin"
         : "=t"(ret)
@@ -215,7 +212,6 @@ float sinf(float arg)
 
     return (float) ret;
 }
-
 
 // IN: angle
 float cosf(float arg)
@@ -233,7 +229,4 @@ float tanf(float arg)
 {
     return (float) __builtin_tan(arg);
 }
-
-
-
 

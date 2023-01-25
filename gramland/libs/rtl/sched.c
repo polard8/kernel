@@ -3,13 +3,18 @@
 
 #include <sys/types.h>
 #include <sched.h>
+#include <rtl/gramado.h>
 
-
+/*
+sched_yield() causes the calling thread to relinquish the CPU.
+The thread is moved to the end of the queue for its static
+priority and a new thread gets to run.
+*/
+// renunciar
 int sched_yield(void)
 {
-    //#todo
-    //rtl_yield();
-    return (int) -1;
+    rtl_yield();
+    return 0;
 }
 
 int sched_setparam(pid_t pid, const struct sched_param* param)

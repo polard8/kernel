@@ -4,7 +4,6 @@
  *     2020 - Created by Fred Nora.
  */
 
-
 #include <types.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -17,7 +16,6 @@
 #define ____SPLIT_STRING_TOKENLIST_MAX  80
 
 typedef char ** split_t;
-
 
 char *tokenList[____SPLIT_STRING_TOKENLIST_MAX];
 
@@ -50,12 +48,12 @@ split_t split_string (unsigned char *buffer)
     if (l >= ____SPLIT_STRING_TOKENLIST_MAX){
         return (split_t) 0;
     }
-         
-  // Criando o ambiente.
- // Transferindo os ponteiros do vetor para o ambiente.
- // quando encontrarmos o delimitador, mas nesse caso,
- // como primeiro argumento não é NULL então começa
- // do início do buffer.
+
+// Criando o ambiente.
+// Transferindo os ponteiros do vetor para o ambiente.
+// quando encontrarmos o delimitador, mas nesse caso,
+// como primeiro argumento não é NULL então começa
+// do início do buffer.
 
     tokenList[0] = strtok ( &address[0], ____SPLIT_STRING_DELIM );
 
