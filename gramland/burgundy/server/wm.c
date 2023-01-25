@@ -162,12 +162,14 @@ on_mouse_event(
     unsigned long x, 
     unsigned long y );
 
-static void on_update_window(int event_type);
 static void on_mouse_pressed(void);
 static void on_mouse_released(void);
-void __probe_tb_button_hover(unsigned long long1, unsigned long long2);
-void __probe_window_hover(unsigned long long1, unsigned long long2);
+static void on_mouse_leave( struct gws_window_d *window );
+static void on_mouse_hover( struct gws_window_d *window );
 
+static void on_update_window(int event_type);
+
+void __probe_window_hover(unsigned long long1, unsigned long long2);
 
 int control_action(int msg, unsigned long long1);
 
@@ -553,15 +555,6 @@ on_mouse_event(
         // painting the pointer in the right position.
         // Lets update the position. See: comp.c
         comp_set_mouse_position(saved_x,saved_y);
-
-        // Update the 'mouse_hover' pointer.
-        // But probing only for the buttons in the taskbar.
-        // Em qual botão o mouse esta passando por cima.
-        // lembrando: o botao esta dentro de outra janela.
-        // Probe taskbar buttons.
-        // #todo
-        // Delete. We don't need to call it anymore.
-        // __probe_tb_button_hover(saved_x,saved_y);
         
         __probe_window_hover(saved_x,saved_y);
         
@@ -3603,9 +3596,12 @@ wmPostMessage(
     return 0;
 }
 
-// local
+
+/*
+#deprecated
 // Se o mouse esta passando sobre os botoes
 // da barra de tarefas.
+void __probe_tb_button_hover(unsigned long long1, unsigned long long2);
 void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
 {
 // Probe taskbar buttons.
@@ -3646,6 +3642,55 @@ void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
         }
     }
     };
+}
+*/
+
+
+// local
+static void on_mouse_leave( struct gws_window_d *window )
+{
+
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic!=1234)
+        return;
+
+// The old mousehover needs to comeback
+// to the normal state.
+// visual efect
+    if (window->type == WT_BUTTON)
+    {
+        window->status = BS_DEFAULT;
+        window->bg_color = xCOLOR_GRAY5;
+        redraw_window(window,TRUE);
+    }
+}
+
+// local
+static void on_mouse_hover( struct gws_window_d *window )
+{
+
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic!=1234)
+        return;
+
+// visual efect
+    if (window->type == WT_BUTTON)
+    {
+        window->status = BS_HOVER;
+        window->bg_color = xCOLOR_GRAY3;
+        redraw_window(window,TRUE);
+    }
+
+    // visual efect
+    if ( window->type == WT_EDITBOX_SINGLE_LINE ||
+         window->type == WT_EDITBOX_MULTIPLE_LINES )
+    {
+        // Do not redraw
+        // Change the cursor type.
+        // ...
+    }
 }
 
 // local
@@ -3693,44 +3738,17 @@ __probe_window_hover(
                 Status = is_within( (struct gws_window_d *) w, long1, long2 );
                 if (Status==TRUE)
                 {
-                    // Maybe we can create a local method
-                    // called on_mouse_hover(w)
-
-                    // The old mouse over needs to comeback
-                    // to the normal state.
-                    // visual efect
-                    if ( (void*) mouse_hover != NULL )
+                    // Deixe a antiga, e repinte ela,
+                    // se estamos numa nova.
+                    if ( w != mouse_hover )
                     {
-                        if (mouse_hover->magic == 1234)
-                        {
-                            if (mouse_hover->type == WT_BUTTON)
-                            {
-                                mouse_hover->status = BS_DEFAULT;
-                                mouse_hover->bg_color = xCOLOR_GRAY5;
-                                redraw_window(mouse_hover,TRUE);
-                            }
-                        }
-                    }
-
-                    // The new mouse over.
-                    // set_mouseover(w);
-                    mouse_hover = (void*) w;
-
-                    // visual efect
-                    if (w->type == WT_BUTTON)
-                    {
-                        w->status = BS_HOVER;
-                        w->bg_color = xCOLOR_GRAY3;
-                        redraw_window(w,TRUE);
-                    }
-
-                    // visual efect
-                    if ( w->type == WT_EDITBOX_SINGLE_LINE ||
-                         w->type == WT_EDITBOX_MULTIPLE_LINES )
-                    {
-                        // Do not redraw
-                        // Change the cursor type.
-                        // ...
+                        on_mouse_leave(mouse_hover);  // repinte a antiga
+                        // The new mouse over.
+                        // #todo: Create set_mouseover(w);
+                        mouse_hover = (void*) w;      // se new
+                        // Já que estamos numa nova, 
+                        // vamos mudar o visual dela.
+                        on_mouse_hover(w);            // repinte a nova
                     }
 
                     return;

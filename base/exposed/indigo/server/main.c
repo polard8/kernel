@@ -1,7 +1,31 @@
 // main.c
 // GNSSRV.BIN
 // Gramado Network Server
+// This is the main server whe Gramado is acting like
+// a server. When the 'product' is the 'Gramado Server'.
+// And a client can use this service to connect
+// with a Gramado Server for sharing resources
+// as well as identifying it self.
+
+// Servidor de configuração de rede local.
+// Segurança/credenciais e inicialização de sessões.
+// Através desse servidor, duas máquinas rodando Gramado
+// podem sincronizar suas ações gerando certificados
+// próprios para máquinas rodando Gramado.
+// Gramado Tokens.
+// Podemos gerar estatísticas sobre o uso da rede
+// e descrições sobre os componentes.
 // 2020 - Created by Fred Nora.
+
+/*
+ Network server costuma ser um termo genérico que identifica
+ um computador como sendo servidor em uma rede. 
+ Esses servidores costumam ser das seguintes classes:
+ + File servers -  files in the local network.
+ + Database servers - files inside the server.
+ + Application servers.
+ */
+
 
 #include <gnsint.h>
 
