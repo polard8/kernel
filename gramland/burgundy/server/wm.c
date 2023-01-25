@@ -333,6 +333,10 @@ on_keyboard_event(
             // ja esta rodando.
             if(tb_buttons_status[0] == TRUE)
                 return 0;
+            //#bugbug: 
+            //Não mude a cor do botão se o estilo for 3d.
+            //pois perde o efeito desejado.
+            //set_bg_color_by_id(tb_buttons[0],xCOLOR_GRAY1);
             set_status_by_id(tb_buttons[0],BS_PRESSED);
             redraw_window_by_id(tb_buttons[0],TRUE);
             return 0;
@@ -1581,19 +1585,35 @@ __draw_window_border(
         return;
     }
 
+// #todo
+// Is it possitle to test the validation here?
+
+// --------------------
+
+    if (window->active == TRUE){
+        window->border_size = 2;
+    }
+    if (window->active != TRUE){
+        window->border_size = 1;
+    }
+
+
 // Editbox
     if ( window->type == WT_EDITBOX || 
          window->type == WT_EDITBOX_MULTIPLE_LINES )
     {
-
         // border size:
         // #todo: it can't be hardcoded,
         // We're gonna have themes.
-        if (window->focus == TRUE){
+        if (window->focus == TRUE)
+        {
             window->border_size=2;
+            //window->border_color1 = COLOR_BLACK;
         }
-        if (window->focus == FALSE){
+        if (window->focus == FALSE)
+        {
             window->border_size=1;
+            //window->border_color1 = 0;
         }
 
         // top
@@ -2990,6 +3010,52 @@ void set_status_by_id( int wid, int status )
     w->status = (int) status;
 }
 
+void set_bg_color_by_id( int wid, unsigned int color )
+{
+    struct gws_window_d *w;
+
+// wid
+    if (wid<0){
+        return;
+    }
+    if (wid>=WINDOW_COUNT_MAX){
+        return;
+    }
+// Window structure
+    w = (struct gws_window_d *) windowList[wid];
+    if ((void*)w==NULL){
+        return;
+    }
+    if (w->used != TRUE) { return; }
+    if (w->magic != 1234){ return; }
+
+// Set bg color
+    w->bg_color = (unsigned int) color;
+}
+
+void set_clientrect_bg_color_by_id( int wid, unsigned int color )
+{
+    struct gws_window_d *w;
+
+// wid
+    if (wid<0){
+        return;
+    }
+    if (wid>=WINDOW_COUNT_MAX){
+        return;
+    }
+// Window structure
+    w = (struct gws_window_d *) windowList[wid];
+    if ((void*)w==NULL){
+        return;
+    }
+    if (w->used != TRUE) { return; }
+    if (w->magic != 1234){ return; }
+
+// Set client rect bg color
+    w->clientrect_bg_color = (unsigned int) color;
+}
+
 void set_focus_by_id(int wid)
 {
     struct gws_window_d *w;
@@ -3576,17 +3642,18 @@ void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
 }
 
 // local
-// Se o mouse esta passando sobre alguma janela
-// do alguns tipos.
-void __probe_window_hover(unsigned long long1, unsigned long long2)
+// Se o mouse esta passando sobre alguma janela de alguns tipos.
+void 
+__probe_window_hover(
+    unsigned long long1, 
+    unsigned long long2 )
 {
-// Probe taskbar buttons.
 // Well. Not valid in fullscreen.
 
     int Status=0;
     register int i=0;
-    int max = WINDOW_COUNT_MAX; // We have 4 buttons in the taskbar.
-    struct gws_window_d *w;  // The window for a button.
+    int max = WINDOW_COUNT_MAX;  // All the windows in the global list.
+    struct gws_window_d *w;
 
     if (WindowManager.initialized!=TRUE){
         return;
@@ -3608,8 +3675,10 @@ void __probe_window_hover(unsigned long long1, unsigned long long2)
     {
         if (w->magic == 1234)
         {
+            // Types:
             if ( w->type == WT_EDITBOX_SINGLE_LINE ||
-                 w->type == WT_EDITBOX_MULTIPLE_LINES )
+                 w->type == WT_EDITBOX_MULTIPLE_LINES ||
+                 w->type == WT_BUTTON )
             {
                 // Is the pointer inside this window?
                 // Registra nova mouse_hover se estiver dentro.
@@ -3618,6 +3687,24 @@ void __probe_window_hover(unsigned long long1, unsigned long long2)
                 {
                     // set_mouseover(w);
                     mouse_hover = (void*) w;
+
+                    // visual efect
+                    if (w->type == WT_BUTTON)
+                    {
+                        w->status = BS_HOVER;
+                        w->bg_color = xCOLOR_GRAY3;
+                        redraw_window(w,TRUE);
+                    }
+
+                    // visual efect
+                    if ( w->type == WT_EDITBOX_SINGLE_LINE ||
+                         w->type == WT_EDITBOX_MULTIPLE_LINES )
+                    {
+                        // Do not redraw
+                        // Change the cursor type.
+                        // ...
+                    }
+
                     return;
                 }
 
@@ -4649,33 +4736,12 @@ redraw_window (
     unsigned int border1=0;
     unsigned int border2=0;
 
-    if ( (unsigned long) window->type == WT_BUTTON )
+    if (window->type == WT_BUTTON)
     {
         //if ( (void*) window->parent == NULL )
             //printf("redraw_window: [FAIL] window->parent\n");
 
-        /*
-        if ( (void*) window->parent != NULL )
-        {
-           wmDrawFrame ( 
-            (struct gws_window_d *) window->parent,  //parent.
-            (struct gws_window_d *) window,      //bg do botão em relação à sua parent. 
-            METRICS_BORDER_SIZE,       //border size
-            (unsigned int)COLOR_BLACK, //border color 1
-            (unsigned int)COLOR_BLACK, //border color 2
-            (unsigned int)COLOR_BLACK, //border color 3
-            (unsigned int)COLOR_BLACK, //ornament color 1
-            (unsigned int)COLOR_BLACK, //ornament color 2
-            1 );  //style
-        }
-        */
-        
-        //border color
-        //o conceito de status e state
-        //está meio misturado. ja que estamos usando
-        //a função de criar janela para criar botão.
-        //#bugbug
-        
+        // Atualiza algumas características da janela.
         switch (window->status)
         {
             case BS_FOCUS:
@@ -4691,6 +4757,8 @@ redraw_window (
                 break;
 
             case BS_HOVER:
+                border1 = COLOR_YELLOW;  //#test
+                border2 = COLOR_YELLOW;  //#test
                 break;
                     
             case BS_DISABLED:
@@ -4698,6 +4766,7 @@ redraw_window (
                 border2 = COLOR_GRAY;
                 break;
 
+            //?
             case BS_PROGRESS:
                 break;
 
@@ -4748,9 +4817,7 @@ redraw_window (
         // ok, repintamos o botao que eh um caso especial
         // nao precisamos das rotinas abaixo,
         // elas serao par aos outros tipos de janela.
-        
         goto done;
-        //return 0;  
     }
 
 // =======================================
@@ -4764,87 +4831,99 @@ redraw_window (
 // Precisamos de uma rotina que redesenhe o frame,
 // sem alocar criar objetos novos.
 
-// Only the boards.
+// ----------------------------------------
+// + Redraws the title bar for WT_OVERLAPPED.
+// + Redraws the borders for overlapped and editbox.
+
     if ( window->type == WT_OVERLAPPED || 
-         window->type == WT_EDITBOX || 
+         window->type == WT_EDITBOX_SINGLE_LINE || 
          window->type == WT_EDITBOX_MULTIPLE_LINES )
     {
-        if ( (void*) window != NULL )
+        // Invalid window
+        if ( (void*) window == NULL )
+            goto fail;
+        if (window->magic != 1234)
+            goto fail;
+
+        // Invalid parent window
+        // # root has no parent, but its type is WT_SIMPLE.
+        if ( (void*) window->parent == NULL )
+            goto fail;
+        if (window->parent->magic != 1234)
+            goto fail;
+
+        // Title bar
+        // Redraw titlebar for overlapped windows.
+        // #todo: Not if the window is in fullscreen mode.
+        if (window->type == WT_OVERLAPPED)
         {
-            if ( (void*) window->parent != NULL )
+            // Valid titlebar.
+            if ( (void*) window->titlebar != NULL )
             {
-                if (window->parent->magic == 1234)
+                if (window->titlebar->magic == 1234 )
                 {
-                    // Redraw titlebar for overlapped windows.
-                    // #todo: Not if the window is in fullscreen mode.
-                    if (window->type == WT_OVERLAPPED)
+                    // Se a janela overlapped é uma janela ativa.
+                    // #bugbug Isso funciona para a janela mãe apenas.
+                    if (window->active == TRUE)
                     {
-                        if ( (void*) window->titlebar != NULL )
-                        {
-                            if (window->titlebar->magic == 1234 )
-                            {
-                                // #bugbug Isso funciona para a janela mãe apenas.
-                                if (window->active == TRUE)
-                                {
-                                    window->titlebar->bg_color = COLOR_BLUE1;
-                                    window->titlebar_color = COLOR_BLUE1;
-                                    window->titlebar_ornament_color = xCOLOR_BLACK;
-                                }
-                                // #bugbug Isso funciona para a janela mãe apenas.
-                                if (window->active == FALSE)
-                                {
-                                    window->titlebar->bg_color = COLOR_GRAY;
-                                    window->titlebar_color = COLOR_GRAY;
-                                    window->titlebar_ornament_color = xCOLOR_GRAY2;
-                                }
-
-                                //bg
-                                rectBackbufferDrawRectangle ( 
-                                    window->titlebar->left, 
-                                    window->titlebar->top, 
-                                    window->titlebar->width, 
-                                    window->titlebar->height, 
-                                    window->titlebar->bg_color, 
-                                    TRUE,   // fill
-                                    (unsigned long) window->rop );  // rop for this window
-                            
-                                // ornament
-                                rectBackbufferDrawRectangle ( 
-                                    window->titlebar->left, 
-                                    ( (window->titlebar->top) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
-                                    window->titlebar->width, 
-                                    METRICS_TITLEBAR_ORNAMENT_SIZE, 
-                                    window->titlebar_ornament_color, 
-                                    TRUE,  // fill
-                                    (unsigned long) window->rop );  // rop_flags
-                            
-                                // redraw controls.
-                                // recursive
-                                // #bugbug
-                                // Recursive is dangerous and
-                                // it is painting in the wrong place.
-                                //redraw_window(window->titlebar->Controls.minimize,FALSE);
-                                //redraw_window(window->titlebar->Controls.maximize,FALSE);
-                                //redraw_window(window->titlebar->Controls.close,FALSE);
-                            }
-                        }
-                    }//tb
-
-                    // let's repaint the borders for some types
-                    if( window->type == WT_OVERLAPPED ||
-                        window->type == WT_EDITBOX ||
-                        window->type == WT_EDITBOX_MULTIPLE_LINES )
+                        window->titlebar->bg_color = COLOR_BLUE1;
+                        window->titlebar_color = COLOR_BLUE1;
+                        window->titlebar_ornament_color = xCOLOR_BLACK;
+                    }
+                    // Se a janela overlapped não é uma janela ativa.
+                    // #bugbug Isso funciona para a janela mãe apenas.
+                    if (window->active == FALSE)
                     {
-                        if(window->active == TRUE )
-                            window->border_size = 2;
-                        if(window->active != TRUE )
-                            window->border_size = 1;
-                        __draw_window_border(window->parent, window);
-                    } // borders
+                        window->titlebar->bg_color = COLOR_GRAY;
+                        window->titlebar_color = COLOR_GRAY;
+                        window->titlebar_ornament_color = xCOLOR_GRAY2;
+                    }
+
+                    //bg
+                    rectBackbufferDrawRectangle ( 
+                        window->titlebar->left, 
+                        window->titlebar->top, 
+                        window->titlebar->width, 
+                        window->titlebar->height, 
+                        window->titlebar->bg_color, 
+                        TRUE,   // fill
+                        (unsigned long) window->rop );  // rop for this window
+
+                    // ornament
+                    rectBackbufferDrawRectangle ( 
+                        window->titlebar->left, 
+                        ( (window->titlebar->top) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+                        window->titlebar->width, 
+                        METRICS_TITLEBAR_ORNAMENT_SIZE, 
+                        window->titlebar_ornament_color, 
+                        TRUE,  // fill
+                        (unsigned long) window->rop );  // rop_flags
+
+                    // redraw controls.
+                    // recursive
+                    // #bugbug
+                    // Recursive is dangerous and
+                    // it is painting in the wrong place.
+                    //redraw_window(window->titlebar->Controls.minimize,FALSE);
+                    //redraw_window(window->titlebar->Controls.maximize,FALSE);
+                    //redraw_window(window->titlebar->Controls.close,FALSE);
                 }
             }
         }
+
+        // Borders: 
+        // Let's repaint the borders for some types.
+        if ( window->type == WT_OVERLAPPED ||
+             window->type == WT_EDITBOX_SINGLE_LINE ||
+             window->type == WT_EDITBOX_MULTIPLE_LINES )
+        {
+            __draw_window_border(window->parent, window);
+        }
+        
+        //...
     }
+
+    // ...
 
 done:
     if (flags == TRUE){
@@ -5253,8 +5332,11 @@ void create_taskbar (unsigned long tb_height)
 {
     int WindowId = -1;  // bar
     int menu_wid;       // button
-    unsigned int frame_color  = 0x00C3C3C3; //COLOR_GRAY;
-    unsigned int client_color = 0x00C3C3C3; //COLOR_GRAY;
+
+// Cores para os botões.
+    unsigned int frame_color  = 0x00C3C3C3;
+    unsigned int client_color = 0x00C3C3C3;
+
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
 
@@ -5349,7 +5431,6 @@ void create_taskbar (unsigned long tb_height)
     };
     tb_buttons_count=0;
 
-
 // ========================================
 // start menu button
 
@@ -5392,8 +5473,8 @@ void create_taskbar (unsigned long tb_height)
             b_width, 
             b_height,   
             taskbar_window, 0, 
-            frame_color, 
-            client_color );    
+            frame_color,     // frame color 
+            client_color );  // client window color
 
     if ( (void *) tmp_button == NULL ){
         gwssrv_debug_print ("create_taskbar: tmp_button\n"); 

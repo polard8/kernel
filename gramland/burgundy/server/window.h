@@ -12,7 +12,6 @@
 typedef int  __wid_t;
 typedef int  wid_t;
 
-
 // ===============================================================
 
 //
@@ -1157,6 +1156,8 @@ struct gws_surface_d *rootSurface;
 
 void set_status_by_id( int wid, int status );
 
+void set_bg_color_by_id( int wid, unsigned int color );
+void set_clientrect_bg_color_by_id( int wid, unsigned int color );
 
 //
 // Focus

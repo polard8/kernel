@@ -567,6 +567,9 @@ void *doCreateWindow (
         return NULL;
     }
 
+    window->bg_color = (unsigned int) frame_color;
+    window->clientrect_bg_color = (unsigned int) client_color;
+
     window->type = (unsigned long) type;
     window->style = (unsigned long) style;  // A lot of flags
 // buffers
@@ -574,7 +577,8 @@ void *doCreateWindow (
     window->back_buf = NULL;
     window->front_buf = NULL;
     window->depth_buf = NULL;
-    //window->DedicatedBuffer = (void*) windowCreateDedicatedBuffer(window);
+    //window->DedicatedBuffer = 
+    //    (void*) windowCreateDedicatedBuffer(window);
     //window->BackBuffer = (void *) g_backbuffer_va;
     //window->FrontBuffer = (void *) g_frontbuffer_pa;
 // Device contexts
@@ -927,15 +931,11 @@ void *doCreateWindow (
 
     window->client_window = NULL;  // window. 
 
-//
-// Terminal window
-//
-
+// Terminal window:
 // #importante
 // Terminal support.
 // Suporte não tradicional à terminais.
 // manipulando variáveis ao invés de uma estrutura.
-
     window->terminal_used = (int) 0;
     window->terminal_magic = (int) 0;
     //#suspenso
@@ -1433,7 +1433,8 @@ void *doCreateWindow (
 
 // Client area rectangle
 
-    if (ClientArea == TRUE){
+    if (ClientArea == TRUE)
+    {
         window->rcClient.left   = (unsigned long) window->left;
         window->rcClient.top    = (unsigned long) window->height;
         window->rcClient.width  = (unsigned long) window->width;
@@ -1714,7 +1715,8 @@ void *CreateWindow (
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
-                         frame_color, client_color, 
+                         frame_color, 
+                         client_color, 
                          (unsigned long) __rop_flags ); 
 
          if ( (void *) __w == NULL ){
@@ -1875,17 +1877,18 @@ draw_frame:
          type == WT_EDITBOX_MULTIPLE_LINES || 
          type == WT_BUTTON )
     {
-        if ( (void*) __w != NULL ){
-        wmCreateWindowFrame ( 
-            (struct gws_window_d *) pWindow,
-            (struct gws_window_d *) __w, 
-            METRICS_BORDER_SIZE,
-            (unsigned int)COLOR_BLACK, 
-            (unsigned int)COLOR_BLACK,
-            (unsigned int)COLOR_BLACK,
-            (unsigned int)xCOLOR_GRAY6,
-            (unsigned int)xCOLOR_GRAY3,
-            1 );
+        if ( (void*) __w != NULL )
+        {
+            wmCreateWindowFrame ( 
+                (struct gws_window_d *) pWindow,
+                (struct gws_window_d *) __w, 
+                METRICS_BORDER_SIZE,
+                (unsigned int)COLOR_BLACK, 
+                (unsigned int)COLOR_BLACK,
+                (unsigned int)COLOR_BLACK,
+                (unsigned int) 0x00C3C3C3,  //xCOLOR_GRAY6,
+                (unsigned int) 0x00C3C3C3,  //xCOLOR_GRAY3,
+                1 );  // style
         }
     }
 
