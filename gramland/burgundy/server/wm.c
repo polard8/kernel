@@ -3134,7 +3134,12 @@ void activate_last_window(void)
     }
     if (last_window->used != TRUE) { return; }
     if (last_window->magic != 1234){ return; }
+
 // Type validation
+// #bugbug
+// Can we active the root window?
+// The root window is WT_SIMPLE.
+
     if (last_window->type != WT_OVERLAPPED){
         return;
     }
@@ -3650,7 +3655,8 @@ __probe_window_hover(
     unsigned long long1, 
     unsigned long long2 )
 {
-// Well. Not valid in fullscreen.
+// Check if the mouse is hover a window, given the coordenates.
+// Well. Not valid in fullscreen for now.
 
     int Status=0;
     register int i=0;
@@ -3687,6 +3693,9 @@ __probe_window_hover(
                 Status = is_within( (struct gws_window_d *) w, long1, long2 );
                 if (Status==TRUE)
                 {
+                    // Maybe we can create a local method
+                    // called on_mouse_hover(w)
+
                     // The old mouse over needs to comeback
                     // to the normal state.
                     // visual efect
@@ -5715,6 +5724,13 @@ int dock_window( struct gws_window_d *window, int position )
 // Dock a given window into a given corner.
 // Not valid in fullscreen mode.
 
+    if (WindowManager.initialized != TRUE){
+        return -1;
+    }
+// Can't dock a window in fullscreen mode.
+    if (WindowManager.is_fullscreen == TRUE){
+        return -1;
+    }
 
 // todo
 // Use the working area, not the device area.
@@ -5724,18 +5740,12 @@ int dock_window( struct gws_window_d *window, int position )
     //Using the working area
     unsigned long w = WindowManager.wa_width;
     unsigned long h = WindowManager.wa_height;
-
     if ( w==0 || h==0 ){
         return -1;
     }
 
 // #bugbug
 // Validate the max value.
-
-// Can't dock a window in fullscreen mode.
-    if (WindowManager.is_fullscreen == TRUE){
-        return -1;
-    }
 
 // Structure validation
     if ( (void*) window == NULL ){
@@ -5745,49 +5755,44 @@ int dock_window( struct gws_window_d *window, int position )
         return -1;
     }
 
-// Can't be the root.
+// Can't be the root
     if (window == __root_window){
         return -1;
     }
-// Can't be the active window.
+// Can't be the active window
     if (window == taskbar_window){
         return -1;
     }
 
-
-//
 // Window type
-//
-
     if (window->type == WT_BUTTON){
         return -1;
     }
-
 
     switch (position){
 
         // top
         // #todo: maximize in this case
         case 1:
-            gwssrv_change_window_position( window, 0, 0); 
+            gwssrv_change_window_position( window, 0, 0 );
             gws_resize_window( window, w, h );
             //gws_resize_window( window, w, h>>1 );
             break;
         //right
         case 2:
-            gwssrv_change_window_position( window, (w>>1), 0); 
+            gwssrv_change_window_position( window, (w>>1), 0 );
             gws_resize_window( window, (w>>1)-4, h-4 );
             break;
         //bottom
         //#todo: restore or put it in the center.
         case 3:
-            gwssrv_change_window_position( window, 0, h>>2); 
-            //gwssrv_change_window_position( window, 0, h>>1); 
+            gwssrv_change_window_position( window, 0, h>>2 );
+            //gwssrv_change_window_position( window, 0, h>>1 );
             gws_resize_window( window, w, h>>1 );
             break;
         //left
         case 4:
-            gwssrv_change_window_position( window, 0, 0); 
+            gwssrv_change_window_position( window, 0, 0 ); 
             gws_resize_window( window, (w>>1)-4, h-4 );
             break;
 
@@ -5795,6 +5800,9 @@ int dock_window( struct gws_window_d *window, int position )
             return -1;
             break;
     };
+
+    // #test
+    set_active_window(window);
 
     redraw_window(window,TRUE);
     return 0; 
@@ -5807,6 +5815,10 @@ struct gws_window_d *get_active_window (void)
 
 void set_active_window (struct gws_window_d *window)
 {
+// #bugbug
+// Can we active the root window?
+// The root window is WT_SIMPLE.
+
     if (window == active_window){
         return;
     }
