@@ -5,6 +5,11 @@
 
 #include <kernel.h>  
 
+
+// Random base number for new port numbers for the clients.
+#define BASE_NEW_CLIENT_PORT_NUMBER  11000
+static unsigned short __new_client_port_number=BASE_NEW_CLIENT_PORT_NUMBER;
+
 unsigned char localhost_ipv4[4] = { 127, 0, 0, 1 };
 
 // Internal
@@ -1250,7 +1255,7 @@ fail:
  */
 // bind() is typically used on the server side, and 
 // associates a socket with a socket address structure, 
-// i.e. a specified local IP address and a port number.
+// i.e. a specified local 'IP address' and a 'port number'.
 // See:
 // https://man7.org/linux/man-pages/man2/bind.2.html
 
@@ -1279,15 +1284,15 @@ sys_bind (
 
 // fd
     if ( sockfd < 0 || sockfd >= OPEN_MAX ){
-        debug_print ("sys_bind: sockfd fail\n");
-        printf      ("sys_bind: sockfd fail\n");
+        debug_print ("sys_bind: sockfd\n");
+        printf      ("sys_bind: sockfd\n");
         return (int) (-EINVAL);
     }
 
 // Check addr structure.
     if ( (void *) addr == NULL ){
-        debug_print ("sys_bind: addr fail\n");
-        printf      ("sys_bind: addr fail\n");
+        debug_print ("sys_bind: addr\n");
+        printf      ("sys_bind: addr\n");
         goto fail;
     }
 
@@ -1307,37 +1312,42 @@ sys_bind (
         goto fail;
     }
 
-// file
-// O objeto do tipo socket.
+// file:
+// The objects type is 'socket'.
 
     f = (file *) p->Objects[sockfd];
     if ( (void *) f == NULL ){
-        debug_print ("sys_bind: f fail\n");
-        printf      ("sys_bind: f fail\n");
+        debug_print ("sys_bind: f\n");
+        printf      ("sys_bind: f\n");
         goto fail;
+    }
+    if (f->magic!=1234){
+       printf("sys_bind: f validation\n");
+       goto fail; 
     }
 
     if ( is_socket(f) != TRUE ){
-        debug_print ("sys_bind: f is not a socket object\n");
-        printf      ("sys_bind: f is not a socket object\n");
+        debug_print ("sys_bind: f is not a socket\n");
+        printf      ("sys_bind: f is not a socket\n");
         goto fail;
     }
 
-// socket
-// A estrutura de socket associada ao objeto do tipo socket.
+// socket structure:
+// A socket object has a socket structure associates with the file.
     s = (struct socket_d *) f->socket;
     if ( (void *) s == NULL ){
-        debug_print ("sys_bind: s fail\n");
-        printf      ("sys_bind: s fail\n");
+        debug_print ("sys_bind: s\n");
+        printf      ("sys_bind: s\n");
         goto fail; 
     }
 
 // family
-// Everything is ok.
 // Binding the name to the socket.
-// So now we need to include the 'name' into the socket structure
+// So, now we need to include the 'name' into the socket structure,
 // respecting the socket's family.
 // Each family has a different size?
+// For now we have only two server, gwssrv and gnssrv,
+// and they are using this type of family.
 
 //++
 // AF_GRAMADO
@@ -1345,15 +1355,18 @@ sys_bind (
     {
         debug_print ("sys_bind: [AF_GRAMADO] Binding the name to the socket.\n");
         // Copy. Always 14.
+        // #important:
+        // For this type of family, the information associated with the
+        // servers socket is a two byte string. Example: 'ws' or 'ns'.
         for (i=0; i<14; i++){
             s->addr.sa_data[i] = addr->sa_data[i];
-        }; 
+        };
         // #debug
         if (Verbose==TRUE){
             printf ("sys_bind: process %d | family %d | len %d\n", 
                 current_process, addr->sa_family, addrlen  );
         }
-        debug_print ("sys_bind: bind ok\n");
+        // debug_print ("sys_bind: bind ok\n");
         return 0;
     }
 //--
@@ -1434,6 +1447,8 @@ fail:
  retransmission, the request may be ignored so that a later reattempt
  at connection succeed.
 */
+// At this moment, the operating system has to assign a not used 
+// random port number to the client.
 // IN: client fd, address, address len
 // OUT: 0=ok <0=fail
 
@@ -1803,6 +1818,13 @@ sys_connect (
         printf ("sys_connect: [FAIL] client socket is not SS_UNCONNECTED\n");
         goto fail;
     }
+
+
+// #test
+// Assign a port number to the client socket.
+// #todo #bugbug We gotta work on this routine.
+    __new_client_port_number++;
+    client_socket->port = (unsigned short) __new_client_port_number;
 
 // Server process
 // #todo

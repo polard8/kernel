@@ -499,10 +499,12 @@ struct socket_d
 
 // 1=LOCAL | 2=REMOTE
     int connection_type;
+
 // ip and port.
     unsigned int ip_ipv4;
     unsigned long ip_ipv6;
     unsigned short port;
+
 // The list of pending connections.
 // Updated by listen().
     int connections_count;
