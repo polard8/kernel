@@ -1,0 +1,16 @@
+
+
+
+Virtualbox log:
+E1000#0: 
+Chip=82540EM 
+LinkUpDelay=3000ms 
+EthernetCRC=on 
+GSO=enabled 
+Itr=disabled 
+ItrRx=enabled 
+TID=disabled 
+R0=enabled 
+RC=disabled
+
+

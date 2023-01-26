@@ -69,7 +69,6 @@ void page_enable()
  * History:
  *     2015 - Created by Fred Nora.
  */
-
 // Called by OS_Loader_Main in main.c
 
 extern void go_to_kernel(void);
@@ -516,6 +515,6 @@ Entry_386:
 }
 
 //
-// End.
+// End
 //
 

@@ -8,3 +8,8 @@
 	Precisa registrar na estrutura de dispositivos e na
 	lista de dispositivos. Colocando informações como
 	a classe do dispositivo. (char, block, network). No caso, block.
+
+
+Virtualbox log:
+PIIX3 ATA: LUN#0: disk, PCHS=963/4/17, total number of sectors 65536.
+

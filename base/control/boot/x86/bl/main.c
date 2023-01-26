@@ -103,7 +103,9 @@ int bliTesting=0;
 
 static unsigned long init_testing_memory_size(int mb);
 static int newOSLoadKernelImage(void);
-static void BlSetupPaging(void);
+
+
+
 static void blShowMenu (void);
 static void BlMenu(void);
 
@@ -254,38 +256,6 @@ fail:
     return (int) (-1);
 }
 
-/*
- * BlSetupPaging:
- *     Setup paging.
- * In this function:
- * @diretorio:
- *   page_directory = 0x9C000
- *   OBS: 
- * Esse diret�rio criado ser� usado pelas primeiros processos durante
- * essa fase de constru��o do sistema.
- *        O ideal � um diret�rio por processo.
- *        Toda vez que o kernel iniciar a execu��o de um processo ele deve 
- * carregar o endere�o do diretorio do processo em CR3.
- *       Por enquanto s� tem um diret�rio criado.
- * @p�ginas:
- *   km_page_table  = 0x8C000 (RING 0).
- *   um_page_table  = 0x8E000 (RING 3).
- *   vga_page_table = 0x8F000 (RING 3).
- *   lfb_page_table = ?? (RING 3).
- * @todo: 
- * Esses endere�os precisam ser registrados em vari�veis globais ou
- * dentro de uma estrutura para se passado para o Kernel.
- * Essa deve ser uma interface que chama as rotinas 
- * de configuraçao da paginaçao. 
- */
-
-// See: pages.c
-static void BlSetupPaging(void)
-{
-    SetUpPaging();
-}
-
-
 // Show menu.
 static void blShowMenu (void)
 {
@@ -376,20 +346,16 @@ ____go:
 }
 
 
-/*
- * OS_Loader_Main:
- *     This is the entrypoint for the C part of the boot loader.
- *     Initializes, loads the kernel image and returns to head.s.
- */
-// The function StartLoader in head.s jumps here.
-// #todo
-// Podemos cair num shell de recuperaçcao
-// caso o carregamento der errado.
-
-// global.
+// OS_Loader_Main:
+// Called by _OS_Loader_Entry_Point in head.s.
+// This is the entrypoint for the C part of the boot loader.
+// + Load the kernel image.
+// + Setup paging and the base pagetables used by the kernel.
+// + Jumps to the kernel image.
 void OS_Loader_Main (void)
 {
     int Status = (-1);
+    int fTest=FALSE;
 
 // root and fat not loaded yet.
     g_fat16_root_status = FALSE;
@@ -708,8 +674,7 @@ See: https://wiki.osdev.org/X86-64
 
 /*
 // x86_64 is supported.
-    if ( (data & 1) != 0 )
-    {
+    if ( (data & 1) != 0 ){
         printf("OS_Loader_Main: x86_64 hardware supported\n");
         refresh_screen();
     }
@@ -752,16 +717,15 @@ See: https://wiki.osdev.org/X86-64
 // In this document.
 // See: pages.c
 
-//#debug
+    //#debug
     //printf ("OS_Loader_Main: Setup paging ...\n");
     //refresh_screen();
 
-    //BlSetupPaging();
     SetUpPaging();
 
-// Nao podemos chamar rotina alguma aqui,
-// somente retornar.
+// Nao podemos chamar rotina alguma aqui, somente retornar.
 // Pois os registradores estao bagunçados.
+
 // Not reached
     while (1){
         asm("cli");

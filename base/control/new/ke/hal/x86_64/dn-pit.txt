@@ -1,0 +1,8 @@
+
+
+virtualbox log:
+PIT: mode=2 count=0x10000 (65536) - 18.20 Hz   (ch=0)
+PIT: mode=2 count=0x48d3  (18643) - 64.00 Hz   (ch=0)
+PIT: mode=3 count=0x2e9b  (11931) - 100.00 Hz  (ch=0)
+PIT: mode=3 count=0x4a9   (1193)  - 1000.15 Hz (ch=0)
+

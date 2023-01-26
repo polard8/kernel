@@ -55,7 +55,7 @@ extern _refresh_screen
 ; eax = 0
 ; ebx = 0x00090000 (boot block address)
 ; ecx = 0
-; edx = 1234       (signature)
+; edx = 1234       (Signature)
 
 global _kernel_begin 
 _kernel_begin:
@@ -101,12 +101,19 @@ START:
     mov rax, qword __SYSTEM_BOOTING
     mov qword [_system_state], rax 
 
-    ;mov r8, rax
-
     xor rax, rax
     xor rbx, rbx
     xor rcx, rcx
     xor rdx, rdx
+
+    mov  r8, rax
+    mov  r9, rax
+    mov r10, rax
+    mov r11, rax
+    mov r12, rax
+    mov r13, rax
+    mov r14, rax
+    mov r15, rax
 
 ; This gdt is here in this document.
 
@@ -272,6 +279,22 @@ START:
 
 ;--------------------------------------
 
+; Clear register 
+    xor rax, rax
+    xor rbx, rbx
+    xor rcx, rcx
+    xor rdx, rdx
+    mov  r8, rax
+    mov  r9, rax
+    mov r10, rax
+    mov r11, rax
+    mov r12, rax
+    mov r13, rax
+    mov r14, rax
+    mov r15, rax
+
+;--------------------------------------
+
 ; Use the calling convention for this compiler.
 ; rdi
 ; No return
@@ -281,7 +304,7 @@ START:
     xor rax, rax
     mov rdi, rax    ; First argument.
     ; ...
-    
+
     call _kmain
 
 dieLoop:

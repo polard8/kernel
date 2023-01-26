@@ -82,7 +82,8 @@ _OS_Loader_Entry_Point:
    JMP StartLoader
 
     %include "header.inc"
-    ;...
+    ; ...
+
 StartLoader:
 
 ; First of all, we're gonna save
@@ -120,21 +121,15 @@ StartLoader:
     mov byte [bl_video_mode], al
     mov dword [_g_lbf_pa], ebx      ;Endereço fisico do LFB.
 
-;
-; == Boot Block ========================================
-;
-
+; Boot Block: 
 ; BootBlock pointer.
 ; Ponteiro para o bootblock passado pelo boot manager.
 ; #todo
 ; We need to use this address to setup the base of the
 ; boot block strucure used in this BL.
-
     mov dword [_SavedBootBlock], edx 
-
 ; Gramado mode. (jail, p1, home ...)
     mov dword [_SavedGramadoMode], edi 
-
 
 ;++
 ; ===============================================
@@ -182,7 +177,6 @@ StartLoader:
     mov dword [_SavedBPP], eax
     mov dword [0x90000 + 24], eax
     mov dword [0x90000 + 28], 0
-
 
 ; ?
 ; 0x00090000 + 32
@@ -237,8 +231,8 @@ StartLoader:
 
 ; PIC initialization.
 ; #todo Explain it better.
-; IRQ 0-7: interrupts 20h-27h.
-; IRQ 8-15: interrupts 28h-2Fh.
+; IRQ 0-7:  Interrupts 20h-27h.
+; IRQ 8-15: Interrupts 28h-2Fh.
 
     cli
     mov al, 00010001b  ;Begin PIC 1 initialization.
@@ -274,13 +268,8 @@ StartLoader:
     out 0x21, al 
     IODELAY 
 
-;
 ; PIT
-;
-
-; PIT
-; #importante
-; Vamos deixar o kernel inicializar o PIT.
+; Initialized by the kernel image.
 
 ;
 ;  Call C part.
@@ -292,10 +281,7 @@ StartLoader:
     jmp _OS_Loader_Main
     ;jmp $
 
-;
 ; == Go to kernel ================================
-;
-
 ; A parte em C salta para cá depois da inicializaçao,
 ; para enfim saltarmos para o kernel.
 ; Called by SetUpPaging() in pages.c.
@@ -352,7 +338,8 @@ _go_to_kernel:
 ; Jump to the 64bit code in KERNEL.BIN.
 ; It will change the game and we will enter in 64bit long mode.
 ; See: _kernel_begin in: 
-; x86_64/entrance/head_64.asm
+; new/arch/x86_64/entrance/head_64.asm
+; search for '__HEAD'.
 
     xor eax, eax
     mov ebx, dword 0x00090000  ; boot block address.
