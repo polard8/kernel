@@ -42,6 +42,25 @@ struct ether_arp
 } __attribute__((packed)); 
 
 
+// =====================================
+
+
+void 
+network_handle_arp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
+void 
+network_send_arp( 
+    int op,   //operation
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6] );
+
+void network_send_arp_reply(void);
+void network_send_arp_request(void);
+
+
 #endif    
 
 

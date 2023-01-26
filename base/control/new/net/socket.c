@@ -447,7 +447,7 @@ socket_inet (
     }
 
     sock->addr_in.sin_family      = AF_INET;
-    sock->addr_in.sin_port        = 11369;  //??
+    sock->addr_in.sin_port        = 11369;  //?
     sock->addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
 
 // Process
@@ -551,7 +551,6 @@ socket_inet (
     //_file->_tmpfname = "socket";
 
 // Buffer support:
-
     _file->_base    = buff;
     _file->_p       = buff;
     _file->_lbfsize = BUFSIZ;
@@ -1481,6 +1480,7 @@ sys_connect (
 // vamos precisar de outra estrututura.
     struct sockaddr_in *addr_in;
     int Verbose = FALSE;
+    register int i=0;
 
     unsigned char *given_ip;
 // The client is trying to connect to to localhost.
@@ -1724,7 +1724,6 @@ sys_connect (
 
 //__go:
 
-
 // #bugbug
 // Daqui pra frente só faz sentido continuarmos
 // se a intenção do cliente foi conectar-se com um servidor
@@ -1738,10 +1737,9 @@ sys_connect (
 // == Client process =============================
 //
 
-// Vamos obter o arquivo do tipo soquete
-// que pertence ao sender.
+// Vamos obter o arquivo do tipo soquete que pertence ao sender.
 
-    if (current_process<0 || current_process >= PROCESS_COUNT_MAX ){
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         printf ("sys_connect: current_process\n");
         goto fail;
     }
@@ -1860,7 +1858,6 @@ sys_connect (
 // presente na estrutura do processo servidor.
 
     int __slot=-1;  //fail
-    register int i=0;
     for (i=3; i<31; i++){
          if (sProcess->Objects[i] == 0){
              __slot = i;

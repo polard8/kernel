@@ -72,11 +72,18 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-OBJS = socket.o network.o    
+OBJS = socket.o network.o \
+arp.o ipv4.o tcp.o udp.o    
+
 
 all:
 	$(CC) -c socket.c   $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
 	$(CC) -c network.c  $(KERNEL_INCLUDE) $(CFLAGS) -o network.o
+#Protocols
+	$(CC) -c prot/arp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o arp.o
+	$(CC) -c prot/ipv4.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ipv4.o
+	$(CC) -c prot/tcp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o tcp.o
+	$(CC) -c prot/udp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o udp.o
 
 # link
 	$(LD) -r -o archive_net.o $(OBJS)

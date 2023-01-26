@@ -25,6 +25,14 @@
 // without a payload:  
 // with a payload: 
 
+// size:
+// By default, the max limit of a TCP packet is 64K or 65535 bytes.
+// 1GB if you use window scaling (by left shifting the window size by 14).
+// The maximum size of a TCP packet is 64K (65535 bytes). 
+// Generally, the packet size gets restricted by the 
+// Maximum Transmission Unit (MTU) of network resources.
+// The MTU (Maximum Transmission Unit) for Ethernet, 
+// for instance, is 1500 bytes. 
 
 typedef uint32_t  tcp_seq;
 typedef uint32_t  tcp_ack;
@@ -34,9 +42,10 @@ typedef uint32_t  tcp_ack;
 struct tcp_d
 {
 
+// Ports:
 // 16,16
-    uint16_t th_sport;  /* source port */
-    uint16_t th_dport;  /* destination port */
+    uint16_t th_sport;  // source port
+    uint16_t th_dport;  // destination port
 
 // 32,32
     tcp_seq th_seq;    /* sequence number */
@@ -58,6 +67,13 @@ struct tcp_d
 // Optional data: 0~40 bytes
 };
 
+// =====================================
+
+
+void 
+network_handle_tcp( 
+    const unsigned char *buffer, 
+    ssize_t size );
 
 #endif    
 

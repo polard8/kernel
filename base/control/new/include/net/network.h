@@ -103,16 +103,8 @@ extern int ____network_late_flag;
 //
 // == Prototypes ====================
 //
-void 
-network_send_arp( 
-    int op,   //operation
-    uint8_t source_ip[4], 
-    uint8_t target_ip[4], 
-    uint8_t target_mac[6] );
 
 
-void network_send_arp_reply(void);
-void network_send_arp_request(void);
 void testNIC(void);
 
 // Handle package.
@@ -120,17 +112,6 @@ void
 network_on_receiving ( 
     const unsigned char *buffer, 
     ssize_t size );
-
-void 
-network_handle_ipv4( 
-    const unsigned char *buffer, 
-    ssize_t size );
-
-void 
-network_handle_arp( 
-    const unsigned char *buffer, 
-    ssize_t size );
-
 
 int network_buffer_in( void *buffer, int len );
 int network_buffer_out( void *buffer, int len );

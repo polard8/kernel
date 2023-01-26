@@ -311,11 +311,14 @@ extern unsigned long gSavedBPP;
 #include "net/in.h"
 #include "net/un.h"
 #include "net/ethernet.h"
-#include "net/arp.h"
-#include "net/ip.h"
-#include "net/udp.h"
-#include "net/tcp.h"
-#include "net/icmp.h" 
+
+// Protocols
+#include "net/prot/arp.h"
+#include "net/prot/ip.h"
+#include "net/prot/tcp.h"
+#include "net/prot/udp.h"
+#include "net/prot/icmp.h" 
+
 #include "net/nports.h"     //(network) Network Ports  (sw)
 #include "net/network.h"     //(network) Gerenciamento de rede.  
 #include "net/socket.h"      //last always

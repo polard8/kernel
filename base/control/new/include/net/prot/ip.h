@@ -6,10 +6,14 @@
 
 #define IPVERSION    4
 
+//
+// Protocols
+//
+
 #define PROTOCOL_IP_ICMP  1
 #define PROTOCOL_IP_TCP   6
 #define PROTOCOL_IP_UDP   11
-
+// ...
 
 #define IP_RF  0x8000			/* reserved fragment flag */
 #define IP_EF  0x8000			/* evil flag, per RFC 3514 */
@@ -17,12 +21,14 @@
 #define IP_MF  0x2000			/* more fragments flag */
 #define IP_OFFMASK  0x1fff		/* mask for fragmenting bits */
 
-
+// ??
 #define IP_MINFRAGSIZE  69     /* minumum size that can be fraged */
 #define IP_MAXPACKET    65535  /* maximum packet size */
 
 #define IP_HEADER_LENGHT  20
 
+
+// ipv4
 // Lenght = 20 bytes
 struct ip_d
 {
@@ -39,6 +45,10 @@ struct ip_d
 // Total lenght (16bits)
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
+// This 16-bit field defines the entire packet size in bytes, 
+// including header and data. 
+// The minimum size is 20 bytes (header without data) and 
+// the maximum is 65,535 bytes. 
     u_int16_t ip_len;
 
 // Identification (16bits)
@@ -61,7 +71,8 @@ struct ip_d
 // Only the header.
     u_int16_t ip_sum;
 
-// Source and dest address.
+// IP:
+// Source and dest IP address.
 // Address in network byte order.
 // See: net/in.h 
     struct in_addr  ip_src;  //(32bits)
@@ -70,6 +81,14 @@ struct ip_d
 // Optional if IHL > 5.
 // 0~320 bits.
 };
+
+// =====================================
+
+void 
+network_handle_ipv4( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 
 #endif   
 
