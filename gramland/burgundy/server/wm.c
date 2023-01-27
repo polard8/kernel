@@ -14,6 +14,9 @@ extern int gUseMouse;
 // See: window.h
 struct gws_windowmanager_d  WindowManager;
 
+// Default color scheme
+struct gws_color_scheme_d* GWSCurrentColorScheme;
+
 // -------------------------------------
 
 // Windows - (struct)
@@ -287,6 +290,12 @@ on_keyboard_event(
     unsigned long Result=0;
     char name_buffer[64];
 
+// #todo
+    unsigned int fg_color = 
+        (unsigned int) get_color(csiSystemFontColor);
+    unsigned int bg_color = 
+        (unsigned int) get_color(csiSystemFontColor);
+
     if (msg<0){
         return 0;
     }
@@ -304,13 +313,12 @@ on_keyboard_event(
         return 0;
     }
 
-
 //================================
     if (msg == GWS_KeyDown)
     {
         // Print a char into the window with focus.
         wm_draw_char_into_the_window(
-            window, (int) long1, xCOLOR_GRAY1 );
+            window, (int) long1, fg_color );
         // Enqueue a message into the queue that belongs
         // to the window with focus.
         // The client application is gonna get this message.
@@ -1137,6 +1145,9 @@ int __has_wallpaper(void)
 // Called by main.c
 void wmInitializeStructure(void)
 {
+    unsigned int bg_color = 
+        (unsigned int) get_color(csiDesktop);
+
 // Clear the structure.
     WindowManager.mode = WM_MODE_TILED;  //tiling
 // orientation
@@ -1182,10 +1193,15 @@ void wmInitializeStructure(void)
     WindowManager.wa_width  = 0;
     WindowManager.wa_height = 0;
 
+//
+// Background color
+//
+
 // Default background color.
-    __set_default_background_color(WM_DEFAULT_BACKGROUND_COLOR);
+    __set_default_background_color(bg_color);
 // Default background color.
-    __set_custom_background_color(COLOR_GREEN);
+    __set_custom_background_color(bg_color);
+
     WindowManager.has_custom_background_color = FALSE;
 // Wallpaper
     WindowManager.has_wallpaper = FALSE;
@@ -1436,6 +1452,13 @@ void do_create_controls(struct gws_window_d *window)
     struct gws_window_d *close;
     int id=-1;
 
+// Colors for the button
+    unsigned int bg_color =
+        (unsigned int) get_color(csiButton);
+    //unsigned int bg_color =
+    //    (unsigned int) get_color(csiButton);
+
+
     if ( (void*)window == NULL ){
         return;
     }
@@ -1476,7 +1499,7 @@ void do_create_controls(struct gws_window_d *window)
             Top,       //t 
             ButtonWidth, 
             ButtonHeight,   
-            window, 0, COLOR_GRAY, COLOR_GRAY );
+            window, 0, bg_color, bg_color );
 
     if ( (void *) minimize == NULL ){
         //gwssrv_debug_print ("xx: minimize fail \n");
@@ -1508,7 +1531,7 @@ void do_create_controls(struct gws_window_d *window)
             Top,       //t 
             ButtonWidth, 
             ButtonHeight,   
-            window, 0, COLOR_GRAY, COLOR_GRAY );
+            window, 0, bg_color, bg_color );
 
     if ( (void *) maximize == NULL ){
         //gwssrv_debug_print ("xx: maximize fail \n");
@@ -1539,7 +1562,7 @@ void do_create_controls(struct gws_window_d *window)
             Top,       //t 
             ButtonWidth, 
             ButtonHeight,   
-            window, 0, COLOR_GRAY, COLOR_GRAY );
+            window, 0, bg_color, bg_color );
 
     if ( (void *) close == NULL ){
         //gwssrv_debug_print ("xx: close fail \n");
@@ -1785,11 +1808,10 @@ wmCreateWindowFrame (
     unsigned int OrnamentColor2 = ornament_color2;
 // Title bar height
     unsigned long TitleBarHeight = METRICS_TITLEBAR_DEFAULT_HEIGHT;
-// Title bar color.
-    unsigned int TitleBarColor = COLOR_BLUE1;   // Light blue (Um pouco fosco) 
-    //unsigned long TitleBarColor = 0x001473E6;  // Claro.  
-    //unsigned long TitleBarColor = 0x00000E80;  // Dark blue
-    // ...
+
+// Titlebar color for active window.
+    unsigned int TitleBarColor = 
+        (unsigned int) get_color(csiActiveWindowTitleBar);
 
     //unsigned long X = (x & 0xFFFF);
     //unsigned long Y = (y & 0xFFFF);
@@ -1900,13 +1922,13 @@ wmCreateWindowFrame (
          
         // Se tiver o foco.
         if (window->focus == TRUE){
-            BorderColor1 = COLOR_BLUE;
-            BorderColor2 = COLOR_BLUE;
-            BorderSize = 2;
+            BorderColor1 = (unsigned int) get_color(csiWWFBorder);
+            BorderColor2 = (unsigned int) get_color(csiWWFBorder);
+            BorderSize = 2;  //#todo: worker
         }else{
-            BorderColor1 = COLOR_INACTIVEBORDER;
-            BorderColor2 = COLOR_INACTIVEBORDER;
-            BorderSize = 1;
+            BorderColor1 = (unsigned int) get_color(csiWindowBorder);
+            BorderColor2 = (unsigned int) get_color(csiWindowBorder);
+            BorderSize = 1;  //#todo: worker
         };
         
         window->border_size = 0;
@@ -1961,11 +1983,11 @@ wmCreateWindowFrame (
 
         // Se tiver o foco.
         if (window->focus == TRUE){
-            BorderColor1 = COLOR_BLUE1;
-            BorderColor2 = COLOR_BLUE1;
+            BorderColor1 = (unsigned int) get_color(csiWWFBorder);
+            BorderColor2 = (unsigned int) get_color(csiWWFBorder);
         }else{
-            BorderColor1 = COLOR_INACTIVEBORDER;
-            BorderColor2 = COLOR_INACTIVEBORDER;
+            BorderColor1 = (unsigned int) get_color(csiWindowBorder);
+            BorderColor2 = (unsigned int) get_color(csiWindowBorder);
         };
 
         window->border_size = 0;
@@ -2012,8 +2034,9 @@ wmCreateWindowFrame (
         {
             window->titlebar_height = TitleBarHeight;
             window->titlebar_color      = (unsigned int) TitleBarColor;
-            window->titlebar_text_color = (unsigned int) COLOR_RED;
-            
+            window->titlebar_text_color = 
+                (unsigned int) get_color(csiSystemFontColor);
+
             // #important: WT_SIMPLE with text.
             // lembre-se estamos relativos à area de cliente
             // da janela mão, seja ela de qual tipo for.
@@ -2065,8 +2088,8 @@ wmCreateWindowFrame (
             // área da janela de aplicativo.
             // Usado somente por overlapped window.
         
-            window->frame.ornament_color1   = OrnamentColor1;  //COLOR_BLACK;
-            window->titlebar_ornament_color = OrnamentColor1;  //COLOR_BLACK;
+            window->frame.ornament_color1   = OrnamentColor1;
+            window->titlebar_ornament_color = OrnamentColor1;
         
             rectBackbufferDrawRectangle ( 
                 tbWindow->left, 
@@ -2104,12 +2127,12 @@ wmCreateWindowFrame (
                     (tbWindow->top  + METRICS_ICON_TOPPAD) );
             }
 
-            //
-            // String (title bar)
-            //
-        
-            window->titlebar_text_color = COLOR_WHITE;
-        
+
+            // Titlebar string support;
+
+            window->titlebar_text_color = 
+                (unsigned int) get_color(csiTitleBarText);
+
             // #todo
             // Temos que gerenciar o posicionamento da string.
         
@@ -2124,7 +2147,7 @@ wmCreateWindowFrame (
                 grDrawString ( 
                     ((tbWindow->left) + StringLeftPad), 
                     ((tbWindow->top)  + StringTopPad), 
-                    COLOR_WHITE, 
+                    window->titlebar_text_color, 
                     tbWindow->name );
             }
 
@@ -2230,13 +2253,23 @@ void wm_flush_rectangle(struct gws_rect_d *rect)
 // Change the root window color and reboot.
 void wm_reboot(void)
 {
+    unsigned int bg_color = get_color(csiDesktop);
+
     if ( (void*) __root_window != NULL )
     {
-        if (__root_window->magic==1234){
-            __root_window->bg_color = COLOR_BLUE;
-            redraw_window(__root_window,TRUE);
+        if (__root_window->magic==1234)
+        {
+            __root_window->bg_color = bg_color;
+            redraw_window(__root_window,FALSE);
+            // #todo
+            // Print some message, draw some image, etc.
+            wm_flush_window(__root_window);
+            
+            // #todo
+            // Free resources
         }
     }
+// Hw reboot.
     rtl_reboot();
 }
 
@@ -3661,7 +3694,7 @@ static void on_mouse_leave( struct gws_window_d *window )
     if (window->type == WT_BUTTON)
     {
         window->status = BS_DEFAULT;
-        window->bg_color = xCOLOR_GRAY5;
+        window->bg_color = (unsigned int) get_color(csiButton);
         redraw_window(window,TRUE);
     }
 }
@@ -3679,7 +3712,7 @@ static void on_mouse_hover( struct gws_window_d *window )
     if (window->type == WT_BUTTON)
     {
         window->status = BS_HOVER;
-        window->bg_color = xCOLOR_GRAY3;
+        window->bg_color = (unsigned int) get_color(csiWhenMouseHover);
         redraw_window(window,TRUE);
     }
 
@@ -4914,16 +4947,20 @@ redraw_window (
                     // #bugbug Isso funciona para a janela mãe apenas.
                     if (window->active == TRUE)
                     {
-                        window->titlebar->bg_color = COLOR_BLUE1;
-                        window->titlebar_color = COLOR_BLUE1;
+                        window->titlebar->bg_color = 
+                            (unsigned int) get_color(csiTaskBar);
+                        window->titlebar_color = 
+                            (unsigned int) get_color(csiTaskBar);
                         window->titlebar_ornament_color = xCOLOR_BLACK;
                     }
                     // Se a janela overlapped não é uma janela ativa.
                     // #bugbug Isso funciona para a janela mãe apenas.
                     if (window->active == FALSE)
                     {
-                        window->titlebar->bg_color = COLOR_GRAY;
-                        window->titlebar_color = COLOR_GRAY;
+                        window->titlebar->bg_color = 
+                            (unsigned int) get_color(csiTaskBar);
+                        window->titlebar_color = 
+                            (unsigned int) get_color(csiTaskBar);
                         window->titlebar_ornament_color = xCOLOR_GRAY2;
                     }
 
@@ -5042,209 +5079,154 @@ update_window (
     return (int) redraw_window(window,flags);
 }
 
-/*
- * gwssrv_initialize_color_schemes:
- *     Isso configura os esquemas de cores utilizados 
- * pelo sistema.
- *     Essa rotina é chamada apenas uma vez na inicialização
- * do kernel.
- *     O esquema de cores a ser utilizado deve estar 
- * salvo no perfil do usuário que fez o logon.
- * Os dois esquemas padrão chamam-se: 'humility' e 'pride'.
- * + O esquema 'humility' são cores com tema cinza, 
- * lembrando interfaces antigas.
- * + O esquema 'pride' são cores modernas 
- *   ( Aquele verde e preto e cinza, das primeiras versões, 
- * com imagens publicadas. )
- * #todo: é preciso criar rotinas que selecionem entre os 
- * modo criados e habilitados.
- * É preciso criar rotinas que permitam que aplicativos 
- * em user mode criem esquemas de cores e habilite eles.
- */
 
-void 
-gwssrv_initialize_color_schemes (int selected_type)
+int gwssrv_initialize_default_color_scheme(void)
 {
-    struct gws_color_scheme_d *humility;
-    struct gws_color_scheme_d *pride;
+// Initialize the default color scheme.
+
+    struct gws_color_scheme_d *cs;
 
 // HUMILITY
 // Criando o esquema de cores humility. (cinza)
 
-    humility = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
+    cs = (void *) malloc( sizeof(struct gws_color_scheme_d) );
 
-    if ( (void *) humility == NULL ){
-        gwssrv_debug_print ("gwssrv_initialize_color_schemes: humility\n");
-        printf             ("gwssrv_initialize_color_schemes: humility\n"); 
-        GWSHumilityColorScheme = NULL;
-        // #bugbug
-        // ? return ????
-    }else{
-
-		//Object.
-		//humility->objectType = ObjectTypeColorScheme;
-		//humility->objectClass = ObjectClassGuiObjects;
-
-        humility->used  = TRUE;
-        humility->magic = 1234;
-        humility->name  = "Humility";
-		
-		//Colors
-		//Definidas em ws.h
-        humility->elements[csiNull] = 0;                             //0
-        humility->elements[csiDesktop] = HUMILITY_COLOR_BACKGROUND;  //1
-        humility->elements[csiWindow] = HUMILITY_COLOR_WINDOW;       //2
-        humility->elements[csiWindowBackground] = HUMILITY_COLOR_WINDOW_BACKGROUND;	 //3
-        humility->elements[csiActiveWindowBorder] = HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;  //4
-        humility->elements[csiInactiveWindowBorder] = HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;  //5
-        humility->elements[csiActiveWindowTitleBar] = HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;  //6
-        humility->elements[csiInactiveWindowTitleBar] = HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;  //7
-        humility->elements[csiMenuBar] = HUMILITY_COLOR_MENUBAR;                //8
-        humility->elements[csiScrollBar] = HUMILITY_COLOR_SCROLLBAR;            //9  
-        humility->elements[csiStatusBar] = HUMILITY_COLOR_STATUSBAR;            //10
-        humility->elements[csiMessageBox] = HUMILITY_COLOR_MESSAGEBOX;          //11
-        humility->elements[csiSystemFontColor] = HUMILITY_COLOR_SYSTEMFONT;     //12
-        humility->elements[csiTerminalFontColor] = HUMILITY_COLOR_TERMINALFONT; //13
-        // ...
-
-		//Sanvando na estrutura padrão para o esquema humility.
-        GWSHumilityColorScheme = (void*) humility;
-    };
-
-// PRIDE 
-// Criando o esquema de cores PRIDE. (colorido)
-
-    pride = (void *) malloc ( sizeof(struct gws_color_scheme_d) );
-
-    if ( (void *) pride == NULL ){
-        gwssrv_debug_print ("gwssrv_initialize_color_schemes: pride\n");
-        printf ("gwssrv_initialize_color_schemes: pride\n");
-        GWSPrideColorScheme = NULL;
-        // #bugbug
-        // ? return ????
-    }else{
-
-		//Object.
-		//pride->objectType  = ObjectTypeColorScheme;
-		//pride->objectClass = ObjectClassGuiObjects;
-
-        pride->used  = TRUE;
-        pride->magic = 1234;
-        pride->name  = "Pride";
-
-		//Colors
-		//Definidas em ws.h
-        pride->elements[csiNull] = 0;
-        pride->elements[csiDesktop] = PRIDE_COLOR_BACKGROUND;  
-        pride->elements[csiWindow] = PRIDE_COLOR_WINDOW;
-        pride->elements[csiWindowBackground] = PRIDE_COLOR_WINDOW_BACKGROUND;
-        pride->elements[csiActiveWindowBorder] = PRIDE_COLOR_ACTIVE_WINDOW_BORDER;  
-        pride->elements[csiInactiveWindowBorder] = PRIDE_COLOR_INACTIVE_WINDOW_BORDER;  
-        pride->elements[csiActiveWindowTitleBar] = PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR;    
-        pride->elements[csiInactiveWindowTitleBar] = PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR;
-        pride->elements[csiMenuBar] = PRIDE_COLOR_MENUBAR;
-        pride->elements[csiScrollBar] = PRIDE_COLOR_SCROLLBAR;
-        pride->elements[csiStatusBar] = PRIDE_COLOR_STATUSBAR;
-        pride->elements[csiMessageBox] = PRIDE_COLOR_MESSAGEBOX;
-        pride->elements[csiSystemFontColor] = PRIDE_COLOR_SYSTEMFONT;    //12
-        pride->elements[csiTerminalFontColor] = PRIDE_COLOR_TERMINALFONT;  //13
-        // ...
-
-		// Sanvando na estrutura padrão para o esquema pride.
-        GWSPrideColorScheme = (void *) pride;
-    };
-
-// Select
-// Configurando qual será o esquema padrão.
-// #todo: 
-// Criar uma função que selecione qual dois esquemas serão usados
-// apenas selecionando o ponteiro da estrutura.  
-
-    switch (selected_type){
-
-    case ColorSchemeNull:
-        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
-        break;
-
-    case ColorSchemeHumility:
-        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
-        break;
-
-    case ColorSchemePride:
-        GWSCurrentColorScheme = (void *) GWSPrideColorScheme; 
-        break;
-
-    default:
-        GWSCurrentColorScheme = (void *) GWSHumilityColorScheme;
-        break;
-    };
-
-// Check current
-    if ( (void*) GWSCurrentColorScheme == NULL ){
-        gwssrv_debug_print ("gwssrv_initialize_color_schemes: GWSCurrentColorScheme\n");
-        printf             ("gwssrv_initialize_color_schemes: GWSCurrentColorScheme\n"); 
-        exit(1);
+    if ( (void *) cs == NULL ){
+        gwssrv_debug_print ("gwssrv_initialize_color_schemes: cs\n");
+        printf             ("gwssrv_initialize_color_schemes: cs\n"); 
+        goto fail;
     }
+
+    cs->initialized=FALSE;
+    cs->id = 0;
+    cs->name  = "Humility";
+    cs->style = 0;
+
+// Colors
+// see: ws.h
+
+// 0
+    cs->elements[csiNull] = 0;
+
+// 1 - Screen background. (Wallpaper)
+    cs->elements[csiDesktop] = 
+        HUMILITY_COLOR_BACKGROUND;  
+
+// 2 - Window
+    cs->elements[csiWindow] = 
+        HUMILITY_COLOR_WINDOW;
+
+// 3 - Window background
+    cs->elements[csiWindowBackground] = 
+        HUMILITY_COLOR_WINDOW_BACKGROUND;
+
+// 4 - Border for active window.
+    cs->elements[csiActiveWindowBorder] = 
+        HUMILITY_COLOR_ACTIVE_WINDOW_BORDER;
+
+// 5 - Border for inactive window.
+    cs->elements[csiInactiveWindowBorder] = 
+        HUMILITY_COLOR_INACTIVE_WINDOW_BORDER;
+
+// 6 - Titlebar for active window.
+    cs->elements[csiActiveWindowTitleBar] = 
+        HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR;
+
+// 7 - Titlebar for inactive window.
+    cs->elements[csiInactiveWindowTitleBar] = 
+        HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR;
+
+// 8 - Menubar
+    cs->elements[csiMenuBar] = 
+        HUMILITY_COLOR_MENUBAR;
+
+// 9 - Scrollbar 
+    cs->elements[csiScrollBar] = 
+        HUMILITY_COLOR_SCROLLBAR;
+
+// 10 - Statusbar
+    cs->elements[csiStatusBar] = 
+        HUMILITY_COLOR_STATUSBAR;
+
+// 11 - Taskbar
+    cs->elements[csiTaskBar] = 
+        HUMILITY_COLOR_TASKBAR;
+
+// ...
+
+// 12 - Messagebox
+    cs->elements[csiMessageBox] = 
+        HUMILITY_COLOR_MESSAGEBOX;
+
+// 13 - System font. (Not a good name!)
+    cs->elements[csiSystemFontColor] = 
+        HUMILITY_COLOR_SYSTEMFONT;
+
+// 14 - Terminal font.
+    cs->elements[csiTerminalFontColor] = 
+        HUMILITY_COLOR_TERMINALFONT;
+
+// 15 - Button.
+    cs->elements[csiButton] = 
+        HUMILITY_COLOR_BUTTON;
+
+    cs->elements[csiWindowBorder] = 
+        HUMILITY_COLOR_WINDOW_BORDER;
+
+    cs->elements[csiWWFBorder] = 
+        HUMILITY_COLOR_WWF_BORDER;
+
+    cs->elements[csiTitleBarText] = 
+        HUMILITY_COLOR_TITLEBAR_TEXT;
+
+    cs->elements[csiWhenMouseHover] = 
+        HUMILITY_COLOR_BG_ONMOUSEHOVER;
+
+    // ...
+
+    cs->used  = TRUE;
+    cs->magic = 1234;
+    cs->initialized=TRUE;
+
+// Salvando na estrutura padrão para o esquema humility.
+    GWSCurrentColorScheme = (void*) cs;
+
+// done:
+
+    // OK
+    return 0;
+
+fail:
+    printf("Couldn't initialize the default color scheme!\n");
+    return -1;
 }
 
-// seleciona o tipo ...isso é um serviço.
-int gwssrv_select_color_scheme (int type)
+
+unsigned int get_color(int index)
 {
+    unsigned int Result=0;
 
-    //#debug
-    //printf("gwssrv_select_color_scheme: type={%d} \n", type);
-
-    switch (type){
-        case ColorSchemeHumility:  goto do_humility;  break;
-        case ColorSchemePride:     goto do_pride;     break;
-        default:
-            gwssrv_debug_print("gwssrv_select_color_scheme: [FAIL] Type not defined\n");
-            goto fail;
-            break;
-    };
-
-do_humility:
-
-    if ( (void *) GWSHumilityColorScheme == NULL ){
-        gwssrv_debug_print("HumilityColorScheme fail\n");
+// Limits
+    if (index<0 || index >= 32){
         goto fail;
-    }else{
-
-        if ( GWSHumilityColorScheme->used  != TRUE || 
-             GWSHumilityColorScheme->magic != 1234 )
-        {
-            gwssrv_debug_print("HumilityColorScheme sig fail\n");
-            goto fail;
-        }
-
-        gwssrv_debug_print("Humility selected\n");
-        GWSCurrentColorScheme = GWSHumilityColorScheme;
-        goto done;
-    };
-
-do_pride:
-
-    if ( (void *) GWSPrideColorScheme == NULL ){
-        gwssrv_debug_print("GWSPrideColorScheme fail\n");
+    }
+    if ( (void*) GWSCurrentColorScheme == NULL ){
         goto fail;
-    }else{
-        if( GWSPrideColorScheme->used  != TRUE || 
-            GWSPrideColorScheme->magic != 1234 )
-        {
-            gwssrv_debug_print("PrideColorScheme sig fail\n");
-            goto fail;
-        }
+    }
+    if (GWSCurrentColorScheme->magic!=1234){
+        goto fail;
+    }
+    if (GWSCurrentColorScheme->initialized!=TRUE){
+        goto fail;
+    }
 
-        gwssrv_debug_print ("Pride selected\n"); 
-        GWSCurrentColorScheme = GWSPrideColorScheme;
-        goto done;
-    };
+    Result = (unsigned int) GWSCurrentColorScheme->elements[index];
 
-done:
-    return 0;
+    return (unsigned int) Result;
+
 fail:
-    gwssrv_debug_print ("gwssrv_select_color_scheme: fail\n");
-    return 1;
+// Invalid color?
+    return (unsigned int) 0;
 }
 
 /*
@@ -5381,13 +5363,13 @@ void create_taskbar (unsigned long tb_height)
     int WindowId = -1;  // bar
     int menu_wid;       // button
 
-// Cores para os botões.
-    unsigned int frame_color  = 0x00C3C3C3;
-    unsigned int client_color = 0x00C3C3C3;
+// Colors for the taskbar and for the buttons.
+    unsigned int bg_color     = (unsigned int) get_color(csiTaskBar);
+    unsigned int frame_color  = (unsigned int) get_color(csiTaskBar);
+    unsigned int client_color = (unsigned int) get_color(csiTaskBar);
 
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
-
     if (w==0 || h==0){
         gwssrv_debug_print ("create_taskbar: w h\n");
         printf             ("create_taskbar: w h\n");
@@ -5418,8 +5400,8 @@ void create_taskbar (unsigned long tb_height)
                                     "TaskBar",  
                                     wLeft, wTop, wWidth, wHeight,   
                                     gui->screen_window, 0, 
-                                    frame_color, 
-                                    client_color );
+                                    bg_color, 
+                                    bg_color );
 
 
 
@@ -5582,8 +5564,8 @@ void create_taskbar (unsigned long tb_height)
 
 // Create root window
 // Called by gwsInit in gws.c.
-// #todo: Talvez essa função possa receber argumentos.
-struct gws_window_d *wmCreateRootWindow(void)
+// #todo: Talvez essa função possa receber mais argumentos.
+struct gws_window_d *wmCreateRootWindow(unsigned int bg_color)
 {
     struct gws_window_d *w;
 // It's because we need a window for drawind a frame.
@@ -5602,10 +5584,9 @@ struct gws_window_d *wmCreateRootWindow(void)
         exit(1);
     }
 
-// Background color
-    unsigned int rootwindow_color = WM_DEFAULT_BACKGROUND_COLOR;
-    __set_default_background_color( WM_DEFAULT_BACKGROUND_COLOR );
-    __set_custom_background_color(WM_DEFAULT_BACKGROUND_COLOR);
+// Default background color.
+    __set_default_background_color(bg_color);
+    __set_custom_background_color(bg_color);
 
     // #debug
     // debug_print("wmCreateRootWindow:\n");
@@ -5621,7 +5602,7 @@ struct gws_window_d *wmCreateRootWindow(void)
                                     1, //view
                                     "RootWindow",  
                                     left, top, width, height,
-                                    NULL, 0, rootwindow_color, rootwindow_color );
+                                    NULL, 0, bg_color, bg_color );
 
 // Struture validation
     if ( (void*) w == NULL){
@@ -6261,12 +6242,13 @@ void wm_Update_TaskBar( char *string, int flush )
 //
 
 // String info.
+    unsigned int string_color = 
+        (unsigned int) get_color(csiSystemFontColor);
     unsigned long string1_left = 
         (unsigned long) (taskbar_window->width - 100);
     unsigned long string2_left = 
         (unsigned long) (string1_left - (8*4));
     unsigned long string_top  = ((taskbar_window->height-8) >> 1);//8 
-    unsigned int string_color = COLOR_BLACK;
     size_t string_size = (size_t) strlen(string);
 
     char frame_counter_string[32];

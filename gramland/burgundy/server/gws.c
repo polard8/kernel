@@ -270,10 +270,9 @@ int gwssrv_init_globals(void)
 // Check validation and panic if fail.
  
     current_mode = gwssrv_get_system_metrics(130);
-
     if (current_mode < 0){
         printf ("gwssrv_init_globals: [FAIL] current_mode\n");
-        exit (1);
+        exit(1);
     }
 
 // framebuffer and backbuffer.
@@ -311,8 +310,8 @@ int gwssrv_init_globals(void)
          SavedBPP == 0 || 
          SavedLFB == 0 )
     {
-        printf ("gwssrv_init_globals: [FAIL] Screen properties\n");
-        exit (1);
+        printf("gwssrv_init_globals: [FAIL] Screen properties\n");
+        exit(1);
     }
 
 // ==============================
@@ -343,10 +342,14 @@ int gwssrv_init_globals(void)
     refresh_device_screen_flag = FALSE;    
     refresh_valid_screen_flag = FALSE;
 
-// Color scheme: Humility
-    gwssrv_initialize_color_schemes(ColorSchemeHumility);
-    gwssrv_select_color_scheme(ColorSchemeHumility);
 
+// Initialize the default color scheme.
+    int cs_status=-1;
+    cs_status = (int) gwssrv_initialize_default_color_scheme();
+    if (cs_status){
+        printf("gwssrv_init_globals: Color scheme\n");
+        exit(1);
+    }
     //...
 
     return 0;
@@ -562,8 +565,10 @@ int gwsInit(void)
 // wm.c
 
     struct gws_window_d  *tmpRootWindow;
-    
-    tmpRootWindow = (struct gws_window_d *) wmCreateRootWindow();
+    unsigned int rootwindow_color = 
+        (unsigned int) get_color(csiDesktop);
+
+    tmpRootWindow = (struct gws_window_d *) wmCreateRootWindow(rootwindow_color);
     if ( (void*) tmpRootWindow == NULL){
         debug_print("gwsInit: tmpRootWindow\n");
         printf     ("gwsInit: tmpRootWindow\n");

@@ -100,6 +100,8 @@ extern int current_mode;
 #define GWS_COLOR_BUTTONTEXT            COLOR_TEXT
 
 
+// --------------------
+
 // #importante
 // usaremos essas definições para configurarmos
 // os dois esquemas básicos, humility e pride.
@@ -111,52 +113,39 @@ extern int current_mode;
 #define HUMILITY_COLOR_WINDOW                     0x00FFFFFF 
 #define HUMILITY_COLOR_WINDOW_BACKGROUND          0x00202020 
 #define HUMILITY_COLOR_ACTIVE_WINDOW_BORDER       0x00404040 
-#define HUMILITY_COLOR_INACTIVE_WINDOW_BORDER     0x00606060 
-#define HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR     0x00404040 
+#define HUMILITY_COLOR_INACTIVE_WINDOW_BORDER     0x00606060
+
+// Titlebar for active window.
+// Light blue (Um pouco fosco) 
+#define HUMILITY_COLOR_ACTIVE_WINDOW_TITLEBAR  COLOR_BLUE1
+
 #define HUMILITY_COLOR_INACTIVE_WINDOW_TITLEBAR   0x00606060 
 #define HUMILITY_COLOR_MENUBAR                    0x00808080 
 #define HUMILITY_COLOR_SCROLLBAR                  0x00FFF5EE 
-#define HUMILITY_COLOR_STATUSBAR                  0x0083FCFF 
-#define HUMILITY_COLOR_MESSAGEBOX                 0x00404040 
-#define HUMILITY_COLOR_SYSTEMFONT                 0x00000000 
-#define HUMILITY_COLOR_TERMINALFONT               0x00FFFFFF 
+#define HUMILITY_COLOR_STATUSBAR                  0x0083FCFF
+
+// Taskbar for the window manager.
+#define HUMILITY_COLOR_TASKBAR  0x00C3C3C3 
+
+#define HUMILITY_COLOR_MESSAGEBOX      0x00404040 
+#define HUMILITY_COLOR_SYSTEMFONT      0x00000000 
+#define HUMILITY_COLOR_TERMINALFONT    0x00FFFFFF 
+
+#define HUMILITY_COLOR_BUTTON  0x00C3C3C3 
+
+// Window border
+#define HUMILITY_COLOR_WINDOW_BORDER  COLOR_INACTIVEBORDER
+
+// Window with focus border
+#define HUMILITY_COLOR_WWF_BORDER  COLOR_BLUE
+
+#define HUMILITY_COLOR_TITLEBAR_TEXT  COLOR_WHITE
+
+#define HUMILITY_COLOR_BG_ONMOUSEHOVER  xCOLOR_GRAY3
+
 //...
 
-#define PRIDE_COLOR_BACKGROUND                    0x00008080 
-#define PRIDE_COLOR_WINDOW                        0x00FFFFFF 
-#define PRIDE_COLOR_WINDOW_BACKGROUND             0x00202020 
-#define PRIDE_COLOR_ACTIVE_WINDOW_BORDER          0x0080FFFF
-#define PRIDE_COLOR_INACTIVE_WINDOW_BORDER        0x0080FFFF
-#define PRIDE_COLOR_ACTIVE_WINDOW_TITLEBAR        0x0080FFFF
-#define PRIDE_COLOR_INACTIVE_WINDOW_TITLEBAR      0x0080FFFF
-#define PRIDE_COLOR_MENUBAR                       0x00808080 
-#define PRIDE_COLOR_SCROLLBAR                     0x00FFF5EE 
-#define PRIDE_COLOR_STATUSBAR                     0x002EB982
-#define PRIDE_COLOR_MESSAGEBOX                    0x00808080  
-#define PRIDE_COLOR_SYSTEMFONT                    0x00000000  
-#define PRIDE_COLOR_TERMINALFONT                  0x00FFFFFF  
-//...
-
-
-/*
- * ColorSchemeType:
- *     Enumerando os esquemas de cores. 
- *     Esses são esquemas default.
- *     Poderemos carregar outros e cada esquema terá 
- * seu índice.
- *     Esses serão sempre os primeiros.    
- */
-
-typedef enum {
-
-    ColorSchemeNull,      // 0 - Null.
-    ColorSchemeHumility,  // 1 - Gray stuff.
-    ColorSchemePride,     // 2 - Colorful.
-    ColorSchemeUser,      // 3 - Personalizado. Criado ou carregado.
-    // ...
-
-}ColorSchemeType;
-
+// --------------------
 
 /*
  * ColorSchemeIndex:
@@ -182,14 +171,22 @@ typedef enum {
     csiMenuBar,                 //8
     csiScrollBar,               //9
     csiStatusBar,               //10
+    csiTaskBar,                 //11
 
-    csiMessageBox,              //11
-    csiSystemFontColor,         //12 BLACK
-    csiTerminalFontColor,       //13 WHITE
-	//...
+    csiMessageBox,              //12
+    csiSystemFontColor,         //13 BLACK
+    csiTerminalFontColor,       //14 WHITE
+    
+    csiButton,   // 15
 
-	//@todo: focus,
-	
+    csiWindowBorder,  // 16 window border
+    csiWWFBorder,     // 17 window with focus border.
+
+    csiTitleBarText,    // 18
+    csiWhenMouseHover   // 19 bg when mouse hover
+
+    //...
+    //@todo: focus,
     //@todo: Window 'shadow' (black??)
 
 }ColorSchemeIndex;  
@@ -204,35 +201,34 @@ typedef enum {
 
 struct gws_color_scheme_d
 {
-    //@todo: É preciso ainda definir esse tipo de objeto.
-	//definir em gdef.h
-	//object_type_t objectType;
-	//object_class_t objectClass;	
-
-    int id;
-
     int used;
     int magic;
 
-	//marcador de estilo de design para 
-	//o padrão de cores.
-	//cada estilo pode invocar por si um padrão de cores.
-	//ou o padrão de cores por si pode representar um estilo.
-    int style;
+    int id;
+    int initialized;
 
     char *name; 
 
-	//cada índice desse array representará um elemento gráfico,
-	//os valores no array são cores correspondentes aos elementos gráficos 
-	//representados por índices.
-    unsigned long elements[32];
+// Marcador de estilo de design para o padrão de cores.
+// Cada estilo pode invocar por si um padrão de cores 
+// ou o padrão de cores por si pode representar um estilo.
+    int style;
 
-	//...
+// Cada índice desse array representará um elemento gráfico,
+// Os valores no array são cores 
+// correspondentes aos elementos gráficos indicados pelos índices.
+
+    unsigned int elements[32];
+    //color_t elements[32];
+
+    //...
+
+// Navigation
+    struct gws_color_scheme_d *next;
 };
 
-struct gws_color_scheme_d* GWSCurrentColorScheme;
-struct gws_color_scheme_d* GWSHumilityColorScheme; // Simples.
-struct gws_color_scheme_d* GWSPrideColorScheme;    // Colorido.
+// See: wm.c
+extern struct gws_color_scheme_d* GWSCurrentColorScheme;
 
 
 //
@@ -295,9 +291,8 @@ struct vid_d vidConfig;
 // == Prototypes ===================================================
 //
 
-// #todo: move this thing to another place.
-void gwssrv_initialize_color_schemes (int selected_type);
-int gwssrv_select_color_scheme (int type);
+int gwssrv_initialize_default_color_scheme(void);
+unsigned int get_color(int index);
 
 #endif   
 

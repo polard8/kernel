@@ -1455,7 +1455,8 @@ void *xxxCreateSurfaceWindow(
     unsigned long color );      //12, Color (bg) (para janela simples).
 
 void create_taskbar (unsigned long tb_height);
-struct gws_window_d *wmCreateRootWindow(void);
+struct gws_window_d *wmCreateRootWindow(unsigned int bg_color);
+
 
 //worker: no checks
 void 

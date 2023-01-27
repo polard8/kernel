@@ -67,6 +67,14 @@ int use_vsync=FALSE;
 
 // unsigned long gws_pallete_16[16];
 
+//
+// Color scheme
+//
+
+
+
+
+
 /*
 // Losethos colors.
 public BGREntry vga_palette4_std[16] = {

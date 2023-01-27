@@ -620,7 +620,8 @@ void *doCreateWindow (
 // Given in chars.
     window->ip_x = 0;       // in chars
     window->ip_y = 0;       // in chars
-    window->ip_color = COLOR_BLACK;
+    window->ip_color = 
+        (unsigned int) get_color(csiSystemFontColor);
     //window->ip_type = 0;    // #bugbug #todo
     //window->ip_style = 0;
 // For mouse
@@ -1539,13 +1540,15 @@ void *doCreateWindow (
                 grDrawString ( 
                     (window->left) +offset, 
                     (window->top)  +8, 
-                    COLOR_WHITE, window->name );
+                    COLOR_WHITE, 
+                    window->name );
             }
             if (buttonSelected == FALSE){
                 grDrawString ( 
                     (window->left) +offset,  
                     (window->top)  +8,  
-                    COLOR_BLACK, window->name );
+                    COLOR_BLACK, 
+                    window->name );
             }
         }
 
