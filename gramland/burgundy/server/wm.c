@@ -3407,15 +3407,35 @@ wm_draw_char_into_the_window(
 // see:
 // https://en.wikipedia.org/wiki/Control_character
 // https://en.wikipedia.org/wiki/ASCII#Printable_characters
+//    ASCII code 96  = ` ( Grave accent )
+//    ASCII code 239 = ´ ( Acute accent )
+//    ASCII code 128 = Ç ( Majuscule C-cedilla )
+//    ASCII code 135 = ç ( Minuscule c-cedilla )
+// 168 - trema
 
+    int is_abnt2_printable=FALSE;
+
+    // Not printable for US.
     if (ascii < 0x20 || ascii >= 0x7F)
     {
         // Control char
         if (ascii < 0x20 || ascii == 0x7F){
             is_control = TRUE;
         }
+        
+        if ( ascii == 168 ||   // trema
+             ascii == 239 ||   // acute
+             ascii == 128 ||   // Ç
+             ascii == 135 )    // ç
+        {
+            is_abnt2_printable = TRUE;
+            goto printable;
+        }
         return;
     }
+
+
+printable:
 
 // string
    _string[0] = (unsigned char) ch;

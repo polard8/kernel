@@ -1,0 +1,9 @@
+
+
+
+
+    ASCII code 96  = ` ( Grave accent )
+    ASCII code 239 = ´ ( Acute accent )
+    ASCII code 128 = Ç ( Majuscule C-cedilla )
+    ASCII code 135 = ç ( Minuscule c-cedilla )
+

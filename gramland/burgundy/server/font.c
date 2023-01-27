@@ -32,6 +32,8 @@ static unsigned char font_nelson_cole2[128*8] = {};
 // Isso pe provisório.
 // Estamos apenas testando essa fonte.
 // A licença é GPL.
+// Adapted for abnt2:
+// 168 = TREMA.
 
 #define FONTDATAMAX 2048
 static unsigned char lin_fontdata_8x8[FONTDATAMAX] = {
@@ -1716,15 +1718,27 @@ static unsigned char lin_fontdata_8x8[FONTDATAMAX] = {
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
 
-	/* 168 0xa8 '¿' */
-	0x18, /* 00011000 */
-	0x00, /* 00000000 */
-	0x18, /* 00011000 */
-	0x18, /* 00011000 */
-	0x30, /* 00110000 */
-	0x63, /* 01100011 */
-	0x3e, /* 00111110 */
-	0x00, /* 00000000 */
+/*
+	// 168 0xa8 '¿'
+	0x18, //00011000
+	0x00, //00000000
+	0x18, //00011000
+	0x18, //00011000
+	0x30, //00110000
+	0x63, //01100011
+	0x3e, //00111110
+	0x00, //00000000
+*/
+
+	// 168 (TREMA) for abnt2
+	0x00, //00000000
+	0x24, //00100100
+	0x24, //00100100
+	0x00, //00000000
+	0x00, //00000000
+	0x00, //00000000
+	0x00, //00000000
+	0x00, //00000000
 
 	/* 169 0xa9 '⌐' */
 	0x00, /* 00000000 */

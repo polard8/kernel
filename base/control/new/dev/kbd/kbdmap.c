@@ -38,13 +38,13 @@ unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'i',
  'o',
  'p',          //25
- ' ',          //26 /// VK_ACENTO_AGUDO acento agudo (00b4 @) dead_acute dead_grave
+ '$',  //239   //26  VK_ACENTO_AGUDO acento agudo (00b4 @) dead_acute dead_grave
  '[',          //27   bracketleft   braceleft
  VK_RETURN,    //28 [Enter].
  VK_LCONTROL,  //29 ms right control. ??
  'a',          //30 (O a minúsculo é 30 em abnt 2).
- 's',          //31.
- 'd',          //32.
+ 's',          //31
+ 'd',          //32
  'f',
  'g',
  'h',
@@ -52,7 +52,7 @@ unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  'k',
  'l',        //38 
  135,        //39 00e7 VK_CCEDILHA ccedilla
- '~',        //40 dead_tilde	dead_circumflex
+ '~',        //40 dead_tilde dead_circumflex
  '\'',       //41 (") (espaço) (') dead_acute dead_diaeresis 
  VK_LSHIFT,  //42 Shift.  
  ']',        //43 bracketright braceright asciitilde Control_bracketright 
@@ -75,8 +75,8 @@ unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  VK_F2,        //60 F2.(abnt)
  VK_F3,        //61 F3.(abnt)
  VK_F4,        //62 F4.(abnt)
- VK_F5,        //63	F5  .(abnt)
- VK_F6,        //64 F6 .(abnt)
+ VK_F5,        //63 F5.(abnt)
+ VK_F6,        //64 F6.(abnt)
  VK_F7,        //65 F7.(abnt)
  VK_F8,        //66 F8.(abnt)
  VK_F9,        //67 F9.(abnt)
@@ -99,25 +99,25 @@ unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
 VK_PRINT,   //84 abnt2=(SysRq) PRINT SCREEN E sys req (abnt).
 '.',        //85
 '\\',       //86 abnt2=(\). abnt2=(help) backslash  bar
-VK_F11,     //87 abnt2=(F11).	 
+VK_F11,     //87 abnt2=(F11). 
 VK_F12,     //88 abnt2=(F12).
 '/',        //89 slash question /?
 VK_F14,     //90
 VK_LWIN,               //91 abnt2=(Left Windows)  (right WinKey) ([).
 VK_RWIN,               //92 abnt2=(Right Windows) (left WinKey) (\).
 VK_CONTROL_MENU,       //93 abnt2=(Application). CONTROL MENU, (]).
-VK_F18,    //94
-VK_F19,    //95
-'`',       //96 (0). (`)Acento grave.(enter)
-VK_LCONTROL,  //97 (1) (a) Minúscula. control
-'/',          //98 (2) (/) KP_Divide
-VK_F23,       //99 (3) VoidSymbol  
+VK_F18,       // 94
+VK_F19,       // 95
+'`',          // 96 (0) (`)Acento grave.(enter)
+VK_LCONTROL,  // 97 (1) (a) Minúscula. control
+'/',          // 98 (2) (/) KP_Divide
+VK_F23,       // 99 (3) VoidSymbol  
 VK_ALTGR,     //100 (4) AltGr
-VK_BREAK,     //101 (5). 0xE9
+VK_BREAK,     //101 (5) 0xE9
 VK_FIND,      //102 (6) (\).
-VK_UP,        //103 (7).
-VK_PRIOR,     //104 (8).
-VK_LEFT,      //105 (9). 0xED
+VK_UP,        //103 (7)
+VK_PRIOR,     //104 (8)
+VK_LEFT,      //105 (9) 0xED
 VK_RIGHT,     //106 *
 VK_SELECT,    //107 +
 VK_DOWN,      //108 RETURN.
@@ -139,15 +139,15 @@ VK_F12,  //123 (F12)
 VK_F13,  //124 abnt2=F13 
 VK_F14,  //125 abnt2=F14
 '.',     //126 abnt=(.) abnt=(F15) VK_ACENTO_TIL   
-VK_F16,	 //127          abnt=(F16) 
-VK_F17,	 //128
-VK_F18,	 //129
-VK_F19,	 //130
-VK_F20,	 //131
-VK_F21,	 //132
-VK_F22,	 //133
-VK_F23,	 //134
-VK_F24,	 //135
+VK_F16,  //127          abnt=(F16) 
+VK_F17,  //128
+VK_F18,  //129
+VK_F19,  //130
+VK_F20,  //131
+VK_F21,  //132
+VK_F22,  //133
+VK_F23,  //134
+VK_F24,  //135
 };
 
 // ---------------------------------------
@@ -164,7 +164,7 @@ unsigned char shift_abnt2[ABNT2_CHARMAP_SIZE] = {
 '#',   //4
 '$',   //5
 '%',   //6
-VK_ABNT2_TREMA, //168,   //7 (00a8 @) (trema)
+168, //VK_ABNT2_TREMA,  //'$',   //VK_ABNT2_TREMA, //168,   //7 (00a8 @) (trema)
 '&',   //8
 '*',   //9
 '(',   //10
@@ -182,8 +182,8 @@ VK_TAB,   // 0x0F     '\t',   //15 TAB
 'U',    //22
 'I',    //23
 'O',    //24
-'P',    //25    (FAIL!)
-'`',    //26
+'P',    //25   (FAIL!)
+'`',    //26   (ASCII 96) (grave accent)
 '{',    //27
 VK_RETURN,   // 28
 CTL,         // 29 
