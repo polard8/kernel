@@ -225,15 +225,24 @@ static void __winmin(int fd)
     int wid        = (int) Terminal.main_window_id;
     int client_wid = (int) Terminal.client_window_id;
 
+// #bugbug
+// Estamos chamando o kernel pra pegar informações sobre tela.
+// Devemos considerar as dimensões da área de trabalho e
+// não as dimensões da tela.
+// #todo: Devemos fazer requests ao servidor para pegar essas informações.
+// #todo: Criar requests para pegar os valores da área de trabalho.
     unsigned long w=rtl_get_system_metrics(1);
     unsigned long h=rtl_get_system_metrics(2);
-                  h=h-40;
+                  // h=h-40;
 
 // resize
-    unsigned long w_width=100;
-    unsigned long w_height=100;
-    if(w>200){w_width=200;}
-    if(h>100){w_height=100;}
+    //unsigned long w_width=100;
+    //unsigned long w_height=100;
+    //if(w>200){w_width=200;}
+    //if(h>100){w_height=100;}
+
+    unsigned long w_width  = (w>>1);
+    unsigned long w_height = (h>>1);
 
     if (fd<0){
         return;

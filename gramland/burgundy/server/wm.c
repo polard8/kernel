@@ -1476,7 +1476,7 @@ void do_create_controls(struct gws_window_d *window)
 
     unsigned long LastLeft = 0; 
     unsigned long Top=0;
-    unsigned long ButtonWidth = 28;
+    unsigned long ButtonWidth = METRICS_TITLEBAR_DEFAULT_WIDTH;
     unsigned long ButtonHeight = (METRICS_TITLEBAR_DEFAULT_HEIGHT -2);
 
     unsigned long PaddingWidth = 1;
@@ -1488,6 +1488,7 @@ void do_create_controls(struct gws_window_d *window)
     //ButtonHeight = (unsigned long) (window->height -4);
 
 // ================================================
+// minimize
     LastLeft = 
         (unsigned long) ( window->width - (3*PaddingWidth) - (ButtonWidth*3) );
 
@@ -1520,6 +1521,7 @@ void do_create_controls(struct gws_window_d *window)
     window->Controls.minimize_wid = (int) id;
 
 // ================================================
+// maximize
     LastLeft = 
         window->width - (2*PaddingWidth) - (ButtonWidth*2);
 
@@ -1552,6 +1554,7 @@ void do_create_controls(struct gws_window_d *window)
     window->Controls.maximize_wid = (int) id;
 
 // ================================================
+// close
     LastLeft = window->width - (1*PaddingWidth) - (ButtonWidth*1);
     
     close = 
@@ -2067,7 +2070,7 @@ wmCreateWindowFrame (
                 return -1;
             }
             
-            //local
+            // local
             do_create_controls(tbWindow);
 
             // #important:
@@ -5923,18 +5926,44 @@ gws_resize_window (
     //if(window == __root_window)
         //return -1;
 
-
-    // Só precisa mudar se for diferente.
-    if ( window->width  != cx ||
-         window->height != cy )
+// Só precisa mudar se for diferente.
+    if ( window->width != cx || window->height != cy )
     {
-        window->width  = (unsigned long) cx;
+
+        // Temos um valor mínimo no caso
+        // de janelas do tipo overlapped.
+        // Mesma coisa para o valor máximo.
+        // Uma janela overlapped não pode ser to tamanho da tela,
+        // mesmo que estejamos em modo fullscreen, pois o modo
+        // full screen usa apenas o conteúdo da área de cliente,
+        // não a janela do tipo overlapped.
+        if (window->type == WT_OVERLAPPED)
+        {
+            if (cx < METRICS_DEFAULT_MINIMUM_WINDOW_WIDTH){
+                cx = METRICS_DEFAULT_MINIMUM_WINDOW_WIDTH;
+            }
+            if (cy < METRICS_DEFAULT_MINIMUM_WINDOW_HEIGHT){
+                cy = METRICS_DEFAULT_MINIMUM_WINDOW_HEIGHT;
+            }
+
+            if (WindowManager.initialized==TRUE)
+            {
+                if (cx > WindowManager.wa_width){
+                    cx=WindowManager.wa_width;
+                }
+                if (cy > WindowManager.wa_height){
+                    cy=WindowManager.wa_height;
+                }
+            }
+        }
+
+        window->width = (unsigned long) cx;
         window->height = (unsigned long) cy;
 
         // Muda tambem as dimençoes da titlebar.
         // Muda somente a largura, pois a altura deve 
         // continuar a mesma;
-        if( window->type == WT_OVERLAPPED )
+        if (window->type == WT_OVERLAPPED)
         {
             // titlebar
             if ( (void*) window->titlebar != NULL )
