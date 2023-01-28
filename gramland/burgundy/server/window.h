@@ -1073,9 +1073,14 @@ struct gws_window_d
     struct gws_window_d  *next;
 };
 
-// Windows.
+//
+// Windows
+//
 
 extern struct gws_window_d  *__root_window; 
+
+extern struct gws_window_d  *active_window; 
+
 // If the window server has a taskbar.
 // maybe we don't need that.
 extern struct gws_window_d  *taskbar_window; 
@@ -1552,6 +1557,8 @@ struct gws_window_d *get_window_from_wid(int wid);
 
 struct gws_window_d *get_active_window (void);
 void set_active_window (struct gws_window_d *window);
+void set_active_by_id(int wid);
+
 
 int dock_active_window(int position);
 int dock_window( struct gws_window_d *window, int position );

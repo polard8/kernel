@@ -723,11 +723,22 @@ int main ( int argc, char *argv[] )
 // It needs to be an EDITBOX window.
 // We need a wrapper for that thing.
 
-    gws_async_command(
-         client_fd,
-         9,             // set focus
-         addressbar_window,
-         addressbar_window );
+    //gws_async_command(
+    //     client_fd,
+    //     9,             // set focus
+    //     addressbar_window,
+    //     addressbar_window );
+
+// set active window.
+    //gws_async_command(
+    //     client_fd,
+    //     15, 
+    //     Main_window,
+    //     Main_window );
+
+    gws_set_focus( client_fd, addressbar_window );
+    gws_set_active( client_fd, Main_window );
+
 
 //
 // Events

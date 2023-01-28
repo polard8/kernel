@@ -350,9 +350,20 @@ int main( int argc, char *argv[] )
 //    gws_async_command(
 //        client_fd, 9, addressbar_window, addressbar_window );
 // Set focus on client window.
-    gws_async_command(
-        client_fd, 9, client_window, client_window );
+    //gws_async_command(
+    //    client_fd, 9, client_window, client_window );
 // =======================================================
+
+// set active window.
+    //gws_async_command(
+    //     client_fd,
+    //     15, 
+    //     main_window,
+    //     main_window );
+
+    gws_set_focus( client_fd, client_window );
+    gws_set_active( client_fd, main_window );
+
 
 // Call the event loop.
 

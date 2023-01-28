@@ -361,7 +361,7 @@ static void __test_load_file(int socket, int wid)
             (unsigned long) COLOR_BLACK,
             (unsigned long) '.' );  // char.
        x++;
-       if(x>20)
+       if (x>20)
        {
            x=0;
            y++;
@@ -607,13 +607,22 @@ int main( int argc, char *argv[] )
 // the input ... so, i guess the window server
 // is printing the chars into the window with focus.
 
-    gws_async_command(
-         client_fd,
-         9,             // set focus
-         client_window,
-         client_window );
+    //gws_async_command(
+    //     client_fd,
+    //     9,             // set focus
+    //     client_window,
+    //     client_window );
 
+// set active window.
+    //gws_async_command(
+    //     client_fd,
+    //     15, 
+    //     main_window,
+    //     main_window );
 
+    gws_set_focus( client_fd, client_window );
+    gws_set_active( client_fd, main_window );
+   
 // ============================================
 
 //

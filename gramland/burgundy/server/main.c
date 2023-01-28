@@ -1996,6 +1996,14 @@ int serviceAsyncCommand(void)
         goto done;
         break;
 
+    // Set active window by id.
+    case 15:
+        // gwssrv_debug_print ("serviceAsyncCommand: [9] \n");
+        if (data<0){ goto done; }
+        set_active_by_id( (int) data );
+        goto done;
+        break;
+
 // poweroff
 // qemu only
     case 22:

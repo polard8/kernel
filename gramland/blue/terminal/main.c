@@ -2831,6 +2831,18 @@ int main ( int argc, char *argv[] )
     clear_terminal_client_window(client_fd);
     doPrompt(client_fd);
 
+
+
+// set active window.
+    //gws_async_command(
+    //     client_fd,
+    //     15, 
+    //     main_window,
+    //     main_window );
+
+    gws_set_active( client_fd, main_window );
+
+
 // Input loop!
 // local routine.
     int InputStatus=-1;

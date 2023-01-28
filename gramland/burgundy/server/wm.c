@@ -545,6 +545,9 @@ on_mouse_event(
 // Process and send message.
     if (event_type == GWS_MouseReleased){
         on_mouse_released();
+        //...
+        // #test
+        // Change the event_type and send another message?
         goto send_message;
     }
 
@@ -815,13 +818,13 @@ static void on_mouse_released(void)
             // Redraw the button
             set_status_by_id(mouse_hover->id,BS_RELEASED);
             redraw_window_by_id(mouse_hover->id,TRUE);
+            
+            
+            
             return;
         }
     }
 // ===================================
-
-
-
 
 
 //tb_button[0]
@@ -3092,6 +3095,31 @@ void set_focus_by_id(int wid)
     set_focus(w);
 }
 
+
+void set_active_by_id(int wid)
+{
+    struct gws_window_d *w;
+
+// wid
+    if (wid<0){
+        return;
+    }
+    if (wid >= WINDOW_COUNT_MAX){
+        return;
+    }
+
+// Window structure
+    w = (struct gws_window_d *) windowList[wid];
+    if ((void*)w==NULL){
+        return;
+    }
+    if (w->used != TRUE) { return; }
+    if (w->magic != 1234){ return; }
+
+    set_active_window(w);
+}
+
+
 void set_first_window( struct gws_window_d *window)
 {
     first_window = (struct gws_window_d *) window;
@@ -3298,6 +3326,11 @@ wm_draw_char_into_the_window(
     unsigned int color )
 {
 // We are painting only on 'editbox'.
+// #todo
+// In the case of editbox, we need to put the text into a buffer
+// that belongs to the window. This way the client application
+// can grab this texts via request.
+
 
 // draw char support.
     unsigned char _string[4];
@@ -3349,11 +3382,30 @@ wm_draw_char_into_the_window(
 // (control=0x0E)
 // #todo: 
 // Isso tem que voltar apagando.
-    if (ch==VK_BACK)
+    if (ch == VK_BACK)
     {
         window->ip_x--;
-        if (window->ip_x < 0){
-            window->ip_x = 0;
+        if (window->ip_x < 0)
+        {
+            if (window->type == WT_EDITBOX_SINGLE_LINE)
+            {
+                window->ip_x = 0;
+                return;
+            }
+            if (window->type == WT_EDITBOX_MULTIPLE_LINES)
+            {
+                window->ip_y--;
+                if (window->ip_y < 0)
+                {
+                    window->ip_y=0;
+                }
+                // #todo #bugbug
+                // Não é pra voltar no fim da linha anterior,
+                // e sim no fim do texto da linha anterior.
+                window->ip_x = (window->width_in_chars -1);
+
+                return;
+            }
         }
         return;
     }
@@ -3361,17 +3413,23 @@ wm_draw_char_into_the_window(
 // TAB
 // (control=0x0F)
 // O ALT esta pressionado?
-    if (ch==VK_TAB)
+    if (ch == VK_TAB)
     {
         window->ip_x += 8;
-        //#todo limits
         if (window->ip_x >= window->width_in_chars)
         {
-            window->ip_x = 0;
-            if (window->type == WT_EDITBOX_MULTIPLE_LINES){
+            if (window->type == WT_EDITBOX_SINGLE_LINE)
+            {
+                window->ip_x = (window->width_in_chars-1);
+            }
+            if (window->type == WT_EDITBOX_MULTIPLE_LINES)
+            {
+                window->ip_x = 0;
                 window->ip_y++;
-                //#todo
-                //if(window->ip_y >= window->height_in_bytes)
+                if (window->ip_y >= window->height_in_chars)
+                {
+                    window->ip_y = (window->height_in_chars-1);
+                }
             }
         }
         return;
@@ -3380,8 +3438,16 @@ wm_draw_char_into_the_window(
 // [Enter]
     if (ch == VK_RETURN)
     {
-        window->ip_x = 0;
-        window->ip_y++;
+        if (window->type == WT_EDITBOX_MULTIPLE_LINES)
+        {
+            window->ip_y++;
+            if (window->ip_y >= window->height_in_chars)
+            {
+                window->ip_y = (window->height_in_chars-1);
+                return;
+            }
+            window->ip_x = 0;
+        }
         return;
     }
 

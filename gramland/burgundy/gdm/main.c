@@ -579,11 +579,23 @@ int main( int argc, char *argv[] )
 // the input ... so, i guess the window server
 // is printing the chars into the window with focus.
 
-    gws_async_command(
-         client_fd,
-         9,             // set focus
-         client_window,
-         client_window );
+    //gws_async_command(
+    //     client_fd,
+    //     9,             // set focus
+    //     client_window,
+    //     client_window );
+
+
+// set active window.
+    //gws_async_command(
+    //     client_fd,
+    //     15, 
+    //     main_window,
+    //     main_window );
+
+    gws_set_focus( client_fd, client_window );
+    gws_set_active( client_fd, main_window );
+
 
 //
 // Event loop

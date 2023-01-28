@@ -57,17 +57,37 @@ int create_main_menu(int position_x, int position_y)
 {
     struct gwssrv_menu_d *menu;
 
+// --------------------------------------
+
     //unsigned long menux = (unsigned long) (position_x & 0xFFF);
     //unsigned long menuy = (unsigned long) (position_y & 0xFFF);
     unsigned long menux = 4;
     unsigned long menuy = 4;
-
-    if (WindowManager.initialized == TRUE){
+// menuy
+    if (WindowManager.initialized == TRUE)
+    {
         menuy = 
             (unsigned long)( WindowManager.wa_top + 
                              WindowManager.wa_height -
                              200 );
     }
+
+    // #test
+    // On corner of active window
+    if ( (void*) active_window != NULL )
+    {
+        if(active_window->magic == 1234)
+        {
+            if (active_window->type == WT_OVERLAPPED)
+            {
+                menux = (active_window->left +3);
+                menuy = (active_window->top  +25);
+            }  
+        }
+    }
+
+
+// --------------------------------------
 
     if ( (void*) gui == NULL )
         return -1;
@@ -227,8 +247,7 @@ struct gwssrv_menu_d *gwssrv_create_menu (
 
     //gwssrv_debug_print("gwssrv_create_menu:\n");
 
-    menu = (struct gwssrv_menu_d *) malloc ( sizeof(struct gwssrv_menu_d) );
-
+    menu = (struct gwssrv_menu_d *) malloc( sizeof(struct gwssrv_menu_d) );
     if ( (void *) menu == NULL ){
         gwssrv_debug_print("gwssrv_create_menu: [FAIL] menu\n");
         return (struct gwssrv_menu_d *) 0;

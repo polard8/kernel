@@ -3123,6 +3123,15 @@ int gws_create_empty_directory (char *dir_name)
 }
 
 
+
+void gws_set_active(int fd, wid_t wid)
+{
+    if (fd<0) { return; }
+    if (wid<0){ return; }
+// IN: fd, request, sub-request, data.
+    gws_async_command( fd, 15, 0, wid );
+}
+
 // Set focus
 // async request.
 void gws_set_focus(int fd, wid_t wid)
@@ -3132,6 +3141,7 @@ void gws_set_focus(int fd, wid_t wid)
 // IN: fd, request, sub-request, data.
     gws_async_command( fd, 9, 0, wid );
 }
+
 
 // Clear the window
 // Repaint it using the default background color.
