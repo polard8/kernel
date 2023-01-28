@@ -43,7 +43,8 @@ void testNIC(void)
     refresh_screen();
 
     network_send_arp_request();
-    
+    //network_test_udp();
+
 // ...
 
     e1000_show_info();

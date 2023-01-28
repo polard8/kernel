@@ -64,6 +64,8 @@ fail:
     return;
 }
 
+
+// Ethernet + arp
 void 
 network_send_arp( 
     int op,   //operation
@@ -79,7 +81,7 @@ network_send_arp(
     printf("network_send_arp:\n");
     refresh_screen();
 
-// The structure for the INtel NIC device.
+// The structure for the Intel NIC device.
     if ( (void*) currentNIC == NULL ){
         printf ("network_send_arp: currentNIC fail\n");
         goto fail;
@@ -88,7 +90,6 @@ network_send_arp(
 // A given IP number for Gramado.
 // Saving it into the NIC structure.
 // 192.168.1.112
-
     currentNIC->ip_address[0] = source_ip[0];  //192;
     currentNIC->ip_address[1] = source_ip[1];  //168;
     currentNIC->ip_address[2] = source_ip[2];  //1;
