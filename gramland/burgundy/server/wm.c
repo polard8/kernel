@@ -87,7 +87,6 @@ static int current_option=OPTION_NOTHING;
 // Quantos botões ja temos.
 static int tb_buttons_count=0;  
 static int tb_buttons[TB_BUTTONS_MAX];
-static int tb_buttons_status[TB_BUTTONS_MAX];
 
 //
 // tb windows
@@ -203,20 +202,14 @@ static void __draw_button_mark_by_wid( int wid, int button_number )
         return;
     }
 
-// Draw a small rectangle.
-// It means that this app was lauched.
-    
-    if (tb_buttons_status[button_number] == TRUE)
-    {
-        rectBackbufferDrawRectangle ( 
-            (w->left +3), 
-            (w->top +4), 
-            (w->width -8), 
-            2, 
-            COLOR_RED, 
-            FALSE, //refresh
-            0 );   //rop_flags
-    }
+    rectBackbufferDrawRectangle ( 
+        (w->left +3), 
+        (w->top +4), 
+        (w->width -8), 
+        2, 
+        COLOR_RED, 
+        FALSE,  //refresh
+        0 );    //rop_flags
 }
 
 static void run_selected_option(void)
@@ -340,9 +333,6 @@ on_keyboard_event(
     if (msg == GWS_SysKeyDown)
     {
         if (long1 == VK_F1){
-            // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
             //#bugbug: 
             //Não mude a cor do botão se o estilo for 3d.
             //pois perde o efeito desejado.
@@ -352,25 +342,16 @@ on_keyboard_event(
             return 0;
         }
         if (long1 == VK_F2){
-            // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
             set_status_by_id(tb_buttons[1],BS_PRESSED);
             redraw_window_by_id(tb_buttons[1],TRUE);
             return 0;
         }
         if (long1 == VK_F3){
-            // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
             set_status_by_id(tb_buttons[2],BS_PRESSED);
             redraw_window_by_id(tb_buttons[2],TRUE);
             return 0;
         }
         if (long1 == VK_F4){
-            // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
             set_status_by_id(tb_buttons[3],BS_PRESSED);
             redraw_window_by_id(tb_buttons[3],TRUE);
             return 0;
@@ -402,52 +383,36 @@ on_keyboard_event(
     if (msg == GWS_SysKeyUp)
     {
         if (long1 == VK_F1){
-            // ja esta rodando.
-            if(tb_buttons_status[0] == TRUE)
-                return 0;
             set_status_by_id( tb_buttons[0], BS_RELEASED );
             redraw_window_by_id(tb_buttons[0],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app1_string);
             tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[0] = TRUE;
             return 0;
         }
         if (long1 == VK_F2){
-            // ja esta rodando.
-            if(tb_buttons_status[1] == TRUE)
-                return 0;
             set_status_by_id( tb_buttons[1], BS_RELEASED );
             redraw_window_by_id(tb_buttons[1],TRUE);
             //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app2_string);
             tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[1] = TRUE;
             return 0;
         }
         if (long1 == VK_F3){
-            // ja esta rodando.
-            if(tb_buttons_status[2] == TRUE)
-                return 0;
             set_status_by_id( tb_buttons[2], BS_RELEASED );
             redraw_window_by_id(tb_buttons[2],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app3_string);
             tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[2] = TRUE;
             return 0;
         }
         if (long1 == VK_F4){
-            // ja esta rodando.
-            if(tb_buttons_status[3] == TRUE)
-                return 0;
             set_status_by_id( tb_buttons[3], BS_RELEASED );
             redraw_window_by_id(tb_buttons[3],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app4_string);
             tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
-            tb_buttons_status[3] = TRUE;
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
             // gUseMouse = TRUE;
@@ -748,26 +713,18 @@ static void on_mouse_pressed(void)
 
         if (mouse_hover->id == tb_buttons[0])
         {
-            if(tb_buttons_status[0] == TRUE)
-                return;
         }
-        
+
         if (mouse_hover->id == tb_buttons[1])
         {
-            if(tb_buttons_status[1] == TRUE)
-                return;
         }
 
         if (mouse_hover->id == tb_buttons[2])
         {
-            if(tb_buttons_status[2] == TRUE)
-                return;
         }
 
         if (mouse_hover->id == tb_buttons[3])
         {
-            if(tb_buttons_status[3] == TRUE)
-                return;
         }
 
         // Redraw the button
@@ -870,9 +827,6 @@ static void on_mouse_released(void)
 //tb_button[0]
     if(mouse_hover->id == tb_buttons[0])
     {
-        // ja esta rodando.
-        if(tb_buttons_status[0] == TRUE)
-            return;
         set_status_by_id(mouse_hover->id,BS_RELEASED);
         redraw_window_by_id(mouse_hover->id,TRUE);
         //create_main_menu(8,8);
@@ -880,52 +834,39 @@ static void on_mouse_released(void)
         //current_option = OPTION_MINIMIZE;
         //yellow_status("0: Min");
         //tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
-        tb_buttons_status[0] = TRUE;
         return;
     }
 
 //tb_button[1]
     if(mouse_hover->id == tb_buttons[1])
     {
-        // ja esta rodando.
-        if(tb_buttons_status[1] == TRUE)
-            return;
         set_status_by_id(mouse_hover->id,BS_RELEASED);
         redraw_window_by_id(mouse_hover->id,TRUE);
         //current_option = OPTION_MAXIMIZE;
         //yellow_status("1: Max");
         //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
-        tb_buttons_status[1] = TRUE;
         return;
     }
 
 //tb_button[2]
     if(mouse_hover->id == tb_buttons[2])
     {
-        // ja esta rodando.
-        if(tb_buttons_status[2] == TRUE)
-            return;
         set_status_by_id(mouse_hover->id,BS_RELEASED);
         redraw_window_by_id(mouse_hover->id,TRUE);
         //current_option = OPTION_CLOSE;
         //yellow_status("2: Close");
         //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
-        tb_buttons_status[2] = TRUE;
         return;
     }
 
 //tb_button[3]
     if(mouse_hover->id == tb_buttons[3])
     {
-        // ja esta rodando.
-        if(tb_buttons_status[3] == TRUE)
-            return;
         set_status_by_id(mouse_hover->id,BS_RELEASED);
         redraw_window_by_id(mouse_hover->id,TRUE);
         //yellow_status("3: OK");
         //run_selected_option();
         //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
-        tb_buttons_status[3] = TRUE;
         // mostra o cliente se ele faz parte da tag 3.
         //show_client(first_client->next,3);
         //show_client_list(3);  //#todo: notworking
@@ -5541,10 +5482,8 @@ void create_taskbar (unsigned long tb_height)
 // ===================================
 // Clean the button list and the pid list.
     register int b=0;
-    for (b=0; b<8; b++)
-    {
+    for (b=0; b<8; b++){
         tb_buttons[b]=0;
-        tb_buttons_status[b]=FALSE;
         tb_pids[b]=0;
     };
     tb_buttons_count=0;
@@ -6346,7 +6285,7 @@ void wm_Update_TaskBar( char *string, int flush )
         if (tb_buttons[i] != 0){
             wid = (int) tb_buttons[i];
             redraw_window_by_id(wid,TRUE);
-            __draw_button_mark_by_wid(wid,i);
+            //__draw_button_mark_by_wid(wid,i);
         }
     };
 
