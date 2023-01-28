@@ -57,7 +57,7 @@ network_handle_udp(
 // Don't print every message.
 // Is it a valid port?
 // Hang if the port is valid.
-    if (dport == 34884)
+    if (dport == 34884 || dport == 11888)
     {
         printf ("MESSAGE={%s}\n",udp_payload);
         printf("udp: breakpoint\n");
@@ -72,13 +72,14 @@ void network_test_udp(void)
     char message[512];
     memset(message,0,sizeof(message));
     sprintf(message,"Hello from Gramado to Gramado\n");
+    uint16_t target_port = (uint16_t) FromNetByteOrder16(34884);
 
     network_send_udp( 
         __udp_gramado_default_ipv4,   // scr ip
         __udp_target_default_ipv4,    // dst ip
         __udp_target_mac,             // dst mac
         message,                      // msg
-        34884 );                      // target port
+        target_port );                // target port
 }
 
 // -----------------
@@ -263,15 +264,17 @@ network_send_udp (
 // Estamos pegando o offset que nos levar� ao endere�o do buffer.
 // Usaremos esse offset logo abaixo.
 // Pegamos esse offset na estrutura do controlador nic intel.
-
-    //uint16_t old = currentNIC->tx_cur;
-
 // Copiando o pacote no buffer.
 // Pegando o endere�o virtual do buffer na estrutura do controlador 
 // nic intel. Para isso usamos o offset obtido logo acima.
 
-    //unsigned char *buffer = (unsigned char *) currentNIC->tx_descs_virt[old];
-      unsigned char *buffer = (unsigned char *) udp_packet;
+    uint16_t buffer_index = (uint16_t) currentNIC->tx_cur;
+// Get the buffer address based on its offset.
+    unsigned char *buffer = 
+        (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
+
+    //#debug
+    //printf ("buffer_index {%d}\n",buffer_index);
 
 // #importante:
 // Preparando ponteiros para manipularmos as 

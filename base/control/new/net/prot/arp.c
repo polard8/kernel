@@ -205,6 +205,7 @@ network_send_arp(
 // Get the buffer address based on its offset.
     unsigned char *buffer = 
         (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
+
 // Get the addresses for the headers.
     unsigned char *src_ethernet = (unsigned char *) eh;
     unsigned char *src_arp      = (unsigned char *) h;

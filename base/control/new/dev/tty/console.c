@@ -1338,6 +1338,16 @@ int consoleCompareStrings(void)
         testNIC();
         goto exit_cmp;
     }
+    if ( strncmp(prompt,"test-arp",8) == 0 ){
+        network_send_arp_request();
+        goto exit_cmp;
+    }
+    if ( strncmp(prompt,"test-udp",8) == 0 ){
+        network_test_udp();
+        goto exit_cmp;
+    }
+
+
 
 // mod0: Call the entrypoint of the module.
 // mod0.bin entry point.
