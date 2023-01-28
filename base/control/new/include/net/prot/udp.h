@@ -6,6 +6,7 @@
 #define __NET_UDP_H    1
 
 // UDP datagram structure
+// 4*2 = 6bytes.
 struct udp_d
 {
 

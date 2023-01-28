@@ -12,7 +12,7 @@
 
 #define PROTOCOL_IP_ICMP  1
 #define PROTOCOL_IP_TCP   6
-#define PROTOCOL_IP_UDP   11
+#define PROTOCOL_IP_UDP   17
 // ...
 
 #define IP_RF  0x8000			/* reserved fragment flag */

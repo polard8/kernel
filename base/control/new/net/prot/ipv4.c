@@ -18,7 +18,6 @@ network_handle_ipv4(
 
     ip = (struct ip_d *) buffer;
 
-
     printf("network_handle_ipv4: ==== IP ====\n");
 
     if ( (void*) ip == NULL ){
@@ -62,7 +61,7 @@ network_handle_ipv4(
 // https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 
     Protocol = (uint8_t) ip->ip_p;
-    printf("Protocol: {%x}\n",Protocol);
+    printf("Protocol: {%xH}\n",Protocol);
 
 // 0x01 -  1 - ICMP - Internet Control Message Protocol
 // 0x06 -  6 - TCP  - Transmission Control Protocol
@@ -84,7 +83,11 @@ network_handle_ipv4(
     if (Protocol == PROTOCOL_IP_UDP)
     {
         printf("UDP Protocol\n");
-        //network_handle_udp(..);
+        network_handle_udp(
+            (buffer + IP_HEADER_LENGHT),
+            ip->ip_len 
+            );
+        return;
     }
 
 // ---------------
