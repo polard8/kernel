@@ -187,21 +187,24 @@ struct gwssrv_menu_item_d *gwssrv_create_menu_item (
         COLOR_GRAY, 
         COLOR_GRAY );    
 
-    if ( (void*) window == NULL )
-    {
+    if ( (void*) window == NULL ){
         item->window = NULL;
         goto fail;
     }
 
 //register.
-
     int mi_wid=-1;
     mi_wid = RegisterWindow(window);
-    if(mi_wid<0)
+    if(mi_wid<0){
         return NULL;
+    }
 
-// The window.
+// This window is a menuitem.
+    window->isMenuItem = TRUE;
+
+// The window this window belongs to.
     item->window = window;
+
 //ok
     return (struct gwssrv_menu_item_d *) item;
 fail:
@@ -262,8 +265,12 @@ struct gwssrv_menu_d *gwssrv_create_menu (
 //#todo register
     int m_wid=-1;
     m_wid = RegisterWindow(window);
-    if(m_wid<0)
+    if(m_wid<0){
         return NULL;
+    }
+
+// This window is a menu.
+    window->isMenu = TRUE;
 
 // Save window pointer.
     menu->window = window; 

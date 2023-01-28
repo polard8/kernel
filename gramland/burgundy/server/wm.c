@@ -713,10 +713,27 @@ static void on_mouse_pressed(void)
         return;
     }
 
-    // button number
-    //if(long1==1){ yellow_status("P1"); }
-    //if(long1==2){ yellow_status("P2"); }
-    //if(long1==3){ yellow_status("P3"); }
+// ===================================
+// #test
+// Lidando com menuitens
+    // Se clicamos em um menu item.
+    if (mouse_hover->isMenuItem == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_PRESSED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return;
+        }
+    }
+// ===================================
+
+
+
+//
+// Lidando com os botões da barra de tarefas.
+//
 
 // Em qual botão da taskbar?
 // Se for igual à um dos botões da tb.
@@ -725,6 +742,9 @@ static void on_mouse_pressed(void)
         mouse_hover->id == tb_buttons[2] ||
         mouse_hover->id == tb_buttons[3] )
     {
+
+        // #bugbug
+        // Check type
 
         if (mouse_hover->id == tb_buttons[0])
         {
@@ -824,6 +844,27 @@ static void on_mouse_released(void)
     //if(long1==3){ yellow_status("R3"); return 0; }
     //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
     //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
+
+
+
+// ===================================
+// #test
+// Lidando com menuitens
+    // Se clicamos em um menu item.
+    if (mouse_hover->isMenuItem == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return;
+        }
+    }
+// ===================================
+
+
+
 
 
 //tb_button[0]
@@ -3816,6 +3857,30 @@ __probe_window_hover(
                 //    long1, long2,
                 //    w->left, w->top );
             }
+            
+            // #test
+            // Are we hover a menu item?
+            // We have two types of menuitens.
+            if ( w->type == WT_SIMPLE || w->type == WT_BUTTON )
+            {
+                if (w->isMenuItem == TRUE)
+                {
+                    Status = is_within( (struct gws_window_d *) w, long1, long2 );
+                    // Yes, we are inside a menuitem.
+                    if(Status==TRUE)
+                    {
+                       if (w != mouse_hover)
+                       {
+                           on_mouse_leave(mouse_hover);
+                           mouse_hover = (void*) w;
+                           on_mouse_hover(w);
+                       }
+                       return;
+                    }
+                }
+            }
+            
+            
         }
     }
     };

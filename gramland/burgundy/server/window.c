@@ -950,9 +950,15 @@ void *doCreateWindow (
     //window->desktop = (void*) Desktop; //configurado anteriormente.
     //window->desktop_id = Desktop->id;  //@todo: verificar elemento.
 
-    // What is that?
-    window->isMenu    = 0;
-    window->isButton  = 0;
+//
+// What is that?
+//
+
+    window->isMenu = FALSE;
+    window->isMenu = FALSE;
+
+    window->isButton = 0;
+
     window->isEditBox = 0;
 
 // Context menu: right click
