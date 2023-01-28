@@ -28,16 +28,17 @@ This repository has the source code for:
 > * Paging.
 > * Threads.
 > * FAT16 file system.
+> * e1000 NIC driver.
+> * IDE PATA. 
 > * ps/2 keyboard. 
 > * ps/2 mouse works fine only on qemu.
 > * Serial port. 
-> * IDE PATA. 
-> * Window Server. See: gramado/core/
 
 ## Userland features.
 
-> * Unix-like commands running in the virtual console.
+> * Window Server. See: gramland/burgundy/server/
 > * Some few clients connected to the window server via unix-sockets.
+> * Unix-like commands running in the virtual console.
 
 ## Libraries.
 
@@ -45,6 +46,7 @@ This repository has the source code for:
 > * Lib for the window server's clients. (libgws)
 
 ## Fred's compilation on Linux.
+
 ```
     Host machine: Ubuntu 22.10
     Linux 5.19.0-23-generic x86_64
