@@ -310,9 +310,9 @@ extern unsigned long gSavedBPP;
 #include "net/host.h"
 #include "net/in.h"
 #include "net/un.h"
-#include "net/ethernet.h"
 
 // Protocols
+#include "net/prot/ethernet.h"
 #include "net/prot/arp.h"
 #include "net/prot/ip.h"
 #include "net/prot/tcp.h"
