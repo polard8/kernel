@@ -138,13 +138,10 @@ pid_t copy_process(
 // parent_pid came from function parameters.
 
 // parent pid.
-    if ( parent_pid < 0 || 
-         parent_pid >= PROCESS_COUNT_MAX )
-    {
+    if (parent_pid < 0 || parent_pid >= PROCESS_COUNT_MAX){
         printf("copy_process: parent_pid\n");
         goto fail;
     }
-
 // parent process pointer.
     parent_process = (struct process_d *) processList[ parent_pid ];
     if ( (void *) parent_process == NULL )
@@ -152,9 +149,7 @@ pid_t copy_process(
         printf("copy_process: parent_process\n");
         goto fail;
     }
-    if ( parent_process->used != TRUE || 
-         parent_process->magic != 1234 )
-    {
+    if (parent_process->used != TRUE || parent_process->magic != 1234){
         printf("copy_process: parent_process validation\n");
         goto fail;
     }
@@ -287,8 +282,7 @@ pid_t copy_process(
 //====
 
 // Limits for the callers pid.
-    if( parent_process->pid < 0 || 
-        parent_process->pid >= PROCESS_COUNT_MAX )
+    if( parent_process->pid < 0 || parent_process->pid >= PROCESS_COUNT_MAX )
     {
         panic("copy_process: parent_process->pid limits\n");
     }
@@ -299,7 +293,6 @@ pid_t copy_process(
     if( parent_process->pid != current_process ){
         panic("copy_process: parent_process->pid != current_process\n");
     }
-
 
 //
 // == child_process =========================================
@@ -641,10 +634,12 @@ do_clone:
 // Carregando a imagem do clone no buffer criado para ela.
 // IN: 
 // name, image va.
+// see: fsload.c
 
-    Status = (int) fs_load_image(
-                       filename, 
-                       (unsigned long) child_process->Image );
+    Status = 
+        (int) fs_load_image(
+                  filename, 
+                  (unsigned long) child_process->Image );
  
     if ( Status != 0 ){
         debug_print ("copy_process: [FAIL] Couldn't load the file\n");

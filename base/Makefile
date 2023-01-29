@@ -11,7 +11,7 @@ EDITION_NAME  = Facilities
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 6
-VERSION_BUILD = 305
+VERSION_BUILD = 306
 # Compiling on gcc 12.2.0
 # Linking on ld 2.39
 
@@ -189,21 +189,20 @@ exposed-tier:
 	$(Q) $(MAKE) -C exposed/azure/
 # Copy to the target folder.
 	-sudo cp exposed/azure/bin/SHUTDOWN.BIN  control/disk/
-
 	-sudo cp exposed/azure/bin/REBOOT.BIN    control/disk/
-	-sudo cp exposed/azure/bin/VGA1.BIN      control/disk/
-
-	-sudo cp exposed/azure/bin/SHELL.BIN     control/disk/
 	-sudo cp exposed/azure/bin/CAT.BIN       control/disk/
-	-sudo cp exposed/azure/bin/TPRINTF.BIN   control/disk/
-	-sudo cp exposed/azure/bin/SHOWFUN.BIN   control/disk/
 	-sudo cp exposed/azure/bin/UNAME.BIN     control/disk/
-	-sudo cp exposed/azure/bin/CMP.BIN       control/disk/
-	-sudo cp exposed/azure/bin/SUM.BIN       control/disk/
-	-sudo cp exposed/azure/bin/TASCII.BIN    control/disk/
-	-sudo cp exposed/azure/bin/FALSE.BIN     control/disk/
-	-sudo cp exposed/azure/bin/TRUE.BIN      control/disk/
-	-sudo cp exposed/azure/bin/GRAMCNF.BIN   control/disk/
+
+	-sudo cp exposed/azure/bin/VGA1.BIN      control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/SHELL.BIN     control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/TPRINTF.BIN   control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/SHOWFUN.BIN   control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/CMP.BIN       control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/SUM.BIN       control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/TASCII.BIN    control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/FALSE.BIN     control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/TRUE.BIN      control/disk/PROGRAMS/
+	-sudo cp exposed/azure/bin/GRAMCNF.BIN   control/disk/PROGRAMS/
 	#...
 
 #========================================
@@ -216,10 +215,10 @@ exposed-tier:
 #========================================
 # ::
 	$(Q) $(MAKE) -C exposed/navy/
-	-sudo cp exposed/navy/bin/N9.BIN   control/disk/
-	-sudo cp exposed/navy/bin/N10.BIN  control/disk/
-	-sudo cp exposed/navy/bin/N11.BIN  control/disk/
-	
+	-sudo cp exposed/navy/bin/N9.BIN   control/disk/PROGRAMS/
+	-sudo cp exposed/navy/bin/N10.BIN  control/disk/PROGRAMS/
+	-sudo cp exposed/navy/bin/N11.BIN  control/disk/PROGRAMS/
+
 #========================================
 	@echo ":: Copying Window server and clients."
 # test ---------------------------
@@ -238,10 +237,10 @@ exposed-tier:
 	-sudo cp ../gramland/blue/bin/TERMINAL.BIN     control/disk/
 	-sudo cp ../gramland/beige/bin/EDITOR.BIN      control/disk/
 	-sudo cp ../gramland/beige/bin/FILEMAN.BIN     control/disk/
-	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/
+	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/PROGRAMS/
 
 	-sudo cp ../gramland/attitude/bin/BROWSER.BIN  control/disk/
-	-sudo cp ../gramland/attitude/bin/DOCV.BIN  control/disk/
+	-sudo cp ../gramland/attitude/bin/DOCV.BIN  control/disk/PROGRAMS/
 
 # This is not part of the exposed-tier
 # But its a de facto external content.

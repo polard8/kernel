@@ -189,11 +189,9 @@ fs_load_fat(
     unsigned long __fatLBA=0;
     size_t        __fatSizeInSectors=0;
 
-
     __fatAddress       = fat_address;
     __fatLBA           = fat_lba;
     __fatSizeInSectors = (fat_size & 0xFFFF);   //fat size in sectors. 246?
-
 
     debug_print ("fs_load_fat:\n");
 
@@ -268,13 +266,12 @@ void
 fs_load_rootdir(
     unsigned long root_address, 
     unsigned long root_lba, 
-    size_t root_size )
+    size_t root_size )  // in sectors.
 {
 
     unsigned long RootAddress=0;
     unsigned long RootLBA=0;
     size_t        RootSize=0;
-
 
     RootAddress = root_address;
     RootLBA     = root_lba;

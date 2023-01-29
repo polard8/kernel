@@ -3,6 +3,21 @@
 
 #include <kernel.h>
 
+
+struct system_fat_d sfMainFAT;
+
+
+// Canonical:
+// The list of the main directories in the system.
+// These are the first directories searched when
+// we're looking for a file.
+struct system_directory_d  sdROOT;      // '/'
+//struct system_directory_d  sdEFI;       // 'EFI
+//struct system_directory_d  sdGRAMADO;   // 'GRAMADO'
+struct system_directory_d  sdPROGRAMS;  // 'PROGRAMS'
+//struct system_directory_d  sdUSERS;     // 'USERS'
+
+
 // Buffers for 8 directories. Each one with 512 entries.
 // 32*512 = 16384
 // 16KB
@@ -2483,15 +2498,106 @@ int fs_initialize_dev_dir(void)
 }
 
 
+void initialize_FAT_and_main_directories(void)
+{
+// >> So podemos chamar isso depois de termos
+// inicialiado o hardware de disco ...
+// see: I_init in x64init.c
+// Load FAT for the first time
+// Load root dir for the first time.
+// Load the other main directories for the first time.
+
+   size_t name_size=0;
+
+// ------------------
+// FAT
+    fs_load_fat( VOLUME1_FAT_ADDRESS, VOLUME1_FAT_LBA, 246 );
+    sfMainFAT.initialized = TRUE;
+
+// ------------------
+// ROOT
+    char *root_name = "/";
+
+    fs_load_rootdir ( 
+        VOLUME1_ROOTDIR_ADDRESS, 
+        VOLUME1_ROOTDIR_LBA, 
+        32 );
+
+    sdROOT.address = (unsigned long) VOLUME1_ROOTDIR_ADDRESS;
+    sdROOT.number_of_entries = 512;
+// name
+    name_size = strlen(root_name);
+    if (name_size <= 0 || name_size >= 64)
+        x_panic("root_name");
+    sdROOT.name_size = (size_t) name_size; 
+    sprintf( sdROOT.name, root_name );
+    sdROOT.initialized = TRUE;
+
+// ------------------
+// PROGRAMS
+// Load the directory that belongs to the root dir.
+    char *programs_name = "PROGRAMS";
+
+    unsigned long programs_buffer=0;
+    unsigned long programs_buffer_size=0;   //in bytes
+
+    // #bugbug
+    // se carregarmos mais arquivos lá do que isso,
+    // então teremos problemas para ler.
+    // # isso é so um teste por enquanto.
+    // Podemos melhorar essa rotina no futuro.
+    // 32 setores, igual o root.
+    // 512 * 32 = 16384 bytes
+    // 16384/4096 = 4 páginas.
+    programs_buffer = 
+        (unsigned long) allocPages(8);  //#todo: A lot bigger when possible.
+
+    if ( (void*) programs_buffer == NULL ){
+        x_panic("programs_buffer");
+    }
+
+    // size in bytes
+    // 32 setores.
+    programs_buffer_size = 16384; //(32*512)
+
+    unsigned long Ret = 1;  // 1 fail | 0 ok.
+    Ret = fsLoadFile ( 
+              (unsigned long) VOLUME1_FAT_ADDRESS,      // fat address
+              (unsigned long) VOLUME1_ROOTDIR_ADDRESS,  // dir address. onde procurar.
+              (int) 512,                                // #bugbug: Number of entries.  
+              (const char *) programs_name,  // nome do diretorio 
+              (unsigned long) programs_buffer,  // onde carregar. 
+              (unsigned long) programs_buffer_size ); // tamanho do buffer onde carregar.                            
+
+    if (Ret!=0){
+        x_panic("Couldn't load PROGRAMS directory");
+    }
+
+    sdPROGRAMS.address = (unsigned long) programs_buffer;
+    sdPROGRAMS.number_of_entries = 512;
+// name
+    name_size = strlen(programs_name);
+    if (name_size <= 0 || name_size >= 64)
+        x_panic("programs_name");
+    sdPROGRAMS.name_size = (size_t) name_size; 
+    sprintf( sdPROGRAMS.name, programs_name );
+    sdPROGRAMS.initialized = TRUE;
+
+// ----------------------            
+   //...
+
+}
+
 // ------------------------------
 // fsInit:
-// Called by init() in init.c
+// Called by I_init() in x64init.c
 int fsInit (void)
 {
     register int i=0;
     int slot = -1;
 
     debug_print ("fsInit: [TODO]\n");
+
 
 // Buffers
 // Buffers for loading the directories while walking on a pathname
@@ -3547,20 +3653,20 @@ fsGetFileSize (
 //via argumento.
 //...
 
-    debug_print ("fsRootDirGetFileSize: $\n");
+    debug_print ("fsGetFileSize: $\n");
 
     if ( (void*) file_name == NULL ){
-        printk("fsRootDirGetFileSize: [ERROR] file_name\n");
+        printk("fsGetFileSize: [ERROR] file_name\n");
         goto fail;
     }
 
     if (*file_name == 0){
-        printk("fsRootDirGetFileSize: [ERROR] *file_name\n");
+        printk("fsGetFileSize: [ERROR] *file_name\n");
         goto fail;
     }
 
     if (dir_address == 0){
-        printk("fsRootDirGetFileSize: [ERROR] dir_address\n");
+        printk("fsGetFileSize: [ERROR] dir_address\n");
         goto fail;
     }
 
@@ -3621,12 +3727,12 @@ fsGetFileSize (
 //
 
     if ( (void *) root == NULL ){
-        panic ("fsRootDirGetFileSize: [FAIL] No root file system!\n");
+        panic ("fsGetFileSize: [FAIL] No root file system!\n");
     }else{
 
         // Setores por cluster.
         Spc = root->spc;
-        if (Spc <= 0){ panic ("fsRootDirGetFileSize: [FAIL] spc\n"); }
+        if (Spc <= 0){ panic ("fsGetFileSize: [FAIL] spc\n"); }
 
         // Max entries ~ Número de entradas no rootdir.
         // #bugbug: 
@@ -3636,7 +3742,7 @@ fsGetFileSize (
         // diretórios e entradas.
 
         max = root->dir_entries;
-        if (max <= 0){ panic ("fsRootDirGetFileSize: [FAIL] max root entries\n"); }
+        if (max <= 0){ panic ("fsGetFileSize: [FAIL] max root entries\n"); }
 
         // More?! 
         // ...
@@ -3669,7 +3775,7 @@ fsGetFileSize (
 
     size_t szFileName = (size_t) strlen(file_name); 
     if (szFileName > 11){
-        printf ("fsRootDirGetFileSize: [FIXME] name size fail %d\n",
+        printf ("fsGetFileSize: [FIXME] name size fail %d\n",
             szFileName );   
         szFileName = 11;
     }
@@ -3705,7 +3811,7 @@ fsGetFileSize (
 fail:
 
     if ( (void*) file_name != NULL ){
-        printf ("fsRootDirGetFileSize: [FAIL] %s not found\n", file_name );
+        printf ("fsGetFileSize: [FAIL] %s not found\n", file_name );
      }
 
     //if ( (void*) NameX != NULL )
@@ -4896,6 +5002,11 @@ sys_read_file_from_disk (
     int __slot = -1;  // ofd.
     void *buff;
 
+// For now we're just able to get files and info
+// in the root dir.
+
+    unsigned long TargetDirAddress = VOLUME1_ROOTDIR_ADDRESS;
+
     // debug_print ("sys_read_file_from_disk: $\n");
 
 // filename
@@ -4932,7 +5043,7 @@ sys_read_file_from_disk (
 // #bugbug: Então 'cat' não deve chamar essa função.
 
     Status = 
-        (int) search_in_dir( file_name, VOLUME1_ROOTDIR_ADDRESS );
+        (int) search_in_dir( file_name, TargetDirAddress );
 
 // Found.
     if (Status == TRUE){
@@ -4965,7 +5076,7 @@ sys_read_file_from_disk (
              __ret = 
                  (int) fsSaveFile ( 
                            VOLUME1_FAT_ADDRESS, 
-                           VOLUME1_ROOTDIR_ADDRESS, 
+                           TargetDirAddress, 
                            FAT16_ROOT_ENTRIES, 
                            (char *) file_name, 
                            (unsigned long) 1,   //2,     // size in sectors 
@@ -5111,7 +5222,7 @@ __OK:
     FileSize = 
         (size_t) fsGetFileSize( 
                       (unsigned char *) file_name,
-                      (unsigned long) VOLUME1_ROOTDIR_ADDRESS );
+                      (unsigned long) TargetDirAddress );
 
     if (FileSize <= 0){
         printf ("sys_read_file_from_disk: FileSize\n");
@@ -5229,7 +5340,7 @@ __OK:
     Status = 
         (int) fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
-                  VOLUME1_ROOTDIR_ADDRESS, 
+                  TargetDirAddress, 
                   FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
                   file_name, 
                   (unsigned long) fp->_base,

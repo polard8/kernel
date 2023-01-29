@@ -39,3 +39,14 @@ You can type:
     game2 - Start demo 2.
     cls   - Clear the screen.
 
+-----------------------
+launching a program from the terminal.
+Just type?
+    $ name
+    $ name.bin
+    $ name -x
+    $ #name.bin  (This one loads from /PROGRAMS/)
+
+
+
+

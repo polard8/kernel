@@ -1355,6 +1355,9 @@ static int I_init(void)
         return FALSE;
     }
 
+
+    initialize_FAT_and_main_directories();
+
 // =========================================
 // In-kernel window manager.
 // #todo: maybe

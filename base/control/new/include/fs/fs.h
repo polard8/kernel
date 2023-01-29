@@ -4,6 +4,42 @@
 #ifndef __FS_FS_H
 #define __FS_FS_H    1
 
+
+// fat info for the boot partition of the system disk.
+struct system_fat_d
+{
+    int initialized;
+    // ...
+};
+extern struct system_fat_d sfMainFAT;
+
+
+// Main directories in the system.
+struct system_directory_d
+{
+// name
+    char name[64];
+    size_t name_size; 
+// Is it loaded in the main memory.
+    int initialized;
+// The virtual address of the directory.
+    unsigned long address;
+// The total number of entries.
+    int number_of_entries;
+};
+
+// Canonical:
+// The list of the main directories in the system.
+// These are the first directories searched when
+// we're looking for a file.
+// see: fs.c
+extern struct system_directory_d  sdROOT;      // '/'
+//extern struct system_directory_d  sdEFI;       // 'EFI
+//extern struct system_directory_d  sdGRAMADO;   // 'GRAMADO'
+extern struct system_directory_d  sdPROGRAMS;  // 'PROGRAMS'
+//extern struct system_directory_d  sdUSERS;     // 'USERS'
+
+
 // Buffers to walk on a pathname,
 // loading until 8 directories.
 // 1 page size.
@@ -542,6 +578,8 @@ fs_load_rootdir(
     unsigned long root_address, 
     unsigned long root_lba, 
     size_t root_size );
+
+void initialize_FAT_and_main_directories(void);
 
 void write_lba( unsigned long address, unsigned long lba );
 

@@ -102,6 +102,7 @@ static void __test_path(void)
         return;
     }
 
+// see: fsload.c
 // IN: path, address, buffer size in bytes.
     status = 
         (int) fs_load_path ( 

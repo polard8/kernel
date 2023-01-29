@@ -3,6 +3,7 @@
 
 #include <kernel.h>
 
+
 int senda=1;
 
 static int __check_address_validation( unsigned long address );
@@ -42,16 +43,19 @@ static int __check_address_validation(unsigned long address)
 /*
  * fsLoadFile:
  *    It loads a file into the memory.
- * IN:
- *     fat_address  = FAT address.
- *     dir_addresss = Directory address.
- *     dir_entries  = Number of entries in the given directory.
- *     file_name    = File name.
- *     buffer = Where to load the file. The pre-allocated buffer.
- *     buffer_size_in_bytes = Maximum buffer size.
- * OUT: 
- *    1=fail 
- *    0=ok.
+
+IN:
+    fat_address          = FAT address.
+    dir_addresss         = Directory address.
+    dir_entries          = Number of entries in the given directory.
+    file_name            = File name.
+    buffer               = Where to load the file. The pre-allocated buffer.
+    buffer_size_in_bytes = Maximum buffer size.
+
+OUT: 
+    1=fail 
+    0=ok.
+
  */
 // #bugbug
 // Essa rotina somente consegue pegar o tamanho do arquivo
@@ -589,6 +593,87 @@ fsLoadFile2 (
                (unsigned long)   fc->buffer_limit );
 }
 
+
+unsigned long 
+fsLoadProgram (
+    char *program_name,
+    unsigned long buffer,
+    unsigned long buffer_size_in_bytes );
+
+unsigned long 
+fsLoadProgram (
+    char *program_name,
+    unsigned long buffer,                 // pre-allocated buffer.
+    unsigned long buffer_size_in_bytes )  // buffer size.
+{
+
+    unsigned long Status=1; // fail
+
+
+    // #debug
+    printf ("fsLoadProgram:\n");
+
+
+    if ( (void*) buffer == NULL ){
+        printf("fsLoadProgram: buffer\n");
+        goto fail;
+    }
+    if (buffer_size_in_bytes == 0){
+        printf("fsLoadProgram: buffer_size_in_bytes\n");
+        goto fail;
+    }
+
+
+    if ( sdPROGRAMS.initialized != TRUE )
+    {
+        printf("fsLoadProgram: sdPROGRAMS.initialized\n");
+        goto fail;
+    }
+
+    if ( sdPROGRAMS.address == 0 )
+    {
+        printf("fsLoadProgram: sdPROGRAMS.address\n");
+        goto fail;
+    }
+
+    unsigned long programs_directory_address = 
+        sdPROGRAMS.address;
+
+/*
+ *    It loads a file into the memory.
+ * IN:
+ *     fat_address  = FAT address.
+ *     dir_addresss = Directory address.
+ *     dir_entries  = Number of entries in the given directory.
+ *     file_name    = File name.
+ *     buffer = Where to load the file. The pre-allocated buffer.
+ *     buffer_size_in_bytes = Maximum buffer size.
+ * OUT: 
+ *    1=fail 
+ *    0=ok.
+ */
+
+    Status = 
+        (unsigned long) fsLoadFile( 
+                            VOLUME1_FAT_ADDRESS, 
+                            programs_directory_address, // onde procurar 
+                            512,    //#bugbug: number of entries.
+                            program_name, 
+                            (unsigned long) buffer,  // buffer
+                            (unsigned long) buffer_size_in_bytes );  // buffer limits in bytes
+
+    if (Status!=0){
+        goto fail;
+    }
+
+    return 0;
+
+fail:
+    refresh_screen();
+    return 1;
+}
+
+
 /*
  * fs_load_path:
  *     Carrega nesse endereço o arquivo que está nesse path.
@@ -1123,9 +1208,48 @@ fail:
 
 // ---------------
 
+static int 
+__try_to_load_program( 
+    const char *filename, 
+    unsigned long image_va );
+
+static int 
+__try_to_load_program( 
+    const char *filename, 
+    unsigned long image_va )
+{
+    unsigned long status=1;
+    unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (unsigned long) (512 * 4096);
+
+    char *new_filename;
+    new_filename = filename;
+
+    // #debug
+    printf ("__try_to_load_program:\n");
+
+    if ( (void*) new_filename == NULL )
+        return -1;
+
+    if ( *new_filename == '#' )
+        new_filename++;
+
+
+    fs_fntos ( (char *) new_filename );
+
+    status = 
+        (unsigned long) fsLoadProgram( new_filename, image_va, BUGBUG_IMAGE_SIZE_LIMIT );
+    
+    if (status == 0){
+        return 0;
+    }
+
+    return -1;
+}
 
 // helper.
 // Loading a image given the filename and its virtual address.
+// called by copy_process in clone.c right after a
+// syscall to 'clone and execute'.
 int 
 fs_load_image( 
     const char *filename, 
@@ -1134,6 +1258,14 @@ fs_load_image(
 
 // #todo:
 // Explain better all these variables.
+
+
+    // #test
+    // Try to load a program
+    if ( *filename == '#' ){
+        return (int) __try_to_load_program(filename,image_va);
+    }
+
 
     int Status=-1;
 
