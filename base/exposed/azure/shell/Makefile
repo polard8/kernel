@@ -1,17 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
-
+# shell
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = cat
-
-#todo:
-#We need to simplify these flags
-
+#NAME = shell
 
 CFLAGS_OLD = -m64 \
 	-std=gnu89 \
@@ -101,23 +96,20 @@ CFLAGS := \
 	-mno-mmx -mno-sse -mno-sse2   
 	
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
-LIBIO    = ../../lib/libio01/include/
-LIBIOOBJ = ../../lib/libio01/obj
-
+LIBC     = ../../libs/rtl/include/
+LIBCOBJ  = ../../libs/rtl/obj
+LIBIO    = ../../libs/libio01/include/
+LIBIOOBJ = ../../libs/libio01/obj
 
 # Objects
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o libio.o    
 
-
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBIO) -o main.o
 all-c:

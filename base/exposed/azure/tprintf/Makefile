@@ -1,17 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
-
+# tprintf
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = cat
-
-#todo:
-#We need to simplify these flags
-
+#NAME = tprintf
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -29,35 +24,26 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
 
 
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .
 	cp $(LIBCOBJ)/rtl.o  .
-	
-	
+
 	cp $(LIBCOBJ)/ctype.o   .
 	cp $(LIBCOBJ)/stdio.o .
 	cp $(LIBCOBJ)/stdlib.o .
@@ -68,13 +54,10 @@ all-c:
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/fcntl.o  .
 
-
 cat-link:
 	ld -m elf_x86_64 -T ../link.ld -o TPRINTF.BIN $(myObjects)    
-
 finalize:
 	cp TPRINTF.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm TPRINTF.BIN 

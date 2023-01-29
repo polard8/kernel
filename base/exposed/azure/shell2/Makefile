@@ -1,23 +1,14 @@
-# shell para o gde
-
-#history:
-#2019 - Created by Fred Nora and Luciano Gonçalez.
-
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
-
-
+# shell2
+# 2019 - Created by Fred Nora and Luciano Gonçalez.
+# todo: Covert this code to 64bit.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = shell  
+#NAME = shell2
 
-#todo:
-#We need to simplify these flags
-
+# todo: Covert this code to 64bit.
 CFLAGS = -m32 \
 	--std=gnu89 \
 	-nodefaultlibs \
@@ -32,26 +23,16 @@ CFLAGS = -m32 \
 	-fno-stack-protector \
 	-s
 
-#	-fleading-underscore \
-#	-fno-stack-protector \
-#	-s
 
+LIBC    = ../../libs/libc03/include/
+LIBCOBJ = ../../libs/libc03/obj
+#API     = ../../libs/api02/include/
+#APIOBJ  = ../../libs/api02/obj
 
-LIBC    = ../../lib/libc03/include/
-LIBCOBJ = ../../lib/libc03/obj
-API     = ../../lib/api02/include/
-APIOBJ  = ../../lib/api02/obj
-
-
-
-	##
-	## Objects
-	##
-
+# Objects
 myObjects = crt0.o \
 main.o \
 shellui.o \
-api.o \
 ctype.o \
 stdio.o \
 stdlib.o \
@@ -61,8 +42,6 @@ builtins.o \
 desktop.o \
 unistd.o \
 stubs.o    
-
-
 
 
 .PHONY: all all-c shell-link finalize clean
@@ -76,10 +55,8 @@ all: crt0.o main.o all-c shell-link finalize clean
 #nao compilar, pegar compilado. tem que ajustar os argumentos recebidos por main.
 crt0.o:
 	gcc  -c  crt0.c  $(CFLAGS) -I $(LIBC) -I $(API) -o crt0.o
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(API) -o main.o
-
 all-c:
 	gcc  -c  shellui.c   -I $(LIBC) -I $(API)  $(CFLAGS) -o shellui.o
 	gcc  -c  builtins.c  -I $(LIBC) -I $(API)  $(CFLAGS) -o builtins.o
@@ -100,18 +77,15 @@ all-c:
 	cp $(LIBCOBJ)/unistd.o .
 	cp $(LIBCOBJ)/stubs.o .	
 	
-	cp $(APIOBJ)/api.o      .
-	
+	#cp $(APIOBJ)/api.o      .
 	
 shell-link:
+#todo: Convert this code to 64bit.
 	ld -m elf_i386 -T ../link.ld -o SHELL2.BIN $(myObjects)  
-
-
 finalize:
 #	cp SHELL2.BIN ../../bin
-
 clean:
 	-rm *.o
 	-rm SHELL2.BIN 
 	
-	
+

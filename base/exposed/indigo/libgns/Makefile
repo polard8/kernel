@@ -1,11 +1,13 @@
 
-# Client-side library for gws window server.
+# libgns
+# Client-side library for gns - gramado network server.
 # 2020 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
-EXTRAVERSION =
+EXTRAVERSION = 
+#NAME = libgns
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -22,9 +24,8 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 # rtl
-LIBS = -I. -I ../../lib/rtl/include/    
+LIBS = -I. -I ../../libs/rtl/include/    
 
 .PHONY: all all-c finalize clean
 

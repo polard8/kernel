@@ -1,3 +1,4 @@
+# n9
 # c4 c-like interpreter
 # grass command for desert.
 # history:
@@ -7,7 +8,7 @@ VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = c4
+#NAME = n9
 
 # usermode cross compiler flags.
 CFLAGS = -Wall
@@ -43,9 +44,8 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
-
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o main.o rtl.o \
@@ -85,10 +85,10 @@ all-c:
 #	cp $(APIOBJ)/api.o  .
 
 jackpot-link:
-	ld -m elf_x86_64 -T ../link.ld -o N11.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../link.ld -o N9.BIN $(myObjects)    
 finalize:
-	cp N11.BIN ../bin 
+	cp N9.BIN ../bin 
 clean:
 	-rm *.o
-	-rm N11.BIN 
+	-rm N9.BIN 
 	

@@ -59,11 +59,9 @@ CFLAGS := \
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I ../include/uapi/
 
-
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)  
-
 
 # See: https://linux.die.net/man/1/ld
 # -s --strip-all:   Omit all symbol information from the output file.
@@ -72,15 +70,14 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-
-
 # Everything is a file.
 OBJS = process.o plib.o thread.o tlib.o \
 create.o clone.o \
 callback.o \
 detect.o \
 hal.o \
-apic.o pit.o ports64.o rtc.o \
+apic.o \
+pit.o ports64.o rtc.o \
 x64init.o x64.o x64info.o x64fault.o \
 queue.o \
 mk.o \
@@ -90,22 +87,26 @@ sched.o schedi.o
 
 all:
 
-	# arch
+# arch
 	$(CC) -c arch/x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
 
-	# hal
+# hal
 
-	$(CC) -c hal/hal.c             $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c hal/detect.c          $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hal/hal.c     $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c hal/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
 
-	$(CC) -c hal/x86_64/apic.c      $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
-	#$(CC) -c hal/x86_64/pic.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
+	#Interrupts
+	$(CC) -c hal/x86_64/inter/apic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
+	#$(CC) -c hal/x86_64/inter/ioapic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
+	#$(CC) -c hal/x86_64/inter/pic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
 
 	$(CC) -c hal/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
 	$(CC) -c hal/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
 	$(CC) -c hal/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
 	$(CC) -c hal/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
 	$(CC) -c hal/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
+
+# ps
 
 	$(CC) -c ps/process.c  $(KERNEL_INCLUDE) $(CFLAGS) -o process.o
 	$(CC) -c ps/plib.c     $(KERNEL_INCLUDE) $(CFLAGS) -o plib.o
@@ -118,13 +119,13 @@ all:
 
 	$(CC) -c ps/callback.c  $(KERNEL_INCLUDE) $(CFLAGS) -o callback.o
 
-	$(CC) -c ps/x86_64/x64fault.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
-	$(CC) -c ps/queue.c    $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
-	$(CC) -c ps/mk.c       $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o
+	$(CC) -c ps/x86_64/x64fault.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64fault.o
+	$(CC) -c ps/queue.c  $(KERNEL_INCLUDE) $(CFLAGS) -o queue.o
+	$(CC) -c ps/mk.c     $(KERNEL_INCLUDE) $(CFLAGS) -o mk.o
 
-	$(CC) -c ps/ws.c       $(KERNEL_INCLUDE) $(CFLAGS) -o ws.o
+	$(CC) -c ps/ws.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ws.o
 
-	$(CC) -c ps/disp/ts.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
+	$(CC) -c ps/disp/ts.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
 	$(CC) -c ps/disp/dispatch.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  
 	$(CC) -c ps/disp/spawn.c     $(KERNEL_INCLUDE)  $(CFLAGS) -o spawn.o  
 	$(CC) -c ps/disp/x86_64/x64cont.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o x64cont.o  

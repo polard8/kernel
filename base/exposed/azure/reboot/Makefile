@@ -5,15 +5,11 @@
 #fazer um makefile pra compilar o shell
 #obs: #bugbug tem que arrumas as coisas aqui.
 
-
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = reboot
-
-#todo:
-#We need to simplify these flags
+#NAME = 
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -30,13 +26,10 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
-LIBIO    = ../../lib/libio01/include/
-LIBIOOBJ = ../../lib/libio01/obj
-
-
+LIBC     = ../../libs/rtl/include/
+LIBCOBJ  = ../../libs/rtl/obj
+LIBIO    = ../../libs/libio01/include/
+LIBIOOBJ = ../../libs/libio01/obj
 
 #Objects
 myObjects = crt0.o main.o rtl.o \
@@ -44,15 +37,12 @@ ctype.o stdio.o stdlib.o string.o \
 unistd.o termios.o ioctl.o fcntl.o libio.o    
 
 
-
 .PHONY: all all-c jackpot-link finalize clean
 
 all: main.o all-c jackpot-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBIO) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .

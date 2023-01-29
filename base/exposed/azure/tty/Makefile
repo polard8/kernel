@@ -1,13 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
+# tty - Testing operations on tty devices.
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = tty
-
 
 # usermode cross compiler flags.
 CFLAGS = -Wall
@@ -42,8 +41,8 @@ CFLAGS += -fno-pie
 CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o rtl.o main.o \

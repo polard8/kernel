@@ -44,9 +44,8 @@ CFLAGS += -fno-pie
 CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
-
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o rtl.o \

@@ -1,12 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
+# sum
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = cat
+#NAME = sum
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -23,8 +23,8 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o rtl.o main.o \

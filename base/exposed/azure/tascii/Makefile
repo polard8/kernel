@@ -1,18 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
+# tascii
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = tascii
-
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -30,29 +24,21 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
-
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o     
-
-
 
 
 .PHONY: all all-c tascii-link finalize clean
 
 all: main.o all-c tascii-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .

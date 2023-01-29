@@ -45,11 +45,10 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdlib.o stdio.o string.o unistd.o termios.o ioctl.o fcntl.o \
 globals.o lexer.o parser.o tree.o compiler.o    

@@ -28,13 +28,10 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o \
 stdio.o \

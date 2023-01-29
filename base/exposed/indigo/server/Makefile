@@ -1,5 +1,5 @@
-# gns - Gramado Network Server.
 # GNSSRV.BIN
+# gnssrv - Gramado Network Server.
 # 2020 - Created by Fred Nora.
 
 VERSION = 0
@@ -25,8 +25,8 @@ CFLAGS = -m64 \
 	
 
 # rtl
-LIBC    = ../../lib/rtl/include/
-LIBCOBJ = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 GWS_INCLUDES  = include/    
 

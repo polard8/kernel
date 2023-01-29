@@ -24,24 +24,22 @@ void *sys_get_message(unsigned long ubuf)
 
 // buffer
 // #todo: Check some other invalid address.
-    if ( ubuf == 0 ){ 
+    if (ubuf == 0){
         panic ("sys_get_message: ubuf\n");
         //return NULL;
     }
 
 // Thread
 // Essa é a thread que chamou esse serviço.
-
     if (current_thread<0 || current_thread>=THREAD_COUNT_MAX){
         return NULL;
     }
-
 // structure
     t = (void *) threadList[current_thread];
     if ( (void *) t == NULL ){
         panic ("sys_get_message: t\n");
     }
-    if ( t->used != TRUE || t->magic != 1234 ){
+    if (t->used != TRUE || t->magic != 1234){
         panic ("sys_get_message: t validation\n");
     }
 
@@ -53,12 +51,12 @@ void *sys_get_message(unsigned long ubuf)
     if ( (void*) m == NULL ){
         goto fail0;
     }
-    if (m->used != TRUE || m->magic != 1234 ){
+    if (m->used != TRUE || m->magic != 1234){
         goto fail0;
     }
 
 // Invalid message code
-    if ( m->msg <= 0 ){
+    if (m->msg <= 0){
         goto fail0;
     }
 // Get standard entries.
@@ -96,7 +94,7 @@ void *sys_get_message(unsigned long ubuf)
 // Yes, We have a message.
 // round
     t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 31 ){  t->MsgQueueHead = 0;  }
+    if ( t->MsgQueueHead >= 31 ){ t->MsgQueueHead=0; }
     return (void *) 1;  //#bugbug
 
 fail0:
@@ -104,7 +102,7 @@ fail0:
 // round
     if ( (void*) t == NULL ){ return NULL; }
     t->MsgQueueHead++;
-    if (t->MsgQueueHead >= 31){ t->MsgQueueHead = 0; }
+    if (t->MsgQueueHead >= 31){ t->MsgQueueHead=0; }
     return NULL;
 }
 
@@ -241,6 +239,7 @@ fail0:
 
 
 // #todo: Not tested yet.
+// #todo: Explain this routine.
 int 
 gramado_post( 
     tid_t sender_tid,
@@ -514,11 +513,10 @@ void show_slot(int tid)
 {
     struct thread_d  *t;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
         printf ("show_slot: tid\n");
         goto fail;
     }
-
 // structure
     t = (void *) threadList[tid];
     if ( (void *) t == NULL ){
@@ -610,11 +608,10 @@ void show_reg(int tid)
 {
     struct thread_d  *t;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
         printf("show_reg: fail\n");
         return;
     }
-
 // structure
     t = (void *) threadList[tid];
     if ( (void *) t == NULL ){
@@ -648,7 +645,6 @@ set_thread_priority (
     struct thread_d *t, 
     unsigned long priority )
 {
-
     //unsigned long NewPriority = priority;
     unsigned long OldPriority = 0;
     unsigned long BasePriority = 0;
@@ -843,13 +839,13 @@ void dead_thread_collector(void)
                  Target->magic == 1234 )
             {
                 // Não podemos matar a Idle thread.
-                if ( Target == Idle ){
+                if (Target == Idle){
                     panic ("dead_thread_collector: We can't kill the Idle thread!\n");
                 }
 
                 // Não podemos matar thread atual,
                 // pois precisamos retornar a execução dela.
-                if ( Target->tid == current_thread ){
+                if (Target->tid == current_thread){
                     panic ("dead_thread_collector: We can't kill the current_thread!\n");
                 }
 
@@ -864,9 +860,9 @@ void dead_thread_collector(void)
                 Target = NULL;
                 threadList[i] = (unsigned long) 0;
 
-                // diminui o contador                
+                // Decrement the counter.
                 UPProcessorBlock.threads_counter--;
-                if ( UPProcessorBlock.threads_counter < 1 ){
+                if (UPProcessorBlock.threads_counter < 1){
                     panic("dead_thread_collector: threads_counter\n");
                 }
 
@@ -882,12 +878,11 @@ void dead_thread_collector(void)
         //Nothing.
     };
 
-//@todo:
+// #todo:
 // MOVEMENT 10 (zombie --> Dead)
 // MOVEMENT 11 (zombie --> Initialized) .. reinicializar.
 
 }
-
 
 /*
  * kill_thread:
@@ -925,17 +920,17 @@ void kill_thread (int tid)
 
 }
 
-
+// #todo
+// It only can be used at the end of the reboot/shutdown routine.
 void kill_all_threads(void)
 {
     register int i=0;
 // Start at '1'.
-// Cant kill Idle thread.
+// Can't kill Idle thread.
+// #todo: Review these numbers.
     for ( i=1; i < THREAD_COUNT_MAX; ++i )
     { 
         kill_thread(i);
     };
 }
-
-
 

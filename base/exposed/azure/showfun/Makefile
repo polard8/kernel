@@ -1,16 +1,12 @@
 
-#history:
-#2019 - Created by Fred Nora.
-
+# showfun
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = cat
-
-#todo:
-#We need to simplify these flags
+#NAME = showfun
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -28,32 +24,20 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
-
-#deletar this is very old
-#API     = ../../../libcore/include/
-#APIOBJ  = ../../../libcore/obj
-
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
 
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o  .

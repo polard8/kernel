@@ -11,7 +11,7 @@ EDITION_NAME  = Facilities
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 6
-VERSION_BUILD = 304
+VERSION_BUILD = 305
 # Compiling on gcc 12.2.0
 # Linking on ld 2.39
 
@@ -173,7 +173,7 @@ exposed-tier:
 
 #========================================
 # ::Build libraries.
-	$(Q) $(MAKE) -C exposed/lib/
+	$(Q) $(MAKE) -C exposed/libs/
 # Don't copy to the disk.
 
 #========================================
@@ -215,10 +215,10 @@ exposed-tier:
 
 #========================================
 # ::
-	$(Q) $(MAKE) -C exposed/wog/
-	-sudo cp exposed/wog/bin/N9.BIN    control/disk/
-	-sudo cp exposed/wog/bin/N10.BIN   control/disk/
-	-sudo cp exposed/wog/bin/N11.BIN   control/disk/
+	$(Q) $(MAKE) -C exposed/navy/
+	-sudo cp exposed/navy/bin/N9.BIN   control/disk/
+	-sudo cp exposed/navy/bin/N10.BIN  control/disk/
+	-sudo cp exposed/navy/bin/N11.BIN  control/disk/
 	
 #========================================
 	@echo ":: Copying Window server and clients."

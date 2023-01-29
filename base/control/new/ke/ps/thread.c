@@ -239,13 +239,10 @@ unsigned long GetThreadStats( int tid, int index )
     if (index<0){
         return 0;
     }
-
 // Thread
-
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return 0;
     }
-
 // structure
     t = (void *) threadList[tid];
     if ( (void *) t == NULL ){
@@ -648,7 +645,7 @@ void thread_show_profiler_info (void)
 
         if ( (void *) thread != NULL )
         {
-            if ( thread->used == TRUE && thread->magic == 1234 )
+            if (thread->used == TRUE && thread->magic == 1234)
             {
                 printf ("tid=%d totalp=%d last_ticks=%d ( %d percent ) name={%s} \n", 
                     thread->tid,
@@ -662,7 +659,6 @@ void thread_show_profiler_info (void)
 
     refresh_screen();
 }
-
 
 unsigned long 
 thread_get_profiler_percentage (struct thread_d *thread)
@@ -767,11 +763,12 @@ int thread_profiler(int service)
                 
                 if ( (void *) __tmp != NULL )
                 {
-                    if ( __tmp->used == TRUE && 
-                         __tmp->magic == 1234 )
+                    if ( __tmp->used == TRUE && __tmp->magic == 1234 )
                     {
-                        // Salva a contagem dessa thread para consulta futura.
-                        __tmp->profiler_last_ticks = __tmp->profiler_ticks_running;
+                        // Salva a contagem dessa thread 
+                        // para consulta futura.
+                        __tmp->profiler_last_ticks = 
+                            __tmp->profiler_ticks_running;
                         
                         // zera a contagem dessa thread,
                         __tmp->profiler_ticks_running = 0;
@@ -815,7 +812,7 @@ int thread_profiler(int service)
 
 /*
  * create_thread:
- *     Cria um thread
+ *     Create a thread.
  * #todo: 
  * O processo ao qual o thread vai ser atribu�do deve ser passado 
  * via argumento, se o argumento for nulo, ent�o usa-se o 
@@ -853,6 +850,8 @@ struct thread_d *create_thread (
     unsigned int cpl,
     int personality )
 {
+// Create a thread.
+
     struct process_d *Process;
     struct thread_d  *Thread;
 // Empty slot
@@ -871,13 +870,13 @@ struct thread_d *create_thread (
 //======================================
 // check parameters.
 
-    if( (void*) room == NULL ){
+    if ( (void*) room == NULL ){
         debug_print ("create_thread: room parameter\n");
     }
-    if( (void*) desktop == NULL ){
+    if ( (void*) desktop == NULL ){
         debug_print ("create_thread: desktop parameter\n");
     }
-    if( (void*) window == NULL ){
+    if ( (void*) window == NULL ){
         debug_print ("create_thread: window parameter\n");
     }
 
@@ -921,9 +920,7 @@ struct thread_d *create_thread (
 // Pois a thread atual não importa.
 // @todo: deletar isso. 
 
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         debug_print ("create_thread: current_thread fail\n");
         printf      ("create_thread: current_thread fail\n");
         return NULL;
@@ -979,10 +976,8 @@ struct thread_d *create_thread (
     Thread->owner_pid = (pid_t)  ProcessID;
 
 // Paging
-
     Thread->pml4_VA  = (unsigned long ) Process->pml4_VA;
     Thread->pml4_PA  = (unsigned long ) Process->pml4_PA;
-
     Thread->pdpt0_VA = (unsigned long ) Process->pdpt0_VA; 
     Thread->pdpt0_PA = (unsigned long ) Process->pdpt0_PA; 
     Thread->pd0_VA   = (unsigned long ) Process->pd0_VA; 
@@ -1093,12 +1088,9 @@ try_next_slot:
         goto try_next_slot;
     }
 
-
 // ======================================
-
 // Index Ok.
 // Now we have an index number.
-
     Thread->tid = (int) i;
 
 //
@@ -1232,13 +1224,11 @@ try_next_slot:
 // Incrementar a contagem de threads no processo.
     //Process->threadCount++;
 
-//Proxima thread da lista.
-
+// Navigation.
     Thread->next = NULL;
 
 // Coloca na lista.
 // #bugbug: Check overflow again.
-
     threadList[ Thread->tid ] = (unsigned long) Thread;
 
     Thread->state = INITIALIZED;  
@@ -1263,21 +1253,22 @@ try_next_slot:
 // limits 
 
     //if ( ProcessorBlock.threads_counter >= THREAD_COUNT_MAX )
-    if ( UPProcessorBlock.threads_counter >= THREAD_COUNT_MAX ){
+    if (UPProcessorBlock.threads_counter >= THREAD_COUNT_MAX){
         panic ("create_thread: [FAIL] UPProcessorBlock.threads_counter \n");
     }
 
 //done:
 
-// #debug
+    // #debug
     debug_print ("create_thread: Done\n");
     //printf ("create_thread: Done\n");
 
 // Warning !!! 
 // ( NÃO COLOCAR PARA EXECUÇÃO, 
-//   OUTRA FUNÇÃO DEVE COLOCAR ISSO PARA EXECUÇÃO )
+// OUTRA FUNÇÃO DEVE COLOCAR ISSO PARA EXECUÇÃO )
 
-    //SelectForExecution(t);  //MOVEMENT 1 (Initialized ---> Standby)
+// MOVEMENT 1 (Initialized ---> Standby)
+    //SelectForExecution(t);
 
 // Return the pointer.
     return (void *) Thread;
@@ -1295,33 +1286,25 @@ void exit_thread (int tid)
     struct thread_d *Idle;
     struct thread_d *Thread;
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
         debug_print ("exit_thread: tid\n");
         return;
     }
 
-//
 // Init thread.
-//
-
 // We can't exit the idle thread.
-
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
     if ( (void *) Idle == NULL ){
         panic ("exit_thread: Idle\n");
     }
-    if ( Idle->magic != 1234 ){
+    if (Idle->magic != 1234){
         panic ("exit_thread: Idle validation\n");
     }
-
-    if ( tid == Idle->tid ){
-        panic ("exit_thread: We can't kill the Idle thread!\n");
+    if (tid == Idle->tid){
+        panic ("exit_thread: We can't kill the Idle thread\n");
     }
 
-//
 // Thread
-//
-
 // Get thread structure.
 
     Thread = (void *) threadList[tid];
@@ -1337,10 +1320,9 @@ void exit_thread (int tid)
 // Zombie
 // Lembrando que se deixarmos no estado ZOMBIE o 
 // deadthread collector vai destruir a estrutura.
-
-        // Let the scheduler put this thread in the ZOMBIE state.
-        Thread->exit_in_progress = TRUE;
-        //Thread->state = ZOMBIE;
+// Let the scheduler put this thread in the ZOMBIE state.
+    Thread->exit_in_progress = TRUE;
+    //Thread->state = ZOMBIE;
     return;
 
 fail:
@@ -1349,17 +1331,17 @@ fail:
     return;
 }
 
-// exit current thread.
+// Exit current thread.
 void exit_current_thread(void)
 {
+    if (current_thread < 0)
+        return;
     exit_thread(current_thread);
 }
 
-/*
- * copy_thread_struct:
- *     Clona uma thread.
- *     Usado no suporte a fork e execução de novos processos.
- */
+// copy_thread_struct:
+// Clona uma thread.
+// Usado no suporte a fork e execução de novos processos.
 // OUT:
 // Pointer for the clone.
 
@@ -1468,8 +1450,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     }
 
 /*
-    if ( clone->personality != father->personality)
-    {
+    if (clone->personality != father->personality){
         debug_print("copy_thread_struct: clone->personality != father->personality\n");
         panic      ("copy_thread_struct: clone->personality != father->personality\n");
     }
@@ -1643,8 +1624,8 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // #todo
 // We gotta check all these values bellow.
 
-	// ss (0x20 | 3)
-	// cs (0x18 | 3)
+    // ss (0x20 | 3)
+    // cs (0x18 | 3)
 
 // Stack frame
     clone->ss     = (unsigned short) (father->ss & 0xFFFF);    // RING 3.
@@ -1703,9 +1684,9 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 	//Thread->CurrentProcessor = 0;
 	//Thread->NextProcessor = 0;
 
-// @todo: 
-// O processo dono da thread precisa ter um diret�rio 
-// de p�ginas v�lido.
+// #todo: 
+// O processo dono da thread precisa ter um diretório 
+// de páginas válido.
 
 // #bugbug
 // Page Directory. (#CR3).
@@ -1723,15 +1704,14 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 	//Thread->idealprocessornumber
 	//Thread->event
 
-// ORDEM: 
-// O que segue � referenciado com pouca frequ�ncia.
+// ORDEM:
+// O que segue é referenciado com pouca frequência.
 
     clone->waitingCount = father->waitingCount;  //Tempo esperando algo.
     clone->blockedCount = father->blockedCount;  //Tempo bloqueada.
 
 // Qual processo pertence a thread clone.
-// Pois bem, por enquanto ela pertence ao mesmo dono
-// da thread pai.
+// Pois bem, por enquanto ela pertence ao mesmo dono da thread pai.
     clone->owner_process = father->owner_process; 
 
 	//Thread->window_station
@@ -1765,8 +1745,6 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 	refresh_screen();
 	while(1){}
 */
-
-    //debug_print("copy_thread_struct: done\n");
     
 // Returning the pointer for the clone.
     return (struct thread_d *) clone;

@@ -27,20 +27,13 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
-
-
-#
 # Objects
-#
-
 myObjects = crt0.o main.o \
 ctype.o stdio.o stdlib.o string.o time.o \
 unistd.o termios.o ioctl.o fcntl.o rtl.o    
-
-
 
 
 .PHONY: all all-c cat-link finalize clean

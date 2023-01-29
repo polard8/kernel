@@ -1,11 +1,13 @@
 
-#PROGRAM = S1
+# socket1
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = 
+
+# PROGRAM = S1
 
 # usermode cross compiler flags.
 CFLAGS = -Wall
@@ -41,8 +43,8 @@ CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
 
-LIBC    = ../../lib/rtl/include/
-LIBCOBJ = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o rtl.o main.o \

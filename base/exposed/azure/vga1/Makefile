@@ -1,19 +1,13 @@
-#reboot command for gde
-#history:
-#2019 - Created by Fred Nora.
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
 
+# vga1
+# Testing VGA interface using io library in ring3.
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = reboot
-
-#todo:
-#We need to simplify these flags
+#NAME = vga1
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -30,10 +24,10 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-LIBC     = ../../lib/rtl/include/
-LIBCOBJ  = ../../lib/rtl/obj
-LIBIO    = ../../lib/libio01/include/
-LIBIOOBJ = ../../lib/libio01/obj
+LIBC     = ../../libs/rtl/include/
+LIBCOBJ  = ../../libs/rtl/obj
+LIBIO    = ../../libs/libio01/include/
+LIBIOOBJ = ../../libs/libio01/obj
 
 #Objects
 myObjects = crt0.o main.o rtl.o \

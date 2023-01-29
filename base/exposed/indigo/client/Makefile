@@ -1,19 +1,13 @@
 
-#history:
-#2019 - Created by Fred Nora.
-
-#todo:
-#fazer um makefile pra compilar o shell
-#obs: #bugbug tem que arrumas as coisas aqui.
+# gns.bin
+# This is a client application for gnssrv.
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = 
-
-#todo:
-#We need to simplify these flags
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -30,24 +24,17 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 #rtl
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
-
+LIBC      = ../../libs/rtl/include/
+LIBCOBJ   = ../../libs/rtl/obj
 #libgns
 LIBGNS    = ../libgns/include/
 LIBGNSOBJ = ../libgns/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o \
 unistd.o termios.o ioctl.o socket.o gns.o    
-
-
 
 .PHONY: all all-c hello-link finalize clean
 
@@ -81,10 +68,8 @@ all-c:
 
 hello-link:
 	ld -m elf_x86_64 -T ../link.ld -o GNS.BIN $(myObjects)    
-
 finalize:
 	cp GNS.BIN  ../bin
-
 clean:
 	-rm *.o
 	-rm GNS.BIN 

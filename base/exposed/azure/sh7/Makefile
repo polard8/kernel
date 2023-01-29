@@ -1,12 +1,11 @@
-# cat for gde
-#history:
-#2019 - Created by Fred Nora.
+# sh7 - Shell for Gramado.
+# 2019 - Created by Fred Nora.
 
 VERSION = 0
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION =
-#NAME = cat
+#NAME = sh7
 
 # usermode cross compiler flags.
 CFLAGS = -Wall
@@ -41,9 +40,8 @@ CFLAGS += -fno-pie
 CFLAGS += -fno-omit-frame-pointer
 CFLAGS += -fno-optimize-sibling-calls    
 
-
-LIBC      = ../../lib/rtl/include/
-LIBCOBJ   = ../../lib/rtl/obj
+LIBC    = ../../libs/rtl/include/
+LIBCOBJ = ../../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o rtl.o main.o \
@@ -57,12 +55,10 @@ fcntl.o \
 termios.o \
 ioctl.o    
 
-
 .PHONY: all all-c cat-link finalize clean
 
 all: main.o all-c cat-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -o main.o
 all-c:
