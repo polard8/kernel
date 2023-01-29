@@ -5006,6 +5006,7 @@ sys_read_file_from_disk (
 // in the root dir.
 
     unsigned long TargetDirAddress = VOLUME1_ROOTDIR_ADDRESS;
+    unsigned long NumberOfEntries = FAT16_ROOT_ENTRIES;
 
     // debug_print ("sys_read_file_from_disk: $\n");
 
@@ -5016,6 +5017,27 @@ sys_read_file_from_disk (
     if (*file_name == 0){
         return (int) (-EINVAL);
     }
+
+
+// -------------------------------------------
+// #test
+// Is it inside the PROGRAMS/ folder?
+    if (*file_name == '#')
+    {
+        if ( sdPROGRAMS.initialized != TRUE ){
+            printf("sys_read_file_from_disk: sdPROGRAMS.initialized\n");
+            goto fail;
+        }
+        if ( sdPROGRAMS.address == 0 ){
+            printf("sys_read_file_from_disk: sdPROGRAMS.address\n");
+            goto fail;
+        }
+        TargetDirAddress = sdPROGRAMS.address;
+        NumberOfEntries = FAT16_ROOT_ENTRIES;
+        file_name++;
+    }
+// -------------------------------------------
+
 
 // Convertendo o formato do nome do arquivo.    
 // >>> "12345678XYZ"
@@ -5077,7 +5099,7 @@ sys_read_file_from_disk (
                  (int) fsSaveFile ( 
                            VOLUME1_FAT_ADDRESS, 
                            TargetDirAddress, 
-                           FAT16_ROOT_ENTRIES, 
+                           NumberOfEntries, 
                            (char *) file_name, 
                            (unsigned long) 1,   //2,     // size in sectors 
                            (unsigned long) 512, //1024,  // size in bytes  
@@ -5341,7 +5363,7 @@ __OK:
         (int) fsLoadFile ( 
                   VOLUME1_FAT_ADDRESS, 
                   TargetDirAddress, 
-                  FAT16_ROOT_ENTRIES,  //#bugbug: Number of entries.
+                  NumberOfEntries,  //#bugbug: Number of entries.
                   file_name, 
                   (unsigned long) fp->_base,
                   fp->_lbfsize );

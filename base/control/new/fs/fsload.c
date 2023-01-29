@@ -609,9 +609,8 @@ fsLoadProgram (
 
     unsigned long Status=1; // fail
 
-
     // #debug
-    printf ("fsLoadProgram:\n");
+    //printf ("fsLoadProgram:\n");
 
 
     if ( (void*) buffer == NULL ){
@@ -1225,7 +1224,7 @@ __try_to_load_program(
     new_filename = filename;
 
     // #debug
-    printf ("__try_to_load_program:\n");
+    //printf ("__try_to_load_program:\n");
 
     if ( (void*) new_filename == NULL )
         return -1;
@@ -1237,8 +1236,11 @@ __try_to_load_program(
     fs_fntos ( (char *) new_filename );
 
     status = 
-        (unsigned long) fsLoadProgram( new_filename, image_va, BUGBUG_IMAGE_SIZE_LIMIT );
-    
+        (unsigned long) fsLoadProgram( 
+                            new_filename, 
+                            image_va, 
+                            BUGBUG_IMAGE_SIZE_LIMIT );
+
     if (status == 0){
         return 0;
     }
