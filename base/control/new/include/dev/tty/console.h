@@ -60,7 +60,12 @@ console_interrupt(
     int device_type, 
     int data );
 
-void console_init_virtual_console (int n);
+void 
+console_init_virtual_console(
+    int n, 
+    unsigned int bg_color, 
+    unsigned int fg_color );
+
 void console_set_current_virtual_console (int n);
 int console_get_current_virtual_console (void);
 void jobcontrol_switch_console(int n);
@@ -142,8 +147,11 @@ console_ioctl (
 
 void REFRESH_STREAM ( file *f );
 
-int clear_console (unsigned int color, int console_number);
-
+int 
+clear_console (
+    unsigned int bg_color, 
+    unsigned int fg_color, 
+    int console_number );
 
 #endif    
 

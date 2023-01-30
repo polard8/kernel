@@ -24,18 +24,20 @@ extern unsigned long wmWindowMananer_SendMessage(void);
 int fg_console=0;
 // 0=apaga 1=acende 
 int consoleTextCursorStatus=0;
+// Cursor
+static int saved_x=0;
+static int saved_y=0;
+
 // Esse eh o marcador de estagio do escape sequence.
 // Usado para manipular csi
 static unsigned long __EscapeSequenceStage = 0;
 
+// Array de parâmetros.
 #define NPAR  16
 static unsigned long par[NPAR];
 static unsigned long npar = 0;
 static unsigned long ques = 0;
 static unsigned char attr = 0x07;
-
-static int saved_x=0;
-static int saved_y=0;
 
 
 //
@@ -44,9 +46,7 @@ static int saved_y=0;
 
 static void __ConsoleOutbyte (int c, int console_number);
 static void __test_path(void);
-
 static void __test_tty(void);
-
 // #todo: Use static modifier.
 void __local_ri(void);
 void csi_J(int par);
@@ -130,39 +130,38 @@ __local_gotoxy (
     int new_y, 
     int console_number )
 {
-    if (console_number<0 || console_number > 3)
-    {
+    if (console_number<0 || console_number > 3){
         return;
     }
 
 // Maior que o largura da linha.
-    //if ( new_x >= (CONSOLE_TTYS[console_number].cursor_right-1) )
     if (new_x > CONSOLE_TTYS[console_number].cursor_right)
     {
         return;
     }
 
 // Maior que a altura da coluna.
-    //if ( new_y >= (CONSOLE_TTYS[console_number].cursor_bottom-1) )
     if (new_y > CONSOLE_TTYS[console_number].cursor_bottom)
     {
         return;
     }
 
-// Set
+// Set x.
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (new_x & 0xFFFFFFFF);
+
+// Set y.
     CONSOLE_TTYS[console_number].cursor_y = 
         (unsigned long) (new_y & 0xFFFFFFFF);
 }
 
-void __local_save_cur (int console_number)
+void __local_save_cur(int console_number)
 {
     saved_x = (int) CONSOLE_TTYS[console_number].cursor_x;
     saved_y = (int) CONSOLE_TTYS[console_number].cursor_y;
 }
 
-void __local_restore_cur (int console_number)
+void __local_restore_cur(int console_number)
 {
     if (console_number<0 || console_number >3)
     {
@@ -176,7 +175,7 @@ void __local_restore_cur (int console_number)
         (unsigned long) (saved_y & 0xFFFF);
 }
 
-void __local_insert_line (int console_number)
+void __local_insert_line(int console_number)
 {
     int oldtop = 0;
     int oldbottom = 0;
@@ -336,7 +335,7 @@ void csi_m(void)
     };
 }
 
-void csi_M ( int nr, int console_number )
+void csi_M (int nr, int console_number)
 {
 /*
     if ( nr > CONSOLE_TTYS[console_number].cursor_height )
@@ -446,7 +445,11 @@ console_interrupt(
 // Initializar virtual console.
 // Inicializa a estrutura de console virtual
 // configura uma entrada no diretorio dev/
-void console_init_virtual_console (int n)
+void 
+console_init_virtual_console(
+    int n, 
+    unsigned int bg_color, 
+    unsigned int fg_color )
 {
     int ConsoleIndex = -1;
 
@@ -454,9 +457,7 @@ void console_init_virtual_console (int n)
 
 // Limits
     ConsoleIndex = (int) n;
-    if ( ConsoleIndex < 0 || 
-         ConsoleIndex >= CONSOLETTYS_COUNT_MAX  )
-    {
+    if (ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX){
         debug_print ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
         x_panic     ("console_init_virtual_console: [FAIL] ConsoleIndex\n");
     }
@@ -571,9 +572,10 @@ void console_init_virtual_console (int n)
 
 // Everyone has the same color.
 // White on black.
-    CONSOLE_TTYS[ConsoleIndex].bg_color = COLOR_BLUE;
-    CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_WHITE;
+    CONSOLE_TTYS[ConsoleIndex].bg_color = bg_color;
+    CONSOLE_TTYS[ConsoleIndex].fg_color = fg_color;
 
+/*
 // Default colors.
 // A different color for each console number.
     if (ConsoleIndex == 0){
@@ -588,6 +590,7 @@ void console_init_virtual_console (int n)
     if (ConsoleIndex == 3){
         CONSOLE_TTYS[ConsoleIndex].fg_color = COLOR_CYAN; 
     }
+*/
 
     //#todo
     // Buffers !!!
@@ -605,7 +608,7 @@ void console_init_virtual_console (int n)
     CONSOLE_TTYS[ConsoleIndex].initialized = TRUE;    
 }
 
-void console_set_current_virtual_console (int n)
+void console_set_current_virtual_console(int n)
 {
     if (n == fg_console){
         return;
@@ -617,7 +620,7 @@ void console_set_current_virtual_console (int n)
     fg_console = (int) n;
 }
 
-int console_get_current_virtual_console (void)
+int console_get_current_virtual_console(void)
 {
     return (int) fg_console;
 }
@@ -637,8 +640,22 @@ void jobcontrol_switch_console(int n)
         debug_print("jobcontrol_switch_console: Limits\n");
         return;
     }
+
+// Set the current virtual console.
     console_set_current_virtual_console(n);
+
+// Clear the screen, set bg and fg colors and set the cursor position.
+//IN: bg color, fg color, console number.
+    clear_console(
+        (unsigned int) CONSOLE_TTYS[n].bg_color,
+        (unsigned int) CONSOLE_TTYS[n].fg_color,
+        n );
+
+// banner
+    printf ("Console number {%d}\n", n);
+    refresh_screen();
 }
+
 
 /*
  * set_up_cursor:
@@ -686,7 +703,7 @@ void set_up_cursor2 ( int console_number, unsigned long x, unsigned long y )
  *     Pega o valor de x.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_x (void)
+unsigned long get_cursor_x(void)
 {
     //if (fg_console<0){ panic("get_cursor_x"); }
     //if (fg_console>=CONSOLETTYS_COUNT_MAX){ panic("get_cursor_x"); }
@@ -698,7 +715,7 @@ unsigned long get_cursor_x (void)
  *     Pega o valor de y.
  *     @todo: Isso pode ir para outro lugar.
  */
-unsigned long get_cursor_y (void)
+unsigned long get_cursor_y(void)
 {
     //if (fg_console<0){ panic("get_cursor_x"); }
     //if (fg_console>=CONSOLETTYS_COUNT_MAX){ panic("get_cursor_x"); }
@@ -730,6 +747,8 @@ void console_scroll(int console_number)
 // See: rect.c
 // #todo
 // Isso deveria ser apenas scroll_rectangle()
+    // #bugbug
+    // Valid only for full screen
     scroll_screen_rect();
 
 // Clear the last line.
@@ -751,20 +770,23 @@ void console_scroll(int console_number)
     CONSOLE_TTYS[console_number].cursor_y = 
         CONSOLE_TTYS[console_number].cursor_bottom; 
 
-// Limpa a últime linha.
+// Limpa a última linha.
 // #bugbug: 
 // Essa rotina pode sujar alguns marcadores importantes.
 // Depois disso precisamos restaurar os valores salvos
 
+/*
    if ( CONSOLE_TTYS[console_number].cursor_left < (CONSOLE_TTYS[console_number].cursor_right-1) )
    {
        for ( i = CONSOLE_TTYS[console_number].cursor_left; 
              i < (CONSOLE_TTYS[console_number].cursor_right-1);
              i++ )
        {
-           __ConsoleOutbyte(' ',console_number); 
+           __ConsoleOutbyte(' ',console_number);
+           //__ConsoleOutbyte('.',console_number); 
        };
     }
+*/
 
 // Restaura limits
     CONSOLE_TTYS[console_number].cursor_left   = (OldLeft   & 0xFFFF);
@@ -798,6 +820,9 @@ void console_scroll(int console_number)
 
 void console_outbyte (int c, int console_number)
 {
+// + Draw char.
+// + Do not refresh char.
+
     register int Ch = c;
     int n = (int) console_number;
     static char prev=0;
@@ -815,16 +840,14 @@ void console_outbyte (int c, int console_number)
     //    return;
     //}
 
-    if ( n < 0 || n >= CONSOLETTYS_COUNT_MAX  )
-    {
+    if (n < 0 || n >= CONSOLETTYS_COUNT_MAX){
         debug_print ("console_outbyte: [FAIL] n\n");
         x_panic     ("console_outbyte: [FAIL] n\n");
     }
 
-    if ( __cWidth == 0 || __cHeight == 0 ){
+    if (__cWidth == 0 || __cHeight == 0){
         x_panic ("console_outbyte: [FAIL] char size\n");
     }
-
 
 // #test
 // Tem momento da inicialização em que esse array de estruturas
@@ -844,6 +867,10 @@ void console_outbyte (int c, int console_number)
 
     //Opção  
     //switch ?? 
+
+    // type: 'int'.
+    if (Ch<0)
+        return;
 
     // form feed - Nova tela.
     if (Ch == '\f')
@@ -1044,9 +1071,17 @@ draw:
 static void __ConsoleOutbyte (int c, int console_number)
 {
     register int Ch = c;
+
+// Target console
     int n = (int) console_number;
+
     int cWidth = get_char_width();
     int cHeight = get_char_height();
+
+    unsigned long screenx=0;
+    unsigned long screeny=0;
+    unsigned int bg_color=0;
+    unsigned int fg_color=0;
 
     // #debug
     // debug_print ("__ConsoleOutbyte:\n");
@@ -1089,32 +1124,43 @@ static void __ConsoleOutbyte (int c, int console_number)
 // Então essa flag não faz sentido.
 // See: char.c
 
-    if (VideoBlock.useGui == TRUE)
-    {
-        // ## NÃO TRANPARENTE ##
-        // Se estamos no modo terminal então usaremos as cores 
-        // configuradas na estrutura do terminal atual.
-        // Branco no preto é um padrão para terminal.
-        if (stdio_terminalmode_flag == 1){
-            d_draw_char ( 
-                 (cWidth * CONSOLE_TTYS[n].cursor_x), 
-                (cHeight * CONSOLE_TTYS[n].cursor_y), 
-                Ch, COLOR_WHITE, 0x303030 );
+    if (VideoBlock.useGui != TRUE)
+        return;
 
-        // ## TRANSPARENTE ##
-        // Se não estamos no modo terminal então usaremos
-        // char transparente.
-        // Não sabemos o fundo. Vamos selecionar o foreground. 
-        }else{
-            d_drawchar_transparent ( 
-                (cWidth  * CONSOLE_TTYS[n].cursor_x), 
-                (cHeight * CONSOLE_TTYS[n].cursor_y), 
-                CONSOLE_TTYS[n].fg_color, 
-                Ch );
-        };
-        // Nothing.
+// Screen position.
+    screenx = (unsigned long) (cWidth  * CONSOLE_TTYS[n].cursor_x);
+    screeny = (unsigned long) (cHeight * CONSOLE_TTYS[n].cursor_y);
+
+// Get the colors for this console.
+    bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color; 
+    fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
+
+// Sempre pinte o bg e o fg.
+    d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
+
+/*
+// ## NÃO TRANPARENTE ##
+// Se estamos no modo terminal então usaremos as cores 
+// configuradas na estrutura do terminal atual.
+// Branco no preto é um padrão para terminal.
+
+    if (stdio_terminalmode_flag == 1){
+        // Pinta bg e fg.
+        d_draw_char ( screenx, screeny, Ch, fg_color, bg_color );
+        return;
     }
+
+// ## TRANSPARENTE ##
+// Se não estamos no modo terminal então usaremos
+// char transparente.
+// Não sabemos o fundo. Vamos selecionar o foreground.     
+
+    // Pinta apenas o fg.
+    d_drawchar_transparent ( screenx, screeny, fg_color, Ch );
+*/
+
 }
+
 
 /*
  * console_putchar:
@@ -1128,8 +1174,10 @@ static void __ConsoleOutbyte (int c, int console_number)
 // então precisamos, antes de uma string efetuar a
 // sincronização do retraço vertical e não a cada char.
 
-void console_putchar ( int c, int console_number )
+void console_putchar (int c, int console_number)
 {
+// + Draw char.
+// + Refresh char.
 
 // Getting char info.
     int cWidth = get_char_width();
@@ -1148,7 +1196,7 @@ void console_putchar ( int c, int console_number )
 // CONSOLETTYS_COUNT_MAX
 // See: tty.h
 
-    if ( console_number < 0 || console_number > 3 ){
+    if (console_number < 0 || console_number > 3){
         panic ("console_putchar: console_number\n");
     }
 
@@ -1197,7 +1245,8 @@ int consoleInputChar(int c)
 
 void __dummy_thread(void)
 {
-    while(1){}
+    while (1){
+    };
 }
 
 void __test_process(void)
@@ -1462,10 +1511,17 @@ int consoleCompareStrings(void)
     }
 
 // cls:
-    if ( strncmp( prompt, "cls", 3 ) == 0 ){
-        //backgroundDraw(COLOR_BLACK);
-        backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
-        set_up_cursor(1,1);
+    if ( strncmp( prompt, "cls", 3 ) == 0 )
+    {
+        //backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
+        //set_up_cursor(1,1);
+
+        //IN: bg color, fg color, console number.
+        clear_console(
+            (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
+            (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
+            fg_console );
+
         goto exit_cmp;
     }
 
@@ -1710,6 +1766,11 @@ done:
 void consolePrompt(void)
 {
     register int i=0;
+
+//
+// Prompt
+//
+
     for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ 
         prompt[i] = (char) '\0'; 
     };
@@ -1721,6 +1782,14 @@ void consolePrompt(void)
     printf("$ ");
     refresh_screen();
     //invalidate_screen();
+
+//
+// Initialize escape sequence.
+//
+    //for (i=0; i<NPAR; i++){
+    //    par[i]=0;
+    //};
+    //__EscapeSequenceStage=0;
 }
 
 // __console_write:
@@ -1813,8 +1882,7 @@ console_write (
     //debug_print ("console_write: [test]\n");
 
 // Console number
-    if ( console_number < 0 || console_number > 3 )
-    {
+    if (console_number < 0 || console_number > 3){
         printf ("console_write: [FAIL] console_number\n");
         goto fail;
     }
@@ -1850,7 +1918,6 @@ console_write (
         ch = data[i];
 
         // Select the stage in the escape sequence.
- 
         switch (__EscapeSequenceStage){
 
             //================================================
@@ -1861,32 +1928,27 @@ console_write (
                 //console_putchar ( '@',console_number);
                 //console_putchar ( '0',console_number);
                 //console_putchar ( '\n',console_number);
-
                // Is printable?
+               // ascii, not abnt2
                if (ch >31 && ch <127){
                     console_putchar ( ch, console_number );
-               
                // >>>> [ Escape ]
                // Entramos em uma escape sequence,
                // entao o proximo case inicia o tratamento da escape sequence.
                } else if (ch==27){
-                   __EscapeSequenceStage=1;  // <<<<<<<--
-
+                   __EscapeSequenceStage=1;
                // ?? \n
                }else if (ch==10 || ch==11 || ch==12){
-                   console_putchar ( ch, console_number );
-
+                   console_putchar(ch,console_number);
                // Enter ? cr \n
                }else if (ch==13){ 
-                   console_putchar ( ch, console_number ); 
-
+                   console_putchar(ch,console_number); 
                // Backspace
                }else if (ch==8) {
-                   console_putchar ( ch, console_number );
-
-               // Tab.S. horizontal tab
+                   console_putchar(ch,console_number);
+               // Tab.
                } else if (ch==9) {
-                   console_putchar ( ch, console_number ); 
+                   console_putchar(ch,console_number); 
                };
                break;
             
@@ -1946,7 +2008,9 @@ console_write (
                 //console_putchar ( '\n',console_number);
  
                 // Limpando o array de parametros.
-                for ( npar=0; npar<NPAR; npar++ ){ par[npar]=0; };
+                for ( npar=0; npar<NPAR; npar++ ){ 
+                    par[npar]=0;
+                };
                 npar=0;
                 //Mudando de estago para checar os parametros.
                 __EscapeSequenceStage=3;  // Next state.
@@ -1969,9 +2033,7 @@ console_write (
                 // Se encontramos um delimitador
                 // e ainda nao acabou o array usado para parametros.
                 // entao avançamos para o proximo char nos parametros.
-                if ( ch == ';' && 
-                     npar < NPAR-1) 
-                {
+                if ( ch == ';' && npar < NPAR-1 ) {
                     // Avançamos, mas quebramos para que o for pegue
                     // o proximo char da string.
                     //#bugbug: Não moda de state??
@@ -1997,7 +2059,7 @@ console_write (
                  // Nao precisamos quebrar, pois ja temos um char.
                  } else { 
                      __EscapeSequenceStage = 4;
-                 }
+                 };
 
             // Stage 4
             case 4:
@@ -2016,7 +2078,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'G': case '`':
-                        if (par[0]){  par[0]--;  }
+                        if (par[0]){ par[0]--; }
                         __local_gotoxy ( 
                             par[0], 
                             CONSOLE_TTYS[console_number].cursor_y, 
@@ -2025,7 +2087,7 @@ console_write (
 
                     // Mudamos o cursor e saimos da escape sequence
                     case 'A':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x,  
                             CONSOLE_TTYS[console_number].cursor_y - par[0], 
@@ -2033,7 +2095,7 @@ console_write (
                         break;
 
                     case 'B': case 'e':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x, 
                             CONSOLE_TTYS[console_number].cursor_y + par[0], 
@@ -2042,7 +2104,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence 
                     case 'C': case 'a':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x + par[0], 
                             CONSOLE_TTYS[console_number].cursor_y, 
@@ -2051,7 +2113,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'D':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x - par[0], 
                             CONSOLE_TTYS[console_number].cursor_y, 
@@ -2060,7 +2122,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'E':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             0, 
                             CONSOLE_TTYS[console_number].cursor_y + par[0], 
@@ -2069,7 +2131,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'F':
-                        if (!par[0]){  par[0]++;  }
+                        if (!par[0]){ par[0]++; }
                         __local_gotoxy ( 
                             0, 
                             CONSOLE_TTYS[console_number].cursor_y - par[0], 
@@ -2078,7 +2140,7 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'd':
-                        if (par[0]){  par[0]--;  }
+                        if (par[0]){ par[0]--; }
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x, 
                             par[0], 
@@ -2087,8 +2149,8 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'H': case 'f':
-                        if (par[0]){  par[0]--;  }
-                        if (par[1]){  par[1]--;  }
+                        if (par[0]){ par[0]--; }
+                        if (par[1]){ par[1]--; }
                         __local_gotoxy ( 
                             par[1],
                             par[0], 
@@ -2096,13 +2158,24 @@ console_write (
                         break;
 
                     // Outros tratadores.
-                    case 'J': csi_J  (par[0]);                 break;
-                    case 'K': csi_K  (par[0]);                 break;
-                    case 'L': csi_L  (par[0], console_number); break;
-                    case 'M': csi_M  (par[0], console_number); break;
-                    case 'P': csi_P  (par[0], console_number); break;
-                    case '@': csi_at (par[0], console_number); break;
-
+                    case 'J': 
+                        csi_J(par[0]);
+                        break;
+                    case 'K':
+                        csi_K(par[0]);
+                        break;
+                    case 'L':
+                        csi_L( par[0], console_number );
+                        break;
+                    case 'M':
+                        csi_M( par[0], console_number );
+                        break;
+                    case 'P':
+                        csi_P( par[0], console_number );
+                        break;
+                    case '@':
+                        csi_at( par[0], console_number );
+                        break;
 
                     // FIM.
                     // Isso marca o fim da escape sequence,
@@ -2112,7 +2185,6 @@ console_write (
                     case 'm': 
                         csi_m(); 
                         break;
-
 
                     // ??  #bugbug
                     // 0x1b[r
@@ -2131,7 +2203,7 @@ console_write (
 
                     // Save cursor
                     case 's': 
-                        __local_save_cur( console_number );
+                        __local_save_cur(console_number);
                         break;
 
                     // Restore cursor
@@ -2315,11 +2387,41 @@ int VirtualConsole_initialize(void)
 // No input in prompt[].
     ShellFlag = FALSE;
 
+    __EscapeSequenceStage=0;
+
+// Limpa o array de parâmetros usado durante o 
+// tratamento de escape sequencies.
+    for (i=0; i<NPAR; i++){
+        par[i]=0;
+    };
+
+    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
+    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
+
+// Default kernel console.
+    bg_colors[0] = (unsigned int) COLOR_BLUE;
+    fg_colors[0] = (unsigned int) COLOR_WHITE;
+// 
+    bg_colors[1] = (unsigned int) COLOR_BLUE;
+    fg_colors[1] = (unsigned int) COLOR_YELLOW;
+// Warning console.
+    bg_colors[2] = (unsigned int) COLOR_ORANGE;
+    fg_colors[2] = (unsigned int) COLOR_WHITE;
+// Danger console.
+    bg_colors[3] = (unsigned int) COLOR_RED;
+    fg_colors[3] = (unsigned int) COLOR_YELLOW;
+
+
 // Virtual Console:
 // The kernel only have four virtual consoles.
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
-        console_init_virtual_console(i);
+        // IN: console index, bg color, fg color
+        console_init_virtual_console(
+            i,
+            bg_colors[i],
+            fg_colors[i] );
+
         //tmp_tty = (struct tty_d *) &CONSOLE_TTYS[i];
         // Register tty device.
         //devmgr_register_device ( 
@@ -2408,8 +2510,12 @@ console_ioctl (
     
     // clear console.
     case 440:
-        // IN: color, console number.
-        clear_console( (unsigned int) arg, fg_console );
+        // IN: bg color, fg color, console number.
+        clear_console( 
+            (unsigned int) arg,
+            (unsigned int) CONSOLE_TTYS[fg_console].fg_color, 
+            fg_console 
+            );
         return 0;
         break;
 
@@ -2530,19 +2636,32 @@ void REFRESH_STREAM(file *f)
 //--
 }
 
-// Clear a console witha a given color.
-int clear_console (unsigned int color, int console_number)
+int 
+clear_console (
+    unsigned int bg_color, 
+    unsigned int fg_color, 
+    int console_number )
 {
+// Clear a console with the given colors.
+
     if ( VideoBlock.useGui != TRUE ){
         return -1;
     }
     if (console_number<0 || console_number > 3){
         return -1;
     }
-    backgroundDraw (color);
-    CONSOLE_TTYS[console_number].cursor_x = 0;
-    CONSOLE_TTYS[console_number].cursor_y = 0;
+
+// Clear background.
+    backgroundDraw(bg_color);
+    CONSOLE_TTYS[console_number].bg_color = (unsigned int) bg_color;
+    CONSOLE_TTYS[console_number].fg_color = (unsigned int) fg_color;
+
+// Cursor
+    __local_gotoxy(0,0,console_number);
+
+    refresh_screen();
 
     return 0;
 }
+
 

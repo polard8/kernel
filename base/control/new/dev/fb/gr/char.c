@@ -166,7 +166,7 @@ void
 d_drawchar_transparent ( 
     unsigned long x, 
     unsigned long y, 
-    unsigned int color, 
+    unsigned int color,   // ? fg_color 
     unsigned long c )
 {
     register int y2=0;

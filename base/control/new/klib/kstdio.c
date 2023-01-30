@@ -282,8 +282,10 @@ void putchar_K(void)
 // Para virtual consoles.
 // Em tty/console.c
 
-int putchar (int ch)
+int putchar(int ch)
 {
+// + Draw char.
+// + Do not refresh char.
 
 // #todo
 // Maybe we can filter the printable chars
@@ -295,6 +297,9 @@ int putchar (int ch)
     if (fg_console<0){
         return (int)(-1);
     }
+
+// + Draw char.
+// + Do not refresh char.
     console_outbyte ( ch, fg_console );
 
     return (int) ch;
@@ -771,17 +776,29 @@ kinguio_vsprintf(
 }
 
 
+// Print a string.
 void kinguio_puts(const char* str)
 {
     register int i=0;
     size_t StringLen=0;
+    int _char=0;
 
     if (!str){
         return;
     }
+
     StringLen = (size_t) strlen(str);
-    for (i=0; i<StringLen; i++){
-        putchar( str[i] );
+    if (StringLen<=0)
+        return;
+
+// Print chars. 
+    for (i=0; i<StringLen; i++)
+    {
+        _char = (int) ( str[i] & 0xFF );
+
+        // Draw, but not refresh.
+        console_outbyte (_char, fg_console);
+        //putchar (str[i]);
     };
 }
 
@@ -790,7 +807,7 @@ void kinguio_puts(const char* str)
 
 int kinguio_printf(const char *fmt, ...)
 {
-    static char print_buffer[1024];
+    static char data_buffer[1024];
     int ret=0;
 
 // If the virtual console isn't full initialized yet.
@@ -798,16 +815,18 @@ int kinguio_printf(const char *fmt, ...)
         return -1;
     }
 
+    memset (data_buffer, 0, 1024); 
+
 //----------
     va_list ap;
     va_start(ap, fmt);
-    memset(print_buffer, 0, 1024); 
-    ret = kinguio_vsprintf(print_buffer, fmt, ap);
+    ret = kinguio_vsprintf(data_buffer, fmt, ap);
     va_end(ap);
 //-----------
 
-// Print and return.
-    kinguio_puts(print_buffer);
+// Print the data buffer.
+    kinguio_puts(data_buffer);
+
     return (int) ret;
 }
 // ===================================
@@ -944,10 +963,7 @@ int k_fgetc(file *f)
 // Tem que ter a opção de pegarmos usando o posicionamento
 // no buffer. O terminal gosta dessas coisas.
 
-//
 // Get the char.
-//
-
     ch = (int) *f->_p;
 
 // Update the pointer
@@ -1480,6 +1496,8 @@ regularfile_ioctl (
         return (int) (-EBADF);
     }
 
+//...
+
     return -1;
 }
 
@@ -1800,11 +1818,33 @@ static void __initialize_virtual_consoles(void)
         x_panic ("__initialize_virtual_consoles: cWidth cHeight");
     }
 
+    unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
+    unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
+
+// Default kernel console.
+    bg_colors[0] = (unsigned int) COLOR_BLUE;
+    fg_colors[0] = (unsigned int) COLOR_WHITE;
+// 
+    bg_colors[1] = (unsigned int) COLOR_BLUE;
+    fg_colors[1] = (unsigned int) COLOR_YELLOW;
+// Warning console.
+    bg_colors[2] = (unsigned int) COLOR_ORANGE;
+    fg_colors[2] = (unsigned int) COLOR_WHITE;
+// Danger console.
+    bg_colors[3] = (unsigned int) COLOR_RED;
+    fg_colors[3] = (unsigned int) COLOR_YELLOW;
+
+
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
         // Make the standard initialization.
-        if( CONSOLE_TTYS[i].initialized == FALSE){
-                console_init_virtual_console(i);
+        if( CONSOLE_TTYS[i].initialized == FALSE)
+        {
+            // IN: console index, bg color, fg color
+            console_init_virtual_console(
+                i,
+                bg_colors[i],
+                fg_colors[i] );
         }
 
         // Set some personalized values.

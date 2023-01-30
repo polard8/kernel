@@ -230,17 +230,32 @@ static void __launch_app_via_initprocess(int index)
 
 static void __enter_embedded_shell(int kernel_in_debug_mode)
 {
-    backgroundDraw(COLOR_EMBEDDED_SHELL_BG);
+    int console_index = fg_console;
+
+    // ShellFlag = FALSE;
+
+//
+// Set up console
+//
+
+    jobcontrol_switch_console(0);
+
+//
+// Message
+//
 
     if (kernel_in_debug_mode){
         printf("[[ KERNEL IN DEBUG MODE ]]\n");
     }
-    printf("kernel console number %d\n",fg_console);
+    printf("kernel console number %d\n",console_index);
     printf("Prompt ON: Type something\n");
     consolePrompt();  // it will refresh the screen.
     //refresh_screen();  
 
-// done
+//
+// Flag
+//
+
     ShellFlag = TRUE;
 }
 

@@ -261,6 +261,7 @@ extern unsigned long gSavedBPP;
 //
 
 // fb device
+#include "dev/fb/gr/color.h"
 #include "dev/fb/hw/halvid.h"
 #include "dev/fb/hw/video.h"
 #include "dev/fb/hw/screen.h"

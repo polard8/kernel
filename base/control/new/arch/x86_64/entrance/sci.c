@@ -2230,8 +2230,22 @@ void *sci2 (
         if(fg_console<0 || fg_console > 3){
             return NULL;
         }
-        //IN: color, console number.
-        clear_console((unsigned int) arg2,fg_console);
+
+        /*
+        //#bugbug; cant change the color of the kernel consoles.
+        //IN: bg color, fg color, console number.
+        clear_console(
+            (unsigned int) arg2,
+            (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
+            fg_console );
+        */
+
+        //IN: bg color, fg color, console number.
+        clear_console(
+            (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
+            (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
+            fg_console );
+
         refresh_screen();
         return NULL;
     }
@@ -2239,10 +2253,16 @@ void *sci2 (
     // Change the foreground color of the current console.
     if (number == 8004)
     {
-        if(fg_console<0 || fg_console > 3){
+        if (fg_console<0 || fg_console > 3){
             return NULL;
         }
-        CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg2;
+        
+        // #bugbug
+        // #deprecated
+        // Cant change the kernel consoles.
+        // Only the other ttys.
+        // CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg2;
+        
         return NULL;
     }
 
