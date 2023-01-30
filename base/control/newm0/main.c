@@ -3,11 +3,8 @@
 // called by ./crt0.c
 // #todo: Do not use 'interrupts'.
 
-struct module_initialization_d
-{
-    int initialized;
-    //unsigned long ksysmboltable_address;
-};
+#include "newm0.h"
+
 struct module_initialization_d  ModuleInitialization;
 
 
@@ -18,33 +15,106 @@ int DIE=0;      //it works
 int PUTCHARK=1; //it works
 int REBOOT=2;   //it works
 int REFESHSCREEN=3;
-    // #todo: Call dead thread collector, scheduler ...
-    // read flags
-    // read messages
-    // ...
+int PUTCHAR_FGCONSOLE=4;  //(1arg)
+// #todo: Call dead thread collector, scheduler ...
+// read flags
+// read messages
+// ...
 
-inline void do_int3(void)
+static void caller0(unsigned long function_address);
+static void 
+caller1(
+    unsigned long function_address, 
+    unsigned long data0 );
+
+static int module_print(char *string);
+static inline void do_int3(void);
+static inline void do_hlt(void);
+
+// -----------------------------
+
+static inline void do_int3(void)
 {
     asm ("int $3");
 }
 
-inline void do_hlt(void)
+static inline void do_hlt(void)
 {
     asm ("hlt");
 }
 
-void caller(unsigned long function_address)
+static void caller0(unsigned long function_address)
 {
-    asm("call *%0" : : "r"(function_address));
+    asm ("call *%0" : : "r"(function_address));
+}
+
+static void 
+caller1(
+    unsigned long function_address, 
+    unsigned long data0 )
+{
+
+    int x = (int) (data0 & 0xFF);
+    int y = (int) (data0 & 0xFF);
+
+// #todo: Simplify
+
+    asm ("movl %1, %%eax;"
+         "movl %%eax, %0;"
+         "movl %%eax, %%edi;"
+         :"=r"(y)        /* output */
+         :"r"(x)         /* input */
+         :"%eax"         /* clobbered register */
+    );   
+
+    //asm (" movq $65, %rdi ");
+    
+    asm ("call *%0" : : "r"(function_address));
 }
 
 
-int module_print( char *string );
-int module_print( char *string )
+static int module_print(char *string)
 {
     //#todo: We nned to send an argument to the kernel function.
-    caller( (unsigned long) kfunctions[PUTCHARK] );
+    caller0( (unsigned long) kfunctions[PUTCHARK] );
     return 0;
+}
+
+
+//strlen
+// strlen:
+//    Give the string lenght in bytes.
+int module_strlen(const char *s);
+int module_strlen(const char *s)
+{
+    register int i=0;
+
+//#todo
+    //if ( (void *) s == NULL ){ return -1; }
+
+    for ( i=0; s[i] != '\0'; ++i )
+    {
+    };
+
+    return (int) i;
+}
+
+
+void module_print_string (char *s);
+void module_print_string (char *s)
+{
+    register int i=0;
+    int size=0;
+    size = module_strlen(s);
+    if (size <= 0)
+        return;
+    for (i=0; i<size; i++)
+    {
+        caller1( 
+            kfunctions[PUTCHAR_FGCONSOLE], 
+            s[i] 
+        );
+    };
 }
 
 
@@ -52,8 +122,15 @@ int module_print( char *string )
 // main:
 //
 
-int module_main(int reason)
+int main( int arc, char *argv[], int reason )
 {
+
+// Invalid reason.
+    if ( reason != 1000 &&
+         reason != 1001 )
+    {
+        return -1;
+    }
 
 // The kernel static entry point.
 // #bugbug: It's not safe.
@@ -93,34 +170,27 @@ int module_main(int reason)
 
     if (Found==1)
     {
-        for (i=0; i<100; i++)
-            caller( (unsigned long) kfunctions[PUTCHARK] );
-        
-        //caller( (unsigned long) kfunctions[DIE] );
-        //caller( (unsigned long) kfunctions[PUTCHARK] );
-        //caller( (unsigned long) kfunctions[REBOOT] );
+        if (reason == 1000){
+            module_print_string("newm0: reason 1000\n");
+        }
+
+        if (reason == 1001){
+            module_print_string("newm0: reason 1001\n");
+        }
+
+
+        //for (i=0; i<100; i++)
+        //    caller0( (unsigned long) kfunctions[PUTCHARK] );
+        //caller0( (unsigned long) kfunctions[DIE] );
+        //caller0( (unsigned long) kfunctions[PUTCHARK] );
+        //caller0( (unsigned long) kfunctions[REBOOT] );
         //do_int3();
-    }
-
-
-// #todo:
-// Call a function sending a pointer to a vector
-// where the kernel will put all the exported functions.
-
-    //unsigned long imported_functions[32];
-
-
-    if (reason==1){
+        //caller1( kfunctions[PUTCHAR_FGCONSOLE], 'x');
+        
         return 0;
     }
 
-    //while(1){
-        // Relax
-        //do_hlt();
-    //};
-
-    return 0;
+fail:
+    return -1;
 }
-
-
 

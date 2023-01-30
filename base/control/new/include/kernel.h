@@ -658,16 +658,23 @@ struct kernel_module_d
     int used;
     int magic;
     int id;
+
+    int initialized;
+
     char name[64];
     size_t name_size;
+
 // Shared info
     struct km_shared_info_d info;
-    int initialized;
     struct thread_d  *thread;
 
-// navigation
-    //struct kernel_module_d *next;
+// Navigation
+    struct kernel_module_d  *next;
 };
+
+// see: globals.c, x64init.c
+extern struct kernel_module_d  *kernel_mod0;
+
 
 
 #define KMODULE_MOD0  0   // first of the list.

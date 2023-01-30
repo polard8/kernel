@@ -19,6 +19,19 @@ extern _kmain
 __SYSTEM_BOOTING EQU  1
 extern _system_state
 
+
+;---------------------------------------------
+; Function table
+; see: newm0/
+extern _die           ;; 0 (no arg)
+extern _putchar_K     ;; 1 (no arg)
+extern _hal_reboot    ;; 2 (no arg)
+extern _refresh_screen  ;; 3 (no arg)
+extern _console_putchar_in_fgconsole  ;; 4 (1 arg)
+; ...
+;---------------------------------------------
+
+
 ;========================================================
 ; _kernel_begin:
 ; Entry point.
@@ -41,14 +54,6 @@ extern _system_state
 ; The function _go_to_kernel jumps here
 ; from head.s in BL.BIN.
 
-; Function table
-extern _die
-extern _putchar_K
-extern _hal_reboot
-extern _refresh_screen
-;extern _kernel_gc
-; ...
-
 ; ----------------------------------------
 ; Kernel entry point
 ; IN:
@@ -69,10 +74,11 @@ _kernel_begin:
 ; Exporting ...
     nop                ; Nop
     DB '__GRAMADO__'   ; Signature
-    DQ _die            ; symbol 0:
-    DQ _putchar_K      ; symbol 1: see: kstdio.c
-    DQ _hal_reboot     ; symbol 2:
-    DQ _refresh_screen ; symbol 3:
+    DQ _die            ; symbol 0:  (no arg)
+    DQ _putchar_K      ; symbol 1: see: kstdio.c (no arg)
+    DQ _hal_reboot     ; symbol 2: (no arg)
+    DQ _refresh_screen ; symbol 3: (no arg)
+    DQ _console_putchar_in_fgconsole  ; sysbol 4: see: console.c (1 arg)
     ; ...
 ; ----------------------
 

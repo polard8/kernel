@@ -3,6 +3,11 @@
 
 #include <kernel.h>
 
+
+// Modulo 0.
+// see: kernel.h
+struct kernel_module_d  *kernel_mod0;
+
 //
 // Product support
 //

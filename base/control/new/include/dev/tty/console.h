@@ -153,6 +153,9 @@ clear_console (
     unsigned int fg_color, 
     int console_number );
 
+
+void console_putchar_in_fgconsole(unsigned long _char);
+
 #endif    
 
 

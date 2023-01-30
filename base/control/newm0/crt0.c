@@ -1,16 +1,31 @@
 
-// crt0 file for a ring 0 kernel module.
+#include "crt0.h"
 
-extern int module_main(int reason);
 
-void module_crt0(void)
+#define NULL  ( (void*) 0 )
+
+// crt0 file for a ring0 kernel module.
+
+extern int main( int arc, char *argv[], int reason );
+
+
+const char *crt0_args[] = {
+    "one",
+    "two",
+    NULL
+};
+
+
+// Entry point
+void module_crt0(int reason)
 {
     int ret_val=0;
-    int reason=0;
 
-    //IN: reason
-    ret_val = 
-        (int) module_main(reason);
+// Calling the main function.
+// IN: 
+// reason
+
+    ret_val = (int) main(2,crt0_args,reason);
 
 // Return to kernel
     //while(1){};

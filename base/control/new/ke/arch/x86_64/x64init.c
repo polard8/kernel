@@ -742,12 +742,10 @@ static int I_x64CreateKernelProcess(void)
                             (unsigned long) ImageAddress,
                             BUGBUG_IMAGE_SIZE_LIMIT ); 
 
-    if ( fileret != 0 )
-    {
-        printf ("I_x64CreateInitialProcess: MOD0.BIN \n");
+    if (fileret != 0){
+        printf ("I_x64CreateInitialProcess: MOD0.BIN\n");
         return FALSE;
     }
-
 
 //
 // Kernel process
@@ -773,23 +771,17 @@ static int I_x64CreateKernelProcess(void)
                      PERSONALITY_GRAMADO );
 
 // Struct and struct validation.
-
-    if ( (void *) KernelProcess == NULL )
-    {
+    if ( (void *) KernelProcess == NULL ){
         printf ("I_x64CreateKernelProcess: KernelProcess\n");
         return FALSE;
     }
-
-    if ( KernelProcess->used != TRUE || 
-         KernelProcess->magic != 1234 )
-    {
+    if (KernelProcess->used != TRUE || KernelProcess->magic != 1234){
         printf ("I_x64CreateKernelProcess: KernelProcess validation\n");
         return FALSE;
     }
 
 // pid
-    if ( KernelProcess->pid != GRAMADO_PID_KERNEL )
-    {
+    if ( KernelProcess->pid != GRAMADO_PID_KERNEL ){
         printf ("I_x64CreateKernelProcess: pid\n");
         return FALSE;
     }
@@ -808,9 +800,7 @@ static int I_x64CreateKernelProcess(void)
 
 // kernel_mm_data validation.
 
-    if ( kernel_mm_data.used != TRUE || 
-         kernel_mm_data.magic != 1234 )
-    {
+    if (kernel_mm_data.used != TRUE || kernel_mm_data.magic != 1234){
         printf ("I_x64CreateKernelProcess: kernel_mm_data validation\n");
         return FALSE;
     }
@@ -894,12 +884,16 @@ static int I_x64CreateKernelProcess(void)
     kmList[KMODULE_MOD0] = (unsigned long) m;
 
 // Finalize the module structure.
-    m->initialized = FALSE;
+    m->initialized = TRUE;
     m->used  = TRUE;
     m->magic = 1234;
 
+// See: kernel.h
+    kernel_mod0 = (struct kernel_module_d *) m; 
+
     return TRUE;
 }
+
 
 
 // Create a ring0 thread for the window server image.

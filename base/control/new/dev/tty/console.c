@@ -55,6 +55,11 @@ void csi_m(void);
 void csi_M(int nr, int console_number);
 void csi_L(int nr, int console_number);
 
+static void 
+caller1(
+    unsigned long function_address, 
+    unsigned long data0 );
+
 // =======================
 
 static void __test_path(void)
@@ -1216,6 +1221,12 @@ void console_putchar (int c, int console_number)
     stdio_terminalmode_flag = FALSE; 
 }
 
+void console_putchar_in_fgconsole(unsigned long _char)
+{
+    int c = (int) (_char & 0xFF);
+    console_putchar( c, fg_console );
+}
+
 // Print consecutive spaces.
 void console_print_indent(int indent, int console_number)
 {
@@ -1310,11 +1321,30 @@ void __test_thread(void)
     //show_slots();
 }
 
-//#test: Calling module.
-void caller(unsigned long function_address);
-void caller(unsigned long function_address)
+
+static void 
+caller1(
+    unsigned long function_address, 
+    unsigned long data0 )
 {
-    asm("call *%0" : : "r"(function_address));
+
+// 32bit
+    unsigned int x = (unsigned int) (data0 & 0xFFFFFFFF);
+    unsigned int y = (unsigned int) (data0 & 0xFFFFFFFF);
+
+// #todo: Simplify
+
+    asm ("movl %1, %%eax;"
+         "movl %%eax, %0;"
+         "movl %%eax, %%edi;"
+         :"=r"(y)        /* output */
+         :"r"(x)         /* input */
+         :"%eax"         /* clobbered register */
+    );   
+
+    //asm (" movq $65, %rdi ");
+    
+    asm ("call *%0" : : "r"(function_address));
 }
 
 
@@ -1398,13 +1428,35 @@ int consoleCompareStrings(void)
     }
 
 
-
 // mod0: Call the entrypoint of the module.
 // mod0.bin entry point.
-    if ( strncmp(prompt,"mod0",4) == 0 ){
-        caller((unsigned long) 0x30A01000); 
+// When this moudule was loaded?
+// see: I_x64CreateKernelProcess in x64init.c
+    if ( strncmp(prompt,"mod0",4) == 0 )
+    {
+        if ( (void*) kernel_mod0 != NULL )
+        {
+            if (kernel_mod0->magic == 1234)
+            {
+                if (kernel_mod0->initialized == TRUE)
+                {
+                    //while(1){
+                    // No return value.
+                    // 1 parameter.
+                    // reason=1000. (Initialize)
+                    caller1((unsigned long) 0x30A01000,1000);
+                    // reason=1001. (test)
+                    caller1((unsigned long) 0x30A01000,1001);
+                    // Invalid reason
+                    caller1((unsigned long) 0x30A01000, 999 );
+                    //};
+                }
+            }
+        }
         goto exit_cmp;
     }
+
+
 
 // dir:
 // List the files in a given directory.
