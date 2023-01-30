@@ -81,10 +81,30 @@ static void terminalInitWindowSizes(void);
 static void terminalInitWindowLimits(void);
 static void terminalInitSystemMetrics(void);
 
-static void __on_return_key_pressed(int fd);
+static int 
+terminalProcedure ( 
+    int fd,
+    int window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
+
+//
+// Event loop
+//
+
+static int __input_STDIN(int fd);
+static int __input_STDOUT(int fd);
+static int __input_STDERR(int fd);
+static int __input_GRAMADOTXT(int fd);
+
 static void compareStrings(int fd);
-static void __try_execute(int fd);
 static void doPrompt(int fd);
+static void __on_return_key_pressed(int fd);
+static void __try_execute(int fd);
+
+static void doHelp(int fd);
+static void doAbout(int fd);
 
 static void clear_terminal_client_window(int fd);
 static void __send_to_child (void);
@@ -599,6 +619,15 @@ static void compareStrings(int fd)
         return;
     }
 
+// Quit embedded shell and
+// start listening to stderr.
+    if ( strncmp(prompt, "start", 5) == 0 )
+    {
+        printf("Quit embedded shell.\n");
+        printf("Start listening to stderr.\n");
+        isUsingEmbeddedShell = FALSE;
+        goto exit_cmp;
+    } 
 
 // exit: Exit the terminal application.
     if( strncmp(prompt,"exit",4) == 0 ){
@@ -672,15 +701,30 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-    if ( strncmp(prompt,"tputstring",10) == 0 ){
-        __test_escapesequence(fd);
-        goto exit_cmp;
-    }
-
     if ( strncmp(prompt,"tputc",5) == 0 ){
         tputc(fd, Terminal.client_window_id, 'x', 1);
         goto exit_cmp;
     }
+
+// #test
+// Print a string inside the client window?
+    if ( strncmp(prompt, "string", 6) == 0 )
+    {
+        cr();
+        lf();  // next line.
+        tputstring(fd, "This is a string!\n");
+        cr();
+        lf();  // enxt line.
+        goto exit_cmp;
+    } 
+
+// scape sequence
+    if ( strncmp(prompt,"tputstring",10) == 0 )
+    {
+        __test_escapesequence(fd);
+        goto exit_cmp;
+    }
+
 
 // Quit 'ws'.
     if ( strncmp(prompt,"ws-quit",7) == 0 ){
@@ -742,37 +786,14 @@ static void compareStrings(int fd)
     }
 
 // 'help'
-    if ( strncmp(prompt,"help",4) == 0 )
-    {
-        cursor_y++;
+    if ( strncmp(prompt,"help",4) == 0 ){
+        doHelp(fd);
+        goto exit_cmp;
+    }
 
-        cursor_x=0;   
-        gws_draw_char ( 
-            fd, 
-            Terminal.client_window_id, 
-            (cursor_x*8), 
-            (cursor_y*8), 
-            fg_color, 
-            '\\' ); 
-
-        cursor_x=1;
-        gws_draw_char ( 
-            fd, 
-            Terminal.client_window_id, 
-            (cursor_x*8), 
-            (cursor_y*8), 
-            fg_color, 
-            'o' ); 
-
-        cursor_x=2;
-        gws_draw_char ( 
-            fd, 
-            Terminal.client_window_id, 
-            (cursor_x*8), 
-            (cursor_y*8), 
-            fg_color, 
-            '/' ); 
-
+// 'about'
+    if ( strncmp(prompt,"about",5) == 0 ){
+        doAbout(fd);
         goto exit_cmp;
     }
 
@@ -785,6 +806,12 @@ static void compareStrings(int fd)
 
 // 'cls'
     if ( strncmp(prompt,"cls",3) == 0 ){
+        clear_terminal_client_window(fd);
+        goto exit_cmp;
+    }
+
+// 'clear'
+    if ( strncmp(prompt,"clear",5) == 0 ){
         clear_terminal_client_window(fd);
         goto exit_cmp;
     }
@@ -847,10 +874,90 @@ static void compareStrings(int fd)
 // Not a reserved word.
 //
 
+// #todo
+// The kernel is gonna crash is the file was no found.
+
     __try_execute(fd);
 
 exit_cmp:
     return;
+}
+
+
+static void doHelp(int fd)
+{
+    if(fd<0){
+        printf("doHelp: Invalid fd\n");
+        return;
+    }
+
+    cr();
+    lf();
+    tputstring(fd,"terminal.bin:");
+
+    cr();
+    lf();
+    tputstring(fd,"This is the terminal application");
+
+    cr();
+    lf();
+    tputstring(fd,"terminal.bin: You can type some commands");
+
+    cr();
+    lf();
+    tputstring(fd,"cls, reboot, shutdown, uname ...");
+
+    cr();
+    lf();
+
+/*
+ //# oldstuff
+        cursor_y++;
+
+        cursor_x=0;   
+        gws_draw_char ( 
+            fd, 
+            Terminal.client_window_id, 
+            (cursor_x*8), 
+            (cursor_y*8), 
+            fg_color, 
+            '\\' ); 
+
+        cursor_x=1;
+        gws_draw_char ( 
+            fd, 
+            Terminal.client_window_id, 
+            (cursor_x*8), 
+            (cursor_y*8), 
+            fg_color, 
+            'o' ); 
+
+        cursor_x=2;
+        gws_draw_char ( 
+            fd, 
+            Terminal.client_window_id, 
+            (cursor_x*8), 
+            (cursor_y*8), 
+            fg_color, 
+            '/' ); 
+ */
+}
+
+
+static void doAbout(int fd)
+{
+// This is the terminal application, 
+// the goal is receiving data from other programs via stdout.
+// But for now we are using a embedded shell.
+
+    if(fd<0)
+        return;
+
+    cr();
+    lf();
+    tputstring(fd,"terminal.bin: This is the terminal application");
+    cr();
+    lf();
 }
 
 static void doPrompt(int fd)
@@ -876,7 +983,14 @@ static void doPrompt(int fd)
 
 // Cursor do terminal.
     cursor_x = 0;
+
+// linha
     cursor_y++;
+    if (cursor_y >= Terminal.height_in_chars)
+    {
+        // #bugbug #todo #provisório
+        clear_terminal_client_window(fd);
+    }
 
 // Refresh client window.
     int wid = Terminal.client_window_id;
@@ -1125,14 +1239,16 @@ test_child_message(void)
 // =======================
 //
 
-//int prev;
-
+// Called by tputc.
 void 
 terminal_write_char (
     int fd, 
     int window, 
     int c )
 {
+// worker
+// Print the char into the window.
+
     static char prev=0;
     unsigned long x = (cursor_x*8);
     unsigned long y = (cursor_y*8);
@@ -1145,7 +1261,7 @@ terminal_write_char (
 // Ver no kernel esse tipo de rotina
 // tab;
 
-    if ( c == '\r' )
+    if (c == '\r')
     {
         cursor_x=0;
         prev = c;
@@ -1158,6 +1274,13 @@ terminal_write_char (
          //printf("NEWLINE\n");
          cursor_x=0; // começo da linha ...(desnecessário)
          cursor_y++;  //linha de baixo
+         // #test
+         // #todo: scroll
+         if ( cursor_y >= Terminal.height_in_chars )
+         {
+             clear_terminal_client_window(fd);  //#provisório
+         }
+
          //começo da linha
          prev = c; 
          return;
@@ -1238,27 +1361,24 @@ void terminalInsertCR (void)
 
 // # terminal stuff
 //line feed
-void lf (void)
+void lf(void)
 {
-    // Enquanto for menor que o limite de linhas, avança.
-
-    if ( cursor_y+1 < __wlMaxRows )
+    //#todo
+    //terminalInsertLF();
+    
+    cursor_y++;
+    if (cursor_y >= Terminal.height_in_chars)
     {
-        cursor_y++; 
-        return;
+        clear_terminal_client_window(Terminal.client_window_id);
     }
-
-	//#todo: Scroll up;
-	//scrup();
 }
-
-
-
 
 // # terminal stuff
 //carriege return
-void cr (void)
+void cr(void)
 {
+    //#todo
+    //terminalInsertCR();
     cursor_x = 0;
 }
 
@@ -1324,8 +1444,12 @@ void __test_escapesequence(int fd)
     tputstring(fd, "done :)\n");
 }
 
+// 
 void tputstring( int fd, char *s )
 {
+// #test
+// Print a string inside the client window?
+
     size_t StringSize=0;
     register int i=0;
     char *b = (char *) s;
@@ -1336,18 +1460,26 @@ void tputstring( int fd, char *s )
         return;
 
     StringSize = (size_t) strlen(s);
-    if(StringSize<=0)
+    if (StringSize <= 0){
         return;
-    // Limits: #test
-    if(StringSize>=32)
-        return;
+    }
+
+// Limits: 
+// #test
+    //if(StringSize>=32)
+        //return;
 
 // Initialize escape sequence steps.
     __sequence_status=0;
+    //__csi_buffer_tail = 0;
 
-    for(i=0; i<StringSize; i++){
+    for (i=0; i<StringSize; i++){
         tputc(fd, Terminal.client_window_id, b[i], 1);
     }
+
+// Initialize escape sequence steps.
+    __sequence_status=0;
+    //__csi_buffer_tail = 0;
 }
 
 
@@ -1439,10 +1571,8 @@ DEC	HEX	CHARACTER
 31	1F	UNIT SEPARATOR (US) DOWN ARROW
 */
 
-
-// See: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-
-// void tputc (int fd, char *c, int len){
+// See: 
+// https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 void 
 tputc ( 
     int fd, 
@@ -1450,6 +1580,9 @@ tputc (
     int c, 
     int len )
 {
+// Pinta o char na janela, estando ou não
+// no shell embutido.
+
     int ivalue=0;
     unsigned char ascii = (unsigned char) c;
     //unsigned char ascii = *c;
@@ -2181,16 +2314,13 @@ static void __on_return_key_pressed(int fd)
     doPrompt(fd);
 }
 
-
-// local
-int 
+static int 
 terminalProcedure ( 
     int fd,
     int window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
-
 {
     if (fd<0)    {return -1;}
     if (window<0){return -1;}
@@ -2239,6 +2369,7 @@ terminalProcedure (
                     input(long1);
                 }
                 // Exibe na área de cliente.
+                // Estando ou não no shell embutido.
                 tputc(
                     (int) fd, 
                     (int) Terminal.client_window_id, 
@@ -2273,11 +2404,9 @@ terminalProcedure (
     return 0;
 }
 
-
-// local
-// Pegando o input de GRAMADO.TXT.
-int __input_GRAMADOTXT(int fd)
+static int __input_GRAMADOTXT(int fd)
 {
+// Pegando o input de GRAMADO.TXT.
 // #importante:
 // Esse event loop pega dados de um arquivo.
 
@@ -2331,7 +2460,7 @@ int __input_GRAMADOTXT(int fd)
 // #bugbug
 // Isso esta falhando porque stdout não é um 'regular file'
 // ele é um console e só esta aceitando saída por enquanto.
-int __input_STDOUT(int fd)
+static int __input_STDOUT(int fd)
 {
 // #importante:
 // Esse event loop pega dados de um arquivo.
@@ -2343,6 +2472,9 @@ int __input_STDOUT(int fd)
     FILE *new_stdin;
     //new_stdin = (FILE *) fopen("gramado.txt","a+");
     new_stdin = stdout;
+
+    printf ("__input_STDOUT: #todo\n");
+    while(1){}
 
     if( (void*) new_stdin == NULL ){
         printf ("__input_STDOUT: new_stdin\n");
@@ -2391,7 +2523,7 @@ int __input_STDOUT(int fd)
 // local
 // Pegando o input de 'stderr'.
 // It's working
-int __input_STDERR(int fd)
+static int __input_STDERR(int fd)
 {
 // #importante:
 // Esse event loop pega dados de um arquivo.
@@ -2405,22 +2537,34 @@ int __input_STDERR(int fd)
     new_stdin = stderr;
     __terminal_input_fp = stderr;   //save global.
 
-    if( (void*) new_stdin == NULL ){
+    printf ("__input_STDERR: #todo\n");
+
+/*
+    if ( (void*) new_stdin == NULL ){
         printf ("__input_STDERR: new_stdin\n");
         return -1;
     }
+*/
+
+    // not standard.
+    // volta ao inicio do arquivo em ring0, depois de ter apagado
+    // o arquivo.
+    // GRAMADO_SEEK_CLEAR
+    //lseek( fileno(new_stdin), 0, 1000);
+    // atualiza as coisas em ring3 e ring0.
+    //rewind(new_stdin);
 
 // relax
-    rtl_yield();
-    rtl_yield();
-    rtl_yield();
-    rtl_yield();
+    //rtl_yield();
+    //rtl_yield();
+    //rtl_yield();
+    //rtl_yield();
     
     while (1){
-        C = fgetc(new_stdin);
+        //C = fgetc(new_stdin);
+        /*
         if (C > 0)
         {
-
             if(C == '9'){
                 //printf("TERMINAL: 9\n");  //console
             }
@@ -2432,16 +2576,18 @@ int __input_STDERR(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        rtl_yield(); // relax
+        */
+        // rtl_yield(); // relax
     };
-    
+
+    printf ("__input_STDERR: Stop listening stderr\n");
     return 0;
 }
 
-// local
-// Pegando o input de 'stdin'.
-int __input_STDIN(int fd)
+
+static int __input_STDIN(int fd)
 {
+// Pegando o input de 'stdin'.
 // #importante:
 // Esse event loop pega dados de um arquivo.
 
@@ -2483,7 +2629,7 @@ int __input_STDIN(int fd)
     //rtl_yield();
 
     while (1){
-        
+
         if (isUsingEmbeddedShell == FALSE){
             break;
         }
@@ -2501,6 +2647,7 @@ int __input_STDIN(int fd)
         //rtl_yield(); // relax
     };
 
+    printf ("__input_STDIN: Stop listening stdin\n");
     return 0;
 }
 
