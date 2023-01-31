@@ -4,27 +4,32 @@
 #ifndef __PARSER_H
 #define __PARSER_H    1
 
-// 8 elementos que explicam o identificador.
-extern int id[8];
+//--------------
+// Elementos que explicam o identificador.
+extern long id[ID_MAX];
 
 //--------------
+// Elementos que explicam a constante.
+extern long constant[CONSTANT_MAX];
 
-//elementos que explicam a constante.
-extern int constant[8];
-//salvando a string das constantes,
-//onde a constante será armazenada dependendo do tipo.
+
+// Salvando a string das constantes,
+// onde a constante será armazenada dependendo do tipo.
 extern char constant_byte[2];   //0xFF
 extern char constant_word[4];   //0xFFFF
 extern char constant_dword[8];  //0xFFFFFFFF
-//o que colocar antes dessa constante.
-//isso varia com a base
+extern char constant_qword[16];  //0xFFFFFFFFFFFFFFFF
+// O que colocar antes dessa constante.
+// Isso varia com a base. Ex: 0x, 0X
 extern char constant_before[2];
-//o que colocar depois dessa constante.
-//isso varia com a base
-extern char constant_aftes[2];
+// O que colocar depois dessa constante.
+// Isso varia com a base. Ex: H, B.
+extern char constant_after[2];
+
 
 //--------------------
-extern int return_info[8];
+extern long return_info[8];
+
 
 extern unsigned long functionList[FUNCTION_COUNT_MAX];
 

@@ -15,25 +15,34 @@ size_t string_size=0;
 int meta_stage=0;
 // -------------------------------------
 
+// -----------------------
+// Elementos que explicam o identificador.
+// See: token.h
+//int id[ID_MAX];
+//#test: 
+// Usaremos long porque estamos armazenando endereços de memoria também.
+long id[ID_MAX];
 
-// 8 elementos que explicam o identificador.
-int id[8];
+// -----------------------
+// Elementos que explicam a constante.
+long constant[CONSTANT_MAX];
 
-//elementos que explicam a constante.
-int constant[8];
-//salvando a string das constantes,
-//onde a constante será armazenada dependendo do tipo.
-char constant_byte[2];   //0xFF
-char constant_word[4];   //0xFFFF
-char constant_dword[8];  //0xFFFFFFFF
-//o que colocar antes dessa constante.
-//isso varia com a base
+
+// Salvando a string das constantes,
+// onde a constante será armazenada dependendo do tipo.
+char constant_byte[2];    //0xFF
+char constant_word[4];    //0xFFFF
+char constant_dword[8];   //0xFFFFFFFF
+char constant_qword[16];  //0xFFFFFFFFFFFFFFFF
+// O que colocar antes dessa constante.
+// Isso varia com a base. Ex: 0x, 0X
 char constant_before[2];
-//o que colocar depois dessa constante.
-//isso varia com a base
-char constant_aftes[2];
+// O que colocar depois dessa constante.
+// Isso varia com a base. Ex: H, B.
+char constant_after[2];
 
-int return_info[8];
+// -----------------------
+long return_info[8];
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
 
@@ -1729,6 +1738,12 @@ void dump_output_file(void)
 
 int parse(int dump_output)
 {
+// Stages:
+// 1: modifier, type, metatag, separator
+// 2: identifier.
+// 3: keyword.
+// 4: separator. Only ';'.
+
     int running = 1;
     register int token=0;
     int i=0;
@@ -1795,6 +1810,12 @@ int parse(int dump_output)
         // >> tipos
         // ...
         
+
+        // 1: modifier, type, metatag, separator
+        // 2: identifier.
+        // 3: keyword.
+        // 4: separator. Only ';'.
+        
         switch (State)
         {
             
@@ -1804,18 +1825,18 @@ int parse(int dump_output)
             case 1:
                 switch (token)
                 {
-                    case TOKENMODIFIER:
 
+                    case TOKENMODIFIER:
                         //#ifdef PARSER_VERBOSE
                         //continua pois precisamos pegar um tipo.
                         //#bugbug ??mas e se o modificar vir seguido de um simbolo ???
                         //printf("State1: TOKENMODIFIER={%s} line %d\n", 
                         //   real_token_buffer, lineno );
                         //#endif
-
                         State = 1;
                         //goto again;
                         break;
+
 
                     // TYPE
                     // >>> peekChar=) significa marcação de tipagem.
@@ -1828,18 +1849,18 @@ int parse(int dump_output)
 
                         // Save
                         id[ID_TYPE] = type_found;
+                        
+                        if (type_found == TMETA)
+                            printf ("TMETA found!\n");
+                        
                         // Depois de um type vem um identificador.
                         State = 2;
                         break;
 
-                    case TOKENMETA:
-                        //keyword_found
-                        printf ("TOKENMETA found!\n");
-                        State = 2;  // Depois de um 'meta' vem um identificador.
-                        break;
 
                     // #bugbug
-                    // e se o arquivo começar com um separador, então teremos problema.	
+                    // e se o arquivo começar com um separador, 
+                    // então teremos problema.
 
                     case TOKENSEPARATOR:
                         //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
@@ -1981,9 +2002,9 @@ int parse(int dump_output)
                     
                     case TOKENIDENTIFIER:
 
-//#ifdef PARSER_VERBOSE
-	//			        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
-//#endif 
+                        //#ifdef PARSER_VERBOSE
+                        //    printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+                        //#endif 
 
                         id[ID_TOKEN] = TOKENIDENTIFIER;
                         id[ID_STACK_OFFSET] = stack_index;
@@ -2418,10 +2439,10 @@ static int __parserInit(void)
     stack_count = 0;
     stack_index = 0;
 
-    for ( i=0; i<8; i++ )  { id[i] = 0;          };
-    for ( i=0; i<8; i++ )  { constant[i] = 0;    };
-    for ( i=0; i<8; i++ )  { return_info[i] = 0; };
-    for ( i=0; i<512; i++ ){ stack[i] = 0;       };
+    for ( i=0; i<ID_MAX; i++ )       { id[i] = 0;          };
+    for ( i=0; i<CONSTANT_MAX; i++ ) { constant[i] = 0;    };
+    for ( i=0; i<8; i++ )            { return_info[i] = 0; };
+    for ( i=0; i<512; i++ )          { stack[i] = 0;       };
     //...
 
 // Esses endereços vão depender do arquivo 

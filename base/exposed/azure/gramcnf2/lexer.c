@@ -78,7 +78,10 @@ int brace_count=0;
 //
 
 static int __lexerInit(void);
-static int skip_white_space(void);
+static int __skip_white_space(void);
+
+//---------------------------------------------------
+
 
 //#### supensa ###
 /*
@@ -105,7 +108,7 @@ int check_newline ()
 			return (int) c;
 		}
 		
-		//se for quanquer outra coisa também deixaremos o skip_white_space tratar
+		//se for quanquer outra coisa também deixaremos o __skip_white_space tratar
 		return (int) c;
         
 		if ( c == '#' )
@@ -166,8 +169,9 @@ int check_newline ()
 */
 
 
+//------------------------------------------------
 // Skipping white spaces.
-static int skip_white_space(void)
+static int __skip_white_space(void)
 {
     register int c=0;
     register int inside=0;
@@ -236,7 +240,7 @@ begin:
 				//excluindo os casos acima, então significa que nossa barra não tinha nada a ver com comentário 
 				//lembrando que a barra aparecei depois de um espaço em branco.
 				//por enquanto vamos dizer que algo está errado com essa barra,
-				//printf("skip_white_space: todo: depois da barra / .");
+				//printf("__skip_white_space: todo: depois da barra / .");
 				//exit(1);
 
                 if (c == '*')
@@ -285,9 +289,9 @@ begin:
                         }else if (c == EOF || c == '\0'){  
 
                             eofno++;
-                            printf ("skip_white_space: unterminated comment in line %d", 
+                            printf ("__skip_white_space: Unterminated comment in line %d \n", 
                                 lineno );
-                            exit (1);
+                            exit(1);
 
 						//default
                             
@@ -343,111 +347,90 @@ begin:
     }; // for
 }
 
-/*
- * yylex:
- *     Pega o próximo token.
- */
+
+// -----------------------------------------
+// yylex:
+// Pega o próximo token.
 int yylex(void)
 {
+    register int value=0;
+
     register int c=0;
     register char *p;
-    register int value=0;
     register int c1=0;
     register int number_length=0;
 
 again:
 
 // Pega um char da stream de entrada.
-    c = skip_white_space();
+    c = (int) __skip_white_space();
 
     switch (c)
     {
-        case 0:
+
+        // 0 or EOF. (-1).
         case EOF:
-            printf ("yylex: EOF\n");
-            eofno++;  
+        case 0:
+            printf ("yylex: 0 or EOF\n");
+            eofno++; 
             value = TOKENEOF;
-            //#test
-            return (value);
+            return (int) (value);
             break;
 
-        case 'A':
-        case 'B':
-        case 'C':
-        case 'D':
-        case 'E':
-        case 'F':
-        case 'G':
-        case 'H':
-        case 'I':
-        case 'J':
-        case 'K':
-        case 'L':
-        case 'M':
-        case 'N':
-        case 'O':
-        case 'P':
-        case 'Q':
-        case 'R':
-        case 'S':
-        case 'T':
-        case 'U':
-        case 'V':
-        case 'W':
-        case 'X':
-        case 'Y':
-        case 'Z':
-        case 'a':
-        case 'b':
-        case 'c':
-        case 'd':
-        case 'e':
-        case 'f':
-        case 'g':
-        case 'h':
-        case 'i':
-        case 'j':
-        case 'k':
-        case 'l':
-        case 'm':
-        case 'n':
-        case 'o':
-        case 'p':
-        case 'q':
-        case 'r':
-        case 's':
-        case 't':
-        case 'u':
-        case 'v':
-        case 'w':
-        case 'x':
-        case 'y':
-        case 'z':
+        // [A~Z] [a~z] [_]
+        case 'A': case 'B': case 'C': case 'D':
+        case 'E': case 'F': case 'G': case 'H':
+        case 'I': case 'J': case 'K': case 'L':
+        case 'M': case 'N': case 'O': case 'P':
+        case 'Q': case 'R': case 'S': case 'T':
+        case 'U': case 'V': case 'W': case 'X':
+        case 'Y': case 'Z':
+        case 'a': case 'b': case 'c': case 'd':
+        case 'e': case 'f': case 'g': case 'h':
+        case 'i': case 'j': case 'k': case 'l':
+        case 'm': case 'n': case 'o': case 'p':
+        case 'q': case 'r': case 's': case 't':
+        case 'u': case 'v': case 'w': case 'x':
+        case 'y': case 'z':
         case '_':
 
+            // Address
             p = token_buffer;
 
-            //#todo: limite tamanho do buffer
+            // #todo: 
+            // Limite tamanho do buffer
+            
             while (1)
             {
-                // Coloca no buffer.
+                // Put into the buffer and increment the buffer address.
                 *p = c;
-                 // Incrementa buffer.
                 p++;
-                // Pega
+
+                // Get next token from the file.
                 c = getc(finput);
-                // Se não for identificador, finalize o buffer.
-                // Devolve o que não batia com a comparação do while.
-                if ( ( isalnum(c) == 0 ) && (c != '_') )
+
+                // Not Alpha-numeric and not '_'.
+                // Finalize the buffer if it is not an identifier.
+                // Only // [A~Z] [a~z] [_] are accepted.
+                // #todo: Maybe we can expand this set of chars accepted
+                // as part of the identifier. Ex: '$'.
+
+                if ( ( isalnum(c) == 0 ) &&  (c != '_') )
                 {
                     *p = 0;
                     ungetc( c, finput );
-                    goto id_ok;
+                    goto we_have_an_identifier;
                 }
             };
 
-            id_ok:
             // Temos um identificador.
+            we_have_an_identifier:
+
+            // Vamos começar dizendo que somos um identificador.
+            // Porem ...
+            // O identificador pode ser um nome de função ou uma variável.
+            // Mas vamos comparar com palavras reservadas.
+            // Caso seja uma das palavras reservadas, então deixamos de ser um identificador.
             value = TOKENIDENTIFIER;
 
             // Reserved?
@@ -456,207 +439,194 @@ again:
             // As palavras reservadas podem ser modificadores, tipos
             // ou palavras chave.
 
+            // Modifiers
+
             if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
             {
-                value = TOKENMODIFIER;
+                keyword_found  = KWSIGNED;
+                value          = TOKENMODIFIER;
                 modifier_found = MSIGNED;
             }
-
             if ( strncmp( real_token_buffer, "unsigned", 8 ) == 0 )
             {
-                value = TOKENMODIFIER;
+                keyword_found  = KWUNSIGNED;
+                value          = TOKENMODIFIER;
                 modifier_found = MUNSIGNED;
             }
-
-            if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
+            if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
             {
-                value = TOKENTYPE;
-                type_found = TINT;
+                keyword_found  = KWINLINE;
+                value          = TOKENMODIFIER;
+                modifier_found = MINLINE;
             }
+            if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
+            {
+                keyword_found  = KWSTATIC;
+                value          = TOKENMODIFIER;
+                modifier_found = MSTATIC;
+            }
+            if ( strncmp( real_token_buffer, "volatile", 8 ) == 0  )
+            {
+                keyword_found  = KWVOLATILE;
+                value          = TOKENMODIFIER;
+                modifier_found = MVOLATILE;
+            }
+
+            // types
 
             if ( strncmp( real_token_buffer, "void", 4 ) == 0 )
             {
-                value = TOKENTYPE;
-                type_found = TVOID;
+                keyword_found = KWVOID;
+                value         = TOKENTYPE;
+                type_found    = TVOID;
             }
-
             if ( strncmp( real_token_buffer, "char", 4 ) == 0 )
             {
-                value = TOKENTYPE;
-                type_found = TCHAR;
+                keyword_found = KWCHAR;
+                value         = TOKENTYPE;
+                type_found    = TCHAR;
             }
-
             if ( strncmp( real_token_buffer, "short", 5 ) == 0 )
             {
-                value = TOKENTYPE;
-                type_found = TSHORT;
+                keyword_found = KWSHORT;
+                value         = TOKENTYPE;
+                type_found    = TSHORT;
             }
-
+            if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
+            {
+                keyword_found = KWINT;
+                value         = TOKENTYPE;
+                type_found    = TINT;
+            }
             if ( strncmp( real_token_buffer, "long", 4 ) == 0 )
             {
-                value = TOKENTYPE;
-                type_found = TLONG;
+                keyword_found = KWLONG;
+                value         = TOKENTYPE;
+                type_found    = TLONG;
             }
-
-            // meta
             if ( strncmp( real_token_buffer, "meta", 4 ) == 0 )
             {
-                value = TOKENMETA;
                 keyword_found = KWMETA;
+                value         = TOKENTYPE;
+                type_found    = TMETA;
             }
-
-
-            // name
-            if ( strncmp( real_token_buffer, "name", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWNAME;
-            }
-
-            // content
-            if ( strncmp( real_token_buffer, "content", 7 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWCONTENT;
-            }
-
-
-            if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWGOTO;
-            }
-
-            if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWRETURN;
-            }
-
-            if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWCONTINUE;
-            }
-
-            if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWDEFAULT;
-            }
-
-            if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWCASE;
-            }
-
-            if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSWITCH;
-            }
-
-            if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWFOR;
-            }
-
-            if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWDO;
-            }
-
-            if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWWHILE;
-            }
-
-            if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWELSE;
-            }
-
-            if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWIF;
-            }
-
-            if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWUNION;
-            }
-
-            if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSTRUCT;
-            }
-
-            if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWENUM;
-            }
-
-            if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSIZEOF;
-            }
-
-            if( strncmp( real_token_buffer, "volatile", 8 ) == 0  )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWVOLATILE;
-            }
-
-            if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWINLINE;
-            }
-
             if ( strncmp( real_token_buffer, "def", 3 ) == 0 )
             {
-                value = TOKENKEYWORD;
                 keyword_found = KWDEF;
+                value         = TOKENTYPE;
+                type_found    = TDEF;
             }
-
-            if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWSTATIC;
-            }
-
             if ( strncmp( real_token_buffer, "var", 3 ) == 0  )
             {
-                value = TOKENKEYWORD;
                 keyword_found = KWVAR;
+                value         = TOKENTYPE;
+                type_found    = TVAR;
+            }
+            if ( strncmp( real_token_buffer, "let", 3 ) == 0  )
+            {
+                keyword_found = KWLET;
+                value         = TOKENTYPE;
+                type_found    = TLET;
+            }
+
+            // keywords
+
+            if ( strncmp( real_token_buffer, "name", 4 ) == 0 )
+            {
+                keyword_found = KWNAME;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "content", 7 ) == 0 )
+            {
+                keyword_found = KWCONTENT;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
+            {
+                keyword_found = KWGOTO;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
+            {
+                keyword_found = KWRETURN;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
+            {
+                keyword_found = KWSWITCH;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
+            {
+                keyword_found = KWCASE;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
+            {
+                keyword_found = KWDEFAULT;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
+            {
+                keyword_found = KWFOR;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
+            {
+                keyword_found = KWCONTINUE;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
+            {
+                keyword_found = KWDO;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
+            {
+                keyword_found = KWWHILE;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
+            {
+                keyword_found = KWIF;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
+            {
+                keyword_found = KWELSE;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
+            {
+                keyword_found = KWUNION;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
+            {
+                keyword_found = KWSTRUCT;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
+            {
+                keyword_found = KWENUM;
+                value         = TOKENKEYWORD;
+            }
+            if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
+            {
+                keyword_found = KWSIZEOF;
+                value         = TOKENKEYWORD;
             }
 
             //...
 
             break;
 
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
+        case '0': case '1': case '2': case '3':
+        case '4': case '5': case '6': case '7':
+        case '8': case '9':
         //case '.':
 
+            // Address
             p = token_buffer;
 
             if ( c == '0' ){
@@ -682,10 +652,10 @@ again:
                         {
                             *p = 0;
                              ungetc ( c, finput );
-						   //fim
-						    value = TOKENCONSTANT;
-							//constant_type_found = //#todo tem que contar. 
-							constant_base_found = CONSTANT_BASE_HEX;
+                            //fim
+                            value = TOKENCONSTANT;
+                            //constant_type_found = //#todo tem que contar. 
+                            constant_base_found = CONSTANT_BASE_HEX;
                             goto constant_done;
                         }
 
@@ -733,7 +703,10 @@ again:
         case '\"':
         {
             c = getc(finput);
+
+            // Address
             p = token_buffer;
+    
             //coloca no token_buffer.
             while (c != '\"')
             {
@@ -825,19 +798,19 @@ again:
                 switch (c)
                 {
                     case '<':
-                        value = ARITHCOMPARE; 
+                        value = ARITHCOMPARE;  //?
                         lexer_code = LE_EXPR; 
                         goto done;
                     case '>':
-                        value = ARITHCOMPARE; 
+                        value = ARITHCOMPARE;  //?
                         lexer_code = GE_EXPR; 
                         goto done;
                     case '!':
-                        value = EQCOMPARE; 
+                        value = EQCOMPARE;  //?
                         lexer_code = NE_EXPR; 
                         goto done;
                     case '=':
-                        value = EQCOMPARE; 
+                        value = EQCOMPARE;  //?
                         lexer_code = EQ_EXPR; 
                         goto done;
                 };
@@ -873,14 +846,13 @@ again:
         };
 
         default:
-            value = c;
-    
+            value = (int) c;
     }; //switch
 
 done:
+// Return the token.
     return (int) value;
 }
-
 
 /*
  * lexerInit:

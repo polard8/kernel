@@ -15,25 +15,34 @@ size_t string_size=0;
 int meta_stage=0;
 // -------------------------------------
 
+// -----------------------
+// Elementos que explicam o identificador.
+// See: token.h
+//int id[ID_MAX];
+//#test: 
+// Usaremos long porque estamos armazenando endereços de memoria também.
+long id[ID_MAX];
 
-// 8 elementos que explicam o identificador.
-int id[8];
+// -----------------------
+// Elementos que explicam a constante.
+long constant[CONSTANT_MAX];
 
-//elementos que explicam a constante.
-int constant[8];
-//salvando a string das constantes,
-//onde a constante será armazenada dependendo do tipo.
-char constant_byte[2];   //0xFF
-char constant_word[4];   //0xFFFF
-char constant_dword[8];  //0xFFFFFFFF
-//o que colocar antes dessa constante.
-//isso varia com a base
+
+// Salvando a string das constantes,
+// onde a constante será armazenada dependendo do tipo.
+char constant_byte[2];    //0xFF
+char constant_word[4];    //0xFFFF
+char constant_dword[8];   //0xFFFFFFFF
+char constant_qword[16];  //0xFFFFFFFFFFFFFFFF
+// O que colocar antes dessa constante.
+// Isso varia com a base. Ex: 0x, 0X
 char constant_before[2];
-//o que colocar depois dessa constante.
-//isso varia com a base
-char constant_aftes[2];
+// O que colocar depois dessa constante.
+// Isso varia com a base. Ex: H, B.
+char constant_after[2];
 
-int return_info[8];
+// -----------------------
+long return_info[8];
 
 unsigned long functionList[FUNCTION_COUNT_MAX];
 
@@ -2430,10 +2439,10 @@ static int __parserInit(void)
     stack_count = 0;
     stack_index = 0;
 
-    for ( i=0; i<8; i++ )  { id[i] = 0;          };
-    for ( i=0; i<8; i++ )  { constant[i] = 0;    };
-    for ( i=0; i<8; i++ )  { return_info[i] = 0; };
-    for ( i=0; i<512; i++ ){ stack[i] = 0;       };
+    for ( i=0; i<ID_MAX; i++ )       { id[i] = 0;          };
+    for ( i=0; i<CONSTANT_MAX; i++ ) { constant[i] = 0;    };
+    for ( i=0; i<8; i++ )            { return_info[i] = 0; };
+    for ( i=0; i<512; i++ )          { stack[i] = 0;       };
     //...
 
 // Esses endereços vão depender do arquivo 

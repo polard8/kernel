@@ -15,33 +15,38 @@ extern int current_string;
 extern int current_separator; 
 extern int current_special;
 
-//#bugbug: 
-//olexer vai usar esse porque a rotina no ctype pode estar com problema #todo 
-#define lexer_isalnum(char) ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
-//#define isdigit(char) (char >= '0' && char <= '9')
-#define ENDFILE -1  /* token that represents end-of-file */
+// #bugbug: 
+// O lexer vai usar esse 
+// porque a rotina no ctype pode estar com problema. #todo 
 
+#define lexer_isalnum(char)  ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+
+// #define isdigit(char) (char >= '0' && char <= '9')
+
+/* token that represents end-of-file */
+// 'EOF'
+#define ENDFILE  -1  
+
+// ------------------------------------------
 // Lexer codes
 typedef enum {
-
     LEXERCODE_NULL,
-    PLUS_EXPR,       //1
-    MINUS_EXPR,      //2 
-    BIT_AND_EXPR,    //3 
-    BIT_IOR_EXPR,    //4
-    MULT_EXPR,       //5
-    TRUNC_DIV_EXPR,  //6
-    TRUNC_MOD_EXPR,  //7
-    BIT_XOR_EXPR,    //8
-    LSHIFT_EXPR,     //9
-    RSHIFT_EXPR,     //10
-    LT_EXPR,         //11
-    GT_EXPR,         //12
-    LE_EXPR,  //13
-    GE_EXPR,  //14
-    NE_EXPR,  //15
-    EQ_EXPR   //16
-
+    PLUS_EXPR,       //  1
+    MINUS_EXPR,      //  2 
+    BIT_AND_EXPR,    //  3 
+    BIT_IOR_EXPR,    //  4
+    MULT_EXPR,       //  5
+    TRUNC_DIV_EXPR,  //  6
+    TRUNC_MOD_EXPR,  //  7
+    BIT_XOR_EXPR,    //  8
+    LSHIFT_EXPR,     //  9
+    RSHIFT_EXPR,     // 10
+    LT_EXPR,         // 11
+    GT_EXPR,         // 12
+    LE_EXPR,         // 13
+    GE_EXPR,         // 14
+    NE_EXPR,         // 15
+    EQ_EXPR          // 16
 }lexercode_t;
 
 
@@ -105,8 +110,12 @@ extern int brace_count;
 // -- Prototypes --------
 //
 
-int lexer_initialize(void);  // Initialize
-int yylex(void);  // get stuff.
+// Initialize
+int lexer_initialize(void);
+
+// Get stuff.
+int yylex(void);
+
 void error(char *msg);
 
 //int check_newline ();
