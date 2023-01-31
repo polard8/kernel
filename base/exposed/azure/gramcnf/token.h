@@ -4,6 +4,66 @@
 #ifndef __TOKEN_H
 #define __TOKEN_H    1
 
+// ----------------------------------
+// keyword_found = Índice de keywords.
+// Keywords
+typedef enum {
+
+    KWNULL,
+
+// types
+    KWVOID,
+    KWCHAR,
+    KWSHORT,
+    KWINT,
+    KWLONG,
+    KWMETA,
+    KWDEF,
+    KWVAR,
+    KWLET,
+
+// name/content
+    KWNAME,
+    KWCONTENT,
+
+// modifiers
+    KWINLINE,
+    KWSTATIC,
+    KWVOLATILE,
+    KWSIGNED,
+    KWUNSIGNED,
+
+// switch/case/default
+    KWSWITCH,
+    KWCASE,
+    KWDEFAULT,
+
+//  if/else
+    KWIF,
+    KWELSE,
+
+//  do/while
+    KWDO,
+    KWWHILE,
+
+    KWFOR,
+    KWCONTINUE,
+
+    KWSTRUCT,
+    KWENUM,
+
+    KWUNION,
+    KWSIZEOF,
+    KWGOTO,
+    KWRETURN,
+
+    // ...
+
+}keywords_t;
+
+
+// ----------------------------------
+// value = token type.
 // Enumeração dos tipos de tokens.
 typedef enum {
 
@@ -18,10 +78,9 @@ typedef enum {
     TOKENSPECIAL,     // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
     TOKENQUALIFIER,   // static volatile ...
     TOKENMODIFIER,    // signed unsigned ...
-    
-    TOKENMETA,        // 'meta'
 
     TOKENTYPE,
+
     ARITHCOMPARE,
     EQCOMPARE,
     ASSIGN,           // =
@@ -35,27 +94,37 @@ typedef enum {
 
 }token_t;
 
-// Enumeração dos tipos de tokens.
+
+// ----------------------------------
+// type_found = Indice de tipo;
+// Enumeração dos tipos de dados.
 typedef enum {
 
     TNULL,
-    TINT,
     TVOID,
     TCHAR,
     TSHORT,
-    TLONG
+    TINT,
+    TLONG,
+    TMETA,
+    TDEF,
+    TVAR,
+    TLET,
     //...
 
 }types_t;
 
+
+// modifier_found - indice de modificador.
 // Enumeração dos modificadores.
 typedef enum {
-
     MNULL,
     MSIGNED,
-    MUNSIGNED
+    MUNSIGNED,
+    MINLINE,
+    MSTATIC,
+    MVOLATILE,
     //...
-
 }modifiers_t;
 
 // Enumeração dos qualificadores.
@@ -68,40 +137,6 @@ typedef enum {
 
 }qualifiers_t;
  
-// Keywords
-typedef enum {
-
-    KWNULL,
-    
-    KWMETA,
-    KWNAME,
-    KWCONTENT,
-
-    KWGOTO,
-    KWRETURN,
-    KWCONTINUE,
-    KWDEFAULT,
-    KWCASE,
-    KWSWITCH,
-    KWFOR,
-    KWDO,
-    KWWHILE,
-    KWELSE,
-    KWIF,
-    KWUNION,
-    KWSTRUCT,
-    KWENUM,
-    KWSIZEOF,
-    KWVOLATILE,
-    KWINLINE,
-    KWSTATIC,
-    KWDEF,          //não faz parte da linguagem c
-    KWVAR           //não faz parte da linguagem c 
-    // ...
-
-}keywords_t;
-
-
 // String s passadas para o parser.
 #define TOKENNULL_STRING        "N"
 #define TOKENKEYWORD_STRING     "KW"   // int while void.

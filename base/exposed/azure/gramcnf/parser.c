@@ -1729,6 +1729,12 @@ void dump_output_file(void)
 
 int parse(int dump_output)
 {
+// Stages:
+// 1: modifier, type, metatag, separator
+// 2: identifier.
+// 3: keyword.
+// 4: separator. Only ';'.
+
     int running = 1;
     register int token=0;
     int i=0;
@@ -1795,6 +1801,12 @@ int parse(int dump_output)
         // >> tipos
         // ...
         
+
+        // 1: modifier, type, metatag, separator
+        // 2: identifier.
+        // 3: keyword.
+        // 4: separator. Only ';'.
+        
         switch (State)
         {
             
@@ -1804,18 +1816,18 @@ int parse(int dump_output)
             case 1:
                 switch (token)
                 {
-                    case TOKENMODIFIER:
 
+                    case TOKENMODIFIER:
                         //#ifdef PARSER_VERBOSE
                         //continua pois precisamos pegar um tipo.
                         //#bugbug ??mas e se o modificar vir seguido de um simbolo ???
                         //printf("State1: TOKENMODIFIER={%s} line %d\n", 
                         //   real_token_buffer, lineno );
                         //#endif
-
                         State = 1;
                         //goto again;
                         break;
+
 
                     // TYPE
                     // >>> peekChar=) significa marcação de tipagem.
@@ -1828,18 +1840,18 @@ int parse(int dump_output)
 
                         // Save
                         id[ID_TYPE] = type_found;
+                        
+                        if (type_found == TMETA)
+                            printf ("TMETA found!\n");
+                        
                         // Depois de um type vem um identificador.
                         State = 2;
                         break;
 
-                    case TOKENMETA:
-                        //keyword_found
-                        printf ("TOKENMETA found!\n");
-                        State = 2;  // Depois de um 'meta' vem um identificador.
-                        break;
 
                     // #bugbug
-                    // e se o arquivo começar com um separador, então teremos problema.	
+                    // e se o arquivo começar com um separador, 
+                    // então teremos problema.
 
                     case TOKENSEPARATOR:
                         //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
@@ -1981,9 +1993,9 @@ int parse(int dump_output)
                     
                     case TOKENIDENTIFIER:
 
-//#ifdef PARSER_VERBOSE
-	//			        printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
-//#endif 
+                        //#ifdef PARSER_VERBOSE
+                        //    printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+                        //#endif 
 
                         id[ID_TOKEN] = TOKENIDENTIFIER;
                         id[ID_STACK_OFFSET] = stack_index;
