@@ -1,15 +1,10 @@
 /*
  * File: vsync.c
- *
- * Descrição:
  *     Sincronisa o retraço vertical.
- *
  *     Na hora de enviar os dados para o LFB é
  * necessário sincronizar com o retraço vertical do monitor.
- *
  *     Pertence ao hal.
  *     Não sei se pertence a x86. ???!!!
- *
  * History:
  *     2015 - Created by Fred Nora.
  */
@@ -20,9 +15,9 @@
 
 #define VSYNC_INPORT  0x3DA
 
+static char vsync_inb(int port);
 
-// Funções internas.
-char vsync_inb (int port);
+// ===============================
 
 // Called by hal_vsync
 void vsync (void)
@@ -55,13 +50,10 @@ void vsync (void)
 }
 
 
-/*
- * vsync_inb: 
- *     Pega um byte na porta. 
- */
-
-char vsync_inb (int port){
-
+// vsync_inb: 
+// Pega um byte na porta. 
+static char vsync_inb(int port)
+{
     char Value = 0;
 
     Value = (char) in8 (port); 

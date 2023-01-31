@@ -1327,6 +1327,12 @@ caller1(
     unsigned long function_address, 
     unsigned long data0 )
 {
+// #todo
+// + Maybe return 'unsigned long'.
+// + Maybe share data via shared memory
+//   using a big buffer for that.
+// + Maybe share the pointer of the buffer of a file.
+// ...
 
 // 32bit
     unsigned int x = (unsigned int) (data0 & 0xFFFFFFFF);
