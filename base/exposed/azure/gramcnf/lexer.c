@@ -498,34 +498,26 @@ again:
                 type_found = TLONG;
             }
 
-            if ( strncmp( real_token_buffer, "asm", 3 ) == 0 )
-            {
-                value = TOKENKEYWORD;
-                keyword_found = KWASM;
-            }
-
-            // #todo:
-            // Isso substituirá akeyword 'asm'
+            // meta
             if ( strncmp( real_token_buffer, "meta", 4 ) == 0 )
             {
-                value = TOKENKEYWORD;    //
-                keyword_found = KWASM;   //KMETA
+                value = TOKENMETA;
+                keyword_found = KWMETA;
             }
 
-            // #todo:
-            // Isso substituirá akeyword 'asm'
+
+            // name
             if ( strncmp( real_token_buffer, "name", 4 ) == 0 )
             {
-                value = TOKENKEYWORD;    //
-                keyword_found = KWASM;   //KMETA
+                value = TOKENKEYWORD;
+                keyword_found = KWNAME;
             }
 
-            // #todo:
-            // Isso substituirá akeyword 'asm'
+            // content
             if ( strncmp( real_token_buffer, "content", 7 ) == 0 )
             {
-                value = TOKENKEYWORD;    //
-                keyword_found = KWASM;   //KMETA
+                value = TOKENKEYWORD;
+                keyword_found = KWCONTENT;
             }
 
 

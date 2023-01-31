@@ -58,7 +58,11 @@ static int __parserInit(void);
 // Functions
 static int parse_function(int token);
 // Statements
-static int parse_asm(int token);
+
+// name/content
+static int parse_name(int token);
+static int parse_content(int token);
+
 static int parse_do(int token);
 static int parse_for(int token);
 static int parse_if(int token);
@@ -217,7 +221,7 @@ static int parse_function(int token)
 }
 
 // Parse asm statement.
-static int parse_asm(int token)
+static int parse_name(int token)
 {
 // #todo:
 // "asm" pode virar um visualizador de strings.
@@ -232,10 +236,10 @@ static int parse_asm(int token)
 
 // Se entramos errado.
     if (token != TOKENKEYWORD){
-        printf ("parse_asm: token error\n");  exit(1);
+        printf ("parse_name: token error\n");  exit(1);
     }
     if (token == TOKENKEYWORD){
-        // printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
+        // printf("parse_name: TOKENKEYWORD={%s} in line %d\n", 
         //     real_token_buffer, lineno );
     }
 
@@ -245,12 +249,12 @@ static int parse_asm(int token)
 
     c = yylex ();
     if (c != TOKENSEPARATOR){
-        printf("parse_asm: expected (\n");  exit(1);
+        printf("parse_name: expected (\n");  exit(1);
     }
     if (c == TOKENSEPARATOR){
         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
         {
-            // printf("parse_asm: TOKENKEYWORD={%s} in line %d\n", 
+            // printf("parse_name: TOKENKEYWORD={%s} in line %d\n", 
             //     real_token_buffer, lineno ); 
             //ok
             inside = 1;
@@ -264,7 +268,7 @@ static int parse_asm(int token)
 
     c = yylex();
     if (c != TOKENSTRING){
-        printf("parse_asm: expected string in asm("")\n");  exit(1);
+        printf("parse_name: expected string in name("")\n");  exit(1);
     }
     if (c == TOKENSTRING)
     {
@@ -278,11 +282,13 @@ static int parse_asm(int token)
         // para manipular strings por outros motivos.
         // Isso pode ser algum tipo de dado vindo 
         // de um arquivo de configuração.
-        printf ("asm-string: {%s}\n",
+        printf ("name-string: {%s}\n",
             real_token_buffer );
         
         
-        if (meta_stage == 0){
+        //Stage 0: Get the name string
+        if (meta_stage == 0)
+        {
             string_size = (size_t) strlen(real_token_buffer);
             if (string_size <= 0 ){
                 printf("string size min\n");
@@ -298,9 +304,13 @@ static int parse_asm(int token)
                 real_token_buffer,
                 string_size );
             metadata[meta_index].name_size = string_size;
+            
+            // Next stage.
             meta_stage++;
-
-        }else if(meta_stage == 1){
+        }
+        
+        /*
+        else if(meta_stage == 1){
             string_size = (size_t) strlen(real_token_buffer);
             if (string_size <= 0 ){
                 printf("string size min\n");
@@ -327,6 +337,7 @@ static int parse_asm(int token)
                 goto error0;
             }
         };
+        */
 
         // Coloca a string no arquivo de saída.
         strcat( outfile, real_token_buffer );
@@ -346,19 +357,173 @@ static int parse_asm(int token)
                 // ok
                 return (int) c;
             }
-            printf("parse_asm: expected ; in asm string\n");
+            printf("parse_name: expected ; in name string\n");
             exit(1);
         }
 
-        printf("parse_asm: expected ) in asm string\n");
+        printf("parse_name: expected ) in name string\n");
         exit(1);
     }
 
 error0:
-    printf ("parse_asm: todo unexpected error in asm string\n");
+    printf ("parse_name: todo unexpected error in name string\n");
     exit(1);
     return -1;
 }
+
+
+// Parse asm statement.
+static int parse_content(int token)
+{
+// #todo:
+// "asm" pode virar um visualizador de strings.
+
+    int c=0;
+    int running = 1;
+    int State = 1;
+    int inside = 0;
+
+    //debug
+    //printf("parse_asm: Initializing ...\n");
+
+// Se entramos errado.
+    if (token != TOKENKEYWORD){
+        printf ("parse_content: token error\n");  exit(1);
+    }
+    if (token == TOKENKEYWORD){
+        // printf("parse_content: TOKENKEYWORD={%s} in line %d\n", 
+        //     real_token_buffer, lineno );
+    }
+
+//
+// (
+//
+
+    c = yylex ();
+    if (c != TOKENSEPARATOR){
+        printf("parse_content: expected (\n");  exit(1);
+    }
+    if (c == TOKENSEPARATOR){
+        if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+        {
+            // printf("parse_content: TOKENKEYWORD={%s} in line %d\n", 
+            //     real_token_buffer, lineno ); 
+            //ok
+            inside = 1;
+        }
+    }
+
+//
+// String?
+// " .... "
+//
+
+    c = yylex();
+    if (c != TOKENSTRING){
+        printf("parse_content: expected string in content("")\n");  exit(1);
+    }
+    if (c == TOKENSTRING)
+    {
+        //if ( strncmp( (char *) real_token_buffer, "\"", 1 ) == 0 ){
+            //ok
+            //inside = 1;
+        //} 
+
+        // #test
+        // Visualizar a string, pois "asm" pode ser usado 
+        // para manipular strings por outros motivos.
+        // Isso pode ser algum tipo de dado vindo 
+        // de um arquivo de configuração.
+        printf ("content-string: {%s}\n",
+            real_token_buffer );
+        
+        
+        /*
+        if (meta_stage == 0){
+            string_size = (size_t) strlen(real_token_buffer);
+            if (string_size <= 0 ){
+                printf("string size min\n");
+                goto error0;
+            }
+            if (string_size >= 64 ){
+                printf("string size max\n");
+                goto error0;
+            }
+            memset(metadata[meta_index].name, 0, 64);
+            strncpy(
+                metadata[meta_index].name,
+                real_token_buffer,
+                string_size );
+            metadata[meta_index].name_size = string_size;
+            meta_stage++;
+
+        }else 
+        */
+        
+        //Stage 1: Get the content string
+        if(meta_stage == 1)
+        {
+            string_size = (size_t) strlen(real_token_buffer);
+            if (string_size <= 0 ){
+                printf("string size min\n");
+                goto error0;
+            }
+            if (string_size >= 128 ){
+                printf("string size max\n");
+                goto error0;
+            }
+            memset(metadata[meta_index].content, 0, 128);
+            strncpy(
+                metadata[meta_index].content,
+                real_token_buffer,
+                string_size );
+            metadata[meta_index].content_size = string_size;
+            metadata[meta_index].initialized = TRUE;
+            
+            //so muda de index depois de 2 strings
+            meta_index++;
+            if (meta_index >= 32){
+                printf("meta_index limits\n");
+                goto error0;
+            }
+
+            // Come back to first stage.
+            meta_stage=0;
+        }
+
+        // Coloca a string no arquivo de saída.
+        strcat( outfile, real_token_buffer );
+        // Ao fim da string vamos para a próxima linha do output file
+        strcat( outfile,"\n");
+
+        c = yylex();
+
+        //)
+        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0 )
+        {
+            inside = 0;
+            c = yylex();
+            // ;
+            if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
+            {
+                // ok
+                return (int) c;
+            }
+            printf("parse_content: expected ; in content string\n");
+            exit(1);
+        }
+
+        printf("parse_content: expected ) in content string\n");
+        exit(1);
+    }
+
+error0:
+    printf ("parse_content: todo unexpected error in comtent string\n");
+    exit(1);
+    return -1;
+}
+
+
 
 // Parse do statement.
 static int parse_do(int token)
@@ -1641,68 +1806,68 @@ int parse(int dump_output)
                 {
                     case TOKENMODIFIER:
 
-//#ifdef PARSER_VERBOSE
-						//continua pois precisamos pegar um tipo.
-						//#bugbug ??mas e se o modificar vir seguido de um simbolo ???
-	//					printf("State1: TOKENMODIFIER={%s} line %d\n", 
-	//					    real_token_buffer, lineno );
-//#endif
+                        //#ifdef PARSER_VERBOSE
+                        //continua pois precisamos pegar um tipo.
+                        //#bugbug ??mas e se o modificar vir seguido de um simbolo ???
+                        //printf("State1: TOKENMODIFIER={%s} line %d\n", 
+                        //   real_token_buffer, lineno );
+                        //#endif
 
-						State = 1;
-						//goto again;
-						break;
+                        State = 1;
+                        //goto again;
+                        break;
 
-
-					// TYPE
-					// >>> peekChar=) significa marcação de tipagem.
-					// >>> peekSymbol=symbol  significa declaração de variável ou função.
+                    // TYPE
+                    // >>> peekChar=) significa marcação de tipagem.
+                    // >>> peekSymbol=symbol  significa declaração de variável ou função.
                     case TOKENTYPE:
 
-//#ifdef PARSER_VERBOSE
-	//		            printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
-//#endif
+                    //#ifdef PARSER_VERBOSE
+                    //  printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
+                    //#endif
 
+                        // Save
                         id[ID_TYPE] = type_found;
-
-						//depois de um type vem um identificador.
-						State = 2;
+                        // Depois de um type vem um identificador.
+                        State = 2;
                         break;
-						
-						
-					// #bugbug	
-					// e se o arquivo começar com um separador, então teremos problema.	
 
+                    case TOKENMETA:
+                        //keyword_found
+                        printf ("TOKENMETA found!\n");
+                        State = 2;  // Depois de um 'meta' vem um identificador.
+                        break;
+
+                    // #bugbug
+                    // e se o arquivo começar com um separador, então teremos problema.	
 
                     case TOKENSEPARATOR:
-
-					    //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
-					
-						// ( função
-						if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
+                        //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
+                        // ( função
+                        if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
-						    // printf ("State2: SEP={%s} line %d\n", real_token_buffer, lineno );
+                            // printf ("State2: SEP={%s} line %d\n", real_token_buffer, lineno );
                             // printf ("[PAR] line %d\n", lineno ); 
-							parentheses_inside++;
+                            parentheses_inside++;
+                            //#test
+                            //peekChar = c;
+                            //tentando mandar alguma coisa para o arquivo de output 
+                            //pra ter o que salvar, pra construir o assembly file;	
+                            // strcat( outfile,"\n segment .text \n");
+                            strcat( outfile,"_");
+                            strcat( outfile,save_symbol);
+                            strcat( outfile,":\n");
+                            //recomeçar a lista. 
+                            //#bugbug desconsiderando o modificador.
+                            State = 1;
+                            break;
+                        }
 
-								//#test
-								//peekChar = c;
-								
-						        //tentando mandar alguma coisa para o arquivo de output 
-						        //pra ter o que salvar, pra construir o assembly file;	
-						       // strcat( outfile,"\n segment .text \n");
-						    strcat( outfile,"_");
-						    strcat( outfile,save_symbol);
-						    strcat( outfile,":\n");
-								
-								//recomeçar a lista. 
-								//#bugbug desconsiderando o modificador.
-							State = 1;
-							break;
-						}
-						
-						//entramos no corpo da função.
-						if ( strncmp( (char *) real_token_buffer, "{", 1 ) == 0  )
-						{
+                        // '{'
+                        // Entramos no corpo da função.
+                        // Curly bracket
+                        if ( strncmp( (char *) real_token_buffer, "{", 1 ) == 0  )
+                        {
 							//printf ("State1: separator={%s} line %d\n", real_token_buffer, lineno ); 
 							printf ("[BRACE] line %d\n", lineno); 
 							braces_inside++;
@@ -1713,9 +1878,10 @@ int parse(int dump_output)
 							break;
 						}
 
-					    //fechando UM parênteses, provavelmente sem nada dentro.
-					    if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
-						{
+                        // ')'
+                        // Fechando UM parênteses, provavelmente sem nada dentro.
+                        if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
+                        {
 						    if ( parentheses_inside > 0 )
 							{
 								//printf("[/PAR] line %d\n", lineno);
@@ -1727,10 +1893,12 @@ int parse(int dump_output)
 							}
 						}
 
-                        //fechando UM corpo de função. 
-				        if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
+                        // '}'
+                        // Fechando UM corpo de função. 
+                        // Curly bracket
+                        if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
                         {
-							printf ("[/BRACE] line %d\n", lineno);
+                            printf ("[/BRACE] line %d\n", lineno);
 
                             if (braces_inside > 0)
                             {
@@ -2081,17 +2249,30 @@ int parse(int dump_output)
                             break;
                         }
 
-                        // STMT: asm
-                        if (keyword_found == KWASM)
+                        //-------------------------
+                        // STMT: 'name'
+                        if (keyword_found == KWNAME)
                         {
-                            //printf ("State3: TOKENKEYWORD={%s} KWASM in line %d \n", 
+                            //printf ("State3: TOKENKEYWORD={%s} KWNAME in line %d \n", 
                             //    real_token_buffer, lineno );
-                            parse_asm(TOKENKEYWORD);
-                            // load_asm();
+                            parse_name(TOKENKEYWORD);
                             //recomeçamos
                             State = 1;
                             break;
                         }
+
+                        //-------------------------
+                        // STMT: 'content'
+                        if (keyword_found == KWCONTENT)
+                        {
+                            //printf ("State3: TOKENKEYWORD={%s} KWCONTENT in line %d \n", 
+                            //    real_token_buffer, lineno );
+                            parse_content(TOKENKEYWORD);
+                            //recomeçamos
+                            State = 1;
+                            break;
+                        }
+
 
                         //...
 

@@ -1,8 +1,8 @@
 
     Usage
-    
-    $ #gramcnf -o test1.cpp --stats  
 
+    $ #gramcnf -o test1.cnf --stats  
+    $ #gramcnf -o test1.cpp --stats  
 ----------------------------------
 Lê duas entradas e coloca numa estrutura.
 No fim teremos muitas estruturas.

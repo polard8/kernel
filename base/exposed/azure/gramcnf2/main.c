@@ -126,6 +126,23 @@ static void debugShowStat(void)
     printf("infile_size:     {%d bytes}\n",infile_size);
     printf("outfile_size:    {%d bytes}\n",outfile_size);
 //#endif
+
+    printf("\n");
+    printf("==========================================\n");
+
+    int i=0;
+    for (i=0; i<32; i++)
+    {
+        if (metadata[i].initialized == TRUE)
+        {
+            printf("\n");
+            printf("name{%s}\n",metadata[i].name); 
+            printf("content{%s}\n",metadata[i].content);
+        }
+    };
+
+    printf("\n");
+    printf("==========================================\n");
 }
 
 //

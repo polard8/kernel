@@ -4,6 +4,9 @@
 #include "gramcnf.h"
 
 
+struct metadata_d  metadata[32];
+
+
 // -- Counters --------
 // Contador para não estourar a lista. 
 int keyword_count=0;

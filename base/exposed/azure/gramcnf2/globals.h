@@ -4,6 +4,21 @@
 #ifndef __GLOBALS_H
 #define __GLOBALS_H    1
 
+// We need 2 asm statement inside a block {} to fill
+// a single structure.
+struct metadata_d
+{
+    int id;
+    int initialized;
+
+    char name[64];
+    int name_size;
+
+    char content[128];
+    int content_size;
+};
+extern struct metadata_d  metadata[32];
+
 // Contador para não estourar a lista. 
 extern int keyword_count; 
 extern int identifier_count; 

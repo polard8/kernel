@@ -18,6 +18,9 @@ typedef enum {
     TOKENSPECIAL,     // O resto. $ # & <= >= -= += ! && || ++ -- \" \' ...
     TOKENQUALIFIER,   // static volatile ...
     TOKENMODIFIER,    // signed unsigned ...
+    
+    TOKENMETA,        // 'meta'
+
     TOKENTYPE,
     ARITHCOMPARE,
     EQCOMPARE,
@@ -69,7 +72,11 @@ typedef enum {
 typedef enum {
 
     KWNULL,
-    KWASM,
+    
+    KWMETA,
+    KWNAME,
+    KWCONTENT,
+
     KWGOTO,
     KWRETURN,
     KWCONTINUE,
