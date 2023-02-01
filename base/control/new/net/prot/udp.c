@@ -4,11 +4,11 @@
 #include <kernel.h>
 
 
-#define __UDP_PACKE_SIZE  ETHERNET_HEADER_LENGHT +\
+#define __UDP_PACKET_SIZE  ETHERNET_HEADER_LENGHT +\
 IP_HEADER_LENGHT +\
 UDP_HEADER_LENGHT + 512  
 
-char udp_packet[__UDP_PACKE_SIZE];
+char udp_packet[__UDP_PACKET_SIZE];
 char udp_payload[1024];
 
 // source ip
@@ -113,12 +113,13 @@ network_send_udp (
     register int i=0;
     int j=0;
 
-// ethernet, ipv4, udp.
+// BUffers:
+// ethernet, ipv4, udp, data.
     struct ether_header  *eh;
     struct ip_d  *ipv4;
     struct udp_d  *udp;
-
     char *data = (char *) data_buffer;
+
 
     if ( (void*) data == NULL ){
         printf ("network_send_udp: Invalid data buffer\n");
@@ -133,6 +134,7 @@ network_send_udp (
 
 // Configurando a estrutura do dispositivo.
 // 192.168.1.112
+// Not used?
     currentNIC->ip_address[0] = source_ip[0];  //192;
     currentNIC->ip_address[1] = source_ip[1];  //168;
     currentNIC->ip_address[2] = source_ip[2];  //1;
@@ -159,8 +161,7 @@ network_send_udp (
         eh->mac_dst[i] = (uint8_t) currentNIC->mac_address[i];  // source 
         eh->mac_src[i] = (uint8_t) target_mac[i];               // dest
     };
-    eh->type = (uint16_t) ToNetByteOrder16 (ETH_TYPE_ARP);
-// ...
+    eh->type = (uint16_t) ToNetByteOrder16 (ETH_TYPE_IP);
 
 //==============================================
 // # ipv4 header #
@@ -175,40 +176,81 @@ network_send_udp (
 // See: ip.h
 
 //>>>>
-    ipv4->v_hl = 0x45;       // 8 bit
-    ipv4->ip_tos    = 0x00;  // 8 bit
+    ipv4->v_hl = 0x45;    // 8 bit
+    ipv4->ip_tos = 0x00;  // 8 bit
 
+// Total Length
 // 16 bit
-    ipv4->ip_len = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512);
+// This 16-bit field defines the entire packet size in bytes, 
+// including header and data. 
+// The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. 
+// ip header + udp header + data.
+// #todo: Check if it is right?
+// No payload do ip temos o (udp+data)
+    unsigned short iplen = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512); 
+    ipv4->ip_len = (unsigned short) ToNetByteOrder16(iplen);
 
-    ipv4->ip_id = 0x0100;    // 16 bit 
+// Identification
+// ... identifying the group of fragments of a single IP datagram. 
+// 16 bit
+    uint16_t ipv4count = 1; 
+    //ipv4->ip_id = 0x0100;
+    ipv4->ip_id = (uint16_t) ToNetByteOrder16(ipv4count);
 
+  //16 bit   //bits  0b01000;
+    ipv4->ip_off = 0x0000;  //0x8
+
+    ipv4->ip_ttl = 0x40;  //8bit
+
+
+// Protocol
+// 8bit
+// IPV4_PROT_UDP; 17 = udp.
 //>>>>
 // #importante
 // Existem varios protocolos para ip.
 // TCP=0x6 UDP=0x11
 //default protocol: UDP
 //#define IPV4_PROT_UDP 0x11
-    ipv4->ip_off = 0x0000;  //16 bit
-    
-    ipv4->ip_ttl = 0x40;              //8bit
-    ipv4->ip_p = 0x11;    //IPV4_PROT_UDP;  // 8bit
-    //ipv4->ip_sum                      // 16bit
+    ipv4->ip_p = 0x11;
 
-//>>>>
+// 16bit
+    ipv4->ip_sum = 0;
+/*
+    uint32_t checksum = 0;
+    checksum += 0x4500;
+    checksum += length;
+    checksum += ipv4count++;
+    checksum += 0x4000;
+    checksum += 0x4000 + protocol;
+    checksum += ToNetByteOrder16((from >> 16) & 0xFFFF);
+    checksum += ToNetByteOrder16(from & 0xFFFF); 
+    checksum += ToNetByteOrder16((to >> 16) & 0xFFFF);
+    checksum += ToNetByteOrder16(to & 0xFFFF);
+    checksum = (checksum >> 16) + (checksum & 0xffff);
+    checksum += (checksum >> 16);
+    ipv4->ip_sum = ToNetByteOrder16((uint16_t) (~checksum));
+*/
+
+// src ip
+// #bugbug: Esta na ordem certa?
     memcpy ( 
-        (void *) ipv4->ip_src.s_addr, 
+        (void *) &ipv4->ip_src.s_addr, 
         (const void *) &source_ip[0], 
         4 );
+    //ipv4->ip_src.s_addr = (unsigned int) ToNetByteOrder32(ipv4->ip_src.s_addr);
 
-//>>>>
+// dst ip
+// #bugbug: Esta na ordem certa?
     memcpy ( 
-        (void *) ipv4->ip_dst.s_addr, 
+        (void *) &ipv4->ip_dst.s_addr, 
         (const void *) &target_ip[0], 
         4 );
+    //ipv4->ip_dst.s_addr = (unsigned int) ToNetByteOrder32(ipv4->ip_dst.s_addr);
 
-
-
+    //printf ("ip %x\n", ipv4->ip_dst.s_addr);
+    //refresh_screen();
+    //while(1){}
 
 //==============================================
 // # udp header #
@@ -238,15 +280,19 @@ network_send_udp (
 //143 IMAP2 Interim Mail Access Prot. v2
 //161 SNMP Simple Network Man. Prot.
 
-    udp->uh_sport = 20;  //FTP-DATA File Transfer
-    udp->uh_dport = 20;  //FTP-DATA File Transfer
+    uint16_t UDP_PORT = 34884;
 
+// src
+    udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
+// dst
+    udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
 
 // Length
 // This field specifies the length in bytes of the UDP header and UDP data. 
 //This field specifies the length in bytes of the UDP header and UDP data. 
 //The minimum length is 8 bytes, the length of the header. 
-    udp->uh_ulen = (UDP_HEADER_LENGHT + 512); 
+    uint16_t __udplen = (UDP_HEADER_LENGHT + 512); 
+    udp->uh_ulen = (uint16_t) ToNetByteOrder16(__udplen);
 
 // Checksum
 // #remember:
@@ -296,102 +342,58 @@ network_send_udp (
 
 //Step1
 //copia o header ethernet
-    for ( j=0; j<ETHERNET_HEADER_LENGHT; j++ ){
-        buffer[j] = src_ethernet[j];
+    int eth_offset=0;
+    for ( j=0; j<ETHERNET_HEADER_LENGHT; j++ )
+    {
+        buffer[eth_offset +j] = src_ethernet[j];
     };
 
 //Step2
 //copia o ipv4
-    for ( j=0; j<IP_HEADER_LENGHT; j++ ){
-        buffer[j + ETHERNET_HEADER_LENGHT] = src_ipv4[j];
+    int ipv4_offset = ETHERNET_HEADER_LENGHT;
+    for ( j=0; j<IP_HEADER_LENGHT; j++ )
+    {
+        buffer[ipv4_offset +j] = src_ipv4[j];
     };
 
 //Step3
 //copia o udp
+    int udp_offset = ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT;
     for ( j=0; j<UDP_HEADER_LENGHT; j++ ){
-        buffer[j + ETHERNET_HEADER_LENGHT +IP_HEADER_LENGHT] = src_udp[j];
+        buffer[udp_offset +j] = src_udp[j];
     };
 
 //Step4
 //copia o xxxdata
-    for ( j=0; j<32; j++ ){
-        buffer[j + ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT + UDP_HEADER_LENGHT] = 
-            data[j];
+    int data_offset = 
+            ( ETHERNET_HEADER_LENGHT +
+              IP_HEADER_LENGHT +
+              UDP_HEADER_LENGHT );
+    for ( j=0; j<512; j++ ){
+        buffer[data_offset +j] = data[j];
     };
 
-
+ 
+// ---------------------------------------
+// send
 // lenght:
 // Vamos configurar na estrutura do nic intel o tamanho do pacote.
 // Lenght de um pacote ipv4.
 // ethernet header, ipv4 header, udp header, data.
-    //unsigned int lenght = __UDP_PACKE_SIZE;
-    
-
-
-// send
-    e1000_send( currentNIC, __UDP_PACKE_SIZE, buffer );
-
-
-//cmd
-    //currentNIC->legacy_tx_descs[old].cmd = 0x1B;
-//status
-    //currentNIC->legacy_tx_descs[old].status = 0;
-// Current TX.
-// Qual � o buffer atual para transmiss�o.
-    //currentNIC->tx_cur = ( currentNIC->tx_cur + 1 ) % 8;
-
-//
-// ==== # SEND # ======
-//
-
-// #importante: 
-// Diga ao controlador qual � o �ndice do descritor a ser usado para  
-// transmitir dados.
-// TDH	= 0x3810,    /* Tx Descriptor Head */
-// TDT	= 0x3818,    /* Tx Descriptor Tail */
-
-	// *( (volatile unsigned int *)(currentNIC->mem_base + 0x3810)) = 0;
-   // *( (volatile unsigned int *)(currentNIC->mem_base + 0x3818)) = currentNIC->tx_cur;
-
-// #debug
-// Colocamos essa mensagem antes de entrarmos no while.
-// Pois precisamos implementar algum contador no while para n�o
-// ficarmos preso nele pra sempre.
-    //printf ("network_SendIPV4_UDP: Sending UDP/IP. *debug *while\n");
-    //refresh_screen ();
-
-// #perigo:
-// Status.
-// Checamos o status do buffer old pra ver se ele foi enviado.
-// Fica travado aqui at� que seja enviado?
-// Poderia ter um timemout?.
-
-    //int t;
-    //for (t=0; t< 25000;t++)
-   // {
-     //    if ( (currentNIC->legacy_tx_descs[old].status & 0xFF) == 1 )
-       //  {
-         //     printf ("Ok");
-           //   debug_print ("network_SendIPV4_UDP: done\n");
-             // return 0;
-         //}
-    //}
-
-    //#todo
-    //while ( !(currentNIC->legacy_tx_descs[old].status & 0xFF) )
-    //{
-        // Nothing.
-    //};
-        
-    //printf (">>>> fail timeout\n");
-    //debug_print ("network_SendIPV4_UDP: timeout\n");
-    //debug_print ("network_SendIPV4_UDP: done\n");
-
-// done:
-    printf("Done\n");
+// 14 + 20 + 6 + 512 = 552.
+    size_t UDP_TOTAL_SIZE = 
+               ( ETHERNET_HEADER_LENGHT +\
+                 IP_HEADER_LENGHT +\
+                 UDP_HEADER_LENGHT +\
+                 512 );  
+    e1000_send( currentNIC, UDP_TOTAL_SIZE, buffer );
+    printf ("Done\n");
+    refresh_screen();
     return 0;
+
 fail:
-    printf("Fail\n");
+    printf ("Fail\n");
+    refresh_screen();
     return -1;
 }
 

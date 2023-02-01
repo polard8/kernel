@@ -123,39 +123,32 @@ network_on_receiving (
         (unsigned short) eth->type);
 */
 
-
+    int Show=FALSE;
     Type = (uint16_t) FromNetByteOrder16(eth->type);
 
     switch (Type){
-    case ETHERTYPE_IPv4: //0x0800:
-        printf ("[0x0800]: IPV4 received\n");
+    case ETHERTYPE_IPv4:
+        Show=TRUE;
         network_handle_ipv4(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
         break;
-    case ETHERTYPE_ARP:  //0x0806:
-        printf ("[0x0806]: ARP received\n");
+    case ETHERTYPE_ARP:
+        Show=TRUE;
         network_handle_arp(
             (buffer + ETHERNET_HEADER_LENGHT),
             size );
         break;
-    //case 0x814C:
-    //    printf ("[0x814C]: SNMP received\n");
-    //    break;
-    case ETHERTYPE_IPv6: //0x86DD:
-        printf ("[0x86DD]: IPV6 received\n");
-        break;
-    //case 0x880B:
-    //    printf ("[0x880B]: PPP received\n");
-    //    break;
+    // ...
+    //case ETHERTYPE_IPv6:
     default:
-        printf ("Default type\n");
+        // printf ("Default type\n");
         break;
     };
 
-    refresh_screen();
+    if (Show)
+        refresh_screen();
 }
-
 
 // in: (Do buffer indicado para o buffer tail)
 // Isso é usado pelo driver de dispositivo

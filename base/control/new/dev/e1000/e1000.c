@@ -1086,6 +1086,10 @@ e1000_send(
     if (len > E1000_DEFAULT_BUFFER_SIZE)
         panic("e1000_send: len\n");
 
+    if ( (void*) data == NULL )
+        panic("e1000:_send: data\n");
+
+
 // current descriptor
     old = d->tx_cur;
     if (old >= SEND_BUFFER_MAX){
@@ -1109,6 +1113,7 @@ e1000_send(
 // status
     d->legacy_tx_descs[old].status = (uint8_t) 0;
 
+// Circula
 // Configura qual vai ser o proximo
     d->tx_cur = (uint16_t) ((d->tx_cur + 1) % 8);
     __E1000WriteCommand( d, 0x3818, d->tx_cur );
@@ -1123,6 +1128,7 @@ e1000_send(
 // done
     return;
 fail:
+
     refresh_screen();
     return;
 }

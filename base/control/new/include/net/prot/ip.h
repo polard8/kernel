@@ -27,7 +27,6 @@
 
 #define IP_HEADER_LENGHT  20
 
-
 // ipv4
 // Lenght = 20 bytes
 struct ip_d

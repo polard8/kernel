@@ -19,6 +19,7 @@ network_handle_ipv4(
     ip = (struct ip_d *) buffer;
 
     printf("network_handle_ipv4: ==== IP ====\n");
+    // printf ("[0x0800]: IPV4 received\n");
 
     if ( (void*) ip == NULL ){
         printf("network_handle_ipv4: ip\n");

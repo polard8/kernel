@@ -313,10 +313,26 @@ editorProcedure(
     //case 8888:
         //break;
 
+    // #todo: It destroys the window.
     case MSG_CLOSE:
         printf ("editor.bin: MSG_CLOSE\n");
         exit(0);
         break;
+    
+    
+    // After a resize event.
+    //case MSG_SIZE:
+        //break;
+
+
+    //case MSG_CREATE: 
+        // Initialize the window. 
+        //return 0; 
+ 
+    //case MSG_PAINT: 
+        // Paint the window's client area. 
+        //return 0; 
+
     //...
     
     default:

@@ -30,6 +30,7 @@ network_handle_arp(
     ar = (struct ether_arp *) buffer;
 
     printf("network_handle_arp: ==== ARP ====\n");
+    //printf ("[0x0806]: ARP received\n");
 
     if ( (void*) ar == NULL ){
         printf("network_handle_arp: ar\n");
@@ -234,13 +235,12 @@ network_send_arp(
 
 // ======================
 // Sending via e1000 api.
-
     // 14 + 28 = 42
-    ssize_t ARP_TOTAL_SIZE = 
-        ( ETHERNET_HEADER_LENGHT + ARP_HEADER_LENGHT );
-
+    size_t ARP_TOTAL_SIZE = 
+        ( ETHERNET_HEADER_LENGHT + \
+          ARP_HEADER_LENGHT );
     e1000_send( currentNIC, ARP_TOTAL_SIZE, buffer );
-
+    printf ("Done\n");
     refresh_screen();
     return;
 

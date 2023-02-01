@@ -9,13 +9,15 @@
 // Its a good choice using hexa instead of integer.
 // We need to change it in the whole system.
 
-// window messages.
-// 
+//
+// Window messages.
+//
+
 //window (1-19)  
 #define MSG_CREATE        1
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 
-#define MSG_SIZE          4
+#define MSG_SIZE          4  // Sent to an app after a resize operation. 
 #define MSG_RESIZE        5
 //#define MSG_OPEN        6
 #define MSG_CLOSE         7
@@ -109,6 +111,8 @@
 #define MSG_MOUSE_DRAG            61
 #define MSG_MOUSE_DROP            62
 //...
+
+
 
 //  terminal commands
 #define MSG_TERMINALCOMMAND      100
