@@ -461,6 +461,7 @@ static int do_event_loop(int fd)
 
         e = (struct gws_event_d *) gws_get_next_event(
                 fd, 
+                __main_window,
                 (struct gws_event_d *) &lEvent );
 
         if ( (void *) e != NULL )

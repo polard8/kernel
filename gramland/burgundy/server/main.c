@@ -167,7 +167,6 @@ static void __init_ws_structure(void);
 static int
 gwsProcedure (
     int client_fd,
-    struct gws_window_d *window,
     int msg,
     unsigned long long1,
     unsigned long long2 );
@@ -833,7 +832,6 @@ static void dispacher(int fd)
     Status = 
         (int) gwsProcedure (
                   (int) fd,
-                  (struct gws_window_d *) message_buffer[0], 
                   (int)                   message_buffer[1],
                   (unsigned long)         message_buffer[2],
                   (unsigned long)         message_buffer[3] );
@@ -954,7 +952,6 @@ exit0:
 static int
 gwsProcedure ( 
     int client_fd,
-    struct gws_window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -1171,14 +1168,12 @@ gwsProcedure (
 
 // The server will return an event from the its client's event queue.
     case GWS_GetNextEvent:
-        
         //#debug
         //gwssrv_debug_print ("gwssrv: [2031] serviceNextEvent\n");
-        
         serviceNextEvent();
         NoReply = FALSE; // Yes. We need a reply.
         break;
-    
+
     // See: grprim.c
     case GWS_GrPlot0:  
         //gwssrv_debug_print ("gwssrv: [2040] serviceGrPlot0\n");
@@ -1566,15 +1561,29 @@ int serviceClientEvent(void)
 // que pertencem ao cliente que chamou esse serviço.
 int serviceNextEvent(void)
 {
-// Window with focus.
-    struct gws_window_d *focus_w;
+// #test
+// Get the window in the queue of a given window.
+// #old from Window with focus.
+
+
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+
+    struct gws_window_d *w;
     register int Head=0;
 
-    focus_w = (struct gws_window_d *) get_focus();    
-    if( (void*) focus_w==NULL ){
+    // Get the window id
+    int wid = (int) ( message_address[0] & 0xFFFFFFFF );
+    if (wid<0 || wid>=WINDOW_COUNT_MAX)
+        goto fail;
+
+    // Get the pointer
+    //#old focus_w = (struct gws_window_d *) get_focus();    
+    w = (void *) windowList[wid];
+
+    if ( (void*) w==NULL ){
         goto fail;
     }
-    if(focus_w->magic != 1234){
+    if (w->magic != 1234){
         goto fail;
     }
 
@@ -1582,28 +1591,28 @@ int serviceNextEvent(void)
 // It will be sent in the socket loop.
 
 //header
-    next_response[0] = 0;  //
+    next_response[0] = 0;
     next_response[1] = SERVER_PACKET_TYPE_EVENT;  //msg type
     next_response[2] = 1234;  //signature
     next_response[3] = 5678;  //signature
 // Index
-    Head = (int) (focus_w->ev_head & 0xFFFFFFFF);
+    Head = (int) (w->ev_head & 0xFFFFFFFF);
 // The message packet.
 // wid, msg=(event type), data1, data2.
-    next_response[4] = (unsigned long) focus_w->ev_wid[Head];
-    next_response[5] = (unsigned long) focus_w->ev_msg[Head];
-    next_response[6] = (unsigned long) focus_w->ev_long1[Head];
-    next_response[7] = (unsigned long) focus_w->ev_long2[Head];
+    next_response[4] = (unsigned long) w->ev_wid[Head];
+    next_response[5] = (unsigned long) w->ev_msg[Head];
+    next_response[6] = (unsigned long) w->ev_long1[Head];
+    next_response[7] = (unsigned long) w->ev_long2[Head];
 // Round
-    focus_w->ev_head++;
-    if (focus_w->ev_head >= 32){
-        focus_w->ev_head=0;
+    w->ev_head++;
+    if (w->ev_head >= 32){
+        w->ev_head=0;
     }
 // Clean
-    focus_w->ev_wid[Head] = 0;
-    focus_w->ev_msg[Head] = 0;
-    focus_w->ev_long1[Head] = 0;
-    focus_w->ev_long2[Head] = 0;
+    w->ev_wid[Head] = 0;
+    w->ev_msg[Head] = 0;
+    w->ev_long1[Head] = 0;
+    w->ev_long2[Head] = 0;
 // Done
     return 0;
 // Fail
@@ -2026,6 +2035,11 @@ int serviceAsyncCommand(void)
         wm_reboot();
         //rtl_reboot();
         goto done;
+        break;
+
+    // Destroy overlapped window.
+    case 90:
+        printf("90: Destroy overlapped window %d\n",data);
         break;
 
     //#todo: Destroy window.

@@ -81,6 +81,11 @@ browserProcedure(
 
     switch (event_type){
 
+    case MSG_CLOSE:
+        printf ("browser.bin: MSG_CLOSE\n");
+        exit(0);
+        break;
+
     // Evento de teste.
     case 1000:
         // If the event window is the main window, so
@@ -162,6 +167,7 @@ static int do_event_loop(int fd)
 
         e = (struct gws_event_d *) gws_get_next_event(
                 fd, 
+                __main_window,
                 (struct gws_event_d *) &lEvent );
 
         if ( (void *) e != NULL )
@@ -364,9 +370,7 @@ int main( int argc, char *argv[] )
     gws_set_focus( client_fd, client_window );
     gws_set_active( client_fd, main_window );
 
-
 // Call the event loop.
-
     return (int) do_event_loop(client_fd);
 }
 

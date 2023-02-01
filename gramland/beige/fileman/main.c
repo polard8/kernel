@@ -90,6 +90,8 @@ static int fileman_init_windows(void);
 static int barInputChar(int c);
 static int barCompareStrings(void);
 
+static int do_event_loop(int fd);
+
 // ================
 
 static int fileman_init_globals(void)
@@ -218,7 +220,19 @@ filemanProcedure(
     switch (msg)
     {
 
-// keydown
+        case MSG_CLOSE:
+            printf ("fileman.bin: MSG_CLOSE\n");
+            // Destroy overlapped window.
+            gws_async_command (
+                fd,
+                90,     //request
+                0,      //sub-request
+                wid );  //data
+                
+            exit(0);
+            break;
+            
+        // keydown
         case MSG_KEYDOWN:
             switch(long1)
             {
@@ -282,6 +296,61 @@ filemanProcedure(
             break;
     };
 
+    return 0;
+}
+
+
+static int do_event_loop(int fd)
+{
+    if(fd<0)
+        return -1;
+
+// #test
+// pegando um evento com o ws.
+// See: libgws/
+
+    struct gws_event_d lEvent;
+    lEvent.used = FALSE;
+    lEvent.magic = 0;
+    lEvent.type = 0;
+    lEvent.long1 = 0;
+    lEvent.long2 = 0;
+
+    struct gws_event_d *e;
+
+// loop
+// Call the local window procedure 
+// if a valid event was found.
+
+    while (1)
+    {
+        //if (isTimeToQuit == TRUE)
+            //break;
+
+        e = (struct gws_event_d *) gws_get_next_event(
+                fd, 
+                Main_window,
+                (struct gws_event_d *) &lEvent );
+
+        if ( (void *) e != NULL )
+        {
+            //if( e->used == TRUE && e->magic == 1234 )
+            if (e->magic == 1234)
+            {
+                //browserProcedure( 
+                //    fd, e->window, e->type, e->long1, e->long2 );
+
+                filemanProcedure ( 
+                    (int) fd,
+                    (int) e->window, 
+                    (int) e->type, 
+                    (unsigned long) e->long1, 
+                    (unsigned long) e->long2 );
+            }
+        }
+    };
+
+// Exit application withou error.
     return 0;
 }
 
@@ -774,6 +843,10 @@ int main ( int argc, char *argv[] )
 // use the thread's queue
     rtl_focus_on_this_thread();
 
+// Call the event loop.
+    return (int) do_event_loop(client_fd);
+
+/*
     while (1){
         if ( rtl_get_event() == TRUE )
         {
@@ -792,6 +865,9 @@ int main ( int argc, char *argv[] )
             RTLEventBuffer[1] = 0;
         }
     };
+*/
+
+
 
 // force hang
     while(1){

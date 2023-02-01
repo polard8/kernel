@@ -179,7 +179,11 @@ struct gws_window_info_d *gws_get_window_info(
     struct gws_window_info_d *window_info );
 
 // The server will return an event from the its client's event queue.
-struct gws_event_d *gws_get_next_event(int fd, struct gws_event_d *event);
+struct gws_event_d *
+gws_get_next_event(
+    int fd, 
+    int wid,
+    struct gws_event_d *event );
 
 // Refresh a window.
 int gws_refresh_window (int fd, wid_t wid );

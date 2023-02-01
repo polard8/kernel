@@ -92,7 +92,7 @@ static struct gws_window_info_d *__gws_get_window_info_response(
     struct gws_window_info_d *window_info );
 
 // == Get next event ==========================
-static int __gws_get_next_event_request(int fd);
+static int __gws_get_next_event_request(int fd,int wid);
 static struct gws_event_d *__gws_get_next_event_response ( 
     int fd, 
     struct gws_event_d *event );
@@ -439,7 +439,7 @@ fail:
 // Setup the parameters and
 // write the data into the file.
 
-static int __gws_get_next_event_request(int fd)
+static int __gws_get_next_event_request(int fd,int wid)
 {
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
@@ -448,9 +448,9 @@ static int __gws_get_next_event_request(int fd)
     //gws_debug_print ("__gws_get_next_event_request: wr\n");
 
 // window id.
-    message_buffer[0] = 0; 
+    message_buffer[0] = (unsigned long) ( wid & 0xFFFFFFFF); 
 // Message code
-    message_buffer[1] = GWS_GetNextEvent;  
+    message_buffer[1] = GWS_GetNextEvent;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
     //...
@@ -2332,6 +2332,7 @@ gws_redraw_window (
 
 struct gws_event_d *gws_get_next_event(
     int fd,
+    int wid,
     struct gws_event_d *event )
 {
     struct gws_event_d *e;
@@ -2346,7 +2347,7 @@ struct gws_event_d *gws_get_next_event(
 // #todo: Check event pointer validation.
 
 // Request
-    req_status = (int) __gws_get_next_event_request(fd);
+    req_status = (int) __gws_get_next_event_request(fd,wid);
     if(req_status<=0){
         return NULL;
     }

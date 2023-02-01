@@ -66,6 +66,80 @@ static struct gws_window_d *__create_window_object(void);
 // =====================================
 //
 
+int 
+window_post_message_broadcast( 
+    int wid, 
+    int event_type, 
+    unsigned long long1,
+    unsigned long long2 )
+{
+// Post message to the window. (broadcast)
+    int return_value=-1;
+    register int i=0;
+    struct gws_window_d *w;
+
+    for (i=0; i<WINDOW_COUNT_MAX; i++)
+    {
+        w = (void*) windowList[i];
+        if ((void*) w != NULL)
+        {
+            if (w->magic==1234)
+            {
+                if (w->type == WT_OVERLAPPED){
+                    window_post_message( w->id, event_type, long1, long2 );
+                }
+            }
+        }
+    };
+
+    return 0;
+}
+
+
+int 
+window_post_message( 
+    int wid, 
+    int event_type, 
+    unsigned long long1,
+    unsigned long long2 )
+{
+// Post message to the window.
+
+    struct gws_window_d *w;
+
+    if (wid < 0)
+        goto fail;
+    if (wid >= WINDOW_COUNT_MAX)
+        goto fail;
+    if (event_type<0)
+        goto fail;
+
+    w = (void*) windowList[wid];
+    if ( (void*) w == NULL )
+        goto fail;
+    if (w->magic != 1234)
+        goto fail;
+
+// Get offset.
+    register int Tail = (int) w->ev_tail;
+// Post
+    w->ev_wid[Tail] = 
+        (unsigned long) (wid & 0xFFFFFFFF);
+    w->ev_msg[Tail] = 
+        (unsigned long) (event_type & 0xFFFFFFFF);
+    w->ev_long1[Tail] = (unsigned long) long1;
+    w->ev_long2[Tail] = (unsigned long) long2;
+// Circula
+    w->ev_tail++;
+    if (w->ev_tail>=32){
+        w->ev_tail=0;
+    }
+
+fail:
+    return -1;
+}
+
+
 void gws_enable_transparence(void)
 {
     config_use_transparency=TRUE;

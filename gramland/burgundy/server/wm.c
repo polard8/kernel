@@ -164,6 +164,8 @@ on_mouse_event(
     unsigned long x, 
     unsigned long y );
 
+static void on_control_clicked(struct gws_window_d *window);
+
 static void on_mouse_pressed(void);
 static void on_mouse_released(void);
 static void on_mouse_leave( struct gws_window_d *window );
@@ -476,9 +478,10 @@ on_keyboard_event(
 }
 
 // Quando temos um evento de mouse,
-// vamos enviar esse evento para a janela com o foco de entrada.
+// vamos enviar esse evento para a janela.
 // Os aplicativos estao recebendo
-// os eventos enviados para as janelas com o foco de entrada.
+// os eventos enviados para as janelas.
+// Mas os aplicativos pegam eventos apenas da 'main window'.
 
 static void 
 on_mouse_event(
@@ -493,12 +496,10 @@ on_mouse_event(
 
 // Window with focus.
     struct gws_window_d *w;
-
     unsigned long saved_x = x;
     unsigned long saved_y = y;
     unsigned long in_x=0;
     unsigned long in_y=0;
-    
     register int Tail=0;
 
     if (gUseMouse != TRUE)
@@ -523,14 +524,11 @@ on_mouse_event(
     if (event_type == GWS_MouseMove)
     {
         //printf("MOVE\n");
-
         // The compositor is doing its job,
         // painting the pointer in the right position.
         // Lets update the position. See: comp.c
         comp_set_mouse_position(saved_x,saved_y);
-        
         __probe_window_hover(saved_x,saved_y);
-        
         return;
     }
 
@@ -548,21 +546,15 @@ on_mouse_event(
         //...
         // #test
         // Change the event_type and send another message?
-        goto send_message;
+        goto post_message;
     }
 
-//
 // Not valid event type
-//
-
 not_valid:
     return;
 
-//
-// Send message
-//
-
-send_message:
+// Post message to the window.
+post_message:
 
 // Enviamos o evento para a janela mouse_hover.
 // O aplicativo vai ler, caso ela seja a janela com 
@@ -596,7 +588,8 @@ send_message:
     saved_x = comp_get_mouse_x_position();
     saved_y = comp_get_mouse_y_position();
 
-// Is it inside the window with focus?
+
+// Check if we are inside the mouse hover.
     if ( saved_x >= w->left &&
          saved_x <= w->right &&
          saved_y >= w->top &&
@@ -637,23 +630,25 @@ send_message:
             }
         }
 
-// data
-        w->single_event.wid   = (int) w->id;
-        w->single_event.msg   = (int) event_type;
-        w->single_event.long1 = (unsigned long) in_x;
-        w->single_event.long2 = (unsigned long) in_y;
-        w->single_event.has_event = TRUE;
-
-        // ---------------
-        Tail = (int) w->ev_tail;
-        w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
-        w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
-        w->ev_long1[Tail] = (unsigned long) in_x;
-        w->ev_long2[Tail] = (unsigned long) in_y;
-        w->ev_tail++;
-        if (w->ev_tail>=32){
-            w->ev_tail=0;
-        }
+        // data
+        
+        // No more single events
+        //w->single_event.wid   = (int) w->id;
+        //w->single_event.msg   = (int) event_type;
+        //w->single_event.long1 = (unsigned long) in_x;
+        //w->single_event.long2 = (unsigned long) in_y;
+        //w->single_event.has_event = TRUE;
+        w->single_event.has_event = FALSE;
+        
+        // Post message to the target window.
+        // #remember:
+        // The app get events only for the main window.
+        // This way the app can close the main window.
+        // #todo: 
+        // So, we need to post a message to the main window,
+        // telling that that message affects the client window.
+        window_post_message( w->id, event_type, in_x, in_y );
+        //------------------
 
         return;
     }
@@ -681,8 +676,53 @@ static void on_mouse_pressed(void)
         return;
     }
 
+
 // ===================================
-// #test
+// >> Minimize control
+    if (mouse_hover->isMinimizeControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_PRESSED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return;
+        }
+    }
+// ===================================
+
+// ===================================
+// >> Maximize control
+    if (mouse_hover->isMaximizeControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_PRESSED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return;
+        }
+    }
+// ===================================
+
+// ===================================
+// >> Close control
+    if (mouse_hover->isCloseControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_PRESSED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            return;
+        }
+    }
+// ===================================
+
+
+
+// ===================================
+// >> menuitem
 // Lidando com menuitens
     // Se clicamos em um menu item.
     if (mouse_hover->isMenuItem == TRUE)
@@ -761,6 +801,65 @@ static void on_mouse_pressed(void)
 }
 
 
+static void on_control_clicked(struct gws_window_d *window)
+{
+// Called when a control button was release.
+// + The button belongs to a title bar
+// + The title bar belongs to an overlapped.
+// #tests:
+// + Post message to close the overlapped
+//   if the button is a close control.
+
+    struct gws_window_d *w1;
+    struct gws_window_d *w2;
+
+// ------------------------------
+// + Post message to close the overlapped
+//   if the button is a close control.
+
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic != 1234)
+        return;
+
+    // it was not clicked.
+    if (window != mouse_hover)
+        return;
+
+// close control
+// A close control was cliked.
+    if (window->isCloseControl == TRUE)
+    {
+        // title bar?
+        w1 = (void*) window->parent;
+        if ( (void*) w1 != NULL )
+        {
+            if (w1->magic == 1234)
+            {
+                // overlapped
+                w2 = (void*) w1->parent;
+                if ( (void*) w2 != NULL )
+                {
+                    if (w2->magic == 1234)
+                    {
+                        // check
+                        if (w2->type == WT_OVERLAPPED)
+                        {
+                            // Post message to the main window
+                            // of the client app.
+                            window_post_message ( 
+                                w2->id,
+                                GWS_Close,
+                                0,
+                                0 );
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 static void on_mouse_released(void)
 {
 
@@ -808,7 +907,58 @@ static void on_mouse_released(void)
 
 
 // ===================================
-// #test
+// >> Minimize control
+    if (mouse_hover->isMinimizeControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            printf("Release on min control\n");
+            return;
+        }
+    }
+// ===================================
+
+// ===================================
+// >> Maximize control
+    if (mouse_hover->isMaximizeControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            printf("Release on max control\n");
+            return;
+        }
+    }
+// ===================================
+
+// ===================================
+// >> Close control
+    if (mouse_hover->isCloseControl == TRUE)
+    {
+        if (mouse_hover->type == WT_BUTTON)
+        {
+            // Redraw the button
+            set_status_by_id(mouse_hover->id,BS_RELEASED);
+            redraw_window_by_id(mouse_hover->id,TRUE);
+            printf("Release on close control\n");
+            // #test
+            // On control clicked
+            // close control: post close message.
+            on_control_clicked(mouse_hover);
+            return;
+        }
+    }
+// ===================================
+
+
+
+// ===================================
+// >> Menuitens
 // Lidando com menuitens
     // Se clicamos em um menu item.
     if (mouse_hover->isMenuItem == TRUE)
@@ -818,9 +968,6 @@ static void on_mouse_released(void)
             // Redraw the button
             set_status_by_id(mouse_hover->id,BS_RELEASED);
             redraw_window_by_id(mouse_hover->id,TRUE);
-            
-            
-            
             return;
         }
     }
@@ -883,6 +1030,8 @@ static void on_mouse_released(void)
 // Do we already have one?
 static void on_update_window(int event_type)
 {
+// Post a message to the window with focus.
+
 // Window with focus.
     struct gws_window_d *w;
     register int Tail=0;
@@ -901,14 +1050,17 @@ static void on_update_window(int event_type)
 // But maybe we can use a queue, just like the 
 // messages in the thread structure.
 
-    w->single_event.wid   = w->id;
-    w->single_event.msg   = event_type;
-    w->single_event.long1 = 0;
-    w->single_event.long2 = 0;
-        
-    w->single_event.has_event = TRUE;
+    // No more single events
+    //w->single_event.wid   = w->id;
+    //w->single_event.msg   = event_type;
+    //w->single_event.long1 = 0;
+    //w->single_event.long2 = 0;
+    //w->single_event.has_event = TRUE;
+    //w->single_event.has_event = FALSE;
 
+/*
 // ---------------
+// Post message
     Tail = (int) w->ev_tail;
     w->ev_wid[Tail]   = (unsigned long) (w->id & 0xFFFFFFFF);
     w->ev_msg[Tail]   = (unsigned long) (event_type & 0xFFFFFFFF);
@@ -918,7 +1070,13 @@ static void on_update_window(int event_type)
     if (w->ev_tail >= 32){
         w->ev_tail=0;
     }
+// ---------------
+ */
+
+// Post message
+    window_post_message( w->id, event_type, 0, 0 );
 }
+
 
 int control_action(int msg, unsigned long long1)
 {
@@ -2862,12 +3020,15 @@ void wm_update_desktop(int tile)
         if ( (void*) w != NULL )
         {
             // Only overlapped windows.
-            if (w->type == WT_OVERLAPPED){
+            if (w->type == WT_OVERLAPPED)
+            {
                 // This is the last valid for now.
                 l = (struct gws_window_d *) w;
                 // Redraw, but do no show it.
                 redraw_window(w,FALSE);
-                // paint the childs of the window with focus.
+                
+                // Post message to the main window.
+                // Paint the childs of the window with focus.
                 on_update_window(GWS_Paint);
                 //invalidate_window(w);
             }
@@ -3651,6 +3812,8 @@ wmPostMessage(
     unsigned long long1,
     unsigned long long2 )
 {
+// Post message to the thread.
+
     unsigned long message_buffer[8];
 
 // Structure validation
@@ -4290,8 +4453,21 @@ int on_combination(int msg_code)
     if (msg_code == GWS_Undo)
     {printf("ws: undo\n"); return 0;}
 
+// [control + a]
     if (msg_code == GWS_SelectAll)
-    {printf("ws: select all\n"); return 0;}
+    {
+        printf("ws: select all\n");
+
+        // #test
+        // Post message to all the overlapped windows.
+        window_post_message_broadcast( 
+            0,
+            GWS_Close,   //MSG_CLOSE
+            1234,
+            5678 );
+
+        return 0;
+    }
 
     if (msg_code == GWS_Find)
     {printf("ws: find\n"); return 0;}
@@ -6105,10 +6281,19 @@ gwssrv_change_window_position (
     unsigned long x, 
     unsigned long y )
 {
-
-// #??
 // Isso deve mudar apenas o deslocamento em relacao
 // a margem e nao a margem ?
+
+// #test
+// Quando uma janela overlapped muda de posição,
+// as janelas que compoem o frame vão acompanhar esse deslocamento
+// pois suas posições são relativas.
+// Mas no caso das janelas filhas, criadas pelos aplicativos,
+// precisarão atualizar suas posições. Ou deverão armazenar
+// suas posições relativas à sua janela mãe.
+// #test
+// Nesse momento, podemos checar, quais janelas possuem essa janela
+// como janela mãe, e ... ?
 
     if ( (void *) window == NULL ){
         gwssrv_debug_print("gwssrv_change_window_position: window\n");

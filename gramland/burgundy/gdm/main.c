@@ -627,6 +627,7 @@ int main( int argc, char *argv[] )
         e = 
         (struct gws_event_d *) gws_get_next_event(
                                    client_fd, 
+                                   main_window,
                                    (struct gws_event_d *) &lEvent );
 
         if ( (void *) e != NULL ){

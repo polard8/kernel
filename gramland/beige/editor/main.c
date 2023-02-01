@@ -114,7 +114,11 @@ static void update_clients(int fd)
         return;
     }
 
-// #todo: We need a list o clients. maybe clients[i]
+// #todo: 
+// We need a list o clients. maybe clients[i]
+
+// #test
+// Get window info.
 
 //#todo: test buttons validation.
     gws_redraw_window(fd, addressbar_window, TRUE);
@@ -298,7 +302,8 @@ editorProcedure(
     // If the event window is the main window, so
     // redraw everyone.
     case MSG_PAINT:
-        if ( event_window == main_window ){
+        if ( event_window == main_window )
+        {
             update_clients(fd);
             return 0;
         }
@@ -308,6 +313,10 @@ editorProcedure(
     //case 8888:
         //break;
 
+    case MSG_CLOSE:
+        printf ("editor.bin: MSG_CLOSE\n");
+        exit(0);
+        break;
     //...
     
     default:
@@ -657,6 +666,7 @@ int main( int argc, char *argv[] )
         e = 
         (struct gws_event_d *) gws_get_next_event(
                                    client_fd, 
+                                   main_window,
                                    (struct gws_event_d *) &lEvent );
 
         if ( (void *) e != NULL )
