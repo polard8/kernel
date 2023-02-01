@@ -291,8 +291,8 @@ static int parse_name(int token)
         // para manipular strings por outros motivos.
         // Isso pode ser algum tipo de dado vindo 
         // de um arquivo de configuração.
-        printf ("name-string: {%s}\n",
-            real_token_buffer );
+        //printf ("name-string: {%s}\n",
+          //  real_token_buffer );
         
         
         //Stage 0: Get the name string
@@ -317,36 +317,6 @@ static int parse_name(int token)
             // Next stage.
             meta_stage++;
         }
-        
-        /*
-        else if(meta_stage == 1){
-            string_size = (size_t) strlen(real_token_buffer);
-            if (string_size <= 0 ){
-                printf("string size min\n");
-                goto error0;
-            }
-            if (string_size >= 128 ){
-                printf("string size max\n");
-                goto error0;
-            }
-            memset(metadata[meta_index].content, 0, 128);
-            strncpy(
-                metadata[meta_index].content,
-                real_token_buffer,
-                string_size );
-            metadata[meta_index].content_size = string_size;
-            meta_stage=0;
-            
-            metadata[meta_index].initialized = TRUE;
-            
-            //so muda de index depois de 2 strings
-            meta_index++;
-            if (meta_index >= 32){
-                printf("meta_index limits\n");
-                goto error0;
-            }
-        };
-        */
 
         // Coloca a string no arquivo de saída.
         strcat( outfile, real_token_buffer );
@@ -443,32 +413,9 @@ static int parse_content(int token)
         // para manipular strings por outros motivos.
         // Isso pode ser algum tipo de dado vindo 
         // de um arquivo de configuração.
-        printf ("content-string: {%s}\n",
-            real_token_buffer );
-        
-        
-        /*
-        if (meta_stage == 0){
-            string_size = (size_t) strlen(real_token_buffer);
-            if (string_size <= 0 ){
-                printf("string size min\n");
-                goto error0;
-            }
-            if (string_size >= 64 ){
-                printf("string size max\n");
-                goto error0;
-            }
-            memset(metadata[meta_index].name, 0, 64);
-            strncpy(
-                metadata[meta_index].name,
-                real_token_buffer,
-                string_size );
-            metadata[meta_index].name_size = string_size;
-            meta_stage++;
+        //printf ("content-string: {%s}\n",
+            //real_token_buffer );
 
-        }else 
-        */
-        
         //Stage 1: Get the content string
         if(meta_stage == 1)
         {
@@ -489,7 +436,10 @@ static int parse_content(int token)
             metadata[meta_index].content_size = string_size;
             metadata[meta_index].initialized = TRUE;
             
-            //so muda de index depois de 2 strings
+            // Salva o index.
+            metadata[meta_index].id = (int) meta_index;
+            
+            // Só muda de index depois de 2 strings.
             meta_index++;
             if (meta_index >= 32){
                 printf("meta_index limits\n");
@@ -1747,6 +1697,9 @@ int parse(int dump_output)
     int running = 1;
     register int token=0;
     int i=0;
+
+// Se estamos esperando um identificador para um tipo.
+    static int waiting_id_for_a_metatype = FALSE;
 // Se entramos em um desses corpos.
     int braces_inside = 0;
     int parentheses_inside = 0;
@@ -1851,8 +1804,10 @@ int parse(int dump_output)
                         id[ID_TYPE] = type_found;
                         
                         if (type_found == TMETA)
+                        {
                             printf ("TMETA found!\n");
-                        
+                            waiting_id_for_a_metatype = TRUE;
+                        }
                         // Depois de um type vem um identificador.
                         State = 2;
                         break;
@@ -2011,6 +1966,35 @@ int parse(int dump_output)
 
                         // Salva o símbolo. #isso funciona.
                         sprintf ( save_symbol, real_token_buffer );
+                        
+                        
+                        //----------------------------------------------------
+                        // Let's put the string into the current structure,
+                        // even if its not initialized yet.
+                        // If we are waiting an id for a type.
+                        // We are waiting the tag name.
+                        // waiting_tagname
+                        if (waiting_id_for_a_metatype == TRUE){
+                        waiting_id_for_a_metatype = FALSE;
+                        
+                        memset(metadata[meta_index].meta_tag, 0,64);
+                        string_size = (size_t) strlen(real_token_buffer);
+                        if (string_size <= 0){
+                            printf("tag size min\n");
+                            exit(1);
+                        }
+                        if (string_size >= 64){
+                            printf("tag size max\n");
+                            exit(1);
+                        }
+                        strncpy(
+                            metadata[meta_index].meta_tag,
+                            real_token_buffer,
+                            string_size );
+                        metadata[meta_index].tag_size = (size_t) string_size;
+                        }
+                        //----------------------------------------------------
+                        
 
                         // emit_symbol();
                         //strcat (TEXT,";[SYMBOL]\n");

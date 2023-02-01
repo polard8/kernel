@@ -8,14 +8,17 @@
 // a single structure.
 struct metadata_d
 {
-    int id;
     int initialized;
+    int id;
+
+    char meta_tag[64];
+    size_t tag_size;
 
     char name[64];
-    int name_size;
+    size_t name_size;
 
     char content[128];
-    int content_size;
+    size_t content_size;
 };
 extern struct metadata_d  metadata[32];
 
