@@ -106,38 +106,46 @@ static int gramcnf_initialize(void)
     program.function_list = NULL;
     //...
 
+// #test
+// initializing the 
+
     return (int) Status;
 }
 
 // Mostra as estatísticas para o desenvolvedor.
 static void debugShowStat(void)
 {
+    register int i=0;
+
     printf("\n");
     printf("==========================================\n");
 
-//#ifdef LEXER_VERBOSE
+// lexer
     printf("number of liner: {%d}\n",lexer_lineno);
     printf("first line:      {%d}\n",lexer_firstline);
     printf("last line:       {%d}\n",lexer_lastline);
     printf("token count:     {%d}\n",lexer_token_count);
-//#endif
 
-//#ifdef PARSER_VERBOSE
+// parser
     printf("infile_size:     {%d bytes}\n",infile_size);
     printf("outfile_size:    {%d bytes}\n",outfile_size);
-//#endif
 
     printf("\n");
     printf("==========================================\n");
 
-    int i=0;
+// metadata
     for (i=0; i<32; i++)
     {
         if (metadata[i].initialized == TRUE)
         {
             printf("\n");
-            printf("name{%s}\n",metadata[i].name); 
-            printf("content{%s}\n",metadata[i].content);
+            printf ("id{%d}: tag{%s} name{%s} content{%s}\n",
+                metadata[i].id,
+                metadata[i].meta_tag,
+                metadata[i].name,
+                metadata[i].content );
+            //printf("name{%s}\n",    metadata[i].name); 
+            //printf("content{%s}\n", metadata[i].content);
         }
     };
 

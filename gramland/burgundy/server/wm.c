@@ -1461,8 +1461,12 @@ void do_create_controls(struct gws_window_d *window)
 
     unsigned long LastLeft = 0; 
     unsigned long Top=0;
-    unsigned long ButtonWidth = METRICS_TITLEBAR_DEFAULT_WIDTH;
-    unsigned long ButtonHeight = (METRICS_TITLEBAR_DEFAULT_HEIGHT -2);
+
+// Buttons.
+    unsigned long ButtonWidth = 
+        METRICS_TITLEBAR_CONTROLS_DEFAULT_WIDTH;
+    unsigned long ButtonHeight = 
+        METRICS_TITLEBAR_CONTROLS_DEFAULT_HEIGHT;
 
     unsigned long PaddingWidth = 1;
 
@@ -1795,7 +1799,8 @@ wmCreateWindowFrame (
     unsigned int OrnamentColor1 = ornament_color1;
     unsigned int OrnamentColor2 = ornament_color2;
 // Title bar height
-    unsigned long TitleBarHeight = METRICS_TITLEBAR_DEFAULT_HEIGHT;
+    unsigned long TitleBarHeight = 
+        METRICS_TITLEBAR_DEFAULT_HEIGHT;
 
 // Titlebar color for active window.
     unsigned int TitleBarColor = 
@@ -2020,8 +2025,11 @@ wmCreateWindowFrame (
         // #todo: Essa janela foi registrada?
         if (useTitleBar == TRUE)
         {
+            window->titlebar_width = 
+                (window->width - BorderSize - BorderSize);
             window->titlebar_height = TitleBarHeight;
-            window->titlebar_color      = (unsigned int) TitleBarColor;
+
+            window->titlebar_color = (unsigned int) TitleBarColor;
             window->titlebar_text_color = 
                 (unsigned int) get_color(csiSystemFontColor);
 
@@ -2033,8 +2041,8 @@ wmCreateWindowFrame (
                              WT_SIMPLE, 0, 1, 1, "TitleBar", 
                              0,  //l 
                              0,  //t
-                             (window->width - BorderSize - BorderSize), 
-                             window->titlebar_height, 
+                             window->titlebar_width,  //w 
+                             window->titlebar_height,  //h 
                              (struct gws_window_d *) window, 
                              0, 
                              window->titlebar_color,  //frame 
@@ -5506,9 +5514,7 @@ void create_taskbar (unsigned long tb_height)
         printf             ("create_taskbar: taskbar_window\n");
         exit(1);
     }
-    if ( taskbar_window->used != TRUE || 
-         taskbar_window->magic != 1234 )
-    {
+    if ( taskbar_window->used != TRUE || taskbar_window->magic != 1234 ){
         gwssrv_debug_print ("create_background: taskbar_window validation\n"); 
         printf             ("create_background: taskbar_window validation\n");
         exit(1);
@@ -5576,8 +5582,10 @@ void create_taskbar (unsigned long tb_height)
     struct gws_window_d *tmp_button;
     int tmp_wid=-1;
     char button_label[32];
-    
-// Creating n buttons in the taskbar
+
+// Quick launch area.
+// Creating n buttons in the taskbar.
+// #todo: We can make this options configurable.
 
     for (i=0; i<nbuttons; i++){
 
@@ -5618,7 +5626,7 @@ void create_taskbar (unsigned long tb_height)
         exit(1);
     }
 
-    if(i==0){
+    if (i==0){
         taskbar_startmenu_button_window = tmp_button;
     }
 
@@ -6357,7 +6365,7 @@ void wm_Update_TaskBar( char *string, int flush )
 
 
 //
-// String
+// Strings
 //
 
 // String info.
@@ -6378,7 +6386,7 @@ void wm_Update_TaskBar( char *string, int flush )
 // Draw the text.
 // less than 10 chars.
     if (string_size < 10){
-        // String 2
+        // String 2. The separator '|'.
         dtextDrawText(
             taskbar_window, string2_left, string_top, string_color, "|" );
         // String 1

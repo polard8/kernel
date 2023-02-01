@@ -356,7 +356,9 @@ int yylex(void)
     register int value=0;
 
     register int c=0;
+
     register char *p;
+
     register int c1=0;
     register int number_length=0;
 
@@ -396,6 +398,9 @@ again:
 
             // Address
             p = token_buffer;
+            
+            // clean
+            memset( real_token_buffer, 0, MAXTOKEN );
 
             // #todo: 
             // Limite tamanho do buffer
@@ -417,7 +422,7 @@ again:
 
                 if ( ( isalnum(c) == 0 ) &&  (c != '_') )
                 {
-                    *p = 0;
+                    *p = 0;  // Finalize
                     ungetc( c, finput );
                     goto we_have_an_identifier;
                 }
@@ -425,6 +430,9 @@ again:
 
             // Temos um identificador.
             we_have_an_identifier:
+            
+            //#debug
+            //printf ("real_token_buffer={%s}\n",real_token_buffer);
 
             // Vamos começar dizendo que somos um identificador.
             // Porem ...
@@ -878,12 +886,16 @@ static int __lexerInit(void)
     maxtoken = MAXTOKEN;
 
 // Clear buffer
-    for ( i=0; i<MAXTOKEN; i++ ){
-        real_token_buffer[i] = (char) '\0';
+    for ( i=0; i<MAXTOKEN; i++ )
+    {
+        //real_token_buffer[i] = (char) '\0';
+        real_token_buffer[i] = 0;
     };
 
-    token_buffer = &real_token_buffer[0]; 
-    sprintf ( real_token_buffer, "uninitialized-token-string" );
+    token_buffer = real_token_buffer;
+    //token_buffer = &real_token_buffer[0]; 
+    //sprintf ( real_token_buffer, "uninitialized-token-string" );
+
     //...
     return 0;
 }

@@ -33,17 +33,41 @@ typedef int  wid_t;
 // Mas o aplicativo pode customizar.
 #define METRICS_BORDER_SIZE  2
 
+//
+// Titlebar
+//
+
+// Default height
+#define METRICS_TITLEBAR_DEFAULT_HEIGHT  24
+// Control width.
+// #todo: Bigger will crash?
+#define METRICS_TITLEBAR_CONTROLS_DEFAULT_WIDTH \
+    (METRICS_TITLEBAR_DEFAULT_HEIGHT-4)
+// Control height.
+// #todo: Bigger will crash?
+// Bigger will paint outside the titlebar.
+// It is accepted in some cases. Just like a skin.
+#define METRICS_TITLEBAR_CONTROLS_DEFAULT_HEIGHT \
+    (METRICS_TITLEBAR_DEFAULT_HEIGHT-4)
+
+// Ornament size
 // Usado para explicitar se a janela é ativa ou não
 // e como separador entre a barra de títulos e a segunda
 // área da janela de aplicativo.
 // Usado somente por overlapped window.
-#define METRICS_TITLEBAR_ORNAMENT_SIZE    1
+// #todo: Bigger will crash?
+#define METRICS_TITLEBAR_ORNAMENT_SIZE  1
 
-#define METRICS_TITLEBAR_DEFAULT_WIDTH  28
-#define METRICS_TITLEBAR_DEFAULT_HEIGHT  24
+//
+// Application window.
+//
 
-#define METRICS_DEFAULT_MINIMUM_WINDOW_WIDTH  (METRICS_TITLEBAR_DEFAULT_WIDTH*5)
-#define METRICS_DEFAULT_MINIMUM_WINDOW_HEIGHT  (METRICS_TITLEBAR_DEFAULT_HEIGHT*3)
+// #todo:
+// Application window. Not child window.
+#define METRICS_DEFAULT_MINIMUM_WINDOW_WIDTH \
+    (METRICS_TITLEBAR_CONTROLS_DEFAULT_WIDTH*5)
+#define METRICS_DEFAULT_MINIMUM_WINDOW_HEIGHT \
+    (METRICS_TITLEBAR_CONTROLS_DEFAULT_HEIGHT*3)
 
 // ...
 
@@ -740,6 +764,7 @@ struct gws_window_d
     int isMaximizeControl;
     int isCloseControl;
 
+    unsigned long titlebar_width;
     unsigned long titlebar_height;
     int titlebarHasIcon;     // If the title bar uses or not an icon.
     int titlebar_style;
