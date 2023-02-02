@@ -140,6 +140,11 @@ int rtl_y_or_n(void)
     };
 }
 
+int rtl_are_you_sure(void)
+{
+    printf ("Are You sure?\n");
+    return (int) rtl_y_or_n();
+}
 
 
 // stdio_atoi:

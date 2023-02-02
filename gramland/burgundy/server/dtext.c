@@ -23,6 +23,15 @@ grDrawString (
     //int cWidth = get_char_width ();
     //int cHeight = get_char_height ();
 
+    //int is_transparent = transparent;  // from parameters.
+    int is_transparent = TRUE;
+
+    //#todo
+    //unsigned int __fg_color = fg_color;
+    //unsigned int __bg_color = bg_color;
+    unsigned int __fg_color = color;
+    //unsigned int __bg_color = color;
+
     if( (void*) string == NULL )
         return;
     if( *string==0 )
@@ -47,17 +56,34 @@ grDrawString (
 
     for ( Index=0; string[Index] != 0; Index++ )
     {
-        grBackbufferDrawCharTransparent ( 
-            x, 
-            y, 
-            (unsigned int) color, 
-            string[Index] );
+        // not transparent.
+        /*
+        if (is_transparent != TRUE)
+        {
+            grBackbufferDrawChar( 
+                x, 
+                y,
+                string[Index],
+                (unsigned int) __fg_color,     // fg color
+                (unsigned int) __bg_color );   // bg color
+        }
+        */
+        
+        // transparent
+        //if (is_transparent == TRUE)
+        //{
+            grBackbufferDrawCharTransparent ( 
+                x, 
+                y, 
+                (unsigned int) __fg_color, 
+                string[Index] );
+         //}
 
         // gradient
         //if( string_flags & ? ){
         //grBackbufferDrawCharTransparent ( 
             //x, y, 
-            //(unsigned int) interpolate_color(COLOR_BLACK, color, x), 
+            //(unsigned int) interpolate_color(COLOR_BLACK, __fg_color, x), 
             //string[Index] );
         //}
 
@@ -82,6 +108,12 @@ dtextDrawText (
 { 
     struct gws_window_d * __w;
 
+// #bugbug
+// Is gui a valid pointer?
+
+    //if ( (void*) gui == NULL )
+        //return;
+
     __w = (struct gws_window_d *) gui->screen_window;
 
 
@@ -94,6 +126,7 @@ dtextDrawText (
 
         if ( (void*)__w != NULL )
         {
+            // #todo: We need a parameter for transparent or not.
             grDrawString ( 
                 (__w->left +x), 
                 (__w->top  +y), 
@@ -101,10 +134,14 @@ dtextDrawText (
                 string );
             return;
         }
+        
+        // #fail
         gwssrv_debug_print("dtextDrawText: __w\n");
         return;
 
     }else{
+
+        // #todo: We need a parameter for transparent or not.
         grDrawString ( 
             (window->left +x), 
             (window->top  +y), 

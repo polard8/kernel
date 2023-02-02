@@ -126,6 +126,18 @@ char *out_char(char *dst,char ch)
 */
 
 
+/*
+char terry_toupper(char ch);
+char terry_toupper(char ch)
+{
+    if (ch>='a' && ch<='z')
+        return ch + 'A'-'a'; 
+    else return ch;
+}
+*/
+
+
+
 int rtl_y_or_n(void)
 {
     static int ch=0;
@@ -145,6 +157,13 @@ int rtl_y_or_n(void)
         };
     };
 }
+
+int rtl_are_you_sure(void)
+{
+    printf ("Are You sure?\n");
+    return (int) rtl_y_or_n();
+}
+
 
 
 // stdio_atoi:

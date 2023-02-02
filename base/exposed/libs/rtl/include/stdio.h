@@ -817,6 +817,8 @@ int libcStartTerminal (void);
 void stdioInitialize(void);
 
 int rtl_y_or_n(void);
+int rtl_are_you_sure(void);
+
 int stdio_atoi (char *s);
 void stdio_fntos (char *name);
 

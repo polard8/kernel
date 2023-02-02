@@ -100,6 +100,39 @@ void *sc82 (
 
 
 /*
+
+  // #todo
+  // Working on that thing.
+  // bt, bts, btr, btc ...
+
+inline void rtl_bt(void *bit_field, unsigned long bit_number);
+inline void rtl_bt(void *bit_field, unsigned long bit_number) 
+{
+    asm("bt %1,%0" : "+m" (*bit_field) : "r" (bit_number) );
+}
+
+inline void rtl_bts(void *bit_field, unsigned long bit_number);
+inline void rtl_bts(void *bit_field, unsigned long bit_number) 
+{
+    asm("bts %1,%0" : "+m" (*bit_field) : "r" (bit_number) );
+}
+
+inline void rtl_btr(void *bit_field, unsigned long bit_number);
+inline void rtl_btr(void *bit_field, unsigned long bit_number) 
+{
+    asm("btr %1,%0" : "+m" (*bit_field) : "r" (bit_number) );
+}
+
+inline void rtl_btc(void *bit_field, unsigned long bit_number);
+inline void rtl_btc(void *bit_field, unsigned long bit_number) 
+{
+    asm("btc %1,%0" : "+m" (*bit_field) : "r" (bit_number) );
+}
+
+*/
+
+
+/*
 // #test
 // Open special devices, given a standard string.
 // Ex: 
