@@ -20,13 +20,14 @@ extern int current_mode;
 
 // Gramado Window Server
 #include "gws.h"
+#include "callback.h"
 
 // Configuration and debug support.
 #include "config/config.h"
 #include "protocol.h"
 #include "globals.h"
 #include "colors.h"
-#include "nc2.h"   //nelson cole 2 font. 8x8
+//#include "nc2.h"   //nelson cole 2 font. 8x8
 
 // #imported
 // Graphics device library.

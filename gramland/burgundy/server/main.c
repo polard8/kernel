@@ -177,79 +177,6 @@ static void initClientSupport(void);
 static void initClientStruct( struct gws_client_d *c );
 
 
-
-// ===============================================
-// Callback support.
-static unsigned long callback_counter=0;
-
-//========================================================
-// The callback restorer.
-static inline void do_restorer(void);
-static inline void do_restorer(void)
-{
-    asm ("int $198");
-}
-//========================================================
-
-//========================================================
-// Callback procedure.
-void callback1(void);
-void callback1(void)
-{
-    // #debug
-    // printf("WS: Callback\n");
-
-    callback_counter++;
-
-    if ( (void*) window_server == NULL ){
-        do_restorer();
-    }
-    if (window_server->initialized != TRUE){
-        do_restorer();
-    }
-
-//#test1
-    //if( (callback_counter % (16*4)) == 0 )
-        //wm_Update_TaskBar("callback");
-
-//#test2
-    //if( (callback_counter % (16*4)) == 0 )
-    //    compose();
-
-// #test3
-// The kernel is not calling us 1000 times per second.
-// #todo: review fps.
-
-// gui
-    if ( (void*) gui == NULL ){
-        do_restorer();
-    }
-// window server
-    if ( (void*) window_server == NULL ){
-        do_restorer();
-    }
-    if (window_server->graphics_initialization_status != TRUE){
-        do_restorer();
-    }
-// window manager
-    if (WindowManager.initialized != TRUE){
-        do_restorer();
-    }
-
-// Compose.
-
-    //if( (callback_counter % (16*4)) == 0 )
-        compose();
- 
-    do_restorer();
-
-//fail
-    while (1){
-        printf("."); fflush(stdout);
-    }
-}
-//========================================================
-
 // This way the module is able to know
 // if the server is accepting input or not.
 int is_accepting_input(void)
@@ -3184,16 +3111,12 @@ static int on_execute(int dm)
 // Register this ring3 address as a callback.
 // The kernel is gonna run this code frequently.
 // Pra isso o ws precisa estar registrado.
+// see: callback.c
 
     if (gUseCallback == TRUE){
-        sc82(
-            44000,
-            (unsigned long) &callback1,
-            (unsigned long) &callback1,
-            (unsigned long) &callback1 );
-
+        callbackInitialize();
+        Initialization.setup_callback_checkpoint = TRUE;
     }
-    Initialization.setup_callback_checkpoint = TRUE;
 
 // ===============================================
 // #todo

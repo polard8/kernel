@@ -2380,31 +2380,44 @@ void *sci2 (
 // #test
 // shared memory 2mb surface.
 // ring 3.
-    if(number == 22777)
+    if (number == 22777)
     {
         if (g_extraheap3_initialized==TRUE)
             return (void*) g_extraheap3_va;
         return NULL;
     }
 
-    // see: ts.c
-    // see: pit.c
+// Callback support.
+// see: ts.c
+// see: pit.c
+// arg2 = address
+// arg3 = pid
+// arg4 = signature
     pid_t ws_pid = -1;
     unsigned long r3_handler=0;
     if(number == 44000)
     {
         // Somente o window server pode chamar esse serviço.
         ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
+        // Checando se caller foi o window server.
         if (current_process != ws_pid){
             panic("sci2: [44000] current_process!=ws_pid\n");
         }
+        // Check signature
+        if (arg4 != 1234){
+            panic("sci2: [44000] Signature\n");
+        }
+        // PID
+        if (arg3 != ws_pid){
+            panic("sci2: [44000] Invalid PID\n");
+        }
         // nao foi inicializado pela inicialização do kenrel.
-        if( ws_callback_info.initialized != TRUE ){
+        if ( ws_callback_info.initialized != TRUE ){
             panic("sci2: [44000] callback support Not initialized\n");
         }
         // Se ele ja esta pronto para efetuarmos o iretq
         // é porque tem alguma coisa errada.
-        if( ws_callback_info.ready == TRUE ){
+        if ( ws_callback_info.ready == TRUE ){
             panic("sci2: [44000] called again\n");
         }
         // Enable for the first time.
@@ -2415,12 +2428,13 @@ void *sci2 (
     }
 
 
+// Counter
 
     __default_syscall_counter++;
 
-    // #todo
-    // Maybe kill the caller. 
-    // Maybe return.
+// #todo
+// Maybe kill the caller. 
+// Maybe return.
 
     panic ("sci2: [FIXME] default syscall \n");
     return NULL;

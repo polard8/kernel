@@ -689,23 +689,19 @@ __refresh_rectangle_via_kgws (
     unsigned long width, 
     unsigned long height )
 {
-    static unsigned long Buffer[5];
-    
-    Buffer[0] = (unsigned long) x;
-    Buffer[1] = (unsigned long) y;
-    Buffer[2] = (unsigned long) (width  & 0xFFFF);
-    Buffer[3] = (unsigned long) (height & 0xFFFF);
-    Buffer[4] = 0; 
+    static unsigned long buffer[5];
 
-    gramado_system_call ( 
-        10, (unsigned long) &Buffer[0], 0, 0 );
+    buffer[0] = (unsigned long) x;
+    buffer[1] = (unsigned long) y;
+    buffer[2] = (unsigned long) (width  & 0xFFFF);
+    buffer[3] = (unsigned long) (height & 0xFFFF);
+    buffer[4] = 0; 
+
+    gramado_system_call ( 10, (unsigned long) buffer, 0, 0 );
 }
 
-/*
- * gws_refresh_rectangle:
- */
+// gws_refresh_rectangle:
 // From backbuffer to frontbuffer.
-
 void 
 gws_refresh_rectangle ( 
     unsigned long x, 
@@ -756,19 +752,16 @@ gws_refresh_rectangle (
     unsigned long Width  = (unsigned long) (width  & 0xFFFF);
     unsigned long Height = (unsigned long) (height & 0xFFFF);
 
+// ==========================================================
 // Refresh in the kernel using the kgws.
-
     if (RefreshRectangleUsingKGWS == TRUE){
         //debug_print("gws_refresh_rectangle: Using R0\n");
         __refresh_rectangle_via_kgws(X,Y,Width,Height);
         return;
     }
 
-//
-// Refresh using the routine inside the ws.
-//
-
 // ==========================================================
+// Refresh using the routine inside the ws.
 
     //debug_print("gws_refresh_rectangle: Using R3\n");
 

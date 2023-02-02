@@ -76,12 +76,8 @@ CINCLUDES += -I .
 
 LDFLAGS = -m elf_x86_64 -T ../../link.ld
 
-
-#
 # Objects
-#
-
-myObjects = crt0.o main.o rtl.o \
+myObjects = crt0.o main.o callback.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
@@ -99,11 +95,10 @@ myObjects += wm.o
 
 all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
-
 main.o:
-	$(CC)  -c  main.c     $(CFLAGS) $(CINCLUDES) -o main.o
-	$(CC)  -c  globals.c  $(CFLAGS) $(CINCLUDES) -o globals.o
-
+	$(CC) -c  main.c      $(CFLAGS) $(CINCLUDES) -o main.o
+	$(CC) -c  globals.c   $(CFLAGS) $(CINCLUDES) -o globals.o
+	$(CC) -c  callback.c  $(CFLAGS) $(CINCLUDES) -o callback.o
 all-c:
 
 #basics1

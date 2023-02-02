@@ -2465,8 +2465,14 @@ wmCompose(
     unsigned long jiffies, 
     unsigned long clocks_per_second )
 {
+    if (__compose_lock == TRUE)
+        return;
+
+    __compose_lock = TRUE;
     compose();
+    __compose_lock = FALSE;
 }
+
 
 /*
 // Marca como 'dirty' todas as janelas filhas,
@@ -2492,6 +2498,10 @@ void refresh_subwidnows( struct gws_window_d *w )
 
 void wmRefreshDirtyRectangles(void)
 {
+// Called by compose.
+// + We need to encapsulate the variables used by this routine
+//   to prevent about concorrent access problems.
+
     register int i=0;
     struct gws_window_d *tmp;
 
@@ -2513,30 +2523,6 @@ void wmRefreshDirtyRectangles(void)
 // Invalidating all the windows ... 
 // and it will be flushed into the framebuffer for the ring0 routines.
 
-//
-// Update
-//
-
-/*
-// #debug 
-// Bar for debug.
-// update message/hour/date ...
-    if ( (void*) __root_window != NULL ) 
-    {
-        if ( __root_window->magic == 1234 )
-        {
-                //redraw_window(tmp,FALSE);  //bugbug
-                grDrawString(
-                    __root_window->left, 
-                    __root_window->top,
-                    COLOR_WHITE,
-                    "Gramado OS");
-               invalidate_window(__root_window);
-               //__root_window->redraw = FALSE;
-        }
-    }
-*/
-
 // ======================================================
 // Flush
 // #todo #bugbug
@@ -2545,16 +2531,13 @@ void wmRefreshDirtyRectangles(void)
 // This is a very slow way of doing this.
 // But it is just a test.
 
-
-// =======================
-// #test
-
+// ??
     //int UpdateScreenFlag=FALSE;
-    int UpdateScreenFlag=TRUE;
+    //int UpdateScreenFlag=TRUE;
+    //if (UpdateScreenFlag != TRUE){
+    //    return;
+    //}
 
-    if (UpdateScreenFlag != TRUE){
-        return;
-    }
 
 // Refresh
 // Lookup the main window list.
@@ -2563,6 +2546,7 @@ void wmRefreshDirtyRectangles(void)
 // It is a valid window and
 // it is a dirty window.
 // Flush the window's rectangle.
+// see: rect.c
 
     for (i=0; i<WINDOW_COUNT_MAX; ++i)
     {
@@ -2578,8 +2562,10 @@ void wmRefreshDirtyRectangles(void)
                     //wm_flush_window(tmp);       //checking parameters
                     //gws_show_window_rect(tmp);  //checking parameters and invalidate.
                     // Direct, no checks.
+
                     gws_refresh_rectangle ( 
                         tmp->left, tmp->top, tmp->width, tmp->height ); 
+
                     validate_window(tmp);
                 }
             }

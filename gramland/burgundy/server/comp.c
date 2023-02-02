@@ -3,7 +3,12 @@
 
 #include "gwsint.h"
 
+// The call back can't use the compose()
+// if the window server is using it at the moment.
+int __compose_lock = FALSE;
+
 extern struct gws_window_d *mouse_hover;
+
 
 // #todo
 // Create some configuration globals here
@@ -125,7 +130,9 @@ void __display_mouse_cursor(void)
 // Called by wmCompose
 void compose(void)
 {
-    int Dirty = FALSE;
+// Called by wmCompose() and callback_compose().
+
+    static int Dirty = FALSE;
 
 // fps++
     if (WindowManager.initialized == TRUE){
@@ -136,7 +143,8 @@ void compose(void)
 // If the background is marked as dirty, 
 // we flush it, validate it, show the cursor and return.
     Dirty = (int) is_background_dirty();
-    if (Dirty == TRUE){
+    if (Dirty == TRUE)
+    {
         gws_show_backbuffer();
         validate_background();  
         return;
@@ -155,7 +163,7 @@ void compose(void)
 // remember: we're using 15 fps refresh,
 // we can change this in the kernel.
 
-    if(gUseMouse == TRUE){
+    if (gUseMouse == TRUE){
         __display_mouse_cursor();
     }
 
@@ -164,7 +172,10 @@ void compose(void)
     validate();
 // fps
     //__update_fps();
+
+    // return;
 }
+
 
 // global
 void comp_initialize_mouse(void)

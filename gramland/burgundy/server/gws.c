@@ -260,6 +260,9 @@ int gwssrv_init_globals(void)
 {
     register int i=0;
 
+// The gate is open.
+    __compose_lock = FALSE;
+
 // Initializing the graphics device library.
 // see: libgd.c
     libgd_initialize();

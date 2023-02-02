@@ -4,6 +4,9 @@
 #ifndef __COMP_H
 #define __COMP_H    1
 
+extern int __compose_lock;
+
+
 long comp_get_mouse_x_position(void);
 long comp_get_mouse_y_position(void);
 void compose(void);
