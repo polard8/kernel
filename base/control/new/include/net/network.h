@@ -110,7 +110,7 @@ void testNIC(void);
 // Handle package.
 void 
 network_on_receiving ( 
-    const unsigned char *buffer, 
+    const unsigned char *frame, 
     ssize_t size );
 
 int network_buffer_in( void *buffer, int len );

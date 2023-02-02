@@ -37,24 +37,30 @@ network_handle_arp(
         goto fail;
     }
 
+/*
 // Show data.
 // Bytes: Net-style.
+// Hardware type (HTYPE)   (00 01) = Ethernet.
     printf("Hardware type: {%x}\n",ar->type);
+// Protocol type (PTYPE)   (08 00) = ipv4.
+// In the case of Ethernet, a 0x0806 EtherType value 
+// is used to identify ARP frames.
     printf("Protocol type: {%x}\n",ar->proto);
     printf("Hardware address lenght: {%x}\n",ar->hlen);
     printf("Protocol address lenght: {%x}\n",ar->plen);
-    printf("op    {%x}\n",ar->op);
+    printf("ARP operation {%x}\n",ar->op);
+    // continua: macs e ips ... 
+*/
 
 // Operation
     uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
-    
     if (op==ARP_OPC_REQUEST){
-        printf("This is REQUEST\n");
+        printf("ARP: This is REQUEST\n");
         //sending a reply, only for the linux host.  x.x.x.8
         //printf("Sending reply to linux host\n");
         //network_send_arp_reply();
     } else if (op==ARP_OPC_REPLY){
-        printf("This is REPLY\n");
+        printf("ARP: This is REPLY\n");
     };
 
     refresh_screen();
@@ -126,9 +132,11 @@ network_send_arp(
 // see: arp.h
 //
 
-// Hardware type (HTYPE)   (00 01)
+// Hardware type (HTYPE)   (00 01) = Ethernet.
     h->type = (uint16_t) 0x0100;
-// Protocol type (PTYPE)   (08 00)
+// Protocol type (PTYPE)   (08 00) = ipv4.
+// In the case of Ethernet, a 0x0806 EtherType value 
+// is used to identify ARP frames.
     h->proto = (uint16_t) 0x0008;
 // Hardware address length (MAC)
     h->hlen = (uint8_t) ETH_ALEN;
@@ -136,12 +144,10 @@ network_send_arp(
     h->plen = (uint8_t) 4;
 // Operation (OPER)
 // We only have two valid operation codes.
-    if ( op != ARP_OPC_REQUEST && 
-         op != ARP_OPC_REPLY )
-    {
+    if (op != ARP_OPC_REQUEST && op != ARP_OPC_REPLY){
         panic("network_send_arp: Invalid operation code\n");
     }
-    h->op = (uint16_t) ToNetByteOrder16(op);  // Invert the two bytes.
+    h->op = (uint16_t) ToNetByteOrder16(op);
 
 //
 // Addresses
@@ -203,8 +209,15 @@ network_send_arp(
     //#debug
     //printf ("buffer_index {%d}\n",buffer_index);
 
+//
+// Buffer
+//
+
+// Let's call it 'frame'.
+// Because we're sending a frame.
+
 // Get the buffer address based on its offset.
-    unsigned char *buffer = 
+    unsigned char *frame = 
         (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
 
 // Get the addresses for the headers.
@@ -212,25 +225,23 @@ network_send_arp(
     unsigned char *src_arp      = (unsigned char *) h;
 
 
-    if ((void*) buffer == NULL){
-        printf("network_send_arp: buffer\n");
-        goto fail;
-    }
-
 //
 // Copy
 //
 
+    if ( (void*) frame == NULL )
+        panic("network_send_arp: frame\n");
+
 // Copy the ethernet header into the buffer.
 // 14 bytes.
     for (i=0; i<ETHERNET_HEADER_LENGHT; i++){
-        buffer[i] = (unsigned char) src_ethernet[i];
+        frame[i] = (unsigned char) src_ethernet[i];
     };
 // Copy the arp header into the buffer.
 // 28 bytes
 // It starts right after the ethernet header.
     for (i=0; i<ARP_HEADER_LENGHT; i++){
-        buffer[ETHERNET_HEADER_LENGHT + i] = (unsigned char) src_arp[i]; 
+        frame[ETHERNET_HEADER_LENGHT + i] = (unsigned char) src_arp[i]; 
     };
 
 // ======================
@@ -239,7 +250,8 @@ network_send_arp(
     size_t ARP_TOTAL_SIZE = 
         ( ETHERNET_HEADER_LENGHT + \
           ARP_HEADER_LENGHT );
-    e1000_send( currentNIC, ARP_TOTAL_SIZE, buffer );
+// Sending a frame!
+    e1000_send( currentNIC, ARP_TOTAL_SIZE, frame );
     printf ("Done\n");
     refresh_screen();
     return;

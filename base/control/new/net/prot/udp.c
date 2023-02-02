@@ -193,14 +193,15 @@ network_send_udp (
 // Identification
 // ... identifying the group of fragments of a single IP datagram. 
 // 16 bit
-    uint16_t ipv4count = 1; 
+    //uint16_t ipv4count = 1; 
     //ipv4->ip_id = 0x0100;
-    ipv4->ip_id = (uint16_t) ToNetByteOrder16(ipv4count);
+    //ipv4->ip_id = (uint16_t) ToNetByteOrder16(ipv4count);
+    ipv4->ip_id = 0;  // No fragmentation for now.
 
   //16 bit   //bits  0b01000;
     ipv4->ip_off = 0x0000;  //0x8
 
-    ipv4->ip_ttl = 0x40;  //8bit
+    ipv4->ip_ttl = 64; //0x40;  //8bit
 
 
 // Protocol
@@ -280,18 +281,18 @@ network_send_udp (
 //143 IMAP2 Interim Mail Access Prot. v2
 //161 SNMP Simple Network Man. Prot.
 
+// src and dst ports
+// Podemos usar o mesmo número de porta?
+// Não para enviarmos dentro da mesma máquina.
     uint16_t UDP_PORT = 34884;
-
-// src
     udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
-// dst
     udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
 
 // Length
+// (UPD header + payload).
 // This field specifies the length in bytes of the UDP header and UDP data. 
-//This field specifies the length in bytes of the UDP header and UDP data. 
-//The minimum length is 8 bytes, the length of the header. 
-    uint16_t __udplen = (UDP_HEADER_LENGHT + 512); 
+// The minimum length is 8 bytes, the length of the header. 
+    uint16_t __udplen = (uint16_t) (UDP_HEADER_LENGHT + 512); 
     udp->uh_ulen = (uint16_t) ToNetByteOrder16(__udplen);
 
 // Checksum
@@ -301,9 +302,14 @@ network_send_udp (
 // that contains some of the same information from the real IPv4 header.
     udp->uh_sum = 0; //#todo
 
+
+
 //
-// == # BUFFER # =====
+// Buffer
 //
+
+// Let's call it 'frame'.
+// Because we're sending a 'frame'.
 
 // ??
 // Quem?
@@ -315,8 +321,9 @@ network_send_udp (
 // nic intel. Para isso usamos o offset obtido logo acima.
 
     uint16_t buffer_index = (uint16_t) currentNIC->tx_cur;
+
 // Get the buffer address based on its offset.
-    unsigned char *buffer = 
+    unsigned char *frame = 
         (unsigned char *) currentNIC->tx_buffers_virt[buffer_index];
 
     //#debug
@@ -331,8 +338,11 @@ network_send_udp (
     unsigned char *src_udp      = (unsigned char *) udp; 
 
 //
-// Copy.
+// Copy
 //
+
+    if ( (void*) frame == NULL )
+        panic("network_send_udp: frame\n");
 
 // Copiando as estruturas para o buffer.
 // >Step1) Copiando o header ethernet.
@@ -345,7 +355,7 @@ network_send_udp (
     int eth_offset=0;
     for ( j=0; j<ETHERNET_HEADER_LENGHT; j++ )
     {
-        buffer[eth_offset +j] = src_ethernet[j];
+        frame[eth_offset +j] = src_ethernet[j];
     };
 
 //Step2
@@ -353,24 +363,24 @@ network_send_udp (
     int ipv4_offset = ETHERNET_HEADER_LENGHT;
     for ( j=0; j<IP_HEADER_LENGHT; j++ )
     {
-        buffer[ipv4_offset +j] = src_ipv4[j];
+        frame[ipv4_offset +j] = src_ipv4[j];
     };
 
 //Step3
 //copia o udp
     int udp_offset = ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT;
     for ( j=0; j<UDP_HEADER_LENGHT; j++ ){
-        buffer[udp_offset +j] = src_udp[j];
+        frame[udp_offset +j] = src_udp[j];
     };
 
 //Step4
-//copia o xxxdata
+//copia o payload.
     int data_offset = 
             ( ETHERNET_HEADER_LENGHT +
               IP_HEADER_LENGHT +
               UDP_HEADER_LENGHT );
     for ( j=0; j<512; j++ ){
-        buffer[data_offset +j] = data[j];
+        frame[data_offset +j] = data[j];
     };
 
  
@@ -385,8 +395,22 @@ network_send_udp (
                ( ETHERNET_HEADER_LENGHT +\
                  IP_HEADER_LENGHT +\
                  UDP_HEADER_LENGHT +\
-                 512 );  
-    e1000_send( currentNIC, UDP_TOTAL_SIZE, buffer );
+                 512 );
+// Send the frame.
+// Via ip, enviaremos (udp+payload).
+    
+    // send via nic
+    e1000_send( currentNIC, UDP_TOTAL_SIZE, frame );
+
+    // send to myself.
+    //network_handle_udp ( 
+    //    frame + ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT ,
+    //    UDP_HEADER_LENGHT + 512 );
+        
+    //#debug
+    //refresh_screen();
+    //while(1){}
+    
     printf ("Done\n");
     refresh_screen();
     return 0;

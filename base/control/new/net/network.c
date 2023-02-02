@@ -56,14 +56,16 @@ void testNIC(void)
 
 void 
 network_on_receiving ( 
-    const unsigned char *buffer, 
+    const unsigned char *frame, 
     ssize_t size )
 {
+// Handle ethernet header.
+
     struct ether_header *eth = 
-        (struct ether_header *) buffer;
+        (struct ether_header *) frame;
     uint16_t Type=0;
 
-    if ( (void*) buffer == NULL ){
+    if ( (void*) frame == NULL ){
         return;
     }
 
@@ -129,15 +131,11 @@ network_on_receiving (
     switch (Type){
     case ETHERTYPE_IPv4:
         Show=TRUE;
-        network_handle_ipv4(
-            (buffer + ETHERNET_HEADER_LENGHT),
-            size );
+        network_handle_ipv4( (frame + ETHERNET_HEADER_LENGHT), size );
         break;
     case ETHERTYPE_ARP:
         Show=TRUE;
-        network_handle_arp(
-            (buffer + ETHERNET_HEADER_LENGHT),
-            size );
+        network_handle_arp( (frame + ETHERNET_HEADER_LENGHT), size );
         break;
     // ...
     //case ETHERTYPE_IPv6:
