@@ -641,6 +641,25 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
+// yes or no.
+// see: stdio.c
+    static int yn_result = -1;
+    if ( strncmp(prompt,"yn",2) == 0 )
+    {
+        yn_result = (int) rtl_y_or_n();
+        if ( yn_result == TRUE ){
+            printf("Returned TRUE\n");
+        }
+        if ( yn_result == FALSE ){
+            printf("Returned FALSE\n");
+        }
+        if ( yn_result != TRUE && yn_result != FALSE ){
+            printf("Returned Invalid result\n");
+        }
+        goto exit_cmp;
+    }
+
+
     if( strncmp(prompt,"open1",5) == 0 )
     {
         open("/DEV/KBD0", "a+"); 

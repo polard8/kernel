@@ -125,20 +125,40 @@ char *out_char(char *dst,char ch)
 }
 */
 
+
+int rtl_y_or_n(void)
+{
+    static int ch=0;
+    printf ("Type: 'y' or 'n'\n");
+    while (1)
+    {
+        // Get and convert to capital.
+        ch = (int) fgetc(stdin);
+        ch = (int) toupper(ch);
+
+        if (ch == 'Y'){
+            printf ("~YES!\n");
+            return TRUE;
+        } else if (ch == 'N'){
+            printf ("~NO!\n");
+            return FALSE;
+        };
+    };
+}
+
+
 // stdio_atoi:
 // Talvez isso possa ir para o topo do 
 // arquivo para servir mais funções.
-
-int stdio_atoi(char *s)
+int stdio_atoi (char *s)
 {
     int rv=0; 
     char sign=0;
 
 // Skip till we find either a digit or '+' or '-'.
-
     while (*s){
-        if (*s <= '9' && *s >= '0'){  break;  }
-        if (*s == '-' || *s == '+'){  break;  }
+        if (*s <= '9' && *s >= '0'){ break; }
+        if (*s == '-' || *s == '+'){ break; }
         s++;
     };
 

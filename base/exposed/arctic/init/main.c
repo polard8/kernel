@@ -343,6 +343,26 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
+/*
+// yes or no.
+// see: stdio.c
+    static int yn_result = -1;
+    if ( strncmp(prompt,"yn",2) == 0 )
+    {
+        yn_result = (int) rtl_y_or_n();
+        if ( yn_result == TRUE ){
+            printf("Returned TRUE\n");
+        }
+        if ( yn_result == FALSE ){
+            printf("Returned FALSE\n");
+        }
+        if ( yn_result != TRUE && yn_result != FALSE ){
+            printf("Returned Invalid result\n");
+        }
+        goto exit_cmp;
+    }
+*/
+
     if ( strncmp(prompt,"about",5) == 0 ){
         printf ("INIT.BIN: This is the first user application\n");
         goto exit_cmp;
@@ -434,6 +454,25 @@ static int __CompareString(void)
 // ----------------------------------------
 
     printf ("Command not found, type 'help' for more commands\n");
+
+/*
+ // This thing is very cool.
+ // I'm not using it for safity.
+    printf ("Command not found!\n");
+    // DE - Desktop Environment?
+    printf ("Do You want to launch the GUI\n");
+    static int yn_result = -1;
+    yn_result = (int) rtl_y_or_n();
+    if ( yn_result == TRUE ){
+        //printf("Returned TRUE\n");
+        do_launch_de();
+        goto exit_cmp;
+    }
+    if ( yn_result == FALSE ){
+        //printf("Returned FALSE\n");
+        printf ("Type 'help' for more commands\n");
+    }
+*/
 
 exit_cmp:
     if (isTimeToQuit==TRUE){
