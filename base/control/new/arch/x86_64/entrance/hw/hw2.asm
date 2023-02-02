@@ -5,12 +5,18 @@
 ; Imports
 ;
 
-; #test
-; testando callbacks.
+
+;
+; Callback support.
+;
+
+; Flag
 extern _asmflagDoCallbackAfterCR3
-extern _asmRing3CallbackAddress
+; Address
+extern _ring3_callback_address
 
 
+; ts
 extern _task_switch_status
 
 
@@ -55,37 +61,71 @@ extern _contextR15
 
 
 ; -------------------------------------
-;; callback restorer.
-;; temos que terminal a rotina do timer e
-;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
-
+; callback restorer.
+; temos que terminal a rotina do timer e
+; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
 ; #bugbug
 ; We gotta check what is the process calling this routine.
 
 callback_restorer:
-    ;drop the useless stack frame
-    pop rax ;rip
-    pop rax ;cs
-    pop rax ;rflags
-    pop rax ;rsp
-    pop rax ;ss
+
+; Drop the useless stack frame.
+; We were in the middle of the timer interrupt,
+; so, we're gonna use the saved context to release the next thread.
+
+    pop rax  ; rip
+    pop rax  ; cs
+    pop rax  ; rflags
+    pop rax  ; rsp
+    pop rax  ; ss
 
 ; #bugbug
 ; We gotta check what is the process calling this routine.
      ;call __xxxxCheckCallerPID
 
-; clear the variables
-; desse jeito a rotina de saida não tentara
+; Clear the variables.
+; Clear the flag and the procedure address.
+; Desse jeito a rotina de saida não tentará
 ; chamar o callback novamente.
     mov qword [_asmflagDoCallbackAfterCR3], 0
-    mov qword [_asmRing3CallbackAddress], 0
+    mov qword [_ring3_callback_address], 0
 
-;; Normal timer exit. (after cr3).
-;; temos que terminal a rotina do timer e
-;; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
-;; que ainda é o window server.
-    jmp unit3Irq0Release
+; Normal timer exit. (after cr3).
+; temos que terminal a rotina do timer e
+; retornarmos para ring 3 com o contexto o ultimo contexto salvo.
+; que ainda é o window server.
+    jmp irq0_release
 
+;------------------------------------------------
+; Salta para um callback no window server em ring3.
+; + Essa rotina foi chamada somente quando o kernel estava usando
+;   a paginação do aplicativo window server.
+; + Interrupçoes desabilitadas
+; + eoi não acionado.
+; Nessa hora vamos para ring3 executar um código no aplicativo,
+; uma interrupção gerada pelo aplicativo nos trará de volta
+; par ao kernel na rotina callback_restorer, e por fim
+; devemos definitivamente voltarmos para o aplicativo em ring 3,
+; através da rotina irq0_release.
+; IN:
+; ss     - Reusado do contexto salvo do aplicativo.
+; rsp    - Reusado do contexto salvo do aplicativo.
+; rflags - ring3, interrupções desabilitadas.
+; cs     - Reusado do contexto salvo do aplicativo.
+; rbx    - rip
+;
+
+__doRing3Callback:
+; Get the RIP address.
+    mov rbx, qword [_ring3_callback_address]
+; Setup the stack frame.
+    push qword [_contextSS]   ; ss
+    push qword [_contextRSP]  ; rsp
+    push qword 0x3000         ; rflags interrupçoes desabilitadas.
+    push qword [_contextCS]   ; cs
+    push rbx                  ; rip
+; Go to the ring3 procedure.
+    iretq
 
 ; -------------------------------------
 ; Irq0 release.
@@ -93,7 +133,7 @@ callback_restorer:
 ; See: _irq0 in unit1hw.asm.
 ; See: ts.c, pit.c, sci.c.
 
-unit3Irq0Release:
+irq0_release:
 
 ; ring3 callback
 ; Se a flag indicar que sim,
@@ -109,13 +149,10 @@ unit3Irq0Release:
 ; o contexto precisa estar salvo.
 ; Se fosse depois, então saltaríamos para outra tarefa
 ; diferente do window server e usaríamos endereços errados.
-
-
     mov rax, qword [_asmflagDoCallbackAfterCR3]
-    mov rbx, qword [_asmRing3CallbackAddress]
-    ; Callback ring3 procedure.
+; Callback ring3 procedure.
     cmp rax, 0x1234
-    je Unit3IretqToRing3Callback
+    je __doRing3Callback
 
 
 ; 64bit
@@ -184,24 +221,6 @@ unit3Irq0Release:
 
     sti
     iretq
-
-
-;------------------------------------------------
-; IN: rbx = rip
-Unit3IretqToRing3Callback:
-
-    push qword [_contextSS]      ; ss
-    push qword [_contextRSP]     ; rsp
-    push qword 0x3000            ; rflags interrupçoes desabilitadas.
-    push qword [_contextCS]      ; cs
-    push rbx                     ; rip
-    ; interrupçoes desabilitadas
-    ; eoi nao acionado.
-    ; quando uma interrupçao voltar para ring3, 
-    ; entao devemos usar unit3Irq0Release
-    ; para retomar as atividades do aplicativo.
-    iretq
-
 
 ;----------------------------------------------
 ; _turn_task_switch_on:

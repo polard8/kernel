@@ -5,10 +5,10 @@
 #ifndef __CALLBACK_H
 #define __CALLBACK_H    1
 
-
 extern unsigned long asmflagDoCallbackAfterCR3;
-extern unsigned long asmRing3CallbackAddress;
 
+//extern unsigned long asmRing3CallbackAddress;
+extern unsigned long ring3_callback_address;
 
 struct ws_callback_info_d
 {

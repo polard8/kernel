@@ -19,7 +19,7 @@
 
 // Exported to asm.
 unsigned long asmflagDoCallbackAfterCR3=0;
-unsigned long asmRing3CallbackAddress=0;
+unsigned long ring3_callback_address=0;
 
 // Not exported to asm.
 int _callback_status=FALSE;
@@ -92,7 +92,7 @@ void prepare_next_ws_callback(void)
     if ( ws_callback_info.callback_address == 0 )
         panic("prepare_next_ws_callback: Invalid ws_callback_info.callback_address\n");
             
-    asmRing3CallbackAddress = 
+    ring3_callback_address = 
         (unsigned long) ws_callback_info.callback_address;
             
 // Dizemos que não ha mais um callback inicializado.

@@ -199,9 +199,9 @@ _irq0:
     fxrstor [_context_fpu_buffer]
 
 ; Release a bandit.
-; see: unit3hw.asm
+; see: hw2.asm
 
-    jmp unit3Irq0Release
+    jmp irq0_release
 ; --------------------------------------
 
 
