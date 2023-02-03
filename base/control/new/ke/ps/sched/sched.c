@@ -9,6 +9,16 @@
 // see: sched.h
 struct scheduler_info_d  SchedulerInfo;
 
+// QUEUES:
+// Earth: (INITIALIZED, STANDBY, ZOMBIE, DEAD).
+// Space: (READY, RUNNING, WAITING, BLOCKED).
+#define QUEUE_READY      0  // Pronta pra retomar.
+#define QUEUE_STANDBY    1  // Pronta pra rodar pela primeira vez.
+#define QUEUE_WAITING    2  // Esperando algum evento.
+#define QUEUE_BLOCKED    3  // Bloqueada.
+#define SCHED_QUEUE_MAX  4
+static int __current_sched_queue=0;
+unsigned long schedQueueHeads[SCHED_QUEUE_MAX];
 
 //
 // Linked lists.
@@ -97,12 +107,21 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // um dado processador para escalonar para ele.
 
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
+
     if ( (void*) Idle == NULL ){
         panic ("__scheduler_rr: Idle\n");
     }
     if ( Idle->used != TRUE || Idle->magic != 1234 ){
         panic ("__scheduler_rr: Idle validation\n");
     }
+
+// A idle thread precisa ser a 
+// thread de controle do processo init.
+
+    if (Idle != InitThread){
+        panic ("__scheduler_rr: Idle != InitThread\n");
+    }
+
     // Estabiliza a idle thread.
     Idle->base_priority = PRIORITY_SYSTEM;
     Idle->priority      = PRIORITY_SYSTEM;
@@ -119,16 +138,26 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
     FirstTID = (tid_t) Idle->tid;
 
+// A idle thread precisa ser a 
+// thread de controle do processo init.
+// INIT_TID = SYSTEM_THRESHOLD_TID.
+
     if (FirstTID != SYSTEM_THRESHOLD_TID){
         panic ("__scheduler_rr: FirstTID\n");
     }
 
-    if (Idle != InitThread){
-        panic ("__scheduler_rr: Idle != InitThread\n");
-    }
 
 // ===============================================
+// Building the queues
+// Clear the list of heads.
+    for (i=0; i<SCHED_QUEUE_MAX; i++){
+        schedQueueHeads[i] = 0;
+    };
 
+// The head of the ready queue.
+    scheduler_set_first_ready(Idle);
+
+// ===============================================
 // Conductor
 // Esse é o condutor exportado, que o ts.c vai usar.
 // Começamos a lista com a Idle thread desse processador.
@@ -347,8 +376,7 @@ tid_t scheduler(void)
     }
 
 // A primeira thread precisa ser a idle thread.
-    if ( first_tid != Idle->tid )
-    {
+    if ( first_tid != Idle->tid ){
         panic("scheduler: first_tid != Idle->tid\n");
     }
 
@@ -362,12 +390,60 @@ tid_t scheduler(void)
 
 
 
+struct thread_d *scheduler_get_head(int index)
+{
+    struct thread_d *t;
+
+    if (index < 0)
+        return NULL;
+    if (index >= SCHED_QUEUE_MAX)
+        return NULL;
+    t = (struct thread_d *) schedQueueHeads[index];
+    if ( (void*) t == NULL )
+        return NULL;
+    if (t->used != TRUE)
+        return NULL;
+    if (t->magic != 1234)
+        return NULL;
+    return (struct thread_d*) t;
+}
 
 
+struct thread_d *scheduler_get_first_ready(void)
+{
+    return (struct thread_d *) scheduler_get_head(QUEUE_READY);
+}
+struct thread_d *scheduler_get_first_standby(void)
+{
+    return (struct thread_d *) scheduler_get_head(QUEUE_STANDBY);
+}
+struct thread_d *scheduler_get_first_waiting(void)
+{
+    return (struct thread_d *) scheduler_get_head(QUEUE_WAITING);
+}
+struct thread_d *scheduler_get_first_blocked(void)
+{
+    return (struct thread_d *) scheduler_get_head(QUEUE_BLOCKED);
+}
 
+//----------------
 
-
-
+void scheduler_set_first_ready(struct thread_d *thread)
+{
+    schedQueueHeads[QUEUE_READY] = (unsigned long) thread;
+}
+void scheduler_set_first_standby(struct thread_d *thread)
+{
+    schedQueueHeads[QUEUE_STANDBY] = (unsigned long) thread;
+}
+void scheduler_set_first_waiting(struct thread_d *thread)
+{
+    schedQueueHeads[QUEUE_WAITING] = (unsigned long) thread;
+}
+void scheduler_set_first_blocked(struct thread_d *thread)
+{
+    schedQueueHeads[QUEUE_BLOCKED] = (unsigned long) thread;
+}
 
 
 // Lock scheduler
@@ -415,6 +491,17 @@ int init_scheduler (unsigned long sched_flags)
 // Input responder.
     flagUseThisInputResponder = FALSE;
     input_responder_tid = -1;
+
+// -------------------------------
+// Sched queue heads.
+    register int i=0;
+    for (i=0; i<SCHED_QUEUE_MAX; i++){
+        schedQueueHeads[i] = 0;
+    };
+    __current_sched_queue = 0;
+    schedQueueHeads[__current_sched_queue] = 
+        (unsigned long) UPProcessorBlock.IdleThread;
+// -------------------------------
 
 
 //

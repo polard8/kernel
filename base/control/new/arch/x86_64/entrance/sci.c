@@ -1049,8 +1049,6 @@ void *sci0 (
 
     pid_t current_process = (pid_t) get_current_process();
 
-
-
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci0_cpl;
     int cpl=-1;
@@ -1091,9 +1089,9 @@ void *sci0 (
 
 // Profiling in the process structure.
 
-    if ( current_process<0 ||
-         current_process >= PROCESS_COUNT_MAX )
-    {
+// Permission
+
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         panic("sci0: current_process\n");
     }
 
@@ -2012,14 +2010,10 @@ void *sci1 (
         // ok
     }
 
-
-
-    if ( current_process<0 ||
-         current_process >= PROCESS_COUNT_MAX )
-    {
+// permission
+    if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         panic("sci1: current_process\n");
     }
-
 
     switch (number){
 
@@ -2084,16 +2078,16 @@ void *sci2 (
         // ok
     }
 
-
     // debug_print("sci2: [TODO]\n");
 
 // Profiling in the process structure.
+
+// Permission
 
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         panic("sci2: current_process\n");
     }
 
-// structure
     p = (struct process_d *) processList[current_process];
     if ( (void*) p == NULL ){
         debug_print("sci2: p\n");

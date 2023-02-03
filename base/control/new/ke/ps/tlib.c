@@ -849,29 +849,9 @@ void dead_thread_collector(void)
                     panic ("dead_thread_collector: We can't kill the current_thread!\n");
                 }
 
-                // Kill
-                // #todo: Podemos apenas colocar a estrutura no stock
-                // ao invez de destruir ela.
-
-                Target->used = 0;
-                Target->magic = 0;
-                Target->state = DEAD; // Por enquanto apenas fecha.
-
-                Target = NULL;
-                threadList[i] = (unsigned long) 0;
-
-                // Decrement the counter.
-                UPProcessorBlock.threads_counter--;
-                if (UPProcessorBlock.threads_counter < 1){
-                    panic("dead_thread_collector: threads_counter\n");
-                }
-
-                // #importante:
-                // Nessa hora precisamos notificar o 
-                // a thread que estava esperando essa thread terminar.
-                // Se essa for a thread primária então o processo 
-                // irá terminar também, então o processo que esperava 
-                // também deverá ser notificado.
+                // Muda o state para DEAD
+                // e libera a estrutura para reuso.
+                kill_thread(Target->tid);
             };
             //Nothing.
         };
@@ -889,35 +869,53 @@ void dead_thread_collector(void)
  *     Destrói uma thread.
  *     Destroi a estrutura e libera o espaço na lista.
  */
-
-void kill_thread (int tid)
+// Muda o state para DEAD
+// e libera a estrutura para reuso.
+void kill_thread(tid_t tid)
 {
-    int Lzzz = tid;
-    debug_print ("kill_thread: Not implemented\n");
-    panic       ("kill_thread: Not implemented\n");
+// Kill a ZOMBIE thread.
+// + Only free the object for future use.
 
-/*
-    //#todo: This is a good routine.
-   
+    struct thread_d *t;
+
+// #debug
+// This is a test yet.
+
+    printf ("kill_thread: {%d}\n", tid);
+    printf ("This is a test yet\n");
+    panic ("kill_thread: #debug\n");
+
+// Can't kill the control thread of the init process.
+// INIT_TID = SYSTEM_THRESHOLD_TID.
+
     if (tid == INIT_TID)
         return;
 
-    if(tid<0)
+// tid limits.
+
+    if (tid<0)
         return;
-    if(tid>=THREAD_COUNT_MAX)
+    if (tid>=THREAD_COUNT_MAX)
         return;
 
-    struct thread_d *t;
+// pointer
+// Thread validation
+
     t = (struct thread_d *) threadList[tid];
-    if( (void*) t == NULL )
+    if ( (void*) t == NULL )
         return;
-    if(t->magic!=1234)
+    if (t->used != TRUE)
+        return;
+    if (t->magic != 1234)
+        return;
+    if (t->state != ZOMBIE)
         return;
 
-// Let the scheduler to the job.
-    t->exit_in_progress = TRUE;
-*/
-
+// Change the state.
+    t->state = DEAD;
+// Change the validation
+// Now this structure can be reused.
+    t->magic = 4321;
 }
 
 // #todo
@@ -933,4 +931,27 @@ void kill_all_threads(void)
         kill_thread(i);
     };
 }
+
+void kill_zombie_threads(void)
+{
+    struct thread_d *t;
+    register int i=0;
+    for (i=0; i<THREAD_COUNT_MAX; i++)
+    {
+         t = (struct thread_d *) threadList[i];
+         if (t->used == TRUE)
+         {
+             if (t->magic == 1234)
+             {
+                 if (t->state == ZOMBIE){
+                     kill_thread(t->tid);
+                 }
+             }
+         }    
+    };
+}
+
+
+
+
 

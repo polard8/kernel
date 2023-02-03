@@ -45,6 +45,17 @@ This repository has the source code for:
 > * unix-like library. (rtl)
 > * Lib for the window server's clients. (libgws)
 
+## Folders.
+A brief description of the directories.
+ * `base/` - Low basic components of the system.  
+  * `control` - Ring 0 stuff.
+   * `boot` - The boot loader.
+   * `disk` - The root directory for the boot partition.
+   * `new` - The Gramado OS kernel.
+  * `exposed` - Ring 3 stuff.
+ * `gramland/` - The window server and it's clients.
+ * `meta/` - Games and 3D experiments.
+
 ## Fred's compilation on Linux.
 
 ```

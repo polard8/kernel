@@ -876,8 +876,9 @@ SetThread_PML4PA (
 void check_for_dead_thread_collector (void);
 void dead_thread_collector (void);
 
-void kill_thread(int tid);
+void kill_thread(tid_t tid);
 void kill_all_threads(void);
+void kill_zombie_threads(void);
 
 // ==
 

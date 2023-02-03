@@ -1,8 +1,0 @@
-
-
-	This folder is a mess.
-	We need to separate 16bit from 32bit code.
-	Maybe we need to create the rm/ ... it is a
-	good starting point.
-
-

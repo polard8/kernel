@@ -71,46 +71,41 @@
 // Define min and max
 // Quantos diretórios podemos alocar aqui?
 
-#define  ____DANGER_TABLE_POINTER_HEAP_BASE  0x1000
-
+#define ____DANGER_TABLE_POINTER_HEAP_BASE  0x1000
 
 // Essa tabela é bem longa
 // Vai até o MBR.
-
 
 //
 // == 128 KB ==================================================
 //
 
-
 // 128 KB mark.
+// O BL fica aqui e posteriormente é sobreposto pelo MBR?
 #define MBR_ADDRESS  0x00020000
-
-#define VOLUME1_VBR_ADDRESS   (MBR_ADDRESS + 0x200) 
-#define VOLUME2_VBR_ADDRESS   (MBR_ADDRESS + 0x200) 
+#define VOLUME1_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
+#define VOLUME2_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
 // ...
-
 
 //
 // == 192 KB ==================================================
 //
 
-// Size?
-#define VOLUME1_FAT_ADDRESS   0x00030000 
-#define VOLUME2_FAT_ADDRESS   0x00030000
-
+#define FAT_ADDRESS  0x00030000
+#define VOLUME1_FAT_ADDRESS  (FAT_ADDRESS + 0)  // Size?
+#define VOLUME2_FAT_ADDRESS  (FAT_ADDRESS + 0)  // Size?
 
 //
 // == 448 KB ==================================================
 //
 
 // Rootdir size = (512*32) = 16 KB.
-#define VOLUME1_ROOTDIR_ADDRESS  0x00070000 
-#define VOLUME2_ROOTDIR_ADDRESS  0x00070000 
+#define ROOTDIR_ADDRESS  0x00070000 
+#define VOLUME1_ROOTDIR_ADDRESS  (ROOTDIR_ADDRESS + 0) 
+#define VOLUME2_ROOTDIR_ADDRESS  (ROOTDIR_ADDRESS + 0)
 
-//#todo
-//#define VOLUME1_ROOTDIR_PA  VOLUME1_ROOTDIR_ADDRESS
-//#define VOLUME2_ROOTDIR_PA  VOLUME2_ROOTDIR_ADDRESS
+#define VOLUME1_ROOTDIR_PA  VOLUME1_ROOTDIR_ADDRESS
+#define VOLUME2_ROOTDIR_PA  VOLUME2_ROOTDIR_ADDRESS
 
 
 /*
@@ -247,6 +242,8 @@ A conservative approach is to avoid everything above 0x00080000.
 //
 // == 640 KB ==================================================
 //
+
+// Base memory limit.
 
 // - 0x000A0000 - 0x000BFFFF - Video RAM (VRAM) Memory
 // - 0x000B0000 - 0x000B7777 - Monochrome Video Memory

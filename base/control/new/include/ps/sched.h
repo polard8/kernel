@@ -59,8 +59,18 @@ void set_input_responder_tid(int tid);
 
 int init_scheduler (unsigned long sched_flags);
 
-// ::core
 tid_t scheduler (void);
+
+// Queue heads.
+struct thread_d *scheduler_get_head(int index);
+struct thread_d *scheduler_get_first_ready(void);
+struct thread_d *scheduler_get_first_standby(void);
+struct thread_d *scheduler_get_first_waiting(void);
+struct thread_d *scheduler_get_first_blocked(void);
+void scheduler_set_first_ready(struct thread_d *thread);
+void scheduler_set_first_standby(struct thread_d *thread);
+void scheduler_set_first_waiting(struct thread_d *thread);
+void scheduler_set_first_blocked(struct thread_d *thread);
 
 void scheduler_lock (void);
 void scheduler_unlock (void);
