@@ -23,6 +23,8 @@ int __ptsname (int fd, char *buf, size_t buflen);
 void *kmalloc (size_t size);
 void kfree (void *ptr);
 void *kcalloc(size_t count, size_t size);
+
+int k_atoi(const char *str);
 int abs(int j);
 
 #endif    

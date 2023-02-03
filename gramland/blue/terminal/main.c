@@ -737,12 +737,27 @@ static void compareStrings(int fd)
         goto exit_cmp;
     } 
 
-// scape sequence
-    if ( strncmp(prompt,"tputstring",10) == 0 )
-    {
+
+// Test escape sequence do terminal.
+    if ( strncmp(prompt,"esc",3) == 0 ){
         __test_escapesequence(fd);
         goto exit_cmp;
     }
+
+
+// Test escape sequence do console no kernel.
+    if ( strncmp(prompt,"esc2",4) == 0 )
+    {
+        //move cursor right
+        printf("\033[8Cm Fred\n");
+        //move cursor left
+        printf("\033[8Dm Fred\n");
+        printf("\033[4Bm cursor down!\n");
+        printf("\033[8Am cursor up!\n");
+        // ...
+        goto exit_cmp;
+    }
+
 
 
 // Quit 'ws'.
@@ -884,7 +899,7 @@ static void compareStrings(int fd)
 
         // Clear the window
         // Repaint it using the default background color.
-        gws_clear_window(fd,Terminal.client_window_id);
+        //gws_clear_window(fd,Terminal.client_window_id);
 
         goto exit_cmp;
     }
@@ -1433,7 +1448,12 @@ void del (void)
 
 void __test_escapesequence(int fd)
 {
-    tputstring(fd, "Testing scape sequence:\n");
+
+    if (fd<0)
+        return;
+
+    tputstring(fd,"\n");
+    tputstring(fd, "Testing escape sequence:\n");
     //tputstring(fd, "One: \033[m");          //uma sequencia.
     //tputstring(fd, "Two: \033[m \033[m");   //duas sequencias.
     tputstring(fd, "~Before \033[m ~Inside \033[m ~ After"); 
@@ -1751,10 +1771,11 @@ tputc (
 
     } else if (term.esc & ESC_START){
 
-        // Um [ já foi encontrado.
+        // Depois de encontrarmos o '[', entramos no ESC_CSI.
         // Vamos analisar a sequencia depois de '['
         // A sequencia vai terminar com um 'm'
         // #todo parse csi
+        // CSI - Control Sequence Introducer
         if(term.esc & ESC_CSI){
 
             switch (ascii)
@@ -1813,7 +1834,9 @@ tputc (
                      return;
                      break;
 
-                 // cursor right
+                 // Cursor right.
+                 // Pegamos o valor que vem antes disso,
+                 // pra sabermos quando devemos mudar o cursor.
                  case 'C':
                      //printf("FOUND {C}\n");
                      ivalue = (int) CSI_BUFFER[0];
@@ -1821,19 +1844,28 @@ tputc (
                      ivalue = atoi(&ivalue); 
                      //printf("ivalue {%d}\n",ivalue);
                      cursor_x = (cursor_x + ivalue);
-                     if(cursor_x>=80){ cursor_x=79; }
+                     if (cursor_x >= 80){
+                         cursor_x=79; 
+                     }
                      return;
                      break;
 
-                 //cursor left
+                 // Cursor left.
+                 // Pegamos o valor que vem antes disso,
+                 // pra sabermos quando devemos mudar o cursor.
                  case 'D':
                      //printf("FOUND {D}\n");
                      ivalue = (int) CSI_BUFFER[0];
                      ivalue = (int) (ivalue & 0xFF); //only the first byte.
                      ivalue = atoi(&ivalue); 
                      //printf("ivalue {%d}\n",ivalue);
-                     cursor_x = (cursor_x - ivalue);
-                     if(cursor_x<0){ cursor_x=0; }
+                     if ( cursor_x >= ivalue )
+                     {
+                         cursor_x = (cursor_x - ivalue);
+                     }
+                     if (cursor_x < 0){
+                         cursor_x=0;
+                     }
                      return;
                      break;
 
@@ -1883,7 +1915,12 @@ tputc (
                 default:
                     //printf ("FOUND {value}\n"); //debug
                     
-                    //#test: using only the first offset for now.
+                    //#test: 
+                    // Using only the first offset for now.
+                    
+                    // Nesse caso estamos colocando números 
+                    // depois de encontrarmos o '['.
+                    // Estamos em ESC_CSI e continuaremos nele.
                     CSI_BUFFER[0] = (char) ascii;
                     
                     //#bugbug: 'PF'
@@ -1920,12 +1957,16 @@ tputc (
 
             // ...
  
+        // Valido para ESC_START tambem.
         }else{
 
             switch (ascii){
 
+            // ESC [ -  CSI Control sequence introducer
+            // Estavamos no ESC_START e encontramos o '['.
             // Encontramos o '[' depois de \033.
             // Entao vamos entrar em ESC_CSI?
+            // see: https://man7.org/linux/man-pages/man4/console_codes.4.html
             case '[':
                 //printf ("FOUND {[}\n"); //debug
                 term.esc |= ESC_CSI;
@@ -1938,8 +1979,10 @@ tputc (
                  term.esc |= ESC_TEST;
                  break;
 
+            //  ESC P - DCS   Device control string (ended by ESC \)
             case 'P':  /* DCS -- Device Control String */
             case '_':  /* APC -- Application Program Command */
+            // ESC ^ - PM    Privacy message (ended by ESC \)
             case '^':  /* PM -- Privacy Message */
             case ']':  /* OSC -- Operating System Command */
             case 'k':  /* old title set compatibility */
@@ -1951,6 +1994,8 @@ tputc (
                 term.esc |= ESC_ALTCHARSET;
                 break;    
 
+            // ESC ( - Start sequence defining G0 character set
+            // (followed by one of B, 0, U, K, as below)
             case ')':  /* set secondary charset G1 (IGNORED) */
             case '*':  /* set tertiary charset G2 (IGNORED) */
             case '+':  /* set quaternary charset G3 (IGNORED) */
@@ -1958,7 +2003,7 @@ tputc (
                 __sequence_status = 0;
                 break;  
 
-
+            // ESC D - IND      Linefeed.
             /* IND -- Linefeed */
             case 'D': 
                 term.esc = 0;
@@ -1966,6 +2011,7 @@ tputc (
                 //printf (" {IND} ");  //debug
                 break;
 
+            // ESC E - NEL  Newline.
             /* NEL -- Next line */ 
             case 'E': 
                 term.esc = 0;
@@ -1973,6 +2019,7 @@ tputc (
                 //printf (" {NEL} "); //debug
                 break;
 
+            // ESC H - HTS Set tab stop at current column.
             /* HTS -- Horizontal tab stop */
             case 'H':   
                 term.esc = 0;
@@ -1980,6 +2027,7 @@ tputc (
                  //printf (" {HTS} "); //debug
                 break;
 
+            // ESC M - RI Reverse linefeed.
             /* RI -- Reverse index */
             case 'M':     
                 term.esc = 0;
@@ -1987,6 +2035,9 @@ tputc (
                 //printf (" {RI} "); //debug
                 break;
 
+            // ESC Z - DECID  DEC private identification.
+            // The kernel returns the string  ESC[?6c, 
+            // claiming that it is a VT102.
             /* DECID -- Identify Terminal */
             case 'Z':  
                  term.esc = 0;
@@ -1994,7 +2045,7 @@ tputc (
                  //printf (" {DECID} "); //debug
                  break;
 
-
+            // ESC c - RIS  Reset.
             /* RIS -- Reset to inital state */
             case 'c': 
                  term.esc = 0;
@@ -2002,6 +2053,7 @@ tputc (
                  //printf (" {reset?} "); //debug
                  break; 
 
+            // ESC = - DECPAM   Set application keypad mode
             /* DECPAM -- Application keypad */
             case '=': 
                  term.esc = 0;
@@ -2009,6 +2061,7 @@ tputc (
                  //printf (" {=} "); //debug
                  break;
 
+            // ESC > - DECPNM   Set numeric keypad mode
             /* DECPNM -- Normal keypad */
             case '>': 
                 term.esc = 0;
@@ -2016,18 +2069,21 @@ tputc (
                 //printf (" {>} "); //debug
                 break;
 
-
+            // ESC 7 - DECSC    Save current state (cursor coordinates,
+            //         attributes, character sets pointed at by G0, G1).
             /* DECSC -- Save Cursor */ 
-            //case '7':     
+            //case '7':
                //  term.esc = 0;
                //  break;
 
+            // ESC 8 - DECRC    Restore state most recently saved by ESC 7.
             /* DECRC -- Restore Cursor */ 
             //case '8': 
                //  term.esc = 0;
                //  break;
 
             /* ST -- Stop */
+            // ESC \  ST    String terminator
             //0x9C ST String Terminator ???
             //case '\\':   
                  //term.esc = 0;

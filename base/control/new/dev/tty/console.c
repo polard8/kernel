@@ -19,6 +19,8 @@ extern unsigned long wmWindowMananer_SendMessage(void);
 //extern unsigned long gSavedX;
 //extern unsigned long gSavedY;
 
+#define __RESPONSE  "\033[?1;2c"
+
 // global
 // Foreground console.
 int fg_console=0;
@@ -273,38 +275,10 @@ void csi_J(int par)
  */
 }
 
-// move to
+
+// apagar n bytes na mesma linha
 void csi_K(int par)
 {
-/*
-    long count __asm__("cx");
-    long start __asm__("di");
-
-	switch (par) {
-		case 0:	   //erase from cursor to end of line 
-			if (x>=columns)
-				return;
-			count = columns-x;
-			start = pos;
-			break;
-		case 1:	//erase from start of line to cursor 
-			start = pos - (x<<1);
-			count = (x<columns)?x:columns;
-			break;
-		case 2: //erase whole line 
-			start = pos - (x<<1);
-			count = columns;
-			break;
-		default:
-			return;
-	}
-	__asm__("cld\n\t"
-		"rep\n\t"
-		"stosw\n\t"
-		::"c" (count),
-		"D" (start),"a" (0x0720)
-		:"cx","di");
- */
 }
 
 // Fim da escape sequence.
@@ -327,8 +301,10 @@ void csi_m(void)
         return;
     }
 
-    for (i=0; i <= npar; i++){
+    for (i=0; i <= npar; i++)
+    {
         Ch = (int) par[i];
+        
         switch (Ch) {
         case 0:  attr=0x07;  break;
         case 1:  attr=0x0f;  break;
@@ -352,7 +328,7 @@ void csi_M (int nr, int console_number)
 */
 }
 
-// move to
+
 void csi_L (int nr, int console_number)
 {
 /*
@@ -1184,11 +1160,17 @@ void console_putchar (int c, int console_number)
 // + Draw char.
 // + Refresh char.
 
-// Getting char info.
-    int cWidth = get_char_width();
-    int cHeight = get_char_height();
+// Char info and
+// parameter for refresh worker.
+    unsigned long x=0;
+    unsigned long y=0;
+    unsigned long cWidth  = get_char_width();
+    unsigned long cHeight = get_char_height();
 
-    if ( cWidth == 0 || cHeight == 0 ){
+    cWidth  = (unsigned long) (cWidth  & 0xFFFF);
+    cHeight = (unsigned long) (cHeight & 0xFFFF);
+
+    if (cWidth == 0 || cHeight == 0){
         panic ("console_putchar: char\n");
     }
 
@@ -1211,11 +1193,10 @@ void console_putchar (int c, int console_number)
     //if( c != 0)
     console_outbyte ( (int) c, console_number );
 
-    refresh_rectangle ( 
-        (CONSOLE_TTYS[console_number].cursor_x * cWidth), 
-        (CONSOLE_TTYS[console_number].cursor_y * cHeight), 
-        cWidth, 
-        cHeight );
+    x = (unsigned long) (CONSOLE_TTYS[console_number].cursor_x * cWidth);
+    y = (unsigned long) (CONSOLE_TTYS[console_number].cursor_y * cHeight);
+
+    refresh_rectangle ( x, y, cWidth, cHeight );
 
 // flag off
     stdio_terminalmode_flag = FALSE; 
@@ -1430,6 +1411,16 @@ int consoleCompareStrings(void)
     }
     if ( strncmp(prompt,"test-udp",8) == 0 ){
         network_test_udp();
+        goto exit_cmp;
+    }
+
+    if ( strncmp(prompt,"str",3) == 0 )
+    {
+        console_print_indent(4,fg_console);
+        console_write_string(fg_console,"This is a string\n");
+        console_print_indent(8,fg_console);
+        console_write_string(fg_console,"This is another string\n");
+        //__respond(fg_console);
         goto exit_cmp;
     }
 
@@ -1919,11 +1910,13 @@ console_read (
     return -1;  //todo
 }
 
+// ------------------------------
 // console_write:
-// Called by sys_write() in sys.c.
-// Tem escape sequence
-// console number, buffer, size.
-// IN: 
+// Called by sys_write() in fs.c quando o arquivo é do tipo console.
+// Also called by sci.c.
+// Tem escape sequence.
+// IN:
+// console number, buffer, size. 
 
 ssize_t 
 console_write ( 
@@ -1931,11 +1924,16 @@ console_write (
     const void *buf, 
     size_t count )
 {
+// Write n bytes of a string into a given console.
+
 // loop
     register int i=0;
     char ch=0; 
     char *data = (char *) buf;
     size_t StringSize=0;
+    int ivalue=0;
+    int ivalue2=0;
+    int ivalue3=0;
 
     //debug_print ("console_write: [test]\n");
 
@@ -1988,26 +1986,32 @@ console_write (
                 //console_putchar ( '\n',console_number);
                // Is printable?
                // ascii, not abnt2
-               if (ch >31 && ch <127){
+               if (ch >= 32 && ch <= 127){
+                    
                     console_putchar ( ch, console_number );
+               
                // >>>> [ Escape ]
                // Entramos em uma escape sequence,
                // entao o proximo case inicia o tratamento da escape sequence.
                } else if (ch==27){
                    __EscapeSequenceStage=1;
+               
                // ?? \n
-               }else if (ch==10 || ch==11 || ch==12){
+               //}else if (ch==10 || ch==11 || ch==12){
+               }else if (ch == '\n'){
+               
                    console_putchar(ch,console_number);
                // Enter ? cr \n
-               }else if (ch==13){ 
+               }else if (ch == '\r'){ 
                    console_putchar(ch,console_number); 
                // Backspace
-               }else if (ch==8) {
+               }else if (ch=='\b') {
                    console_putchar(ch,console_number);
                // Tab.
-               } else if (ch==9) {
+               } else if (ch=='\t') {
                    console_putchar(ch,console_number); 
                };
+               
                break;
             
             //================================================
@@ -2025,32 +2029,39 @@ console_write (
                 // Isso porque o estagio mudara dependendo do char encontrado agora.
                 __EscapeSequenceStage=0; 
                 
-                // '['
-                // CSI.    '0x1b['
+
+                // ESC [ -  CSI Control sequence introducer
+                // https://man7.org/linux/man-pages/man4/console_codes.4.html
                 if (ch=='['){
                     __EscapeSequenceStage = 2;
-                
-                // >>> nao eh csi ... o 'E' esta no lugar do '['
-                
+
+                // ESC E - NEL  Newline.
                 }else if (ch=='E'){ 
                     __local_gotoxy ( 0, (CONSOLE_TTYS[console_number].cursor_y + 1), console_number );
+                    //__EscapeSequenceStage = 0;
+                
+                // ESC M - RI Reverse linefeed.
                 }else if (ch=='M'){
                     __local_ri ();   //scroll. deixa pra depois. kkk
+                    //__EscapeSequenceStage = 0;
+                
+                // ESC D - IND Linefeed.
                 }else if (ch=='D'){
                     console_putchar ( ch, console_number );  //lf();
+                    //__EscapeSequenceStage = 0;
+                
+                // ESC Z - DECID  DEC private identification.
+                // The kernel returns the string  ESC[?6c, 
+                // claiming that it is a VT102.
                 }else if (ch=='Z'){
                     __respond (console_number);    //test
+                    //__EscapeSequenceStage = 0;
                 
                 //??
                 // tivemos um 0x1b e o cursor esta em determinado lugar.
-                }else if ( CONSOLE_TTYS[console_number].cursor_x == '7'){   //?? What L.T.
-                    __local_save_cur (console_number);
+                }else{
+                }
                 
-                //??
-                // tivemos um 0x1b e o cursor esta em determinado lugar.
-                }else if ( CONSOLE_TTYS[console_number].cursor_x == '8' ){  //?? What L.T.
-                    __local_restore_cur (console_number);
-                };
                 break;
 
             //================================================
@@ -2106,9 +2117,12 @@ console_write (
                     // Multiplicamos o que estava no buffer por 10.
                     // Mas nem sei o que ja estava no buffer??
                     // porque fizemos isso ?
-                    // o buffer provavelmente esta vazio no primeiro numero.
-                    // Sendo assim qeubramos para tentarmos pegar mais numeros no for.
-                    par[npar] = 10 * par[npar] + ch - '0';
+                    // O valor no buffer provavelmente é 0,
+                    // no primeiro numero.
+                    // Sendo assim quebramos para 
+                    // tentarmos pegar mais numeros no for.
+                    //par[npar] = (10 * par[npar]) +ch -'0';
+                    par[npar] = ch;
                     break;
 
                  // Nao eh um delimitador nem um numero.
@@ -2136,103 +2150,163 @@ console_write (
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'G': case '`':
-                        if (par[0]){ par[0]--; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
-                            par[0], 
+                            ivalue, 
                             CONSOLE_TTYS[console_number].cursor_y, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // Mudamos o cursor e saimos da escape sequence
+                    // n lines up
                     case 'A':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x,  
-                            CONSOLE_TTYS[console_number].cursor_y - par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y - ivalue, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     case 'B': case 'e':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x, 
-                            CONSOLE_TTYS[console_number].cursor_y + par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y + ivalue, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
+                    // Cursor right.
                     // mudamos o cursor e saimos da escape sequence 
                     case 'C': case 'a':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
-                            CONSOLE_TTYS[console_number].cursor_x + par[0], 
+                            CONSOLE_TTYS[console_number].cursor_x + ivalue, 
                             CONSOLE_TTYS[console_number].cursor_y, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
+                    // Cursor left.
                     // mudamos o cursor e saimos da escape sequence
                     case 'D':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
-                            CONSOLE_TTYS[console_number].cursor_x - par[0], 
+                            CONSOLE_TTYS[console_number].cursor_x - ivalue, 
                             CONSOLE_TTYS[console_number].cursor_y, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'E':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
                             0, 
-                            CONSOLE_TTYS[console_number].cursor_y + par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y + ivalue, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'F':
-                        if (!par[0]){ par[0]++; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
                         __local_gotoxy ( 
                             0, 
-                            CONSOLE_TTYS[console_number].cursor_y - par[0], 
+                            CONSOLE_TTYS[console_number].cursor_y - ivalue, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'd':
-                        if (par[0]){ par[0]--; }
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+
                         __local_gotoxy ( 
                             CONSOLE_TTYS[console_number].cursor_x, 
-                            par[0], 
+                            ivalue, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // mudamos o cursor e saimos da escape sequence
                     case 'H': case 'f':
-                        if (par[0]){ par[0]--; }
-                        if (par[1]){ par[1]--; }
+
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+
+                        ivalue2 = par[1];
+                        ivalue2 = (ivalue2 & 0xFF);
+                        ivalue2 = k_atoi(&ivalue2);
+
                         __local_gotoxy ( 
-                            par[1],
-                            par[0], 
+                            ivalue,
+                            ivalue2, 
                             console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // Outros tratadores.
                     case 'J': 
-                        csi_J(par[0]);
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_J(ivalue);
+                        __EscapeSequenceStage = 4;
                         break;
                     case 'K':
-                        csi_K(par[0]);
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_K(ivalue);
+                        __EscapeSequenceStage = 4;
                         break;
                     case 'L':
-                        csi_L( par[0], console_number );
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_L( ivalue, console_number );
+                        __EscapeSequenceStage = 4;
                         break;
                     case 'M':
-                        csi_M( par[0], console_number );
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_M( ivalue, console_number );
+                        __EscapeSequenceStage = 4;
                         break;
                     case 'P':
-                        csi_P( par[0], console_number );
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_P( ivalue, console_number );
+                        __EscapeSequenceStage = 4;
                         break;
                     case '@':
-                        csi_at( par[0], console_number );
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+                        csi_at( ivalue, console_number );
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // FIM.
@@ -2241,32 +2315,51 @@ console_write (
                     // Essa rotina cheaca os parametros e configura o atributo
                     // de acordo com o ultimo parametro.
                     case 'm': 
-                        csi_m(); 
+                        //printf ("m found\n");
+                        //csi_m(); 
+                        // Limpando o array de parametros.
+                        for ( npar=0; npar<NPAR; npar++ ){ 
+                            par[npar]=0;
+                        };
+                        npar=0;
+                        __EscapeSequenceStage = 0;
                         break;
 
                     // ??  #bugbug
                     // 0x1b[r
                     // Isso ajusta o top e o bottom.
                     case 'r':
-                        if (par[0])  { par[0]--; }
-                        if (!par[1]) { par[1] = CONSOLE_TTYS[console_number].cursor_bottom; }  
-                        if (par[0] < par[1] &&
-                            par[1] <= CONSOLE_TTYS[console_number].cursor_bottom ) 
-                        {
+                        ivalue = par[0];
+                        ivalue = (ivalue & 0xFF);
+                        ivalue = k_atoi(&ivalue);
+
+                        ivalue2 = par[1];
+                        ivalue2 = (ivalue2 & 0xFF);
+                        ivalue2 = k_atoi(&ivalue2);
+
+                        //if (par[0])  { par[0]--; }
+                        //if (!par[1]) { par[1] = CONSOLE_TTYS[console_number].cursor_bottom; }  
+                        //if (par[0] < par[1] &&
+                        //    par[1] <= CONSOLE_TTYS[console_number].cursor_bottom ) 
+                        //{
                             // Ajuste feito por 'r'.
-                            CONSOLE_TTYS[console_number].cursor_top    = par[0];
-                            CONSOLE_TTYS[console_number].cursor_bottom = par[1];
-                        }
+                        //    CONSOLE_TTYS[console_number].cursor_top    = par[0];
+                         //   CONSOLE_TTYS[console_number].cursor_bottom = par[1];
+                        //}
+                        
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // Save cursor
                     case 's': 
                         __local_save_cur(console_number);
+                        __EscapeSequenceStage = 4;
                         break;
 
                     // Restore cursor
                     case 'u': 
                         __local_restore_cur(console_number);
+                        __EscapeSequenceStage = 4;
                         break;
                 };
                 break;
@@ -2287,29 +2380,31 @@ fail:
 }
 
 
-// #bugbug
-// Isso tá errado.
+void console_write_string(int console_number, char *string)
+{
+// Write a string into a console.
+    char *p;
+    p = string;
+    size_t i=0;
+    size_t size = strlen(string);
+    if(size<=0)
+        return;
+    for (i=0; i<size; i++)
+    {
+        console_write(
+            console_number, 
+            p,
+            1 );
+        p++;
+    };
+}
 
-#define __RESPONSE  "\033[?1;2c"
 
 void __respond (int console_number)
 {
     char *p = __RESPONSE;
-
-// #todo: max limit
-    if(console_number<0){
-        return;
-    }
-
-    while (*p){
-        //PUTCH(*p,tty->read_q);
-        console_putchar ( (int) *p, console_number );
-        p++;
-    };
-
-    //copy_to_cooked(tty);
+    console_write_string(console_number,p);
 }
-
 
 // See:
 // https://en.wikipedia.org/wiki/Control_character

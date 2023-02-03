@@ -138,6 +138,9 @@ console_write (
     const void *buf, 
     size_t count );
 
+void console_write_string(int console_number, char *string);
+
+
 int 
 console_ioctl ( 
     int fd, 
