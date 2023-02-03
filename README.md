@@ -13,11 +13,6 @@ This repository has the source code for:
 
     Gramado (c) is a 64bit multithreaded operating system.
 
-    Gramado Kernel - base/
-    Gramado DE     - gramland/
-    Gramado Games  - meta/
-
-
 ## Screenshots
 
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-1.png)
@@ -47,12 +42,17 @@ This repository has the source code for:
 
 ## Folders.
 A brief description of the directories.
+
+    Gramado Kernel - base/
+    Gramado DE     - gramland/
+    Gramado Games  - meta/
+
  * `base/` - Low basic components of the system.  
-  * `control` - Ring 0 stuff.
-   * `boot` - The boot loader.
-   * `disk` - The root directory for the boot partition.
-   * `new` - The Gramado OS kernel.
-  * `exposed` - Ring 3 stuff.
+   * `control` - Ring 0 stuff.
+     * `boot` - The boot loader.
+     * `disk` - The root directory for the boot partition.
+     * `new` - The Gramado OS kernel.
+   * `exposed` - Ring 3 stuff.
  * `gramland/` - The window server and it's clients.
  * `meta/` - Games and 3D experiments.
 
