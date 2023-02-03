@@ -1,0 +1,23 @@
+
+
+	images/
+	This is the place for the final images.
+	The virtual disks that is gonna be used in the virtual machines.
+
+--------------------------------------------------
+Targets:
+
+
+    pc/
+    The image here is a target for legacy pc machines.
+    It uses MBR and starts in 16 bit mode using BIOS.
+    This is a full installation.
+
+    pcefi/
+    pc machines using efi boot loader.
+    This is a full installation
+
+
+
+
+

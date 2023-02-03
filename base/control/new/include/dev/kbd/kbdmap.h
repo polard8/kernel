@@ -4,6 +4,8 @@
 #ifndef __KBDMAP_H
 #define __KBDMAP_H    1
 
+#define ABNT2_CHARMAP_NAME  "abnt2"
+
 // Char map size.
 #define ABNT2_CHARMAP_SIZE  136 
 // see: kbdmap.c

@@ -42,6 +42,8 @@ static unsigned long ques = 0;
 static unsigned char attr = 0x07;
 
 
+static unsigned long console_interrupt_counter=0;
+
 //
 // == Private functions: Prototypes ======================
 //
@@ -66,6 +68,8 @@ caller1(
 
 static void __test_path(void)
 {
+// Test the pathname support.
+
     int status = -1;
     //unsigned long tmp_size = (512*4096);    // 512*4096 = 2MB
     void *b; //= (void *) allocPages ( 512 );
@@ -102,8 +106,8 @@ static void __test_path(void)
 // The loader is not getting the file size
 // from the fat entry.
     unsigned long BufferSize = (4096);  //One page!
-    b = (void *) allocPages(1); 
 
+    b = (void *) allocPages(1); 
     if ( (void*) b == NULL ){
         printf("b fail\n");
         return;
@@ -121,7 +125,7 @@ static void __test_path(void)
         return;
     }
     if ( (void*)b != NULL ){
-        printf("OUTPUT:{%s}\n",b);
+        printf("OUTPUT: {%s}\n",b);
     }
 }
 
@@ -140,23 +144,19 @@ __local_gotoxy (
     if (console_number<0 || console_number > 3){
         return;
     }
-
 // Maior que o largura da linha.
     if (new_x > CONSOLE_TTYS[console_number].cursor_right)
     {
         return;
     }
-
 // Maior que a altura da coluna.
     if (new_y > CONSOLE_TTYS[console_number].cursor_bottom)
     {
         return;
     }
-
 // Set x.
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (new_x & 0xFFFFFFFF);
-
 // Set y.
     CONSOLE_TTYS[console_number].cursor_y = 
         (unsigned long) (new_y & 0xFFFFFFFF);
@@ -170,8 +170,7 @@ void __local_save_cur(int console_number)
 
 void __local_restore_cur(int console_number)
 {
-    if (console_number<0 || console_number >3)
-    {
+    if (console_number<0 || console_number >3){
         return;
     }
 
@@ -291,28 +290,30 @@ void csi_K(int par)
 
 void csi_m(void)
 {
+// Set some attributes based on the parameters found.
+// Sets colors and style of the characters.
+
     register int i=0;
-    int Ch=0;
+    int max = (int)(npar & 0xFFFFFFFF);
+    int ivalue=0;
 
 // #bugbug
 // Check 'npar'
 
-    if (npar == 0){
+    if (max == 0){
         return;
     }
 
-    for (i=0; i <= npar; i++)
+    for (i=0; i <= max; i++)
     {
-        Ch = (int) par[i];
-        
-        switch (Ch) {
-        case 0:  attr=0x07;  break;
-        case 1:  attr=0x0f;  break;
-        case 4:  attr=0x0f;  break;
-        case 7:  attr=0x70;  break;
-        case 27: attr=0x07;  break;
-        // default?
-        };
+        // Get the parameter value.
+        ivalue = par[0];
+        ivalue = (ivalue & 0xFF);
+        ivalue = k_atoi(&ivalue);
+
+        // #todo
+        // Call a worker for each of these parameters.
+        //console_set_parameter(ivalue);
     };
 }
 
@@ -343,10 +344,12 @@ void csi_L (int nr, int console_number)
 
 //============================================
 // console_interrupt:
-// called by devices that are not block devices.
-// probably keyboard and serial devices.
+// Called by devices that are not block devices.
+// Probably keyboard and serial devices.
 // See: keyboard.c and serial.c
 // Called by DeviceInterface_PS2Keyboard() in ps2kbd.c
+// IN:
+// #todo: Explain the parameters.
 
 void 
 console_interrupt(
@@ -354,28 +357,24 @@ console_interrupt(
     int device_type, 
     int data )
 {
-    //int TargetThread = foreground_thread;
-    int TargetThreadTID = (target_thread & 0xFFFF);
+// Devece drivers will call this routine to process the data.
+// The data is a 'char'.
+
+    // # Not in use.
+    tid_t target_tid = (tid_t) target_thread;
+
     int DeviceType = device_type;
     int Data = data;
     int Status=-1;
 
-// #todo
-// E se não tivermos uma foreground thread ?
-// foreground representa a thred com 'foco de entrada'
-// >> então, se não tivermos uma thread com foco de entrada,
-// podemos mandar a mensagem para outra thread ?
+    console_interrupt_counter++;
 
-// #todo: 
-// Check overflow
-// #todo
-// Maybe we can set the idle thread if it fail.
-// #todo: max limit
-
-    if (TargetThreadTID < 0){
-        debug_print ("console_interrupt: [FAIL] TargetThreadTID\n");
-        return;
+    // # Not in use.
+    if (target_tid < 0 || target_tid >= THREAD_COUNT_MAX){
+        debug_print ("console_interrupt: target_tid\n");
+        goto fail;
     }
+
 
     switch (DeviceType){
 
@@ -383,45 +382,41 @@ console_interrupt(
         // data =  raw byte.
         // See: kgws.c
         case CONSOLE_DEVICE_KEYBOARD:
-            debug_print("console_interrupt: input from keyboard device :)\n");
-
+            debug_print("console_interrupt: Input from keyboard device\n");
             // In this case the target tid is the window server.
             // IN: scancode, prefix.
             // #bugbug: No prefix always. We need a prefix.
-            Status = 
-                (int) wmKeyEvent( Data, (int) 0 );
-            
+            Status =  (int) wmKeyEvent( Data, (int) 0 );
             if (Status<0){
-                return;
+                goto fail;
             }
-            
-            // Lets end this round putting a given thread at the end
-            // of this round.
-
-            // #tested: No difference at all.
-            //if ( TargetThreadTID > 0 && TargetThreadTID < THREAD_COUNT_MAX )
-                //cut_round( threadList[TargetThreadTID] );
-
             break;
 
         // COM port
         case CONSOLE_DEVICE_SERIAL:
-            debug_print("console_interrupt: input from serial device\n");
+            debug_print("console_interrupt: Input from serial device\n");
             break;
  
         //network device.
         case CONSOLE_DEVICE_NETWORK:
-            debug_print("console_interrupt: input from network device\n");
+            debug_print("console_interrupt: Input from network device\n");
             break;
 
         // ...
 
         default:
-            debug_print("console_interrupt: [FAIL] Default input device\n");
+            debug_print("console_interrupt: Undefined input device\n");
+            goto fail;
             break;
     };
-}
 
+// done
+    return;
+
+fail:
+    debug_print ("console_interrupt: Fail\n");
+    return;
+}
 
 // Initializar virtual console.
 // Inicializa a estrutura de console virtual
@@ -432,7 +427,11 @@ console_init_virtual_console(
     unsigned int bg_color, 
     unsigned int fg_color )
 {
-    int ConsoleIndex = -1;
+// Initialize a given console.
+// #todo: We can pass more parameters.
+
+    register int ConsoleIndex = -1;
+    register int i=0;
 
     debug_print ("console_init_virtual_console:\n");
 
@@ -582,6 +581,49 @@ console_init_virtual_console(
 
     //CONSOLE_TTYS[ConsoleIndex].vc_mode = 0;
 
+//
+// Charset support.
+//
+
+// see:
+// https://man7.org/linux/man-pages/man7/charsets.7.html
+
+    CONSOLE_TTYS[ConsoleIndex].charset_lowercase = (void*) map_abnt2;
+    CONSOLE_TTYS[ConsoleIndex].charset_uppercase = (void*) shift_abnt2;
+    CONSOLE_TTYS[ConsoleIndex].charset_controlcase = (void*) ctl_abnt2;
+
+    CONSOLE_TTYS[ConsoleIndex].charset_size = 
+        (size_t) ABNT2_CHARMAP_SIZE;
+
+// charset name
+
+    size_t name_size = (size_t) strlen(ABNT2_CHARMAP_NAME);
+
+    memset(
+        CONSOLE_TTYS[ConsoleIndex].charset_name,
+        0,
+        64);
+    strncpy( 
+        CONSOLE_TTYS[ConsoleIndex].charset_name,
+        ABNT2_CHARMAP_NAME,
+        name_size );
+    
+    CONSOLE_TTYS[ConsoleIndex].charset_name_size = 
+        (size_t) name_size;
+
+// ascii, unicode ...
+    CONSOLE_TTYS[ConsoleIndex].charset_id = 0;
+
+// language id.
+    CONSOLE_TTYS[ConsoleIndex].charset_lang_id = 0;
+
+//
+// Font support.
+//
+
+    CONSOLE_TTYS[ConsoleIndex].font_address = 
+        (void*) gwsGetCurrentFontAddress();
+
 // #bugbug
 // A estrutura tem mais elementos que podem ser inicializados.
 // Tivemos problemas ao tentar inicializa-los.
@@ -617,7 +659,10 @@ int console_get_current_virtual_console(void)
 
 void jobcontrol_switch_console(int n)
 {
-    if ( n<0 || n >= CONSOLETTYS_COUNT_MAX ){
+    unsigned int bg_color=COLOR_BLACK;
+    unsigned int fg_color=COLOR_WHITE;
+
+    if (n<0 || n >= CONSOLETTYS_COUNT_MAX){
         debug_print("jobcontrol_switch_console: Limits\n");
         return;
     }
@@ -626,11 +671,10 @@ void jobcontrol_switch_console(int n)
     console_set_current_virtual_console(n);
 
 // Clear the screen, set bg and fg colors and set the cursor position.
-//IN: bg color, fg color, console number.
-    clear_console(
-        (unsigned int) CONSOLE_TTYS[n].bg_color,
-        (unsigned int) CONSOLE_TTYS[n].fg_color,
-        n );
+// IN: bg color, fg color, console number.
+    bg_color = (unsigned int) CONSOLE_TTYS[n].bg_color;
+    fg_color = (unsigned int) CONSOLE_TTYS[n].fg_color;
+    clear_console( bg_color, fg_color, n );
 
 // banner
     printf ("Console number {%d}\n", n);
@@ -2316,7 +2360,7 @@ console_write (
                     // de acordo com o ultimo parametro.
                     case 'm': 
                         //printf ("m found\n");
-                        //csi_m(); 
+                        //csi_m(); // Set some attributes based on the parameters found.
                         // Limpando o array de parametros.
                         for ( npar=0; npar<NPAR; npar++ ){ 
                             par[npar]=0;

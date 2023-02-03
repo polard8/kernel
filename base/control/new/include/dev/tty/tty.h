@@ -130,11 +130,12 @@ struct tty_queue
 
 /*
  * tty_d:
- *     The tty structure need to have a pointer to
- * a buffer and a pointer to a thread. These is the where
- * we're gonna send the data.
+ * This is tty structure.
  */
-// estrutura para tty
+// ??
+// The tty structure need to have a pointer to
+// a buffer and a pointer to a thread. These is the where
+// we're gonna send the data.
 // uma estrutura de tty deve estar associado a
 // uma janela de terminal virtual.
 
@@ -149,9 +150,10 @@ struct tty_d
     int used;
     int magic;
     int index;
-// tty name
-    char name[64];      // 
-    size_t Name_len;    // len 
+
+// Name support
+    char name[64];
+    size_t Name_len;
 
     int initialized;
 
@@ -198,18 +200,13 @@ struct tty_d
 // == Security ============================================
 //
 
-// #todo: Process group?
-    //int pgrp;
-
 // process group.
 // Usando quanto tiver uma interrupção de tty.
 // Quais processos estão no mesmo grupo quanto tiver a interrupção.
 // Vamos sinalizá-los.
     gid_t gid;
-// ??
 // Quantos processos estao usando essa tty.
     int pid_count;
-
 // Owner process.
     struct process_d *process;
 // #todo: merge?
@@ -217,7 +214,6 @@ struct tty_d
     struct thread_d *thread;
 // Control thread;
     struct thread_d *control;
-
 // What is the user logged in this terminal?
 // see: user.h
     struct user_info_d *user_info;
@@ -231,7 +227,7 @@ struct tty_d
 // == transmition ========
 //
 
-//linked socket?
+// linked socket?
     struct tty_d *link;
 
 //
@@ -241,11 +237,9 @@ struct tty_d
 // Device.
     //struct device_d *device;
     struct ttydrv_d *driver;
-
 // i don't like this
 // line discipline
     struct ttyldisc_d *ldisc;
-
 // termios
 // see: ktermios.h
     //struct termios termios;
@@ -279,34 +273,67 @@ struct tty_d
 // When we are using the kgws.
     //struct window_d  *window;
 
+
 //
-// system metrics.
+// Cursor support.
 //
-    
-// cursor dimentions in pixel.
+
+// Cursor position in bytes.
+    unsigned long cursor_x;
+    unsigned long cursor_y;
+// Margins.
+// The cursor respect these limits.
+    unsigned long cursor_left;    // Left margin. In chars.
+    unsigned long cursor_top;     // Top margin. In lines.
+    unsigned long cursor_right;   // Right margin. In chars.
+    unsigned long cursor_bottom;  // Bottom margin. In lines.
+// Cursor dimentions in pixel.
     unsigned long cursor_width_in_pixels;
-    unsigned long cursor_height_in_pixels; 
+    unsigned long cursor_height_in_pixels;
+
+//
+// Charset support.
+// See: kbdmap.c, kbdmap.h
+//
+
+// see:
+// https://man7.org/linux/man-pages/man7/charsets.7.html
+
+// lowercase
+// Normal chars.
+    void *charset_lowercase;
+// uppercase
+// Shift + key.
+    void *charset_uppercase;
+// control + key.
+    void *charset_controlcase;
+
+    size_t charset_size;
+
+    char charset_name[64];
+    size_t charset_name_size;
+
+// id do charset.
+    int charset_id;
+
+// Language id.
+// x = 'en-br'
+// English BR for abnt2.
+    int charset_lang_id;
+
+//
+// Font support
+// see: font.c, char.c
+//
+
+    void *font_address;
 
 // Char support.
 // bg and fg colors.
     unsigned int bg_color;
     unsigned int fg_color;
 
-//
-// Print support
-//
-
-    // print position in chars.
-    unsigned long cursor_x;
-    unsigned long cursor_y;
-
     int fullscreen_flag;
-
-// Margins:
-    unsigned long cursor_left;    // Left margin. In chars.
-    unsigned long cursor_top;     // Top margin. In lines.
-    unsigned long cursor_right;   // Right margin. In chars.
-    unsigned long cursor_bottom;  // Bottom margin. In lines.
 
 // Connections:
 // pty associa a tty 'to' com a tty 'from'.
@@ -315,6 +342,7 @@ struct tty_d
 // Navigation
     //struct tty_d *next;
 };
+
 
 //
 // == consoles ==================

@@ -174,33 +174,31 @@ d_drawchar_transparent (
     unsigned char bit_mask = 0x80;
     char *work_char;  
 
+/*
+ * Get the font pointer.
+ * #todo:
+ *     usar variavel g8x8fontAddress.
+ *     + Criar e usar uma estrutura para fonte.
+ *     + Usar o ponteiro para a fonte atual que foi carregada.
+ *     + Criar um switch para o tamanho da fonte.
+ *     isso deveria estar na inicializa��o do m�dulo char.
+ */
 
-	/*
-	 * Get the font pointer.
-	 *
-	 * @todo:
-	 *     usar variavel g8x8fontAddress.
-	 *     + Criar e usar uma estrutura para fonte.
-	 *     + Usar o ponteiro para a fonte atual que foi carregada.
-	 *     + Criar um switch para o tamanho da fonte.
-	 *     isso deveria estar na inicializa��o do m�dulo char.
-	 *     ...
-	 */
-
-	// Default:
-	//     Testando o uso de uma fonte default no caso de erro.
-	//     Testando a troca da fonte padr�o.
-	//     O sistema n�o vai parar no caso de erro. Nesse caso ele escolhera
-	// um valor default.
-	// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
-
+// Default:
+//     Testando o uso de uma fonte default no caso de erro.
+//     Testando a troca da fonte padr�o.
+//     O sistema n�o vai parar no caso de erro. Nesse caso ele escolhera
+// um valor default.
+// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
 
 // Trying to use the ROM BIOS font 
 // if we do not have loadable one.
 // default: bios font
 
-    if ( gws_currentfont_address == 0 ){
-        gws_currentfont_address = (unsigned long) BIOSFONT8X8;
+    if (gws_currentfont_address == 0)
+    {
+        gwsSetCurrentFontAddress(BIOSFONT8X8);
+        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;
     }
 
 // Selecting the default char properties.

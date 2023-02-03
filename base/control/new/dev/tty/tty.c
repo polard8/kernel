@@ -426,6 +426,39 @@ tty_write (
                      (int) n );
 }
 
+
+/*
+ //#todo
+int 
+tty_change_charset(
+    struct tty_d *tty,
+    void *normal,
+    void *shift,
+    void *ctl );
+int 
+tty_change_charset(
+    struct tty_d *tty,
+    void *normal,
+    void *shift,
+    void *ctl )
+{
+// #todo
+// Change the addresses for the charsets.
+    return 0;
+}
+*/
+
+
+/*
+ //#todo
+int tty_change_font_address( struct tty_d *tty, void *font_address );
+int tty_change_font_address( struct tty_d *tty, void *font_address )
+{
+// Change the name for the fornt address.
+    return 0;
+}
+*/
+
 // tty_reset_termios: 
 // Reset termios in a given tty.
 // See: tty.h

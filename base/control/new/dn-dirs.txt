@@ -2,17 +2,39 @@
     Data driven kernel
     ------------------
 
-(1) i/o:
-    dev/
-    fs/
-    net/
+(1) i/o/data:
+    dev/ - i/o system.
+    fs/  - File system support.
+    net/ - Network support.
 
-(2) process:
-    arch/
-    ke/
-    klib/
-    mm/
+(2) process/system:
+    arch/    - Initialization and syscall interface.
+    ke/      - hal, processes and threads.
+    klib/    - libc support.
+    mm/      - Memory management.
+    sys/
 
 (3) user/security:
     user/
+
+----------------------------------------------
+High level functions:
+
+    + sys_xxxxx functions.
+    + newos_xxxx functions.
+    + sci0, sci1, sci2 handlers in sci.c.
+    + ke_xxxxx functions.
+    +...
+
+#todo
+Maybe we need to create only one prefix for highlevel functions.
+
+
+
+    
+    
+    
+    
+
+
 

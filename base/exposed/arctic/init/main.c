@@ -55,7 +55,7 @@ __Procedure (
     unsigned long long1, 
     unsigned long long2 );
 
-static int __server_loop(void);
+static int __idlethread_loop(void);
 
 static void initPrompt(void);
 static int __CompareString(void);
@@ -482,7 +482,7 @@ exit_cmp:
     return 0;
 }
 
-static int __server_loop(void)
+static int __idlethread_loop(void)
 {
 
 // #todo
@@ -490,12 +490,16 @@ static int __server_loop(void)
 // Get the message code.
 // Who can call us?
 
-    while (TRUE)
-    {
+    while (TRUE){
+
+        // Nessa hora ja não nos preocupamos mais com essa thread.
+        // Ele receberá algumas mensagens eventualmente.
+
+        rtl_yield();
 
         //if( isTimeToQuit == TRUE )
             //break;
-        
+
         if ( rtl_get_event() == TRUE )
         {
             // save
@@ -586,11 +590,10 @@ int main( int argc, char **argv)
     //rtl_focus_on_this_thread();
 
 //
-// Server loop.
+// Idle thread loop.
 // 
-    int ServerLoopStatus = -1;
-
-    ServerLoopStatus = (int) __server_loop();
+    int IdleLoopStatus = -1;
+    IdleLoopStatus = (int) __idlethread_loop();
 
 
 /*
@@ -610,6 +613,7 @@ int main( int argc, char **argv)
 */
 
 // hang
+// Not reached.
     while (TRUE){
         rtl_yield();
     };

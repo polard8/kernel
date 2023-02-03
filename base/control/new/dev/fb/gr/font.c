@@ -39,22 +39,22 @@ void gwsSetCurrentFontCharHeight (int height)
     set_char_height (height);
 }
 
-unsigned long gwsGetCurrentFontAddress (void)
+unsigned long gwsGetCurrentFontAddress(void)
 {
     return (unsigned long) gws_currentfont_address;
 }
 
-void gwsSetCurrentFontAddress ( unsigned long address )
+void gwsSetCurrentFontAddress (unsigned long address)
 {
     gws_currentfont_address = (unsigned long) address;
 }
-
 
 // gwsInstallFont:
 // Carregando e instalando uma fonte dado o nome.
 int gwsInstallFont (char *file_name)
 {
 // Load a font from the disk.
+// # Not in use.
 
     unsigned long fileret=0;
 

@@ -9,8 +9,8 @@
 // ---------------------------------
 // lowercase
 // NORMAL ABNT2.
-// obs: Isso pode ser carregável para várias configurações de teclado.
-
+// obs: 
+// Isso pode ser carregável para várias configurações de teclado.
 unsigned char map_abnt2[ABNT2_CHARMAP_SIZE] = {
  0,      //Scancode 0.
  033,    //1  (Esc). (\e)
@@ -151,8 +151,8 @@ VK_F24,  //135
 };
 
 // ---------------------------------------
-// maiúsculas
 // uppercase
+// maiúsculas
 // SHIFT ABNT2.
 // +Combinação com shift pressionado.
 // +Com capslock acionado.
@@ -290,7 +290,6 @@ VK_ABNT2_DELETE,  //',',    //83 abnt2(,)
 // ------------------------------
 // control + key
 // CONTROL ABNT2.
- 
 unsigned char ctl_abnt2[ABNT2_CHARMAP_SIZE] = {
 0,     //0
 033,   //1
