@@ -220,10 +220,12 @@ fs_save_rootdir (
     unsigned long root_lba, 
     size_t root_size )
 {
+
+
 // #bugbug: 
-// Debug provisório.
+// Debug
     debug_print ("fs_save_rootdir:\n");
-    printf      ("Saving rootdie\n");
+    printf      ("Saving rootdir\n");
     refresh_screen();
 
 // Filters

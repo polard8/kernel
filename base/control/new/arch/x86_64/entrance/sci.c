@@ -2324,8 +2324,20 @@ void *sci2 (
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
 
-
-
+// FAT cache.
+// This is the FAT cache for the system disk.
+// The boot partition.
+    int savefat_Status = -1;
+    if (number == 10008)
+    {
+        savefat_Status = (int) fs_save_fat16_cache();
+        if ( savefat_Status < 0 || 
+             fat_cache_saved != FAT_CACHE_SAVED )
+        {
+            panic ("10008: couldn' save fat\n");
+        }
+        return NULL;
+    }
 
 
 // Get the tid of the current thread.

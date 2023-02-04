@@ -138,6 +138,7 @@ via_libio:
         good = libio_inport8(0x64);
     };
 
+
     debug_print("reboot.bin: Go!\n");
          printf("reboot.bin: Go!\n");
     
@@ -154,10 +155,24 @@ via_rtl:
     printf ("reboot via rtl\n");
     debug_print("reboot.bin: Go!\n");
          printf("reboot.bin: Go!\n");
+
+// #todo
+// Nesse momento temos que gravar 
+// o cache da FAT no disco físico
+// antes de desligarmos.
+// Senão teremos problemas para ler os novos arquivos depois
+// que religarmos.
+
+    //#test
+    //save fat
+    //printf("saving fat...\n");
+    //sc82( 10008, 0, 0, 0);
+
+    // The kernel save the fat.
+    // see: service 110. sys_reboot()
     rtl_reboot();
 
     exit(1);
     return (int) (-1);
-    // return 0;
 }
 

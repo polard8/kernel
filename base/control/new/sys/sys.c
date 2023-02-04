@@ -476,12 +476,11 @@ int sys_reboot (void)
 // The boot partition.
     int Status = -1;
     Status = (int) fs_save_fat16_cache();
-    if ( Status < 0 || 
-         fat_cache_saved != FAT_CACHE_SAVED )
-    {
+    if ( Status < 0 || fat_cache_saved != FAT_CACHE_SAVED ){
         debug_print("sys_reboot: Can't reboot without saving the fat cache\n");
         goto fail;
     }
+
 // Reboot
     debug_print("sys_reboot: Rebooting\n");
     hal_reboot();

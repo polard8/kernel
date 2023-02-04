@@ -1361,6 +1361,8 @@ sys_open (
     int flags, 
     mode_t mode )
 {
+// Open a file, or create if is doesn't exist.
+
     int value = -1;
     file *fp;
 
@@ -4804,7 +4806,11 @@ save_file:
         // #debug.
         printf ("fsSaveFile: [DEBUG] next={%x}\n", next);
 
+        // O next é o marcador de fim de lista.
         if (next == 0xFFF8){
+
+            // Então pegamos o penúltimo e colocamos
+            // o finalizador lá nesse offset.
             next = fat16ClustersToSave[i-1];
             fat[next] = 0xFFF8;
             goto do_save_dir_and_fat;
@@ -5073,6 +5079,7 @@ sys_read_file_from_disk (
     }
 
 // Not found.
+// Let's create it if the flags tell us to do that.
     if (Status != TRUE)
     {
          //#debug
@@ -5092,17 +5099,19 @@ sys_read_file_from_disk (
                  printf("sys_read_file_from_disk: buff\n");
                  goto fail;
              }
+             memset(buff,0,1024);
+             sprintf(buff,"This is a new file.");
 
              //++
-             // See: fs/write.c
+             // See: 
              __ret = 
                  (int) fsSaveFile ( 
                            VOLUME1_FAT_ADDRESS, 
                            TargetDirAddress, 
                            NumberOfEntries, 
                            (char *) file_name, 
-                           (unsigned long) 1,   //2,     // size in sectors 
-                           (unsigned long) 512, //1024,  // size in bytes  
+                           (unsigned long)  1,    // 1, size in sectors 
+                           (unsigned long) 512,  // 512, size in bytes  
                            (char *) buff,         // buffer ?
                            (char) 0x20 );         // flag 
               //--

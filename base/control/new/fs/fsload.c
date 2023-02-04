@@ -375,6 +375,8 @@ __found:
 // #todo
 // Na verdade os dois primeiros clusters estão indisponíveis.
 
+    // First cluster.
+
     cluster = (unsigned short) __dir[ z+13 ];
 
     if ( cluster <= 0 || cluster > 0xFFF0 )
@@ -501,8 +503,15 @@ __loop_next_entry:
 // We already did that a single time before.
 // #bugbug: Não pode ser menor que 0, pois é unsigned short.
 
-    if ( cluster <= 0 || cluster > 0xFFF0 ){
-        panic("fsLoadFile: fat[] vector overflow.\n");
+
+    // #bugbug: O marcador é 0xFFF8
+    // Mas no caso de ser um arquivo de apenas um setor
+    // então podemos ter aqui o marcador de fim de arquivo.
+    //if ( cluster <= 0 || cluster > 0xFFF8 )
+    if ( cluster <= 0 || cluster > 0xFFF0 )
+    {
+        printf("nreads={%d} cluster{%x}\n",nreads,cluster);
+        panic("fsLoadFile: fat[] vector limits.\n");
     }
 
 // Read disk.

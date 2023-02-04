@@ -687,6 +687,10 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
+    int file_index=0;
+    char tmp_file_name[64];
+    char index_string_buffer[64];
+
     // #libc
     // Testing libc components.
     if( strncmp(prompt,"libc",4) == 0 )
@@ -699,8 +703,27 @@ static void compareStrings(int fd)
         //fclose(stdout); 
         //fclose(stderr); 
 
-        //creat( "newfile.txt", 0666 );
-        //mkdir( "newdir", 0666 );
+        //creat( "newfile.txt", 0666 );  // fcntl.c
+        //mkdir( "newdir", 0666 );       // unistd.c
+
+        // #test: Cria n files.
+        // stress test:
+        // O rootdir tem 512 entradas,
+        // vai acabar as entradas ou o heap do kernel.
+        // # OK. It is working.
+        for (file_index=0; file_index<16; file_index++)
+        {
+            printf ("Creating file number {%d}\n",file_index);
+
+            // Set up a custom filename.
+            memset(tmp_file_name,0,64);
+            sprintf( tmp_file_name, "new" );
+            itoa ( (int) file_index, index_string_buffer );
+            strcat(tmp_file_name,index_string_buffer);
+            strcat(tmp_file_name,".txt");
+
+            creat( tmp_file_name, 0666 );
+        };
         
         goto exit_cmp; 
     }
