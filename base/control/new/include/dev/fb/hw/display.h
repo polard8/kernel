@@ -1,4 +1,7 @@
 
+// display.h
+// Display device support.
+
 
 #ifndef __HALVID_H
 #define __HALVID_H    1
@@ -9,38 +12,31 @@ struct display_device_d
 {
     int used;
     int magic;
-    
     // The file to handle this device.
     file *_file;
-
     //char name[64];
-
 //
 // LFB - Linear Frame Buffer
 //
-
     unsigned long framebuffer_pa;
     unsigned long framebuffer_va;
-
     unsigned long framebuffer_width;
     unsigned long framebuffer_height;
     unsigned long framebuffer_bpp;
-    
     // How many bytes in a single row.
     unsigned long framebuffer_pitch;
-    
     // used for allocations.
     unsigned long framebuffer_size_in_bytes;
-
     // basically the same as above.
     struct screen_d *screen;
 
-    //...
+    // FILE *fp;
+
+    //...    
+
+    struct display_device_d *next;
 };
 
-// Te info comes from the gramado boot loader.
-struct display_device_d *GramadoDisplayDevice;
-//struct display_device_d *QemuDisplayDevice;
 
 
 /*

@@ -1,4 +1,6 @@
-// video.h
+
+// bldisp.h
+// bl display device
 
 // See:
 // http://www.brokenthorn.com/Resources/OSDevVid2.html
@@ -76,6 +78,9 @@ typedef struct _vbeInfoBlock {
 #ifndef __VIDEO_H
 #define __VIDEO_H    1
 
+
+// The info comes from the gramado boot loader.
+extern struct display_device_d *bl_display_device;
 
 int Video_initialize(void);
 

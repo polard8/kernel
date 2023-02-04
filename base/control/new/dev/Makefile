@@ -82,7 +82,7 @@ devmgr.o \
 serial.o \
 storage.o \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
-video.o vsync.o screen.o \
+bldisp.o vsync.o screen.o \
 xpixel.o line.o rect.o bg.o \
 font.o char.o text.o \
 graphics.o \
@@ -111,7 +111,10 @@ all:
 	$(CC) -c e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
 
 # fb/hw
-	$(CC) -c fb/hw/video.c  $(KERNEL_INCLUDE) $(CFLAGS) -o video.o
+
+# bl display device
+	$(CC) -c fb/hw/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
+
 	$(CC) -c fb/hw/vsync.c  $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o
 	$(CC) -c fb/hw/screen.c $(KERNEL_INCLUDE) $(CFLAGS) -o screen.o
 

@@ -1,5 +1,6 @@
 
-// video.c
+// bldisp.c
+// bl display device
 
 // Rotinas paga gerenciar os controladores de video.
 // Crt, Vga ...
@@ -49,6 +50,10 @@ See:
 
 
 #include <kernel.h>
+
+
+// The info comes from the gramado boot loader.
+struct display_device_d *bl_display_device;
 
 
 //@todo: Criar um arquivo para gerenciar fontes.

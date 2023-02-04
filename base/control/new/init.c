@@ -902,38 +902,38 @@ static int booting_begin(int arch_type)
 
     printf("booting_begin: Setup display device\n");
 
-    GramadoDisplayDevice = 
+    bl_display_device = 
         (struct display_device_d *) kmalloc ( sizeof(struct display_device_d) ); 
 
     // Memory allocation for Display device structure.
-    if ( (void*) GramadoDisplayDevice == NULL ){
+    if ( (void*) bl_display_device == NULL ){
         x_panic ("Error: 0x05");
     }
 
 // framebuffer address.
-    GramadoDisplayDevice->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
-    GramadoDisplayDevice->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
+    bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
+    bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
  
 // w, h, bpp.
-    GramadoDisplayDevice->framebuffer_width  = (unsigned long) xBootBlock.deviceWidth;
-    GramadoDisplayDevice->framebuffer_height = (unsigned long) xBootBlock.deviceHeight;
-    GramadoDisplayDevice->framebuffer_bpp    = (unsigned long) xBootBlock.bpp;
+    bl_display_device->framebuffer_width  = (unsigned long) xBootBlock.deviceWidth;
+    bl_display_device->framebuffer_height = (unsigned long) xBootBlock.deviceHeight;
+    bl_display_device->framebuffer_bpp    = (unsigned long) xBootBlock.bpp;
 
 // pitch
-    GramadoDisplayDevice->framebuffer_pitch = 
+    bl_display_device->framebuffer_pitch = 
         (unsigned long) ( xBootBlock.deviceWidth * xBootBlock.bpp );
 
 // size in bytes.
-    GramadoDisplayDevice->framebuffer_size_in_bytes =
-        (unsigned long) ( GramadoDisplayDevice->framebuffer_pitch * GramadoDisplayDevice->framebuffer_height );
+    bl_display_device->framebuffer_size_in_bytes =
+        (unsigned long) ( bl_display_device->framebuffer_pitch * bl_display_device->framebuffer_height );
 
 
 // Is it a valid screen pointer?
-    GramadoDisplayDevice->screen = (struct screen_d *) CurrentScreen;
+    bl_display_device->screen = (struct screen_d *) CurrentScreen;
 
 // validation
-    GramadoDisplayDevice->used = TRUE;
-    GramadoDisplayDevice->magic = 1234;
+    bl_display_device->used = TRUE;
+    bl_display_device->magic = 1234;
 
 
 //=============================
