@@ -1,19 +1,21 @@
 ## Gramado OS build instructions
 
 ## Fred's host machine
+
 ```
-    Host machine: Ubuntu 22.10
-    Linux 5.19.0-23-generic x86_64
-    gcc (Ubuntu) 12.2.0 
-    GNU ld (GNU Binutils for Ubuntu) 2.39
-    NASM version 2.25.05
+    Host machine: Ubuntu 20.04.5 LTS
+    Linux 5.4.0-137-generic x86_64
+    gcc (Ubuntu) 9.4.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.34
+    NASM version 2.14.02
 ```
+
 
 ## Linux dependencies
 
 **Debian / Ubuntu**
 ```console
-sudo apt install build-essential nasm make qemu-system-x86 qemu-system-gui qemu-utils 
+sudo apt install build-essential nasm make qemu-system-x86-64 qemu-system-gui qemu-utils 
 ```
 
 ## Build on Linux

@@ -56,14 +56,14 @@ A brief description of the directories.
  * `gramland/` - The window server and it's clients.
  * `meta/` - Games and 3D experiments.
 
-## Fred's compilation on Linux.
+## Fred's host machine
 
 ```
-    Host machine: Ubuntu 22.10
-    Linux 5.19.0-23-generic x86_64
-    gcc (Ubuntu) 12.2.0 
-    GNU ld (GNU Binutils for Ubuntu) 2.39
-    NASM version 2.25.05
+    Host machine: Ubuntu 20.04.5 LTS
+    Linux 5.4.0-137-generic x86_64
+    gcc (Ubuntu) 9.4.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.34
+    NASM version 2.14.02
 ```
 
 ## How to Build?
