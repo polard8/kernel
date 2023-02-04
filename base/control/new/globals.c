@@ -104,6 +104,9 @@ int g_kernel_symbols_available=FALSE;
 int gUseWMCallbacks=FALSE;
 
 
+//see: display.h, init.c, bldisp.c
+struct x_boot_block_d  xBootBlock;
+
 //#bugbug
 //move this to kernel (ring 0) crt support.
 //error support.

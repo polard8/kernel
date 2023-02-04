@@ -129,19 +129,6 @@ unsigned long saved_bootblock_base=0;
 // xxxhead.asm
 extern void x84_64_initialize_machine(void);
 
-// Local boot structure.
-struct x_boot_block_d
-{
-    int initialized;
-    unsigned long lfb_pa;
-    unsigned long deviceWidth;    // in pixels
-    unsigned long deviceHeight;   // in pixels
-    unsigned long bpp;            // bytes per pixel
-    unsigned long last_valid_pa;  // Last valid physical address.
-    unsigned long gramado_mode;   // system mode.
-    // ...
-};
-struct x_boot_block_d  xBootBlock;
 
 
 // ================================
@@ -902,38 +889,10 @@ static int booting_begin(int arch_type)
 
     printf("booting_begin: Setup display device\n");
 
-    bl_display_device = 
-        (struct display_device_d *) kmalloc ( sizeof(struct display_device_d) ); 
+// bl display device.
+// see: bldisp.c
+    bldisp_initialize();
 
-    // Memory allocation for Display device structure.
-    if ( (void*) bl_display_device == NULL ){
-        x_panic ("Error: 0x05");
-    }
-
-// framebuffer address.
-    bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
-    bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
- 
-// w, h, bpp.
-    bl_display_device->framebuffer_width  = (unsigned long) xBootBlock.deviceWidth;
-    bl_display_device->framebuffer_height = (unsigned long) xBootBlock.deviceHeight;
-    bl_display_device->framebuffer_bpp    = (unsigned long) xBootBlock.bpp;
-
-// pitch
-    bl_display_device->framebuffer_pitch = 
-        (unsigned long) ( xBootBlock.deviceWidth * xBootBlock.bpp );
-
-// size in bytes.
-    bl_display_device->framebuffer_size_in_bytes =
-        (unsigned long) ( bl_display_device->framebuffer_pitch * bl_display_device->framebuffer_height );
-
-
-// Is it a valid screen pointer?
-    bl_display_device->screen = (struct screen_d *) CurrentScreen;
-
-// validation
-    bl_display_device->used = TRUE;
-    bl_display_device->magic = 1234;
 
 
 //=============================

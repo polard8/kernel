@@ -113,19 +113,18 @@ all:
 # fb/hw
 
 # bl display device
-	$(CC) -c fb/hw/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
+	$(CC) -c display/hw/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
+	$(CC) -c display/hw/vsync.c  $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o
+	$(CC) -c display/hw/screen.c $(KERNEL_INCLUDE) $(CFLAGS) -o screen.o
 
-	$(CC) -c fb/hw/vsync.c  $(KERNEL_INCLUDE) $(CFLAGS) -o vsync.o
-	$(CC) -c fb/hw/screen.c $(KERNEL_INCLUDE) $(CFLAGS) -o screen.o
-
-	$(CC) -c fb/gr/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
-	$(CC) -c fb/gr/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c fb/gr/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c fb/gr/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
-	$(CC) -c fb/gr/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c fb/gr/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
-	$(CC) -c fb/gr/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c fb/gr/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
+	$(CC) -c display/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
+	$(CC) -c display/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c display/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c display/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c display/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c display/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
+	$(CC) -c display/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c display/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
 
 # kbd
 	$(CC) -c kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o

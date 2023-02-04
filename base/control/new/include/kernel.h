@@ -261,16 +261,19 @@ extern unsigned long gSavedBPP;
 //
 
 // fb device
-#include "dev/fb/gr/color.h"
-#include "dev/fb/hw/display.h"   // display device support.
-#include "dev/fb/hw/bldisp.h"    // bootloader display device
-#include "dev/fb/hw/screen.h"
-#include "dev/fb/gr/fonts.h"
-#include "dev/fb/gr/ascii.h" 
-#include "dev/fb/gr/ws.h"
-#include "dev/fb/gr/window.h"
-#include "dev/fb/gr/bg.h"
-#include "dev/fb/gr/graphics.h"
+#include "dev/display/color.h"
+
+#include "dev/display/hw/display.h"   // display device support.
+#include "dev/display/hw/bldisp.h"    // bootloader display device
+#include "dev/display/hw/screen.h"
+
+#include "dev/display/fonts.h"
+#include "dev/display/ascii.h" 
+#include "dev/display/ws.h"
+#include "dev/display/window.h"
+#include "dev/display/bg.h"
+#include "dev/display/graphics.h"
+
 // Serial port. (COM).
 #include "dev/tty/serial.h"
 

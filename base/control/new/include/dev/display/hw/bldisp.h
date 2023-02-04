@@ -82,11 +82,11 @@ typedef struct _vbeInfoBlock {
 // The info comes from the gramado boot loader.
 extern struct display_device_d *bl_display_device;
 
-int Video_initialize(void);
+int bldisp_initialize(void);
 
+int Video_initialize(void);
 unsigned long videoGetMode (void);
 void videoSetMode (unsigned long mode);
-
 void videoSetupCGAStartAddress (unsigned long address);
 
 #endif    

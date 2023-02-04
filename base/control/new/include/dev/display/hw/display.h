@@ -6,6 +6,21 @@
 #ifndef __HALVID_H
 #define __HALVID_H    1
 
+// Local boot structure.
+struct x_boot_block_d
+{
+    int initialized;
+    unsigned long lfb_pa;
+    unsigned long deviceWidth;    // in pixels
+    unsigned long deviceHeight;   // in pixels
+    unsigned long bpp;            // bytes per pixel
+    unsigned long last_valid_pa;  // Last valid physical address.
+    unsigned long gramado_mode;   // system mode.
+    // ...
+};
+
+// see: globals.c, init.c, bldisp.c
+extern struct x_boot_block_d  xBootBlock;
 
 
 struct display_device_d
