@@ -17,14 +17,37 @@ unsigned char __udp_gramado_default_ipv4[4] = {
 };
 // destination ip (linux)
 unsigned char __udp_target_default_ipv4[4]  = { 
-    192, 168, 1, 8  //linux
+    192, 168, 1, 6  //linux
 };
 // Target MAC.
 unsigned char __udp_target_mac[6] = { 
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 
+uint16_t inet_csum(const void *buf, size_t hdr_len);
 //---------------------
+
+// Checksum #test
+// credits: https://gist.github.com/jonhoo/7780260
+uint16_t inet_csum(const void *buf, size_t hdr_len)
+{
+  unsigned int sum=0;  //32bit
+  const uint16_t *ip1;
+
+  ip1 = (const uint16_t *) buf;
+  while (hdr_len > 1)
+  {
+    sum += *ip1++;
+    if (sum & 0x80000000)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    hdr_len -= 2;
+  }
+
+  while (sum >> 16)
+    sum = (sum & 0xFFFF) + (sum >> 16);
+
+  return (uint16_t) (~sum);
+}
 
 void 
 network_handle_udp( 
@@ -32,20 +55,23 @@ network_handle_udp(
     ssize_t size )
 {
     struct udp_d *udp;
-
-    printf("network_handle_ipv4: ==== UDP ====\n");
-
     udp = (struct udp_d *) buffer;
-    if ( (void*) buffer == NULL )
+
+    if ( (void*) buffer == NULL ){
+        printf("network_handle_ipv4: buffer\n");
         return;
+    }
 
     uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
     uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
+
+/*
+    //#debug
     printf ("sp ={%d}\n",sport);
     printf ("dp ={%d}\n",dport);
-
     printf ("len={%d}\n",udp->uh_ulen);
     printf ("sum={%d}\n",udp->uh_sum);
+*/
 
     memset(udp_payload,0,sizeof(udp_payload));
     strncpy(
@@ -59,8 +85,8 @@ network_handle_udp(
 // Hang if the port is valid.
     if (dport == 34884 || dport == 11888)
     {
-        printf ("MESSAGE={%s}\n",udp_payload);
-        printf("udp: breakpoint\n");
+        printf("UDP: dport{%d}\n",dport);
+        printf (" '%s' \n",udp_payload);
         die();
     }
 }
@@ -177,18 +203,22 @@ network_send_udp (
 
 //>>>>
     ipv4->v_hl = 0x45;    // 8 bit
-    ipv4->ip_tos = 0x00;  // 8 bit
+
+// Type of service (8bits)
+// - Differentiated Services Code Point (6bits)
+// - Explicit Congestion Notification (2bits)
+    ipv4->ip_tos = 0x00;  // 8 bit (0=Normal)
 
 // Total Length
 // 16 bit
 // This 16-bit field defines the entire packet size in bytes, 
 // including header and data. 
 // The minimum size is 20 bytes (header without data) and the maximum is 65,535 bytes. 
-// ip header + udp header + data.
+// ip header + (udp header + data).
 // #todo: Check if it is right?
 // No payload do ip temos o (udp+data)
-    unsigned short iplen = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512); 
-    ipv4->ip_len = (unsigned short) ToNetByteOrder16(iplen);
+    uint16_t iplen = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512); 
+    ipv4->ip_len = (uint16_t) ToNetByteOrder16(iplen);
 
 // Identification
 // ... identifying the group of fragments of a single IP datagram. 
@@ -196,42 +226,19 @@ network_send_udp (
     //uint16_t ipv4count = 1; 
     //ipv4->ip_id = 0x0100;
     //ipv4->ip_id = (uint16_t) ToNetByteOrder16(ipv4count);
-    ipv4->ip_id = 0;  // No fragmentation for now.
+    ipv4->ip_id = 0;  
 
-  //16 bit   //bits  0b01000;
-    ipv4->ip_off = 0x0000;  //0x8
+// Flags (3bits) (Do we have fragments?)
+// Fragment offset (13bits) (fragment position)
+// 0x4000
+    //ipv4->ip_off = 0x0000;  //0x8
+    ipv4->ip_off = ToNetByteOrder16(0x0040);  //Don't fragment
 
     ipv4->ip_ttl = 64; //0x40;  //8bit
 
-
-// Protocol
-// 8bit
-// IPV4_PROT_UDP; 17 = udp.
-//>>>>
-// #importante
-// Existem varios protocolos para ip.
-// TCP=0x6 UDP=0x11
-//default protocol: UDP
-//#define IPV4_PROT_UDP 0x11
+// Protocol (8bit)
+// 0x11 = UDP. (17)
     ipv4->ip_p = 0x11;
-
-// 16bit
-    ipv4->ip_sum = 0;
-/*
-    uint32_t checksum = 0;
-    checksum += 0x4500;
-    checksum += length;
-    checksum += ipv4count++;
-    checksum += 0x4000;
-    checksum += 0x4000 + protocol;
-    checksum += ToNetByteOrder16((from >> 16) & 0xFFFF);
-    checksum += ToNetByteOrder16(from & 0xFFFF); 
-    checksum += ToNetByteOrder16((to >> 16) & 0xFFFF);
-    checksum += ToNetByteOrder16(to & 0xFFFF);
-    checksum = (checksum >> 16) + (checksum & 0xffff);
-    checksum += (checksum >> 16);
-    ipv4->ip_sum = ToNetByteOrder16((uint16_t) (~checksum));
-*/
 
 // src ip
 // #bugbug: Esta na ordem certa?
@@ -248,8 +255,30 @@ network_send_udp (
         (const void *) &target_ip[0], 
         4 );
     //ipv4->ip_dst.s_addr = (unsigned int) ToNetByteOrder32(ipv4->ip_dst.s_addr);
-
     //printf ("ip %x\n", ipv4->ip_dst.s_addr);
+
+
+// Checksum
+// 16bit
+/*
+    uint32_t checksum = 0;
+    checksum += 0x4500;
+    checksum += length;
+    checksum += ipv4count++;
+    checksum += 0x4000;
+    checksum += 0x4000 + protocol;
+    checksum += ToNetByteOrder16((from >> 16) & 0xFFFF);
+    checksum += ToNetByteOrder16(from & 0xFFFF); 
+    checksum += ToNetByteOrder16((to >> 16) & 0xFFFF);
+    checksum += ToNetByteOrder16(to & 0xFFFF);
+    checksum = (checksum >> 16) + (checksum & 0xffff);
+    checksum += (checksum >> 16);
+    ipv4->ip_sum = ToNetByteOrder16((uint16_t) (~checksum));
+*/
+
+    ipv4->ip_sum = 0;
+    ipv4->ip_sum = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
+
     //refresh_screen();
     //while(1){}
 
@@ -300,8 +329,9 @@ network_send_udp (
 // When UDP runs over IPv4, 
 // the checksum is computed using a "pseudo header" 
 // that contains some of the same information from the real IPv4 header.
-    udp->uh_sum = 0; //#todo
-
+// # UDP lets us set the checksum to 0 to ignore it?
+    udp->uh_sum = 0;  //#todo
+//----------------------------------------------------------------------
 
 
 //

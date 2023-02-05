@@ -1102,6 +1102,16 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
     }
 
 //
+// == NIC device ===============================================
+//
+
+    if ( fp->____object == ObjectTypeNIC ){
+       printf("sys_write: Writing on NIC device ... #todo\n");
+       //network_on_sending(ubuf,count);
+       return 0;
+   }
+
+//
 // == Sockets ===============================================
 //
     ncopy = count;

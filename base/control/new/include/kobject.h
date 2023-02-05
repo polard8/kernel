@@ -18,18 +18,18 @@ typedef enum {
 
     ObjectTypeNull,               //0 Null. (Free)
 
-    // fs/
+// File
     ObjectTypeDirectory,          // diretório de arquivos
     ObjectTypeFile,               // (Regular file)
     ObjectTypePipe,               //
     ObjectTypeFileSystem,         // <<<< This file represents a 'File System'.
-    
+
+// Metafile
     // metafile just like GRAMADO or BRAMADO.
     // or even a hidden lba with no entry in the directory
     ObjectTypeMetafile,
 
-    // hwi/
-    
+
     //ObjectTypeSerialPort,    //COM ports.
     
     ObjectTypeDevice,         // device ??
@@ -45,7 +45,7 @@ typedef enum {
     ObjectTypeVirtualConsole, //
     ObjectTypeCharDev,        //
     ObjectTypeBlockDev,       //
-    ObjectTypeNetworkDev,     //
+    ObjectTypeNIC,     // NIC device
     ObjectTypeVideo,          // video
     ObjectTypeCpu,           
     ObjectTypeDma,  

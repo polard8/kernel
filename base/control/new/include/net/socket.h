@@ -5,6 +5,8 @@
 #ifndef __NET_SOCKET_H
 #define __NET_SOCKET_H    1
 
+#define SOCKET_MAX_PENDING_CONNECTIONS   32
+
 // Socket state
 #define SS_NULL           0
 #define SS_UNCONNECTED    1

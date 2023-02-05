@@ -33,6 +33,26 @@ extern unsigned long wmData_Callback2;
 //#define KEYBOARD_OBF       0x01    //Output buffer flag.
 
 
+//--------------------------------------
+// Ponteiros para ícones
+// Ponteiros para o endereço onde os ícones 
+// foram carregados.
+// queremos saber se o endereço alocado eh compartilhado ...
+// para o window server usar ... entao chamaremos de sharedbufferIcon.
+
+void *shared_buffer_app_icon;  //1
+void *shared_buffer_file_icon; 
+void *shared_buffer_folder_icon;
+void *shared_buffer_terminal_icon;
+void *shared_buffer_cursor_icon;
+// ... 
+
+int zorder=0;
+int zorderCounter=0;         //contador de janelas incluidas nessa lista.   
+int zorderTopWindow=0;
+//...
+
+
 // ============================
 static unsigned long presence_level=32;
 static unsigned long flush_fps=30;
@@ -83,16 +103,15 @@ wmRegisterWSCallbacks(
 
     gUseWMCallbacks = TRUE;
 
-    // Save callbacks
-    // See: swlib.asm
+// Save callbacks
+// See: swlib.asm
     wmData_Callback0 = (unsigned long) callback0;
     wmData_Callback1 = (unsigned long) callback1;
     wmData_Callback2 = (unsigned long) callback2;
 
-
-    if( wmData_Callback0 == 0 ||
-        wmData_Callback1 == 0 ||
-        wmData_Callback2 == 0  )
+    if ( wmData_Callback0 == 0 ||
+          wmData_Callback1 == 0 ||
+          wmData_Callback2 == 0  )
     {
         panic("wmRegisterWSCallbacks: Invalid callbacks\n");
     }
@@ -212,7 +231,7 @@ static void __launch_app_via_initprocess(int index)
     tid_t src_tid = 0;  //#todo
     tid_t dst_tid = (tid_t) INIT_TID;
 
-    if( index < 4001 || index > 4009 )
+    if ( index < 4001 || index > 4009 )
     {
         return;
     }
@@ -240,9 +259,7 @@ static void __enter_embedded_shell(int kernel_in_debug_mode)
 
     jobcontrol_switch_console(0);
 
-//
 // Message
-//
 
     if (kernel_in_debug_mode){
         printf("[[ KERNEL IN DEBUG MODE ]]\n");
@@ -252,10 +269,7 @@ static void __enter_embedded_shell(int kernel_in_debug_mode)
     consolePrompt();  // it will refresh the screen.
     //refresh_screen();  
 
-//
 // Flag
-//
-
     ShellFlag = TRUE;
 }
 
@@ -288,41 +302,12 @@ void exit_kernel_console(void)
 }
 
 
-// kernel initialized on debug mode.
-// only on initialzation.
+// #deprecated
 // called by init.c
 void kgwm_early_kernel_console(void)
 {
-
-// fail
-// se ja estamos no ambiente de desktop
-// com toda a gui funcionando.
-    if ( gUseWMCallbacks == TRUE )
-    {
-        return;
-    }
-
-    //IN: kernel in in debug mode.
-    __enter_embedded_shell(TRUE);
-
-// Enable input
-    asm("sti");
-
-    while(1){
-        // exit loop
-        if (ShellFlag == FALSE)
-        {
-            // mandamos uma mensagem para o ws, para atualizar o desktop.
-            if(gUseWMCallbacks==TRUE){
-                __exit_embedded_shell();
-            }
-            break;
-        }
-    };
-
-// Disable input end return to init.c
-    asm("cli");
-    return;
+// #deprecated
+    x_panic ("kgwm_early_kernel_console:");
 }
 
 
@@ -565,9 +550,7 @@ wmProcedure (
 
         // #??
         // Não enviamos mensagem caso não seja combinação?
-        if( shift_status != TRUE &&
-            ctrl_status != TRUE &&
-            alt_status != TRUE )
+        if ( shift_status != TRUE && ctrl_status != TRUE && alt_status != TRUE )
         {
             return 0;
         }
@@ -1568,7 +1551,6 @@ done:
         (unsigned long)     Event_LongRawByte );
 
     return (int) __Status;
-    //return 0;
 }
 
 // ----------------------------------------------
@@ -1631,14 +1613,10 @@ wmMouseEvent(
 // atraves do segundo long.
 // IN: window pointer, event id, button number. button number.
 
-    if ( event_id == MSG_MOUSEPRESSED || 
-         event_id == MSG_MOUSERELEASED )
+    if ( event_id == MSG_MOUSEPRESSED || event_id == MSG_MOUSERELEASED )
     {
-        post_message_to_ws(
-            NULL,
-            event_id,
-            button_number,
-            button_number ); //#todo: send control keys status.
+        // #todo: Send control keys status.
+        post_message_to_ws( NULL, event_id, button_number, button_number );
         return 0;
     }
 
@@ -1698,15 +1676,15 @@ int windowLoadGramadoIcons(void)
 {
     unsigned long fRet=0;
 
-	//#debug
-	//printf("windowLoadGramadoIcons:\n");
+    //#debug
+    //printf("windowLoadGramadoIcons:\n");
 
 // ## Icon support ##
-//iconSupport:
+// iconSupport:
 // Carregando alguns ícones básicos usados pelo sistema.
 // ## size ##
 // Vamos carregar ícones pequenos.
-//@todo checar a validade dos ponteiros.
+// @todo checar a validade dos ponteiros.
 // #bugbug
 // Size determinado, mas não sabemos o tamanho dos ícones.
 // 4 pages.
@@ -1716,12 +1694,12 @@ int windowLoadGramadoIcons(void)
 
     unsigned long tmp_size = (4*4096);
 
-    // See: window.h
-    shared_buffer_app_icon       = (void *) allocPages(4);
-    shared_buffer_file_icon      = (void *) allocPages(4);
-    shared_buffer_folder_icon    = (void *) allocPages(4);
+// See: window.h
+    shared_buffer_app_icon          = (void *) allocPages(4);
+    shared_buffer_file_icon           = (void *) allocPages(4);
+    shared_buffer_folder_icon      = (void *) allocPages(4);
     shared_buffer_terminal_icon  = (void *) allocPages(4);
-    shared_buffer_cursor_icon    = (void *) allocPages(4);
+    shared_buffer_cursor_icon      = (void *) allocPages(4);
     // ...
 
     if ( (void *) shared_buffer_app_icon == NULL ){
@@ -1741,7 +1719,7 @@ int windowLoadGramadoIcons(void)
     }
 
 //
-// Load
+// Load .BMP images.
 //
 
 // app icon
@@ -1827,6 +1805,12 @@ void *ui_get_system_icon(int n)
     if (n <= 0){
         return NULL;
     }
+
+// #bugbug
+// This is very unsafe.
+// The app can mess up our memory.
+// #todo
+// Only the window server can access this routine.
 
     switch (n){
     case 1: return (void *) shared_buffer_app_icon;       break;

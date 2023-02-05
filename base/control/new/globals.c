@@ -3,11 +3,6 @@
 
 #include <kernel.h>
 
-
-// Modulo 0.
-// see: kernel.h
-struct kernel_module_d  *kernel_mod0;
-
 //
 // Product support
 //
@@ -19,13 +14,26 @@ int g_platform_type = PFT_64BIT;
 // System type.
 int g_system_type = SYSTEM_TYPE_NULL;
 
-
 //
 // Boot support
 //
 
+// #bugbug
+// We are using another structure.
+// see: init.c
 // see: gdef.h
 struct boot_block_d  BootBlock;
+// This is the write structure for this.
+//see: display.h, init.c, bldisp.c
+struct x_boot_block_d  xBootBlock;
+
+
+// Salvando o último endereço válido de memória ram.
+// usado em head.asm
+// see: x64mm.h
+unsigned long blSavedLastValidAddress=0;  //pa
+unsigned long blSavedPhysicalMemoryInKB=0;
+
 
 //
 // System arch
@@ -85,8 +93,16 @@ int abnt2=FALSE;
 unsigned int g_processor_count=0;
 int g_smp_initialized = FALSE;
 
+// see: window.h
+struct gui_d  *gui; 
+
+
 // Logon.
 int g_logged=FALSE;
+
+// Modulo 0.
+// see: kernel.h
+struct kernel_module_d  *kernel_mod0;
 
 
 // Kernel information variables.
@@ -104,8 +120,34 @@ int g_kernel_symbols_available=FALSE;
 int gUseWMCallbacks=FALSE;
 
 
-//see: display.h, init.c, bldisp.c
-struct x_boot_block_d  xBootBlock;
+unsigned long g_ring0area_va=0;
+unsigned long g_ring3area_va=0;
+unsigned long g_kernelimage_va=0;
+unsigned long g_frontbuffer_va=0;
+unsigned long g_backbuffer_va=0;
+unsigned long g_pagedpool_va=0;  //pagedpool virtual address
+unsigned long g_heappool_va=0;
+unsigned long g_extraheap1_va=0;
+unsigned long g_extraheap2_va=0;
+unsigned long g_extraheap3_va=0;
+
+
+// Endereço virtual do pool de heaps.
+// os heaps nessa área serão dados para os processos.
+int g_heap_count=0;
+int g_heap_count_max=0;
+unsigned long g_heap_size=0;
+
+
+// extra heap 1
+unsigned long g_extraheap1_size=0;
+int g_extraheap1_initialized=0;
+// extra heap 2
+unsigned long g_extraheap2_size=0;
+int g_extraheap2_initialized=0;
+// extra heap 3
+unsigned long g_extraheap3_size=0;
+int g_extraheap3_initialized=0;
 
 //#bugbug
 //move this to kernel (ring 0) crt support.

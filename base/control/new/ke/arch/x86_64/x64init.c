@@ -1026,18 +1026,7 @@ void init_globals(void)
     g_smp_initialized = FALSE;
     g_processor_count = 0;
 
-
 // ===================
-// Vamos atrasar configuração de janela 
-// em favor de configuração de mensagem
-
-// ??
-// What is this?
-// Atalho para a próxima mensagem de teclado..(test) debug
-    gNextKeyboardMessage = (int) 0;
-
-// Essa flag bloqueia e impede que uma janela obtenha o foco.
-    gFocusBlocked = (int) 0;
 
 // Profiler
 // See: 

@@ -4,8 +4,12 @@
 #ifndef __PS_PROCESS_H
 #define __PS_PROCESS_H    1
 
-
 extern int copy_process_in_progress;
+
+#define G_DEFAULT_PROCESSHEAP_SIZE  (128 * 1024)
+#define G_DEFAULT_PROCESSHEAP_COUNTMAX  16 
+
+
 
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.

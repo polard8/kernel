@@ -4,6 +4,12 @@
 #ifndef __X64MM_H
 #define __X64MM_H    1
 
+// Salvando o último endereço válido de memória ram.
+// usado em head.asm
+// see: globals.c
+extern unsigned long blSavedLastValidAddress;
+extern unsigned long blSavedPhysicalMemoryInKB;
+
 
 // Definições dos campos das páginas.
 #define PAGE_PRESENT            0x001
@@ -25,6 +31,10 @@
 // The virtual address of the kernel pml4 table.
 // see: pages.c
 extern unsigned long gKernelPML4Address; 
+
+
+
+
 
 
 /*

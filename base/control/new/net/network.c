@@ -54,7 +54,8 @@ void testNIC(void)
     refresh_screen();
 }
 
-void 
+
+int 
 network_on_receiving ( 
     const unsigned char *frame, 
     ssize_t size )
@@ -66,17 +67,14 @@ network_on_receiving (
     uint16_t Type=0;
 
     if ( (void*) frame == NULL ){
-        return;
+        printf("network_on_receiving: frame\n");
+        goto fail;
     }
 
-    if (size <= 0){
-        printf("network_on_receiving: size<=0\n");
-        return;
-    }
-    // 8192
-    if (size > E1000_DEFAULT_BUFFER_SIZE){
-        printf("network_on_receiving: size>8192\n");
-        return;
+    // 1~8192
+    if (size <= 0 || size > E1000_DEFAULT_BUFFER_SIZE){
+        printf("network_on_receiving: size\n");
+        goto fail;
     }
 
 //
@@ -104,7 +102,7 @@ network_on_receiving (
     //printf("Ethernet Header\n");
 
     if ( (void*) eth == NULL ){
-        return;
+        goto fail;
     }
 
 // #debug
@@ -141,11 +139,26 @@ network_on_receiving (
     //case ETHERTYPE_IPv6:
     default:
         // printf ("Default type\n");
+        goto fail;
         break;
     };
 
-    if (Show)
+    if (Show){
         refresh_screen();
+    }
+
+    return 0;
+fail:
+    return -1;
+}
+
+
+int 
+network_on_sending ( 
+    const unsigned char *frame, 
+    ssize_t size )
+{
+    return -1;
 }
 
 // in: (Do buffer indicado para o buffer tail)

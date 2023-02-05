@@ -12,9 +12,11 @@
 #ifndef  __WINDOW_H
 #define  __WINDOW_H    1
 
+
 #define KGWS_ZORDER_BOTTOM   0 
 #define KGWS_ZORDER_TOP     1023   //top window
 #define KGWS_ZORDER_MAX     1024   //max
+
 
 // #importante:
 // Tipos de mensagem de comunicação nos diálogos 
@@ -44,34 +46,14 @@
 #define WINDOW_CLOSED    4321
 //... 
 
-//desktop window. (Área de trabalho) 
-//#define MAINWINDOW_DEFAULTX  ?
-//#define MAINWINDOW_DEFAULTY  ?
 
+//
+// Message code.
+//
+
+#define MSG_NULL  0 
  
-// Número máximo de janelas.
-//@todo: Aumentar esse tamanho.
-
-// # window lock support #
-#define WINDOW_LOCKED    1
-#define WINDOW_UNLOCKED  0
-
-/*
- * Messages.
- * mensagens para procedimentos de janelas e 
- * para diálogos dentro do gws.
- * Obs: Isso refere-se principalmente à janelas.
- */
-
- //??tipos de mensagens ??
-#define MSG_NULL          0 
-#define SIGNAL_NULL       0 
-#define STREAM_MSG_NULL   0 
-#define BUFFER_MSG_NULL   0 
-#define CAT_MSG_NULL      0  
-
- 
-//window (1-19)  
+// Window (1-19)  
 #define MSG_CREATE        1
 #define MSG_DESTROY       2
 #define MSG_MOVE          3 
@@ -98,8 +80,6 @@
 #define MSG_SYSKEYDOWN    22
 #define MSG_SYSKEYUP      23
 
-
-
 // mouse (30 - 39)
 #define MSG_MOUSEKEYDOWN     30
 #define MSG_MOUSEKEYUP       31
@@ -115,7 +95,6 @@
 #define MSG_MOUSEEXITED      39   //?? descapturou ??
 //#define MSG_MOUSEMOVEBYOFFSET
 //#define MSG_MOUSEMOVETOELEMENT
-
 
 //outros (40 - ...)
 #define MSG_COMMAND       40
@@ -136,22 +115,22 @@
 //nessa mensagem.
 //#bugbug: temos outro grupo de mensagems abordadndo esse tema logo abaixo.
 
-#define MSG_TERMINAL_COMMAND 49
-#define MSG_TERMINAL_SHUTDOWN 50
+#define MSG_TERMINAL_COMMAND  49
+#define MSG_TERMINAL_SHUTDOWN  50
 #define MSG_TERMINAL_REBOOT   51
 
-#define MSG_DEVELOPER 52
+#define MSG_DEVELOPER  52
 
-//UM TIMER SE ESGOTOU,
-#define MSG_TIMER 53   
+// UM TIMER SE ESGOTOU,
+#define MSG_TIMER  53
 //...
 
-//o servidor de rede se comunica com o processo.
-#define MSG_AF_INET 54
-#define MSG_NET_DATA_IN 55
+// O servidor de rede se comunica com o processo.
+#define MSG_AF_INET  54
+#define MSG_NET_DATA_IN  55
 
-//o driver de network está notificando um processo em ring3.
-#define MSG_NETWORK_NOTIFY_PROCESS 56
+// O driver de network está notificando um processo em ring3.
+#define MSG_NETWORK_NOTIFY_PROCESS  56
 
 // mouse support: continuação ...
 #define MSG_MOUSE_DOUBLECLICKED   60
@@ -183,11 +162,11 @@
 
 // o evento de rolagem aconteceu ...
 // O número do evento será entregue em long1.
-#define MSG_HSCROLL 2000
-#define MSG_VSCROLL 2001
+#define MSG_HSCROLL  2000
+#define MSG_VSCROLL  2001
 
 // 
-// == Window Type ====
+// Window type
 //
 
 #define WT_NULL          0 
@@ -214,117 +193,14 @@
 //... 
 
 // window style
-#define WINDOW_STYLE_FLOATING 1000 
-#define WINDOW_STYLE_DOCKING  2000  //(atracada em algum canto.)
+#define WINDOW_STYLE_FLOATING  1000
+#define WINDOW_STYLE_DOCKING   2000
 //...
 
-// window status
+// Window status
 #define WINDOW_STATUS_ACTIVE       1
 #define WINDOW_STATUS_INACTIVE     0
 //...
-
-//window relationship status. (seu status em relação as outras janelas.)
-//Obs: tem uma estreita ligação com o status da thread que está trabalahndo com ela 
-//e com a prioridade dessa thread e do processo que a possui.
-// *** RELAÇÃO IMPLICA PRIORIDADE ***
-#define WINDOW_REALATIONSHIPSTATUS_FOREGROUND     1000
-#define WINDOW_REALATIONSHIPSTATUS_BACKGROUND     2000
-#define WINDOW_REALATIONSHIPSTATUS_OWNED          3000  //Possuida por outra janela.
-#define WINDOW_REALATIONSHIPSTATUS_ZAXIS_TOP      4000
-#define WINDOW_REALATIONSHIPSTATUS_ZAXIS_BOTTOM   6000
-//...
-
-// Apresentação.
-#define VIEW_NULL       0
-#define VIEW_FULL       1
-#define VIEW_MAXIMIZED  2  
-#define VIEW_MINIMIZED  4
-#define VIEW_NORMAL     8  // Normal (restaurada)
-// ...
-
-//
-// ## botoes  ##
-//
-
-//button state
-#define BS_NULL 0 
-#define BS_DEFAULT 1
-#define BS_FOCUS   2
-#define BS_PRESS   3
-#define BS_HOVER   4
-#define BS_DISABLED 5
-#define BS_PROGRESS 6
-//...
-
-    //button states:
-    //0. NULL.
-	//1. Default 
-    //2. Focus
-    //3. Expanded/Toggled/Selected
-    //4. Disabled
-    //5. Hover and Active	
-
-//#define BN_CLICKED  200
-//#define BN_DOWN     1
-//#define BN_UP       2
-//#define BN_SELECTED 3
- 
-//@todo: what ??? 
-//?? um handle para o desktop. 
-#define HWND_DESKTOP  0
-
- 
-/*
- * Dimensões: 
- * Parametro principal para dimensões de janela.
- * todos os outros tomam esse como refêrencia.
- * depende do modo que estiver usando.
- * vesa 112:
- * 640x480x24bit - (3 bytes por pixel)
- * @todo, o kernel usará dimensões 640x480 no modo gráfico.
- */
-#define KERNEL_COL_MAX  640 
-#define KERNEL_LIN_MAX  480 
-
-#define BAR_STEPS   46
-#define LINE KERNEL_COL_MAX 
-
-// dimensões - provisorio
-#define COL_MAX   KERNEL_COL_MAX 
-#define LINHA_MAX KERNEL_LIN_MAX  
-
-
-/*
- * Constants para a task bar.
- */
- 
-//#define TASKBUTTONS_BASE 40
-//#define CLOCK_BASE  (KERNEL_COL_MAX-40)
-
-
-//=========================================
-//    ****    KERNEL WINDOW    ****
-//Definições padronizadas para janelas do kernel usadas para 
-//fornecer informações sobre o sistema.
-// (Retângulo grande no topo da tela.)
-// #bugbug
-// Isso não é uma coisa boa.
-
-#define KERNEL_WINDOW_DEFAULT_LEFT 0
-#define KERNEL_WINDOW_DEFAULT_TOP  0
-#define KERNEL_WINDOW_DEFAULT_WIDTH  800
-#define KERNEL_WINDOW_DEFAULT_HEIGHT (600/4) 
-#define KERNEL_WINDOW_DEFAULT_CLIENTCOLOR  xCOLOR_GRAY2
-#define KERNEL_WINDOW_DEFAULT_BGCOLOR      xCOLOR_GRAY1
-//...
-
-//
-// ESSA VARIÁVEL BLOQUEIA O FOCO NA JANELA DO DESENVOLVEDOR 
-//
-int _lockfocus;
-
-// ESSA SERÁ USADA DEPOIS QUANDO A INTERFACE GRÁFICA ESTIVER MAIS ROBUSTA;
-int gFocusBlocked;   
 
 /*
  * rect_d:
@@ -478,13 +354,11 @@ struct msg_d
 // validation
     int used;
     int magic;
-
 // standard header
     struct window_d *window;  //#opaque
     int msg;
     unsigned long long1;
     unsigned long long2;
-
 // extra payload
     unsigned long long3;
     unsigned long long4;
@@ -529,34 +403,27 @@ unsigned long windowList[WINDOW_COUNT_MAX];
 // ??
 unsigned long Windows[KGWS_ZORDER_MAX];
 
-//id da janela que o mouse está em cima.
+// id da janela que o mouse está em cima.
 int window_mouse_over; 
 
-//
-//  ## Ponteiros para ícones ##
-// 
- 
+//--------------------------------------
+// Ponteiros para ícones
 // Ponteiros para o endereço onde os ícones 
 // foram carregados.
-
 // queremos saber se o endereço alocado eh compartilhado ...
 // para o window server usar ... entao chamaremos de sharedbufferIcon.
+// see: kgwm.c
 
-void *shared_buffer_app_icon;  //1
-void *shared_buffer_file_icon; 
-void *shared_buffer_folder_icon;
-void *shared_buffer_terminal_icon;
-void *shared_buffer_cursor_icon;
+extern void *shared_buffer_app_icon;  //1
+extern void *shared_buffer_file_icon; 
+extern void *shared_buffer_folder_icon;
+extern void *shared_buffer_terminal_icon;
+extern void *shared_buffer_cursor_icon;
 // ... 
-
-//??
-// struct window_d  *FULLSCREEN_TABWINDOW;   
 
 //
 // == z order support =========================
 //
-
-//#define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
 
 //esses tipo indicam algum posicionamento dentro da xorder.
 typedef enum {
@@ -598,234 +465,50 @@ struct zorder_d
 	struct zorder_d *next;
 };
 
-/* 
-struct zorderInfo
-{
-    struct window *top_window;	
-} 
-*/
 
-int zorder;
-int zorderCounter;         //contador de janelas incluidas nessa lista.   
-int zorderTopWindow;
+//see:  kgwm.c
+extern int zorder;
+extern int zorderCounter;         //contador de janelas incluidas nessa lista.   
+extern int zorderTopWindow;
 //...
 
-/*
- * zorderList[] support.
- *     Sobreposição de janelas.    
- *     ?? Precisamos reorganizar a lista ??
- *     ?? seria melhor uma lista encadeada ??
- *     ??e quando fecharem uma janela no meio da lista ??
- *
- *  >> Quando criamos uma janela ela é incluída no primeiro lugar vago da lista.
- *  >> quando deletamos uma janela, apenas excluimos ela da lista, não precisamos reorganizar.
- *  >> uma janelas minimizada é excluida dessa lista, é zerada z_axis_order na sua estrutura.
- *  >> repintaremos começando do zero.
- */ 
-//unsigned long zorderList[ZORDER_COUNT_MAX];
 
-//
-// Backbuffer support. (espelho da memória de video)
-//
-
-struct backbufferinfo_d
-{
-	//@todo: object support
-
-    int used;
-    int magic;
-	
-    unsigned long start;
-    unsigned long end;
-    unsigned long size;
-    //...
-
-    //@todo:
-	// ?? O que nos podemos ter aqui ??	
-	// terminal., window, line disciplice, cursor ...
-	//input buffer? z-order ??
-};
-struct backbufferinfo_d *BackBufferInfo;
-
-
-//
-// Frontbuffer support. (memória de vídeo)
-//
-
-
-/*
-#deprecated.
-struct frontbufferinfo_d
-{
-	int used;
-	int magic;
-    unsigned long start;
-    unsigned long end;
-    unsigned long size;
-	unsigned long width;
-    unsigned long height;
-	unsigned long bpp;
-	// ?? O que nos podemos ter aqui ??	
-	// terminal., window, line disciplice, cursor ...
-};
-struct frontbufferinfo_d *FrontBufferInfo;
-*/
-
-
-/*
- * gui:
- *     Nível 0 
- *     ## gui  ##
- *
- * Obs: Foi incluído aqui os ponteiros para as janelas principais usadas nos 
- * principais recursos gráficos, como control menu do desktop por exemplo.
- * 2015 - Created by Fred Nora.
- */
-
-// #bugbug
-// Muita coisa nessa estrutura precis ser revista.
-// Tendo em vista que ela apenas contempla o kgws
-// como provedor de recursos gráficos.
-// Dessa forma essa estrutura só faz sentido no ambiente 
-// de setup, que usa o kgws.
+// gui:
+// 2015 - Created by Fred Nora.
 
 struct gui_d
 {
     int initialised;
 
-    // Procedimento da janela ativa.
-    unsigned long procedure;  
-
-    // #bugbug
-    // precisamos de estrutura de device context,
-    // onde teremos informações sobre o hardware
-    // responsável pelos recursos gráficos.
-
-    // BUFFERS
-    // Ponteiros para os principais buffers usados pelo sistema.
-
-    // LFB:
-    // O endereço do início da memória de vídeo do cartão de memória.
-    // obs: Quantos desses ponteiros precisamos dentro da memória de
-    // vídeo? E se tivermos várias placas de memória de vídeo, seria
-    // um lfb para cada placa?
-    // Esse valor foi configurado pelo BIOS pelo metodo VESA.
-
-    unsigned long lfb;
-    // unsigned long lfb_pa;  //use this one
-
-    // Backbuffer
-    // O Backbuffer pe o buffer para colocar a imagem de pano de fundo.
-    // Ele será o buffer dedicado da janela principal gui->main. 
-
-	// #importante.
-	// Um backbuffer pode cobrir a área de vários monitores.
-	// O conceito de backbuffer pode estar relacionado com o conceito de room,
-	// (window station), com vários desktops e monitores.
-
-    unsigned long backbuffer;
-    //unsigned long backbuffer_pa;  //use this one
-
-    void *backbuffer1; 
-    void *backbuffer2; 
-    void *backbuffer3;
-    // ...
-
-/*
- * Default dedicated buffers.
- *     Esses ponteiros podem ser usados para aloca
- * memória para buffer dedicado antes mesmo de se criar a estrutura
- * da janela.
- * Obs: Toda janela tem que ter um buffer dedicado, onde ela será pintada.
- * Depois de pintada ela pertencerá a uma lista de janelas que serão
- * enviadas para o LFB seguindo a ordem da lista.
- */
-
-	//void* defaultWindowDedicatedBuffer1;
-	//void* defaultWindowDedicatedBuffer2;
-	//void* defaultWindowDedicatedBuffer3;
-    //...
-
-    // redraw
-    // Flag para repintar todas as janelas.
-    // #todo: #bugbug, Isso parece estranho. Cada janela
-    // está pintada em seu buffer dedicado e fica por conta de
-    // cada janela decidir se repinta ou não apenas ela.
+// redraw
+// Flag para repintar todas as janelas.
+// #todo: #bugbug, Isso parece estranho. Cada janela
+// está pintada em seu buffer dedicado e fica por conta de
+// cada janela decidir se repinta ou não apenas ela.
 
     int redraw;
 
-    // refresh
-    // Flag para enviar do backbuffer para a memória de video.
-    // Seguindo uma lista linkada, copiaremos o conteúdo do buffer
-    // dedicado de cada janela da lista no LFB. Primeiro é Backbuffer
-    // que é o buffer da janela principal, que funcionará como
-    // Head da lista.
+// refresh
+// Flag para enviar do backbuffer para a memória de video.
+// Seguindo uma lista linkada, copiaremos o conteúdo do buffer
+// dedicado de cada janela da lista no LFB. Primeiro é Backbuffer
+// que é o buffer da janela principal, que funcionará como
+// Head da lista.
 
     int refresh;
 
-    // status das janelas usadas pelo sistema.
-	int screenStatus;
-	int backgroundStatus;
-	int logoStatus;
-	int mainStatus;
-	int navigationbarStatus;
-	int menuStatus;
-	int taskbarStatus;
-	int statusbarStatus;
-	int infoboxStatus;
-	int messageboxStatus;
-	int debugStatus;
-	int gridStatus;
-
-	/*
-	 * Windows
-	 *
-	 * Obs: 
-	 * Ponteiros para as janelas principais usadas na interfáce
-	 * gráfica. Essas janelas não dependem dos processos e sim os
-	 * processos dependem delas. Os processos do sistema poderão recriar
-	 * essas janelas e registrar seus ponteiros aqui. Por exemplo, o control
-	 * menu pode sofrer alterações e depois registrar o ponteiro aqui.
-	 * Outro exemplo é o control menu da janela ativa, toda vez que
-	 * trocar a janela ativa, deve-se registrar o ponteiro do control menu
-	 * da janela aqui, para fácil acesso.
-	 *
-	 * Os ponteiros aqui serão organizados em grupos:
-	 * ==============================================
-	 * Screen - root window
-	 * Grupo 0: Background, Logo, Desktop, Taskbar.
-	 * Grupo 1: Main (Full Screen), Status Bar. 
-	 * Grupo 2: Grid. (grid de ícones flutuantes)
-	 * Grupo 3: Control menu.(Control menu da janel atual).
-	 * Grupo 4: Info Box, ToolTip.
-	 * Grupo 5: ??
-	 * Grupo 6: Outras.
-	 */
-
 // Security
-
     struct usession_d  *CurrentUserSession;
-    struct room_d      *CurrentRoom;
+    struct room_d        *CurrentRoom;  // (Window station)
     struct desktop_d   *CurrentDesktop;
-
-//
-// User info.
-//
-    //struct user_info_d *User; 
-    //...
 };
 
-// #importante
-// Estrutura global. 
-// (Usada para passar estutura entre funções)
-
-struct gui_d  *gui; 
+extern struct gui_d  *gui; 
 
 
 //
 // == prototypes ================
 //
-
 
 //
 // pixel
@@ -846,14 +529,12 @@ backbuffer_putpixel (
     unsigned long _y, 
     unsigned long _rop_flags );
 
-
 void 
 frontbuffer_putpixel ( 
     unsigned int  _color,
     unsigned long _x, 
     unsigned long _y, 
     unsigned long _rop_flags );
-
 
 //
 // char
@@ -863,7 +544,6 @@ void set_char_width ( int width );
 void set_char_height (int height);
 int get_char_width (void);
 int get_char_height (void);
-
 
 void 
 d_draw_char ( 
@@ -892,9 +572,8 @@ draw_string (
     char *string ); 
 
 // Early panic function.
-// #todo: Explain it better.
-void x_panic( char *string );
-
+// Print a panic message in the early stages.
+void x_panic(char *string);
 
 //
 // line
@@ -947,14 +626,9 @@ refresh_rectangle (
 
 void scroll_screen_rect (void);
 
-
-
-
-
 //
 // == wm =====================
 //
-
 
 // See: kgwm.c
 void 
@@ -972,7 +646,6 @@ unsigned long wmSendInputToWindowManager(
     unsigned long long1,
     unsigned long long2);
 
-
 void exit_kernel_console(void);
 void kgwm_early_kernel_console(void);
 
@@ -988,17 +661,4 @@ wmKeyEvent(
 int wmMouseEvent(int event_id,long long1, long long2);
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
 

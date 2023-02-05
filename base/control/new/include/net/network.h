@@ -107,11 +107,19 @@ extern int ____network_late_flag;
 
 void testNIC(void);
 
+
 // Handle package.
-void 
+int 
 network_on_receiving ( 
     const unsigned char *frame, 
     ssize_t size );
+
+
+int 
+network_on_sending ( 
+    const unsigned char *frame, 
+    ssize_t size );
+
 
 int network_buffer_in( void *buffer, int len );
 int network_buffer_out( void *buffer, int len );

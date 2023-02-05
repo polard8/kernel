@@ -11,7 +11,7 @@ unsigned char __arp_gramado_default_ipv4[4] = {
     192, 168, 1, 112 
 };
 unsigned char __arp_target_default_ipv4[4]  = { 
-    192, 168, 1, 8 
+    192, 168, 1, 6 
 };
 unsigned char __arp_gateway_default_ipv4[4] = { 
     192, 168, 1, 1 
@@ -26,11 +26,10 @@ network_handle_arp(
     const unsigned char *buffer, 
     ssize_t size )
 {
+// 0x0806
+
     struct ether_arp *ar;
     ar = (struct ether_arp *) buffer;
-
-    printf("network_handle_arp: ==== ARP ====\n");
-    //printf ("[0x0806]: ARP received\n");
 
     if ( (void*) ar == NULL ){
         printf("network_handle_arp: ar\n");
@@ -55,18 +54,19 @@ network_handle_arp(
 // Operation
     uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
     if (op==ARP_OPC_REQUEST){
-        printf("ARP: This is REQUEST\n");
+        printf("ARP: This is a REQUEST\n");
         //sending a reply, only for the linux host.  x.x.x.8
         //printf("Sending reply to linux host\n");
         //network_send_arp_reply();
     } else if (op==ARP_OPC_REPLY){
-        printf("ARP: This is REPLY\n");
+        printf("ARP: This is a REPLY\n");
     };
 
     refresh_screen();
     return;
 
 fail:
+    printf("network_handle_arp: Fail\n");
     refresh_screen();
     return;
 }

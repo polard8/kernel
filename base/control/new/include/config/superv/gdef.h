@@ -1,28 +1,11 @@
 /*
- * File: gdef.h
- * Descrição:
- *     Definições globais. 
- *     Será utilizado por todos os módulos. Deve ficar no início.
- *     Quando uma definição deve ser acessada por todos os módulos
- *     do kernel base ela deve ficar aqui.
- * #todo: 
- * FAZER O MÁXIMO DE COISAS SISTEMICAMENTE NÃO-IMPORTANTES PRIMEIRO.
- * que não comprometam o sistema. como gui.
- */
-
-/*
- * Sobre a GUI:
- * ============
- *     Um grid flutuante de janelas quadradas, 4 janelas.
- *     O message box pode ser um retângulo abaixo do grid.
- *     Uma janela de terminal virtual igual à um celular. 
- * Desse modo, enquanto essas 6 janelas não são flutuantes, dá pra
- * ir usando elas desenha das no backbuffer mesmo.
- * divisão da tela:   
- * quatro quadrantes de 10.
- * divide por vinte e multiplica pela quantidade desejada.
- *         (multiplicador*(total/20)) 
- */
+  * File: gdef.h
+  * Descrição:
+  *     Definições globais. 
+  *     Será utilizado por todos os módulos. Deve ficar no início.
+  *     Quando uma definição deve ser acessada por todos os módulos
+  *     do kernel base ela deve ficar aqui.
+  */
 
 /*
  Sobre o banco de dados:
@@ -58,8 +41,6 @@ dessa conta.
 #define ____GDEF_H    1
 
 
-//#define BIOS_FONT8X8 0x000FFA6E
-
 //using gui flags.
 #define GUI_ON   1
 #define GUI_OFF  0
@@ -73,57 +54,21 @@ dessa conta.
 #define HAL         4   //4
 
 
-//IOPL constants.
-#define KernelMode 0
+// IOPL constants.
+// Intel/AMD
+#define KernelMode  0
 #define UserMode   3
-#define RING0 0
-#define RING1 1
-#define RING2 2
-#define RING3 3
-
-
-
-//Kernel status constants.
-#define  KERNEL_NULL          0
-#define  KERNEL_INITIALIZED   1
-#define  KERNEL_ABORTED       2
-#define  KERNEL_INICIALIZADO  KERNEL_INITIALIZED
-#define  KERNEL_ABORTADO      KERNEL_ABORTED
+#define RING0  0
+#define RING1  1
+#define RING2  2
+#define RING3  3
 
 
 //#define LOBYTE(w) ((char)(((unsigned long )(w)) & 0xff))
 //#define HIBYTE(w) ((char)((((unsigned long)(w)) >> 8) & 0xff))
 
 
-// user
-//#define SUPER_USER    0
-
-
-
-/*
-// Classes of processes queues.
-#define NQ          0
-#define SYSTEM_Q    1
-#define SERVICES_Q  2
-#define USER_Q      3
-*/
-
-
 // ===================================================
-
-
-// Salvando o último endereço válido de memória ram.
-// usado em head.asm
-
-unsigned long blSavedLastValidAddress;
-unsigned long blSavedPhysicalMemoryInKB;
-
-unsigned long blSavedMetafileAddress;
-unsigned long blSavedDiskNumber;
-unsigned long blSavedHeads;
-unsigned long blSavedSPT;
-unsigned long blSavedCylinders;
-//...
 
 //keyboard suppport 
 //abnt2 flag.
@@ -148,13 +93,10 @@ extern int abnt2;
  */
 
 typedef enum {
-
-	OsTypeClient,
-	OsTypeServer,
-	OsTypeHeadlessServer,
-
+    OsTypeClient,
+    OsTypeServer,
+    OsTypeHeadlessServer,
     // ...
-    
 }os_type_t;
 
 
@@ -162,6 +104,8 @@ typedef enum {
 // The boot block structure.
 //
 
+// #todo
+// Actually the init.c is using another structure for this purpose.
 struct boot_block_d
 {
     unsigned long bootblock_address;  //pa ?? va ??
@@ -183,27 +127,22 @@ struct boot_block_d
     //...
     int initialized;
 };
-
 // see: globals.c
 extern struct boot_block_d  BootBlock;
 
-//#todo: move this to socket.h
-#define SOCKET_MAX_PENDING_CONNECTIONS   32
 
-// 
 // Regions
-//
-
-unsigned long g_ring0area_va;
-unsigned long g_ring3area_va;
-unsigned long g_kernelimage_va;
-unsigned long g_frontbuffer_va;   
-unsigned long g_backbuffer_va;
-unsigned long g_pagedpool_va;  //pagedpool virtual address
-unsigned long g_heappool_va;
-unsigned long g_extraheap1_va;
-unsigned long g_extraheap2_va;
-unsigned long g_extraheap3_va;
+// see: globals.c
+extern unsigned long g_ring0area_va;
+extern unsigned long g_ring3area_va;
+extern unsigned long g_kernelimage_va;
+extern unsigned long g_frontbuffer_va;   
+extern unsigned long g_backbuffer_va;
+extern unsigned long g_pagedpool_va;  //pagedpool virtual address
+extern unsigned long g_heappool_va;
+extern unsigned long g_extraheap1_va;
+extern unsigned long g_extraheap2_va;
+extern unsigned long g_extraheap3_va;
 
 
 // frontbuffer and backbuffer.
@@ -212,49 +151,23 @@ extern unsigned long g_frontbuffer_pa;
 extern unsigned long g_backbuffer_pa;
 
 
-/*
-struct display_info_d
-{
-    // The LFB. (frontbuffer)
-    unsigned long framebuffer;
-    unsigned long width;
-    unsigned long height;
-    unsigned long depth;    // bits per pixel.
-};
-*/
-
-
-// endereço virtual do pool de heaps.
+// Endereço virtual do pool de heaps.
 // os heaps nessa área serão dados para os processos.
-int g_heap_count;
-int g_heap_count_max;
-unsigned long g_heap_size;
-#define G_DEFAULT_PROCESSHEAP_SIZE (1024*128)
-#define G_DEFAULT_PROCESSHEAP_COUNTMAX 16     //16 PROCESSOS #BUGBUG
+// see: globals.c
+extern int g_heap_count;
+extern int g_heap_count_max;
+extern unsigned long g_heap_size;
 
-
-
-#define  G_DEFAULT_EXTRAHEAP_SIZE  0x400000;  //4MB
 
 // extra heap 1
-
-unsigned long g_extraheap1_size;
-int g_extraheap1_initialized;
-
+extern unsigned long g_extraheap1_size;
+extern int g_extraheap1_initialized;
 // extra heap 2
-
-unsigned long g_extraheap2_size;
-int g_extraheap2_initialized;
-
+extern unsigned long g_extraheap2_size;
+extern int g_extraheap2_initialized;
 // extra heap 3
-unsigned long g_extraheap3_size;
-int g_extraheap3_initialized;
-
-
-// keyboard support.
-
-int gNextKeyboardMessage;
-
+extern unsigned long g_extraheap3_size;
+extern int g_extraheap3_initialized;
 
 #endif   
 
