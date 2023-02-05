@@ -1,0 +1,13 @@
+
+A structure for display devices.
+Now the structure for display devices is mandatory.
+We are cutting off all the other structures trying to deal
+with display stuff.
+
+This structure will handle all the display information
+for the given display device.
+
+We will use the term display, not video, not screen.
+
+An application will be able to open the device driver
+and change some configuration.

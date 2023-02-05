@@ -11,9 +11,9 @@ EDITION_NAME  = Facilities
 
 VERSION_MAJOR = 1
 VERSION_MINOR = 6
-VERSION_BUILD = 307
-# Compiling on gcc 12.2.0
-# Linking on ld 2.39
+VERSION_BUILD = 308
+# Compiling on gcc 9.4.0
+# Linking on ld 2.34
 
 KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
