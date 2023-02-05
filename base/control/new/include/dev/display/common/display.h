@@ -2,9 +2,8 @@
 // display.h
 // Display device support.
 
-
-#ifndef __HALVID_H
-#define __HALVID_H    1
+#ifndef __COMMON_DISPLAY_H
+#define __COMMON_DISPLAY_H    1
 
 // Local boot structure.
 struct x_boot_block_d
@@ -42,8 +41,6 @@ struct display_device_d
     unsigned long framebuffer_pitch;
     // used for allocations.
     unsigned long framebuffer_size_in_bytes;
-    // basically the same as above.
-    struct screen_d *screen;
 
     // FILE *fp;
 

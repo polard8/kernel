@@ -1,15 +1,20 @@
 
 // window.h
 // ring0, kernel base.
+// #todo
+// Tem muita coisa aqui nesse documento para ser deletado.
+// Que era de quando existia gui dentro do kernel.
+// Talvez alguma coisa sobre janela seja preservado,
+// pois vamos dar suporte ao conceito de 'surfaces',
+// que serao areas de memoria compartilhadas entre o painter-client side 
+// e o compositor, server-side. 
 
 #ifndef  __WINDOW_H
 #define  __WINDOW_H    1
 
-
-#define KGWS_ZORDER_BOTTOM  0 
+#define KGWS_ZORDER_BOTTOM   0 
 #define KGWS_ZORDER_TOP     1023   //top window
 #define KGWS_ZORDER_MAX     1024   //max
-
 
 // #importante:
 // Tipos de mensagem de comunicação nos diálogos 
@@ -26,8 +31,7 @@
 // Se uma janela está aberta ou não. 
 #define HANDLE_STATUS_CLOSE 0
 #define HANDLE_STATUS_OPEN 1
- 
- 
+
 //used
 #define WINDOW_NOTUSED   0
 #define WINDOW_USED      1
@@ -40,7 +44,6 @@
 #define WINDOW_CLOSED    4321
 //... 
 
-
 //desktop window. (Área de trabalho) 
 //#define MAINWINDOW_DEFAULTX  ?
 //#define MAINWINDOW_DEFAULTY  ?
@@ -49,11 +52,9 @@
 // Número máximo de janelas.
 //@todo: Aumentar esse tamanho.
 
-
 // # window lock support #
 #define WINDOW_LOCKED    1
 #define WINDOW_UNLOCKED  0
-
 
 /*
  * Messages.
@@ -141,11 +142,9 @@
 
 #define MSG_DEVELOPER 52
 
-
 //UM TIMER SE ESGOTOU,
 #define MSG_TIMER 53   
 //...
-
 
 //o servidor de rede se comunica com o processo.
 #define MSG_AF_INET 54
@@ -171,12 +170,10 @@
 // control+s
 #define MSG_SAVE    72
 
-
 #define MSG_CONTROL_ARROW_UP     80
 #define MSG_CONTROL_ARROW_DOWN   81
 #define MSG_CONTROL_ARROW_LEFT   82
 #define MSG_CONTROL_ARROW_RIGHT  83
-
 
 //  terminal commands
 #define MSG_TERMINALCOMMAND      100
@@ -184,16 +181,13 @@
 //#define TERMINALCOMMAND_PRINT??? 1001
 //...
 
-
 // o evento de rolagem aconteceu ...
 // O número do evento será entregue em long1.
 #define MSG_HSCROLL 2000
 #define MSG_VSCROLL 2001
 
-
-
 // 
-// ==== Window Type ====
+// == Window Type ====
 //
 
 #define WT_NULL          0 
@@ -219,13 +213,10 @@
 #define WT_TITLEBAR 11
 //... 
 
-
-
 // window style
 #define WINDOW_STYLE_FLOATING 1000 
 #define WINDOW_STYLE_DOCKING  2000  //(atracada em algum canto.)
 //...
-
 
 // window status
 #define WINDOW_STATUS_ACTIVE       1
@@ -243,9 +234,6 @@
 #define WINDOW_REALATIONSHIPSTATUS_ZAXIS_BOTTOM   6000
 //...
 
-
-
-
 // Apresentação.
 #define VIEW_NULL       0
 #define VIEW_FULL       1
@@ -253,7 +241,6 @@
 #define VIEW_MINIMIZED  4
 #define VIEW_NORMAL     8  // Normal (restaurada)
 // ...
-
 
 //
 // ## botoes  ##
@@ -269,7 +256,6 @@
 #define BS_PROGRESS 6
 //...
 
-
     //button states:
     //0. NULL.
 	//1. Default 
@@ -282,43 +268,30 @@
 //#define BN_DOWN     1
 //#define BN_UP       2
 //#define BN_SELECTED 3
-
-
-
  
 //@todo: what ??? 
 //?? um handle para o desktop. 
-#define HWND_DESKTOP 0
+#define HWND_DESKTOP  0
 
-
- 
  
 /*
  * Dimensões: 
- * 
  * Parametro principal para dimensões de janela.
  * todos os outros tomam esse como refêrencia.
  * depende do modo que estiver usando.
- *
  * vesa 112:
- *
  * 640x480x24bit - (3 bytes por pixel)
- * 
  * @todo, o kernel usará dimensões 640x480 no modo gráfico.
- */   
-#define KERNEL_COL_MAX 640 
-#define KERNEL_LIN_MAX 480 
+ */
+#define KERNEL_COL_MAX  640 
+#define KERNEL_LIN_MAX  480 
 
-#define	BAR_STEPS   46
+#define BAR_STEPS   46
 #define LINE KERNEL_COL_MAX 
 
-//dimensões - provisorio
+// dimensões - provisorio
 #define COL_MAX   KERNEL_COL_MAX 
 #define LINHA_MAX KERNEL_LIN_MAX  
-
-
-
-
 
 
 /*
@@ -345,36 +318,19 @@
 #define KERNEL_WINDOW_DEFAULT_BGCOLOR      xCOLOR_GRAY1
 //...
 
-
-
 //
 // ESSA VARIÁVEL BLOQUEIA O FOCO NA JANELA DO DESENVOLVEDOR 
 //
 int _lockfocus;
 
-
 // ESSA SERÁ USADA DEPOIS QUANDO A INTERFACE GRÁFICA ESTIVER MAIS ROBUSTA;
 int gFocusBlocked;   
 
-
-
-// #todo: deletar.
-//unsigned long g_mainwindow_width;
-//unsigned long g_mainwindow_height;
-//unsigned long g_navigationbar_width;
-//unsigned long g_navigationbar_height;
-
-
-
-
-
 /*
- **************************************************
  * rect_d:
  *     Estrutura para gerenciamento de retângulos.
  *     Um retângulo pertence à uma janela.
  */
-
 // #todo
 // Usar isso para lidar com dirty rectangles.
 
@@ -394,11 +350,8 @@ struct rect_d
 // If the rectangle is dirty, so it needs to be flushed into 
 // the framebuffer.
 // When we draw a window it needs to be invalidated.
-
     int dirty;
-
     int flag;
-
 // Estilo de design
     int style;
 
@@ -423,7 +376,6 @@ struct rect_d
     struct rect_d *next;
 };
 
-
 // Isso pode ser útil principalmente
 // para passar um retângulo de um ambiente para outro.
 // É muito mais didático que a figura do retângulo como objeto.
@@ -437,24 +389,17 @@ struct surface_d
     struct surface_d *next;
 };
 
-
-// #todo
-// struct surface_d *backbuffer_surface;
-
-
 /* rgba */
 struct tagRGBA
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
    char red;
    char green;
    char blue;
    char alpha;
 };
 struct tagRGBA *RGBA;
-
 
 //
 // Window Class support.
@@ -469,10 +414,9 @@ typedef enum {
     WindowClassServer,    // 3 servidor
 }wc_t;
 
-
 //classes de janelas controladas pelos aplicativos.
 typedef enum {
-    WindowClassApplicationWindow,	
+    WindowClassApplicationWindow,
 	//...
 }client_window_classes_t;
 
@@ -496,42 +440,36 @@ typedef enum {
     WindowClassControl,   //??
     WindowClassDialog,
     WindowClassInfo,
-    //...	
+    //...
 }kernel_window_classes_t;
-
 
 //classes de janelas controladas pelos servidores.
 typedef enum {
     WindowClassServerWindow,
-    //...	
+    //...
 }server_window_classes_t;
 
-
-//estrutura para window class
+// estrutura para window class
 struct window_class_d
 {
-	
-	//Que tipo de window class.
-	// do sistema, dos processos ...
-    //tipo de classe.
-	
+
+//Que tipo de window class.
+// do sistema, dos processos ...
+//tipo de classe.
+
 	wc_t windowClass; 
 
-	//1
+//1
     client_window_classes_t	clientClass;
-	
-	//2
-	kernel_window_classes_t	kernelClass;
-	
-	//3
+//2
+	kernel_window_classes_t kernelClass;
+//3
 	server_window_classes_t serverClass;
-	
-	//Endereço do procedimento de janela.
-	//(eip da thread primcipal do app)
+//Endereço do procedimento de janela.
+//(eip da thread primcipal do app)
 	unsigned long procedure;
     //...
 };
-
 
 // Message structure.
 struct msg_d 
@@ -582,31 +520,17 @@ struct window_d
     //int magic;
 };
 
-struct window_d *CurrentWindow;    //Janela atual
-struct window_d *ActiveWindow;     //Janela atual.
-struct window_d *WindowWithFocus;  //Janela com o foco de entrada.   
-//...
+// #maybe
+//struct window_d *kernel_surface_window;
 
-// Lista encadeada de janelas.
-struct window_d *window_Conductor2;
-struct window_d *window_Conductor;
-struct window_d *window_rootConductor;
-//...
-
-//
 // Window list.
-//
-
 unsigned long windowList[WINDOW_COUNT_MAX];
-
 
 // ??
 unsigned long Windows[KGWS_ZORDER_MAX];
 
-
 //id da janela que o mouse está em cima.
 int window_mouse_over; 
-
 
 //
 //  ## Ponteiros para ícones ##
@@ -628,23 +552,19 @@ void *shared_buffer_cursor_icon;
 //??
 // struct window_d  *FULLSCREEN_TABWINDOW;   
 
-
 //
 // == z order support =========================
 //
 
 //#define ZORDER_COUNT_MAX  128  //??PROVISÓRIO   
 
-
 //esses tipo indicam algum posicionamento dentro da xorder.
 typedef enum {
     zordertypeNull,     //ignorado
     zordertypeTop,      //acima de todas
     zordertypeBottom,   //abaixo de rodas.
-    //...	
+    //...
 }zorder_type_t;
-
-
 
 //essas são as camadas onde os objetos gráficos ficam ...
 //estão associadas com formulários e containers.
@@ -657,12 +577,10 @@ typedef enum {
     //...
 }zorder_layer_t;
 
-
 // Estrutura para controlar um índice de janela 
 // ponteiros de instãncias dessa estrutura ficarão na lista zorderList[].
 // Obs: uma estrutura de janela pode ter um poteiro para essa 
 // estrutura que controlará todas as propriedades de zorder relaticas a aquela janela.
-
 struct zorder_d
 {
 	// tipo ... top ou bottom.
@@ -674,12 +592,9 @@ struct zorder_d
 	int zIndex;
     
 	//?? ...
-	
     struct window_d *window;
-	
 	//toda janela está na lista de zorder de outra janela.
 	struct window_d *parent; //janela mãe... 
-	
 	struct zorder_d *next;
 };
 
@@ -695,9 +610,6 @@ int zorderCounter;         //contador de janelas incluidas nessa lista.
 int zorderTopWindow;
 //...
 
-
-
-
 /*
  * zorderList[] support.
  *     Sobreposição de janelas.    
@@ -711,7 +623,6 @@ int zorderTopWindow;
  *  >> repintaremos começando do zero.
  */ 
 //unsigned long zorderList[ZORDER_COUNT_MAX];
-
 
 //
 // Backbuffer support. (espelho da memória de video)
@@ -741,28 +652,24 @@ struct backbufferinfo_d *BackBufferInfo;
 // Frontbuffer support. (memória de vídeo)
 //
 
+
+/*
+#deprecated.
 struct frontbufferinfo_d
 {
-	//@todo: object support
-	
 	int used;
 	int magic;
-	
     unsigned long start;
     unsigned long end;
     unsigned long size;
-	
 	unsigned long width;
     unsigned long height;
 	unsigned long bpp;
-	//
-	
-    //@todo:
 	// ?? O que nos podemos ter aqui ??	
 	// terminal., window, line disciplice, cursor ...
 };
 struct frontbufferinfo_d *FrontBufferInfo;
-
+*/
 
 
 /*

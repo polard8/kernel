@@ -20,6 +20,20 @@ struct ws_info_d  WindowServerInfo;
 
 //=================================
 
+
+// called by x86_64/x64init.c
+// #todo
+// Maybe we can use some parametes here.
+
+int KGWS_initialize(void)
+{
+    grInit();
+    init_logon_manager();
+    return 0;
+}
+
+
+
 // write_in_tty:
 // Colocamos na tty PS2KeyboardDeviceTTY ou imprimimos na tela.
 
@@ -397,16 +411,6 @@ grPlot0 (
     }
     */
 
-// Device screen structure
-// See: screen.h
-
-    // #debug
-    if ( (void *) DeviceScreen == NULL ){
-        Draw = FALSE;
-        panic("grPlot0: DeviceScreen\n");
-        //exit(1);
-    }
-
 // #todo
 // Precisamos checar algumas globais, como HotSpotX e HotSpotY.
 
@@ -530,9 +534,8 @@ draw:
     // if we are drawing inside a given window.
 
     // Checking the device screen limits.
-        
-    if ( 0 <= X < DeviceScreen->width && 
-         0 <= Y < DeviceScreen->height )
+    // #todo: use a display device structure
+    if ( 0 <= X < gSavedX && 0 <= Y < gSavedY )
     {
         if (Draw == TRUE)
         {
@@ -813,114 +816,6 @@ int grInit (void)
     HotSpotX = (deviceWidth>>1);
     HotSpotY = (deviceHeight>>1);
 
-    return 0;
-}
-
-
-
-// called by x86_64/x64init.c
-// #todo
-// Maybe we can use some parametes here.
-
-int KGWS_initialize(void)
-{
-    //debug_print("KGWS_initialize:[TODO]\n");
-
-// Display
-
-    CurrentDisplay = (void *) kmalloc(sizeof(struct gws_display_d));
-    if ( (void*) CurrentDisplay == NULL ){
-        debug_print("KGWS_initialize: [FAIL] CurrentDisplay\n");
-        printf     ("KGWS_initialize: [FAIL] CurrentDisplay\n");
-        die(); 
-    }
-
-    CurrentDisplay->id = 0;  // ??
-    CurrentDisplay->fd = 0;  // ??
-    CurrentDisplay->used = TRUE; 
-    CurrentDisplay->magic = 1234; 
-
-// Screen
-
-    DeviceScreen  = (void *) kmalloc(sizeof(struct gws_screen_d));
-    if ( (void*) DeviceScreen == NULL ){
-        debug_print("KGWS_initialize: [FAIL] DeviceScreen\n");
-        printf     ("KGWS_initialize: [FAIL] DeviceScreen\n");
-        die();
-    }
-
-    DeviceScreen->id = 0; 
-    DeviceScreen->flags = 0;
-
-// #test
-// Configuramos algumas variaveis globais quando
-// chamamos a rotina de inicializaçao de globais.
-// See: gwssrv_init_globals().
-
-    DeviceScreen->width  = gSavedX;
-    DeviceScreen->height = gSavedY;
-    DeviceScreen->bpp    = gSavedBPP;  // bits per pixel
-
-// #todo
-// Maybe we can check the validation of w h bpp.
-
-    DeviceScreen->pitch = 
-        ( gSavedX * (gSavedBPP/8) );
-
-// #todo: 
-// Cuidado, não queremos divisão por zero.
-
-    DeviceScreen->font_size = 0;    //todo
-    DeviceScreen->char_width = 0;   //todo
-    DeviceScreen->char_height = 0;  //todo
-
-// # ??
-// We simply used gwssrv_get_system_metrics() to get these addresses.
-// See: gwssrv_init_globals()
-// We need to find a better way to get these addresses,
-// maybe a library. (direct framebuffer library thing)
-
-    DeviceScreen->backbuffer  = (void *) BACKBUFFER_VA;
-    DeviceScreen->frontbuffer = (void *) FRONTBUFFER_VA;
-
-// #todo
-// Maybe we can check the validation of the buffers.
-
-    //DeviceScreen->hotspot_x = ( DeviceScreen->width  / 2 );
-    //DeviceScreen->hotspot_y = ( DeviceScreen->height / 2 );
-    DeviceScreen->hotspot_x = ( DeviceScreen->width  >> 1 );
-    DeviceScreen->hotspot_y = ( DeviceScreen->height >> 1 );
-
-// Limites para a tela em cruz. '+'
-    DeviceScreen->min_x = 0;
-    DeviceScreen->min_y = 0;
-    //DeviceScreen->max_x = ( DeviceScreen->width  / 2 );
-    //DeviceScreen->max_y = ( DeviceScreen->height / 2 );
-    DeviceScreen->max_x = ( DeviceScreen->width  >> 1 );
-    DeviceScreen->max_y = ( DeviceScreen->height >> 1 );
-
-// The device screen will be the valid screen for now.
-// Save the device screen in the diplay structure.
-
-    if ( (void *) CurrentDisplay != NULL ){
-        CurrentDisplay->device_screen = DeviceScreen;
-        CurrentDisplay->valid_screen  = DeviceScreen;
-    }
-
-// Validation
-    DeviceScreen->used = TRUE;
-    DeviceScreen->magic = 1234;
-
-// Graphics
-    grInit();
-
-// Breakpoint
-// #debug
-    //asm("int $3");
-
-//#todo
-    init_logon_manager();
-    
     return 0;
 }
 

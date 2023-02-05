@@ -1,9 +1,10 @@
 
 // color.h
+// Small set of colors used by the 
+// raw display device routines inside the kernel.
 
-#ifndef __GR_COLOR_H
-#define __GR_COLOR_H    1
-
+#ifndef __COLOR_H
+#define __COLOR_H    1
 
 // Basics
 #define COLOR_WHITE    0x00FFFFFF

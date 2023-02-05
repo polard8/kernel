@@ -29,7 +29,6 @@
 // Colors
 //
 
-
 /*
  * ColorSchemeType:
  *     Enumerando os esquemas de cores. 
@@ -115,9 +114,7 @@ struct color_scheme_d
 //cada índice desse array representará um elemento gráfico,
 //os valores no array são cores correspondentes aos elementos gráficos 
 //representados por índices.
-
     unsigned long elements[32];
-
     //...
 };
 
@@ -127,12 +124,8 @@ struct color_scheme_d
 
 struct color_scheme_d *HumilityColorScheme; // Simples.
 struct color_scheme_d *PrideColorScheme;    // Colorido.
-
 struct color_scheme_d *CurrentColorScheme;
-
 // ===============================================================
-
-
 
 struct ws_info_d
 {
@@ -148,9 +141,7 @@ struct ws_info_d
 // see: graphics.c
 extern struct ws_info_d  WindowServerInfo;
 
-
 // ===============================================================
-
 
 // # Principais variáveis globais #
 // This is not the right place for them.
@@ -174,7 +165,6 @@ int userenvironmentStatus;    //User environment status.
 int rooms_count;  
 int desktops_count;
 int windows_count;  
-
 
 int current_window;         //gws
 int current_menu;           //gws

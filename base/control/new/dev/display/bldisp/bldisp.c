@@ -52,6 +52,10 @@ See:
 #include <kernel.h>
 
 
+int refresh_device_screen_flag=0;
+int refresh_valid_screen_flag=0;
+
+
 unsigned long screen_size_in_kb=0;
 // hack: for debuging purpose
 int g_use_fake_screen_size=0;
@@ -62,14 +66,6 @@ unsigned long fake_screen_size_in_kb=0;
 int refresh_screen_enabled=0;
 // We need to flush the whole screen into the frontbuffer.
 int screen_is_dirty=0;
-
-
-struct paint_d PAINT;
-
-struct screen_d  *CurrentScreen;
-struct screen_d  *Screen;
-struct screen_d  *ScreenInfo;
-
 
 unsigned long gSavedLFB=0;
 unsigned long gSavedX=0;
@@ -155,6 +151,7 @@ static char vsync_inb(int port)
 }
 
 // ===============================
+
 
 // Called by hal_vsync
 void vsync (void)
@@ -408,49 +405,9 @@ int screenInit(void)
 
     screen_bpp = gSavedBPP;
     screen_pitch = ( gSavedBPP * gSavedX );
-
-// Setup Screen structure.
-// See: screen.h
-    
-    Screen = (void *) kmalloc( sizeof(struct screen_d) );
-
-    if ( (void *) Screen == NULL )
-    {
-        panic("screenInit: Screen\n");
-    }
-
-    Screen->id = 0;  //?
-
-    Screen->left   = (unsigned long) SCREEN_DEFAULT_LEFT;
-    Screen->top    = (unsigned long) SCREEN_DEFAULT_TOP; 
-    Screen->width  = (unsigned long) screenGetWidth();
-    Screen->height = (unsigned long) screenGetHeight();
-
-    if( Screen->width == 0 || Screen->height == 0 )
-    {
-        panic("screenInit: width height\n");
-    }
-
-    // ...
-
-    Screen->next = NULL;
-
-    Screen->used = TRUE;
-    Screen->magic = 1234;
-
-// Salvando o ponteiro da estrutura.
-    ScreenInfo    = (void *) Screen;
-    CurrentScreen = (void *) Screen;
-
     //...
-
     return 0;
 }
-
-
-
-
-
 
 //==============================
 
@@ -485,9 +442,6 @@ int bldisp_initialize(void)
 // size in bytes.
     bl_display_device->framebuffer_size_in_bytes =
         (unsigned long) ( bl_display_device->framebuffer_pitch * bl_display_device->framebuffer_height );
-
-// Is it a valid screen pointer?
-    bl_display_device->screen = (struct screen_d *) CurrentScreen;
 
 // validation
     bl_display_device->used = TRUE;

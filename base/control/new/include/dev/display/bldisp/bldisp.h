@@ -2,9 +2,11 @@
 // bldisp.h
 // bl display device
 
+#ifndef __BLDISP_BLDISP_H
+#define __BLDISP_BLDISP_H    1
+
 // See:
 // http://www.brokenthorn.com/Resources/OSDevVid2.html
-
 /*
     3C0-3CF  EGA/VGA
 	3C0 VGA attribute and sequencer register
@@ -74,16 +76,16 @@ typedef struct _vbeInfoBlock {
 }vbeInfoBlock;
 */
 
-
-#ifndef __VIDEO_H
-#define __VIDEO_H    1
-
 #define COLUMNS  80
 #define ROWS     25
 #define SCREEN_WIDTH   COLUMNS
 #define SCREEN_HEIGHT  ROWS
 #define SCREEN_DEFAULT_LEFT  0
 #define SCREEN_DEFAULT_TOP   0
+
+
+extern int refresh_device_screen_flag;
+extern int refresh_valid_screen_flag;
 
 
 extern unsigned long screen_size_in_kb;
@@ -96,60 +98,6 @@ extern unsigned long fake_screen_size_in_kb;
 extern int refresh_screen_enabled;
 // We need to flush the whole screen into the frontbuffer.
 extern int screen_is_dirty;
-
-
-//
-// PAINT
-//
-// #sobre:
-// A estrutura PAINT vai descrever os planos
-// que serão usados pelo compositor para desenhar
-// a tela.
-// Cada plano tem seu backbuffer e seu frontbuffer.
-// A placa de vídeo fará todos os frontbuffers serem pintados
-// na mesma tela, gerando efeito de sombra e transparência.
-struct plane_d
-{
-    int used;
-    unsigned char *frontbuffer;
-    unsigned char *backbuffer;
-    unsigned long size_x;
-    unsigned long size_y;
-    unsigned long size_bpp;
-};
-struct paint_d
-{
-    struct plane_d plane[4];
-    int number_of_planes;
-};
-extern struct paint_d PAINT;
-
-/*
- * screen_d:
- *     Estrutura para informações sobre o monitor.
- *     Screen Object.
- */
-struct screen_d 
-{
-    object_type_t  objectType;
-    object_class_t objectClass;
-    int used;
-    int magic;
-    int id;
-    unsigned long left;
-    unsigned long top;  
-    unsigned long width; 
-    unsigned long height; 
-    unsigned long flag; 
-    unsigned long error;  
-// Navigation
-    struct screen_d *next; 
-};
-
-extern struct screen_d  *CurrentScreen;
-extern struct screen_d  *Screen;
-extern struct screen_d  *ScreenInfo;
-
 
 extern unsigned long gSavedLFB;
 extern unsigned long gSavedX;
@@ -178,12 +126,12 @@ void fb_refresh_screen (unsigned long flags);
 void refresh_screen (void);
 int screenInit (void);
 
-int bldisp_initialize(void);
-
-int Video_initialize(void);
 unsigned long videoGetMode (void);
 void videoSetMode (unsigned long mode);
 void videoSetupCGAStartAddress (unsigned long address);
+
+int Video_initialize(void);
+int bldisp_initialize(void);
 
 #endif    
 
