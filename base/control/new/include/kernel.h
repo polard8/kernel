@@ -263,9 +263,11 @@ extern unsigned long gSavedBPP;
 // fb device
 #include "dev/display/color.h"
 
-#include "dev/display/hw/display.h"   // display device support.
-#include "dev/display/hw/bldisp.h"    // bootloader display device
-#include "dev/display/hw/screen.h"
+// display device support.
+#include "dev/display/common/display.h"
+
+// bootloader display device
+#include "dev/display/bldisp/bldisp.h"
 
 #include "dev/display/fonts.h"
 #include "dev/display/ascii.h" 

@@ -123,9 +123,6 @@ struct video_d  VideoBlock;
 // == prototypes =================================
 //
 
-
-void vsync (void);
-
 #endif    
 
 
