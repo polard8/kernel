@@ -30,8 +30,8 @@ void network_dhcp_dialog(void)
         __dhcp_source_ipv4,   // scr ip
         __dhcp_target_ipv4,    // dst ip
         __dhcp_target_mac,    // dst mac
-        67,                  // source port
-        68,                  // target port
+        68,                  // source port
+        67,                  // target port
         message,                         // msg - dhcp structure.
         512 );                               // msg lenght
 
