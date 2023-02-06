@@ -93,7 +93,7 @@ network_handle_ipv4(
 
 // ---------------
 // Not to me.
-    if ( dst_ipv4[3] != 112 ||
+    if ( dst_ipv4[3] != 12 ||
          dst_ipv4[2] != 1 ||
          dst_ipv4[1] != 168 ||
          dst_ipv4[0] != 192 )

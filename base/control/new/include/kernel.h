@@ -323,6 +323,7 @@ extern unsigned long gSavedBPP;
 #include "net/prot/ip.h"
 #include "net/prot/tcp.h"
 #include "net/prot/udp.h"
+#include "net/prot/dhcp.h" 
 #include "net/prot/icmp.h" 
 
 #include "net/nports.h"     //(network) Network Ports  (sw)

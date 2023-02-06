@@ -8,7 +8,7 @@ unsigned char __arp_broadcast_mac[6] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 unsigned char __arp_gramado_default_ipv4[4] = { 
-    192, 168, 1, 112 
+    192, 168, 1, 12 
 };
 unsigned char __arp_target_default_ipv4[4]  = { 
     192, 168, 1, 6 
@@ -96,11 +96,11 @@ network_send_arp(
 
 // A given IP number for Gramado.
 // Saving it into the NIC structure.
-// 192.168.1.112
+// 192.168.1.12
     currentNIC->ip_address[0] = source_ip[0];  //192;
     currentNIC->ip_address[1] = source_ip[1];  //168;
     currentNIC->ip_address[2] = source_ip[2];  //1;
-    currentNIC->ip_address[3] = source_ip[3];  //112;
+    currentNIC->ip_address[3] = source_ip[3];  //12;
 
 //==============================================
 // # ethernet header #

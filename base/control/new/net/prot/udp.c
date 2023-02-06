@@ -13,7 +13,7 @@ char udp_payload[1024];
 
 // source ip
 unsigned char __udp_gramado_default_ipv4[4] = { 
-    192, 168, 1, 112 
+    192, 168, 1, 12 
 };
 // destination ip (linux)
 unsigned char __udp_target_default_ipv4[4]  = { 
@@ -100,15 +100,16 @@ void network_test_udp(void)
     char message[512];
     memset(message,0,sizeof(message));
     sprintf(message,"Hello from Gramado to Linux\n");
-    //uint16_t target_port = (uint16_t) FromNetByteOrder16(34884);
+
 
     network_send_udp( 
         __udp_gramado_default_ipv4,   // scr ip
         __udp_target_default_ipv4,    // dst ip
         __udp_target_mac,             // dst mac
-        message,                      // msg
-        34884 );                // target port
-
+        34885,                  // source port
+        34884,                  // dst port
+        message,         //msg
+         512 );              //msg lenght
 }
 
 // -----------------
@@ -136,8 +137,10 @@ network_send_udp (
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
     uint8_t target_mac[6], 
+    unsigned short source_port,
+    unsigned short target_port,
     char *data_buffer,
-    unsigned short port )
+    size_t data_langht )
 {
     register int i=0;
     int j=0;
@@ -162,12 +165,12 @@ network_send_udp (
     }
 
 // Configurando a estrutura do dispositivo.
-// 192.168.1.112
+// 192.168.1.12
 // Not used?
     currentNIC->ip_address[0] = source_ip[0];  //192;
     currentNIC->ip_address[1] = source_ip[1];  //168;
     currentNIC->ip_address[2] = source_ip[2];  //1;
-    currentNIC->ip_address[3] = source_ip[3];  //112;
+    currentNIC->ip_address[3] = source_ip[3];  //12;
     //...
 
 //==============================================
@@ -233,10 +236,8 @@ network_send_udp (
 
 // Flags (3bits) (Do we have fragments?)
 // Fragment offset (13bits) (fragment position)
-// 0x4000
-    //ipv4->ip_off = 0x0000;  //0x8
-    //ipv4->ip_off = ToNetByteOrder16(0x0040);  //Don't fragment
-    ipv4->ip_off = 0x4000; //ToNetByteOrder16(0x0040);  //Don't fragment
+// Don't fragment for now.
+ ipv4->ip_off = ToNetByteOrder16(0x4000); 
 
     ipv4->ip_ttl = 64; //0x40;  //8bit
 
@@ -311,34 +312,10 @@ network_send_udp (
         goto fail;
     }
 
-// UDP ports;
-// #todo
-// Essas portas podem ser passadas via argumento.
-// A porta de origem representa o processo cliente
-// A porta de destino representa o processo servidor.
-// Se o argumento passado for a estrutura (channel)
-// ent�o teremos muita informa��o.
-//20 FTP-DATA File Transfer [Default Data]
-//21 FTP File Transfer [Control]
-//23 TELNET Telnet
-//25 SMTP Simple Mail Transfer
-//37 TIME Time
-//69 TFTP Trivial File Transfer
-//79 FINGER Finger
-//110 POP3 Post Office Protocol v 3
-//123 NTP Network Time Protocol
-//143 IMAP2 Interim Mail Access Prot. v2
-//161 SNMP Simple Network Man. Prot.
 
-// src and dst ports
-// Podemos usar o mesmo número de porta?
-// Não para enviarmos dentro da mesma máquina.
-    //uint16_t UDP_PORT = 34884;
-    //udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
-    //udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
-
-    udp->uh_sport = (uint16_t) ToNetByteOrder16(port+1);
-    udp->uh_dport = (uint16_t) ToNetByteOrder16(port);
+// Ports
+    udp->uh_sport = (uint16_t) ToNetByteOrder16(source_port);
+    udp->uh_dport = (uint16_t) ToNetByteOrder16(target_port);
 
 // Length
 // (UPD header + payload).
@@ -444,24 +421,18 @@ network_send_udp (
 // Lenght de um pacote ipv4.
 // ethernet header, ipv4 header, udp header, data.
 // 14 + 20 + 6 + 512 = 552.
-    size_t UDP_TOTAL_SIZE = 
+    size_t FRAME_SIZE = 
                ( ETHERNET_HEADER_LENGHT +\
                  IP_HEADER_LENGHT +\
                  UDP_HEADER_LENGHT +\
                  512 );
-// Send the frame.
-// Via ip, enviaremos (udp+payload).
-    
-    // send via nic
-    e1000_send( currentNIC, UDP_TOTAL_SIZE, frame );
 
-    // send to myself.
-    //network_handle_udp ( 
-    //    frame + ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT ,
-    //    UDP_HEADER_LENGHT + 512 );
 
-    // send do myself
-    //network_on_receiving(frame,UDP_TOTAL_SIZE);
+// Send frame via NIC.
+    e1000_send( currentNIC, FRAME_SIZE, frame );
+
+// Send frame to myself.
+    // network_on_receiving(frame,FRAME_SIZE);
 
     //#debug
     //refresh_screen();
