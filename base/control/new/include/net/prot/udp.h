@@ -5,10 +5,10 @@
 #ifndef __NET_UDP_H
 #define __NET_UDP_H    1
 
-#define UDP_HEADER_LENGHT  8
+#define UDP_HEADER_LENGHT  6
 
 // UDP datagram structure
-// 4*2 = 8bytes.
+// 4*2 = 6bytes.
 struct udp_d
 {
 
@@ -39,12 +39,11 @@ void network_test_udp(void);
 
 int
 network_send_udp ( 
-    unsigned int source_ip, 
-    unsigned int target_ip, 
-    unsigned short source_port,
-    unsigned short target_port,
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6], 
     char *data_buffer,
-    size_t data_lenght );
+    unsigned short port );
 
 #endif   
 

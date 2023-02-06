@@ -100,24 +100,15 @@ void network_test_udp(void)
     char message[512];
     memset(message,0,sizeof(message));
     sprintf(message,"Hello from Gramado to Linux\n");
-    size_t message_lenght = strlen(message);
+    //uint16_t target_port = (uint16_t) FromNetByteOrder16(34884);
 
-    unsigned int *source_ip = 
-        (unsigned int *) &__udp_gramado_default_ipv4[0];
-    unsigned int *target_ip = 
-        (unsigned int *) &__udp_target_default_ipv4[0];
-
-    unsigned int src_ip = (unsigned int) source_ip[0];
-    unsigned int dst_ip = (unsigned int) target_ip[0];
-
-    uint16_t source_port = (uint16_t) 34885;
-    uint16_t target_port = (uint16_t) 34884;
-
-// Send the frame.
     network_send_udp( 
-        src_ip, dst_ip,
-        source_port, target_port,
-        message, message_lenght ); 
+        __udp_gramado_default_ipv4,   // scr ip
+        __udp_target_default_ipv4,    // dst ip
+        __udp_target_mac,             // dst mac
+        message,                      // msg
+        34884 );                // target port
+
 }
 
 // -----------------
@@ -142,37 +133,22 @@ void network_test_udp(void)
 // (Ethernet + IP + UDP)
 int
 network_send_udp ( 
-    unsigned int source_ip, 
-    unsigned int target_ip, 
-    unsigned short source_port,
-    unsigned short target_port,
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
+    uint8_t target_mac[6], 
     char *data_buffer,
-    size_t data_lenght )
+    unsigned short port )
 {
     register int i=0;
     int j=0;
 
-// Buffers:
+// BUffers:
 // ethernet, ipv4, udp, data.
     struct ether_header  *eh;
     struct ip_d  *ipv4;
     struct udp_d  *udp;
-
     char *data = (char *) data_buffer;
-    //size_t len = data_lenght;
 
-    if (data_lenght <= 0){
-        printf ("network_send_udp: Invalid data_lenght\n");
-        goto fail;
-    }
-
-    if (data_lenght > 512){
-        printf ("network_send_udp: data_lenght limits\n");
-        goto fail;
-    }
-
-// Broadcast MAC
-    unsigned char broadcast_mac[6] ={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
     if ( (void*) data == NULL ){
         printf ("network_send_udp: Invalid data buffer\n");
@@ -184,6 +160,15 @@ network_send_udp (
         printf ("network_send_udp: currentNIC fail\n");
         goto fail;
     }
+
+// Configurando a estrutura do dispositivo.
+// 192.168.1.112
+// Not used?
+    currentNIC->ip_address[0] = source_ip[0];  //192;
+    currentNIC->ip_address[1] = source_ip[1];  //168;
+    currentNIC->ip_address[2] = source_ip[2];  //1;
+    currentNIC->ip_address[3] = source_ip[3];  //112;
+    //...
 
 //==============================================
 // # ethernet header #
@@ -203,7 +188,7 @@ network_send_udp (
 
     for ( i=0; i<6; i++ ){
         eh->mac_dst[i] = (uint8_t) currentNIC->mac_address[i];  // source 
-        eh->mac_src[i] = (uint8_t) broadcast_mac[i];                      // dest
+        eh->mac_src[i] = (uint8_t) target_mac[i];               // dest
     };
     eh->type = (uint16_t) ToNetByteOrder16 (ETH_TYPE_IP);
 
@@ -227,9 +212,6 @@ network_send_udp (
 // - Explicit Congestion Notification (2bits)
     ipv4->ip_tos = 0x00;  // 8 bit (0=Normal)
 
-
-
-
 // Total Length
 // 16 bit
 // This 16-bit field defines the entire packet size in bytes, 
@@ -238,11 +220,7 @@ network_send_udp (
 // ip header + (udp header + data).
 // #todo: Check if it is right?
 // No payload do ip temos o (udp+data)
-
-// (IPv4 header + IPv4 payload)
-    unsigned short ip_header_lenght = IP_HEADER_LENGHT;
-    unsigned short ip_payload_lenght = (UDP_HEADER_LENGHT + data_lenght);
-    uint16_t iplen = (ip_header_lenght + ip_payload_lenght); 
+    uint16_t iplen = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512); 
     ipv4->ip_len = (uint16_t) ToNetByteOrder16(iplen);
 
 // Identification
@@ -255,13 +233,16 @@ network_send_udp (
 
 // Flags (3bits) (Do we have fragments?)
 // Fragment offset (13bits) (fragment position)
-    ipv4->ip_off = ToNetByteOrder16(0x4000);
+// 0x4000
+    //ipv4->ip_off = 0x0000;  //0x8
+    //ipv4->ip_off = ToNetByteOrder16(0x0040);  //Don't fragment
+    ipv4->ip_off = 0x4000; //ToNetByteOrder16(0x0040);  //Don't fragment
 
     ipv4->ip_ttl = 64; //0x40;  //8bit
 
 // Protocol (8bit)
 // 0x11 = UDP. (17)
-    ipv4->ip_p = (uint8_t) 0x11;
+    ipv4->ip_p = 0x11;
 
 /*
 // src ip
@@ -282,7 +263,6 @@ network_send_udp (
     //printf ("ip %x\n", ipv4->ip_dst.s_addr);
 */
 
-/*
     unsigned char *spa = (unsigned char *) &ipv4->ip_src.s_addr;
     unsigned char *tpa = (unsigned char *) &ipv4->ip_dst.s_addr;
     int it=0;
@@ -291,10 +271,7 @@ network_send_udp (
         spa[it] = (uint8_t) source_ip[it]; 
         tpa[it] = (uint8_t) target_ip[it]; 
     };
-*/
 
-    ipv4->ip_src.s_addr = (unsigned int) source_ip;
-    ipv4->ip_dst.s_addr = (unsigned int) target_ip;
 
 // Checksum
 // 16bit
@@ -314,9 +291,7 @@ network_send_udp (
     ipv4->ip_sum = ToNetByteOrder16((uint16_t) (~checksum));
 */
 
-// Setup a value used in the calculation.
     ipv4->ip_sum = 0;
-
     unsigned short s = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
     ipv4->ip_sum = (uint16_t) ToNetByteOrder16(s);
 
@@ -336,18 +311,40 @@ network_send_udp (
         goto fail;
     }
 
-// Ports
-    udp->uh_sport = (uint16_t) ToNetByteOrder16(source_port);
-    udp->uh_dport = (uint16_t) ToNetByteOrder16(target_port);
+// UDP ports;
+// #todo
+// Essas portas podem ser passadas via argumento.
+// A porta de origem representa o processo cliente
+// A porta de destino representa o processo servidor.
+// Se o argumento passado for a estrutura (channel)
+// ent�o teremos muita informa��o.
+//20 FTP-DATA File Transfer [Default Data]
+//21 FTP File Transfer [Control]
+//23 TELNET Telnet
+//25 SMTP Simple Mail Transfer
+//37 TIME Time
+//69 TFTP Trivial File Transfer
+//79 FINGER Finger
+//110 POP3 Post Office Protocol v 3
+//123 NTP Network Time Protocol
+//143 IMAP2 Interim Mail Access Prot. v2
+//161 SNMP Simple Network Man. Prot.
+
+// src and dst ports
+// Podemos usar o mesmo número de porta?
+// Não para enviarmos dentro da mesma máquina.
+    //uint16_t UDP_PORT = 34884;
+    //udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
+    //udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
+
+    udp->uh_sport = (uint16_t) ToNetByteOrder16(port+1);
+    udp->uh_dport = (uint16_t) ToNetByteOrder16(port);
 
 // Length
 // (UPD header + payload).
 // This field specifies the length in bytes of the UDP header and UDP data. 
 // The minimum length is 8 bytes, the length of the header. 
-
-    unsigned short udp_header_lenght = UDP_HEADER_LENGHT;
-    unsigned short udp_payload_lenght = data_lenght;
-    uint16_t __udplen = (uint16_t) (udp_header_lenght + udp_payload_lenght); 
+    uint16_t __udplen = (uint16_t) (UDP_HEADER_LENGHT + 512); 
     udp->uh_ulen = (uint16_t) ToNetByteOrder16(__udplen);
 
 // Checksum
@@ -435,9 +432,10 @@ network_send_udp (
             ( ETHERNET_HEADER_LENGHT +
               IP_HEADER_LENGHT +
               UDP_HEADER_LENGHT );
-    for ( j=0; j<data_lenght; j++ ){
+    for ( j=0; j<512; j++ ){
         frame[data_offset +j] = data[j];
     };
+
  
 // ---------------------------------------
 // send
@@ -446,19 +444,24 @@ network_send_udp (
 // Lenght de um pacote ipv4.
 // ethernet header, ipv4 header, udp header, data.
 // 14 + 20 + 6 + 512 = 552.
-    size_t FRAME_SIZE = 
+    size_t UDP_TOTAL_SIZE = 
                ( ETHERNET_HEADER_LENGHT +\
                  IP_HEADER_LENGHT +\
                  UDP_HEADER_LENGHT +\
-                 data_lenght );
+                 512 );
+// Send the frame.
+// Via ip, enviaremos (udp+payload).
+    
+    // send via nic
+    e1000_send( currentNIC, UDP_TOTAL_SIZE, frame );
 
+    // send to myself.
+    //network_handle_udp ( 
+    //    frame + ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT ,
+    //    UDP_HEADER_LENGHT + 512 );
 
-// Send frame via NIC.
-    e1000_send( currentNIC, FRAME_SIZE, frame );
-
-// #debug
-// Send frame to myself.
-    // network_on_receiving(frame,FRAME_SIZE);
+    // send do myself
+    //network_on_receiving(frame,UDP_TOTAL_SIZE);
 
     //#debug
     //refresh_screen();
