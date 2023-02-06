@@ -45,7 +45,7 @@ network_send_udp (
     unsigned short source_port,
     unsigned short target_port,
     char *data_buffer,
-    size_t data_langht );
+    size_t data_lenght );
 
 #endif   
 
