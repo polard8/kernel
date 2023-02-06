@@ -13,6 +13,18 @@ acknowledge (confirmação)
 #ifndef __DHCP_H
 #define __DHCP_H    1
 
+
+struct dhcp_info_d
+{
+// We have the info given to us by the server.
+    int initialized;
+    unsigned int host_ip;
+    //...
+};
+// see: dhcp.c
+extern struct dhcp_info_d dhcp_info;
+
+
 // Message Types
 
 #define DHCP_DISCOVER                   1
@@ -78,7 +90,13 @@ struct dhcp_d
 } __attribute__ ((packed));
 
 
-void network_dhcp_dialog(void);
+void 
+network_dhcp_send(
+    struct dhcp_d *dhcp,
+    int message_type, 
+    unsigned short sport, 
+    unsigned short dport );
+int network_initialize_dhcp(void);
 
 #endif    
 

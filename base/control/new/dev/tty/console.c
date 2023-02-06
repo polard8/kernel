@@ -1457,6 +1457,10 @@ int consoleCompareStrings(void)
         network_test_udp();
         goto exit_cmp;
     }
+    if ( strncmp(prompt,"test-dhcp",9) == 0 ){
+        network_initialize_dhcp();
+        goto exit_cmp;
+    }
 
     if ( strncmp(prompt,"str",3) == 0 )
     {
