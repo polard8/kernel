@@ -78,11 +78,11 @@ network_handle_ipv4(
         //network_handle_tcp(..);
         goto drop0;
     }
-// UCP
+// UDP
     if (Protocol == PROTOCOL_IP_UDP)
     {
-        printf ("target: %d.%d.%d.%d \n",
-            dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
+        printf ("IP: Target IP: %d.%d.%d.%d \n",
+            dst_ipv4[0], dst_ipv4[1], dst_ipv4[2], dst_ipv4[3] );
         printf("ip_sum={%x} \n",ip->ip_sum);
         network_handle_udp(
             (buffer + IP_HEADER_LENGHT),
@@ -93,10 +93,10 @@ network_handle_ipv4(
 
 // ---------------
 // Not to me.
-    if ( dst_ipv4[3] != 112 ||
-         dst_ipv4[2] != 1 ||
-         dst_ipv4[1] != 168 ||
-         dst_ipv4[0] != 192 )
+    if ( dst_ipv4[0] != 192  ||
+          dst_ipv4[1] != 168  ||
+          dst_ipv4[2] != 1  ||
+          dst_ipv4[3] != 112 )
     {
         printf ("IP: NOT TO ME. Drop it\n");
         goto drop0; 

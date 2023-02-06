@@ -43,6 +43,7 @@ struct ip_d
 
 // Total lenght (16bits)
 // (IP + (TCP + data)) given in bytes.
+// ip header + ip payload
 // 20~65535
 // This 16-bit field defines the entire packet size in bytes, 
 // including header and data. 
@@ -53,6 +54,7 @@ struct ip_d
 // Identification (16bits)
 // When the message is large and we have a lot of packets.
 // Actually they are 'fragments' of a packet.
+// Actually they are packets of a message.
     u_int16_t ip_id;
 
 // Flags (3bits) (Do we have fragments?)
@@ -74,6 +76,7 @@ struct ip_d
 // Source and dest IP address.
 // Address in network byte order.
 // See: net/in.h 
+
     struct in_addr  ip_src;  //(32bits)
     struct in_addr  ip_dst;  //(32bits) 
 

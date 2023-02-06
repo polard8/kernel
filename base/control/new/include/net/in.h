@@ -131,8 +131,8 @@ typedef __sa_family_t  sa_family_t;
 /* address in network byte order */
 struct in_addr 
 {
-    //in_addr_t  s_addr;
     uint32_t s_addr;
+    //in_addr_t  s_addr;
 };
 
 

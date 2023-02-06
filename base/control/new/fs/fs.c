@@ -1132,6 +1132,11 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
 
     if ( fp->____object == ObjectTypeSocket )
     {
+        // #todo
+        // Here we can send via NIC using network_send_udp()
+        // for datagrams.
+        // see: udp.c
+
         // Can't write.
         if ((fp->_flags & __SWR) == 0){
             debug_print("sys_write: [FAIL] flag __SWR \n");

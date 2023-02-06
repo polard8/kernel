@@ -6,8 +6,9 @@
 #define ____KERNEL_CONFIG_H    1
 
 #define USE_SERIALDEBUG    0
-#define USE_E1000    0
+#define USE_E1000    1
 // ...
+
 
 //
 // ## IMPORTANTE ##
