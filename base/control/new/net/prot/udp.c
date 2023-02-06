@@ -27,6 +27,7 @@ unsigned char __udp_target_mac[6] = {
 uint16_t inet_csum(const void *buf, size_t hdr_len);
 //---------------------
 
+
 // Checksum #test
 // credits: https://gist.github.com/jonhoo/7780260
 uint16_t inet_csum(const void *buf, size_t hdr_len)
@@ -48,6 +49,7 @@ uint16_t inet_csum(const void *buf, size_t hdr_len)
 
   return (uint16_t) (~sum);
 }
+
 
 void 
 network_handle_udp( 
@@ -97,15 +99,16 @@ void network_test_udp(void)
 {
     char message[512];
     memset(message,0,sizeof(message));
-    sprintf(message,"Hello from Gramado to Gramado\n");
-    uint16_t target_port = (uint16_t) FromNetByteOrder16(34884);
+    sprintf(message,"Hello from Gramado to Linux\n");
+    //uint16_t target_port = (uint16_t) FromNetByteOrder16(34884);
 
     network_send_udp( 
         __udp_gramado_default_ipv4,   // scr ip
         __udp_target_default_ipv4,    // dst ip
         __udp_target_mac,             // dst mac
         message,                      // msg
-        target_port );                // target port
+        34884 );                // target port
+
 }
 
 // -----------------
@@ -232,7 +235,8 @@ network_send_udp (
 // Fragment offset (13bits) (fragment position)
 // 0x4000
     //ipv4->ip_off = 0x0000;  //0x8
-    ipv4->ip_off = ToNetByteOrder16(0x0040);  //Don't fragment
+    //ipv4->ip_off = ToNetByteOrder16(0x0040);  //Don't fragment
+    ipv4->ip_off = 0x4000; //ToNetByteOrder16(0x0040);  //Don't fragment
 
     ipv4->ip_ttl = 64; //0x40;  //8bit
 
@@ -240,6 +244,7 @@ network_send_udp (
 // 0x11 = UDP. (17)
     ipv4->ip_p = 0x11;
 
+/*
 // src ip
 // #bugbug: Esta na ordem certa?
     memcpy ( 
@@ -256,6 +261,16 @@ network_send_udp (
         4 );
     //ipv4->ip_dst.s_addr = (unsigned int) ToNetByteOrder32(ipv4->ip_dst.s_addr);
     //printf ("ip %x\n", ipv4->ip_dst.s_addr);
+*/
+
+    unsigned char *spa = (unsigned char *) &ipv4->ip_src.s_addr;
+    unsigned char *tpa = (unsigned char *) &ipv4->ip_dst.s_addr;
+    int it=0;
+    for ( it=0; it<4; it++ )
+    {
+        spa[it] = (uint8_t) source_ip[it]; 
+        tpa[it] = (uint8_t) target_ip[it]; 
+    };
 
 
 // Checksum
@@ -277,8 +292,13 @@ network_send_udp (
 */
 
     ipv4->ip_sum = 0;
-    ipv4->ip_sum = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
+    unsigned short s = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
+    ipv4->ip_sum = (uint16_t) ToNetByteOrder16(s);
 
+    //unsigned short s1 = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
+    //unsigned short s2 = (uint16_t) inet_csum2( ipv4, sizeof(struct ip_d) );
+    //printf("s1={%x} s2={%x} \n",s1,s2);
+    printf("ip_sum={%x} \n",ipv4->ip_sum);
     //refresh_screen();
     //while(1){}
 
@@ -313,9 +333,12 @@ network_send_udp (
 // src and dst ports
 // Podemos usar o mesmo número de porta?
 // Não para enviarmos dentro da mesma máquina.
-    uint16_t UDP_PORT = 34884;
-    udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
-    udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
+    //uint16_t UDP_PORT = 34884;
+    //udp->uh_sport = (uint16_t) ToNetByteOrder16(8888);
+    //udp->uh_dport = (uint16_t) ToNetByteOrder16(UDP_PORT);
+
+    udp->uh_sport = (uint16_t) ToNetByteOrder16(port+1);
+    udp->uh_dport = (uint16_t) ToNetByteOrder16(port);
 
 // Length
 // (UPD header + payload).
@@ -436,7 +459,10 @@ network_send_udp (
     //network_handle_udp ( 
     //    frame + ETHERNET_HEADER_LENGHT + IP_HEADER_LENGHT ,
     //    UDP_HEADER_LENGHT + 512 );
-        
+
+    // send do myself
+    //network_on_receiving(frame,UDP_TOTAL_SIZE);
+
     //#debug
     //refresh_screen();
     //while(1){}

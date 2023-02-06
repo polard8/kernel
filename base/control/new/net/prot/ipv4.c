@@ -36,8 +36,8 @@ network_handle_ipv4(
     uint8_t Version = (uint8_t) ((v_hl >> 4) & 0x0F);
     uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);  // Header lenght. 5=20bytes.
 
-    //printf("IP Version: {%d}\n", Version);
-    //printf("Header lenght: {%d}\n", Lenght);
+    printf("IP Version: {%d}\n", Version);
+    printf("Header lenght: {%d}\n", Lenght);
 
     if (Version!=4){
         printf("IP: Not version 4\n");
@@ -47,7 +47,7 @@ network_handle_ipv4(
 // Total lenght (16bits)
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
-    //printf("Total lenght: {%d}\n",ip->ip_len);
+    printf("Total lenght: {%d}\n",ip->ip_len);
 
     if (ip->ip_len < 20 || ip->ip_len > 65535){
         //#debug
@@ -59,7 +59,7 @@ network_handle_ipv4(
 // https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 
     Protocol = (uint8_t) ip->ip_p;
-    //printf("Protocol: {%xH}\n",Protocol);
+    printf("Protocol: {%xH}\n",Protocol);
 
 // 0x01 -  1 - ICMP - Internet Control Message Protocol
 // 0x06 -  6 - TCP  - Transmission Control Protocol
@@ -81,7 +81,9 @@ network_handle_ipv4(
 // UCP
     if (Protocol == PROTOCOL_IP_UDP)
     {
-        printf("IP: UDP Protocol\n");
+        printf ("target: %d.%d.%d.%d \n",
+            dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
+        printf("ip_sum={%x} \n",ip->ip_sum);
         network_handle_udp(
             (buffer + IP_HEADER_LENGHT),
             ip->ip_len 
