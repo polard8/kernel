@@ -5,7 +5,6 @@
 
 #include <kernel.h>
 
-
 // Status do driver de network
 // 0 - uninitialized
 // 1 - initialized
@@ -324,6 +323,9 @@ int networkGetStatus (void)
 {
     return (int) network_status;
 }
+
+
+
 
 /*
  * networkInit: 

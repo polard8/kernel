@@ -1205,6 +1205,8 @@ static void __e1000_receive(void)
 
 static void DeviceInterface_e1000(void)
 {
+// Called by the interrupt handler.
+
     uint32_t InterruptCause=0;
 
 // The current nic

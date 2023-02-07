@@ -78,17 +78,25 @@ network_handle_arp(
         if ( ar->arp_tpa[3] == 12 )
         {
             printf("ARP: Reply to ME!\n");
-           printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
-               ar->arp_sha[0], 
-               ar->arp_sha[1], 
-               ar->arp_sha[2], 
-               ar->arp_sha[3],
-               ar->arp_sha[4],
-               ar->arp_sha[5] );
+            printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+                ar->arp_sha[0], 
+                ar->arp_sha[1], 
+                ar->arp_sha[2], 
+                ar->arp_sha[3],
+                ar->arp_sha[4],
+                ar->arp_sha[5] );
             //refresh_screen();
             //while(1){}
-            
+
+            // #todo
+            // Save this values to use in the future.
+            // see:  udp.c
+            network_save_mac(ar->arp_sha);
+
             /*
+             //#
+             //Maybe we gotta return from one interrupt
+             //before generating another one.
             network_send_udp( 
                 __arp_gramado_default_ipv4,   // scr ip
                 ar->arp_spa,    // dst ip

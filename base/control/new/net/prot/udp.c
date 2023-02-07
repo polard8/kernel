@@ -24,6 +24,11 @@ unsigned char __udp_target_mac[6] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 
+unsigned char saved_mac[6] = { 
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
+};
+
+
 uint16_t inet_csum(const void *buf, size_t hdr_len);
 //---------------------
 
@@ -101,6 +106,15 @@ network_handle_udp(
 
 // -----------------
 
+void network_save_mac( uint8_t mac[6] )
+{
+    register int i=0;
+    for (i=0; i<6; i++){
+        saved_mac[i] = (uint8_t) mac[i];
+    };
+}
+
+
 void network_test_udp(void)
 {
     char message[512];
@@ -116,6 +130,39 @@ void network_test_udp(void)
         34884,                  // dst port
         message,         //msg
          512 );              //msg lenght
+}
+
+
+
+void 
+network_test_udp0(
+    uint8_t tmac[6], 
+    uint8_t tip[4],
+    unsigned short sport,
+    unsigned short dport )
+{
+    char message[512];
+    memset(message,0,sizeof(message));
+    sprintf(message,"Hello from Gramado to Linux\n");
+
+
+    network_send_udp( 
+        __udp_gramado_default_ipv4,   // scr ip
+        tip,    // dst ip
+        tmac,             // dst mac
+        sport,                  // source port
+        dport,                  // dst port
+        message,         //msg
+         512 );              //msg lenght
+}
+
+void network_test_udp2(void)
+{
+    network_test_udp0( 
+        saved_mac,                                   // linux mac
+        __udp_target_default_ipv4,    // linux ip
+        34885,
+        34884 );
 }
 
 // -----------------
