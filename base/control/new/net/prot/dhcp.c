@@ -53,7 +53,20 @@ network_dhcp_send(
     dhcp->siaddr = 0;
     dhcp->giaddr = 0;
 
+// Fill mac
+
     //fillMac(dhcp->chaddr, default_ethernet_device.mac);
+
+    int i=0;
+    if ( (void*) currentNIC != NULL )
+    {
+        for ( i=0; i<6; i++ ){
+            dhcp->chaddr[i] = (uint8_t) currentNIC->mac_address[i];  // source 
+        };
+    }
+
+
+
     memset(dhcp->sname, 0, 64);
     memset(dhcp->file, 0, 128);
     dhcp->magic_cookie = ToNetByteOrder32(0x63825363);
@@ -151,7 +164,7 @@ int network_initialize_dhcp(void)
     printf("network_initialize_dhcp: done\n");
     //dhcp_info.initialized =  TRUE;
     
-    while(1){}
+    //while(1){}
     return 0;
 fail:
     printf("network_initialize_dhcp: fail\n");

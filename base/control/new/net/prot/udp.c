@@ -91,6 +91,12 @@ network_handle_udp(
         printf (" '%s' \n",udp_payload);
         die();
     }
+
+    if (dport == 68){
+        printf("UDP: dport{%d}\n",dport);
+        die();
+    }
+
 }
 
 // -----------------

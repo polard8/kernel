@@ -26,6 +26,7 @@ network_handle_arp(
     const unsigned char *buffer, 
     ssize_t size )
 {
+// handler
 // 0x0806
 
     struct ether_arp *ar;
@@ -55,11 +56,17 @@ network_handle_arp(
     uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
     if (op==ARP_OPC_REQUEST){
         printf("ARP: This is a REQUEST\n");
-        //sending a reply, only for the linux host.  x.x.x.8
-        //printf("Sending reply to linux host\n");
-        //network_send_arp_reply();
+        // Sending a reply, only for linux
+            if ( ar->arp_spa[3] == 6 ){
+                   // #bugbug
+                   // O reply esta usando o mac broadcast.
+                   // tem que ser o mac de quem fez o request.
+                   network_send_arp_reply();
+            }
+
     } else if (op==ARP_OPC_REPLY){
-        printf("ARP: This is a REPLY\n");
+        printf("ARP: REPLY to %d.%d.%d.%d\n",
+            ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
     };
 
     refresh_screen();
@@ -80,6 +87,8 @@ network_send_arp(
     uint8_t target_ip[4], 
     uint8_t target_mac[6] )
 {
+// Send ARP.
+
     struct ether_header *eh;
     struct ether_arp *h;
     register int i=0;
@@ -264,7 +273,8 @@ fail:
 
 void network_send_arp_request(void)
 {
-// Send ARP request to a Linus host.
+// Send ARP request to 192.168.1.6.
+
     network_send_arp( 
         ARP_OPC_REQUEST, 
         __arp_gramado_default_ipv4,  // src ip 
@@ -276,7 +286,7 @@ void network_send_arp_request(void)
 
 void network_send_arp_reply(void)
 {
-// Send ARP request to a Linus host.
+// Send ARP reply to 192.168.1.6.
 
 // #bugbug
 // Sending reply to broadcast
