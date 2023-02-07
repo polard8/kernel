@@ -7,6 +7,9 @@
 unsigned char __arp_broadcast_mac[6] = { 
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
+unsigned char __arp_target_mac[6] = { 
+    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
+};
 unsigned char __arp_gramado_default_ipv4[4] = { 
     192, 168, 1, 12 
 };
@@ -28,6 +31,11 @@ network_handle_arp(
 {
 // handler
 // 0x0806
+
+    char message[512];
+    memset(message,0,sizeof(message));
+    sprintf(message,"Hello from Gramado to Linux\n");
+
 
     struct ether_arp *ar;
     ar = (struct ether_arp *) buffer;
@@ -54,19 +62,46 @@ network_handle_arp(
 
 // Operation
     uint16_t op = (uint16_t) FromNetByteOrder16(ar->op);
+
+
+// REQUEST
+// Sending a reply.
+// sha is the [mac] of the machine that sent us a request.
+// spa is the [ip    ] of the machine that sent us a request.
     if (op==ARP_OPC_REQUEST){
         printf("ARP: This is a REQUEST\n");
-        // Sending a reply, only for linux
-            if ( ar->arp_spa[3] == 6 ){
-                   // #bugbug
-                   // O reply esta usando o mac broadcast.
-                   // tem que ser o mac de quem fez o request.
-                   network_send_arp_reply();
-            }
-
+        network_send_arp_reply( ar->arp_sha, ar->arp_spa );
+// REPLY
     } else if (op==ARP_OPC_REPLY){
-        printf("ARP: REPLY to %d.%d.%d.%d\n",
-            ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
+
+        // to me
+        if ( ar->arp_tpa[3] == 12 )
+        {
+            printf("ARP: Reply to ME!\n");
+           printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+               ar->arp_sha[0], 
+               ar->arp_sha[1], 
+               ar->arp_sha[2], 
+               ar->arp_sha[3],
+               ar->arp_sha[4],
+               ar->arp_sha[5] );
+            //refresh_screen();
+            //while(1){}
+            
+            /*
+            network_send_udp( 
+                __arp_gramado_default_ipv4,   // scr ip
+                ar->arp_spa,    // dst ip
+                ar->arp_sha,     // dst mac
+                34885,              // source port
+                34884,               // dst port
+                message,         //msg
+                512 );              //msg lenght
+            */
+        }
+
+        //printf("ARP: REPLY to %d.%d.%d.%d\n",
+        //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
     };
 
     refresh_screen();
@@ -82,10 +117,10 @@ fail:
 // Ethernet + arp
 void 
 network_send_arp( 
-    int op,   //operation
+    uint8_t target_mac[6],
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
-    uint8_t target_mac[6] )
+    int op )
 {
 // Send ARP.
 
@@ -276,15 +311,17 @@ void network_send_arp_request(void)
 // Send ARP request to 192.168.1.6.
 
     network_send_arp( 
-        ARP_OPC_REQUEST, 
+        __arp_broadcast_mac,                // target mac
         __arp_gramado_default_ipv4,  // src ip 
-        __arp_target_default_ipv4,   // dst ip (Linux)
-        __arp_broadcast_mac          // target mac
-        );
+        __arp_target_default_ipv4,      // dst ip (Linux)
+        ARP_OPC_REQUEST );
 }
 
 
-void network_send_arp_reply(void)
+void 
+network_send_arp_reply(
+    uint8_t target_mac[6],
+    uint8_t target_ip[4] )
 {
 // Send ARP reply to 192.168.1.6.
 
@@ -292,11 +329,10 @@ void network_send_arp_reply(void)
 // Sending reply to broadcast
 
     network_send_arp( 
-        ARP_OPC_REPLY, 
+        target_mac,                // target mac
         __arp_gramado_default_ipv4,  // src ip 
-        __arp_target_default_ipv4,   // dst ip (Linux)
-        __arp_broadcast_mac          // target mac
-        );
+        target_ip,       // dst ip (Linux)
+        ARP_OPC_REPLY );
 }
 
 

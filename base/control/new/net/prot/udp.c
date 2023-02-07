@@ -196,8 +196,8 @@ network_send_udp (
 // O endereço mac do destino foi passado via argumento.
 
     for ( i=0; i<6; i++ ){
-        eh->mac_dst[i] = (uint8_t) currentNIC->mac_address[i];  // source 
-        eh->mac_src[i] = (uint8_t) target_mac[i];               // dest
+        eh->mac_src[i] = (uint8_t) currentNIC->mac_address[i];  // source 
+        eh->mac_dst[i] = (uint8_t) target_mac[i];               // dest
     };
     eh->type = (uint16_t) ToNetByteOrder16 (ETH_TYPE_IP);
 
@@ -437,10 +437,9 @@ network_send_udp (
 // Send frame via NIC.
     e1000_send( currentNIC, FRAME_SIZE, frame );
 
+// #debug
 // Send frame to myself.
-    // network_on_receiving(frame,FRAME_SIZE);
-
-    //#debug
+    //network_on_receiving(frame,FRAME_SIZE);
     //refresh_screen();
     //while(1){}
     

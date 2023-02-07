@@ -52,14 +52,17 @@ network_handle_arp(
 
 void 
 network_send_arp( 
-    int op,   //operation
+    uint8_t target_mac[6],
     uint8_t source_ip[4], 
     uint8_t target_ip[4], 
-    uint8_t target_mac[6] );
+    int op );
 
-void network_send_arp_reply(void);
 void network_send_arp_request(void);
 
+void 
+network_send_arp_reply(
+    uint8_t target_mac[6],
+    uint8_t target_ip[4] );
 
 #endif    
 

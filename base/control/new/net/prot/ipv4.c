@@ -68,13 +68,14 @@ network_handle_ipv4(
 // ping?
     if (Protocol == PROTOCOL_IP_ICMP)
     {
-        printf("IP: ICMP Protocol\n");
+        //printf("IP: ICMP Protocol\n");
         //network_handle_icmp(..);
+        goto drop0;
     }
 // TCP
     if (Protocol == PROTOCOL_IP_TCP)
     {
-        printf("IP: TCP Protocol\n");
+        //printf("IP: TCP Protocol\n");
         //network_handle_tcp(..);
         goto drop0;
     }
