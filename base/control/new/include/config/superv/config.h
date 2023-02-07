@@ -5,56 +5,55 @@
 #ifndef ____KERNEL_CONFIG_H
 #define ____KERNEL_CONFIG_H    1
 
+// Flags:
 #define USE_SERIALDEBUG    0
 #define USE_E1000    0
 // ...
 
 
-//
+// ----------------------------------------------------------------
+// Disk configuration:
 // ## IMPORTANTE ##
-//
-
-//TEM QUE CONFIGURAR O BL TAMBÉM
-
-// usaremos essa configuraçao provisoriamente
+// TEM QUE CONFIGURAR O BL TAMBÉM
+// Usaremos essa configuraçao provisoriamente
 // ate que tenhamos a condiçao de selecionarmos corretamente
 // o canal e o dispositivo.
 // Inicializaremos essas variaveis ao inicializarmos
 // o controlador de ata. ide. em ata.c ata_initialize.
-
-
 // USE PRIMARY MASTER!!
-
 // Portas bases encontradas nas BARs.
-//BAR0 = base port 1F0   (channel 0 primary master) (channel 0 primary slave) 
-//BAR1 = base port 3F6	 channel ??
-//BAR2 = base port 170   (channel 1 secondary master) (channel 1 secondary slave)
-//BAR3 = base port 376   channel ??
-
-
+// BAR0 = base port 1F0   (channel 0 primary master) (channel 0 primary slave) 
+// BAR1 = base port 3F6	 channel ??
+// BAR2 = base port 170   (channel 1 secondary master) (channel 1 secondary slave)
+// BAR3 = base port 376   channel ??
 // #importante
 // master e slave é coisa do PATA
 // então 3f6 pode ser canal 2 e 376 pode ser canal 3.
-
 
 #define __BAR0  0
 #define __BAR1  1
 #define __BAR2  2
 #define __BAR3  3
-
 #define __CHANNEL0  __BAR0 
 #define __CHANNEL1  __BAR2
 #define __CHANNEL2  __BAR1
 #define __CHANNEL3  __BAR3
-
-
 // See: 
 // ata_initialize in ata.c
-
 #define __IDE_PORT    __CHANNEL0
 
-
-//-------------------------------
+// ----------------------------------------------------------------
+// virtualbox Info:
+// PIIX3 ATA: LUN#0: disk, PCHS=963/4/17, total number of sectors 65536
+#define FRED_VHD_32MB
+#if defined(FRED_VHD_32MB)
+#define VHD_32MB_CHS { 963, 4, 17,  0 }  
+//#define VHD_32MB_CHS { 862, 4, 19,  0 }  
+//#define VHD_32MB_CHS { 0x35E, 0x4, 0x13, 0 }  
+#else 
+#error "must define vhd"
+#endif
+// ----------------------------------------------------------------
 
 // #bugbug
 // Ouve uma falha..
@@ -101,9 +100,12 @@ fifth..     ide4, usually PCI, probed
 sixth..     ide5, usually PCI, probed
 */
 
-
+// ----------------------------------------------------------------
+// PIT configuration:
 #define DEFAULT_PIT_FREQ  1000
 
+// ----------------------------------------------------------------
+// Runlevels
 // Where are the types defines?
 // See:
 // core/init.c
@@ -111,18 +113,9 @@ sixth..     ide5, usually PCI, probed
 // display manager (with GUI) 
 // Same as runlevel 3 + display manager.
 // Full multi-user graphical mode. 
-
 // #define DEFAULT_RUNLEVEL  0
 #define DEFAULT_RUNLEVEL  5
 
-#define FRED_VHD_32MB
-
-#if defined(FRED_VHD_32MB)
-#define VHD_32MB_CHS { 862, 4, 19,  0 }  
-//#define VHD_32MB_CHS { 0x35E, 0x4, 0x13, 0 }  
-#else 
-#error "must define vhd"
-#endif
 
 
 /* configuração de compilação */

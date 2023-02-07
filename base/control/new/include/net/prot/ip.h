@@ -6,6 +6,11 @@
 
 #define IPVERSION    4
 
+#define MAC_IN_BYTES  6
+#define IPV4_IN_BYTES  4
+//#define IPV6_IN_BYTES  ?
+
+
 //
 // Protocols
 //

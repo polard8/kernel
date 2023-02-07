@@ -68,6 +68,8 @@ typedef struct __dhcp_header{
 } __attribute__ ((packed)) dhcp_header_t;
 */
 
+#define OPTIONS_SIZE    (312 - 4)
+
 // dhcp header
 struct dhcp_d
 {
@@ -86,16 +88,21 @@ struct dhcp_d
     unsigned char   sname [64];
     unsigned char   file [128];
     unsigned int    magic_cookie;
-    unsigned char   options[312 - 4];
+
+    unsigned char options[OPTIONS_SIZE];
+
 } __attribute__ ((packed));
 
 
 void 
 network_dhcp_send(
     struct dhcp_d *dhcp,
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
     int message_type, 
     unsigned short sport, 
     unsigned short dport );
+
 int network_initialize_dhcp(void);
 
 #endif    

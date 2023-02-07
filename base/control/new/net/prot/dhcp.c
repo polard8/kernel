@@ -1,10 +1,13 @@
 
 // dhcp.c
+// dhcp initialization.
+// 2023 - Created by Fred Nora.
+// Credits: Nelson Cole. (Sirius OS)
 
 #include <kernel.h>
 
 
-struct dhcp_info_d dhcp_info;
+struct dhcp_info_d  dhcp_info;
 
 // source ip
 unsigned char __dhcp_source_ipv4[4] = { 
@@ -24,6 +27,8 @@ unsigned char __dhcp_target_mac[6] = {
 void 
 network_dhcp_send(
     struct dhcp_d *dhcp,
+    uint8_t source_ip[4], 
+    uint8_t target_ip[4], 
     int message_type, 
     unsigned short sport, 
     unsigned short dport )
@@ -94,6 +99,31 @@ network_dhcp_send(
             break;
 
         case DHCP_REQUEST:
+            printf("DHCP REQUEST\n");
+            // Requested IP address
+            dhcp->options[3] = OPT_REQUESTED_IP_ADDR;
+            dhcp->options[4] = IPV4_IN_BYTES;
+            dhcp->options[5] = (uint8_t) source_ip[0];
+            dhcp->options[6] = (uint8_t) source_ip[1];
+            dhcp->options[7] = (uint8_t) source_ip[2];
+            dhcp->options[8] = (uint8_t) source_ip[3];
+            // Server Identifier
+            dhcp->options[9] = OPT_SERVER_ID;
+            dhcp->options[10] = IPV4_IN_BYTES;
+            dhcp->options[11] = (uint8_t) target_ip[0];
+            dhcp->options[12] = (uint8_t) target_ip[1];
+            dhcp->options[13] = (uint8_t) target_ip[2];
+            dhcp->options[14] = (uint8_t) target_ip[3];
+            // Parameter Request list 
+            dhcp->options[15]= OPT_PARAMETER_REQUEST;
+            dhcp->options[16]= 3;
+            dhcp->options[17]= OPT_SUBNET_MASK;
+            dhcp->options[18]= OPT_ROUTER;
+            dhcp->options[19]= OPT_DNS;
+            // Option End
+            dhcp->options[20]= OPT_END;
+            opt_size = 21;
+
             break;
         default:
             printf("DHCP UNKNOWN\n");
@@ -106,8 +136,8 @@ network_dhcp_send(
         __dhcp_source_ipv4,    // scr ip
         __dhcp_target_ipv4,    // dst ip
         __dhcp_target_mac,    // dst mac
-        68,                  // source port
-        67,                  // target port
+        sport,                  // source port
+        dport,                  // target port
         dhcp,                         // (data) msg - dhcp structure.
         sizeof(struct dhcp_d) - 308 + opt_size );   // data len msg lenght
 
@@ -143,6 +173,8 @@ int network_initialize_dhcp(void)
 // Send discover
     network_dhcp_send( 
         dhcp,  //header 
+        __dhcp_source_ipv4,  // 0.0.0.0 
+        __dhcp_target_ipv4,  // Broadcast
         DHCP_DISCOVER,  // message code. 
         68,                             // s port
         67 );                          // d port
@@ -152,10 +184,12 @@ int network_initialize_dhcp(void)
 /*
 // Send request
     network_dhcp_send( 
+        #todo my ip,
+        #todo dhcp server ip,
         dhcp,  //header 
         DHCP_REQUEST,  // message code. 
-        68,                             // s port
-        67 );                          // d port
+        ?,                             // s port
+        ? );                          // d port
 */
 
 // listen
