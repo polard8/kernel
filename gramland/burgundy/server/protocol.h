@@ -48,7 +48,6 @@ struct _gReq
     unsigned long ul12;
     unsigned long ul13;
 
-
 // Strings or some other data.
     unsigned char data[256];
 };

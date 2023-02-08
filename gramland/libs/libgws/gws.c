@@ -647,7 +647,6 @@ static int __gws_refresh_window_request( int fd, int window )
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes=0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_refresh_window_request: wr\n");
 
@@ -739,7 +738,6 @@ __gws_redraw_window_request (
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes = 0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_redraw_window_request: wr\n");
 
@@ -887,7 +885,6 @@ __gws_change_window_position_request (
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes = 0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_change_window_position_request: wr\n");
 
@@ -1037,7 +1034,6 @@ __gws_resize_window_request (
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes = 0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_resize_window_request: wr\n");
 
@@ -1189,7 +1185,6 @@ __gws_refresh_rectangle_request (
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes = 0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_refresh_rectangle_request: wr\n");
 
@@ -1299,7 +1294,6 @@ __gws_drawchar_request (
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes = 0;
-    //char *name = "Window name 1";
 
     //gws_debug_print ("__gws_drawchar_request: wr\n");      
 
@@ -1423,26 +1417,18 @@ __gws_drawtext_request (
     message_buffer[7] = color;
 
 // String support
-    char buf[256];
+// Fill the string buffer
     register int i=0;
     int string_off=8;
-    
     char *p = (char *) &message_buffer[string_off];
-
-    // Fill the string buffer
     for (i=0; i<250; i++)
     {
-        // The whole buffer has 512 chars.
-        // #bugbug: We dont have 250 longs into the buffer.
-        //message_buffer[string_off] = (char) *string;
         *p = *string;   // Put a char.
-        //string_off++; 
         // Increment both
         p++;
         string++; 
     };
     *p = 0;  // finalize the string
-    //message_buffer[string_off] = 0;
 
 // Write
 
@@ -1595,26 +1581,20 @@ __gws_settext_request (
     message_buffer[7] = color;
 
 // String support
-    char buf[256];
+// Fill the string buffer
+
     register int i=0;
     int string_off=8;
-    
     char *p = (char *) &message_buffer[string_off];
 
-    // Fill the string buffer
     for (i=0; i<250; i++)
     {
-        // The whole buffer has 512 chars.
-        // #bugbug: We dont have 250 longs into the buffer.
-        //message_buffer[string_off] = (char) *string;
         *p = *string;   // Put a char.
-        //string_off++; 
         // Increment both
         p++;
         string++; 
     };
     *p = 0;  // finalize the string
-    //message_buffer[string_off] = 0;
 
 // Write
 
@@ -1768,26 +1748,18 @@ __gws_gettext_request (
     message_buffer[7] = color;
 
 // String support
-    char buf[256];
+// Fill the string buffer
     register int i=0;
     int string_off=8;
-    
     char *p = (char *) &message_buffer[string_off];
-
-    // Fill the string buffer
     for (i=0; i<250; i++)
     {
-        // The whole buffer has 512 chars.
-        // #bugbug: We dont have 250 longs into the buffer.
-        //message_buffer[string_off] = (char) *string;
         *p = *string;   // Put a char.
-        //string_off++; 
         // Increment both
         p++;
         string++; 
     };
     *p = 0;  // finalize the string
-    //message_buffer[string_off] = 0;
 
 // Write
 
@@ -1962,17 +1934,19 @@ __gws_clone_and_execute_request (
     message_buffer[7] = (unsigned long) arg4; 
 
 // String support
-    char buf[256];
+// Fill the string buffer.
     register int i=0;
     int string_off=8;
-    // Fill the string buffer.
+    char *p = (char *) &message_buffer[string_off];
     for (i=0; i<250; i++)
     {
-        message_buffer[string_off] = *string;
-        string_off++;
+        *p = *string;
+        p++;
         string++;
     };
-    message_buffer[string_off] = 0;
+    *p = 0;
+    p++;
+    *p = 0;
 
 // Write
 
@@ -2163,18 +2137,19 @@ __gws_createwindow_request (
 
 // String support
 // Set up the string starting in the offset '14'.
-    char buf[256];
     register int i=0;
     int max=250;
     int string_off=14;
+    char *p = (char *) &message_buffer[string_off];
     for (i=0; i<max; i++)
     {
-        message_buffer[string_off] = *Name;
-        string_off++; 
+        *p = *Name;   // Put the char into the message buffer.
+        p++;
         Name++;
     };
-    message_buffer[string_off] = 0;
+    *p = 0;
 // ------
+
 
 // Write
     n_writes = -1;
@@ -3691,7 +3666,6 @@ gws_async_command (
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes=0;
     int Value=0;
-    //char *name = "Window name 1";
 
 // Enviamos um request para o servidor.
 // Precisamos mesmo de um loop para isso?
@@ -3767,7 +3741,6 @@ gws_async_command2 (
         (unsigned long *) &__gws_message_buffer[0];
     int n_writes=0;
     int Value=0;
-    //char *name = "Window name 1";
 
     // #debug
     // gws_debug_print ("gws_async_command2: send...\n"); 

@@ -2129,11 +2129,15 @@ int serviceCreateWindow (int client_fd)
 // String support 
 // Copiando para nossa estrutura local.
     register int string_off = 14;
-    for (i=0; i<256; ++i){
-        r.data[i] = message_address[string_off];
-        string_off++;
+    char *p = (char *) &message_address[string_off];
+    memset(r.data, 0, 256);
+    for (i=0; i<256; ++i)
+    {
+        r.data[i] = *p;  //Get a char from the message buffer. 
+        p++;
     };
     r.data[i] = 0;
+    r.data[i+1] = 0;
 //--
 // ========================================
 
@@ -2725,9 +2729,12 @@ void serviceCloneAndExecute(void)
     unsigned char buf[256+1];
     register int i=0;
     int string_off=8;
-    for (i=0; i<256; i++){
-         buf[i] = message_address[string_off];
-         string_off++;
+    char *p = (char *) &message_address[string_off];
+    memset(buf, 0 ,256);
+    for (i=0; i<256; i++)
+    {
+         buf[i] = *p;
+         p++;
     };
     buf[i] = 0;
 // ==================================
@@ -2795,11 +2802,7 @@ int serviceDrawText(void)
     char *p = (char *) &message_address[string_off];
     for (i=0; i<256; i++)
     {
-        // Get every char.
-        // The whole message buffer has 512 bytes.
-         //buf[i] = message_address[string_off];
          buf[i] = *p;  //Get a char
-         //string_off++;
          p++;
     };
     buf[i] = 0;  // finalize the buffer.
@@ -2916,11 +2919,7 @@ int serviceSetText(void)
     char *p = (char *) &message_address[string_off];
     for (i=0; i<256; i++)
     {
-        // Get every char.
-        // The whole message buffer has 512 bytes.
-         //buf[i] = message_address[string_off];
          buf[i] = *p;  //Get a char
-         //string_off++;
          p++;
     };
     buf[i] = 0;  // finalize the buffer.
@@ -3050,32 +3049,6 @@ int serviceGetText(void)
     //if( y >= deviceHeight )
         //return -1;
 
-//
-// == String support ========
-//
-
-/*
-// ==================================
-// Set string into the message
-// #todo: Talvez poderiamos receber o tamanho da string.
-    //unsigned char buf[256+1];
-    register int i=0;
-    int string_off=8;
-    char *p = (char *) &message_address[string_off];
-    for (i=0; i<256; i++)
-    {
-        // Get every char.
-        // The whole message buffer has 512 bytes.
-         //buf[i] = message_address[string_off];
-         //buf[i] = *p;  //Get a char
-         *p = window->
-         //string_off++;
-         
-         p++;
-    };
-    buf[i] = 0;  // finalize the buffer.
-// ==================================
-*/
 //
 // == Draw ===============================================
 //
