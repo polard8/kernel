@@ -80,25 +80,47 @@ network_handle_udp(
     printf ("sum={%d}\n",udp->uh_sum);
 */
 
+
+// Clean the payload local buffer.
     memset(udp_payload,0,sizeof(udp_payload));
+// Create a local copy of the payload.
     strncpy(
         udp_payload,
-        (buffer + 6),
+        (buffer + UDP_HEADER_LENGHT),
         512 );
-
 
 // Don't print every message.
 // Is it a valid port?
 // Hang if the port is valid.
+
+    char *p;
+    p = udp_payload;
+    int mFlag=0;
+
     if (dport == 34884 || dport == 11888)
     {
-        printf("UDP: dport{%d}\n",dport);
-        printf (" '%s' \n",udp_payload);
-        die();
+        printf ("UDP: Message{%s}\n", udp_payload );
+
+        //printf("UDP: dport{%d}\n",dport);
+        //printf (" '%s' \n",udp_payload);
+        //die();
+
+        // Parse message
+        // #todo: Create a worker
+        if ( p[0] == '#' && p[1] == '-')
+        {
+            if (p[2] == 'x'){
+                printf("x command\n");
+                //hal_reboot();
+                die();
+            }
+        }
     }
 
-    if (dport == 68){
-        printf("UDP: dport{%d}\n",dport);
+// #test
+// DHCP stuff.
+    if (dport == 68 || dport == 67){
+        printf("UDP: dport{%d}   #debug\n",dport);
         die();
     }
 

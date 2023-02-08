@@ -125,6 +125,8 @@ struct dhcp_d
 
 // ------------------------------
 
+void network_save_dhcp_server_id( uint8_t ip[4] );
+
 void 
 network_dhcp_send(
     struct dhcp_d *dhcp,

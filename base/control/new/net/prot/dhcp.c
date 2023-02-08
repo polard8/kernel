@@ -16,6 +16,17 @@ struct dhcp_info_d  dhcp_info;
 unsigned char __dhcp_source_ipv4[4] = { 
     0, 0, 0, 0 
 };
+// source ip
+unsigned char __dhcp_source_ipv4_2[4] = { 
+    192, 168, 1, 12 
+};
+
+// source ip
+unsigned char dhcp_saved_server_id[4] = { 
+    192, 168, 1, 1 
+};
+
+
 // destination ip (broadcast)
 unsigned char __dhcp_target_ipv4[4]  = { 
     0xFF, 0xFF, 0xFF, 0xFF  
@@ -25,6 +36,19 @@ unsigned char __dhcp_target_ipv4[4]  = {
 unsigned char __dhcp_target_mac[6] = { 
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
+
+
+//---------------
+
+// Called byt some handler to save the dhcp server ip.
+void network_save_dhcp_server_id( uint8_t ip[4] )
+{
+    register int i=0;
+    for (i=0; i<4; i++){
+        dhcp_saved_server_id[i] = (uint8_t) ip[i];
+    };
+}
+
 
 
 void 
@@ -66,6 +90,7 @@ network_dhcp_send(
 // if this flag is set to 1, the DHCP server sent a reply back by broadcast. 
 // The remaining bits of the flags field are reserved for future use.
     dhcp->flags = ToNetByteOrder16(0x0000);
+    //dhcp->flags = ToNetByteOrder16(0x8000);
 
 // ciaddr: Client IP address.
     dhcp->ciaddr = (unsigned int) 0;
@@ -156,7 +181,7 @@ network_dhcp_send(
         //++
         // Parameter Request list
         dhcp->options[3] = OPT_PARAMETER_REQUEST;
-        dhcp->options[4] = 3;  // Lenght
+        dhcp->options[4] = (uint8_t) 3;  // Lenght
         dhcp->options[5] = OPT_SUBNET_MASK;
         dhcp->options[6] = OPT_ROUTER;
         dhcp->options[7] = OPT_DNS;
@@ -174,7 +199,7 @@ network_dhcp_send(
         //++
         // Requested IP address
         dhcp->options[3] = OPT_REQUESTED_IP_ADDR;
-        dhcp->options[4] = IPV4_IN_BYTES;  // Lenght
+        dhcp->options[4] = (uint8_t) IPV4_IN_BYTES;  // Lenght
         dhcp->options[5] = (uint8_t) source_ip[0];
         dhcp->options[6] = (uint8_t) source_ip[1];
         dhcp->options[7] = (uint8_t) source_ip[2];
@@ -184,7 +209,7 @@ network_dhcp_send(
         //++
         // Server Identifier
         dhcp->options[9] = OPT_SERVER_ID;
-        dhcp->options[10] = IPV4_IN_BYTES;  // Lenght
+        dhcp->options[10] = (uint8_t)IPV4_IN_BYTES;  // Lenght
         dhcp->options[11] = (uint8_t) target_ip[0];
         dhcp->options[12] = (uint8_t) target_ip[1];
         dhcp->options[13] = (uint8_t) target_ip[2];
@@ -194,7 +219,7 @@ network_dhcp_send(
         //++
         // Parameter Request list 
         dhcp->options[15]= OPT_PARAMETER_REQUEST;
-        dhcp->options[16]= 3;  // Lenght
+        dhcp->options[16]= (uint8_t) 3;  // Lenght
         dhcp->options[17]= OPT_SUBNET_MASK;
         dhcp->options[18]= OPT_ROUTER;
         dhcp->options[19]= OPT_DNS;
@@ -260,6 +285,7 @@ int network_initialize_dhcp(void)
 // Dialog
 //
 
+// #test
 // Send discover
     network_dhcp_send( 
         dhcp,  //header 
@@ -269,6 +295,17 @@ int network_initialize_dhcp(void)
         68,                             // s port
         67 );                          // d port
 
+/*
+// #test
+// Send request
+    network_dhcp_send( 
+        dhcp,  //header 
+        __dhcp_source_ipv4_2,  // 192.168.1.12
+        __dhcp_target_ipv4,  // Broadcast
+        DORA_R,  // message code. 
+        68,                             // s port
+        67 );                          // d port
+*/
 
     printf("network_initialize_dhcp: done\n");
     //dhcp_info.initialized =  TRUE;
