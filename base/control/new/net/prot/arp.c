@@ -92,20 +92,6 @@ network_handle_arp(
             // Save this values to use in the future.
             // see:  udp.c
             network_save_mac(ar->arp_sha);
-
-            /*
-             //#
-             //Maybe we gotta return from one interrupt
-             //before generating another one.
-            network_send_udp( 
-                __arp_gramado_default_ipv4,   // scr ip
-                ar->arp_spa,    // dst ip
-                ar->arp_sha,     // dst mac
-                34885,              // source port
-                34884,               // dst port
-                message,         //msg
-                512 );              //msg lenght
-            */
         }
 
         //printf("ARP: REPLY to %d.%d.%d.%d\n",

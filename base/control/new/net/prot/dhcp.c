@@ -4,6 +4,9 @@
 // 2023 - Created by Fred Nora.
 // Credits: Nelson Cole. (Sirius OS)
 
+// D.O.R.A.
+// Discover, Offer, Request, Ack
+
 #include <kernel.h>
 
 
@@ -33,36 +36,57 @@ network_dhcp_send(
     unsigned short sport, 
     unsigned short dport )
 {
-    //char message[512];
-    //memset(message,0,sizeof(message));
-    //sprintf(message,"#todo dhcp structure\n");
-
     int opt_size = 0;
 
-    //struct dhcp_d *dhcp;
-    //dhcp = (struct dhcp_d *) kmalloc ( sizeof(struct dhcp_d) );
     if ((void*) dhcp == NULL){
         printf("network_dhcp_dialog: dhcp\n");
         goto fail;
     }
 
-    dhcp->op    = 1;
+// 1 = REQUEST, 2 = REPLY
+    dhcp->op = 1;
+// 1 = Ethernet
     dhcp->htype = 1;
+// MAC lenght
     dhcp->hlen  = 6;
+// ?
     dhcp->hops  = 0;
+
+// xid:
+// Transaction ID, a random number chosen by the client 
+// to identify an IP address allocation.
     dhcp->xid   = ToNetByteOrder32(0x3903F326);
+
+// Elapsed time in seconds.
     dhcp->secs  = ToNetByteOrder16(0);
+
+// flags: 
+// The leftmost bit is defined as the BROADCAST (B) flag. 
+// If this flag is set to 0, the DHCP server sent a reply back by unicast; 
+// if this flag is set to 1, the DHCP server sent a reply back by broadcast. 
+// The remaining bits of the flags field are reserved for future use.
     dhcp->flags = ToNetByteOrder16(0x0000);
-    dhcp->ciaddr= 0;
-    dhcp->yiaddr= 0;
-    dhcp->siaddr = 0;
-    dhcp->giaddr = 0;
 
+// ciaddr: Client IP address.
+    dhcp->ciaddr = (unsigned int) 0;
+// yiaddr: 'your' (client) IP address, assigned by the server.
+    dhcp->yiaddr = (unsigned int) 0;
+// siaddr: 
+// Next server IP.
+// Server IP address, from which the client obtained 
+// configuration parameters.
+    dhcp->siaddr = (unsigned int) 0;
+// giaddr: 
+// Relay agent IP.
+// IP address of the first relay agent a request message traveled.
+// Relay agent is used when the dhcp is outside the local network.
+    dhcp->giaddr = (unsigned int) 0;
+
+// chaddr: 
+// Client hardware address.
 // Fill mac
-
-    //fillMac(dhcp->chaddr, default_ethernet_device.mac);
-
-    int i=0;
+    memset( dhcp->chaddr, 0, 16 );
+    register int i=0;
     if ( (void*) currentNIC != NULL )
     {
         for ( i=0; i<6; i++ ){
@@ -70,67 +94,133 @@ network_dhcp_send(
         };
     }
 
-
-
+// sname: 
+// Server host name, from which the client obtained configuration parameters.
     memset(dhcp->sname, 0, 64);
+
+// file: 
+// Bootfile name and path information, defined by the server to the client.
     memset(dhcp->file, 0, 128);
-    dhcp->magic_cookie = ToNetByteOrder32(0x63825363);
 
+// DHCP magic cookie: 
+// 99, 130, 83, 99
+    dhcp->magic_cookie = 
+        (unsigned int) ToNetByteOrder32(0x63825363);
+
+//
+// Options
+//
+
+//-----------------------------------
+// DORA_D
+// 53 Message type:
+//   + Discover
+// 55 Parameter list:
+//   + 1   - Subnet mask
+//   + 3   - Router
+//   + 6   - DNS servers
+
+//-----------------------------------
+// DORA_R
+// 53 Message type:
+//     + Request
+// 50 - Requested IP address:
+//     + 4 bytes
+// 54 - dhcp server id:
+//     + 4 bytes
+// 55 Parameter list:
+//   + 1   - Subnet mask
+//   + 3   - Router
+//   + 6   - DNS servers
+
+
+// 53 = DHCP Message type.
     dhcp->options[0] = OPT_DHCP_MESSAGE_TYPE;
-    dhcp->options[1] = 0x01;
+    dhcp->options[1] = 0x01;  // lenght
+    dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
 
-// DHCP Message Type
-    dhcp->options[2] = message_type;
-
+// In DORA we only have two kind of send:
+// The Discover and the Request.
+    if ( message_type != DORA_D && message_type != DORA_R )
+    {
+        printf("Invalide DORA message type\n");
+        goto fail;
+    }
 
     switch(message_type){
 
-        case DHCP_DISCOVER:
-            printf("DHCP DISCOVERY\n");
-            // Parameter Request list
-            dhcp->options[3] = OPT_PARAMETER_REQUEST;
-            dhcp->options[4] = 3;
-            dhcp->options[5] = OPT_SUBNET_MASK;
-            dhcp->options[6] = OPT_ROUTER;
-            dhcp->options[7] = OPT_DNS;
-            // Option End
-            dhcp->options[8] = OPT_END;
-            opt_size = 9;
-            break;
+    // Discovering and IP.
+    case DORA_D:
+        printf("DORA_D\n");
+        
+        //++
+        // Parameter Request list
+        dhcp->options[3] = OPT_PARAMETER_REQUEST;
+        dhcp->options[4] = 3;  // Lenght
+        dhcp->options[5] = OPT_SUBNET_MASK;
+        dhcp->options[6] = OPT_ROUTER;
+        dhcp->options[7] = OPT_DNS;
+        //--
 
-        case DHCP_REQUEST:
-            printf("DHCP REQUEST\n");
-            // Requested IP address
-            dhcp->options[3] = OPT_REQUESTED_IP_ADDR;
-            dhcp->options[4] = IPV4_IN_BYTES;
-            dhcp->options[5] = (uint8_t) source_ip[0];
-            dhcp->options[6] = (uint8_t) source_ip[1];
-            dhcp->options[7] = (uint8_t) source_ip[2];
-            dhcp->options[8] = (uint8_t) source_ip[3];
-            // Server Identifier
-            dhcp->options[9] = OPT_SERVER_ID;
-            dhcp->options[10] = IPV4_IN_BYTES;
-            dhcp->options[11] = (uint8_t) target_ip[0];
-            dhcp->options[12] = (uint8_t) target_ip[1];
-            dhcp->options[13] = (uint8_t) target_ip[2];
-            dhcp->options[14] = (uint8_t) target_ip[3];
-            // Parameter Request list 
-            dhcp->options[15]= OPT_PARAMETER_REQUEST;
-            dhcp->options[16]= 3;
-            dhcp->options[17]= OPT_SUBNET_MASK;
-            dhcp->options[18]= OPT_ROUTER;
-            dhcp->options[19]= OPT_DNS;
-            // Option End
-            dhcp->options[20]= OPT_END;
-            opt_size = 21;
+        // Option End
+        dhcp->options[8] = OPT_END;
+        opt_size = 9;
+        break;
 
-            break;
-        default:
-            printf("DHCP UNKNOWN\n");
-            break;   
+    // Requesting an IP.
+    case DORA_R:
+        printf("DORA_R\n");
+
+        //++
+        // Requested IP address
+        dhcp->options[3] = OPT_REQUESTED_IP_ADDR;
+        dhcp->options[4] = IPV4_IN_BYTES;  // Lenght
+        dhcp->options[5] = (uint8_t) source_ip[0];
+        dhcp->options[6] = (uint8_t) source_ip[1];
+        dhcp->options[7] = (uint8_t) source_ip[2];
+        dhcp->options[8] = (uint8_t) source_ip[3];
+        //--
+
+        //++
+        // Server Identifier
+        dhcp->options[9] = OPT_SERVER_ID;
+        dhcp->options[10] = IPV4_IN_BYTES;  // Lenght
+        dhcp->options[11] = (uint8_t) target_ip[0];
+        dhcp->options[12] = (uint8_t) target_ip[1];
+        dhcp->options[13] = (uint8_t) target_ip[2];
+        dhcp->options[14] = (uint8_t) target_ip[3];
+        //--
+
+        //++
+        // Parameter Request list 
+        dhcp->options[15]= OPT_PARAMETER_REQUEST;
+        dhcp->options[16]= 3;  // Lenght
+        dhcp->options[17]= OPT_SUBNET_MASK;
+        dhcp->options[18]= OPT_ROUTER;
+        dhcp->options[19]= OPT_DNS;
+        //--
+       
+        // Option End
+        dhcp->options[20]= OPT_END;
+        opt_size = 21;
+        break;
+
+    default:
+        printf("network_dhcp_send: default message_type\n");
+        goto fail;
+        break;   
     };
 
+//
+// Sending UDP frame.
+//
+
     printf("Sending udp ...\n");
+
+// UDP payload is the base of the dhcp structure.
+    char *udp_payload = (char *) dhcp;
+    //size_t udp_payload_size = (size_t) ( sizeof(struct dhcp_d) - 308 + opt_size );
+    size_t udp_payload_size = (size_t) ( sizeof(struct dhcp_d) );
 
     network_send_udp( 
         __dhcp_source_ipv4,    // scr ip
@@ -138,12 +228,12 @@ network_dhcp_send(
         __dhcp_target_mac,    // dst mac
         sport,                  // source port
         dport,                  // target port
-        dhcp,                         // (data) msg - dhcp structure.
-        sizeof(struct dhcp_d) - 308 + opt_size );   // data len msg lenght
+        udp_payload,
+        udp_payload_size ); 
 
-    //printf("done\n");
-
+// done:
     return;
+
 fail:
     refresh_screen();
     return;
@@ -175,24 +265,9 @@ int network_initialize_dhcp(void)
         dhcp,  //header 
         __dhcp_source_ipv4,  // 0.0.0.0 
         __dhcp_target_ipv4,  // Broadcast
-        DHCP_DISCOVER,  // message code. 
+        DORA_D,  // message code. 
         68,                             // s port
         67 );                          // d port
-
-// listen 68
-
-/*
-// Send request
-    network_dhcp_send( 
-        #todo my ip,
-        #todo dhcp server ip,
-        dhcp,  //header 
-        DHCP_REQUEST,  // message code. 
-        ?,                             // s port
-        ? );                          // d port
-*/
-
-// listen
 
 
     printf("network_initialize_dhcp: done\n");
