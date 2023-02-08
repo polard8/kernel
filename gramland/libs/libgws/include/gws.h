@@ -159,6 +159,25 @@ gws_draw_text (
     unsigned int color,
     char *string );
 
+int 
+gws_set_text (
+    int fd, 
+    int window,
+    unsigned long x,
+    unsigned long y,
+    unsigned int color,
+    char *string );
+
+int 
+gws_get_text (
+    int fd, 
+    int window,
+    unsigned long x,
+    unsigned long y,
+    unsigned int color,
+    char *string );
+
+
 // Redraw a window.
 int 
 gws_redraw_window (

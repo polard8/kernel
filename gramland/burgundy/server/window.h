@@ -680,12 +680,14 @@ struct gws_window_d
 // ======================================
 // The text for this input devices.
 
-    const char *window_text;
-    int text_size_in_bytes;
+    char *window_text;
+    size_t textbuffer_size_in_bytes;
+    size_t text_size_in_bytes;
     int text_fd;             // file descriptor for the text
 
-    const char *window_doc;
-    int doc_size_in_bytes;
+    char *window_doc;
+    size_t docbuffer_size_in_bytes;
+    size_t doc_size_in_bytes;
     int doc_fd;             // file descriptor for the document.
 
     // ...

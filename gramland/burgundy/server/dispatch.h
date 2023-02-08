@@ -56,14 +56,19 @@ int serviceAsyncCommand(void);
 // 2222: service 1
 void serviceExitGWS(void);
 
-
 // 2223
 int servicePutClientMessage(void);
 
 // 2224
 int serviceGetClientMessage(void);
 
-// 2030
+// #todo: No number yet. 2240
+int serviceSetText(void);
+// #todo: No number yet. 2241
+int serviceGetText(void); 
+
+
+// 2030 ?
 // When a client send us an event
 int serviceClientEvent(void);
 

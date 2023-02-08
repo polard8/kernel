@@ -625,7 +625,7 @@ void *doCreateWindow (
 // Checando se o esquema de cores está funcionando.
 
 /*
-	if ( (void *) CurrentColorScheme == NULL ){		
+	if ( (void *) CurrentColorScheme == NULL ){
 		panic ("CreateWindow: CurrentColorScheme");
 	}else{
 		if ( CurrentColorScheme->used != 1 || CurrentColorScheme->magic != 1234 ){
@@ -687,6 +687,36 @@ void *doCreateWindow (
     window->locked = FALSE;
 
 // ===================================
+// Input support:
+// The buffer and the input pointers.
+
+//
+// WT_EDITBOX
+//
+
+// Let's setup the buffer for the text.
+    size_t text_size = 0;
+
+    if ( type == WT_EDITBOX ||
+          type == WT_EDITBOX_MULTIPLE_LINES )
+    {
+        if(type == WT_EDITBOX)
+            text_size = 128;
+        if(type == WT_EDITBOX_MULTIPLE_LINES)
+            text_size = 256;
+
+        window->text_size_in_bytes = 0;
+        window->window_text = (void*) malloc(text_size);
+        if ( (void*) window->window_text != NULL )
+        {
+            memset(window->window_text, 0, text_size);  // Clear 
+            window->textbuffer_size_in_bytes = (size_t) text_size;
+            window->text_size_in_bytes = 0;
+        }
+
+        window->text_fd = 0;  // No file for now.
+    }
+
 // Input pointer device.
     window->ip_device = IP_DEVICE_NULL;
     window->ip_on = FALSE;  // desligado

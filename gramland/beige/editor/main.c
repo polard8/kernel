@@ -104,6 +104,7 @@ static void update_clients(int fd);
 static int editor_init_windows(void);
 static int editor_init_globals(void);
 
+static __test_text(int fd, int wid);
 static void __test_load_file(int socket, int wid);
 
 // ============
@@ -343,6 +344,48 @@ editorProcedure(
     return -1;
 }
 
+
+// #test
+// Set text and Get text into an editbox window.
+static __test_text(int fd, int wid)
+{
+// Testing new requests.
+
+    char *p;
+
+// Inject
+    gws_set_text (
+        (int) fd,      // fd,
+        (int) wid,    // window id,
+        (unsigned long)  1, 
+        (unsigned long)  1, 
+        (unsigned long) COLOR_BLACK,
+        "Injected text");
+
+// Get back
+    p = (char *) gws_get_text (
+        (int) fd,      // fd,
+        (int) wid,    // window id,
+        (unsigned long)  1, 
+        (unsigned long)  1, 
+        (unsigned long) COLOR_BLACK,
+        "Dirty");
+
+    if ( (void*) p == NULL )
+        printf("editor.bin: Invalid text buffer\n");
+
+// Print out
+    if ( (void*) p != NULL )
+    {
+        gws_draw_text (
+            (int) fd,      // fd,
+            (int) wid,    // window id,
+            (unsigned long)  1, 
+            (unsigned long)  1, 
+            (unsigned long) COLOR_RED,
+            p );
+    }
+}
 
 // #test
 // Working on routine to load a file
@@ -621,6 +664,14 @@ int main( int argc, char *argv[] )
 
 // Show main window.
     gws_refresh_window (client_fd, main_window);
+
+// =======================
+// #test
+// Testing new requests.
+// Injecting a text into the editbox window.
+    //__test_text(client_fd, main_window);
+    //gws_refresh_window (client_fd, main_window);
+
 
 // ============================================
 // focus

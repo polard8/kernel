@@ -989,7 +989,7 @@ gwsProcedure (
         //gwssrv_debug_print ("gwssrv: [1005] serviceDrawText\n"); 
         serviceDrawText();
         //NoReply = FALSE;  // The client-side library is waiting for response.
-        NoReply = TRUE;     // syncronous
+        NoReply = TRUE; 
         break;
 
     // Refresh window
@@ -1117,14 +1117,13 @@ gwsProcedure (
     // 2222: Async command 
     // Do not send a reply.
     case GWS_AsyncCommand:
-        
         //#debug
         //gwssrv_debug_print ("gwssrv: GWS_AsyncCommand\n");
                   //printf ("gwssrv: GWS_AsyncCommand\n");
-        
         serviceAsyncCommand();
         NoReply = TRUE;
         break;
+
 
     case GWS_PutClientMessage:
         
@@ -1136,13 +1135,24 @@ gwsProcedure (
         break;
 
     case GWS_GetClientMessage:
-        
         //#debug
         //gwssrv_debug_print ("gwssrv: GWS_GetClientMessage\n");
-        
         serviceGetClientMessage();
         NoReply = FALSE;
         break;
+
+    case GWS_SetText:
+        printf ("[GWS_SetText] #todo\n");
+        serviceSetText();
+        NoReply = TRUE;
+        break;
+
+    case GWS_GetText:
+        printf ("[GWS_GetText] #todo\n");
+        serviceGetText();
+        NoReply = FALSE;  // The response is the text.
+        break;
+
 
 // Let's get one event from the client's event queue.
 // Send it as a response.
@@ -2782,11 +2792,17 @@ int serviceDrawText(void)
     unsigned char buf[256+1];
     register int i=0;
     int string_off=8;
-    for (i=0; i<256; i++){
-         buf[i] = message_address[string_off];
-         string_off++;
+    char *p = (char *) &message_address[string_off];
+    for (i=0; i<256; i++)
+    {
+        // Get every char.
+        // The whole message buffer has 512 bytes.
+         //buf[i] = message_address[string_off];
+         buf[i] = *p;  //Get a char
+         //string_off++;
+         p++;
     };
-    buf[i] = 0;
+    buf[i] = 0;  // finalize the buffer.
 // ==================================
 
 //
@@ -2837,6 +2853,323 @@ crazy_fail:
     debug_print("serviceDrawText: [ERROR] crazy_fail\n");
     return -1;
 }
+
+
+// Put the text into the buffer
+// if the window is an editbox window.
+int serviceSetText(void)
+{
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    struct gws_window_d  *window;
+    int window_id = -1;      // index 4
+    unsigned long x;         // index 5
+    unsigned long y;         // index 6
+    unsigned long color;     // index 7
+// Device context
+    unsigned long deviceLeft   = 0;
+    unsigned long deviceTop    = 0;
+    unsigned long deviceWidth  = (__device_width  & 0xFFFF );
+    unsigned long deviceHeight = (__device_height & 0xFFFF );
+
+    // #debug
+    // gwssrv_debug_print ("gwssrv: serviceDrawText\n");
+
+// Get values.
+// #todo: Check the message code.
+// wid, x, y, color.
+    window_id = (int) message_address[4];
+    x                   = (unsigned long) message_address[5];
+    y                   = (unsigned long) message_address[6];
+    color            = (unsigned long) message_address[7];
+    window_id = (window_id & 0xFFFF);
+    x = (x & 0xFFFF);
+    y = (y & 0xFFFF);
+
+// Text?
+    /*
+    //size 256 bytes
+    unsigned char *text_buffer = (unsigned char *) &message_address[MSG_OFFSET_LONGSTRING];
+    int s = sizeof(text_buffer);
+    if(s<0 || s>= 256){
+        gwssrv_debug_print ("serviceSetText: serviceDrawText [DEBUG]   SIZE \n");
+        exit(1);
+    }
+    */
+
+// Limits
+// O texto começa fora dos limites da tela do dispositivo.
+    //if( x >= deviceWidth )
+        //return -1;
+    //if( y >= deviceHeight )
+        //return -1;
+
+//
+// == String support ========
+//
+
+// ==================================
+// Get string from message
+// #todo: Talvez poderiamos receber o tamanho da string.
+    unsigned char buf[256+1];
+    register int i=0;
+    int string_off=8;
+    char *p = (char *) &message_address[string_off];
+    for (i=0; i<256; i++)
+    {
+        // Get every char.
+        // The whole message buffer has 512 bytes.
+         //buf[i] = message_address[string_off];
+         buf[i] = *p;  //Get a char
+         //string_off++;
+         p++;
+    };
+    buf[i] = 0;  // finalize the buffer.
+// ==================================
+
+//
+// == Draw ===============================================
+//
+
+    //#todo
+    //switch (alignment) {  ... }
+
+// Window support.
+// Se a janela alvo tem um índice fora dos limites
+
+// wid
+    if ( window_id < 0 ){ return -1; }
+    if ( window_id >= WINDOW_COUNT_MAX ){
+        return -1;
+    }
+
+// window structure.
+    window = (struct gws_window_d *) windowList[window_id];
+    if ( (void*) window == NULL ){ 
+        return -1; 
+    }
+    if (window->magic != 1234){
+        return -1; 
+    }
+
+/*
+// If this window is overlapped window,
+// so paint into the client area.
+    if (window->type == WT_OVERLAPPED){
+        x += window->rcClient.left;
+        y += window->rcClient.top;
+    }
+*/
+
+    if (window->type == WT_EDITBOX ||
+         window->type == WT_EDITBOX_MULTIPLE_LINES   )
+    {
+        if (window->type == WT_EDITBOX)
+        {
+             window->text_size_in_bytes = 0;  // No text
+
+            //128
+            for (i=0; i<64; i++)
+            {
+                if ( (void*) window->window_text != NULL )
+                {
+                    if (window->textbuffer_size_in_bytes > 64)
+                    {
+                        window->window_text[i] = (char) buf[i];
+                        window->text_size_in_bytes++;
+                    }
+                }
+            };
+        }
+    }
+
+// Draw text
+// Good window. Let's paint into it.
+// #todo
+// Maybe a flag can tell us to do that or not.
+
+    //dtextDrawText ( 
+    //    (struct gws_window_d *) window,
+    //    x, y, (unsigned int) color, buf );
+
+// #debug
+// Flush the window into the framebuffer.
+// #todo: invalidate, not show.
+    //gws_show_window_rect(window);
+    //invalidate_window(window);
+
+    return 0;
+crazy_fail:
+    debug_print("serviceSetText: [ERROR] crazy_fail\n");
+    return -1;
+}
+
+
+int serviceGetText(void)
+{
+    unsigned long *message_address = (unsigned long *) &__buffer[0];
+    struct gws_window_d  *window;
+    int window_id = -1;      // index 4
+    unsigned long x;         // index 5
+    unsigned long y;         // index 6
+    unsigned long color;     // index 7
+// Device context
+    unsigned long deviceLeft  = 0;
+    unsigned long deviceTop = 0;
+    unsigned long deviceWidth = (__device_width  & 0xFFFF);
+    unsigned long deviceHeight = (__device_height & 0xFFFF);
+
+    // #debug
+    // gwssrv_debug_print ("gwssrv: serviceDrawText\n");
+
+// Get values.
+// #todo: Check the message code.
+// wid, x, y, color.
+    window_id = (int) message_address[4];
+    x                   = (unsigned long) message_address[5];
+    y                   = (unsigned long) message_address[6];
+    color            = (unsigned long) message_address[7];
+    window_id = (window_id & 0xFFFF);
+    x = (x & 0xFFFF);
+    y = (y & 0xFFFF);
+
+// Text?
+    /*
+    //size 256 bytes
+    unsigned char *text_buffer = (unsigned char *) &message_address[MSG_OFFSET_LONGSTRING];
+    int s = sizeof(text_buffer);
+    if(s<0 || s>= 256){
+        gwssrv_debug_print ("serviceGetText: serviceDrawText [DEBUG]   SIZE \n");
+        exit(1);
+    }
+    */
+
+// Limits
+// O texto começa fora dos limites da tela do dispositivo.
+    //if( x >= deviceWidth )
+        //return -1;
+    //if( y >= deviceHeight )
+        //return -1;
+
+//
+// == String support ========
+//
+
+/*
+// ==================================
+// Set string into the message
+// #todo: Talvez poderiamos receber o tamanho da string.
+    //unsigned char buf[256+1];
+    register int i=0;
+    int string_off=8;
+    char *p = (char *) &message_address[string_off];
+    for (i=0; i<256; i++)
+    {
+        // Get every char.
+        // The whole message buffer has 512 bytes.
+         //buf[i] = message_address[string_off];
+         //buf[i] = *p;  //Get a char
+         *p = window->
+         //string_off++;
+         
+         p++;
+    };
+    buf[i] = 0;  // finalize the buffer.
+// ==================================
+*/
+//
+// == Draw ===============================================
+//
+
+    //#todo
+    //switch (alignment) {  ... }
+
+// Window support.
+// Se a janela alvo tem um índice fora dos limites
+
+// wid
+    if ( window_id < 0 ){ return -1; }
+    if ( window_id >= WINDOW_COUNT_MAX ){
+        return -1;
+    }
+
+// window structure.
+    window = (struct gws_window_d *) windowList[window_id];
+    if ( (void*) window == NULL ){ 
+        return -1; 
+    }
+    if (window->magic != 1234){
+        return -1; 
+    }
+
+/*
+// If this window is overlapped window,
+// so paint into the client area.
+    if (window->type == WT_OVERLAPPED){
+        x += window->rcClient.left;
+        y += window->rcClient.top;
+    }
+*/
+
+    register int i=0;
+    int string_off=8;
+    char *p = (char *) &message_address[string_off];
+    int gotten=0;
+
+    if (window->type == WT_EDITBOX ||
+         window->type == WT_EDITBOX_MULTIPLE_LINES   )
+    {
+        if (window->type == WT_EDITBOX)
+        {
+             window->text_size_in_bytes = 0;  // No text
+
+            //128
+            for (i=0; i<64; i++)
+            {
+                if ( (void*) window->window_text != NULL )
+                {
+                    if (window->textbuffer_size_in_bytes > 64)
+                    {
+                        // Copy the bytes from the window buffer to the
+                        // message buffer and finalize the message buffer.
+                        *p = window->window_text[i];
+                        gotten++;
+                        //window->window_text[i] = (char) buf[i];
+                        //window->text_size_in_bytes++;
+                    }
+                }
+            };
+            if (gotten<=0){
+                printf("Fail on getting text from window buffer\n");
+            }
+            *p = 0;  // Finalize the string into the message buffer.
+        }
+    }
+
+// Draw text
+// Good window. Let's paint into it.
+// #todo
+// Maybe a flag can tell us to do that or not.
+
+    //dtextDrawText ( 
+    //    (struct gws_window_d *) window,
+    //    x, y, (unsigned int) color, buf );
+
+// #debug
+// Flush the window into the framebuffer.
+// #todo: invalidate, not show.
+    //gws_show_window_rect(window);
+    //invalidate_window(window);
+
+    return 0;
+crazy_fail:
+    debug_print("serviceGetText: [ERROR] crazy_fail\n");
+    return -1;
+}
+
+
+
+
+
 
 // O buffer é uma global nesse documento.
 int 

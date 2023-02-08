@@ -40,6 +40,13 @@
 #define GWS_GrRectangle           2042
 #define GWS_AsyncCommand          2222
 
+#define GWS_SetText  2240
+#define GWS_GetText  2241
+
+// Quit the process if it's possible.
+//#define GWS_Quit    4080
+
+
 #define GWS_DrainInput            8080
 
 //#todo
@@ -47,14 +54,16 @@
 
 //#todo
 // Called by the kernel x times per second.
-//#define GWS_Compositor     9091    
 //#define GWS_RefreshDirtyRectangles  9091
+//#define GWS_Compositor     9091    
 
 //#todo
 // Redraw all the windows. Back to front.
 //#define GWS_UpdateDesktop  9092
 
 #define GWS_GetWindowInfo   9093
+
+#define GWS_CloneAndExecute  9099
 
 // ...
 

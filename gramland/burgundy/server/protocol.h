@@ -236,6 +236,9 @@ typedef struct _gRep gRep;
 // Get a message from the client's queue.
 #define GWS_GetClientMessage    2224
 
+#define GWS_SetText  2240
+#define GWS_GetText  2241
+
 // Quit the process if it's possible.
 #define GWS_Quit    4080
 
@@ -254,7 +257,6 @@ typedef struct _gRep gRep;
 
 #define GWS_GetWindowInfo   9093
 
-//test
 #define GWS_CloneAndExecute  9099
 
 // =====================================================
