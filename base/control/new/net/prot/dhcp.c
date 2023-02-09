@@ -30,6 +30,7 @@ unsigned char dhcp_saved_server_id[4] = {
 // destination ip (broadcast)
 unsigned char __dhcp_target_ipv4[4]  = { 
     0xFF, 0xFF, 0xFF, 0xFF  
+    //192,168,1,255
 };
 
 // Target MAC.
@@ -243,9 +244,9 @@ network_dhcp_send(
     printf("Sending udp ...\n");
 
 // UDP payload is the base of the dhcp structure.
-    char *udp_payload = (char *) dhcp;
+    char *__udp_payload = (char *) dhcp;
     //size_t udp_payload_size = (size_t) ( sizeof(struct dhcp_d) - 308 + opt_size );
-    size_t udp_payload_size = (size_t) ( sizeof(struct dhcp_d) );
+    size_t __udp_payload_size = (size_t) ( sizeof(struct dhcp_d) );
 
     network_send_udp( 
         __dhcp_source_ipv4,    // scr ip
@@ -253,8 +254,8 @@ network_dhcp_send(
         __dhcp_target_mac,    // dst mac
         sport,                  // source port
         dport,                  // target port
-        udp_payload,
-        udp_payload_size ); 
+        __udp_payload,
+        __udp_payload_size ); 
 
 // done:
     return;

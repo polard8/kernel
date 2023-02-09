@@ -90,7 +90,6 @@ typedef struct __dhcp_header{
 // dhcp header
 struct dhcp_d
 {
-
     unsigned char op;
     unsigned char htype;  // Ethernet
     unsigned char hlen;  // 6

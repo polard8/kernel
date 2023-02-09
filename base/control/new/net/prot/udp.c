@@ -4,12 +4,14 @@
 #include <kernel.h>
 
 
+/*
 #define __UDP_PACKET_SIZE  ETHERNET_HEADER_LENGHT +\
 IP_HEADER_LENGHT +\
 UDP_HEADER_LENGHT + 512  
+*/
 
-char udp_packet[__UDP_PACKET_SIZE];
-char udp_payload[1024];
+//char udp_packet[__UDP_PACKET_SIZE];
+static char udp_payload[1024];
 
 // source ip
 unsigned char __udp_gramado_default_ipv4[4] = { 
@@ -30,8 +32,31 @@ unsigned char saved_mac[6] = {
 
 
 uint16_t inet_csum(const void *buf, size_t hdr_len);
+unsigned short IPv4Checksum(const unsigned char *start, unsigned len);
 //---------------------
 
+unsigned short IPv4Checksum(const unsigned char *start, unsigned len)
+{
+    unsigned int checksum = 0;
+    unsigned short *p = (unsigned short *)start;
+    while (len > 1) {
+        checksum += *p++;
+        len -= 2;
+    }
+
+    if (len != 0) {
+        checksum += *(unsigned char *)p;
+    }
+
+
+    checksum = (checksum & 0xffff) + (checksum >> 16);
+    checksum += (checksum >> 16);
+
+    unsigned short final = ~checksum;
+
+    return (unsigned short) ToNetByteOrder16(final);
+    //return htons(final);
+}
 
 // Checksum #test
 // credits: https://gist.github.com/jonhoo/7780260
@@ -87,7 +112,8 @@ network_handle_udp(
     strncpy(
         udp_payload,
         (buffer + UDP_HEADER_LENGHT),
-        512 );
+        1020 );
+    udp_payload[1021] = 0;
 
 // Don't print every message.
 // Is it a valid port?
@@ -290,7 +316,8 @@ network_send_udp (
 // - Explicit Congestion Notification (2bits)
     ipv4->ip_tos = 0x00;  // 8 bit (0=Normal)
 
-// Total Length
+
+// IPV4 Length
 // 16 bit
 // This 16-bit field defines the entire packet size in bytes, 
 // including header and data. 
@@ -298,8 +325,12 @@ network_send_udp (
 // ip header + (udp header + data).
 // #todo: Check if it is right?
 // No payload do ip temos o (udp+data)
-    uint16_t iplen = (IP_HEADER_LENGHT + UDP_HEADER_LENGHT + 512); 
-    ipv4->ip_len = (uint16_t) ToNetByteOrder16(iplen);
+// O lenght do protocolo precisa conter o seu proprio header e o seu proprio payload.
+    uint16_t xxxdata = (uint16_t) (data_lenght & 0xFFFF);
+    uint16_t __ipheaderlen = IP_HEADER_LENGHT;
+    uint16_t __ippayloadlen = (uint16_t) (UDP_HEADER_LENGHT +  xxxdata);
+    uint16_t __iplen = (uint16_t) (__ipheaderlen + __ippayloadlen); 
+    ipv4->ip_len = (uint16_t) ToNetByteOrder16(__iplen);
 
 // Identification
 // ... identifying the group of fragments of a single IP datagram. 
@@ -314,7 +345,7 @@ network_send_udp (
 // Don't fragment for now.
  ipv4->ip_off = ToNetByteOrder16(0x4000); 
 
-    ipv4->ip_ttl = 64; //0x40;  //8bit
+    ipv4->ip_ttl = 255;  //64; //0x40;  //8bit
 
 // Protocol (8bit)
 // 0x11 = UDP. (17)
@@ -368,19 +399,24 @@ network_send_udp (
 */
 
     ipv4->ip_sum = 0;
-    unsigned short s = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
-    ipv4->ip_sum = (uint16_t) ToNetByteOrder16(s);
+
+    //unsigned short s = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
+    //ipv4->ip_sum = (uint16_t) ToNetByteOrder16(s);
+    ipv4->ip_sum = (uint16_t) IPv4Checksum(ipv4, sizeof(struct ip_d) );
 
     //unsigned short s1 = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
     //unsigned short s2 = (uint16_t) inet_csum2( ipv4, sizeof(struct ip_d) );
     //printf("s1={%x} s2={%x} \n",s1,s2);
     printf("ip_sum={%x} \n",ipv4->ip_sum);
+
+    //printf ("size %d\n", sizeof (struct ip_d) );
     //refresh_screen();
     //while(1){}
 
 //==============================================
 // # udp header #
 //
+
     udp = (void *) kmalloc ( sizeof(struct udp_d) );
     if ( (void *) udp == NULL){
         printf ("network_send_udp: udp fail\n");
@@ -392,11 +428,13 @@ network_send_udp (
     udp->uh_sport = (uint16_t) ToNetByteOrder16(source_port);
     udp->uh_dport = (uint16_t) ToNetByteOrder16(target_port);
 
-// Length
+// UDP Length
 // (UPD header + payload).
 // This field specifies the length in bytes of the UDP header and UDP data. 
 // The minimum length is 8 bytes, the length of the header. 
-    uint16_t __udplen = (uint16_t) (UDP_HEADER_LENGHT + 512); 
+    uint16_t __udpheaderlen = UDP_HEADER_LENGHT;
+    uint16_t __udppayloadlen = (uint16_t) (data_lenght & 0xFFFF);
+    uint16_t __udplen = (uint16_t) (__udpheaderlen + __udppayloadlen); 
     udp->uh_ulen = (uint16_t) ToNetByteOrder16(__udplen);
 
 // Checksum
@@ -406,6 +444,11 @@ network_send_udp (
 // that contains some of the same information from the real IPv4 header.
 // # UDP lets us set the checksum to 0 to ignore it?
     udp->uh_sum = 0;  //#todo
+
+    //printf ("size %d\n", sizeof (struct  udp_d) );
+    //refresh_screen();
+    //while(1){}
+
 //----------------------------------------------------------------------
 
 
@@ -484,7 +527,7 @@ network_send_udp (
             ( ETHERNET_HEADER_LENGHT +
               IP_HEADER_LENGHT +
               UDP_HEADER_LENGHT );
-    for ( j=0; j<512; j++ ){
+    for ( j=0; j<data_lenght; j++ ){
         frame[data_offset +j] = data[j];
     };
 
@@ -500,7 +543,7 @@ network_send_udp (
                ( ETHERNET_HEADER_LENGHT +\
                  IP_HEADER_LENGHT +\
                  UDP_HEADER_LENGHT +\
-                 512 );
+                 data_lenght );
 
 
 // Send frame via NIC.

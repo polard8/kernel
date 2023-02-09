@@ -311,6 +311,17 @@ void network_send_arp_request(void)
         ARP_OPC_REQUEST );
 }
 
+void network_send_arp_request2(void)
+{
+// Send ARP request to 192.168.1.1.
+
+    network_send_arp( 
+        __arp_broadcast_mac,                // target mac
+        __arp_gramado_default_ipv4,  // src ip 
+        __arp_gateway_default_ipv4,   // dst ip (Gateway)
+        ARP_OPC_REQUEST );
+}
+
 
 void 
 network_send_arp_reply(

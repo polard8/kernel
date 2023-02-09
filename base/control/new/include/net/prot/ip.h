@@ -55,6 +55,8 @@ struct ip_d
 // the maximum is 65,535 bytes. 
     u_int16_t ip_len;
 
+//-------------------------------
+
 // Identification (16bits)
 // When the message is large and we have a lot of packets.
 // Actually they are 'fragments' of a packet.
@@ -63,6 +65,8 @@ struct ip_d
 // Flags (3bits) (Do we have fragments?)
 // Fragment offset (13bits) (fragment position)
     u_int16_t ip_off;
+
+//-------------------------------
 
 // Time to live (8bits)
 // Counter 
@@ -75,16 +79,21 @@ struct ip_d
 // Only the header.
     u_int16_t ip_sum;
 
+//-------------------------------
+
 // IP:
 // Source and dest IP address.
 // Address in network byte order.
 // See: net/in.h 
     struct in_addr  ip_src;  //(32bits)
+
+//-------------------------------
+
     struct in_addr  ip_dst;  //(32bits) 
 
 // Optional if IHL > 5.
 // 0~320 bits.
-};
+} __attribute__ ((packed));
 
 // =====================================
 

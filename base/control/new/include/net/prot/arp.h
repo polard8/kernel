@@ -58,6 +58,7 @@ network_send_arp(
     int op );
 
 void network_send_arp_request(void);
+void network_send_arp_request2(void);
 
 void 
 network_send_arp_reply(

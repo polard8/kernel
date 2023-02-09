@@ -96,7 +96,7 @@ struct ether_header
     uint8_t mac_dst[ETH_ALEN];  // destination mac
     uint8_t mac_src[ETH_ALEN];  // source mac
     uint16_t type;              // type of protocol: ARP/IP ...
-} __attribute__((packed)); 
+} __attribute__ ((packed));
 
 
 #endif    

@@ -1519,6 +1519,10 @@ int consoleCompareStrings(void)
         network_send_arp_request();
         goto exit_cmp;
     }
+    if ( strncmp(prompt,"test-arp2",9) == 0 ){
+        network_send_arp_request2();
+        goto exit_cmp;
+    }
     if ( strncmp(prompt,"test-udp",8) == 0 ){
         network_test_udp();
         goto exit_cmp;
