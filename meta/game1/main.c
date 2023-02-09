@@ -2310,10 +2310,8 @@ serviceCreateWindow (int client_fd)
     char *p = (char *) &message_address[string_off];
     for (i=0; i<256; ++i)
     {
-        //r.data[i] = message_address[string_off];
         r.data[i] = *p;
         p++;
-        //string_off++;
     };
     r.data[i] = 0;
 //--
