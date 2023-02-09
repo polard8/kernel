@@ -63,6 +63,9 @@ static int __CompareString(void);
 static void do_help(void);
 static void do_launch_de(void);
 static void do_hello(int caller);
+
+static void do_clear_console(void);
+
 // ====================
 
 
@@ -175,23 +178,21 @@ static void do_launch_de(void)
 {
     int ret_val=-1;
 
+    do_clear_console();
     printf ("Launching GUI\n");
 
-
-//-----
-// #test
 // Sending cmdline via stdin
-
     rewind(stdin);
     write( fileno(stdin), cmdline1, strlen(cmdline1) );
 
-//-----
-
+// Launch new process.
     ret_val = (int) rtl_clone_and_execute(app1_name);
     if (ret_val<=0){
         printf("Couldn't clone\n");
     }
+
     //printf("pid=%d\n",ret_val);
+
 // Quit the command line.
     isTimeToQuit = TRUE;
 }
@@ -227,11 +228,16 @@ static void do_clear_console(void)
     //ioctl(1,440, 0x0011DD11);
 // White on blue.
 // Clear the background of the fg console.
-     sc82( 8003,__COLOR_BLUE,0,0 );
+    //sc82( 8003,__COLOR_BLUE,0,0 );
 // Change the fg color of the fg console.
-     sc82( 8004,__COLOR_WHITE,0,0 );
-}
+    //sc82( 8004,__COLOR_WHITE,0,0 );
 
+//#todo
+// Use ioctl instead
+
+// Respeitando as cores do fg console.
+    ioctl(1,440,0);
+}
 
 static inline void do_int3(void)
 {
@@ -423,6 +429,7 @@ static int __CompareString(void)
 // Initialize the network server and quit the command line.
     if( strncmp(prompt,"nsq",3) == 0 ){
         printf ("~NSQ\n");
+        do_clear_console();
         rtl_clone_and_execute(app3_name);
         isTimeToQuit = TRUE;
         goto exit_cmp;
@@ -440,12 +447,14 @@ static int __CompareString(void)
 
     if ( strncmp(prompt,"game1",5) == 0 ){
         printf ("~ Game 1:\n");
+        do_clear_console();
         rtl_clone_and_execute("game1.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
     if ( strncmp(prompt,"game2",5) == 0 ){
         printf ("~ Game 2:\n");
+        do_clear_console();
         rtl_clone_and_execute("game2.bin");
         isTimeToQuit = TRUE;
         goto exit_cmp;
@@ -558,9 +567,10 @@ int main( int argc, char **argv)
 // maybe there is no window server installed.
 
     printf(":: Gramado OS ::\n");
-
-    int C=0;
     initPrompt();
+
+    register int C=0;
+
     while(1)
     {
         if( isTimeToQuit == TRUE ){

@@ -878,6 +878,8 @@ void console_scroll(int console_number)
     CONSOLE_TTYS[console_number].cursor_right  = (OldRight  & 0xFFFF);
     CONSOLE_TTYS[console_number].cursor_bottom = (OldBottom & 0xFFFF);
 
+// Reposiciona:
+// Primeira coluna, última linha.
     CONSOLE_TTYS[console_number].cursor_x = 0; 
     CONSOLE_TTYS[console_number].cursor_y = 
         (CONSOLE_TTYS[console_number].cursor_bottom -1); 
@@ -974,10 +976,11 @@ void console_outbyte (int c, int console_number)
     {
         // #todo: 
         // Melhorar esse limite.
-        if (CONSOLE_TTYS[n].cursor_y > CONSOLE_TTYS[n].cursor_bottom){
+        if (CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
                  console_scroll(n);
             }
+            // Última linha.
             CONSOLE_TTYS[n].cursor_y = ( CONSOLE_TTYS[n].cursor_bottom -1 );
             prev = Ch; 
         }else{
@@ -994,7 +997,7 @@ void console_outbyte (int c, int console_number)
     if ( Ch == '\n' && prev != '\r' ) 
     {
         // Se o line feed apareceu quando estamos na ultima linha
-        if ( CONSOLE_TTYS[n].cursor_y > CONSOLE_TTYS[n].cursor_bottom){
+        if ( CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
             if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
                 console_scroll(n);
             }
@@ -1147,6 +1150,269 @@ void console_outbyte (int c, int console_number)
     __ConsoleOutbyte(Ch,n);
     prev = Ch;
 }
+
+
+void console_outbyte2 (int c, int console_number)
+{
+// + Draw char.
+// + Refresh char.
+
+    register int Ch = c;
+    int n = (int) console_number;
+    static char prev=0;
+// char support.
+    unsigned long __cWidth  = gwsGetCurrentFontCharWidth();
+    unsigned long __cHeight = gwsGetCurrentFontCharHeight();
+
+    // #debug
+    // debug_print ("console_outbyte:\n");
+
+    // #todo: Check overflow.
+    //if (n<0)
+    //{
+    //    debug_print ("console_outbyte: n\n");
+    //    return;
+    //}
+
+    if (n < 0 || n >= CONSOLETTYS_COUNT_MAX){
+        debug_print ("console_outbyte: [FAIL] n\n");
+        x_panic     ("console_outbyte: [FAIL] n\n");
+    }
+
+    if (__cWidth == 0 || __cHeight == 0){
+        x_panic ("console_outbyte: [FAIL] char size\n");
+    }
+
+// #test
+// Tem momento da inicialização em que esse array de estruturas
+// não funciona, e perdemos a configuração feita
+
+    if (CONSOLE_TTYS[n].initialized != TRUE){
+        //x_panic ("console_outbyte: CONSOLE_TTYS");
+        debug_print ("console_outbyte: [BUGBUG] CONSOLE_TTYS not initialized\n");
+        return;
+    }
+
+// Obs:
+// Podemos setar a posição do curso usando método,
+// simulando uma variável protegida.
+
+//checkChar:
+
+    //Opção  
+    //switch ?? 
+
+    // type: 'int'.
+    if (Ch<0)
+        return;
+
+    // form feed - Nova tela.
+    if (Ch == '\f')
+    {
+        CONSOLE_TTYS[n].cursor_y = CONSOLE_TTYS[n].cursor_top;
+        CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+        return;
+    }
+
+// #obs: #m$. 
+// É normal \n retornar sem imprimir nada.
+
+// Início da próxima linha. 
+// not used!!!  "...\r\n";
+
+    if ( Ch == '\n' && prev == '\r' ) 
+    {
+        // #todo: 
+        // Melhorar esse limite.
+        
+        if (CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
+            if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
+                 console_scroll(n);
+            }
+            // Vai para última linha
+            CONSOLE_TTYS[n].cursor_y = ( CONSOLE_TTYS[n].cursor_bottom -1 );
+            prev = Ch; 
+        // Avança uma linha e volta para o começo da linha.
+        }else{
+            CONSOLE_TTYS[n].cursor_y++;
+            CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+            prev = Ch;
+        };
+        return;
+    }
+
+// Próxima linha no modo terminal.
+// "...\n"
+
+    if ( Ch == '\n' && prev != '\r' ) 
+    {
+        // Se o line feed apareceu quando estamos na ultima linha
+        if ( CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom){
+            if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
+                console_scroll(n);
+            }
+            CONSOLE_TTYS[n].cursor_y = (CONSOLE_TTYS[n].cursor_bottom -1);
+            prev = Ch;
+        }else{
+            CONSOLE_TTYS[n].cursor_y++;
+            // Retornaremos mesmo assim ao início da linha 
+            // se estivermos imprimindo no terminal.
+            if ( stdio_terminalmode_flag == 1 ){
+                CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+            } 
+
+            // Verbose mode do kernel.
+            // permite que a tela do kernel funcione igual a um 
+            // terminal, imprimindo os printfs um abaixo do outro.
+            // sempre reiniciando x.
+            if (stdio_verbosemode_flag == 1){
+                CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+            } 
+
+            // Obs: No caso estarmos imprimindo em um editor 
+            // então não devemos voltar ao início da linha.
+
+            prev = Ch;
+        };
+
+        return;
+    }
+
+// TAB
+// #todo: Criar a variável 'g_tab_size'.
+
+    if ( Ch == '\t' ) 
+    {
+        CONSOLE_TTYS[n].cursor_x += (8);
+        prev = Ch;
+        return; 
+
+        // Não adianta só avançar, tem que apagar o caminho até lá.
+
+		//int tOffset;
+		//tOffset = 8 - ( g_cursor_left % 8 );
+		//while(tOffset--){
+		//	_outbyte(' ');
+		//}
+		//set_up_cursor( g_cursor_x +tOffset, g_cursor_y );
+		//return; 
+    }
+
+// Liberando esse limite.
+// Permitindo os caracteres menores que 32.
+
+    //if( c <  ' '  && c != '\r' && c != '\n' && c != '\t' && c != '\b' )
+    //{
+    //    return;
+    //};
+
+// Apenas voltar ao início da linha.
+    if (Ch == '\r')
+    {
+        CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+        prev = Ch;
+        return; 
+    }
+
+// Space
+// #bugbug 
+// Com isso o ascii 0x20 foi pintado, 
+// mas como todos os bits do char na fonte estão desligados, 
+// então não pinta coisa alguma.
+
+    if (Ch == 0x20)
+    {
+        CONSOLE_TTYS[n].cursor_x++;
+        prev = Ch;
+        return; 
+    }
+
+// Backspace
+
+    //if ( Ch == '\b' )
+    if (Ch == 0x8)
+    {
+        CONSOLE_TTYS[n].cursor_x--; 
+        prev = Ch;
+        return;
+    }
+
+//
+// == Limits ====
+//
+
+//
+// Collision.
+//
+
+// Out of screen
+// Sem espaço horizontal.
+    if ( CONSOLE_TTYS[n].cursor_left >= CONSOLE_TTYS[n].cursor_right )
+    {
+        panic ("console_oubyte: l >= r ");
+    }
+
+// Out of screen
+// Sem espaço vertical.
+    if ( CONSOLE_TTYS[n].cursor_top >= CONSOLE_TTYS[n].cursor_bottom )
+    {
+        panic ("console_oubyte: t >= b ");
+    }
+
+
+    int Increment = FALSE;
+
+// Fim da linha.
+// Limites para o número de caracteres numa linha.
+// Voltamos ao inicio da linha e avançamos uma linha.
+// Caso contrario, apenas incrementa a coluna.
+
+    if ( CONSOLE_TTYS[n].cursor_x >= (CONSOLE_TTYS[n].cursor_right -1) ){
+        CONSOLE_TTYS[n].cursor_y++;
+        CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+    }else{
+        //CONSOLE_TTYS[n].cursor_x++;
+        Increment = TRUE;
+    };
+
+// Número máximo de linhas. (n pixels por linha.)
+// #bugbug
+// Tem um scroll logo acima que considera um valor
+// de limite diferente desse.
+
+    if ( CONSOLE_TTYS[n].cursor_y >= CONSOLE_TTYS[n].cursor_bottom)  
+    {
+        if (CONSOLE_TTYS[n].fullscreen_flag == TRUE ){
+            console_scroll(n);
+        }
+        CONSOLE_TTYS[n].cursor_x = 0;  //CONSOLE_TTYS[n].cursor_left;
+        CONSOLE_TTYS[n].cursor_y = 
+            (CONSOLE_TTYS[n].cursor_bottom -1);
+    }
+
+// Imprime os caracteres normais.
+// Nesse momento imprimiremos os caracteres.
+// Imprime os caracteres normais.
+// Atualisa o prev.
+
+//draw:
+    // Draw in x*8 | y*8.
+    // Don't change the position.
+    __ConsoleOutbyte(Ch,n);
+    prev = Ch;
+
+
+// Refresh.
+    unsigned long x=0;
+    unsigned long y=0;
+    x = (unsigned long) (CONSOLE_TTYS[n].cursor_x * __cWidth);
+    y = (unsigned long) (CONSOLE_TTYS[n].cursor_y * __cHeight);
+    refresh_rectangle ( x, y, __cWidth, __cHeight );
+
+    if(Increment)
+        CONSOLE_TTYS[n].cursor_x++;
+}
+
 
 // worker
 // __ConsoleOutbyte:
@@ -1303,9 +1569,13 @@ void console_putchar (int c, int console_number)
     //if( c != 0)
     console_outbyte ( (int) c, console_number );
 
+// #danger
+// We will no be able to refresh if the routine above
+// change the cursor position, incrementing or
+// comming back to the start of the line.
+
     x = (unsigned long) (CONSOLE_TTYS[console_number].cursor_x * cWidth);
     y = (unsigned long) (CONSOLE_TTYS[console_number].cursor_y * cHeight);
-
     refresh_rectangle ( x, y, cWidth, cHeight );
 
 // flag off
@@ -1919,9 +2189,9 @@ int consoleCompareStrings(void)
 
 // Invalid command
 
-    printf("\n");
+    //printf("\n");
     printf ("Error: Command not found!\n");
-    printf("\n");
+    //printf("\n");
 
 exit_cmp:
    //nothing
@@ -2047,6 +2317,8 @@ console_write (
     size_t count )
 {
 // Write n bytes of a string into a given console.
+// Called by sys_write.
+// Called by sys_write on fflush().
 
 // loop
     register int i=0;
@@ -2110,7 +2382,10 @@ console_write (
                // ascii, not abnt2
                if (ch >= 32 && ch <= 127){
                     
-                    console_putchar ( ch, console_number );
+                    // Draw and refresh.
+                    //console_putchar ( ch, console_number );
+                    // Draw and refresh.
+                    console_outbyte2 ( ch, console_number );
                
                // >>>> [ Escape ]
                // Entramos em uma escape sequence,
@@ -2858,7 +3133,7 @@ console_ioctl (
 // IN: bg color, fg color, console number.
     case 440:
         clear_console( 
-            (unsigned int) arg,
+            (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
             (unsigned int) CONSOLE_TTYS[fg_console].fg_color, 
             fg_console );
         return 0;

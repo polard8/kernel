@@ -797,10 +797,14 @@ void kinguio_puts(const char* str)
         _char = (int) ( str[i] & 0xFF );
 
         // Draw, but not refresh.
-        console_outbyte (_char, fg_console);
-        //putchar (str[i]);
+         //console_outbyte (_char, fg_console);
+
+        // Draw, and refresh.
+        // Refreshing a single char. :)
+        console_outbyte2 (_char, fg_console);
     };
 }
+
 
 // printf
 // Credits: Nelson Cole. Project Sirius/Kinguio.

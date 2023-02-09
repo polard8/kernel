@@ -113,6 +113,8 @@ void console_scroll (int console_number);
 //
 
 void console_outbyte (int c, int console_number);
+void console_outbyte2 (int c, int console_number);
+
 void console_putchar ( int c, int console_number );
 void console_print_indent(int indent, int console_number);
 int consoleInputChar( int c );
