@@ -964,9 +964,9 @@ static void *__extra_services (
         return NULL;
     }
 
-// ioctl ()
+// ioctl() handler.
+// See: fs.c
 // IN: fd, request, arg
-// See: sys.c
     if ( number == 8000 ){
         return (void *) sys_ioctl ( 
                             (int) arg2, 
@@ -2130,8 +2130,12 @@ void *sci2 (
         return (void*) sys_get_system_metrics(arg2);
     }
 
+// ioctl() handler.
+// See: fs.c
+// IN: fd, request, arg
     if (number == 4){
         debug_print("sci2: [4] ioctl\n");
+        // #todo
         //return (void*) sys_ioctl ( (int) arg2, (unsigned long) arg3, (unsigned long) arg4 );
         return NULL;
     }
@@ -2196,19 +2200,23 @@ void *sci2 (
                             (unsigned long) arg3 );
     }
 
-    // ioctl()
-    // See: ke/sys.c
-    // #bugbug: fd versus console number,
-    if ( number == 8000 ){
+
+// ioctl() handler.
+// See: fs.c
+// IN: fd, request, arg
+    if (number == 8000)
+    {
         debug_print("sci2: [8000] ioctl\n");
+        //printf("sci2: [8000] ioctl\n");
         return (void *) sys_ioctl ( 
                             (int) arg2, 
                             (unsigned long) arg3, 
                             (unsigned long) arg4 );
     }
 
-    // fcntl()
-    // See: ke/sys.c
+
+// fcntl()
+// See: ke/sys.c
     if ( number == 8001 ){
         debug_print("sci2: [8001] fcntl\n");
         return (void *) sys_fcntl (

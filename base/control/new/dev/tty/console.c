@@ -3,6 +3,18 @@
 
 #include <kernel.h>
 
+// Fullscreen kernel console.
+// Handmade by the kernel at the initialization.
+// see: tty.h
+struct tty_d  CONSOLE_TTYS[CONSOLETTYS_COUNT_MAX];
+
+// Main consoles.
+struct tty_d  *console0_tty;
+struct tty_d  *console1_tty;
+struct tty_d  *console2_tty;
+struct tty_d  *console3_tty;
+
+
 // 
 // Imports
 //
@@ -20,6 +32,9 @@ extern unsigned long wmWindowMananer_SendMessage(void);
 //extern unsigned long gSavedY;
 
 #define __RESPONSE  "\033[?1;2c"
+
+// Se o console esta atuando como um shell comparando palavras.
+int ShellFlag=FALSE;
 
 // global
 // Foreground console.
@@ -144,19 +159,25 @@ __local_gotoxy (
     if (console_number<0 || console_number > 3){
         return;
     }
+
 // Maior que o largura da linha.
     if (new_x > CONSOLE_TTYS[console_number].cursor_right)
     {
+        //new_x = CONSOLE_TTYS[console_number].cursor_right;
         return;
     }
+
 // Maior que a altura da coluna.
     if (new_y > CONSOLE_TTYS[console_number].cursor_bottom)
     {
+        //new_y = CONSOLE_TTYS[console_number].cursor_bottom;
         return;
     }
+
 // Set x.
     CONSOLE_TTYS[console_number].cursor_x = 
         (unsigned long) (new_x & 0xFFFFFFFF);
+
 // Set y.
     CONSOLE_TTYS[console_number].cursor_y = 
         (unsigned long) (new_y & 0xFFFFFFFF);
@@ -435,6 +456,21 @@ console_init_virtual_console(
 
     debug_print ("console_init_virtual_console:\n");
 
+/*
+// Char width and height
+    int cWidth  = get_char_width();
+    int cHeight = get_char_height();
+    if ( cWidth == 0 || cHeight == 0 ){
+        x_panic ("console_init_virtual_console: cWidth cHeight");
+    }
+*/
+
+// #todo #bugbug
+// determinado: 8 = char size.
+// #todo: Use cWidth and cHeight.
+    unsigned long screen_width_in_chars = (unsigned long) (gSavedX/8);
+    unsigned long screen_height_in_chars = (unsigned long) (gSavedY/8);
+
 // Limits
     ConsoleIndex = (int) n;
     if (ConsoleIndex < 0 || ConsoleIndex >= CONSOLETTYS_COUNT_MAX){
@@ -538,16 +574,11 @@ console_init_virtual_console(
 
 // Cursor limits
 
-// #todo #bugbug
-// determinado: 8 = char size.
-    unsigned long screen_width_in_chars  = (unsigned long) (gSavedX/8);
-    unsigned long screen_height_in_chars = (unsigned long) (gSavedY/8);
-
 // Full screen
     CONSOLE_TTYS[ConsoleIndex].fullscreen_flag = TRUE;
     CONSOLE_TTYS[ConsoleIndex].cursor_left = 0;
     CONSOLE_TTYS[ConsoleIndex].cursor_top  = 0;
-    CONSOLE_TTYS[ConsoleIndex].cursor_right  = screen_width_in_chars;
+    CONSOLE_TTYS[ConsoleIndex].cursor_right = screen_width_in_chars;
     CONSOLE_TTYS[ConsoleIndex].cursor_bottom = screen_height_in_chars;
 
 // Everyone has the same color.
@@ -627,8 +658,24 @@ console_init_virtual_console(
 // #bugbug
 // A estrutura tem mais elementos que podem ser inicializados.
 // Tivemos problemas ao tentar inicializa-los.
+// ...
 
-    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE;    
+    switch (ConsoleIndex){
+    case 0:
+        console0_tty = (struct tty_d *) &CONSOLE_TTYS[0];
+        break;
+    case 1:
+        console1_tty = (struct tty_d *) &CONSOLE_TTYS[1];
+        break;
+    case 2:
+        console2_tty = (struct tty_d *) &CONSOLE_TTYS[2];
+        break;
+    case 3:
+        console3_tty = (struct tty_d *) &CONSOLE_TTYS[3];
+        break;
+    };
+
+    CONSOLE_TTYS[ConsoleIndex].initialized = TRUE; 
 }
 
 void console_set_current_virtual_console(int n)
@@ -723,28 +770,40 @@ void set_up_cursor2 ( int console_number, unsigned long x, unsigned long y )
 }
 */
 
-/*
- * get_cursor_x:
- *     Pega o valor de x.
- *     @todo: Isso pode ir para outro lugar.
- */
 unsigned long get_cursor_x(void)
 {
-    //if (fg_console<0){ panic("get_cursor_x"); }
-    //if (fg_console>=CONSOLETTYS_COUNT_MAX){ panic("get_cursor_x"); }
+// In the case of called before console initialization.
+    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
+        return 0;
+    }
     return (unsigned long) CONSOLE_TTYS[fg_console].cursor_x;
 }
 
-/*
- * get_cursor_y:
- *     Pega o valor de y.
- *     @todo: Isso pode ir para outro lugar.
- */
 unsigned long get_cursor_y(void)
 {
-    //if (fg_console<0){ panic("get_cursor_x"); }
-    //if (fg_console>=CONSOLETTYS_COUNT_MAX){ panic("get_cursor_x"); }
+// In the case of called before console initialization.
+    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
+        return 0;
+    }
     return (unsigned long) CONSOLE_TTYS[fg_console].cursor_y; 
+}
+
+unsigned long get_bg_color(void)
+{
+// In the case of called before console initialization.
+    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
+        return 0;
+    }
+    return (unsigned long) CONSOLE_TTYS[fg_console].bg_color;
+}
+
+unsigned long get_fg_color(void)
+{
+// In the case of called before console initialization.
+    if (fg_console<0 || fg_console>=CONSOLETTYS_COUNT_MAX){
+        return 0;
+    }
+    return (unsigned long) CONSOLE_TTYS[fg_console].fg_color;
 }
 
 void console_scroll(int console_number)
@@ -1033,17 +1092,23 @@ void console_outbyte (int c, int console_number)
 // Collision.
 //
 
+// Out of screen
 // Sem espaço horizontal.
     if ( CONSOLE_TTYS[n].cursor_left >= CONSOLE_TTYS[n].cursor_right )
     {
         panic ("console_oubyte: l >= r ");
     }
 
+// Out of screen
 // Sem espaço vertical.
     if ( CONSOLE_TTYS[n].cursor_top >= CONSOLE_TTYS[n].cursor_bottom )
     {
         panic ("console_oubyte: t >= b ");
     }
+
+
+    //__ConsoleOutbyte(Ch,n);
+    //prev = Ch;
 
 // Fim da linha.
 // Limites para o número de caracteres numa linha.
@@ -1051,10 +1116,10 @@ void console_outbyte (int c, int console_number)
 // Caso contrario, apenas incrementa a coluna.
 
     if ( CONSOLE_TTYS[n].cursor_x >= (CONSOLE_TTYS[n].cursor_right -1) ){
-        CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
         CONSOLE_TTYS[n].cursor_y++;
-    }else{ 
-        CONSOLE_TTYS[n].cursor_x++;  
+        CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_left;
+    }else{
+        CONSOLE_TTYS[n].cursor_x++;
     };
 
 // Número máximo de linhas. (n pixels por linha.)
@@ -1077,7 +1142,8 @@ void console_outbyte (int c, int console_number)
 // Imprime os caracteres normais.
 // Atualisa o prev.
 
-draw:
+//draw:
+    // Draw in x*8 | y*8.
     __ConsoleOutbyte(Ch,n);
     prev = Ch;
 }
@@ -1476,7 +1542,6 @@ int consoleCompareStrings(void)
         //__respond(fg_console);
         goto exit_cmp;
     }
-
 
 // mod0: Call the entrypoint of the module.
 // mod0.bin entry point.
@@ -2587,6 +2652,10 @@ void csi_at (int nr, int console_number)
 // We have 4 preallocated tty structures for virtual consoles.
 int VirtualConsole_initialize(void)
 {
+// Early initialization of the consoles.
+// It's gonna be reinitializad by __initialize_virtual_consoles()
+// in kstdio.c
+
     register int i=0;
 
 // No embedded shell for now.
@@ -2682,46 +2751,198 @@ console_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
+
     debug_print ("console_ioctl: TODO\n");
+    //printf ("console_ioctl: TODO\n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
+// Standard stream.
+// Only the fd 1 is a console.
+// This is the fg_console, always.
+    if ( fd != 1 )
+    {
+        //#debug
+        panic ("console_ioctl: fd != 1\n");
+    }
+
+    //#debug
+    //printf ("console_ioctl:  fd=1\n");
+
+//----------------------------------------------------------------------
+// Setup the foreground console.
+// We operate only on the fg_console!
+
     if (fg_console<0 || fg_console > 3){
-        debug_print ("console_ioctl: fg_console\n");
-        return -1;
+        panic ("console_ioctl: fg_console\n");
     }
 
     switch (request){
 
+// #todo:
+// There is no fflush here in ring0.
+// The ring3 libc is doing this job using write.
+// ??
+// The ring3 flush implementation flushes the content 
+// that is in a ring 3 buffer.
+// The flush in ring 0 maybe can flush the backbuffer
+// into the lfb.
+// 1
+// Flush accumulated input data.
+// Flushes data received, but not read.
+    case TCIFLUSH:
+        debug_print ("console_ioctl: TCIFLUSH\n");
+        printf ("console_ioctl: TCIFLUSH\n");
+        refresh_screen();  //#test
+        break;
+
+// 2
+// Flush accumulated output data.
+// Flushes data written but not transmitted.
+    case TCOFLUSH:
+        printf ("console_ioctl: TCOFLUSH\n");
+        refresh_screen();  //#test
+        break;
+
+// 3
+// Flush accumulated input and output data.
+// Flushes both data received but not read, and 
+// data written but not transmitted.
+    case TCIOFLUSH:
+        printf ("console_ioctl: TCIOFLUSH\n");
+        refresh_screen();  //#test
+        break;
+
+// #todo: 
+// Yes, we can return data from the console tty termios. 
+    // case TCGETS:
+    // ...
+
+    // ...
+
+//
+// fg color
+//
+
     // set fg color.
     case 400:
-        CONSOLE_TTYS[fg_console].fg_color = (unsigned int) arg;
+        //#deprecated
         return 0;
         break;
     // get fg color.
     case 401:
-        return (int) CONSOLE_TTYS[fg_console].fg_color;
+        return (int) get_fg_color();
         break;
+
+//
+// bg color
+//
+
     // set bg color.
     case 402:
-        CONSOLE_TTYS[fg_console].bg_color = (unsigned int) arg;
+        //#deprecated
         return 0;
         break;
     // get bg color.
     case 403:
-        return (int) CONSOLE_TTYS[fg_console].bg_color;
+        return (int) get_bg_color();
         break;
-    
-    // clear console.
+
+// Clear console.
+// IN: bg color, fg color, console number.
     case 440:
-        // IN: bg color, fg color, console number.
         clear_console( 
             (unsigned int) arg,
             (unsigned int) CONSOLE_TTYS[fg_console].fg_color, 
-            fg_console 
-            );
+            fg_console );
+        return 0;
+        break;
+
+// Is it initialized or not?
+    case 500:
+        return (int) CONSOLE_TTYS[fg_console].initialized;
+        break;
+
+// Is it stopped?
+    case 501:
+        return (int) CONSOLE_TTYS[fg_console].stopped;
+        break;
+
+// What process group it belongs to?
+    case 502:
+        return (int) CONSOLE_TTYS[fg_console].gid;
+        break;
+
+// ??
+// Qual eh o modo de operacao do console virtual.
+// graphics, text ...
+    case 503:
+        return (int) CONSOLE_TTYS[fg_console].vc_mode;
+        break;
+
+// tty type
+    case 504:
+        return (int) CONSOLE_TTYS[fg_console].type;
+        break;
+
+// tty subtype
+    case 505:
+        return (int) CONSOLE_TTYS[fg_console].subtype;
+        break;
+
+// ??
+// Qual terminal virtual esta usando essa tty.
+    case 506:
+        return (int) CONSOLE_TTYS[fg_console].virtual_terminal_pid;
+        break;
+
+// fullscreen or not?
+    case 507:
+        return (int) CONSOLE_TTYS[fg_console].fullscreen_flag;
+        break;
+
+// charset id
+    case 508:
+        return (int) CONSOLE_TTYS[fg_console].charset_id;
+        break;
+
+// charset lang id
+    case 509:
+        return (int) CONSOLE_TTYS[fg_console].charset_lang_id;
+        break;
+
+//
+// Margins in bytes
+//
+
+    case 510:
+        return (int) CONSOLE_TTYS[fg_console].cursor_left;
+        break;
+    case 511:
+        return (int) CONSOLE_TTYS[fg_console].cursor_top;
+        break;
+    case 512:
+        return (int) CONSOLE_TTYS[fg_console].cursor_right;
+        break;
+    case 513:
+        return (int) CONSOLE_TTYS[fg_console].cursor_bottom;
+        break;
+
+// In pixels
+
+    case 514:
+        return (int) CONSOLE_TTYS[fg_console].cursor_width_in_pixels;
+        break;
+    case 515:
+        return (int) CONSOLE_TTYS[fg_console].cursor_height_in_pixels;
+        break;
+
+// ...
+
+    case 999:
+        console_scroll(fg_console);
         return 0;
         break;
 
@@ -2730,17 +2951,21 @@ console_ioctl (
         return 0;
         break;
 
-    // cursor x position
-    // #bugbug #todo  limits
+    // Cursor: x position
     case 1001:
-        CONSOLE_TTYS[fg_console].cursor_x = 0;
+        __local_gotoxy(
+            arg,
+            CONSOLE_TTYS[fg_console].cursor_y, 
+            fg_console );
         return 0;
         break;
 
-    // cursor y position
-    // #bugbug #todo  limits
+    // Cursor: y position
     case 1002:
-        CONSOLE_TTYS[fg_console].cursor_y = 0;
+        __local_gotoxy(
+            CONSOLE_TTYS[fg_console].cursor_x,
+            arg, 
+            fg_console );
         return 0;
         break;
 
@@ -2756,17 +2981,44 @@ console_ioctl (
         return (int) (-EINVAL);
         break;
 
-    // #todo:
-    // There is no fflush here in ring0.
-    // The ring3 libc is doing this job using write.
-    case TCIFLUSH:
-        debug_print ("console_ioctl: [TEST] flush\n");
+// ...
+
+// Goto first line at given col.
+    case 1008:
+        // IN: x, y, console number
+        __local_gotoxy(
+            arg,
+            0, 
+            fg_console );
         break;
-        
-    // #todo: Yes, we can return data from the console tty termios. 
-    // case TCGETS:
+
+// Goto last line at given col.
+    case 1009:
+        // IN: x, y, console number
+        __local_gotoxy(
+            arg,
+            (CONSOLE_TTYS[fg_console].cursor_bottom -1), 
+            fg_console );
+        break;
+
+    case 1010:
+        // max limit
+        if (arg < 70){
+            console_print_indent(arg,fg_console);
+        }
+        break;
+
+// Get cursor x
+    case 1011:
+        return (int) get_cursor_x();
+        break;
+// Get cursor y
+    case 1012:
+        return (int) get_cursor_y();
+        break;
+
     // ...
-    
+
     default:
         debug_print ("console_ioctl: [TODO] request\n");
         return (int) (-EINVAL);

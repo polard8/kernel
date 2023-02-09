@@ -996,25 +996,17 @@ static int I_x64CreateTID0(void)
 void init_globals(void)
 {
     int Status=FALSE;
-    //int i=0;
-
-//#ifdef EXECVE_VERBOSE
-    //debug_print("init_globals:\n");
-    //printf     ("init_globals:\n");
-//#endif
 
 // Inicializa as estruturas do fluxo padrão.
 // Isso vai usar a file table.
-
     Status = (int) kstdio_initialize();
-    if(Status != TRUE){
+    if (Status != TRUE){
         panic("init_globals: kstdio_initialize fail\n");
     }
 
 // Screen
 // Now we can print strings in the screen.
 // Reinitializing ... we already printed the banner.
-
     screenInit();
 
     //debug_print("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
@@ -1059,60 +1051,44 @@ void init_globals(void)
 // Security layers.
 // user session, room(window station), desktop.
     current_usersession = (int) 0;
-    current_room        = (int) 0;
-    current_desktop     = (int) 0;
+    current_room = (int) 0;
+    current_desktop = (int) 0;
+
 // Process, Thread.
 // See: kernel.h   
     foreground_process = (pid_t) 0;
-    foreground_thread  = (int) 0;
-    //current_process    = (pid_t) 0;
-    set_current_process(0);
-    current_thread     = (int) 0;
+    foreground_thread = (tid_t) 0;
+    //current_process = (pid_t) 0;
+    set_current_process(0);  //?
+    current_thread = (int) 0;
 
 // The kernel request
 // See: request.c
     clear_request();
 
 //
-// == kgws ===========================================
+// KGWS
 //
 
-    // =========================================
-    //if ( g_useGUI != TRUE ){
-    //    panic("init_globals: No GUI\n");
-    //}
-
-// ===============================================
 // Window support
-    current_window    = (int) 0;  // Current Window.
-    windows_count     = (int) 0;  // Window count.
-    window_with_focus = (int) 0;  // Window with focus.
-    current_menu      = (int) 0;  // Current Menu.
-    // Continua ...
+    windows_count = (int) 0;  // Window count.
+    current_window = (int) 0;
+    window_with_focus = (int) 0;  //#deprecated
+    current_menu = (int) 0;
+    // ...
 
-    // #todo
-
-    // windows
-    //init_windows();
-        
-    // #todo: Delete?
-    //init_menus();
-
-    // Continua...
-
-    // ??
-    // Messages.
+// Messages
     g_new_message = 0;
 
 //
-// == fs ==============================
+// FS
 //
 
-// ==============================
 // fs support
 // FS type.
 // type 1, fat16.
 // #todo
+
     g_currentvolume_filesystem_type = FS_TYPE_FAT16;
     g_currentvolume_fatbits = (int) 16;
 }

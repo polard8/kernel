@@ -72,31 +72,27 @@ io_ioctl (
     unsigned long request, 
     unsigned long arg )
 {
-
     file *f;
     int ObjectType = -1;
 
     debug_print ("io_ioctl: [TODO]\n");
+    //printf ("io_ioctl: [TODO]\n");
 
-    if ( fd < 0 || fd >= OPEN_MAX )
-    {
+    if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
 // Get file pointer.
 
     f = (file *) get_file_from_fd(fd);
-
-    if ( (void *) f == NULL )
-    {
+    if ( (void *) f == NULL ){
         debug_print("io_ioctl: [FAIL] f\n");
         return -1;
     }
-
-// #todo
-// Check validation
-
-    if( f->magic != 1234 ){
+    if (f->used != TRUE){
+        return -1;
+    }
+    if ( f->magic != 1234 ){
         return -1;
     }
 
@@ -105,6 +101,11 @@ io_ioctl (
 // What type of file we will support here?
 
     ObjectType = (int) f->____object;
+
+    if (ObjectType < 0){
+        debug_print("io_ioctl: ObjectType\n");
+        return -1;
+    }
 
     switch (ObjectType){
 

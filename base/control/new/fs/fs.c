@@ -1695,16 +1695,31 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
 // Called by sc82 in sci.c
 // Enquanto sys_ioctl eh chamada pelos applicativos,
 // io_ioctl eh chamada pelas rotinas dentro do kernel.
-// See: drivers/io.c
+// See: io.c
 int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 {
+// ioctl() implementation.
+
+    int status=-1;
+
     debug_print ("sys_ioctl: [FIXME] \n");
+    //printf("sys_ioctl: [FIXME] \n");
 
     if ( fd < 0 || fd >= OPEN_MAX ){
         return (int) (-EBADF);
     }
 
-    return (int) io_ioctl(fd,request,arg);
+    status = (int) io_ioctl(fd,request,arg);
+    if (status<0)
+    {
+        //?
+    }
+
+    // #debug
+    // We need to see the error messages.
+    refresh_screen();
+
+    return (int) status;
 }
 
 

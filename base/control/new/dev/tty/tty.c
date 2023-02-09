@@ -5,10 +5,6 @@
 
 static int new_tty_index=0;
 
-// see: tty.h
-struct tty_d  CONSOLE_TTYS[8];
-
-
 /*
  * __tty_read:
  *     Read n bytes from a tty. raw buffer.

@@ -144,7 +144,7 @@ struct tty_d
     object_type_t  objectType;
     object_class_t objectClass;
 // File pointer:
-// The pipe fd, the socket fd, the read write operation.
+// To setup the device.
     file *fp;
 // In the TTYs table?
     int used;
@@ -281,7 +281,7 @@ struct tty_d
 // Cursor position in bytes.
     unsigned long cursor_x;
     unsigned long cursor_y;
-// Margins.
+// Margins in bytes.
 // The cursor respect these limits.
     unsigned long cursor_left;    // Left margin. In chars.
     unsigned long cursor_top;     // Top margin. In lines.
@@ -340,26 +340,20 @@ struct tty_d
 // master/slave.
 
 // Navigation
-    //struct tty_d *next;
+    struct tty_d  *next;
 };
-
 
 //
 // == consoles ==================
 //
 
 // Index
-extern int fg_console;
+//extern int fg_console;
 
-// Consoles virtuais
-// Consoles virtuais em full screen.
-// Criados a unha pelo kernel.
 
-#define CONSOLETTYS_COUNT_MAX    4
-//#define CONSOLETTYS_COUNT_MAX    8
-
-// see: tty.c
-extern struct tty_d  CONSOLE_TTYS[8];
+// Fullscreen kernel console.
+// Handmade by the kernel at the initialization.
+//#define CONSOLETTYS_COUNT_MAX    4
 
 
 // == prototypes ===============================================

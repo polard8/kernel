@@ -110,6 +110,8 @@ static void clear_terminal_client_window(int fd);
 static void __send_to_child (void);
 static void __test_winfo(int fd, int wid);
 
+static void __test_ioctl(void);
+
 static void __test_message(void);
 
 static void __winmax(int fd);
@@ -326,6 +328,79 @@ void __test_gws(int fd)
          //fd, Window, FALSE );
     //text
     //gws_draw_text(fd,Window,0,0,COLOR_RED,"This is a string");
+}
+
+
+static void __test_ioctl(void)
+{
+// Testing the 'foreground console' configuration.
+// It's working.
+
+    //printf ("~ioctl: Tests...\n");
+
+// Setup cursor position.
+    //ioctl(1, 1001, 10);  // Cursor x
+    //ioctl(1, 1002, 10);  // Cursor y
+    //ioctl(1, 1003,  2);  //switch to the virtual console 2. 
+
+// Setup cursor position.
+    //ioctl( STDOUT_FILENO, 1001, 0 );  // Cursor x 
+    //ioctl( STDOUT_FILENO, 1002, 0 );  // Cursor y
+    //printf("| Test: Cursor position at 0:0\n");
+
+/*
+// Indentation
+    ioctl(1, 1010, 8);
+    printf ("| Starting at column 8\n");
+*/
+//-----------
+
+    int maxcol = ioctl( STDOUT_FILENO, 512, 0 );  //Get max col
+
+//-----------
+
+// Goto first line, position 0.
+    ioctl( STDOUT_FILENO, 1008, 0 );
+    printf("A"); fflush(stdout);
+
+// Goto first line. position 70
+    ioctl( STDOUT_FILENO, 1008, maxcol -2); //Set
+    printf("a"); fflush(stdout);
+
+//-----------
+
+// Goto last line, position 0.
+    ioctl( STDOUT_FILENO, 1009, 0 );
+    printf("Z"); fflush(stdout);
+
+// Goto last line. position 70
+    ioctl( STDOUT_FILENO, 1009, maxcol-2 );
+    printf("z"); fflush(stdout);
+
+// Scroll forever.
+    //while(1){
+    //    printf("%d\n",rtl_jiffies());
+    //   ioctl(1,999,0);  //scroll
+    //};
+
+// Flush?
+// It's not about flushing the ring3 buffer into the file.
+    //ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // input
+    //ioctl ( STDOUT_FILENO, TCIFLUSH, 0 ); // console
+    //ioctl ( STDERR_FILENO, TCIFLUSH, 0 ); // regular file
+    //ioctl ( 4,             TCIFLUSH, 0 ); // invalid?
+
+// Invalid limits
+    //ioctl ( -1, -1, 0 );
+    //ioctl ( 33, -1, 0 );
+
+// Changing the color.
+// #deprecated.
+// The application will not change the colors anymore.
+    //ioctl(1, 1000,COLOR_CYAN);
+
+    //printf ("done\n");
+
 }
 
 // Comand 'w-main'.
@@ -790,29 +865,8 @@ static void compareStrings(int fd)
     }
 
 // Testing ioctl
-    if( strncmp(prompt,"ioctl",5) == 0 )
-    {
-        printf ("~ioctl: Tests...\n");
-
-        // flush
-        //ioctl ( STDIN_FILENO,  TCIFLUSH, 0 ); // input
-        //ioctl ( STDOUT_FILENO, TCIFLUSH, 0 ); // console
-        //ioctl ( STDERR_FILENO, TCIFLUSH, 0 ); // regular file
-        //ioctl ( 4,             TCIFLUSH, 0 ); // invalid?
-
-        // invalid limits
-        //ioctl ( -1, -1, 0 );
-        //ioctl ( 33, -1, 0 );
-
-        // 1 = Virtual Console.
-        // Changing the color.
-        // ok: it is working
-        //ioctl(1, 1000,COLOR_CYAN);
-        //ioctl(1, 1001, 10);  //change x
-        //ioctl(1, 1002, 10);  //change y
-        //ioctl(1, 1003,  2);  //switch to the virtual console 2. 
-        
-        printf ("done\n");
+    if( strncmp(prompt,"ioctl",5) == 0 ){
+        __test_ioctl();
         goto exit_cmp;
     }
 

@@ -1784,39 +1784,25 @@ static void __initialize_inode_table(void)
     };
 }
 
-
-// #??
-// Maybe we are doing this for the second time.
-// Configurando o cursor para todos os consoles.
-// Estamos fazendo isso pela segunda vez.
-// A primeira foi quando criamos os consoles.
-// See:
-// tty.h
-// console.h
-// #bugbug
-// Isso ja foi feito antes em VirtualConsole_initialize?
-// See console.c
-// Vamos refazer de forma personalizada.
-
 static void __initialize_virtual_consoles(void)
 {
+// Reinitializing the consoles for the second time.
+// The first time was VirtualConsole_initialize() in console.c
+// See: tty.h, console.h, console.c
+
     register int i=0;
-    int cWidth=0;
-    int cHeight=0;
 
-// Screen width and height
-    if ( gSavedX == 0 || gSavedY == 0 )
-    {
-        x_panic("__initialize_virtual_consoles: gSavedX gSavedY");
-    }
+// stdout:
+// At this moment we need a valid stdout structure.
 
-// Char width and height
-    cWidth  = get_char_width();
-    cHeight = get_char_height();
-    
-    if ( cWidth == 0 || cHeight == 0 ){
-        x_panic ("__initialize_virtual_consoles: cWidth cHeight");
-    }
+    if ( (void*) stdout == NULL )
+        x_panic("__initialize_virtual_consoles: No stdout");
+    if (stdout->magic != 1234)
+        x_panic("__initialize_virtual_consoles: Invalid stdout");
+
+//
+// Colors
+//
 
     unsigned int bg_colors[CONSOLETTYS_COUNT_MAX];
     unsigned int fg_colors[CONSOLETTYS_COUNT_MAX];
@@ -1824,7 +1810,7 @@ static void __initialize_virtual_consoles(void)
 // Default kernel console.
     bg_colors[0] = (unsigned int) COLOR_BLUE;
     fg_colors[0] = (unsigned int) COLOR_WHITE;
-// 
+// Auxiliary kernel console.
     bg_colors[1] = (unsigned int) COLOR_BLUE;
     fg_colors[1] = (unsigned int) COLOR_YELLOW;
 // Warning console.
@@ -1838,33 +1824,67 @@ static void __initialize_virtual_consoles(void)
     for (i=0; i<CONSOLETTYS_COUNT_MAX; i++)
     {
         // Make the standard initialization.
-        if( CONSOLE_TTYS[i].initialized == FALSE)
+        if ( CONSOLE_TTYS[i].initialized == FALSE)
         {
             // IN: console index, bg color, fg color
             console_init_virtual_console(
                 i,
                 bg_colors[i],
                 fg_colors[i] );
-        }
 
-        // Set some personalized values.
-        
-        // Cursor.
-        CONSOLE_TTYS[i].cursor_x = 0;
-        CONSOLE_TTYS[i].cursor_y = 0;
-        // dc: Full screen
-        CONSOLE_TTYS[i].fullscreen_flag = TRUE;
-        CONSOLE_TTYS[i].cursor_left   = 0;
-        CONSOLE_TTYS[i].cursor_top    = 0;
-        CONSOLE_TTYS[i].cursor_right  = (gSavedX/cWidth);
-        CONSOLE_TTYS[i].cursor_bottom = (gSavedY/cHeight);
-        //Let's use the standard colors.
-        //CONSOLE_TTYS[i].bg_color = COLOR_BLACK;
-        //CONSOLE_TTYS[i].fg_color = COLOR_WHITE;
+            if (i==0)
+            {
+                if ( (void*) console0_tty != NULL )
+                {
+                    if (console0_tty->magic != 1234){
+                        x_panic("__initialize_virtual_consoles: No console0_tty");
+                    }
+                    console0_tty->fp = (file *) stdout;
+                    console0_tty->next = NULL;
+                }
+            }
+
+            if (i==1)
+            {
+                if ( (void*) console1_tty != NULL )
+                {
+                    if (console1_tty->magic != 1234){
+                        x_panic("__initialize_virtual_consoles: No console1_tty");
+                    }
+                    console1_tty->fp = (file *) stdout;
+                    console1_tty->next = NULL;
+                }
+            }
+
+            if (i==2)
+            {
+                if ( (void*) console2_tty != NULL )
+                {
+                    if (console2_tty->magic != 1234){
+                        x_panic("__initialize_virtual_consoles: No console2_tty");
+                    }
+                    console2_tty->fp = (file *) stdout;
+                    console2_tty->next = NULL;
+                }
+            }
+
+            if (i==3)
+            {
+                if ( (void*) console3_tty != NULL )
+                {
+                    if (console3_tty->magic != 1234){
+                        x_panic("__initialize_virtual_consoles: No console3_tty");
+                    }
+                    console3_tty->fp = (file *) stdout;
+                    console0_tty->next = NULL;
+                }
+            }
+
+        }
     };
 
 // The foreground console.
-    jobcontrol_switch_console(0);
+    jobcontrol_switch_console(DEFAULT_CONSOLE);
 
 // #test
     //set_up_cursor(0,1);
@@ -1935,19 +1955,13 @@ int kstdio_initialize (void)
     __initialize_stdout();
     __initialize_stderr();
 
-// Virtual console (again)
-// We already initialize the structure at the beginning
-// of the kernel initialization.
-// See: VirtualConsole_initialize() in user/console.c
+// Virtual consoles. (Second time).
     __initialize_virtual_consoles();
 
-// Background
-// #bugbug
-// Estamos fazendo isso pela segunda vez.
-// A primeira foi em kmain.
+// Background (Second time).
     Background_initialize(COLOR_KERNEL_BACKGROUND);
 
-// done
+// Done
     kstdio_standard_streams_initialized = TRUE;
     return TRUE;
 fail:
