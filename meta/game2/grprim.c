@@ -14,7 +14,7 @@ struct gr_projectionF_d  CurrentProjectionF;
 struct gr_cameraF_d  CurrentCameraF;
 
 // Swap two bytes
-#define ____SWAP(x,y) do { (x)=(x)^(y); (y)=(x)^(y); (x)=(x)^(y); } while(0)
+#define ____SWAP(x,y)  do { (x)=(x)^(y); (y)=(x)^(y); (x)=(x)^(y); } while(0)
 
 // See:
 // https://wiki.osdev.org/3D_Renderer_Basics
@@ -129,9 +129,7 @@ grInitializeProjection(
     unsigned long height,
     float scalefactor )
 {
-
 // Projection Matrix
-
     float fNear = (float) znear;  //0.1f;
     float fFar  = (float) zfar;   //1000.0f;
     float fFov = (float) fov;     //90.0f;
@@ -141,8 +139,8 @@ grInitializeProjection(
     CurrentProjectionF.znear = (float) znear;
     CurrentProjectionF.zfar  = (float) zfar;
     CurrentProjectionF.fov   = (float) fov;
-    
-    // % da tela.
+
+// % da tela.
     if ( (float) scalefactor <= 0.0f ){
         scalefactor = (float) 0.5f;   // default
     }
@@ -150,7 +148,7 @@ grInitializeProjection(
 
 // fail
 // Division by '0'.
-    if(height == 0){
+    if (height == 0){
         return -1;
     }
 
@@ -162,11 +160,11 @@ grInitializeProjection(
     CurrentProjectionF.height = (unsigned long) (height & 0xFFFFFFFF);
     CurrentProjectionF.ar = (float) fAspectRatio;
 
+// :::: The fov scaling factor. ::::
+// Quanto menor for o angulo, maior será o objeto.
+// fov in radient.
+// 1/tan(fov/2)
 
-    // :::: The fov scaling factor. ::::
-    // Quanto menor for o angulo, maior será o objeto.
-    // fov in radient.
-    // 1/tan(fov/2)
     float fFovRad = 
         1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
     //float fFovRad = 1.0f / tanf(fFov * 0.5f / 180.0f * 3.14159f);
@@ -204,8 +202,7 @@ grInitializeProjection(
  *     The device context was created in the beginning of
  * of the initialization.
  *     To handle the device context we have the structures:
- * 'display' and 'screen'. The clients will use the data in these
- *  structures.
+ * 'display' and 'screen'. The clients will use the data in these structures.
  */
 
 int grInit (void)
@@ -218,7 +215,7 @@ int grInit (void)
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         gwssrv_debug_print ("grInit: w h\n");
-        printf             ("grInit: w h\n");
+        printf ("grInit: w h\n");
         exit(1);
     }
 
@@ -246,24 +243,27 @@ int grInit (void)
         (unsigned long) (deviceHeight & 0xFFFFFFFF),
         (float) 0.5f ); 
 
-// using int.
+// Using int.
     projection_initialize();
 // Changing the view for the current projection.
     gr_depth_range(CurrentProjection,0,40);
-// world
+// World
     world_initialize();
 
 // == Camera ==========
 // Initialize the current camera.
 // Change some attributes for the current camera.
 // The projection is a field in the camera's structure.
+
     //gwssrv_debug_print ("grInit: camera\n");
     camera_initialize();
     cameraF_initialize();
+    
     //camera ( 
     //    -40, -40, 0,     // position vector
     //    -40,  40, 0,     // upview vector
     //     10,  10, 10 );  // lookat vector
+
     camera ( 
         0, 0, 0,     // position vector
         0, 0, 0,     // upview vector
@@ -274,11 +274,10 @@ int grInit (void)
     return 0;
 }
 
+
 int world_initialize(void)
 {
-    CurrentWorld = 
-        (void *) malloc( sizeof( struct gr_world_d ) );
-
+    CurrentWorld = (void *) malloc( sizeof( struct gr_world_d ) );
     if ( (void*) CurrentWorld == NULL ){
         printf("world_initialize: fail\n");
         exit(1);
@@ -302,9 +301,7 @@ int world_initialize(void)
 
 int camera_initialize(void)
 {
-    CurrentCamera = 
-        (void *) malloc( sizeof( struct gr_camera_d ) );
-
+    CurrentCamera = (void *) malloc( sizeof( struct gr_camera_d ) );
     if ( (void*) CurrentCamera == NULL ){
         printf("camera_initialize: fail\n");
         exit(1);
@@ -313,19 +310,22 @@ int camera_initialize(void)
     CurrentCamera->initialized = FALSE;
     CurrentCamera->used = TRUE;
     CurrentCamera->magic = 1234;
+
 // Position
     CurrentCamera->position.x = 0;
     CurrentCamera->position.y = 0;
     CurrentCamera->position.z = 0;
+
 // Upview
     CurrentCamera->upview.x = 0;
     CurrentCamera->upview.y = 0;
     CurrentCamera->upview.z = 0;
-// Lookat. (target point origin)
+
+// Lookat. Target point origin.
     CurrentCamera->lookat.x = 0;
     CurrentCamera->lookat.y = 0;
     CurrentCamera->lookat.z = 0;
-
+    
     if ( (void*) CurrentProjection != NULL )
     {
         if (CurrentProjection->initialized == TRUE){
@@ -335,26 +335,31 @@ int camera_initialize(void)
     }
 
     CurrentCamera->initialized = TRUE;
+
     return 0;
 }
 
 int cameraF_initialize(void)
 {
     CurrentCameraF.initialized = FALSE;
+
 // Position
     CurrentCameraF.position.x = (float) 0.0f;
     CurrentCameraF.position.y = (float) 0.0f;
     CurrentCameraF.position.z = (float) 0.0f;
+
 // Upview
     CurrentCameraF.upview.x = (float) 0.0f;
     CurrentCameraF.upview.y = (float) 0.5f;   //#####up
     CurrentCameraF.upview.z = (float) 0.0f;
-// Lookat. (target point origin)
+
+// Lookat. target point origin.
     CurrentCameraF.lookat.x = (float) 0.0f;
     CurrentCameraF.lookat.y = (float) 0.0f;
     CurrentCameraF.lookat.z = (float) 0.0f;
 
     CurrentCameraF.initialized = TRUE;
+
     return 0;
 }
 
@@ -364,7 +369,6 @@ camera (
     int xUp, int yUp, int zUp,
     int xLookAt, int yLookAt, int zLookAt )
 {
-
     if ( (void*) CurrentCamera == NULL ){
         return -1;
     }
@@ -373,17 +377,19 @@ camera (
     }
 
 // EYE:
-// position
+// Position
     CurrentCamera->position.x = x;
     CurrentCamera->position.y = y;
     CurrentCamera->position.z = z;
+
 // UP:
-// upview
+// Upview
     CurrentCamera->upview.x = xUp;
     CurrentCamera->upview.y = yUp;
     CurrentCamera->upview.z = zUp;
+
 // AT:
-// lookat. target point origin.
+// Lookat. target point origin.
     CurrentCamera->lookat.x = xLookAt;
     CurrentCamera->lookat.y = yLookAt;
     CurrentCamera->lookat.z = zLookAt;
@@ -391,29 +397,26 @@ camera (
     return 0;
 }
 
-
 int unveil_world(void)
 {
 // object window
     struct gws_window_d *ow;
-
     ow = NULL;
-    //#todo
-    // use the demo window if it is possible
-    if( (void*) __demo_window != NULL ){
-       if(__demo_window->magic==1234)
-        ow = __demo_window;
+// #todo
+// Use the demo window if it is possible.
+    if ( (void*) __demo_window != NULL ){
+        if (__demo_window->magic==1234)
+            ow = __demo_window;
     }
 
     if ( (void*) CurrentWorld == NULL )
         return -1;
-    if(CurrentWorld->magic != 1234)
+    if (CurrentWorld->magic != 1234)
         return -1;
-    if(CurrentWorld->initialized!=TRUE)
+    if (CurrentWorld->initialized!=TRUE)
         return -1;
 
 // --------------------------------
-// #test:
 // The horizon.
 // The camera is a vanishing point in this line.
     CurrentWorld->h1.x = CurrentWorld->center.x;
@@ -444,7 +447,7 @@ int unveil_world(void)
 // Draw the 3 axis
 // Draw line
     //int off=100;
-    // y
+// y
     plotLine3d ( 
         ow,
         CurrentWorld->center.x,  
@@ -454,7 +457,7 @@ int unveil_world(void)
         CurrentWorld->center.y + CurrentWorld->y_size, 
         CurrentWorld->center.z,
         COLOR_RED ); 
-    // x
+// x
     plotLine3d ( 
         ow,
         CurrentWorld->center.x - CurrentWorld->x_size,
@@ -464,7 +467,7 @@ int unveil_world(void)
         CurrentWorld->center.y,  
         CurrentWorld->center.z,
         COLOR_GREEN ); 
-    // z
+// z
     plotLine3d ( 
         ow,
         CurrentWorld->center.x + CurrentWorld->z_size,
@@ -478,22 +481,21 @@ int unveil_world(void)
     return 0;
 }
 
-
 int 
 unveil_camera(
     int model_x, int model_y, int model_z )
 {
 // object window
     struct gws_window_d *ow;
-    struct gr_ray_d r;
-
     ow = NULL;
-    //#todo
-    // use the demo window if it is possible
-    if( (void*) __demo_window != NULL ){
-       if(__demo_window->magic==1234)
-        ow = __demo_window;
+// #todo
+// Use the demo window if it is possible
+    if ( (void*) __demo_window != NULL ){
+        if (__demo_window->magic==1234)
+            ow = __demo_window;
     }
+
+    struct gr_ray_d  r;
 
     r.used = TRUE;
     r.magic = 1234;
@@ -505,15 +507,14 @@ unveil_camera(
     r.p[RAY_ORIGIN].z = 0;
     r.p[RAY_ORIGIN].color = COLOR_WHITE;
 
-// --------------------------------
-// where is our camera?
-    if( (void*) CurrentCamera == NULL ){
+// Where is our camera?
+    if ( (void*) CurrentCamera == NULL ){
         return -1;
     }
     if (CurrentCamera->magic != 1234){
         return -1;
     }
-    if(CurrentCamera->initialized != TRUE){
+    if (CurrentCamera->initialized != TRUE){
         return -1;
     }
 
@@ -605,31 +606,28 @@ gr_set_ray_info(
     struct gr_vec3D_d *origin,
     struct gr_vec3D_d *direction )
 {
-
     if ( (void*) r == NULL ){
         return -1;
     }
     if (r->magic != 1234){
         return -1;
     }
-
-    if( (void*) origin == NULL )
+    if ( (void*) origin == NULL )
         return -1;
-    if( (void*) direction == NULL )
+    if ( (void*) direction == NULL )
         return -1;
 
-// origin
+// Origin
     r->p[0].x = (int) origin->x;
     r->p[0].y = (int) origin->y;
     r->p[0].z = (int) origin->z;
-// direction
+// Direction
     r->p[1].x = (int) direction->x;
     r->p[1].y = (int) direction->y;
     r->p[1].z = (int) direction->z;
 // ok
     return 0;
 }
-
 
 int gr_reset_ray_info(struct gr_ray_d *r)
 {
@@ -651,7 +649,6 @@ int gr_reset_ray_info(struct gr_ray_d *r)
 // ok
     return 0;
 }
-
 
 struct gr_ray_d *ray_object(void)
 {
@@ -696,9 +693,7 @@ int projection_initialize(void)
 // See: 
 // gr_projection_d
 
-    CurrentProjection = 
-        (void *) malloc ( sizeof( struct gr_projection_d ) );
-    
+    CurrentProjection = (void *) malloc ( sizeof( struct gr_projection_d ) );
     if ( (void*) CurrentProjection == NULL ){
         printf("projection_initialize: CurrentProjection\n");
         exit(1);
@@ -716,9 +711,8 @@ int projection_initialize(void)
 // Use the default dc.
     CurrentProjection->dc = gr_dc;
     CurrentProjection->initialized = FALSE;
-// #todo: 
-// Perspective or orthogonal.
-    CurrentProjection->type = 1;
+    // #todo: Perspective or orthogonal
+    CurrentProjection->type = 1; 
 
 //
 // Orthographic projection plane
@@ -749,7 +743,7 @@ int projection_initialize(void)
     //CurrentProjection->frustrum_view = ?;
 
     //...
-    
+
     CurrentProjection->used = TRUE;
     CurrentProjection->magic = 1234;
     CurrentProjection->initialized = TRUE;
@@ -769,7 +763,6 @@ gr_depth_range(
 // Changing the view for a given projection.
 int view (struct gr_projection_d *projection, int near, int far)
 {
-
     if ( (void*) projection == NULL ){
         printf("view: projection\n");
         return -1;
@@ -811,7 +804,7 @@ gr_clamp(
     vect->x = max(min_value, vect->x);
     vect->y = max(min_value, vect->y);
     vect->z = max(min_value, vect->z);
-
+        
     vect->x = min(max_value, vect->x);
     vect->y = min(max_value, vect->y);
     vect->z = min(max_value, vect->z);
@@ -830,9 +823,9 @@ gwsViewport(
     int width, 
     int height)
 {
-    // Esses valores não podem ser maiores
-    // que os valores da tela.
-    
+// Esses valores não podem ser maiores
+// que os valores da tela.
+
     if (topleft_x<0)
         topleft_x=0;
     if(topleft_y<0)
@@ -844,7 +837,7 @@ gwsViewport(
         width=0;
 
     // ...
-
+    
     // #todo
     // call that routine.
     //projection_initialize(...)
@@ -1014,7 +1007,6 @@ done:
         }
     }
 
-
 // ===================================================
 // Return values:
 
@@ -1080,13 +1072,17 @@ int gr_dc_fill( struct dc_d *dc, unsigned int bg_color )
     dc->bg_color = (unsigned int) bg_color;
 
     rectBackbufferDrawRectangle ( 
-        dc->left, dc->top, dc->width, dc->height, 
+        dc->left, 
+        dc->top, 
+        dc->width,
+        dc->height, 
         dc->bg_color, 
         TRUE,           // fill
         dc->rop );
 
     return 0;
 }
+
 
 // plot point
 // 2d
@@ -1255,20 +1251,24 @@ grPlot0 (
 // #todo
 // This is a work in progress
 
-// Final 2D screen coordenates.
+    // Final 2D screen coordenates.
     int X=0;
     int Y=0;
     unsigned long rop = 0;  //#todo
-// Draw flag
+
+    // Draw flag.
     int Draw = TRUE;
+
     int UsingDepthBuffer = FALSE;
     int UsingAlphaBlending = FALSE;
+
 // clipping window support.
     struct gws_window_d *w;
     int UseClipping = FALSE;
-// Hotspot. (center?)
+
     int hotspotx=0;
     int hotspoty=0;
+
     int UseLeftHand = gUseLeftHand;
     //UseLeftHand = TRUE;   //LEFT HAND
     //UseLeftHand = FALSE;  //RIGHT HAND
@@ -1306,6 +1306,8 @@ grPlot0 (
          return 0;
      if (z >= zFar)
          return 0;
+
+//-------------------------------------
 
 //-------------------------------------
 // #todo
@@ -1477,8 +1479,7 @@ grPlot0 (
     return (-1);
 }
 
-
-// plot with graphics effects. use flags.
+// Plot with graphics effects. use flags.
 int 
 grPlot1 ( 
     struct gws_window_d *clipping_window,   
@@ -1509,17 +1510,15 @@ grPlot1 (
         goto PlotPixel;
     }
 
-    // #todo #test
-    // plot pixel using the caes in fx.
-    
-    if ( flags & 0x00000001 )
-    {
+// #todo #test
+// plot pixel using the caes in fx.
+
+    if ( flags & 0x00000001 ){
         fBlack = TRUE;
         colorValue = (unsigned int) 0x00000000;
     }
 
-    if ( flags & 0x00000020 )
-    {
+    if ( flags & 0x00000020 ){
         fNoZBuffer = TRUE;
         zValue = 0;
     }
@@ -1533,7 +1532,6 @@ PlotPixel:
                      zValue, xValue, yValue, 
                      (unsigned int) colorValue );
 }
-
 
 // #todo
 // See: gwsProcedure(), service 2040 in main.c
@@ -1818,9 +1816,7 @@ void drawRectangleF(struct gr_rectangleF3D_d *rectangle)
         return;
     }
 
-//
-// parameters
-//
+// Parameters
 
     float znear = (float) 0.01f;  //default
     float zfar  = (float) 10.0f;  //default
@@ -1858,22 +1854,22 @@ void drawRectangleF(struct gr_rectangleF3D_d *rectangle)
 // #test
 // Ficando menor conforma z aumenta.
 
-    if(rectangle->p[0].z != 0.0f)
+    if (rectangle->p[0].z != 0.0f)
     {
         rectangle->p[0].x = (float) (rectangle->p[0].x/rectangle->p[0].z);  
         rectangle->p[0].y = (float) (rectangle->p[0].y/rectangle->p[0].z);
     }
-    if(rectangle->p[1].z != 0.0f)
+    if (rectangle->p[1].z != 0.0f)
     {
         rectangle->p[1].x = (float) (rectangle->p[1].x/rectangle->p[1].z);  
         rectangle->p[1].y = (float) (rectangle->p[1].y/rectangle->p[1].z);
     }
-    if(rectangle->p[2].z != 0.0f)
+    if (rectangle->p[2].z != 0.0f)
     {
         rectangle->p[2].x = (float) (rectangle->p[2].x/rectangle->p[2].z);  
         rectangle->p[2].y = (float) (rectangle->p[2].y/rectangle->p[2].z);
     }
-    if(rectangle->p[3].z != 0.0f)
+    if (rectangle->p[3].z != 0.0f)
     {
         rectangle->p[3].x = (float) (rectangle->p[3].x/rectangle->p[3].z);  
         rectangle->p[3].y = (float) (rectangle->p[3].y/rectangle->p[3].z);
@@ -1916,7 +1912,6 @@ void drawRectangleF(struct gr_rectangleF3D_d *rectangle)
     __rectangleZZ( (struct gr_rectangle_d *) &r );
 }
 
-
 // worker
 // 4 3d lines, not filled.
 void __rectangleZZ(struct gr_rectangle_d *rect)
@@ -1939,28 +1934,28 @@ void __rectangleZZ(struct gr_rectangle_d *rect)
 // Draw 4 lines.
 //
 
-// cima
+// Top
     //plotLine3d2 ( left, top,  z, right, top, z, color, flag );
     plotLine3d2 ( 
         rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
         rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color, 
         0 );
 
-// baixo
+// Bottom
      //plotLine3d2 ( left, bottom, z, right,bottom, z, color, flag );
      plotLine3d2 ( 
          rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color,
          rect->p[2].x, rect->p[2].y, rect->p[2].z, rect->p[2].color, 
          0 );
 
-// esquerda
+// Left
      //plotLine3d2 ( left, top, z, left, bottom, z, color, flag );
      plotLine3d2 ( 
          rect->p[0].x, rect->p[0].y, rect->p[0].z, rect->p[0].color,
          rect->p[3].x, rect->p[3].y, rect->p[3].z, rect->p[3].color, 
          0 ); 
 
-// direita
+// Right
      //plotLine3d2 ( right,  top, z, right, bottom, z, color, flag );
      plotLine3d2 ( 
          rect->p[1].x, rect->p[1].y, rect->p[1].z, rect->p[1].color,
@@ -1970,7 +1965,7 @@ void __rectangleZZ(struct gr_rectangle_d *rect)
 
 int grRectangle(struct gr_rectangle_d *rect)
 {
-    if( (void*) rect == NULL )
+    if ( (void*) rect == NULL )
         return -1;
 
 // #todo
@@ -2040,8 +2035,8 @@ rectangle_ras3D (
 // x0,y0,z0, x1,y1,z1, color.
         
     for ( Line = top;
-          Line >= bottom; 
-          Line-- )
+             Line >= bottom; 
+             Line-- )
     {
         plotLine3d ( 
             NULL,
@@ -2051,14 +2046,12 @@ rectangle_ras3D (
     };
 }
 
-
 // Scaling: Inflate cube.
 int 
 xxxInflateCubeZ ( 
     struct gr_cube_d *cube, 
     int value )
 {
-
     if ( (void*) cube == NULL ){
         return (-1);
     }
@@ -2066,36 +2059,36 @@ xxxInflateCubeZ (
     //int value = z;
     //int value = z*2;
 
-    // south points =====================================
+// South points =====================================
     cube->p[0].x = (cube->p[0].x - value);
     cube->p[0].y = (cube->p[0].y + value);
     cube->p[0].z = (cube->p[0].z - value);
-        
+
     cube->p[1].x = (cube->p[1].x + value);
     cube->p[1].y = (cube->p[1].y + value);
     cube->p[1].z = (cube->p[1].z - value);
-        
+
     cube->p[2].x = (cube->p[2].x + value);
     cube->p[2].y = (cube->p[2].y - value);
     cube->p[2].z = (cube->p[2].z - value);
-        
+
     cube->p[3].x = (cube->p[3].x - value);
     cube->p[3].y = (cube->p[3].y - value);
     cube->p[3].z = (cube->p[3].z - value);
 
-    //north points ================================
+// North points ================================
     cube->p[4].x = (cube->p[4].x - value);
     cube->p[4].y = (cube->p[4].y + value);
     cube->p[4].z = (cube->p[4].z + value);
-        
+
     cube->p[5].x = (cube->p[5].x + value);
     cube->p[5].y = (cube->p[5].y + value);
     cube->p[5].z = (cube->p[5].z + value);
-        
+
     cube->p[6].x = (cube->p[6].x + value);
     cube->p[6].y = (cube->p[6].y - value);
     cube->p[6].z = (cube->p[6].z + value);
-        
+
     cube->p[7].x = (cube->p[7].x - value);
     cube->p[7].y = (cube->p[7].y - value);
     cube->p[7].z = (cube->p[7].z + value);
@@ -2113,36 +2106,36 @@ xxxDeflateCubeZ (
         return -1;
     }
 
-// south points ==========================
+// South points ==========================
     cube->p[0].x = (cube->p[0].x + value);
     cube->p[0].y = (cube->p[0].y - value);
     cube->p[0].z = (cube->p[0].z + value);
-        
+
     cube->p[1].x = (cube->p[1].x - value);
     cube->p[1].y = (cube->p[1].y - value);
     cube->p[1].z = (cube->p[1].z + value);
-        
+
     cube->p[2].x = (cube->p[2].x - value);
     cube->p[2].y = (cube->p[2].y + value);
     cube->p[2].z = (cube->p[2].z + value);
-        
+
     cube->p[3].x = (cube->p[3].x + value);
     cube->p[3].y = (cube->p[3].y + value);
     cube->p[3].z = (cube->p[3].z + value);
 
-// north points =========================
+// North points =========================
     cube->p[4].x = (cube->p[4].x + value);
     cube->p[4].y = (cube->p[4].y - value);
     cube->p[4].z = (cube->p[4].z - value);
-        
+
     cube->p[5].x = (cube->p[5].x - value);
     cube->p[5].y = (cube->p[5].y - value);
     cube->p[5].z = (cube->p[5].z - value);
-        
+
     cube->p[6].x = (cube->p[6].x - value);
     cube->p[6].y = (cube->p[6].y + value);
     cube->p[6].z = (cube->p[6].z - value);
-        
+
     cube->p[7].x = (cube->p[7].x + value);
     cube->p[7].y = (cube->p[7].y + value);
     cube->p[7].z = (cube->p[7].z - value);
@@ -2191,14 +2184,14 @@ grTriangle3(
 int grTriangle(struct gr_triangle_d *triangle)
 {
     int npixels=0;  // Number of pixels changed.
-    
+
     if ( (void*) triangle == NULL ){
         return (int) npixels;
     }
 
 // #todo
 // something
-  
+
     npixels += grTriangle3(NULL,triangle);
 
     return (int) npixels;
@@ -2214,8 +2207,7 @@ fillTriangle0(
     int x3, int y3, 
     unsigned int c)
 {
-// Number of pixels changed.
-    int npixels=0;
+    int npixels=0;  // Number of pixels changed.
 
     int t1x=0;
     int t2x=0;
@@ -2483,7 +2475,6 @@ fillTriangle(
     return (int) npixels;
 }
 
-
 // IN: projected triangle.
 // float
 int 
@@ -2648,10 +2639,10 @@ plotTriangleF(
 
 // #tmp
 // Scale factor limits
-    if( (float) scale_factor < 0.01f ){
+    if ( (float) scale_factor < 0.01f ){
         scale_factor = (float) 0.01f;
     }
-    if( (float) scale_factor > 2.00f ){
+    if ( (float) scale_factor > 2.00f ){
         scale_factor = (float) 2.00f;
     }
 
@@ -2907,7 +2898,7 @@ int xxxDrawCubeZ ( struct gr_cube_d *cube )
                 cube->p[3].x, cube->p[3].y, cube->p[3].z, 
                 cube->p[7].x, cube->p[7].y, cube->p[7].z, cube->p[3].color );
 
-//=================================================================
+//=====================================================
 
 // left 
 // Isso só funciona para retângulos não inclinados.
@@ -3022,7 +3013,7 @@ plotCircle (
    
     //loop
     register int x = -r;
-   
+
     int y = 0;
     int err = (2-(2*r));
 
@@ -3033,31 +3024,29 @@ plotCircle (
       //setPixel(xm+x, ym-y); /* III. Quadrant */
       //setPixel(xm+y, ym+x); /*  IV. Quadrant */
 
-      grPlot0 ( NULL, 0, xm-x, ym+y, color);
-      grPlot0 ( NULL, 0, xm-y, ym-x, color);
-      grPlot0 ( NULL, 0, xm+x, ym-y, color);
-      grPlot0 ( NULL, 0, xm+y, ym+x, color);
+    grPlot0 ( NULL, 0, xm-x, ym+y, color);
+    grPlot0 ( NULL, 0, xm-y, ym-x, color);
+    grPlot0 ( NULL, 0, xm+x, ym-y, color);
+    grPlot0 ( NULL, 0, xm+y, ym+x, color);
+
+    r = err;
       
-      r = err;
+    // #ugly routine.
       
-      // #ugly routine.
-      
-      /* e_xy+e_y < 0 */
-      if (r <= y) 
-      { 
-           err += ++y * 2 + 1; 
-      }           
-      
-      /* e_xy+e_x > 0 or no 2nd y-step */
-      if (r > x || err > y) 
-      { 
-          err += ++x * 2+1; 
-      }
-      
+    /* e_xy+e_y < 0 */
+    if (r <= y) 
+    { 
+        err += ++y * 2 + 1; 
+    }
+
+    /* e_xy+e_x > 0 or no 2nd y-step */
+    if (r > x || err > y) 
+    { 
+        err += ++x * 2+1; 
+    }
+
     } while (x < 0);
 }
-   
-
 
 // ?? what means 'm' ???
 void 
@@ -3072,7 +3061,7 @@ grCircle3 (
 
     /* II. Quadrant */ 
     //int x = -r, y = 0, err = 2-2*r; 
-   
+
     //loop
     register int x = -r;
    
@@ -3231,9 +3220,7 @@ grEllipse3 (
     
     } while (x0 <= x1);
 
-
-    /* too early stop of flat ellipses a=1 */
-    
+/* Too early stop of flat ellipses a=1 */
     while (y0-y1 < b) {
         grPlot0 ( NULL, z, x0-1,    y0, color);  // -> finish tip of ellipse
         grPlot0 ( NULL, z, x1+1,  y0++, color);
@@ -3313,10 +3300,13 @@ matrix_multiply_2x3 (
     int mat2[2][3], 
     int res[2][3])
 {
+
     int N1 = 2;
     int N2 = 3;
+    
     int i, j, k;
-
+    
+    
     for (i = 0; i < N1; i++) 
     {
         for (j = 0; j < N2; j++) 
@@ -3338,13 +3328,14 @@ void multiply4 (int mat1[4][4], int mat2[4][4], int res[4][4])
     register int j=0; 
     register int k=0;
 
-    for (i=0; i<4; i++) 
+    for (i = 0; i < 4; i++) 
     {
-        for (j=0; j<4; j++) 
+        for (j = 0; j < 4; j++) 
         {
             res[i][j] = 0;
+            
             // slow
-            for (k=0; k<4; k++){
+            for (k = 0; k < 4; k++){
                 res[i][j] += mat1[i][k] * mat2[k][j];
             };
         };
@@ -3419,9 +3410,9 @@ gr_rotate_x(
 
 // ---------------------------------------------------
 
-    if( (void*) in_tri == NULL )
+    if ( (void*) in_tri == NULL )
         return -1;
-    if( (void*) out_tri == NULL )
+    if ( (void*) out_tri == NULL )
         return -1;
 
 //-----------------------------    
@@ -3442,6 +3433,7 @@ gr_rotate_x(
     return 0;
 }
 
+//--------------------------------------------------
 // Rotate in y
 int 
 gr_rotate_y(
@@ -3465,9 +3457,9 @@ gr_rotate_y(
     matRotY.m[3][3] = (float) 1.0f;
 
 // ---------------------------------------------------
-    if( (void*) in_tri == NULL )
+    if ( (void*) in_tri == NULL )
         return -1;
-    if( (void*) out_tri == NULL )
+    if ( (void*) out_tri == NULL )
         return -1;
 
 //-----------------------------    
@@ -3488,6 +3480,7 @@ gr_rotate_y(
     return 0;
 }
 
+//--------------------------------------------------
 // Rotate in z
 int 
 gr_rotate_z(
@@ -3511,9 +3504,9 @@ gr_rotate_z(
 	matRotZ.m[3][3] = (float) 1.0f;
 
 // ---------------------------------------------------
-    if( (void*) in_tri == NULL )
+    if ( (void*) in_tri == NULL )
         return -1;
-    if( (void*) out_tri == NULL )
+    if ( (void*) out_tri == NULL )
         return -1;
 
 // rotação em z,
@@ -3533,10 +3526,11 @@ gr_rotate_z(
         (struct gr_vecF3D_d *) &in_tri->p[2], 
         (struct gr_vecF3D_d *) &out_tri->p[2], 
         &matRotZ);
+//-----------------------------    
 
     return 0;
 }
-
+//--------------------------------------------------
 
 
 struct gr_vecF3D_d *grVectorCrossProduct(
@@ -3564,8 +3558,8 @@ float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 )
 // 0:        Perpendicular.
 
 // Fake perpendicular.
-    if( (void*) v1 == NULL ){ return (float) 0.0f; }
-    if( (void*) v2 == NULL ){ return (float) 0.0f; }
+    if ( (void*) v1 == NULL ){ return (float) 0.0f; }
+    if ( (void*) v2 == NULL ){ return (float) 0.0f; }
 
     return (float) ( v1->x * v2->x + 
                      v1->y * v2->y + 
@@ -3585,8 +3579,8 @@ int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
     int scalar=0;
 
 // Fake perpendicular.
-    if( (void*) v1 == NULL ){ return 0; }
-    if( (void*) v2 == NULL ){ return 0; }
+    if ( (void*) v1 == NULL ){ return 0; }
+    if ( (void*) v2 == NULL ){ return 0; }
 
     scalar  = (v1->x * v2->x);
     scalar += (v1->y * v2->y);
@@ -3594,7 +3588,6 @@ int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
 
     return (int) (scalar & 0xFFFFFFFF );
 }
-
 
 int gr_triangle_area_int (int base, int height)
 {
@@ -3678,12 +3671,12 @@ gr_find_img_height_int (
 // Return the image height
 // Check pointer validation
 
-    if( (int*) img_height == NULL){
+    if ( (int*) img_height == NULL){
         return -1;  //fail
     }
-    
+
     *img_height = (int) resIH;
-    
+
     return 0; //ok
 }
 
@@ -3696,7 +3689,7 @@ int fib (int n)
     int b=0;
 
     if (Copy <= 1){ return Copy; }
-    
+
     a = fib(Copy - 1); 
     b = fib(Copy - 2);
 
@@ -3726,11 +3719,11 @@ void __print_fib(int max)
 }
 */
 
+
 void gr_scale_vec( struct gr_vec3D_d *v, int scale )
 {
-    if ( (void*) v == NULL ){
+    if ( (void*) v == NULL )
         return;
-    }
 
     v->x *= scale;
     v->y *= scale;
@@ -3755,11 +3748,13 @@ plotCharBackbufferDrawcharTransparent (
     unsigned long color, 
     unsigned long c )
 {
-//loop
+// Loop
     register int y2=0;
     register int x2=0;
+
     char *work_char;
     unsigned char bit_mask = 0x80;
+
     //int CharWidth;
     //int CharHeight;
 
@@ -3982,7 +3977,7 @@ void grDCMono (
     unsigned char subpixel_true_color,    //I64 true_color=0,
     unsigned char subpixel_false_color )  //I64 false_color=COLOR_MONO)
 {
-    int i=0;
+    register int i=0;
     unsigned char *dst;
     struct gws_screen_d *Screen;
 
@@ -3999,9 +3994,7 @@ void grDCMono (
         return;
     }
 
-//
 // Device screen
-//
 
     Screen = dc->device_screen;
 
@@ -4009,7 +4002,6 @@ void grDCMono (
         printf ("Screen\n");
         return;
     }
-
     if (Screen->used != TRUE || Screen->magic != 1234 ){
         printf ("Screen validation\n");
         return;
@@ -4040,13 +4032,13 @@ void grDCMono (
     }
 }
 
-// substitui cor no lfb
+// Substitui cor no lfb.
 void grDCColorChg ( 
     struct gws_display_d *dc,
     unsigned char subpixel_src_color,
     unsigned char subpixel_dst_color )  // dst_color=COLOR_TRANSPARENT )
 {
-    int i=0;
+    register int i=0;
     unsigned char *dst;
     struct gws_screen_d *Screen;
 
@@ -4070,7 +4062,7 @@ void grDCColorChg (
     if ( (void*) Screen == NULL ){
         return;
     }
-    if (Screen->used != 1 || Screen->magic != 1234 ){
+    if (Screen->used != TRUE || Screen->magic != 1234 ){
         return;
     }
 
@@ -4113,7 +4105,7 @@ plotQuadBezierSeg (
     long err=0; 
     long cur = xx*sy-yy*sx;
 
-    /* sign of gradient must not change */
+/* sign of gradient must not change */
     //assert(xx*sx <= 0 && yy*sy <= 0);  
 
     if ( xx*sx <= 0 && 
@@ -4162,7 +4154,8 @@ plotQuadBezierSeg (
       if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
     
     } while (dy < dx );           /* gradient negates -> algorithm fails */
-
+    
+    
     }
 
 /* plot remaining part to end */
@@ -4240,7 +4233,6 @@ interpolate_color(
 //#todo: Explain it better.
 unsigned int invert_color(unsigned int color)
 {
-// Is the operator a '~0x0000'
     unsigned int Color = (unsigned int) (color ^ 0x00FFFFFF);
     return (unsigned int) Color;
 }

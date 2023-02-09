@@ -74,9 +74,7 @@ dtextDrawText (
     unsigned char *string )
 { 
     struct gws_window_d * __w;
-
     __w = (struct gws_window_d *) gui->screen_window;
-
 
     if ( (void *) window == NULL ){
 

@@ -7,11 +7,9 @@
 
 #include "gramado.h"
 
-
 // Draw char support
 int gcharWidth=0;
 int gcharHeight=0;
-
 
 // IN: left, right, top, bottom.
 void
@@ -21,9 +19,7 @@ DrawBorder(
 {
     register int i=0;
     register int j=0;
-
     int CharSize = 8;
-
 
     l = (l&0xFFFF);
     r = (r&0xFFFF);

@@ -744,11 +744,11 @@ struct gws_window_d *__create_demo_window (
 {
     struct gws_window_d *w;
 
-    if( (void*) __root_window == NULL ){
+    if ( (void*) __root_window == NULL ){
         return NULL;
     }
 
-// Create window.
+// Create window
 
     w = 
         (struct gws_window_d *) CreateWindow ( 
@@ -765,8 +765,7 @@ struct gws_window_d *__create_demo_window (
     if ( (void *) w == NULL ){
         return NULL;
     }
-    if ( w->used != TRUE ||  w->magic != 1234 )
-    {
+    if ( w->used != TRUE ||  w->magic != 1234 ){
         return NULL;
     }
 
@@ -780,10 +779,9 @@ struct gws_window_d *__create_demo_window (
     return (struct gws_window_d *)  w;
 }
 
-
 static void __draw_model1(int step, int target_axis)
 {
-    // object window
+// object window
     struct gws_window_d *ow;
     ow = NULL;
     //#todo
@@ -816,14 +814,12 @@ static void __draw_model1(int step, int target_axis)
     if ( target_axis >= 1 && target_axis <= 3 )
         over = target_axis;
 
-//-------------------------------------
-
 // -----------------------------------------------
 // Draw the world
 
     int wstatus=-1;
     wstatus = (int) unveil_world();
-    if(wstatus<0)
+    if (wstatus<0)
         return;
 
 //
@@ -872,7 +868,6 @@ static void __draw_model1(int step, int target_axis)
 
 // -----------------------------------------------
 // The vehicle. (hehe)
-
 
 
 // -----------------------------------------------

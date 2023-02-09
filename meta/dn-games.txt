@@ -4,10 +4,10 @@
 	A place for games, tests and hacks.
 
 ----------------
-bin/
-    ...
-----------------
-game2/
+game2/ or game2/
     It's working fine on qemu and virtualbox.
-    Sometimes it fails on kvm. ( Something is not working when using float variables).
-    
+    Sometimes it was failing on kvm. 
+    ( It was something is not working when using float variables ).
+    Actually it was the callback in an environment with floating point.
+    We still use floating point, but no more callback for now!
+

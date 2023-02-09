@@ -1,7 +1,6 @@
 
 // comp.c
 
-
 // window server routines.
 #include "gramado.h"
 
@@ -24,16 +23,15 @@ static long __new_mouse_y=0;
 static int __mouse_initialized = FALSE;
 
 
-
 // Onde esta o mouse? em que janela?
 // simple implementation.
 // get the old one in the 32bit version of gramado.
 
 void mouse_at(void)
 {
-    int i=0;
+    register int i=0;
     struct gws_window_d *w;
-    for(i=0; i<WINDOW_COUNT_MAX; i++)
+    for (i=0; i<WINDOW_COUNT_MAX; i++)
     {
         w = (void*) windowList[i];
         if ( (void*) w != NULL )

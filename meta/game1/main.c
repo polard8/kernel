@@ -260,7 +260,6 @@ void gwssrv_debug_print (char *string)
     if ( (void*) string == NULL ){
         return;
     }
-
     gramado_system_call ( 
         289,
         (unsigned long) string,
@@ -2214,25 +2213,16 @@ fail:
 static int 
 serviceCreateWindow (int client_fd)
 {
-
-// #test
 // The structure for the standard request.
-
     gReq r;
-
-
-    //loop
+//loop
     register int i=0;
-
-    // The buffer is a global variable.
+// The buffer is a global variable.
     unsigned long *message_address = (unsigned long *) &__buffer[0];
-
     struct gws_window_d *Window;
     struct gws_window_d *Parent;
     int pw=0;
-
     int id = -1;
-
 // Arguments
     unsigned long x=0;
     unsigned long y=0;
@@ -2251,22 +2241,18 @@ serviceCreateWindow (int client_fd)
     int ClientPID = -1;
     int ClientTID = -1;
 
-
     unsigned int frame_color = COLOR_WINDOW;
     unsigned int client_color = COLOR_WINDOW;
 
-    //#debug
+//#debug
     gwssrv_debug_print ("serviceCreateWindow:\n");
-    //asm("cli");
 
 //
 // Get the arguments.
 //
 
-
 // The header.
 // 0,1,2,3
-
     r.wid  = message_address[0];  // window id
     r.code = message_address[1];  // message code
     r.ul2  = message_address[2];  // data1
@@ -2320,10 +2306,14 @@ serviceCreateWindow (int client_fd)
 // String support 
 // Copiando para nossa estrutura local.
     int string_off = 14; 
+    memset (r.data, 0, 256);
+    char *p = (char *) &message_address[string_off];
     for (i=0; i<256; ++i)
     {
-        r.data[i] = message_address[string_off];
-        string_off++;
+        //r.data[i] = message_address[string_off];
+        r.data[i] = *p;
+        p++;
+        //string_off++;
     };
     r.data[i] = 0;
 //--
@@ -2572,10 +2562,8 @@ int serviceDrawChar (void)
     
     unsigned char _string[4];
 
-
     // #debug
     gwssrv_debug_print ("serviceDrawChar: \n");
-
 
 // Get message parameters.
 
@@ -2585,10 +2573,8 @@ int serviceDrawChar (void)
     color     = message_address[7];
     unsigned long C = (unsigned long) message_address[8];
     //text_buffer =    //#todo
-   
 
 // Let's create a fake string.
-
    _string[0] = (unsigned char) C;
    _string[1] = (unsigned char) 0;
 
@@ -2596,7 +2582,6 @@ int serviceDrawChar (void)
 // Window ID
 //
 
-    // Limits
     if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
         gwssrv_debug_print ("gwssrv: serviceDrawChar window_id\n");
         return -1;
@@ -3050,7 +3035,6 @@ fail:
     return -1;
 }
 
-
 // #todo
 // Get the name of the image for a process to lauch.
 // IN: for arguments and a string.
@@ -3063,12 +3047,13 @@ static void serviceCloneAndExecute(void)
 // #todo: Talvez poderiamos receber o tamanho da string.
 
     unsigned char buf[256+1];
-    int i=0;
+    register int i=0;
     int string_off=8;
+    char *p = (char *) &message_address[string_off];
     for(i=0; i<256; i++)
     {
-         buf[i] = message_address[string_off];
-         string_off++;
+         buf[i] = *p;
+         p++;
     };
     buf[i] = 0;
 // ==================================
@@ -3156,12 +3141,13 @@ int serviceDrawText (void)
 // #todo: Talvez poderiamos receber o tamanho da string.
 
     unsigned char buf[256+1];
-    int i=0;
+    register int i=0;
     int string_off=8;
-    for(i=0; i<256; i++)
+    char *p = (char*) &message_address[string_off];
+    for (i=0; i<256; i++)
     {
-         buf[i] = message_address[string_off];
-         string_off++;
+        buf[i] = *p;
+        p++;
     };
     buf[i] = 0;
 // ==================================
