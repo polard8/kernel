@@ -203,6 +203,9 @@ extern unsigned long gSavedBPP;
 #include "mm/mm.h"
 #include "mm/memmap.h" 
 #include "mm/intelmm.h"
+
+#include "mm/mmblock.h"
+
 #include "mm/x64mm.h"
 #include "mm/mmglobal.h"  // Deve ficar mais acima.
 #include "mm/heap.h"      // Heap pointer support.

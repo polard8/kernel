@@ -52,6 +52,7 @@ PHONY := all
 # build: User command.
 all:  \
 build-gramado-os \
+copy-extras \
 /mnt/gramadoxvhd \
 vhd-mount \
 vhd-copy-files \
@@ -102,7 +103,6 @@ PHONY := runkvm
 runkvm: do_runkvm
 do_runkvm:
 	sh ./runkvm
-
 
 #===================================================
 #::0
@@ -177,13 +177,15 @@ exposed-tier:
 # Don't copy to the disk.
 
 #========================================
-# ::Building init process.
+# :: Arctic 
+# Building init process.
 	$(Q) $(MAKE) -C exposed/arctic/
 # Copy to the target folder.
 	-sudo cp exposed/arctic/bin/INIT.BIN  control/disk/ 
 
 #========================================
-# ::Building userland commands.
+# :: Azure 
+# Building userland commands.
 # userland
 	@echo ":: Making userland."
 	$(Q) $(MAKE) -C exposed/azure/
@@ -206,30 +208,34 @@ exposed-tier:
 	#...
 
 #========================================
-# ::
-	$(Q) $(MAKE) -C exposed/indigo/ 
+# :: Indigo 1
+	$(Q) $(MAKE) -C exposed/indigo1/ 
 # Copy to the target folder.
-	-sudo cp exposed/indigo/bin/GNSSRV.BIN  control/disk/
-	-sudo cp exposed/indigo/bin/GNS.BIN     control/disk/
+	-sudo cp exposed/indigo1/bin/GNSSRV.BIN  control/disk/
+	-sudo cp exposed/indigo1/bin/GNS.BIN     control/disk/
 
 #========================================
-# ::
-	$(Q) $(MAKE) -C exposed/navy/
-	-sudo cp exposed/navy/bin/N9.BIN   control/disk/PROGRAMS/
-	-sudo cp exposed/navy/bin/N10.BIN  control/disk/PROGRAMS/
-	-sudo cp exposed/navy/bin/N11.BIN  control/disk/PROGRAMS/
+# :: Indigo 2
+	$(Q) $(MAKE) -C exposed/indigo2/
+	-sudo cp exposed/indigo2/bin/N9.BIN   control/disk/PROGRAMS/
+	-sudo cp exposed/indigo2/bin/N10.BIN  control/disk/PROGRAMS/
+	-sudo cp exposed/indigo2/bin/N11.BIN  control/disk/PROGRAMS/
+
+	@echo "~exposed-tier"
+
+PHONY := copy-extras
+copy-extras:
+# Let's copy some images from gramland/ and meta/
+
+	@echo "copy-extras"
 
 #========================================
+# :: Gramland
+# Copying every image from gramland/.
+
 	@echo ":: Copying Window server and clients."
-# test ---------------------------
-# Importing from another project.
-#burgundy
-#bugbug: This GWS.BIN client has some special calls.
-#do not use it for tests here.
 
-# This is not part of the exposed-tier
-# But its a de facto external content.
-#gramland
+# burgundy, blue and beige: (Students)
 	-sudo cp ../gramland/burgundy/bin/GWSSRV.BIN   control/disk/
 	-sudo cp ../gramland/burgundy/bin/GWS.BIN      control/disk/
 	-sudo cp ../gramland/burgundy/bin/GDM.BIN      control/disk/
@@ -239,8 +245,15 @@ exposed-tier:
 	-sudo cp ../gramland/beige/bin/FILEMAN.BIN     control/disk/
 	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/PROGRAMS/
 
+# attitude: Wild and free.
 	-sudo cp ../gramland/attitude/bin/BROWSER.BIN  control/disk/
 	-sudo cp ../gramland/attitude/bin/DOCV.BIN  control/disk/PROGRAMS/
+
+#========================================
+# :: Meta
+# Copying every image from meta/.
+
+	@echo ":: Copying meta apps."
 
 # This is not part of the exposed-tier
 # But its a de facto external content.
@@ -248,7 +261,8 @@ exposed-tier:
 #todo: Add the games and demos, not the engines.
 	-sudo cp ../meta/bin/*.BIN   control/disk/
 
-	@echo "~exposed-tier"
+	@echo "~ copy-extras"
+
 #===================================================
 #::2
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.

@@ -364,8 +364,8 @@ void showMemoryBlocksForTheKernelAllocator(void)
     };
 
 // Quantos slots estão sendo usados?
-    printf ("used slots: %d/%d\n",
-        mmblockCount, MMBLOCK_COUNT_MAX );
+    //printf ("used slots: %d/%d\n",
+    //    mmblockCount, MMBLOCK_COUNT_MAX );
 
 // Aqui podemos aprentar informações sobre o heap.
 // como tamanho, espaço disponível, ponteiro, à que processo ele 

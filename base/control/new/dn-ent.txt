@@ -1,0 +1,13 @@
+
+
+	Entrances:
+
+------------------------------------
+Entrance 1:
+    entrance1/
+    For 'staff' and 'visitors'.
+
+------------------------------------
+Entrance 2:
+    ke/ps/entrance2/
+    For 'studants'.

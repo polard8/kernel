@@ -2,8 +2,8 @@
     n9.bin - Interpreter.
  
 usage:
-    type: $n9 -x test2.cpp
-    type: $n9 -y exemple1.cpp
+    type: $n11 -x test2.cpp
+    type: $n11 -y exemple1.cpp
 
 ------------------------
 

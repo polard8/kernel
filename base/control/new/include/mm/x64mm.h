@@ -12,29 +12,24 @@ extern unsigned long blSavedPhysicalMemoryInKB;
 
 
 // Definições dos campos das páginas.
-#define PAGE_PRESENT            0x001
-#define PAGE_WRITE              0x002
-#define PAGE_USER               0x004
+#define PAGE_PRESENT    0x001
+#define PAGE_WRITE         0x002
+#define PAGE_USER           0x004
 // 0x008 write through
-#define PAGE_NOCACHE            0x010
-#define PAGE_ACCESSED           0x020
-#define PAGE_DIRTY              0x040
+#define PAGE_NOCACHE    0x010
+#define PAGE_ACCESSED    0x020
+#define PAGE_DIRTY            0x040
 //0x080 page atribute table
-#define PAGE_GLOBAL             0x100
-#define PAGE_AVAIL              0xE00
+#define PAGE_GLOBAL    0x100
+#define PAGE_AVAIL         0xE00
 #define PAGE_PRESENT_WRITE       ( PAGE_WRITE | PAGE_PRESENT )
 #define PAGE_PRESENT_WRITE_USER  ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT )
 #define PAGE_KERNEL_PGPROT       (PAGE_PRESENT_WRITE)
-
 
 // Kernel pml4. (cr3)
 // The virtual address of the kernel pml4 table.
 // see: pages.c
 extern unsigned long gKernelPML4Address; 
-
-
-
-
 
 
 /*
@@ -494,103 +489,9 @@ struct memory_info_d
 //struct memory_info_d *miMemoryInfo;
 //...
 
-// MM BLOCK.
-//#define MMBLOCK_HEADER_SIZE  128   // canonical.   //#deprecated
-//#define MMBLOCK_COUNT_MAX  (4096)
-#define MMBLOCK_COUNT_MAX  (2*4096)
 
 
-/*
- * mmblock_d:
- *     Estrutura para memory blocks.
- *     Temos v�rios blocos de mem�ria espalhados em lugares diferentes 
- * dentro de um heap.
- *     Essa estrutura � usada pelo kernel para controlar as �reas de mem�ria
- * alocadas din�micamente dentro do heap do kernel.
- * @todo: 
- * Os blocos precisam de alguma organiza��o. 
- * Por enquanto, o total � 256 heaps de tamanhos diferentes.
- * Os blocos formar�o uma lista encadeada que ser� percorrida para se 
- * encontrar um bloco vazio. (walk).
- * Importante: A mem�ria ser� organizada em bancos, que conter�o mem�ria 
- * privada e mem�ria compartilhada. Os blocos de mem�ria e os heaps 
- * precisam estar associadoas aos bancos, que conter�o informa��es sobre 
- * processos e usu�rios. @todo:
- * Obs: Os bancos est�o definidos em bank.h
- * Obs: Um heap de processo tem v�rios blocos dentro.
- * IMPORTANTE: 
- *     Talvez tenhamos algum limite para o tamanho dessa estrutura 
- * em especial. (N�o incluir nenhuma vari�vel por enquanto!).
- */ 
 
-// Essa estrutura é para gerenciar áreas de memória 
-// alocadas dinamicamente dentro do heap do processo kernel. 
-// >>> Don't change this structure.
-// It has a fixed size.
-
-struct mmblock_d 
-{
-// Header size = 112+4 = 116
-
-// #bugbug
-// Don't change this structure,
-
-// Identificadores.
-    unsigned long Header;      //Endere�o onde come�a o header do heap. *Importante.
-    unsigned long headerSize;  //Tamanho do header em bytes.
-    unsigned long Id;          //Id do header.
-    unsigned long Used;        //Flag 'usado' ou 'livre'.
-    unsigned long Magic;       //Magic number. Ver se n�o est� corrompido.
-
-// Status
-// Se o bloco esta livre ou nao.
-// #todo:
-// Actually we can use this 'long' to create a set of flags.
-    unsigned long Free;
-
-// Mensuradores. (sizes).
-    unsigned long requestSize;   //Tamanho, em bytes, da �rea solicitada.
-    unsigned long unusedBytes;   //Quantidade de bytes n�o usados na �rea do cliente.	
-    unsigned long userareaSize;  //Tamanho da �rea reservada para o cliente. 
-                                 //(request size + unused bytes). 
-// User area.
-// Address where the allocated area starts.
-    unsigned long userArea;
-
-// Footer
-// The address where the footer starts.
-// Ele representa o fim da áre de cliente e o início
-// sa próxima alocação.
-    unsigned long Footer;
-
-// 32bit
-// Process ID.
-    pid_t pid;
-
-// Thread pointer.
-// The pointer for the current thread.
-    struct thread_d  *thread;
-
-// Navigation
-    struct mmblock_d *Prev;
-    struct mmblock_d *Next;
-};
-extern struct mmblock_d  *current_mmblock;
-
-/*
- * mmblockCount:
- *     mm block support.
- *     Conta os blocos de mem�ria dentro de um heap.
- *     dentro do heap usado pelo kernel eu acho ?? 
- */
-// see: mm.c
-extern unsigned long mmblockCount;
-
-// Lista de blocos. 
-// Lista de blocos de memória dentro de um heap.
-// #todo: Na verdade temos que usar lista encadeada. 
-// see: mm.c
-extern unsigned long mmblockList[MMBLOCK_COUNT_MAX];  
 
 // -----------------------------------
 
