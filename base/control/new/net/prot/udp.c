@@ -31,54 +31,7 @@ unsigned char saved_mac[6] = {
 };
 
 
-uint16_t inet_csum(const void *buf, size_t hdr_len);
-unsigned short IPv4Checksum(const unsigned char *start, unsigned len);
 //---------------------
-
-unsigned short IPv4Checksum(const unsigned char *start, unsigned len)
-{
-    unsigned int checksum = 0;
-    unsigned short *p = (unsigned short *)start;
-    while (len > 1) {
-        checksum += *p++;
-        len -= 2;
-    }
-
-    if (len != 0) {
-        checksum += *(unsigned char *)p;
-    }
-
-
-    checksum = (checksum & 0xffff) + (checksum >> 16);
-    checksum += (checksum >> 16);
-
-    unsigned short final = ~checksum;
-
-    return (unsigned short) ToNetByteOrder16(final);
-    //return htons(final);
-}
-
-// Checksum #test
-// credits: https://gist.github.com/jonhoo/7780260
-uint16_t inet_csum(const void *buf, size_t hdr_len)
-{
-  unsigned int sum=0;  //32bit
-  const uint16_t *ip1;
-
-  ip1 = (const uint16_t *) buf;
-  while (hdr_len > 1)
-  {
-    sum += *ip1++;
-    if (sum & 0x80000000)
-      sum = (sum & 0xFFFF) + (sum >> 16);
-    hdr_len -= 2;
-  }
-
-  while (sum >> 16)
-    sum = (sum & 0xFFFF) + (sum >> 16);
-
-  return (uint16_t) (~sum);
-}
 
 
 void 
@@ -379,34 +332,20 @@ network_send_udp (
         tpa[it] = (uint8_t) target_ip[it]; 
     };
 
-
+//
 // Checksum
-// 16bit
-/*
-    uint32_t checksum = 0;
-    checksum += 0x4500;
-    checksum += length;
-    checksum += ipv4count++;
-    checksum += 0x4000;
-    checksum += 0x4000 + protocol;
-    checksum += ToNetByteOrder16((from >> 16) & 0xFFFF);
-    checksum += ToNetByteOrder16(from & 0xFFFF); 
-    checksum += ToNetByteOrder16((to >> 16) & 0xFFFF);
-    checksum += ToNetByteOrder16(to & 0xFFFF);
-    checksum = (checksum >> 16) + (checksum & 0xffff);
-    checksum += (checksum >> 16);
-    ipv4->ip_sum = ToNetByteOrder16((uint16_t) (~checksum));
-*/
+//
 
     ipv4->ip_sum = 0;
+    ipv4->ip_sum =
+         (uint16_t)  net_checksum(
+              0, 
+              0,
+              (const unsigned char *) ipv4, 
+              (const unsigned char *) ipv4 + sizeof(struct ip_d));
+    ipv4->ip_sum =
+         (uint16_t) ToNetByteOrder16(ipv4->ip_sum);
 
-    //unsigned short s = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
-    //ipv4->ip_sum = (uint16_t) ToNetByteOrder16(s);
-    ipv4->ip_sum = (uint16_t) IPv4Checksum(ipv4, sizeof(struct ip_d) );
-
-    //unsigned short s1 = (uint16_t) inet_csum( ipv4, sizeof(struct ip_d) );
-    //unsigned short s2 = (uint16_t) inet_csum2( ipv4, sizeof(struct ip_d) );
-    //printf("s1={%x} s2={%x} \n",s1,s2);
     printf("ip_sum={%x} \n",ipv4->ip_sum);
 
     //printf ("size %d\n", sizeof (struct ip_d) );

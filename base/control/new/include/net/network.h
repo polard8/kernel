@@ -105,6 +105,12 @@ extern int ____network_late_flag;
 //
 
 
+unsigned short 
+net_checksum(
+    const unsigned char *phdr, 
+    int phdr_len, 
+    const unsigned char *start, 
+    const unsigned char *end);
 
 void testNIC(void);
 
