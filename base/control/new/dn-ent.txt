@@ -3,11 +3,11 @@
 	Entrances:
 
 ------------------------------------
-Entrance 1:
-    entrance1/
-    For 'staff' and 'visitors'.
+Entrance:
+    entrance/
+    For 'staff', 'visitors' and 'students'.
 
 ------------------------------------
-Entrance 2:
-    ke/ps/entrance2/
-    For 'studants'.
+Intake:
+    ke/ps/intake/
+    For 'students' right after a preemption.
