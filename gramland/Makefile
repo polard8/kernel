@@ -15,24 +15,22 @@ all:
 	make -C libs/rtl
 	make -C libs/libgws
 	make -C libs/libgd
-# burgundy
+
+# burgundy: Unit 3
 	make -C burgundy/server
 	make -C burgundy/client
 	make -C burgundy/gdm
-# blue
+# blue: Unit 2
 	make -C blue/terminal  
-# beige
+# beige: Unit 1
 	make -C beige/cmdline
 	make -C beige/editor
 	make -C beige/fileman
 	make -C beige/setup
-# attitude
-	make -C attitude/browser
-	make -C attitude/docv
-	
-clean-all:
+	make -C beige/browser
+	make -C beige/docv
 
-	-rm -f attitude/bin/*.BIN
+clean-all:
 	-rm -f beige/bin/*.BIN
 	-rm -f blue/bin/*.BIN
 	-rm -f burgundy/bin/*.BIN

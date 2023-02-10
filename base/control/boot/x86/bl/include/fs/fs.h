@@ -31,11 +31,10 @@
 #define FAT_ERRO_2   0xffff8   
 #define FAT_ERRO_3   0xffff7
 #define FAT_ERRO_4   0xffff6
-#define FAT_STATUS_1 0xffff5    //N�o h� mais entradas cheias.
+#define FAT_STATUS_1 0xffff5    //Não ha mais entradas cheias.
 #define FAT_STATUS_2 0xffff4
 #define FAT_STATUS_3 0xffff3
 #define FAT_STATUS_4 0xffff2
-
 
 // #importante:
 // Status de carregamento.
@@ -45,12 +44,12 @@ extern int g_fat16_root_status;
 extern int g_fat16_fat_status;
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
 extern int g_file_system_type;
-// Buffer para salvar uma entrada de diretorio.
-// @todo: Tamanho da entrada? Desperdicio?
-extern char buffer_dir_entry[512];
+
+
 // Lista de clusters em um arquivo.
-// @todo: Tamanho de arquivos?
-extern unsigned short file_cluster_list[1024];
+//#define MAX_CLUSTERS  1024
+#define MAX_CLUSTERS  2048
+extern unsigned short file_cluster_list[MAX_CLUSTERS];
 
 
 // #bugbug
@@ -77,7 +76,7 @@ extern struct partition_table_d  partition;
 // File System initialization support.
 //
 
-int fsInit();
+int fsInit(void);
 void fsInitStructures();
 void fsInitFat();
 
@@ -135,7 +134,7 @@ fsSaveFileName (
     unsigned long eid, 
     unsigned long initial_cluster);
 
-unsigned long fsCreateFile( char *name, unsigned long id);
+
 
 //int fs_search_file(unsigned char *file_name);
 
@@ -169,9 +168,6 @@ void fs_save_entry_on_root(unsigned long eid);
 //
 // Dir support.
 //
-
-unsigned long fsCreateDir( char *name , unsigned long id);
-void fsCreateFileName( char *name, unsigned long id,unsigned long eid);
 
 void fs_save_entry_on_disc(unsigned long id, unsigned long eid);
 void fs_set_entry(unsigned long id, unsigned long eid);

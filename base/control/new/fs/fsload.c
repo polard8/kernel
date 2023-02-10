@@ -606,15 +606,10 @@ fsLoadFile2 (
 unsigned long 
 fsLoadProgram (
     char *program_name,
-    unsigned long buffer,
-    unsigned long buffer_size_in_bytes );
-
-unsigned long 
-fsLoadProgram (
-    char *program_name,
     unsigned long buffer,                 // pre-allocated buffer.
     unsigned long buffer_size_in_bytes )  // buffer size.
 {
+// Load an image from PROGRAM/
 
     unsigned long Status=1; // fail
 

@@ -20,25 +20,17 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
 
-
-// globals
-
+// Globals
 int g_fat16_root_status=0;
 int g_fat16_fat_status=0;
 int g_file_system_type=0;
 
-// Buffer para salvar uma entrada de diretorio.
-// #todo: 
-// Tamanho da entrada? Desperdicio?
-char buffer_dir_entry[512];
-
 // Lista de clusters em um arquivo.
 // #todo: 
 // Tamanho de arquivos?
-unsigned short file_cluster_list[1024];
+unsigned short file_cluster_list[MAX_CLUSTERS];
 
 // see: fs.h
 struct partition_table_d  partition;
@@ -203,21 +195,6 @@ fs_create_entry (
     unsigned long eid,
     unsigned long cluster,
     unsigned long size )
-{
-     // Nothing for now.
-}
-
-
-/*
- * fsCreateFileName:
- *     Cria um nome de arquivo.    
- */
-
-void 
-fsCreateFileName ( 
-    char *name, 
-    unsigned long id,
-    unsigned long eid )
 {
      // Nothing for now.
 }
@@ -435,15 +412,14 @@ void fs_install()
  */
 void fs_relood_dir (unsigned long id)
 {
-	//return;    //Ainda não implementada.   
+    //return;    //Ainda não implementada.   
 }
 
 
 /*
  * fsLoadFile:
  * Carrega um arquivo na memória. (#fat16)
- * O Boot Loader utiliza essa rotina para carregar os arquivos 
- * do sistema.
+ * O Boot Loader utiliza essa rotina para carregar os arquivos do sistema.
  * #todo:
  * +A libC chama essa função atravez de open(...).
  * +Mudar o tipo de retorno para 'int'.
@@ -459,10 +435,14 @@ fsLoadFile (
     //unsigned long i=0;
     //unsigned long j=0;
     unsigned short next=0;
-    //dir support.
-    //unsigned short *root = (unsigned short *) FAT16_ROOTDIR_ADDRESS;
+
+// Directory
     unsigned short *dir = (unsigned short *) dir_address;
-    unsigned long max = 512;    //Número máximo de entradas no root dir.
+
+// Iterator
+// Número máximo de entradas no root dir.
+    register unsigned long max = 512; 
+
     unsigned long z = 0;        //Deslocamento no diretório raiz.
     //unsigned long n = 0;        //Deslocamento no nome.
     char name_x[13];
@@ -542,13 +522,12 @@ fsLoadFile (
             name_x[11] = 0;
 
             Status = (int) strncmp( name, name_x, 11 );
-            
             if ( Status == 0 ){
                 cluster = (unsigned short) dir[z +13];
                 goto found;
             }
         }
-        
+
         // Se a entrada eh vazia, vamos para a proxima.
         // (32 bytes / 2) = próxima entrada!
         // 512 entradas.
@@ -556,7 +535,6 @@ fsLoadFile (
         z += 16;
         max--;
     }; 
-
 
 // =======================
 // not found
@@ -580,10 +558,9 @@ found:
 
 // #bugbug
 // It is unsigned short.
+
     // if ( cluster == 0 || cluster > 0xFFF0 )
-    
-    if ( cluster <= 0 || 
-         cluster > 0xFFF0 )
+    if ( cluster <= 0 || cluster > 0xFFF0 )
     {
         printf ("fsLoadFile: [FAIL] Cluster limits File=[%s] Cluster=[%d]\n", 
             &dir[z], cluster );
@@ -677,8 +654,7 @@ while(1)
     cluster = (unsigned short) next;
 
 // Ver se o cluster carregado era o último cluster do arquivo.
-    if ( cluster == 0xFFFF || 
-         cluster == 0xFFF8 )
+    if ( cluster == 0xFFFF || cluster == 0xFFF8 )
     {
         goto done; 
     }
@@ -716,7 +692,6 @@ done:
 int path_count(const char *path)
 {
     int result=0;
-
     register int i=0;
     int max = (int) (80*25);
 
@@ -1240,15 +1215,14 @@ void fs_load_fatEx()
  *     Uma lista de clusters, forma um arquivo.
  */
  
-void fs_put_list_on_fat (){
+void fs_put_list_on_fat ()
+{
+    register unsigned short i=0;
+    unsigned short ListSize = MAX_CLUSTERS;
 
-    unsigned short i=0;
-    unsigned short lista_size = 1024;
-
-
-    for ( i=0; i < lista_size; i++ )
+    for ( i=0; i < ListSize; i++ )
     {
-        // último elemento da lista.
+        // Último elemento da lista.
         if ( file_cluster_list[i] == 0xFFFF || 
              file_cluster_list[i] == 0xFFF8 )
         {
@@ -1256,9 +1230,9 @@ void fs_put_list_on_fat (){
             return;
         }
 
-        // um elemento qualquer da lista.
+        // Um elemento qualquer da lista.
         if ( file_cluster_list[i] > 0 && 
-             file_cluster_list[i] < lista_size )
+             file_cluster_list[i] < ListSize )
         {
             fs_set_fat_entry ( 
                 file_cluster_list[i], 
@@ -1271,13 +1245,12 @@ void fs_put_list_on_fat (){
 /*
  * fs_find_n_empty_entries: 
  */
- 
 unsigned long fs_find_n_empty_entries (unsigned long n)
 {
-    unsigned long i=0;
+    register unsigned long i=0;
     unsigned long l=0;
     unsigned short empty=0;
-    unsigned short lista_size = 1024;
+    unsigned short ListSize = MAX_CLUSTERS;
 
 // #todo: 
 // Pegar de estrutura.
@@ -1289,16 +1262,14 @@ unsigned long fs_find_n_empty_entries (unsigned long n)
     unsigned short fat_max = (64*512/2); 
 
 
-    // Limits.
+// Limits.
 
-    // #bugbug
-    // It is 'unsigned long'
+// #bugbug
+// It is 'unsigned long'
 
-    if ( n < 0 || n > lista_size )
-    {
+    if ( n < 0 || n > ListSize ){
         goto fail;
     }
-
 
     for (i = 0; i < n; i++)
     {
@@ -1526,93 +1497,6 @@ done:
 }
 
 
-/* 
- * fsCreateDir: 
- *     Cria um diretório. 
- */
-
-unsigned long fsCreateDir ( char *name , unsigned long id )
-{
-    //#bugbug 
-
-    return fsCreateFile ( name, id );   
-}
-
-
-
-/* 
- * fsCreateFile: 
- *     Cria um arquivo. 
- */
-
-// #todo
-// Maybe we need this for a log.
-
-unsigned long fsCreateFile ( char *name, unsigned long id )
-{
-    unsigned long fat_entry=0;
-    unsigned long dir_entry=0;
-    unsigned long size = 1;
-
-    //encontra uma entrada vazia na fat.
-    fat_entry = fs_find_empty_entry();
-
-	//testar antes a validade da entrada.
-
-    if ( fat_entry == 0 ){
-        printf("fs_create_file: error, o cluster vazio eh 0 \n" );
-        goto fail;
-    }
-
-	//erro 2 - nao ha mais entradas vazias
-    if ( fat_entry == FAT_ERRO_1 ){
-		printf("FAT_ERRO_1 nao ha mais entradas vazias\n" );
-		goto fail;
-    }
-	
-	//
-    if ( fat_entry < 0 || fat_entry > 1024 ){
-	    printf("FAT entry fora dos limites!\n");
-		goto fail;
-    }
-
-	//marca na entrada da fat como fim de arquivo.(size 1)
-	//fs_set_fat_entry( fat_entry, 0x0000fff8 );
-     fs_set_fat_entry( fat_entry, 0x0000FFFF );  //EOF 0x0000fff8
-
-	//procura uma entrada vazia no diretorio.
-    dir_entry = fs_search_empty_entry(id);
-
-    if( dir_entry == 0 ){
-        printf("fs_create_file: nao ha entradas vazias no diretorio escolhido\n");
-        goto fail;		
-    }
-   
-    if ( dir_entry < 0 || dir_entry > 64 )
-    {
-        printf("fs_create_file: entry out of range\n");
-        goto fail;
-    }
-
-	//cria a entrada no diretorio
-	fs_create_entry( name, id, dir_entry, fat_entry, size ); 
-	
-	//fs_save_entry_on_root(i);
-
-done:
-
-#ifdef BL_VERBOSE
-    printf ("fs_create_file: done ! cluster = %d \n",fat_entry);
-#endif    
-
-    return 0;
-
-fail:   
-    printf ("fail cluster = %d \n",fat_entry);
-    return 1;
-}
-
-
 /*
  * fsClearFat:
  *     Apaga a fat, colocando zero em tudo.
@@ -1705,8 +1589,15 @@ void fsInitStructures()
 
 // Called by init() in init.c
 
-int fsInit()
+int fsInit(void)
 {
+    register int i=0;
+
+// Clear the list of clusters.
+    for (i=0; i<MAX_CLUSTERS; i++){
+        file_cluster_list[i] = 0;
+    };
+
     fsInitStructures();
     fsInitFat();
     // ...

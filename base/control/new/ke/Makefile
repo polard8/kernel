@@ -125,13 +125,14 @@ all:
 
 	$(CC) -c ps/ws.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ws.o
 
-	$(CC) -c ps/disp/ts.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
-	$(CC) -c ps/disp/dispatch.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  
-	$(CC) -c ps/disp/spawn.c     $(KERNEL_INCLUDE)  $(CFLAGS) -o spawn.o  
-	$(CC) -c ps/disp/x86_64/x64cont.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o x64cont.o  
 
-	$(CC) -c ps/sched/sched.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o sched.o  
-	$(CC) -c ps/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
+# Entrance 2
+	$(CC) -c ps/intake/disp/ts.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o ts.o  
+	$(CC) -c ps/intake/disp/dispatch.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o dispatch.o  
+	$(CC) -c ps/intake/disp/spawn.c     $(KERNEL_INCLUDE)  $(CFLAGS) -o spawn.o  
+	$(CC) -c ps/intake/disp/x86_64/x64cont.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o x64cont.o  
+	$(CC) -c ps/intake/sched/sched.c   $(KERNEL_INCLUDE)  $(CFLAGS) -o sched.o  
+	$(CC) -c ps/intake/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
 
 # link
 	$(LD) -r -o archive_ke.o $(OBJS)

@@ -309,34 +309,19 @@ palavra_reservada:
         goto exit_cmp;
     }
 
-	// newfile
-	if( strncmp( prompt, "newfile", 7 ) == 0 ){
-	    printf("~newfile - create empty file\n");
-		fsCreateFile( "novo    txt", 0);
-        goto exit_cmp;
-    }
-
-	// newdir
-	if( strncmp( prompt, "newdir", 7 ) == 0 ){
-	    printf("~newdir - create empty folder\n");
-		fsCreateDir( "novo    dir", 0);
-        goto exit_cmp;
-    }
-
-    //testa mbr
+// testa mbr
     if( strncmp( prompt, "mbr", 3 ) == 0 ){
 	    printf("~mbr\n");
 		testa_mbr();
 		goto exit_cmp;
     }
 
-    //testa /root
+// testa /root
     if( strncmp( prompt, "root", 4 ) == 0 ){
 	    printf("~/root\n");
 		testa_root();
 		goto exit_cmp;
     }
-
 
     if( strncmp( prompt, "start", 5 ) == 0 ){
 	    printf("~start\n");

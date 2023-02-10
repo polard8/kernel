@@ -35,18 +35,7 @@ void set_up_color (unsigned long color)
     g_system_color = (unsigned long) color;
 }
 
-
-/*
- * set_up_text_color:
- *     Atribui o primeiro plano e o fundo.
- *
- *     Top 4 bytes are the background, 
- *     bottom 4 bytes are the foreground color.
- *     @todo: Acho que eu quiz dizer bits.
- *
- *     @todo: Checar o tamanho da variável g_char_attrib. 
- */
-
+// ??
 void 
 set_up_text_color ( 
     unsigned char forecolor, 

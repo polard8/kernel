@@ -5,9 +5,9 @@
 
 // List of clusters. 
 // Usado na rotina de carregamento de arquivo.
-// #bugbug: Isso não é desperdício?
-// um arquivo só pode ter 1024 indices?
-#define MAX_CLUSTERS  1024
+// #bugbug
+// O limite é um arquivo de 512KB.
+// see: fs.h
 unsigned short file_cluster_list[MAX_CLUSTERS]; 
 
 

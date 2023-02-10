@@ -236,18 +236,20 @@ copy-extras:
 	@echo ":: Copying Window server and clients."
 
 # burgundy, blue and beige: (Students)
+
+# burgundy: Unit 3
 	-sudo cp ../gramland/burgundy/bin/GWSSRV.BIN   control/disk/
 	-sudo cp ../gramland/burgundy/bin/GWS.BIN      control/disk/
 	-sudo cp ../gramland/burgundy/bin/GDM.BIN      control/disk/
 	-sudo cp ../gramland/burgundy/bin/GDM2.BIN     control/disk/
+# blue: Unit 2
 	-sudo cp ../gramland/blue/bin/TERMINAL.BIN     control/disk/
+# beige: Unit 1
 	-sudo cp ../gramland/beige/bin/EDITOR.BIN      control/disk/
 	-sudo cp ../gramland/beige/bin/FILEMAN.BIN     control/disk/
 	-sudo cp ../gramland/beige/bin/CMDLINE.BIN     control/disk/PROGRAMS/
-
-# attitude: Wild and free.
-	-sudo cp ../gramland/attitude/bin/BROWSER.BIN  control/disk/
-	-sudo cp ../gramland/attitude/bin/DOCV.BIN  control/disk/PROGRAMS/
+	-sudo cp ../gramland/beige/bin/BROWSER.BIN  control/disk/
+	-sudo cp ../gramland/beige/bin/DOCV.BIN  control/disk/PROGRAMS/
 
 #========================================
 # :: Meta

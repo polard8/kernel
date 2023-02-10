@@ -219,9 +219,11 @@ extern unsigned long search_path_dir_entries;
 
 // List of clusters. 
 // Usado na rotina de carregamento de arquivo.
-// #bugbug: Isso não é desperdício?
-extern unsigned short file_cluster_list[1024]; 
-
+// #bugbug
+// O limite é um arquivo de 512KB.
+//#define MAX_CLUSTERS  1024
+#define MAX_CLUSTERS  2048
+extern unsigned short file_cluster_list[MAX_CLUSTERS]; 
 
 
 //
@@ -684,6 +686,13 @@ unsigned long
 fsLoadFile2 ( 
     struct file_context_d *fc, 
     unsigned char *file_name );
+
+// Load an image from PROGRAM/
+unsigned long 
+fsLoadProgram (
+    char *program_name,
+    unsigned long buffer,
+    unsigned long buffer_size_in_bytes );
 
 int 
 fs_load_path ( 

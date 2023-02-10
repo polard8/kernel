@@ -148,12 +148,17 @@ kernel-header:
 
 # Head
 # head_64.o
-# personas: warden, student, visitor.
-# unit 0, unit 1, unit 3, unit 4, visitor
-	$(NASM) arch/x86_64/entrance/head_64.asm \
+	$(NASM) entrance/head/x86_64/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I arch/x86_64/entrance/ \
+	-I entrance/head/x86_64/ \
 	-f elf64 -o head_64.o
+
+# Systemcall interface.
+# sci.o
+	$(CC) -c entrance/visitor/sci.c \
+	$(KERNEL_INCLUDE) \
+	$(CFLAGS) \
+	-o sci.o    
 
 # Init
 # init.o
@@ -170,14 +175,6 @@ kernel-header:
 
 # sys_xxx()
 	$(CC) -c sys/sys.c $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
-
-# Systemcall interface.
-# sci.o
-# unit 2 (xapx)
-	$(CC) -c arch/x86_64/entrance/sci.c \
-	$(KERNEL_INCLUDE) \
-	$(CFLAGS) \
-	-o sci.o    
 
 # ring0 libc.
 # klib/
@@ -196,7 +193,7 @@ kernel-footer:
 	# ...
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
-	$(LD) $(LDFLAGS) -T arch/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
+	$(LD) $(LDFLAGS) -T entrance/head/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
 clean:
 	rm -rf *.o   
 	@echo "~clean"
