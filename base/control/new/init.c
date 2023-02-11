@@ -692,12 +692,13 @@ static int booting_begin(int arch_type)
         debug_print("Screen size fail. pitch\n");
     }
 
-// Quantos kb vamos precisar para uma tela nessa resoluçao?
+// Quantos KB vamos precisar para uma tela nessa resoluçao?
     sz_in_kb = 
         (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
 
+// Saving:
 // Screen size in kb.
-// Remember: For now we only have 2048 kb mapped for lfb.
+// Remember: For now we only have 2048KB mapped for LFB.
     screen_size_in_kb = sz_in_kb;
 
     // #debug

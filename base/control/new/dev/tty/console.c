@@ -809,10 +809,10 @@ unsigned long get_fg_color(void)
 void console_scroll(int console_number)
 {
     register int i=0;
-    // Salvar cursor
+// Salvar cursor
     unsigned long OldX=0;
     unsigned long OldY=0;
-    // Salvar limites
+// Salvar limites
     unsigned long OldLeft=0;
     unsigned long OldTop=0;
     unsigned long OldRight=0;
@@ -831,8 +831,9 @@ void console_scroll(int console_number)
 // See: rect.c
 // #todo
 // Isso deveria ser apenas scroll_rectangle()
-    // #bugbug
-    // Valid only for full screen
+// #bugbug
+// Valid only for full screen
+
     scroll_screen_rect();
 
 // Clear the last line.
@@ -840,12 +841,16 @@ void console_scroll(int console_number)
 // Salva cursor
     OldX = CONSOLE_TTYS[console_number].cursor_x;
     OldY = CONSOLE_TTYS[console_number].cursor_y;
-
 // Salva cursor limits
     OldLeft   = CONSOLE_TTYS[console_number].cursor_left;
     OldTop    = CONSOLE_TTYS[console_number].cursor_top;
     OldRight  = CONSOLE_TTYS[console_number].cursor_right;
     OldBottom = CONSOLE_TTYS[console_number].cursor_bottom;
+
+
+// #bugbug
+// cursor_bottom Isso não é a última, é o limite.
+// A última é cursor_bottom-1.
 
 // Cursor na ultima linha.
 // Para podermos limpa-la.

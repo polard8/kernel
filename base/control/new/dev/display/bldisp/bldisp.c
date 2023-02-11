@@ -253,11 +253,11 @@ void screenSetSize( unsigned long width, unsigned long height )
 
 /*
  * fb_refresh_screen:
- *     Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
- *     Ok, isso está no lugar certo. Pois somente
- *  O driver de vídeo pode acessar o LFB
- *  /x/video/screen.c 
+ * Coloca o conteúdo do BackBuffer no LFB da memória de vídeo.
+ * Ok, isso está no lugar certo. Pois somente o driver display device  
+ * pode acessar o LFB.
  */
+
 // backup.
 // This is working very well.
 // Copying long by long.
@@ -271,7 +271,7 @@ void screenSetSize( unsigned long width, unsigned long height )
 // para alguma parte não mapeada no lfb.
 // Precisamos de limites. Obedecendo a quantidade mapeada.
 // #bugbug
-// Como temos apenas 2MB de lfb mapeados, 
+// Como temos apenas 2MB de LFB mapeados, 
 // então vamos copiar menos dados pra evitar ultrapassar o limite
 // e causar PF.
 // #todo
@@ -279,40 +279,50 @@ void screenSetSize( unsigned long width, unsigned long height )
 
 void fb_refresh_screen (unsigned long flags)
 {
-    int i=0;
+
+// #option
+// Use this one. It is working fine.
+    //refresh_rectangle( 0, 0, gSavedX, gSavedY ); 
+
+// Loop
+    register int i=0;
 // Char. The slow way.
     unsigned char *backbuffer  = (unsigned char *) BACKBUFFER_VA;
     unsigned char *frontbuffer = (unsigned char *) FRONTBUFFER_VA;
-// Long. The fast way.
+// Long. The fast way. (8bytes)
     unsigned long *backbuffer_long  = (unsigned long *) BACKBUFFER_VA;
     unsigned long *frontbuffer_long = (unsigned long *) FRONTBUFFER_VA;
 
 // We can't refresh.
-// The buffer wasn't validated.
-    if ( refresh_screen_enabled != TRUE ){
+// The buffer wasn't validated yet.
+// #todo: Check this into the display device structure.
+// see: init.c
+    if (refresh_screen_enabled != TRUE){
         debug_print_string("fb_refresh_screen: [FAIL-FIXME] refresh_screen_flag\n");
         return;
     }
 
+// Invalid screen parameters.
+// #todo: Check these into the display device structure.
     if ( gSavedX == 0 || gSavedY == 0 || gSavedBPP == 0 )
     {
         panic("fb_refresh_screen: display info\n");
     }
 
-// #todo
-// Isso significa que só poderemos 
-// usar o modo 320x200 por enquanto.
-// clipping:
+
+// #
+// Provisório, até termos condições de usar mais memória.
+// Clipping:
 // Podemos recortar, e mesmo que a resoluçao seja alta,
-// somente escreveremos nos primeiros 2mb ...
-// Isso seria divertido, a velocidade seria alta,
-// mas teriamos uma tela recortada. kkk
-// Essa tecnica pode ser uma opçao configuravel
+// somente escreveremos nos primeiros 2MB por enquanto.
+// #todo
+// Também podemos salvar esse tipo de valor na 
+// estrutura de display device.
 
-    //int Total = (int)(gSavedX*gSavedBPP*gSavedY);
-    int Total = 
-        (int) (screen_size_in_kb * 1024);
 
+// Total number of bytes in the screen.
+// see: init.c
+    int TotalInBytes = (int) (screen_size_in_kb * 1024);
 
 /*
 // nao pode ser mais que 2mb
@@ -330,11 +340,14 @@ void fb_refresh_screen (unsigned long flags)
     if ( g_use_fake_screen_size == TRUE)
     {
         //fake_screen_size_in_kb = (( 320*4*200 )/1024);
-        Total = (int) (fake_screen_size_in_kb * 1024);
+        TotalInBytes = (int) (fake_screen_size_in_kb * 1024);
     }
 
-// nao pode ser mais que 2mb
-    if (Total >= 2097152 ){
+// 800*3*600 = 1440000
+// 800*4*600 = 1920000
+// Não pode ser mais que 2MB.
+// 2048 * 1024 = 2097152.
+    if (TotalInBytes >= 2097152){
         debug_print_string("fb_refresh_screen: [FAIL-FIXME] Total\n");
         return;
     }
@@ -343,36 +356,25 @@ void fb_refresh_screen (unsigned long flags)
 // Refresh
 //
 
+// #todo: Suspend this.
 // Vertical synchonization?
 //  if(flags & 1)
     vsync();
 
-// Fast way ?
-// Divisible by 8. So use the fast way.
-
-    int FastTotal=0;
-    if ( (Total % 8) == 0 )
-    {
-        FastTotal = (int) (Total >> 3);
-        for ( i=0; i<FastTotal; i++ ){
-            frontbuffer_long[i] = backbuffer_long[i];
-        };
-        return;
-    }
-
-// Slow way.
-// One byte per time.
-    for ( i=0; i<Total; i++ ){
-        frontbuffer[i] = backbuffer[i];
-    };
-
-    return;
+// Refresh
+    refresh_rectangle( 0, 0, gSavedX, gSavedY );
 }   
-
 
 void refresh_screen (void)
 {
+// #bugbug
+// This routine is not working for higher resolutions.
+// We are missing the last few bytes.
     fb_refresh_screen(0);
+
+// #option
+// It is working
+    //refresh_rectangle( 0, 0, gSavedX, gSavedY ); 
 }
 
 // The whole screen is dirty.

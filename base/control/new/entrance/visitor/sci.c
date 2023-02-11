@@ -1266,7 +1266,7 @@ void *sci0 (
                 (unsigned long) message_address[1],    //y
                 (unsigned long) message_address[2],    //width
                 (unsigned long) message_address[3],    //height
-                (unsigned int)  message_address[4],    //color
+                (unsigned int)  message_address[4],      //color
                 (unsigned long) message_address[5] );  //rop_flags
             return NULL;
             break;

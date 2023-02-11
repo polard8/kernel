@@ -5,7 +5,7 @@
 
 
 //
-// == private functions: prototypes =====================
+// == private functions: prototypes ====================
 //
 
 static void 
@@ -42,13 +42,11 @@ static void *__rectStrCopyMemory32 (
  * __drawrectangle0: 
  *     Draw a rectangle on backbuffer or frontbuffer.
  */
-
 // Service 9.
 // #bugbug
 // Agora precisamos considerar o limite de apenas 2mb
 // de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
 // Pois nao queremos escrever em area nao mapeada.
-
 // IN:
 // 1=backbuffer
 // 2=frontbuffer
@@ -65,39 +63,30 @@ __drawrectangle0(
 {
     //debug_print("__drawrectangle0: r0 :)\n");
 
-// Copy.
+// Copy
     unsigned long X      = (x      & 0xFFFF);
     unsigned long Y      = (y      & 0xFFFF);
     unsigned long Width  = (width  & 0xFFFF); 
     unsigned long Height = (height & 0xFFFF);
     unsigned int Color   = color;
 
-
 // Invalid argument
-    if (back_or_front != 1 && 
-        back_or_front != 2 )
-    {
-         panic("__drawrectangle0: back_or_front\n");
+    if ( back_or_front != 1 && back_or_front != 2 ){
+        panic("__drawrectangle0: back_or_front\n");
     }
 
-    //loop
+// Loop
     unsigned long internal_height = (unsigned long) Height;
-
-    // #todo
-    // Get the clipping window/rectangle.
-
+// #todo
+// Get the clipping window/rectangle.
     struct rect_d  Rect;
     struct rect_d  ClippingRect;
-
-// flag
+// Flag
     int UseClipping = TRUE;
-
-
 // dc: Clipping
 // Clipping support.
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
     unsigned long deviceHeight = (unsigned long) screenGetHeight();
-    
     if ( deviceWidth == 0 || deviceHeight == 0 )
     {
         debug_print ("__drawrectangle0: [PANIC] w h\n");
@@ -144,20 +133,18 @@ __drawrectangle0(
 // == Target rectangle ================
 //
 
-    Rect.bg_color = (unsigned int) Color;
-
-    // Dimensions
+// Dimensions
     Rect.x = 0;
     Rect.y = 0;
     Rect.width  = (Width  & 0xFFFF);
     Rect.height = (Height & 0xFFFF);
-
-    // Margins
+// Margins
     Rect.left   = (X & 0xFFFF);
     Rect.top    = (Y & 0xFFFF);
     Rect.right  = (unsigned long) (Rect.left + Rect.width);
     Rect.bottom = (unsigned long) (Rect.top  + Rect.height); 
-
+// bg color
+    Rect.bg_color = (unsigned int) Color;
 
 //
 // Clipping
@@ -198,41 +185,43 @@ __drawrectangle0(
     while (1)
     {
         // 1=backbuffer
-        if( back_or_front == 1 ){
+        if (back_or_front == 1){
             backbuffer_draw_horizontal_line ( 
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
         // 2=backbuffer
-        if( back_or_front == 2 ){
+        if (back_or_front == 2){
             frontbuffer_draw_horizontal_line ( 
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
+        // Next line.
         Y++;
-        
+
         // #??
         // Porque podemos desejar escrever no backbuffer
         // um retângulo que ultrapasse a área do frontbuffer.
-        
-        if ( UseClipping == TRUE )
+        if (UseClipping == TRUE)
         {
-            if ( Y > ClippingRect.bottom ){ break; };
+            if (Y > ClippingRect.bottom)
+            {
+                break;
+            }
         }
 
         // Decrementa o contador.
         internal_height--;
         if (internal_height == 0)
+        {
             break;
+        }
     };
-
 
 // ??
 // Send the rectangle to a list.
 
 // Invalidate
-// Sujo de tinta.
-
     Rect.dirty = TRUE;
 }
 
@@ -252,13 +241,11 @@ backbuffer_draw_rectangle(
 
 // 1=backbuffer
 // 2=frontbuffer
+
     __drawrectangle0(
         x, y, width, height,
-        color,
-        rop_flags,
-        1 );      // back or front.
+        color, rop_flags, 1 );
 }
-
 
 void 
 frontbuffer_draw_rectangle( 
@@ -275,32 +262,24 @@ frontbuffer_draw_rectangle(
 
     __drawrectangle0(
         x, y, width, height,
-        color,
-        rop_flags,
-        2 );      // back or front.
+        color, rop_flags, 2 );
 }
-
 
 /*
  * refresh_rectangle:
- *     Copiar um retângulo do backbuffer para o frontbuffer. 
- *     @todo: Rotina parecida com essa pode ser criada e usada para manipular 
- * regiões da tela, como área de cliente efetuar scroll de buffer em páginas 
- * de navegador ou menus .. mas para isso, a cópia seria dentro do próprio 
- * backbuffer ou de um terceiro buffer para o backbuffer. 
+ * Copia um retângulo do backbuffer para o frontbuffer.
  * Histórico:
  *     2017 - Criado por Frederico Lamberti Pissarra.
  *     2018 - Fred Nora.
  */
-// #todo 
-//kgws não pode acessar o lfb, devemos chamar o diálogo em x/video.c
-//#importante
-//É bem mais rápido com múltiplos de 4.
+// #importante
+// É bem mais rápido com múltiplos de 4.
+//
 // #bugbug
-// Agora precisamos considerar o limite de apenas 2mb
-// de lfb mapeados e de apenas 2 mb de backbuffer mapeados.
-// Pois nao queremos escrever em area nao mapeada.
-// Copy a rectangle.
+// No momento precisamos considerar o limite de apenas 2MB de LFB mapeados e 
+// de apenas 2MB de backbuffer mapeados.
+// Pois nao queremos escrever em área não mapeada.
+//
 
 static void 
 __refresh_rectangle0 ( 
@@ -311,32 +290,39 @@ __refresh_rectangle0 (
     unsigned long buffer_dest,
     unsigned long buffer_src )
 {
+// Copy a rectangle.
+// Given the addresses of the buffers.
+
     //#debug
     // debug_print("__refresh_rectangle0: (Ring 0)\n");
 
-    //void *dest       = (void *)      FRONTBUFFER_ADDRESS;
-    //const void *src  = (const void*) BACKBUFFER_ADDRESS;
+// #todo
+// Checar a validade desses endereços.
+    //if (buffer_dest == 0){ return; }
+    //if (buffer_src == 0) { return; }
+
     void *dest       = (void *)      buffer_dest;
     const void *src  = (const void*) buffer_src;
 
-// loop
+// Loop
     register unsigned int i=0;
     register unsigned int lines=0;
-    unsigned int line_size=0; 
+    unsigned int hl_width = 0;  // horizontal line width. 
     register int count=0; 
 
 // Screen pitch.
 // screen line size in pixels * bytes per pixel.
-    unsigned int screen_pitch=0;  
+    unsigned int screen_pitch=0;
 // Rectangle pitch
 // rectangle line size in pixels * bytes per pixel.
-    unsigned int rectangle_pitch=0;  
+    unsigned int rectangle_pitch=0;
     unsigned int offset=0;
 // = 3; 24bpp
+// = 4; 32bpp
     int bytes_count=0;
     int FirstLine = (int) (y & 0xFFFF);
-    //int UseVSync = FALSE;
     int UseClipping = TRUE;
+    //int UseVSync = FALSE;
 
 //==========
 // dc
@@ -350,18 +336,19 @@ __refresh_rectangle0 (
 
 // Internal
 
+// Get function parameters.
     unsigned long X = (unsigned long) (x & 0xFFFF);
     unsigned long Y = (unsigned long) (y & 0xFFFF);
+    hl_width = (unsigned int) (width  & 0xFFFF);
+    lines    = (unsigned int) (height & 0xFFFF);
 
-    line_size = (unsigned int) (width  & 0xFFFF); 
-    lines     = (unsigned int) (height & 0xFFFF);
-
+// How many bytes per pixel?
     switch (gSavedBPP){
         case 32:  bytes_count = 4;  break;
         case 24:  bytes_count = 3;  break;
         // ... #todo
         default:
-            panic("refresh_rectangle: SavedBPP\n");
+            panic("refresh_rectangle: gSavedBPP\n");
             break;
     };
 
@@ -371,23 +358,17 @@ __refresh_rectangle0 (
 
 // Screen pitch.
 // Screen line size in pixels plus bytes per pixel.
-    screen_pitch = 
-        (unsigned int) (bytes_count * deviceWidth);
+    screen_pitch = (unsigned int) (bytes_count * deviceWidth);
 
 // Rectangle pitch.
 // rectangle line size in pixels * bytes per pixel.
-//(line_size * bytes_count) é o número de bytes por linha. 
-    rectangle_pitch = 
-        (unsigned int) (bytes_count * line_size);
+// (line_size * bytes_count) é o número de bytes por linha. 
+    rectangle_pitch = (unsigned int) (bytes_count * hl_width);
 
-// #atenção.
-//offset = (unsigned int) BUFFER_PIXEL_OFFSET( x, y );
+    offset = (unsigned int) ( (Y*screen_pitch) + (X*bytes_count) );
 
-    offset = 
-        (unsigned int) ( (Y*screen_pitch) + (bytes_count*X) );
-
-    dest = (void *)       (dest + offset); 
-    src  = (const void *) (src  + offset); 
+    dest = (void *)       (dest + offset);
+    src  = (const void *) (src  + offset);
 
 // #bugbug
 // Isso pode nos dar problemas.
@@ -408,9 +389,16 @@ __refresh_rectangle0 (
     if ( (rectangle_pitch % 8) == 0 )
     {
         count = (rectangle_pitch>>3);
-        for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
-                if ( (FirstLine + i) > deviceHeight ){ break; }
+        for ( i=0; i < lines; i++ )
+        {
+            if (UseClipping == TRUE)
+            {
+                // #todo: Não podemos escremer na linha 600, por exemple.
+                //if ( (FirstLine + i) >= deviceHeight )
+                if ( (FirstLine + i) > deviceHeight )
+                { 
+                    break;
+                }
             }
             memcpy64 ( (void *) dest, (const void *) src, count );
             dest += screen_pitch;
@@ -432,9 +420,16 @@ __refresh_rectangle0 (
     if ( (rectangle_pitch % 4) == 0 )
     {
         count = (rectangle_pitch>>2);
-        for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
-                if ( (FirstLine + i) > deviceHeight ){ break; }
+        for ( i=0; i < lines; i++ )
+        {
+            if (UseClipping == TRUE)
+            {
+                // #todo: Não podemos escrever na linha 600, por exemplo.
+                // if ( (FirstLine + i) >= deviceHeight )
+                if ( (FirstLine + i) > deviceHeight )
+                { 
+                    break; 
+                }
             }
             memcpy32 ( (void *) dest, (const void *) src, count );
             dest += screen_pitch;
@@ -452,9 +447,16 @@ __refresh_rectangle0 (
 
     if ( (rectangle_pitch % 4) != 0 )
     {
-        for ( i=0; i < lines; i++ ){
-            if ( UseClipping == TRUE ){
-                if ( (FirstLine + i) > deviceHeight ){ break; }
+        for ( i=0; i < lines; i++ )
+        {
+            if (UseClipping == TRUE)
+            {
+                // #todo: Não podemos escrever na linha 600, por exemplo.
+                // if ( (FirstLine + i) >= deviceHeight )
+                if ( (FirstLine + i) > deviceHeight )
+                { 
+                    break; 
+                }
             }
             memcpy ( (void *) dest, (const void *) src, rectangle_pitch );
             dest += screen_pitch; 
@@ -464,6 +466,7 @@ __refresh_rectangle0 (
     }
 }
 
+// Service 10.
 // ??
 // A ideia aqui é efetuar o refresh de um retângulo 
 // que esteja em um dado buffer.

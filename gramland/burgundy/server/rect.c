@@ -974,10 +974,8 @@ __drawrectangle0(
     unsigned long Height = (height & 0xFFFF);
     unsigned int Color   = color;
 
-
 // Invalid argument
-    if (back_or_front != 1 && 
-        back_or_front != 2 )
+    if (back_or_front != 1 && back_or_front != 2 )
     {
          //panic("__drawrectangle0: back_or_front\n");
          gwssrv_debug_print("__drawrectangle0: back_or_front\n");
