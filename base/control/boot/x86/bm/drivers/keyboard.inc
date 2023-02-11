@@ -169,17 +169,11 @@ keylayoutupper:
   db    0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ç', 0x22, '~' 
   db    0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', ':', 0, 0, 0, ' ', 0
 
-
-
-; 0e = backspace
-; 1c = enter
-
-
-
-;;==================================================================
+;==============================
 ; keyboard:
 ;     Keyboard interrupt. (IRQ 0x01), (INT 0x21)
-
+; 0e = backspace
+; 1c = enter
 ;++
 keyboard:
     ;nop
@@ -188,60 +182,89 @@ _irq1:
     push eax
     push ebx
 
-	;Debug.
+    ;Debug.
     ;mov al, byte [debug_char]
     ;mov byte [0xB8002], al
     ;inc byte [debug_char]
-	
-	;For debug to see if system is still running.
-	;call keyboard_debug
 
-	;Get the scancode from the keyboard.
-	
-	xor eax, eax
-	in al, 0x60
-	
-	;@todo: Escape, volta para o Shell.
-	;cmp al, SCAN_ESC
-	
-	cmp al, 0x2A		   ;Left Shift Make.
-	je keyboard_shift
-	cmp al, 0x36		   ;Right Shift Make.
-	je keyboard_shift
-	cmp al, 0xAA		   ;Left Shift Break.
-	je keyboard_noshift
-	cmp al, 0xB6	       ;Right Shift Break.
-	je keyboard_noshift
-	
-	;Testa o scan code para keyup ou keydown.
-	
-	;Key down.
-	test al, 0x80
-	jz keydown
-	;Key up.
-	jmp keyup
-	
+    ;For debug to see if system is still running.
+    ;call keyboard_debug
+
+; Get the scancode from the keyboard.
+    xor eax, eax
+    in al, 0x60
+
+; Status reg
+; > Strobe the keyboard to ack the char
+; > Send back
+; Strobe the bit high
+; and then strobe it low.
+    push eax
+    xor eax, eax
+    in al, 0x61
+    or al, 0x80
+    out 0x61, al
+    pop eax
+
+; #todo: 
+; Escape, volta para o Shell.
+    ;cmp al, SCAN_ESC
+
+; Left Shift Make. (Pressed)
+    cmp al, 0x2A	
+    je keyboard_shift
+; Right Shift Make. (Pressed)
+    cmp al, 0x36
+    je keyboard_shift
+
+; Left Shift Break. (Released)
+    cmp al, 0xAA
+    je keyboard_noshift
+; Right Shift Break. (Released)
+    cmp al, 0xB6
+    je keyboard_noshift
+
+; Testa o scan code para keyup ou keydown.
+; Key down.
+    test al, 0x80
+    jz keydown
+; Key up.
+    jmp keyup
+
 ;=======
-;Keydown.
+; Keydown.
 keydown:
-	cmp byte [key_shift], 0x00
-	jne keyboard_lowercase
-	jmp keyboard_uppercase
+    cmp byte [key_shift], 0x00
+    jne keyboard_lowercase
+    jmp keyboard_uppercase
+
+;--------------
 ;Minúsculas.
 keyboard_lowercase:
-	mov ebx, keylayoutupper
-	jmp keyboard_processkey
+    mov ebx, keylayoutupper
+    jmp keyboard_processkey
+
+;--------------
 ;Maiúsculas.
 keyboard_uppercase:
-	mov ebx, keylayoutlower
-;Convert the scancode.
+    mov ebx, keylayoutlower
+    ; Fall through.
+
+;--------------
+; Convert the scancode.
+; Put the key into the buffer.
 keyboard_processkey:
-	add ebx, eax
-	mov bl, [ebx]
-	mov [key], bl    ;Pega a tecla.
-	mov al, [key]
-	jmp keyboard_done
-	
+
+    add ebx, eax
+    mov bl, [ebx]
+
+; Put the key into the buffer.
+    mov [key], bl 
+
+    mov al, [key]
+
+    jmp keyboard_done
+
 ;======
 ;Keyup.
 keyup:
@@ -353,40 +376,10 @@ wait_key:
     pop edx
     ret
 
-
-
-
-;============================================================
+;------------------------------------------------
 ; keyboardInit:
-;     Set keyboard repeat rate to max.
-
-	;; #bugbug
-	;; Cancelado.
-	;; Não precisamos disso, pois vamos configurar o teclado 
-	;; durante a inicialização do i8042 no kernel.
-
 keyboardInit:
-	;push ax
-			
-	;Set Typematic Rate/Delay.
-	;mov al, 0xf3
-	;out 0x60, al
-
-	;30 cps and .25 second delay.
-	;xor al, al
-	;out 0x60, al
-
-	;Set/Reset LEDs.
-	;mov al, 0xed
-	;out 0x60, al
-
-	;All off.
-	;xor al, al
-	;out 0x60, al
-
-	;pop ax
-	RET
-
+    RET
 
 ;===========================================================
 ;; reboot:

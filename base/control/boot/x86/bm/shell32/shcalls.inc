@@ -14,9 +14,8 @@ exit:
 ; Chamaremos uma rotina que volta para o modo real, 
 ; muda o modo de vídeo e inicializa a GUI.
 ; See: stage3/pm.inc 
-do_boot:
 ; Default to 800x600.
-
+do_boot:
 ; 320x200
     ;jmp do_gramado_mode_jail
 ; 640x480
@@ -25,7 +24,7 @@ do_boot:
     jmp do_gramado_mode_home
 ; 1024x768
     ;jmp do_gramado_mode_p2
-; ??
+; ?x?
     ;jmp do_gramado_mode_castle
     jmp do_boot
 ; =============================================

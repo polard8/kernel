@@ -107,6 +107,7 @@ cpustatus:              equ 0x009FEF00  ; Location of CPU status data (256 bytes
 cpuqueue:               equ 0x009FF000  ; Location of CPU Queue. Each queue item is 16 bytes. (4KiB before the 2MiB mark, Room for 256 entries)
 
 
+;--------------------------------------------------------------------------
 ; System variables:
 ; DQ - Starting at offset 0, increments by 0x8
 
@@ -162,7 +163,11 @@ os_Screen_Cursor_Col:  equ os_SystemVariables + 282
 cursorx:               equ os_SystemVariables + 384  ; cursor row location
 cursory:               equ os_SystemVariables + 385  ; cursor column location
 scancode:              equ os_SystemVariables + 386
-key:                   equ os_SystemVariables + 387
+
+; Buffer for next key.
+; see: keyboard.inc
+key:  equ  os_SystemVariables + 387
+
 key_shift:             equ os_SystemVariables + 388
 screen_cursor_x:       equ os_SystemVariables + 389
 screen_cursor_y:       equ os_SystemVariables + 390
@@ -179,7 +184,11 @@ app_argc:              equ os_SystemVariables + 400
 os_VideoDepth:         equ os_SystemVariables + 401
 os_VideoEnabled:       equ os_SystemVariables + 402
 
+;--------------------------------------------------------------------------
+
+;
 ; Variables:
+;
 
 cpuqueuemax:  dw  256
 screen_cols:  db  80    ;largura. 

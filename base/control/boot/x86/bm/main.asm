@@ -135,6 +135,7 @@ save_cylinder_numbers: dw 0
 ; /dev/sdd - 0x83
 
 bm_main:
+; Entry point. (16bits)
 
 ; Set up registers.
 ; Adjust segment registers and stack.
@@ -155,6 +156,45 @@ bm_main:
     mov byte [bootmanagerDriveNumber], dl
     mov byte [META$FILE.DISK_NUMBER], dl
     mov byte [DISKINFO16_disk_number], dl
+
+
+; =====================
+; Reset keyboard controller.
+; see:
+; http://www.ctyme.com/intr/int-16.htm
+
+; Int 16/AX=0601h - AAKEYS - EMPTY KEY-EVENT BUFFER
+    ;xor ax, ax
+    ;mov ax,  0601h
+    ;int 0x16
+
+; Int 16/AH=04h - Tandy 2000 - KEYBOARD - FLUSH KEYBOARD BUFFER
+    ;xor ax, ax
+    ;mov ah,  04h
+    ;int 0x16
+
+; Int 16/AH=25h - HUNTER 16 - RESET KEYBOARD
+    ;xor ax, ax
+    ;mov ah,  25h
+    ;int 0x16
+
+; Int 16/AX=6F09h - HP Vectra EX-BIOS - F16_KBD_RESET - RESET KEYBOARD TO DEFAULTS
+    ;xor ax, ax
+    ;mov ax,  6F09h
+    ;int 0x16
+
+; Int 16/AH=FFh - KEYBOARD - KBUF extensions - ADD KEY TO TAIL OF KEYBOARD BUFFER
+    ;xor ax, ax
+    ;mov ah,  0xFF
+    ;int 0x16
+
+; get keystroke
+; Int 16/AH=00h - KEYBOARD - GET KEYSTROKE
+; On extended keyboards, this function discards any extended keystrokes, 
+; returning only when a non-extended keystroke is available. 
+    ;xor ax, ax
+    ;int 0x16
+
 
 ; Get disk info.
 ; Get drive parameters: 

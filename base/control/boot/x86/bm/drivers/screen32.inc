@@ -141,9 +141,11 @@ os_output:
 
 ; ----------------------------------------------------------------------
 ; os_output_char -- Displays a char
-;  IN:	AL  = char to display
-; OUT:	All registers perserved
+;  IN: AL  = char to display
+; OUT: All registers perserved
+
 os_output_char:
+
 	push edi
 	push edx
 	push ecx
@@ -154,7 +156,9 @@ os_output_char:
 	je os_output_char_graphics
 
 os_output_char_text:
-	mov ah, 0x07		; Store the attribute into AH so STOSW can be used later on
+
+; Store the attribute into AH so STOSW can be used later on
+    mov ah, 0x07
 
 	push eax
 	mov ax, [os_Screen_Cursor_Row]
@@ -164,12 +168,18 @@ os_output_char_text:
 	mov bx, [os_Screen_Cursor_Col]
 	add ax, bx
 	shl ax, 1			; multiply by 2
-	mov edi, 0xB8000		; Address of the screen buffer
-	add edi, eax
-	pop eax
 
-	stosw			; Write the character and attribute with one call
-	jmp os_output_char_done
+; Address of the screen buffer
+; Base + offset.
+    mov edi, 0xB8000
+    add edi, eax
+
+    pop eax
+
+; Write the character and attribute with one call.
+    stosw
+
+    jmp os_output_char_done
 
 os_output_char_graphics:
 	mov ebx, [os_Font_Color]
@@ -177,6 +187,7 @@ os_output_char_graphics:
 	call os_glyph_put
 
 os_output_char_done:
+
 	call os_inc_cursor
 
 	pop eax

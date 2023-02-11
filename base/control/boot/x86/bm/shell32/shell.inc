@@ -45,7 +45,12 @@ align 1
 ;++
 
 os_command_line:
+; We're gonna get a string.
+; The last key is a [Enter].
 
+    mov byte [key], 0
+
+; #todo: Deprecated
 ; Flag diferente de zero se haverá alguma operação com arquivo.
     cmp byte [file_flag], 0
     je .do_prompt
@@ -54,21 +59,18 @@ os_command_line:
     ;Color.
     ;mov ebx, 0x00FF0000
     ;mov [os_Font_Color], ebx
-.do_change_name:
 
-; Mostra uma string, que é um prompt para mudar o nome do arquivo.
+.do_change_name:
+    ; Mostra uma string, que é um prompt para mudar o nome do arquivo.
     mov esi, prompt_change_file
     call os_output
-
-; Não mostra o prompt.
+    ; Não mostra o prompt.
     jmp .no_prompt
 
-    ; Print new prompt.
-    ; See: stage3/shell/shlib.inc
-
+; Print new prompt.
+; See: stage3/shell/shlib.inc
 .do_prompt:
     call show_prompt_string
-
 .no_prompt:
 
     ;Color.
@@ -79,6 +81,8 @@ os_command_line:
 ; Limit the input to 250 characters.
 ; This buffer has 1024 bytes.
 
+; Get a string.
+; input32.inc
     mov edi, cli_temp_string
     mov ecx, 250
     call os_input
@@ -536,7 +540,12 @@ os_command_line_ret:
     ret
 
 
-;=====================================================================
+;================================================
+; Wrapper
+init_shell:
+    jmp  shellInit
+
+;================================================
 ; shellInit:
 ;     Interface para chamar o início do Shell do Boot Manager.
 ;     Obs: O Essa rotina pode receber algum argumento.
@@ -546,22 +555,14 @@ os_command_line_ret:
 ; We need to initialize the i8042 when we enter 
 ; in the 32bit protected mode environment.
 ;+
-
-init_shell:
-    nop
 shellInit: 
 
 ; Let's drain the keyboard output buffer.
 ; #todo: Use a loop for that.
+; #bugbug: Not working
 
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
-    in al, 0x60
+    ;in al, 0x60
+    ;in al, 0x60
 
     jmp os_command_line
     ret
