@@ -920,7 +920,11 @@ pciHandleDevice (
 // Maybe 'pci' is the 'class' of this device.
 
     __file->____object = ObjectTypePciDevice;
+
     __file->isDevice = TRUE;
+// #todo
+    __file->dev_major = 0;
+    __file->dev_minor = 0;
 
     //debug_print("pciHandleDevice: #todo Call devmgr_register_device()\n");
 

@@ -33,12 +33,8 @@
  *	@(#)types.h	7.17 (Berkeley) 5/6/91
  */
 
-
-
-
-#ifndef ____TYPES2_H
-#define ____TYPES2_H    1
-
+#ifndef __PUBLIC_TYPES2_H
+#define __PUBLIC_TYPES2_H    1
 
 /* BSD types. */
 typedef  unsigned char    u_char;

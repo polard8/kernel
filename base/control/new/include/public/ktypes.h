@@ -1,8 +1,8 @@
 
 // ktypes.h
 
-#ifndef ____KTYPES_H
-#define ____KTYPES_H    1 
+#ifndef __PUBLIC_KTYPES_H
+#define __PUBLIC_KTYPES_H    1 
 
 #define TRUE  1
 #define FALSE  0

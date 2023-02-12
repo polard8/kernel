@@ -66,6 +66,9 @@ void ps2kbd_initialize_device (void)
     fp->magic = 1234;
     fp->____object = ObjectTypeFile;
     fp->isDevice = TRUE;
+// #todo
+    fp->dev_major = 0;
+    fp->dev_minor = 0;
 
 // #todo: Initialize the file structure ... buffer ...
 

@@ -7,12 +7,15 @@
 
 #define SOCKET_MAX_PENDING_CONNECTIONS   32
 
+
 // Socket state
 #define SS_NULL           0
 #define SS_UNCONNECTED    1
 #define SS_CONNECTING     2
 #define SS_CONNECTED      3
 #define SS_DISCONNECTING  4
+
+
 // Ports
 #define PORTS_WS  4040
 #define PORTS_NS  4041
@@ -140,17 +143,14 @@ typedef	_BSD_SSIZE_T_	ssize_t;
 #define AF_IUCV       32            /* IUCV sockets			*/
 #define AF_RXRPC      33            /* RxRPC sockets 		*/
 #define AF_RS232      35            /* Serial socket (NEW!) */
+// ...
 #define AF_GRAMADO    8000
-#define AF_MAX        AF_GRAMADO  //#todo
-
-
-/*
- * Definitions for network related sysctl, CTL_NET.
- * Second level is protocol family.
- * Third level is protocol number.
- * Further levels are defined by the individual families below.
- */
+// Max
+#define AF_MAX    AF_GRAMADO
 #define NET_MAXID    AF_MAX
+#define NPROTO	   AF_MAX
+// -------------------------------------------------------
+
 
 #define MAXHOSTNAMELEN    256
 
@@ -347,17 +347,15 @@ struct sockpeercred
 
 typedef unsigned  socklen_t;
 
-
-//bsd
 /*
  * Structure used for manipulating linger option.
+ * BSD-style.
  */
 struct linger 
 {
     int l_onoff;     /* option on/off */
     int l_linger;    /* linger time in seconds */
 };
-
 
 //bsd
 /*
@@ -376,7 +374,7 @@ struct	accept_filter_arg {
 struct sockaddr 
 {
     unsigned short sa_family;
-    char           sa_data[14];
+    char sa_data[14];
 };
 
 /*
@@ -413,26 +411,30 @@ struct sockaddr_big {
 */
 
 
-
-/* Device structure */
-typedef struct socket_context {
-
-    struct socket_context *next, *prev;
-    unsigned fd;
+/*
+//#bugbug
+//Device structure 
+struct socket_context 
+{
+    struct socket_context *next; 
+    struct socket_context *prev;
+    unsigned int fd;
     int family;
     int type;
     int protocol;
+};
+typedef struct socket_context  socket_t;
+*/
 
-}socket_t;
-
-
-typedef struct {
-
+/*
+ //#bugbug
+struct hostent_d 
+{
     char *h_addr;
-    unsigned h_length;
-
-}hostent;
-
+    unsigned int h_length;
+};
+typedef struct hostent_d  hostent;
+*/
 
 //=========
 

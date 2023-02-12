@@ -176,8 +176,10 @@ extern unsigned long gSavedBPP;
 #include "kerrno.h"
 #include "kcdefs.h"
 #include "kstddef.h"
-#include "ktypes.h"
-#include "ktypes2.h"
+
+#include "public/ktypes.h"
+#include "public/ktypes2.h"
+
 #include "kobject.h"
 #include "klimits.h"
 #include "kstdio.h"
@@ -387,6 +389,8 @@ extern unsigned long gSavedBPP;
 #include "user/logoff.h"
 #include "user/user.h"
 #include "user/security.h"
+
+#include "public/reboot.h"
 
 // ==============================
 

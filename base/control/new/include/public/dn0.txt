@@ -1,0 +1,8 @@
+
+
+	public/
+
+	This folder is for public files. Exported to the 
+	kernel modules. Ring 0 only.
+	This is public API. 
+

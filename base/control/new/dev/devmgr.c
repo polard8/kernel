@@ -262,12 +262,17 @@ devmgr_register_device (
     //if( (void*) f == NULL ){
     //    panic ("devmgr_register_device: f\n");
     //}
-// Save the file pointer.
-    d->_fp  = (file *) f;
+
+// #todo
+    f->dev_major = 0;
+// Device index into the deviceList[].
+    f->dev_minor = (short) (d->index & 0xFFFF);
+
+
 // Device structure.
     f->device = (struct device_d *) d;
-// Device index into the deviceList[].
-    f->deviceId = d->index; 
+// Save the file pointer.
+    d->_fp  = (file *) f;
     d->__class = (unsigned char) dev_class;
     d->__type  = (unsigned char) dev_type;
 

@@ -303,10 +303,57 @@ unsigned long syncList[SYNC_COUNT_MAX];
 
 struct file_d
 {
+
     object_type_t ____object;
     int used;
     int magic;
     char *_tmpfname;  
+
+// Index for the list of open files that belongs to a process.
+// p->Objects[_file]
+// #todo: Maybe 'int'.
+    short _file;
+
+// Global index.
+// A estrutura de arquivos aponta para tabela global de 
+// arquivos abertos.
+    int filetable_index;
+
+    pid_t pid;  // Process
+    uid_t uid;  // User 
+    gid_t gid;  // Group
+
+//
+// inode
+//
+
+// A estrutura de arquivos aponta para a tabela de inodes.
+    int inodetable_index;
+    struct inode_d   *inode;
+
+//
+// Device
+//
+
+// The minor represents an index in deviceList[i].
+    int isDevice;
+    short dev_major;  // Driver ID.
+    short dev_minor;  // Device ID.
+    struct device_d  *device;
+
+    struct tty_d  *tty;
+
+//
+// Socket
+//
+
+    int socket_buffer_full;
+    struct socket_d  *socket;
+
+
+//
+// Buffer
+//
 
 // Endereço base do buffer.
     unsigned char *_base;
@@ -354,111 +401,39 @@ struct file_d
     int _blksize;    // stat.st_blksize (may be != _bf._size) 
     fpos_t _offset;  // current lseek offset
 
-    int   _charbuf;
+    int _charbuf;
    // =============================
-
 
 //
 // == (2) synchronization ========
 //
 
-// #test
+
 // Sincronizando a leitura e a escrita
 // para arquivos como socket, tty, buffer ... etc.
-
     struct kstdio_sync_d  sync;
+
+//----------------------------------------------
 
 // Contador de descritores de arquivo que usam essa mesma estrutura.
 // we need to synchronize the readers.
     int fd_counter;
 
-// Que thread está esperando por
-// alguma operação no arquivo.
-// pode ser um socket, um pipe.
-// >>> a thread pode esperar quando quer ler mais está vazio.
-// pode esperar quando quer escrever mas ta cheio.
-// ?? pode esperar por escrita ??
-// >> acorda quem estava esperando pra escrever.
-    //struct thread_d *thread_waiting; 
-    int tid_waiting;
-    int socket_buffer_full;
-
-    //??
-    //int stopped;
-
-   // =============================
-    //
-    // == (3) transmition ========
-    //
-
-    // The file it self is the transmitions agent.
-
-// fileno, if Unix descriptor, else -1
-// UNIX System file descriptor
-// #bugbug: use 'int'.
-    short _file;
-
-    struct inode_d   *inode;
-    struct socket_d  *socket;
-
     //pipe ??
-
-// A estrutura de arquivos aponta para tabela global de 
-// arquivos abertos.
-    int filetable_index;
-
-    // A estrutura de arquivos aponta para a tabela de inodes.
-    int inodetable_index;
-
-// =============================
-// #bugbug
-// Identificador do primeiro processo à abrir o arquivo
-// ou o processo que tem as permissões.
-
-    pid_t pid;  // Process
-    uid_t uid;  // User 
-    gid_t gid;  // Group
-
-//
-// tty
-//
-
-    // If the file is a tty, we need a tty structure.
-    struct tty_d  *tty;
 
     int iopl;
 
-// Operations 
-// #todo: Please, do not use virtual functions for now!
-    // See: __P in sys/cdefs.h
+// The list of threads that are waiting for this object.
+    //struct thread_d *waiting;
+    int tid_waiting;
 
-    // #deprecated
-    //int (*_close) __P((void *));
-    //int (*_read)  __P((void *, char *, int));
-    //fpos_t (*_seek)  __P((void *, fpos_t, int));
-    //int (*_write) __P((void *, const char *, int));
-
-//
-// == device ============
-//
-
-// TRUE = Yes, it is a device.
-// Se for um dispositivo, então a estrutura abaixo deve ser usada.
-// #todo: change to 'is_device'
-    int isDevice;
-// Índice na lista deviceList[]
-// #bugbug: Esse indice deve estar contido na
-// estrutura apontada logo abaixo.
-    int deviceId;
-// #importante
-// A estrutura do dispositivo associado à esse arquivo.
-// Abrindo esse arquivo, se ele for um objeto do tipo
-// dispositivo, ent~ao io_control vai poder configura-lo
-    struct device_d  *device;
+// Navigation?
+    struct file_d  *next;
 };
 
 // The file structure type.
 typedef struct file_d  file; 
+typedef struct file_d  object; 
 
 //-----------------------------------------------
 

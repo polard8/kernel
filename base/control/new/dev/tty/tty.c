@@ -701,7 +701,12 @@ struct tty_d *tty_create(void)
     __file->used = TRUE;
     __file->magic = 1234;
     __file->____object = ObjectTypeTTY;
+
     __file->isDevice = TRUE;
+// #todo
+    __file->dev_major = 0;
+    __file->dev_minor = 0;
+
 // A estrutura de tty associada com esse arquivo.
     __file->tty = __tty;
 // Esse é o arquivo que aponta para essa estrutura.
