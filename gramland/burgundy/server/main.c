@@ -1960,6 +1960,12 @@ int serviceAsyncCommand(void)
         goto done;
         break;
 
+    case 44:
+        gUseMouse = TRUE;
+        wm_change_bg_color(COLOR_BLUE,TRUE,TRUE); //ok
+        goto done;
+        break;
+
     // ...
 
     // Set flag to quit the server.

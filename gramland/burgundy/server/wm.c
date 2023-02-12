@@ -7,7 +7,7 @@
 
 #include "gwsint.h"
 
-extern int gUseMouse;
+//extern int gUseMouse;
 
 // Global main structure.
 // Not a pointer.

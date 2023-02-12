@@ -2424,6 +2424,17 @@ void *sci2 (
         return NULL;
     }
 
+// 
+    if (number == 22011)
+    {
+        if (HVInfo.initialized == TRUE){
+            if (HVInfo.type == HV_TYPE_QEMU){
+                printf("[22011]: PS2 full initialization on qemu\n");
+                PS2_initialization();
+            }
+        }
+        return NULL;
+    }
 
 
 // #test

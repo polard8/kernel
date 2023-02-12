@@ -745,6 +745,14 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
+// Enable mouse.
+    if( strncmp(prompt,"ps2-qemu", 8) == 0 )
+    {
+        sc82 ( 22011, 0, 0, 0 );   // Enable in kernel.
+        gws_async_command(fd,44,0,0);
+        goto exit_cmp;
+    }
+
 
 // yes or no.
 // see: stdio.c
