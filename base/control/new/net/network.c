@@ -8,7 +8,7 @@
 // Status do driver de network
 // 0 - uninitialized
 // 1 - initialized
-int network_status=FALSE; 
+static int network_status=FALSE; 
 
 // Essa flag poderia ir para dentro da estrutura acima,
 int ____network_late_flag=0;
@@ -98,26 +98,40 @@ void testNIC(void)
     refresh_screen();
 }
 
-
+// IN:
+// + frame base address
+// + frame total size
 int 
 network_on_receiving ( 
     const unsigned char *frame, 
-    ssize_t size )
+    ssize_t frame_size )
 {
-// Handle ethernet header.
+// + Handle ethernet header.
+// + Call the handler for the given protocol.
 
-    struct ether_header *eth = 
-        (struct ether_header *) frame;
+    struct ether_header *eth = (struct ether_header *) frame;
     uint16_t Type=0;
 
+// Drop it!
+    if (network_status != TRUE)
+    {
+        //#debug
+        //printf("Packet: Network is OFF\n");
+        //refresh_screen();
+
+        return -1;
+    }
+
     if ( (void*) frame == NULL ){
-        printf("network_on_receiving: frame\n");
+        //printf("network_on_receiving: frame\n");
         goto fail;
     }
 
     // 1~8192
-    if (size <= 0 || size > E1000_DEFAULT_BUFFER_SIZE){
-        printf("network_on_receiving: size\n");
+    if ( frame_size <= 0 || 
+          frame_size > E1000_DEFAULT_BUFFER_SIZE )
+    {
+        //printf("network_on_receiving: frame_size\n");
         goto fail;
     }
 
@@ -173,11 +187,15 @@ network_on_receiving (
     switch (Type){
     case ETHERTYPE_IPv4:
         Show=TRUE;
-        network_handle_ipv4( (frame + ETHERNET_HEADER_LENGHT), size );
+        network_handle_ipv4( 
+            (frame + ETHERNET_HEADER_LENGHT), 
+            (frame_size - ETHERNET_HEADER_LENGHT)  );
         break;
     case ETHERTYPE_ARP:
         Show=TRUE;
-        network_handle_arp( (frame + ETHERNET_HEADER_LENGHT), size );
+        network_handle_arp( 
+            (frame + ETHERNET_HEADER_LENGHT), 
+            (frame_size - ETHERNET_HEADER_LENGHT)  );
         break;
     // ...
     //case ETHERTYPE_IPv6:
@@ -200,8 +218,11 @@ fail:
 int 
 network_on_sending ( 
     const unsigned char *frame, 
-    ssize_t size )
+    ssize_t frame_size )
 {
+    if (network_status != TRUE)
+        return -1;
+
     return -1;
 }
 
@@ -356,7 +377,7 @@ fail:
    return (int) -1;
 }
 
-void networkSetstatus (int status)
+void networkSetStatus (int status)
 {
     if ( status < 0 || status > 1 ){
         return;
@@ -393,7 +414,7 @@ int networkInit (void)
     debug_print ("networkInit: [TODO] [FIXME]\n");
 
 // Status
-    networkSetstatus(FALSE);
+    networkSetStatus(FALSE);
 
 // =====================================================
 // #importante
@@ -527,8 +548,16 @@ int networkInit (void)
 
 // Initializes the socket list.
     socket_init();
+
 // Status
-    networkSetstatus(TRUE);
+// #todo:
+// Some ring3 process will set the status.
+// Untill this, the network module will drop
+// all the packets and will not send any packet.
+// see: 
+// network_on_receiving() and network_on_sending();
+
+    //networkSetStatus(TRUE);
 
     return 0;
 }

@@ -41,6 +41,57 @@ unsigned char __dhcp_target_mac[6] = {
 
 //---------------
 
+void 
+network_handle_dhcp( 
+    const unsigned char *buffer, 
+    ssize_t size )
+{
+
+    struct dhcp_d *dhcp;
+    dhcp = (struct dhcp_d *) buffer;
+
+    if ( (void*) buffer == NULL ){
+        return;
+    }
+
+// Minimum size
+    //if (size < ? )
+        //return;
+
+// yiaddr: Your ip address.
+    int your_ip[4];
+    your_ip[0] = (int) (dhcp->yiaddr                & 0xFF);
+    your_ip[1] = (int) ( (dhcp->yiaddr >> 8)   & 0xFF);
+    your_ip[2] = (int) ( (dhcp->yiaddr >> 16) & 0xFF);
+    your_ip[3] = (int) ( (dhcp->yiaddr >> 24) & 0xFF);
+    printf ("network_handle_dhcp: Your IP %d.%d.%d.%d\n",
+        your_ip[0],
+        your_ip[1],
+        your_ip[2],
+        your_ip[3] );
+
+// chaddr: Client hardware address.
+    printf ("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
+        dhcp->chaddr[0],
+        dhcp->chaddr[1],
+        dhcp->chaddr[2],
+        dhcp->chaddr[3],
+        dhcp->chaddr[4],
+        dhcp->chaddr[5] );
+
+/*
+    switch (?){
+        case Offer:
+        case Ack:
+    };
+*/
+
+    refresh_screen();
+    die();
+
+    return;
+}
+
 // Called byt some handler to save the dhcp server ip.
 void network_save_dhcp_server_id( uint8_t ip[4] )
 {
@@ -276,11 +327,16 @@ int network_initialize_dhcp(void)
 
     struct dhcp_d *dhcp;
 
+    if (networkGetStatus() != TRUE)
+       return -1;
+
     dhcp = (struct dhcp_d *) kmalloc ( sizeof(struct dhcp_d) );
     if ((void*) dhcp == NULL){
         printf("network_initialize_dhcp: dhcp\n");
         goto fail;
     }
+
+
 
 //
 // Dialog

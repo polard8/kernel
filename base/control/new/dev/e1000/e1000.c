@@ -303,7 +303,7 @@ static void __initialize_tx_support(struct intel_nic_info_d *d)
 
         // #test: 
         // Configurando o tamanho do buffer
-        d->legacy_tx_descs[i].length = E1000_DEFAULT_BUFFER_SIZE;
+        d->legacy_tx_descs[i].length = (uint16_t) E1000_DEFAULT_BUFFER_SIZE;
 
         //cmd: bits
         //IDE VLE DEXT RSV RS IC IFCS EOP
@@ -561,7 +561,7 @@ static void __initialize_rx_support(struct intel_nic_info_d *d)
 
         // #test: 
         // Configurando o tamanho do buffer
-        d->legacy_rx_descs[i].length = E1000_DEFAULT_BUFFER_SIZE;
+        d->legacy_rx_descs[i].length = (uint16_t) E1000_DEFAULT_BUFFER_SIZE;
         d->legacy_rx_descs[i].status = 0;
     };
 
@@ -1133,16 +1133,24 @@ fail:
     return;
 }
 
+// Worker:
+// Called by DeviceInterface_e1000().
 static void __e1000_receive(void)
 {
-    unsigned char *buffer;
-    uint16_t old=0;
-    uint32_t len=0;
 
-    if ( (void*) currentNIC == NULL )
+// Frame
+    unsigned char *frame;
+    uint16_t frame_lenght=0x0000;
+
+// Descriptor index.
+    uint16_t old=0;
+
+    if ( (void*) currentNIC == NULL ){
         return;
-    if (currentNIC->magic != 1234)
+    }
+    if (currentNIC->magic != 1234){
         return;
+    }
 
 // #maybe a while
 
@@ -1153,14 +1161,22 @@ static void __e1000_receive(void)
         if (old >= RECEIVE_BUFFER_MAX){
             panic("__e1000_receive: [receive] old\n");
         }
-        
-        // Lenght.
-        // #check the limits.
-        len = currentNIC->legacy_rx_descs[old].length;
 
-        //#test: Apenas pegando o buffer para usarmos logo adiante.
-        // 64bit virtual address.
-        buffer = (unsigned char *) currentNIC->rx_buffers_virt[old];
+        // Get the frame base address.
+        frame = (unsigned char *) currentNIC->rx_buffers_virt[old];
+        if ( (void*) frame == NULL )
+        {
+             //#debug
+             panic ("__e1000_receive: frame\n");
+        }
+
+        // Get the frame lenght.
+        frame_lenght = (uint16_t) currentNIC->legacy_rx_descs[old].length;
+        if (frame_lenght>E1000_DEFAULT_BUFFER_SIZE)
+        {
+             //#debug
+             panic ("__e1000_receive: frame_lenght\n");
+        }
 
         //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
         //chamaremos logo adiante, usando o buffer que pegamos acima.
@@ -1194,10 +1210,15 @@ static void __e1000_receive(void)
 
         //#test buffer
         //eh = (void*) buffer;
-        if ( (void*) buffer != NULL )
+        // IN:
+        // + frame address
+        // + frame lenght
+        if ( (void*) frame != NULL )
         {
-            //network_on_receiving ( (const unsigned char*) buffer, 1500 );
-            network_on_receiving ( (const unsigned char*) buffer, len );
+            network_on_receiving ( 
+                (const unsigned char*) frame, 
+                (ssize_t) (frame_lenght & 0xFFFF) );
+
             e1000_rx_counter++;
         }
     }

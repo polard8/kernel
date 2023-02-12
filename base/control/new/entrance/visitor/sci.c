@@ -2387,9 +2387,44 @@ void *sci2 (
     }
 
     // Get Init PID
-    if(number == 10020){ return (void*) GRAMADO_PID_INIT; }
+    if (number == 10020){ return (void*) GRAMADO_PID_INIT; }
     // Get Init TID
-    if(number == 10021){ return (void*) INIT_TID; }
+    if (number == 10021){ return (void*) INIT_TID; }
+
+//
+// Network
+//
+
+// Set network status.
+    if (number == 22001)
+    {
+        networkSetStatus((int) arg2);
+        return NULL;
+    }
+// Get network status.
+    if (number == 22002){
+        return (void*) networkGetStatus();
+    }
+// Test some net component.
+    if (number == 22003)
+    {
+        switch (arg2){
+            case 1:
+                network_send_arp_request();
+                break;
+            case 2:
+                network_test_udp();
+                break;
+            case 3:
+                network_initialize_dhcp();
+                break;
+            case 4:
+                break;
+        };
+        return NULL;
+    }
+
+
 
 // #test
 // shared memory 2mb surface.

@@ -20,18 +20,35 @@ PHONY := step3-base
 step3-base:
 	make -C  base
 
-clean-all:
-# In gramland/
-	-rm gramland/attitude/bin/*.BIN
-	-rm gramland/beige/bin/*.BIN
-	-rm gramland/blue/bin/*.BIN
-	-rm gramland/burgundy/bin/*.BIN
+
+PHONY := clean
+clean: clean-all
+
+PHONY := clean-all
+clean-all: clean-meta clean-gramland clean-base
+
+PHONY := clean-meta
+clean-meta:
 # In meta/
 	-rm meta/bin/*.BIN
+
+PHONY := clean-gramland
+clean-gramland:
+# In gramland/
+	-rm gramland/burgundy/bin/*.BIN
+	-rm gramland/blue/bin/*.BIN
+	-rm gramland/beige/bin/*.BIN
+
+PHONY := clean-base
+clean-base:
 # In base/
-	-rm base/control/new/KERNEL.BIN
+	-rm base/exposed/arctic/bin/*.BIN
+	-rm base/exposed/azure/bin/*.BIN
+	-rm base/exposed/indigo1/bin/*.BIN
+	-rm base/exposed/indigo2/bin/*.BIN
 	-rm base/control/newm0/MOD0.BIN
-	-rm base/exposed/arctic/bin/INIT.BIN
+	-rm base/control/new/KERNEL.BIN
+
 
 
 

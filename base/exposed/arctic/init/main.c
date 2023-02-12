@@ -110,7 +110,7 @@ __Procedure (
 // range: 4001~4009 
 
     case __MSG_COMMAND:
-        printf("init.bin: MSG_COMMAND %d \n",long1);
+        //printf("init.bin: MSG_COMMAND %d \n",long1);
         switch (long1)
         {
             case 4001:  //app1
@@ -124,27 +124,26 @@ __Procedure (
             case 4003:  //app3
                 printf("init.bin: 4003\n");
                 rtl_clone_and_execute("editor.bin");
-                //rtl_clone_and_execute("cmdline.bin");
                 break;
             case 4004:  //app4
-                printf("init.bin: 4004\n");
-                rtl_clone_and_execute("reboot.bin");
+                //printf("init.bin: 4004\n");
+                //rtl_clone_and_execute("reboot.bin");
                 break;
             case 4005:  //app5
-                printf("init.bin: 4005\n");
-                rtl_clone_and_execute("terminal.bin");
+                //printf("init.bin: 4005\n");
+                //rtl_clone_and_execute("terminal.bin");
                 break;
             case 4006:  //app6
-                printf("init.bin: 4006\n");
-                rtl_clone_and_execute("fileman.bin");
+                //printf("init.bin: 4006\n");
+                //rtl_clone_and_execute("fileman.bin");
                 break;
             case 4007:  //app7
-                printf("init.bin: 4007\n");
-                rtl_clone_and_execute("editor.bin");
+                //printf("init.bin: 4007\n");
+                //rtl_clone_and_execute("editor.bin");
                 break;
             case 4008:  //app8
-                printf("init.bin: 4008\n");
-                rtl_clone_and_execute("reboot.bin");
+                //printf("init.bin: 4008\n");
+                //rtl_clone_and_execute("reboot.bin");
                 break;
             default:
                 break;

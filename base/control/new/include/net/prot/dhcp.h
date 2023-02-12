@@ -124,6 +124,11 @@ struct dhcp_d
 
 // ------------------------------
 
+void 
+network_handle_dhcp( 
+    const unsigned char *buffer, 
+    ssize_t size );
+
 void network_save_dhcp_server_id( uint8_t ip[4] );
 
 void 

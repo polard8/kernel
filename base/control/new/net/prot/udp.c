@@ -34,6 +34,9 @@ unsigned char saved_mac[6] = {
 //---------------------
 
 
+// IN:
+// buffer = udp header base address.
+// size     = udp packet size. (header + data)
 void 
 network_handle_udp( 
     const unsigned char *buffer, 
@@ -46,6 +49,14 @@ network_handle_udp(
         printf("network_handle_ipv4: buffer\n");
         return;
     }
+
+// The minimum size.
+// Only the udp header.
+    //if (size < UDP_HEADER_LENGHT){
+    //    printf("network_handle_udp: size\n");
+    //    return;
+    //}
+
 
     uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
     uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
@@ -97,12 +108,19 @@ network_handle_udp(
     }
 
 // #test
-// DHCP stuff.
-    if (dport == 68 || dport == 67){
+// DHCP dialog
+// Receiving Offer and Ack.
+    if (dport == 68 || dport == 67)
+    {
         printf("UDP: dport{%d}   #debug\n",dport);
-        die();
-    }
+        refresh_screen();
+        //die();
 
+        // Handle dhcp protocol.
+        network_handle_dhcp(
+            (buffer + UDP_HEADER_LENGHT),
+            (udp->uh_ulen - UDP_HEADER_LENGHT) );
+    }
 }
 
 // -----------------
@@ -122,6 +140,8 @@ void network_test_udp(void)
     memset(message,0,sizeof(message));
     sprintf(message,"Hello from Gramado to Linux\n");
 
+    if (networkGetStatus() != TRUE)
+       return;
 
     network_send_udp( 
         __udp_gramado_default_ipv4,   // scr ip
@@ -271,6 +291,7 @@ network_send_udp (
 
 
 // IPV4 Length
+// ip + (ip payload)
 // 16 bit
 // This 16-bit field defines the entire packet size in bytes, 
 // including header and data. 

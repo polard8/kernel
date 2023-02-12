@@ -716,6 +716,36 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
+// Enable network
+    if( strncmp(prompt,"net-on",6) == 0 ){
+        sc82 ( 22001, 
+        1,  // ON 
+        0, 0 );
+        goto exit_cmp;
+    }
+// Disable network
+    if( strncmp(prompt,"net-off",7) == 0 ){
+        sc82 ( 22001, 
+        0,  // OFF
+         0, 0 );
+        goto exit_cmp;
+    }
+
+// Network tests:
+    if( strncmp(prompt,"n1", 2) == 0 ){
+        sc82 ( 22003, 1, 0, 0 );
+        goto exit_cmp;
+    }
+    if( strncmp(prompt,"n2", 2) == 0 ){
+        sc82 ( 22003, 2, 0, 0 );
+        goto exit_cmp;
+    }
+    if( strncmp(prompt,"n3", 2) == 0 ){
+        sc82 ( 22003, 3, 0, 0 );
+        goto exit_cmp;
+    }
+
+
 // yes or no.
 // see: stdio.c
     static int yn_result = -1;

@@ -119,19 +119,21 @@ void testNIC(void);
 int 
 network_on_receiving ( 
     const unsigned char *frame, 
-    ssize_t size );
+    ssize_t frame_size );
 
 
 int 
 network_on_sending ( 
     const unsigned char *frame, 
-    ssize_t size );
+    ssize_t frame_size );
 
 
 int network_buffer_in( void *buffer, int len );
 int network_buffer_out( void *buffer, int len );
-void networkSetstatus(int status);
+
+void networkSetStatus(int status);
 int networkGetStatus(void);
+
 // #fixme
 int networkInit (void);
 

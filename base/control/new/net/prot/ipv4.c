@@ -6,7 +6,8 @@
 // handle ipv4 package
 // Called by all the embedded nic device drivers.
 // IN:
-// buffer = The address after the ethernet header.
+// buffer = ip header base address.
+// size = ip packet size. (ip header + ip payload).
 void 
 network_handle_ipv4( 
     const unsigned char *buffer, 
@@ -23,6 +24,13 @@ network_handle_ipv4(
         printf("network_handle_ipv4: ip\n");
         goto fail;
     }
+
+// The minimum size.
+// Only the ip header.
+    //if (size < IP_HEADER_LENGHT){
+    //    printf("network_handle_ipv4: size\n");
+    //    goto fail;
+    //}
 
     unsigned char *src_ipv4 = 
         (unsigned char *) &ip->ip_src.s_addr;
@@ -45,6 +53,7 @@ network_handle_ipv4(
     }
 
 // Total lenght (16bits)
+// ip header + ip payload.
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
     printf("Total lenght: {%d}\n",ip->ip_len);
@@ -85,10 +94,11 @@ network_handle_ipv4(
         printf ("target: %d.%d.%d.%d \n",
             dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
         printf("ip_sum={%x} \n",ip->ip_sum);
+        
         network_handle_udp(
             (buffer + IP_HEADER_LENGHT),
-            ip->ip_len 
-            );
+            (ip->ip_len - IP_HEADER_LENGHT)  );
+
         return;
     }
 

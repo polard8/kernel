@@ -45,6 +45,14 @@ network_handle_arp(
         goto fail;
     }
 
+// The minimum size.
+// Only the udp header.
+    //if (size < ARP_HEADER_LENGHT){
+    //    printf("network_handle_arp: size\n");
+    //    goto fail;
+    //}
+
+
 /*
 // Show data.
 // Bytes: Net-style.
@@ -303,6 +311,9 @@ fail:
 void network_send_arp_request(void)
 {
 // Send ARP request to 192.168.1.6.
+
+    if (networkGetStatus() != TRUE)
+       return;
 
     network_send_arp( 
         __arp_broadcast_mac,                // target mac

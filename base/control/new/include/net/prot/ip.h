@@ -47,6 +47,7 @@ struct ip_d
     u_int8_t ip_tos;
 
 // Total lenght (16bits)
+// IP + (ip payload).
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
 // This 16-bit field defines the entire packet size in bytes, 
