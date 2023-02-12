@@ -28,6 +28,17 @@ typedef int  wid_t;
 #define METRICS_ICON_LEFT    METRICS_ICON_LEFTPAD
 #define METRICS_ICON_TOP     METRICS_ICON_TOPPAD
 
+// Icons
+// see: icon_cache in the Gramado OS kernel.
+#define ICON_ID_APP  1
+#define ICON_ID_FILE  2
+#define ICON_ID_FOLDER  3
+#define ICON_ID_TERMINAL  4
+#define ICON_ID_CURSOR  5
+// ...
+#define ICON_ID_DEFAULT  ICON_ID_APP
+
+
 // Border size consistente, por questão de estilo.
 // Para jaleas de aplicativos. Overlapped.
 // Mas o aplicativo pode customizar.

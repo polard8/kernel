@@ -4,9 +4,6 @@
 
 #include <kernel.h> 
 
-
-
-
 // 
 // Imports
 //
@@ -42,12 +39,10 @@ extern unsigned long wmData_Callback2;
 // queremos saber se o endereço alocado eh compartilhado ...
 // para o window server usar ... entao chamaremos de sharedbufferIcon.
 
-void *shared_buffer_app_icon;  //1
-void *shared_buffer_file_icon; 
-void *shared_buffer_folder_icon;
-void *shared_buffer_terminal_icon;
-void *shared_buffer_cursor_icon;
-// ... 
+// Icon cache structure.
+// see: window.h
+struct icon_cache_d  icon_cache;
+
 
 int zorder=0;
 int zorderCounter=0;         //contador de janelas incluidas nessa lista.   
@@ -912,7 +907,7 @@ __wmProcessExtendedKeyboardKeyStroke(
 // :: We are called, we do not read data from a file provided
 // by the device driver.
 // We post the message into the stdin file and into the
-// control thread of the widnow server and sometimes
+// control thread of the Window Server and sometimes
 // we process the input before sending a message.
 // ----------------------------------------------
 // Envia uma mensagem de teclado para a janela com o 
@@ -1678,6 +1673,8 @@ int windowLoadGramadoIcons(void)
 {
     unsigned long fRet=0;
 
+    icon_cache.initialized = FALSE;
+
     //#debug
     //printf("windowLoadGramadoIcons:\n");
 
@@ -1695,29 +1692,35 @@ int windowLoadGramadoIcons(void)
 // See: base/
 
     unsigned long tmp_size = (4*4096);
+    icon_cache.size_in_bytes = (size_t) tmp_size;
 
 // See: window.h
-    shared_buffer_app_icon          = (void *) allocPages(4);
-    shared_buffer_file_icon           = (void *) allocPages(4);
-    shared_buffer_folder_icon      = (void *) allocPages(4);
-    shared_buffer_terminal_icon  = (void *) allocPages(4);
-    shared_buffer_cursor_icon      = (void *) allocPages(4);
+    icon_cache.app          = (void *) allocPages(4);
+    icon_cache.file           = (void *) allocPages(4);
+    icon_cache.folder      = (void *) allocPages(4);
+    icon_cache.terminal  = (void *) allocPages(4);
+    icon_cache.cursor      = (void *) allocPages(4);
     // ...
 
-    if ( (void *) shared_buffer_app_icon == NULL ){
-        panic ("windowLoadGramadoIcons: shared_buffer_app_icon\n");
+    if ( (void *) icon_cache.app == NULL ){
+        printf ("windowLoadGramadoIcons: app\n");
+        goto fail;
     }
-    if ( (void *) shared_buffer_file_icon == NULL ){
-        panic ("windowLoadGramadoIcons: shared_buffer_file_icon\n");
+    if ( (void *) icon_cache.file == NULL ){
+        printf ("windowLoadGramadoIcons: file\n");
+        goto fail;
     }
-    if ( (void *) shared_buffer_folder_icon == NULL ){
-        panic ("windowLoadGramadoIcons: shared_buffer_folder_icon\n");
+    if ( (void *) icon_cache.folder == NULL ){
+        printf ("windowLoadGramadoIcons: folder\n");
+        goto fail;
     }
-    if ( (void *) shared_buffer_terminal_icon == NULL ){
-        panic ("windowLoadGramadoIcons: shared_buffer_terminal_icon\n");
+    if ( (void *) icon_cache.terminal == NULL ){
+        printf ("windowLoadGramadoIcons: terminal\n");
+        goto fail;
     }
-    if ( (void *) shared_buffer_cursor_icon == NULL ){
-        panic ("windowLoadGramadoIcons: shared_buffer_cursor_icon\n");
+    if ( (void *) icon_cache.cursor == NULL ){
+        printf ("windowLoadGramadoIcons: cursor\n");
+        goto fail;
     }
 
 //
@@ -1731,10 +1734,11 @@ int windowLoadGramadoIcons(void)
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,
                             "APP     BMP", 
-                            (unsigned long) shared_buffer_app_icon,
+                            (unsigned long) icon_cache.app,
                             tmp_size );
     if (fRet != 0){
-        panic("windowLoadGramadoIcons: APP.BMP\n");
+        printf("windowLoadGramadoIcons: APP.BMP\n");
+        goto fail;
     }
 
 // file icon
@@ -1744,10 +1748,11 @@ int windowLoadGramadoIcons(void)
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES, 
                             "FILE    BMP", 
-                            (unsigned long) shared_buffer_file_icon,
+                            (unsigned long) icon_cache.file,
                             tmp_size );
     if (fRet != 0){
-        panic("windowLoadGramadoIcons: FILE.BMP\n");
+        printf("windowLoadGramadoIcons: FILE.BMP\n");
+        goto fail;
     }
 
 // folder icon
@@ -1757,10 +1762,11 @@ int windowLoadGramadoIcons(void)
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,
                             "FOLDER  BMP", 
-                            (unsigned long) shared_buffer_folder_icon,
+                            (unsigned long) icon_cache.folder,
                             tmp_size );
     if (fRet != 0){
-        panic("windowLoadGramadoIcons: FOLDER.BMP\n");
+        printf("windowLoadGramadoIcons: FOLDER.BMP\n");
+        goto fail;
     }
 
 // terminal icon
@@ -1770,10 +1776,11 @@ int windowLoadGramadoIcons(void)
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES, 
                             "TERMINALBMP", 
-                            (unsigned long) shared_buffer_terminal_icon,
+                            (unsigned long) icon_cache.terminal,
                             tmp_size );
     if (fRet != 0){
-        panic("windowLoadGramadoIcons: TERMINAL.BMP\n");
+        printf("windowLoadGramadoIcons: TERMINAL.BMP\n");
+        goto fail;
     }
 
 // cursor icon
@@ -1783,17 +1790,22 @@ int windowLoadGramadoIcons(void)
                             VOLUME1_ROOTDIR_ADDRESS, 
                             FAT16_ROOT_ENTRIES,
                             "CURSOR  BMP", 
-                            (unsigned long) shared_buffer_cursor_icon,
+                            (unsigned long) icon_cache.cursor,
                             tmp_size );
     if (fRet != 0){
-        panic("windowLoadGramadoIcons: CURSOR.BMP\n");
+        printf("windowLoadGramadoIcons: CURSOR.BMP\n");
+        goto fail;
     }
 
 // More?
 // Podemos checar se eles foram carregados corretamente,
 // conferindo apenas a assinatura em cada um deles.
-
+    icon_cache.initialized = TRUE;
     return 0;
+fail:
+    icon_cache.initialized = FALSE;
+    panic ("windowLoadGramadoIcons: Fail\n");
+    return -1;
 }
 
 // Get a shared buffer to a system icon.
@@ -1804,7 +1816,11 @@ int windowLoadGramadoIcons(void)
 
 void *ui_get_system_icon(int n)
 {
-    if (n <= 0){
+    if (icon_cache.initialized != TRUE){
+        return NULL;
+    }
+
+    if (n < 1 || n > 5){
         return NULL;
     }
 
@@ -1815,11 +1831,11 @@ void *ui_get_system_icon(int n)
 // Only the window server can access this routine.
 
     switch (n){
-    case 1: return (void *) shared_buffer_app_icon;       break;
-    case 2: return (void *) shared_buffer_file_icon;      break;
-    case 3: return (void *) shared_buffer_folder_icon;    break;
-    case 4: return (void *) shared_buffer_terminal_icon;  break;
-    case 5: return (void *) shared_buffer_cursor_icon;    break;
+    case 1: return (void *) icon_cache.app;       break;
+    case 2: return (void *) icon_cache.file;      break;
+    case 3: return (void *) icon_cache.folder;    break;
+    case 4: return (void *) icon_cache.terminal;  break;
+    case 5: return (void *) icon_cache.cursor;    break;
     // ...
     };
 

@@ -517,6 +517,7 @@ void *doCreateWindow (
     unsigned long fullWindowWidth  = (unsigned long) deviceWidth;
     unsigned long fullWindowHeight = (unsigned long) deviceHeight;
 
+// Style
 // Button suport
     int buttonFocus    = FALSE;
     int buttonSelected = FALSE;
@@ -527,6 +528,7 @@ void *doCreateWindow (
 
     //debug_print ("doCreateWindow:\n");
 
+// Style (rop)
     int is_solid = TRUE;
     if (rop_flags != 0){
         is_solid = FALSE;
@@ -539,27 +541,33 @@ void *doCreateWindow (
 // #bugbug
 // maximized, minimized and fullscreen are not style features.
 // move these things to another flag.
+// see:
+// https://learn.microsoft.com/en-us/windows/win32/winmsg/window-styles
+// see: border, captions, scrobar ...
 
 // Maximized
 // WS_MAXIMIZED
     if (style & 0x0001){
+        // see: border, captions, scrobar ...
         Fullscreen = FALSE;
         Minimized = FALSE;
-        Maximized = TRUE;  //:)
+        Maximized = TRUE;   // It is also a style
     }
 // Minimized
 // WS_MINIMIZED
     if (style & 0x0002){
+        // see: border, captions, scrobar ...
         Fullscreen = FALSE;
-        Maximized = FALSE;
-        Minimized = TRUE;  //:)
+        Maximized = FALSE;    // It is also a style
+        Minimized = TRUE; 
     }
 // Fullscreen
 // WS_FULLSCREEN
     if (style & 0x0004){
-        Maximized = FALSE;
+        // see: border, captions, scrobar ...
+        Maximized = FALSE;   // It is also a style
         Minimized = FALSE;
-        Fullscreen = TRUE;  //:)
+        Fullscreen = TRUE; 
     }
 
 // Salvar para depois restaurar os valores originais no fim da rotina.
@@ -666,7 +674,7 @@ void *doCreateWindow (
     window->view   = (int) view;
     window->focus  = FALSE;
     window->dirty  = FALSE;  // Validate
-    window->locked = FALSE;
+    //window->locked = FALSE;
 
 // Event queue
     register int e=0;

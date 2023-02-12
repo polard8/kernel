@@ -2006,6 +2006,13 @@ wmCreateWindowFrame (
     window->width  = (window->width  & 0xFFFF);
     window->height = (window->height & 0xFFFF);
 
+// #test:
+// Defaults:
+// Colocamos default, depois muda de acordo com os parametros.
+
+    window->frame.titlebar_icon_id = ICON_ID_DEFAULT;
+    // ...
+
 // #todo
 // Desenhar o frame e depois desenhar a barra de títulos
 // caso esse estilo de frame precise de uma barra.
@@ -2267,7 +2274,7 @@ wmCreateWindowFrame (
             // Icon ID:
             // Devemos receber um argumento do aplicativo,
             // na hora da criação da janela.
-            window->frame.titlebar_icon_id = 1;
+            window->frame.titlebar_icon_id = ICON_ID_APP;
 
             // Decode the bmp that is in a buffer
             // and display it directly into the framebuffer. 

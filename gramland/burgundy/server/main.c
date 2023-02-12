@@ -1950,6 +1950,9 @@ int serviceAsyncCommand(void)
         goto done;
         break;
 
+    // #todo
+    // Change the title bar icon, given the cache ID.
+
 // poweroff
 // qemu only
     case 22:

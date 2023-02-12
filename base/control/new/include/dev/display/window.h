@@ -414,12 +414,21 @@ int window_mouse_over;
 // para o window server usar ... entao chamaremos de sharedbufferIcon.
 // see: kgwm.c
 
-extern void *shared_buffer_app_icon;  //1
-extern void *shared_buffer_file_icon; 
-extern void *shared_buffer_folder_icon;
-extern void *shared_buffer_terminal_icon;
-extern void *shared_buffer_cursor_icon;
-// ... 
+// Icon cache structure.
+// see: kgwm.c
+struct icon_cache_d
+{
+    int initialized;
+    size_t size_in_bytes;
+
+// Pointers to shared memory.
+    void *app;  //1
+    void *file; 
+    void *folder;
+    void *terminal;
+    void *cursor;  //5
+};
+extern struct icon_cache_d  icon_cache;
 
 //
 // == z order support =========================
@@ -478,7 +487,7 @@ extern int zorderTopWindow;
 
 struct gui_d
 {
-    int initialised;
+    int initialized;
 
 // redraw
 // Flag para repintar todas as janelas.
