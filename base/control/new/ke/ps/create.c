@@ -149,7 +149,7 @@ struct thread_d *create_init_thread (void)
 // ===============================
 // Message queue.
 
-    for ( q=0; q<32; ++q ){ t->MsgQueue[q] = 0; };
+    for ( q=0; q<MSG_QUEUE_MAX; ++q ){ t->MsgQueue[q] = 0; };
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
 
@@ -158,7 +158,7 @@ struct thread_d *create_init_thread (void)
 
     struct msg_d  *tmp;
 
-    for ( i=0; i<32; ++i )
+    for ( i=0; i<MSG_QUEUE_MAX; ++i )
     {
         tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
         if ( (void*) tmp == NULL ){

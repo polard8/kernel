@@ -3735,17 +3735,17 @@ int wmInputReader(void)
     
     int __Status=-1;
 
-    for (i=0; i<=31; i++)
+    for (i=0; i<MSG_QUEUE_MAX; i++)
     {
         //nao volte ao inicio da fila
-        if(i<31){
+        if(i< (MSG_QUEUE_MAX-1)){
             __Status = rtl_get_event2(i,FALSE);
         }
         //volte ao inicio da fila.
-        if(i==31){
+        if(i==(MSG_QUEUE_MAX-1)){
             __Status = rtl_get_event2(i,TRUE);
         }
-        
+
         // reset
         //if (__Status!=TRUE){
         //    __Status = rtl_get_event2(i,TRUE);

@@ -192,6 +192,8 @@ typedef enum {
 
 // --------------------------------
 
+#define MSG_QUEUE_MAX  64
+
 // TCB - Thread Control Block
 
 struct thread_d 
@@ -655,7 +657,7 @@ struct thread_d
 // Message Queue
 // For the msg_d structure,
 // see: window.h
-    unsigned long MsgQueue[32];
+    unsigned long MsgQueue[MSG_QUEUE_MAX];
     int MsgQueueHead;
     int MsgQueueTail;
 // ====================================================

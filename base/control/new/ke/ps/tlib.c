@@ -94,7 +94,7 @@ void *sys_get_message(unsigned long ubuf)
 // Yes, We have a message.
 // round
     t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 31 ){ t->MsgQueueHead=0; }
+    if ( t->MsgQueueHead >= MSG_QUEUE_MAX ){ t->MsgQueueHead=0; }
     return (void *) 1;  //#bugbug
 
 fail0:
@@ -102,7 +102,7 @@ fail0:
 // round
     if ( (void*) t == NULL ){ return NULL; }
     t->MsgQueueHead++;
-    if (t->MsgQueueHead >= 31){ t->MsgQueueHead=0; }
+    if (t->MsgQueueHead >= MSG_QUEUE_MAX){ t->MsgQueueHead=0; }
     return NULL;
 }
 
@@ -144,7 +144,7 @@ void *sys_get_message2(
     }
 
 // Get the index.
-    if( index<0 || index >= 32){
+    if( index<0 || index >= MSG_QUEUE_MAX){
         goto fail0;
     }
     t->MsgQueueHead = (int) (index & 0xFFFFFFFF);
@@ -210,7 +210,7 @@ void *sys_get_message2(
 // Yes, We have a message.
 // round
     t->MsgQueueHead++;
-    if ( t->MsgQueueHead >= 32 ){ t->MsgQueueHead = 0; }
+    if ( t->MsgQueueHead >= MSG_QUEUE_MAX ){ t->MsgQueueHead = 0; }
     return (void *) 1;
 
 // Is it a valid thread pointer?
@@ -229,7 +229,7 @@ fail0:
 
     if( (void*) t != NULL){
         t->MsgQueueHead++;
-        if ( t->MsgQueueHead >= 32 ){
+        if ( t->MsgQueueHead >= MSG_QUEUE_MAX ){
             t->MsgQueueHead = 0;
         }
     }
@@ -379,7 +379,7 @@ post_message_to_tid (
 
 // Done
     t->MsgQueueTail++;
-    if (t->MsgQueueTail >= 31){
+    if (t->MsgQueueTail >= MSG_QUEUE_MAX){
         t->MsgQueueTail = 0;
     }
     return 0;
@@ -387,7 +387,7 @@ post_message_to_tid (
 fail0:
     if ( (void*) t == NULL ){ return -1; }
     t->MsgQueueTail++;
-    if (t->MsgQueueTail >= 31){
+    if (t->MsgQueueTail >= MSG_QUEUE_MAX){
         t->MsgQueueTail = 0;
     }
     return -1;

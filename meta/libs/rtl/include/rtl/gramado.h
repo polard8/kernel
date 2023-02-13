@@ -120,6 +120,8 @@ unsigned long  rtl_to_ulong  (long ch);
 // == events ===========================================
 //
 
+#define MSG_QUEUE_MAX  64
+
 // System messages in the thread's event queue.
 
 #define RTL_WAIT_FOR_EVENTS  1

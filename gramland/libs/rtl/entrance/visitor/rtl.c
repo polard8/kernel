@@ -20,9 +20,8 @@
 
 // global
 // rtl system events support.
-
+// Buffer to save a event. (one msg)
 unsigned long RTLEventBuffer[32];
-
 
 // =========================
 

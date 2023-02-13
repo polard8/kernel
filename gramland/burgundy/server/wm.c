@@ -4394,6 +4394,7 @@ int wmInputReader(void)
 // Process all the messages in the queue, 
 // starting at the first message.
 // Disrespecting the circular input.
+
     int __Status = -1;
     register int i=0;
 // see: event.h
@@ -4401,12 +4402,13 @@ int wmInputReader(void)
 
     int IsCombination=FALSE;
 
-    for (i=0; i<=31; i++)
+// 32 slots
+    for (i=0; i<MSG_QUEUE_MAX; i++)
     {
         // Não volte ao inicio da fila
-        if(i<31) { __Status = rtl_get_event2(i,FALSE); }
+        if(i< (MSG_QUEUE_MAX-1)) { __Status = rtl_get_event2(i,FALSE); }
         // Volte ao inicio da fila.
-        if(i==31){ __Status = rtl_get_event2(i,TRUE);  }
+        if(i==(MSG_QUEUE_MAX-1)){ __Status = rtl_get_event2(i,TRUE);  }
 
         // #todo
         // Se a mensagem for um input de teclado,

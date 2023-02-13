@@ -89,12 +89,13 @@ __ps_initialize_thread_common_elements(struct thread_d *t)
 // see: window.h
 
 // Clear the message queue.
-    for ( i=0; i<32; ++i ){ t->MsgQueue[i] = 0; };
+    for ( i=0; i<MSG_QUEUE_MAX; ++i ){ t->MsgQueue[i] = 0; };
     t->MsgQueueHead = 0;
     t->MsgQueueTail = 0;
 
-// Create all the 32 pointers.
-    for ( i=0; i<32; ++i )
+// Create all the 32 pointers
+// for the messages.
+    for ( i=0; i<MSG_QUEUE_MAX; ++i )
     {
         tmp = (struct msg_d *) kmalloc( sizeof( struct msg_d ) );
         if ( (void*) tmp == NULL ){
