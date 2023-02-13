@@ -6,6 +6,7 @@
 
 extern int __compose_lock;
 
+void set_refresh_pointer_status(int value);
 
 long comp_get_mouse_x_position(void);
 long comp_get_mouse_y_position(void);

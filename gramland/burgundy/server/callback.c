@@ -98,6 +98,7 @@ void callbackInitialize(void)
 // Each 16 ms. 60fps
     //unsigned long ms = 2;        // 500 fps
     unsigned long ms = 16;   // 60 fps
+    //unsigned long ms=32;
     //unsigned long ms = 500;
     //unsigned long ms = 999;
 

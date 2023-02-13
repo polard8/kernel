@@ -1048,7 +1048,7 @@ e1000_init_nic (
 
     //#debug
     //printf ("e1000_init_nic: Test #breakpoint\n");
-    refresh_screen();
+    //refresh_screen();
     //while(1){ asm("hlt"); }
 
     e1000_initialized = TRUE;

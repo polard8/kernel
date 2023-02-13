@@ -210,14 +210,20 @@ int __rtc_init_datastructure(void)
     rtc->DayOfMonth = read_cmos_bcd(7);  
     rtc->used = TRUE;
     rtc->magic = 1234;
-  
+
+// #bugbug
+// Pointer not initialized yet.
 // Hardware structure
-    if ( (void *) Hardware == NULL ){
-        printf("get_cmos_info: Hardware\n");
-        goto fail;
-    }
+    //if ( (void *) Hardware == NULL )
+    //{
+        // #bugbug
+    //    printf("get_cmos_info: Hardware\n");
+    //    goto fail;
+    //}
+    
 // Save
-    Hardware->rtc = rtc;
+    //Hardware->rtc = rtc;
+
 
     //#debug
     //printf("Time=%d:%d:%d\n", rtc->Hours, rtc->Minutes, rtc->Seconds );

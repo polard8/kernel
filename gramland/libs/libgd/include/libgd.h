@@ -56,6 +56,14 @@ frontbuffer_putpixel (
     unsigned long _y, 
     unsigned long _rop_flags );
 
+int 
+libgd_putpixel ( 
+    unsigned int color, 
+    int x, 
+    int y,
+    unsigned long rop,
+    int back_or_front );
+
 unsigned int grBackBufferGetPixelColor( int x, int y );
 
 #endif    

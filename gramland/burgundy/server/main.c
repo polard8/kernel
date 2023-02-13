@@ -1957,7 +1957,7 @@ int serviceAsyncCommand(void)
 
     case 44:
         gUseMouse = TRUE;
-        wm_change_bg_color(COLOR_BLUE,TRUE,TRUE); //ok
+        //wm_change_bg_color(COLOR_BLUE,TRUE,TRUE); //ok
         goto done;
         break;
 

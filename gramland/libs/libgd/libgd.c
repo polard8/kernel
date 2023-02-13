@@ -146,7 +146,6 @@ grBackBufferPutpixel2 (
     return (int) gramado_system_call ( 6, color, x, y );
 }
 
-
 /*
  * fb_BackBufferPutpixel:
  *     Put pixel in the device screen.
@@ -597,6 +596,28 @@ frontbuffer_putpixel (
         _y,
         _rop_flags,
         buffer );
+}
+
+int 
+libgd_putpixel ( 
+    unsigned int color, 
+    int x, 
+    int y,
+    unsigned long rop,
+    int back_or_front )
+{
+// 1=back | 2=front
+
+    if (back_or_front ==1){
+        backbuffer_putpixel(color,x,y,rop);
+        return 0;
+    }
+    if (back_or_front == 2){
+        frontbuffer_putpixel(color,x,y,rop);
+        return 0;
+    }
+
+    return -1;
 }
 
 //============

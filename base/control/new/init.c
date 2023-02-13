@@ -226,7 +226,9 @@ static int booting_end(int arch_type)
 
 // Final message before jumping to init process.
     printf("booting_end:\n");
-    refresh_screen();
+
+    //#debug
+    //refresh_screen();
     //while(1){}
 
 // Setup command line for the init process.
@@ -248,6 +250,7 @@ static int booting_end(int arch_type)
         
         case CURRENT_ARCH_X86_64:
             // Do not return!
+            // see: x64init.c
             I_x64ExecuteInitialProcess();
             break;
         default:

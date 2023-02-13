@@ -530,26 +530,20 @@ bmpDisplayBMP (
     unsigned int *palette        = (unsigned int *) (address + 0x36);
     unsigned char *palette_index = (unsigned char *) &pal_address;
 
-
-
 // Limits
-
 // #todo: 
 // #bugbug: Isso é provisório.
 // Get system metrics.
-
     xLimit = 800;
     yLimit = 600;
 
 // #debug:
     //gwssrv_debug_print ("bmpDisplayBMP:\n");
 
-// Limits.
-    if ( x > xLimit || 
-         y > yLimit )
-    {
-        gwssrv_debug_print ("bmpDisplayBMP: Limits \n");
-        printf             ("bmpDisplayBMP: Limits \n");
+// Limits
+    if ( x > xLimit || y > yLimit ){
+        gwssrv_debug_print ("bmpDisplayBMP: Limits\n");
+        printf ("bmpDisplayBMP: Limits\n");
         goto fail;
     }
 
@@ -557,7 +551,7 @@ bmpDisplayBMP (
 // Testar validade do endereço.
     if (address == 0){
         gwssrv_debug_print ("bmpDisplayBMP: address\n");
-        printf             ("bmpDisplayBMP: address\n");
+        printf ("bmpDisplayBMP: address\n");
         goto fail;
     }
 
@@ -574,9 +568,7 @@ bmpDisplayBMP (
 
 /*
     bh = (struct gws_bmp_header_d *) malloc( sizeof(struct gws_bmp_header_d) );
-
-    if ( (void *) bh == NULL )
-    {
+    if ( (void *) bh == NULL ){
         gwssrv_debug_print ("bmpDisplayBMP: bh fail \n");
         printf             ("bmpDisplayBMP: bh fail \n");
         goto fail;
@@ -585,25 +577,21 @@ bmpDisplayBMP (
 
 // See: https://en.wikipedia.org/wiki/BMP_file_format
 
-
 // Signature
 // 2 bytes
     sig = *(unsigned short *) &bmp[0];
     __Local_bh.bmpType = (unsigned short) sig;
     //printf ("sig={%x}\n",sig);
 
-
-    if ( bmp[0] != 'B' || bmp[1] != 'M' )
-    {
+    if ( bmp[0] != 'B' || bmp[1] != 'M' ){
         gwssrv_debug_print ("bmpDisplayBMP: [FAIL] signature \n");
-        printf             ("bmpDisplayBMP: [FAIL] signature %c %c\n", 
+        printf  ("bmpDisplayBMP: [FAIL] signature %c %c\n", 
             bmp[0], bmp[1]);
         goto fail;
     }
 
-// Size.
+// Size
 // 4 bytes	The size of the BMP file in bytes
-
     unsigned int Size = *(unsigned int *) &bmp[2];
     __Local_bh.bmpSize = (unsigned int) Size;
     //printf ("Size={%x}\n",Size);
@@ -689,7 +677,6 @@ bmpDisplayBMP (
     left = (x & 0xFFFF);
     top  = (y & 0xFFFF);
     bottom = ( top + __Local_bi.bmpHeight );
-
 
 //
 // Data area.
@@ -877,7 +864,7 @@ bmpDisplayBMP (
                     // da cor selecionada.
                     if (color != bmp_selected_color)
                     {
-                        // Zoom support.
+                        // No scale
                         if (useZoom==FALSE)
                         {
                             // IN: color, x, y, rop
@@ -891,7 +878,7 @@ bmpDisplayBMP (
                         // #test
                         // Testing zoom support.
                         
-                        // zoom support
+                        // With scale.
                         if (useZoom==TRUE)
                         {
                             for (ihZoom=0; ihZoom < (ZoomFactor+1); ihZoom++){

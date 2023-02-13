@@ -364,25 +364,22 @@ static int I_x64CreateInitialProcess(void)
     return TRUE;
 }
 
-
-
 // Passa o comando para o primeiro processo em user mode.
 // Esse processo ja foi previamente configurado.
-// Called by kmain() in init.c
+// Called by booting_end() in init.c
 void I_x64ExecuteInitialProcess (void)
 {
-    struct thread_d  *Thread;
-    int i=0;
+    struct thread_d  *t;
+    register int i=0;
 
     //#todo
     debug_print ("I_x64ExecuteInitialProcess:\n");
 
-// #debug
-// For real machine.
-
+    // #debug
+    // For real machine.
     //printf      ("I_x64ExecuteInitialProcess: [TODO]\n");
     //refresh_screen();
-   
+
     if ( system_state != SYSTEM_BOOTING ){
         panic ("I_x64ExecuteInitialProcess: system_state\n");    
     }
@@ -394,7 +391,6 @@ void I_x64ExecuteInitialProcess (void)
 
 // Se essa rotina foi chamada antes mesmo
 // do processo ter sido devidamente configurado.
-
     if ( InitialProcessInitialized != TRUE ){
         debug_print ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
         panic       ("I_x64ExecuteInitialProcess: InitialProcessInitialized\n");
@@ -403,73 +399,63 @@ void I_x64ExecuteInitialProcess (void)
 // The first thread to run will the control thread 
 // of the init process. It is called InitThread.
 
-    Thread = (struct thread_d *) InitThread; 
+    t = (struct thread_d *) InitThread; 
 
-    if ( (void *) Thread == NULL ){
-        panic ("I_x64ExecuteInitialProcess: Thread\n");
+    if ( (void *) t == NULL ){
+        panic ("I_x64ExecuteInitialProcess: t\n");
     }
-    if ( Thread->used != TRUE || 
-         Thread->magic != 1234 )
-    {
-        panic ("I_x64ExecuteInitialProcess: Thread validation\n");
+    if ( t->used != TRUE || t->magic != 1234 ){
+        panic ("I_x64ExecuteInitialProcess: t validation\n");
     }
-    if ( Thread->tid < 0 || 
-         Thread->tid > THREAD_COUNT_MAX )
-    {
+    if ( t->tid < 0 || t->tid > THREAD_COUNT_MAX ){
         panic("I_x64ExecuteInitialProcess: tid\n");
     }
 
-
 // It its context is already saved, 
 // so this is not the fist time.
-    
-    if ( Thread->saved != FALSE ){
+    if ( t->saved != FALSE ){
         panic("I_x64ExecuteInitialProcess: saved\n");
     }
 
 // Set the current thread.
-    set_current_thread(Thread->tid);
+    set_current_thread(t->tid);
 
 // Set the first foreground thread.
 // #todo: We need a function for this job.
-    foreground_thread = (tid_t) Thread->tid;
+    foreground_thread = (tid_t) t->tid;
 
 // State
 // The thread needs to be in Standby state.
-
-    if ( Thread->state != STANDBY )
-    {
-        printf ("I_x64ExecuteInitialProcess: state tid={%d}\n", 
-            Thread->tid);
+    if (t->state != STANDBY){
+        printf ("I_x64ExecuteInitialProcess: state tid={%d}\n", t->tid );
         die();
     }
 
 // :: MOVEMENT 2 ( Standby --> Running )
 
-    if ( Thread->state == STANDBY ){
-        debug_print("I_x64ExecuteInitialProcess: Thread->state = RUNNING\n");
-        Thread->state = RUNNING;
+    if (t->state == STANDBY){
+        debug_print("I_x64ExecuteInitialProcess: Now RUNNING!\n");
+        t->state = RUNNING;
     }
 
 //
 // Current process.
 //
-    if ( Thread->owner_process->pid != GRAMADO_PID_INIT ){
-        panic("I_x64ExecuteInitialProcess: Thread->owner_process->pid\n");
+
+    if (t->owner_process->pid != GRAMADO_PID_INIT){
+        panic("I_x64ExecuteInitialProcess: t->owner_process->pid\n");
     }
     set_current_process(GRAMADO_PID_INIT);
 
 // List
 // Dispatcher ready list.
 // Maybe it is not used.
-
     for ( i=0; i < PRIORITY_MAX; i++ ){
-        dispatcherReadyList[i] = (unsigned long) Thread;
+        dispatcherReadyList[i] = (unsigned long) t;
     };
 
 // Counting the type of the dispatching criteria.
     IncrementDispatcherCount(SELECT_IDLE_COUNT);
-
 
 // #todo 
 // check this
@@ -494,7 +480,7 @@ void I_x64ExecuteInitialProcess (void)
 // See: https://en.wikipedia.org/wiki/Translation_lookaside_buffer
 // #bugbug: rever isso.
 
-    x64_load_pml4_table( Thread->pml4_PA );
+    x64_load_pml4_table( t->pml4_PA );
 
     asm ("movq %cr3, %rax");
     asm ("movq %rax, %cr3");
@@ -650,13 +636,13 @@ void I_x64ExecuteInitialProcess (void)
 
 
 // cpl
-    if (Thread->cpl != RING3 ){
+    if (t->cpl != RING3 ){
         panic ("I_x64ExecuteInitialProcess: cpl\n");
     }
 
 // iopl
 // weak protection
-    if (Thread->rflags_initial_iopl != 3 ){
+    if (t->rflags_initial_iopl != 3 ){
         panic ("I_x64ExecuteInitialProcess: rflags_initial_iopl\n");
     }
 
@@ -666,7 +652,9 @@ void I_x64ExecuteInitialProcess (void)
     //refresh_screen();
     //while(1){}
 
+// Entry point and ring3 stack.
 // CONTROLTHREAD_ENTRYPOINT
+
     unsigned long entry = (unsigned long) 0x0000000000201000;
     unsigned long rsp3  = (unsigned long) 0x00000000002FFFF0;
 
@@ -695,7 +683,6 @@ void I_x64ExecuteInitialProcess (void)
     PROGRESS("I_x64ExecuteInitialProcess: Unexpeted error\n");
     panic   ("I_x64ExecuteInitialProcess: Unexpeted error\n");
 }
-
 
 // Create the kernel process.
 // It will create a process for two images:

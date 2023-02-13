@@ -1229,7 +1229,7 @@ done:
     printf("smp_probe: done\n");
 
     // #debug
-    refresh_screen();
+    //refresh_screen();
     //while(1){}
 
     // g_smp_initialized = TRUE;

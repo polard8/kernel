@@ -23,7 +23,20 @@ static long __new_mouse_x=0;
 static long __new_mouse_y=0;
 static int __mouse_initialized = FALSE;
 
+static int refresh_pointer_status= FALSE;
+
 static void draw_mouse_pointer(void);
+
+
+// --------------------------
+
+void set_refresh_pointer_status(int value)
+{
+    if (value != FALSE && value != TRUE)
+        return;
+    refresh_pointer_status = value;
+}
+
 
 // Onde esta o mouse? em que janela?
 // simple implementation.
@@ -68,6 +81,7 @@ long comp_get_mouse_y_position(void)
 
 static void draw_mouse_pointer(void)
 {
+
 // #todo: 
 // print directly into the lfb.
 // DRAW
@@ -76,7 +90,7 @@ static void draw_mouse_pointer(void)
         (unsigned long) __new_mouse_y, 
         (unsigned long) 8, 
         (unsigned long) 8, 
-        COLOR_YELLOW, 
+        COLOR_RED, 
         0 );
 }
 
@@ -102,26 +116,21 @@ void __display_mouse_cursor(void)
 //------
 //#dangerdanger
 //#todo: show the backbuffer
-// APAGA
 
-// Apaga
-// So apagaremos se houve algum movimento.
-    //if( __old_mouse_x != __new_mouse_x ||
-    //    __old_mouse_y != __new_mouse_y )
-    //{
-        //gws_refresh_rectangle( 
-        //    __old_mouse_x, __old_mouse_y, 8, 8 );
-       gws_refresh_rectangle( 
-            __old_mouse_x, __old_mouse_y, 10, 10 );
-
-    //}
+// Apaga se houve algum evento, como movimento.
+    if (refresh_pointer_status == TRUE)
+    {
+        gws_refresh_rectangle( __old_mouse_x, __old_mouse_y, 16, 16 );
+        set_refresh_pointer_status(FALSE);
+    }
 
 // save
     __old_mouse_x = __new_mouse_x;
     __old_mouse_y = __new_mouse_y;
 
+// Draw direcly into the lfb.
     draw_mouse_pointer();
-//------        
+//------ 
 }
 
 

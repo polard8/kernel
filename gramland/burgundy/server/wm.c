@@ -518,6 +518,8 @@ on_mouse_event(
 // as rotinas de pintura de cursor que estao no kernel.
     if (event_type == GWS_MouseMove)
     {
+        set_refresh_pointer_status(TRUE);
+ 
         //printf("MOVE\n");
         // The compositor is doing its job,
         // painting the pointer in the right position.
@@ -4307,8 +4309,7 @@ int on_combination(int msg_code)
     if (msg_code == 88112)
     {
         gUseMouse = TRUE;
-        wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
-
+        //wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
         //printf ("server: [88112]\n");
         //__switch_focus();
         //wm_update_desktop(TRUE); //ok.

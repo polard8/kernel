@@ -491,13 +491,20 @@ refresh_rectangle (
 // #debug
 // Used for optimization tests.
 
+   //#debug
     //int RefreshFlash=TRUE;
     int RefreshFlash=FALSE;
+    long i=0;
+    long count=2000000;
 
-    if (RefreshFlash==TRUE){
+    if (RefreshFlash==TRUE)
+    {
+        // Draw directly into the lfb.
         frontbuffer_draw_rectangle( 
             x, y, width, height, 
             COLOR_YELLOW, 0 );
+         // Wait ...
+         for (i=0; i<count; i++){};
     }
 // =====================
 
