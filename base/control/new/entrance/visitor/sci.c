@@ -8,17 +8,13 @@
 
 #include <kernel.h>  
 
-//#define SERVICE_NUMBER_MAX  255
-
 static unsigned long __default_syscall_counter=0;
-
 
 //globals
 //see:sw.asm
 unsigned long sci0_cpl=0;
 unsigned long sci1_cpl=0;
 unsigned long sci2_cpl=0;
-
 
 //
 // == private functions: prototypes =============
@@ -2225,11 +2221,11 @@ void *sci2 (
                             (unsigned long) arg4 );
     }
 
-    // Clear the fg console background with a given color.
-    // Do not change the colors.
+// Clear the fg console background with a given color.
+// Do not change the colors.
     if (number == 8003)
     { 
-        if(fg_console<0 || fg_console > 3){
+        if (fg_console<0 || fg_console > 3){
             return NULL;
         }
 
@@ -2251,8 +2247,8 @@ void *sci2 (
         refresh_screen();
         return NULL;
     }
-    
-    // Change the foreground color of the current console.
+
+// Change the foreground color of the current console.
     if (number == 8004)
     {
         if (fg_console<0 || fg_console > 3){
@@ -2268,12 +2264,12 @@ void *sci2 (
         return NULL;
     }
 
-    // Configurando sincronização de leitura e escrita em arquivo.
-    // principalmente socket.
-    // A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
-    // #ok: podemos usar ioctl
-    // See: sys.c
-    if ( number == 10000 )
+// Configurando sincronização de leitura e escrita em arquivo.
+// principalmente socket.
+// A estrutura de arquivo contém uma estrutura de sincronização de leitura e escrita.
+// #ok: podemos usar ioctl
+// See: sys.c
+    if (number == 10000)
     {
         debug_print("sci2: [10000] sys_set_file_sync\n");
         // IN: fd, request, data
@@ -2287,13 +2283,10 @@ void *sci2 (
 // #ok: podemos usar ioctl
 // See: sys.c
 // IN: fd, request
-
-    if ( number == 10001 ){
+    if (number == 10001){
         //debug_print("sci2: [10000] sys_get_file_sync\n");
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
-
-
 
 //=====
 // See: sys.c
@@ -2347,7 +2340,6 @@ void *sci2 (
         return NULL;
     }
 
-
 // Get the tid of the current thread.
     if ( number == 10010 ){
         //debug_print("sci2: [10010] GetCurrentTID\n");
@@ -2396,8 +2388,7 @@ void *sci2 (
 //
 
 // Set network status.
-    if (number == 22001)
-    {
+    if (number == 22001){
         networkSetStatus((int) arg2);
         return NULL;
     }
@@ -2487,9 +2478,7 @@ void *sci2 (
         return NULL;
     }
 
-
 // Counter
-
     __default_syscall_counter++;
 
 // #todo

@@ -1,6 +1,6 @@
 
 // gns.c
-// This is a client-side library for the GNS. 
+// This is a client-side library for the GNSSRV.
 
 #include <types.h>
 #include <stddef.h>
@@ -11,7 +11,6 @@
 #include <rtl/gramado.h>
 
 #include "include/gns.h"
-
 
 #define SIZE_DONT_CHANGE  512
 char __gns_buffer[SIZE_DONT_CHANGE];
@@ -57,7 +56,6 @@ void gns_yield(void)
     gns_system_call (265,0,0,0);
 }
 
-
 // hello request
 static int __gns_hello_request (int fd)
 {
@@ -78,9 +76,9 @@ static int __gns_hello_request (int fd)
 // Se foi possível enviar, então saimos do loop.        
 // obs: podemos usar send();
 
-    // message: Solicita um hello!      
+// Message: Solicita um hello!      
     message_buffer[0] = 0;       // window. 
-    message_buffer[1] = 1000;    // msg=hello.
+    message_buffer[1] = GNS_Hello;  //1000;    // msg=hello.
     message_buffer[2] = 0;
     message_buffer[3] = 0;
     // ...
@@ -96,7 +94,7 @@ static int __gns_hello_request (int fd)
            break;
         }
 
-        for (i=0; i<9; i++)
+        for (i=0; i<11; i++)
         {
             //gramado_system_call (265,0,0,0); //yield thread.
             //gnst_yield();
@@ -111,14 +109,13 @@ static int __gns_hello_request (int fd)
     return (int) n_writes;
 }
 
-
 static int __gns_hello_response(int fd)
 {
     unsigned long *message_buffer = (unsigned long *) &__gns_buffer[0];   
     int n_reads = 0;    // For receiving responses.
     int i=0;
-    char response_buffer[64];
-    
+    char response_buffer[128];
+
     if (fd<0){
         return -1;
     }
@@ -186,14 +183,14 @@ process_reply:
 // and then put the message into the tmp buffer.
 // Se tem alguma coisa no buffer, mostra
 
-    for (i=0; i<64; i++){
+    for (i=0; i<128; i++){
         response_buffer[i]=0;
     };
 
 // Get the payload.
-
+// The message is in the offset 128?
     sprintf( response_buffer, (__gns_buffer+128) );
-    response_buffer[63] = 0;  //finaliza
+    response_buffer[127] = 0;  //finaliza
 
     if ( *response_buffer != 0 ){
         printf("RESPONSE: { %s } \n", response_buffer );
@@ -202,6 +199,17 @@ process_reply:
     return (int) n_reads;
 }
 
+
+void
+gns_async_command ( 
+    int fd, 
+    unsigned long request,
+    unsigned long sub_request,
+    unsigned long data )
+{
+    // #todo
+    // Post asynchonous request to the server.
+}
 
 // =============================================
 int gns_hello (int fd)

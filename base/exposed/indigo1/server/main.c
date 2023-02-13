@@ -130,8 +130,7 @@ static void dispatch(int fd)
 // =====================
 // Read the request.
 
-    n_reads = 
-        (int) read ( fd, __buffer, sizeof(__buffer) );
+    n_reads = (int) read ( fd, __buffer, sizeof(__buffer) );
 
     if (n_reads <= 0)
     {
@@ -152,7 +151,7 @@ static void dispatch(int fd)
 
 // Nesse momento já lemos alguma coisa.
 
-    // Invalid message code
+// Invalid message code.
     if (message_buffer[1] == 0)
     { 
         debug_print ("gnssrv: dispatch Unknown message\n");
@@ -167,16 +166,17 @@ static void dispatch(int fd)
         message_buffer[2] = 0;
         message_buffer[3] = 0;
         gnssrv_yield(); 
-      
+ 
         return;
     }
 
+// OK:
 // Valid message
-// Call the service
+// Call the service!
 
     gnsProcedure ( 
-        (void *)        message_buffer[0], 
-        (int)           message_buffer[1], 
+        (void *) message_buffer[0], 
+        (int)       message_buffer[1], 
         (unsigned long) message_buffer[2], 
         (unsigned long) message_buffer[3] );
 
@@ -197,9 +197,8 @@ static void dispatch(int fd)
 // Send reply!
 //
 
-    //char *m = (char *) (&__buffer[0] + 128);
     char *m = (char *) (__buffer + 128);
-    sprintf( m, "GRAMADO 501 Not Implemented");
+    sprintf( m, "GRAMADO 501 Not Implemented!");
     //sprintf( m, "HTTP/1.1 501 Not Implemented\n\n");
     //sprintf( m, "HTTP/1.1 400 Bad Request\n Content-Type: text/html\n Content-Length: 0\n");
 
@@ -214,7 +213,6 @@ static void dispatch(int fd)
 // Talvez aqui possamos usar alguma função chamada post_message().
 
 // Sending the reply.
-
     n_writes = (int) write ( fd, __buffer, sizeof(__buffer) );
     if (n_writes<=0){
         debug_print ("gnssrv: dispatch Response fail\n");
@@ -239,11 +237,6 @@ static void dispatch(int fd)
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
 }
 
-/*
- * gnsProcedure:
- *     Main dialog.
- */
-
 static int 
 gnsProcedure ( 
     void *window, 
@@ -251,9 +244,10 @@ gnsProcedure (
     unsigned long long1, 
     unsigned long long2 )
 {
-    int my_pid = -1;
+// Do a service. 
+// Called by dispath();
 
-    //debug_print ("gnssrv: gnsProcedure\n");
+    int my_pid = -1;
 
     if (msg<0){
         return -1;
@@ -307,9 +301,9 @@ gnsProcedure (
 
         // MSG_GNS_HELLO
         case 1000:
-            //printf ("\n");
             printf ("gnssrv: [1000] Hello from Gramado Network Server!\n");
             printf ("\n");
+            rtl_yield();
             NoReply = FALSE;
             return 0;
             break;

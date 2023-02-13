@@ -78,7 +78,7 @@ int main ( int argc, char *argv[] )
     int addrlen=0;
     server_address.sin_family = AF_INET;
     // Connecting to the network server in this machine.
-    server_address.sin_port        = PORTS_NS;       // htons(PORTS_NS);
+    server_address.sin_port = PORTS_NS;       // htons(PORTS_NS);
     server_address.sin_addr.s_addr = IP(127,0,0,1);  // inet_addr("192.168.0.101");
 
     addrlen = sizeof(server_address);
@@ -127,23 +127,19 @@ int main ( int argc, char *argv[] )
             //break;
 
         // Send
-        //printf("gns.bin: Send message\n");
         service_status = (int) gns_hello(client_fd);
-        if ( service_status <= 0 ){
-            printf("gns.bin: service failed\n");
+        if (service_status <= 0){
+            printf("gns.bin: Service failed\n");
         }
+
         // Sleep
-        //printf("gns.bin: Sleep\n");
-        //gns_yield();
-        //gns_yield();
-        //gns_yield();
         gns_yield();
     };
 
 // Not reached.
     close(client_fd);
     debug_print ("gns.bin: bye\n"); 
-    printf      ("gns.bin: bye\n");
+    printf ("gns.bin: bye\n");
     return 0;
 }
 

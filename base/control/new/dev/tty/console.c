@@ -1887,6 +1887,7 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+/*
 // #note
 // We already did that in the kernel initialization.
     if ( strncmp(prompt,"fpu",3) == 0 )
@@ -1899,7 +1900,9 @@ int consoleCompareStrings(void)
         printf("done\n");
         goto exit_cmp;
     }
+*/
 
+/*
 // smp:
 // See: x64.c
     if ( strncmp( prompt, "smp", 3 ) == 0 )
@@ -1911,6 +1914,7 @@ int consoleCompareStrings(void)
         printf("#suspended: See init_hal() in hal.c\n");
         goto exit_cmp;
     }
+*/
 
 // disk: Show some disk information.
 // See: ata.c
@@ -2055,14 +2059,15 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+/*
 // thread:
 // #bugbug: ring0 threads are a huge problem.
 // Avoid that for now.
-
     if ( strncmp( prompt, "thread", 6 ) == 0 ){
         //__test_thread();
         goto exit_cmp;
     }
+*/
 
 // time:
     if ( strncmp( prompt, "time", 4 ) == 0 )
@@ -2095,12 +2100,12 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+/*
 // ========
 // 'wm'
 // Send input to the window manager
 // inside the window server (gwssrv.bin).
 // See: kgwm.c
-
     if ( strncmp( prompt, "wm", 2 ) == 0 )
     {
         if (gUseWMCallbacks != TRUE){
@@ -2124,6 +2129,8 @@ int consoleCompareStrings(void)
 
         goto exit_cmp;
     }
+*/
+
 
 // ========
 // close: Sending a MSG_CLOSE messsage to the init thread.
