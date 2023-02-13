@@ -2,12 +2,6 @@
 // kernel.h
 // Created by Fred Nora.
 
-
-// This status flag is setted when
-// the callouts to GWSSRV.BIN are installed.
-extern int gUseWMCallbacks;
-
-
 //
 // == gramado modes =========================
 //

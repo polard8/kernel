@@ -8,21 +8,6 @@
 // Imports
 //
 
-// from swlib.asm
-// Used to handle callbacks used by the window server.
-extern unsigned long wmData_RDI;
-extern unsigned long wmData_RSI;
-extern unsigned long wmData_RDX;
-extern unsigned long wmData_RCX;
-extern unsigned long wmWindowMananer_SendMessage(void);
-
-
-// from swlib.asm
-// Used to handle callbacks used by the window server.
-extern unsigned long wmData_Callback0;
-extern unsigned long wmData_Callback1;
-extern unsigned long wmData_Callback2;
-
 
 //keyboard support
 //#define KEYBOARD_KEY_PRESSED  0x80
@@ -89,92 +74,10 @@ static unsigned long __last_tick(void);
 
 // ============================
 
-// Register callbacks sent by gwssrv.bin
-void 
-wmRegisterWSCallbacks(
-    unsigned long callback0,
-    unsigned long callback1,
-    unsigned long callback2 )
-{
-    printf("wmRegisterWSCallbacks:\n");
-
-    gUseWMCallbacks = TRUE;
-
-// Save callbacks
-// See: swlib.asm
-    wmData_Callback0 = (unsigned long) callback0;
-    wmData_Callback1 = (unsigned long) callback1;
-    wmData_Callback2 = (unsigned long) callback2;
-
-    if ( wmData_Callback0 == 0 ||
-          wmData_Callback1 == 0 ||
-          wmData_Callback2 == 0  )
-    {
-        panic("wmRegisterWSCallbacks: Invalid callbacks\n");
-    }
-
-//#debug
-
-    //printf("wmData_Callback0 = %x \n", wmData_Callback0);
-    //printf("wmData_Callback0 = %x \n", wmData_Callback1);
-    //printf("wmData_Callback0 = %x \n", wmData_Callback2);
-
-    // No while.
-    // scroll will not work
-    //while(1){
-        //asm("call *%0" : : "r"(wsCallbacks[0]));
-    //}
-    
-
-//done:
-    //printf("done\n");
-
-// #importante
-// Nesse momento podemos criar
-// interrupçoes para esses endereços.
-
-    refresh_screen();
-    //while(1){}
-}
-
 static unsigned long __last_tick(void)
 {
     return (unsigned long) jiffies;
 }
-
-// #
-// This callback is not used at the moment.
-// We're gonna use this to call some routines
-// inside the kernel modules.
-// Send input to the window manager
-// inside the window server ( gwssrv.bin )
-unsigned long 
-wmSendInputToWindowManager(
-    unsigned long wid,
-    unsigned long msg,
-    unsigned long long1,
-    unsigned long long2)
-{
-
-// We can't!
-    if( gUseWMCallbacks != TRUE )
-        return 0;
-
-    //asm("call *%0" : : "r"(wsCallbacks[0]));
-
-// Setup parameters
-// See: swlib.asm
-
-    wmData_RDI = (unsigned long) (wid & 0xFFFF); 
-    wmData_RSI = (unsigned long) (msg & 0xFFFF);
-    wmData_RDX = (unsigned long) long1;
-    wmData_RCX = (unsigned long) long2;
-
-// Trampoline
-// See: swlib.asm
-    return (unsigned long) wmWindowMananer_SendMessage();
-}
-
 
 //#todo: Talvez essa rotina possa ir pra outro lugar.
 // talvez na lib.
@@ -277,10 +180,6 @@ static void __exit_embedded_shell(void)
     printf ("Prompt OFF: Bye\n");
     printf("\n");
     refresh_screen();
-// update desktop
-    if ( gUseWMCallbacks == TRUE ){
-         //wmSendInputToWindowManager(0,9092,0,0);
-    }
 // done
     ShellFlag = FALSE;
 }
@@ -288,12 +187,7 @@ static void __exit_embedded_shell(void)
 
 void exit_kernel_console(void)
 {
-// Se estavamos no ambiente de desktop completo
-// e nao no modo debug.
-// se temos callbacks e' porque o window server inicializou isso.
-    if ( gUseWMCallbacks == TRUE ){
-        __exit_embedded_shell();
-    }
+    __exit_embedded_shell();
 // suficiente para o modo debug.
     ShellFlag = FALSE;
 }
@@ -1890,17 +1784,6 @@ void schedulerUpdateScreen(void)
 
     deviceWidth  = (deviceWidth & 0xFFFF);
     deviceHeight = (deviceHeight & 0xFFFF);
-
-// ============================
-// Redraw and flush stuff.
-
-// Calling the window manager inside the window server
-// at gwssrv.bin
-// 9091 = message code for calling the compositor.
-
-    if (gUseWMCallbacks == TRUE){
-        //wmSendInputToWindowManager(0,9091,0,0);
-    }
 
 // ============================
 // Precisamos apenas validar todos retangulos

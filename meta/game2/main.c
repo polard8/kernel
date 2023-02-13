@@ -107,9 +107,6 @@ See: https://wiki.osdev.org/Graphics_stack
 #define LONGSTRING_SIZE        256
 // ...
 
-// See: wm.c
-extern int g_handler_flag;
-
 //see: gws.h
 struct gws_d  *window_server;
 
@@ -3393,8 +3390,6 @@ static int on_execute(void)
 
     IsTimeToQuit = FALSE;
     IsAcceptingConnections = TRUE;
-    g_handler_flag = FALSE;  // The kernel can't use the handler.
-
 
 // #test: Transparence.
     //gws_enable_transparence();
@@ -3701,45 +3696,6 @@ static int on_execute(void)
 
     //curconn = serverClient->fd;
     newconn = -1;
- 
-
-// #important
-// Here we are exporting some callback to the base kernel.
-// This way the kernel is able to call this routine directly.
-// It is possible because the window server and the base kernel
-// are sharing the process structure and the same memory space.
-// This is an unusual practice. :)
-// #test
-// Registrando handlers de input.
-// usados como aceleradores de teclado e mouse.
-// Dessa forma o console poder'a digitar diretamente 
-// na janela com foco de entrada.
-// Os parametros serao passados via memoria compartilhada.
-// poderao ser longos ou pequenos.
-// >>>>>>> ou ainda esses handler pode receber apenas algumas mensagens,
-// principalmente as mensagens relativas ao window manager.
-// It also enable the kernel for calling our compositor.
-// See the callback in wm.c
-
-
-/*
-    #suspended
-    We are in ring3 now!
-
-    gwssrv_debug_print ("gwssrv: Exporting callback\n");
-    gramado_system_call( 
-        101234, 
-        (unsigned long) &wmHandler, 
-        (unsigned long) &wmHandler, 
-        (unsigned long) &wmHandler );
-*/
-
-
-// #bugbug
-// Daqui pra frente o kernel pode possivelmente
-// invocar esse callout e tentar fazer alguma coisa aqui.
-// Devemos bloquiar isso até o momento em que estivermos
-// completamente prontos.
 
 // ========================================================
 
@@ -3766,8 +3722,6 @@ static int on_execute(void)
 
     gwssrv_debug_print ("gwssrv: Entering main loop.\n");
     rtl_focus_on_this_thread();
-// Yes, the kernel can use the handler.
-    g_handler_flag = TRUE;
     running = TRUE;
 
     window_server->status = STATUS_RUNNING;

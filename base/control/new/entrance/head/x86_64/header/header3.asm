@@ -547,7 +547,7 @@ setup_vectors:
 ; #todo
 ; Explain it better.
 
-    mov rax,  qword callback_restorer
+    mov rax,  qword _callback_restorer
     mov rbx,  qword 198
     call _setup_system_interrupt  
 

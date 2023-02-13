@@ -19,14 +19,6 @@ struct tty_d  *console3_tty;
 // Imports
 //
 
-// from swlib.asm
-// Used to handle callbacks used by the window server.
-extern unsigned long wmData_RDI;
-extern unsigned long wmData_RSI;
-extern unsigned long wmData_RDX;
-extern unsigned long wmData_RCX;
-extern unsigned long wmWindowMananer_SendMessage(void);
-
 // used for handling screen dimensions.
 //extern unsigned long gSavedX;
 //extern unsigned long gSavedY;
@@ -2099,38 +2091,6 @@ int consoleCompareStrings(void)
             SerialPortInfo.com1.baudrate);
         goto exit_cmp;
     }
-
-/*
-// ========
-// 'wm'
-// Send input to the window manager
-// inside the window server (gwssrv.bin).
-// See: kgwm.c
-    if ( strncmp( prompt, "wm", 2 ) == 0 )
-    {
-        if (gUseWMCallbacks != TRUE){
-            goto exit_cmp;
-        }
-
-        // See: swlib.asm
-        // Setup parameters
-        //wmData_RDI = 0;
-        //wmData_RSI = MSG_SYSKEYDOWN;  //MSG_KEYDOWN;
-        //wmData_RDX = VK_F1;           //3;
-        //wmData_RCX = 4;
-        // Trampoline
-        //wmWindowMananer_SendMessage();
- 
-        //#test
-        //wmSendInputToWindowManager(0,9092,0,0);  // update desktop
-        //wmSendInputToWindowManager(0,9093,0,0);    // ramdom tests
-        //wmSendInputToWindowManager(0,0,0,0);
-        //wmSendInputToWindowManager(0,0,0,0);
-
-        goto exit_cmp;
-    }
-*/
-
 
 // ========
 // close: Sending a MSG_CLOSE messsage to the init thread.

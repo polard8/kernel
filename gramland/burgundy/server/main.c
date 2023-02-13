@@ -3,8 +3,7 @@
 // This is a ring0 display server and window manager.
 // It has the same PID of the kernel, 0.
 // #todo: 
-// We need a fancy name for this project,
-// not only 'gws'.
+// We need a fancy name for this project, not only 'gws'.
 
 /*
  * File: main.c
@@ -118,10 +117,6 @@ See: https://wiki.osdev.org/Graphics_stack
 #define MSG_OFFSET_LONGSTRING  128
 #define LONGSTRING_SIZE        256
 // ...
-
-// See: wm.c
-extern int g_handler_flag;
-
 
 // see: globals.h
 struct initialization_d  Initialization;
@@ -3331,8 +3326,6 @@ static int on_execute(int dm)
     IsTimeToQuit = FALSE;
     IsAcceptingInput = TRUE;
     IsAcceptingConnections = TRUE;
-// The kernel can't use the handler.
-    g_handler_flag = FALSE;
 
 // ==========================================
 // Starting the initialization phases.
@@ -3620,48 +3613,6 @@ static int on_execute(int dm)
 
     //curconn = serverClient->fd;
     newconn = -1;
-
-// Yes, the kernel can use the handler.
-// Its used in the input reader.
-    g_handler_flag = TRUE;
-
-// #important
-// Here we are exporting some callback to the base kernel.
-// This way the kernel is able to call this routine directly.
-// It is possible because the window server and the base kernel
-// are sharing the process structure and the same memory space.
-// This is an unusual practice. :)
-// #test
-// Registrando handlers de input.
-// usados como aceleradores de teclado e mouse.
-// Dessa forma o console poder'a digitar diretamente 
-// na janela com foco de entrada.
-// Os parametros serao passados via memoria compartilhada.
-// poderao ser longos ou pequenos.
-// >>>>>>> ou ainda esses handler pode receber apenas algumas mensagens,
-// principalmente as mensagens relativas ao window manager.
-// It also enable the kernel for calling our compositor.
-// See the callback in wm.c
-
-
-/*
-    #suspended
-    We are in ring3 now!
-
-    gwssrv_debug_print ("gwssrv: Exporting callback\n");
-    gramado_system_call( 
-        101234, 
-        (unsigned long) &wmHandler, 
-        (unsigned long) &wmHandler, 
-        (unsigned long) &wmHandler );
-*/
-
-
-// #bugbug
-// Daqui pra frente o kernel pode possivelmente
-// invocar esse callout e tentar fazer alguma coisa aqui.
-// Devemos bloquiar isso até o momento em que estivermos
-// completamente prontos.
 
 // ========================================================
 

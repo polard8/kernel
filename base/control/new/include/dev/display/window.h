@@ -639,22 +639,6 @@ void scroll_screen_rect (void);
 // == wm =====================
 //
 
-// See: kgwm.c
-void 
-wmRegisterWSCallbacks(
-    unsigned long callback0,
-    unsigned long callback1,
-    unsigned long callback2 );
-
-// Send input to the window manager
-// inside the window server
-// gwssrv.bin
-unsigned long wmSendInputToWindowManager(
-    unsigned long wid,
-    unsigned long msg,
-    unsigned long long1,
-    unsigned long long2);
-
 void exit_kernel_console(void);
 void kgwm_early_kernel_console(void);
 

@@ -1002,20 +1002,6 @@ static void *__extra_services (
         panic("__extra_services: [9999] #deprecated\n");
     }
 
-// 
-// ======================================
-//
-
-// Register callbacks sent by gwssrv.bin
-    if ( number == 101234 )
-    {
-        return (void*) newos_register_ws_callbacks(
-            (pid_t) current_process,
-            (unsigned long) arg2,
-            (unsigned long) arg3,
-            (unsigned long) arg4 );
-    }
-
 // fail
     return NULL;
 }
@@ -2446,7 +2432,7 @@ void *sci2 (
 // arg4 = signature
     pid_t ws_pid = -1;
     unsigned long r3_handler=0;
-    if(number == 44000)
+    if (number == 44000)
     {
         // Somente o window server pode chamar esse serviço.
         ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
@@ -2516,33 +2502,6 @@ void newos_reboot(unsigned long reboot_flags)
     sys_reboot();
     //hal_reboot();
 }
-
-
-// See: kgwm.c
-int 
-newos_register_ws_callbacks(
-    pid_t pid,
-    unsigned long callback0,
-    unsigned long callback1,
-    unsigned long callback2 )
-{
-
-// Who can do this?
-// Only the gwssrv.bin.
-
-    if(pid != KernelProcess->pid){
-        panic("newos_register_ws_callbacks: pid");
-    }
-
-    //#todo: filter parameters
-    wmRegisterWSCallbacks(
-        (unsigned long) callback0,
-        (unsigned long) callback1,
-        (unsigned long) callback2 );
-
-    return 0;
-}
-
 
 unsigned long newos_get_system_metrics(int index)
 {

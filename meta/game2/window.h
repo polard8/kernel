@@ -1292,15 +1292,6 @@ void activate_last_window(void);
 void wm_add_window_into_the_list( struct gws_window_d *window );
 void wm_remove_window_from_list_and_kill( struct gws_window_d *window );
 
-
-// Entry point
-unsigned long 
-wmHandler(
-    unsigned long arg1_rdi,
-    unsigned long arg2_rsi,
-    unsigned long arg3_rdx,
-    unsigned long arg4_rcx );
-
 unsigned long wmGetLastInputJiffie(int update);
 
 int wmSTDINInputReader(void);

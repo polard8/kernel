@@ -115,11 +115,6 @@ unsigned long KernelPages=0;
 
 int g_kernel_symbols_available=FALSE;
 
-// This status flag is setted when
-// the callouts to GWSSRV.BIN are installed.
-int gUseWMCallbacks=FALSE;
-
-
 unsigned long g_ring0area_va=0;
 unsigned long g_ring3area_va=0;
 unsigned long g_kernelimage_va=0;

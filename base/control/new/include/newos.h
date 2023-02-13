@@ -6,13 +6,6 @@
 
 void newos_reboot(unsigned long reboot_flags);
 
-int 
-newos_register_ws_callbacks(
-    pid_t pid,
-    unsigned long callback0,
-    unsigned long callback1,
-    unsigned long callback2 );
-
 unsigned long newos_get_system_metrics(int index);
 
 pid_t newos_getpid(void);

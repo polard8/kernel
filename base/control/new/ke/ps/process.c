@@ -68,7 +68,6 @@ struct process_d  *InitProcess;    // Init process.
 
 //==============================================
 
-
 void set_current_process(pid_t pid)
 {
     __current_pid = (pid_t) pid;

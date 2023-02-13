@@ -67,7 +67,8 @@ extern _contextR15
 ; #bugbug
 ; We gotta check what is the process calling this routine.
 
-callback_restorer:
+global _callback_restorer
+_callback_restorer:
 
 ; Drop the useless stack frame.
 ; We were in the middle of the timer interrupt,
@@ -168,8 +169,6 @@ irq0_release:
 
 ; Wait TLB.
     ;IODELAY 
-
-
 ;
 ; == Restore context ====================
 ;

@@ -258,22 +258,6 @@ static inline void do_hlt(void)
     asm ("hlt");
 }
 
-static inline void do_restorer(void);
-static inline void do_restorer(void)
-{
-    asm ("int $198");
-}
-void callback1(void)
-{
-    printf("INIT: Callback\n");
-    do_restorer();
-
-    while(1){
-        printf("."); fflush(stdout);
-    }
-}
-
-
 static int __CompareString(void)
 {
     int ret_val=-1;
@@ -287,19 +271,9 @@ static int __CompareString(void)
     if ( *c == '\0' ){
         goto exit_cmp;
     }
-//LF
-    printf("\n");
 
-//testando callback
-//o kernel tem que retornar para a funçao indicada.
-//#suspended: The ws is using this callback support.
-    //if( strncmp(prompt,"callback",8) == 0 )
-    //{
-    //    printf("~callback\n");
-    //    sc82(44000,&callback1,&callback1,&callback1);
-    //    printf("~done\n");
-    //    goto exit_cmp;
-    //}
+// LF
+    printf("\n");
 
     if ( strncmp(prompt,"t1",2) == 0 )
     {

@@ -49,12 +49,6 @@ static const char *app4_string = "fileman.bin";
 static unsigned long last_input_jiffie=0;
 
 
-// global.
-// Permission:
-// TRUE = The kernel can use the handler.
-int g_handler_flag;
-
-
 // #todo
 // Input event
 // Comparar os tick, em dois momentos:
@@ -3647,174 +3641,6 @@ wmProcedure(
     return 0;
 }
 
-
-// Entry point
-// Called by the kernel.
-// Order: rdi, rsi, rdx, rcx, r8, r9.
-// IN: wid, msg_code, long1, long2
-// #todo: 
-// Para algumas chamadas o kernel pode passar 
-// o ponteiro para um bloco de informações.
-unsigned long 
-wmHandler(
-    unsigned long arg1_rdi,
-    unsigned long arg2_rsi,
-    unsigned long arg3_rdx,
-    unsigned long arg4_rcx )
-{
-    unsigned long r=0;
-
-// Final message
-    struct gws_window_d *w;
-    int msg=0;
-    unsigned long long1=0;
-    unsigned long long2=0;
-
-// #debug
-//    debug_print ("wmHandler:-----------------------------\n");
-
-   if( g_handler_flag != TRUE ){
-       return 0;
-   }
-
-// #debug
-    //printf("wmHandler: %x %x %x %x\n", 
-        //arg1_rdi, arg2_rsi, arg3_rdx, arg4_rcx );
-
-// wid
-// Ignoring this parameter
-// We ware called by the kernel, and the kernel has no information
-// about the windows. So, the messages sent by the kernel are able
-// to act on the active window, on the window with focus and
-// on the server itself.
-
-    //int wid=-1;
-    //wid = (int) (arg1_rdi & 0xFFFF);
-
-// Message
-    msg = (int) (arg2_rsi & 0xFFFF);
-
-
-// #special
-// Refresh rectangles and exit.
-// GWS_RefreshDirtyRectangles
-
-// #todo:
-// This way the kernel is able to call the
-// compositor at a given timer.
-// Called by the kernel in pit.c
-
-    if ( msg == 9091 )
-    {
-        // debug_print ("wmHandler: 9091\n");
-        // IN: jiffies, clocks per second
-        wmCompose( 
-            (unsigned long) arg3_rdx,
-            (unsigned long) arg4_rcx );
-        
-        return 0;
-    }
-
-// #test
-// Redraw all the windows. Back to front.
-// GWS_UpdateDesktop
-
-    if ( msg == 9092 )
-    {
-        //debug_print ("wmHandler: 9092\n");
-        wm_update_desktop(TRUE);
-        return 0;  //important: We need to return.
-    }
-
-
-// ==============================================
-// #test
-// Testing some random functions.
-
-    if (msg == 9093)
-    {
-        debug_print ("wmHandler: 9093\n");
-
-        // #test
-        // drawing a rect using kernel and ws routines.
-        // TRUE = use kgws ; FALSE =  do not use kgws.
-
-        rectBackbufferDrawRectangle0(
-            10, 10, 40, 40,
-            COLOR_RED,
-            TRUE,      // fill? 
-            0,         // rop falgs
-            FALSE );   // TRUE = use kgws. (kernel service)
-        //refresh_rectangle_via_kgws(10, 10, 40, 40);
-
-        return 0;
-    }
-// ==============================================
-
-// Data
-
-    long1 = (unsigned long) arg3_rdx;
-    long2 = (unsigned long) arg4_rcx;
-
-//
-// Calling wmProcedure()
-//
-
-    switch (msg){
-
-    case GWS_MouseMove:
-    case GWS_MousePressed:
-    case GWS_MouseReleased:
-        //#debug
-        //if( msg == GWS_MousePressed ){ printf("%d\n",long1); }
-        r = (unsigned long) wmProcedure(
-                NULL,  //(struct gws_window_d *) 0,
-                (int) msg,
-                (unsigned long) long1,
-                (unsigned long) long2 ); 
-        return (unsigned long) r;
-        break;
-
-// #important:
-// Mandaremos input de teclado somente para 
-// a janela com foco de entrada,
-// seja ela de qualquer tipo.
-// get_focus() will give us a valid pointer or null.
-// mensagens desse tipo
-// devem ir para a janela com o foco de entrada.
-// #todo #test
-// Se não temos uma janela com foco de entrada,
-// então devemos mandar a mensagem para a janela ativa?
-
-    case GWS_KeyDown:
-    case GWS_SysKeyDown:
-    case GWS_SysKeyUp:
-    case GWS_SwitchFocus:
-        return (unsigned long) on_keyboard_event(
-            (int) msg, 
-            (unsigned long) long1, 
-            (unsigned long) long2 );
-        break;
-
-    //case 9091:
-        //wmCompositor();
-        //return 0;  //important
-        //break;
-
-    // Mensagens que atuam sobre o window server.
-    default:
-        //printf("wmHandler: default message\n");
-        return 0;
-        break;
-    };
-
-done:
-    // #debug
-    // debug_print ("wmHandler: done\n");
-    return (unsigned long) r;
-}
-
-
 unsigned long wmGetLastInputJiffie(int update)
 {
     if(update==TRUE){
@@ -3842,15 +3668,13 @@ int wmSTDINInputReader(void)
 
     for (i=0; i<nreads; i++)
     {
-            g_handler_flag = TRUE;
-
-            wmHandler( 
+            /*
+            ???procedure( 
                 0,             // window pointer
                 GWS_KeyDown,   // msg code
                 buffer[i],    // long1
                 buffer[i] );  // long2
-            
-            g_handler_flag = FALSE;
+            */
     };
 
     return (int) nreads;
@@ -4075,14 +3899,15 @@ int wmInputReader(void)
                  RTLEventBuffer[1] == GWS_MousePressed ||
                  RTLEventBuffer[1] == GWS_MouseReleased )
             {
-                if (comp_config_use_mouse == TRUE){
-                g_handler_flag = TRUE;
-                wmHandler( 
-                    0,
-                    RTLEventBuffer[1],
-                    RTLEventBuffer[2],
-                    RTLEventBuffer[3] );
-                g_handler_flag = FALSE;
+                if (comp_config_use_mouse == TRUE)
+                {
+                     /*
+                    ???procedure( 
+                        0,
+                        RTLEventBuffer[1],
+                        RTLEventBuffer[2],
+                        RTLEventBuffer[3] );
+                    */
                 }
             }
             
@@ -4102,14 +3927,13 @@ int wmInputReader(void)
             
             // See: wm.c
             // IN: wid, msg_code, long1, long2
-
-                g_handler_flag = TRUE;
-                wmHandler( 
+                /*
+                ???procedure( 
                     0,    // #todo window with focus.
                     RTLEventBuffer[1],
                     RTLEventBuffer[2],
                     RTLEventBuffer[3] );
-                g_handler_flag = FALSE;
+                */
             }
         }
     };
