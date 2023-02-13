@@ -17,6 +17,9 @@ struct ws_callback_info_d
     int ready;  // pronto para uso.
     unsigned long callback_address;
     unsigned long callback_address_saved;
+
+    unsigned long each_n_ms;
+    unsigned long times_per_second;
 };
 
 //extern int _callback_status;
@@ -28,7 +31,9 @@ extern struct ws_callback_info_d  ws_callback_info;
 // -------------
 
 void initialize_ws_callback_info(void);
-void setup_callback(unsigned long r3_address);
+
+void setup_callback(unsigned long r3_address, unsigned long ms);
+
 void prepare_next_ws_callback(void);
 
 #endif    

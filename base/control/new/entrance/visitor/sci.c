@@ -2440,10 +2440,6 @@ void *sci2 (
         if (current_process != ws_pid){
             panic("sci2: [44000] current_process!=ws_pid\n");
         }
-        // Check signature
-        if (arg4 != 1234){
-            panic("sci2: [44000] Signature\n");
-        }
         // PID
         if (arg3 != ws_pid){
             panic("sci2: [44000] Invalid PID\n");
@@ -2460,7 +2456,14 @@ void *sci2 (
         // Enable for the first time.
         // Configuramos o callback em ts.c.
         r3_handler = (unsigned long) arg2;
-        setup_callback( (unsigned long) r3_handler );
+ 
+        //arg4: desired ms
+        if (arg4<1 || arg4>1000){
+            printf("[44000] Invalid ms\n");
+            panic("[44000] Invalid ms\n");
+        }
+         //setup_callback( (unsigned long) r3_handler, 16 );
+        setup_callback( (unsigned long) r3_handler, arg4 );
         return NULL;
     }
 

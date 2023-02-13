@@ -94,12 +94,17 @@ void callbackInitialize(void)
     unsigned long address = (unsigned long) &callback_procedure;
     int pid = getpid();
     unsigned long lpid = (pid & 0xFFFFFFFF);
-    const unsigned long signature = 1234;
+
+// Each 16 ms. 60fps
+    //unsigned long ms = 2;        // 500 fps
+    unsigned long ms = 16;   // 60 fps
+    //unsigned long ms = 500;
+    //unsigned long ms = 999;
 
     sc82(
         44000,
-        (unsigned long) address,
-        (unsigned long) lpid,
-        (unsigned long) signature );
+        (unsigned long) address,  // ring 3 address
+        (unsigned long) lpid,         // pid
+        (unsigned long) ms );       // desired ms.
 }
 

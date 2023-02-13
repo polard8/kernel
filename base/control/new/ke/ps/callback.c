@@ -34,8 +34,11 @@ struct ws_callback_info_d  ws_callback_info;
 void initialize_ws_callback_info(void)
 {
     ws_callback_info.ready = FALSE;  // status
-    ws_callback_info.callback_address = 0;
+    ws_callback_info.callback_address = 0;   //#bugbug Invalid ring3 address.
     ws_callback_info.callback_address_saved = 0;
+
+    ws_callback_info.each_n_ms = 16;
+    ws_callback_info.times_per_second = (1000/16); 
 
 // Initialized for the first time.
     ws_callback_info.initialized = TRUE;
@@ -44,7 +47,7 @@ void initialize_ws_callback_info(void)
 
 // service 44000
 // Also called by DeviceInterface_PIT in pit.c.
-void setup_callback(unsigned long r3_address)
+void setup_callback(unsigned long r3_address, unsigned long ms)
 {
 
     // nao foi inicializado pela inicialização do kenrel.
@@ -53,11 +56,6 @@ void setup_callback(unsigned long r3_address)
         panic("setup_callback: callback support Not initialized\n");
     }
 
-// Indica que temos um callback
-// passado pelo window server.
-    //_callback_status = TRUE;
-    ws_callback_info.ready = TRUE;
-    
 // Esse é o endereço do handler em ring 3.
 // passado pelo window server.
     //_callback_address = (unsigned long) r3_address;
@@ -69,6 +67,20 @@ void setup_callback(unsigned long r3_address)
 // chamando essa função. Para isso ele usa essa variável salva.
     //_callback_address_saved = (unsigned long) r3_address;
     ws_callback_info.callback_address_saved = (unsigned long) r3_address;
+
+    if(ms<1)
+        panic("setup_callback: ms<1\n");
+    if(ms>1000)
+        panic("setup_callback: ms>1000\n");
+
+    ws_callback_info.each_n_ms = ms;  //16;
+    ws_callback_info.times_per_second = (1000/ms);  //(1000/16); 
+
+// Indica que temos um callback
+// passado pelo window server.
+    //_callback_status = TRUE;
+    ws_callback_info.ready = TRUE;
+
 }
 
 

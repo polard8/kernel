@@ -3496,12 +3496,16 @@ static int on_execute(void)
 
     if( gUseCallback == TRUE )
     {
+        /*
+        //#bugbug: Check parameters.
         sc82(
             44000,
             (unsigned long) &callback1,
-            (unsigned long) &callback1,
-            (unsigned long) &callback1 );
+            (unsigned long) pid,  //pid
+            (unsigned long) 16 );  //ms
+        */
     }
+
 
 
 // #todo
