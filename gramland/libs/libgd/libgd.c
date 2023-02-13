@@ -1,13 +1,12 @@
 
 // libgd.c 
+// These are display device routines.
 // #todo
 // The goal here is building a graphics library interface.
 // Here we gonna call the routines in the device driver.
 // It is an abstraction.
 
-
 #include "include/libgd.h"
-
 
 //
 // private
@@ -32,6 +31,51 @@ static unsigned long libgd_device_height=0;
 static unsigned long libgd_device_bpp=0;
 
 // ----------------------------------
+
+
+/*
+void 
+libgd_put_pixel(
+    unsigned long x_in_bytes, 
+    unsigned long y, 
+    unsigned long surface_pitch, 
+    unsigned long surface_height,
+    unsigned int color,   // 4bytes color. Only 32 bpp.
+    void *surface_buffer );
+void 
+libgd_put_pixel(
+    unsigned long x_in_bytes, 
+    unsigned long y, 
+    unsigned long surface_pitch, 
+    unsigned long surface_height,
+    unsigned int color,   // 4bytes color. Only 32 bpp.
+    void *surface_buffer )
+{
+// Print a pixel in a given surface.
+// 4bytes color. Only 32 bpp.
+
+// x = offset in bytes.
+// surface_pitch = How many bytes in the surface.
+    if (x_in_bytes >= surface_pitch || y >= surface_height) 
+        return;
+
+// Surface
+    unsigned int *buf = (unsigned int*) surface_buffer;
+
+//
+// Draw
+//
+
+    unsigned long line_offset = (unsigned long) (y * surface_pitch);
+    unsigned long col_offset  = (unsigned long) x_in_bytes; //Offset in bytes.
+    unsigned long address = (unsigned long) (buf + (line_offset + col_offset));
+
+// Draw 4bytes pixel.
+// 32bpp.
+
+    *(unsigned int*)( (unsigned int*) address ) = (unsigned int) color;
+}
+*/
 
 // Initialize the library.
 int libgd_initialize(void)
