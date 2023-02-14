@@ -1,6 +1,6 @@
 
 # fs/
-# Compile all the files and create archive_fs.o
+# Compile all the files and create ar_fs.o
 
 AS	= as
 LD	= ld
@@ -77,29 +77,18 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 OBJS = fs.o pipe.o elf.o search.o fsload.o    
 
 all:
-
-	$(CC) -c elf.c     $(KERNEL_INCLUDE) $(CFLAGS) -o elf.o
-	$(CC) -c fs.c      $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
-	$(CC) -c pipe.c    $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
+	$(CC) -c elf.c         $(KERNEL_INCLUDE) $(CFLAGS) -o elf.o
+	$(CC) -c fs.c          $(KERNEL_INCLUDE) $(CFLAGS) -o fs.o
+	$(CC) -c pipe.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pipe.o
 	$(CC) -c search.c  $(KERNEL_INCLUDE) $(CFLAGS) -o search.o
-	$(CC) -c fsload.c  $(KERNEL_INCLUDE) $(CFLAGS) -o fsload.o
+	$(CC) -c fsload.c   $(KERNEL_INCLUDE) $(CFLAGS) -o fsload.o
 	
 # link
-	$(LD) -r -o archive_fs.o $(OBJS)
-	cp archive_fs.o ../
+	$(LD) -r -o ar_fs.o $(OBJS)
+	cp ar_fs.o ../
 	rm *.o
+
+clean:
+	rm *.o    
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	

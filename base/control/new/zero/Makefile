@@ -1,6 +1,6 @@
 
-# klib/
-# Compile all the files and create archive_klib.o
+# zero/
+# Compile all the files and create ar_zero.o
 
 AS	= as
 LD	= ld
@@ -17,7 +17,6 @@ PYTHON	= python
 PYTHON2	= python2
 PYTHON3	= python3
 RUBY	= ruby
-
 
 # test: gramado 64bit
 # See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
@@ -54,16 +53,13 @@ CFLAGS := \
 	-fno-omit-frame-pointer \
 	-fno-optimize-sibling-calls    
 
-
 # Exported files. Kernel api;
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I ../include/uapi/
 
-
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)  
-
 
 # See: https://linux.die.net/man/1/ld
 # -s --strip-all:   Omit all symbol information from the output file.
@@ -84,25 +80,12 @@ all:
 	$(CC) -c kunistd.c $(KERNEL_INCLUDE) $(CFLAGS) -o kunistd.o
 
 # link
-	$(LD) -r -o archive_klib.o $(OBJS)
-
-# copy
-	cp archive_klib.o ../
+	$(LD) -r -o ar_zero.o $(OBJS)
+	cp ar_zero.o ../
 	rm *.o
 	
 clean:
-	rm *.o
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	rm *.o    
+	
+	
+	

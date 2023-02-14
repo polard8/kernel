@@ -86,11 +86,7 @@ CFLAGS := \
 	-fno-optimize-sibling-calls \
 	-mno-red-zone \
 	#-mno-mmx -mno-sse -mno-sse2   
-
-
 endif
-
-
 
 .PHONY: all libc-header libc-content libc-footer link install clean
 
@@ -100,10 +96,8 @@ link install clean
 	@echo "Ok?"
 
 libc-header:
-
-# unit 3: First release.
-	gcc  -c  entrance/student/unit3/crt0.c  $(CFLAGS) -I. -I include/ -o crt0.o
-
+# student
+	gcc  -c  entrance/student/crt0.c  $(CFLAGS) -I. -I include/ -o crt0.o
 # visitor
 	gcc -c entrance/visitor/rtl.c  $(CFLAGS) -I. -I include/ -o rtl.o
 

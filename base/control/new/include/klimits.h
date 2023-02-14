@@ -33,6 +33,9 @@
 // Maximum value an 'unsigned short int' can hold.  (Minimum is 0.) 
 #define USHRT_MAX  65535
 
+//#todo: Use default lib.
+#define HEX_LEN  8
+#define ____INT_MAX  2147483647
 
 #endif    
 

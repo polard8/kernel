@@ -1,6 +1,6 @@
 
 # ke/
-# Compile all the files and create archive_ke.o
+# Compile all the files and create ar_ke.o
 
 AS	= as
 LD	= ld
@@ -135,8 +135,10 @@ all:
 	$(CC) -c ps/intake/sched/schedi.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedi.o  
 
 # link
-	$(LD) -r -o archive_ke.o $(OBJS)
-	cp archive_ke.o ../
+	$(LD) -r -o ar_ke.o $(OBJS)
+	cp ar_ke.o ../
 	rm *.o
 	
-	
+clean:
+	rm *.o
+

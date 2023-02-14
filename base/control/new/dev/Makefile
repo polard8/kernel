@@ -1,6 +1,6 @@
 
 # dev/
-# Compile all the files and create archive_dev.o
+# Compile all the files and create ar_dev.o
 
 AS	= as
 LD	= ld
@@ -147,8 +147,10 @@ all:
 	$(CC) -c tty/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
 
 # link
-	$(LD) -r -o archive_dev.o $(OBJS)
-	cp archive_dev.o ../
+	$(LD) -r -o ar_dev.o $(OBJS)
+	cp ar_dev.o ../
 	rm *.o
 	
-	
+clean:
+	rm *.o    
+

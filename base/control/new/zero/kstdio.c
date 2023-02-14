@@ -3,10 +3,6 @@
 
 #include <kernel.h>
 
-//#todo: Use default lib.
-#define HEX_LEN  8
-#define ____INT_MAX  2147483647
-
 //
 // File pointers.
 //
@@ -247,6 +243,9 @@ fail:
 
 void printchar (char **str, int c)
 {
+
+// Valid pointer.
+// We have a string.
     if (str){
 
         if ( c == '\n' ){
@@ -258,19 +257,18 @@ void printchar (char **str, int c)
 
         ++(*str);
 
-    } else (void) putchar(c);
+// Invalid pointer
+// No string.
+    } else {
+        putchar (c);
+    };
 }
 
-
+// Used for tests.
 void putchar_K(void)
 {
-    //while(1){
-        putchar('K');
-        //putchar('\n');
-        //refresh_screen();
-    //}
+    putchar ('K');
 }
-
 
 /*
  * putchar:
@@ -369,7 +367,6 @@ prints (
         ++pc;
     };
 
-
     return (int) pc;
 }
 
@@ -378,9 +375,7 @@ prints (
  * printi:
  *     Rotina de suporta a printf.
  */
-
 // '**out' #dangerdanger
-
 int 
 printi (
     char **out, 
@@ -427,8 +422,8 @@ printi (
         u /= b;
     };
 
-
-    if (neg){
+    if (neg)
+    {
         if ( width && (pad & PAD_ZERO) ){
             printchar (out, '-');
             ++pc;
@@ -578,17 +573,14 @@ int printk_old ( const char *format, ... )
 {
     register int *varg = (int *) (&format);
 
-    // #bugbug:
-    
-    // Se print() está usando '0' como buffer,
-    // então ele está sujando a IVT. 
-
-    //Atençao:
-    // print() nao analisa flags.
+// #bugbug:
+// Se print() está usando '0' como buffer,
+// então ele está sujando a IVT. 
+// #:
+// print() nao analisa flags.
 
     return (int) print(0,varg);
 }    
-
 
 // print() is a helper function for this one.
 /*
@@ -689,7 +681,6 @@ char *kinguio_itoa (int val, char *str)
     return str;
 }
 
-
 static char *_vsputs_r(char *dest, char *src)
 {
     unsigned char *usrc = (unsigned char *) src;
@@ -715,7 +706,7 @@ kinguio_vsprintf(
     int d=0;
     char c=0; 
     char *s;
-    char buffer[256];
+    char buffer[256];  //#bugbug: Too short.
     char _c_r[] = "\0\0";
 
     while ( fmt[index] )
@@ -815,7 +806,7 @@ int kinguio_printf(const char *fmt, ...)
     int ret=0;
 
 // If the virtual console isn't full initialized yet.
-    if( Initialization.console_log != TRUE ){
+    if (Initialization.console_log != TRUE){
         return -1;
     }
 
@@ -865,9 +856,8 @@ int sprintf_old ( char *str, const char *format, ... )
     return (int) print (&str, varg);
 }    
 
-
-// sprintf
-// Variable parameter form to achieve sprintf 
+// mysprintf: (sprintf)
+// Variable parameter form to achieve sprintf.
 int mysprintf(char *buf, const char *fmt, ...)
 {
     int i=0;
@@ -1039,7 +1029,6 @@ int k_fseek ( file *f, long offset, int whence )
         goto fail;
     }
 
-
 /*
 SEEK_SET
     The file offset is set to offset bytes.
@@ -1069,10 +1058,10 @@ SEEK_END
 // O ponteiro de trabalho para refletir a próxima
 // leitura. mas não precisa isso, pois o offset é relativo à base.
     case SEEK_SET:
-        if(offset<0){
+        if (offset<0){
             offset=0;
         }
-        if( offset > f->_cnt ){
+        if ( offset > f->_cnt ){
             offset = f->_cnt;
         }
         // Read and write devem começar de (base + offset).
@@ -1097,7 +1086,7 @@ SEEK_END
 // não em relação ao ponteiro da base.
 // temos que respeitar a quantidade disponivel.
     case SEEK_CUR:
-        if( offset > f->_cnt ){
+        if ( offset > f->_cnt ){
             offset = f->_cnt;
         }
         // Read and write devem começar de (current + offset).
@@ -1514,9 +1503,7 @@ static void __initialize_stdin(void)
 // pega slot em file_table[] para stdin
 
     slot = get_free_slots_in_the_file_table();
-    if ( slot < 0 || 
-         slot >= NUMBER_OF_FILES )
-    {
+    if ( slot < 0 || slot >= NUMBER_OF_FILES ){
         x_panic("__initialize_stdin: slot");
     }
     stdin = (file *) file_table[slot];
@@ -1543,8 +1530,8 @@ static void __initialize_stdin(void)
 // #bugbug
 // Esse buffer está sendo usado pelo console.
 
-    stdin->_base     = &prompt[0];    //See: kstdio.h
-    stdin->_p        = &prompt[0];
+    stdin->_base = &prompt[0];    //See: kstdio.h
+    stdin->_p       = &prompt[0];
     stdin->_bf._base = stdin->_base;
     stdin->_lbfsize = PROMPT_SIZE; //128; //#todo
     stdin->_r = 0;
@@ -1556,7 +1543,7 @@ static void __initialize_stdin(void)
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES){
+    if (slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("__initialize_stdin: [FAIL] stdin inode slot\n");
     }
     stdin->inode = (struct inode_d *) inode_table[slot];
@@ -1585,9 +1572,7 @@ static void __initialize_stdout(void)
 // pega slot em file_table[] para stdout
 
     slot = get_free_slots_in_the_file_table();
-    if( slot < 0 || 
-        slot >= NUMBER_OF_FILES )
-    {
+    if ( slot < 0 || slot >= NUMBER_OF_FILES ){
         x_panic("__initialize_stdout: slot");
     }
     stdout = (file *) file_table[slot];
@@ -1619,8 +1604,8 @@ static void __initialize_stdout(void)
     stdout->_flags = (__SWR | __SRD); 
 
 // buffer
-    stdout->_base     = &prompt_out[0];  //See: kstdio.h
-    stdout->_p        = &prompt_out[0];
+    stdout->_base = &prompt_out[0];  //See: kstdio.h
+    stdout->_p       = &prompt_out[0];
     stdout->_bf._base = stdout->_base;
     stdout->_lbfsize  = PROMPT_SIZE; //128; //#todo
     stdout->_r = 0;
@@ -1632,12 +1617,12 @@ static void __initialize_stdout(void)
     // inode support.
     // pega slot em inode_table[] 
     slot = get_free_slots_in_the_inode_table();
-    if(slot<0 || slot >=NUMBER_OF_FILES){
+    if (slot<0 || slot >=NUMBER_OF_FILES){
         x_panic("__initialize_stdout: stdout inode slot\n");
     }
     stdout->inode = (struct inode_d *) inode_table[slot];
     stdout->inodetable_index = slot;
-    if( (void*) stdout->inode == NULL ){
+    if ( (void*) stdout->inode == NULL ){
         x_panic("__initialize_stdout: stdout inode struct\n");
     }
     stdout->inode->filestruct_counter = 1; //inicialize
@@ -1660,9 +1645,7 @@ static void __initialize_stderr(void)
 // pega slot em file_table[] para stderr
 
     slot = get_free_slots_in_the_file_table();
-    if( slot < 0 || 
-        slot >= NUMBER_OF_FILES )
-    {
+    if ( slot < 0 || slot >= NUMBER_OF_FILES ){
         x_panic("__initialize_stderr: slot");
     }
     stderr = (file *) file_table[slot];
@@ -1686,8 +1669,8 @@ static void __initialize_stderr(void)
 // _flags
     stderr->_flags = (__SWR | __SRD); 
 // buffer
-    stderr->_base     = &prompt_err[0];  //See: kstdio.h
-    stderr->_p        = &prompt_err[0];
+    stderr->_base = &prompt_err[0];  //See: kstdio.h
+    stderr->_p       = &prompt_err[0];
     stderr->_bf._base = stderr->_base;
     stderr->_lbfsize  = PROMPT_SIZE; //128; //#todo
     stderr->_r = 0;
@@ -1704,7 +1687,7 @@ static void __initialize_stderr(void)
     }
     stderr->inode = (struct inode_d *) inode_table[slot];
     stderr->inodetable_index = slot;
-    if( (void*) stderr->inode == NULL ){
+    if ( (void*) stderr->inode == NULL ){
         x_panic("__initialize_stderr: stderr inode struct\n");
     }
     stderr->inode->filestruct_counter = 1; //inicialize

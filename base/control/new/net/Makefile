@@ -1,6 +1,6 @@
 
 # net/
-# Compile all the files and create archive_net.o
+# Compile all the files and create ar_net.o
 
 AS	= as
 LD	= ld
@@ -59,11 +59,9 @@ CFLAGS := \
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I ../include/uapi/
 
-
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)  
-
 
 # See: https://linux.die.net/man/1/ld
 # -s --strip-all:   Omit all symbol information from the output file.
@@ -87,9 +85,12 @@ all:
 	$(CC) -c prot/dhcp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o dhcp.o
 
 # link
-	$(LD) -r -o archive_net.o $(OBJS)
-	cp archive_net.o ../
+	$(LD) -r -o ar_net.o $(OBJS)
+	cp ar_net.o ../
 	rm *.o
+	
+clean:
+	rm *.o    
 	
 	
 

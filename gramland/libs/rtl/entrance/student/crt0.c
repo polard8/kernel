@@ -1,8 +1,6 @@
-/*
- * File: student/unit3/crt0.c
- * Usado para inicializar a rt na libc for 64bit.
- */
 
+// crt0.c
+// Standard crt0 for Gramado OS ring 3 applications.
 
 #include <types.h>
 #include <stddef.h>

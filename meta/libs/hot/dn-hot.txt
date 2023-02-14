@@ -1,6 +1,0 @@
-
-
- toolkit called hot.
-
-
-    hot_create_window()

@@ -41,8 +41,6 @@ else
 endif
 
 
-
-
 # test: gramado 64bit
 # See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
 CFLAGS := \
@@ -108,14 +106,14 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # Classes: Head | Body | Hooks
 
 # Head
-objects-y := head_64.o init.o archive_klib.o    
+objects-y := head_64.o init.o ar_zero.o    
 # Body
-objects-y += archive_dev.o  
-objects-y += archive_fs.o  
-objects-y += archive_ke.o  
-objects-y += archive_mm.o  
-objects-y += archive_net.o  
-objects-y += archive_user.o    
+objects-y += ar_dev.o  
+objects-y += ar_fs.o  
+objects-y += ar_ke.o  
+objects-y += ar_mm.o  
+objects-y += ar_net.o  
+objects-y += ar_user.o    
 # Hooks
 objects-y += debug.o  
 objects-y += info.o  
@@ -127,13 +125,6 @@ objects-y += runtime.o
 objects-y += system.o  
 objects-y += sys.o    
 objects-y += sci.o    
-
-# test
-#objects-$(CONFIG_MAIN1) += archive_something.o   
-#objects-$(CONFIG_MAIN2) += archive_something.o   
-#objects-$(CONFIG_MAIN3) += archive_something.o   
-#objects-$(CONFIG_MAIN4) += archive_something.o   
-
 
 PHONY := all
 all: kernel-header kernel-content kernel-footer \
@@ -177,8 +168,8 @@ kernel-header:
 	$(CC) -c sys/sys.c $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
 
 # ring0 libc.
-# klib/
-	$(MAKE) -C klib/
+# zero/
+	$(MAKE) -C zero/
 
 kernel-content:
 	@echo "Compiling: Compiling kernel content ..."

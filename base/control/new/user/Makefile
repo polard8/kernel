@@ -1,6 +1,6 @@
 
 # user/
-# Compile all the files and create archive_user.o
+# Compile all the files and create ar_user.o
 
 AS	= as
 LD	= ld
@@ -17,7 +17,6 @@ PYTHON	= python
 PYTHON2	= python2
 PYTHON3	= python3
 RUBY	= ruby
-
 
 # test: gramado 64bit
 # See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
@@ -54,16 +53,13 @@ CFLAGS := \
 	-fno-omit-frame-pointer \
 	-fno-optimize-sibling-calls    
 
-
 # Exported files. Kernel api;
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I ../include/uapi/
 
-
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)  
-
 
 # See: https://linux.die.net/man/1/ld
 # -s --strip-all:   Omit all symbol information from the output file.
@@ -72,11 +68,9 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-
 OBJS = desktop.o room.o usession.o \
 logoff.o logon.o \
 userenv.o    
-
 
 all:
 
@@ -90,23 +84,12 @@ all:
 
 	$(CC) -c userenv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
 
-
 # link
-	$(LD) -r -o archive_user.o $(OBJS)
-	cp archive_user.o ../
+	$(LD) -r -o ar_user.o $(OBJS)
+	cp ar_user.o ../
 	rm *.o
 	
+clean:
+	rm *.o     
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
+	

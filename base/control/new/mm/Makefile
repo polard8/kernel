@@ -1,6 +1,6 @@
 
 # mm/
-# Compile all the files and create archive_mm.o
+# Compile all the files and create ar_mm.o
 
 AS	= as
 LD	= ld
@@ -54,16 +54,13 @@ CFLAGS := \
 	-fno-omit-frame-pointer \
 	-fno-optimize-sibling-calls    
 
-
 # Exported files. Kernel api;
 # Used by the kernel modules and user space applications.
 USER_INCLUDE   := -I ../include/uapi/
 
-
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)  
-
 
 # See: https://linux.die.net/man/1/ld
 # -s --strip-all:   Omit all symbol information from the output file.
@@ -83,21 +80,11 @@ all:
 	$(CC) -c pages.c   $(KERNEL_INCLUDE) $(CFLAGS) -o pages.o
 
 # link
-	$(LD) -r -o archive_mm.o $(OBJS)
-	cp archive_mm.o ../
+	$(LD) -r -o ar_mm.o $(OBJS)
+	cp ar_mm.o ../
 	rm *.o
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+clean:
+	rm *.o    
+	
+	

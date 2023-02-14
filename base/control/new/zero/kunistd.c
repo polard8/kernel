@@ -85,7 +85,7 @@ long pathconf (const char *pathname, int name)
 } 
 
 
-// lseek - reposition read/write file offset
+// sys_lseek - reposition read/write file offset
 // See:
 // https://man7.org/linux/man-pages/man2/lseek.2.html
 // #todo:
