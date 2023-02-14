@@ -234,6 +234,12 @@ int main( int argc, char *argv[] )
 
 // A janela é a metade da tela.
     unsigned long w_width  = (w/2);
+    // #hack
+    if (w == 800)
+        w_width = 640;
+    // #hack
+    if (w == 640)
+        w_width = 480;
     unsigned long w_height = (h/2);
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 );

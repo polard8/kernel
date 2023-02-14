@@ -420,6 +420,12 @@ int main ( int argc, char *argv[] )
 //
 
     unsigned long wWidth  = (w >> 1);
+    // #hack
+    if (w == 800)
+        wWidth = 640;
+    // #hack
+    if (w == 640)
+        wWidth = 480;
     unsigned long wHeight = (h - 100);
     unsigned long wLeft   = (w - wWidth)  >> 1;
     unsigned long wTop    = (h - wHeight) >> 1;

@@ -490,7 +490,13 @@ int main( int argc, char *argv[] )
     }
 
 // Tamanho da janela.
-    unsigned long w_width  = (w>>1);
+    unsigned long w_width = (w>>1);
+    // #hack
+    if (w == 800)
+        w_width = 640;
+    // #hack
+    if (w == 640)
+        w_width = 480;
     unsigned long w_height = (h - 100); //(h>>1);
 
 // Original
@@ -514,7 +520,8 @@ int main( int argc, char *argv[] )
 // Se a tela for pequena demais para os dias de hoje. hahaha
 
     // Position and dimensions.
-    if (w == 320){
+    if (w == 320)
+    {
         viewwindowx = 0;
         viewwindowy = 0;
         w_width = w;

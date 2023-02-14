@@ -2933,8 +2933,18 @@ int main ( int argc, char *argv[] )
 
     unsigned long mwWidth  = (w >> 1);
     unsigned long mwHeight = (h >> 1); 
+    // #hack
+    if (w == 800)
+        mwWidth = 640;
+    // #hack
+    if (w == 640)
+        mwWidth = 480;
+    // #hack
+    if (w == 320)
+        mwWidth = 240;
     unsigned long mwLeft   = ( ( w - mwWidth ) >> 1 );
     unsigned long mwTop    = ( ( h - mwHeight) >> 1 );
+    
     unsigned int mwColor   = COLOR_WINDOW;
 
 // Client area window
