@@ -1,5 +1,7 @@
 
-// global virtual addresses.
+// x64gva.h
+// Virtual memory overview.
+// Global virtual addresses.
 
 #ifndef ____GVA_H
 #define ____GVA_H    1

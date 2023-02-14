@@ -164,6 +164,7 @@ extern unsigned long gSavedBPP;
 
 #include "gramado/debug.h"
 
+#include "gramado/jiffies.h"
 
 // klib: libc support.
 #include "kstdarg.h"

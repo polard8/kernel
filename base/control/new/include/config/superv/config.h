@@ -102,7 +102,8 @@ sixth..     ide5, usually PCI, probed
 
 // ----------------------------------------------------------------
 // PIT configuration:
-#define DEFAULT_PIT_FREQ  1000
+
+#define DEFAULT_JIFFY_FREQ    1000
 
 // ----------------------------------------------------------------
 // Runlevels

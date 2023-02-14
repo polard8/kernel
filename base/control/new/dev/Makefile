@@ -74,77 +74,76 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 
 # Everything is a file.
-OBJS = tty.o \
-io.o \
-disk_r.o disk_w.o \
-pci.o pciinfo.o pciscan.o \
-devmgr.o \
-serial.o \
-storage.o \
+OBJS = \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
+disk_r.o disk_w.o storage.o \
 bldisp.o \
-xpixel.o line.o rect.o bg.o \
-font.o char.o text.o \
-graphics.o \
-e1000.o \
+xpixel.o line.o rect.o bg.o font.o char.o text.o graphics.o \
+console.o vt.o kgwm.o \
 i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
-console.o vt.o kgwm.o    
+serial.o \
+tty.o \
+e1000.o \
+devmgr.o io.o \
+pci.o pciinfo.o pciscan.o     
+
 
 all:
 
-	$(CC) -c disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
-	$(CC) -c disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
-	$(CC) -c storage.c $(KERNEL_INCLUDE) $(CFLAGS) -o storage.o 
-	$(CC) -c io.c      $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
-	$(CC) -c devmgr.c  $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
-	$(CC) -c i8042.c   $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
-
 # ata
-	$(CC) -c ata/ata.c     $(KERNEL_INCLUDE) $(CFLAGS) -o ata.o 
-	$(CC) -c ata/atadma.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atadma.o 
-	$(CC) -c ata/atahdd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atahdd.o 
-	$(CC) -c ata/atainit.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainit.o 
-	$(CC) -c ata/atairq.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
-	$(CC) -c ata/atapci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
+	$(CC) -c blkdev/ata/ata.c     $(KERNEL_INCLUDE) $(CFLAGS) -o ata.o 
+	$(CC) -c blkdev/ata/atadma.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atadma.o 
+	$(CC) -c blkdev/ata/atahdd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atahdd.o 
+	$(CC) -c blkdev/ata/atainit.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainit.o 
+	$(CC) -c blkdev/ata/atairq.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
+	$(CC) -c blkdev/ata/atapci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
+# storage
+	$(CC) -c blkdev/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
+	$(CC) -c blkdev/disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
+	$(CC) -c blkdev/storage.c $(KERNEL_INCLUDE) $(CFLAGS) -o storage.o 
 
-# e1000
-	$(CC) -c e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
 
 # bl display device
-	$(CC) -c display/bldisp/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
+	$(CC) -c chardev/display/bldisp/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
 # graphics
-	$(CC) -c display/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
-	$(CC) -c display/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
-	$(CC) -c display/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
-	$(CC) -c display/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
-	$(CC) -c display/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
-	$(CC) -c display/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
-	$(CC) -c display/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
-	$(CC) -c display/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
-
+	$(CC) -c chardev/display/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
+	$(CC) -c chardev/display/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
+	$(CC) -c chardev/display/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c chardev/display/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
+	$(CC) -c chardev/display/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
+	$(CC) -c chardev/display/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
+	$(CC) -c chardev/display/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
+	$(CC) -c chardev/display/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
 # kbd
-	$(CC) -c kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
-	$(CC) -c kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c kbd/ps2kbd.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ps2kbd.o
-
+	$(CC) -c chardev/kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
+	$(CC) -c chardev/kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c chardev/kbd/ps2kbd.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ps2kbd.o
 # mouse
-	$(CC) -c mouse/mouse.c    $(KERNEL_INCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c mouse/ps2mouse.c $(KERNEL_INCLUDE) $(CFLAGS) -o ps2mouse.o
-
-# pci
-	$(CC) -c pci/pci.c     $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
-	$(CC) -c pci/pciinfo.c $(KERNEL_INCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c pci/pciscan.c $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
-
+	$(CC) -c chardev/mouse/mouse.c    $(KERNEL_INCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c chardev/mouse/ps2mouse.c $(KERNEL_INCLUDE) $(CFLAGS) -o ps2mouse.o
 # serial
-	$(CC) -c serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
-
+	$(CC) -c chardev/serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 # tty
-	$(CC) -c tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
-	$(CC) -c tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
-	$(CC) -c tty/vt.c       $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c chardev/tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
+	$(CC) -c chardev/tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
+	$(CC) -c chardev/tty/vt.c       $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
+	$(CC) -c chardev/tty/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
+# ps2
+	$(CC) -c chardev/i8042.c   $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
 
-	$(CC) -c tty/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
+
+# e1000
+	$(CC) -c netdev/e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 
+
+
+# i/o
+	$(CC) -c devmgr.c  $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
+	$(CC) -c io.c            $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
+# pci
+	$(CC) -c pci.c         $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c pciinfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciinfo.o
+	$(CC) -c pciscan.c $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
+
 
 # link
 	$(LD) -r -o ar_dev.o $(OBJS)

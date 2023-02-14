@@ -1,7 +1,7 @@
 
-// gpa.h 
-// Global declaration of static physical address 
-// used by the kernel.
+// x64gpa.h 
+// Physical memory overview.
+// Global declaration of static physical address used by the kernel.
 
 #ifndef ____GPA_H
 #define ____GPA_H  1

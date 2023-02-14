@@ -225,7 +225,7 @@ void DeviceInterface_PIT(void)
     if ( ws_callback_info.initialized == TRUE )
     {
         if ( ws_callback_info.each_n_ms < 1 ||
-              ws_callback_info.each_n_ms > 1000 )
+              ws_callback_info.each_n_ms > JIFFY_FREQ )
         {
             panic ("PIT: Invalid ws_callback_info.each_n_ms\n");
         }
@@ -243,6 +243,19 @@ void DeviceInterface_PIT(void)
     }
 //--------------------
 
+/*
+// Poll if the interrupt is not working.
+// The problem is that in th ereal machine, the interrupt
+// sometimes start working and then stop.
+    if (ps2_use_polling == TRUE)
+    {
+// Polling kbd and mouse
+        if ( (jiffies % (JIFFY_FREQ/60) ) == 0 )
+        {
+            // poll
+        }
+    }
+*/
 
 /*
     if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
@@ -713,10 +726,10 @@ struct timer_d *create_timer (
 // limite de 1 tick.
 
     // ms
-    if (ms < (1000/sys_time_hz) )
+    if (ms < (JIFFY_FREQ/sys_time_hz) )
     {
         printf ("create_timer: Ajust ms\n");
-        ms = (1000/sys_time_hz);
+        ms = (JIFFY_FREQ/sys_time_hz);
     }
 
     // type
@@ -760,7 +773,7 @@ struct timer_d *create_timer (
             Timer->id = ID;
 
             // ms/(ms por tick)
-            Timer->initial_count_down = (unsigned long) ( ms / (1000/sys_time_hz) );
+            Timer->initial_count_down = (unsigned long) ( ms / (JIFFY_FREQ/sys_time_hz) );
             Timer->count_down = Timer->initial_count_down;
 
             //1 = one shot 
