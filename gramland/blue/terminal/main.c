@@ -717,12 +717,9 @@ static void compareStrings(int fd)
     }
 
 // Sleep until
-// IN: number, ms, 0, 0.
-    if( strncmp(prompt,"sleep",5) == 0 )
-    {
-        //#todo: Create a function for that.
-        // rtl_sleep_until(ms)
-        sc82( 266, 2000, 2000, 2000 );
+// IN: ms.
+    if( strncmp(prompt,"sleep",5) == 0 ){
+        rtl_sleep(2000);
         goto exit_cmp;
     }
 

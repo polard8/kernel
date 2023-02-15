@@ -552,10 +552,16 @@ setup_vectors:
     call _setup_system_interrupt  
 
 ; =====================
+; Called by the ring3 process at the initialization
+; to enable the maskable interrupts.
+; It drops the iopl to ring 0.
+; 32~255.
+; The init process is the first ring3 process
+; to call this interrupt, enabling the PIT itnerrupt
+; for the first time and then we have the multithead working.
 ; Uma interrupção para habilitar as interrupções mascaráveis.
-; quem usará isso será a thread primária do processo init.
-; apenas uma vez.
-; It also drop the iop to ring 0.
+; quem usará isso será a thread primária 
+; dos processos em ring3, apenas uma vez.
 ; See: sw.asm
 
     mov rax,  qword _int199

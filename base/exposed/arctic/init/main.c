@@ -188,7 +188,11 @@ static void do_launch_de(void)
     ret_val = (int) rtl_clone_and_execute(app1_name);
     if (ret_val<=0){
         printf("Couldn't clone\n");
+        return;
     }
+
+// Sleep (Good!)
+    //sc82( 266, 8000, 8000, 8000 );
 
     //printf("pid=%d\n",ret_val);
 

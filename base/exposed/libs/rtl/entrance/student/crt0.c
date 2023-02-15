@@ -311,6 +311,15 @@ e o crt0 do driver, não ativa.
 // The IOPL defines the minimum CPL required to 
 // directly access I/O ports and to 
 // execute I/O Sensitive Instructions (IN, INS, OUT, OUTS, CLI, STI). 
+/*
+ Called by the ring3 process at the initialization
+to enable the maskable interrupts.
+ It drops the iopl to ring 0.
+ 32~255.
+ The init process is the first ring3 process
+ to call this interrupt, enabling the PIT itnerrupt
+ for the first time and then we have the multithead working.
+*/
 
     asm volatile ("int $199");
 

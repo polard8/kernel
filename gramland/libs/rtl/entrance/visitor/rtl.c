@@ -1977,6 +1977,22 @@ void rtl_yield(void)
     gramado_system_call (265,0,0,0);
 }
 
+// This is a worker called bu rtl_sleep()
+// Mayme we can have more parameters here
+// allowing us to create more different sort of wrappers.
+void rtl_sleep_until(unsigned long ms)
+{
+    if (ms==0){
+        ms=1;
+    }
+    sc82( 266, ms, ms, ms );
+}
+
+void rtl_sleep(unsigned long ms)
+{
+    rtl_sleep_until(ms);
+}
+
 
 // The whole screen is dirty.
 // It can be flushed into the framebuffer.

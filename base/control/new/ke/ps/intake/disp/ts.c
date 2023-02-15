@@ -167,8 +167,6 @@ static void cry(unsigned long flags)
         gramado_shutdown(0);
 }
 
-
-
 /*
  * task_switch:
  *     Switch the thread.
@@ -198,7 +196,6 @@ static void __task_switch(void)
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         panic ("ts: current_thread\n");
     }
-
 // structure
     CurrentThread = (void *) threadList[current_thread]; 
     if ( (void *) CurrentThread == NULL ){
@@ -294,6 +291,10 @@ The remainder ??
 // isso precisa ser zerado quando ela reiniciar no próximo round.
     CurrentThread->runningCount_ms = 
         (unsigned long) CurrentThread->runningCount_ms + (DEFAULT_PIT_FREQ/sys_time_hz);
+
+//
+// -----------------------------------------
+//
 
 // Locked?
 // Taskswitch locked? 
@@ -699,7 +700,7 @@ fail:
 */
 // Called by:
 // irq0_TIMER in pit.c.
-// _irq0 in hw.asm. (old way?)
+// _irq0 in hw.asm. 
 
 void psTaskSwitch(void)
 {
@@ -721,6 +722,7 @@ void psTaskSwitch(void)
         die();
     }
 
+// First check!
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         printf ("psTaskSwitch: current_thread %d", current_thread); 
         die();
@@ -728,16 +730,14 @@ void psTaskSwitch(void)
 
 // Permitindo que o assembly chame o callback.
 // Somente quando o processo interrompido for o init.
-
     pid_t ws_pid=-1;
     ws_pid = (pid_t) socket_get_gramado_port(GRAMADO_WS_PORT);
-
-    // Se estamos na thread do window server.
+// Se estamos na thread do window server.
     if (current_process == ws_pid)
     {
         // Se o callback ja foi inicializado
         // por uma chamada do window server.
-        if ( ws_callback_info.ready == TRUE )
+        if (ws_callback_info.ready == TRUE)
         {
             //see: callback.c
             prepare_next_ws_callback();

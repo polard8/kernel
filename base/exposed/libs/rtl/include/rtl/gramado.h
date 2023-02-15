@@ -260,6 +260,10 @@ int rtl_focus_on_me(void);
 
 void rtl_yield(void);
 
+void rtl_sleep_until(unsigned long ms);
+void rtl_sleep(unsigned long ms);
+
+
 // The whole screen is dirty.
 // It can be flushed into the framebuffer.
 void rtl_invalidate_screen(void);
