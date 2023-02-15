@@ -411,35 +411,34 @@ void *doCreateWindow (
 // Obs: 
 // Podemos ir usando apenas um estilo padrão por enquanto.
 
+//
+// Internal flags.
+//
+
 // #todo:
 // Receberemos isso via parametro de função.
 // Default is FALSE.
 // We need to know the parent's bg color.
-    //int Transparent = FALSE;
-    //int Transparent = TRUE;
-
+    int Transparent = FALSE;
     int Maximized=0;
     int Minimized=0;
     int Fullscreen=0;
-
 // Bars
 // A title bar é criadas pela função
 // que cria o frame.
-
 // Title bar buttons. [v] [^] [X] 
     int MinimizeButton = FALSE;
     int MaximizeButton = FALSE;
     int CloseButton    = FALSE;
-    // ...
-
 // Items.
-    int Background    = FALSE;
-    int ClientArea    = FALSE;
     int Shadow        = FALSE;
-    int ButtonDown    = FALSE; 
+    int Background    = FALSE;
+    int TitleBar      = FALSE;
+    int Border        = FALSE;  // Usado no edit box, na overlapped.
+    int ClientArea    = FALSE;
+    int ButtonDown    = FALSE;  // ??
     int ButtonUp      = FALSE;  // ??
     int ButtonSysMenu = FALSE;  // system menu na barra de títulos.
-    int Border        = FALSE;  // usado no edit box.
     // ...
 
 // Desktop support.
@@ -534,6 +533,9 @@ void *doCreateWindow (
         is_solid = FALSE;
     }
 
+//---------------------------------------------------------
+
+
 //
 // style
 //
@@ -546,29 +548,27 @@ void *doCreateWindow (
 // see: border, captions, scrobar ...
 
 // Maximized
-// WS_MAXIMIZED
-    if (style & 0x0001){
-        // see: border, captions, scrobar ...
-        Fullscreen = FALSE;
-        Minimized = FALSE;
-        Maximized = TRUE;   // It is also a style
+// #todo:
+// The window occupy the whole desktop working area.
+    if (style & WS_MAXIMIZED)
+    {
+        Maximized=TRUE;
     }
+
 // Minimized
-// WS_MINIMIZED
-    if (style & 0x0002){
-        // see: border, captions, scrobar ...
-        Fullscreen = FALSE;
-        Maximized = FALSE;    // It is also a style
-        Minimized = TRUE; 
+// (Iconic)
+    if (style & WS_MINIMIZED)
+    {
+        Minimized=TRUE;
     }
 // Fullscreen
-// WS_FULLSCREEN
-    if (style & 0x0004){
-        // see: border, captions, scrobar ...
-        Maximized = FALSE;   // It is also a style
-        Minimized = FALSE;
-        Fullscreen = TRUE; 
+// Paint only the client area.
+    if (style & WS_FULLSCREEN)
+    {
+        Fullscreen=TRUE;
     }
+
+//---------------------------------------------------------
 
 // Salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
@@ -689,7 +689,7 @@ void *doCreateWindow (
 
 // Lock or unlock the window.
     //window->locked = FALSE;
-    //if (style & 0x8000){
+    //if (style & WS_LOCKED){
     //    window->locked = TRUE;
     //}
     window->locked = FALSE;
@@ -831,26 +831,8 @@ void *doCreateWindow (
     window->width  = (unsigned long) (WindowWidth  & 0xFFFF);
     window->height = (unsigned long) (WindowHeight & 0xFFFF);
 
-// Maximized?
-    if (Maximized == TRUE)
-    {
-        window->left   = deviceLeft;
-        window->top    = deviceTop;
-        window->width  = deviceWidth;
-        // #todo: Nesse momento temos que ter a altura da barra 
-        // registrada em estrutura.
-        window->height = (deviceHeight - 40);  //menos a barra
-    }
-
-// Fullscreen
-    if (Fullscreen == TRUE)
-    {
-        window->left   = 0;  //fullWindowX;
-        window->top    = 0;  //fullWindowY;
-        window->width  = deviceWidth;
-        window->height = deviceHeight; 
-    }
-
+// #todo
+// We need a variable for char width.
     window->width_in_chars  = 
         (unsigned long) (window->width / 8);   //>>3
     window->height_in_chars = 
@@ -869,47 +851,34 @@ void *doCreateWindow (
 // == Client area ==
 //
 
-// #todo
-// Os valores da área de cliente são elaborados
-// no decorrer da construção da janela.
-// Inicialmente ela é do tamanho da janela.
-// A área de cliente é relativa à janela.
-// #todo: Qual tipo de janela tem área de cliente?
-// #todo: Qual é o tamanho da área de cliente?
-// é o valor passado via argumentos? e o frame é extra?
-// Local
-
-    //old
-    //clientRect.left   = 0;
-    //clientRect.top    = 0;
-    //clientRect.width  = (unsigned long) window->width;
-    //clientRect.height = (unsigned long) window->height;
-
-//#test: considerando as bordas.
-//#todo: usar os valores da largura das bordas.
-
-// #todo: 
-// Precisamos considerar a barra de títulos 
-// se formos overlapped e tivermos uma. 
-// Ou modificar o top depois de criarmos a barra de títulos.
-
+// #todo:
+// We need a variable for border size.
+// #todo:
+// We need a variable for title bar height.
+    unsigned long __BorderSize=2;
+    unsigned long __TBHeight=32;
 // left
-    clientRect.left = (unsigned long) 2;  // + borda da esq
+// + borda da esq
+    clientRect.left = (unsigned long) __BorderSize;  
 // top
-    clientRect.top  = (unsigned long) 2;  // + borda superior 
+// + borda superior 
+    clientRect.top  = (unsigned long) __BorderSize;  
+
 // borda + barra.
-    if (window->type == WT_OVERLAPPED){
-        clientRect.top  = (unsigned long) 2+32;
+    if (window->type == WT_OVERLAPPED)
+    {
+        clientRect.top  = 
+            (unsigned long) (__BorderSize + __TBHeight);
     }
 // width
 // menos bordas laterais
     clientRect.width  = 
-        (unsigned long) (window->width -2 -2);
+        (unsigned long) (window->width -__BorderSize -__BorderSize);
 // height
 // menos bordas superior e inferior
     // menos a barra de tarefas.
     clientRect.height = 
-        (unsigned long) (window->height -2 -32 -2); 
+        (unsigned long) (window->height -__BorderSize -__TBHeight -__BorderSize); 
 
 // If we have scrollbars.
 // #todo: Diminuimos as dimensões se o style
@@ -917,6 +886,8 @@ void *doCreateWindow (
     //if (window->style & WS_VSCROLLBAR)
     //    clientRect.width -= 24;
     //if (window->style & WS_HSCROLLBAR)
+    //    clientRect.height -=24;
+    //if (window->style & WS_STATUSBAR)
     //    clientRect.height -=24;
 
 // Save
@@ -929,6 +900,7 @@ void *doCreateWindow (
 // =================================
 
 // ??
+// #deprecated?
 // Deslocamento em relação a janela mãe.
 // Passado via argumento.
     window->x = WindowX;
@@ -945,55 +917,81 @@ void *doCreateWindow (
 
 // If we have a parent window.
 // parent + arguments
+// Sempre é relativo à janela mãe.
+// Se a janela mãe é overlapped,
+// então também é relativo à janela de cliente.
+// Pois é o lugar padrão para criar janelas cliente.
+// Isso só não será válido, se uma flag especial 
+// permitir criar uma janela fora da área de cliente.
+
     if ( (void*) window->parent != NULL )
     {
-        // Sempre é relativo à janela mãe.
         window->left = (window->parent->left + WindowX); 
         window->top  = (window->parent->top  + WindowY);
-        // Se a janela mãe é overlapped,
-        // então também é relativo à janela de cliente.
-        // Pois é o lugar padrão para criar janelas cliente.
-        // Isso só não será válido, se uma flag especial 
-        // permitir criar uma janela fora da área de cliente.
         if (window->parent->type == WT_OVERLAPPED){
             window->left += window->parent->rcClient.left;
             window->top  += window->parent->rcClient.top;
         }
     }
 
-// right and bottom.
-    window->right  = (unsigned long) ( window->left + window->width );
-    window->bottom = (unsigned long) ( window->top  + window->height ); 
+// Right and bottom.
+    window->right = 
+        (unsigned long) (window->left + window->width);
+    window->bottom = 
+        (unsigned long) (window->top + window->height); 
+
 //--
 
-// Maximized
-// #bugbug
-// max and full aren't the same thing.
-// #todo: use the working area structure.
-    if (Maximized == TRUE){
-        window->left = deviceLeft;
-        window->top  = deviceTop;
+
+// Maximized. OK
+// Fit to the desktop working area.
+    if (Maximized == TRUE)
+    {
+        if (WindowManager.initialized == TRUE)
+        {
+            window->left   = WindowManager.wa_left;
+            window->top    = WindowManager.wa_top;
+            window->width  = WindowManager.wa_width;
+            window->height = WindowManager.wa_height;
+
+            // Right and bottom.
+            window->right = 
+                (unsigned long) (window->left + window->width);
+            window->bottom = 
+                (unsigned long) (window->top + window->height); 
+        }
     }
 
-// Fullscreen
-    if (Fullscreen == TRUE){
-        window->left = deviceLeft;
-        window->top  = deviceTop;
+// Fullscreen OK
+    if (Fullscreen == TRUE)
+    {
+        window->left = fullWindowX;
+        window->top  = fullWindowY;
+        window->width = fullWindowWidth;
+        window->height = fullWindowHeight;
+
+        // Right and bottom.
+        window->right = 
+            (unsigned long) (window->left + window->width);
+        window->bottom = 
+            (unsigned long) (window->top + window->height); 
+
+        window->full_left   = window->left;
+        window->full_top    = window->top;
+        window->full_width  = window->width;
+        window->full_height = window->height;
+
+        // Fullscreen Right and bottom.
+        window->full_right  = window->right;
+        window->full_bottom = window->bottom;
+
+        if (WindowManager.initialized == TRUE)
+        {
+            WindowManager.fullscreen_window = 
+                (struct gws_window_d *) window;
+            WindowManager.is_fullscreen = TRUE;
+        }
     }
-
-// Full ?
-// Margins and dimensions for fullscreen mode.
-// #bugbug
-// This is valid only for some types of window.
-// #bugbug
-// left and top needs to be '0'?
-
-    window->full_left   = fullWindowX;
-    window->full_top    = fullWindowY;
-    window->full_right  = (fullWindowX + fullWindowWidth);
-    window->full_bottom = (fullWindowY + fullWindowHeight);
-    window->full_width  = fullWindowWidth;
-    window->full_height = fullWindowHeight;
 
 // Color: Background and client area.
     window->bg_color            = (unsigned int) frame_color;
@@ -1174,7 +1172,8 @@ void *doCreateWindow (
 
     // Edit box. (Simples + borda preta).
     // Editbox não tem sombra, tem bordas. 
-    case WT_EDITBOX:
+    //case WT_EDITBOX:
+    case WT_EDITBOX_SINGLE_LINE:
     case WT_EDITBOX_MULTIPLE_LINES:
         window->ip_device = IP_DEVICE_KEYBOARD;
         window->frame.used = TRUE;
@@ -1187,19 +1186,24 @@ void *doCreateWindow (
     // Overlapped. (completa, para aplicativos).
     // Sombra, bg, título + borda, cliente area ...
     // #obs: Teremos recursividade para desenhar outras partes.
+    // + Sempre tem barra de títulos.
+    // + Sempre tem borda.
     case WT_OVERLAPPED:
         window->ip_device = IP_DEVICE_NULL;
         window->frame.used = TRUE;
+        // Internal flag.
         Shadow         = TRUE;
         Background     = TRUE;
         ClientArea     = TRUE;
-        MinimizeButton = TRUE;
-        MaximizeButton = TRUE;
-        CloseButton    = TRUE; 
+        MinimizeButton = TRUE; //Depends on the style.
+        MaximizeButton = TRUE; //Depends on the style.
+        CloseButton    = TRUE; //Depends on the style.
+        // Always.
         window->shadowUsed     = TRUE;
         window->backgroundUsed = TRUE;
         window->titlebarUsed   = TRUE;
         window->controlsUsed   = TRUE;
+        window->borderUsed     = TRUE;
         window->clientAreaUsed = TRUE;
         window->background_style = 0;
         break;
@@ -1994,7 +1998,7 @@ draw_frame:
 // style.
 
     if ( type == WT_OVERLAPPED || 
-         type == WT_EDITBOX || 
+         type == WT_EDITBOX_SINGLE_LINE || 
          type == WT_EDITBOX_MULTIPLE_LINES || 
          type == WT_BUTTON )
     {

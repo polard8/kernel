@@ -1228,22 +1228,22 @@ rectBackbufferDrawRectangle0 (
 
 // Clip
 
-// se a largura for maior que largura do dispositivo.
+// Se a largura for maior que largura do dispositivo.
     if ( rect.width > device_w ){
         rect.width = (unsigned long) device_w;
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.width > device_w\n");
         return;
     }
 
-// se a altura for maior que altura do dispositivo.
+// Se a altura for maior que altura do dispositivo.
     if ( rect.height > device_h ){
         rect.height = (unsigned long) device_h;
         debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.height > device_h\n");
         return;
     }
 
-// limits
-// Se for maior que o espaço que sobre, 
+// Limits
+// Se for maior que o espaço que sobra, 
 // então será igual ao espaço que sobra.
 
     if ( rect.width > (device_w - rect.left) )
@@ -1415,10 +1415,7 @@ rectBackbufferDrawRectangle (
 
     // ok: It's working
     rectBackbufferDrawRectangle0(
-        x,
-        y,
-        width,
-        height,
+        x, y, width, height,
         color,
         fill,
         rop_flags,
@@ -1428,11 +1425,7 @@ rectBackbufferDrawRectangle (
     /*
     // ok: It's working
     rectBackbufferDrawRectangle0(
-        x,
-        y,
-        width,
-        height,
-        color,
+        x, y, width, height, color,
         fill,
         rop_flags,
         FALSE );   // FALSE = do not use kgws. (kernel service)

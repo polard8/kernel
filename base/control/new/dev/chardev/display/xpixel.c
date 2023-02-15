@@ -37,11 +37,8 @@ putpixel0 (
     unsigned long _rop_flags,
     unsigned long buffer_va )
 {
-    //unsigned char *where = (unsigned char *) BACKBUFFER_VA;
     unsigned char *where = (unsigned char *) buffer_va;
-    
     unsigned int Color = (unsigned int) (_color & 0xFFFFFFFF);
-
 // A cor passada via argumento.
 // Color bytes
     char b, g, r, a;
@@ -59,11 +56,10 @@ putpixel0 (
 // 3 = 24 bpp
 // 2 = 16 bpp
 // ...
-
     int bytes_count=0;
 
 // Buffer address validation.
-    if(buffer_va == 0){
+    if (buffer_va == 0){
         panic("putpixel0: buffer_va\n");
     }
 
@@ -95,9 +91,7 @@ putpixel0 (
 
 // #importante
 // Pegamos a largura do dispositivo.
-
     int width = (int) (gSavedX & 0xFFFF);
-    
     width = (int) (width & 0xFFFF);
 
     int offset=0;

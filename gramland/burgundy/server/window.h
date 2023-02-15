@@ -222,18 +222,25 @@ void wmInitializeStructure(void);
 #define WINDOW_LOCKED    1
 #define WINDOW_UNLOCKED  0
 
-
-// window style
-// #bugbug
-// maximized, minimized and fullscreen are not style features.
-// move these things to another flag.
+//
+// Window style
+//
 
 #define WS_MAXIMIZED    0x0001
-#define WS_MINIMIZED    0x0002
+#define WS_MINIMIZED    0x0002  // Iconic
 #define WS_FULLSCREEN   0x0004
-// ...
+#define WS_STATUSBAR    0x0008  // In the bottom
+
+#define WS_LOCKED              0x0010  // No input
+#define WS_CLIP_IN_CLIENTAREA  0x0040
+
+#define WS_TITLEBAR      0x0100
+#define WS_TITLEBARICON  0x0200
+
 #define WS_HSCROLLBAR   0x1000
 #define WS_VSCROLLBAR   0x2000
+#define WS_CHILD        0x4000
+
 
 // window status
 #define WINDOW_STATUS_ACTIVE       1

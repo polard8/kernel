@@ -5,6 +5,28 @@
 #ifndef  __LIBGWS_WINDOW_H
 #define  __LIBGWS_WINDOW_H    1
 
+
+//
+// Window style
+//
+
+#define WS_MAXIMIZED    0x0001
+#define WS_MINIMIZED    0x0002  // Iconic
+#define WS_FULLSCREEN   0x0004
+#define WS_STATUSBAR    0x0008  // In the bottom
+
+#define WS_LOCKED              0x0010  // No input
+#define WS_CLIP_IN_CLIENTAREA  0x0040
+
+#define WS_TITLEBAR      0x0100
+#define WS_TITLEBARICON  0x0200
+
+#define WS_HSCROLLBAR   0x1000
+#define WS_VSCROLLBAR   0x2000
+#define WS_CHILD        0x4000
+
+
+
 // Button state
 #define BS_NULL      0 
 #define BS_DEFAULT   1

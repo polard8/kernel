@@ -1926,8 +1926,9 @@ wmCreateWindowFrame (
     int useFrame       = FALSE;
     int useTitleBar    = FALSE;
     int useTitleString = FALSE;
-    int useBorder      = FALSE;
     int useIcon        = FALSE;
+    int useStatusBar   = FALSE;
+    int useBorder      = FALSE;
     // ...
 
 // #bugbug
@@ -2035,14 +2036,26 @@ wmCreateWindowFrame (
         useBorder=TRUE;
         break;
 
-    case WT_OVERLAPPED:  
+    case WT_OVERLAPPED:
         useFrame=TRUE; 
-        useIcon=TRUE;
         useTitleBar=TRUE;  // Normalmente uma janela tem a barra de t[itulos.
-        if ( window->style & 0x0001 ){ useTitleBar=FALSE; }    //maximized
-        //if ( window->style & 0x0004 ){ useTitleBar=FALSE; }  //fullscreen
         useTitleString=TRUE;
+        useIcon=TRUE;
         useBorder=TRUE;
+        // Quando a overlapped esta em fullscreen,
+        // então não usamos title bar,
+        // nem bordas.
+        if (window->style & WS_FULLSCREEN)
+        {
+            //useFrame=FALSE;
+            useTitleBar=FALSE;
+            useTitleString=FALSE;
+            useIcon=FALSE;
+            useBorder=FALSE; 
+        }
+        if (window->style & WS_STATUSBAR){
+            useStatusBar=TRUE;
+        }
         break;
     
     case WT_BUTTON:      
@@ -2061,7 +2074,7 @@ wmCreateWindowFrame (
 // ===============================================
 // editbox
 
-    if ( Type == WT_EDITBOX || 
+    if ( Type == WT_EDITBOX_SINGLE_LINE || 
          Type == WT_EDITBOX_MULTIPLE_LINES )
     {
 
@@ -2318,39 +2331,65 @@ wmCreateWindowFrame (
         // atualizar o top da área de cliente.
         //window->rcClient.top += window->titlebar_height;
 
-        //
-        // Status bar (bottom)
-        // 
-        
-        // A janela overlapped tem statusbar.
-        // Se for maximized ou fullscreen
-        // #todo: Essa janela foi registrada?
-        if ( window->style & 0x0008 )
+        // Status bar
+        // (In the bottom)
+        // #todo: It turns the client area smaller.
+        //if (window->style & WS_STATUSBAR)
+        if (useStatusBar == TRUE)
         {
-            window->statusbar_height = 32;
-            window->statusbar_color = (unsigned int) 0x00AC81;
+            //#debug
+            //printf ("sb\n");
+            //while(1){}
+            
+            // #todo
+            // Move these variables to the start
+            // of the routine.
+            unsigned long sbLeft=0;
+            unsigned long sbTop=0;
+            unsigned long sbWidth=8;
+            unsigned long sbHeight=32;
 
-            unsigned long sbTop = 0;
-            unsigned long sbWidth = 8;
-            if ( (void*) window->parent != NULL ){
+            window->statusbar_height=sbHeight;
+
+            unsigned int sbColor = COLOR_STATUSBAR4;
+            window->statusbar_color = (unsigned int) sbColor;
+
+            // ??
+            // Se tem uma parent válida?
+            // Porque depende da parent?
+            //if ( (void*) window->parent != NULL )
+            if ( (void*) window != NULL )
+            {
+                // Relative to the app window.
                 sbTop = 
                 (unsigned long) (window->rcClient.height - window->statusbar_height);
+                // #bugbug
+                // We're gonna fail if we use
+                // the whole width 'window->width'.
+                // Clipping?
                 sbWidth = 
-                (unsigned long) (window->rcClient.width);
+                (unsigned long) (window->width - 4);
             }
 
-            // estamos relativos à nossa área de cliente
+            // Estamos relativos à nossa área de cliente
             // Seja ela do tipo que for.
             // #todo: apos criarmos a janela de status no fim da
             // area de cliente, então precisamos redimensionar a
             // nossa área de cliente.
+            
+            // #debug
+            //printf ("l=%d t=%d w=%d h=%d\n",
+            //    sbLeft, sbTop, sbWidth, sbHeight );
+            //while(1){}
+            
             sbWindow = 
                 (void *) doCreateWindow ( 
-                             WT_SIMPLE, 0, 1, 1, "Statusbar", 
-                             0,       //l                                                //left
-                             sbTop,   //t
-                             sbWidth, //width 
-                             window->statusbar_height,  //height                                  //height
+                             WT_SIMPLE, 
+                             0, // Style 
+                             1, 
+                             1, 
+                             "Statusbar", 
+                             sbLeft, sbTop, sbWidth, sbHeight,
                              (struct gws_window_d *) window, 
                              0, 
                              window->statusbar_color,  //frame
@@ -2384,15 +2423,10 @@ wmCreateWindowFrame (
 // ===============================================
 // button
 
-    //button
-    if (Type == WT_BUTTON)
-    {
-        //gwssrv_debug_print ("wmCreateWindowFrame: [TODO] frame for button\n");
-        //todo frame or not
-        //just like the edit box.
-        // ok     
-        return 0;
-    }
+    //if (Type == WT_BUTTON)
+    //{
+    //    return 0;
+    //}
 
     return 0;
 }

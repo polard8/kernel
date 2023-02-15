@@ -443,17 +443,22 @@ int main ( int argc, char *argv[] )
 
 // main window
 // Locked and maximized.
-// style: 0x0001=maximized | 0x0002=minimized | 0x0004=fullscreen | 0x0008=statusbar?
-// style: 0x8000=locked
-
+// style: 
+// 0x0001=maximized | 
+// 0x0002=minimized | 
+// 0x0004=fullscreen | 
+// 0x0008=statusbar
+// See: window.h
+// WS_FULLSCREEN WS_MAXIMIZED WS_STATUSBAR
     Main_window = 
         (int) gws_create_window ( 
                   client_fd,
                   WT_OVERLAPPED, 1, 1, "GRAMADO SHELL",
                   wLeft, wTop, wWidth, wHeight,
                   0,
-                  0x8008,
-                  COLOR_GRAY, COLOR_GRAY );
+                  WS_STATUSBAR,
+                  COLOR_GRAY, 
+                  COLOR_GRAY );
 
     if (Main_window < 0){
         debug_print("fileman: Main_window fail\n");
@@ -479,8 +484,10 @@ int main ( int argc, char *argv[] )
                   2,  //top  pad
                   header_w_width,   //width 
                   header_w_height,  //height
-                  Main_window, 0, 
-                  xCOLOR_GRAY7, xCOLOR_GRAY7 );
+                  Main_window, 
+                  0, 
+                  xCOLOR_GRAY7, 
+                  xCOLOR_GRAY7 );
 
     if (Header_window<0){
         debug_print("fileman: Header_window fail\n"); 
@@ -501,10 +508,12 @@ int main ( int argc, char *argv[] )
                   2, 
                   (header_w_width -2 -2 -2 -24 -2), 
                   24,
-                  Header_window, 0, 
-                  COLOR_EDITBOX, COLOR_EDITBOX );
+                  Header_window, 
+                  0, 
+                  COLOR_EDITBOX, 
+                  COLOR_EDITBOX );
 
-    if ( addressbar_window < 0 ){
+    if (addressbar_window < 0){
         debug_print("fileman: addressbar_window fail\n"); 
         printf     ("fileman: addressbar_window fail\n"); 
         exit(1);
@@ -524,8 +533,10 @@ int main ( int argc, char *argv[] )
                   2,                           //t 
                   24, 
                   24,
-                  Header_window, 0, 
-                  COLOR_GRAY, COLOR_GRAY );
+                  Header_window, 
+                  0, 
+                  COLOR_GRAY, 
+                  COLOR_GRAY );
 
     if (button < 0){
         debug_print("fileman: button fail\n"); 
@@ -533,21 +544,29 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
-
 //
 // == Menu_window ============================
 //
 
-// Se a janela mãe é overlapped, então estamos
-// relativos à area de cliente dela.
+// Se a janela mãe é overlapped, 
+// então estamos relativos à area de cliente dela.
 
     unsigned long mwLeft   = 2;
     unsigned long mwTop    = header_w_height +2 +2;  // depois da address bar e seus pads.
     unsigned long mwWidth  = (wWidth/4) -4;
     
-    //#bugbug: wrong. precisamos pegar as dimensões da área de cliente.
-    unsigned long mwHeight = (wHeight - mwTop -4 -titlebarHeight);
+    //#bugbug: 
+    // Wrong. 
+    // Precisamos pegar as dimensões da área de cliente.
+    // Tem uma função pra isso, que é válida
+    // pra janelas registradas.
+    unsigned long mwHeight = 
+        (wHeight - mwTop -4 -titlebarHeight);
 
+    // #hack
+    // I wanna see the status bar for now.
+    mwHeight = mwHeight - 40;
+    
     Menu_window = 
         (int) gws_create_window ( 
                   client_fd,
@@ -555,7 +574,8 @@ int main ( int argc, char *argv[] )
                   mwLeft, mwTop, mwWidth, mwHeight, 
                   Main_window, 
                   0, 
-                  COLOR_BLUE2CYAN, COLOR_BLUE2CYAN );
+                  COLOR_BLUE2CYAN, 
+                  COLOR_BLUE2CYAN );
 
     if (Menu_window<0){
         debug_print("fileman: Menu_window fail\n"); 
@@ -577,8 +597,10 @@ int main ( int argc, char *argv[] )
                   client_fd,
                   WT_SIMPLE, 1, 1,"LogoWin",
                   lwLeft, lwTop, lwWidth, lwHeight, 
-                  Menu_window, 0, 
-                  COLOR_BLUE, COLOR_BLUE );
+                  Menu_window, 
+                  0, 
+                  COLOR_BLUE, 
+                  COLOR_BLUE );
 
     if (Logo_window<0){
         debug_print("fileman: Logo_window fail\n"); 
@@ -596,7 +618,8 @@ int main ( int argc, char *argv[] )
                       8, 8, 50, 24,
                       Logo_window, 
                       0, 
-                      COLOR_WHITE, COLOR_WHITE );
+                      COLOR_WHITE, 
+                      COLOR_WHITE );
     }
     if (lw_button1<0){
         debug_print("fileman: lw_button1 fail\n"); 
@@ -713,20 +736,18 @@ int main ( int argc, char *argv[] )
                   WT_SIMPLE, 1, 1, "ClientWin",
                   cwLeft, cwTop, cwWidth, cwHeight,
                   Main_window, 
-                  0,  // style: 0x0001=maximized | 0x0002=minimized | 0x0004=fullscreen 
+                  0,
                   COLOR_WHITE, 
                   COLOR_WHITE );
 
     if (Client_window<0){
         debug_print("fileman: Client_window fail\n"); 
     }
-
 //
 // =============================================================
 //
 
 // Items
-
     register int index=0;
     gMaxIndex = NUMBER_OF_WINDOWS;
 
@@ -755,7 +776,8 @@ int main ( int argc, char *argv[] )
                       iLeft, iTop, iWidth, iHeight, 
                       Client_window, 
                       0,
-                      ItemColor, ItemColor );
+                      ItemColor, 
+                      ItemColor );
 
         if ( windows[index] < 0 )
         {
@@ -767,9 +789,9 @@ int main ( int argc, char *argv[] )
         gws_draw_text ( 
             (int) client_fd, 
             (int) windows[index], 
-            8, 8, COLOR_BLACK, "Item");
+            8, 8, xCOLOR_GRAY2, "Item");
         
-        // atualiza o top do próximo item.
+        // Atualiza o top do próximo item.
         iTop = (iTop + iHeight);
     };
 

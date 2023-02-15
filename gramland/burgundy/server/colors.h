@@ -432,6 +432,7 @@ public BGREntry vga_palette4_gray[16] = {
 #define COLOR_STATUSBAR   COLOR_WINDOW   //branca
 #define COLOR_STATUSBAR2  xCOLOR_GRAY6   //cinza
 #define COLOR_STATUSBAR3  0x83FCFF       //verde
+#define COLOR_STATUSBAR4  0x00AC81       //verde
 #define COLOR_STATUSBARTEXT      COLOR_TEXT
 
 // Taskbar
@@ -439,8 +440,10 @@ public BGREntry vga_palette4_gray[16] = {
 #define COLOR_TASKBARTEXT  COLOR_TEXT
 
 // Titlebar
-#define COLOR_TITLEBAR      COLOR_BLUE
+#define COLOR_TITLEBAR  COLOR_BLUE
 #define COLOR_TITLEBARTEXT  COLOR_TEXT
+
+
 
 // Topbar
 #define COLOR_TOPBAR      0x83F52C
