@@ -372,8 +372,18 @@ The remainder ??
         if ( CurrentThread->state == RUNNING && 
              CurrentThread->yield_in_progress == TRUE )
         {
-            CurrentThread->runningCount = CurrentThread->quantum;
+            CurrentThread->runningCount = CurrentThread->quantum;  // Esgoto
             CurrentThread->yield_in_progress = FALSE;
+        }
+
+        if ( CurrentThread->state == RUNNING && 
+             CurrentThread->sleep_in_progress == TRUE )
+        {
+            printf ("ts: Do sleep until\n");
+            CurrentThread->runningCount = CurrentThread->quantum;  // Esgoto
+            sleep_until(CurrentThread->tid, CurrentThread->desired_sleep_ms); // set waiting
+            CurrentThread->sleep_in_progress = FALSE;
+            printf ("ts: Status=%d\n",CurrentThread->state);
         }
 
         IncrementDispatcherCount (SELECT_CURRENT_COUNT);

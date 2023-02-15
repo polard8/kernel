@@ -181,6 +181,47 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
         if ( (void *) TmpThread != NULL )
         {
+
+            // :: Waiting threads
+            // Wake up some threads, given them a chance. 
+            // and not putting waiting threads into the round.
+            // Alarm and wakeup.
+            // A thread esta esperando.
+            if ( TmpThread->used  == TRUE && 
+                 TmpThread->magic == 1234 && 
+                 TmpThread->state == WAITING )
+            {
+                //panic ("Gotten!\n");
+                  
+                // Check alarm
+                if ( jiffies > TmpThread->alarm ){
+                    //TmpThread->signal = ?
+                    TmpThread->alarm=0;
+                }
+                // Wake up
+                //if ( TmpThread->signal ){
+                //    TmpThread->state = READY;
+                //}
+                // Wake up
+                // #bugbug
+                // Como o scheduler é chamado apenas de tempos em tempos
+                // então essa checagem anao é real-time.
+                // Na hora de checar, pode ser que o tempo limite ja passou.
+                if ( jiffies >= TmpThread->wake_jiffy)
+                {
+                    
+                     // #debug
+                    printf ("sched: j1=%d | j2=%d |\n", jiffies, TmpThread->wake_jiffy);
+                    //panic ("Wake!\n");
+                    
+                    printf("sched: Waking up\n");
+                    do_thread_ready(TmpThread->tid);
+                    
+                    //panic("Wake ok\n");
+                } 
+            }
+
+            // :: Ready threads.
             // Scheduler.
             // A thread esta pronta.
             if ( TmpThread->used  == TRUE && 
@@ -250,23 +291,6 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                         TmpThread->quantum = QUANTUM_MAX;
                 }
 
-            }
-
-            // Alarm
-            // A thread esta esperando.
-            if ( TmpThread->used  == TRUE && 
-                 TmpThread->magic == 1234 && 
-                 TmpThread->state == WAITING )
-            {
-                // Check alarm
-                if ( jiffies > TmpThread->alarm ){
-                    //TmpThread->signal = ?
-                    TmpThread->alarm=0;
-                }
-                // Wake up
-                //if ( TmpThread->signal ){
-                //    TmpThread->state = READY;
-                //}
             }
 
             // Exit

@@ -528,7 +528,7 @@ unsigned long now (void)
 
 
 // fake
-void sleep (unsigned long ms)
+void pit_sleep (unsigned long ms)
 {
     unsigned long t=1;
 

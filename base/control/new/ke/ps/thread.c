@@ -1126,6 +1126,10 @@ try_next_slot:
     Thread->blockedCount  = 0; 
     Thread->blocked_limit = QUANTUM_MAX;
 
+    Thread->yield_in_progress = FALSE;
+    Thread->sleep_in_progress = FALSE;
+    Thread->desired_sleep_ms = 0;
+
 // How many times it was scheduled.
     Thread->scheduledCount=0;
 
@@ -1583,6 +1587,10 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // blockedCount - Tempo bloqueada.
     clone->blockedCount = 0;
     clone->blocked_limit = father->blocked_limit;
+
+    clone->yield_in_progress = FALSE;
+    clone->sleep_in_progress = FALSE;
+    clone->desired_sleep_ms = 0;
 
     clone->scheduledCount = 0; 
 

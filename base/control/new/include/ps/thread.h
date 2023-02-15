@@ -294,9 +294,11 @@ struct thread_d
 // flag. 
 // 1 = Sinaliza que a thread está dando a preferência
 // e que deve sair quando for seguro fazer isso.
-
     int yield_in_progress;
-    
+
+    int sleep_in_progress;
+    unsigned long desired_sleep_ms;
+
     int _its_my_party_and_ill_cry_if_i_want_to;
 
 // error. @todo:
@@ -444,11 +446,14 @@ struct thread_d
 // blocked_jiffie: Time when blocked.
 // zombie_jiffie:  Time when the thread became a zombie.
 
-    unsigned long initial_jiffie;
-    unsigned long ready_jiffie;
-    unsigned long waiting_jiffie;
-    unsigned long blocked_jiffie;
-    unsigned long zombie_jiffie;
+    unsigned long initial_jiffy;
+    unsigned long ready_jiffy;
+    unsigned long waiting_jiffy;
+    unsigned long blocked_jiffy;
+    unsigned long zombie_jiffy;
+
+// Time when the thread needs to wakeup.
+    unsigned long wake_jiffy;
 
 // How much jiffies until now.
     unsigned long step;

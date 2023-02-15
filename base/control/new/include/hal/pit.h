@@ -236,7 +236,7 @@ void timerDisableTextCursor (void);
 
 unsigned long now (void);
 
-void sleep (unsigned long ms);
+void pit_sleep (unsigned long ms);
 
 int timerInit (void);
 int early_timer_init (void);

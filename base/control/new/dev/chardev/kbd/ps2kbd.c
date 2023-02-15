@@ -336,7 +336,7 @@ void keyboard_set_leds (char flag)
     {
     };
     out8 (0x60,0xED); 
-    sleep (100);
+    pit_sleep (100);
 
 // Wait for bit 1 of status reg to be zero.
 // Send flag. 
@@ -344,7 +344,7 @@ void keyboard_set_leds (char flag)
     {
     };
     out8 (0x60,flag);
-    sleep (100);
+    pit_sleep (100);
 
 // #todo: Mudar o status.
     // switch(flag){}

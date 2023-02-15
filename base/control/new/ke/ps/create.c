@@ -212,6 +212,10 @@ struct thread_d *create_init_thread (void)
     t->signal = 0;
     t->umask  = 0;
 
+    t->yield_in_progress =  FALSE;
+    t->sleep_in_progress =  FALSE;
+    t->desired_sleep_ms = 0;
+
     //
     // #obs: 
     // Essa parte eh dependente da arquitetura, 

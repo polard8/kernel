@@ -276,7 +276,7 @@ grBackbufferDrawCharTransparent (
 
 // Draw char
 // Put pixel using the ring3 routine.
-// See: bitblt.c
+// See: libgd.c
 
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
@@ -298,7 +298,7 @@ grBackbufferDrawCharTransparent (
             bit_mask = (bit_mask >> 1);
         };
 
-        // Próxima linha da 8 linhas do caractere.
+        // Próxima linha das 8 linhas do caractere.
         y++; 
         work_char++; 
     };

@@ -2153,11 +2153,30 @@ void *sci2 (
 // See: ps/sched/schedi.c
 // Set a flag that this thread will be preempted.
 
-    if (number == 265){
+    if (number == 265)
+    {
         debug_print("sci2: [265] Yield\n");   
         yield(current_thread); 
         return NULL; 
     }
+
+// Sleep until.
+// IN: tid, ms
+    if (number == 266)
+    {
+        printf("sci2: [266] Sleep until\n");   
+        // #bugbug
+        // We cant drastically change the state of a thread,
+        // we need to schedule that operation.
+        // given to the ts the opportunity to do that 
+        // in the right moment. As well as we do for the yield operation.
+        
+        // Agendando a operação de sleep.
+        // O ts vai fazer isso quando for seguro.
+        sleep( (tid_t) current_thread, (unsigned long) arg2 );
+        return NULL; 
+    }
+
 
 // 900
 // Clona e executa o filho dado o nome do filho.

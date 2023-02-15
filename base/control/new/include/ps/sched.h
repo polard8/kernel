@@ -88,10 +88,14 @@ void do_thread_initialized(tid_t tid);
 void do_thread_standby(tid_t tid);
 void do_thread_running(tid_t tid);
 void do_thread_ready(tid_t tid);
-void do_thread_waiting(tid_t tid);
+
+void do_thread_waiting(tid_t tid, unsigned long ms);
+
 void do_thread_blocked(tid_t tid);
 void do_thread_zombie(tid_t tid);
 void do_thread_dead(tid_t tid);
+
+void sleep_until (tid_t tid, unsigned long ms);
 
 void drop_quantum(struct thread_d *thread);
 
@@ -105,6 +109,7 @@ int wakeup_thread_reason ( int tid, int reason );
 int wakeup_scan_thread_reason ( int reason );
 void wakeup_thread (int tid);
 void yield (tid_t tid);
+void sleep (tid_t tid, unsigned long ms);
 
 void check_for_standby (void);
 

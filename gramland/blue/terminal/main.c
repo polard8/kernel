@@ -716,6 +716,16 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
+// Sleep until
+// IN: number, ms, 0, 0.
+    if( strncmp(prompt,"sleep",5) == 0 )
+    {
+        //#todo: Create a function for that.
+        // rtl_sleep_until(ms)
+        sc82( 266, 2000, 2000, 2000 );
+        goto exit_cmp;
+    }
+
 // Enable network
     if( strncmp(prompt,"net-on",6) == 0 ){
         sc82 ( 22001, 

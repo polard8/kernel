@@ -691,7 +691,7 @@ sys_read (
             
             fp->_flags = 0;
             fp->_flags |= __SWR;                  // pode escrever
-            do_thread_ready( fp->tid_waiting );   // acorda escritores. 
+            //do_thread_ready( fp->tid_waiting );   // acorda escritores. 
             fp->tid_waiting = -1;
 
             // #bugbug
@@ -741,7 +741,7 @@ sys_read (
                     fp->_flags &= ~__SRD;  // nao posso mais LER.            
                     fp->_flags |= __SWR;   // pode escrever também
                     //debug_print("sys_read: WAKEUP WRITER\n");
-                    do_thread_ready( fp->tid_waiting );  // acorda escritores.
+                    //do_thread_ready( fp->tid_waiting );  // acorda escritores.
                     fp->tid_waiting = -1;
                     //debug_print("sys_read:done\n");
                     return (ssize_t) nbytes;    // bytes escritos.
@@ -1206,7 +1206,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
                     fp->socket_buffer_full = TRUE;     // buffer cheio
                     fp->_flags &= ~__SWR;              // nao posso mais ESCREVER.            
                     fp->_flags |= __SRD;               // pode ler 
-                    do_thread_ready(fp->tid_waiting);  // acorda leitores
+                    //do_thread_ready(fp->tid_waiting);  // acorda leitores
                     fp->tid_waiting = -1;
                 
                     // #bugbug

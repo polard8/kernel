@@ -144,7 +144,7 @@ void spawn_thread(int tid)
 
 // Initial jiffie
 // Spawn time.
-    target_thread->initial_jiffie = (unsigned long) jiffies;
+    target_thread->initial_jiffy = (unsigned long) jiffies;
 
 // how much tick untill now.
     target_thread->step = 0;

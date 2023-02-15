@@ -165,13 +165,16 @@ void do_thread_ready(tid_t tid)
 */
 
     t->state = READY;
-    t->ready_jiffie = (unsigned long) jiffies;
+    t->ready_jiffy = (unsigned long) jiffies;
 }
 
 // 5, 13
-void do_thread_waiting(tid_t tid)
+void do_thread_waiting(tid_t tid, unsigned long ms)
 {
-    struct thread_d *t; 
+    struct thread_d *t;
+    unsigned long JiffiesToWait = ms;
+
+    printf("do_thread_waiting: %dms\n", ms);
 
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return;
@@ -190,7 +193,18 @@ void do_thread_waiting(tid_t tid)
     }
 
     t->state = WAITING;
-    t->waiting_jiffie = (unsigned long) jiffies;
+
+// Start
+    t->waiting_jiffy = (unsigned long) jiffies;
+
+// End
+    if (JiffiesToWait == 0){
+        JiffiesToWait = 1;
+    }
+    t->wake_jiffy = (unsigned long) (jiffies + JiffiesToWait);
+
+    printf ("do_thread_waiting: j1=%d | j2=%d |\n", jiffies, t->wake_jiffy);
+    printf("do_thread_waiting: done\n");
 }
 
 // 12, 7
@@ -230,7 +244,7 @@ void do_thread_blocked(tid_t tid)
 */
 
     t->state = BLOCKED;
-    t->blocked_jiffie = (unsigned long) jiffies;
+    t->blocked_jiffy = (unsigned long) jiffies;
 }
 
 // 9
@@ -263,7 +277,7 @@ void do_thread_zombie(tid_t tid)
     }
 
     t->state = ZOMBIE;
-    t->zombie_jiffie = (unsigned long) jiffies;
+    t->zombie_jiffy = (unsigned long) jiffies;
 }
 
 // 10
@@ -288,6 +302,19 @@ void do_thread_dead(tid_t tid)
     }
 
     t->state = DEAD;
+}
+
+void sleep_until (tid_t tid, unsigned long ms)
+{
+    printf("sleep_until:\n");
+
+    if (tid<0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+    if (ms == 0){
+        ms=1;
+    }
+    do_thread_waiting(tid, ms);
 }
 
 void drop_quantum(struct thread_d *thread)
@@ -728,6 +755,46 @@ void yield (tid_t tid)
 
     t->yield_in_progress = TRUE;
 }
+
+// Yield
+// Set a flag that this thread will be preempted.
+// Desiste do tempo de processamento.
+// cooperativo.
+// Muda o seu tempo executando para: Próximo de acabar.
+
+void sleep (tid_t tid, unsigned long ms)
+{
+    struct thread_d  *t;
+
+    printf ("sleep\n");
+
+// tid
+    if (tid < 0 || tid >= THREAD_COUNT_MAX){
+        return;
+    }
+
+// structure
+    t = (void *) threadList[tid];
+    if ( (void *) t == NULL ){
+        return;
+    }
+    if ( t->used != TRUE || t->magic != 1234 ){
+        return;
+    }
+
+// Flag 
+// 1 = Sinaliza que a thread está dando a preferência
+// e que deve sair quando for seguro fazer isso.
+// Agenda o yield.
+// >>> O ts.c vai fazer isso na hora certa.
+// O ts.c vai esgotar o quantum dessa thread
+// no momento do task switching.
+// Isso não deve afetar a prioridde da thread.
+
+    t->sleep_in_progress = TRUE;
+    t->desired_sleep_ms = ms;
+}
+
 
 
 /*

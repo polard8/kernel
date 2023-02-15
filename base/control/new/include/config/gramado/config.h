@@ -7,8 +7,9 @@
 
 
 //#bugbug
-#define IMAGESIZE_LIMIT_IN_KB  400
-
+// see: process.c
+//#define IMAGESIZE_LIMIT_IN_KB  400
+#define IMAGESIZE_LIMIT_IN_KB  405
 
 #endif    
 
