@@ -2984,7 +2984,7 @@ int main ( int argc, char *argv[] )
                   WT_OVERLAPPED, 1, 1, "TERMINAL",
                   mwLeft, mwTop, mwWidth, mwHeight,
                   0,
-                  0x0000,
+                  WS_TERMINAL,
                   mwColor, 
                   mwColor );
 

@@ -1741,6 +1741,179 @@ void do_create_controls(struct gws_window_d *window)
     window->Controls.initialized = TRUE;
 }
 
+// Create titlebar and controls.
+struct gws_window_d *do_create_titlebar(
+    struct gws_window_d *parent,
+    unsigned long border_size,
+    unsigned long tb_height,
+    unsigned int color,
+    unsigned int ornament_color,
+    int has_icon,
+    int icon_id,
+    int has_string )
+{
+    struct gws_window_d *tbWindow;
+    unsigned long BorderSize = border_size;
+    unsigned long TitleBarWidth=0;
+    unsigned long TitleBarHeight = tb_height;  //#todo metrics
+    unsigned int TitleBarColor = color;
+    unsigned long rop = 0;
+
+    if ( (void*) parent == NULL )
+        return NULL;
+    if (parent->magic!=1234)
+        return NULL;
+
+    TitleBarWidth = 
+        (parent->width - BorderSize - BorderSize);
+    parent->titlebar_width = TitleBarWidth;
+    parent->titlebar_height = TitleBarHeight;
+
+    parent->titlebar_color = (unsigned int) TitleBarColor;
+    parent->titlebar_text_color = 
+        (unsigned int) get_color(csiSystemFontColor);
+
+    rop = parent->rop;
+
+//-----------
+
+// #important: WT_SIMPLE with text.
+// lembre-se estamos relativos à area de cliente
+// da janela mão, seja ela de qual tipo for.
+    tbWindow = 
+       (void *) doCreateWindow ( 
+                    WT_SIMPLE, 0, 1, 1, "TitleBar", 
+                    0, 0, TitleBarWidth, TitleBarHeight, 
+                    (struct gws_window_d *) parent, 
+                    0, 
+                    TitleBarColor,  //frame 
+                    TitleBarColor,  //client
+                    (unsigned long) rop );   // rop_flags from the parent 
+
+    if ( (void *) tbWindow == NULL ){
+        gwssrv_debug_print ("do_create_titlebar: tbWindow fail \n");
+        return -1;
+    }
+
+    tbWindow->type = WT_SIMPLE;
+    tbWindow->isTitleBar = TRUE;
+
+// ---------------------------------
+// Controle
+    //do_create_controls(tbWindow);
+
+// --------------------------------
+// Icon
+
+    int useIcon = has_icon;  //#HACK
+    parent->titlebarHasIcon = FALSE;
+
+// O posicionamento em relação
+// à janela é consistente por questão de estilo.
+// See: bmp.c
+// IN: index, left, top.
+// Icon ID:
+// Devemos receber um argumento do aplicativo,
+// na hora da criação da janela.
+    parent->frame.titlebar_icon_id = icon_id;
+    
+// Decode the bmp that is in a buffer
+// and display it directly into the framebuffer. 
+// IN: index, left, top
+// see: bmp.c
+    if (useIcon == TRUE)
+    {
+        gwssrv_display_system_icon( 
+            (int) parent->frame.titlebar_icon_id, 
+            (tbWindow->left + METRICS_ICON_LEFTPAD), 
+            (tbWindow->top  + METRICS_ICON_TOPPAD) );
+
+        parent->titlebarHasIcon = TRUE;
+    }
+
+// ---------------------------
+// Ornament
+    int useOrnament = TRUE;
+
+// Ornamento:
+// Ornamento na parte de baixo da title bar.
+// #important:
+// O ornamento é pintado dentro da barra, então isso
+// não afetará o positionamento da área de cliente.
+// border on bottom.
+// Usado para explicitar se a janela é ativa ou não
+// e como separador entre a barra de títulos e a segunda
+// área da janela de aplicativo.
+// Usado somente por overlapped window.
+
+    unsigned int OrnamentColor1 = ornament_color;
+
+    parent->frame.ornament_color1   = OrnamentColor1;
+    parent->titlebar_ornament_color = OrnamentColor1;
+
+    rectBackbufferDrawRectangle ( 
+        tbWindow->left, 
+        ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+        tbWindow->width, 
+        METRICS_TITLEBAR_ORNAMENT_SIZE, 
+        OrnamentColor1, 
+        TRUE,
+        0 );  // rop_flags no rop in this case?
+
+
+//----------------------
+// string
+// Titlebar string support;
+
+    int useTitleString=has_string;  //#HACK
+
+    // String support.
+    // String at center?
+    unsigned long StringLeftPad = 0;
+    unsigned long StringTopPad = 8;  // char size.
+    size_t StringSize = (size_t) strlen( (const char *) parent->name );
+    if (StringSize > 64){
+        StringSize = 64;
+    }
+
+// pad | icon | pad | pad
+    StringLeftPad = 
+        (unsigned long) ((2*METRICS_ICON_LEFTPAD) +16 +METRICS_ICON_LEFTPAD);
+
+
+    parent->titlebar_text_color = 
+        (unsigned int) get_color(csiTitleBarText);
+
+// #todo
+// Temos que gerenciar o posicionamento da string.
+// #bugbug: Use 'const char *'
+
+    tbWindow->name = 
+        (char *) strdup( (const char *) parent->name );
+
+    //#todo: validation
+    //if ( (void*) tbWindow->name == NULL ){}
+
+    if (useTitleString == TRUE)
+    {
+        grDrawString ( 
+            ((tbWindow->left) + StringLeftPad), 
+            ((tbWindow->top)  + StringTopPad), 
+            parent->titlebar_text_color, 
+            tbWindow->name );
+    }
+
+
+// ---------------------------------
+// Controle
+    do_create_controls(tbWindow);
+
+//----------------------
+    parent->titlebar = (struct gws_window_d *) tbWindow;  // Window pointer!
+  
+    return (struct gws_window_d *) tbWindow;
+}
+
 // worker:
 // Draw the border of edit box and overlapped windows.
 // >> no checks
@@ -1971,6 +2144,8 @@ wmCreateWindowFrame (
     unsigned int TitleBarColor = 
         (unsigned int) get_color(csiActiveWindowTitleBar);
 
+    int icon_id = ICON_ID_APP; //dfault.
+
     //unsigned long X = (x & 0xFFFF);
     //unsigned long Y = (y & 0xFFFF);
     //unsigned long Width = (width & 0xFFFF);
@@ -2128,19 +2303,6 @@ wmCreateWindowFrame (
 // overlapped?
 // Draw border, titlebar and status bar.
 
-    // String support.
-    // String at center?
-    unsigned long StringLeftPad = 0;
-    unsigned long StringTopPad = 8;  // char size.
-    size_t StringSize = (size_t) strlen( (const char *) window->name );
-    if (StringSize > 64){
-        StringSize = 64;
-    }
-
-// pad | icon | pad | pad
-    StringLeftPad = 
-        (unsigned long) ((2*METRICS_ICON_LEFTPAD) +16 +METRICS_ICON_LEFTPAD);
-
 // #todo:
 // String right não pode ser maior que 'last left' button.
 
@@ -2209,46 +2371,37 @@ wmCreateWindowFrame (
         // #todo: Essa janela foi registrada?
         if (useTitleBar == TRUE)
         {
-            window->titlebar_width = 
-                (window->width - BorderSize - BorderSize);
-            window->titlebar_height = TitleBarHeight;
+            // This is a application window.
+            if ( window->style & WS_APP)
+                icon_id = ICON_ID_APP;
+            // This is a application window.
+            if ( window->style & WS_DIALOG) 
+                icon_id = ICON_ID_FILE;
+            // This is a application window.
+            if ( window->style & WS_TERMINAL) 
+                icon_id = ICON_ID_TERMINAL;
 
-            window->titlebar_color = (unsigned int) TitleBarColor;
-            window->titlebar_text_color = 
-                (unsigned int) get_color(csiSystemFontColor);
 
-            // #important: WT_SIMPLE with text.
-            // lembre-se estamos relativos à area de cliente
-            // da janela mão, seja ela de qual tipo for.
+            // IN: 
+            // parent, border size, height, color, ornament color,
+            //  use icon, use string.
             tbWindow = 
-                (void *) doCreateWindow ( 
-                             WT_SIMPLE, 0, 1, 1, "TitleBar", 
-                             0,  //l 
-                             0,  //t
-                             window->titlebar_width,  //w 
-                             window->titlebar_height,  //h 
-                             (struct gws_window_d *) window, 
-                             0, 
-                             window->titlebar_color,  //frame 
-                             window->titlebar_color,  //client
-                             (unsigned long) window->rop );   // rop_flags from the parent 
+                (struct gws_window_d *) do_create_titlebar(
+                    window,
+                    BorderSize,
+                    TitleBarHeight,
+                    TitleBarColor,
+                    OrnamentColor1,
+                    useIcon,
+                    icon_id,
+                    useTitleString );
 
-            if ( (void *) tbWindow == NULL ){
-                gwssrv_debug_print ("wmCreateWindowFrame: tbWindow fail \n");
-                return -1;
-            }
-            tbWindow->type = WT_SIMPLE;
-            tbWindow->isTitleBar = TRUE;
-            window->titlebar = (struct gws_window_d *) tbWindow;  // Window pointer!
             // Register window
             id = RegisterWindow(tbWindow);
             if (id<0){
                 gwssrv_debug_print ("wmCreateWindowFrame: Couldn't register window\n");
                 return -1;
             }
-            
-            // local
-            do_create_controls(tbWindow);
 
             // #important:
             // The Titlebar in an overlapped window will affect
@@ -2256,81 +2409,6 @@ wmCreateWindowFrame (
             // Depois de pintarmos a titlebar,
             // temos que atualizar o top da área de cliente.
             window->rcClient.top += window->titlebar_height;
-
-            // Ornamento:
-            // Ornamento na parte de baixo da title bar.
-            // #important:
-            // O ornamento é pintado dentro da barra, então isso
-            // não afetará o positionamento da área de cliente.
-            // border on bottom.
-            // Usado para explicitar se a janela é ativa ou não
-            // e como separador entre a barra de títulos e a segunda
-            // área da janela de aplicativo.
-            // Usado somente por overlapped window.
-        
-            window->frame.ornament_color1   = OrnamentColor1;
-            window->titlebar_ornament_color = OrnamentColor1;
-        
-            rectBackbufferDrawRectangle ( 
-                tbWindow->left, 
-                ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
-                tbWindow->width, 
-                METRICS_TITLEBAR_ORNAMENT_SIZE, 
-                OrnamentColor1, 
-                TRUE,
-                0 );  // rop_flags no rop in this case?
-
-            //
-            // Icon (Titlebar)
-            //
-
-            // O posicionamento em relação
-            // à janela é consistente por questão de estilo.
-            // See: bmp.c
-            // IN: index, left, top.
-            window->titlebarHasIcon = FALSE;
-            
-            // Icon ID:
-            // Devemos receber um argumento do aplicativo,
-            // na hora da criação da janela.
-            window->frame.titlebar_icon_id = ICON_ID_APP;
-
-            // Decode the bmp that is in a buffer
-            // and display it directly into the framebuffer. 
-            // IN: index, left, top
-            // see: bmp.c
-            if (useIcon == TRUE){
-                window->titlebarHasIcon = TRUE;
-                gwssrv_display_system_icon( 
-                    (int) window->frame.titlebar_icon_id, 
-                    (tbWindow->left + METRICS_ICON_LEFTPAD), 
-                    (tbWindow->top  + METRICS_ICON_TOPPAD) );
-            }
-
-
-            // Titlebar string support;
-
-            window->titlebar_text_color = 
-                (unsigned int) get_color(csiTitleBarText);
-
-            // #todo
-            // Temos que gerenciar o posicionamento da string.
-        
-            // #bugbug: Use 'const char *'
-            tbWindow->name = 
-                (char *) strdup( (const char *) window->name );
-        
-            //#todo: validation
-            //if ( (void*) tbWindow->name == NULL ){}
-        
-            if (useTitleString == TRUE){
-                grDrawString ( 
-                    ((tbWindow->left) + StringLeftPad), 
-                    ((tbWindow->top)  + StringTopPad), 
-                    window->titlebar_text_color, 
-                    tbWindow->name );
-            }
-
         }  //--use title bar.
         // ooooooooooooooooooooooooooooooooooooooooooooooo
 

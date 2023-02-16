@@ -26,7 +26,12 @@
 #define WS_VSCROLLBAR   0x2000
 #define WS_CHILD        0x4000
 
+#define WS_APP       0x10000
+#define WS_DIALOG    0x20000
+#define WS_TERMINAL  0x40000
 
+
+//----------
 
 // Button state
 #define BS_NULL      0 

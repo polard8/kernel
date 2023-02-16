@@ -266,6 +266,12 @@ void wmInitializeStructure(void);
 #define WS_VSCROLLBAR   0x2000
 #define WS_CHILD        0x4000
 
+#define WS_APP       0x10000
+#define WS_DIALOG    0x20000
+#define WS_TERMINAL  0x40000
+
+//----------
+
 
 // window status
 #define WINDOW_STATUS_ACTIVE       1
@@ -656,6 +662,10 @@ struct gws_window_d
 // Margins and dimensions.
 //
 
+// Positions. Relative to the parent.
+    unsigned long x;
+    unsigned long y; 
+
 // Margins. (position)
 // Deslocamento em relação à tela. (screen)
     unsigned long left;        //margem esquerda 
@@ -673,16 +683,6 @@ struct gws_window_d
     unsigned long full_bottom;
     unsigned long full_width;
     unsigned long full_height;
-
-//
-// cursor ?
-// 
-
-// Offset inside the window.
-// Can be used by the rectangles.
-// Deslocamento em relação a janela mãe.
-    unsigned long x;
-    unsigned long y; 
 
     // #todo    
     //unsigned long border_color;
@@ -1560,6 +1560,17 @@ __draw_button_borders(
     unsigned int outer_color );
 
 void do_create_controls( struct gws_window_d *window);
+
+// Create titlebar and controls.
+struct gws_window_d *do_create_titlebar(
+    struct gws_window_d *parent,
+    unsigned long border_size,
+    unsigned long tb_height,
+    unsigned int color,
+    unsigned int ornament_color,
+    int has_icon,
+    int icon_id,
+    int has_string );
 
 // #important: 
 // O frame de uma janela deve fazer parte do window manager
