@@ -441,13 +441,8 @@ int main ( int argc, char *argv[] )
         wHeight = (h-40);
     }
 
-// main window
-// Locked and maximized.
+// Main window
 // style: 
-// 0x0001=maximized | 
-// 0x0002=minimized | 
-// 0x0004=fullscreen | 
-// 0x0008=statusbar
 // See: window.h
 // WS_FULLSCREEN WS_MAXIMIZED WS_STATUSBAR
     Main_window = 
@@ -456,7 +451,7 @@ int main ( int argc, char *argv[] )
                   WT_OVERLAPPED, 1, 1, "GRAMADO SHELL",
                   wLeft, wTop, wWidth, wHeight,
                   0,
-                  WS_STATUSBAR,
+                  WS_STATUSBAR,//(WS_TRANSPARENT | WS_STATUSBAR),
                   COLOR_GRAY, 
                   COLOR_GRAY );
 

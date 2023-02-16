@@ -1313,6 +1313,15 @@ void wmInitializeStructure(void)
         }
     }
 
+// #todo
+// Desktop composition.
+// #todo
+// Create methods so enable and disable this feature.
+    WindowManager.comp.use_transparence = FALSE;
+    WindowManager.comp.is_enabled = FALSE;
+    WindowManager.comp.use_visual_effects = FALSE;
+    WindowManager.comp.initialized = TRUE;
+
 // fullscreen support.
     WindowManager.is_fullscreen = FALSE;
     //WindowManager.is_fullscreen = TRUE;

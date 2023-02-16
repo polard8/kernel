@@ -20,6 +20,7 @@
 
 #define WS_TITLEBAR      0x0100
 #define WS_TITLEBARICON  0x0200
+#define WS_TRANSPARENT   0x0400
 
 #define WS_HSCROLLBAR   0x1000
 #define WS_VSCROLLBAR   0x2000

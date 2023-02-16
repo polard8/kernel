@@ -83,6 +83,24 @@ typedef int  wid_t;
 // ...
 
 // ===============================================================
+// #todo
+// All the application windows
+// are gonna have a offscreen surface,
+// and then the compositor is gonna
+// copy them all into the backbuffer.
+
+struct desktop_composition_d
+{
+    int initialized;
+
+    int is_enabled;
+
+// Transparent window frames.
+    int use_transparence;
+// 2D visual effects associated with the composition method.
+    int use_visual_effects;
+    // ...
+};
 
 // The window manager global structure.
 struct gws_windowmanager_d
@@ -157,6 +175,12 @@ struct gws_windowmanager_d
     //struct gws_window_d *layer3_list;
     //struct gws_window_d *layer4_list;
 
+// #todo
+// All the application windows
+// are gonna have a offscreen surface,
+// and then the compositor is gonna
+// copy them all into the backbuffer.
+    struct desktop_composition_d comp;
 
 // A are de cliente de uma janela sera mostrada
 // na tela toda e essa flag sera acionada.
@@ -236,6 +260,7 @@ void wmInitializeStructure(void);
 
 #define WS_TITLEBAR      0x0100
 #define WS_TITLEBARICON  0x0200
+#define WS_TRANSPARENT   0x0400
 
 #define WS_HSCROLLBAR   0x1000
 #define WS_VSCROLLBAR   0x2000

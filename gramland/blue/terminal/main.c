@@ -3070,7 +3070,10 @@ int main ( int argc, char *argv[] )
                   client_fd,
                   WT_SIMPLE, 1, 1, "ter-client",
                   wLeft, wTop, wWidth, wHeight,
-                  main_window,0,COLOR_BLACK,COLOR_BLACK );
+                  main_window,
+                  0x0000,
+                  COLOR_BLACK,
+                  COLOR_BLACK );
 
     if (terminal_window<0){
         printf("terminal: fail on terminal_window\n");

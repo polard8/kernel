@@ -533,6 +533,10 @@ void *doCreateWindow (
         is_solid = FALSE;
     }
 
+// No flags for now.
+// It depends on the window style.
+    unsigned long __rop_flags=0;
+
 //---------------------------------------------------------
 
 
@@ -566,6 +570,16 @@ void *doCreateWindow (
     if (style & WS_FULLSCREEN)
     {
         Fullscreen=TRUE;
+    }
+
+    if (style & WS_TRANSPARENT)
+    {
+        Transparent=TRUE;
+        // Get the given flags.
+        __rop_flags = rop_flags;
+        //#test #hack
+        if ( __rop_flags == 0 )
+            __rop_flags = 20;  //gray
     }
 
 //---------------------------------------------------------
@@ -1451,7 +1465,7 @@ void *doCreateWindow (
                 rectBackbufferDrawRectangle ( 
                     (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, TRUE, rop_flags );
+                    __tmp_color, TRUE, __rop_flags );
             }
 
             if ( (void*) Parent != NULL )
@@ -1461,7 +1475,7 @@ void *doCreateWindow (
                 rectBackbufferDrawRectangle ( 
                     (window->left +1),     (window->top +1), 
                     (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, TRUE, rop_flags );
+                    __tmp_color, TRUE, __rop_flags );
             }
 
             //#todo
@@ -1537,7 +1551,7 @@ void *doCreateWindow (
             // This routine is calling the kernel to paint the rectangle.
             rectBackbufferDrawRectangle ( 
                     window->left, window->top, window->width, window->height, 
-                    window->bg_color, TRUE, rop_flags );
+                    window->bg_color, TRUE, __rop_flags );
         }
 
         // Draw the background if we have a parent window.
@@ -1547,7 +1561,7 @@ void *doCreateWindow (
             // This routine is calling the kernel to paint the rectangle.
             rectBackbufferDrawRectangle ( 
                 window->left, window->top, window->width, window->height, 
-                window->bg_color, TRUE, rop_flags );
+                window->bg_color, TRUE, __rop_flags );
         }
     }
 
