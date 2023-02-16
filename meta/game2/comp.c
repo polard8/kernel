@@ -2,7 +2,7 @@
 // comp.c
 
 // window server routines.
-#include "gramado.h"
+#include "gram3d.h"
 
 //global
 int comp_config_use_mouse = FALSE;

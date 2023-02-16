@@ -28,7 +28,7 @@ extern int current_mode;
 #include "nc2.h"   //nelson cole 2 font. 8x8
 
 // Graphics device library.
-#include <libgd.h>
+#include <libdisp.h>
 
 #include "char.h"
 #include "dtext.h"

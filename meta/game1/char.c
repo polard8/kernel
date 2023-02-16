@@ -5,7 +5,7 @@
  *     2019 - Created by Fred Nora.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 // Draw char support
 int gcharWidth=0;

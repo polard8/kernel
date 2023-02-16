@@ -62,7 +62,6 @@ user_ccflags += -fno-omit-frame-pointer
 user_ccflags += -fno-optimize-sibling-calls    
 	
 
-
 user_ldflags = -m elf_x86_64 -T ../link.ld
 
 #todo
@@ -71,8 +70,8 @@ user_ldflags = -m elf_x86_64 -T ../link.ld
 LIBC     = ../libs/rtl/include/
 LIBCOBJ  = ../libs/rtl/obj
 
-LIBGD     = ../libs/libgd/include/
-LIBGDOBJ  = ../libs/libgd/obj
+LIBDISP    = ../libs/libdisp/include/
+LIBDISPOBJ = ../libs/libdisp/obj
 
 WS_INCLUDES       = include/ 
 WS_INCLUDES_LOCAL = .
@@ -86,7 +85,7 @@ ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
 myObjects += globals.o 
-myObjects += libgd.o
+myObjects += libdisp.o
 
 myObjects += archive_basics1.o
 myObjects += archive_basics2.o
@@ -103,39 +102,39 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	$(CC)  -c  main.c     $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o main.o
-	$(CC)  -c  globals.c  $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o globals.o
+	$(CC)  -c  main.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o main.o
+	$(CC)  -c  globals.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o globals.o
 
 all-c:
 
 #basics1
-	$(CC)  -c  char.c      $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o char.o
-	$(CC)  -c  dtext.c     $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o dtext.o
+	$(CC)  -c  char.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o char.o
+	$(CC)  -c  dtext.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o dtext.o
 	$(LD) -r -o archive_basics1.o char.o dtext.o 
 
-	$(CC)  -c  line.c      $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o line.o
-	$(CC)  -c  rect.c      $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o rect.o
-	$(CC)  -c  window.c    $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o window.o
-	$(CC)  -c  gws.c       $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o gws.o
-	$(CC)  -c  comp.c      $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o comp.o
-	$(CC)  -c  bmp.c       $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o bmp.o
-	$(CC)  -c  connect.c   $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o connect.o
-	$(CC)  -c  button.c    $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o button.o
+	$(CC)  -c  line.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o line.o
+	$(CC)  -c  rect.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o rect.o
+	$(CC)  -c  window.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o window.o
+	$(CC)  -c  gws.c       $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o gws.o
+	$(CC)  -c  comp.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o comp.o
+	$(CC)  -c  bmp.c       $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o bmp.o
+	$(CC)  -c  connect.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o connect.o
+	$(CC)  -c  button.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o button.o
 	$(LD) -r -o archive_basics2.o \
 line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 
 #fx
-	$(CC)  -c  grprim.c    $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o grprim.o
-	$(CC)  -c  sprite.c    $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o sprite.o
-	$(CC)  -c  demos.c     $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o demos.o
+	$(CC)  -c  grprim.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o grprim.o
+	$(CC)  -c  sprite.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o sprite.o
+	$(CC)  -c  demos.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o demos.o
 	$(LD) -r -o archive_fx.o  grprim.o sprite.o demos.o 
 
 #extra
-	$(CC)  -c  xxxinput.c  $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o xxxinput.o
-	$(CC)  -c  font.c      $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I . -o font.o
+	$(CC)  -c  xxxinput.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o xxxinput.o
+	$(CC)  -c  font.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o font.o
 	$(LD) -r -o archive_extra.o  xxxinput.o font.o 
 
-	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I $(LIBGD) -I include/ -I .  -o wm.o
+	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I include/ -I .  -o wm.o
 
 #
 # == imported objects =============================
@@ -159,7 +158,7 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 
 #test
 	cp $(LIBCOBJ)/math.o .
-	cp $(LIBGDOBJ)/libgd.o .
+	cp $(LIBDISPOBJ)/libdisp.o .
 
 gws-link:
 	$(LD) $(user_ldflags) -o GAME1.BIN $(myObjects)

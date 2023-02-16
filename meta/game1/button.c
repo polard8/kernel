@@ -3,7 +3,7 @@
  *     Create button.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 /*
  * gws_draw_button:

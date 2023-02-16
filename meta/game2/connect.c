@@ -2,7 +2,7 @@
 // Register the window server in the system.
 
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 // Registered ?

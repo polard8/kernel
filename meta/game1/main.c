@@ -77,7 +77,7 @@ See: https://wiki.osdev.org/Graphics_stack
 // This file is part of this project.
 // It is NOT a library.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 #define VERSION  "0.1"

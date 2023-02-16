@@ -1,7 +1,7 @@
 
 // globals.c
 
-#include "gramado.h"
+#include "gram3d.h"
 
 // =========================
 // h:d.s

@@ -1,7 +1,7 @@
 
 // sprite.c
 
-#include "gramado.h"
+#include "gram3d.h"
 
 // Display all the sprites found in a given list.
 int gr_display_sprite_list( struct gws_sprite_d *root )

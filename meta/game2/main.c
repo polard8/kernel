@@ -77,7 +77,7 @@ See: https://wiki.osdev.org/Graphics_stack
 // This file is part of this project.
 // It is NOT a library.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 #define VERSION  "0.1"
@@ -2307,10 +2307,8 @@ serviceCreateWindow (int client_fd)
     char *p = (char *) &message_address[string_off];
     for (i=0; i<256; ++i)
     {
-        //r.data[i] = message_address[string_off];
         r.data[i] = *p;
         p++;
-        //string_off++;
     };
     r.data[i] = 0;
 //--
@@ -3505,7 +3503,6 @@ static int on_execute(void)
             (unsigned long) 16 );  //ms
         */
     }
-
 
 
 // #todo

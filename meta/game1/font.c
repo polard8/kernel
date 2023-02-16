@@ -2,7 +2,7 @@
 // todo: 
 // the font support.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 int gfontSize=0;

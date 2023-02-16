@@ -5,7 +5,7 @@
  *     2020 - Create by Fred Nora.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 extern int comp_config_use_mouse;
 
@@ -47,6 +47,12 @@ static const char *app4_string = "fileman.bin";
 
 
 static unsigned long last_input_jiffie=0;
+
+
+// global.
+// Permission:
+// TRUE = The kernel can use the handler.
+int g_handler_flag;
 
 
 // #todo
@@ -3674,7 +3680,7 @@ int wmSTDINInputReader(void)
                 GWS_KeyDown,   // msg code
                 buffer[i],    // long1
                 buffer[i] );  // long2
-            */
+              */
     };
 
     return (int) nreads;
@@ -3745,7 +3751,7 @@ int wmInputReader(void)
         if(i==(MSG_QUEUE_MAX-1)){
             __Status = rtl_get_event2(i,TRUE);
         }
-
+ 
         // reset
         //if (__Status!=TRUE){
         //    __Status = rtl_get_event2(i,TRUE);
@@ -3901,7 +3907,7 @@ int wmInputReader(void)
             {
                 if (comp_config_use_mouse == TRUE)
                 {
-                     /*
+                   /*
                     ???procedure( 
                         0,
                         RTLEventBuffer[1],
@@ -3910,8 +3916,7 @@ int wmInputReader(void)
                     */
                 }
             }
-            
-            
+
             // todo: get time for diagnoses. (jiffies)
             // mensagens desse tipo
             // devem ir para a janela com o foco de entrada.
@@ -3928,7 +3933,7 @@ int wmInputReader(void)
             // See: wm.c
             // IN: wid, msg_code, long1, long2
                 /*
-                ???procedure( 
+                ????procedure( 
                     0,    // #todo window with focus.
                     RTLEventBuffer[1],
                     RTLEventBuffer[2],

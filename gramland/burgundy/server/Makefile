@@ -67,11 +67,11 @@ CFLAGS += -fno-optimize-sibling-calls
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 LIBC      = ../../libs/rtl/include/
 LIBCOBJ   = ../../libs/rtl/obj
-LIBGD     = ../../libs/libgd/include/
-LIBGDOBJ  = ../../libs/libgd/obj
+LIBDISP     = ../../libs/libdisp/include/
+LIBDISPOBJ  = ../../libs/libdisp/obj
 
 CINCLUDES  = -I $(LIBC)  
-CINCLUDES += -I $(LIBGD)
+CINCLUDES += -I $(LIBDISP)
 CINCLUDES += -I .    
 
 LDFLAGS = -m elf_x86_64 -T ../../link.ld
@@ -82,7 +82,7 @@ ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
 myObjects += globals.o 
-myObjects += libgd.o
+myObjects += libdisp.o
 
 myObjects += archive_basics1.o
 myObjects += archive_basics2.o
@@ -151,7 +151,7 @@ line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 	cp $(LIBCOBJ)/ioctl.o .
 	cp $(LIBCOBJ)/fcntl.o .
 
-	cp $(LIBGDOBJ)/libgd.o .
+	cp $(LIBDISPOBJ)/libdisp.o .
 
 gws-link:
 	$(LD) $(LDFLAGS) -o GWSSRV.BIN $(myObjects)

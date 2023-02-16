@@ -18,7 +18,7 @@
 // atualizado. (rect)
 
 
-#include "gramado.h"
+#include "gram3d.h"
 
 #define OVERLAPPED_MIN_WIDTH    80
 #define OVERLAPPED_MIN_HEIGHT   80

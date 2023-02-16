@@ -2,8 +2,8 @@
 // libgd.h
 // graphics device library.
 
-#ifndef __LIBGD_H
-#define __LIBGD_H  1
+#ifndef __LIBDISP_H
+#define __LIBDISP_H  1
 
 #include "vk.h"       // # view input events
 #include "lt8x8.h"
@@ -55,14 +55,6 @@ frontbuffer_putpixel (
     unsigned long _x, 
     unsigned long _y, 
     unsigned long _rop_flags );
-
-int 
-libgd_putpixel ( 
-    unsigned int color, 
-    int x, 
-    int y,
-    unsigned long rop,
-    int back_or_front );
 
 unsigned int grBackBufferGetPixelColor( int x, int y );
 

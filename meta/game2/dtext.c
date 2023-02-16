@@ -3,7 +3,7 @@
  *     Draw text routines.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 // grDrawString:

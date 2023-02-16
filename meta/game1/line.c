@@ -2,7 +2,7 @@
 // line.c 
 // We are using the library libgd.o.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 //#bugbug: use unsigned int for 'color'.

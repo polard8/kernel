@@ -6,7 +6,7 @@
 // Here we gonna call the routines in the device driver.
 // It is an abstraction.
 
-#include "include/libgd.h"
+#include "include/libdisp.h"
 
 //
 // private

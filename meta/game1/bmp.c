@@ -15,7 +15,7 @@
  *            Ported from older versions in the system.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 // Flag que avisa que deve haver alguma mudança nas cores. 
 int bmp_change_color_flag = FALSE;

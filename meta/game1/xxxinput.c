@@ -6,16 +6,12 @@
 // nem seu se devemos colocar isso realmente aqui ...
 // mas precisamos ter rotinas como essas em algum lugar que não seja o kernel.
 
-
 // #test
 // Colocando aqui algumas rotinas de input.
 // São específicas para o gramado.
 // Começaremos com as rotinas de mouse.
 
-#include "gramado.h"
-
-
-
+#include "gram3d.h"
 
 // =============================================================
 

@@ -2,7 +2,7 @@
 // demos.c
 // A place for demos.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 struct gws_window_d *__demo_window;
 

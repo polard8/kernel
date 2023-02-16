@@ -14,7 +14,7 @@ all:
 # libs
 	make -C libs/rtl
 	make -C libs/libgws
-	make -C libs/libgd
+	make -C libs/libdisp
 
 # burgundy: Unit 3
 	make -C burgundy/server
@@ -34,7 +34,7 @@ clean-all:
 	-rm -f beige/bin/*.BIN
 	-rm -f blue/bin/*.BIN
 	-rm -f burgundy/bin/*.BIN
-	-rm -f libs/libgd/obj/*.o
+	-rm -f libs/libdisp/obj/*.o
 	-rm -f libs/libgws/obj/*.o
 	-rm -f libs/rtl/obj/*.o
 

@@ -2,7 +2,7 @@
 // rect.c 
 // Rectangle support for gws.
 
-#include "gramado.h"
+#include "gram3d.h"
 
 //
 // == private functions: prototypes ====================

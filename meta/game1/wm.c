@@ -5,7 +5,7 @@
  *     2020 - Create by Fred Nora.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 extern int comp_config_use_mouse;
 

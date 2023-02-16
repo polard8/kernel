@@ -1,13 +1,11 @@
 
-// libgd.c 
+// libdisp.c 
 // #todo
 // The goal here is building a graphics library interface.
 // Here we gonna call the routines in the device driver.
 // It is an abstraction.
 
-
-#include "include/libgd.h"
-
+#include "include/libdisp.h"
 
 //
 // private

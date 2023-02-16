@@ -28,19 +28,14 @@ CFLAGS = -m64 \
 	-s \
 	-Werror=strict-prototypes    
 
-
 LIBS = -I.  -I ../rtl/include/
-
 
 .PHONY: all all-c finalize clean
 
 all: all-c finalize clean
 	@echo "Ok?"
-
 all-c:
-
-	gcc -c libgd.c  $(CFLAGS) $(LIBS) -o libgd.o
-
+	gcc -c libdisp.c  $(CFLAGS) $(LIBS) -o libdisp.o
 finalize:
 	-mkdir obj/
 	-cp *.o obj/

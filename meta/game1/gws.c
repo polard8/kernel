@@ -6,7 +6,7 @@
  */
 
 // Window server routines.
-#include "gramado.h"
+#include "gram3d.h"
 
 int dirty=0;
 int background=0;

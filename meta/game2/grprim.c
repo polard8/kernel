@@ -5,7 +5,7 @@
  *     2020 - Created by Fred Nora.
  */
 
-#include "gramado.h"
+#include "gram3d.h"
 
 
 // The projection structure.

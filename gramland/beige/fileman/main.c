@@ -746,15 +746,29 @@ int main ( int argc, char *argv[] )
     register int index=0;
     gMaxIndex = NUMBER_OF_WINDOWS;
 
-    if (current_mode==GRAMADO_JAIL){
-        gMaxIndex=3;
+    //if (current_mode==GRAMADO_JAIL){
+    //    gMaxIndex=3;
+    //}
+
+    gMaxIndex = (cwHeight/24);
+
+    if (cwHeight <= 24){
+        printf ("cwHeight is too small\n");
+        exit(1);
+    }
+
+    if (cwHeight < (3*24)){
+        //printf ("cwHeight is too small\n");
+        //exit(1);
+        gMaxIndex = 1;
     }
 
     unsigned long iLeft   = 0;
     unsigned long iTop    = 0;
     unsigned long iWidth  = cwWidth;  // mesma largura da client window.
-    unsigned long iHeight = (cwHeight/gMaxIndex);
-
+    //unsigned long iHeight = (cwHeight/gMaxIndex);
+    unsigned long iHeight = 24;
+    
     unsigned int ItemColor=COLOR_WHITE;
 
     for (index=0; index<gMaxIndex; index++)
