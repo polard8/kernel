@@ -1137,14 +1137,23 @@ void console_outbyte (int c, int console_number)
             (CONSOLE_TTYS[n].cursor_bottom -1);
     }
 
-// Imprime os caracteres normais.
+
+
+//draw:
+// Draw in x*8 | y*8.
+// Only if the echo mode is enabled.
 // Nesse momento imprimiremos os caracteres.
 // Imprime os caracteres normais.
 // Atualisa o prev.
 
-//draw:
-    // Draw in x*8 | y*8.
-    __ConsoleOutbyte(Ch,n);
+// local modes
+    tcflag_t c_lflag = 
+        (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
+
+    if (c_lflag & ECHO){
+        __ConsoleOutbyte(Ch,n);
+    }
+
     prev = Ch;
 }
 
@@ -1387,15 +1396,23 @@ void console_outbyte2 (int c, int console_number)
             (CONSOLE_TTYS[n].cursor_bottom -1);
     }
 
-// Imprime os caracteres normais.
+
+// draw:
+// Draw in x*8 | y*8.
+// Don't change the position.
+// Only if the echo mode is enabled.
 // Nesse momento imprimiremos os caracteres.
 // Imprime os caracteres normais.
-// Atualisa o prev.
 
-//draw:
-    // Draw in x*8 | y*8.
-    // Don't change the position.
-    __ConsoleOutbyte(Ch,n);
+// local modes
+    tcflag_t c_lflag = 
+        (tcflag_t) CONSOLE_TTYS[n].termios.c_lflag;
+    
+    if (c_lflag & ECHO){
+        __ConsoleOutbyte(Ch,n);
+    }
+
+// Atualisa o prev.
     prev = Ch;
 
 
@@ -2270,7 +2287,36 @@ console_read (
     const void *buf, 
     size_t count )
 {
-    debug_print ("console_read: [TODO]\n");
+// #todo
+// Not fully implemented!
+
+// Console number
+    if (console_number < 0 || console_number > 3){
+        printf ("console_read: [FAIL] console_number\n");
+        goto fail;
+    }
+// Buffer
+    if ( (void *) buf == NULL ){
+        printf ("console_read: buf\n");
+        goto fail;
+    }
+// Count
+    if (!count){
+        printf ("console_read: count\n");
+        goto fail;
+    }
+
+    //debug_print ("console_read: [TODO]\n");
+
+/*
+// #test
+    __tty_read( 
+        (struct tty_d *) &CONSOLE_TTYS[console_number],
+        buf,
+        count );
+*/
+
+fail:
     return -1;  //todo
 }
 
@@ -2323,6 +2369,15 @@ console_write (
 // Write string
 //   
 
+/*
+// #test
+    __tty_write( 
+        (struct tty_d *) &CONSOLE_TTYS[console_number],
+        buf,
+        count );
+*/
+
+
 // Isso eh o contador de estagios do escape sequence.
 // Vamos percorret todos os bytes da sequencia quando
 // encontrarmos o marcador.
@@ -2354,8 +2409,6 @@ console_write (
                // ascii, not abnt2
                if (ch >= 32 && ch <= 127){
                     
-                    // Draw and refresh.
-                    //console_putchar ( ch, console_number );
                     // Draw and refresh.
                     console_outbyte2 ( ch, console_number );
                

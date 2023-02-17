@@ -1067,6 +1067,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
+        goto fail;
     }
 
 // =======================================================
@@ -1088,6 +1089,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
+        goto fail;
     }
 
 // =======================================================
@@ -1099,6 +1101,7 @@ ssize_t sys_write (int fd, char *ubuf, size_t count)
         if (fp->____object == ObjectTypeFile){
             goto RegularFile;
         }
+        goto fail;
     }
 
 //

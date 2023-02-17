@@ -118,10 +118,14 @@ struct termios_d
     tcflag_t c_iflag;      // input modes 
     tcflag_t c_oflag;      // output modes 
 
-    tcflag_t c_cflag;      // control modes 
-    tcflag_t c_lflag;      // local modes 
+// control modes
+// Describes the hardware control of the terminal.
+    tcflag_t c_cflag; 
+// local modes 
+// Controls various terminal functions.
+    tcflag_t c_lflag;
 
-    //unsigned char c_line;  // line discipline (linux?) 
+    //unsigned char c_line;
     cc_t c_cc[NCCS];       // control characters 
 
     speed_t  c_ispeed;     // input speed 
