@@ -156,6 +156,9 @@
 #define MSG_GWS_QUIT    4080
 
 // drain input 8080
+
+#define MSG_HOTKEY 8888
+
 // switch focus 9090
 // refresh dirty rectangles 9091
 // update desktop 9092

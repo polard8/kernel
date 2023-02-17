@@ -49,6 +49,8 @@
 
 #define GWS_DrainInput            8080
 
+#define GWS_HotKey  8888
+
 //#todo
 //#define GWS_SwitchFocus    9090
 

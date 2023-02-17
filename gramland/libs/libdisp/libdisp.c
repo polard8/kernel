@@ -73,6 +73,12 @@ libgd_put_pixel(
 // Draw 4bytes pixel.
 // 32bpp.
 
+    //#todo
+    //unsigned int *p = (unsigned int *) address; 
+    //p[0] = (unsigned int) color;
+
+// #todo
+// Não precisa ser assim.
     *(unsigned int*)( (unsigned int*) address ) = (unsigned int) color;
 }
 */

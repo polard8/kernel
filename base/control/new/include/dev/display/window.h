@@ -98,6 +98,8 @@
 
 //outros (40 - ...)
 #define MSG_COMMAND       40
+#define MSG_SYSCOMMAND  MSG_COMMAND
+
 #define MSG_CUT           41
 
 #define MSG_COPY          42
@@ -164,6 +166,9 @@
 // O número do evento será entregue em long1.
 #define MSG_HSCROLL  2000
 #define MSG_VSCROLL  2001
+
+#define MSG_HOTKEY  8888
+
 
 // 
 // Window type

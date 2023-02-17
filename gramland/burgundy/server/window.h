@@ -1265,9 +1265,6 @@ struct gws_surface_d *xxxCreateSurface(
     unsigned long height,
     unsigned long color );
 
-void wm_flush_rectangle(struct gws_rect_d *rect);
-void wm_flush_window(struct gws_window_d *window);
-void wm_flush_screen(void);
 
 void wm_reboot(void);
 
@@ -1302,13 +1299,7 @@ wmPostMessage(
     unsigned long long1,
     unsigned long long2 );
 
-void 
-wmCompose(
-    unsigned long jiffies, 
-    unsigned long clocks_per_second );
 
-void wmRefreshDirtyRectangles(void);
-void flush_frame(void);
 
 void wm_update_window_by_id(int wid);
 void wm_update_active_window(void);
@@ -1364,15 +1355,7 @@ is_within (
 
 //refaz zorder.
 void reset_zorder(void);
-void validate_window (struct gws_window_d *window);
 
-void invalidate_window_by_id( int wid );
-void invalidate_window (struct gws_window_d *window);
-
-void invalidate_root_window(void);
-void invalidate_taskbar_window(void);
-void __begin_paint(struct gws_window_d *window);
-void __end_paint(struct gws_window_d *window);
 
 // #todo
 // Precisamos usar o esquema de cores.
@@ -1523,9 +1506,8 @@ copy_offset_rect (
     unsigned long cx, 
     unsigned long cy ); 
     
-int gws_show_window_rect (struct gws_window_d *window);
-int flush_window (struct gws_window_d *window);
-int flush_window_by_id(int wid);
+
+
 
 void *xxxCreateSurfaceWindow( 
     unsigned long type,        // 1, Tipo de janela (popup,normal,...)
@@ -1543,21 +1525,6 @@ void *xxxCreateSurfaceWindow(
 
 void create_taskbar (unsigned long tb_height);
 struct gws_window_d *wmCreateRootWindow(unsigned int bg_color);
-
-
-//worker: no checks
-void 
-__draw_window_border( 
-    struct gws_window_d *parent, 
-    struct gws_window_d *window );
-
-void 
-__draw_button_borders(
-    struct gws_window_d *w,
-    unsigned int color1,
-    unsigned int color2,
-    unsigned int color2_light,
-    unsigned int outer_color );
 
 void do_create_controls( struct gws_window_d *window);
 
@@ -1672,21 +1639,6 @@ gwssrv_change_window_position (
     struct gws_window_d *window, 
     unsigned long x, 
     unsigned long y );
-
-int 
-redraw_window (
-    struct gws_window_d *window, 
-    unsigned long flags ); 
-
-int redraw_window_by_id(int wid, unsigned long flags);
-
-int clear_window_by_id(int wid, unsigned long flags);
-
-
-int 
-update_window ( 
-    struct gws_window_d *window, 
-    unsigned long flags );
 
 void gwsWindowLock (struct gws_window_d *window);
 void gwsWindowUnlock (struct gws_window_d *window);

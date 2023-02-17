@@ -41,6 +41,7 @@ extern int current_mode;
 #include "menu.h"
 #include "grinput.h"   //#test
 #include "window.h"
+#include "painter.h"
 #include "bmp.h"
 
 // h:0.0
@@ -191,7 +192,8 @@ unsigned long gwssrv_get_system_metrics (int index);
 
 void gwssrv_enter_critical_section (void);
 void gwssrv_exit_critical_section (void);
-void gwssrv_show_backbuffer (void);
+
+
 
 char *gwssrv_get_version(void);
 

@@ -157,6 +157,8 @@ typedef struct _gRep gRep;
 
 //outros (40 - ...)
 #define GWS_Command  40
+#define GWS_SysCommand  GWS_Command
+
 #define GWS_Cut      41
 #define GWS_Copy     42
 #define GWS_Paste    43
@@ -243,6 +245,8 @@ typedef struct _gRep gRep;
 
 #define GWS_DrainInput    8080
 // ...
+
+#define GWS_HotKey  8888
 
 // #test
 #define GWS_SwitchFocus    9090

@@ -6,6 +6,7 @@
 
 #include <kernel.h>
 
+static int __prefix=0;
 
 //
 // == private functions: prototypes ================
@@ -92,6 +93,8 @@ void ps2kbd_initialize_device (void)
     wait_then_write(I8042_STATUS, 0xae);
     keyboard_expect_ack();
 
+    __prefix=0;
+
     PS2Keyboard.initialized = TRUE;
 }  
 
@@ -127,9 +130,9 @@ void ps2kbd_initialize_device (void)
 
 void DeviceInterface_PS2Keyboard(void)
 {
-    unsigned char __raw = 0;
-    unsigned char val = 0;
-    static int __prefix=0;
+// Make/Break code.
+    unsigned char __raw=0;
+    unsigned char val=0;
     // Usado nos testes
     //struct process_d *p;
     // Usado pra checar se a foreground thread quer raw input.
@@ -155,7 +158,7 @@ void DeviceInterface_PS2Keyboard(void)
         ? TRUE 
         : FALSE;
 // Yes it is a mouse.
-    if ( is_mouse_device == TRUE )
+    if (is_mouse_device == TRUE)
         return;
 
 // =============================================
@@ -257,9 +260,13 @@ sc_again:
 CheckByte:
 
 // Check prefix for extended keyboard sequence.
-    if (__raw == 0xE0 || __raw == 0xE1)
-    {
-        __prefix = (int) (__raw & 0xFF);
+
+    if (__raw == 0xE0){
+        __prefix = (int) (__raw & 0x000000FF);
+        goto done;
+    }
+    if (__raw == 0xE1){
+        __prefix = (int) (__raw & 0x000000FF);
         goto done;
     }
 
@@ -268,7 +275,8 @@ CheckByte:
 NormalByte:
 
 // #opçao
-// Apenas enfileira os raw bytes.
+// Apenas enfileira os raw bytes e n~ao processa.
+    //if ( flag ...
    // put_rawbyte(__raw)
  
 // We don't need this.
@@ -276,9 +284,9 @@ NormalByte:
 // to the windows server.
 // see: tty/kgwm.c
 // IN: tid, scancode, prefix.
-       wmKeyEvent( 
-           (unsigned char) __raw,
-           (int) (__prefix & 0xFF) );
+    wmKeyEvent( 
+        (unsigned char) __raw,
+        (int) (__prefix & 0xFF) );
 
 // Clean the mess.
     __prefix=0;

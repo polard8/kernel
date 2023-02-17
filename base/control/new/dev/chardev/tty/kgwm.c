@@ -543,6 +543,8 @@ wmProcedure (
                 }
                 if (shift_status == TRUE){
                     //post_message_to_ws( NULL, (int) 88105,0, 0 );
+                    //post_message_to_foreground_thread(
+                    //    NULL, ??, 1234, 1234 );
                 }
                 return 0;
                 break;
@@ -588,6 +590,8 @@ wmProcedure (
                 }
                 if (shift_status == TRUE){
                     //post_message_to_ws( NULL, (int) 88108,0, 0 );
+                    // MSG_HOTKEY=8888 | 1 = Hotkey id 1.
+                    post_message_to_ws( NULL, (int) MSG_HOTKEY, 1, 0 );
                 }
                 return 0;
                 break;
@@ -858,6 +862,7 @@ wmKeyEvent(
     int prefix )
 {
 // Post keyboard event to the current foreground thread.
+// Called by the keyboard handler.
 
     int Prefix = (int) (prefix & 0xFF);
 
@@ -895,6 +900,10 @@ wmKeyEvent(
 
     // true for keyup and false for keydown.
     // int Break = TRUE;
+
+    // #todo
+    //if ( raw_byte & 0x80 )
+    //    Break = TRUE;
 
 //#todo
     //debug_print("xxxKeyEvent:\n");
@@ -1373,11 +1382,9 @@ done:
         // que representam comandos.
         if (Event_Message == MSG_KEYDOWN)
         {
-            // Se uma tecla de controle estiver acionada,
-            // então não mandamos o evento para o arquivo,
-            // pois vamos chamar o procedimento local e
-            // considerarmos a combinação de teclas, 
-            // antes de enviarmos o evento.
+            // Nenhuma tecla de controle esta acionada,
+            // então vamos colocar a tecla no arquivo de input.
+            // Somente keydown. (make).
             if ( alt_status != TRUE && 
                  ctrl_status != TRUE && 
                  shift_status != TRUE )
@@ -1434,6 +1441,7 @@ done:
 // Como a chamada aos consoles do kernel ou control+alt+del.
 
     // ShellFlag == TRUE
+
     __Status = 
         (int) wmProcedure(
         (struct window_d *) Event_Window,    // opaque pointer

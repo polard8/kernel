@@ -30,6 +30,212 @@ static void draw_mouse_pointer(void);
 
 // --------------------------
 
+// Refresh screen via kernel.
+// Copy the backbuffer in the frontbuffer(lfb).
+// #??
+// It uses the embedded window server in the kernel.
+//#define	SYSTEMCALL_REFRESHSCREEN        11
+// #todo
+// trocar o nome dessa systemcall.
+// refresh screen será associado à refresh all windows.
+
+void gwssrv_show_backbuffer(void)
+{
+    // #todo: Just invalidate root window.
+    gramado_system_call(11,0,0,0);
+}
+
+
+int flush_window (struct gws_window_d *window)
+{
+    return (int) gws_show_window_rect(window);
+}
+
+int flush_window_by_id(int wid)
+{
+    struct gws_window_d *w;
+
+// wid
+    if (wid<0 || wid>=WINDOW_COUNT_MAX)
+        return -1;
+// Structure validation
+    w = (void*) windowList[wid];
+    if ( (void*) w == NULL )
+        return -1;
+
+// Flush
+    flush_window(w);
+    return 0;
+}
+
+// #bugbug
+// This name is wrong.
+// A frame can be only a window inside a client application.
+void flush_frame(void)
+{
+    wm_flush_screen();
+}
+
+/*
+ * wmRefreshDirtyRectangles: 
+ */
+// Called by compose().
+// O compositor deve ser chamado para compor um frame 
+// logo após uma intervenção do painter, que reaje às
+// ações do usuário.
+// Ele não deve ser chamado X vezes por segundo.
+// Quem deve ser chamado X vezes por segundo é a rotina 
+// de refresh, que vai efetuar refresh dos retângulos sujos e
+// dependendo da ação do compositor, o refresh pode ser da tela toda.
+
+void wmRefreshDirtyRectangles(void)
+{
+// Called by compose.
+// + We need to encapsulate the variables used by this routine
+//   to prevent about concorrent access problems.
+
+    register int i=0;
+    struct gws_window_d *tmp;
+
+// #debug
+    //gwssrv_debug_print("wmRefreshDirtyRectangles:\n");
+
+//==========================================================
+// ++  Start
+
+    //t_start = rtl_get_progress_time();
+
+//
+// == Update screen ====================
+//
+
+// Redrawing all the windows.
+// redraw using zorder.
+// refresh using zorder.
+// Invalidating all the windows ... 
+// and it will be flushed into the framebuffer for the ring0 routines.
+
+// ======================================================
+// Flush
+// #todo #bugbug
+// Flush all the dirty windows into the framebuffer.
+// It will lookup the main window list.
+// This is a very slow way of doing this.
+// But it is just a test.
+
+// ??
+    //int UpdateScreenFlag=FALSE;
+    //int UpdateScreenFlag=TRUE;
+    //if (UpdateScreenFlag != TRUE){
+    //    return;
+    //}
+
+
+// Refresh
+// Lookup the main window list.
+// #todo: This is very slow. We need a linked list.
+// Get next
+// It is a valid window and
+// it is a dirty window.
+// Flush the window's rectangle.
+// see: rect.c
+
+    for (i=0; i<WINDOW_COUNT_MAX; ++i)
+    {
+        tmp = (struct gws_window_d *) windowList[i];
+
+        if ( (void*) tmp != NULL )
+        {
+            if ( tmp->used == TRUE && tmp->magic == 1234 )
+            {
+                if (tmp->dirty == TRUE)
+                {
+                    //Wrappers
+                    //wm_flush_window(tmp);       //checking parameters
+                    //gws_show_window_rect(tmp);  //checking parameters and invalidate.
+                    // Direct, no checks.
+
+                    gws_refresh_rectangle ( 
+                        tmp->left, tmp->top, tmp->width, tmp->height ); 
+
+                    validate_window(tmp);
+                }
+            }
+        }
+    };
+}
+
+
+
+/*
+ * gws_show_window_rect:
+ *     Mostra o retângulo de uma janela que está no backbuffer.
+ *     Tem uma janela no backbuffer e desejamos enviar ela 
+ * para o frontbuffer.
+ *     A rotina de refresh rectangle tem que ter o vsync
+ *     #todo: criar um define chamado refresh_window.
+ */
+// ??
+// Devemos validar essa janela, para que ela 
+// não seja redesenhada sem antes ter sido suja?
+// E se validarmos alguma janela que não está pronta?
+// #test: validando
+
+int gws_show_window_rect (struct gws_window_d *window)
+{
+    //struct gws_window_d  *p;
+
+    //#debug
+    //debug_print("gws_show_window_rect:\n");
+
+// Structure validation
+    if ( (void *) window == NULL ){
+        return -1;
+    }
+    if (window->used != TRUE) { return -1; }
+    if (window->magic != 1234){ return -1; }
+
+//#shadow 
+// ?? E se a janela tiver uma sombra, 
+// então precisamos mostrar a sombra também. 
+//#bugbug
+//Extranhamente essa checagem atraza a pintura da janela.
+//Ou talvez o novo tamanho favoreça o refresh rectangle,
+//ja que tem rotinas diferentes para larguras diferentes
+
+    //if ( window->shadowUsed == 1 )
+    //{
+        //window->width = window->width +4;
+        //window->height = window->height +4;
+
+        //refresh_rectangle ( window->left, window->top, 
+        //    window->width +2, window->height +2 ); 
+        //return (int) 0;
+    //}
+
+    //p = window->parent;
+
+
+// Refresh rectangle
+// See: rect.c   
+
+    gws_refresh_rectangle ( 
+        window->left, 
+        window->top, 
+        window->width, 
+        window->height ); 
+
+    validate_window(window);
+
+    return 0;
+
+fail:
+    debug_print("gws_show_window_rect: fail\n");
+    return (int) -1;
+}
+
+
+
 void set_refresh_pointer_status(int value)
 {
     if (value != FALSE && value != TRUE)
@@ -184,6 +390,31 @@ void compose(void)
 
     // return;
 }
+
+// Called by the main routine for now.
+// Its gonne be called by the timer.
+// See: comp.c
+void 
+wmCompose(
+    unsigned long jiffies, 
+    unsigned long clocks_per_second )
+{
+    if (__compose_lock == TRUE)
+        return;
+
+    __compose_lock = TRUE;
+    compose();
+    __compose_lock = FALSE;
+}
+
+/*
+// Marca como 'dirty' todas as janelas filhas,
+// dai o compositor faz o trabalho de exibir na tela.
+void refresh_subwidnows( struct gws_window_d *w );
+void refresh_subwidnows( struct gws_window_d *w )
+{
+}
+*/
 
 
 // global
