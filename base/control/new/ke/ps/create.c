@@ -59,8 +59,8 @@ struct thread_d *create_init_thread (void)
 // priority: low
 
     t->type = THREAD_TYPE_SYSTEM;
-    t->base_priority = PRIORITY_SYSTEM;  // Static
-    t->priority      = PRIORITY_SYSTEM;  // Dynamic
+    t->base_priority = PRIORITY_SYSTEM_THRESHOLD;  // Static
+    t->priority      = PRIORITY_SYSTEM_THRESHOLD;  // Dynamic
 
     // #todo
     // #bugbug
@@ -185,7 +185,7 @@ struct thread_d *create_init_thread (void)
     // Jiffies
     t->step = 0; 
 
-    t->quantum           = QUANTUM_MIN;
+    t->quantum           = QUANTUM_NORMAL_THRESHOLD;
     t->quantum_limit_min = QUANTUM_MIN;
     t->quantum_limit_max = QUANTUM_MAX;
 

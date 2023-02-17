@@ -326,14 +326,15 @@ post_message_to_tid (
     t->runningCount = 0;
     t->runningCount_ms = 0;
 
+
 // Giving more credits to the receiver.
 // The receiver will lose this time in the scheduler.
 // The scheduler will balance the credits.
-    t->quantum = (t->quantum + QUANTUM_BOOST);
+    //t->quantum = (t->quantum + QUANTUM_BOOST);
+    //if (t->quantum > QUANTUM_MAX){
+    //    t->quantum = QUANTUM_MAX;
+    //}
 
-    if (t->quantum > QUANTUM_MAX){
-        t->quantum = QUANTUM_MAX;
-    }
 
 // Wake up the target thread?
     // wakeup_thread(t->tid);
@@ -676,7 +677,7 @@ set_thread_priority (
 
 // Se a prioridade basica pertencer a classe de tempo real
 // nao podemos mudar a prioridade.
-    if (BasePriority > PRIORITY_NORMAL){ return; }
+    //if (BasePriority > PRIORITY_SYSTEM_THRESHOLD){ return; }
 
 // Limits again
     if (priority > PRIORITY_MAX){

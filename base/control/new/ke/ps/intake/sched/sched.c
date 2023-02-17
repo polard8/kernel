@@ -123,9 +123,9 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
     }
 
     // Estabiliza a idle thread.
-    Idle->base_priority = PRIORITY_SYSTEM;
-    Idle->priority      = PRIORITY_SYSTEM;
-    Idle->quantum = QUANTUM_THRESHOLD;  // Credits.
+    Idle->base_priority = PRIORITY_SYSTEM_THRESHOLD;
+    Idle->priority      = PRIORITY_SYSTEM_THRESHOLD;
+    Idle->quantum = QUANTUM_NORMAL_THRESHOLD;  // Credits.
 
     //Idle->affinity_processor = 0;
     //Idle->current_processor = 0;
@@ -244,10 +244,10 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Checa se temos problemas com a prioridade base.
                 // Estabiliza.
                 if (TmpThread->base_priority < PRIORITY_MIN){
-                    TmpThread->base_priority=PRIORITY_NORMAL;
+                    TmpThread->base_priority=PRIORITY_MIN;
                 }
                 if (TmpThread->base_priority > PRIORITY_MAX){
-                    TmpThread->base_priority=PRIORITY_NORMAL;
+                    TmpThread->base_priority=PRIORITY_MAX;
                 }
                 // Voltamos para a base depois de checada a base.
                 // Caso tenha havido algum problema na 
@@ -270,16 +270,16 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 
                 // Balance all.
                 // Priority normal. balance.
-                TmpThread->quantum = QUANTUM_Q2;
+                TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
 
                 // Init thread: low
                 if ( TmpThread == Idle ){
-                    TmpThread->quantum = QUANTUM_THRESHOLD;
+                    TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
                 }
 
                 // Foreground thread: high
                 if ( TmpThread->tid == foreground_thread ){
-                    TmpThread->quantum = QUANTUM_TIME_CRITICAL_RT;
+                    TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
                 }
 
                 // Window server: Very high
@@ -288,7 +288,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 if (WindowServerInfo.initialized == TRUE)
                 {
                     if (TmpThread->tid == WindowServerInfo.tid)
-                        TmpThread->quantum = QUANTUM_MAX;
+                        TmpThread->quantum = QUANTUM_SYSTEM_THRESHOLD;
                 }
 
             }

@@ -1001,8 +1001,8 @@ struct thread_d *create_thread (
 // The parameters needs to provide us this information.
 
     Thread->type = THREAD_TYPE_SYSTEM; 
-    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM;  //static
-    Thread->priority      = (unsigned long) PRIORITY_SYSTEM;  //dynamic
+    Thread->base_priority = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //static
+    Thread->priority      = (unsigned long) PRIORITY_SYSTEM_THRESHOLD;  //dynamic
 
     Thread->plane = FOREGROUND_THREAD;
 
@@ -1108,7 +1108,7 @@ try_next_slot:
     Thread->step = 0;
 
 // Quantum.
-    Thread->quantum           = QUANTUM_MIN;
+    Thread->quantum           = QUANTUM_NORMAL_THRESHOLD;
     Thread->quantum_limit_min = QUANTUM_MIN; 
     Thread->quantum_limit_max = QUANTUM_MAX; 
 

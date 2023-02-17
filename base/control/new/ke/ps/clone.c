@@ -983,19 +983,19 @@ do_clone:
 
 
 // Threshold
-    parent_thread->priority = PRIORITY_THRESHOLD;
-    child_thread->priority  = PRIORITY_THRESHOLD;
-    parent_thread->quantum  = QUANTUM_THRESHOLD;
-    child_thread->quantum   = QUANTUM_THRESHOLD;
+    parent_thread->priority = PRIORITY_NORMAL_THRESHOLD;
+    child_thread->priority  = PRIORITY_NORMAL_THRESHOLD;
+    parent_thread->quantum  = QUANTUM_NORMAL_THRESHOLD;
+    child_thread->quantum   = QUANTUM_NORMAL_THRESHOLD;
 
 // Time critical
     if ( parent_thread->type == THREAD_TYPE_SYSTEM ||
          child_thread->type == THREAD_TYPE_SYSTEM )
     {
-        parent_thread->priority = PRIORITY_TIME_CRITICAL;
-        child_thread->priority  = PRIORITY_TIME_CRITICAL;
-        parent_thread->quantum  = QUANTUM_TIME_CRITICAL;
-        child_thread->quantum   = QUANTUM_TIME_CRITICAL;
+        parent_thread->priority = PRIORITY_SYSTEM_THRESHOLD;
+        child_thread->priority  = PRIORITY_SYSTEM_THRESHOLD;
+        parent_thread->quantum  = QUANTUM_SYSTEM_THRESHOLD;
+        child_thread->quantum   = QUANTUM_SYSTEM_THRESHOLD;
     }
 
 // Select for execution

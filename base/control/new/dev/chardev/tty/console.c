@@ -1645,7 +1645,7 @@ void __test_process(void)
     p = (void*) sys_create_process ( 
             NULL, NULL, NULL,       // room, desktop, window
             0,                      // Reserved
-            PRIORITY_HIGH,          // priority
+            PRIORITY_NORMAL_THRESHOLD,          // priority
             get_current_process(),  // ppid
             "no-name",              // name
             RING3 );                // iopl 
@@ -1682,7 +1682,7 @@ void __test_thread(void)
         (struct thread_d *) create_thread ( 
                                 NULL, NULL, NULL,  // room desktop window 
                                 __dummy_thread,    // init_rip, 
-                                PRIORITY_HIGH, 
+                                PRIORITY_NORMAL_THRESHOLD, 
                                 get_current_process(), 
                                 "no-name",
                                 RING0,

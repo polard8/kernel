@@ -239,7 +239,9 @@ sixth..     ide5, usually PCI, probed
 //...
 
 // See: ps/quantum.h
-#define CONFIG_QUANTUM_MULTIPLIER    1
+//#define CONFIG_QUANTUM_MULTIPLIER    1
+//#define CONFIG_QUANTUM_MULTIPLIER    2
+#define CONFIG_QUANTUM_MULTIPLIER    3
 
 #endif 
 

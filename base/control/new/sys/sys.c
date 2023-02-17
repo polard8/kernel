@@ -4,7 +4,6 @@
 #include <kernel.h> 
 
 
-
 // See:
 // kunistd.h
 // https://man7.org/linux/man-pages/man2/alarm.2.html
@@ -214,7 +213,7 @@ void *sys_create_process (
         (void *) create_process ( 
                      NULL, NULL, NULL, 
                      (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
-                     PRIORITY_HIGH, 
+                     PRIORITY_NORMAL_THRESHOLD, 
                      (int) current_pid, 
                      (char *) NewName, 
                      RING3, 

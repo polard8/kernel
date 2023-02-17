@@ -227,8 +227,8 @@ static void __maximize_ws_priority(pid_t pid)
     struct thread_d *t;
 
     unsigned long ProcessType         = PROCESS_TYPE_SYSTEM;
-    unsigned long ProcessBasePriority = PRIORITY_SYSTEM;
-    unsigned long ProcessPriority     = PRIORITY_SYSTEM;
+    unsigned long ProcessBasePriority = PRIORITY_SYSTEM_THRESHOLD;
+    unsigned long ProcessPriority     = PRIORITY_MAX;
 
     unsigned long ThreadType         = ProcessType;
     unsigned long ThreadBasePriority = ProcessBasePriority;

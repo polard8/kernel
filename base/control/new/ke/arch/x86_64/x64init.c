@@ -204,8 +204,8 @@ static int I_x64CreateInitialProcess(void)
 // Create init process
 //
 
-    unsigned long BasePriority = PRIORITY_SYSTEM;
-    unsigned long Priority     = PRIORITY_SYSTEM;
+    unsigned long BasePriority = PRIORITY_SYSTEM_THRESHOLD;
+    unsigned long Priority     = PRIORITY_SYSTEM_THRESHOLD;
 
     InitProcess = 
         (void *) create_process( 
@@ -711,8 +711,8 @@ static int I_x64CreateKernelProcess(void)
 
     //debug_print ("I_x64CreateKernelProcess:\n");
 
-    unsigned long BasePriority = PRIORITY_SYSTEM;
-    unsigned long Priority     = PRIORITY_SYSTEM;
+    unsigned long BasePriority = PRIORITY_MAX;
+    unsigned long Priority     = PRIORITY_MAX;
 
 //
 // Module 0 image.

@@ -311,8 +311,8 @@ copy_process_struct(
 // Balancing the priority.
 // Please, don't inherit base priority!
 // The priority for the clone.
-    unsigned long CloneBasePriority=PRIORITY_NORMAL;
-    unsigned long ClonePriority=PRIORITY_NORMAL;
+    unsigned long CloneBasePriority=PRIORITY_NORMAL_THRESHOLD;
+    unsigned long ClonePriority=PRIORITY_NORMAL_THRESHOLD;
 
     /*
     if ( p1 == p2 ){
