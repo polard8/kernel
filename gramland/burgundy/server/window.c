@@ -712,33 +712,6 @@ void *doCreateWindow (
 // Input support:
 // The buffer and the input pointers.
 
-//
-// WT_EDITBOX
-//
-
-// Let's setup the buffer for the text.
-    size_t text_size = 0;
-
-    if ( type == WT_EDITBOX ||
-          type == WT_EDITBOX_MULTIPLE_LINES )
-    {
-        if(type == WT_EDITBOX)
-            text_size = 128;
-        if(type == WT_EDITBOX_MULTIPLE_LINES)
-            text_size = 256;
-
-        window->text_size_in_bytes = 0;
-        window->window_text = (void*) malloc(text_size);
-        if ( (void*) window->window_text != NULL )
-        {
-            memset(window->window_text, 0, text_size);  // Clear 
-            window->textbuffer_size_in_bytes = (size_t) text_size;
-            window->text_size_in_bytes = 0;
-        }
-
-        window->text_fd = 0;  // No file for now.
-    }
-
 // Input pointer device.
     window->ip_device = IP_DEVICE_NULL;
     window->ip_on = FALSE;  // desligado
@@ -1746,7 +1719,11 @@ void *CreateWindow (
 // overlapped, editbox, button and simple.
     int ValidType=FALSE;
 
+    size_t text_size = 0;
+
     //gwssrv_debug_print ("CreateWindow:\n");
+
+
 
 // =================
 // name
@@ -1901,9 +1878,26 @@ void *CreateWindow (
              goto fail;
          }
 
-        //pintamos simples, mas a tipagem será  overlapped
-        //__w->type = WT_EDITBOX;   
-        __w->type = type;
+        //--------------------
+        // Let's setup the buffer for the text.
+        if(type == WT_EDITBOX)
+            text_size = 128;
+        if(type == WT_EDITBOX_MULTIPLE_LINES)
+            text_size = 256;
+        __w->textbuffer_size_in_bytes = 0;
+        __w->text_size_in_bytes = 0;
+        __w->window_text = (void*) malloc(text_size);
+        if ( (void*) __w->window_text != NULL )
+        {
+            memset(__w->window_text, 0, text_size);  // Clear 
+            __w->textbuffer_size_in_bytes = (size_t) text_size;
+            __w->text_size_in_bytes = 0;
+        }
+        __w->text_fd = 0;  // No file for now.
+        //--------------------
+
+        // Pintamos simples, mas o tipo sera edit   
+        __w->type = type;  //:)
         __w->locked = FALSE;
         goto draw_frame;
     }

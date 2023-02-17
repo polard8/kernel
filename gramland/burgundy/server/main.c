@@ -762,7 +762,7 @@ static void dispacher(int fd)
 // Então logo abaixo mandaremos uma resposta de erro
 // e não uma resposta normal.
     if(Status < 0){
-         SendErrorResponse = TRUE;
+        SendErrorResponse = TRUE;
     }
 
 //
@@ -973,8 +973,8 @@ gwsProcedure (
         //gwssrv_debug_print ("gwssrv: [1004] serviceDrawChar\n");
         
         serviceDrawChar();
-        //NoReply = FALSE;  // asyncronous
-        NoReply = TRUE;   // syncronous
+        //NoReply = FALSE;
+        NoReply = TRUE;
         break;
 
 // Draw text
@@ -999,7 +999,7 @@ gwsProcedure (
         //if ( is_accepting_input() == TRUE )
         //    wmInputReader();
         //NoReply = FALSE;
-        NoReply = TRUE;    // syncronous
+        NoReply = TRUE;
         break;
 
      // Redraw window
@@ -1137,17 +1137,17 @@ gwsProcedure (
         break;
 
     case GWS_SetText:
-        printf ("[GWS_SetText] #todo\n");
+        //printf ("[GWS_SetText] #todo\n");
         serviceSetText();
         NoReply = TRUE;
         break;
 
     case GWS_GetText:
-        printf ("[GWS_GetText] #todo\n");
+        //printf ("[GWS_GetText] #todo\n");
         serviceGetText();
         NoReply = FALSE;  // The response is the text.
+        return 0;
         break;
-
 
 // Let's get one event from the client's event queue.
 // Send it as a response.
@@ -2885,9 +2885,9 @@ int serviceSetText(void)
 // #todo: Check the message code.
 // wid, x, y, color.
     window_id = (int) message_address[4];
-    x                   = (unsigned long) message_address[5];
-    y                   = (unsigned long) message_address[6];
-    color            = (unsigned long) message_address[7];
+    x         = (unsigned long) message_address[5];
+    y         = (unsigned long) message_address[6];
+    color     = (unsigned long) message_address[7];
     window_id = (window_id & 0xFFFF);
     x = (x & 0xFFFF);
     y = (y & 0xFFFF);
@@ -2923,11 +2923,15 @@ int serviceSetText(void)
     char *p = (char *) &message_address[string_off];
     for (i=0; i<256; i++)
     {
-         buf[i] = *p;  //Get a char
-         p++;
+        buf[i] = *p;  //Get a char
+        p++;
     };
     buf[i] = 0;  // finalize the buffer.
 // ==================================
+
+    //#debug
+    //printf("BUF: %s\n",buf);
+    //while(1){}
 
 //
 // == Draw ===============================================
@@ -2940,18 +2944,22 @@ int serviceSetText(void)
 // Se a janela alvo tem um índice fora dos limites
 
 // wid
-    if ( window_id < 0 ){ return -1; }
-    if ( window_id >= WINDOW_COUNT_MAX ){
-        return -1;
+
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX )
+    {
+        printf("Invalid wid\n");
+        goto fail;
     }
 
 // window structure.
     window = (struct gws_window_d *) windowList[window_id];
     if ( (void*) window == NULL ){ 
-        return -1; 
+        printf("Invalid window\n");
+        goto fail;
     }
     if (window->magic != 1234){
-        return -1; 
+        printf("window magic\n");
+        goto fail;
     }
 
 /*
@@ -2963,27 +2971,40 @@ int serviceSetText(void)
     }
 */
 
-    if (window->type == WT_EDITBOX ||
-         window->type == WT_EDITBOX_MULTIPLE_LINES   )
+    if ( window->type != WT_EDITBOX_SINGLE_LINE &&
+         window->type != WT_EDITBOX_MULTIPLE_LINES )
     {
-        if (window->type == WT_EDITBOX)
-        {
-             window->text_size_in_bytes = 0;  // No text
-
-            //128
-            for (i=0; i<64; i++)
-            {
-                if ( (void*) window->window_text != NULL )
-                {
-                    if (window->textbuffer_size_in_bytes > 64)
-                    {
-                        window->window_text[i] = (char) buf[i];
-                        window->text_size_in_bytes++;
-                    }
-                }
-            };
-        }
+        printf("Invalid widnow type\n");
+        goto fail;
     }
+
+    if (window->textbuffer_size_in_bytes < 64)
+    {
+        printf("textbuffer_size_in_bytes\n");
+        goto fail;
+    }
+
+    if ( (void*) window->window_text == NULL )
+    {
+        printf("window_text\n");
+        goto fail;
+    }
+    memset( window->window_text, 0, 64 );
+
+    window->text_size_in_bytes = 0;  // No text
+    //128
+    for (i=0; i<64; i++)
+    {
+        if ( (void*) window->window_text != NULL )
+        {
+            window->window_text[i] = (char) buf[i];
+            window->text_size_in_bytes++;
+        }
+    };
+
+    //#debug
+    //printf("WINDOW: %s\n",window->window_text);
+    //while(1){}
 
 // Draw text
 // Good window. Let's paint into it.
@@ -3000,15 +3021,24 @@ int serviceSetText(void)
     //gws_show_window_rect(window);
     //invalidate_window(window);
 
+// OK
+    //printf("done\n");
     return 0;
+
 crazy_fail:
     debug_print("serviceSetText: [ERROR] crazy_fail\n");
     return -1;
+fail:
+   printf("fail\n");
+   return -1;
 }
 
 
 int serviceGetText(void)
 {
+// Get a text from a window.
+// Editbox only.
+
     unsigned long *message_address = (unsigned long *) &__buffer[0];
     struct gws_window_d  *window;
     int window_id = -1;      // index 4
@@ -3028,9 +3058,9 @@ int serviceGetText(void)
 // #todo: Check the message code.
 // wid, x, y, color.
     window_id = (int) message_address[4];
-    x                   = (unsigned long) message_address[5];
-    y                   = (unsigned long) message_address[6];
-    color            = (unsigned long) message_address[7];
+    x         = (unsigned long) message_address[5];
+    y         = (unsigned long) message_address[6];
+    color     = (unsigned long) message_address[7];
     window_id = (window_id & 0xFFFF);
     x = (x & 0xFFFF);
     y = (y & 0xFFFF);
@@ -3064,19 +3094,25 @@ int serviceGetText(void)
 // Se a janela alvo tem um índice fora dos limites
 
 // wid
-    if ( window_id < 0 ){ return -1; }
-    if ( window_id >= WINDOW_COUNT_MAX ){
+    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX )
+    {
+        printf("Invalid wid\n");
         return -1;
     }
 
 // window structure.
     window = (struct gws_window_d *) windowList[window_id];
-    if ( (void*) window == NULL ){ 
-        return -1; 
+    if ( (void*) window == NULL )
+    {
+        printf("Invalid window\n");
+        return -1;
     }
-    if (window->magic != 1234){
-        return -1; 
+    if (window->magic != 1234)
+    {
+        printf("Invalid magic\n");
+        return -1;
     }
+
 
 /*
 // If this window is overlapped window,
@@ -3087,56 +3123,65 @@ int serviceGetText(void)
     }
 */
 
+// Header
+// wid, msg type, signature1, signature2.
+    next_response[0] = (unsigned long) (window_id & 0xFFFFFFFF);
+    next_response[1] = SERVER_PACKET_TYPE_REPLY;
+    next_response[2] = 1234;
+    next_response[3] = 5678;
+
+
     register int i=0;
     int string_off=8;
-    char *p = (char *) &message_address[string_off];
+    char *p = (char *) &next_response[string_off];
     int gotten=0;
 
-    if (window->type == WT_EDITBOX ||
-         window->type == WT_EDITBOX_MULTIPLE_LINES   )
+    if (window->type != WT_EDITBOX &&
+         window->type != WT_EDITBOX_MULTIPLE_LINES )
     {
-        if (window->type == WT_EDITBOX)
-        {
-             window->text_size_in_bytes = 0;  // No text
-
-            //128
-            for (i=0; i<64; i++)
-            {
-                if ( (void*) window->window_text != NULL )
-                {
-                    if (window->textbuffer_size_in_bytes > 64)
-                    {
-                        // Copy the bytes from the window buffer to the
-                        // message buffer and finalize the message buffer.
-                        *p = window->window_text[i];
-                        gotten++;
-                        //window->window_text[i] = (char) buf[i];
-                        //window->text_size_in_bytes++;
-                    }
-                }
-            };
-            if (gotten<=0){
-                printf("Fail on getting text from window buffer\n");
-            }
-            *p = 0;  // Finalize the string into the message buffer.
-        }
+        printf("Invalid window type\n");
+        return -1;
     }
 
-// Draw text
-// Good window. Let's paint into it.
-// #todo
-// Maybe a flag can tell us to do that or not.
+    if (window->textbuffer_size_in_bytes < 64)
+    {
+        printf("textbuffer_size_in_bytes\n");
+        return -1;
+    }
 
-    //dtextDrawText ( 
-    //    (struct gws_window_d *) window,
-    //    x, y, (unsigned int) color, buf );
+    if ( (void*) window->window_text == NULL )
+    {
+        printf("window_text\n");
+        return -1;
+    }
 
-// #debug
-// Flush the window into the framebuffer.
-// #todo: invalidate, not show.
-    //gws_show_window_rect(window);
-    //invalidate_window(window);
+    //window->text_size_in_bytes = 0;  // No text
 
+    //128
+    for (i=0; i<64; i++)
+    {
+        // Copy the bytes from the window buffer to the
+        // message buffer and finalize the message buffer.
+        *p = window->window_text[i];
+        p++;
+        gotten++;
+    };
+
+// Finalize the string into the message buffer.
+    *p = 0;
+
+    if (gotten <= 0)
+    {
+        printf("Fail on getting text from window buffer\n");
+        return -1;
+    }
+
+    //#debug
+    //char *base = (char *) &next_response[string_off];
+    //printf ("GOTTEN into the next_response buffer: %s\n", base );
+    //while(1){}
+
+// OK
     return 0;
 crazy_fail:
     debug_print("serviceGetText: [ERROR] crazy_fail\n");

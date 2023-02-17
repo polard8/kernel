@@ -66,6 +66,8 @@ struct gws_event_d *CurrentEvent;
 // #todo: Use 'const char *'.
 char *title_when_no_title = "Window";
 
+char __string_buffer[512];   // dst
+
 // #test
 // Tentando deixar o buffer aqui e aproveitar em mais funções.
 // #??
@@ -1747,6 +1749,7 @@ __gws_gettext_request (
     message_buffer[6] = top; 
     message_buffer[7] = color;
 
+/*
 // String support
 // Fill the string buffer
     register int i=0;
@@ -1760,6 +1763,7 @@ __gws_gettext_request (
         string++; 
     };
     *p = 0;  // finalize the string
+*/
 
 // Write
 
@@ -1791,18 +1795,16 @@ __gws_gettext_request (
 // Mas como sabemos que é um soquete,
 // então sabemos que é possível ler.
 
-static char * __gws_gettext_response(int fd)
+static char *__gws_gettext_response(int fd)
 {
     unsigned long *message_buffer = 
         (unsigned long *) &__gws_message_buffer[0];
     ssize_t n_reads=0;
-
-    char buffer[512];
-    char *p = (char *) &message_buffer[8];
+    char *p = (char *) &message_buffer[8];  // src
     register int i=0;
 
-
     if (fd<0){
+        printf ("__gws_gettext_response: fd\n");
         return NULL;  
     }
 
@@ -1824,6 +1826,7 @@ response_loop:
     //    goto response_loop;
     //}
     
+    // #bugbug: Loop infinito.
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
         //gws_yield(); 
@@ -1831,9 +1834,10 @@ response_loop:
     }
     
     // Se retornou -1 é porque algo está errado com o arquivo.
-    if (n_reads < 0){
-        gws_debug_print ("__gws_settext_response: recv fail.\n");
-        printf          ("__gws_settext_response: recv fail.\n");
+    if (n_reads < 0)
+    {
+        gws_debug_print ("__gws_gettext_response: recv fail.\n");
+        printf          ("__gws_gettext_response: recv fail.\n");
         printf ("Something is wrong with the socket.\n");
         return NULL;
         //exit (1);
@@ -1855,6 +1859,7 @@ response_loop:
         case GWS_SERVER_PACKET_TYPE_EVENT:            
         case GWS_SERVER_PACKET_TYPE_ERROR:
         default:
+            printf ("__gws_gettext_response: Not a reply\n");
             return NULL;
             break; 
     };
@@ -1869,34 +1874,27 @@ process_reply:
 
     //gws_debug_print ("terminal: bye\n"); 
     //printf ("terminal: Window ID %d \n", message_buffer[0] );
-    //printf ("terminal: Bye\n");
-    
+    //printf ("__gws_gettext_response: process_reply\n");
+
     // #todo
     // Podemos usar a biblioteca e testarmos
     // vários serviços da biblioteca nesse momento.
-    memset(buffer, 0 ,512);
+    memset(__string_buffer, 0 ,512);
+// Get from message buffer
+// and put it into the local buffer.
     for (i=0; i<256; i++)
     {
-        // Get from message buffer
-        // and put it into the local buffer.
-        buffer[i] = *p; 
+        __string_buffer[i] = *p; 
         p++;
     };
-    buffer[i+1] = 0; // finalize the local buffer.
-    //*p = 0;
-    //p++;
-    //*p = 0;  
+    __string_buffer[i+1] = 0; // finalize the local buffer.
+
+   //printf ("__gws_gettext_response: __string_buffer[] %s\n",__string_buffer);
+   //while(1){}
 
 // Return the address of a local buffer.
-    return (char*) buffer;
-
-
-// Process an event.
-process_event:
-    //gws_debug_print ("gws_drawtext_response: We got an event\n"); 
-    return NULL;
+    return (char*) __string_buffer;
 }
-
 
 
 //----------------------------------------------------
@@ -2357,7 +2355,8 @@ gws_set_text (
     unsigned int color,
     char *string )
 {
-// Draw text.
+// Inject a text into the text buffer of a window.
+// Editbox only
 
     int response =0;
     int Value=0;
@@ -2413,9 +2412,12 @@ gws_get_text (
     unsigned int color,
     char *string )
 {
-// Draw text.
+// Get a text from the text buffer of a window.
+// Editbox only
 
-    int response =0;
+    char *where;
+    where = string;
+
     int Value=0;
     int req_status = -1;
 
@@ -2452,9 +2454,34 @@ gws_get_text (
         //gws_yield();
     };
 
-    response = (int) __gws_gettext_response (fd);
+    int c=0;
+    char *p;
+    p = (char *) __gws_gettext_response(fd);
 
-    return (int) response;
+    if ( (void*) p == NULL )
+    {
+        printf("gws_get_text: Invalid p\n");
+        return -1;
+    }
+
+    // From 'p' to 'where'.
+    if ( (void*) p != NULL )
+    {
+        // O ponteiro dado pelo app.
+        if ( (void*) where != NULL )
+        {
+            // Copy
+            for (c=0; c<64; c++)
+            {
+                *where = *p;
+                where++;
+                p++;
+            };
+        }
+    }
+
+// status OK.
+    return (int) 0;
 }
 
 

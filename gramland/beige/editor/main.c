@@ -104,7 +104,7 @@ static void update_clients(int fd);
 static int editor_init_windows(void);
 static int editor_init_globals(void);
 
-static __test_text(int fd, int wid);
+static void __test_text(int fd, int wid);
 static void __test_load_file(int socket, int wid);
 
 // ============
@@ -351,11 +351,16 @@ editorProcedure(
 
 // #test
 // Set text and Get text into an editbox window.
-static __test_text(int fd, int wid)
+static void __test_text(int fd, int wid)
 {
 // Testing new requests.
 
-    char *p;
+    //char *p;
+
+    if (fd<0)
+        return;
+    if (wid<0)
+        return;
 
 // Inject
     gws_set_text (
@@ -366,18 +371,32 @@ static __test_text(int fd, int wid)
         (unsigned long) COLOR_BLACK,
         "Injected text");
 
+    //#debug
+    //return;
+
 // Get back
-    p = (char *) gws_get_text (
-        (int) fd,      // fd,
+    char string_buffer[256];
+    memset(string_buffer,0,256);
+    sprintf(string_buffer,"dirty");
+    int status = 
+    gws_get_text (
+        (int) fd,     // fd,
         (int) wid,    // window id,
         (unsigned long)  1, 
         (unsigned long)  1, 
         (unsigned long) COLOR_BLACK,
-        "Dirty");
+        (char *) string_buffer );
 
-    if ( (void*) p == NULL )
-        printf("editor.bin: Invalid text buffer\n");
+    //if ( (void*) p == NULL ){
+    //    printf("editor.bin: Invalid text buffer\n");
+    //    return;
+    //}
 
+    //#debug
+    printf("__test_text: {%s}\n",string_buffer);
+    //while(1){}
+
+/*
 // Print out
     if ( (void*) p != NULL )
     {
@@ -389,6 +408,7 @@ static __test_text(int fd, int wid)
             (unsigned long) COLOR_RED,
             p );
     }
+*/
 }
 
 // #test
@@ -676,13 +696,13 @@ int main( int argc, char *argv[] )
 // Show main window.
     gws_refresh_window (client_fd, main_window);
 
+
 // =======================
 // #test
 // Testing new requests.
 // Injecting a text into the editbox window.
-    //__test_text(client_fd, main_window);
-    //gws_refresh_window (client_fd, main_window);
-
+    //__test_text(client_fd, client_window);
+    //gws_refresh_window (client_fd, client_window);
 
 // ============================================
 // focus
