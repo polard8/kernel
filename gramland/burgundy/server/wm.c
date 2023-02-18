@@ -1702,19 +1702,32 @@ struct gws_window_d *do_create_titlebar(
 // Icon ID:
 // Devemos receber um argumento do aplicativo,
 // na hora da criação da janela.
+
+    if (icon_id < 1 || icon_id > 5)
+    {
+        //icon_id = 1;
+        printf ("do_create_titlebar: Invalid icon id\n");
+        return -1;
+    }
+
     parent->frame.titlebar_icon_id = icon_id;
     
 // Decode the bmp that is in a buffer
 // and display it directly into the framebuffer. 
 // IN: index, left, top
 // see: bmp.c
+    unsigned long iL=0;
+    unsigned long iT=0;
+    unsigned long iWidth = 16;
+
     if (useIcon == TRUE)
     {
+        iL = (unsigned long) (tbWindow->left + METRICS_ICON_LEFTPAD);
+        iT = (unsigned long) (tbWindow->top  + METRICS_ICON_TOPPAD);
         gwssrv_display_system_icon( 
-            (int) parent->frame.titlebar_icon_id, 
-            (tbWindow->left + METRICS_ICON_LEFTPAD), 
-            (tbWindow->top  + METRICS_ICON_TOPPAD) );
-
+            (int) icon_id, 
+            (unsigned long) iL, 
+            (unsigned long) iT );
         parent->titlebarHasIcon = TRUE;
     }
 
@@ -1764,9 +1777,15 @@ struct gws_window_d *do_create_titlebar(
     }
 
 // pad | icon | pad | pad
-    StringLeftPad = 
-        (unsigned long) ((2*METRICS_ICON_LEFTPAD) +16 +METRICS_ICON_LEFTPAD);
 
+    if (useIcon == FALSE){
+        StringLeftPad = (unsigned long) METRICS_ICON_LEFTPAD;
+    }
+    if (useIcon == TRUE)
+    {
+        StringLeftPad = 
+            (unsigned long) ( METRICS_ICON_LEFTPAD +iWidth +(2*METRICS_ICON_LEFTPAD));
+    }
 
     parent->titlebar_text_color = 
         (unsigned int) get_color(csiTitleBarText);
@@ -1778,21 +1797,27 @@ struct gws_window_d *do_create_titlebar(
     tbWindow->name = 
         (char *) strdup( (const char *) parent->name );
 
-    //#todo: validation
-    //if ( (void*) tbWindow->name == NULL ){}
+// validation
+    if ( (void*) tbWindow->name == NULL )
+    {
+        printf ("do_create_titlebar: Invalid name\n");
+        return -1;
+    }
+
+    unsigned long sL=0;
+    unsigned long sT=0;
+    unsigned int sColor = COLOR_WHITE;
 
     if (useTitleString == TRUE)
     {
-        grDrawString ( 
-            ((tbWindow->left) + StringLeftPad), 
-            ((tbWindow->top)  + StringTopPad), 
-            parent->titlebar_text_color, 
-            tbWindow->name );
+        sL = (unsigned long) ((tbWindow->left) + StringLeftPad);
+        sT = (unsigned long) ((tbWindow->top)  + StringTopPad);
+        sColor = (unsigned int) parent->titlebar_text_color;
+        grDrawString ( sL, sT, sColor, tbWindow->name );
     }
 
-
 // ---------------------------------
-// Controle
+// Controls
     do_create_controls(tbWindow);
 
 //----------------------

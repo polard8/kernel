@@ -40,6 +40,7 @@ extern int current_mode;
 #include "wt.h"
 #include "menu.h"
 #include "grinput.h"   //#test
+#include "metrics.h"
 #include "window.h"
 #include "painter.h"
 #include "bmp.h"
