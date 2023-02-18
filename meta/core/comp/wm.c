@@ -3694,22 +3694,26 @@ int on_combination(int msg_code)
 
     if (msg_code == GWS_ControlArrowUp){
         //dock_active_window(1);
-        FlyingCubeMove(0,4,(float) 0.08f); //back
+        //FlyingCubeMove(0,4,(float) 0.08f); //back
+        FlyingCubeMove(0,3,(float) 0.08f); //front
         return 0;
     }
     if (msg_code == GWS_ControlArrowRight){
         //dock_active_window(2);
-        FlyingCubeMove(0,1,(float) 0.08f);  //left
+        //FlyingCubeMove(0,1,(float) 0.08f);  //left
+        FlyingCubeMove(0,2,(float) 0.08f); //right
         return 0;
     }
     if (msg_code == GWS_ControlArrowDown){
         //dock_active_window(3);
-        FlyingCubeMove(0,3,(float) 0.08f); //front
+        //FlyingCubeMove(0,3,(float) 0.08f); //front
+        FlyingCubeMove(0,4,(float) 0.08f); //back
         return 0;
     }
     if (msg_code == GWS_ControlArrowLeft){
         //dock_active_window(4); 
-        FlyingCubeMove(0,2,(float) 0.08f); //right
+        //FlyingCubeMove(0,2,(float) 0.08f); //right
+        FlyingCubeMove(0,1,(float) 0.08f);  //left
         return 0;
     }
 
@@ -4223,6 +4227,8 @@ void wm_exit_fullscreen_mode(int tile)
 // developer status.
 void yellowstatus0(char *string, int refresh)
 {
+// Draw a yellow bar in the active window.
+
     //methods. get with the w.s., not with the system.
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
@@ -4232,15 +4238,12 @@ void yellowstatus0(char *string, int refresh)
     unsigned long bar_size = w;
 
     struct gws_window_d *aw;
-    
-    //aw = (struct gws_window_d *) windowList[active_window];
+
     aw = (void*) active_window;
-    
     if( (void*) aw == NULL ){
         return;
     }
-
-    if(aw->magic!=1234){
+    if (aw->magic!=1234){
         return;
     }
 
@@ -4298,7 +4301,8 @@ void yellowstatus0(char *string, int refresh)
         bar_size = 32;
     }
 
-    if(refresh){
+// Show now?
+    if (refresh){
         gws_refresh_rectangle(
             (aw->left +2), 
             (aw->top  +2), 
@@ -4309,7 +4313,7 @@ void yellowstatus0(char *string, int refresh)
 
 void yellow_status(char *string)
 {
-    if( (void*) string == NULL ){
+    if ( (void*) string == NULL ){
         return;
     }
     yellowstatus0(string,TRUE);

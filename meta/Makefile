@@ -16,7 +16,8 @@ all:
 	make -C libs/libgws
 	make -C libs/libdisp
 
-# gramado game engine.
+# Gramado game engine.
+	make -C core/comp
 	make -C game1
 	make -C game2
 
@@ -25,6 +26,7 @@ clean-all:
 	-rm -f libs/libgws/obj/*.o
 	-rm -f libs/rtl/obj/*.o
 
+	-rm core/comp/*.o
 	-rm game1/*.o
 	-rm game2/*.o
 

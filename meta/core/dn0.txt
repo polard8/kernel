@@ -1,0 +1,5 @@
+
+
+	GMC - Gramado Meta Compositor.
+
+	Desktop ccomposition with fx.

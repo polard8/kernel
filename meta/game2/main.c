@@ -308,7 +308,9 @@ void gwssrv_enter_critical_section (void)
 
     while (1){
         S = (int) gramado_system_call ( 226, 0, 0, 0 );
-        if ( S == 1 ){ goto done; }
+        if ( S == 1 ){
+            goto done; 
+        }
     };
 
     // Close the gate. turn FALSE.
@@ -3735,10 +3737,6 @@ static int on_execute(void)
         // see: demo.c
         demoFlyingCube();
 
-        // Messages
-        // read only one valid message from 
-        // thread's message queue.
-        // # This is very good. Only use this one.
         wmInputReader();
 
         if (IsAcceptingConnections == TRUE)

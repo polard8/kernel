@@ -3686,6 +3686,218 @@ int wmSTDINInputReader(void)
     return (int) nreads;
 }
 
+int on_combination(int msg_code);
+int on_combination(int msg_code)
+{
+    if (msg_code<0)
+        return -1;
+
+    if (msg_code == GWS_ControlArrowUp){
+        //dock_active_window(1);
+        FlyingCubeMove(0,4,(float) 0.08f); //back
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowRight){
+        //dock_active_window(2);
+        FlyingCubeMove(0,1,(float) 0.08f);  //left
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowDown){
+        //dock_active_window(3);
+        FlyingCubeMove(0,3,(float) 0.08f); //front
+        return 0;
+    }
+    if (msg_code == GWS_ControlArrowLeft){
+        //dock_active_window(4); 
+        FlyingCubeMove(0,2,(float) 0.08f); //right
+        return 0;
+    }
+
+    if (msg_code == GWS_Cut)
+    {printf("ws: cut\n"); return 0;}
+
+    if (msg_code == GWS_Copy){
+        printf("ws: copy\n"); 
+        gramado_terminate();
+        return 0;
+    }
+
+    if (msg_code == GWS_Paste)
+    {printf("ws: paste\n"); return 0;}
+
+    if (msg_code == GWS_Undo)
+    {printf("ws: undo\n"); return 0;}
+
+// [control + a]
+    if (msg_code == GWS_SelectAll)
+    {
+        printf("ws: select all\n");
+
+        /* 
+        // #test
+        // Post message to all the overlapped windows.
+        window_post_message_broadcast( 
+            0,
+            GWS_Close,   //MSG_CLOSE
+            1234,
+            5678 );
+        */ 
+        return 0;
+    }
+    
+
+    if (msg_code == GWS_Find)
+    {printf("ws: find\n"); return 0;}
+
+    if (msg_code == GWS_Save)
+    {
+        printf("Save\n");
+        //on_menu();  //#test
+        return 0;
+    }
+
+// #tests
+// Via shift + f12
+// + Enable mouse.
+// + Change bg color.
+    if (msg_code == 88112)
+    {
+        //gUseMouse = TRUE;
+        
+        //wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
+        //printf ("server: [88112]\n");
+        //__switch_focus();
+        //wm_update_desktop(TRUE); //ok.
+
+        return 0;
+    }
+
+//OK
+    return -1;
+}
+
+
+int is_combination(int msg_code);
+int is_combination(int msg_code)
+{
+    if (msg_code<0)
+        return FALSE;
+
+    switch (msg_code){
+    case GWS_ControlArrowUp:
+    case GWS_ControlArrowRight:
+    case GWS_ControlArrowDown:
+    case GWS_ControlArrowLeft:
+    case GWS_Cut:
+    case GWS_Copy:
+    case GWS_Paste:
+    case GWS_Undo:
+    case GWS_SelectAll:
+    case GWS_Find:
+    case GWS_Save:
+    case 88112:
+        return TRUE;
+        break;
+    //...
+    default:
+        return FALSE;
+        break;
+    };
+
+    return FALSE;
+}
+
+int wmInputReader(void)
+{
+// Get the messages in the queue,
+// respecting the circular queue.
+
+    int status=0;
+
+    register long i=0;
+    long extra_attempts=10;
+
+    int msg=0;
+    unsigned long long1=0;
+    unsigned long long2=0;
+
+    int IsCombination=FALSE;
+
+    status = (int) rtl_get_event();
+    if (status != TRUE)
+    {
+        for (i=0; i<extra_attempts; i++)
+        {
+            status = (int) rtl_get_event();
+            if (status == TRUE)
+                goto new_event;
+        };
+        goto fail;
+    }
+
+new_event:
+    msg = (int) (RTLEventBuffer[1] & 0xFFFFFFFF);
+    long1 = (unsigned long) RTLEventBuffer[2];
+    long2 = (unsigned long) RTLEventBuffer[3];
+
+
+// MOUSE events
+    if ( msg == GWS_MouseMove || 
+         msg == GWS_MousePressed ||
+         msg == GWS_MouseReleased )
+    {
+        on_mouse_event(
+            (int) msg,
+            (unsigned long) long1,
+            (unsigned long) long2 ); 
+        return 0;
+    }
+
+// Print char into the keyboard owner window.
+    if ( msg == GWS_KeyDown ||
+         msg == GWS_SysKeyDown ||
+         msg == GWS_SysKeyUp )
+    {
+        on_keyboard_event( 
+            (int) msg, (unsigned long) long1, (unsigned long) long2 );
+        return 0;
+    }
+
+// Is it a combination?
+    IsCombination = (int) is_combination(msg);
+    if (IsCombination){
+        on_combination(msg);
+    }
+
+/*
+// Hotkeys
+    if (msg == GWS_HotKey)
+    {
+        // #todo: Call a worker for that.
+
+        // Hot key id.
+        // Activate the window associated with the given ID.
+        if (long1 == 1){
+            printf ("GWS_Hotkey 1\n");
+        }
+        if (long1 == 2){
+            printf ("GWS_Hotkey 2\n");
+        }
+        // ...
+    }
+ */
+
+// Sys commands
+    //if (msg == GWS_Command){
+        // #todo: Call a worker for that.
+    //}
+
+//Unknown:
+    return 0;
+fail:
+    return -1;
+}
+
 
 // ------------------------------------------------
 // This is basically the low level input support 
@@ -3706,7 +3918,7 @@ int wmSTDINInputReader(void)
 // pra cada tipo de sistema.
 // called by main.c
 
-int wmInputReader(void)
+int wmInputReader2(void)
 {
     register int i=0;
 

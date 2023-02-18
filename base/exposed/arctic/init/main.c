@@ -422,6 +422,15 @@ static int __CompareString(void)
 // We need a pointer instead.
 // see: meta/
 
+    // GMC - Gramado Meta Compositor.
+    if ( strncmp(prompt,"comp",4) == 0 ){
+        printf ("~ Comp:\n");
+        do_clear_console();
+        rtl_clone_and_execute("comp.bin");
+        isTimeToQuit = TRUE;
+        goto exit_cmp;
+    }
+    // Game 1.
     if ( strncmp(prompt,"game1",5) == 0 ){
         printf ("~ Game 1:\n");
         do_clear_console();
@@ -429,6 +438,7 @@ static int __CompareString(void)
         isTimeToQuit = TRUE;
         goto exit_cmp;
     }
+    // Game 2.
     if ( strncmp(prompt,"game2",5) == 0 ){
         printf ("~ Game 2:\n");
         do_clear_console();

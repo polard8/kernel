@@ -3725,8 +3725,10 @@ static int on_execute(void)
     window_server->status = STATUS_RUNNING;
     window_server->initialized = TRUE;
 
-    // see: demo.c
+
+// see: demo.c
     demoFlyingCubeSetup();
+    //__setupCatModel(TRUE,TRUE,TRUE);
 
     while (running == TRUE){
 
@@ -3735,7 +3737,8 @@ static int on_execute(void)
         }
 
         // see: demo.c
-        demoFlyingCube();
+        paintFlyingCubeScene();
+        //demoCat();
 
         wmInputReader();
 
