@@ -124,7 +124,9 @@ objects-y += request.o
 objects-y += runtime.o  
 objects-y += system.o  
 objects-y += sys.o    
+objects-y += mod.o    
 objects-y += sci.o    
+
 
 PHONY := all
 all: kernel-header kernel-content kernel-footer \
@@ -150,6 +152,13 @@ kernel-header:
 	$(KERNEL_INCLUDE) \
 	$(CFLAGS) \
 	-o sci.o    
+
+# Module interface.
+# mod.o
+	$(CC) -c entrance/mod/mod.c \
+	$(KERNEL_INCLUDE) \
+	$(CFLAGS) \
+	-o mod.o    
 
 # Init
 # init.o

@@ -46,6 +46,46 @@ static char *_vsputs_r(char *dest, char *src);
 
 // ---------------------------
 
+
+int __feedSTDIN( unsigned long ch )
+{
+    //char Data = (char) (ch & 0x7F);
+    char Data = (char) (ch & 0xFF);
+    char ch_buffer[2];
+
+    if ( (void*) stdin == NULL ){
+        goto fail;
+    }
+    if (stdin->used != TRUE) { return -1; }
+    if (stdin->magic != 1234){ return -1; }
+
+// Can write.
+    stdin->sync.can_write = TRUE;
+// Can write and read.
+    stdin->_flags = __SWR;
+// Data
+    ch_buffer[0] = (char) (Data & 0xFF);
+
+// Write
+// Write 1 byte.
+
+    file_write_buffer ( 
+        (file *) stdin, 
+        (char *) ch_buffer, 
+        (int) 1 );
+
+// Can read.
+// O aplicativo precisa disso.
+    stdin->sync.can_read = TRUE;
+// Can read.
+// O worker no kernel precisa disso.
+    stdin->_flags = __SRD;
+    return 0;
+fail:
+    return -1;
+}
+
+
 // service 8002
 // IN: fd for the new stdin
 // OUT: TRUE or FALSE.

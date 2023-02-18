@@ -78,15 +78,14 @@ OBJS = \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 disk_r.o disk_w.o storage.o \
 bldisp.o \
-xpixel.o line.o rect.o bg.o font.o char.o text.o graphics.o \
-console.o vt.o kgwm.o \
+xpixel.o line.o rect.o bg.o font.o char.o text.o graphics.o kgwm.o \
+console.o vt.o \
 i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 serial.o \
 tty.o \
 e1000.o \
-devmgr.o io.o \
+devmgr.o io.o grinput.o \
 pci.o pciinfo.o pciscan.o     
-
 
 all:
 
@@ -114,6 +113,7 @@ all:
 	$(CC) -c chardev/display/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
 	$(CC) -c chardev/display/bg.c       $(KERNEL_INCLUDE) $(CFLAGS) -o bg.o
 	$(CC) -c chardev/display/graphics.c $(KERNEL_INCLUDE) $(CFLAGS) -o graphics.o
+	$(CC) -c chardev/display/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
 # kbd
 	$(CC) -c chardev/kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
 	$(CC) -c chardev/kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
@@ -127,7 +127,6 @@ all:
 	$(CC) -c chardev/tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
 	$(CC) -c chardev/tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 	$(CC) -c chardev/tty/vt.c       $(KERNEL_INCLUDE) $(CFLAGS) -o vt.o
-	$(CC) -c chardev/tty/kgwm.c     $(KERNEL_INCLUDE) $(CFLAGS) -o kgwm.o
 # ps2
 	$(CC) -c chardev/i8042.c   $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
 
@@ -137,12 +136,13 @@ all:
 
 
 # i/o
-	$(CC) -c devmgr.c  $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
-	$(CC) -c io.c            $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
+	$(CC) -c grinput.c  $(KERNEL_INCLUDE) $(CFLAGS) -o grinput.o
+	$(CC) -c devmgr.c   $(KERNEL_INCLUDE) $(CFLAGS) -o devmgr.o 
+	$(CC) -c io.c       $(KERNEL_INCLUDE) $(CFLAGS) -o io.o
 # pci
-	$(CC) -c pci.c         $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
+	$(CC) -c pci.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pci.o
 	$(CC) -c pciinfo.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciinfo.o
-	$(CC) -c pciscan.c $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
+	$(CC) -c pciscan.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pciscan.o
 
 
 # link

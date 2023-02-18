@@ -100,10 +100,6 @@ struct gui_d  *gui;
 // Logon.
 int g_logged=FALSE;
 
-// Modulo 0.
-// see: kernel.h
-struct kernel_module_d  *kernel_mod0;
-
 
 // Kernel information variables.
 unsigned long KernelSize=0;

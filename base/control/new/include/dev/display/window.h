@@ -648,15 +648,12 @@ void exit_kernel_console(void);
 void kgwm_early_kernel_console(void);
 
 // ==========
-
-// Input events:
-
 int 
-wmKeyEvent(
-    unsigned char raw_byte,
-    int prefix );
-
-int wmMouseEvent(int event_id,long long1, long long2);
+wmProcedure ( 
+    struct window_d *window, 
+    int msg, 
+    unsigned long long1, 
+    unsigned long long2 );
 
 #endif    
 

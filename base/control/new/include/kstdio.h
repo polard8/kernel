@@ -556,6 +556,8 @@ static __inline int bsd__sputc (int _c, FILE *_p)
 // == prototypes ============================
 //
 
+int __feedSTDIN( unsigned long ch );
+
 int is_socket (file *f);
 int is_virtual_console (file *f);
 
