@@ -75,26 +75,20 @@ static unsigned long last_input_jiffie=0;
 #define OPTION_CLOSE     3
 static int current_option=OPTION_NOTHING;
 
-//
-// tb buttons
-//
 
+// tb buttons
 // Quantos botões ja temos.
 static int tb_buttons_count=0;  
 static int tb_buttons[TB_BUTTONS_MAX];
 
-//
 // tb windows
-//
-
 // Ponteiros de estrutura de janelas.
 static unsigned long tb_windows[TB_BUTTONS_MAX];
 
-//
 // tb pids
-//
-
 static int tb_pids[TB_BUTTONS_MAX];
+
+
 
 //
 // Window list.
@@ -246,6 +240,7 @@ on_keyboard_event(
     unsigned long long2 )
 {
     struct gws_window_d *window;
+    struct gws_window_d *tmp;
     unsigned long Result=0;
     char name_buffer[64];
 
@@ -353,7 +348,9 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[0],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app1_string);
-            tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            if (tb_pids[0] == 0){
+                tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            }
             return 0;
         }
         if (long1 == VK_F2){
@@ -362,7 +359,9 @@ on_keyboard_event(
             //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app2_string);
-            tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            if (tb_pids[1] == 0){
+                tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            }
             return 0;
         }
         if (long1 == VK_F3){
@@ -370,7 +369,9 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[2],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app3_string);
-            tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            if (tb_pids[2] == 0){
+                tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            }
             return 0;
         }
         if (long1 == VK_F4){
@@ -378,7 +379,9 @@ on_keyboard_event(
             redraw_window_by_id(tb_buttons[3],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app4_string);
-            tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            if (tb_pids[3] == 0){
+                tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            }
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
             // gUseMouse = TRUE;
@@ -828,6 +831,8 @@ static void on_control_clicked(struct gws_window_d *window)
 
 static void on_mouse_released(void)
 {
+    struct gws_window_d *tmp;
+    struct gws_window_d *old_focus;
 
     //wm_Update_TaskBar("RELEASED",TRUE);
 
@@ -869,6 +874,32 @@ static void on_mouse_released(void)
     //if(long1==3){ yellow_status("R3"); return 0; }
     //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
     //if(long1==2){ create_main_menu(mousex,mousey); return 0; }
+
+
+// ===================================
+// Title bar
+    if (mouse_hover->isTitleBar == TRUE)
+    {
+        // Get parent.
+        tmp = (struct gws_window_d *) mouse_hover->parent;
+        if ( (void*) tmp != NULL )
+        {
+            if (tmp->magic == 1234)
+            {
+                // Set as last window and update desktop.
+                if (tmp->type == WT_OVERLAPPED)
+                {
+                    //old_focus = (void*) get_focus(); 
+                    //if ((void*) old_focus != NULL )
+
+                    set_active_window(tmp);
+                    set_focus(tmp);
+                    redraw_window(tmp,TRUE);
+                    return;
+                }
+            }
+        }
+    }
 
 
 
@@ -2569,7 +2600,8 @@ void wm_update_desktop(int tile)
         return;
     }
 
-// This is the last valid for now.
+// The first is the last valid window.
+
     l = (struct gws_window_d *) w;
 
     while(1){
@@ -2625,6 +2657,17 @@ void wm_update_active_window(void)
     wid = (int) active_window->id;
     wm_update_window_by_id(wid);
 }
+
+// Set the last widnow and update the deesktop.
+void 
+wm_update_desktop2(
+    struct gws_window_d *last_window,
+    int tile )
+{
+    set_last_window(last_window);
+    wm_update_desktop(TRUE);
+}
+
 
 // #todo
 // Explain it better.
@@ -2958,7 +3001,7 @@ struct gws_window_d *get_first_window(void)
     return (struct gws_window_d *) first_window;
 }
 
-void set_last_window( struct gws_window_d *window )
+void set_last_window(struct gws_window_d *window)
 {
     if ( (void*) window == NULL ){
          return;
@@ -3698,9 +3741,9 @@ __probe_window_hover(
             // #test
             // Are we hover a menu item?
             // We have two types of menuitens.
-            if ( w->type == WT_SIMPLE || w->type == WT_BUTTON )
+            if ( w->type == WT_SIMPLE)
             {
-                if (w->isMenuItem == TRUE)
+                if (w->isTitleBar == TRUE)
                 {
                     Status = is_within( (struct gws_window_d *) w, long1, long2 );
                     // Yes, we are inside a menuitem.
@@ -3716,8 +3759,7 @@ __probe_window_hover(
                     }
                 }
             }
-            
-            
+
         }
     }
     };

@@ -243,5 +243,6 @@ sixth..     ide5, usually PCI, probed
 //#define CONFIG_QUANTUM_MULTIPLIER    2
 #define CONFIG_QUANTUM_MULTIPLIER    3
 
+
 #endif 
 

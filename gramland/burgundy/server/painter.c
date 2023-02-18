@@ -612,7 +612,8 @@ redraw_window (
                 {
                     // Se a janela overlapped é uma janela ativa.
                     // #bugbug Isso funciona para a janela mãe apenas.
-                    if (window->active == TRUE)
+                    //if (window->active == TRUE)
+                    if (window == active_window)
                     {
                         window->titlebar->bg_color = 
                             (unsigned int) get_color(csiTaskBar);
@@ -622,7 +623,8 @@ redraw_window (
                     }
                     // Se a janela overlapped não é uma janela ativa.
                     // #bugbug Isso funciona para a janela mãe apenas.
-                    if (window->active == FALSE)
+                    //if (window->active == FALSE)
+                    if (window != active_window)
                     {
                         window->titlebar->bg_color = 
                             (unsigned int) get_color(csiTaskBar);
