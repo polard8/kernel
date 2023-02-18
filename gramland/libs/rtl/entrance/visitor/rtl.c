@@ -400,32 +400,23 @@ int xxxScanApplicationQueue(void)
 
 // Check if it is a valid event.
 
-    // No, we do not have an event. 
-    // Yield and clear.
-    if ( RTLEventBuffer[1] == 0 )
+// No, we do not have an event. 
+// Just clear.
+    if (RTLEventBuffer[1] == 0)
     {
-
-        // ??
-        // In a test we saw that it was better without this thing.
-        // But just in case. It will stay here.
-
-        //sc82 (265,0,0,0);
-
         for(i=0; i<32; i++){
             RTLEventBuffer[i] = 0;
         };
-
         return FALSE;
     }
 
-    //#test
-    //jiffies
+//#test
+//jiffies
     //printf ("jiffies: %d\n",RTLEventBuffer[11]);
 
 // Yes, we have an event.
     return TRUE;
 }
-
 
 int rtl_get_event(void)
 {
@@ -476,17 +467,9 @@ int xxxScanApplicationQueue2(int index, int restart)
     // Yield and clear.
     if ( RTLEventBuffer[1] == 0 )
     {
-
-        // ??
-        // In a test we saw that it was better without this thing.
-        // But just in case. It will stay here.
-
-        //sc82 (265,0,0,0);
-
         for(i=0; i<32; i++){
             RTLEventBuffer[i] = 0;
         };
-
         return FALSE;
     }
 
@@ -547,12 +530,10 @@ struct rtl_event_d *rtl_next_event (void)
  // Check if it is a valid event.
 
 // No, we do not have an event. 
-// Yield and clear.
 // Clean
 
     if ( rtlEvent.msg == 0 )
     {
-        sc82 (265,0,0,0);
         rtlEvent.window = NULL;
         rtlEvent.msg    = 0;
         rtlEvent.long1  = 0;
@@ -581,21 +562,20 @@ struct rtl_event_d *rtl_next_event (void)
 void rtl_enter_critical_section (void)
 {
     int S=0;
-
     while (TRUE){
         S = (int) gramado_system_call ( 
                       SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
-        if ( S == 1 ){ goto done; }
+        if (S == 1){
+            goto done;
+        }
     };
 // Nothing
 done:
-
 // #todo
 // Muda para zero para que ninguem entre.
     gramado_system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
     return;
 }
-
 
 // V (Verhogen) incrementar.
 // Hora de sair. Mudo para 1 para que outro possa entrar.
@@ -610,7 +590,6 @@ void rtl_exit_critical_section (void)
         0, 
         0 );
 }
-
 
 void *rtl_create_process( const char *file_name )
 {

@@ -401,21 +401,20 @@ struct rtl_event_d *rtl_next_event (void)
 void rtl_enter_critical_section (void)
 {
     int S=0;
-
     while (TRUE){
         S = (int) gramado_system_call ( 
                       SYSTEMCALL_GET_KERNELSEMAPHORE, 0, 0, 0 );
-        if ( S == 1 ){ goto done; }
+        if (S == 1){
+            goto done;
+        }
     };
 // Nothing
 done:
-
 // #todo
 // Muda para zero para que ninguem entre.
     gramado_system_call ( SYSTEMCALL_CLOSE_KERNELSEMAPHORE, 0, 0, 0 );
     return;
 }
-
 
 // V (Verhogen) incrementar.
 // Hora de sair. Mudo para 1 para que outro possa entrar.
@@ -430,7 +429,6 @@ void rtl_exit_critical_section (void)
         0, 
         0 );
 }
-
 
 void *rtl_create_process( const char *file_name )
 {

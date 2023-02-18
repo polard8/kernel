@@ -235,16 +235,11 @@ void gwssrv_enter_critical_section (void)
     // Se ainda for 0, continuo no while.
     // TRUE = OPEN.
     // FALSE = CLOSED.
-    // yield thread if closed.
 
     while (1){
         S = (int) gramado_system_call ( 226, 0, 0, 0 );
 
         if ( S == 1 ){ goto done; }
-        
-        //yield thread.
-        //gramado_system_call (265,0,0,0); 
-        sc82 (265,0,0,0);
     };
 
     // Close the gate. turn FALSE.
@@ -397,7 +392,6 @@ __again:
     //n_writes = send ( fd, __buffer, sizeof(__buffer), 0 );
     
     if (n_writes<=0){
-        rtl_yield();
         goto __again;
     }
 
@@ -605,7 +599,7 @@ exit2:
     message_buffer[4] = 0;
     message_buffer[5] = 0;
 exit1:
-    rtl_yield();
+   // Nothing
 exit0:
 // Sync. Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
@@ -693,7 +687,7 @@ static void dispacher(int fd)
 // socket e o kernel copia??
 // o kernel copia para aquele arquivo ao qual esse estivere conectado.
 // olhando em accept[0]
-// Precisamos fechar o client e yield se a leitura der errado?
+// Precisamos fechar o client se a leitura der errado?
 
 //
 // Recv
@@ -727,7 +721,7 @@ static void dispacher(int fd)
 //
 
 // Invalid request. 
-// Clean and yield.
+// Clean
     if (message_buffer[1] == 0 ){
         gwssrv_debug_print ("dispacher: Invalid request\n");
         goto exit2;
@@ -839,7 +833,6 @@ exit2:
     message_buffer[4] = 0;
     message_buffer[5] = 0;
 exit1:
-    //rtl_yield();
 exit0:
     return;
 }
@@ -3704,9 +3697,7 @@ static int on_execute(int dm)
 
         if (IsTimeToQuit == TRUE){ break; };
 
-        // Process all the messages in the queue, 
-        // starting at the first message.
-        // Disrespecting the circular input.
+        // Respecting the circular queue.
         if (IsAcceptingInput == TRUE){
             wmInputReader();
         }

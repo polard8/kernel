@@ -308,12 +308,7 @@ void gwssrv_enter_critical_section (void)
 
     while (1){
         S = (int) gramado_system_call ( 226, 0, 0, 0 );
-
         if ( S == 1 ){ goto done; }
-        
-        //yield thread.
-        //gramado_system_call (265,0,0,0); 
-        sc82 (265,0,0,0);
     };
 
     // Close the gate. turn FALSE.
@@ -671,7 +666,7 @@ exit2:
     message_buffer[4] = 0;
     message_buffer[5] = 0;
 exit1:
-    gwssrv_yield();
+    //gwssrv_yield();
 exit0:
 // Sync. Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );

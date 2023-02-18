@@ -1336,7 +1336,9 @@ void wm_remove_window_from_list_and_kill( struct gws_window_d *window );
 unsigned long wmGetLastInputJiffie(int update);
 
 int wmSTDINInputReader(void);
+
 int wmInputReader(void);
+int wmInputReader2(void);
 
 void wm_Update_TaskBar( char *string, int flush );
 

@@ -923,21 +923,10 @@ int main ( int argc, char *argv[] )
         // See: connect.c
         //gws_set_client_fd(client_fd);
         //gws_payment();
-        
-        //refresh background and yield.
-        //gws_refresh_yield(client_fd);
-        
-        //gws_refresh_window (client_fd, main_window);
-        //gws_yield();
     //}
-
 
     // #test: Chamando um demo.
     // gws_async_command(client_fd,4,9,0); //cat
-
-
-
-
 
 /*
 //============================================================

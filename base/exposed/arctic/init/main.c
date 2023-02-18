@@ -476,21 +476,15 @@ static int __idlethread_loop(void)
 // Get the message code.
 // Who can call us?
 
+// Nessa hora ja não nos preocupamos mais com essa thread.
+// Ele receberá algumas mensagens eventualmente.
     while (TRUE){
-
-        // Nessa hora ja não nos preocupamos mais com essa thread.
-        // Ele receberá algumas mensagens eventualmente.
-
-        rtl_yield();
-
         //if( isTimeToQuit == TRUE )
             //break;
-
         if ( rtl_get_event() == TRUE )
         {
             // save
             __Caller = (int) ( RTLEventBuffer[8] & 0xFFFF );
-
             __Procedure ( 
                 (void*) RTLEventBuffer[0], 
                 RTLEventBuffer[1], 
@@ -602,7 +596,7 @@ int main( int argc, char **argv)
 // hang
 // Not reached.
     while (TRUE){
-        rtl_yield();
+        //rtl_yield();
     };
 
     return 0;

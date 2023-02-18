@@ -4062,6 +4062,96 @@ int is_combination(int msg_code)
     return FALSE;
 }
 
+int wmInputReader(void)
+{
+// Get the messages in the queue,
+// respecting the circular queue.
+
+    int status=0;
+
+    register long i=0;
+    long extra_attempts=10;
+
+    int msg=0;
+    unsigned long long1=0;
+    unsigned long long2=0;
+
+    int IsCombination=FALSE;
+
+    status = (int) rtl_get_event();
+    if (status != TRUE)
+    {
+        for (i=0; i<extra_attempts; i++)
+        {
+            status = (int) rtl_get_event();
+            if (status == TRUE)
+                goto new_event;
+        };
+        goto fail;
+    }
+
+new_event:
+    msg = (int) (RTLEventBuffer[1] & 0xFFFFFFFF);
+    long1 = (unsigned long) RTLEventBuffer[2];
+    long2 = (unsigned long) RTLEventBuffer[3];
+
+
+// MOUSE events
+    if ( msg == GWS_MouseMove || 
+         msg == GWS_MousePressed ||
+         msg == GWS_MouseReleased )
+    {
+        on_mouse_event(
+            (int) msg,
+            (unsigned long) long1,
+            (unsigned long) long2 ); 
+        return 0;
+    }
+
+// Print char into the keyboard owner window.
+    if ( msg == GWS_KeyDown ||
+         msg == GWS_SysKeyDown ||
+         msg == GWS_SysKeyUp )
+    {
+        on_keyboard_event( 
+            (int) msg, (unsigned long) long1, (unsigned long) long2 );
+        return 0;
+    }
+
+// Is it a combination?
+    IsCombination = (int) is_combination(msg);
+    if (IsCombination){
+        on_combination(msg);
+    }
+
+// Hotkeys
+    if (msg == GWS_HotKey)
+    {
+        // #todo: Call a worker for that.
+
+        // Hot key id.
+        // Activate the window associated with the given ID.
+        if (long1 == 1){
+            printf ("GWS_Hotkey 1\n");
+        }
+        if (long1 == 2){
+            printf ("GWS_Hotkey 2\n");
+        }
+        // ...
+    }
+
+// Sys commands
+    //if (msg == GWS_Command){
+        // #todo: Call a worker for that.
+    //}
+
+//Unknown:
+    return 0;
+fail:
+    return -1;
+}
+
+
 // ------------------------------------------------
 // This is basically the low level input support 
 // for the Gramado OS when running the Gramado Window System.
@@ -4100,7 +4190,7 @@ int is_combination(int msg_code)
 // entregues pelo gramado.
 // Called by main.c
 
-int wmInputReader(void)
+int wmInputReader2(void)
 {
 // Process all the messages in the queue, 
 // starting at the first message.

@@ -783,10 +783,6 @@ static int __gws_redraw_window_reponse(int fd)
 // prestado o servido.
 // obs: Nesse momento deveríamos estar dormindo.
 
-    //int y=0;
-    //for(y=0; y<15; y++)
-        //gws_yield();   // See: libgws/
-
 // #todo
 // Podemos checar antes se o fd 
 // representa um objeto que permite leitura.
@@ -811,13 +807,11 @@ response_loop:
                       0 );
 
     //if (n_reads<=0){
-    //     gws_yield(); 
     //    goto response_loop;
     //}
     
     // Se retornou 0, podemos tentar novamente.
     if (n_reads == 0){
-        //gws_yield(); 
         goto response_loop;
     }
     
@@ -2002,7 +1996,7 @@ gws_draw_char (
     //gws_debug_print("gws_draw_char: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         if (Value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -2061,7 +2055,7 @@ gws_draw_text (
     //gws_debug_print("gws_draw_text: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         if (Value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -2117,7 +2111,7 @@ gws_clone_and_execute2 (
     //gws_debug_print("gws_draw_text: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         if (Value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -2353,7 +2347,7 @@ gws_change_window_position (
 // Waiting to read the response.
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return (int) -1; }
         //gws_yield();
@@ -2394,7 +2388,7 @@ gws_resize_window(
 // Waiting to read the response.
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         //gws_yield();
@@ -2435,7 +2429,7 @@ gws_redraw_window (
 // Waiting to read the response.
     while (TRUE){
         Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         if (Value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -2474,7 +2468,7 @@ struct gws_event_d *gws_get_next_event(
 // Waiting to read the response.
     while (TRUE){
         Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR )
         {
@@ -2537,7 +2531,7 @@ struct gws_window_info_d *gws_get_window_info(
 // Waiting to read the response.
     while (TRUE){
         Value = (unsigned long) rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR )
         {
@@ -2629,7 +2623,7 @@ gws_refresh_retangle (
     //gws_debug_print("gws_refresh_retangle: response\n");
     while (1){
         Value = rtl_get_file_sync( fd, SYNC_REQUEST_GET_ACTION );
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_REPLY ) { break; }
         if (Value == ACTION_ERROR ) { return -1; }
         if (Value == ACTION_NULL )  { return -1; }  //no reponse. (syncronous)
@@ -2766,7 +2760,7 @@ gws_create_window (
                       fd, 
                       SYNC_REQUEST_GET_ACTION );
 
-        if (value == ACTION_REQUEST){ rtl_yield(); }
+        //if (value == ACTION_REQUEST){ rtl_yield(); }
         if (value == ACTION_REPLY ) { break; }
         if (value == ACTION_ERROR ) { return -1; }
         //if (value == ACTION_NULL )  { return -1; }  // no reply
@@ -3354,7 +3348,7 @@ gws_async_command (
         // Essa é a sincronização esperada.
         // Não teremos uma resposta, mas precisamos
         // conferir a sincronização.
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_NULL )  { goto done; }
         if (Value == ACTION_ERROR ) { goto done; }
         
@@ -3441,7 +3435,7 @@ gws_async_command2 (
         // Essa é a sincronização esperada.
         // Não teremos uma resposta, mas precisamos
         // conferir a sincronização.
-        if (Value == ACTION_REQUEST){ rtl_yield(); }
+        //if (Value == ACTION_REQUEST){ rtl_yield(); }
         if (Value == ACTION_NULL )  { goto done; }
         if (Value == ACTION_ERROR ) { goto done; }
         

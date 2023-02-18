@@ -370,17 +370,9 @@ int xxxScanApplicationQueue(void)
     // Yield and clear.
     if ( RTLEventBuffer[1] == 0 )
     {
-
-        // ??
-        // In a test we saw that it was better without this thing.
-        // But just in case. It will stay here.
-
-        //sc82 (265,0,0,0);
-
         for(i=0; i<32; i++){
             RTLEventBuffer[i] = 0;
         };
-
         return FALSE;
     }
 
@@ -442,17 +434,9 @@ int xxxScanApplicationQueue2(int index, int restart)
     // Yield and clear.
     if ( RTLEventBuffer[1] == 0 )
     {
-
-        // ??
-        // In a test we saw that it was better without this thing.
-        // But just in case. It will stay here.
-
-        //sc82 (265,0,0,0);
-
         for(i=0; i<32; i++){
             RTLEventBuffer[i] = 0;
         };
-
         return FALSE;
     }
 
@@ -509,12 +493,9 @@ struct rtl_event_d *rtl_next_event (void)
  // Check if it is a valid event.
 
 // No, we do not have an event. 
-// Yield and clear.
 // Clean
-
     if ( rtlEvent.msg == 0 )
     {
-        sc82 (265,0,0,0);
         rtlEvent.window = NULL;
         rtlEvent.msg    = 0;
         rtlEvent.long1  = 0;

@@ -777,9 +777,8 @@ int main( int argc, char *argv[] )
         }
     };
 
-// HANG
+// Hang
     while(1){
-        rtl_yield();
     };
 
 

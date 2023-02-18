@@ -738,15 +738,19 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-// Network tests:
+// Network tests
+
+// arp
     if( strncmp(prompt,"n1", 2) == 0 ){
         sc82 ( 22003, 1, 0, 0 );
         goto exit_cmp;
     }
+// udp
     if( strncmp(prompt,"n2", 2) == 0 ){
         sc82 ( 22003, 2, 0, 0 );
         goto exit_cmp;
     }
+// dhcp
     if( strncmp(prompt,"n3", 2) == 0 ){
         sc82 ( 22003, 3, 0, 0 );
         goto exit_cmp;
@@ -1205,10 +1209,6 @@ void test_tty_support(int fd)
    gramado_system_call ( 900, 
        (unsigned long) "true.bin", 0, 0 );
 
-
-    gws_yield();
-    
-    
     int i=0;
     while(1){
 
@@ -1222,8 +1222,7 @@ void test_tty_support(int fd)
             }
             return;
         }
-        gws_yield();
-        
+
         //i++;
         //if(i>20) i=0;
     }
@@ -2631,9 +2630,6 @@ static int __input_GRAMADOTXT(int fd)
 // Poisiona no início do arquivo.
     rewind(new_stdin);
 
-// relax
-    rtl_yield();
-    
     while (1){
         C = fgetc(new_stdin);
         if (C > 0)
@@ -2645,12 +2641,10 @@ static int __input_GRAMADOTXT(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        rtl_yield(); // relax
     };
-    
+
     return 0;
 }
-
 
 // local
 // Pegando o input de 'stdout'.
@@ -2690,17 +2684,11 @@ static int __input_STDOUT(int fd)
 // Poisiona no início do arquivo.
     rewind(new_stdin);
 
-// relax
-    rtl_yield();
-    
     while (1){
-
         C = fgetc(new_stdin);
-
-        if( C == EOF || C == VK_RETURN ){
+        if ( C == EOF || C == VK_RETURN ){
             rewind(new_stdin);
         }
-        
         if (C > 0)
         {
             terminalProcedure( 
@@ -2710,7 +2698,6 @@ static int __input_STDOUT(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        rtl_yield(); // relax
     };
     
     return 0;
@@ -2751,12 +2738,6 @@ static int __input_STDERR(int fd)
     // atualiza as coisas em ring3 e ring0.
     //rewind(new_stdin);
 
-// relax
-    //rtl_yield();
-    //rtl_yield();
-    //rtl_yield();
-    //rtl_yield();
-    
     while (1){
         //C = fgetc(new_stdin);
         /*
@@ -2774,13 +2755,11 @@ static int __input_STDERR(int fd)
                 C );          // long2 (ascii)
         }
         */
-        // rtl_yield(); // relax
     };
 
     printf ("__input_STDERR: Stop listening stderr\n");
     return 0;
 }
-
 
 static int __input_STDIN(int fd)
 {
@@ -2822,15 +2801,10 @@ static int __input_STDIN(int fd)
     // atualiza as coisas em ring3 e ring0.
     rewind(new_stdin);
 
-// relax
-    //rtl_yield();
-
     while (1){
-
         if (isUsingEmbeddedShell == FALSE){
             break;
         }
-
         C = fgetc(new_stdin);
         if (C > 0)
         {
@@ -2841,7 +2815,6 @@ static int __input_STDIN(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        //rtl_yield(); // relax
     };
 
     printf ("__input_STDIN: Stop listening stdin\n");
@@ -2924,7 +2897,6 @@ int main ( int argc, char *argv[] )
             // porque o servidor tem clentes demais.
             // Vamos esperar para sempre?
             if (con_status == ECONNREFUSED){
-                rtl_yield();
             }
 
         }else{
