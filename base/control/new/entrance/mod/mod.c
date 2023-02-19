@@ -86,5 +86,37 @@ void test_mod0(void)
     }
 }
 
+void xp_putchar_in_fgconsole(unsigned long _char)
+{
+    int c = (int) (_char & 0xFF);
+
+// Draw and refresh.
+    console_outbyte2 ( c, fg_console );
+}
+
+void xp_refresh_screen(void)
+{
+    refresh_screen();
+}
+
+void xp_reboot(void)
+{
+    hal_reboot();
+}
+
+void xp_putchar_test(void)
+{
+    int c='x';
+    console_outbyte2 ( c, fg_console );
+}
+
+void xp_die(void)
+{
+    printf("xp_die:\n");
+    die();
+}
+
+
+
 
 

@@ -49,6 +49,12 @@ extern unsigned long kmList[KMODULE_MAX];
 
 
 void test_mod0(void);
+// xp - Cross Pointers.
+void xp_putchar_in_fgconsole(unsigned long _char);
+void xp_refresh_screen(void);
+void xp_reboot(void);
+void xp_putchar_test(void);
+void xp_die(void);
 
 #endif   
 

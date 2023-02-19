@@ -1592,11 +1592,6 @@ void console_putchar (int c, int console_number)
     stdio_terminalmode_flag = FALSE; 
 }
 
-void console_putchar_in_fgconsole(unsigned long _char)
-{
-    int c = (int) (_char & 0xFF);
-    console_putchar( c, fg_console );
-}
 
 // Print consecutive spaces.
 void console_print_indent(int indent, int console_number)
@@ -2350,10 +2345,10 @@ console_write (
                // Is printable?
                // ascii, not abnt2
                if (ch >= 32 && ch <= 127){
-                    
+
                     // Draw and refresh.
                     console_outbyte2 ( ch, console_number );
-               
+
                // >>>> [ Escape ]
                // Entramos em uma escape sequence,
                // entao o proximo case inicia o tratamento da escape sequence.

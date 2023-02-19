@@ -21,17 +21,24 @@ int PUTCHAR_FGCONSOLE=4;  //(1arg)
 // read messages
 // ...
 
+// -------------------
+
 static void caller0(unsigned long function_address);
 static void 
 caller1(
     unsigned long function_address, 
     unsigned long data0 );
 
-static int module_print(char *string);
 static inline void do_int3(void);
 static inline void do_hlt(void);
 
+int module_strlen(const char *s);
+static int newm0_1001(void);
+static int newm0_initialize(void);
+static void newm0_print_string (char *s);
+
 // -----------------------------
+
 
 static inline void do_int3(void)
 {
@@ -72,19 +79,10 @@ caller1(
     asm ("call *%0" : : "r"(function_address));
 }
 
-
-static int module_print(char *string)
-{
-    //#todo: We nned to send an argument to the kernel function.
-    caller0( (unsigned long) kfunctions[PUTCHARK] );
-    return 0;
-}
-
-
 //strlen
 // strlen:
 //    Give the string lenght in bytes.
-int module_strlen(const char *s);
+
 int module_strlen(const char *s)
 {
     register int i=0;
@@ -99,9 +97,7 @@ int module_strlen(const char *s)
     return (int) i;
 }
 
-
-void module_print_string (char *s);
-void module_print_string (char *s)
+static void newm0_print_string (char *s)
 {
     register int i=0;
     int size=0;
@@ -117,33 +113,23 @@ void module_print_string (char *s)
     };
 }
 
-
-//
-// main:
-//
-
-int main( int arc, char *argv[], int reason )
+static int newm0_initialize(void)
 {
-
-// Invalid reason.
-    if ( reason != 1000 &&
-         reason != 1001 )
-    {
-        return -1;
-    }
 
 // The kernel static entry point.
 // #bugbug: It's not safe.
 // We need a random address.
-
     unsigned char *k = (unsigned char *) 0x30001000;
 
 // #test
 // Lookup for "__GRAMADO__"
 // see: head_64.asm
-    int i=0;
-    int Found=0;
+    register int i=0;
+    int Found=0;  //FALSE
     unsigned long __function_table=0;
+
+    ModuleInitialization.initialized = 0;
+
     for (i=0; i<100; i++)
     {
         if (k[i+0]  == '_' &&
@@ -168,29 +154,61 @@ int main( int arc, char *argv[], int reason )
     //unsigned long *kfunctions = (unsigned long *) __function_table;
     kfunctions = (unsigned long *) __function_table;
 
+// done?
+    // TRUE
     if (Found==1)
     {
-        if (reason == 1000){
-            module_print_string("newm0: reason 1000\n");
-        }
-
-        if (reason == 1001){
-            module_print_string("newm0: reason 1001\n");
-        }
-
-
-        //for (i=0; i<100; i++)
-        //    caller0( (unsigned long) kfunctions[PUTCHARK] );
-        //caller0( (unsigned long) kfunctions[DIE] );
-        //caller0( (unsigned long) kfunctions[PUTCHARK] );
-        //caller0( (unsigned long) kfunctions[REBOOT] );
-        //do_int3();
-        //caller1( kfunctions[PUTCHAR_FGCONSOLE], 'x');
-        
+        ModuleInitialization.initialized = 1;
+        newm0_print_string("newm0_initialize: Initialized\n");
         return 0;
     }
 
 fail:
+    ModuleInitialization.initialized = 0;
+    return -1;
+}
+
+
+static int newm0_1001(void)
+{
+    if (ModuleInitialization.initialized != 1){
+        return -1;
+    }
+    newm0_print_string("newm0_1001: reason 1001\n");
+
+    //for (i=0; i<100; i++)
+    //    caller0( (unsigned long) kfunctions[PUTCHARK] );
+
+    //caller0( (unsigned long) kfunctions[DIE] );
+    //caller0( (unsigned long) kfunctions[PUTCHARK] );
+    //caller0( (unsigned long) kfunctions[REBOOT] );
+    //do_int3();
+    //caller1( kfunctions[PUTCHAR_FGCONSOLE], 'x');
+
+// Done
+    return 0;
+}
+
+// ---------------------------
+// main:
+int main( int arc, char *argv[], int reason )
+{
+
+    if (reason<0)
+        return -1;
+
+    switch (reason){
+        case 1000:
+            return (int) newm0_initialize();
+            break;
+        case 1001:
+            return (int) newm0_1001();
+            break;
+        default:
+            return -1;
+            break;
+    };
+
     return -1;
 }
 

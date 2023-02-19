@@ -22,12 +22,13 @@ extern _system_state
 
 ;---------------------------------------------
 ; Function table
+; see: mod.c
 ; see: newm0/
-extern _die           ;; 0 (no arg)
-extern _putchar_K     ;; 1 (no arg)
-extern _hal_reboot    ;; 2 (no arg)
-extern _refresh_screen  ;; 3 (no arg)
-extern _console_putchar_in_fgconsole  ;; 4 (1 arg)
+extern _xp_die                   ;; 0 (no arg)
+extern _xp_putchar_test          ;; 1 (no arg)
+extern _xp_reboot                ;; 2 (no arg)
+extern _xp_refresh_screen        ;; 3 (no arg)
+extern _xp_putchar_in_fgconsole  ;; 4 (1 arg)
 ; ...
 ;---------------------------------------------
 
@@ -72,13 +73,16 @@ _kernel_begin:
 ; ----------------------
 ; header data area:
 ; Exporting ...
+; see: mod.c
+; see: newm0/
+
     nop                ; Nop
     DB '__GRAMADO__'   ; Signature
-    DQ _die            ; symbol 0:  (no arg)
-    DQ _putchar_K      ; symbol 1: see: kstdio.c (no arg)
-    DQ _hal_reboot     ; symbol 2: (no arg)
-    DQ _refresh_screen ; symbol 3: (no arg)
-    DQ _console_putchar_in_fgconsole  ; sysbol 4: see: console.c (1 arg)
+    DQ _xp_die                   ; symbol 0:  (no arg)
+    DQ _xp_putchar_test          ; symbol 1: (no arg)
+    DQ _xp_reboot                ; symbol 2: (no arg)
+    DQ _xp_refresh_screen        ; symbol 3: (no arg)
+    DQ _xp_putchar_in_fgconsole  ; symbol 4: see: console.c (1 arg)
     ; ...
 ; ----------------------
 
