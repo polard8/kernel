@@ -67,24 +67,15 @@ user_ccflags = \
 user_ldflags = -m elf_x86_64 -T x86_64/link_r0.ld
 
 #todo
-#path longo. vamos mudar  as libs de lugar para gramado/libs.
-
+# This is a invalid pathname.
+# We're gonna point this to a valid mod0.bin rtl.
 LIBC              = ../../../comtier/lib/rtl/include/
 LIBCOBJ           = ../../../comtier/lib/rtl/obj
 WS_INCLUDES       = include/ 
 WS_INCLUDES_LOCAL = .
 
 
-#
 # Objects
-#
-
-
-#head
-#myObjects = crt0.o main.o rtl.o \
-#ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
-#termios.o ioctl.o fcntl.o    
-
 myObjects = crt0.o main.o    
 
 
@@ -92,19 +83,15 @@ myObjects = crt0.o main.o
 
 all: crt0.o main.o all-c gws-link finalize clean
 	@echo "Ok?"
-	
 crt0.o:
 	$(CC)  -c  crt0.c  $(user_ccflags) -I . -o crt0.o
-
 main.o:
 	$(CC)  -c  main.c  $(user_ccflags) -I . -o main.o
-
 all-c:
 
 # == imported objects =============================
 
 # rtl/
-
 
 gws-link:
 	$(LD) $(user_ldflags) -o MOD0.BIN $(myObjects)

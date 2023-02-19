@@ -1,6 +1,7 @@
 
-#include <kernel.h>    
+// request.c
 
+#include <kernel.h>    
 
 void clear_request (void)
 {
@@ -19,7 +20,7 @@ void clear_request (void)
     REQUEST.long5  = 0;
     REQUEST.long6  = 0;
 
-    // The number of the current request.
+// The number of the current request.
     kernel_request = 0;
 }
 
@@ -43,7 +44,6 @@ create_request (
     unsigned long long2 )
 {
 
-
     debug_print ("create_request:\n");
 
     if (number > KERNEL_REQUEST_MAX){
@@ -51,7 +51,6 @@ create_request (
         return 1;
         //return -1;  //#todo: Use this one if it is possible.
     }
-
 
     kernel_request = number;
 
@@ -77,8 +76,8 @@ create_request (
     REQUEST.long1  = (unsigned long) long1;
     REQUEST.long2  = (unsigned long) long2;
 
-	//extra.
-	//rever isso depois.
+// Extra.
+// rever isso depois.
     REQUEST.long3 = 0;
     REQUEST.long4 = 0;
     REQUEST.long5 = 0;
@@ -88,14 +87,11 @@ create_request (
 }
 
 
-
 /*
- *******************************************************
  * request:
  *    Trata os requests do Kernel.
  *    Isso eh chamado durante a a fase kernel 
  *    de uma interrupçao de timer.
- *    
  *    São serviços que terão seu atendimento atrazado até pouco antes de 
  * retornar da interrupção do timer.
  *    Sendo assim, um programa em user mode pode solicitar um request através
@@ -105,31 +101,22 @@ create_request (
  * de request.
  *   Um request será atendido somente quando o timeout zerar. (defered)
  */
+int request (void)
+{
 
-int request (void){
-
-    // Targets
-
+// Targets
     struct process_d  *Process;
     struct thread_d   *Thread;
-
     int PID=-1;
     int TID=-1;
-
     unsigned long r=0;    //Número do request.
     unsigned long t=0;    //Tipo de thread. (sistema, periódica...).
 
-
-	// targets
-
+// targets
     PID = (int) REQUEST.target_pid;
     TID = (int) REQUEST.target_tid;
 
-
-//
 // Timeout
-//
-
     if ( REQUEST.timeout > 0 )
     {
         REQUEST.timeout--;
@@ -137,16 +124,13 @@ int request (void){
         //return -1; // use this one if it is possible.
     }
 
-//
 // Filter
-//
 
     if ( PID < 0 || PID > PROCESS_COUNT_MAX ){
         Process = NULL;
     }else{
         Process = (void *) processList[PID];
     };
-
 
     if ( TID < 0 || TID > THREAD_COUNT_MAX ){
         Thread = NULL;
@@ -155,9 +139,7 @@ int request (void){
     };
 
 
-//
 // Number
-//
 
     r = kernel_request;
 
@@ -326,28 +308,12 @@ int request (void){
     };
 
 
-//Done:
-//   Essas finalizações aplicam para todos os requests.
-
+// Done:
+// Essas finalizações aplicam para todos os requests.
     clear_request();
     kernel_request = (unsigned long) 0;  
 
-    // Ok.
+// Ok.
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

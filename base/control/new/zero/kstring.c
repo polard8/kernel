@@ -152,8 +152,8 @@ void *memcpy64 ( void *v_dst, const void *v_src, unsigned long n )
 
 // strcpy:  
 //     Copy a string
-char *strcpy ( char *to, const char *from ){
-
+char *strcpy ( char *to, const char *from )
+{
     register int i=0;
 
     while ( to[i] = from[i] )

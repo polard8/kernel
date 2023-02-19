@@ -33,11 +33,339 @@ static inline void do_int3(void);
 static inline void do_hlt(void);
 
 int module_strlen(const char *s);
+void *memset ( void *ptr, int value, int size );
+char *strcpy ( char *to, const char *from );
+char *kinguio_itoa (int val, char *str);
+void 
+kinguio_i2hex( 
+    unsigned int val, 
+    char *dest, 
+    int len );
+    
 static int newm0_1001(void);
 static int newm0_initialize(void);
 static void newm0_print_string (char *s);
 
+// printf support.
+void kinguio_puts(const char* str);
+static char *_vsputs_r(char *dest, char *src);
+int 
+kinguio_vsprintf(
+    char *str, 
+    const char *fmt, 
+    va_list ap );
+int kinguio_printf(const char *fmt, ...);
+int mysprintf(char *buf, const char *fmt, ...);
+
+#define printf   kinguio_printf
+#define printk   kinguio_printf
+#define sprintf  mysprintf
+
+
 // -----------------------------
+
+//strlen
+// strlen:
+//    Give the string lenght in bytes.
+
+int module_strlen(const char *s)
+{
+    register int i=0;
+
+//#todo
+    //if ( (void *) s == NULL ){ return -1; }
+
+    for ( i=0; s[i] != '\0'; ++i )
+    {
+    };
+
+    return (int) i;
+}
+
+void *memset ( void *ptr, int value, int size )
+{
+    register int i=0;
+
+    if ( ptr != NULL && size > 0 )
+    {
+        //#bugbug.
+        unsigned char *temp = ptr;
+
+        for ( i=0; i < size; i++ )
+        {
+            *temp++ = (unsigned char) value;
+        };
+    }
+
+    return (void *) ptr;
+}
+
+// strcpy:  
+//     Copy a string
+char *strcpy ( char *to, const char *from )
+{
+    register int i=0;
+
+    while ( to[i] = from[i] )
+    {
+        i += 1;
+    };
+
+    return (to);
+}
+
+char *kinguio_itoa (int val, char *str) 
+{
+    int value = val;
+    char *valuestring = (char *) str;
+    int min_flag=0;
+    char swap=0; 
+    char *p;
+
+    if (0 > value)
+    {
+        *valuestring++ = '-';
+        value = -____INT_MAX> value ? min_flag = ____INT_MAX : -value;
+    }
+
+    p = valuestring;
+
+    do {
+         *p++ = (char) (value % 10) + '0';
+         value /= 10;
+    } while (value);
+
+    if (min_flag != 0)
+    {
+        ++*valuestring;
+    }
+
+    *p-- = '\0';
+
+    while (p > valuestring)
+    {
+        swap = *valuestring;
+        *valuestring++ = *p;
+        *p-- = swap;
+    };
+
+    return str;
+}
+
+void 
+kinguio_i2hex( 
+    unsigned int val, 
+    char *dest, 
+    int len )
+{
+    char *cp;
+    register int i=0;
+    int x=0;
+    unsigned n=0;  //??
+
+    if (val == 0)
+    {
+        cp = &dest[0];
+        *cp++ = '0';
+        *cp = '\0';
+        return;
+    }
+
+    n = val;
+    cp = &dest[len];
+
+    while (cp > dest)
+    {
+        x = (n & 0xF);
+        n >>= 4;
+        
+        // #
+        *--cp = x + ((x > (HEX_LEN+1)) ? 'A' - 10 : '0');
+    };
+
+    dest[len] = '\0';
+
+    cp = &dest[0];
+
+    for (i=0; i<len; i++)
+    {
+        if (*cp == '0'){
+            cp++;
+        }else{
+            strcpy (dest,cp);
+            break;
+        };
+    }
+
+    cp = &dest[0];
+    n = module_strlen(cp);
+
+    memset( (dest+n), 0, (8-n) );
+}
+
+
+
+// Print a string.
+void kinguio_puts(const char* str)
+{
+    register int i=0;
+    ssize_t StringLen=0;
+    int _char=0;
+
+    if (ModuleInitialization.initialized != 1){
+        return;
+    }
+
+    if (!str){
+        return;
+    }
+
+    StringLen = (ssize_t) module_strlen(str);
+    if (StringLen<=0)
+        return;
+
+// Print chars. 
+    for (i=0; i<StringLen; i++)
+    {
+        _char = (int) ( str[i] & 0xFF );
+        caller1( 
+            kfunctions[PUTCHAR_FGCONSOLE], 
+            _char ); 
+    };
+}
+
+static char *_vsputs_r(char *dest, char *src)
+{
+    unsigned char *usrc = (unsigned char *) src;
+    unsigned char *udest = (unsigned char *) dest;
+
+    while ( *usrc )
+    { 
+        *udest++ = *usrc++; 
+    };
+
+    return (char *) udest;
+}
+
+
+int 
+kinguio_vsprintf(
+    char *str, 
+    const char *fmt, 
+    va_list ap )
+{
+    char *str_tmp = str;
+    int index=0;
+    unsigned char u=0;
+    int d=0;
+    char c=0; 
+    char *s;
+    char buffer[256];  //#bugbug: Too short.
+    char _c_r[] = "\0\0";
+
+    while ( fmt[index] )
+    {
+        switch (fmt[index]){
+
+        case '%':
+
+            ++index;
+
+            switch (fmt[index]){
+
+            case 'c':
+                *_c_r = c = (char) va_arg (ap, int);
+                str_tmp = _vsputs_r(str_tmp,_c_r);
+                break;
+
+            case 's':
+                s = va_arg (ap, char*);
+                str_tmp = _vsputs_r(str_tmp,s);
+                break;
+
+            case 'd':
+            case 'i':
+                d = va_arg (ap, int);
+                kinguio_itoa (d,buffer);
+                str_tmp = _vsputs_r(str_tmp,buffer);
+                break;
+
+            case 'u':
+                u = va_arg (ap, unsigned int);
+                kinguio_itoa (u,buffer);
+                str_tmp = _vsputs_r(str_tmp,buffer);
+                break;
+
+            case 'X':
+            case 'x':
+                d = va_arg (ap, int);
+                kinguio_i2hex(d, buffer,8);
+                str_tmp = _vsputs_r(str_tmp,buffer);
+                break;
+
+            default:
+                str_tmp = _vsputs_r(str_tmp,"%%");
+                break;
+            }
+            break;
+
+        default:
+            *_c_r = fmt[index];
+            str_tmp = _vsputs_r(str_tmp,_c_r);
+            break;
+        }
+        ++index;
+    }
+
+    return (int) ( (long) str_tmp - (long) str );
+}
+
+
+// printf implementation.
+// Credits:
+// Nelson Cole. Kinguio/Sirius OS.
+int kinguio_printf(const char *fmt, ...)
+{
+    static char data_buffer[1024];
+    int ret=0;
+
+/*
+// If the virtual console isn't full initialized yet.
+    if (Initialization.console_log != TRUE){
+        return -1;
+    }
+*/
+    memset (data_buffer, 0, 1024); 
+
+//----------
+    va_list ap;
+    va_start(ap, fmt);
+    ret = kinguio_vsprintf(data_buffer, fmt, ap);
+    va_end(ap);
+//-----------
+
+// Print the data buffer.
+    kinguio_puts(data_buffer);
+
+    return (int) ret;
+}
+// ===================================
+
+// mysprintf: (sprintf)
+// Variable parameter form to achieve sprintf.
+int mysprintf(char *buf, const char *fmt, ...)
+{
+    int i=0;
+
+// Write the fmt format string to the buffer buf 
+    va_list args;
+    va_start(args, fmt);
+    i = kinguio_vsprintf(buf, fmt, args);
+    va_end(args);
+
+    return (int) i;
+}
+
 
 
 static inline void do_int3(void)
@@ -79,24 +407,6 @@ caller1(
     asm ("call *%0" : : "r"(function_address));
 }
 
-//strlen
-// strlen:
-//    Give the string lenght in bytes.
-
-int module_strlen(const char *s)
-{
-    register int i=0;
-
-//#todo
-    //if ( (void *) s == NULL ){ return -1; }
-
-    for ( i=0; s[i] != '\0'; ++i )
-    {
-    };
-
-    return (int) i;
-}
-
 static void newm0_print_string (char *s)
 {
     register int i=0;
@@ -108,8 +418,7 @@ static void newm0_print_string (char *s)
     {
         caller1( 
             kfunctions[PUTCHAR_FGCONSOLE], 
-            s[i] 
-        );
+            s[i] );
     };
 }
 
@@ -184,6 +493,10 @@ static int newm0_1001(void)
     //caller0( (unsigned long) kfunctions[REBOOT] );
     //do_int3();
     //caller1( kfunctions[PUTCHAR_FGCONSOLE], 'x');
+
+// #testing printf
+    int value=1234;
+    printf("mod0.bin: {%d} Testing printf :)\n",value);
 
 // Done
     return 0;
