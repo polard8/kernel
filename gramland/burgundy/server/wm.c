@@ -1711,7 +1711,7 @@ struct gws_window_d *do_create_titlebar(
     }
 
     parent->frame.titlebar_icon_id = icon_id;
-    
+
 // Decode the bmp that is in a buffer
 // and display it directly into the framebuffer. 
 // IN: index, left, top
@@ -4935,8 +4935,27 @@ void create_taskbar (unsigned long tb_height)
 
     // Número de botões criados.
     tb_buttons_count++;
+
+    /*
+    // --------------------------------------
+    // Decode the bmp that is in a buffer
+    // and display it directly into the framebuffer. 
+    // IN: index, left, top
+    // see: bmp.c
+    unsigned long iL=0;
+    unsigned long iT=0;
+    iL = (unsigned long) (b_left + METRICS_ICON_LEFTPAD);
+    iT = (unsigned long) (b_top + METRICS_ICON_TOPPAD);
+    gwssrv_display_system_icon( 
+        (int) 1, 
+        (unsigned long) iL, 
+        (unsigned long) iT );
+    // --------------------------------------
+    */
+
     };
 
+// ---------------------
 // Show
     flush_window_by_id(taskbar_window->id);
     //flush_window_by_id(__taskbar_startmenu_button_window->id);

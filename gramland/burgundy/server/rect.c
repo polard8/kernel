@@ -1231,42 +1231,22 @@ rectBackbufferDrawRectangle0 (
 // Se a largura for maior que largura do dispositivo.
     if ( rect.width > device_w ){
         rect.width = (unsigned long) device_w;
-        debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.width > device_w\n");
-        return;
+        //debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.width > device_w\n");
+        //return;
     }
 
 // Se a altura for maior que altura do dispositivo.
     if ( rect.height > device_h ){
         rect.height = (unsigned long) device_h;
-        debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.height > device_h\n");
-        return;
+        //debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.height > device_h\n");
+        //return;
     }
 
 // Limits
 // Se for maior que o espaço que sobra, 
 // então será igual ao espaço que sobra.
 
-    if ( rect.width > (device_w - rect.left) )
-    {
-        rect.width = (unsigned long) (device_w - rect.left);
-        //debug_print("rectBackbufferDrawRectangle0: [AJUST] rect.width\n");
-    }
 
-    if (rect.height > (device_h - rect.top) )
-    {
-        rect.height = (unsigned long) (device_h - rect.top);
-        //debug_print("rectBackbufferDrawRectangle0: [AJUST] rect.height\n");
-    }
-
-// check
-    if ( rect.right > device_w ){
-        debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.right > device_w\n");
-        return;
-    }
-    if ( rect.bottom > device_h ){
-        debug_print("rectBackbufferDrawRectangle0: [FAIL] rect.bottom > device_h\n");
-        return;
-    }
 
 // empty
     if (fill == FALSE){

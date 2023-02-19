@@ -241,8 +241,18 @@ int main( int argc, char *argv[] )
     if (w == 640)
         w_width = 480;
     unsigned long w_height = (h/2);
+
     unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
     unsigned long viewwindowy = ( ( h - w_height) >> 1 );
+    //unsigned long viewwindowx = 100;
+    //unsigned long viewwindowy = 100;
+
+// #test
+// #bugbug
+// Se tentarmos pintar fora dos limites da tela,
+// então a janela sofrerá clipping e não teremos problemas.
+// O proble não é a pintura, é sim na hora do refresh.
+// Pois o refresh vai escrever em área não mapeada de memória.
 
     if (w == 320)
     {

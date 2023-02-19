@@ -257,18 +257,6 @@ struct rect_d
     struct rect_d *next;
 };
 
-// Isso pode ser útil principalmente
-// para passar um retângulo de um ambiente para outro.
-// É muito mais didático que a figura do retângulo como objeto.
-struct surface_d
-{
-    int used;
-    int magic;
-    int dirty;
-    struct rect_d *rect;
-    
-    struct surface_d *next;
-};
 
 /* rgba */
 struct tagRGBA
@@ -391,12 +379,11 @@ struct msg_d
 };
 
 
-// #deprecated
+// Used by surface_d
 struct window_d
 {
-    int dummy_deprecated;
-    //int used;
-    //int magic;
+    int wid;
+    struct rect_d *next;
 };
 
 // #maybe
@@ -410,6 +397,37 @@ unsigned long Windows[KGWS_ZORDER_MAX];
 
 // id da janela que o mouse está em cima.
 int window_mouse_over; 
+
+
+//--------------------------------------
+
+// Isso pode ser útil principalmente
+// para passar um retângulo de um ambiente para outro.
+// É muito mais didático que a figura do retângulo como objeto.
+struct surface_d
+{
+    int used;
+    int magic;
+
+// How many bytes?
+    size_t size_in_bytes;
+    int bpp;
+    unsigned long width;
+    unsigned long pitch;
+    unsigned long height;
+
+// Surface ID.
+    int surface_id;
+// Window ID.
+// This window owns this surface.
+// The wid provided by the window server.
+    int owner_wid;
+
+    int dirty;
+    struct rect_d rect;
+
+    struct surface_d *next;
+};
 
 //--------------------------------------
 // Ponteiros para ícones
