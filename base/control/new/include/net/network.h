@@ -105,6 +105,20 @@ extern int ____network_late_flag;
 //
 
 
+void 
+network_fill_mac(
+    unsigned char *to, 
+    unsigned char *from );
+void 
+network_fill_ipv4(
+    unsigned char *to,
+    unsigned char *from );
+void 
+network_fill_ipv6(
+    unsigned char *to,
+    unsigned char *from );
+
+
 unsigned short 
 net_checksum(
     const unsigned char *phdr, 

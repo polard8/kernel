@@ -87,6 +87,23 @@ network_handle_udp(
     p = udp_payload;
     int mFlag=0;
 
+// #test
+// DHCP dialog
+// Receiving Offer and Ack.
+    //if (dport == 68)
+    if (dport == 68 || dport == 67)
+    {
+        printf("UDP: dport{%d}   #debug\n",dport);
+        //refresh_screen();
+        //die();
+
+        // Handle dhcp protocol.
+        network_handle_dhcp(
+            (buffer + UDP_HEADER_LENGHT),
+            (udp->uh_ulen - UDP_HEADER_LENGHT) );
+        return;
+    }
+
     if (dport == 34884 || dport == 11888)
     {
         printf ("UDP: Message{%s}\n", udp_payload );
@@ -105,21 +122,6 @@ network_handle_udp(
                 die();
             }
         }
-    }
-
-// #test
-// DHCP dialog
-// Receiving Offer and Ack.
-    if (dport == 68 || dport == 67)
-    {
-        printf("UDP: dport{%d}   #debug\n",dport);
-        refresh_screen();
-        //die();
-
-        // Handle dhcp protocol.
-        network_handle_dhcp(
-            (buffer + UDP_HEADER_LENGHT),
-            (udp->uh_ulen - UDP_HEADER_LENGHT) );
     }
 }
 
@@ -516,12 +518,12 @@ network_send_udp (
     //while(1){}
     
     printf ("Done\n");
-    refresh_screen();
+    //refresh_screen();
     return 0;
 
 fail:
     printf ("Fail\n");
-    refresh_screen();
+    //refresh_screen();
     return -1;
 }
 

@@ -11,10 +11,10 @@ unsigned char __arp_target_mac[6] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
 };
 unsigned char __arp_gramado_default_ipv4[4] = { 
-    192, 168, 1, 12 
+    0, 0, 0, 0 
 };
 unsigned char __arp_target_default_ipv4[4]  = { 
-    192, 168, 1, 6 
+    192, 168, 1, 1 
 };
 unsigned char __arp_gateway_default_ipv4[4] = { 
     192, 168, 1, 1 
@@ -106,12 +106,12 @@ network_handle_arp(
         //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
     };
 
-    refresh_screen();
+    //refresh_screen();
     return;
 
 fail:
     printf("network_handle_arp: Fail\n");
-    refresh_screen();
+    //refresh_screen();
     return;
 }
 
@@ -318,7 +318,7 @@ void network_send_arp_request(void)
     network_send_arp( 
         __arp_broadcast_mac,                // target mac
         __arp_gramado_default_ipv4,  // src ip 
-        __arp_target_default_ipv4,      // dst ip (Linux)
+        __arp_target_default_ipv4,      // dst ip 
         ARP_OPC_REQUEST );
 }
 

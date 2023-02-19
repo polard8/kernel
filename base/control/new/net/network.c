@@ -34,6 +34,64 @@ char *default_network_version_string = "0.0.0";
 
 // ====================================================
 
+void 
+network_fill_mac(
+    unsigned char *to, 
+    unsigned char *from )
+{
+    register long i=0;
+
+    if ( (void*) to == NULL )
+        return;
+    if ( (void*) from == NULL )
+        return;
+
+    for (i=0; i<6; i++)
+    {
+        to[i] = from[i];
+    };
+}
+
+
+void 
+network_fill_ipv4(
+    unsigned char *to,
+    unsigned char *from )
+{
+    register long i=0;
+
+    if ( (void*) to == NULL )
+        return;
+    if ( (void*) from == NULL )
+        return;
+
+    for (i=0; i < 4; i++)
+    {
+        to[i] = from[i];
+    };
+}
+
+void 
+network_fill_ipv6(
+    unsigned char *to,
+    unsigned char *from )
+{
+    register long i=0;
+
+    if ( (void*) to == NULL )
+        return;
+    if ( (void*) from == NULL )
+        return;
+
+    for (i=0; i < 6; i++)
+    {
+        to[i] = from[i];
+    };
+}
+
+
+
+
 // Credits: Sirius OS.
 unsigned short 
 net_checksum(

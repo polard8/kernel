@@ -46,7 +46,6 @@ network_handle_dhcp(
     const unsigned char *buffer, 
     ssize_t size )
 {
-
     struct dhcp_d *dhcp;
     dhcp = (struct dhcp_d *) buffer;
 
@@ -59,16 +58,23 @@ network_handle_dhcp(
         //return;
 
 // yiaddr: Your ip address.
-    int your_ip[4];
-    your_ip[0] = (int) (dhcp->yiaddr                & 0xFF);
-    your_ip[1] = (int) ( (dhcp->yiaddr >> 8)   & 0xFF);
-    your_ip[2] = (int) ( (dhcp->yiaddr >> 16) & 0xFF);
-    your_ip[3] = (int) ( (dhcp->yiaddr >> 24) & 0xFF);
-    printf ("network_handle_dhcp: Your IP %d.%d.%d.%d\n",
-        your_ip[0],
-        your_ip[1],
-        your_ip[2],
-        your_ip[3] );
+    char your_ip[4];
+    your_ip[0] = (char) (dhcp->yiaddr          & 0xFF);
+    your_ip[1] = (char) ( (dhcp->yiaddr >> 8)  & 0xFF);
+    your_ip[2] = (char) ( (dhcp->yiaddr >> 16) & 0xFF);
+    your_ip[3] = (char) ( (dhcp->yiaddr >> 24) & 0xFF);
+    printf ("network_handle_dhcp: Your IP %d.%d.%d.%d  <<< ---------\n",
+        your_ip[0], your_ip[1], your_ip[2], your_ip[3] );
+
+// siaddr: Your ip address.
+    char server_ip[4];
+    server_ip[0] = (char) (dhcp->siaddr          & 0xFF);
+    server_ip[1] = (char) ( (dhcp->siaddr >> 8)  & 0xFF);
+    server_ip[2] = (char) ( (dhcp->siaddr >> 16) & 0xFF);
+    server_ip[3] = (char) ( (dhcp->siaddr >> 24) & 0xFF);
+    printf ("network_handle_dhcp: Server IP %d.%d.%d.%d  <<< ---------\n",
+        server_ip[0], server_ip[1], server_ip[2], server_ip[3] );
+
 
 // chaddr: Client hardware address.
     printf ("network_handle_dhcp: Client MAC %x.%x.%x.%x.%x.%x\n",
@@ -79,15 +85,59 @@ network_handle_dhcp(
         dhcp->chaddr[4],
         dhcp->chaddr[5] );
 
-/*
-    switch (?){
-        case Offer:
-        case Ack:
-    };
-*/
 
-    refresh_screen();
-    die();
+// Operation
+// Is it a Reply?
+    //if (dhcp->op == 1)
+        //return;
+    if (dhcp->op == 2)
+        printf ("HDCP: Reply received\n");
+
+
+// 53 = DHCP Message type.
+    //if (dhcp->options[0] != OPT_DHCP_MESSAGE_TYPE)
+        //return;
+    //dhcp->options[1] = 0x01;  // lenght
+    //dhcp->options[2] = (uint8_t) message_type;  // Discover or Request.
+
+    if ( dhcp->options[2] != DORA_O && dhcp->options[2] != DORA_A )
+    {
+        //return;
+    }
+
+    if ( dhcp->options[2] == DORA_O )
+        printf ("HDCP: Offer received\n");
+    if ( dhcp->options[2] == DORA_A )
+    {
+        printf ("HDCP: Ack received <<<< -------------- ACK :)\n");
+        die();
+    }
+    if ( dhcp->options[2] == DHCP_DECLINE ){
+        printf ("HDCP: Decline received\n");
+        return;
+    }
+
+// #test
+// Send request
+    if ( dhcp->options[2] == DORA_O )
+    {
+        printf ("DHCP: Send Dora Request #todo\n");
+        
+        // #bugbug
+        // This is causing PF.
+        network_dhcp_send( 
+            dhcp,  //header 
+            your_ip,  // Your ip
+            server_ip,  // Server ip
+            DORA_R,  // message code. (Request) 
+            68,      // s port ?
+            67 );    // d port ?
+        
+        return;
+    }
+
+    //refresh_screen();
+    //die();
 
     return;
 }
@@ -228,7 +278,7 @@ network_dhcp_send(
 
     // Discovering and IP.
     case DORA_D:
-        printf("DORA_D\n");
+        printf("DORA_D <<<-----------------------\n");
         
         //++
         // Parameter Request list
@@ -246,7 +296,7 @@ network_dhcp_send(
 
     // Requesting an IP.
     case DORA_R:
-        printf("DORA_R\n");
+        printf("DORA_R <<<<----------------\n");
 
         //++
         // Requested IP address
@@ -309,10 +359,11 @@ network_dhcp_send(
         __udp_payload_size ); 
 
 // done:
+    printf("network_dhcp_send: done :)\n");
     return;
 
 fail:
-    refresh_screen();
+    //refresh_screen();
     return;
 }
 
@@ -349,8 +400,8 @@ int network_initialize_dhcp(void)
         __dhcp_source_ipv4,  // 0.0.0.0 
         __dhcp_target_ipv4,  // Broadcast
         DORA_D,  // message code. 
-        68,                             // s port
-        67 );                          // d port
+        68,    // s port
+        67);   // d port
 
 /*
 // #test
