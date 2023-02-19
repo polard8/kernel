@@ -7,9 +7,15 @@
 // over a hundred hardware registers accessible 
 // from the Port I/O address space.
 // See: http://www.brokenthorn.com/Resources/OSDevVid2.html
+
 // :::: 
-// CRT Controller, Sequencer, Graphics Controller, RAMDAC,
-// Video memory, Attribute Controller
+// CRT Controller, 
+// Sequencer, 
+// Graphics Controller, 
+// RAMDAC,
+// Video memory, 
+// Attribute Controller.
+
 /*
 Graphics Registers -- 
     Control the way the CPU accesses video RAM.
@@ -27,7 +33,7 @@ External Registers --
 */
 
 
-// super vga?
+// Super vga?
 // In order for us to support SuperVGA devices we have only two options:
 // + Write a device driver for each type of display device we want to support.
 // + Use Vesa Bios Extensions (VBE).
@@ -41,24 +47,24 @@ External Registers --
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
 // libio
 #include <libio.h>
 
 
-// Sefine the ports,
-// taken from http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c
+// Define the ports.
+// Taken from: 
+// http://files.osdev.org/mirrors/geezer/osd/graphics/modes.c
 
 // ===============================
 // Step1:
-// Bit 0 of this register controls the location 
-// of several other registers: 
-// if cleared, port 0x3D4 is mapped to 0x3B4 ...
+// Bit 0 of this register controls the location of several other registers: 
+// If cleared, port 0x3D4 is mapped to 0x3B4 ...
 #define VGA_MISC_WRITE  0x3C2
 #define VGA_MISC_READ   0x3CC
 
 // ===============================
 // Step2:
+// Sequencer.
 #define VGA_SEQ_INDEX  0x3C4
 #define VGA_SEQ_DATA   0x3C5
 /* VGA sequencer register indices */
@@ -88,6 +94,7 @@ External Registers --
 
 // ===============================
 // Step4:
+// Graphics Controller.
 #define VGA_GC_INDEX  0x3CE
 #define VGA_GC_DATA   0x3CF
 /* VGA graphics controller register indices */
@@ -117,22 +124,35 @@ External Registers --
 // input
 #define VGA_INSTAT_READ  0x3DA
 
-#define VGA_NUM_SEQ_REGS   5
+#define VGA_NUM_SEQ_REGS    5
 #define VGA_NUM_CRTC_REGS  25
-#define VGA_NUM_GC_REGS    9
+#define VGA_NUM_GC_REGS     9
 #define VGA_NUM_AC_REGS    21
-#define VGA_NUM_REGS       (1+VGA_NUM_SEQ_REGS+VGA_NUM_CRTC_REGS+VGA_NUM_GC_REGS+VGA_NUM_AC_REGS)
+#define VGA_NUM_REGS       ( 1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS + VGA_NUM_GC_REGS + VGA_NUM_AC_REGS )
 
+
+// --------------------------------------
+
+//
 // The vga identifiers.
+//
+
+// w, h, bpp.
 unsigned int VGA_width=0;
 unsigned int VGA_height=0;
 unsigned int VGA_bpp=0;
+
+// ---------------------------------------------
+
+// Address
 unsigned char *VGA_address;
 
-/**
-* CREATE THE REGISTER ARRAY 
-* TAKEN FROM http://wiki.osdev.org/VGA_Hardware
-*/
+// ---------------------------------------------
+
+/*
+ * CREATE THE REGISTER ARRAY 
+ * TAKEN FROM http://wiki.osdev.org/VGA_Hardware
+ */
 
 unsigned char mode_320_200_256[] = {
 
@@ -150,8 +170,8 @@ unsigned char mode_320_200_256[] = {
  */
     // 0x63,  // 0110 0011
     0xE3,  // 1100 0011
-//-----------------------------
 
+//-----------------------------
 /* SEQ */
 /**
  * Index 0x00: - (Reset).
@@ -266,7 +286,7 @@ void VGA_init(int width, int height, int bpp);
 // The DAC is still in an undefined state. 
 void write_registers(unsigned char *regs)
 {
-    unsigned int i;
+    unsigned int i=0;
 
     printf ("write_registers:\n");
 
@@ -352,11 +372,19 @@ void write_registers(unsigned char *regs)
 */
 void VGA_clear_screen(void)
 {
+
+// #bugbug
+// We're a ring 3 application.
+// We can't write in this memory address.
+
    unsigned int x=0;
    unsigned int y=0;
 
-    printf ("VGA_clear_screen:\n");
-    
+    //#debug
+    printf ("VGA_clear_screen: #todo\n");
+    return;
+
+/*
     for(y=0; y<VGA_height; y++)
     {
         for (x=0; x<VGA_width; x++)
@@ -364,15 +392,20 @@ void VGA_clear_screen(void)
             VGA_address[ VGA_width*y+x ] = 0x0f;
         };
     };
+*/
+
 }
 
 
-/**
-* Note here the vga struct must have 
-* the width 320 and 
-* height of 200
-* color mode is 256.
-*/
+/*
+ * ------------------------------------------------------------------
+ * VGA_init:
+ *     320x200x256.
+ *     Note here the vga struct must have 
+ *     the width 320 and 
+ *     height of 200
+ *    color mode is 256.
+ */
 
 void 
 VGA_init(
@@ -387,15 +420,16 @@ VGA_init(
    VGA_height = (unsigned int) (height & 0xFFFF);
    VGA_bpp    = (bpp & 0xFF);
 
+// #bugbug
+// We can't write on this address from ring3.
    VGA_address = 0xA0000;
 
 //enables the mode 13 state
    write_registers( mode_320_200_256 );
 
-   //clears the screen
+// Clears the screen
    //VGA_clear_screen();
 }
-
 
 // ======================================================
 
@@ -409,10 +443,8 @@ static void serial_write_char (char data)
 }
 
 
-//
+// ======================================================
 // main
-//
-
 int main ( int argc, char *argv[] )
 {
     char *env_host;
@@ -423,12 +455,17 @@ int main ( int argc, char *argv[] )
 
     printf ("VGA1.BIN:\n");
 
+
+// #test
+// In Virtualbox: It only changes the height to 300.
+// Tested on VBoxVGA only.
+// #todo: Test on VMSVGA.
+// QEMU/QEMUkvm: It doesn't change the resolution at all.
     VGA_init(320,200,256);
 
-    while(1){}
-    //asm("int $3");
-
-
+    printf ("VGA1.BIN: Done #hang\n");
+    while(1){
+    };
 
 
    /*

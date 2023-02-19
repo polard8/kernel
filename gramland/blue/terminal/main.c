@@ -2908,8 +2908,8 @@ int main ( int argc, char *argv[] )
     //int main_window = 0;
     //int terminal_window = 0;
 
+// --------------------------------------
 // main window
-
     unsigned long mwWidth  = (w >> 1);
     unsigned long mwHeight = (h >> 1); 
     // #hack
@@ -2923,9 +2923,12 @@ int main ( int argc, char *argv[] )
         mwWidth = 240;
     unsigned long mwLeft   = ( ( w - mwWidth ) >> 1 );
     unsigned long mwTop    = ( ( h - mwHeight) >> 1 );
-    
+    //unsigned long mwLeft   = 0; //( ( w - mwWidth ) >> 1 );
+    //unsigned long mwTop    = 0; // ( ( h - mwHeight) >> 1 );
+
     unsigned int mwColor   = COLOR_WINDOW;
 
+// --------------------------------------
 // Client area window
 
 // Set default

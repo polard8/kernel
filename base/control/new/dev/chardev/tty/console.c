@@ -67,6 +67,13 @@ void csi_M(int nr, int console_number);
 void csi_L(int nr, int console_number);
 
 
+//
+// VGA test
+//
+
+void DANGER_VGA_clear_screen(void);
+void __vga_test1(void);
+
 // =======================
 
 static void __test_path(void)
@@ -1688,7 +1695,6 @@ void __test_thread(void)
 }
 
 
-void DANGER_VGA_clear_screen(void);
 void DANGER_VGA_clear_screen(void)
 {
 /*
@@ -1716,6 +1722,18 @@ void DANGER_VGA_clear_screen(void)
 
     printf("done\n");
     refresh_screen();
+}
+
+
+void __vga_test1(void)
+{
+    unsigned char *p = (unsigned char *) 0x000A0000;
+    *p = 0x10;
+    p++;
+    *p = 0x80;
+    p++;
+    *p = 0xC0;
+    p++;
 }
 
 // Read and write from a tty device.
@@ -1807,8 +1825,27 @@ int consoleCompareStrings(void)
     }
 
 // Testing vga stuff.
-    if ( strncmp(prompt,"vga-cls",7) == 0 ){
+// #
+// We already called vga1.bin in ring 3?
+// #test
+// Notificando o window server que a resolução mudou.
+// #todo
+// Muidas estruturas aindapossuem valores que estão condizentes
+// com a resolução antiga e precisa ser atualizados.
+
+    if ( strncmp(prompt,"vga1",4) == 0 )
+    {
+        printf ("vga1: This is a work in progress ...\n");
+        /*
         //DANGER_VGA_clear_screen();
+        __vga_test1();
+        screenSetSize(800,300);
+        gSavedX = 800;
+        gSavedY = 300;
+        //Send message to ws,
+        // telling that the resolution changed.
+        post_message_to_ws( NULL, 800300, 800, 300 );
+        */
         goto exit_cmp;
     }
 

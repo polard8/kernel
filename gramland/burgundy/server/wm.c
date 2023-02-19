@@ -4170,6 +4170,28 @@ new_event:
         // #todo: Call a worker for that.
     //}
 
+// #test
+// Notificando o window server que a resolução mudou.
+// #todo
+// Muidas estruturas aindapossuem valores que estão condizentes
+// com a resolução antiga e precisa ser atualizados.
+
+    if (msg == 800300)
+    {
+        printf("800300 w=%d h=%d\n", long1, long2);
+        /*
+        __device_width = long1;
+        __device_height = long2;
+        SavedX=long1;
+        SavedY=long2;
+        if ( (void*) taskbar_window != NULL )
+        {
+            taskbar_window->left = 0;
+            taskbar_window->top = long2 - 32;
+        }
+        */
+    }
+
 //Unknown:
     return 0;
 fail:

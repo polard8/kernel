@@ -20,6 +20,7 @@ static void __a_soft_place_to_fall(void);
 
 unsigned long doGetSystemMetrics(int index)
 {
+// Called by sys_get_system_metrics() in sys.c
 
     // We are trying to have more system calls. sc80 sc81 sc82.
     // These system calls uses different set of selectors.
