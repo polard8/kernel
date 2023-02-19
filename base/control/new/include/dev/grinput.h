@@ -13,7 +13,7 @@ int
 wmKeyEvent(
     unsigned char raw_byte,
     int prefix );
-int wmTimerEvent(int data);
+int wmTimerEvent(int signature);
 
 
 #endif    

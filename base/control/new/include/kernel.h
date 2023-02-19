@@ -273,9 +273,12 @@ extern unsigned long gSavedBPP;
 #include "dev/display/ascii.h" 
 #include "dev/display/ws.h"
 #include "dev/display/window.h"
-#include "dev/display/grinput.h"
+//#include "dev/grinput.h"
 #include "dev/display/bg.h"
 #include "dev/display/graphics.h"
+
+#include "dev/grinput.h"
+
 
 // Serial port. (COM).
 #include "dev/tty/serial.h"

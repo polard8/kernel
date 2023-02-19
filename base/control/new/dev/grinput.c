@@ -893,9 +893,48 @@ done:
     return (int) __Status;
 }
 
-int wmTimerEvent(int data)
+int wmTimerEvent(int signature)
 {
 // Called by the timer handler.
+
+    if (signature!=1234)
+        return -1;
+
+//--------------------
+// It is time to flush the dirty rectangles
+// in the window server.
+// 1000/16*4 = 15,625 fps.
+// #test 60fps com o pit a 1000.
+// 1000/16*1 = 62.5
+// 1000/16*2 = 31,25
+// 1000/16*3 = 20,83
+// 1000/16*4 = 15,625
+// ::: Reset callback stuff.
+// Reconfigura os dados sobre o callback.
+// #todo: Podemos ter uma estrutura para eles.
+// Acho que o assembly importa esses valores,
+// e é mais difícil importar de estruturas.
+
+    if ( ws_callback_info.initialized == TRUE )
+    {
+        if ( ws_callback_info.each_n_ms < 1 ||
+              ws_callback_info.each_n_ms > JIFFY_FREQ )
+        {
+            panic ("PIT: Invalid ws_callback_info.each_n_ms\n");
+        }
+ 
+        if ( (jiffies % (ws_callback_info.each_n_ms) ) == 0 )
+        {
+            // reinitialize callback based on the saved value.
+                if ( ws_callback_info.callback_address_saved != 0 )
+                {
+                    setup_callback(
+                        ws_callback_info.callback_address_saved,
+                        ws_callback_info.each_n_ms );
+               }
+        }
+    }
+//--------------------
 
     return 0;
 }

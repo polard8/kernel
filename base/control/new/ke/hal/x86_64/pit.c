@@ -187,82 +187,16 @@ irq0_TIMER (void)
     spawn_reset_eoi_state();
 }
 
-extern unsigned long _callback_address_saved;
 
-
-//static int __CallbackFlagInterval = (16*4);  // 15
-//static int __CallbackFlagInterval = (16*3);  // 20
-//static int __CallbackFlagInterval = (16*2);  // 31 :)
-//static int __CallbackFlagInterval = (16*1);  // 62
-
-// #bugbug
-// Quando a flag é acionada, 
-// anda temos que esperar o scheduler selecionar o ws
-// para vermos o callback sendo chamado.
-
-// Worker
-// Scheduler
-// Ignoramos a tid retornada pela rotina.
 void DeviceInterface_PIT(void)
 {
+// The pit handler.
+// Called by irq0_TIMER().
+
+// Increment tick counter.
     jiffies++;
-
-//--------------------
-// It is time to flush the dirty rectangles
-// in the window server.
-// 1000/16*4 = 15,625 fps.
-// #test 60fps com o pit a 1000.
-// 1000/16*1 = 62.5
-// 1000/16*2 = 31,25
-// 1000/16*3 = 20,83
-// 1000/16*4 = 15,625
-// ::: Reset callback stuff.
-// Reconfigura os dados sobre o callback.
-// #todo: Podemos ter uma estrutura para eles.
-// Acho que o assembly importa esses valores,
-// e é mais difícil importar de estruturas.
-
-    if ( ws_callback_info.initialized == TRUE )
-    {
-        if ( ws_callback_info.each_n_ms < 1 ||
-              ws_callback_info.each_n_ms > JIFFY_FREQ )
-        {
-            panic ("PIT: Invalid ws_callback_info.each_n_ms\n");
-        }
- 
-        if ( (jiffies % (ws_callback_info.each_n_ms) ) == 0 )
-        {
-            // reinitialize callback based on the saved value.
-                if ( ws_callback_info.callback_address_saved != 0 )
-                {
-                    setup_callback(
-                        ws_callback_info.callback_address_saved,
-                        ws_callback_info.each_n_ms );
-               }
-        }
-    }
-//--------------------
-
-/*
-// Poll if the interrupt is not working.
-// The problem is that in th ereal machine, the interrupt
-// sometimes start working and then stop.
-    if (ps2_use_polling == TRUE)
-    {
-// Polling kbd and mouse
-        if ( (jiffies % (JIFFY_FREQ/60) ) == 0 )
-        {
-            // poll
-        }
-    }
-*/
-
-/*
-    if ( (jiffies % DEFAULT_PIT_FREQ) == 0 )
-    {
-        KiScheduler();
-    }
-*/
+// The master timer.
+    wmTimerEvent(1234);
 }
 
 //-------------------------
