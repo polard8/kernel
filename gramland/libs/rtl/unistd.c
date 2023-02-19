@@ -2221,8 +2221,16 @@ int access(const char *pathname, int mode)
 }
 
 
-// #see: sys/utsname.h
+/*
+int rtl_uname(struct utsname *buf, unsigned long flags);
+int rtl_uname(struct utsname *buf, unsigned long flags)
+{
+    //#todo: flags
+    return (int) uname(buf);
+}
+*/
 
+// #see: sys/utsname.h
 int uname(struct utsname *buf)
 {
     int value = -1;

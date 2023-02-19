@@ -261,10 +261,26 @@ int gws_initialize_library(void)
 // So we need the libc support. 
 // Check the compilation and include the libc. ???
 
-    //CurrentEvent = (void *) malloc(sizeof(struct gws_event_d));
+    //CurrentEvent = (void *) gws_malloc(sizeof(struct gws_event_d));
 
     return 0;
     // return (int) ws_pid;
+}
+
+void *gws_malloc(size_t size)
+{
+    if (size<=0){
+        size=1;
+    }
+    return (void*) malloc(size);
+}
+
+void gws_free(void *ptr)
+{
+    if ( (void*) ptr == NULL ){
+        return;
+    }
+    free(ptr);
 }
 
 //
@@ -3376,7 +3392,7 @@ struct gws_menu_d *gws_create_menu (
 
 // Menu
     menu = 
-        (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
+        (struct gws_menu_d *) gws_malloc( sizeof(struct gws_menu_d) );
     if ( (void *) menu == NULL )
     {
         debug_print("gws_create_menu: [FAIL] menu\n");
@@ -3410,7 +3426,7 @@ struct gws_menu_d *gws_create_menu (
     if (window <= 0)
     { 
         debug_print("gws_create_menu: [FAIL] window\n");
-        //free(menu);
+        //gws_free(menu);
         menu->window = 0;  //#bugbug !!!!
         return (struct gws_menu_d *) 0;
     }
@@ -3449,7 +3465,7 @@ struct gws_menu_item_d *gws_create_menu_item (
 
 // Create menu item.
     item = 
-        (struct gws_menu_item_d *) malloc( sizeof(struct gws_menu_item_d) );
+        (struct gws_menu_item_d *) gws_malloc( sizeof(struct gws_menu_item_d) );
 
     if ( (void *) item == NULL ){
         debug_print("gws_create_menu_item: item\n");
@@ -3828,7 +3844,7 @@ struct gws_display_d *gws_open_display(char *display_name)
 // Create the display structure.
 
     Display = 
-        (struct gws_display_d *) malloc( sizeof( struct gws_display_d ) );
+        (struct gws_display_d *) gws_malloc( sizeof( struct gws_display_d ) );
 
     if ( (void*) Display == NULL ){
         printf ("gws_open_display: Couldn't create display\n");

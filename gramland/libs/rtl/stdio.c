@@ -926,7 +926,7 @@ int putc (int ch, FILE *stream){
 
 // don't change it
 // See: unix v7
-int fgetc ( FILE *stream ){
+int fgetc(FILE *stream){
     return (int) getc(stream);
 }
 
@@ -1373,6 +1373,10 @@ FILE *fopen2 ( const char *filename, const char *mode )
 
 void scroll (void)
 {
+
+// #bugbug
+// These definitions?
+
     // loop
     register unsigned short i=0;
     register unsigned short j=0;

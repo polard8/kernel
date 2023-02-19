@@ -107,6 +107,9 @@ void gws_debug_print (char *string);
 // Initialize the library.
 int gws_initialize_library (void);
 
+void *gws_malloc(size_t size);
+void gws_free(void *ptr);
+
 // Services.
 // Dialog with the library
 // IN: service number, ...
