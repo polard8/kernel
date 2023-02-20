@@ -1682,10 +1682,10 @@ void dump_output_file(void)
     printf ("number of lines: %d \n", lineno );
 }
 
+// -------------------------
 // parse:
 // Função principal.
 // Pegando tokens com o lexer e fazendo coisas ...
-
 int parse(int dump_output)
 {
 // Stages:
@@ -1739,17 +1739,10 @@ int parse(int dump_output)
 
 // Vamos usar um while até que se encontre o fim do arquivo.
 
-    while (running == 1)
-    {
+    while (running == 1){
+        // Get a token from lexer.
         token = yylex();
-    
-        // EOF: 
-        // O lexer nos disse que acabou.
-        if (token == TOKENEOF){
-            printf ("parse: ~EOF\n");
-            running = 0;
-            break;
-        }
+        if (token == TOKENEOF){ running=0; break; }
 
         again:
 
@@ -1762,23 +1755,19 @@ int parse(int dump_output)
         // >> qualificadores 
         // >> tipos
         // ...
-        
 
         // 1: modifier, type, metatag, separator
         // 2: identifier.
         // 3: keyword.
         // 4: separator. Only ';'.
-        
         switch (State)
         {
-            
             // # State 1: 
             // Modifier, type or separator,    
             // [TODO]= tipo e enum
             case 1:
                 switch (token)
                 {
-
                     case TOKENMODIFIER:
                         //#ifdef PARSER_VERBOSE
                         //continua pois precisamos pegar um tipo.
@@ -1790,39 +1779,27 @@ int parse(int dump_output)
                         //goto again;
                         break;
 
-
                     // TYPE
                     // >>> peekChar=) significa marcação de tipagem.
                     // >>> peekSymbol=symbol  significa declaração de variável ou função.
                     case TOKENTYPE:
-
-                    //#ifdef PARSER_VERBOSE
-                    //  printf("State1: TOKENTYPE={%s} line %d\n", real_token_buffer, lineno );
-                    //#endif
-
-                        // Save
                         id[ID_TYPE] = type_found;
-                        
-                        if (type_found == TMETA)
-                        {
-                            printf ("TMETA found!\n");
+                        if (type_found == TMETA){
+                            printf ("meta: Line %d\n",lineno);
                             waiting_id_for_a_metatype = TRUE;
                         }
                         // Depois de um type vem um identificador.
                         State = 2;
                         break;
 
-
                     // #bugbug
                     // e se o arquivo começar com um separador, 
                     // então teremos problema.
-
                     case TOKENSEPARATOR:
                         //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
                         // ( função
                         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
-                            // printf ("State2: SEP={%s} line %d\n", real_token_buffer, lineno );
                             // printf ("[PAR] line %d\n", lineno ); 
                             parentheses_inside++;
                             //#test
@@ -1844,38 +1821,33 @@ int parse(int dump_output)
                         // Curly bracket
                         if ( strncmp( (char *) real_token_buffer, "{", 1 ) == 0  )
                         {
-							//printf ("State1: separator={%s} line %d\n", real_token_buffer, lineno ); 
-							printf ("[BRACE] line %d\n", lineno); 
-							braces_inside++;
-									
-							//isso vai para o 1 onde procura-se por modificadores e tipos,
-							//mas se estivermos com o corpo da função aberto ele avançará para o próximo state.
-							State = 1;
-							break;
-						}
+                            //printf ("[BRACE] line %d\n", lineno); 
+                            braces_inside++;
+                            // Isso vai para o 1 onde procura-se por modificadores e tipos,
+                            // mas se estivermos com o corpo da função aberto ele avançará para o próximo state.
+                            State = 1;
+                            break;
+                        }
 
                         // ')'
                         // Fechando UM parênteses, provavelmente sem nada dentro.
                         if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
                         {
-						    if ( parentheses_inside > 0 )
-							{
-								//printf("[/PAR] line %d\n", lineno);
-								parentheses_inside--;
+                            if (parentheses_inside > 0)
+                            {
+                                //printf("[/PAR] line %d\n", lineno);
+                                parentheses_inside--;
                                 State = 1;
-								break;
-								//State++;
-                                //goto again; 
-							}
-						}
+                                break;
+                            }
+                        }
 
                         // '}'
                         // Fechando UM corpo de função. 
                         // Curly bracket
                         if ( strncmp( (char *) real_token_buffer, "}", 1 ) == 0  )
                         {
-                            printf ("[/BRACE] line %d\n", lineno);
-
+                            //printf ("[/BRACE] line %d\n", lineno);
                             if (braces_inside > 0)
                             {
                                 braces_inside--;
@@ -1884,14 +1856,13 @@ int parse(int dump_output)
                             }
                         }
 
-						if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
-						{
-							printf(" ; separator found!\n");
-							State = 1;
-						}
+                        if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
+                        {
+                            //printf(" ; separator found!\n");
+                            State=1;
+                        }
+
                         break;
-
-
 
                     //#bugbug
 					//Não devemos aceitar diretivas do preprocessador nesse momento,
@@ -1980,11 +1951,11 @@ int parse(int dump_output)
                         memset(metadata[meta_index].meta_tag, 0,64);
                         string_size = (size_t) strlen(real_token_buffer);
                         if (string_size <= 0){
-                            printf("tag size min\n");
+                            printf("ERROR: tag size min\n");
                             exit(1);
                         }
                         if (string_size >= 64){
-                            printf("tag size max\n");
+                            printf("ERROR: tag size max\n");
                             exit(1);
                         }
                         strncpy(
@@ -2048,7 +2019,8 @@ int parse(int dump_output)
                             if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
                             {
 								//se não tem parênteses aberto.
-								if ( parentheses_inside < 1 ){
+								if ( parentheses_inside < 1 )
+								{
 									printf("state2: Error trying to close a not opened parentheses in line %d \n", 
 									  lineno );
 									exit(1);
@@ -2147,8 +2119,9 @@ int parse(int dump_output)
 							
                         } // Fim o IF token==separator.
 
-						printf ("state2: TOKENIDENTIFIER fail\n");
-						exit (1);
+                        printf ("state2: TOKENIDENTIFIER fail\n");
+                        exit(1);
+
 						//tentando mandar alguma coisa para o arquivo de output 
 						//pra ter o que salvar, pra construir o assembly file;	
 						//strcat( outfile,"\n");
@@ -2212,7 +2185,8 @@ int parse(int dump_output)
 
                             token = parse_return (TOKENKEYWORD);
                             // EXpected: ';'
-                            if ( token != TOKENSEPARATOR ){
+                            if ( token != TOKENSEPARATOR )
+                            {
                                 printf ("State3: TOKENKEYWORD TOKENSEPARATOR fail\n");
                                 exit (1);
                             }
@@ -2319,27 +2293,25 @@ int parse(int dump_output)
                     case TOKENSEPARATOR:
                         // ';'
                         if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  ){
-				            //ok #todo
-			            }else{
-					        printf (" State4: expected ; in line %d \n", 
-					            lineno );
-					        exit(1);
-				        };
-					    break;
-				        default:
-					        printf (" State4: default. expected ; in line %d\n", 
-					            lineno );
-					        exit(1);
-				            break;
+                            //ok #todo
+                        }else{
+                            printf ("State4: [ERROR] Expected ';' in line %d\n", 
+                                lineno );
+                            exit(1);
+                        };
+                        break;
+                        
+                        default:
+                            printf("State4: [default] Expected ';' in line %d\n", 
+                                lineno );
+                            exit(1);
+                            break;
                 };
                 break;
 
-			// Default:
-             default:
-
-//#ifdef PARSER_VERBOSE
-			    //printf("<default>State default: Error.\n");
-//#endif
+            // Default:
+            default:
+                //printf("<default>State default: Error.\n");
 
                 if (parentheses_inside > 0){
                     printf("default: expected ) in line %d \n", lineno);
@@ -2350,8 +2322,8 @@ int parse(int dump_output)
                 if (braces_inside == 0){
                     //
                 }
-				goto debug_output;
-				//exit(1);
+                goto debug_output;
+                //exit(1);
                 break;
  
         };//switch State
@@ -2367,19 +2339,22 @@ int parse(int dump_output)
             //printf ("parser: End of size cont \n");
             //running = 0;
         //}
-
     };
 
-// Saimos do while running.
-
-//#debug
-	//printf("\n INPUT: \n");
-	//printf("%s\n",stdin->_base);
-	//printf("number of lines: %d \n",lineno);
-	//...
-
+// ----------------------
+// Stop running.
+// Saimos do while.
 debug_output:
 
+// --------------------------------
+// Dump input file?
+    //printf("\n INPUT: \n");
+    //printf("%s\n",stdin->_base);
+    //printf("number of lines: %d \n",lineno);
+    //...
+
+// --------------------------------
+// Dump output file?
     if (dump_output)
         dump_output_file();
 
@@ -2397,17 +2372,19 @@ debug_output:
     printf ("--------------------------------\n");
     printf ("number of lines: %d \n", lineno );
 */
+
     goto parse_exit;
 
 hang:
     printf ("parse: *hang\n");   
-    while (1){ asm ("pause"); };
+    while (1){
+        asm ("pause");
+    };
 syntax:
     printf ("parse: Systax error in line %d \n", lineno );
-    exit (1);
-
+    exit(1);
 parse_exit:
-    printf ("parse: done\n");
+    printf ("parse: Done\n");
     return 0;
 }
 
@@ -2416,8 +2393,10 @@ parse_exit:
 static int __parserInit(void)
 {
     register int i=0;
-    //infile_size = 0;
-    //outfile_size = 0;
+
+    infile_size = 0;
+    outfile_size = 0;
+
 // Stack support
     stack_flag = 0;
     stack_count = 0;
@@ -2444,7 +2423,7 @@ static int __parserInit(void)
 // Called by compiler().
 int parser_initialize(void)
 {
-    printf ("parser_initialize:\n");
+    //printf ("parser_initialize:\n");
     return (int) __parserInit();
 }
 

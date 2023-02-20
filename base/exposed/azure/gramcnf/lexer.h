@@ -52,13 +52,18 @@ typedef enum {
 
 extern int eofno;
 
-// LIne support.
+//
+// Line support.
+//
+
+// Current line.
 extern int lineno;
-extern int lexer_lineno;   // Total numbe rof lines.
+extern int lexer_number_of_lines;   // Total numbe rof lines.
 extern int lexer_firstline;
 extern int lexer_lastline;
-extern int lexer_token_count;
 
+
+extern int lexer_token_count;
 extern int number_of_tokens;
 
 extern int lexer_code;

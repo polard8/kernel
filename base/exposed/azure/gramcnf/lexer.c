@@ -18,13 +18,18 @@ int current_special=0;
 
 int eofno=0;
 
+//
 // Line support
-int lineno=0;        // Current line number.
-int lexer_lineno=0;  // Total numbe rof lines.
+//
+
+// Current line number.
+int lineno=0;
+int lexer_number_of_lines=0;  // Total number of lines.
 int lexer_firstline=0;
 int lexer_lastline=0;
-int lexer_token_count=0;
 
+
+int lexer_token_count=0;
 int number_of_tokens=0;  // Total number of tokens.
 
 int lexer_code=0;
@@ -373,9 +378,11 @@ again:
         // 0 or EOF. (-1).
         case EOF:
         case 0:
-            printf ("yylex: 0 or EOF\n");
+            //printf ("yylex: 0 or EOF\n");
             eofno++; 
             value = TOKENEOF;
+            lexer_lastline = lineno;  // Last line?
+            lexer_number_of_lines = lexer_lastline;
             return (int) (value);
             break;
 
@@ -711,7 +718,6 @@ again:
         case '\"':
         {
             c = getc(finput);
-
             // Address
             p = token_buffer;
     
@@ -874,12 +880,12 @@ static int __lexerInit(void)
     //next_index = 0;
 
 // Line support
-
 // Arquivos de texto começa com a linha 1.
-    lineno = 1;
-    //lexer_lineno = 0;
-    lexer_firstline = 1;
-    //lexer_lastline = 0;
+
+    lexer_firstline=1;
+    lexer_lastline=1;
+    lexer_number_of_lines=1;
+    lineno = lexer_firstline;  // Current line.
 
     eofno = 0;  // eof++
     lexer_code = 0;
@@ -902,7 +908,7 @@ static int __lexerInit(void)
 
 int lexer_initialize(void)
 {
-    printf ("parser_initialize:\n");
+    //printf ("parser_initialize:\n");
     return (int) __lexerInit();
 }
 

@@ -53,13 +53,17 @@ static int gramcnf_initialize(void)
 
 // Clear buffers
 
+    infile_size = 0;
+    outfile_size = 0;
+
+
 // Clear infile and outfile buffers.
-    for ( i=0; i<INFILE_SIZE; i++ ){
+    for ( i=0; i<INFILE_MAX_SIZE; i++ ){
         infile[i] = '\0';
     };
     sprintf (infile, "; ======================== \n");
     strcat (infile,  "; Initializing infile ...  \n\n");
-    for ( i=0; i<OUTFILE_SIZE; i++ ){
+    for ( i=0; i<OUTFILE_MAX_SIZE; i++ ){
         outfile[i] = '\0';
     };
     sprintf (outfile, "; ========================\n");
@@ -118,15 +122,21 @@ static void debugShowStat(void)
     register int i=0;
 
     printf("\n");
-    printf("==========================================\n");
+    printf("debugShowStat\n");
 
+// -------------------------
 // lexer
-    printf("number of liner: {%d}\n",lexer_lineno);
+    printf("==========================================\n");
+    printf("Lexer info:\n");
+    printf("number of lines: {%d}\n",lexer_number_of_lines);
     printf("first line:      {%d}\n",lexer_firstline);
     printf("last line:       {%d}\n",lexer_lastline);
     printf("token count:     {%d}\n",lexer_token_count);
 
+// -------------------------
 // parser
+    printf("==========================================\n");
+    printf("parser info:\n");
     printf("infile_size:     {%d bytes}\n",infile_size);
     printf("outfile_size:    {%d bytes}\n",outfile_size);
 

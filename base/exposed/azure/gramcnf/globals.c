@@ -42,10 +42,10 @@ int asm_flag=0;
 FILE *finput;
 
 unsigned long infile_size=0;
-char infile[INFILE_SIZE];
+char infile[INFILE_MAX_SIZE];
 
 unsigned long outfile_size=0;
-char outfile[OUTFILE_SIZE];
+char outfile[OUTFILE_MAX_SIZE];
 
 // #importante
 // Esses dois buffers serão copiados no final do buffer outfile.

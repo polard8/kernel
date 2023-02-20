@@ -54,13 +54,13 @@ extern int asm_flag;
 
 extern FILE *finput; 
 
-#define INFILE_SIZE  512
+#define INFILE_MAX_SIZE  512
 extern unsigned long infile_size;
-extern char infile[INFILE_SIZE];
+extern char infile[INFILE_MAX_SIZE];
 
-#define OUTFILE_SIZE  512
+#define OUTFILE_MAX_SIZE  512
 extern unsigned long outfile_size;
-extern char outfile[OUTFILE_SIZE];
+extern char outfile[OUTFILE_MAX_SIZE];
 
 
 // #importante
