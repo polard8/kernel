@@ -96,6 +96,11 @@ struct network_info_d
     struct host_info_d *host_info;
     //..
 
+
+// Stats
+    unsigned long tx_counter;
+    unsigned long rx_counter;
+
     struct network_info_d *next;
 };
 extern struct network_info_d *CurrentNetwork;
@@ -154,6 +159,8 @@ int networkGetStatus(void);
 
 void networkSetOnlineStatus(int status);
 int networkGetOnlineStatus(void);
+
+void networkUpdateCounter(int the_counter);
 
 // #fixme
 int networkInit (void);

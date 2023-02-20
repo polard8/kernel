@@ -15,12 +15,14 @@ int e1000_interrupt_flag=0;
 int e1000_irq_count=0;
 unsigned long gE1000InputTime=0;
 
+// Counters.
 static unsigned long e1000_tx_counter=0;
 static unsigned long e1000_rx_counter=0;
 
 // =======================================
 
-static void __e1000_receive(void);
+static void __e1000_on_transmit(void);
+static void __e1000_on_receive(void);
 // NIC device handler.
 static void DeviceInterface_e1000(void);
 
@@ -797,6 +799,9 @@ e1000_init_nic (
 
     e1000_initialized = FALSE;
 
+    e1000_tx_counter=0;
+    e1000_rx_counter=0;
+
 // #debug
     debug_print ("e1000_init_nic:\n");
     printf      ("e1000_init_nic:\n");
@@ -1133,9 +1138,16 @@ fail:
     return;
 }
 
+static void __e1000_on_transmit(void)
+{
+    // printf ("DeviceInterface_e1000: Transmit completed\n");
+    e1000_tx_counter++;
+    networkUpdateCounter(1);
+}
+
 // Worker:
 // Called by DeviceInterface_e1000().
-static void __e1000_receive(void)
+static void __e1000_on_receive(void)
 {
 
 // Frame
@@ -1159,7 +1171,7 @@ static void __e1000_receive(void)
         old = currentNIC->rx_cur;
         
         if (old >= RECEIVE_BUFFER_MAX){
-            panic("__e1000_receive: [receive] old\n");
+            panic("__e1000_on_receive: [receive] old\n");
         }
 
         // Get the frame base address.
@@ -1167,7 +1179,7 @@ static void __e1000_receive(void)
         if ( (void*) frame == NULL )
         {
              //#debug
-             panic ("__e1000_receive: frame\n");
+             panic ("__e1000_on_receive: frame\n");
         }
 
         // Get the frame lenght.
@@ -1175,7 +1187,7 @@ static void __e1000_receive(void)
         if (frame_lenght>E1000_DEFAULT_BUFFER_SIZE)
         {
              //#debug
-             panic ("__e1000_receive: frame_lenght\n");
+             panic ("__e1000_on_receive: frame_lenght\n");
         }
 
         //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
@@ -1220,17 +1232,19 @@ static void __e1000_receive(void)
                 (ssize_t) (frame_lenght & 0xFFFF) );
 
             e1000_rx_counter++;
+            networkUpdateCounter(2);
         }
     }
 }
 
 static void DeviceInterface_e1000(void)
 {
-// Called by the interrupt handler.
+// Called by the irq_E1000().
 
     uint32_t InterruptCause=0;
 
-// The current nic
+// The current NIC.
+// (Intel structure?)
     if ( (void*) currentNIC == NULL )
         panic("DeviceInterface_e1000: currentNIC\n");
     if (currentNIC->magic != 1234)
@@ -1274,11 +1288,10 @@ static void DeviceInterface_e1000(void)
         goto fail;
     }
 
-    // 0x01 - transmit completed.
+    // 0x01 - Transmit completed.
     // INTERRUPT_TXDW
     if (InterruptCause & 0x01){
-        printf ("DeviceInterface_e1000: Transmit completed\n");
-        e1000_tx_counter++;
+        __e1000_on_transmit();
         goto done;
 
     // 0x02
@@ -1298,8 +1311,7 @@ static void DeviceInterface_e1000(void)
     // 0x80 - Reveive.
     // INTERRUPT_RXT0
     } else if (InterruptCause & 0x80){
-        //printf ("DeviceInterface_e1000: Receive\n");
-        __e1000_receive();
+        __e1000_on_receive();
         goto done;
 
     // INTERRUPT_RXDMT0
@@ -1314,22 +1326,19 @@ static void DeviceInterface_e1000(void)
         goto done;
 
     }else{
-        printf("DeviceInterface_e1000: Unknown interrupt cause: {%x}\n",
+        printf("DeviceInterface_e1000: Unknown interrupt cause {%x}\n",
             InterruptCause);   
-        goto done;
+        goto fail;
     };
 
 done:
-    // Clear all the bits.
-    // Write 1b, clear the bit.
+// Clear all the bits.
+// Write 1b, clear the bit.
     // __E1000WriteCommand( currentNIC, 0xC0, 0xffffffff );
-    refresh_screen();
     return;
 fail:
-    refresh_screen();
     return;
 }
-
 
 /*
  *******************************************

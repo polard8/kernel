@@ -465,6 +465,27 @@ int networkGetOnlineStatus(void)
     return (int) __is_online;
 }
 
+
+void networkUpdateCounter(int the_counter)
+{
+// Update counter for the current network.
+// 1=TX | 2=RX.
+
+    if ( (void*) CurrentNetwork == NULL )
+        return;
+    if (CurrentNetwork->magic != 1234)
+        return;
+
+    if (the_counter == 1){
+        CurrentNetwork->tx_counter++;
+        return;
+    }
+    if (the_counter == 2){
+        CurrentNetwork->rx_counter++;
+        return;
+    }
+}
+
 /*
  * networkInit: 
  * It only initializes some network structures. 
@@ -520,6 +541,9 @@ int networkInit (void)
 
     ni->version_string = (void*) default_network_version_string;
     ni->version_string_size = (size_t) strlen(default_network_version_string);
+
+    ni->tx_counter=0;
+    ni->rx_counter=0;
 
     ni->next = NULL;
     ni->used = TRUE;
