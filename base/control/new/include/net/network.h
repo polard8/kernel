@@ -4,6 +4,10 @@
 #ifndef __NET_NETWORK_H
 #define __NET_NETWORK_H    1
 
+
+#define ONLINE  TRUE
+#define OFFLINE FALSE
+
 // >> The register at offset 0x00 is the "IOADDR" window. 
 // >> The register at offset 0x04 is the "IODATA" window. 
 
@@ -147,6 +151,9 @@ int network_buffer_out( void *buffer, int len );
 
 void networkSetStatus(int status);
 int networkGetStatus(void);
+
+void networkSetOnlineStatus(int status);
+int networkGetOnlineStatus(void);
 
 // #fixme
 int networkInit (void);

@@ -10,6 +10,10 @@
 // 1 - initialized
 static int network_status=FALSE; 
 
+// Are we online?
+// Do we already have an valid IP?
+static int __is_online = FALSE;
+
 // Essa flag poderia ir para dentro da estrutura acima,
 int ____network_late_flag=0;
 
@@ -175,8 +179,6 @@ network_on_receiving (
     {
         //#debug
         //printf("Packet: Network is OFF\n");
-        //refresh_screen();
-
         return -1;
     }
 
@@ -263,9 +265,9 @@ network_on_receiving (
         break;
     };
 
-    if (Show){
-        refresh_screen();
-    }
+    //if (Show){
+    //    refresh_screen();
+    //}
 
     return 0;
 fail:
@@ -450,6 +452,18 @@ int networkGetStatus (void)
 
 
 
+void networkSetOnlineStatus(int status)
+{
+    if (status != TRUE && status != FALSE)
+        return;
+    __is_online = (int) status;
+}
+
+
+int networkGetOnlineStatus(void)
+{
+    return (int) __is_online;
+}
 
 /*
  * networkInit: 
@@ -471,8 +485,11 @@ int networkInit (void)
 
     debug_print ("networkInit: [TODO] [FIXME]\n");
 
-// Status
+// The network is disabled.
     networkSetStatus(FALSE);
+
+// We're offline.
+    networkSetOnlineStatus(OFFLINE);
 
 // =====================================================
 // #importante

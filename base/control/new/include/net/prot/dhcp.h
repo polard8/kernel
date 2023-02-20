@@ -14,11 +14,23 @@ acknowledge (confirmação)
 #define __DHCP_H    1
 
 
+// Save information about the dhcp initialization.
 struct dhcp_info_d
 {
+
 // We have the info given to us by the server.
+// This is set TRUE only after the ACK.
     int initialized;
-    unsigned int host_ip;
+
+// Your ip.
+// The IP we got from server.
+    uint8_t your_ipv4[4];
+
+// The server IP.
+    uint8_t server_ipv4[4];
+// The server MAC.
+    uint8_t server_mac[6];
+
     //...
 };
 // see: dhcp.c
@@ -117,6 +129,8 @@ network_dhcp_send(
     unsigned short dport );
 
 int network_initialize_dhcp(void);
+
+void network_show_dhcp_info(void);
 
 #endif    
 

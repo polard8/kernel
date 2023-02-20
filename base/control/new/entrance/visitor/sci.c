@@ -2393,6 +2393,7 @@ void *sci2 (
 //
 
 // Set network status.
+// Enable or disable.
     if (number == 22001){
         networkSetStatus((int) arg2);
         return NULL;

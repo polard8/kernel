@@ -891,7 +891,7 @@ void console_scroll(int console_number)
 // O certo seria dispatchUpdateScreen()
 
     //invalidate_screen();  //#bugbug not working
-    refresh_screen();
+    //refresh_screen();
 }
 
 /*

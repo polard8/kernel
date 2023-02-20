@@ -82,6 +82,21 @@ network_handle_arp(
 // REPLY
     } else if (op==ARP_OPC_REPLY){
 
+        printf("ARP: Reply\n");
+        // Show MAC
+        printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+            ar->arp_sha[0], 
+            ar->arp_sha[1], 
+            ar->arp_sha[2], 
+            ar->arp_sha[3],
+            ar->arp_sha[4],
+            ar->arp_sha[5] );
+
+        // Show IP
+        //printf("ARP: REPLY to %d.%d.%d.%d\n",
+        //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
+
+        /*
         // to me
         if ( ar->arp_tpa[3] == 12 )
         {
@@ -101,17 +116,12 @@ network_handle_arp(
             // see:  udp.c
             network_save_mac(ar->arp_sha);
         }
-
-        //printf("ARP: REPLY to %d.%d.%d.%d\n",
-        //    ar->arp_tpa[0], ar->arp_tpa[1], ar->arp_tpa[2], ar->arp_tpa[3] );
+        */
     };
 
-    //refresh_screen();
     return;
-
 fail:
     printf("network_handle_arp: Fail\n");
-    //refresh_screen();
     return;
 }
 
@@ -299,11 +309,11 @@ network_send_arp(
 // Sending a frame!
     e1000_send( currentNIC, ARP_TOTAL_SIZE, frame );
     printf ("Done\n");
-    refresh_screen();
+    //refresh_screen();
     return;
 
 fail:
-    refresh_screen();
+    //refresh_screen();
     return;
 }
 

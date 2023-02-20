@@ -90,14 +90,12 @@ network_handle_udp(
 // #test
 // DHCP dialog
 // Receiving Offer and Ack.
+// Handle dhcp protocol.
     //if (dport == 68)
     if (dport == 68 || dport == 67)
     {
         printf("UDP: dport{%d}   #debug\n",dport);
-        //refresh_screen();
         //die();
-
-        // Handle dhcp protocol.
         network_handle_dhcp(
             (buffer + UDP_HEADER_LENGHT),
             (udp->uh_ulen - UDP_HEADER_LENGHT) );
