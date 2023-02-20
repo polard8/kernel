@@ -6,7 +6,7 @@
 // There is another point:
 // The 'event delivery' and 'return' support.
 
-#include <kernel.h>  
+#include <kernel.h>
 
 static unsigned long __default_syscall_counter=0;
 
@@ -2147,7 +2147,7 @@ void *sci2 (
                             (int)          arg4 );
     }
 
-    // ...    
+    // ...
 
 // yield 
 // See: ps/sched/schedi.c
@@ -2155,7 +2155,7 @@ void *sci2 (
 
     if (number == 265)
     {
-        debug_print("sci2: [265] Yield\n");   
+        debug_print("sci2: [265] Yield\n");
         yield(current_thread); 
         return NULL; 
     }
@@ -2184,17 +2184,15 @@ void *sci2 (
 // #bugbug: Isso às vezes falha na máquina real.
 // #todo: Use more arguments.
 // See: clone.c
+// IN: file name, parent pid, clone flags.
+// OUT: Child's PID.
 
-    // IN: file name, parent pid, clone flags.
-    // OUT: Child's PID.
     if ( number == 900 )
     {
         debug_print("sci2: [900] clone and execute\n");
-        
         // #debug
         //printf("sci2: copy_process called by pid{%d}\n",current_process);
         //refresh_screen();
-        
         return (void *) copy_process( 
                             (const char *) arg2, 
                             (pid_t) current_process, 
@@ -2233,25 +2231,14 @@ void *sci2 (
         if (fg_console<0 || fg_console > 3){
             return NULL;
         }
-
-        /*
-        //#bugbug; cant change the color of the kernel consoles.
-        //IN: bg color, fg color, console number.
-        clear_console(
-            (unsigned int) arg2,
-            (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
-            fg_console );
-        */
-
-        //IN: bg color, fg color, console number.
+        // IN: bg color, fg color, console number.
         clear_console(
             (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
             (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
             fg_console );
-
-        refresh_screen();
         return NULL;
     }
+
 
 // Change the foreground color of the current console.
     if (number == 8004)
@@ -2330,6 +2317,7 @@ void *sci2 (
         return (void*) sys_get_file_sync( (int) arg2, (int) arg3 );
     }
 
+// Save FAT cache into the disk.
 // FAT cache.
 // This is the FAT cache for the system disk.
 // The boot partition.
@@ -2351,8 +2339,9 @@ void *sci2 (
         return (void*) GetCurrentTID();
     }
 
+// -----------------------------
 // foreground thread
-// Set the foreground thread tid.
+// Set the foreground thread given it's tid.
 // #todo: We need a method for that.
 // IN: arg2=tid.
     if ( number == 10011 )
@@ -2434,15 +2423,25 @@ void *sci2 (
     }
 
 
-// #test
+// #deprecated.
 // shared memory 2mb surface.
 // ring 3.
     if (number == 22777)
     {
-        if (g_extraheap3_initialized==TRUE)
-            return (void*) g_extraheap3_va;
+
+        // #bugbug
+        // Is it true?
+        // I guess we are using all the extraheaps for slab allocations.
+        // This syscall was called to provide shared memory for surfaces 
+        // for ring3.
+
+        //if (g_extraheap3_initialized==TRUE)
+        //    return (void*) g_extraheap3_va;
+
+        panic ("[22777] Deprecated syscall\n");
         return NULL;
     }
+
 
 // Callback support.
 // see: ts.c

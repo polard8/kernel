@@ -32,6 +32,8 @@ struct thread_d  *InitThread;
 // Ponteiro para a thread usada na hora da clonagem de processos.
 struct thread_d  *ClonedThread;
 
+struct thread_d *timeout_thread;
+
 // List of all threads.
 unsigned long threadList[THREAD_COUNT_MAX];
 

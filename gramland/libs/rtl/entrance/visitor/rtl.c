@@ -176,10 +176,18 @@ int rtl_get_key_state(int vk)
 // ring3
 void *rtl_shm_get_2mb_surface(void)
 {
-    void *ptr;
-    ptr = (void*) sc82(22777,0,0,0);
-    return (void*) ptr;
+
+// #deprecated
+// The 22777 syscall is deprecated.
+
+    //void *ptr;
+    //ptr = (void*) sc82(22777,0,0,0);
+    //return (void*) ptr;
+
+    printf("rtl_shm_get_2mb_surface: Deprecated\n");
+    return NULL;
 }
+
 
 
 // ==========================================

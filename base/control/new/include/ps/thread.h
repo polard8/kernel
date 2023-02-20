@@ -301,6 +301,9 @@ struct thread_d
 
     int _its_my_party_and_ill_cry_if_i_want_to;
 
+
+    int waiting_for_timeout;
+
 // error. @todo:
     //unsigned long error;
 
@@ -761,6 +764,9 @@ extern struct thread_d  *ClonedThread;
 // See: sched.c
 extern struct thread_d  *Conductor;
 extern struct thread_d  *tmpConductor;
+
+
+extern struct thread_d *timeout_thread;
 
 
 // Maximum number of kernel threads in the system.

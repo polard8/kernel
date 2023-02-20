@@ -1,21 +1,15 @@
 
 // ts.c
 // Task switching.
-// Actually it is thread scwitching.
+// Actually it's thread scwitching.
 
-#include <kernel.h>    
-
-//#define TS_DEBUG
-
-//--------------------------------------
-
+#include <kernel.h>
 
 static void __task_switch (void);
-static void __on_finished_executing( struct thread_d *t );
-
+static void __on_finished_executing(struct thread_d *t);
 static void cry(unsigned long flags);
 
-//============
+// =============================================
 
 // ## PREEMPT ##
 // Preempt
@@ -32,7 +26,6 @@ static void cry(unsigned long flags);
 static void __on_finished_executing(struct thread_d *t)
 {
 
-// structure
     if ( (void*) t == NULL )
         panic("__on_finished_executing: t\n");
     if (t->magic!=1234)
@@ -45,7 +38,7 @@ static void __on_finished_executing(struct thread_d *t)
     //    panic("task_switch: CurrentThread->state != RUNNING");
 
     //if ( CurrentThread->state != RUNNING )
-    //     goto try_next;
+    //     goto ZeroGravity;
 
 //
 // Preempt
@@ -61,7 +54,8 @@ static void __on_finished_executing(struct thread_d *t)
 // Check for a thread in standby.
 // In this case, this routine will not return.
 // See: schedi.c
-    check_for_standby();   
+    check_for_standby();
+
 // ---------------------------------------------------------
 
 //
@@ -169,14 +163,15 @@ static void cry(unsigned long flags)
 
 /*
  * task_switch:
- *     Switch the thread.
- *     Save and restore context.
- *     Select the next thread and dispatch.
- *     return to _irq0.
- *     Called by KiTaskSwitch.
+ * + Switch the thread.
+ * + Save and restore context.
+ * + Select the next thread and dispatch.
+ * + Return to _irq0.
  */
 static void __task_switch(void)
 {
+// Called by KiTaskSwitch().
+
 // Current
     struct process_d *CurrentProcess;
     struct thread_d  *CurrentThread;
@@ -206,18 +201,15 @@ static void __task_switch(void)
     }
 // =======================================================
 
-//
 // Current process
-//
-
 // The owner of the current thread.
 
 // pid
     owner_pid = (pid_t) CurrentThread->owner_pid;
+
     if ( owner_pid < 0 || owner_pid >= PROCESS_COUNT_MAX ){
         panic ("ts: owner_pid\n");
     }
-
 // structure
     CurrentProcess = (void *) processList[owner_pid];
     if ( (void *) CurrentProcess == NULL ){
@@ -226,17 +218,11 @@ static void __task_switch(void)
     if ( CurrentProcess->used != TRUE || CurrentProcess->magic != 1234 ){
         panic ("ts: CurrentProcess validation\n");
     }
-
 // check pid
     if (CurrentProcess->pid != owner_pid){
         panic("ts: CurrentProcess->pid != owner_pid\n");
     }
-
-//
-// Update the global variable.
-//
-
-    //current_process = (pid_t) owner_pid;
+// Set the new current process.
     set_current_process(owner_pid);
 
 //
@@ -360,9 +346,10 @@ The remainder ??
 // O seu contexto está salvo, mas o handler em assembly
 // vai usar o contexto que ele já possui.
 
-    // Ainda não esgotou o tempo de processamento.
-    // Vamos retornar e permitir que ela continue rodando,
-    // ou sinalizar que
+// ::
+// Ainda não esgotou o tempo de processamento.
+// Vamos retornar e permitir que ela continue rodando.
+
     if ( CurrentThread->runningCount < CurrentThread->quantum ){
 
         // Yield in progress. 
@@ -392,47 +379,53 @@ The remainder ??
         //debug_print ("s");  // the same again
         return; 
 
-    // End of quantum:
-    // Preempt: >> MOVEMENT 3 (Running --> Ready).
-    // Agora esgotou o tempo de processamento.
-    // Calling local worker.
+// ::
+// End of quantum:
+// Preempt thread, check for standby, check for signals ...
+// Agora esgotou o tempo de processamento.
+// Preempt: >> MOVEMENT 3 (Running --> Ready).
     } else if ( CurrentThread->runningCount >= CurrentThread->quantum ){
-
         __on_finished_executing(CurrentThread);
-        goto try_next;
-    
-    // Estamos perdidos com o tempo de processamento.
-    // Can we balance it?
+        // Jumping to this label for the first time.
+        goto ZeroGravity;
+
+// ::
+// Estamos perdidos com o tempo de processamento.
+// Can we balance it?
     }else{
         panic ("ts: CurrentThread->runningCount\n");
     };
 
-
+CrazyFail:
 // Crazy Fail!
 // #bugbug
 // Não deveríamos estar aqui.
 // Podemos abortar ou selecionar a próxima provisóriamente.
-
     //#debug
     //panic ("ts.c: crazy fail");
-
     goto dispatch_current; 
+
+// =====================================================================
 
 //
 // == TRY NEXT THREAD =====
 //
 
-try_next: 
+// Zero gravity!
+// At this point we don't have a thread to run and
+// the old thread already have its context saved.
 
+// Try next thread.
+ZeroGravity:
+// try_next: 
+
+
+// Two situations:
+// We have '0' threads or only '1' thread.
+// We are in a Uni-Processor mode.
 // No threads
 // #todo: Can we reintialize the kernel?
 // See: up.h and cpu.h
-
-// No threads
-    if (UPProcessorBlock.threads_counter == 0){
-        panic("ts: No threads\n");
-    }
-
 // Only '1' thread.
 // Is that thread the idle thread?
 // Can we use the mwait instruction ?
@@ -443,14 +436,47 @@ try_next:
 // If we will run only the idle thread, 
 // so we can use the mwait instruction. 
 // asm ("mwait"); 
-
 // Only 1 thread.
 // The Idle thread is gonna be the scheduler condutor.
+
+
+// No threads.
+    if (UPProcessorBlock.threads_counter == 0){
+        panic("ts: No threads\n");
+    }
+
+// Only one thread.
     if (UPProcessorBlock.threads_counter == 1){
         Conductor = (void *) UPProcessorBlock.IdleThread;
         goto go_ahead;
     }
 
+
+// Pick a thread and break the round?
+// We can do this if a thread was selected as
+// 'timeout_thread'.
+
+    if ( (void*) timeout_thread != NULL )
+    {
+        if (timeout_thread->magic == 1234)
+        {
+            if (timeout_thread->waiting_for_timeout == TRUE)
+            {
+                timeout_thread->waiting_for_timeout = FALSE;
+                Conductor = (void *) timeout_thread;
+                Conductor->next = NULL;
+                goto go_ahead;
+            }
+        }
+    }
+
+
+
+//
+// End of round ?
+//
+
+// ---------------------------------
 // Reescalonar se chegamos ao fim do round.
 // #bugbug
 // Ao fim do round estamos tendo problemas ao reescalonar 
@@ -523,18 +549,18 @@ go_ahead:
     if ( (void *) TargetThread == NULL ){
         debug_print ("ts: Struct ");
         current_thread = (tid_t) KiScheduler();
-        goto try_next;
+        goto ZeroGravity;
     }
     if ( TargetThread->used != TRUE || TargetThread->magic != 1234 ){
         debug_print ("ts: val ");
         current_thread = (tid_t) KiScheduler();
-        goto try_next;
+        goto ZeroGravity;
     }
 // Not ready?
     if (TargetThread->state != READY){
         debug_print ("ts: state ");
         current_thread = (tid_t) KiScheduler();
-        goto try_next;
+        goto ZeroGravity;
     }
 
 //
@@ -735,13 +761,13 @@ void psTaskSwitch(void)
 // Se estamos na thread do window server.
     if (current_process == ws_pid)
     {
-        // Se o callback ja foi inicializado
+        // Se o callback ja foi inicializado 
         // por uma chamada do window server.
+        // see: callback.c
+        // Return. No taskswitching
         if (ws_callback_info.ready == TRUE)
         {
-            //see: callback.c
             prepare_next_ws_callback();
-            //no taskswitching
             return;
         }
     }

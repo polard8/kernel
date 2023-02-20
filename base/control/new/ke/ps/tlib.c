@@ -321,29 +321,25 @@ post_message_to_tid (
         panic("post_message_to_tid: dst_tid != t->tid\n");
     }
 
-// Reset the running count.
-// Giving to the thread more time.
-    t->runningCount = 0;
-    t->runningCount_ms = 0;
+
+//
+// This thread needs a timeout.
+//
+
+// Let's tell to ts.c that this thread needs a timeout.
+// So this way the ts ca break the round and give to this thread
+// the opportunity to run immediately.
+
+    timeout_thread = (struct thread_d *) t;
+    timeout_thread->waiting_for_timeout = TRUE;
 
 
-// Giving more credits to the receiver.
-// The receiver will lose this time in the scheduler.
-// The scheduler will balance the credits.
-    //t->quantum = (t->quantum + QUANTUM_BOOST);
-    //if (t->quantum > QUANTUM_MAX){
-    //    t->quantum = QUANTUM_MAX;
-    //}
+//
+// The message
+//
 
-
-// Wake up the target thread?
-    // wakeup_thread(t->tid);
-
-// #todo
-// Podemos melhorar a prioridade ou o quantum da thread alvo.
 
 // ==========================================================
-// #test
 // Vamos colocar essa mensagem na outra fila de mensagens.
 // Essa nova fila sera a única fila no futuro.
 
