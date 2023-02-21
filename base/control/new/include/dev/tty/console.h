@@ -75,7 +75,12 @@ struct virtual_console_login_d
 //
 
 int VirtualConsole_initialize(void);
-void console_banner(unsigned long banner_flags);
+
+void 
+console_banner(
+    const char *product_string, 
+    const char *build_string, 
+    unsigned long banner_flags );
 
 void 
 console_interrupt(

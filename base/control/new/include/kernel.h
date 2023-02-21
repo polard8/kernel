@@ -137,12 +137,13 @@ extern unsigned long gSavedBPP;
 // Gramado OS headers.
 
 // ==================================
+#include "admin/product/product.h"  // Product type
+#include "admin/product/version.h"  // Product version
+// ==================================
 // Gramado Configuration
 #include "config/gramado/config.h"
-#include "config/gramado/version.h"    // Product. 
 #include "config/gramado/u.h"          // User
 #include "config/gramado/system.h"
-
 // ==================================
 #include "gramado/utsname.h"
 

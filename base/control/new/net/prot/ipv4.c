@@ -20,6 +20,8 @@ network_handle_ipv4(
     struct ip_d *ip;
     ip = (struct ip_d *) buffer;
 
+    //printf ("IP: received\n");
+
     if ( (void*) ip == NULL ){
         printf("network_handle_ipv4: ip\n");
         goto fail;
@@ -44,8 +46,8 @@ network_handle_ipv4(
     uint8_t Version = (uint8_t) ((v_hl >> 4) & 0x0F);
     uint8_t Lenght  = (uint8_t) (v_hl & 0x0F);  // Header lenght. 5=20bytes.
 
-    printf("IP Version: {%d}\n", Version);
-    printf("Header lenght: {%d}\n", Lenght);
+    //printf("IP Version: {%d}\n", Version);
+    //printf("Header lenght: {%d}\n", Lenght);
 
     if (Version!=4){
         printf("IP: Not version 4\n");
@@ -56,7 +58,7 @@ network_handle_ipv4(
 // ip header + ip payload.
 // (IP + (TCP + data)) given in bytes.
 // 20~65535
-    printf("Total lenght: {%d}\n",ip->ip_len);
+    //printf("Total lenght: {%d}\n",ip->ip_len);
 
     if (ip->ip_len < 20 || ip->ip_len > 65535){
         //#debug
@@ -68,11 +70,26 @@ network_handle_ipv4(
 // https://en.wikipedia.org/wiki/List_of_IP_protocol_numbers
 
     Protocol = (uint8_t) ip->ip_p;
-    printf("Protocol: {%xH}\n",Protocol);
+    //printf("Protocol: {%xH}\n",Protocol);
 
 // 0x01 -  1 - ICMP - Internet Control Message Protocol
 // 0x06 -  6 - TCP  - Transmission Control Protocol
 // 0x11 - 17 - UDP  - User Datagram Protocol
+
+// UDP
+    if (Protocol == PROTOCOL_IP_UDP)
+    {
+        //printf ("target: %d.%d.%d.%d \n",
+        //    dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
+        //printf("ip_sum={%x} \n",ip->ip_sum);
+        
+        network_handle_udp(
+            (buffer + IP_HEADER_LENGHT),
+            (ip->ip_len - IP_HEADER_LENGHT)  );
+
+        return;
+    }
+
 
 // ping?
     if (Protocol == PROTOCOL_IP_ICMP)
@@ -88,22 +105,13 @@ network_handle_ipv4(
         //network_handle_tcp(..);
         goto drop0;
     }
-// UCP
-    if (Protocol == PROTOCOL_IP_UDP)
-    {
-        printf ("target: %d.%d.%d.%d \n",
-            dst_ipv4[0],dst_ipv4[1],dst_ipv4[2],dst_ipv4[3]);
-        printf("ip_sum={%x} \n",ip->ip_sum);
-        
-        network_handle_udp(
-            (buffer + IP_HEADER_LENGHT),
-            (ip->ip_len - IP_HEADER_LENGHT)  );
 
-        return;
-    }
+drop:
+    return;
 
 // ---------------
 // Not to me.
+    /*
     if ( dst_ipv4[3] != 12 ||
          dst_ipv4[2] != 1 ||
          dst_ipv4[1] != 168 ||
@@ -112,10 +120,11 @@ network_handle_ipv4(
         printf ("IP: NOT TO ME. Drop it\n");
         goto drop0; 
     }
+    */
 
 // ---------------
 // To me.
-    printf ("IP: TO ME!\n");
+    //printf ("IP: TO ME!\n");
     //printf("Src IPV4: {%x}\n", ip->ip_src.s_addr);
     //printf("Dst IPV4: {%x}\n", ip->ip_dst.s_addr);
     // destination

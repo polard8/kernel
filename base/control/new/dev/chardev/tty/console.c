@@ -720,7 +720,6 @@ void jobcontrol_switch_console(int n)
 
 // banner
     printf ("Console number {%d}\n", n);
-    refresh_screen();
 }
 
 
@@ -891,8 +890,10 @@ void console_scroll(int console_number)
 // O certo seria dispatchUpdateScreen()
 
     //invalidate_screen();  //#bugbug not working
-    //refresh_screen();
+
+    refresh_screen();
 }
+
 
 /*
  * console_outbyte:
@@ -3006,18 +3007,35 @@ int VirtualConsole_initialize(void)
 // This will be the first message in the screen.
 // It is goona be seen at top/left corner of the screen.
 
-void console_banner(unsigned long banner_flags)
+void 
+console_banner(
+    const char *product_string, 
+    const char *build_string, 
+    unsigned long banner_flags )
 {
 // Serial debug
-    if (Initialization.serial_log == TRUE){
+    if (Initialization.serial_log == TRUE)
+    {
         debug_print ("Gramado OS\n");
     }
 // Virtual console
-    if (Initialization.console_log == TRUE){
+    if (Initialization.console_log == TRUE)
+    {
+        if (fg_console < 0 || fg_console > 3)
+            return;
+        if (CONSOLE_TTYS[fg_console].initialized != TRUE){
+            debug_print ("console_banner: fg_console not initialized\n");
+            //x_panic("x");
+            return;
+        }
+        clear_console(
+            CONSOLE_TTYS[fg_console].bg_color,
+            CONSOLE_TTYS[fg_console].fg_color,
+            fg_console );
         set_up_cursor(0,0);
-        printf ("Gramado OS\n");
+        printf ("%s\n", product_string );
+        printf ("%s\n", build_string );
     }
-    refresh_screen();
 }
 
 // console_ioctl:
@@ -3396,7 +3414,6 @@ clear_console (
     __local_gotoxy(0,0,console_number);
 
     refresh_screen();
-
     return 0;
 }
 

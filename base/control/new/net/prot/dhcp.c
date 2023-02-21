@@ -47,8 +47,10 @@ network_handle_dhcp(
     ssize_t size )
 {
     struct dhcp_d *dhcp;
-
     dhcp = (struct dhcp_d *) buffer;
+
+    //printf ("DHCP: Received\n");
+
     if ( (void*) dhcp == NULL ){
         return;
     }
@@ -56,6 +58,7 @@ network_handle_dhcp(
 // Minimum size
     //if (size < ? )
         //return;
+
 
 // yiaddr: Your ip address.
     uint8_t your_ipv4[4];
@@ -84,7 +87,6 @@ network_handle_dhcp(
         dhcp->chaddr[3],
         dhcp->chaddr[4],
         dhcp->chaddr[5] );
-
 
 // Operation
 // Is it a Reply?
@@ -132,7 +134,7 @@ network_handle_dhcp(
         dhcp_info.initialized = TRUE;
         networkSetOnlineStatus(ONLINE);
         network_show_dhcp_info();
-        die();
+        //die();
         return;
     }
 
@@ -324,16 +326,29 @@ network_dhcp_send(
 
         //++
         // Parameter Request list 
-        dhcp->options[15]= OPT_PARAMETER_REQUEST;
-        dhcp->options[16]= (uint8_t) 3;  // Lenght
-        dhcp->options[17]= OPT_SUBNET_MASK;
-        dhcp->options[18]= OPT_ROUTER;
-        dhcp->options[19]= OPT_DNS;
+        dhcp->options[15] = OPT_PARAMETER_REQUEST;
+        dhcp->options[16] = (uint8_t) 3;  // Lenght
+        dhcp->options[17] = OPT_SUBNET_MASK;
+        dhcp->options[18] = OPT_ROUTER;
+        dhcp->options[19] = OPT_DNS;
         //--
-       
+        
+        //++
+        //#test: Host name
+        dhcp->options[20] = 12;
+        dhcp->options[21] = 7;   // size in bytes
+        dhcp->options[22] = 'G';
+        dhcp->options[23] = 'R';
+        dhcp->options[24] = 'A';
+        dhcp->options[25] = 'M';
+        dhcp->options[26] = 'A';
+        dhcp->options[27] = 'D';
+        dhcp->options[28] = '0';
+        //--
+
         // Option End
-        dhcp->options[20]= OPT_END;
-        opt_size = 21;
+        dhcp->options[29]= OPT_END;
+        opt_size = 30;
         break;
 
     default:

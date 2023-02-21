@@ -45,6 +45,8 @@ network_handle_udp(
     struct udp_d *udp;
     udp = (struct udp_d *) buffer;
 
+    //printf ("UDP: Received\n");
+
     if ( (void*) buffer == NULL ){
         printf("network_handle_ipv4: buffer\n");
         return;
@@ -87,6 +89,9 @@ network_handle_udp(
     p = udp_payload;
     int mFlag=0;
 
+    //#debug
+    //printf("UDP: dport{%d}   #debug\n",dport);
+
 // #test
 // DHCP dialog
 // Receiving Offer and Ack.
@@ -94,7 +99,7 @@ network_handle_udp(
     //if (dport == 68)
     if (dport == 68 || dport == 67)
     {
-        printf("UDP: dport{%d}   #debug\n",dport);
+        //printf("UDP: dport{%d}   #debug\n",dport);
         //die();
         network_handle_dhcp(
             (buffer + UDP_HEADER_LENGHT),
@@ -120,6 +125,12 @@ network_handle_udp(
                 die();
             }
         }
+    }
+
+    if (dport == 22888)
+    {
+        printf ("UDP: Message{%s}\n", udp_payload );
+        die();
     }
 }
 

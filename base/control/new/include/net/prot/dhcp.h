@@ -62,16 +62,18 @@ extern struct dhcp_info_d dhcp_info;
 // Options codes.
 //
 
-#define OPT_PAD                         0
-#define OPT_SUBNET_MASK                 1
-#define OPT_ROUTER                      3
-#define OPT_DNS                         6
-#define OPT_REQUESTED_IP_ADDR           50
-#define OPT_LEASE_TIME                  51
+#define OPT_PAD          0
+#define OPT_SUBNET_MASK  1
+#define OPT_ROUTER       3
+#define OPT_DNS          6
+
+#define OPT_REQUESTED_IP_ADDR  50
+#define OPT_LEASE_TIME         51
 #define OPT_DHCP_MESSAGE_TYPE  53
-#define OPT_SERVER_ID                   54
+#define OPT_SERVER_ID          54
 #define OPT_PARAMETER_REQUEST  55
-#define OPT_END                         255
+
+#define OPT_END    255
 
 #define OPTIONS_SIZE    (312 - 4)
 

@@ -77,20 +77,20 @@ network_handle_arp(
 // sha is the [mac] of the machine that sent us a request.
 // spa is the [ip    ] of the machine that sent us a request.
     if (op==ARP_OPC_REQUEST){
-        printf("ARP: This is a REQUEST\n");
+        //printf("ARP: REQUEST\n");
         network_send_arp_reply( ar->arp_sha, ar->arp_spa );
 // REPLY
     } else if (op==ARP_OPC_REPLY){
 
-        printf("ARP: Reply\n");
+        //printf("ARP: REPLAY\n");
         // Show MAC
-        printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
-            ar->arp_sha[0], 
-            ar->arp_sha[1], 
-            ar->arp_sha[2], 
-            ar->arp_sha[3],
-            ar->arp_sha[4],
-            ar->arp_sha[5] );
+        //printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+            //ar->arp_sha[0], 
+            //ar->arp_sha[1], 
+            //ar->arp_sha[2], 
+            //ar->arp_sha[3],
+            //ar->arp_sha[4],
+            //ar->arp_sha[5] );
 
         // Show IP
         //printf("ARP: REPLY to %d.%d.%d.%d\n",
@@ -141,8 +141,8 @@ network_send_arp(
     register int i=0;
 
     // #debug
-    printf("network_send_arp:\n");
-    refresh_screen();
+    //printf("network_send_arp:\n");
+    //refresh_screen();
 
 // The structure for the Intel NIC device.
     if ( (void*) currentNIC == NULL ){
@@ -308,7 +308,7 @@ network_send_arp(
           ARP_HEADER_LENGHT );
 // Sending a frame!
     e1000_send( currentNIC, ARP_TOTAL_SIZE, frame );
-    printf ("Done\n");
+    //printf ("Done\n");
     //refresh_screen();
     return;
 

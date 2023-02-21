@@ -49,15 +49,6 @@ struct initialization_d  Initialization;
             + __GNUC_MINOR__ * 100 \
             + __GNUC_PATCHLEVEL__ )
 
-
-//static char *s_hostname;
-//#define PLATFORM_STRING                 "x64"
-
-
-#define RELEASE_TYPE_NULL  0
-#define RELEASE_TYPE_RC    1
-#define RELEASE_TYPE_BETA  2
-
 // ==========================
 
 //
@@ -556,6 +547,9 @@ static int preinit(void)
 
 static int booting_begin(int arch_type)
 {
+    char product_string[256];
+    char build_string[256];
+
     int Status = (-1);
 
 // #IMPORTAT: 
@@ -768,14 +762,29 @@ static int booting_begin(int arch_type)
 // see: tty/console.c
 
     Initialization.console_log = TRUE;
-    console_banner(0);
+
+    // product string
+    sprintf(product_string,PRODUCT_NAME);
+    strcat(product_string," ");
+    strcat(product_string,PRODUCT_TYPE_STRING);
+    strcat(product_string,"\0");
+    // build string
+    sprintf(build_string,"Build ");
+    strcat(build_string,BUILD_STRING);
+    strcat(build_string,"\0");
+
+// Crear screen and print version string.
+    console_banner( product_string, build_string, 0 );
+// Print gcc version
     printf("gcc: %d\n",GCC_VERSION);
+// Print device info.
     printf ("Width:%d Height:%d BPP:%d\n",
         xBootBlock.deviceWidth,
         xBootBlock.deviceHeight,
         xBootBlock.bpp );
+// ...
 
-// Breakpoint
+    // Breakpoint
     //refresh_screen();
     //while(1){}
 

@@ -17,12 +17,12 @@
 /* Operating system release (e.g., "2.6.28") */
 #define RELEASE_NAME  RELEASE_STRING 
 /* Hardware identifier */
-#define MACHINE_NAME  "hardware-name"
+#define MACHINE_NAME  MACHINE_TYPE_STRING
 /* Name within "some implementation-defined network" */
-#define NODE_NAME     "gramado-node"
+#define NODE_NAME     "gramado"
 
 //#todo: domain name
-#define DOMAIN_NAME     "domain-name"
+#define DOMAIN_NAME     "gramado"
 
 // system
 #define SYSTEM_VERSION_MAJOR  VERSION_MAJOR

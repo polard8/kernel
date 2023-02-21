@@ -1,21 +1,10 @@
 #E - Facility I
 #base
 # Gramado Kernel
-
 # License: BSD License
-# Product configuration
-# See: 0config/version.h
-
-PRODUCT_NAME  = Gramado Kernel
-EDITION_NAME  = Facilities
-
-VERSION_MAJOR = 1
-VERSION_MINOR = 6
-VERSION_BUILD = 308
 # Compiling on gcc 9.4.0
 # Linking on ld 2.34
 
-KERNELVERSION = $(VERSION_MAJOR)$(if $(VERSION_MINOR),.$(VERSION_MINOR)$(if $(VERSION_BUILD),.$(VERSION_BUILD)))
 
 # Make variables (CC, etc...)
 AS      = as
@@ -62,10 +51,8 @@ clean
 # Giving permitions to run.
 	chmod 755 ./run
 	chmod 755 ./runkvm
-	
-# Product info:
-	@echo "$(PRODUCT_NAME) $(EDITION_NAME) $(KERNELVERSION)"
-#	@echo "$(ARCH)"
+
+	@echo "Done?"
 
 
 #----------

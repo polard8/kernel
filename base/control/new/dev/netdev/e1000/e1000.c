@@ -1153,7 +1153,6 @@ static void __e1000_on_receive(void)
 // Frame
     unsigned char *frame;
     uint16_t frame_lenght=0x0000;
-
 // Descriptor index.
     uint16_t old=0;
 
@@ -1166,27 +1165,30 @@ static void __e1000_on_receive(void)
 
 // #maybe a while
 
-    if ( (currentNIC->legacy_rx_descs[currentNIC->rx_cur].status & 0x01) == 0x01 ) 
+    
+    while ( ( currentNIC->legacy_rx_descs[ currentNIC->rx_cur ].status & 0x01) == 0x01 ) 
     {
+        // Pega o atual e circula.
         old = currentNIC->rx_cur;
-        
+        currentNIC->rx_cur = (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
+
         if (old >= RECEIVE_BUFFER_MAX){
             panic("__e1000_on_receive: [receive] old\n");
         }
 
-        // Get the frame base address.
-        frame = (unsigned char *) currentNIC->rx_buffers_virt[old];
-        if ( (void*) frame == NULL )
-        {
-             //#debug
-             panic ("__e1000_on_receive: frame\n");
-        }
+        //#debug
+        //printf ("BUFFER ID: gotten from %d\n", old);
 
-        // Get the frame lenght.
+        // Get the frame base address.
+        // frame addres and frame lenght.
+        frame = (unsigned char *) currentNIC->rx_buffers_virt[old];
         frame_lenght = (uint16_t) currentNIC->legacy_rx_descs[old].length;
-        if (frame_lenght>E1000_DEFAULT_BUFFER_SIZE)
-        {
-             //#debug
+
+        // Validation
+        if ( (void*) frame == NULL ){
+            panic ("__e1000_on_receive: frame\n");
+        }
+        if (frame_lenght>E1000_DEFAULT_BUFFER_SIZE){
              panic ("__e1000_on_receive: frame_lenght\n");
         }
 
@@ -1196,12 +1198,13 @@ static void __e1000_on_receive(void)
         // Our Net layer should handle it
         // NetHandlePacket(currentNIC->ndev, len, (PUInt8)currentNIC->rx_buffers_virt[old]);
 
-        // zera.
-        currentNIC->legacy_rx_descs[old].status = 0;
+        // Somente apagar o primeiro bit
+        currentNIC->legacy_rx_descs[old].status &= ~1;
 
         // ?? Provavelmente seleciona o buffer antes de circular.
         // #bugbug: devemos circular primeiro pra depois chamar essa rotina?
         // RDT - Receive Descriptor Tail
+        // REG_RXDESCTAIL
         __E1000WriteCommand ( currentNIC, 0x2818, old );
 
         // Se o bit de statos estava acionado, então copiamos esse
@@ -1214,11 +1217,6 @@ static void __e1000_on_receive(void)
              //printf("DeviceInterface_e1000: [DEBUG] iret\n");
              //refresh_screen();
         //}  
-
-        // circula. (32 buffers)
-        // Seleciona o próximo buffer.
-        currentNIC->rx_cur = 
-            (currentNIC->rx_cur + 1) % RECEIVE_BUFFER_MAX; 
 
         //#test buffer
         //eh = (void*) buffer;
