@@ -11,7 +11,7 @@
 extern int is_menu_active;
 
 // menu item
-struct gwssrv_menu_item_d
+struct gws_menu_item_d
 {
     struct gws_window_d *window;
     int id;
@@ -21,11 +21,11 @@ struct gwssrv_menu_item_d
     unsigned long width;
     unsigned long height;
     unsigned int color;
-    struct gwssrv_menu_item_d *next;
+    struct gws_menu_item_d *next;
 };
 
 // menu
-struct gwssrv_menu_d
+struct gws_menu_d
 {
     struct gws_window_d *window;
     struct gws_window_d *parent;
@@ -39,8 +39,8 @@ struct gwssrv_menu_d
     int highlight;  //Item em destaque
 // list
     int itens_count;
-    struct gwssrv_menu_item_d *list;
-    //struct gwssrv_menu_d *next;
+    struct gws_menu_item_d *list;
+    //struct gws_menu_d *next;
 };
 
 //
@@ -51,16 +51,16 @@ struct gwssrv_menu_d
 int on_menu(void);
 
 // checa se o mouse esta passando sobre o menu.
-int __is_inside_menu(struct gwssrv_menu_d *menu, int x, int y);
+int __is_inside_menu(struct gws_menu_d *menu, int x, int y);
 
-int gwssrv_get_number_of_itens (struct gwssrv_menu_d *menu);
+int gwssrv_get_number_of_itens (struct gws_menu_d *menu);
 
-struct gwssrv_menu_item_d *gwssrv_create_menu_item (
+struct gws_menu_item_d *gwssrv_create_menu_item (
     char *label,
     int id,
-    struct gwssrv_menu_d *menu);
+    struct gws_menu_d *menu);
 
-struct gwssrv_menu_d *gwssrv_create_menu (
+struct gws_menu_d *gwssrv_create_menu (
     struct gws_window_d *parent,
     int highlight,
     int count,

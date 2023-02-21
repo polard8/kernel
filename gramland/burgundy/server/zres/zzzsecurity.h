@@ -1,12 +1,14 @@
 
-// #test
+// security.h
+// OK, We already have this kind of information 
+// inside the kernel. But let give to this a chance
+// and see who is better.
 
+// #test
 // The purpose here is to handle the structure
 // usersession, room, desktop.
 // But we already have these structure inside the kernel
 // this is a good place to protect them all.
-
-
 // WINDOW -> DESKTOP -> ROOM -> USER SECTION.
 
 #ifndef __SECURITY_H

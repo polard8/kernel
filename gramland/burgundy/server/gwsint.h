@@ -41,7 +41,10 @@ extern int current_mode;
 #include "menu.h"
 #include "grinput.h"   //#test
 #include "metrics.h"
+
 #include "window.h"
+#include "vdesktop.h"
+
 #include "painter.h"
 #include "bmp.h"
 
@@ -49,11 +52,6 @@ extern int current_mode;
 #include "os/screen.h"   // X-like
 #include "os/display.h"  // X-like
 #include "os/host.h"     // X-like h:0.0
-
-// Teremos isso aqui no window server,
-// kgws é outro ws par ao ambiente de setup e tera 
-// seu próprio gerenciamento.
-#include "security.h"
 #include "gui.h"
 #include "comp.h"
 #include "event.h"    // view inputs

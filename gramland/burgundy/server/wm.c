@@ -122,13 +122,6 @@ static unsigned long ____new_time=0;
 // private functions: prototypes ==========================
 //
 
-static unsigned long 
-wmProcedure(
-    struct gws_window_d *window,
-    int msg,
-    unsigned long long1,
-    unsigned long long2 );
-
 static void animate_window( struct gws_window_d *window );
 static void __Tile(void);
 static void run_selected_option(void);
@@ -170,7 +163,23 @@ int control_action(int msg, unsigned long long1);
 
 // =====================================================
 
+struct gws_window_d *get_parent(struct gws_window_d *w)
+{
+    struct gws_window_d *p;
 
+    if ( (void*) w == NULL )
+        return NULL;
+    if (w->magic != 1234)
+        return NULL;
+
+    p = (struct gws_window_d *) w->parent;
+    if ( (void*) p == NULL )
+        return NULL;
+    if (p->magic != 1234)
+        return NULL;
+
+    return (struct gws_window_d *) p;
+}
 
 static void run_selected_option(void)
 {
@@ -1751,15 +1760,13 @@ struct gws_window_d *do_create_titlebar(
     parent->frame.ornament_color1   = OrnamentColor1;
     parent->titlebar_ornament_color = OrnamentColor1;
 
-    rectBackbufferDrawRectangle ( 
+    doFillWindow(
         tbWindow->left, 
         ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
         tbWindow->width, 
         METRICS_TITLEBAR_ORNAMENT_SIZE, 
         OrnamentColor1, 
-        TRUE,
         0 );  // rop_flags no rop in this case?
-
 
 //----------------------
 // string
@@ -3752,7 +3759,6 @@ __probe_window_hover(
                         // vamos mudar o visual dela.
                         on_mouse_hover(w);            // repinte a nova
                     }
-
                     return;
                 }
 
@@ -3766,21 +3772,21 @@ __probe_window_hover(
             // #test
             // Are we hover a menu item?
             // We have two types of menuitens.
-            if ( w->type == WT_SIMPLE)
+            if (w->type == WT_SIMPLE)
             {
                 if (w->isTitleBar == TRUE)
                 {
                     Status = is_within( (struct gws_window_d *) w, long1, long2 );
                     // Yes, we are inside a menuitem.
-                    if(Status==TRUE)
+                    if (Status==TRUE)
                     {
-                       if (w != mouse_hover)
-                       {
-                           on_mouse_leave(mouse_hover);
-                           mouse_hover = (void*) w;
-                           on_mouse_hover(w);
-                       }
-                       return;
+                        if (w != mouse_hover)
+                        {
+                            on_mouse_leave(mouse_hover);
+                            mouse_hover = (void*) w;
+                            on_mouse_hover(w);
+                        }
+                        return;
                     }
                 }
             }
@@ -3795,7 +3801,7 @@ __probe_window_hover(
 // The keyboard input messages will affect
 // the window with focus.
 // For the mouse input, the window has a NULL pointer.
-static unsigned long 
+unsigned long 
 wmProcedure(
     struct gws_window_d *window,
     int msg,
@@ -3843,12 +3849,20 @@ wmProcedure(
         break;
     case GWS_Move:
         printf("wmProcedure: [3] GWS_Move\n");
+        //gwssrv_change_window_position ( 
+            //(struct gws_window_d *) window, 
+            //(unsigned long) long1,   // x 
+            //(unsigned long) long2 );  // y
         break;
     case GWS_Size: //get size?
         printf("wmProcedure: [4] GWS_Size\n");
         break;
     case GWS_Resize: //set size ?
         printf("wmProcedure: [5] GWS_Resize\n");
+        //gws_resize_window ( 
+            //(struct gws_window_d *) window, 
+            //(unsigned long) long1,    //w 
+            //(unsigned long) long2 );  //h
         break;
     // ...
     case GWS_Close:
@@ -3863,15 +3877,18 @@ wmProcedure(
         break;
     case GWS_SetFocus: // set focus
         printf("wmProcedure: [9] GWS_SetFocus\n");
+        //set_focus(window);
         break;
     case GWS_KillFocus: //kill focus
         printf("wmProcedure: [10] GWS_KillFocus\n");
         break;
     case GWS_Activate:
         printf("wmProcedure: [11] GWS_Activate\n");
+        //set_active_window(window);
         break;
     case GWS_ShowWindow:
-        printf("wmProcedure: [12] GWS_ShowWindow\n");
+        //printf("wmProcedure: [12] GWS_ShowWindow\n");
+        // gws_show_window_rect(window);
         break;
     case GWS_SetCursor:
         printf("wmProcedure: [13] GWS_SetCursor\n");
@@ -3890,6 +3907,8 @@ wmProcedure(
         break;
     case GWS_SetFocus2:
         printf("wmProcedure: [18] GWS_SetFocus2\n");
+        //set_focus(window);
+        //set_focus_by_id(long1); //IN: wid
         break;
     case GWS_GetFocus2:
         printf("wmProcedure: [19] GWS_GetFocus2\n");
@@ -3928,6 +3947,9 @@ wmProcedure(
         break;
 
     //case MSG_REPAINT:
+        //redraw_window (
+          //(struct gws_window_d *) window, 
+          //(unsigned long) long1 );  //flags
         //if (window == __root_window){
         //    wm_update_desktop(TRUE);
         //}
@@ -4432,26 +4454,24 @@ void yellowstatus0(char *string,int refresh)
     if ( current_mode == GRAMADO_JAIL ){
         //bar_size = w;
         bar_size = (w>>1);
-        rectBackbufferDrawRectangle ( 
+        doFillWindow ( 
             aw->left +2, 
             aw->top  +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
-            1,
             0 );
     }else{
 
         //bar_size = (offset_string2 + (4*8) );
         //bar_size = (offset_string2 + (100) );
         bar_size = (w>>1);
-        rectBackbufferDrawRectangle ( 
+        doFillWindow ( 
             aw->left +2, 
             aw->top +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
-            1,
             0 );
     };
 

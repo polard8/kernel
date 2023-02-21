@@ -785,7 +785,7 @@ struct gws_window_d
 // Menubar
 
     struct gws_window_d *menubar;
-    struct gwssrv_menu_d  *barMenu;      // Menu da barra de menu.
+    struct gws_menu_d  *barMenu;      // Menu da barra de menu.
     unsigned int menubar_color;
     unsigned long menubar_height;
     int menubar_style;
@@ -855,7 +855,7 @@ struct gws_window_d
 // 12
 
 // Menu da janela.
-    struct gwssrv_menu_d *contextmenu;          // Menu da janela.
+    struct gws_menu_d *contextmenu;          // Menu da janela.
 
 //==================================
 
@@ -865,6 +865,7 @@ struct gws_window_d
 
 // Menuitem text.
 // Texto no caso dessa janela ser um ítem de menu.
+// #?? Why is it const?
     const char *menuitem_text;
 
 // ======================================================
@@ -1189,7 +1190,7 @@ void set_clientrect_bg_color_by_id( int wid, unsigned int color );
 void set_focus(struct gws_window_d *window);
 struct gws_window_d *get_focus(void);
 void __switch_focus(void);
-void set_focus_by_id( int wid );
+void set_focus_by_id(int wid);
 
 //
 // Mouse hover
@@ -1273,6 +1274,8 @@ struct gws_window_d *get_last_window(void);
 void activate_first_window(void);
 void activate_last_window(void);
 
+struct gws_window_d *get_parent(struct gws_window_d *w);
+
 // list support
 // not tested yet
 void wm_add_window_into_the_list( struct gws_window_d *window );
@@ -1288,6 +1291,13 @@ int wmInputReader2(void);
 void wm_Update_TaskBar( char *string, int flush );
 
 void wmInitializeGlobals(void);
+
+unsigned long 
+wmProcedure(
+    struct gws_window_d *window,
+    int msg,
+    unsigned long long1,
+    unsigned long long2 );
 
 void yellowstatus0(char *string,int refresh);
 void yellow_status(char *string);

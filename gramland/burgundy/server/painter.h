@@ -5,6 +5,16 @@
 #ifndef __PAINTER_H
 #define __PAINTER_H    1
 
+int 
+doFillWindow( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned int color,
+    unsigned long rop_flags );
+
+
 void 
 __draw_button_borders(
     struct gws_window_d *w,

@@ -1424,32 +1424,10 @@ void *doCreateWindow (
             if (window->focus == TRUE) { __tmp_color = xCOLOR_GRAY1; }
             if (window->focus == FALSE){ __tmp_color = xCOLOR_GRAY2; }
 
-            //ok funciona
-            //rectBackbufferDrawRectangle ( window->left +1, window->top +1, 
-            //    window->width +1 +1, window->height +1 +1, 
-            //    __tmp_color, 1 ); 
-         
-            //test
-            //remeber: the first window do not have a parent.
-            if ( (void*) Parent == NULL )
-            { 
-                // #check
-                // This routine is calling the kernel to paint the rectangle.
-                rectBackbufferDrawRectangle ( 
-                    (window->left +1),     (window->top +1), 
-                    (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, TRUE, __rop_flags );
-            }
-
-            if ( (void*) Parent != NULL )
-            {
-                // #check
-                // This routine is calling the kernel to paint the rectangle.
-                rectBackbufferDrawRectangle ( 
-                    (window->left +1),     (window->top +1), 
-                    (window->width +1 +1), (window->height +1 +1), 
-                    __tmp_color, TRUE, __rop_flags );
-            }
+            doFillWindow( 
+                (window->left +1),     (window->top +1), 
+                (window->width +1 +1), (window->height +1 +1), 
+                __tmp_color, __rop_flags );
 
             //#todo
             window->shadow_color = (unsigned int) __tmp_color;
@@ -1516,30 +1494,13 @@ void *doCreateWindow (
             }
         }
 
-        // Draw the background if we do not have a parent window.
-        // Remember: The first window do not have a parent.
-        if ( (void*) Parent == NULL )
-        {
-            // #check
-            // This routine is calling the kernel to paint the rectangle.
-            rectBackbufferDrawRectangle ( 
-                    window->left, window->top, window->width, window->height, 
-                    window->bg_color, TRUE, __rop_flags );
-        }
-
-        // Draw the background if we have a parent window.
-        if ( (void*) Parent != NULL )
-        { 
-            // #check
-            // This routine is calling the kernel to paint the rectangle.
-            rectBackbufferDrawRectangle ( 
-                window->left, window->top, window->width, window->height, 
-                window->bg_color, TRUE, __rop_flags );
-        }
+        // Paint the background
+        // #check
+        // This routine is calling the kernel to paint the rectangle.
+        doFillWindow( 
+            window->left, window->top, window->width, window->height, 
+            window->bg_color, __rop_flags );
     }
-
-    //#debug
-    //asm ("int $3");
 
 // Client area rectangle
 

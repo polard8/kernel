@@ -55,7 +55,7 @@ int on_menu(void)
 // ::: The context menu for the root window.
 int create_main_menu(int position_x, int position_y)
 {
-    struct gwssrv_menu_d *menu;
+    struct gws_menu_d *menu;
 
 // --------------------------------------
 
@@ -96,7 +96,7 @@ int create_main_menu(int position_x, int position_y)
 
     // #testing (NEW)
     menu = 
-        (struct gwssrv_menu_d *) gwssrv_create_menu (
+        (struct gws_menu_d *) gwssrv_create_menu (
             (int) gui->screen_window,  //parent
             (int) 0,   //highlight
             (int) 4,   //count
@@ -114,25 +114,25 @@ int create_main_menu(int position_x, int position_y)
     gwssrv_create_menu_item (
         "F1 - Minimize",
         (int) 0,
-        (struct gwssrv_menu_d *) menu );
+        (struct gws_menu_d *) menu );
 
 //menu item 1
     gwssrv_create_menu_item (
         "F2 - Maximize",
         (int) 1,
-        (struct gwssrv_menu_d *) menu );
+        (struct gws_menu_d *) menu );
 
 //menu item 2
     gwssrv_create_menu_item (
         "F3 - Close",
         (int) 2,
-        (struct gwssrv_menu_d *) menu );
+        (struct gws_menu_d *) menu );
 
 //menu item 3
     gwssrv_create_menu_item (
         "F4 - Close menu",
         (int) 3,
-        (struct gwssrv_menu_d *) menu );  
+        (struct gws_menu_d *) menu );  
 
 //show
     if ( (void*) menu->window != NULL )
@@ -143,7 +143,7 @@ int create_main_menu(int position_x, int position_y)
     {
         if(__root_window->magic == 1234)
         {
-            __root_window->contextmenu = (struct gwssrv_menu_d *) menu;
+            __root_window->contextmenu = (struct gws_menu_d *) menu;
             __root_window->contextmenu->in_use = TRUE;
         
             is_menu_active=TRUE;
@@ -153,32 +153,30 @@ int create_main_menu(int position_x, int position_y)
     return 0;
 }
 
-
 // Create menu item
-struct gwssrv_menu_item_d *gwssrv_create_menu_item (
+struct gws_menu_item_d *gwssrv_create_menu_item (
     char *label,
     int id,
-    struct gwssrv_menu_d *menu)
+    struct gws_menu_d *menu)
 {
-    struct gwssrv_menu_item_d *item;
-    struct gws_window_d       *window;  //menu item window
+    struct gws_menu_item_d *item;
+    struct gws_window_d    *window;  //menu item window
 
     //gwssrv_debug_print("gwssrv_create_menu_item:\n");    
     
     if ( (void *) menu == NULL ){
-        return (struct gwssrv_menu_item_d *) 0;
+        return (struct gws_menu_item_d *) 0;
     }
-    
-    //create menu item.
-    item = (struct gwssrv_menu_item_d *) malloc( sizeof(struct gwssrv_menu_item_d) );
 
+// Create menu item.
+    item = (struct gws_menu_item_d *) malloc( sizeof(struct gws_menu_item_d) );
     if ( (void *) item == NULL ){
-        return (struct gwssrv_menu_item_d *) 0;
+        return (struct gws_menu_item_d *) 0;
     }
 
     //provisório
     if(id>5 || id>menu->itens_count)
-        return (struct gwssrv_menu_item_d *) 0;
+        return (struct gws_menu_item_d *) 0;
 
 
     item->id = id;
@@ -226,13 +224,13 @@ struct gwssrv_menu_item_d *gwssrv_create_menu_item (
     item->window = window;
 
 //ok
-    return (struct gwssrv_menu_item_d *) item;
+    return (struct gws_menu_item_d *) item;
 fail:
-    return (struct gwssrv_menu_item_d *) 0;
+    return (struct gws_menu_item_d *) 0;
 }
 
 
-struct gwssrv_menu_d *gwssrv_create_menu (
+struct gws_menu_d *gwssrv_create_menu (
     struct gws_window_d *parent,
     int highlight,
     int count,
@@ -242,15 +240,15 @@ struct gwssrv_menu_d *gwssrv_create_menu (
     unsigned long height,
     unsigned int color )
 {
-    struct gwssrv_menu_d  *menu;
+    struct gws_menu_d  *menu;
     struct gws_window_d    *window;
 
     //gwssrv_debug_print("gwssrv_create_menu:\n");
 
-    menu = (struct gwssrv_menu_d *) malloc( sizeof(struct gwssrv_menu_d) );
+    menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
     if ( (void *) menu == NULL ){
         gwssrv_debug_print("gwssrv_create_menu: [FAIL] menu\n");
-        return (struct gwssrv_menu_d *) 0;
+        return (struct gws_menu_d *) 0;
     }
 
 // Deslocamento em relação a janela mãe.
@@ -298,14 +296,14 @@ struct gwssrv_menu_d *gwssrv_create_menu (
     //menu->used = TRUE;
     //menu->magic = 1234;
 
-    return (struct gwssrv_menu_d *) menu;
+    return (struct gws_menu_d *) menu;
 }
 
 
 
 
 // checa se o mouse esta passando sobre o main menu.
-int __is_inside_menu(struct gwssrv_menu_d *menu, int x, int y)
+int __is_inside_menu(struct gws_menu_d *menu, int x, int y)
 {
 
 // #todo
@@ -313,13 +311,12 @@ int __is_inside_menu(struct gwssrv_menu_d *menu, int x, int y)
 // a parent window para encontrarmos o 
 // deslocamento correto.
 
-    struct gwssrv_menu_d *m;
+    struct gws_menu_d *m;
 
     struct gws_window_d *pw;
     struct gws_window_d *mw;
 
-    m = (struct gwssrv_menu_d *) menu;
-
+    m = (struct gws_menu_d *) menu;
     if( (void*)m==NULL )
         return -1;
 
@@ -352,7 +349,7 @@ int __is_inside_menu(struct gwssrv_menu_d *menu, int x, int y)
 
 
 
-int gwssrv_get_number_of_itens (struct gwssrv_menu_d *menu)
+int gwssrv_get_number_of_itens (struct gws_menu_d *menu)
 {
     if ( (void*) menu == NULL ){
         return -1;
@@ -363,25 +360,25 @@ int gwssrv_get_number_of_itens (struct gwssrv_menu_d *menu)
 
 
 /*
-struct gwssrv_menu_item_d *gwssrv_get_menu_item(struct gwssrv_menu_d *menu, int i);
-struct gwssrv_menu_item_d *gwssrv_get_menu_item(struct gwssrv_menu_d *menu, int i)
+struct gws_menu_item_d *gwssrv_get_menu_item(struct gws_menu_d *menu, int i);
+struct gws_menu_item_d *gwssrv_get_menu_item(struct gws_menu_d *menu, int i)
 {
-     //return (struct gwssrv_menu_item_d *) ?;
+     //return (struct gws_menu_item_d *) ?;
 }
 */
 
 
 /*
-int gwssrv_redraw_menuitem(struct gwssrv_menu_item_d *);
-int gwssrv_redraw_menuitem(struct gwssrv_menu_item_d *)
+int gwssrv_redraw_menuitem(struct gws_menu_item_d *);
+int gwssrv_redraw_menuitem(struct gws_menu_item_d *)
 {
 }
 */
 
 
 /*
-int gwssrv_redraw_menu ( struct gwssrv_menu_d *menu );
-int gwssrv_redraw_menu ( struct gwssrv_menu_d *menu )
+int gwssrv_redraw_menu ( struct gws_menu_d *menu );
+int gwssrv_redraw_menu ( struct gws_menu_d *menu )
 {
     int i=0;
     int n=0;

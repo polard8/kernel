@@ -7,6 +7,25 @@ static void __draw_button_mark_by_wid( int wid, int button_number );
 //===================================================================
 //
 
+// Paint the rectangle.
+int 
+doFillWindow( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned long width, 
+    unsigned long height, 
+    unsigned int color,
+    unsigned long rop_flags )
+{
+    rectBackbufferDrawRectangle ( 
+        x, y, width, height, 
+        color, 
+        TRUE,  // Fill or not? 
+        rop_flags );
+
+    return 0; 
+}
+
 // Here we're gonna redraw the given window
 // and invalidate it.
 int 
