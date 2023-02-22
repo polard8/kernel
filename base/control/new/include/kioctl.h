@@ -10,17 +10,19 @@
 /*
  * Window/terminal size structure.  
  * This information is stored by the kernel
- * in order to provide a consistent interface, but is not used by the kernel.
+ * in order to provide a consistent interface.
  */
- 
-/* 
-struct winsize {
-	unsigned short	ws_row;		// rows, in characters 
-	unsigned short	ws_col;		// columns, in characters 
-	unsigned short	ws_xpixel;	// horizontal size, pixels 
-	unsigned short	ws_ypixel;	// vertical size, pixels 
+
+// Implementation of 'winsize' structure.
+struct winsize_d
+{
+    unsigned short ws_row;  // Rows, in characters. 
+    unsigned short ws_col;  // Columns, in characters. 
+    unsigned short ws_xpixel;  // Horizontal size, pixels. 
+    unsigned short ws_ypixel;  // Certical size, pixels.
 };
-*/
+#define winsize winsize_d
+
 
 /*
  * Pun for SUN.

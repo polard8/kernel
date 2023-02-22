@@ -43,12 +43,12 @@ network_handle_udp(
     ssize_t size )
 {
     struct udp_d *udp;
-    udp = (struct udp_d *) buffer;
 
     //printf ("UDP: Received\n");
 
-    if ( (void*) buffer == NULL ){
-        printf("network_handle_ipv4: buffer\n");
+    udp = (struct udp_d *) buffer;
+    if ( (void*) udp == NULL ){
+        printf("network_handle_ipv4: udp\n");
         return;
     }
 
@@ -58,7 +58,6 @@ network_handle_udp(
     //    printf("network_handle_udp: size\n");
     //    return;
     //}
-
 
     uint16_t sport = (uint16_t) FromNetByteOrder16(udp->uh_sport);
     uint16_t dport = (uint16_t) FromNetByteOrder16(udp->uh_dport);
@@ -90,7 +89,7 @@ network_handle_udp(
     int mFlag=0;
 
     //#debug
-    //printf("UDP: dport{%d}   #debug\n",dport);
+    printf("UDP: dport{%d}   #debug\n",dport);
 
 // #test
 // DHCP dialog
@@ -115,14 +114,21 @@ network_handle_udp(
         //printf (" '%s' \n",udp_payload);
         //die();
 
-        // Parse message
-        // #todo: Create a worker
-        if ( p[0] == '#' && p[1] == '-')
+        // Mini-parser.
+        // #todo: Create a worker.
+        if ( p[0] == '#' && 
+             p[1] == ':')
         {
-            if (p[2] == 'x'){
-                printf("x command\n");
-                //hal_reboot();
-                die();
+            // Switch:
+            if (p[2] == '1'){
+                //post_message_to_ws(NULL,MSG_CLOSE,0,0);
+            }
+            // Update desktop
+            if (p[2] == '2'){
+                //post_message_to_ws(NULL,9092,0,0);
+            }
+            if (p[2] == '3'){
+                //post_message_to_ws(NULL,MSG_CLOSE,0,0);
             }
         }
     }

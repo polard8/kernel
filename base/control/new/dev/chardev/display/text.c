@@ -1,15 +1,10 @@
 
-// dtext.c
-
+// text.c
 
 #include <kernel.h>
 
-
-/* 
- * draw_string:
- *     Draw a string on the screen. 
- */
-
+// draw_string:
+// Draw a string on the screen. 
 void 
 draw_string ( 
     unsigned long x,
@@ -17,15 +12,11 @@ draw_string (
     unsigned int color,
     char *string )
 {
-
-    // loop
     register int Index=0;
 
    //int cWidth = 8;
     int cWidth = get_char_width ();
     //int cHeight = get_char_height ();
-
-
 
     //if ( cWidth == 0 || cHeight == 0 )
     if ( cWidth == 0 ){

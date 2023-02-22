@@ -141,18 +141,13 @@ void DeviceInterface_PS2Keyboard(void)
 // =============================================
 // #test
 
-#define I8042_STATUS 0x64
-#define I8042_WHICH_BUFFER 0x20
-#define I8042_BUFFER_FULL 0x01
-#define I8042_MOUSE_BUFFER 0x20
-#define I8042_KEYBOARD_BUFFER 0x00
-
 // Get status.
+// Return if the output buffer is not full.
     unsigned char status = in8(I8042_STATUS);
-// buffer full?
-    if (!(status & I8042_BUFFER_FULL))
+    if (!(status & I8042_STATUS_OUTPUT_BUFFER_FULL))
         return;
-// which device?
+
+// Which device?
     int is_mouse_device = 
         ((status & I8042_WHICH_BUFFER) == I8042_MOUSE_BUFFER) 
         ? TRUE 
@@ -178,7 +173,8 @@ sc_again:
 // #define KBIT    0x80  /* bit used to ack characters to keyboard */
 
 // Get the rawbyte for the key struck.
-    __raw = in8(0x60);
+// Read the byte out of the controller.
+    __raw = (unsigned char) in8(0x60);
 
 //===========================================
 // Get
@@ -187,7 +183,7 @@ sc_again:
 // Strobe the bit high
 // and then strobe it low.
 
-    val = in8(0x61); 
+    val = (unsigned char) in8(0x61); 
     out8(0x61, val | 0x80);  
     out8(0x61, val);
 //===========================================

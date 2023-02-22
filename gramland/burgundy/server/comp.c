@@ -87,6 +87,14 @@ void flush_frame(void)
 // Quem deve ser chamado X vezes por segundo é a rotina 
 // de refresh, que vai efetuar refresh dos retângulos sujos e
 // dependendo da ação do compositor, o refresh pode ser da tela toda.
+// Refresh
+// Lookup the main window list.
+// #todo: This is very slow. We need a linked list.
+// Get next
+// It is a valid window and
+// it is a dirty window.
+// Flush the window's rectangle and invalidate the window.
+// see: rect.c
 
 void wmRefreshDirtyRectangles(void)
 {
@@ -97,74 +105,22 @@ void wmRefreshDirtyRectangles(void)
     register int i=0;
     struct gws_window_d *tmp;
 
-// #debug
-    //gwssrv_debug_print("wmRefreshDirtyRectangles:\n");
-
-//==========================================================
-// ++  Start
-
-    //t_start = rtl_get_progress_time();
-
-//
-// == Update screen ====================
-//
-
-// Redrawing all the windows.
-// redraw using zorder.
-// refresh using zorder.
-// Invalidating all the windows ... 
-// and it will be flushed into the framebuffer for the ring0 routines.
-
-// ======================================================
-// Flush
-// #todo #bugbug
-// Flush all the dirty windows into the framebuffer.
-// It will lookup the main window list.
-// This is a very slow way of doing this.
-// But it is just a test.
-
-// ??
-    //int UpdateScreenFlag=FALSE;
-    //int UpdateScreenFlag=TRUE;
-    //if (UpdateScreenFlag != TRUE){
-    //    return;
-    //}
-
-
-// Refresh
-// Lookup the main window list.
-// #todo: This is very slow. We need a linked list.
-// Get next
-// It is a valid window and
-// it is a dirty window.
-// Flush the window's rectangle.
-// see: rect.c
-
-    for (i=0; i<WINDOW_COUNT_MAX; ++i)
-    {
+    for (i=0; i<WINDOW_COUNT_MAX; ++i){
         tmp = (struct gws_window_d *) windowList[i];
-
         if ( (void*) tmp != NULL )
         {
             if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
-                if (tmp->dirty == TRUE)
-                {
-                    //Wrappers
-                    //wm_flush_window(tmp);       //checking parameters
-                    //gws_show_window_rect(tmp);  //checking parameters and invalidate.
-                    // Direct, no checks.
-
+                // Faster: Refresh via KGWS and validate.
+                if (tmp->dirty == TRUE){
                     gws_refresh_rectangle ( 
                         tmp->left, tmp->top, tmp->width, tmp->height ); 
-
                     validate_window(tmp);
                 }
             }
         }
     };
 }
-
 
 
 /*

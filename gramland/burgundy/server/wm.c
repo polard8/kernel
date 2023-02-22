@@ -83,12 +83,10 @@ static int tb_buttons[TB_BUTTONS_MAX];
 
 // tb windows
 // Ponteiros de estrutura de janelas.
-static unsigned long tb_windows[TB_BUTTONS_MAX];
+//static unsigned long tb_windows[TB_BUTTONS_MAX];
 
 // tb pids
 static int tb_pids[TB_BUTTONS_MAX];
-
-
 
 //
 // Window list.
@@ -966,7 +964,8 @@ static void on_mouse_released(void)
 // ===================================
 // >> Menuitens
 // Lidando com menuitens
-    // Se clicamos em um menu item.
+// Se clicamos em um menu item.
+    unsigned long selected_item=0;
     if (mouse_hover->isMenuItem == TRUE)
     {
         if (mouse_hover->type == WT_BUTTON)
@@ -974,6 +973,14 @@ static void on_mouse_released(void)
             // Redraw the button
             set_status_by_id(mouse_hover->id,BS_RELEASED);
             redraw_window_by_id(mouse_hover->id,TRUE);
+
+            selected_item = (unsigned long) (mouse_hover->id & 0xFFFF);
+            menuProcedure(
+                NULL,
+                (int) 1,
+                (unsigned long) selected_item,
+                (unsigned long) BS_RELEASED );
+
             return;
         }
     }
@@ -3818,24 +3825,6 @@ wmProcedure(
     //printf("wmProcedure: w=? m=%d l1=%d l2=%d\n", 
         //msg, long1, long2 );
 
-// -------------
-// Redirect if the menu is active.
-    int menu_res=0;
-    if (is_menu_active == TRUE)
-    {
-        // see: menu.c
-        menu_res = 
-            (int) menuProcedure(
-                      NULL,
-                      (int) msg,
-                      (unsigned long) long1,
-                      (unsigned long) long2 );
-
-        return (int) menu_res;
-    }
-// -------------
-
-
 // See:
 // globals.h
 
@@ -4024,8 +4013,14 @@ int on_combination(int msg_code)
         return 0;
     }
 
+    // control+x
     if (msg_code == GWS_Cut)
-    {printf("ws: cut\n"); return 0;}
+    {
+        printf("ws: cut\n"); 
+        // #test
+        // gwssrv_quit();
+        return 0;
+    }
 
     if (msg_code == GWS_Copy)
     {printf("ws: copy\n"); return 0;}
@@ -4055,8 +4050,12 @@ int on_combination(int msg_code)
     if (msg_code == GWS_Find)
     {printf("ws: find\n"); return 0;}
 
-    if (msg_code == GWS_Save){
-        on_menu();  //#test
+// #test
+// Creates a menu for the root window.
+// Only refresh if it is already created.
+    if (msg_code == GWS_Save)
+    {
+        on_menu();
         return 0;
     }
 
@@ -4213,6 +4212,11 @@ new_event:
         }
         */
     }
+    
+    //if (msg == GWS_Close)
+    //    gwssrv_quit();
+    //if (msg == GWS_UpdateDesktop)
+    //    wm_update_desktop(TRUE);
 
 //Unknown:
     return 0;
@@ -4973,7 +4977,7 @@ void create_taskbar (unsigned long tb_height)
     // id de janelas.
     tb_buttons[i] = (int) tmp_wid;
     // ponteiros de estruturas de janelas do tipo botão.
-    tb_windows[i] = (unsigned long) tmp_button;
+    //tb_windows[i] = (unsigned long) tmp_button;
 
     // Número de botões criados.
     tb_buttons_count++;

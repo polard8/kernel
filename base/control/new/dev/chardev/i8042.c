@@ -8,18 +8,15 @@
 // See: input/i8042/ps2.h
 
 /*
- // #todo: Get these info with HAL.
+// #todo: Get these info with HAL.
 static int i8042_keyboard_irq=0;
 static int i8042_mouse_irq=0;
 static unsigned long i8042_keyboard_interrupt_handler=0;
 static unsigned long i8042_mouse_interrupt_handler=0;
 */
 
+//-------------------------------------
 
-// Drain
-//#define I8042_BUFFER 0x60
-//#define I8042_STATUS 0x64
-//#define I8042_BUFFER_FULL 0x01
 
 void I8042Controller_do_drain(void)
 {
@@ -27,78 +24,67 @@ void I8042Controller_do_drain(void)
     unsigned char byte=0;
 
     debug_print("I8042Controller_do_drain:\n");
-
-    for (;;) {
-        status = in8(0x64);
-        // empty
-        if (!(status & 0x01)){
+    while (1){
+        status = (unsigned char) in8(0x64);
+        // Empty?
+        if (!(status & I8042_STATUS_OUTPUT_BUFFER_FULL)){
             return;
         }  
-        byte = in8(0x60);
+        byte = (unsigned char) in8(0x60);
     };
 }
 
-
-/*
- * kbdc_wait:
- *     Espera por flag de autorização para ler ou escrever.
- */
-
-// #??
-// is this the best option for x86_64?
-#define __local_out_any_b(p)  asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
-
-// Espera para ler ou para escrever!
-#define __I8042_BUFFER_FULL  0x01
+// kbdc_wait:
+// Espera por flag de autorização para ler ou escrever.
+// #bugbug?
+// Is this the best option for x86_64?
+#define __local_out_any_b(p)  \
+    asm volatile ( "outb %%al,%0" : : "dN"((p)) : "eax" )
 
 // #todo: Descreva pra que serve o bit 1. valor 2.
 
 void kbdc_wait (unsigned char type)
 {
     unsigned char StatusChar=0;
-    unsigned char Type=0;
+    unsigned char Type = (type & 0xFF);
     int i=0;
     int timeout=10000;
 
-    Type = (type & 0xFF);
-
 // =====================================
 // 0 = READ
+// Sinalizado que o buffer ta cheio.
+// # Somente para mouse.
+// See: serenity os.
+// Quando for '1' eu saio.
     if (Type==0)
     {
-        // Spin
         for (i=0; i<timeout; i++) 
         {
             StatusChar = (unsigned char) in8(0x64);
-           
-           // Sinalizado que o buffer ta cheio.
-           // # Somente para mouse.
-           // See: serenity os.
-           // Quando for '1' eu saio.
-           if ( (StatusChar & __I8042_BUFFER_FULL) != 0 )
-           {
+            if ( (StatusChar & I8042_STATUS_OUTPUT_BUFFER_FULL) != 0 )
+            {
                __local_out_any_b (0x80);
                return;
-           }
+            }
         };
-        // End of time.
         return;
     }
 
 // =====================================
 // 1 = WRITE
+// Quando for '0', eu saio.
     if (Type==1)
     {
         for (i=0; i<timeout; i++)
         {
-            // Quando for '0', eu saio.
-            if ( !(in8(0x64) & 2) )
+            if ( !(in8(0x64) & I8042_STATUS_INPUT_BUFFER_FULL) )
             {
                 __local_out_any_b (0x80);
                 return;
             }
         };
-    };
+        return;
+    }
 }  
 
 
@@ -123,28 +109,25 @@ void prepare_for_output(void)
 unsigned char wait_then_read (int port)
 {
     prepare_for_input();
-    return (unsigned char) in8 (port);
+    return (unsigned char) in8(port);
 }
 
 void wait_then_write ( int port, int data )
 {
     prepare_for_output();
-    out8 ( port, data );
+    out8( port, data );
 }
-
 
 // This is called by gdeshell.
 int PS2_initialize(void)
 {
     debug_print ("PS2_initialize: [TODO]\n");
-	//ps2();
+    //ps2();
     return 0;
 }
 
-
 //#define __PS2MOUSE_SET_DEFAULTS              0xF6
 //#define __PS2MOUSE_SET_RESOLUTION            0xE8
-
 
 // Early initialization
 // Only keyboard.
@@ -192,13 +175,6 @@ int PS2_initialization(void)
 }
 
 
-int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
-{
-    debug_print("ps2_ioctl: [TODO]\n");
-    return -1;
-}
-
-
 /*
  * ps2:
  *     Inicializa o controlador ps2.
@@ -210,11 +186,9 @@ int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
  *     As vezes os dois não funcionam ao mesmo tempo se a 
  *     inicialização não for feita desse jeito. 
  */
-
 // Essa é uma inicializaçao completa.
 // See:
 // https://wiki.osdev.org/%228042%22_PS/2_Controller
-
 
 void ps2(void)
 {
@@ -227,7 +201,7 @@ void ps2(void)
 
     // #debug
     printf ("ps2: Initializing..\n");
-    refresh_screen();
+    //refresh_screen();
 
     // The main structure fisrt of all.
     // #todo: create ps_initialize_main_structure();
@@ -353,7 +327,7 @@ void ps2(void)
 // imprimir o resultado da disponibilidade.
 
     if (keyboard_available == 1){
-        printf("----\n");
+        //printf("----\n");
         printf("~ Keyboard available\n");
         ps2kbd_initialize_device();
         PS2.keyboard_initialized = TRUE;
@@ -372,9 +346,9 @@ void ps2(void)
 
     if (mouse_available == 1 ){
 
-        printf("----\n");
+        //printf("----\n");
         printf("~ Mouse available\n");
-        
+
         // #todo
         //ps2mouse_initialize_device();
 
@@ -418,13 +392,26 @@ void ps2(void)
 //==========================
 
 // Wait for nothing!
-    kbdc_wait (1);
-    kbdc_wait (1);
-    kbdc_wait (1);
-    kbdc_wait (1);
+    kbdc_wait(1);
+    kbdc_wait(1);
+    kbdc_wait(1);
+    kbdc_wait(1);
 
     //#debug
     printf ("ps2: done\n");
-    refresh_screen();
+    //refresh_screen();
 }
+
+int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
+{
+    debug_print("ps2_ioctl: [TODO]\n");
+    return -1;
+}
+
+//
+// End
+//
+
+
+
 

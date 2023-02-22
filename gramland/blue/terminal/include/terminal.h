@@ -5,6 +5,16 @@
 #define __TERMINAL__    1
 
 //
+// Define control characters.
+//
+
+#define TERMINAL_ESCAPE 0x1B
+#define TERMINAL_INTRODUCER '['
+#define TERMINAL_PARAMETER_SEPARATOR ';'
+#define TERMINAL_RUBOUT 0x7F
+
+
+//
 // CSI support
 // 
 

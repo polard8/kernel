@@ -191,8 +191,6 @@ typedef struct _gRep gRep;
 // control+s
 #define GWS_Save    72
 
-
-
 #define GWS_ControlArrowUp      80
 #define GWS_ControlArrowDown    81
 #define GWS_ControlArrowLeft    82
@@ -229,7 +227,6 @@ typedef struct _gRep gRep;
 #define GWS_GrPlot0               2040
 #define GWS_GrCubeZ               2041
 #define GWS_GrRectangle           2042
-
 
 #define GWS_AsyncCommand          2222
 // Put a message into the client's queue.

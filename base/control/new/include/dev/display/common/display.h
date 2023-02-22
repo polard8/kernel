@@ -34,6 +34,7 @@ struct display_device_d
 //
     unsigned long framebuffer_pa;
     unsigned long framebuffer_va;
+
     unsigned long framebuffer_width;
     unsigned long framebuffer_height;
     unsigned long framebuffer_bpp;
@@ -42,6 +43,14 @@ struct display_device_d
     // used for allocations.
     unsigned long framebuffer_size_in_bytes;
 
+
+    //unsigned long screen_rows;
+    //unsigned long buffer_rows;
+    
+    //int mode;
+    //unsigned long flags;
+    
+    //struct tty_d *console_tty
     // FILE *fp;
 
     //...    

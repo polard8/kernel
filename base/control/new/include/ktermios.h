@@ -50,16 +50,6 @@ Macro: int NCCS
     The value of this macro is the number of elements in the c_cc array. 
 */
 
-// #todo: struct winsize_d
-struct winsize 
-{
-    unsigned short ws_row;
-    unsigned short ws_col;
-    unsigned short ws_xpixel;
-    unsigned short ws_ypixel;
-};
-
-
 // Indices into c_cc array.  
 // Default values in parentheses. POSIX Table 7-5. 
 

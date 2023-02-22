@@ -423,7 +423,7 @@ static int __send_response(int fd, int type)
 {
 // Reusing the same buffer from the request.
     unsigned long *message_buffer = (unsigned long *) &__buffer[0];
-    int n_writes = 0;
+    int n_writes=0;
     int Status=0;
 
 /*
@@ -441,18 +441,22 @@ static int __send_response(int fd, int type)
 // 0:
 // wid
     message_buffer[0] = (unsigned long) next_response[0];
+    //message_buffer[0] = (unsigned long) (next_response[0] & 0xFFFFFFFF);
 
 // 1:
 // Type of reply.
 
     switch(type){
-    case 1:  // normal reply
+    // Normal reply
+    case 1:
         message_buffer[1] = SERVER_PACKET_TYPE_REPLY;
         break;
-    case 2:  // event
+    // Event
+    case 2:
         message_buffer[1] = SERVER_PACKET_TYPE_EVENT;
         break;
-    case 3:  // error
+    // Error
+    case 3:
     default:
         message_buffer[1] = SERVER_PACKET_TYPE_ERROR;
         break;
@@ -514,16 +518,18 @@ static int __send_response(int fd, int type)
     }
     */
 
-// limits
-    if (fd<0 || fd>31)
-    {
-        Status = -1;
-        goto exit2;
-    }
+
 
 //
 // Send
 //
+
+// Limits
+    if (fd<0 || fd>31)
+    {
+        Status = -1;
+        goto exit1;
+    }
 
 // We can't write on our own socket.
     if (fd == ____saved_server_fd){
@@ -532,10 +538,12 @@ static int __send_response(int fd, int type)
         while(1){}
     }
 
-// A valid client is always 31.
+// #test
+// For now, the only valid fd is 31.
     if (fd != 31){
         printf("__send_response: fd != 31\n");
-        while(1){}
+        while(1){
+        };
     }
 
 // Write
@@ -546,10 +554,11 @@ static int __send_response(int fd, int type)
 // Cleaning
 // Limpa se a resposta der certo ou se der errado.
 
-    message_buffer[0] = 0;
-    message_buffer[1] = 0;
-    message_buffer[2] = 0;
-    message_buffer[3] = 0;
+    // #delete:  Because message_buffer = __buffer.
+    //message_buffer[0] = 0;
+    //message_buffer[1] = 0;
+    //message_buffer[2] = 0;
+    //message_buffer[3] = 0;
 
     register int b=0;
     for (b=0; b<MSG_BUFFER_SIZE; ++b){
@@ -576,30 +585,25 @@ static int __send_response(int fd, int type)
         
         //close(fd);
         Status=-1;
-        goto exit2;
+        goto exit1;
     }
 
-// YES, We sent a response.
-    if (n_writes > 0)
-    {
-        // #debug
-        // gwssrv_debug_print ("__send_response: Response sent\n");
-        
+// YES, We sent the response.
+    if (n_writes > 0){
         Status=0;
         goto exit0;
     }
 
-// ??
+    // Fall through.
+
 // Fail
-exit2:
+exit1:
     message_buffer[0] = 0;
     message_buffer[1] = 0;
     message_buffer[2] = 0;
     message_buffer[3] = 0;
     message_buffer[4] = 0;
     message_buffer[5] = 0;
-exit1:
-   // Nothing
 exit0:
 // Sync. Set response.
     rtl_set_file_sync( fd, SYNC_REQUEST_SET_ACTION, ACTION_REPLY );
@@ -722,7 +726,7 @@ static void dispacher(int fd)
 
 // Invalid request. 
 // Clean
-    if (message_buffer[1] == 0 ){
+    if (message_buffer[1] == 0){
         gwssrv_debug_print ("dispacher: Invalid request\n");
         goto exit2;
     }
@@ -730,10 +734,8 @@ static void dispacher(int fd)
 // Um cliente solicitou um evento.
 // Vamos sinalizar o tipo de resposta que temos que enviar,
 // caso nenhum erro aconteça.
-
     int doSendEvent = FALSE;
-    if ( message_buffer[1] == GWS_GetNextEvent )
-    {
+    if (message_buffer[1] == GWS_GetNextEvent){
         doSendEvent = TRUE;  // The response is an EVENT, not a REPLY.
     }
 
@@ -748,9 +750,9 @@ static void dispacher(int fd)
     Status = 
         (int) gwsProcedure (
                   (int) fd,
-                  (int)                   message_buffer[1],
-                  (unsigned long)         message_buffer[2],
-                  (unsigned long)         message_buffer[3] );
+                  (int)           message_buffer[1],
+                  (unsigned long) message_buffer[2],
+                  (unsigned long) message_buffer[3] );
 
 // Como o serviço não pode ser prestado corretamente.
 // Então logo abaixo mandaremos uma resposta de erro
@@ -778,7 +780,6 @@ static void dispacher(int fd)
             fd, SYNC_REQUEST_SET_ACTION, ACTION_NULL );
         goto exit0;
     }
-
 
 //
 // == reponse ================
@@ -2706,6 +2707,7 @@ int serviceRefreshWindow(void)
 
 // Flush
     gws_show_window_rect(window);
+    // wmInputReader();
 
 done:
     return 0;
@@ -3736,6 +3738,7 @@ static int on_execute(int dm)
 
     if (IsTimeToQuit != TRUE){
         debug_print ("gwssrv: [ERROR] Invalid IsTimeToQuit\n");
+        return -1;
     }
 
 // #todo
@@ -3780,6 +3783,8 @@ int main (int argc, char **argv)
     int f3= FALSE;
     int f4= FALSE;
     int fDisplayManager=FALSE;
+
+    char shutdown_string[64];
 
     if (argc>0)
     {
@@ -3846,16 +3851,33 @@ int main (int argc, char **argv)
     };
  */
 
-
 //0 = Time to quit.
     Status = (int) on_execute(fDisplayManager);
-    if (Status == 0){
+
+    // Shutdown the server.
+    if (Status == 0)
+    {
         gwssrv_debug_print ("GWSSRV.BIN: exit(0)\n");
         printf             ("GWSSRV.BIN: exit(0)\n");
-        // #bugbug
-        // The thread state didn't change.
-        // We are still in RUNNING state.
-        // It probably hang in the exit function.
+
+        // Clear root window.
+        if ( (void*) __root_window != NULL )
+        {
+            clear_window_by_id( __root_window->id, TRUE );
+            memset(shutdown_string, 0 , 64);
+            strcat(shutdown_string,"ws: Shutting down ...");
+            strcat(shutdown_string,"\0");
+            dtextDrawText ( 
+                (struct gws_window_d *) __root_window,
+                8, 
+                8, 
+                (unsigned int) COLOR_WHITE, 
+                shutdown_string );
+            wm_flush_window(__root_window);
+            close( ____saved_server_fd );
+            rtl_clone_and_execute("shutdown.bin");
+            exit(0);
+        }
         exit(0);
     }
 
@@ -3865,6 +3887,8 @@ int main (int argc, char **argv)
     printf            ("GWSSRV.BIN: Hang on exit\n");
     while(1){
     };
+
+//exit0:
     return 0;
 }
 

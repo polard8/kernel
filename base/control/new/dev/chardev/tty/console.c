@@ -643,12 +643,9 @@ console_init_virtual_console(
 // language id.
     CONSOLE_TTYS[ConsoleIndex].charset_lang_id = 0;
 
-//
 // Font support.
-//
-
     CONSOLE_TTYS[ConsoleIndex].font_address = 
-        (void*) gwsGetCurrentFontAddress();
+        (void*) fontGetCurrentAddress();
 
 // #bugbug
 // A estrutura tem mais elementos que podem ser inicializados.
@@ -1338,13 +1335,20 @@ void console_outbyte2 (int c, int console_number)
     }
 
 // Backspace
-
-    //if ( Ch == '\b' )
-    if (Ch == 0x8)
+    //if (Ch == 0x8)
+    if ( Ch == '\b' )
     {
-        CONSOLE_TTYS[n].cursor_x--; 
         prev = Ch;
-        return;
+        if (CONSOLE_TTYS[n].cursor_x > 0){
+            CONSOLE_TTYS[n].cursor_x--; 
+            return;
+        }
+        if (CONSOLE_TTYS[n].cursor_y > 0)
+        {
+            CONSOLE_TTYS[n].cursor_y -= 1;
+            CONSOLE_TTYS[n].cursor_x = CONSOLE_TTYS[n].cursor_right-1;
+            return;
+        }
     }
 
 //

@@ -17,6 +17,25 @@
 //#define BIOSFONT8X8 0x000FFA6E
 //...
 
+// # char support # 
+#define CHAR_WIDTH   8
+#define CHAR_HEIGHT  8 
+#define DEFAULT_CHAR_WIDTH   8
+#define DEFAULT_CHAR_HEIGHT  8
+//...
+
+
+// see: font.c
+extern unsigned long gws_currentfont_address;
+extern unsigned long g8x8fontAddress;          // 8×8, 80×25,CGA, EGA
+extern unsigned long g8x14fontAddress;         // 8x14,80×25,EGA
+extern unsigned long g8x16fontAddress;         // ??
+extern unsigned long g9x14fontAddress;         // 9x14,80×25,MDA, Hercules
+extern unsigned long g9x16fontAddress;         // 9x16,80×25,VGA
+//...
+
+extern int gfontSize;
+
 typedef enum {
     FONTNULL,
     FONT8X8,
@@ -33,8 +52,10 @@ int gwsGetCurrentFontCharWidth (void);
 void gwsSetCurrentFontCharWidth (int width);
 int gwsGetCurrentFontCharHeight (void);
 void gwsSetCurrentFontCharHeight (int height);
-unsigned long gwsGetCurrentFontAddress (void);
-void gwsSetCurrentFontAddress ( unsigned long address );
+
+unsigned long fontGetCurrentAddress(void);
+void fontSetCurrentAddress(unsigned long address);
+
 int gwsInstallFont ( char *file_name );
 
 #endif    

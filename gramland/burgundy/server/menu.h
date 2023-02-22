@@ -8,7 +8,11 @@
 #define MI_TYPE_SEPARATOR  1000
 #define MI_TYPE_TEXT       2000
 
-extern int is_menu_active;
+
+#define MAINMENU_BUTTONS_MAX  5
+extern int mainmenu_buttons_count;  
+extern int mainmenu_buttons[MAINMENU_BUTTONS_MAX];
+
 
 // menu item
 struct gws_menu_item_d
@@ -42,6 +46,7 @@ struct gws_menu_d
     struct gws_menu_item_d *list;
     //struct gws_menu_d *next;
 };
+extern struct gws_menu_d *main_menu;
 
 //
 // == Prototypes ==============================================
@@ -70,6 +75,7 @@ struct gws_menu_d *gwssrv_create_menu (
     unsigned long height,
     unsigned int color );
 
+int redraw_main_menu(void);
 int create_main_menu(int position_x, int position_y);
 
 int

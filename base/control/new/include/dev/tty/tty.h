@@ -291,6 +291,12 @@ struct tty_d
     unsigned long cursor_width_in_pixels;
     unsigned long cursor_height_in_pixels;
 
+
+// #test
+// The winsize structure used in ioctl().
+// see: kioctl.h
+    struct winsize_d winsize;
+
 //
 // Charset support.
 // See: kbdmap.c, kbdmap.h

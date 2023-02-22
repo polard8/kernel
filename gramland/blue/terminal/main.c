@@ -980,6 +980,7 @@ static void compareStrings(int fd)
 // 't1'
     if ( strncmp(prompt,"t1",2) == 0 )
     {
+        //printf("One Two \b\b\b\b\b\b\b\b\b\bX\n");
         
         // pixel: ok
         //gws_plot0(fd, 20, 20, 0, COLOR_RED );
@@ -1846,6 +1847,7 @@ tputc (
                 break;
 
             //^[   (Esc)
+            //case TERMINAL_ESCAPE:
             //case '\e':
             //case '\033':
             case '\x1b':
@@ -2009,9 +2011,11 @@ tputc (
 
                      break;
 
+
                  // Estilo de texto.
                  // Quando aparece o ';' temos que mudar o estilo.
                  // No buffer tem o valor do novo estilo.
+                 //case TERMINAL_PARAMETER_SEPARATOR:
                  case ';':
                      //printf("FOUND {;}\n");
                      ivalue = (int) CSI_BUFFER[0];
@@ -2088,6 +2092,7 @@ tputc (
             // Encontramos o '[' depois de \033.
             // Entao vamos entrar em ESC_CSI?
             // see: https://man7.org/linux/man-pages/man4/console_codes.4.html
+            //case TERMINAL_INTRODUCER:
             case '[':
                 //printf ("FOUND {[}\n"); //debug
                 term.esc |= ESC_CSI;

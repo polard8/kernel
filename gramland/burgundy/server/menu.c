@@ -3,50 +3,61 @@
 
 #include "gwsint.h"
 
-int is_menu_active=FALSE;
+int mainmenu_buttons_count=0;
+int mainmenu_buttons[MAINMENU_BUTTONS_MAX];
+
+
+struct gws_menu_d *main_menu;
+
+
+// ----------------
+
+// TRUE = OK
+int redraw_main_menu(void)
+{
+// Invalid menu. Cant redraw.
+    if ( (void*) main_menu == NULL )
+        return FALSE;
+    if (main_menu->in_use != TRUE)
+        return FALSE;
+
+// Redraw bg window.
+   redraw_window(main_menu->window,TRUE);
+
+// Redraw items.
+    struct gws_menu_item_d *tmp;
+    tmp = (struct gws_menu_item_d *)main_menu->list;  //First
+    while (1){
+        if ( (void*) tmp == NULL )
+            break;
+        // Redraw menu item.
+        if ( (void*) tmp != NULL ){
+            redraw_window(tmp->window,1);
+        }
+        tmp = (struct gws_menu_item_d *) tmp->next;
+    };
+
+// ok
+    return TRUE;
+}
 
 // Chamado na hora de inicializar ou finaliza o menu.
 int on_menu(void)
 {
+    int status=FALSE;
 
-    if ( (void*)__root_window == NULL )
-        return -1;
-
-    if (__root_window->magic != 1234){
-        return -1;
-    }
-
-// cria o menu
-// Se não tem o context menu. Então cria.
-
-    if ( (void*) __root_window->contextmenu == NULL ){
-        create_main_menu(0,0);
+// Redraw if we already have a valid menu.
+    status = redraw_main_menu();
+    if (status==TRUE)
         return 0;
-    }
 
-// para de usar o menu
-// Se temos o menu e temos a janela do menu.
-// repinta ela e mostra.
+// Create the main_menu.
+// At the position 8:8 of the root window.
+    if (status != TRUE){
+        create_main_menu(8,8);
+    } 
 
-    struct gws_window_d *mw;
-
-    mw = (struct gws_window_d *) __root_window->contextmenu->window;
-    
-    if( (void*) mw != NULL )
-    {
-        if (mw->magic == 1234)
-        {
-            is_menu_active = FALSE;
-            wm_update_desktop(TRUE);
-            //redraw_window(
-            //    __root_window->contextmenu->window, 
-            //    TRUE ); 
-            return 0;
-        }
-        return -1;
-    }
-
-    return -1;
+    return 0;
 }
 
 
@@ -55,101 +66,120 @@ int on_menu(void)
 // ::: The context menu for the root window.
 int create_main_menu(int position_x, int position_y)
 {
+//
+
     struct gws_menu_d *menu;
+    unsigned long menux = (position_x & 0xFFFF);
+    unsigned long menuy = (position_y & 0xFFFF);
 
-// --------------------------------------
-
-    //unsigned long menux = (unsigned long) (position_x & 0xFFF);
-    //unsigned long menuy = (unsigned long) (position_y & 0xFFF);
-    unsigned long menux = 4;
-    unsigned long menuy = 4;
-// menuy
-    if (WindowManager.initialized == TRUE)
-    {
-        menuy = 
-            (unsigned long)( WindowManager.wa_top + 
-                             WindowManager.wa_height -
-                             200 );
-    }
-
-    // #test
-    // On corner of active window
-    if ( (void*) active_window != NULL )
-    {
-        if(active_window->magic == 1234)
-        {
-            if (active_window->type == WT_OVERLAPPED)
-            {
-                menux = (active_window->left +3);
-                menuy = (active_window->top  +25);
-            }  
-        }
-    }
-
-
-// --------------------------------------
-
-    if ( (void*) gui == NULL )
+// No window manager.
+    if (WindowManager.initialized != TRUE)
         return -1;
-    if ( (void*) gui->screen_window == NULL )
+    if (WindowManager.initialized != TRUE)
         return -1;
 
-    // #testing (NEW)
+// No root window.
+    if ( (void*) __root_window == NULL )
+        return -1;
+    if (__root_window->magic != 1234)
+        return -1;
+
+
+    register int b=0;
+    for (b=0; b<MAINMENU_BUTTONS_MAX; b++){
+        mainmenu_buttons[b]=0;
+    };
+    mainmenu_buttons_count = 0;
+
+//
+// Create the menu.
+//
+
     menu = 
         (struct gws_menu_d *) gwssrv_create_menu (
-            (int) gui->screen_window,  //parent
-            (int) 0,   //highlight
-            (int) 4,   //count
+            (struct gws_window_d *) __root_window,  // Parent window.
+            (int) 0,   // Highlight
+            (int) 4,   // Count. Number of items.
             (unsigned long) menux,
             (unsigned long) menuy,
             (unsigned long) 200,
             (unsigned long) 200,
-            (unsigned long) COLOR_WHITE );
+            (unsigned long) COLOR_GRAY );
 
     if ( (void*) menu == NULL ){
+        printf("create_main_menu: menu\n");
         return -1;
     }
 
-//menu item 0
-    gwssrv_create_menu_item (
-        "F1 - Minimize",
+//
+// Create menu items.
+//
+
+    struct gws_menu_item_d *tmp;
+
+// Item 0
+    tmp = 
+    (struct gws_menu_item_d *) gwssrv_create_menu_item (
+        "Reboot",
         (int) 0,
         (struct gws_menu_d *) menu );
-
-//menu item 1
-    gwssrv_create_menu_item (
-        "F2 - Maximize",
-        (int) 1,
-        (struct gws_menu_d *) menu );
-
-//menu item 2
-    gwssrv_create_menu_item (
-        "F3 - Close",
-        (int) 2,
-        (struct gws_menu_d *) menu );
-
-//menu item 3
-    gwssrv_create_menu_item (
-        "F4 - Close menu",
-        (int) 3,
-        (struct gws_menu_d *) menu );  
-
-//show
-    if ( (void*) menu->window != NULL )
-        gws_show_window_rect(menu->window);
-
-// global
-    if ( (void*) __root_window != NULL )
-    {
-        if(__root_window->magic == 1234)
-        {
-            __root_window->contextmenu = (struct gws_menu_d *) menu;
-            __root_window->contextmenu->in_use = TRUE;
-        
-            is_menu_active=TRUE;
-        }
+// Register wid.
+    if ( (void*) tmp != NULL ){
+        if ( (void*) tmp->window != NULL )
+            mainmenu_buttons[0] = tmp->window->id;
     }
 
+// Item 1
+    tmp = 
+    (struct gws_menu_item_d *) gwssrv_create_menu_item (
+        "Shutdown",
+        (int) 1,
+        (struct gws_menu_d *) menu );
+// Register wid.
+    if ( (void*) tmp != NULL ){
+        if ( (void*) tmp->window != NULL )
+            mainmenu_buttons[1] = tmp->window->id;
+    }
+
+// Item 2
+    tmp = 
+    (struct gws_menu_item_d *) gwssrv_create_menu_item (
+        "Shutdown server",
+        (int) 2,
+        (struct gws_menu_d *) menu );
+// Register wid.
+    if ( (void*) tmp != NULL ){
+        if ( (void*) tmp->window != NULL )
+            mainmenu_buttons[2] = tmp->window->id;
+    }
+
+// Item 3
+    tmp = 
+    (struct gws_menu_item_d *) gwssrv_create_menu_item (
+        "Nothing",
+        (int) 3,
+        (struct gws_menu_d *) menu );  
+// Register wid.
+    if ( (void*) tmp != NULL ){
+        if ( (void*) tmp->window != NULL )
+            mainmenu_buttons[3] = tmp->window->id;
+    }
+
+//
+// Show
+// 
+
+    if ( (void*) menu->window == NULL ){
+        printf("create_main_menu: menu->window\n");
+        return -1;
+    }
+    flush_window(menu->window);
+
+// The mai menu.
+    main_menu = (struct gws_menu_d *) menu;
+    main_menu->in_use = TRUE;
+
+// Done
     return 0;
 }
 
@@ -165,7 +195,7 @@ struct gws_menu_item_d *gwssrv_create_menu_item (
     //gwssrv_debug_print("gwssrv_create_menu_item:\n");    
     
     if ( (void *) menu == NULL ){
-        return (struct gws_menu_item_d *) 0;
+        return NULL;
     }
 
 // Create menu item.
@@ -223,12 +253,38 @@ struct gws_menu_item_d *gwssrv_create_menu_item (
 // The window this window belongs to.
     item->window = window;
 
-//ok
-    return (struct gws_menu_item_d *) item;
-fail:
-    return (struct gws_menu_item_d *) 0;
-}
+    struct gws_menu_item_d *tmp;
 
+    // First.
+    tmp = (struct gws_menu_item_d *) menu->list;
+    if ( (void*) tmp == NULL ){
+        menu->list = (struct gws_menu_item_d *) item;
+        // OK. Return first.
+        return (struct gws_menu_item_d *) item;
+    }
+
+    register int C=0;
+    while (1)
+    {
+        if (C>5){
+            return NULL;
+        }
+            
+        if ( (void*) tmp->next == NULL ){
+            tmp->next = (struct gws_menu_item_d *) item;
+            // OK. Return first.
+            return (struct gws_menu_item_d *) item;
+        }
+        tmp = (struct gws_menu_item_d *) tmp->next;
+        C++;
+    };
+
+fail:
+    printf ("gwssrv_create_menu_item: Fail\n");
+    return NULL;
+done:
+    return (struct gws_menu_item_d *) item;
+}
 
 struct gws_menu_d *gwssrv_create_menu (
     struct gws_window_d *parent,
@@ -240,16 +296,18 @@ struct gws_menu_d *gwssrv_create_menu (
     unsigned long height,
     unsigned int color )
 {
-    struct gws_menu_d  *menu;
-    struct gws_window_d    *window;
+    struct gws_menu_d *menu;
+    struct gws_window_d *bg_window;
+    int m_wid = -1;
 
-    //gwssrv_debug_print("gwssrv_create_menu:\n");
-
+// Create menu object.
     menu = (struct gws_menu_d *) malloc( sizeof(struct gws_menu_d) );
     if ( (void *) menu == NULL ){
-        gwssrv_debug_print("gwssrv_create_menu: [FAIL] menu\n");
-        return (struct gws_menu_d *) 0;
+        printf("gwssrv_create_menu: menu\n");
+        return NULL;
     }
+
+    menu->in_use = FALSE;  // Not yet.
 
 // Deslocamento em relação a janela mãe.
     menu->x = x;
@@ -261,40 +319,42 @@ struct gws_menu_d *gwssrv_create_menu (
     menu->highlight = highlight;
     menu->itens_count = count;
 
-    window = 
+//
+// Background window.
+//
+
+    bg_window = 
         (struct gws_window_d *) CreateWindow ( 
             WT_SIMPLE, 
             0,  //style
             1,  //status
             1,  //view
-            "menu-bg",  
+            "menu-bg-w",  
             menu->x, menu->y, menu->width, menu->height,   
             (struct gws_window_d *) parent, 
             0, 
-            color, 
-            color ); 
+            color, color ); 
 
-    if ( (void *) window == NULL ){
-        gwssrv_debug_print ("gwssrv_create_menu: window fail\n");  
+    if ( (void *) bg_window == NULL ){
+        printf ("gwssrv_create_menu: bg_window\n");  
         return NULL;
     }
 
 //#todo register
-    int m_wid=-1;
-    m_wid = RegisterWindow(window);
-    if(m_wid<0){
+    m_wid = RegisterWindow(bg_window);
+    if (m_wid<0){
+        printf ("gwssrv_create_menu: Coudn't register bg_window\n");  
         return NULL;
     }
 
 // This window is a menu.
-    window->isMenu = TRUE;
+    bg_window->isMenu = TRUE;
 
 // Save window pointer.
-    menu->window = window; 
+    menu->window = bg_window; 
     menu->parent = parent;
 
-    //menu->used = TRUE;
-    //menu->magic = 1234;
+    menu->in_use =  TRUE;
 
     return (struct gws_menu_d *) menu;
 }
@@ -424,30 +484,35 @@ menuProcedure(
     if(msg<0)
         return -1;
 
-    switch (msg){
-    case GWS_SysKeyUp:
-        if (long1==VK_F1){
-            printf("F1\n");
-            return 1;
-        }
-        if (long1==VK_F2){
-            printf("F2\n");
-            return 2;
-        }
-        if (long1==VK_F3){
-            printf("F3\n");
-            return 3;
-        }
-        if (long1==VK_F4){
-            printf("F4\n");
-            return 4;
-        }
-        break;
-    default:
-        break;
-    };
+    int item = (int) (long1 & 0xFFFF);
+    int _i0 = (int) (mainmenu_buttons[0] & 0xFFFF);
+    int _i1 = (int) (mainmenu_buttons[1] & 0xFFFF);
+    int _i2 = (int) (mainmenu_buttons[2] & 0xFFFF);
+    int _i3 = (int) (mainmenu_buttons[3] & 0xFFFF);
 
-    return -1;
+    if (item == _i0){
+        //printf("XXX\n");
+        rtl_clone_and_execute("reboot.bin");
+        return 0;
+    }
+    if (item == _i1){
+        //printf("XXX\n");
+        rtl_clone_and_execute("shutdown.bin");
+        return 0;
+    }
+    if (item == _i2){
+        //printf("XXX\n");
+        //rtl_clone_and_execute("reboot.bin");
+        gwssrv_quit();
+        return 0;
+    }
+    if (item == _i3){
+        printf("Nothing\n");
+        //rtl_clone_and_execute("reboot.bin");
+        return 0;
+    }
+
+    return 0;
 }
 
 

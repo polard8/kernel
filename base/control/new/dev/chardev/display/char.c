@@ -183,22 +183,20 @@ d_drawchar_transparent (
  *     + Criar um switch para o tamanho da fonte.
  *     isso deveria estar na inicializa��o do m�dulo char.
  */
-
 // Default:
 //     Testando o uso de uma fonte default no caso de erro.
 //     Testando a troca da fonte padr�o.
 //     O sistema n�o vai parar no caso de erro. Nesse caso ele escolhera
 // um valor default.
-// Definido em: include/kernel/gramado/kservers/kgws/kgws/ws.h
-
+// Definido em: ws.h
 // Trying to use the ROM BIOS font 
 // if we do not have loadable one.
 // default: bios font
 
-    if (gws_currentfont_address == 0)
-    {
-        gwsSetCurrentFontAddress(BIOSFONT8X8);
-        //gws_currentfont_address = (unsigned long) BIOSFONT8X8;
+// Set the base address for the current font.
+// See: font.c
+    if (gws_currentfont_address == 0){
+        fontSetCurrentAddress(BIOSFONT8X8);
     }
 
 // Selecting the default char properties.
