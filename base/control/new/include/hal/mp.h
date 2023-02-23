@@ -31,7 +31,7 @@ floating pointer structure.
 // See
 // https://pdos.csail.mit.edu/6.828/2008/readings/ia32/MPspec.pdf
 // https://wiki.osdev.org/Symmetric_Multiprocessing
-struct mp_floating_pointer_structure 
+struct mp_floating_pointer_structure_d 
 {
 
 // The Signature, must contain _MP_, and 
@@ -65,12 +65,13 @@ struct mp_floating_pointer_structure
 // all other bits are reserved.
     uint32_t features; 
 };
-struct mp_floating_pointer_structure *MPTable;
+// see: x64.c
+extern struct mp_floating_pointer_structure_d *MPTable;
 
 
 // See:
 // https://wiki.osdev.org/Symmetric_Multiprocessing
-struct mp_configuration_table 
+struct mp_configuration_table_d 
 {
 // "PCMP"
     char signature[4];
@@ -100,7 +101,8 @@ struct mp_configuration_table
     uint8_t extended_table_checksum;
     uint8_t reserved;
 };
-struct mp_configuration_table *MPConfigurationTable;
+// see: x64.c
+extern struct mp_configuration_table_d *MPConfigurationTable;
 
 
 // #
@@ -125,7 +127,7 @@ Assignment |     4 |      8 | One entry per system interrupt source.
 
 
 //# size: 20 bytes
-struct entry_processor 
+struct entry_processor_d 
 {
 // #todo:
 // apic stuff. Move the structure to apic.h?
@@ -154,7 +156,7 @@ struct entry_processor
 
 /*
 // # size: 8 bytes
-struct entry_io_apic 
+struct entry_io_apic_d 
 {
     uint8_t type; // Always 2
     uint8_t id;
@@ -164,6 +166,19 @@ struct entry_io_apic
     uint32_t address; // The memory mapped address of the IO APIC is memory
 };
 */
+
+
+struct smp_info_d
+{
+    int initialized;
+    struct mp_floating_pointer_structure_d *mp_floating_point;
+    struct mp_configuration_table_d *mp_configuration_table;
+// Array of pointers.
+    unsigned long processors[32];
+    unsigned int number_of_processors;
+};
+// see: x64.c
+extern struct smp_info_d smp_info;
 
 //
 // prototypes ==========

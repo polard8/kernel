@@ -214,6 +214,8 @@ inline void invalidate_cache_flush(void)
 // PAGETABLE_RES5, LAPIC_VA, PD_ENTRY_LAPIC, KERNEL_PD_PA.
 void lapic_initializing(unsigned long lapic_pa)
 {
+// Called by smp_probe in x64.c
+
     printf("lapic_initializing: \n");
 
     LAPIC.initialized = FALSE;

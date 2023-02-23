@@ -7,6 +7,15 @@
 extern void DisableSSE(void);
 extern void EnableSSE(void);
 
+// see: mp.h
+struct mp_floating_pointer_structure_d *MPTable;
+// see: mp.h
+struct mp_configuration_table_d *MPConfigurationTable;
+// see: mp.h
+struct smp_info_d smp_info;
+
+
+
 /*
  // 8259 isa irqs
 unsigned char isa_irqs[16] = {
@@ -847,7 +856,7 @@ void x64_load_pml4_table(unsigned long phy_addr)
     asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
 
-// If the MP Floating Point Structure 
+// MP Floating Point Structure:
 // To use these tables, the MP Floating Point Structure 
 // must first be found. As the name suggests, 
 // it is a Floating Point Structure and must be searched for.
@@ -862,12 +871,13 @@ void x64_load_pml4_table(unsigned long phy_addr)
 // :: c) In the BIOS ROM address space between 0xF0000 and 0xFFFFF.
 // See:
 // https://wiki.osdev.org/Symmetric_Multiprocessing
-// Called by I_init() in x64init.c.
 // OUT:
 // TRUE = OK.
 // FALSE = FAIL.
 int smp_probe(void)
 {
+// Probe the MP Floating Point structure.
+// Called by I_init() in x64init.c.
 
 // 0x040E - The base address.
 // Get a short value.
@@ -883,7 +893,10 @@ int smp_probe(void)
 
     printf("smp_probe:\n");
 
+// #todo
+// We can use a structure and put all these variable together,
     g_smp_initialized = FALSE;
+    smp_info.initialized = FALSE;
 
 // At this point we gotta have a lot of information
 // in the structure 'processor'.
@@ -899,11 +912,11 @@ int smp_probe(void)
 // Probe ebda address at bda base.
 //
 
-    printf("EBDA short Address: %x \n",bda[0]); 
+    printf("EBDA short Address: %x\n", bda[0] ); 
     ebda_address = (unsigned long) ( bda[0] << 4 );
     ebda_address = (unsigned long) ( ebda_address & 0xFFFFFFFF);
-    printf("EBDA Address: %x \n",ebda_address); 
-    
+    printf("EBDA Address: %x\n", ebda_address ); 
+
     // #debug
     // refresh_screen();
 
@@ -941,11 +954,15 @@ int smp_probe(void)
 
 // Signature not found.
 // #todo: Try APIC instead.
-    if (mp_found != TRUE){
+    if (mp_found != TRUE)
+    {
         printf("smp_probe: MP table wasn't found!\n");
         printf ("Try APIC table instead\n");
         goto fail;
     }
+
+
+//mp_table_found:
 
 // ==============================================
 // MPTable
@@ -959,12 +976,16 @@ int smp_probe(void)
     unsigned long table_address = 
         (unsigned long) (ebda_address + i);
     MPTable = 
-        (struct mp_floating_pointer_structure *) table_address;
+        (struct mp_floating_pointer_structure_d *) table_address;
 
+// Saving
+    smp_info.mp_floating_point = 
+        (struct mp_floating_pointer_structure_d *) MPTable;
 // ---------------------------------------------
 // Print table info
 
 // Signature
+// "_MP_" 
 // + OK on qemu.
 // + OK on kvm.
 // + FAIL on Virtualbox. #todo: try APIC.
@@ -979,7 +1000,8 @@ int smp_probe(void)
     //while(1){}
 
 // ------------------------------------------
-// The address of the MP Configuration Table. 
+// Getting the address of the MP Configuration Table. 
+// Pointed by th MP Floating point structure.
 // 32bit address.
     unsigned long configurationtable_address = 
         (unsigned long) (MPTable->configuration_table & 0xFFFFFFFF);
@@ -1030,87 +1052,101 @@ int smp_probe(void)
     //while(1){}
 
 // ==============================================
-// MPConfigurationTable
+// MPConfigurationTable structure.
+// Pointed by th MP Floating point structure.
 
 // Struture pointer.
 // MP Configuration table.
     MPConfigurationTable = 
-        (struct mp_configuration_table *) configurationtable_address;
-
+        (struct mp_configuration_table_d *) configurationtable_address;
 
     if ((void*) MPConfigurationTable == NULL ){
         printf("smp_probe: Invalid Configuration table address\n");
         goto fail;
     }
+// Saving
+    smp_info.mp_configuration_table = 
+        (struct mp_configuration_table_d *) MPConfigurationTable;
 
-// signature
+
+// Signature
+// "PCMP"
     printf("Signature: %c %c %c %c\n",
         MPConfigurationTable->signature[0],
         MPConfigurationTable->signature[1],
         MPConfigurationTable->signature[2],
         MPConfigurationTable->signature[3] );
 
-    char oemid_string[8+1];
-    char productid_string[12+1];
+
+// Intel strings: 
+// "OEM00000" "PROD00000000"
 
 // OEM ID STRING
+    char oemid_string[8+1];
     for (i=0; i<8; i++){
         oemid_string[i] = MPConfigurationTable->oem_id[i];
     };
     oemid_string[8]=0;  // finish
+    printf("OEM ID STRING: {%s}\n",oemid_string);
 
 // PRODUCT ID STRING
+    char productid_string[12+1];
     for (i=0; i<12; i++){
         productid_string[i] = MPConfigurationTable->product_id[i];
     };
     productid_string[12]=0;  // finish
-
-// intel: OEM00000 PROD00000000
-
-// OEM ID STRING
-    printf("OEM ID STRING: {%s}\n",oemid_string);
-// PRODUCT ID STRING
     printf("PRODUCT ID STRING: {%s}\n",productid_string);
 
+// Lapic address
     printf("lapic address: {%x}\n",
         MPConfigurationTable->lapic_address );
 
-
-    if ( MPConfigurationTable->lapic_address != LAPIC_BASE ){
+// Is this the standard lapic address?
+    if ( MPConfigurationTable->lapic_address != LAPIC_BASE )
+    {
         printf("fail: Not standard lapic address\n");
+        printf("Found={%x} Standard{%x}\n",
+            MPConfigurationTable->lapic_address,
+            LAPIC_BASE );
     }
-
-// Max number of entries.
-    int EntryCount = (int) MPConfigurationTable->entry_count;
-    printf("Entry count: {%d}\n",
-        MPConfigurationTable->entry_count);
-
-    //#debug
-    //refresh_screen();
-    //while(1){}
 
 // --------------------------------
 // Initialize lapic.
 // See:
 // apic.c
-
 // Check the local apic table for the current processor.
 // That one we are using right now.
 // The BSP.
-
     printf("smp_probe: Initialize lapic\n");
-
     lapic_initializing( 
         (unsigned long) MPConfigurationTable->lapic_address );
 
     if (LAPIC.initialized != TRUE){
         printf("smp_probe: lapic initialization fail\n");
     }
-
     //#debug
     //refresh_screen();
     //while(1){}
 
+
+//
+// Entries
+//
+
+// Probing the entries right below the MPConfigurationTable.
+
+// -------------------------------
+// Max number of entries.
+
+    register int EntryCount = 
+        (int) MPConfigurationTable->entry_count;
+
+    printf("Entry count: {%d}\n",
+        MPConfigurationTable->entry_count);
+
+    //#debug
+    //refresh_screen();
+    //while(1){};
 
 
 // #bugbug
@@ -1131,7 +1167,7 @@ int smp_probe(void)
 // The address of the first entry.
     unsigned long entry_base = 
     (unsigned long) ( configurationtable_address + 
-                      sizeof( struct mp_configuration_table ) );
+                      sizeof( struct mp_configuration_table_d ) );
 
 
 /*
@@ -1152,92 +1188,101 @@ Assignment |     4 |      8 | One entry per system interrupt source.
 // Estrutura para entradas que descrevem um processador.
 // Processor = type 0.
 
-    struct entry_processor *e;
+    struct entry_processor_d *e;
 
 // This routine gets the number of processors.
 // #todo:
 // We can create a method for that routine.
 // Register this number into the global data.
     unsigned int NumberOfProcessors=0;
+    g_processor_count = NumberOfProcessors;
 
 // EntryCount has the max number of entries.
 // #bugbug
 // #test
 
-    if( EntryCount > 32 ){
+    if ( EntryCount > 32 )
+    {
         printf("#bugbug: EntryCount > 32\n");
         EntryCount = 32;
     }
 
-    g_processor_count = NumberOfProcessors;
 
+// Clean the list.
+    for (i=0; i<32; i++){
+        smp_info.processors[i] = 0;
+    };
+    smp_info.number_of_processors = 0;
+
+// loop:
+// Check all the n entries indicated in the table above.
     for (i=0; i<EntryCount; i++)
     {
-        // tracing
-        printf("\n");
-        printf(":::: Entry %d: \n",i);
+        // Tracing
+        //printf("\n");
+        //printf(":::: Entry %d:\n",i);
         
-        e = (struct entry_processor *) entry_base;
-        // Not a processor entry.
-        // It's not a processor.
-        // Always '0' for processor.
-        if (e->type != 0){
-            printf("smp_probe: Not a processor entry {%d}\n",
-                e->type );
-            goto done;
-        }
+        // Looking for processors.
+        e = (struct entry_processor_d *) entry_base;
+
         // It is a processor entry.
         if (e->type == 0){
+
+            smp_info.processors[NumberOfProcessors] = (unsigned long) e;
             NumberOfProcessors += 1;
+
+            // #todo
+            // We neet a worker function for this job.
+            printf ("PROCESSOR found! in entry %d\n",i);
+            // apic id.
+            printf("local_apic_id %d\n", e->local_apic_id);
+            // apic version
+            printf("local_apic_version %d\n", e->local_apic_version);
+            // Flags:
+            // If bit 0 is clear then the processor must be ignored.
+            // If bit 1 is set then the processor is the bootstrap processor.
+            // Ignore the processor.
+            if( (e->flags & (1<<0)) == 0 ){
+                printf("Processor must be ignored\n");
+            }
+            // BSP processor.
+            if( e->flags & (1<<1) ){
+                printf("smp_probe: The processor is a BSP\n");
+            }
+            printf ("stepping: %d\n", (e->signature & 0x00F));
+            printf ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
+            printf ("  family: %d\n",((e->signature & 0xF00) >> 8) );
+
+            entry_base = (unsigned long) (entry_base + 20);
+
+        // Not a processor.
+        } else if (e->type != 0){
+            //printf ("Device type %d in entry %d\n", e->type, i );
+            entry_base = (unsigned long) (entry_base + 8);
         }
-
-        // apic id.
-        printf("local_apic_id %d\n", e->local_apic_id);
-        // apic version
-        printf("local_apic_version %d\n", e->local_apic_version);
-
-        // Flags:
-        // If bit 0 is clear then the processor must be ignored.
-        // If bit 1 is set then the processor is the bootstrap processor.
-
-        // Ignore the processor.
-        if( (e->flags & (1<<0)) == 0 ){
-            printf("Processor must be ignored\n");
-        }
-
-        // BSP processor.
-        if( e->flags & (1<<1) ){
-            printf("smp_probe: The processor is a BSP\n");
-        }
-
-        printf ("stepping: %d\n", (e->signature & 0x00F));
-        printf ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
-        printf ("  family: %d\n",((e->signature & 0xF00) >> 8) );
-
-        // Next entry
-        // Each processor entry has 20 bytes.
-        // The other types has 8 bytes.
-        // #bugbug: O tamanho depende do tipo de entrada.
-        entry_base = (unsigned long) (entry_base + 20);
     };
 
 done:
+
     g_processor_count = 
         (unsigned int) NumberOfProcessors;
-    
+    smp_info.number_of_processors = (unsigned int) NumberOfProcessors;
     printf("Processor count: {%d}\n",g_processor_count);
     printf("smp_probe: done\n");
 
+    smp_info.initialized = TRUE;
+
     // #debug
     //refresh_screen();
-    //while(1){}
+    //while(1){
+    //};
 
     // g_smp_initialized = TRUE;
     return TRUE;
 fail:
-    refresh_screen();
-
+    //refresh_screen();
     g_smp_initialized = FALSE;
+    smp_info.initialized = FALSE;
     return FALSE;
 }
 
