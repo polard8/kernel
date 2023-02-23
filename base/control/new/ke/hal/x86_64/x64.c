@@ -856,6 +856,7 @@ void x64_load_pml4_table(unsigned long phy_addr)
     asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
 
+
 // MP Floating Point Structure:
 // To use these tables, the MP Floating Point Structure 
 // must first be found. As the name suggests, 
@@ -1117,7 +1118,8 @@ int smp_probe(void)
 // Check the local apic table for the current processor.
 // That one we are using right now.
 // The BSP.
-    printf("smp_probe: Initialize lapic\n");
+    printf("smp_probe: Initialize lapic for BSP\n");
+    // Setup BSP's local APIC.
     lapic_initializing( 
         (unsigned long) MPConfigurationTable->lapic_address );
 
@@ -1285,4 +1287,15 @@ fail:
     smp_info.initialized = FALSE;
     return FALSE;
 }
+
+void smp_probe_via_acpi(void)
+{
+// After you've gathered the information, 
+// you'll need to disable the PIC and prepare for I/O APIC. 
+// You also need to setup BSP's local APIC. 
+// Then, startup the APs using SIPIs.
+}
+
+
+
 

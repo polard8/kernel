@@ -8,10 +8,15 @@
  *       +Integrated local APICs.
  *       +APIC timer.
  *       +I/O APICs.
- * 2015.
+ * Credits:
+ *     https://wiki.osdev.org/Symmetric_Multiprocessing
+ *     Nelson Cole. (Sirius-x86-64).
+ * History:
+ *     2015 - Created by Fred Nora.
+ *     2023 - Implementing/Porting more basic routines.
  */
 // See:
-// hwi/dd/nhid/arch/x86/apic.c
+// apic.c
 // https://wiki.osdev.org/Symmetric_Multiprocessing
 // https://www.cheesecake.org/sac/smp.html
 
@@ -74,16 +79,14 @@ void flush_cashes(void)
 */
 
 
-//@todo: definir porta 70h usada nesse arquivo.
-
+// #todo: 
+// Definir porta 70h usada nesse arquivo. ??
 static unsigned int local_apic_read_command(unsigned short addr)
 {
     if( (void *) LAPIC.lapic_va == NULL ){
         panic("local_apic_read_command: LAPIC.lapic_va\n");
     }
 
-// #todo
-// Review this method.
     return *( (volatile unsigned int *)(LAPIC.lapic_va + addr));
 }
 
@@ -93,39 +96,32 @@ static void local_apic_write_command(unsigned short addr,unsigned int val)
         panic("local_apic_write_command: LAPIC.lapic_va\n");
     }
 
-// #good
     *( (volatile unsigned int *)(LAPIC.lapic_va + addr)) = val;
 }
 
 // Get local apic id.
 // see: https://wiki.osdev.org/APIC#Local_APIC_registers
+// bits 24~31 for pentium 4 and later.
 static unsigned int local_apic_get_id(void)
 {
-// bits 24~31 for pentium 4 and later.
     return (unsigned int) (local_apic_read_command(LAPIC_APIC_ID) >> 24) & 0xFF;
 }
 
 // Get local apic version.
 // see: https://wiki.osdev.org/APIC#Local_APIC_registers
-static unsigned int local_apic_get_version(void)
-{
 // bits: 0~7 for Integrated APIC.
 // 10H~15H
+static unsigned int local_apic_get_version(void)
+{
     return (unsigned int) (local_apic_read_command(LAPIC_APIC_VERSION) & 0xFF);
 }
 
-// #todo
-// Not tested yet.
-// EOI
-// EOI Register
-// Write to the register with offset 0xB0 
-// using the value 0 to signal an end of interrupt. 
+// EOI:
 // A non-zero value may cause a general protection fault.
+// Not tested yet.
 static void local_apic_eoi(void)
 {
-    local_apic_write_command(
-        (unsigned short) 0xB0,
-        (unsigned int) 0 );
+    local_apic_write_command( (unsigned short) LAPIC_EOI, (unsigned int) 0 );
 }
 
 // Spurious Interrupt Vector Register
@@ -214,6 +210,7 @@ inline void invalidate_cache_flush(void)
 // PAGETABLE_RES5, LAPIC_VA, PD_ENTRY_LAPIC, KERNEL_PD_PA.
 void lapic_initializing(unsigned long lapic_pa)
 {
+// Setup BSP's local APIC.
 // Called by smp_probe in x64.c
 
     printf("lapic_initializing: \n");
@@ -442,36 +439,89 @@ void APIC::wakeupSequence(U32 apicId, U8 pvect)
 		xAPICDriver::write(APIC_REGISTER_ICR_LOW, lreg.value);
 }
 */ 
- 
+
 // NOTE: ICRLow and ICRHigh are types in the Silcos kernel. If your code uses direct bit
 // manipulations you must replace some code with bit operations.
 
 
-//
-// end ======================================================
-//
 
-
-
-/*
-uint32_t apic_read(void* apic_base, uint32_t register);
-uint32_t apic_read(void* apic_base, uint32_t register) 
+void local_apic_send_init(unsigned int apic_id)
 {
-    return *((volatile uint32_t*)(apic_base + register));
+// Send one time.
+
+// High
+    local_apic_write_command(
+        LAPIC_ICR_HIGH, 
+        (apic_id << 24) );
+
+// Low
+    local_apic_write_command(
+        LAPIC_ICR_LOW,
+        ICR_INIT | 
+        ICR_PHYSICAL | 
+        ICR_ASSERT | 
+        ICR_EDGE | 
+        ICR_NO_SHORTHAND );
+
+// Loop
+    while ( local_apic_read_command(LAPIC_ICR_LOW) & ICR_SEND_PENDING )
+    {
+        asm volatile ("pause;");
+    };
 }
-*/
 
 
-/*
-void apic_write(void* apic_base, uint32_t register, uint32_t data);
-void apic_write(void* apic_base, uint32_t register, uint32_t data) 
+
+void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
 {
-    *((volatile uint32_t*)(apic_base + register)) = data;
+// Send one time.
+
+// High
+    local_apic_write_command(
+        LAPIC_ICR_HIGH, 
+        (apic_id << 24) );
+
+// Low
+    local_apic_write_command(
+        LAPIC_ICR_LOW,
+        vector | 
+        ICR_STARTUP | 
+        ICR_PHYSICAL | 
+        ICR_ASSERT | 
+        ICR_EDGE | 
+        ICR_NO_SHORTHAND );
+
+// Loop
+    while ( local_apic_read_command(LAPIC_ICR_LOW) & ICR_SEND_PENDING)
+    {
+        asm volatile ("pause;");
+    }
 }
-*/
+
+// Send INIT IPI
+void Send_INIT_IPI_Once(unsigned int apic_id)
+{
+// One single time.
+    local_apic_write_command(0x280, 0); // clear APIC errors
+    local_apic_send_init(apic_id);
+    mdelay(100); // wait 10 msec
+}
+
+// Send STARTUP IPI (twice)
+void Send_STARTUP_IPI_Twice(unsigned int apic_id)
+{
+// Twice
+    int i=0;
+    for (i=0; i<2; i++)
+    {
+        local_apic_write_command(0x280, 0); // clear APIC errors
+        local_apic_send_startup(apic_id, 0x8);
+        mdelay(200); // wait 200 msec
+    };
+}
 
 
 //
-// End.
+// End
 //
 

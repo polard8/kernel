@@ -186,6 +186,7 @@ extern struct smp_info_d smp_info;
 
 // See: x64.c
 int smp_probe(void);
+void smp_probe_via_acpi(void);
 
 #endif   
 

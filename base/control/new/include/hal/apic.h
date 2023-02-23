@@ -79,6 +79,45 @@ losethos os - Adam1a.HPP.
 
 // ====================
 
+//
+// ICR - Interrupt Command Register
+//
+
+// Delivery Mode
+#define ICR_FIXED                       0x00000000
+#define ICR_LOWEST                      0x00000100
+#define ICR_SMI                         0x00000200
+#define ICR_NMI                         0x00000400
+#define ICR_INIT                        0x00000500
+#define ICR_STARTUP                     0x00000600
+
+// Destination Mode
+#define ICR_PHYSICAL                    0x00000000
+#define ICR_LOGICAL                     0x00000800
+
+// Delivery Status
+#define ICR_IDLE                        0x00000000
+#define ICR_SEND_PENDING                0x00001000
+
+// Level
+#define ICR_DEASSERT                    0x00000000
+#define ICR_ASSERT                      0x00004000
+
+// Trigger Mode
+#define ICR_EDGE                        0x00000000
+#define ICR_LEVEL                       0x00008000
+
+// Destination Shorthand
+#define ICR_NO_SHORTHAND                0x00000000
+#define ICR_SELF                        0x00040000
+#define ICR_ALL_INCLUDING_SELF          0x00080000
+#define ICR_ALL_EXCLUDING_SELF          0x000c0000
+
+
+
+
+
+// ====================
 
 //#define LAPICF_APIC_ENABLED		0x100
 
@@ -160,6 +199,11 @@ int has_apic (void);
 void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
 
+
+void local_apic_send_init(unsigned int apic_id);
+void local_apic_send_startup(unsigned int apic_id, unsigned int vector);
+void Send_INIT_IPI_Once(unsigned int apic_id);
+void Send_STARTUP_IPI_Twice(unsigned int apic_id);
 
 #endif    //____APIC_H
 

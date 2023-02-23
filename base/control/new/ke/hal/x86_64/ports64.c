@@ -97,9 +97,33 @@ void wait_ns (int count)
 {
     count /= 100; 
 
-    while (--count)
-        io_delay ();
+    while (--count){
+        io_delay();
+    };
 }
+
+void mdelay(int count)
+{
+// #todo
+    int i=0;
+    for (i=0; i<(count*10000); i++)
+    {
+        io_delay();
+        //asm volatile ("nop;");
+    };
+}
+
+void udelay(int count)
+{
+// #todo
+    int i=0;
+    for (i=0; i<(count*10000); i++)
+    {
+        io_delay();
+        //asm volatile ("nop;");
+    };
+}
+
 
 // Service 126.
 // #todo
