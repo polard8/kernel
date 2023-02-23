@@ -55,6 +55,9 @@ __Procedure (
     unsigned long long1, 
     unsigned long long2 );
 
+// Loops
+static int __coolmenu_loop(void);
+static int __stdin_loop(void);
 static int __idlethread_loop(void);
 
 static void initPrompt(void);
@@ -279,6 +282,15 @@ static int __CompareString(void)
 // LF
     printf("\n");
 
+// #test
+// Enter the cool menu.
+    if (strncmp(prompt,"coolmenu",8) == 0)
+    {
+        __coolmenu_loop();
+        goto exit_cmp;
+    }
+
+
     if ( strncmp(prompt,"t1",2) == 0 )
     {
         //creat("saved1.txt",0);
@@ -478,8 +490,115 @@ exit_cmp:
     return 0;
 }
 
+static int __coolmenu_loop(void)
+{
+// Get input from sdtin.
+
+// Clear the console and set cursor position to 0,0.
+    do_clear_console();
+
+// ====
+// Small command line interpreter.
+// We need to hang here because 
+// maybe there is no window server installed.
+
+    printf("\n");
+    printf(":: Cool menu ::\n");
+
+    printf("\n");
+    printf("+ (q) - Quit the cool menu\n");  
+    printf("\n");
+    printf("+ (r) - Reboot the system\n");  
+    printf("\n");
+    printf("+ (s) - Shutdown the system\n");  
+
+    initPrompt();
+
+    register int C=0;
+    static int yn_result = FALSE;
+
+    while(1)
+    {
+        if( isTimeToQuit == TRUE ){
+            break;
+        }
+        C = (int) fgetc(stdin);
+        
+        // Quit the cool menu.
+        if (C == 'q'){
+            break;
+        }
+
+        // Reboot the system.
+        if (C =='r')
+        {
+            printf ("Reboot the system? (yn)\n");
+            yn_result = (int) rtl_y_or_n();
+            if (yn_result == TRUE){
+                rtl_clone_and_execute("reboot.bin");
+            }
+        }
+
+        // Poweroff the system.
+        if (C =='s')
+        {
+            printf ("Shutdown the system? (yn)\n");
+            yn_result = (int) rtl_y_or_n();
+            if (yn_result == TRUE){
+                rtl_clone_and_execute("shutdown.bin");
+            }
+        }
+    };
+}
+
+static int __stdin_loop(void)
+{
+// Get input from sdtin.
+
+//================================
+
+// Clear the console and set cursor position to 0,0.
+    do_clear_console();
+
+// ====
+// Small command line interpreter.
+// We need to hang here because 
+// maybe there is no window server installed.
+
+    printf(":: Gramado OS ::\n");
+    initPrompt();
+
+    register int C=0;
+
+    while(1)
+    {
+        if( isTimeToQuit == TRUE ){
+            break;
+        }
+        C = (int) fgetc(stdin);
+        if( C == __VK_RETURN )
+        {
+            __CompareString();
+        }
+        if( C >= 0x20 && C <= 0x7F )
+        {
+            printf("%c",C);
+            fflush(stdout);
+
+            input(C);  // coloca no prompt.
+        }
+    };
+
+    //#debug
+    //printf("~Quit\n");
+    //while(1){}
+
+//================================
+}
+
 static int __idlethread_loop(void)
 {
+// Get input from idlethread.
 
 // #todo
 // Get the id of the caller.
@@ -539,6 +658,10 @@ int main( int argc, char **argv)
     gramado_system_call (643,0,0,0);
 
 
+
+/*
+//================================
+
 // Clear the console and set cursor position to 0,0.
     do_clear_console();
 
@@ -576,39 +699,28 @@ int main( int argc, char **argv)
     //while(1){}
 
 //================================
-    
+*/
+
+//================================
+// Get input from stdin.
+    __stdin_loop();
+
+
+//================================
+// Get input from idle thread.
+// Idle thread loop.
+
     //# no focus!
     //rtl_focus_on_this_thread();
 
-//
-// Idle thread loop.
-// 
     int IdleLoopStatus = -1;
     IdleLoopStatus = (int) __idlethread_loop();
 
-
-/*
-    while (TRUE){
-        //if( isTimeToQuit == TRUE )
-            //break;
-        if ( rtl_get_event() == TRUE )
-        {
-            //if( RTLEventBuffer[1] == MSG_QUIT ){ break; }
-            __Procedure ( 
-                (void*) RTLEventBuffer[0], 
-                RTLEventBuffer[1], 
-                RTLEventBuffer[2], 
-                RTLEventBuffer[3] );
-        }
-    };
-*/
-
+//================================
 // hang
 // Not reached.
     while (TRUE){
-        //rtl_yield();
     };
-
     return 0;
 }
 
