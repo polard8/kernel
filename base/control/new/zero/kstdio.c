@@ -754,9 +754,7 @@ kinguio_vsprintf(
         switch (fmt[index]){
 
         case '%':
-
             ++index;
-
             switch (fmt[index]){
 
             case 'c':
@@ -826,16 +824,12 @@ void kinguio_puts(const char* str)
     for (i=0; i<StringLen; i++)
     {
         _char = (int) ( str[i] & 0xFF );
-
+        // Draw, and refresh a single char.
+        console_outbyte2 (_char, fg_console);
         // Draw, but not refresh.
          //console_outbyte (_char, fg_console);
-
-        // Draw, and refresh.
-        // Refreshing a single char. :)
-        console_outbyte2 (_char, fg_console);
     };
 }
-
 
 // printf
 // Credits: Nelson Cole. Project Sirius/Kinguio.
@@ -900,15 +894,16 @@ int sprintf_old ( char *str, const char *format, ... )
 // Variable parameter form to achieve sprintf.
 int mysprintf(char *buf, const char *fmt, ...)
 {
-    int i=0;
+    register int n=0;
 
 // Write the fmt format string to the buffer buf 
     va_list args;
     va_start(args, fmt);
-    i = kinguio_vsprintf(buf, fmt, args);
+    n = (int) kinguio_vsprintf(buf, fmt, args);
+    //buf[n] = '\0';
     va_end(args);
 
-    return (int) i;
+    return (int) n;
 }
 
 

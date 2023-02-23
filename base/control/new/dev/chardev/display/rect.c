@@ -190,7 +190,7 @@ __drawrectangle0(
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
-        // 2=backbuffer
+        // 2=frontbuffer
         if (back_or_front == 2){
             frontbuffer_draw_horizontal_line ( 
                 Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );

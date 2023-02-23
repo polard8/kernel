@@ -773,7 +773,9 @@ pciHandleDevice (
         __device_class = DEVICE_CLASS_NETWORK;
 
         //--------------
-        // e1000
+        // e1000: 82545EM-A
+        //if ( (D->Vendor == 0x8086) && (D->Device == 0x100F ) )
+        // e1000: 82540EM-A
         if ( (D->Vendor == 0x8086) && (D->Device == 0x100E ) )
         {
             debug_print ("pciHandleDevice: [0x8086:0x100E] e1000 found\n");

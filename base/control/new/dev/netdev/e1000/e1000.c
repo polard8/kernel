@@ -819,13 +819,13 @@ e1000_init_nic (
     data = (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 0 );
     Vendor = (unsigned short) (data       & 0xffff);
     Device = (unsigned short) (data >> 16 & 0xffff);
+
     if ( Vendor != 0x8086 || Device != 0x100E )
     {
-        debug_print ("e1000_init_nic: [FAIL] Device not found\n");
-        panic       ("e1000_init_nic: [FAIL] Device not found\n");
-        // #bugbug: Maybe only return.
-        return (int) (-1);
+        debug_print ("e1000_init_nic: Expected 82540EM\n");
+        panic ("e1000_init_nic: Expected 82540EM\n");
     }
+
     // #debug
     printf ("Vendor=%x | Device=%x \n", Vendor, Device );
 
@@ -858,12 +858,14 @@ e1000_init_nic (
 // +usar if else.
 // já fizemos essa checagem antes.
 
+/*
     if ( pci_device->Vendor != 0x8086 || pci_device->Device != 0x100E )
     {
         panic ("e1000_init_nic: 82540EM not found\n");
         // #bugbug: Maybe only return.
         return (int) (-1);
     }
+*/
 
 // BARs
 
