@@ -59,7 +59,7 @@ External Registers --
 // Step1:
 // Bit 0 of this register controls the location of several other registers: 
 // If cleared, port 0x3D4 is mapped to 0x3B4 ...
-#define VGA_MISC_WRITE  0x3C2
+#define VGA_MISC_WRITE  0x3C2  // Miscellaneous Output Register.
 #define VGA_MISC_READ   0x3CC
 
 // ===============================
@@ -157,17 +157,21 @@ unsigned char *VGA_address;
 unsigned char mode_320_200_256[] = {
 
 /* MISC
- *
+ * Miscellaneous Output Register
  * 0x63 => 0110 0011
  * 7 6 5 4 3 2 1 0
  * 1 1 0 0 0 1 1 0
  * VSP HSP - - CS CS ERAM IOS
  * 7,6 - 480 lines
  * 5,4 - free
- * 3,2 - 28,322 MHZ Clock
+ * 3,2 - 28,322 MHZ Clock (Clock selection)
  * 1 - Enable Ram
  * 0 - Map 0x3d4 to 0x3b4. (if cleared)
  */
+// 0xE3 - mode 12h (640x480 planar 16 color mode)
+// 0x63 - mode 13h (320x200 linear 256-color mode)
+// 0xE3 - mode X   (320x240 planar 256 color mode)
+
     // 0x63,  // 0110 0011
     0xE3,  // 1100 0011
 
@@ -206,10 +210,16 @@ unsigned char mode_320_200_256[] = {
 
 //-----------------------------
 /* CRTC */
+// By programming this unit you can control the resolution of your monitor, 
+// as well as some hardware overlay and panning effects.
 // registers 0-7 of 0x3D4 
 // are write protected by the protect bit (bit 7 of index 0x11).
+
+// Registers involved in horizontal timing: (0x00~0x05)
+// Registers involved in vertical timing:   (0x06,0x07,0x09,0x10,0x11,0x12,0x15,0x16)
+
     0x5F,  // 0x00  Horizontal Total 
-    0x4F,  // 0x01  Horizontal Display Enable End (640/8) = 80 = 0x50
+    39, //79, //0x4F,  // 0x01  Horizontal Display Enable End (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 <<<----
     0x50,  // 0x02  Horizontal Blanking Start
     0x82,  // 0x03  Horizontal Blanking End
     0x54,  // 0x04  horizontal retrace pulse start
@@ -226,7 +236,7 @@ unsigned char mode_320_200_256[] = {
     0x00,  // 0x0F  cursor location low
     0x9C,  // 0x10  Vertical Retrace Start (bits 0..7)
     0x0E,  // 0x11  Vertical Retrace End
-    0x8F,  // 0x12  Vertical Display Enable End (bits 0..7)
+    0x8F,  // 0x12  Vertical Display Enable End (bits 0..7) <<<----
     0x28,  // 0x13  offset
     0x40,  // 0x14  underline location
     0x96,  // 0x15  Vertical Blanking Start (bits 0..7)
