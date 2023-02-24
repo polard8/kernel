@@ -1394,7 +1394,7 @@ void *doCreateWindow (
  */
 
 // =================================
-// ## Shadow ## (Frame shadow)
+// ## Shadow ## (Shadow for the frame)
 // A sombra pertence à janela e ao frame.
 // A sombra é maior que a própria janela.
 // Se estivermos em full screen não tem sombra?
@@ -1441,7 +1441,7 @@ void *doCreateWindow (
     }
 
 // ===============================================
-// ## Background ## (Frame)
+// ## Background ## (Background for the frame)
 // Background para todo o espaço ocupado pela janela e pelo seu frame.
 // O posicionamento do background depende do tipo de janela.
 // Um controlador ou um editbox deve ter um posicionamento relativo
@@ -1937,13 +1937,16 @@ void *CreateWindow (
 // == Draw frame ===============================
 //
 
+draw_frame:
+// (Borders for the frame)
+// We already have the shadow and 
+// the background for the frame.
+// These were created by doCreateWindow.
 // #todo:
 // Lembrando que frame é coisa do wm.
 // Porém tem algumas coisas que o window server faz,
 // como as bordas de um editbox.
 
-draw_frame:
-    //gwssrv_debug_print ("CreateWindow: draw_frame \n");
     if ( (void*) __w == NULL ){
         gwssrv_debug_print ("CreateWindow.draw_frame: __w\n");
         goto fail;
