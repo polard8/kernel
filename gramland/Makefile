@@ -20,13 +20,13 @@ all:
 	make -C burgundy/server
 	make -C burgundy/client
 	make -C burgundy/gdm
+	make -C burgundy/setup
 # blue: Unit 2
 	make -C blue/terminal  
 # beige: Unit 1
 	make -C beige/cmdline
 	make -C beige/editor
 	make -C beige/fileman
-	make -C beige/setup
 	make -C beige/browser
 	make -C beige/docv
 

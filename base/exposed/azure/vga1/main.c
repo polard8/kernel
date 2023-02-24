@@ -147,6 +147,7 @@ unsigned int VGA_bpp=0;
 // Address
 unsigned char *VGA_address;
 
+
 // ---------------------------------------------
 
 /*
@@ -210,39 +211,47 @@ unsigned char mode_320_200_256[] = {
 
 //-----------------------------
 /* CRTC */
+// http://martin.hinner.info/vga/timing.html
 // By programming this unit you can control the resolution of your monitor, 
 // as well as some hardware overlay and panning effects.
 // registers 0-7 of 0x3D4 
 // are write protected by the protect bit (bit 7 of index 0x11).
 
 // Registers involved in horizontal timing: (0x00~0x05)
-// Registers involved in vertical timing:   (0x06,0x07,0x09,0x10,0x11,0x12,0x15,0x16)
+// Horizontal timings are based on character clocks (multiples of 8 or 9 pixels)
 
-    0x5F,  // 0x00  Horizontal Total 
-    39, //79, //0x4F,  // 0x01  Horizontal Display Enable End (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 <<<----
-    0x50,  // 0x02  Horizontal Blanking Start
-    0x82,  // 0x03  Horizontal Blanking End
-    0x54,  // 0x04  horizontal retrace pulse start
-    0x80,  // 0x05  horizontal retrace end
-    0xBF,  // 0x06  vertical total
-    0x1F,  // 0x07  overflow
-    0x00,  // 0x08  present row scan
-    0x41,  // 0x09  maximum scanline
-    0x00,  // 0x0A  cursor start
-    0x00,  // 0x0B  cursor end
-    0x00,  // 0x0C  start address high  (#bugbug)
-    0x00,  // 0x0D  start address low   (#bugbug)
-    0x00,  // 0x0E  cursor location high
-    0x00,  // 0x0F  cursor location low
-    0x9C,  // 0x10  Vertical Retrace Start (bits 0..7)
-    0x0E,  // 0x11  Vertical Retrace End
-    0x8F,  // 0x12  Vertical Display Enable End (bits 0..7) <<<----
-    0x28,  // 0x13  offset
-    0x40,  // 0x14  underline location
-    0x96,  // 0x15  Vertical Blanking Start (bits 0..7)
-    0xB9,  // 0x16  Vertical Blanking End (bits 0..6)
-    0xA3,  // 0x17  CRT mode control
-    0xFF,  // 0x18  line compare
+// Registers involved in vertical timing:   (0x06,0x07,0x09,0x10,0x11,0x12,0x15,0x16)
+// Vertical timings are per-scanline.
+
+// Since these easily exceed the 255 limit of one byte, 
+// the Overflow Register is used to store the high-order bits.
+
+    0x5F,  // h  0x00  Horizontal Total 
+    0x4F,  // h1 0x01  Horizontal Display Enable End (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 (vm) <<<----
+    0x50,  // h2 0x02  Horizontal Blanking Start
+    0x82,  // h  0x03  Horizontal Blanking End | Horizontal Display Skew	(5.6) | Horizontal Blanking End (bits 0..4) 1000 0010
+    0x54,  // h3 0x04  horizontal retrace pulse start
+    0x80,  // h  0x05  horizontal retrace end | H. Blanking End (bit 5) 7? | Horizontal Retrace End (0..4)   1000 0000
+
+    0xBF,  // 0x06 v  vertical total
+    0x1F,  // 0x07 v  overflow
+    0x00,  // 0x08    present row scan
+    0x41,  // 0x09 v  maximum scanline
+    0x00,  // 0x0A    cursor start
+    0x00,  // 0x0B    cursor end
+    0x00,  // 0x0C    start address high  (#bugbug)
+    0x00,  // 0x0D    start address low   (#bugbug)
+    0x00,  // 0x0E    cursor location high
+    0x00,  // 0x0F    cursor location low
+    0x9C,  // 0x10 v3 Vertical Retrace Start (bits 0..7)
+    0x0E,  // 0x11 v  Vertical Retrace End
+    0x8F,  // 0x12 v1 Vertical Display Enable End (bits 0..7) (vm) <<<----
+    0x28,  // 0x13    offset
+    0x40,  // 0x14    underline location
+    0x96,  // 0x15 v2 Vertical Blanking Start (bits 0..7)
+    0xB9,  // 0x16 v  Vertical Blanking End (bits 0..6)
+    0xA3,  // 0x17    CRT mode control
+    0xFF,  // 0x18    line compare
 
 //-----------------------------
 /* GC */
