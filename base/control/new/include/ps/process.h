@@ -861,7 +861,6 @@ void ps_initialize_process_common_elements( struct process_d *p );
 struct process_d *create_process ( 
     struct room_d    *room,
     struct desktop_d *desktop,
-    struct window_d  *window,
     unsigned long base_address, 
     unsigned long priority, 
     ppid_t ppid, 

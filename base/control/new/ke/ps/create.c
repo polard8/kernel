@@ -3,7 +3,6 @@
 
 #include <kernel.h>  
 
-
 // ==================================================
 // create_init_thread:
 // The control thread of the first ring3 process.
@@ -11,14 +10,11 @@
 
 struct thread_d *create_init_thread (void)
 {
-    struct thread_d  *t;
-
-
+    struct thread_d *t;
 // This is the first thread.
 // See: thread.h
-    int TID = (int) INIT_TID;
-
-    // loops
+    tid_t TID = (tid_t) INIT_TID;
+// loops
     register int r=0;    // Wait reason.
     register int i=0;    // Message queue.
     register int q=0;    // Message queue.
@@ -165,10 +161,12 @@ struct thread_d *create_init_thread (void)
             debug_print("create_tid3: tmp\n");
             panic      ("create_tid3: tmp\n");
         }
-        tmp->window = NULL;
+        
+        tmp->opaque_window = NULL;
         tmp->msg = 0;
         tmp->long1 = 0;
         tmp->long2 = 0;
+        
         tmp->long3 = 0;
         tmp->long4 = 0;
         tmp->used = TRUE;

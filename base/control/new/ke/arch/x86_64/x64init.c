@@ -209,7 +209,8 @@ static int I_x64CreateInitialProcess(void)
 
     InitProcess = 
         (void *) create_process( 
-                     NULL, NULL, NULL, 
+                     NULL, 
+                     NULL,  
                      (unsigned long) CONTROLTHREAD_BASE,  //0x00200000 
                      BasePriority, 
                      (int) KernelProcess->pid, 
@@ -746,7 +747,8 @@ static int I_x64CreateKernelProcess(void)
  
     KernelProcess = 
         (void *) create_process( 
-                     NULL, NULL, NULL, 
+                     NULL, 
+                     NULL,  
                      (unsigned long) 0x30000000, 
                      BasePriority, 
                      (int) 0,        //ppid
@@ -1052,17 +1054,6 @@ void init_globals(void)
 // The kernel request
 // See: request.c
     clear_request();
-
-//
-// KGWS
-//
-
-// Window support
-    windows_count = (int) 0;  // Window count.
-    current_window = (int) 0;
-    window_with_focus = (int) 0;  //#deprecated
-    current_menu = (int) 0;
-    // ...
 
 // Messages
     g_new_message = 0;

@@ -263,21 +263,16 @@ extern unsigned long gSavedBPP;
 
 // fb device
 #include "dev/display/color.h"
-
 // display device support.
 #include "dev/display/common/display.h"
-
 // bootloader display device
 #include "dev/display/bldisp/bldisp.h"
-
 #include "dev/display/fonts.h"
-#include "dev/display/ascii.h" 
+#include "dev/display/ascii.h"
 #include "dev/display/ws.h"
-#include "dev/display/window.h"
-//#include "dev/grinput.h"
+#include "dev/display/ws2.h"
 #include "dev/display/bg.h"
 #include "dev/display/graphics.h"
-
 #include "dev/grinput.h"
 
 
@@ -366,19 +361,18 @@ extern unsigned long gSavedBPP;
 #include "ps/ts.h"
 #include "ps/tasks.h"
 #include "ps/callback.h"
-#include "ps/process.h"
-#include "ps/thread.h"
 #include "ps/sched.h"
 #include "ps/queue.h"
 #include "ps/mk.h"
 #include "ps/dispatch.h"
-
+#include "ps/msg.h"
+#include "ps/thread.h"
+#include "ps/process.h"
 
 
 //
 // Configurações finais
 //
-
 
 // Autentication
 // Security
@@ -600,30 +594,21 @@ extern unsigned long errno;
 //#define USERS_PATH     "/Platform/Users"
 //...
 
-//node od a linked list.
 struct node_d
 {
     void *data;
-
-    //struct window_d *window;
-    //int msg;	
-    //unsigned long long1;
-    //unsigned long long2;
-    
     struct node_d *flink;
     struct node_d *blink;    
 };
 
-
-//Linked list support.
+// Linked list support.
 struct linkedlist_d
 {
     struct node_d *head;
     struct node_d *tail;
 };
 
-
-//save args support. 
+// Save args support. 
 struct kernel_args_d
 {
     unsigned long arg1;

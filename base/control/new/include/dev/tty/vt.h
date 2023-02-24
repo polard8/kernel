@@ -1,26 +1,23 @@
 
+// vt.h
+
 #ifndef ____VT_H
 #define ____VT_H  1
 
-// This struct is an element of window_d struct.
 struct vt_d
 {
     //Object
-    
+
     int id;
-    
     int used;
     int magic;
-    
-    
-    // The PID of the father that owns the terminal window.
-    int father_pid;
-    
-    // The PID of the command running inside the window that is
-    // a terminal.
-    int child_pid;
-    
-    // what is the state of this terminal ?
+
+// The PID of the father that owns the terminal window.
+    pid_t father_pid;
+// The PID of the command running inside the window that is a terminal.
+    pid_t child_pid;
+
+// what is the state of this terminal ?
     int state;
     
     

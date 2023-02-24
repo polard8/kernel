@@ -67,10 +67,10 @@ __ProcessExtendedKeyboardKeyStroke(
         case 0x1D: //pause, r-control
             break;
         case 0x52: //ins
-            post_message_to_ws( NULL, MSG_INSERT, 0, scancode );
+            post_message_to_ws( MSG_INSERT, 0, scancode );
             break;
         case 0x53:  //del
-            post_message_to_ws( NULL, MSG_CLEAR, 0, scancode );
+            post_message_to_ws( MSG_CLEAR, 0, scancode );
             break;
         case 0x47:  //home
             break;
@@ -87,31 +87,31 @@ __ProcessExtendedKeyboardKeyStroke(
 
         case 0x4D:  //right
             if(ctrl_status==TRUE){
-                post_message_to_ws( NULL, MSG_CONTROL_ARROW_RIGHT, VK_RIGHT, scancode );
+                post_message_to_ws( MSG_CONTROL_ARROW_RIGHT, VK_RIGHT, scancode );
                 return 0;
             }
-            //post_message_to_ws( NULL, MSG_KEYDOWN, VK_RIGHT, scancode );
+            //post_message_to_ws( MSG_KEYDOWN, VK_RIGHT, scancode );
             break;
         case 0x48:  //up
             if(ctrl_status==TRUE){
-                post_message_to_ws( NULL, MSG_CONTROL_ARROW_UP, VK_UP, scancode );
+                post_message_to_ws( MSG_CONTROL_ARROW_UP, VK_UP, scancode );
                 return 0;
             }
-            //post_message_to_ws( NULL, MSG_KEYDOWN, VK_UP, scancode );
+            //post_message_to_ws( MSG_KEYDOWN, VK_UP, scancode );
             break;
         case 0x50:  //down
             if(ctrl_status==TRUE){
-                post_message_to_ws( NULL, MSG_CONTROL_ARROW_DOWN, VK_DOWN, scancode );
+                post_message_to_ws( MSG_CONTROL_ARROW_DOWN, VK_DOWN, scancode );
                 return 0;
             }
-            //post_message_to_ws( NULL, MSG_KEYDOWN, VK_DOWN, scancode );
+            //post_message_to_ws( MSG_KEYDOWN, VK_DOWN, scancode );
             break;
         case 0x4B:  //left
             if(ctrl_status==TRUE){
-                post_message_to_ws( NULL, MSG_CONTROL_ARROW_LEFT, VK_LEFT, scancode );
+                post_message_to_ws( MSG_CONTROL_ARROW_LEFT, VK_LEFT, scancode );
                 return 0;
             }
-            //post_message_to_ws( NULL, MSG_KEYDOWN, VK_LEFT, scancode );
+            //post_message_to_ws( MSG_KEYDOWN, VK_LEFT, scancode );
             break;
 
         case 0x5D:  //sysmenu (app)
@@ -193,7 +193,7 @@ wmMouseEvent(
     if ( event_id == MSG_MOUSEPRESSED || event_id == MSG_MOUSERELEASED )
     {
         // #todo: Send control keys status.
-        post_message_to_ws( NULL, event_id, button_number, button_number );
+        post_message_to_ws( event_id, button_number, button_number );
         return 0;
     }
 
@@ -225,7 +225,6 @@ wmMouseEvent(
         if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
 
         post_message_to_ws(
-            NULL, 
             event_id, 
             (unsigned long) long1, 
             (unsigned long) long2 );
@@ -321,12 +320,11 @@ wmKeyEvent(
     unsigned char Keyboard_RawByte  =0;
     unsigned char Keyboard_ScanCode =0;    // The scancode.
 
-    //==============
-    // [event block]
-    struct window_d  *Event_Window;            //arg1 - window pointer
-    int               Event_Message       =0;  //arg2 - message number
-    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code (vk)
-    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
+//==============
+// [event block]
+    int           Event_Message       = 0;  //arg2 - message number
+    unsigned long Event_LongASCIICode = 0;  //arg3 - ascii code (vk)
+    unsigned long Event_LongRawByte   = 0;  //arg4 - raw byte
     //===================
 
 // #test
@@ -334,10 +332,6 @@ wmKeyEvent(
     //struct thread_d *input_thread;
     //input_thread = (struct thread_d *) threadList[tid];
     //input_thread->quantum = 20;
-
-    // Inicializando a janela, 
-    // pois os outros elementos já foram incializados logo acima.
-    Event_Window = NULL;
 
     // true for keyup and false for keydown.
     // int Break = TRUE;
@@ -847,7 +841,6 @@ done:
              shift_status != TRUE )
         {
             post_message_to_ws(
-                NULL, 
                 Event_Message, 
                 Event_LongASCIICode,
                 Event_LongRawByte );
@@ -885,10 +878,9 @@ done:
 
     __Status = 
         (int) wmProcedure(
-        (struct window_d *) Event_Window,    // opaque pointer
-        (int)               Event_Message,
-        (unsigned long)     Event_LongASCIICode,
-        (unsigned long)     Event_LongRawByte );
+        (int)           Event_Message,
+        (unsigned long) Event_LongASCIICode,
+        (unsigned long) Event_LongRawByte );
 
     return (int) __Status;
 }

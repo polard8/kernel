@@ -269,11 +269,6 @@ struct tty_d
 // Qual terminal virtual esta usando essa tty.
     int virtual_terminal_pid;
 
-// Window.
-// When we are using the kgws.
-    //struct window_d  *window;
-
-
 //
 // Cursor support.
 //

@@ -1,5 +1,6 @@
 
-// window.h
+// ws2.h
+// Window system support.
 // ring0, kernel base.
 // #todo
 // Tem muita coisa aqui nesse documento para ser deletado.
@@ -9,43 +10,8 @@
 // que serao areas de memoria compartilhadas entre o painter-client side 
 // e o compositor, server-side. 
 
-#ifndef  __WINDOW_H
-#define  __WINDOW_H    1
-
-
-#define KGWS_ZORDER_BOTTOM   0 
-#define KGWS_ZORDER_TOP     1023   //top window
-#define KGWS_ZORDER_MAX     1024   //max
-
-
-// #importante:
-// Tipos de mensagem de comunicação nos diálogos 
-// e procesimento de janelas:
-// 
-// SIGNAL_       Sinal. Não contém argumentos.
-// MSG_          Message. Contém os argumentos padrão.
-// STREAMMSG_    Streams. O argumento é um ponteiro para uma stream.
-// BUFFER_MSG_   Buffer. O argumento é um ponteiro para um buffer.
-// CAT_MSG_      Concatenate. Os argumentos long1 e long devem ser concatenados.
- 
-
-// Window handle status
-// Se uma janela está aberta ou não. 
-#define HANDLE_STATUS_CLOSE 0
-#define HANDLE_STATUS_OPEN 1
-
-//used
-#define WINDOW_NOTUSED   0
-#define WINDOW_USED      1
-#define WINDOW_GC        216   //Sinalizada para o GC.
-//...
-
-//magic
-#define WINDOW_NOTMAGIC  0
-#define WINDOW_MAGIC     1234 
-#define WINDOW_CLOSED    4321
-//... 
-
+#ifndef __DISPLAY_WS2_H
+#define __DISPLAY_WS2_H    1
 
 //
 // Message code.
@@ -219,19 +185,16 @@ struct rect_d
 {
     object_type_t  objectType;
     object_class_t objectClass;
-
     int used;
     int magic;
 
-//
 // Invalidate
-//
-
 // Sujo de tinta.
 // If the rectangle is dirty, so it needs to be flushed into 
 // the framebuffer.
 // When we draw a window it needs to be invalidated.
     int dirty;
+
     int flag;
 // Estilo de design
     int style;
@@ -268,136 +231,6 @@ struct tagRGBA
    char blue;
    char alpha;
 };
-struct tagRGBA *RGBA;
-
-//
-// Window Class support.
-//
-
-// ?? rever. 
-// Enumerando classe de janela 
-typedef enum {
-    WindowClassNull,
-    WindowClassClient,    // 1 cliente
-    WindowClassKernel,    // 2 kernel
-    WindowClassServer,    // 3 servidor
-}wc_t;
-
-//classes de janelas controladas pelos aplicativos.
-typedef enum {
-    WindowClassApplicationWindow,
-	//...
-}client_window_classes_t;
-
-//??bugbug: tá errado.
-//classes de janelas controladas exclusivamente pelo kernel.
-typedef enum {
-    WindowClassKernelWindow,    //janelas criadas pelo kernel ... coma a "tela azul da morte"
-    WindowClassTerminal,  //janela de terminal usada pelos aplicativos que não criam janela e gerenciada pelo kernel	
-    WindowClassButton,
-    WindowClassComboBox,
-    WindowClassEditBox,
-    WindowClassListBox,
-    WindowClassScrollBar,
-    WindowClassMessageOnly, //essa janela não é visível, serve apenas para troca de mensagens ...
-    WindowClassMenu,
-    WindowClassDesktopWindow,
-    WindowClassDialogBox,
-    WindowClassMessageBox,
-    WindowClassTaskSwitchWindow,
-    WindowClassIcons,
-    WindowClassControl,   //??
-    WindowClassDialog,
-    WindowClassInfo,
-    //...
-}kernel_window_classes_t;
-
-//classes de janelas controladas pelos servidores.
-typedef enum {
-    WindowClassServerWindow,
-    //...
-}server_window_classes_t;
-
-// estrutura para window class
-struct window_class_d
-{
-
-//Que tipo de window class.
-// do sistema, dos processos ...
-//tipo de classe.
-
-	wc_t windowClass; 
-
-//1
-    client_window_classes_t	clientClass;
-//2
-	kernel_window_classes_t kernelClass;
-//3
-	server_window_classes_t serverClass;
-//Endereço do procedimento de janela.
-//(eip da thread primcipal do app)
-	unsigned long procedure;
-    //...
-};
-
-// Message structure.
-struct msg_d 
-{
-
-// validation
-    int used;
-    int magic;
-// standard header
-    struct window_d *window;  //#opaque
-    int msg;
-    unsigned long long1;
-    unsigned long long2;
-// extra payload
-    unsigned long long3;
-    unsigned long long4;
-
-// extention
-
-    pid_t sender_pid;
-    pid_t receiver_pid;
-
-    tid_t sender_tid;
-    tid_t receiver_tid;
-    // ...
-    
-    //unsigned long jiffie1;
-    //unsigned long jiffie2;
-
-// #todo
-// We need some synchronization flags.
-// Maybe its better putting this flag into the thread struct.
-// t->msg_flags;
-    //unsigned long flags;
-
-// navigation?
-    struct msg_d *next;
-};
-
-
-// Used by surface_d
-struct window_d
-{
-    int wid;
-    struct rect_d *next;
-};
-
-// #maybe
-//struct window_d *kernel_surface_window;
-
-// Window list.
-unsigned long windowList[WINDOW_COUNT_MAX];
-
-// ??
-unsigned long Windows[KGWS_ZORDER_MAX];
-
-// id da janela que o mouse está em cima.
-int window_mouse_over; 
-
 
 //--------------------------------------
 
@@ -408,7 +241,9 @@ struct surface_d
 {
     int used;
     int magic;
-
+// Surface ID.
+    int surface_id;
+    struct rect_d rect;
 // How many bytes?
     size_t size_in_bytes;
     int bpp;
@@ -416,15 +251,12 @@ struct surface_d
     unsigned long pitch;
     unsigned long height;
 
-// Surface ID.
-    int surface_id;
 // Window ID.
 // This window owns this surface.
 // The wid provided by the window server.
     int owner_wid;
 
     int dirty;
-    struct rect_d rect;
 
     struct surface_d *next;
 };
@@ -443,7 +275,6 @@ struct icon_cache_d
 {
     int initialized;
     size_t size_in_bytes;
-
 // Pointers to shared memory.
     void *app;  //1
     void *file; 
@@ -453,61 +284,9 @@ struct icon_cache_d
 };
 extern struct icon_cache_d  icon_cache;
 
-//
-// == z order support =========================
-//
-
-//esses tipo indicam algum posicionamento dentro da xorder.
-typedef enum {
-    zordertypeNull,     //ignorado
-    zordertypeTop,      //acima de todas
-    zordertypeBottom,   //abaixo de rodas.
-    //...
-}zorder_type_t;
-
-//essas são as camadas onde os objetos gráficos ficam ...
-//estão associadas com formulários e containers.
-typedef enum {
-    zorderlayerNull,     //ignorado
-    zorderlayerBack,     //back layer. é a área onde os métodos invocarão a construção de objetos gráficos.
-    zorderlayerMiddle,   //middle layer. é onde os objetos gráficos e as etiquetas de controle são colocadas.
-    zorderlayerFront,    //front layer. são colocados os controles não gráficos como: 
-                         //CommandButton, CheckBox e ListBox 
-    //...
-}zorder_layer_t;
-
-// Estrutura para controlar um índice de janela 
-// ponteiros de instãncias dessa estrutura ficarão na lista zorderList[].
-// Obs: uma estrutura de janela pode ter um poteiro para essa 
-// estrutura que controlará todas as propriedades de zorder relaticas a aquela janela.
-struct zorder_d
-{
-	// tipo ... top ou bottom.
-	//encontraremos com facilidade se ela é top ou bottom.
-	
-	//zorder_type_t zorderType; 
-	//zorder_layer_t zorderLayer;
-	
-	int zIndex;
-    
-	//?? ...
-    struct window_d *window;
-	//toda janela está na lista de zorder de outra janela.
-	struct window_d *parent; //janela mãe... 
-	struct zorder_d *next;
-};
-
-
-//see:  kgwm.c
-extern int zorder;
-extern int zorderCounter;         //contador de janelas incluidas nessa lista.   
-extern int zorderTopWindow;
-//...
-
 
 // gui:
 // 2015 - Created by Fred Nora.
-
 struct gui_d
 {
     int initialized;
@@ -534,7 +313,6 @@ struct gui_d
     struct room_d        *CurrentRoom;  // (Window station)
     struct desktop_d   *CurrentDesktop;
 };
-
 extern struct gui_d  *gui; 
 
 
@@ -668,7 +446,6 @@ void kgwm_early_kernel_console(void);
 // ==========
 int 
 wmProcedure ( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );

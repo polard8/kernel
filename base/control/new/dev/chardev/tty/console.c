@@ -1646,7 +1646,8 @@ void __test_process(void)
 // Only ring3 for now.
 // See: sys.c
     p = (void*) sys_create_process ( 
-            NULL, NULL, NULL,       // room, desktop, window
+            NULL, 
+            NULL, 
             0,                      // Reserved
             PRIORITY_NORMAL_THRESHOLD,          // priority
             get_current_process(),  // ppid
@@ -1683,7 +1684,8 @@ void __test_thread(void)
 
     t = 
         (struct thread_d *) create_thread ( 
-                                NULL, NULL, NULL,  // room desktop window 
+                                NULL,
+                                NULL,
                                 __dummy_thread,    // init_rip, 
                                 PRIORITY_NORMAL_THRESHOLD, 
                                 get_current_process(), 
@@ -1849,7 +1851,7 @@ int consoleCompareStrings(void)
         gSavedY = 300;
         //Send message to ws,
         // telling that the resolution changed.
-        post_message_to_ws( NULL, 800300, 800, 300 );
+        post_message_to_ws( 800300, 800, 300 );
         */
         goto exit_cmp;
     }
@@ -2096,7 +2098,6 @@ int consoleCompareStrings(void)
         post_message_to_tid(
             (tid_t) 0,                //sender tid. #todo
             (tid_t) InitThread->tid,  //receiver tid.
-            NULL,                     //window
             (int) MSG_CLOSE,          //msg code
             0,
             0 );
@@ -2111,7 +2112,6 @@ int consoleCompareStrings(void)
         post_message_to_tid(
             (tid_t) 0,                // sender tid #todo
             (tid_t) InitThread->tid,  // receiver tid
-            NULL,                     // window
             (int) MSG_COMMAND,        // msg code
             (unsigned long) 4001,     // data1
             0 );
@@ -2128,7 +2128,6 @@ int consoleCompareStrings(void)
         post_message_to_tid(
             (tid_t) 0,                 //sender tid #todo
             (tid_t) InitThread->tid,   //receiver tid
-            NULL,                      //window
             (int) MSG_COMMAND,         //msg code
             (unsigned long) 4002,      //data1
             0 );
@@ -2146,7 +2145,6 @@ int consoleCompareStrings(void)
         post_message_to_tid(
             (tid_t) 0,                // sender tid. (#todo)
             (tid_t) InitThread->tid,  // receiver tid
-            NULL,                     // window
             (int) MSG_COMMAND,        // msg code
             (unsigned long) 4003,     // data
             (unsigned long) 0 );      // data

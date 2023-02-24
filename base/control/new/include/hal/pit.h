@@ -163,25 +163,20 @@ struct timer_d
     int magic;
     int id;
 
-	//1 = one shot 
-	//2 = intermitent
+//1 = one shot 
+//2 = intermitent
     int type;
 
-    // Owner
-    struct process_d  *process;
-    struct thread_d   *thread;
+// Owner
+    struct process_d *process;
+    struct thread_d  *thread;
+    pid_t pid;
+    tid_t tid;
 
-    int pid;
-    int tid;
-
-    // ??
-    struct window_d   *window;
-
-    // Counter
+// Counter
     int count_down;          // Decrementing
     int initial_count_down;  // base fixa
-
-    // Quantas vezes o timer se esgotou.
+// Quantas vezes o timer se esgotou.
     unsigned long times;
 
     // ??

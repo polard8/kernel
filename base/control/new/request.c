@@ -11,7 +11,6 @@ void clear_request (void)
     REQUEST.target_pid = 0;
     REQUEST.target_tid = 0;
 
-    REQUEST.window = NULL;
     REQUEST.msg    = 0;
     REQUEST.long1  = 0;
     REQUEST.long2  = 0;
@@ -38,7 +37,6 @@ create_request (
     int timeout,
     int target_pid,
     int target_tid,
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -68,10 +66,8 @@ create_request (
     REQUEST.target_pid = target_pid;
     REQUEST.target_tid = target_tid;
 
-    // #obs
-    // Atenção com isso.
-
-    REQUEST.window = (struct window_d *) window;
+// #obs
+// Atenção com isso.
     REQUEST.msg    = (int) msg;
     REQUEST.long1  = (unsigned long) long1;
     REQUEST.long2  = (unsigned long) long2;

@@ -1,5 +1,5 @@
 
-//  graphics.h
+// graphics.h
 
 #ifndef __GRAPHICS_H
 #define __GRAPHICS_H    1
@@ -26,32 +26,11 @@ void schedulerUpdateScreen(void);
 
 // =======================================================
 
-int 
-write_in_tty ( 
-    struct tty_d *target_tty,
-    struct window_d *window, 
-    int message,
-    unsigned long ascii_code,
-    unsigned long raw_byte );
-
-int 
-postto_eventqueue( 
-    int tid,
-    struct window_d *window, 
-    int message,
-    unsigned long ascii_code,
-    unsigned long raw_byte );
-
-// ===============================
-
-int fib (int n);
+int fib(int n);
 
 int 
 grPlot0 ( 
-    struct window_d *clipping_window,   
-    int z, 
-    int x, 
-    int y, 
+    int z, int x, int y, 
     unsigned int color );
 
 void 

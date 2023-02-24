@@ -103,10 +103,12 @@ __ps_initialize_thread_common_elements(struct thread_d *t)
         if ( (void*) tmp == NULL ){
             panic("__ps_initialize_thread_common_elements: tmp");
         }
-        tmp->window = NULL;
+
+        tmp->opaque_window = NULL;
         tmp->msg = 0;
         tmp->long1 = 0;
         tmp->long2 = 0;
+
         tmp->long3 = 0;
         tmp->long4 = 0;
 
@@ -845,7 +847,6 @@ int thread_profiler(int service)
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long init_rip, 
     unsigned long init_stack, 
     pid_t pid, 
@@ -879,9 +880,6 @@ struct thread_d *create_thread (
     if ( (void*) desktop == NULL ){
         debug_print ("create_thread: desktop parameter\n");
     }
-    if ( (void*) window == NULL ){
-        debug_print ("create_thread: window parameter\n");
-    }
 
 // #bugbug
 // Nao podemos usar isso aqui porque a rotina declonagem
@@ -892,7 +890,7 @@ struct thread_d *create_thread (
     //}
 
 // #bugbug
-// Nao podemos usar isso aqui porque a rotina declonagem
+// Nao podemos usar isso aqui porque a rotina de clonagem
 // chama essa funçao mas reconfigura esse valor logo em seguida.
 
     //if( init_stack == 0 ){
@@ -1267,7 +1265,7 @@ try_next_slot:
 //done:
 
     // #debug
-    debug_print ("create_thread: Done\n");
+    //debug_print ("create_thread: Done\n");
     //printf ("create_thread: Done\n");
 
 // Warning !!! 
@@ -1438,7 +1436,8 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     
     clone = 
         (struct thread_d *) create_thread ( 
-                                NULL, NULL, NULL, 
+                                NULL, 
+                                NULL,  
                                 0,  // initial rip 
                                 0,  // initial rsp
                                 father->owner_pid, 

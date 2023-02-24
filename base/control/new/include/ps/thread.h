@@ -862,7 +862,6 @@ struct thread_d *copy_thread_struct (struct thread_d *thread);
 struct thread_d *create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long init_rip, 
     unsigned long init_stack, 
     pid_t pid, 
@@ -927,22 +926,19 @@ gramado_post(
 int
 post_message_to_tid ( 
     tid_t sender_tid,
-    tid_t receiver_tid, 
-    struct window_d *window, 
+    tid_t receiver_tid,
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
 
 int
 post_message_to_ws( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
 
 int
 post_message_to_foreground_thread ( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );

@@ -3,21 +3,20 @@
 
 #include <kernel.h>  
 
-
 int init_logon_manager (void)
 {
-    //#todo
-
-    struct window_d  *hWindow; 
-    int z=0;
+// #todo
+// #bugbug
 
     debug_print("init_logon_manager: [TODO FIXME]\n");
 
-    //printf ("init_logon_manager: Initialize version support \n");
-    //doSetupVersion();
+// #bugbug
+// Is it the first time? Or not?
 
     gui = (void *) kmalloc ( sizeof(struct gui_d) );
-    if ( (void *) gui == NULL ){
+
+    if ( (void *) gui == NULL )
+    {
         panic ("init_logon_manager: [FAIL] gui\n");
     }
 
@@ -47,17 +46,6 @@ int init_logon_manager (void)
 // display and screen
     current_display = 0;
     current_screen  = 0;
-// window and menu.
-    current_window  = 0;
-    current_menu    = 0;    
-
-// Initializing zorder list.
-// #bugbug: Not a place for this.
-    for ( z=0; z < KGWS_ZORDER_MAX; z++ )
-    {
-        Windows[z] = (unsigned long) 0;
-    };
-    zorderCounter = 0;
 
 // #test
 // Mostrando as mensagens antes de pintarmos a primeira janela.
@@ -66,16 +54,6 @@ int init_logon_manager (void)
     //breakpoint
     //refresh_screen();
     //while(1){}
-
-
-// Inicia estrutura.
-// window.c
-// #bugbug: Not a place for this.
-    //init_windows();
-
-//menus.
-// #bugbug: Not a place for this.
-        //init_menus();
 
     // ...
 

@@ -284,28 +284,27 @@ static void *__extra_services (
     struct process_d *__p;
     struct process_d *__net_process;
     struct desktop_d *__desktop;
-    //struct desktop_d *_Desktop;
-    struct window_d  *__window;
-//generic file pointer
-    file *__fp;
-//bmp file pointer.
-    file *__bmfp;
+// Generic file pointer
+//    file *__fp;
+// bmp file pointer.
+//    file *__bmfp;
     unsigned long *message_address = (unsigned long *) arg2;
 
     pid_t current_process = (pid_t) get_current_process();
 
-//Deprecated.
-//Outro n�mero fará esse trabalhao.
-    if ( number == 260 ){
+
+// Outro numero fará esse trabalhao.
+    if ( number == 260 )
+    {
         return (void *) sys_read ( 
                             (unsigned int) arg2, 
                             (char *)       arg3, 
                             (int)          arg4 );
     }
 
-//Deprecated.
-//Outro numero fará esse trabalho.
-    if ( number == 261 ){
+// Outro numero fará esse trabalho.
+    if ( number == 261 )
+    {
         return (void *) sys_write ( 
                             (unsigned int) arg2, 
                             (char *)       arg3, 
@@ -856,18 +855,15 @@ static void *__extra_services (
 // IN: reason, reason
     if ( number == 970 )
     {
-            create_request ( 
-                (unsigned long) 15,      // number 
-                (int) 1,                 // status 
-                (int) 0,                 // timeout. 0=imediatamente.
-                (int) current_process,   // target_pid
-                (int) current_thread,    // target_tid
-                NULL,                    // window 
-                (int) 0,                 // msg  
-                (unsigned long) arg2,    // long1  
-                (unsigned long) arg3 );  // long2
-
-        //wait_for_a_reason ( current_thread, (int) arg2 );
+        create_request ( 
+            (unsigned long) 15,      // number 
+            (int) 1,                 // status 
+            (int) 0,                 // timeout. 0=imediatamente.
+            (pid_t) current_process,   // target_pid
+            (tid_t) current_thread,    // target_tid
+            (int) 0,                 // msg  
+            (unsigned long) arg2,    // long1  
+            (unsigned long) arg3 );  // long2
         return NULL;
     }
 
@@ -1424,23 +1420,7 @@ void *sci0 (
         // Request number 12. (Exit thread)
   
         case SYS_EXIT:
-            // #bugbug: Não podemos fechar a thread atual e
-            // retornarmos de uma systemcall.
-            // tem que agendar o exit através de um request.
-            // Mas os requests estão desabilitados no momento.
-            debug_print ("sci0: [TODO] SYS_EXIT\n");
-            
-            //create_request ( 
-            //    (unsigned long) 12,      // number 
-            //    (int) 1,                 // status 
-            //    (int) 0,                 // timeout. 0=imediatamente.
-            //    (int) current_process,   // target_pid
-            //    (int) current_thread,    // target_tid
-            //    NULL,                    // window 
-            //    (int) 0,                 // msg  ??
-            //    (unsigned long) arg2,    // long1  
-            //    (unsigned long) arg3 );  // long2
-
+            panic("sci.c: SYS_EXIT\n");
             return NULL;
             break;
    
@@ -1451,7 +1431,9 @@ void *sci0 (
         // Outra syscall tem que colocar ela em STANDBY.
         case SYS_CREATETHREAD:
             debug_print("sci0: [FIXME] SYS_CREATETHREAD\n");
-            return (void *) sys_create_thread ( NULL,  NULL, NULL, 
+            return (void *) sys_create_thread (
+                                NULL,
+                                NULL,
                                 arg2,             // init eip
                                 arg3,             // init stack
                                 current_process,  // pid
@@ -1490,7 +1472,6 @@ void *sci0 (
             return (void *) sys_create_process ( 
                                 NULL,             // room
                                 NULL,             // desktop
-                                NULL,             // window
                                 0,                // Reserved
                                 arg3,             // priority
                                 current_process,  // ppid

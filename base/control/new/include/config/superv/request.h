@@ -1,4 +1,8 @@
 
+// request.h
+// #todo
+// This is not the right place for this file.
+
 #ifndef ____REQUEST_H 
 #define ____REQUEST_H    1
 
@@ -49,26 +53,25 @@ unsigned long kernel_request;
  *     Aqui ficarao os argumentos para atender o request.
  *     Serao os mesmos das mensagens, para inclusive interagir com elas.
  */
-
 struct request_d
 {
-	// Número do request.
+
+// Número do request.
     unsigned long kernel_request;
-	
-	// 0 = No request.
-	// 1 = Driver request. (high priority)
-	// 2 = Server request. (medium priority)
-	// 3 = User request.   (low priority)
-	
-	int status;
-	
-	// Temporizador.
-	// O request pode ser atendido imediatamente ou
-	// adiado até que esse temporizador seja zerado.
-	// 0 ~ ?
-	
-	int timeout;
-	
+
+// 0 = No request.
+// 1 = Driver request. (high priority)
+// 2 = Server request. (medium priority)
+// 3 = User request.   (low priority)
+    int status;
+
+// Temporizador.
+// O request pode ser atendido imediatamente ou
+// adiado até que esse temporizador seja zerado.
+// 0 ~ ?
+// #todo: Use 'unsigned long'.
+    int timeout;
+
     int target_pid;
     int target_tid;
 
@@ -76,20 +79,17 @@ struct request_d
 // Action support
 //
 
-	// basic
-    struct window_d *window;  //#todo
+// basic
     int msg;
     unsigned long long1;
     unsigned long long2;
-
-	// extra	
+// extra
     unsigned long long3;
     unsigned long long4;
     unsigned long long5;
     unsigned long long6;
 };
 struct request_d  REQUEST;
-
 
 //
 // Prototypes ===============
@@ -104,7 +104,6 @@ create_request (
     int timeout,
     int target_pid,
     int target_tid,
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 );

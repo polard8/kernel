@@ -105,7 +105,6 @@ unsigned long sys_get_system_metrics(int n)
 void *sys_create_process ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long res1,          //nothing
     unsigned long priority, 
     int ppid, 
@@ -211,7 +210,8 @@ void *sys_create_process (
 
     new = 
         (void *) create_process ( 
-                     NULL, NULL, NULL, 
+                     NULL, 
+                     NULL,  
                      (unsigned long) CONTROLTHREAD_BASE, //0x00200000 
                      PRIORITY_NORMAL_THRESHOLD, 
                      (int) current_pid, 
@@ -225,12 +225,12 @@ void *sys_create_process (
     if ((void*) new == NULL)
     {
         printf("sys_create_process: new\n");
-        refresh_screen();
+        //refresh_screen();
         goto fail;
     }
 
     printf("sys_create_process: done :)\n");
-    refresh_screen();
+    //refresh_screen();
 
     // Switch back
     x64_load_pml4_table( old_pml4 );
@@ -243,7 +243,7 @@ void *sys_create_process (
 
 fail:
     printf("sys_create_process: fail\n");
-    refresh_screen();
+    //refresh_screen();
 
     // Switch back
     x64_load_pml4_table( old_pml4 );
@@ -264,7 +264,6 @@ fail:
 void *sys_create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long init_rip, 
     unsigned long priority, 
     int ppid, 
@@ -310,7 +309,8 @@ void *sys_create_thread (
     
     Thread = 
         (struct thread_d *) create_thread ( 
-                                room, desktop, window, 
+                                room, 
+                                desktop,  
                                 init_rip, 
                                 priority, 
                                 ppid, 
@@ -318,8 +318,7 @@ void *sys_create_thread (
                                 iopl,
                                 ThreadPersonality ); 
 
-    if ( (void *) Thread == NULL )
-    {
+    if ( (void *) Thread == NULL ){
         debug_print ("sys_create_thread: [FAIL] Thread\n");
         return NULL;
     }

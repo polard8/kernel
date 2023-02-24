@@ -1,22 +1,16 @@
 
 // ws.h
-// Window server support.
+// Window system support.
 // Colors and color scheme.
 
-#ifndef __WS_H
-#define __WS_H    1
+#ifndef __DISPLAY_WS_H
+#define __DISPLAY_WS_H    1
+
 
 // Counters.
 #define USER_SESSION_COUNT_MAX  16
 #define ROOM_COUNT_MAX          16
 #define DESKTOP_COUNT_MAX       16
-
-#define WINDOW_COUNT_MAX          1024 
-#define MAX_WINDOWS WINDOW_COUNT_MAX 
-
-// # video mode support #
-#define VIDEO_MODE_TEXT     1
-#define VIDEO_MODE_GRAPHIC  2 
 
 //
 // Colors
@@ -30,14 +24,11 @@
  *     Esses serão sempre os primeiros.    
  */
 typedef enum {
-
     ColorSchemeNull,      // 0 - Null.
     ColorSchemeHumility,  // 1 - Gray stuff.
     ColorSchemePride,     // 2 - Colorful.
     // ...
-
 }ColorSchemeType;
-
 
 /*
  * ColorSchemeIndex:
@@ -46,7 +37,6 @@ typedef enum {
  *     O esquema de cores se aplica ao servidor 
  * de recursos gráficos. GWS.
  */
-
 typedef enum {
 
     csiNull,                    //0
@@ -78,7 +68,6 @@ typedef enum {
  *     Estrutura para esquema de cores. 
  *     O esquema de cores se aplica ao servidor de recursos gráficos. 
  */ 
-
 struct color_scheme_d
 {
 
@@ -110,27 +99,23 @@ struct color_scheme_d
     unsigned long elements[32];
     //...
 };
-
 // #ps:
 // The kernel only have two color schemes:
 // Humility and Pride.
-
-struct color_scheme_d *HumilityColorScheme; // Simples.
-struct color_scheme_d *PrideColorScheme;    // Colorido.
-struct color_scheme_d *CurrentColorScheme;
+// see: graphics.c
+extern struct color_scheme_d *HumilityColorScheme; // Simples.
+extern struct color_scheme_d *PrideColorScheme;    // Colorido.
+extern struct color_scheme_d *CurrentColorScheme;
 // ===============================================================
 
 struct ws_info_d
 {
     int initialized;
-
     pid_t pid;
     int pid_personality;
-
     tid_t tid;
     int tid_personality
 };
-
 // see: graphics.c
 extern struct ws_info_d  WindowServerInfo;
 
@@ -139,87 +124,36 @@ extern struct ws_info_d  WindowServerInfo;
 // # Principais variáveis globais #
 // This is not the right place for them.
 
-// monitor. (hardware)
-int current_display; 
-   
-// superficie.
-// Um monitor pode ter varias screens
-// e uma screen pode estar em mais de um monitor
-int current_screen;      
-
-int guiStatus;       //Status da Interface gráfica do usuário.
-
-//Status de ambientes gráficos.
-int logonStatus;              //Logon status.
-int logoffStatus;             //Logoff status.
-int userenvironmentStatus;    //User environment status.
-
-//Contagens de ambientes;
-int rooms_count;  
-int desktops_count;
-int windows_count;  
-
-int current_window;         //gws
-int current_menu;           //gws
-
-//
-// # Outras variáveis globais #
-//
-
-//a janela que está em full screen.
-int fullscreen_window;
-//janela ativa
-int active_window;
-//janela com foco de entrada. 
-int window_with_focus;
-//janela com o mouse em cima.(captured mouse);
-int mouseover_window;
-//Indice 0 na zorder atual.  
-int top_window;
-//edit box atual
-int editbox_window;
-//combobox atual
-int combobox_window;
-//janela atual do terminal atual.
-int terminal_window;
-
-// ## tests ##
-//int mouseover_window;
-//int current_button_window;
-////cada janela tem seu controle first responder.
-//int current_first responder.
-//...
-
-//#todo
-// Move these to font.c
-
+// see: graphics.c
+extern int current_display; 
+extern int current_screen;
+extern int guiStatus;
+// Status de ambientes gráficos.
+extern int logonStatus;              //Logon status.
+extern int logoffStatus;             //Logoff status.
+extern int userenvironmentStatus;    //User environment status.
+// Contagens de ambientes;
+extern int rooms_count;  
+extern int desktops_count;
 
 // draw char support
-int gcharWidth;
-int gcharHeight;
-
-unsigned long g_system_color;
-unsigned long g_char_attrib;
-
+extern int gcharWidth;
+extern int gcharHeight;
+extern unsigned long g_system_color;
+extern unsigned long g_char_attrib;
 // LFB - address for kernel graphic mode
-unsigned long g_kernel_lfb; 
-
+extern unsigned long g_kernel_lfb; 
 //video mode
-unsigned long g_current_vm;          //video memory
-unsigned long g_current_video_mode;  //video mode
-
+extern unsigned long g_current_vm;          //video memory
+extern unsigned long g_current_video_mode;  //video mode
 //status do cursor.
 //se ele deve aparecer e piscar ou não.
-int g_show_text_cursor;
-
+extern int g_show_text_cursor;
 //status: aceso ou apagado.
 //0=apaga 1=acende.
-int textcursorStatus;      
-
-
-unsigned long g_mousepointer_x;
-unsigned long g_mousepointer_y;
-
+extern int textcursorStatus;      
+extern unsigned long g_mousepointer_x;
+extern unsigned long g_mousepointer_y;
 
 //
 // == window server ==================================================
@@ -227,14 +161,11 @@ unsigned long g_mousepointer_y;
 
 // types of window server.
 typedef enum {
-
     WindowServerTypeNull,
     WindowServerTypeEmbedded,       // Embedded inside the base kernel.
     WindowServerTypeRing0Process,
     WindowServerTypeRing3Process
-    
     // ...
-
 } window_server_t;
 
 // The window server struct.

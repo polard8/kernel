@@ -910,12 +910,10 @@ void ps_initialize_process_common_elements(struct process_d *p)
     return;
 }
 
-
 // Create process
 struct process_d *create_process ( 
     struct room_d    *room,
     struct desktop_d *desktop,
-    struct window_d  *window,
     unsigned long base_address, 
     unsigned long priority, 
     ppid_t ppid, 
@@ -946,23 +944,20 @@ struct process_d *create_process (
     if( (void*) desktop == NULL ){
         //debug_print ("create_process: [FIXME] desktop parameter is NULL\n");
     }
-    if( (void*) window == NULL ){
-        //debug_print ("create_process: [FIXME] window parameter is NULL\n");
-    }
 
 // #todo
 // Maybe the virtual 0 is n option in the future. Maybe.
 
-    if( base_address == 0 ){
+    if (base_address == 0){
         panic ("create_process: [ERROR] base_address\n");
     }
-    if( ppid < 0 ){
+    if (ppid < 0){
         panic ("create_process: [ERROR] ppid\n");
     }
-    if( (void*) name == NULL ){
+    if ( (void*) name == NULL ){
         panic ("create_process: [ERROR] name\n");
     }
-    if( *name == 0 ){
+    if ( *name == 0 ){
         panic ("create_process: [ERROR] *name\n");
     }
 
@@ -1018,21 +1013,19 @@ struct process_d *create_process (
 // Na verdade podemos usar aquela fun��o que procura por um vazio. 
 
     while (1){
-
         PID = (int) getNewPID();
-
         if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
         {
             debug_print ("create_process: [FAIL] getNewPID \n");
             printf      ("create_process: [FAIL] getNewPID %d \n", PID);
             goto fail;
         }
-
         EmptyEntry = (void *) processList[PID];
  
-        if ( (void *) EmptyEntry == NULL ){ break; }
+        if ( (void *) EmptyEntry == NULL ){ 
+            break;
+        }
     };
- 
 // ====================
 
 // Worker
@@ -1399,7 +1392,7 @@ struct process_d *create_process (
 // Fail
 fail:
     //Process = NULL;
-    refresh_screen();
+    //refresh_screen();
     return NULL;
 }
 

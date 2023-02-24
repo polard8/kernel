@@ -21,12 +21,6 @@
 struct icon_cache_d  icon_cache;
 
 
-int zorder=0;
-int zorderCounter=0;         //contador de janelas incluidas nessa lista.   
-int zorderTopWindow=0;
-//...
-
-
 // ============================
 static unsigned long presence_level=32;
 static unsigned long flush_fps=30;
@@ -63,7 +57,6 @@ static unsigned long __last_tick(void)
 // local
 // Launch an app via init process.
 // Just a small range of messages are accepted.
-// See: gramado/core/client
 // range: 4001~4009
 
 static void __launch_app_via_initprocess(int index)
@@ -75,13 +68,11 @@ static void __launch_app_via_initprocess(int index)
     {
         return;
     }
-
 // Post
 // #todo: sender.
     post_message_to_tid(
         (tid_t) src_tid,        // sender tid
         (tid_t) dst_tid,        // receiver tid
-        NULL,                   // window
         (int) MSG_COMMAND,      // msg code
         (unsigned long) index,  // range: 4001~4009
         0 );
@@ -171,7 +162,6 @@ void kgwm_early_kernel_console(void)
 
 int 
 wmProcedure ( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -286,37 +276,37 @@ wmProcedure (
             if (ShellFlag != TRUE)
             {
                 if (ctrl_status == TRUE && long1 == 'c'){
-                    post_message_to_ws( NULL, MSG_COPY, long1, long2 );
+                    post_message_to_ws( MSG_COPY, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 'v'){
-                    post_message_to_ws( NULL, MSG_PASTE, long1, long2 );
+                    post_message_to_ws( MSG_PASTE, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 'x'){
-                    post_message_to_ws( NULL, MSG_CUT, long1, long2 );
+                    post_message_to_ws( MSG_CUT, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 'z'){
-                    post_message_to_ws( NULL, MSG_UNDO, long1, long2 );
+                    post_message_to_ws( MSG_UNDO, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 'a'){
-                    post_message_to_ws( NULL, MSG_SELECT_ALL, long1, long2 );
+                    post_message_to_ws( MSG_SELECT_ALL, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 'f'){
-                    post_message_to_ws( NULL, MSG_FIND, long1, long2 );
+                    post_message_to_ws( MSG_FIND, long1, long2 );
                     return 0;
                 }
 
                 if (ctrl_status == TRUE && long1 == 's'){
-                    post_message_to_ws( NULL, MSG_SAVE, long1, long2 );
+                    post_message_to_ws( MSG_SAVE, long1, long2 );
                     return 0;
                 }
 
@@ -324,7 +314,7 @@ wmProcedure (
 
                 // No caso da combinação não ter sido tratada na rotina acima.
                 // Enviamos combinação de [shift + tecla] de digitaçao.
-                post_message_to_ws( NULL, msg, long1, long2 );
+                post_message_to_ws( msg, long1, long2 );
                 // return 0;
 
                 // Send it to the window server.
@@ -405,11 +395,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77101,0, 0 );
+                    //post_message_to_ws( (int) 77101, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(0);
-                    //post_message_to_ws( NULL, (int) 88101,0, 0 );
+                    //post_message_to_ws( (int) 88101, 0, 0 );
                 }
                 return 0;
                 break;
@@ -420,11 +410,11 @@ wmProcedure (
                      return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77102,0, 0 );
+                    //post_message_to_ws( (int) 77102, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(1);
-                    //post_message_to_ws( NULL, (int) 88102,0, 0 );
+                    //post_message_to_ws( (int) 88102, 0, 0 );
                 }
                 return 0;
                 break;
@@ -435,11 +425,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77103,0, 0 );
+                    //post_message_to_ws( (int) 77103, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(2);
-                    //post_message_to_ws( NULL, (int) 88103,0, 0 );
+                    //post_message_to_ws( (int) 88103, 0, 0 );
                 }
                 return 0;
                 break;
@@ -454,19 +444,18 @@ wmProcedure (
                         return 0;
                     }
                     //__launch_app_via_initprocess(4004);
-                    //post_message_to_ws( 
-                    //    NULL, 33888, 0, 0 ); //#TEST
+                    //post_message_to_ws( 33888, 0, 0 ); //#TEST
                     return 0;
                 }
                 // alt+f4: The vm handle this combination.
                 // We can't use it on vms.
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77104,0, 0 );
+                    //post_message_to_ws( (int) 77104, 0, 0 );
                     return 0;
                 }
                 if (shift_status == TRUE){
                     jobcontrol_switch_console(3);
-                    //post_message_to_ws( NULL, (int) 88104,0, 0 );
+                    //post_message_to_ws( (int) 88104, 0, 0 );
                 }
                 return 0;
                 break;
@@ -475,17 +464,16 @@ wmProcedure (
             case VK_F5:
                 if (ctrl_status == TRUE){
                     //__launch_app_via_initprocess(4005);
-                    //post_message_to_ws( 
-                        //NULL, 33888, 0, 0 ); //#TEST
+                    //post_message_to_ws( 33888, 0, 0 ); //#TEST
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77105,0, 0 );
+                    //post_message_to_ws( (int) 77105, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 88105,0, 0 );
+                    //post_message_to_ws( (int) 88105, 0, 0 );
                     //post_message_to_foreground_thread(
-                    //    NULL, ??, 1234, 1234 );
+                    //   ??, 1234, 1234 );
                 }
                 return 0;
                 break;
@@ -498,10 +486,10 @@ wmProcedure (
                     return 0; 
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77106,0, 0 );
+                    //post_message_to_ws( (int) 77106, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 88106,0, 0 );
+                    //post_message_to_ws( (int) 88106, 0, 0 );
                 }
                 return 0;
                 break;
@@ -513,10 +501,10 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77107,0, 0 );
+                    //post_message_to_ws( (int) 77107, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 88107,0, 0 );
+                    //post_message_to_ws( (int) 88107, 0, 0 );
                 }
                 return 0;
                 break;
@@ -527,12 +515,12 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77108,0, 0 );
+                    //post_message_to_ws( (int) 77108, 0, 0 );
                 }
                 if (shift_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 88108,0, 0 );
+                    //post_message_to_ws( (int) 88108, 0, 0 );
                     // MSG_HOTKEY=8888 | 1 = Hotkey id 1.
-                    post_message_to_ws( NULL, (int) MSG_HOTKEY, 1, 0 );
+                    post_message_to_ws( (int) MSG_HOTKEY, 1, 0 );
                 }
                 return 0;
                 break;
@@ -544,7 +532,7 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77109,0, 0 );
+                    //post_message_to_ws( (int) 77109, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     // #goal
@@ -552,7 +540,7 @@ wmProcedure (
                     // We can't call another process and 
                     // we want to reboot the machine.
                     sys_reboot();
-                    //post_message_to_ws( NULL, (int) 88109,0, 0 );
+                    //post_message_to_ws( (int) 88109, 0, 0 );
                 }
                 return 0;
                 break;
@@ -564,13 +552,13 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77110,0, 0 );
+                    //post_message_to_ws( (int) 77110, 0, 0 );
                 }
                 if (shift_status == TRUE){
                     Background_initialize(COLOR_KERNEL_BACKGROUND);
                     show_slots();   //See: tlib.c
                     //pages_calc_mem();
-                    //post_message_to_ws( NULL, (int) 88110,0, 0 );
+                    //post_message_to_ws( (int) 88110, 0, 0 );
                     refresh_screen();
                 }
                 return 0;
@@ -583,11 +571,11 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77111,0, 0 );
+                    //post_message_to_ws( (int) 77111, 0, 0 );
                 }
                 if (shift_status == TRUE){
                    hal_reboot();
-                   //post_message_to_ws( NULL, (int) 88111,0, 0 );
+                   //post_message_to_ws( (int) 88111, 0, 0 );
                 }
                 return 0;
                 break;
@@ -599,14 +587,14 @@ wmProcedure (
                     return 0;
                 }
                 if (alt_status == TRUE){
-                    //post_message_to_ws( NULL, (int) 77112,0, 0 );
+                    //post_message_to_ws( (int) 77112, 0, 0 );
                 }
 
                 // [SHIFT + F12]
                 // Update desktop and show the mouse pointer.
                 // IN: window, msg code, data1, data2.
                 if (shift_status == TRUE){
-                    post_message_to_ws( NULL, (int) 88112,0, 0 );
+                    post_message_to_ws( (int) 88112, 0, 0 );
                 }
                 return 0;
                 break;
@@ -627,7 +615,7 @@ wmProcedure (
 
 fail:
     debug_print("wmProcedure: fail\n");
-    refresh_screen();
+    //refresh_screen();
     return -1;
 }
 

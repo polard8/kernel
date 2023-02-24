@@ -437,7 +437,6 @@ unsigned long sys_get_system_metrics(int n);
 void *sys_create_process ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long res1,          //nothing
     unsigned long priority, 
     int ppid, 
@@ -447,7 +446,6 @@ void *sys_create_process (
 void *sys_create_thread ( 
     struct room_d     *room,
     struct desktop_d  *desktop,
-    struct window_d   *window,
     unsigned long init_rip, 
     unsigned long priority, 
     int ppid, 

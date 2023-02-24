@@ -3,6 +3,54 @@
 
 #include <kernel.h>  
 
+// see: ws.h
+struct color_scheme_d *HumilityColorScheme; // Simples.
+struct color_scheme_d *PrideColorScheme;    // Colorido.
+struct color_scheme_d *CurrentColorScheme;
+
+
+// monitor. (hardware)
+int current_display=0;
+
+// superficie.
+// Um monitor pode ter varias screens
+// e uma screen pode estar em mais de um monitor
+int current_screen=0;
+
+//Status da Interface gráfica do usuário.
+int guiStatus=0;
+
+// Status de ambientes gráficos.
+int logonStatus=0;            //Logon status.
+int logoffStatus=0;           //Logoff status.
+int userenvironmentStatus=0;  //User environment status.
+
+// Contagens de ambientes;
+int rooms_count=0;
+int desktops_count=0;
+
+// draw char support
+int gcharWidth=8;
+int gcharHeight=8;
+unsigned long g_system_color=0;
+unsigned long g_char_attrib=0;
+
+unsigned long g_kernel_lfb=0;
+
+//video mode
+unsigned long g_current_vm=0;          //video memory
+unsigned long g_current_video_mode=0;  //video mode
+
+//status do cursor.
+//se ele deve aparecer e piscar ou não.
+int g_show_text_cursor=0;
+//status: aceso ou apagado.
+//0=apaga 1=acende.
+int textcursorStatus=0; 
+
+unsigned long g_mousepointer_x=0;
+unsigned long g_mousepointer_y=0;
+
 
 // Device hotspot.
 static unsigned long HotSpotX=0;
@@ -32,243 +80,18 @@ int KGWS_initialize(void)
     return 0;
 }
 
-
-
-// write_in_tty:
-// Colocamos na tty PS2KeyboardDeviceTTY ou imprimimos na tela.
-
-int 
-write_in_tty ( 
-    struct tty_d *target_tty,
-    struct window_d *window, 
-    int message,
-    unsigned long ascii_code,
-    unsigned long raw_byte )
-{
-
-//
-// tty
-//
-
-    //struct tty_d *tty;
-    //tty = (struct tty_d *) PS2KeyboardDeviceTTY;
-    //tty = (struct tty_d *) target_tty;
-
-//
-// Event block
-//
-
-    //==============
-    // [event block]
-    struct window_d  *Event_Window;            //arg1 - window pointer
-    int               Event_Message       =0;  //arg2 - message number
-    unsigned long     Event_LongASCIICode =0;  //arg3 - ascii code
-    unsigned long     Event_LongRawByte   =0;  //arg4 - raw byte
-    //===================
-
-// setup event block
-// get parameters.
-
-    Event_Window        = (struct window_d  *) window;
-    Event_Message       = message;
-    Event_LongASCIICode = ascii_code;
-    Event_LongRawByte   = raw_byte;
-
-
-    // ===========================
-
-    // #todo
-    // Send the message to the TYY,
-    // this way the foreground process is able to read it
-    // using stdin.
-    // See:
-    // devmgr.h ps2kbd.c
-    // ...
-    
-    // only one standard event
-    unsigned long event_buffer[5];
-
-
-    int i=0;    //iterator.
-    char bugBuffer[4];
-
-
-//
-// SETUP INPUT MODE
-//
-
-    // The event mode is not the mode we want.
-    // We want the tty mode to put the chars into the keyboard tty.
-
-    //if ( current_input_mode != INPUT_MODE_TTY )
-    //if ( IOControl.useTTY != TRUE )
-    //{
-       // panic("sendto_tty: [ERROR] Wrong input mode\n");
-    //}
-
-//
-// TTY INPUT MODE
-//
-
-    //if ( current_input_mode == INPUT_MODE_TTY )
-    //if ( IOControl.useTTY == TRUE )
-    //{
-
-        //if ( (void *) tty != NULL )
-        //{
-            // ok. This is a valid tty pointer.
-       
-        // #test
-        // Let's write something ...
-            event_buffer[0] = (unsigned long) Event_Window;                      // window pointer 
-            event_buffer[1] = (unsigned long) Event_Message;                     // message number.
-            event_buffer[2] = (unsigned long) Event_LongASCIICode & 0x000000ff;  // ascii code
-            event_buffer[3] = (unsigned long) Event_LongRawByte   & 0x000000ff;  // raw byte
-       
-        // #todo
-        // >> PS2KeyboardDeviceTTY->_rbuffer
-        // No buffer 'bruto' colocamos os raw bytes.
-        // >> PS2KeyboardDeviceTTY->_cbuffer
-        // No buffer 'canonico' colocamos os ascii codes.
-        // ps: nao usaremos o buffer de output no caso do teclado. 
-        
-        //devemos cheacar se o tty esta configurado para
-        //escrever na fila bruta ou canonica e escrevermos no lugar certo
-        //Do mesmo modo deve ser a leitura.
-        //a configuraçao pode ser feita em ring3// see:ioctl
-        // esse tipo de decisao deve ficar dentro das rotinas de leitura e escrita e nao aqui.
-        
-        //quanto a fila eh canonica, escrevemos somente os keydown.
-                
-            //xxxbug[0] = 'x';  //fake bytes
-            bugBuffer[0] = Event_LongASCIICode & 0x000000ff;
-
-        // ?? #bugbug
-        // Explique melhor isso. ... estamos escrevendo um byte 
-        // no arquivo '0' ???
-        if ( Event_Message == MSG_KEYDOWN)
-            sys_write(0,bugBuffer,1);
-        
-        // coloca o raw byte no buffer de raw byte.
-        //file_write_buffer ( PS2KeyboardDeviceTTY->_rbuffer, "dirty", 5);
-        
-            //
-            // Suspenso.
-            //
-            
-            //canonica
-            //if ( Event_Message == MSG_KEYDOWN)
-            //file_write_buffer ( tty->_cbuffer, bugBuffer , 1);
-        
-        
-        
-        // #bugbug
-        // Estamos colocando um evento no buffer 'bruto'.
-       
-        // it is gonna write in the base of the buffer.
-        // >> Essa rotina escreve na fila bruta. (raw buffer).
-        // See: tty.c
-        
-        //__tty_write ( 
-        //    (struct tty_d *) PS2KeyboardDeviceTTY, 
-        //    (char *) event_buffer, 
-        //    (int) (4*4) );  //16 bytes = apenas um evento.
-         
-         // Sinalizamos que temos um novo evento.
-         
-         // #todo
-         // Precisamos de uma flag que diga que é para imprimirmos na tela.
-         
-         // o teclado esta escrevendo na tty
-         // ela decide se faz echo no console ou nao,
-         // dependendo da configuraçao da tty.
-         // #test: fazendo echo
-           // if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] != '\n') )
-           // {
-                // ainda nao pode ler.
-                //tty->new_event = FALSE;
-         
-                //console_write ( 
-                    //(int) fg_console, 
-                    //(const void *) bugBuffer, 
-                    //(size_t) 1 );
-
-                
-                // #bugbug:
-                // Usado somente para teste.
-                //refresh_screen(); 
-            //}
-            //pode ler
-           // if ( (Event_Message == MSG_KEYDOWN) && ((char)bugBuffer[0] == 'q') )
-           // {
-               // tty->new_event = TRUE;
-
-             // da proxima vez escreveremos no inicio do buffer.
-             //PS2KeyboardDeviceTTY->_rbuffer->_w = 0;
-             // PS2KeyboardDeviceTTY->_rbuffer->_r = 0;
-             //PS2KeyboardDeviceTTY->_rbuffer->_p = PS2KeyboardDeviceTTY->_rbuffer->_base; 
-             //PS2KeyboardDeviceTTY->_rbuffer->_cnt = PS2KeyboardDeviceTTY->_rbuffer->_lbfsize;
-             //for( xxxi=0; xxxi<BUFSIZ; xxxi++){ PS2KeyboardDeviceTTY->_rbuffer->_p[xxxi] = 0; };
-           // }
-  
-        //}
-        
-        // ok
-        return 0;
-    //} //fim do current input mode. (TTY MODE)
-
-
-fail:
-
-    // Invalid input mode.
-    debug_print ("sendto_tty: [FAIL] Invalid input mode\n");
-
-    // fail
-    return -1;
-}
-
-
-// ==================================
-// postto_eventqueue:
-// keyboard events.
-// Envia eventos para a fila na thread em foreground.
-// Chama um diálogo local para algumas combinações de teclas.
-
-// Called by UserInput_SendKeyboardMessage in this document.
-
-
-// #deprecated?
-int 
-postto_eventqueue ( 
-    int tid,
-    struct window_d *window, 
-    int message,
-    unsigned long ascii_code,
-    unsigned long raw_byte )
-{
-    return -1;
-}
-//==========================================================
-
-
-
-
-
-// ==========================================================
-
 void kgws_enable(void)
 {
     debug_print("kgws_enable: Enable KGWS\n");
          printf("kgws_enable: Enable KGWS\n");
     refresh_screen();
-    
+
     // Sending event messages to the thread associated with the wwf.
     //current_input_mode = INPUT_MODE_SETUP;
     IOControl.useEventQueue = TRUE;
     
     EnableKGWS = TRUE;
 }
-
 
 void kgws_disable(void)
 {
@@ -305,36 +128,26 @@ int fib (int n)
     return (int) (a+b);
 } 
 
-
 /*
- ******************************* 
  * grPlot0:
  *      plot pixel.
  *      Low level routine.
  *      Plot into a normalized screen. kinda.
  *      #new: Plotting into a clipping window.
  */
-
 // low level plot.
 // History:
 //     2020 - Created by Fred Nora.
-
 // window ?
 // Essa rotina pode pintar em qualquer posição 
 // da tela do dispositivo. 
 // Com origem no centro da tela.
-
 // Aceitamos valores negativos e positivos.
 // O limite máximo será modular.
-
 // 3D fullscreen, origin in center.
-
 int 
 grPlot0 ( 
-    struct window_d *clipping_window,   
-    int z, 
-    int x, 
-    int y, 
+    int z, int x, int y, 
     unsigned int color )
 {
 
@@ -382,34 +195,14 @@ grPlot0 (
      int X=0;
      int Y=0;
 
+// #todo
+// If the clipping window is invalid, 
+// so we're gonna use the root window.
+// #todo:
+// Maybe we need to use the device context structure,
+// or something like that.
 
-//
-// The clipping window.
-//
-
-    //struct gws_window_d *w;
-
-    // #todo
-    // If the clipping window is invalid, 
-    // so we're gonna use the root window.
-    // #todo:
-    // Maybe we need to use the device context structure,
-    // or something like that.
-    
     UseClipping = FALSE;
-    
-    
-    /*
-    if ( (void*) clipping_window != NULL )
-    {
-        if ( clipping_window->used  == TRUE && 
-             clipping_window->magic == 1234 )
-        {
-            UseClipping = TRUE;
-            w = (struct gws_window_d *) clipping_window;
-        }
-    }
-    */
 
 // #todo
 // Precisamos checar algumas globais, como HotSpotX e HotSpotY.
@@ -621,10 +414,10 @@ plotLine3d (
     z1 = x1;
 
     for (;;) {
-
-        grPlot0 ( NULL, z0, x0, y0, color );
-     
-        if (i-- == 0) { break; }
+        grPlot0 ( z0, x0, y0, color );
+        if (i-- == 0){
+            break;
+        }
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; }
         y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; }
         z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; }
@@ -680,10 +473,10 @@ plotCircleZ (
       //setPixel(xm+x, ym-y); /* III. Quadrant */
       //setPixel(xm+y, ym+x); /*  IV. Quadrant */
       
-      grPlot0 ( NULL, z, xm-x, ym+y, color);
-      grPlot0 ( NULL, z, xm-y, ym-x, color);
-      grPlot0 ( NULL, z, xm+x, ym-y, color);
-      grPlot0 ( NULL, z, xm+y, ym+x, color);
+      grPlot0 ( z, xm-x, ym+y, color );
+      grPlot0 ( z, xm-y, ym-x, color );
+      grPlot0 ( z, xm+x, ym-y, color );
+      grPlot0 ( z, xm+y, ym+x, color );
 
       r = err;
       
@@ -729,12 +522,14 @@ void noraDrawingStuff3 (int x, int y, int z)
             if ( _x != 0 )
             {
                 if ( _y % _x == 0 ){
-                    grPlot0 ( NULL, _z, _x, _y,COLOR_GREEN );
+                    grPlot0 ( _z, _x, _y,COLOR_GREEN );
                 }
             }
         };
-        
-        if ( _x >= limitY) { break; }
+        if (_x >= limitY)
+        { 
+            break;
+        }
     };
 }
 
@@ -788,7 +583,7 @@ void demo0(void)
 {
     // #test 
 
-    //grPlot0(NULL,0,10,10,COLOR_GREEN);
+    //grPlot0(0,10,10,COLOR_GREEN);
     //plotCircleZ ( 0, 12, 25, COLOR_GREEN, 0); 
     //plotLine3d ( 4, 3,0, 40, 2,0, COLOR_WHITE);
                         

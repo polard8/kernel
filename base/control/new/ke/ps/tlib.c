@@ -60,7 +60,7 @@ void *sys_get_message(unsigned long ubuf)
         goto fail0;
     }
 // Get standard entries.
-    message_address[0] = (unsigned long) m->window;
+    message_address[0] = (unsigned long) m->opaque_window;
     message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
     message_address[2] = (unsigned long) m->long1;
     message_address[3] = (unsigned long) m->long2;
@@ -83,10 +83,11 @@ void *sys_get_message(unsigned long ubuf)
 // clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
-    m->window = NULL;
+    m->opaque_window = NULL;
     m->msg = 0;
     m->long1 = 0;
     m->long2 = 0;
+
     m->long3 = 0;
     m->long4 = 0;
 
@@ -166,7 +167,7 @@ void *sys_get_message2(
         goto fail0;
     }
 // Get standard entries.
-    message_address[0] = (unsigned long) m->window;
+    message_address[0] = (unsigned long) m->opaque_window;
     message_address[1] = (unsigned long) (m->msg & 0xFFFFFFFF);
     message_address[2] = (unsigned long) m->long1;
     message_address[3] = (unsigned long) m->long2;
@@ -189,10 +190,12 @@ void *sys_get_message2(
 // Clear the entry.
 // Consumimos a mensagem. Ela não existe mais.
 // Mas preservamos a estrutura.
-    m->window = NULL;
+
+    m->opaque_window = NULL;
     m->msg = 0;
     m->long1 = 0;
     m->long2 = 0;
+
     m->long3 = 0;
     m->long4 = 0;
 
@@ -252,19 +255,15 @@ gramado_post(
     if (receiver_tid<0){
         return -1;
     }
-
     if ( (void*) message == NULL ){
         return -1;
     }
-
     message->sender_tid   = (tid_t) sender_tid;
     message->receiver_tid = (tid_t) receiver_tid;
-    
 // Post
     return (int) post_message_to_tid( 
-                     (tid_t) message->sender_tid,
-                     (tid_t) message->receiver_tid,
-                     NULL,
+                     (tid_t) sender_tid,
+                     (tid_t) receiver_tid,
                      (int) message->msg,
                      (unsigned long) message->long1,
                      (unsigned long) message->long2 );
@@ -280,8 +279,7 @@ gramado_post(
 int
 post_message_to_tid ( 
     tid_t sender_tid,
-    tid_t receiver_tid, 
-    struct window_d *window, 
+    tid_t receiver_tid,
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -352,7 +350,7 @@ post_message_to_tid (
         panic ("post_message_to_tid: m validation\n");
     }
 
-    m->window = (struct window_d *) window;
+    m->opaque_window = NULL;
     m->msg    = (int) (MessageCode & 0xFFFFFFFF);
     m->long1  = (unsigned long) long1;
     m->long2  = (unsigned long) long2;
@@ -394,7 +392,6 @@ fail0:
 // well tested.
 int
 post_message_to_ws ( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
@@ -424,7 +421,6 @@ post_message_to_ws (
     post_message_to_tid(
         (tid_t) src_tid,  // sender tid
         (tid_t) dst_tid,  // receiver tid
-        NULL,
         (int) msg,
         (unsigned long) long1,
         (unsigned long) long2 );
@@ -436,26 +432,20 @@ post_message_to_ws (
 // Post message to the foreground thread.
 int
 post_message_to_foreground_thread ( 
-    struct window_d *window, 
     int msg, 
     unsigned long long1, 
     unsigned long long2 )
 {
-
-// Paranoia.
     if ( foreground_thread < 0 || foreground_thread >= THREAD_COUNT_MAX ){
         return -1;
     }
-
     if (msg<0){
         return -1;
     }
-
 // #todo: Sender?
     return (int) post_message_to_tid(
                      (tid_t) 0, 
                      (tid_t) foreground_thread,
-                     window, 
                      (int) msg, 
                      (unsigned long) long1,
                      (unsigned long) long2 );
@@ -476,13 +466,11 @@ sys_post_message_to_tid(
     if ( dst_tid < 0 || dst_tid >= THREAD_COUNT_MAX ){
         return 0;
     }
-
 // Message buffer
     if (message_buffer == 0){
         return 0;
     }
     unsigned long *buf = (unsigned long *) message_buffer;
-
 // Message code
     int MessageCode = (int) ( buf[1] & 0xFFFFFFFF );
 
@@ -494,7 +482,6 @@ sys_post_message_to_tid(
     post_message_to_tid(
         (tid_t) src_tid,    // sender tid
         (tid_t) dst_tid,    // receiver tid
-        (struct window_d *) buf[0],  // #bugbug: It needs to be NULL?! 
         (int) MessageCode,
         (unsigned long) buf[2],
         (unsigned long) buf[3] );
