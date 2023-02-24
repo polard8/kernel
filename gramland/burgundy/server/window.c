@@ -1394,7 +1394,7 @@ void *doCreateWindow (
  */
 
 // =================================
-// #Shadow
+// ## Shadow ## (Frame shadow)
 // A sombra pertence à janela e ao frame.
 // A sombra é maior que a própria janela.
 // Se estivermos em full screen não tem sombra?
@@ -1441,7 +1441,7 @@ void *doCreateWindow (
     }
 
 // ===============================================
-// ## Background ##
+// ## Background ## (Frame)
 // Background para todo o espaço ocupado pela janela e pelo seu frame.
 // O posicionamento do background depende do tipo de janela.
 // Um controlador ou um editbox deve ter um posicionamento relativo
@@ -1502,7 +1502,9 @@ void *doCreateWindow (
             window->bg_color, __rop_flags );
     }
 
-// Client area rectangle
+// ===============================================
+// ## Client area rectangle ##
+//
 
     if (ClientArea == TRUE)
     {
