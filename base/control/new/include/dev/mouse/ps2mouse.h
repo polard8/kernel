@@ -72,11 +72,16 @@
 // mouse info.
 struct ps2_mouse_d
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
     file *fp;
-    int device_id;
     int initialized;
+    int irq_is_working;
+    int use_polling;
+    unsigned long last_jiffy;
+
+    int device_id;
+
     unsigned int resolution;
     unsigned int sample_rate;
 
@@ -92,9 +97,11 @@ struct ps2_mouse_d
     int has_wheel;
     int has_five_buttons;
 };
-//#todo
-// If we have only one mouse device.
-struct ps2_mouse_d  PS2Mouse;
+// see: ps2mouse.c
+extern struct ps2_mouse_d  PS2Mouse;
+
+
+
 
 extern unsigned long g_mousepointer_width;
 extern unsigned long g_mousepointer_height;
@@ -117,6 +124,8 @@ extern int mouse_button_action;
 void zzz_mouse_write(unsigned char data);
 unsigned char zzz_mouse_read (void);
 void mouse_expect_ack (void);
+
+void ps2mouse_poll(void);
 
 #endif   
 

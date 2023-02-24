@@ -6,6 +6,9 @@
 
 #include <kernel.h>
 
+// see: ps2mouse.h
+struct ps2_mouse_d  PS2Mouse;
+
 /*
  #todo
  enable mouse?
@@ -393,6 +396,9 @@ void ps2mouse_initialize_device(void)
 
     debug_print ("ps2mouse_initialize_device:\n");
     PS2Mouse.initialized = FALSE;
+    PS2Mouse.irq_is_working = FALSE;
+    PS2Mouse.use_polling = FALSE;
+    PS2Mouse.last_jiffy = jiffies;
 
 //====================================
 // #test
@@ -693,6 +699,27 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
     PS2Mouse.initialized = TRUE;
 }
 
+// #test
+// Poll keyboard
+void ps2mouse_poll(void)
+{
+
+// #bugbug
+// #todo
+// We need a loop for mouse polling.
+// It's because a packet uses more than on interrupt.
+
+/*
+    if (PS2Mouse.initialized != TRUE)
+        return;
+    if (PS2Mouse.irq_is_working == TRUE)
+        return;
+    if (PS2Mouse.use_polling == TRUE){
+        DeviceInterface_PS2Mouse();
+    }
+*/
+}
+
 // Called by irq12_MOUSE in mouse.c.
 // See: https://wiki.osdev.org/Mouse_Input
 // See: https://wiki.osdev.org/User:Kmtdk
@@ -756,6 +783,8 @@ void DeviceInterface_PS2Mouse(void)
     if ( is_mouse_device == FALSE )
         return;
 // =============================================
+
+    PS2Mouse.last_jiffy = jiffies;
 
 // Get the byte
     _byte = (unsigned char) in8(0x60);

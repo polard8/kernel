@@ -6,6 +6,9 @@
 
 #include <kernel.h>
 
+// see: ps2kbd.h
+struct ps2_keyboard_d  PS2Keyboard;
+
 static int __prefix=0;
 
 //
@@ -53,6 +56,9 @@ void ps2kbd_initialize_device (void)
 {
     debug_print ("ps2kbd_initialize_device:\n");
     PS2Keyboard.initialized = FALSE;
+    PS2Keyboard.irq_is_working = FALSE;
+    PS2Keyboard.use_polling = FALSE;
+    PS2Keyboard.last_jiffy = jiffies;
 
 //====================================
 // #test
@@ -96,7 +102,22 @@ void ps2kbd_initialize_device (void)
     __prefix=0;
 
     PS2Keyboard.initialized = TRUE;
-}  
+}
+
+
+// #test
+// Poll keyboard
+void ps2kbd_poll(void)
+{
+    if (PS2Keyboard.initialized != TRUE)
+        return;
+    if (PS2Keyboard.irq_is_working == TRUE)
+        return;
+    if (PS2Keyboard.use_polling == TRUE){
+        DeviceInterface_PS2Keyboard();
+    }
+}
+
 
 /*
  * DeviceInterface_PS2Keyboard: 
@@ -162,7 +183,9 @@ void DeviceInterface_PS2Keyboard(void)
 // #obs:
 // O byte pode ser uma resposta à um comando ou um scancode.
 
-sc_again:
+//sc_again:
+
+    PS2Keyboard.last_jiffy = jiffies;
 
 //===========================================
 // #test

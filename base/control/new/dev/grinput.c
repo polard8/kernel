@@ -928,6 +928,21 @@ int wmTimerEvent(int signature)
     }
 //--------------------
 
+/*
+//#test
+// Polling ps2
+    if ( (jiffies % (16) ) == 0 )
+    {
+        PS2Keyboard.use_polling=TRUE;
+        PS2Keyboard.irq_is_working=FALSE;
+        ps2kbd_poll();
+
+        PS2Mouse.use_polling=TRUE;
+        PS2Mouse.irq_is_working=FALSE;
+        ps2mouse_poll();
+    }
+*/
+
     return 0;
 }
 

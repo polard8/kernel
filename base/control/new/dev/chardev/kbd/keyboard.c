@@ -7,7 +7,6 @@
 
 #include <kernel.h>
 
-unsigned long gPS2KeyboardInputTime=0;
 
 // Status
 // @todo: Status pode ser (int).
@@ -27,14 +26,7 @@ unsigned long numlock_status=0;
 unsigned long scrolllock_status=0;
 //...
 
-static unsigned long ps2keyboard_watchdog_jiffies=0;
-
 // ==================================
-
-unsigned long ps2keyboard_get_last_wd_jiffies(void)
-{
-    return (unsigned long) ps2keyboard_watchdog_jiffies;
-}
 
 // ps/2 keyboard irq handler.
 __VOID_IRQ 
@@ -45,10 +37,9 @@ irq1_KEYBOARD (void)
         in8(0x60);
         return;
     }
-// Time
-    gPS2KeyboardInputTime = (unsigned long) jiffies;
-// Watchdog
-    ps2keyboard_watchdog_jiffies = (unsigned long) jiffies;
+    PS2Keyboard.irq_is_working = TRUE;
+    PS2Keyboard.last_jiffy = jiffies;
+
 // Disable mouse port.
 // Call the main routine.
 // Reenable the mouse port if ps2 mouse was initialized.

@@ -108,25 +108,23 @@ struct keyboardMessage
 // this is gonna be used by PS2 structure in ps2.h
 struct ps2_keyboard_d
 {
-    object_type_t  objectType;
+    object_type_t objectType;
     object_class_t objectClass;
-
     file *fp;
+    int initialized;
+    int irq_is_working;
+    int use_polling;
+    unsigned long last_jiffy;
 
     keyboard_type_t type;
-
-    int initialized;
-
 
     // #todo
     // int control_fd;
     // int input_fd;
     // pid_t pid;
 };
-
-// #todo
-// If we have only one kbd device.
-struct ps2_keyboard_d  PS2Keyboard;
+// see: ps2kbd.c
+extern struct ps2_keyboard_d  PS2Keyboard;
 
 // ======================================================
 
@@ -170,6 +168,8 @@ void xxx_keyboard_write (uint8_t data);
 
 unsigned char zzz_keyboard_read (void);
 void keyboard_expect_ack (void);
+
+void ps2kbd_poll(void);
 
 #endif    
 

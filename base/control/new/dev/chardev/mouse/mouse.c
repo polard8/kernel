@@ -6,7 +6,6 @@
 
 #include <kernel.h>
 
-unsigned long gPS2MouseInputTime=0;
 unsigned long g_mousepointer_width=0;
 unsigned long g_mousepointer_height=0;
 // Estado dos botões do mouse
@@ -20,14 +19,7 @@ int old_mouse_button_3=FALSE;
 // Se ouve alguma modificação no estado dos botões.
 int mouse_button_action=FALSE;
 
-static unsigned long ps2mouse_watchdog_jiffies=0;
-
 // ==============
-
-unsigned long ps2mouse_get_last_wd_jiffies(void)
-{
-    return (unsigned long) ps2mouse_watchdog_jiffies;
-}
 
 // ps/2 mouse irq handler.
 __VOID_IRQ 
@@ -38,10 +30,9 @@ irq12_MOUSE (void)
         in8(0x60);
         return;
     }
-// Time
-    gPS2MouseInputTime = (unsigned long) jiffies;
-// Watchdog
-    ps2mouse_watchdog_jiffies = (unsigned long) jiffies;
+    PS2Mouse.irq_is_working = TRUE;
+    PS2Mouse.last_jiffy = jiffies;
+
 // Disable keyboard port.
 // Call the main routine.
 // Reanable keyboard port.
