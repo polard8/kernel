@@ -1,10 +1,8 @@
 
 // fs.c
+// File system support.
 
 #include <kernel.h>
-
-
-struct system_fat_d sfMainFAT;
 
 
 // Canonical:
@@ -35,37 +33,12 @@ struct filesystem_d  *root;
 // gcc -Wall Defined but not used!
 static char *____root_name = "/";
 
-// Boot partition.
-int fat_cache_saved=FALSE;
-int fat_cache_loaded=FALSE;
-
 struct cwd_d  CWD;
 
 //char search_path[?];
 unsigned long search_path_dir_address=0;
 unsigned long search_path_dir_entries=0;
 
-
-//
-// == Cluster list ===============================
-//
-
-// Lista de clusters.
-// Isso permite salvar um arquivo com 32 mil clusters ??
-// #todo: Em que momento essa lista foi inicializada??
-
-// #bugbug: 
-// This list has 32 KB size.
-
-// #bugbug
-// Checar se essa 'e a quantidade limite de 
-// entradas que podemos acessar na fat.
-// Ou e' apenas o limite da lista.
-
-//#define CLUSTERS_TO_SAVE_MAX  (8*1024) //#bugbug
-#define CLUSTERS_TO_SAVE_MAX  (32*1024)
-
-unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 
 // ========================================
 
@@ -327,7 +300,7 @@ int file_read_buffer ( file *f, char *buffer, int len )
     }
 
 fail:
-    refresh_screen();
+    //refresh_screen();
     return EOF;
 }
 
@@ -518,7 +491,7 @@ file_write_buffer (
 // Unknown type.
 fail:
     //printf ("file_write_buffer: fail\n");
-    refresh_screen();
+    //refresh_screen();
     return EOF;
 }
 
@@ -857,7 +830,7 @@ RegularFile:
 
     if (fp->____object == ObjectTypePTMX){
         printk ("sys_read: [TODO] trying to read a PTMX device file\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -866,7 +839,7 @@ RegularFile:
 
     if (fp->____object == ObjectTypePTY){
         printk ("sys_read: [TODO] trying to read a PTY device file\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -875,7 +848,7 @@ RegularFile:
 
     if (fp->____object == ObjectTypeFileSystem){
         printk ("sys_read: [TODO] trying to read a file system\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -1299,7 +1272,7 @@ RegularFile:
 // Pseudo terminal multiplexer.
     if (fp->____object == ObjectTypePTMX){
         printk ("sys_write: [TODO] trying to write a PTMX device file\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -1307,7 +1280,7 @@ RegularFile:
 // pty () pseudo terminal.
     if (fp->____object == ObjectTypePTY){
         printk ("sys_write: [TODO] trying to write a PTY device file\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -1315,7 +1288,7 @@ RegularFile:
 // File system
     if (fp->____object == ObjectTypeFileSystem){
         printk ("sys_write: [TODO] trying to write a file system\n");
-        refresh_screen();
+        //refresh_screen();
         return 0;
     }
 
@@ -1411,7 +1384,7 @@ sys_open (
             // current process structure
             // and return the fd.
             printf("sys_open: #todo isDevice!\n");
-            refresh_screen();
+            //refresh_screen();
             return -1;
         }
     }
@@ -1602,7 +1575,7 @@ int sys_close(int fd)
 // Object type not supported.
     debug_print("sys_close:[FAIL] Object type not supported yet \n");
 fail:
-    debug_print("sys_close: [FAIL] \n");
+    debug_print("sys_close: [FAIL]\n");
     return (int) (-1);
 }
 
@@ -1720,7 +1693,7 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 
     // #debug
     // We need to see the error messages.
-    refresh_screen();
+    //refresh_screen();
 
     return (int) status;
 }
@@ -1775,7 +1748,7 @@ file *get_file_from_fd(int fd)
 
     return (file *) fp;
 fail:
-    refresh_screen();
+    //refresh_screen();
     return NULL;
 }
 
@@ -2132,7 +2105,7 @@ __OK:
 
     if ( __slot < 0 || __slot >= 32 ){
         printf ("sys_open_device_by_number: __slot fail\n");
-        refresh_screen();
+        //refresh_screen();
         return (int) (-1);
     }
 
@@ -2289,139 +2262,6 @@ int get_free_slots_in_the_inode_table(void)
     }
 
     return (int) -1;
-}
-
-// #todo: Describe this routine.
-// credits: hoppy os.
-// from 8.3
-// not tested yet.
-void 
-from_FAT_name (
-    char *src, 
-    char *dst )
-{
-    register int i=0;
-    int j=0;
-    int k=0;
-
-// #todo: 
-// debug messages.
- 
-    if ( (void *) src == NULL ){ return; }
-    if ( (void *) dst == NULL ){ return; }
-
-    if (*src == 0){ return; }
-    if (*dst == 0){ return; }
-
-// dirty
-// pra saber o tamanho do nome exluindo os espaços.
-
-    for (j=7; j >= 0 && src[j] == 0x20; j--)
-    {
-        // Nothing.
-    };
-
-    k=0;
-
-// j eh o tamanho do nome calculado anteriormente.
-// copia esse nome.
-
-    for ( i=0; i<=j; i++ )
-    {
-        dst[k++] = src[i];
-    };
-
-    if (*src != '.')
-    {
-        dst[k++] = '.';
-    }
-
-// dirty.
-// pra saber o tamanho da extensao, excluindo os espaços.
-    for (j=10; j>=8 && src[j]==0x20; j--)
-    {
-        // Nothing.
-    };
-    
-    //
-    if (j==7) {
-    
-        if (k==1){
-           dst[k]=0;
-        } else {
-
-            if (dst[0]=='.'){
-                dst[k]=0;
-            }else{
-                dst[k-1]=0;
-            };
-        };
-    
-    } else {
-        
-        for (i=8; i<=j; i++)
-        {
-            dst[k++] = src[i];
-        };
-        
-        dst[k++] = 0;
-    };
-}
-
-
-// #todo: Describe this routine.
-// credits: hoppy os.
-// to 8.3
-// not tested yet.
-void 
-to_FAT_name (
-    char *src,
-    char *dst )
-{
-    register int i=0;
-    char *ptr;
-
-    // Parent directory
-    if ( !strcmp(src,"..") ) {
-        strcpy(dst,src);
-        i=2;
-    
-    // Current directory
-    } else if (!strcmp(src,".")) {
-        strcpy(dst,src);
-        i=1;
- 
-    // Regular file.
-    } else {
-
-        ptr = src;
-        i=0;
-        
-        // Começamos com o nome.
-        while (i<8 && *ptr && *ptr != '.') 
-        {
-            dst[i++] = *ptr++;
-        };
-
-        // Completa com ' ' ate 8.
-        while (i<8){ dst[i++] = 0x20; };
-        
-        if (*ptr == '.') { ptr++; }
-        
-        // Agora a extensao
-        while (i<11 && *ptr){
-            dst[i++] = *ptr++;
-        };
-    };
-
-// Completa com espaço ate o fim.
-// 'i' indica o offset de onde devemos começar.
-// Isso tambem vai completar com espaço quando a extensao
-// tiver menos que 3 chars.
-
-    while (i<11){
-        dst[i++] = 0x20;
-    };
 }
 
 /*
@@ -2860,23 +2700,6 @@ int init_directory_facilities(void)
     return 0;
 }
 
-// Called by fsInit inthis document.
-int fat16Init (void)
-{
-    debug_print ("fat16Init: [TODO]\n");
-
-// Initializing the cache state.
-    fat_cache_loaded = FAT_CACHE_NOT_LOADED;
-    fat_cache_saved  = FAT_CACHE_NOT_SAVED;
-// Set type
-    set_filesystem_type(FS_TYPE_FAT16);
-// Structures and fat
-    fs_init_structures();
-    fs_init_fat();
-
-    return 0;
-}
-
 
 // #todo
 // Change the return type to 'int' and
@@ -3010,84 +2833,6 @@ void fs_init_structures (void)
     };
 }
 
-// #todo
-// Change the return type to 'int' and
-// remove all the messages. Maybe.
-void fs_init_fat (void)
-{
-    debug_print ("fs_init_fat: [TODO]\n");
-
-// root
-// The root file system structure.
-// "/"
-
-    if ( (void *) root == NULL ){
-        panic ("fs_init_fat: root\n");
-    }
-
-// ==================================
-
-// fat
-// Let's create the 'fat' structure.
-// See:
-
-    bootvolume_fat = 
-        (void *) kmalloc( sizeof(struct fat_d) );
-
-    if ( (void *) bootvolume_fat == NULL ){
-        panic ("fs_init_fat: bootvolume_fat\n");
-    }
-
-// Populate it with some values found in the root structure.
-    bootvolume_fat->initialized = FALSE;
-
-// ??
-// The same type of the root filesystem?
-    bootvolume_fat->type = (int) root->type;
-
-    bootvolume_fat->fat_address = 
-        (unsigned long) root->fat_address; 
-
-    bootvolume_fat->fat_first_lba = 
-        (unsigned long) root->fat_first_lba;
-    bootvolume_fat->fat_last_lba = 
-        (unsigned long) root->fat_last_lba;
-
-    //bootvolume_fat->fat_size_in_sectors = (unsigned long) root->fat_size_in_sectors;
-    //bootvolume_fat->size_in_bytes = 0;  // (bootvolume_fat->fat_size_in_sectors / 2), se sector=512.
-    //bootvolume_fat->size_in_kb = 0;     // bootvolume_fat->size_in_bytes/1024
-
-// #todo
-// Check this values.
-
-// #todo
-// What is this address?
-// Is this the virtual address of the
-// start of the fat table?
-
-    if ( bootvolume_fat->fat_address == 0 ){
-        panic ("fs_init_fat: bootvolume_fat->fat_address\n");
-    }
-
-// #bugbug: 
-// Is it int ?
-    if ( bootvolume_fat->type <= 0 ){
-        panic ("fs_init_fat: fat->type\n");
-    }
-
-    bootvolume_fat->volume = NULL;
-
-    // ...
-
-    bootvolume_fat->initialized = TRUE;
-    bootvolume_fat->used = TRUE;
-    bootvolume_fat->magic = 1234;
-
-// #bugbug
-// Tem que passar esse ponteiro para algum lugar.
-    //return;
-}
-
 // #todo: use int return.
 void file_close (file *_file)
 {
@@ -3156,105 +2901,6 @@ int fsCheckELFFile(unsigned long address)
     }
     return (int) elfCheckSignature(address);
 }
-
-/*
- * fsFAT16ListFiles:
- *     Mostra os nomes dos arquivos de um diretório.
- *     Sistema de arquivos fat16.
- * IN:
- * dir_address = Ponteiro para 
- * um endereço de memória onde foi carregado o diretório. 
- */
-// #todo
-// is dir_address virtual or physical?
-// Change this name to dir_pa or dir_va.
-
-void 
-fsFAT16ListFiles ( 
-    const char     *dir_name, 
-    unsigned short *dir_address, 
-    int            number_of_entries )
-{
-// Iterator
-    register int i=0;
-// Offset
-    int j=0;  
-// Max number of entries.
-    int max = number_of_entries;
-// 8.3
-    char NameString[12];
-// Buffer
-    unsigned short *shortBuffer = (unsigned short *) dir_address;
-    unsigned char  *charBuffer  = (unsigned char *)  dir_address;
-
-    if ( (void *) dir_name == NULL ){
-        printf ("fsFAT16ListFiles: [FAIL] dir_name\n");
-        goto fail;
-    }
-
-    if ( *dir_name == 0 ){
-        printf ("fsFAT16ListFiles: [FAIL] *dir_name\n");
-        goto fail;
-    }
-
-// banner message.
-// #bugbug
-// Missing string finalization.
-        
-    // printf ("fsFAT16ListFiles: Listing names in [%s]\n\n", 
-    //        dir_name );
-            
-// Number of entries.
-    if (number_of_entries <= 0){
-        debug_print ("fsFAT16ListFiles: number_of_entries\n");
-        goto fail;
-    }
-
-// #bugbug
-// Number of entries.
-    if (number_of_entries > 512){
-        debug_print ("fsFAT16ListFiles: number_of_entries is too big\n");
-        goto fail;
-    }
-
-// Show 'max' entries in the directory.
-
-    i=0; 
-    j=0;
-    while (i < max)
-    {
-        // Not invalid and not free.
-        if ( charBuffer[j] != FAT_DIRECTORY_ENTRY_LAST &&
-             charBuffer[j] != FAT_DIRECTORY_ENTRY_FREE )
-        {
-             // #bugbug
-             memcpy( 
-                 (char*) NameString, 
-                 (const char *) &charBuffer[j],
-                 11 );
-             NameString[11] = 0;  //finalize string
-             printf("%s\n", NameString );
-        }
-
-        // (32/2) proxima entrada! 
-        // (16 words) 512 vezes!
- 
-        //j += 16;  //short buffer  
-          j += 32;  //char buffer
-
-        i++;  
-    }; 
-
-    // ...
- 
-    goto done;
-
-fail:
-    printk ("fsFAT16ListFiles: fail\n");
-done:
-    refresh_screen();
-}
-
 
 /*
  * fsInitializeWorkingDiretoryString:
@@ -3569,7 +3215,7 @@ int fsList(const char *dir_name)
 
 fail:
     debug_print ("fsList: fail\n");
-    refresh_screen();
+    //refresh_screen();
     return -1;
 }
 
@@ -3622,267 +3268,9 @@ fsListFiles (
 fail:
     printf ("fail\n");
 done:
-    refresh_screen ();
+    //refresh_screen ();
     return;
 }
-
-// fsGetFileSize: 
-// #bugbug: Isso dá problemas na máquina real.
-// Essa rotina é chamada pela função fopen, por isso precisamos dela.
-// Pega o tamanho de um arquivo que está no diretório raiz.
-// #todo: 
-// Podemos alterar para pegar de um arquivo 
-// que esteja no diretório alvo.
-// #todo:
-// Antes de carregar um arquivo o sistema de arquivos
-// precisa preencher uma estrutura com informações sobre ele. 
-// se já existir um registro é melhor.
-// #bugbug
-// Estamos com problemas na string do nome.
-// #bugbug
-// Loading the root dir everytime.
-// #todo
-// is dir_address virtual or physical?
-// Change this name to dir_pa or dir_va.
-
-unsigned long 
-fsGetFileSize ( 
-    unsigned char *file_name, 
-    unsigned long dir_address )
-{
-    unsigned long FileSize=0;    // 64bit
-    unsigned int intFileSize=0;  // 32bit
-
-    register int i=0;
-    unsigned long max = 64;    //?? @todo: rever. Número máximo de entradas.
-    unsigned long z = 0;       //Deslocamento do rootdir 
-    unsigned long n = 0;       //Deslocamento no nome.
-
-    // #bugbug
-    // Estamos com problemas na string do nome.
- 
-    char NameX[13];
-    int CmpStatus = (-1);
-
-    int Spc=0;
-
-// #importante:
-// Poderíamos usar malloc ou alocador de páginas ??
-// #todo: 
-// Devemos carregar o diretório alvo.
-// VOLUME1_ROOTDIR_ADDRESS;
-    unsigned short *Dir = 
-        (unsigned short *) dir_address;
-
-// #todo: Devemos carregar o diretório atual.
-//unsigned long current_dir_address = (unsigned long) Newpage();
-//#todo: devemos checar se o endereço é válido.
-	//unsigned short *current_dir = (unsigned short *) current_dir_address;	
-// #todo: 
-// devemos chamar uma função que carregue um diretório no endereço passado 
-//via argumento.
-//...
-
-    debug_print ("fsGetFileSize: $\n");
-
-    if ( (void*) file_name == NULL ){
-        printk("fsGetFileSize: [ERROR] file_name\n");
-        goto fail;
-    }
-
-    if (*file_name == 0){
-        printk("fsGetFileSize: [ERROR] *file_name\n");
-        goto fail;
-    }
-
-    if (dir_address == 0){
-        printk("fsGetFileSize: [ERROR] dir_address\n");
-        goto fail;
-    }
-
-// Lock ??.
-    //taskswitch_lock();
-    //scheduler_lock();
-
-//
-// ## ROOT ##
-//
-
-//loadRoot:
-
-//Carrega o diretório raiz na memória.
-
-//#ifdef KERNEL_VERBOSE
-    //printf ("fsRootDirGetFileSize: Loading root..\n"); 
-//#endif
-
-// #bugbug
-// pega o tamanho de um arquivo que está no diretório raiz.
-// #todo: 
-// podemos alterar para pegar de um arquivo que esteja no diretório alvo.	
-// #bugbug
-// Estamos chamando isso toda vez que
-// tentamos abrir um arquivo.
-
-// Carregando o diretório raiz.
-// #bugbug
-// Case seja o diretório raiz ...
-// e essa for a primeira vez que estamos carregando um arquivo.
-// #todo: FIXME
-
-    if (dir_address == VOLUME1_ROOTDIR_ADDRESS)
-    {
-        // #bugbug
-        // We can not do this everytime this function
-        // is called.
-
-        fs_load_rootdir ( 
-            VOLUME1_ROOTDIR_ADDRESS, 
-            VOLUME1_ROOTDIR_LBA, 
-            32 );
-    }
-
-// #todo:
-// precisamos na verdade carregarmos o diretório corrente.
-// Continua ... 
-// Pegar mais informações sobre o sistema de arquivos.
-// #obs
-// Checa se é válida a estrutura do sistema de arquivos.
-// A intenção é obtermos a quantidade de entradas no diretório raiz.
-// #bugbug: 
-// Mas isso deveria ser feito para o diretório atual.
-
-//
-// == root filesystem structure ===============================
-//
-
-    if ( (void *) root == NULL ){
-        panic ("fsGetFileSize: [FAIL] No root file system!\n");
-    }else{
-
-        // Setores por cluster.
-        Spc = root->spc;
-        if (Spc <= 0){ panic ("fsGetFileSize: [FAIL] spc\n"); }
-
-        // Max entries ~ Número de entradas no rootdir.
-        // #bugbug: 
-        // Devemos ver o número de entradas no diretório raiz
-        // #bugbug: Esse valor não é válido para todos os diretórios
-        // por isso temos que usar estruturas para gerenciar
-        // diretórios e entradas.
-
-        max = root->dir_entries;
-        if (max <= 0){ panic ("fsGetFileSize: [FAIL] max root entries\n"); }
-
-        // More?! 
-        // ...
-    };
-
-//
-// file name
-//
-
-// #debug
-// vamos mostrar a string.
-    //printf ("fsGetFileSize: file_name={%s}\n", file_name);
-
-// Busca simples pelo arquivo no diretório raiz.
-// todo: Essa busca pode ser uma rotina mais sofisticada. 
-// Uma função auxiliar.
-// Primero caractere da entrada:
-// 0 = entrada vazia.
-// $ = entrada de arquivo deletado.
-// outros ...
-// ATENÇÃO:
-// Na verdade a variável 'root' é do tipo short.
-
-// Procura o arquivo no diretório raiz.
-
-//search_file:
-
-// file name limit.
-// Se o tamanho da string falhou, vamos ajustar.
-
-    size_t szFileName = (size_t) strlen(file_name); 
-    if (szFileName > 11){
-        printf ("fsGetFileSize: [FIXME] name size fail %d\n",
-            szFileName );   
-        szFileName = 11;
-    }
-
-// Compare.
-// Copia o nome e termina incluindo o char 0.
-// Compara 11 caracteres do nome desejado, 
-// com o nome encontrado na entrada atual.
-    i=0; 
-    while (i < max)
-    {
-        // Se a entrada não for vazia.
-        if ( Dir[z] != 0 )
-        {
-            memcpy ( NameX, &Dir[z], szFileName );
-            NameX[szFileName] = 0;
-            CmpStatus = strncmp ( file_name, NameX, szFileName );
-            if ( CmpStatus == 0 ){
-                goto found;
-            }
-            // Nothing
-        }; 
-
-        // Next entry.
-        // (32/2)  (16 words) 512 times!
-
-        z += 16;    
-        i++;        
-    }; 
-
-// Not found!
-
-fail:
-
-    if ( (void*) file_name != NULL ){
-        printf ("fsGetFileSize: [FAIL] %s not found\n", file_name );
-     }
-
-    //if ( (void*) NameX != NULL )
-        // printf ("fsRootDirGetFileSize: %s not found\n", NameX );
-
-    refresh_screen();
-    return (unsigned long) 0;
-
-// Found!
-
-found:
-
-    // #debug
-    // printf("arquivo encontrado\n");
-    // refresh_screen();
-    // while(1){}
-
-// #debug
-// Pegando o tamanho do arquivo.
-// Offsets: 28 29 30 31
-
-    //FileSize = *(unsigned long*) (VOLUME1_ROOTDIR_ADDRESS + (z*2) + 28 );
-    intFileSize = *(unsigned int *) (dir_address + (z*2) + 28 );
-
-    FileSize = (unsigned long) intFileSize;
-
-	//printf ("%d \n" , root[ z+14 ]);
-	//printf ("%d \n" , root[ z+15 ]);
-	//printf ("done: FileSize=%d \n" , FileSize);
-
-	//#debug
-	//refresh_screen();
-	//while(1){ asm("hlt"); }
-
-    // #debug
-    // printf ("fsRootDirGetFileSize: FileSize=%d \n" , FileSize );
-    // refresh_screen ();
-
-    return (unsigned long) ( FileSize & 0x00000000FFFFFFFF );
-}
-
 
 /*
  * fsUpdateWorkingDiretoryString:
@@ -3989,32 +3377,6 @@ void fsUpdateWorkingDiretoryString ( char *string )
 
     //debug_print ("fsUpdateWorkingDiretoryString: done\n"); 
 }
-
-// helper function to handle fat cache status.
-void fs_fat16_cache_not_saved(void)
-{
-    fat_cache_saved = FAT_CACHE_NOT_SAVED;
-}
-
-int fs_save_fat16_cache(void)
-{
-    debug_print("fs_save_fat16_cache: Saving FAT cache\n");
-
-    if (fat_cache_saved != FAT_CACHE_NOT_SAVED){
-        return -1;
-    }
-
-// #todo: Change this name.
-// see: dev/disk_w.c
-    fs_save_fat(
-        VOLUME1_FAT_ADDRESS,
-        VOLUME1_FAT_LBA,
-        VOLUME1_FAT_SIZE );
-    fat_cache_saved = FAT_CACHE_SAVED;
-
-    return 0;
-}
-
 
 /*
  * fs_fntos:     
@@ -4326,7 +3688,7 @@ int fs_print_process_cwd(pid_t pid)
                 p->pid, current_target_dir.name);
         }
 
-        refresh_screen();
+        //refresh_screen();
         return 0;
     };
 
@@ -4368,7 +3730,7 @@ void fs_show_file_table(void)
         }
     };
 
-    refresh_screen();
+    //refresh_screen();
 }
 
 void fs_show_inode_info (struct inode_d *i)
@@ -4407,7 +3769,7 @@ void fs_show_inode_table(void)
         }
     };
 
-    refresh_screen();
+    //refresh_screen();
 }
 
 void fs_show_root_fs_info(void)
@@ -4441,7 +3803,7 @@ void fs_show_root_fs_info(void)
 fail:
     printf("fail\n");
 done:
-    refresh_screen();
+    //refresh_screen();
     return;
 }
 
@@ -4583,6 +3945,7 @@ fsSaveFile (
     }
 
 // Load root dir and FAT.
+// see: dev/blkdev/disk_r.c
     fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
     fs_load_fat( VOLUME1_FAT_ADDRESS, VOLUME1_FAT_LBA, 246 );
 
@@ -4925,14 +4288,14 @@ do_save_dir_and_fat:
     // #debug
     //debug_print ("fsSaveFile: done\n");
     //printf      ("fsSaveFile: done\n");
-    refresh_screen();
+    //refresh_screen();
 
     return 0;
 
 fail:
     debug_print ("fsSaveFile: Fail\n");
     printf      ("fsSaveFile: Fail\n");
-    refresh_screen ();
+    //refresh_screen ();
     return (int) 1;  // Why 1?
     //return -1;
 }
@@ -5111,30 +4474,30 @@ sys_read_file_from_disk (
     if (Status != TRUE)
     {
          //#debug
-         printf ("sys_read_file_from_disk: [FIXME] File not found!\n");
-         refresh_screen();
-         
-         // Create a new one.
-         // #todo: Use sys_crete_empty_file.
-         if (flags & O_CREAT)
-         {
-             debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
+        printf ("sys_read_file_from_disk: [FIXME] File not found!\n");
+        //refresh_screen();
 
-             // #todo:
-             // Define the default value for this case.
-             buff = (void*) kmalloc(1024);
-             if ((void*)buff==NULL){
-                 printf("sys_read_file_from_disk: buff\n");
-                 goto fail;
-             }
-             memset(buff,0,1024);
-             sprintf(buff,"This is a new file.");
+        // Create a new one.
+        // #todo: Use sys_crete_empty_file.
+        if (flags & O_CREAT)
+        {
+            debug_print ("sys_read_file_from_disk: [O_CREAT] Creating a new file\n"); 
 
-             //++
-             // See: 
-             __ret = 
-                 (int) fsSaveFile ( 
-                           VOLUME1_FAT_ADDRESS, 
+            // #todo:
+            // Define the default value for this case.
+            buff = (void*) kmalloc(1024);
+            if ((void*)buff==NULL){
+                printf("sys_read_file_from_disk: buff\n");
+                goto fail;
+            }
+            memset(buff,0,1024);
+            sprintf(buff,"This is a new file.");
+
+            //++
+            // See: 
+            __ret = 
+                (int) fsSaveFile ( 
+                          VOLUME1_FAT_ADDRESS, 
                            TargetDirAddress, 
                            NumberOfEntries, 
                            (char *) file_name, 
@@ -5316,7 +4679,7 @@ __OK:
         {
             printf ("sys_read_file_from_disk: File size out of limits\n");
             printf ("%d bytes \n",FileSize);
-            refresh_screen();
+            //refresh_screen();
             return (-1);
         }
         
@@ -5327,7 +4690,7 @@ __OK:
         
         if ( (void *) fp->_base == NULL ){
             printf ("sys_read_file_from_disk: Couldn't create a new buffer\n");
-            refresh_screen();
+            //refresh_screen();
             return -1;             
         }
  
@@ -5383,7 +4746,7 @@ __OK:
     if (fp->_fsize >= fp->_lbfsize)
     {
         printf ("sys_read_file_from_disk: the file is larger than the buffer\n");
-        refresh_screen();
+        //refresh_screen();
         fp->_r = fp->_lbfsize;
         fp->_w = fp->_lbfsize;
         fp->_cnt = 0;
@@ -5518,7 +4881,7 @@ done:
 // Pois essa rotina eh usada por open();
     return (int) fp->_file;
 fail:
-    refresh_screen();
+    //refresh_screen();
     return -1;
 }
 

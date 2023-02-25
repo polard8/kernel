@@ -25,7 +25,6 @@ static void cry(unsigned long flags);
 
 static void __on_finished_executing(struct thread_d *t)
 {
-
     if ( (void*) t == NULL )
         panic("__on_finished_executing: t\n");
     if (t->magic!=1234)

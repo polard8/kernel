@@ -5,15 +5,6 @@
 #define __FS_FS_H    1
 
 
-// fat info for the boot partition of the system disk.
-struct system_fat_d
-{
-    int initialized;
-    // ...
-};
-extern struct system_fat_d sfMainFAT;
-
-
 // Main directories in the system.
 struct system_directory_d
 {
@@ -170,22 +161,9 @@ extern struct cwd_d  CWD;
 #define  FS_UNKNOWNWORKINGDIRECTORY_ID  (-1)
 
 
-// FAT cache
-#define FAT_CACHE_LOADED       1
-#define FAT_CACHE_NOT_LOADED   0
-#define FAT_CACHE_SAVED        1
-#define FAT_CACHE_NOT_SAVED    0
-
-
-
 //
 //  == Variables =================================
 //
-
-// Boot partition.
-extern int fat_cache_saved;
-extern int fat_cache_loaded;
-
 
 
 //
@@ -514,9 +492,7 @@ void *get_file(int Index);
 void set_file( void *file, int Index);
 
 int fsInit (void);
-int fat16Init (void);
 void fs_init_structures (void);
-void fs_init_fat (void);
 
 void file_close (file *_file);
 size_t file_get_len(file *_file);
@@ -524,11 +500,7 @@ struct inode_d *file_inode (file *f);
 int file_truncate ( file *_file, size_t len);
 int fsCheckELFFile ( unsigned long address );
 
-void 
-fsFAT16ListFiles ( 
-    const char     *dir_name, 
-    unsigned short *dir_address, 
-    int            number_of_entries );
+
     
 int init_directory_facilities(void);
 void fsInitializeWorkingDiretoryString (void);
@@ -603,13 +575,11 @@ fs_save_rootdir (
     unsigned long root_lba, 
     size_t root_size );
 
-unsigned long 
-fsGetFileSize ( 
-    unsigned char *file_name, 
-    unsigned long dir_address );
 
 void fsUpdateWorkingDiretoryString (char *string);
-void fs_fat16_cache_not_saved(void);
+
+
+
 void fs_fntos(char *name);
 int fs_get_free_fd_from_pid (pid_t pid);
 int fs_initialize_process_cwd ( pid_t pid, char *string );

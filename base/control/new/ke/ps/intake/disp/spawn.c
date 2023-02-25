@@ -13,7 +13,6 @@ static int __spawn_is_eoi_needed(void);
 
 //=====================
 
-
 // global
 // used by the taskswitching
 void spawn_set_eoi_state(void)
@@ -23,7 +22,6 @@ void spawn_set_eoi_state(void)
 
 // global
 // used by the taskswitching
-
 void spawn_reset_eoi_state(void)
 {
     __spawn_eoi_is_necessary = FALSE;
@@ -67,8 +65,7 @@ void spawn_thread(int tid)
 
     debug_print ("spawn_thread: target_thread\n");
 
-    if ( next_tid < 0 || next_tid >= THREAD_COUNT_MAX )
-    {
+    if ( next_tid < 0 || next_tid >= THREAD_COUNT_MAX ){
         printf ("spawn_thread: next_tid=%d", next_tid );  
         die();
     }
@@ -76,15 +73,14 @@ void spawn_thread(int tid)
 // target thread.
 
     target_thread = (void *) threadList[next_tid]; 
-
     if ( (void *) target_thread == NULL )
     {
         printf ("spawn_thread: target_thread, next_tid={%d}", 
             next_tid );  
         die();
     }
-
-    if ( target_thread->used != TRUE || target_thread->magic != 1234 )
+    if ( target_thread->used != TRUE || 
+         target_thread->magic != 1234 )
     {
         panic("spawn_thread: target_thread validation");
     }
@@ -96,7 +92,6 @@ void spawn_thread(int tid)
         debug_print ("spawn_thread: Spawning the control thread of a new clone\n");
         //refresh_screen();
     }
-
 
 // Check tid validation
     if (target_thread->tid != next_tid){
@@ -120,13 +115,11 @@ void spawn_thread(int tid)
 // Initializing
 // Not saved
     target_thread->saved = FALSE;
-
     target_thread->exit_in_progress = FALSE;
 
 // ??
 // More checks ?
 // Prepare some elements.
-
 // #todo
 // Talvez ja exista um worker para essa rotina.
 
@@ -145,10 +138,8 @@ void spawn_thread(int tid)
 // Initial jiffie
 // Spawn time.
     target_thread->initial_jiffy = (unsigned long) jiffies;
-
 // how much tick untill now.
     target_thread->step = 0;
-
     target_thread->initial_time_ms = 0;
     target_thread->total_time_ms = 0;
 
@@ -161,7 +152,7 @@ void spawn_thread(int tid)
 // MOVEMENT 2 (Standby --> Running).
 //
 
-    if ( target_thread->state == STANDBY )
+    if (target_thread->state == STANDBY)
     {
         target_thread->state = RUNNING;
         
@@ -175,22 +166,18 @@ void spawn_thread(int tid)
         //    QUEUE_RUNNING );
     }
 
-    // Destrava o mecanismo de taskswitch.
-    // Destrava o Scheduler.
-
+// Destrava o mecanismo de taskswitch.
+// Destrava o Scheduler.
     set_task_status(UNLOCKED);
     scheduler_unlock(); 
 
-    // Paranoia: Check state.
-
-    if ( target_thread->state != RUNNING ){
+// Paranoia: Check state.
+    if (target_thread->state != RUNNING){
         printf ("spawn_thread: State TID={%d}\n", next_tid );
         die();
     }
 
-
 // Do we have an owner process?
-
     if ( (void*) target_thread->owner_process == NULL ){
         panic("spawn_thread: target_thread->owner_process\n");
     }
@@ -200,43 +187,31 @@ void spawn_thread(int tid)
 // Talvez o ponteiro t->process nao foi devidamente inicializado.
 
     //pid_t cur_pid = (pid_t) target_thread->process->pid;
-    
     pid_t cur_pid = (pid_t) target_thread->owner_pid;
-    
-    if ( cur_pid < 0 || 
-         cur_pid >= PROCESS_COUNT_MAX )
-    {
+
+    if ( cur_pid < 0 || cur_pid >= PROCESS_COUNT_MAX ){
         panic("spawn_thread: cur_pid\n");
     }
 
 // The current process will be the owner pid.
-
     set_current_process(cur_pid);
     
 
 // Set current thread
 // (global) (tid)
-
-    //(tid)
+//(tid)
     current_thread = (int) target_thread->tid;
-
-// paranoia
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         panic("spawn_thread: current_thread\n");
     }
 
     IncrementDispatcherCount (SELECT_INITIALIZED_COUNT);
-
-
 
 // local
 // Set cr3 and flush TLB.
 
     debug_print ("spawn_thread: Load pml4\n");
     __spawn_load_pml4_table ( target_thread->pml4_PA );
-
 
 //#bugbug
 //Maybe we need to call a method for that.
@@ -269,7 +244,6 @@ void spawn_thread(int tid)
         panic("spawn_thread: eoi_is_needed != TRUE\n");
     }
 
-
 //
 // cpl
 //
@@ -282,12 +256,10 @@ void spawn_thread(int tid)
     }
 */
 
-    if( target_thread->cpl != RING3)
-    {
+    if (target_thread->cpl != RING3){
         debug_print ("spawn_thread: Invalid cpl\n");
         panic       ("spawn_thread: Invalid cpl\n");
     }
-
 
 // ===================
 // ring 0
@@ -299,9 +271,7 @@ void spawn_thread(int tid)
     if ( target_thread->cpl == RING0 )
     {
         //#debug
-        
         debug_print ("spawn_thread: RING0\n");
-        
         //printf      ("spawn_thread: RING0\n");
         //debug_print ("spawn_thread: RING0 not supported yet\n");
         //panic       ("spawn_thread: RING0 not supported yet\n");
@@ -340,7 +310,7 @@ void spawn_thread(int tid)
 // ===================
 // ring 3
     
-    if ( target_thread->cpl == RING3 )
+    if (target_thread->cpl == RING3)
     {
         spawn_enter_usermode( 
             TRUE,  // EOI
@@ -366,7 +336,6 @@ void spawn_thread(int tid)
     asm ("movb $0x20, %al \n");
     asm ("outb %al, $0x20 \n");
 
-
     asm volatile ( 
         " movq $0, %%rax    \n" 
         " mov %%ax, %%ds    \n" 
@@ -391,7 +360,6 @@ void spawn_thread(int tid)
     panic ("spawn_thread: [ERROR] iretq fail\n");
 }
 
-
 // do not check parameters.
 void 
 spawn_enter_usermode( 
@@ -413,32 +381,30 @@ spawn_enter_usermode(
         asm ("outb %al, $0x20 \n");
     }
 
-
 // #bugbug
 // Only for ring 3 with iopl 3. weak protection.
 
     asm volatile ( 
-        " movq $0, %%rax    \n" 
-        " mov %%ax, %%ds    \n" 
-        " mov %%ax, %%es    \n" 
-        " mov %%ax, %%fs    \n" 
-        " mov %%ax, %%gs    \n" 
-        " movq %0, %%rax    \n" 
-        " movq %1, %%rsp    \n" 
-        " movq $0, %%rbp    \n" 
-        " pushq $0x23       \n"  
-        " pushq %%rsp       \n" 
-        " pushq $0x3202     \n"  // Interrupts enabled for the thread that is not the first.
-        " pushq $0x1B       \n" 
-        " pushq %%rax       \n" 
-        " iretq             \n" :: "D"(entry), "S"(rsp3) );
-  
+        " movq $0, %%rax  \n" 
+        " mov %%ax, %%ds  \n" 
+        " mov %%ax, %%es  \n" 
+        " mov %%ax, %%fs  \n" 
+        " mov %%ax, %%gs  \n" 
+        " movq %0, %%rax  \n" 
+        " movq %1, %%rsp  \n" 
+        " movq $0, %%rbp  \n" 
+        " pushq $0x23     \n"  
+        " pushq %%rsp     \n" 
+        " pushq $0x3202   \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x1B     \n" 
+        " pushq %%rax     \n" 
+        " iretq           \n" :: "D"(entry), "S"(rsp3) );
+
     PROGRESS("spawn_enter_usermode: -- iretq fail ---\n");
 
     // Paranoia
     panic ("spawn_enter_usermode: [ERROR] iretq fail\n");
 }
-
 
 // do not check parameters.
 void 
@@ -447,18 +413,14 @@ spawn_enter_kernelmode(
     unsigned long entry_va,  // Entry point
     unsigned long rsp0_va )  // Stack pointer.
 {
-
-    // This is the entry point of the new thread
+// This is the entry point of the new thread
     unsigned long entry = (unsigned long) entry_va;
-
     unsigned long rsp0  = (unsigned long) rsp0_va;
-
 
     // #debug
     //printf("rsp0: %x \n",rsp0);
     //refresh_screen();
     //while(1){}
-
 
     if ( eoi == TRUE ){
         asm ("movb $0x20, %al \n");
@@ -467,31 +429,29 @@ spawn_enter_kernelmode(
 
 // #todo
 // We need to review the stack frame for ring0
-
 // only for ring 0 threads with iopl 0.
 
     asm volatile ( 
-        " movq $0, %%rax    \n" 
-        " mov %%ax, %%ds    \n" 
-        " mov %%ax, %%es    \n" 
-        " mov %%ax, %%fs    \n" 
-        " mov %%ax, %%gs    \n"
-        " movq %0, %%rax    \n" 
-        " movq %1, %%rsp    \n" 
-        " movq $0, %%rbp    \n" 
-        " pushq $0x10       \n"  
-        " pushq %%rsp       \n" 
-        " pushq $0x0202     \n"  // Interrupts enabled for the thread that is not the first.
-        " pushq $0x8       \n" 
-        " pushq %%rax       \n" 
-        " iretq             \n" :: "D"(entry), "S"(rsp0) );
-  
+        " movq $0, %%rax  \n" 
+        " mov %%ax, %%ds  \n" 
+        " mov %%ax, %%es  \n" 
+        " mov %%ax, %%fs  \n" 
+        " mov %%ax, %%gs  \n"
+        " movq %0, %%rax  \n" 
+        " movq %1, %%rsp  \n" 
+        " movq $0, %%rbp  \n" 
+        " pushq $0x10     \n"  
+        " pushq %%rsp     \n" 
+        " pushq $0x0202   \n"  // Interrupts enabled for the thread that is not the first.
+        " pushq $0x8      \n" 
+        " pushq %%rax     \n" 
+        " iretq           \n" :: "D"(entry), "S"(rsp0) );
+
     PROGRESS("spawn_enter_kernelmode: -- iretq fail ---\n");
 
     // Paranoia
     panic ("spawn_enter_kernelmode: [ERROR] iretq fail\n");
 }
-
 
 // KiSpawnTask:
 // Interface to spawn a thread.
@@ -500,8 +460,7 @@ void KiSpawnThread(int tid)
 {
     debug_print ("KiSpawnThread:\n");
 
-    if ( tid < 0 || tid >= THREAD_COUNT_MAX )
-    {
+    if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
         printf("KiSpawnThread: TID=%d\n", tid );
         die();
     }
@@ -509,7 +468,6 @@ void KiSpawnThread(int tid)
 // Not reached
     panic("KiSpawnThread:\n");
 }
-
 
 // spawn_pid:
 // Spawn the control thread of a process.
@@ -529,25 +487,20 @@ void spawn_pid(pid_t pid)
     }
 
 // process structure.
-
     p = (struct process_d *) processList[pid];
-    
     if ( (void*) p == NULL ){
         panic("spawn_pid: p\n");
     }
-
-    if ( p->used != TRUE || p->magic != 1234 )
-    {
+    if ( p->used != TRUE || p->magic != 1234 ){
         panic("spawn_pid: p validation\n");
     }
 
-// spawn
+// Spawn
     __tid = (tid_t) p->control->tid;
     KiSpawnThread(__tid);
-// not reached
-    panic("spawn_pid: fail");
+// Not reached
+    panic("spawn_pid: Fail\n");
 }
-
 
 void spawn_tid(int tid)
 {
@@ -557,16 +510,14 @@ void spawn_tid(int tid)
         panic("spawn_tid: tid\n");
 
     t = (struct thread_d *) threadList[tid];
-    
     if ( (void*) t == NULL )
         panic("spawn_tid: tid\n");
-
     if ( t->used != TRUE || t->magic != 1234 )
         panic("spawn_tid: validation\n");
 
-// spawn
+// Spawn
     KiSpawnThread(tid);
-// not reached
-    panic("spawn_tid: fail");
+// Not reached
+    panic("spawn_tid: Fail\n");
 }
 

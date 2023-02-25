@@ -97,6 +97,19 @@
 #define FILE_ATTRIBUTE_UNUSED1       0x40
 #define FILE_ATTRIBUTE_UNUSED2       0x80
 
+
+// FAT cache
+#define FAT_CACHE_LOADED       1
+#define FAT_CACHE_NOT_LOADED   0
+#define FAT_CACHE_SAVED        1
+#define FAT_CACHE_NOT_SAVED    0
+
+// Boot partition.
+extern int fat_cache_saved;
+extern int fat_cache_loaded;
+
+
+
 //
 // FAT16 directory entry
 //
@@ -150,7 +163,6 @@ struct fat_d
 
     int type;
 
-
     unsigned long fat_address;      // endereço da fat  
 
     unsigned long fat_first_lba;    // first lba
@@ -167,23 +179,54 @@ struct fat_d
     
     struct volume_d *volume;
 };
-
-
 // See: 
 // fs_init_fat in fs.c
-
 // A FAT usada no boot volume.
-struct fat_d  *bootvolume_fat;
+// see: fat16.c
+extern struct fat_d  *bootvolume_fat;
+
+
+// fat info for the boot partition of the system disk.
+struct system_fat_d
+{
+    int initialized;
+    //#todo
+    //struct fat_d  *_fat;
+    // ...
+};
+extern struct system_fat_d sfMainFAT;
+
+
+//#define CLUSTERS_TO_SAVE_MAX  (8*1024) //#bugbug
+#define CLUSTERS_TO_SAVE_MAX  (32*1024)
+// see: fat16.c
+extern unsigned short fat16ClustersToSave[CLUSTERS_TO_SAVE_MAX];
 
 
 // 
 // == prototypes ==========================================
 //
 
+
 void from_FAT_name( char *src, char *dst );
 void to_FAT_name( char *src, char *dst );
 
+void fs_fat16_cache_not_saved(void);
 int fs_save_fat16_cache(void);
+
+unsigned long 
+fsGetFileSize ( 
+    unsigned char *file_name, 
+    unsigned long dir_address );
+
+void 
+fsFAT16ListFiles ( 
+    const char     *dir_name, 
+    unsigned short *dir_address, 
+    int            number_of_entries );
+
+void fat16_init_fat_structure(void);
+int fat16Init(void);
 
 #endif    
 

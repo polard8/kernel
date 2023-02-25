@@ -1,14 +1,11 @@
 
 // dispatch.c
 
-
 #include <kernel.h>  
-
 
 // Contador de dispatch por categoria de dispatch.
 // #todo: Cada processador pode ter uma dessa?
 // See: dispatch.h
-
 struct dispatch_count_d  *DispatchCountBlock;
 
 /*
@@ -20,12 +17,10 @@ struct dispatch_count_d  *DispatchCountBlock;
  * Obs: Esse modelo apresentou bons resultados por muito 
  * tempo. Vamos preserva-lo. 
  */
-
 // #todo
 // Create error messages.
 // Isse é chamado várias vezes, é melhor não ter mensagem de debug.
 // See: dispatch.h
-
 void IncrementDispatcherCount (int type)
 {
 

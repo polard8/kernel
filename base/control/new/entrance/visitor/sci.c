@@ -407,8 +407,10 @@ static void *__extra_services (
 // Isso poderá ser chamado pelo init.bin, pelo shell
 // ou qualquer outro.
 // see: 
-    if ( number == 350 ){
-        printf("350:\n"); refresh_screen();
+    if ( number == 350 )
+    {
+        printf("350:\n"); 
+        //refresh_screen();
         return (void *) sys_initialize_component ((int) arg2);
     }
 
@@ -1750,7 +1752,7 @@ void *sci0 (
             {
                 debug_print("sci0: [SYS_PWD] Yes, I'm the super user.\n");
                 printf     ("sci0: [SYS_PWD] Yes, I'm the super user.\n");
-                refresh_screen();
+                //refresh_screen();
             }
             sys_pwd();
             return NULL;
