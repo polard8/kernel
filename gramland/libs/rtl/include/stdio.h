@@ -799,6 +799,10 @@ int libcStartTerminal (void);
 /*Inicialização da biblioteca*/
 void stdioInitialize(void);
 
+int
+rtl_GetS(
+    unsigned char *buf,
+    size_t size );
 
 int rtl_y_or_n(void);
 int rtl_are_you_sure(void);

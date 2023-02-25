@@ -47,7 +47,7 @@
 // área da janela de aplicativo.
 // Usado somente por overlapped window.
 // #todo: Bigger will crash?
-#define METRICS_TITLEBAR_ORNAMENT_SIZE  1
+#define METRICS_TITLEBAR_ORNAMENT_SIZE  2
 
 //
 // Application window.

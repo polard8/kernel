@@ -1516,7 +1516,7 @@ wmCreateWindowFrame (
     unsigned int border_color3,
     unsigned int ornament_color1,
     unsigned int ornament_color2,
-    int style );
+    int frame_style );
 
 // Low level
 void *doCreateWindow ( 

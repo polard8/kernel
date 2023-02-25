@@ -1520,7 +1520,7 @@ void do_create_controls(struct gws_window_d *window)
 
     unsigned long LastLeft = 0; 
     
-    unsigned long TopPadding=2;  // Top margin
+    unsigned long TopPadding=1; //2;  // Top margin
     unsigned long RightPadding=2;  // Right margin
     
     unsigned long SeparatorWidth=1;
@@ -1657,8 +1657,12 @@ struct gws_window_d *do_create_titlebar(
 {
     struct gws_window_d *tbWindow;
     unsigned long BorderSize = border_size;
+
+    unsigned long TitleBarLeft=0;
+    unsigned long TitleBarTop=0;
     unsigned long TitleBarWidth=0;
     unsigned long TitleBarHeight = tb_height;  //#todo metrics
+
     unsigned int TitleBarColor = color;
     unsigned long rop = 0;
 
@@ -1667,9 +1671,39 @@ struct gws_window_d *do_create_titlebar(
     if (parent->magic!=1234)
         return NULL;
 
+    // Se a parent é uma overlapped  e esta maximizada
+    // então faremos uma title bar diferente,
+    // que preencha todo o topo da tela.
+    int IsMaximized=FALSE;
+    if (parent->type == WT_OVERLAPPED &&
+        parent->style == WS_MAXIMIZED )
+    {
+        IsMaximized=TRUE;
+    }
+
+    //#todo: Different position, depending on the style
+    // if maximized or not.
+    if (IsMaximized==TRUE)
+    {
+        TitleBarLeft=0;
+        TitleBarTop=0;
+    }
+    if (IsMaximized!=TRUE)
+    {
+        TitleBarLeft=0;
+        TitleBarTop=0;
+    }
+
+// Width
+    // Considere as bordas.
     TitleBarWidth = 
         (parent->width - BorderSize - BorderSize);
+    // Desconsidere as cordas.
+    if (IsMaximized==TRUE)
+        TitleBarWidth = parent->width;
     parent->titlebar_width = TitleBarWidth;
+
+// Height
     parent->titlebar_height = TitleBarHeight;
 
     parent->titlebar_color = (unsigned int) TitleBarColor;
@@ -1686,7 +1720,10 @@ struct gws_window_d *do_create_titlebar(
     tbWindow = 
        (void *) doCreateWindow ( 
                     WT_SIMPLE, 0, 1, 1, "TitleBar", 
-                    0, 0, TitleBarWidth, TitleBarHeight, 
+                    TitleBarLeft, 
+                    TitleBarTop, 
+                    TitleBarWidth, 
+                    TitleBarHeight, 
                     (struct gws_window_d *) parent, 
                     0, 
                     TitleBarColor,  //frame 
@@ -1763,6 +1800,9 @@ struct gws_window_d *do_create_titlebar(
 // Usado somente por overlapped window.
 
     unsigned int OrnamentColor1 = ornament_color;
+    unsigned long OrnamentHeight = METRICS_TITLEBAR_ORNAMENT_SIZE;
+    if (IsMaximized == TRUE)
+        OrnamentHeight = 1;
 
     parent->frame.ornament_color1   = OrnamentColor1;
     parent->titlebar_ornament_color = OrnamentColor1;
@@ -1771,7 +1811,7 @@ struct gws_window_d *do_create_titlebar(
         tbWindow->left, 
         ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
         tbWindow->width, 
-        METRICS_TITLEBAR_ORNAMENT_SIZE, 
+        OrnamentHeight, 
         OrnamentColor1, 
         0 );  // rop_flags no rop in this case?
 
@@ -1881,7 +1921,7 @@ wmCreateWindowFrame (
     unsigned int border_color3,
     unsigned int ornament_color1,
     unsigned int ornament_color2,
-    int style ) 
+    int frame_style ) 
 {
     int useFrame       = FALSE;
     int useTitleBar    = FALSE;
@@ -1959,6 +1999,18 @@ wmCreateWindowFrame (
         return -1;
     }
 
+// Uma overlapped maximizada não tem borda.
+    int IsMaximized = FALSE;
+    if (window->style & WS_MAXIMIZED){
+        IsMaximized=TRUE;
+    }
+// Uma overlapped maximizada não tem borda.
+    int IsFullscreen = FALSE;
+    if (window->style & WS_FULLSCREEN){
+        IsFullscreen=TRUE;
+    }
+
+
 // #bugbug
 // Estamos mascarando pois os valores anda corrompendo.
     window->left   = (window->left   & 0xFFFF);
@@ -1998,6 +2050,7 @@ wmCreateWindowFrame (
         useBorder=TRUE;
         break;
 
+    // Uma overlapped maximizada não tem borda.
     case WT_OVERLAPPED:
         useFrame=TRUE; 
         useTitleBar=TRUE;  // Normalmente uma janela tem a barra de t[itulos.
@@ -2072,15 +2125,12 @@ wmCreateWindowFrame (
 
         // Draw the border of an edit box.
         __draw_window_border(parent,window);
-
         return 0;
     }
 
-
 // ===============================================
-// overlapped?
+// Overlapped?
 // Draw border, titlebar and status bar.
-
 // #todo:
 // String right não pode ser maior que 'last left' button.
 
@@ -2117,7 +2167,12 @@ wmCreateWindowFrame (
         }
 
         // Quatro bordas de uma janela overlapped.
-        __draw_window_border(parent,window);
+        // Uma overlapped maximizada não tem bordas.
+        if ( IsMaximized == FALSE && 
+             IsFullscreen == FALSE)
+        {
+            __draw_window_border(parent,window);
+        }
 
         // #important:
         // The border in an overlapped window will affect

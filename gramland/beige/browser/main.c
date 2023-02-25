@@ -301,7 +301,9 @@ int main( int argc, char *argv[] )
                   (w_width -4 -4 -24 -4), 
                   24,//32,
                   main_window,  
-                  0, COLOR_WHITE, COLOR_WHITE );
+                  0, 
+                  COLOR_WHITE, 
+                  COLOR_WHITE );
 
     if (addressbar_window < 0){
         debug_print("browser: addressbar_window fail\n"); 

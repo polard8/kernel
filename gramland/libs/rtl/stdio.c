@@ -3466,6 +3466,55 @@ int getchar6(FILE *input_stream,FILE *output_stream)
 */
 
 
+
+int
+rtl_GetS(
+    unsigned char *buf,
+    size_t size )
+{
+// Prompt into fixed length string. Size must include terminator.
+// Credits: TempleOS
+// #todo: Not tested yet.
+
+    unsigned char *st;
+    int ch=0;
+    int i=0;
+
+    if ((void*)buf == NULL)
+        return 0;
+    if (size <= 0) 
+        return 0;
+
+    while (TRUE) 
+    {
+        ch = (int) fgetc(stdin);
+
+        if (ch == '\n') {
+            //printf("%c",ch);
+            //printf("\n");
+            fflush(stdout);
+            break;
+      
+        } else if (ch == '\b') {
+            if (i>0) {
+                i--;
+                printf("%c",ch);
+            }
+      
+        } else {
+            if (i<size-1) {
+                buf[i++]=ch;
+                printf("%c",ch);
+            }
+        };
+    }
+
+    buf[i]=0;
+
+    return (int) i;
+}
+
+
 /*
 int feof(FILE *fp)
 {

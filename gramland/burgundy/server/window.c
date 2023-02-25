@@ -420,9 +420,9 @@ void *doCreateWindow (
 // Default is FALSE.
 // We need to know the parent's bg color.
     int Transparent = FALSE;
-    int Maximized=0;
-    int Minimized=0;
-    int Fullscreen=0;
+    int Maximized=FALSE;
+    int Minimized=FALSE;
+    int Fullscreen=FALSE;
 // Bars
 // A title bar é criadas pela função
 // que cria o frame.
@@ -554,26 +554,22 @@ void *doCreateWindow (
 // Maximized
 // #todo:
 // The window occupy the whole desktop working area.
-    if (style & WS_MAXIMIZED)
-    {
+    if (style & WS_MAXIMIZED){
         Maximized=TRUE;
     }
 
 // Minimized
 // (Iconic)
-    if (style & WS_MINIMIZED)
-    {
+    if (style & WS_MINIMIZED){
         Minimized=TRUE;
     }
 // Fullscreen
 // Paint only the client area.
-    if (style & WS_FULLSCREEN)
-    {
+    if (style & WS_FULLSCREEN){
         Fullscreen=TRUE;
     }
 
-    if (style & WS_TRANSPARENT)
-    {
+    if (style & WS_TRANSPARENT){
         Transparent=TRUE;
         // Get the given flags.
         __rop_flags = rop_flags;
@@ -667,7 +663,10 @@ void *doCreateWindow (
     window->clientrect_bg_color = (unsigned int) client_color;
 
     window->type = (unsigned long) type;
-    window->style = (unsigned long) style;  // A lot of flags
+
+// A lot of flags
+    window->style = (unsigned long) style;
+
 // buffers
     window->dedicated_buf = NULL;
     window->back_buf = NULL;
@@ -1631,6 +1630,9 @@ void *doCreateWindow (
     
     } //button
 
+    //#debug
+    //window->style = style;
+
 // Invalidate the window.
 // #todo: Only if it is not minimized.
     window->dirty = TRUE;
@@ -1753,6 +1755,13 @@ void *CreateWindow (
     //if ( (void*) windowname == NULL ){}
     //if ( *windowname == 0 ){}
 
+    
+
+    //if (style & WS_MAXIMIZED){
+    //    printf("MAX 1\n"); 
+    //}
+
+
 // ============================
 // Types with frame.
 
@@ -1790,7 +1799,11 @@ void *CreateWindow (
 
         __w = 
             (void *) doCreateWindow ( 
-                         WT_SIMPLE, style, status, view, (char *) _name,
+                         WT_SIMPLE, 
+                         style, 
+                         status, 
+                         view, 
+                         (char *) _name,
                          x, y, width, height, 
                          (struct gws_window_d *) pWindow, 
                          desktopid, 
@@ -1798,10 +1811,16 @@ void *CreateWindow (
                          client_color, 
                          (unsigned long) __rop_flags ); 
 
-         if ( (void *) __w == NULL ){
+        if ( (void *) __w == NULL ){
              gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
              goto fail;
-         }
+        }
+
+        //if (__w->style & WS_MAXIMIZED){
+        //    printf("MAX2\n"); 
+        //}
+        //printf ("overlapped: breakpoint\n");
+        //while(1){}
 
         // Pintamos simples, mas a tipagem será overlapped.
         __w->type = WT_OVERLAPPED;

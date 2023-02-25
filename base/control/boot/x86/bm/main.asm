@@ -916,10 +916,14 @@ xxx_setupRegisters:
     xor bx, bx
     xor ax, ax
     sti
+
 ; Enable a20 line.
+; see: rm/s2a20.inc
 xxx_setupA20:
+
     pusha
-    call A20_enable
+    call A20_fast_enable
+    ;; call A20_enable
     mov si, msg_a20
     call DisplayMessage
     popa
