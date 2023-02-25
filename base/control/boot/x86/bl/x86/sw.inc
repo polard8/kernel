@@ -1,5 +1,6 @@
-
-; File: software.inc
+; sw.inc
+; Routines for software interrupts support.
+;
 ; Descrição:
 ;     Rotinas de software para o boot loader.
 ;     Interrupções de software.

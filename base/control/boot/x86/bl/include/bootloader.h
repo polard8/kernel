@@ -602,7 +602,7 @@ int BltimerInit();
 //
 // Paging support.
 //
-int SetUpPaging();
+void SetUpPaging(void);
 
 //
 // Disk support.

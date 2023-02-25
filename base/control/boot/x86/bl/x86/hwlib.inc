@@ -1,5 +1,6 @@
+; hwlib.inc
+; Support for hw.inc
 ;
-; File: hardwarelib.inc
 ; Descrição:
 ;     Rotinas de apoio às rotinas em hardware.inc.
 ; Histórico:

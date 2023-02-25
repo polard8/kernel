@@ -1,5 +1,6 @@
+; headlib.s 
+; Support for head.s
 ;
-; File: headlib.s 
 ; Descrição:
 ;     Biblioteca que complementa o arquivo head.s.
 ;     (tss, ldt, stacks).

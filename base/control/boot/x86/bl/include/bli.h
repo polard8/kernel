@@ -1,10 +1,8 @@
 /*
  * File: bli.h
- *
  * Boot Loader Internal. Para rotinas globais começadas com BlXXXX.
  * Acessiveis à todos os módulos do boot loader.
  */
-
 
 //
 // Procedure.

@@ -10,6 +10,8 @@
 
 #include <bootloader.h>
 
+extern void BlTransferToKernel(void);
+
 // local
 // inline?
 void load_pml4_table(void *phy_addr)
@@ -71,10 +73,12 @@ void page_enable()
  */
 // Called by OS_Loader_Main in main.c
 
-extern void go_to_kernel(void);
-
-int SetUpPaging()
+void SetUpPaging(void)
 {
+// + Setup pages.
+// + Transfer execution to the kernel.
+// This routine does not return.
+
     unsigned int i=0;
 
 // 9 9 9 9 12
@@ -448,7 +452,9 @@ Entry_386:
     //printf ("SetUpPaging: load_pml4_table\n");
     //refresh_screen();
     
-    load_pml4_table( &boot_pml4[0] );
+    unsigned long pml4_address = (unsigned long) &boot_pml4[0];
+
+    load_pml4_table( (unsigned long) pml4_address );
 
 //
 // MSR
@@ -502,16 +508,16 @@ Entry_386:
     //refresh_screen();
 
 // Go to kernel
-// See: head.s
+// See: transfer.inc
 
-    go_to_kernel();
+    BlTransferToKernel();
 
 // Not reached
-    while(1){
-        asm("hlt");
+Hang:
+    while (1){
+        asm ("cli");
+        asm ("hlt");
     };
-
-    return 0;
 }
 
 //

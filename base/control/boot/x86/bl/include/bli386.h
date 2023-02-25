@@ -7,17 +7,12 @@
 #ifndef __BLI386_H
 #define __BLI386_H    1
 
-
 //see: main.c
 extern int bliTesting; 
 
-
-
 #endif    
-
-
  
 //
-//End.
+// End
 //
 

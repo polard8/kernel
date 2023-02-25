@@ -1,5 +1,6 @@
+; hw.inc
+; Routines for hardware interrupts support.
 ;
-; File: hardware.inc 
 ; Descrição:
 ;     Rotinas de hardware para o boot loader.
 ;     Handlers para interrupções. (De hardware).

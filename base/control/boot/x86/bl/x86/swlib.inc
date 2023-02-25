@@ -1,5 +1,6 @@
-
-; File: softwarelib.inc
+; swlib.inc
+; Support to sw.inc
+;
 ; Descrição:
 ;     Rotinas de apoio para rotinas de software em software.inc.
 ; 2015 - Created by Fred Nora.
