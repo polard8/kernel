@@ -15,7 +15,7 @@ This repository has the source code for:
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-1.png)
+![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-4.png)
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-3.png)
 
 ## Kernel features.
