@@ -81,7 +81,7 @@ grDrawString (
                 x, y, 
                 (unsigned int) __fg_color, 
                 string[Index],
-                gws_currentfont_address );
+                font_lt8x8); //gws_currentfont_address );
          //}
 
         // gradient
