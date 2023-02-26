@@ -1269,6 +1269,7 @@ void
 wm_update_desktop2(
     struct gws_window_d *last_window,
     int tile );
+void wm_update_desktop3(struct gws_window_d *top_window);
 
 void set_first_window( struct gws_window_d *window);
 struct gws_window_d *get_first_window(void);

@@ -7,7 +7,13 @@
 
 #include "gwsint.h"
 
-//extern int gUseMouse;
+
+// Clicked over a window.
+static int grab_is_active=FALSE;
+// Move the mouse without release the button.
+static int is_dragging = FALSE;
+static int grab_wid = -1;
+
 
 // Global main structure.
 // Not a pointer.
@@ -280,15 +286,16 @@ on_keyboard_event(
         return 0;
     }
 
-// Window with focus.
-// keyboard_owner
-    //w = (void*) keyboard_owner;
+// Window with focus. 
+// (keyboard_owner)
     window = (struct gws_window_d *) get_focus();
     if ( (void*) window == NULL ){
+        // #debug
         printf("on_keyboard_event: window\n");
         return 0;
     }
-    if (window->magic!=1234){
+    if (window->magic != 1234){
+        // #debug
         printf("on_keyboard_event: window magic\n");
         return 0;
     }
@@ -524,6 +531,15 @@ on_mouse_event(
 // as rotinas de pintura de cursor que estao no kernel.
     if (event_type == GWS_MouseMove)
     {
+        // If we already clicked the window
+        // and now we're moving it.
+        // So, now we're dragging it.
+        if (grab_is_active == TRUE){
+            is_dragging = TRUE;
+        }else if (grab_is_active != TRUE){
+            is_dragging = FALSE;
+        };
+
         set_refresh_pointer_status(TRUE);
  
         //printf("MOVE\n");
@@ -679,6 +695,16 @@ static void on_mouse_pressed(void)
         return;
     }
 
+// Grab event
+    if (mouse_hover->isTitleBar == TRUE)
+    {
+        grab_wid = mouse_hover->id;
+        grab_is_active = TRUE;
+        // We're not dragging yet.
+        // Just clicked.
+        is_dragging = FALSE;
+        return;
+    }
 
 // ===================================
 // >> Minimize control
@@ -872,8 +898,9 @@ static void on_mouse_released(void)
 {
     struct gws_window_d *tmp;
     struct gws_window_d *old_focus;
-
-    //wm_Update_TaskBar("RELEASED",TRUE);
+    struct gws_window_d *wgrab;
+    long x=0;
+    long y=0;
 
     // button number
     //if(long1==1){ yellow_status("R1"); }
@@ -903,6 +930,61 @@ static void on_mouse_released(void)
     if (mouse_hover->magic!=1234)
         return;
 
+    // If we already clicked on a window
+    // and are already dragging it.
+    // So, now it's time to drop it.
+    if ( grab_is_active == TRUE && 
+         is_dragging == TRUE && 
+         grab_wid > 0 )
+    {
+        // Drop it.
+        grab_is_active = FALSE;
+        is_dragging = FALSE;
+        
+        wgrab = (struct gws_window_d *) get_window_from_wid(grab_wid);
+        if ( (void*) wgrab != NULL )
+        {
+            // Muda a janela mãe da grab se ela for titlebar.
+            if (wgrab->magic == 1234)
+            {
+                if (wgrab->isTitleBar == TRUE)
+                {
+                    if ( (void*)wgrab->parent != NULL)
+                    {
+                        // Posição atual do mouse.
+                        x = (long) comp_get_mouse_x_position();
+                        y = (long) comp_get_mouse_y_position();
+
+                        // #todo
+                        // + Put the window in the top of the z-order.
+                        // + Redraw all the desktop.
+                        // + Activate the window.
+                        // + Set focus?
+                        gwssrv_change_window_position( 
+                            wgrab->parent, x, y );
+                        
+                        // Redraw everything.
+                        wm_update_desktop3(wgrab->parent);
+                        
+                        //redraw_window(__root_window,FALSE);
+                        //set_active_window(wgrab->parent);
+                        //redraw_window(wgrab->parent,FALSE);
+                        //wm_Update_TaskBar("...",FALSE);
+                        //flush_window(__root_window);
+                        
+                        grab_wid = -1;
+                        return;
+                    }
+                }
+            }
+            // No more grab window.
+            grab_wid = -1;
+            return;
+        }
+        grab_wid = -1;
+        return;
+    }
+
     //if(long1==1){ yellow_status("R1"); }
     //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
     //if(long1==1){ 
@@ -928,12 +1010,12 @@ static void on_mouse_released(void)
                 // Set as last window and update desktop.
                 if (tmp->type == WT_OVERLAPPED)
                 {
+                    wm_update_desktop3(tmp);
                     //old_focus = (void*) get_focus(); 
                     //if ((void*) old_focus != NULL )
-
-                    set_active_window(tmp);
-                    set_focus(tmp);
-                    redraw_window(tmp,TRUE);
+                    //set_active_window(tmp);
+                    //set_focus(tmp);
+                    //redraw_window(tmp,TRUE);
                     return;
                 }
             }
@@ -2790,7 +2872,7 @@ void wm_update_active_window(void)
     wm_update_window_by_id(wid);
 }
 
-// Set the last widnow and update the deesktop.
+// Set the last widnow and update the desktop.
 void 
 wm_update_desktop2(
     struct gws_window_d *last_window,
@@ -2800,6 +2882,27 @@ wm_update_desktop2(
     wm_update_desktop(TRUE);
 }
 
+
+void wm_update_desktop3(struct gws_window_d *top_window)
+{
+// #todo
+// We need to redraw a lot of windows.
+
+    if ( (void*) __root_window == NULL )
+        return;
+    if ( (void*) top_window == NULL )
+        return;
+    if (top_window->magic != 1234)
+        return;
+
+    redraw_window(__root_window,FALSE);
+    set_active_window(top_window);
+    set_focus(top_window);
+    redraw_window(top_window,FALSE);
+    wm_Update_TaskBar("...",FALSE);
+// Flush the whole desktop.
+    flush_window(__root_window);
+}
 
 // #todo
 // Explain it better.
@@ -5876,6 +5979,10 @@ void wmInitializeGlobals(void)
     ____new_time=0;
     old_x=0;
     old_y=0;
+    
+    grab_is_active = FALSE;
+    is_dragging = FALSE;
+    grab_wid = -1;
 }
 
 //
