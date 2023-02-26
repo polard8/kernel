@@ -719,7 +719,6 @@ struct gws_window_d
     // para tornarem-se visíveis.
     struct gws_rect_d  *dirty_rects;
 
-
 //
 // == window stack ================================
 //
@@ -848,9 +847,13 @@ struct gws_window_d
 
 // The owner
     struct gws_window_d  *parent;
-// We need to redraw all the child widnows.
+// We need to redraw all the child windows.
     struct gws_window_d  *child_list;
+// Brother or sister with at least 'one' parent in common.
+    struct gws_window_d *subling_list;
 
+// We have an associated window when we are iconic.
+    //struct gws_window_d *assoc_wind;
 // =========================================================
 // 12
 

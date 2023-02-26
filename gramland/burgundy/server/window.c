@@ -340,6 +340,10 @@ static struct gws_window_d *__create_window_object(void)
     window->used = TRUE;
     window->magic = 1234;
 
+// Validate.
+// This way the compositor can't redraw it.
+    window->dirty = FALSE;
+
     return (struct gws_window_d *) window;
 }
 
@@ -658,15 +662,11 @@ void *doCreateWindow (
     if ( (void*) window == NULL ){
         return NULL;
     }
-
     window->bg_color = (unsigned int) frame_color;
     window->clientrect_bg_color = (unsigned int) client_color;
-
     window->type = (unsigned long) type;
-
 // A lot of flags
     window->style = (unsigned long) style;
-
 // buffers
     window->dedicated_buf = NULL;
     window->back_buf = NULL;
@@ -686,7 +686,8 @@ void *doCreateWindow (
     window->status = (int) (status & 0xFFFFFFFF);
     window->view   = (int) view;
     window->focus  = FALSE;
-    window->dirty  = FALSE;  // Validate
+    // We already validated it when we create the object.
+    //window->dirty  = FALSE;  // Validate
     //window->locked = FALSE;
 
 // Event queue
@@ -705,6 +706,8 @@ void *doCreateWindow (
     //if (style & WS_LOCKED){
     //    window->locked = TRUE;
     //}
+// Can't lock,
+// We need permitions to do our work.
     window->locked = FALSE;
 
 // ===================================
@@ -746,16 +749,20 @@ void *doCreateWindow (
     };
 
 // ===================================
-// Parent window
-    if ( (void*) pWindow == NULL ){
-        debug_print ("doCreateWindow: [CHECK THIS] Invalid parent window\n");
-    }
-    Parent         = (struct gws_window_d *) pWindow;
-    window->parent = (struct gws_window_d *) Parent;
+// Parent and child.
 
-// ===================================
-// Child list
+    if ( (void*) pWindow == NULL ){
+        window->parent = NULL;
+        Parent = NULL;
+        window->subling_list = NULL;
+    }
+    if ( (void*) pWindow != NULL ){
+        window->parent = (struct gws_window_d *) pWindow;
+        Parent = (struct gws_window_d *) pWindow;
+        //window->subling_list = ?;
+    }
     window->child_list = NULL;
+
 
 // #todo: 
 // é importante definir o procedimento de janela desde já.
@@ -1242,7 +1249,7 @@ void *doCreateWindow (
         window->background_style = 0;
         break;
 
-    // Ícone da área de trabalho.
+    // Ícone na área de trabalho.
     // #todo: icons has borders sometimes.
     case WT_ICON:
         window->ip_device = IP_DEVICE_NULL;
@@ -2041,8 +2048,13 @@ draw_frame:
 
 // ===============
 // Unlock the window
+// Only at the end of this routine.
+// #bugbug: We cant create the parts of the window
+// if the window is locked.
+// So, we can't lock it at the beginning.
     __w->locked = FALSE;
 // Invalidate the window rectangle.
+// Only at the end of this routine.
     __w->dirty = TRUE;
     return (void *) __w;
 fail:

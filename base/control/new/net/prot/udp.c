@@ -108,12 +108,14 @@ network_handle_udp(
 
     if (dport == 34884 || dport == 11888)
     {
-        printf ("UDP: Message{%s}\n", udp_payload );
+        //printf ("UDP: Message{%s}\n", udp_payload );
+        printf ("MESSAGE: {%s}\n", udp_payload );
 
         //printf("UDP: dport{%d}\n",dport);
         //printf (" '%s' \n",udp_payload);
         //die();
 
+        /*
         // Mini-parser.
         // #todo: Create a worker.
         if ( p[0] == '#' && 
@@ -131,6 +133,7 @@ network_handle_udp(
                 //post_message_to_ws(NULL,MSG_CLOSE,0,0);
             }
         }
+        */
     }
 
     if (dport == 22888)

@@ -112,9 +112,11 @@ void wmRefreshDirtyRectangles(void)
             if ( tmp->used == TRUE && tmp->magic == 1234 )
             {
                 // Faster: Refresh via KGWS and validate.
-                if (tmp->dirty == TRUE){
+                if (tmp->dirty == TRUE)
+                {
                     gws_refresh_rectangle ( 
                         tmp->left, tmp->top, tmp->width, tmp->height ); 
+                    
                     validate_window(tmp);
                 }
             }

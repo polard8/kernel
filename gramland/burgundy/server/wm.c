@@ -158,8 +158,27 @@ void __probe_window_hover(unsigned long long1, unsigned long long2);
 int control_action(int msg, unsigned long long1);
 
 
-
+void __button_pressed(int wid);
+void __button_released(int wid);
 // =====================================================
+
+
+void __button_pressed(int wid)
+{
+    if (wid < 0 || wid >= WINDOW_COUNT_MAX )
+        return; 
+    set_status_by_id( wid, BS_PRESSED );
+    redraw_window_by_id(wid,TRUE);
+}
+void __button_released(int wid)
+{
+    if (wid < 0 || wid >= WINDOW_COUNT_MAX )
+        return; 
+    set_status_by_id( wid, BS_RELEASED );
+    redraw_window_by_id(wid,TRUE);
+}
+
+
 
 struct gws_window_d *get_parent(struct gws_window_d *w)
 {
@@ -305,23 +324,27 @@ on_keyboard_event(
             //Não mude a cor do botão se o estilo for 3d.
             //pois perde o efeito desejado.
             //set_bg_color_by_id(tb_buttons[0],xCOLOR_GRAY1);
-            set_status_by_id(tb_buttons[0],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[0],TRUE);
+            __button_pressed(tb_buttons[0]);
+            //set_status_by_id(tb_buttons[0],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[0],TRUE);
             return 0;
         }
         if (long1 == VK_F2){
-            set_status_by_id(tb_buttons[1],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[1],TRUE);
+            __button_pressed(tb_buttons[1]);
+            //set_status_by_id(tb_buttons[1],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[1],TRUE);
             return 0;
         }
         if (long1 == VK_F3){
-            set_status_by_id(tb_buttons[2],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[2],TRUE);
+            __button_pressed(tb_buttons[2]);
+            //set_status_by_id(tb_buttons[2],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[2],TRUE);
             return 0;
         }
         if (long1 == VK_F4){
-            set_status_by_id(tb_buttons[3],BS_PRESSED);
-            redraw_window_by_id(tb_buttons[3],TRUE);
+            __button_pressed(tb_buttons[3]);
+            //set_status_by_id(tb_buttons[3],BS_PRESSED);
+            //redraw_window_by_id(tb_buttons[3],TRUE);
             return 0;
         }
         
@@ -351,8 +374,9 @@ on_keyboard_event(
     if (msg == GWS_SysKeyUp)
     {
         if (long1 == VK_F1){
-            set_status_by_id( tb_buttons[0], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[0],TRUE);
+            __button_released(tb_buttons[0]);
+            //set_status_by_id( tb_buttons[0], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[0],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app1_string);
             if (tb_pids[0] == 0){
@@ -361,8 +385,9 @@ on_keyboard_event(
             return 0;
         }
         if (long1 == VK_F2){
-            set_status_by_id( tb_buttons[1], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[1],TRUE);
+            __button_released(tb_buttons[1]);
+            //set_status_by_id( tb_buttons[1], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[1],TRUE);
             //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app2_string);
@@ -372,8 +397,9 @@ on_keyboard_event(
             return 0;
         }
         if (long1 == VK_F3){
-            set_status_by_id( tb_buttons[2], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[2],TRUE);
+            __button_released(tb_buttons[2]);
+            //set_status_by_id( tb_buttons[2], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[2],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app3_string);
             if (tb_pids[2] == 0){
@@ -382,8 +408,9 @@ on_keyboard_event(
             return 0;
         }
         if (long1 == VK_F4){
-            set_status_by_id( tb_buttons[3], BS_RELEASED );
-            redraw_window_by_id(tb_buttons[3],TRUE);
+            __button_released(tb_buttons[3]);
+            //set_status_by_id( tb_buttons[3], BS_RELEASED );
+            //redraw_window_by_id(tb_buttons[3],TRUE);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app4_string);
             if (tb_pids[3] == 0){
@@ -660,8 +687,9 @@ static void on_mouse_pressed(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_PRESSED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_pressed(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_PRESSED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             return;
         }
     }
@@ -674,8 +702,9 @@ static void on_mouse_pressed(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_PRESSED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_pressed(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_PRESSED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             return;
         }
     }
@@ -688,8 +717,9 @@ static void on_mouse_pressed(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_PRESSED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_pressed(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_PRESSED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             return;
         }
     }
@@ -706,8 +736,9 @@ static void on_mouse_pressed(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_PRESSED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_pressed(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_PRESSED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             return;
         }
     }
@@ -747,8 +778,9 @@ static void on_mouse_pressed(void)
         }
 
         // Redraw the button
-        set_status_by_id(mouse_hover->id,BS_PRESSED);
-        redraw_window_by_id(mouse_hover->id,TRUE);
+        __button_pressed(mouse_hover->id);
+        //set_status_by_id(mouse_hover->id,BS_PRESSED);
+        //redraw_window_by_id(mouse_hover->id,TRUE);
         return;
     }
 
@@ -917,8 +949,9 @@ static void on_mouse_released(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_released(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_RELEASED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             printf("Release on min control\n");
             return;
         }
@@ -932,8 +965,9 @@ static void on_mouse_released(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_released(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_RELEASED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             printf("Release on max control\n");
             return;
         }
@@ -947,8 +981,9 @@ static void on_mouse_released(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_released(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_RELEASED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
             printf("Release on close control\n");
             // #test
             // On control clicked
@@ -958,8 +993,6 @@ static void on_mouse_released(void)
         }
     }
 // ===================================
-
-
 
 // ===================================
 // >> Menuitens
@@ -971,8 +1004,9 @@ static void on_mouse_released(void)
         if (mouse_hover->type == WT_BUTTON)
         {
             // Redraw the button
-            set_status_by_id(mouse_hover->id,BS_RELEASED);
-            redraw_window_by_id(mouse_hover->id,TRUE);
+            __button_released(mouse_hover->id);
+            //set_status_by_id(mouse_hover->id,BS_RELEASED);
+            //redraw_window_by_id(mouse_hover->id,TRUE);
 
             selected_item = (unsigned long) (mouse_hover->id & 0xFFFF);
             menuProcedure(
@@ -990,8 +1024,9 @@ static void on_mouse_released(void)
 //tb_button[0]
     if(mouse_hover->id == tb_buttons[0])
     {
-        set_status_by_id(mouse_hover->id,BS_RELEASED);
-        redraw_window_by_id(mouse_hover->id,TRUE);
+        __button_released(mouse_hover->id);
+        //set_status_by_id(mouse_hover->id,BS_RELEASED);
+        //redraw_window_by_id(mouse_hover->id,TRUE);
         //create_main_menu(8,8);
         //wm_update_active_window();
         //current_option = OPTION_MINIMIZE;
@@ -1003,8 +1038,9 @@ static void on_mouse_released(void)
 //tb_button[1]
     if(mouse_hover->id == tb_buttons[1])
     {
-        set_status_by_id(mouse_hover->id,BS_RELEASED);
-        redraw_window_by_id(mouse_hover->id,TRUE);
+        __button_released(mouse_hover->id);
+        //set_status_by_id(mouse_hover->id,BS_RELEASED);
+        //redraw_window_by_id(mouse_hover->id,TRUE);
         //current_option = OPTION_MAXIMIZE;
         //yellow_status("1: Max");
         //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
@@ -1014,8 +1050,9 @@ static void on_mouse_released(void)
 //tb_button[2]
     if(mouse_hover->id == tb_buttons[2])
     {
-        set_status_by_id(mouse_hover->id,BS_RELEASED);
-        redraw_window_by_id(mouse_hover->id,TRUE);
+        __button_released(mouse_hover->id);
+        //set_status_by_id(mouse_hover->id,BS_RELEASED);
+        //redraw_window_by_id(mouse_hover->id,TRUE);
         //current_option = OPTION_CLOSE;
         //yellow_status("2: Close");
         //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
@@ -1025,8 +1062,9 @@ static void on_mouse_released(void)
 //tb_button[3]
     if(mouse_hover->id == tb_buttons[3])
     {
-        set_status_by_id(mouse_hover->id,BS_RELEASED);
-        redraw_window_by_id(mouse_hover->id,TRUE);
+        __button_released(mouse_hover->id); 
+        //set_status_by_id(mouse_hover->id,BS_RELEASED);
+        //redraw_window_by_id(mouse_hover->id,TRUE);
         //yellow_status("3: OK");
         //run_selected_option();
         //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
