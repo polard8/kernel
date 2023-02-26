@@ -32,9 +32,9 @@ grDrawString (
     unsigned int __fg_color = color;
     //unsigned int __bg_color = color;
 
-    if( (void*) string == NULL )
+    if ( (void*) string == NULL )
         return;
-    if( *string==0 )
+    if ( *string==0 )
         return;
 
 // #fail
@@ -45,7 +45,8 @@ grDrawString (
         //#debug
         //gde_message_box (3, "xxx","dtext-draw_string: cWidth");
         printf ("grDrawString: cWidth\n");
-        while(1){}
+        while(1){
+        };
     }
 
     //int size = sizeof(string);  
@@ -72,11 +73,15 @@ grDrawString (
         // transparent
         //if (is_transparent == TRUE)
         //{
-            grBackbufferDrawCharTransparent ( 
-                x, 
-                y, 
+            //grBackbufferDrawCharTransparent ( 
+            //    x, y, 
+            //    (unsigned int) __fg_color, 
+            //    string[Index] );
+            grBackbufferDrawCharTransparent2 ( 
+                x, y, 
                 (unsigned int) __fg_color, 
-                string[Index] );
+                string[Index],
+                gws_currentfont_address );
          //}
 
         // gradient

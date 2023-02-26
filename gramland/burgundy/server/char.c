@@ -125,20 +125,14 @@ DrawBorder(
     };
 }
 
-
-
 int gwssrv_init_char(void)
 {
-
-    //char
+//char
     gcharWidth  = 8;   //gde_get_system_metrics (7);
     gcharHeight = 8;   //gde_get_system_metrics (8);
-
     //...
-    
     return 0;
 }
-
 
 // Constrói um caractere transparente 8x8 no buffer.
 void 
@@ -176,6 +170,7 @@ int charGetCharHeight (void)
 }
 
 
+
 /*
  * charBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
@@ -192,15 +187,16 @@ grBackbufferDrawCharTransparent (
     unsigned long x, 
     unsigned long y, 
     unsigned int color, 
-    unsigned long c )
+    int ch )
 {
-    //loop
-    register int y2=0;
-    register int x2=0;
-    char *work_char;
-    unsigned char bit_mask = 0x80;
+    int Char = (int) (ch & 0xFF);
     //int CharWidth;
     //int CharHeight;
+    char *work_char_p;
+    unsigned char bit_mask = 0x80;
+//loop
+    register int y2=0;
+    register int x2=0;
 
 /*
  Get the font pointer.
@@ -221,8 +217,9 @@ grBackbufferDrawCharTransparent (
         //gcharHeight = DEFAULT_CHAR_HEIGHT;             //8.
         // #debug
         // Estamos parando para testes.
-        printf ("grBackbufferDrawCharTransparent : Initialization fail\n");
-        while(1){}
+        printf ("grBackbufferDrawCharTransparent: Initialization fail\n");
+        while (1){
+        };
     }
 
 // #todo: 
@@ -271,8 +268,8 @@ grBackbufferDrawCharTransparent (
     //}
 
 
-    work_char = 
-        (void *) gws_currentfont_address + (c * gcharHeight);
+    work_char_p = 
+        (void *) gws_currentfont_address + (Char * gcharHeight);
 
 // Draw char
 // Put pixel using the ring3 routine.
@@ -284,7 +281,7 @@ grBackbufferDrawCharTransparent (
 
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
-            if ( ( *work_char & bit_mask ) )
+            if ( ( *work_char_p & bit_mask ) )
             {
                 // IN: color, x, y,rop
                 grBackBufferPutpixel ( 
@@ -300,9 +297,88 @@ grBackbufferDrawCharTransparent (
 
         // Próxima linha das 8 linhas do caractere.
         y++; 
-        work_char++; 
+        work_char_p++; 
     };
 }
+
+// ----
+void 
+grBackbufferDrawCharTransparent2 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned int color, 
+    int ch,
+    char *stock_address )
+{
+    int Char = (int) (ch & 0xFF);
+    //int CharWidth;
+    //int CharHeight;
+    char *work_char_p;
+    unsigned char bit_mask = 0x80;
+// Where the font is.
+    char *base_address;
+    base_address = stock_address;
+//loop
+    register int y2=0;
+    register int x2=0;
+
+// Invalid base address
+    if ( (void*) base_address == NULL )
+    {
+        //#debug
+        //printf("grBackbufferDrawCharTransparent2: base_address\n");
+        goto fail;
+    }
+
+// Invalid char dimensions.
+    if ( gcharWidth <= 0 || gcharHeight <= 0 )
+    {
+        //#debug
+        //printf("grBackbufferDrawCharTransparent2: base_address\n");
+        goto fail;
+    }
+
+// The pointer for the working char.
+    work_char_p = 
+        (void *) base_address + (Char * gcharHeight);
+
+// Draw char
+// Put pixel using the ring3 routine.
+// See: libgd.c
+
+    for ( y2=0; y2 < gcharHeight; y2++ )
+    {
+        bit_mask = 0x80;
+
+        for ( x2=0; x2 < gcharWidth; x2++ )
+        {
+            if ( ( *work_char_p & bit_mask ) )
+            {
+                // IN: color, x, y,rop
+                grBackBufferPutpixel ( 
+                    (unsigned int) color, 
+                    (x + x2), 
+                    y,
+                    (unsigned long) 0 );  
+            }
+
+            // Rotate bitmask.
+            bit_mask = (bit_mask >> 1);
+        };
+
+        // Próxima linha das 8 linhas do caractere.
+        y++; 
+        work_char_p++; 
+    };
+
+//done:
+    return;
+fail:
+    printf("grBackbufferDrawCharTransparent2: Fail\n");
+    while (1){
+    };
+}
+
 
 /*
  * charBackbufferDrawchar:

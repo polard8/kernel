@@ -40,7 +40,16 @@ grBackbufferDrawCharTransparent (
     unsigned long x, 
     unsigned long y, 
     unsigned int color, 
-    unsigned long c );
+    int ch );
+
+// Given a pointer for the font base address.
+void 
+grBackbufferDrawCharTransparent2 ( 
+    unsigned long x, 
+    unsigned long y, 
+    unsigned int color, 
+    int ch,
+    char *stock_address );
 
 /*
  * draw_char:

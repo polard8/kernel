@@ -15,7 +15,7 @@ unsigned long g9x16fontAddress=0;         // 9x16,80×25,VGA
 //unsigned long gws_eye_sprite_address=0;
 
 
-static void __initialize_lt8x8_font(void);
+static char *__initialize_lt8x8_font(void);
 
 // ==================
 
@@ -35,8 +35,9 @@ static unsigned char font_nelson_cole2[128*8] = {};
 // Adapted for abnt2:
 // 168 = TREMA.
 
-#define FONTDATAMAX 2048
-static unsigned char lin_fontdata_8x8[FONTDATAMAX] = {
+// 256*8 = 2048
+#define FONTDATAMAX  2048
+static unsigned char font_lin8x8[FONTDATAMAX] = {
 
 	/* 0 0x00 '^@' */
 	0x00, /* 00000000 */
@@ -2637,9 +2638,12 @@ static unsigned char TableBitReverse[] = {
 };
 
 
+// The final place for the lt font.
+char *font_lt8x8;
+
 // losethos font.
 // Inverted order.
-static unsigned char font_lt8x8[256*8] = {
+static unsigned char __inverted_font_lt8x8[256*8] = {
 
 // 0
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2940,51 +2944,52 @@ static unsigned char font_lt8x8[256*8] = {
 };
 
 
-static void __initialize_lt8x8_font(void)
+static char *__initialize_lt8x8_font(void)
 {
     unsigned char *tmp;
     unsigned char c=0;
     register int i=0;
 
     tmp = (unsigned char *) malloc (256*8);
-    if ( (unsigned char *) tmp == NULL ){
+    if ( (void *) tmp == NULL ){
         printf ("__initialize_lt8x8_font: [FAIL] tmp\n");
-        exit(1);
+        goto fail;
     }
 
 // Pega um char da fonte lt e coloca na buffer provisorio.
-    for (i=0; i<(256*8); i++){
-        c      = (unsigned char) font_lt8x8[i];
+    for (i=0; i<(256*8); i++)
+    {
+        c      = (unsigned char) __inverted_font_lt8x8[i];
         tmp[i] = (unsigned char) TableBitReverse[c];
     }; 
 
-    // lt8x8
-    gws_currentfont_address = (unsigned long) tmp;
-    // ...
+// Done:
+// Return the address of the new font.
+    return (char*) tmp;
+fail:
+    return NULL;
 }
-
 
 int gwssrv_init_font(void)
 {
-
-// Font sie
+// Font size
     gfontSize = 8;
 
-// ---------------
-// #suspensa.
-// Usando Uma rotina para configurar o endereço.
-// LoseThos font.
-    //__initialize_lt8x8_font();
+// Linux font.
+// This is the current.
+    gws_currentfont_address = (unsigned long) font_lin8x8;
 
-// ---------------
-// Configurando o endereço manualmente.
-    //gws_currentfont_address = (unsigned long) &font_lt8x8[0];        // lt inverted.
-    //gws_currentfont_address = (unsigned long) &font_nelson_cole2[0]; // nc2
-    //...
-    gws_currentfont_address = (unsigned long) &lin_fontdata_8x8[0];
+// Losethos font.
+// We need to invert the data.
+    font_lt8x8 = (char *) __initialize_lt8x8_font();
+    if ( (void*) font_lt8x8 == NULL ){
+        printf("gwssrv_init_font: Initialization fail\n");
+        goto fail;
+    }
 
+// done:
     return 0;
+fail:
+    return -1;
 }
-
-
 

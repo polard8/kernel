@@ -514,21 +514,38 @@ getsockname (
 
 // ===================================
 
-int inet_aton (const char *cp, struct in_addr *inp)
+// see:
+// https://man7.org/linux/man-pages/man3/inet_pton.3.html
+int inet_pton(int af, const char *src, void *dst)
 {
-    debug_print ("inet_aton: [TODO]\n");
+    printf ("inet_pton: [TODO]\n");
     return -1;
 }
 
+int inet_aton (const char *cp, struct in_addr *inp)
+{
+    printf ("inet_aton: [TODO]\n");
+    return -1;
+}
+
+// see:
+// https://pubs.opengroup.org/onlinepubs/009695399/functions/inet_addr.html
 in_addr_t inet_addr(const char *cp)
 {
-    printf ("inet_addr: [TODO]\n");
+/*
+    in_addr_t tmp {};
+    int rc = inet_pton(AF_INET, str, &tmp);
+    if (rc <= 0)
+        return INADDR_NONE;
+    return tmp;
+*/
+    printf ("printf: [TODO]\n");
     return (in_addr_t) 0;
 }
 
 in_addr_t inet_network(const char *cp)
 {
-    debug_print ("inet_network: [TODO]\n");
+    printf ("inet_network: [TODO]\n");
     return (in_addr_t) 0;
 }
 
@@ -537,22 +554,17 @@ in_addr_t inet_network(const char *cp)
 // Convert network-format internet address
 // to base 256 d.d.d.d representation.
 
-char *inet_ntoa ( struct in_addr in ) 
+char *inet_ntoa (struct in_addr in) 
 {
-    debug_print ("inet_ntoa: [TODO]\n");
-    
-    /*
-    static char ret[18];
+/*
+    static char buffer[32];
+    inet_ntop(AF_INET, &in.s_addr, buffer, sizeof(buffer));
+    return buffer;
+ */
 
-    strlcpy(ret, "[inet_ntoa error]", sizeof(ret));
-    (void) inet_ntop(AF_INET, &in, ret, (socklen_t)sizeof ret);
-
-    return ret;
-    */
-
-    return (char *) 0;
+    printf ("inet_ntoa: [TODO]\n");
+    return NULL;
 }
-
 
 // inet_makeaddr:
 // Formulate an Internet address from network + host.  Used in
@@ -560,11 +572,10 @@ char *inet_ntoa ( struct in_addr in )
 
 struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 {
-    in_addr_t addr;
     struct in_addr ret;
+    in_addr_t addr;
 
-    printf("inet_makeaddr: [BUGBUG] Not implemented!\n");
-
+    printf("inet_makeaddr: [TODO] Not implemented!\n");
 
 	/*
 	if (net < 128)
@@ -578,7 +589,7 @@ struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 	ret.s_addr = htonl(addr);
 	*/
 
-    return ret;
+    return (struct in_addr) ret;
 }
 
 
@@ -588,7 +599,7 @@ struct in_addr inet_makeaddr ( in_addr_t net, in_addr_t host )
 
 in_addr_t inet_lnaof(struct in_addr in)
 {
-    printf("inet_lnaof: [BUGBUG] Not implemented!\n");
+    printf("inet_lnaof: [todo] Not implemented!\n");
     return 0;
 
    /*

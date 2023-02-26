@@ -5,6 +5,8 @@
 #ifndef GWS_FONT_H
 #define GWS_FONT_H    1
 
+extern char *font_lt8x8;
+
 //
 // Font
 //
