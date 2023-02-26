@@ -71,7 +71,7 @@ KERNEL_INCLUDE := -I ../include/ $(USER_INCLUDE)
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
 # Everything is a file.
-OBJS = process.o plib.o thread.o tlib.o \
+OBJS = process.o plib.o thread.o tlib.o msg.o \
 create.o clone.o \
 callback.o \
 detect.o \
@@ -113,6 +113,7 @@ all:
 
 	$(CC) -c ps/thread.c  $(KERNEL_INCLUDE) $(CFLAGS) -o thread.o
 	$(CC) -c ps/tlib.c    $(KERNEL_INCLUDE) $(CFLAGS) -o tlib.o
+	$(CC) -c ps/msg.c     $(KERNEL_INCLUDE) $(CFLAGS) -o msg.o
 
 	$(CC) -c ps/create.c    $(KERNEL_INCLUDE) $(CFLAGS) -o create.o
 	$(CC) -c ps/clone.c     $(KERNEL_INCLUDE) $(CFLAGS) -o clone.o
