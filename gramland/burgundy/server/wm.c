@@ -4255,18 +4255,20 @@ int on_combination(int msg_code)
         return 0;
     }
 
-// #tests
-// Via shift + f12
+// [shift + f12]
+// Enable the ps2 mouse support
+// by making the full ps2-initialization.
+// Valid only for qemu.
 // + Enable mouse.
 // + Change bg color.
     if (msg_code == 88112)
     {
+        // Calling the kernel to make the full ps2 initialization.
+        // #todo: Create a wrapper fot that syscall.
+        // #todo: Allow only the ws pid to make this call.
+        sc82 ( 22011, 0, 0, 0 );
+        // Enable the use of mouse here in the server.
         gUseMouse = TRUE;
-        //wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
-        //printf ("server: [88112]\n");
-        //__switch_focus();
-        //wm_update_desktop(TRUE); //ok.
-
         return 0;
     }
 

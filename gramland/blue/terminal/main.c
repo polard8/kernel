@@ -757,9 +757,12 @@ static void compareStrings(int fd)
     }
 
 // Enable mouse.
+// Begging the window server to initialize
+// the mouse support. The kernel part and the ws part.
     if( strncmp(prompt,"ps2-qemu", 8) == 0 )
     {
-        sc82 ( 22011, 0, 0, 0 );   // Enable in kernel.
+        // #todo
+        // Create a wrapper for that request.
         gws_async_command(fd,44,0,0);
         goto exit_cmp;
     }

@@ -189,12 +189,17 @@ static void __draw_cat(int eye_scale, int cat_z)
 }
 
 
+// #todo
+// We can use this for 'screen saver'
+// and break the loop whe the user hit a key
+// or move the mouse.
 void demoCat (void)
 {
     register int i=0;
     int j=0;
 
-    int count = 8;
+    //int count = 8;
+    static int count=4;
     int scale_max = 100;
 
 // Changing the vire for the current projection.
@@ -223,7 +228,10 @@ void demoCat (void)
             // good for qemu,
             //for (j=0; j<8; j++){ rtl_yield();}  // Delay
             // good for kvm,
-            for (j=0; j<80; j++){ rtl_yield();}  // Delay
+            for (j=0; j<80; j++)
+            {
+                rtl_yield();  //#todo: Do not use this delay for now.
+            }  
         };
         
         count--;

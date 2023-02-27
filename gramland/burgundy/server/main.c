@@ -1949,9 +1949,14 @@ int serviceAsyncCommand(void)
         goto done;
         break;
 
+// Enable ps2-mouse support.
     case 44:
+        // Calling the kernel to make the full ps2 initialization.
+        // #todo: Create a wrapper fot that syscall.
+        // #todo: Allow only the ws pid to make this call.
+        sc82 ( 22011, 0, 0, 0 );
+        // Enable the use of mouse here in the server.
         gUseMouse = TRUE;
-        //wm_change_bg_color(COLOR_BLUE,TRUE,TRUE); //ok
         goto done;
         break;
 
@@ -3694,6 +3699,9 @@ static int on_execute(int dm)
 
 // The last initialization phase.
     Initialization.current_phase = 3;
+
+    // Given 'n' seconds with no requests or input events,
+    // so we can run the screen saver animation.
 
     while (running == TRUE){
 
