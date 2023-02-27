@@ -536,12 +536,9 @@ network_send_udp (
     //while(1){}
     
     printf ("Done\n");
-    //refresh_screen();
     return 0;
-
 fail:
     printf ("Fail\n");
-    //refresh_screen();
     return -1;
 }
 

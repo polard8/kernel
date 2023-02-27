@@ -82,15 +82,54 @@ network_handle_arp(
 // REPLY
     } else if (op==ARP_OPC_REPLY){
 
-        //printf("ARP: REPLAY\n");
-        // Show MAC
-        //printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
-            //ar->arp_sha[0], 
-            //ar->arp_sha[1], 
-            //ar->arp_sha[2], 
-            //ar->arp_sha[3],
-            //ar->arp_sha[4],
-            //ar->arp_sha[5] );
+        printf("ARP: REPLY from %d.%d.%d.%d\n",
+            ar->arp_spa[0], 
+            ar->arp_spa[1], 
+            ar->arp_spa[2], 
+            ar->arp_spa[3] );
+
+        // From gateway?
+        // #todo:
+        // We got to use the ipv4 given by the dhcp dialog.
+        if ( ar->arp_spa[0] == 192 && 
+             ar->arp_spa[1] == 168  && 
+             ar->arp_spa[2] == 1  &&
+             ar->arp_spa[3] == 1 )
+        {
+            // Show MAC
+            //printf("ARP:  MAC found %x.%x.%x.%x.%x.%x\n",
+                //ar->arp_sha[0], 
+                //ar->arp_sha[1], 
+                //ar->arp_sha[2], 
+                //ar->arp_sha[3],
+                //ar->arp_sha[4],
+                //ar->arp_sha[5] );
+
+            // Save into the default network info.
+            if ( (void*) CurrentNetwork != NULL )
+            {
+                if ( CurrentNetwork->initialized == TRUE )
+                {
+                    printf ("Saving gateway info\n");
+                    network_fill_ipv4( 
+                        CurrentNetwork->gateway_ipv4,
+                        ar->arp_spa );
+                    network_fill_mac( 
+                        CurrentNetwork->gateway_mac,
+                        ar->arp_sha );
+
+                    // Show saved MAC
+                    //printf("ARP:  Saved MAC %x.%x.%x.%x.%x.%x\n",
+                        //CurrentNetwork->gateway_mac[0], 
+                        //CurrentNetwork->gateway_mac[1], 
+                        //CurrentNetwork->gateway_mac[2], 
+                        //CurrentNetwork->gateway_mac[3],
+                        //CurrentNetwork->gateway_mac[4],
+                        //CurrentNetwork->gateway_mac[5] );
+                }
+            }
+            //die();
+        }
 
         // Show IP
         //printf("ARP: REPLY to %d.%d.%d.%d\n",
@@ -309,37 +348,47 @@ network_send_arp(
 // Sending a frame!
     e1000_send( currentNIC, ARP_TOTAL_SIZE, frame );
     //printf ("Done\n");
-    //refresh_screen();
     return;
-
 fail:
-    //refresh_screen();
     return;
 }
 
-
+// Request to gateway
 void network_send_arp_request(void)
 {
 // Send ARP request to 192.168.1.6.
-
-    if (networkGetStatus() != TRUE)
-       return;
-
-    network_send_arp( 
-        __arp_broadcast_mac,                // target mac
-        __arp_gramado_default_ipv4,  // src ip 
-        __arp_target_default_ipv4,      // dst ip 
-        ARP_OPC_REQUEST );
+    //if (networkGetStatus() != TRUE)
+    //   return;
+    // IN: src ipv4, dst ipv4, dst mac.
+    network_arp_request_to( 
+        __arp_gramado_default_ipv4,
+        __arp_target_default_ipv4 );
 }
 
+// Request to gateway
 void network_send_arp_request2(void)
 {
 // Send ARP request to 192.168.1.1.
+    //if (networkGetStatus() != TRUE)
+    //   return;
+    // IN: src ipv4, dst ipv4, dst mac.
+    network_arp_request_to( 
+        __arp_gramado_default_ipv4,
+        __arp_gateway_default_ipv4 );
+}
 
+// Send ARP request to a given ipv4.
+void 
+network_arp_request_to(
+    uint8_t src_ipv4[4],
+    uint8_t dst_ipv4[4] )
+{
+    if (networkGetStatus() != TRUE)
+       return;
     network_send_arp( 
-        __arp_broadcast_mac,                // target mac
-        __arp_gramado_default_ipv4,  // src ip 
-        __arp_gateway_default_ipv4,   // dst ip (Gateway)
+        __arp_broadcast_mac,   // target mac (broadcast)
+        src_ipv4,  // src ip 
+        dst_ipv4,  // dst ip 
         ARP_OPC_REQUEST );
 }
 

@@ -96,6 +96,10 @@ struct network_info_d
     struct host_info_d *host_info;
     //..
 
+// Gateway support.
+    uint8_t gateway_ipv4[4];
+    uint8_t gateway_mac[6];
+    int gateway_initialized;
 
 // Stats
     unsigned long tx_counter;

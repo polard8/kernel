@@ -34,6 +34,7 @@ struct ether_arp
     uint8_t arp_sha[ETH_ALEN];  // Sender Hardware Address, mac 
 // src ip
     uint8_t arp_spa[4];         // Sender Protocol Address, ip 
+
 // dst mac
     uint8_t arp_tha[ETH_ALEN];  // Target Hardware Address, mac
 // dst ip
@@ -57,6 +58,11 @@ network_send_arp(
     uint8_t target_ip[4], 
     int op );
 
+// Send ARP request to a given ipv4.
+void 
+network_arp_request_to(
+    uint8_t src_ipv4[4],
+    uint8_t dst_ipv4[4] );
 void network_send_arp_request(void);
 void network_send_arp_request2(void);
 

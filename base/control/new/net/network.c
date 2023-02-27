@@ -35,6 +35,9 @@ struct network_info_d *CurrentNetwork;
 char *default_network_name_string = "default-network-name";
 char *default_network_version_string = "0.0.0";
 
+// Target MAC.
+unsigned char __saved_gateway_mac[6];
+
 
 // ====================================================
 
@@ -529,6 +532,9 @@ int networkInit (void)
     if ( (void*) ni == NULL ){
         panic("networkInit: ni\n");
     }
+    // Clear the structure,
+    memset( ni, 0, sizeof (struct network_info_d) );
+    ni->initialized = FALSE;
     ni->id = 0;
     ni->version_major = 0x0000;
     ni->version_minor = 0x0000;
@@ -542,13 +548,26 @@ int networkInit (void)
     ni->version_string = (void*) default_network_version_string;
     ni->version_string_size = (size_t) strlen(default_network_version_string);
 
+// Gateway info.
+// Clear the info. (again)
+    for (i=0; i<6; i++){
+        ni->gateway_mac[i] = 0;
+    };
+    for (i=0; i<4; i++){
+        ni->gateway_ipv4[i] = 0;
+    };
+    ni->gateway_initialized = FALSE;
+
+// Counters.
     ni->tx_counter=0;
     ni->rx_counter=0;
 
     ni->next = NULL;
     ni->used = TRUE;
     ni->magic = 1234;
-    ni->initialized = FALSE;
+    
+    // This structure is initialized.
+    ni->initialized = TRUE;
     CurrentNetwork = (struct network_info_d *) ni;
 
 //======================================
