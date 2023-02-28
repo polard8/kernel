@@ -43,17 +43,17 @@ This repository has the source code for:
 ## Folders.
 A brief description of the directories.
 
-    Gramado Kernel - base/
-    Gramado DE     - gramland/
+    Gramado Kernel - core/
+    Gramado DE     - desktop/
     Gramado Games  - meta/
 
- * `base/` - Low basic components of the system.  
+ * `core/` - Low basic components of the system.  
    * `control` - Ring 0 stuff.
      * `boot` - The boot loader.
      * `disk` - The root directory for the boot partition.
      * `new` - The Gramado OS kernel.
    * `exposed` - Ring 3 stuff.
- * `gramland/` - The window server and it's clients.
+ * `desktop/` - The window server and it's clients.
  * `meta/` - Games and 3D experiments.
 
 ## Fred's host machine
@@ -68,20 +68,20 @@ A brief description of the directories.
 
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/base/admin/docs/build.md)
+> See the [Gramado OS build instructions](https://github.com/frednora/gramado/blob/master/core/admin/docs/build.md)
 
 ## Building and running on vm
 
 ```bash
 $ make
-$ cd base
+$ cd core
 $ ./run
 ```
 
 ## Clean up the mess
 
 ```bash
-$ cd base
+$ cd core
 $ make clean-all
 ```
 
@@ -92,7 +92,7 @@ Please, give us some feedback.
 
 ## Documentation
 
-> See the [docs](https://github.com/frednora/gramado/tree/master/base/admin/docs).
+> See the [docs](https://github.com/frednora/gramado/tree/master/core/admin/docs).
 
 ## Author
 

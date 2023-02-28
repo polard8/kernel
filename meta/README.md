@@ -1,4 +1,4 @@
-# havefun - A place for games.
+# meta - A place for games.
 
 
 

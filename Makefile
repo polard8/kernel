@@ -2,7 +2,7 @@
 # Build Gramado OS.
 
 PHONY := all
-all: step1-meta step2-gramland step3-base
+all: step1-meta step2-desktop step3-core
 	@echo "Done"
 
 #D8
@@ -11,50 +11,51 @@ step1-meta:
 	make -C  meta
 
 #A15
-PHONY := step2-gramland
-step2-gramland:
-	make -C  gramland
+PHONY := step2-desktop
+step2-desktop:
+	make -C  desktop
 
 #E25
-PHONY := step3-base
-step3-base:
-	make -C  base
+PHONY := step3-core
+step3-core:
+	make -C  core
 
 
 PHONY := clean
 clean: clean-all
 
 PHONY := clean-all
-clean-all: clean-meta clean-gramland clean-base
+clean-all: clean-meta clean-desktop clean-core
 
 PHONY := clean-meta
 clean-meta:
 # In meta/
 	-rm meta/bin/*.BIN
 
-PHONY := clean-gramland
-clean-gramland:
-# In gramland/
-	-rm gramland/burgundy/bin/*.BIN
-	-rm gramland/blue/bin/*.BIN
-	-rm gramland/beige/bin/*.BIN
+PHONY := clean-desktop
+clean-desktop:
+# In desktop/
+	-rm desktop/gramland/bin/*.BIN
+	-rm desktop/burgundy/bin/*.BIN
+	-rm desktop/blue/bin/*.BIN
+	-rm desktop/beige/bin/*.BIN
 
-PHONY := clean-base
-clean-base:
-# In base/
-	-rm base/exposed/arctic/bin/*.BIN
-	-rm base/exposed/azure/bin/*.BIN
-	-rm base/exposed/indigo1/bin/*.BIN
-	-rm base/exposed/indigo2/bin/*.BIN
-	-rm base/control/newm0/MOD0.BIN
-	-rm base/control/new/KERNEL.BIN
+PHONY := clean-core
+clean-core:
+# In core/
+	-rm core/exposed/arctic/bin/*.BIN
+	-rm core/exposed/azure/bin/*.BIN
+	-rm core/exposed/indigo1/bin/*.BIN
+	-rm core/exposed/indigo2/bin/*.BIN
+	-rm core/control/newm0/MOD0.BIN
+	-rm core/control/new/KERNEL.BIN
 # Clear the disk cache
-	-rm -rf base/control/disk/*.BIN 
-	-rm -rf base/control/disk/*.BMP
-	-rm -rf base/control/disk/EFI/BOOT/*.EFI 
-	-rm -rf base/control/disk/GRAMADO/*.BIN 
-	-rm -rf base/control/disk/PROGRAMS/*.BIN 
-	-rm -rf base/control/disk/USERS/*.BIN 
+	-rm -rf core/control/disk/*.BIN 
+	-rm -rf core/control/disk/*.BMP
+	-rm -rf core/control/disk/EFI/BOOT/*.EFI 
+	-rm -rf core/control/disk/GRAMADO/*.BIN 
+	-rm -rf core/control/disk/PROGRAMS/*.BIN 
+	-rm -rf core/control/disk/USERS/*.BIN 
 
 
 

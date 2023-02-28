@@ -7,15 +7,15 @@ Building the system:
 
 -----------------------
 Clean up the mess:
-    Go to base/ folder and type 'make clean-all'
+    Go to core/ folder and type 'make clean-all'
 
 -----------------------
 Launching the vm:
-    Go to base/ folder and type './run' or './runkvm' 
+    Go to core/ folder and type './run' or './runkvm' 
 
 -----------------------
 Boot interface:
-see: base/control/boot/x86/bm/shell32/
+see: core/control/boot/x86/bm/shell32/
 You can type: 
 
     bootjail - for 320x200 resolution. 
@@ -29,7 +29,7 @@ You can type:
 
 -----------------------
 Init process interface:
-see: base/exposed/arctic/init/
+see: core/exposed/arctic/init/
 You can type:
 
     boot    - Initialize the Desktop Environment, (GUI).
