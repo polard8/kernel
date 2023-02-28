@@ -292,6 +292,10 @@ int main( int argc, char *argv[] )
 // #todo: set focus.
 // Se a janela mae for overlapped,
 // entao seremos relativos à sua áre de cliente.
+
+    //unsigned long ab_width = (w_width -4 -4 -24 -4);
+    unsigned long ab_width = (w_width -50);
+
     addressbar_window = 
         (int) gws_create_window (
                   client_fd,
@@ -300,8 +304,8 @@ int main( int argc, char *argv[] )
                   4, 
                   (w_width -4 -4 -24 -4), 
                   24,//32,
-                  main_window,  
-                  0, 
+                  main_window,  // janela mãe é overlapped. pinta na client area.
+                  WS_CHILD, 
                   COLOR_WHITE, 
                   COLOR_WHITE );
 
@@ -330,7 +334,8 @@ int main( int argc, char *argv[] )
                   4,                 // t
                   24, 
                   24,
-                  main_window, 0, COLOR_GRAY, COLOR_GRAY );
+                  main_window,// janela mãe é overlapped. pinta na client area. 
+                  0, COLOR_GRAY, COLOR_GRAY );
 
     if (button < 0)
         debug_print("browser: button fail\n"); 
@@ -340,15 +345,19 @@ int main( int argc, char *argv[] )
 
 // ===================
 // client window (White)
+
+    unsigned long cw_left = 4;
+    unsigned long cw_top = 4 +24 +4;
+    unsigned long cw_width  = (w_width>>1);
+    unsigned long cw_height = (w_height>>1);
+
     client_window = 
         (int) gws_create_window (
                   client_fd,
-                  WT_SIMPLE,1,1,"client",
-                  4,                       // l
-                  4 +24 +4,                // t
-                  w_width-8, 
-                  w_height -4 -24 -4 -4,
-                  main_window, 0, COLOR_WHITE, COLOR_WHITE );
+                  WT_SIMPLE, 1, 1, "Client",
+                  cw_left, cw_top, cw_width, cw_height,
+                  main_window,// janela mãe é overlapped. pinta na client area. 
+                  0, COLOR_WHITE, COLOR_WHITE );
 
     if (client_window < 0)
         debug_print("browser: client_window fail\n"); 

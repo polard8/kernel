@@ -190,21 +190,18 @@ void set_input_status(int is_accepting)
     IsAcceptingInput = (int) is_accepting;
 }
 
-
 // Print a simple string in the serial port.
 void gwssrv_debug_print (char *string)
 {
     if ( (void*) string == NULL ){
         return;
     }
-
     gramado_system_call ( 
         289,
         (unsigned long) string,
         (unsigned long) string,
         (unsigned long) string );
 }
-
 
 // We can use the rtl or the library
 unsigned long gwssrv_get_system_metrics (int index)
@@ -1664,8 +1661,8 @@ int serviceGetWindowInfo(void)
     next_response[3] = 5678;
 // Window
 // l,t,w,h
-    next_response[7]  = (unsigned long) w->left;
-    next_response[8]  = (unsigned long) w->top; 
+    next_response[7]  = (unsigned long) w->absolute_x;
+    next_response[8]  = (unsigned long) w->absolute_y;
     next_response[9]  = (unsigned long) w->width;
     next_response[10] = (unsigned long) w->height;
 // Client rectangle
@@ -2347,8 +2344,8 @@ int serviceDrawChar (void)
 
 // Get message parameters.
     window_id = message_address[4];
-    x         = message_address[5];
-    y         = message_address[6]; 
+    x         = message_address[5];  // left
+    y         = message_address[6];  // top
     color     = message_address[7];
     unsigned long C = (unsigned long) message_address[8];
     //text_buffer =    //#todo
@@ -2362,10 +2359,6 @@ int serviceDrawChar (void)
         gwssrv_debug_print ("gwssrv: serviceDrawChar window_id\n");
         return -1;
     }
-
-    // #debug
-    // gwssrv_debug_print ("serviceDrawChar: get window pointer\n");
-
 // Get the window structure given the id.
     window = (struct gws_window_d *) windowList[window_id];
     if ( (void *) window == NULL ){
@@ -2377,52 +2370,61 @@ int serviceDrawChar (void)
         return -1;
     }
 
+    x = (unsigned long) (x & 0xFFFFFFFF);
+    y = (unsigned long) (y & 0xFFFFFFFF);
+
 // Draw
 // Let's draw the char 
 // using the routine for drawing a string.
 // See: dtext.c
 // If this window is overlapped window,
 // so paint into the client area.
-    if (window->type == WT_OVERLAPPED){
-        x += window->rcClient.left;
-        y += window->rcClient.top;
-    }
-    dtextDrawText ( 
+    if (window->type == WT_OVERLAPPED)
+    {
+        // #
+        // A chamada indica um deslocamento 
+        // dentro da área de cliente da parent,
+        // não um valor absoluto.
+        // >> Adiciona o deslocamento da client area.
+        x = window->rcClient.left + x;
+        y = window->rcClient.top  + y;
+        // >> Adiciona o deslocamento da parent.
+        dtextDrawText2 ( 
+            (struct gws_window_d *) window,
+            x, 
+            y, 
+            color, 
+            (unsigned char *) &_string[0],
+            TRUE );
+
+    }else{
+        // #
+        // A chamada indica um deslocamento na parent,
+        // não um valor absoluto.
+        // >> Adiciona o deslocamento da parent.
+        dtextDrawText2 ( 
+            (struct gws_window_d *) window,
+            x, 
+            y, 
+            color, 
+            (unsigned char *) &_string[0],
+            TRUE );
+    };
+
+// Draw
+
+/*
+    dtextDrawText2 ( 
         (struct gws_window_d *) window,
         x, 
         y, 
         color, 
-        (unsigned char *) &_string[0] );
-
-// #options:
-    //#test
-    //It is working
-    // Usando a janela screen por enquanto.
-    //dtextDrawText ( (struct gws_window_d *) gui->screen,
-        //x, y, color, (unsigned char *) &_string[0] );
-    //It is working
-    //charBackbufferDrawcharTransparent ( x, y, color, C );
-
-// Refresh
-// Refresh only the char.
-// #todo:
-// Maybe we can simply invalidar a small rectangle.
-// Maybe we can have a flag telling us if we need 
-// or not to refresh the char.
-
-    //gws_show_backbuffer ();         // for debug   
-    //gws_show_window_rect(window);   // something faster for now.
-    //something faster.
-    // x,y,w,h
-    gws_refresh_rectangle ( 
-        (window->left +x), 
-        (window->top  +y), 
-        8, 
-        8 );
+        (unsigned char *) &_string[0],
+        TRUE );
+*/
 
     return 0;
 }
-
 
 int serviceChangeWindowPosition(void)
 {
@@ -3136,7 +3138,7 @@ int serviceGetText(void)
     char *p = (char *) &next_response[string_off];
     int gotten=0;
 
-    if (window->type != WT_EDITBOX &&
+    if ( window->type != WT_EDITBOX &&
          window->type != WT_EDITBOX_MULTIPLE_LINES )
     {
         printf("Invalid window type\n");

@@ -115,7 +115,7 @@ void wmRefreshDirtyRectangles(void)
                 if (tmp->dirty == TRUE)
                 {
                     gws_refresh_rectangle ( 
-                        tmp->left, tmp->top, tmp->width, tmp->height ); 
+                        tmp->absolute_x, tmp->absolute_y, tmp->width, tmp->height ); 
                     
                     validate_window(tmp);
                 }
@@ -178,8 +178,8 @@ int gws_show_window_rect (struct gws_window_d *window)
 // See: rect.c   
 
     gws_refresh_rectangle ( 
-        window->left, 
-        window->top, 
+        window->absolute_x, 
+        window->absolute_y, 
         window->width, 
         window->height ); 
 
@@ -217,9 +217,9 @@ void mouse_at(void)
         {
             if (w->magic == 1234)
             {
-                if ( __new_mouse_x > w->left &&
+                if ( __new_mouse_x > w->absolute_x &&
                      __new_mouse_x < w->right &&
-                     __new_mouse_y > w->top &&
+                     __new_mouse_y > w->absolute_y &&
                      __new_mouse_y > w->bottom )
                 {
                     if (w != __root_window)

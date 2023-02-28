@@ -103,8 +103,10 @@ set_rect (
         return FALSE;
     }
 
+// ?? relative
     rect->left = left;
     rect->top = top;
+
     rect->width = width;
     rect->height = height;
 

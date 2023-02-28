@@ -1,4 +1,5 @@
 
+// painter.c
 
 #include "gwsint.h"
 
@@ -93,8 +94,8 @@ static void __draw_button_mark_by_wid( int wid, int button_number )
     }
 
     rectBackbufferDrawRectangle ( 
-        (w->left +3), 
-        (w->top +4), 
+        (w->absolute_x +3), 
+        (w->absolute_y +4), 
         (w->width -8), 
         2, 
         COLOR_RED, 
@@ -144,20 +145,20 @@ __draw_button_borders(
 // Cima
 // top, top+1, top+2
     rectBackbufferDrawRectangle ( 
-        w->left+1, 
-        w->top, 
+        w->absolute_x+1, 
+        w->absolute_y, 
         w->width-2,
         BorderSize, 
         outer_color, TRUE,0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1, 
-        w->top+1, 
+        w->absolute_x+1, 
+        w->absolute_y+1, 
         w->width-2, 
         BorderSize, 
         color1, TRUE,0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1+1, 
-        w->top+1+1,
+        w->absolute_x+1+1, 
+        w->absolute_y+1+1,
         w->width-4, 
         BorderSize, 
         color1, TRUE,0 );
@@ -165,20 +166,20 @@ __draw_button_borders(
 // Esq
 // left, left+1, left+2
     rectBackbufferDrawRectangle ( 
-        w->left, 
-        w->top+1, 
+        w->absolute_x, 
+        w->absolute_y+1, 
         BorderSize, 
         w->height-2,
         outer_color, TRUE,0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1, 
-        w->top+1, 
+        w->absolute_x+1, 
+        w->absolute_y+1, 
         BorderSize, 
         w->height-2,
         color1, TRUE,0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1+1, 
-        w->top+1+1, 
+        w->absolute_x+1+1, 
+        w->absolute_y+1+1, 
         BorderSize, 
         w->height-4,
         color1, TRUE,0 );
@@ -191,20 +192,20 @@ __draw_button_borders(
 // Dir
 // right-3, right-2, right-1
     rectBackbufferDrawRectangle ( 
-        ((w->left) + (w->width) -1), 
-        w->top+1, 
+        ((w->absolute_x) + (w->width) -1), 
+        w->absolute_y+1, 
         BorderSize, 
         w->height-2, 
         outer_color, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        ((w->left) + (w->width) -1 -1), 
-        w->top+1, 
+        ((w->absolute_x) + (w->width) -1 -1), 
+        w->absolute_y+1, 
         BorderSize, 
         w->height-2, 
         color2, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        ((w->left) + (w->width) -1 -1 -1), 
-        w->top+1+1, 
+        ((w->absolute_x) + (w->width) -1 -1 -1), 
+        w->absolute_y+1+1, 
         BorderSize, 
         w->height-4, 
         color2_light, TRUE, 0 );
@@ -213,20 +214,20 @@ __draw_button_borders(
 // Baixo
 // bottom-1, bottom-2, bottom-3
     rectBackbufferDrawRectangle ( 
-        w->left+1, 
-        ( (w->top) + (w->height) -1 ),  
+        w->absolute_x+1, 
+        ( (w->absolute_y) + (w->height) -1 ),  
         w->width-2, 
         BorderSize, 
         outer_color, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1, 
-        ( (w->top) + (w->height) -1 -1),  
+        w->absolute_x+1, 
+        ( (w->absolute_y) + (w->height) -1 -1),  
         w->width-2, 
         BorderSize, 
         color2, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        w->left+1+1, 
-        ( (w->top) + (w->height) -1 -1 -1),  
+        w->absolute_x+1+1, 
+        ( (w->absolute_y) + (w->height) -1 -1 -1),  
         w->width-4, 
         BorderSize, 
         color2_light, TRUE, 0 );
@@ -242,6 +243,7 @@ __draw_window_border(
     struct gws_window_d *parent, 
     struct gws_window_d *window )
 {
+// + We dont have a border size yet.
 
     if ( (void*) parent == NULL ){
         return;
@@ -254,7 +256,8 @@ __draw_window_border(
 // Is it possitle to test the validation here?
 
 // --------------------
-
+// + We dont have a border size yet.
+// Define border size.
     if (window->active == TRUE){
         window->border_size = 2;
     }
@@ -262,7 +265,65 @@ __draw_window_border(
         window->border_size = 1;
     }
 
+// ----------
+// Overlapped
+    if (window->type == WT_OVERLAPPED)
+    {
+        //if (window->active == TRUE)
+        //    window->border_size=2;
+        //if (window->active == FALSE)
+        //    window->border_size=1;
 
+        // Absolute values.
+        // Relative to the screen.
+
+        // top
+        rectBackbufferDrawRectangle( 
+            parent->absolute_x + window->left, 
+            parent->absolute_y + window->top, 
+            window->width, 
+            window->border_size, 
+            window->border_color1, 
+            TRUE, 
+            0 );
+        // left
+        rectBackbufferDrawRectangle( 
+            parent->absolute_x + window->left, 
+            parent->absolute_y + window->top, 
+            window->border_size, 
+            window->height, 
+            window->border_color1, 
+            TRUE,
+            0 );
+        // right
+        rectBackbufferDrawRectangle( 
+            (parent->absolute_x + window->left + window->width - window->border_size), 
+            (parent->absolute_y + window->top), 
+            window->border_size, 
+            window->height, 
+            window->border_color2, 
+            TRUE,
+            0 );
+        // bottom
+        rectBackbufferDrawRectangle ( 
+            (parent->absolute_x + window->left), 
+            (parent->absolute_y + window->top + window->height - window->border_size), 
+            window->width, 
+            window->border_size, 
+            window->border_color2, 
+            TRUE,
+            0 );
+    
+        // #test
+        // Subtract border size.
+        //window->left   += window->border_size;
+        //window->top    += window->border_size;
+        //window->right  -= window->border_size;
+        //window->bottom -= window->border_size;
+        return;
+    }
+
+// ------------------
 // Editbox
     if ( window->type == WT_EDITBOX || 
          window->type == WT_EDITBOX_MULTIPLE_LINES )
@@ -283,8 +344,8 @@ __draw_window_border(
 
         // top
         rectBackbufferDrawRectangle( 
-            window->left, 
-            window->top, 
+            window->absolute_x, 
+            window->absolute_y, 
             window->width, 
             window->border_size, 
             window->border_color1, 
@@ -292,8 +353,8 @@ __draw_window_border(
             0 );
         // left
         rectBackbufferDrawRectangle( 
-            window->left, 
-            window->top, 
+            window->absolute_x, 
+            window->absolute_y, 
             window->border_size, 
             window->height, 
             window->border_color1, 
@@ -301,8 +362,8 @@ __draw_window_border(
             0 );
         // right
         rectBackbufferDrawRectangle( 
-            (window->left + window->width - window->border_size), 
-            window->top,  
+            (window->absolute_x + window->width - window->border_size), 
+            window->absolute_y,  
             window->border_size, 
             window->height, 
             window->border_color2, 
@@ -310,8 +371,8 @@ __draw_window_border(
             0 );
         // bottom
         rectBackbufferDrawRectangle ( 
-            window->left, 
-            (window->top + window->height - window->border_size), 
+            window->absolute_x, 
+            (window->absolute_y + window->height - window->border_size), 
             window->width, 
             window->border_size, 
             window->border_color2, 
@@ -324,59 +385,7 @@ __draw_window_border(
         //window->top    += window->border_size;
         //window->right  -= window->border_size;
         //window->bottom -= window->border_size;
-    }
-
-// Overlapped
-    if (window->type == WT_OVERLAPPED)
-    {
-
-        if (window->active == TRUE)
-            window->border_size=2;
-        if (window->active == FALSE)
-            window->border_size=1;
-
-        // top
-        rectBackbufferDrawRectangle( 
-            parent->left + window->left, 
-            parent->top  + window->top, 
-            window->width, 
-            window->border_size, 
-            window->border_color1, 
-            TRUE, 
-            0 );
-        // left
-        rectBackbufferDrawRectangle( 
-            parent->left + window->left, 
-            parent->top + window->top, 
-            window->border_size, window->height, 
-            window->border_color1, 
-            TRUE,
-            0 );
-        // right
-        rectBackbufferDrawRectangle( 
-            (parent->left + window->left + window->width - window->border_size), 
-            (parent->top + window->top), 
-            window->border_size, 
-            window->height, 
-            window->border_color2, 
-            TRUE,
-            0 );
-        // bottom
-        rectBackbufferDrawRectangle ( 
-            (parent->left + window->left), 
-            (parent->top + window->top + window->height - window->border_size), 
-            window->width, 
-            window->border_size, 
-            window->border_color2, 
-            TRUE,
-            0 );
-    
-        // #test
-        // Subtract border size.
-        //window->left   += window->border_size;
-        //window->top    += window->border_size;
-        //window->right  -= window->border_size;
-        //window->bottom -= window->border_size;
+        return;
     }
 }
 
@@ -448,8 +457,8 @@ redraw_window (
 
             // Shadow rectangle.
             rectBackbufferDrawRectangle ( 
-                (window->left +1), 
-                (window->top +1), 
+                (window->absolute_x +1), 
+                (window->absolute_y +1), 
                 (window->width +1 +1), 
                 (window->height +1 +1), 
                 __tmp_color, 
@@ -472,8 +481,8 @@ redraw_window (
     {
         // redraw the background rectandle.
         rectBackbufferDrawRectangle ( 
-                window->left, 
-                window->top, 
+                window->absolute_x, 
+                window->absolute_y, 
                 window->width, 
                 window->height, 
                 window->bg_color, 
@@ -569,15 +578,15 @@ redraw_window (
 
         if (Selected == TRUE){
             grDrawString ( 
-                (window->left) +offset, 
-                (window->top)  +8, 
+                (window->absolute_x) +offset, 
+                (window->absolute_y) +8, 
                 COLOR_WHITE, window->name );
         }
 
         if (Selected == FALSE){
             grDrawString ( 
-                (window->left) +offset, 
-                (window->top)  +8, 
+                (window->absolute_x) +offset, 
+                (window->absolute_y) +8, 
                 COLOR_BLACK, window->name );
         }
 
@@ -654,8 +663,8 @@ redraw_window (
 
                     //bg
                     rectBackbufferDrawRectangle ( 
-                        window->titlebar->left, 
-                        window->titlebar->top, 
+                        window->titlebar->absolute_x, 
+                        window->titlebar->absolute_y, 
                         window->titlebar->width, 
                         window->titlebar->height, 
                         window->titlebar->bg_color, 
@@ -664,8 +673,8 @@ redraw_window (
 
                     // ornament
                     rectBackbufferDrawRectangle ( 
-                        window->titlebar->left, 
-                        ( (window->titlebar->top) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+                        window->titlebar->absolute_x, 
+                        ( (window->titlebar->absolute_y) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
                         window->titlebar->width, 
                         METRICS_TITLEBAR_ORNAMENT_SIZE, 
                         window->titlebar_ornament_color, 

@@ -1,7 +1,6 @@
-/*
- * File: dtext.c 
- *     Draw text routines.
- */
+
+// File: dtext.c 
+// Draw text routines.
 
 #include "gwsint.h"
 
@@ -17,6 +16,8 @@ grDrawString (
     unsigned int color,
     unsigned char *string )
 {
+// Absolute positions.
+
     int Index=0;
     //#bugbug:  Determinando
     int cWidth = 8;   
@@ -111,48 +112,69 @@ dtextDrawText (
     unsigned int color,
     unsigned char *string )
 { 
-    struct gws_window_d * __w;
 
-// #bugbug
-// Is gui a valid pointer?
+// Window validation
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic!=1234)
+        return;
 
-    //if ( (void*) gui == NULL )
-        //return;
-
-    __w = (struct gws_window_d *) gui->screen_window;
-
-
+// String validation
     if( (void*) string == NULL )
         return;
     if( *string==0 )
         return;
 
-    if ( (void *) window == NULL ){
+// Draw
+// Absolute
+    grDrawString ( 
+        (window->absolute_x +x), 
+        (window->absolute_y +y), 
+        (unsigned int) color, 
+         string );
+}
 
-        if ( (void*)__w != NULL )
-        {
-            // #todo: We need a parameter for transparent or not.
-            grDrawString ( 
-                (__w->left +x), 
-                (__w->top  +y), 
-                (unsigned int) color, 
-                string );
-            return;
-        }
-        
-        // #fail
-        gwssrv_debug_print("dtextDrawText: __w\n");
+void 
+dtextDrawText2 ( 
+    struct gws_window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned int color,
+    unsigned char *string,
+    int flush )
+{ 
+
+// Window validation
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic!=1234)
         return;
 
-    }else{
+// String validation
+    if( (void*) string == NULL )
+        return;
+    if( *string==0 )
+        return;
 
-        // #todo: We need a parameter for transparent or not.
-        grDrawString ( 
-            (window->left +x), 
-            (window->top  +y), 
-            (unsigned int) color, 
-            string );
-    };
+// Draw
+// Absolute
+    grDrawString ( 
+        (window->absolute_x +x), 
+        (window->absolute_y +y), 
+        (unsigned int) color, 
+         string );
+
+// Flush
+// Absolute
+    if (flush){
+        gws_refresh_rectangle ( 
+            (window->absolute_x +x), 
+            (window->absolute_y +y), 
+            8, 
+            8 );
+    }
 }
+
+
 
 

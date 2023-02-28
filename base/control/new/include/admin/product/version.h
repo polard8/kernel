@@ -9,7 +9,7 @@
 
 // Current build number.
 // Updated by the builder.
-#define CURRENT_BUILD_NUMBER    310
+#define CURRENT_BUILD_NUMBER    311
 
 // Version
 #define VERSION_MAJOR    1

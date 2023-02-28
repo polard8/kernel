@@ -27,6 +27,8 @@
 // #define WT_SURFACE    11
 // #define WT_MAX (WT_SURFACE+1)
 
+#define WT_TITLEBAR  12
+
 #endif    
 
 

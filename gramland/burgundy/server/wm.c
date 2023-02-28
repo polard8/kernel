@@ -609,17 +609,17 @@ post_message:
 
 
 // Check if we are inside the mouse hover.
-    if ( saved_x >= w->left &&
+    if ( saved_x >= w->absolute_x &&
          saved_x <= w->right &&
-         saved_y >= w->top &&
+         saved_y >= w->absolute_y &&
          saved_y <= w->bottom )
     {
         // #debug
         // printf("Inside mouse hover window :)\n");
     
         // Values inside the window.
-        in_x = (unsigned long) (saved_x - w->left);
-        in_y = (unsigned long) (saved_y - w->top);
+        in_x = (unsigned long) (saved_x - w->absolute_x);
+        in_y = (unsigned long) (saved_y - w->absolute_y);
 
         // Change the input pointer
         // inside the window editbox.
@@ -1767,7 +1767,6 @@ void do_create_controls(struct gws_window_d *window)
 // Create titlebar and controls.
 struct gws_window_d *do_create_titlebar(
     struct gws_window_d *parent,
-    unsigned long border_size,
     unsigned long tb_height,
     unsigned int color,
     unsigned int ornament_color,
@@ -1775,25 +1774,29 @@ struct gws_window_d *do_create_titlebar(
     int icon_id,
     int has_string )
 {
-    struct gws_window_d *tbWindow;
-    unsigned long BorderSize = border_size;
+// Respect the border size
+// of the parent.
 
+    struct gws_window_d *tbWindow;
+    // The position and the dimensions depends on the
+    // border size.
     unsigned long TitleBarLeft=0;
     unsigned long TitleBarTop=0;
     unsigned long TitleBarWidth=0;
     unsigned long TitleBarHeight = tb_height;  //#todo metrics
-
+    // Color and rop.
     unsigned int TitleBarColor = color;
-    unsigned long rop = 0;
+    unsigned long rop=0;
 
     if ( (void*) parent == NULL )
         return NULL;
     if (parent->magic!=1234)
         return NULL;
 
-    // Se a parent é uma overlapped  e esta maximizada
-    // então faremos uma title bar diferente,
-    // que preencha todo o topo da tela.
+// Se a parent é uma overlapped  e esta maximizada
+// então faremos uma title bar diferente,
+// que preencha todo o topo da tela.
+// Nesse caso a parent não deve ter borda.
     int IsMaximized=FALSE;
     if (parent->type == WT_OVERLAPPED &&
         parent->style == WS_MAXIMIZED )
@@ -1801,45 +1804,55 @@ struct gws_window_d *do_create_titlebar(
         IsMaximized=TRUE;
     }
 
-    //#todo: Different position, depending on the style
-    // if maximized or not.
-    if (IsMaximized==TRUE)
-    {
-        TitleBarLeft=0;
-        TitleBarTop=0;
-    }
-    if (IsMaximized!=TRUE)
-    {
-        TitleBarLeft=0;
-        TitleBarTop=0;
-    }
+// border size.
+// Respect the border size
+// of the parent.
+    //unsigned long BorderSize = parent->border_size;
 
-// Width
-    // Considere as bordas.
-    TitleBarWidth = 
-        (parent->width - BorderSize - BorderSize);
-    // Desconsidere as cordas.
+// #todo: 
+// Different position, depending on the style
+// if the parent is maximized or not.
+// Without border, everything changes.
     if (IsMaximized==TRUE)
+    {
+        TitleBarLeft  = 0;
+        TitleBarTop   = 0;
         TitleBarWidth = parent->width;
-    parent->titlebar_width = TitleBarWidth;
+    }
+// A parent não está maximizada,
+// então considere diminuir a largura, 
+// para incluir as bordas.
+    if (IsMaximized != TRUE)
+    {
+        TitleBarLeft = parent->border_size;
+        TitleBarTop  = parent->border_size;
+        // border size can't be '0'.
+        //if (parent->border_size==0){
+        //    printf ("bsize%d\n",parent->border_size);
+        //    while(1){}
+        //}
+        TitleBarWidth = (parent->width - parent->border_size - parent->border_size);
+    }
 
-// Height
+// Save
     parent->titlebar_height = TitleBarHeight;
-
+    parent->titlebar_width = TitleBarWidth;
     parent->titlebar_color = (unsigned int) TitleBarColor;
     parent->titlebar_text_color = 
         (unsigned int) get_color(csiSystemFontColor);
 
+// Herda o rop.
     rop = parent->rop;
 
 //-----------
 
-// #important: WT_SIMPLE with text.
+// #important: 
+// WT_SIMPLE with text.
 // lembre-se estamos relativos à area de cliente
 // da janela mão, seja ela de qual tipo for.
     tbWindow = 
        (void *) doCreateWindow ( 
-                    WT_SIMPLE, 0, 1, 1, "TitleBar", 
+                    WT_TITLEBAR, 0, 1, 1, "TitleBar", 
                     TitleBarLeft, 
                     TitleBarTop, 
                     TitleBarWidth, 
@@ -1851,16 +1864,15 @@ struct gws_window_d *do_create_titlebar(
                     (unsigned long) rop );   // rop_flags from the parent 
 
     if ( (void *) tbWindow == NULL ){
-        gwssrv_debug_print ("do_create_titlebar: tbWindow fail \n");
+        gwssrv_debug_print ("do_create_titlebar: tbWindow\n");
         return -1;
     }
-
     tbWindow->type = WT_SIMPLE;
     tbWindow->isTitleBar = TRUE;
 
-// ---------------------------------
-// Controle
-    //do_create_controls(tbWindow);
+// No room drawing more stuff inside the tb window.
+    if (tbWindow->width == 0)
+        return -1;
 
 // --------------------------------
 // Icon
@@ -1895,8 +1907,8 @@ struct gws_window_d *do_create_titlebar(
 
     if (useIcon == TRUE)
     {
-        iL = (unsigned long) (tbWindow->left + METRICS_ICON_LEFTPAD);
-        iT = (unsigned long) (tbWindow->top  + METRICS_ICON_TOPPAD);
+        iL = (unsigned long) (tbWindow->absolute_x + METRICS_ICON_LEFTPAD);
+        iT = (unsigned long) (tbWindow->absolute_y  + METRICS_ICON_TOPPAD);
         gwssrv_display_system_icon( 
             (int) icon_id, 
             (unsigned long) iL, 
@@ -1928,8 +1940,8 @@ struct gws_window_d *do_create_titlebar(
     parent->titlebar_ornament_color = OrnamentColor1;
 
     doFillWindow(
-        tbWindow->left, 
-        ( (tbWindow->top) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+        tbWindow->absolute_x, 
+        ( (tbWindow->absolute_y) + (tbWindow->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
         tbWindow->width, 
         OrnamentHeight, 
         OrnamentColor1, 
@@ -1955,11 +1967,14 @@ struct gws_window_d *do_create_titlebar(
     if (useIcon == FALSE){
         StringLeftPad = (unsigned long) METRICS_ICON_LEFTPAD;
     }
-    if (useIcon == TRUE)
-    {
+    if (useIcon == TRUE){
         StringLeftPad = 
             (unsigned long) ( METRICS_ICON_LEFTPAD +iWidth +(2*METRICS_ICON_LEFTPAD));
     }
+
+//
+// Text support
+//
 
     parent->titlebar_text_color = 
         (unsigned int) get_color(csiTitleBarText);
@@ -1984,8 +1999,8 @@ struct gws_window_d *do_create_titlebar(
 
     if (useTitleString == TRUE)
     {
-        sL = (unsigned long) ((tbWindow->left) + StringLeftPad);
-        sT = (unsigned long) ((tbWindow->top)  + StringTopPad);
+        sL = (unsigned long) ((tbWindow->absolute_x) + StringLeftPad);
+        sT = (unsigned long) ((tbWindow->absolute_y) + StringTopPad);
         sColor = (unsigned int) parent->titlebar_text_color;
         grDrawString ( sL, sT, sColor, tbWindow->name );
     }
@@ -2133,8 +2148,8 @@ wmCreateWindowFrame (
 
 // #bugbug
 // Estamos mascarando pois os valores anda corrompendo.
-    window->left   = (window->left   & 0xFFFF);
-    window->top    = (window->top    & 0xFFFF);
+    window->absolute_x   = (window->absolute_x   & 0xFFFF);
+    window->absolute_y    = (window->absolute_y    & 0xFFFF);
     window->width  = (window->width  & 0xFFFF);
     window->height = (window->height & 0xFFFF);
 
@@ -2260,7 +2275,7 @@ wmCreateWindowFrame (
         // Maybe we nned border size and padding size.
         
         // Consistente para overlapped.
-        BorderSize = METRICS_BORDER_SIZE;
+        //BorderSize = METRICS_BORDER_SIZE;
         // ...
         
         // #todo
@@ -2269,29 +2284,33 @@ wmCreateWindowFrame (
         // It also has a border style.
 
         // Se tiver o foco.
-        if (window->focus == TRUE){
-            BorderColor1 = (unsigned int) get_color(csiWWFBorder);
-            BorderColor2 = (unsigned int) get_color(csiWWFBorder);
-        }else{
-            BorderColor1 = (unsigned int) get_color(csiWindowBorder);
-            BorderColor2 = (unsigned int) get_color(csiWindowBorder);
-        };
+        //if (window->focus == TRUE){
+        //    BorderColor1 = (unsigned int) get_color(csiWWFBorder);
+        //    BorderColor2 = (unsigned int) get_color(csiWWFBorder);
+        //}else{
+        //    BorderColor1 = (unsigned int) get_color(csiWindowBorder);
+        //    BorderColor2 = (unsigned int) get_color(csiWindowBorder);
+        //};
 
-        window->border_size = 0;
-        window->borderUsed = FALSE;
-        if (useBorder==TRUE){
-            window->border_color1 = (unsigned int) BorderColor1;
-            window->border_color2 = (unsigned int) BorderColor2;
-            window->border_size   = BorderSize;
-            window->borderUsed    = TRUE;
-        }
+        //window->border_size = 0;
+        //window->borderUsed = FALSE;
+        //if (useBorder==TRUE){
+            //window->border_color1 = (unsigned int) BorderColor1;
+            //window->border_color2 = (unsigned int) BorderColor2;
+            //window->border_size   = BorderSize;
+        //    window->borderUsed    = TRUE;
+        //}
 
         // Quatro bordas de uma janela overlapped.
         // Uma overlapped maximizada não tem bordas.
+        window->borderUsed = FALSE;
+        
         if ( IsMaximized == FALSE && 
              IsFullscreen == FALSE)
         {
+            window->borderUsed = FALSE;
             __draw_window_border(parent,window);
+            // Now we have a border size.
         }
 
         // #important:
@@ -2341,7 +2360,6 @@ wmCreateWindowFrame (
             tbWindow = 
                 (struct gws_window_d *) do_create_titlebar(
                     window,
-                    BorderSize,
                     TitleBarHeight,
                     TitleBarColor,
                     OrnamentColor1,
@@ -2509,16 +2527,16 @@ static void animate_window( struct gws_window_d *window )
     
     for (i=0; i<800; i++)
     {
-         if ( (window->left - 1) == 0){
+         if ( (window->absolute_x - 1) == 0){
              return;
          }
-         if ( (window->top - 1) == 0){
+         if ( (window->absolute_y - 1) == 0){
              return;
          }
          gwssrv_change_window_position(
               window, 
-              window->left -1, 
-              window->top  -1);
+              window->absolute_x -1, 
+              window->absolute_y  -1);
               redraw_window(window,FALSE);
               invalidate_window(window);
     };
@@ -2728,8 +2746,8 @@ int wmManageWindow(struct gws_window_d *w)
         goto fail;
     }
 
-    c->l = w->left;
-    c->t = w->top;
+    c->l = w->absolute_x;
+    c->t = w->absolute_y;
     c->w = w->width;
     c->h = w->height;
     for (i=0; i<4; i++){
@@ -3645,8 +3663,8 @@ printable:
         // Refresh rectangle
         // x,y,w,h
         gws_refresh_rectangle ( 
-            (window->left + (window->ip_x*8)), 
-            (window->top  + (window->ip_y*8)), 
+            (window->absolute_x + (window->ip_x*8)), 
+            (window->absolute_y + (window->ip_y*8)), 
             8, 
             8 );
 
@@ -4657,8 +4675,8 @@ void yellowstatus0(char *string,int refresh)
         //bar_size = w;
         bar_size = (w>>1);
         doFillWindow ( 
-            aw->left +2, 
-            aw->top  +2, 
+            aw->absolute_x +2, 
+            aw->absolute_y  +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
@@ -4669,8 +4687,8 @@ void yellowstatus0(char *string,int refresh)
         //bar_size = (offset_string2 + (100) );
         bar_size = (w>>1);
         doFillWindow ( 
-            aw->left +2, 
-            aw->top +2, 
+            aw->absolute_x +2, 
+            aw->absolute_y +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
@@ -4678,10 +4696,10 @@ void yellowstatus0(char *string,int refresh)
     };
 
 // Escreve as strings
-    
     grDrawString ( 
-        aw->left +2 + offset_string1, 
-        aw->top  +2 + 8, COLOR_BLACK, 
+        aw->absolute_x +2 + offset_string1, 
+        aw->absolute_y +2 + 8, 
+        COLOR_BLACK, 
         string );
     
     //grDrawString ( offset_string2, 8, COLOR_BLACK, "FPS" );
@@ -4694,7 +4712,7 @@ void yellowstatus0(char *string,int refresh)
 
     if(refresh){
         gws_refresh_rectangle(
-            (aw->left +2), (aw->top +2), bar_size, 24 );
+            (aw->absolute_x +2), (aw->absolute_y +2), bar_size, 24 );
     }
 }
 
@@ -4749,9 +4767,9 @@ is_within2 (
     }
 
 //relative to the parent.
-    int x1= pw->left + w->left; 
+    int x1= pw->absolute_x + w->absolute_x; 
     int x2= x1 + w->width;
-    int y1= pw->top  + w->top;
+    int y1= pw->absolute_y  + w->absolute_y;
     int y2= y1 + w->height;
 
     if( x > x1 && 
@@ -4782,9 +4800,9 @@ is_within (
         if ( window->used == TRUE && window->magic == 1234 )
         {
             // yes!
-            if ( x >= window->left   && 
+            if ( x >= window->absolute_x   && 
                  x <= window->right  &&
-                 y >= window->top    &&
+                 y >= window->absolute_y    &&
                  y <= window->bottom )
             {
                 return TRUE;
@@ -5140,10 +5158,7 @@ void create_taskbar (unsigned long tb_height)
         (struct gws_window_d *) CreateWindow ( 
             WT_BUTTON, 0, 1, 1, 
             button_label,  //string  
-            b_left, 
-            b_top, 
-            b_width, 
-            b_height,   
+            b_left, b_top, b_width, b_height,   
             taskbar_window, 0, 
             frame_color,     // frame color 
             client_color );  // client window color
@@ -5700,11 +5715,13 @@ gwssrv_change_window_position (
 // #bugbug #todo
 // Temos que checar a validade da parent.
 
-    window->x = x;
-    window->y = y;
+// relativo
+    window->left = x;
+    window->top = y;
+// absoluto
     //if ( (void*) window->parent == NULL ){ return; };
-    window->left = (window->parent->left + window->x);
-    window->top  = (window->parent->top  + window->y);
+    window->absolute_x = (window->parent->absolute_x + x);
+    window->absolute_y = (window->parent->absolute_y + y);
 
 // Se overlapped:
 // Muda também as posições da titlebar.
@@ -5714,10 +5731,10 @@ gwssrv_change_window_position (
         // Title bar window.
         if ( (void*) window->titlebar != NULL )
         {
-            window->titlebar->left = 
-                ( window->left + window->border_size );
-            window->titlebar->top = 
-                ( window->top  + window->border_size );
+            window->titlebar->absolute_x = 
+                ( window->absolute_x + window->border_size );
+            window->titlebar->absolute_y = 
+                ( window->absolute_y  + window->border_size );
         
             //if (window->titlebar->Controls.initialized == TRUE)
             //{
@@ -5894,15 +5911,12 @@ void wm_Update_TaskBar( char *string, int flush )
     if ( WindowManager.is_fullscreen == TRUE ){
         return;
     }
-
     if ( (void*) string == NULL ){
         return;
     }
-
     if (*string == 0){
         return;
     }
-
 // Window
     if ( (void*) taskbar_window == NULL ){
         return;
@@ -5931,7 +5945,6 @@ void wm_Update_TaskBar( char *string, int flush )
             //__draw_button_mark_by_wid(wid,i);
         }
     };
-
 
 //
 // Strings

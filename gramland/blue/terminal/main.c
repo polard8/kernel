@@ -1451,6 +1451,7 @@ terminal_write_char (
 // White on black
 // IN: fd, wid, l, t, color, ch.
 
+// Draw and refresh?
     gws_draw_char (
         (int) fd,
         (int) window,
@@ -1759,20 +1760,16 @@ tputc (
         is_control = TRUE;
     }
 
-
 // Invalid socket
-    if(fd<0)
+    if (fd<0)
         return;
-
 // Invalid target window.
-    if(window<0)
+    if (window<0)
         return;
-
 // Invalid char len.
 // #bugbug: Isso nem precisa.
      //if(len!=1)
          //len=1;
-
     //??
     //if(iofd != -1) {}
 

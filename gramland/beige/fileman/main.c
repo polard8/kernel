@@ -467,19 +467,34 @@ int main ( int argc, char *argv[] )
 
 // Como nossa janela mãe é overlapped,
 // então estamos relativos a sua área de cliente.
-    unsigned long header_w_width = wWidth -2 -2;
+    //unsigned long header_w_width = wWidth -2 -2;
+    //unsigned long header_w_height = 2 +24 +2;
+
+    unsigned long header_w_left = 0;
+    unsigned long header_w_top = 0;
+    // #bugbug
+    // Para a largura devemos considerar a largura da área de cliente
+    // nesse caso, onde a janela mãe é overlapped.
+    // Uma flag no style pode indicar que devemos fazer clipping
+    // na área de cliente.
+    unsigned long header_w_width = (wWidth - 50);
     unsigned long header_w_height = 2 +24 +2;
 
 // Container for editbox and button.
+// #bugbug
+// A janela não pode ser maior que a área de cliente.
+// Quando a janela mãe é overlapped,
+// a janela é relativa à área de cliente da
+// janela mãe.
     Header_window = 
         (int) gws_create_window ( 
                   client_fd,
                   WT_SIMPLE, 1, 1,"HeaderWin",
-                  2,  //left pad
-                  2,  //top  pad
-                  header_w_width,   //width 
-                  header_w_height,  //height
-                  Main_window, 
+                  header_w_left,  //l
+                  header_w_left,  //t
+                  header_w_width,  //w
+                  header_w_height,  //h
+                  Main_window, // >>> Main_window é overlapped.
                   0, 
                   xCOLOR_GRAY7, 
                   xCOLOR_GRAY7 );
@@ -489,6 +504,11 @@ int main ( int argc, char *argv[] )
         printf     ("fileman: Header_window fail\n"); 
         exit(1);
     }
+
+    //#debug
+    //gws_refresh_window (client_fd, Main_window);
+    //while(1){}
+
 
 //
 // == Address bar =========================

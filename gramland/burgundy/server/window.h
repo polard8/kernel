@@ -607,16 +607,15 @@ struct gws_window_d
 // Margins and dimensions.
 //
 
-// Positions. Relative to the parent.
-    unsigned long x;
-    unsigned long y; 
-
-// Margins. (position)
-// Deslocamento em relação à tela. (screen)
+// Relativo a tela.
+    unsigned long absolute_x;
+    unsigned long absolute_y; 
+// Relativo a parent.
     unsigned long left;        //margem esquerda 
     unsigned long top;         //margem superior
     unsigned long right;       //margem direita  
     unsigned long bottom;      //margem inferior  
+
 // Dimension
     unsigned long width;
     unsigned long height;
@@ -1496,7 +1495,6 @@ void do_create_controls( struct gws_window_d *window);
 // Create titlebar and controls.
 struct gws_window_d *do_create_titlebar(
     struct gws_window_d *parent,
-    unsigned long border_size,
     unsigned long tb_height,
     unsigned int color,
     unsigned int ornament_color,
@@ -1558,6 +1556,15 @@ void *CreateWindow (
     unsigned int frame_color, 
     unsigned int client_color ); 
 
+int RegisterWindow(struct gws_window_d *window);
+
+struct gws_window_d *get_window_from_wid(int wid);
+
+struct gws_window_d *get_active_window (void);
+void set_active_window (struct gws_window_d *window);
+void set_active_by_id(int wid);
+
+//---
 void 
 grDrawString ( 
     unsigned long x,
@@ -1573,13 +1580,15 @@ dtextDrawText (
     unsigned int color,
     unsigned char *string );
 
-int RegisterWindow(struct gws_window_d *window);
-
-struct gws_window_d *get_window_from_wid(int wid);
-
-struct gws_window_d *get_active_window (void);
-void set_active_window (struct gws_window_d *window);
-void set_active_by_id(int wid);
+void 
+dtextDrawText2 ( 
+    struct gws_window_d *window,
+    unsigned long x,
+    unsigned long y,
+    unsigned int color,
+    unsigned char *string,
+    int flush );
+//---
 
 
 int dock_active_window(int position);

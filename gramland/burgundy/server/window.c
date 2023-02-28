@@ -690,6 +690,25 @@ void *doCreateWindow (
     //window->dirty  = FALSE;  // Validate
     //window->locked = FALSE;
 
+    // Initializing border stuff
+    window->border_color1 = COLOR_WHITE;
+    window->border_color2 = COLOR_WHITE;
+    window->border_size = 2;
+    window->border_style = 0;
+    window->borderUsed = FALSE;
+    // ## na verdade isse será trabalhado logo abaixo.
+    if (window->type == WT_OVERLAPPED)
+    {
+        window->borderUsed = TRUE;
+        window->border_style = 1; // Minimum.
+    }
+    unsigned long __BorderSize = window->border_size;
+
+// Title bar height.
+// #todo: use metrics.
+    unsigned long __TBHeight = METRICS_TITLEBAR_DEFAULT_HEIGHT;
+
+
 // Event queue
     register int e=0;
     for (e=0; e<32; e++){
@@ -835,8 +854,9 @@ void *doCreateWindow (
 
 // The frame rectangle.
 // Initial configuration.
-    window->rcWindow.left   = (unsigned long) WindowX;       // window left
-    window->rcWindow.top    = (unsigned long) WindowY;       // window top
+// Relative values.
+    window->rcWindow.left   = (unsigned long) 0; //WindowX;       // window left
+    window->rcWindow.top    = (unsigned long) 0; //WindowY;       // window top
     window->rcWindow.width  = (unsigned long) WindowWidth;   // window width
     window->rcWindow.height = (unsigned long) WindowHeight;  // window height
 
@@ -848,8 +868,7 @@ void *doCreateWindow (
 // We need a variable for border size.
 // #todo:
 // We need a variable for title bar height.
-    unsigned long __BorderSize=2;
-    unsigned long __TBHeight=32;
+
 // left
 // + borda da esq
     clientRect.left = (unsigned long) __BorderSize;  
@@ -866,12 +885,20 @@ void *doCreateWindow (
 // width
 // menos bordas laterais
     clientRect.width  = 
-        (unsigned long) (window->width -__BorderSize -__BorderSize);
+        (unsigned long) ( 
+            window->width -
+            __BorderSize -
+            __BorderSize );
 // height
 // menos bordas superior e inferior
     // menos a barra de tarefas.
     clientRect.height = 
-        (unsigned long) (window->height -__BorderSize -__TBHeight -__BorderSize); 
+        (unsigned long) ( 
+            window->height -
+            __BorderSize -
+            __TBHeight -
+            __BorderSize); 
+
 
 // If we have scrollbars.
 // #todo: Diminuimos as dimensões se o style
@@ -896,8 +923,8 @@ void *doCreateWindow (
 // #deprecated?
 // Deslocamento em relação a janela mãe.
 // Passado via argumento.
-    window->x = WindowX;
-    window->y = WindowY;
+    //window->x = WindowX;
+    //window->y = WindowY;
 
 //++
 // Margens.
@@ -905,6 +932,8 @@ void *doCreateWindow (
 
 // We don't have a parent wiindow.
 // If this is the first of all windows.
+
+// Relative
     window->left = WindowX;
     window->top  = WindowY; 
 
@@ -917,21 +946,79 @@ void *doCreateWindow (
 // Isso só não será válido, se uma flag especial 
 // permitir criar uma janela fora da área de cliente.
 
+    if ( (void*) window->parent == NULL )
+    {
+        window->absolute_x = WindowX;
+        window->absolute_y = WindowY; 
+    }
+
+// Calcula o absoluto
     if ( (void*) window->parent != NULL )
     {
-        window->left = (window->parent->left + WindowX); 
-        window->top  = (window->parent->top  + WindowY);
-        if (window->parent->type == WT_OVERLAPPED){
-            window->left += window->parent->rcClient.left;
-            window->top  += window->parent->rcClient.top;
-        }
+        // A parent não é uma title bar,
+        // Então vamos usar o posicionamento absoluto da
+        // janela mãe.
+        //window->left = (window->parent->left + WindowX); 
+        //window->top  = (window->parent->top  + WindowY);
+        //window->left = (window->parent->x + WindowX); 
+        //window->top  = (window->parent->y  + WindowY);
+
+        //if ( window->parent->type == WT_OVERLAPPED || 
+        //     window->parent->type == WT_SIMPLE  )
+        //{
+            // Se estamos criando uma title bar,
+            // ela deve considerar o left da parent e não
+            // o left da area de cliente.
+            //if (window->type == WT_TITLEBAR){
+                //absolute_x = 
+                //    window->parent->x + WindowX;
+                //absolute_y  = 
+                //    window->parent->y + WindowY;
+                    
+                window->absolute_x = 
+                    window->parent->absolute_x + WindowX;
+                window->absolute_y = 
+                    window->parent->absolute_y + WindowY;
+            
+            // Se a janela que estamos criando não é uma title bar
+            // então considere o left da área de cliente da janela mãe.
+            //}else{
+                //if (window->style & WS_CHILD)
+                if (window->parent->type == WT_OVERLAPPED )
+                {
+                    // Dentro da área de cliente.
+                    window->absolute_x = 
+                        window->parent->absolute_x + 
+                        window->parent->rcClient.left + 
+                        WindowX;
+                    window->absolute_y  = 
+                        window->parent->absolute_y +
+                        window->parent->rcClient.top + 
+                        WindowY;
+
+                    // Fora da área de cliente.
+                    if ( window->type == WT_TITLEBAR)
+                    {
+                        window->absolute_x = 
+                            window->parent->absolute_x + 
+                            WindowX;
+                        window->absolute_y  = 
+                           window->parent->absolute_y + 
+                           WindowY;
+                    }
+                    
+                    // Fora da área de cliente.
+                    
+                }
+            //};
+        //}
     }
 
 // Right and bottom.
     window->right = 
-        (unsigned long) (window->left + window->width);
+        (unsigned long) (window->absolute_x + window->width);
     window->bottom = 
-        (unsigned long) (window->top + window->height); 
+        (unsigned long) (window->absolute_y + window->height); 
 
 //--
 
@@ -942,35 +1029,35 @@ void *doCreateWindow (
     {
         if (WindowManager.initialized == TRUE)
         {
-            window->left   = WindowManager.wa_left;
-            window->top    = WindowManager.wa_top;
+            window->absolute_x = WindowManager.wa_left;
+            window->absolute_y = WindowManager.wa_top;
             window->width  = WindowManager.wa_width;
             window->height = WindowManager.wa_height;
 
             // Right and bottom.
             window->right = 
-                (unsigned long) (window->left + window->width);
+                (unsigned long) (window->absolute_x + window->width);
             window->bottom = 
-                (unsigned long) (window->top + window->height); 
+                (unsigned long) (window->absolute_y + window->height); 
         }
     }
 
 // Fullscreen OK
     if (Fullscreen == TRUE)
     {
-        window->left = fullWindowX;
-        window->top  = fullWindowY;
+        window->absolute_x = fullWindowX;
+        window->absolute_y  = fullWindowY;
         window->width = fullWindowWidth;
         window->height = fullWindowHeight;
 
         // Right and bottom.
         window->right = 
-            (unsigned long) (window->left + window->width);
+            (unsigned long) (window->absolute_x + window->width);
         window->bottom = 
-            (unsigned long) (window->top + window->height); 
+            (unsigned long) (window->absolute_y + window->height); 
 
-        window->full_left   = window->left;
-        window->full_top    = window->top;
+        window->full_left   = window->absolute_x;
+        window->full_top    = window->absolute_y;
         window->full_width  = window->width;
         window->full_height = window->height;
 
@@ -1156,6 +1243,7 @@ void *doCreateWindow (
 
     // Simple window. (Sem barra de títulos).
     case WT_SIMPLE:
+    case WT_TITLEBAR:
         window->ip_device = IP_DEVICE_NULL;
         window->frame.used = FALSE;
         Background = TRUE;
@@ -1431,7 +1519,7 @@ void *doCreateWindow (
             if (window->focus == FALSE){ __tmp_color = xCOLOR_GRAY2; }
 
             doFillWindow( 
-                (window->left +1),     (window->top +1), 
+                (window->absolute_x +1), (window->absolute_y +1), 
                 (window->width +1 +1), (window->height +1 +1), 
                 __tmp_color, __rop_flags );
 
@@ -1463,6 +1551,7 @@ void *doCreateWindow (
         // Select background color.
         switch (type){
             case WT_SIMPLE:
+            case WT_TITLEBAR:
             case WT_OVERLAPPED:
             case WT_POPUP:
             case WT_EDITBOX:
@@ -1489,31 +1578,36 @@ void *doCreateWindow (
         // também leva em conta o posicionamento 
         // da área de cliente da janela mãe
 
-        if (type==WT_EDITBOX || type==WT_EDITBOX_MULTIPLE_LINES)
-        {
-            if ( (void*) window->parent != NULL )
-            {
-                window->left = 
-                    (window->left + window->parent->rcClient.left);
-                window->top = 
-                    (window->top  + window->parent->rcClient.top);
-            }
-        }
+        //if (type==WT_EDITBOX || type==WT_EDITBOX_MULTIPLE_LINES)
+        //{
+			//ja fizemos isso acima.
+            //if ( (void*) window->parent != NULL )
+            //{
+            //   window->left = 
+            //        (window->left + window->parent->rcClient.left);
+            //    window->top = 
+            //        (window->top  + window->parent->rcClient.top);
+            //}
+        //}
 
         // Paint the background
         // #check
         // This routine is calling the kernel to paint the rectangle.
+        
+        // Absolute.
         doFillWindow( 
-            window->left, window->top, window->width, window->height, 
-            window->bg_color, __rop_flags );
+            window->absolute_x, 
+            window->absolute_y, 
+            window->width, 
+            window->height, 
+            window->bg_color, 
+            __rop_flags );
     }
 
 // ===============================================
 // ## Client area rectangle ##
-//
 
-    if (ClientArea == TRUE)
-    {
+    if (ClientArea == TRUE){
         window->rcClient.left   = (unsigned long) window->left;
         window->rcClient.top    = (unsigned long) window->height;
         window->rcClient.width  = (unsigned long) window->width;
@@ -1616,15 +1710,15 @@ void *doCreateWindow (
             // Button label
             if (buttonSelected == TRUE){
                 grDrawString ( 
-                    (window->left) +offset, 
-                    (window->top)  +8, 
+                    (window->absolute_x) + offset, 
+                    (window->absolute_y) + 8, 
                     COLOR_WHITE, 
                     window->name );
             }
             if (buttonSelected == FALSE){
                 grDrawString ( 
-                    (window->left) +offset,  
-                    (window->top)  +8,  
+                    (window->absolute_x) + offset,  
+                    (window->absolute_y) + 8,  
                     COLOR_BLACK, 
                     window->name );
             }
@@ -1931,7 +2025,7 @@ void *CreateWindow (
 // Types with no frame!
 
 //====
-//simple
+// Simple
     if (type == WT_SIMPLE)
     {
         //gwssrv_debug_print ("CreateWindow: WT_SIMPLE \n");
@@ -2008,9 +2102,9 @@ draw_frame:
                 (struct gws_window_d *) pWindow,
                 (struct gws_window_d *) __w, 
                 METRICS_BORDER_SIZE,
-                (unsigned int)COLOR_BLACK, 
-                (unsigned int)COLOR_BLACK,
-                (unsigned int)COLOR_BLACK,
+                (unsigned int) COLOR_BLACK, 
+                (unsigned int) COLOR_BLACK,
+                (unsigned int) COLOR_BLACK,
                 (unsigned int) 0x00C3C3C3,  //xCOLOR_GRAY6,
                 (unsigned int) 0x00C3C3C3,  //xCOLOR_GRAY3,
                 1 );  // style
