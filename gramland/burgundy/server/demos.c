@@ -58,8 +58,8 @@ void demoClearSurface(unsigned int color)
             if( gr_dc->initialized == TRUE )
             {
                 rectBackbufferDrawRectangle ( 
-                    gr_dc->left, 
-                    gr_dc->top, 
+                    gr_dc->absolute_x, 
+                    gr_dc->absolute_y, 
                     gr_dc->width, 
                     gr_dc->height,
                     color, 1, 0 );
@@ -94,8 +94,8 @@ void demoFlushSurface(void)
             if( gr_dc->initialized == TRUE )
             {
                 gws_refresh_rectangle(
-                    gr_dc->left, 
-                    gr_dc->top, 
+                    gr_dc->absolute_x, 
+                    gr_dc->absolute_y, 
                     gr_dc->width, 
                     gr_dc->height );
 

@@ -3704,6 +3704,16 @@ static int on_execute(int dm)
 
     // Given 'n' seconds with no requests or input events,
     // so we can run the screen saver animation.
+    
+    /*
+    demoCat();
+    demoLine1();
+    demoLines();
+    demoPolygon();
+    demoPolygon2();
+    demoTriangle();
+    demoCurve();
+    */
 
     while (running == TRUE){
 

@@ -56,10 +56,8 @@ struct dc_d
     unsigned long device_height;
     unsigned long bpp;
 
-// virtual window.
-// relativos a tela?
-    unsigned long left;
-    unsigned long top;
+    unsigned long absolute_x;
+    unsigned long absolute_y;
     unsigned long width;
     unsigned long height;
 

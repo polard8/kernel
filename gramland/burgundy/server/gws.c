@@ -511,8 +511,8 @@ int gwsInit(void)
     gr_dc->bpp = DeviceScreen->bpp;
     
     // virtual window.
-    gr_dc->left   = 0;
-    gr_dc->top    = 0;
+    gr_dc->absolute_x = 0;
+    gr_dc->absolute_y = 0;
     gr_dc->width  = gr_dc->device_width;
     gr_dc->height = gr_dc->device_height;
 

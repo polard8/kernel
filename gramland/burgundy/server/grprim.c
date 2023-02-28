@@ -820,9 +820,9 @@ grPlot0 (
         // Se temos uma janela válida.
         if ( UseClipping == TRUE )
         {
-            if ( finalx >= w->left  && 
+            if ( finalx >= w->absolute_x  && 
                  finalx <= w->right &&
-                 finaly >= w->top   && 
+                 finaly >= w->absolute_y   && 
                  finaly <= w->bottom )
                  {
                      // Plot pixel into the raster.
@@ -2177,7 +2177,6 @@ void grDCMono (
         printf ("dc\n");
         return;
     }
-
     if (dc->used != TRUE || dc->magic != 1234 )
     {
         printf ("dc validation\n");
