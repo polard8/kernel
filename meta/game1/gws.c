@@ -552,13 +552,13 @@ int gwsInit(void)
 //
 
 // virtual window.
-    gr_dc->left   = 0;
-    gr_dc->top    = 0;
+    gr_dc->absolute_x   = 0;
+    gr_dc->absolute_y    = 0;
     gr_dc->width  = (unsigned long) (gr_dc->device_width & 0xFFFFFFFF);
     gr_dc->height = (unsigned long) (gr_dc->device_height & 0xFFFFFFFF);
 
-    gr_dc->right  = gr_dc->left + gr_dc->width;
-    gr_dc->bottom = gr_dc->top  + gr_dc->height;
+    gr_dc->right  = gr_dc->absolute_x + gr_dc->width;
+    gr_dc->bottom = gr_dc->absolute_y + gr_dc->height;
 
 // #test
 // Usado na estrutura de projeção.

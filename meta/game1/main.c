@@ -1856,8 +1856,8 @@ static int serviceGetWindowInfo(void)
     next_response[3] = 5678;  //signature
 
 // Window
-    next_response[7]  = (unsigned long) w->left;
-    next_response[8]  = (unsigned long) w->top; 
+    next_response[7]  = (unsigned long) w->absolute_x;
+    next_response[8]  = (unsigned long) w->absolute_y; 
     next_response[9]  = (unsigned long) w->width;
     next_response[10] = (unsigned long) w->height;
 
@@ -2640,8 +2640,8 @@ int serviceDrawChar (void)
 
     // x,y,w,h
     gws_refresh_rectangle ( 
-        (window->left +x), 
-        (window->top  +y), 
+        (window->absolute_x +x), 
+        (window->absolute_y +y), 
         8, 
         8 );
 

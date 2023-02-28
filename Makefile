@@ -48,6 +48,13 @@ clean-base:
 	-rm base/exposed/indigo2/bin/*.BIN
 	-rm base/control/newm0/MOD0.BIN
 	-rm base/control/new/KERNEL.BIN
+# Clear the disk cache
+	-rm -rf base/control/disk/*.BIN 
+	-rm -rf base/control/disk/*.BMP
+	-rm -rf base/control/disk/EFI/BOOT/*.EFI 
+	-rm -rf base/control/disk/GRAMADO/*.BIN 
+	-rm -rf base/control/disk/PROGRAMS/*.BIN 
+	-rm -rf base/control/disk/USERS/*.BIN 
 
 
 

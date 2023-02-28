@@ -78,8 +78,8 @@ struct dc_d
 
 // virtual window.
 // relativos a tela?
-    unsigned long left;
-    unsigned long top;
+    unsigned long absolute_x;
+    unsigned long absolute_y;
     unsigned long width;
     unsigned long height;
 

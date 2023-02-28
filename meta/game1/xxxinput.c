@@ -361,10 +361,10 @@ int top_at ( int x, int y ){
 
                  // #importante
                  // Checando coordenadas.
-                  if ( x > (tmp->left)  && 
-                       x < (tmp->left + tmp->width)  && 
-                       y > (tmp->top)  &&
-                       y < (tmp->top + tmp->height)  )
+                  if ( x > (tmp->absolute_x)  && 
+                       x < (tmp->absolute_x + tmp->width)  && 
+                       y > (tmp->absolute_y)  &&
+                       y < (tmp->absolute_y + tmp->height)  )
                  {
 					 //printf ("%d",z);
                       // salva essa.

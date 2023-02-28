@@ -724,8 +724,8 @@ int projection_initialize(void)
 // são dependentes do dispositivos.
 // Do mesmo modo que podemos ter uma tela virtual.
 
-    CurrentProjection->l = gr_dc->left;
-    CurrentProjection->t = gr_dc->top;
+    CurrentProjection->l = gr_dc->absolute_x;
+    CurrentProjection->t = gr_dc->absolute_y;
     CurrentProjection->w = gr_dc->width;
     CurrentProjection->h = gr_dc->height;
 
@@ -1052,7 +1052,7 @@ int gr_dc_refresh_screen(struct dc_d *dc)
 
 // Refresh
     gws_refresh_rectangle(
-        dc->left, dc->top, dc->width, dc->height );
+        dc->absolute_x, dc->absolute_y, dc->width, dc->height );
 
     return 0;
 }
@@ -1072,8 +1072,8 @@ int gr_dc_fill( struct dc_d *dc, unsigned int bg_color )
     dc->bg_color = (unsigned int) bg_color;
 
     rectBackbufferDrawRectangle ( 
-        dc->left, 
-        dc->top, 
+        dc->absolute_x, 
+        dc->absolute_y, 
         dc->width,
         dc->height, 
         dc->bg_color, 
@@ -1115,8 +1115,8 @@ gr_dc_plot0(
     unsigned long finaly = (unsigned long) (y & 0xFFFFFFFF);
     unsigned long rop = (unsigned long) dc->rop;
 
-    finalx += dc->left;
-    finaly += dc->top;
+    finalx += dc->absolute_x;
+    finaly += dc->absolute_y;
 
     grBackBufferPutpixel(
         (unsigned int) color, 
@@ -1373,8 +1373,8 @@ grPlot0 (
 // e sim no centro da área de cliente da janela.
 // o dc atual deve ser a área de cliente da janela.
     if (UseClipping==TRUE){
-        hotspotx = w->left + (w->width /2);
-        hotspoty = w->top  + (w->height /2);
+        hotspotx = w->absolute_x + (w->width /2);
+        hotspoty = w->absolute_y  + (w->height /2);
     }
 
 // transform
@@ -1456,8 +1456,8 @@ grPlot0 (
         // Esta dentro da janela.
         if (UseClipping == TRUE)
         {
-            if ( X >= w->left && X <= w->right &&
-                 Y >= w->top  && Y <= w->bottom )
+            if ( X >= w->absolute_x && X <= w->right &&
+                 Y >= w->absolute_y  && Y <= w->bottom )
             {
                 return (int) grBackBufferPutpixel(
                                 (unsigned int) color, X, Y, rop ); 

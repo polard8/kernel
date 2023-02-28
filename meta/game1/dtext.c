@@ -81,8 +81,8 @@ dtextDrawText (
         if ( (void*)__w != NULL )
         {
             grDrawString ( 
-                (__w->left +x), 
-                (__w->top  +y), 
+                (__w->absolute_x +x), 
+                (__w->absolute_y +y), 
                 (unsigned int) color, 
                 string );
             return;
@@ -92,8 +92,8 @@ dtextDrawText (
 
     }else{
         grDrawString ( 
-            (window->left +x), 
-            (window->top  +y), 
+            (window->absolute_x +x), 
+            (window->absolute_y +y), 
             (unsigned int) color, 
             string );
     };

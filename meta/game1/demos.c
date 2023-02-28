@@ -1162,8 +1162,8 @@ demoClearSurface(
             if (clipping_window->type == WT_SIMPLE)
             {
                 rectBackbufferDrawRectangle ( 
-                    clipping_window->left, 
-                    clipping_window->top, 
+                    clipping_window->absolute_x, 
+                    clipping_window->absolute_y, 
                     clipping_window->width, 
                     clipping_window->height,
                     color, 1, 0 );
@@ -1181,8 +1181,8 @@ demoClearSurface(
             if( gr_dc->initialized == TRUE )
             {
                 rectBackbufferDrawRectangle ( 
-                    gr_dc->left, 
-                    gr_dc->top, 
+                    gr_dc->absolute_x, 
+                    gr_dc->absolute_y, 
                     gr_dc->width, 
                     gr_dc->height,
                     color, 1, 0 );
@@ -1238,8 +1238,8 @@ void demoFlushSurface(struct gws_window_d *clipping_window)
             if( gr_dc->initialized == TRUE )
             {
                 gws_refresh_rectangle(
-                    gr_dc->left, 
-                    gr_dc->top, 
+                    gr_dc->absolute_x, 
+                    gr_dc->absolute_y, 
                     gr_dc->width, 
                     gr_dc->height );
 

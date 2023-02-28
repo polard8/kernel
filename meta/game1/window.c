@@ -607,9 +607,7 @@ void *doCreateWindow (
     */
 
 // Create the window object.
-
     window = (struct gws_window_d *) __create_window_object();
-
     if ( (void*) window == NULL ){
         return NULL;
     }
@@ -776,8 +774,8 @@ void *doCreateWindow (
 // Maximized ?
     if (Maximized == TRUE)
     {
-        window->left   = deviceLeft;
-        window->top    = deviceTop;
+        window->absolute_x = deviceLeft;
+        window->absolute_y = deviceTop;
         window->width  = deviceWidth;
         //#todo: Nesse momento temos que ter a altura da barra 
         //registrada em estrutura.
@@ -787,8 +785,8 @@ void *doCreateWindow (
 // Fullscreen
     if (Fullscreen == TRUE)
     {
-        window->left   = 0;//fullWindowX;
-        window->top    = 0;//fullWindowY;
+        window->absolute_x = 0;//fullWindowX;
+        window->absolute_y = 0;//fullWindowY;
         window->width  = deviceWidth;
         window->height = deviceHeight; 
     }
@@ -875,8 +873,8 @@ void *doCreateWindow (
 // ??
 // Deslocamento em relação a janela mãe.
 // Passado via argumento.
-    window->x = WindowX;
-    window->y = WindowY;
+    window->left = WindowX;
+    window->top = WindowY;
 
 //++
 // Margens.
@@ -885,16 +883,16 @@ void *doCreateWindow (
 
 // We don't have a parent wiindow.
 // If this is the first of all windows.
-    window->left = WindowX;
-    window->top  = WindowY; 
+    window->absolute_x = WindowX;
+    window->absolute_y = WindowY; 
 
 // If we have a parent window.
 // parent + arguments
     if ( (void*) window->parent != NULL)
     {
         // Sempre é relativo à janela mãe.
-        window->left = (window->parent->left + WindowX); 
-        window->top  = (window->parent->top  + WindowY);
+        window->absolute_x = (window->parent->absolute_x + WindowX); 
+        window->absolute_y = (window->parent->absolute_y + WindowY);
         
         // Se a janela mãe é overlapped,
         // então também é relativo à janela de cliente.
@@ -903,14 +901,14 @@ void *doCreateWindow (
         // permitir criar uma janela fora da área de cliente.
         if (window->parent->type == WT_OVERLAPPED)
         {
-            window->left += window->parent->rcClient.left;
-            window->top  += window->parent->rcClient.top;
+            window->absolute_x += window->parent->rcClient.left;
+            window->absolute_y += window->parent->rcClient.top;
         }
     }
 
 // right and bottom.
-    window->right  = (unsigned long) ( window->left + window->width );
-    window->bottom = (unsigned long) ( window->top  + window->height ); 
+    window->right  = (unsigned long) ( window->absolute_x + window->width );
+    window->bottom = (unsigned long) ( window->absolute_y + window->height ); 
 //--
 
 
@@ -920,15 +918,15 @@ void *doCreateWindow (
 // #todo: use the working area structure.
     if ( Maximized == TRUE )
     {
-        window->left = deviceLeft;
-        window->top  = deviceTop;
+        window->absolute_x = deviceLeft;
+        window->absolute_y = deviceTop;
     }
 
 // Fullscreen
     if ( Fullscreen == TRUE )
     {
-        window->left = deviceLeft;
-        window->top  = deviceTop;
+        window->absolute_x = deviceLeft;
+        window->absolute_y = deviceTop;
     }
 
 // Full ?
@@ -1415,7 +1413,7 @@ void *doCreateWindow (
                 // #check
                 // This routine is calling the kernel to paint the rectangle.
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1),     (window->top +1), 
+                    (window->absolute_x +1),     (window->absolute_y +1), 
                     (window->width +1 +1), (window->height +1 +1), 
                     __tmp_color, TRUE, rop_flags );
             }
@@ -1425,7 +1423,7 @@ void *doCreateWindow (
                 // #check
                 // This routine is calling the kernel to paint the rectangle.
                 rectBackbufferDrawRectangle ( 
-                    (window->left +1),     (window->top +1), 
+                    (window->absolute_x +1),     (window->absolute_y +1), 
                     (window->width +1 +1), (window->height +1 +1), 
                     __tmp_color, TRUE, rop_flags );
             }
@@ -1489,10 +1487,10 @@ void *doCreateWindow (
         {
             if ( (void*) window->parent != NULL )
             {
-                window->left = 
-                    (window->left + window->parent->rcClient.left);
-                window->top = 
-                    (window->top  + window->parent->rcClient.top);
+                window->absolute_x = 
+                    (window->absolute_x + window->parent->rcClient.left);
+                window->absolute_y = 
+                    (window->absolute_y  + window->parent->rcClient.top);
             }
         }
 
@@ -1503,7 +1501,7 @@ void *doCreateWindow (
             // #check
             // This routine is calling the kernel to paint the rectangle.
             rectBackbufferDrawRectangle ( 
-                    window->left, window->top, window->width, window->height, 
+                    window->absolute_x, window->absolute_y, window->width, window->height, 
                     window->bg_color, TRUE, rop_flags );
         }
 
@@ -1513,7 +1511,7 @@ void *doCreateWindow (
             // #check
             // This routine is calling the kernel to paint the rectangle.
             rectBackbufferDrawRectangle ( 
-                window->left, window->top, window->width, window->height, 
+                window->absolute_x, window->absolute_y, window->width, window->height, 
                 window->bg_color, TRUE, rop_flags );
         }
     }
@@ -1525,8 +1523,8 @@ void *doCreateWindow (
 // Client area rectangle.
 
     if (ClientArea == TRUE){
-        window->rcClient.left   = (unsigned long) window->left;
-        window->rcClient.top    = (unsigned long) window->height;
+        window->rcClient.left   = (unsigned long) 0; //window->absolute_x;
+        window->rcClient.top    = (unsigned long) 0; //window->absolute_y;
         window->rcClient.width  = (unsigned long) window->width;
         window->rcClient.height = (unsigned long) window->height;
     }
@@ -1627,15 +1625,15 @@ void *doCreateWindow (
 
             if (buttonSelected == TRUE){
                 grDrawString ( 
-                    (window->left) +offset, 
-                    (window->top)  +8, 
+                    (window->absolute_x) +offset, 
+                    (window->absolute_y) +8, 
                     COLOR_WHITE, window->name );
             }
 
             if (buttonSelected == FALSE){
                 grDrawString ( 
-                    (window->left) +offset,  
-                    (window->top)  +8,  
+                    (window->absolute_x) +offset,  
+                    (window->absolute_y) +8,  
                     COLOR_BLACK, window->name );
             }
         }
