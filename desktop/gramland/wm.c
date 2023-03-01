@@ -2851,7 +2851,7 @@ void wm_update_desktop(int tile)
                 l = (struct gws_window_d *) w;
                 // Redraw, but do no show it.
                 redraw_window(w,FALSE);
-                
+
                 // Post message to the main window.
                 // Paint the childs of the window with focus.
                 on_update_window(GWS_Paint);
@@ -2914,10 +2914,17 @@ void wm_update_desktop3(struct gws_window_d *top_window)
         return;
 
     redraw_window(__root_window,FALSE);
+
     set_active_window(top_window);
     set_focus(top_window);
     redraw_window(top_window,FALSE);
+    // Post message to the main window.
+    // Paint the childs of the window with focus.
+    on_update_window(GWS_Paint);
+
+
     wm_Update_TaskBar("...",FALSE);
+
 // Flush the whole desktop.
     flush_window(__root_window);
 }
@@ -3877,8 +3884,9 @@ void __probe_tb_button_hover(unsigned long long1, unsigned long long2)
 
 
 // local
-static void on_mouse_leave( struct gws_window_d *window )
+static void on_mouse_leave(struct gws_window_d *window)
 {
+// When the mouse pointer leaves a window.
 
     if ( (void*) window == NULL )
         return;
@@ -5476,10 +5484,14 @@ int dock_window( struct gws_window_d *window, int position )
             break;
     };
 
-    // #test
-    set_active_window(window);
 
+    set_active_window(window);
+    set_focus(window);
     redraw_window(window,TRUE);
+    // Post message to the main window.
+    // Paint the childs of the window with focus.
+    on_update_window(GWS_Paint);
+
     return 0; 
 }
 
@@ -5715,13 +5727,13 @@ gwssrv_change_window_position (
 // #bugbug #todo
 // Temos que checar a validade da parent.
 
-// relativo
-    window->left = x;
-    window->top = y;
 // absoluto
     //if ( (void*) window->parent == NULL ){ return; };
     window->absolute_x = (window->parent->absolute_x + x);
     window->absolute_y = (window->parent->absolute_y + y);
+// relativo
+    window->left = x;
+    window->top = y;
 
 // Se overlapped:
 // Muda também as posições da titlebar.
@@ -5743,22 +5755,32 @@ gwssrv_change_window_position (
             //}
         }
 
-        // client area . (rectangle).
-
-        // left
-        window->rcClient.left = (unsigned long) 2;  // + borda da esq
-        // top
-        window->rcClient.top = (unsigned long) 2+32;
-        // width
-        // menos bordas laterais
-        window->rcClient.width = 
-            (unsigned long) (window->width -2 -2 );
-        // height
-        // menos bordas superior e inferior
-        // menos a barra de tarefas.
-        window->rcClient.height = 
-            (unsigned long) (window->height -2 -32 -2); 
+        // Client area . (rectangle).
+        // Esses valores são relativos, então não mudam.
     }
+
+
+// Se nossa parent é overlapped.
+    struct gws_window_d *p;
+    p = window->parent;
+    if ( (void*) p != NULL )
+    {
+        if (p->magic == 1234)
+        {
+            if (p->type == WT_OVERLAPPED)
+            {
+                window->absolute_x = 
+                   p->absolute_x +
+                   p->rcClient.left +
+                   window->left;
+                window->absolute_y = 
+                   p->absolute_y +
+                   p->rcClient.top +
+                   window->top;
+            }
+        }
+    }
+
 
 // #bugbug
 // Precisa mesmo pinta toda vez que mudar a posiçao?

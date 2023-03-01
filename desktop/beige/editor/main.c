@@ -71,6 +71,17 @@ static int addressbar_window = 0;
 static int client_window = 0;
 static int savebutton_window = 0;
 
+struct client_window_d
+{
+    unsigned long l;
+    unsigned long t;
+    unsigned long w;
+    unsigned long h;
+};
+struct client_window_d cwAddressBar;
+struct client_window_d cwButton;
+struct client_window_d cwText;
+
 // #todo
 // int button_list[8];
 
@@ -114,6 +125,78 @@ static void update_clients(int fd)
     if (fd<0){
         return;
     }
+
+    // Local.
+    struct gws_window_info_d lWi;
+
+// Get info about the main window.
+//IN: fd, wid, window info structure.
+    gws_get_window_info(
+        fd, 
+        main_window,   // The app window.
+        (struct gws_window_info_d *) &lWi );
+
+// Change the position of the clients.
+
+//---------------------------------------------
+// Save
+    cwAddressBar.l = (( lWi.cr_width/8 )*2);
+    cwAddressBar.t = 4;
+    cwAddressBar.w = (( lWi.cr_width/8 )*3);
+    cwAddressBar.h = 24;
+    gws_change_window_position( 
+        fd,
+        addressbar_window,
+        cwAddressBar.l,
+        cwAddressBar.t );
+    gws_resize_window(
+        fd,
+        addressbar_window,
+        cwAddressBar.w,
+        cwAddressBar.h );
+
+
+//---------------------------------------------
+// Save
+    cwButton.l = (( lWi.cr_width/8 )*7);
+    cwButton.t = 4;
+    cwButton.w = (( lWi.cr_width/8 )*1);
+    cwButton.h = 24;
+    gws_change_window_position( 
+        fd,
+        savebutton_window,
+        cwButton.l,
+        cwButton.t );
+    gws_resize_window(
+        fd,
+        savebutton_window,
+        cwButton.w,
+        cwButton.h );
+
+//-----------------------
+// the text window
+// Save
+// Save
+    cwText.l = 0;
+    cwText.t = (cwAddressBar.t + cwAddressBar.h + 2);
+    cwText.w = lWi.cr_width;
+    cwText.h = (lWi.cr_height - cwText.t);
+
+    gws_change_window_position( 
+        fd,
+        client_window,
+        cwText.l,
+        cwText.t );
+    gws_change_window_position( 
+        fd,
+        client_window,
+        cwText.l,
+        cwText.t );
+    gws_resize_window(
+        fd,
+        client_window,
+        cwText.w,
+        cwText.h );
 
 // #todo: 
 // We need a list o clients. maybe clients[i]
@@ -303,8 +386,7 @@ editorProcedure(
     // If the event window is the main window, so
     // redraw everyone.
     case MSG_PAINT:
-        if ( event_window == main_window )
-        {
+        if (event_window == main_window){
             update_clients(fd);
             return 0;
         }
@@ -582,7 +664,7 @@ int main( int argc, char *argv[] )
         exit(1);
     }
 
-// Labal.
+// Label.
 // Text inside the main window.
 // Right below the title bar.
 // Right above the client window.
@@ -594,6 +676,19 @@ int main( int argc, char *argv[] )
         (unsigned long) COLOR_BLACK,
         " Name: ");
 
+// -----------------------------
+
+    // Local.
+    struct gws_window_info_d lWi;
+
+// Get info about the main window.
+//IN: fd, wid, window info structure.
+    gws_get_window_info(
+        client_fd, 
+        main_window,   // The app window.
+        (struct gws_window_info_d *) &lWi );
+
+
 // Address bar - (edit box)
 // Inside the main window.
 // se a janela mae é overlapped, 
@@ -602,9 +697,9 @@ int main( int argc, char *argv[] )
         (int) gws_create_window (
                   client_fd,
                   WT_EDITBOX,1,1,"address-bar",
-                  (( w_width/8 )*2),    //l
-                  4,                    //t
-                  (( w_width/8 )*3), 
+                  (( lWi.cr_width/8 )*2),  //l
+                  4,                       //t
+                  (( lWi.cr_width/8 )*3), 
                   24,    
                   main_window, 
                   0, COLOR_WHITE, COLOR_WHITE );
@@ -624,6 +719,11 @@ int main( int argc, char *argv[] )
             (unsigned long) COLOR_BLACK,
             "text.txt");
      }
+// Save
+    cwAddressBar.l = (( lWi.cr_width/8 )*2);
+    cwAddressBar.t = 4;
+    cwAddressBar.w = (( lWi.cr_width/8 )*3);
+    cwAddressBar.h = 24;
 
 // The [Save] button.
 // inside the main window.
@@ -632,15 +732,22 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_BUTTON,1,1,"Save",
-                  (( w_width/8 )*6),  //l 
+                  (( lWi.cr_width/8 )*6),  //l 
                   4,                  //t
-                  (( w_width/8 )*1), 
+                  (( lWi.cr_width/8 )*1), 
                   24,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
     if (savebutton_window < 0){
         //debug_print("editor: savebutton_window fail\n"); 
     }
+
+// Save
+    cwButton.l = (( lWi.cr_width/8 )*7);
+    cwButton.t = 4;
+    cwButton.w = (( lWi.cr_width/8 )*1);
+    cwButton.h = 24;
+
 
 //
 // == Client window =======================
@@ -672,15 +779,15 @@ int main( int argc, char *argv[] )
 // Lembre-se que temos uma status bar.
 
 // left:
-    unsigned long cw_left = 4;
+    unsigned long cw_left = 0;
 // top: pad | address bar | pad
-    unsigned long cw_top = 4 +24 +4;
+    unsigned long cw_top =  (cwAddressBar.t + cwAddressBar.h + 2);
 // width: Width - borders.
-    unsigned long cw_width = ((w_width/8)*7);
+    unsigned long cw_width = (lWi.cr_width);
 // height:
 // #bugbug:
 // We gotta get the client window values.
-    unsigned long cw_height = ((w_height/8)*6);
+    unsigned long cw_height = (lWi.cr_height - cw_top);
 
     client_window = 
         (int) gws_create_window ( 
@@ -692,6 +799,12 @@ int main( int argc, char *argv[] )
     if (client_window < 0){
         //debug_print("editor: client_window fail\n"); 
     }
+
+// Save
+    cwText.l = 0;
+    cwText.t = (cwAddressBar.t + cwAddressBar.h + 2);
+    cwText.w = lWi.cr_width;
+    cwText.h = (lWi.cr_height - cwText.t);
 
 // Show main window.
     gws_refresh_window (client_fd, main_window);

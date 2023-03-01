@@ -412,17 +412,13 @@ redraw_window (
 
     unsigned int __tmp_color = COLOR_WINDOW;
 
-    //#debug
-    //gwssrv_debug_print ("redraw_window:\n");
 
 // Structure validation.
     if ( (void *) window == NULL ){
         goto fail;
-        //return -1;
     }
     if (window->used!=TRUE || window->magic!=1234){
         goto fail;
-        //return -1;
     }
 
 // =======================
@@ -490,7 +486,7 @@ redraw_window (
                 (unsigned long) window->rop );   // ROP for this window.
 
         // All done for WT_SIMPLE type.
-        if( window->type == WT_SIMPLE ){
+        if (window->type == WT_SIMPLE){
             goto done;
         }
     }

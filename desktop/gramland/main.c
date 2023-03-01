@@ -2565,33 +2565,26 @@ int serviceRedrawWindow (void)
 
 // Window ID
     window_id = (int) (window_id & 0xFFFF);
-    if ( window_id < 0 || window_id >= WINDOW_COUNT_MAX ){
+    if (window_id < 0 || window_id >= WINDOW_COUNT_MAX){
         gwssrv_debug_print ("serviceRedrawWindow: [FAIL] window_id\n");
         goto fail;
     }
-
 // Get the window structure given the id.
     window = (struct gws_window_d *) windowList[window_id];
     if ( (void *) window == NULL ){
         gwssrv_debug_print ("serviceRedrawWindow: window\n");
         goto fail;
     }
-    if ( window->used != TRUE || 
-         window->magic != 1234 )
-    {
+    if (window->used != TRUE || window->magic != 1234){
         gwssrv_debug_print ("serviceRedrawWindow: window validation\n");
         goto fail;
     }
-
-// Valid window. 
-// Do not refresh it yet.
-    //window->dirty = FALSE;
 
 // Redraw it.
 // IN: w, flags: 
 // flags: 
 // TRUE = show the window now. FALSE=do not show the window.
-    redraw_window (
+    redraw_window ( 
         (struct gws_window_d *) window, 
         (unsigned long) flags );
 
@@ -2599,9 +2592,7 @@ int serviceRedrawWindow (void)
 // Now the compositor can refresh it.
 // Não podemos mostra se a flag diz pra não mostrar.
     // window->dirty = TRUE;
-
     return 0;
-
 fail:
     return (int) (-1);
 }
