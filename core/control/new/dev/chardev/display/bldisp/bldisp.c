@@ -448,6 +448,10 @@ int bldisp_initialize(void)
 // validation
     bl_display_device->used = TRUE;
     bl_display_device->magic = 1234;
+
+    PROGRESS("bldisp_initialize: Setup display device\n");
+    printf("bldisp_initialize: Setup display device\n");
+
     return 0;
 }
 

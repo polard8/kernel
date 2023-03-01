@@ -19,7 +19,7 @@
 #define VERSION_WORD    0x0106
 // Strings
 #define VERSION_STRING    "1.6"
-#define BUILD_STRING      "309"
+#define BUILD_STRING      "312"
 #define RELEASE_STRING    PRODUCT_TYPE_STRING
 
 #endif

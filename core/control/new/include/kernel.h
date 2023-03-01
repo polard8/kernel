@@ -643,34 +643,20 @@ struct kernel_classes_d  KernelClasses;
 // == prototypes ==========================================
 //
 
-// inicialização do kernel, independente da arquitetura.
-// See: init.c
+// see: kmain.c
 int kmain(int arch_type);
+// Inicialização do kernel, independente da arquitetura.
+// See: init.c
+int kmain2(int arch_type);
+
 void gramado_shutdown (int how);
 
-// ================================================
-
-//
 // x86_64 Initialization. (Main routine)
-//
-
 // x64init.c
 int I_x64main (void);
 void I_x64ExecuteInitialProcess (void);
 
-// ================================================
-
-//
 // Finalizations support.
-//
-
 void faults(unsigned long number);
-
-// #debug
-// usado durante a construçao dos handlers das irqs.
-// See: main.c hw.asm headlib.asm
-void xxxxIRQ0_DEBUG_MESSAGE(void);
-void xxxxIRQ1_DEBUG_MESSAGE(void);
-
 void panic ( const char *format, ... );
 void die (void);

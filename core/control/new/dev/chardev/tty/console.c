@@ -3,6 +3,11 @@
 
 #include <kernel.h>
 
+#define GCC_VERSION ( __GNUC__ * 10000 \
+            + __GNUC_MINOR__ * 100 \
+            + __GNUC_PATCHLEVEL__ )
+
+
 // Fullscreen kernel console.
 // Handmade by the kernel at the initialization.
 // see: tty.h
@@ -3037,6 +3042,8 @@ console_banner(
         set_up_cursor(0,0);
         printf ("%s\n", product_string );
         printf ("%s\n", build_string );
+        // Print gcc version
+        printf("gcc: %d\n",GCC_VERSION);
     }
 }
 

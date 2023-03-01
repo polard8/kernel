@@ -45,10 +45,6 @@
 struct initialization_d  Initialization;
 
 
-#define GCC_VERSION ( __GNUC__ * 10000 \
-            + __GNUC_MINOR__ * 100 \
-            + __GNUC_PATCHLEVEL__ )
-
 // ==========================
 
 //
@@ -137,501 +133,31 @@ static void preinit_OutputSupport(void);
 static void preinit_Serial(void);
 
 // Booting routines.
+static void kernel_booting(int arch_type);
 static int booting_begin(int arch_type);
 static int booting_end(int arch_type);
+
+static void kernel_final_messages(void);
 
 // System initialization routines.
 
 static int __setup_cmdline(void);
 static void __enter_debug_mode(void);
 
+
+static void __print_resolution_info(void);
+static void __check_gramado_mode(void);
+static void __import_data_from_linker(void);
+
+static void __check_refresh_support(void);
 // ================================
 
-// Setup stdin file.
-// Clean the buffer.
-// Set the offset position.
-// See: kstdio.c
-static int __setup_cmdline(void)
+// Worker
+static void __check_refresh_support(void)
 {
-    char cmdline[64];
+// Check if we can use refresh_screen or not.
 
-    memset(cmdline, 0, 64);  
-    cmdline[63]=0;
-
-    if ( (void*) stdin == NULL ){
-        return -1;
-    }
-    if (stdin->magic!=1234){
-        return -1;
-    }
-// Rewind.
-    k_fseek( stdin, 0, SEEK_SET );
-// Clean
-    file_write_buffer( stdin, cmdline, 64 );
-    k_fseek( stdin, 0, SEEK_SET );
-    return 0;
-}
-
-static void __enter_debug_mode(void)
-{
-    if( Initialization.serial_log == TRUE ){
-        PROGRESS("__enter_debug_mode:\n");
-    }
-
-    if( Initialization.console_log != TRUE )
-    {
-        if( Initialization.serial_log == TRUE ){
-            PROGRESS("__enter_debug_mode: can't use the cirtual console\n");
-        }
-    }
-
-    if( Initialization.console_log == TRUE )
-    {
-        printf("init.c: The kernel is in debug mode.\n");
-        refresh_screen();
-        
-        kgwm_early_kernel_console();
-        
-        printf("init.c: End of debug mode.\n");
-        refresh_screen();
-        
-        die();
-    }
-
-    die();
-}
-
-// Last step:
-// This function stays in the top of this document.
-static int booting_end(int arch_type)
-{
-
-// Open the kernel virtual console 
-// instead of first process.
-// We can receive this flag via command line.
-
-    //int UseDebugMode=TRUE;
-    int UseDebugMode=FALSE;
-
-    PROGRESS("booting_end:\n");
-
-// Final message before jumping to init process.
-    printf("booting_end:\n");
-
-    //#debug
-    //refresh_screen();
-    //while(1){}
-
-// Setup command line for the init process.
-    __setup_cmdline();
-
-// Clear the screen again.
-    zero_initialize_background();
-
-// ::: Initialization on debug mode.
-// Initialize the default kernel virtual console.
-// It depends on the run_level.
-// See: kgwm.c
-
-    if ( UseDebugMode == TRUE ){
-        __enter_debug_mode();
-    }
-
-    switch (arch_type){
-        
-        case CURRENT_ARCH_X86_64:
-            // Do not return!
-            // see: x64init.c
-            I_x64ExecuteInitialProcess();
-            break;
-        default:
-            panic("booting_end: arch_type\n");
-            break;
-    };
-
-    return FALSE;
-}
-
-
-static void preinit_Globals(int arch_type)
-{
-
-// Scheduler policies
-// Early initialization.
-// See: 
-// sched.h, sched.c.
-    SchedulerInfo.policy = SCHED_RR;
-    SchedulerInfo.flags  = (unsigned long) 0;
-
-// Initializing the global spinlock.
-    __spinlock_ipc = TRUE;
-
-// IO Control
-    IOControl.useTTY = FALSE;        // Model not implemented yet.
-    IOControl.useEventQueue = TRUE;  // The current model.
-    IOControl.initialized = TRUE;    // IO system initialized.
-
-    // ...
-}
-
-// see: serial.c
-static void preinit_Serial(void)
-{
-    int Status=FALSE;
-    Status = serial_init();
-    if(Status!=TRUE){
-        //#bugbug
-        //Oh boy!, We can't use the serial debug.
-    }
-    debug_print("preinit_Serial: Initialized\n");
-}
-
-static void preinit_OutputSupport(void)
-{
-    PROGRESS("preinit_OutputSupport:\n");
-
-// O refresh ainda não funciona, 
-// precisamos calcular se a quantidade mapeada é suficiente.
-    refresh_screen_enabled = FALSE;
-
-    PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
-    zero_initialize_virtual_consoles();
-
-// #IMPORTAT: 
-// We do not have all the runtime support yet.
-// We can't use printf yet.
-}
-
-
-// ------------------------------
-// kmain:
-// Called by START in arch/x86_64/entrance/head_64.asm.
-// See: kernel.h
-
-int kmain(int arch_type)
-{
-    int Status=FALSE;
-
-    asm ("cli");
-
-// Starting the counter.
-    Initialization.current_phase = 0;
-
-
-/*
-    char hostname[64];
-    sprintf(hostname,"gramado");
-    s_hostname = (char *) &hostname[0];
-*/
-
-// Setup debug mode.
-// Enable the usage of the serial debug.
-// It is not initialized yet.
-// #see: debug.c
-    disable_serial_debug();
-    if (USE_SERIALDEBUG == 1){
-        enable_serial_debug();
-    }
-
-//
-// Presence level
-//
-
-// See:
-// sched.h, sched.c
-
-    // (timer ticks / fps) = level
-
-    //presence_level = (1000/1000);  //level 1;    // 1000   fps
-    //presence_level = (1000/500);   //level 2;    // 500    fps
-    //presence_level = (1000/250);   //level 4;    // 250    fps
-    //presence_level = (1000/125);   //level 8;    // 125    fps
-    //presence_level = (1000/62);    //level 16;   // 62,20  fps
-    //presence_level = (1000/25);    //level 32;   // 31,25  fps
-    //presence_level = (1000/15);    //level 64;   // 15,625 fps 
-    //presence_level = (1000/10);    //level 100;   // 10 fps
-    //presence_level = (1000/5);     //level 200;   // 5  fps
-    // presence_level = (1000/4);     //level 250;  // 4  fps
-    //presence_level = (1000/2);     //level 500;   // 2  fps
-    //presence_level = (1000/1);     //level 1000;  // 1  fps
-
-    //set_update_screen_frequency(30);
-    set_update_screen_frequency(60);
-    //set_update_screen_frequency(120);
-
-// ==================
-
-// Preinit
-    preinit();
-
-// Booting ...
-
-    current_arch = CURRENT_ARCH_X86_64;
-
-    Status = (int) booting_begin(current_arch);
-
-    if (Status==TRUE){
-        Status = (int) booting_end(current_arch);
-    }
-
-    if (Status != TRUE)
-    {
-        // panic screen
-        // Mostramos informações completas ou
-        // permitimos a inicialização de outro modo,
-        // talvez algum modo de recuperação ou simplificado.
- 
-        if( Initialization.serial_log == TRUE ){
-            PROGRESS("kmain: booting_end fail\n");
-        }
-        if( Initialization.console_log == TRUE )
-        {
-            printf("kmain: booting_end fail\n");
-            printf("kmain: Trying debug mode\n");
-            __enter_debug_mode();
-        }
-        die();
-    }
-
-// Final messages
-    if( Initialization.serial_log == TRUE ){
-        PROGRESS("kmain: [final message] FAILURE\n");
-    }
-    if( Initialization.console_log == TRUE ){
-        printf("kmain: [final message] FAILURE\n");
-        refresh_screen();
-    }
-
-    system_state = SYSTEM_DEAD;
-
-// Retorna para o assembly e para em hlt.
-// see: _kernel_begin in head_64.asm.
-
-    return FALSE;
-}
-
-
-// limitation: No serial debug yet.
-// #todo: #bugbug
-// We have another BootBlock structure in info.h
-static int preinit_SetupBootblock(void)
-{
-
-// Magic
-// #bugbug: Explain it better.
-    unsigned long bootMagic = 
-        (unsigned long) (magic & 0x00000000FFFFFFFF); 
-
-// The boot block address. 0x0000000000090000.
-// Each entry has 8 bytes.
-// virtual = physical.
-    unsigned long *xxxxBootBlock = (unsigned long*) BootBlockVA; 
-
-// lfb
-// Esse endereço virtual foi configurado pelo bootloader.
-// Ainda não configuramos a paginação no kernel.
-    unsigned long *fb = (unsigned long *) FRONTBUFFER_VA; 
-    fb[0] = 0x00FFFFFF;
-
-// Check magic
-// Paint a white screen if magic is ok.
-// Paint a 'colored' screen if magic is not ok.
-    register int i=0;
-// WHITE
-    if (bootMagic == 1234){
-        for (i=0; i<320*32; i++){ fb[i] = 0xFFFFFFFFFFFFFFFF; };
-    }
-// COLORED
-    if (bootMagic != 1234){
-        for (i=0; i<320*32; i++){ fb[i] = 0xFF00FFFFFFF00FFF; };
-        //#debug
-        //while(1){}
-    }
-
-    //#debug
-    //while(1){}
-
-// Boot block (local structure)
-// Saving the boot block
-// Structure in this document.
-// We will have a global one in gdef.h
-
-    xBootBlock.lfb_pa        = (unsigned long) xxxxBootBlock[bbOffsetLFB_PA];
-    xBootBlock.deviceWidth   = (unsigned long) xxxxBootBlock[bbOffsetX];
-    xBootBlock.deviceHeight  = (unsigned long) xxxxBootBlock[bbOffsetY];
-    xBootBlock.bpp           = (unsigned long) xxxxBootBlock[bbOffsetBPP];
-    xBootBlock.last_valid_pa = (unsigned long) xxxxBootBlock[bbLastValidPA];
-    xBootBlock.gramado_mode  = (unsigned long) xxxxBootBlock[bbGramadoMode];
-    xBootBlock.initialized = TRUE;
-
-// ------------------------------------------------------
-
-// Gramado mode.
-// Gramado mode. (jail, p1, home ...)
-// Save global variable.
-    current_mode = (unsigned long) xBootBlock.gramado_mode;
-
-    // ...
-
-// resolution
-// global variables.
-// See: kernel.h
-    gSavedLFB = (unsigned long) xBootBlock.lfb_pa;
-    gSavedX   = (unsigned long) xBootBlock.deviceWidth;
-    gSavedY   = (unsigned long) xBootBlock.deviceHeight;
-    gSavedBPP = (unsigned long) xBootBlock.bpp;
-
-// #todo
-// Setup the real boot block structure at gdef.h
-
-// Set up private variables in screen.c
-    screenSetSize (gSavedX,gSavedY);
-
-// Memory support.
-
-// Last valid physical address.
-// Used to get the available physical memory.
-    blSavedLastValidAddress = (unsigned long) xBootBlock.last_valid_pa; 
-// Memory size in KB.
-    blSavedPhysicalMemoryInKB = (blSavedLastValidAddress / 1024);
-
-    return 0;
-}
-
-
-static int preinit(void)
-{
-    system_state = SYSTEM_PREINIT;
-
-// Checkpoints
-    Initialization.phase1_checkpoint = FALSE;
-    Initialization.phase2_checkpoint = FALSE;
-    Initialization.phase3_checkpoint = FALSE;
-    Initialization.hal_checkpoint = FALSE;
-    Initialization.microkernel_checkpoint = FALSE;
-    Initialization.executive_checkpoint = FALSE;
-    Initialization.gramado_checkpoint = FALSE;
-
-// Flags
-    Initialization.serial_log = FALSE;
-    Initialization.console_log = FALSE;
-
-// Hack Hack
-    VideoBlock.useGui = TRUE;
-
-// first of all
-// Getting critical boot information.
-    preinit_SetupBootblock();
-
-// We do not have serial debug yet.
-    preinit_Globals(0);  // IN: arch_type
-
-// Serial debug support.
-    preinit_Serial();
-    PROGRESS("preinit: Serial debug initialized\n");
-
-// Initialize the virtual console structures.
-// We do not have all the runtime support yet.
-// We can't use printf yet.
-    PROGRESS("preinit: preinit_OutputSupport\n");
-    preinit_OutputSupport();
-
-    return 0;
-}
-
-
-static int booting_begin(int arch_type)
-{
-    char product_string[256];
-    char build_string[256];
-
-    int Status = (-1);
-
-// #IMPORTAT: 
-// We do not have all the runtime support yet.
-// We can't use printf yet.
-
-    system_state = SYSTEM_BOOTING;
-
-    PROGRESS("booting_begin:\n");
-    printf("booting_begin:\n");
-
-// boot info
-    if (xBootBlock.initialized != TRUE){
-        panic ("booting_begin: xBootBlock.initialized\n");
-    }
-
-// =================================================
-// Show some basic info.
-
-// #todo
-// The mode.
-    //debug_print ("mode: ");
-    //debug_print ("\n");
-
-// #todo
-// The architecture.
-    //debug_print ("arch: ");
-    //debug_print ("\n");
-
-//
-// Pixel
-//
-
-    //ok
-    //backbuffer_putpixel(COLOR_WHITE,100,100,0);
-    //backbuffer_putpixel(COLOR_WHITE,150,150,0);
-    //backbuffer_putpixel(COLOR_WHITE,160,160,0);
-
-// Refresh sceen
-    //refresh_screen();
-
-// Video support
-    PROGRESS("booting_begin: zero_initialize_video\n");
-    zero_initialize_video();
-
-// Runtime
-// #bugbug:
-// We need the runtime initialization for the messages.
-// What about to initialize it early?! now!!!!
-// #bugbug
-// Here the background is not initialized yet,
-// so, we have a lot of dirty things.
-// See: ke/runtime.c
-
-    //#breakpoint: BLACK ON WHITE.
-    //ok, funcionou na maq real no modo jail, provavelmente 320x200.
-    //Ainda nao podemos usar o refresh screen porque a
-    //flag refresh_screen_enabled ainda nao foi acionada.
-    //for (i=0; i< 320*25; i++){ fb[i] = 0; };
-    //while(1){asm("hlt");};
-
-// Runtime:
-// System memory support.
-// Heap, stack, memory usage and frames.
-
-// #hackhack
-    current_arch = CURRENT_ARCH_X86_64;
-
-    PROGRESS("booting_begin: zero_initialize_runtime\n");
-    zero_initialize_runtime(current_arch);
-
-// =========================
-// Clear the screen.
-// print some basic info.
-// Setup printing resources.
-
-
-// Setup Default kernel font.
-// ROM BIOS 8x8 font.
-// see: font.c
-
-    PROGRESS("booting_begin: gwsInitializeDefaultKernelFont\n");
-    gwsInitializeDefaultKernelFont();
-
-// Initializing background for the very first time.
-    PROGRESS("booting_begin: zero_initialize_background\n");
-    zero_initialize_background();
+// -------------------------------------------
 
 // No refresh screen yet!
 // Ainda nao podemos usar o refresh screen porque a
@@ -739,51 +265,38 @@ static int booting_begin(int arch_type)
         refresh_screen_enabled = TRUE;
     }
 
-// =================================
-// Console:
-// We have a virtual console and we can use the printf.
-// This is the first message in the screen.
-// see: tty/console.c
+// -------------------------------------------
 
-    Initialization.console_log = TRUE;
+}
 
-    // product string
-    sprintf(product_string,PRODUCT_NAME);
-    strcat(product_string," ");
-    strcat(product_string,PRODUCT_TYPE_STRING);
-    strcat(product_string,"\0");
-    // build string
-    sprintf(build_string,"Build ");
-    strcat(build_string,BUILD_STRING);
-    strcat(build_string,"\0");
-
-// Crear screen and print version string.
-    console_banner( product_string, build_string, 0 );
-// Print gcc version
-    printf("gcc: %d\n",GCC_VERSION);
+// Worker
+static void __print_resolution_info(void)
+{
 // Print device info.
     printf ("Width:%d Height:%d BPP:%d\n",
         xBootBlock.deviceWidth,
         xBootBlock.deviceHeight,
         xBootBlock.bpp );
-// ...
-
-    // Breakpoint
-    //refresh_screen();
-    //while(1){}
-
+// ---------------
+// Is it supported?
 // #temp
 // Supported widths. 800, 640, 320.
-
     if ( xBootBlock.deviceWidth != 800 &&
          xBootBlock.deviceWidth != 640 &&
          xBootBlock.deviceWidth != 320 )
     {
-        panic("booting_begin: Unsupported resolution\n");
+        panic("__print_resolution_info: Unsupported resolution\n");
     }
+}
+
+// Worker
+static void __check_gramado_mode(void)
+{
+//-----------
+// gramado mode.
 
 // Show gramado mode.
-    printf ("gramadomode:%d\n",current_mode);
+    printf ("gramado mode: %d\n",current_mode);
 
     switch (current_mode){
 // #temp
@@ -799,25 +312,26 @@ static int booting_begin(int arch_type)
     case GRAMADO_CASTLE:
     case GRAMADO_CALIFORNIA:
         // #bugbug: panic and x_panic are not working at this point.
-        debug_print("booting_begin: Unsupported gramado mode\n");
-        panic("booting_begin: Unsupported gramado mode\n");
+        debug_print("__check_gramado_mode: Unsupported gramado mode\n");
+        panic("__check_gramado_mode: Unsupported gramado mode\n");
         //x_panic("x");
         //die();
         break;
 // Undefined gramado mode.
     default:
         // #bugbug: panic and x_panic are not working at this point.
-        debug_print("booting_begin: Undefined gramado mode\n");
-        panic("booting_begin: Undefined gramado mode\n");
+        debug_print("__check_gramado_mode: Undefined gramado mode\n");
+        panic("__check_gramado_mode: Undefined gramado mode\n");
         break;
-    }
+    };
 
-// Breakpoint
+    // Breakpoint
     //refresh_screen();
     //while(1){}
+}
 
-// ================================================
-
+static void __import_data_from_linker(void)
+{
 // #todo
 // Isso deve ter uma flag no aquivo de configuração.
 // config.h i guess.
@@ -872,184 +386,438 @@ static int booting_begin(int arch_type)
         //refresh_screen();
         //while(1){}
     }
+}
 
+// Setup stdin file.
+// Clean the buffer.
+// Set the offset position.
+// See: kstdio.c
+static int __setup_cmdline(void)
+{
+    char cmdline[64];
 
-// =====================================
+    memset(cmdline, 0, 64);  
+    cmdline[63]=0;
 
-// Display device
-// bl display device.
-// see: bldisp.c
-    PROGRESS("booting_begin: zero_initialize_background\n");
-    printf("booting_begin: Setup display device\n");
-    bldisp_initialize();
+    if ( (void*) stdin == NULL ){
+        return -1;
+    }
+    if (stdin->magic!=1234){
+        return -1;
+    }
+// Rewind.
+    k_fseek( stdin, 0, SEEK_SET );
+// Clean
+    file_write_buffer( stdin, cmdline, 64 );
+    k_fseek( stdin, 0, SEEK_SET );
+    return 0;
+}
 
-//=============================
-// Initialize current archtecture.
+static void __enter_debug_mode(void)
+{
+    if( Initialization.serial_log == TRUE ){
+        PROGRESS("__enter_debug_mode:\n");
+    }
 
-    //printf("Plataform: %s\n", PLATFORM_STRING );
-
-// #todo
-// A partir daqui faremos inicializações de partes
-// dependentes da arquitetura.
-
-    // Hack hack
-    // Também sado por outras rotinas dainicialização.
-    //current_arch = CURRENT_ARCH_X86_64;
-
-    switch (arch_type){
-
-    case CURRENT_ARCH_X86_64:
-        //debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
-        zero_initialize_background();
-        Status = (int) zero_initialize_x64();
-        if (Status == TRUE){
-            // Do not return!
-            //booting_end(CURRENT_ARCH_X86_64);
-            
-            //ok
-            return TRUE;
+    if( Initialization.console_log != TRUE )
+    {
+        if( Initialization.serial_log == TRUE ){
+            PROGRESS("__enter_debug_mode: can't use the cirtual console\n");
         }
-        debug_print ("kernel_main: CURRENT_ARCH_X86_64 fail\n");
-        x_panic("Panic: Error 0x01");
-        //#todo: return -1;
-        break;
+    }
 
-    // See:
-    // armmain (); ??
+    if( Initialization.console_log == TRUE )
+    {
+        printf("init.c: The kernel is in debug mode.\n");
+        refresh_screen();
+        
+        kgwm_early_kernel_console();
+        
+        printf("init.c: End of debug mode.\n");
+        refresh_screen();
+        
+        die();
+    }
 
-    // ...
+    die();
+}
 
-    default:
-        debug_print ("kernel_main: Current arch not defined!\n");
-        //system_state = SYSTEM_ABORTED;
-        x_panic("Error 0x03");
-        //#todo: return FALSE;
-        break;
-    };
+static int booting_end(int arch_type)
+{
+// + Pass the command to the first process or,
+// + Pass thecommand to the embedded debug shell.
 
-//=============================
+// Open the kernel virtual console 
+// instead of first process.
+// We can receive this flag via command line.
 
-    //ok
-    //debug_print ("kernel_main: Testing reboot\n");
-    //hal_reboot();
+    //int UseDebugMode=TRUE;
+    int UseDebugMode=FALSE;
 
-    //void *buff;
-    //buff = (void*) kmalloc(1024*512);
-    //if ( (void*) buff != NULL ){ debug_print ("kmalloc OK\n"); }
-    //if ( (void*) buff == NULL ){ debug_print ("kmalloc FAIL\n"); }
+    PROGRESS("booting_end:\n");
 
+// Final message before jumping to init process.
+    printf("booting_end:\n");
 
-    //console_outbyte('z',fg_console);
-
-
-
-
-    //int x= 0x2345;
-    //char *s ="String";
-    //char b[512];
-    
-    //printf("kernel_main: info ::\n");
-    
-    //kinguio_printf("kernel_main: *breakpoint %x %s\n",x,s);
-    //mysprintf(b,"Testing string \n");
-    //kinguio_printf("kernel_main:  %s\n",b);
-
-    //printf("kernel_main: *breakpoint %x %s\n",x,s);
-    //sprintf(b,"Testing string \n");
-    //sprintf(b,"Testing string2: %x\n",x);
-    //printf("kernel_main:  %s\n",b);
-
-    //printf ("LFB PA = %x \n",xBootBlock.lfb_pa );
-    //printf ("Width  = %d \n",xBootBlock.deviceWidth );
-    //printf ("Height = %d \n",xBootBlock.deviceHeight );
-    //printf ("BPP    = %d \n",xBootBlock.bpp );
-    //printf ("last valid pa = %d \n",xBootBlock.last_valid_pa);
-
+    //#debug
     //refresh_screen();
     //while(1){}
 
+// Setup command line for the init process.
+    __setup_cmdline();
 
-    /*
-    // Antecipado
-    // ++
-    // ======================================
-    // Screen size
-    
-    unsigned long bytes_per_pixel = 0;
-    unsigned long pitch = 0;
-    unsigned long sz_in_kb = 0;
+// Clear the screen again.
+    zero_initialize_background();
 
+// ::: Initialization on debug mode.
+// Initialize the default kernel virtual console.
+// It depends on the run_level.
+// See: kgwm.c
+    if (UseDebugMode == TRUE){
+        __enter_debug_mode();
+    }
+
+    switch (arch_type){
+        
+        case CURRENT_ARCH_X86_64:
+            // Do not return!
+            // see: x64init.c
+            I_x64ExecuteInitialProcess();
+            break;
+        default:
+            panic("booting_end: arch_type\n");
+            break;
+    };
+
+    return FALSE;
+}
+
+
+static void preinit_Globals(int arch_type)
+{
+
+// Scheduler policies
+// Early initialization.
+// See: 
+// sched.h, sched.c.
+    SchedulerInfo.policy = SCHED_RR;
+    SchedulerInfo.flags  = (unsigned long) 0;
+
+// Initializing the global spinlock.
+    __spinlock_ipc = TRUE;
+
+// IO Control
+    IOControl.useTTY = FALSE;        // Model not implemented yet.
+    IOControl.useEventQueue = TRUE;  // The current model.
+    IOControl.initialized = TRUE;    // IO system initialized.
+
+    // ...
+//
+// Presence level
+//
+
+// See:
+// sched.h, sched.c
+
+    // (timer ticks / fps) = level
+
+    //presence_level = (1000/1000);  //level 1;    // 1000   fps
+    //presence_level = (1000/500);   //level 2;    // 500    fps
+    //presence_level = (1000/250);   //level 4;    // 250    fps
+    //presence_level = (1000/125);   //level 8;    // 125    fps
+    //presence_level = (1000/62);    //level 16;   // 62,20  fps
+    //presence_level = (1000/25);    //level 32;   // 31,25  fps
+    //presence_level = (1000/15);    //level 64;   // 15,625 fps 
+    //presence_level = (1000/10);    //level 100;   // 10 fps
+    //presence_level = (1000/5);     //level 200;   // 5  fps
+    // presence_level = (1000/4);     //level 250;  // 4  fps
+    //presence_level = (1000/2);     //level 500;   // 2  fps
+    //presence_level = (1000/1);     //level 1000;  // 1  fps
+
+    //set_update_screen_frequency(30);
+    set_update_screen_frequency(60);
+    //set_update_screen_frequency(120);
+}
+
+// see: serial.c
+static void preinit_Serial(void)
+{
+    int Status=FALSE;
+    Status = serial_init();
+    if(Status!=TRUE){
+        //#bugbug
+        //Oh boy!, We can't use the serial debug.
+    }
+    PROGRESS("preinit_Serial: Serial debug initialized\n");
+}
+
+static void preinit_OutputSupport(void)
+{
+    PROGRESS("preinit_OutputSupport:\n");
+
+// O refresh ainda não funciona, 
+// precisamos calcular se a quantidade mapeada é suficiente.
     refresh_screen_enabled = FALSE;
-    screen_size_in_kb = 0;
 
-    if ( xBootBlock.bpp == 24 || xBootBlock.bpp == 32 )
-    {
-        bytes_per_pixel = (xBootBlock.bpp / 8); 
-        pitch = (xBootBlock.deviceWidth * bytes_per_pixel);
-    }  
+    PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
+    zero_initialize_virtual_consoles();
 
-    if ( pitch == 0){
-        refresh_screen_enabled = FALSE;
-        printf ("Screen size fail. pitch\n");
+    PROGRESS("preinit_OutputSupport: preinit_OutputSupport\n");
+
+// #IMPORTAT: 
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+}
+
+static void kernel_final_messages(void)
+{
+// Final messages
+    if ( Initialization.serial_log == TRUE ){
+        PROGRESS("kmain: [final message] FAILURE\n");
     }
-
-    if ( pitch != 0){
-        
-        sz_in_kb = (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
-        screen_size_in_kb = sz_in_kb;
-        
-        printf ("Screen size: %d KB\n", sz_in_kb);
-        
-        // fail.
-        if ( sz_in_kb >= 2048 ){
-            refresh_screen_enabled = FALSE;
-            printf ("Screen size fail sz_in_k\n");
-        }
-    
-        // ok
-        if ( sz_in_kb < 2048 ){
-            refresh_screen_enabled = TRUE;  
-        }
+    if ( Initialization.console_log == TRUE ){
+        printf("kmain: [final message] FAILURE\n");
+        refresh_screen();
     }
-    // ======================================
-    // --
-    */
+}
 
-
-//
+// ------------------------------
+// kmain2:
+int kmain2(int arch_type)
+{
+// Preinit
+    preinit();
+// Booting ...
+    kernel_booting(arch_type);
 // Fail
-//
+    kernel_final_messages();
+    system_state = SYSTEM_DEAD;
+// Return to kmain().
+    return FALSE;
+}
 
-// =====================================
-// Final messages.
+// limitation: No serial debug yet.
+// #todo: #bugbug
+// We have another BootBlock structure in info.h
+static int preinit_SetupBootblock(void)
+{
 
-    printf("\n");
-    printf("init.c: Kernel initialization fail\n\n");
-    refresh_screen();
-// Show process info if it's valid.
-    if( (void*) KernelProcess != NULL )
-    {
-        if(KernelProcess->magic==1234)
-        {
-            set_current_process(KernelProcess->pid);
-            show_currentprocess_info();
-            refresh_screen();
-        }
+// Magic
+// #bugbug: Explain it better.
+    unsigned long bootMagic = 
+        (unsigned long) (magic & 0x00000000FFFFFFFF); 
+
+// The boot block address. 0x0000000000090000.
+// Each entry has 8 bytes.
+// virtual = physical.
+    unsigned long *xxxxBootBlock = (unsigned long*) BootBlockVA; 
+
+// lfb
+// Esse endereço virtual foi configurado pelo bootloader.
+// Ainda não configuramos a paginação no kernel.
+    unsigned long *fb = (unsigned long *) FRONTBUFFER_VA; 
+    fb[0] = 0x00FFFFFF;
+
+// Check magic
+// Paint a white screen if magic is ok.
+// Paint a 'colored' screen if magic is not ok.
+    register int i=0;
+// WHITE
+    if (bootMagic == 1234){
+        for (i=0; i<320*32; i++){ fb[i] = 0xFFFFFFFFFFFFFFFF; };
     }
-// ===========================================
-// Rule 22:
-// "When in doubt, know your way out."
-// Full console support.
-fail2:
-    //printf ("kernel_main: Fail. HANG\n");
-    //refresh_screen();
-// Only serial debug support.
-fail1:
-    PROGRESS("Kernel:0:0\n"); 
-    debug_print ("[Kernel] kernel_main-fail: Hang\n");
-// No output support.
-// #maybe: Return to xxxhead.asm and hang.
-fail0:
+// COLORED
+    if (bootMagic != 1234){
+        for (i=0; i<320*32; i++){ fb[i] = 0xFF00FFFFFFF00FFF; };
+        //#debug
+        //while(1){}
+    }
+
+    //#debug
+    //while(1){}
+
+// Boot block (local structure)
+// Saving the boot block
+// Structure in this document.
+// We will have a global one in gdef.h
+
+    xBootBlock.lfb_pa        = (unsigned long) xxxxBootBlock[bbOffsetLFB_PA];
+    xBootBlock.deviceWidth   = (unsigned long) xxxxBootBlock[bbOffsetX];
+    xBootBlock.deviceHeight  = (unsigned long) xxxxBootBlock[bbOffsetY];
+    xBootBlock.bpp           = (unsigned long) xxxxBootBlock[bbOffsetBPP];
+    xBootBlock.last_valid_pa = (unsigned long) xxxxBootBlock[bbLastValidPA];
+    xBootBlock.gramado_mode  = (unsigned long) xxxxBootBlock[bbGramadoMode];
+    xBootBlock.initialized = TRUE;
+
+// ------------------------------------------------------
+
+// Gramado mode.
+// Gramado mode. (jail, p1, home ...)
+// Save global variable.
+    current_mode = (unsigned long) xBootBlock.gramado_mode;
+
+    // ...
+
+// resolution
+// global variables.
+// See: kernel.h
+    gSavedLFB = (unsigned long) xBootBlock.lfb_pa;
+    gSavedX   = (unsigned long) xBootBlock.deviceWidth;
+    gSavedY   = (unsigned long) xBootBlock.deviceHeight;
+    gSavedBPP = (unsigned long) xBootBlock.bpp;
+
+// #todo
+// Setup the real boot block structure at gdef.h
+
+// Set up private variables in screen.c
+    screenSetSize (gSavedX,gSavedY);
+
+// Memory support.
+
+// Last valid physical address.
+// Used to get the available physical memory.
+    blSavedLastValidAddress = (unsigned long) xBootBlock.last_valid_pa; 
+// Memory size in KB.
+    blSavedPhysicalMemoryInKB = (blSavedLastValidAddress / 1024);
+
+    return 0;
+}
+
+
+static int preinit(void)
+{
+    system_state = SYSTEM_PREINIT;
+
+// Starting the counter.
+    Initialization.current_phase = 0;
+
+// ==================
+
+// Checkpoints
+    Initialization.phase1_checkpoint = FALSE;
+    Initialization.phase2_checkpoint = FALSE;
+    Initialization.phase3_checkpoint = FALSE;
+    Initialization.hal_checkpoint = FALSE;
+    Initialization.microkernel_checkpoint = FALSE;
+    Initialization.executive_checkpoint = FALSE;
+    Initialization.gramado_checkpoint = FALSE;
+
+// Flags
+    Initialization.serial_log = FALSE;
+    Initialization.console_log = FALSE;
+
+// Hack Hack
+    VideoBlock.useGui = TRUE;
+
+// first of all
+// Getting critical boot information.
+    preinit_SetupBootblock();
+// We do not have serial debug yet.
+    preinit_Globals(0);  // IN: arch_type
+// Serial debug support.
+    preinit_Serial();
+// Initialize the virtual console structures.
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+    preinit_OutputSupport();
+
+    return 0;
+}
+
+static void kernel_booting(int arch_type)
+{
+    int Status=FALSE;
+
+// Begin
+// Kernel initialization.
+    Status = (int) booting_begin(arch_type);
+
+// End
+// + Pass the command to the first process or,
+// + Pass the command to the embedded debug shell.
+    if (Status==TRUE){
+        Status = (int) booting_end(arch_type);
+    }
+
+// + Pass the command to the embedded debug shell if possible.
+    if (Status != TRUE)
+    {
+        // panic screen
+        // Mostramos informações completas ou
+        // permitimos a inicialização de outro modo,
+        // talvez algum modo de recuperação ou simplificado.
+ 
+        if( Initialization.serial_log == TRUE ){
+            PROGRESS("kmain: booting_end fail\n");
+        }
+        if( Initialization.console_log == TRUE )
+        {
+            printf("kmain: booting_end fail\n");
+            printf("kmain: Trying debug mode\n");
+            __enter_debug_mode();
+        }
+        die();
+    }
+}
+
+// OUT: TRUE or FALSE.
+static int booting_begin(int arch_type)
+{
+// + Initialize video.
+// + Initialize runtime. 
+//   Memory initialization.
+// + Initialize default kernel font.
+// + Initialize background
+// + Initialize display device.
+// + Initialize x86_64 architecture.
+
+    int Status = (-1);
+
+// #IMPORTAT: 
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+
+    system_state = SYSTEM_BOOTING;
+
+    PROGRESS("booting_begin:\n");
+    printf("booting_begin:\n");
+
+// boot info
+    if (xBootBlock.initialized != TRUE){
+        panic ("booting_begin: xBootBlock.initialized\n");
+    }
+
+// Video support
+    zero_initialize_video();
+// Runtime
+// Memory initialization
+    zero_initialize_runtime(arch_type);
+// kernel font.
+   zero_initialize_default_kernel_font();
+// Initializing background for the very first time.
+    zero_initialize_background();
+// Setup refresh/flush support.
+// Flush data into the lfb.
+    __check_refresh_support();
+// Now we have console debug
+    Initialization.console_log = TRUE;
+// Show banner!
+    zero_show_banner();
+// Print resolution info
+    __print_resolution_info();
+// Check gramado mode
+    __check_gramado_mode();
+// Import data from linker.
+    __import_data_from_linker();
+// Initialize bootloader display device.
+    bldisp_initialize();
+// Initialize the current architecture.
+    Status = (int) zero_initialize_arch(arch_type);
+    if (Status == TRUE){
+        // Done!
+        return TRUE;
+    }
+// Fail
     system_state = SYSTEM_ABORTED;
     x_panic("Error: 0x02");
     return FALSE;
@@ -1058,28 +826,6 @@ fail0:
 void gramado_shutdown(int how)
 {
     //hal_shutdown();
-}
-
-// #deprecated
-// #see: 
-// kernel.h and hw.asm
-void xxxxIRQ0_DEBUG_MESSAGE(void)
-{
-    debug_print ("xxxxIRQ0_DEBUG_MESSAGE:\n");
-    //xxxDrawString("TICK\n");
-    //console_outbyte('x',fg_console);
-    //printf ("k\n");
-    //refresh_screen();
-}
-
-
-// #deprecated
-// #See: kernel.h and hw.asm
-void xxxxIRQ1_DEBUG_MESSAGE(void)
-{
-    debug_print ("xxxxIRQ1_DEBUG_MESSAGE:\n");
-    printf ("k");
-    refresh_screen();
 }
 
 
