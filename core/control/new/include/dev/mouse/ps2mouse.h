@@ -121,9 +121,9 @@ extern int mouse_button_action;
 // == prototypes =====================
 //
 
-void zzz_mouse_write(unsigned char data);
-unsigned char zzz_mouse_read (void);
-void mouse_expect_ack (void);
+unsigned char i8042_mouse_read (void);
+void i8042_mouse_write(unsigned char data);
+void i8042_mouse_expect_ack (void);
 
 void ps2mouse_poll(void);
 

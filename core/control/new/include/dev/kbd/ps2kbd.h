@@ -151,10 +151,14 @@ extern unsigned long scrolllock_status;
 // == prototypes ===========================
 //
 
-void kbdc_wait (unsigned char type);
+uint8_t i8042_keyboard_read (void);
+void i8042_keyboard_write (uint8_t data);
+unsigned char i8042_keyboard_read2(void);
+void i8042_keyboard_expect_ack (void);
 
-void keyboardDisable (void);
-void keyboardEnable (void);
+void i8042_keyboard_disable(void);
+void i8042_keyboard_enable (void);
+
 void keyboard_set_leds (char flag);
 
 unsigned long keyboardGetKeyState(int vk);
@@ -162,12 +166,6 @@ unsigned long keyboardGetKeyState(int vk);
 int get_alt_status (void);
 int get_ctrl_status (void);
 int get_shift_status (void);
-
-uint8_t xxx_keyboard_read (void);
-void xxx_keyboard_write (uint8_t data);
-
-unsigned char zzz_keyboard_read (void);
-void keyboard_expect_ack (void);
 
 void ps2kbd_poll(void);
 

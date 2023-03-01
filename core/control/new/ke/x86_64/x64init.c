@@ -508,9 +508,8 @@ void I_x64ExecuteInitialProcess (void)
 // Com isso alguns recursos somente para as fases anteriores
 // deverão ficar indisponíveis.
 
-// End of phase.
+// -------------------------------
 // Starting phase 4.
-
     Initialization.current_phase = 4;
 
 // =============
@@ -1073,7 +1072,7 @@ void init_globals(void)
 
 // ==============================
 // I_init:
-// Phases 1 and 2.
+// Phases 1.
 // Called in the initialization phase 0.
 // Called by x64main in x64init.c
 // OUT: TRUE if it is ok.
@@ -1090,47 +1089,24 @@ static int I_init(void)
 // ==================
 // Check kernel phase.
 
-    if (Initialization.current_phase != 0){
-        printf ("I_init: Initialization phase is Not 0.\n");
+    if (Initialization.current_phase != 1){
+        printf ("I_init: Initialization phase is Not 1.\n");
         return FALSE;
     }
 
 // ===============================
 // Globals
-
-    PROGRESS("Kernel:2:1\n"); 
-    //debug_print ("I_init: Globals\n");
+    PROGRESS("Kernel:2:1: globals\n"); 
     init_globals();
 
-// ===============================
-// Create the progress bar.
-// No bar for now.
-// #importante
-// À partir daqui podemos exibir strings na tela.
-
-    PROGRESS("Kernel:2:2\n"); 
+// Nothing for now.
+    //PROGRESS("Kernel:2:2\n"); 
+    //PROGRESS("Kernel:2:3\n"); 
 
 // ===============================
-// io manager
-// #bugbug:
-// Depois de iniciar as globais, provavelmente o cursor mude 
-// para o início da tela.
-// então após iniciarmos as globais temos que repintar o background e 
-// fazer um refresh da tela se a flag de verbose estiver ligada.
-
-    PROGRESS("Kernel:2:3\n"); 
-    //debug_print ("I_init: Object manager\n");
-    //init_object_manager ();
-    //debug_print ("I_init: io manager\n");
-    //ioInit ();
-
-// ===============================
-// device manager.
-// Inicializa o gerenciamento de dispositivos.
-// Inicializa a lista de dispositivos.
-
-    PROGRESS("Kernel:2:4\n"); 
-    //debug_print ("I_init: device manager\n");
+// Initialize device manager.
+// see: dev/devmgr.c
+    PROGRESS("Kernel:2:4 device manager\n"); 
     init_device_manager();
 
 // ===============================
@@ -1140,9 +1116,9 @@ static int I_init(void)
 // A estrutura 'storage' vai ser o nível mais baixo.
 // É nela que as outras partes devem se basear.
 
-    PROGRESS("Kernel:2:5\n"); 
-    //debug_print ("I_init: storage structure\n");
+    PROGRESS("Kernel:2:5 storage, disk, volume, fs\n"); 
 
+// Storage
     int st_status=FALSE;
     st_status = init_storage_support();
     if ( st_status != TRUE ){
@@ -1150,110 +1126,38 @@ static int I_init(void)
        return FALSE;
     }
 
-// volume
-// Initialize the disk structure.
-// See: storage.c
+// Disks and volumes.
+// see: storage.c
     disk_init();
-
-// disk
-// Initialize the disk structure.
-// It depends on the disk structures.
-// See: storage.c
     volume_init();
 
-// fs
+// File systems support.
+// see: fs.c
     //vfsInit();
     fsInit();
     // ...
 
 // ==========================
-// network
-// Maybe we have a new plain for that in the 64bit version of Gramado.
+// Network support.
 // See: network.c
-
-    PROGRESS("Kernel:2:6\n"); 
-    //debug_print ("I_init: network [FIXME]\n");
+    PROGRESS("Kernel:2:6 network\n"); 
     networkInit();
 
-// ==========================
-// Initialize Platform structure.
-// #todo
-
-    PROGRESS("Kernel:2:7\n"); 
-    //debug_print ("I_init: Platform struct\n");
-
-//++
-// ====================================================================
-    /*
-    Platform = (void *) kmalloc ( sizeof(struct platform_d) );
-
-    if ( (void *) Platform ==  NULL ){
-        panic ("core-init: Platform\n");
-    }else{
-
-        // UP or MP.
-        Platform->system_type = SYSTEM_TYPE_NULL;
-
-        // Hardware
-        Hardware = (void *) kmalloc ( sizeof(struct hardware_d) );
-
-        if ( (void *) Hardware ==  NULL ){
-            panic ("core-init: Hardware\n");
-        }else{
-            Platform->Hardware = (void *) Hardware;
-            //printf(".");
-        };
-
-		//Firmware
-        Firmware = (void *) kmalloc ( sizeof(struct firmware_d) );
-
-        if ((void *) Firmware ==  NULL ){
-            panic ("core-init: Firmware\n");
-        }else{
-            Platform->Firmware = (void *) Firmware;
-            //printf("."); 
-        };
-
-
-		//System (software)
-
-		// #IMPORTATE: 
-		// Aqui estamos inicializando a estrutura do systema.
-
-        System = (void *) kmalloc ( sizeof(struct system_d) );
-
-        if ( (void *) System ==  NULL ){
-            panic ("core-init: System\n");
-        }else{
-            System->used  = TRUE;  // Sinaliza que a estrutura esta em uso.
-            System->magic = 1234;  // Sinaliza que a estrutura não esta corrompida.
-            
-            Platform->System = (void *) System;
-            //printf(".");
-        };
-
-		//printf(" Done!\n");	
-		//...
-    };
-    */
-// ====================================================================
-//--
-
+// Nothing for now.
+    //PROGRESS("Kernel:2:7\n"); 
 
 // ===============================
 // #important
-// We need to be in the phase 0.
+// We need to be in the phase 1.
 
-    if (Initialization.current_phase != 0){
-        printf ("I_init: Initialization phase is NOT 0.\n");
-        return FALSE;
-    }
+    //if (Initialization.current_phase != 1){
+    //    printf ("I_init: Initialization phase is NOT 1.\n");
+    //    return FALSE;
+    //}
 
 // ==========================
 // hal
-
-    PROGRESS("Kernel:2:8\n"); 
-    //debug_print ("I_init: hal\n");
+    PROGRESS("Kernel:2:8 hal\n"); 
     Status = init_hal();
     if (Status != TRUE){
         printf ("I_init: init_hal fail\n");
@@ -1263,8 +1167,7 @@ static int I_init(void)
 // ==========================
 // microkernel components:
 // mm, ipc, ps ...
-
-    PROGRESS("Kernel:2:9\n"); 
+    PROGRESS("Kernel:2:9 microkernel\n"); 
     Status = init_microkernel();
     if (Status != TRUE){
         printf ("I_init: init_microkernel fail\n");
@@ -1273,8 +1176,7 @@ static int I_init(void)
 
 // =========================================
 // Executive components
-
-    PROGRESS("Kernel:2:10\n"); 
+    PROGRESS("Kernel:2:10 executive\n"); 
     Status = init_executive();
     if (Status != TRUE){
         printf ("I_init: init_executive fail\n"); 
@@ -1284,58 +1186,44 @@ static int I_init(void)
 // =========================================
 // Some gui components.
 // #todo: rever 
-
-    PROGRESS("Kernel:2:11\n"); 
+    PROGRESS("Kernel:2:11 gramado, fat directories\n"); 
     Status = init_gramado();
     if (Status != TRUE){
         printf ("I_init: init_gramado fail\n"); 
         return FALSE;
     }
 
-
+// FAT support.
     initialize_FAT_and_main_directories();
 
 // =========================================
-// In-kernel window manager.
-// #todo: maybe
-
-    PROGRESS("Kernel:2:12\n"); 
-    //init_window_manager();
-
-// End of phase.
-// Starting phase 1.
-    Initialization.current_phase = 1;
-
-// ========================
-// We need to be in the phase 1.
-
-    if (Initialization.current_phase != 1){
-        printf ("I_init: Initialization phase is NOT 1\n");
-        return FALSE;
-    }
+// Nothing for now.
+    //PROGRESS("Kernel:2:12\n"); 
 
 // =========================================
-// 'processor' structure.
-// The 'processor' structure.
-// ?? Is it 'up' or 'smp' ?
+// 2:13: 
+// Initialize processor information.
+// + 'processor' structuture initialization.
+// + Probing processor type.
+// + Initialize fpu and smp support.
+// + Detect the hypervisor.
 
-    PROGRESS("Kernel:2:13\n"); 
+    PROGRESS("Kernel:2:13 processor, fpu, smp, hv\n"); 
+
+// --------
+// 'processor' structuture initialization.
     processor = (void *) kmalloc( sizeof( struct processor_d ) ); 
-    if ( (void *) processor == NULL )
-    {
+    if ( (void *) processor == NULL ){
         printf("I_init: processor\n");
         return FALSE;
     }
 
-// =============================
-// Processor type:
-
+// --------
+// Probing processor type.
 // #todo
 // Check if cpuid instruction is available.
 // See: _x86_test_cpuid_support on bootmx/headlib.asm
 // #todo: extern int x86_test_cpuid_support(void);
-
-
 // Sonda pra ver qual é a marca do processador.
 // #todo: 
 // É a segunda vez que fazemos a sondagem ?!
@@ -1345,21 +1233,16 @@ static int I_init(void)
 // Let's make some initialization and 
 // get more information about the processor
 // using the cpuid instruction.
-// See: detect.c
-// 1pump/arch/x86/x86.c
-// 1pump/arch/amd/cpuamd.c
+// See: 
+// detect.c
+// x86.c
+// cpuamd.c
 
     ProcessorType = (int) hal_probe_processor_type();
-
-// #error
-// Vamos suspender isso por enquanto ...
-// precisamos apurar essa rotina de identificação da cpu.
-
-    //if (ProcessorType <= 0){
-    //    x_panic("init: [ERROR] ProcessorType\n");
-    //}
-
     processor->Type = (int) ProcessorType;
+
+// --------
+// Initialize fpu and smp support.
 
     int fpu_status = -1;     // fail
     int smp_status = FALSE;  // fail
@@ -1402,75 +1285,23 @@ static int I_init(void)
         break;
     };
 
-// =======================
-// Detect the hypervisor string 
-// saved into the processor data structure.
+// --------
+// Detect the hypervisor.
+// Saved into the processor data structure.
 // Save the option found into a global variable.
 // #todo: We need a structure for that thing.
 // see: detect.c
-
     detect_hv();
 
-
-// =========================================
-// process manager.
-// #obs: O contexto é depedente.
-// Inicializando o Process manager.
-
-    PROGRESS("Kernel:2:14\n"); 
-    // init_process_manager();
-
-// =========================================
-// Load rootdir.
-
-    PROGRESS("Kernel:2:15\n"); 
-
-    // #todo: 
-    // We can move this above to the 'storage' section.
-
-    // #importante
-    // Só podemos carregar o diretório raiz depois que 
-    // inicializamos o controlador de IDE e as estruturas de 
-    // sistema de arquivos.
-    // #todo: Precisamos inicializar a estrutura de diretorio
-    // usada pelo diretorio raiz, para colocarmos o ponteiro
-    // na estrutura de processos, juntamente com o ponteiro
-    // para o cwd. 
-    // Talvez essa seja a hora de criarmos a estrutura para
-    // o diretorio raiz, mas ainda nao temos estrutura de processo.
-
-    //debug_print ("I_init: load rootdir.\n");
-    // Carregando o diretório raiz.
-    //fs_load_rootdir( VOLUME1_ROOTDIR_ADDRESS, VOLUME1_ROOTDIR_LBA, 32 );
-
-    // Disable interrupts, lock task switch and scheduler.
-
-    // # isso ja foi feito no começo da rotina de inicialização do kernel.
-    // Tem que pensar nisso antes de tudo.
-
-    //asm ("cli");
-    //set_task_status(LOCKED); 
-    //scheduler_lock();
-
-// End of phase.
-// Starting phase 2.
-    Initialization.current_phase = 2;
-
-// =========================================
-// keyboard stuff.
+// ======================
 // Nothing for now.
-
-// ====================
-// done:
-
-    PROGRESS("Kernel:2:16\n"); 
-    //debug_print ("I_init: done\n");
-    //printf      ("I_init: done\n");
+    //PROGRESS("Kernel:2:14\n"); 
+    //PROGRESS("Kernel:2:15\n"); 
+    //PROGRESS("Kernel:2:16\n"); 
 
 // ok
 // Return to the main initialization routine
 // in x64init.c
-
     return TRUE;
 
 // ====================
@@ -1486,24 +1317,15 @@ fail0:
 }
 
 
-/*
- * I_x64main: 
- * Function history:
- *     2015 - Created by Fred Nora.
- */
-// Initialization phases:
-// 0 - I_x64main()
-// 1 - See: I_init()
-// 2 - See: I_init()
-// 3 - See: I_x64main()
-// 4 - See: I_x64main()
-// Called by kmain in init.c
-
 int I_x64main (void)
 {
+// Called by zero_initialize_x64().
+
     int Status = FALSE;
 
-// Phase counter: Starting phase 0.
+// -------------------------------
+// Phase counter: 
+// Starting phase 0.
 // We already did that before in kmain().
     Initialization.current_phase = 0;
 
@@ -1569,44 +1391,38 @@ int I_x64main (void)
 // durante essa fase da inicialização.
 // See: sysinit.c
 
-    PROGRESS("Kernel:1:2\n"); 
-
+    PROGRESS("Kernel:1:2 \n"); 
     if (Initialization.current_phase != 0){
         debug_print ("I_x64main: Initialization phase is NOT 0.\n");
         return FALSE;
     }
 
-// Phases 1 and 2.
+// -------------------------------
+// Starting phase 1.
+    Initialization.current_phase = 1;
 
     Status = (int) I_init(); 
-
     if ( Status != TRUE ){
         printf ("I_x64main: I_init fail\n");
         return FALSE;
     }
 
-// End of phase.
+// -------------------------------
+// Starting phase 2.
+    Initialization.current_phase = 2;
+    // :)
+
+// -------------------------------
 // Starting phase 3.
     Initialization.current_phase = 3;
 
 //================================
 // Initialize all the kernel graphics support.
-    PROGRESS("Kernel:1:3\n"); 
-
 // Initialize all the kernel graphics support.
 // some extra things like virtual terminal and tty.
 // #todo: rever essa inicializaçao.
-// See: user/graphics.c
-
-    KGWS_initialize();
-
-// debug
-    //printf("~kgws\n");
-    //refresh_screen();
-    //while(1){}
-
+// See: graphics.c
 // ================================
-// user/ ?
 // Initialize window server manager.
 // ws.c
 // #debug:  
@@ -1616,16 +1432,24 @@ int I_x64main (void)
 // Quem chamou essa funçao foi o começo da inicializaçao do kernel.
 // Retornamos para x86main.c para arch x86.
 // See: drivers/ws.c
-
-    PROGRESS("Kernel:1:4\n"); 
-    ws_init();
-
+// Initialize ws callback support.
 // see: callback.c
+
+    PROGRESS("Kernel:1:3 kgws, ws, ws callback\n"); 
+    // Graphics infrastruture.
+    KGWS_initialize();
+    // ws registration support.
+    ws_init();
+    // ws callback support.
     initialize_ws_callback_info();
 
+// ================================
+// Nothing for now.
+    //PROGRESS("Kernel:1:4\n"); 
 
 // ================================
-// GDT
+// DANGER !!!
+// :::: GDT ::::
 // Setup GDT again.
 // We already made this at kernel startup.
 // # Caution.
@@ -1636,17 +1460,10 @@ int I_x64main (void)
 // Depois de renovarmos a GDT precisamos
 // recarregar os registradores de segmento?
 // See: hal/arch/x86/x86.c
-
-//
-// DANGER !!!
-//
-
 // #bugbug
 // see: x64.c
 
-    PROGRESS("Kernel:1:5\n"); 
-    //debug_print ("[x64] I_x64main: [DANGER] Initializing GDT\n");
-    //printf      ("[x86] I_x64main: Initializing GDT\n");      
+    PROGRESS("Kernel:1:5 gdt\n"); 
     x64_init_gdt();
 
 // ================================
@@ -1656,78 +1473,31 @@ int I_x64main (void)
 // a process structure to handle the kernel base and the
 // window server's control thread.
 
-    PROGRESS("Kernel:1:6\n"); 
+    PROGRESS("Kernel:1:6 kernel process\n"); 
     Status = I_x64CreateKernelProcess();
-
-    if(Status != TRUE){
+    if (Status != TRUE){
         debug_print ("Couldn't create the Kernel process\n");
         return FALSE;
     }
 
 // ================================
-// Creating a ring 0 thread for the kernel.
-// Local
-// It creates the thread used by the window server.
-// It is the ring0 thread that belongs to the kernel process.
-// It is also the control thread of the kernel process.
-// And it is also the initial idle thread.
-// #todo: The kernel needs a standar sti/hlt idle thread.
-
-// #
-// Agora a rotina que cria o processo também cria
-// a thread.
-
+// Nothing for now
     //PROGRESS("Kernel:1:7\n"); 
-    //I_x64CreateWSControlThread();
-
 
 // ================================
-// Session Manager.
-// Cria e inicializa apenas o GWS.BIN em 
-// gramado/core/client.
-// Local routine.
-// + Carrega a imagem do primeiro processo que 
-// vai rodar em user mode.
-// + Configura sua estrutura de processo.
-// + Configura sua estrutura de thraed.
-// Não passa o comando para o processo.
+// Create the first ring3 process.
+// INIT.BIN.
 
-    PROGRESS("Kernel:1:8\n"); 
+    PROGRESS("Kernel:1:8 init process\n"); 
     Status = I_x64CreateInitialProcess();
-
     if(Status != TRUE){
         debug_print ("Couldn't create the Initial process\n");
         return FALSE;
     }
 
 //================================
-// Check some initialization flags.
-    PROGRESS("Kernel:1:9\n"); 
-
-
-/*
-#ifdef  ENTRY_DEBUG_CHECK_VALIDATIONS
-
-    Status = (int) debug();
-
-    if ( Status != 0 ){
-        printf ("[x86] x86main: debug\n");
-        system_state = KERNEL_ABORTED;
-        goto fail;
-    }
-
-#endif
-*/
-
-
-	// ======== # TESTS # ========
-	// begin - We can make some tests here.
-
-    //Inicializando as variáveis do cursor piscante do terminal.
-    //isso é um teste.
-    
-    //timer_cursor_used   = 0;   //desabilitado.
-    //timer_cursor_status = 0;
+// Nothing for now.
+    // PROGRESS("Kernel:1:9\n"); 
 
 // ================================
 // Early ps/2 initialization.
@@ -1738,69 +1508,27 @@ int I_x64main (void)
 // Chamaremos essa inicialização básica nesse momento.
 // A inicialização completa será chamada pelo processo init.
 // See: i8042.c
-
-    PROGRESS("Kernel:1:10\n"); 
-    //debug_print ("[x64] I_x64main: ps2\n"); 
-
 // ================
 // Early initialization
 // Only the keyboard.
 // It is working
-    PS2_early_initialization();
-
 // ================
 // This is the full initialization.
 // #bugbug This is a test yet.
 // It fails in the real machine.
+
+    PROGRESS("Kernel:1:10 ps2\n"); 
+    PS2_early_initialization();
     //PS2_initialization();
 
-// ================================
-// Loading some system files.
-// icons, bmps, etc ...
-// Loading file tests.
-// #test:
-// Background support.
-// Used to test load_path()
-// See: ws/bg.c
-// #Aviso:
-// Isso funcionou, não mudar de lugar.
-// Mas isso faz parte da interface gráfica,
-// Só que somente nesse momento temos recursos 
-// suficientes para essa rotina funcionar.
-// See: kgwm.c
-
-    PROGRESS("Kernel:1:11\n"); 
-
-    //bg_load_image ();
+// Loading .BMP icon images.
+    PROGRESS("Kernel:1:11 icons\n"); 
     windowLoadGramadoIcons();
 
-
-// ================================
-// Font support.
-// #bugbug
-// Font is independent from the x86 archtechture.
-// We can do this in some other place. Maybe :)
-// See: config/config.h
-
-    PROGRESS("Kernel:1:12\n"); 
-    //gfontSize = DEFAULT_FONT_SIZE;
-
-
-// ================================
-// Testing some rectangle support.
-
-    PROGRESS("Kernel:1:13\n"); 
-
-// ================================
-// Done
-// The routine is over.
-// The caller will start the first thread create by us.
-// The expected return value is 1234.
-
-    PROGRESS("Kernel:1:14\n"); 
-
-    //debug_print ("[x64] I_x64main: done\n");
-    //debug_print ("==============\n");
+// Nothing for now.
+    //PROGRESS("Kernel:1:12\n"); 
+    //PROGRESS("Kernel:1:13\n"); 
+    //PROGRESS("Kernel:1:14\n"); 
 
     return TRUE;
 
@@ -1809,7 +1537,7 @@ int I_x64main (void)
 
 fail:
     // Nothing
-    PROGRESS("Kernel:1:00\n"); 
+    PROGRESS("Kernel:1:00 fail\n"); 
 fail0:
     debug_print ("[x64] I_x64main: fail\n");
     refresh_screen(); 

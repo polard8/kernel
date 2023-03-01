@@ -93,6 +93,72 @@ static void __initialize_mouse_position(void);
 
 // ----------------------------------------------------
 
+// zzz_mouse_read:
+// Pega um byte na porta 0x60.
+unsigned char i8042_mouse_read (void)
+{
+    unsigned char Value=0;
+
+    //debug_print ("i8042_mouse_read:\n");
+
+    //debug_print ("[1]:\n");
+    prepare_for_input();
+    //debug_print ("[2]:\n");
+    Value = (unsigned char) in8(0x60);
+
+    //debug_print ("i8042_mouse_read: Done\n");
+    return (unsigned char) Value;
+}
+
+// Esta função será usada para escrever dados 
+// do mouse na porta 0x60, fora do IRQ12
+void i8042_mouse_write(unsigned char data)
+{
+    prepare_for_output();
+    out8(0x64,0xD4);
+    prepare_for_output();
+    out8(0x60,data);
+}
+
+void i8042_mouse_expect_ack (void)
+{
+    // #bugbug
+    // ? loop infinito  
+    // while ( xxx_mouse_read() != 0xFA );
+
+    unsigned char ack_value=0;
+    int timeout=100;
+
+    while(1) 
+    {
+        timeout--;
+        if (timeout<0){  break;  }
+
+        ack_value = (unsigned char) i8042_mouse_read();
+        
+        // OK
+        if (ack_value == 0xFA){
+            return;  
+        }
+    }; 
+
+// Acabou o tempo, vamos checar o valor.
+// Provavelmente esta errado.
+    if ( ack_value != 0xFA )
+    {
+        //#debug
+        //printf ("expect_ack: not ack\n");
+        return;
+        //return -1;
+    }
+
+    return;
+    //return 0;
+}
+
+
+
+
 static void __initialize_mouse_position(void)
 {
     unsigned long deviceWidth  = (unsigned long) screenGetWidth();
@@ -362,9 +428,9 @@ static void __ps2mouse_parse_data_packet(void)
 //int __get_device_id(void);
 int __get_device_id(void)
 {
-    zzz_mouse_write (PS2MOUSE_GET_DEVICE_ID);
-    mouse_expect_ack();
-    return (int) zzz_mouse_read(); 
+    i8042_mouse_write (PS2MOUSE_GET_DEVICE_ID);
+    i8042_mouse_expect_ack();
+    return (int) i8042_mouse_read(); 
 }
 
 // ps2mouse_initialize_device:
@@ -494,45 +560,39 @@ void ps2mouse_initialize_device(void)
 
     // Enable mouse.
     wait_then_write(0x64,0xA8);
-    mouse_expect_ack();
+    i8042_mouse_expect_ack();
 
 // ========================================
 // Reset
-
 // #bugbug: Isso reseta o controlador ps2 inteiro?
 // Essa rotina avisa que vai escrever na porta do mouse
 // antes de escrever.
 // Então reseta somente o mouse e não o teclado.
-
-    zzz_mouse_write(0xFF); 
-    mouse_expect_ack();
+    i8042_mouse_write(0xFF); 
+    i8042_mouse_expect_ack();
 
 // ========================================
 // Default
-
 // 0xF6 Set default settings.
-
-    zzz_mouse_write (__PS2MOUSE_SET_DEFAULTS);
-    mouse_expect_ack();
+    i8042_mouse_write (__PS2MOUSE_SET_DEFAULTS);
+    i8042_mouse_expect_ack();
 
 // ========================================
 // set sample rate
 // Sampling Rate: Packets the mouse can send per second.
-
-    zzz_mouse_write(0xF3);
-    mouse_expect_ack(); // ACK
-    zzz_mouse_write(PS2MOUSE_DEFAULT_SAMPLERATE);  //200
-    mouse_expect_ack(); // ACK
+    i8042_mouse_write(0xF3);
+    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_write(PS2MOUSE_DEFAULT_SAMPLERATE);  //200
+    i8042_mouse_expect_ack(); // ACK
     PS2Mouse.sample_rate = PS2MOUSE_DEFAULT_SAMPLERATE;
 
 // ========================================
 // set resolution
 // Resolution: DeltaX or DeltaY for each millimeter of mouse movement.
-
-    zzz_mouse_write(__PS2MOUSE_SET_RESOLUTION);
-    mouse_expect_ack(); // ACK
-    zzz_mouse_write(PS2MOUSE_RESULUTION);  //0~3
-    mouse_expect_ack(); // ACK
+    i8042_mouse_write(__PS2MOUSE_SET_RESOLUTION);
+    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_write(PS2MOUSE_RESULUTION);  //0~3
+    i8042_mouse_expect_ack(); // ACK
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
 // ========================================
@@ -540,13 +600,13 @@ void ps2mouse_initialize_device(void)
 // Scaling: 
 // Apply a simple non-linear distortion 
 // to mouse movement.
-    zzz_mouse_write(0xE6);
-    mouse_expect_ack(); // ACK
+    i8042_mouse_write(0xE6);
+    i8042_mouse_expect_ack(); // ACK
 
 // ========================================
 // Enable the mouse
-    zzz_mouse_write(0xF4);
-    mouse_expect_ack(); // ACK
+    i8042_mouse_write(0xF4);
+    i8042_mouse_expect_ack(); // ACK
 
 // #test
 
@@ -606,18 +666,18 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
         device_id != PS2MOUSE_INTELLIMOUSE_EXPLORER_ID )
     {
         // Send magical wheel initiation sequence.
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (200);
-        mouse_expect_ack();
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (100);
-        mouse_expect_ack();
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (80);
-        mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (200);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (100);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (80);
+        i8042_mouse_expect_ack();
 
         // Checando novamente pra ver se ficou inteligente.
         device_id = (int) __get_device_id();
@@ -658,18 +718,18 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
     if (PS2Mouse.device_id == PS2MOUSE_INTELLIMOUSE_ID)
     {
         // Enable five buttons
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (200);
-        mouse_expect_ack();
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (200);
-        mouse_expect_ack();
-        zzz_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
-        mouse_expect_ack();
-        zzz_mouse_write (80);
-        mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (200);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (200);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (PS2MOUSE_SET_SAMPLE_RATE);
+        i8042_mouse_expect_ack();
+        i8042_mouse_write (80);
+        i8042_mouse_expect_ack();
         // Pega novamente para sabermos se e' mouse de id 4
         // e tem 5 botoes.
         device_id = (int) __get_device_id();
@@ -690,10 +750,10 @@ None	Ancient AT keyboard with translation enabled in the PS/Controller (not poss
 //--
 
 // resolution again
-    zzz_mouse_write(__PS2MOUSE_SET_RESOLUTION);
-    mouse_expect_ack(); // ACK
-    zzz_mouse_write(PS2MOUSE_RESULUTION);  //0~3
-    mouse_expect_ack(); // ACK
+    i8042_mouse_write(__PS2MOUSE_SET_RESOLUTION);
+    i8042_mouse_expect_ack(); // ACK
+    i8042_mouse_write(PS2MOUSE_RESULUTION);  //0~3
+    i8042_mouse_expect_ack(); // ACK
     PS2Mouse.resolution = PS2MOUSE_RESULUTION;
 
     PS2Mouse.initialized = TRUE;
@@ -862,76 +922,6 @@ void DeviceInterface_PS2Mouse(void)
 // o window server poderá ler depois.
    //write_packet(mousefp,...)
 }
-
-
-// Esta função será usada para escrever dados 
-// do mouse na porta 0x60, fora do IRQ12
-void zzz_mouse_write(unsigned char data)
-{
-    kbdc_wait(1);
-    out8(0x64,0xD4);
-    kbdc_wait(1);
-    out8(0x60,data);
-}
-
-
-/*
- * zzz_mouse_read:
- *     Pega um byte na porta 0x60.
- */
-unsigned char zzz_mouse_read (void)
-{
-    unsigned char Value=0;
-
-    debug_print ("zzz_mouse_read:\n");
-
-    //debug_print ("[1]:\n");
-    prepare_for_input();
-    //debug_print ("[2]:\n");
-    Value = (unsigned char) in8(0x60);
-
-    //debug_print ("zzz_mouse_read: Done\n");
-    return (unsigned char) Value;
-}
-
-
-void mouse_expect_ack (void)
-{
-    // #bugbug
-    // ? loop infinito  
-    // while ( xxx_mouse_read() != 0xFA );
-
-    unsigned char ack_value=0;
-    int timeout=100;
-
-    while(1) 
-    {
-        timeout--;
-        if (timeout<0){  break;  }
-
-        ack_value = (unsigned char) zzz_mouse_read();
-        
-        // OK
-        if (ack_value == 0xFA){
-            return;  
-        }
-    }; 
-
-// Acabou o tempo, vamos checar o valor.
-// Provavelmente esta errado.
-    if ( ack_value != 0xFA )
-    {
-        //#debug
-        //printf ("expect_ack: not ack\n");
-        return;
-        //return -1;
-    }
-
-    return;
-    //return 0;
-}
-
-
 
 
 

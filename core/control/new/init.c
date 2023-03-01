@@ -226,7 +226,7 @@ static int booting_end(int arch_type)
     __setup_cmdline();
 
 // Clear the screen again.
-    Background_initialize(COLOR_KERNEL_BACKGROUND); 
+    zero_initialize_background();
 
 // ::: Initialization on debug mode.
 // Initialize the default kernel virtual console.
@@ -294,13 +294,8 @@ static void preinit_OutputSupport(void)
 // precisamos calcular se a quantidade mapeada é suficiente.
     refresh_screen_enabled = FALSE;
 
-// As estruturas de console sao estruturas de tty,
-// mas sao um array de estruturas, nao precisa de malloc,
-// por isso podem ser chamadas nesse momento.
-// #test
-// We need to test it better.
-    PROGRESS("preinit_OutputSupport: VirtualConsole_initialize\n");
-    VirtualConsole_initialize();
+    PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
+    zero_initialize_virtual_consoles();
 
 // #IMPORTAT: 
 // We do not have all the runtime support yet.
@@ -588,21 +583,12 @@ static int booting_begin(int arch_type)
     //backbuffer_putpixel(COLOR_WHITE,150,150,0);
     //backbuffer_putpixel(COLOR_WHITE,160,160,0);
 
-//
 // Refresh sceen
-//
     //refresh_screen();
 
 // Video support
-// See: video.c
-
-    //#breakpoint: BLACK ON WHITE.
-    //ok, funcionou na maq real no modo jail, provavelmente 320x200.
-    //for (i=0; i< 320*25; i++){ fb[i] = 0; };
-    //while(1){asm("hlt");};
-
-    PROGRESS("booting_begin: Video_initialize\n");
-    Video_initialize();
+    PROGRESS("booting_begin: zero_initialize_video\n");
+    zero_initialize_video();
 
 // Runtime
 // #bugbug:
@@ -627,8 +613,8 @@ static int booting_begin(int arch_type)
 // #hackhack
     current_arch = CURRENT_ARCH_X86_64;
 
-    PROGRESS("booting_begin: Runtime_initialize\n");
-    Runtime_initialize(current_arch);
+    PROGRESS("booting_begin: zero_initialize_runtime\n");
+    zero_initialize_runtime(current_arch);
 
 // =========================
 // Clear the screen.
@@ -644,10 +630,8 @@ static int booting_begin(int arch_type)
     gwsInitializeDefaultKernelFont();
 
 // Initializing background for the very first time.
-// See: bg.c
-
-    PROGRESS("booting_begin: Background_initialize\n");
-    Background_initialize(COLOR_KERNEL_BACKGROUND);
+    PROGRESS("booting_begin: zero_initialize_background\n");
+    zero_initialize_background();
 
 // No refresh screen yet!
 // Ainda nao podemos usar o refresh screen porque a
@@ -893,20 +877,11 @@ static int booting_begin(int arch_type)
 // =====================================
 
 // Display device
-// See:
-// halvid.h
-// gva.h
-// Todas essas informações devem ser passadas pelo Gramado Boot Loader.
-
-    PROGRESS("booting_begin: Background_initialize\n");
-
-    printf("booting_begin: Setup display device\n");
-
 // bl display device.
 // see: bldisp.c
+    PROGRESS("booting_begin: zero_initialize_background\n");
+    printf("booting_begin: Setup display device\n");
     bldisp_initialize();
-
-
 
 //=============================
 // Initialize current archtecture.
@@ -923,11 +898,10 @@ static int booting_begin(int arch_type)
 
     switch (arch_type){
 
-    // See: x64init.c in ke/arch/x86_64/
     case CURRENT_ARCH_X86_64:
         //debug_print ("kernel_main: [CURRENT_ARCH_X86_64] calling x64main() ...\n");
-        Background_initialize(COLOR_KERNEL_BACKGROUND);  // again
-        Status = (int) I_x64main();
+        zero_initialize_background();
+        Status = (int) zero_initialize_x64();
         if (Status == TRUE){
             // Do not return!
             //booting_end(CURRENT_ARCH_X86_64);
@@ -1042,17 +1016,17 @@ static int booting_begin(int arch_type)
     */
 
 
+//
+// Fail
+//
 
 // =====================================
-
-// Final message.
+// Final messages.
 
     printf("\n");
     printf("init.c: Kernel initialization fail\n\n");
     refresh_screen();
-
 // Show process info if it's valid.
-
     if( (void*) KernelProcess != NULL )
     {
         if(KernelProcess->magic==1234)
@@ -1062,48 +1036,29 @@ static int booting_begin(int arch_type)
             refresh_screen();
         }
     }
-
-// hang.
-
-    //while (1){
-    //    asm ("cli");
-    //    asm ("hlt");
-    //};
-
 // ===========================================
-
-//
-// Fail
-//
-
 // Rule 22:
-// " When in doubt, know your way out. "
-
+// "When in doubt, know your way out."
 // Full console support.
 fail2:
-    //printf ("kernel_main: Fail. *HANG\n");
+    //printf ("kernel_main: Fail. HANG\n");
     //refresh_screen();
-
 // Only serial debug support.
 fail1:
     PROGRESS("Kernel:0:0\n"); 
-    debug_print ("[Kernel] kernel_main-fail:  *hang \n");
-
+    debug_print ("[Kernel] kernel_main-fail: Hang\n");
 // No output support.
+// #maybe: Return to xxxhead.asm and hang.
 fail0:
     system_state = SYSTEM_ABORTED;
-    // Return to xxxhead.asm and hang.
-
     x_panic("Error: 0x02");
     return FALSE;
 }
 
-
-void gramado_shutdown (int how)
+void gramado_shutdown(int how)
 {
     //hal_shutdown();
 }
-
 
 // #deprecated
 // #see: 

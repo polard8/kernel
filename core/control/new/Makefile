@@ -106,7 +106,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 # Classes: Head | Body | Hooks
 
 # Head
-objects-y := head_64.o init.o ar_crt.o  
+objects-y := head_64.o init.o zero.o ar_crt.o  
 # Body
 objects-y += ar_dev.o  
 objects-y += ar_fs.o  
@@ -183,6 +183,9 @@ k3:
 	$(CC) -c zero/request.c  $(KERNEL_INCLUDE) $(CFLAGS) -o request.o
 	$(CC) -c zero/sys/system.c   $(KERNEL_INCLUDE) $(CFLAGS) -o system.o
 	$(CC) -c zero/sys/sys.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sys.o
+
+# Initializations
+	$(CC) -c zero/zero.c  $(KERNEL_INCLUDE) $(CFLAGS) -o zero.o
 
 # Module interface.
 # mod.o

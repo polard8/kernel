@@ -97,7 +97,7 @@ void ps2kbd_initialize_device (void)
 
 // Enable keyboard port
     wait_then_write(I8042_STATUS, 0xae);
-    keyboard_expect_ack();
+    i8042_keyboard_expect_ack();
 
     __prefix=0;
 
@@ -315,25 +315,24 @@ done:
 }
 
 
-// keyboardDisable:
+// i8042_keyboard_disable:
 // Disable keyboard.
 // Wait for bit 1 of status reg to be zero.
 // Send code for setting disable command.
     
-void keyboardDisable (void)
+void i8042_keyboard_disable (void)
 {
     while ( ( in8 (0x64) & 2) != 0 )
     { 
          // Nothing.
     };
-
     out8 (0x60,0xF5);
     //sleep(100);
 }
 
 // keyboardEnable:
 //     Enable keyboard.
-void keyboardEnable (void)
+void i8042_keyboard_enable (void)
 {
 
     // #bugbug
@@ -427,47 +426,43 @@ int get_shift_status (void)
     return (int) shift_status;
 }
 
-// xxx_keyboard_read:
+// i8042_keyboard_read:
 // Esta função será usada para ler dados do teclado na 
 // porta 0x60, fora do IRQ1.
 
-uint8_t xxx_keyboard_read (void)
+uint8_t i8042_keyboard_read (void)
 {
     uint8_t Value=0;
 
-    kbdc_wait(0);
+    prepare_for_input();
     Value = in8(0x60);
     wait_ns(400);
 
     return (uint8_t) Value;
 }
 
-// xxx_keyboard_write: 
+// i8042_keyboard_write: 
 // Esta função será usada para escrever dados do teclado 
 // na porta 0x60, fora do IRQ1.
-
-void xxx_keyboard_write (uint8_t data)
+void i8042_keyboard_write (uint8_t data)
 {
-    kbdc_wait(1);
+    prepare_for_output();
     out8 ( 0x60, data );
     wait_ns(400);
 }
 
 
 /*
- * zzz_keyboard_read:
+ * i8042_keyboard_read2:
  *     Pega um byte na porta 0x60.
  */
-
-unsigned char zzz_keyboard_read (void)
+unsigned char i8042_keyboard_read2(void)
 {
     prepare_for_input();
-
     return (unsigned char) in8(0x60);
 }
 
-
-void keyboard_expect_ack (void)
+void i8042_keyboard_expect_ack (void)
 {
     // #bugbug
     // ? loop infinito  
@@ -481,7 +476,7 @@ void keyboard_expect_ack (void)
         timeout--;
         if (timeout<0){  break;  }
 
-        //ack_value = (unsigned char) zzz_keyboard_read();
+        //ack_value = (unsigned char) i8042_keyboard_read2();
         
         prepare_for_input();
         ack_value = (unsigned char) in8(0x60);

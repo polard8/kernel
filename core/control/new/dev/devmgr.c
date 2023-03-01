@@ -137,6 +137,8 @@ void devmgr_show_device_list(int object_type)
 
 // init_device_manager:
 // Called by init() in init.c.
+// Inicializa o gerenciamento de dispositivos.
+// Inicializa a lista de dispositivos.
 void init_device_manager (void)
 {
     debug_print ("init_device_manager:\n");

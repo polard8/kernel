@@ -397,7 +397,7 @@ extern unsigned long gSavedBPP;
 
 #include "gramado/syscalls.h"
 
-
+#include "zero.h"
 #include "newos.h"
 
 // ==============================

@@ -87,24 +87,23 @@ sched.o schedi.o
 
 all:
 
-# arch
-	$(CC) -c arch/x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+	$(CC) -c x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
 
 # hal
 
-	$(CC) -c hal/hal.c     $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
-	$(CC) -c hal/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c hal.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
+	$(CC) -c x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
 
 	#Interrupts
-	$(CC) -c hal/x86_64/inter/apic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
-	#$(CC) -c hal/x86_64/inter/ioapic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
-	#$(CC) -c hal/x86_64/inter/pic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c x86_64/inter/apic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
+	#$(CC) -c x86_64/inter/ioapic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
+	#$(CC) -c x86_64/inter/pic.c  $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
 
-	$(CC) -c hal/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
-	$(CC) -c hal/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
-	$(CC) -c hal/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
-	$(CC) -c hal/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
-	$(CC) -c hal/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
+	$(CC) -c x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
+	$(CC) -c x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
+	$(CC) -c x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
 
 # ps
 

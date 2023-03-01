@@ -15,6 +15,8 @@ static unsigned long i8042_keyboard_interrupt_handler=0;
 static unsigned long i8042_mouse_interrupt_handler=0;
 */
 
+static void __ps2_wait (unsigned char type);
+
 //-------------------------------------
 
 
@@ -34,7 +36,7 @@ void I8042Controller_do_drain(void)
     };
 }
 
-// kbdc_wait:
+// __ps2_wait:
 // Espera por flag de autorização para ler ou escrever.
 // #bugbug?
 // Is this the best option for x86_64?
@@ -43,7 +45,7 @@ void I8042Controller_do_drain(void)
 
 // #todo: Descreva pra que serve o bit 1. valor 2.
 
-void kbdc_wait (unsigned char type)
+static void __ps2_wait (unsigned char type)
 {
     unsigned char StatusChar=0;
     unsigned char Type = (type & 0xFF);
@@ -87,20 +89,16 @@ void kbdc_wait (unsigned char type)
     }
 }  
 
-
-// =======================
-// prepare ..
-
-// 0 = READ
 void prepare_for_input(void)
 {
-    kbdc_wait(0);
+// 0 = READ
+    __ps2_wait(0);
 }
 
-// 1 = WRITE
 void prepare_for_output(void)
 {
-    kbdc_wait(1);
+// 1 = WRITE
+    __ps2_wait(1);
 }
 
 // =======================
@@ -392,14 +390,13 @@ void ps2(void)
 //==========================
 
 // Wait for nothing!
-    kbdc_wait(1);
-    kbdc_wait(1);
-    kbdc_wait(1);
-    kbdc_wait(1);
+    __ps2_wait(1);
+    __ps2_wait(1);
+    //__ps2_wait(1);
+    //__ps2_wait(1);
 
     //#debug
     printf ("ps2: done\n");
-    //refresh_screen();
 }
 
 int ps2_ioctl ( int fd, unsigned long request, unsigned long arg )
