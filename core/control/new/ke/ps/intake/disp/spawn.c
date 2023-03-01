@@ -453,21 +453,20 @@ spawn_enter_kernelmode(
     panic ("spawn_enter_kernelmode: [ERROR] iretq fail\n");
 }
 
-// KiSpawnTask:
+// psSpawnThread:
 // Interface to spawn a thread.
-
-void KiSpawnThread(int tid)
+void psSpawnThread(tid_t tid)
 {
-    debug_print ("KiSpawnThread:\n");
-
+    debug_print ("psSpawnThread:\n");
     if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
-        printf("KiSpawnThread: TID=%d\n", tid );
+        printf("psSpawnThread: TID=%d\n", tid );
         die();
     }
     spawn_thread(tid);
 // Not reached
-    panic("KiSpawnThread:\n");
+    panic("psSpawnThread:\n");
 }
+
 
 // spawn_pid:
 // Spawn the control thread of a process.
@@ -497,7 +496,7 @@ void spawn_pid(pid_t pid)
 
 // Spawn
     __tid = (tid_t) p->control->tid;
-    KiSpawnThread(__tid);
+    psSpawnThread(__tid);
 // Not reached
     panic("spawn_pid: Fail\n");
 }
@@ -516,7 +515,7 @@ void spawn_tid(int tid)
         panic("spawn_tid: validation\n");
 
 // Spawn
-    KiSpawnThread(tid);
+    psSpawnThread(tid);
 // Not reached
     panic("spawn_tid: Fail\n");
 }

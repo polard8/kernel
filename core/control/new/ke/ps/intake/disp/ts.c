@@ -125,7 +125,7 @@ static void __on_finished_executing(struct thread_d *t)
         //#debug
         //debug_print (" X ");
         tsCallExtraRoutines();
-        //KiRequest();
+        //xxRequest();
         //request();
         extra = FALSE;
     }
@@ -169,7 +169,7 @@ static void cry(unsigned long flags)
  */
 static void __task_switch(void)
 {
-// Called by KiTaskSwitch().
+// Called by psTaskSwitch().
 
 // Current
     struct process_d *CurrentProcess;
@@ -497,7 +497,7 @@ ZeroGravity:
 
 // End of round. Rebuild the round.
     if ( (void *) Conductor->next == NULL ){
-        current_thread = (tid_t) KiScheduler();
+        current_thread = (tid_t) psScheduler();
         goto go_ahead;
     }
 
@@ -547,18 +547,18 @@ go_ahead:
     TargetThread = (void *) Conductor;
     if ( (void *) TargetThread == NULL ){
         debug_print ("ts: Struct ");
-        current_thread = (tid_t) KiScheduler();
+        current_thread = (tid_t) psScheduler();
         goto ZeroGravity;
     }
     if ( TargetThread->used != TRUE || TargetThread->magic != 1234 ){
         debug_print ("ts: val ");
-        current_thread = (tid_t) KiScheduler();
+        current_thread = (tid_t) psScheduler();
         goto ZeroGravity;
     }
 // Not ready?
     if (TargetThread->state != READY){
         debug_print ("ts: state ");
-        current_thread = (tid_t) KiScheduler();
+        current_thread = (tid_t) psScheduler();
         goto ZeroGravity;
     }
 
@@ -818,10 +818,10 @@ void tsCallExtraRoutines(void)
     debug_print ("tsCallExtraRoutines: [FIXME] \n");
 
     // Kernel requests.
-    //KiRequest();
+    //xxRequest();
 
     // Unix signals.
-    //KiSignal();
+    //xxSignal();
 
     // ...
 

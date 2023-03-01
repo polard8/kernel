@@ -487,15 +487,14 @@ void pit_sleep (unsigned long ms)
  * timerInit:
  *     Inicializa o driver de timer.
  *     Inicializa as variáveis do timer.
- *     @todo: KiTimerInit 
  * (unsigned long CallBackExemplo); 
  */
-
 int timerInit (void)
 {
 
     panic("timerInit: #deprecated");
     return 0;
+
 /*
     int i=0;
 

@@ -818,7 +818,7 @@ _irq10:
     push gs
 
 
-    ;call _KiPciHandler1
+    ;call _PciHandler1
 
     ;; EOI.
     ;; Order: Second, first.
@@ -994,7 +994,7 @@ _irq11:
     push gs
 
 
-    ;call _KiPciHandler2
+    ;call _PciHandler2
 
     ;; EOI.
     ;; Order: Second, first.
@@ -1030,10 +1030,8 @@ _irq11:
     pop rbx
     pop rax
 
-
     sti
     iretq
-
 ;===================
 
 

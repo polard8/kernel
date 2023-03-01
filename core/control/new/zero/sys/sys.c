@@ -538,8 +538,7 @@ void sys_show_system_info(int n)
         //systemShowDevicesInfo();
         //pciInfo();
         break;
-    case 5:  
-        //KiInformation(); 
+    case 5:
         break;
     // See: detect.c
     case 6:

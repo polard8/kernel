@@ -78,10 +78,7 @@ unsigned long scheduler_get_status (void);
 
 void cut_round( struct thread_d *last_thread );
 
-// ===
-
-tid_t KiScheduler (void);
-
+tid_t psScheduler(void);
 
 // Switching states.
 void do_thread_initialized(tid_t tid);

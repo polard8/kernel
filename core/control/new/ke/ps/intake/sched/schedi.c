@@ -5,7 +5,7 @@
 
 
 /*
- * KiScheduler:
+ * psScheduler:
  *    Interface para chamar a rotina de scheduler.
  *    Troca as threads que estão em user mode, 
  * usando o método cooperativo. 
@@ -21,7 +21,7 @@
  * sua prioridade básica e executa.
  */
 // OUT: next tid.
-tid_t KiScheduler(void)
+tid_t psScheduler(void)
 {
 
 // #bugbug
@@ -36,7 +36,7 @@ tid_t KiScheduler(void)
 
     if (g_scheduler_status == LOCKED)
     {
-        debug_print ("KiScheduler: Locked $\n");
+        debug_print ("psScheduler: Locked $\n");
         // #bugbug
         // Why are we returning tid 0?
         //return 0;
@@ -45,7 +45,7 @@ tid_t KiScheduler(void)
 
 // Não existem threads nesse processador.
     if (UPProcessorBlock.threads_counter == 0){
-        panic("KiScheduler: UPProcessorBlock.threads_counter == 0\n");
+        panic("psScheduler: UPProcessorBlock.threads_counter == 0\n");
     }
 
 // So existe uma thread nesse processador.
@@ -56,7 +56,7 @@ tid_t KiScheduler(void)
         Conductor = 
             (struct thread_d *) UPProcessorBlock.IdleThread;
         current_thread = (tid_t) Conductor->tid;
-        debug_print("schedi: Idle $\n");
+        debug_print("psScheduler: Idle $\n");
         // Return tid.
         return (tid_t) current_thread;
     }
@@ -74,8 +74,7 @@ void do_thread_initialized(tid_t tid)
     if (tid < 0 || tid >= THREAD_COUNT_MAX){
         return;
     }
-
-// structure
+// Structure
     t = (void *) threadList[tid];
     if ( (void*) t == NULL ){
         return;
@@ -86,7 +85,7 @@ void do_thread_initialized(tid_t tid)
     if (t->magic != 1234){
         return;
     }
-
+//  Change state.
     t->state = INITIALIZED;
 }
 
@@ -499,13 +498,12 @@ void wait_for_a_reason ( int tid, int reason )
         }
     };
 
-   //KiScheduler ();
-   
+   //psScheduler ();
+
    // #debug
    printf ("wait_for_a_reason: done\n");
-   refresh_screen();
+   //refresh_screen();
 }
-
 
 /*
  * wakeup_thread_reason:
@@ -894,30 +892,22 @@ void check_for_standby(void)
 // Done: 
 // Nenhuma tarefa precisa ser inicializada.
 // Podemos apenas retornar para o taskswitch.
-
     return;
 
-//
 // Spawn
-//
-
 // See: spawn.c
 do_spawn:
-
 // tid validation?
     if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         goto fail;
     }
-
 // Can't spawn the INIT_TID.
 // It was the first launched thread.
     if (current_thread == INIT_TID){
         panic("check_for_standby: Can't spawn INIT_TID\n");
     }
-
 // Spawn
-    KiSpawnThread(current_thread);
-
+    psSpawnThread(current_thread);
 // Not reached.
 fail:
     panic("check_for_standby: ERROR\n");
