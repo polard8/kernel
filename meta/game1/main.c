@@ -3385,19 +3385,15 @@ static int on_execute(void)
 
     IsTimeToQuit = FALSE;
     IsAcceptingConnections = TRUE;
-
-// #test: Transparence.
+// #test: 
+// Transparence.
     //gws_enable_transparence();
     gws_disable_transparence();
-
-
 // Window server structure
     __init_ws_structure();
-
 // Window manager
     wmInitializeGlobals();
     __init_wm_structure();
-
 
     /*
     FILE *input_fp;
@@ -3451,9 +3447,7 @@ static int on_execute(void)
         //exit(0);
     }
 
-    if ( serverClient->used != TRUE || 
-         serverClient->magic != 1234 )
-    {
+    if ( serverClient->used != TRUE || serverClient->magic != 1234 ){
         printf ("ws: serverClient validation\n");
         while(1){}
         //exit(0);
@@ -3472,9 +3466,7 @@ static int on_execute(void)
 // Precisamos a opcao de desregistrar, para tentarmos 
 // mais de um window server.
 // See: connect.c
-
     _status = (int) register_ws();
-
     if (_status<0)
     {
         gwssrv_debug_print ("gwssrv: Couldn't register the server\n");
@@ -3766,7 +3758,7 @@ static int on_execute(void)
             //close(newconn);
         }
 
-        // Not accpeting
+        // Not accepeting
         //if (IsAcceptingConnections == FALSE)
         //{
             //close(newconn);
@@ -3843,9 +3835,7 @@ int main(int argc, char **argv)
     starting_tick = (unsigned long) rtl_jiffies();
 
 //0 = Time to quit.
-
     Status = (int) on_execute();
-
     if(Status == 0)
     {
         //gwssrv_debug_print ("GWSSRV.BIN: exit(0)\n");

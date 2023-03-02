@@ -3459,8 +3459,8 @@ static int on_execute(int dm)
 // see: callback.c
 
     if (gUseCallback == TRUE){
-        callbackInitialize();
-        Initialization.setup_callback_checkpoint = TRUE;
+        //callbackInitialize();
+        //Initialization.setup_callback_checkpoint = TRUE;
     }
 
 // ===============================================
@@ -3738,6 +3738,13 @@ static int on_execute(int dm)
             //close(newconn);
         }
 
+        // ##
+        // We're calling this because we don't have a
+        // callback anymore.
+        // This was the jog of the callback.
+        // #todo: We need a timer.
+        compose();
+
         // Not accpeting
         //if (IsAcceptingConnections == FALSE){
             //close(newconn);
@@ -3835,7 +3842,8 @@ int main (int argc, char **argv)
 // O callback tem feito o refresh de muita coisa.
 // Ficar sem ele afeta muito a interface.
 // Mas isso esta aqui para testes.
-    gUseCallback = TRUE;
+    //gUseCallback = TRUE;
+    gUseCallback = FALSE;
 
     Initialization.current_phase = 0;
     Initialization.ws_struct_checkpoint = FALSE;
