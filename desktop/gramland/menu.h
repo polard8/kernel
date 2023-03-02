@@ -17,34 +17,42 @@ extern int mainmenu_buttons[MAINMENU_BUTTONS_MAX];
 // menu item
 struct gws_menu_item_d
 {
-    struct gws_window_d *window;
     int id;
     int selected;
+
+    unsigned int color;
+
+    // Relative
     unsigned long x;
     unsigned long y;
     unsigned long width;
     unsigned long height;
-    unsigned int color;
+    struct gws_window_d *bg_window;
     struct gws_menu_item_d *next;
 };
 
 // menu
 struct gws_menu_d
 {
-    struct gws_window_d *window;
-    struct gws_window_d *parent;
 // TRUE = the menu procedure is running at the moment.
     int in_use;
+
+    unsigned int color;
+
+// Número do item em destaque.
+    int highlight;  
+    // Relative
     unsigned long x;
     unsigned long y;
     unsigned long width;
     unsigned long height;
-    unsigned int color;
-    int highlight;  //Item em destaque
-// list
+// Background window.
+    struct gws_window_d *bg_window;
+// The window that this menu belongs to.
+    struct gws_window_d *owner_window;
+// List of items.
     int itens_count;
     struct gws_menu_item_d *list;
-    //struct gws_menu_d *next;
 };
 extern struct gws_menu_d *main_menu;
 

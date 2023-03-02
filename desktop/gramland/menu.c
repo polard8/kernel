@@ -22,17 +22,17 @@ int redraw_main_menu(void)
         return FALSE;
 
 // Redraw bg window.
-   redraw_window(main_menu->window,TRUE);
+   redraw_window(main_menu->bg_window,TRUE);
 
 // Redraw items.
     struct gws_menu_item_d *tmp;
-    tmp = (struct gws_menu_item_d *)main_menu->list;  //First
+    tmp = (struct gws_menu_item_d *) main_menu->list;  //First
     while (1){
         if ( (void*) tmp == NULL )
             break;
         // Redraw menu item.
         if ( (void*) tmp != NULL ){
-            redraw_window(tmp->window,1);
+            redraw_window(tmp->bg_window,1);
         }
         tmp = (struct gws_menu_item_d *) tmp->next;
     };
@@ -125,8 +125,8 @@ int create_main_menu(int position_x, int position_y)
         (struct gws_menu_d *) menu );
 // Register wid.
     if ( (void*) tmp != NULL ){
-        if ( (void*) tmp->window != NULL )
-            mainmenu_buttons[0] = tmp->window->id;
+        if ( (void*) tmp->bg_window != NULL )
+            mainmenu_buttons[0] = tmp->bg_window->id;
     }
 
 // Item 1
@@ -137,8 +137,8 @@ int create_main_menu(int position_x, int position_y)
         (struct gws_menu_d *) menu );
 // Register wid.
     if ( (void*) tmp != NULL ){
-        if ( (void*) tmp->window != NULL )
-            mainmenu_buttons[1] = tmp->window->id;
+        if ( (void*) tmp->bg_window != NULL )
+            mainmenu_buttons[1] = tmp->bg_window->id;
     }
 
 // Item 2
@@ -149,8 +149,8 @@ int create_main_menu(int position_x, int position_y)
         (struct gws_menu_d *) menu );
 // Register wid.
     if ( (void*) tmp != NULL ){
-        if ( (void*) tmp->window != NULL )
-            mainmenu_buttons[2] = tmp->window->id;
+        if ( (void*) tmp->bg_window != NULL )
+            mainmenu_buttons[2] = tmp->bg_window->id;
     }
 
 // Item 3
@@ -161,19 +161,19 @@ int create_main_menu(int position_x, int position_y)
         (struct gws_menu_d *) menu );  
 // Register wid.
     if ( (void*) tmp != NULL ){
-        if ( (void*) tmp->window != NULL )
-            mainmenu_buttons[3] = tmp->window->id;
+        if ( (void*) tmp->bg_window != NULL )
+            mainmenu_buttons[3] = tmp->bg_window->id;
     }
 
 //
 // Show
 // 
 
-    if ( (void*) menu->window == NULL ){
-        printf("create_main_menu: menu->window\n");
+    if ( (void*) menu->bg_window == NULL ){
+        printf("create_main_menu: menu->bg_window\n");
         return -1;
     }
-    flush_window(menu->window);
+    flush_window(menu->bg_window);
 
 // The mai menu.
     main_menu = (struct gws_menu_d *) menu;
@@ -217,7 +217,7 @@ struct gws_menu_item_d *gwssrv_create_menu_item (
     item->y      = (item->height*id);
 
 // A janela do menu.
-    if(menu->window == NULL){
+    if(menu->bg_window == NULL){
         return NULL;
     }
 
@@ -230,13 +230,13 @@ struct gws_menu_item_d *gwssrv_create_menu_item (
         1, //view 
         (char *) label,  
         item->x, item->y, item->width, item->height,   
-        menu->window, 
+        menu->bg_window, 
         0, 
         COLOR_GRAY, 
         COLOR_GRAY );    
 
     if ( (void*) window == NULL ){
-        item->window = NULL;
+        item->bg_window = NULL;
         goto fail;
     }
 
@@ -250,8 +250,7 @@ struct gws_menu_item_d *gwssrv_create_menu_item (
 // This window is a menuitem.
     window->isMenuItem = TRUE;
 
-// The window this window belongs to.
-    item->window = window;
+    item->bg_window = window;
 
     struct gws_menu_item_d *tmp;
 
@@ -351,8 +350,8 @@ struct gws_menu_d *gwssrv_create_menu (
     bg_window->isMenu = TRUE;
 
 // Save window pointer.
-    menu->window = bg_window; 
-    menu->parent = parent;
+    menu->bg_window = bg_window; 
+    menu->owner_window = parent;
 
     menu->in_use =  TRUE;
 
@@ -380,13 +379,13 @@ int __is_inside_menu(struct gws_menu_d *menu, int x, int y)
     if( (void*)m==NULL )
         return -1;
 
-// parent window
-    pw = m->parent;
+// Owner.
+    pw = m->owner_window;
     if( (void*)pw == NULL )
         return -1;
 
 // menu window
-    mw = m->window;
+    mw = m->bg_window;
     if( (void*)mw == NULL )
         return -1;
 
