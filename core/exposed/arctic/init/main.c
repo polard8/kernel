@@ -66,6 +66,8 @@ static int __CompareString(void);
 
 static void do_help(void);
 static void do_launch_de(void);
+static void do_launch_de2(void);
+static void do_launch_list(void);
 static void do_hello(int caller);
 
 static void do_clear_console(void);
@@ -177,6 +179,22 @@ static void do_help(void)
     printf("[control + f9] to open the kernel console\n");
 }
 
+static void do_launch_list(void)
+{
+// Raw and ugly set of programs.
+    rtl_clone_and_execute("gramland.bin");
+    rtl_clone_and_execute("terminal.bin");
+    rtl_clone_and_execute("editor.bin");
+    rtl_clone_and_execute("browser.bin");
+    rtl_clone_and_execute("fileman.bin");
+
+// #
+// Quit the command line.
+// It's too much faster if we do not quit.
+// But we need to quit and start listening for messages.
+    isTimeToQuit = TRUE;
+}
+
 static void do_launch_de(void)
 {
     int ret_val=-1;
@@ -203,6 +221,37 @@ static void do_launch_de(void)
 // Quit the command line.
     isTimeToQuit = TRUE;
 }
+
+static void do_launch_de2(void)
+{
+    int ret_val=-1;
+
+    do_clear_console();
+    printf ("Launching GUI\n");
+// Sending cmdline via stdin
+    rewind(stdin);
+    write( fileno(stdin), cmdline1, strlen(cmdline1) );
+// Launch new process.
+    ret_val = (int) rtl_clone_and_execute("gramland.bin");
+    if (ret_val<=0){
+        printf("Couldn't clone\n");
+        return;
+    }
+// Launch new process.
+    ret_val = (int) rtl_clone_and_execute("terminal.bin");
+    if (ret_val<=0){
+        printf("Couldn't clone\n");
+        return;
+    }
+
+// Sleep (Good!)
+    //sc82( 266, 8000, 8000, 8000 );
+    //printf("pid=%d\n",ret_val);
+// Quit the command line.
+    isTimeToQuit = TRUE;
+}
+
+
 
 static void initPrompt(void)
 {
@@ -291,6 +340,11 @@ static int __CompareString(void)
         goto exit_cmp;
     }
 
+    //#test
+    if ( strncmp(prompt,"list",4) == 0 ){
+        do_launch_list();
+        goto exit_cmp;
+    }
 
     if ( strncmp(prompt,"t1",2) == 0 )
     {
@@ -396,6 +450,14 @@ static int __CompareString(void)
         do_launch_de();
         goto exit_cmp;
     }
+// Initialize the window server, the terminal and 
+// quit the command line.
+    if ( strncmp(prompt,"wsq2",4) == 0 ){
+        printf ("~WSQ2\n");
+        do_launch_de2();
+        goto exit_cmp;
+    }
+
     if ( strncmp(prompt,"boot",4) == 0 ){
         printf ("~BOOT\n");
         do_launch_de();
