@@ -27,10 +27,14 @@ extern int current_mode;
 // Variáveis para habilitações de verbose pra debug.
 //
 
-#include <config/config.h>  
-#include <gdef.h>  
+#include "config/config.h" 
+#include "gdef.h"
 
  
+extern unsigned long SavedX;
+extern unsigned long SavedY;
+extern unsigned long SavedBPP;
+
 /*
  * Variáveis importadas.
  * Stack pointers ??
@@ -250,64 +254,50 @@ extern void refresh_screen();
 #define COLOR_BLUE  0x000000FF
 // ...
 
-
 /*
- * Includes.
+ * Includes
  */
  
 #include "en/strings.h"
+#include "memmap.h"   // Memory Map - address.
+#include "diskmap.h"  // Disk Map   - sectors.
+#include "heap.h"
 
-#include <memmap.h>     //Memory Map - address.
-#include <diskmap.h>    //Disk Map   - sectors.
-
-//#test.
-#include <heap.h> 
-
-// Lib C support.
-#include <types.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+// Lib C.
+#include "types.h"
+#include "stddef.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
 //...
 
-//#test
-#include <cpuid.h>
+#include "cpuid.h"
 
-/*
- * Boot Loader i386 specific support.
- */
-#include <bli386.h>
+//  Internal
+#include "bli386.h"
 
-/*
- * File System support.
- */
-#include <sys/exec_elf.h>
+// ELF
+#include "sys/exec_elf.h"
+// File systems.
+#include "fs/fs.h"
+#include "pci.h"
 
-#include <fs/fs.h>
+// Device drivers.
+#include "dd/display.h"
+#include "dd/r_render.h"  // Graphics
+#include "dd/keyboard.h"  // irq 1.
+#include "dd/ata.h"
+#include "dd/ide.h"
+//#include "timer.h"  // irq 0.
 
-#include <pci.h>
+// Embedded mini-shell
+#include "shell.h"
 
-//#include <timer.h>     //irq 0.
-#include <dd/keyboard.h>    //irq 1.
-#include <dd/ata.h>
-#include <dd/ide.h>
-
-
-// Shell.
-// Boot Loader mini-shell support. 
-// Obs: This must be the last one.
-
-#include <shell.h>
-
-//
-// (Boot Loader Internal). Para rotinas globais começadas com BlXXXX().
+// (Boot Loader Internal). 
+// Para rotinas globais começadas com BlXXXX().
 // Acessiveis à todos os módulos do boot loader.
-//
-#include <bli.h>
+#include "bli.h"
 
-
-#include <render/r_render.h>
 
 //
 // Variáveis globais.
@@ -576,10 +566,9 @@ cpuSetMSR (
 // Initialization support.
 //
 
-void OS_Loader_Main (void);
-
-int init();
-void init_globals();
+void bl_main(void);
+int init(void);
+void init_globals(void);
 void boot(); 
 
 //
@@ -597,7 +586,7 @@ void panic(const char *msg);
 // Timer support.
 //
 void timer();
-int BltimerInit();
+int blTimerInit();
 
 //
 // Paging support.
@@ -653,15 +642,10 @@ pciConfigReadWord (
 
 void system_services();
 
+
 void reboot();
-
-// See: abort.c
-//
 void abort(void);
-
-// See: main.c
 void die(void);
-
 
 //
 // End.

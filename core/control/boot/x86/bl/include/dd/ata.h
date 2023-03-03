@@ -2,29 +2,19 @@
  * File: ata.h
  * Essas rotinas fazem parte do projeto Sirius e são usadas aqui
  * para suporte à IDE/AHCI.
- * 2018 - Created by Nelson Cole. 
+ * 2018 - Created by Nelson Cole (Sirius OS)
  */
 
-/*
- * credits:
- * Khole Operating System
- * ata/ata.h 
- * Copyright (C) 2017,2018 Nelson Cole <nelsoncole72@gmail.com>
- */
-
-
-#ifndef __ATA_H__
-#define __ATA_H__    1
+#ifndef __DD_ATA_H
+#define __DD_ATA_H    1
 
 // nelson cole
 // suporte a disco.
 // usado no kernel base
 
-//
 // =====================================================================
 //     IDE controller support by Nelson Cole
 // =====================================================================
-//
 
 //see: ide.c
 extern int ATAFlag;

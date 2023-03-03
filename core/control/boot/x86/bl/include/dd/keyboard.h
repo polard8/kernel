@@ -13,18 +13,15 @@
  *     2015 - Ported from older versions.
  */
 
-#ifndef __KEYBOARD_H
-#define __KEYBOARD_H    1
+#ifndef __DD_KEYBOARD_H
+#define __DD_KEYBOARD_H    1
 
-
-//
-// Buffer.
-//
-
+// Buffer
 #define CHEIO  1
 #define VAZIO  0
 
-#define OBF  0x01    //Output Buffer Flag.
+//Output Buffer Flag.
+#define OBF  0x01
 
 #define	L		0x01    // Locking function.
 #define	SHF		0x02	// Keyboard shift.

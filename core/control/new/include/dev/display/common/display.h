@@ -21,6 +21,17 @@ struct x_boot_block_d
 // see: globals.c, init.c, bldisp.c
 extern struct x_boot_block_d  xBootBlock;
 
+// #test
+// We can use only an area of the screen.
+// Or multiple areas.
+struct virtual_screen_d
+{
+// Relative to the actual screen.
+    unsigned long left;
+    unsigned long top;
+    unsigned long width;
+    unsigned long height;
+};
 
 struct display_device_d
 {
@@ -29,20 +40,39 @@ struct display_device_d
     // The file to handle this device.
     file *_file;
     //char name[64];
+
+// Structure initialization.
+    int initialized;
+
 //
 // LFB - Linear Frame Buffer
 //
+
+
+// Start
     unsigned long framebuffer_pa;
     unsigned long framebuffer_va;
+
+// End
+    //unsigned long framebuffer_end_pa;
+    //unsigned long framebuffer_end_va;
+
+// End of installed memory
+    //unsigned long memory_end_pa;
+    //unsigned long memory_end_va;
+
+// #bugbug
+// Actually it is about the visible area,
+// But we also need the info about all the available memory
+// inside the display device.
 
     unsigned long framebuffer_width;
     unsigned long framebuffer_height;
     unsigned long framebuffer_bpp;
     // How many bytes in a single row.
     unsigned long framebuffer_pitch;
-    // used for allocations.
+    // Screen size in bytes.
     unsigned long framebuffer_size_in_bytes;
-
 
     //unsigned long screen_rows;
     //unsigned long buffer_rows;
@@ -53,7 +83,12 @@ struct display_device_d
     //struct tty_d *console_tty
     // FILE *fp;
 
-    //...    
+    //...   
+
+// #test
+// We can use only an area of the screen.
+// Or multiple areas.
+    struct virtual_screen_d virtual_screen;
 
     struct display_device_d *next;
 };

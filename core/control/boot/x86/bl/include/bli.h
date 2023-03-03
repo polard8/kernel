@@ -16,11 +16,8 @@ bl_procedure (
     unsigned long long2 );
 
 
-//
 // Finalizations support.
-//
-
-void BlAbort();
+void blAbort();
 
 
 //

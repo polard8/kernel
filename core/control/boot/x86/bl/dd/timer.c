@@ -12,30 +12,22 @@
 
 #include <bootloader.h>
 
-
 unsigned long timerTicks=0;
-
 
 // irq handler.
 // Increment jiffies.
-
 void timer()
 {
     timerTicks++;
-
     //if ( timerTicks % 100 == 0 )
     //{
         // Nothing ...
     //}
 }
 
-
-/*
- * BltimerInit:
- *     Inicializa o módulo timer.
- */
-
-int BltimerInit()
+// blTimerInit:
+// Inicializa o módulo timer.
+int blTimerInit()
 {
     int Status=0;
 
@@ -44,8 +36,7 @@ int BltimerInit()
     return (int) Status;
 }
 
-
 //
-// End.
+// End
 //
 

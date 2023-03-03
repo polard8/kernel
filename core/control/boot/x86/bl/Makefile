@@ -1,6 +1,4 @@
-#
-# Compiling Gramado Boot Loader 1.0 
-# BSD License
+# Compiling Gramado Boot Loader
 # 2018 - Created by Fred Nora.
 #      - Adapted from Matheus Castello's script.
 # todo:
@@ -11,8 +9,7 @@ VERSION = 1
 PATCHLEVEL = 0
 SUBLEVEL = 0
 EXTRAVERSION = 
-NAME = LandLoader
-
+NAME = GramadoBootLoader
 
 # Make variables (CC, etc...)
 AS	= as
@@ -48,7 +45,7 @@ CFLAGS = -m32 \
 	-s
 
 # Objects 
-myObjects = head.o main.o \
+myObjects = head.o main.o globals.o \
 loader.o init.o ports.o x86.o \
 stdio.o stdlib.o string.o \
 keyboard.o pci.o hdd.o ide.o timer.o \
@@ -66,45 +63,36 @@ all-bl: bl-x86 link-x86 finalize clean
 
 bl-x86:
 
-    # Head
+# Head
 	$(NASM)  -I x86/  x86/head.s -f elf -o head.o
-
-    # main
+# main
 	$(CC) -c main.c -I include/ $(CFLAGS) -o main.o 
-
-    # init
+	$(CC) -c globals.c -I include/ $(CFLAGS) -o globals.o 
+# init
 	$(CC) -c init.c -I include/ $(CFLAGS) -o init.o 
-
-    # libc
+# libc
 	$(CC) -c stdio.c   -I include/ $(CFLAGS) -o stdio.o
 	$(CC) -c string.c  -I include/ $(CFLAGS) -o string.o
 	$(CC) -c stdlib.c  -I include/ $(CFLAGS) -o stdlib.o
-
-	#x86
+#x86
 	$(CC) -c x86/faults.c  -I include/ $(CFLAGS)  -o faults.o
 	$(CC) -c x86/x86.c     -I include/ $(CFLAGS)  -o x86.o
 	$(CC) -c x86/ports.c   -I include/ $(CFLAGS)  -o ports.o 
-
-	# mm
+# mm
 	$(CC) -c pages.c   -I include/ $(CFLAGS) -o pages.o
 	$(CC) -c heap.c    -I include/ $(CFLAGS) -o heap.o
-
-    #Sys
+#Sys
 	$(CC) -c procedure.c -I include/ $(CFLAGS) -o procedure.o
 	$(CC) -c abort.c     -I include/ $(CFLAGS) -o abort.o
-
-    #Shell
+#Shell
 	$(CC) -c shell.c -I include/ $(CFLAGS) -o shell.o
-
-    #fs
+#fs
 	$(CC) -c fs/fs.c     -I include/ $(CFLAGS) -o fs.o
 	$(CC) -c fs/loader.c -I include/ $(CFLAGS) -o loader.o
 
 	$(CC) -c render/r_render.c  -I include/ $(CFLAGS) -o r_render.o
 
-
 	$(CC) -c pci.c  -I include/ $(CFLAGS)  -o pci.o
-
 # dd
 	$(CC) -c dd/keyboard.c  -I include/ $(CFLAGS)  -o keyboard.o
 	$(CC) -c dd/timer.c     -I include/ $(CFLAGS)  -o timer.o
@@ -113,17 +101,14 @@ bl-x86:
 
 
 link-x86:
+#todo:
+# Change to ELF.
 	$(LD) -m i386pe -T x86/link.ld -o BL.BIN $(myObjects)    
-
 finalize:
 	cp BL.BIN ../bin/
-
 clean:
 	find . -type f -name '*.o' -delete
 	-rm BL.BIN
-
 clean2:
 	-rm BL.BIN
 	
-	
-		

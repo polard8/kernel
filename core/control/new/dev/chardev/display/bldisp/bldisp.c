@@ -418,10 +418,9 @@ int bldisp_initialize(void)
 {
 // Initialize bl display device.
 
+// Memory allocation for Display device structure.
     bl_display_device = 
         (struct display_device_d *) kmalloc ( sizeof(struct display_device_d) ); 
-
-    // Memory allocation for Display device structure.
     if ( (void*) bl_display_device == NULL ){
         x_panic ("Error: 0x05");
     }
@@ -431,6 +430,9 @@ int bldisp_initialize(void)
         x_panic ("bldisp_initialize: xBootBlock");
     }
 
+// Structure initialization.
+    bl_display_device->initialized = FALSE;
+
 // framebuffer address.
     bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
     bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
@@ -438,16 +440,31 @@ int bldisp_initialize(void)
     bl_display_device->framebuffer_width  = (unsigned long) xBootBlock.deviceWidth;
     bl_display_device->framebuffer_height = (unsigned long) xBootBlock.deviceHeight;
     bl_display_device->framebuffer_bpp   = (unsigned long) xBootBlock.bpp;
-// pitch
+// Pitch
     bl_display_device->framebuffer_pitch = 
-        (unsigned long) ( xBootBlock.deviceWidth * xBootBlock.bpp );
-// size in bytes.
+        (unsigned long) (xBootBlock.bpp * xBootBlock.deviceWidth);
+// Screen size in bytes.
     bl_display_device->framebuffer_size_in_bytes =
-        (unsigned long) ( bl_display_device->framebuffer_pitch * bl_display_device->framebuffer_height );
+        (unsigned long) (bl_display_device->framebuffer_height * bl_display_device->framebuffer_pitch);
+
+
+// #test
+// The main virtual screen for this device.
+// Relative values.
+    bl_display_device->virtual_screen.left = (unsigned long) 0;
+    bl_display_device->virtual_screen.top  = (unsigned long) 0;
+    bl_display_device->virtual_screen.width = 
+        (unsigned long) bl_display_device->framebuffer_width;
+    bl_display_device->virtual_screen.height = 
+        (unsigned long) bl_display_device->framebuffer_height;
+
+    bl_display_device->next = NULL;
 
 // validation
     bl_display_device->used = TRUE;
     bl_display_device->magic = 1234;
+// Structure initialization.
+    bl_display_device->initialized = TRUE;
 
     PROGRESS("bldisp_initialize: Setup display device\n");
     printf("bldisp_initialize: Setup display device\n");

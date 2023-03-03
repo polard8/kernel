@@ -6,30 +6,22 @@
  *     2015 - Created by Fred Nora.
  */
 
-
 #include <bootloader.h>
 
 
 // Variaveis herdadas do boot manager
-
 // O modo de boot. gui or cli.
 extern unsigned long SavedBootMode;
-
 // Endereço do boot block
 extern unsigned long SavedBootBlock;   
-
 // device info
 //extern unsigned long SavedLFB;
 //extern unsigned long SavedX;
 //extern unsigned long SavedY;
 //extern unsigned long SavedBPP;
 
-
-/*
- * set_up_color:
- *     Configura cor padrão para o sistema.
- */
-
+// set_up_color:
+// Configura cor padrão para o sistema.
 void set_up_color (unsigned long color)
 {   
     g_system_color = (unsigned long) color;
@@ -51,22 +43,17 @@ set_up_text_color (
  *     @Mudar para BlInitGlobals();
  *     o retorno por ser int.
  */
-
 //void BlInitGlobals() 
-void init_globals ()
+void init_globals(void)
 {
-
 // Próximo procedimento, status and file system type.
 // 1=fat16.
-
     g_next_proc = (unsigned long) bl_procedure;
     g_proc_status = 0;
     g_file_system_type = 1;
     //...
-
 // Procedure structure. 
 // @todo Check.
-
     procedure_info.next = (unsigned long) bl_procedure;
     procedure_info.status = 0;
     //...
@@ -77,11 +64,9 @@ void init_globals ()
  * init:
  *     Função principal do arquivo init.c.
  */
- 
 // Called by OS_Loader_Main in main.c
-
 //int init (int ?){ 
-int init ()
+int init(void)
 {
     g_cursor_x = 0;
     g_cursor_y = 0;
@@ -177,7 +162,7 @@ int init ()
 
     fsInit();       // File system.
     shellInit();    // Embedded shell.
-    BltimerInit();  // Timer.
+    blTimerInit();  // Timer.
 
 // Type:
 //     CD, HD, PXE, FLASH, FAT16 ...

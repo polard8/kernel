@@ -17,12 +17,13 @@
  *     2020 - Revision.
  */
 
-
 #include <bootloader.h>
 
 //
 // globals
 //
+
+struct display_device_d  DisplayDevice;
 
 int ____testing_memory_size_flag=0;
 unsigned long __last_valid_address=0;
@@ -102,12 +103,14 @@ int bliTesting=0;
 //
 
 static unsigned long init_testing_memory_size(int mb);
-static int newOSLoadKernelImage(void);
-
-
-
+static unsigned long __setup_physical_memory(void);
+static void 
+__clean_memory( 
+    unsigned long start_address, 
+    unsigned long end_address );
+static int blLoadKernelImage(void);
 static void blShowMenu (void);
-static void BlMenu(void);
+static void blMenu(void);
 
 // =========================================
 
@@ -213,6 +216,99 @@ static unsigned long init_testing_memory_size (int mb)
 // end - Testing memory size
 //================================================================
 
+// OUT: Return last valid address.
+static unsigned long __setup_physical_memory(void)
+{
+//++
+// == Memory size ===============================
+// #test
+// Sondando quanta mem�ria f�sica tem instalada.
+// Faremos isso antes de mapearmos qualquer coisa e
+// antes de carregarmos qualquer arquivo.
+// #todo:
+// Temos v�rias quest�es � se considerar, como o fato de sujarmos
+// a IVT no in�cio da mem�ria.
+
+    unsigned long __address = 0;
+
+    // ok
+    //__address = (unsigned long) init_testing_memory_size (4);
+    // ok
+    //__address = (unsigned long) init_testing_memory_size (64);
+    // ok
+    //__address = (unsigned long) init_testing_memory_size (127);  
+    // 511
+    //__address = (unsigned long) init_testing_memory_size (1024);   
+
+    //para testar na m�quina real com 2048 mb instalado.
+    __address = (unsigned long) init_testing_memory_size(2048);   
+    
+// #todo
+// Temos que passar esses valores para o kernel,
+// juntamente com os valores que passsamos durante a inicialização
+// em assembly, através do boot buffer em 0x0000000000090000. 
+// See: head.s
+// LFB_VA:      0x00090000 + 0
+// WIDTH:       0x00090000 + 8
+// HEIGHT:      0x00090000 + 16
+// BPP:         0x00090000 + 24
+// LAST_VALID:  0x00090000 + 32
+// LAST_VALID:  0x00090000 + 40 (complement)
+// ...
+
+    unsigned long *LastValid = 
+        (unsigned long*) (0x00090000 + 32); 
+    
+    unsigned long *LastValidComplement = 
+        (unsigned long*) (0x00090000 + 36); 
+
+    LastValid[0]           = (unsigned long) __address;
+    LastValidComplement[0] = (unsigned long) 0;
+
+//#debug
+    //printf ("BlMain: Las valid PA = %x \n", __address);
+    //refresh_screen();
+    //while(1){}
+// =======================================
+//--
+
+// Return last valid address.
+    return (unsigned long) __address;
+}
+
+static void 
+__clean_memory( 
+    unsigned long start_address, 
+    unsigned long end_address )
+{
+//++
+// =======================================
+// Cleaning the RAM.
+// Vamos limpar somente a parte que será usada pelos 
+// primeiros componentes do sistema.
+// Mas mesmo assim precisamos limpar o bss das imagens
+// e limpar as áreas alocadas.
+// 32 mb, começando de 1mb.
+// Is it slow?
+
+    unsigned long *CLEARBASE = (unsigned char *) start_address;
+    register int i=0;
+    int max = ( (1024*1024*32) / 4 );    // (32mb/4)
+
+// Limpamos somente se está dentro da área
+// previamente descoberta.
+// 4 bytes per time.
+    for ( i=0; i<max; i++ )
+    {
+        if ( &CLEARBASE[i] < end_address ){
+            CLEARBASE[i] = (unsigned long) 0;
+        }
+    };
+// =======================================
+//--
+}
+
+
 
 /*
  * newOSLoadKernelImage: 
@@ -228,7 +324,7 @@ static unsigned long init_testing_memory_size (int mb)
 // to search in the default folder.
 // Called by OS_Loader_Main().
 
-static int newOSLoadKernelImage(void)
+static int blLoadKernelImage(void)
 {
     int Status = -1;
 // Standard name.
@@ -285,8 +381,7 @@ static void blShowMenu (void)
 }
 
 
-
-static void BlMenu(void)
+static void blMenu(void)
 {
     char Key=0;
 
@@ -345,14 +440,14 @@ ____go:
     return;
 }
 
-
-// OS_Loader_Main:
+// --------------------------------
+// bl_main:
 // Called by _OS_Loader_Entry_Point in head.s.
 // This is the entrypoint for the C part of the boot loader.
 // + Load the kernel image.
 // + Setup paging and the base pagetables used by the kernel.
 // + Jumps to the kernel image.
-void OS_Loader_Main (void)
+void bl_main (void)
 {
     int Status = (-1);
     int fTest=FALSE;
@@ -360,7 +455,6 @@ void OS_Loader_Main (void)
 // root and fat not loaded yet.
     g_fat16_root_status = FALSE;
     g_fat16_fat_status = FALSE;
-
 // main flags.
     gdefLegacyBIOSBoot  = FALSE;
     gdefEFIBoot         = FALSE;
@@ -368,216 +462,64 @@ void OS_Loader_Main (void)
     gdefShowLogo        = FALSE;
     gdefShowProgressBar = FALSE;
     // ...
-
 // Set GUI.
     // VideoBlock.useGui = 1;
     // VideoBlock.useGui = 0;
 
+// Display device
+// Saving some display device info.
+
+    DisplayDevice.width  = (unsigned long) SavedX;
+    DisplayDevice.height = (unsigned long) SavedY;
+    DisplayDevice.bpp    = (unsigned long) SavedBPP;
+
+// Line in bytes.
+    DisplayDevice.pitch = 
+        (unsigned long) (SavedBPP * SavedX);
+// Screen in bytes.
+    DisplayDevice.screen_size_in_bytes = 
+        (unsigned long) (SavedY * DisplayDevice.pitch);
+
+    DisplayDevice.initialized = TRUE;
+
+
 // Init.
 // See: init.c
-
     Status = (int) init();
     if (Status != 0){
         // #todo
     }
+// Setup physical memory.
+    unsigned long last_address=0;
+    last_address = (unsigned long) __setup_physical_memory();
+// Clean up memory.
+// IN: start address, end address.
+    __clean_memory(
+        (unsigned long) 0x100000,
+        (unsigned long) last_address );
+// Initialize bl heap.
+// malloc support.
+    init_heap();
+// Initialize IDE support.
+    init_hdd();
 
-//++
-// == Memory size ===============================
-// #test
-// Sondando quanta mem�ria f�sica tem instalada.
-// Faremos isso antes de mapearmos qualquer coisa e
-// antes de carregarmos qualquer arquivo.
-// #todo:
-// Temos v�rias quest�es � se considerar, como o fato de sujarmos
-// a IVT no in�cio da mem�ria.
-
-    unsigned long __address = 0;
-
-    // ok
-    //__address = (unsigned long) init_testing_memory_size (4);
-    // ok
-    //__address = (unsigned long) init_testing_memory_size (64);
-    // ok
-    //__address = (unsigned long) init_testing_memory_size (127);  
-    // 511
-    //__address = (unsigned long) init_testing_memory_size (1024);   
-
-    //para testar na m�quina real com 2048 mb instalado.
-    __address = (unsigned long) init_testing_memory_size(2048);   
-    
-// #todo
-// Temos que passar esses valores para o kernel,
-// juntamente com os valores que passsamos durante a inicialização
-// em assembly, através do boot buffer em 0x0000000000090000. 
-// See: head.s
-// LFB_VA:      0x00090000 + 0
-// WIDTH:       0x00090000 + 8
-// HEIGHT:      0x00090000 + 16
-// BPP:         0x00090000 + 24
-// LAST_VALID:  0x00090000 + 32
-// LAST_VALID:  0x00090000 + 40 (complement)
-// ...
-
-    unsigned long *LastValid = 
-        (unsigned long*) (0x00090000 + 32); 
-    
-    unsigned long *LastValidComplement = 
-        (unsigned long*) (0x00090000 + 36); 
-
-    LastValid[0]           = (unsigned long) __address;
-    LastValidComplement[0] = (unsigned long) 0;
-
-//#debug
-    //printf ("BlMain: Las valid PA = %x \n", __address);
-    //refresh_screen();
-    //while(1){}
-// =======================================
-//--
-
-
-
-//++
-// =======================================
-// Cleaning the RAM.
-// Vamos limpar somente a parte que será usada pelos 
-// primeiros componentes do sistema.
-// Mas mesmo assim precisamos limpar o bss das imagens
-// e limpar as áreas alocadas.
-// 32 mb, começando de 1mb.
-// Is it slow?
-
-    unsigned long *CLEARBASE = (unsigned char *) 0x100000;  
-
-    register int i=0;
-    int max = ( (1024*1024*32) / 4 );    // (32mb/4)
-
-//  Limpamos somente se está dentro da área
-// previamente descoberta.
-// 4 bytes per time.
-
-    for ( i=0; i<max; i++ )
-    {
-        if ( &CLEARBASE[i] < __address )
-        {
-            CLEARBASE[i] = (unsigned long) 0;
-        }
-    };
-// =======================================
-//--
-
-
-// #todo
-// Precisamos reconsiderar a necessidade de fazermos isso.
-// O timer ira atrazar a inicializaçao ?
-// Precisamos dessas interrupçoes para alguma coisa como
-// o driver de ata ?
-
-// #debug
-    // printf("habilitando as interrupcoes\n");
-    // refresh_screen();
-
-// Interrupts
-// #todo
-// Podemos adiar isso ?
-// #todo:
-// Talvez devamos adiar esse sti.
-// #bugbug: Talvez isso seja necessario para usar o hd.
-
-    //asm ("sti");
-
-    init_heap();  // malloc support.
-    init_hdd();   // IDE driver.
-
-// #todo: 
-// Clean the screen.
-
-// Welcome Message.
-// banner
-
-//#ifdef BL_VERBOSE
-    //printf ("BlMain: Starting Boot Loader..\n");
-    //refresh_screen();
-//#endif
-
+// debug
     if (g_initialized != TRUE){
         printf("OS_Loader_Main: g_initialized\n");
         die();
     }
 
-// #important:
-// ===========
-// Daqui pra frente vamos carregar os arquivos. 
-// Lembrando que o Boot Loader somente carrega 
-// de dispositivo IDE.
-
-//
-// Inicia os carregamentos.
-//
-
-//Carrega arquivos.
-//#ifdef BL_VERBOSE
-//    printf ("BlMain: Loading rootdir and fat ..\n");
-//    refresh_screen();
-//#endif
-
-
-// #todo
-// Maybe we need the return from these routines.
-
-
-// ========
-// #slow
-// Load root dir.
-
-    //#debug
-    //printf ("OS_Loader_Main: Loading rootdir ..\n");
-    //refresh_screen();
-
+// Loading root dir.
     fs_load_rootdirEx();
     g_fat16_root_status = TRUE;
 
-// ========
-// #slow
-// Load FAT.
-    
-    //#debug
-    //printf ("OS_Loader_Main: Loading fat ..\n");
-    //refresh_screen();
-
+// Loading FAT.
     fs_load_fatEx();
     g_fat16_fat_status = TRUE;
 
-// #todo
-// Podemos mostrar o menu de opções
-// imediatamente antes da opção de carregarmos o kernel.
-// Dessa forma o boot loader carregará o kernel adequado
-// de acordo com o ítem selecionado no menu, que pode ser
-// uma aplicação ou modo diferente de inicialização.
+// Loading kernel image.
 
-    /*
-     #bugbug: It hangs the system.
-    BlMenu();
-    printf("hang\n"); 
-    refresh_screen();
-    while(1){}
-    */
-
-//
-// Loading files.
-//
-
-// ?? maybe.
-    // BlLoadConfigFiles ();   
-
-// #slow
-// Loading the kernel image.
-// Helper function in this document.
-
-    //#debug
-    //printf ("OS_Loader_Main: Loading kernel image ..\n");
-    //refresh_screen();
-
-    Status = newOSLoadKernelImage();
+    Status = blLoadKernelImage();
     if (Status<0){
          printf("OS_Loader_Main: newOSLoadKernelImage fail.\n");
          refresh_screen();
@@ -733,9 +675,9 @@ See: https://wiki.osdev.org/X86-64
     };
 }
 
-// BlAbort:
+// blAbort:
 // Rotina para abortar o bootloader em caso de erro grave.
-void BlAbort()
+void blAbort()
 {
 //@todo: 
 //Talvez poderia ter uma interface antes de chamar a rotina abort().
@@ -743,20 +685,6 @@ void BlAbort()
     //checks()
     abort(); 
 }
-
-
-/*
- * BlKernelModuleMain:
- *     Se é o kernel que está chamando o Boot Loader 
- * na forma de módulo do kernel em kernel mode.
- */
-
-void BlKernelModuleMain()
-{
-    //printf ("BlKernelModuleMain: Boot Loader\n");
-    //refresh_screen();
-}
-
 
 // die:
 // CLI HLT routine.

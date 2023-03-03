@@ -40,10 +40,8 @@ segment .head_x86
 extern ___last_valid_address 
 
 
-extern _g_lbf_pa            ; LFB - Linear Frame Buffer. (physical address).
-extern _OS_Loader_Main      ; Entrada da parte em C.
-extern _BlKernelModuleMain  ; Reentrada do bl, agora na forma de m�dulo.
-;extern _shell_main         ; Entrada do Shell do Boot Loader.
+extern _g_lbf_pa  ; LFB - Linear Frame Buffer. (physical address).
+extern _bl_main   ; Entrada da parte em C.
 ;...
 
 ; Kernel image address:
@@ -59,7 +57,7 @@ KRN_ENTRYPOINT  equ  0x00101000  ; Entry point
 
 
 ;==================================================
-; _OS_Loader_Entry_Point:
+; _START:
 ;     Entry point do Boot Loader.
 ;     The BM.BIN jumped here into this point.
 ; ---------------------
@@ -76,14 +74,11 @@ KRN_ENTRYPOINT  equ  0x00101000  ; Entry point
 ; ebp: Boot block address.
 ; edi: Gramado mode. (jail, p1, home ...)
 
-global _OS_Loader_Entry_Point
-_OS_Loader_Entry_Point:
-
+global _START
+_START:
    JMP StartLoader
-
     %include "header.inc"
     ; ...
-
 StartLoader:
 
 ; First of all, we're gonna save
@@ -271,17 +266,12 @@ StartLoader:
 ; PIT
 ; Initialized by the kernel image.
 
-;
-;  Call C part.
-;
-
+; Call C part.
 ; Calling C part of the kernel base.
 ; See: main.c
-
-    jmp _OS_Loader_Main
+    jmp _bl_main
     ;jmp $
-; ---------------
-; Hang
+
 bl_Loop:
     cli
     hlt

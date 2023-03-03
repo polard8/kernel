@@ -2,14 +2,12 @@
  * File: ide.h
  * Descrição:
  *     Header para rotinas de hardware para drivers de ide. hdd.
- * #todo 
- * ide struct 
  * History:
  *     2015
  */
 
-#ifndef __IDE_H
-#define __IDE_H    1
+#ifndef __DD_IDE_H
+#define __DD_IDE_H    1
 
 // IDE ports.
 extern int g_current_ide_channel;
