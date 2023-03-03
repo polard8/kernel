@@ -11,6 +11,9 @@ struct ps2_keyboard_d  PS2Keyboard;
 
 static int __prefix=0;
 
+unsigned char ps2kbd_led_status=0;
+
+
 //
 // == private functions: prototypes ================
 //
@@ -234,16 +237,16 @@ void DeviceInterface_PS2Keyboard(void)
     // ACKNOWLEDGE
     case 0xFA:
         //#test
-        printf ("DeviceInterface_PS2Keyboard: ack\n");
-        refresh_screen();
+        //printf ("DeviceInterface_PS2Keyboard: ack\n");
+        //refresh_screen();
         goto done;
         break;
     
     // RESEND
     case 0xFE:
         //#test
-        printf ("DeviceInterface_PS2Keyboard: resend\n");
-        refresh_screen();
+        //printf ("DeviceInterface_PS2Keyboard: resend\n");
+        //refresh_screen();
         goto done;
         break;
 
@@ -347,21 +350,15 @@ void i8042_keyboard_enable (void)
     //sleep(100);
 }
 
-/*
- * keyboard_set_leds:
- *     Set keyboard flags.
- *     ED = Set led.
- */
-void keyboard_set_leds (char flag)
+// see: ps2kbd.h
+void keyboard_set_leds(unsigned char flags)
 {
-    //#todo: Filtro.
-
 // Wait for bit 1 of status reg to be zero.
 // Send code for setting the flag.
     while ( ( in8 (0x64) & 2) != 0 )
     {
     };
-    out8 (0x60,0xED); 
+    out8 (0x60,KEYBOARD_SET_LEDS); 
     pit_sleep (100);
 
 // Wait for bit 1 of status reg to be zero.
@@ -369,12 +366,10 @@ void keyboard_set_leds (char flag)
     while ( ( in8 (0x64) & 2) != 0 )
     {
     };
-    out8 (0x60,flag);
+    out8 (0x60,flags);
     pit_sleep (100);
-
-// #todo: Mudar o status.
-    // switch(flag){}
 }
+
 
 // keyboardGetKeyState:
 // Pega o status das teclas de modificação.

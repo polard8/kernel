@@ -4,6 +4,8 @@
 #ifndef ____PS2MOUSE_H
 #define ____PS2MOUSE_H    1
 
+#define PS2_MOUSE_IRQ  12
+
 // 0~3
 #define PS2MOUSE_RESULUTION_TEST  1
 #define PS2MOUSE_RESULUTION    3

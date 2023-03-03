@@ -489,23 +489,28 @@ void bl_main (void)
     if (Status != 0){
         // #todo
     }
+
 // Setup physical memory.
+// Get last valid address.
     unsigned long last_address=0;
     last_address = (unsigned long) __setup_physical_memory();
+
 // Clean up memory.
 // IN: start address, end address.
     __clean_memory(
         (unsigned long) 0x100000,
         (unsigned long) last_address );
+
 // Initialize bl heap.
 // malloc support.
     init_heap();
+
 // Initialize IDE support.
     init_hdd();
 
 // debug
     if (g_initialized != TRUE){
-        printf("OS_Loader_Main: g_initialized\n");
+        printf("bl_main: g_initialized\n");
         die();
     }
 
@@ -521,7 +526,7 @@ void bl_main (void)
 
     Status = blLoadKernelImage();
     if (Status<0){
-         printf("OS_Loader_Main: newOSLoadKernelImage fail.\n");
+         printf("bl_main: blLoadKernelImage fail.\n");
          refresh_screen();
          while(1){
              asm("cli");
@@ -576,7 +581,7 @@ void bl_main (void)
     printf ("paging and jump to the kernel.\n");
 */
 
-    printf("OS_Loader_Main: Kernel image loaded.\n");
+    printf("bl_main: Kernel image loaded.\n");
 
 //#breakpoint
     //refresh_screen();
@@ -624,7 +629,7 @@ See: https://wiki.osdev.org/X86-64
 
 // x86_64 is not supported.
     if ( (data & 1) == 0 ){
-        printf("OS_Loader_Main: [ERROR] x86_64 hardware not supported\n");
+        printf("bl_main: [ERROR] x86_64 hardware not supported\n");
         refresh_screen();
         while(1){
             asm ("cli");

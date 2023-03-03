@@ -4,12 +4,14 @@
 #include <kernel.h>
 
 
-//keyboard support
+// Keyboard support
 //#define KEYBOARD_KEY_PRESSED  0x80
 #define KEYBOARD_KEY_MASK  0x7F
 //#define KEYBOARD_FULL      1
 //#define KEYBOARD_EMPTY     0
 //#define KEYBOARD_OBF       0x01    //Output buffer flag.
+
+#define BREAK_MASK  0x80
 
 
 static int 
@@ -29,6 +31,7 @@ __ProcessExtendedKeyboardKeyStroke(
     unsigned long vk,
     unsigned long rawbyte )
 {
+// Combinations.
 
 /*
  Scancodes:
@@ -333,13 +336,6 @@ wmKeyEvent(
     //input_thread = (struct thread_d *) threadList[tid];
     //input_thread->quantum = 20;
 
-    // true for keyup and false for keydown.
-    // int Break = TRUE;
-
-    // #todo
-    //if ( raw_byte & 0x80 )
-    //    Break = TRUE;
-
 //#todo
     //debug_print("xxxKeyEvent:\n");
 
@@ -431,12 +427,24 @@ wmKeyEvent(
     //isDown = !(Keyboard_RawByte & 0x80);
 
 // ================================================
-//key_released:
+// Make or Break?
 
-    // Não está pressioanda
-    if ( (Keyboard_RawByte & 0x80) != 0 )
+    int fBreak = FALSE;
+
+    // Released: Yes, it's a break.
+    if ( (Keyboard_RawByte & BREAK_MASK) != 0 ){
+        fBreak = TRUE;
+    }
+    // Pressed: It's not a break, it's a make.
+    if ( (Keyboard_RawByte & BREAK_MASK) == 0 ){
+        fBreak = FALSE;
+    }
+
+// ================================================
+// Released: Yes, it's a break.
+
+    if (fBreak == TRUE)
     {
-        // Break = TRUE;
         // Desativando o bit de paridade caso esteja ligado.
         Keyboard_ScanCode = Keyboard_RawByte;
         Keyboard_ScanCode &= KEYBOARD_KEY_MASK;
@@ -449,65 +457,60 @@ wmKeyEvent(
 
         switch (Keyboard_ScanCode)
         {
-            // left shift liberado.
-            case VK_LSHIFT: 
-                shift_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_LSHIFT: Liberada\n"); refresh_screen();
-                break;
 
-            // left control liberado.
-            case VK_LCONTROL:
-                ctrl_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_LCONTROL: Liberada\n"); refresh_screen();
-                break;
-
-            // left winkey liberada.
-            case VK_LWIN:
-                winkey_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_LWIN: Liberada\n"); refresh_screen();
-                break;
-
-            // left alt liberado.
-            case VK_LMENU:
-                alt_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_LMENU: Liberada\n"); refresh_screen();
-                break;
-
-            // right winkey liberada.
-            case VK_RWIN:
-                winkey_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_RWIN: Liberada\n"); refresh_screen();
-                break;
-
-            // control menu.
-            case VK_CONTROL_MENU:
-                //controlmenu_status = 0; //@todo
-                Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_CONTROL_MENU: Liberada\n"); refresh_screen();
-                break;
-
-            //right control liberada.
-            case VK_RCONTROL:
-                ctrl_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_RCONTROL: Liberada\n"); refresh_screen();
-                break;
-
-            // right Shift liberado.
+            // Shift released.
+            case VK_LSHIFT:
             case VK_RSHIFT:
-                shift_status = FALSE;  Event_Message = MSG_SYSKEYUP;
-                //printf ("VK_RSHIFT: Liberada\n"); refresh_screen();
+                shift_status = FALSE;  
+                Event_Message = MSG_SYSKEYUP;
+                break;
+
+            // Control released.
+            case VK_LCONTROL:
+            case VK_RCONTROL:
+                ctrl_status = FALSE;  
+                Event_Message = MSG_SYSKEYUP;
+                break;
+
+            // Winkey released.
+            case VK_LWIN:
+            case VK_RWIN:
+                winkey_status = FALSE;
+                Event_Message = MSG_SYSKEYUP;
+                break;
+                
+            // Alt released
+            case VK_LMENU:
+            //case VK_RMENU:
+                alt_status = FALSE;  
+                Event_Message = MSG_SYSKEYUP;
+                break;
+
+            // Control menu.
+            // Application menu.
+            case VK_CONTROL_MENU:
+                //controlmenu_status = 0; //#todo
+                Event_Message = MSG_SYSKEYUP;
                 break;
 
             // Funções liberadas.
-            case VK_F1: case VK_F2: case VK_F3: case VK_F4:
-            case VK_F5: case VK_F6: case VK_F7: case VK_F8:
-            case VK_F9: case VK_F10: case VK_F11: case VK_F12:
+            case VK_F1: 
+            case VK_F2: 
+            case VK_F3: 
+            case VK_F4:
+            case VK_F5: 
+            case VK_F6: 
+            case VK_F7: 
+            case VK_F8:
+            case VK_F9: 
+            case VK_F10: 
+            case VK_F11: 
+            case VK_F12:
                 Event_Message = MSG_SYSKEYUP;
                 break;
 
-            // ...
-
-            // A tecla liberada NÃO é do sistema.
+            // Not a system key,
+            // just a regular keyup.
             default:
                 Event_Message = MSG_KEYUP;
                 break;
@@ -553,13 +556,10 @@ wmKeyEvent(
     }
 
 // ================================================
-// key_pressed:
+// Pressed: It's not a break, it's a make.
 
-    // Está pressionada.
-    if ( (Keyboard_RawByte & 0x80) == 0 ) 
+    if (fBreak != TRUE)
     {
-        // Break = FALSE;
-
         Keyboard_ScanCode = Keyboard_RawByte;
         Keyboard_ScanCode &= KEYBOARD_KEY_MASK; //Desativando o bit de paridade caso esteja ligado.
 
@@ -570,6 +570,37 @@ wmKeyEvent(
 
         switch (Keyboard_ScanCode)
         {
+
+            // Shift pressed.
+            case VK_LSHIFT:
+            case VK_RSHIFT:
+                shift_status = TRUE;
+                Event_Message = MSG_SYSKEYDOWN;
+                break;
+
+            // Control pressed.
+            case VK_LCONTROL:
+            case VK_RCONTROL:
+                ctrl_status = TRUE;
+                Event_Message = MSG_SYSKEYDOWN;
+                break;
+
+            // Winkey pressed.
+            case VK_LWIN:
+            case VK_RWIN:
+                winkey_status = TRUE; 
+                Event_Message = MSG_SYSKEYDOWN;
+                break;
+
+            // Alt pressed.
+            case VK_LMENU:
+            //case VK_RMENU:
+                alt_status = TRUE;
+                Event_Message = MSG_SYSKEYDOWN;
+                break;
+
+
+
             // back space será tratado como tecla normal
 
             // #todo: tab,
@@ -581,71 +612,16 @@ wmKeyEvent(
                 if (capslock_status == FALSE){ 
                     capslock_status = TRUE; 
                     Event_Message = MSG_SYSKEYDOWN; 
+                    //ps2kbd_led_status ^= KBD_LEDS_CAPSBIT;
                     break; 
                 }
                 if (capslock_status == TRUE){ 
                     capslock_status = FALSE; 
                     Event_Message = MSG_SYSKEYDOWN; 
+                    //ps2kbd_led_status ^= KBD_LEDS_CAPSBIT;
                     break; 
                 }
                 break; 
-
-            // left shift pressionada.
-            // case KEY_SHIFT:
-            case VK_LSHIFT:
-                shift_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // left control pressionada.
-            // case KEY_CTRL:
-            case VK_LCONTROL:
-                ctrl_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // left winkey pressionada.
-            case VK_LWIN:
-                winkey_status = TRUE; 
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // left alt pressionada.
-            case VK_LMENU:
-                alt_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // #todo 
-            // alt gr.
-
-            // right winkey pressionada.
-            case VK_RWIN:
-                winkey_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // #todo: 
-            // Control menu.
-
-            // right control pressionada.
-            case VK_RCONTROL:
-                ctrl_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // right shift pressionada.
-            case VK_RSHIFT:
-                shift_status = TRUE;
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
-
-            // Funções pressionadas.
-            case VK_F1: case VK_F2: case VK_F3: case VK_F4:
-            case VK_F5: case VK_F6: case VK_F7: case VK_F8:
-            case VK_F9: case VK_F10: case VK_F11: case VK_F12:
-                Event_Message = MSG_SYSKEYDOWN;
-                break;
 
             // num Lock.
             // Muda o status do numlock não importa o anterior.
@@ -653,11 +629,13 @@ wmKeyEvent(
                 if (numlock_status == FALSE){
                     numlock_status = TRUE;
                     Event_Message = MSG_SYSKEYDOWN;
+                    //ps2kbd_led_status ^= KBD_LEDS_NUMSBIT;
                     break;
                 }
                 if (numlock_status == TRUE){ 
                     numlock_status = FALSE;
                     Event_Message = MSG_SYSKEYDOWN; 
+                    //ps2kbd_led_status ^= KBD_LEDS_NUMSBIT;
                     break; 
                 }
                 break;
@@ -668,20 +646,36 @@ wmKeyEvent(
                 if (scrolllock_status == FALSE){  
                     scrolllock_status = TRUE;
                     Event_Message = MSG_SYSKEYDOWN;
+                    //ps2kbd_led_status ^= KBD_LEDS_SCRLBIT;
                     break;
                 }
                 if (scrolllock_status == TRUE){ 
                     scrolllock_status = FALSE;
                     Event_Message = MSG_SYSKEYDOWN; 
+                    //ps2kbd_led_status ^= KBD_LEDS_SCRLBIT;
                     break; 
                 }
                 break;
 
-            //...
+            // Funções pressionadas.
+            case VK_F1: 
+            case VK_F2: 
+            case VK_F3: 
+            case VK_F4:
+            case VK_F5: 
+            case VK_F6: 
+            case VK_F7: 
+            case VK_F8:
+            case VK_F9: 
+            case VK_F10: 
+            case VK_F11: 
+            case VK_F12:
+                Event_Message = MSG_SYSKEYDOWN;
+                break;
 
-            // A tecla pressionada não é do sistema.
+            // Not a system key,
+            // just a regular keydown.
             default:
-                // printf("keyboard debug: default: MSG_KEYDOWN\n");
                 Event_Message = MSG_KEYDOWN;
                 break;
         };
@@ -690,7 +684,7 @@ wmKeyEvent(
         // Teclas de digitaçao
         // Uma tecla normal foi pressionada ou liberada
         // mensagem de digitação.
-        if (Event_Message == MSG_KEYDOWN || Event_Message == MSG_KEYUP)
+        if (Event_Message == MSG_KEYDOWN)
         {
             // Minúsculas.
             if (capslock_status == FALSE && shift_status == FALSE)
@@ -718,7 +712,7 @@ wmKeyEvent(
         // ==============================
         // Teclas de sistema
         // Uma tecla do sistema foi pressionada ou liberada.
-        if (Event_Message == MSG_SYSKEYDOWN || Event_Message == MSG_SYSKEYUP)
+        if (Event_Message == MSG_SYSKEYDOWN)
         {   
             // se pressionamos teclas de sistema como capslock ligado
             if (capslock_status == FALSE)
@@ -733,7 +727,7 @@ wmKeyEvent(
     }
 
 //
-// == Dispatch ====
+// == Dispatch ========
 //
 
 // Done
@@ -746,6 +740,7 @@ done:
     Event_LongRawByte = 
         (unsigned long) (Keyboard_RawByte & 0x000000FF);
 
+// Invalid ascii code?
 // Não tem virtual key '0'.
     if (Event_LongASCIICode == 0){
         return -1;
@@ -753,6 +748,7 @@ done:
 
 // ------------------------------------
 // It is a extended keyboard key.
+// Send combination keys to the window server.
     if (Prefix == 0xE0 || Prefix== 0xE1)
     {
         __ProcessExtendedKeyboardKeyStroke(
@@ -760,66 +756,36 @@ done:
                 (int) Event_Message, 
                 (unsigned long) Event_LongASCIICode,
                 (unsigned long) Event_LongRawByte );
-
         return 0;
     }
-
-// #todo
-// A sistema precisa ter uma flag
-// para cada tipo de processamento aqui.
-// ioctl() poderá mudar as configurações
-// do dispositivo de teclado, determinando
-// que tipo de recurso de processamento
-// de input estará disponível.
-
-// #todo
-// Check 'control + alt + del'.
-// Teclas de digitação.
-// Manda para o window server.
-// Ele vai imprimir na janela com foco de entrada
-// e enviar mensagem para a thread com foco.
-
-/*
-    if ( Event_Message == MSG_KEYDOWN )
-    {
-        if ( ShellFlag!=TRUE ){
-            wmSendInputToWindowManager(0, MSG_KEYDOWN, Event_LongASCIICode, Event_LongRawByte);
-            return 0;
-        }
-    }
-*/
-
-// #test
-// Colocando no arquivo.
-// Não colocamos quando estivermos no modo 'console',
-// pois nesse caso o aplicativo em ring3 receberia input de teclado
-// e reagiria a esse input.
-// Write:
-// Estamos dentro do kernel.
-// Vamos escrever diretamente no buffer do arquivo,
-// dado seu ponteiro de estrutura.
-// O fd do processo atual não serveria nesse momento.
-// See: sys.c
-
-    //char ch_buffer[2];
 
 // ==================================
 // Coloca no arquivo stdin.
 // Envia para a thread de controle do window server.
-// Colocamos no arquivo somente se não estivermos
-// no modo console.
+// Colocamos no arquivo somente se não estivermos no modo console.
+// Coloca no arquivo stdin.
+// Somente ascii.
+// #todo: Nesse caso da pra enviar os primeiros ascii
+// que representam comandos.
+// Nenhuma tecla de controle esta acionada,
+// então vamos colocar a tecla no arquivo de input.
+// Somente keydown. (make).
+// Envia para a thread de controle do window server.
+// Todo tipo de tecla.
+// Se uma tecla de controle estiver acionada,
+// então não mandamos o evento para a thread,
+// pois vamos chamar o procedimento local e
+// considerarmos a combinação de teclas, 
+// antes de enviarmos o evento.
+// O estado de capslock não importa aqui.
 
+
+    // Not in the embedded shell.
     if (ShellFlag != TRUE)
     {
-        // Coloca no arquivo stdin.
-        // Somente ascii.
-        // #todo: Nesse caso da pra enviar os primeiros ascii
-        // que representam comandos.
+        // Only normal keys. For terminal support.
         if (Event_Message == MSG_KEYDOWN)
         {
-            // Nenhuma tecla de controle esta acionada,
-            // então vamos colocar a tecla no arquivo de input.
-            // Somente keydown. (make).
             if ( alt_status != TRUE && 
                  ctrl_status != TRUE && 
                  shift_status != TRUE )
@@ -828,14 +794,9 @@ done:
             }
         }
 
-        // Envia para a thread de controle do window server.
-        // Todo tipo de tecla.
-        // Se uma tecla de controle estiver acionada,
-        // então não mandamos o evento para a thread,
-        // pois vamos chamar o procedimento local e
-        // considerarmos a combinação de teclas, 
-        // antes de enviarmos o evento.
-        // O estado de capslock não importa aqui.
+        // Send break and make keys to the window server.
+        // Not a combination key, so return 
+        // without calling the local procedure.
         if ( alt_status != TRUE && 
              ctrl_status != TRUE && 
              shift_status != TRUE )
@@ -844,15 +805,11 @@ done:
                 Event_Message, 
                 Event_LongASCIICode,
                 Event_LongRawByte );
-            
-            // Não há tecla de controle pressionada.
-            // então podemos retornar depois de termos
-            // enviado uma mensagem para a thread.
-            // Dessa forma, evitamos chamar o procedimento local.
-            return 0;  //ok 
+            return 0;
         }
     }
 
+// ------------------------------
 // Process the event using the system's window procedures.
 // It can use the kernel's virtual console or
 // send the event to the loadable window server.
@@ -878,9 +835,9 @@ done:
 
     __Status = 
         (int) wmProcedure(
-        (int)           Event_Message,
-        (unsigned long) Event_LongASCIICode,
-        (unsigned long) Event_LongRawByte );
+                  (int) Event_Message,
+                  (unsigned long) Event_LongASCIICode,
+                  (unsigned long) Event_LongRawByte );
 
     return (int) __Status;
 }

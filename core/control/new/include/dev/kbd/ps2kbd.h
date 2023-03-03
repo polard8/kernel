@@ -4,6 +4,9 @@
 #ifndef ____PS2KBD_H
 #define ____PS2KBD_H    1
 
+#define PS2_KEYBOARD_IRQ  1
+
+
 // Ports:
 // =====
 //     The entire range for the keyboard is 60-6F,
@@ -38,6 +41,11 @@
 #define KBC_DEVCMD_BAT_DONE	0xaa
 #define KBC_DEVCMD_BAT_FAIL	0xfc
 */
+
+#define KBD_LEDS_SCRLBIT  0x01  // Scroll lock led.
+#define KBD_LEDS_NUMSBIT  0x02  // Num lock led.
+#define KBD_LEDS_CAPSBIT  0x04  // Caps lock led.
+extern unsigned char ps2kbd_led_status;
 
 // keyboard commands
 #define  KEYBOARD_SET_LEDS       0xED    // Set keyboard leds.
@@ -159,7 +167,7 @@ void i8042_keyboard_expect_ack (void);
 void i8042_keyboard_disable(void);
 void i8042_keyboard_enable (void);
 
-void keyboard_set_leds (char flag);
+void keyboard_set_leds(unsigned char flags);
 
 unsigned long keyboardGetKeyState(int vk);
 

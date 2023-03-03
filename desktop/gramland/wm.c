@@ -126,6 +126,8 @@ static unsigned long ____new_time=0;
 // private functions: prototypes ==========================
 //
 
+static void __set_foreground_tid(int tid);
+
 static void animate_window( struct gws_window_d *window );
 static void __Tile(void);
 static void run_selected_option(void);
@@ -3023,6 +3025,18 @@ struct gws_window_d *get_active(void)
 }
 */
 
+// Set the foreground thread given its tid.
+// Pede para o kernel mudar a foreground thread.
+// A foreground thread será a thread associada com a janela
+// que possui o foco de entrada.
+static void __set_foreground_tid(int tid)
+{
+    if (tid<0){
+        return;
+    }
+    sc82 ( 10011, tid, tid, tid );
+}
+
 // Set focus on a window.
 // This is the window that owns the keyboard input.
 // Change the foreground thread.
@@ -3030,9 +3044,9 @@ struct gws_window_d *get_active(void)
 // the thread associated with this given window.
 void set_focus(struct gws_window_d *window)
 {
-// A janela que ja tinha o foco de entrada.
+
+    // A janela que ja tinha o foco de entrada.
     //struct gws_window_d *wOld;
-    int ClientTID = -1;
 
     if ( (void*) window == NULL ){
         return;
@@ -3079,14 +3093,9 @@ void set_focus(struct gws_window_d *window)
 // The window with focus.
     keyboard_owner = (void*) window;
 
-// Pede para o kernel mudar a foreground thread.
-// A foreground thread será a thread associada com a janela
-// que possui o foco de entrada.
-    ClientTID = (int) (window->client_tid & 0xFFFFFFFF);
-    if (ClientTID<0){
-        return;
-    }
-    sc82 ( 10011, ClientTID, ClientTID, ClientTID );
+// Set the foreground thread.
+// That's the tid associated with this window.
+    __set_foreground_tid( (int) window->client_tid );
 }
 
 // Pega o ponteiro da janela com foco de entrada.
