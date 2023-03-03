@@ -1,4 +1,5 @@
 
+; header3.asm
 
 ;; See:
 ;; head_64.asm for the stack.
@@ -73,6 +74,7 @@ _x64_clear_nt_flag:
     ret
 
 
+; Called by x64_init_gdt() in x64.c
 global _gdt_flush
 _gdt_flush:
 

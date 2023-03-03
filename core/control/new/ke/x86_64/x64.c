@@ -15,6 +15,12 @@ struct mp_configuration_table_d *MPConfigurationTable;
 struct smp_info_d smp_info;
 
 
+// 32 segment descriptors.
+// see: x64gdt.h
+struct segment_descriptor_d xxx_gdt[DESCRIPTOR_COUNT_MAX];
+// Isso é o registro da gdt
+struct gdt_ptr_d  xxx_gdt_ptr;
+
 
 /*
  // 8259 isa irqs
@@ -42,20 +48,32 @@ int x64_init_gdt(void)
     // debug_print ("[x64] x64_init_gdt: [DANGER] \n");
 
 // Clean the GDT. #danger
-    unsigned long GDT_Base = (unsigned long) &xxx_gdt[GNULL_SEL];
-    size_t        GDT_NumberOfEntries = DESCRIPTOR_COUNT_MAX;  //32 
-    size_t        GDT_Size = 
-        (size_t) (sizeof(struct segment_descriptor_d) * GDT_NumberOfEntries);
+// 32 segment descriptors.
+// see: x64gdt.h
+
+    unsigned long GDT_Base = 
+        (unsigned long) &xxx_gdt[GNULL_SEL];
+
+    size_t GDT_NumberOfEntries = DESCRIPTOR_COUNT_MAX;  //32 
+    size_t GDT_Size = 
+        (size_t) ( sizeof(struct segment_descriptor_d) * GDT_NumberOfEntries );
     memset( GDT_Base, 0, GDT_Size );
+
+
+// ---------------------------
+// Segment Descriptor
 
 // IN: 
 // (entry address, limit, base, type, s, dpl, p, avl, l, db, g)
 
+
+// ----------------
 // null
     set_gdt_entry ( 
         &xxx_gdt[GNULL_SEL], 
         0,0,0,0,0,0,0,0,0,0);
 
+// ----------------
 // ring 0
 // dpl 0
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
@@ -63,9 +81,9 @@ int x64_init_gdt(void)
         &xxx_gdt[GCODE_SEL], 
         0,    // limit
         0x0,  // base
-        SEG_CODE_EXRD, //0xA,  // type
+        SEG_CODE_EXRD, // type=0xA (Execute/Read)
         1,    // s
-        RING0, //0,    // dpl
+        RING0,  // dpl=0
         1,    // p
         0,    // avl
         1,    // l
@@ -75,15 +93,16 @@ int x64_init_gdt(void)
         &xxx_gdt[GDATA_SEL], 
         0,    // limit
         0x0,  // base
-        SEG_DATA_RDWR, //0x2,  // type
+        SEG_DATA_RDWR, // type=0x2 (Read/Write)
         1,    // s
-        RING0, //0,    // dpl
+        RING0,  // dpl=0
         1,    // p
         0,    // avl
         1,    // l
         0,    // db
         0);   // g
 
+// ----------------
 // ring 3
 // dpl 3
 // (n, limit, base, type, s, dpl, p, avl, l, db, g)
@@ -91,9 +110,9 @@ int x64_init_gdt(void)
         &xxx_gdt[GUCODE_SEL], 
         0,    // limit
         0x0,  // base
-        SEG_CODE_EXRD, //0xA,  // type
+        SEG_CODE_EXRD, // type=0xA (Execute/Read)
         1,    // s
-        RING3, //3,    // dpl ??
+        RING3,  // dpl=3
         1,    // p
         0,    // avl
         1,    // l
@@ -103,14 +122,16 @@ int x64_init_gdt(void)
         &xxx_gdt[GUDATA_SEL], 
         0,      // limit   
         0x0,    // base
-        SEG_DATA_RDWR, //0x2,    // type
+        SEG_DATA_RDWR, // type=0x2 (Read/Write)
         1,      // s
-        RING3, //3,      // dpl ??
+        RING3,  // dpl=3
         1,      // p
         0,      // avl
         1,      // l
         0,      // db
         0);     // g
+
+// ----------------
 
 //
 // tss
@@ -133,19 +154,29 @@ int x64_init_gdt(void)
         (void *) &rsp0Stack    // ring 0 stack address
         );
 
-    // tss, dpl 3
-    // Two entries.
+// System Segment Descriptor
+
+// tss, dpl 3
+// Two entries.
     set_gdt_entry( 
         &xxx_gdt[GTSS_SEL], 
-        sizeof(struct tss_d) - 1, 
-        (unsigned long) tss, 
-        0x9,0,3,1,0,0,0,1);
+        sizeof(struct tss_d) - 1,   // limit
+        (unsigned long) tss,    // base 
+        0x9,  // type = (64-bit TSS (Available))
+        0,    // s
+        RING3,    // dpl=3.
+        1,   // p
+        0,   // avl
+        0,   // l
+        0,   // db
+        1);  // g
     set_gdt_entry( 
         &xxx_gdt[GTSS_CONT_SEL], 
         (unsigned long) tss >> 32,
         (unsigned long) tss >> 48,
         0,0,0,0,0,0,0,0);
 
+// Current TSS.
     CurrentTSS = tss;
     //CurrentTSS = (struct tss_d *) tss;
 
@@ -161,7 +192,8 @@ int x64_init_gdt(void)
         (unsigned long) &xxx_gdt[GNULL_SEL];
 
 
-// register.
+// Register.
+// see: header3.asm
     gdt_flush( (unsigned long) &xxx_gdt_ptr );
 
     // See: x64gdt.h

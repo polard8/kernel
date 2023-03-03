@@ -16,8 +16,7 @@
 //??
 
 // ========================
-
-// índices na gdt.
+// Índices na GDT.
 #define GNULL_SEL      0  // Null descriptor
 #define GCODE_SEL      1  // Kernel code descriptor
 #define GDATA_SEL      2  // Kernel data descriptor
@@ -29,11 +28,10 @@
 #define GLDT_CONT_SEL  8  // Default LDT descriptor
 
 // ========================
-
-// dpl
-#define SEL_KPL  0  // kernel privilege level
-#define SEL_UPL  3  // user privilege level
-
+// DPL
+// see: gdef.h
+#define SEL_KPL  RING0  // Kernel privilege level.
+#define SEL_UPL  RING3  // User privilege level.
 
 /* system segments and gate types */
 #define SDT_SYSNULL      0	/* system null */
@@ -71,9 +69,26 @@
 #define SDT_MEMERC	30	/* memory execute read conforming */
 #define SDT_MEMERAC	31	/* memory execute read accessed conforming */
 
-
 #define GSEL(s,r)  (((s) << 3) | r)
 
+//---------------------------------------------
+
+
+/*
+// ---------------------------
+// System Segment Descriptor
+Type: Type of system segment.
+Types available in 32-bit protected mode:
+0x1: 16-bit TSS (Available)
+0x2: LDT
+0x3: 16-bit TSS (Busy)
+0x9: 32-bit TSS (Available)
+0xB: 32-bit TSS (Busy)
+Types available in Long Mode:
+0x2: LDT
+0x9: 64-bit TSS (Available)
+0xB: 64-bit TSS (Busy)
+*/
 
 /*
  * Memory and System segment descriptors
@@ -87,20 +102,16 @@
 /* 8 byte segment descriptor */
 struct segment_descriptor_d 
 {
-
 // 16 bits
     unsigned long limit_15_0 :16;
-
 // 16 bits
     unsigned long base_15_0  :16;
-
 // 16 bits
     unsigned long base_23_16 :8;
     unsigned long type :4;  //segment type
     unsigned long s    :1;  //s
     unsigned long dpl  :2;  //segment descriptor priority level 
     unsigned long p    :1;  //segment descriptor present 
-
 // 16 bits
     unsigned long limit_19_16 :4;
     unsigned long avl :1;
@@ -108,9 +119,7 @@ struct segment_descriptor_d
     unsigned long db  :1;
     unsigned long g   :1;
     unsigned long base_31_24 :8;
-
 } __attribute__((packed));
-
 
 // #todo
 // We will use this in the future.
@@ -118,15 +127,17 @@ struct segment_descriptor_d
 // For now we are setting up gdt at the initialization
 // using Assembly language. 
 // Isso é uma gdt com 32 entradas.
-
 #define DESCRIPTOR_COUNT_MAX    32
-
-struct segment_descriptor_d xxx_gdt[DESCRIPTOR_COUNT_MAX];
-
+// 32 segment descriptors.
+// see: x64.c
+extern struct segment_descriptor_d xxx_gdt[DESCRIPTOR_COUNT_MAX];
 // Isso é o registro da gdt
+extern struct gdt_ptr_d  xxx_gdt_ptr;
 //static struct gdt_ptr_d xxx_gdt_ptr;
-struct gdt_ptr_d  xxx_gdt_ptr;
 
+
+// ---------------------------
+// Segment Descriptor
 
 #define SEG_DATA_RD        0x00 // Read-Only
 #define SEG_DATA_RDA       0x01 // Read-Only, accessed
@@ -247,20 +258,14 @@ set_gdt_entry (
     unsigned char db,   //Sz 
     unsigned char g );
 
-
-
-//
-// credits: Linux.
-//
-
-static inline void native_load_gdt ( struct gdt_ptr_d *dtr)
+static inline void native_load_gdt (struct gdt_ptr_d *dtr)
 {
-	asm volatile ("lgdt %0"::"m" (*dtr));
+    asm volatile ("lgdt %0"::"m" (*dtr));
 }
 
-static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
+static inline void native_store_gdt (struct gdt_ptr_d *dtr)
 {
-	asm volatile ("sgdt %0":"=m" (*dtr));
+    asm volatile ("sgdt %0":"=m" (*dtr));
 }
 
 #define load_gdt(dtr)   native_load_gdt(dtr)
@@ -269,27 +274,6 @@ static inline void native_store_gdt ( struct gdt_ptr_d *dtr)
 int x64_init_gdt(void);
 
 #endif    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
