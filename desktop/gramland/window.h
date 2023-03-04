@@ -27,6 +27,31 @@ typedef int  wid_t;
 
 
 
+struct start_menu_d
+{
+    int initialized;
+    int wid;
+};
+extern struct start_menu_d StartMenu;
+
+
+// Quick launch area
+// default left position.
+#define QUICK_LAUNCH_AREA_PADDING  80
+#define QL_BUTTON_MAX  4
+struct quick_launch_d
+{
+    int initialized;
+// Número de botões efetivamente criados.
+    int buttons_count;
+// List of buttons. (wid)
+    int buttons[QL_BUTTON_MAX];
+// list of PIDs associated with the buttons.
+    int pids[QL_BUTTON_MAX];
+};
+extern struct quick_launch_d QuickLaunch;
+
+
 // ===============================================================
 // #todo
 // All the application windows

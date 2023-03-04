@@ -56,20 +56,6 @@ static const char *app4_string = "fileman.bin";
 
 static unsigned long last_input_jiffie=0;
 
-// #todo
-// Input event
-// Comparar os tick, em dois momentos:
-// aqui e no driver.
-// Calcular o delta.
-//unsigned long gMouseInputEventTime=0;
-//unsigned long gKeyboardInputEventTime=0;
-
-//#define DEFAULT_ALIVIO  16
-//static unsigned long alivio=DEFAULT_ALIVIO;
-
-// Quick launch area
-// default left position.
-#define QUICK_LAUNCH_AREA_PADDING  80
 
 // Taskbar
 #define TB_HEIGHT  40
@@ -78,25 +64,10 @@ static unsigned long last_input_jiffie=0;
 #define TB_BUTTON_WIDTH  TB_BUTTON_HEIGHT
 #define TB_BUTTONS_MAX  8
 
-// # deprecated?
-// Affects the active window
-#define OPTION_NOTHING  0
-#define OPTION_MINIMIZE  1
-#define OPTION_MAXIMIZE  2
-#define OPTION_CLOSE     3
-static int current_option=OPTION_NOTHING;
 
-// Start menu wid
-static int sm_wid=-1;
+struct start_menu_d StartMenu;
+struct quick_launch_d QuickLaunch;
 
-// tb buttons
-// Quantos botões ja temos.
-static int tb_buttons_count=0;  
-static int tb_buttons[TB_BUTTONS_MAX];
-
-
-// tb pids
-static int tb_pids[TB_BUTTONS_MAX];
 
 //
 // Window list.
@@ -134,7 +105,6 @@ static void __set_foreground_tid(int tid);
 
 static void animate_window( struct gws_window_d *window );
 static void __Tile(void);
-static void run_selected_option(void);
 
 //
 // Keyboard
@@ -172,6 +142,10 @@ int control_action(int msg, unsigned long long1);
 
 void __button_pressed(int wid);
 void __button_released(int wid);
+
+void __create_start_menu(void);
+void __create_quick_launch_area(void);
+
 // =====================================================
 
 
@@ -208,66 +182,6 @@ struct gws_window_d *get_parent(struct gws_window_d *w)
         return NULL;
 
     return (struct gws_window_d *) p;
-}
-
-static void run_selected_option(void)
-{
-    struct gws_window_d *w;
-
-    yellow_status("RUN");
-
-// Nothing to do.
-    if( WindowManager.initialized != TRUE )
-        return;
-
-// get active window
-    //w = (struct gws_window_d *) windowList[active_window];
-    w = (void*) active_window;
-    if ( (void*) w == NULL ){
-        current_option=OPTION_NOTHING;
-        return;
-    }
-    if (w->magic!=1234){
-        current_option=OPTION_NOTHING;
-        return;
-    }
-
-    if (w->type!=WT_OVERLAPPED){
-        current_option=OPTION_NOTHING;
-        return;
-    }
-
-// =============
-
-// Clicked with option: 'nothing'.
-    if (current_option==OPTION_NOTHING)
-    {
-        gwssrv_change_window_position(w,20,20);
-        gws_resize_window(w,100,100);
-        redraw_window(w,TRUE);
-        current_option=OPTION_NOTHING;
-        return;
-    }
-
-    if (current_option==OPTION_MINIMIZE){
-        gws_resize_window(w,100,100);
-        redraw_window(w,TRUE);
-        current_option=OPTION_NOTHING;
-        return;
-    }
-
-//#bugbug: e se a janela ativa for a root?
-    if(current_option==OPTION_MAXIMIZE)
-    {
-        //redraw_window_by_id(active_window,TRUE);
-        //redraw_window(w,TRUE);
-        wm_update_window_by_id(w->id);
-    }
-
-    if(current_option==OPTION_CLOSE){
-    }
-
-    current_option=OPTION_NOTHING;
 }
 
 // #todo: explain it
@@ -333,35 +247,22 @@ on_keyboard_event(
     if (msg == GWS_SysKeyDown)
     {
         if (long1 == VK_F1){
-            //#bugbug: 
-            //Não mude a cor do botão se o estilo for 3d.
-            //pois perde o efeito desejado.
-            //set_bg_color_by_id(tb_buttons[0],xCOLOR_GRAY1);
-            __button_pressed(tb_buttons[0]);
-            //set_status_by_id(tb_buttons[0],BS_PRESSED);
-            //redraw_window_by_id(tb_buttons[0],TRUE);
+            __button_pressed(  QuickLaunch.buttons[0] );
             return 0;
         }
         if (long1 == VK_F2){
-            __button_pressed(tb_buttons[1]);
-            //set_status_by_id(tb_buttons[1],BS_PRESSED);
-            //redraw_window_by_id(tb_buttons[1],TRUE);
+            __button_pressed(QuickLaunch.buttons[1]);
             return 0;
         }
         if (long1 == VK_F3){
-            __button_pressed(tb_buttons[2]);
-            //set_status_by_id(tb_buttons[2],BS_PRESSED);
-            //redraw_window_by_id(tb_buttons[2],TRUE);
+            __button_pressed(QuickLaunch.buttons[2]);
             return 0;
         }
         if (long1 == VK_F4){
-            __button_pressed(tb_buttons[3]);
-            //set_status_by_id(tb_buttons[3],BS_PRESSED);
-            //redraw_window_by_id(tb_buttons[3],TRUE);
+            __button_pressed(QuickLaunch.buttons[3]);
             return 0;
         }
-        
-        
+
         // #todo: Explain it better.
         if (long1 == VK_F9 || 
             long1 == VK_F10 || 
@@ -388,47 +289,38 @@ on_keyboard_event(
     if (msg == GWS_SysKeyUp)
     {
         if (long1 == VK_F1){
-            __button_released(tb_buttons[0]);
-            //set_status_by_id( tb_buttons[0], BS_RELEASED );
-            //redraw_window_by_id(tb_buttons[0],TRUE);
+            __button_released(QuickLaunch.buttons[0]);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app1_string);
-            if (tb_pids[0] == 0){
-                tb_pids[0] = (int) rtl_clone_and_execute(name_buffer);
+            if (QuickLaunch.pids[0] == 0){
+                QuickLaunch.pids[0] = (int) rtl_clone_and_execute(name_buffer);
             }
             return 0;
         }
         if (long1 == VK_F2){
-            __button_released(tb_buttons[1]);
-            //set_status_by_id( tb_buttons[1], BS_RELEASED );
-            //redraw_window_by_id(tb_buttons[1],TRUE);
-            //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
+            __button_released(QuickLaunch.buttons[1]);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app2_string);
-            if (tb_pids[1] == 0){
-                tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
+            if (QuickLaunch.pids[1] == 0){
+                QuickLaunch.pids[1] = (int) rtl_clone_and_execute(name_buffer);
             }
             return 0;
         }
         if (long1 == VK_F3){
-            __button_released(tb_buttons[2]);
-            //set_status_by_id( tb_buttons[2], BS_RELEASED );
-            //redraw_window_by_id(tb_buttons[2],TRUE);
+            __button_released(QuickLaunch.buttons[2]);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app3_string);
-            if (tb_pids[2] == 0){
-                tb_pids[2] = (int) rtl_clone_and_execute(name_buffer);
+            if (QuickLaunch.pids[2] == 0){
+                QuickLaunch.pids[2] = (int) rtl_clone_and_execute(name_buffer);
             }
             return 0;
         }
         if (long1 == VK_F4){
-            __button_released(tb_buttons[3]);
-            //set_status_by_id( tb_buttons[3], BS_RELEASED );
-            //redraw_window_by_id(tb_buttons[3],TRUE);
+            __button_released(QuickLaunch.buttons[3]);
             memset(name_buffer,0,64-1);
             strcpy(name_buffer,app4_string);
-            if (tb_pids[3] == 0){
-                tb_pids[3] = (int) rtl_clone_and_execute(name_buffer);
+            if (QuickLaunch.pids[3] == 0){
+                QuickLaunch.pids[3] = (int) rtl_clone_and_execute(name_buffer);
             }
             // #test: ps2 full initialization.
             // sc80(350,1,1,1);
@@ -439,12 +331,12 @@ on_keyboard_event(
         // update desktop
         if (long1 == VK_F5)
         {
-            set_status_by_id(tb_buttons[0],BS_RELEASED);
-            set_status_by_id(tb_buttons[1],BS_RELEASED);
-            set_status_by_id(tb_buttons[2],BS_RELEASED);
-            set_status_by_id(tb_buttons[3],BS_RELEASED);
+            set_status_by_id(QuickLaunch.buttons[0],BS_RELEASED);
+            set_status_by_id(QuickLaunch.buttons[1],BS_RELEASED);
+            set_status_by_id(QuickLaunch.buttons[2],BS_RELEASED);
+            set_status_by_id(QuickLaunch.buttons[3],BS_RELEASED);
             WindowManager.is_fullscreen = FALSE;
-            
+
             //set_input_status(FALSE);
             wm_update_desktop(TRUE);
             //set_input_status(TRUE);
@@ -785,35 +677,33 @@ static void on_mouse_pressed(void)
 
 // Em qual botão da taskbar?
 // Se for igual à um dos botões da tb.
-    if( mouse_hover->id == tb_buttons[0] ||
-        mouse_hover->id == tb_buttons[1] ||
-        mouse_hover->id == tb_buttons[2] ||
-        mouse_hover->id == tb_buttons[3] )
+    if( mouse_hover->id == QuickLaunch.buttons[0] ||
+        mouse_hover->id == QuickLaunch.buttons[1] ||
+        mouse_hover->id == QuickLaunch.buttons[2] ||
+        mouse_hover->id == QuickLaunch.buttons[3] )
     {
 
         // #bugbug
         // Check type
 
-        if (mouse_hover->id == tb_buttons[0])
+        if (mouse_hover->id == QuickLaunch.buttons[0])
         {
         }
 
-        if (mouse_hover->id == tb_buttons[1])
+        if (mouse_hover->id == QuickLaunch.buttons[1])
         {
         }
 
-        if (mouse_hover->id == tb_buttons[2])
+        if (mouse_hover->id == QuickLaunch.buttons[2])
         {
         }
 
-        if (mouse_hover->id == tb_buttons[3])
+        if (mouse_hover->id == QuickLaunch.buttons[3])
         {
         }
 
         // Redraw the button
         __button_pressed(mouse_hover->id);
-        //set_status_by_id(mouse_hover->id,BS_PRESSED);
-        //redraw_window_by_id(mouse_hover->id,TRUE);
         return;
     }
 
@@ -1111,52 +1001,37 @@ static void on_mouse_released(void)
 
 
 //tb_button[0]
-    if(mouse_hover->id == tb_buttons[0])
+    if(mouse_hover->id == QuickLaunch.buttons[0])
     {
         __button_released(mouse_hover->id);
-        //set_status_by_id(mouse_hover->id,BS_RELEASED);
-        //redraw_window_by_id(mouse_hover->id,TRUE);
         //create_main_menu(8,8);
         //wm_update_active_window();
-        //current_option = OPTION_MINIMIZE;
         //yellow_status("0: Min");
-        //tb_pids[0] = (int) rtl_clone_and_execute("terminal.bin");
+        //QuickLaunch.pids[0] = (int) rtl_clone_and_execute("terminal.bin");
         return;
     }
 
 //tb_button[1]
-    if(mouse_hover->id == tb_buttons[1])
+    if(mouse_hover->id == QuickLaunch.buttons[1])
     {
         __button_released(mouse_hover->id);
-        //set_status_by_id(mouse_hover->id,BS_RELEASED);
-        //redraw_window_by_id(mouse_hover->id,TRUE);
-        //current_option = OPTION_MAXIMIZE;
-        //yellow_status("1: Max");
-        //tb_pids[1] = (int) rtl_clone_and_execute("editor.bin");
+        //QuickLaunch.pids[1] = (int) rtl_clone_and_execute("editor.bin");
         return;
     }
 
 //tb_button[2]
-    if(mouse_hover->id == tb_buttons[2])
+    if(mouse_hover->id == QuickLaunch.buttons[2])
     {
         __button_released(mouse_hover->id);
-        //set_status_by_id(mouse_hover->id,BS_RELEASED);
-        //redraw_window_by_id(mouse_hover->id,TRUE);
-        //current_option = OPTION_CLOSE;
-        //yellow_status("2: Close");
-        //tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
+        //QuickLaunch.pids[2] = (int) rtl_clone_and_execute("fileman.bin");
         return;
     }
 
 //tb_button[3]
-    if(mouse_hover->id == tb_buttons[3])
+    if(mouse_hover->id == QuickLaunch.buttons[3])
     {
         __button_released(mouse_hover->id); 
-        //set_status_by_id(mouse_hover->id,BS_RELEASED);
-        //redraw_window_by_id(mouse_hover->id,TRUE);
-        //yellow_status("3: OK");
-        //run_selected_option();
-        //tb_pids[3] = (int) rtl_clone_and_execute("browser.bin");
+        //QuickLaunch.pids[3] = (int) rtl_clone_and_execute("browser.bin");
         // mostra o cliente se ele faz parte da tag 3.
         //show_client(first_client->next,3);
         //show_client_list(3);  //#todo: notworking
@@ -2874,8 +2749,6 @@ void wm_update_desktop(int tile)
     set_active_window(l);
     set_focus(l);  //no ... focus on client window.
 
-    current_option = OPTION_NOTHING;
-
 // Update the taskbar at the bottom of the screen,
 // but do not show it yet.
     wm_Update_TaskBar("DESKTOP",FALSE);
@@ -4290,7 +4163,7 @@ int on_combination(int msg_code)
 // Creates a menu for the root window.
 // Only refresh if it is already created.
     if (msg_code == GWS_Save){
-        __button_pressed( sm_wid );  //#wrong: provisorio.
+        __button_pressed( StartMenu.wid );  //#wrong: provisorio.
         on_menu();
         return 0;
     }
@@ -5035,6 +4908,187 @@ struct gws_window_d *gws_window_from_id (int id)
 }
 */
 
+
+
+void __create_start_menu(void)
+{
+// Colors for the taskbar and for the buttons.
+    unsigned int bg_color     = (unsigned int) get_color(csiTaskBar);
+    unsigned int frame_color  = (unsigned int) get_color(csiTaskBar);
+    unsigned int client_color = (unsigned int) get_color(csiTaskBar);
+
+
+// ========================================
+// Quick launch area buttons
+
+    if ( (void*) taskbar_window == NULL ){
+        printf("__create_start_menu: taskbar_window\n");
+        exit(0);
+    }
+    if (taskbar_window->magic != 1234){
+        printf("__create_start_menu: taskbar_window validation\n");
+        exit(0);
+    }
+
+
+
+// ========================================
+// Start menu button
+
+    unsigned long sm_left= TB_BUTTON_PADDING;
+    unsigned long sm_top = TB_BUTTON_PADDING;
+    unsigned long sm_width = 
+      ( QUICK_LAUNCH_AREA_PADDING -
+        TB_BUTTON_PADDING -
+        TB_BUTTON_PADDING );
+    unsigned long sm_height = (taskbar_window->height -8);
+    struct gws_window_d *sm_window;
+
+    sm_window = 
+        (struct gws_window_d *) CreateWindow ( 
+            WT_BUTTON, 0, 1, 1, 
+            "Gramado",  //string  
+            sm_left, sm_top, sm_width, sm_height,   
+            taskbar_window, 
+            0, 
+            frame_color,     // frame color 
+            client_color );  // client window color
+
+    if ( (void *) sm_window == NULL ){
+        gwssrv_debug_print ("__create_start_menu: sm_window\n"); 
+        printf             ("__create_start_menu: sm_window\n");
+        exit(1);
+    }
+    if ( sm_window->used != TRUE || sm_window->magic != 1234 ){
+        gwssrv_debug_print ("__create_start_menu: sm_window validation\n"); 
+        printf             ("__create_start_menu: sm_window validation\n");
+        exit(1);
+    }
+
+// Register the button.
+    StartMenu.wid = RegisterWindow(sm_window);
+    if (StartMenu.wid<0){
+        gwssrv_debug_print ("__create_start_menu: Couldn't register sm_window\n");
+        printf             ("__create_start_menu: Couldn't register sm_window\n");
+        exit(1);
+    }
+    StartMenu.initialized = TRUE;
+}
+
+void __create_quick_launch_area(void)
+{
+
+// Colors for the taskbar and for the buttons.
+    unsigned int bg_color     = (unsigned int) get_color(csiTaskBar);
+    unsigned int frame_color  = (unsigned int) get_color(csiTaskBar);
+    unsigned int client_color = (unsigned int) get_color(csiTaskBar);
+
+
+// ========================================
+// Quick launch area buttons
+
+    if ( (void*) taskbar_window == NULL ){
+        printf("__create_quick_launch_area: taskbar_window\n");
+        exit(0);
+    }
+    if (taskbar_window->magic != 1234){
+        printf("__create_quick_launch_area: taskbar_window validation\n");
+        exit(0);
+    }
+
+// ===================================
+// button box:
+// ===================================
+// Clean the button list and the pid list.
+    register int b=0;
+    for (b=0; b<QL_BUTTON_MAX; b++)
+    {
+        QuickLaunch.buttons[b]=0;
+        QuickLaunch.pids[b]=0;
+    };
+    QuickLaunch.buttons_count=0;
+
+    //unsigned long Space = TB_BUTTON_PADDING;   //4;
+    //unsigned long b_width  = TB_BUTTON_WIDTH;    //(8*10);
+    //unsigned long b_height = TB_BUTTON_HEIGHT;   //40-(Space*2);
+    //unsigned long b_left   = TB_BUTTON_PADDING;  //Space;
+    //unsigned long b_top    = TB_BUTTON_PADDING;  //Space;
+
+    unsigned long b_left   = 0; 
+    unsigned long b_top    = TB_BUTTON_PADDING;
+
+    //unsigned long b_width  = TB_BUTTON_WIDTH;
+    //unsigned long b_height = TB_BUTTON_HEIGHT;
+    //unsigned long b_width  = (unsigned long)(tb_height -8);
+    //unsigned long b_height = (unsigned long)(tb_height -8);
+    unsigned long b_width  = (unsigned long)(taskbar_window->height -8);
+    unsigned long b_height = (unsigned long)(taskbar_window->height -8);
+
+    register int i=0;         //iterator
+    int nbuttons=4;  //quantidade de botões na lista    
+    struct gws_window_d *tmp_button;
+    int tmp_wid=-1;
+    char button_label[32];
+
+// -----------------------------
+// Quick launch area.
+// Creating n buttons in the taskbar.
+// #todo: We can make this options configurable.
+
+    for (i=0; i<nbuttons; i++){
+
+    b_left = 
+        QUICK_LAUNCH_AREA_PADDING +
+        TB_BUTTON_PADDING + ( (TB_BUTTON_PADDING*i) + (b_width*i) );
+
+    itoa(i,button_label);
+    button_label[2] = 0;
+    
+    tmp_button = 
+        (struct gws_window_d *) CreateWindow ( 
+            WT_BUTTON, 0, 1, 1, 
+            button_label,  //string  
+            b_left, b_top, b_width, b_height,   
+            taskbar_window, 0, 
+            frame_color,     // frame color 
+            client_color );  // client window color
+
+    if ( (void *) tmp_button == NULL ){
+        gwssrv_debug_print ("__create_quick_launch_area: tmp_button\n"); 
+        printf             ("__create_quick_launch_area: tmp_button\n");
+        exit(1);
+    }
+    if ( tmp_button->used != TRUE || tmp_button->magic != 1234 ){
+        gwssrv_debug_print ("__create_quick_launch_area: tmp_button validation\n"); 
+        printf             ("__create_quick_launch_area: tmp_button validation\n");
+        exit(1);
+    }
+
+// Register the button.
+    tmp_wid = RegisterWindow(tmp_button);
+    if (tmp_wid<0){
+        gwssrv_debug_print ("__create_quick_launch_area: Couldn't register button\n");
+        printf             ("__create_quick_launch_area: Couldn't register button\n");
+        exit(1);
+    }
+
+    if (i==0){
+        taskbar_startmenu_button_window = tmp_button;
+    }
+
+//save
+    // id de janelas.
+    QuickLaunch.buttons[i] = (int) tmp_wid;
+    // ponteiros de estruturas de janelas do tipo botão.
+    //tb_windows[i] = (unsigned long) tmp_button;
+
+    // Número de botões criados.
+    QuickLaunch.buttons_count++;
+    };
+
+    QuickLaunch.initialized = TRUE;
+}
+
 // Taskbar
 // Window server's widget.
 // Cria a barra na parte de baixo da tela.
@@ -5044,16 +5098,14 @@ struct gws_window_d *gws_window_from_id (int id)
 // todos os aplicativos que usam essa tag.
 void create_taskbar (unsigned long tb_height)
 {
-    int WindowId = -1;  // bar
-    int menu_wid;       // button
-
+    unsigned long w = gws_get_device_width();
+    unsigned long h = gws_get_device_height();
+    int wid = -1;
 // Colors for the taskbar and for the buttons.
     unsigned int bg_color     = (unsigned int) get_color(csiTaskBar);
     unsigned int frame_color  = (unsigned int) get_color(csiTaskBar);
     unsigned int client_color = (unsigned int) get_color(csiTaskBar);
 
-    unsigned long w = gws_get_device_width();
-    unsigned long h = gws_get_device_height();
     if (w==0 || h==0){
         gwssrv_debug_print ("create_taskbar: w h\n");
         printf             ("create_taskbar: w h\n");
@@ -5102,15 +5154,15 @@ void create_taskbar (unsigned long tb_height)
     }
 
 // Register the window.
-    WindowId = (int) RegisterWindow(taskbar_window);
-    if (WindowId<0){
+    wid = (int) RegisterWindow(taskbar_window);
+    if (wid<0){
         gwssrv_debug_print ("create_taskbar: Couldn't register window\n");
         printf             ("create_taskbar: Couldn't register window\n");
         exit(1);
     }
 
 // wid
-    taskbar_window->id = WindowId;
+    taskbar_window->id = wid;
 // Setup Window manager.
     WindowManager.taskbar = (struct gws_window_d *) taskbar_window;
 // Show
@@ -5129,179 +5181,19 @@ void create_taskbar (unsigned long tb_height)
     //while(1){}
     */
 
-// ===================================
-// button box:
-
-// ===================================
-// Clean the button list and the pid list.
-    register int b=0;
-    for (b=0; b<8; b++){
-        tb_buttons[b]=0;
-        tb_pids[b]=0;
-    };
-    tb_buttons_count=0;
-
+// ========================================
+// Start menu.
+    __create_start_menu();
 
 // ========================================
-// Start menu button
-
-    unsigned long sm_left= TB_BUTTON_PADDING;
-    unsigned long sm_top = TB_BUTTON_PADDING;
-    unsigned long sm_width = 
-      ( QUICK_LAUNCH_AREA_PADDING -
-        TB_BUTTON_PADDING -
-        TB_BUTTON_PADDING );
-    unsigned long sm_height = (tb_height -8);
-    struct gws_window_d *sm_window;
-
-    sm_window = 
-        (struct gws_window_d *) CreateWindow ( 
-            WT_BUTTON, 0, 1, 1, 
-            "Gramado",  //string  
-            sm_left, sm_top, sm_width, sm_height,   
-            taskbar_window, 
-            0, 
-            frame_color,     // frame color 
-            client_color );  // client window color
-
-    if ( (void *) sm_window == NULL ){
-        gwssrv_debug_print ("create_taskbar: sm_window\n"); 
-        printf             ("create_taskbar: sm_window\n");
-        exit(1);
-    }
-    if ( sm_window->used != TRUE || sm_window->magic != 1234 ){
-        gwssrv_debug_print ("create_background: sm_window validation\n"); 
-        printf             ("create_background: sm_window validation\n");
-        exit(1);
-    }
-
-// Register the button.
-    sm_wid = RegisterWindow(sm_window);
-    if (sm_wid<0){
-        gwssrv_debug_print ("create_taskbar: Couldn't register sm_window\n");
-        printf             ("create_taskbar: Couldn't register sm_window\n");
-        exit(1);
-    }
-
-// ========================================
-// Quick launch area buttons
-
-    //unsigned long Space = TB_BUTTON_PADDING;   //4;
-    //unsigned long b_width  = TB_BUTTON_WIDTH;    //(8*10);
-    //unsigned long b_height = TB_BUTTON_HEIGHT;   //40-(Space*2);
-    //unsigned long b_left   = TB_BUTTON_PADDING;  //Space;
-    //unsigned long b_top    = TB_BUTTON_PADDING;  //Space;
-
-    unsigned long b_left   = 0; 
-    unsigned long b_top    = TB_BUTTON_PADDING;
-
-    //unsigned long b_width  = TB_BUTTON_WIDTH;
-    //unsigned long b_height = TB_BUTTON_HEIGHT;
-    unsigned long b_width  = (unsigned long)(tb_height -8);
-    unsigned long b_height = (unsigned long)(tb_height -8);
-
-    register int i=0;         //iterator
-    int nbuttons=4;  //quantidade de botões na lista    
-    struct gws_window_d *tmp_button;
-    int tmp_wid=-1;
-    char button_label[32];
-
-// -----------------------------
 // Quick launch area.
-// Creating n buttons in the taskbar.
-// #todo: We can make this options configurable.
-
-    for (i=0; i<nbuttons; i++){
-
-    b_left = 
-        QUICK_LAUNCH_AREA_PADDING +
-        TB_BUTTON_PADDING + ( (TB_BUTTON_PADDING*i) + (b_width*i) );
-
-    itoa(i,button_label);
-    button_label[2] = 0;
-    
-    tmp_button = 
-        (struct gws_window_d *) CreateWindow ( 
-            WT_BUTTON, 0, 1, 1, 
-            button_label,  //string  
-            b_left, b_top, b_width, b_height,   
-            taskbar_window, 0, 
-            frame_color,     // frame color 
-            client_color );  // client window color
-
-    if ( (void *) tmp_button == NULL ){
-        gwssrv_debug_print ("create_taskbar: tmp_button\n"); 
-        printf             ("create_taskbar: tmp_button\n");
-        exit(1);
-    }
-    if ( tmp_button->used != TRUE || tmp_button->magic != 1234 ){
-        gwssrv_debug_print ("create_background: tmp_button validation\n"); 
-        printf             ("create_background: tmp_button validation\n");
-        exit(1);
-    }
-
-// Register the button.
-    tmp_wid = RegisterWindow(tmp_button);
-    if (tmp_wid<0){
-        gwssrv_debug_print ("create_taskbar: Couldn't register button\n");
-        printf             ("create_taskbar: Couldn't register button\n");
-        exit(1);
-    }
-
-    if (i==0){
-        taskbar_startmenu_button_window = tmp_button;
-    }
-
-//save
-    // id de janelas.
-    tb_buttons[i] = (int) tmp_wid;
-    // ponteiros de estruturas de janelas do tipo botão.
-    //tb_windows[i] = (unsigned long) tmp_button;
-
-    // Número de botões criados.
-    tb_buttons_count++;
-
-    /*
-    // --------------------------------------
-    // Decode the bmp that is in a buffer
-    // and display it directly into the framebuffer. 
-    // IN: index, left, top
-    // see: bmp.c
-    unsigned long iL=0;
-    unsigned long iT=0;
-    iL = (unsigned long) (b_left + METRICS_ICON_LEFTPAD);
-    iT = (unsigned long) (b_top + METRICS_ICON_TOPPAD);
-    gwssrv_display_system_icon( 
-        (int) 1, 
-        (unsigned long) iL, 
-        (unsigned long) iT );
-    // --------------------------------------
-    */
-
-    };
+    __create_quick_launch_area();
 
 // ---------------------
 // Show
-    flush_window_by_id(taskbar_window->id);
-    //flush_window_by_id(__taskbar_startmenu_button_window->id);
+
     //flush_window(taskbar_window);
-    //flush_window(__taskbar_startmenu_button_window);
-
-// The first keyboard owner.
-    //keyboard_owner = (void*) taskbar_window;
-
-// #debug
-
-/*
-    printf ("button: %d %d %d %d\n",
-        __taskbar_startmenu_button_window->left,
-        __taskbar_startmenu_button_window->top,
-        __taskbar_startmenu_button_window->width,
-        __taskbar_startmenu_button_window->height );
-
-    refresh_screen();
-    while(1){}
-*/
+    flush_window_by_id(wid);
 }
 
 // Create root window
@@ -6015,16 +5907,17 @@ void wm_Update_TaskBar( char *string, int flush )
     //redraw_window(taskbar_window,TRUE);
     //redraw_window(__taskbar_startmenu_button_window,TRUE);
 
-    //redraw_window_by_id(sm_wid,TRUE);
-    redraw_window_by_id(sm_wid,FALSE);
+    //redraw_window_by_id(StartMenu.wid,TRUE);
+    redraw_window_by_id(StartMenu.wid,FALSE);
     
 // Redraw, all the valid buttons in the list.
     register int i=0;
     int wid=0;
-    for (i=0; i<TB_BUTTONS_MAX; i++)
+    for (i=0; i<QL_BUTTON_MAX; i++)
     {
-        if (tb_buttons[i] != 0){
-            wid = (int) tb_buttons[i];
+        if (QuickLaunch.buttons[i] != 0)
+        {
+            wid = (int) QuickLaunch.buttons[i];
             //redraw_window_by_id(wid,TRUE);
             redraw_window_by_id(wid,FALSE);
             //__draw_button_mark_by_wid(wid,i);
