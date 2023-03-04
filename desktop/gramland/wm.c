@@ -58,11 +58,14 @@ static unsigned long last_input_jiffie=0;
 
 
 // Taskbar
-#define TB_HEIGHT  40
-#define TB_BUTTON_PADDING  4
+#define TB_BUTTON_PADDING  2
+// 36
+//#define TB_HEIGHT  40
+#define TB_HEIGHT  (24+TB_BUTTON_PADDING+TB_BUTTON_PADDING)
+//#define TB_BUTTON_PADDING  4
 #define TB_BUTTON_HEIGHT  (TB_HEIGHT - (TB_BUTTON_PADDING*2))
 #define TB_BUTTON_WIDTH  TB_BUTTON_HEIGHT
-#define TB_BUTTONS_MAX  8
+// #define TB_BUTTONS_MAX  8
 
 
 struct start_menu_d StartMenu;
@@ -4166,6 +4169,7 @@ int on_combination(int msg_code)
     {
         if (StartMenu.is_created != TRUE)
         {
+            __button_pressed( StartMenu.wid );
             create_main_menu();
             return 0;
         }
@@ -4962,7 +4966,9 @@ void __create_start_menu(void)
       ( QUICK_LAUNCH_AREA_PADDING -
         TB_BUTTON_PADDING -
         TB_BUTTON_PADDING );
-    unsigned long sm_height = (taskbar_window->height -8);
+    unsigned long sm_height = (taskbar_window->height -
+        TB_BUTTON_PADDING -
+        TB_BUTTON_PADDING );
     struct gws_window_d *sm_window;
 
     sm_window = 
@@ -5042,8 +5048,12 @@ void __create_quick_launch_area(void)
     //unsigned long b_height = TB_BUTTON_HEIGHT;
     //unsigned long b_width  = (unsigned long)(tb_height -8);
     //unsigned long b_height = (unsigned long)(tb_height -8);
-    unsigned long b_width  = (unsigned long)(taskbar_window->height -8);
-    unsigned long b_height = (unsigned long)(taskbar_window->height -8);
+    unsigned long b_width  = (unsigned long)(taskbar_window->height -
+        TB_BUTTON_PADDING -
+        TB_BUTTON_PADDING );
+    unsigned long b_height = (unsigned long)(taskbar_window->height -
+        TB_BUTTON_PADDING -
+        TB_BUTTON_PADDING );
 
     register int i=0;         //iterator
     int nbuttons=4;  //quantidade de botões na lista    
