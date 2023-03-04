@@ -67,6 +67,10 @@ static unsigned long last_input_jiffie=0;
 //#define DEFAULT_ALIVIO  16
 //static unsigned long alivio=DEFAULT_ALIVIO;
 
+// Quick launch area
+// default left position.
+#define QUICK_LAUNCH_AREA_PADDING  80
+
 // Taskbar
 #define TB_HEIGHT  40
 #define TB_BUTTON_PADDING  4
@@ -74,6 +78,7 @@ static unsigned long last_input_jiffie=0;
 #define TB_BUTTON_WIDTH  TB_BUTTON_HEIGHT
 #define TB_BUTTONS_MAX  8
 
+// # deprecated?
 // Affects the active window
 #define OPTION_NOTHING  0
 #define OPTION_MINIMIZE  1
@@ -81,15 +86,14 @@ static unsigned long last_input_jiffie=0;
 #define OPTION_CLOSE     3
 static int current_option=OPTION_NOTHING;
 
+// Start menu wid
+static int sm_wid=-1;
 
 // tb buttons
 // Quantos botões ja temos.
 static int tb_buttons_count=0;  
 static int tb_buttons[TB_BUTTONS_MAX];
 
-// tb windows
-// Ponteiros de estrutura de janelas.
-//static unsigned long tb_windows[TB_BUTTONS_MAX];
 
 // tb pids
 static int tb_pids[TB_BUTTONS_MAX];
@@ -356,6 +360,7 @@ on_keyboard_event(
             //redraw_window_by_id(tb_buttons[3],TRUE);
             return 0;
         }
+        
         
         // #todo: Explain it better.
         if (long1 == VK_F9 || 
@@ -4284,8 +4289,8 @@ int on_combination(int msg_code)
 // #test
 // Creates a menu for the root window.
 // Only refresh if it is already created.
-    if (msg_code == GWS_Save)
-    {
+    if (msg_code == GWS_Save){
+        __button_pressed( sm_wid );  //#wrong: provisorio.
         on_menu();
         return 0;
     }
@@ -5136,8 +5141,50 @@ void create_taskbar (unsigned long tb_height)
     };
     tb_buttons_count=0;
 
+
 // ========================================
-// start menu button
+// Start menu button
+
+    unsigned long sm_left= TB_BUTTON_PADDING;
+    unsigned long sm_top = TB_BUTTON_PADDING;
+    unsigned long sm_width = 
+      ( QUICK_LAUNCH_AREA_PADDING -
+        TB_BUTTON_PADDING -
+        TB_BUTTON_PADDING );
+    unsigned long sm_height = (tb_height -8);
+    struct gws_window_d *sm_window;
+
+    sm_window = 
+        (struct gws_window_d *) CreateWindow ( 
+            WT_BUTTON, 0, 1, 1, 
+            "Gramado",  //string  
+            sm_left, sm_top, sm_width, sm_height,   
+            taskbar_window, 
+            0, 
+            frame_color,     // frame color 
+            client_color );  // client window color
+
+    if ( (void *) sm_window == NULL ){
+        gwssrv_debug_print ("create_taskbar: sm_window\n"); 
+        printf             ("create_taskbar: sm_window\n");
+        exit(1);
+    }
+    if ( sm_window->used != TRUE || sm_window->magic != 1234 ){
+        gwssrv_debug_print ("create_background: sm_window validation\n"); 
+        printf             ("create_background: sm_window validation\n");
+        exit(1);
+    }
+
+// Register the button.
+    sm_wid = RegisterWindow(sm_window);
+    if (sm_wid<0){
+        gwssrv_debug_print ("create_taskbar: Couldn't register sm_window\n");
+        printf             ("create_taskbar: Couldn't register sm_window\n");
+        exit(1);
+    }
+
+// ========================================
+// Quick launch area buttons
 
     //unsigned long Space = TB_BUTTON_PADDING;   //4;
     //unsigned long b_width  = TB_BUTTON_WIDTH;    //(8*10);
@@ -5159,6 +5206,7 @@ void create_taskbar (unsigned long tb_height)
     int tmp_wid=-1;
     char button_label[32];
 
+// -----------------------------
 // Quick launch area.
 // Creating n buttons in the taskbar.
 // #todo: We can make this options configurable.
@@ -5166,6 +5214,7 @@ void create_taskbar (unsigned long tb_height)
     for (i=0; i<nbuttons; i++){
 
     b_left = 
+        QUICK_LAUNCH_AREA_PADDING +
         TB_BUTTON_PADDING + ( (TB_BUTTON_PADDING*i) + (b_width*i) );
 
     itoa(i,button_label);
@@ -5958,13 +6007,17 @@ void wm_Update_TaskBar( char *string, int flush )
 
 // Redraw the bar.
 // Redraw the buttons.
+    //redraw_window_by_id(taskbar_window->id,TRUE);
+    redraw_window_by_id(taskbar_window->id,FALSE);
 
-    redraw_window_by_id(taskbar_window->id,TRUE);
     //redraw_window_by_id(
     //    __taskbar_startmenu_button_window->id,TRUE);
     //redraw_window(taskbar_window,TRUE);
     //redraw_window(__taskbar_startmenu_button_window,TRUE);
 
+    //redraw_window_by_id(sm_wid,TRUE);
+    redraw_window_by_id(sm_wid,FALSE);
+    
 // Redraw, all the valid buttons in the list.
     register int i=0;
     int wid=0;
@@ -5972,7 +6025,8 @@ void wm_Update_TaskBar( char *string, int flush )
     {
         if (tb_buttons[i] != 0){
             wid = (int) tb_buttons[i];
-            redraw_window_by_id(wid,TRUE);
+            //redraw_window_by_id(wid,TRUE);
+            redraw_window_by_id(wid,FALSE);
             //__draw_button_mark_by_wid(wid,i);
         }
     };

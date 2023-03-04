@@ -33,6 +33,10 @@
 #define SEL_KPL  RING0  // Kernel privilege level.
 #define SEL_UPL  RING3  // User privilege level.
 
+#define DPL_RING0  RING0
+#define DPL_RING3  RING3
+
+
 /* system segments and gate types */
 #define SDT_SYSNULL      0	/* system null */
 #define SDT_SYS286TSS    1	/* system 286 TSS available */
@@ -108,10 +112,10 @@ struct segment_descriptor_d
     unsigned long base_15_0  :16;
 // 16 bits
     unsigned long base_23_16 :8;
-    unsigned long type :4;  //segment type
-    unsigned long s    :1;  //s
-    unsigned long dpl  :2;  //segment descriptor priority level 
-    unsigned long p    :1;  //segment descriptor present 
+    unsigned long type :4;  // Segment type
+    unsigned long s    :1;  // s (Represents this as a "system" or "code/data" descriptor.)
+    unsigned long dpl  :2;  // (Descriptor privilege level)
+    unsigned long p    :1;  // (Present bit) (In memory or not)
 // 16 bits
     unsigned long limit_19_16 :4;
     unsigned long avl :1;

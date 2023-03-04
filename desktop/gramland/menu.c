@@ -46,15 +46,21 @@ int on_menu(void)
 {
     int status=FALSE;
 
+    //unsigned long width  = gws_get_device_width();
+    unsigned long height = gws_get_device_height();
+    unsigned long left = 4;
+    unsigned long top = (height>>1);
+
 // Redraw if we already have a valid menu.
     status = redraw_main_menu();
-    if (status==TRUE)
+    if (status==TRUE){
         return 0;
+    }
 
 // Create the main_menu.
 // At the position 8:8 of the root window.
     if (status != TRUE){
-        create_main_menu(8,8);
+        create_main_menu(left,top);
     } 
 
     return 0;

@@ -83,7 +83,7 @@ int x64_init_gdt(void)
         0x0,  // base
         SEG_CODE_EXRD, // type=0xA (Execute/Read)
         1,    // s
-        RING0,  // dpl=0
+        DPL_RING0,  // dpl=0
         1,    // p
         0,    // avl
         1,    // l
@@ -95,7 +95,7 @@ int x64_init_gdt(void)
         0x0,  // base
         SEG_DATA_RDWR, // type=0x2 (Read/Write)
         1,    // s
-        RING0,  // dpl=0
+        DPL_RING0,  // dpl=0
         1,    // p
         0,    // avl
         1,    // l
@@ -112,7 +112,7 @@ int x64_init_gdt(void)
         0x0,  // base
         SEG_CODE_EXRD, // type=0xA (Execute/Read)
         1,    // s
-        RING3,  // dpl=3
+        DPL_RING3,  // dpl=3
         1,    // p
         0,    // avl
         1,    // l
@@ -124,7 +124,7 @@ int x64_init_gdt(void)
         0x0,    // base
         SEG_DATA_RDWR, // type=0x2 (Read/Write)
         1,      // s
-        RING3,  // dpl=3
+        DPL_RING3,  // dpl=3
         1,      // p
         0,      // avl
         1,      // l
