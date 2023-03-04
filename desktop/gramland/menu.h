@@ -60,8 +60,6 @@ extern struct gws_menu_d *main_menu;
 // == Prototypes ==============================================
 //
 
-//
-int on_menu(void);
 
 // checa se o mouse esta passando sobre o menu.
 int __is_inside_menu(struct gws_menu_d *menu, int x, int y);
@@ -84,7 +82,7 @@ struct gws_menu_d *gwssrv_create_menu (
     unsigned int color );
 
 int redraw_main_menu(void);
-int create_main_menu(int position_x, int position_y);
+int create_main_menu(void);
 
 int
 menuProcedure(

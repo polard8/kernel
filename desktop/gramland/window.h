@@ -31,6 +31,10 @@ struct start_menu_d
 {
     int initialized;
     int wid;
+
+    int is_created;
+    int is_selected;   // focus.
+    int is_visible;  // Pressed
 };
 extern struct start_menu_d StartMenu;
 

@@ -21,8 +21,14 @@ int redraw_main_menu(void)
     if (main_menu->in_use != TRUE)
         return FALSE;
 
+    if ( (void*) main_menu->bg_window == NULL )
+        return -1;
+    if (main_menu->bg_window->magic != 1234)
+        return -1;
+
 // Redraw bg window.
-   redraw_window(main_menu->bg_window,TRUE);
+   //redraw_window(main_menu->bg_window,TRUE);
+   redraw_window(main_menu->bg_window,FALSE);
 
 // Redraw items.
     struct gws_menu_item_d *tmp;
@@ -31,52 +37,37 @@ int redraw_main_menu(void)
         if ( (void*) tmp == NULL )
             break;
         // Redraw menu item.
-        if ( (void*) tmp != NULL ){
-            redraw_window(tmp->bg_window,1);
+        if ( (void*) tmp != NULL )
+        {
+            //redraw_window(tmp->bg_window,1);
+            redraw_window(tmp->bg_window,FALSE);
         }
         tmp = (struct gws_menu_item_d *) tmp->next;
     };
 
+    flush_window(main_menu->bg_window);
+
 // ok
+    StartMenu.is_visible = TRUE;
     return TRUE;
 }
-
-// Chamado na hora de inicializar ou finaliza o menu.
-int on_menu(void)
-{
-    int status=FALSE;
-
-    //unsigned long width  = gws_get_device_width();
-    unsigned long height = gws_get_device_height();
-    unsigned long left = 4;
-    unsigned long top = (height>>1);
-
-// Redraw if we already have a valid menu.
-    status = redraw_main_menu();
-    if (status==TRUE){
-        return 0;
-    }
-
-// Create the main_menu.
-// At the position 8:8 of the root window.
-    if (status != TRUE){
-        create_main_menu(left,top);
-    } 
-
-    return 0;
-}
-
 
 // #test
 // Window server's widget.
 // ::: The context menu for the root window.
-int create_main_menu(int position_x, int position_y)
+int create_main_menu(void)
 {
 //
 
     struct gws_menu_d *menu;
-    unsigned long menux = (position_x & 0xFFFF);
-    unsigned long menuy = (position_y & 0xFFFF);
+
+    unsigned long m_left = 0;
+    unsigned long m_top = 0;
+    unsigned long m_width = (WindowManager.wa_width >> 2); //200;
+    unsigned long m_height = WindowManager.wa_height;  //200;
+    unsigned int m_color = COLOR_WHITE;
+
+    StartMenu.is_created = FALSE;
 
 // No window manager.
     if (WindowManager.initialized != TRUE)
@@ -106,11 +97,11 @@ int create_main_menu(int position_x, int position_y)
             (struct gws_window_d *) __root_window,  // Parent window.
             (int) 0,   // Highlight
             (int) 4,   // Count. Number of items.
-            (unsigned long) menux,
-            (unsigned long) menuy,
-            (unsigned long) 200,
-            (unsigned long) 200,
-            (unsigned long) COLOR_GRAY );
+            (unsigned long) m_left,
+            (unsigned long) m_top,
+            (unsigned long) m_width,
+            (unsigned long) m_height,
+            (unsigned int) m_color );
 
     if ( (void*) menu == NULL ){
         printf("create_main_menu: menu\n");
@@ -186,6 +177,9 @@ int create_main_menu(int position_x, int position_y)
     main_menu->in_use = TRUE;
 
 // Done
+    StartMenu.is_selected = FALSE;
+    StartMenu.is_visible = TRUE;
+    StartMenu.is_created = TRUE;
     return 0;
 }
 

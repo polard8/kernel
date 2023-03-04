@@ -4162,9 +4162,30 @@ int on_combination(int msg_code)
 // #test
 // Creates a menu for the root window.
 // Only refresh if it is already created.
-    if (msg_code == GWS_Save){
-        __button_pressed( StartMenu.wid );  //#wrong: provisorio.
-        on_menu();
+    if (msg_code == GWS_Save)
+    {
+        if (StartMenu.is_created != TRUE)
+        {
+            create_main_menu();
+            return 0;
+        }
+
+        if (StartMenu.is_visible != TRUE)
+        {
+            __button_pressed( StartMenu.wid );
+            redraw_main_menu();
+            return 0;
+        }
+
+        if (StartMenu.is_visible == TRUE)
+        {
+            __button_released( StartMenu.wid );
+            // Update desktop but don't show the menu.
+            StartMenu.is_visible = FALSE;
+            wm_update_desktop(TRUE);
+            return 0;
+        }
+
         return 0;
     }
 
