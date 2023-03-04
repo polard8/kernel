@@ -87,8 +87,8 @@ struct thread_d *create_init_thread (void)
 
     // ...
 
-    t->input_flags = 
-        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE);
+    t->input_mode = IM_MESSAGE_INPUT;
+
 
 	// @todo: 
 	// #bugbug: #importante

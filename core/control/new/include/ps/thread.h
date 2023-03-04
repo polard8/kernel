@@ -110,7 +110,14 @@ typedef enum {
 }thread_inputmodel_t;
 */
 
-
+// #todo
+// t->input_mode
+// Do not process anything ...
+// Just port the raw byte to the target thread.
+#define IM_RAW_INPUT  1
+// Gramado kernel process the raw input
+// and post the standard gramado input message.
+#define IM_MESSAGE_INPUT  2
 
 
 /*
@@ -220,14 +227,17 @@ struct thread_d
 // to send the input when this is the current thread.
 // #todo:
 // NOT_RECEIVING
+    //unsigned long input_flags;
 
-    unsigned long input_flags;
-
-
-// #suspenso. 
-// Vamos usar as flags em 't->input_flags'
-
-    //thread_inputmodel_t input_model;
+// #test
+// #todo
+// Do not process anything ...
+// Just port the raw byte to the target thread.
+// #define IM_RAW_INPUT    1
+// Gramado kernel process the raw input
+// and post the standard gramado input message.
+// #define IM_MESSAGE_INPUT 2
+    unsigned int input_mode;
 
 // Surface
     struct rect_d *surface_rect;

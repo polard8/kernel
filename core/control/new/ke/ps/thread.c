@@ -1031,11 +1031,7 @@ struct thread_d *create_thread (
 // Input model
 //
 
-// ??
-    //Thread->input_model = THREAD_INPUTMODEL_NULL;
-
-    Thread->input_flags = 
-        (unsigned long) (INPUT_MODEL_STDIN | INPUT_MODEL_MESSAGEQUEUE );
+    Thread->input_mode = IM_MESSAGE_INPUT;
 
 // ??
 // Explain it better.
@@ -1481,11 +1477,7 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // Input
 //
 
-// #suspenso. 
-// Vamos usar as flags em 't->input_flags'
-    //clone->input_model = father->input_model; 
-    
-    clone->input_flags = father->input_flags;
+
 
 // #importante
 // Esse momento � critico.
