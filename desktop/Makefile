@@ -16,30 +16,39 @@ all:
 	make -C libs/libgws
 	make -C libs/libdisp
 
+# ----------------
+# Graphics engine. (game1)
+	make -C eng/
+
+# ----------------
 # Gramland window server.
 	make -C gramland/
 
-# burgundy: Unit 3
-	make -C burgundy/client
-	make -C burgundy/gdm
-	make -C burgundy/setup
-# blue: Unit 2
-	make -C blue/terminal  
-# beige: Unit 1
-	make -C beige/cmdline
-	make -C beige/editor
-	make -C beige/fileman
-	make -C beige/browser
-	make -C beige/docv
+# ----------------
+# Shell
+
+# apps: Unit 3
+	make -C apps/client
+	make -C apps/gdm
+	make -C apps/setup
+# apps: Unit 2
+	make -C apps/terminal  
+# apps: Unit 1
+	make -C apps/cmdline
+	make -C apps/editor
+	make -C apps/fileman
+	make -C apps/browser
+	make -C apps/docv
 
 clean-all:
-	-rm -f beige/bin/*.BIN
-	-rm -f blue/bin/*.BIN
-	-rm -f burgundy/bin/*.BIN
+	-rm -f eng/bin/*.BIN
 	-rm -f gramland/bin/*.BIN
-	-rm -f libs/libdisp/obj/*.o
+	-rm -f apps/bin/*.BIN
 	-rm -f libs/libgws/obj/*.o
+	-rm -f libs/libdisp/obj/*.o
 	-rm -f libs/rtl/obj/*.o
+	
+	
 
 
 

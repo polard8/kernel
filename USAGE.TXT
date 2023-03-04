@@ -35,8 +35,7 @@ You can type:
     boot    - Initialize the Desktop Environment, (GUI).
     gramado - Initialize the Desktop Environment, (GUI).
     wsq     - Initialize the Desktop Environment, (GUI).
-    game1 - Start demo 1.
-    game2 - Start demo 2.
+    eng     - Start graphics engine.
     cls   - Clear the screen.
 
 -----------------------

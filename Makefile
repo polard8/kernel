@@ -2,13 +2,8 @@
 # Build Gramado OS.
 
 PHONY := all
-all: step1-meta step2-desktop step3-core
+all: step2-desktop step3-core
 	@echo "Done"
-
-#D8
-PHONY := step1-meta
-step1-meta:
-	make -C  meta
 
 #A15
 PHONY := step2-desktop
@@ -25,12 +20,7 @@ PHONY := clean
 clean: clean-all
 
 PHONY := clean-all
-clean-all: clean-meta clean-desktop clean-core
-
-PHONY := clean-meta
-clean-meta:
-# In meta/
-	-rm meta/bin/*.BIN
+clean-all: clean-desktop clean-core
 
 PHONY := clean-desktop
 clean-desktop:

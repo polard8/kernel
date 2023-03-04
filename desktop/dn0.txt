@@ -1,27 +1,13 @@
 
 
-    Gramland:
-    It's a place for the window server
-    and the clients.
+apps/
+    Client applications.
 
-beige/:
-    Unit I clients.
-    cmdline, editor, fileman, setup, tests.
-blue/:
-    Unit II clients.
-    terminal
-burgundy/:
-    Unit III clients.
-    Sobriety.
-    server - The Gramado Window Server.
-    client - The first client for gws.
-    gdm    - Gramado Display manager.
-    setup  - System installation.
-libs:
-    Libraries.
-    libgws - Client-side library for gws.
-    rtl    - ring 3 libc.
+eng/
+    Graphics engine.
 
+gramland/
+    Window server.
 
-
-
+libs/
+    Client-side libraries.

@@ -212,7 +212,7 @@ exposed-tier:
 
 PHONY := copy-extras
 copy-extras:
-# Let's copy some images from desktop/ and meta/
+# Let's copy some images from desktop/
 
 	@echo "copy-extras"
 
@@ -222,36 +222,31 @@ copy-extras:
 
 	@echo ":: Copying Window server and clients."
 
-
+# Graphics engine
+	-sudo cp ../desktop/eng/bin/ENG.BIN   control/disk/
+# Window server
 	-sudo cp ../desktop/gramland/bin/GRAMLAND.BIN   control/disk/
 
-# burgundy, blue and beige: (Students)
+#
+# Shell
+#
 
-# burgundy: Unit 3
-	-sudo cp ../desktop/burgundy/bin/GWS.BIN      control/disk/
-	-sudo cp ../desktop/burgundy/bin/GDM.BIN      control/disk/
-	-sudo cp ../desktop/burgundy/bin/GDM2.BIN     control/disk/
-# blue: Unit 2
-	-sudo cp ../desktop/blue/bin/TERMINAL.BIN     control/disk/
-# beige: Unit 1
-	-sudo cp ../desktop/beige/bin/EDITOR.BIN      control/disk/
-	-sudo cp ../desktop/beige/bin/FILEMAN.BIN     control/disk/
-	-sudo cp ../desktop/beige/bin/CMDLINE.BIN     control/disk/PROGRAMS/
-	-sudo cp ../desktop/beige/bin/BROWSER.BIN  control/disk/
-	-sudo cp ../desktop/beige/bin/DOCV.BIN  control/disk/PROGRAMS/
+# apps, apps and apps: (Students)
+
+# apps: Unit 3
+	-sudo cp ../desktop/apps/bin/GWS.BIN   control/disk/
+	-sudo cp ../desktop/apps/bin/GDM.BIN   control/disk/
+	-sudo cp ../desktop/apps/bin/GDM2.BIN  control/disk/
+# apps: Unit 2
+	-sudo cp ../desktop/apps/bin/TERMINAL.BIN  control/disk/
+# apps: Unit 1
+	-sudo cp ../desktop/apps/bin/EDITOR.BIN   control/disk/
+	-sudo cp ../desktop/apps/bin/FILEMAN.BIN  control/disk/
+	-sudo cp ../desktop/apps/bin/CMDLINE.BIN  control/disk/PROGRAMS/
+	-sudo cp ../desktop/apps/bin/BROWSER.BIN  control/disk/
+	-sudo cp ../desktop/apps/bin/DOCV.BIN     control/disk/PROGRAMS/
 
 #========================================
-# :: Meta
-# Copying every image from meta/.
-
-	@echo ":: Copying meta apps."
-
-# This is not part of the exposed-tier
-# But its a de facto external content.
-#meta
-#todo: Add the games and demos, not the engines.
-	-sudo cp ../meta/bin/*.BIN   control/disk/
-
 	@echo "~ copy-extras"
 
 #===================================================

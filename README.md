@@ -45,7 +45,6 @@ A brief description of the directories.
 
     Gramado Kernel - core/
     Gramado DE     - desktop/
-    Gramado Games  - meta/
 
  * `core/` - Low basic components of the system.  
    * `control` - Ring 0 stuff.
@@ -54,7 +53,9 @@ A brief description of the directories.
      * `new` - The Gramado OS kernel.
    * `exposed` - Ring 3 stuff.
  * `desktop/` - The window server and it's clients.
- * `meta/` - Games and 3D experiments.
+   * `apps` - Client applications.
+   * `eng` - Graphics engine.
+   * `gramland` - Window server.
 
 ## Fred's host machine
 
