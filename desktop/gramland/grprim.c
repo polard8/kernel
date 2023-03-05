@@ -682,6 +682,8 @@ grPlot0 (
     int UsingAlphaBlending = FALSE;
 // clipping window support.
     struct gws_window_d *w;
+// False. But it turns into TRUE 
+// if we have a valid window pointer.
     int UseClipping = FALSE;
 // left hand orientation
 // z+ on top/right corner.
@@ -971,42 +973,95 @@ void plotLine(int x0, int y0, int x1, int y1)
 // plotLine3d:
 // Bresenham in 3D
 // The algorithm could be extended to three (or more) dimensions.
-// #todo: color is unsigned int.
-
 void 
 plotLine3d (
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
     unsigned int color )
 {
-   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
-   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-   int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
-   
-   //#bugbug: This macro is wrong?!
-   //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
-   
-   int dm = grMAX3(dx,dy,dz);
-   register int i = dm;
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+
+    //#bugbug: This macro is wrong?!
+    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
+    int dm = grMAX3(dx,dy,dz);
+    register int i = dm;
 
     // x1 = y1 = z1 = dm/2; /* error offset */
- 
+
     x1 = (dm >> 1);
     y1 = x1;
     z1 = x1;
 
     for (;;) {
-
-        grPlot0 ( 
-            NULL, 
-            z0, x0, y0, color, 0 );
-     
-        if (i-- == 0) { break; }
+        grPlot0 ( NULL, z0, x0, y0, color, 0 );
+        if (i-- == 0) { 
+            break;
+        }
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; }
         y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; }
         z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; }
     };
 }
+
+// plotLine3dEx:
+// Bresenham in 3D
+// The algorithm could be extended to three (or more) dimensions.
+void 
+plotLine3dEx (
+    struct gws_window_d *window,
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1, 
+    unsigned int color )
+{
+
+    if ( (void*) window == NULL )
+        return;
+    if (window->magic!=1234)
+        return;
+
+    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int dz = abs(z1-z0), sz = z0<z1 ? 1 : -1; 
+   
+    //#bugbug: This macro is wrong?!
+    //int dm = grMAX3 (dx,dy,dz), i = dm; /* maximum difference */
+    int dm = grMAX3(dx,dy,dz);
+    register int i = dm;
+
+    // x1 = y1 = z1 = dm/2; /* error offset */
+
+    x1 = (dm >> 1);
+    y1 = x1;
+    z1 = x1;
+
+    for (;;) {
+        grPlot0 ( window, z0, x0, y0, color, 0 );
+        if (i-- == 0) {
+            break;
+        }
+
+        x1 -= dx; 
+        if (x1 < 0) { 
+            x1 += dm; 
+            x0 += sx;
+        }
+
+        y1 -= dy;
+        if (y1 < 0) { 
+            y1 += dm; 
+            y0 += sy; 
+        }
+
+        z1 -= dz;
+        if (z1 < 0) {
+            z1 += dm; 
+            z0 += sz; 
+        }
+    };
+}
+
 
 // #todo
 // plot line given two colors.
@@ -1046,7 +1101,8 @@ plotLine3d2 (
         grPlot0 ( NULL, z0, x0, y0, color1, 0 );
         //grPlot0 ( NULL, z0, x0, y0, color2, 0 );
       
-        if (i-- == 0) break;
+        if (i-- == 0) 
+            break;
         x1 -= dx; if (x1 < 0) { x1 += dm; x0 += sx; } 
         y1 -= dy; if (y1 < 0) { y1 += dm; y0 += sy; } 
         z1 -= dz; if (z1 < 0) { z1 += dm; z0 += sz; } 
@@ -2154,114 +2210,6 @@ plotCharBackbufferDrawcharTransparentZ (
         y--;
         work_char++; 
     };
-}
-
-// substitui cor no lfb
-void grDCMono (
-    struct gws_display_d *dc,
-    unsigned char subpixel_quest,         //I64 quest=COLOR_TRANSPARENT,
-    unsigned char subpixel_true_color,    //I64 true_color=0,
-    unsigned char subpixel_false_color )  //I64 false_color=COLOR_MONO)
-{
-    register int i=0;
-    unsigned char *dst;
-    struct gws_screen_d *Screen;
-
-    //printf ("grDCMono:\n");
-
-//
-// Device context
-//
-
-    if ( (void *) dc == NULL ){
-        printf ("dc\n");
-        return;
-    }
-    if (dc->used != TRUE || dc->magic != 1234 )
-    {
-        printf ("dc validation\n");
-        return;
-    }
-
-//
-// Device screen
-//
-
-    Screen = dc->device_screen;
-    if ( (void*) Screen == NULL ){
-        printf ("Screen\n");
-        return;
-    }
-    if (Screen->used != TRUE || Screen->magic != 1234 ){
-        printf ("Screen validation\n");
-        return;
-    }
-
-    // 3 BPP
-    if (Screen->bpp == 24) {
-        
-        dst = (unsigned char *) Screen->frontbuffer;  //dst = dc->body;
-        i = (int) (Screen->height * Screen->pitch);   //i = dc->width_internal*dc->height;
-
-        //if (i<0)
-            //return;
-                   
-        while (i--){
-            
-            if ( *dst == subpixel_quest ){
-                *dst++ = subpixel_true_color;
-            }else{
-                *dst++ = subpixel_false_color;
-            };
-        };
-    }
-
-    //??
-    if (Screen->bpp != 24) {
-        printf ("not 24bpp\n");
-    }
-}
-
-// substitui cor no lfb
-void grDCColorChg ( 
-    struct gws_display_d *dc,
-    unsigned char subpixel_src_color,
-    unsigned char subpixel_dst_color )  // dst_color=COLOR_TRANSPARENT )
-{
-    register int i=0;
-    unsigned char *dst;
-    struct gws_screen_d *Screen;
-
-    //printf ("grDCColorChg:\n");
-
-// Device context
-    if ( (void *) dc == NULL )
-        return;
-    if (dc->used != 1 || dc->magic != 1234 )
-        return;    
-
-//
-// Screen
-//
-
-    Screen = dc->device_screen;
-    if ( (void*) Screen == NULL )
-        return;
-    if (Screen->used != 1 || Screen->magic != 1234 )
-        return;    
-
-    if (Screen->bpp == 24) 
-    {
-        dst = (unsigned char *) Screen->frontbuffer;
-        i = (int) (Screen->height * Screen->pitch);
-        while (i--){
-            if (*dst == subpixel_src_color){
-                *dst++ = subpixel_dst_color;
-            }else{
-                dst++;
-            };
-        };
-    }
 }
 
 // Bézier curve

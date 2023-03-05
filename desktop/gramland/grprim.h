@@ -295,6 +295,13 @@ plotLine3d (
     int x1, int y1, int z1, 
     unsigned int color );
 
+void 
+plotLine3dEx (
+    struct gws_window_d *window,
+    int x0, int y0, int z0, 
+    int x1, int y1, int z1, 
+    unsigned int color );
+
 // plot line given two colors.
 // interpolation?
 void 
@@ -410,19 +417,6 @@ plotCharBackbufferDrawcharTransparentZ (
     unsigned long color, 
     unsigned long c,
     int z );
-
-// substitui cor no lfb
-void grDCMono (
-    struct gws_display_d *dc,
-    unsigned char subpixel_quest,         //I64 quest=COLOR_TRANSPARENT,
-    unsigned char subpixel_true_color,    //I64 true_color=0,
-    unsigned char subpixel_false_color );  //I64 false_color=COLOR_MONO)
-
-// substitui cor no lfb
-void grDCColorChg ( 
-    struct gws_display_d *dc,
-    unsigned char subpixel_src_color,
-    unsigned char subpixel_dst_color );  // dst_color=COLOR_TRANSPARENT )
 
 // interpolation
 unsigned int 

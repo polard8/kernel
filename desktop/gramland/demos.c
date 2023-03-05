@@ -16,6 +16,8 @@ static void __draw_demo_curve1(int position, int model_z);
 
 void demoLines(void)
 {
+// Draw lines.
+
     register int i=0;
 
     for (i=0; i<320; i+=5)
@@ -241,9 +243,7 @@ void demoCat (void)
 
 void demoLine1(void)
 {
-
-    // #bugbug
-    // Needs to be a square ?
+// Draw lines.
 
     if (current_mode != GRAMADO_JAIL)
         return;
