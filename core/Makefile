@@ -58,7 +58,7 @@ clean
 #----------
 # build: Developer comand 1.
 # install
-# Build the images and put them all into control/disk/ folder.
+# Build the images and put them all into os/disk/ folder.
 PHONY := install
 install: do_install
 do_install: \
@@ -68,7 +68,7 @@ build-gramado-os
 #----------
 # build: Developer comand 2.
 # image
-# Copy all the files from control/disk/ to the VHD.
+# Copy all the files from os/disk/ to the VHD.
 PHONY := image
 image: do_image
 do_image: \
@@ -96,13 +96,9 @@ do_runkvm:
 # ~ Step 0: gramado files.
 
 PHONY := build-gramado-os  
-build-gramado-os: \
-control-tier \
-exposed-tier    
+build-gramado-os:     
 
-#1
-control-tier:
-	@echo ":: [control-tier] Building VHD, bootloaders and kernel image."
+	@echo ":: [] Building VHD, bootloaders and kernel image."
 
 # options: 
 # main.asm and main2.asm
@@ -116,99 +112,92 @@ control-tier:
 
 
 # Create the VHD.
-	$(Q)$(NASM) control/boot/vd/fat/main.asm \
-	-I control/boot/vd/fat/ \
+	$(Q)$(NASM) os/boot/vd/fat/main.asm \
+	-I os/boot/vd/fat/ \
 	-o GRAMADO.VHD 
 
 # Create backup for mbr.
-	$(Q)$(NASM) control/boot/vd/fat/stage1.asm \
-	-I control/boot/vd/fat/ \
+	$(Q)$(NASM) os/boot/vd/fat/stage1.asm \
+	-I os/boot/vd/fat/ \
 	-o MBR0.BIN
-	sudo cp MBR0.BIN  control/disk/
+	sudo cp MBR0.BIN  os/disk/
 
 # ::Build BM.BIN.
-	$(Q)$(MAKE) -C control/boot/x86/bm/ 
+	$(Q)$(MAKE) -C os/boot/x86/bm/ 
 # Copy to the target folder.
-	sudo cp control/boot/x86/bin/BM.BIN  control/disk/
+	sudo cp os/boot/x86/bin/BM.BIN  os/disk/
 
 # ::Build BL.BIN.
-	$(Q)$(MAKE) -C control/boot/x86/bl/ 
+	$(Q)$(MAKE) -C os/boot/x86/bl/ 
 # Copy to the target folder.
-	sudo cp control/boot/x86/bin/BL.BIN  control/disk/
+	sudo cp os/boot/x86/bin/BL.BIN  os/disk/
 
 
 # ::Build kernel image.
-	$(Q)$(MAKE) -C control/new/
+	$(Q)$(MAKE) -C os/kernel/
 # Copy to the target folder.
-	sudo cp control/new/KERNEL.BIN  control/disk/GRAMADO
+	sudo cp os/kernel/KERNEL.BIN  os/disk/GRAMADO
 
 
 # ::Build the ring0 module image.
-	$(Q)$(MAKE) -C control/newm0/
+	$(Q)$(MAKE) -C os/newm0/
 # Copy the ring0 module image.
-	sudo cp control/newm0/MOD0.BIN  control/disk/
+	sudo cp os/newm0/MOD0.BIN  os/disk/
 
 # Install BMPs
-	sudo cp control/data/themes/537/*.BMP  control/disk/
-#...
-
-	@echo "~control-tier"
-
-#2
-exposed-tier:
-	@echo ":: [exposed-tier] Building libraries and network server."
+	sudo cp os/data/themes/537/*.BMP  os/disk/
 
 #========================================
 # ::Build libraries.
-	$(Q) $(MAKE) -C exposed/libs/
+	$(Q) $(MAKE) -C libs/
 # Don't copy to the disk.
 
 #========================================
-# :: Arctic 
+# :: init.bin 
 # Building init process.
-	$(Q) $(MAKE) -C exposed/arctic/
+	$(Q) $(MAKE) -C init/
 # Copy to the target folder.
-	-sudo cp exposed/arctic/bin/INIT.BIN  control/disk/ 
+	-sudo cp init/bin/INIT.BIN  os/disk/ 
 
 #========================================
 # :: Azure 
 # Building userland commands.
 # userland
 	@echo ":: Making userland."
-	$(Q) $(MAKE) -C exposed/azure/
+	$(Q) $(MAKE) -C azure/
 # Copy to the target folder.
-	-sudo cp exposed/azure/bin/SHUTDOWN.BIN  control/disk/
-	-sudo cp exposed/azure/bin/REBOOT.BIN    control/disk/
-	-sudo cp exposed/azure/bin/CAT.BIN       control/disk/
-	-sudo cp exposed/azure/bin/UNAME.BIN     control/disk/
+	-sudo cp azure/bin/SHUTDOWN.BIN  os/disk/
+	-sudo cp azure/bin/REBOOT.BIN    os/disk/
+	-sudo cp azure/bin/CAT.BIN       os/disk/
+	-sudo cp azure/bin/UNAME.BIN     os/disk/
 
-	-sudo cp exposed/azure/bin/VGA1.BIN      control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/SHELL.BIN     control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/TPRINTF.BIN   control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/SHOWFUN.BIN   control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/CMP.BIN       control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/SUM.BIN       control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/TASCII.BIN    control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/FALSE.BIN     control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/TRUE.BIN      control/disk/PROGRAMS/
-	-sudo cp exposed/azure/bin/GRAMCNF.BIN   control/disk/PROGRAMS/
+	-sudo cp azure/bin/VGA1.BIN      os/disk/PROGRAMS/
+	-sudo cp azure/bin/SHELL.BIN     os/disk/PROGRAMS/
+	-sudo cp azure/bin/TPRINTF.BIN   os/disk/PROGRAMS/
+	-sudo cp azure/bin/SHOWFUN.BIN   os/disk/PROGRAMS/
+	-sudo cp azure/bin/CMP.BIN       os/disk/PROGRAMS/
+	-sudo cp azure/bin/SUM.BIN       os/disk/PROGRAMS/
+	-sudo cp azure/bin/TASCII.BIN    os/disk/PROGRAMS/
+	-sudo cp azure/bin/FALSE.BIN     os/disk/PROGRAMS/
+	-sudo cp azure/bin/TRUE.BIN      os/disk/PROGRAMS/
+	-sudo cp azure/bin/GRAMCNF.BIN   os/disk/PROGRAMS/
 	#...
 
 #========================================
 # :: Indigo 1
-	$(Q) $(MAKE) -C exposed/indigo1/ 
+	$(Q) $(MAKE) -C indigo1/ 
 # Copy to the target folder.
-	-sudo cp exposed/indigo1/bin/GNSSRV.BIN  control/disk/
-	-sudo cp exposed/indigo1/bin/GNS.BIN     control/disk/
+	-sudo cp indigo1/bin/GNSSRV.BIN  os/disk/
+	-sudo cp indigo1/bin/GNS.BIN     os/disk/
 
 #========================================
 # :: Indigo 2
-	$(Q) $(MAKE) -C exposed/indigo2/
-	-sudo cp exposed/indigo2/bin/N9.BIN   control/disk/PROGRAMS/
-	-sudo cp exposed/indigo2/bin/N10.BIN  control/disk/PROGRAMS/
-	-sudo cp exposed/indigo2/bin/N11.BIN  control/disk/PROGRAMS/
+	$(Q) $(MAKE) -C indigo2/
+	-sudo cp indigo2/bin/N9.BIN   os/disk/PROGRAMS/
+	-sudo cp indigo2/bin/N10.BIN  os/disk/PROGRAMS/
+	-sudo cp indigo2/bin/N11.BIN  os/disk/PROGRAMS/
 
-	@echo "~exposed-tier"
+	@echo "~tier"
 
 PHONY := copy-extras
 copy-extras:
@@ -223,9 +212,9 @@ copy-extras:
 	@echo ":: Copying Window server and clients."
 
 # Graphics engine
-	-sudo cp ../desktop/eng/bin/ENG.BIN   control/disk/
+	-sudo cp ../desktop/eng/bin/ENG.BIN   os/disk/
 # Window server
-	-sudo cp ../desktop/gramland/bin/GRAMLAND.BIN   control/disk/
+	-sudo cp ../desktop/gramland/bin/GRAMLAND.BIN   os/disk/
 
 #
 # Shell
@@ -234,17 +223,17 @@ copy-extras:
 # apps, apps and apps: (Students)
 
 # apps: Unit 3
-	-sudo cp ../desktop/apps/bin/GWS.BIN   control/disk/
-	-sudo cp ../desktop/apps/bin/GDM.BIN   control/disk/
-	-sudo cp ../desktop/apps/bin/GDM2.BIN  control/disk/
+	-sudo cp ../desktop/apps/bin/GWS.BIN   os/disk/
+	-sudo cp ../desktop/apps/bin/GDM.BIN   os/disk/
+	-sudo cp ../desktop/apps/bin/GDM2.BIN  os/disk/
 # apps: Unit 2
-	-sudo cp ../desktop/apps/bin/TERMINAL.BIN  control/disk/
+	-sudo cp ../desktop/apps/bin/TERMINAL.BIN  os/disk/
 # apps: Unit 1
-	-sudo cp ../desktop/apps/bin/EDITOR.BIN   control/disk/
-	-sudo cp ../desktop/apps/bin/FILEMAN.BIN  control/disk/
-	-sudo cp ../desktop/apps/bin/CMDLINE.BIN  control/disk/PROGRAMS/
-	-sudo cp ../desktop/apps/bin/BROWSER.BIN  control/disk/
-	-sudo cp ../desktop/apps/bin/DOCV.BIN     control/disk/PROGRAMS/
+	-sudo cp ../desktop/apps/bin/EDITOR.BIN   os/disk/
+	-sudo cp ../desktop/apps/bin/FILEMAN.BIN  os/disk/
+	-sudo cp ../desktop/apps/bin/CMDLINE.BIN  os/disk/PROGRAMS/
+	-sudo cp ../desktop/apps/bin/BROWSER.BIN  os/disk/
+	-sudo cp ../desktop/apps/bin/DOCV.BIN     os/disk/PROGRAMS/
 
 #========================================
 	@echo "~ copy-extras"
@@ -269,14 +258,14 @@ vhd-mount:
 #===================================================
 #::4
 # ~ Step 4 vhd-copy-files - Copying files into the mounted VHD.
-# Copying the control/disk/ folder into the mounted VHD.
+# Copying the os/disk/ folder into the mounted VHD.
 vhd-copy-files:
 	@echo "========================="
 	@echo "Build: Copying files into the mounted VHD ..."
 
-	# Copy control/disk/
+	# Copy os/disk/
 	# sends everything from disk/ to root.
-	sudo cp -r control/disk/*  /mnt/gramadoxvhd
+	sudo cp -r os/disk/*  /mnt/gramadoxvhd
 
 #===================================================
 #:::5
@@ -314,33 +303,33 @@ clean-all: clean
 	-rm *.ISO
 
 # ==================
-# control tier.
+# os tier.
 
 # Clear boot images
-	-rm -rf control/boot/x86/bin/*.BIN
+	-rm -rf os/boot/x86/bin/*.BIN
 # Clear newos kernel image
-	-rm -rf control/new/KERNEL.BIN
+	-rm -rf os/kernel/KERNEL.BIN
 # Clear the ring0 module image
-	-rm -rf control/newm0/MOD0.BIN
+	-rm -rf os/newm0/MOD0.BIN
 # Clear the disk cache
-	-rm -rf control/disk/*.BIN 
-	-rm -rf control/disk/*.BMP
-	-rm -rf control/disk/EFI/BOOT/*.EFI 
-	-rm -rf control/disk/GRAMADO/*.BIN 
-	-rm -rf control/disk/PROGRAMS/*.BIN 
-	-rm -rf control/disk/USERS/*.BIN 
+	-rm -rf os/disk/*.BIN 
+	-rm -rf os/disk/*.BMP
+	-rm -rf os/disk/EFI/BOOT/*.EFI 
+	-rm -rf os/disk/GRAMADO/*.BIN 
+	-rm -rf os/disk/PROGRAMS/*.BIN 
+	-rm -rf os/disk/USERS/*.BIN 
 
 # ==================
 # exposed tier.
 
-	-rm exposed/arctic/bin/*.BIN
-	-rm exposed/arctic/init/*.o
-	-rm exposed/azure/bin/*.BIN
-	-rm exposed/indigo/bin/*.BIN
-	-rm exposed/lib/fonts/bin/*.FON
-	-rm exposed/lib/libgns/obj/*.o
-	-rm exposed/lib/libio01/obj/*.o
-	-rm exposed/lib/rtl/obj/*.o
+	-rm init/bin/*.BIN
+	-rm init/init/*.o
+	-rm azure/bin/*.BIN
+	-rm indigo/bin/*.BIN
+	-rm libs/fonts/bin/*.FON
+	-rm libs/libgns/obj/*.o
+	-rm libs/libio01/obj/*.o
+	-rm libs/rtl/obj/*.o
 
 	@echo "~clean-all"
 

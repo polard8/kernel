@@ -1,6 +1,5 @@
 
 
-	basetier folder: (data tier)
 	:: database and legacy systems and external application.
 	:: Model layer
 	

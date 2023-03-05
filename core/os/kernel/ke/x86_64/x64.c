@@ -1328,6 +1328,34 @@ void smp_probe_via_acpi(void)
 // Then, startup the APs using SIPIs.
 }
 
+/*
+void x64_show_smp_into(void);
+void x64_show_smp_into(void)
+{
+// Processor entry.
+    struct entry_processor_d *p_entry;
+    int i=0;
+
+    if (smp_info.initialized != TRUE)
+        return;
+    // #debug
+    if (smp_info.number_of_processors > 16)
+        return;
+
+    for (i=0; i<smp_info.number_of_processors; i++)
+    {
+        p_entry = (struct entry_processor_d *) smp_info.processors[i];
+        if ( (void*) p_entry != NULL )
+        {
+            //#todo
+            // Print info.
+        }
+    };
+}
+*/
+
+
+
 
 
 

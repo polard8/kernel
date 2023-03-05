@@ -30,8 +30,8 @@ CFLAGS = -m64 \
 	-Werror=strict-prototypes    
 	
 
-LIBC    = ../../libs/rtl/include/
-LIBCOBJ = ../../libs/rtl/obj
+LIBC    = ../libs/rtl/include/
+LIBCOBJ = ../libs/rtl/obj
 
 # Objects
 myObjects = crt0.o main.o rtl.o \
@@ -67,9 +67,9 @@ all-c:
 	#cp $(LIBGWSOBJ)/rw.o .
 	
 hello-link:
-	ld -m elf_x86_64 -T ../link.ld -o INIT.BIN $(myObjects)    
+	ld -m elf_x86_64 -T link.ld -o INIT.BIN $(myObjects)    
 finalize:
-	cp INIT.BIN  ../bin
+	cp INIT.BIN  bin/
 clean:
 	-rm *.o
 	-rm INIT.BIN 
