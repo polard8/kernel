@@ -1516,7 +1516,7 @@ void *xxxCreateSurfaceWindow(
     unsigned long clientcolor, //11, Cor da área de cliente
     unsigned long color );      //12, Color (bg) (para janela simples).
 
-void create_taskbar (unsigned long tb_height);
+void create_taskbar (unsigned long tb_height, int show);
 struct gws_window_d *wmCreateRootWindow(unsigned int bg_color);
 
 void do_create_controls( struct gws_window_d *window);

@@ -5127,7 +5127,7 @@ void __create_quick_launch_area(void)
 // os aplicativos podem ser agrupados por tag.
 // quando uma tag eh acionada, o wm exibe 
 // todos os aplicativos que usam essa tag.
-void create_taskbar (unsigned long tb_height)
+void create_taskbar (unsigned long tb_height, int show)
 {
     unsigned long w = gws_get_device_width();
     unsigned long h = gws_get_device_height();
@@ -5146,15 +5146,16 @@ void create_taskbar (unsigned long tb_height)
 // Taskbar.
 // Create  window.
 
-    if (tb_height<40){
-        tb_height = 40;
+    //if (tb_height<40)
+    if (tb_height<24){
+        tb_height = 24;
     }
     if(tb_height >= h){
         tb_height = h-40;
     }
 
     unsigned long wLeft   = (unsigned long) 0;
-    unsigned long wTop    = (unsigned long) (h-tb_height);  //(h-40);
+    unsigned long wTop    = (unsigned long) (h-tb_height);
     unsigned long wWidth  = (unsigned long) w;
     unsigned long wHeight = (unsigned long) tb_height;  //40;
 
@@ -5223,8 +5224,8 @@ void create_taskbar (unsigned long tb_height)
 // ---------------------
 // Show
 
-    //flush_window(taskbar_window);
-    flush_window_by_id(wid);
+    if (show)
+        flush_window_by_id(wid);
 }
 
 // Create root window

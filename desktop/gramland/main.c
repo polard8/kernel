@@ -1292,12 +1292,12 @@ static int initGraphics(void)
 // Create root window.
 // Create and update the taskbar window.
     initBackground();
-// IN: height
-    //create_taskbar(100);
-    create_taskbar(40);  
+
+// IN: height, flush.
+    create_taskbar(METRICS_TASKBAR_DEFAULT_HEIGHT,FALSE);  
     wm_Update_TaskBar("Welcome!",TRUE);
 
-//#debug
+    //#debug
     //gws_show_backbuffer();
     //while(1){}
 //

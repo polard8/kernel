@@ -25,11 +25,21 @@
 
 
 //
+// Taskbar
+//
+
+// Default height
+// 28 = (20 +2+2 +2+2)
+#define METRICS_TASKBAR_DEFAULT_HEIGHT  28
+
+//
 // Titlebar
 //
 
 // Default height
+// 24 = (16 +2+2 +2+2)
 #define METRICS_TITLEBAR_DEFAULT_HEIGHT  24
+
 // Control width.
 // #todo: Bigger will crash?
 #define METRICS_TITLEBAR_CONTROLS_DEFAULT_WIDTH \
