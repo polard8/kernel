@@ -199,6 +199,11 @@ static void do_launch_de(void)
 {
     int ret_val=-1;
 
+    char filename[16];
+    size_t string_size=0;
+    memset(filename,0,16);
+
+
     do_clear_console();
     printf ("Launching GUI\n");
 
@@ -207,7 +212,11 @@ static void do_launch_de(void)
     write( fileno(stdin), cmdline1, strlen(cmdline1) );
 
 // Launch new process.
-    ret_val = (int) rtl_clone_and_execute(app1_name);
+    sprintf(filename,app1_name);
+    string_size = strlen(app1_name);
+    filename[string_size] = 0;
+    ret_val = (int) rtl_clone_and_execute(filename);
+    //ret_val = (int) rtl_clone_and_execute(app1_name);
     if (ret_val<=0){
         printf("Couldn't clone\n");
         return;
@@ -322,7 +331,7 @@ static int __CompareString(void)
 // Generic file support.
     int fd= -1;
     FILE *fp;
- 
+
 // Primeira letra do prompt.
     c = prompt;
     if ( *c == '\0' ){

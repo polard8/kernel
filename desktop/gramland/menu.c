@@ -3,12 +3,16 @@
 
 #include "gwsint.h"
 
+
 int mainmenu_buttons_count=0;
 int mainmenu_buttons[MAINMENU_BUTTONS_MAX];
 
-
 struct gws_menu_d *main_menu;
 
+static const char *mn_app0 = "terminal.bin";
+static const char *mn_app1 = "editor.bin";
+static const char *mn_app2 = "reboot.bin";
+static const char *mn_app3 = "shutdown.bin";
 
 // ----------------
 
@@ -132,7 +136,7 @@ int create_main_menu(void)
 // Item 0
     tmp = 
     (struct gws_menu_item_d *) gwssrv_create_menu_item (
-        "Reboot",
+        "Terminal",
         (int) 0,
         (struct gws_menu_d *) menu );
 // Register wid.
@@ -144,7 +148,7 @@ int create_main_menu(void)
 // Item 1
     tmp = 
     (struct gws_menu_item_d *) gwssrv_create_menu_item (
-        "Shutdown",
+        "Editor",
         (int) 1,
         (struct gws_menu_d *) menu );
 // Register wid.
@@ -156,7 +160,7 @@ int create_main_menu(void)
 // Item 2
     tmp = 
     (struct gws_menu_item_d *) gwssrv_create_menu_item (
-        "Shutdown server",
+        "Reboot",
         (int) 2,
         (struct gws_menu_d *) menu );
 // Register wid.
@@ -168,7 +172,7 @@ int create_main_menu(void)
 // Item 3
     tmp = 
     (struct gws_menu_item_d *) gwssrv_create_menu_item (
-        "Nothing",
+        "Shutdown",
         (int) 3,
         (struct gws_menu_d *) menu );  
 // Register wid.
@@ -484,7 +488,12 @@ menuProcedure(
 {
     int Status=FALSE;
 
+    char filename[16];
+    size_t string_size=0;
+
     //printf("menuProcedure:\n");
+
+    memset(filename,0,16);
 
     /*
     // ok, it is working
@@ -505,24 +514,32 @@ menuProcedure(
     int _i3 = (int) (mainmenu_buttons[3] & 0xFFFF);
 
     if (item == _i0){
-        //printf("XXX\n");
-        rtl_clone_and_execute("reboot.bin");
+        sprintf(filename,mn_app0);
+        string_size = strlen(mn_app0);
+        filename[string_size] = 0;
+        rtl_clone_and_execute(filename);
         return 0;
     }
     if (item == _i1){
-        //printf("XXX\n");
-        rtl_clone_and_execute("shutdown.bin");
+        sprintf(filename,mn_app1);
+        string_size = strlen(mn_app1);
+        filename[string_size] = 0;
+        rtl_clone_and_execute(filename);
         return 0;
     }
     if (item == _i2){
-        //printf("XXX\n");
-        //rtl_clone_and_execute("reboot.bin");
-        gwssrv_quit();
+        sprintf(filename,mn_app2);
+        string_size = strlen(mn_app2);
+        filename[string_size] = 0;
+        rtl_clone_and_execute(filename);
         return 0;
     }
     if (item == _i3){
-        printf("Nothing\n");
-        //rtl_clone_and_execute("reboot.bin");
+        //sprintf(filename,mn_app3);
+        //string_size = strlen(mn_app3);
+        //filename[string_size] = 0;
+        //rtl_clone_and_execute(filename);
+        gwssrv_quit();
         return 0;
     }
 

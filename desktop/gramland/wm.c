@@ -149,6 +149,12 @@ void __button_released(int wid);
 void __create_start_menu(void);
 void __create_quick_launch_area(void);
 
+
+void on_menu_event(void);
+
+int is_combination(int msg_code);
+int on_combination(int msg_code);
+
 // =====================================================
 
 
@@ -597,6 +603,13 @@ static void on_mouse_pressed(void)
         return;
     }
 
+//#test
+// Start menu button.
+    if (mouse_hover->id == StartMenu.wid){
+        __button_pressed(mouse_hover->id);
+        return;
+    }
+
 // Grab event
     if (mouse_hover->isTitleBar == TRUE)
     {
@@ -830,6 +843,17 @@ static void on_mouse_released(void)
     if (mouse_hover->magic!=1234)
         return;
 
+
+//#test
+// Start menu button.
+    if (mouse_hover->id == StartMenu.wid){
+        __button_released(mouse_hover->id);
+        on_menu_event();
+        return;
+    }
+
+
+
     // If we already clicked on a window
     // and are already dragging it.
     // So, now it's time to drop it.
@@ -932,9 +956,7 @@ static void on_mouse_released(void)
         {
             // Redraw the button
             __button_released(mouse_hover->id);
-            //set_status_by_id(mouse_hover->id,BS_RELEASED);
-            //redraw_window_by_id(mouse_hover->id,TRUE);
-            printf("Release on min control\n");
+            //printf("Release on min control\n");
             return;
         }
     }
@@ -948,9 +970,7 @@ static void on_mouse_released(void)
         {
             // Redraw the button
             __button_released(mouse_hover->id);
-            //set_status_by_id(mouse_hover->id,BS_RELEASED);
-            //redraw_window_by_id(mouse_hover->id,TRUE);
-            printf("Release on max control\n");
+            //printf("Release on max control\n");
             return;
         }
     }
@@ -964,9 +984,7 @@ static void on_mouse_released(void)
         {
             // Redraw the button
             __button_released(mouse_hover->id);
-            //set_status_by_id(mouse_hover->id,BS_RELEASED);
-            //redraw_window_by_id(mouse_hover->id,TRUE);
-            printf("Release on close control\n");
+            //printf("Release on close control\n");
             // #test
             // On control clicked
             // close control: post close message.
@@ -1007,7 +1025,6 @@ static void on_mouse_released(void)
     if(mouse_hover->id == QuickLaunch.buttons[0])
     {
         __button_released(mouse_hover->id);
-        //create_main_menu(8,8);
         //wm_update_active_window();
         //yellow_status("0: Min");
         //QuickLaunch.pids[0] = (int) rtl_clone_and_execute("terminal.bin");
@@ -4102,7 +4119,32 @@ int wmSTDINInputReader(void)
 }
 
 
-int on_combination(int msg_code);
+void on_menu_event(void)
+{
+    if (StartMenu.is_created != TRUE)
+    {
+        __button_pressed( StartMenu.wid );
+        create_main_menu();
+        return;
+    }
+
+    if (StartMenu.is_visible != TRUE)
+    {
+        __button_pressed( StartMenu.wid );
+        redraw_main_menu();
+        return;
+    }
+
+    if (StartMenu.is_visible == TRUE)
+    {
+        __button_released( StartMenu.wid );
+        // Update desktop but don't show the menu.
+        StartMenu.is_visible = FALSE;
+        wm_update_desktop(TRUE);
+        return;
+    }
+}
+
 int on_combination(int msg_code)
 {
     if (msg_code<0)
@@ -4165,31 +4207,8 @@ int on_combination(int msg_code)
 // #test
 // Creates a menu for the root window.
 // Only refresh if it is already created.
-    if (msg_code == GWS_Save)
-    {
-        if (StartMenu.is_created != TRUE)
-        {
-            __button_pressed( StartMenu.wid );
-            create_main_menu();
-            return 0;
-        }
-
-        if (StartMenu.is_visible != TRUE)
-        {
-            __button_pressed( StartMenu.wid );
-            redraw_main_menu();
-            return 0;
-        }
-
-        if (StartMenu.is_visible == TRUE)
-        {
-            __button_released( StartMenu.wid );
-            // Update desktop but don't show the menu.
-            StartMenu.is_visible = FALSE;
-            wm_update_desktop(TRUE);
-            return 0;
-        }
-
+    if (msg_code == GWS_Save){
+        on_menu_event();
         return 0;
     }
 
@@ -4214,7 +4233,7 @@ int on_combination(int msg_code)
     return -1;
 }
 
-int is_combination(int msg_code);
+
 int is_combination(int msg_code)
 {
     if (msg_code<0)
