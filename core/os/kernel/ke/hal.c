@@ -215,14 +215,14 @@ void hal_test_speaker(void)
 
 
 /*
- * init_hal:
+ * halInitialize:
  * Initialize kernel base hal.
  *     Archtecture independent inicialization ...
  */
 // Called by I_Init() in init.c
 // OUT: TRUE if its ok.
 
-int init_hal(void)
+int halInitialize(void)
 {
     int Status = FALSE;
 

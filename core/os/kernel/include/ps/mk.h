@@ -20,7 +20,7 @@
 // == prototypes =========================
 //
 
-int init_microkernel (void);
+int psInitializeMKComponents (void);
 
 
 #endif   

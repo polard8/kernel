@@ -516,13 +516,13 @@ void doSetupVersion(void)
 // see: /dev/ata/atainit.c
 // OUT: return TRUE if its ok.
 
-int init_executive(void)
+int zeroInitializeSystemComponents(void)
 {
 // Initialize pci, rtc and ata.
 
     int Status = FALSE;
 
-    debug_print ("init_executive:\n");
+    debug_print ("zeroInitializeSystemComponents:\n");
     Initialization.executive_checkpoint = FALSE;
     init_pci();
     init_rtc();

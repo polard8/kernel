@@ -624,9 +624,9 @@ fail:
 
 // called by I_init()
 // OUT: return TRUE if its ok.
-int init_gramado (void)
+int kgwmInitialize (void)
 {
-    debug_print ("init_gramado: [fixme]\n");
+    debug_print ("kgwmInitialize: [fixme]\n");
     return TRUE;
 }
 

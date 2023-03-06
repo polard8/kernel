@@ -4,16 +4,14 @@
 
 #include <kernel.h> 
 
-
 // Called by I_init().
-
-int init_microkernel (void)
+int psInitializeMKComponents (void)
 {
     int Status = FALSE;
 
     Initialization.microkernel_checkpoint = TRUE;
 
-    debug_print ("init_microkernel:\n");
+    debug_print ("psInitializeMKComponents:\n");
 
 
 // Init scheduler.

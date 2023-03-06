@@ -174,8 +174,8 @@ int control_action(int msg, unsigned long long1);
 
 static void __draw_button_mark_by_wid( int wid, int button_number );
 
-
-
+static int is_combination(int msg_code);
+static int on_combination(int msg_code);
 
 // ===================
 // pinta um retangulo no botao
@@ -3686,8 +3686,7 @@ int wmSTDINInputReader(void)
     return (int) nreads;
 }
 
-int on_combination(int msg_code);
-int on_combination(int msg_code)
+static int on_combination(int msg_code)
 {
     if (msg_code<0)
         return -1;
@@ -3744,7 +3743,7 @@ int on_combination(int msg_code)
         */ 
         return 0;
     }
-    
+
 
     if (msg_code == GWS_Find)
     {printf("ws: find\n"); return 0;}
@@ -3753,9 +3752,7 @@ int on_combination(int msg_code)
     {
         printf("Save\n");
         //on_menu();  //#test
-        
-        rtl_clone_and_execute("fileman.bin");
-        
+        //rtl_clone_and_execute("fileman.bin");
         return 0;
     }
 
@@ -3779,9 +3776,7 @@ int on_combination(int msg_code)
     return -1;
 }
 
-
-int is_combination(int msg_code);
-int is_combination(int msg_code)
+static int is_combination(int msg_code)
 {
     if (msg_code<0)
         return FALSE;

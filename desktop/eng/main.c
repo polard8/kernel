@@ -3356,6 +3356,8 @@ static int InitHot(void)
 
 static int on_execute(void)
 {
+    int ShowDemo=FALSE;
+
     int flagUseClient = FALSE;
     //int flagUseClient = TRUE;
     int UseCompositor = TRUE;  // #debug flags
@@ -3718,7 +3720,9 @@ static int on_execute(void)
     window_server->initialized = TRUE;
 
     // see: demo.c
-    demoFlyingCubeSetup();
+    if (ShowDemo){
+        demoFlyingCubeSetup();
+    }
 
     while (running == TRUE){
 
@@ -3727,7 +3731,9 @@ static int on_execute(void)
         }
 
         // see: demo.c
-        demoFlyingCube();
+        if (ShowDemo){
+            demoFlyingCube();
+        }
 
         wmInputReader();
 

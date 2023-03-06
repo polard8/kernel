@@ -68,7 +68,7 @@ void *ui_get_system_icon ( int n );
 
 int grInit (void);
 int KGWS_initialize(void);
-int init_gramado (void);
+int kgwmInitialize (void);
 
 #endif   
 

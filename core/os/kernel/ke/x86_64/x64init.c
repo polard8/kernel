@@ -1158,9 +1158,9 @@ static int I_init(void)
 // ==========================
 // hal
     PROGRESS("Kernel:2:8 hal\n"); 
-    Status = init_hal();
+    Status = halInitialize();
     if (Status != TRUE){
-        printf ("I_init: init_hal fail\n");
+        printf ("I_init: halInitialize fail\n");
         return FALSE;
     }
 
@@ -1168,28 +1168,28 @@ static int I_init(void)
 // microkernel components:
 // mm, ipc, ps ...
     PROGRESS("Kernel:2:9 microkernel\n"); 
-    Status = init_microkernel();
+    Status = psInitializeMKComponents();
     if (Status != TRUE){
-        printf ("I_init: init_microkernel fail\n");
+        printf ("I_init: psInitializeMKComponents fail\n");
         return FALSE;
     }
 
 // =========================================
 // Executive components
     PROGRESS("Kernel:2:10 executive\n"); 
-    Status = init_executive();
+    Status = zeroInitializeSystemComponents();
     if (Status != TRUE){
-        printf ("I_init: init_executive fail\n"); 
+        printf ("I_init: zeroInitializeSystemComponents fail\n"); 
         return FALSE;
     }
 
 // =========================================
 // Some gui components.
 // #todo: rever 
-    PROGRESS("Kernel:2:11 gramado, fat directories\n"); 
-    Status = init_gramado();
+    PROGRESS("Kernel:2:11 kgwm, fat directories\n"); 
+    Status = kgwmInitialize();
     if (Status != TRUE){
-        printf ("I_init: init_gramado fail\n"); 
+        printf ("I_init: kgwmInitialize fail\n"); 
         return FALSE;
     }
 

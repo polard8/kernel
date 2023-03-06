@@ -340,10 +340,8 @@ struct system_d  *System;
 // == Prototypes =====================
 //
 
-int init_executive(void);
-
+int zeroInitializeSystemComponents(void);
 unsigned long doGetSystemMetrics(int index);
-
 void doSetupVersion(void);
 
 #endif    

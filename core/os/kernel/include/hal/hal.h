@@ -135,7 +135,7 @@ void hal_test_speaker(void);
 int hal_hardware_detect (void);
 void init_cpu (void);
 
-int init_hal (void);
+int halInitialize(void);
 
 #endif    
 
