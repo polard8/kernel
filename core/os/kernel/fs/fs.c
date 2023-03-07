@@ -3854,6 +3854,11 @@ fsSaveFile (
     char *file_address,
     char flag )  
 {
+// #todo
+// For now we are using a local buffer to handle
+// the target directory entry.
+// Use the entry structure (fat16_directory_entry_d) found in fat.h.
+
     int Status = 0;
 
     unsigned long i = 0; 
@@ -3864,8 +3869,13 @@ fsSaveFile (
     unsigned short next=0;
     unsigned short sector=0;
 
+// #todo: Use the structure.
+// Entry structure.
+// see: fat.h
+    //struct fat16_directory_entry_d entry_fat16;
 // Directory entry buffer.
     char DirEntry[32];
+
 //Entry size in words.
     int EntrySize = 0;
     int Offset = 0;

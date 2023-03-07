@@ -243,7 +243,7 @@ static void __check_refresh_support(void)
     if ( refresh_screen_enabled != TRUE )
     {
         debug_print("kernel_main: refresh_screen_enabled != TRUE\n");
-        Initialization.console_log = FALSE;
+        Initialization.is_console_log_initialized = FALSE;
         while(1){asm("hlt");};
         //die(); //we dont have refresh screen support,
     }
@@ -415,27 +415,24 @@ static int __setup_cmdline(void)
 
 static void __enter_debug_mode(void)
 {
-    if( Initialization.serial_log == TRUE ){
+    if (Initialization.is_serial_log_initialized == TRUE){
         PROGRESS("__enter_debug_mode:\n");
     }
 
-    if( Initialization.console_log != TRUE )
+    if (Initialization.is_console_log_initialized != TRUE)
     {
-        if( Initialization.serial_log == TRUE ){
+        if (Initialization.is_serial_log_initialized == TRUE){
             PROGRESS("__enter_debug_mode: can't use the cirtual console\n");
         }
     }
 
-    if( Initialization.console_log == TRUE )
+    if (Initialization.is_console_log_initialized == TRUE)
     {
         printf("init.c: The kernel is in debug mode.\n");
-        refresh_screen();
-        
+        //refresh_screen();
         kgwm_early_kernel_console();
-        
         printf("init.c: End of debug mode.\n");
         refresh_screen();
-        
         die();
     }
 
@@ -572,11 +569,11 @@ static void preinit_OutputSupport(void)
 static void kernel_final_messages(void)
 {
 // Final messages
-    if ( Initialization.serial_log == TRUE ){
-        PROGRESS("kmain: [final message] FAILURE\n");
+    if ( Initialization.is_serial_log_initialized == TRUE ){
+        PROGRESS("init: [final message] FAILURE\n");
     }
-    if ( Initialization.console_log == TRUE ){
-        printf("kmain: [final message] FAILURE\n");
+    if ( Initialization.is_console_log_initialized == TRUE ){
+        printf("init: [final message] FAILURE\n");
         refresh_screen();
     }
 }
@@ -704,8 +701,12 @@ static int preinit(void)
     Initialization.gramado_checkpoint = FALSE;
 
 // Flags
-    Initialization.serial_log = FALSE;
-    Initialization.console_log = FALSE;
+// We still dont have any log/verbose support.
+    Initialization.is_serial_log_initialized = FALSE;
+    Initialization.is_console_log_initialized = FALSE;
+// The display dirver is not initialized yet,
+// but the kernel owns it.
+    Initialization.kernel_owns_display_device = TRUE;
 
 // Hack Hack
     VideoBlock.useGui = TRUE;
@@ -748,13 +749,13 @@ static void kernel_booting(int arch_type)
         // permitimos a inicialização de outro modo,
         // talvez algum modo de recuperação ou simplificado.
  
-        if( Initialization.serial_log == TRUE ){
-            PROGRESS("kmain: booting_end fail\n");
+        if (Initialization.is_serial_log_initialized == TRUE){
+            PROGRESS("init: booting_end fail\n");
         }
-        if( Initialization.console_log == TRUE )
+        if (Initialization.is_console_log_initialized == TRUE)
         {
-            printf("kmain: booting_end fail\n");
-            printf("kmain: Trying debug mode\n");
+            printf("init: booting_end fail\n");
+            printf("init: Trying debug mode\n");
             __enter_debug_mode();
         }
         die();
@@ -801,7 +802,7 @@ static int booting_begin(int arch_type)
 // Flush data into the lfb.
     __check_refresh_support();
 // Now we have console debug
-    Initialization.console_log = TRUE;
+    Initialization.is_console_log_initialized = TRUE;
 // Show banner!
     zero_show_banner();
 // Print resolution info

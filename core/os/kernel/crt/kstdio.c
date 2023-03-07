@@ -840,7 +840,7 @@ int kinguio_printf(const char *fmt, ...)
     int ret=0;
 
 // If the virtual console isn't full initialized yet.
-    if (Initialization.console_log != TRUE){
+    if (Initialization.is_console_log_initialized != TRUE){
         return -1;
     }
 

@@ -132,25 +132,55 @@ extern int fat_cache_loaded;
 // 1Ch      4 bytes   File size in bytes
 
 // SFN Entry
+// see:
+// http://elm-chan.org/docs/fat_e.html
 struct fat16_directory_entry_d 
 {
-    unsigned char   FileName[11];       //8.3   
 
-    unsigned char   Attributes;  
-    unsigned char   Reserved1; 
-    unsigned char   CreationMS;
+//Short file name (SFN). (8.3)
+    unsigned char FileName[11];
 
-    unsigned short  CreationTime; 
-    unsigned short  CreationDate; 
-    unsigned short  LastAccessDate;
-    unsigned short  Reserved2;          //for fat32 
-    unsigned short  LastWriteTime;  
-    unsigned short  LastWriteDate;  
-    unsigned short  StartingCluster; 
+/*
+    File attribute in combination of following flags. 
+    Upper 2 bits are reserved and must be zero.
+0x01: ATTR_READ_ONLY (Read-only)
+0x02: ATTR_HIDDEN (Hidden)
+0x04: ATTR_SYSTEM (System)
+0x08: ATTR_VOLUME_ID (Volume label)
+0x10: ATTR_DIRECTORY (Directory)
+0x20: ATTR_ARCHIVE (Archive)
+0x0F: ATTR_LONG_FILE_NAME (LFN entry)
+*/
+    unsigned char Attributes;
+/*
+Optional flags that indicates case information of the SFN.
+0x08: Every alphabet in the body is low-case.
+0x10: Every alphabet in the extensiton is low-case.
+*/
+    unsigned char Reserved1; 
 
-    unsigned int   FileSize; 
+// Creation time (3 byte)
+    unsigned char CreationMS;  //Optional sub-second information.
+    unsigned short CreationTime; 
+// Creation date. (2 byte)
+    unsigned short CreationDate; 
+// Optional last accesse date. (2 byte)
+    unsigned short LastAccessDate; 
+
+// (First Cluster High)
+// Upper part of cluster number. 
+// Always zero on the FAT12/16 volume.
+// For fat32 
+    unsigned short Reserved2;
+// Modification time.
+    unsigned short LastWriteTime;  
+// Modification date.
+    unsigned short LastWriteDate;  
+// (First Cluster Low)
+    unsigned short StartingCluster; 
+// File size. 
+    unsigned int FileSize; 
 };  
-
 
 
 // fat16 structure.

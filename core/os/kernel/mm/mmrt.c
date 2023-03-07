@@ -30,7 +30,7 @@ static int __init_runtime(int arch_type)
         Status = (int) mmInit();
         if (Status < 0)
         {
-            if (Initialization.serial_log == TRUE){
+            if (Initialization.is_serial_log_initialized == TRUE){
                 debug_print("__init_runtime: mmInit fail\n");
             }
             goto fail;
@@ -40,7 +40,7 @@ static int __init_runtime(int arch_type)
     // armmain(); ?
     // ...
     default:
-        if (Initialization.serial_log == TRUE){
+        if (Initialization.is_serial_log_initialized == TRUE){
             debug_print ("__init_runtime: current_arch\n");
         }
         goto fail;
@@ -69,7 +69,7 @@ int Runtime_initialize(int arch_type)
 
     Status = (int) __init_runtime(arch_type);
     if (Status!=TRUE){
-        if (Initialization.serial_log == TRUE){
+        if (Initialization.is_serial_log_initialized == TRUE){
             debug_print("Runtime_initialize: __init_runtime fail\n");
         }
         die();

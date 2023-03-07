@@ -424,10 +424,10 @@ static void __a_soft_place_to_fall(void)
 // The kernel hangs.
 void die(void)
 {
-    if (Initialization.serial_log == TRUE){
+    if (Initialization.is_serial_log_initialized == TRUE){
         PROGRESS("die:\n");
     }
-    if (Initialization.console_log == TRUE){
+    if (Initialization.is_console_log_initialized == TRUE){
         printf("die: System Halted\n");
         refresh_screen();
     }

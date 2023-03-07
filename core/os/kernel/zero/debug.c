@@ -1,6 +1,6 @@
 
 // debug.c
-// See: gramado/debug.h
+// See: debug.h
 
 #include <kernel.h>
 
@@ -146,7 +146,7 @@ void debug_print(char *data)
     }
 
 // Is it fully initialized?
-    if (Initialization.serial_log != TRUE){
+    if (Initialization.is_serial_log_initialized != TRUE){
         return;
     }
 
@@ -171,10 +171,9 @@ void PROGRESS(char *string)
 {
 // Verbose via serial.
 
-    if (Initialization.serial_log != TRUE){
+    if (Initialization.is_serial_log_initialized != TRUE){
         return;
     }
-
 // Parameter validation
     if ( (void*) string == NULL ){
         return;

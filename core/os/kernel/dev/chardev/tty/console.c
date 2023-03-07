@@ -3021,12 +3021,11 @@ console_banner(
     unsigned long banner_flags )
 {
 // Serial debug
-    if (Initialization.serial_log == TRUE)
-    {
+    if (Initialization.is_serial_log_initialized == TRUE){
         debug_print ("Gramado OS\n");
     }
 // Virtual console
-    if (Initialization.console_log == TRUE)
+    if (Initialization.is_console_log_initialized == TRUE)
     {
         if (fg_console < 0 || fg_console > 3)
             return;

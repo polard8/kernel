@@ -9,7 +9,7 @@
 
 // Current build number.
 // Updated by the builder.
-#define CURRENT_BUILD_NUMBER    313
+#define CURRENT_BUILD_NUMBER    314
 
 // Version
 #define VERSION_MAJOR    1
@@ -19,7 +19,7 @@
 #define VERSION_WORD    0x0106
 // Strings
 #define VERSION_STRING    "1.6"
-#define BUILD_STRING      "313"
+#define BUILD_STRING      "314"
 #define RELEASE_STRING    PRODUCT_TYPE_STRING
 
 #endif
