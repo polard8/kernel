@@ -19,4 +19,13 @@ Running:
 --------------------------------------
 Configuration file:
     new/include/config/superv/config.h
+
+--------------------------------------
+The boot loader starts at:
+    core/os/boot/vd/fat/main.asm
+--------------------------------------
+The kernel starts at:
+    core/os/kernel/ke/x86_64/startup/
     
+
+
