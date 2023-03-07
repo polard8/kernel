@@ -1,8 +1,7 @@
 /*
  * File: apic.c
- *    Controlador APIC.
- *    Arquivo principal do módulo interno do kernel.
  *    APIC - Advanced Programmable Interrupt Controller.
+ *    Controlador APIC.
  *   Stuff:
  *       +Discrete APIC.
  *       +Integrated local APICs.
@@ -217,12 +216,21 @@ void lapic_initializing(unsigned long lapic_pa)
 
     LAPIC.initialized = FALSE;
 
+// Invalid address.
 // 0xFEE00000
 // see: x64gpa.h
-
-    if (lapic_pa != __LAPIC_PA){
-        panic("lapic_initializing: lapic_pa\n");
+    if (lapic_pa != __LAPIC_PA)
+    {
+        LAPIC.initialized = FALSE;
+        //panic("lapic_initializing: lapic_pa\n");
+        printf("lapic_initializing: lapic_pa\n");
+        return;
     }
+
+// #todo
+// Do we have apic support in this processor?
+// has_apic()
+
 
 // ===================
 

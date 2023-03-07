@@ -717,6 +717,7 @@ void x64_init_fpu (void)
 // before using any floating point operations.
 // see:
 // https://wiki.osdev.org/FPU
+// Called by I_init() in x64init.c
 int x64_init_fpu_support(void)
 {
 // + Enable SSE support.
@@ -727,25 +728,21 @@ int x64_init_fpu_support(void)
         printf("x64_init_fpu_support: processor\n");
         return -1;
     }
-
 // has SSE
     if (processor->hasSSE != TRUE){
         printf("x64_init_fpu_support: hasSSE\n");
         return -1;
     }
-
 // has SSE2
     if (processor->hasSSE2 != TRUE){
         printf("x64_init_fpu_support: hasSSE2\n");
         return -1;
     }
-
 // has SSE3
     if (processor->hasSSE3 != TRUE){
         printf("x64_init_fpu_support: hasSSE3\n");
         return -1;
     }
-
 // has x87fpu
 // Check the FPU bit in CPUID.
     if (processor->hasX87FPU != TRUE){
@@ -754,27 +751,30 @@ int x64_init_fpu_support(void)
     }
 
 // Enable SSE.
-// Clear TS bit in cr0.
+// + Clear 'TS' bit in cr0.
+// TS - Task switched.
+// Allows saving x87 task context upon a task switch 
+// only after x87 instruction used.
 // see: arch/x86_64/entrance/hw/hw1.asm
     EnableSSE();
 
-// ??
 // Enable
-// Set OSFXSR and OSXMMEXCPT in cr4.
-// Clear EM and Set MP in cr0.
+// + Set OSFXSR and OSXMMEXCPT in cr4.
+// + Clear EM and Set MP in cr0.
 
     asm volatile (
         " movq %%cr4, %%rax;  "
-        " orl $0x600, %%eax;  "    /*Set OSFXSR and OSXMMEXCPT*/
+        " orl $0x600, %%eax;  "  // Set OSFXSR and OSXMMEXCPT.
         " movq %%rax, %%cr4;  "
-        
+
         " movq %%cr0, %%rax;  "
-        " andw $0xFFFB, %%ax; "    /*Clear EM*/
-        " orw $0x2, %%ax;     "    /*Set MP*/
-        " movq %%rax, %%cr0;  " :: );
+        " andw $0xFFFB, %%ax; "  // Clear EM
+        " orw $0x2, %%ax;     "  // Set MP
+        " movq %%rax, %%cr0;  " 
+        :: );
 
 // Initialize fpu support.
-// simply call 'fninit' instruction.
+// Simply call 'fninit' instruction.
     x64_init_fpu();
  
     return 0;
@@ -888,7 +888,7 @@ void x64_load_pml4_table(unsigned long phy_addr)
     asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
 
-
+// x64_probe_smp>
 // MP Floating Point Structure:
 // To use these tables, the MP Floating Point Structure 
 // must first be found. As the name suggests, 
@@ -907,10 +907,14 @@ void x64_load_pml4_table(unsigned long phy_addr)
 // OUT:
 // TRUE = OK.
 // FALSE = FAIL.
-int smp_probe(void)
-{
 // Probe the MP Floating Point structure.
 // Called by I_init() in x64init.c.
+// It works on qemu and qemu/kvm.
+// It doesn't work on Virtualbox. (Table not found).
+int x64_probe_smp(void)
+{
+// + Find the processor entries using the MP Floating point table.
+// + Initialize local apic.
 
 // 0x040E - The base address.
 // Get a short value.
@@ -924,7 +928,7 @@ int smp_probe(void)
     unsigned char c3=0;
     unsigned char c4=0;
 
-    printf("smp_probe:\n");
+    printf("x64_probe_smp:\n");
 
 // #todo
 // We can use a structure and put all these variable together,
@@ -934,11 +938,11 @@ int smp_probe(void)
 // At this point we gotta have a lot of information
 // in the structure 'processor'.
     if ( (void*) processor == NULL ){
-        panic("smp_probe: processor\n");
+        panic("x64_probe_smp: processor\n");
     }
 // Is APIC supported?
     if (processor->hasAPIC != TRUE){
-        panic("smp_probe: No APIC\n");
+        panic("x64_probe_smp: No APIC\n");
     }
 
 //
@@ -989,7 +993,7 @@ int smp_probe(void)
 // #todo: Try APIC instead.
     if (mp_found != TRUE)
     {
-        printf("smp_probe: MP table wasn't found!\n");
+        printf("x64_probe_smp: MP table wasn't found!\n");
         printf ("Try APIC table instead\n");
         goto fail;
     }
@@ -1094,7 +1098,7 @@ int smp_probe(void)
         (struct mp_configuration_table_d *) configurationtable_address;
 
     if ((void*) MPConfigurationTable == NULL ){
-        printf("smp_probe: Invalid Configuration table address\n");
+        printf("x64_probe_smp: Invalid Configuration table address\n");
         goto fail;
     }
 // Saving
@@ -1142,26 +1146,6 @@ int smp_probe(void)
             MPConfigurationTable->lapic_address,
             LAPIC_BASE );
     }
-
-// --------------------------------
-// Initialize lapic.
-// See:
-// apic.c
-// Check the local apic table for the current processor.
-// That one we are using right now.
-// The BSP.
-    printf("smp_probe: Initialize lapic for BSP\n");
-    // Setup BSP's local APIC.
-    lapic_initializing( 
-        (unsigned long) MPConfigurationTable->lapic_address );
-
-    if (LAPIC.initialized != TRUE){
-        printf("smp_probe: lapic initialization fail\n");
-    }
-    //#debug
-    //refresh_screen();
-    //while(1){}
-
 
 //
 // Entries
@@ -1267,7 +1251,7 @@ Assignment |     4 |      8 | One entry per system interrupt source.
 
             // #todo
             // We neet a worker function for this job.
-            printf ("PROCESSOR found! in entry %d\n",i);
+            printf (">>>>> PROCESSOR found! in entry %d\n",i);
             // apic id.
             printf("local_apic_id %d\n", e->local_apic_id);
             // apic version
@@ -1281,7 +1265,7 @@ Assignment |     4 |      8 | One entry per system interrupt source.
             }
             // BSP processor.
             if( e->flags & (1<<1) ){
-                printf("smp_probe: The processor is a BSP\n");
+                printf("x64_probe_smp: The processor is a BSP\n");
             }
             printf ("stepping: %d\n", (e->signature & 0x00F));
             printf ("   model: %d\n",((e->signature & 0x0F0) >> 4) );
@@ -1302,7 +1286,7 @@ done:
         (unsigned int) NumberOfProcessors;
     smp_info.number_of_processors = (unsigned int) NumberOfProcessors;
     printf("Processor count: {%d}\n",g_processor_count);
-    printf("smp_probe: done\n");
+    printf("x64_probe_smp: done\n");
 
     smp_info.initialized = TRUE;
 
@@ -1314,18 +1298,33 @@ done:
     // g_smp_initialized = TRUE;
     return TRUE;
 fail:
-    //refresh_screen();
     g_smp_initialized = FALSE;
     smp_info.initialized = FALSE;
     return FALSE;
 }
 
-void smp_probe_via_acpi(void)
+int x64_probe_smp_via_acpi(void)
 {
 // After you've gathered the information, 
 // you'll need to disable the PIC and prepare for I/O APIC. 
 // You also need to setup BSP's local APIC. 
 // Then, startup the APs using SIPIs.
+
+// #todo
+// Probe the acpi table.
+// + 'RSDP signature'
+
+    lapic_initializing( 0xFEE00000 );
+
+    if (LAPIC.initialized == TRUE){
+        printf("x64_probe_smp_via_acpi: lapic initialization ok\n");
+        return TRUE;
+    }else if (LAPIC.initialized != TRUE){
+        printf("x64_probe_smp_via_acpi: lapic initialization fail\n");
+        return FALSE;
+    };
+
+    return FALSE;
 }
 
 /*

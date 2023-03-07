@@ -1248,34 +1248,62 @@ static int I_init(void)
     int smp_status = FALSE;  // fail
 
     switch (ProcessorType){
+
+    // INTEL:
+    // + Get processor information.
+    // + Initialize fpu/see support.
+    // + Initialize smp support via MP Floating point structure. (kinda).
     case Processor_INTEL:  
     case Processor_AMD:
+        // Get processor information.
         x64_init_intel();   
         //init_amd(); 
+        //Initialize fpu/see support.
         fpu_status = (int) x64_init_fpu_support();
         if (fpu_status<0){
             printf("I_init: [FAIL] FPU Initialization fail\n");
             return FALSE;
         }
 
-        // #debug
+        // Initialize smp support via MP Floating point structure. (kinda).
         // Testando a inicializaçao do lapic.
         // Tentando ler o id e a versao.
+        // It works on qemu and qemu/kvm.
+        // It doesn't work on Virtualbox. (Table not found).
         // See: x64.c
-        smp_status = (int) smp_probe();
-        if (smp_status!=TRUE){
-            printf("I_init: [FAIL] SMP probe fail\n");
-            //return FALSE;
-        
-            //#debug
-            //refresh_screen();
-            //while(1){}
+        smp_status = (int) x64_probe_smp();
+        if (smp_status == TRUE)
+        {
+            printf("I_init: [x64_probe_smp] ok\n");
+            // Initialize LAPIC based on the address we found before.
+            if ( (void*) MPConfigurationTable != NULL )
+            {
+                if ( MPConfigurationTable->lapic_address != 0 )
+                {
+                    lapic_initializing( MPConfigurationTable->lapic_address );
+                    if (LAPIC.initialized == TRUE){
+                        printf("??: lapic initialization ok\n");
+                    }else if (LAPIC.initialized != TRUE){
+                        printf("??: lapic initialization fail\n");
+                    };
+                }
+            }
+        }
+        if (smp_status != TRUE)
+        {
+            printf("I_init: [x64_probe_smp] fail\n");
+            // #test #todo
+            // Using the ACPI tables.
+            smp_status = (int) x64_probe_smp_via_acpi();
+            if (smp_status!=TRUE){
+                printf("I_init: [x64_probe_smp_via_acpi] fail\n");
+            }
         }
 
         //#breakpoint
         //printf("#breakpoint in I_init()\n");
         //refresh_screen();
-        //while(1){  asm ("cli");  }
+        //while(1){ }
 
         break;
     // ...
