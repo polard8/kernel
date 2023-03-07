@@ -582,8 +582,9 @@ static void kernel_final_messages(void)
 }
 
 // ------------------------------
-// kmain2:
-int kmain2(int arch_type)
+// init_system:
+// Called by kmain.c
+int init_system(int arch_type)
 {
 // Preinit
     preinit();

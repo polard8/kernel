@@ -143,10 +143,11 @@ k1:
 # top
 # Head
 # head_64.o
-	$(NASM) boot/head/x86_64/head_64.asm \
+	$(NASM) ke/x86_64/startup/head_64.asm \
 	$(KERNEL_INCLUDE) \
-	-I boot/head/x86_64/ \
+	-I ke/x86_64/startup/ \
 	-f elf64 -o head_64.o
+
 
 # top
 # Ring0 libc.
@@ -205,7 +206,7 @@ k3:
 
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
-	$(LD) $(LDFLAGS) -T boot/head/x86_64/link.ld -o KERNEL.BIN $(objects-y)    
+	$(LD) $(LDFLAGS) -T ke/x86_64/startup/link.ld -o KERNEL.BIN $(objects-y)    
 clean:
 	rm -rf *.o   
 	@echo "~clean"

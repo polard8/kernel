@@ -1544,3 +1544,28 @@ fail0:
     return FALSE;
 }
 
+
+// Called by START in head_64.asm.
+void x64InitializeKernel(int arch_type)
+{
+    asm ("cli");
+
+    //#hack
+    // current_arch = CURRENT_ARCH_X86_64;
+
+// see:
+// kernel/kmain.c
+
+    kmain(arch_type);
+
+// Not reached.
+    while (1){
+        asm ("cli");
+        asm ("hlt");
+    }
+}
+
+
+
+
+

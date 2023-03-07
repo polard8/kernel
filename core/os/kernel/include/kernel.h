@@ -643,11 +643,13 @@ struct kernel_classes_d  KernelClasses;
 // == prototypes ==========================================
 //
 
+void x64InitializeKernel(int arch_type);
+
 // see: kmain.c
 int kmain(int arch_type);
 // Inicialização do kernel, independente da arquitetura.
 // See: init.c
-int kmain2(int arch_type);
+int init_system(int arch_type);
 
 void gramado_shutdown (int how);
 

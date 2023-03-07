@@ -10,8 +10,8 @@ MAKE	= make
 NASM	= nasm
 OBJCOPY	= objcopy
 OBJDUMP	= objdump
-LEX	= flex
-YACC	= bison
+#LEX	= flex
+#YACC	= bison
 PERL	= perl
 PYTHON	= python
 PYTHON2	= python2
@@ -87,9 +87,12 @@ sched.o schedi.o
 
 all:
 
-	$(CC) -c x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+# x64init/
 
-# hal
+	$(CC) -c x86_64/x64init/x64init.c  \
+$(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+
+# hal/
 
 	$(CC) -c hal.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hal.o
 	$(CC) -c x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o

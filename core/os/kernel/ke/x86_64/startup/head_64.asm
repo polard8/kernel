@@ -12,7 +12,7 @@ __HEAD
 ; See: init.c
 extern _saved_bootblock_base
 extern _magic
-extern _kmain
+extern _x64InitializeKernel
 
 ; See:
 ; kernel.h
@@ -129,12 +129,14 @@ START:
 
     lgdt [EARLY_GDT64.Pointer]
 
+; Segment registers:
+; See: boot loader for CS initialization.
     mov ax, EARLY_GDT64.Data
     mov ds, ax
     mov es, ax
-    ;mov fs, ax
-    ;mov gs, ax
-
+    ; Do we need FS and GS in x86_64?
+    mov fs, ax
+    mov gs, ax
 ; Early kernel stack. 
 ; 64 KB.
     mov ss, ax
@@ -146,6 +148,7 @@ START:
     lldt ax
 
 ; Clear registers
+; RBP, RSI, RDI.
     xor rax, rax
     mov rbp, rax
     mov rsi, rax
@@ -308,15 +311,15 @@ START:
 ; Use the calling convention for this compiler.
 ; rdi
 ; No return
-; See: init.c
+; See: x64init.c
 ; #todo: arch type (2) ??
  
     xor rax, rax
     mov rdi, rax    ; First argument.
     ; ...
+    call _x64InitializeKernel
 
-    call _kmain
-
+; Not reached.
 dieLoop:
     cli
     hlt
@@ -2801,7 +2804,7 @@ _bss_start:
 ; 64 KB.
 global _EarlyKernelStackEnd
 _EarlyKernelStackEnd:
-    resb (1024*64)
+    resb (64*1024)
 global _EarlyKernelStack
 _EarlyKernelStack:
 
@@ -2810,7 +2813,7 @@ _EarlyKernelStack:
 ; 64 KB
 global _rsp0StackEnd
 _rsp0StackEnd:
-    resb (1024*64)
+    resb (64*1024)
 global _rsp0Stack
 _rsp0Stack:
 
