@@ -107,7 +107,7 @@ all-c:
 	$(CC)  -c  rtl/line.c  $(CFLAGS) $(CINCLUDES) -o line.o
 	$(CC)  -c  rtl/rect.c  $(CFLAGS) $(CINCLUDES) -o rect.o
 	$(CC)  -c  ui/window.c    $(CFLAGS) $(CINCLUDES) -o window.o
-	$(CC)  -c  rtl/painter.c   $(CFLAGS) $(CINCLUDES) -o painter.o
+	$(CC)  -c  ui/painter.c   $(CFLAGS) $(CINCLUDES) -o painter.o
 	$(CC)  -c  gws.c       $(CFLAGS) $(CINCLUDES) -o gws.o
 	$(CC)  -c comp/comp.c  $(CFLAGS) $(CINCLUDES) -o comp.o
 	$(CC)  -c  bmp.c       $(CFLAGS) $(CINCLUDES) -o bmp.o

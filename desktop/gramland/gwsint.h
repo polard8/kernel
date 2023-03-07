@@ -42,8 +42,7 @@ extern int current_mode;
 #include "ui/metrics.h"
 #include "ui/window.h"
 #include "ui/vdesktop.h"
-
-#include "rtl/painter.h"
+#include "ui/painter.h"
 #include "bmp.h"
 
 // h:0.0
