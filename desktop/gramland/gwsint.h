@@ -26,62 +26,56 @@ extern int current_mode;
 #include "config/config.h"
 #include "protocol.h"
 #include "globals.h"
-#include "colors.h"
-//#include "nc2.h"   //nelson cole 2 font. 8x8
+#include "ui/colors.h"
 
 // #imported
 // Display device library.
 #include <libdisp.h>
 
-#include "char.h"
-#include "dtext.h"
-#include "line.h"
+#include "rtl/char.h"
+#include "rtl/dtext.h"
+#include "rtl/line.h"
 
-#include "wt.h"
-#include "menu.h"
+#include "ui/wt.h"
+#include "ui/menu.h"
 #include "grinput.h"   //#test
-#include "metrics.h"
+#include "ui/metrics.h"
+#include "ui/window.h"
+#include "ui/vdesktop.h"
 
-#include "window.h"
-#include "vdesktop.h"
-
-#include "painter.h"
+#include "rtl/painter.h"
 #include "bmp.h"
 
 // h:0.0
 #include "os/screen.h"   // X-like
 #include "os/display.h"  // X-like
 #include "os/host.h"     // X-like h:0.0
-#include "gui.h"
-#include "comp.h"
+#include "ui/gui.h"
+
+// Compositor
+#include "comp/comp.h"
+
 #include "event.h"    // view inputs
 
-#include "grprim.h"
+#include "rtl/grprim.h"
 #include "sprite.h"
 #include "demos.h"
 
+#include "os/packet.h"
+#include "os/connect.h"
 
-#include "packet.h"
-
-
-// # model. business logic
-// #todo:
-// We can put this thing in the library. (libgws)
-// or (libcon)
-#include "connect.h"
-
-#include "font.h"
+#include "ui/font.h"
 
 // Client structure.
 // O proprio servidor poderia ser o cliente 0??
-#include "client.h"
+#include "os/client.h"
 
 // Device Context.
 // This is the structure that is gonna be used by the
 // drawing routines.
 // 'dc->something'
 // It needs to be the last one.
-#include "dc.h"
+#include "os/dc.h"
 
 
 #include "dispatch.h"

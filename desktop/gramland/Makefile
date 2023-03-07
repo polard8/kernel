@@ -100,35 +100,35 @@ main.o:
 all-c:
 
 #basics1
-	$(CC)  -c  char.c      $(CFLAGS) $(CINCLUDES) -o char.o
-	$(CC)  -c  dtext.c     $(CFLAGS) $(CINCLUDES) -o dtext.o
+	$(CC)  -c  rtl/char.c   $(CFLAGS) $(CINCLUDES) -o char.o
+	$(CC)  -c  rtl/dtext.c  $(CFLAGS) $(CINCLUDES) -o dtext.o
 	$(LD) -r -o archive_basics1.o char.o dtext.o 
 
-	$(CC)  -c  line.c      $(CFLAGS) $(CINCLUDES) -o line.o
-	$(CC)  -c  rect.c      $(CFLAGS) $(CINCLUDES) -o rect.o
-	$(CC)  -c  window.c    $(CFLAGS) $(CINCLUDES) -o window.o
-	$(CC)  -c  painter.c   $(CFLAGS) $(CINCLUDES) -o painter.o
+	$(CC)  -c  rtl/line.c  $(CFLAGS) $(CINCLUDES) -o line.o
+	$(CC)  -c  rtl/rect.c  $(CFLAGS) $(CINCLUDES) -o rect.o
+	$(CC)  -c  ui/window.c    $(CFLAGS) $(CINCLUDES) -o window.o
+	$(CC)  -c  rtl/painter.c   $(CFLAGS) $(CINCLUDES) -o painter.o
 	$(CC)  -c  gws.c       $(CFLAGS) $(CINCLUDES) -o gws.o
-	$(CC)  -c  comp.c      $(CFLAGS) $(CINCLUDES) -o comp.o
+	$(CC)  -c comp/comp.c  $(CFLAGS) $(CINCLUDES) -o comp.o
 	$(CC)  -c  bmp.c       $(CFLAGS) $(CINCLUDES) -o bmp.o
-	$(CC)  -c  connect.c   $(CFLAGS) $(CINCLUDES) -o connect.o
+	$(CC)  -c  os/connect.c   $(CFLAGS) $(CINCLUDES) -o connect.o
 	$(CC)  -c  button.c    $(CFLAGS) $(CINCLUDES) -o button.o
 	$(LD) -r -o archive_basics2.o \
 line.o rect.o window.o painter.o gws.o comp.o bmp.o connect.o button.o
 
 #fx
-	$(CC)  -c  grprim.c    $(CFLAGS) $(CINCLUDES) -o grprim.o
+	$(CC)  -c  rtl/grprim.c    $(CFLAGS) $(CINCLUDES) -o grprim.o
 	$(CC)  -c  sprite.c    $(CFLAGS) $(CINCLUDES) -o sprite.o
 	$(CC)  -c  demos.c     $(CFLAGS) $(CINCLUDES) -o demos.o
 	$(LD) -r -o archive_fx.o  grprim.o sprite.o demos.o 
 
 #extra
 	$(CC)  -c grinput.c  $(CFLAGS) $(CINCLUDES) -o grinput.o
-	$(CC)  -c  font.c    $(CFLAGS) $(CINCLUDES) -o font.o
+	$(CC)  -c ui/font.c    $(CFLAGS) $(CINCLUDES) -o font.o
 	$(LD) -r -o archive_extra.o grinput.o font.o 
 
-	$(CC)  -c  menu.c  $(CFLAGS) $(CINCLUDES) -o menu.o
-	$(CC)  -c  wm.c    $(CFLAGS) $(CINCLUDES) -o wm.o
+	$(CC)  -c ui/menu.c  $(CFLAGS) $(CINCLUDES) -o menu.o
+	$(CC)  -c ui/wm.c    $(CFLAGS) $(CINCLUDES) -o wm.o
 
 #
 # == imported objects =============================
