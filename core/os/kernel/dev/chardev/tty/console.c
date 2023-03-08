@@ -1955,6 +1955,13 @@ int consoleCompareStrings(void)
         goto exit_cmp;
     }
 
+// display:
+    if ( strncmp( prompt, "display", 7 ) == 0 )
+    {
+        bldisp_show_info();  //bl display device.
+        goto exit_cmp;
+    }
+
 // cls:
     if ( strncmp( prompt, "cls", 3 ) == 0 )
     {

@@ -406,7 +406,10 @@ int screenInit(void)
         (unsigned long) gSavedY );
 
     screen_bpp = gSavedBPP;
-    screen_pitch = ( gSavedBPP * gSavedX );
+// Pitch
+// Ex: ((32/8)*800)
+    screen_pitch = 
+        (unsigned long) ( (gSavedBPP/8) * gSavedX );
     //...
     return 0;
 }
@@ -436,17 +439,28 @@ int bldisp_initialize(void)
 // framebuffer address.
     bl_display_device->framebuffer_pa = (unsigned long) xBootBlock.lfb_pa;
     bl_display_device->framebuffer_va = (unsigned long) FRONTBUFFER_VA;
+
+
 // w, h, bpp.
-    bl_display_device->framebuffer_width  = (unsigned long) xBootBlock.deviceWidth;
-    bl_display_device->framebuffer_height = (unsigned long) xBootBlock.deviceHeight;
-    bl_display_device->framebuffer_bpp   = (unsigned long) xBootBlock.bpp;
+    bl_display_device->framebuffer_width  = 
+        (unsigned long) xBootBlock.deviceWidth;
+    bl_display_device->framebuffer_height = 
+        (unsigned long) xBootBlock.deviceHeight;
+    bl_display_device->framebuffer_bpp = 
+        (unsigned long) xBootBlock.bpp;
 // Pitch
+// Ex: ((32/8)*800)
     bl_display_device->framebuffer_pitch = 
-        (unsigned long) (xBootBlock.bpp * xBootBlock.deviceWidth);
+        (unsigned long) ( (xBootBlock.bpp/8) * xBootBlock.deviceWidth);
+
 // Screen size in bytes.
     bl_display_device->framebuffer_size_in_bytes =
-        (unsigned long) (bl_display_device->framebuffer_height * bl_display_device->framebuffer_pitch);
+        (unsigned long) ( bl_display_device->framebuffer_height * 
+                          bl_display_device->framebuffer_pitch );
 
+// Screen size in KB.
+    bl_display_device->framebuffer_size_in_kb =
+        (unsigned long) (bl_display_device->framebuffer_size_in_bytes / 1024);
 
 // #test
 // The main virtual screen for this device.
@@ -472,6 +486,26 @@ int bldisp_initialize(void)
     return 0;
 }
 
+void bldisp_show_info(void)
+{
+// #todo
+// We need a generic worker to display information
+// about a given display device.
+
+    if ( (void*) bl_display_device == NULL )
+        return;
+    if (bl_display_device->magic != 1234)
+        return;
+    if (bl_display_device->initialized != TRUE)
+        return;
+// Print
+    printf ("Width: %d | Height: %d | BPP: %d \n",
+        bl_display_device->framebuffer_width,
+        bl_display_device->framebuffer_height,
+        bl_display_device->framebuffer_bpp );
+    printf("Screen size: %d KB\n",
+        bl_display_device->framebuffer_size_in_kb );
+}
 
 static int __videoInit(void)
 {

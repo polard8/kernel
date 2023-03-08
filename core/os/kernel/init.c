@@ -175,7 +175,6 @@ static void __check_refresh_support(void)
 
     unsigned long bytes_per_pixel = 0;
     unsigned long pitch = 0;
-    unsigned long sz_in_kb = 0;
 
     refresh_screen_enabled = FALSE;
     screen_size_in_kb = 0;
@@ -187,7 +186,8 @@ static void __check_refresh_support(void)
          xBootBlock.bpp == 32 )
     {
         bytes_per_pixel = (xBootBlock.bpp / 8); 
-        pitch = (xBootBlock.deviceWidth * bytes_per_pixel);
+        pitch = 
+            (unsigned long) (xBootBlock.deviceWidth * bytes_per_pixel);
     }  
 
 // pitch fail,
@@ -199,32 +199,32 @@ static void __check_refresh_support(void)
         debug_print("Screen size fail. pitch\n");
     }
 
-// Quantos KB vamos precisar para uma tela nessa resoluçao?
-    sz_in_kb = 
-        (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
+// ---------------
 
 // Saving:
 // Screen size in kb.
 // Remember: For now we only have 2048KB mapped for LFB.
-    screen_size_in_kb = sz_in_kb;
+// Quantos KB vamos precisar para uma tela nessa resoluçao?
+    screen_size_in_kb = 
+        (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
 
     // #debug
-    //printf ("Screen size: %d KB\n", sz_in_kb);
+    //printf ("Screen size: %d KB\n", screen_size_in_kb);
  
 // Se a quantidade usada por uma tela nessa resoluçao
 // for maior que o que temos disponivel.
 // Entao nao podemos habilitar o refresh screen.
 
-    if ( sz_in_kb >= 2048 ){
+    if ( screen_size_in_kb >= 2048 ){
         refresh_screen_enabled = FALSE;
-        debug_print ("Screen size fail sz_in_k\n");
+        debug_print ("Screen size fail screen_size_in_kb\n");
     }
 
 // ok
 // Ok We can use the refresh routine.
 // Because we have memory enough for that.
 
-    if ( sz_in_kb < 2048 ){
+    if ( screen_size_in_kb < 2048 ){
         refresh_screen_enabled = TRUE;  
     }
     
@@ -249,7 +249,8 @@ static void __check_refresh_support(void)
     }
 */
 
-// #hackhack
+// #hack
+// #bugbug
 // Nesse caso a rotina de refreshscreen vai usar
 // um tamanho falso de tela, bem pequeno, que
 // cabe na memoria mapeada disponivel.
@@ -257,6 +258,12 @@ static void __check_refresh_support(void)
 // que tivermos problemas.
 // tudo isso se resolvera quando mapearmos memoria
 // o suficiente para resoluçoes grandes.
+
+    // #todo
+    // (Screen Extents)
+    // #todo: We can use the concept of screen extents
+    // in this case. It's similar to virtual screens. :)
+
     if ( refresh_screen_enabled != TRUE )
     {
         // enough for 320x200x32bpp

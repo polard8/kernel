@@ -573,11 +573,15 @@ __refresh_rectangle0 (
     lines     = (unsigned int) (height & 0xFFFF);
 
     switch (SavedBPP){
-
-    case 32:  bytes_count = 4;  break;
-    case 24:  bytes_count = 3;  break;
-    // ... #todo
-
+    // (32/8)
+    case 32:
+        bytes_count = 4;
+        break;
+    // (24/8)
+    case 24:
+        bytes_count = 3;
+        break;
+    // ...
     default:
         //panic ("refresh_rectangle: SavedBPP\n");
         return;

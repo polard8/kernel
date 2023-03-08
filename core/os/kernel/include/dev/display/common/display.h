@@ -69,10 +69,14 @@ struct display_device_d
     unsigned long framebuffer_width;
     unsigned long framebuffer_height;
     unsigned long framebuffer_bpp;
-    // How many bytes in a single row.
+
+// How many bytes in a single row.
     unsigned long framebuffer_pitch;
-    // Screen size in bytes.
+
+// Screen size in bytes.
     unsigned long framebuffer_size_in_bytes;
+// Screen size in KB.
+    unsigned long framebuffer_size_in_kb;
 
     //unsigned long screen_rows;
     //unsigned long buffer_rows;
@@ -94,13 +98,11 @@ struct display_device_d
 };
 
 
-
 /*
-  * Video mode:
+ * Video mode:
  *     Modo de vídeo usado.
  *     //@todo: se estamos encapsulando no módulo, retirar o G de global.
  */
-
 unsigned long g_video_mode;    
 
 
@@ -163,6 +165,8 @@ struct video_d  VideoBlock;
 //
 // == prototypes =================================
 //
+
+void bldisp_show_info(void);
 
 #endif    
 

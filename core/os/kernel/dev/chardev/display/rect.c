@@ -344,8 +344,14 @@ __refresh_rectangle0 (
 
 // How many bytes per pixel?
     switch (gSavedBPP){
-        case 32:  bytes_count = 4;  break;
-        case 24:  bytes_count = 3;  break;
+        case 32:
+            // (32/8)
+            bytes_count = 4;
+            break;
+        case 24:
+            // (24/8)
+            bytes_count = 3;
+            break;
         // ... #todo
         default:
             panic("refresh_rectangle: gSavedBPP\n");
