@@ -119,9 +119,11 @@ static unsigned int local_apic_get_version(void)
     return (unsigned int) (local_apic_read_command(LAPIC_APIC_VERSION) & 0xFF);
 }
 
-// EOI:
+
+// EOI Register:
+// Write to the register with offset 0xB0 using the value 0 
+// to signal an end of interrupt. 
 // A non-zero value may cause a general protection fault.
-// Not tested yet.
 static void local_apic_eoi(void)
 {
     local_apic_write_command( (unsigned short) LAPIC_EOI, (unsigned int) 0 );
@@ -278,16 +280,16 @@ void lapic_initializing(unsigned long lapic_pa)
 // ---------------
 // ID
     int localid = (int) local_apic_get_id();
-    printf("localid: %d\n",(localid & 0xFF));
     LAPIC.local_id = (int) (localid & 0xFF);
+    //printf("localid: %d\n",LAPIC.local_id);
 
 // ---------------
 // Version
 // 8bits
 // 10H~15H
     int localversion = (int) local_apic_get_version();
-    printf("localversion: %xH\n", (localversion & 0xFF));
     LAPIC.local_version = (int) (localversion & 0xFF);
+    //printf("localversion: %xH\n", LAPIC.local_version);
 
 //=====================================
 // Destination Format Register (DFR)
@@ -299,6 +301,11 @@ void lapic_initializing(unsigned long lapic_pa)
     //*(volatile unsigned int*)(LAPIC.lapic_va + ?) = 0x01000000; 
     //*(volatile unsigned int*)(LAPIC.lapic_va + 0x20) = 8;
 
+
+// Print:
+    printf("ID: %d | VERSION: %xH\n",
+        LAPIC.local_id,
+        LAPIC.local_version );
 
     LAPIC.initialized = TRUE;
 }
@@ -403,18 +410,73 @@ void enable_apic(void)
     if (LAPIC.initialized != TRUE)
         panic("enable_apic: LAPIC not initialized\n");
 
-//Hardware enable the Local APIC if it wasn't enabled.
+
+// Hardware enable the Local APIC if it wasn't enabled.
     cpu_set_apic_base ( cpu_get_apic_base() );
 
-// ??
-// These values?
-// Set the Spurious Interrupt Vector Register bit 8 
-// to start receiving interrupts.
-// To enable the APIC, set bit 8 (or 0x100) of this register.
-    // IN: address, value
+
+/*
+ // Clear task priority to enable all interrupts
+    local_apic_write_command(
+        (unsigned short) 0x0080, 
+        (unsigned int) 0 );
+*/
+/*
+// Logical Destination Mode
+    // Flat mode
+    local_apic_write_command(
+        (unsigned short) 0x00e0, 
+        (unsigned int) 0xffffffff);
+    // All cpus use logical id 1. ?
+    local_apic_write_command(
+        (unsigned short) 0x00d0, 
+        (unsigned int) 0x01000000);
+*/
+
+/*
+Spurious-Interrupt Vector Register:
+The Spurious-Interrupt Vector Register contains 
+ + the bit to enable and disable the local APIC. It also has 
+ + a field to specify the interrupt vector number to be delivered 
+   to the processor in the event of a spurious interrupt. 
+This register is 32 bits and has the following format:
+
+... | 9  | 8  |   7~4  | 3 | 2 | 1 | 0 
+... | FC | EN | VECTOR | 1 | 1 | 1 | 1
+
+EN bit (8):
+This allows software to enable or disable the APIC module at any time. 
+Writing a value of 1 to this bit enables the APIC module, and 
+writing a value of 0 disables it.
+
+VECTOR(7~4):
+This field of the Spurious-Interrupt Vector Register 
+specifies which interrupt vector is delivered to the processor 
+in the event of a spurious interrupt. 
+The processor then transfers control to the 
+interrupt handler in the IDT, 
+at the vector number delivered to it by the APIC. 
+Basically, the VECTOR field specifies 
+which interrupt handler to transfer control 
+to in the event of a spurious interrupt.
+Bits 0-3 of this vector field are hard-wired to 1111b, or 15. 
+Bits 4-7 of this field are programmable by software.
+
+So:
+   0x1FF:
+   1 (1111) 1111.
+   We are setting the bits 4~7 of the vector.
+*/
+
     local_apic_write_command (
-        (unsigned short) 0xF0, 
-        (unsigned int) (local_apic_read_command(0xF0) | 0x100) );
+        (unsigned short) 0x00F0,  
+        (unsigned int) ( 0xFF | 0x100) );
+
+    // IN: address, value
+    //local_apic_write_command (
+    //    (unsigned short) 0x00F0,  
+    //    (unsigned int) (local_apic_read_command(0xF0) | 0x100) );
+
 }
 
 //
@@ -476,13 +538,16 @@ void APIC::wakeupSequence(U32 apicId, U8 pvect)
 void local_apic_send_init(unsigned int apic_id)
 {
 // Send one time.
+// Respect the order: 
+// First 0x310 then 0x300.
 
-// High
+// High (0x310)
     local_apic_write_command(
         LAPIC_ICR_HIGH, 
         (apic_id << 24) );
 
-// Low
+// Low (0x300)
+// (No vector? vector 0?)
     local_apic_write_command(
         LAPIC_ICR_LOW,
         ICR_INIT | 
@@ -500,16 +565,24 @@ void local_apic_send_init(unsigned int apic_id)
 
 
 
-void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
+void 
+local_apic_send_startup(
+    unsigned int apic_id, 
+    unsigned int vector )
 {
 // Send one time.
+// Respect the order: 
+// First 0x310 then 0x300.
 
-// High
+    //#todo
+    //vector = (vector & 0xFF);
+
+// High (0x310)
     local_apic_write_command(
         LAPIC_ICR_HIGH, 
         (apic_id << 24) );
 
-// Low
+// Low (0x300)
     local_apic_write_command(
         LAPIC_ICR_LOW,
         vector | 
@@ -520,7 +593,7 @@ void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
         ICR_NO_SHORTHAND );
 
 // Loop
-    while ( local_apic_read_command(LAPIC_ICR_LOW) & ICR_SEND_PENDING)
+    while ( local_apic_read_command(LAPIC_ICR_LOW) & ICR_SEND_PENDING )
     {
         asm volatile ("pause;");
     }
@@ -530,7 +603,7 @@ void local_apic_send_startup(unsigned int apic_id, unsigned int vector)
 void Send_INIT_IPI_Once(unsigned int apic_id)
 {
 // One single time.
-    local_apic_write_command(0x280, 0); // clear APIC errors
+    local_apic_write_command(0x280, 0);  // Clear APIC errors.
     local_apic_send_init(apic_id);
     mdelay(100); // wait 10 msec
 }
@@ -539,11 +612,13 @@ void Send_INIT_IPI_Once(unsigned int apic_id)
 void Send_STARTUP_IPI_Twice(unsigned int apic_id)
 {
 // Twice
-    int i=0;
+
+    unsigned int vector_number = 0x8;
+    long i=0;
     for (i=0; i<2; i++)
     {
-        local_apic_write_command(0x280, 0); // clear APIC errors
-        local_apic_send_startup(apic_id, 0x8);
+        local_apic_write_command(0x280, 0);  // Clear APIC errors.
+        local_apic_send_startup(apic_id, vector_number);
         mdelay(200); // wait 200 msec
     };
 }

@@ -1193,7 +1193,7 @@ entry info:
 Description | Type | Length | Comments
 Processor  |     0 |     20 | One entry per processor.
 Bus        |     1 |      8 | One entry per bus.
-I/O APIC   |     2 |      8 | One entry per I/O APIC.
+I/O APIC   |     2 |      8 | One entry per I/O APIC. :)
 I/O 
 Interrupt 
 Assignment |     3 |      8 | One entry per bus interrupt source.
@@ -1202,6 +1202,8 @@ Interrupt
 Assignment |     4 |      8 | One entry per system interrupt source.
 */
 
+// #remember:
+// One type of entry is IOAPIC.
 
 // Estrutura para entradas que descrevem um processador.
 // Processor = type 0.
