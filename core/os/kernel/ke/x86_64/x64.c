@@ -1,7 +1,7 @@
 
 // x64.c
 
-#include <kernel.h>    
+#include <kernel.h>
 
 // See: unit1hw.asm
 extern void DisableSSE(void);
@@ -888,7 +888,7 @@ void x64_load_pml4_table(unsigned long phy_addr)
     asm volatile ("movq %0, %%cr3"::"r"(phy_addr));
 }
 
-// x64_probe_smp>
+// x64_probe_smp:
 // MP Floating Point Structure:
 // To use these tables, the MP Floating Point Structure 
 // must first be found. As the name suggests, 

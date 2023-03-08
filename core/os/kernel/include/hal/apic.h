@@ -193,11 +193,14 @@ struct lapic_info_d  LAPIC;
 
 // =======================
 
-void lapic_initializing(unsigned long lapic_pa);
 // Check presence of apic.
 int has_apic (void);
 void cpu_set_apic_base(unsigned long apic);
 unsigned long cpu_get_apic_base(void); 
+void lapic_initializing(unsigned long lapic_pa);
+
+void apic_disable_legacy_pic(void);
+void enable_apic(void); 
 
 
 void local_apic_send_init(unsigned int apic_id);

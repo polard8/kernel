@@ -2,6 +2,11 @@
  * File: apic.c
  *    APIC - Advanced Programmable Interrupt Controller.
  *    Controlador APIC.
+ *    APIC ("Advanced Programmable Interrupt Controller") 
+ *    is the updated Intel standard for the older PIC.
+ *   The APIC is used for 
+ *   + sophisticated interrupt redirection, and for 
+ *   + sending interrupts between processors.
  *   Stuff:
  *       +Discrete APIC.
  *       +Integrated local APICs.
@@ -15,7 +20,7 @@
  *     2023 - Implementing/Porting more basic routines.
  */
 // See:
-// apic.c
+// https://wiki.osdev.org/APIC
 // https://wiki.osdev.org/Symmetric_Multiprocessing
 // https://www.cheesecake.org/sac/smp.html
 
@@ -44,7 +49,6 @@
 // the STARTUP IPI to wake up application processors in
 // systems with integrated APICs, 
 // but must use INIT IPI in systems with the 82489DX APIC.
-
 // When the system is operated in Symmetric I/O Mode, 
 // the operating system may enable the
 // LINTIN0 and LINTIN1 of any or all local APICs as necessary.
@@ -229,7 +233,8 @@ void lapic_initializing(unsigned long lapic_pa)
 
 // #todo
 // Do we have apic support in this processor?
-// has_apic()
+    //if (has_apic() != TRUE)
+        //panic("lapic_initializing: APIC not supported\n");
 
 
 // ===================
@@ -315,7 +320,6 @@ void lapic_initializing(unsigned long lapic_pa)
  *  and if the local APIC hasn't been disabled in MSRs
  *  note that this requires CPUID to be supported.
  */
-
 // #todo: Change function name.
 // See: cpuid.h
 
@@ -328,18 +332,15 @@ int has_apic (void)
 
 // #bugbug
 // Do we have cpuid support?
-
    cpuid( 1, eax, ebx, ecx, edx );
 
    return (int) (edx & CPUID_FEAT_EDX_APIC);
 }
 
 
-/* Set the physical address for local APIC registers */
-// ??
+// Set the physical address for local APIC registers.
 // Is it possible to change the base?
 // But we have a default adddress, it is 0xFEE00000.
-
 void cpu_set_apic_base(unsigned long apic) 
 {
    unsigned int edx=0;
@@ -350,12 +351,11 @@ void cpu_set_apic_base(unsigned long apic)
 //   edx = (apic >> 32) & 0x0f;
 //#endif
  
-   cpuSetMSR (
-       (unsigned int) IA32_APIC_BASE_MSR, 
-       (unsigned int) eax, 
-       (unsigned int) edx );
+    cpuSetMSR (
+        (unsigned int) IA32_APIC_BASE_MSR, 
+        (unsigned int) eax, 
+        (unsigned int) edx );
 }
-
  
 /*
  * Get the physical address of the APIC registers page
@@ -382,20 +382,40 @@ unsigned long cpu_get_apic_base (void)
     return (unsigned long) (eax & 0xfffff000);
 }
 
-
 // #todo: 
-/* 
-void enable_apic(void); 
-void enable_apic (void){
-    //Hardware enable the Local APIC if it wasn't enabled.
-    cpu_set_apic_base ( cpu_get_apic_base() );
- 
-    // ??
-    //Set the Spurious Interrupt Vector Register bit 8 to start receiving interrupts.
-    write_reg (0xF0, ReadRegister(0xF0) | 0x100);
-}
-*/
+// #danger !!!
+/* Section 11.4.1 of 3rd volume of Intel SDM recommends 
+  mapping the base address page as strong uncacheable 
+  for correct APIC operation. */
+void enable_apic(void)
+{
+// #todo
+// We need to setup a lot of registers 
+// before enabling the apic.
 
+    printf("enable_apic: \n");
+
+// #todo
+// Do we have apic support in this processor?
+    //if (has_apic() != TRUE)
+        //panic("enable_apic: APIC not supported\n");
+
+    if (LAPIC.initialized != TRUE)
+        panic("enable_apic: LAPIC not initialized\n");
+
+//Hardware enable the Local APIC if it wasn't enabled.
+    cpu_set_apic_base ( cpu_get_apic_base() );
+
+// ??
+// These values?
+// Set the Spurious Interrupt Vector Register bit 8 
+// to start receiving interrupts.
+// To enable the APIC, set bit 8 (or 0x100) of this register.
+    // IN: address, value
+    local_apic_write_command (
+        (unsigned short) 0xF0, 
+        (unsigned int) (local_apic_read_command(0xF0) | 0x100) );
+}
 
 //
 // IO APIC Configuration 
@@ -528,6 +548,30 @@ void Send_STARTUP_IPI_Twice(unsigned int apic_id)
     };
 }
 
+
+void apic_disable_legacy_pic(void)
+{
+// Legacy PIC mask all off.
+
+    printf("apic_disable_legacy_pic:\n");
+
+// Envia ICW1 reset
+    out8(0x20,0x11);	// reset PIC 1
+    out8(0xA0,0x11);	// reset PIC 2
+// Envia ICW2 start novo PIC 1 e 2
+    out8(0x21,0x20);	// PIC 1 localiza no IDT 39-32 
+    out8(0xA1,0x28);	// PIC 2 localiza no IDT 47-40
+// Envia ICW3
+    out8(0x21,0x04);	// IRQ2 conexao em cascata com o PIC 2
+    out8(0xA1,0x02);
+// Envia ICW4
+    out8(0x21,0x01);
+    out8(0xA1,0x01);
+// OCW1
+// Desabilita todas as interrupcoes
+    out8(0x21,0xFF);
+    out8(0xA1,0xFF);
+}
 
 //
 // End

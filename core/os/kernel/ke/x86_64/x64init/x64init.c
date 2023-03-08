@@ -1299,11 +1299,17 @@ static int I_init(void)
                 printf("I_init: [x64_probe_smp_via_acpi] fail\n");
             }
         }
+        
+        // #test
+        // #todo
+        // We need to setup a lot of registers 
+        // before enabling the apic.
+        //enable_apic();
 
         //#breakpoint
         //printf("#breakpoint in I_init()\n");
         //refresh_screen();
-        //while(1){ }
+        //while(1){}
 
         break;
     // ...
