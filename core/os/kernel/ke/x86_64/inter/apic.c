@@ -416,7 +416,8 @@ void enable_apic(void)
 
 
 /*
- // Clear task priority to enable all interrupts
+// Clear task priority to enable all interrupts.
+// Task Priority Register (TPR), to inhibit softint delivery?
     local_apic_write_command(
         (unsigned short) 0x0080, 
         (unsigned int) 0 );
@@ -427,6 +428,8 @@ void enable_apic(void)
     local_apic_write_command(
         (unsigned short) 0x00e0, 
         (unsigned int) 0xffffffff);
+*/
+/*
     // All cpus use logical id 1. ?
     local_apic_write_command(
         (unsigned short) 0x00d0, 
@@ -476,6 +479,29 @@ So:
     //local_apic_write_command (
     //    (unsigned short) 0x00F0,  
     //    (unsigned int) (local_apic_read_command(0xF0) | 0x100) );
+
+
+/*
+//---------------------
+#test
+#todo
+//Task Priority Register (TPR), to inhibit softint delivery
+    *(volatile unsigned int*)(lapicbase + APIC_TPR) = 0; //0x20;
+// Timer interrupt vector, to disable timer interrupts
+    //*(volatile unsigned int*)(lapicbase + APIC_LVT_TIMER) = APIC_CONFIG_DATA_LVT(0,1,0,0,0,null,0x20);
+// Performance counter interrupt, to disable performance counter interrupts
+    //*(volatile unsigned int*)(lapicbase + APIC_LVT_PERFORMANCE) = APIC_CONFIG_DATA_LVT(null,1,0,0,0,0,0x21);
+// Local interrupt 0, to enable normal external interrupts, Trigger Mode = Level
+    //*(volatile unsigned int*)(lapicbase + APIC_LVT_LINT0) = APIC_CONFIG_DATA_LVT(null,1,null,null,1,7,0x22);
+// Local interrupt 1, to enable normal NMI processing
+    //*(volatile unsigned int*)(lapicbase + APIC_LVT_LINT1) = APIC_CONFIG_DATA_LVT(null,1,null,null,0,4,0x23);
+// Error interrupt, to disable error interrupts
+    //*(volatile unsigned int*)(lapicbase + APIC_LVT_ERROR) = APIC_CONFIG_DATA_LVT(null,1,null,null,null,0,0x24);
+// Spurious interrupt Vector Register, to enable the APIC and set
+// spurious vector to 255
+    //*(volatile unsigned int*)(lapicbase + APIC_S_INT_VECTOR) = 0x1ff;
+//---------------------
+*/
 
 }
 

@@ -28,6 +28,7 @@
 #include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -451,7 +452,7 @@ static void __test_text(int fd, int wid)
         (unsigned long)  1, 
         (unsigned long)  1, 
         (unsigned long) COLOR_BLACK,
-        "Injected text");
+        "Injected text :)");
 
     //#debug
     //return;
@@ -501,13 +502,13 @@ static void __test_load_file(int socket, int wid)
 // #
 // This is a work in progress!
 
-    int fd=-1;
-    char *name = "TEST1.CPP";
+    int fd = -1;
+    char *name = "init.ini";
 
     file_status = FALSE;
 
     fd = open( (char*) name, 0, "a+" );
-    lseek(fd,0,SEEK_SET);
+    //lseek(fd,0,SEEK_SET);
     int nreads=0;
     nreads = read(fd,file_buffer,511);
     if (nreads>0)
@@ -522,24 +523,33 @@ static void __test_load_file(int socket, int wid)
 
     unsigned long x=0;
     unsigned long y=0;
-
-    int i=0;
+    register int i=0;
+    // Draw and refresh chars.
     for (i=0; i<nreads; i++)
     {
-        // Refresh?
-        gws_draw_char (
-            (int) socket,      // socket fd
-            (int) wid,         // wid
-            (unsigned long) x, // left
-            (unsigned long) y, // top
-            (unsigned long) COLOR_BLACK,
-            (unsigned long) '.' );  // char.
-       x++;
-       if (x>20)
-       {
+        if ( isalnum( file_buffer[i] ) )
+        {
+            gws_draw_char (
+                (int) socket,      // socket fd
+                (int) wid,         // wid
+                (unsigned long) x, // left
+                (unsigned long) y, // top
+                (unsigned long) COLOR_BLACK,
+                (unsigned long) file_buffer[i] );  // char.
+        }
+
+        x += 8;  // Next column.
+        if (x > (8*40))
+        {
            x=0;
-           y++;
-       }
+           y += 8;  // Next row.
+        }
+
+        if (file_buffer[i] == '\n')
+        {
+            x=0;
+            y += 8;
+        }
     };
 }
 
@@ -815,6 +825,9 @@ int main( int argc, char *argv[] )
 // Testing new requests.
 // Injecting a text into the editbox window.
     //__test_text(client_fd, client_window);
+    //gws_refresh_window (client_fd, client_window);
+
+    //__test_load_file(client_fd, client_window);
     //gws_refresh_window (client_fd, client_window);
 
 // ============================================
