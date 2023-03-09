@@ -12,7 +12,7 @@ __HEAD
 ; See: init.c
 extern _saved_bootblock_base
 extern _magic
-extern _x64InitializeKernel
+extern _I_x64InitializeKernel
 
 ; See:
 ; kernel.h
@@ -56,6 +56,7 @@ extern _xp_putchar_in_fgconsole  ;; 4 (1 arg)
 ; from head.s in BL.BIN.
 
 ; ----------------------------------------
+; ::(1)
 ; Kernel entry point
 ; IN:
 ; eax = 0
@@ -65,6 +66,7 @@ extern _xp_putchar_in_fgconsole  ;; 4 (1 arg)
 
 global _kernel_begin 
 _kernel_begin:
+; We don't have any print support yet.
 
     cli
     cld 
@@ -317,7 +319,7 @@ START:
     xor rax, rax
     mov rdi, rax    ; First argument.
     ; ...
-    call _x64InitializeKernel
+    call _I_x64InitializeKernel
 
 ; Not reached.
 dieLoop:

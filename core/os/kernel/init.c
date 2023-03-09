@@ -423,20 +423,19 @@ static int __setup_cmdline(void)
 static void __enter_debug_mode(void)
 {
     if (Initialization.is_serial_log_initialized == TRUE){
-        PROGRESS("__enter_debug_mode:\n");
+        debug_print("__enter_debug_mode:\n");
     }
 
     if (Initialization.is_console_log_initialized != TRUE)
     {
         if (Initialization.is_serial_log_initialized == TRUE){
-            PROGRESS("__enter_debug_mode: can't use the cirtual console\n");
+            debug_print("__enter_debug_mode: can't use the cirtual console\n");
         }
     }
 
     if (Initialization.is_console_log_initialized == TRUE)
     {
         printf("init.c: The kernel is in debug mode.\n");
-        //refresh_screen();
         kgwm_early_kernel_console();
         printf("init.c: End of debug mode.\n");
         refresh_screen();
@@ -446,6 +445,9 @@ static void __enter_debug_mode(void)
     die();
 }
 
+
+// ====================
+// ::(4)(2)(2)
 static int booting_end(int arch_type)
 {
 // + Pass the command to the first process or,
@@ -458,9 +460,8 @@ static int booting_end(int arch_type)
     //int UseDebugMode=TRUE;
     int UseDebugMode=FALSE;
 
-    PROGRESS("booting_end:\n");
-
 // Final message before jumping to init process.
+    PROGRESS("::(4)(2)(2) booting_end:\n");
     printf("booting_end:\n");
 
     //#debug
@@ -497,8 +498,11 @@ static int booting_end(int arch_type)
 }
 
 
+// ==========================
+// ::(4)(1)(2)
 static void preinit_Globals(int arch_type)
 {
+// We dont have any print support for now.
 
 // Scheduler policies
 // Early initialization.
@@ -543,41 +547,59 @@ static void preinit_Globals(int arch_type)
     //set_update_screen_frequency(120);
 }
 
+// =========================
+// ::(4)(1)(3)
 // see: serial.c
 static void preinit_Serial(void)
 {
+// We still don't have any print support yet.
+// But at the end of this routine we can use the serial debug.
+
     int Status=FALSE;
     Status = serial_init();
     if(Status!=TRUE){
         //#bugbug
         //Oh boy!, We can't use the serial debug.
     }
-    PROGRESS("preinit_Serial: Serial debug initialized\n");
+    PROGRESS("::(4)(1)(3):\n");
+    debug_print("preinit_Serial: Serial debug initialized\n");
 }
 
+
+// ======================
+// ::(4)(1)(4)
 static void preinit_OutputSupport(void)
 {
-    PROGRESS("preinit_OutputSupport:\n");
+// #important: 
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+// We only initialized some console structures,
+// not the full support for printf functions.
+
+    PROGRESS("::(4)(1)(4)\n");
+    debug_print("preinit_OutputSupport:\n");
 
 // O refresh ainda não funciona, 
 // precisamos calcular se a quantidade mapeada é suficiente.
     refresh_screen_enabled = FALSE;
 
-    PROGRESS("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
+    debug_print("preinit_OutputSupport: zero_initialize_virtual_consoles\n");
     zero_initialize_virtual_consoles();
 
-    PROGRESS("preinit_OutputSupport: preinit_OutputSupport\n");
+    debug_print("preinit_OutputSupport: preinit_OutputSupport\n");
 
-// #IMPORTAT: 
+// #important: 
 // We do not have all the runtime support yet.
 // We can't use printf yet.
 }
 
+// ===================
+// ::(4)(3)
 static void kernel_final_messages(void)
 {
 // Final messages
     if ( Initialization.is_serial_log_initialized == TRUE ){
-        PROGRESS("init: [final message] FAILURE\n");
+        PROGRESS("::(4)(3): [final message] FAILURE\n");
     }
     if ( Initialization.is_console_log_initialized == TRUE ){
         printf("init: [final message] FAILURE\n");
@@ -585,27 +607,52 @@ static void kernel_final_messages(void)
     }
 }
 
-// ------------------------------
-// init_system:
-// Called by kmain.c
-int init_system(int arch_type)
+// ===========================
+// ::(4)
+// I_init_main:
+// Called by I_kmain in kmain.c
+int I_init_main(int arch_type)
 {
+// We don't have any print support yet.
+
+// ::(4)(1)
 // Preinit
+// We initialized the serial debug support,
+// and console structures, but we still can't use 
+// the printf functions.
     preinit();
+
+// ::(4)(2)
 // Booting ...
+// There are two phases in this routine.
+// + booting begin: It's when we do a lot of kernel basics initialization.
+//   In the middle of this routine we initialize the runtime support
+//   and we are able to use 'printf' for the first time ever.
+// + booting end: It's when we're ending the kernel initialization.
+//   It's the time do execute the first ring 3 process,
+//   passing the command to the user mode. 
+//   There's no loop in ring 0, there is no switch ro ring3 in the middle
+//   of the kernel code, and absolutely there is no fucking fork() here
+//   on this holy ground.
     kernel_booting(arch_type);
+
+// ::(4)(3)
 // Fail
     kernel_final_messages();
     system_state = SYSTEM_DEAD;
-// Return to kmain().
+// Return to I_kmain().
     return FALSE;
 }
 
+
+// ==============================
+// ::(4)(1)(1)
 // limitation: No serial debug yet.
 // #todo: #bugbug
 // We have another BootBlock structure in info.h
 static int preinit_SetupBootblock(void)
 {
+// We don't have any print support for now.
 
 // Magic
 // #bugbug: Explain it better.
@@ -688,9 +735,14 @@ static int preinit_SetupBootblock(void)
     return 0;
 }
 
-
+// ==========================
+// ::(4)(1)
 static int preinit(void)
 {
+// We don't have any print support for now.
+// But here is the moment when we initialize the
+// serial debug support.
+
     system_state = SYSTEM_PREINIT;
 
 // Starting the counter.
@@ -718,24 +770,40 @@ static int preinit(void)
 // Hack Hack
     VideoBlock.useGui = TRUE;
 
+// ::(4)(1)(1)
 // first of all
 // Getting critical boot information.
     preinit_SetupBootblock();
+// ::(4)(1)(2)
 // We do not have serial debug yet.
     preinit_Globals(0);  // IN: arch_type
+
+// ::(4)(1)(3)
 // Serial debug support.
+// After that routine we can use the serial debug functions.
     preinit_Serial();
+
+// ::(4)(1)(4)
 // Initialize the virtual console structures.
 // We do not have all the runtime support yet.
 // We can't use printf yet.
+// #important: 
+// We do not have all the runtime support yet.
+// We can't use printf yet.
+// We only initialized some console structures,
+// not the full support for printf functions.
     preinit_OutputSupport();
 
     return 0;
 }
 
+// ==========================
+// ::(4)(2)
 static void kernel_booting(int arch_type)
 {
     int Status=FALSE;
+
+    PROGRESS("::(4)(2)\n");
 
 // Begin
 // Kernel initialization.
@@ -751,13 +819,14 @@ static void kernel_booting(int arch_type)
 // + Pass the command to the embedded debug shell if possible.
     if (Status != TRUE)
     {
+        PROGRESS("::(4)(2)(3)\n");
         // panic screen
         // Mostramos informações completas ou
         // permitimos a inicialização de outro modo,
         // talvez algum modo de recuperação ou simplificado.
  
         if (Initialization.is_serial_log_initialized == TRUE){
-            PROGRESS("init: booting_end fail\n");
+            debug_print("init: booting_end fail\n");
         }
         if (Initialization.is_console_log_initialized == TRUE)
         {
@@ -767,8 +836,14 @@ static void kernel_booting(int arch_type)
         }
         die();
     }
+
+// Da fuck!
+    PROGRESS("::(4)(2)(?)\n");
 }
 
+
+// ====================
+// ::(4)(2)(1)
 // OUT: TRUE or FALSE.
 static int booting_begin(int arch_type)
 {
@@ -788,7 +863,7 @@ static int booting_begin(int arch_type)
 
     system_state = SYSTEM_BOOTING;
 
-    PROGRESS("booting_begin:\n");
+    PROGRESS("::(4)(2)(1) booting_begin:\n");
     printf("booting_begin:\n");
 
 // boot info
@@ -826,6 +901,8 @@ static int booting_begin(int arch_type)
         // Done!
         return TRUE;
     }
+
+//========================
 // Fail
     system_state = SYSTEM_ABORTED;
     x_panic("Error: 0x02");

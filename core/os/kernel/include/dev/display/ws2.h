@@ -436,6 +436,14 @@ refresh_rectangle (
 
 void scroll_screen_rect (void);
 
+
+// see: bitblt.c
+int 
+bitblt(
+    struct rect_d *src_rect,
+    struct rect_d *dst_rect,
+    unsigned long rop );
+
 //
 // == wm =====================
 //

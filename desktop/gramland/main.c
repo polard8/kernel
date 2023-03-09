@@ -2130,13 +2130,14 @@ int serviceCreateWindow (int client_fd)
     register int string_off = 14;
     char *p = (char *) &message_address[string_off];
     memset(r.data, 0, 256);
-    for (i=0; i<256; ++i)
-    {
+    for (i=0; i<256; ++i){
         r.data[i] = *p;  //Get a char from the message buffer. 
         p++;
     };
-    r.data[i] = 0;
-    r.data[i+1] = 0;
+    r.data[255] = 0;
+    // #bugbug: Out of range
+    //r.data[i] = 0;
+    //r.data[i+1] = 0;
 //--
 // ========================================
 

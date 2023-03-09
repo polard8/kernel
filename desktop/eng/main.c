@@ -2302,12 +2302,14 @@ serviceCreateWindow (int client_fd)
     int string_off = 14; 
     memset (r.data, 0, 256);
     char *p = (char *) &message_address[string_off];
-    for (i=0; i<256; ++i)
-    {
+    for (i=0; i<256; ++i){
         r.data[i] = *p;
         p++;
     };
-    r.data[i] = 0;
+    r.data[255] = 0;
+    // #bugbug: Out of range
+    //r.data[i] = 0;
+    //r.data[i+1] = 0;
 //--
 
 // ========================================

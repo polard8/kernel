@@ -78,7 +78,7 @@ OBJS = \
 ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
 disk_r.o disk_w.o storage.o \
 bldisp.o \
-xpixel.o line.o rect.o bg.o font.o char.o text.o graphics.o kgwm.o \
+xpixel.o line.o rect.o bitblt.o bg.o font.o char.o text.o graphics.o kgwm.o \
 console.o vt.o \
 i8042.o kbdmap.o ps2kbd.o ps2mouse.o keyboard.o mouse.o \
 serial.o \
@@ -108,6 +108,7 @@ all:
 	$(CC) -c chardev/display/xpixel.c   $(KERNEL_INCLUDE) $(CFLAGS) -o xpixel.o
 	$(CC) -c chardev/display/line.c     $(KERNEL_INCLUDE) $(CFLAGS) -o line.o
 	$(CC) -c chardev/display/rect.c     $(KERNEL_INCLUDE) $(CFLAGS) -o rect.o
+	$(CC) -c chardev/display/bitblt.c   $(KERNEL_INCLUDE) $(CFLAGS) -o bitblt.o
 	$(CC) -c chardev/display/font.c     $(KERNEL_INCLUDE) $(CFLAGS) -o font.o
 	$(CC) -c chardev/display/char.c     $(KERNEL_INCLUDE) $(CFLAGS) -o char.o
 	$(CC) -c chardev/display/text.c     $(KERNEL_INCLUDE) $(CFLAGS) -o text.o
