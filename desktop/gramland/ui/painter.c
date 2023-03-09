@@ -390,6 +390,90 @@ __draw_window_border(
 }
 
 
+int redraw_titlebar_window(struct gws_window_d *window)
+{
+    struct gws_window_d *parent;
+    struct gws_window_d *tb_window;
+    unsigned long rop=0;
+
+
+// Title bar window.
+    tb_window = (struct gws_window_d *) window;
+    if ( (void*) tb_window == NULL )
+        return -1;
+    if (tb_window->magic != 1234)
+        return -1;
+
+// Parent stuff
+    parent = (struct gws_window_d *) tb_window->parent;
+    if ( (void*) parent == NULL )
+        return -1;
+    if (parent->magic != 1234)
+        return -1;
+
+    rop = (unsigned long) parent->rop;
+
+// ------------------
+// Parent is active.
+    if (parent == active_window)
+    {
+        tb_window->bg_color = 
+            (unsigned int) get_color(csiActiveWindowTitleBar);
+
+        parent->titlebar_color = 
+            (unsigned int) get_color(csiActiveWindowTitleBar);
+        parent->titlebar_ornament_color = xCOLOR_BLACK;
+    }
+
+// ------------------
+// Parent is NOT active.
+    if (parent != active_window)
+    {
+        tb_window->bg_color = 
+            (unsigned int) get_color(csiInactiveWindowTitleBar);
+
+        parent->titlebar_color = 
+            (unsigned int) get_color(csiInactiveWindowTitleBar);
+        parent->titlebar_ornament_color = xCOLOR_GRAY2;
+    }
+
+//--------
+
+//
+// Paint
+//
+
+// bg
+    rectBackbufferDrawRectangle ( 
+        tb_window->absolute_x, 
+        tb_window->absolute_y, 
+        tb_window->width, 
+        tb_window->height, 
+        tb_window->bg_color, 
+        TRUE,   // fill
+        (unsigned long) rop );  // rop for this window
+
+// Ornament
+    rectBackbufferDrawRectangle ( 
+        tb_window->absolute_x, 
+        ( (tb_window->absolute_y) + (tb_window->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
+        tb_window->width, 
+        METRICS_TITLEBAR_ORNAMENT_SIZE, 
+        parent->titlebar_ornament_color, 
+        TRUE,  // fill
+        (unsigned long) rop );  // rop_flags
+
+// redraw controls.
+// recursive
+// #bugbug
+// Recursive is dangerous and
+// it is painting in the wrong place.
+    //redraw_window(tb_window->Controls.minimize,FALSE);
+    //redraw_window(tb_window->Controls.maximize,FALSE);
+    //redraw_window(tb_window->Controls.close,FALSE);
+
+    return 0;
+}
 
 // redraw_window:
 // Let's redraw the window.
@@ -629,62 +713,11 @@ redraw_window (
         // #todo: Not if the window is in fullscreen mode.
         if (window->type == WT_OVERLAPPED)
         {
-            // Valid titlebar.
+            // Redraw the title bar.
             if ( (void*) window->titlebar != NULL )
             {
-                if (window->titlebar->magic == 1234 )
-                {
-                    // Se a janela overlapped é uma janela ativa.
-                    // #bugbug Isso funciona para a janela mãe apenas.
-                    //if (window->active == TRUE)
-                    if (window == active_window)
-                    {
-                        window->titlebar->bg_color = 
-                            (unsigned int) get_color(csiTaskBar);
-                        window->titlebar_color = 
-                            (unsigned int) get_color(csiTaskBar);
-                        window->titlebar_ornament_color = xCOLOR_BLACK;
-                    }
-                    // Se a janela overlapped não é uma janela ativa.
-                    // #bugbug Isso funciona para a janela mãe apenas.
-                    //if (window->active == FALSE)
-                    if (window != active_window)
-                    {
-                        window->titlebar->bg_color = 
-                            (unsigned int) get_color(csiTaskBar);
-                        window->titlebar_color = 
-                            (unsigned int) get_color(csiTaskBar);
-                        window->titlebar_ornament_color = xCOLOR_GRAY2;
-                    }
-
-                    //bg
-                    rectBackbufferDrawRectangle ( 
-                        window->titlebar->absolute_x, 
-                        window->titlebar->absolute_y, 
-                        window->titlebar->width, 
-                        window->titlebar->height, 
-                        window->titlebar->bg_color, 
-                        TRUE,   // fill
-                        (unsigned long) window->rop );  // rop for this window
-
-                    // ornament
-                    rectBackbufferDrawRectangle ( 
-                        window->titlebar->absolute_x, 
-                        ( (window->titlebar->absolute_y) + (window->titlebar->height) - METRICS_TITLEBAR_ORNAMENT_SIZE ),  
-                        window->titlebar->width, 
-                        METRICS_TITLEBAR_ORNAMENT_SIZE, 
-                        window->titlebar_ornament_color, 
-                        TRUE,  // fill
-                        (unsigned long) window->rop );  // rop_flags
-
-                    // redraw controls.
-                    // recursive
-                    // #bugbug
-                    // Recursive is dangerous and
-                    // it is painting in the wrong place.
-                    //redraw_window(window->titlebar->Controls.minimize,FALSE);
-                    //redraw_window(window->titlebar->Controls.maximize,FALSE);
-                    //redraw_window(window->titlebar->Controls.close,FALSE);
+                if (window->titlebar->magic == 1234){
+                    redraw_titlebar_window( window->titlebar );                
                 }
             }
         }
