@@ -1195,6 +1195,10 @@ static void initBackground(void)
 // Se estivermos em JAIL, podemos arriscar algum background melhor.
 // Talvez alguma imagem.
 
+    // COLOR_BACKGROUND = that green.
+    unsigned int bg_color = 
+        (unsigned int) get_color(csiDesktop);
+
     __root_window = 
         (struct gws_window_d *) CreateWindow ( 
             WT_SIMPLE, 
@@ -1204,7 +1208,7 @@ static void initBackground(void)
             "RootWindow",  
             0, 0, w, h,   
             gui->screen_window, 0, 
-            COLOR_BACKGROUND, COLOR_BACKGROUND );
+            bg_color, bg_color );
 
     // #debug
     // asm ("int $3");

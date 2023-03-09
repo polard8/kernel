@@ -5,7 +5,8 @@
 // Signature. "MB".
 #define BMP_TYPE  0x4D42
 
-#define BMP_DEFAULT_ZOOM_FACTOR  8
+//#define BMP_DEFAULT_ZOOM_FACTOR  8
+#define BMP_DEFAULT_ZOOM_FACTOR  1
 
 // Flag
 #define BMP_CHANGE_COLOR_NULL  0
@@ -68,22 +69,48 @@ char *gwssrv_bmp_mouse_pointer;
 // ...
 
 /*
- * bmpDisplayBMP:
+ * bmpDisplayBMP0:
  * Mostra na tela uma imagem bmp carregada na memória. no backbuffer()
  * IN:
  *     address = endereço base
  *     x       = posicionamento 
  *     y       = posicionamento
+ *     zoom factor
+ *     show or not?
  */
  
+int 
+bmpDisplayBMP0 ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y,
+    int zoom_factor,
+    int show );
+
 int 
 bmpDisplayBMP ( 
     char *address, 
     unsigned long x, 
-    unsigned long y );
+    unsigned long y,
+    int show );
+
 
 //void __test_load_bmp2(void);
-int gwssrv_display_system_icon ( int index, unsigned long x, unsigned long y );
+
+int 
+bmp_decode_system_icon0 ( 
+    int index, 
+    unsigned long x, 
+    unsigned long y,
+    int show,
+    int zoom_factor );
+
+int 
+bmp_decode_system_icon ( 
+    int index, 
+    unsigned long x, 
+    unsigned long y,
+    int show );
 
 //
 // End.

@@ -463,22 +463,26 @@ fail:
 
 
 /*
- * bmpDisplayBMP:
+ * bmpDisplayBMP0:
  *     Mostra na tela uma imagem BMP que j� est� 
  * carregada na mem�ria. (pinta no backbuffer)
  * IN:
  *     address = endere�o base onde o bmp j� est� carregado.
  *     x       = posicionamento 
  *     y       = posicionamento
+ *     factor =
+ *     show or not?
  *     @todo: Criar defines para esses deslocamentos.
  */
 // Paint into the backbuffer, but refresh after that.
 // OUT: 0=ok | -1=fail.
 int 
-bmpDisplayBMP ( 
+bmpDisplayBMP0 ( 
     char *address, 
     unsigned long x, 
-    unsigned long y )
+    unsigned long y,
+    int zoom_factor,
+    int show )
 {
 // Endereço base do BMP que foi carregado na memoria
     unsigned char *bmp = (unsigned char *) address;
@@ -499,13 +503,21 @@ bmpDisplayBMP (
     unsigned int top=0; 
     unsigned int bottom=0;
 
+    struct gws_rect_d finalRect;
+
 // Zoom support.
 // It is working.
 // But we need to work in the 'position' thing
 // and accept some function parameters for that effect.
 
-    int useZoom=FALSE;
-    int ZoomFactor = BMP_DEFAULT_ZOOM_FACTOR;
+    //int useZoom=FALSE;
+    int useZoom=TRUE;
+    //int ZoomFactor = BMP_DEFAULT_ZOOM_FACTOR;
+    int ZoomFactor = zoom_factor;
+    //#hack #provisorio
+    if (zoom_factor == 1)
+        useZoom = FALSE;
+
     int iwZoom=0;
     int ihZoom=0;
 
@@ -542,16 +554,16 @@ bmpDisplayBMP (
 
 // Limits
     if ( x > xLimit || y > yLimit ){
-        gwssrv_debug_print ("bmpDisplayBMP: Limits\n");
-        printf ("bmpDisplayBMP: Limits\n");
+        gwssrv_debug_print ("bmpDisplayBMP0: Limits\n");
+        printf ("bmpDisplayBMP0: Limits\n");
         goto fail;
     }
 
 // #todo:
 // Testar validade do endereço.
     if (address == 0){
-        gwssrv_debug_print ("bmpDisplayBMP: address\n");
-        printf ("bmpDisplayBMP: address\n");
+        gwssrv_debug_print ("bmpDisplayBMP0: address\n");
+        printf ("bmpDisplayBMP0: address\n");
         goto fail;
     }
 
@@ -584,8 +596,8 @@ bmpDisplayBMP (
     //printf ("sig={%x}\n",sig);
 
     if ( bmp[0] != 'B' || bmp[1] != 'M' ){
-        gwssrv_debug_print ("bmpDisplayBMP: [FAIL] signature \n");
-        printf  ("bmpDisplayBMP: [FAIL] signature %c %c\n", 
+        gwssrv_debug_print ("bmpDisplayBMP0: [FAIL] signature \n");
+        printf  ("bmpDisplayBMP0: [FAIL] signature %c %c\n", 
             bmp[0], bmp[1]);
         goto fail;
     }
@@ -676,7 +688,17 @@ bmpDisplayBMP (
 
     left = (x & 0xFFFF);
     top  = (y & 0xFFFF);
-    bottom = ( top + __Local_bi.bmpHeight );
+// Bottom afected by the zoom factor.
+    //bottom = ( top + __Local_bi.bmpHeight );
+    bottom = 
+        ( top + 
+          (__Local_bi.bmpHeight * ZoomFactor) );
+
+// Final rect to refresh.
+    finalRect.left = left;
+    finalRect.top  = top;
+    finalRect.width  = (__Local_bi.bmpWidth * ZoomFactor);
+    finalRect.height = (bottom-top);
 
 //
 // Data area.
@@ -729,7 +751,7 @@ bmpDisplayBMP (
     // We need to abort.
     default:  
         base = 0x36;
-        gwssrv_debug_print ("bmpDisplayBMP: [FAIL] bmpBitCount fail\n"); 
+        gwssrv_debug_print ("bmpDisplayBMP0: [FAIL] bmpBitCount fail\n"); 
         break;
     };
 
@@ -881,13 +903,17 @@ bmpDisplayBMP (
                         // With scale.
                         if (useZoom==TRUE)
                         {
-                            for (ihZoom=0; ihZoom < (ZoomFactor+1); ihZoom++){
-                            for (iwZoom=0; iwZoom < (ZoomFactor+1); iwZoom++){ 
+                            for (ihZoom=0; ihZoom < ZoomFactor; ihZoom++){
+                            for (iwZoom=0; iwZoom < ZoomFactor; iwZoom++){ 
                             // IN: color, x, y, rop
                             grBackBufferPutpixel ( 
                                 (unsigned int) color, 
-                                (unsigned long) left   + (j * ZoomFactor) + iwZoom, 
-                                (unsigned long) bottom - (i * ZoomFactor) + ihZoom,
+                                (unsigned long) 
+                                    left + 
+                                    ((j * ZoomFactor) + iwZoom), 
+                                (unsigned long) 
+                                    bottom - 
+                                    ((i * ZoomFactor) + ihZoom),
                                 (unsigned long) 0 );
                             };};
                         }
@@ -902,7 +928,8 @@ bmpDisplayBMP (
                 // pintamos normalmente a cor atual.
                 case BMP_CHANGE_COLOR_SUBSTITUTE:
                     // Substituímos se for igual
-                    if (color == bmp_selected_color){
+                    if (color == bmp_selected_color)
+                    {
                         // IN: color, x, y, rop
                         grBackBufferPutpixel ( 
                             (unsigned int) bmp_substitute_color, 
@@ -940,14 +967,23 @@ bmpDisplayBMP (
                     break;
             };
 
-            left++;    // next pixel.
+            // next pixel.
+            // Esse é o repetidor se não estivermos usando zoom.
+            // Se estivermos usando zoom, o repetidor é o do for.
+            if (useZoom != TRUE){
+                left++;
+            }
         };
 
         // Vamos para a linha anterior.
         // Reiniciamos o x.
 
-        bottom = (bottom-1);
-        left = x;
+        // Esse é o repetidor se não estivermos usando zoom.
+        // Se estivermos usando zoom, o repetidor é o do for.
+        if (useZoom != TRUE){
+            bottom = (bottom-1);
+            left = x;
+        }
     };
 
 // ## test palette 
@@ -970,20 +1006,48 @@ done:
 
 // #todo
 // Create a flag in the function's parameter.
-    //if(flag==TRUE)
-    gws_refresh_rectangle (X,Y,Width,Height);
+    if(show == TRUE)
+    {
+        //gws_refresh_rectangle (X,Y,Width,Height);
+        // Final rect to refresh.
+        gws_refresh_rectangle (
+            finalRect.left,
+            finalRect.top,
+            finalRect.width,
+            finalRect.height );
+    }
 
 // #debug
-    //gwssrv_debug_print ("bmpDisplayBMP: done \n");
-    //printf            ("bmpDisplayBMP: done \n");
+    //gwssrv_debug_print ("bmpDisplayBMP0: done \n");
+    //printf            ("bmpDisplayBMP0: done \n");
     //printf("w={%d} h={%d}\n", bi->bmpWidth, bi->bmpHeight );
     
     return 0;
 
 fail:
-    gwssrv_debug_print ("bmpDisplayBMP: fail\n");
-    printf             ("bmpDisplayBMP: fail\n");
+    gwssrv_debug_print ("bmpDisplayBMP0: fail\n");
+    printf             ("bmpDisplayBMP0: fail\n");
     return (int) -1;
+}
+
+int 
+bmpDisplayBMP ( 
+    char *address, 
+    unsigned long x, 
+    unsigned long y,
+    int show )
+{
+// Decode, paint and maybe refresh.
+
+    int res=0;
+    res = (int) bmpDisplayBMP0( 
+        address, 
+        x, 
+        y, 
+        BMP_DEFAULT_ZOOM_FACTOR,
+        show );
+
+    return (int) res;
 }
 
 // mostra no lfb
@@ -1104,12 +1168,17 @@ static void *__get_system_icon (int n)
 // >> Called by wmCreateWindowFrame in wm.c
 
 int 
-gwssrv_display_system_icon ( 
+bmp_decode_system_icon0 ( 
     int index, 
     unsigned long x, 
-    unsigned long y )
+    unsigned long y,
+    int show,
+    int zoom_factor )
 {
-    int RefreshScreen= FALSE;
+    //#expensive: Refresh the whole screen.    
+    //int RefreshScreen= FALSE;
+    int RefreshScreen = show;
+
 // Shared memory
 // Um endereço compartilhado onde o ícone
 // foi carregado pelo kernel.
@@ -1166,17 +1235,19 @@ gwssrv_display_system_icon (
         bmp_selected_color = COLOR_WHITE;
         // Paint into the backbuffer, but refresh after that.
         draw_status = 
-            (int) bmpDisplayBMP( 
+            (int) bmpDisplayBMP0( 
                 (char *) sm_buffer, 
                 (unsigned long) bmp_x, 
-                (unsigned long) bmp_y ); 
+                (unsigned long) bmp_y,
+                zoom_factor,
+                show ); 
         if (draw_status<0){
             //#todo: error message.
         } 
     }
 
      //#debug
-     //printf("gwssrv_display_system_icon: *hang2\n");
+     //printf("gwssrv_display_system_icon: hang2\n");
      
 // #bugbug #todo
 // We need to use the routine to refresh the rectangle.
@@ -1187,6 +1258,24 @@ gwssrv_display_system_icon (
      }
 
      return 0;
+}
+
+int 
+bmp_decode_system_icon ( 
+    int index, 
+    unsigned long x, 
+    unsigned long y,
+    int show )
+{
+    int res=0;
+    res = (int) bmp_decode_system_icon0(
+        index,
+        x,
+        y,
+        show, 
+        BMP_DEFAULT_ZOOM_FACTOR );
+    
+    return (int) res;
 }
 
 //

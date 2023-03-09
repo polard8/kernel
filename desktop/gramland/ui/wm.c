@@ -1810,11 +1810,14 @@ struct gws_window_d *do_create_titlebar(
     if (useIcon == TRUE)
     {
         iL = (unsigned long) (tbWindow->absolute_x + METRICS_ICON_LEFTPAD);
-        iT = (unsigned long) (tbWindow->absolute_y  + METRICS_ICON_TOPPAD);
-        gwssrv_display_system_icon( 
+        iT = (unsigned long) (tbWindow->absolute_y + METRICS_ICON_TOPPAD);
+
+        bmp_decode_system_icon( 
             (int) icon_id, 
             (unsigned long) iL, 
-            (unsigned long) iT );
+            (unsigned long) iT,
+            FALSE );
+
         parent->titlebarHasIcon = TRUE;
     }
 
@@ -2716,6 +2719,24 @@ void wm_update_desktop(int tile)
 
 // Redraw root window, but do not shot it yet.
     redraw_window(__root_window,FALSE);
+
+
+// #test
+// Testing zoom.
+// ======================================
+
+/*
+ // #ok: It's working
+    bmp_decode_system_icon0(
+        4,  //Index
+        8,  // x
+        8,  // y
+        TRUE,  // show
+        4 // zoom factor
+        );
+    //refresh_screen();
+    while(1){}
+*/
 
 // ======================================
 // Redraw the whole stack of windows,
