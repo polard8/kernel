@@ -1,6 +1,6 @@
 /*
  * File: main.c
- *     Gramado Display Manager.
+ *     GDM - Gramado Display Manager.
  * History:
  *     2022 - Created by Fred Nora.
  */
@@ -43,8 +43,8 @@
 
 // Ports
 #define PORTS_WS  4040
-#define PORTS_NS  4041
-#define PORTS_FS  4042
+//#define PORTS_NS  4041
+//#define PORTS_FS  4042
 // ...
 
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
@@ -57,8 +57,15 @@ struct sockaddr_in addr = {
 };
 */
 
-unsigned long gScreenWidth=0;
-unsigned long gScreenHeight=0;
+// Screen
+unsigned long screen_width=0;
+unsigned long screen_height=0;
+
+// gdm
+unsigned long gdm_x=0;
+unsigned long gdm_y=0;
+unsigned long gdm_width=0;
+unsigned long gdm_height=0;
 
 //
 // Windows
@@ -115,10 +122,8 @@ static void update_clients(int fd)
 
 int fileman_init_globals(void)
 {
-    //gws_debug_print("fileman_init_globals:\n");
-    gScreenWidth  = gws_get_system_metrics(1);
-    gScreenHeight = gws_get_system_metrics(2);
-    //...
+    screen_width  = (unsigned long) gws_get_system_metrics(1);
+    screen_height = (unsigned long) gws_get_system_metrics(2);
     return 0;
 }
 
@@ -325,12 +330,13 @@ int main( int argc, char *argv[] )
         exit(1);
     }
 
-// =====================================================
+
+// Get globals from server.
+    fileman_init_globals();
+
 // Device info
-    unsigned long w = gws_get_system_metrics(1);
-    unsigned long h = gws_get_system_metrics(2);
-    if ( w == 0 || h == 0 ){
-        printf ("gdm: w h\n");
+    if ( screen_width == 0 || screen_height == 0 ){
+        printf ("gdm: screen_width screen_height\n");
         exit(1);
     }
 
@@ -342,46 +348,29 @@ int main( int argc, char *argv[] )
 // #todo: precisamos de um request que selecione
 // o modo de operação do window manager.
 
-    //unsigned long w_width  = (w>>1);
-    //unsigned long w_height = (h - 100); //(h>>1);
-    unsigned long w_width  = (w>>1);
-    unsigned long w_height = (h>>1);
-// original
-    unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
-    unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
 
+// Posicionamento e demensoes da main window.
+    gdm_width  = (unsigned long) (screen_width  >> 1);
+    gdm_height = (unsigned long) (screen_height >> 1);
+    gdm_x = 
+        (unsigned long) ( ( screen_width  - gdm_width ) >> 1 );
+    gdm_y = 
+        (unsigned long) ( ( screen_height - gdm_height) >> 1 ); 
 
-    // test1: Erro de posicionamento.
-    //unsigned long viewwindowx = 580;
-    //unsigned long viewwindowy = ( ( h - w_height) >> 1 ); 
-
-    // test2: Erro de posicionamento.
-    //unsigned long viewwindowx = ( ( w - w_width ) >> 1 );
-    //unsigned long viewwindowy = 400; 
-
-    // test3: top/left
-    //unsigned long viewwindowx = 0;
-    //unsigned long viewwindowy = 0; 
-
-// #hackhack
-// @media
-// Se a tela for pequena demais para os dias de hoje. hahaha
-
-    if (w == 320)
+    // #hack
+    if (screen_width == 320)
     {
-        //posicionamento
-        viewwindowx = 0;
-        viewwindowy = 0;
-        // dimensoes
-        w_width = w;
-        w_height = h;
+        gdm_x = 0;
+        gdm_y = 0;
+        gdm_width  = (unsigned long) screen_width;
+        gdm_height = (unsigned long) screen_height;
     }
 
 // Cursor limits based on the window size.
     cursor_x = 0;
     cursor_y = 0;
-    cursor_x_max = ((w_width/8)  -1);
-    cursor_y_max = ((w_height/8) -1);
+    cursor_x_max = ((gdm_width/8)  -1);
+    cursor_y_max = ((gdm_height/8) -1);
 
 
 // Creating the main window.
@@ -395,8 +384,8 @@ int main( int argc, char *argv[] )
     main_window = 
         (int) gws_create_window (
                   client_fd,
-                  WT_OVERLAPPED, 1, 1, "gdm - Display Manager", 
-                  viewwindowx, viewwindowy, w_width, w_height,
+                  WT_OVERLAPPED, 1, 1, "GDM", 
+                  gdm_x, gdm_y, gdm_width, gdm_height,
                   0, 
                   0x0000,  
                   COLOR_RED,   // #todo: client bg. Not implemented. 
@@ -429,9 +418,9 @@ int main( int argc, char *argv[] )
         (int) gws_create_window (
                   client_fd,
                   WT_EDITBOX,1,1,"login-win",
-                  (( w_width/8 )*2) +20,  //l 
+                  (( gdm_width/8 )*2) +20,  //l 
                   4,                      //t
-                  (( w_width/8 )*2),      //w
+                  (( gdm_width/8 )*2),      //w
                   24,                     //h
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
@@ -457,9 +446,9 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_BUTTON,1,1,"Reboot",
-                  (( w_width/8 )*5), 
+                  (( gdm_width/8 )*5), 
                   4,
-                  (( w_width/8 )*2), 
+                  (( gdm_width/8 )*2), 
                   24,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
@@ -487,13 +476,13 @@ int main( int argc, char *argv[] )
 // Inside the mainwindow.
 // Lembre-se que temos uma status bar.
 // left:
-    unsigned long cw_left = (( w_width/8 )*2) + 20; //4;
+    unsigned long cw_left = (( gdm_width/8 )*2) + 20; //4;
 // top:
 // Title bar + address bar.
     unsigned long cw_top = (4 +(24) +4); //(32 +4 +(24) +4);
 // width:
 // Width - borders.
-    unsigned long cw_width = (( w_width/8 )*2);//( w_width -4 -4);
+    unsigned long cw_width = (( gdm_width/8 )*2);//( w_width -4 -4);
 // height:
 // Height - topbar - addressbar - borders - statusbar 
 // #bugbug:
@@ -522,9 +511,9 @@ int main( int argc, char *argv[] )
         (int) gws_create_window ( 
                   client_fd,
                   WT_BUTTON,1,1,"Confirm",
-                  (( w_width/8 )*5),   //l
+                  (( gdm_width/8 )*5),   //l
                   (4 +(24) +4),        //t
-                  (( w_width/8 )*2),   //w
+                  (( gdm_width/8 )*2),   //w
                   24,                  //h
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 

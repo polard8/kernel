@@ -3358,7 +3358,8 @@ static int InitHot(void)
 
 static int on_execute(void)
 {
-    int ShowDemo=FALSE;
+    //int ShowDemo=FALSE;
+    int ShowDemo=TRUE;
 
     int flagUseClient = FALSE;
     //int flagUseClient = TRUE;

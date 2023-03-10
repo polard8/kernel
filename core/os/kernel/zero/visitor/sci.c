@@ -2132,7 +2132,7 @@ void *sci2 (
 
     // ...
 
-// yield 
+// Yield 
 // See: ps/sched/schedi.c
 // Set a flag that this thread will be preempted.
 

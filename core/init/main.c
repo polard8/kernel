@@ -111,6 +111,11 @@ __Procedure (
 
     switch (msg){
 
+    // #todo
+    //case MSG_YIELD:
+        //rtl_yield();
+        //break;
+
 // Start a client.
 // It's gonna wor only if the is already running.
 // range: 4001~4009 
@@ -691,6 +696,8 @@ static int __idlethread_loop(void)
                 RTLEventBuffer[1], 
                 RTLEventBuffer[2], 
                 RTLEventBuffer[3] );
+            //#test
+            //rtl_yield();
         }
     };
 

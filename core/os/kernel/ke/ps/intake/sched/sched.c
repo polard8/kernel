@@ -207,7 +207,7 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Como o scheduler é chamado apenas de tempos em tempos
                 // então essa checagem anao é real-time.
                 // Na hora de checar, pode ser que o tempo limite ja passou.
-                if ( jiffies >= TmpThread->wake_jiffy)
+                if (jiffies >= TmpThread->wake_jiffy)
                 {
                     
                      // #debug

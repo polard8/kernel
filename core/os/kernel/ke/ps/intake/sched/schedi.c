@@ -750,6 +750,7 @@ void yield (tid_t tid)
 // O ts.c vai esgotar o quantum dessa thread
 // no momento do task switching.
 // Isso não deve afetar a prioridde da thread.
+// see: ts.c
 
     t->yield_in_progress = TRUE;
 }

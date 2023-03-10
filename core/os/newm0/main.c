@@ -212,7 +212,7 @@ void kinguio_puts(const char* str)
     ssize_t StringLen=0;
     int _char=0;
 
-    if (ModuleInitialization.initialized != 1){
+    if (ModuleInitialization.initialized != TRUE){
         return;
     }
 
@@ -437,7 +437,7 @@ static int newm0_initialize(void)
     int Found=0;  //FALSE
     unsigned long __function_table=0;
 
-    ModuleInitialization.initialized = 0;
+    ModuleInitialization.initialized = FALSE;
 
     for (i=0; i<100; i++)
     {
@@ -467,20 +467,20 @@ static int newm0_initialize(void)
     // TRUE
     if (Found==1)
     {
-        ModuleInitialization.initialized = 1;
+        ModuleInitialization.initialized = TRUE;
         newm0_print_string("newm0_initialize: Initialized\n");
         return 0;
     }
 
 fail:
-    ModuleInitialization.initialized = 0;
+    ModuleInitialization.initialized = FALSE;
     return -1;
 }
 
 
 static int newm0_1001(void)
 {
-    if (ModuleInitialization.initialized != 1){
+    if (ModuleInitialization.initialized != TRUE){
         return -1;
     }
     newm0_print_string("newm0_1001: reason 1001\n");
