@@ -31,4 +31,10 @@ all:
 	make -C tprintf
 	make -C tascii
 	make -C jackpot
+
+	make -C n9
+	make -C n10
+	make -C n11
+	
+	
 	

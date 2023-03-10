@@ -160,44 +160,42 @@ build-gramado-os:
 	-sudo cp init/bin/INIT.BIN  os/disk/ 
 
 #========================================
-# :: Azure 
+# :: Azure (Commands)
 # Building userland commands.
 # userland
 	@echo ":: Making userland."
-	$(Q) $(MAKE) -C azure/
+	$(Q) $(MAKE) -C commands/
 # Copy to the target folder.
-	-sudo cp azure/bin/SHUTDOWN.BIN  os/disk/
-	-sudo cp azure/bin/REBOOT.BIN    os/disk/
-	-sudo cp azure/bin/CAT.BIN       os/disk/
-	-sudo cp azure/bin/UNAME.BIN     os/disk/
+	-sudo cp commands/bin/SHUTDOWN.BIN  os/disk/
+	-sudo cp commands/bin/REBOOT.BIN    os/disk/
+	-sudo cp commands/bin/CAT.BIN       os/disk/
+	-sudo cp commands/bin/UNAME.BIN     os/disk/
 
-	-sudo cp azure/bin/VGA1.BIN      os/disk/PROGRAMS/
-	-sudo cp azure/bin/SHELL.BIN     os/disk/PROGRAMS/
-	-sudo cp azure/bin/TPRINTF.BIN   os/disk/PROGRAMS/
-	-sudo cp azure/bin/SHOWFUN.BIN   os/disk/PROGRAMS/
-	-sudo cp azure/bin/CMP.BIN       os/disk/PROGRAMS/
-	-sudo cp azure/bin/SUM.BIN       os/disk/PROGRAMS/
-	-sudo cp azure/bin/TASCII.BIN    os/disk/PROGRAMS/
-	-sudo cp azure/bin/FALSE.BIN     os/disk/PROGRAMS/
-	-sudo cp azure/bin/TRUE.BIN      os/disk/PROGRAMS/
-	-sudo cp azure/bin/GRAMCNF.BIN   os/disk/PROGRAMS/
+	-sudo cp commands/bin/VGA1.BIN      os/disk/PROGRAMS/
+	-sudo cp commands/bin/SHELL.BIN     os/disk/PROGRAMS/
+	-sudo cp commands/bin/TPRINTF.BIN   os/disk/PROGRAMS/
+	-sudo cp commands/bin/SHOWFUN.BIN   os/disk/PROGRAMS/
+	-sudo cp commands/bin/CMP.BIN       os/disk/PROGRAMS/
+	-sudo cp commands/bin/SUM.BIN       os/disk/PROGRAMS/
+	-sudo cp commands/bin/TASCII.BIN    os/disk/PROGRAMS/
+	-sudo cp commands/bin/FALSE.BIN     os/disk/PROGRAMS/
+	-sudo cp commands/bin/TRUE.BIN      os/disk/PROGRAMS/
+	-sudo cp commands/bin/GRAMCNF.BIN   os/disk/PROGRAMS/
 	#...
 
+	-sudo cp commands/bin/N9.BIN   os/disk/PROGRAMS/
+	-sudo cp commands/bin/N10.BIN  os/disk/PROGRAMS/
+	-sudo cp commands/bin/N11.BIN  os/disk/PROGRAMS/
+
+
 #========================================
-# :: Indigo 1
-	$(Q) $(MAKE) -C indigo1/ 
+# :: Indigo 1 (net)
+	$(Q) $(MAKE) -C net/ 
 # Copy to the target folder.
-	-sudo cp indigo1/bin/GNSSRV.BIN  os/disk/
-	-sudo cp indigo1/bin/GNS.BIN     os/disk/
+	-sudo cp net/bin/GNSSRV.BIN  os/disk/
+	-sudo cp net/bin/GNS.BIN     os/disk/
 
-#========================================
-# :: Indigo 2
-	$(Q) $(MAKE) -C indigo2/
-	-sudo cp indigo2/bin/N9.BIN   os/disk/PROGRAMS/
-	-sudo cp indigo2/bin/N10.BIN  os/disk/PROGRAMS/
-	-sudo cp indigo2/bin/N11.BIN  os/disk/PROGRAMS/
-
-	@echo "~tier"
+	@echo "~build-gramado-os end?"
 
 PHONY := copy-extras
 copy-extras:
@@ -324,7 +322,7 @@ clean-all: clean
 
 	-rm init/bin/*.BIN
 	-rm init/init/*.o
-	-rm azure/bin/*.BIN
+	-rm commands/bin/*.BIN
 	-rm indigo/bin/*.BIN
 	-rm libs/fonts/bin/*.FON
 	-rm libs/libgns/obj/*.o
