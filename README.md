@@ -47,15 +47,19 @@ A brief description of the directories.
     Gramado DE     - desktop/
 
  * `core/` - Low basic components of the system.  
-   * `control` - Ring 0 stuff.
+   * `commands` - Unix-like commands and more.
+   * `init` - The init process.
+   * `libs` - Libraries.
+   * `net` - Network stuff.
+   * `os` - Main ring0 Components.
      * `boot` - The boot loader.
      * `disk` - The root directory for the boot partition.
-     * `new` - The Gramado OS kernel.
-   * `exposed` - Ring 3 stuff.
+     * `kernel` - The Gramado OS kernel.
  * `desktop/` - The window server and it's clients.
    * `apps` - Client applications.
    * `eng` - Graphics engine.
    * `gramland` - Window server.
+   * `libs` - Libraries.
 
 ## Fred's host machine
 
