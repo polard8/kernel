@@ -369,18 +369,21 @@ extern unsigned long gSavedBPP;
 #include "ps/thread.h"
 #include "ps/process.h"
 
-
 //
-// Configurações finais
+// user/
 //
 
-// Autentication
-// Security
-#include "user/usession.h"
-#include "user/room.h"
-#include "user/desktop.h"
-#include "user/logon.h"
-#include "user/logoff.h"
+// VEM - Virtual Environment Manager.
+// Autentication, security.
+#include "user/vem/usession.h"
+#include "user/vem/room.h"
+#include "user/vem/desktop.h"
+
+// SM - Session Manager.
+#include "user/sm/logon.h"
+#include "user/sm/logoff.h"
+
+// User
 #include "user/user.h"
 #include "user/security.h"
 

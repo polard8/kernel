@@ -74,15 +74,17 @@ userenv.o
 
 all:
 
-#security
-	$(CC) -c desktop.c   $(KERNEL_INCLUDE) $(CFLAGS) -o desktop.o
-	$(CC) -c room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
-	$(CC) -c usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
+# VEM - Virtual Environment Manager.
+# Security
+	$(CC) -c vem/desktop.c   $(KERNEL_INCLUDE) $(CFLAGS) -o desktop.o
+	$(CC) -c vem/room.c      $(KERNEL_INCLUDE) $(CFLAGS) -o room.o
+	$(CC) -c vem/usession.c  $(KERNEL_INCLUDE) $(CFLAGS) -o usession.o
 
-	$(CC) -c logoff.c    $(KERNEL_INCLUDE) $(CFLAGS) -o logoff.o
-	$(CC) -c logon.c     $(KERNEL_INCLUDE) $(CFLAGS) -o logon.o
+# SM - Session Manager
+	$(CC) -c sm/logoff.c  $(KERNEL_INCLUDE) $(CFLAGS) -o logoff.o
+	$(CC) -c sm/logon.c   $(KERNEL_INCLUDE) $(CFLAGS) -o logon.o
 
-	$(CC) -c userenv.c   $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
+	$(CC) -c userenv.c  $(KERNEL_INCLUDE) $(CFLAGS) -o userenv.o
 
 # link
 	$(LD) -r -o ar_user.o $(OBJS)
