@@ -15,7 +15,7 @@ This repository has the source code for:
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-6.png)
+![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-7.png)
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-3.png)
 
 ## Kernel features.
@@ -46,7 +46,7 @@ A brief description of the directories.
     Gramado Kernel - core/
     Gramado DE     - desktop/
 
- * `core/` - Low basic components of the system.  
+ * `core/` - Low level basic components of the system.  
    * `commands` - Unix-like commands and more.
    * `init` - The init process.
    * `libs` - Libraries.
