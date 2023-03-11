@@ -125,41 +125,53 @@ static void __winmin(int fd);
 static void __test_message(void)
 {
     unsigned long message_buffer[32];
-    
+
     message_buffer[0] = 0; //window
     message_buffer[1] = (unsigned long) 44888;  // message code
-    message_buffer[2] = (unsigned long) 1234;
-    message_buffer[3] = (unsigned long) 5678;
+    message_buffer[2] = (unsigned long) 1234;   // Signature
+    message_buffer[3] = (unsigned long) 5678;   // Signature
 // receiver
     message_buffer[4] = 0;  //init tid
 // sender
     message_buffer[5] = 0;  //?
 
-    unsigned long MessageBuffer = 
-        (unsigned long) &message_buffer[0];
+    //unsigned long MessageBuffer = 
+    //    (unsigned long) &message_buffer[0];
 
-//
+
+// The tid of init.bin is '0', i guess. :)
+    int init_tid = 0;
+
+// ---------------------------------
 // Post
-//
-
 // Add the message into the queue. In tail.
 // IN: tid, message buffer address
     rtl_post_system_message( 
-        (int) 0,  //init tid 
-        (unsigned long) MessageBuffer );
+        (int) init_tid, 
+        (unsigned long) message_buffer );
 
+// ---------------------------------
 // #test
 // loop to get the response.
 // Its a different buffer from the send routine above.
 
+    int __src_tid=-1;
+    int __dst_tid=-1;
+    
     while(1)
     {
         if ( rtl_get_event() == TRUE )
         {
-            if  ( RTLEventBuffer[1] == 44888 ){
+            // Receiving a response from init.bin?
+            if  (RTLEventBuffer[1] == 44888)
+            {
+                // Get caller's tid.
+                __src_tid = (int) ( RTLEventBuffer[8] & 0xFFFF );
+                // Get receiver's tid.
+                __dst_tid = (int) ( RTLEventBuffer[9] & 0xFFFF );
                 printf("terminal.bin: 44888 received | sender=%d receiver=%d\n",
-                    RTLEventBuffer[8],   //sender (the caller)
-                    RTLEventBuffer[9] ); //receiver
+                    __src_tid,   // Sender, (the caller).
+                    __dst_tid);  // Receiver, (us).
                 break;
             }
         }
@@ -711,7 +723,9 @@ static void compareStrings(int fd)
         goto exit_cmp;
     }
 
-    if( strncmp(prompt,"msg",3) == 0 ){
+// Sending message to init.bin?
+    if( strncmp(prompt,"msg",3) == 0 )
+    {
         __test_message();
         goto exit_cmp;
     }
