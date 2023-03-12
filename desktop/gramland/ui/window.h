@@ -450,13 +450,9 @@ typedef enum {
 } gws_ip_device_t;
 
 // The controls for a given window.
-// w.Controls->minimize
+// w->Controls.minimize_wid
 struct windowcontrols_d
 {
-    //struct gws_window_d *minimize;
-    //struct gws_window_d *maximize;  //maximize/restore
-    //struct gws_window_d *close;  
-
     int minimize_wid;
     int maximize_wid;
     int close_wid;
@@ -780,6 +776,9 @@ struct gws_window_d
     int isMinimizeControl;
     int isMaximizeControl;
     int isCloseControl;
+    // The relative position with width,
+    // (width - left_offset) = left.
+    unsigned long left_offset;
 
     unsigned long titlebar_width;
     unsigned long titlebar_height;

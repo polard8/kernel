@@ -390,6 +390,37 @@ __draw_window_border(
 }
 
 
+int redraw_controls(struct gws_window_d *window)
+{
+    struct gws_window_d *tb_window;
+
+    tb_window = window;
+    if ( (void*) tb_window == NULL )
+        return -1;
+    if (tb_window->magic != 1234)
+        return -1;
+
+    int wid=-1;
+
+
+ //#todo
+ // Esta funcionando ...
+ // mas precisamos considar quando a janela muda de tamanho.
+
+    wid = tb_window->Controls.minimize_wid;
+    redraw_window_by_id(wid,FALSE);
+
+    wid = tb_window->Controls.maximize_wid;
+    redraw_window_by_id(wid,FALSE);
+
+    wid = tb_window->Controls.close_wid;
+    redraw_window_by_id(wid,FALSE);
+
+
+
+    return 0;
+}
+
 int redraw_titlebar_window(struct gws_window_d *window)
 {
     struct gws_window_d *parent;
@@ -463,14 +494,33 @@ int redraw_titlebar_window(struct gws_window_d *window)
         TRUE,  // fill
         (unsigned long) rop );  // rop_flags
 
-// redraw controls.
-// recursive
-// #bugbug
-// Recursive is dangerous and
-// it is painting in the wrong place.
-    //redraw_window(tb_window->Controls.minimize,FALSE);
-    //redraw_window(tb_window->Controls.maximize,FALSE);
-    //redraw_window(tb_window->Controls.close,FALSE);
+// --------------------
+// Icon
+
+    int icon_id = 
+        (int) parent->frame.titlebar_icon_id;
+
+// Decode the bmp that is in a buffer
+// and display it directly into the framebuffer. 
+// IN: index, left, top
+// see: bmp.c
+    unsigned long iL=0;
+    unsigned long iT=0;
+    unsigned long iWidth = 16;
+
+    //#hack #todo
+    int useIcon = parent->titlebarHasIcon;
+    if (useIcon == TRUE)
+    {
+        iL = (unsigned long) (tb_window->absolute_x + METRICS_ICON_LEFTPAD);
+        iT = (unsigned long) (tb_window->absolute_y + METRICS_ICON_TOPPAD);
+
+        bmp_decode_system_icon( 
+            (int) icon_id, 
+            (unsigned long) iL, 
+            (unsigned long) iT,
+            FALSE );
+    }
 
     return 0;
 }
@@ -716,8 +766,10 @@ redraw_window (
             // Redraw the title bar.
             if ( (void*) window->titlebar != NULL )
             {
-                if (window->titlebar->magic == 1234){
-                    redraw_titlebar_window( window->titlebar );                
+                if (window->titlebar->magic == 1234)
+                {
+                    redraw_titlebar_window( window->titlebar );
+                    redraw_controls( window->titlebar );
                 }
             }
         }

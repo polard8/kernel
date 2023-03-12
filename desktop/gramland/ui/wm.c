@@ -1580,6 +1580,9 @@ void do_create_controls(struct gws_window_d *window)
         return;
     }
 
+    minimize->left_offset = 
+        (unsigned long) (window->width - LastLeft);
+
     minimize->type = WT_BUTTON;
     minimize->isMinimizeControl = TRUE;
 
@@ -1617,6 +1620,9 @@ void do_create_controls(struct gws_window_d *window)
         return;
     }
 
+    maximize->left_offset = 
+        (unsigned long) (window->width - LastLeft);
+
     maximize->type = WT_BUTTON;
     maximize->isMaximizeControl = TRUE;
     
@@ -1652,6 +1658,9 @@ void do_create_controls(struct gws_window_d *window)
     if (close->magic!=1234){
         return;
     }
+
+    close->left_offset = 
+        (unsigned long) (window->width - LastLeft);
 
     close->type = WT_BUTTON;
     close->isCloseControl = TRUE;
@@ -5605,6 +5614,10 @@ gws_resize_window (
     unsigned long cx, 
     unsigned long cy )
 {
+    struct gws_window_d *tmp_window;
+    int tmp_wid = -1;
+
+
     if ( (void *) window == NULL ){
         return -1;
     }
@@ -5657,6 +5670,59 @@ gws_resize_window (
             {
                 window->titlebar->width = 
                     (window->width - window->border_size - window->border_size );
+
+                // ============
+                // minimize
+                tmp_wid = 
+                    (int) window->titlebar->Controls.minimize_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        // width - left_offset.
+                        tmp_window->left = 
+                            (unsigned long) (window->titlebar->width - 
+                             tmp_window->left_offset);
+                    }
+                }
+
+                // ============
+                // maximize
+                tmp_wid = 
+                    (int) window->titlebar->Controls.maximize_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        // width - left_offset.
+                        tmp_window->left = 
+                            (unsigned long) (window->titlebar->width - 
+                             tmp_window->left_offset);
+                    }
+                }
+
+                // ============
+                // close
+                tmp_wid = 
+                    (int) window->titlebar->Controls.close_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        // width - left_offset.
+                        tmp_window->left = 
+                            (unsigned long) (window->titlebar->width - 
+                             tmp_window->left_offset);
+                    }
+                }
+
+
             }
 
             // client area . (rectangle).
@@ -5728,6 +5794,10 @@ gwssrv_change_window_position (
 // Nesse momento, podemos checar, quais janelas possuem essa janela
 // como janela mãe, e ... ?
 
+    struct gws_window_d *tmp_window;
+    int tmp_wid = -1;
+
+
     if ( (void *) window == NULL ){
         gwssrv_debug_print("gwssrv_change_window_position: window\n");
         return -1;
@@ -5770,11 +5840,70 @@ gwssrv_change_window_position (
             window->titlebar->absolute_y = 
                 ( window->absolute_y  + window->border_size );
         
-            //if (window->titlebar->Controls.initialized == TRUE)
-            //{
+            
+            if (window->titlebar->Controls.initialized == TRUE)
+            {
                 // get pointer from id.
                 // change position of the controls.
-            //}
+
+                // #todo
+                // We need a worker for that job.
+
+                //===============
+                // Change position for minimize.
+                tmp_wid = 
+                    (int) window->titlebar->Controls.minimize_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        tmp_window->absolute_x = 
+                            ( window->titlebar->absolute_x + tmp_window->left );
+                        tmp_window->absolute_y = 
+                            ( window->titlebar->absolute_y + tmp_window->top );
+                    }
+                }
+
+                //===============
+                // Change position for maximize.
+                tmp_wid = 
+                    (int) window->titlebar->Controls.maximize_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        tmp_window->absolute_x = 
+                            ( window->titlebar->absolute_x + tmp_window->left );
+                        tmp_window->absolute_y = 
+                            ( window->titlebar->absolute_y + tmp_window->top );
+                    }
+                }
+
+                //===============
+                // Change position for close.
+                tmp_wid = 
+                    (int) window->titlebar->Controls.close_wid;
+                tmp_window = 
+                    (struct gws_window_d *) get_window_from_wid(tmp_wid);
+                if ( (void*) tmp_window != NULL )
+                {
+                    if (tmp_window->magic == 1234)
+                    {
+                        tmp_window->absolute_x = 
+                            ( window->titlebar->absolute_x + tmp_window->left );
+                        tmp_window->absolute_y = 
+                            ( window->titlebar->absolute_y + tmp_window->top );
+                    }
+                }
+
+
+
+            }
+            
         }
 
         // Client area . (rectangle).

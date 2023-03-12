@@ -39,7 +39,7 @@ void invalidate_taskbar_window(void);
 void invalidate_window (struct gws_window_d *window);
 void invalidate_window_by_id( int wid );
 
-
+int redraw_controls(struct gws_window_d *window);
 int redraw_titlebar_window(struct gws_window_d *window);
 int 
 redraw_window (
