@@ -456,8 +456,8 @@ void sys_exit_thread (int tid);
 
 int sys_fork (void);
 
-int sys_getpid (void);
-int sys_getppid (void);
+pid_t sys_getpid(void);
+pid_t sys_getppid(void);
 
 int sys_initialize_component(int n);
 

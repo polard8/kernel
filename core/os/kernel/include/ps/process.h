@@ -137,6 +137,7 @@ struct process_d
 // PPID, (Parent Process Identification),
     pid_t pid;
     pid_t ppid;
+
 // group
 // GID, (Group Identification),
     gid_t gid;

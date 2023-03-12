@@ -749,7 +749,7 @@ static void *__extra_services (
        return (void *) get_process_stats ( (pid_t) arg2, (int) arg3 );
     }
 
-// get thread stats given tid
+// Get thread stats given tid
 // IN: tid, number
     if ( number == 881 ){
         return (void *) GetThreadStats ( (int) arg2, (int) arg3 );
@@ -1025,9 +1025,9 @@ void *sci0 (
     char *aa3 = (char *) arg3;
     char *aa4 = (char *) arg4;
 
-    int desktopID=0;
+    pid_t current_process = (pid_t) get_current_pid();
 
-    pid_t current_process = (pid_t) get_current_process();
+    int desktopID=0;
 
 //cpl
     unsigned long *cpl_buffer = (unsigned long *) &sci0_cpl;
@@ -1057,14 +1057,12 @@ void *sci0 (
         // ok
     }
 
-
-
-
     // #debug
     //debug_print("sc0:\n");
     //printf("sc0:\n");
     //refresh_screen();
 
+    //?? #deprecated?
     g_profiler_ints_gde_services++;
 
 // Profiling in the process structure.
@@ -1112,48 +1110,27 @@ void *sci0 (
         return NULL;
     }
 
-    // #debug
-    // #todo: Explain it better.
-    if (number == 4321)
-    {
-        printf ("4321: arg2 %x | arg3 %x | arg4 %x \n",arg2,arg3,arg4);
+// #debug
+// #todo: Explain it better.
+    if (number == 4321){
+        printf ("4321: arg2 %x | arg3 %x | arg4 %x \n",
+            arg2,arg3,arg4);
         invalidate_screen();
-        //refresh_screen();
         return NULL;
     }
 
-
-    // ================================
-    // Color scheme.
-
-    /*
-    if ( (void *) CurrentColorScheme == NULL ){
-        panic ("sci0: CurrentColorScheme\n");
-    }else{
-        if ( CurrentColorScheme->used  != TRUE || 
-             CurrentColorScheme->magic != 1234 )
-        {
-            debug_print ("sci0: CurrentColorScheme\n");
-            panic       ("sci0: CurrentColorScheme\n");
-        }
-        WindowColor           = CurrentColorScheme->elements[csiWindowBackground]; 
-        WindowClientAreaColor = CurrentColorScheme->elements[csiWindow]; 
-    };
-    */
-
-	// ================================
-	// Desktop ID.
-
+// ================================
+// Desktop ID.
     // desktopID = (int) get_current_desktop_id ();
 
-
 // Extra services
-
     if (number>256){
         return (void *) __extra_services(number,arg2,arg3,arg4);
     }
 
+//
 // Switch
+//
 
     switch (number){
 
@@ -1224,7 +1201,9 @@ void *sci0 (
             return NULL; 
             break;
 
-        // 8 @todo: BugBug, aqui precisamos de 4 par�metros.
+        // 8 
+        // #todo: #bugbug: 
+        // Aqui precisamos de mais parâmetros.
         case SYS_BUFFER_DRAWLINE:
             backbuffer_draw_horizontal_line ( 
                 (unsigned long) a2, 
@@ -1236,22 +1215,22 @@ void *sci0 (
             break;
 
         // 9 - Draw a rectangle into the backbuffer.
-        // see: _int128 in sw.asm.
         // see: rect.c
-        //case SYS_BUFFER_DRAWRECT:
         case 9:
+        //case SYS_BUFFER_DRAWRECT:
             //debug_print("sci0: [9]\n");
             backbuffer_draw_rectangle ( 
                 (unsigned long) message_address[0],    //x 
                 (unsigned long) message_address[1],    //y
                 (unsigned long) message_address[2],    //width
                 (unsigned long) message_address[3],    //height
-                (unsigned int)  message_address[4],      //color
+                (unsigned int)  message_address[4],    //color
                 (unsigned long) message_address[5] );  //rop_flags
             return NULL;
             break;
 
         // 10 - Refresh rectangle.
+        // Region?
         case 10:
             //debug_print("sci0: [10]\n");
             refresh_rectangle ( 
@@ -1263,14 +1242,14 @@ void *sci0 (
             break;
 
 
-        //11, Coloca o conte�do do backbuffer no LFB.
+        // 11:
+        // Flush the backbuffer into the lfb.
         case SYS_REFRESHSCREEN: 
             invalidate_screen();
-            //refresh_screen();
             return NULL;
             break;
 
-
+        // Reserved.
         //rede: 12,13,14,15
 
         // 16 - open()
@@ -1278,7 +1257,6 @@ void *sci0 (
         // In ring0, see: fs.c
         // IN: pathname, flags, mode
         // OUT: fd
-
         case SYS_OPEN:
             debug_print ("sci0: SYS_OPEN\n");
             return (void *) sys_open ( 
@@ -1295,7 +1273,6 @@ void *sci0 (
             debug_print ("sci0: SYS_CLOSE\n");
             return (void *) sys_close( (int) arg2 );
             break;
-
 
         // 18 - read() 
         // See: sys.c
@@ -1315,9 +1292,9 @@ void *sci0 (
                                 (int)          arg4 );  
             break;
 
+        // Reserved
         // Buffers support: 20~23 
-        // Windows support: 24~28
- 
+        // Surface support: 24~28
         // 33 - free number.
 
         // 34
@@ -1347,15 +1324,15 @@ void *sci0 (
         case SYS_GETUSERNAME:
             return (void *) __getusername ( (char *) arg2 );
             break;
-            
-        // 41 - set user name 
+
+        // 41 - Set user name 
         // #todo: This operation needs permition?
         case SYS_SETUSERNAME:
             return (void *) __setusername ( (const char *) arg2 ); 
             break;
 
         // 42 - livre
-        // usar para manipulação de arquivo
+        // #todo: Usar para manipulação de arquivo.
 
         // 43 - Create an empty file.
         // See: fs.c
@@ -1370,10 +1347,8 @@ void *sci0 (
             break;
 
         // 45 - livre
-        // usar para manipulação de arquivo ou diretório.
-
+        // #todo: Usar para manipulação de arquivo ou diretório.
         // 46 ~ 48 (usar para cpu support)
-
 
         // 47 - livre
         // Show cpu info.
@@ -1384,7 +1359,7 @@ void *sci0 (
 
         // 48 - livre
 
-        // 49 - livre
+        // 49
         // Show system info
         // See: sys.c
         case 49:
@@ -1442,10 +1417,8 @@ void *sci0 (
                                 (char *) a4 );    // name
             break; 
 
-
-
         // 73
-        // See: ke/sys.c
+        // See: sys.c
         // Cria um processo e coloca a thread primária pra rodar.
         // #bugbug: 
         // Na inicializacao do kernel, nos criamos um processo
@@ -1458,12 +1431,10 @@ void *sci0 (
         // registradores de segmento podem estar em ring3.
         // ?? Talvez poderiamos criar um request, da mesma maneira 
         // que fazemos com a criaçao de threads e o spawn.
-
         // #todo
         // Aqui no kernel, precisamos criar mais rotinas de suporte
         // a criacao de processos.
         // Temos poucas opçoes e tudo esta meio fora de ordem ainda.
-
         // syscall: 
         // arg2 = name
         // arg3 = process priority
@@ -1481,7 +1452,6 @@ void *sci0 (
                                 RING3 );          // iopl 
             break;
 
-
         // 80 - Show current process info.
         // #todo: Mostrar em uma janela própria.
         // #todo: Devemos chamar uma função que 
@@ -1491,8 +1461,7 @@ void *sci0 (
             return NULL;
             break;
 
-        // 81
-        // Get parent process id.
+        // 81: Get parent process id.
         // See: sys.c
         case SYS_GETPPID: 
             return (void *) sys_getppid();
@@ -1513,7 +1482,6 @@ void *sci0 (
         // PID veio via argumento.
         // IN: pid, status, option
         // #todo: Change the name to sys_xxxx
- 
         case SYS_WAIT4PID: 
             debug_print("sci0: [FIXME] SYS_WAIT4PID\n");
             return (void *) do_waitpid( 
@@ -1524,19 +1492,14 @@ void *sci0 (
             //block_for_a_reason ( (int) current_thread, (int) arg2 ); //suspenso
             break;
 
-
         // 84 - livre.
 
-        case 85:
-        //case SYS_GETPID: 
-            //return (void *) newos_getpid();
-            return (void *) get_current_process();
+        //case 85:
+        case SYS_GETPID: 
+            return (void *) get_current_pid();
             break;
 
         // 86 - livre.
-        //case 86:
-            //return (void*) 
-            //break;
 
         // Testa se o processo é válido
         // se for valido retorna 1234
@@ -1608,7 +1571,6 @@ void *sci0 (
             return NULL;
             break;
 
-
         // 126
         // Permitindo que drivers e servidores em usermode acessem
         // as portas.
@@ -1617,7 +1579,6 @@ void *sci0 (
         // #todo: 
         // Tem que resolver as quest�es de privil�gios.
         // IN: bits, port
-
         case SYS_USERMODE_PORT_IN:
             return (void *) portsx86_IN ( 
                                 (int) (arg2 & 0xFFFFFFFF), 
@@ -1632,7 +1593,6 @@ void *sci0 (
         // #todo: 
         // Tem que resolver as quest�es de privil�gios.
         // IN: bits, port, value
-
         case SYS_USERMODE_PORT_OUT:
             portsx86_OUT ( 
                 (int) arg2, 
@@ -1682,7 +1642,6 @@ void *sci0 (
         case 138:
             return (void *) keyboardGetKeyState( (unsigned char) arg2 );
             break;
-
 
         // 150~156 User and group support.
 
@@ -1929,7 +1888,6 @@ void *sci0 (
             debug_print ("sci0: [FIXME] Default\n");
             printf      ("sci0: [FIXME] Default SYSCALL {%d}\n", number );
             invalidate_screen();
-            //refresh_screen ();
             return NULL;
             break;
     };
@@ -1946,7 +1904,6 @@ void *sci1 (
     unsigned long arg3, 
     unsigned long arg4 )
 {
-
     debug_print ("sci1: [TODO]\n");
 
     pid_t current_process = (pid_t) get_current_process();

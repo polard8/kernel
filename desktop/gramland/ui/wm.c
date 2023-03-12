@@ -450,12 +450,14 @@ on_mouse_event(
 
         set_refresh_pointer_status(TRUE);
  
-        //printf("MOVE\n");
+        // Update the global mouse position.
         // The compositor is doing its job,
         // painting the pointer in the right position.
         // Lets update the position. See: comp.c
         comp_set_mouse_position(saved_x,saved_y);
+        // Check the window we are inside of.
         __probe_window_hover(saved_x,saved_y);
+
         return;
     }
 
@@ -602,6 +604,14 @@ static void on_mouse_pressed(void)
     if (mouse_hover->magic!=1234){
         return;
     }
+
+// Now we have a new mouse_owner.
+// #todo
+// Maybe we can send a message to this window,
+// and the client can make all the changes it wants.
+    mouse_owner = mouse_hover;
+    //mouse_owner->mouse_x = 0;
+    //mouse_owner->mouse_y = 0;
 
 //#test
 // Start menu button.

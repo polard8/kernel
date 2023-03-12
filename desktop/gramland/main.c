@@ -139,10 +139,6 @@ static int __saved_sync_id = -1;
 
 static int running = FALSE;
 
-
-extern struct gws_window_d *keyboard_owner;
-extern struct gws_window_d *mouse_owner;
-
 //
 // == Private functions: Prototypes ========
 //

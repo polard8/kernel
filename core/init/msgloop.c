@@ -113,6 +113,10 @@ __Procedure (
         do_hello(caller_tid);
         break;
 
+    case 55888:
+        //rtl_reboot();
+        break;
+
     // #todo
     //case MSG_YIELD:
         //rtl_yield();

@@ -1139,6 +1139,8 @@ extern struct gws_window_d  *taskbar_startmenu_button_window;
 extern struct gws_window_d *first_window;
 extern struct gws_window_d *last_window;
 
+extern struct gws_window_d *keyboard_owner;
+extern struct gws_window_d *mouse_owner;
 
 
 //

@@ -112,7 +112,7 @@ static void __test_winfo(int fd, int wid);
 
 static void __test_ioctl(void);
 
-static void __test_message(void);
+static void __test_message(unsigned long msg_code);
 
 static void __winmax(int fd);
 static void __winmin(int fd);
@@ -122,12 +122,12 @@ static void __winmin(int fd);
 // #test
 // We sent the message 44888 to the init process
 // and we got the same message back as a response.
-static void __test_message(void)
+static void __test_message(unsigned long msg_code)
 {
     unsigned long message_buffer[32];
 
     message_buffer[0] = 0; //window
-    message_buffer[1] = (unsigned long) 44888;  // message code
+    message_buffer[1] = (unsigned long) msg_code;  // message code
     message_buffer[2] = (unsigned long) 1234;   // Signature
     message_buffer[3] = (unsigned long) 5678;   // Signature
 // receiver
@@ -157,7 +157,15 @@ static void __test_message(void)
 
     int __src_tid=-1;
     int __dst_tid=-1;
-    
+
+// =================
+
+// Not a hello. Don't wait response.
+    if (msg_code != 44888)
+        return;
+
+// Wait for hello (44888)
+// If we sent a hello.
     while(1)
     {
         if ( rtl_get_event() == TRUE )
@@ -726,7 +734,8 @@ static void compareStrings(int fd)
 // Sending message to init.bin?
     if( strncmp(prompt,"msg",3) == 0 )
     {
-        __test_message();
+        __test_message(44888);  // hello
+        //__test_message(55888);  // reboot
         goto exit_cmp;
     }
 

@@ -360,39 +360,33 @@ int sys_fork(void)
     return -1;
 }
 
-
 // 85 
 // Get PID of the current process.
-//#todo: change to 'pid_t'
-int sys_getpid (void)
+pid_t sys_getpid (void)
 {
-    return (pid_t) get_current_process();
+    return (pid_t) get_current_pid();
 }
-
 
 // 81
 // Get the PID of the father.
-int sys_getppid (void)
+pid_t sys_getppid(void)
 {
     struct process_d *p;
-    pid_t pid = -1;
-
-    pid_t current_process = (pid_t) get_current_process();
-
-    pid = (int) current_process;
-
-    if ( pid >= 0 && pid < PROCESS_COUNT_MAX )
-    {
-        p = (void *) processList[pid];
-
-        if ( (void *) p == NULL ){ return (int) -1; }
-
-        if ( p->used != 1 || p->magic != 1234 ){ return (int) -1; }
-
-        return (int) p->ppid;
+    pid_t current_pid = (pid_t) get_current_pid();
+    if (current_pid < 0 || current_pid >= PROCESS_COUNT_MAX){
+        goto fail;
     }
-
-    return (int) (-1);
+    p = (void *) processList[current_pid];
+    if ( (void *) p == NULL ){
+        goto fail;
+    }
+    if ( p->used != TRUE || p->magic != 1234 ){
+        goto fail;
+    }
+// OK:
+    return (pid_t) p->ppid;
+fail:
+    return (pid_t) -1;
 }
 
 
