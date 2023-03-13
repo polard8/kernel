@@ -855,16 +855,21 @@ void *doCreateWindow (
 
 // =================================
 
-// The frame rectangle.
-// Initial configuration.
-// Relative values.
-    window->rcWindow.left   = (unsigned long) 0; //WindowX;       // window left
-    window->rcWindow.top    = (unsigned long) 0; //WindowY;       // window top
-    window->rcWindow.width  = (unsigned long) WindowWidth;   // window width
-    window->rcWindow.height = (unsigned long) WindowHeight;  // window height
+//
+// Window area.
+//
+
+// Initial configuration for the window rectangle.
+// Relative values. (l,t,w,h)
+    window->rcWindow.left = (unsigned long) 0;
+    window->rcWindow.top = (unsigned long) 0;
+    window->rcWindow.width = (unsigned long) WindowWidth;
+    window->rcWindow.height = (unsigned long) WindowHeight;
+
+// =================================
 
 //
-// == Client area ==
+// Client area.
 //
 
 // #todo:
@@ -913,21 +918,15 @@ void *doCreateWindow (
     //if (window->style & WS_STATUSBAR)
     //    clientRect.height -=24;
 
-// Save
-// The original values. They are the same of the window.
-    window->rcClient.left   = clientRect.left;    // window left
-    window->rcClient.top    = clientRect.top;     // window top
-    window->rcClient.width  = clientRect.width;   // window width
-    window->rcClient.height = clientRect.height;  // window height
+
+// Client rectangle:
+    window->rcClient.left   = clientRect.left;
+    window->rcClient.top    = clientRect.top;
+    window->rcClient.width  = clientRect.width;
+    window->rcClient.height = clientRect.height;
 
 // =================================
 
-// ??
-// #deprecated?
-// Deslocamento em relação a janela mãe.
-// Passado via argumento.
-    //window->x = WindowX;
-    //window->y = WindowY;
 
 //++
 // Margens.
@@ -1018,9 +1017,9 @@ void *doCreateWindow (
     }
 
 // Right and bottom.
-    window->right = 
+    window->absolute_right = 
         (unsigned long) (window->absolute_x + window->width);
-    window->bottom = 
+    window->absolute_bottom = 
         (unsigned long) (window->absolute_y + window->height); 
 
 //--
@@ -1038,9 +1037,9 @@ void *doCreateWindow (
             window->height = WindowManager.wa_height;
 
             // Right and bottom.
-            window->right = 
+            window->absolute_right = 
                 (unsigned long) (window->absolute_x + window->width);
-            window->bottom = 
+            window->absolute_bottom = 
                 (unsigned long) (window->absolute_y + window->height); 
         }
     }
@@ -1054,9 +1053,9 @@ void *doCreateWindow (
         window->height = fullWindowHeight;
 
         // Right and bottom.
-        window->right = 
+        window->absolute_right = 
             (unsigned long) (window->absolute_x + window->width);
-        window->bottom = 
+        window->absolute_bottom = 
             (unsigned long) (window->absolute_y + window->height); 
 
         window->full_left   = window->absolute_x;
@@ -1065,8 +1064,8 @@ void *doCreateWindow (
         window->full_height = window->height;
 
         // Fullscreen Right and bottom.
-        window->full_right  = window->right;
-        window->full_bottom = window->bottom;
+        window->full_right  = window->absolute_right;
+        window->full_bottom = window->absolute_bottom;
 
         if (WindowManager.initialized == TRUE)
         {
@@ -1076,9 +1075,12 @@ void *doCreateWindow (
         }
     }
 
-// Color: Background and client area.
-    window->bg_color            = (unsigned int) frame_color;
-    window->clientrect_bg_color = (unsigned int) client_color;
+// Colors: 
+// Background and client area background.
+    window->bg_color = 
+        (unsigned int) frame_color;
+    window->clientrect_bg_color = 
+        (unsigned int) client_color;
 
 // #todo: As outras características do cursor.
 // Características.
@@ -1108,22 +1110,21 @@ void *doCreateWindow (
     //	window->cursor->cursorType = cursorTypeDefault;
     //}
 
-//Barras.
-//As flags que representam a presença de cada uma das barras
-//serão acionadas mais tarde, na hora da pintuda, de acordo com
-//o tipo de janela à ser pintada.
+// Barras.
+// As flags que representam a presença de cada uma das barras
+// serão acionadas mais tarde, na hora da pintuda, 
+// de acordo com o tipo de janela à ser pintada.
 
 // The child list
     window->child_list = NULL;
 
 // Client window 
-// (#importante)
+// (#important)
 // Client window support.
 // Obs: A área de cliente será um retângulo e não uma janela.
 // Mas nda impede da estrutra gerenciar uma janela que fique 
 // em cima da área de cliente.
-
-    window->client_window = NULL;  // window. 
+    window->client_window = NULL;
 
 // Terminal window:
 // #importante
@@ -1143,16 +1144,12 @@ void *doCreateWindow (
     //window->desktop = (void*) Desktop; //configurado anteriormente.
     //window->desktop_id = Desktop->id;  //@todo: verificar elemento.
 
-//
-// What is that?
-//
-
+// What kind of component is it?
     window->isMenu = FALSE;
     window->isMenu = FALSE;
-
-    window->isButton = 0;
-
-    window->isEditBox = 0;
+    window->isButton = FALSE;
+    window->isEditBox = FALSE;
+    // ...
 
 // Context menu: right click
 // ou clicando no icone.
@@ -1168,9 +1165,9 @@ void *doCreateWindow (
     // window->text = NULL; 
 
 // Actions
-    window->draw   = FALSE;  // #todo: Cuidado com isso.
+    window->draw = FALSE;  // #todo: Cuidado com isso.
     window->redraw = FALSE;
-    window->show   = TRUE;   // Inicialmente presumimos que precisamos mostrar essa janela.
+    window->show = TRUE;   // Inicialmente presumimos que precisamos mostrar essa janela.
 
     // Continua ...
 
@@ -1181,6 +1178,7 @@ void *doCreateWindow (
     //window->linkedlist = NULL;
 
 // Navigation
+// #todo: Put these at the end of the routine.
     window->prev = (void *) Parent;
     window->next = NULL;
 
@@ -1262,7 +1260,7 @@ void *doCreateWindow (
         window->ip_device = IP_DEVICE_KEYBOARD;
         window->frame.used = TRUE;
         Background = TRUE;
-        Border     = TRUE;
+        Border = TRUE;
         window->backgroundUsed = TRUE;
         window->background_style = 0;
         break;
@@ -1469,8 +1467,8 @@ void *doCreateWindow (
         window->width  = gui->main->width;
         window->height = gui->main->height; 
         
-        window->right = (unsigned long) window->left + window->width;
-        window->bottom = (unsigned long) window->top  + window->height;       
+        window->absolute_right = (unsigned long) window->left + window->width;
+        window->absolute_bottom = (unsigned long) window->top  + window->height;       
 
         // ??
         // Deslocamentos em relação às margens.
@@ -1563,41 +1561,16 @@ void *doCreateWindow (
             case WT_ICON:
             case WT_BUTTON:
                 window->bg_color = (unsigned int) frame_color;
-                //if (window->focus == TRUE)
-                //    window->bg_color = (unsigned int) COLOR_BLUE;
                 break;
-            //#fixme
             default:
-                // #fail
-                window->bg_color = (unsigned int) COLOR_PINK;  //BLACK?
-                //window->bg_color = CurrentColorScheme->elements[csiWindowBackground]; 
+                window->bg_color = 
+                    (unsigned int) COLOR_PINK;
                 break;
         };
 
-        // Se a janela for edibox, vamos colocar ela 
-        // dentro da área de cliente da janela mãe.
-        // Editbox só pode existir dentro da área de cliente.
-        // Seu posicionamento em relação a tela
-        // também leva em conta o posicionamento 
-        // da área de cliente da janela mãe
-
-        //if (type==WT_EDITBOX || type==WT_EDITBOX_MULTIPLE_LINES)
-        //{
-			//ja fizemos isso acima.
-            //if ( (void*) window->parent != NULL )
-            //{
-            //   window->left = 
-            //        (window->left + window->parent->rcClient.left);
-            //    window->top = 
-            //        (window->top  + window->parent->rcClient.top);
-            //}
-        //}
-
-        // Paint the background
-        // #check
+        // Paint the background.
         // This routine is calling the kernel to paint the rectangle.
-        
-        // Absolute.
+        // Absolute values.
         doFillWindow( 
             window->absolute_x, 
             window->absolute_y, 
@@ -1605,16 +1578,26 @@ void *doCreateWindow (
             window->height, 
             window->bg_color, 
             __rop_flags );
+    
+        // #todo
+        // Could we return now if its type is WT_SIMPLE?
     }
 
 // ===============================================
 // ## Client area rectangle ##
 
-    if (ClientArea == TRUE){
+    if (ClientArea == TRUE)
+    {
+        // #bugbug
+        // Doing this for the second time.
+        // We already worked on these values
+        // on top of this routine.
+        /*
         window->rcClient.left   = (unsigned long) window->left;
         window->rcClient.top    = (unsigned long) window->height;
         window->rcClient.width  = (unsigned long) window->width;
         window->rcClient.height = (unsigned long) window->height;
+        */
     }
 
 //

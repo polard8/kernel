@@ -823,9 +823,9 @@ grPlot0 (
         if ( UseClipping == TRUE )
         {
             if ( finalx >= w->absolute_x  && 
-                 finalx <= w->right &&
+                 finalx <= w->absolute_right &&
                  finaly >= w->absolute_y   && 
-                 finaly <= w->bottom )
+                 finaly <= w->absolute_bottom )
                  {
                      // Plot pixel into the raster.
                      // The origin is top/left of the viewport. (0,0).

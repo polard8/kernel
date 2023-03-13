@@ -107,7 +107,7 @@ static unsigned long ____new_time=0;
 static void __set_foreground_tid(int tid);
 
 static void animate_window( struct gws_window_d *window );
-static void __Tile(void);
+static void wm_tile(void);
 
 //
 // Keyboard
@@ -520,9 +520,9 @@ post_message:
 
 // Check if we are inside the mouse hover.
     if ( saved_x >= w->absolute_x &&
-         saved_x <= w->right &&
+         saved_x <= w->absolute_right &&
          saved_y >= w->absolute_y &&
-         saved_y <= w->bottom )
+         saved_y <= w->absolute_bottom )
     {
         // #debug
         // printf("Inside mouse hover window :)\n");
@@ -2469,8 +2469,11 @@ static void animate_window( struct gws_window_d *window )
 // #todo:
 // only application windows? overlapped.
 
-static void __Tile(void)
+static void wm_tile(void)
 {
+// #todo
+// Maybe we can receive some parameters.
+
     struct gws_window_d *w;
     int cnt=0;
     int c=0;
@@ -2496,7 +2499,7 @@ static void __Tile(void)
     cnt=0;
     w = (struct gws_window_d *) first_window;
     if((void*)w==NULL){
-        debug_print("__Tile: w==NULL\n");
+        debug_print("wm_tile: w==NULL\n");
         return; 
     }
     while ((void*)w != NULL){
@@ -2509,7 +2512,7 @@ static void __Tile(void)
 // create a stack of windows in the top/left corner of the screen.
     w = (struct gws_window_d *) first_window;
     if ((void*)w==NULL){ 
-        debug_print("__Tile: w==NULL\n");
+        debug_print("wm_tile: w==NULL\n");
         return; 
     }
     //if(w->magic!=1234)
@@ -2723,12 +2726,12 @@ void wm_update_desktop(int tile)
 // #test
 // Starting with the first window of the list,
 // create a stack o windows in the top/left corner of the screen.
+// #todo: 
+// Maybe we use an argument here. A set of flags.
     if (tile)
     {
-        //#todo: Maybe we use an argument here. A set of flags.
-        if (WindowManager.mode == WM_MODE_TILED)
-        {
-            __Tile();
+        if (WindowManager.mode == WM_MODE_TILED){
+            wm_tile();
         }
     }
 
@@ -4766,29 +4769,23 @@ is_within (
     unsigned long x, 
     unsigned long y )
 {
-
 // #bugbug
 // E se a janela tem janela mae?
-
     if ( (void*) window != NULL )
     {
         if ( window->used == TRUE && window->magic == 1234 )
         {
-            // yes!
             if ( x >= window->absolute_x   && 
-                 x <= window->right  &&
+                 x <= window->absolute_right  &&
                  y >= window->absolute_y    &&
-                 y <= window->bottom )
+                 y <= window->absolute_bottom )
             {
                 return TRUE;
             }
         }
     }
-
     return FALSE;
 }
-
-
 
 /*
 void destroy_window (struct gws_window_d *window);

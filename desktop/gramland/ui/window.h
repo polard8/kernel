@@ -539,6 +539,27 @@ struct gws_window_d
 // Structure validation
     int used;
     int magic;
+
+// The frame's rectangle.
+    struct gws_rect_d  rcWindow;
+// The Client area.
+// This is the viewport for some applications, just like browsers.
+    struct gws_rect_d  rcClient;
+
+// Relativo a tela.
+    unsigned long absolute_x;
+    unsigned long absolute_y;
+    unsigned long absolute_right;
+    unsigned long absolute_bottom;
+
+// This is the window rectangle. (rcWindow)
+// Relativo a parent.
+    unsigned long left;
+    unsigned long top;
+    unsigned long width;
+    unsigned long height;
+
+
 // Controls
     struct windowcontrols_d  Controls;
 // Single event
@@ -632,18 +653,7 @@ struct gws_window_d
 // Margins and dimensions.
 //
 
-// Relativo a tela.
-    unsigned long absolute_x;
-    unsigned long absolute_y; 
-// Relativo a parent.
-    unsigned long left;        //margem esquerda 
-    unsigned long top;         //margem superior
-    unsigned long right;       //margem direita  
-    unsigned long bottom;      //margem inferior  
 
-// Dimension
-    unsigned long width;
-    unsigned long height;
 // Margins and dimensions when this window is in fullscreen mode.
 // #todo: Maybe we can use a sctructure for that.
     unsigned long full_left;
@@ -725,23 +735,6 @@ struct gws_window_d
 // Maybe we can have a device context only for the client area.
     struct dc_d  *client_dc;
 
-//
-// Rectangles
-//
-
-// The frame's rectangle.
-    struct gws_rect_d  rcWindow;
-// The Client area.
-// This is the viewport for some applications, just like browsers.
-    struct gws_rect_d  rcClient;
-
-    // Os componentes dessa janela.
-    struct gws_rect_d  *rects;
-
-    // Os retângulos que foram pintados e
-    // precisam ser copiados para o framebuffer
-    // para tornarem-se visíveis.
-    struct gws_rect_d  *dirty_rects;
 
 //
 // == window stack ================================

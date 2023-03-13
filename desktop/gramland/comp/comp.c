@@ -218,9 +218,9 @@ void mouse_at(void)
             if (w->magic == 1234)
             {
                 if ( __new_mouse_x > w->absolute_x &&
-                     __new_mouse_x < w->right &&
+                     __new_mouse_x < w->absolute_right &&
                      __new_mouse_y > w->absolute_y &&
-                     __new_mouse_y > w->bottom )
+                     __new_mouse_y > w->absolute_bottom )
                 {
                     if (w != __root_window)
                     {

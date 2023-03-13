@@ -111,6 +111,8 @@ static void __draw_button_mark_by_wid( int wid, int button_number )
 // IN: window, color, color, color, color.
 // color1: left,top
 // color2: right, bottom
+// color2_light
+// outer_color
 // #check
 // This routine is calling the kernel to paint the rectangle.
 void 
@@ -122,7 +124,7 @@ __draw_button_borders(
     unsigned int outer_color )
 {
 // #test
-// Size in pizels de apenas 1/3 de todo o size.
+// Size in pixels de apenas 1/3 de todo o size.
     unsigned long BorderSize = 1;
 // Isso deve ser o total.
     //window->border_size = ?
@@ -137,12 +139,19 @@ __draw_button_borders(
         return;
     }
 
+// Order:
+// top/left ... right/bottom.
+
+
 //  ____
 // |
 //
 // board1, borda de cima e esquerda.
+// Cores, de fora pra dentro:
+// outer_color, color1, color1.
 
-// Cima
+// -------------------------------
+// :: Top
 // top, top+1, top+2
     rectBackbufferDrawRectangle ( 
         w->absolute_x+1, 
@@ -163,7 +172,8 @@ __draw_button_borders(
         BorderSize, 
         color1, TRUE,0 );
 
-// Esq
+// -------------------------------
+// :: Right
 // left, left+1, left+2
     rectBackbufferDrawRectangle ( 
         w->absolute_x, 
@@ -184,12 +194,16 @@ __draw_button_borders(
         w->height-4,
         color1, TRUE,0 );
 
+
 //  
 //  ____|
 //
 // board2, borda direita e baixo.
+// Cores, de fora pra dentro:
+// outer_color, color2, color2_light.
 
-// Dir
+// -------------------------------
+// :: Left
 // right-3, right-2, right-1
     rectBackbufferDrawRectangle ( 
         ((w->absolute_x) + (w->width) -1), 
@@ -198,36 +212,36 @@ __draw_button_borders(
         w->height-2, 
         outer_color, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        ((w->absolute_x) + (w->width) -1 -1), 
+        ((w->absolute_x) + (w->width) -2), 
         w->absolute_y+1, 
         BorderSize, 
         w->height-2, 
         color2, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
-        ((w->absolute_x) + (w->width) -1 -1 -1), 
+        ((w->absolute_x) + (w->width) -3), 
         w->absolute_y+1+1, 
         BorderSize, 
         w->height-4, 
         color2_light, TRUE, 0 );
 
-
-// Baixo
+// -------------------------------
+// :: Bottom
 // bottom-1, bottom-2, bottom-3
     rectBackbufferDrawRectangle ( 
         w->absolute_x+1, 
-        ( (w->absolute_y) + (w->height) -1 ),  
+        ((w->absolute_y) + (w->height) -1),  
         w->width-2, 
         BorderSize, 
         outer_color, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
         w->absolute_x+1, 
-        ( (w->absolute_y) + (w->height) -1 -1),  
+        ((w->absolute_y) + (w->height) -2),  
         w->width-2, 
         BorderSize, 
         color2, TRUE, 0 );
     rectBackbufferDrawRectangle ( 
         w->absolute_x+1+1, 
-        ( (w->absolute_y) + (w->height) -1 -1 -1),  
+        ((w->absolute_y) + (w->height) -3),  
         w->width-4, 
         BorderSize, 
         color2_light, TRUE, 0 );
