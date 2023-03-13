@@ -1872,13 +1872,11 @@ struct gws_window_d *do_create_titlebar(
         0 );  // rop_flags no rop in this case?
 
 //----------------------
-// string
-// Titlebar string support;
+// String
+// Titlebar string support.
+// Using the parent's name.
 
-    int useTitleString=has_string;  //#HACK
-
-    // String support.
-    // String at center?
+    int useTitleString = has_string;  //#HACK
     unsigned long StringLeftPad = 0;
     unsigned long StringTopPad = 8;  // char size.
     size_t StringSize = (size_t) strlen( (const char *) parent->name );
@@ -1887,7 +1885,6 @@ struct gws_window_d *do_create_titlebar(
     }
 
 // pad | icon | pad | pad
-
     if (useIcon == FALSE){
         StringLeftPad = (unsigned long) METRICS_ICON_LEFTPAD;
     }
@@ -1899,7 +1896,8 @@ struct gws_window_d *do_create_titlebar(
 //
 // Text support
 //
-
+    // #todo
+    // We already did that before.
     parent->titlebar_text_color = 
         (unsigned int) get_color(csiTitleBarTextColor);
 
@@ -1907,25 +1905,23 @@ struct gws_window_d *do_create_titlebar(
 // Temos que gerenciar o posicionamento da string.
 // #bugbug: Use 'const char *'
 
-    tbWindow->name = 
-        (char *) strdup( (const char *) parent->name );
-
-// validation
-    if ( (void*) tbWindow->name == NULL )
-    {
+    tbWindow->name = (char *) strdup( (const char *) parent->name );
+    if ( (void*) tbWindow->name == NULL ){
         printf ("do_create_titlebar: Invalid name\n");
         return -1;
     }
 
     unsigned long sL=0;
     unsigned long sT=0;
-    unsigned int sColor = COLOR_WHITE;
-
+    unsigned int sColor = 
+        (unsigned int) parent->titlebar_text_color;
     if (useTitleString == TRUE)
     {
+        // Saving relative position.
+        parent->titlebar_text_left = StringLeftPad;
+        parent->titlebar_text_top = StringTopPad;
         sL = (unsigned long) ((tbWindow->absolute_x) + StringLeftPad);
         sT = (unsigned long) ((tbWindow->absolute_y) + StringTopPad);
-        sColor = (unsigned int) parent->titlebar_text_color;
         grDrawString ( sL, sT, sColor, tbWindow->name );
     }
 

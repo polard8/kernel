@@ -771,7 +771,13 @@ struct gws_window_d
 
     unsigned int titlebar_color;
     unsigned int titlebar_ornament_color;
+    
+    // Text properties.
+    //int titlebar_has_string; //#todo: Create this flag.
+    unsigned long titlebar_text_left;
+    unsigned long titlebar_text_top;
     unsigned int titlebar_text_color;
+
 
     int isMinimizeControl;
     int isMaximizeControl;

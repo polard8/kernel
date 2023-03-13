@@ -416,8 +416,6 @@ int redraw_controls(struct gws_window_d *window)
     wid = tb_window->Controls.close_wid;
     redraw_window_by_id(wid,FALSE);
 
-
-
     return 0;
 }
 
@@ -520,6 +518,33 @@ int redraw_titlebar_window(struct gws_window_d *window)
             (unsigned long) iL, 
             (unsigned long) iT,
             FALSE );
+    }
+
+// ---------------
+
+//
+// Text
+//
+
+    unsigned long sL=0;
+    unsigned long sT=0;
+    unsigned int sColor = 
+        (unsigned int) parent->titlebar_text_color;
+    
+    int useTitleString = TRUE; //#HACK
+    if (useTitleString == TRUE)
+    {
+        // margin + relative position.
+        sL = 
+            (unsigned long) 
+            ( tb_window->absolute_x + parent->titlebar_text_left);
+        sT = 
+            (unsigned long) 
+            ( tb_window->absolute_y + parent->titlebar_text_top);
+        
+        if ( (void*) tb_window->name != NULL ){
+            grDrawString ( sL, sT, sColor, tb_window->name );
+        }
     }
 
     return 0;
