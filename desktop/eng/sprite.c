@@ -218,7 +218,8 @@ gr_display_sprite(
                 (int) (z + sprite->z1), 
                 (int) (x + sprite->x1), 
                 (int) (y + sprite->y1), 
-                (unsigned int) sprite->color1 );
+                (unsigned int) sprite->color1,
+                0 );
             break;
         case SPRITE_LINE:
             plotLine3d ( 

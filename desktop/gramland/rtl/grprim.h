@@ -282,8 +282,8 @@ grPlot1 (
     int y, 
     int z, 
     unsigned int color,
+    unsigned long rop,
     unsigned long flags );
-
 
 //
 // == Line ==============================================
@@ -300,7 +300,8 @@ plotLine3dEx (
     struct gws_window_d *window,
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
-    unsigned int color );
+    unsigned int color,
+    unsigned long rop );
 
 // plot line given two colors.
 // interpolation?

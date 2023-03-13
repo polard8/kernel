@@ -5,17 +5,13 @@
  *     2020 - Created by Fred Nora.
  */
 
-
 #ifndef __GRPRIM_H
 #define __GRPRIM_H   1
 
-
 #define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
 #define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
-
 #define grMIN3(x,y,z)    (x < y  ? (x < z ? x : z) : (y < z ? y : z))
 #define grMAX3(x,y,z)    ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
-
 
 /*
 #define MIN2(v0,v1) ((v0<v1)?v0:v1)
@@ -622,18 +618,18 @@ grPlot2D (
 
 // Point. 
 int 
-grPlot0 (
+grPlot0 ( 
     struct gws_window_d *clipping_window,   
     int z, int x, int y, 
-    unsigned int color );
+    unsigned int color,
+    unsigned long rop );
 
 int 
 grPlot1 ( 
     struct gws_window_d *clipping_window,   
-    int x, 
-    int y, 
-    int z, 
+    int x, int y, int z, 
     unsigned int color,
+    unsigned long rop,
     unsigned long flags );
 
 int serviceGrPlot0(void);

@@ -850,9 +850,7 @@ grPlot0 (
     return (-1);
 }
 
-
-// #bugbug: Rebuild this.
-// plot with graphics effects. use flags.
+// Plot with graphics effects.
 int 
 grPlot1 ( 
     struct gws_window_d *clipping_window,   
@@ -860,6 +858,7 @@ grPlot1 (
     int y, 
     int z, 
     unsigned int color,
+    unsigned long rop,
     unsigned long flags )
 {
 
@@ -901,14 +900,12 @@ grPlot1 (
     // ...
 
 PlotPixel:
-
     return (int) grPlot0 ( 
                      clipping_window, 
                      zValue, xValue, yValue, 
                      (unsigned int) colorValue,
-                     0 );
+                     rop );
 }
-
 
 // #todo
 // See: gwsProcedure(), service 2040 in main.c
@@ -1013,7 +1010,8 @@ plotLine3dEx (
     struct gws_window_d *window,
     int x0, int y0, int z0, 
     int x1, int y1, int z1, 
-    unsigned int color )
+    unsigned int color,
+    unsigned long rop )
 {
 
     if ( (void*) window == NULL )
@@ -1036,8 +1034,14 @@ plotLine3dEx (
     y1 = x1;
     z1 = x1;
 
-    for (;;) {
-        grPlot0 ( window, z0, x0, y0, color, 0 );
+    for (;;) 
+    {
+        grPlot0( 
+            window, 
+            z0, x0, y0, 
+            color, 
+            rop );
+
         if (i-- == 0) {
             break;
         }
