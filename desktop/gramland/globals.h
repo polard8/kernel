@@ -205,8 +205,10 @@ typedef enum {
     csiWindowBorder,  // 16 window border
     csiWWFBorder,     // 17 window with focus border.
 
-    csiTitleBarText,    // 18
-    csiWhenMouseHover   // 19 bg when mouse hover
+    csiTitleBarTextColor,  // 18
+    csiWhenMouseHover,     // 19 bg when mouse hover
+    
+    csiTaskBarTextColor   // 20: Color for text in the taskbar.
 
     //...
     //@todo: focus,
@@ -314,6 +316,7 @@ struct vid_d vidConfig;
 // == Prototypes ===================================================
 //
 
+// wm.c
 int gwssrv_initialize_default_color_scheme(void);
 unsigned int get_color(int index);
 

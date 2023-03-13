@@ -1901,7 +1901,7 @@ struct gws_window_d *do_create_titlebar(
 //
 
     parent->titlebar_text_color = 
-        (unsigned int) get_color(csiTitleBarText);
+        (unsigned int) get_color(csiTitleBarTextColor);
 
 // #todo
 // Temos que gerenciar o posicionamento da string.
@@ -4815,6 +4815,7 @@ void destroy_window (struct gws_window_d *window)
 int gwssrv_initialize_default_color_scheme(void)
 {
 // Initialize the default color scheme.
+// #todo: Put this routine in another document.
 
     struct gws_color_scheme_d *cs;
 
@@ -4908,11 +4909,15 @@ int gwssrv_initialize_default_color_scheme(void)
     cs->elements[csiWWFBorder] = 
         HUMILITY_COLOR_WWF_BORDER;
 
-    cs->elements[csiTitleBarText] = 
+    cs->elements[csiTitleBarTextColor] = 
         HUMILITY_COLOR_TITLEBAR_TEXT;
 
     cs->elements[csiWhenMouseHover] = 
         HUMILITY_COLOR_BG_ONMOUSEHOVER;
+
+
+    cs->elements[csiTaskBarTextColor] = 
+        xCOLOR_GRAY2;
 
     // ...
 
@@ -5272,17 +5277,11 @@ void create_taskbar (unsigned long tb_height, int show)
     //while(1){}
     */
 
-// ========================================
 // Start menu.
     __create_start_menu();
-
-// ========================================
 // Quick launch area.
     __create_quick_launch_area();
-
-// ---------------------
 // Show
-
     if (show)
         flush_window_by_id(wid);
 }
@@ -6141,7 +6140,7 @@ void wm_Update_TaskBar( char *string, int flush )
 
 // String info.
     unsigned int string_color = 
-        (unsigned int) get_color(csiSystemFontColor);
+        (unsigned int) get_color(csiTaskBarTextColor);
     unsigned long string1_left = 
         (unsigned long) (taskbar_window->width - 100);
     unsigned long string2_left = 

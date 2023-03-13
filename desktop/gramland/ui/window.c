@@ -414,6 +414,9 @@ void *doCreateWindow (
 // Cada tipo de tanela poderá ter vários estilos.
 // Obs: 
 // Podemos ir usando apenas um estilo padrão por enquanto.
+// #todo
+// We need different colors for the text inside the buttons.
+
 
 //
 // Internal flags.
