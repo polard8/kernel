@@ -1740,6 +1740,9 @@ int serviceAsyncCommand(void)
     unsigned long data4=0;
     //...
 
+// Helper
+    int wid = -1;
+
     //#debug
     //gwssrv_debug_print ("serviceAsyncCommand:\n");
     //asm("cli");
@@ -1901,20 +1904,17 @@ int serviceAsyncCommand(void)
     //see: wm.c
     case 11:
         wm_update_desktop(TRUE);
-        //return 0;
         goto done;
         break;
 
     case 12:
         __switch_focus();
-        //return 0;
         goto done;
         break;
 
     // data=wid
     case 13:
         invalidate_window_by_id(data);
-        //return 0;
         goto done;
         break;
 
@@ -1969,13 +1969,16 @@ int serviceAsyncCommand(void)
     case 89:
         printf("89: Reboot via ws\n");
         wm_reboot();
-        //rtl_reboot();
         goto done;
         break;
 
     // Destroy overlapped window.
     case 90:
-        printf("90: Destroy overlapped window %d\n",data);
+        wid = (int) (data & 0xFFFFFFFF);
+        printf("90: Destroy overlapped window %d\n",wid);
+        DestroyWindow(wid);
+        wm_rebuild_list();
+        wm_update_desktop(TRUE);
         break;
 
     //#todo: Destroy window.

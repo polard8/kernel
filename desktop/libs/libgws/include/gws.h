@@ -368,6 +368,8 @@ gws_async_command2 (
     unsigned long data3,
     unsigned long data4 );
 
+
+void gws_destroy_window(int fd, wid_t wid);
 void gws_set_active(int fd, wid_t wid);
 void gws_set_focus(int fd, wid_t wid);
 void gws_clear_window(int fd, wid_t wid);

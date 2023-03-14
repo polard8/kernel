@@ -2219,6 +2219,95 @@ int RegisterWindow(struct gws_window_d *window)
     return (int) (-1);
 }
 
+int DestroyWindow(int wid)
+{
+// Only overlapped.
+    struct gws_window_d *window;
+    struct gws_window_d *tmpw;
+
+    if (wid<0){
+        return -1;
+    }
+    window = (struct gws_window_d *) get_window_from_wid(wid);
+    if ( (void*) window == NULL )
+        return -1;
+    if (window->magic != 1234)
+        return -1;
+
+    if (window->type != WT_OVERLAPPED)
+        return -1;
+
+
+// ---------------
+// titlebar
+// Get the wids for the controls and 
+// destroy the title bar window.
+    int wid_min=-1;
+    int wid_max=-1;
+    int wid_clo=-1;
+    tmpw = (void *) window->titlebar;
+    if ( (void*) tmpw != NULL )
+    {
+        if (tmpw->magic == 1234)
+        {
+            // Get wids.
+            wid_min = (int) tmpw->Controls.minimize_wid;
+            wid_max = (int) tmpw->Controls.maximize_wid;
+            wid_clo = (int) tmpw->Controls.close_wid;
+            // Destroy titlebar window.
+            tmpw->magic = 0;
+            tmpw->used = FALSE;
+            tmpw = NULL;
+        }
+    }
+// ---------------
+// Destroy min control
+    tmpw = (struct gws_window_d *) get_window_from_wid(wid_min);
+    if ( (void*) tmpw != NULL )
+    {
+        if (tmpw->magic == 1234)
+        {
+            tmpw->magic = 0;
+            tmpw->used = FALSE;
+            tmpw = NULL;
+        }
+    }
+// ---------------
+// Destroy max control
+    tmpw = (struct gws_window_d *) get_window_from_wid(wid_max);
+    if ( (void*) tmpw != NULL )
+    {
+        if (tmpw->magic == 1234)
+        {
+            tmpw->magic = 0;
+            tmpw->used = FALSE;
+            tmpw = NULL;
+        }
+    }
+// ---------------
+// Destroy clo control
+    tmpw = (struct gws_window_d *) get_window_from_wid(wid_clo);
+    if ( (void*) tmpw != NULL )
+    {
+        if (tmpw->magic == 1234)
+        {
+            tmpw->magic = 0;
+            tmpw->used = FALSE;
+            tmpw = NULL;
+        }
+    }
+// ---------------
+// Destroy the overlapped window.
+// #todo
+// + Destroy the child list.
+// +...
+    window->magic = 0;
+    window->used = FALSE;
+    window = NULL;
+
+    return 0;
+}
+
 
 /*
 int this_type_has_a_title(int window_type);

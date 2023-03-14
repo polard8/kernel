@@ -421,6 +421,12 @@ browserProcedure(
         }
         break;
 
+    case MSG_CLOSE:
+        printf ("docv.bin: MSG_CLOSE\n");
+        gws_destroy_window(fd,__main_window);
+        exit(0);
+        break;
+
     //...
     
     default:

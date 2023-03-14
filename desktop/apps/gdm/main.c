@@ -269,6 +269,12 @@ gdmProcedure(
     //        printf("MSG_KEYDOWN\n");
     //    break;
 
+    case MSG_CLOSE:
+        printf ("gdm.bin: MSG_CLOSE\n");
+        gws_destroy_window(fd,main_window);
+        exit(0);
+        break;
+
     //...
     
     default:

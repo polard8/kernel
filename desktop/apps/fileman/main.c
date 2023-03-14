@@ -219,19 +219,6 @@ filemanProcedure(
 
     switch (msg)
     {
-
-        case MSG_CLOSE:
-            printf ("fileman.bin: MSG_CLOSE\n");
-            // Destroy overlapped window.
-            gws_async_command (
-                fd,
-                90,     //request
-                0,      //sub-request
-                wid );  //data
-                
-            exit(0);
-            break;
-            
         // keydown
         case MSG_KEYDOWN:
             switch(long1)
@@ -293,6 +280,15 @@ filemanProcedure(
                     return 0;
                     break;
             };
+            break;
+
+        case MSG_CLOSE:
+            printf ("fileman.bin: MSG_CLOSE\n");
+            gws_destroy_window(fd,Main_window);
+            exit(0);
+            break;
+
+        default:
             break;
     };
 

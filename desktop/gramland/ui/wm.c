@@ -129,6 +129,7 @@ on_mouse_event(
     unsigned long x, 
     unsigned long y );
 
+static void on_control_clicked_by_wid(int wid);
 static void on_control_clicked(struct gws_window_d *window);
 
 static void on_mouse_pressed(void);
@@ -639,8 +640,6 @@ static void on_mouse_pressed(void)
         {
             // Redraw the button
             __button_pressed(mouse_hover->id);
-            //set_status_by_id(mouse_hover->id,BS_PRESSED);
-            //redraw_window_by_id(mouse_hover->id,TRUE);
             return;
         }
     }
@@ -758,9 +757,27 @@ static void on_mouse_pressed(void)
 }
 
 
+// When clicked or 'pressed' via keyboard.
+static void on_control_clicked_by_wid(int wid)
+{
+    struct gws_window_d *window;
+    
+    if(wid<0)
+        return;
+    window = (struct gws_window_d *) get_window_from_wid(wid);
+    if ((void*) window == NULL)
+        return;
+    if (window->magic != 1234)
+        return;
+
+    on_control_clicked(window);
+}
+
+// When clicked or 'pressed' via keyboard.
 static void on_control_clicked(struct gws_window_d *window)
 {
 // Called when a control button was release.
+// ( Clicked by the mouse or some other input event)
 // + The button belongs to a title bar
 // + The title bar belongs to an overlapped.
 // #tests:
@@ -779,11 +796,27 @@ static void on_control_clicked(struct gws_window_d *window)
     if (window->magic != 1234)
         return;
 
-    // it was not clicked.
-    if (window != mouse_hover)
-        return;
+// It was not clicked.
+// When the mouse is the only valid input device.
+    //if (window != mouse_hover)
+        //return;
 
-// close control
+// ------------
+// Minimize control
+    if (window->isMinimizeControl == TRUE)
+    {
+        return;
+    }
+
+// ------------
+// Maximize control
+    if (window->isMaximizeControl == TRUE)
+    {
+        return;
+    }
+
+// ------------
+// Close control
 // A close control was cliked.
     if (window->isCloseControl == TRUE)
     {
@@ -1125,6 +1158,10 @@ static void on_update_window(int event_type)
 
 int control_action(int msg, unsigned long long1)
 {
+// #todo
+// Explain the parameters.
+// It affects the active window.
+
     struct gws_window_d *aw;
     struct gws_window_d *w;
     int minimize_wid =-1;
@@ -1144,6 +1181,8 @@ int control_action(int msg, unsigned long long1)
     if (aw->magic!=1234){
         return -1;
     }
+    //if (aw->type != WT_OVERLAPPED)
+        //return -1;
 
 // -----------------------
 // titlebar
@@ -1159,53 +1198,48 @@ int control_action(int msg, unsigned long long1)
         return -1;
     }
 
-// Get IDs.
+// Get WIDs.
     minimize_wid = (int) w->Controls.minimize_wid;
     maximize_wid = (int) w->Controls.maximize_wid;
     close_wid    = (int) w->Controls.close_wid;
     
     switch (msg){
+
     case GWS_SysKeyDown:
         if (long1==VK_F9){
-            //printf("F9\n");
-            set_status_by_id(minimize_wid,BS_PRESSED);
-            redraw_window_by_id(minimize_wid,TRUE);
+            __button_pressed(minimize_wid);
             return 0;
         }
         if (long1==VK_F10){
-            //printf("F10\n");
-            set_status_by_id(maximize_wid,BS_PRESSED);
-            redraw_window_by_id(maximize_wid,TRUE);
+            __button_pressed(maximize_wid);
             return 0;
         }
         if (long1==VK_F11){
-            //printf("F11\n");
-            set_status_by_id(close_wid,BS_PRESSED);
-            redraw_window_by_id(close_wid,TRUE);
+            __button_pressed(close_wid);
             return 0;
         }
         return 0;
         break;
+
     case GWS_SysKeyUp:
         if (long1==VK_F9){
-            //printf("F9\n");
-            set_status_by_id(minimize_wid,BS_RELEASED);
-            redraw_window_by_id(minimize_wid,TRUE);
+            __button_released(minimize_wid);
+            on_control_clicked_by_wid(minimize_wid);
             return 0;
         }
         if (long1==VK_F10){
-            //printf("F10\n");
-            set_status_by_id(maximize_wid,BS_RELEASED);
-            redraw_window_by_id(maximize_wid,TRUE);
+            __button_released(maximize_wid);
+            on_control_clicked_by_wid(maximize_wid);
             return 0;
         }
+        // The close control was released.
         if (long1==VK_F11){
-            //printf("F11\n");
-            set_status_by_id(close_wid,BS_RELEASED);
-            redraw_window_by_id(close_wid,TRUE);
+            __button_released(close_wid);
+            on_control_clicked_by_wid(close_wid);
             return 0;
         }
         break;
+
     default:
         break;
     };
@@ -3322,6 +3356,26 @@ done:
     window->next = NULL;
     set_active_window(window);
 }
+
+void wm_rebuild_list(void)
+{
+    struct gws_window_d *window;
+    register int i=0;
+    for (i=0; i<WINDOW_COUNT_MAX; i++)
+    {
+        window = (struct gws_window_d *) windowList[i];
+        if ( (void*) window != NULL )
+        {
+            if (window->magic == 1234)
+            {
+                if (window->type == WT_OVERLAPPED){
+                    wm_add_window_into_the_list(window);
+                }
+            }
+        }
+    };
+}
+
 
 // not tested yet
 void wm_remove_window_from_list_and_kill( struct gws_window_d *window)

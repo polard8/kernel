@@ -393,13 +393,9 @@ editorProcedure(
         }
         break;
 
-    // test
-    //case 8888:
-        //break;
-
-    // #todo: It destroys the window.
     case MSG_CLOSE:
         printf ("editor.bin: MSG_CLOSE\n");
+        gws_destroy_window(fd,main_window);
         exit(0);
         break;
     
@@ -408,7 +404,6 @@ editorProcedure(
     //case MSG_SIZE:
         //break;
 
-
     //case MSG_CREATE: 
         // Initialize the window. 
         //return 0; 
@@ -416,6 +411,10 @@ editorProcedure(
     //case MSG_PAINT: 
         // Paint the window's client area. 
         //return 0; 
+
+    // test
+    //case 8888:
+        //break;
 
     case 9191:
         printf("9191\n");

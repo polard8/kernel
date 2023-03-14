@@ -1308,9 +1308,13 @@ void activate_last_window(void);
 
 struct gws_window_d *get_parent(struct gws_window_d *w);
 
+
+
 // list support
 // not tested yet
 void wm_add_window_into_the_list( struct gws_window_d *window );
+void wm_rebuild_list(void);
+
 void wm_remove_window_from_list_and_kill( struct gws_window_d *window );
 
 unsigned long wmGetLastInputJiffie(int update);
@@ -1586,6 +1590,8 @@ void *CreateWindow (
     unsigned int client_color ); 
 
 int RegisterWindow(struct gws_window_d *window);
+
+int DestroyWindow(int wid);
 
 struct gws_window_d *get_window_from_wid(int wid);
 

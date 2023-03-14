@@ -727,6 +727,7 @@ static void compareStrings(int fd)
 // exit: Exit the terminal application.
     if( strncmp(prompt,"exit",4) == 0 ){
         printf("~exit: Exit the terminal application\n");
+        gws_destroy_window(fd,main_window);
         exit(0);
         goto exit_cmp;
     }
@@ -2618,6 +2619,13 @@ terminalProcedure (
     //    };
     //    return 0;
     //    break;
+
+    case MSG_CLOSE:
+        printf ("terminal.bin: MSG_CLOSE\n");
+        gws_destroy_window(fd,main_window);
+        exit(0);
+        break;
+
 
     default:
         return 0;

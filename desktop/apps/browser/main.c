@@ -81,11 +81,6 @@ browserProcedure(
 
     switch (event_type){
 
-    case MSG_CLOSE:
-        printf ("browser.bin: MSG_CLOSE\n");
-        exit(0);
-        break;
-
     // Evento de teste.
     case 1000:
         // If the event window is the main window, so
@@ -125,6 +120,12 @@ browserProcedure(
             //gws_set_focus(fd,__addressbar_window);
             return 0;
         }
+        break;
+
+    case MSG_CLOSE:
+        printf ("browser.bin: MSG_CLOSE\n");
+        gws_destroy_window(fd,__main_window);
+        exit(0);
         break;
 
     //...
