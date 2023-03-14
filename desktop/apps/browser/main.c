@@ -325,7 +325,8 @@ int main( int argc, char *argv[] )
     }
 
 // ===================
-// button
+// button WT_BUTTON
+
     button = 
         (int) gws_create_window (
                   client_fd,
@@ -336,6 +337,21 @@ int main( int argc, char *argv[] )
                   24,
                   main_window,// janela mãe é overlapped. pinta na client area. 
                   0, COLOR_GRAY, COLOR_GRAY );
+
+
+/*
+// #testing WT_ICON
+    button = 
+        (int) gws_create_window (
+                  client_fd,
+                  WT_ICON, 1, 1, ">",
+                  (w_width -24 -4),  // l 
+                  4,                 // t
+                  24, 
+                  24,
+                  main_window,// janela mãe é overlapped. pinta na client area. 
+                  0, COLOR_RED, COLOR_RED );
+*/
 
     if (button < 0)
         debug_print("browser: button fail\n"); 

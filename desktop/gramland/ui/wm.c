@@ -2035,12 +2035,10 @@ wmCreateWindowFrame (
 // o w.top do retângulo da área de cliente.
 
 // check parent
-
     if ( (void*) parent == NULL ){
         //gwssrv_debug_print ("wmCreateWindowFrame: [FAIL] parent\n");
         return -1;
     }
-
     if (parent->used != TRUE || parent->magic != 1234){
         return -1;
     }
@@ -2065,18 +2063,16 @@ wmCreateWindowFrame (
         IsFullscreen=TRUE;
     }
 
-
 // #bugbug
 // Estamos mascarando pois os valores anda corrompendo.
-    window->absolute_x   = (window->absolute_x   & 0xFFFF);
-    window->absolute_y    = (window->absolute_y    & 0xFFFF);
+    window->absolute_x = (window->absolute_x & 0xFFFF);
+    window->absolute_y = (window->absolute_y & 0xFFFF);
     window->width  = (window->width  & 0xFFFF);
     window->height = (window->height & 0xFFFF);
 
 // #test:
 // Defaults:
 // Colocamos default, depois muda de acordo com os parametros.
-
     window->frame.titlebar_icon_id = ICON_ID_DEFAULT;
     // ...
 
@@ -2128,7 +2124,9 @@ wmCreateWindowFrame (
         }
         break;
     
-    case WT_BUTTON:      
+    
+    case WT_BUTTON:
+    case WT_ICON:
         useFrame=TRUE;
         useIcon=FALSE; 
         break;
@@ -2399,12 +2397,17 @@ wmCreateWindowFrame (
     }
 
 // ===============================================
-// button
+// Icon
 
-    //if (Type == WT_BUTTON)
-    //{
-    //    return 0;
-    //}
+
+    if (Type == WT_ICON)
+    {
+        window->borderUsed = TRUE;
+        __draw_window_border(parent,window);
+        //printf("border\n"); while(1){}
+        return 0;
+    }
+
 
     return 0;
 }

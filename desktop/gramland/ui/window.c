@@ -1817,6 +1817,7 @@ void *CreateWindow (
     case WT_EDITBOX_MULTIPLE_LINES:
     case WT_BUTTON:
     case WT_SIMPLE:
+    case WT_ICON:
         ValidType=TRUE;
         break;
     };
@@ -2008,7 +2009,6 @@ void *CreateWindow (
     }
 
 // ============================
-// Types with no frame!
 
 //====
 // Simple
@@ -2034,6 +2034,35 @@ void *CreateWindow (
         __w->locked = FALSE;
         goto draw_frame;
     }
+
+// ---------------------
+// Icon 
+
+    if (type == WT_ICON)
+    {
+        //gwssrv_debug_print ("CreateWindow: WT_ICON\n");
+
+        __w = 
+            (void *) doCreateWindow ( 
+                         WT_SIMPLE, 0, status, view, (char *) _name,
+                         x, y, width, height, 
+                         (struct gws_window_d *) pWindow, 
+                         desktopid, 
+                         frame_color, client_color, 
+                         (unsigned long) __rop_flags );  
+
+         if ( (void *) __w == NULL ){
+             gwssrv_debug_print ("CreateWindow: doCreateWindow fail\n");
+             goto fail;
+         }
+
+        __w->type = WT_ICON;
+        __w->locked = FALSE;
+        goto draw_frame;
+    }
+
+
+// ---------------------
 
 //type_fail:
     gwssrv_debug_print ("CreateWindow: [FAIL] type\n");
@@ -2080,7 +2109,8 @@ draw_frame:
     if ( type == WT_OVERLAPPED || 
          type == WT_EDITBOX_SINGLE_LINE || 
          type == WT_EDITBOX_MULTIPLE_LINES || 
-         type == WT_BUTTON )
+         type == WT_BUTTON ||
+         type == WT_ICON )
     {
         if ( (void*) __w != NULL )
         {

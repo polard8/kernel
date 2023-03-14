@@ -2317,6 +2317,11 @@ int serviceCreateWindow (int client_fd)
 
     // if( Show == TRUE )
     gws_show_window_rect(Window);
+    
+    //#debug
+    //if (Window->type == WT_ICON)
+    //    while(1){}
+    
     //Window->dirty = TRUE;
     return 0;
 fail:
