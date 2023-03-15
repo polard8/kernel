@@ -2280,7 +2280,7 @@ fail:
 // que está em last_window.
 // No teste isso é chamado pelo kernel através do handler.
 // Mas também será usado por rotinas internas.
-void wm_update_desktop(int tile)
+void wm_update_desktop(int tile, int show)
 {
     struct gws_window_d *w;  // tmp
     struct gws_window_d *l;  // last of the stack
@@ -2361,9 +2361,10 @@ void wm_update_desktop(int tile)
     wm_Update_TaskBar("DESKTOP",FALSE);
 // Invalidate the root window.
 // Shows the whole screen
-    invalidate_window(__root_window);
+    //invalidate_window(__root_window);
+    if (show)
+        flush_window(__root_window);
 }
-
 
 // Set focus on a window.
 // This is the window that owns the keyboard input.
@@ -3356,7 +3357,7 @@ wmProcedure(
             comp_get_mouse_y_position() );  // current cursor y
         
         //if(long1==1){ yellow_status("R1"); }
-        //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
+        //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE,TRUE); return 0; }
         //if(long1==1){ 
             //yellow_status("R1"); 
             //create_main_menu(8,8);
@@ -3522,7 +3523,7 @@ wmProcedure(
             (int)msg,
             (unsigned long)long1,
             (unsigned long)long2);
-        //wm_update_desktop(TRUE); // 
+        //wm_update_desktop(TRUE,TRUE); // 
         return 0;
         break;
 
@@ -3592,7 +3593,7 @@ wmProcedure(
             //set_status_by_id(tb_buttons[2],BS_RELEASED);
             //set_status_by_id(tb_buttons[3],BS_RELEASED);
             //WindowManager.is_fullscreen = FALSE;
-            //wm_update_desktop(TRUE);
+            //wm_update_desktop(TRUE,TRUE);
             return 0;
         }
 
@@ -3635,7 +3636,7 @@ wmProcedure(
 
     //case MSG_REPAINT:
         //if (window == __root_window){
-        //    wm_update_desktop(TRUE);
+        //    wm_update_desktop(TRUE,TRUE);
         //}
         //break;
 
@@ -3767,7 +3768,7 @@ static int on_combination(int msg_code)
         //wm_change_bg_color(COLOR_RED,TRUE,TRUE); //ok
         //printf ("server: [88112]\n");
         //__switch_focus();
-        //wm_update_desktop(TRUE); //ok.
+        //wm_update_desktop(TRUE,TRUE); //ok.
 
         return 0;
     }
@@ -4068,7 +4069,7 @@ int wmInputReader2(void)
                      if( (void*) __root_window->contextmenu->window != NULL )
                      {
                          is_menu_active = FALSE;
-                         wm_update_desktop(TRUE);
+                         wm_update_desktop(TRUE,TRUE);
                          //redraw_window(
                          //    __root_window->contextmenu->window, 
                          //    TRUE ); 
@@ -4096,7 +4097,7 @@ int wmInputReader2(void)
 
                 //printf ("server: [88112]\n");
                 //__switch_focus();
-                //wm_update_desktop(TRUE); //ok.
+                //wm_update_desktop(TRUE,TRUE); //ok.
                 //wm_reboot();
                 
                 //demos_startup_animation(7);
@@ -4177,14 +4178,13 @@ void wm_change_bg_color(unsigned int color, int tile, int fullscreen)
         return;
     }
 
-// tile
-    if(tile){
-        wm_update_desktop(TRUE);
+// Tile
+    if (tile){
+        wm_update_desktop(TRUE,TRUE);
     }else{
-        wm_update_desktop(FALSE);
-    }
+        wm_update_desktop(FALSE,TRUE);
+    };
 }
-
 
 void wm_enter_fullscreen_mode(void)
 {
@@ -4213,9 +4213,8 @@ void wm_exit_fullscreen_mode(int tile)
         return;
 
     WindowManager.is_fullscreen = FALSE;
-    wm_update_desktop(tile);
+    wm_update_desktop(tile,TRUE);
 }
-
 
 // yellow bar. (rectangle not window)
 // developer status.
@@ -4229,20 +4228,19 @@ void yellowstatus0(char *string, int refresh)
     unsigned long offset_string2 = ( 8*5 );
     unsigned long bar_size = w;
 
-    struct gws_window_d *aw;
-    
-    //aw = (struct gws_window_d *) windowList[active_window];
-    aw = (void*) active_window;
-    
-    if( (void*) aw == NULL ){
+    struct gws_window_d *window;
+
+// Target window.
+    //window = (void*) active_window;
+    window = (void*) __root_window;
+    if ( (void*) window == NULL ){
+        return;
+    }
+    if (window->magic!=1234){
         return;
     }
 
-    if(aw->magic!=1234){
-        return;
-    }
-
-    //if(aw->type!=WT_OVERLAPPED){
+    //if(window->type!=WT_OVERLAPPED){
     //    return;
     //}
 
@@ -4259,8 +4257,8 @@ void yellowstatus0(char *string, int refresh)
         //bar_size = w;
         bar_size = (w>>1);
         rectBackbufferDrawRectangle ( 
-            aw->absolute_x +2, 
-            aw->absolute_y  +2, 
+            window->absolute_x +2, 
+            window->absolute_y +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
@@ -4272,8 +4270,8 @@ void yellowstatus0(char *string, int refresh)
         //bar_size = (offset_string2 + (100) );
         bar_size = (w>>1);
         rectBackbufferDrawRectangle ( 
-            aw->absolute_x +2, 
-            aw->absolute_y +2, 
+            window->absolute_x +2, 
+            window->absolute_y +2, 
             bar_size, 
             24, 
             COLOR_YELLOW, 
@@ -4281,11 +4279,11 @@ void yellowstatus0(char *string, int refresh)
             0 );
     };
 
-// Escreve as strings
-    
+// Escreve as strings.
     grDrawString ( 
-        aw->absolute_x +2 + offset_string1, 
-        aw->absolute_y  +2 + 8, COLOR_BLACK, 
+        window->absolute_x +2 + offset_string1, 
+        window->absolute_y +2 + 8, 
+        COLOR_BLACK, 
         string );
     
     //grDrawString ( offset_string2, 8, COLOR_BLACK, "FPS" );
@@ -4296,10 +4294,11 @@ void yellowstatus0(char *string, int refresh)
         bar_size = 32;
     }
 
-    if(refresh){
+// Refresh
+    if (refresh){
         gws_refresh_rectangle(
-            (aw->absolute_x +2), 
-            (aw->absolute_y  +2), 
+            (window->absolute_x +2), 
+            (window->absolute_y +2), 
             bar_size,
             24 );
     }
@@ -6384,7 +6383,6 @@ void wm_Update_TaskBar( char *string, int flush )
     if ( (void*) string == NULL ){
         return;
     }
-
     if (*string == 0){
         return;
     }
@@ -6399,21 +6397,20 @@ void wm_Update_TaskBar( char *string, int flush )
 
 // Redraw the bar.
 // Redraw the buttons.
-
-    redraw_window_by_id(taskbar_window->id,TRUE);
-    //redraw_window_by_id(
-    //    __taskbar_startmenu_button_window->id,TRUE);
-    //redraw_window(taskbar_window,TRUE);
-    //redraw_window(__taskbar_startmenu_button_window,TRUE);
+// But not show yet.
+    //redraw_window_by_id(taskbar_window->id,TRUE);
+    redraw_window_by_id(taskbar_window->id,FALSE);
 
 // Redraw, all the valid buttons in the list.
     register int i=0;
     int wid=0;
     for (i=0; i<TB_BUTTONS_MAX; i++)
     {
-        if(tb_buttons[i] != 0){
+        if(tb_buttons[i] != 0)
+        {
             wid = (int) tb_buttons[i];
-            redraw_window_by_id(wid,TRUE);
+            //redraw_window_by_id(wid,TRUE);
+            redraw_window_by_id(wid,FALSE);
             __draw_button_mark_by_wid(wid,i);
         }
     };
@@ -6452,8 +6449,6 @@ void wm_Update_TaskBar( char *string, int flush )
 // Show the window.
     if(flush==TRUE){
         flush_window_by_id(taskbar_window->id);
-        //flush_window(taskbar_window);
-        //invalidate_window(taskbar_window);
     }
 }
 

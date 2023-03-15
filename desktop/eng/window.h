@@ -1272,7 +1272,7 @@ void show_client_list(int tag); //#todo: notworking
 void show_client( struct gws_client_d *c, int tag );
 int wmManageWindow( struct gws_window_d *w );
 
-void wm_update_desktop(int tile);
+void wm_update_desktop(int tile, int show);
 
 void set_first_window( struct gws_window_d *window);
 struct gws_window_d *get_first_window(void);

@@ -1,24 +1,20 @@
-
 /*
-# game1 - 3D game for Gramado OS.
+# ENG.BIN - 3D game for Gramado OS.
 # This is also a server.
 # It's called by the init process.
 # 2022 - Created by Fred Nora.
 */
-
 // This is a ring0 display server and window manager.
 // It has the same PID of the kernel, 0.
 // #todo: 
 // We need a fancy name for this project,
 // not only 'gws'.
-
 /*
  * File: main.c
  *    Main file for the Gramado Window Server.
  *    History:
  *        2020 - Created by Fred Nora.
  */
-
 // See:
 // Transformations
 // http://math.hws.edu/graphicsbook/c2/s3.html
@@ -35,7 +31,6 @@
 // hostname:D.S
 // [host]:<display>[.screen]
 // [host]:<display>.[screen]
-
 // host:
 // host refers to a network host name, and 
 // if absent means to connect to the local machine 
@@ -49,16 +44,13 @@
 // to other programs that connect to it.
 // screen:
 // a single monitor or a group of monitors.
-
 // display manager:
 // login stuff
 // The display manager must authenticate itself to the server.
-
 // main.c
 // Arquivo principal do gws.
 // As funções começam com o nome do módulo
 // para que em client side começem com gws_
-
 /*
 See: https://wiki.osdev.org/Graphics_stack
     > Application Layer
@@ -2101,14 +2093,13 @@ serviceAsyncCommand (void)
         break;
 
     case 11:
-        wm_update_desktop(TRUE); //see: wm.c
-        //return 0;
+        //see: wm.c
+        wm_update_desktop(TRUE,TRUE);
         goto done;
         break;
 
     case 12:
         __switch_focus();
-        //return 0;
         goto done;
         break;
 
@@ -2342,20 +2333,15 @@ serviceCreateWindow (int client_fd)
     //while(1){}
 
 //===================
-
 // Limits
-
-    if (pw<0 || pw>=WINDOW_COUNT_MAX)
-    {
+    if (pw<0 || pw>=WINDOW_COUNT_MAX){
         gwssrv_debug_print("serviceCreateWindow: parent window id fail\n");
         pw=0;
-        
         printf("pw\n");
         exit(1);
     }
 
 // Get parent window structure pointer.
-
     Parent = (struct gws_window_d *) windowList[pw];
 
 // #bugbug
@@ -2364,16 +2350,13 @@ serviceCreateWindow (int client_fd)
     if ( (void *) Parent == NULL )
     {
         gwssrv_debug_print ("serviceCreateWindow: parent window struct fail\n");
-        
-        
         // #bugbug
         // #todo: panic here.
-        if ( (void*) gui == NULL )
-        {
+        if ( (void*) gui == NULL ){
             gwssrv_debug_print ("serviceCreateWindow: gui fail\n");
             //exit(1);
         }
-        
+
         //if ( (void*) gui != NULL ) )
         //{
         //    Parent = gui->screen_window;
@@ -2417,16 +2400,9 @@ serviceCreateWindow (int client_fd)
         //return -1;
     }
 
-
-//===============================================
-
-//
+// ===============================================
 // The client fd.
-//
-
     Window->client_fd = (int) client_fd;
-
-
 
 //
 // Input queue
@@ -3734,8 +3710,11 @@ static int on_execute(void)
         }
 
         // see: demo.c
-        if (ShowDemo){
-            demoFlyingCube();
+        // IN: Draw desktop.
+        if (ShowDemo)
+        {
+            //demoFlyingCube(TRUE);
+            demoFlyingCube(FALSE);
         }
 
         wmInputReader();

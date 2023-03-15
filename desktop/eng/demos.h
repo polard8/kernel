@@ -54,7 +54,7 @@ void demoModel1(void);
 // flying cube
 void FlyingCubeMove(int number, int direction, float value);
 void demoFlyingCubeSetup(void);
-void demoFlyingCube(void);
+void demoFlyingCube(int draw_desktop);
 
 #endif    
 

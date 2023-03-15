@@ -2041,25 +2041,31 @@ void demoFlyingCubeSetup(void)
     game_update_taskbar = FALSE;
 }
 
-// called by the engine
-void demoFlyingCube(void)
+// Called by the engine
+void demoFlyingCube(int draw_desktop)
 {
     struct cube_model_d *tmp_cube;
 
 // Begin time.
     unsigned long beginTick = rtl_jiffies();
 
+// -------------------------
 // Clear canvas.
     //demoClearWA(COLOR_BLACK);                //clear surface
     gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
 
+// Draw desktop.
+    if (draw_desktop)
+        wm_update_desktop(TRUE,TRUE);
+
+// -------------------------
 // Draw terrain.
 // No rotation. Small translation in positive z.
     drawTerrain(terrain,0.0f);
 
 // Draw all the cubes.
     register int n=1; // terrain =0
-    while(1){
+    while (1){
 
         if(n>=CUBE_MAX){
             break;
@@ -2075,7 +2081,7 @@ void demoFlyingCube(void)
         //IN: cube number, direction, amount
         //FlyingCubeMove( n, 1, (float) 0.01f );
 
-        if( tmp_cube != NULL )
+        if (tmp_cube != NULL)
         {
 
             // Acceletarion: How fast the velocity changes.
@@ -2091,7 +2097,7 @@ void demoFlyingCube(void)
                 (struct cube_model_d *) tmp_cube,
                 (float) tmp_cube->v );
         }
-        
+
         n++;
     };
 
@@ -2108,7 +2114,7 @@ void demoFlyingCube(void)
 
 // Ja se passou 1 segundo?
     static char buf_fps[64];
-    if(deltaTick>1000)
+    if (deltaTick>1000)
     {
         sec++; // New second.
         memset(buf_fps,0,64);
@@ -2120,6 +2126,7 @@ void demoFlyingCube(void)
 
 // Draw yellow bar.
     yellowstatus0(buf_fps,FALSE);
+
 // Flush the backbuffer into the framebuffer.
     gramado_flush_surface(NULL);
 }

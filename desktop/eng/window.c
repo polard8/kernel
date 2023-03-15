@@ -489,11 +489,10 @@ void *doCreateWindow (
 
     //debug_print ("doCreateWindow:\n");
 
-
     int is_solid = TRUE;
-    if (rop_flags != 0)
+    if (rop_flags != 0){
         is_solid = FALSE;
-
+    }
 
 //
 // style
@@ -504,29 +503,23 @@ void *doCreateWindow (
 // move these things to another flag.
 
 // Maximized
-// WS_MAXIMIZED
-    if ( style & 0x0001 ){
-        Fullscreen = FALSE;
-        Minimized = FALSE;
-        Maximized = TRUE;  //:)
+// #todo:
+// The window occupy the whole desktop working area.
+    if (style & WS_MAXIMIZED){
+        Maximized=TRUE;
     }
 // Minimized
-// WS_MINIMIZED
-    if ( style & 0x0002 ){
-        Fullscreen = FALSE;
-        Maximized = FALSE;
-        Minimized = TRUE;  //:)
+// (Iconic)
+    if (style & WS_MINIMIZED){
+        Minimized=TRUE;
     }
 // Fullscreen
-// WS_FULLSCREEN
-    if ( style & 0x0004 ){
-        Maximized = FALSE;
-        Minimized = FALSE;
-        Fullscreen = TRUE;  //:)
+// Paint only the client area.
+    if (style & WS_FULLSCREEN){
+        Fullscreen=TRUE;
     }
 
-
-//salvar para depois restaurar os valores originais no fim da rotina.
+//Salvar para depois restaurar os valores originais no fim da rotina.
 	//unsigned long saveLeft;
 	//unsigned long saveTop;
 	
@@ -1671,14 +1664,11 @@ fail:
 // Não podemos usar a estrutura de janela da api.
 // #todo: change name to 'const char *'
 // Called by serviceCreateWindow() in main.c.
-
 // #test
 // Uma janela que é cliente, será criada
 // com deslocamento relativo à area de cliente.
 // Para criar janelas filhas com deslocamento relativo
 // a janela do aplicativo, tem que ativar uma flag.
-
-
 void *CreateWindow ( 
     unsigned long type, 
     unsigned long style,
@@ -1722,7 +1712,6 @@ void *CreateWindow (
     memset(name_local_copy,0,256);
     strcpy(name_local_copy,windowname);
 // =================
-
 
 // See:
 // config.h, main.c
@@ -1790,7 +1779,7 @@ void *CreateWindow (
 
 //====
 // Overlapped
-    if ( type == WT_OVERLAPPED )
+    if (type == WT_OVERLAPPED)
     {
         //gwssrv_debug_print ("CreateWindow: WT_OVERLAPPED\n");
         
@@ -1803,7 +1792,7 @@ void *CreateWindow (
         {
             // 1 = Tiling mode.
             // Do tamanho da área de trabalho.
-            if(WindowManager.mode == 1)
+            if (WindowManager.mode == 1)
             {
                 x=0;
                 y=0;

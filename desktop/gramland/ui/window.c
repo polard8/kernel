@@ -564,7 +564,6 @@ void *doCreateWindow (
     if (style & WS_MAXIMIZED){
         Maximized=TRUE;
     }
-
 // Minimized
 // (Iconic)
     if (style & WS_MINIMIZED){
