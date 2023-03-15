@@ -159,6 +159,7 @@ wmMouseEvent(
     long long2 )
 {
 // Called by the mouse handler.
+// Called by __ps2mouse_parse_data_packet in ps2mouse.c.
 
     int Status=-1;
     //static long old_x=0;
@@ -192,10 +193,10 @@ wmMouseEvent(
 // então podemos enviar o status das teclads de controle
 // atraves do segundo long.
 // IN: window pointer, event id, button number. button number.
-
-    if ( event_id == MSG_MOUSEPRESSED || event_id == MSG_MOUSERELEASED )
+// #todo: Send control keys status.
+    if ( event_id == MSG_MOUSEPRESSED || 
+         event_id == MSG_MOUSERELEASED )
     {
-        // #todo: Send control keys status.
         post_message_to_ws( event_id, button_number, button_number );
         return 0;
     }

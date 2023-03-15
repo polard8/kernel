@@ -289,33 +289,40 @@ network_on_sending (
     return -1;
 }
 
+
+// network_push_packet:
 // in: (Do buffer indicado para o buffer tail)
 // Isso é usado pelo driver de dispositivo
 // pra salvar o conteúdo que veio da rede em
 // um buffer que pode ser lido pelos aplicativos.
-int network_buffer_in( void *buffer, int len )
+int 
+network_push_packet( 
+    void *src_buffer, 
+    int len )
 {
 // Push packet.
+
+    printf ("--------------------- >>>> PUSH\n");
 
     int tail=0;
     void *dst_buffer;
 
 // Check args
-    if ( (void*) buffer == NULL ){
-        panic ("network_buffer_in: buffer\n");
+    if ( (void*) src_buffer == NULL ){
+        panic ("network_push_packet: src_buffer\n");
     }
 
 // #todo
 // Veja na configuração do dispositivo, que o buffer 
 // configurado para o hardware é de 0x3000 bytes.
     if (len>1500){
-        debug_print("network_buffer_in: [FIXME] len\n");
+        debug_print("network_push_packet: [FIXME] len\n");
         len = 1500;
         //return -1;
     }
 
     if (NETWORK_BUFFER.initialized != TRUE){
-        panic ("network_buffer_in: Shared buffers not initialized\n");
+        panic ("network_push_packet: Shared buffers not initialized\n");
     }
 
     tail = (int) NETWORK_BUFFER.receive_tail;
@@ -334,14 +341,17 @@ int network_buffer_in( void *buffer, int len )
 
 // Fail
 // Limits.
-    if (tail < 0 || tail >= 32){
+    if (tail < 0 || tail >= 32)
+    {
+        //#debug
+        panic ("network_push_packet: tail\n");
         return -1;
     }
 
 // Check buffer status.
 // Se o buffer está cheio é porque ele não foi consumido.
 // Vamos sobrepor?
-    int buffer_status = NETWORK_BUFFER.receive_status[tail];
+    int buffer_status = NETWORK_BUFFER.is_full[tail];
     if (buffer_status == TRUE)
     {
         // #bugbug
@@ -353,40 +363,56 @@ int network_buffer_in( void *buffer, int len )
     }
 
 // Get the destination buffer.
-    dst_buffer = (void*) NETWORK_BUFFER.receive_buffer[tail];
+    dst_buffer = (void*) NETWORK_BUFFER.buffers[tail];
 // Copy
-    if ((void*)dst_buffer != NULL){
-        memcpy( dst_buffer, buffer, len);
-    }
+    if ((void*)dst_buffer != NULL)
+    {
+        memcpy( 
+            dst_buffer,   // Data coes to the list.
+            src_buffer,   // Data comes from the device. 
+            len );        // Lenght.
+    } 
 
 // Avisamos que esse buffer está cheio.
-    NETWORK_BUFFER.receive_status[tail] = TRUE;
+    NETWORK_BUFFER.is_full[tail] = TRUE;
 
     //printf("network_buffer_in: ok\n");
     //refresh_screen();
-    return 0;  //ok
+    //return 0;  //ok
+    return (int) len;
 
 fail:
     return (int) -1;
 }
 
 
+// network_pop_packet:
 // out: (Do buffer head para o buffer indicado)
 // Isso é usado pelos aplicativos
 // para pegarem os conteúdos salvos nos buffers.
 // Daí os aplicativos interpretam os protocolos.
-int network_buffer_out ( void *buffer, int len )
+int 
+network_pop_packet ( 
+    void *u_buffer,   // User buffer to get the data. 
+    int len )         // Size.
 {
 // Pop packet.
+// Circular queue. :)
+// This is a service called only by the
+// network server to get input from the
+// queue filled by the NIC devices.
+// It doesn't open any device to get data.
+
+    //printf (" ---------- >>>> POP\n");
 
     int head=0;
     void *src_buffer;
 
-    debug_print("network_buffer_out:\n");
+    debug_print("network_pop_packet:\n");
 
 // check args
-    if ( (void*) buffer == NULL ){
-        panic ("network_buffer_out: [FAIL] buffer\n");
+    if ( (void*) u_buffer == NULL ){
+        panic ("network_pop_packet: [FAIL] u_buffer\n");
     }
 
 // #bugbug:
@@ -395,24 +421,24 @@ int network_buffer_out ( void *buffer, int len )
 // Veja na configuração do dispositivo, que o buffer 
 // configurado para o hardware é de 0x3000 bytes.
     if (len>1500){
-        debug_print("network_buffer_out: [FIXME] len\n");
+        debug_print("network_pop_packet: [FIXME] len\n");
         len=1500;
         //return -1;
     }
 
     if (NETWORK_BUFFER.initialized != TRUE){
-        panic ("network_buffer_out: Shared buffers not initialized\n");
+        panic ("network_pop_packet: Shared buffers not initialized\n");
     }
 
 // Vamos pegar um numero de buffer para enviarmos o pacote.
 // o kernel vai retirar do head ... 
 // o que foi colocado pelo aplicativo em tail.
-    head = (int) NETWORK_BUFFER.send_head;
+    head = (int) NETWORK_BUFFER.receive_head;
 
 // circula.
-    NETWORK_BUFFER.send_head++;
-    if (NETWORK_BUFFER.send_head >= 8){
-        NETWORK_BUFFER.send_head=0;
+    NETWORK_BUFFER.receive_head++;
+    if (NETWORK_BUFFER.receive_head >= 32){
+        NETWORK_BUFFER.receive_head=0;
     }
 
 // #todo
@@ -421,20 +447,35 @@ int network_buffer_out ( void *buffer, int len )
     //printf ("network_buffer_in: buffer_len %d\n",len);
     //refresh_screen();
 
-    if (head<0 || head >= 8){
+    if (head<0 || head >= 32)
+    {
+        //#debug
+        panic ("network_push_packet: head\n");
         return -1;
     }
 
+// Is the buffer full?
+    if ( NETWORK_BUFFER.is_full[head] != TRUE )
+        return 0;
+
 // Get the source buffer.
-    src_buffer = (void*) NETWORK_BUFFER.send_buffer[head];
+    src_buffer = (void*) NETWORK_BUFFER.buffers[head];
 // Copy
-    if ((void*)src_buffer != NULL){
-        memcpy( buffer, src_buffer, len );
+    if ((void*)src_buffer != NULL)
+    {
+        memcpy( 
+            u_buffer,   // User buffer to get the data. 
+            src_buffer, // Where the buffer was stored in the list.
+            len );      // Lenght.
+    
+        // Now this buffer is empty.
+        NETWORK_BUFFER.is_full[head] = FALSE;
     }
 
     //printf("network_buffer_in: ok\n");
     //refresh_screen();
-    return 0;  //ok
+    //return 0;  //ok
+    return (int) len;
     
 fail:
    return (int) -1;
@@ -588,25 +629,12 @@ int networkInit (void)
         if ((void *)tmp_buffer_address == NULL){
             panic("networkInit: [FAIL] receive tmp_buffer_address\n");
         }
-        NETWORK_BUFFER.receive_buffer[i] = (unsigned long) tmp_buffer_address;
-        NETWORK_BUFFER.receive_status[i] = FALSE;  //EMPTY
+        NETWORK_BUFFER.buffers[i] = (unsigned long) tmp_buffer_address;
+        NETWORK_BUFFER.is_full[i] = FALSE;  //EMPTY
     };
     NETWORK_BUFFER.receive_tail=0;
     NETWORK_BUFFER.receive_head=0;
 // ========================================
-// send buffers
-    for (i=0; i<8; i++){
-        tmp_buffer_address = (void*) newPage();
-        if((void *)tmp_buffer_address == NULL){
-            panic("networkInit: [FAIL] send tmp_buffer_address\n");
-        }
-        NETWORK_BUFFER.send_buffer[i] = (unsigned long) tmp_buffer_address;
-        NETWORK_BUFFER.send_status[i] = FALSE;  //EMPTY 
-    };
-    NETWORK_BUFFER.send_tail=0;
-    NETWORK_BUFFER.send_head=0;
-// =====================================
-
 // flag
     NETWORK_BUFFER.initialized = TRUE;
 

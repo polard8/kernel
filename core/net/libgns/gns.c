@@ -56,6 +56,26 @@ void gns_yield(void)
     gns_system_call (265,0,0,0);
 }
 
+
+// Get packet from kernel device.
+int gns_get_packet( unsigned long buffer, int buffer_lenght )
+{
+    unsigned long res=0;
+    unsigned long len = (unsigned long) (buffer_lenght & 0xFFFFFFFF);
+
+    if (buffer == 0)
+        return -1;
+    if (len==0)
+        return -1;
+
+    res = (unsigned long) gns_system_call (
+        118,     // Msg code
+        buffer,  // Buffer address
+        len,     // Buffer lenght
+        0);      // Nothing
+    return (int) (res & 0xFFFFFFFF);
+}
+
 // hello request
 static int __gns_hello_request (int fd)
 {

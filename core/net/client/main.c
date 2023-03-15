@@ -48,6 +48,10 @@
 
 #define IP(a, b, c, d)  (a << 24 | b << 16 | c << 8 | d)
 
+
+char buffer[1500];
+
+
 /*
 // #test
 // gerar número aleatório dentro de uma faixa.
@@ -115,22 +119,44 @@ int main ( int argc, char *argv[] )
         exit(1);
     }
 
+
+// ------------------
+// Send request and wait for response.
+// Ok. Its working :)
+    int hello_status = (int) gns_hello(client_fd);
+    if (hello_status <= 0){
+        printf("gns.bin: Service failed\n");
+    }
+
 // Loop
 // See: 
 // libgns/
 
+    int data_status=-1;
     int service_status = -1;
-
     while (1)
     {
         //if( isTimeToQuit == TRUE )
             //break;
 
-        // Send
-        service_status = (int) gns_hello(client_fd);
-        if (service_status <= 0){
-            printf("gns.bin: Service failed\n");
+        // ------------------
+        // Get data from kernel.
+        data_status = (int) gns_get_packet( buffer, 1500 );
+        if (data_status > 0)
+        {
+           //#debug
+           // We got data from kernel.
+           printf("Data: %s\n",buffer);
+           //exit(0);
         }
+
+        // ------------------
+        // Send request and wait for response.
+        // Ok. Its working :)
+        //service_status = (int) gns_hello(client_fd);
+        //if (service_status <= 0){
+        //    printf("gns.bin: Service failed\n");
+        //}
 
         // Sleep
         gns_yield();

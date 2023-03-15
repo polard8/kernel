@@ -18,6 +18,9 @@ void *gns_system_call (
     unsigned long c, 
     unsigned long d );
 
+int gns_get_packet( unsigned long buffer, int buffer_lenght );
+
+
 void
 gns_async_command ( 
     int fd, 

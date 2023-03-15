@@ -1550,8 +1550,14 @@ void *sci0 (
             return (void *) sys_post_message_to_tid( (int) arg2, (unsigned long) arg3 );
             break;
 
-        // 113~119: free
+        // 113~117: free
 
+        // 118~119
+        case 118:
+            // IN: user buffer, buffer lenght.
+            return (void*) network_pop_packet( (unsigned long) &message_address[0], (int) arg3 );
+            break;
+            
         // 120
         // Get a message given the index.
         // With restart support.

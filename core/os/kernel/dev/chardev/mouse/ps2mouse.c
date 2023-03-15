@@ -247,6 +247,9 @@ quit:
 
 static void __ps2mouse_parse_data_packet(void)
 {
+// Parse the mouse pacjet and 
+// send event to wmMouseEvent in grinput.c.
+
 // The first byte.
     unsigned char Flags=0;
 // Overflow support.
@@ -417,7 +420,7 @@ static void __ps2mouse_parse_data_packet(void)
 
 // Call the event handler.
 // IN: event id, x, y.
-// see: kgwm.c
+// see: grinput.c
     if (ps2_mouse_moving==TRUE){
         wmMouseEvent( MSG_MOUSEMOVE, mouse_x, mouse_y );
     }

@@ -141,6 +141,14 @@ network_handle_udp(
         printf ("UDP: Message{%s}\n", udp_payload );
         die();
     }
+
+// --------------
+// #test
+// Copy into a list of buffers.
+// The application is gonna get this.
+    network_push_packet( 
+        udp_payload, 
+        512 );
 }
 
 // -----------------

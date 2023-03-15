@@ -45,15 +45,9 @@ struct network_buffer_d
 // Receive
     int receive_tail;
     int receive_head;
-    unsigned long receive_buffer[32];
+    unsigned long buffers[32];
 // O status de cada buffer, se ele está vazio ou não.
-    int receive_status[32];
-// Send
-    int send_tail;
-    int send_head;
-    unsigned long send_buffer[8];
-// O status de cada buffer, se ele está vazio ou não.
-    int send_status[8];
+    int is_full[32];
 };
 
 // See: network.c
@@ -155,8 +149,10 @@ network_on_sending (
     ssize_t frame_size );
 
 
-int network_buffer_in( void *buffer, int len );
-int network_buffer_out( void *buffer, int len );
+
+// Push and Pop data.
+int network_push_packet( void *src_buffer, int len );
+int network_pop_packet( void *u_buffer, int len );
 
 void networkSetStatus(int status);
 int networkGetStatus(void);

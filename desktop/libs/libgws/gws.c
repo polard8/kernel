@@ -231,7 +231,9 @@ void *gws_system_call (
 // Debug via serial port. (COM1)
 void gws_debug_print(char *string)
 {
-    if ( (void*) string == NULL ){ return; }
+    if ( (void*) string == NULL ){
+        return;
+    }
     if ( *string == 0 ){
         return;
     }
@@ -3026,9 +3028,12 @@ void invalidate_surface_retangle(void)
 // Async.
 void gws_invalidate_window(int fd,int wid)
 {
-    if (fd<0) { return; }
-    if (wid<0){ return; }
-
+    if (fd<0){
+        return;
+    }
+    if (wid<0){
+        return;
+    }
     gws_async_command(fd,13,0,wid);
 }
 
@@ -3245,17 +3250,17 @@ void gws_start_thread (void *thread)
 // #todo: Use 'const char*'.
 // OUT: ??
 
-int gws_clone_and_execute (char *name)
+int gws_clone_and_execute(char *name)
 {
     unsigned long Value=0;
 
     if ( (void*) name == NULL ){ 
         debug_print("gws_clone_and_execute: name\n");
-        return (int) -1; 
+        goto fail;
     }
     if ( *name == 0 ){ 
         debug_print("gws_clone_and_execute: *name\n");
-        return (int) -1; 
+        goto fail; 
     }
 
     // #todo
@@ -3266,8 +3271,9 @@ int gws_clone_and_execute (char *name)
 
 // #todo
 // Error message
-
     return (int) (Value & 0xF);
+fail:
+    return (int) -1;
 }
 
 // Get system metrics.
@@ -3308,7 +3314,6 @@ done:
     gws_system_call ( 227, 0, 0, 0 );
     return;
 }
-
 
 // exit critical section
 // open the gate.
@@ -3381,7 +3386,7 @@ struct gws_menu_d *gws_create_menu (
 
     if (fd<0){
         debug_print("gws_create_menu: fd\n");
-        return (struct gws_menu_d *) 0;
+        goto fail;
     }
 
 // #todo: Check parent validation
@@ -3393,10 +3398,9 @@ struct gws_menu_d *gws_create_menu (
 // Menu
     menu = 
         (struct gws_menu_d *) gws_malloc( sizeof(struct gws_menu_d) );
-    if ( (void *) menu == NULL )
-    {
+    if ( (void *) menu == NULL ){
         debug_print("gws_create_menu: [FAIL] menu\n");
-        return (struct gws_menu_d *) 0;
+        goto fail;
     }
 // Offset related to the window
     menu->x = x;
@@ -3423,12 +3427,11 @@ struct gws_menu_d *gws_create_menu (
                   height,
                   parent, 0, color, color );
 
-    if (window <= 0)
-    { 
+    if (window <= 0){
         debug_print("gws_create_menu: [FAIL] window\n");
         //gws_free(menu);
         menu->window = 0;  //#bugbug !!!!
-        return (struct gws_menu_d *) 0;
+        goto fail;
     }
 
 // Saving 
@@ -3438,6 +3441,8 @@ struct gws_menu_d *gws_create_menu (
 
 // Return the pointer.
     return (struct gws_menu_d *) menu;
+fail:
+    return NULL;
 }
 
 // Create a menu item for a given valid menu.

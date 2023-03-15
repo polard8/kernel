@@ -606,6 +606,9 @@ static void on_mouse_pressed(void)
         return;
     }
 
+    //if (mouse_hover == __root_window)
+        //return;
+
 // Now we have a new mouse_owner.
 // #todo
 // Maybe we can send a message to this window,
