@@ -216,24 +216,36 @@ on_keyboard_event(
         return 0;
     }
 
+/*
 // Window with focus. 
 // (keyboard_owner)
     window = (struct gws_window_d *) get_focus();
-    if ( (void*) window == NULL ){
-        // #debug
-        printf("on_keyboard_event: window\n");
+// No keyboard owner
+    if ( (void*) window == NULL )
+    {
         return 0;
     }
-    if (window->magic != 1234){
-        // #debug
-        printf("on_keyboard_event: window magic\n");
+    if (window->magic != 1234)
+    {
+        // #bugbug
+        // Invalid keyboard_owner.
+        //keyboard_owner = NULL;
         return 0;
     }
+*/
 
 //================================
     if (msg == GWS_KeyDown)
     {
+        // We need the keyboard_owner.
+        window = (struct gws_window_d *) get_focus();
+        if ((void*) window == NULL )
+            return 0;
+        if (window->magic!=1234)
+            return 0;
+
         // Print a char into the window with focus.
+        // It needs to be an editbox?
         wm_draw_char_into_the_window(
             window, (int) long1, fg_color );
         // Enqueue a message into the queue that belongs
@@ -286,11 +298,18 @@ on_keyboard_event(
         // Enfileirar a mensagem na fila de mensagens
         // da janela com foco de entrada.
         // O cliente vai querer ler isso.
+        // We need the keyboard_owner.
+        window = (struct gws_window_d *) get_focus();
+        if ((void*) window == NULL )
+            return 0;
+        if (window->magic!=1234)
+            return 0;
         wmPostMessage(
             (struct gws_window_d *) window,
             (int)msg,
             (unsigned long)long1,
             (unsigned long)long2);
+
         //wm_update_desktop(TRUE); // 
         return 0;
     }
@@ -1382,21 +1401,10 @@ void wmInitializeStructure(void)
     WindowManager.frame_counter = 0;
     WindowManager.fps = 0;
 
-// root window
+// At this moment we don't have a root window.
     WindowManager.root = NULL;
-    if ( (void*) __root_window != NULL ){
-        if ( __root_window->magic == 1234 ){
-            WindowManager.root = 
-                (struct gws_window_d *) __root_window;
-        }
-    }
+// At this moment we don't have a taskbar window.
     WindowManager.taskbar = NULL;
-    if ( (void*) taskbar_window != NULL ){
-        if ( taskbar_window->magic == 1234 ){
-            WindowManager.taskbar = 
-                (struct gws_window_d *) taskbar_window;
-        }
-    }
 
 // #todo
 // Desktop composition.
@@ -2263,6 +2271,9 @@ wmCreateWindowFrame (
         if ( IsMaximized == FALSE && 
              IsFullscreen == FALSE)
         {
+            //WindowManager.is_fullscreen = TRUE;
+            //WindowManager.fullscreen_window = window;
+            
             window->borderUsed = FALSE;
             __draw_window_border(parent,window);
             // Now we have a border size.
@@ -2804,17 +2815,22 @@ void wm_update_desktop(int tile)
 // Set focus on the last window of the stack. 
 
     w = (struct gws_window_d *) first_window;
-    if ((void*)w == NULL){ 
+    if ((void*)w == NULL)
+    { 
+        first_window = NULL;
         wm_Update_TaskBar("DESKTOP",FALSE);
-        invalidate_window(__root_window);
+        flush_window(__root_window);
         return; 
     }
-    if (w->magic!=1234){
+    if (w->magic!=1234)
+    {
+        first_window = NULL;
+        wm_Update_TaskBar("DESKTOP",FALSE);
+        flush_window(__root_window);
         return;
     }
 
 // The first is the last valid window.
-
     l = (struct gws_window_d *) w;
 
     while(1){
@@ -3463,6 +3479,7 @@ wm_draw_char_into_the_window(
     unsigned int color )
 {
 // We are painting only on 'editbox'.
+// Not on root window.
 // #todo
 // In the case of editbox, we need to put the text into a buffer
 // that belongs to the window. This way the client application
@@ -3482,6 +3499,23 @@ wm_draw_char_into_the_window(
     if (window->magic != 1234){
         return;
     }
+
+// Not on root window.
+    if (window == __root_window)
+        return;
+
+// Invalid window type
+    int is_valid_wt=FALSE;
+    switch (window->type){
+        case WT_EDITBOX_SINGLE_LINE:
+        case WT_EDITBOX_MULTIPLE_LINES:
+            is_valid_wt = TRUE;
+            break;
+    };
+    if (is_valid_wt != TRUE)
+        return;
+
+
 // Invalid char
     if (ch<0){
         return;
@@ -3791,6 +3825,11 @@ wmPostMessage(
     if (window->used != TRUE) { return -1; }
     if (window->magic != 1234){ return -1; }
 
+// No messages to root window.
+    if (window == __root_window)
+        return -1;
+
+// Message code validation
     if (msg<0){
         return -1;
     }
@@ -4300,8 +4339,16 @@ int on_combination(int msg_code)
         return 0;
     }
 
+
+// [control+f]
     if (msg_code == GWS_Find)
-    {printf("ws: find\n"); return 0;}
+    {
+        printf("ws: find\n");
+        //printf("root: %s\n", WindowManager.root->name );
+        //printf("taskbar: %s\n", WindowManager.taskbar->name );
+        return 0;
+    }
+
 
 // #test
 // Creates a menu for the root window.
@@ -5345,6 +5392,8 @@ void create_taskbar (unsigned long tb_height, int show)
 struct gws_window_d *wmCreateRootWindow(unsigned int bg_color)
 {
     struct gws_window_d *w;
+    int status=-1;
+
 // It's because we need a window for drawind a frame.
 // WT_OVERLAPPED needs a window and WT_SIMPLE don't.
     unsigned long rootwindow_valid_type = WT_SIMPLE;
@@ -5426,8 +5475,13 @@ struct gws_window_d *wmCreateRootWindow(unsigned int bg_color)
     invalidate_surface_retangle();
     w->dirty = TRUE;  // Invalidate again.
     w->locked = TRUE;
-// Root window
-    gwsDefineInitialRootWindow(w);
+
+// Register root window.
+    status = gwsDefineInitialRootWindow(w);
+    if (status<0){
+        printf("wmCreateRootWindow: Couldn't register root window\n");
+        exit(0);
+    }
 
 // #
 // Do not register now.
@@ -5435,25 +5489,21 @@ struct gws_window_d *wmCreateRootWindow(unsigned int bg_color)
     return (struct gws_window_d *) w;
 }
 
+// OUT: 
+// 0=ok | <0=Fail.
 int gwsDefineInitialRootWindow (struct gws_window_d *window)
 {
 
 // Structure validation
-    if ( (void *) window == NULL ){
-        debug_print("gwsDefineInitialRootWindow: window\n");
-        printf     ("gwsDefineInitialRootWindow: window\n");
-        exit(1);
-        //return -1;
-    }
-    if (window->magic != 1234){
-        debug_print("gwsDefineInitialRootWindow: window magic\n");
-        printf     ("gwsDefineInitialRootWindow: window magic\n");
-        exit(1);
-        //return -1;
-    }
+    if ( (void *) window == NULL )
+        return -1;
+    if (window->magic != 1234)
+        return -1;
 
+// Set
     __root_window      = (struct gws_window_d *) window;
     WindowManager.root = (struct gws_window_d *) window;
+// OK.
     return 0;
 }
 

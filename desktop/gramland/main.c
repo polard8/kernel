@@ -1275,45 +1275,6 @@ static int initGraphics(void)
 
     window_server->graphics_initialization_status = FALSE;
 
-// gwsInit
-// Initialize the window server infrastructure.
-// The current display and the current screen.
-// It will create the root window.
-// See: gws.c
-
-    __init_status = (int) gwsInit();
-    if (__init_status != 0){
-        debug_print ("initGraphics: [PANIC] Couldn't initialize the graphics\n");
-        printf      ("initGraphics: [PANIC] Couldn't initialize the graphics\n");
-        goto fail;
-        //exit(1);
-    }
-
-// Create root window.
-// Create and update the taskbar window.
-    initBackground();
-
-// IN: height, flush.
-    create_taskbar(METRICS_TASKBAR_DEFAULT_HEIGHT,FALSE);  
-    wm_Update_TaskBar("Welcome!",TRUE);
-
-    //#debug
-    //gws_show_backbuffer();
-    //while(1){}
-//
-// == checks ==============
-//
-
-// Check if we already have the root window.
-
-    if ( (void*) __root_window == NULL ){
-        gwssrv_debug_print ("initGraphics: [FAIL] root window doesn't exist\n");
-        printf             ("initGraphics: [FAIL] root window doesn't exist\n");
-        goto fail;
-        //exit(1);
-    }
-    keyboard_owner = (void*) __root_window;
-    mouse_owner    = (void*) __root_window;
 
 //#debug
     //gws_show_backbuffer();
@@ -3283,50 +3244,54 @@ static int initGUI(void)
 {
     int graphics_status = -1;
 
-// #todo: 
-// Is it the first time?
+//
+// GUI
+//
 
-    graphics_status = (int) initGraphics();
-    if (graphics_status<0){
-        printf("initGUI: initGraphics failed\n");
-        return (int) -1;
+// gwsInit
+// Initialize the window server infrastructure.
+// The current display and the current screen.
+// It will create the root window.
+// See: gws.c
+
+    int __init_status = (int) gwsInit();
+    if (__init_status != 0){
+        debug_print ("initGUI: [PANIC] Couldn't initialize the graphics\n");
+        printf      ("initGUI: [PANIC] Couldn't initialize the graphics\n");
+        //goto fail;
+        exit(1);
     }
 
-//
-// == demos ==================================
-//
+// Create root window.
+// Create and update the taskbar window.
+    initBackground();
+
+// IN: height, flush.
+// See: wm.c
+    create_taskbar(METRICS_TASKBAR_DEFAULT_HEIGHT,FALSE);  
+    wm_Update_TaskBar("Welcome!",TRUE);
 
     //#debug
-    //printf ("l=%d\n",gr_dc->left);
-    //printf ("t=%d\n",gr_dc->top);
-    //printf ("w=%d\n",gr_dc->width);
-    //printf ("h=%d\n",gr_dc->height);
+    //gws_show_backbuffer();
     //while(1){}
+//
+// == checks ==============
+//
 
-// Always run some demo if we are in JAIL mode.
-// It's an animation in the initialization.
-// Seleciona a animaçao.
-// Nao deve travar, deve ter timeout.
+// Check if we already have the root window.
 
-    if ( current_mode == GRAMADO_JAIL ||
-         current_mode == GRAMADO_P1 ||
-         current_mode == GRAMADO_HOME )
-    {
-        // #todo
-        // Keep the graphics routines
-        // clean and simple in this server.
-        // demos_startup_animation(7);  //curve
-        // demos_startup_animation(9);  //cat
-        // again
-        // wm_Update_TaskBar("Welcome :)",TRUE);
+    if ( (void*) __root_window == NULL ){
+        gwssrv_debug_print ("initGraphics: [FAIL] root window doesn't exist\n");
+        printf             ("initGraphics: [FAIL] root window doesn't exist\n");
+        //goto fail;
+        exit(1);
     }
-
-    Initialization.setup_graphics_interface_checkpoint = TRUE;
+    keyboard_owner = (void*) __root_window;
+    mouse_owner    = (void*) __root_window;
 
 // ok, no errors.
     return 0;
 }
-
 
 /*
  * on_execute: 
@@ -3526,30 +3491,35 @@ static int on_execute(int dm)
     Initialization.setup_connection_checkpoint = TRUE;
 
 // ==================================================
-// Init Hot
-// The graphics interface.
-// #todo: maybe a flag in the parameters.
-// #todo: Change this name.
+// Init GUI
 
-// This is the second phase of the initialization
-// The graphics infrastructure.
-// 2d, 3d, windows.
     Initialization.current_phase = 2;
 
-    int graphics_status = -1;
-    graphics_status = (int) initGUI();
-    if (graphics_status<0){
+    int gui_status = -1;
+    gui_status = (int) initGUI();
+    if (gui_status<0){
         printf("on_execute: initGUI failed\n");
         return (int) -1;
     }
 
 // ==================================================
+// Init Graphics
 
-//
-// The window manager
-//
+    int graphics_status = (int) initGraphics();
+    if (graphics_status<0){
+        printf("on_execute: initGraphics failed\n");
+        return (int) -1;
+    }
+    Initialization.setup_graphics_interface_checkpoint = TRUE;
 
-// ===============
+// ----------------------------------------------
+// Check window manager,
+// Is it initialized?
+
+    if (WindowManager.initialized != TRUE)
+    {
+       // Ohhhh
+    }
 
     if( (void*) WindowManager.root == NULL ){
         gwssrv_debug_print("gwssrv: WindowManager.root fail\n");
@@ -3589,7 +3559,6 @@ static int on_execute(int dm)
 
     //gws_show_backbuffer();
     //while(1){}
-
     // #debug
     //printf ("fd: %d\n", serverClient->fd);
     //while(1){}
