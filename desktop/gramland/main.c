@@ -1864,7 +1864,7 @@ int serviceAsyncCommand(void)
 
     //see: wm.c
     case 11:
-        wm_update_desktop(TRUE);
+        wm_update_desktop(TRUE,TRUE);
         goto done;
         break;
 
@@ -1939,7 +1939,7 @@ int serviceAsyncCommand(void)
         printf("90: Destroy overlapped window %d\n",wid);
         DestroyWindow(wid);
         wm_rebuild_list();
-        wm_update_desktop(TRUE);
+        wm_update_desktop(TRUE,TRUE);
         break;
 
     //#todo: Destroy window.

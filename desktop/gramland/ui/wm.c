@@ -310,7 +310,7 @@ on_keyboard_event(
             (unsigned long)long1,
             (unsigned long)long2);
 
-        //wm_update_desktop(TRUE); // 
+        //wm_update_desktop(TRUE,TRUE); // 
         return 0;
     }
 
@@ -367,7 +367,7 @@ on_keyboard_event(
             WindowManager.is_fullscreen = FALSE;
 
             //set_input_status(FALSE);
-            wm_update_desktop(TRUE);
+            wm_update_desktop(TRUE,TRUE);
             //set_input_status(TRUE);
             
             return 0;
@@ -975,7 +975,7 @@ static void on_mouse_released(void)
     }
 
     //if(long1==1){ yellow_status("R1"); }
-    //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE); return 0; }
+    //if(long1==2){ yellow_status("R2"); wm_update_desktop(TRUE,TRUE); return 0; }
     //if(long1==1){ 
         //yellow_status("R1"); 
         //create_main_menu(8,8);
@@ -2769,7 +2769,7 @@ fail:
 // que está em last_window.
 // No teste isso é chamado pelo kernel através do handler.
 // Mas também será usado por rotinas internas.
-void wm_update_desktop(int tile)
+void wm_update_desktop(int tile, int show)
 {
     struct gws_window_d *w;  // tmp
     struct gws_window_d *l;  // last of the stack
@@ -2869,7 +2869,10 @@ void wm_update_desktop(int tile)
     wm_Update_TaskBar("DESKTOP",FALSE);
 // Invalidate the root window.
 // Shows the whole screen
-    invalidate_window(__root_window);
+    //invalidate_window(__root_window);
+    if(show){
+        flush_window(__root_window);
+    }
 }
 
 void wm_update_active_window(void)
@@ -2892,9 +2895,8 @@ wm_update_desktop2(
     int tile )
 {
     set_last_window(last_window);
-    wm_update_desktop(TRUE);
+    wm_update_desktop(TRUE,TRUE);
 }
-
 
 void wm_update_desktop3(struct gws_window_d *top_window)
 {
@@ -4207,7 +4209,7 @@ wmProcedure(
           //(struct gws_window_d *) window, 
           //(unsigned long) long1 );  //flags
         //if (window == __root_window){
-        //    wm_update_desktop(TRUE);
+        //    wm_update_desktop(TRUE,TRUE);
         //}
         //break;
 
@@ -4278,7 +4280,7 @@ void on_menu_event(void)
         __button_released( StartMenu.wid );
         // Update desktop but don't show the menu.
         StartMenu.is_visible = FALSE;
-        wm_update_desktop(TRUE);
+        wm_update_desktop(TRUE,TRUE);
         return;
     }
 }
@@ -4517,7 +4519,7 @@ new_event:
     //if (msg == GWS_Close)
     //    gwssrv_quit();
     //if (msg == GWS_UpdateDesktop)
-    //    wm_update_desktop(TRUE);
+    //    wm_update_desktop(TRUE,TRUE);
 
 //Unknown:
     return 0;
@@ -4675,11 +4677,11 @@ void wm_change_bg_color(unsigned int color, int tile, int fullscreen)
         return;
     }
 
-// tile
+// Tile
     if (tile){
-        wm_update_desktop(TRUE);
+        wm_update_desktop(TRUE,TRUE);
     }else{
-        wm_update_desktop(FALSE);
+        wm_update_desktop(FALSE,TRUE);
     };
 }
 
@@ -4718,7 +4720,7 @@ void wm_exit_fullscreen_mode(int tile)
         return;
     }
     WindowManager.is_fullscreen = FALSE;
-    wm_update_desktop(tile);
+    wm_update_desktop(tile,TRUE);
 }
 
 // yellow bar. (rectangle not window)
@@ -6231,7 +6233,6 @@ void wm_Update_TaskBar( char *string, int flush )
         if (QuickLaunch.buttons[i] != 0)
         {
             wid = (int) QuickLaunch.buttons[i];
-            //redraw_window_by_id(wid,TRUE);
             redraw_window_by_id(wid,FALSE);
             //__draw_button_mark_by_wid(wid,i);
         }
@@ -6272,7 +6273,6 @@ void wm_Update_TaskBar( char *string, int flush )
     if (flush==TRUE){
         flush_window_by_id(taskbar_window->id);
         //flush_window(taskbar_window);
-        //invalidate_window(taskbar_window);
     }
 }
 
