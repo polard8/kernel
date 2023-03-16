@@ -1073,7 +1073,7 @@ void load_pml4_table(void *phy_addr)
 // inline?
 void enable_pae(void)
 {
-    // PAE and PGE
+    // PAE and PGE.
     asm volatile ( " movq %%cr4, %%rax; "
                    " orl $0x20,  %%eax; "
                    " movq %%rax, %%cr4  " :: );

@@ -1,16 +1,15 @@
 
 // intelmm.h
 
-
-#ifndef ____INTELMM_H
-#define ____INTELMM_H    1
+#ifndef __MM_INTELMM_H
+#define __MM_INTELMM_H    1
 
 
 //
 // tables support
 //
 
-//PDE - Page Directory Entry
+// PDE - Page Directory Entry.
 struct intel_pde_d
 {
     unsigned long Present              :1;
@@ -28,8 +27,7 @@ struct intel_pde_d
     unsigned long PageTableBaseAddress :20;
 };
 
-
-//PTE - Page Table Entry
+// PTE - Page Table Entry.
 struct intel_pte_d
 {
     unsigned long Present         :1;

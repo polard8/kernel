@@ -10,18 +10,17 @@
 extern unsigned long blSavedLastValidAddress;
 extern unsigned long blSavedPhysicalMemoryInKB;
 
-
 // Definições dos campos das páginas.
-#define PAGE_PRESENT    0x001
-#define PAGE_WRITE         0x002
-#define PAGE_USER           0x004
+#define PAGE_PRESENT  0x001
+#define PAGE_WRITE    0x002
+#define PAGE_USER     0x004
 // 0x008 write through
-#define PAGE_NOCACHE    0x010
-#define PAGE_ACCESSED    0x020
-#define PAGE_DIRTY            0x040
+#define PAGE_NOCACHE   0x010
+#define PAGE_ACCESSED  0x020
+#define PAGE_DIRTY     0x040
 //0x080 page atribute table
-#define PAGE_GLOBAL    0x100
-#define PAGE_AVAIL         0xE00
+#define PAGE_GLOBAL  0x100
+#define PAGE_AVAIL   0xE00
 #define PAGE_PRESENT_WRITE       ( PAGE_WRITE | PAGE_PRESENT )
 #define PAGE_PRESENT_WRITE_USER  ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT )
 #define PAGE_KERNEL_PGPROT       (PAGE_PRESENT_WRITE)
