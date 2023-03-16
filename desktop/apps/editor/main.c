@@ -72,16 +72,16 @@ static int addressbar_window = 0;
 static int client_window = 0;
 static int savebutton_window = 0;
 
-struct client_window_d
+struct child_window_d
 {
     unsigned long l;
     unsigned long t;
     unsigned long w;
     unsigned long h;
 };
-struct client_window_d cwAddressBar;
-struct client_window_d cwButton;
-struct client_window_d cwText;
+struct child_window_d cwAddressBar;
+struct child_window_d cwButton;
+struct child_window_d cwText;
 
 // #todo
 // int button_list[8];
@@ -123,12 +123,12 @@ static void __test_load_file(int socket, int wid);
 
 static void update_clients(int fd)
 {
+    // Local
+    struct gws_window_info_d lWi;
+
     if (fd<0){
         return;
     }
-
-    // Local.
-    struct gws_window_info_d lWi;
 
 // Get info about the main window.
 //IN: fd, wid, window info structure.
@@ -139,7 +139,7 @@ static void update_clients(int fd)
 
 // Change the position of the clients.
 
-//---------------------------------------------
+// ---------------------------------------------
 // Save
     cwAddressBar.l = (( lWi.cr_width/8 )*2);
     cwAddressBar.t = 4;
@@ -155,7 +155,6 @@ static void update_clients(int fd)
         addressbar_window,
         cwAddressBar.w,
         cwAddressBar.h );
-
 
 //---------------------------------------------
 // Save
