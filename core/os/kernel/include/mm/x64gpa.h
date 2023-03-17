@@ -355,22 +355,18 @@ A conservative approach is to avoid everything above 0x00080000.
 
 // 8
 #define BACKBUFFER  0x800000
-#define BACKBUFFER_PART1  BACKBUFFER
 #define SMALLSYSTEM_BACKBUFFER   BACKBUFFER
 #define MEDIUMSYSTEM_BACKBUFFER  BACKBUFFER
 #define LARGESYSTEM_BACKBUFFER   BACKBUFFER
 
 // 10
-// Reservado para backbuffer
-//#define BACKBUFFER_PART2  0xA00000
+// 0xA00000
 
 // 12
-// Reservado para backbuffer
-//#define BACKBUFFER_PART3  0xC00000
+// 0xC00000
 
 // 14
-// Reservado para backbuffer
-//#define BACKBUFFER_PART4  0xE00000
+// 0xE00000
 
 //
 // == 16 MB =========================================================
@@ -378,6 +374,13 @@ A conservative approach is to avoid everything above 0x00080000.
 // 0x01000000
 
 // 16
+// #bugbug
+// The 'heap pool' has 2MB in size
+// and it starts at 0x01000000. (16MB mark).
+// 2MB = 2048 KB.
+// (2048/64) = 32 KB.
+// It has 64 processes with 32KB each.
+// See: process.h
 #define HEAPPOOL  0x01000000
 #define SMALLSYSTEM_HEAPPOLL_START   HEAPPOOL
 #define MEDIUMSYSTEM_HEAPPOLL_START  HEAPPOOL
@@ -459,11 +462,11 @@ A conservative approach is to avoid everything above 0x00080000.
 
 // Used by the frame table. (FT)
 // See: x64mm.h
+// | 128MB ~ 1GB | 
 
 #define __128MB_MARK_PA  (0x08000000)
 #define __256MB_MARK_PA  (0x10000000)
 #define __512MB_MARK_PA  (0x20000000)
-#define __1GB_MARK_PA    (0x40000000)
 
 //
 // == 1GB =========================================================

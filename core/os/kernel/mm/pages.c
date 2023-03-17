@@ -1640,13 +1640,9 @@ static void __initialize_frontbuffer(void)
 
 static void __initialize_backbuffer(void)
 {
-    unsigned long *pt_backbuffer = (unsigned long *) PAGETABLE_BACKBUFFER;
-
-// backbuffer_pa:     
-// backbuffer, (16MB mark) 0x01000000.
-// #bugbug: Essa eh a mesma posiçao do heappool.
-//16mb mark
-    //unsigned long backbuffer_pa = (unsigned long) 0x01000000; 
+// The pagetable for the first 2MB.
+    unsigned long *pt_backbuffer = 
+        (unsigned long *) PAGETABLE_BACKBUFFER;
 
 // 8mb mark
 // This is the right place: see: x64gpa.h
@@ -1834,15 +1830,28 @@ void *slab_1MB_allocator(void)
 
 static void __initialize_heappool(void)
 {
+// The pagetable.
     unsigned long *pt_heappool = (unsigned long *) PAGETABLE_HEAPPOOL; 
+// The pa.
     unsigned long heappool_pa = (unsigned long) SMALL_heappool_pa;
-
-    g_heappool_va = (unsigned long) HEAPPOOL_VA; //0x30800000;
-
+// The va. 0x30800000;
+    g_heappool_va = (unsigned long) HEAPPOOL_VA;
+// Used memory. 2048 KB.
     mm_used_heappool = (1024 * 2);
-    g_heap_count     = 0;
+
+// -----------------------
+// The heaps in the pool.
+// see: process.h and x64gpa.h
+
+    // Counting the heaps we get from the pool.
+    g_heap_count = 0;
+    // Maximum number of heaps in the pool
+    // 64.
     g_heap_count_max = G_DEFAULT_PROCESSHEAP_COUNTMAX;
-    g_heap_size      = G_DEFAULT_PROCESSHEAP_SIZE;  //#bugbug
+    // The heap size.
+    // 32KB.
+    g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
+
 
 // IN:
 // Endereço virtual do diretório de páginas.

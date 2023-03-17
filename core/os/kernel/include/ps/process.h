@@ -6,10 +6,18 @@
 
 extern int copy_process_in_progress;
 
-#define G_DEFAULT_PROCESSHEAP_SIZE  (128 * 1024)
-#define G_DEFAULT_PROCESSHEAP_COUNTMAX  16 
 
+// #bugbug
+// The 'heap pool' has 2MB in size
+// and it starts at 0x01000000. (16MB mark).
+// 2MB = 2048 KB.
+// (2048/64) = 32 KB.
+// It has 64 processes with 32KB each.
+#define __HEAP_POOL_SIZE_IN_BYTES       (2048 * 1024)
+#define G_DEFAULT_PROCESSHEAP_SIZE      (  32 * 1024)
+#define G_DEFAULT_PROCESSHEAP_COUNTMAX  (64) 
 
+//-----------------
 
 //#bugbug
 //talvez aqui nao seja o melhor lugar pra definir isso.
