@@ -291,6 +291,7 @@ pio_rw_sector (
     unsigned char c=0;
     unsigned int lba = (unsigned int) _lba;
 
+// Fail
     if ( rw != 0x20 && 
          rw != 0x30 )
     {
@@ -430,13 +431,8 @@ pio_rw_sector (
 
     //out8 (0x1F1, isDMA)
 
-
-//
 // # timeout sim, 
 // não podemos esperar para sempre.
-//
-
-
 // #bugbug:
 // Isso deve ir para cima.
 
@@ -455,14 +451,12 @@ again:
     c = (unsigned char) ( c & 8 );
 
 // Checa o estado do bit.
-    if ( c == 0 )
+    if (c == 0)
     {
         TimeoutCounter--;
-
         if (TimeoutCounter == 0){
             goto failTimeOut;
         }
-
         // #bugbug: 
         // Isso pode enrroscar aqui.
         goto again;
@@ -470,10 +464,7 @@ again:
 // ================================
 //--
 
-
-//
 // Read or write.
-//
 
     switch (rw){
 
@@ -519,7 +510,6 @@ failTimeOut:
     printf ("pio_rw_sector: [FAIL] Timeout\n");
     return (int) (-3);
 }
-
 
 /*
  * ataReadSector:

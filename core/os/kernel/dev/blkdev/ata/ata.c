@@ -13,7 +13,56 @@
 // see: ide.h
 struct ide_port_d  ide_ports[4];
 
+//
+// Variables
+//
 
+int ATAFlag=0;
+unsigned short *ata_identify_dev_buf;
+// Saving values.
+unsigned char ata_record_dev=0;
+unsigned char ata_record_channel=0;
+
+// #important
+// Qual é o canal e o dispositivo usado no momento
+// pela rotina de leitura e escrita.
+// See: config.h ata.c hdd.c
+int g_current_ide_port_index=0;
+
+// #important
+// Qual é o canal e o dispositivo usado no momento do boot 
+// pela rotina de leitura e escrita.
+// See: config.h ata.c hdd.c
+int g_boottime_ide_port_index=0;
+
+
+/*
+ * PCIDeviceATA:
+ * Estrutura de dispositivos pci para um disco ata.
+ * #bugbug: E se tivermos mais que um instalado ???
+ * #importante
+ * Essa é uma estrutura de dispositivos pci 
+ * criada para o gramado, 
+ * definida em pci.h
+ */
+struct pci_device_d *PCIDeviceATA;
+// struct pci_device_d *PCIDeviceATA2;
+// ...
+
+
+
+struct dev_nport  dev_nport;
+
+// Not a pointer.
+// see: ata.h
+struct ata_d  ata;
+
+// Current storage device.
+// see: ata.h
+struct ata_device_d *current_sd;
+// List for storage devices.
+// see: ata.h
+struct ata_device_d *ready_queue_dev;
 
 // base address 
 // BAR0 is the start of the I/O ports used by the primary channel.
@@ -30,11 +79,8 @@ unsigned long ATA_BAR3_SECONDARY_CONTROL_PORT=0;  // Secondary Control Block Bas
 unsigned long ATA_BAR4=0;  // Legacy Bus Master Base Address
 unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Address
 
-
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
-
-
 
 //
 // == Private functions: prototypes ==============
@@ -103,16 +149,14 @@ void ata_delay(void)
     };
 }
 
-
 // #bugbug
-// Lê o status de um disco determinado, se os valores na estrutura 
-// estiverem certos.
+// Lê o status de um disco determinado, 
+// se os valores na estrutura estiverem certos.
 // #todo: return type.
 unsigned char ata_status_read(void)
 {
     return in8( ata.cmd_block_base_address + ATA_REG_STATUS );
 }
-
 
 void ata_cmd_write (int cmd_val)
 {
@@ -139,7 +183,6 @@ void ata_soft_reset(void)
         (unsigned short) ata.ctrl_block_base_address, 
         (unsigned char) (data & 0xFB) );
 }
-
 
 unsigned char ata_wait_drq(void)
 {
@@ -220,7 +263,6 @@ static void __set_ata_addr (int channel)
         //break;
     };
 }
-
 
 // local
 // __ata_config_structure:
@@ -323,7 +365,6 @@ ata_ioctl (
     return -1;
 }
 
-
 // ata_initialize:
 // Inicializa o IDE e mostra informações sobre o disco.
 // Sondando na lista de dispositivos encontrados 
@@ -341,12 +382,10 @@ int ata_initialize (int ataflag)
 	Me parece que em nenhum momento na rotina de inicialização
 	o dispositivo foi registrado, como acontece na sondagem dos 
 	outros dispositivos pci.
-
 	Precisa registrar na estrutura de dispositivos e na
 	lista de dispositivos. Colocando informações como
 	a classe do dispositivo. (char, block, network). No caso, block.
 */
-
 
     int Status = -1;  //error
     int Value = -1;
@@ -653,10 +692,8 @@ done:
 
 
 // ide_identify_device:
-// ??
 // O número da porta identica qual disco queremos pegar informações.
 // Slavaremos algumas informações na estrutura de disco.
-
 // OUT:
 // 0xFF = erro ao identificar o número.
 // 0    = PATA ou SATA
@@ -1212,25 +1249,18 @@ int ide_dev_init (char port)
     struct ata_device_d  *new_dev;
 
     int isBootTimeIDEPort=FALSE;
-
     int data=0;
-
     unsigned long value1=0;
     unsigned long value2=0;
     unsigned long value3=0;
     unsigned long value4=0;
 
-
 // Limits
 // 4 ports only    
-
-    if ( port < 0 || 
-         port >= 4)
-    {
+    if ( port < 0 || port >= 4){
         printf ("ide_dev_init: port\n");
         goto fail;
     }
-
 
 // storage
 // We need this structure.
@@ -1261,11 +1291,9 @@ int ide_dev_init (char port)
     int boottime_ideport = ata_get_boottime_ide_port_index();
     
     // YES!
-    if( port == boottime_ideport)
-    {
+    if (port == boottime_ideport){
         isBootTimeIDEPort = TRUE;
     }
-
 
 //
 // new_dev
@@ -1273,10 +1301,9 @@ int ide_dev_init (char port)
 
 // See: ata.h
 
-    new_dev = ( struct ata_device_d * ) kmalloc( sizeof(struct ata_device_d) );
-
-    if ( (void *) new_dev ==  NULL )
-    {
+    new_dev = 
+        ( struct ata_device_d * ) kmalloc( sizeof(struct ata_device_d) );
+    if ( (void *) new_dev ==  NULL ){
         printf ("ide_dev_init: new_dev\n");
         goto fail;
     }
@@ -1291,15 +1318,12 @@ int ide_dev_init (char port)
 // 0    = PATA ou SATA
 // 0x80 = ATAPI ou SATAPI
 
-
 // ================
 // Unidade de classe desconhecida.
-    if ( data == 0xFF )
-    {
+    if (data == 0xFF){
         debug_print ("ide_dev_init: [FIXME] data\n");
         return (int) -1;
     }
-
 
 // ================
 // Unidades ATA.
@@ -1644,11 +1668,9 @@ fail:
     return -1;  // Not reached.
 }
 
-
 void ata_show_device_list_info(void)
 {
-    struct ata_device_d *sd;
-
+    struct ata_device_d  *sd;
     unsigned long mb28=0;
     unsigned long mb48=0;
 
@@ -1692,12 +1714,10 @@ void ata_show_device_list_info(void)
     };
 }
 
-
 /* 
  * dev_switch:
- *     ?? Porque esse tipo ?? 
+ * ?? Porque esse tipo ?? 
  */
-
 static inline void dev_switch (void)
 {
 
@@ -1744,13 +1764,10 @@ int nport_ajust ( char nport )
  
     while ( nport != getnport_dev() )
     {
-        if ( i == 4 )
-        { 
+        if (i == 4){
             return (int) 1; 
         }
-        
-        dev_switch ();
-        
+        dev_switch();
         i++;
     };
 
@@ -1827,13 +1844,9 @@ void show_ide_info (void)
 	//};
 	*/
 
-
 	// Estrutura 'atapi'
 	// Qual lista ??
-
 	// Estrutura 'ata_device_d'
-	// Estão na lista 'ready_queue_dev'	
-
-    //refresh_screen ();
+	// Estão na lista 'ready_queue_dev'
 }
 

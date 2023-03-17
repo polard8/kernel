@@ -2,8 +2,8 @@
 // ata.h
 // Created by Nelson Cole.
 
-#ifndef __ATA_H
-#define __ATA_H    1
+#ifndef __ATA_ATA_H
+#define __ATA_ATA_H    1
 
 
 // Bus.
@@ -26,34 +26,30 @@
 #define ATA_LBA28     28
 #define ATA_LBA48     48
 
-
+// Force mode.
 #define FORCEPIO 1234
 
-//#bugbug 
-//Precisamos encontrar endereços válidos.
+// #bugbug 
+// Precisamos encontrar endereços válidos.
 #define DMA_PHYS_ADDR0  0xa0000
 #define DMA_PHYS_ADDR1  0xb0000
 #define DMA_PHYS_ADDR2  0xb0000
 #define DMA_PHYS_ADDR3  0xb0000 
 
-
-//#bubbug usar definição do gramado.
-#define PCI_CLASSE_MASS 1
-
+// #bugbug: 
+// Usar definição do Gramado.
+#define PCI_CLASSE_MASS  1
 
 // Controladores de unidades ATA.
-#define ATA_IDE_CONTROLLER  0x1
-#define ATA_RAID_CONTROLLER 0x4
-#define ATA_AHCI_CONTROLLER 0x6
-#define ATA_UNKNOWN_CONTROLLER    0xFF   
-
-
+#define ATA_IDE_CONTROLLER   0x1
+#define ATA_RAID_CONTROLLER  0x4
+#define ATA_AHCI_CONTROLLER  0x6
+#define ATA_UNKNOWN_CONTROLLER  0xFF   
 
 // Retorno da inicializacao PCI. 
 #define PCI_MSG_ERROR       -1
 #define PCI_MSG_AVALIABLE   0x80
 #define PCI_MSG_SUCCESSFUL  0
-
 
 // IO Space Legacy BARs IDE. 
 #define ATA_IDE_BAR0_PRIMARY_COMMAND    0x1F0  // Primary Command Block Base Address.
@@ -62,7 +58,6 @@
 #define ATA_IDE_BAR3_SECONDARY_CONTROL  0x376  // Secondary Control Block Base Address.
 #define ATA_IDE_BAR4_BUS_MASTER  0      // Bus Master Base Address.
 #define ATA_IDE_BAR5  0      // Usado pelo AHCI.
-
 
 // ATA/ATAPI Command Set.
 
@@ -104,18 +99,16 @@
 #define ATA_IDENT_MAX_LBA_EXT  200
 */
 
-
 // ATAPI descrito no SCSI.
 #define ATAPI_CMD_READ  0xA8
 #define ATAPI_CMD_EJECT 0x1B
 
-//ATA bits de status control (alternativo).
+// ATA bits de status control (alternativo).
 #define ATA_SC_HOB  0x80    // High Order Byte.
 #define ATA_SC_SRST 0x04    // Soft Reset.
 #define ATA_SC_nINE 0x02    // INTRQ.
 
-
-//ATA bits de status. 
+// ATA bits de status. 
 #define ATA_SR_BSY  0x80    // Busy
 #define ATA_SR_DRDY 0x40    // Device Ready
 #define ATA_SR_DF   0x20    // Device Fault
@@ -125,7 +118,7 @@
 #define ATA_SR_IDX  0x02    // Index
 #define ATA_SR_ERR  0x01    // Error
 
-//ATA bits de errro após a leitura.
+// ATA bits de errro após a leitura.
 #define ATA_ER_BBK   0x80    // 
 #define ATA_ER_UNC   0x40    //
 #define ATA_ER_MC    0x20    //
@@ -135,11 +128,8 @@
 #define ATA_ER_TK0NF 0x02    //
 #define ATA_ER_AMNF  0x01    //
 
-
-//
+// --------------------------
 // Registers
-//
-
 // See:
 // https://wiki.osdev.org/ATA_PIO_Mode
 
@@ -166,7 +156,6 @@
 // R, Status Register	Used to read the current status.
 #define ATA_REG_STATUS    0x07
 
-
 /*
  #todo
  testar esse outros registradores.
@@ -185,40 +174,36 @@
 // Variables
 //
 
-int ATAFlag;
-unsigned short  *ata_identify_dev_buf;
-
-// ??
-unsigned char ata_record_dev;
-unsigned char ata_record_channel;
-
+// See: ata.c
+extern int ATAFlag;
+extern unsigned short *ata_identify_dev_buf;
+extern unsigned char ata_record_dev;
+extern unsigned char ata_record_channel;
 // #important
 // Qual é o canal e o dispositivo usado no momento
 // pela rotina de leitura e escrita.
 // See: config.h ata.c hdd.c
-
-int g_current_ide_port_index; 
-
+extern int g_current_ide_port_index; 
 // #important
 // Qual é o canal e o dispositivo usado no momento do boot 
 // pela rotina de leitura e escrita.
 // See: config.h ata.c hdd.c
-
-int g_boottime_ide_port_index; 
+extern int g_boottime_ide_port_index; 
 
 
 /*
  * PCIDeviceATA:
- *     Estrutura de dispositivos pci para um disco ata.
- *     #bugbug: E se tivermos mais que um instalado ???
- *     #importante
- *     Esssa é uma estrutura de dispositivos pci criada para o gramado, 
- * definida em pci.h
+ * Estrutura de dispositivos pci para um disco ata.
+ * #bugbug: E se tivermos mais que um instalado ???
+ * #importante
+ * Essa é uma estrutura de dispositivos pci 
+ * criada para o gramado, 
+ * definida em pci.h e criada em ata.c
  */
-
-struct pci_device_d *PCIDeviceATA;
-// struct pci_device_d *PCIDeviceATA2;
+extern struct pci_device_d *PCIDeviceATA;
+// extern struct pci_device_d *PCIDeviceATA2;
 // ...
+
 
 /*
  * dev_nport:
@@ -260,31 +245,29 @@ struct dev_nport
     unsigned char dev30;
     unsigned char dev31;
 };
-struct dev_nport dev_nport;
 
+// see: ata.c
+extern struct dev_nport  dev_nport;
 
-// História:
-//     Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
-//     ICH5 integraçao do SATA e suporte total ACPI 2.0.
-//     ICH6 implementaram os controladores AHCI SATA pela primeira vez.
-
+// ----------------
+// History:
+// Programação do ATA a partir do ICH5/9 e suporte a IDE legado.
+// ICH5 integraçao do SATA e suporte total ACPI 2.0.
+// ICH6 implementaram os controladores AHCI SATA pela primeira vez.
+// Nelson Cole.
 
 /*
  * ata:
- *     Estrutura para o controle de execução do programa.
+ * Estrutura para o controle de execução do programa.
  */ 
-
 struct ata_d
 {
     int used;
     int magic;
-
     uint8_t channel;  // Primary or secondary.
     uint8_t dev_num;  // Master or slave.
-
     // byte
     uint8_t chip_control_type;
-    
     uint8_t dev_type;  
     uint8_t access_type;
     uint8_t cmd_read_modo;
@@ -292,13 +275,12 @@ struct ata_d
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
-
-//#todo
+    //#todo
     //struct ata_device_d devs[4];
 };
 
 // Not a pointer.
-struct ata_d  ata;
+extern struct ata_d  ata;
 
 
 /*
@@ -306,7 +288,6 @@ struct ata_d  ata;
  * storage device.
  * É uma estrutura para dispositivos de armazenamento.
  */
-
 // #todo
 // Change to ata_device_d
 // Do jeito que esta, nos da a impressao errada de que 
@@ -329,7 +310,6 @@ struct ata_device_d
     
     unsigned long dev_byte_per_sector;
 
-
     unsigned long dev_total_num_sector;             // lba28
     unsigned long dev_total_num_sector_lba48;  // lba48
 
@@ -347,13 +327,9 @@ struct ata_device_d
     unsigned long _MaxLBA;
     unsigned long _MaxLBAExt;
 
-//
 // disk info structure.
-//
-
 // See:
 // disk.h
-
     struct disk_d *disk;
 
 // A list of threads waiting on this device.
@@ -361,13 +337,10 @@ struct ata_device_d
 
     struct ata_device_d  *next;
 };
-
 // Current storage device.
-struct ata_device_d *current_sd;
-
+extern struct ata_device_d *current_sd;
 // List for storage devices.
-struct ata_device_d *ready_queue_dev;
-
+extern struct ata_device_d *ready_queue_dev;
 
 //======================================================
 
@@ -385,7 +358,6 @@ extern unsigned long ATA_BAR2_SECONDARY_COMMAND_PORT;  // Secondary Command Bloc
 extern unsigned long ATA_BAR3_SECONDARY_CONTROL_PORT;  // Secondary Control Block Base Address
 extern unsigned long ATA_BAR4;  // Legacy Bus Master Base Address
 extern unsigned long ATA_BAR5;  // AHCI Base Address / SATA Index Data Pair Base Address
-
 
 
 //
@@ -410,19 +382,17 @@ extern unsigned long ATA_BAR5;  // AHCI Base Address / SATA Index Data Pair Base
 #define ide_dma_primary     0x00
 #define ide_dma_secundary   0x01
 
-
-/* ide_dma_prdt: */
-
+// ide_dma_prdt:
 struct {
-
     uint32_t addr;
     uint32_t len;
-
 }ide_dma_prdt[4];
 
-// pci support
-// #todo: Podemos mudar isso para pic.h, mas precisamos ver 
-// se aceitará a tipagem.
+// ------------------------
+// PCI support.
+// #todo: 
+// Podemos mudar isso para pic.h, 
+// mas precisamos ver se aceitará a tipagem.
 
 #define CONFIG_ADDR(bus,device,fn,offset)\
                        (\
@@ -432,11 +402,9 @@ struct {
                        ((uint32_t)(offset) &0xfc)|0x80000000)
 
 
-
 //
 // == Prototypes ==============================================
 //
-
 
 // Show info of the list of devices.
 void ata_show_device_list_info(void);
@@ -486,7 +454,6 @@ diskWritePCIConfigAddr (
 
 int ata_initialize ( int ataflag );
 
-
 // Read and write via pio mode.
 int 
 pio_rw_sector ( 
@@ -494,7 +461,6 @@ pio_rw_sector (
     unsigned int _lba, 
     int rw, 
     unsigned int port_index );
-
 
 int 
 ataReadSector( 
