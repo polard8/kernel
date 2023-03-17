@@ -294,18 +294,14 @@ pio_rw_sector (
     if ( rw != 0x20 && 
          rw != 0x30 )
     {
-
     }
-
 
 // 0~3
 // We only support 4 ports.
     port_index = (unsigned int) (port_index & 0xFF);
-
-    if( port_index > 3 ){
-        panic ("pio_rw_sector: We only support 4 ata ports.");
+    if (port_index > 3){
+        panic ("pio_rw_sector: We only support 4 ata ports.\n");
     }
-
 
 // #todo
 // Maybe check the limits for lba.
@@ -327,35 +323,47 @@ pio_rw_sector (
 // 0x01F6 
 // Port to send drive and bit 24 - 27 of LBA
 // Setup the bit 24-27 of the lba.
-
     lba = (int) (_lba >> 24);
 
+
+// ---------------------------
+// Master or slave?
+//#define ATA_MASTER  0
+//#define ATA_SLAVE   1 
+// see: ide.h
+
+    uint8_t value = (uint8_t) ide_ports[port_index].dev_num;
+    int is_slave = FALSE;
+    // Not a slave device.
+    if (value == ATA_MASTER){
+        is_slave = FALSE;
+    }
+    // Yes, it's a slave device.
+    if (value == ATA_SLAVE){
+        is_slave = TRUE;
+    }
+    // Not master, nor slave!
+    if ( value != ATA_MASTER && value != ATA_SLAVE ){
+        panic("pio_rw_sector: value?\n");
+    }
+
+// -----------------
+// (LBA | (master/slave)).
 // no bit 4.
 // 0 = master 
 // 1 = slave
 // master. bit 4 = 0
 // 1110 0000b;
 // slave. bit 4 = 1
-//1111 0000b;
-
-    int is_slave=0;
-
-    is_slave = ide_ports[port_index].dev_num;
-
-    if( is_slave != FALSE && is_slave != TRUE )
-        panic("pio_rw_sector: is_slave");
-
-
-// not slave
+// 1111 0000b;
+// Not slave
     if (is_slave == FALSE){ 
         lba = (unsigned int) (lba | 0x000000E0);
     }
-
-// slave
+// Slave
     if (is_slave == TRUE){
         lba = (unsigned int) (lba | 0x000000F0);
     }
-
     port = (unsigned short) (ide_ports[port_index].base_port + 6);
     out8 ( 
         (unsigned short) port, 
@@ -547,7 +555,6 @@ ataReadSector (
     unsigned int CurrentPortIndex = 
         (unsigned int) ata_get_current_ide_port_index();
 
-
 /*
 // ====================================================
 // #test
@@ -578,16 +585,14 @@ ataReadSector (
 // ====================================================
 */
 
-
 // IN:
-// (buffer, lba, rw flag, port number, master )
-
+// (buffer, lba, rw flag, port number)
     Status = 
         (int) pio_rw_sector ( 
-        (unsigned long) buffer, 
-        (unsigned long) lba, 
-        (int) 0x20,
-        (unsigned int) CurrentPortIndex ); 
+                  (unsigned long) buffer, 
+                  (unsigned long) lba, 
+                  (int) 0x20,
+                  (unsigned int) CurrentPortIndex ); 
 
     return (int) Status;
 }

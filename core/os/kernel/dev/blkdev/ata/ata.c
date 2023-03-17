@@ -8,6 +8,13 @@
 
 #include <kernel.h>  
 
+
+// Four ports.
+// see: ide.h
+struct ide_port_d  ide_ports[4];
+
+
+
 // base address 
 // BAR0 is the start of the I/O ports used by the primary channel.
 // BAR1 is the start of the I/O ports which control the primary channel.
@@ -26,6 +33,8 @@ unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Addr
 
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
+
+
 
 //
 // == Private functions: prototypes ==============

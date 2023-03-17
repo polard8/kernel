@@ -136,10 +136,10 @@ network_handle_udp(
         */
     }
 
-    if (dport == 22888)
-    {
+
+    if (dport == 22888){
         printf ("UDP: Message{%s}\n", udp_payload );
-        die();
+        //die();
     }
 
 // --------------

@@ -55,17 +55,11 @@ typedef enum {
 	idedevicetypesPATAPI,    // 2
 	idedevicetypesSATAPI      // 3
 	
-}ide_device_types_t;	
+}ide_device_types_t;
 
 
-
-
- //
- // IDE ports support
- //
-
+// IDE ports support
 // Structure for a ide port.
-
 struct ide_port_d 
 {
     // #todo
@@ -74,45 +68,31 @@ struct ide_port_d
     // Structure validation.
     int used;
     int magic;
-
     // The port number.
     //int id;
     uint8_t id;
-
-    // PATA, SATA, PATAPI, SATAPI
+// PATA, SATA, PATAPI, SATAPI
     int type;
-
     char *name;
-
     unsigned short base_port;
-
-
 // #test
 // The size of the disk given in sectors.
 // This is a work in progress, don't trust in this value yet.
     unsigned long size_in_sectors;
-
 // #todo
 // Salvar aqui o canal usado pela porta
 // e se o dispositivo é master ou slave.
-  
     uint8_t channel;   // #bugbug: penso que seja para primary ou secondary.
     uint8_t dev_num;   // #bugbug: penso que seja para master e slave.
-
     // ...
-
 // Dá pra colocar aqui mais informações sobre 
 // o dispositivo conectado a porta.
 // podemos usar ponteiros para estruturas.
 };
-
 // Four ports.
-struct ide_port_d  ide_ports[4];
+extern struct ide_port_d  ide_ports[4];
 
-
-
-unsigned long ide_handler_address;
-
+// ---------
 
 //estrutura para canais da controladora IDE. 
 typedef struct ide_channel_d ide_channel_t; 
