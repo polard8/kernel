@@ -112,7 +112,8 @@ void memoryShowMemoryInfo (void)
     printf ("extraheap3     (%d KB)\n", mm_used_extraheap3 );
     printf ("frame table    (%d KB)\n", mm_used_frame_table );
 
-// System type
+//==================================
+// System type. (size)
     printf ("\n");
     printf ("=======================\n");
     printf ("This is a ");
@@ -129,19 +130,22 @@ void memoryShowMemoryInfo (void)
 
     printf ("with %d MB \n", (memorysizeTotal/1024) );
 
+//==================================
+// Other info:
+// see: pages.c
     printf("\n");
     pages_print_info(g_mm_system_type);
-            
+
 //==================================
 // Frame table
 
     printf ("\n");
     printf ("Frame Table:\n");
-    printf("start: %xH | end: %xH\n", FT.start_pa, FT.end_pa );
-    printf ("size: %d KB\n", FT.size_in_kb );
-    printf ("total frames:     [%d]\n",    FT.size_in_frames );
-    printf ("used frames:      [%d]\n",    FT.number_of_used_frames );
-    printf ("reserved frames:  [%d]\n",    FT.number_of_reserved_frames );
+    printf ("Start PA: %xH | End PA: %xH\n", FT.start_pa, FT.end_pa );
+    printf ("Size: %d KB\n", FT.size_in_kb );
+    printf ("Total frames:     [%d]\n",    FT.size_in_frames );
+    printf ("Used frames:      [%d]\n",    FT.number_of_used_frames );
+    printf ("Reserved frames:  [%d]\n",    FT.number_of_reserved_frames );
     // ...
 
 //==================================
@@ -209,10 +213,8 @@ void memoryShowMemoryInfo (void)
         (imageAvailableAreaSize_in_Bytes/1024);
 
     printf("\n");
-    printf("IMAGE SIZE: #todo \n");
-
-    printf("\n");
-    printf("IMAGE AVAILABLE AREA:  [%x...%x] Total={%d KB} \n",
+    printf("KERNEL IMAGE SIZE: #todo \n");
+    printf("KERNEL IMAGE AVAILABLE AREA VA:  [%x...%x] Total={%d KB} \n",
         imageAvailableAreaStart, 
         imageAvailableAreaEnd, 
         imageAvailableAreaSize_in_KB );
@@ -224,7 +226,7 @@ void memoryShowMemoryInfo (void)
     //printf("\n[Kernel Heap and Stack info:]\n");
 
     printf("\n");
-    printf("HEAP:  [%x...%x] Total={%d KB} \n",
+    printf("KERNEL HEAP VA:  [%x...%x] Total={%d KB} \n",
         kernel_heap_start, kernel_heap_end, HeapTotal );
     printf("AvailableHeap={%d KB}\n", (g_available_heap/1024) );
 
@@ -238,10 +240,11 @@ void memoryShowMemoryInfo (void)
 // indicado no TSS.
 
     printf("\n");
-    printf("STACK: [%x...%x] Total={%d KB} \n", 
+    printf("KERNEL STACK VA: [%x...%x] Total={%d KB} \n", 
         kernel_stack_start, kernel_stack_end, StackTotal );
-    printf("STACK: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
+    printf("KERNEL STACK PA: StartPhysicalAddress={%x} \n", kernel_stack_start_pa );
 
+//==================================
 // Video info.
     pages_print_video_info();
 
@@ -278,10 +281,7 @@ void mmShowPML4EntryForAllProcesses (int entry_number)
             //}
         }
     };
-
-    refresh_screen();
-}  
-
+}
 
 // Mostra as estruturas de pagina 
 // usadas para paginação no pagedpool.

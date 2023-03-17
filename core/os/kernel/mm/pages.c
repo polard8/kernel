@@ -629,31 +629,15 @@ static void mmSetupMemoryUsage(void)
 // Frame table to handle a pool of page frames.
 // Vamos configurar a frame table de acordo com o total de memória RAM.
 // See: x64mm.h
-
-int I_initialize_frame_table(void)
-{
-    //int i=0;
-
-    debug_print("I_initialize_frame_table:\n");
-
-// Clear
-    FT.initialized = FALSE;
-    FT.used  = FALSE;
-    FT.magic = 0;
-
-//
-// ===================================================================
-//
-
 // #important
 // Vamos configurar a frame table de acordo com o total de memória RAM.
-// 'memorysizeTotal' is the ram size in KB.
+// 'memorysizeTotal' is the RAM size in KB.
 // Configura apenas o início e o fim.
-// Start:
+// >>> Start:
 // FRAME_TABLE_START_PA
 // This is the start of the table.
 // This is the 256MB mark.
-// End:
+// >>> End:
 // FRAME_TABLE_END_PA
 // This is the end of the table.
 // See:
@@ -665,12 +649,25 @@ int I_initialize_frame_table(void)
 // We need more them this to have a FT.
 // It will depend on the size of the RAM.
 // This routine will find this value.
+int I_initialize_frame_table(void)
+{
 
-    debug_print ("I_initialize_frame_table: Setup FT\n");
+    debug_print("I_initialize_frame_table:\n");
 
-// Default start and end values.
+// Clear.
+    FT.initialized = FALSE;
+    FT.used  = FALSE;
+    FT.magic = 0;
+// Setup 'Start' and 'End' default physical addresses.
+// Size = 0.
     FT.start_pa = __128MB_MARK_PA;
     FT.end_pa   = __128MB_MARK_PA;
+
+// what is the 'End'?
+// Let's setup the size of the frame table.
+// Changing the 'End' physical address given
+// the size of the physical RAM.
+
 
 // =================================================
 // Size in KB.
@@ -678,6 +675,7 @@ int I_initialize_frame_table(void)
 // Então temos mais memória do que precisamos
 // e a frame table será limitada à marca de 1GB.
 
+    // 1024 KB?
     if ( memorysizeTotal >= (1024*1024) ){
         FT.end_pa = __1GB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 1GB or more\n");
@@ -688,6 +686,7 @@ int I_initialize_frame_table(void)
 // Size in KB.
 // Se a RAM for maior ou igual à 512MB.
 
+    // 512 KB?
     if ( memorysizeTotal >= (512*1024) ){
         FT.end_pa = __512MB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 512MB or more\n");
@@ -698,6 +697,7 @@ int I_initialize_frame_table(void)
 // Size in KB.
 // Se a RAM for maior ou igual à 256MB.
 
+    // 256 KB?
     if ( memorysizeTotal >= (256*1024) ){
         FT.end_pa = __256MB_MARK_PA;
         debug_print ("I_initialize_frame_table: We have 256MB or more\n");
@@ -729,6 +729,7 @@ int I_initialize_frame_table(void)
         x_panic     ("I_initialize_frame_table: less than 250MB \n");
     }
 
+// Minimum
 // Não é menor que 250MB.
 // 250*1024*1024 = 268435456 = 0x10000000.
     FT.end_pa = (unsigned long) __256MB_MARK_PA;
@@ -741,14 +742,20 @@ initialize_frame_table:
 // Slow. Use a define for this value.
 // 250*1024*1024 = 268435456 = 0x10000000.
 
-    if (FT.end_pa < __256MB_MARK_PA){
-        debug_print ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA\n");
-         x_panic    ("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA");
-    }
+    debug_print ("I_initialize_frame_table: Checking range limits\n");
+    // Underflow.
     if (FT.end_pa < FT.start_pa){
-        debug_print ("I_initialize_frame_table: FT.end_pa < FT.start_pa\n");
-         x_panic    ("I_initialize_frame_table: FT.end_pa < FT.start_pa");
+        x_panic("I_initialize_frame_table: FT.end_pa < FT.start_pa");
     }
+    // Too small.
+    if (FT.end_pa < __256MB_MARK_PA){
+        x_panic("I_initialize_frame_table: FT.end_pa < __256MB_MARK_PA");
+    }
+    // We don't have a maximum limit for now.
+    //if (FT.end_pa > __3GB_MARK_PA){
+    //    x_panic("I_initialize_frame_table: FT.end_pa > __3GB_MARK_PA");
+    //}
+
 
 // Total size in KB.
     mm_used_frame_table = 
@@ -2263,46 +2270,50 @@ fail:
 
 void pages_print_info(int system_type)
 {
-    switch(system_type){
+
+    if (system_type<0)
+        return;
+
+    switch (system_type){
 
     case stSmallSystem:
-            printf("Origin:            %xH \n", SMALL_origin_pa );
-            printf("Base kernel start: %xH \n", SMALL_kernel_base_pa );
-            printf("User area start:   %xH \n", SMALL_user_pa );
-            printf("cga memory:        %xH \n", SMALL_cga_pa );
-            printf("frontbuffer:       %xH \n", SMALL_frontbuffer_pa );
-            printf("backbuffer:        %xH \n", SMALL_backbuffer_pa );
-            printf("paged memory pool: %xH \n", SMALL_pagedpool_pa );
-            printf("heap pool:         %xH \n", SMALL_heappool_pa );
-            printf("extraheap1:        %xH \n", SMALL_extraheap1_pa );
-            printf("extraheap2:        %xH \n", SMALL_extraheap2_pa );
-            printf("extraheap3:        %xH \n", SMALL_extraheap3_pa );
+            printf("Origin PA:            %xH \n", SMALL_origin_pa );
+            printf("Base kernel start PA: %xH \n", SMALL_kernel_base_pa );
+            printf("User area start PA:   %xH \n", SMALL_user_pa );
+            printf("cga memory PA:        %xH \n", SMALL_cga_pa );
+            printf("frontbuffer PA:       %xH \n", SMALL_frontbuffer_pa );
+            printf("backbuffer PA:        %xH \n", SMALL_backbuffer_pa );
+            printf("paged memory pool PA: %xH \n", SMALL_pagedpool_pa );
+            printf("heap pool PA:         %xH \n", SMALL_heappool_pa );
+            printf("extraheap1 PA:        %xH \n", SMALL_extraheap1_pa );
+            printf("extraheap2 PA:        %xH \n", SMALL_extraheap2_pa );
+            printf("extraheap3 PA:        %xH \n", SMALL_extraheap3_pa );
         break;
     case stMediumSystem:
-            printf("Origin:            %xH \n", MEDIUM_origin_pa );
-            printf("Base kernel start: %xH \n", MEDIUM_kernel_base_pa );
-            printf("User area start:   %xH \n", MEDIUM_user_pa );
-            printf("cga memory:        %xH \n", MEDIUM_cga_pa );
-            printf("frontbuffer:       %xH \n", MEDIUM_frontbuffer_pa );
-            printf("backbuffer:        %xH \n", MEDIUM_backbuffer_pa );
-            printf("paged memory pool: %xH \n", MEDIUM_pagedpool_pa );
-            printf("heap pool:         %xH \n", MEDIUM_heappool_pa );
-            printf("extraheap1:        %xH \n", MEDIUM_extraheap1_pa );
-            printf("extraheap2:        %xH \n", MEDIUM_extraheap2_pa );
-            printf("extraheap3:        %xH \n", MEDIUM_extraheap3_pa );
+            printf("Origin PA:            %xH \n", MEDIUM_origin_pa );
+            printf("Base kernel start PA: %xH \n", MEDIUM_kernel_base_pa );
+            printf("User area start PA:   %xH \n", MEDIUM_user_pa );
+            printf("cga memory PA:        %xH \n", MEDIUM_cga_pa );
+            printf("frontbuffer PA:       %xH \n", MEDIUM_frontbuffer_pa );
+            printf("backbuffer PA:        %xH \n", MEDIUM_backbuffer_pa );
+            printf("paged memory pool PA: %xH \n", MEDIUM_pagedpool_pa );
+            printf("heap pool PA:         %xH \n", MEDIUM_heappool_pa );
+            printf("extraheap1 PA:        %xH \n", MEDIUM_extraheap1_pa );
+            printf("extraheap2 PA:        %xH \n", MEDIUM_extraheap2_pa );
+            printf("extraheap3 PA:        %xH \n", MEDIUM_extraheap3_pa );
         break;
     case stLargeSystem:
-            printf("Origin:            %xH \n", LARGE_origin_pa );
-            printf("Base kernel start: %xH \n", LARGE_kernel_base_pa );
-            printf("User area start:   %xH \n", LARGE_user_pa );
-            printf("cga memory:        %xH \n", LARGE_cga_pa );
-            printf("frontbuffer:       %xH \n", LARGE_frontbuffer_pa );
-            printf("backbuffer:        %xH \n", LARGE_backbuffer_pa );
-            printf("paged memory pool: %xH \n", LARGE_pagedpool_pa );
-            printf("heap pool:         %xH \n", LARGE_heappool_pa );
-            printf("extraheap1:        %xH \n", LARGE_extraheap1_pa );
-            printf("extraheap2:        %xH \n", LARGE_extraheap2_pa );
-            printf("extraheap3:        %xH \n", LARGE_extraheap3_pa );
+            printf("Origin PA:            %xH \n", LARGE_origin_pa );
+            printf("Base kernel start PA: %xH \n", LARGE_kernel_base_pa );
+            printf("User area start PA:   %xH \n", LARGE_user_pa );
+            printf("cga memory PA:        %xH \n", LARGE_cga_pa );
+            printf("frontbuffer PA:       %xH \n", LARGE_frontbuffer_pa );
+            printf("backbuffer PA:        %xH \n", LARGE_backbuffer_pa );
+            printf("paged memory pool PA: %xH \n", LARGE_pagedpool_pa );
+            printf("heap pool PA:         %xH \n", LARGE_heappool_pa );
+            printf("extraheap1 PA:        %xH \n", LARGE_extraheap1_pa );
+            printf("extraheap2 PA:        %xH \n", LARGE_extraheap2_pa );
+            printf("extraheap3 PA:        %xH \n", LARGE_extraheap3_pa );
         break;
     default:
         break;
@@ -2314,18 +2325,16 @@ void pages_print_video_info(void)
 {
 // Video info
     printf("\n\n");
-
-    printf ("FrontbufferPA={%x} FrontbufferVA={%x} \n", 
+    printf ("Frontbuffer PA: {%x} | Frontbuffer VA: {%x}\n", 
         SMALL_frontbuffer_pa, 
         g_frontbuffer_va );
 
-   printf ("BackbufferPA={%x}  BackbufferVA={%x} \n", 
+    printf ("Backbuffer PA: {%x} | Backbuffer VA: {%x}\n", 
         SMALL_backbuffer_pa, 
         g_backbuffer_va );
 }
 
-
 //
-// End.
+// End
 //
 
