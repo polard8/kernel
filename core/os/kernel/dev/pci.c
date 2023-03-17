@@ -1,7 +1,7 @@
 
 // pci.c
 
-#include <kernel.h>    
+#include <kernel.h>
 
 //
 // BAR Support
@@ -25,6 +25,36 @@ int pciListOffset=0;
 //...
 
 static void __is_pci_supported(void);
+
+
+/*
+// #todo:
+// Checar se temos uma lista dessa no suporte a PCI.
+const char *pci_classes[] = {
+    "Unknown [old]",
+    "Mass storage",
+    "Network",
+    "Display",
+    "Multimedia device",
+    "Memory",
+    "Bridge device",
+    "Simple Communication",
+    "Base System Peripheral",
+    "Input Device",
+    "Docking Station",
+    "Processor",
+    "Serial Bus",
+    "Wireless",
+    "Inteligent I/O",
+    "Satellite Communications",
+    "Encrypt/Decrypt",
+    "Data acquisition and signal processing",
+    [255]="Unknown"
+};
+*/
+
+
+
 
 //========================================
 // pci_classes2:
@@ -615,15 +645,12 @@ pciHandleDevice (
     struct pci_device_d *D;
     int Status = -1;
     uint32_t data=0;
-
 // char, block, network
     unsigned char __device_class=0;  // Not defined yet.
 // pci, legacy
     unsigned char __device_type = DEVICE_TYPE_PCI;
-
     unsigned char _irq_line=0;
     unsigned char _irq_pin=0;
-
 // Name support.
     char __tmpname[64];
     char *newname;
@@ -684,10 +711,8 @@ pciHandleDevice (
 // ou mesmo um nome genérico.
 // #todo: put the correct type.
 
-
     data = 
         (uint32_t) diskReadPCIConfigAddr ( bus, dev, fun, 8 );
-
 
 // PCI Class and subclass
     D->classCode = (unsigned char) (data >> 24) & 0xFF;

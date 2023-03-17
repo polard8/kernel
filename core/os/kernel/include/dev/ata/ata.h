@@ -5,6 +5,12 @@
 #ifndef __ATA_ATA_H
 #define __ATA_ATA_H    1
 
+#define IDE_ATA    0
+#define IDE_ATAPI  1
+
+//#define HDD1_IRQ 14 
+//#define HDD2_IRQ 15 
+
 
 // Bus.
 #define ATA_PRIMARY   0x00
@@ -60,7 +66,6 @@
 #define ATA_IDE_BAR5  0      // Usado pelo AHCI.
 
 // ATA/ATAPI Command Set.
-
 #define ATA_CMD_CFA_ERASE_SECTORS               0xC0
 #define ATA_CMD_CFA REQUEST_EXTENDED_ERROR_CODE 0x03
 #define ATA_CMD_CHECK_MEDIA_CARD_TYPE           0xD1
@@ -82,6 +87,13 @@
 #define ATA_CMD_WRITE_DMA_EXT                   0x35
 #define ATA_CMD_WRITE_SECTORS                   0x30
 #define ATA_CMD_WRITE_SECTORS_EXT               0x34
+
+/*
+#define IDE_CMD_READ    0x20
+#define IDE_CMD_WRITE   0x30
+#define IDE_CMD_RDMUL   0xC4
+#define IDE_CMD_WRMUL   0xC5
+*/
 
 /*
  //#todo: esse deslocamento é em bytes,
@@ -198,7 +210,7 @@ extern int g_boottime_ide_port_index;
  * #importante
  * Essa é uma estrutura de dispositivos pci 
  * criada para o gramado, 
- * definida em pci.h e criada em ata.c
+ * definida em pci.h e criada em atapci.c
  */
 extern struct pci_device_d *PCIDeviceATA;
 // extern struct pci_device_d *PCIDeviceATA2;
@@ -351,7 +363,6 @@ extern struct ata_device_d *ready_queue_dev;
 #define DISK3 3
 #define DISK4 4
 
-
 extern unsigned long ATA_BAR0_PRIMARY_COMMAND_PORT;    // Primary Command Block Base Address
 extern unsigned long ATA_BAR1_PRIMARY_CONTROL_PORT;    // Primary Control Block Base Address
 extern unsigned long ATA_BAR2_SECONDARY_COMMAND_PORT;  // Secondary Command Block Base Address
@@ -388,26 +399,77 @@ struct {
     uint32_t len;
 }ide_dma_prdt[4];
 
-// ------------------------
-// PCI support.
-// #todo: 
-// Podemos mudar isso para pic.h, 
-// mas precisamos ver se aceitará a tipagem.
 
-#define CONFIG_ADDR(bus,device,fn,offset)\
-                       (\
-                       (((uint32_t)(bus) &0xff) << 16)|\
-                       (((uint32_t)(device) &0x3f) << 11)|\
-                       (((uint32_t)(fn) &0x07) << 8)|\
-                       ((uint32_t)(offset) &0xfc)|0x80000000)
+//
+// == IDE ===============================================
+//
 
+
+// IDE ports.
+// 0 primary master 
+// 1 primary slave 
+// 2 secondary master 
+// 3 secondary slave.
+typedef enum {
+	ideportsPrimaryMaster,    // 0
+	ideportsPrimarySlave,     // 1
+	ideportsSecondaryMaster,  // 2
+	ideportsSecondarySlave    // 3
+}ide_ports_t;
+
+typedef enum {
+	idetypesPrimaryMaster,    // 0
+	idetypesPrimarySlave,     // 1
+	idetypesSecondaryMaster,  // 2
+	idetypesSecondarySlave    // 3
+}ide_types_t;
+
+typedef enum {
+	idedevicetypesPATA,    // 0
+	idedevicetypesSATA,    // 1
+	idedevicetypesPATAPI,  // 2
+	idedevicetypesSATAPI   // 3
+}ide_device_types_t;
+
+// ----------------
+
+// IDE ports support
+// Structure for a ide port.
+struct ide_port_d 
+{
+    // #todo
+    // Object header ?
+
+    // Structure validation.
+    int used;
+    int magic;
+    // The port number.
+    //int id;
+    uint8_t id;
+// PATA, SATA, PATAPI, SATAPI
+    int type;
+    char *name;
+    unsigned short base_port;
+// #test
+// The size of the disk given in sectors.
+// This is a work in progress, don't trust in this value yet.
+    unsigned long size_in_sectors;
+// #todo
+// Salvar aqui o canal usado pela porta
+// e se o dispositivo é master ou slave.
+    uint8_t channel;   // #bugbug: penso que seja para primary ou secondary.
+    uint8_t dev_num;   // #bugbug: penso que seja para master e slave.
+    // ...
+// Dá pra colocar aqui mais informações sobre 
+// o dispositivo conectado a porta.
+// podemos usar ponteiros para estruturas.
+};
+// Four ports.
+extern struct ide_port_d  ide_ports[4];
 
 //
 // == Prototypes ==============================================
 //
-
-// Show info of the list of devices.
-void ata_show_device_list_info(void);
 
 void ata_soft_reset (void);
 unsigned char ata_status_read (void);
@@ -452,7 +514,6 @@ diskWritePCIConfigAddr (
     int offset, 
     int data );
 
-int ata_initialize ( int ataflag );
 
 // Read and write via pio mode.
 int 
@@ -490,13 +551,12 @@ ide_dma_data (
     uint8_t nport );
 
 int 
-ataDialog ( 
+init_ata ( 
     int msg, 
-    unsigned long long1, 
-    unsigned long long2 );
+    unsigned long long1 );
 
-uint32_t diskPCIScanDevice ( int class );
-int atapciConfigurationSpace ( struct pci_device_d *D );
+uint32_t diskPCIScanDevice (int class);
+int atapciConfigurationSpace (struct pci_device_d *D);
 unsigned char ata_wait_irq (void);
 int disk_ata_wait_irq (void);
 int ide_identify_device ( uint8_t nport );
@@ -504,7 +564,10 @@ int ide_dev_init (char port);
 static inline void dev_switch (void);
 static inline int getnport_dev (void);
 int nport_ajust ( char nport );
-void show_ide_info (void);
+
+// Show info:
+void ata_show_ide_info(void);
+void ata_show_device_list_info(void);
 
 #endif    
 

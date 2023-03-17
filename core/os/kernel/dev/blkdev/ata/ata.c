@@ -9,14 +9,6 @@
 #include <kernel.h>  
 
 
-// Four ports.
-// see: ide.h
-struct ide_port_d  ide_ports[4];
-
-//
-// Variables
-//
-
 int ATAFlag=0;
 unsigned short *ata_identify_dev_buf;
 // Saving values.
@@ -34,35 +26,6 @@ int g_current_ide_port_index=0;
 // pela rotina de leitura e escrita.
 // See: config.h ata.c hdd.c
 int g_boottime_ide_port_index=0;
-
-
-/*
- * PCIDeviceATA:
- * Estrutura de dispositivos pci para um disco ata.
- * #bugbug: E se tivermos mais que um instalado ???
- * #importante
- * Essa é uma estrutura de dispositivos pci 
- * criada para o gramado, 
- * definida em pci.h
- */
-struct pci_device_d *PCIDeviceATA;
-// struct pci_device_d *PCIDeviceATA2;
-// ...
-
-
-
-struct dev_nport  dev_nport;
-
-// Not a pointer.
-// see: ata.h
-struct ata_d  ata;
-
-// Current storage device.
-// see: ata.h
-struct ata_device_d *current_sd;
-// List for storage devices.
-// see: ata.h
-struct ata_device_d *ready_queue_dev;
 
 // base address 
 // BAR0 is the start of the I/O ports used by the primary channel.
@@ -82,9 +45,33 @@ unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Addr
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
 
+
+// --------------------------
+
+// Four ports.
+// see: ide.h
+struct ide_port_d  ide_ports[4];
+
+
+struct dev_nport  dev_nport;
+
+// Current storage device.
+// see: ata.h
+struct ata_device_d *current_sd;
+// List for storage devices.
+// see: ata.h
+struct ata_device_d *ready_queue_dev;
+
+// Not a pointer.
+// see: ata.h
+struct ata_d  ata;
+
+
 //
 // == Private functions: prototypes ==============
 //
+
+static int __ata_initialize(int ataflag);
 
 static void __local_io_delay(void);
 static void __ata_pio_read( void *buffer, int bytes );
@@ -347,347 +334,6 @@ void ata_set_current_ide_port_index(unsigned int port_index)
 int ata_get_current_ide_port_index(void)
 {
     return (int) g_current_ide_port_index;
-}
-
-// #todo ioctl
-int 
-ata_ioctl ( 
-    int fd, 
-    unsigned long request, 
-    unsigned long arg )
-{
-    debug_print("ata_ioctl: #todo\n");
-
-    if(fd<0){
-        return -1;
-    }
-
-    return -1;
-}
-
-// ata_initialize:
-// Inicializa o IDE e mostra informações sobre o disco.
-// Sondando na lista de dispositivos encontrados 
-// pra ver se tem algum controlador de disco IDE.
-// IN: ?
-// Configurando flags do driver.
-// FORCEPIO = 1234
-// Called by ataDialog in atainit.c
-
-int ata_initialize (int ataflag)
-{
-
-/*
-	#todo
-	Me parece que em nenhum momento na rotina de inicialização
-	o dispositivo foi registrado, como acontece na sondagem dos 
-	outros dispositivos pci.
-	Precisa registrar na estrutura de dispositivos e na
-	lista de dispositivos. Colocando informações como
-	a classe do dispositivo. (char, block, network). No caso, block.
-*/
-
-    int Status = -1;  //error
-    int Value = -1;
-    // iterator.
-    int iPortNumber=0;
-    unsigned char bus=0;
-    unsigned char dev=0;
-    unsigned char fun=0;
-
-    debug_print("ata_initialize: todo\n");
-
-// Setup interrupt breaker.
-    //debug_print("ata_initialize: Turn on interrupt breaker\n");
-    __breaker_ata1_initialized = FALSE;
-    __breaker_ata2_initialized = FALSE;
-// A estrutura ainda nao foi configurada.
-    ata.used = FALSE;
-    ata.magic = 0;
-
-// ======================================
-// #importante 
-// HACK HACK
-// Usando as definições feitas em config.h
-// até que possamos encontrar dinamicamente 
-// o canal e o dispositivo certos.
-// __IDE_PORT indica qual é o indice de porta.
-// Configumos o atual como sendo o mesmo
-// usado durante o boot.
-// #todo
-// Poderemos mudar o atual conforme nossa intenção
-// de acessarmos outros discos.
-// See: config.h
-
-    unsigned int boottime_ideport_index = __IDE_PORT;
-    unsigned int current_ideport_index = __IDE_PORT;
-
-    ata_set_boottime_ide_port_index(boottime_ideport_index);
-    ata_set_current_ide_port_index(current_ideport_index);
-// ============================================
-
-// ??
-// Configurando flags do driver.
-// FORCEPIO = 1234
-
-    ATAFlag = (int) ataflag;
-
-//
-// Messages
-//
-
-//#ifdef KERNEL_VERBOSE
-    //printf ("ata_initialize:\n");
-    //printf ("Initializing IDE/AHCI support ...\n");
-//#endif
-
-// #test
-// Sondando na lista de dispositivos encontrados 
-// pra ver se tem algum controlador de disco IDE.
-// #importante:
-// Estamos sondando uma lista que contruimos quando fizemos
-// uma sondagem no começo da inicializaçao do kernel.
-// #todo: 
-// Podemos salvar essa lista.
-// #todo
-// O que é PCIDeviceATA?
-// É uma estrutura para dispositivos pci. (pci_device_d)
-// Vamos mudar de nome.
-
-    PCIDeviceATA = 
-        (struct pci_device_d *) scan_pci_device_list2 ( 
-                                    (unsigned char) PCI_CLASSCODE_MASS, 
-                                    (unsigned char) PCI_SUBCLASS_IDE );
-
-    if ( (void *) PCIDeviceATA == NULL ){
-        printk("ata_initialize: PCIDeviceATA\n");
-        Status = (int) -1;
-        goto fail;
-    }
-
-    if ( PCIDeviceATA->used != TRUE || PCIDeviceATA->magic != 1234 )
-    {
-        printk ("ata_initialize: PCIDeviceATA validation\n");
-        Status = (int) -1;
-        goto fail;
-    }
-
-//#debug
-    // printf (": IDE device found\n");
-    // printf ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
-
-// Vamos saber mais sobre o dispositivo encontrado. 
-// #bugbug: 
-// Esse retorno é só um código de erro.
-// Nessa hora configuramos os valores na estrutura 'ata.xxx'
-
-    Value = 
-        (unsigned long) atapciConfigurationSpace( (struct pci_device_d*) PCIDeviceATA );
-
-    if (Value == PCI_MSG_ERROR)
-    {
-        printk ("ata_initialize: Error Driver [%x]\n", Value );
-        Status = (int) -1;
-        goto fail;
-    }
-
-// Explicando:
-// Aqui estamos pegando nas BARs o número das portas.
-// Logo em seguida salvaremos esses números e usaremos
-// eles para fazer uma rotina de soft reset.
-// See:
-// https://wiki.osdev.org/PCI_IDE_Controller
-
-// base address 
-// BAR0 is the start of the I/O ports used by the primary channel.
-// BAR1 is the start of the I/O ports which control the primary channel.
-// BAR2 is the start of the I/O ports used by secondary channel.
-// BAR3 is the start of the I/O ports which control secondary channel.
-// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
-// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
-
-    ATA_BAR0_PRIMARY_COMMAND_PORT   = ( PCIDeviceATA->BAR0 & ~7 ) + ATA_IDE_BAR0_PRIMARY_COMMAND   * ( !PCIDeviceATA->BAR0 );
-    ATA_BAR1_PRIMARY_CONTROL_PORT   = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1_PRIMARY_CONTROL   * ( !PCIDeviceATA->BAR1 );
-    ATA_BAR2_SECONDARY_COMMAND_PORT = ( PCIDeviceATA->BAR2 & ~7 ) + ATA_IDE_BAR2_SECONDARY_COMMAND * ( !PCIDeviceATA->BAR2 );
-    ATA_BAR3_SECONDARY_CONTROL_PORT = ( PCIDeviceATA->BAR3 & ~3 ) + ATA_IDE_BAR3_SECONDARY_CONTROL * ( !PCIDeviceATA->BAR3 );
-
-    ATA_BAR4 = ( PCIDeviceATA->BAR4 & ~0x7 ) + ATA_IDE_BAR4_BUS_MASTER * ( !PCIDeviceATA->BAR4 );
-    ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5            * ( !PCIDeviceATA->BAR5 );
-
-// Colocando nas estruturas.
-    ide_ports[0].base_port = 
-        (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
-    ide_ports[1].base_port = 
-        (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT   & 0xFFFF);
-    ide_ports[2].base_port = 
-        (unsigned short) (ATA_BAR2_SECONDARY_COMMAND_PORT & 0xFFFF);
-    ide_ports[3].base_port = 
-        (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF);
-    // Tem ainda a porta do dma na bar4.
-
-//
-// De acordo com o tipo.
-//
-
-// #??
-// Em que momento setamos os valores dessa estrutura.
-// Precisamos de uma flag que diga que a estrutura ja esta inicializada.
-// Caso contrario nao podemos usar os valores dela.
-// >> Isso acontece  logo acima quando chamamos
-// a funçao atapciConfigurationSpace()
-
-    if ( ata.used != TRUE || ata.magic != 1234 ){
-        printk("ata_initialize: ata structure validation\n");
-        goto fail;
-    }
-
-// Que tipo de controlador?
-// A rotina atapciConfigurationSpace() configurou
-// a estrutura 'ata' com o tipo de controlador encontrado.
-
-// ==============================================
-// IDE controller type.
-
-    // Type
-    if (ata.chip_control_type == ATA_IDE_CONTROLLER){
-
-        //Soft Reset, defina IRQ
-        out8(
-            (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF),
-            0xff );
-        out8( 
-            (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
-            0xff );
-        out8( 
-            (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF), 
-            0x00 );
-        out8( 
-            (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
-            0x00 );
-        // ??
-        ata_record_dev     = 0xff;
-        ata_record_channel = 0xff;
-
-        //printf ("Initializing IDE Mass Storage device ...\n");
-        //refresh_screen ();
-
-        // As estruturas de disco serão colocadas em uma lista encadeada.
-        
-        //#deprecated
-        //ide_mass_storage_initialize();
-
-        // ready_queue_dev
-        // Vamos trabalhar na lista de dispositivos.
-        // Iniciando a lista.
-        // ata_device_d structure.
-
-        ready_queue_dev = 
-            (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
-
-        if ( (void*) ready_queue_dev == NULL ){
-            printf("ata_initialize: ready_queue_dev\n");
-            Status = (int) -1;
-            goto fail;
-        }
-
-        // current_sd
-        // Initialize the head of the list.
-        // Not used.
-        // There is a loop to reinitialize the
-        // structure of each of all ports.
-
-        current_sd = ( struct ata_device_d * ) ready_queue_dev;
-        current_sd->dev_id   = __next_sd_id++;
-        current_sd->dev_type = -1;
-        // Channel and device.
-        // ex: primary/master.
-        current_sd->dev_channel = -1;
-        current_sd->dev_num     = -1;
-        current_sd->dev_nport   = -1;
-        current_sd->next = NULL;
-
-        // #bugbug
-        // Is this a buffer? For what?
-        // Is this buffer enough?
-        ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
-        if ( (void *) ata_identify_dev_buf == NULL ){
-            printf ("ata_initialize: ata_identify_dev_buf\n");
-            Status = (int) -1;
-            goto fail;
-        }
-
-        // Sondando dispositivos e imprimindo na tela.
-        // As primeiras quatro portas do controlador IDE. 
-        // #todo
-        // Create a constant for 'max'.
-        // We're gonna create the structure for each 
-        // of the devices.
-        
-        for ( 
-            iPortNumber=0; 
-            iPortNumber < 4; 
-            iPortNumber++ )
-        {
-            ide_dev_init(iPortNumber);
-        };
-
-        // Ok
-        Status = 0;
-        goto done;
-    }
-
-
-// ==============================================
-// RAID controller.
-
-    if (ata.chip_control_type == ATA_RAID_CONTROLLER){
-        printf("ata_initialize: RAID not supported yet\n");
-        Status = (int) -1;
-        goto fail;
-    }
-
-// ==============================================
-// AHCI controller type.
-// #todo:
-// On qemu: Feature '-s -machine q35' uses ahci.
-// It emulates ICH9 not I440FX.
-// see: https://wiki.qemu.org/Features/Q35
-
-    if (ata.chip_control_type == ATA_AHCI_CONTROLLER){
-        printf("ata_initialize: AHCI not supported yet\n");
-        Status = (int) -1;
-        goto fail;
-    }
-
-// ==============================================
-// Unknown controller type.
-
-    if (ata.chip_control_type == ATA_UNKNOWN_CONTROLLER){
-        printf("ata_initialize: Unknown controller type\n");
-        Status = (int) -1;
-        goto fail;
-    }
-
-// ==============================================
-// Nem IDE, nem RAID, nem AHCI.
-
-    Status = (int) -1;
-    printf("ata_initialize: IDE, AHCI or RAID were not found\n");
-
-fail:
-    printf ("ata_initialize: fail\n");
-    return -1;
-    //return (int) Status;
-
-done:
-// Setup interrupt breaker.
-// Só liberamos se a inicialização fncionou.
-    if ( Status == 0 ){
-        debug_print("ata_initialize: Turn off interrupt breaker\n");
-        __breaker_ata1_initialized = TRUE; 
-        __breaker_ata2_initialized = TRUE; 
-    }
-    return (int) Status;
 }
 
 
@@ -1668,51 +1314,6 @@ fail:
     return -1;  // Not reached.
 }
 
-void ata_show_device_list_info(void)
-{
-    struct ata_device_d  *sd;
-    unsigned long mb28=0;
-    unsigned long mb48=0;
-
-// The head of the list
-    sd = (struct ata_device_d *) ready_queue_dev;
-    
-    while ( (void *) sd != NULL ){
-
-    if(sd->boottime_device == TRUE){
-        printf("\n");
-        printf("The boot device is the port %d\n",sd->dev_nport);
-    }
-
-    printf("PORT %d: lba28{%d} lba48{%d}\n",
-        sd->dev_nport, 
-        sd->dev_total_num_sector,
-        sd->dev_total_num_sector_lba48 );
-
-    //#debug
-    //printf("PORT %d: LBA28 v1{%d} v2{%d} \n",
-        //sd->dev_nport, 
-        //sd->lba28_value1,
-        //sd->lba28_value2 );
-
-    //#debug
-    //printf("PORT %d: LBA48 v1{%d} v2{%d} v3{%d} v4{%d}\n",
-        //sd->dev_nport, 
-        //sd->lba48_value1,
-        //sd->lba48_value2,
-        //sd->lba48_value3,
-        //sd->lba48_value4 );
-
-    mb28 = (unsigned long) (((sd->dev_total_num_sector * 512)/1024)/1024);
-    mb48 = (unsigned long) (((sd->dev_total_num_sector_lba48 * 512)/1024)/1024);
-
-    printf("LBA28 {%d MB} LBA48{%d MB}\n",
-        mb28, mb48 );
-
-    sd = (struct ata_device_d *) sd->next;
-
-    };
-}
 
 /* 
  * dev_switch:
@@ -1779,74 +1380,412 @@ int nport_ajust ( char nport )
     return 0;
 }
 
+// #todo ioctl
+int 
+ata_ioctl ( 
+    int fd, 
+    unsigned long request, 
+    unsigned long arg )
+{
+    debug_print("ata_ioctl: #todo\n");
+    if(fd<0){
+        return -1;
+    }
+    return -1;
+}
+
+
+// ++
+//----------------------------------------------
+
+// ata_initialize:
+// Inicializa o IDE e mostra informações sobre o disco.
+// Sondando na lista de dispositivos encontrados 
+// pra ver se tem algum controlador de disco IDE.
+// IN: ?
+// Configurando flags do driver.
+// FORCEPIO = 1234
+// Called by ataDialog in atainit.c
+
+static int __ata_initialize(int ataflag)
+{
 
 /*
- * show_ide_info:
- *     Mostrar as informações obtidas na inicializações 
- * do controlador.
- */
+	#todo
+	Me parece que em nenhum momento na rotina de inicialização
+	o dispositivo foi registrado, como acontece na sondagem dos 
+	outros dispositivos pci.
+	Precisa registrar na estrutura de dispositivos e na
+	lista de dispositivos. Colocando informações como
+	a classe do dispositivo. (char, block, network). No caso, block.
+*/
 
+    int Status = -1;  //error
+    int Value = -1;
+    // iterator.
+    int iPortNumber=0;
+    unsigned char bus=0;
+    unsigned char dev=0;
+    unsigned char fun=0;
+
+    debug_print("__ata_initialize: todo\n");
+
+// Setup interrupt breaker.
+    //debug_print("ata_initialize: Turn on interrupt breaker\n");
+    __breaker_ata1_initialized = FALSE;
+    __breaker_ata2_initialized = FALSE;
+// A estrutura ainda nao foi configurada.
+    ata.used = FALSE;
+    ata.magic = 0;
+
+// ======================================
+// #importante 
+// HACK HACK
+// Usando as definições feitas em config.h
+// até que possamos encontrar dinamicamente 
+// o canal e o dispositivo certos.
+// __IDE_PORT indica qual é o indice de porta.
+// Configumos o atual como sendo o mesmo
+// usado durante o boot.
 // #todo
-// Not used. Please, call this routine.
+// Poderemos mudar o atual conforme nossa intenção
+// de acessarmos outros discos.
+// See: config.h
 
-void show_ide_info (void)
-{
-    int i=0;
+    unsigned int boottime_ideport_index = __IDE_PORT;
+    unsigned int current_ideport_index = __IDE_PORT;
 
-    printf("\n");
-    printf ("\n  show_ide_info:  \n");
+    ata_set_boottime_ide_port_index(boottime_ideport_index);
+    ata_set_current_ide_port_index(current_ideport_index);
+// ============================================
 
-    for ( i=0; i<4; i++ )
+// ??
+// Configurando flags do driver.
+// FORCEPIO = 1234
+
+    ATAFlag = (int) ataflag;
+
+//
+// Messages
+//
+
+//#ifdef KERNEL_VERBOSE
+    //printf ("ata_initialize:\n");
+    //printf ("Initializing IDE/AHCI support ...\n");
+//#endif
+
+// #test
+// Sondando na lista de dispositivos encontrados 
+// pra ver se tem algum controlador de disco IDE.
+// #importante:
+// Estamos sondando uma lista que contruimos quando fizemos
+// uma sondagem no começo da inicializaçao do kernel.
+// #todo: 
+// Podemos salvar essa lista.
+// #todo
+// O que é PCIDeviceATA?
+// É uma estrutura para dispositivos pci. (pci_device_d)
+// Vamos mudar de nome.
+
+    PCIDeviceATA = 
+        (struct pci_device_d *) scan_pci_device_list2 ( 
+                                    (unsigned char) PCI_CLASSCODE_MASS, 
+                                    (unsigned char) PCI_SUBCLASS_IDE );
+
+    if ( (void *) PCIDeviceATA == NULL ){
+        printk("__ata_initialize: PCIDeviceATA\n");
+        Status = (int) -1;
+        goto fail;
+    }
+
+    if ( PCIDeviceATA->used != TRUE || PCIDeviceATA->magic != 1234 )
     {
-        printf("\n");
-        printf ("id=%d \n", ide_ports[i].id );
-        printf ("channel=%d dev_num=%d \n", 
-            ide_ports[i].channel, 
-            ide_ports[i].dev_num );
-        //printk ("used=%d magic=%d \n", 
-        //    ide_ports[i].used, 
-        //    ide_ports[i].magic );
-        printf ("type=%d      \n", ide_ports[i].type );
-        printf ("base_port=%x \n", ide_ports[i].base_port );
-        printf ("name=%s      \n", ide_ports[i].name );
+        printk ("__ata_initialize: PCIDeviceATA validation\n");
+        Status = (int) -1;
+        goto fail;
+    }
+
+//#debug
+    // printf (": IDE device found\n");
+    // printf ("[ Vendor=%x Device=%x ]\n", PCIDeviceATA->Vendor, PCIDeviceATA->Device );
+
+// Vamos saber mais sobre o dispositivo encontrado. 
+// #bugbug: 
+// Esse retorno é só um código de erro.
+// Nessa hora configuramos os valores na estrutura 'ata.xxx'
+
+    Value = 
+        (unsigned long) atapciConfigurationSpace( (struct pci_device_d*) PCIDeviceATA );
+
+    if (Value == PCI_MSG_ERROR)
+    {
+        printk ("__ata_initialize: Error Driver [%x]\n", Value );
+        Status = (int) -1;
+        goto fail;
+    }
+
+// Explicando:
+// Aqui estamos pegando nas BARs o número das portas.
+// Logo em seguida salvaremos esses números e usaremos
+// eles para fazer uma rotina de soft reset.
+// See:
+// https://wiki.osdev.org/PCI_IDE_Controller
+
+// base address 
+// BAR0 is the start of the I/O ports used by the primary channel.
+// BAR1 is the start of the I/O ports which control the primary channel.
+// BAR2 is the start of the I/O ports used by secondary channel.
+// BAR3 is the start of the I/O ports which control secondary channel.
+// BAR4 is the start of 8 I/O ports controls the primary channel's Bus Master IDE.
+// BAR4 + 8 is the Base of 8 I/O ports controls secondary channel's Bus Master IDE.
+
+    ATA_BAR0_PRIMARY_COMMAND_PORT   = ( PCIDeviceATA->BAR0 & ~7 ) + ATA_IDE_BAR0_PRIMARY_COMMAND   * ( !PCIDeviceATA->BAR0 );
+    ATA_BAR1_PRIMARY_CONTROL_PORT   = ( PCIDeviceATA->BAR1 & ~3 ) + ATA_IDE_BAR1_PRIMARY_CONTROL   * ( !PCIDeviceATA->BAR1 );
+    ATA_BAR2_SECONDARY_COMMAND_PORT = ( PCIDeviceATA->BAR2 & ~7 ) + ATA_IDE_BAR2_SECONDARY_COMMAND * ( !PCIDeviceATA->BAR2 );
+    ATA_BAR3_SECONDARY_CONTROL_PORT = ( PCIDeviceATA->BAR3 & ~3 ) + ATA_IDE_BAR3_SECONDARY_CONTROL * ( !PCIDeviceATA->BAR3 );
+
+    ATA_BAR4 = ( PCIDeviceATA->BAR4 & ~0x7 ) + ATA_IDE_BAR4_BUS_MASTER * ( !PCIDeviceATA->BAR4 );
+    ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5            * ( !PCIDeviceATA->BAR5 );
+
+// Colocando nas estruturas.
+    ide_ports[0].base_port = 
+        (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
+    ide_ports[1].base_port = 
+        (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT   & 0xFFFF);
+    ide_ports[2].base_port = 
+        (unsigned short) (ATA_BAR2_SECONDARY_COMMAND_PORT & 0xFFFF);
+    ide_ports[3].base_port = 
+        (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF);
+    // Tem ainda a porta do dma na bar4.
+
+//
+// De acordo com o tipo.
+//
+
+// #??
+// Em que momento setamos os valores dessa estrutura.
+// Precisamos de uma flag que diga que a estrutura ja esta inicializada.
+// Caso contrario nao podemos usar os valores dela.
+// >> Isso acontece  logo acima quando chamamos
+// a funçao atapciConfigurationSpace()
+
+    if ( ata.used != TRUE || ata.magic != 1234 ){
+        printk("__ata_initialize: ata structure validation\n");
+        goto fail;
+    }
+
+// Que tipo de controlador?
+// A rotina atapciConfigurationSpace() configurou
+// a estrutura 'ata' com o tipo de controlador encontrado.
+
+// ==============================================
+// IDE controller type.
+
+    // Type
+    if (ata.chip_control_type == ATA_IDE_CONTROLLER){
+
+        //Soft Reset, defina IRQ
+        out8(
+            (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF),
+            0xff );
+        out8( 
+            (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
+            0xff );
+        out8( 
+            (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF), 
+            0x00 );
+        out8( 
+            (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
+            0x00 );
+        // ??
+        ata_record_dev     = 0xff;
+        ata_record_channel = 0xff;
+
+        //printf ("Initializing IDE Mass Storage device ...\n");
+        //refresh_screen ();
+
+        // As estruturas de disco serão colocadas em uma lista encadeada.
         
-        printf ("Size in sectors = %d \n", 
-            ide_ports[i].size_in_sectors );
+        //#deprecated
+        //ide_mass_storage_initialize();
+
+        // ready_queue_dev
+        // Vamos trabalhar na lista de dispositivos.
+        // Iniciando a lista.
+        // ata_device_d structure.
+
+        ready_queue_dev = 
+            (struct ata_device_d *) kmalloc( sizeof(struct ata_device_d) );
+
+        if ( (void*) ready_queue_dev == NULL ){
+            printf("__ata_initialize: ready_queue_dev\n");
+            Status = (int) -1;
+            goto fail;
+        }
+
+        // current_sd
+        // Initialize the head of the list.
+        // Not used.
+        // There is a loop to reinitialize the
+        // structure of each of all ports.
+
+        current_sd = ( struct ata_device_d * ) ready_queue_dev;
+        current_sd->dev_id   = __next_sd_id++;
+        current_sd->dev_type = -1;
+        // Channel and device.
+        // ex: primary/master.
+        current_sd->dev_channel = -1;
+        current_sd->dev_num     = -1;
+        current_sd->dev_nport   = -1;
+        current_sd->next = NULL;
+
+        // #bugbug
+        // Is this a buffer? For what?
+        // Is this buffer enough?
+        ata_identify_dev_buf = (unsigned short *) kmalloc(4096);
+        if ( (void *) ata_identify_dev_buf == NULL ){
+            printf ("ata_initialize: ata_identify_dev_buf\n");
+            Status = (int) -1;
+            goto fail;
+        }
+
+        // Sondando dispositivos e imprimindo na tela.
+        // As primeiras quatro portas do controlador IDE. 
+        // #todo
+        // Create a constant for 'max'.
+        // We're gonna create the structure for each 
+        // of the devices.
+        
+        for ( 
+            iPortNumber=0; 
+            iPortNumber < 4; 
+            iPortNumber++ )
+        {
+            ide_dev_init(iPortNumber);
+        };
+
+        // Ok
+        Status = 0;
+        goto done;
+    }
+
+
+// ==============================================
+// RAID controller.
+
+    if (ata.chip_control_type == ATA_RAID_CONTROLLER){
+        printf("__ata_initialize: RAID not supported yet\n");
+        Status = (int) -1;
+        goto fail;
+    }
+
+// ==============================================
+// AHCI controller type.
+// #todo:
+// On qemu: Feature '-s -machine q35' uses ahci.
+// It emulates ICH9 not I440FX.
+// see: https://wiki.qemu.org/Features/Q35
+
+    if (ata.chip_control_type == ATA_AHCI_CONTROLLER){
+        printf("__ata_initialize: AHCI not supported yet\n");
+        Status = (int) -1;
+        goto fail;
+    }
+
+// ==============================================
+// Unknown controller type.
+
+    if (ata.chip_control_type == ATA_UNKNOWN_CONTROLLER){
+        printf("__ata_initialize: Unknown controller type\n");
+        Status = (int) -1;
+        goto fail;
+    }
+
+// ==============================================
+// Nem IDE, nem RAID, nem AHCI.
+
+    Status = (int) -1;
+    printf("__ata_initialize: IDE, AHCI or RAID were not found\n");
+
+fail:
+    printf ("__ata_initialize: fail\n");
+    return -1;
+    //return (int) Status;
+
+done:
+// Setup interrupt breaker.
+// Só liberamos se a inicialização fncionou.
+    if ( Status == 0 ){
+        debug_print("__ata_initialize: Turn off interrupt breaker\n");
+        __breaker_ata1_initialized = TRUE; 
+        __breaker_ata2_initialized = TRUE; 
+    }
+    return (int) Status;
+}
+
+//----------------------------------------------
+//--
+
+// ataDialog:
+// Rotina de diálogo com o driver ATA. 
+// Called by init_executive() in system.c
+// #importante
+// Nessa hora ja temos as estruturas de disk e volume inicializadas.
+// entao as estruturas usadas pelo driver ata, pode
+// se registrar em disk ou volume.
+// msg:
+// 1 = Initialize the driver.
+// 2 = Register the driver.
+// ...
+
+// IN: ???
+int 
+init_ata ( 
+    int msg, 
+    unsigned long long1 )
+{
+// Called by zeroInitializeSystemComponents in system.c
+// Do some ata routine given the operation number.
+
+    int Status = 1;  // Error.
+
+    debug_print ("init_ata:\n");
+
+    switch (msg)
+    {
+
+        // ATAMSG_INITIALIZE
+        // Initialize driver.
+        // ata.c
+        case 1:
+            debug_print("init_ata: Initialize ata support\n");
+            if (long1 == FORCEPIO){
+                debug_print("ATA in PIO mode\n\n");
+            }
+            // IN: forcepio?
+            Status = (int) __ata_initialize( (int) long1 );
+            // We can't live without this at the moment.
+            if(Status<0){
+                panic("init_ata: ata_initialize failed\n");
+            }
+            return (int) Status;
+            break;
+
+        //ATAMSG_REGISTER
+        //registra o driver. 
+        //case 2:
+        //    break;
+
+        default:
+            panic("init_ata: Unsupported service.\n");
+            break;
     };
 
-//
-// # debug.
-//
-
-// primary secondary  ... master slave
-    // printf ( " channel=%d dev=%d \n", ata.channel, ata.dev_num );
-
-
-	/*
-	// Estrutura 'ata'
-	// Qual lista ??
-	
-	//pegar a estrutura de uma lista.
-	
-	//if( ata != NULL )
-	//{
-		printf("ata:\n");
- 	    printf("type={%d}\n", (int) ata.chip_control_type);
-	    printf("channel={%d}\n", (int) ata.channel);
-	    printf("devType={%d}\n", (int) ata.dev_type);
-	    printf("devNum={%d}\n", (int) ata.dev_num);
-	    printf("accessType={%d}\n", (int) ata.access_type);
-	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
-		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
-	//};
-	*/
-
-	// Estrutura 'atapi'
-	// Qual lista ??
-	// Estrutura 'ata_device_d'
-	// Estão na lista 'ready_queue_dev'
+    return (int) Status;
 }
+
+
+
+
+
 

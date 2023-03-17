@@ -3,32 +3,22 @@
 
 #include <kernel.h>
 
-// #todo:
-// Checar se temos uma lista dessa no suporte a PCI.
 
-const char *pci_classes[] = {
-    "Unknown [old]",
-    "Mass storage",
-    "Network",
-    "Display",
-    "Multimedia device",
-    "Memory",
-    "Bridge device",
-    "Simple Communication",
-    "Base System Peripheral",
-    "Input Device",
-    "Docking Station",
-    "Processor",
-    "Serial Bus",
-    "Wireless",
-    "Inteligent I/O",
-    "Satellite Communications",
-    "Encrypt/Decrypt",
-    "Data acquisition and signal processing",
-    [255]="Unknown"
-};
+/*
+ * PCIDeviceATA:
+ * Estrutura de dispositivos pci para um disco ata.
+ * #bugbug: E se tivermos mais que um instalado ???
+ * #importante
+ * Essa é uma estrutura de dispositivos pci 
+ * criada para o gramado, 
+ * definida em pci.h
+ */
+struct pci_device_d *PCIDeviceATA;
+// struct pci_device_d *PCIDeviceATA2;
+// ...
 
 
+// ---------------------------------------------
 
 /* 
  * diskReadPCIConfigAddr:
@@ -42,8 +32,7 @@ diskReadPCIConfigAddr (
     int fun, 
     int offset )
 {
-    out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
-
+    out32 ( PCI_PORT_ADDR, __PCI_CONFIG_ADDR( bus, dev, fun, offset ) );
     return (uint32_t) in32 (PCI_PORT_DATA);
 }
 
@@ -61,7 +50,7 @@ diskWritePCIConfigAddr (
     int offset, 
     int data )
 {
-    out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, offset ) );
+    out32 ( PCI_PORT_ADDR, __PCI_CONFIG_ADDR( bus, dev, fun, offset ) );
     out32 ( PCI_PORT_DATA, data );
 }
 
@@ -100,7 +89,7 @@ uint32_t diskPCIScanDevice(int class)
         {
             for ( fun=0; fun < 8; fun++ )
             {
-                out32 ( PCI_PORT_ADDR, CONFIG_ADDR( bus, dev, fun, 0x8) );
+                out32 ( PCI_PORT_ADDR, __PCI_CONFIG_ADDR( bus, dev, fun, 0x8) );
 
                 data = in32 (PCI_PORT_DATA);
                 

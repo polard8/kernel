@@ -75,7 +75,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 # Everything is a file.
 OBJS = \
-ata.o atadma.o atahdd.o atainit.o atairq.o atapci.o \
+ata.o atadma.o atahdd.o atainfo.o atairq.o atapci.o \
 disk_r.o disk_w.o storage.o \
 bldisp.o \
 xpixel.o line.o rect.o bitblt.o bg.o font.o char.o text.o graphics.o kgwm.o \
@@ -93,9 +93,10 @@ all:
 	$(CC) -c blkdev/ata/ata.c     $(KERNEL_INCLUDE) $(CFLAGS) -o ata.o 
 	$(CC) -c blkdev/ata/atadma.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atadma.o 
 	$(CC) -c blkdev/ata/atahdd.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atahdd.o 
-	$(CC) -c blkdev/ata/atainit.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainit.o 
+	$(CC) -c blkdev/ata/atainfo.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainfo.o 
 	$(CC) -c blkdev/ata/atairq.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
 	$(CC) -c blkdev/ata/atapci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
+
 # storage
 	$(CC) -c blkdev/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
 	$(CC) -c blkdev/disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o

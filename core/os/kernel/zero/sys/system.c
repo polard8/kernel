@@ -526,7 +526,8 @@ int zeroInitializeSystemComponents(void)
     Initialization.executive_checkpoint = FALSE;
     init_pci();
     init_rtc();
-    ataDialog ( 1, FORCEPIO, FORCEPIO );
+    // IN: msg, data1.
+    init_ata( 1, FORCEPIO );
     Initialization.executive_checkpoint = TRUE;
 
     return TRUE;

@@ -227,7 +227,21 @@ Class Description
 0x0D-0xFE  Reserved
 0xFF  Misc
 */
- 
+
+//------------------------------------------------------
+
+// Building a 32bit value given the elements.
+// Used in atapci.c
+#define __PCI_CONFIG_ADDR(bus,device,fn,offset)\
+                       (\
+                       (((uint32_t)(bus) &0xff) << 16)|\
+                       (((uint32_t)(device) &0x3f) << 11)|\
+                       (((uint32_t)(fn) &0x07) << 8)|\
+                       ((uint32_t)(offset) &0xfc)|0x80000000)
+
+//------------------------------------------------------
+
+                       
 
 // Ports
 #define PCI_PORT_ADDR     0xCF8

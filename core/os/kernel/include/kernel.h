@@ -297,9 +297,9 @@ extern unsigned long gSavedBPP;
 
 // ata, sata
 #include "dev/ata/ata.h"
-#include "dev/ata/ide.h"
+
 // storage
-#include "dev/super.h"
+#include "dev/superblk.h"
 #include "dev/volume.h"
 #include "dev/disk.h"  
 #include "dev/storage.h" 
