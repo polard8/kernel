@@ -739,25 +739,33 @@ static void __e1000_setup_irq(int irq_line)
 
 static unsigned long __mapping_nic1_device_address(unsigned long pa)
 {
-    // 0x00088000
-    unsigned long *nic1_page_table = (unsigned long *) PAGETABLE_NIC1;
-    unsigned long nic1_pa = (unsigned long) pa;
-    //unsigned long flags = (unsigned long) ( PAGE_WRITE | PAGE_PRESENT );  // flags=3
 
+// pt
+// 0x00088000
+    unsigned long *nic1_page_table = 
+        (unsigned long *) PAGETABLE_NIC1;
+// pa
+    unsigned long nic1_pa = (unsigned long) pa;
+// va
+    unsigned long nic1_va = NIC_INTEL_E1000_VA;
+
+// pd index:
+// entry=393
+// PD_ENTRY_NIC1
+// see: gentry.h
+    int pdindex = (int) X64_GET_PDE_INDEX(nic1_va);
+
+// Flags:
 // 10=cache desable 8= Write-Through 0x002 = Writeable 0x001 = Present
 // 0001 1011
     unsigned long flags = (unsigned long) 0x1B;
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,          // pd 
-        (int) PD_ENTRY_NIC1,                   // entry
-        (unsigned long) &nic1_page_table[0],   // pt
-        (unsigned long) pa,                    // region base
-        (unsigned long) flags );               // flags=1b
-
-//entry=393
-//see: gentry.h
-    unsigned long nic1_va = 0x0000000031200000;
+        (unsigned long) KERNEL_PD_PA,         // pd 
+        (int) pdindex,                        // entry
+        (unsigned long) &nic1_page_table[0],  // pt
+        (unsigned long) pa,                   // region base
+        (unsigned long) flags );              // flags=1b
 
     return (unsigned long) nic1_va; 
 }

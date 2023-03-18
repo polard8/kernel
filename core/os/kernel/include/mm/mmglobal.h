@@ -40,21 +40,22 @@ typedef unsigned long  pt_entry_t;
 // #todo: 9 9 9 9 12
 
 // OFFSET - Level 0
-#define X64_GET_OFFSET(addr) \
-    (((unsigned)(addr)) & 0xFFF)
+#define X64_GET_OFFSET(va) \
+    (((unsigned)(va)) & 0xFFF)
 // PTE - Level 1
 // Desloca o offset e pegar os 9 bits do índice de pte.
-#define X64_GET_PTE_INDEX(addr) \
-    (((unsigned)(addr) >> (12)) & 0x1FF)
+#define X64_GET_PTE_INDEX(va) \
+    (((unsigned)(va) >> (12)) & 0x1FF)
 // PDE - Level 2
-#define X64_GET_PDE_INDEX(addr) \
-    (((unsigned)(addr) >> (12+9)) & 0x1FF)
+#define X64_GET_PDE_INDEX(va) \
+    (((unsigned)(va) >> (12+9)) & 0x1FF)
 // PDPE - Level 3
-#define X64_GET_PDPE_INDEX(addr) \
-    (((unsigned)(addr) >> (12+9+9)) & 0x1FF)
+#define X64_GET_PDPE_INDEX(va) \
+    (((unsigned)(va) >> (12+9+9)) & 0x1FF)
 // PML4E - Level 4
-#define X64_GET_PML4E_INDEX(addr) \
-    (((unsigned)(addr) >> (12+9+9+9)) & 0x1FF)
+#define X64_GET_PML4E_INDEX(va) \
+    (((unsigned)(va) >> (12+9+9+9)) & 0x1FF)
+
 
 /*
  Obs: 

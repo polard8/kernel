@@ -1,17 +1,35 @@
 
 // intelmm.h
+// x86_64 only.
 
 #ifndef __MM_INTELMM_H
 #define __MM_INTELMM_H    1
-
 
 //
 // tables support
 //
 
+// Level 4
+// PML4E - PML4 Entry.
+struct intel_pml4e_d
+{
+// #todo
+// ...
+};
+
+// Level 3
+// PDPTE - Page directory Pointer Table Entry. 
+struct intel_pdpte_d
+{
+// #todo
+// ...
+};
+
+// Level 2
 // PDE - Page Directory Entry.
 struct intel_pde_d
 {
+// #todo
     unsigned long Present              :1;
     unsigned long ReadWrite            :1;
     unsigned long UserSupervisor       :1;
@@ -27,9 +45,11 @@ struct intel_pde_d
     unsigned long PageTableBaseAddress :20;
 };
 
+// Level 1
 // PTE - Page Table Entry.
 struct intel_pte_d
 {
+// #todo
     unsigned long Present         :1;
     unsigned long ReadWrite       :1;
     unsigned long UserSupervisor  :1;

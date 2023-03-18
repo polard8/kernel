@@ -602,7 +602,6 @@ do_clone:
 
 // Configurando os buffers.
 // Os endereços virtual e físico da imagem do processo filho.
-
 // O endereço virtual da imagem do processo filho.
 // No processo pai estava salvo o endereço virtual do buffer
 // reservado para a imagem do clone.
@@ -783,7 +782,6 @@ do_clone:
 // criaremos nossa pagetable.
 
     unsigned long ptVA = (unsigned long) get_table_pointer();
-
     if ( ptVA == 0 ){
         panic ("copy_process: [FAIL] ptVA\n");
     }
@@ -813,13 +811,37 @@ do_clone:
     if(child_process->pd0_PA==0)
         panic("copy_process: child_process->pd0_PA==0\n");
 
-//See: gentry.h
+
+// The va for the base of the image. 0x200000.
+// #bugbug:
+// We have an old value for the 'image base va'
+// early in this routine. But this is the one we want.
+// This is the standard one.
+    unsigned long __image_va =
+        (unsigned long) CONTROLTHREAD_BASE;
+// The va for the entry point of the image. 0x201000
+    unsigned long __image_entrypoint_va = 
+        (unsigned long) CONTROLTHREAD_ENTRYPOINT;  
+
+// pd index
+    int __pdindex = 
+        (int) X64_GET_PDE_INDEX(CONTROLTHREAD_BASE);
+    unsigned long __flags = 
+        (unsigned long) (PAGE_USER | PAGE_WRITE | PAGE_PRESENT); // 7
+
+// #todo
+// We need to remake this thing.
+// See: gentry.h
     mm_fill_page_table( 
         (unsigned long) child_process->pd0_VA,   // directory va. 
-        (int) PD_ENTRY_RING3AREA,      // directory entry for image base.
-        (unsigned long) ptVA,            // page table va.
+        (int) __pdindex,                         // directory entry for image base.
+        (unsigned long) ptVA,                    // page table va.
         (unsigned long) child_process->ImagePA,  // Region 2mb pa.
-        (unsigned long) 7 );             // flags.
+        (unsigned long) __flags );               // flags.
+
+
+    // Image base va.
+    child_process->Image = (unsigned long) __image_va; 
 
 // Clonando o pdpt0 do kernel.
     child_process->pdpt0_VA = (unsigned long) CloneKernelPDPT0();
@@ -852,10 +874,10 @@ do_clone:
 // Instalando o ponteiro para a pagetable entrada do diretório.
 // #?? Isso ja foi feito pela rotina mm_fill_page_table.
 // podemos criar uma rotina igual, mas que não instale o ponteiro no pd.
-    PageDirectory[PD_ENTRY_RING3AREA] = 
+    PageDirectory[__pdindex] = 
         (unsigned long) ptPA;
-    PageDirectory[PD_ENTRY_RING3AREA] = 
-        (unsigned long) (PageDirectory[PD_ENTRY_RING3AREA] | 7); 
+    PageDirectory[__pdindex] = 
+        (unsigned long) (PageDirectory[__pdindex] | __flags); 
 
 //============================
 // Page Directory Pointer Table
@@ -891,11 +913,12 @@ do_clone:
 // The entry point in the start of the image. 0x201000.
 // And the stack ??
 
-    child_process->Image = (unsigned long) CONTROLTHREAD_BASE;        // 0x200000 
-    child_thread->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT;  // 0x201000
+    // Entry point 0x201000.
+    child_thread->rip = 
+        (unsigned long) __image_entrypoint_va;
+
 
 // Process name.
-
     strcpy ( child_process->__processname, (const char *) filename );   
     //child_process->processName_len = (size_t) strlen ( (const char *) filename );
     child_process->processName_len = (size_t) sizeof(child_process->__processname);

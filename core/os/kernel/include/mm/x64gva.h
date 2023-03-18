@@ -84,18 +84,15 @@
 #define EXTRAHEAP2_VA   0x0000000030C00000  // ?
 #define EXTRAHEAP3_VA   0x0000000030E00000  // ?
 
-
 //alias
 #define MOD0_IMAGE_VA       EXTRAHEAP1_VA
 #define MOD0_ENTRYPOINT_VA  0x0000000030A01000
-
 
 // Os registradores do lapic.
 #define LAPIC_VA   0x0000000031000000
 
 // NIC Intel e1000, entry 393 no pd.
-// 0x0000000031200000
-
+#define NIC_INTEL_E1000_VA  0x0000000031200000
 
 // The start of the kernel image virtual address.
 #define KERNEL_IMAGE_BASE  KERNELIMAGE_VA  

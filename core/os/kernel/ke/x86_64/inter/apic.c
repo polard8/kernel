@@ -248,7 +248,8 @@ void lapic_initializing(unsigned long lapic_pa)
 // va
     LAPIC.lapic_va = (unsigned long) LAPIC_VA;
 // pagedirectory entry
-    LAPIC.entry = (int) PD_ENTRY_LAPIC; 
+    int pdindex = (int) X64_GET_PDE_INDEX(LAPIC_VA);
+    LAPIC.entry = (int) pdindex; 
 
 // Create the table and include the pointer 
 // into the kernel page directory.
@@ -257,7 +258,7 @@ void lapic_initializing(unsigned long lapic_pa)
 
     mm_fill_page_table( 
       (unsigned long) KERNEL_PD_PA,    // pd 
-      (int) PD_ENTRY_LAPIC,            // entry
+      (int) pdindex,            // entry
       (unsigned long) &pt_lapic[0],    // pt
       (unsigned long) (lapic_pa & 0xFFFFFFFF),    // region base (pa)
       (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3

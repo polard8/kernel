@@ -1401,10 +1401,14 @@ static void __initialize_ring0area(void)
 
 // kernel_address_pa: 
 // Início da memória RAM.
+
+// pa
     unsigned long kerneladdress_pa = (unsigned long) SYSTEM_ORIGIN;
-
+// va
     g_ring0area_va = (unsigned long) RING0AREA_VA;
-
+// pdindex
+    int pdindex = (int) X64_GET_PDE_INDEX(RING0AREA_VA);
+// size
 // 1MB, pois seremos sobrepostos pela imagem do kernel.  
     mm_used_ring0_area = (1024 * 1);  
 
@@ -1434,7 +1438,7 @@ static void __initialize_ring0area(void)
 // e na entrada do diretório de páginas.
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,       // pd 
-        (int) PD_ENTRY_RING0AREA,           // entry
+        (int) pdindex,                      // entry
         (unsigned long) &pt_ring0area[0],   // pt
         (unsigned long) kerneladdress_pa,   // region base
         (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
@@ -1456,25 +1460,26 @@ static void __initialize_ring0area(void)
 // Criando a entrada número 1 do diretório.
 // Isso mapeia 2 MB de memória em user mode.
 // SMALL_user_pa = user_address_pa
+// user_address_pa = 0x02000000
+// 32MB mark
+// 0x02000000pys = 0x00200000vir  ?? 
+// Essa é uma área em user mode
+// size = (2 MB).
 
 static void __initialize_ring3area(void)
 {
     unsigned long *pt_ring3area = (unsigned long *) PAGETABLE_RING3AREA;
 
+// pa
 // user_address_pa:   
 // User area, (32MB mark) 0x02000000.
     unsigned long useraddress_pa = (unsigned long) USER_BASE;
-
+// va
     g_ring3area_va = (unsigned long) RING3AREA_VA;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(RING3AREA_VA);
+// size
     mm_used_ring3_area = (1024 * 2);  //2mb
-
-    // user_address_pa = 0x02000000
-    // 32MB mark
-    // 0x02000000pys = 0x00200000vir  ?? 
-    // Essa é uma área em user mode
-
-    // (2 MB).
 
 // Criamos a pagetable.
 // Criando a entrada número 1 do diretório.
@@ -1490,7 +1495,7 @@ static void __initialize_ring3area(void)
 // e na entrada do diretório de páginas.
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,      // pd 
-        (int) PD_ENTRY_RING3AREA,          // entry
+        (int) pdindex,                     // entry
         (unsigned long) &pt_ring3area[0],  // pt
         (unsigned long) useraddress_pa,    // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
@@ -1518,12 +1523,15 @@ static void __initialize_kernelimage_region(void)
 {
     unsigned long *pt_kernelimage = (unsigned long *) PAGETABLE_KERNELIMAGE; 
 
+// pa
 // kernel_base_pa:    
 // Início da imagem do kernel. (1MB mark).
     unsigned long kernelimage_pa = (unsigned long) KERNEL_BASE;
-    
+// va
     g_kernelimage_va = (unsigned long) KERNELIMAGE_VA;
-    
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(KERNELIMAGE_VA);
+// size
     mm_used_kernelimage = (1024 * 2);  //2mb
 
 // kernel_base_pa = 0x100000pys
@@ -1545,10 +1553,9 @@ static void __initialize_kernelimage_region(void)
 // Endereço físico da região de 2MB que queremos mapear.
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
-
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,        // pd 
-        (int) PD_ENTRY_KERNELIMAGE,          // entry
+        (int) pdindex,                       // entry
         (unsigned long) &pt_kernelimage[0],  // pt
         (unsigned long) kernelimage_pa,      // region base
         (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
@@ -1580,13 +1587,18 @@ static void __initialize_kernelimage_region(void)
 
 static void __initialize_frontbuffer(void)
 {
-    unsigned long *pt_frontbuffer = (unsigned long *) PAGETABLE_FRONTBUFFER;
-
-// framebuffer_pa:    frontbuffer, VESA LFB from boot manager.
-    unsigned long framebuffer_pa = (unsigned long) SMALL_frontbuffer_pa;
-    
+    unsigned long *pt_frontbuffer = 
+        (unsigned long *) PAGETABLE_FRONTBUFFER;
+// pa
+// framebuffer_pa:
+// frontbuffer, VESA LFB from boot manager.
+    unsigned long framebuffer_pa = 
+        (unsigned long) SMALL_frontbuffer_pa;
+// va
     g_frontbuffer_va = (unsigned long) FRONTBUFFER_VA;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(FRONTBUFFER_VA);
+// size
     mm_used_lfb = (1024 * 2);
 
 // framebuffer_pa = Endereço físico do lfb.
@@ -1616,10 +1628,10 @@ static void __initialize_frontbuffer(void)
 // e na entrada do diretório de páginas.
 
     mm_fill_page_table( 
-        (unsigned long) KERNEL_PD_PA,         // pd 
-        (int) PD_ENTRY_FRONTBUFFER,           // entry
-        (unsigned long) &pt_frontbuffer[0],   // pt
-        (unsigned long) framebuffer_pa,       // region base
+        (unsigned long) KERNEL_PD_PA,        // pd 
+        (int) pdindex,                       // entry
+        (unsigned long) &pt_frontbuffer[0],  // pt
+        (unsigned long) framebuffer_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 }
 
@@ -1646,10 +1658,14 @@ static void __initialize_backbuffer(void)
 
 // 8mb mark
 // This is the right place: see: x64gpa.h
+
+// pa
     unsigned long backbuffer_pa = (unsigned long) SMALL_backbuffer_pa; 
-
+// va
     g_backbuffer_va = (unsigned long) BACKBUFFER_VA;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(BACKBUFFER_VA);
+// size
     mm_used_backbuffer = (1024 * 2);
 
 // backbuffer_pa = 0x01000000pys
@@ -1669,7 +1685,7 @@ static void __initialize_backbuffer(void)
 
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,       // pd 
-        (int) PD_ENTRY_BACKBUFFER,          // entry
+        (int) pdindex,                      // entry
         (unsigned long) &pt_backbuffer[0],  // pt
         (unsigned long) backbuffer_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
@@ -1688,15 +1704,20 @@ static void __initialize_backbuffer(void)
 
 static void __initialize_pagedpool(void)
 {
-    unsigned long *pt_pagedpool = (unsigned long *) PAGETABLE_PAGEDPOOL;
-    unsigned long pagedpool_pa = (unsigned long) SMALL_pagedpool_pa;
-
+    unsigned long *pt_pagedpool = 
+        (unsigned long *) PAGETABLE_PAGEDPOOL;
+// pa
+    unsigned long pagedpool_pa = 
+        (unsigned long) SMALL_pagedpool_pa;
+// va
 // Esse é o endereço virtual do início do pool de pageframes.
 // #bugbug: O paged pool so tem 2mb, veja pages.c
 // então só podemos mapear 2*1024*1024/4096 páginas.
 // 0x30600000;  // 2mb a mais que o backbuffer
     g_pagedpool_va = (unsigned long) PAGEDPOOL_VA;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(PAGEDPOOL_VA);
+// size
     mm_used_pagedpool = (1024 * 2);  //2mb 
 
 // mapeando 2mb de memória em ring3 para o pagedpool.
@@ -1707,10 +1728,9 @@ static void __initialize_pagedpool(void)
 // Endereço físico da região de 2MB que queremos mapear.
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
-
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,      // pd 
-        (int) PD_ENTRY_PAGEDPOOL,          // entry
+        (int) pdindex,                     // entry
         (unsigned long) &pt_pagedpool[0],  // pt
         (unsigned long) pagedpool_pa,      // region base 
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
@@ -1831,11 +1851,15 @@ void *slab_1MB_allocator(void)
 static void __initialize_heappool(void)
 {
 // The pagetable.
-    unsigned long *pt_heappool = (unsigned long *) PAGETABLE_HEAPPOOL; 
+    unsigned long *pt_heappool = 
+        (unsigned long *) PAGETABLE_HEAPPOOL; 
 // The pa.
-    unsigned long heappool_pa = (unsigned long) SMALL_heappool_pa;
+    unsigned long heappool_pa = 
+        (unsigned long) SMALL_heappool_pa;
 // The va. 0x30800000;
     g_heappool_va = (unsigned long) HEAPPOOL_VA;
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(HEAPPOOL_VA);
 // Used memory. 2048 KB.
     mm_used_heappool = (1024 * 2);
 
@@ -1852,7 +1876,6 @@ static void __initialize_heappool(void)
     // 32KB.
     g_heap_size = G_DEFAULT_PROCESSHEAP_SIZE;
 
-
 // IN:
 // Endereço virtual do diretório de páginas.
 // Índice da entrada no diretório indicado.
@@ -1860,10 +1883,9 @@ static void __initialize_heappool(void)
 // Endereço físico da região de 2MB que queremos mapear.
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
-
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,     // pd 
-        (int) PD_ENTRY_HEAPPOOL,          // entry
+        (int) pdindex,                    // entry
         (unsigned long) &pt_heappool[0],  // pt
         (unsigned long) heappool_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
@@ -1878,11 +1900,19 @@ static void __initialize_heappool(void)
 
 static void __initialize_extraheap1(void)
 {
-    unsigned long *pt_extraheap1 = (unsigned long *) PAGETABLE_EXTRAHEAP1;
-    unsigned long extraheap1_pa = (unsigned long) SMALL_extraheap1_pa;
-    g_extraheap1_va = (unsigned long) EXTRAHEAP1_VA; //0x30A00000;
-    mm_used_extraheap1 = (1024 * 2);
+    unsigned long *pt_extraheap1 = 
+        (unsigned long *) PAGETABLE_EXTRAHEAP1;
+// pa
+    unsigned long extraheap1_pa = 
+        (unsigned long) SMALL_extraheap1_pa;
+// va
+    g_extraheap1_va = 
+        (unsigned long) EXTRAHEAP1_VA; //0x30A00000;
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(EXTRAHEAP1_VA);
+// size
     g_extraheap1_size = (1024 * 2); 
+    mm_used_extraheap1 = (1024 * 2);
 
 // IN:
 // Endereço virtual do diretório de páginas.
@@ -1891,10 +1921,9 @@ static void __initialize_extraheap1(void)
 // Endereço físico da região de 2MB que queremos mapear.
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
-
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,       // pd 
-        (int) PD_ENTRY_EXTRAHEAP1,          // entry
+        (int) pdindex,                      // entry
         (unsigned long) &pt_extraheap1[0],  // pt
         (unsigned long) extraheap1_pa,      // region base
         (unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
@@ -1907,11 +1936,16 @@ static void __initialize_extraheap1(void)
 // used by the slab allocator.
 static void __initialize_extraheap2(void)
 {
-    unsigned long *pt_extraheap2 = (unsigned long *) PAGETABLE_EXTRAHEAP2;
-    unsigned long extraheap2_pa = (unsigned long) SMALL_extraheap2_pa;
-
+    unsigned long *pt_extraheap2 = 
+        (unsigned long *) PAGETABLE_EXTRAHEAP2;
+// pa
+    unsigned long extraheap2_pa = 
+        (unsigned long) SMALL_extraheap2_pa;
+// va
     g_extraheap2_va = (unsigned long) EXTRAHEAP2_VA; //0x30C00000;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(EXTRAHEAP2_VA);
+// size
     mm_used_extraheap2 = (1024 * 2); 
     g_extraheap2_size = (1024 * 2);  
 
@@ -1922,12 +1956,11 @@ static void __initialize_extraheap2(void)
 // Endereço físico da região de 2MB que queremos mapear.
 // As flags usadas em todas as entradas da pagetable
 // e na entrada do diretório de páginas.
-
     mm_fill_page_table( 
-      (unsigned long) KERNEL_PD_PA,          // pd 
-      (int) PD_ENTRY_EXTRAHEAP2,             // entry
-      (unsigned long) &pt_extraheap2[0],     // pt
-      (unsigned long) extraheap2_pa,         // region base
+      (unsigned long) KERNEL_PD_PA,       // pd 
+      (int) pdindex,                      // entry
+      (unsigned long) &pt_extraheap2[0],  // pt
+      (unsigned long) extraheap2_pa,      // region base
       (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
 
     g_extraheap2_initialized = TRUE;
@@ -1938,21 +1971,25 @@ static void __initialize_extraheap2(void)
 // used by the slab allocator.
 static void __initialize_extraheap3(void)
 {
-    unsigned long *pt_extraheap3 = (unsigned long *) PAGETABLE_EXTRAHEAP3;
-    unsigned long extraheap3_pa = (unsigned long) SMALL_extraheap3_pa;
-
+    unsigned long *pt_extraheap3 = 
+        (unsigned long *) PAGETABLE_EXTRAHEAP3;
+// pa
+    unsigned long extraheap3_pa = 
+        (unsigned long) SMALL_extraheap3_pa;
+// va
     g_extraheap3_va = (unsigned long) EXTRAHEAP3_VA; //0x30E00000;
-
+// pd index
+    int pdindex = (int) X64_GET_PDE_INDEX(EXTRAHEAP3_VA);
+// size
     mm_used_extraheap3 = (1024 * 2); 
     g_extraheap3_size = (1024 * 2);  
 
     mm_fill_page_table( 
         (unsigned long) KERNEL_PD_PA,       // pd 
-        (int) PD_ENTRY_EXTRAHEAP3,          // entry
+        (int) pdindex,                      // entry
         (unsigned long) &pt_extraheap3[0],  // pt
         (unsigned long) extraheap3_pa,      // region base
         (unsigned long) ( PAGE_USER | PAGE_WRITE | PAGE_PRESENT ) );  // flags=7
-        //(unsigned long) ( PAGE_WRITE | PAGE_PRESENT ) );  // flags=3
 
     g_extraheap3_initialized = TRUE;
 }

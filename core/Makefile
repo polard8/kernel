@@ -33,12 +33,10 @@ else
 	Q = @
 endif
 
-
+# --------------------------------------
 # == Start ====
-
-PHONY := all
-
 # build: User command.
+PHONY := all
 all:  \
 build-gramado-os \
 copy-extras \
@@ -51,11 +49,9 @@ clean
 # Giving permitions to run.
 	chmod 755 ./run
 	chmod 755 ./runkvm
-
 	@echo "Done?"
 
-
-#----------
+# --------------------------------------
 # build: Developer comand 1.
 # install
 # Build the images and put them all into os/disk/ folder.
@@ -65,7 +61,7 @@ do_install: \
 build-gramado-os  
 
 
-#----------
+# --------------------------------------
 # build: Developer comand 2.
 # image
 # Copy all the files from os/disk/ to the VHD.
@@ -77,29 +73,12 @@ vhd-mount          \
 vhd-copy-files     \
 vhd-unmount        \
 
-#----------
-# build: Developer comand 3.
-# run
-# run the system on qemu.
-PHONY := run
-run: do_run
-do_run:
-	sh ./run
-
-PHONY := runkvm
-runkvm: do_runkvm
-do_runkvm:
-	sh ./runkvm
-
-#===================================================
+# --------------------------------------
 #::0
 # ~ Step 0: gramado files.
-
 PHONY := build-gramado-os  
 build-gramado-os:     
-
 	@echo ":: [] Building VHD, bootloaders and kernel image."
-
 # options: 
 # main.asm and main2.asm
 # O mbr só consegue ler o root dir para pegar o BM.BIN
@@ -132,12 +111,10 @@ build-gramado-os:
 # Copy to the target folder.
 	sudo cp os/boot/x86/bin/BL.BIN  os/disk/
 
-
 # ::Build kernel image.
 	$(Q)$(MAKE) -C os/kernel/
 # Copy to the target folder.
 	sudo cp os/kernel/KERNEL.BIN  os/disk/GRAMADO
-
 
 # ::Build the ring0 module image.
 	$(Q)$(MAKE) -C os/newm0/
@@ -147,19 +124,16 @@ build-gramado-os:
 # Install BMPs
 	sudo cp os/data/themes/537/*.BMP  os/disk/
 
-#========================================
 # ::Build libraries.
 	$(Q) $(MAKE) -C libs/
 # Don't copy to the disk.
 
-#========================================
 # :: init.bin 
 # Building init process.
 	$(Q) $(MAKE) -C init/
 # Copy to the target folder.
 	-sudo cp init/bin/INIT.BIN  os/disk/ 
 
-#========================================
 # :: Azure (Commands)
 # Building userland commands.
 # userland
@@ -188,7 +162,6 @@ build-gramado-os:
 	-sudo cp commands/bin/N11.BIN  os/disk/PROGRAMS/
 
 
-#========================================
 # :: Indigo 1 (net)
 	$(Q) $(MAKE) -C net/ 
 # Copy to the target folder.
@@ -197,13 +170,13 @@ build-gramado-os:
 
 	@echo "~build-gramado-os end?"
 
+# --------------------------------------
 PHONY := copy-extras
 copy-extras:
 # Let's copy some images from desktop/
 
 	@echo "copy-extras"
 
-#========================================
 # :: desktop
 # Copying every image from desktop/.
 
@@ -233,10 +206,9 @@ copy-extras:
 	-sudo cp ../desktop/apps/bin/BROWSER.BIN  os/disk/
 	-sudo cp ../desktop/apps/bin/DOCV.BIN     os/disk/PROGRAMS/
 
-#========================================
 	@echo "~ copy-extras"
 
-#===================================================
+# --------------------------------------
 #::2
 # Step 2: /mnt/gramadoxvhd  - Creating the directory to mount the VHD.
 /mnt/gramadoxvhd:
@@ -244,7 +216,7 @@ copy-extras:
 	@echo "Build: Creating the directory to mount the VHD ..."
 	sudo mkdir /mnt/gramadoxvhd
 
-#===================================================
+# --------------------------------------
 #::3
 # ~ Step 3: vhd-mount - Mounting the VHD.
 vhd-mount:
@@ -253,19 +225,18 @@ vhd-mount:
 	-sudo umount /mnt/gramadoxvhd
 	sudo mount -t vfat -o loop,offset=32256 GRAMADO.VHD /mnt/gramadoxvhd/
 
-#===================================================
+# --------------------------------------
 #::4
 # ~ Step 4 vhd-copy-files - Copying files into the mounted VHD.
 # Copying the os/disk/ folder into the mounted VHD.
 vhd-copy-files:
 	@echo "========================="
 	@echo "Build: Copying files into the mounted VHD ..."
-
 	# Copy os/disk/
 	# sends everything from disk/ to root.
 	sudo cp -r os/disk/*  /mnt/gramadoxvhd
 
-#===================================================
+# --------------------------------------
 #:::5
 # ~ Step 5 vhd-unmount  - Unmounting the VHD.
 vhd-unmount:
@@ -273,28 +244,28 @@ vhd-unmount:
 	@echo "Build: Unmounting the VHD ..."
 	sudo umount /mnt/gramadoxvhd
 
+# --------------------------------------
+# Run on qemu.
+PHONY := run
+run: do_run
+do_run:
+	sh ./run
 
-# Danger!
-# This is gonna copy th image into the real HD.
-# My host is running on sdb and i copy the image into sda.
-# It is because the sda is in primary master IDE.
-# Gramado has been tested on sda
-# and the Fred's Linux host machine is on sdb.
-danger-install-sda:
-	sudo dd if=./GRAMADO.VHD of=/dev/sda
-danger-install-sdb:
-	sudo dd if=./GRAMADO.VHD of=/dev/sdb
+# --------------------------------------
+# Run on qemu using kvm.
+PHONY := runkvm
+runkvm: do_runkvm
+do_runkvm:
+	sh ./runkvm
 
-
-#
-# == clean ========
-#
-
-# Main files.
+# --------------------------------------
+# Basic clean.
 clean:
 	-rm *.o
 	@echo "~clean"
 
+# --------------------------------------
+# Clean up all the mess.
 clean-all: clean
 
 	-rm *.VHD
@@ -331,6 +302,8 @@ clean-all: clean
 
 	@echo "~clean-all"
 
+# --------------------------------------
+# Usage instructions.
 usage:
 	@echo "Building everything:"
 	@echo "make all"
@@ -339,6 +312,18 @@ usage:
 	@echo "Testing on qemu:"
 	@echo "./run"
 	@echo "./runkvm"
+
+# --------------------------------------
+# Danger zone!
+# This is gonna copy th image into the real HD.
+# My host is running on sdb and i copy the image into sda.
+# It is because the sda is in primary master IDE.
+# Gramado has been tested on sda
+# and the Fred's Linux host machine is on sdb.
+danger-install-sda:
+	sudo dd if=./GRAMADO.VHD of=/dev/sda
+danger-install-sdb:
+	sudo dd if=./GRAMADO.VHD of=/dev/sdb
 
 # End.
 
