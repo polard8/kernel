@@ -943,8 +943,8 @@ mm_fill_page_table(
     unsigned long region_2mb_pa,
     unsigned long flags );
 
-int mmSetUpPaging (void);
-
+// This routine initializes the paging infrastructure.
+int mmInitializePaging(void);
 int mmInit(void);
 
 // ============

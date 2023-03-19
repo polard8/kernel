@@ -594,6 +594,8 @@ void *clone_pml4(unsigned long pml4_va)
 
 static void mmSetupMemoryUsage(void)
 {
+// Called by mmInitializePaging().
+
     debug_print ("mmSetupMemoryUsage: Setup memory usage\n");
 
 // used memory:
@@ -651,6 +653,7 @@ static void mmSetupMemoryUsage(void)
 // This routine will find this value.
 int I_initialize_frame_table(void)
 {
+// Called by mmInitializePaging().
 
     debug_print("I_initialize_frame_table:\n");
 
@@ -1307,6 +1310,7 @@ mm_fill_page_table(
 // Talvez ja tenhamos feito isso antes, mas não tem problema.
 void __initialize_ram_usage_varables(void)
 {
+// Called by mmInitializePaging().
 
 // The whole range.
     memorysizeUsed = 0;
@@ -1328,6 +1332,7 @@ void __initialize_ram_usage_varables(void)
 
 void __initialize_default_physical_regions(void)
 {
+// Called by mmInitializePaging().
 
 // small systems
     SMALL_origin_pa      = (unsigned long) SMALLSYSTEM_ORIGIN_ADDRESS;
@@ -2011,6 +2016,7 @@ static void __initialize_extraheap3(void)
 
 static void mmInitializeKernelPageTables(void)
 {
+// Called by mmInitializePaging().
 // Install some pagetables into the 
 // kernel pae directory 0.
 
@@ -2054,18 +2060,19 @@ static void mmInitializeKernelPageTables(void)
 }
 
 // ======================================
-// mmSetUpPaging:
+// mmInitializePaging:
+// This routine initializes the paging infrastructure.
 // Main routine.
 // Initalizing the paging support.
 // Mapping the static system areas.
 // Called by mmInit() in mminit.c
 
-int mmSetUpPaging(void)
+int mmInitializePaging(void)
 {
     register unsigned int i=0;
 
     //if( serial_debug == TRUE )
-        debug_print("mmSetUpPaging:\n");
+        debug_print("mmInitializePaging:\n");
 
 // local worker:
 // RAM usage management.
@@ -2150,10 +2157,9 @@ int mmSetUpPaging(void)
          kernel_mm_data.pd0_va   == 0 || 
          kernel_mm_data.pd0_pa   == 0 )
     {
-        debug_print ("mmSetUpPaging: [FAIL] Invalid kernel_mm_data \n");
-        x_panic     ("mmSetUpPaging: [FAIL] Invalid kernel_mm_data \n");
+        debug_print ("mmInitializePaging: [FAIL] Invalid kernel_mm_data\n");
+        x_panic     ("mmInitializePaging: [FAIL] Invalid kernel_mm_data\n");
     }
-
 
 //
 // SYSTEM MEMORY - PAGED POOLS 
@@ -2164,14 +2170,11 @@ int mmSetUpPaging(void)
 
 // Message. (verbose).
 
-
-
 // fast check
 // #bugbug: x_panic is not available yet.
 
     //if( framebuffer_pa == 0 )
         //x_panic("mmSetupPaging: framebuffer_pa");
-
 
 // # DIRECTORIES
 // Preenchendo todo o diret�rio de p�ginas do kernel com p�ginas 
@@ -2223,8 +2226,10 @@ int mmSetUpPaging(void)
 
 // Páginas presentes, pode ler e escrever, user mode.
 // flags=7
-    kernel_pdpt0[0] = (unsigned long) &kernel_pd0[0];
-    kernel_pdpt0[0] = (unsigned long) ( kernel_pdpt0[0] | PAGE_USER | PAGE_WRITE | PAGE_PRESENT );
+    kernel_pdpt0[0] = 
+        (unsigned long) &kernel_pd0[0];
+    kernel_pdpt0[0] = 
+        (unsigned long) ( kernel_pdpt0[0] | PAGE_USER | PAGE_WRITE | PAGE_PRESENT );
 
 // pdpt >> pml4
 // Pointing the 'page directory pointer table' address 
@@ -2232,21 +2237,24 @@ int mmSetUpPaging(void)
 
 // Páginas presentes, pode ler e escrever, user mode.
 // flags=7
-    kernel_pml4[0] = (unsigned long) &kernel_pdpt0[0];
-    kernel_pml4[0] = (unsigned long) ( kernel_pml4[0] | PAGE_USER | PAGE_WRITE | PAGE_PRESENT );
+    kernel_pml4[0] = 
+        (unsigned long) &kernel_pdpt0[0];
+    kernel_pml4[0] = 
+        (unsigned long) ( kernel_pml4[0] | PAGE_USER | PAGE_WRITE | PAGE_PRESENT );
 
-// local worker: Initialize kernel page tables.
+// local worker: 
+// Initialize kernel page tables.
     mmInitializeKernelPageTables();
 
-
-    if ( memorysizeTotal == 0 ){
-        debug_print ("mmSetUpPaging: [FIXME] We need the memorysizeTotal\n");
+    if (memorysizeTotal == 0){
+        debug_print ("mmInitializePaging: [FIXME] We need the memorysizeTotal\n");
         //while(1){}
     }
-    debug_print ("mmSetUpPaging: [DEBUG] memorysizeTotal is not zero\n");
+    debug_print ("mmInitializePaging: [DEBUG] memorysizeTotal is not zero\n");
     //while(1){}
 
-// local worker: Initialize frame table.
+// local worker: 
+// Initialize frame table.
     I_initialize_frame_table();
 
 // local worker: Setup memory usage.
@@ -2254,24 +2262,18 @@ int mmSetUpPaging(void)
 
 // ==============================================
 
-    debug_print ("SetUpPaging: [DANGER] Load cr3\n");
-
+    debug_print ("mmInitializePaging: [DANGER] Load cr3\n");
 
 // pae
     //printf ("SetUpPaging: enable_pae\n");
-    //refresh_screen();
 
     //isso ja foi feito no bl.
     //enable_pae();
 
-    //refresh_screen();
     //while(1){}
-
 
 // Load it in cr3.
     //printf ("SetUpPaging: load_pml4_table\n");
-    //refresh_screen();
-    
 
 // #importante
 // O kernel já está em long mode,
@@ -2286,10 +2288,67 @@ int mmSetUpPaging(void)
 
     load_pml4_table( (void *) &kernel_pml4[0] );
 
+//-----------------------------------------------------
+
+// Done:
+// Ok, nesse momento estamos usado um novo
+// espaço de endereçamento do kernel.
+// #todo
+// + Agora podemos usar os endereços virtuais
+//   configurados nessa rotina.
+// + Agora podemos limpar os buffers e heaps
+//   criados logo acima. Pois no momento em que foram criados
+//   não era possível limpá-los pois não havíamos
+//   setado um novo pml4 no cr3.
+
+// #test
+// Cleaning buffers.
+// #danger: 
+// + If we clear a wrong address. 
+// + If overflow.
+    //size_t _size_in_kb=0;
+    //size_t _size_in_bytes=0;
+
+
+/*
+// Clear the extraheap 1
+    _size_in_kb = 
+        (size_t) (g_extraheap1_size & 0xFFFFFFFF);
+    _size_in_bytes =
+        (size_t) (_size_in_kb/1024);
+    memset( EXTRAHEAP1_VA, 0, _size_in_bytes );
+*/
+
+/*
+// Clear the extraheap 2
+    _size_in_kb = 
+        (size_t) (g_extraheap2_size & 0xFFFFFFFF);
+    _size_in_bytes =
+        (size_t) (_size_in_kb/1024);
+    memset( EXTRAHEAP2_VA, 0, _size_in_bytes );
+*/
+
+/*
+// Clear the extraheap 3
+    _size_in_kb = 
+        (size_t) (g_extraheap3_size & 0xFFFFFFFF);
+    _size_in_bytes =
+        (size_t) (_size_in_kb/1024);
+    memset( EXTRAHEAP3_VA, 0, _size_in_bytes );
+*/
+
+/*
+// Clear the paged pool.
+    _size_in_kb = 
+        (size_t) (mm_used_pagedpool & 0xFFFFFFFF);
+    _size_in_bytes =
+        (size_t) (_size_in_kb/1024);
+    memset( PAGEDPOOL_VA, 0, _size_in_bytes );
+*/
+
 
     // ==============================================
     //printf ("SetUpPaging: cpuSetMSR\n");
-    //refresh_screen();
     
     // #todo
     // long mode exige uma configuração usando msr.
@@ -2298,15 +2357,13 @@ int mmSetUpPaging(void)
     //in: MSR, LO, HI
     //cpuSetMSR( 0xC0000080, 0x100, 0 );
 
-
     // #debug
-    //refresh_screen();
     //while(1){
     //    asm ("cli");
     //}
 
 //done:
-    debug_print("mmSetUpPaging: done\n");
+    debug_print("mmInitializePaging: done\n");
 // OK
     return 0;
 fail:

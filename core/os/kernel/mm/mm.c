@@ -479,10 +479,11 @@ int mmInit(void)
 
     // Continua...
 
+// Initializing the paging infrastructure.
 // Mapping all the static system areas.
 // See: pages.c
     int PagingStatus=-1;
-    PagingStatus = (int) mmSetUpPaging();
+    PagingStatus = (int) mmInitializePaging();
     if (PagingStatus<0){
         x_panic("mmInit: Paging");
     }
