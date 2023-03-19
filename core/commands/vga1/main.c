@@ -83,11 +83,12 @@ External Registers --
 
 // ===============================
 // Step3:
-// The CRTC registers allow us to control 
-// the pixel clock timings of the horizontal and vertical retrace and 
+// The CRTC registers allow us 
+// to control the pixel clock timings of the 
+// horizontal and vertical retrace and 
 // blanking periods of the display.
-// These timing periods help control 
-// the output of the display (the video resolution), and 
+// These timing periods help 
+// control the output of the display (the video resolution), and 
 // the refresh rate.
 #define VGA_CRTC_INDEX  0x3D4      /* 0x3B4 */
 #define VGA_CRTC_DATA   0x3D5      /* 0x3B5 */
@@ -128,7 +129,8 @@ External Registers --
 #define VGA_NUM_CRTC_REGS  25
 #define VGA_NUM_GC_REGS     9
 #define VGA_NUM_AC_REGS    21
-#define VGA_NUM_REGS       ( 1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS + VGA_NUM_GC_REGS + VGA_NUM_AC_REGS )
+#define VGA_NUM_REGS \
+    ( 1 + VGA_NUM_SEQ_REGS + VGA_NUM_CRTC_REGS + VGA_NUM_GC_REGS + VGA_NUM_AC_REGS )
 
 
 // --------------------------------------
@@ -214,24 +216,47 @@ unsigned char mode_320_200_256[] = {
 // http://martin.hinner.info/vga/timing.html
 // By programming this unit you can control the resolution of your monitor, 
 // as well as some hardware overlay and panning effects.
-// registers 0-7 of 0x3D4 
-// are write protected by the protect bit (bit 7 of index 0x11).
-
-// Registers involved in horizontal timing: (0x00~0x05)
+// Registers 0-7 of 0x3D4 
+// are 'write protected' by the protect bit (bit 7 of index 0x11).
+// Horizontal:
+// Registers involved in horizontal timing: 
+// (0x00~0x05)
 // Horizontal timings are based on character clocks (multiples of 8 or 9 pixels)
-
-// Registers involved in vertical timing:   (0x06,0x07,0x09,0x10,0x11,0x12,0x15,0x16)
+// Vertical:
+// Registers involved in vertical timing:
+// (0x06,0x07,0x09,0x10,0x11,0x12,0x15,0x16)
 // Vertical timings are per-scanline.
-
 // Since these easily exceed the 255 limit of one byte, 
 // the Overflow Register is used to store the high-order bits.
 
-    0x5F,  // h  0x00  Horizontal Total 
-    0x4F,  // h1 0x01  Horizontal Display Enable End (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 (vm) <<<----
-    0x50,  // h2 0x02  Horizontal Blanking Start
-    0x82,  // h  0x03  Horizontal Blanking End | Horizontal Display Skew	(5.6) | Horizontal Blanking End (bits 0..4) 1000 0010
-    0x54,  // h3 0x04  horizontal retrace pulse start
-    0x80,  // h  0x05  horizontal retrace end | H. Blanking End (bit 5) 7? | Horizontal Retrace End (0..4)   1000 0000
+// h  0x00
+// Horizontal Total
+    0x5F,
+// h1 0x01  
+// Horizontal Display Enable End 
+// (40*8)=320 | (80*8)=640 |(640/8) = 80 = 0x50 (vm) <<<----
+// 0x39 ... 64*8=512.
+    0x4F,
+// h2 0x02  
+// Horizontal Blanking Start  
+    0x50,
+// h  0x03  
+// Horizontal Blanking End | 
+// Horizontal Display Skew (5.6) | 
+// Horizontal Blanking End (bits 0..4) 
+// 1000 0010
+// '100' '00010'
+    0x82,  
+// h3 0x04  
+// Horizontal retrace pulse start
+    0x54,
+// h  0x05  
+// Horizontal retrace end | 
+// H. Blanking End (bit 5) 7? | 
+// Horizontal Retrace End (0..4)   1000 0000
+    0x80,  
+
+//-----------
 
     0xBF,  // 0x06 v  vertical total
     0x1F,  // 0x07 v  overflow
@@ -245,7 +270,12 @@ unsigned char mode_320_200_256[] = {
     0x00,  // 0x0F    cursor location low
     0x9C,  // 0x10 v3 Vertical Retrace Start (bits 0..7)
     0x0E,  // 0x11 v  Vertical Retrace End
-    0x8F,  // 0x12 v1 Vertical Display Enable End (bits 0..7) (vm) <<<----
+// 0x12 v1 
+// Vertical Display Enable End 
+// (bits 0..7) (vm) <<<----
+// 0x39 ... 64*8=512.
+// 0x19 ... 32*8=256.
+    0x19, //0x39,  //0x8F,  
     0x28,  // 0x13    offset
     0x40,  // 0x14    underline location
     0x96,  // 0x15 v2 Vertical Blanking Start (bits 0..7)

@@ -544,6 +544,7 @@ int redraw_titlebar_window(struct gws_window_d *window)
     unsigned long sT=0;
     unsigned int sColor = 
         (unsigned int) parent->titlebar_text_color;
+
     
     int useTitleString = TRUE; //#HACK
     if (useTitleString == TRUE)
@@ -555,6 +556,18 @@ int redraw_titlebar_window(struct gws_window_d *window)
         sT = 
             (unsigned long) 
             ( tb_window->absolute_y + parent->titlebar_text_top);
+
+        /*
+        // #debug
+        // It shows the height of the parent window. (Overlapped).
+        char new_name[64];
+        int __h = (int) (parent->height & 0xFFFFFFFF);
+        memset(new_name,0,64);
+        itoa ( (int) __h, new_name );
+        size_t __s = strlen(new_name);
+        new_name[__s] = 0;
+        grDrawString ( sL, sT, sColor, new_name );
+        */
         
         if ( (void*) tb_window->name != NULL ){
             grDrawString ( sL, sT, sColor, tb_window->name );

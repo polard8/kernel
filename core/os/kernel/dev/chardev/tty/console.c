@@ -1858,6 +1858,8 @@ int consoleCompareStrings(void)
         // telling that the resolution changed.
         post_message_to_ws( 800300, 800, 300 );
         */
+        // IN: msgcode, w, h
+        //post_message_to_ws( 800300, 800, 256 );
         goto exit_cmp;
     }
 

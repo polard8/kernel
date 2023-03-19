@@ -4500,22 +4500,30 @@ new_event:
 // Muidas estruturas aindapossuem valores que estão condizentes
 // com a resolução antiga e precisa ser atualizados.
 
+
     if (msg == 800300)
     {
         printf("800300 w=%d h=%d\n", long1, long2);
+        
         /*
+        //globals
         __device_width = long1;
         __device_height = long2;
+        // globals
         SavedX=long1;
         SavedY=long2;
+        // Update taskbar
         if ( (void*) taskbar_window != NULL )
         {
             taskbar_window->left = 0;
             taskbar_window->top = long2 - 32;
         }
+        // Update working area.
+        WindowManager.wa_height = (long2 - 40);
         */
     }
-    
+
+
     //if (msg == GWS_Close)
     //    gwssrv_quit();
     //if (msg == GWS_UpdateDesktop)
