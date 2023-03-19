@@ -308,9 +308,9 @@ _int130:
     push rsp
     pushfq
 
-    ; Parameters:
-    ; RDI, RSI, RDX, RCX, R8, and R9 are used 
-    ; for integer and memory address arguments
+; Parameters:
+; RDI, RSI, RDX, RCX, R8, and R9 are used 
+; for integer and memory address arguments
 
     mov rdi, rax  ; arg1: service number
     mov rsi, rbx  ; arg2:
@@ -329,7 +329,6 @@ _int130:
     mov rax, qword [.int130_cs]
     and rax, 3
     mov qword [_sci2_cpl], rax
-
 
     fxsave [__sw_local_fpu_buffer]
 
@@ -385,39 +384,38 @@ _int130:
 ;global _int198
 ;_int198:
 ;    jmp _x64_restorer
-    
-    
+
 
 ; ----------------------------------------------
-; int 199
+; _int199:
 ; It will enable the interrupts and the taskswitching
 ; for the first time.
 ; It is because the kernel goes to the init process
 ; with the interrupts disabled. ;)
-; This is called only from the init process in user mode.
-; see: INIT.BIN.
-; #
+; Is this called only from the init process in user mode?
 ; I guess all the processes in ring 3 are calling this routine.
-
-global _int199
-_int199:
+; It means that all processes are starting with some kind
+; of privilegies until the crt0 routine call this interrupt.
+; see: INIT.BIN.
 ; Enable the interrupts.
-; 9 -IF, Interrupt enable flag
+; 9 - IF
+; 'Interrupt enable' flag
 ; Changing the iopl.
-; bits 12-13 - IOPL, I/O privilege level.
+; bits '12-13'
+; IOPL, I/O privilege level.
 ; We drop the minimum iopl level to ring 0,
 ; so, this way only a process with cpl 0
 ; is able to use instructions like in, out, cli, sti.
 
+global _int199
+_int199:
     pop qword [.frameRIP]
     pop qword [.frameCS]
     pop qword [.frameRFLAGS]
-
 ; iopl 0 (Drop)
     mov qword [.frameRFLAGS], 0x0000000000000200
 ; iopl 3
     ;mov qword [.frameRFLAGS], 0x0000000000003200
-
     push qword [.frameRFLAGS]
     push qword [.frameCS]
     push qword [.frameRIP]
@@ -425,10 +423,4 @@ _int199:
 .frameRIP:     dq 0
 .frameCS:      dq 0
 .frameRFLAGS:  dq 0
-
-
-
-
-
-
 
