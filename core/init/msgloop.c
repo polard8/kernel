@@ -77,7 +77,7 @@ __Procedure (
                 break;
             case 4002:  //app2
                 printf("init.bin: 4002\n");
-                rtl_clone_and_execute("fileman.bin");
+                rtl_clone_and_execute("gdm.bin");
                 break;
             case 4003:  //app3
                 printf("init.bin: 4003\n");
@@ -93,7 +93,7 @@ __Procedure (
                 break;
             case 4006:  //app6
                 //printf("init.bin: 4006\n");
-                //rtl_clone_and_execute("fileman.bin");
+                //rtl_clone_and_execute("gdm.bin");
                 break;
             case 4007:  //app7
                 //printf("init.bin: 4007\n");

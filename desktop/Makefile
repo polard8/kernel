@@ -36,7 +36,6 @@ all:
 # apps: Unit 1
 	make -C apps/cmdline
 	make -C apps/editor
-	make -C apps/fileman
 	make -C apps/browser
 	make -C apps/docv
 

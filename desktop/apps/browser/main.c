@@ -88,7 +88,7 @@ static void update_clients(int fd)
         (struct gws_window_info_d *) &lWi );
 
 // ---------------------------------------------
-// Save
+// address bar
     cwAddressBar.l = (( lWi.cr_width/8 )*2);
     cwAddressBar.t = 4;
     cwAddressBar.w = (( lWi.cr_width/8 )*3);

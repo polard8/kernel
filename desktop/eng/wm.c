@@ -42,7 +42,7 @@ struct gws_window_d *top_window;     // z-order
 static const char *app1_string = "terminal.bin";
 static const char *app2_string = "editor.bin";
 static const char *app3_string = "browser.bin";
-static const char *app4_string = "fileman.bin";
+static const char *app4_string = "gdm.bin";
 //static const char *app4_string = "cmdline.bin";
 
 
@@ -3409,7 +3409,7 @@ wmProcedure(
         //    redraw_window_by_id(mousehover_window,TRUE);
             //current_option = OPTION_CLOSE;
             //yellow_status("2: Close");
-        //    tb_pids[2] = (int) rtl_clone_and_execute("fileman.bin");
+        //    tb_pids[2] = (int) rtl_clone_and_execute("gdm.bin");
         //    tb_buttons_status[2] = TRUE;
         //    return 0;
         //}
@@ -3547,7 +3547,7 @@ wmProcedure(
             //    return 0;
             //set_status_by_id( tb_buttons[1], BS_RELEASED );
             //redraw_window_by_id(tb_buttons[1],TRUE);
-            //tb_pids[1] = (int) rtl_clone_and_execute("fileman.bin");
+            //tb_pids[1] = (int) rtl_clone_and_execute("gdm.bin");
             //memset(name_buffer,0,64-1);
             //strcpy(name_buffer,app2_string);
             //tb_pids[1] = (int) rtl_clone_and_execute(name_buffer);
@@ -3753,7 +3753,7 @@ static int on_combination(int msg_code)
     {
         printf("Save\n");
         //on_menu();  //#test
-        //rtl_clone_and_execute("fileman.bin");
+        //rtl_clone_and_execute("gdm.bin");
         return 0;
     }
 

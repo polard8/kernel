@@ -51,7 +51,7 @@ struct gws_window_d *top_window;     // z-order
 static const char *app1_string = "terminal.bin";
 static const char *app2_string = "editor.bin";
 static const char *app3_string = "browser.bin";
-static const char *app4_string = "fileman.bin";
+static const char *app4_string = "gdm.bin";
 //static const char *app4_string = "cmdline.bin";
 
 static unsigned long last_input_jiffie=0;
@@ -1108,7 +1108,7 @@ static void on_mouse_released(void)
     if(mouse_hover->id == QuickLaunch.buttons[2])
     {
         __button_released(mouse_hover->id);
-        //QuickLaunch.pids[2] = (int) rtl_clone_and_execute("fileman.bin");
+        //QuickLaunch.pids[2] = (int) rtl_clone_and_execute("gdm.bin");
         return;
     }
 

@@ -131,7 +131,7 @@ static void update_clients(int fd)
     }
 
 // Get info about the main window.
-//IN: fd, wid, window info structure.
+// IN: fd, wid, window info structure.
     gws_get_window_info(
         fd, 
         main_window,   // The app window.
@@ -140,7 +140,7 @@ static void update_clients(int fd)
 // Change the position of the clients.
 
 // ---------------------------------------------
-// Save
+// address bar
     cwAddressBar.l = (( lWi.cr_width/8 )*2);
     cwAddressBar.t = 4;
     cwAddressBar.w = (( lWi.cr_width/8 )*3);
@@ -157,7 +157,7 @@ static void update_clients(int fd)
         cwAddressBar.h );
 
 //---------------------------------------------
-// Save
+// button
     cwButton.l = (( lWi.cr_width/8 )*7);
     cwButton.t = 4;
     cwButton.w = (( lWi.cr_width/8 )*1);
@@ -208,7 +208,7 @@ static void update_clients(int fd)
     gws_redraw_window(fd, addressbar_window, TRUE);
     gws_redraw_window(fd, savebutton_window, TRUE);
     gws_redraw_window(fd, client_window,     TRUE);
-//#test
+
     gws_set_focus(fd,client_window);
 }
 
@@ -893,7 +893,6 @@ int main( int argc, char *argv[] )
 
         if ( (void *) e != NULL )
         {
-            //if( e->used == TRUE && e->magic == 1234 )
             if (e->magic == 1234){
                 editorProcedure(
                     client_fd, e->window, e->type, e->long1, e->long2 );
