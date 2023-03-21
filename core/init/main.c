@@ -648,6 +648,8 @@ int main( int argc, char **argv)
 //================================
 // Get input from idle thread.
 // Idle thread loop.
+// Now the init process enters in 'server mode'.
+// Getting system messages from it's queue in the control thread.
     return (int) run_server();
 }
 
