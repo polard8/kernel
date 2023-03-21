@@ -20,13 +20,39 @@
 ;---------------------------------------------------
 ; #importante
 ; This image was loaded in 0H:8000H.
-; It's easier to handle the gdt stuff when the org is
-; in 8000H and the segment is 0H.
+; It's easier to handle the gdt stuff 
+; when the org is in 8000H and the segment is 0H.
 ; 32768 - 65535 (hex: 8000h - FFFFh)
 ; 32KB for this program
 ; This is the limit we have.
 ; #danger:
 ; We are almost reaching this limit.
+
+
+;       +----------+
+;       |          | 
+;       |----------| 
+;       | BL.BIN   | 
+;       |          | 
+;       |----------| 0x2000:0x0000
+;       |          | 
+;       |----------| 
+;       |          | 
+;       |BM.BIN    | 
+;       |          | The entry point.
+;  >>>  |----------| 0x0000:0x8000 :)
+;       |          |
+;       |----------| 0x0000:0x6000
+;       |INITIAL   | Initial stack address.
+;       |STACK     | It goes down.
+;       |----------| 
+;       |          |
+;       |----------| 
+;       | FAT/ROOT |
+;       |----------| 0x0000:0x1000
+;       |          |
+;       +----------+
+
 
 [ORG 0x8000]
 
@@ -284,6 +310,7 @@ bm_main:
 
 ; ========================================
 ; Carregar root.
+; Where? es:bx  0:0x1000
 
 bootmanager_LOADROOT:
 
@@ -314,7 +341,6 @@ bootmanager_LOADROOT:
     mov WORD [bootmanagerdatasector], ax     ; base of root directory
     ;Read root directory into memory (0:1000) ?
     ;mov WORD [bootmanagerdatasector], 591  ;;SIMULADO In�cio da �rea de dados.
-
 
     mov ax, word [ROOTDIRSTART]  ; Inicio do root.
     mov cx, word [ROOTDIRSIZE]   ; Tamanho do root.
@@ -348,9 +374,10 @@ bootmanager_LOADROOT:
     loop .bootmanagerLOOP
     jmp bootmanagerFAILURE
 
-;
+
+; -------------------------------------
 ; Load FAT.
-;
+; Where? es:bx  0:0x1000
 
 ;; Se o nome for encontrado.
 bootmanager_LOADFAT:
@@ -365,16 +392,18 @@ bootmanager_LOADFAT:
     ;int 0x16
 
 ; Save starting cluster of boot image.
+; Offset '0x001A' of the entry that starts in 'di'.
+; After saving we can override the root.
     mov dx, WORD [di + 0x001A]
     mov WORD [bootmanagercluster], dx  ; file's first cluster.
 
 ; #BUGBUG ?
 ; NAO ESTAMOS CARREGANDO A FAT INTEIRA.
-; CARREGAR A FAT INTEIRA D� PROBLEMA.
+; CARREGAR A FAT INTEIRA DA PROBLEMA.
 
 ; Read FAT into memory (es:bx).?? Onde ??
 ; ?? 0:0x1000 
-; ?? Qual � o segmento e o offset da FAT ??
+; ?? Qual é o segmento e o offset da FAT ??
 
     mov ax, 0 
     mov es, ax
@@ -392,22 +421,19 @@ bootmanager_LOADFAT:
     ;Debug breakpoint. 
     ;jmp $
 
-; Message.
+; -----------------------------------------
+; Load image.
 ; Read image file into memory (0x2000:0)(es:bx)
+; Destination for the image.
+; es:bx = (2000:0).
 
+; Message.
     mov si, bootmanagermsgImg
     call bootmanagerDisplayMessage
 
 ; Opçao de mensagem.
 ; mov si, bootmanagermsgCRLF
 ; call bootmanagerDisplayMessage
-
-;
-; Load image.
-;
-
-; Destination for the image.
-; es:bx = (2000:0).
 
     mov ax, 0x2000 
     mov es, ax

@@ -10,6 +10,36 @@
 ; The video mode is the text mode.
 ; 2017 - Created by Fred Nora.
 
+
+;       +--------+
+;       |        |
+;       |--------|
+;       | FAT    |
+;       |--------| 0x17C0:0x0200
+;       |        |
+;       |--------|
+;       |        |
+;       | BM.BIN |
+;       |        |
+;       |--------| 0x0000:0x8000
+;       |        |
+;       |--------|
+;       | ROOT   |
+;       | DIR    |
+;       |--------| 0x07C0:0x0200
+;       |BOOT SEC| 
+;       |ORIGIN  | 
+;  >>>  |--------| 0x07C0:0x0000 :)
+;       |        |
+;       |--------| 0x0000:0x6000
+;       |INITIAL | Initial stack address.
+;       |STACK   | It goes down.
+;       |--------| 
+;       |        |
+;       +--------+
+
+
+
 ; The standard MBR entry point is 0x7C00.
 ; The origin in 0x0000,
 ; but the segments in 0x07C0.

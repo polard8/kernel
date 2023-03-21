@@ -5,22 +5,22 @@
 ; It's a 32bit, kernel mode, system aplication used to load the 
 ; kernel and some other files.
 ; Descriçao:
-; Esse arquivo � o entrypoint do Boot Loader. (BL.BIN).
-; Parte inicial do n�cleo do Boot Loader para a arquitetura x86 de 32bit 
+; Esse arquivo é o entrypoint do Boot Loader. (BL.BIN).
+; Parte inicial do núcleo do Boot Loader para a arquitetura x86 de 32bit 
 ; para desktops.
 ; Startup module for the 32bit Boot Loader of a 32bit OS for desktops.
 ; Localizaçao:
-; O Boot Loader � carregado em 0x00020000 com o entry point em 0x00021000.
+; O Boot Loader é carregado em 0x00020000 
+; com o entry point em 0x00021000.
 ; Atribuiçoes:   
 ;    + Inicializar a arquitetura x86. 
-;    + Chamar c�digo em C para carregar o kernel.
+;    + Chamar código em C para carregar o kernel.
 ;    + Passar o comando para o kernel.
 ; ATENÇAO:
-; Logo abaixo, no fim desse arquivo, est�o GDT, IDT e includes.
+; Logo abaixo, no fim desse arquivo, estão GDT, IDT e includes.
 ; History:
 ;     2015 - Created by Fred Nora.
 ;     2021 - Creating a 64bit boot loader.
-
 
 ; #todo:
 ; bl.bin é feito em 32bit e ainda em 32bit ele deve carregar
@@ -29,6 +29,21 @@
 ;  necessarias para entrar em 64bit. Poderá usar rotinas
 ; em assembly 64bit. 
 ; E por fim salta para o kernel de 64bit.
+
+
+;       +-------------+
+;       |             |
+;       | KERNEL.BIN  |
+;       | Entry point | 0x00101000
+;       |-------------| 0x00100000
+;       |             |
+;       |             |
+;       |-------------|
+;       | BL.BIN      |
+;       | Entry point | 0x00021000
+;  >>>  |-------------| 0x00020000 :)
+;       |             |
+;       +-------------+
 
 
 ; Segmento onde inicia a parte em Assembly.

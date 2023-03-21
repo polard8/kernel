@@ -18,6 +18,35 @@
 ;; org = 0
 ;; See: main.asm 
 
+;       +--------+
+;       |        |
+;       |--------|
+;       | FAT    |
+;       |--------| 0x17C0:0x0200
+;       |        |
+;       |--------|
+;       |        |
+;       | BM.BIN |
+;       |        |
+;       |--------| 0x0000:0x8000
+;       |        |
+;       |--------|
+;       | ROOT   |
+;       | DIR    |
+;       |--------| 0x07C0:0x0200
+;       |BOOT SEC| 
+;       |ORIGIN  | 
+;  >>>  |--------| 0x07C0:0x0000 :)
+;       |        |
+;       |--------| 0x0000:0x6000
+;       |INITIAL | Initial stack address.
+;       |STACK   | It goes down.
+;       |--------| 
+;       |        |
+;       +--------+
+
+
+
 
 END_OF_CLUSTER EQU  0xFFFF
 ;;END_OF_CLUSTER2 EQU 0xFFF8
@@ -239,7 +268,8 @@ FAILURE:
 GRAMADOINIT:
 
 ; Step1:
-; Code located at 0x7C00, adjust segment registers to 0x07C0:0.
+; Code located at 0x7C00, 
+; adjust segment registers to 0x07C0:0.
 ; Create stack.   0:6000h
     cli
     mov ax, 0x07C0
@@ -553,8 +583,8 @@ __loop_LOAD_IMAGE:
 Step8_PARAMETERS:
     mov dl, byte [DriveNumber]
 Step9_FLY:
-    PUSH WORD  0         ; cs
-    PUSH WORD  0x8000    ; offset 
+    PUSH WORD  0         ; CS
+    PUSH WORD  0x8000    ; Offset 
     RETF
 
 
