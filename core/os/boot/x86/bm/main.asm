@@ -93,14 +93,6 @@ G_VIDEO_MODE EQU 0x0112    ;640x480
 ;; ...
 ;; ======================================
 
-;; GUI FLAG.
-;; 1 = Starts system GUI.
-;; 0 = Starts the Boot Manager CLI.
-
-;G_START_GUI EQU 1  ;; 1= (YES) 0 = (NO)  
-G_START_GUI EQU 0  ;; 1= (YES) 0 = (NO)  
-
-
 ;; 16 bit:
 ;; Estamos no primeiro setor do BM.BIN, ele começa em 16 bit.
 [bits 16]
@@ -971,24 +963,26 @@ xxx_Config:
 .setupBootMode:
     mov si, msg_selecting_videomode
     call DisplayMessage
-    ; Debug
-    ; JMP $
 
-; #important:
-; It gets a global configurable variable.
-; See the in the top of this document.
-; 1=gui 2=text
+    ; #debug
+    ; JMP $
 
 ;; ++
 ;; =====================================
 .preSelection:
 
-    mov al, G_START_GUI 
+; 1 = Starts system GUI.
+; 0 = Starts the Boot Manager CLI.
+; Select CLI. 
+; The bm-shell in 32bit assembly.
+
+    mov al, 0 
 
     cmp al, 1
     je .xxxxGUI
     cmp al, 0
     je .xxxxCLI
+
     jmp .xxxxGUI
 ;; =====================================
 ;; --

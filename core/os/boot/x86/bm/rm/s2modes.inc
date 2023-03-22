@@ -28,25 +28,20 @@ get_boot_mode:
     mov al, byte [META$FILE.INIT_MODE]
     ret 
 
-
 ;--------------------------------------------
 ; set_video_mode:
 ;     Configura um modo de video.
 ;     in: ax
-; 
 set_video_mode:
     mov word [META$FILE.VIDEO_MODE], ax
     ret 
  
- 
 ; get_video_mode:
 ;     Pega o modo de video.
 ;     out: ax
-
 get_video_mode:
     mov ax, word [META$FILE.VIDEO_MODE]
     ret 
-
 
 ;==================================================================
 ; s2modesActivateMode:
@@ -136,7 +131,7 @@ mShell:
 ; Talvez os argumentos devam ser preparados antes.
 ; Inicializao do modo protegido.
 ; Switching to Protected Mode.
-; See: stage3/pm.inc
+; See: rm/pm.inc
 
 .bootMode:
 

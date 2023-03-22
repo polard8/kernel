@@ -23,7 +23,6 @@
 ; obs: 
 ; Talvez essa rotina deva receber argumentos. 
 ; Na inicialização essa rotina é chamada em modo texto.
-; Called by mShell in s2modes.inc
 ; routine:
 ; Keep the interrupts disabled.
 ; Setup registers 
@@ -35,6 +34,7 @@
 ; flush pipeline. jmp.
 
 pmInit:
+; Called by mShell in s2modes.inc.
 
     cli
 
