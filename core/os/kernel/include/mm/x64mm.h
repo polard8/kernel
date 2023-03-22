@@ -508,7 +508,7 @@ struct page_d
 
 // Índice do frame.
 // Começando a contar do início da memória física.
-    unsigned int frame_number;
+    unsigned int absolute_frame_number;
 
 // Locked:
 // Não pode ser descarregado para o disco.

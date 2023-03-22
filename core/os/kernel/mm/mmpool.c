@@ -96,128 +96,111 @@ fail:
 
 void *newPage (void)
 {
-    struct page_d *New;
-
-// Esse é o endereço virtual do início do pool de pageframes.
-// Isso significa que num pool temos vários pageframes.
-
+// Esse é o endereço virtual do início do pool de páginas.
     unsigned long base = (unsigned long) g_pagedpool_va;
-
     unsigned long va=0;
     unsigned long pa=0;
-    
     int PageSize = PAGE_SIZE;  //4096;
+    struct page_d *New;
 
     //debug_print ("newPage:\n");
 
-    if ( base == 0 )
-    {
+// Invalid base address.
+    if (base == 0){
         debug_print ("newPage: base\n");
         panic       ("newPage: base\n");
-        //return NULL;
     }
 
-// Cria e registra uma estrutura de página.
-// Objeto página.
-
+// Create and register a page object.
     New = (void *) __pageObject();
-
-    if ( New == NULL )
-    {
+    if (New == NULL){
         debug_print ("newPage: New\n");
         panic       ("newPage: New\n");
-        //goto fail;
     }
-
-    if ( New->used != TRUE )
-    {
+    if (New->used != TRUE){
         debug_print ("newPage: New used\n");
-        panic       ("newPage: New used \n");
+        panic       ("newPage: New used\n");
     }
-
-    if ( New->magic != 1234 )
-    {
+    if (New->magic != 1234){
         debug_print ("newPage: New magic\n");
-        panic       ("newPage: New magic \n");
+        panic       ("newPage: New magic\n");
     }
 
+// Index validation.
+    if (New->id < 0){
+        panic ("newPage: id underflow\n");
+    }
+    if (New->id >= PAGE_COUNT_MAX){
+        panic ("newPage: id overflow\n");
+    }
 
-// Pega o id 
-// Checa o limite de slots.
+    New->locked = FALSE;
 
-
-    if (New->id < 0)
-        panic ("newPage: out of range\n");
-
-    if (New->id >= PAGE_COUNT_MAX)
-        panic ("newPage: out of range\n");
-
-// trava ou não?
-    New->locked = 0;
-
-// contador de referências.
-// Quantos processos estão usando essa página compartilhada.
+// Reference counter.
+// How many processes?
     New->ref_count = 1;
 
-// #importante
-// precisamos pegar o endereço físico e dividir pelo tamanho da página.
-// #debug  #bugbug: Wrong value for 'base'.
+    // #debug
     //printf ("newPage: base=%x id=%d \n",base,New->id);
-    //refresh_screen();
     //while(1){}
 
 //
-//  VA
+// VA
+// va = base + (index * page size);
 //
 
-// Pegando o endereço virtual.
-// Temos uma base, que é um endereço virtual,
-// um índice e um tamanho de página.
-    va = (unsigned long) ( base + (New->id * PageSize) );
-
+    unsigned long va_offset = (unsigned long) (New->id * PageSize);
+    va = (unsigned long) (base + va_offset);
     if (va==0){
-        panic ("newPage: va==0\n");
+        panic("newPage: va==0\n");
     }
 
 //
-//  PA
+// PA
+// Using the kernel table to get the physical address.
 //
 
-// Pegando o endereço físico.
-// Convertendo de virtual para físico,
-// usando o pml4 do kernel.
+    // IN: Virtual address, kernel pml4 address.
+    pa = (unsigned long) virtual_to_physical(va,gKernelPML4Address);
 
-    pa = 
-        (unsigned long) virtual_to_physical ( va, gKernelPML4Address );
-
-// O pool não começa no endereço físico '0'.
-// Então nenhum dos frames pode começar em '0'.
+// Invalid physical address.
+// #todo
+// SMALLSYSTEM_PAGEDPOLL_START is the physical address for the base
+// in small systems.
     if (pa==0){
         panic ("newPage: pa==0\n");
     }
 
+// ++
+// -------------------------
+// What is the position of the frame,
+// starting fromt the beginning of the physical memory?
+// #todo
+// #bugbug
+// The routine below is not good.
+// Maybe we can change it.
 // #test
 // Calculando o número do frame com base
 // no endereço físico.
-
     unsigned long alignedPA = (unsigned long) pa;
     unsigned long remainder = (unsigned long)( pa % PAGE_SIZE );
-
 // Se temos um resto, ajustamos o endereço físico
 // par apontar par ao início do frame.
     if (remainder != 0){
         alignedPA = (unsigned long) ( pa - remainder );
     }
-
 // Com base no endereço do início do frame,
 // calculamos o indic do frame.
 // Os frames são contados à partir do início 
 // da memória física.                 
-    New->frame_number = (unsigned int) (alignedPA / PAGE_SIZE);
+    New->absolute_frame_number = 
+        (unsigned int) (alignedPA / PAGE_SIZE);
+// -------------------------
+// --
 
 // Return the virtual address.
-    //return (void *) va;
-    return (void *) ( base + (New->id * PageSize) );
+    return (void *) va;
+    //return (void *) ( base + (New->id * PageSize) );
 
 fail:
     debug_print ("newPage: fail\n");
@@ -430,14 +413,9 @@ void *allocPages (int size)
         {
             // #bugbug
             // Isso pode esgotar o heap do kernel
-
             p = (void *) kmalloc ( sizeof( struct page_d ) );
-
-            if ( p == NULL )
-            {
-                //printf ("allocPages: fail 2\n");
+            if ( (void*) p == NULL ){
                 panic ("allocPages: fail 2\n");
-                //goto fail;
             }
 
             //printf("#");
@@ -455,19 +433,22 @@ void *allocPages (int size)
             // Precisamos usar pml4
 
             // Pegando o endereço virtual.
-            va = (unsigned long) ( base + (p->id * 4096) ); 
+            va = (unsigned long) ( base + (p->id * PAGE_SIZE) ); 
             pa = (unsigned long) virtual_to_physical ( va, gKernelPML4Address ); 
 
-            if ( ( pa % PAGE_SIZE ) != 0 ) 
-            {
+            //++
+            //-----------
+            // Getting the absolute frame number,
+            // starting from the beginning of the physiscal memory.
+            if ( ( pa % PAGE_SIZE ) != 0 ) {
                 pa = pa - ( pa % PAGE_SIZE);
             }
-
-            p->frame_number = (pa / PAGE_SIZE);
-
-            if ( pa == 0 ){
-                p->frame_number = 0;
+            p->absolute_frame_number = (pa / PAGE_SIZE);
+            if (pa == 0){
+                p->absolute_frame_number = 0;
             }
+            //-----------
+            //--
 
             //---
 
@@ -477,7 +458,7 @@ void *allocPages (int size)
             pageConductor = (void *) pageConductor->next;
 
             // #obs:
-            // Vamos precisr da estrutura da primeira página alocada.
+            // Vamos precisar da estrutura da primeira página alocada.
             // #Importante:
             // Retornaremos o endereço virtual inicial do primeiro 
             // pageframe da lista. Ou seja, da primeira página.
@@ -493,19 +474,17 @@ void *allocPages (int size)
                         process->allocated_memory += (size*PAGE_SIZE);
                 }
                 
-                return (void *) ( base + (Ret->id * 4096) );
+                return (void *) ( base + (Ret->id * PAGE_SIZE) );
             }
             //fail
         };
     };
 
 fail:
-
     // #debug
     debug_print ("allocPages: fail\n");
     //printf      ("allocPages: fail\n");
     panic       ("allocPages: fail\n");
-
     return NULL;
 }
 
@@ -535,19 +514,19 @@ void initializeFramesAlloc (void)
 // Talvez seja desnecessário criar essa entrada.
 
     p = (void *) kmalloc( sizeof( struct page_d ) );
-
     if ( (void*) p == NULL){
         debug_print ("initializeFramesAlloc:\n");
         panic       ("initializeFramesAlloc:\n");
     }
-
-    p->id = 0;
     p->used = TRUE;
     p->magic = 1234;
+
+    p->id = 0;
     p->free = TRUE;  //free
     p->next = NULL; 
     // ...
-
     pageAllocList[0] = (unsigned long) p;
 }
+
+
 

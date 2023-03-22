@@ -306,12 +306,10 @@ void showPagedMemoryList(int max)
             printf ("id=%d free=%d frameno=%d ref=%d \n", 
                 p->id,            // Número do slot.
                 p->free,          // ?
-                p->frame_number,  // 
+                p->absolute_frame_number,  // 
                 p->ref_count );   // Quantos processos estão usando essa pag.
         }
     };
-
-    refresh_screen();
 }  
 
 
