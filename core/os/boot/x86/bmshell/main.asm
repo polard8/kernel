@@ -973,11 +973,10 @@ xxx_Config:
 
 ; 1 = Starts system GUI.
 ; 0 = Starts the Boot Manager CLI.
+; Select CLI. 
+; The bm-shell in 32bit assembly.
 
-; Select GUI. 
-; No bm-shell in 32bit assembly.
-    
-    mov al, 1
+    mov al, 0 
 
     cmp al, 1
     je .xxxxGUI

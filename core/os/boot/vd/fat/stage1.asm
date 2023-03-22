@@ -127,8 +127,18 @@ cluster     dw  0x0000
 ;absoluteTrack  db 0x00
 ;CylinderNumbers:  dd 0  ;;dword
 
+; ---------------------------
 ; The image name.
-ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+
+; It loads a faster version of the boot manager,
+; with no 32bit-assembly shell.
+;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+; It loads the legacy version of the boot manager,
+; with the 32bit-assembly shell.
+ImageName     db "BMSHELL BIN", 0x0D, 0x0A, 0x00
+
+
+; Message:
 ; 'R' = Root fail.
 msgFailure    db "R", 0x00 
 ;...
