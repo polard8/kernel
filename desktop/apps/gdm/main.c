@@ -77,6 +77,20 @@ static int client_window = 0;
 static int rebootbutton_window = 0;   //first button
 static int confirmbutton_window = 0;  //second button
 
+
+struct child_window_d
+{
+    unsigned long l;
+    unsigned long t;
+    unsigned long w;
+    unsigned long h;
+};
+struct child_window_d cwBox1;
+struct child_window_d cwButton1;
+struct child_window_d cwBox2;
+struct child_window_d cwButton2;
+
+
 // #todo
 // int button_list[8];
 
@@ -114,6 +128,26 @@ static void update_clients(int fd);
 
 static void update_clients(int fd)
 {
+    // Local
+    struct gws_window_info_d lWi;
+
+    if (fd<0){
+        return;
+    }
+
+// Get info about the main window.
+// IN: fd, wid, window info structure.
+    gws_get_window_info(
+        fd, 
+        main_window,   // The app window.
+        (struct gws_window_info_d *) &lWi );
+
+// ...
+
+// #todo
+// Update values.
+
+
     gws_redraw_window(fd, addressbar_window, TRUE);
     gws_redraw_window(fd, rebootbutton_window, TRUE);
     gws_redraw_window(fd, confirmbutton_window, TRUE);
