@@ -72,11 +72,14 @@ unsigned long gdm_height=0;
 //
 
 static int main_window = 0;
-static int addressbar_window = 0;
-static int client_window = 0;
-static int rebootbutton_window = 0;   //first button
-static int confirmbutton_window = 0;  //second button
+// bar1 | button1
+static int bar1_window = 0;
+static int button1_window = 0;
+// bar2 | button2
+static int bar2_window = 0;
+static int button2_window = 0;
 
+//-------------
 
 struct child_window_d
 {
@@ -85,9 +88,9 @@ struct child_window_d
     unsigned long w;
     unsigned long h;
 };
-struct child_window_d cwBox1;
+struct child_window_d cwBar1;
 struct child_window_d cwButton1;
-struct child_window_d cwBox2;
+struct child_window_d cwBar2;
 struct child_window_d cwButton2;
 
 
@@ -142,16 +145,80 @@ static void update_clients(int fd)
         main_window,   // The app window.
         (struct gws_window_info_d *) &lWi );
 
-// ...
 
-// #todo
-// Update values.
+// ---------------------------------------------
+// cwBar1
+    cwBar1.l = (( lWi.cr_width/8 )*2) +20; 
+    cwBar1.t = 4;
+    cwBar1.w = (( lWi.cr_width/8 )*2);
+    cwBar1.h = 24;
+    gws_change_window_position( 
+        fd,
+        bar1_window,
+        cwBar1.l,
+        cwBar1.t );
+    gws_resize_window(
+        fd,
+        bar1_window,
+        cwBar1.w,
+        cwBar1.h );
 
+// ---------------------------------------------
+// cwButton1
+    cwButton1.l = (( lWi.cr_width/8 )*5);
+    cwButton1.t = 4;
+    cwButton1.w = (( lWi.cr_width/8 )*2);
+    cwButton1.h = 24;
+    gws_change_window_position( 
+        fd,
+        button1_window,
+        cwButton1.l,
+        cwButton1.t );
+    gws_resize_window(
+        fd,
+        button1_window,
+        cwButton1.w,
+        cwButton1.h );
 
-    gws_redraw_window(fd, addressbar_window, TRUE);
-    gws_redraw_window(fd, rebootbutton_window, TRUE);
-    gws_redraw_window(fd, confirmbutton_window, TRUE);
-    gws_redraw_window(fd, client_window, TRUE);
+// ---------------------------------------------
+// cwBar2
+    cwBar2.l = (( lWi.cr_width/8 )*2) + 20;
+    cwBar2.t = (4 +(24) +4);
+    cwBar2.w = (( lWi.cr_width/8 )*2);
+    cwBar2.h = 24;
+    gws_change_window_position( 
+        fd,
+        bar2_window,
+        cwBar2.l,
+        cwBar2.t );
+    gws_resize_window(
+        fd,
+        bar2_window,
+        cwBar2.w,
+        cwBar2.h );
+
+// ---------------------------------------------
+// cwButton2
+    cwButton2.l = (( lWi.cr_width/8 )*5);
+    cwButton2.t = (4 +(24) +4);
+    cwButton2.w = (( lWi.cr_width/8 )*2);
+    cwButton2.h = 24;
+    gws_change_window_position( 
+        fd,
+        button2_window,
+        cwButton2.l,
+        cwButton2.t );
+    gws_resize_window(
+        fd,
+        button2_window,
+        cwButton2.w,
+        cwButton2.h );
+
+// ----------
+    gws_redraw_window(fd, bar1_window, TRUE);
+    gws_redraw_window(fd, button1_window, TRUE);
+    gws_redraw_window(fd, bar2_window, TRUE);
+    gws_redraw_window(fd, button2_window, TRUE);
 }
 
 int fileman_init_globals(void)
@@ -209,7 +276,7 @@ void editorDrawChar(int fd, int ch)
 // Calling the window server for drawing the char.
     gws_draw_char ( 
         fd, 
-        client_window, 
+        bar2_window, 
         (cursor_x*8), 
         (cursor_y*8), 
         COLOR_BLACK, 
@@ -261,12 +328,12 @@ gdmProcedure(
 
     //36
     case MSG_MOUSERELEASED:
-        if ( event_window == addressbar_window ||
-             event_window == client_window )
+        if ( event_window == bar1_window ||
+             event_window == bar2_window )
         {
             //gws_redraw_window(fd, event_window, TRUE);
             // IN: fd, wid, left, top, color, char.
-            if (event_window == client_window){
+            if (event_window == bar2_window){
                 gws_draw_char (
                     (int) fd,
                     (int) event_window,
@@ -277,11 +344,11 @@ gdmProcedure(
             }
             return 0;
         }
-        if (event_window == rebootbutton_window){
-            printf("~ reboot button clicked\n");
+        if (event_window == button1_window){
+            printf("~ button1 clicked\n");
         }
-        if (event_window == confirmbutton_window){
-            printf("~ confirm button clicked\n");
+        if (event_window == button2_window){
+            printf("~ button2 clicked\n");
         }
         return 0;
         break;
@@ -292,9 +359,9 @@ gdmProcedure(
         // redraw everyone.
         if (event_window == main_window){
             update_clients(fd);
-            //gws_redraw_window(fd, addressbar_window, TRUE);
-            //gws_redraw_window(fd, rebootbutton_window, TRUE);
-            //gws_redraw_window(fd, client_window,     TRUE);
+            //gws_redraw_window(fd, bar1_window, TRUE);
+            //gws_redraw_window(fd, button1_window, TRUE);
+            //gws_redraw_window(fd, bar2_window,     TRUE);
             return 0;
         }
         break;
@@ -380,6 +447,10 @@ int main( int argc, char *argv[] )
         exit(1);
     }
 
+
+// ---------------------------------
+// Main window
+
 // Tamanho da janela.
 // #
 // Isso depende do modo em que o window manager esta operando.
@@ -450,50 +521,53 @@ int main( int argc, char *argv[] )
         (unsigned long) COLOR_BLACK,
         " Login: ");
 
-// login window
-// Address bar - (edit box)
+// ---------------------------------
+// bar1_window: (username)
 // Inside the main window.
 
-    addressbar_window = 
+    unsigned long bar1_l = (( gdm_width/8 )*2) +20;
+    unsigned long bar1_t = 4;
+    unsigned long bar1_w = (( gdm_width/8 )*2);
+    unsigned long bar1_h = 24;
+
+    bar1_window = 
         (int) gws_create_window (
                   client_fd,
-                  WT_EDITBOX,1,1,"login-win",
-                  (( gdm_width/8 )*2) +20,  //l 
-                  4,                      //t
-                  (( gdm_width/8 )*2),      //w
-                  24,                     //h
+                  WT_EDITBOX, 1, 1, "bar1_window",
+                  bar1_l, bar1_t, bar1_w, bar1_h,
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if (addressbar_window<0){
-        debug_print("gdm: addressbar_window fail\n");
+    if (bar1_window<0){
+        debug_print("gdm: bar1_window fail\n");
     }
 // Text inside the address bar.
-    if (addressbar_window>0){
+    if (bar1_window>0){
         gws_draw_text (
             (int) client_fd,            // fd
-            (int) addressbar_window,    // window id
+            (int) bar1_window,          // window id
             (unsigned long) 8,          // left
             (unsigned long) 8,          // top
             (unsigned long) COLOR_BLACK,
             "admin");
      }
 
-// first button
+// ---------------------------------
+// button1_window: (reboot button window)
 // The [Reboot] button.
 // inside the main window.
-
-    rebootbutton_window = 
+    unsigned long bu1_l = (( gdm_width/8 )*5);
+    unsigned long bu1_t = 4;
+    unsigned long bu1_w = (( gdm_width/8 )*2);
+    unsigned long bu1_h = 24;
+    button1_window = 
         (int) gws_create_window ( 
                   client_fd,
-                  WT_BUTTON,1,1,"Reboot",
-                  (( gdm_width/8 )*5), 
-                  4,
-                  (( gdm_width/8 )*2), 
-                  24,
+                  WT_BUTTON, 1, 1, "Reboot",
+                  bu1_l, bu1_t, bu1_w, bu1_h,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if (rebootbutton_window<0){
-        debug_print("editor: rebootbutton_window fail\n"); 
+    if (button1_window<0){
+        debug_print("editor: button1_window fail\n"); 
     }
 
 // -------------------------------
@@ -509,56 +583,44 @@ int main( int argc, char *argv[] )
         (unsigned long) COLOR_BLACK,
         " Password: ");
 
-// == Client window =======================
 
-// (Editbox)
-// Client window (White)
-// Inside the mainwindow.
-// Lembre-se que temos uma status bar.
-// left:
-    unsigned long cw_left = (( gdm_width/8 )*2) + 20; //4;
-// top:
-// Title bar + address bar.
-    unsigned long cw_top = (4 +(24) +4); //(32 +4 +(24) +4);
-// width:
-// Width - borders.
-    unsigned long cw_width = (( gdm_width/8 )*2);//( w_width -4 -4);
-// height:
-// Height - topbar - addressbar - borders - statusbar 
-// #bugbug:
-// Well, the window manager will change the mainwindow values
-// to fit the 'working area' that exclude the taskbar,
-// so we will need to redraw the client window.
-    unsigned long cw_height = 24; //32;//( w_height -32 -40 -4 -4 -32 );
+// ---------------------------------
+// bar2_window: password
+    unsigned long bar2_l = (( gdm_width/8 )*2) + 20;
+    unsigned long bar2_t = (4 +(24) +4);
+    unsigned long bar2_w = (( gdm_width/8 )*2);
+    unsigned long bar2_h = 24;
 
-// password window.
-    client_window = 
+    bar2_window = 
         (int) gws_create_window ( 
                   client_fd,
                   WT_EDITBOX, 1, 1, "password-win",
-                  cw_left, cw_top, cw_width, cw_height,
+                  bar2_l, bar2_t, bar2_w, bar2_h,
                   main_window, 0, COLOR_WHITE, COLOR_WHITE );
 
-    if (client_window<0){
-        debug_print("gdm: client_window\n"); 
+    if (bar2_window<0){
+        debug_print("gdm: bar2_window\n"); 
     }
 
-// first button
+// ---------------------------------
+// button2_window: (confirm button)
 // The [Enter] button.
 // inside the main window.
 
-    confirmbutton_window = 
+    unsigned long bu2_l = (( gdm_width/8 )*5);
+    unsigned long bu2_t = (4 +(24) +4);
+    unsigned long bu2_w = (( gdm_width/8 )*2);
+    unsigned long bu2_h = 24;
+
+    button2_window = 
         (int) gws_create_window ( 
                   client_fd,
-                  WT_BUTTON,1,1,"Confirm",
-                  (( gdm_width/8 )*5),   //l
-                  (4 +(24) +4),        //t
-                  (( gdm_width/8 )*2),   //w
-                  24,                  //h
+                  WT_BUTTON, 1, 1, "Confirm",
+                  bu2_l, bu2_t, bu2_w, bu2_h,
                   main_window, 0, COLOR_GRAY, COLOR_GRAY );
 
-    if (confirmbutton_window<0){
-        debug_print("gdm: confirmbutton_window\n");
+    if (button2_window<0){
+        debug_print("gdm: button2_window\n");
     }
 
 /*
@@ -566,7 +628,7 @@ int main( int argc, char *argv[] )
     for (t=1; t<8; t++){
     gws_draw_text (
         (int) client_fd,        // fd,
-        (int) client_window,    // window id,
+        (int) bar2_window,    // window id,
         (unsigned long) 4,      // left,
         (unsigned long) t*8,    // top,
         (unsigned long) COLOR_BLACK,
@@ -579,7 +641,7 @@ int main( int argc, char *argv[] )
     for (t=0; t<80; t++){
         gws_draw_char (
             (int) client_fd,        // fd,
-            (int) client_window,    // window id,
+            (int) bar2_window,    // window id,
             (unsigned long) t*8,    // left,
             (unsigned long) 8,      // top,
             (unsigned long) COLOR_BLUE,
@@ -611,8 +673,8 @@ int main( int argc, char *argv[] )
     //gws_async_command(
     //     client_fd,
     //     9,             // set focus
-    //     client_window,
-    //     client_window );
+    //     bar2_window,
+    //     bar2_window );
 
 
 // set active window.
@@ -622,7 +684,7 @@ int main( int argc, char *argv[] )
     //     main_window,
     //     main_window );
 
-    gws_set_focus( client_fd, client_window );
+    gws_set_focus( client_fd, bar2_window );
     gws_set_active( client_fd, main_window );
 
 
