@@ -1,19 +1,58 @@
 
-	Folders:
+    Some words about the boot loader options.
 
+-----------------
+Folders:
 
 bl/
     32 bit bootloader written in C.
     It loader the kernel image.
-
 bm/
     Boot manager with no embedded shell.
-
 bmshell/
     Boot manager with an embedded shell.
-
 setup/
    ?
 
 -----------------
  We can use the MBR to select what bm we want to initialize.
+
+-----------------
+Bootloader:
+Eu criei mais um programa de bootloader. 
+Agora a inicialização tem duas opções.
+
++ BM.BIN: 
+    Faz uma inicialização mais simplificada carregando 
+    o bootloader BL.BIN e mudando para o modo gráfico.
+
++ BMSHELL.BIN:
+    Inicializa em modo texto e roda um mini shell em Assembly 32bit ... 
+    após um comando no shell ele volta pra 16bit 
+    realiza alguma operação como mudar o modo de video ou 
+    desligar a máquina via APM. E por fim pode voltar para 32bit, 
+    mas agora no modo gráfico e saltando para o boot loader BL.BIN. 
+    Eu sempre usei essa opção para testar diferentes resoluções 
+    que podem ser selecionadas através desse mini-shell.
+
+    As duas opções ficarão disponíveis podendo ser selecionadas no MBR.
+
+    Outras opções de boot serão criadas no futuro como EFI. 
+A minha partição é uma partição FAT16 assinada como partição EFI 
+na tabela de partições.
+
+    O GRUB não é uma opção por enquanto por causa da licença e 
+por causa da forma que ele é instalado no início do disco.
+
+    O Gramado tem um MBR no primeiro setor e um VBR no setor 63. 
+Por isso tem margem pra tentar outras opções. 
+Por causa desse espaço todo. 
+Esse espaço talvez seja o suficiente para GPT ou variantes ... 
+mas minha intenção sempre foi usar esse espaço para 
+colocar meta-files com algum tipo de configuração de inicialização.
+
+    Eu pretendo dar margem para suportar sistemas e programas em 16bit, 
+no estilo mikeos ... mas o modo de 32bit será ignorado. 
+Em 32bit só terá o mínimo possível de código.
+
+
