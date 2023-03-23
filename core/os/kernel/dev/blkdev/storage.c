@@ -9,6 +9,17 @@ const char* sdc_string = "sdc";
 const char* sdd_string = "sdd";
 const char* sdfail_string = "sd?";
 
+
+// #test
+// see: disk.h
+struct partition_table_d *system_disk_pt0;
+struct partition_table_d *system_disk_pt1;
+struct partition_table_d *system_disk_pt2;
+struct partition_table_d *system_disk_pt3;
+//struct partition_table_d *boot_partition; 
+//struct partition_table_d *system_partition; 
+
+
 //
 // private functions: prototypes ============
 //
@@ -301,11 +312,125 @@ static int __create_vfs_partition(void)
 }
 
 
+struct partition_table_d *disk_get_partition_table(int index)
+{
+// #bugbug
+// Only if the ata driver is already initialized.
+
+    struct partition_table_d *pt;
+    unsigned char *mbr_base = (unsigned char *) MBR_ADDRESS_VA; 
+
+    if (g_ata_driver_initialized != TRUE){
+        panic("disk_get_partition_table: g_ata_driver_initialized\n");
+    }
+
+// Read from disk.
+    fs_load_mbr(MBR_ADDRESS_VA);
+    
+    /*
+    // #debug
+    int i=0;
+    for (i=0; i<512; i++){
+        printf("%c",mbr_base[i]);
+    };
+    printf("\n");
+    */
+
+// Partition table
+    switch (index)
+    {
+        case 0:
+            pt = (struct partition_table_d *) (mbr_base + MBR_PT0_OFFSET);
+            break;
+        case 1:
+            pt = (struct partition_table_d *) (mbr_base + MBR_PT1_OFFSET);
+            break;
+        case 2:
+            pt = (struct partition_table_d *) (mbr_base + MBR_PT2_OFFSET);
+            break;
+        case 3:
+            pt = (struct partition_table_d *) (mbr_base + MBR_PT3_OFFSET);
+            break;
+        default:
+            return NULL;
+            break;
+    };
+
+    //#debug
+    //printf("Partition %d:\n",index);
+    //printf("active %x\n", pt->active );
+    //printf("start lba %d\n", pt->start_lba );
+    //printf("size %x\n", pt->size );
+    // ...
+
+    return (struct partition_table_d *) pt;
+};
+
+
+int disk_initialize_mbr_info(void)
+{
+// #bugbug
+// Only if the ata driver is already initialized.
+
+// + We are already getting the partition tables.
+// #todo
+// Get all the info in the mbr sector
+// And save it in some variable and structures.
+
+    printf ("disk_get_mbr_info:\n");
+
+    if (g_ata_driver_initialized != TRUE){
+        panic("disk_get_mbr_info: g_ata_driver_initialized\n");
+    }
+
+//
+// Partition tables
+//
+
+    system_disk_pt0 = (struct partition_table_d *) disk_get_partition_table(0);
+    if ( (void*) system_disk_pt0 == NULL )
+        return -1;
+
+    system_disk_pt1 = (struct partition_table_d *) disk_get_partition_table(1);
+    if ( (void*) system_disk_pt1 == NULL )
+        return -1;
+
+    system_disk_pt2 = (struct partition_table_d *) disk_get_partition_table(2);
+    if ( (void*) system_disk_pt2 == NULL )
+        return -1;
+
+    system_disk_pt3 = (struct partition_table_d *) disk_get_partition_table(3);
+    if ( (void*) system_disk_pt3 == NULL )
+        return -1;
+
+    printf("done\n");
+    //while(1){}
+    return 0;
+}
+
+void disk_show_mbr_info(void)
+{
+
+// partition table 0
+    if ( (void*) system_disk_pt0 == NULL )
+        return;
+
+    //#debug
+    //printf("Partition %d:\n",index);
+    printf("active %x\n", 
+        system_disk_pt0->active );
+    printf("start lba %d\n", 
+        system_disk_pt0->start_lba );
+    printf("size %x\n", 
+        system_disk_pt0->size );
+    // ...
+}
+
+
 /*
  * disk_init:
  *     Initialize the disk manager.
  */
-
 // #bugbug
 // #fixme
 // The boot disk was not include in the diskList[]
@@ -333,9 +458,7 @@ int disk_init (void)
         panic ("disk_init: storage\n");
     }
 
-
 // Clean the disk list.
-
     for ( i=0; i<DISK_COUNT_MAX; i++ )
     {
         diskList[i] = 0;

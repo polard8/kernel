@@ -41,6 +41,7 @@
 // Size?
 #define REALMODE_FREEAREA  0x500
 
+// mbr and vbr
 // A place for the kernel 
 // to put the MBR on the fly.
 #define MBR_ADDRESS  0x600

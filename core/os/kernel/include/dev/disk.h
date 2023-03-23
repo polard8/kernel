@@ -7,9 +7,8 @@
 #define SECTOR_SIZE    512  
 //#define SECTOR_SIZE  4096  
 
-#define MBR_BOOTABLE        0x80
-#define MBR_SIGNATURE       0xAA55
-
+#define MBR_BOOTABLE   0x80
+#define MBR_SIGNATURE  0xAA55
 
 #define DISK_COUNT_MAX 1024    //8
 
@@ -78,7 +77,7 @@
 
 // partition table
 // mbr partition table offsets.
-#define  MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
+#define MBR_Table       446  /* MBR: Offset of partition table in the MBR */ 
 #define MBR_PT0_OFFSET  0x01BE  // (446) 
 #define MBR_PT1_OFFSET  0x01CE  // (462)
 #define MBR_PT2_OFFSET  0x01DE  // (478) 
@@ -122,16 +121,13 @@
  * disk_type_t:
  *     Enumerando os tipos de disk.
  */
-
 typedef enum {
-
     DISK_TYPE_NULL, 
     DISK_TYPE_PATA,
     DISK_TYPE_PATAPI,
     DISK_TYPE_SATA,
     DISK_TYPE_SATAPI
     //...
-
 }disk_type_t;
 
 
@@ -140,11 +136,9 @@ typedef enum {
 // Um disco virtual também pode ter muitos volumes virtuais.
 
 typedef enum {
-
     DISK_CLASS_NULL,
     DISK_CLASS_PHYSICAL,
     DISK_CLASS_VIRTUAL
-
 }disk_class_t;
 
 
@@ -155,8 +149,7 @@ struct bpb_d
     int used;
     int magic;
     //...
-
-    struct bpb_d *next;
+    struct bpb_d  *next;
 };
 
 
@@ -186,33 +179,31 @@ Element (offset)  Size      Description
 
 struct partition_table_d
 {
-
 // //0x80=active  0x00=inactive
     unsigned char active;
-
 // #todo
 // Talvez isso não importe se estivermos usando LBA.
     unsigned char start_chs[3];  //sizes:  8,6,10
-
     unsigned char type;
-
 // #todo
 // Talvez isso não importe se estivermos usando LBA.
-    unsigned char end_chs[3];    //sizes:  8,6,10
-    
+    unsigned char end_chs[3];    //sizes:  8,6,10   
 // Sectors between MBR and first sector.
-    unsigned long offset;
-    
+    unsigned int start_lba;
 // Sectors in partition.
 // O tamanho da partição dado em setores.
 // Se estivermos usando isso, então o CHS não importa.
-    unsigned long size;
+    unsigned int size;
 };
 
 // #test
-//struct partition_table_d *partition; 
-struct partition_table_d *system_partition; 
-
+// see: storage.c
+extern struct partition_table_d *system_disk_pt0;
+extern struct partition_table_d *system_disk_pt1;
+extern struct partition_table_d *system_disk_pt2;
+extern struct partition_table_d *system_disk_pt3;
+//extern struct partition_table_d *boot_partition; 
+//extern struct partition_table_d *system_partition; 
 
 // This is a good code.
 // It is easy to handle the partition table values.
@@ -317,6 +308,10 @@ unsigned long diskList[DISK_COUNT_MAX];
 
 int disk_init (void);
 void *disk_get_disk_handle ( int number );
+
+struct partition_table_d *disk_get_partition_table(int index);
+int disk_initialize_mbr_info(void);
+void disk_show_mbr_info(void);
 
 //
 // Show info

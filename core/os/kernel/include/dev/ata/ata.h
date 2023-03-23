@@ -182,6 +182,8 @@
 
 // ===========================================================
 
+extern int g_ata_driver_initialized;
+
 //
 // Variables
 //

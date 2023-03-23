@@ -1783,6 +1783,14 @@ int consoleCompareStrings(void)
     //debug_print("consoleCompareStrings: \n");
     printf("\n");
 
+// test mbr
+// see: storage.c
+    if ( strncmp(prompt,"mbr",3) == 0 )
+    {
+        disk_show_mbr_info();
+        goto exit_cmp;
+    }
+
 // test nic
     if ( strncmp(prompt,"test-nic",8) == 0 ){
         testNIC();

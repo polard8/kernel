@@ -7,21 +7,17 @@
 #define ____GVA_H    1
 
 
-    // #todo
-    // Tem um monte de endereços usados no início da 
-    // memoria virtual do kernel. Mas acontece que esses
-    // endereços são os mesmos para físico e virtual.
-    // então precisamos estar concordância com os endereços
-    // encontrados em gpa.h 
+// #todo
+// Tem um monte de endereços usados no início da 
+// memoria virtual do kernel. Mas acontece que esses
+// endereços são os mesmos para físico e virtual.
+// então precisamos estar concordância com os endereços
+// encontrados em gpa.h 
 
-
-// mbr
-#define MBR_ADDRESS_VA    0x00020000  
-
-// vbr
-//Podemos alocar memória para isso, liberando esse espaço?
-#define VOLUME1_VBR_ADDRESS_VA   (0x00020000 + 0x200) 
-#define VOLUME2_VBR_ADDRESS_VA   (0x00020000 + 0x200) 
+// mbr and vbr
+#define MBR_ADDRESS_VA    0x600  
+#define VOLUME1_VBR_ADDRESS_VA   (MBR_ADDRESS_VA + 0x200) 
+#define VOLUME2_VBR_ADDRESS_VA   (MBR_ADDRESS_VA + 0x200) 
 
 // fat
 //Podemos alocar memória para isso, liberando esse espaço?

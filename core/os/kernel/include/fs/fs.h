@@ -535,11 +535,6 @@ fatLoadCluster (
     unsigned long address, 
     unsigned long spc );
 
-void 
-fs_load_fat(
-    unsigned long fat_address, 
-    unsigned long fat_lba, 
-    size_t fat_size );
 
 void 
 fs_load_metafile (
@@ -547,6 +542,17 @@ fs_load_metafile (
     unsigned long first_lba, 
     unsigned long size );
 
+// MBR
+void fs_load_mbr(unsigned long mbr_address);
+
+// FAT
+void 
+fs_load_fat(
+    unsigned long fat_address, 
+    unsigned long fat_lba, 
+    size_t fat_size );
+
+// ROOT
 void 
 fs_load_rootdir(
     unsigned long root_address, 

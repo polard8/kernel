@@ -20,7 +20,7 @@
 // in the Gramado system.
 
 // mbr
-#define MBR_LBA               0 
+#define MBR_LBA  0 
 
 //================================
 // boot partition

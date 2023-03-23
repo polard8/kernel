@@ -628,6 +628,9 @@ P0:
 .endC:      db  0
 .endS:      db  0
 .startLBA:       dd  0x3F        ; 63
+; #todo
+; We gotta send this value to the kernel.
+; The file system needs to respect this limit.
 .partitionSize:  dd  0x0000FFA7  ; in sectors. almost 32MB
 
 ; Partition 1, 2 and 3.

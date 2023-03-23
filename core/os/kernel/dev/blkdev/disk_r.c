@@ -160,6 +160,55 @@ fatLoadCluster (
     };
 }
 
+// Load metafile
+void 
+fs_load_metafile (
+    unsigned long buffer, 
+    unsigned long first_lba, 
+    unsigned long size )
+{
+
+    debug_print ("fs_load_metafile:\n");
+
+    unsigned long SizeInSectors = (size & 0xFFFFFFFF);
+
+    if (buffer == 0){
+        debug_print ("fs_load_metafile: [ERROR] buffer\n");
+        return;
+    }
+    if (size == 0){
+        debug_print ("fs_load_metafile: [ERROR] size\n");
+        return;
+    }
+
+    __load_sequential_sectors ( 
+        buffer, 
+        first_lba, 
+        SizeInSectors );
+}
+
+
+void fs_load_mbr(unsigned long mbr_address)
+{
+
+    unsigned long MBR_Address=0;
+    unsigned long MBR_Lba=0;
+    size_t        MBR_Size=0;  // In sectors.
+
+    MBR_Address = mbr_address;
+    MBR_Lba     = MBR_LBA;  // LBA = 0.
+    MBR_Size    = 1;        // Number of sectors = 1.
+
+    debug_print ("fs_load_rootdir:\n");
+
+    __load_sequential_sectors ( 
+        MBR_Address, 
+        MBR_Lba, 
+        MBR_Size );
+}
+
+
+
 
 /*
  * fs_load_fat:
@@ -220,36 +269,6 @@ fs_load_fat(
 }
 
 
-
-// Load metafile
-void 
-fs_load_metafile (
-    unsigned long buffer, 
-    unsigned long first_lba, 
-    unsigned long size )
-{
-
-    debug_print ("fs_load_metafile:\n");
-
-    unsigned long SizeInSectors = (size & 0xFFFFFFFF);
-
-    if (buffer == 0){
-        debug_print ("fs_load_metafile: [ERROR] buffer\n");
-        return;
-    }
-
-    if ( size == 0 ){
-        debug_print ("fs_load_metafile: [ERROR] size\n");
-        return;
-    }
-
-    __load_sequential_sectors ( 
-        buffer, 
-        first_lba, 
-        SizeInSectors );
-}
-
-
 /*
  * fs_load_rootdir:
  * 
@@ -284,6 +303,9 @@ fs_load_rootdir(
         RootLBA, 
         RootSize );
 }
+
+
+
 
 
 //

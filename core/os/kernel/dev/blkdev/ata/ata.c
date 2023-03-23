@@ -8,6 +8,8 @@
 
 #include <kernel.h>  
 
+int g_ata_driver_initialized=FALSE;
+
 
 int ATAFlag=0;
 unsigned short *ata_identify_dev_buf;
@@ -1434,6 +1436,10 @@ static int __ata_initialize(int ataflag)
     //debug_print("ata_initialize: Turn on interrupt breaker\n");
     __breaker_ata1_initialized = FALSE;
     __breaker_ata2_initialized = FALSE;
+
+// Driver status.
+    g_ata_driver_initialized = FALSE;
+
 // A estrutura ainda nao foi configurada.
     ata.used = FALSE;
     ata.magic = 0;
@@ -1720,6 +1726,10 @@ done:
         __breaker_ata1_initialized = TRUE; 
         __breaker_ata2_initialized = TRUE; 
     }
+
+// Driver status.
+    g_ata_driver_initialized = TRUE;
+
     return (int) Status;
 }
 
