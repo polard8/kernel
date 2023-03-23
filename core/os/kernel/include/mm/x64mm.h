@@ -965,7 +965,7 @@ unsigned long get_new_frame (void);
 unsigned long alloc_frame(void);
 
 // #danger
-unsigned long get_table_pointer (void);
+unsigned long get_table_pointer_va(void);
 
 void load_pml4_table(void *phy_addr);
 

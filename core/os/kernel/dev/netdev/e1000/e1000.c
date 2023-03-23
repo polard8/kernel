@@ -743,7 +743,7 @@ static unsigned long __mapping_nic1_device_address(unsigned long pa)
 // pt
 // 0x00088000
     unsigned long *nic1_page_table = 
-        (unsigned long *) PAGETABLE_NIC1;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_NIC1;
 // pa
     unsigned long nic1_pa = (unsigned long) pa;
 // va

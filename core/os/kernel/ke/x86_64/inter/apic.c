@@ -242,7 +242,8 @@ void lapic_initializing(unsigned long lapic_pa)
 // ===================
 
 // page table
-    unsigned long *pt_lapic = (unsigned long *) PAGETABLE_RES5;
+    unsigned long *pt_lapic = 
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_RES5;
 // pa
     LAPIC.lapic_pa = (unsigned long) (lapic_pa & 0xFFFFFFFF);
 // va

@@ -189,7 +189,7 @@ void *CreateAndIntallPageTable (
 // Page table
 //
 
-    unsigned long ptVA = (unsigned long) get_table_pointer();  //ok
+    unsigned long ptVA = (unsigned long) get_table_pointer_va();  //ok
     if ( ptVA == 0 ){
         panic ("CreateAndIntallPageTable: [FAIL] ptVA\n");
     }
@@ -348,44 +348,40 @@ unsigned long alloc_frame(void)
 //
 // #important: DANGER !!!
 //
-// get_table_pointer:
-//
+// get_table_pointer_va:
 // #bugbug
 // Isso eh um improviso, precisamos de outro endereço.
 // >>>> 0x1000
-//
 // O sistema esta usando esse endereço como inicio de um heap
 // onde pegamos paginas (frames?) de memoria para criarmos diretorios de paginas.
 // Isso porque precisamos de endereços que terminem com pelo menos 
 // 12 bits zerados.
-//
 // #todo: 
 // Precisamos encontrar outro lugar para esse heap, 
 // tendo em vista que o numero de diretorios criados sera grande 
 // e o heap invadir outras areas.
-//
 // #bugbug
 // Vamos improvisar um limite por enquanto.
-// See: globals/gpa.h
-//
+// See: mm/gpa.h
+// 0x1000
 
-unsigned long table_pointer_heap_base = ____DANGER_TABLE_POINTER_HEAP_BASE;
-//unsigned long table_pointer_heap_base = 0x1000;
+unsigned long table_pointer_heap_base = 
+    ____DANGER_TABLE_POINTER_HEAP_BASE;
 
-// ====================================================================
+// ======================================================
 
 // Isso serve pra pegarmos um endereço físico
 // que servira de base para criarmos uma pagetable.
 // Mas endereço físico e virtual são iguais nessa região.
 // Identidade 1:1.
 
-unsigned long get_table_pointer (void)
+unsigned long get_table_pointer_va(void)
 {
-    debug_print ("get_table_pointer:\n");
+    debug_print ("get_table_pointer_va:\n");
 
 // Incrementa 4KB.
     table_pointer_heap_base = 
-        (unsigned long) (table_pointer_heap_base + 0x1000 );
+        (unsigned long) (table_pointer_heap_base + 0x1000);
 
 // #todo
 // Precisamos de uma nova origem.
@@ -398,10 +394,14 @@ unsigned long get_table_pointer (void)
 // Esse o o endereço mais baixo entre os endereços usados
 // pelo sistema de arquivos.
 
-    //if ( table_pointer_heap_base >= VM_BASE )
-    if ( table_pointer_heap_base >= MBR_ADDRESS )
+
+// Reach the max limit.
+// 0x20000
+    //if (table_pointer_heap_base >= MBR_ADDRESS)
+    if (table_pointer_heap_base >= FAT_ADDRESS)
     {
-        panic ("get_table_pointer: [FIXME] Limits\n");
+        //0x00030000
+        panic ("get_table_pointer_va: [FIXME] Limits\n");
     }
 
     return (unsigned long) table_pointer_heap_base;
@@ -417,9 +417,7 @@ void *CloneKernelPDPT0(void)
 // criarmos um pdpt.
 // Identidade 1:1.
 
-    //destAddressVA = (unsigned long) newPage (); 
-    destAddressVA = (unsigned long) get_table_pointer(); 
-
+    destAddressVA = (unsigned long) get_table_pointer_va(); 
     if ( destAddressVA == 0 ){
         panic ("CloneKernelPDPT0: destAddressVA\n");
     }
@@ -451,9 +449,7 @@ void *CloneKernelPD0(void)
 // criarmos um pd.
 // Identidade 1:1.
 
-    //destAddressVA = (unsigned long) newPage (); 
-    destAddressVA = (unsigned long) get_table_pointer(); 
-
+    destAddressVA = (unsigned long) get_table_pointer_va();
     if ( destAddressVA == 0 ){
         panic ("CloneKernelPD0: destAddressVA\n");
     }
@@ -492,10 +488,8 @@ void *CloneKernelPML4(void)
 // Mas endereço físico e virtual são iguais nessa região.
 // Identidade 1:1.
 
-    //destAddressVA = (unsigned long) newPage (); 
-    destAddressVA = (unsigned long) get_table_pointer(); 
-
-    if ( destAddressVA == 0 ){
+    destAddressVA = (unsigned long) get_table_pointer_va(); 
+    if (destAddressVA == 0){
         panic ("CloneKernelPML4: destAddressVA\n");
     }
 
@@ -555,8 +549,7 @@ void *clone_pml4(unsigned long pml4_va)
 // criarmos um pml4.
 // Identidade 1:1.
 
-    destAddressVA = (unsigned long) get_table_pointer(); 
-    
+    destAddressVA = (unsigned long) get_table_pointer_va();
     if (destAddressVA == 0){
         panic ("clone_pml4: destAddressVA\n");
     }
@@ -1402,7 +1395,8 @@ void __initialize_default_physical_regions(void)
 
 static void __initialize_ring0area(void)
 {
-    unsigned long *pt_ring0area = (unsigned long *) PAGETABLE_RING0AREA; 
+    unsigned long *pt_ring0area = 
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_RING0AREA; 
 
 // kernel_address_pa: 
 // Início da memória RAM.
@@ -1473,7 +1467,8 @@ static void __initialize_ring0area(void)
 
 static void __initialize_ring3area(void)
 {
-    unsigned long *pt_ring3area = (unsigned long *) PAGETABLE_RING3AREA;
+    unsigned long *pt_ring3area = 
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_RING3AREA;
 
 // pa
 // user_address_pa:   
@@ -1526,7 +1521,8 @@ static void __initialize_ring3area(void)
 
 static void __initialize_kernelimage_region(void)
 {
-    unsigned long *pt_kernelimage = (unsigned long *) PAGETABLE_KERNELIMAGE; 
+    unsigned long *pt_kernelimage = 
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_KERNELIMAGE; 
 
 // pa
 // kernel_base_pa:    
@@ -1593,7 +1589,7 @@ static void __initialize_kernelimage_region(void)
 static void __initialize_frontbuffer(void)
 {
     unsigned long *pt_frontbuffer = 
-        (unsigned long *) PAGETABLE_FRONTBUFFER;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_FRONTBUFFER;
 // pa
 // framebuffer_pa:
 // frontbuffer, VESA LFB from boot manager.
@@ -1659,7 +1655,7 @@ static void __initialize_backbuffer(void)
 {
 // The pagetable for the first 2MB.
     unsigned long *pt_backbuffer = 
-        (unsigned long *) PAGETABLE_BACKBUFFER;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_BACKBUFFER;
 
 // 8mb mark
 // This is the right place: see: x64gpa.h
@@ -1710,7 +1706,7 @@ static void __initialize_backbuffer(void)
 static void __initialize_pagedpool(void)
 {
     unsigned long *pt_pagedpool = 
-        (unsigned long *) PAGETABLE_PAGEDPOOL;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_PAGEDPOOL;
 // pa
     unsigned long pagedpool_pa = 
         (unsigned long) SMALL_pagedpool_pa;
@@ -1857,7 +1853,7 @@ static void __initialize_heappool(void)
 {
 // The pagetable.
     unsigned long *pt_heappool = 
-        (unsigned long *) PAGETABLE_HEAPPOOL; 
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_HEAPPOOL; 
 // The pa.
     unsigned long heappool_pa = 
         (unsigned long) SMALL_heappool_pa;
@@ -1906,7 +1902,7 @@ static void __initialize_heappool(void)
 static void __initialize_extraheap1(void)
 {
     unsigned long *pt_extraheap1 = 
-        (unsigned long *) PAGETABLE_EXTRAHEAP1;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_EXTRAHEAP1;
 // pa
     unsigned long extraheap1_pa = 
         (unsigned long) SMALL_extraheap1_pa;
@@ -1942,7 +1938,7 @@ static void __initialize_extraheap1(void)
 static void __initialize_extraheap2(void)
 {
     unsigned long *pt_extraheap2 = 
-        (unsigned long *) PAGETABLE_EXTRAHEAP2;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_EXTRAHEAP2;
 // pa
     unsigned long extraheap2_pa = 
         (unsigned long) SMALL_extraheap2_pa;
@@ -1977,7 +1973,7 @@ static void __initialize_extraheap2(void)
 static void __initialize_extraheap3(void)
 {
     unsigned long *pt_extraheap3 = 
-        (unsigned long *) PAGETABLE_EXTRAHEAP3;
+        (unsigned long *) get_table_pointer_va();  //PAGETABLE_EXTRAHEAP3;
 // pa
     unsigned long extraheap3_pa = 
         (unsigned long) SMALL_extraheap3_pa;

@@ -41,6 +41,13 @@
 // Size?
 #define REALMODE_FREEAREA  0x500
 
+// A place for the kernel 
+// to put the MBR on the fly.
+#define MBR_ADDRESS  0x600
+#define VOLUME1_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
+#define VOLUME2_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
+// ...
+
 
 // ...
 
@@ -67,37 +74,44 @@
 // #OBS: Os endereços físico e virtual são iguais.
 // See: mm/pages.c
 
-//#todo
-// Define min and max
+// #todo
+// Define min and max.
 // Quantos diretórios podemos alocar aqui?
+// 31KB. (31 alocações)
 
+// This is the base address of a pre-alocated
+// heap of pagetables.
+// 31KB. (31 alocações)
 #define ____DANGER_TABLE_POINTER_HEAP_BASE  0x1000
 
 // Essa tabela é bem longa
 // Vai até o MBR.
+// #bugbug
+// We're gonna use this area to put the AP trampoline code.
 
 //
 // == 128 KB ==================================================
 //
 
-// 128 KB mark.
-// O BL fica aqui e posteriormente é sobreposto pelo MBR?
-#define MBR_ADDRESS  0x00020000
-#define VOLUME1_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
-#define VOLUME2_VBR_ADDRESS  (MBR_ADDRESS + 0x200) 
-// ...
+//#define __128KBMARK  0x00020000
 
 //
 // == 192 KB ==================================================
 //
 
+// #bugbug
+// Both are using the same address.
+
 #define FAT_ADDRESS  0x00030000
 #define VOLUME1_FAT_ADDRESS  (FAT_ADDRESS + 0)  // Size?
-#define VOLUME2_FAT_ADDRESS  (FAT_ADDRESS + 0)  // Size?
+//#define VOLUME2_FAT_ADDRESS  (FAT_ADDRESS + 0)  // Size?
 
 //
 // == 448 KB ==================================================
 //
+
+// #bugbug
+// Both are using the same address.
 
 // Rootdir size = (512*32) = 16 KB.
 #define ROOTDIR_ADDRESS  0x00070000 
@@ -171,25 +185,26 @@ A conservative approach is to avoid everything above 0x00080000.
 // 0x0008F000 - Pagetable para mapear os primeiros 4MB de memoria fisica.
 // ring0. 1:1
 
-
-// Pagetables.
-// Static 
+// Pagetables. (static)
+// #test
+// We are not using this addresses anymore.
+// Now We're get these from a small heap that starts at 0x1000.
 //#define PAGETABLE_RES7       0x00080000
-#define PAGETABLE_RES6         0x00081000
-#define PAGETABLE_RES5         0x00082000  //lapic. see: apic.c
-#define PAGETABLE_AHCI1        0x00083000   
-#define PAGETABLE_EXTRAHEAP3   0x00084000
-#define PAGETABLE_EXTRAHEAP2   0x00085000
-#define PAGETABLE_EXTRAHEAP1   0x00086000
-#define PAGETABLE_HEAPPOOL     0x00087000 
-#define PAGETABLE_NIC1         0x00088000
-#define PAGETABLE_PAGEDPOOL    0x00089000
-#define PAGETABLE_BACKBUFFER   0x0008A000
-#define PAGETABLE_FRONTBUFFER  0x0008B000
-#define PAGETABLE_CGA          0x0008C000
-#define PAGETABLE_RING3AREA    0x0008D000
-#define PAGETABLE_KERNELIMAGE  0x0008E000
-#define PAGETABLE_RING0AREA    0x0008F000
+//#define PAGETABLE_RES6         0x00081000
+//#define PAGETABLE_RES5         0x00082000  //lapic. see: apic.c
+//#define PAGETABLE_AHCI1        0x00083000   
+//#define PAGETABLE_EXTRAHEAP3   0x00084000
+//#define PAGETABLE_EXTRAHEAP2   0x00085000
+//#define PAGETABLE_EXTRAHEAP1   0x00086000
+//#define PAGETABLE_HEAPPOOL     0x00087000 
+//#define PAGETABLE_NIC1         0x00088000
+//#define PAGETABLE_PAGEDPOOL    0x00089000
+//#define PAGETABLE_BACKBUFFER   0x0008A000
+//#define PAGETABLE_FRONTBUFFER  0x0008B000
+//#define PAGETABLE_CGA          0x0008C000
+//#define PAGETABLE_RING3AREA    0x0008D000
+//#define PAGETABLE_KERNELIMAGE  0x0008E000
+//#define PAGETABLE_RING0AREA    0x0008F000
 
 
 //
@@ -202,14 +217,16 @@ A conservative approach is to avoid everything above 0x00080000.
 // então poderemos ter perdido algum valor 
 // colocado aí pelo BIOS.
 
+// 'Canonical'
 // O endereço físico e virtual do boot block são o mesmo.
 // Boot block size?
 #define BOOTBLOCK_PA  0x0000000000090000
 
+
+// 'Canonical?'
 // Page Map Level N.
 // pd, pdpt, pml4 for the kernel process.
 // Lembrando que a parte das flags precisa ser '000'
-
 #define KERNEL_PD_PA    0x000000000009A000  //pml2
 #define KERNEL_PDPT_PA  0x000000000009B000  //pml3
 #define KERNEL_PML4_PA  0x000000000009C000  //pml4

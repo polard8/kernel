@@ -781,8 +781,8 @@ do_clone:
 // Alocando um endereço virtual onde 
 // criaremos nossa pagetable.
 
-    unsigned long ptVA = (unsigned long) get_table_pointer();
-    if ( ptVA == 0 ){
+    unsigned long ptVA = (unsigned long) get_table_pointer_va();
+    if (ptVA == 0){
         panic ("copy_process: [FAIL] ptVA\n");
     }
 
