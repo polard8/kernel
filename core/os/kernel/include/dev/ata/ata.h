@@ -270,18 +270,47 @@ extern struct dev_nport  dev_nport;
 // ICH6 implementaram os controladores AHCI SATA pela primeira vez.
 // Nelson Cole.
 
+struct ata_port_info_d
+{
+// helper structure for ata_controller_d.
+
+    uint8_t channel;  // Primary or secondary.
+    uint8_t dev_num;  // Master or slave.
+};
+
+
 /*
  * ata:
  * Estrutura para o controle de execução do programa.
  */ 
-struct ata_d
+struct ata_controller_d
 {
+// ATA Mass storage controler structure.
+
+// Structure validation
     int used;
     int magic;
+
+// The structure was initialized.
+    //int initialized;
+
+// IDE, RAID, AHCI.
+    uint8_t controller_type;
+
+
+// #bugbug
+// Um dispositivo controlador por esse controller?
+// #todo
+// We gotta save the device independent info
+// in a proper ata device information structure.
+// Not in the controller information structure.
+
+    // 4 dispositivos.
+    //struct ata_port_info_d  port[4];
+
     uint8_t channel;  // Primary or secondary.
     uint8_t dev_num;  // Master or slave.
-    // byte
-    uint8_t chip_control_type;
+
     uint8_t dev_type;  
     uint8_t access_type;
     uint8_t cmd_read_modo;
@@ -289,12 +318,17 @@ struct ata_d
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
     uint32_t ahci_base_address;
+
     //#todo
     //struct ata_device_d devs[4];
 };
 
 // Not a pointer.
-extern struct ata_d  ata;
+// #todo
+// Actually we need a pointer,
+// because the system is gonna have more than one
+// ata controller. Specially in VMs.
+extern struct ata_controller_d  ata_controller;
 
 
 /*
@@ -558,7 +592,9 @@ init_ata (
     unsigned long long1 );
 
 uint32_t diskPCIScanDevice (int class);
-int atapciConfigurationSpace (struct pci_device_d *D);
+
+int atapciSetupMassStorageController(struct pci_device_d *D);
+
 unsigned char ata_wait_irq (void);
 int disk_ata_wait_irq (void);
 int ide_identify_device ( uint8_t nport );

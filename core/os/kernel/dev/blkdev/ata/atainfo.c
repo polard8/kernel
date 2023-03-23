@@ -13,7 +13,7 @@ void ata_show_ide_info(void)
     int i=0;
 
     printf("\n");
-    printf ("ata_show_ide_info:  \n");
+    printf ("ata_show_ide_info: ide ports\n");
 
     for ( i=0; i<4; i++ )
     {
@@ -38,7 +38,7 @@ void ata_show_ide_info(void)
 //
 
 // primary secondary  ... master slave
-    // printf ( " channel=%d dev=%d \n", ata.channel, ata.dev_num );
+    // printf ( " channel=%d dev=%d \n", ata_controller.channel, ata_controller.dev_num );
 
 /*
 	// Estrutura 'ata'
@@ -48,16 +48,16 @@ void ata_show_ide_info(void)
 	//if( ata != NULL )
 	//{
 		printf("ata:\n");
- 	    printf("type={%d}\n", (int) ata.chip_control_type);
-	    printf("channel={%d}\n", (int) ata.channel);
-	    printf("devType={%d}\n", (int) ata.dev_type);
-	    printf("devNum={%d}\n", (int) ata.dev_num);
-	    printf("accessType={%d}\n", (int) ata.access_type);
-	    printf("cmdReadMode={%d}\n", (int) ata.cmd_read_modo);
-	    printf("cmdBlockBaseAddress={%d}\n", (int) ata.cmd_block_base_address);
-	    printf("controlBlockBaseAddress={%d}\n", (int) ata.ctrl_block_base_address);
-		printf("busMasterBaseAddress={%d}\n", (int) ata.bus_master_base_address);
-		printf("ahciBaseAddress={%d}\n", (int) ata.ahci_base_address);
+ 	    printf("type={%d}\n", (int) ata_controller.chip_control_type);
+	    printf("channel={%d}\n", (int) ata_controller.channel);
+	    printf("devType={%d}\n", (int) ata_controller.dev_type);
+	    printf("devNum={%d}\n", (int) ata_controller.dev_num);
+	    printf("accessType={%d}\n", (int) ata_controller.access_type);
+	    printf("cmdReadMode={%d}\n", (int) ata_controller.cmd_read_modo);
+	    printf("cmdBlockBaseAddress={%d}\n", (int) ata_controller.cmd_block_base_address);
+	    printf("controlBlockBaseAddress={%d}\n", (int) ata_controller.ctrl_block_base_address);
+		printf("busMasterBaseAddress={%d}\n", (int) ata_controller.bus_master_base_address);
+		printf("ahciBaseAddress={%d}\n", (int) ata_controller.ahci_base_address);
 	//};
 */
 }
@@ -69,6 +69,10 @@ void ata_show_device_list_info(void)
     struct ata_device_d  *sd;
     unsigned long mb28=0;
     unsigned long mb48=0;
+
+    printf("ata_show_device_list_info:\n");
+    printf("Printing information about all the\n");
+    printf("ata devices in the list\n");
 
 // The head of the list
     sd = (struct ata_device_d *) ready_queue_dev;

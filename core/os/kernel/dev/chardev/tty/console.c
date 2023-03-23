@@ -1922,12 +1922,15 @@ int consoleCompareStrings(void)
 */
 
 // disk: Show some disk information.
-// See: ata.c
-    if ( strncmp( prompt, "disk", 4 ) == 0 ){
-        printf("disk: Show ide info:\n");
+// See: atainfo.c
+    if ( strncmp( prompt, "ata", 3 ) == 0 )
+    {
+        printf("ATA controller information:\n");
+        // #todo
+        // We gotta print the information 
+        // in the 'ata controller' info structure.
+        ata_show_ide_info();
         ata_show_device_list_info();
-        //show_ide_info();
-        //disk_show_info();
         goto exit_cmp;
     }
 
