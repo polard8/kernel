@@ -5,6 +5,32 @@
 
 #include <kernel.h>  
 
+
+void ata_show_ata_controller_info(void)
+{
+    if (g_ata_driver_initialized != TRUE)
+        return;
+// Print data.
+    switch (AtaController.controller_type)
+    {
+        case ATA_IDE_CONTROLLER:
+            printf("IDE controller\n");
+            break;
+        case ATA_RAID_CONTROLLER:
+            printf("RAID controller\n");
+            break;
+        case ATA_AHCI_CONTROLLER:
+            printf("AHCI controller\n");
+            break;
+        case ATA_UNKNOWN_CONTROLLER:
+        default:
+            printf("Unknown controller type\n");
+            break;
+    };
+
+    
+}
+
 // ata_show_ide_info:
 // Mostrar as informações obtidas 
 // na inicializações do controlador.

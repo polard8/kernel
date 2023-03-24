@@ -279,34 +279,28 @@ struct ata_port_info_d
 };
 
 
+
+struct ata_controller_d
+{
+// The structure was initialized.
+    //int initialized;
+// IDE, RAID, AHCI.
+    uint8_t controller_type;
+};
+extern struct ata_controller_d AtaController;
+
+
 /*
  * ata:
  * Estrutura para o controle de execução do programa.
  */ 
-struct ata_controller_d
+struct ata_port_d
 {
 // ATA Mass storage controler structure.
 
 // Structure validation
     int used;
     int magic;
-
-// The structure was initialized.
-    //int initialized;
-
-// IDE, RAID, AHCI.
-    uint8_t controller_type;
-
-
-// #bugbug
-// Um dispositivo controlador por esse controller?
-// #todo
-// We gotta save the device independent info
-// in a proper ata device information structure.
-// Not in the controller information structure.
-
-    // 4 dispositivos.
-    //struct ata_port_info_d  port[4];
 
     uint8_t channel;  // Primary or secondary.
     uint8_t dev_num;  // Master or slave.
@@ -317,10 +311,7 @@ struct ata_controller_d
     uint32_t cmd_block_base_address;
     uint32_t ctrl_block_base_address;
     uint32_t bus_master_base_address;
-    uint32_t ahci_base_address;
-
-    //#todo
-    //struct ata_device_d devs[4];
+    //uint32_t ahci_base_address;
 };
 
 // Not a pointer.
@@ -328,7 +319,7 @@ struct ata_controller_d
 // Actually we need a pointer,
 // because the system is gonna have more than one
 // ata controller. Specially in VMs.
-extern struct ata_controller_d  ata_controller;
+extern struct ata_port_d  ata_port;
 
 
 /*
@@ -597,8 +588,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D);
 
 unsigned char ata_wait_irq (void);
 int disk_ata_wait_irq (void);
-int ide_identify_device ( uint8_t nport );
-int ide_dev_init (char port);
+
 static inline void dev_switch (void);
 static inline int getnport_dev (void);
 int nport_ajust ( char nport );
@@ -606,6 +596,7 @@ int nport_ajust ( char nport );
 // Show info:
 void ata_show_ide_info(void);
 void ata_show_device_list_info(void);
+void ata_show_ata_controller_info(void);
 
 #endif    
 

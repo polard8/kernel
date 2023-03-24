@@ -1926,9 +1926,7 @@ int consoleCompareStrings(void)
     if ( strncmp( prompt, "ata", 3 ) == 0 )
     {
         printf("ATA controller information:\n");
-        // #todo
-        // We gotta print the information 
-        // in the 'ata controller' info structure.
+        ata_show_ata_controller_info();
         ata_show_ide_info();
         ata_show_device_list_info();
         goto exit_cmp;

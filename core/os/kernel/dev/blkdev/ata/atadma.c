@@ -9,9 +9,9 @@
 
 void ide_dma_start (void)
 {
-    unsigned char data = in8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd );
+    unsigned char data = in8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd );
 
-    out8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd, data | 1 );
+    out8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd, data | 1 );
 }
 
 // ide_dma_stop:
@@ -19,13 +19,13 @@ void ide_dma_start (void)
 
 void ide_dma_stop (void)
 {
-    unsigned char data = in8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd ); 
+    unsigned char data = in8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd ); 
 
-    out8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd, data & ~1 );
+    out8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd, data & ~1 );
 
-    data = in8 ( ata_controller.bus_master_base_address + ide_dma_reg_status );
+    data = in8 ( ata_port.bus_master_base_address + ide_dma_reg_status );
 
-    out8 ( ata_controller.bus_master_base_address + ide_dma_reg_status, data & ~6 );
+    out8 ( ata_port.bus_master_base_address + ide_dma_reg_status, data & ~6 );
 }
 
 /*
@@ -36,7 +36,7 @@ void ide_dma_stop (void)
 
 int ide_dma_read_status (void)
 {
-    return in8 ( ata_controller.bus_master_base_address + ide_dma_reg_status );
+    return in8 ( ata_port.bus_master_base_address + ide_dma_reg_status );
 }
 
 /*
@@ -73,26 +73,26 @@ ide_dma_data (
     phy = (uint32_t) &ide_dma_prdt[nport];
 
     // prds physical.
-    out32 ( ata_controller.bus_master_base_address + ide_dma_reg_addr, phy );
+    out32 ( ata_port.bus_master_base_address + ide_dma_reg_addr, phy );
 
 	// (bit 3 read/write)
 	// 0 = Memory reads.
 	// 1 = Memory writes.
 
-    data = in8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd ) &~8;
+    data = in8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd ) &~8;
 
     // #todo: bit 8, Confilito no Oracle VirtualBox
 	// #obs: Isso foi enviado via argumento e agora foi alerado.
 
     flg = 1;  
 
-    out8 ( ata_controller.bus_master_base_address + ide_dma_reg_cmd, data | flg << 3 );
+    out8 ( ata_port.bus_master_base_address + ide_dma_reg_cmd, data | flg << 3 );
 
 	// Limpar o bit de interrupção e 
 	// o bit de erro no registo de status.
 
-    data = in8 ( ata_controller.bus_master_base_address + ide_dma_reg_status );
-    out8 ( ata_controller.bus_master_base_address + ide_dma_reg_status, data &~6 );
+    data = in8 ( ata_port.bus_master_base_address + ide_dma_reg_status );
+    out8 ( ata_port.bus_master_base_address + ide_dma_reg_status, data &~6 );
 }
 
 

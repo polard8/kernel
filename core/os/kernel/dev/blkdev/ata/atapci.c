@@ -132,13 +132,13 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     uint32_t data=0;
 
 // A estrutura ainda nao foi configurada.
-    ata_controller.used = FALSE;
-    ata_controller.magic = 0;
+    ata_port.used = FALSE;
+    ata_port.magic = 0;
 
 // We still don't know the type of this controller.
 // But the caller already knows that 
 // it's a mass storage device, and ide.
-    ata_controller.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
+    AtaController.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
 
 // Check parameters.
     if ( (void *) D == NULL ){
@@ -199,7 +199,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_IDE ){
 
         // #type: (IDE).
-        ata_controller.controller_type = (uint8_t) ATA_IDE_CONTROLLER; 
+        AtaController.controller_type = (uint8_t) ATA_IDE_CONTROLLER; 
 
         // Compatibilidade e nativo, primary.
         data  = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
@@ -237,7 +237,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
 //#ifdef KERNEL_VERBOSE 
         //kprintf ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-        //    ata_sub_class_code_register_strings[ata_controller.controller_type],
+        //    ata_sub_class_code_register_strings[AtaController.controller_type],
         //    ata_pci.progif,
         //    ata_pci.revisionId );
 //#endif
@@ -256,7 +256,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_RAID ){
 
         // #type: (ATA RAID).
-        ata_controller.controller_type = (uint8_t) ATA_RAID_CONTROLLER;
+        AtaController.controller_type = (uint8_t) ATA_RAID_CONTROLLER;
         printf ("atapciSetupMassStorageController: ATA RAID not supported\n");
         goto fail;
 
@@ -273,7 +273,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     }else if ( D->classCode == PCI_CLASSCODE_MASS && D->subclass == PCI_SUBCLASS_SATA ){
 
         // #type (ACHI)
-        ata_controller.controller_type = (uint8_t) ATA_AHCI_CONTROLLER;
+        AtaController.controller_type = (uint8_t) ATA_AHCI_CONTROLLER;
 
         // Compatibilidade e nativo, primary.
         data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 8 );
@@ -306,7 +306,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 
 //#ifdef KERNEL_VERBOSE
         // kprintf ("[ Sub Class Code %s Programming Interface %d Revision ID %d ]\n",\
-        //     ata_sub_class_code_register_strings[ata_controller.controller_type], 
+        //     ata_sub_class_code_register_strings[ata_port.controller_type], 
         //     ata_pci.progif,
         //     ata_pci.revisionId );
 //#endif
@@ -322,7 +322,7 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     // ?:? = Class/subclass not supported.
     }else{
         // #type: Unknown controller.
-        ata_controller.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
+        AtaController.controller_type = (uint8_t) ATA_UNKNOWN_CONTROLLER;
         printf("atapciSetupMassStorageController: Mass Storage Device NOT supported\n");
         goto fail;
     };
@@ -372,13 +372,13 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     //printf ("[ Synchronous DMA Control Register %x ]\n", data );
 
 //done:
-    ata_controller.used = TRUE;
-    ata_controller.magic = 1234;
+    ata_port.used = TRUE;
+    ata_port.magic = 1234;
     return (int) PCI_MSG_SUCCESSFUL;
 
 fail:
-    ata_controller.used = FALSE;
-    ata_controller.magic = 0;
+    ata_port.used = FALSE;
+    ata_port.magic = 0;
     refresh_screen();
     return (int) PCI_MSG_ERROR;
 }
