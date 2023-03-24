@@ -282,6 +282,8 @@ struct ata_port_info_d
 
 struct ata_controller_d
 {
+// ATA Mass storage controler structure.
+
 // The structure was initialized.
     //int initialized;
 // IDE, RAID, AHCI.
@@ -296,7 +298,8 @@ extern struct ata_controller_d AtaController;
  */ 
 struct ata_port_d
 {
-// ATA Mass storage controler structure.
+// Structure for an ata device.
+// We also have a structure for ide devices.
 
 // Structure validation
     int used;
