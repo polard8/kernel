@@ -101,9 +101,16 @@ Flags                 db 0x00
 ; Signature: 0x29 | 41.
 Signature             db 0x29
 
+; #bugbug
+; The MBR represents the disk, not the volume.
 ; Volume ID and Volume label.
-VolumeID              dd 0x980E63F5     ; 32bit
-VolumeLabel           db "GRAMADO    "  ; 11 bytes
+; VolumeID              dd 0x980E63F5     ; 32bit
+; VolumeLabel           db "GRAMADO    "  ; 11 bytes
+
+; Disk ID and Disk label.
+DiskID     dd  0x980E63F5     ; 32bit
+DiskLabel  db  "GRAMADODISK"  ; 11 bytes
+
 
 ; File system identification string. 
 SystemID              db "FAT16   "

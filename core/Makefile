@@ -89,17 +89,17 @@ build-gramado-os:
 # O BL.BIN procura o kernel no diretorio GRAMADO/
 # See: fs/loader.c
 
-
-# Create the VHD.
+#----------------------------------
+# Create the virtual disk 0.
 	$(Q)$(NASM) os/boot/vd/fat/main.asm \
 	-I os/boot/vd/fat/ \
 	-o GRAMADO.VHD 
-
-# Create backup for mbr.
+# Create backup for MBR 0.
 	$(Q)$(NASM) os/boot/vd/fat/stage1.asm \
 	-I os/boot/vd/fat/ \
 	-o MBR0.BIN
 	sudo cp MBR0.BIN  os/disk/
+
 
 # ::Build BM.BIN.
 	$(Q)$(MAKE) -C os/boot/x86/bm/ 

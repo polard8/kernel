@@ -159,18 +159,15 @@ db 0x01
 ;; order to be recognized by Windows NT.
 db 0x29
 
-;; ??
-;; #importante
+;; Volume Serial Number. 
 ;; unsigned long VolumeSerialNumber;
-;; Volume Serial Number. A unique number that is created when you 
+;; A unique number that is created when you 
 ;; format the volume.
 db 0xE3, 0x50, 0xB1, 0x6E
 
-
-
-
+;; Volume Label. 
 ;; unsigned char VolumeLabel[11];
-;; Volume Label. This field was used to store the volume label, 
+;; This field was used to store the volume label, 
 ;; but the volume label is now stored as special file in the root directory.
 db  "GRAMADO VBR"
 
