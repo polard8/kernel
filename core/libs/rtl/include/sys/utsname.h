@@ -36,10 +36,7 @@ char  machine[]  Name of the hardware type on which the system is running.
 */
 
 
-/* 
- * Structure describing the system and machine.
- */
-
+// Structure describing the system and machine.
 struct utsname 
 {
     /* Name of the implementation of the operating system.  */
@@ -63,20 +60,19 @@ struct utsname
 };
 
 
+// The length of the arrays in a struct utsname is unspecified 
+// the fields are terminated by a null byte ('\0').
 
+//
+// == Prototypes ========
+//
 
-//The length of the arrays in a struct utsname is unspecified (see
-//NOTES); the fields are terminated by a null byte ('\0').
-
-
-
-//uname() returns system information in the structure pointed to by
-//buf.  The utsname struct is defined in <sys/utsname.h>:
-
+// uname() returns system information in the structure 
+// pointed to by buf. 
+// The utsname struct is defined in <sys/utsname.h>:
 // Imp-lemented in unistd.c (Why not?)
 
-int uname(struct utsname *buf);
-
+int uname(struct utsname *data);
 
 #endif    
 

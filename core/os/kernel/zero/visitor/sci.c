@@ -415,13 +415,12 @@ static void *__extra_services (
     }
 
 // 377 
-// todo: implement uname() libc support.
+// Get info to fill the utsname structure.
 // See: sys.c
-    if ( number == 377 )
+    if (number == 377)
     {
-        //printf ("__extra_services: [377] uname. [todo] \n");
-        //invalidate_screen();
-        //refresh_screen();
+        if ( (void*) arg2 == NULL )
+            return NULL;
         sys_uname ( (struct utsname *) arg2 );        
         return NULL;
     }
@@ -630,65 +629,73 @@ static void *__extra_services (
     }    
 
 // 600 - dup
-    if ( number == 600 ){
+    if (number == 600){
         return (void *) sys_dup( (int) arg2 );  
     }
-
 // 601 - dup2
-    if ( number == 601 ){
+    if (number == 601){
         return (void *) sys_dup2( (int) arg2, (int) arg3 );
     }
-
 // 602 - dup3
-    if ( number == 602 ){
+    if (number == 602){
         return (void *) sys_dup3( (int) arg2, (int) arg3, (int) arg4 );
     }
-
 
 
 // 603 - lseek support.
 // See: klib/kunistd.c
 // IN: fd, offset, whence.
-    if ( number == 603 ){
+    if (number == 603){
         return (void *) sys_lseek ( 
                             (int)   arg2, 
                             (off_t) arg3, 
                             (int)   arg4 );
     }
 
-
-
+// 640
+// Lock the taskswtiching.
+// Only the init thread can call this service.
     if (number == 640)
     {
-        if(current_thread != INIT_TID){return NULL;}
-        taskswitch_lock();
+        if (current_thread == INIT_TID){
+            taskswitch_lock();
+        }
         return NULL;
     }
 
 // 641
-// Unlock taskswitching 
+// Unlock taskswitching.
+// Only the init thread can call this service.
     if (number == 641)
     {
-        if(current_thread != INIT_TID){return NULL;}
-        taskswitch_unlock();
+        if (current_thread == INIT_TID){
+            taskswitch_unlock();
+        }
         return NULL;
     }
 
+// 642
+// Lock the scheduler.
+// Only the init thread can call this service.
     if (number == 642)
     {
-        if(current_thread != INIT_TID){return NULL;}
-        scheduler_lock();
+        if (current_thread == INIT_TID){
+            scheduler_lock();
+        }
         return NULL;
     }
 
 // 643
-// Unlock scheduler
+// Unlock scheduler.
+// Only the init thread can call this service.
     if (number == 643)
     {
-        if(current_thread != INIT_TID){return NULL;}
-        scheduler_unlock();
+        if (current_thread == INIT_TID){
+            scheduler_unlock();
+        }
         return NULL;
     }
+
 
 // Show device list.
     if (number == 770)
@@ -714,14 +721,13 @@ static void *__extra_services (
         return (void *) __sethostname ( (const char *) arg2); 
     }
 
-// get user name
-    if ( number == 803 ){
-        return (void *) __getusername ( (char *) arg2);
+// Get user name.
+    if (number == 803){
+        return (void *) __getusername ( (char *) arg2 );
     }
-
-// set user name
-    if ( number == 804 ){
-        return (void *) __setusername ( (const char *) arg2); 
+// Set user name.
+    if (number == 804){
+        return (void *) __setusername ( (const char *) arg2 ); 
     }
 
 // #todo
@@ -780,7 +786,7 @@ static void *__extra_services (
     }
 
 // Setup the thread's surface rectangle.
-    if ( number == 892 )
+    if (number == 892)
     {
         __setup_surface_rectangle( 
             (unsigned long) message_address[0],  //l 
@@ -852,11 +858,14 @@ static void *__extra_services (
     //if ( number == 957 ){ return (void *) gui->main; }  
 
 // 970 - Create request.
-// A interrupção n�o conseguir� retornar para a mesma thread.
-// Chamar� o scheduler por conta pr�pria;
+// ?? #bugbug
+// A interrupção não conseguirá retornar para a mesma thread.
+// Chamará o scheduler por conta própria.
 // IN: reason, reason
     if ( number == 970 )
     {
+        // #suspended
+        /*
         create_request ( 
             (unsigned long) 15,      // number 
             (int) 1,                 // status 
@@ -866,6 +875,7 @@ static void *__extra_services (
             (int) 0,                 // msg  
             (unsigned long) arg2,    // long1  
             (unsigned long) arg3 );  // long2
+        */
         return NULL;
     }
 
@@ -879,8 +889,8 @@ static void *__extra_services (
     //}
 
 // Show root files system info.
-    if ( number == 4444 )
-    {
+// Print into the raw kernel console.
+    if (number == 4444){
         fs_show_root_fs_info();
         return NULL;
     }
@@ -958,10 +968,10 @@ static void *__extra_services (
         return NULL;
     }
 
-// ioctl() handler.
+// ioctl() implementation.
 // See: fs.c
 // IN: fd, request, arg
-    if ( number == 8000 ){
+    if (number == 8000){
         return (void *) sys_ioctl ( 
                             (int) arg2, 
                             (unsigned long) arg3, 
@@ -977,33 +987,30 @@ static void *__extra_services (
                             (unsigned long) arg4 );
     }
 
+// ?? #bugbug
 // Setup stdin pointer
 // See: kstdio
-    if (number == 8002 )
-    {
-        // IN: fd
+// IN: fd
+    if (number == 8002){
         return (void *) sys_setup_stdin((int) arg2);
     }
 
-// test: pegando o endereço de um buffer de icone..
+// Pegando o endereço de um buffer de icone.
 // queremos saber se ele eh compartilhado.
 // shared_buffer_terminal_icon
+// #bugbug: Static size for the icons. Static buffer size.
 // See: wm.c
     if (number == 9100){
+        if (arg2<0)
+            return NULL;
         return (void *) ui_get_system_icon ( (int) arg2 );
     }
 
     // ...
 
-// #deprecated
-    if ( number == 9999 ){
-        panic("__extra_services: [9999] #deprecated\n");
-    }
-
 // fail
     return NULL;
 }
-
 
 // Handler for the interrupt 0x80.
 void *sci0 ( 
@@ -1110,6 +1117,7 @@ void *sci0 (
         return NULL;
     }
 
+/*
 // #debug
 // #todo: Explain it better.
     if (number == 4321){
@@ -1118,6 +1126,7 @@ void *sci0 (
         invalidate_screen();
         return NULL;
     }
+*/
 
 // ================================
 // Desktop ID.
@@ -1141,25 +1150,30 @@ void *sci0 (
         // 1 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
         // #todo: This operation needs permition.
+        // #todo: Return value.
+        // IN: buffer address and lba address.
         case SYS_READ_LBA: 
-            ataReadSector ( 
-                (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
+            storage_read_sector( 
+                (unsigned long) arg2, (unsigned long) arg3 ); 
             break;
-
 
         // 2 (i/o) Essa rotina pode ser usada por 
         // um driver em user mode.
         // #todo: This operation needs permition.
+        // #todo: Return value.
+        // IN: buffer address and lba address.
         case SYS_WRITE_LBA: 
-            ataWriteSector ( 
-                (unsigned long) arg2, (unsigned long) arg3, 0 , 0 ); 
+            storage_write_sector( 
+                (unsigned long) arg2, (unsigned long) arg3 ); 
             break;
 
         // 3 
-        // Carregar um arquivo do disco para a mem�ria.
+        // Carregar um arquivo do disco para a memória.
         // See: fs/fs.c
         // IN: name, flags, mode
         case SYS_READ_FILE:
+            //if ( (void*) a2 == NULL )
+                //return NULL;
             return (void *) sys_read_file_from_disk ( 
                                 (char *) a2, 
                                 (int)    arg3, 
@@ -1259,6 +1273,8 @@ void *sci0 (
         // OUT: fd
         case SYS_OPEN:
             debug_print ("sci0: SYS_OPEN\n");
+            //if ( (void*) arg2 == NULL )
+                //return NULL;
             return (void *) sys_open ( 
                                 (const char *) arg2, 
                                 (int)          arg3, 
@@ -1271,10 +1287,13 @@ void *sci0 (
         // IN: fd
         case SYS_CLOSE:
             debug_print ("sci0: SYS_CLOSE\n");
+            //if (arg2 < 0)
+                //return NULL;
             return (void *) sys_close( (int) arg2 );
             break;
 
         // 18 - read() 
+        // IN: ?
         // See: sys.c
         case SYS_READ:
             return (void *) sys_read ( 
@@ -1284,6 +1303,7 @@ void *sci0 (
             break;
 
         // 19 - write()
+        // IN: ?
         // See: sys.c
         case SYS_WRITE:
             return (void *) sys_write ( 
@@ -1374,10 +1394,11 @@ void *sci0 (
         // see: console.c
         // IN: ch, console id.
         case SYS_KGWS_PUTCHAR:
+            //if (arg3<0)
+                //return NULL;
             console_putchar ( (int) arg2, (int) arg3 ); 
             return NULL;
             break;
-
 
         //
         // ## EXIT ##
@@ -1494,7 +1515,7 @@ void *sci0 (
 
         // 84 - livre.
 
-        //case 85:
+        // 85
         case SYS_GETPID: 
             return (void *) get_current_pid();
             break;
@@ -1504,7 +1525,7 @@ void *sci0 (
         // Testa se o processo é válido
         // se for valido retorna 1234
         // testando ...
-        case SYS_88:   
+        case SYS_88:
             return (void *) processTesting (arg2);
             break;
 
@@ -1529,6 +1550,9 @@ void *sci0 (
         int reb_ret=-1;
         case SYS_REBOOT: 
             debug_print("sci0: SYS_REBOOT\n");
+            // #todo
+            // This is a wrapper.
+            // This function needs some flags.
             reb_ret = (int) sys_reboot();
             return (void *) (reb_ret & 0xFFFFFFFF);
             break;
@@ -1539,7 +1563,8 @@ void *sci0 (
         // IN: buffer for message elements.
         case 111:
             //debug_print("sci0: 111\n");
-            return (void *) sys_get_message( (unsigned long) &message_address[0] );
+            return (void *) sys_get_message( 
+                (unsigned long) &message_address[0] );
             break;
 
         // tlib.c
@@ -1547,17 +1572,25 @@ void *sci0 (
         // Asynchronous.
         // IN: tid, message buffer address.
         case 112:
-            return (void *) sys_post_message_to_tid( (int) arg2, (unsigned long) arg3 );
+            //if (arg2<0)
+                //return NULL;
+            return (void *) sys_post_message_to_tid( 
+                (int) arg2, (unsigned long) arg3 );
             break;
 
         // 113~117: free
 
-        // 118~119
+        // 118~119: network
+
+        // Pop data from network queue.
         case 118:
             // IN: user buffer, buffer lenght.
             return (void*) network_pop_packet( (unsigned long) &message_address[0], (int) arg3 );
             break;
-            
+        // Push data into the network queue?
+        //case 119:
+            //break;
+
         // 120
         // Get a message given the index.
         // With restart support.
@@ -1637,9 +1670,9 @@ void *sci0 (
 
         // 134~136: free
 
-        // 137 - #deprecated.
+        // 137 - #deprecated?
         case SYS_GETCH:
-            panic("SYS_GETCH: #deprecated\n"); 
+            panic("SYS_GETCH: #deprecated ?\n"); 
             return NULL;
             break;
 
@@ -1694,7 +1727,7 @@ void *sci0 (
 
         // 163
         // update socket  
-        // retorno 0=ok 1=fail		
+        // retorno 0=ok 1=fail
         // Gramado API socket support. (not libc)
         case 163:
             return (void *) update_socket ( 
@@ -1839,7 +1872,8 @@ void *sci0 (
 // Obs: 
 // #todo: 
 // Poderia ser uma chamada para configurar o posicionamento 
-// e outra para configurar as dimens�es.
+// e outra para configurar as dimensões.
+// #todo: Atomic stuff.
         case SYS_GET_KERNELSEMAPHORE:
             return (void *) __spinlock_ipc;
             break;
@@ -1885,7 +1919,10 @@ void *sci0 (
         // (250 ~ 255) - Info support.
 
         // 250
+        // IN: index
         case SYS_GETSYSTEMMETRICS:
+            //if (arg2<0)
+                //return NULL;
             return (void *) sys_get_system_metrics ( (int) arg2 );
             break;
 
@@ -2172,19 +2209,19 @@ void *sci2 (
 
 // Clear the fg console background with a given color.
 // Do not change the colors.
+    unsigned int bg_color=0;
+    unsigned int fg_color=0;
     if (number == 8003)
     { 
         if (fg_console<0 || fg_console > 3){
             return NULL;
         }
+        bg_color = (unsigned int) CONSOLE_TTYS[fg_console].bg_color;
+        fg_color = (unsigned int) CONSOLE_TTYS[fg_console].fg_color;
         // IN: bg color, fg color, console number.
-        clear_console(
-            (unsigned int) CONSOLE_TTYS[fg_console].bg_color,
-            (unsigned int) CONSOLE_TTYS[fg_console].fg_color,
-            fg_console );
+        clear_console( bg_color, fg_color, fg_console );
         return NULL;
     }
-
 
 // Change the foreground color of the current console.
     if (number == 8004)

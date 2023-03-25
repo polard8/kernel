@@ -530,7 +530,6 @@ failTimeOut:
 // Só falta conseguirmos as variáveis que indicam o canal e 
 // se é master ou slave.
 
- 
 int
 ataReadSector ( 
     unsigned long buffer, 

@@ -340,6 +340,17 @@ struct partition_table_d *disk_get_partition_table(int index);
 int disk_initialize_mbr_info(void);
 void disk_show_mbr_info(void);
 
+
+int
+storage_read_sector( 
+    unsigned long buffer, 
+    unsigned long lba );
+
+int
+storage_write_sector( 
+    unsigned long buffer, 
+    unsigned long lba );
+
 //
 // Show info
 //

@@ -2321,32 +2321,28 @@ int access(const char *pathname, int mode)
 }
 
 
-
 // #see: sys/utsname.h
-int uname (struct utsname *buf)
+int uname(struct utsname *data)
 {
     int value = -1;
 
-    debug_print("uname: TODO\n");
-
-    if ( (void*) buf == NULL )
-    {
+    if ( (void*) data == NULL ){
         errno = EINVAL;
         return -1;
     }
 
-    value = (int) gramado_system_call ( 
-                      377, 
-                      (unsigned long) buf, 
-                      0, 
-                      0 );
+    value = 
+        (int) gramado_system_call ( 
+                  377, 
+                  (unsigned long) data, 
+                  0, 
+                  0 );
 
-    if(value<0)
-    {
-        errno=(-value);
+    if (value<0){
+        errno = (-value);
         return -1;
     }
-    
+
     return (int) value;
 }
 

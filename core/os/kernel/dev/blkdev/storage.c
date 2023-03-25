@@ -426,6 +426,45 @@ void disk_show_mbr_info(void)
     // ...
 }
 
+int
+storage_read_sector( 
+    unsigned long buffer, 
+    unsigned long lba )
+{
+    int res=-1;
+
+    //if (buffer == 0)
+        //return -1;
+
+    res = (int) ataReadSector ( 
+                    (unsigned long) buffer, 
+                    (unsigned long) lba, 
+                    0, 
+                    0 );
+    return (int) res; 
+}
+
+int
+storage_write_sector( 
+    unsigned long buffer, 
+    unsigned long lba )
+{
+    int res=-1;
+
+    //if (buffer == 0)
+        //return -1;
+
+    res = (int) ataWriteSector ( 
+                    (unsigned long) buffer, 
+                    (unsigned long) lba, 
+                    0, 
+                    0 );
+    return (int) res; 
+}
+
+
+
+
 
 /*
  * disk_init:

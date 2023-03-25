@@ -34,7 +34,7 @@ struct dhcp_info_d
     //...
 };
 // see: dhcp.c
-extern struct dhcp_info_d dhcp_info;
+extern struct dhcp_info_d  dhcp_info;
 
 
 // Message Types

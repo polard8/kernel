@@ -73,23 +73,22 @@ int __getusername (char *buffer)
 
     if ( (void*) buffer == NULL ){
         debug_print ("__getusername: [FAIL] buffer\n");
-        return -1;
+        goto fail;
     }
 
-//Estrutura default para informações sobre o host.
-//host.h
-
-    if ( (void *) CurrentUser == NULL ){
-        printf ("__getusername: CurrentUser\n");
-        return (int) -1; 
-    }else{
-        
-        //64 bytes
-        strcpy ( login_buffer, (const char *) CurrentUser->__username );
-                
+// Estrutura default para informações sobre o host.
+// 64 bytes
+// host.h
+    if ( (void *) CurrentUser != NULL )
+    {
+        strcpy( 
+            login_buffer, 
+            (const char *) CurrentUser->__username );
+       
         return (int) CurrentUser->userName_len;
-    };
+    }
 
+fail:
     return (int) -1;
 }
 
@@ -102,26 +101,25 @@ int __setusername(const char *new_username)
 {
     if ( (void*) new_username == NULL ){
         debug_print ("__setusername: [FAIL] new_username\n");
-        return -1;
+        goto fail;
     }
 
 // Estrutura de usuário.
 // #todo
 // Where is this structure defined?
+// 64 bytes
 
-    if ( (void *) CurrentUser == NULL ){
-        printf ("__setusername: CurrentUser\n");
-        return (int) -1;
-    }else{
-
-        CurrentUser->userName_len = (size_t) strlen (new_username) + 1;
-
-        //64 bytes
-        strcpy ( CurrentUser->__username, (const char *) new_username);
-        
+    if ( (void *) CurrentUser != NULL )
+    {
+        CurrentUser->userName_len = 
+            (size_t) (strlen(new_username) + 1);
+        strcpy( 
+            CurrentUser->__username, 
+            (const char *) new_username );
         return 0;
-    };
+    }
 
+fail:
     return (int) -1;
 }
 

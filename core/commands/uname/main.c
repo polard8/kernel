@@ -7,9 +7,6 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 
-
-void usage(void);
-
 /*
 char  sysname[]  Name of this implementation of the operating system. 
 char  release[]  Current release level of this implementation. 
@@ -21,6 +18,12 @@ char  machine[]  Name of the hardware type on which the system is running.
 */
 // See:
 // https://man7.org/linux/man-pages/man2/uname.2.html
+
+
+// ==========================
+
+static void usage(void);
+
 
 /*
 static int is_64_kernel(void);
@@ -54,7 +57,8 @@ Flags
 -v	Displays the operating system version.
 -x	Displays the information specified with the -a flag as well as the LAN network number, as specified by the -l flag.
 */
-void usage(void)
+
+static void usage(void)
 {
     printf("usage: Fail\n");
     exit(1);
@@ -76,10 +80,12 @@ int main (int argc, char **argv)
 
 // Get parametes.
     // #debug
-    printf("argc: {%d}\n",argc);
+    // printf("argc: {%d}\n",argc);
 
 // Nothing to parse
-    if(argc == 1){
+    if (argc == 1)
+    {
+        fSysName = TRUE;
         goto display_info;
     }
 
@@ -97,10 +103,10 @@ int main (int argc, char **argv)
         //...
     };
 
+display_info:
+
 // Get kernel info
     uname(&un);
-
-display_info:
 
     if (fAll == TRUE)
     {
@@ -119,7 +125,7 @@ display_info:
         
     return 0;
 fail:
-    // usage(0);
+    usage();
     return -1;
 }
 
