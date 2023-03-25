@@ -1552,10 +1552,10 @@ static void __initialize_stdin(void)
 // This is a regular file.
     stdin->____object = ObjectTypeFile;
 // sync
-    stdin->sync.sender = -1;
-    stdin->sync.receiver = -1;
-    stdin->sync.can_read    = TRUE;
-    stdin->sync.can_write   = FALSE;
+    stdin->sync.sender_pid = (pid_t) -1;
+    stdin->sync.receiver_pid = (pid_t) -1;
+    stdin->sync.can_read = TRUE;
+    stdin->sync.can_write = FALSE;
     stdin->sync.can_execute = FALSE;
     stdin->sync.can_accept  = FALSE;
     stdin->sync.can_connect = FALSE;
@@ -1628,10 +1628,10 @@ static void __initialize_stdout(void)
     stdout->____object = ObjectTypeVirtualConsole; 
 
 // sync
-    stdout->sync.sender = -1;
-    stdout->sync.receiver = -1;
-    stdout->sync.can_read    = TRUE;
-    stdout->sync.can_write   = TRUE;
+    stdout->sync.sender_pid = (pid_t) -1;
+    stdout->sync.receiver_pid = (pid_t) -1;
+    stdout->sync.can_read = TRUE;
+    stdout->sync.can_write = TRUE;
     stdout->sync.can_execute = FALSE;
     stdout->sync.can_accept  = FALSE;
     stdout->sync.can_connect = FALSE;
@@ -1694,8 +1694,8 @@ static void __initialize_stderr(void)
 // This is a regular file.
     stderr->____object = ObjectTypeFile;
 // sync
-    stderr->sync.sender = -1;
-    stderr->sync.receiver = -1;
+    stderr->sync.sender_pid = (pid_t) -1;
+    stderr->sync.receiver_pid = (pid_t) -1;
     stderr->sync.can_read    = TRUE;
     stderr->sync.can_write   = TRUE;
     stderr->sync.can_execute = FALSE;
@@ -1705,7 +1705,7 @@ static void __initialize_stderr(void)
     stderr->_flags = (__SWR | __SRD); 
 // buffer
     stderr->_base = &prompt_err[0];  //See: kstdio.h
-    stderr->_p       = &prompt_err[0];
+    stderr->_p    = &prompt_err[0];
     stderr->_bf._base = stderr->_base;
     stderr->_lbfsize  = PROMPT_SIZE; //128; //#todo
     stderr->_r = 0;

@@ -241,8 +241,8 @@ struct kstdio_sync_d
     int used;
     int magic;
 
-    pid_t sender;
-    pid_t receiver;
+    pid_t sender_pid;
+    pid_t receiver_pid;
 
     // REQUEST, REPLY, EVENT, ERROR
     // See: defines above.

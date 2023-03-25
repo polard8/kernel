@@ -141,26 +141,21 @@ no:
     return ToNetByteOrder16(final);
 }
 
-
-
-
 // Test, called by the kernel console.
-void testNIC(void)
+void network_test_NIC(void)
 {
     // #debug
-    printf("testNIC:\n");
-    refresh_screen();
+    //printf("testNIC:\n");
 
-    network_send_arp_request();
+    //network_send_arp_request();
     //network_test_udp();
+    // ...
 
-// ...
-
+// Show NIC info.
     e1000_show_info();
 
     // #debug
-    printf("testNIC: done\n");
-    refresh_screen();
+    //printf("testNIC: done\n");
 }
 
 // IN:

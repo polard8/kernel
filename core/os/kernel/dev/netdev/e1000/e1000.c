@@ -59,10 +59,14 @@ static void __e1000_linkup(struct intel_nic_info_d *d);
 
 void e1000_show_info(void)
 {
-    printf( "CounterS: TX={%d} RX={%d}\n",
+    printf("e1000 NIC info:\n");
+
+    if ( (void*) currentNIC == NULL ){
+        printf ("currentNIC fail\n");
+    }
+    printf("Counters: TX={%d} RX={%d}\n",
         e1000_tx_counter, e1000_rx_counter );
 }
-
 
 //
 // =====================

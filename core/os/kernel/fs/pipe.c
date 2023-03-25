@@ -426,8 +426,8 @@ int sys_pipe ( int *pipefd, int flags )
         // full duplex ?
 
         // sync: 
-        f1->sync.sender = -1;
-        f1->sync.receiver = -1;
+        f1->sync.sender_pid = (pid_t) -1;
+        f1->sync.receiver_pid = (pid_t) -1;
         f1->sync.action = ACTION_NULL;
         f1->sync.can_read = TRUE;
         f1->sync.can_write = TRUE;
@@ -435,9 +435,9 @@ int sys_pipe ( int *pipefd, int flags )
         f1->sync.can_accept = FALSE;
         f1->sync.can_connect = FALSE;
 
-        // sync: 
-        f2->sync.sender = -1;
-        f2->sync.receiver = -1;
+        // sync:
+        f2->sync.sender_pid = (pid_t) -1;
+        f2->sync.receiver_pid = (pid_t) -1;
         f2->sync.action = ACTION_NULL;
         f2->sync.can_read = TRUE;
         f2->sync.can_write = TRUE;

@@ -133,7 +133,7 @@ net_checksum(
     const unsigned char *start, 
     const unsigned char *end);
 
-void testNIC(void);
+void network_test_NIC(void);
 
 
 // Handle package.

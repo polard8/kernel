@@ -1793,7 +1793,7 @@ int consoleCompareStrings(void)
 
 // test nic
     if ( strncmp(prompt,"test-nic",8) == 0 ){
-        testNIC();
+        network_test_NIC();
         goto exit_cmp;
     }
     if ( strncmp(prompt,"test-arp",8) == 0 ){
@@ -1817,6 +1817,12 @@ int consoleCompareStrings(void)
         network_initialize_dhcp();
         goto exit_cmp;
     }
+
+    if ( strncmp(prompt,"dhcp",4) == 0 ){
+        network_show_dhcp_info();
+        goto exit_cmp;
+    }
+
 
     if ( strncmp(prompt,"str",3) == 0 )
     {

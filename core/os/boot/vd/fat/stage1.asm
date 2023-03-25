@@ -11,7 +11,8 @@
 ;; Não mudar os endereços de segmento e offset usados 
 ;; para não arrumar problemas.
 ;; History:
-;;     2017 - Fred Nora.
+;;     2005 - Created.
+;;     It is the first file created for the project.
 ;; Partition table:
 ;; See:
 ;;     https://thestarman.pcministry.com/asm/mbr/PartTables.htm

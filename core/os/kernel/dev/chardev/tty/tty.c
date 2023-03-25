@@ -712,8 +712,8 @@ struct tty_d *tty_create(void)
 // Esse é o arquivo que aponta para essa estrutura.
     __tty->fp = __file;
 // sync
-    __file->sync.sender = -1;
-    __file->sync.receiver = -1;
+    __file->sync.sender_pid = (pid_t) -1;
+    __file->sync.receiver_pid = (pid_t) -1;
     __file->sync.action = ACTION_NULL;
     __file->sync.can_read = TRUE;
     __file->sync.can_write = TRUE;

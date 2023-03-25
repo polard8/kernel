@@ -28,7 +28,9 @@ unsigned long socketList[SOCKET_COUNT_MAX];
 static pid_t gramado_ports[GRAMADO_PORT_MAX];
 
 // ====================
+
 static int __socket_initialize_gramado_ports(void);
+
 // ====================
 
 /*
@@ -109,7 +111,7 @@ struct socket_d *create_socket_object(void)
     return (struct socket_d *) s;
 
 fail:
-    refresh_screen();
+    //refresh_screen();
     return NULL;
 }
 
@@ -121,7 +123,7 @@ unsigned int getSocketIPV4(struct socket_d *socket)
     if (socket->magic!=1234){
         return 0;
     }
-    return (unsigned int) socket->ip_ipv4; 
+    return (unsigned int) socket->ip_ipv4;
 }
 
 unsigned long getSocketIPV6(struct socket_d *socket)
@@ -132,7 +134,7 @@ unsigned long getSocketIPV6(struct socket_d *socket)
     if (socket->magic!=1234){
         return 0;
     }
-    return (unsigned long) socket->ip_ipv6; 
+    return (unsigned long) socket->ip_ipv6;
 }
 
 unsigned short getSocketPort(struct socket_d *socket)
@@ -143,7 +145,7 @@ unsigned short getSocketPort(struct socket_d *socket)
     if (socket->magic!=1234){
         return 0;
     }
-    return (unsigned short) socket->port; 
+    return (unsigned short) socket->port;
 }
 
 // Get the pointer for the socket structure 
@@ -160,6 +162,8 @@ struct socket_d *get_socket_from_fd (int fd)
         return (struct socket_d *) 0;
     }
 
+//----------------
+// #todo: We need a worker for that routine.
 // process
     pid_t current_process = (pid_t) get_current_process();
     if (current_process<0 || current_process>=PROCESS_COUNT_MAX){
@@ -169,6 +173,7 @@ struct socket_d *get_socket_from_fd (int fd)
     if ( (void *) p == NULL ){
         goto fail;
     }
+//----------------
 
 // The file.
     _file = (file *) p->Objects[fd];
@@ -200,7 +205,6 @@ void show_socket_for_a_process (pid_t pid)
     }
 
 // process
-
     p = (struct process_d *) processList[pid];
     if ( (void *) p == NULL ){
         printf("p\n");
@@ -233,11 +237,11 @@ void show_socket_for_a_process (pid_t pid)
     //printf ("",s->);
 
 //done:
-    refresh_screen();
+    //refresh_screen();
     return;
 
 fail:
-   refresh_screen();
+   //refresh_screen();
    return;
 }
 
@@ -254,9 +258,10 @@ socket_gramado (
     int protocol )
 {
     file *_file;
-    struct process_d *Process;
+    char *buff;
     register int i=0;
     int __slot = -1;
+    struct process_d *Process;
 
     debug_print ("socket_gramado:\n");
 
@@ -274,23 +279,21 @@ socket_gramado (
     }
 
     sock->addr.sa_family  = family;
-    sock->addr.sa_data[0] = 'x'; 
+    sock->addr.sa_data[0] = 'x';
     sock->addr.sa_data[1] = 'x';
 
 // Process
-
     pid_t current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         printf ("socket_gramado: current_process\n");
         goto fail;
     }
-
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
         printf("socket_gramado: Process\n");
         goto fail;
     }
-    if ( Process->used != TRUE || Process->magic != 1234 ){
+    if (Process->used != TRUE || Process->magic != 1234){
         printf("socket_gramado: Process validation\n");
         goto fail;
     }
@@ -307,38 +310,39 @@ socket_gramado (
 // Como ainda não temos rotinas par ao fluxo padrão,
 // pode ser que peguemos os índices reservados.
 // Para evitar, começaremos depois deles.
-
 // Reserva um slot.
+// 31 is also reserved. The server is reading 
+// only in this fd.
     __slot = -1; //fail
     //for ( i=3; i<NUMBER_OF_FILES; i++ )
     for ( i=3; i<31; i++ )
     {
-        if ( Process->Objects[i] == 0 )
+        if (Process->Objects[i] == 0)
         { 
-            __slot = i;
+            __slot = (int) i;
             break; 
         }
     };
 
 // Check slot validation. 
-    if ( __slot == -1 ){
+    if (__slot == -1)
+    {
         printf ("socket_gramado: [FAIL] No free slots\n");
         goto fail;
     }
 
 // Buffer
 
-    //char *buff = (char *) newPage ();
-    char *buff = (char *) kmalloc(BUFSIZ);
+    //buff = (char *) newPage ();
+    buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
-        debug_print ("socket_gramado: [FAIL] Buffer allocation fail\n");
-        printf      ("socket_gramado: [FAIL] Buffer allocation fail\n");
+        debug_print ("socket_gramado: buff fail\n");
+        printf      ("socket_gramado: buff fail\n");
         goto fail;
     }
 
 // File
-
     _file = (void *) kmalloc ( sizeof(file) );
     if ( (void *) _file == NULL  ){
         //Process->Objects[__slot] = (unsigned long) 0;
@@ -357,8 +361,8 @@ socket_gramado (
 
 // sync
 
-    _file->sync.sender   = -1;
-    _file->sync.receiver = -1;
+    _file->sync.sender_pid = (pid_t) -1;
+    _file->sync.receiver_pid = (pid_t) -1;
     _file->sync.action = ACTION_NULL;
     _file->sync.can_read    = TRUE;
     _file->sync.can_write   = TRUE;
@@ -412,7 +416,7 @@ socket_gramado (
     return (int) __slot;
 fail:
     debug_print ("socket_gramado: [FAIL]\n");
-    refresh_screen();
+    //refresh_screen();
     return (int) (-1);
 }
 
@@ -429,9 +433,10 @@ socket_inet (
     int protocol )
 {
     file *_file;
-    struct process_d *Process;
+    char *buff;
     register int i=0;
     int __slot = -1;
+    struct process_d *Process;
 
     if ( (void*) sock == NULL ){
         debug_print ("socket_inet: sock\n");
@@ -451,13 +456,11 @@ socket_inet (
     sock->addr_in.sin_addr.s_addr = SYS_SOCKET_IP(127,0,0,1);
 
 // Process
-
     pid_t current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX ){
         printf ("socket_inet: current_process\n");
         goto fail;
     }
-
     Process = (void *) processList[current_process];
     if ( (void *) Process == NULL ){
         printf("socket_inet: Process\n");
@@ -487,7 +490,7 @@ socket_inet (
     {
         if ( Process->Objects[i] == 0 )
         { 
-            __slot = i; 
+            __slot = (int) i; 
             break; 
         }
     };
@@ -500,8 +503,8 @@ socket_inet (
 
 // Buffer
 
-    //char *buff = (char *) newPage ();
-    char *buff = (char *) kmalloc(BUFSIZ);
+    //buff = (char *) newPage ();
+    buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_inet: [FAIL] Buffer allocation fail\n");
@@ -527,8 +530,8 @@ socket_inet (
 
 // sync
 
-    _file->sync.sender = -1;
-    _file->sync.receiver = -1;
+    _file->sync.sender_pid = (pid_t) -1;
+    _file->sync.receiver_pid = (pid_t) -1;
     _file->sync.action = ACTION_NULL;
     _file->sync.can_read = TRUE;
     _file->sync.can_write = TRUE;
@@ -577,7 +580,7 @@ socket_inet (
     return (int) __slot;
 fail:
     debug_print ("socket_inet: [FAIL]\n");
-    refresh_screen();
+    //refresh_screen();
     return (int) (-1);
 }
 
@@ -624,14 +627,14 @@ int socket_ioctl ( int fd, unsigned long request, unsigned long arg )
     case 4000:
         debug_print ("socket_ioctl: [4000]\n");
         printf("socket_ioctl: [4000] fd %d pid %d #debug\n", fd, arg);
-        refresh_screen();
+        //refresh_screen();
         // Is it a valid pid?
-        f->sync.sender = (pid_t) arg;
+        f->sync.sender_pid = (pid_t) arg;
         return 0;
         break;
 
     case 4001:
-        return (int) f->sync.sender;
+        return (int) f->sync.sender_pid;
         break;
 
     case 4002:
@@ -671,7 +674,7 @@ int socket_write ( unsigned int fd, char *buf, int count )
 
 pid_t socket_get_gramado_port (int port)
 {
-    if ( port<0 || port >31){
+    if (port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return (pid_t) -1;
     }
@@ -682,7 +685,7 @@ pid_t socket_get_gramado_port (int port)
 // Usados apenas na famíla AF_GRAMADO.
 int socket_set_gramado_port (int port, pid_t pid)
 {
-    if ( port<0 || port >31){
+    if (port<0 || port >31){
         debug_print ("socket_set_gramado_port: port fail\n");
         return -1;
     }
@@ -707,9 +710,10 @@ socket_unix (
     int protocol )
 {
     file *_file;
-    struct process_d *Process;
+    char *buff;
     register int i=0;
     int __slot = -1;
+    struct process_d *Process;
 
     debug_print ("socket_unix:\n");
 
@@ -768,7 +772,7 @@ socket_unix (
     {
         if ( Process->Objects[i] == 0 )
         { 
-            __slot = i; 
+            __slot = (int) i; 
             break; 
         }
     };
@@ -780,9 +784,8 @@ socket_unix (
     }
 
 // Buffer
-
-    //char *buff = (char *) newPage ();
-    char *buff = (char *) kmalloc(BUFSIZ);
+    //buff = (char *) newPage ();
+    buff = (char *) kmalloc(BUFSIZ);
     if ( (void *) buff == NULL ){
         //Process->Objects[__slot] = (unsigned long) 0;
         debug_print ("socket_unix: [FAIL] Buffer allocation fail\n");
@@ -812,8 +815,8 @@ socket_unix (
 
 // sync
 
-    _file->sync.sender = -1;
-    _file->sync.receiver = -1;
+    _file->sync.sender_pid = (pid_t) -1;
+    _file->sync.receiver_pid = (pid_t) -1;
     _file->sync.action = ACTION_NULL;
     _file->sync.can_read = TRUE;
     _file->sync.can_write = TRUE;
@@ -865,7 +868,7 @@ socket_unix (
     return (int) __slot;
 fail:
     debug_print ("socket_unix: fail\n");
-    refresh_screen();
+    //refresh_screen();
     return (int) (-1);  
 }
 
@@ -1404,7 +1407,7 @@ sys_bind (
 fail:
     debug_print ("sys_bind: [FAIL] Something is wrong!\n");
     printf      ("sys_bind: [FAIL] Something is wrong!\n");
-    refresh_screen();
+    //refresh_screen();
     return (int) (-1);
 }   
 
@@ -1500,7 +1503,7 @@ sys_connect (
     if ( client_socket_fd < 0 || client_socket_fd >= OPEN_MAX ){
         debug_print ("sys_connect: client_socket_fd\n");
         printf      ("sys_connect: client_socket_fd\n");
-        refresh_screen();
+        //refresh_screen();
         return (int) (-EINVAL);
     }
 
@@ -1508,7 +1511,7 @@ sys_connect (
 // Usando a estrutura que nos foi passada.
     if ( (void *) addr == NULL ){
         printf ("sys_connect: addr\n");
-        refresh_screen();
+        //refresh_screen();
         return (int) (-EINVAL);
     }
 // #todo: type.
@@ -1558,7 +1561,7 @@ sys_connect (
         if ( addr->sa_data[0] == 'f' && addr->sa_data[1] == 's' ){
             target_pid = (pid_t) gramado_ports[GRAMADO_FS_PORT]; 
         }
-        // ...
+        // xx: ...
         if ( target_pid<0 || target_pid >= PROCESS_COUNT_MAX ){
             printf ("sys_connect: AF_GRAMADO target_pid\n");
             goto fail;
@@ -1647,7 +1650,6 @@ sys_connect (
                 printf("sys_connect: PORT {%d}\n", 
                     addr_in->sin_port);
                 //#debug
-                refresh_screen();
                 //while(1){}
             }
             break;
@@ -1658,12 +1660,16 @@ sys_connect (
         if (addr_in->sin_port == PORTS_NS)
         {
             target_pid = (pid_t) gramado_ports[GRAMADO_NS_PORT]; 
-            if (Verbose==TRUE){
+            if (Verbose==TRUE)
+            {
                 printf("sys_connect: [AF_INET] Connecting to the Network Server\n");
-                printf("sys_connect: IP {%x}\n", addr_in->sin_addr.s_addr );
-                printf("sys_connect: PORT {%d}\n", addr_in->sin_port);
-                refresh_screen();
-                }
+                printf("sys_connect: IP {%x}\n", 
+                    addr_in->sin_addr.s_addr );
+                printf("sys_connect: PORT {%d}\n", 
+                    addr_in->sin_port);
+                //#debug
+                //while(1){}
+            }
             break;
         }
 
@@ -1858,11 +1864,13 @@ sys_connect (
 // presente na estrutura do processo servidor.
 
     int __slot=-1;  //fail
-    for (i=3; i<31; i++){
-         if (sProcess->Objects[i] == 0){
-             __slot = i;
-             goto __OK_new_slot;
-         }
+    for (i=3; i<31; i++)
+    {
+        if (sProcess->Objects[i] == 0)
+        {
+            __slot = (int) i;
+            goto __OK_new_slot;
+        }
     };
 
 // #fail: 
@@ -1901,8 +1909,11 @@ __OK_new_slot:
 // encontrado em p->Objects[], mas por enquanto estamos usando 
 // apenas o slot número 31.
 
-    //sProcess->Objects[__slot] = (unsigned long) f;  // no que encontramos
-    sProcess->Objects[31] = (unsigned long) f;  // no 31.
+// :: The free slot we found before.
+    //sProcess->Objects[__slot] = (unsigned long) f;
+// :: The standard fd used by the servers in GramadoOS.
+    sProcess->Objects[31] = (unsigned long) f;
+
 
 // Connecting!
 // #bugbug
@@ -1997,9 +2008,9 @@ __OK_new_slot:
 
     // #debug 
     // #breakpoint
-    if (Verbose==TRUE){
+    if (Verbose==TRUE)
+    {
         printf("sys_connect: Breakpoint :)\n");
-        refresh_screen();
         while(1){}
     }
 //ok.
@@ -2007,10 +2018,8 @@ __OK_new_slot:
 fail:
     debug_print("sys_connect: Fail\n");
     printf     ("sys_connect: Fail\n");
-    refresh_screen();  // #bugbug: Slow!
     return -1;
 }
-
 
 int 
 sys_getsockname ( 
@@ -2148,8 +2157,8 @@ int sys_listen (int sockfd, int backlog)
 // #todo: Use SOCKET_MAX_PENDING_CONNECTIONS
     Backlog = backlog;
 
-    if ( Backlog <= 0 ) { Backlog=1; }
-    if ( Backlog >= 32 ){ Backlog=31; }
+    if (Backlog <= 0) { Backlog=1; }
+    if (Backlog >= 32){ Backlog=31; }
 
 // We need to get the socket structure in the process structure.
 // We need to clean the list. Not here. when creating the socket.
@@ -2233,7 +2242,7 @@ int sys_listen (int sockfd, int backlog)
 fail:
     debug_print ("sys_listen: [FAIL]\n");
     printf      ("sys_listen: [FAIL]\n");
-    refresh_screen();
+    //refresh_screen();
     //while(1){}
     return -1;
 }
@@ -2381,8 +2390,6 @@ int sys_socket ( int family, int type, int protocol )
         (unsigned short) 0x0000;
     int Verbose = FALSE;
 
-    pid_t current_process = (pid_t) get_current_process();
-    
     // #debug
     // Slow.
 
@@ -2426,11 +2433,12 @@ int sys_socket ( int family, int type, int protocol )
 
 // #debug
 // '0' is the only valid value for now.
-    if ( protocol != 0){
+    if (protocol != 0){
         panic ("sys_socket: protocol not supported yet.\n");
     }
 
 // Current pid.
+    pid_t current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         debug_print ("sys_socket: current_process fail\n");
         panic       ("sys_socket: current_process fail\n");
@@ -2526,7 +2534,7 @@ int sys_socket ( int family, int type, int protocol )
 
 fail:
     debug_print ("sys_socket: [FAIL] Something is wrong!\n");
-    refresh_screen();
+    //refresh_screen();
     return (int) (-1);
 }
 
