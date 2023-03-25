@@ -66,7 +66,6 @@ diskWritePCIConfigAddr (
  * OUT: data.
  *      -1 = error (#bugbug, pois o tipo de retorno eh unsigned int)
  */
-
 uint32_t diskPCIScanDevice(int class)
 {
     int bus=0;
@@ -89,10 +88,12 @@ uint32_t diskPCIScanDevice(int class)
         {
             for ( fun=0; fun < 8; fun++ )
             {
-                out32 ( PCI_PORT_ADDR, __PCI_CONFIG_ADDR( bus, dev, fun, 0x8) );
+                out32( 
+                    PCI_PORT_ADDR, 
+                    __PCI_CONFIG_ADDR( bus, dev, fun, 0x8) );
 
                 data = in32 (PCI_PORT_DATA);
-                
+
                 if ( ( data >> 24 & 0xff ) == class )
                 {
                     // #debug
@@ -132,8 +133,8 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
     uint32_t data=0;
 
 // A estrutura ainda nao foi configurada.
-    ata_port.used = FALSE;
-    ata_port.magic = 0;
+    //ata_port.used = FALSE;
+    //ata_port.magic = 0;
 
 // We still don't know the type of this controller.
 // But the caller already knows that 
@@ -367,18 +368,18 @@ int atapciSetupMassStorageController(struct pci_device_d *D)
 //
 // == DMA ====================
 //
-    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48);
+    data = diskReadPCIConfigAddr ( D->bus, D->dev, D->func, 0x48 );
 //#debug
     //printf ("[ Synchronous DMA Control Register %x ]\n", data );
 
 //done:
-    ata_port.used = TRUE;
-    ata_port.magic = 1234;
+    //ata_port.used = TRUE;
+    //ata_port.magic = 1234;
     return (int) PCI_MSG_SUCCESSFUL;
 
 fail:
-    ata_port.used = FALSE;
-    ata_port.magic = 0;
+    //ata_port.used = FALSE;
+    //ata_port.magic = 0;
     refresh_screen();
     return (int) PCI_MSG_ERROR;
 }

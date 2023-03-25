@@ -4229,8 +4229,9 @@ save_file:
             //#debug 
             //printf("write_lba\n");
             //refresh_screen();
-
-            disk_ata_wait_irq();
+            
+            // ata_get_current_ide_port_index()
+            disk_ata_wait_irq(__IDE_PORT);
 
             //grava - Aqui next esta certo!
             //write_lba ( (unsigned long) address, VOLUME1_DATAAREA_LBA + next -2 );

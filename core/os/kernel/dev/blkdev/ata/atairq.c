@@ -87,7 +87,7 @@ irq15_SECONDARY_IDE (void)
 // Veja se é possível mudar o retorno para 'int'.
 // #obs: Tem uma função semelhante logo abaixo.
 
-unsigned char ata_wait_irq (void)
+unsigned char ata_wait_irq (int p)
 {
     unsigned long tmp = 0x10000;
     unsigned char data=0;
@@ -95,7 +95,7 @@ unsigned char ata_wait_irq (void)
 
     while (!ata_irq_invoked)
     {
-        data = ata_status_read();
+        data = ata_status_read(p);
 
         if ( (data & ATA_SR_ERR) )
         {
@@ -137,7 +137,7 @@ unsigned char ata_wait_irq (void)
 //     -1   = ok por status do controlador.
 //     0x80 = ok por tempo esperado.
 
-int disk_ata_wait_irq (void)
+int disk_ata_wait_irq (int p)
 {
     unsigned long Timeout = 1000;
     unsigned char Data=0;
@@ -145,7 +145,7 @@ int disk_ata_wait_irq (void)
     if ( ata_irq_invoked == TRUE ){ goto done; }
     while (!ata_irq_invoked)
     {
-        Data = (unsigned char) ata_status_read();
+        Data = (unsigned char) ata_status_read(p);
         // O status indicou um erro.
         if (Data & ATA_SR_ERR){
             ata_irq_invoked = FALSE;   

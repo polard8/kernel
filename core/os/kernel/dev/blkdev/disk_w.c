@@ -7,6 +7,7 @@
 
 static int 
 __do_save_sequence ( 
+    int p,
     unsigned long buffer_va, 
     unsigned long lba, 
     size_t number_of_clusters );
@@ -16,6 +17,7 @@ __do_save_sequence (
 
 static int 
 __do_save_sequence ( 
+    int p,
     unsigned long buffer_va, 
     unsigned long lba, 
     size_t number_of_clusters )
@@ -47,7 +49,7 @@ __do_save_sequence (
         // Maybe, do not use this on vms.
         // See: atairq.c
         // if (is_qemu != TRUE)
-        disk_ata_wait_irq();
+        disk_ata_wait_irq(p);
 
         ataWriteSector ( 
             (unsigned long) ( buffer_base + buffer_off ), 
@@ -193,7 +195,9 @@ fs_save_fat (
     }
 
 // Do save!
+// ata_get_current_ide_port_index()
     __do_save_sequence(
+        __IDE_PORT, //port   // #bugbug: hard coded.
         (unsigned long) fat_address,
         (unsigned long) fat_lba,
         (size_t) fat_size );
@@ -244,7 +248,9 @@ fs_save_rootdir (
     }
 
 // Do save!
+// ata_get_current_ide_port_index()
     __do_save_sequence(
+        __IDE_PORT,
         (unsigned long) root_address,
         (unsigned long) root_lba,
         (size_t) root_size );

@@ -47,13 +47,11 @@ unsigned long ATA_BAR5=0;  // AHCI Base Address / SATA Index Data Pair Base Addr
 // O próximo ID de unidade disponível.
 static uint32_t __next_sd_id = 0; 
 
-
 // --------------------------
 
 // Four ports.
 // see: ide.h
 struct ide_port_d  ide_ports[4];
-
 
 struct dev_nport  dev_nport;
 
@@ -66,7 +64,7 @@ struct ata_device_d *ready_queue_dev;
 
 // Not a pointer.
 // see: ata.h
-struct ata_port_d  ata_port;
+struct ata_port_d  ata_port[4];  // 32 ports.
 struct ata_controller_d AtaController;
 
 //
@@ -76,11 +74,10 @@ struct ata_controller_d AtaController;
 static int __ata_initialize(int ataflag);
 
 static void __local_io_delay(void);
-static void __ata_pio_read( void *buffer, int bytes );
-static void __ata_pio_write( void *buffer, int bytes );
+static void __ata_pio_read ( int p, void *buffer, int bytes );
+static void __ata_pio_write ( int p, void *buffer, int bytes );
 static unsigned char __ata_config_structure(char nport);
-static void __set_ata_addr(int channel);
-
+static void __set_ata_addr (int p, int channel);
 
 static int __ide_identify_device(uint8_t nport);
 static int ata_initialize_ide_device(char port);
@@ -96,24 +93,24 @@ static void __local_io_delay (void)
 // low level worker
 // #todo:
 // avoid this for compatibility with another compiler.
-static void __ata_pio_read ( void *buffer, int bytes )
+static void __ata_pio_read ( int p, void *buffer, int bytes )
 {
     asm volatile  (\
         "cld;\
         rep; insw"::"D"(buffer),\
-        "d"(ata_port.cmd_block_base_address + ATA_REG_DATA),\
+        "d"(ata_port[p].cmd_block_base_address + ATA_REG_DATA),\
         "c"(bytes/2) );
 }
 
 // low level worker
 // #todo:
 // avoid this for compatibility with another compiler.
-static void __ata_pio_write ( void *buffer, int bytes )
+static void __ata_pio_write ( int p, void *buffer, int bytes )
 {
     asm volatile  (\
         "cld;\
         rep; outsw"::"S"(buffer),\
-        "d"(ata_port.cmd_block_base_address + ATA_REG_DATA),\
+        "d"(ata_port[p].cmd_block_base_address + ATA_REG_DATA),\
         "c"(bytes/2) );
 }
 
@@ -146,67 +143,67 @@ void ata_delay(void)
 // Lê o status de um disco determinado, 
 // se os valores na estrutura estiverem certos.
 // #todo: return type.
-unsigned char ata_status_read(void)
+unsigned char ata_status_read(int p)
 {
-    return in8( ata_port.cmd_block_base_address + ATA_REG_STATUS );
+    return in8( ata_port[p].cmd_block_base_address + ATA_REG_STATUS );
 }
 
-void ata_cmd_write (int cmd_val)
+void ata_cmd_write (int p, int cmd_val)
 {
     // no_busy 
-    ata_wait_not_busy();
+    ata_wait_not_busy(p);
 
     out8 ( 
-        (unsigned short) ((ata_port.cmd_block_base_address + ATA_REG_CMD) & 0xFFFF), 
+        (unsigned short) ((ata_port[p].cmd_block_base_address + ATA_REG_CMD) & 0xFFFF), 
         (unsigned char) (cmd_val & 0xFF) );
 
     ata_wait(400);  
 }
 
-void ata_soft_reset(void)
+void ata_soft_reset(int p)
 {
     unsigned char data = 
-        (unsigned char) in8( ata_port.ctrl_block_base_address );
+        (unsigned char) in8( ata_port[p].ctrl_block_base_address );
 
     out8( 
-        (unsigned short) ata_port.ctrl_block_base_address, 
+        (unsigned short) ata_port[p].ctrl_block_base_address, 
         (unsigned char) (data | 0x4) );
 
     out8( 
-        (unsigned short) ata_port.ctrl_block_base_address, 
+        (unsigned short) ata_port[p].ctrl_block_base_address, 
         (unsigned char) (data & 0xFB) );
 }
 
-unsigned char ata_wait_drq(void)
+unsigned char ata_wait_drq(int p)
 {
 // #todo: Simplify this routine.
-    while ( !(ata_status_read() & ATA_SR_DRQ) )
+    while ( !(ata_status_read(p) & ATA_SR_DRQ) )
     {
-        if ( ata_status_read() & ATA_SR_ERR ){
+        if ( ata_status_read(p) & ATA_SR_ERR ){
             return 1;
         }
     };
     return 0;
 }
 
-unsigned char ata_wait_no_drq (void)
+unsigned char ata_wait_no_drq (int p)
 {
 // #todo: Simplify this routine.
-    while ( ata_status_read() & ATA_SR_DRQ )
+    while ( ata_status_read(p) & ATA_SR_DRQ )
     {
-        if ( ata_status_read() & ATA_SR_ERR ){
+        if ( ata_status_read(p) & ATA_SR_ERR ){
             return 1;
         }
     };
     return 0;
 }
 
-unsigned char ata_wait_busy (void)
+unsigned char ata_wait_busy (int p)
 {
 // #todo: Simplify this routine.
-    while (!(ata_status_read() & ATA_SR_BSY ))
+    while (!(ata_status_read(p) & ATA_SR_BSY ))
     {
-        if ( ata_status_read() & ATA_SR_ERR ){
+        if ( ata_status_read(p) & ATA_SR_ERR ){
             return 1;
         }
     };
@@ -215,12 +212,12 @@ unsigned char ata_wait_busy (void)
 
 // #todo: 
 // Ao configurar os bits BUSY e DRQ devemos verificar retornos de erros.
-unsigned char ata_wait_not_busy (void)
+unsigned char ata_wait_not_busy (int p)
 {
 // #todo: Simplify this routine.
-    while ( ata_status_read() & ATA_SR_BSY )
+    while ( ata_status_read(p) & ATA_SR_BSY )
     {
-        if ( ata_status_read() & ATA_SR_ERR ){
+        if ( ata_status_read(p) & ATA_SR_ERR ){
             return 1;
         }
     };
@@ -228,7 +225,7 @@ unsigned char ata_wait_not_busy (void)
 }
 
 // local worker
-static void __set_ata_addr (int channel)
+static void __set_ata_addr (int p, int channel)
 {
 // Select the i/o ports given the channel.
 // The ports we found in the BARs.
@@ -242,20 +239,20 @@ static void __set_ata_addr (int channel)
     switch (channel){
 
     case ATA_PRIMARY:
-        ata_port.cmd_block_base_address = 
+        ata_port[p].cmd_block_base_address = 
             ATA_BAR0_PRIMARY_COMMAND_PORT;
-        ata_port.ctrl_block_base_address = 
+        ata_port[p].ctrl_block_base_address = 
             ATA_BAR1_PRIMARY_CONTROL_PORT;
-        ata_port.bus_master_base_address = 
+        ata_port[p].bus_master_base_address = 
             ATA_BAR4;
         break;
 
     case ATA_SECONDARY:
-        ata_port.cmd_block_base_address = 
+        ata_port[p].cmd_block_base_address = 
             ATA_BAR2_SECONDARY_COMMAND_PORT;
-        ata_port.ctrl_block_base_address = 
+        ata_port[p].ctrl_block_base_address = 
             ATA_BAR3_SECONDARY_CONTROL_PORT;
-        ata_port.bus_master_base_address = 
+        ata_port[p].bus_master_base_address = 
             ATA_BAR4 + 8;
         break;
 
@@ -286,20 +283,20 @@ static unsigned char __ata_config_structure (char nport)
     // 0~3
     switch (nport){
     case 0:
-        ata_port.channel = ATA_PRIMARY;    //0;  // primary
-        ata_port.dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
+        ata_port[nport].channel = ATA_PRIMARY;    //0;  // primary
+        ata_port[nport].dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
         break;
     case 1: 
-        ata_port.channel = ATA_PRIMARY;    //0;  // primary
-        ata_port.dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
+        ata_port[nport].channel = ATA_PRIMARY;    //0;  // primary
+        ata_port[nport].dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
         break;
     case 2:
-        ata_port.channel = ATA_SECONDARY;  //1;  // secondary
-        ata_port.dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
+        ata_port[nport].channel = ATA_SECONDARY;  //1;  // secondary
+        ata_port[nport].dev_num = ATA_MASTER;     //0;  // not slave ATA_MASTER
         break;
     case 3:
-        ata_port.channel = ATA_SECONDARY;  //1;  // secondary
-        ata_port.dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
+        ata_port[nport].channel = ATA_SECONDARY;  //1;  // secondary
+        ata_port[nport].dev_num = ATA_SLAVE;      //1;  // slave    ATA_SLAVE
         break;
     default:
         // panic ?
@@ -311,7 +308,9 @@ static unsigned char __ata_config_structure (char nport)
 // local worker.
 // Select the i/o ports given the channel.
 // The ports we found in the BARs.
-    __set_ata_addr (ata_port.channel);
+    __set_ata_addr(
+        nport,
+        ata_port[nport].channel );
 
     return 0;
 }
@@ -319,7 +318,7 @@ static unsigned char __ata_config_structure (char nport)
 // atapi_pio_read:
 // #todo
 // Avoid this for compatibility with another compiler.
-inline void atapi_pio_read ( void *buffer, uint32_t bytes )
+inline void atapi_pio_read ( int p, void *buffer, uint32_t bytes )
 {
 // No checks!
 // #todo: Port number via parameter.
@@ -331,7 +330,7 @@ inline void atapi_pio_read ( void *buffer, uint32_t bytes )
     asm volatile  (\
         "cld;\
         rep; insw"::"D"(buffer),\
-        "d"(ata_port.cmd_block_base_address + ATA_REG_DATA),\
+        "d"(ata_port[p].cmd_block_base_address + ATA_REG_DATA),\
         "c"(bytes/2) );
 }
 
@@ -398,8 +397,8 @@ static int __ide_identify_device(uint8_t nport)
 // Sem unidade conectada ao barramento
 // #todo
 // Precisamos de uma mensagem aqui.
-    if ( ata_status_read() == 0xFF ){
-        debug_print("__ide_identify_device: ata_status_read()\n");
+    if ( ata_status_read(nport) == 0xFF ){
+        debug_print("__ide_identify_device: ata_status_read(nport)\n");
         goto fail;
     }
 
@@ -409,17 +408,17 @@ static int __ide_identify_device(uint8_t nport)
 // então temos que nos certificar que esses valores 
 // são válidos.
 //Reset?
-    out8 ( ata_port.cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
-    out8 ( ata_port.cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7-0
-    out8 ( ata_port.cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15-8
-    out8 ( ata_port.cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_SECCOUNT, 0 );  // Sector Count 7:0
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA0,     0 );  // LBA  7-0
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA1,     0 );  // LBA 15-8
+    out8 ( ata_port[nport].cmd_block_base_address + ATA_REG_LBA2,     0 );  // LBA 23-16
 
 // Select device
 // #todo:
 // Review the data sent to the port.
     out8( 
-        (unsigned short) ( ata_port.cmd_block_base_address + ATA_REG_DEVSEL), 
-        (unsigned char) 0xE0 | ata_port.dev_num << 4 );
+        (unsigned short) ( ata_port[nport].cmd_block_base_address + ATA_REG_DEVSEL), 
+        (unsigned char) 0xE0 | ata_port[nport].dev_num << 4 );
 
 //
 // Solicitando informações sobre o disco.
@@ -428,20 +427,20 @@ static int __ide_identify_device(uint8_t nport)
 // cmd
     ata_wait (400);
     debug_print("__ide_identify_device: ATA_CMD_IDENTIFY_DEVICE\n");
-    ata_cmd_write (ATA_CMD_IDENTIFY_DEVICE); 
+    ata_cmd_write (nport,ATA_CMD_IDENTIFY_DEVICE); 
     ata_wait (400);
 
-    // ata_wait_irq();
+    // ata_wait_irq(nport);
 
 // Nunca espere por um IRQ aqui
 // Devido unidades ATAPI, ao menos que pesquisamos pelo Bit ERROR
 // Melhor seria fazermos polling
 // Sem unidade no canal.
 
-    debug_print("__ide_identify_device: ata_status_read()\n");
+    debug_print("__ide_identify_device: ata_status_read(nport)\n");
 
-    if ( ata_status_read() == 0 ){
-        debug_print("__ide_identify_device: ata_status_read()\n");
+    if ( ata_status_read(nport) == 0 ){
+        debug_print("__ide_identify_device: ata_status_read(nport)\n");
         goto fail;
     }
 
@@ -466,16 +465,16 @@ static int __ide_identify_device(uint8_t nport)
  */
 
 // Saving.
-    // lba1 = in8( ata_port.cmd_block_base_address + ATA_REG_LBA1 );
-    // lba2 = in8( ata_port.cmd_block_base_address + ATA_REG_LBA2 );
+    // lba1 = in8( ata_port[nport].cmd_block_base_address + ATA_REG_LBA1 );
+    // lba2 = in8( ata_port[nport].cmd_block_base_address + ATA_REG_LBA2 );
 
     // REG_CYL_LO = 4
     // REG_CYL_HI = 5
 
 // Signature:
 // Getting signature bytes.
-    sig_byte_1 = in8( ata_port.cmd_block_base_address + 4 );
-    sig_byte_2 = in8( ata_port.cmd_block_base_address + 5 );
+    sig_byte_1 = in8( ata_port[nport].cmd_block_base_address + 4 );
+    sig_byte_2 = in8( ata_port[nport].cmd_block_base_address + 5 );
 
 // #todo
 // In this moment we're trying to find 
@@ -489,7 +488,7 @@ static int __ide_identify_device(uint8_t nport)
 // uma operação de leitura ou escrita.
 
     unsigned long rw_size_in_sectors=0;
-    rw_size_in_sectors = in8( ata_port.cmd_block_base_address + ATA_REG_SECCOUNT );
+    rw_size_in_sectors = in8( ata_port[nport].cmd_block_base_address + ATA_REG_SECCOUNT );
     if (rw_size_in_sectors>0){
        printf("::#breakpoint NumberOfSectors %d \n",rw_size_in_sectors);
        refresh_screen();
@@ -528,7 +527,7 @@ static int __ide_identify_device(uint8_t nport)
 #define Status          7
 #define Command         7
     unsigned long Max_LBA=0;
-    unsigned int port = (ata_port.cmd_block_base_address & 0xFFFF);
+    unsigned int port = (ata_port[nport].cmd_block_base_address & 0xFFFF);
 */    
 
 //#atençao
@@ -557,7 +556,7 @@ static int __ide_identify_device(uint8_t nport)
     //unsigned char buffer[512+1];
     //unsigned short buffer[512+1];
 
-    // ata_port.cmd_block_base_address?
+    // ata_port[nport].cmd_block_base_address?
     // Isso foi configurado logo acima,
     // então a função hdd_ata_pio_read
     // vai usar a mesma porta que estamos 
@@ -573,11 +572,11 @@ static int __ide_identify_device(uint8_t nport)
 */
 
 /*
-    ata_wait_drq();
-    __ata_pio_read ( buffer, 512 );
+    ata_wait_drq(p);
+    __ata_pio_read ( p, buffer, 512 );
 
-    ata_wait_not_busy();
-    ata_wait_no_drq();
+    ata_wait_not_busy(p);
+    ata_wait_no_drq(p);
 */
 
 /*  
@@ -620,19 +619,19 @@ static int __ide_identify_device(uint8_t nport)
         // aqui esperamos pelo DRQ
         // e eviamos 256 word de dados PIO
 
-        ata_wait_drq();
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
+        ata_wait_drq(nport);
+        __ata_pio_read ( nport, ata_identify_dev_buf, 512 );
 
-        ata_wait_not_busy();
-        ata_wait_no_drq();
+        ata_wait_not_busy(nport);
+        ata_wait_no_drq(nport);
 
         // See: ide.h
 
         ide_ports[nport].id = (uint8_t) nport;           // Port index.
         ide_ports[nport].type = (int) idedevicetypesPATA;  // Device type.
         ide_ports[nport].name = "PATA";
-        ide_ports[nport].channel = ata_port.channel;  // Primary or secondary.
-        ide_ports[nport].dev_num = ata_port.dev_num;  // Master or slave.
+        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
 
@@ -674,8 +673,8 @@ static int __ide_identify_device(uint8_t nport)
             disk->gid = current_group;
             // ...
 
-            disk->channel = ata_port.channel;  // Primary or secondary.
-            disk->dev_num = ata_port.dev_num;  // Master or slave.
+            disk->channel = ata_port[nport].channel;  // Primary or secondary.
+            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
 
             // disk->next = NULL;
             
@@ -699,18 +698,18 @@ static int __ide_identify_device(uint8_t nport)
         // entao devemos esperar pelo DRQ ao invez de um BUSY
         // em seguida enviar 256 word de dados PIO.
 
-        ata_wait_drq(); 
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
+        ata_wait_drq(nport); 
+        __ata_pio_read ( nport, ata_identify_dev_buf, 512 );
+        ata_wait_not_busy(nport);
+        ata_wait_no_drq(nport);
 
         // See: ide.h
 
         ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].type = (int) idedevicetypesSATA;  // Device type.
         ide_ports[nport].name = "SATA";                    // Port name.
-        ide_ports[nport].channel = ata_port.channel;  // Primary or secondary.
-        ide_ports[nport].dev_num = ata_port.dev_num;  // Master or slave.
+        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
 
@@ -750,8 +749,8 @@ static int __ide_identify_device(uint8_t nport)
             disk->pid = (pid_t) get_current_process();  //current_process;
             disk->gid = current_group;
               
-            disk->channel = ata_port.channel;  // Primary or secondary.
-            disk->dev_num = ata_port.dev_num;  // Master or slave.
+            disk->channel = ata_port[nport].channel;  // Primary or secondary.
+            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
  
             // disk->next = NULL;
             
@@ -772,20 +771,20 @@ static int __ide_identify_device(uint8_t nport)
          sig_byte_2 == 0xEB )
     {
         //kputs("Unidade PATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
-        ata_wait_drq(); 
-        __ata_pio_read ( ata_identify_dev_buf, 512 );
-        ata_wait_not_busy();
-        ata_wait_no_drq();
+        ata_wait_drq(nport); 
+        __ata_pio_read ( nport, ata_identify_dev_buf, 512 );
+        ata_wait_not_busy(nport);
+        ata_wait_no_drq(nport);
 
         // See: ide.h
 
         ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].type = (int) idedevicetypesPATAPI;
         ide_ports[nport].name = "PATAPI";
-        ide_ports[nport].channel = ata_port.channel;  // Primary or secondary.
-        ide_ports[nport].dev_num = ata_port.dev_num;  // Master or slave.
+        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
 
@@ -816,8 +815,8 @@ static int __ide_identify_device(uint8_t nport)
 
 
 
-            disk->channel = ata_port.channel;  // Primary or secondary.
-            disk->dev_num = ata_port.dev_num;  // Master or slave.
+            disk->channel = ata_port[nport].channel;  // Primary or secondary.
+            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
 
             // #todo: Check overflow.
             diskList[nport] = (unsigned long) disk;
@@ -835,20 +834,20 @@ static int __ide_identify_device(uint8_t nport)
         sig_byte_2 == 0x96)
     {
         //kputs("Unidade SATAPI\n");   
-        ata_cmd_write(ATA_CMD_IDENTIFY_PACKET_DEVICE);
+        ata_cmd_write(nport,ATA_CMD_IDENTIFY_PACKET_DEVICE);
         ata_wait(400);
-        ata_wait_drq(); 
-        __ata_pio_read(ata_identify_dev_buf,512);
-        ata_wait_not_busy();
-        ata_wait_no_drq();
+        ata_wait_drq(nport); 
+        __ata_pio_read(nport,ata_identify_dev_buf,512);
+        ata_wait_not_busy(nport);
+        ata_wait_no_drq(nport);
 
         // See: ide.h
 
         ide_ports[nport].id = (uint8_t) nport;
         ide_ports[nport].type = (int) idedevicetypesSATAPI;
         ide_ports[nport].name = "SATAPI";
-        ide_ports[nport].channel = ata_port.channel;  // Primary or secondary.
-        ide_ports[nport].dev_num = ata_port.dev_num;  // Master or slave.
+        ide_ports[nport].channel = ata_port[nport].channel;  // Primary or secondary.
+        ide_ports[nport].dev_num = ata_port[nport].dev_num;  // Master or slave.
         ide_ports[nport].used = (int) TRUE;
         ide_ports[nport].magic = (int) 1234;
 
@@ -877,8 +876,8 @@ static int __ide_identify_device(uint8_t nport)
             sprintf ( (char *) name_buffer, "SATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
 
-            disk->channel = ata_port.channel;  // Primary or secondary.
-            disk->dev_num = ata_port.dev_num;  // Master or slave.
+            disk->channel = ata_port[nport].channel;  // Primary or secondary.
+            disk->dev_num = ata_port[nport].dev_num;  // Master or slave.
 
             // #todo: Check overflow.
             diskList[nport] = (unsigned long) disk;
@@ -1250,11 +1249,10 @@ static int ata_initialize_ide_device(char port)
 // Mas temos um problema. Talvez quando essa função
 // foi chamada o dev_num ainda não tenha cido inicializado.
 
-    new_dev->dev_channel = ata_port.channel;
-    new_dev->dev_num     = ata_port.dev_num;
+    new_dev->dev_channel = ata_port[port].channel;
+    new_dev->dev_num     = ata_port[port].dev_num;
 
     new_dev->dev_nport = port;
-
 
 //
 // bootitme device?
@@ -1460,7 +1458,6 @@ static int __ata_initialize(int ataflag)
 //   IDE devices we have in this controller.
 // + It's gonna fail for RAID and AHCI.
 
-
 /*
 	#todo
 	Me parece que em nenhum momento na rotina de inicialização
@@ -1473,11 +1470,8 @@ static int __ata_initialize(int ataflag)
 
     int Status = -1;  //error
     int Value = -1;
-    // iterator.
+    // Iterator.
     int iPortNumber=0;
-    unsigned char bus=0;
-    unsigned char dev=0;
-    unsigned char fun=0;
 
     debug_print("__ata_initialize: todo\n");
 
@@ -1488,10 +1482,11 @@ static int __ata_initialize(int ataflag)
 
 // Driver status.
     g_ata_driver_initialized = FALSE;
+    AtaController.initialized = FALSE;
 
 // A estrutura ainda nao foi configurada.
-    ata_port.used = FALSE;
-    ata_port.magic = 0;
+    //ata_port.used = FALSE;
+    //ata_port.magic = 0;
 
 // ======================================
 // #importante 
@@ -1600,6 +1595,8 @@ static int __ata_initialize(int ataflag)
     ATA_BAR4 = ( PCIDeviceATA->BAR4 & ~0x7 ) + ATA_IDE_BAR4_BUS_MASTER * ( !PCIDeviceATA->BAR4 );
     ATA_BAR5 = ( PCIDeviceATA->BAR5 & ~0xf ) + ATA_IDE_BAR5            * ( !PCIDeviceATA->BAR5 );
 
+// Get the base i/o port for 
+// all the 4 ata ide ports.
 // Colocando nas estruturas.
     ide_ports[0].base_port = 
         (unsigned short) (ATA_BAR0_PRIMARY_COMMAND_PORT   & 0xFFFF);
@@ -1622,10 +1619,10 @@ static int __ata_initialize(int ataflag)
 // >> Isso acontece  logo acima quando chamamos
 // a funçao atapciConfigurationSpace()
 
-    if ( ata_port.used != TRUE || ata_port.magic != 1234 ){
-        printk("__ata_initialize: ata_port structure validation\n");
-        goto fail;
-    }
+    //if ( ata_port.used != TRUE || ata_port.magic != 1234 ){
+    //    printk("__ata_initialize: ata_port structure validation\n");
+    //    goto fail;
+    //}
 
 // Que tipo de controlador?
 // A rotina atapciConfigurationSpace() configurou
@@ -1640,7 +1637,7 @@ static int __ata_initialize(int ataflag)
         printf ("__ata_initialize: [IDE] Initialize ports\n");
         //while(1){}
         
-        //Soft Reset, defina IRQ
+        // Soft Reset, defina IRQ.
         out8(
             (unsigned short) (ATA_BAR1_PRIMARY_CONTROL_PORT & 0xFFFF),
             0xff );
@@ -1653,6 +1650,7 @@ static int __ata_initialize(int ataflag)
         out8( 
             (unsigned short) (ATA_BAR3_SECONDARY_CONTROL_PORT & 0xFFFF), 
             0x00 );
+
         // ??
         ata_record_dev     = 0xff;
         ata_record_channel = 0xff;
@@ -1685,7 +1683,7 @@ static int __ata_initialize(int ataflag)
         // There is a loop to reinitialize the
         // structure of each of all ports.
 
-        current_sd = ( struct ata_device_d * ) ready_queue_dev;
+        current_sd = (struct ata_device_d *) ready_queue_dev;
         current_sd->dev_id   = __next_sd_id++;
         current_sd->dev_type = -1;
         // Channel and device.
@@ -1791,6 +1789,7 @@ done:
 
 // Driver status.
     g_ata_driver_initialized = TRUE;
+    AtaController.initialized = TRUE;
 
     return (int) Status;
 }
@@ -1825,7 +1824,6 @@ init_ata (
 
     switch (msg)
     {
-
         // ATAMSG_INITIALIZE
         // Initialize driver.
         // ata.c
@@ -1837,7 +1835,7 @@ init_ata (
             // IN: forcepio?
             Status = (int) __ata_initialize( (int) long1 );
             // We can't live without this at the moment.
-            if(Status<0){
+            if (Status<0){
                 panic("init_ata: ata_initialize failed\n");
             }
             return (int) Status;

@@ -285,7 +285,7 @@ struct ata_controller_d
 // ATA Mass storage controler structure.
 
 // The structure was initialized.
-    //int initialized;
+    int initialized;
 // IDE, RAID, AHCI.
     uint8_t controller_type;
 };
@@ -322,7 +322,7 @@ struct ata_port_d
 // Actually we need a pointer,
 // because the system is gonna have more than one
 // ata controller. Specially in VMs.
-extern struct ata_port_d  ata_port;
+extern struct ata_port_d  ata_port[4];  // 32 ports.
 
 
 /*
@@ -501,21 +501,21 @@ extern struct ide_port_d  ide_ports[4];
 // == Prototypes ==============================================
 //
 
-void ata_soft_reset (void);
-unsigned char ata_status_read (void);
+void ata_soft_reset(int p);
 
-void ata_cmd_write (int cmd_val);
+unsigned char ata_status_read(int p);
+void ata_cmd_write (int p, int cmd_val);
 
-unsigned char ata_wait_drq (void);
-unsigned char ata_wait_no_drq (void);
+unsigned char ata_wait_drq(int p);
+unsigned char ata_wait_no_drq (int p);
+unsigned char ata_wait_busy (int p);
+unsigned char ata_wait_not_busy (int p);
 
-unsigned char ata_wait_busy (void);
-unsigned char ata_wait_not_busy (void);
 
 void ata_wait (int val);
 void ata_delay (void);
 
-inline void atapi_pio_read ( void *buffer, uint32_t bytes );
+inline void atapi_pio_read ( int p, void *buffer, uint32_t bytes );
 
 void ata_set_boottime_ide_port_index(unsigned int port_index);
 int ata_get_boottime_ide_port_index(void);
@@ -569,9 +569,9 @@ ataWriteSector (
 
 int init_hdd (void);
 
-void ide_dma_start (void);
-void ide_dma_stop (void);
-int ide_dma_read_status (void);
+void ide_dma_start (int p);
+void ide_dma_stop (int p);
+int ide_dma_read_status (int p);
 
 void 
 ide_dma_data ( 
@@ -589,8 +589,8 @@ uint32_t diskPCIScanDevice (int class);
 
 int atapciSetupMassStorageController(struct pci_device_d *D);
 
-unsigned char ata_wait_irq (void);
-int disk_ata_wait_irq (void);
+unsigned char ata_wait_irq (int p);
+int disk_ata_wait_irq (int p);
 
 static inline void dev_switch (void);
 static inline int getnport_dev (void);
