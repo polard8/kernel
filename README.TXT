@@ -3,12 +3,10 @@ Product names:
 
     Gramado Kernel - core/
     Gramado DE     - desktop/
-    Gramado Games  - meta/
 
 --------------------------------------
-    core/    - (E) Boot loader, kernel and commands. 
-    desktop/ - (A) Gramado Window System. (Window server and clients). (DE).
-    meta     - (D) Games.
+    core/    - Boot loader, kernel and commands. 
+    desktop/ - Gramado Window System. (Window server and clients). (DE).
 --------------------------------------
 Build:
     Type 'make'
@@ -18,7 +16,7 @@ Running:
     Go into the core/ folder and type './run' or './runkvm'
 --------------------------------------
 Configuration file:
-    new/include/config/superv/config.h
+    include/config/superv/config.h
 
 --------------------------------------
 The boot loader starts at:
