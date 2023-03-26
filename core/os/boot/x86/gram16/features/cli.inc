@@ -26,19 +26,89 @@ get_cmd:				; Main processing loop
 	mov bx, 64
 	call os_input_string
 
-
-
-; ...
-
-    ;#debug
-    xor ax, ax
-    int 0x16
-
 	call os_print_newline
-    
+
+	mov ax, input			; Remove trailing spaces
+	call os_string_chomp
+
+	mov si, input			; If just enter pressed, prompt again
+	cmp byte [si], 0
+	je get_cmd
+
+	mov si, input			; Separate out the individual command
+	mov al, ' '
+	call os_string_tokenize
+
+	mov word [param_list], di	; Store location of full parameters
+
+	mov si, input			; Store copy of command for later modifications
+	mov di, command
+	call os_string_copy
+
+	; First, let's check to see if it's an internal command...
+
+	mov ax, input
+	call os_string_uppercase
+
+	mov si, input
+
+; ---------------------------
+
+	mov di, help_string		; 'HELP' entered?
+	call os_string_compare
+	jc near print_help
+
+	mov di, cls_string		; 'CLS' entered?
+	call os_string_compare
+	jc near clear_screen
+
+	mov di, ver_string		; 'VER' entered?
+	call os_string_compare
+	jc near print_ver
+
+
     jmp get_cmd
 
+
+execute_bin:
+
+	;mov ax, 0			; Clear all registers
+	;mov bx, 0
+	;mov cx, 0
+	;mov dx, 0
+	;mov word si, [param_list]
+	;mov di, 0
+
+	;call 32768			; Call the external program
+
+    jmp get_cmd
 ; =====================================================================
+
+
+; ------------------------------------------------------------------
+
+print_help:
+	mov si, help_text
+	call os_print_string
+	jmp get_cmd
+
+; ------------------------------------------------------------------
+
+clear_screen:
+	call os_clear_screen
+	jmp get_cmd
+
+
+; ------------------------------------------------------------------
+
+print_ver:
+	mov si, version_msg
+	call os_print_string
+	jmp get_cmd
+
+
+; =====================================================================
+
 
 	input			times 64 db 0
 	command			times 32 db 0

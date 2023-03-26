@@ -75,6 +75,18 @@ option_screen:
     ;jmp $
 
 
+; ------------------------------------------------------------------
+; SYSTEM VARIABLES -- Settings for programs and system calls
+
+
+	; Time and date formatting
+
+	fmt_12_24	db 0		; Non-zero = 24-hr format
+
+	fmt_date	db 0, '/'	; 0, 1, 2 = M/D/Y, D/M/Y or Y/M/D
+					; Bit 7 = use name for months
+					; If bit 7 = 0, second byte = separator character
+
 ;
 ; --------------------------------
 ;
@@ -99,7 +111,7 @@ option_screen:
     %include "features/disk.inc"
     %include "features/keyboard.inc"
     %include "features/screen.inc"
-
+    %include "features/string.inc"
 
 ; messages
 Message1 db  0x0D, 0x0A, "G16KERN.BIN: 2000H:0H position", 0x00
