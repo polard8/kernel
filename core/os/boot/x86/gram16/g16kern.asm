@@ -53,108 +53,58 @@ g16kern_main:
 	int 10h
 
 option_screen:
+
+; option 1
+; ...
+
+; option 2
+; ...
+
+; option 3
     call os_command_line
-    xor ax,ax
-    int 0x16
+
     jmp option_screen    ; Offer menu/CLI choice after CLI has exited
 
-end:
 
-    mov si, Message2
-    call os_print_string
+;end:
+    ;mov si, Message2
+    ;call os_print_string
+    ;xor ax, ax
+    ;int 0x16   
+    ;int 0x19
+    ;jmp $
 
-    xor ax, ax
-    int 0x16
-    
-    int 0x19
-    jmp $
-    
+
 ;
 ; --------------------------------
 ;
 
 ; 16bit includes.
     ;%include "features/s2metafile.inc"
-    %include "features/s2header.inc"
-    %include "features/s2bpb.inc"
+    ;%include "features/s2header.inc"
+    ;%include "features/s2bpb.inc"
     ;%include "features/s2gdt.inc"
     ;%include "features/s2vesa.inc" 
-    %include "features/s2config16.inc" 
+    ;%include "features/s2config16.inc" 
     ;%include "features/s2a20.inc"
     ;%include "features/s2lib.inc"
     ;%include "features/s2fat12.inc"
     ;%include "features/s2fat16.inc"
     ;%include "features/s2menu16.inc"
     ;%include "features/s2modes.inc"
-    %include "features/s2detect.inc"
-    %include "features/lib16.inc"
+    ;%include "features/s2detect.inc"
+    ;%include "features/lib16.inc"
     ; ...
+    %include "features/cli.inc"
+    %include "features/disk.inc"
+    %include "features/keyboard.inc"
+    %include "features/screen.inc"
 
-   
-    
-    
-;------------------------------
-os_command_line:
-    
-    ;#todo
-
-	;call os_clear_screen
-
-	mov si, version_msg
-	call os_print_string
-	mov si, help_text
-	call os_print_string
-
-get_cmd:				; Main processing loop
- 
-    mov si, prompt			; Main loop; prompt for input
-    call os_print_string
-
-	;mov si, input
-
-	;mov di, exit_string		; 'EXIT' entered?
-	;call os_string_compare
-	;jc near exit
-
-    ret
-
-
-;------------------------------
-g16kernDisplayMessage:
-    lodsb                  ; load next character
-    or al, al              ; test for NUL character
-    jz .g16kern_done_message
-    mov ah, 0x0E           ; BIOS teletype
-    mov bh, 0x00           ; display page 0
-    mov bl, 0x07           ; text attribute
-    int 0x10               ; invoke BIOS
-    jmp g16kernDisplayMessage
-.g16kern_done_message:
-    ret
-
-os_print_string:
-    jmp g16kernDisplayMessage
 
 ; messages
 Message1 db  0x0D, 0x0A, "G16KERN.BIN: 2000H:0H position", 0x00
 Message2 db  0x0D, 0x0A, "G16KERN.BIN: That is all", 0x00
-version_msg		db 'MikeOS ', MIKEOS_VER, 13, 10, 0
-help_text		db 'Commands: DIR, LS, COPY, REN, DEL, CAT, SIZE, CLS, HELP, TIME, DATE, VER, EXIT', 13, 10, 0
+;version_msg		db 'MikeOS ', MIKEOS_VER, 13, 10, 0
+;help_text		db 'Commands: DIR, LS, COPY, REN, DEL, CAT, SIZE, CLS, HELP, TIME, DATE, VER, EXIT', 13, 10, 0
 
-;
-; features: 
-; Everything bellow goes to the features/ folder.
-;
-
-; --------------------------------------------------------------------
-
-	prompt			db '> ', 0
-
-
-; ---------------------------------------------------------------------------
-	Sides dw 2
-	SecsPerTrack dw 18
-; ******************************************************************
-	bootdev db 0			; Boot device number
-; ******************************************************************
 
