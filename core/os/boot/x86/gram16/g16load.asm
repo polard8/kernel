@@ -100,6 +100,8 @@ G_VIDEO_MODE EQU 0x0112    ;640x480
 ; Entry point.
 ; This is the entry point for the BM.BIN.
 ; Jump after the data area.
+; We are at 0:8000H.
+; We load a 32bit image at 2000h:0.
 os_call_vectors:
     jmp bm_main
     ;jmp bm_vector1
@@ -535,14 +537,23 @@ bootmanagerDONE:
 ; executará um shell embutido nesse programa.
 ; Esse shell consegue voltar para 16.
 
-    push WORD 0
-    push WORD AFTER_DATA 
+    ;push WORD 0
+    ;push WORD AFTER_DATA 
+    ;retf
+
+; parameters
+    mov dl, byte [bootmanagerDriveNumber]
+
+; G16KERN.BIN Image entry point.
+    push WORD 0x2000
+    push WORD 0 
     retf
+
 
 ; Fail. 
 ; #todo: Colocar uma mensagem de erro.
 bootmanagerFAILURE:
-    int 0x18
+    ;int 0x18
     jmp $
     ;mov  si, bootmanagermsgFailure
     ;call  bootmanagerDisplayMessage
@@ -656,8 +667,12 @@ bootmanagercluster     dw 0x0000  ; Cluster.
 ; ===============================================
 ; Messages and strings.
 ; File name.
+
+;bootmanager_ImageName:
+;    db "BL      BIN", 0x0D, 0x0A, 0x00
 bootmanager_ImageName:
-    db "BL      BIN", 0x0D, 0x0A, 0x00
+    db "G16KERN BIN", 0x0D, 0x0A, 0x00
+
 ; Strings.
 bootmanagermsgFAT       db  0x0D, 0x0A, "Loading FAT",   0x0D, 0x0A, 0x00
 bootmanagermsgImg       db  0x0D, 0x0A, "Loading Image", 0x0D, 0x0A, 0x00
@@ -822,20 +837,20 @@ stage2_main:
 ;
 
 ; 16bit includes.
-    %include "rm/s2metafile.inc"
-    %include "rm/s2header.inc"
-    %include "rm/s2bpb.inc"
-    %include "rm/s2gdt.inc"
-    %include "rm/s2vesa.inc" 
-    %include "rm/s2config16.inc" 
-    %include "rm/s2a20.inc"
-    %include "rm/s2lib.inc"
-    %include "rm/s2fat12.inc"
-    %include "rm/s2fat16.inc"
-    %include "rm/s2menu16.inc"
-    %include "rm/s2modes.inc"
-    %include "rm/s2detect.inc"
-    %include "rm/lib16.inc"
+    %include "features/s2metafile.inc"
+    %include "features/s2header.inc"
+    %include "features/s2bpb.inc"
+    %include "features/s2gdt.inc"
+    %include "features/s2vesa.inc" 
+    %include "features/s2config16.inc" 
+    %include "features/s2a20.inc"
+    %include "features/s2lib.inc"
+    %include "features/s2fat12.inc"
+    %include "features/s2fat16.inc"
+    %include "features/s2menu16.inc"
+    %include "features/s2modes.inc"
+    %include "features/s2detect.inc"
+    %include "features/lib16.inc"
     ; ...
 
 ; ==============================================================
@@ -871,6 +886,8 @@ AFTER_DATA:
 ;; a etapa de carregamento do arquivo.
 ;; #todo
 ;; Rever essa assinatudo, pois tudo no sistema agora usa ELF.
+
+    ;jmp dont_check_signature
 
 xxx_checkSig:
 
@@ -918,6 +935,11 @@ xxx_checkSig:
     call DisplayMessage
     ;debug
     ;jmp $
+
+; ========
+;dont_check_signature:
+    ;nop
+
 ; Turn off fdc motor.
 xxx_turnoffFDCMotor:
     mov dx, 3F2h 
@@ -927,7 +949,10 @@ xxx_turnoffFDCMotor:
 xxx_setupPS2Mouse:
     mov ax, 0c201h
     int 15h
+
+
 xxx_setupRegisters:
+
     cli
     mov ax, 0 
     mov ds, ax
@@ -1080,7 +1105,7 @@ stage2_msg_pe_sigFound:
 ; Switch to protected mode.
 ; Comuta para o modo protegido.
 
-    %include  "rm/pm.inc"
+    %include  "features/pm.inc"
 
 ;--------------------------------------------------------
 ; 32 bits - (Boot Manager 32bit Asm.)
@@ -1095,70 +1120,70 @@ bootmanager_main:
 ; 14 - Header principal. 
 ; Definições globais usadas em 32bit.
 ; Header principal em 32 bits.
-    %include "header32.inc"
+    %include "extras/header32.inc"
 ; 13 - Headers. 
-    %include "system.inc"     ; Arquivo de configura��o do sistema.
-    %include "init.inc"       ; Arquivo de configura��o da inicializa��o.
-    %include "sysvar32.inc"   ; Variáveis do sistema.
-    %include "x86/gdt32.inc"  ; Gdt
-    %include "x86/idt32.inc"  ; Idt
-    %include "x86/ldt32.inc"  ; Ldt
-    %include "x86/tss32.inc"  ; Tss.
-    %include "stacks32.inc"   ; Stacks
-    %include "x86/ints32.inc"      ; Handles para as interrupções.
-    %include "fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
+    %include "extras/system.inc"     ; Arquivo de configura��o do sistema.
+    %include "extras/init.inc"       ; Arquivo de configura��o da inicializa��o.
+    %include "extras/sysvar32.inc"   ; Variáveis do sistema.
+    %include "extras/x86/gdt32.inc"  ; Gdt
+    %include "extras/x86/idt32.inc"  ; Idt
+    %include "extras/x86/ldt32.inc"  ; Ldt
+    %include "extras/x86/tss32.inc"  ; Tss.
+    %include "extras/stacks32.inc"   ; Stacks
+    %include "extras/x86/ints32.inc"      ; Handles para as interrupções.
+    %include "extras/fs/fat16header.inc"  ; Headers para o sistema de arquivos fat16.
 ; 12 - Monitor.
-    %include "drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
-    %include "drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
-    %include "string32.inc"  ; Rotinas de strings em 32 bits.
-    %include "font32.inc"    ; Fonte.
+    %include "extras/drivers/screen32.inc"  ; Rotinas de screen em 32 bits.
+    %include "extras/drivers/input32.inc"   ; Rotinas de input 2m 32 bits.
+    %include "extras/string32.inc"  ; Rotinas de strings em 32 bits.
+    %include "extras/font32.inc"    ; Fonte.
 ; 11 - Hardware.
-    %include "x86/cpuinfo.inc"  ; Rotinas de detec��o e configura��o de cpu.
-    %include "hardware.inc"     ; Rotinas de detec��o e configura��o de hardware.
+    %include "extras/x86/cpuinfo.inc"  ; Rotinas de detec��o e configura��o de cpu.
+    %include "extras/hardware.inc"     ; Rotinas de detec��o e configura��o de hardware.
     ; ...
 ; 10 - Irqs.
-    %include "drivers/timer.inc"     ; Irq 0, Timer.
-    %include "drivers/keyboard.inc"  ; Irq 1, Keyboard.
-    %include "drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
-    %include "drivers/clock.inc"     ; Irq 8, Clock.
-    %include "drivers/hdd32.inc"     ; Irq 14/15, Hdd.
+    %include "extras/drivers/timer.inc"     ; Irq 0, Timer.
+    %include "extras/drivers/keyboard.inc"  ; Irq 1, Keyboard.
+    %include "extras/drivers/fdc32.inc"     ; Irq 6, Fdc. (@todo: Suspender o suporte.)
+    %include "extras/drivers/clock.inc"     ; Irq 8, Clock.
+    %include "extras/drivers/hdd32.inc"     ; Irq 14/15, Hdd.
     ; ...
 ; 9 - Tasks. (#no tasks)
 ; Rotinas de inicialização do sistema de tarefas.
-    %include "tasks32.inc"   
+    %include "extras/tasks32.inc"   
 ; 8 - lib32.
 ; Rotinas em 32 bits. 
 ; 7 - setup  
 ; Inicializa arquitetura.
-    %include "setup.inc"
+    %include "extras/setup.inc"
 ; 6 - Disk.
-    %include "fs/fat12pm.inc"   ;FAT12 em 32 bits.
-    %include "fs/fat16lib.inc"  ;FAT16 (rotinas).
-    %include "fs/fat16.inc"     ;FAT16 (fun��es principais).
-    %include "fs/ramfs.inc"     ;RamDisk fs.
-    %include "fs/format.inc"    ;Formata.
-    %include "fs/fs32.inc"      ;fs, (ger�ncia os sistemas de arquivos).
+    %include "extras/fs/fat12pm.inc"   ;FAT12 em 32 bits.
+    %include "extras/fs/fat16lib.inc"  ;FAT16 (rotinas).
+    %include "extras/fs/fat16.inc"     ;FAT16 (fun��es principais).
+    %include "extras/fs/ramfs.inc"     ;RamDisk fs.
+    %include "extras/fs/format.inc"    ;Formata.
+    %include "extras/fs/fs32.inc"      ;fs, (ger�ncia os sistemas de arquivos).
 ; 5 - File.
-    %include "installer.inc"   ;Instala metafiles em LBAs espec�ficas.
-    %include "fs/file.inc"     ;Operaçoes com aquivos.
-    %include "bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
+    %include "extras/installer.inc"   ;Instala metafiles em LBAs espec�ficas.
+    %include "extras/fs/file.inc"     ;Operaçoes com aquivos.
+    %include "extras/bootloader.inc"  ;Carrega o Boot Loader (BL.BIN).
 ; 4 - Debug.
 ; System debug.
-    %include "debug.inc"
+    %include "extras/debug.inc"
 ; 3 - blconfig.
 ; Gerencia a inicialização.
-    %include "blconfig.inc"
+    %include "extras/blconfig.inc"
 ; 2 - Boot Manager Mini-Shell.
 ; Prompt de comandos.
-    %include "shell32/shell.inc"
-    %include "shell32/shcalls.inc"  ;Chamadas dos comandos.
-    %include "shell32/shlib.inc"    ;Lib de funções do Shell.
-    %include "shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
+    %include "extras/shell32/shell.inc"
+    %include "extras/shell32/shcalls.inc"  ;Chamadas dos comandos.
+    %include "extras/shell32/shlib.inc"    ;Lib de funções do Shell.
+    %include "extras/shell32/shmsg.inc"    ;Mensagens e variáveis do Shell.
 ; 1 - Start.
-    %include "start.inc"
+    %include "extras/start.inc"
 ; 0 - lib32.
 ;Rotinas em 32 bits.
-    %include "lib32.inc" 
+    %include "extras/lib32.inc" 
 ; ========================================================
 
 ;

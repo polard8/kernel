@@ -141,9 +141,15 @@ cluster     dw  0x0000
 ; It loads a faster version of the boot manager,
 ; with no 32bit-assembly shell.
 ;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+
 ; It loads the legacy version of the boot manager,
 ; with the 32bit-assembly shell.
 ImageName     db "BMSHELL BIN", 0x0D, 0x0A, 0x00
+
+; GRAM16 OS
+; Maybe a mikeos-like kernel
+; for 16 bit applications. XXX.G16
+;ImageName     db "G16LOAD BIN", 0x0D, 0x0A, 0x00
 
 
 ; Message:
@@ -433,6 +439,8 @@ LOADROOT:
     push  cx
     mov  cx, 0x000B       ; Eleven character name.
     mov  si, ImageName    ; Image name to find.
+    ; It prints the image name while comparing each entry.
+    ; Debug purpose.
     pusha
     call  DisplayMessage
     popa
