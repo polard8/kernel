@@ -2,32 +2,12 @@
 	Teams:
 
 ------------------
-Gramado Boot:
-	+ core/control/boot/
-	+ core/control/disk/
-	+ core/control/images/
+Gramado Core
+    boot, kernel, init process and commands.
+------------------
+Gramado Desktop
+    window server, gui apps and graphics engine.
 
------------------
-Gramado Kernel:
-	+ core/control/new/
-	+ core/control/newm0/
-	+ core/exposed/arctic/init/
-
-----------------
-Gramado Posix:
-	+ core/exposed/azure/
-
-----------------
-Gramado DE:
-	+ desktop/
-
-----------------
-Gramland window server:
-	+ desktop/gramland/
-
----------------
-Gramado 3D:
-	+ meta/
 
 
 
