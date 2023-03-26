@@ -54,6 +54,11 @@ get_cmd:				; Main processing loop
 
 ; ---------------------------
 
+	mov di, exit_string		; 'EXIT' entered?
+	call os_string_compare
+	jc near do_exit
+
+
 	mov di, help_string		; 'HELP' entered?
 	call os_string_compare
 	jc near print_help
@@ -83,6 +88,11 @@ execute_bin:
 
     jmp get_cmd
 ; =====================================================================
+
+
+; ------------------------------------------------------------------
+do_exit:
+    RET
 
 
 ; ------------------------------------------------------------------
