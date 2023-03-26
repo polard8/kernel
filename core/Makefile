@@ -109,11 +109,6 @@ build-gramado-os:
 	$(Q)$(MAKE) -C os/boot/x86/bmshell/ 
 # Copy to the target folder.
 	sudo cp os/boot/x86/bin/BMSHELL.BIN  os/disk/
-# ::Build GRAM16.BIN.
-	$(Q)$(MAKE) -C os/boot/x86/gram16/ 
-# Copy to the target folder.
-	sudo cp os/boot/x86/bin/G16LOAD.BIN  os/disk/
-	sudo cp os/boot/x86/bin/G16KERN.BIN  os/disk/
 
 
 # ::Build BL.BIN.

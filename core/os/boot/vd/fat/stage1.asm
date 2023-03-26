@@ -146,11 +146,6 @@ cluster     dw  0x0000
 ; with the 32bit-assembly shell.
 ImageName     db "BMSHELL BIN", 0x0D, 0x0A, 0x00
 
-; GRAM16 OS
-; Maybe a mikeos-like kernel
-; for 16 bit applications. XXX.G16
-;ImageName     db "G16LOAD BIN", 0x0D, 0x0A, 0x00
-
 
 ; Message:
 ; 'R' = Root fail.
