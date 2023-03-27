@@ -1,4 +1,8 @@
 
+; 1 = Starts system GUI.
+; 0 = Starts the Boot Manager CLI.
+finish_saved_boot_option db 0
+
 ; ==============================================================
 ; AFTER_DATA:
 ; Inicio real do stage 2.
@@ -146,7 +150,8 @@ xxx_Config:
 ; Select GUI. 
 ; No bm-shell in 32bit assembly.
     
-    mov al, 1
+    mov al, byte [finish_saved_boot_option]
+    ;mov al, 1
 
     ; Initialize Gramado boot loader.
     cmp al, 1

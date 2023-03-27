@@ -100,15 +100,14 @@ build-gramado-os:
 	-o MBR0.BIN
 	sudo cp MBR0.BIN  os/disk/
 
-
-# ::Build BM.BIN.
+# ::Build BM.BIN. (legacy, no dialog)
 	$(Q)$(MAKE) -C os/boot/x86/bm/ 
 # Copy to the target folder.
 	sudo cp os/boot/x86/bin/BM.BIN  os/disk/
-# ::Build BMSHELL.BIN.
-	$(Q)$(MAKE) -C os/boot/x86/bmshell/ 
+# ::Build BM2.BIN. (Interface with dialog)
+	$(Q)$(MAKE) -C os/boot/x86/bm2/ 
 # Copy to the target folder.
-	sudo cp os/boot/x86/bin/BMSHELL.BIN  os/disk/
+	sudo cp os/boot/x86/bin/BM2.BIN  os/disk/
 
 
 # ::Build BL.BIN.

@@ -184,19 +184,20 @@ String:
 ;
 ;.Printf - String em teletipo.
 ;
+;os_print_string:
 .Printf:	
-    mov ah, 0x0E	
-    mov bh, 0x00	
-    mov bl, 0x07	
-.proxCar:	
-    lodsb		
-    or al, al	
-    jz .volta	
-    int 0x10	
-    jmp .proxCar	
-.volta:
-    ret	
-	
+	pusha
+	mov ah, 0Eh			; int 10h teletype function
+.__repeat:
+	lodsb				; Get char from string
+	cmp al, 0
+	je .__done			; If char is zero, end of string
+	int 10h				; Otherwise, print it
+	jmp .__repeat			; And move on to next char
+.__done:
+	popa
+	ret
+
 ;
 ; .TitleBar - Strings nas barras. in: bx
 ;

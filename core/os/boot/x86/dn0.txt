@@ -8,9 +8,9 @@ bl/
     32 bit bootloader written in C.
     It loader the kernel image.
 bm/
-    Boot manager with no embedded shell.
-bmshell/
     Boot manager with an embedded shell.
+bm2/
+    Boot manager with that fancy dialog.
 setup/
    ?
 

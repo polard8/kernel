@@ -1,9 +1,10 @@
 
 # Create BM.BIN.
-# No shell.
-# This is faster version of the boot manager.
-# It initializes the pre-selected graphics mode
-# and jumps into the BL.BIN.
+# It initializes the bm-shell in 32bit assembly.
+# In this shell we can select the graphics mode
+# switching back to realmode.
+# This was the legacy version of this program.
+#
 
 all: asm-stuff cp-stuff clean
 	@echo "BM.BIN OK ?"

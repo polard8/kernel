@@ -138,13 +138,15 @@ cluster     dw  0x0000
 ; ---------------------------
 ; The image name.
 
-; It loads a faster version of the boot manager,
-; with no 32bit-assembly shell.
-;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
-
+; legacy boot
 ; It loads the legacy version of the boot manager,
 ; with the 32bit-assembly shell.
-ImageName     db "BMSHELL BIN", 0x0D, 0x0A, 0x00
+;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+
+; It loads a faster version of the boot manager,
+; with no 32bit-assembly shell.
+; boot manager with dialog.
+ImageName     db "BM2     BIN", 0x0D, 0x0A, 0x00
 
 
 ; Message:
