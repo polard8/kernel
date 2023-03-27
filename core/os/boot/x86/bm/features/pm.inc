@@ -17,6 +17,15 @@
 ;     2016 - Revision.
 
 
+; ===================================================
+
+; Trampoline.
+; pm
+; Switch to protected mode.
+; Comuta para o modo protegido.
+
+
+
 ; ===========================================================
 ; pmInit:
 ;     Switching to Protected Mode.

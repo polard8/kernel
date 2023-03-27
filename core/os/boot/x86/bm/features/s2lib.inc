@@ -1,10 +1,32 @@
 ;
-; File: lib16/s2lib.inc
-;
+; File: s2lib.inc
 ;     Funções utilizadas pelo Stage 2.
-;
 ; 2015 - Created by Fred Nora.
 ;
+
+; ==================================
+; stage2Shutdown:
+;     Shutdown the machine via APM.
+;     16bit, real mode, using BIOS.
+
+stage2Shutdown:
+; Connect to APM API
+    MOV  AX, 5301h
+    XOR  BX, BX
+    INT  15h
+; Try to set APM version (to 1.2)
+    MOV  AX, 530Eh
+    XOR  BX, BX
+    MOV  CX, 0102h
+    INT  15h
+; Turn off the system
+    MOV  AX, 5307h
+    MOV  BX, 0001h
+    MOV  CX, 0003h
+    INT  15h
+; Exit 
+; (for good measure and in case of failure)
+    RET
 
 
 ;-----------------------------------
