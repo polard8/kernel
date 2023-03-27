@@ -129,58 +129,21 @@ debug:
 ;--
 
 
-;==============================================================
-; do_save:
-;     Torna permanente as alterações de 
-;     inicialização e partições.
-;++
+; Nothing for now.
 do_save:
-    ;pushad
-    ;Torna permanente as alterações de inicialização.
-    ;call blconfig_salvar_alteracoes   
-    ;Torna permanente as alterações nas partições.
-    ;call fs32_save_current_partition  
-    ;popad
     jmp os_command_line
-;--
 
-
-;==============================================================
-; do_formatdisk:
-;     Formata um disco.
-;++	
-
+; Nothing for now.
 do_formatdisk:
-    ;pushad
-    ;call format_disk
-    ;popad
     jmp os_command_line
-;--
 
-;==============================================================
-; do_make_boot:
-;     Cria diretórios e arquivos para Boot.
-;++
+; Nothing for now.
 do_make_boot:  
-    ;pushad
-    ;call make_boot
-    ;popad
     jmp os_command_line
-;--
 
-;==============================================================
-; do_install:
-;     Transfere conteúdo do disco 
-;     de uma lba para outra.
-;     (da area reservada(lba 1024) para o sistema de arquivos.)
-;++
+; Nothing for now.
 do_install:
-    ;#suspensa!
-    ;call install_bootloader ; instala o bootloader.
-    ;mov eax, file1_string 
-    ;call installer      ;executa o installer
     jmp os_command_line
-;--
 
 ;==============================================================
 ; do_set_modo1:
@@ -332,17 +295,13 @@ do_deletedir:
     jmp os_command_line
 ;--
 
-;==============================================================
-; do_changedir:
-;      Muda o diretório atual.
+; Nothing for now.
 do_changedir:
     jmp os_command_line
 
-;==============================================================
-; ls:
-; lista os arquivos.
-; Apresentação no estilo unix.
+; Nothing for now.
 ls:
+    ;jmp dir
     jmp os_command_line
 
 ;==============================================================
@@ -573,20 +532,16 @@ shellcallsFail:
     jmp os_command_line
 ;--
 
-; #deprecated.
-;os_bmfs_file_list:
-;    ret 
 
-; #deprecated.
+; Nothing for now.
 testzone:
     jmp os_command_line
-;--
 
 ;; debug messages
 debug_message_fixme2_loading_sector:  
     db "[FIXME]: Loading sector on real machine?", 13, 10, 0
 
 ;
-; End.
+; End
 ;
 

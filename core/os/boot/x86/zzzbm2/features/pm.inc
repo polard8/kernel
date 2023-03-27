@@ -206,12 +206,12 @@ Gramado_pm32:
 
 ;;===========================================================
 ;; rmShutdown:
-;;     Desliga a máquina fica APM. Não tem argumentos. 
-;;     Obs: Estamos usando a gdt do módulo de 32 bit
-
+;; Desliga a máquina fica APM. Não tem argumentos. 
+;; Obs: Estamos usando a gdt do módulo de 32 bit
 ;; Called by do_shutdown in shcalls.inc
 
 rmShutdown:
+; Called by shcalls.inc
 
     mov ax, DATA_SEL    
     mov ds,ax
@@ -342,10 +342,10 @@ do_rm:
     ;mov si, rm_shutdown_msg1
     ;call DisplayMessage
 
-.doShutdown:
 ; See: main.asm
-
+.doShutdown:
     call stage2Shutdown
+    jmp s2_FAILURE
     jmp $
 
 ;;
@@ -371,22 +371,23 @@ rm_shutdown_msg1:
 
 ;; ====================================================================
 ;; rmStartGUI:
-;; 
-;;     Inicializa o modo gráfico padrão.
-;;     Essa rotina está em 32bit e foi chamada pelo shell. 
-;;     Essa rotina poderá ser chamada pelo shell em 32 bit modo texto,
-;;     que está dentro do boot manager. 
-;;     Obs: 
-;;     Estamos usando a gdt do módulo de 32 bit      
-;;
-;; ****  IMPORTANTE  ****
+;; Inicializa o modo gráfico padrão.
+;; Essa rotina está em 32bit e foi chamada pelo shell. 
+;; Essa rotina poderá ser chamada pelo shell em 32 bit modo texto,
+;; que está dentro do boot manager. 
+;; Obs: 
+;; Estamos usando a gdt do módulo de 32 bit      
+;; IMPORTANTE
 ;; BL.BIN já foi carregado por BM.BIN usando os recursos do BIOS.
 ;; Só nos resta passar o comando para BL.BIN.
-;;
-
 ;; Called by do_boot in shcalls.inc
 
 rmStartGUI:
+; Called by shcalls.inc
+; #todo
+; We can receive an argument with a pointer
+; to the name of the image. And load the image
+; at the default address 2000H:0H.
 
     mov ax, DATA_SEL 
     mov ds, ax
@@ -404,9 +405,7 @@ rmStartGUI:
 ; somente o seletor para modo protegido de 16 bit.
 
     jmp RM_Code_Sel:pmode_16bit_startgui
-
 [BITS 16]
-
 pmode_16bit_startgui:
 
 ; Ajusta os seletores de código para 
@@ -422,35 +421,30 @@ pmode_16bit_startgui:
     ;debug
     ;jmp $
 
-    ; Carrega ivt = 0:0
+; Load IVT;
+; Address 0h:0h
 
     lidt [ivtr_rm] 
 
 ; 5. 
-; Clear the PE flag in the CR0 register to switch to real-address mode.
-
+; Clear the PE flag in the CR0 register to 
+; switch to real-address mode.
 
    mov eax, cr0
    and al, 0xFE
    mov cr0, eax
 
-
-;; ###############################################################
-;; 6. 
-;; Execute a far JMP instruction to 
-;; jump to a real-address mode program. 
-;; This operation flushes the instruction queue and 
-;; loads the appropriate base and 
-;; access rights values in the CS register.
-;;
-
-;; #importante:
-;; Usando um jmp de 16 bit modo real.
+; 6. 
+; Execute a far JMP instruction to 
+; jump to a real-address mode program. 
+; This operation flushes the instruction queue and 
+; loads the appropriate base and 
+; access rights values in the CS register.
+; #important:
+; Usando um jmp de 16 bit modo real.
 
     JMP 0:do_rm_startgui 
-
     ;; Nothing.
-
 do_rm_startgui:
 
 ;; 7. 
@@ -458,56 +452,56 @@ do_rm_startgui:
 ;; real-address mode code. If any of the registers are not going 
 ;; to be used in real-address mode, write 0s to them.
 
-;; Segmento 0
-
     cli
+
+; Segments
     mov ax, 0x0000
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
-
-    ; Create stack
+; Create stack
     mov ax, 0x0000
     mov ss, ax
     mov sp, 0xFFFF
 
-;; Reprogram PIC: 
-;; Voltando ao estado legado.
-;; Changes: 
-;; IRQ 0-7 to INT 08h-0Fh  
-;; IRQ 8-15 to INT 70h-77h
+; PIC.
+; Reprogram PIC: 
+; Voltando ao estado legado.
+; Changes: 
+; IRQ 0-7 to INT 08h-0Fh  
+; IRQ 8-15 to INT 70h-77h
 
-    mov al, 10001b       ; Begin PIC 1 initialization.
+    mov al, 10001b    ; Begin PIC 1 initialization.
     out 20h, al
-    mov al, 10001b       ; Begin PIC 2 initialization.
+    mov al, 10001b    ; Begin PIC 2 initialization.
     out 0A0h, al
 
-    mov al, 08h          ; IRQ 0-7: back to ints 8h-Fh.
+    mov al, 08h       ; IRQ 0-7: back to ints 8h-Fh.
     out 21h, al
 
-    mov al, 70h          ; IRQ 8-15: back to ints 70h-77h.
+    mov al, 70h       ; IRQ 8-15: back to ints 70h-77h.
     out 0A1h, al
 
-    mov al, 100b         ; Slave connected to IRQ2.
+    mov al, 100b      ; Slave connected to IRQ2.
     out 21h, al
     mov al, 2
     out 0A1h, al
-    mov al, 1            ; Intel environment, manual EOI.
+    mov al, 1         ; Intel environment, manual EOI.
     out 21h, al
     out 0A1h, al
     in al, 21h
 
+; Enable interrupts
 ; Mask off all interrupts for now. 
 ; PERMITE TODAS AS INTS.
-; Enable interrupts
 
     mov al, 0
     out 0x21, al
     out 0xA1, al
 
-; #importante
 ; Renable interrupts.
+; #important
 
     sti 
 
@@ -586,7 +580,6 @@ do_rm_startgui:
     ;; #todo
     ;; Some routine needs to get this value for us
     ;; in the root dir, entry 'B'RAMADO. 'B' means boot configuration.
-    ;;
     
     ;; Pegamos a que nos foi oferecida 
     ;; pelo comando de boot.
@@ -687,33 +680,31 @@ do_rm_startgui:
     
 ____gramado_mode_done:
 
-;; Saving the gramado mode in a tmp variable.
-;; We will save in the boot block in the future.
-;; See: bootloader.inc. Defined here.
-;; See: start.inc. Where we setup the boot block
-    
+; Saving the gramado mode in a tmp variable.
+; We will save in the boot block in the future.
+; See: bootloader.inc. Defined here.
+; See: start.inc. Where we setup the boot block
+; #bugbug
+; Here we're using 32bit address because
+; a20 is enabled.
     xor eax, eax
     mov al, byte [META$FILE.GRAMADO_MODE]
     mov dword [tmp_gamemode], eax
-    
-    
-    ; Set mode.
-    ; gui or cli.
+
+; Set mode.
+; gui or cli.
     mov al, byte BOOTMODE_GUI
     call set_boot_mode
 
-; See: stage2/lib16/s2modes.inc
-
+; See: 
+; s2modes.inc
     JMP s2modesActivateMode 
     JMP $
-
 
 ;; Mensagens para a rotina de shutdown.
 rm_startgui_msg1: 
     db  'pm.inc: [RM] Press a key to start GUI', 13, 10, 0
 ; ...
-
-
 
 ;;
 ;; ===========================================================
@@ -724,7 +715,7 @@ rm_startgui_msg1:
 ;; Temos que mudar para 32bit [bits 32]
 ;; para não estragar codigos subsequêntes.
 
-[bits 32]
+;[bits 32]
 
 ;
 ; End.

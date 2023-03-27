@@ -141,12 +141,19 @@ cluster     dw  0x0000
 ; legacy boot
 ; It loads the legacy version of the boot manager,
 ; with the 32bit-assembly shell.
-;ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
+ImageName     db "BM      BIN", 0x0D, 0x0A, 0x00
 
+
+; #BUGBUG 
+; Suspended!!!!
+; Something is affecting the window server,
+; if we enter in the graphics mode without entering
+; the shell first. There are two routines 
+; to initialize the gui mode. Only one is good.
 ; It loads a faster version of the boot manager,
 ; with no 32bit-assembly shell.
 ; boot manager with dialog.
-ImageName     db "BM2     BIN", 0x0D, 0x0A, 0x00
+;ImageName     db "BM2     BIN", 0x0D, 0x0A, 0x00
 
 
 ; Message:

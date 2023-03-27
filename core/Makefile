@@ -104,10 +104,17 @@ build-gramado-os:
 	$(Q)$(MAKE) -C os/boot/x86/bm/ 
 # Copy to the target folder.
 	sudo cp os/boot/x86/bin/BM.BIN  os/disk/
+
+# #BUGBUG 
+# Suspended!!!!
+# Something is affecting the window server,
+# if we enter in the graphics mode without entering
+# the shell first. There are two routines 
+# to initialize the gui mode. Only one is good.
 # ::Build BM2.BIN. (Interface with dialog)
-	$(Q)$(MAKE) -C os/boot/x86/bm2/ 
+#	$(Q)$(MAKE) -C os/boot/x86/bm2/ 
 # Copy to the target folder.
-	sudo cp os/boot/x86/bin/BM2.BIN  os/disk/
+#	sudo cp os/boot/x86/bin/BM2.BIN  os/disk/
 
 
 # ::Build BL.BIN.

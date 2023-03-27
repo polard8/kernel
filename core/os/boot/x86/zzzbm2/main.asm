@@ -16,7 +16,8 @@
 ; The only way to change the resolution for now is 
 ; changing a global variable in this document.
 ; History:
-;     2005 - Created by Fred Nora. 
+; 2005 - Created by Fred Nora. 
+; Credits: MikeOS (License: BSD).
 ;---------------------------------------------------
 ; #importante
 ; This image was loaded in 0H:8000H.
@@ -53,9 +54,7 @@
 ;       |          |
 ;       +----------+
 
-	%DEFINE MIKEOS_VER '4.7.0'	; OS version number
-	%DEFINE MIKEOS_API_VER 18	; API version for programs to check
-
+	%DEFINE GBM_VER '1.1'	; version number
 
 [ORG 0x8000]
 
@@ -328,21 +327,33 @@ restart_loop:
 ;
 load_stuff:
     call Window.ClearScreen
-    ; This routine will jump to AFTER_DATA.
-    jmp test_load_bl_image
+    
+; IN:
+; ax = pointer to the image name.
+    ;mov ax, word bootmanager_ImageName1
+    ;call test_load_bl_image
+    mov ax, word bootmanager_ImageName2
+    call test_load_bl_image
+
+    ; see: finish.inc
+    push WORD 0
+    push WORD AFTER_DATA 
+    retf
+
+bootmanager_ImageName1:  db "BL      BIN", 0x0D, 0x0A, 0x00
+bootmanager_ImageName2:  db "BL      BIN", 0x0D, 0x0A, 0x00
 
 ;-------------------------------------------------------------
 
 	; Data for the above code...
 
-	;os_init_msg     db 'Welcome to MikeOS', 0
 	os_init_msg     db 'Gramado Boot Manager', 0
-	;os_version_msg  db 'Version ', MIKEOS_VER, 0
+	;os_version_msg  db 'Version ', GBM_VER, 0
 	os_version_msg  db ':) ', 0
 	
 	dialog_string_1  db 'Please select an option:', 0
 	dialog_string_2  db '+ [OK] to initialize the system       ', 0
-	dialog_string_3  db '+ [ Cancel] for command line          ', 0
+	dialog_string_3  db '+ [Cancel] for command line           ', 0
 
     ;mov si, bootmanagermsgCRLF
     ;call bootmanagerDisplayMessage

@@ -7,16 +7,13 @@
 ; no estilo mikeos.
 ;
 
-; ========================================
-; Carregar root.
-; Where? es:bx  0:0x1000
-
-test_load_bl_image:
-    nop
+;----------------------------------------------   
+; Simply load the root dir.
+; 0:0x1000
 bootmanager_LOADROOT:
 
 ; Compute size of root directory and store in "cx".
-
+    pusha
     xor cx, cx
     xor dx, dx
     mov ax, 0x0020                        ; 32 byte directory entry.
@@ -46,8 +43,9 @@ bootmanager_LOADROOT:
     mov ax, word [ROOTDIRSTART]  ; Inicio do root.
     mov cx, word [ROOTDIRSIZE]   ; Tamanho do root.
     mov bx, 0x1000               ; root_buffer. Copy root dir above bootcode
-    call bootmanagerReadSectors
+    call diskReadSectors  ;bootmanagerReadSectors
 
+    ; not needed
     pusha
     mov si, bootmanagermsgCRLF
     call bootmanagerDisplayMessage
@@ -55,119 +53,124 @@ bootmanager_LOADROOT:
 
     ;Debug breakpoint.
     ;jmp $
+    popa
+     
+    ret
+
+;----------------------------
+
+; --------------------------------
+; 
+search_image_name:
+
+    pusha
 
     ;Browse root directory for binary image.
     mov cx, WORD [bootmanagerMaxRootEntries]  ; Load loop counter.
     mov di, 0x1000                            ; root_buffer, 0x1000, locate first root entry. ?
-.bootmanagerLOOP:
-    push cx
+
+._loop:
+
+    push cx  ;++Contador de chars
     mov cx, 0x000B                 ; eleven character name
-    mov si, bootmanager_ImageName  ; image name to find
+    ;mov si, bootmanager_ImageName  ; image name to find
+    mov si, word [image_name_pointer]
     pusha
     call bootmanagerDisplayMessage
     popa
     push di
     rep cmpsb                       ; test for entry match
     pop di
-    je bootmanager_LOADFAT
-    pop cx
+    je ._image_found  ;bootmanager_LOADFAT
+    pop cx  ;--Contador de chars
+
     add di, 0x0020                  ; queue next directory entry
-    loop .bootmanagerLOOP
-    jmp bootmanagerFAILURE
+    loop ._loop
 
+; The image was NOT found in the root directory.
+._image_not_found:
+    popa
+    jmp diskFailure
 
+; The image was found in the root directory.
+._image_found:
+    pop cx  ;--Contador de chars
+
+    ; 'di' has the pointer to the entry
+    ; where we found the image name.
+
+    mov ax, di
+    mov word [entry_address], ax
+    
+    popa
+    ret
+    
 ; -------------------------------------
-; Load FAT.
+entry_address: dw 0
+
+
+;---------------------------------------------
+; Load FAT
+real_load_fat:
 ; Where? es:bx  0:0x1000
 
-;; Se o nome for encontrado.
-bootmanager_LOADFAT:
+    pusha
 
     pusha
     mov si, bootmanagermsgFAT
     call bootmanagerDisplayMessage
     popa
 
-    ; Debug breakpoint.
-    ;mov ah, 0x00
-    ;int 0x16
-
-; Save starting cluster of boot image.
-; Offset '0x001A' of the entry that starts in 'di'.
-; After saving we can override the root.
-    mov dx, WORD [di + 0x001A]
-    mov WORD [bootmanagercluster], dx  ; file's first cluster.
-
-; #BUGBUG ?
-; NAO ESTAMOS CARREGANDO A FAT INTEIRA.
-; CARREGAR A FAT INTEIRA DA PROBLEMA.
-
 ; Read FAT into memory (es:bx).?? Onde ??
 ; ?? 0:0x1000 
 ; ?? Qual é o segmento e o offset da FAT ??
 
+    pusha
     mov ax, 0 
     mov es, ax
-
 ; Compute location of FAT and store in "ax".
-
     mov ax, WORD [bootmanagerHiddenSectors]    ; adjust for bootsector.
     add ax, WORD [bootmanagerReservedSectors]  ; lba inicial da fat ?.
     mov cx, 8         ; (apenas 8 setores da fat.) (246/2)  ;; metade da fat  WORD [bootmanagerSectorsPerFAT]
     mov bx, 0x1000    ; fat_buffer ; copy FAT above bootcode.
-    call bootmanagerReadSectors
-
-; Nesse momento ja carregamos a FAT.
-
-    ;Debug breakpoint. 
-    ;jmp $
+    call diskReadSectors  ;bootmanagerReadSectors
+    popa
+    
+    popa
+    ret
 
 ; -----------------------------------------
 ; Load image.
 ; Read image file into memory (0x2000:0)(es:bx)
 ; Destination for the image.
 ; es:bx = (2000:0).
+real_load_image:
 
-; Message.
-    mov si, bootmanagermsgImg
-    call bootmanagerDisplayMessage
+    pusha
 
-; Opçao de mensagem.
-; mov si, bootmanagermsgCRLF
-; call bootmanagerDisplayMessage
-
-; Boot loader image.
+; --------------------------------
+; Ajust the image segment.
+; Es:bx para a imagem.
     mov ax, 0x2000 
     mov es, ax
     mov bx, 0x0000
-
-;
-; Ajust fat segment.
-; 
-
-; gs:bx para a FAT.
-; FAT segment.
 ; Salva o offset da imagem.
-
     push bx 
 
+; --------------------------------
+; Ajust FAT segment.
+; gs:bx para a FAT.
     mov ax, 0 
     mov gs, ax 
 
-;
 ; Loading the image.
-;
-
-bootmanager_LOADIMAGE:
-
+loop_bootmanager_LOADIMAGE_Sector:
     mov ax, WORD [bootmanagercluster]  ; Cluster to read.
     pop bx                             ; Buffer to read into (offset da imagem).
-    call bootmanagerClusterLBA         ; Convert cluster to LBA.
-
+    call diskClusterLBA  ;bootmanagerClusterLBA         ; Convert cluster to LBA.
     xor cx, cx
     mov cl, BYTE 1    ;[bootmanagerSectorsPerCluster] ;sectors to read.
-    call bootmanagerReadSectors
-
+    call diskReadSectors  ;bootmanagerReadSectors
     push bx
     ;Compute next cluster.
     mov ax, WORD [bootmanagercluster]  ; Identify current cluster.
@@ -178,28 +181,88 @@ bootmanager_LOADIMAGE:
     mov dx, WORD [gs:bx]               ; Read two bytes from FAT.
 .bootmanagerDONE:
     mov WORD [bootmanagercluster], dx  ; store new cluster.
-
 ; EOF
 ; 0x0FF0 test for end of file.
-
+; Se o loop voltar, então tem o pop em cima,
+; se não voltar, entaõ tem o pop em baixo.
     cmp dx, 0xFFFF
-    jne bootmanager_LOADIMAGE
-    ;jnb bootmanager_LOADIMAGE 
+    jne loop_bootmanager_LOADIMAGE_Sector
+    pop bx
 
+;---------------------------------------
+; The image was loaded.
 bootmanagerDONE:
+
     mov si, bootmanagermsgDONE
     call bootmanagerDisplayMessage
-    
+
+    popa
+    ret
+
     ; see: finish.inc
-    push WORD 0
-    push WORD AFTER_DATA 
-    retf
+    ;push WORD 0
+    ;push WORD AFTER_DATA 
+    ;retf
+
+; ========================================
+; :)
+; Load the image.
+; (load fat, root and image).
+; IN:
+; ax = pointer to the image name.
+test_load_bl_image:
+; Carregamos uma imagem cujo ponteiro para o nome
+; esta e 'ax'.
+; #todo:
+; Podemos carregar o boot loader e mudarmos para 32bit ou
+; uma aplicação em 16 e permanecermos em 16bit.
+
+    pusha
+
+    ;cmp ax, 0
+    ;je diskFailure
+
+; save the pointer to the image name
+    mov word [image_name_pointer], ax
+
+    ; Simply load the root dir at 0h:0x1000.
+    call bootmanager_LOADROOT
+
+    ; Search the name and 
+    ; save the entry address in [entry_address]. 
+    call search_image_name
+
+; Save starting cluster of boot image.
+; Offset '0x001A' of the entry that starts in 'di'.
+; After saving we can override the root.
+    ; Parameter
+    mov ax, word [entry_address]
+    mov di, ax
+    mov dx, WORD [di + 0x001A]
+    mov WORD [bootmanagercluster], dx  ; file's first cluster.
+
+    ; Where? es:bx  0:0x1000
+    call real_load_fat
+
+    ;pusha
+
+    ; Message.
+    mov si, bootmanagermsgImg
+    call bootmanagerDisplayMessage
+    
+    call real_load_image
+
+    popa
+    ret
+
+image_name_pointer: dw 0
 
 ;---------------------------------------------
     
 ; Fail. 
 ; #todo: Colocar uma mensagem de erro.
 bootmanagerFAILURE:
+diskFailure:
     int 0x18
     jmp $
     ;mov  si, bootmanagermsgFailure
@@ -213,7 +276,8 @@ bootmanagerFAILURE:
 ; "es:bx".
 ;     Carrega na mem�ria, em es:bx, 'cx' setores do disco, come�ando pela 
 ; LBA 'ax'.
-bootmanagerReadSectors:
+diskReadSectors:
+;bootmanagerReadSectors:
     mov WORD [bootmanagerDAPBuffer], bx
     mov WORD [bootmanagerDAPBuffer+2], es
     mov WORD [bootmanagerDAPStart], ax
@@ -270,7 +334,8 @@ bootmanagerReadSectors:
 ; convert FAT cluster into LBA addressing scheme
 ; LBA = (cluster - 2) * sectors per cluster
 
-bootmanagerClusterLBA:
+diskClusterLBA:
+;bootmanagerClusterLBA:
     sub ax, 0x0002     ; zero base cluster number.
     xor cx, cx
     mov cl, BYTE  1    ;[bootmanagerSectorsPerCluster] ; convert byte to word.
@@ -301,7 +366,7 @@ bootmanagercluster     dw 0x0000  ; Cluster.
 ; Messages and strings.
 ; File name.
 
-bootmanager_ImageName:  db "BL      BIN", 0x0D, 0x0A, 0x00
+;bootmanager_ImageName:  db "BL      BIN", 0x0D, 0x0A, 0x00
 
 ; Strings.
 bootmanagermsgFAT       db  0x0D, 0x0A, "Loading FAT",   0x0D, 0x0A, 0x00

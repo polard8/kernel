@@ -2,6 +2,7 @@
 ; File: s2lib.inc
 ;     Funções utilizadas pelo Stage 2.
 ; 2015 - Created by Fred Nora.
+; Credits: MikeOS. (License: BSD).
 ;
 
 ; ==================================
@@ -88,8 +89,6 @@ s2_turnoff_motor:
 ;;==================================
 ; s2_setup_registers:
 ;     Configura os registradores.
-;
-
 s2_setup_registers: 
     cli
     ;; data
@@ -111,9 +110,7 @@ s2_setup_registers:
 ;; ===========================
 ; DisplayMessage:
 ;     Mostra uma string.
-
 ;s2libDisplayMessage:
-
 DisplayMessage:
     mov ah, 0x0E
     mov bh, 0x00
@@ -132,18 +129,16 @@ PoeString:
     jmp DisplayMessage
     jmp $
 
-
 ;-----------------------------------
 ; String:
 ;     Rotinas de string.
 ;     Variável global.
-;
 ;++
 String:
-;
+
+; -----------------------------------------------------------------
 ; .Length - Return length of a string
 ; IN: AX = string location, OUT AX = length (other regs preserved)
-;
 .Length:               ;; comprimento da string
 	pusha
 
@@ -161,11 +156,10 @@ String:
 	mov ax, [.tmp_counter]
 	ret
 	.tmp_counter:	dw 0
-	
-; 
+
+; -----------------------------------------------------------------
 ; .Copy - Copy one string into another
 ; IN/OUT: SI = source, DI = destination
-;
 .Copy:
 	pusha
 .cmore:
@@ -180,11 +174,11 @@ String:
 	mov byte [di], 0	; Write terminating zero
 	popa
 	ret
-	
-;
+
+; -----------------------------------------------------------------
 ;.Printf - String em teletipo.
-;
 ;os_print_string:
+; #todo: Change to '.Print'
 .Printf:	
 	pusha
 	mov ah, 0Eh			; int 10h teletype function
@@ -198,9 +192,8 @@ String:
 	popa
 	ret
 
-;
+; -----------------------------------------------------------------
 ; .TitleBar - Strings nas barras. in: bx
-;
 .TitleBar:
     push bx
 	mov dh, 0
@@ -216,9 +209,8 @@ String:
 	popa
     ret
 
-;
+; -----------------------------------------------------------------
 ; .MenuBar - Barra de menu. in: bx
-;
 .MenuBar:
     push bx
 	mov dh, 1
@@ -234,10 +226,9 @@ String:
 	call String.Printf
 	popa
 	ret
-	
-;
+
+; -----------------------------------------------------------------
 ; .StatusBar - Barra de status. in: bx
-;
 .StatusBar:
     push bx
 	mov dh, 23
@@ -253,10 +244,9 @@ String:
 	call String.Printf
 	popa
     ret
-	
-;
+
+; -----------------------------------------------------------------
 ; .TaskBar - Barra de tarefas. in: bx
-;
 .TaskBar:
     push bx
 	mov dh, 24
@@ -362,7 +352,6 @@ Window:
 	popa
 	ret
 
-
 ; -----------------------------------------------------------------
 ; draw_block -- Render block of specified colour
 ; IN: BL/DL/DH/SI/DI = colour/start X pos/start Y pos/width/finish Y pos
@@ -439,14 +428,10 @@ Window:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;--
 
-
-;
 ;Draw_Line; 
-;
 ;ah = color
 ;dh = coluna 
 ;dl = linha
-;
 Draw_Line:
 	call Cursor.Move
 	mov ah, 7h ;cor
@@ -478,7 +463,6 @@ Io:
 	ret
 	.wk_tmp_buf:	dw 0
 
-
 ; -----------------------------------------------------------------
 ;.PutCh - print character (int 21h, AH = 2h)
 .PutCh:
@@ -503,18 +487,18 @@ Io:
 	ret
 	.gc_tmp: db 0
 
-	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Device - rotinas relacionadas a dispositivos.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;++
 Device:
 
+; -----------------------------------------------------------------
 ;reboot system.
 .Reboot:
     mov al, 0xFE
-	out 0x64, al
-	jmp $
+    out 0x64, al
+    jmp $
 
 ; -----------------------------------------------------------------
 ; Reset floppy drive
@@ -553,8 +537,7 @@ Device:
 msg1_hd  db "", 0
 msg2_hd  db "", 0
 
- 
-    
+
 ;
-; End.
-;	 
+; End
+; 
