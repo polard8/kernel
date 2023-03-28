@@ -345,11 +345,9 @@ void restore_current_context (void)
 
 // Restore CR3 and flush TLB.
     load_pml4_table ( (unsigned long) t->pml4_PA );
-    
-    // #bugbug: rever isso.
+// #bugbug: rever isso.
     asm ("movq %cr3, %rax");
     asm ("movq %rax, %cr3");
-
 //done:
     return;
 fail1:
@@ -365,15 +363,9 @@ int contextCheckThreadRing3Context (int tid)
 {
     struct thread_d  *t;
 
-    //...
-
-// Limits.
-// Erro. Status.
-
     if ( tid < 0 || tid >= THREAD_COUNT_MAX ){
         return FALSE;
     }
-
     t = (void *) threadList[tid]; 
     if ( (void *) t == NULL ){
         return FALSE;

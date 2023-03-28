@@ -442,7 +442,7 @@ ____go:
 
 // --------------------------------
 // bl_main:
-// Called by _OS_Loader_Entry_Point in head.s.
+// Called by StartLoader in head.s.
 // This is the entrypoint for the C part of the boot loader.
 // + Load the kernel image.
 // + Setup paging and the base pagetables used by the kernel.

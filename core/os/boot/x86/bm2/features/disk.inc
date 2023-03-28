@@ -114,6 +114,10 @@ entry_address: dw 0
 real_load_fat:
 ; Where? es:bx  0:0x1000
 
+; #bugbug
+; We're not loading the whole FAT table.
+; Only 8 sectors of 246.
+
     pusha
 
     pusha

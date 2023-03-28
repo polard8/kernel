@@ -23,6 +23,7 @@ int I_kmain(int arch_type)
         enable_serial_debug();
     }
 
+// see: init.c
     return (int) I_init_main(current_arch);
 }
 

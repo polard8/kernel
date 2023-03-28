@@ -9,6 +9,7 @@
 // Sent us a system message.
 static int caller_tid =-1;
 
+//-----------------------------------------
 
 static int __idlethread_loop(void);
 static void do_hello(int src_tid);
@@ -20,8 +21,8 @@ __Procedure (
     int msg, 
     unsigned long long1, 
     unsigned long long2 );
-// ===========================
 
+// ===========================
 
 // #test Hello.
 // Responding the hello.
@@ -36,6 +37,9 @@ static void do_hello(int src_tid)
 
     printf("init.bin: [44888] Hello received from %d\n", 
         src_tid );
+
+    //if (dst_tid<0)
+        //return;
 
 // -------------
 // Reply: 

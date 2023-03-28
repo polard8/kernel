@@ -662,7 +662,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 
 
         //----------------------------------------------------
-        // Use Cross-Product to get surface normal
+        // Use Cross-Product to get surface normal.
         struct gr_vecF3D_d normal; 
         struct gr_vecF3D_d line1; 
         struct gr_vecF3D_d line2;
@@ -684,7 +684,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             (float) sqrt( (double)
                         ( normal.x*normal.x + 
                           normal.y*normal.y + 
-                          normal.z*normal.z) );
+                          normal.z*normal.z ) );
 
         normal.x = (float) (normal.x/l); 
         normal.y = (float) (normal.y/l); 
@@ -696,6 +696,12 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 
         // #test
         // Considering the camera position.
+        // One method of implementing back-face culling is by 
+        // discarding all triangles where the dot product of 
+        // their surface normal and the camera-to-triangle 
+        // vector is greater than or equal to zero.
+        // see:
+        // https://en.wikipedia.org/wiki/Back-face_culling
         if (CurrentCameraF.initialized == FALSE){ return; }
         float tmp = 
              (float) (

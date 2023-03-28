@@ -1,20 +1,17 @@
 
 # Build Gramado OS.
 
-PHONY := all
-all: step2-desktop step3-core
+PHONY := secret-chord
+secret-chord: step2-desktop step3-core
 	@echo "Done"
 
-#A15
 PHONY := step2-desktop
 step2-desktop:
 	make -C  desktop
 
-#E25
 PHONY := step3-core
 step3-core:
 	make -C  core
-
 
 PHONY := clean
 clean: clean-all

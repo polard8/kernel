@@ -122,28 +122,22 @@ void dispatcher(int type)
 
 dispatch_current:
 
-// tid
-    if ( current_thread < 0 || 
-         current_thread >= THREAD_COUNT_MAX )
-    {
+// Target thread.
+
+    if ( current_thread < 0 || current_thread >= THREAD_COUNT_MAX ){
         panic("dispatcher: current_thread\n");
     }
-
-// pointer
     TargetThread = (void *) threadList[current_thread];
-
     if ( (void *) TargetThread == NULL ){
         panic ("dispatcher: TargetThread\n");
     }
-
-// validation
-    if ( TargetThread->magic != 1234 ){
+    if (TargetThread->magic != 1234){
         panic ("dispatcher: magic\n");
     }
 
 // state
 // #todo: dispatch idle?
-    if ( TargetThread->state != READY ){
+    if (TargetThread->state != READY){
         panic ("dispatcher: state\n");
     }
 
@@ -158,8 +152,9 @@ dispatch_current:
         // #check
         //if( TargetThread->readyCount > TargetThread->ready_limit)
         //{}
-        
-        TargetThread->state = RUNNING;
+
+        TargetThread->state = RUNNING;  // :)
+
         TargetThread->runningCount = 0;
         TargetThread->runningCount_ms = 0;
 
@@ -185,8 +180,8 @@ dispatch_current:
         TargetThread->quantum = QUANTUM_MIN;
     }
 
-
-    UPProcessorBlock.CurrentThread = (struct thread_d *) TargetThread;
+    UPProcessorBlock.CurrentThread = 
+        (struct thread_d *) TargetThread;
 
 //
 // ## RESTORE CONTEXT ##

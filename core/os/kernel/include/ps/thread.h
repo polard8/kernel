@@ -904,7 +904,7 @@ spawn_enter_kernelmode(
     unsigned long entry_va,
     unsigned long rsp0_va );
 
-void spawn_thread (int tid);
+void spawn_thread(tid_t tid);
 void psSpawnThread(tid_t tid);
 
 void spawn_pid(pid_t pid);

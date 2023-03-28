@@ -71,7 +71,7 @@ void page_enable()
  * History:
  *     2015 - Created by Fred Nora.
  */
-// Called by OS_Loader_Main in main.c
+// Called by bl_main in main.c
 
 void SetUpPaging(void)
 {

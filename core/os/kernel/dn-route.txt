@@ -1,0 +1,14 @@
+
+    Main route for KERNEL.BIN:
+
+------------------------------------------
+_kernel_begin   head_64.asm
+START           head_64.asm
+I_x64InitializeKernel  x64init.c
+I_kmain                kmain.c
+I_init_main            init.c
+kernel_booting         init.c
+booting_end            init.c
+I_x64ExecuteInitialProcess  x64init.c
+
+
