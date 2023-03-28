@@ -406,7 +406,7 @@ rmStartGUI:
 
     jmp RM_Code_Sel:pmode_16bit_startgui
 [BITS 16]
-pmode_16bit_startgui:
+pmode_16bit_startgui:  ;;16bit protected mode
 
 ; Ajusta os seletores de código para 
 ; modo protegido de 16 bit.
@@ -445,7 +445,7 @@ pmode_16bit_startgui:
 
     JMP 0:do_rm_startgui 
     ;; Nothing.
-do_rm_startgui:
+do_rm_startgui:  ;;16bit realmode
 
 ;; 7. 
 ;; Load the SS, DS, ES, FS, and GS registers as needed by the 
@@ -676,7 +676,7 @@ do_rm_startgui:
 ;;
 
 ; Inicializa o modo selecionado.
-; See: stage2/lib16/s2modes.inc
+; See: s2modes.inc
     
 ____gramado_mode_done:
 

@@ -1,5 +1,9 @@
 
+   bugfix:
+   Now the initialization routes are kinda similar
+   and the initialization is not affecting the window server anymore.
 
+------------------
 
     The way we initialize the GUI mode is affecting the 
     window server in 64bit.

@@ -164,6 +164,11 @@ xxx_Config:
 ;; --
 
 
+;
+; Go!
+;
+
+
 ;;
 ;; == Text mode ==============================
 ;;
@@ -173,7 +178,8 @@ xxx_Config:
 .xxxxCLI:
     mov al, byte BOOTMODE_SHELL
     call set_boot_mode
-    jmp .xxxxGO
+    JMP s2modesActivateMode  ; pm.inc
+    jmp $
 
 ;;
 ;; == Graphics mode ==========================
@@ -185,28 +191,12 @@ xxx_Config:
 ;   ## SET UP BOOT MODE ##
 .xxxxGUI:
     mov word [META$FILE.VIDEO_MODE], G_VIDEO_MODE
+    mov byte [META$FILE.GRAMADO_MODE], 0x02     ; GRAMADO MODE: HOME 800x600
     mov al, byte BOOTMODE_GUI
     call set_boot_mode
-    jmp .xxxxGO
+    JMP do_rm_startgui  ; pm.inc
+    jmp $
 
-;
-; Go!
-;
-
-;
-; == \o/ ========
-;
-
-; Initialize Gramado boot loader.
-; Activate the chosen mode.
-; (s2modes.inc)
-.xxxxGO:
-    JMP s2modesActivateMode  
-    JMP $
-
-;
-; == \o/ ========
-;
 
 ; =======================================================
 ; Messages
