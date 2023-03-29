@@ -13,33 +13,7 @@ static int hits=0;
 unsigned long deltaTick=0;
 unsigned long sec=0;
 
-
-//float cube_x[8];
-//float cube_y[8];
-
-struct cube_model_d
-{
-    float fThetaAngle;
-    struct gr_vecF3D_d vecs[32];
-    int colors[32];
-    float hposition;  //horisontal position
-    float vposition;  //vertical position
-    float model_initial_distance;
-    float model_distance;
-
-// Acceletarion: How fast the velocity changes.
-    float a;
-// Velocity:
-    float v;
-// Time:
-    float t;
-};
-
-// The terrain is a cube
-// The index 0.
-struct cube_model_d *terrain;
-
-//#define CUBE_MAX  4
+// For the demo.
 #define CUBE_MAX  8
 unsigned long cubes[CUBE_MAX];
 
@@ -66,10 +40,6 @@ static int __r[4][4] = {
 */
 
 
-static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z);
-static void __draw_demo_curve1(int position, int model_z);
-static void __draw_model1(int step, int target_axis);
-
 struct gws_window_d *__create_demo_window (
     unsigned long left,
     unsigned long top,
@@ -78,36 +48,8 @@ struct gws_window_d *__create_demo_window (
 
 static void drawTerrain(struct cube_model_d *cube, float fElapsedTime);
 static void drawFlyingCube(struct cube_model_d *cube, float vel);
-void drawRectangle0(float modelz);
+
 //======================
-
-
-void drawRectangle0(float modelz)
-{
-    struct gr_rectangleF3D_d r;
-
-    r.p[0].x = (float) -0.02f;  
-    r.p[0].y = (float)  0.02f;  
-    r.p[0].z = (float) modelz;  
-    r.p[0].color = COLOR_WHITE;
-
-    r.p[1].x = (float)  0.02f;  
-    r.p[1].y = (float)  0.02f;  
-    r.p[1].z = (float) modelz;  
-    r.p[1].color = COLOR_WHITE;
-
-    r.p[2].x = (float)  0.02f;  
-    r.p[2].y = (float) -0.02f;  
-    r.p[2].z = (float) modelz;  
-    r.p[2].color = COLOR_WHITE;
-
-    r.p[3].x = (float) -0.02f;  
-    r.p[3].y = (float) -0.02f;  
-    r.p[3].z = (float) modelz;  
-    r.p[3].color = COLOR_WHITE;
-
-    drawRectangleF( (struct gr_rectangleF3D_d *) &r );
-}
 
 
 static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
@@ -785,309 +727,6 @@ struct gws_window_d *__create_demo_window (
     return (struct gws_window_d *)  w;
 }
 
-static void __draw_model1(int step, int target_axis)
-{
-// object window
-    struct gws_window_d *ow;
-    ow = NULL;
-    //#todo
-    // use the demo window if it is possible
-    if( (void*) __demo_window != NULL ){
-       if(__demo_window->magic==1234)
-        ow = __demo_window;
-    }
-
-    //int gd = DETECT; 
-    int gd = 0;
-    int gm; 
-    int i = step;
-    int a;
-    int max_x = 800/2;
-    // Path of the program
-    //initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-    //int floor_max = (800/2)-(405/2); 
-
-// scene increment.
-// all the objects in the scene will be incremented
-// when this value turns bigger ...
-// the objects are moving in the z line.
-    int increment = 0;
-
-    int ShowCamera=TRUE;
-
-    //1=x | 2=y | 3=z
-    int over=1;
-    if ( target_axis >= 1 && target_axis <= 3 )
-        over = target_axis;
-
-// -----------------------------------------------
-// Draw the world
-
-    int wstatus=-1;
-    wstatus = (int) unveil_world();
-    if (wstatus<0)
-        return;
-
-//
-// Draw
-//
-
-// -----------------------------------------------
-// Road (bg) yellow (grid)
-
-    struct gr_line_d floorline;
-    int w=320;  //terrain width
-    int h=240;  //terrain height
-    int start_at=20; // distance from vp1.
-    int initial_wheel_radius = ((h+start_at)/2);
-    int scl=4; //scale
-    int col = w/scl; // numero de colunas
-    int row = h/scl; // numero de linhas
-    //int floor_max=800/2;
-    unsigned int floor_final_color = 0;
-    int l=0;
-    for (l=0; l<row; l++)
-    {
-        floorline.p[0].x = CurrentWorld->h1.x -(l*scl) -start_at;
-        floorline.p[0].y = CurrentWorld->h1.y -(l*scl) -start_at;
-        floorline.p[0].z = CurrentWorld->h1.z;
-        //floorline.p[0].color = 0xFEE135;  // yellow
-
-        floorline.p[1].x = CurrentWorld->h2.x -(l*scl) -start_at;
-        floorline.p[1].y = CurrentWorld->h2.y -(l*scl) -start_at;
-        floorline.p[1].z = CurrentWorld->h2.z;
-        //floorline.p[1].color = 0x567d46;  // green
-        
-        floor_final_color = 0x567d46;
-        //floor_final_color = 
-        //    (unsigned int) interpolate_color(
-        //        floorline.p[0].color,
-        //        floorline.p[1].color,
-        //        l );
-                 
-        plotLine3d ( 
-            ow,
-            floorline.p[0].x, floorline.p[0].y, floorline.p[0].z, 
-            floorline.p[1].x, floorline.p[1].y, floorline.p[1].z, 
-            floor_final_color ); 
-     };
-
-// -----------------------------------------------
-// The vehicle. (hehe)
-
-
-// -----------------------------------------------
-//  guidão
-    int g1x= 0; int g1y= 0; int g1z= 0;
-    int g2x= 0; int g2y= 0; int g2z= 0;
-
-    if(over==1){
-    g1x= CurrentWorld->center.x -20 +i;
-    g1y= CurrentWorld->center.y +45;
-    g1z= CurrentWorld->center.z;
-    g2x= CurrentWorld->center.x -10 +i;
-    g2y= CurrentWorld->center.y +45;
-    g2z= CurrentWorld->center.z;
-    }
-    if(over==2){
-    g1x= CurrentWorld->center.x -20;
-    g1y= CurrentWorld->center.y +45 +i;
-    g1z= CurrentWorld->center.z;
-    g2x= CurrentWorld->center.x -10;
-    g2y= CurrentWorld->center.y +45 +i;
-    g2z= CurrentWorld->center.z;
-    }
-    if(over==3){
-    g1x= CurrentWorld->center.x -20;
-    g1y= CurrentWorld->center.y +45;
-    g1z= CurrentWorld->center.z +i;
-    g2x= CurrentWorld->center.x -10;
-    g2y= CurrentWorld->center.y +45;
-    g2z= CurrentWorld->center.z +i;
-    }
-    plotLine3d ( 
-         ow,
-         g1x, g1y, g1z,
-         g2x, g2y, g2z, 
-         COLOR_BLACK); 
-
-// -----------------------------------------------
-// garfo (barra de direção)
-    int b1x= 0; int b1y= 0; int b1z= 0;
-    int b2x= 0; int b2y= 0; int b2z= 0;
-
-    if(over==1){
-    b1x= CurrentWorld->center.x -10 +i;
-    b1y= CurrentWorld->center.y +45;
-    b1z= CurrentWorld->center.z;
-    b2x= CurrentWorld->center.x +i;
-    b2y= CurrentWorld->center.y;
-    b2z= CurrentWorld->center.z;
-    }
-    if(over==2){
-    b1x= CurrentWorld->center.x -10;
-    b1y= CurrentWorld->center.y +45 +i;
-    b1z= CurrentWorld->center.z;
-    b2x= CurrentWorld->center.x;
-    b2y= CurrentWorld->center.y +i;
-    b2z= CurrentWorld->center.z;
-    }
-    if(over==3){
-    b1x= CurrentWorld->center.x -10;
-    b1y= CurrentWorld->center.y +45;
-    b1z= CurrentWorld->center.z +i;
-    b2x= CurrentWorld->center.x;
-    b2y= CurrentWorld->center.y;
-    b2z= CurrentWorld->center.z +i;
-    }
-    plotLine3d ( 
-         ow,
-         b1x, b1y, b1z,
-         b2x, b2y, b2z, 
-         COLOR_BLACK); 
-
-
-// -----------------------------------------
-// wheel
-// #todo: We do not have a structure for circles yet.
-
-    int wheelx=0;
-    int wheely=0;
-    int wheelz=0;
-    // O raio diminui a cada step.
-    int wheelr = 0;
-    
-    // x
-    if (over==1)
-        wheelr = (initial_wheel_radius); 
-    // y
-    if (over==2)
-        wheelr = (initial_wheel_radius); 
-    // z
-    if (over==3)
-        wheelr = (initial_wheel_radius - (i>>1) ); 
-
-
-    if (over==1){
-        wheelx = CurrentWorld->center.x+i;
-        wheely = CurrentWorld->center.y;
-        wheelz = CurrentWorld->center.z;
-    }
-    if (over==2){
-        wheelx = CurrentWorld->center.x;
-        wheely = CurrentWorld->center.y+i;
-        wheelz = CurrentWorld->center.z;
-    }
-    if (over==3){
-        wheelx = CurrentWorld->center.x;
-        wheely = CurrentWorld->center.y;
-        wheelz = CurrentWorld->center.z+i;
-    }
-    grCircle3 ( 
-        ow,
-        wheelx, wheely, wheelr,
-        GRCOLOR_LIGHTBLACK, 
-        wheelz ); 
-
-// -----------------------------------------------
-// The cat. :)
-    // in: eye scale, x,y,z
-    __draw_cat( 
-        1,
-        wheelx, wheely, wheelz);
-
-// -----------------------------------------------
-// Where is our camera?
-// Seguindo o guidão.
-// IN: modelx, modely, modelz
-    if(ShowCamera==TRUE){
-         unveil_camera (g1x,g1y,g1z);
-    }
-
-    // again
-    wstatus = (int) unveil_world();
-    if(wstatus<0)
-        return;
-
-    //#test
-    // It's dangeours, but a very cool effect.
-    //gr_dc->width -= 1;
-    //gr_dc->height -= 1;
-}
-
-
-void demoModel1(void)
-{
-    register int i=0;
-    int max_step = 200; //800/2;
-
-    if(current_mode != GRAMADO_HOME)
-         return;
-
-// ---------------
-// Create a demo window
-    struct gws_window_d *dw;
-    dw = NULL;
-    dw = (struct gws_window_d *) __create_demo_window(8,8,480,400);
-    if( (void*) dw != NULL )
-    {
-       if(dw->magic==1234)
-       {
-           __demo_window = dw;
-       }
-    }
-
-// ---------------
-// The camera for the bike.
-// floor.
-// (world: left hand)
-    camera ( 
-        -150, 80, 0,    // position vector
-        -150, 90, 0,    // upview vector
-         0,   0, 0 );   // lookat vector
-
-// ---------------
-// The depth clipping
-// Clipping z
-    gr_depth_range(
-        CurrentProjection,   // projection
-        -(800/2),            // zNear
-         (800/2) );          // zFar
-
-
-// -----------------------------------
-// Setup model
-// eyes, whiskers, mouth
-    __setupCatModel(TRUE,TRUE,TRUE);
-    
-// -----------------------------------
-// Move the cycle
-    int round=0;
-    int target_axis=1;  //1~3
-    while(1){
-
-    for (i=0; i<max_step; i++)
-    {
-        // bg light blue
-            demoClearSurface(dw,0x87ceeb);
-        //IN: step, switch axis
-            __draw_model1(i,target_axis);
-        // Clear the screen
-        demoFlushSurface(dw);
-    };
-
-    //1~3
-    target_axis++;
-    if(target_axis > 3){
-        target_axis=1;
-    }
-    round++;
-    if(round >= 8)
-        break;
-    };
-}
-
-
 void demoLines(void)
 {
     int i=0;
@@ -1128,256 +767,7 @@ void demoLines(void)
     refresh_screen();
 }
 
-
-// We can use a NULL window.
-void gramado_clear_surface(struct gws_window_d *clipping_window, unsigned int color)
-{
-    demoClearSurface(clipping_window,color);
-}
-
-// Start surface.
-// only the working area.
-void demoClearWA(unsigned int color)
-{
-// IN: l,t,w,h,color,fill,rop
-    rectBackbufferDrawRectangle ( 
-           WindowManager.wa_left, 
-           WindowManager.wa_top, 
-           WindowManager.wa_width, 
-           WindowManager.wa_height, 
-           color, 
-           1,   //fill 
-           0 ); //rop
-}
-
-// Start surface
-void 
-demoClearSurface(
-    struct gws_window_d *clipping_window, 
-    unsigned int color)
-{
-    // #todo
-    // We can do this for more resolutions. 
-
-// Se a clipping window é válida.
-// ONLY ONE TYPE FOR NOW.
-    if ( (void*) clipping_window != NULL )
-    {
-        if(clipping_window->magic==1234)
-        {
-            if (clipping_window->type == WT_SIMPLE)
-            {
-                rectBackbufferDrawRectangle ( 
-                    clipping_window->absolute_x, 
-                    clipping_window->absolute_y, 
-                    clipping_window->width, 
-                    clipping_window->height,
-                    color, 1, 0 );
-                return;
-            }
-        }
-    }
-
-
-// device context
-    if ( (void*) gr_dc != NULL )
-    {
-        if (gr_dc->magic == 1234)
-        {
-            if( gr_dc->initialized == TRUE )
-            {
-                rectBackbufferDrawRectangle ( 
-                    gr_dc->absolute_x, 
-                    gr_dc->absolute_y, 
-                    gr_dc->width, 
-                    gr_dc->height,
-                    color, 1, 0 );
-                
-                return;
-            }
-        }
-    }
-
-    unsigned int fail_color = COLOR_RED;
-
-// Limpa na resolução 320x200
-// IN: l,t,w,h,color,fill,rop
-    rectBackbufferDrawRectangle ( 
-           0, 0, 320, 200, 
-           fail_color, 1, 0 );
-}
-
-
-
-void gramado_flush_surface(struct gws_window_d *clipping_window)
-{
-    demoFlushSurface(clipping_window);
-}
-
-// #todo
-// We can do this for more resolutions. 
-// mostra na resolução 320x200
-void demoFlushSurface(struct gws_window_d *clipping_window)
-{
-// Flush the surface.
-
-
-// Se a clipping window é válida.
-// ONLY ONE TYPE FOR NOW.
-    if ( (void*) clipping_window != NULL )
-    {
-        if(clipping_window->magic==1234)
-        {
-            if (clipping_window->type == WT_SIMPLE)
-            {
-                gws_show_window_rect(clipping_window);
-                return;
-            }
-        }
-    }
-
-// default dc
-    if ( (void*) gr_dc != NULL )
-    {
-        if (gr_dc->magic == 1234)
-        {
-            if( gr_dc->initialized == TRUE )
-            {
-                gws_refresh_rectangle(
-                    gr_dc->absolute_x, 
-                    gr_dc->absolute_y, 
-                    gr_dc->width, 
-                    gr_dc->height );
-
-                return;
-            }
-        }
-    }
-
-    gws_refresh_rectangle(
-        0, 0, 320, 200 );
-}
-
-
-void __setupCatModel(int eyes, int whiskers, int mouth )
-{
-    CatModel.eyesVisible     = eyes;
-    CatModel.whiskersVisible = whiskers;
-    CatModel.mouthVisible    = mouth;
-}
-
-
-//worker
-static void __draw_cat(int eye_scale, int cat_x, int cat_y, int cat_z)
-{
-    // object window
-    struct gws_window_d *ow;
-    ow = NULL;
-    //#todo
-    // use the demo window if it is possible
-    if( (void*) __demo_window != NULL )
-    {
-       if (__demo_window->magic==1234){
-           ow = __demo_window;
-       }
-    }
-
-// model
-    int model_x = (int) cat_x;
-    int model_y = (int) cat_y;
-    int model_z = (int) cat_z;
-    int model_radius = 25;
-
-// eyes
-    int eye1_x = model_x -10;
-    int eye1_y = model_y +20;
-    int eye2_x = model_x +10;
-    int eye2_y = model_y +20;
-    int eye_radius = (int) (1*eye_scale);
-//---
-
-// head
-// IN: window,x,y,r,color,z
-    grCircle3 ( 
-        ow,
-        model_x + 0,
-        model_y + 12,
-        model_radius,
-        GRCOLOR_LIGHTBLACK,
-        model_z );
-
-// eyes
-    if ( CatModel.eyesVisible == TRUE )
-    {
-        grCircle3 ( 
-            ow,
-            eye1_x, 
-            eye1_y, 
-            eye_radius, 
-            GRCOLOR_LIGHTBLACK, 
-            model_z );
-        grCircle3 ( 
-            ow,
-            eye2_x, 
-            eye2_y, 
-            eye_radius, 
-            GRCOLOR_LIGHTBLACK, 
-            model_z );
-    }
-
-// whiskers
-    if ( CatModel.whiskersVisible == TRUE ){
-        // =
-        plotLine3d ( 
-            ow,
-            model_x -40, model_y +8, model_z, 
-            model_x -4,  model_y +5, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-        plotLine3d ( 
-            ow,
-            model_x -40, model_y +5, model_z, 
-            model_x -4,  model_y +4, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-        plotLine3d ( 
-            ow,
-            model_x -40, model_y +2, model_z, 
-            model_x -4,  model_y +3, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-
-        // =
-        plotLine3d ( 
-            ow,
-            model_x + 4,  model_y +5, model_z, 
-            model_x + 40, model_y +8, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-        plotLine3d ( 
-            ow,
-            model_x + 4,  model_y +4, model_z, 
-            model_x + 40, model_y +5, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-        plotLine3d ( 
-            ow,
-            model_x + 4,  model_y +3, model_z, 
-            model_x + 40, model_y +2, model_z, 
-            GRCOLOR_LIGHTBLACK); 
-    }
-
-// mouth
-    if ( CatModel.mouthVisible == TRUE )
-    {
-        plotLine3d ( 
-            ow,
-            model_x -10, model_y -2, model_z, 
-            model_x +10, model_y -2, model_z, 
-             GRCOLOR_LIGHTBLACK); 
-    
-        unveil_camera ( -10, -2, model_z );
-    }
-//---
-}
-
-
-void demoCat (void)
+void demoCat(void)
 {
     register int i=0;
     int j=0;
@@ -1454,12 +844,10 @@ void demoTriangle(void)
            __demo_window = dw;
        }
     }
+
 //------------------------------------------
-
     struct gr_triangle_d *triangle;
-
     int line_size = 40;
-
 
 // Create the triangle.
     triangle = (void *) malloc( sizeof( struct gr_triangle_d ) );
@@ -1516,6 +904,8 @@ void demoTriangle(void)
 // asteroids space ship like.
 void demoPolygon(void)
 {
+// Down arrow shape.
+
     struct gr_polygon_d *p;
     unsigned long vecList[8];
     
@@ -1639,6 +1029,8 @@ void demoPolygon(void)
 
 void demoPolygon2(void)
 {
+// Diamond shape.
+
     struct gr_polygon_d *p;
     unsigned long vecList[8];
     
@@ -1768,57 +1160,6 @@ void demoPolygon2(void)
     };   //while
 }
 
-
-// IN: ?
-static void __draw_demo_curve1(int position, int model_z)
-{
-    int yOffset = (position + position);
-    //int modelz = 0;
-    int modelz = (int) model_z;
-
-// line
-// a variaçao de y2 me pareceu certa.
-// IN: ??
-    
-    plotQuadBezierSeg ( 
-        0,   0,  modelz,          //x0, y0, z0, //ponto inicial
-        40,  40, modelz,          //x1, y1, z1, //?
-       100,  20+yOffset, modelz,  //x2, y2, z2, //ponto final
-       GRCOLOR_LIGHTBLACK );
-
-// String! char by char.
-// IN: x,y,color,c,z
-
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*0), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'G', modelz );
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*1), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'R', modelz );   
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*2), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'A', modelz );
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*3), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'M', modelz );
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*4), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'A', modelz );
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*5), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'D', modelz );
-    plotCharBackbufferDrawcharTransparentZ ( 
-        40+ (8*6), 
-        20+yOffset, 
-        GRCOLOR_LIGHTRED, 'O', modelz );
-}
-
 // Curva e string.
 void demoCurve(void)
 {
@@ -1828,31 +1169,23 @@ void demoCurve(void)
 
     // IN: ?, near, far
     gr_depth_range( CurrentProjection, 0, 100 );
-
-// loop
-
+// Loop
     while (count>0){
-
     count--;
-
     for (i=0; i<10; i++)
     {
         validate_background();
         demoClearSurface(NULL,GRCOLOR_LIGHTYELLOW);
-
         // IN: position, modelz
         __draw_demo_curve1(i,0);
         //__draw_demo_curve1(i,i*4);
-
         //invalidate_background();
         demoFlushSurface(NULL);      // flush surface
-        
         // delay  
         //for (j=0; j<8; j++){ gwssrv_yield();}
     };
     }
 }
-
 
 // Control + arrow key
 void FlyingCubeMove(int number, int direction, float value)

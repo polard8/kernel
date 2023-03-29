@@ -3698,6 +3698,15 @@ static int on_execute(void)
     window_server->status = STATUS_RUNNING;
     window_server->initialized = TRUE;
 
+// Testing demos.
+    //demoCat();
+    //demoCurve();
+    //demoLines();
+    //demoPolygon();
+    //demoPolygon2();
+    //demoTriangle();
+    //while(1){}
+
     // see: demo.c
     if (ShowDemo){
         demoFlyingCubeSetup();

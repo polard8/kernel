@@ -123,11 +123,16 @@ all-c:
 	$(LD) -r -o archive_basics2.o \
 line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 
+
 #fx
-	$(CC)  -c  grprim.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o grprim.o
-	$(CC)  -c  sprite.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o sprite.o
-	$(CC)  -c  demos.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o demos.o
-	$(LD) -r -o archive_fx.o  grprim.o sprite.o demos.o 
+	$(CC)  -c  grprim.c $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o grprim.o
+	$(CC)  -c  sprite.c $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o sprite.o
+	$(CC)  -c  models.c $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o models.o
+	$(CC)  -c  surface.c $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o surface.o
+	$(CC)  -c  demos.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o demos.o
+	$(LD) -r -o archive_fx.o \
+grprim.o sprite.o models.o surface.o demos.o 
+
 
 #extra
 	$(CC)  -c  xxxinput.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o xxxinput.o

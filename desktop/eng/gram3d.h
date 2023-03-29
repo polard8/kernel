@@ -1,5 +1,5 @@
 
-// gws.h 
+// gram3d.h 
 
 // ...
 extern int current_mode;
@@ -55,14 +55,11 @@ extern int current_mode;
 
 #include "grprim.h"
 #include "sprite.h"
+#include "surface.h"
+#include "models.h"
+
 #include "demos.h"
 
-
-//
-// model
-//
-
-// # data model
 #include "packet.h"
 
 
