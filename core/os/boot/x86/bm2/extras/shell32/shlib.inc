@@ -1,5 +1,5 @@
 
-; File: shell/shlib.inc
+; File: shell32/shlib.inc
 ; Rotinas de apoio para o Shell do Boot Manager.
 ; 2015 - Created.
 

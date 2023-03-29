@@ -23,10 +23,10 @@
 ; It's easier to handle the gdt stuff 
 ; when the org is in 8000H and the segment is 0H.
 ; 32768 - 65535 (hex: 8000h - FFFFh)
-; 32KB for this program
-; This is the limit we have.
-; #danger:
-; We are almost reaching this limit.
+
+; #bugbug
+; 32KB is the limit for this program?
+; We are almost there.
 
 
 ;       +----------+

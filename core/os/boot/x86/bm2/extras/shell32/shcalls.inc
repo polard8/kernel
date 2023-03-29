@@ -60,142 +60,7 @@ do_gramado_mode_california:
 do_shutdown:
     jmp rmShutdown
 
-;==============================================================
-; do_mount_volume:
-;     Montando o volume do sistema. (testing...)
-;     Obs: O volume do sistema será um subdiretório 
-;          do diretório de volumes.
 
-do_mount_volume:
-
-    pushad
-
-    call os_screen_clear 
-    call reset_cursor
-
-    ;Carregando o diretório raiz.
-    ;call load_root_first_sector 
-
-	
-	;Pega a base do diretório raiz. (diretório de volumes).
-	;mov esi, dword FAT16_ROOTDIR_ADDRESS
-	;mov edi, system_volume_string
-	;call os_string_compare
-	;jc .ok	
-	;jmp .fail
-
-.ok:
-	;Setup current dir.   
-    mov dword [g_current_fat_lba], 256        ;Fat do volume atual
-    mov dword [g_current_directory_lba], 510  ;Diretório do volume atual.   
-    mov dword [g_current_dataarea_lba],  542  ;?? ;lba do inicio da area de dados do volume atual. 
-
-	;load FAT
-	;Inicia ide.
-	call init_ide0_master
-	;Coloca um setor da fat no buffer.
-	mov eax, dword FAT16_FAT_ADDRESS
-	mov ebx, dword [g_current_fat_lba] ;LBA da fat do diretório atual. 
-	call hd0_read_sector
-	
-	;Load DIR
-	;Inicia ide.
-	call init_ide0_master	
-	;coloca um setor no buffer.
-	mov eax, dword FAT16_ROOTDIR_ADDRESS
-	mov ebx, dword [g_current_directory_lba] 
-	call hd0_read_sector
-	
-	jmp .done
-.fail:
-    nop
-.done:
-    popad
-    jmp os_command_line
- 
-
-
-;==============================================================
-; debug:
-;     Mostra as configurações de inicialização 
-;     que estão no arquivo INIT.CNF.
-;++
-
-debug:
-    pushad
-    call debug_main
-    popad
-    jmp os_command_line
-;--
-
-
-; Nothing for now.
-do_save:
-    jmp os_command_line
-
-; Nothing for now.
-do_formatdisk:
-    jmp os_command_line
-
-; Nothing for now.
-do_make_boot:  
-    jmp os_command_line
-
-; Nothing for now.
-do_install:
-    jmp os_command_line
-
-;==============================================================
-; do_set_modo1:
-;     Configura modo1.
-;++
-do_set_modo1:
-    push eax
-    call blconfig_set_modo1
-    mov eax, dword 1
-    call blconfig_alterar_status_bm16
-    pop eax
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_set_modo2:
-;     Configura modo2.
-;++
-do_set_modo2:
-    push eax
-    call blconfig_set_modo2
-    mov eax, dword 1
-    call blconfig_alterar_status_bm16
-    pop eax
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_set_modo3:
-;     Configura modo3.
-;++
-do_set_modo3:
-    push eax
-    call blconfig_set_modo3
-    mov eax, dword 1
-    call blconfig_alterar_status_bm16
-    pop eax
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_set_modo4:
-;     Configura modo4.
-;++
-do_set_modo4:
-    push eax
-    call blconfig_set_modo4
-    mov eax, dword 1
-    call blconfig_alterar_status_bm16
-    pop eax
-    jmp os_command_line
-;--
 
 ;==============================================================
 ; do_set_v0:
@@ -241,68 +106,6 @@ do_set_v3:
     ret
 ;--
 
-;==============================================================
-; do_openfile:
-;     Abre um arquivo.
-do_openfile:
-    mov byte[file_flag], 1
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_makefile:
-;     Cria um arquivo.
-;++
-
-do_makefile:
-    mov byte[file_flag], 2
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_deletefile: 
-;     Deleta um arquivo.
-;++
-do_deletefile:
-    mov byte[file_flag], 3
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_opendir:
-;     Abre um diretório.
-;++
-do_opendir:
-    mov byte[file_flag], 4
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_makedir:
-;     Cria um diretório.
-;++
-do_makedir:
-    mov byte[file_flag], 5
-    jmp os_command_line
-;--
-
-;==============================================================
-; do_deletedir:
-;    Deleta um diretório.
-;++
-do_deletedir:
-    mov byte[file_flag], 6
-    jmp os_command_line
-;--
-
-; Nothing for now.
-do_changedir:
-    jmp os_command_line
-
-; Nothing for now.
-ls:
-    ;jmp dir
-    jmp os_command_line
 
 ;==============================================================
 ; dir:
@@ -534,8 +337,8 @@ shellcallsFail:
 
 
 ; Nothing for now.
-testzone:
-    jmp os_command_line
+;testzone:
+;    jmp os_command_line
 
 ;; debug messages
 debug_message_fixme2_loading_sector:  

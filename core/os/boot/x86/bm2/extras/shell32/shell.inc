@@ -169,11 +169,18 @@ os_command_line:
     pop esi                     ;Pop the command string.
 
 
+;--------------------------------------------------------
+
+;
+; Compare reserved word.
+;
+
 ;
 ; == Compare ========
 ;
 
 ; Compara a primeira palavra - (edi).
+; See: shmsg.inc
 
 ; =========
 ; 'boot'
@@ -281,7 +288,7 @@ os_command_line:
 ; 'disk'
 ; Mostra informações sobre um disco.
 .xDisk:
-    mov edi, hd_string
+    mov edi, disk_string
     call os_string_compare
     jc hd_test
 
@@ -289,42 +296,17 @@ os_command_line:
 ; 'part' 
 ; Mostra informações sobre uma partição.
 .xPart:
-    mov edi, particao_string  
+    mov edi, part_string  
     call os_string_compare
     jc shellcallsPartitionTest
     ;jc particao_test
 
-; =========
-;'mode1'
-;Set mode 1.
-.xMode1:
-    mov edi, modo1_string
-    call os_string_compare
-    jc do_set_modo1
 
-; =========
-;'mode2'
-;Set mode 2.
-.xMode2:
-    mov edi, modo2_string
-    call os_string_compare
-    jc do_set_modo2
+;--------------------------------------------------------
 
-; =========
-;'mode3'
-;Set mode 3.
-.xMode3:
-    mov edi, modo3_string
-    call os_string_compare
-    jc do_set_modo3
-
-; =========
-;'mode4'
-;Set mode 4.
-.xMode4:
-    mov edi, modo4_string
-    call os_string_compare
-    jc do_set_modo4
+;
+; Not a reserved word.
+;
 
 ; Obs:
 ; Se a palavra digitada não for uma das palavras reservadas 

@@ -48,7 +48,7 @@ bootmanager_LOADROOT:
     ; not needed
     pusha
     mov si, bootmanagermsgCRLF
-    call bootmanagerDisplayMessage
+    call String.Print
     popa
 
     ;Debug breakpoint.
@@ -76,7 +76,7 @@ search_image_name:
     ;mov si, bootmanager_ImageName  ; image name to find
     mov si, word [image_name_pointer]
     pusha
-    call bootmanagerDisplayMessage
+    call String.Print
     popa
     push di
     rep cmpsb                       ; test for entry match
@@ -122,7 +122,7 @@ real_load_fat:
 
     pusha
     mov si, bootmanagermsgFAT
-    call bootmanagerDisplayMessage
+    call String.Print
     popa
 
 ; Read FAT into memory (es:bx).?? Onde ??
@@ -196,17 +196,10 @@ loop_bootmanager_LOADIMAGE_Sector:
 ;---------------------------------------
 ; The image was loaded.
 bootmanagerDONE:
-
     mov si, bootmanagermsgDONE
-    call bootmanagerDisplayMessage
-
+    call String.Print
     popa
     ret
-
-    ; see: finish.inc
-    ;push WORD 0
-    ;push WORD AFTER_DATA 
-    ;retf
 
 ; ========================================
 ; :)
@@ -252,7 +245,7 @@ test_load_bl_image:
 
     ; Message.
     mov si, bootmanagermsgImg
-    call bootmanagerDisplayMessage
+    call String.Print
     
     call real_load_image
 
@@ -270,7 +263,7 @@ diskFailure:
     int 0x18
     jmp $
     ;mov  si, bootmanagermsgFailure
-    ;call  bootmanagerDisplayMessage
+    ;call  String.Print
     ;mov  ah, 0x00
     ;int  0x16         ; await keypress
     ;int  0x19         ; warm boot computer
@@ -313,7 +306,7 @@ diskReadSectors:
 
 .bootmanagerSUCCESS:
     mov si, bootmanagermsgProgress
-    call bootmanagerDisplayMessage
+    call String.Print
     pop cx
     pop bx
     pop ax

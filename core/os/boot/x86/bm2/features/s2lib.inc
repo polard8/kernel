@@ -176,21 +176,20 @@ String:
 	ret
 
 ; -----------------------------------------------------------------
-;.Printf - String em teletipo.
-;os_print_string:
-; #todo: Change to '.Print'
-.Printf:	
-	pusha
-	mov ah, 0Eh			; int 10h teletype function
+; .Print - Display a string via BIOS teletype.
+; Display ASCIIZ string at "ds:si" via BIOS.
+.Print:
+    pusha
+    mov ah, 0Eh    ; int 10h teletype function
 .__repeat:
-	lodsb				; Get char from string
-	cmp al, 0
-	je .__done			; If char is zero, end of string
-	int 10h				; Otherwise, print it
-	jmp .__repeat			; And move on to next char
+    lodsb          ; Get char from string
+    cmp al, 0
+    je .__done     ; If char is zero, end of string
+    int 10h        ; Otherwise, print it
+    jmp .__repeat  ; And move on to next char
 .__done:
-	popa
-	ret
+    popa
+    ret
 
 ; -----------------------------------------------------------------
 ; .TitleBar - Strings nas barras. in: bx
@@ -205,7 +204,7 @@ String:
 	call Window.TitleBar
 	popa
 	pusha
-	call String.Printf
+	call String.Print
 	popa
     ret
 
@@ -223,7 +222,7 @@ String:
 	call Window.MenuBar
 	popa
 	pusha
-	call String.Printf
+	call String.Print
 	popa
 	ret
 
@@ -241,7 +240,7 @@ String:
 	call Window.StatusBar
 	popa
 	pusha
-	call String.Printf
+	call String.Print
 	popa
     ret
 
@@ -259,7 +258,7 @@ String:
 	call Window.TaskBar
 	popa
 	pusha
-	call String.Printf
+	call String.Print
 	popa
     ret
 ;--

@@ -24,10 +24,11 @@
 ; It's easier to handle the gdt stuff 
 ; when the org is in 8000H and the segment is 0H.
 ; 32768 - 65535 (hex: 8000h - FFFFh)
-; 32KB for this program
-; This is the limit we have.
-; #danger:
-; We are almost reaching this limit.
+
+; #bugbug
+; 32KB is the limit for this program?
+; We are almost there.
+
 
 
 ;       +----------+
@@ -581,6 +582,7 @@ BL_LBA      equ  0
     %include "features/lib16.inc"
     %include "features/disk.inc"
     %include "features/screen.inc"
+    %include "features/dialog.inc"
     %include "features/finish.inc"
     %include "features/pm.inc"
 
@@ -636,10 +638,10 @@ bootmanager_main:
 ; 6 - Disk.
     %include "extras/fs/fat12pm.inc"   ;FAT12 em 32 bits.
     %include "extras/fs/fat16lib.inc"  ;FAT16 (rotinas).
-    %include "extras/fs/fat16.inc"     ;FAT16 (fun��es principais).
+    %include "extras/fs/fat16.inc"     ;FAT16 (funçoes principais).
     %include "extras/fs/ramfs.inc"     ;RamDisk fs.
     %include "extras/fs/format.inc"    ;Formata.
-    %include "extras/fs/fs32.inc"      ;fs, (ger�ncia os sistemas de arquivos).
+    %include "extras/fs/fs32.inc"      ;fs, (gerencia os sistemas de arquivos).
 ; 5 - File.
     %include "extras/installer.inc"   ;Instala metafiles em LBAs espec�ficas.
     %include "extras/fs/file.inc"     ;Operaçoes com aquivos.
