@@ -3714,16 +3714,10 @@ static int on_execute(void)
 
     while (running == TRUE){
 
+        beginTick = rtl_jiffies();
+
         if (IsTimeToQuit == TRUE){
             break;
-        }
-
-        // see: demo.c
-        // IN: Draw desktop.
-        if (ShowDemo)
-        {
-            //demoFlyingCube(TRUE);
-            demoFlyingCube(FALSE);
         }
 
         wmInputReader();
@@ -3760,6 +3754,13 @@ static int on_execute(void)
         //{
             //close(newconn);
         //}
+
+        // see: demo.c
+        // IN: Draw desktop.
+        if (ShowDemo){
+            //demoFlyingCube(TRUE,COLOR_BLACK);
+            demoFlyingCube(FALSE,COLOR_BLACK);
+        }
     };
 
 // =======================================
@@ -3767,8 +3768,6 @@ static int on_execute(void)
     if (IsTimeToQuit != TRUE){
         debug_print ("gwssrv: [ERROR] Invalid IsTimeToQuit\n");
     }
-
-
     if (IsTimeToQuit == TRUE){
         //printf("main.c: Quit the engine :)\n");
     }

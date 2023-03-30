@@ -800,6 +800,7 @@ float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 );
 int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 );
 
 int gr_discriminant_int(int a, int b, int c);
+float gr_discriminant(float a, float b, float c);
 
 int gr_triangle_area_int (int base, int height);
 

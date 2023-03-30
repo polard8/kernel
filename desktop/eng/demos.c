@@ -10,8 +10,10 @@ int gUseDemos = TRUE;
 static int game_update_taskbar=TRUE;
 static int frames=0;
 static int hits=0;
-unsigned long deltaTick=0;
+unsigned long beginTick=0;
+unsigned long accumulatedDeltaTick=0;
 unsigned long sec=0;
+static char buf_fps[64];
 
 // For the demo.
 #define CUBE_MAX  8
@@ -652,16 +654,28 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         // discarding all triangles where the dot product of 
         // their surface normal and the camera-to-triangle 
         // vector is greater than or equal to zero.
+        // Nesse caso eles estão na mesma direção ou
+        // são perpendiculares. Só queremos os vetores que
+        // estão em direções opostas.
         // see:
         // https://en.wikipedia.org/wiki/Back-face_culling
         if (CurrentCameraF.initialized == FALSE){ return; }
+        // Dot product.
         float tmp = 
              (float) (
              normal.x * (triRotatedXYZ.p[0].x - CurrentCameraF.position.x) + 
              normal.y * (triRotatedXYZ.p[0].y - CurrentCameraF.position.y) +
              normal.z * (triRotatedXYZ.p[0].z - CurrentCameraF.position.z) );
-        if( (float) tmp <  0.0f){ cull=FALSE; }  //paint
-        if( (float) tmp >= 0.0f){ cull=TRUE;  }  //do not paint
+        // It needs to be in opposite direction. (negative).
+        // Culling = abate.
+        
+        // Same direction or perpendicular.
+        // Do not paint.
+        if( (float) tmp >= 0.0f){ cull=TRUE;  }
+        // Opposite direction.
+        // Paint. (Não abate). Muuuuu.
+        if( (float) tmp < 0.0f){ cull=FALSE; }
+
         //----------------------------------------------------
 
         // We need a valid window, 
@@ -673,24 +687,27 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         // uma rotina 2D de rasterização.
         // Isso será feito pela rotina de contrução de triangulos.
         int fill_triangle = TRUE;
-        if ( (void*) __root_window != NULL )
+
+        // It means that the vectors are in opposite directions.
+        // So, we're gonna paint this surface.
+        // Muuuuu!
+        if (cull==FALSE)
         {
-            if (cull==FALSE)
-            {
-                // The 'image space'.
-                // Our image space is not 1:1:1
-                // It's something like 2:2:1000
-                // No z normalization
-                // #bugbug
-                // We have a scale factor do x and y.
-                // But we do not have a scale factor for z.
-                // So, z can be any vallur between 0.01f and 1000.0f.
-                // #todo
-                // Maybe this function can accept more parameters.
-                plotTriangleF(
-                    (struct gws_window_d *) __root_window, 
-                    (struct gr_triangleF3D_d *) &triRotatedXYZ,
-                    fill_triangle ); 
+            // The 'image space'.
+            // Our image space is not 1:1:1
+            // It's something like 2:2:1000
+            // No z normalization
+            // #bugbug
+            // We have a scale factor do x and y.
+            // But we do not have a scale factor for z.
+            // So, z can be any vallur between 0.01f and 1000.0f.
+            // #todo
+            // Maybe this function can accept more parameters.
+            if ( (void*) __root_window != NULL ){
+            plotTriangleF(
+                (struct gws_window_d *) __root_window, 
+                (struct gr_triangleF3D_d *) &triRotatedXYZ,
+                fill_triangle );
             }
         }
     };
@@ -1252,8 +1269,10 @@ void demoFlyingCubeSetup(void)
 // Cube1
     register int i=0;
     
-    deltaTick=0;
+    accumulatedDeltaTick=0;
     sec=0;
+// Clear the buffer for the string in the yellow bar.
+    memset(buf_fps,0,64);
 
 /*
     for (i=0; i<8; i++){
@@ -1392,23 +1411,26 @@ void demoFlyingCubeSetup(void)
     game_update_taskbar = FALSE;
 }
 
-// Called by the engine
-void demoFlyingCube(int draw_desktop)
+// Called by the engine in main.c.
+void demoFlyingCube(int draw_desktop, unsigned int bg_color)
 {
-    struct cube_model_d *tmp_cube;
+// + Clear the surface 
+// + Draw the frame.
 
+    struct cube_model_d *tmp_cube;
 // Begin time.
-    unsigned long beginTick = rtl_jiffies();
+// Moved to the main loop of the server.
+    //unsigned long beginTick = rtl_jiffies();
 
 // -------------------------
 // Clear canvas.
-    //demoClearWA(COLOR_BLACK);                //clear surface
-    gramado_clear_surface(NULL,COLOR_BLACK);   //clear surface
-
+    //demoClearWA(COLOR_BLACK);            //clear surface
+    gramado_clear_surface(NULL,bg_color);  //clear surface
 // Draw desktop.
-    if (draw_desktop)
+    if (draw_desktop){
+        // IN: ?
         wm_update_desktop(TRUE,TRUE);
-
+    }
 // -------------------------
 // Draw terrain.
 // No rotation. Small translation in positive z.
@@ -1459,19 +1481,18 @@ void demoFlyingCube(int draw_desktop)
     //}
 
     unsigned long endTick = rtl_jiffies();
-    deltaTick += endTick - beginTick;
+    accumulatedDeltaTick += endTick - beginTick;
 // New frame.
     frames++;
 
 // Ja se passou 1 segundo?
-    static char buf_fps[64];
-    if (deltaTick>1000)
+    if (accumulatedDeltaTick>1000)
     {
         sec++; // New second.
         memset(buf_fps,0,64);
         itoa(frames,buf_fps);
             strcat(buf_fps," FPS");
-        deltaTick=0;
+        accumulatedDeltaTick=0;
         frames=0;
     }
 

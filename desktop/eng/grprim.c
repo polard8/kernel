@@ -670,7 +670,7 @@ struct gr_ray_d *ray_object(void)
 // Get delta for bhaskara.
 // d<0: (negative) "Raiz de número negativo em Baskara"
 // d=0: (null)     duas raizes reais iguais.
-// d>0: (positive) duas raizes reais diferentes.
+// d>0: (positive) duas raizes reais diferentes. (Intersection)
 int gr_discriminant_int(int a, int b, int c)
 {
 // Discriminant: Delta da função em bhaskara.
@@ -678,15 +678,18 @@ int gr_discriminant_int(int a, int b, int c)
     return (int) Discriminant;
 }
 
-
-/*
-float gr_discriminant(float a, float b, float c);
+// Get delta for bhaskara.
+// d<0: (negative) "Raiz de número negativo em Baskara"
+// d=0: (null)     duas raizes reais iguais.
+// d>0: (positive) duas raizes reais diferentes. (Intersection)
 float gr_discriminant(float a, float b, float c)
 {
-    float d = (float) ((b*b) - (4*a*c));
-    return (float) d;
+// Used to test for intesection in the ray tracing.
+// Discriminant: Delta da função em bhaskara.
+    float Discriminant = (float) ((b*b) - (4*a*c));
+    return (float) Discriminant;
 }
-*/
+
 
 // See:
 int projection_initialize(void)
@@ -3623,7 +3626,7 @@ float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 )
 // Fake perpendicular.
     if ( (void*) v1 == NULL ){ return (float) 0.0f; }
     if ( (void*) v2 == NULL ){ return (float) 0.0f; }
-
+// (x*x + y*y + z*z)
     return (float) ( v1->x * v2->x + 
                      v1->y * v2->y + 
                      v1->z * v2->z );
@@ -3645,6 +3648,7 @@ int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 )
     if ( (void*) v1 == NULL ){ return 0; }
     if ( (void*) v2 == NULL ){ return 0; }
 
+// (x*x + y*y + z*z)
     scalar  = (v1->x * v2->x);
     scalar += (v1->y * v2->y);
     scalar += (v1->z * v2->z);

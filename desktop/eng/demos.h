@@ -7,6 +7,8 @@
 extern int gUseDemos;
 extern struct gws_window_d *__demo_window;
 
+extern unsigned long beginTick;
+
 //
 // == Prototypes ===============
 //
@@ -22,7 +24,7 @@ void demoCat(void);
 // flying cube
 void FlyingCubeMove(int number, int direction, float value);
 void demoFlyingCubeSetup(void);
-void demoFlyingCube(int draw_desktop);
+void demoFlyingCube(int draw_desktop, unsigned int bg_color);
 
 #endif    
 
