@@ -3,6 +3,17 @@
 # GWS - Gramland Window Server.
 # 2020 - Created by Fred Nora.
 
+linkTarget = GRAMLAND.BIN
+
+# See: https://linux.die.net/man/1/ld
+# -s --strip-all:   Omit all symbol information from the output file.
+# -x --discard-all: Delete all local symbols.
+# -static: Do not link against shared libraries. 
+# -M --print-map:   Print a link map to the standard output.
+# LDFLAGS := -m elf_x86_64 -static
+# LDFLAGS := -m elf_x86_64 -s -x -static  
+linkFlags  = -m elf_x86_64 \
+-s -x -static -T ../link.ld
 
 VERSION = 0
 PATCHLEVEL = 1
@@ -71,10 +82,6 @@ LIBDISPOBJ  = ../libs/libdisp/obj
 CINCLUDES  = -I $(LIBC)  
 CINCLUDES += -I $(LIBDISP)
 CINCLUDES += -I .    
-
-# Link support.
-linkTarget = GRAMLAND.BIN
-linkFlags  = -m elf_x86_64 -T ../link.ld
 
 # Objects
 myObjects = crt0.o main.o callback.o rtl.o \

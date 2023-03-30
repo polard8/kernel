@@ -4,6 +4,18 @@
 # It's called by the init process.
 # 2022 - Created by Fred Nora.
 
+linkTarget = ENG.BIN
+
+# See: https://linux.die.net/man/1/ld
+# -s --strip-all:   Omit all symbol information from the output file.
+# -x --discard-all: Delete all local symbols.
+# -static: Do not link against shared libraries. 
+# -M --print-map:   Print a link map to the standard output.
+# Usermode
+linkFlags = -m elf_x86_64 \
+-s -x -static -T ../link.ld
+
+
 VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
@@ -60,9 +72,7 @@ user_ccflags += -fno-PIE
 user_ccflags += -fno-pie
 user_ccflags += -fno-omit-frame-pointer
 user_ccflags += -fno-optimize-sibling-calls    
-	
 
-user_ldflags = -m elf_x86_64 -T ../link.ld
 
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
@@ -166,13 +176,13 @@ grprim.o sprite.o models.o surface.o demos.o
 	cp $(LIBDISPOBJ)/libdisp.o .
 
 gws-link:
-	$(LD) $(user_ldflags) -o ENG.BIN $(myObjects)
+	$(LD) $(linkFlags) -o $(linkTarget) $(myObjects)
 	#$(LD) -r -o gramado.o $(myObjects)
 finalize:
-	cp ENG.BIN  bin/
+	cp $(linkTarget)  bin/
 clean:
 	-rm *.o
-	-rm ENG.BIN 
+	-rm $(linkTarget) 
 clean2:
 	-rm *.o
 

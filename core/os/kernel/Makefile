@@ -1,10 +1,17 @@
 
-# todo:
-# The first goal of this makefile is 
-# mount the assembly files 
-# in the folder kernel/1pump/arch/x86_64/pumpcore/
-# Evething starts in the file head_64.asm
+# It builds the kernel image.
 
+linkTarget = KERNEL.BIN
+
+# See: https://linux.die.net/man/1/ld
+# -s --strip-all:   Omit all symbol information from the output file.
+# -x --discard-all: Delete all local symbols.
+# -static: Do not link against shared libraries. 
+# -M --print-map:   Print a link map to the standard output.
+# LDFLAGS := -m elf_x86_64 -static
+# LDFLAGS := -m elf_x86_64 -s -x -static  
+linkFlags := -m elf_x86_64 \
+-s -x -static -T ke/x86_64/startup/link.ld
 
 # Make variables (CC, etc...)
 AS	= as
@@ -86,14 +93,6 @@ USER_INCLUDE   := -I include/uapi/
 KERNEL_INCLUDE := -I include/ $(USER_INCLUDE)  
 
 
-# See: https://linux.die.net/man/1/ld
-# -s --strip-all:   Omit all symbol information from the output file.
-# -x --discard-all: Delete all local symbols.
-# -M --print-map:   Print a link map to the standard output.
-# LDFLAGS := -m elf_x86_64 -static
-LDFLAGS := -m elf_x86_64 -s -x -static  
-
-
 # ========================
 # Config
 
@@ -148,15 +147,15 @@ k1:
 	-I ke/x86_64/startup/ \
 	-f elf64 -o head_64.o
 
-
 # top
 # Ring0 libc.
 # crt/
 	$(MAKE) -C crt/
 
-	$(CC) -c globals.c  $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
-	$(CC) -c init.c $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
-	$(CC) -c kmain.c $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
+# More
+	$(CC) -c globals.c $(KERNEL_INCLUDE) $(CFLAGS) -o globals.o
+	$(CC) -c init.c    $(KERNEL_INCLUDE) $(CFLAGS) -o init.o
+	$(CC) -c kmain.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
 
 k2:
 #kernel-content:
@@ -203,10 +202,9 @@ k3:
 	$(CFLAGS) \
 	-o sci.o    
 
-
 link-kernel:
 	@echo "Linking: Linking the kernel image ..."
-	$(LD) $(LDFLAGS) -T ke/x86_64/startup/link.ld -o KERNEL.BIN $(objects-y)    
+	$(LD) $(linkFlags) -o $(linkTarget) $(objects-y)    
 clean:
 	rm -rf *.o   
 	@echo "~clean"
