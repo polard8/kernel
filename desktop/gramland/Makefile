@@ -72,7 +72,9 @@ CINCLUDES  = -I $(LIBC)
 CINCLUDES += -I $(LIBDISP)
 CINCLUDES += -I .    
 
-LDFLAGS = -m elf_x86_64 -T ../link.ld
+# Link support.
+linkTarget = GRAMLAND.BIN
+linkFlags  = -m elf_x86_64 -T ../link.ld
 
 # Objects
 myObjects = crt0.o main.o callback.o rtl.o \
@@ -154,10 +156,10 @@ line.o rect.o window.o bitblt.o painter.o gws.o comp.o bmp.o connect.o button.o
 	cp $(LIBDISPOBJ)/libdisp.o .
 
 gws-link:
-	$(LD) $(LDFLAGS) -o GRAMLAND.BIN $(myObjects)
+	$(LD) $(linkFlags) -o $(linkTarget) $(myObjects)
 finalize:
-	cp GRAMLAND.BIN bin/
+	cp $(linkTarget) bin/
 clean:
 	-rm *.o
-	-rm GRAMLAND.BIN 
+	-rm $(linkTarget)
 	

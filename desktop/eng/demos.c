@@ -399,9 +399,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     //}
 
     //float vel = (float) cube->a * (float) cube->t; 
-
     //float vel = (float) 1.0f * fElapsedTime;
-    
+
     cube->fThetaAngle = (float) (cube->fThetaAngle + (float) vel);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + (float) 1.0f * fElapsedTime);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
@@ -532,19 +531,20 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             (struct gr_vecF3D_d *) &triRotatedXYZ.p[2], 
             (struct gr_mat4x4_d *) &matRotZ);
 
-
+        // The color for the rotated triangle.
         triRotatedXYZ.p[0].color = tri.p[0].color;
         triRotatedXYZ.p[1].color = tri.p[1].color;
         triRotatedXYZ.p[2].color = tri.p[2].color;
 
-        // Translate in z.
+        // Translate in z. (move)
 
         // Increment distance
         cube->model_distance = (float) (cube->model_distance + 0.00005f);
+        // Increment distance if we have a terrain.
         if( (void*)terrain != NULL)
             cube->model_distance = (float) terrain->model_distance;
-        
-        // Restart distance
+
+        // Restart distance if we reached the limit in the z-axis.
         if (cube->model_distance > 14.0f){
             cube->model_distance = (float) 0.8f;
             //hits++;
@@ -553,6 +553,9 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             //wm_Update_TaskBar((char *)string0,FALSE);
             //wm_Update_TaskBar("hit",FALSE);
         }
+
+        // Change the z values in the triangle,
+        // based on the the new z model position.
 
         triRotatedXYZ.p[0].z =
             (float) (
@@ -563,8 +566,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             (float) (
             triRotatedXYZ.p[1].z + 
             cube->model_initial_distance +
-            cube->model_distance ); 
-
+            cube->model_distance );
         triRotatedXYZ.p[2].z = 
             (float) (
             triRotatedXYZ.p[2].z + 
@@ -581,6 +583,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         //triRotatedXYZ.p[2].x = 
         //    (float) (triRotatedXYZ.p[2].x + cube->hposition); 
 
+        // Translate the triangle in x based in the terrain x position.
+
         if( (void*)terrain != NULL)
         {
             triRotatedXYZ.p[0].x = 
@@ -591,7 +595,9 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
                 (float) (triRotatedXYZ.p[2].x + terrain->hposition + cube->hposition); 
         }
 
-        // coloca o cubo no chão do terreno.
+        // Translate the triangle in y based in the terrain y position.
+        // Coloca o cubo no chão do terreno.
+        
         if( (void*)terrain != NULL)
         {
             triRotatedXYZ.p[0].y = 
@@ -602,6 +608,10 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
                 (float) (triRotatedXYZ.p[2].y + terrain->vposition + cube->vposition); 
         }
 
+        // ----------------------------------------------------
+        // backface culling:
+        // Normal vector for the triangle surface.
+        // We wanna know if we need or not to draw this triangle.
 
         //----------------------------------------------------
         // Use Cross-Product to get surface normal.
@@ -675,6 +685,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
                 // We have a scale factor do x and y.
                 // But we do not have a scale factor for z.
                 // So, z can be any vallur between 0.01f and 1000.0f.
+                // #todo
+                // Maybe this function can accept more parameters.
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
                     (struct gr_triangleF3D_d *) &triRotatedXYZ,

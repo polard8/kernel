@@ -667,13 +667,15 @@ struct gr_ray_d *ray_object(void)
     return (struct gr_ray_d *) tmp;
 }
 
+// Get delta for bhaskara.
 // d<0: (negative) "Raiz de número negativo em Baskara"
 // d=0: (null)     duas raizes reais iguais.
 // d>0: (positive) duas raizes reais diferentes.
 int gr_discriminant_int(int a, int b, int c)
 {
-    int d = (int) ((b*b) - (4*a*c));
-    return (int) d;
+// Discriminant: Delta da função em bhaskara.
+    int Discriminant = (int) ((b*b) - (4*a*c));
+    return (int) Discriminant;
 }
 
 
