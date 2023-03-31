@@ -142,11 +142,9 @@ __ps_setup_x64_context (
 {
 
 // cpl
-
     if (cpl != RING0 && cpl != RING3){
         panic ("__ps_setup_x64_context: Invalid cpl\n");
     }
-
     t->cpl = (unsigned int) cpl;
 
 //
@@ -164,42 +162,42 @@ __ps_setup_x64_context (
 // rflags for ring3: (0x3200).
 
     // ring 0
-    if ( t->cpl == RING0 )
+    if (t->cpl == RING0)
     {
         t->rflags_initial_iopl = (unsigned int) 0;
         t->rflags_current_iopl = (unsigned int) 0;
 
-        t->ss     = 0x10;
-        t->rsp    = (unsigned long) init_stack; 
-        t->rflags = (unsigned long) 0x0202;
-        t->cs     = 0x8; 
-        t->rip    = (unsigned long) init_rip; 
+        t->context.ss     = 0x10;
+        t->context.rsp    = (unsigned long) init_stack; 
+        t->context.rflags = (unsigned long) 0x0202;    // #caution.
+        t->context.cs     = 0x8; 
+        t->context.rip    = (unsigned long) init_rip; 
 
         // (0x10 | 0)
-        t->ds = 0x10; 
-        t->es = 0x10; 
-        t->fs = 0x10; 
-        t->gs = 0x10; 
+        t->context.ds = 0x10; 
+        t->context.es = 0x10; 
+        t->context.fs = 0x10; 
+        t->context.gs = 0x10; 
     }
 
     // ring 3
-    if ( t->cpl == RING3 )
+    if (t->cpl == RING3)
     {
         //#see: weak protection for threads in ring 3.
         t->rflags_initial_iopl = (unsigned int) 3;
         t->rflags_current_iopl = (unsigned int) 3;
 
-        t->ss     = 0x23;    
-        t->rsp    = (unsigned long) init_stack; 
-        t->rflags = (unsigned long) 0x3202;
-        t->cs     = 0x1B; 
-        t->rip    = (unsigned long) init_rip; 
+        t->context.ss     = 0x23;    
+        t->context.rsp    = (unsigned long) init_stack; 
+        t->context.rflags = (unsigned long) 0x3202;    // #caution
+        t->context.cs     = 0x1B; 
+        t->context.rip    = (unsigned long) init_rip; 
 
         // (0x20 | 3)
-        t->ds = 0x23; 
-        t->es = 0x23; 
-        t->fs = 0x23; 
-        t->gs = 0x23; 
+        t->context.ds = 0x23; 
+        t->context.es = 0x23; 
+        t->context.fs = 0x23; 
+        t->context.gs = 0x23; 
     }
 
 //
@@ -209,24 +207,23 @@ __ps_setup_x64_context (
 // This is used by the control thread.
     t->initial_rip = (unsigned long) init_rip; 
 
-    t->rax = 0;
-    t->rbx = 0;
-    t->rcx = 0;
-    t->rdx = 0;
-    t->rsi = 0;
-    t->rdi = 0;
-    t->rbp = 0;
-
-// We can save something here for control purpose.
-// It can be used for the spawner.
-    t->r8 = 0;
-    t->r9 = 0;
-    t->r10 = 0;
-    t->r11 = 0;
-    t->r12 = 0;
-    t->r13 = 0;
-    t->r14 = 0;
-    t->r15 = 0;
+// General purpose registers.
+// We can pass something to the application using r8~15.
+    t->context.rax = 0;
+    t->context.rbx = 0;
+    t->context.rcx = 0;
+    t->context.rdx = 0;
+    t->context.rsi = 0;
+    t->context.rdi = 0;
+    t->context.rbp = 0;
+    t->context.r8 = 0;
+    t->context.r9 = 0;
+    t->context.r10 = 0;
+    t->context.r11 = 0;
+    t->context.r12 = 0;
+    t->context.r13 = 0;
+    t->context.r14 = 0;
+    t->context.r15 = 0;
 
     //Thread->tss = current_tss;
 
@@ -1630,21 +1627,25 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
     // cs (0x18 | 3)
 
 // Stack frame
-    clone->ss     = (unsigned short) (father->ss & 0xFFFF);    // RING 3.
-    clone->rsp    = (unsigned long) father->rsp;   // wrong
-    clone->rflags = (unsigned long) father->rflags;
-    clone->cs     = (unsigned short) (father->cs & 0xFFFF);
-    clone->rip    = (unsigned long) father->rip;   // wrong 
+    clone->context.ss = 
+        (unsigned short) (father->context.ss & 0xFFFF);    // RING 3.
+    clone->context.rsp = 
+        (unsigned long) father->context.rsp;   // wrong
+    clone->context.rflags = 
+        (unsigned long) father->context.rflags;
+    clone->context.cs = 
+        (unsigned short) (father->context.cs & 0xFFFF);
+    clone->context.rip = 
+        (unsigned long) father->context.rip;   // wrong 
 
 // O endereço incial, para controle.
-    clone->initial_rip = (unsigned long) father->initial_rip; 
+    clone->initial_rip = 
+        (unsigned long) father->initial_rip; 
 
 // check iopl
-
      int cpl=-1;
-     cpl = (int) (clone->cs & 0xFF);
+     cpl = (int) (clone->context.cs & 0xFF);
      cpl = (int) (cpl & 3);
-
      if (cpl != 3){
          panic("copy_thread_struct: cpl\n");
      }
@@ -1653,26 +1654,27 @@ struct thread_d *copy_thread_struct(struct thread_d *thread)
 // We need the initial stack address
 // (0x20 | 3)
 
-    clone->ds = father->ds; 
-    clone->es = father->es; 
-    clone->fs = father->fs; 
-    clone->gs = father->gs; 
+    clone->context.ds = father->context.ds; 
+    clone->context.es = father->context.es; 
+    clone->context.fs = father->context.fs; 
+    clone->context.gs = father->context.gs; 
 
-    clone->rax = father->rax;
-    clone->rbx = father->rbx;
-    clone->rcx = father->rcx;
-    clone->rdx = father->rdx;
-    clone->rsi = father->rsi;
-    clone->rdi = father->rdi;
-    clone->rbp = father->rbp;
-    clone->r8 = father->r8;
-    clone->r9 = father->r9;
-    clone->r10 = father->r10;
-    clone->r11 = father->r11;
-    clone->r12 = father->r12;
-    clone->r13 = father->r13;
-    clone->r14 = father->r14;
-    clone->r15 = father->r15;
+// General purpose
+    clone->context.rax = father->context.rax;
+    clone->context.rbx = father->context.rbx;
+    clone->context.rcx = father->context.rcx;
+    clone->context.rdx = father->context.rdx;
+    clone->context.rsi = father->context.rsi;
+    clone->context.rdi = father->context.rdi;
+    clone->context.rbp = father->context.rbp;
+    clone->context.r8  = father->context.r8;
+    clone->context.r9  = father->context.r9;
+    clone->context.r10 = father->context.r10;
+    clone->context.r11 = father->context.r11;
+    clone->context.r12 = father->context.r12;
+    clone->context.r13 = father->context.r13;
+    clone->context.r14 = father->context.r14;
+    clone->context.r15 = father->context.r15;
 
 //
 // TSS

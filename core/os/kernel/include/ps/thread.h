@@ -522,7 +522,6 @@ struct thread_d
     unsigned long blockedCount_ms;
     unsigned long blocked_limit;
 
-
 // How many times it was scheduled.
     unsigned long scheduledCount;
 
@@ -548,10 +547,10 @@ struct thread_d
 // == Profiler ==================================
 //
 
+// #todo: Create a structure. (local, no pointer)
 // Quanto por cento do tempo a thread ficou rodando.
 // No caso do processo, é a soma do quanto ficou rodando 
 // todas as suas threads.
-
 // ? these names are not good.
     unsigned long profiler_percentage_running;
     unsigned long profiler_percentage_running_res;
@@ -690,60 +689,16 @@ struct thread_d
 // Reason to close the thread.
     int exit_code;
 
-//
-// == Context ======================= 
-//
+// Context
+// see: x64context.h
+    struct x64_context_d  context;
 
-// #todo: 
-// Usars uma estrutura.
-// #todo: 
-// Isso deve virar um ponteiro de estrutura.
-// ?? O que faremos, pois temos mais de uma arquitetura.
-
-    // struct x86_context_d  *context;
-
-// stack frame;
-    unsigned short ss;
-    unsigned long  rsp;
-    unsigned long  rflags;
-    unsigned short cs;
-    unsigned long  rip;    //usado com o pd do processo?
-
-// para o kernel saltar para o novo processo.
+// Para o kernel saltar para o novo processo.
     unsigned long ring0_rip;  //usado com o pd do kernel?
     unsigned long ripPA;
 
-    unsigned short ds;
-    unsigned short es;
-    unsigned short fs;
-    unsigned short gs;
-
-    unsigned long rax;
-    unsigned long rbx;
-    unsigned long rcx;
-    unsigned long rdx;
-    unsigned long rsi;
-    unsigned long rdi;
-    unsigned long rbp;
-    
-    unsigned long r8;
-    unsigned long r9;
-    unsigned long r10;
-    unsigned long r11;
-    unsigned long r12;
-    unsigned long r13;
-    unsigned long r14;
-    unsigned long r15;
-
-//continua o contexto ...
-
-//O endereço incial, para controle.
+// O endereço incial, para controle.
     unsigned long initial_rip;
-
-// #todo
-// 512 bytes, alinhados em 16.
-// unsigned char fxsave[512]__atribute_aligned(...);
-    unsigned char fpu_buffer[512];
 
 //
 //  tss

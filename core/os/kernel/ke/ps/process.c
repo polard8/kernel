@@ -2027,13 +2027,14 @@ struct process_d *create_and_initialize_process_object(void)
 //
 
 // Stack for the clone. 
-
-    new_process->control->rsp = (unsigned long) CONTROLTHREAD_STACK;
+// #bugbug: The stack size?
+    new_process->control->context.rsp = 
+        (unsigned long) CONTROLTHREAD_STACK;
 
     new_process->StackStart = 
         (unsigned long) CONTROLTHREAD_STACK;
     new_process->StackSize = 
-        (unsigned long) (32*1024);  // Isso foi usado na rotina de alocação.
+        (unsigned long) (32*1024);  
     new_process->StackEnd = 
         (unsigned long) ( new_process->StackStart - new_process->StackSize );
 
@@ -2042,7 +2043,9 @@ struct process_d *create_and_initialize_process_object(void)
 
 
 // #todo: Explain it better.
-    new_process->Image = (unsigned long) CONTROLTHREAD_BASE;  // 0x200000 
+// 0x200000
+    new_process->Image = 
+        (unsigned long) CONTROLTHREAD_BASE;
 
     new_process->used = TRUE;
     new_process->magic = 1234;

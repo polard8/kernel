@@ -554,9 +554,9 @@ do_clone:
 
 // Standard va entry point.
 // 0x201000
+    child_thread->context.rip = 
+        (unsigned long) CONTROLTHREAD_ENTRYPOINT;
 
-    child_thread->rip = (unsigned long) CONTROLTHREAD_ENTRYPOINT;
-    
 // 32KB size
 // #todo 
 // Precisa ser do mesmo tamanho que o pai 
@@ -565,7 +565,7 @@ do_clone:
 // que foi alocada anteriormente. Precisamos de uma variavel
 // na estrutura que registre seu tamanho.
 
-    child_thread->rsp = 
+    child_thread->context.rsp = 
         (unsigned long) (parent_process->childStack + (30*1024));
 
     // #debug
@@ -913,15 +913,15 @@ do_clone:
 // The entry point in the start of the image. 0x201000.
 // And the stack ??
 
-    // Entry point 0x201000.
-    child_thread->rip = 
+// Entry point 0x201000.
+    child_thread->context.rip = 
         (unsigned long) __image_entrypoint_va;
-
 
 // Process name.
     strcpy ( child_process->__processname, (const char *) filename );   
     //child_process->processName_len = (size_t) strlen ( (const char *) filename );
-    child_process->processName_len = (size_t) sizeof(child_process->__processname);
+    child_process->processName_len = 
+        (size_t) sizeof(child_process->__processname);
 
     //#debug
     //ok

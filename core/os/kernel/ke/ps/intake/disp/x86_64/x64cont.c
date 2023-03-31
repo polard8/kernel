@@ -130,39 +130,43 @@ void save_current_context (void)
 // use t->x64_context.ss  ...
 
     // Stack frame
-    t->ss     = (unsigned long) (contextss[0] & 0xFFFF);  // usermode
-    t->rsp    = (unsigned long) contextrsp[0];            // usermode
-    t->rflags = (unsigned long) contextrflags[0];
-    t->cs     = (unsigned long) (contextcs[0]  & 0xFFFF);
-    t->rip    = (unsigned long) contextrip[0];
+    t->context.ss     = (unsigned long) (contextss[0] & 0xFFFF);  // usermode
+    t->context.rsp    = (unsigned long) contextrsp[0];            // usermode
+    t->context.rflags = (unsigned long) contextrflags[0];
+    t->context.cs     = (unsigned long) (contextcs[0]  & 0xFFFF);
+    t->context.rip    = (unsigned long) contextrip[0];
 
     // Segments
-    t->ds = (unsigned long) (contextds[0] & 0xFFFF);
-    t->es = (unsigned long) (contextes[0] & 0xFFFF);
-    t->fs = (unsigned long) (contextfs[0] & 0xFFFF);
-    t->gs = (unsigned long) (contextgs[0] & 0xFFFF);
+    t->context.ds = (unsigned long) (contextds[0] & 0xFFFF);
+    t->context.es = (unsigned long) (contextes[0] & 0xFFFF);
+    t->context.fs = (unsigned long) (contextfs[0] & 0xFFFF);
+    t->context.gs = (unsigned long) (contextgs[0] & 0xFFFF);
 
-    t->rax = (unsigned long) contextrax[0];
-    t->rbx = (unsigned long) contextrbx[0];
-    t->rcx = (unsigned long) contextrcx[0];
-    t->rdx = (unsigned long) contextrdx[0];
-    t->rsi = (unsigned long) contextrsi[0];
-    t->rdi = (unsigned long) contextrdi[0];
-    t->rbp = (unsigned long) contextrbp[0];
+// General purpose
 
-    t->r8 = (unsigned long) contextr8[0];
-    t->r9 = (unsigned long) contextr9[0];
-    t->r10 = (unsigned long) contextr10[0];
-    t->r11 = (unsigned long) contextr11[0];
-    t->r12 = (unsigned long) contextr12[0];
-    t->r13 = (unsigned long) contextr13[0];
-    t->r14 = (unsigned long) contextr14[0];
-    t->r15 = (unsigned long) contextr15[0];
+    t->context.rax = (unsigned long) contextrax[0];
+    t->context.rbx = (unsigned long) contextrbx[0];
+    t->context.rcx = (unsigned long) contextrcx[0];
+    t->context.rdx = (unsigned long) contextrdx[0];
+    t->context.rsi = (unsigned long) contextrsi[0];
+    t->context.rdi = (unsigned long) contextrdi[0];
+    t->context.rbp = (unsigned long) contextrbp[0];
+
+    t->context.r8 = (unsigned long) contextr8[0];
+    t->context.r9 = (unsigned long) contextr9[0];
+    t->context.r10 = (unsigned long) contextr10[0];
+    t->context.r11 = (unsigned long) contextr11[0];
+    t->context.r12 = (unsigned long) contextr12[0];
+    t->context.r13 = (unsigned long) contextr13[0];
+    t->context.r14 = (unsigned long) contextr14[0];
+    t->context.r15 = (unsigned long) contextr15[0];
 
 // Save fpu stuff.
     register int i=0;
-    for (i=0; i<512; i++){
-         t->fpu_buffer[i] = (unsigned char) context_fpu_buffer[i];
+    for (i=0; i<512; i++)
+    {
+        t->context.fpu_buffer[i] = 
+            (unsigned char) context_fpu_buffer[i];
     };
 
 // stime and utime
@@ -225,7 +229,7 @@ void save_current_context (void)
 
 // rflags
 // ok, it's working
-    unsigned long rflags = (unsigned long) t->rflags;
+    unsigned long rflags = (unsigned long) t->context.rflags;
     int rflags_iopl = (int) (rflags & 0x200 );
 
 // changing it on the fly
@@ -306,41 +310,44 @@ void restore_current_context (void)
 //
 
     // Stack frame
-    contextss[0]     = (unsigned long) t->ss & 0xffff;  // usermode
-    contextrsp[0]    = (unsigned long) t->rsp;          // usermode 
-    contextrflags[0] = (unsigned long) t->rflags;
-    contextcs[0]     = (unsigned long) t->cs & 0xffff;  
-    contextrip[0]    = (unsigned long) t->rip;
+    contextss[0]     = (unsigned long) t->context.ss & 0xffff;  // usermode
+    contextrsp[0]    = (unsigned long) t->context.rsp;          // usermode 
+    contextrflags[0] = (unsigned long) t->context.rflags;
+    contextcs[0]     = (unsigned long) t->context.cs & 0xffff;  
+    contextrip[0]    = (unsigned long) t->context.rip;
 
     // Segments
-    contextds[0] = (unsigned long) t->ds & 0xffff;
-    contextes[0] = (unsigned long) t->es & 0xffff; 
-    contextfs[0] = (unsigned long) t->fs & 0xffff; 
-    contextgs[0] = (unsigned long) t->gs & 0xffff; 
+    contextds[0] = (unsigned long) t->context.ds & 0xffff;
+    contextes[0] = (unsigned long) t->context.es & 0xffff; 
+    contextfs[0] = (unsigned long) t->context.fs & 0xffff; 
+    contextgs[0] = (unsigned long) t->context.gs & 0xffff; 
 
-    contextrax[0] = (unsigned long) t->rax;  
-    contextrbx[0] = (unsigned long) t->rbx; 
-    contextrcx[0] = (unsigned long) t->rcx;  
-    contextrdx[0] = (unsigned long) t->rdx; 
-    contextrsi[0] = (unsigned long) t->rsi;  
-    contextrdi[0] = (unsigned long) t->rdi; 
-    contextrbp[0] = (unsigned long) t->rbp;  
+// General purpose.
+
+    contextrax[0] = (unsigned long) t->context.rax;  
+    contextrbx[0] = (unsigned long) t->context.rbx; 
+    contextrcx[0] = (unsigned long) t->context.rcx;  
+    contextrdx[0] = (unsigned long) t->context.rdx; 
+    contextrsi[0] = (unsigned long) t->context.rsi;  
+    contextrdi[0] = (unsigned long) t->context.rdi; 
+    contextrbp[0] = (unsigned long) t->context.rbp;  
     // Continua...
 
-    contextr8[0] = (unsigned long) t->r8;  
-    contextr9[0] = (unsigned long) t->r9;  
-
-    contextr10[0] = (unsigned long) t->r10;  
-    contextr11[0] = (unsigned long) t->r11;  
-    contextr12[0] = (unsigned long) t->r12;  
-    contextr13[0] = (unsigned long) t->r13;  
-    contextr14[0] = (unsigned long) t->r14;  
-    contextr15[0] = (unsigned long) t->r15;  
+    contextr8[0]  = (unsigned long) t->context.r8;  
+    contextr9[0]  = (unsigned long) t->context.r9;  
+    contextr10[0] = (unsigned long) t->context.r10;  
+    contextr11[0] = (unsigned long) t->context.r11;  
+    contextr12[0] = (unsigned long) t->context.r12;  
+    contextr13[0] = (unsigned long) t->context.r13;  
+    contextr14[0] = (unsigned long) t->context.r14;  
+    contextr15[0] = (unsigned long) t->context.r15; 
 
 // Restore
     register int i=0;
-    for (i=0; i<512; i++){
-        context_fpu_buffer[i] = (unsigned char) t->fpu_buffer[i];
+    for (i=0; i<512; i++)
+    {
+        context_fpu_buffer[i] = 
+            (unsigned char) t->context.fpu_buffer[i];
     };
 
 // Restore CR3 and flush TLB.
@@ -399,7 +406,7 @@ int contextCheckThreadRing3Context (int tid)
     }
 
 // Segment
-    if ( t->cs != 0x1B ) {
+    if (t->context.cs != 0x1B) {
         debug_print("contextCheckThreadRing3Context: segments fail\n");
         return FALSE; 
     }

@@ -271,8 +271,8 @@ void spawn_thread(tid_t tid)
         // #suspended
         //spawn_enter_kernelmode( 
         //    TRUE,  // EOI
-        //    (unsigned long) target_thread->rip,
-        //    (unsigned long) target_thread->rsp );
+        //    (unsigned long) target_thread->context.rip,
+        //    (unsigned long) target_thread->context.rsp );
     }
 
     // #debug
@@ -280,11 +280,11 @@ void spawn_thread(tid_t tid)
     // refresh_screen();
     // while(1){}
     
-    // Target->ss     & 0xffff
-    // Target->rsp
-    // Target->rflags
-    // Target->cs     & 0xffff
-    // Target->rip
+    // Target->context.ss     & 0xffff
+    // Target->context.rsp
+    // Target->context.rflags
+    // Target->context.cs     & 0xffff
+    // Target->context.rip
 
 // ===================
 // ring 1
@@ -306,8 +306,8 @@ void spawn_thread(tid_t tid)
     {
         spawn_enter_usermode( 
             TRUE,  // EOI
-            (unsigned long) target_thread->rip,
-            (unsigned long) target_thread->rsp );
+            (unsigned long) target_thread->context.rip,
+            (unsigned long) target_thread->context.rsp );
     }
 
 // Paranoia

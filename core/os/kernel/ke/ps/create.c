@@ -247,38 +247,40 @@ struct thread_d *create_init_thread (void)
     t->rflags_initial_iopl = (unsigned int) 3; 
     t->rflags_current_iopl = (unsigned int) 3; 
 
-    t->ss     = 0x23;
-    t->rsp    = (unsigned long) CONTROLTHREAD_STACK; 
-    t->rflags = 0x3202;
-    t->cs     = 0x1B;
-    t->rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
+// Stack frame.
+    t->context.ss     = 0x23;
+    t->context.rsp    = (unsigned long) CONTROLTHREAD_STACK; 
+    t->context.rflags = 0x3202;  // #caution
+    t->context.cs     = 0x1B;
+    t->context.rip    = (unsigned long) CONTROLTHREAD_ENTRYPOINT; 
 
-    t->ds = 0x23;  
-    t->es = 0x23;
-    t->fs = 0x23;
-    t->gs = 0x23;
+    t->context.ds = 0x23;  
+    t->context.es = 0x23;
+    t->context.fs = 0x23;
+    t->context.gs = 0x23;
 
-    t->rax = 0;
-    t->rbx = 0;
-    t->rcx = 0;
-    t->rdx = 0;
+// General purpose
 
-    t->rsi = 0;
-    t->rdi = 0;
-    t->rbp = 0;
-    // ...
-
-    t->r8 = 0;
-    t->r9 = 0;
-    t->r10 = 0;
-    t->r11 = 0;
-    t->r12 = 0;
-    t->r13 = 0;
-    t->r14 = 0;
-    t->r15 = 0;
+    t->context.rax = 0;
+    t->context.rbx = 0;
+    t->context.rcx = 0;
+    t->context.rdx = 0;
+    t->context.rsi = 0;
+    t->context.rdi = 0;
+    t->context.rbp = 0;
+    // rsp
+    t->context.r8 = 0;
+    t->context.r9 = 0;
+    t->context.r10 = 0;
+    t->context.r11 = 0;
+    t->context.r12 = 0;
+    t->context.r13 = 0;
+    t->context.r14 = 0;
+    t->context.r15 = 0;
 
 // O endereço incial, para controle.
-    t->initial_rip = (unsigned long) t->rip; 
+    t->initial_rip = 
+        (unsigned long) t->context.rip; 
 
     t->saved = FALSE; 
 
@@ -287,7 +289,6 @@ struct thread_d *create_init_thread (void)
 	//IdleThread->root = (struct _iobuf *) file_root;
 	//IdleThread->pwd  = (struct _iobuf *) file_pwd;
 
-	
 	//CPU configuration.
 	//IdleThread->cpuID = 0;              //Qual processador.
 	//IdleThread->confined = 1;           //Flag, confinado ou n�o.
@@ -336,10 +337,10 @@ struct thread_d *create_init_thread (void)
 // == Queue =====================================
 //
  
-    // #bugbug
-	// N�o h� a necessidade de colocar na fila de inicializadas
-	// se logo em seguida estamos selecionando para execu��o 
-	// colocando no estado standby.
+// #bugbug
+// Nao ha a necessidade de colocar na fila de inicializadas
+// se logo em seguida estamos selecionando para execuçao
+// colocando no estado standby.
 
 //
 // #bugbug: Overflow
@@ -363,9 +364,8 @@ struct thread_d *create_init_thread (void)
     return (struct thread_d *) t;
 }
 
-
 //
-// End.
+// End
 //
 
 

@@ -36,7 +36,7 @@ void show_slot(int tid)
         t->quantum,    // Quantum
         t->step,       // >>> Jiffies
         t->initial_rip,
-        t->rflags,
+        t->context.rflags,
         t->name_address );
 
     printf(":: stime{%d} utime{%d}\n",t->stime,t->utime);
@@ -120,13 +120,13 @@ void show_reg(int tid)
 // Show registers
     printf("\n");
     printf("rflags=[%x]\n", 
-        t->rflags);
+        t->context.rflags);
     printf("cs:rip=[%x:%x] ss:rsp=[%x:%x]\n", 
-        t->cs, t->rip, t->ss, t->rsp );
+        t->context.cs, t->context.rip, t->context.ss, t->context.rsp );
     printf("ds=[%x] es=[%x] fs=[%x] gs=[%x]\n",
-        t->ds, t->es, t->fs, t->gs );
+        t->context.ds, t->context.es, t->context.fs, t->context.gs );
     printf("a=[%x] b=[%x] c=[%x] d=[%x]\n",
-        t->rax, t->rbx, t->rcx, t->rdx );
+        t->context.rax, t->context.rbx, t->context.rcx, t->context.rdx );
 // r8~r12
 // ...
 }

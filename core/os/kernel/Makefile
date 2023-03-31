@@ -131,6 +131,8 @@ all: k1 k2 k3 \
 link-kernel \
 clean    
 
+	@echo "Done?"
+
 # The boot \o/
 # The x86 head of the monster.
 k1:
