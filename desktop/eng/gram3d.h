@@ -54,6 +54,9 @@ extern int current_mode;
 #include "event.h"    // view inputs
 
 #include "grprim.h"
+#include "camera.h"
+#include "world.h"
+#include "proj.h"
 #include "sprite.h"
 #include "surface.h"
 #include "models.h"
