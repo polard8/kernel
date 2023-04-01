@@ -58,6 +58,8 @@ extern int current_mode;
 #include "event.h"    // view inputs
 
 #include "rtl/grprim.h"
+#include "rtl/camera.h"
+#include "rtl/proj.h"
 #include "sprite.h"
 #include "demos.h"
 

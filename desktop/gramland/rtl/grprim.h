@@ -110,62 +110,7 @@ struct gr_ray_d
 };
 
 
-//
-// projection
-//
 
-// ??
-// graphical projection perspective
-// See:
-// https://en.wikipedia.org/wiki/Perspective_(graphical)
-struct gr_projection_d
-{
-    int used;
-    int magic;
-    int initialized;
-
-    // perspective or orthographic
-    int type;
-
-// fovy   Number The angle between the upper and lower 
-// sides of the viewing frustum.
-// aspect Number The aspect ratio of the viewing window. (width/height).
- 
-// The frustrum:   
-// The rectangle that the can see.
-// The limits in z axis. zmin and zmax;
-// projection window.
-
-    struct gr_rectangle_d  *frustrum_view;
-    
-// Distance to the near clipping plane along the -Z axis.
-    int zNear;
-// Distance to the far clipping plane along the -Z axis.
-// In other words, the larger the z, the further is the object. 
-// After the flip, the coordinate system is no longer a 
-    int zFar; 
-// zRange = zNear - zFar;
-    int zRange;
-// fov: field of view.
-    int angle_of_view;
-// The apex.
-    // mid_x = (left + right) * 0.5;
-    // mid_y = (bottom + top)  * 0.5;
-    struct gr_vec3D_d  *frustrum_apex;
- // aspect ratio
-    // ar = screen width / screen height
-    // #bugbug: We are using int, not float.
-    int ar;
-
-// ------------------
-// viewport: 
-// All the view port information is found 
-// the local device context.
-
-    struct dc_d *dc;
-};
-
-struct gr_projection_d  *CurrentProjection;
 
 // The Perspective Calculation
 
@@ -179,30 +124,6 @@ struct gr_projection_d  *CurrentProjection;
 //
 // camera
 //
-
-// Camera
-struct gr_camera_d
-{
-    int used;
-    int magic;
-    int initialized;
-
-// EYE: Position of the camera.
-    struct gr_vec3D_d position;
-// UP: Orientation.
-    struct gr_vec3D_d upview;
-// AT: target point.
-    struct gr_vec3D_d lookat;
-
-// ?
-    struct gr_projection_d *projection;
-
-// Next node in the linked list.
-    // int id;
-    // struct gr_camera_d *next;
-};
-
-struct gr_camera_d  *CurrentCamera;
 
 
 // array of chars.
@@ -232,24 +153,6 @@ struct gr_bitmap_d
 
 int grInit(void);
 
-
-//
-// Camera
-//
-
-int camera_initialize(void);
-
-int 
-camera ( 
-    int x, int y, int z,
-    int xUp, int yUp, int zUp,
-    int xLookAt, int yLookAt, int zLookAt );
-
-int projection_initialize(void);
-
-int gr_depth_range(struct gr_projection_d *projection, int near, int far);
-// Chaging the view for a given projection
-int view (struct gr_projection_d *projection, int near, int far);
 
 // See: view()
 void 

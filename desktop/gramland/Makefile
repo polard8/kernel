@@ -127,10 +127,13 @@ all-c:
 line.o rect.o window.o bitblt.o painter.o gws.o comp.o bmp.o connect.o button.o
 
 #fx
-	$(CC)  -c  rtl/grprim.c    $(CFLAGS) $(CINCLUDES) -o grprim.o
-	$(CC)  -c  sprite.c    $(CFLAGS) $(CINCLUDES) -o sprite.o
-	$(CC)  -c  demos.c     $(CFLAGS) $(CINCLUDES) -o demos.o
-	$(LD) -r -o archive_fx.o  grprim.o sprite.o demos.o 
+	$(CC)  -c  rtl/grprim.c  $(CFLAGS) $(CINCLUDES) -o grprim.o
+	$(CC)  -c  rtl/camera.c  $(CFLAGS) $(CINCLUDES) -o camera.o
+	$(CC)  -c  rtl/proj.c    $(CFLAGS) $(CINCLUDES) -o proj.o
+	$(CC)  -c  sprite.c      $(CFLAGS) $(CINCLUDES) -o sprite.o
+	$(CC)  -c  demos.c       $(CFLAGS) $(CINCLUDES) -o demos.o
+	$(LD) -r -o archive_fx.o \
+grprim.o camera.o proj.o sprite.o demos.o 
 
 #extra
 	$(CC)  -c grinput.c  $(CFLAGS) $(CINCLUDES) -o grinput.o
