@@ -229,10 +229,15 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
         triRotatedXYZ.p[2].color = tri.p[2].color;
 
 
-        // Translate in z.
+        // Translate in z. (terrain)
 
         // Increment distance
-        cube->model_distance = (float) (cube->model_distance + 0.00005f);
+        //cube->model_distance = (float) (cube->model_distance + 0.00005f);
+        cube->model_distance = 
+            (float) ( 
+                cube->model_distance + 
+                cube->model_distance_delta );
+        
         // Restart distance
         if (cube->model_distance > 14.0f){
             cube->model_distance = (float) 0.8f;
@@ -538,13 +543,20 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         triRotatedXYZ.p[1].color = tri.p[1].color;
         triRotatedXYZ.p[2].color = tri.p[2].color;
 
+        // -z-------
         // Translate in z. (move)
 
         // Increment distance
-        cube->model_distance = (float) (cube->model_distance + 0.00005f);
+        //cube->model_distance = (float) (cube->model_distance + 0.00005f);
+        cube->model_distance = 
+            (float) ( 
+                cube->model_distance + 
+                cube->model_distance_delta );
+
+        // #test: Because each cube has it's own delta.
         // Increment distance if we have a terrain.
-        if( (void*)terrain != NULL)
-            cube->model_distance = (float) terrain->model_distance;
+        // if ((void*)terrain != NULL)
+        //    cube->model_distance = (float) terrain->model_distance;
 
         // Restart distance if we reached the limit in the z-axis.
         if (cube->model_distance > 14.0f){
@@ -562,7 +574,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         triRotatedXYZ.p[0].z =
             (float) (
             triRotatedXYZ.p[0].z + 
-            cube->model_initial_distance +
+            cube->model_initial_distance + 
             cube->model_distance ); 
         triRotatedXYZ.p[1].z = 
             (float) (
@@ -585,9 +597,10 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         //triRotatedXYZ.p[2].x = 
         //    (float) (triRotatedXYZ.p[2].x + cube->hposition); 
 
+        // -x-------
         // Translate the triangle in x based in the terrain x position.
 
-        if( (void*)terrain != NULL)
+        if ((void*)terrain != NULL)
         {
             triRotatedXYZ.p[0].x = 
                 (float) (triRotatedXYZ.p[0].x + terrain->hposition + cube->hposition); 
@@ -597,10 +610,11 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
                 (float) (triRotatedXYZ.p[2].x + terrain->hposition + cube->hposition); 
         }
 
+        // -y-------
         // Translate the triangle in y based in the terrain y position.
         // Coloca o cubo no chão do terreno.
         
-        if( (void*)terrain != NULL)
+        if ((void*)terrain != NULL)
         {
             triRotatedXYZ.p[0].y = 
                 (float) (triRotatedXYZ.p[0].y + terrain->vposition + cube->vposition); 
@@ -1298,8 +1312,7 @@ void demoFlyingCubeSetup(void)
         }
 
         // Create terrain
-        if (count==0)
-        {
+        if (count==0){
             terrain = (struct cube_model_d *) cube;
         }
 
@@ -1336,8 +1349,14 @@ void demoFlyingCubeSetup(void)
         cube->colors[10] = GRCOLOR_LIGHTBLUE;
         cube->colors[11] = GRCOLOR_LIGHTGREEN;
 
-        cube->model_initial_distance = (float) 8.0f;
+        // All the cubes.
+        cube->model_initial_distance = 
+            (float) DEFAULT_CUBE_INITIAL_Z_POSITION;
+            //(float) 8.0f;
         cube->model_distance = (float) 0.0f;
+        cube->model_distance_delta = 
+            (float) DEFAULT_CUBE_INITIAL_DELTA_Z;
+            //(float) 0.00005f;
 
         // left or right
         //srand(count);
@@ -1364,6 +1383,7 @@ void demoFlyingCubeSetup(void)
     };
 
 // Terrain
+// Special values for the terrain.
 
     if ( (void*) terrain != NULL )
     {
@@ -1391,8 +1411,14 @@ void demoFlyingCubeSetup(void)
         terrain->colors[10] = GRCOLOR_DARKWHITE;
         terrain->colors[11] = GRCOLOR_DARKWHITE;
 
-        terrain->model_initial_distance = (float) 4.0f;//8.0f;
+        // z translation support.
+        terrain->model_initial_distance = 
+            (float) DEFAULT_TERRAIN_INITIAL_Z_POSITION;
+            //(float) 4.0f;
         terrain->model_distance = (float) 0.0f;
+        terrain->model_distance_delta = 
+            (float) DEFAULT_TERRAIN_INITIAL_DELTA_Z;
+            //(float) 0.00005f;
 
         terrain->hposition = (float)  0.0f;
         terrain->vposition = (float) -3.0f;
