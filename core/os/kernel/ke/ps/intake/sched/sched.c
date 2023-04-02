@@ -92,40 +92,35 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 // #todo:
 // We need to create another hook for the AP cores.
 
-
     if (SchedulerInfo.initialized != TRUE){
         panic("__scheduler_rr: Scheduler not initialized\n");
     }
-
     if (SchedulerInfo.policy != SCHED_RR){
         panic("__scheduler_rr: Scheduler policy\n");
     }
 
-
 // O processador atual precisa ter uma idle configurada.
 // #todo: Por enquanto estamos usando o UP, mas usaremos
 // um dado processador para escalonar para ele.
-
     Idle = (struct thread_d *) UPProcessorBlock.IdleThread;
-
     if ( (void*) Idle == NULL ){
         panic ("__scheduler_rr: Idle\n");
     }
-    if ( Idle->used != TRUE || Idle->magic != 1234 ){
+    if (Idle->used != TRUE || Idle->magic != 1234){
         panic ("__scheduler_rr: Idle validation\n");
     }
 
 // A idle thread precisa ser a 
 // thread de controle do processo init.
-
     if (Idle != InitThread){
         panic ("__scheduler_rr: Idle != InitThread\n");
     }
 
-    // Estabiliza a idle thread.
+// Estabilize the priority.
     Idle->base_priority = PRIORITY_SYSTEM_THRESHOLD;
     Idle->priority      = PRIORITY_SYSTEM_THRESHOLD;
-    Idle->quantum = QUANTUM_NORMAL_THRESHOLD;  // Credits.
+// Estabilize the credits.
+    Idle->quantum = QUANTUM_NORMAL_THRESHOLD;
 
     //Idle->affinity_processor = 0;
     //Idle->current_processor = 0;
@@ -181,22 +176,22 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
         if ( (void *) TmpThread != NULL )
         {
-
+            // ---------------------------
             // :: Waiting threads
             // Wake up some threads, given them a chance. 
             // and not putting waiting threads into the round.
             // Alarm and wakeup.
             // A thread esta esperando.
-            if ( TmpThread->used  == TRUE && 
+            if ( TmpThread->used == TRUE && 
                  TmpThread->magic == 1234 && 
                  TmpThread->state == WAITING )
             {
                 //panic ("Gotten!\n");
-                  
+
                 // Check alarm
-                if ( jiffies > TmpThread->alarm ){
-                    //TmpThread->signal = ?
+                if (jiffies > TmpThread->alarm){
                     TmpThread->alarm=0;
+                    //TmpThread->signal = ?
                 }
                 // Wake up
                 //if ( TmpThread->signal ){
@@ -209,22 +204,21 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 // Na hora de checar, pode ser que o tempo limite ja passou.
                 if (jiffies >= TmpThread->wake_jiffy)
                 {
-                    
                      // #debug
-                    printf ("sched: j1=%d | j2=%d |\n", jiffies, TmpThread->wake_jiffy);
+                    printf ("sched: j1=%d | j2=%d |\n", 
+                        jiffies, TmpThread->wake_jiffy);
                     //panic ("Wake!\n");
-                    
                     printf("sched: Waking up\n");
                     do_thread_ready(TmpThread->tid);
-                    
                     //panic("Wake ok\n");
                 } 
             }
 
+            // ---------------------------
             // :: Ready threads.
             // Scheduler.
             // A thread esta pronta.
-            if ( TmpThread->used  == TRUE && 
+            if ( TmpThread->used == TRUE && 
                  TmpThread->magic == 1234 && 
                  TmpThread->state == READY )
             {
@@ -256,30 +250,28 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
 
                 // Balance
                 // Non interactive system services and processes.
-                //if (TmpThread->personality == PERSONALITY_GRAMADO)
-                //{
+                //if (TmpThread->personality == PERSONALITY_GRAMADO){
                 //    TmpThread->quantum = QUANTUM_MIN;
                 //}
 
                 // Balance
                 // Interactive gui applications.
-                //if (TmpThread->personality == PERSONALITY_GWS)
-                //{
+                //if (TmpThread->personality == PERSONALITY_GWS){
                 //    TmpThread->quantum = QUANTUM_MAX;
                 //}
-                
+
                 // Balance all.
                 // Priority normal. balance.
                 TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
-
                 // Init thread: low
-                if ( TmpThread == Idle ){
+                if (TmpThread == Idle){
                     TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD;
                 }
-
                 // Foreground thread: high
-                if ( TmpThread->tid == foreground_thread ){
-                    TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
+                if (TmpThread->tid == foreground_thread)
+                {
+                    //TmpThread->quantum = QUANTUM_NORMAL_TIME_CRITICAL;
+                    TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +1;
                 }
 
                 // Window server: Very high
@@ -288,11 +280,16 @@ static tid_t __scheduler_rr(unsigned long sched_flags)
                 if (WindowServerInfo.initialized == TRUE)
                 {
                     if (TmpThread->tid == WindowServerInfo.tid)
-                        TmpThread->quantum = QUANTUM_SYSTEM_THRESHOLD;
+                    {
+                        //TmpThread->quantum = QUANTUM_SYSTEM_THRESHOLD;
+                        TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +2;
+                        //TmpThread->quantum = QUANTUM_NORMAL_THRESHOLD +1;
+                    }
                 }
 
             }
 
+            // ---------------------------
             // Exit
             // exit in progress
             if (TmpThread->magic==1234)
