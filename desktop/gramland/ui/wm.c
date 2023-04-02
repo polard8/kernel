@@ -1394,7 +1394,7 @@ void wmInitializeStructure(void)
 
 // Clear the structure.
     WindowManager.mode = WM_MODE_TILED;  //tiling
-// orientation
+// Orientation
     WindowManager.vertical = FALSE;   // horizontal. default
     //WindowManager.vertical = TRUE;
 // How many frames until now.
@@ -1428,12 +1428,14 @@ void wmInitializeStructure(void)
 // #todo
 // Desktop rectangles
 
+
 // Working area.
 // Área de trabalho.
-    WindowManager.wa_left   = 0;
-    WindowManager.wa_top    = 0;
-    WindowManager.wa_width  = 0;
-    WindowManager.wa_height = 0;
+// Container, not a window.
+    WindowManager.wa.left = 0;
+    WindowManager.wa.top = 0;
+    WindowManager.wa.width = 0;
+    WindowManager.wa.height = 0;
 
 //
 // Background color
@@ -2577,10 +2579,13 @@ static void wm_tile(void)
     //}
 
 // Initializing
-    unsigned long Left   = WindowManager.wa_left;
-    unsigned long Top    = WindowManager.wa_top;
-    unsigned long Width  = WindowManager.wa_width;
-    unsigned long Height = WindowManager.wa_height;
+
+    // Working Area.
+    unsigned long Left   = WindowManager.wa.left;
+    unsigned long Top    = WindowManager.wa.top;
+    unsigned long Width  = WindowManager.wa.width;
+    unsigned long Height = WindowManager.wa.height;
+
     unsigned long l2=0;
     unsigned long t2=0;
     unsigned long w2=0;
@@ -2609,16 +2614,16 @@ static void wm_tile(void)
                 w->active = FALSE;
                 w->focus = TRUE;
                 w->border_size = 1;
-                
+
                 // resize.
                 // width: Metade da largura da área de trabalho.
                 // height: Altura da área de trabalho dividido pela
                 // quantidade de janelas que temos.
-                Width  = (unsigned long) (WindowManager.wa_width / 2) -4;
-                Height = (unsigned long) WindowManager.wa_height;
+                Width  = (unsigned long) (WindowManager.wa.width / 2) -4;
+                Height = (unsigned long) WindowManager.wa.height;
                 if (cnt > 1)
-                    Height = (unsigned long) (WindowManager.wa_height / (cnt-1));
-                
+                    Height = (unsigned long) (WindowManager.wa.height / (cnt-1));
+
                 w2 = Width;
                 h2 = Height -4;
                 gws_resize_window(w, w2, h2);
@@ -2626,10 +2631,10 @@ static void wm_tile(void)
                 // positions.
                 // left: comaça na metade da área de tranalho.
                 // top: depende do indice da janela na lista.
-                Left = (unsigned long) (WindowManager.wa_width / 2) +2;
+                Left = (unsigned long) (WindowManager.wa.width / 2) +2;
                 Top  = (unsigned long) (Height * i);
                 l2 = Left;
-                t2 = Top +2; 
+                t2 = Top +2;
                 gwssrv_change_window_position(w, l2, t2);
 
                 // master?
@@ -2650,16 +2655,16 @@ static void wm_tile(void)
                     // resize.
                     // width: metade da área de trabalho.
                     // height: altura da área de trabalho.
-                    Width  = (unsigned long) (WindowManager.wa_width / 2);
-                    Height = (unsigned long) WindowManager.wa_height;
+                    Width  = (unsigned long) (WindowManager.wa.width / 2);
+                    Height = (unsigned long) WindowManager.wa.height;
                     w2 = Width  -4;
                     h2 = Height -4;
                     gws_resize_window(w, w2, h2);
 
                     // positions.
                     // Canto superior esquerdo. Com padding.
-                    Left = (unsigned long) WindowManager.wa_left;
-                    Top  = (unsigned long) WindowManager.wa_top; 
+                    Left = (unsigned long) WindowManager.wa.left;
+                    Top  = (unsigned long) WindowManager.wa.top; 
                     l2 = Left +2;
                     t2 = Top  +2;
                     gwssrv_change_window_position(w, l2, t2);
@@ -2670,8 +2675,8 @@ static void wm_tile(void)
             if (WindowManager.vertical==TRUE)
             {
                 //#todo:
-                //w->height = WindowManager.wa_height; 
-                //w->width  = (WindowManager.wa_width/cnt);
+                //w->height = WindowManager.wa.height; 
+                //w->width  = (WindowManager.wa.width/cnt);
                 //w->left   = (w->width * i);
                 //w->top    = 0;
             }
@@ -2967,8 +2972,8 @@ void wm_update_window_by_id(int wid)
         gwssrv_change_window_position(w,0,0);
         gws_resize_window(
             w,
-            WindowManager.wa_width,
-            WindowManager.wa_height);
+            WindowManager.wa.width,
+            WindowManager.wa.height);
     }
 
     if (WindowManager.is_fullscreen == TRUE)
@@ -4519,10 +4524,9 @@ new_event:
             taskbar_window->top = long2 - 32;
         }
         // Update working area.
-        WindowManager.wa_height = (long2 - 40);
+        WindowManager.wa.height = (long2 - 40);
         */
     }
-
 
     //if (msg == GWS_Close)
     //    gwssrv_quit();
@@ -5574,8 +5578,8 @@ int dock_window( struct gws_window_d *window, int position )
     //unsigned long h = gws_get_device_height();
     //#test
     //Using the working area
-    unsigned long w = WindowManager.wa_width;
-    unsigned long h = WindowManager.wa_height;
+    unsigned long w = WindowManager.wa.width;
+    unsigned long h = WindowManager.wa.height;
     if ( w==0 || h==0 ){
         return -1;
     }
@@ -5770,11 +5774,11 @@ gws_resize_window (
 
             if (WindowManager.initialized==TRUE)
             {
-                if (cx > WindowManager.wa_width){
-                    cx=WindowManager.wa_width;
+                if (cx > WindowManager.wa.width){
+                    cx=WindowManager.wa.width;
                 }
-                if (cy > WindowManager.wa_height){
-                    cy=WindowManager.wa_height;
+                if (cy > WindowManager.wa.height){
+                    cy=WindowManager.wa.height;
                 }
             }
         }

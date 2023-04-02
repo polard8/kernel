@@ -50,6 +50,9 @@ extern int current_mode;
 #include "os/screen.h"   // X-like
 #include "os/display.h"  // X-like
 #include "os/host.h"     // X-like h:0.0
+
+#include "os/surface.h"
+
 #include "ui/gui.h"
 
 // Compositor

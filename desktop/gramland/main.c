@@ -3535,12 +3535,13 @@ static int on_execute(int dm)
     }
 
 // The working area.
-    WindowManager.wa_left = 0;
-    WindowManager.wa_top = 0;
+// Container.
+    WindowManager.wa.left = 0;
+    WindowManager.wa.top = 0;
 // #danger
-    WindowManager.wa_width = 
+    WindowManager.wa.width = 
         WindowManager.root->width;
-    WindowManager.wa_height =
+    WindowManager.wa.height =
         (WindowManager.root->height - WindowManager.taskbar->height);
 
 // We already did that before. Its ok.
@@ -3550,10 +3551,10 @@ static int on_execute(int dm)
     //Not working
     /*
     printf ("wa: %d %d %d %d",
-        WindowManager.wa_left,
-        WindowManager.wa_top,
-        WindowManager.wa_width,
-        WindowManager.wa_height );
+        WindowManager.wa.left,
+        WindowManager.wa.top,
+        WindowManager.wa.width,
+        WindowManager.wa.height );
     */
 // ===============
 

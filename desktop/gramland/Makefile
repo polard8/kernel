@@ -121,10 +121,17 @@ all-c:
 	$(CC)  -c  gws.c       $(CFLAGS) $(CINCLUDES) -o gws.o
 	$(CC)  -c comp/comp.c  $(CFLAGS) $(CINCLUDES) -o comp.o
 	$(CC)  -c  bmp.c       $(CFLAGS) $(CINCLUDES) -o bmp.o
-	$(CC)  -c  os/connect.c   $(CFLAGS) $(CINCLUDES) -o connect.o
+
+	$(CC)  -c  os/connect.c $(CFLAGS) $(CINCLUDES) -o connect.o
+	$(CC)  -c  os/surface.c $(CFLAGS) $(CINCLUDES) -o surface.o
+
 	$(CC)  -c  button.c    $(CFLAGS) $(CINCLUDES) -o button.o
+
 	$(LD) -r -o archive_basics2.o \
-line.o rect.o window.o bitblt.o painter.o gws.o comp.o bmp.o connect.o button.o
+line.o rect.o window.o bitblt.o painter.o gws.o comp.o bmp.o \
+connect.o surface.o \
+button.o
+
 
 #fx
 	$(CC)  -c  rtl/grprim.c  $(CFLAGS) $(CINCLUDES) -o grprim.o

@@ -66,15 +66,22 @@ extern struct quick_launch_d QuickLaunch;
 struct desktop_composition_d
 {
     int initialized;
-
     int is_enabled;
-
 // Transparent window frames.
     int use_transparence;
 // 2D visual effects associated with the composition method.
     int use_visual_effects;
     // ...
 };
+
+struct gws_container_d
+{
+    unsigned long left;
+    unsigned long top;
+    unsigned long width;
+    unsigned long height;
+};
+
 
 // The window manager global structure.
 struct gws_windowmanager_d
@@ -87,16 +94,19 @@ struct gws_windowmanager_d
 // ...
     int mode;
 
-// 1= vertical 0=horizontal
+// Tiling orientation.
+// 1=vertical 0=horizontal
     int vertical;
 
-// The Working area.
+// The 'Working Area'.
 // The screen size, less the task bar.
-    int wa_left;
-    int wa_top;
-    int wa_width;
-    int wa_height;
-    // ...
+    struct gws_container_d wa;
+
+// #todo
+// Maybe we can create more containers,
+// and shrink the body container 'wa'.
+    //struct gws_container_d icon_area;
+
 
     unsigned long frame_counter;
     //unsigned long jiffies;
@@ -125,21 +135,13 @@ struct gws_windowmanager_d
 // Se tiver uma janela em fullscreen então pintamos, invalidamos
 // seu retângulo e validamos todos os outros.
 
-// Windows.
-    
-    // root
-    struct gws_window_d *root;
-    
-    // taskbar support
-    struct gws_window_d *taskbar;
-    // window inside the taskbar.
-    //struct gws_window_d *box1;   // left box: button box
-    //struct gws_window_d *box2;   // right box: notification box
-    // floating windows support
-    // windows on top of taskbar if the tb is on bottom of the screen.
-    //struct gws_window_d *tray1;  // left tray: start menu
-    //struct gws_window_d *tray2;  // right tray: notification window
+// Windows
 
+// root
+    struct gws_window_d *root;
+// taskbar
+    struct gws_window_d *taskbar;
+// ...
 
 // #test
 // z-order for all the layers.
@@ -1174,37 +1176,6 @@ unsigned long zList[ZORDER_MAX];
 //
 
 
-
-// #test
-// Uma janela criada pelo kgws em ring0 será representada 
-// aqui na forma de surface, e o servidor 
-// poderá solicitar ao kgws operações sobre essa surface.
-
-struct gws_surface_d
-{
-    int used;
-    int magic;
-    
-    // Pointer to the window in kgws.
-    // Redirection?
-    void *window_object;
-    
-    unsigned long left;
-    unsigned long top;
-    unsigned long width;
-    unsigned long height;
-
-// Só depois de inicializada os valores da janela são validos.
-    int initialized;
-    int dirty;
-    int locked;
-    // ...
-
-    struct gws_surface_d *next;
-};
-struct gws_surface_d *rootSurface;
-
-
 //
 // == prototypes ===========================
 //
@@ -1234,14 +1205,6 @@ struct gws_window_d *get_mousehover(void);
 // transparence
 void gws_enable_transparence(void);
 void gws_disable_transparence(void);
-
-struct gws_surface_d *xxxCreateSurface( 
-    unsigned long left,
-    unsigned long top,
-    unsigned long width,
-    unsigned long height,
-    unsigned long color );
-
 
 void wm_reboot(void);
 
@@ -1502,23 +1465,7 @@ copy_offset_rect (
     struct gws_rect_d *rectSrc, 
     unsigned long cx, 
     unsigned long cy ); 
-    
 
-
-
-void *xxxCreateSurfaceWindow( 
-    unsigned long type,        // 1, Tipo de janela (popup,normal,...)
-    unsigned long status,      // 2, Estado da janela (ativa ou nao)
-    unsigned long view,        // 3, (min, max ...)
-    char *windowname,          // 4, Título. 
-    unsigned long x,           // 5, Deslocamento em relação às margens do Desktop. 
-    unsigned long y,           // 6, Deslocamento em relação às margens do Desktop.
-    unsigned long width,       // 7, Largura da janela.
-    unsigned long height,      // 8, Altura da janela.
-    void *pSurfaceWindow,      // 9, Endereço da estrutura da janela mãe.
-    unsigned long desktop_id,  //10, Desktop id.
-    unsigned long clientcolor, //11, Cor da área de cliente
-    unsigned long color );      //12, Color (bg) (para janela simples).
 
 void create_taskbar (unsigned long tb_height, int show);
 struct gws_window_d *wmCreateRootWindow(unsigned int bg_color);

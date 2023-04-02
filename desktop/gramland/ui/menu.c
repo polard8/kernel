@@ -67,23 +67,23 @@ int create_main_menu(void)
 
     unsigned long m_left = 0;
     unsigned long m_top = 0;
-    unsigned long m_width  = (WindowManager.wa_width  >> 1);
-    unsigned long m_height = (WindowManager.wa_height >> 1);
+    unsigned long m_width  = (WindowManager.wa.width  >> 1);
+    unsigned long m_height = (WindowManager.wa.height >> 1);
     unsigned int m_color = COLOR_WHITE;
 
 // Special width.
     if (current_mode == GRAMADO_JAIL)
     {
-        m_top    = ((WindowManager.wa_height >> 1)*1);
-        m_width  = (WindowManager.wa_width  >> 1);
-        m_height = (WindowManager.wa_height >> 1);
+        m_top    = ((WindowManager.wa.height >> 1)*1);
+        m_width  = (WindowManager.wa.width  >> 1);
+        m_height = (WindowManager.wa.height >> 1);
     }
 // Special height.
     if ( current_mode == GRAMADO_P1 || current_mode == GRAMADO_HOME)
     {
-        m_top    = ((WindowManager.wa_height >> 2)*3);
-        m_width  = (WindowManager.wa_width  >> 2);
-        m_height = (WindowManager.wa_height >> 2);
+        m_top    = ((WindowManager.wa.height >> 2)*3);
+        m_width  = (WindowManager.wa.width  >> 2);
+        m_height = (WindowManager.wa.height >> 2);
     }
 
     StartMenu.is_created = FALSE;
