@@ -170,6 +170,8 @@ void test_draw_line2(void)
  *     Draw a horizontal line on backbuffer. 
  */
 // #todo: return the number of pixels changed.
+// Called by the triangle rasterization routine
+// fillTriangle0() in grprim.c.
 int
 grBackbufferDrawHorizontalLine ( 
     unsigned long x1,  //min
@@ -183,9 +185,9 @@ grBackbufferDrawHorizontalLine (
     //unsigned long __x2 = (unsigned long) x2;  //max
     //unsigned long __y  = (unsigned long) y;
 
-    // The worker uses 'int'
-    int __x1 = (int) (x1 & 0xFFFFFFFF);  //x min
-    int __x2 = (int) (x2 & 0xFFFFFFFF);  //x max
+// The worker uses 'int'.
+    int __x1 = (int) (x1 & 0xFFFFFFFF);  // x min
+    int __x2 = (int) (x2 & 0xFFFFFFFF);  // x max
     int __y  = (int) ( y & 0xFFFFFFFF);  // y
     unsigned long rop=0;
 
@@ -227,23 +229,25 @@ grBackbufferDrawHorizontalLine (
         return (int) npixels;
     }
 
-
     npixels = (int) (__x2 - __x1);
 
 // loop:
+// Plot a pixel using the top/left coordinates. (0,0).
 // IN: color, x, y, rop
     while (__x1 < __x2)
     {
+        // #??
+        // is this the perfect woutine for this job?
         grPlot2D( 
             (unsigned int) color, 
             (int) __x1, 
             (int) __y, 
             (unsigned long) rop );
-        
+
         __x1++;
     };
 
-// Return the number of pixels changed.
+// Return the number of changed pixels.
     return (int) npixels;
 }
 

@@ -34,7 +34,7 @@ fb_BackBufferPutpixel (
     unsigned long rop,
     unsigned long buffer_va );
 
-void 
+int
 putpixel0 ( 
     unsigned int  _color,
     unsigned long _x, 

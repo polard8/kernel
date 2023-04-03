@@ -625,6 +625,7 @@ gr_dc_plot0(
 
 
 // Plot a pixel using the top/left coordinates. (0,0).
+// Clipping in the screen.
 int 
 grPlot2D ( 
     unsigned int color, 
@@ -632,9 +633,16 @@ grPlot2D (
     int y,
     unsigned long rop )
 {
+// #todo: 
+// Return the number of changed pixels. '1' or '0'.
+
+    // Clipping
+    // 0 pixels changed.
+    if (x<0)
+        return 0;
+
     return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
 }
-
 
 /*
  * grPlot0:
@@ -1757,8 +1765,10 @@ int grTriangle(struct gr_triangle_d *triangle)
 }
 //---------------------
 
-// Fill a triangle - Bresenham method
-// Original from http://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+// Fill a triangle - Bresenham method.
+// Original from 
+// http://www.sunshine2k.de/\
+// coding/java/TriangleRasterization/TriangleRasterization.html
 int 
 fillTriangle0(
     int x1, int y1,
@@ -1766,7 +1776,10 @@ fillTriangle0(
     int x3, int y3, 
     unsigned int c)
 {
-    int npixels=0;  // Number of pixels changed.
+// Triangle rasterization.
+
+// Number of changed pixels.
+    int npixels=0;
 
     int t1x=0;
     int t2x=0;
@@ -1983,8 +1996,11 @@ fillTriangle(
     struct gr_triangle_d *triangle,
     int hotspotx, int hotspoty )
 {
-    int npixels=0;  // Number of pixels changed.
 
+// Number of changed pixels.
+    int npixels=0;
+// Transformed values.
+// Valid for 2D with 0:0 in the top/left corner.
     int X0=0; int Y0=0;
     int X1=0; int Y1=0;
     int X2=0; int Y2=0;
@@ -2018,7 +2034,8 @@ fillTriangle(
         TRUE, //UseLeftHand,
         hotspotx, hotspoty ); 
 
-    unsigned int color = triangle->p[0].color;
+// Color
+    unsigned int color = (unsigned int) triangle->p[0].color;
 
 // Draw
 // Cavalier Oblique Drawings.
@@ -2034,6 +2051,8 @@ fillTriangle(
     return (int) npixels;
 }
 
+
+// -------------------------------------------------
 // IN: projected triangle.
 // float
 int 
@@ -2042,8 +2061,9 @@ plotTriangleF(
     struct gr_triangleF3D_d *t,
     int fill )
 {
-    int npixels=0;  // Number of pixels changed.
 
+// Number of changed pixels.
+    int npixels=0;
 // Engine triangle structure.
 // Using 'int',
     struct gr_triangle_d final_triangle;
@@ -2087,13 +2107,19 @@ plotTriangleF(
 
         window_width  = (unsigned long) CurrentProjectionF.width;
         window_height = (unsigned long) CurrentProjectionF.height;
-
+        if (window_width == 0){
+            printf ("Invalid aspect ratio\n");
+            exit(1);
+        }
+        // 600/800 = 0.75
+        // 480/640 = 0.75
+        // 200/320 = 0.625
         ar = 
             (float)((float) window_height / (float) window_width );
         
         // scale factor
-        //#todo: hotspot
         // 0.5f
+        // #todo: hotspot
         scale_factor = (float) CurrentProjectionF.scale_factor;
     }
 
@@ -2205,13 +2231,20 @@ plotTriangleF(
         scale_factor = (float) 2.00f;
     }
 
+    // Ex: (0.5 * 0.75 * 0.5 * 800) = 150
+    // Ex: (0.5 * 0.75 * 0.5 * 600) = 112.5
     long x0 = (long) (t->p[0].x *ar * scale_factor * (float) window_width);
     long y0 = (long) (t->p[0].y     * scale_factor * (float) window_height);
     long x1 = (long) (t->p[1].x *ar * scale_factor * (float) window_width);
     long y1 = (long) (t->p[1].y     * scale_factor * (float) window_height);
     long x2 = (long) (t->p[2].x *ar * scale_factor * (float) window_width);
     long y2 = (long) (t->p[2].y     * scale_factor * (float) window_height);
-  
+
+// Final rectangle. Using 'int'.
+// Considerando o hotspot no centro,
+// o valor tem que ser menor que 800/2 
+// ou menor que 600/2.
+
     final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
     final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
     final_triangle.p[0].z = (int) 0;
@@ -2257,6 +2290,263 @@ plotTriangleF(
     return (int) npixels;
 }
 //------------------
+
+
+// -------------------------------------------------
+// IN: projected vector.
+// float
+int 
+plotPixelF(
+    struct gws_window_d *window,
+    struct gr_vecF3D_d *vec )
+{
+// Plot a single pixel.
+// # Not tested yet.
+// We have a lot of calculations only for a single pixel.
+// This routine is good for some kind of ray tracing.
+
+// Number of changed pixels.
+    int npixels=0;
+
+// Engine triangle structure.
+// Using 'int',
+    //struct gr_triangle_d final_triangle;
+
+    if (CurrentProjectionF.initialized != TRUE){
+        printf("plotTriangleF: CurrentProjectionF\n");
+        return (int) npixels;
+    }
+
+// #test
+    //unsigned long window_width = 800;
+    //unsigned long window_height = 600;
+    //unsigned long window_width = gws_get_device_width();
+    //unsigned long window_height = gws_get_device_height();
+
+// Check the 'projected triangle'.
+    if ((void*)vec == NULL){
+        return (int) npixels;
+    }
+
+// Projection parameters.
+// No matrix.
+
+    // z
+    float znear = (float) 0.01f;  //default
+    float zfar  = (float) 10.0f;  //default
+    // ar
+    unsigned long window_width  = 200;
+    unsigned long window_height = 200;
+    float ar = (float) 1.0f;      //default
+    // scaling factor.
+    // % da tela.
+    // fov scale factor = 1/( tan(a/2) )
+    // x=afx and y=fy
+    float scale_factor = (float) 0.5f;   //default
+ 
+    if (CurrentProjectionF.initialized == TRUE)
+    {
+        znear = (float) CurrentProjectionF.znear;
+        zfar  = (float) CurrentProjectionF.zfar;
+
+        window_width  = (unsigned long) CurrentProjectionF.width;
+        window_height = (unsigned long) CurrentProjectionF.height;
+        if (window_width == 0){
+            printf ("Invalid aspect ratio\n");
+            exit(1);
+        }
+        // 600/800 = 0.75
+        // 480/640 = 0.75
+        // 200/320 = 0.625
+        ar = 
+            (float)((float) window_height / (float) window_width );
+        
+        // scale factor
+        // 0.5f
+        // #todo: hotspot
+        scale_factor = (float) CurrentProjectionF.scale_factor;
+    }
+
+// #todo
+// Well, z needs to be between 0 and 1.
+// the scale factor for z is s.
+// z = (sz - sznear)
+
+// #bugbug
+// somente depois de aplicarmos o scale factor
+// é que podemos realizar o clipping.
+
+// #bugbug
+// We have a scale factor do x and y.
+// But we do not have a scale factor for z.
+// So, z can be any vallur between 0.01f and 1000.0f.
+
+// The 'image space'.
+// Our image space is not 1:1:1
+// It's something like 2:2:1000
+// No z normalization
+
+// Clipping in z
+
+    if (vec->z < znear){ return 0; }
+    if (vec->z > zfar) { return 0; }
+
+// #test
+// Ficando menor conforme z aumenta.
+
+/*
+    if (t->p[0].z != 0.0f)
+    {
+        t->p[0].x = (float) (t->p[0].x/t->p[0].z);
+        t->p[0].y = (float) (t->p[0].y/t->p[0].z);
+    }
+    if (t->p[1].z != 0.0f)
+    {
+        t->p[1].x = (float) (t->p[1].x/t->p[1].z);
+        t->p[1].y = (float) (t->p[1].y/t->p[1].z);
+    }
+    if (t->p[2].z != 0.0f)
+    {
+        t->p[2].x = (float) (t->p[2].x/t->p[2].z);
+        t->p[2].y = (float) (t->p[2].y/t->p[2].z);
+    }
+*/
+
+/*
+ //#wrong?
+    if (t->p[0].z != 0.0f)
+    {
+        t->p[0].x = (float) (t->p[0].x / t->p[0].z * tanf(45.5f/2) );
+        t->p[0].y = (float) (t->p[0].y / t->p[0].z * tanf(45.5f/2));
+    } 
+    if (t->p[1].z != 0.0f)
+    {
+        t->p[1].x = (float) (t->p[1].x/t->p[1].z * tanf(45.5f/2));
+        t->p[1].y = (float) (t->p[1].y/t->p[1].z * tanf(45.5f/2));
+    }
+    if (t->p[2].z != 0.0f)
+    {
+        t->p[2].x = (float) (t->p[2].x/t->p[2].z * tanf(45.5f/2));
+        t->p[2].y = (float) (t->p[2].y/t->p[2].z * tanf(45.5f/2));
+    }
+*/
+
+// scale
+// Ajustando à tela.
+// x=afx  y=fx
+// So, we're using the 0.5f for scale factor,
+// but we gotta use 1/(tan(a/2))
+
+
+    //#test
+    // tan(45)=1
+    // tan(90/2)=1
+    //scale_factor = (float) ( 1.0f/tanf(90.0f*0.5f)/2.0f);
+    //scale_factor = (float) (1/tanf(45.0f/2.0f));
+    //scale_factor = (float) (1/tanf(80.0f * 0.5f / 180.0f * 3.14159f));
+
+// Se o scale_factor for 0.5f o valor será
+// metade da tela.
+// então -1 +1 preenche a tela toda.
+
+// Quanto menor for campo de visão, 
+// maior sera o scale factor e maior sera o objeto.
+// Quanto maior for o campo de visão,
+// menor sera o scale factor e menor sera o objeto.
+
+    //#test
+    //scale_factor = 0.1f;  // fov grande, scale factor pequeno, objeto pequeno
+    //scale_factor = 0.5f;  // fov medio, scale factor medio, objeto normal
+    //scale_factor = 1.0f;  // fov pequeno, scale factor grande, objeto grande
+
+    //#test
+    //scale_factor = 0.01f;  // very small.
+    //scale_factor = 2.0f;
+
+// #tmp
+// Scale factor limits
+    if ( (float) scale_factor < 0.01f ){
+        scale_factor = (float) 0.01f;
+    }
+    if ( (float) scale_factor > 2.00f ){
+        scale_factor = (float) 2.00f;
+    }
+
+    // Ex: (0.5 * 0.75 * 0.5 * 800) = 150
+    // Ex: (0.5 * 0.75 * 0.5 * 600) = 112.5
+    long x0 = (long) (vec->x *ar * scale_factor * (float) window_width);
+    long y0 = (long) (vec->y     * scale_factor * (float) window_height);
+    //long x1 = (long) (t->p[1].x *ar * scale_factor * (float) window_width);
+    //long y1 = (long) (t->p[1].y     * scale_factor * (float) window_height);
+    //long x2 = (long) (t->p[2].x *ar * scale_factor * (float) window_width);
+    //long y2 = (long) (t->p[2].y     * scale_factor * (float) window_height);
+
+// Final rectangle. Using 'int'.
+// Considerando o hotspot no centro,
+// o valor tem que ser menor que 800/2 
+// ou menor que 600/2.
+
+    int final_x = (int) ( x0 & 0xFFFFFFFF);
+    int final_y = (int) ( y0 & 0xFFFFFFFF);
+    //int final_z = (int) 0;
+    unsigned int final_color = (unsigned int) vec->color;
+
+    //final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
+    //final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
+    //final_triangle.p[0].z = (int) 0;
+    //final_triangle.p[0].color = t->p[0].color; //COLOR_WHITE;
+    
+    //final_triangle.p[1].x = (int) ( x1 & 0xFFFFFFFF);
+    //final_triangle.p[1].y = (int) ( y1 & 0xFFFFFFFF);
+    //final_triangle.p[1].z = (int) 0;
+    //final_triangle.p[1].color = t->p[1].color; // COLOR_WHITE;
+    
+    //final_triangle.p[2].x = (int) ( x2 & 0xFFFFFFFF);
+    //final_triangle.p[2].y = (int) ( y2 & 0xFFFFFFFF);
+    //final_triangle.p[2].z = (int) 0;
+    //final_triangle.p[2].color = t->p[2].color; // COLOR_WHITE;
+
+    //final_triangle.used = TRUE;
+    //final_triangle.initialized = TRUE;
+
+    //#debug
+    //printf("x0=%d y0=%d | x1=%d y1=%d | x2=%d y2=%d \n",
+    //    final_triangle.p[0].x, final_triangle.p[0].y, 
+    //    final_triangle.p[1].x, final_triangle.p[1].y, 
+    //    final_triangle.p[2].x, final_triangle.p[2].y );
+
+// Not filled.
+// we dont need a valid window.
+// #todo: return pixel counter.
+    //if (!fill){
+    //    npixels += grTriangle3( window, &final_triangle );
+    //}
+
+// Filled
+// We need a valid window.
+// #todo: return pixel counter.
+    //if (fill){
+    //    npixels += fillTriangle( 
+    //                   window, 
+    //                   &final_triangle, 
+    //                   HotSpotX, HotSpotY );
+    //}
+
+// Plot 2d pixel usiing top/left 0:0.
+// IN: color, x, y, rop.
+    grPlot2D( 
+        (unsigned int) final_color, 
+        (int) final_x, 
+        (int) final_y, 
+        (unsigned long) 0 );
+
+// Return pixel counter.
+    //return (int) npixels;
+    return 1;
+}
+//------------------
+
+
 
 // Polyline
 // O segundo ponto da linha 

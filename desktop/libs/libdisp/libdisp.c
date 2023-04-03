@@ -127,11 +127,22 @@ grBackBufferPutpixel (
     int y,
     unsigned long rop )
 {
+// #todo: Return the number of changed pixels. '0'
     if(x<0){ return -1; }
     if(y<0){ return -1; }
+    //if(x<0){ return 0; }
+    //if(y<0){ return 0; }
+
+// #bugbug: We don't have rop in this routine.
 // IN: color, x, y, rop, target buffer.
     return (int) fb_BackBufferPutpixel( 
                      color, x, y, rop, libgd_BACKBUFFER_VA );
+
+// #test: This routine has rop support.
+// #bugbug: These two routines are using different types
+// in the parameters.
+    //return (int) putpixel0( 
+    //                 color, x, y, rop, libgd_BACKBUFFER_VA );
 }
 
 // ## putpixel: 
@@ -190,6 +201,9 @@ fb_BackBufferPutpixel (
     unsigned long rop,
     unsigned long buffer_va )  
 {
+// #todo: Return the number of changed pixels.
+// #bugbug: We don't have rop in this routine.
+
     unsigned char *where = (unsigned char *) libgd_BACKBUFFER_VA;
     //unsigned char *where = (unsigned char *) buffer_va;
 
@@ -259,6 +273,7 @@ fb_BackBufferPutpixel (
 // Que eh o tamanho do buffer que temos ate agora.
     unsigned long pitch=0; 
 
+    // #todo: Return the number of changed pixels. '0'
     if (bytes_count!=3 && bytes_count!=4 )
         return -1;
 
@@ -272,6 +287,7 @@ fb_BackBufferPutpixel (
         tmpOffset = (unsigned long) ( (pitch*y) + (x<<2) );
     }
 
+    // #todo: Return the number of changed pixels. '0'
     if ( tmpOffset >= MaxOffset )
     {
         debug_print ("fb_BackBufferPutpixel: [ERROR] backbuffer limits > Max\n"); 
@@ -334,10 +350,17 @@ fb_BackBufferPutpixel (
     if (libgd_SavedBPP == 32){
         where[Offset +3] = a; 
     }
+
+// #todo: Return the number of changed pixels. '1'
     return 0;
+    //return (int) 1;
 fail:
+
+// #todo: Return the number of changed pixels. '0'
     return -1;
+    //return 0;
 }
+
 
 /*
  * putpixel0:
@@ -351,7 +374,7 @@ fail:
 // + Change the names of these parameters.
 // + Create a parameter for the address of the buffer.
 
-void 
+int
 putpixel0 ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -359,6 +382,7 @@ putpixel0 (
     unsigned long _rop_flags,
     unsigned long buffer_va )
 {
+// #todo: Return the number of changed pixels.
 
 // The address where we're gonna put the data into.
 // #todo: It needs to be a valid ring3 address.
@@ -392,7 +416,7 @@ putpixel0 (
     if (buffer_va == 0){
         //panic("putpixel0: buffer_va\n");
         gwssrv_debug_print("putpixel0: buffer_va\n");
-        return;
+        return 0;  // 0 changed pixels.
     }
 
 // Split: bgra
@@ -567,6 +591,9 @@ putpixel0 (
     where[offset +1] = g3;
     where[offset +2] = r3;
     if (bpp == 32){ where[offset +3] = a3; };
+
+// Return the number of changed pixels.
+    return (int) 1;
 }
 
 void 

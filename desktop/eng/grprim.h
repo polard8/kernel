@@ -52,9 +52,7 @@ struct gr_vecF2D_d
 };
 
 
-
 // 3D float point.
-// #todo: Maybe in the future.
 struct gr_vecF3D_d
 {
     float x;
@@ -513,6 +511,12 @@ plotTriangleF(
     struct gws_window_d *window,
     struct gr_triangleF3D_d *t,
     int fill );
+
+// Plot a single pixel.
+int 
+plotPixelF(
+    struct gws_window_d *window,
+    struct gr_vecF3D_d *vec );
 
 //
 // == polygon ===========================
