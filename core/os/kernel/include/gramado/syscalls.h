@@ -451,27 +451,18 @@ void *sys_create_thread (
     int ppid, 
     char *name );
 
-
-void sys_exit_thread (int tid);
-
-int sys_fork (void);
-
+int sys_exit_thread (tid_t tid);
+int sys_fork(void);
 pid_t sys_getpid(void);
 pid_t sys_getppid(void);
-
 int sys_initialize_component(int n);
-
 int sys_serial_debug_printk ( char *s );
-
 void sys_show_system_info ( int n );
-
 int sys_uname (struct utsname *ubuf);
-
 void sys_vsync(void);
 
-int sys_reboot(void);
-void sys_shutdown (void);
-
+int sys_reboot(unsigned long flags);
+void sys_shutdown(unsigned long flags);
 
 #endif    
 

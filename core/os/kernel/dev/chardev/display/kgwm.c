@@ -84,22 +84,16 @@ static void __enter_embedded_shell(int kernel_in_debug_mode)
 
     // ShellFlag = FALSE;
 
-//
 // Set up console
-//
 
     jobcontrol_switch_console(0);
-
 // Message
-
     if (kernel_in_debug_mode){
         printf("[[ KERNEL IN DEBUG MODE ]]\n");
     }
     printf("kernel console number %d\n",console_index);
     printf("Prompt ON: Type something\n");
-    consolePrompt();  // it will refresh the screen.
-    //refresh_screen();  
-
+    consolePrompt();  // It will refresh the screen.
 // Flag
     ShellFlag = TRUE;
 }
@@ -251,7 +245,6 @@ wmProcedure (
         //case VK_TAB: 
             //printf("TAB\n"); 
             //invalidate_screen();
-            //refresh_screen(); 
             //break;
 
         default:
@@ -534,13 +527,9 @@ wmProcedure (
                 if (alt_status == TRUE){
                     //post_message_to_ws( (int) 77109, 0, 0 );
                 }
+                // [Shift+F9] - Reboot
                 if (shift_status == TRUE){
-                    // #goal
-                    // This is a emergency keycombination.
-                    // We can't call another process and 
-                    // we want to reboot the machine.
-                    sys_reboot();
-                    //post_message_to_ws( (int) 88109, 0, 0 );
+                    sys_reboot(0);
                 }
                 return 0;
                 break;
@@ -573,9 +562,9 @@ wmProcedure (
                 if (alt_status == TRUE){
                     //post_message_to_ws( (int) 77111, 0, 0 );
                 }
+                // [Shift+F11] - Force reboot.
                 if (shift_status == TRUE){
                    hal_reboot();
-                   //post_message_to_ws( (int) 88111, 0, 0 );
                 }
                 return 0;
                 break;
@@ -615,10 +604,8 @@ wmProcedure (
 
 fail:
     debug_print("wmProcedure: fail\n");
-    //refresh_screen();
     return -1;
 }
-
 
 //----------------------------------------------
 
@@ -863,11 +850,11 @@ void schedulerUpdateScreen(void)
 
 // Flush the whole screen and exit.
 // The whole screen is invalidated.
+// Validate the screen
     if (screen_is_dirty == TRUE)
     {
         refresh_screen();
         validate_all = TRUE;
-        // Validate the screen
         screen_is_dirty = FALSE;
     }
 

@@ -407,11 +407,9 @@ static void *__extra_services (
 // Isso poderá ser chamado pelo init.bin, pelo shell
 // ou qualquer outro.
 // see: 
-    if ( number == 350 )
-    {
+    if (number == 350){
         printf("350:\n"); 
-        //refresh_screen();
-        return (void *) sys_initialize_component ((int) arg2);
+        return (void *) sys_initialize_component((int) arg2);
     }
 
 // 377 
@@ -419,6 +417,7 @@ static void *__extra_services (
 // See: sys.c
     if (number == 377)
     {
+        debug_print("__extra_services: [377]\n");
         if ( (void*) arg2 == NULL )
             return NULL;
         sys_uname ( (struct utsname *) arg2 );        
@@ -531,13 +530,12 @@ static void *__extra_services (
                 // Esse modo de input nao vai mais existir.
                 // o cliente pegara o input.
                 // current_input_mode = INPUT_MODE_WS; 
-                
+
                 // returning ok.
                 // But, we could return the port number.
-                
+
                 //#debug
                 //printf("513: done\n");
-                //refresh_screen();
                 //while(1){}
                 
                 return (void *) TRUE;  //ok 
@@ -546,9 +544,8 @@ static void *__extra_services (
 
         //#debug
         //printf("513: fail\n");
-        //refresh_screen();
         //while(1){}
-        
+
         return NULL; //fail
     }    
 
@@ -1067,7 +1064,6 @@ void *sci0 (
     // #debug
     //debug_print("sc0:\n");
     //printf("sc0:\n");
-    //refresh_screen();
 
     //?? #deprecated?
     g_profiler_ints_gde_services++;
@@ -1079,7 +1075,6 @@ void *sci0 (
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         panic("sci0: current_process\n");
     }
-
     p = (struct process_d *) processList[current_process];
     if ( (void*) p == NULL ){
         debug_print("sci0: p\n");
@@ -1110,8 +1105,8 @@ void *sci0 (
         p->exit_in_progress = TRUE;
         // Quando o scheduler passar por ela,
         // vai pular ela e marca-la como zombie.
-        if( (void*) p->control != NULL ){
-            if(p->control->magic==1234)
+        if ( (void*) p->control != NULL ){
+            if (p->control->magic==1234)
                 p->control->exit_in_progress = TRUE;
         }
         return NULL;
@@ -1543,17 +1538,12 @@ void *sci0 (
         // 100~109: free
 
         // 110
-        // Use 'int'
-        // # We need to return when a non-superuser process call this
-        // service. We don't wanna hang the system in this case.
+        // IN: flags.
         // see: ke/sys.c
         int reb_ret=-1;
         case SYS_REBOOT: 
             debug_print("sci0: SYS_REBOOT\n");
-            // #todo
-            // This is a wrapper.
-            // This function needs some flags.
-            reb_ret = (int) sys_reboot();
+            reb_ret = (int) sys_reboot(0);
             return (void *) (reb_ret & 0xFFFFFFFF);
             break;
 
@@ -1746,11 +1736,10 @@ void *sci0 (
         case SYS_PWD:
             // #test
             // Isso é um teste. Essa chamada não precisa disso.
-            if (is_superuser() == TRUE )
+            if (is_superuser() == TRUE)
             {
                 debug_print("sci0: [SYS_PWD] Yes, I'm the super user.\n");
                 printf     ("sci0: [SYS_PWD] Yes, I'm the super user.\n");
-                //refresh_screen();
             }
             sys_pwd();
             return NULL;
@@ -2175,7 +2164,6 @@ void *sci2 (
         debug_print("sci2: [900] clone and execute\n");
         // #debug
         //printf("sci2: copy_process called by pid{%d}\n",current_process);
-        //refresh_screen();
         return (void *) copy_process( 
                             (const char *) arg2, 
                             (pid_t) current_process, 
@@ -2502,10 +2490,10 @@ static void __servicePutChar(int c)
     console_putchar ( (int) c, fg_console );
 }
 
+// #todo: Return 'int'.
 void newos_reboot(unsigned long reboot_flags)
 {
-    sys_reboot();
-    //hal_reboot();
+    sys_reboot(reboot_flags);
 }
 
 unsigned long newos_get_system_metrics(int index)
