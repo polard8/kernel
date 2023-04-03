@@ -286,9 +286,6 @@ int rtl_get_file_sync(int fd, int request)
     return (int) sc82 (10007,fd,request,0);
 }
 
-
-
-
 unsigned char rtl_to_uchar (char ch)
 {
     return (unsigned char) ch;
@@ -316,16 +313,16 @@ unsigned long rtl_to_ulong (long ch)
 // Maybe a boolian 'int' for TRUE or FALSE.
 unsigned long rtl_get_system_message(unsigned long message_buffer)
 {
+// #todo: Handle the return value.
+    //unsigned long res=0;
     if (message_buffer == 0){
         return 0;
     }
-
     gramado_system_call ( 
         111,
         (unsigned long) message_buffer,
         (unsigned long) message_buffer,
         (unsigned long) message_buffer );
-
     return 0;
 }
 
@@ -401,7 +398,6 @@ int xxxScanApplicationQueue(void)
     };
 
 // Get event from the thread's event queue.
-
     rtl_enter_critical_section(); 
     rtl_get_system_message( (unsigned long) &RTLEventBuffer[0] );
     rtl_exit_critical_section(); 

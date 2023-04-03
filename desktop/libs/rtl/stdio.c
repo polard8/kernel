@@ -913,25 +913,22 @@ int __putc(int ch, FILE *stream)
     return (int) ch;
 }
 
-
-// don't change it
+// Don't change it.
 int getc (FILE *stream){
     return (int) __getc (stream);
 }
 
-// don't change it
+// Don't change it.
 int putc (int ch, FILE *stream){
     return (int) __putc (ch, stream);
 }
 
-// don't change it
-// See: unix v7
+// Don't change it.
 int fgetc(FILE *stream){
     return (int) getc(stream);
 }
 
-// don't change it
-// See: unix v7
+// Don't change it.
 int fputc ( int ch, FILE *stream ){
     return (int) putc(ch,stream);
 }
@@ -940,12 +937,12 @@ int fputc ( int ch, FILE *stream ){
 // Root 2
 //
 
-// don't change it
+// Don't change it.
 int getchar (void){
     return (int) getc(stdin);
 }
 
-// don't change it
+// Don't change it.
 int putchar (int ch){
     return (int) putc ( (int) ch, stdout );
 }
@@ -957,13 +954,13 @@ int putchar (int ch){
 // #todo
 // Do not use this. Use fgets instead.
 // Using gets we can read more than we need.
-
 char *gets(char *s)
 {
     register int c=0;
     register char *cs;
-
     cs = s;
+
+    // #ugly
     while ((c = getchar()) != '\n' && c >= 0)
         *cs++ = c;
     if (c<0 && cs==s)
@@ -1058,11 +1055,9 @@ int getw (FILE *stream)
     return (i | (getc(stream)<<8));
 }
 
-
 //#test
 int putw (int w, FILE *stream)
 {
-
     //#todo
     //if ( (void*) stream == NULL ){}
 
@@ -1193,7 +1188,6 @@ FILE *fopen ( const char *filename, const char *mode )
 
 // Open
 // See: fcntl.c
-
     fd = open (filename, flags, oflags);  
     if (fd < 0){
         printf ("fopen: open() fail\n");
@@ -1210,7 +1204,6 @@ FILE *fopen ( const char *filename, const char *mode )
 
 // Descriptor
     __stream->_file = fd;
-
 
 // ==============================
 // Buffer
@@ -1234,7 +1227,6 @@ FILE *fopen ( const char *filename, const char *mode )
     __stream->_p = __stream->_base;
     __stream->_r = 0;
     __stream->_w = 0;   //#todo: Write from the end of the file.
-
 // The size of the ring3 buffer.
     __stream->_lbfsize = BUFSIZ;
 // #bugbug
@@ -1243,7 +1235,6 @@ FILE *fopen ( const char *filename, const char *mode )
 // So it needs to be initialized with 0.
     //__stream->_fsize = BUFSIZ;
     __stream->_fsize = 0;
-
     __stream->_cnt = BUFSIZ;
 
 // Flags
@@ -1370,7 +1361,6 @@ FILE *fopen2 ( const char *filename, const char *mode )
  *     #todo: Talvez deva levar em conta o modo de operação.
  *            Se estamos ou full screen ou não.
  */
-
 void scroll (void)
 {
 
@@ -1460,34 +1450,34 @@ void clearerr(FILE* stream)
 
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 {
-    size_t nreads=0;
     void *data;
-    int number_of_bytes = -1;
-
-// Initialize local variable.
+    size_t nreads=0;
+    size_t number_of_bytes = -1;
     data = ptr;
+
     if ( (void *) data == NULL ){
         printf ("fread: ptr \n");
         return (size_t) -1;
     }
-
     if (size <= 0){
         printf ("fread: size \n");
         return (size_t) -1;
     }
-
 // Quantidade inválida.
     if (n <= 0){
         printf ("fread: n \n");
         return (size_t) -1;
     }
-
 // Se não temos o ponteiro, então não teremos o fd
 // para usarmos em read().
     if ( (void *) fp == NULL ){
         printf ("fread: fp \n");
         return (size_t) -1;
     }
+
+// ====================================
+// Calculando a quantidade de bytes.
+    number_of_bytes = (size_t) (size * n);
 
 // buffer size
     size_t _max = sizeof(data);    
@@ -1547,7 +1537,7 @@ fwrite (
     FILE *fp )
 {
     size_t nwrite=0;
-    int number_of_bytes = -1;
+    size_t number_of_bytes = -1;
 
 // Pointer validation.
     if ( (void *) ptr == NULL ){
@@ -1573,10 +1563,9 @@ fwrite (
     }
 // ====================================
 // Calculando a quantidade de bytes.
-    number_of_bytes = (size * n);
+    number_of_bytes = (size_t) (size * n);
 
     size_t _max = sizeof(ptr);
-
     if (number_of_bytes > _max){
         number_of_bytes = _max;
     }
@@ -3613,14 +3602,9 @@ int fseek ( FILE *stream, long offset, int whence )
         return -1;
     }
  
- // lseek
- // #bugbug:
- // This function is not working yet.
-
+// lseek
     off = lseek ( fileno(stream), offset, whence );
-    
-    if (off < 0)
-    {
+    if (off < 0){
         debug_print ("fseek: lseek fail \n");
         return off;
     }
@@ -3654,7 +3638,7 @@ int linux_fputc (int c, FILE *f)
        return EOF;
     }
 
-    return fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
+    return (int) fwrite(&ch, 1, 1, f) == 1 ? ch : EOF;
 }
 
 
@@ -3892,13 +3876,10 @@ int sscanf ( const char *str, const char *format, ... )
 {
     va_list args;
     va_start(args, format);
-
     const char *start = str;
-
 
     for ( ; *format != '\0'; format++ )
     {
-
         if ( *format == '%' && format[1] == 'd' ){
 
             // #bugbug
@@ -4091,7 +4072,8 @@ kvprintf (
     int radix, 
     va_list ap )
 {
-    
+
+    // #danger
     //#define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
     #define PCHAR(c) { int cc=(c); if(func) (*func)(cc,arg); else *d++ = cc; retval++; }
 
@@ -4107,7 +4089,6 @@ kvprintf (
 	int dwidth, upper;
 	char padc;
 	int stop = 0, retval = 0;
-
 
     num = 0;
 
@@ -4135,11 +4116,11 @@ kvprintf (
 
         while ( ( ch = (u_char) *fmt++ ) != '%' || stop ) 
         {
-			//if (ch == '')
-			//	return (retval);
-
-            if (ch == 0){ return (retval); }
-
+            //if (ch == '')
+            //    return (retval);
+            if (ch == 0){
+                return (retval);
+            }
             PCHAR (ch);
         };
 
@@ -4190,7 +4171,7 @@ kvprintf (
 					width = -width;
 				}
 				
-			} else {
+			}else{
 				
 				dwidth = va_arg(ap, int);
 			};
@@ -4232,11 +4213,11 @@ kvprintf (
 			p = va_arg(ap, char *);
 
             // #bugbug: 
-            // This is very dangeours, and ugly.
+            // This is very very dangeours.
             for (q = ksprintn(nbuf, num, *p++, NULL, 0); *q;)
             {
                 PCHAR (*q--);
-            }
+            };
 
             if (num == 0){ break; }
 
@@ -4510,7 +4491,7 @@ kvprintf (
 static void xxxputchar ( int c, void *arg )
 {
 	/* add your putchar here */
-	
+
 	//printf("%c",c);
     putchar( (int) c );
 }

@@ -153,7 +153,7 @@ void __create_quick_launch_area(void);
 
 void on_menu_event(void);
 
-int is_combination(int msg_code);
+inline int is_combination(int msg_code);
 int on_combination(int msg_code);
 
 // =====================================================
@@ -4387,7 +4387,7 @@ int on_combination(int msg_code)
 }
 
 
-int is_combination(int msg_code)
+inline int is_combination(int msg_code)
 {
     if (msg_code<0)
         return FALSE;

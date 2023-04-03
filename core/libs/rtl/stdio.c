@@ -924,8 +924,9 @@ char *gets(char *s)
 {
     register int c;
     register char *cs;
-
     cs = s;
+    
+    // #danger
     while ((c = getchar()) != '\n' && c >= 0)
         *cs++ = c;
     if (c<0 && cs==s)
@@ -957,10 +958,8 @@ int puts (const char *s)
 //s n iop
 char *fgets (char *s, int size, FILE *stream)
 {
-    //int c=0;
     register int c;
     register char *cs;
-
     cs = s;
     
     // Maior ou igual a 0.
@@ -968,23 +967,23 @@ char *fgets (char *s, int size, FILE *stream)
             (c = getc(stream)) >= 0 ) 
     {
         *cs++ = c;
-        
-        if (c=='\n'){ break; }
+        if (c=='\n'){
+            break;
+        }
     };
 
-    // Nesse momento, acabou o size, ou
-    // encontramos um '\n'.
-    
-    // Se o último char for EOF
-    // e não pegamos char algum. 
-    if ( c<0 && cs==s ) { return NULL; }
-    
-    // Finalizamos a string construída.
+// Nesse momento, acabou o size, ou
+// encontramos um '\n'.
+// Se o último char for EOF
+// e não pegamos char algum. 
+    if ( c<0 && cs==s ){
+        return NULL;
+    }
+// Finalizamos a string construída.
     *cs++ = '\0';
 
     return (s);
 }
-
 
 //s iop
 int fputs ( const char *s, FILE *stream )
@@ -1020,12 +1019,11 @@ int getw (FILE *stream)
 	//if (stream->_flags&_IOEOF)
 		//return(-1);
 
-
-    if (stream->eof == 1 ){
+    if (stream->eof == 1){
         return EOF;
     }
 
-
+// #ugly
     return (i | (getc(stream)<<8));
 }
 
@@ -1033,7 +1031,6 @@ int getw (FILE *stream)
 //#test
 int putw (int w, FILE *stream)
 {
-
     //#todo
     //if ( (void*) stream == NULL ){}
 
@@ -1066,8 +1063,7 @@ int fclose (FILE *stream)
     
     debug_print ("fclose: [FIXME]\n");
 
-    if ( (void *) stream == NULL )
-    {  
+    if ( (void *) stream == NULL ){
         return EOF;  
     }
 
@@ -1213,7 +1209,6 @@ FILE *fopen ( const char *filename, const char *mode )
     __stream->_p = __stream->_base; 
     __stream->_r = 0;
     __stream->_w = 0;
-
     __stream->_lbfsize = BUFSIZ;
 // #bugbug
 // The size of the 'data' in ring 3?
@@ -1221,7 +1216,6 @@ FILE *fopen ( const char *filename, const char *mode )
 // So it needs to be initialized with 0.
     //__stream->_fsize = BUFSIZ;
     __stream->_fsize = 0;
-
     __stream->_cnt = BUFSIZ;
 
 // Flags
@@ -1231,12 +1225,11 @@ FILE *fopen ( const char *filename, const char *mode )
 // Saving the name in ring3.
     __stream->_tmpfname = (char *) strdup(filename);
 
-//done:
-    __stream->used  = TRUE;
+    __stream->used = TRUE;
     __stream->magic = 1234;
+
     return (FILE *) __stream;
 }
-
 
 /*
  * fopen2:
@@ -1333,10 +1326,8 @@ FILE *fopen2 ( const char *filename, const char *mode )
 
 // ===================
 // Buffer
-
     __stream->_base = (unsigned char *) address; 
     __stream->_p = __stream->_base;
-
     __stream->_lbfsize = (int) s;
     //__stream->_fsize=0;
     __stream->_cnt = __stream->_lbfsize;
@@ -1355,32 +1346,24 @@ FILE *fopen2 ( const char *filename, const char *mode )
  *            Se estamos ou full screen ou não.
  */
 
-void scroll (void){
-
-    //loop
+void scroll (void)
+{
+//loop
     register unsigned short i=0;
     register unsigned short j=0;
-
-
 	//Início da tela.
     unsigned short *p1 = (unsigned short *) SCREEN_START;
-
 	//Início da segunda linha.
     unsigned short *p2 = (unsigned short *) (SCREEN_START + 2 * SCREEN_WIDTH);
 
-
-
-	// Linhas.
-	// Usa o valor default se passar dos limites.
-
+// Linhas.
+// Usa o valor default se passar dos limites.
     if ( g_rows == 0 || g_rows >= SCREEN_MAX_HEIGHT )
     {
         g_rows = SCREEN_HEIGHT;
     }
 
-
-	// 24 vezes.
-
+// 24 vezes.
     for ( i=0; i < g_rows -1; i++ )
     {
 	    //80 vezes.
@@ -1429,11 +1412,11 @@ void scroll (void){
     }
 }
 
-
 void clearerr (FILE* stream)
 {
-    if ( (void *) stream == NULL ){  return;  }
-
+    if ( (void *) stream == NULL ){
+        return;
+    }
     //stream->_flags &= ~(_IOERR|_IOEOF);
     stream->eof = FALSE;
     stream->error = 0;
@@ -1457,51 +1440,40 @@ void clearerr (FILE* stream)
 size_t fread (void *ptr, size_t size, size_t n, FILE *fp)
 {
     void *data;
-
-    int nreads = 0;
-    int number_of_bytes = -1;
-
-// Initialize local variable.
+    size_t nreads=0;
+    size_t number_of_bytes = -1;
     data = ptr;
 
-    if ( (void *) data == NULL )
-    {
+    if ( (void *) data == NULL ){
         printf ("fread: ptr \n");
         return (size_t) -1;
     }
-
-    if ( size <= 0 )
-    {
+    if ( size <= 0 ){
         printf ("fread: size \n");
         return (size_t) -1;
     }
-
-    // Quantidade inválida.
-    if ( n <= 0 )
-    {
+    if ( n <= 0 ){
         printf ("fread: n \n");
         return (size_t) -1;
     }
-    
-    // Se não temos o ponteiro, então não teremos o fd
-    // para usarmos em read().
-    if ( (void *) fp == NULL )
-    {
+// Se não temos o ponteiro, então não teremos o fd
+// para usarmos em read().
+    if ( (void *) fp == NULL ){
         printf ("fread: fp \n");
         return (size_t) -1;
     }
 
-    // buffer size
+// ====================================
+// Calculando a quantidade de bytes.
+    number_of_bytes = (size_t) (size * n);
+
+// buffer size
     size_t _max = sizeof(data);
-    
-    if (_max <= 0)
-    {
+    if (_max <= 0){
         printf("fread: [DEBUG] buffer size <= 0 \n");
         return (size_t) -1;
     }
-
-    if (_max > BUFSIZ)
-    {
+    if (_max > BUFSIZ){
         printf("fread: [DEBUG] buffer size\n");
         _max = BUFSIZ;
     }
@@ -1554,24 +1526,21 @@ fwrite (
     size_t n, 
     FILE *fp )
 {
-    int nwrite = 0;
-    int number_of_bytes = -1;
-
+    size_t nwrite=0;
+    size_t number_of_bytes = -1;
 
 // Pointer validation.
     if ( (void *) ptr == NULL ){
         printf ("fwrite: ptr \n");
         goto error0;
     }
-
 // Tamanho do elemento dado em bytes.
-    if ( size <= 0 ){
+    if (size <= 0){
         printf ("fwrite: size \n");
         goto error0;
     }
-
 // Quantidade de elementos.
-    if ( n <= 0 ){
+    if (n <= 0){
         printf ("fwrite: n \n");
         goto error0;
     }
@@ -1585,15 +1554,12 @@ fwrite (
     }
 
 // ====================================
-
-    // Calculando a quantidade de bytes.
-    number_of_bytes = (size * n);
+// Calculando a quantidade de bytes.
+    number_of_bytes = (size_t) (size * n);
     
     size_t _max = sizeof(ptr);
-    
     if ( number_of_bytes > _max )
         number_of_bytes = _max;
-
 
 //
 // Write
@@ -1602,14 +1568,11 @@ fwrite (
     //nwrite = write( fileno(fp), ptr, sizeof(ptr) );
     //nwrite = write ( fileno(fp), ptr, n );
     nwrite = write ( fileno(fp), ptr, number_of_bytes );
-
 // Se não conseguimos escrever.
-    if (nwrite <= 0)
-    {
+    if (nwrite <= 0){
         printf ("fwrite: write() fail \n");
         goto error1;
     }
-
 // Se escrevemos menos do que desejavamos.
     if (nwrite < number_of_bytes)
     {
@@ -1617,19 +1580,16 @@ fwrite (
         goto error1;
     }
 
-//done:
     return (size_t) nwrite; 
 
 // Se já temos um ponteiro de arquivo válido.
 error1:
     fp->_flags |= _IOERR;
     // ...
-
 // Ainda não sabemos se o ponteiro de arquivo é válido.
 error0:
     return (size_t) EOF;   
 }
-
 
 // O prompt precisa ser inicializado pelo crt0 e
 // quando ele sobre flush.
@@ -1638,12 +1598,10 @@ int prompt_putchar ( int c, int con_id )
 
     if ( con_id < 0 )
         return -1;
-    
     if ( con_id >= 4 )
         return -1;
 
-
-   //#todo: overflow do prompt[]
+    //#todo: overflow do prompt[]
 
     // ??
     //eol
@@ -1651,21 +1609,20 @@ int prompt_putchar ( int c, int con_id )
         input ( (unsigned long) c );
         return c;
     }
-
     // se \n
     if ( c == '\n' ){
        prompt_flush (con_id);
     }
 
-    // ??
-    // #bugbug: We need a return here.
-    return 0;  //??
+// ??
+// #bugbug: We need a return here.
+    return 0;
 } 
 
-
-
-int prompt_put_string ( char *string )
+int prompt_put_string (char *string)
 {
+// #todo: The return thing.
+
     if ( (void *) string == NULL )
         return -1;
 
@@ -1673,9 +1630,10 @@ int prompt_put_string ( char *string )
     return 0;
 }
 
-
 int prompt_strcat (char *string)
 {
+// #todo: The return thing.
+
     if ( (void *) string == NULL )
         return -1;
 
@@ -1686,42 +1644,35 @@ int prompt_strcat (char *string)
 
 int prompt_flush ( int con_id )
 {
-    size_t len;
+    size_t len=0;
 
     if ( con_id < 0 )
-        return -1;
-    
+        return -1;    
     if ( con_id >= 4 )
         return -1;
 
-    //finaliza.
+//finaliza.
     input ('\0'); 
-    len = strlen( (const char *) prompt );  
-
+    len = strlen( (const char *) prompt );
     gramado_system_call ( 66, (unsigned long) prompt, con_id, len );  
     prompt_clean ();
     
     return 0; 
 }
 
-
 void prompt_clean (void)
 {
-    int i=0;
+    register int i=0;
 
 // Linpando o buffer de entrada.
-
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ )
-    {
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
         prompt[i] = (char) '\0';
-    }
-
+    };
     prompt[0] = (char) '\0';
     prompt_pos = 0;
     prompt_status = 0;
     prompt_max = PROMPT_MAX_DEFAULT;  
 }
-
 
 /*
  ****************************************************************
@@ -3000,9 +2951,7 @@ unsigned long input(unsigned long ch)
 
 //Filtra limite.
 //retornar 1??
-
-    if ( prompt_pos > prompt_max )
-    {
+    if (prompt_pos > prompt_max){
         printf ("input: [FAIL] Full buffer!\n");
         return (unsigned long) 0;   
     }
