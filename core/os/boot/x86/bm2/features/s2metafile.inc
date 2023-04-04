@@ -1,21 +1,17 @@
 ;
-; File: s2metafile.inc
+; s2metafile.inc
+; 'This is a work in progress'.
 ;
-;     This is the main META$FILE used in the Gramado Boot Manager. 
-;
-;     Esse é um metafile de inicialização. É uma parte do Boot Manager e fica 
+; This is the main META$FILE used in the Gramado Boot Manager. 
+; Esse é um metafile de inicialização. É uma parte do Boot Manager e fica 
 ; no segundo setor do HD. Os programas podem acessar as informações contidas 
 ; aqui. O tamanho do metafile é 2 setores. 1KB.
-;
-;
-;* Importante:
-;  O metafile conterá o maior número possível de informações salvas. Para isso 
+; Importante:
+; O metafile conterá o maior número possível de informações salvas. Para isso 
 ; talvez o tamanho do metafile seja revisto. Por enquanto é de 1KB. 
-;
-; *Importante:
+; Importante:
 ; O metafile dará maior importãncia para as informações relativas
 ; ao armazenamento de dados em disco. (STORAGE).
-;
 ;
 ; Lista de variáveis presentes nesse metafile:
 ; ===========================================
@@ -125,45 +121,45 @@ META$FILE:
 ;então ele foi carregado pelo stage 1 que pasou o comando para ele.
 .TRAP1:
     PUSH 0 
-	PUSH AFTER_DATA    ;; *fat16 (Padrão) Quando carregado pe stage 1.      
+    PUSH AFTER_DATA    ;; *fat16 (Padrão) Quando carregado pe stage 1.      
     RETF
 ;No caso de BM ser um arquivo no sistema de arquivos. Então ele foi carregado 
 ;pelo mbr em 0:8000h e o metafile fica em 0:8200h.
 .TRAP2:
     PUSH 0 
-	PUSH AFTER_DATA ;; fat12 ?? @todo:       
+    PUSH AFTER_DATA ;; fat12 ?? @todo:       
     RETF
-	
+
 .TRAP3:
     PUSH 0 
-	PUSH AFTER_DATA ;; fat16 ?? @todo:
+    PUSH AFTER_DATA ;; fat16 ?? @todo:
     RETF
-	
+
 .TRAP4:
     PUSH 0 
-	PUSH AFTER_DATA ;; fat32 ?? @todo:
+    PUSH AFTER_DATA ;; fat32 ?? @todo:
     RETF
-	
+
 .TRAP5:
     PUSH 0 
-	PUSH AFTER_DATA ;; ext2 ?? @todo:
+    PUSH AFTER_DATA ;; ext2 ?? @todo:
     RETF
-	
+
 .TRAP6:
     PUSH 0 
-	PUSH AFTER_DATA ;; outro fs ?? @todo:
+    PUSH AFTER_DATA ;; outro fs ?? @todo:
     RETF
 
 .TRAP7:
     PUSH 0 
-	PUSH AFTER_DATA ;;  outro fs ?? @todo:
+    PUSH AFTER_DATA ;;  outro fs ?? @todo:
     RETF
 
 .TRAP8:
     PUSH 0 
-	PUSH AFTER_DATA ;;  outro fs ?? @todo:
+    PUSH AFTER_DATA ;;  outro fs ?? @todo:
     RETF
-	
+
 
 ; Assinatura do metafile.
 .MAGIC_NUMBER: DW 1234
@@ -360,49 +356,38 @@ META$FILE:
 ;;
 ;; Continua ... (*Lembrando que por enquanto temos apenas 1KB de tamanho).
 ;;
-    
-;
+
 ; @todo:
-;  
 ;    Em 'Modo Real', usando BIOS, é possível detectar 
 ;    vários parametros do sistema.
-;
 ;    (IMPORTANTE) O metafile pode ser editado por outros programas.
-;
-;
 
-
-;;
 ;; Ponteiro para o endereço de memória onde deve ser carregado
 ;; o arquivo de configuração de inicialização do sistema.
-;;
 .INITIALIZATION_FILE_ADDRESS:
     DD 0
-;;
-;; *Para terminar, colocamos um ponteiro para o endereço de memória 
-;;  onde deve ser carregado um arquivo com informações mais completas
-;;  sobre o sistema.
-;;
+
+;; Para terminar, colocamos um ponteiro para o endereço de memória 
+;; onde deve ser carregado um arquivo com informações mais completas
+;; sobre o sistema.
 .SYSTEM_INFO_FILE_ADDRESS:   
     DD 0
     
-
-;;#test
+;; #test
 ;; jail, p1, home, p2, castle.
 .GRAMADO_MODE: 
     DB 0x00
 
-
-META$FILE_END:	
+META$FILE_END:
     TIMES (2*512) - (META$FILE_END - META$FILE) DB 0
     ;TIMES (4*512) - (META$FILE_END - META$FILE) DB 0
     ;TIMES (8*512) - (META$FILE_END - META$FILE) DB 0
-    ;;Almentaremos se for possível, lembrando que por enquanto
-	;; o Boot manager te uma limitação de tamanho em 32 KB.
-	;;...  	
+
+;; Almentaremos se for possível, lembrando que por enquanto
+;; o Boot manager te uma limitação de tamanho em 32 KB.
 ;;--
 
 ;
-;fim.
+; End
 ;
 

@@ -1,18 +1,14 @@
 ;
 ; File: s2header.inc 
-;
 ; This is the header file for the Gramado Boot Manager.
 ; Defines and variables used in the Stage 2.
-;
-; *Importante:
+; Importante:
 ; O arquivo stage2.inc faz uma sequência de inclusões de módulos
 ; de 16bit que compõem o stage2. Os promeiros devem ser s2metafile.inc 
 ; e s2header.inc que servirão de suporte para todos os outros modulos
 ; do stage2.
-;
 ; 2015 - Created by Fred Nora.
 ;
-
 
 ;
 ; SATA Controller Modes: 
@@ -35,8 +31,51 @@
 
 ; Definições usadas apenas em 16bit.
 ; #bugbug: Isso deveria ficar num arquivo mais global.
-%DEFINE BOOTMANAGER_VER '1.1'
+%DEFINE BOOTMANAGER_VER  '1.1'
 ;;...
+
+;------------------------------------
+
+; stage 2
+CODE_SEGMENT   equ  0
+DATA_SEGMENT   equ  0
+STACK_SEGMENT  equ  0
+STACK_POINTER  equ  0x6000
+; vbr
+VBR_SEGMENT  equ  8000H
+VBR_OFFSET   equ  7C00H
+VBR_LBA      equ  63
+; fat
+FAT_SEGMENT  equ  6000H
+FAT_OFFSET   equ  0
+FAT_LBA      equ  67
+; root
+ROOT_SEGMENT  equ  4000H
+ROOT_OFFSET   equ  0
+ROOT_LBA      equ  559
+
+; ========================
+; Aqui está a localização do bootloader na memória. 
+; A LBAno importa, pois ele foi carregado do sistema sistema de 
+; arquivos e a LBA inicial dele estava armazenada na entrada do 
+; diretrio raiz.
+
+; Boot Loader.
+BL_SEGMENT  equ  2000H
+BL_OFFSET   equ  0
+BL_LBA      equ  0
+
+;--------------------------------------- 
+; Algum suporte para cores no modo texto. 
+; BLUE    equ     01f00h
+; RED     equ     02f00h
+; GREEN   equ     04f00h
+
+
+;------------------------------------
+
+
+
 
 
 
@@ -157,15 +196,10 @@ g_Fat16BPB  dd 0    ;Para rotinas de 32 bit.
 ;; == Messages =====================================================
 ;;
 
-;;
 ;; Splash.
-;;
-
 msg_bm_splash:
     db 'Gramado Boot Manager ', 
     db 'version ', BOOTMANAGER_VER, 13, 10, 0 
-
-
 
 msg_s2_init: 
     db 13, 10, "s2: Initializing stage 2", 13, 10, 0
@@ -175,7 +209,6 @@ msg_s2_activating_mode:
 
 msg_s2_failure:               
     db "s2: No sig", 13, 10, 0  
-
 
 ;msg
 msg_iniciando_bootmanager    db "s2: Initializing",         13, 10, 0
@@ -200,13 +233,9 @@ debug_msg_1                  db "s2: Press any key",0
 debug_msg_2                  db "s2: loaded.",0
 debug_msg_3                  db "s2: F",0
 debug_msg_done               db "s2: Loaded, returning",0
-;outros
-kernel_msg                   db "s2: Loading KERNEL.BIN", 13, 10, 0 
+; Outros
 s_a20                        db "s2: A20", 13, 10,0 
 s_test_mode12h               db "s2: Mode 12h",0 
-
-s2header_boot_loader_name  db  'BL      BIN',0
-
 
 ;Mensagens usadas pelo sistema de arquivos.
 ;msg_s2fat16_Loading db 'L',13,10,0
@@ -222,5 +251,5 @@ msg_s2fat16_step4        db '~4',13,10,0
 ;...
 
 ;
-;fim.
+; End
 ;
