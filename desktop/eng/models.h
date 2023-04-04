@@ -18,9 +18,14 @@ extern struct cat_model_d  CatModel;   // Cat model 0.
 //  Flying cube.
 struct cube_model_d
 {
-    float fThetaAngle;
+// 6 faces.
+// 12 triangles.
+
+// We don't need 32 vectors.
     struct gr_vecF3D_d vecs[32];
-    int colors[32];
+    unsigned int colors[32];
+
+    float fThetaAngle;
     float hposition;  //horisontal position
     float vposition;  //vertical position
 
@@ -44,6 +49,7 @@ extern struct cube_model_d *terrain;
 
 #define DEFAULT_CUBE_INITIAL_DELTA_Z    (0.005f)    //(0.00005f)
 #define DEFAULT_TERRAIN_INITIAL_DELTA_Z (0.00002f)  //(0.00005f)
+
 
 // -----------------------------------------
 

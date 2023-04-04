@@ -1321,10 +1321,13 @@ void demoFlyingCubeSetup(void)
         // Initialize vectors.
         for (i=0; i<32; i++)
         {
-             cube->vecs[i].x = (float) 0.0f;
-             cube->vecs[i].y = (float) 0.0f;
-             cube->vecs[i].z = (float) 0.0f;
+            cube->vecs[i].x = (float) 0.0f;
+            cube->vecs[i].y = (float) 0.0f;
+            cube->vecs[i].z = (float) 0.0f;
         };
+
+        // The model for a regular cube.
+        // #todo: Load this from a file.
 
         cube->vecs[1].x = (float) -0.2f;  cube->vecs[1].y = (float) -0.2f;  cube->vecs[1].z = (float) 0.2f;
         cube->vecs[2].x = (float)  0.2f;  cube->vecs[2].y = (float) -0.2f;  cube->vecs[2].z = (float) 0.2f;
@@ -1336,6 +1339,7 @@ void demoFlyingCubeSetup(void)
         cube->vecs[7].x = (float) -0.2f;  cube->vecs[7].y = (float) -0.2f;  cube->vecs[7].z = (float) -0.2f;
         cube->vecs[8].x = (float)  0.2f;  cube->vecs[8].y = (float) -0.2f;  cube->vecs[8].z = (float) -0.2f;
 
+        // 12 faces, 12 colors.
         cube->colors[0] = GRCOLOR_LIGHTYELLOW;
         cube->colors[1] = GRCOLOR_LIGHTMAGENTA;
         cube->colors[2] = GRCOLOR_DARKBLUE;
@@ -1387,6 +1391,10 @@ void demoFlyingCubeSetup(void)
 
     if ( (void*) terrain != NULL )
     {
+
+        // The model for the terrain.
+        // #todo: Load this from a file.
+
         terrain->vecs[1].x = (float) -80.0f;  terrain->vecs[1].y = (float) -0.12f;  terrain->vecs[1].z = (float) 8.0f;
         terrain->vecs[2].x = (float)  80.0f;  terrain->vecs[2].y = (float) -0.12f;  terrain->vecs[2].z = (float) 8.0f;
         terrain->vecs[3].x = (float) -80.0f;  terrain->vecs[3].y = (float)  0.12f;  terrain->vecs[3].z = (float) 8.0f;
@@ -1397,7 +1405,9 @@ void demoFlyingCubeSetup(void)
         terrain->vecs[8].x = (float)  80.0f;  terrain->vecs[8].y = (float) -0.12f;  terrain->vecs[8].z = (float) -0.8f;
         //terrain->model_initial_distance = (float) 8.0f;
         //terrain->model_distance = (float) 0.0f;
-        
+
+        // 12 faces, 12 colors.
+
         terrain->colors[0] = GRCOLOR_DARKWHITE;
         terrain->colors[1] = GRCOLOR_DARKWHITE;
         terrain->colors[2] = GRCOLOR_DARKWHITE;
