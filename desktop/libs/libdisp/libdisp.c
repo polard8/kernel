@@ -127,11 +127,11 @@ grBackBufferPutpixel (
     int y,
     unsigned long rop )
 {
-// #todo: Return the number of changed pixels. '0'
-    if(x<0){ return -1; }
-    if(y<0){ return -1; }
-    //if(x<0){ return 0; }
-    //if(y<0){ return 0; }
+// #todo: Return the number of changed pixels.
+
+// Clipping
+    if(x<0){ return 0; }
+    if(y<0){ return 0; }
 
 // #bugbug: We don't have rop in this routine.
 // IN: color, x, y, rop, target buffer.
@@ -228,7 +228,7 @@ fb_BackBufferPutpixel (
 // #bubug: Não fazer multilicações
 //MaxOffset = (int) (1024*10124*4);
 //MaxOffset = (int) 0x00400000;
-    MaxOffset = (int) 0x00200000;
+    MaxOffset = (int) 0x00200000;  // 2MB
 
     char b, g, r, a;
     b = (color & 0xFF);
@@ -275,35 +275,31 @@ fb_BackBufferPutpixel (
 
     // #todo: Return the number of changed pixels. '0'
     if (bytes_count!=3 && bytes_count!=4 )
-        return -1;
+        goto fail;
 
     if (bytes_count==3){
         pitch = (unsigned long) (deviceWidth*bytes_count);
         tmpOffset = (unsigned long) ( (pitch*y) + (x*bytes_count) );
     }
-
     if (bytes_count==4){
         pitch = (unsigned long) (deviceWidth<<2);
         tmpOffset = (unsigned long) ( (pitch*y) + (x<<2) );
     }
 
-    // #todo: Return the number of changed pixels. '0'
-    if ( tmpOffset >= MaxOffset )
+// #todo
+// Debug
+    if (tmpOffset >= MaxOffset)
     {
-        debug_print ("fb_BackBufferPutpixel: [ERROR] backbuffer limits > Max\n"); 
-        return -1;
-        //asm("int $3");
-        
-        //printf ("pixelBackBufferPutpixel: [ERROR] backbuffer limits > Max\n");
+        printf ("fb_BackBufferPutpixel: MaxOffset\n");
         //printf ("tmpOffset=%x\n",tmpOffset);
         //printf ("x=%d\n",x);
         //printf ("y=%d\n",y);
         //printf ("width=%d\n",width);
-        //exit(1);
-        //goto fail;
+        exit(1);
+        goto fail;
     }
 
-// int. menor que 4MB
+// int. menor que 2MB
     Offset = (int) tmpOffset;
 
 // #bugbug
@@ -351,16 +347,12 @@ fb_BackBufferPutpixel (
         where[Offset +3] = a; 
     }
 
-// #todo: Return the number of changed pixels. '1'
-    return 0;
-    //return (int) 1;
+// Return the number of changed pixels. '1'.
+    return (int) 1;
+// Return the number of changed pixels. '0'.
 fail:
-
-// #todo: Return the number of changed pixels. '0'
-    return -1;
-    //return 0;
+    return 0;
 }
-
 
 /*
  * putpixel0:

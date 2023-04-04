@@ -1451,7 +1451,10 @@ void demoFlyingCubeSetup(void)
 void demoFlyingCube(int draw_desktop, unsigned int bg_color)
 {
 // + Clear the surface 
-// + Draw the frame.
+// + Draw the frame. 
+//   background.
+//   (terrain + 7 cubes).
+//   It means 12*8 triangles.
 
     struct cube_model_d *tmp_cube;
 // Begin time.
@@ -1470,13 +1473,15 @@ void demoFlyingCube(int draw_desktop, unsigned int bg_color)
 // -------------------------
 // Draw terrain.
 // No rotation. Small translation in positive z.
+// 12 triangles.
     drawTerrain(terrain,0.0f);
 
 // Draw all the cubes.
+// (12*7) triangles.
     register int n=1; // terrain =0
     while (1){
 
-        if(n>=CUBE_MAX){
+        if (n>=CUBE_MAX){
             break;
         }
 
@@ -1490,16 +1495,15 @@ void demoFlyingCube(int draw_desktop, unsigned int bg_color)
         //IN: cube number, direction, amount
         //FlyingCubeMove( n, 1, (float) 0.01f );
 
+        // Acceletarion: How fast the velocity changes.
+        // Each cube has it's own acceleration.
+        // Cada cubo tem uma aceleração diferente.
+        // Então, com o passar do tempo,
+        // cada cubo tera um incremento diferente na sua velocidade.
+
         if (tmp_cube != NULL)
         {
-
-            // Acceletarion: How fast the velocity changes.
-            // Each cube has it's own acceleration.
-            // Cada cubo tem uma aceleração diferente.
-            // Então, com o passar do tempo,
-            // cada cubo tera um incremento diferente
-            // na sua velocidade.
-            tmp_cube->t = (float) tmp_cube->t + (float) sec * 0.1f;  
+            tmp_cube->t = (float) tmp_cube->t + (float) sec * 0.1f;
             tmp_cube->v = (float) tmp_cube->t * tmp_cube->a;  
             
             drawFlyingCube( 

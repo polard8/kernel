@@ -179,7 +179,8 @@ grBackbufferDrawHorizontalLine (
     unsigned long x2,  //max
     unsigned int color )
 {
-    int npixels=0;  // Number of pixels changed.
+// Number of pixels changed.
+    int npixels=0;
     
     //unsigned long __x1 = (unsigned long) x1;  //min
     //unsigned long __x2 = (unsigned long) x2;  //max
@@ -195,19 +196,19 @@ grBackbufferDrawHorizontalLine (
     //unsigned long deviceHeight = gws_get_device_height();
     int w = (int) (deviceWidth & 0xFFFFFFFF);
 
+// Clipping left.
 // Temos que começar de 0.
 // Se o xmin for menor que 0, então temos que
-// considerarmos não pintar a diferença que esta
-// fora da tela.
+// considerarmos não pintar a diferença que esta fora da tela.
     //int dx=0;
     if (__x1<0)
     { 
         __x1=0;  //good
     }
 
+// We can draw a horizontal line above the screen.
     if (y<0){
-        //y=0;
-        debug_print("grBackbufferDrawHorizontalLine: y<0\n");
+        //debug_print("grBackbufferDrawHorizontalLine: y<0\n");
         return (int) npixels;
     }
 
@@ -218,34 +219,47 @@ grBackbufferDrawHorizontalLine (
     //    debug_print("grBackbufferDrawHorizontalLine: __x2 > 800\n");
     //    return (int) npixels;
     //}
-    
-    //ok. its working
-    if(__x2 >= w){
+
+// Clipping right.
+// ok. its working
+    if (__x2 >= w){
         __x2 = w-1;
     }
 
-    if (__x1 > __x2){
-        debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
+// Invalid line values.
+    if (__x1 > __x2)
+    {
+        //debug_print("grBackbufferDrawHorizontalLine: __x1 > __x2\n");
         return (int) npixels;
     }
 
+// Delta
+// Pre-calculating the 
+// number of pixels in the real painted line.
     npixels = (int) (__x2 - __x1);
 
 // loop:
 // Plot a pixel using the top/left coordinates. (0,0).
 // IN: color, x, y, rop
+    int check_value = 0;
     while (__x1 < __x2)
     {
-        // #??
-        // is this the perfect woutine for this job?
-        grPlot2D( 
-            (unsigned int) color, 
-            (int) __x1, 
-            (int) __y, 
-            (unsigned long) rop );
-
+        // #todo
+        // Here, we need to check if we actually
+        // are drawing all the pixels.
+        check_value += 
+            (int) grPlot2D( 
+                      (unsigned int) color, 
+                      (int) __x1, 
+                      (int) __y, 
+                      (unsigned long) rop );
         __x1++;
     };
+
+// We painted less than we wanted.
+    if ( check_value < npixels ){
+        npixels = check_value; 
+    }
 
 // Return the number of changed pixels.
     return (int) npixels;

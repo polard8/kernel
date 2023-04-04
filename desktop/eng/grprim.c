@@ -636,11 +636,12 @@ grPlot2D (
 // #todo: 
 // Return the number of changed pixels. '1' or '0'.
 
-    // Clipping
-    // 0 pixels changed.
+// Clipping
+// 0 pixels changed.
     if (x<0)
         return 0;
-
+    if (y<0)
+        return 0;
     return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
 }
 
@@ -2269,12 +2270,9 @@ plotTriangleF(
     //    final_triangle.p[1].x, final_triangle.p[1].y, 
     //    final_triangle.p[2].x, final_triangle.p[2].y );
 
-// Not filled.
-// we dont need a valid window.
-// #todo: return pixel counter.
-    if (!fill){
-        npixels += grTriangle3( window, &final_triangle );
-    }
+//
+// Plot triangle
+//
 
 // Filled
 // We need a valid window.
@@ -2284,6 +2282,15 @@ plotTriangleF(
                        window, 
                        &final_triangle, 
                        HotSpotX, HotSpotY );
+
+        return (int) npixels;
+    }
+
+// Not filled.
+// we dont need a valid window.
+// #todo: return pixel counter.
+    if (!fill){
+        npixels += grTriangle3( window, &final_triangle );
     }
 
 // Return pixel counter.
