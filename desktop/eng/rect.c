@@ -1500,24 +1500,24 @@ rectBackbufferDrawRectangle0 (
 
     while (number_of_lines--)
     {
-        
         if (rect.top >= rect.bottom){ break; }
         if (rect.top >= device_h)   { break; }
-        
+
         grBackbufferDrawHorizontalLine ( 
-            rect.left, rect.top, rect.right, 
-            (unsigned int) rect.bg_color );
+            rect.left, 
+            rect.top, 
+            rect.right, 
+            (unsigned int) rect.bg_color,
+            rop_flags );
         
         rect.top++;
     };
 
 // Invalidate
     rect.dirty = TRUE;
-
 done:
     return;
 }
-
 
 void 
 rectBackbufferDrawRectangle ( 

@@ -353,7 +353,8 @@ static void drawTerrain(struct cube_model_d *cube, float fElapsedTime)
                 plotTriangleF(
                     (struct gws_window_d *) __root_window, 
                     (struct gr_triangleF3D_d *) &triRotatedXYZ,
-                    fill_triangle ); 
+                    fill_triangle,
+                    0 ); 
             }
         }
     };
@@ -721,7 +722,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             plotTriangleF(
                 (struct gws_window_d *) __root_window, 
                 (struct gr_triangleF3D_d *) &triRotatedXYZ,
-                fill_triangle );
+                fill_triangle,
+                0 );
             }
         }
     };

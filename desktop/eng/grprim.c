@@ -1775,7 +1775,8 @@ fillTriangle0(
     int x1, int y1,
     int x2, int y2,
     int x3, int y3, 
-    unsigned int c)
+    unsigned int c,
+    unsigned long rop )
 {
 // Triangle rasterization.
 
@@ -1887,7 +1888,7 @@ fillTriangle0(
 
         // Draw line from min to max points found on the y
         // #todo: return the number of pixels changed.
-        npixels += grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        npixels += grBackbufferDrawHorizontalLine( minx, y, maxx, c, rop );
 
         // Now increase y
         if(!changed1){ t1x += signx1; }
@@ -1974,7 +1975,7 @@ fillTriangle0(
         // Draw line from min to max points found on the y
         // #todo: return the number of pixels changed.
         // see: line.c
-        npixels += grBackbufferDrawHorizontalLine(minx,y,maxx,c);
+        npixels += grBackbufferDrawHorizontalLine( minx, y, maxx, c, rop );
 
         // Now increase y
         if(!changed1) { t1x += signx1; }
@@ -1995,7 +1996,8 @@ int
 fillTriangle(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle,
-    int hotspotx, int hotspoty )
+    int hotspotx, int hotspoty,
+    unsigned long rop )
 {
 
 // Number of changed pixels.
@@ -2046,7 +2048,8 @@ fillTriangle(
                    (int) (X0 & 0xFFFFFFFF), (int) (Y0 & 0xFFFFFFFF),
                    (int) (X1 & 0xFFFFFFFF), (int) (Y1 & 0xFFFFFFFF),
                    (int) (X2 & 0xFFFFFFFF), (int) (Y2 & 0xFFFFFFFF),
-                   (unsigned int) color );
+                   (unsigned int) color,
+                   rop );
 
 // Return pixel counter.
     return (int) npixels;
@@ -2060,7 +2063,8 @@ int
 plotTriangleF(
     struct gws_window_d *window,
     struct gr_triangleF3D_d *t,
-    int fill )
+    int fill,
+    unsigned long rop )
 {
 
 // Number of changed pixels.
@@ -2281,7 +2285,8 @@ plotTriangleF(
         npixels += fillTriangle( 
                        window, 
                        &final_triangle, 
-                       HotSpotX, HotSpotY );
+                       HotSpotX, HotSpotY,
+                       rop );
 
         return (int) npixels;
     }
@@ -2289,6 +2294,7 @@ plotTriangleF(
 // Not filled.
 // we dont need a valid window.
 // #todo: return pixel counter.
+// #todo: rop parameter.
     if (!fill){
         npixels += grTriangle3( window, &final_triangle );
     }
@@ -2305,7 +2311,8 @@ plotTriangleF(
 int 
 plotPixelF(
     struct gws_window_d *window,
-    struct gr_vecF3D_d *vec )
+    struct gr_vecF3D_d *vec,
+    unsigned long rop )
 {
 // Plot a single pixel.
 // # Not tested yet.
@@ -2536,7 +2543,7 @@ plotPixelF(
     //    npixels += fillTriangle( 
     //                   window, 
     //                   &final_triangle, 
-    //                   HotSpotX, HotSpotY );
+    //                   HotSpotX, HotSpotY, 0 );
     //}
 
 // Plot 2d pixel usiing top/left 0:0.
@@ -2545,7 +2552,7 @@ plotPixelF(
         (unsigned int) final_color, 
         (int) final_x, 
         (int) final_y, 
-        (unsigned long) 0 );
+        (unsigned long) rop );
 
 // Return pixel counter.
     //return (int) npixels;

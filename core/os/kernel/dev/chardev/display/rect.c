@@ -8,7 +8,7 @@
 // == private functions: prototypes ====================
 //
 
-static void 
+static int 
 __drawrectangle0( 
     unsigned long x, 
     unsigned long y, 
@@ -51,7 +51,7 @@ static void *__rectStrCopyMemory32 (
 // 1=backbuffer
 // 2=frontbuffer
 
-static void 
+static int 
 __drawrectangle0( 
     unsigned long x, 
     unsigned long y, 
@@ -61,6 +61,10 @@ __drawrectangle0(
     unsigned long rop_flags,
     int back_or_front )
 {
+// Return the number of changed pixels.
+
+    int npixels=0;
+
     //debug_print("__drawrectangle0: r0 :)\n");
 
 // Copy
@@ -91,9 +95,9 @@ __drawrectangle0(
     {
         debug_print ("__drawrectangle0: [PANIC] w h\n");
         //panic       ("__drawrectangle0: [PANIC] w h\n");
-        return;
+        //return 0;
+        goto fail;
     }
-
 
 //
 // Clipping rectangle
@@ -185,15 +189,19 @@ __drawrectangle0(
     while (1)
     {
         // 1=backbuffer
-        if (back_or_front == 1){
-            backbuffer_draw_horizontal_line ( 
-                Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
+        if (back_or_front == 1)
+        {
+            npixels += 
+                backbuffer_draw_horizontal_line ( 
+                    Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
         // 2=frontbuffer
-        if (back_or_front == 2){
-            frontbuffer_draw_horizontal_line ( 
-                Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
+        if (back_or_front == 2)
+        {
+            npixels += 
+                frontbuffer_draw_horizontal_line ( 
+                    Rect.left, Y, Rect.right, Rect.bg_color, rop_flags );
         }
 
         // Next line.
@@ -204,32 +212,31 @@ __drawrectangle0(
         // um retângulo que ultrapasse a área do frontbuffer.
         if (UseClipping == TRUE)
         {
-            if (Y > ClippingRect.bottom)
-            {
+            if (Y > ClippingRect.bottom){
                 break;
             }
         }
 
         // Decrementa o contador.
         internal_height--;
-        if (internal_height == 0)
-        {
+        if (internal_height == 0){
             break;
         }
     };
 
-// ??
-// Send the rectangle to a list.
-
 // Invalidate
     Rect.dirty = TRUE;
+
+    return (int) npixels;
+fail:
+    return 0;
 }
 
 // Service 9: 
 // Draw a rectangle into the backbuffer.
 // Usado pelo window server para pintar retângulos.
 // Called by sci0() in sci.c.
-void 
+int 
 backbuffer_draw_rectangle( 
     unsigned long x, 
     unsigned long y, 
@@ -238,16 +245,15 @@ backbuffer_draw_rectangle(
     unsigned int color,
     unsigned long rop_flags )
 {
-
+// Return the number of changed pixels.
 // 1=backbuffer
 // 2=frontbuffer
-
-    __drawrectangle0(
+    return (int) __drawrectangle0(
         x, y, width, height,
         color, rop_flags, 1 );
 }
 
-void 
+int 
 frontbuffer_draw_rectangle( 
     unsigned long x, 
     unsigned long y, 
@@ -256,11 +262,10 @@ frontbuffer_draw_rectangle(
     unsigned int color,
     unsigned long rop_flags )
 {
-
+// Return the number of changed pixels.
 // 1=backbuffer
 // 2=frontbuffer
-
-    __drawrectangle0(
+    return (int) __drawrectangle0(
         x, y, width, height,
         color, rop_flags, 2 );
 }

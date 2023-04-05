@@ -177,7 +177,8 @@ grBackbufferDrawHorizontalLine (
     unsigned long x1,  //min
     unsigned long y, 
     unsigned long x2,  //max
-    unsigned int color )
+    unsigned int color,
+    unsigned long rop )
 {
 // Number of pixels changed.
     int npixels=0;
@@ -190,7 +191,7 @@ grBackbufferDrawHorizontalLine (
     int __x1 = (int) (x1 & 0xFFFFFFFF);  // x min
     int __x2 = (int) (x2 & 0xFFFFFFFF);  // x max
     int __y  = (int) ( y & 0xFFFFFFFF);  // y
-    unsigned long rop=0;
+    unsigned long _rop = rop;
 
     unsigned long deviceWidth  = gws_get_device_width();
     //unsigned long deviceHeight = gws_get_device_height();
@@ -252,7 +253,7 @@ grBackbufferDrawHorizontalLine (
                       (unsigned int) color, 
                       (int) __x1, 
                       (int) __y, 
-                      (unsigned long) rop );
+                      (unsigned long) _rop );
         __x1++;
     };
 

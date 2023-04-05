@@ -324,7 +324,7 @@ extern struct gui_d  *gui;
 // pixel
 //
 
-void 
+int 
 putpixel0 ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -332,14 +332,14 @@ putpixel0 (
     unsigned long _rop_flags,
     unsigned long buffer_va );
 
-void 
+int 
 backbuffer_putpixel ( 
     unsigned int  _color,
     unsigned long _x, 
     unsigned long _y, 
     unsigned long _rop_flags );
 
-void 
+int 
 frontbuffer_putpixel ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -389,7 +389,7 @@ void x_panic(char *string);
 // line
 //
 
-void 
+int 
 backbuffer_draw_horizontal_line ( 
     unsigned long x1,
     unsigned long y, 
@@ -397,7 +397,7 @@ backbuffer_draw_horizontal_line (
     unsigned int color,
     unsigned long rop_flags );
 
-void 
+int 
 frontbuffer_draw_horizontal_line ( 
     unsigned long x1,
     unsigned long y, 
@@ -405,11 +405,8 @@ frontbuffer_draw_horizontal_line (
     unsigned int color,
     unsigned long rop_flags );
 
-//
 // Draw rectangle into the backbuffer.
-//
-
-void 
+int 
 backbuffer_draw_rectangle( 
     unsigned long x, 
     unsigned long y, 
@@ -418,7 +415,7 @@ backbuffer_draw_rectangle(
     unsigned int color,
     unsigned long rop_flags );
 
-void 
+int 
 frontbuffer_draw_rectangle( 
     unsigned long x, 
     unsigned long y, 

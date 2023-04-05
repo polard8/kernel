@@ -29,7 +29,12 @@
 // + Change the names of these parameters.
 // + Create a parameter for the address of the buffer.
 
-void 
+// Colors:
+// b,   g,  r,  a = Color from parameter.
+// b2, g2, r2, a2 = Color from backbuffer.
+// b3, g3, r3, a3 = Color to be stored.
+
+int 
 putpixel0 ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -39,20 +44,16 @@ putpixel0 (
 {
     unsigned char *where = (unsigned char *) buffer_va;
     unsigned int Color = (unsigned int) (_color & 0xFFFFFFFF);
+// ----------------------------
 // A cor passada via argumento.
-// Color bytes
     char b, g, r, a;
-
-    // bgra
     b = (Color & 0xFF);
     g = (Color & 0xFF00) >> 8;
     r = (Color & 0xFF0000) >> 16;
     a = (Color >> 24) + 1;
-
 // Positions
     int x = (int) (_x & 0xFFFF);
     int y = (int) (_y & 0xFFFF);
-
 // 3 = 24 bpp
 // 2 = 16 bpp
 // ...
@@ -117,15 +118,16 @@ putpixel0 (
 // == Modify ==============================
 //
 
+// ------------------------------------------
 // A cor que estava no framebuffer.
     unsigned char b2, g2, r2, a2;
-
 // Get yhe color.
     b2 = where[offset];
     g2 = where[offset +1];
     r2 = where[offset +2];
     if ( gSavedBPP == 32 ){ a2 = where[offset +3]; };
 
+// ------------------------------
 // A cor transformada.
 // A cor a ser gravada.
     unsigned char b3, g3, r3, a3;
@@ -258,16 +260,18 @@ putpixel0 (
 // == Register =====================
 // 
 
+// ----------------------------
 // BGR and A
-
     where[offset]    = b3;
     where[offset +1] = g3;
     where[offset +2] = r3;
     if ( gSavedBPP == 32 ){ where[offset +3] = a3; };
+
+// Number of changed pixels.
+    return 1;
 }
 
-
-void 
+int 
 backbuffer_putpixel ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -275,7 +279,8 @@ backbuffer_putpixel (
     unsigned long _rop_flags )
 {
 // Putpixel at the given buffer address.
-    putpixel0(
+// Return the number of changed pixels.
+    return (int ) putpixel0(
         _color,
         _x,
         _y,
@@ -283,8 +288,7 @@ backbuffer_putpixel (
         BACKBUFFER_VA );
 }
 
-
-void 
+int 
 frontbuffer_putpixel ( 
     unsigned int  _color,
     unsigned long _x, 
@@ -292,7 +296,8 @@ frontbuffer_putpixel (
     unsigned long _rop_flags )
 {
 // Putpixel at the given buffer address.
-    putpixel0(
+// Return the number of changed pixels.
+    return (int) putpixel0(
         _color,
         _x,
         _y,

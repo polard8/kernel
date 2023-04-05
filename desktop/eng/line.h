@@ -23,13 +23,13 @@ A_naive_line_drawing_algorithm(
 void test_draw_line(void);
 void test_draw_line2(void);
 
-
 int
 grBackbufferDrawHorizontalLine ( 
-    unsigned long x1,
+    unsigned long x1,  //min
     unsigned long y, 
-    unsigned long x2,  
-    unsigned int color );
+    unsigned long x2,  //max
+    unsigned int color,
+    unsigned long rop );
     
 void 
 backbuffer_draw_horizontal_line ( 

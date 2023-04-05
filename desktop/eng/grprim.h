@@ -491,32 +491,36 @@ grTriangle3(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle );
 
-int grTriangle( struct gr_triangle_d *triangle);
+int grTriangle(struct gr_triangle_d *triangle);
 
 int 
 fillTriangle0(
     int x1, int y1,
     int x2, int y2,
     int x3, int y3, 
-    unsigned int c);
+    unsigned int c,
+    unsigned long rop );
 
 int 
 fillTriangle(
     struct gws_window_d *window, 
     struct gr_triangle_d *triangle,
-    int hotspotx, int hotspoty );
+    int hotspotx, int hotspoty,
+    unsigned long rop );
 
 int 
 plotTriangleF(
     struct gws_window_d *window,
     struct gr_triangleF3D_d *t,
-    int fill );
+    int fill,
+    unsigned long rop );
 
 // Plot a single pixel.
 int 
 plotPixelF(
     struct gws_window_d *window,
-    struct gr_vecF3D_d *vec );
+    struct gr_vecF3D_d *vec,
+    unsigned long rop );
 
 //
 // == polygon ===========================

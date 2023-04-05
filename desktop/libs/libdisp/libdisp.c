@@ -133,6 +133,11 @@ grBackBufferPutpixel (
     if(x<0){ return 0; }
     if(y<0){ return 0; }
 
+
+    //if (x > 200 && x < 600)
+    //    rop = 1;
+
+
 // #bugbug: We don't have rop in this routine.
 // IN: color, x, y, rop, target buffer.
     return (int) fb_BackBufferPutpixel( 
@@ -193,6 +198,11 @@ grBackBufferPutpixel2 (
 // Copy the same already did before in other parts
 // of the system.
 
+// Colors:
+// b,   g,  r,  a = Color from parameter.
+// b2, g2, r2, a2 = Color from backbuffer.
+// b3, g3, r3, a3 = Color to be stored.
+
 int 
 fb_BackBufferPutpixel ( 
     unsigned int color, 
@@ -235,6 +245,8 @@ fb_BackBufferPutpixel (
     g = (color & 0xFF00)   >> 8;
     r = (color & 0xFF0000) >> 16;
     a = (color >> 24) + 1;
+
+    int Operation = (int) (rop & 0xFF);
 
     // 3 = 24 bpp
     int bytes_count=0;
@@ -318,34 +330,135 @@ fb_BackBufferPutpixel (
 // the lsb is the operation code.
 // See the same routine in the kernel side.
 
-/*
 //
-// == Modify ==============================
+// ==================================================
 //
 
-    char b2, g2, r2, a2;
-
-// get
+// ------------------------------------------
+// A cor encontrada no buffer.
+    unsigned char b2, g2, r2, a2;
+// Get
     b2 = where[Offset];
     g2 = where[Offset +1];
     r2 = where[Offset +2];
     if ( libgd_SavedBPP == 32 ){ a2 = where[Offset +3]; };
 
-// change
-    b = (b2 & 1);
+// ------------------------------------------
+// A cor transformada.
+// A cor a ser gravada.
+    unsigned char b3, g3, r3, a3;
+
+
+// ------------
+// 0 = Sem modificação
+// A cor a ser registrada é a mesma enviada por argumento.
+    if (Operation == 0){
+        r3=r;  g3=g;  b3=b;  a3=a;
+    }
+// ------------
+// 1 = or
+    if (Operation == 1)
+    {
+        r3 = (r2 | r);
+        g3 = (g2 | g);
+        b3 = (b2 | b);
+        a3 = a2;
+    }
+// ------------
+// 2 = and
+    if (Operation == 2)
+    {
+        r3 = (r2 & r);
+        g3 = (g2 & g);
+        b3 = (b2 & b);
+        a3 = a2;
+    }
+// ------------
+// 3 = xor
+    if (Operation == 3)
+    {
+        r3 = (r2 ^ r);
+        g3 = (g2 ^ g);
+        b3 = (b2 ^ b);
+        a3 = a2;
+    }
+// ------------
+// 10 - red
+    if (Operation == 10)
+    {
+        r3 = (r2 & 0xFE);
+        g3 = g2;
+        b3 = b2; 
+        a3 = a2;
+    }
+// ------------
+// 11 - green
+    if (Operation == 11)
+    {
+        r3 = r2;
+        g3 = (g2 & 0xFE);
+        b3 = b2; 
+        a3 = a2;
+    }
+// ------------
+// 12 - blue
+    if (Operation == 12)
+    {
+        r3 = r2;
+        g3 = g2;
+        b3 = (b2 & 0xFE); 
+        a3 = a2;
+    }
+// ------------
+// 20 - gray
+    if (Operation == 20)
+    {
+        r3 = (r2 & 0x80);
+        g3 = (g2 & 0x80);
+        b3 = (b2 & 0x80);
+        a3 = a2;
+    }
+// ------------
+// 21 - gray
+    if (Operation == 21)
+    {
+        r3 = (r2 & 0x00);
+        g3 = (g2 & 0xFF);
+        b3 = (b2 & 0xFF);
+        a3 = a2;
+    }
+
+// luminosity
+// Gray: luminosity = R*0.3 + G*0.59 + B *0.11
+
+/*
+ // #test
+ // This is a test yet.
+    unsigned char common_gray=0;
+    if ( Operation == 22 )
+    {
+        r3 = ((r2 * 30 )/100);
+        g3 = ((g2 * 59 )/100);
+        b3 = ((b2 * 11 )/100);
+        common_gray = (unsigned char) (r3+g3+b3);
+        r3=(unsigned char)common_gray;
+        g3=(unsigned char)common_gray;
+        b3=(unsigned char)common_gray;
+        a3 = a2;
+    }
 */
+
+
 
 //
 // == Record ==============================
 //
 
 // BGR and A
-    where[Offset]    = b;
-    where[Offset +1] = g;
-    where[Offset +2] = r;
-    if (libgd_SavedBPP == 32){
-        where[Offset +3] = a; 
-    }
+    where[Offset]    = b3;
+    where[Offset +1] = g3;
+    where[Offset +2] = r3;
+    if (libgd_SavedBPP == 32){ where[Offset +3] = a3; };
 
 // Return the number of changed pixels. '1'.
     return (int) 1;
@@ -365,6 +478,11 @@ fail:
 // #todo
 // + Change the names of these parameters.
 // + Create a parameter for the address of the buffer.
+
+// Colors:
+// b,   g,  r,  a = Color from parameter.
+// b2, g2, r2, a2 = Color from backbuffer.
+// b3, g3, r3, a3 = Color to be stored.
 
 int
 putpixel0 ( 
@@ -399,6 +517,8 @@ putpixel0 (
     int width = (int) (libgd_SavedX & 0xFFFF);  // device width
 // Positions
     int offset=0;   // the offset of the pixel into the buffer.
+
+
     int x = (int) (_x & 0xFFFF);
     int y = (int) (_y & 0xFFFF);
 
