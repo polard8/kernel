@@ -62,6 +62,7 @@ extern int current_mode;
 
 // #imported
 #include <grprim0.h>
+#include <libgr.h>
 #include "rtl/grprim.h"
 #include "rtl/camera.h"
 #include "rtl/proj.h"

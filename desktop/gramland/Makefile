@@ -78,9 +78,12 @@ LIBC        = ../libs/rtl/include/
 LIBCOBJ     = ../libs/rtl/obj
 LIBDISP     = ../libs/libdisp/include/
 LIBDISPOBJ  = ../libs/libdisp/obj
+LIBGR       = ../libs/libgr/include/
+LIBGROBJ    = ../libs/libgr/obj
 
 CINCLUDES  = -I $(LIBC)  
 CINCLUDES += -I $(LIBDISP)
+CINCLUDES += -I $(LIBGR)
 CINCLUDES += -I .    
 
 # Objects
@@ -90,6 +93,7 @@ termios.o ioctl.o fcntl.o
 
 myObjects += globals.o 
 myObjects += libdisp.o
+myObjects += libgr.o
 
 myObjects += archive_basics1.o
 myObjects += archive_basics2.o
@@ -171,6 +175,7 @@ grprim.o camera.o proj.o sprite.o demos.o
 	cp $(LIBCOBJ)/fcntl.o .
 
 	cp $(LIBDISPOBJ)/libdisp.o .
+	cp $(LIBGROBJ)/libgr.o .
 
 gws-link:
 	$(LD) $(linkFlags) -o $(linkTarget) $(myObjects)

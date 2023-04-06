@@ -1124,103 +1124,6 @@ rectangle_ras3D (
     };
 }
 
-// Scaling: Inflate cube.
-int 
-xxxInflateCubeZ ( 
-    struct gr_cube_d *cube, 
-    int value )
-{
-    if ( (void*) cube == NULL ){
-        return (-1);
-    }
-
-    //int value = z;
-    //int value = z*2;
-
-    // south points =====================================
-    cube->p[0].x = (cube->p[0].x - value);
-    cube->p[0].y = (cube->p[0].y + value);
-    cube->p[0].z = (cube->p[0].z - value);
-        
-    cube->p[1].x = (cube->p[1].x + value);
-    cube->p[1].y = (cube->p[1].y + value);
-    cube->p[1].z = (cube->p[1].z - value);
-        
-    cube->p[2].x = (cube->p[2].x + value);
-    cube->p[2].y = (cube->p[2].y - value);
-    cube->p[2].z = (cube->p[2].z - value);
-        
-    cube->p[3].x = (cube->p[3].x - value);
-    cube->p[3].y = (cube->p[3].y - value);
-    cube->p[3].z = (cube->p[3].z - value);
-
-    //north points ================================
-    cube->p[4].x = (cube->p[4].x - value);
-    cube->p[4].y = (cube->p[4].y + value);
-    cube->p[4].z = (cube->p[4].z + value);
-        
-    cube->p[5].x = (cube->p[5].x + value);
-    cube->p[5].y = (cube->p[5].y + value);
-    cube->p[5].z = (cube->p[5].z + value);
-        
-    cube->p[6].x = (cube->p[6].x + value);
-    cube->p[6].y = (cube->p[6].y - value);
-    cube->p[6].z = (cube->p[6].z + value);
-        
-    cube->p[7].x = (cube->p[7].x - value);
-    cube->p[7].y = (cube->p[7].y - value);
-    cube->p[7].z = (cube->p[7].z + value);
-
-    return 0;
-}
-
-// Scaling: Deflate cube.
-int 
-xxxDeflateCubeZ ( 
-    struct gr_cube_d *cube, 
-    int value )
-{
-    if ( (void*) cube == NULL ){
-        return -1;
-    }
-
-    // south points ==========================
-    cube->p[0].x = (cube->p[0].x + value);
-    cube->p[0].y = (cube->p[0].y - value);
-    cube->p[0].z = (cube->p[0].z + value);
-        
-    cube->p[1].x = (cube->p[1].x - value);
-    cube->p[1].y = (cube->p[1].y - value);
-    cube->p[1].z = (cube->p[1].z + value);
-        
-    cube->p[2].x = (cube->p[2].x - value);
-    cube->p[2].y = (cube->p[2].y + value);
-    cube->p[2].z = (cube->p[2].z + value);
-        
-    cube->p[3].x = (cube->p[3].x + value);
-    cube->p[3].y = (cube->p[3].y + value);
-    cube->p[3].z = (cube->p[3].z + value);
-
-    // north points =========================
-    cube->p[4].x = (cube->p[4].x + value);
-    cube->p[4].y = (cube->p[4].y - value);
-    cube->p[4].z = (cube->p[4].z - value);
-        
-    cube->p[5].x = (cube->p[5].x - value);
-    cube->p[5].y = (cube->p[5].y - value);
-    cube->p[5].z = (cube->p[5].z - value);
-        
-    cube->p[6].x = (cube->p[6].x - value);
-    cube->p[6].y = (cube->p[6].y + value);
-    cube->p[6].z = (cube->p[6].z - value);
-        
-    cube->p[7].x = (cube->p[7].x + value);
-    cube->p[7].y = (cube->p[7].y + value);
-    cube->p[7].z = (cube->p[7].z - value);
-
-    return 0;
-}
-
 // Triangle.
 int xxxTriangleZ ( struct gr_triangle_d *triangle )
 {
@@ -1776,45 +1679,6 @@ plotEllipseRectZ (
     };
 }
 
-// Fibonacci Series using Recursion 
-// ??: slow.
-int fib(int n)
-{ 
-    register int Copy = n;
-    int a=0;
-    int b=0;
-
-    if (Copy <= 1){ return Copy; }
-    
-    a = fib(Copy - 1); 
-    b = fib(Copy - 2);
-
-    return (int) (a+b);
-} 
-
-/*
-// print fibonacci
-void __print_fib(int max);
-void __print_fib(int max)
-{
-    int i=0;
-    int a=0;
-    int b=1;
-    int c;
-    
-    if (max<0)
-        return;
-    
-    while(a<max)
-    {
-        printf("%d\n,a");
-        c = a+b;
-        a = b;
-        b = c;
-    };
-}
-*/
-
 /*
  * plotCharBackbufferDrawcharTransparent:
  *     Desenha um caractere sem alterar o pano de fundo.
@@ -2177,40 +2041,6 @@ int servicepixelBackBufferPutpixel(void)
     grBackBufferPutpixel(color,x,y,0);
 
     return 0;
-}
-
-//#todo: Explain it better.
-unsigned int 
-interpolate_color(
-    unsigned int color1, 
-    unsigned int color2, 
-    unsigned int fraction )
-{
-    unsigned int final_color=0;
-
-    unsigned char r1 = (unsigned char) (color1 >> 16) & 0xff;
-    unsigned char r2 = (unsigned char) (color2 >> 16) & 0xff;
-    unsigned char g1 = (unsigned char) (color1 >> 8) & 0xff;
-    unsigned char g2 = (unsigned char) (color2 >> 8) & 0xff;
-    unsigned char b1 = (unsigned char) color1 & 0xff;
-    unsigned char b2 = (unsigned char) color2 & 0xff;
-
-    final_color = 
-        (unsigned int) (    
-        (unsigned int) ( (r2 - r1) * fraction + r1 ) << 16 | 
-        (unsigned int) ( (g2 - g1) * fraction + g1 ) <<  8 | 
-        (unsigned int) ( (b2 - b1) * fraction + b1 )
-    );
-    
-    return (unsigned int) final_color;
-}
-
-//??
-//#todo: Explain it better.
-unsigned int invert_color(unsigned int color)
-{
-    unsigned int Color = (unsigned int) (color ^ 0x00FFFFFF);
-    return (unsigned int) Color;
 }
 
 //

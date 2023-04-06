@@ -77,25 +77,33 @@ user_ccflags += -fno-optimize-sibling-calls
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC     = ../libs/rtl/include/
-LIBCOBJ  = ../libs/rtl/obj
-
+LIBC       = ../libs/rtl/include/
+LIBCOBJ    = ../libs/rtl/obj
 LIBDISP    = ../libs/libdisp/include/
 LIBDISPOBJ = ../libs/libdisp/obj
+LIBGR      = ../libs/libgr/include/
+LIBGROBJ   = ../libs/libgr/obj
+LIBGR3D    = ../libs/libgr3d/include/
+LIBGR3DOBJ = ../libs/libgr3d/obj
+
+CINCLUDES  = -I $(LIBC)  
+CINCLUDES += -I $(LIBDISP)
+CINCLUDES += -I $(LIBGR)
+CINCLUDES += -I $(LIBGR3D)
+CINCLUDES += -I .    
 
 WS_INCLUDES       = include/ 
 WS_INCLUDES_LOCAL = .
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o stdlib.o string.o conio.o socket.o signal.o unistd.o \
 termios.o ioctl.o fcntl.o    
 
 myObjects += globals.o 
 myObjects += libdisp.o
+myObjects += libgr.o
+myObjects += libgr3d.o
 
 myObjects += archive_basics1.o
 myObjects += archive_basics2.o
@@ -112,46 +120,45 @@ all: main.o all-c gws-link finalize clean
 	@echo "Ok?"
 
 main.o:
-	$(CC)  -c  main.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o main.o
-	$(CC)  -c  globals.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o globals.o
+	$(CC)  -c  main.c     $(user_ccflags) $(CINCLUDES) -o main.o
+	$(CC)  -c  globals.c  $(user_ccflags) $(CINCLUDES) -o globals.o
 
 all-c:
 
 #basics1
-	$(CC)  -c  char.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o char.o
-	$(CC)  -c  dtext.c     $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o dtext.o
+	$(CC)  -c  char.c  $(user_ccflags) $(CINCLUDES) -o char.o
+	$(CC)  -c  dtext.c $(user_ccflags) $(CINCLUDES) -o dtext.o
 	$(LD) -r -o archive_basics1.o char.o dtext.o 
 
-	$(CC)  -c  line.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o line.o
-	$(CC)  -c  rect.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o rect.o
-	$(CC)  -c  window.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o window.o
-	$(CC)  -c  gws.c       $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o gws.o
-	$(CC)  -c  comp.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o comp.o
-	$(CC)  -c  bmp.c       $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o bmp.o
-	$(CC)  -c  connect.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o connect.o
-	$(CC)  -c  button.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o button.o
+	$(CC)  -c  line.c      $(user_ccflags) $(CINCLUDES) -o line.o
+	$(CC)  -c  rect.c      $(user_ccflags) $(CINCLUDES) -o rect.o
+	$(CC)  -c  window.c    $(user_ccflags) $(CINCLUDES) -o window.o
+	$(CC)  -c  gws.c       $(user_ccflags) $(CINCLUDES) -o gws.o
+	$(CC)  -c  comp.c      $(user_ccflags) $(CINCLUDES) -o comp.o
+	$(CC)  -c  bmp.c       $(user_ccflags) $(CINCLUDES) -o bmp.o
+	$(CC)  -c  connect.c   $(user_ccflags) $(CINCLUDES) -o connect.o
+	$(CC)  -c  button.c    $(user_ccflags) $(CINCLUDES) -o button.o
 	$(LD) -r -o archive_basics2.o \
 line.o rect.o window.o gws.o comp.o bmp.o connect.o button.o
 
 #fx
-	$(CC)  -c grprim.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o grprim.o
-	$(CC)  -c camera.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o camera.o
-	$(CC)  -c world.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o world.o
-	$(CC)  -c proj.c    $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o proj.o
-	$(CC)  -c sprite.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o sprite.o
-	$(CC)  -c models.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o models.o
-	$(CC)  -c surface.c $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o surface.o
-	$(CC)  -c demos.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o demos.o
+	$(CC)  -c grprim.c  $(user_ccflags) $(CINCLUDES) -o grprim.o
+	$(CC)  -c camera.c  $(user_ccflags) $(CINCLUDES) -o camera.o
+	$(CC)  -c world.c   $(user_ccflags) $(CINCLUDES) -o world.o
+	$(CC)  -c proj.c    $(user_ccflags) $(CINCLUDES) -o proj.o
+	$(CC)  -c sprite.c  $(user_ccflags) $(CINCLUDES) -o sprite.o
+	$(CC)  -c models.c  $(user_ccflags) $(CINCLUDES) -o models.o
+	$(CC)  -c surface.c $(user_ccflags) $(CINCLUDES) -o surface.o
+	$(CC)  -c demos.c   $(user_ccflags) $(CINCLUDES) -o demos.o
 	$(LD) -r -o archive_fx.o \
 grprim.o camera.o world.o proj.o sprite.o models.o surface.o demos.o 
 
-
 #extra
-	$(CC)  -c  xxxinput.c  $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o xxxinput.o
-	$(CC)  -c  font.c      $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I . -o font.o
+	$(CC)  -c  xxxinput.c  $(user_ccflags) $(CINCLUDES) -o xxxinput.o
+	$(CC)  -c  font.c      $(user_ccflags) $(CINCLUDES) -o font.o
 	$(LD) -r -o archive_extra.o  xxxinput.o font.o 
 
-	$(CC)  -c  wm.c   $(user_ccflags) -I $(LIBC) -I $(LIBDISP) -I include/ -I .  -o wm.o
+	$(CC)  -c  wm.c   $(user_ccflags) $(CINCLUDES) -I include/  -o wm.o
 
 #
 # == imported objects =============================
@@ -176,6 +183,8 @@ grprim.o camera.o world.o proj.o sprite.o models.o surface.o demos.o
 #test
 	cp $(LIBCOBJ)/math.o .
 	cp $(LIBDISPOBJ)/libdisp.o .
+	cp $(LIBGROBJ)/libgr.o .
+	cp $(LIBGR3DOBJ)/libgr3d.o .
 
 gws-link:
 	$(LD) $(linkFlags) -o $(linkTarget) $(myObjects)

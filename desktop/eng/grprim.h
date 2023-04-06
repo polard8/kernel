@@ -5,67 +5,13 @@
  *     2020 - Created by Fred Nora.
  */
 
+// Some 3D stuff using float.
+
 #ifndef __GRPRIM_H
 #define __GRPRIM_H   1
 
-// some 3D stuff using float.
-
-
-// 2D float point.
-// #todo: Maybe in the future.
-struct gr_vecF2D_d
-{
-    float x;
-    float y;
-    unsigned int color;
-};
-
-
-// 3D float point.
-struct gr_vecF3D_d
-{
-    float x;
-    float y;
-    float z;
-    unsigned int color;
-};
-
-// ---------------------------------------
-
-
-// float 3D triangle
-struct gr_triangleF3D_d
-{
-    int used;
-    int magic;
-    int initialized;
-    struct gr_vecF3D_d p[3];
-    // mesh support.
-    struct gr_triangleF3D_d *last;
-    struct gr_triangleF3D_d *next;
-};
-
-// 3D rectangle. float falues.
-struct gr_rectangleF3D_d
-{
-    struct gr_vecF3D_d p[4];
-    // mesh support.
-    struct gr_rectangleF3D_d *last;
-    struct gr_rectangleF3D_d *next;
-};
-
-
-// float
-struct gr_mat4x4_d
-{
-    float m[4][4];  // = { 0 };
-};
-
-
 //================================================
-
 // The Perspective Calculation
-
 // we can calculate the location of a 3D vertex in a 
 // 2D viewing window with a multiplication and a division like this:
 // x' = (x*near)/z
@@ -76,32 +22,6 @@ struct gr_mat4x4_d
 //
 // ===========================================
 //
-
-// matrix
-
-/*
-static int projection4x4[4][4] = { 
-        {1,0,0,0}, 
-        {0,1,0,0},
-        {0,0,0,0},
-        {1,1,0,0}
-        };
-*/
-
-// #ugly
-void 
-multiply4(
-    int mat1[4][4], 
-    int mat2[4][4], 
-    int res[4][4] );
-
-void 
-gr_MultiplyMatrixVector(
-    struct gr_vecF3D_d *i, 
-    struct gr_vecF3D_d *o, 
-    struct gr_mat4x4_d *m );
-
-
 
 int 
 gr_rotate_x(
@@ -311,8 +231,6 @@ int xxxPolygonZ ( struct gr_polygon_d *polygon );
 // == Cube ============================
 //
 
-int xxxInflateCubeZ( struct gr_cube_d *cube, int value );
-int xxxDeflateCubeZ( struct gr_cube_d *cube, int value );
 int xxxDrawCubeZ( struct gr_cube_d *cube );
 //sevice 2041
 int serviceGrCubeZ(void);
@@ -365,37 +283,7 @@ grEllipse3 (
 void noraDrawingStuff(void);
 void noraDrawingStuff3(int x, int y, int z);
 
-struct gr_vecF3D_d *grVectorCrossProduct(
-    struct gr_vecF3D_d *v1, 
-    struct gr_vecF3D_d *v2 );
 
-float dot_productF( struct gr_vecF3D_d *v1, struct gr_vecF3D_d *v2 );
-int dot_product( struct gr_vec3D_d *v1, struct gr_vec3D_d *v2 );
-
-int gr_discriminant_int(int a, int b, int c);
-float gr_discriminant(float a, float b, float c);
-
-int gr_triangle_area_int (int base, int height);
-
-int gr_magic_volume (int x, int y, int z);
-int gr_magic_area (int x, int y, int z);
-
-int 
-gr_find_obj_height_int ( 
-    int *obj_height, int obj_distance,
-    int img_height, int img_distance );
-int 
-gr_find_img_height_int ( 
-    int obj_height, int obj_distance,
-    int *img_height, int img_distance );
-
-
-// Fibonacci Series using Recursion 
-// #todo: Create fib_int and fib_long
-// This thing is very slow.
-int fib(int n);
-
-void gr_scale_vec( struct gr_vec3D_d *v, int scale );
 
 //
 // == Char ========================================
@@ -419,14 +307,6 @@ plotCharBackbufferDrawcharTransparentZ (
 // Pixel
 int servicepixelBackBufferPutpixel (void);
 
-// interpolation
-unsigned int 
-interpolate_color(
-    unsigned int color1, 
-    unsigned int color2, 
-    unsigned int fraction );
-
-unsigned int invert_color(unsigned int color);
 
 #endif    
 

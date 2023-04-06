@@ -124,8 +124,6 @@ int xxxPolygonZ(struct gr_polygon_d *polygon);
 // == Cube ============================
 //
 
-int xxxInflateCubeZ ( struct gr_cube_d *cube, int value );
-int xxxDeflateCubeZ ( struct gr_cube_d *cube, int value );
 int xxxDrawCubeZ(struct gr_cube_d *cube);
 
 
@@ -167,10 +165,6 @@ plotEllipseRectZ (
     unsigned long color,
     int z );
 
-// Fibonacci Series using Recursion 
-// #todo: Create fib_int and fib_long
-int fib(int n);
-
 //
 // == Char ========================================
 //
@@ -189,15 +183,6 @@ plotCharBackbufferDrawcharTransparentZ (
     unsigned int color, 
     unsigned long c,
     int z );
-
-// Interpolation
-unsigned int 
-interpolate_color(
-    unsigned int color1, 
-    unsigned int color2, 
-    unsigned int fraction );
-
-unsigned int invert_color(unsigned int color);
 
 #endif    
 

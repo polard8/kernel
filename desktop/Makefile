@@ -12,9 +12,11 @@ VERSION_BUILD = ?
 all:
 
 # libs
-	make -C libs/rtl
-	make -C libs/libgws
-	make -C libs/libdisp
+	make -C libs/rtl/
+	make -C libs/libgws/
+	make -C libs/libdisp/
+	make -C libs/libgr/
+	make -C libs/libgr3d/
 
 # ----------------
 # Graphics engine. (game1)
@@ -44,6 +46,8 @@ clean-all:
 	-rm -f gramland/bin/*.BIN
 	-rm -f apps/bin/*.BIN
 	-rm -f libs/libgws/obj/*.o
+	-rm -f libs/libgr/obj/*.o
+	-rm -f libs/libgr3d/obj/*.o
 	-rm -f libs/libdisp/obj/*.o
 	-rm -f libs/rtl/obj/*.o
 	
