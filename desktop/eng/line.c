@@ -39,15 +39,14 @@ testLines (
     int x2, int y2, 
     int color )
 {
-   int dx = x2-x1;
-   int dy = y2-y1;
-     
-  plotLine3d(NULL,   x1,  y1-dy, 0,   x1+dx, y1   , 0, color);
-  plotLine3d(NULL,x1+dx,     y1, 0,     x1, y1+dy , 0, color);
-  plotLine3d(NULL,   x1,  y1+dy, 0,  x1-dx, y1    , 0, color);
-  plotLine3d(NULL,x1-dx,     y1, 0,     x1, y1-dy , 0, color);
-}
+    int dx = x2-x1;
+    int dy = y2-y1;
 
+    plotLine3d(NULL,   x1,  y1-dy, 0,   x1+dx, y1   , 0, color);
+    plotLine3d(NULL,x1+dx,     y1, 0,     x1, y1+dy , 0, color);
+    plotLine3d(NULL,   x1,  y1+dy, 0,  x1-dx, y1    , 0, color);
+    plotLine3d(NULL,x1-dx,     y1, 0,     x1, y1-dy , 0, color);
+}
 
 //#bugbug: use unsigned int for 'color'.
 //ok triangulo invertido.

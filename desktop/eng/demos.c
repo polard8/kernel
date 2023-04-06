@@ -370,10 +370,10 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     struct gr_mat4x4_d  matRotY;
     struct gr_mat4x4_d  matRotZ; 
 // Triangles
-    struct gr_triangleF3D_d  tri;            // triângulo original.
-    struct gr_triangleF3D_d  triRotatedX; 
-    struct gr_triangleF3D_d  triRotatedXY;
-    struct gr_triangleF3D_d  triRotatedXYZ;
+    struct gr_triangleF3D_d  tri;            // Original triangle.
+    struct gr_triangleF3D_d  triRotatedX;    // Rotate in X
+    struct gr_triangleF3D_d  triRotatedXY;   // Rotate in Y
+    struct gr_triangleF3D_d  triRotatedXYZ;  // Rotate in Z (Projected)
 
     int sequence[3*16];  //cube
     int cull=FALSE;
@@ -413,6 +413,12 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     //cube->fThetaAngle = (float) (cube->fThetaAngle + (float) 1.0f * fElapsedTime);
     //cube->fThetaAngle = (float) (cube->fThetaAngle + 1.0f * fElapsedTime);
 
+// ?
+// Generating the matrices.
+// Perceba que só atribuímos valores à matriz de rotação em X.
+// Então logo abaixo quando efetuarmos as 3 possíveis rotações,
+// o modelo fara rotação apenas em X.
+
 //------------------------------------------------
 // Rotation X
 // counter-clockwise
@@ -441,7 +447,10 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     matRotZ.m[2][2] = (float) 1.0f;
     matRotZ.m[3][3] = (float) 1.0f;
 
-// 12 triangles.
+// ?
+// The 'face' has three vector.
+// Now we're selection the indexes for these three vectors. I guess.
+// 12 triangles. (12*3) = 36 vectors.
 // Order: north, top, south, bottom, east, west.
 // clockwise
     sequence[0]  = (int) 1; sequence[1]  = (int) 2;  sequence[2] = (int) 4; //f 1 2 4 // north bottom  n
@@ -471,9 +480,10 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
     {
         cull=FALSE;
 
+        // Jumping three offsets each time.
         off = (int) ((i-1)*3);
         
-        v = (int) sequence[off+0];
+        v = (int) sequence[off+0];  // Get the vertice index.
         tri.p[0].x = (float) cube->vecs[v].x;
         tri.p[0].y = (float) cube->vecs[v].y;
         tri.p[0].z = (float) cube->vecs[v].z;
@@ -481,18 +491,19 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         if(i >= 1 && i <= 12){
             tri.p[0].color = cube->colors[i-1];  // rectangle color
         }
-        v = (int) sequence[off+1];
+        v = (int) sequence[off+1];  // Get the vertice index.
         tri.p[1].x = (float) cube->vecs[v].x;
         tri.p[1].y = (float) cube->vecs[v].y;
         tri.p[1].z = (float) cube->vecs[v].z;
         tri.p[1].color = COLOR_WHITE;  // not used
 
-        v = (int) sequence[off+2];
+        v = (int) sequence[off+2];  // Get the vertice index.
         tri.p[2].x = (float) cube->vecs[v].x;
         tri.p[2].y = (float) cube->vecs[v].y;
         tri.p[2].z = (float) cube->vecs[v].z;
         tri.p[2].color = COLOR_WHITE;  // not used
 
+        // Now we have a triangle. A face.
 
         //-----------------------------    
         // Rotate in X-Axis
@@ -540,6 +551,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             (struct gr_mat4x4_d *) &matRotZ);
 
         // The color for the rotated triangle.
+        // This is the original color.
         triRotatedXYZ.p[0].color = tri.p[0].color;
         triRotatedXYZ.p[1].color = tri.p[1].color;
         triRotatedXYZ.p[2].color = tri.p[2].color;
@@ -636,14 +648,17 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         struct gr_vecF3D_d line1; 
         struct gr_vecF3D_d line2;
 
+        // Vector 1 - Vector 0.
         line1.x = (float) triRotatedXYZ.p[1].x - triRotatedXYZ.p[0].x;
         line1.y = (float) triRotatedXYZ.p[1].y - triRotatedXYZ.p[0].y;
         line1.z = (float) triRotatedXYZ.p[1].z - triRotatedXYZ.p[0].z;
 
+        // Vector 2 - Vector 0.
         line2.x = (float) triRotatedXYZ.p[2].x - triRotatedXYZ.p[0].x;
         line2.y = (float) triRotatedXYZ.p[2].y - triRotatedXYZ.p[0].y;
         line2.z = (float) triRotatedXYZ.p[2].z - triRotatedXYZ.p[0].z;
 
+        // Normalize.
         normal.x = (float) (line1.y * line2.z - line1.z * line2.y);
         normal.y = (float) (line1.z * line2.x - line1.x * line2.z);
         normal.z = (float) (line1.x * line2.y - line1.y * line2.x);
@@ -655,6 +670,7 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
                           normal.y*normal.y + 
                           normal.z*normal.z ) );
 
+        // Divide por um valor comum entre eles.
         normal.x = (float) (normal.x/l); 
         normal.y = (float) (normal.y/l); 
         normal.z = (float) (normal.z/l);
@@ -674,8 +690,14 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         // estão em direções opostas.
         // see:
         // https://en.wikipedia.org/wiki/Back-face_culling
-        if (CurrentCameraF.initialized == FALSE){ return; }
+        
+        // No camera.
+        if (CurrentCameraF.initialized == FALSE){
+            return;
+        }
+
         // Dot product.
+        // Normal 'vezes' a distancia entre um dado vetor e a camera.
         float tmp = 
              (float) (
              normal.x * (triRotatedXYZ.p[0].x - CurrentCameraF.position.x) + 
@@ -718,12 +740,13 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
             // So, z can be any vallur between 0.01f and 1000.0f.
             // #todo
             // Maybe this function can accept more parameters.
-            if ( (void*) __root_window != NULL ){
-            plotTriangleF(
-                (struct gws_window_d *) __root_window, 
-                (struct gr_triangleF3D_d *) &triRotatedXYZ,
-                fill_triangle,
-                0 );
+            if ( (void*) __root_window != NULL )
+            {
+                plotTriangleF(
+                    (struct gws_window_d *) __root_window, 
+                    (struct gr_triangleF3D_d *) &triRotatedXYZ,
+                    fill_triangle,
+                    0 );
             }
         }
     };
