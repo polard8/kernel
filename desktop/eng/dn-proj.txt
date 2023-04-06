@@ -29,6 +29,15 @@ origem no canto superior esquerdo.
     todos estarão olhando para o mesmo vanishing point,
     que é o infinito do personagem central. E não todo mundo olhando
     para o próprio infinito. Que é o 'certo' a se fazer. hahaha.
+    Se o observador estiver logo atras do personagem central, 
+    então ele verá a lateral dos outros personagens e estará alinhado
+    somente com o personagem central.
+    Nessa engina os personagens naturalmente apontam para um vanishing point,
+    e não para o próprio infinito.
+    
+    
+    
+    
     
     
     
