@@ -471,10 +471,11 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 // draw a rectangle
    //drawRectangle0((float) 0.08f);
 
-// ---------
-// draw a cube
 
-    //cull=FALSE;
+// - Loop --------------------------------
+// Draw a list of triangles.
+// A cube has 6 faces and 12 triangles.
+// 1~12
 
     for (i=1; i <= nTriangles; i++)
     {
@@ -612,6 +613,8 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
 
         // -x-------
         // Translate the triangle in x based in the terrain x position.
+        // From the center, not from the top/left corner.
+        // Because our 3D int engine assumes that.
 
         if ((void*)terrain != NULL)
         {
@@ -626,7 +629,9 @@ static void drawFlyingCube(struct cube_model_d *cube, float vel)
         // -y-------
         // Translate the triangle in y based in the terrain y position.
         // Coloca o cubo no chão do terreno.
-        
+        // From the center, not from the top/left corner.
+        // Because our 3D int engine assumes that.
+
         if ((void*)terrain != NULL)
         {
             triRotatedXYZ.p[0].y = 
@@ -1501,6 +1506,7 @@ void demoFlyingCube(int draw_desktop, unsigned int bg_color)
 // 12 triangles.
     drawTerrain(terrain,0.0f);
 
+//- Loop ------------------------------
 // Draw all the cubes.
 // (12*7) triangles.
     register int n=1; // terrain =0

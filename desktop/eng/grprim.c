@@ -2069,9 +2069,13 @@ plotTriangleF(
 
 // Number of changed pixels.
     int npixels=0;
+
+// The projected trinagle.
 // Engine triangle structure.
 // Using 'int',
-    struct gr_triangle_d final_triangle;
+// because this is what we're gonna paint into a 2D screen.
+    //struct gr_triangle_d final_triangle;
+    struct gr_triangle_d  triProjected;
 
     if (CurrentProjectionF.initialized != TRUE){
         printf("plotTriangleF: CurrentProjectionF\n");
@@ -2236,6 +2240,8 @@ plotTriangleF(
         scale_factor = (float) 2.00f;
     }
 
+// Scale nto view.
+
     // Ex: (0.5 * 0.75 * 0.5 * 800) = 150
     // Ex: (0.5 * 0.75 * 0.5 * 600) = 112.5
     long x0 = (long) (t->p[0].x *ar * scale_factor * (float) window_width);
@@ -2245,46 +2251,56 @@ plotTriangleF(
     long x2 = (long) (t->p[2].x *ar * scale_factor * (float) window_width);
     long y2 = (long) (t->p[2].y     * scale_factor * (float) window_height);
 
+
+// ----------------------------------------
+// The projected triangle. (for 2D screen).
 // Final rectangle. Using 'int'.
 // Considerando o hotspot no centro,
 // o valor tem que ser menor que 800/2 
 // ou menor que 600/2.
 
-    final_triangle.p[0].x = (int) ( x0 & 0xFFFFFFFF);
-    final_triangle.p[0].y = (int) ( y0 & 0xFFFFFFFF);
-    final_triangle.p[0].z = (int) 0;
-    final_triangle.p[0].color = t->p[0].color; //COLOR_WHITE;
+    triProjected.p[0].x = (int) ( x0 & 0xFFFFFFFF);
+    triProjected.p[0].y = (int) ( y0 & 0xFFFFFFFF);
+    triProjected.p[0].z = (int) 0;
+    triProjected.p[0].color = t->p[0].color; //COLOR_WHITE;
     
-    final_triangle.p[1].x = (int) ( x1 & 0xFFFFFFFF);
-    final_triangle.p[1].y = (int) ( y1 & 0xFFFFFFFF);
-    final_triangle.p[1].z = (int) 0;
-    final_triangle.p[1].color = t->p[1].color; // COLOR_WHITE;
+    triProjected.p[1].x = (int) ( x1 & 0xFFFFFFFF);
+    triProjected.p[1].y = (int) ( y1 & 0xFFFFFFFF);
+    triProjected.p[1].z = (int) 0;
+    triProjected.p[1].color = t->p[1].color; // COLOR_WHITE;
     
-    final_triangle.p[2].x = (int) ( x2 & 0xFFFFFFFF);
-    final_triangle.p[2].y = (int) ( y2 & 0xFFFFFFFF);
-    final_triangle.p[2].z = (int) 0;
-    final_triangle.p[2].color = t->p[2].color; // COLOR_WHITE;
+    triProjected.p[2].x = (int) ( x2 & 0xFFFFFFFF);
+    triProjected.p[2].y = (int) ( y2 & 0xFFFFFFFF);
+    triProjected.p[2].z = (int) 0;
+    triProjected.p[2].color = t->p[2].color; // COLOR_WHITE;
 
-    final_triangle.used = TRUE;
-    final_triangle.initialized = TRUE;
+    triProjected.used = TRUE;
+    triProjected.initialized = TRUE;
 
     //#debug
     //printf("x0=%d y0=%d | x1=%d y1=%d | x2=%d y2=%d \n",
-    //    final_triangle.p[0].x, final_triangle.p[0].y, 
-    //    final_triangle.p[1].x, final_triangle.p[1].y, 
-    //    final_triangle.p[2].x, final_triangle.p[2].y );
+    //    triProjected.p[0].x, triProjected.p[0].y, 
+    //    triProjected.p[1].x, triProjected.p[1].y, 
+    //    triProjected.p[2].x, triProjected.p[2].y );
 
 //
 // Plot triangle
 //
 
+// #alert
+// Our engine when painting 3D stuff using 'int'
+// has the venter of the screen as a reference,
+// So, if we translated the triangle, we did it
+// from the center, not from the top/left corner.
+
 // Filled
 // We need a valid window.
 // #todo: return pixel counter.
+// The projected triangle uses 'int'.
     if (fill){
         npixels += fillTriangle( 
                        window, 
-                       &final_triangle, 
+                       &triProjected, 
                        HotSpotX, HotSpotY,
                        rop );
 
@@ -2295,8 +2311,9 @@ plotTriangleF(
 // we dont need a valid window.
 // #todo: return pixel counter.
 // #todo: rop parameter.
+// The projected triangle uses 'int'.
     if (!fill){
-        npixels += grTriangle3( window, &final_triangle );
+        npixels += grTriangle3( window, &triProjected );
     }
 
 // Return pixel counter.
