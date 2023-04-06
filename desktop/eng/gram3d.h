@@ -53,6 +53,7 @@ extern int current_mode;
 #include "comp.h"
 #include "event.h"    // view inputs
 
+#include <grprim0.h>   // Common for eng and gramland.
 #include "grprim.h"
 #include "camera.h"
 #include "world.h"

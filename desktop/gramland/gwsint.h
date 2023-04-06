@@ -60,6 +60,8 @@ extern int current_mode;
 
 #include "event.h"    // view inputs
 
+// #imported
+#include <grprim0.h>
 #include "rtl/grprim.h"
 #include "rtl/camera.h"
 #include "rtl/proj.h"

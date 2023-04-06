@@ -1829,7 +1829,7 @@ void
 plotCharBackbufferDrawcharTransparent ( 
     unsigned long x, 
     unsigned long y, 
-    unsigned long color, 
+    unsigned int color, 
     unsigned long c )
 {
     //loop
@@ -1915,10 +1915,10 @@ plotCharBackbufferDrawcharTransparent (
 
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
-           // Put pixel. 
+            // Put pixel. 
+            // IN: z,x,y,color,rop
             if ( ( *work_char & bit_mask ) )
             {
-                // IN: z,x,y,color.
                 grPlot0 ( 
                     NULL, 
                     0, x + x2, y, 
@@ -1950,7 +1950,7 @@ void
 plotCharBackbufferDrawcharTransparentZ ( 
     unsigned long x, 
     unsigned long y, 
-    unsigned long color, 
+    unsigned int color, 
     unsigned long c,
     int z )
 {
@@ -2027,26 +2027,22 @@ plotCharBackbufferDrawcharTransparentZ (
     work_char = 
         (void *) gws_currentfont_address + (c * gcharHeight);
 
-//
 // Draw
-//
-
 // #todo
 // We need a flat to invert or not.
 // invert
 // ok. it works
-
     for ( y2=0; y2 < gcharHeight; y2++ )
     {
         bit_mask = 0x80;
 
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
-           // Put pixel. 
+            // Put pixel. 
+            // começa do fim
+            // IN: z,x,y,color,rop
             if ( ( *work_char & bit_mask ) )
             {
-                // começa do fim
-                // IN: z,x,y,color.
                 grPlot0 ( 
                     NULL, 
                     z, x + x2, (y + gcharWidth), 
@@ -2074,11 +2070,11 @@ plotQuadBezierSeg (
     int x0, int y0, int z0, 
     int x1, int y1, int z1,
     int x2, int y2, int z2, 
-    unsigned long color )
-{ 
+    unsigned int color )
+{
     int  sx = x2-x1, sy = y2-y1;
-    long xx = x0-x1, yy = y0-y1, xy;         /* relative values for checks */
-    //double dx, dy, err, cur = xx*sy-yy*sx;                    /* curvature */
+    long xx = x0-x1, yy = y0-y1, xy;          /* relative values for checks */
+    //double dx, dy, err, cur = xx*sy-yy*sx;  /* curvature */
 
     //loop
     register long dx=0; 
@@ -2108,22 +2104,22 @@ plotQuadBezierSeg (
         cur = -cur;  
     }  
     
-    if (cur != 0) {                                    /* no straight line */
+    if (cur != 0) {                           /* no straight line */
 
-    xx += sx; xx *= sx = x0 < x2 ? 1 : -1;           /* x step direction */
-    yy += sy; yy *= sy = y0 < y2 ? 1 : -1;           /* y step direction */
-    xy = 2*xx*yy; xx *= xx; yy *= yy;          /* differences 2nd degree */
-    if (cur*sx*sy < 0) {                           /* negated curvature? */
+    xx += sx; xx *= sx = x0 < x2 ? 1 : -1;    /* x step direction */
+    yy += sy; yy *= sy = y0 < y2 ? 1 : -1;    /* y step direction */
+    xy = 2*xx*yy; xx *= xx; yy *= yy;         /* differences 2nd degree */
+    if (cur*sx*sy < 0) {                      /* negated curvature? */
       xx = -xx; yy = -yy; xy = -xy; cur = -cur;
     }
     
-    //dx = 4.0*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
+    //dx = 4.0*sy*cur*(x1-x0)+xx-xy;          /* differences 1st degree */
     //dy = 4.0*sx*cur*(y0-y1)+yy-xy;
 
-    dx = 4*sy*cur*(x1-x0)+xx-xy;             /* differences 1st degree */
+    dx = 4*sy*cur*(x1-x0)+xx-xy;              /* differences 1st degree */
     dy = 4*sx*cur*(y0-y1)+yy-xy;
     
-    xx += xx; yy += yy; err = dx+dy+xy;                /* error 1st step */    
+    xx += xx; yy += yy; err = dx+dy+xy;       /* error 1st step */    
     do {                              
       
       /* plot curve */
@@ -2131,7 +2127,7 @@ plotQuadBezierSeg (
       grPlot0( NULL, x0, y0, z0, color, 0 );
 
       if (x0 == x2 && y0 == y2) return;  /* last pixel -> curve finished */
-      y1 = 2*err < dx;                  /* save value for test of y step */
+      y1 = 2*err < dx;                   /* save value for test of y step */
       if (2*err > dy) { x0 += sx; dx -= xy; err += dy += yy; } /* x step */
       if (    y1    ) { y0 += sy; dy -= xy; err += dx += xx; } /* y step */
     

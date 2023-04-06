@@ -4318,6 +4318,7 @@ int on_combination(int msg_code)
         printf("ws: cut\n"); 
         // #test
         // gwssrv_quit();
+        //demoCat();
         return 0;
     }
 

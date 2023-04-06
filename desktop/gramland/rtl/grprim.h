@@ -5,147 +5,13 @@
 #ifndef __GRPRIM_H
 #define __GRPRIM_H   1
 
-#define grMIN2(a, b)  (((a) < (b)) ? (a) : (b))
-#define grMAX2(a, b)  (((a) > (b)) ? (a) : (b))
-#define grMIN3(x,y,z)    (x < y  ? (x < z ? x : z) : (y < z ? y : z))
-#define grMAX3(x,y,z)    ( (x>y) ? ((x>z)?x:z)     : ((y>z)?y:z) )
-/*
-#define MIN2(v0,v1) ((v0<v1)?v0:v1)
-#define MAX2(v0,v1) ((v0>v1)?v0:v1)
-#define MIN3(v0,v1,v2) ((v0<v1)?((v0<v2)?v0:v2):((v1<v2)?v1:v2))
-#define MAX3(v0,v1,v2) ((v0>v1)?((v0>v2)?v0:v2):((v1>v2)?v1:v2))
-*/
-//#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-
-// 2D integer vector.
-struct gr_vec2D_d
-{
-    int x;
-    int y;
-    unsigned int color;
-};
-
-// 3D integer vector.
-struct gr_vec3D_d
-{
-    int x;
-    int y;
-    int z;
-    unsigned int color;
-};
-
-// 3D line
-struct gr_line_d
-{
-    struct gr_vec3D_d p[2];
-};
-
-// 3D triangle
-struct gr_triangle_d
-{
-    struct gr_vec3D_d p[3];
-    struct gr_triangle_d *last;
-    struct gr_triangle_d *next;
-};
-
-// 3D rectangle
-struct gr_rectangle_d
-{
-    struct gr_vec3D_d p[4];
-    struct gr_rectangle_d *last;
-    struct gr_rectangle_d *next;
-};
-
-// 3D Cube
-struct gr_cube_d
-{
-    struct gr_vec3D_d p[8];
-};
-
-
-#define POLYGON_POLYPOINT    1
-#define POLYGON_POLYLINE     2
-
-struct gr_polygon_d 
-{
-// type: POLYLINE, POLYPOINT
-    int type;
-// number of elements.
-    int n;
-// List of vectors.
-    void *list_address;
-};
-
-
-// #define RAY_TYPE_LIGHT    1
-// #define RAY_TYPE_??       2
-
-#define RAY_ORIGIN  0
-#define RAY_TARGET  1
-// todo: aliases
-
-// a vector with a starting point.
-struct gr_ray_d
-{
-// Type of ray.
-// primary ray, reflection ray, shadow ray.
-    int type;
-
-    //int intensity;
-    //int gradation;
-    //int interpolation;
-    // ...
-
-// The starting point is the source of light.
-//#define RAY_ORIGIN  0
-//#define RAY_TARGET  1
-
-    // 0 = starting point
-    // 1 = vector
-    struct gr_vec3D_d p[2];
-
-    // Distance between the starting point and
-    // the target.
-    int distance;
-};
-
-
-
-
 // The Perspective Calculation
-
 // we can calculate the location of a 3D vertex in a 
 // 2D viewing window with a multiplication and a division like this:
 // x' = (x*near)/z
 // y' = (y*near)/z
 // x' = (x*near)/(-z)
 // y' = (y*near)/(-z)
-
-//
-// camera
-//
-
-
-// array of chars.
-struct gr_bitmap_d
-{
-    int type;
-    unsigned long width;
-    unsigned long height;
-// 64 falgs.
-    unsigned long flags;
-    unsigned int color;
-// Translation
-    int x;
-    int y;
-    int z;
-// buffer
-    char *body;
-};
-
-// struct gr_bitmap_d *bitmap_screen;
-// ...
-
 
 //
 // ===========================================================
@@ -211,13 +77,15 @@ plotLine3dEx (
 void 
 plotLine3d2 (
     int x0, int y0, int z0, unsigned long color1,
-    int x1, int y1, int z1, unsigned long color2, int flag );
-    
+    int x1, int y1, int z1, unsigned long color2, 
+    int flag );
+
 void 
 plotQuadBezierSeg ( 
     int x0, int y0, int z0, 
     int x1, int y1, int z1,
-    int x2, int y2, int z2, unsigned long color );
+    int x2, int y2, int z2, 
+    unsigned int color );
 
 //
 // == rectangle =======================================
@@ -311,18 +179,18 @@ void
 plotCharBackbufferDrawcharTransparent ( 
     unsigned long x, 
     unsigned long y, 
-    unsigned long color, 
+    unsigned int color, 
     unsigned long c );
 
 void 
 plotCharBackbufferDrawcharTransparentZ ( 
     unsigned long x, 
     unsigned long y, 
-    unsigned long color, 
+    unsigned int color, 
     unsigned long c,
     int z );
 
-// interpolation
+// Interpolation
 unsigned int 
 interpolate_color(
     unsigned int color1, 
