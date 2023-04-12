@@ -1,5 +1,4 @@
 
-
 The boot sequence:
 
     + MBR

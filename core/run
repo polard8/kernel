@@ -1,11 +1,32 @@
 #!/bin/sh
 # Running Gramado OS on qemu.
 
+# Common
+GRAMADO_CPUS="2"
+GRAMADO_RAM_SIZE="256"
+GRAMADO_DISK_IMAGE="GRAMADO.VHD"
+
+QEMU="qemu-system-x86_64"
+
+set -e
+
+# Exit the script.
+die(){
+	echo "die: "
+	exit 1
+}
+
+# Hello!
 	echo "~~~~>"
 
-	qemu-system-x86_64 -hda GRAMADO.VHD \
-	-m 256 \
-	-smp 2 \
+# Launch qemu application.
+# Order: CPU, RAM, DISK, DEVICES.
+	$QEMU \
+	-smp $GRAMADO_CPUS \
+	-m   $GRAMADO_RAM_SIZE \
+	-hda $GRAMADO_DISK_IMAGE \
 	-serial stdio \
 	-netdev type=user,id=net1 -device e1000,netdev=net1
 
+# Exit the script.
+	die

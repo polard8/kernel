@@ -1,24 +1,20 @@
-# Welcome to Gramado OS
+# GramadoOS
 
+Gramado Operating System.
 
-This repository has the source code for:
+## What is Gramado Operating System?
 
-* Gramado boot loader
-* Gramado kernel
-* Gramado Window Server
-* Applications
-* Commands
+GramadoOS is a graphical operating system for x86_64 computers.
 
-## What is Gramado?
+## What is the category it belongs to? 
 
-    Gramado (c) is a 64bit multithreaded operating system.
+Gramado is a hobby operating system, not a commercial operating system, 
+because it is a small system and has only some few features, 
+not all the features needed by a commercial operating system.
 
-## Screenshots
+## What are the features of Gramado Operating system?
 
-![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-7.png)
-![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-3.png)
-
-## Kernel features.
+The core features are:
 
 > * Paging.
 > * Threads.
@@ -29,22 +25,33 @@ This repository has the source code for:
 > * ps/2 mouse works fine only on qemu.
 > * Serial port. 
 
-## Userland features.
+The desktop features are:
 
 > * Window Server. See: gramland/burgundy/server/
 > * Some few clients connected to the window server via unix-sockets.
 > * Unix-like commands running in the virtual console.
 
-## Libraries.
+The libraries are:
 
 > * unix-like library. (rtl)
 > * Lib for the window server's clients. (libgws)
 
-## Folders.
-A brief description of the directories.
+## The source code.
+
+You can find the source code on Github in the internet, 
+where you can clone the repository, contribute to the project or
+download the code. The address is https://github.com/frednora/gramado.
+
+## A description of the directories in the Gramado source code.
+
+There are only two main subdirectories: core/ and desktop/.
+core/ is a place for the low level code and
+desktop/ is a place for the graphical user interface.
 
     Gramado Kernel - core/
     Gramado DE     - desktop/
+
+    The next few lines has a brief description of the subdirectories:
 
  * `core/` - Low level basic components of the system.  
    * `commands` - Unix-like commands and more.
@@ -61,15 +68,10 @@ A brief description of the directories.
    * `gramland` - Window server.
    * `libs` - Libraries.
 
-## Fred's host machine
+## Who are the developers?
 
-```
-    Host machine: Ubuntu 20.04.5 LTS
-    Linux 5.4.0-137-generic x86_64
-    gcc (Ubuntu) 9.4.0 
-    GNU ld (GNU Binutils for Ubuntu) 2.34
-    NASM version 2.14.02
-```
+The main developer is Fred Nora, a brazilian developer.
+Fred Nora is the creator and main maintainer of the project.
 
 ## How to Build?
 
@@ -90,28 +92,66 @@ $ cd core
 $ make clean-all
 ```
 
-The old versions were tested for a long period of time on my 
-real machine. A Gigabyte/Intel Core 2 Duo/Chipset VIA.
-Now i'm testing only on qemu and virtualbox.
-Please, give us some feedback.
+## What are the host machine to build the project?
+
+For now the system has been compiled on Ubuntu operating system,
+LTS releases. 
+
+```
+    Host machine: Ubuntu 20.04.5 LTS
+    Linux 5.4.0-146-generic x86_64
+    gcc (Ubuntu) 9.4.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.34
+    NASM version 2.14.02
+```
+
+## Can I test the system on a virtual machine?
+
+Yes, you can test the system on a virtual machine.
+The system has been tested by Fred Nora on qemu, qemu with kvm and virtualbox.
+Now, Fred Nora is testing the system only on qemu and virtualbox.
+
+## Can I test the system on a real machine?
+
+Yes, we can test the system in the real machines. 
+This way we can improve the system. 
+The older versions of the system were tested for a long period of time 
+on a real machine. That machine was a Gigabyte machine 
+with an Intel Core 2 Duo processor and a VIA chipset.
+
+## Do we need some feedback from the users and from the developers?
+
+Yes, need some feedback. Plase make some comments on Github or send messages
+to Fred Nora.
 
 ## Documentation
+
+The project has a folder for documentation and design notes. 
+The fodler is core/admin/docs/.
 
 > See the [docs](https://github.com/frednora/gramado/tree/master/core/admin/docs).
 
 ## Author
 
-* **Fred Nora** - [frednora](https://twitter.com/frednora)
+* **Fred Nora** - [Fred Nora's Twitter account](https://twitter.com/frednora)
+* **Fred Nora** - [Fred Nora's Facebook account](https://facebook.com/frednora)
 
 ## Contributors
 
-* **Fred Nora** - [frednora](https://facebook.com/frednora)
+* **Fred Nora** - [Fred Nora's Facebook account](https://facebook.com/frednora)
+* **Fred Nora** - [Fred Nora's Facebook account](https://facebook.com/frednora)
 
 ## License
 
 Gramado is a Free and Open Source operating system.
 The source code uses the BSD license.
 
+## Screenshots
+
+![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-7.png)
+![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-3.png)
+
+
 # Quotes:
-> Oh boy, there is no spoon!
+> Oh boy, there is no fork!
 > The beast hates science and the scientist.
