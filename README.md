@@ -151,7 +151,7 @@ found all over the project.
 Gramado is a Free and Open Source operating system.
 The source code uses the BSD license.
 
-## Screenshots
+## Here are some screenshots of Gramado Operating System.
 
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-7.png)
 ![Screenshot](https://raw.githubusercontent.com/frednora/screenshots/main/gramado-3.png)
@@ -159,4 +159,6 @@ The source code uses the BSD license.
 
 # Quotes:
 > Oh boy, there is no fork!
+> Ii.
+> Ww. 
 > The beast hates science and the scientist.
