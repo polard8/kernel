@@ -85,7 +85,7 @@ $ cd core
 $ ./run
 ```
 
-## Clean up the mess
+## Clean up the unused files to make a fresh compilation
 
 ```bash
 $ cd core
@@ -121,15 +121,20 @@ with an Intel Core 2 Duo processor and a VIA chipset.
 
 ## Do we need some feedback from the users and from the developers?
 
-Yes, need some feedback. Plase make some comments on Github or send messages
-to Fred Nora.
+Yes, we need some feedback. 
+Please make some comments on Github or send messages to Fred Nora.
 
 ## Documentation
 
 The project has a folder for documentation and design notes. 
-The fodler is core/admin/docs/.
+The folder is core/admin/docs/.
 
 > See the [docs](https://github.com/frednora/gramado/tree/master/core/admin/docs).
+
+The project is looking for some people to create a better documentation, for free, 
+as a contribuition to the open source community. To create this new documentation 
+we can use the documentation in core/admin/docs/ and the design notes 
+found all over the project.
 
 ## Author
 
