@@ -158,7 +158,8 @@ The source code uses the BSD license.
 
 
 # Quotes:
-> Oh boy, there is no fork!
-> Ii.
-> Ww. 
-> The beast hates science and the scientist.
+> * Oh boy, there is no fork!
+> * Ii.
+> * Ww. 
+> * The beast hates science and the scientist.
+
