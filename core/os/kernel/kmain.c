@@ -1,4 +1,6 @@
 
+// kmain.c
+
 #include <kernel.h>
 
 
@@ -11,9 +13,10 @@ int I_kmain(int arch_type)
 {
 // We don't have any print support yet.
 
-    //current_arch = arch_type;
     // #hack
     current_arch = CURRENT_ARCH_X86_64;
+    //current_arch = (int) arch_type;
+
 // Setup debug mode.
 // Enable the usage of the serial debug.
 // It is not initialized yet.

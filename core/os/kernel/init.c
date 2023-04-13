@@ -41,7 +41,8 @@
 // Global
 //unsigned long gInitializationPhase=0;
 
-// No pointer.
+// The initialization structure.
+// See: config/superv/kinit.h
 struct initialization_d  Initialization;
 
 
@@ -605,6 +606,89 @@ static void kernel_final_messages(void)
         printf("init: [final message] FAILURE\n");
         refresh_screen();
     }
+}
+
+void init_globals(void)
+{
+// Architecture independent?
+// Not everything here.
+// Order: cpu, ram, devices, etc.
+
+    int Status=FALSE;
+
+// smp
+    g_smp_initialized = FALSE;
+    g_processor_count = 0;
+
+// Profiler
+// See: pints.h
+// Intel/AMD
+// Legacy hardware interrupts (irqs) (legacy pic)
+    g_profiler_ints_irq0  = 0;
+    g_profiler_ints_irq1  = 0;
+    g_profiler_ints_irq2  = 0;
+    g_profiler_ints_irq3  = 0;
+    g_profiler_ints_irq4  = 0;
+    g_profiler_ints_irq5  = 0;
+    g_profiler_ints_irq6  = 0;
+    g_profiler_ints_irq7  = 0;
+    g_profiler_ints_irq8  = 0;
+    g_profiler_ints_irq9  = 0;
+    g_profiler_ints_irq10 = 0;
+    g_profiler_ints_irq11 = 0;
+    g_profiler_ints_irq12 = 0;
+    g_profiler_ints_irq13 = 0;
+    g_profiler_ints_irq14 = 0;
+    g_profiler_ints_irq15 = 0;
+    // ...
+// Interrupção para serviços do sistema.
+    g_profiler_ints_gde_services = 0;
+
+// User and group.
+    current_user  = 0;
+    current_group = 0;
+
+// Security layers.
+// User session, room(window station), desktop.
+    current_usersession = (int) 0;
+    current_room = (int) 0;
+    current_desktop = (int) 0;
+
+// Process
+    foreground_process = (pid_t) 0;
+    //current_process = (pid_t) 0;
+    set_current_process(0);  //?
+
+// Thread
+    foreground_thread = (tid_t) 0;
+    current_thread = (int) 0;
+
+// File system support.
+// Type=1 | FAT16.
+    g_currentvolume_filesystem_type = FS_TYPE_FAT16;
+    g_currentvolume_fatbits = (int) 16;
+
+// Inicializa as estruturas do fluxo padrão.
+// Isso vai usar a file table.
+    Status = (int) kstdio_initialize();
+    if (Status != TRUE){
+        panic("init_globals: kstdio_initialize fail\n");
+    }
+
+// Screen
+// Now we can print strings in the screen.
+// Reinitializing ... we already printed the banner.
+    screenInit();
+
+    //debug_print("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
+    //printf     ("init_globals: [printf] WE HAVE MESSAGES NOW!\n");
+
+// ===================
+
+
+// The kernel request
+// See: request.c
+    clear_request();
 }
 
 // ===========================

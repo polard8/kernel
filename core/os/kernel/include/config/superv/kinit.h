@@ -13,11 +13,11 @@
 struct initialization_d
 {
 
-// Current phase:
+// Current phase
     int current_phase;
 
 // Checkpoints:
-// #bugbug> some names here are deprecated.
+// #bugbug: Some names here are deprecated.
     int phase1_checkpoint; 
     int phase2_checkpoint;
     int phase3_checkpoint;
@@ -27,7 +27,7 @@ struct initialization_d
     int gramado_checkpoint;
 
 //
-// flags
+// Flags
 //
 
 // Se ja podemos usar o dispositivo serial para log.
@@ -49,13 +49,15 @@ struct initialization_d
     // ...
 }; 
 
-// No pointer.
+// Externam reference.
 // see: init.c
 extern struct initialization_d  Initialization;
 
 // ========================
 
-void init_globals (void);
+// See: ke/x86_64/x64init/x64init.c
+// See: init.c
+void init_globals(void);
 
 #endif    
 

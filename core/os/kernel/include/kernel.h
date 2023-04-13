@@ -525,22 +525,10 @@ int dead_thread_collector_flag;
 //cr3. current page directoory address.
 unsigned long current_process_pagedirectory_address;
 
-
-// Logon.
+// Logon
 extern int g_logged;
 
-// GUI
-//flag.
-//If the kernel is in graphics mode.
-extern int g_useGUI; 
-
-//Messages support.
-unsigned long g_new_message;
-unsigned long g_next_app;       // Procedure adreess.
-unsigned long g_proc_status;    // Procedure status.
-
-
-//Drivers support.
+// Drivers support
 int g_driver_ps2keyboard_initialized;   //ps2 keyboard
 int g_driver_ps2mouse_initialized;      //ps2 mouse
 

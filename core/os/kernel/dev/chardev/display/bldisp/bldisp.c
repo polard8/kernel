@@ -519,10 +519,11 @@ static int __videoInit(void)
         //panic("videoInit:\n");
         debug_print("__videoInit:\n");
         asm ("cli \n");
-        while(1){ asm("hlt"); }
+        while (1){
+            asm("hlt");
+        };
     }
 
-    g_useGUI          = TRUE;
     VideoBlock.useGui = TRUE;
 
 //

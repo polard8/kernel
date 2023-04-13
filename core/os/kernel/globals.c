@@ -58,11 +58,6 @@ int current_mode=0;
 // booting, rebooting ...
 int system_state = SYSTEM_NULL;
 
-// GUI
-// flag.
-// If the kernel is in graphics mode.
-int g_useGUI=FALSE;
-
 // INPUT_MODE_SETUP, INPUT_MODE_WS ...
 //int current_input_mode=0;
 
