@@ -14,34 +14,33 @@
 #ifndef __HEAP_H
 #define __HEAP_H  1
 
-//Contagem de heap.
+// Contagem de heap.
 #define HEAP_COUNT_MAX  256 
 
-unsigned long HEAP_START; 
-unsigned long HEAP_END;
-unsigned long HEAP_SIZE;
+// see: stdlib.c
+extern unsigned long HEAP_START; 
+extern unsigned long HEAP_END;
+extern unsigned long HEAP_SIZE;
  
-//@todo: padronizar 
-unsigned long heapCount;            //Conta os heaps da stdlib.
+// see: stdlib.c
+unsigned long heapCount;
 
-unsigned long heap_start;    //Start.
-unsigned long heap_end;      //End.
+// see: stdlib.c
+extern unsigned long heap_start;        // Start
+extern unsigned long heap_end;          // End
+extern unsigned long g_heap_pointer;    // Pointer
+extern unsigned long g_available_heap;  // Available 
 
-unsigned long g_heap_pointer;       //Pointer.
-unsigned long g_available_heap;     //Available. 
-
-// Heap pointer:
-//     Isso deve apontar para o heap buffer atual. Quando acabar o heap atual
-// deve-se chamar o kernel para criar mais heap dentro da working set do processo.
- 
-void *Heap;    
+// see: stdlib.c
+void *Heap;
 
 //
 // HEAP
 //
 
-#define HEAP_BUFFER_SIZE (32*1024)  // 32KB, provisório.
-//static unsigned char HeapBuffer[HEAP_BUFFER_SIZE]; 
+// 32KB, provisório.
+#define HEAP_BUFFER_SIZE  (32*1024)
+
 
 /*
  * heap_d:
@@ -61,33 +60,23 @@ struct heap_d
     //lista linkada de blocos. 
     //struct mmblock_d *nextblock; 
 };
-struct heap_d *libcHeap;
-//...
 
-//Heap list.
-//obs:. heapList[0] = The Kernel Heap !
-unsigned long heapList[HEAP_COUNT_MAX];
+// see: stdlib.c
+extern unsigned long heapList[HEAP_COUNT_MAX];
+
 
 //
 // == prototypes ===============================================
 //
 
-void heapSetLibcHeap( unsigned long HeapStart, unsigned long HeapSize);
 
-
-//
-// Alloc and Free.
-//
-
-unsigned long heapAllocateMemory ( unsigned long size );
-
-unsigned long FreeHeap( unsigned long size );
-
+void heapSetLibcHeap(unsigned long HeapStart, unsigned long HeapSize);
+unsigned long heapAllocateMemory(unsigned long size);
+unsigned long FreeHeap(unsigned long size);
 
 #endif    
 
-
 //
-// End.
+// End
 //
 

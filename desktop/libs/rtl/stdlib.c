@@ -30,6 +30,34 @@ static unsigned long last_valid=0;       // Último heap pointer válido.
 static unsigned long last_size=0;        // Último tamanho alocado.
 static unsigned long mm_prev_pointer=0;  // Endereço da úntima estrutura alocada.
 
+
+// ================================================
+
+unsigned long HEAP_START=0;
+unsigned long HEAP_END=0;
+unsigned long HEAP_SIZE=0;
+
+// #todo: Padronizar 
+unsigned long heapCount=0;  // Conta os heaps da stdlib.
+
+unsigned long heap_start=0;        // Start
+unsigned long heap_end=0;          // End
+unsigned long g_heap_pointer=0;    // Pointer
+unsigned long g_available_heap=0;  // Available 
+
+// Heap pointer:
+// Isso deve apontar para o heap buffer atual. 
+// Quando acabar o heap atual deve-se chamar o kernel 
+// para criar mais heap dentro da working set do processo.
+void *Heap;
+
+//static unsigned char HeapBuffer[HEAP_BUFFER_SIZE]; 
+
+// Heap list.
+// obs:. heapList[0] = The Kernel Heap!
+unsigned long heapList[HEAP_COUNT_MAX];
+
+
 //
 // == Private functions: Prototypes ================================
 //
@@ -47,7 +75,6 @@ static char *__findenv( const char *name, int *offset );
 static int stdlib_strncmp ( char *s1, char *s2, int len )
 {
     register int n=0;
-
     n = (int) len;
 
     while (n>0){
@@ -481,10 +508,10 @@ unsigned long heapAllocateMemory (unsigned long size)
 
     debug_print ("heapAllocateMemory: $\n");
 
-    //debug_print ("heapAllocateMemory: [1]\n");
-    // Se não há heap disponível, não há muito o que fazer.
 
 // Available heap.
+// Se não há heap disponível, não há muito o que fazer.
+
     if (g_available_heap == 0)
     {
         // @todo: 
@@ -497,21 +524,17 @@ unsigned long heapAllocateMemory (unsigned long size)
 
         debug_print ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
         printf      ("heapAllocateMemory: [FAIL] g_available_heap={0}\n");
-        //refresh_screen();
-        
         return (unsigned long) 0;
         //while(1){};
     }
 
     //debug_print ("heapAllocateMemory: [2]\n");
 
-    // Size limits. (Min, max).
-
+// Size limits. (Min, max).
 // Se o tamanho desejado é igual a zero.
     if (size == 0){
         debug_print ("heapAllocateMemory: [ERROR] size=0 \n");
         printf      ("heapAllocateMemory: [ERROR] size=0 \n");
-        //refresh_screen();
         return (unsigned long) g_heap_pointer;
     }
 
@@ -524,7 +547,6 @@ unsigned long heapAllocateMemory (unsigned long size)
     if (size >= g_available_heap){
         debug_print ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
         printf      ("heapAllocateMemory: [ERROR] size >= g_available_heap\n");
-        //refresh_screen();
         return (unsigned long) 0;
     }
 
@@ -539,8 +561,7 @@ try_again:
     debug_print ("heapAllocateMemory-r3: try_again\n");
 
     mmblockCount++;
-    
-    if ( mmblockCount >= MMBLOCK_COUNT_MAX )
+    if (mmblockCount >= MMBLOCK_COUNT_MAX)
     {
         debug_print ("heapAllocateMemory-r3: [ERROR] mmblockCount limits!\n");
         //printf      ("heapAllocateMemory: [ERROR] mmblockCount limits!\n");
@@ -562,11 +583,7 @@ try_again:
         return (unsigned long) 0;
     }
 
-
-//
 // Identificadores
-//
-
 // O Header do header do bloco 
 // é o inicio da estrutura que o define. (hã???)
 // Pointer Limits. 
@@ -634,16 +651,16 @@ try_again:
         // #bugbug: Porque nao usamos sizeof( struct mmblock_d ) ?
         // See: mm.h
         Current->headerSize = MMBLOCK_HEADER_SIZE;
-
         Current->Id    = mmblockCount;    //Id do mmblock.
         Current->Used  = 1;               //Flag, 'sendo Usado' ou 'livre'.
         Current->Magic = 1234;            //Magic number. Ver se não está corrompido.
         Current->Free  = 0;               //not free.
         // Continua ...
 
-//
-// Mensuradores. (tamanhos) (@todo:)
-//
+        //
+        // Mensuradores. 
+        // (tamanhos) (@todo:)
+        //
 
         // @todo:
         // Tamanho da área reservada para o cliente.
@@ -700,9 +717,9 @@ try_again:
 
         return (unsigned long) Current->userArea;
 
-        // Nothing.
+        // Nothing
 
-    // Se o ponteiro da estrutura de mmblock for inválido.
+// Se o ponteiro da estrutura de mmblock for inválido.
     }else{
         debug_print ("heapAllocateMemory: [FAIL] Current == NULL\n");
         printf      ("heapAllocateMemory: [FAIL] Current\n");
@@ -755,10 +772,8 @@ unsigned long FreeHeap (unsigned long size)
 {
     // #suspensa 
     // #todo
-
     return (unsigned long) g_heap_pointer;
 }
-
 
 /*
  * libcInitRT:
