@@ -274,7 +274,7 @@ grBackbufferDrawCharTransparent (
             if ( ( *work_char & bit_mask ) )
             {
                 // IN: color, x, y,rop
-                grBackBufferPutpixel ( 
+                libdisp_backbuffer_putpixel ( 
                     (unsigned int) color, 
                     (x + x2), 
                     y,
@@ -397,7 +397,7 @@ grBackbufferDrawChar (
         for ( x2=0; x2 < gcharWidth; x2++ )
         {
             // IN: color, x, y, rop
-            grBackBufferPutpixel ( 
+            libdisp_backbuffer_putpixel ( 
                 *work_char & bit_mask ? fgcolor: bgcolor, 
                 (x + x2), 
                 y,

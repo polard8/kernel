@@ -93,7 +93,7 @@ A_naive_line_drawing_algorithm(
          y = (y1 + dy * (x - x1) / dx);
          
          // IN: color, x, y, rop
-         grBackBufferPutpixel(color,x,y,0);
+         libdisp_backbuffer_putpixel(color,x,y,0);
     }; 
 }
 

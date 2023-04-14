@@ -4,6 +4,7 @@
 #ifndef __LIBGR_H
 #define __LIBGR_H    1
 
+#include <types.h>
 #include <stddef.h>
 #include "grprim0.h"
 
@@ -18,6 +19,20 @@ static int projection4x4[4][4] = {
         {1,1,0,0}
         };
 */
+
+
+// -------------------------------------------------------
+
+// Alternative.
+int 
+libgr_transform_from_viewspace_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, int _z,
+    int left_hand,
+    int _hotspotx, int _hotspoty );
+
+
+
 
 
 // Using 'int'.

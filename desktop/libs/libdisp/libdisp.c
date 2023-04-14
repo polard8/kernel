@@ -119,9 +119,8 @@ int libgd_initialize(void)
 
 // Plot pixel into the raster.
 // The origin is top/left of the viewport. (0,0).
-// #todo: Include 'rop' argument.
 int 
-grBackBufferPutpixel ( 
+libdisp_backbuffer_putpixel ( 
     unsigned int color, 
     int x, 
     int y,
@@ -213,6 +212,9 @@ fb_BackBufferPutpixel (
 {
 // #todo: Return the number of changed pixels.
 // #bugbug: We don't have rop in this routine.
+
+// #bugbug
+// The lib needs to be already initialized.
 
     unsigned char *where = (unsigned char *) libgd_BACKBUFFER_VA;
     //unsigned char *where = (unsigned char *) buffer_va;

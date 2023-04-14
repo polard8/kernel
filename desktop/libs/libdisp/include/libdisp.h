@@ -12,7 +12,7 @@
 int libgd_initialize(void);
 
 int 
-grBackBufferPutpixel ( 
+libdisp_backbuffer_putpixel ( 
     unsigned int color, 
     int x, 
     int y,

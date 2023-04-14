@@ -440,7 +440,7 @@ bmpDisplayBMP (
                         // IN: color, x, y, rop
                         if (useZoom==FALSE)
                         {
-                            grBackBufferPutpixel ( 
+                            libdisp_backbuffer_putpixel ( 
                                 (unsigned int) color, 
                                 (unsigned long) left, 
                                 (unsigned long) bottom,
@@ -453,7 +453,7 @@ bmpDisplayBMP (
                         {
                             for (ihZoom=0; ihZoom < (ZoomFactor+1); ihZoom++){
                             for (iwZoom=0; iwZoom < (ZoomFactor+1); iwZoom++){ 
-                            grBackBufferPutpixel ( 
+                            libdisp_backbuffer_putpixel ( 
                                 (unsigned int) color, 
                                 (unsigned long) left   + (j * ZoomFactor) + iwZoom, 
                                 (unsigned long) bottom - (i * ZoomFactor) + ihZoom,
@@ -476,7 +476,7 @@ bmpDisplayBMP (
                     // IN: color, x, y, rop
                     if (color == bmp_selected_color)
                     {
-                        grBackBufferPutpixel ( 
+                        libdisp_backbuffer_putpixel ( 
                             (unsigned int) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
@@ -488,7 +488,7 @@ bmpDisplayBMP (
                     // IN: color, x, y, rop
                     if (color != bmp_selected_color)
                     {
-                        grBackBufferPutpixel ( 
+                        libdisp_backbuffer_putpixel ( 
                             (unsigned int) color,  //bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
@@ -503,7 +503,7 @@ bmpDisplayBMP (
                 // IN: color, x,y,rop
                 case BMP_CHANGE_COLOR_NULL:
                 default:
-                    grBackBufferPutpixel( 
+                    libdisp_backbuffer_putpixel( 
                         (unsigned int) color,  //bmp_substitute_color, 
                         (unsigned long) left, 
                         (unsigned long) bottom,

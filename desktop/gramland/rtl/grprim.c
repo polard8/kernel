@@ -663,7 +663,7 @@ grPlot0 (
             // Plot pixel into the raster.
             // The origin is top/left of the viewport. (0,0).
             // IN: color, x, y, rop
-            grBackBufferPutpixel( 
+            libdisp_backbuffer_putpixel( 
                 (unsigned int) color, finalx, finaly, rop ); 
         }
 
@@ -678,7 +678,7 @@ grPlot0 (
                      // Plot pixel into the raster.
                      // The origin is top/left of the viewport. (0,0).
                      // IN: color, x, y, rop
-                     grBackBufferPutpixel(
+                     libdisp_backbuffer_putpixel(
                          (unsigned int) color, finalx, finaly, rop ); 
                  }
         }
@@ -2038,7 +2038,7 @@ int servicepixelBackBufferPutpixel(void)
     if (x<0){ return -1; }
     if (y<0){ return -1; }
 
-    grBackBufferPutpixel(color,x,y,0);
+    libdisp_backbuffer_putpixel(color,x,y,0);
 
     return 0;
 }

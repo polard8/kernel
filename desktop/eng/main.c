@@ -1188,7 +1188,7 @@ gwsProcedure (
     // backbuffer putpixel. (again)
     // IN: Color, x, y,rop
     case GWS_BackbufferPutPixel2:
-        grBackBufferPutpixel ( 
+        libdisp_backbuffer_putpixel ( 
             (unsigned long) COLOR_PINK, 
             (unsigned long) long1, 
             (unsigned long) long2,
@@ -2143,14 +2143,12 @@ serviceAsyncCommand (void)
 
     case 1000:
         //printf("1000: %d %d %d\n",data1,data2,data3);
-
         // IN: color, x, y, rop
-        grBackBufferPutpixel(
+        libdisp_backbuffer_putpixel(
             (unsigned int) data3,    //color 
             (data1 & 0xFFFFFFFF),    //x
             (data2 & 0xFFFFFFFF),    //y
             (data4 & 0xFFFFFFFF) );  //rop
-             
         //refresh_screen();  //#bugbug
         break;
 

@@ -329,171 +329,6 @@ gwsViewport(
 }
 
 
-// Transforme from the (x,y,z) coordinates of the 'view space'
-// to the (x,y) coordinates of the 2d screen space.
-// Hand-made. No matrix.
-// Using the left-hand style. The same found in Direct3D.
-// Not normalized screen.
-// Called by grPlot0().
-// (This is a not standard method).
-// (0,0) represents the top/left corner in a 2D screen.
-// The center of the screen in 2D is the hotspot.
-// (0,0,0) represents the center of the screen in 3D viewspace
-// (0,0,0) in 3D is also the hotspot.
-// OUT: 
-// Return the 2D screen coordinates in res_x and res_y.
-
-// z in 45 degree.
-// Isso é uma projeção quando z esta inclinado em 45 graus.
-// #
-// Trasformation for Cavalier Oblique Drawings.
-// It uses full depth.
-int 
-__transform_from_viewspace_to_screespace(
-    int *res_x, int *res_y,
-    int _x, int _y, int _z,
-    int left_hand,
-    int _hotspotx, int _hotspoty )
-{
-// #
-// The viewspace is the view considering 
-// the camera's point of view.
-
-// 3d
-// save parameters. (++)
-    int x  = (int) _x;  //1
-    int y  = (int) _y;  //2
-    //int x2 = (int) _y;  //3 #crazy
-    int z  = (int) _z;  //4
-
-// The given hotspot.
-// The center os our surface.
-    int hotspotx = (int) (_hotspotx & 0xFFFFFFFF);
-    int hotspoty = (int) (_hotspoty & 0xFFFFFFFF);
-
-// 2d:
-// final result.
-    int X=0;
-    int Y=0;
-
-    // Register z value into the z buffer.
-    //int RegisterZValue=FALSE;
-
-// The world space.
-// (HotSpotX,HotSpotY,0)
-// This is the origin of the 'world space'.
-// model space.
-// Been the reference for all the 'object spaces'.
-
-// ===================================================
-// X::
-
-// --------------------
-// z maior ou igual a zero.
-//    |
-//    ----
-//
-    if (z >= 0)
-    {
-        // x positivo, para direita.
-        if (x >= 0 ){
-            X = (int) ( hotspotx + x );
-        }
-        // x negativo, para esquerda.
-        if (x < 0 ){ x = abs(x);   
-            X = (int) ( hotspotx - x );
-        }
-        goto done;
-    }
-
-// --------------------
-// z negativo
-//  _
-//   |
-//
-    if (z < 0)
-    {
-        // x positivo, para direita.
-        if (x >= 0){
-            X = (int) (hotspotx + x);
-        }
-        // x negativo, para esquerda.
-        if (x < 0){  x = abs(x); 
-            X = (int) (hotspotx - x);
-        }
-        goto done;
-    }
-
-done:
-
-// ===================================================
-// Y::
-     // y positivo, para cima.
-     if ( y >= 0 ){
-         Y = (int) ( hotspoty - y );
-     }
-     // y negativo, para baixo
-     if ( y < 0 ){ y = abs(y);
-         Y = (int) ( hotspoty + y );
-     }
-
-// ===================================================
-// Z::
-// Posição canônica do eixo z.
-// Usado para projeção em 2D depois de feita
-// as transformações.
-
-    // LEFT-HAND
-    if (left_hand == TRUE)
-    {
-        // z é positivo para todos os casos 
-        // onde z é maior igual a 0.
-        if(z >= 0)
-        { 
-            X = (X + z);  //para direita
-            Y = (Y - z);  //para cima
-        }
-        // z é módulo para todos os casos 
-        // em que z é menor que 0.
-        if(z < 0){ z = abs(z);
-            X = (X - z);   // para esquerda
-            Y = (Y + z);   // para baixo
-        }
-    }
-
-    // RIGHT-HAND
-    if (left_hand != TRUE)
-    {
-        // z é positivo para todos os casos 
-        // onde z é maior igual a 0.
-        if(z >= 0)
-        { 
-            X = (X - z);  //para esquerda
-            Y = (Y + z);  //para baixo
-        }
-        // z é módulo para todos os casos 
-        // em que z é menor que 0.
-        if(z < 0){ z = abs(z);
-            X = (X + z);   // para esquerda
-            Y = (Y - z);   // para baixo
-        }
-    }
-
-// ===================================================
-// Return values:
-
-    // fail
-    if ( (void*) res_x == NULL ){ return (int) -1; }
-    if ( (void*) res_y == NULL ){ return (int) -1; }
-
-    *res_x = (int) X;
-    *res_y = (int) Y;
-
-    // ok
-    return 0;
-}
-
-
 void gr_dc_extents_init(struct dc_d *dc)
 {
     if ( (void*) dc == NULL ){
@@ -590,7 +425,7 @@ gr_dc_plot0(
     finalx += dc->absolute_x;
     finaly += dc->absolute_y;
 
-    grBackBufferPutpixel(
+    libdisp_backbuffer_putpixel(
         (unsigned int) color, 
         finalx, 
         finaly, 
@@ -618,7 +453,7 @@ grPlot2D (
         return 0;
     if (y<0)
         return 0;
-    return (int) grBackBufferPutpixel( (unsigned int) color, x, y, rop ); 
+    return (int) libdisp_backbuffer_putpixel( (unsigned int) color, x, y, rop ); 
 }
 
 /*
@@ -717,7 +552,7 @@ grPlot2D (
 
 int 
 grPlot0 ( 
-    struct gws_window_d *clipping_window,   
+    struct gws_window_d *clipping_window,
     int z, int x, int y, 
     unsigned int color,
     unsigned long rop )
@@ -863,7 +698,7 @@ grPlot0 (
     }
 
 // transform
-    __transform_from_viewspace_to_screespace( 
+    libgr_transform_from_viewspace_to_screespace( 
         (int *) &X, (int *) &Y, 
         x, y, z,
         UseLeftHand,
@@ -928,7 +763,7 @@ grPlot0 (
         // #todo
         // O rop pode vir do dc.
         if (UseClipping == FALSE){
-            return (int) grBackBufferPutpixel( 
+            return (int) libdisp_backbuffer_putpixel( 
                              (unsigned int) color, X, Y, _rop );
         }
 
@@ -944,7 +779,7 @@ grPlot0 (
             if ( X >= w->absolute_x && X <= w->right &&
                  Y >= w->absolute_y  && Y <= w->bottom )
             {
-                return (int) grBackBufferPutpixel(
+                return (int) libdisp_backbuffer_putpixel(
                                 (unsigned int) color, X, Y, _rop ); 
             }
         }
@@ -1897,19 +1732,19 @@ fillTriangle(
 // Trasformation for Cavalier Oblique Drawings.
 // It uses full depth.
 
-    __transform_from_viewspace_to_screespace( 
+    libgr_transform_from_viewspace_to_screespace( 
         (int *) &X0, (int *) &Y0, 
         triangle->p[0].x, triangle->p[0].y, triangle->p[0].z,
         TRUE, //UseLeftHand,
         hotspotx, hotspoty ); 
 
-    __transform_from_viewspace_to_screespace( 
+    libgr_transform_from_viewspace_to_screespace( 
         (int *) &X1, (int *) &Y1, 
         triangle->p[1].x, triangle->p[1].y, triangle->p[1].z,
         TRUE, //UseLeftHand,
         hotspotx, hotspoty ); 
 
-    __transform_from_viewspace_to_screespace( 
+    libgr_transform_from_viewspace_to_screespace( 
         (int *) &X2, (int *) &Y2, 
         triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
         TRUE, //UseLeftHand,
@@ -3005,7 +2840,7 @@ void noraDrawingStuff(void)
             if ( x != 0 ){
                 if ( (y % x) == 0 ){
                     // IN: color, x, y, rop
-                    grBackBufferPutpixel(color,x,y,0); 
+                    libdisp_backbuffer_putpixel(color,x,y,0); 
                 }
             }
         };
@@ -3579,7 +3414,7 @@ int servicepixelBackBufferPutpixel(void)
     if (x<0){ return -1; }
     if (y<0){ return -1; }
 
-    grBackBufferPutpixel(color,x,y,0);
+    libdisp_backbuffer_putpixel(color,x,y,0);
 
     return 0;
 }

@@ -91,7 +91,7 @@ A_naive_line_drawing_algorithm(
          // ugly
          y = (y1 + dy * (x - x1) / dx);
          // IN: color, x, y, rop
-         grBackBufferPutpixel(color,x,y,0);
+         libdisp_backbuffer_putpixel(color,x,y,0);
     }; 
 }
 
@@ -209,8 +209,9 @@ grBackbufferDrawHorizontalLine (
 // IN: color, x, y, rop
 // see: libgd.c
 
-    while (__x1 < __x2){
-        grBackBufferPutpixel( 
+    while (__x1 < __x2)
+    {
+        libdisp_backbuffer_putpixel( 
             (unsigned int) color, 
             (int) __x1, 
             (int) __y,

@@ -449,7 +449,7 @@ bmpDisplayBMP0 (
                         if (useZoom==FALSE)
                         {
                             // IN: color, x, y, rop
-                            grBackBufferPutpixel ( 
+                            libdisp_backbuffer_putpixel ( 
                                 (unsigned int) color, 
                                 (unsigned long) left, 
                                 (unsigned long) bottom,
@@ -465,7 +465,7 @@ bmpDisplayBMP0 (
                             for (ihZoom=0; ihZoom < ZoomFactor; ihZoom++){
                             for (iwZoom=0; iwZoom < ZoomFactor; iwZoom++){ 
                             // IN: color, x, y, rop
-                            grBackBufferPutpixel ( 
+                            libdisp_backbuffer_putpixel ( 
                                 (unsigned int) color, 
                                 (unsigned long) 
                                     left + 
@@ -490,7 +490,7 @@ bmpDisplayBMP0 (
                     if (color == bmp_selected_color)
                     {
                         // IN: color, x, y, rop
-                        grBackBufferPutpixel ( 
+                        libdisp_backbuffer_putpixel ( 
                             (unsigned int) bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
@@ -501,12 +501,12 @@ bmpDisplayBMP0 (
                     // #todo: Usar a cor atual e não a substituta.
                     if (color != bmp_selected_color){
                         // IN: color, x, y, rop
-                        grBackBufferPutpixel ( 
+                        libdisp_backbuffer_putpixel ( 
                             (unsigned int) color, //bmp_substitute_color, 
                             (unsigned long) left, 
                             (unsigned long) bottom,
                             (unsigned long) 0 );
-                    }; 
+                    }
                     break;
 
                 // ...
@@ -518,7 +518,7 @@ bmpDisplayBMP0 (
                 case BMP_CHANGE_COLOR_NULL:
                 default:
                     // IN: color, x,y,rop
-                    grBackBufferPutpixel( 
+                    libdisp_backbuffer_putpixel( 
                         (unsigned int) color, //bmp_substitute_color, 
                         (unsigned long) left, 
                         (unsigned long) bottom,
