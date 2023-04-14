@@ -1,7 +1,11 @@
 
 // bmp.h
 // BMP file support.
- 
+
+#ifndef __GRAMLAND_BMP_H
+#define __GRAMLAND_BMP_H    1
+
+
 // Signature. "MB".
 #define BMP_TYPE  0x4D42
 
@@ -27,7 +31,7 @@ extern unsigned int bmp_substitute_color;
 
 #define GWS_BMP_TYPE  BMP_TYPE
 
-//OFFSETS
+// Offsets
 #define GWS_BMP_OFFSET_WIDTH      18
 #define GWS_BMP_OFFSET_HEIGHT     22
 #define GWS_BMP_OFFSET_BITPLANES  26
@@ -37,27 +41,27 @@ extern unsigned int bmp_substitute_color;
 // See: https://en.wikipedia.org/wiki/BMP_file_format
 struct gws_bmp_header_d                     
 {
-    unsigned short bmpType;           /* Magic number for file */
-    unsigned int   bmpSize;           /* Size of file */
-    unsigned short bmpReserved1;      /* Reserved */
-    unsigned short bmpReserved2;      /* ... */
-    unsigned int   bmpOffBits;        /* Offset to bitmap data */
+    unsigned short bmpType;       // Magic number for file
+    unsigned int   bmpSize;       // Size of file
+    unsigned short bmpReserved1;  // Reserved
+    unsigned short bmpReserved2;  // ...
+    unsigned int   bmpOffBits;    // Offset to bitmap data
 };
 
 // See: https://en.wikipedia.org/wiki/BMP_file_format   
 struct gws_bmp_infoheader_d                     
 {
-    unsigned int  bmpSize;           /* Size of info header */
-    unsigned int  bmpWidth;          /* Width of image */
-    unsigned int  bmpHeight;         /* Height of image */
-    unsigned short bmpPlanes;        /* Number of color planes */
-    unsigned short bmpBitCount;      /* Number of bits per pixel */
-    unsigned int  bmpCompression;    /* Type of compression to use */
-    unsigned int  bmpSizeImage;      /* Size of image data */
-    unsigned int  bmpXPelsPerMeter;  /* X pixels per meter */
-    unsigned int  bmpYPelsPerMeter;  /* Y pixels per meter */
-    unsigned int  bmpClrUsed;        /* Number of colors used */
-    unsigned int  bmpClrImportant;   /* Number of important colors */
+    unsigned int  bmpSize;           // Size of info header
+    unsigned int  bmpWidth;          // Width of image
+    unsigned int  bmpHeight;         // Height of image
+    unsigned short bmpPlanes;        // Number of color planes
+    unsigned short bmpBitCount;      // Number of bits per pixel
+    unsigned int  bmpCompression;    // Type of compression to use
+    unsigned int  bmpSizeImage;      // Size of image data
+    unsigned int  bmpXPelsPerMeter;  // X pixels per meter
+    unsigned int  bmpYPelsPerMeter;  // Y pixels per meter
+    unsigned int  bmpClrUsed;        // Number of colors used
+    unsigned int  bmpClrImportant;   // Number of important colors
 };
 
 //
@@ -68,9 +72,13 @@ char *gwssrv_bmp_cursor_pointer;
 char *gwssrv_bmp_mouse_pointer;
 // ...
 
+// -------------------------------------------
+
+
 /*
  * bmpDisplayBMP0:
- * Mostra na tela uma imagem bmp carregada na memória. no backbuffer()
+ * Mostra na tela uma imagem bmp carregada na memória. 
+ * No backbuffer.
  * IN:
  *     address = endereço base
  *     x       = posicionamento 
@@ -94,9 +102,6 @@ bmpDisplayBMP (
     unsigned long y,
     int show );
 
-
-//void __test_load_bmp2(void);
-
 int 
 bmp_decode_system_icon0 ( 
     int index, 
@@ -112,8 +117,12 @@ bmp_decode_system_icon (
     unsigned long y,
     int show );
 
+
+#endif   
+
+
 //
-// End.
+// End
 //
 
 
