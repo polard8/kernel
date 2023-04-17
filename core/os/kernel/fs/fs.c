@@ -1596,8 +1596,8 @@ int sys_fcntl ( int fd, int cmd, unsigned long arg )
         return (int) (-EINVAL);
     }
 
-//POSIX Table 6-1.
-//See: fcntl.h
+// POSIX Table 6-1.
+// See: fcntl.h
 
     switch (cmd){
 
@@ -1708,11 +1708,10 @@ int sys_ioctl( int fd, unsigned long request, unsigned long arg )
 // Prototype in rtl/sci/sys.h
 file *get_file_from_fd(int fd)
 {
-
-// File pointer.
+// File pointer
     file *fp;
-
-    struct process_d *p;  // current process
+// Current process
+    struct process_d *p;
 
     pid_t current_pid = (pid_t) get_current_process();
     if ( current_pid < 0 || current_pid >= PROCESS_COUNT_MAX ){
@@ -1748,7 +1747,6 @@ file *get_file_from_fd(int fd)
 
     return (file *) fp;
 fail:
-    //refresh_screen();
     return NULL;
 }
 
@@ -1837,7 +1835,6 @@ int get_saved_sync(void)
 {
     return (int) __saved_sync_id;
 }
-
 
 // service 10007
 // #todo
@@ -2074,11 +2071,11 @@ int sys_open_device_by_number(int device_index)
 
 // Put the pointer into the list.
 
+// Process
     pid_t current_process = (pid_t) get_current_process();
     if (current_process < 0 || current_process >= PROCESS_COUNT_MAX){
         return -1;
     }
-
     p = (struct process_d *) processList[current_process];
     if ( (void *) p == NULL ){
         debug_print ("sys_open_device_by_number: p\n");

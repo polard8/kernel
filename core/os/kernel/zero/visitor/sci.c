@@ -47,53 +47,53 @@ static void __initialize_ws_info(pid_t pid)
 {
     struct process_d *p;
     struct thread_d *t;
-
-    pid_t current_process = (pid_t) get_current_process();
+    pid_t current_process = -1;
 
     debug_print ("__initialize_ws_info:\n");
 
+// Maybe we can just emit an error message and return.
+    if (WindowServerInfo.initialized == TRUE){
+        panic("__initialize_ws_info: The ws is already running\n");
+    }
+    WindowServerInfo.initialized = FALSE;
+
+// -----------------
+// PID
+// Get process pointer.
+    if (pid < 0 || pid >= PROCESS_COUNT_MAX){
+        return;
+    }
+    current_process = (pid_t) get_current_process();
     if (pid != current_process){
         panic("__initialize_ws_info: pid != current_process\n");
     }
-
-// #todo
-// Maybe we can just emit an error message and return.
-
-    if( WindowServerInfo.initialized == TRUE ){
-        panic("__initialize_ws_info: The ws is already running\n");
-    }
-
-    WindowServerInfo.initialized = FALSE;
-    
-    if (pid < 0 || pid >= PROCESS_COUNT_MAX)
-    {
-        return;
-    }
-
-// process
     p = (struct process_d *) processList[pid];
-    if( (void*) p == NULL )
+    if ((void*) p == NULL){
         return;
-    if(p->magic!=1234)
+    }
+    if (p->magic != 1234){
         return;
-    // Changing personality.
-    // The childs will have the same personality
-    p->personality = (int) PERSONALITY_GWS;
-    WindowServerInfo.pid_personality = (int) PERSONALITY_GWS;
- 
-// thread
-    t = (struct thread_d *) p->control;
-    if( (void*) t == NULL )
-        return;
-    if(t->magic!=1234)
-        return;
-    // Changing personality.
-    // The childs will have the same personality
-    t->personality = (int) PERSONALITY_GWS;
-    WindowServerInfo.tid_personality = (int) PERSONALITY_GWS;
-
+    }
     WindowServerInfo.pid = (pid_t) pid;
+
+// -----------------
+// TID
+// The control thread.
+    t = (struct thread_d *) p->control;
+    if ((void*) t == NULL){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
     WindowServerInfo.tid = (tid_t) t->tid;
+
+// ----------------
+// Personality
+    p->personality = (int) PERSONALITY_GWS;
+    t->personality = (int) PERSONALITY_GWS;
+    WindowServerInfo.pid_personality = (int) PERSONALITY_GWS;
+    WindowServerInfo.tid_personality = (int) PERSONALITY_GWS;
 
     WindowServerInfo.initialized = TRUE;
 }
@@ -178,23 +178,31 @@ static void __setup_surface_rectangle(
         return;
     }
 
-// structure
+// Thread
     t = (struct thread_d *) threadList[current_thread];
-    if ( (void*) t == NULL ){ return; }
-    if ( t->magic != 1234 ) { return; }
+    if ((void*) t == NULL){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
 
+// Rect
     r = t->surface_rect;
-    if ( (void*) r == NULL ){ return; }
-    if ( r->magic != 1234 ) { return; }
-    
+    if ((void*) r == NULL){
+        return;
+    }
+    if (r->magic != 1234){
+        return;
+    }
+
+// Rect data
     r->left   = (left   & 0xFFFF);
     r->top    = (top    & 0xFFFF);
     r->width  = (width  & 0xFFFF);
     r->height = (height & 0xFFFF);
-
     r->dirty = FALSE;
 }
-
 
 static void __invalidate_surface_rectangle(void)
 {
@@ -205,14 +213,25 @@ static void __invalidate_surface_rectangle(void)
         return;
     }
 
+// Thread
     t = (struct thread_d *) threadList[current_thread];
-    if ( (void*) t == NULL ){ return; }
-    if ( t->magic != 1234 ) { return; }
+    if ((void*) t == NULL){
+        return;
+    }
+    if (t->magic != 1234){
+        return;
+    }
 
+// Rect
     r = t->surface_rect;
-    if ( (void*) r == NULL ){ return; }
-    if ( r->magic != 1234 ) { return; }
+    if ((void*) r == NULL){
+        return;
+    }
+    if (r->magic != 1234){
+        return;
+    }
 
+// Rect data
     r->dirty = TRUE;
 }
 
