@@ -275,6 +275,10 @@ void *doCreateWindow (
 // #todo
 // We need different colors for the text inside the buttons.
 
+// The window object.
+    register struct gws_window_d *window;
+    struct gws_window_d *Parent;
+
 
 //
 // Internal flags.
@@ -321,11 +325,6 @@ void *doCreateWindow (
     struct gws_window_d *windowButton6;
 
 // Structs.
-
-// The window object.
-    struct gws_window_d *window;
-    struct gws_window_d *Parent;
-
 	//struct desktop_d *Desktop;  //suspenso.
 
 // The client rectangle.
@@ -1621,7 +1620,7 @@ void *CreateWindow (
     unsigned int frame_color, 
     unsigned int client_color ) 
 {
-   struct gws_window_d  *__w;
+   register struct gws_window_d *__w;
    unsigned long __rop_flags=0;
 // This function is able to create some few 
 // kinds of windows for now:
