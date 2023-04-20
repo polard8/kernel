@@ -2872,41 +2872,42 @@ static int __input_STDERR(int fd)
 // #importante:
 // Esse event loop pega dados de um arquivo.
 
+    FILE *new_stdin;
     int C=0;
     int client_fd = fd;
     int window_id = Terminal.client_window_id;
 
-    FILE *new_stdin;
+    printf ("__input_STDERR: #todo\n");
+
+// New stdin.
     //new_stdin = (FILE *) fopen("gramado.txt","a+");
     new_stdin = stderr;
     __terminal_input_fp = stderr;   //save global.
-
-    printf ("__input_STDERR: #todo\n");
-
-/*
-    if ( (void*) new_stdin == NULL ){
+    if ((void*) new_stdin == NULL)
+    {
         printf ("__input_STDERR: new_stdin\n");
         return -1;
     }
-*/
 
-    // not standard.
-    // volta ao inicio do arquivo em ring0, depois de ter apagado
-    // o arquivo.
-    // GRAMADO_SEEK_CLEAR
+// Not standard.
+// Volta ao inicio do arquivo em ring0, 
+// depois de ter apagado o arquivo.
+// GRAMADO_SEEK_CLEAR
     //lseek( fileno(new_stdin), 0, 1000);
-    // atualiza as coisas em ring3 e ring0.
+// Atualiza as coisas em ring3 e ring0.
     //rewind(new_stdin);
 
+// Launch the child application (PROGRAMS/SHELL.BIN)
+// "#shell.bin"
+    rtl_clone_and_execute("#shell.bin");
+
+// Loop
     while (1){
-        //C = fgetc(new_stdin);
-        /*
+        C = fgetc(new_stdin);
+        if (C == 'q')
+            break;
         if (C > 0)
         {
-            if(C == '9'){
-                //printf("TERMINAL: 9\n");  //console
-            }
-            
             terminalProcedure( 
                 client_fd,    // socket
                 window_id,    // window ID
@@ -2914,9 +2915,9 @@ static int __input_STDERR(int fd)
                 C,            // long1 (ascii)
                 C );          // long2 (ascii)
         }
-        */
     };
 
+//done:
     printf ("__input_STDERR: Stop listening stderr\n");
     return 0;
 }
@@ -3348,28 +3349,24 @@ int main ( int argc, char *argv[] )
 // from stdin
 // stdin é um 'regular file'
     InputStatus = __input_STDIN(client_fd);
-
-// estavamos lendo em stdin, e vamos começar a ler em stderr
-// sem mandarmos o kernel enviar o input para stderr
+// Estavamos lendo em stdin, e vamos começar a ler em stderr.
     if (InputStatus == 0)
     {
-        //printf("TERMINAL: newloop\n");
-        // from srderr
-        // stderr é um 'regular file'
-        // It's working.
-        // rebubina o arquivo de input.
-        //rewind(stdin);
-        // agora vamos ler stderr
         InputStatus = __input_STDERR(client_fd);
+        if (InputStatus == 0)
+            goto done;
     }
 
-//exit:
-    debug_print ("terminal: bye\n"); 
-    printf      ("terminal: bye\n");
+// hang:
+    debug_print ("terminal.bin: Hang\n"); 
+    printf      ("terminal.bin: Hang\n");
 
     while(1){
     };
 
+done:
+    debug_print ("terminal.bin: Bye\n"); 
+    printf      ("terminal.bin: Bye\n");
     return 0;
 }
 

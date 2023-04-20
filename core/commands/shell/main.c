@@ -516,183 +516,105 @@ int main_backup ( int argc, char *argv[] )
 
 
 //
+// Main
+//
+
 int main ( int argc, char *argv[] )
 {
+    register int i=0;
+    int C=0;
 
-    // New stdout
-    // Terminal application is reading from stderr.
-    //stdout = stderr;
-    //printf("SHELL.BIN: Hello terminal!\n");
+// -----------------------------------
+// (>>> stdout)
+// Still using the kernel console.
 
-//
-// SHELL.BIN 
-// receberá input de teclado via stdin.
-//
-
-
-// #test
-// Reading the arguments.
-
-    //rewind(stdout);
-
-    // Still using the kernel console.
-    printf("argc={%d} ",argc);
+    printf("shell.bin: argc={%d} ",argc);
     fflush(stdout);
-
-    int i=0;
-
-    if(argc>0)
+    if (argc>0)
     {
-        for(i=0; i<argc; i++)
-        {
-            // Still using the kernel console.
-            printf("argv[%d]: %s \n",
-                i, 
-                argv[i] );
-            //fflush(stdout);
-            //rewind(stdout);
+        for (i=0; i<argc; i++){
+            printf("argv[%d]: %s\n", i, argv[i] );
         };
     }
 
-    //if ( strncmp( argv[0],"One", 3) == 0 )
-    //{
-        //printf("One");
-        //fflush(stdout);
-    //}
-
-//============================
-
-    //char buffer[512];
-    //in
-    //read(stdin,buffer,511);
-    //buffer[511]=0;
-    
-    //out
-    //rewind(stdout);
-    //printf("%s",buffer);
-    //fflush(stdout);
-
-
-// #bugbug: Isso nao funcionou, o kernel continua
-// colocando o input no arquivo determinado pelo terminal
-
-
-/*
-// input de teclado.
-// ---------------
-// O kernel seleciona qual será 
-// o arquivo para teclado ps2.
-
-    gramado_system_call(
-        8002,
-        fileno(stdin),
-        0,
-        0 );
-
-// rebubina o arquivo de input.
-    rewind(stdin);
-// -----------
-*/
-
-// relax
-    //rtl_yield();
-
-// #bugbug
-// Precisamos usar ess fflush.
-// Não sei porque.
-
-// rebubina o arquivo de output.
-// Pois agora ele eh um arquivo regular, nao um tty console.
-    //rewind(stdout);
-
-    //ok
-    //printf("%c",'$');
-    //fflush(stdout);
-
-    //ok
-    //printf("SHELL.BIN: Hello terminal!");
-    //fflush(stdout);
-
-    //#test  ok
-    //printf("SHELL.BIN: Hello \033[8Cm terminal!");
-    //fflush(stdout);
-
-    //#test  ok
-    //printf("SHELL.BIN: Cursor| \x1b[8Bm |down!");
-    //fflush(stdout);
-
-//
-// =========================================================
-//
+// -----------------------------------
+// (>>> stderr)
+// Now we have a new stdout.
+// Now we're gonna send the data to the terminal.bin
+// that is reading stderr.
 
     stdout = stderr;
 
-    // Simple string.
+// Send a simple string.
     printf("SHELL.BIN: Shell is alive!$ ");
     fflush(stdout);
 
-//#test
-    //rewind(stdout);
-    //shellPrompt();
-
-    int C=0;
-
-// Pegamos o char de stdin e 
-// enviaremos para o terminal via stdout.
+// ------------------------------------------------
+// Loop: (Input events).
+// Reading from stdin and sending to our new stdout.
+// stderr.
 
     while (1){
 
+        // #bugbug
+        // We got a PF when we type a lot of keys.
+        // And sometimes when we type Enter.
+
         C = fgetc(stdin);
-        
         // Como estamos usando um arquivo regular,
         // entao o kernel concatena ate chegar no fim do arquivo.
-        if( C == EOF ){
+        if (C == EOF){
             //rewind(stdin);
             //exit(0);
         }
-        
-        if( C > 0){
-             
-             // Enter
-             if( C == VK_RETURN )
-             {
-                 //printf("%c",'$');
-                 //fflush(stdout);
-                 shellCompare();
-             }
-        
-             // Printable chars.
-             if (C >= 0x20 && C <= 0x7F)
-             {
-                 input(C);
 
-                 //#debug
-                 // o terminal vai imprimir errado.
-                 // ok funcionou.
-                 //printf("%c", (C+1) ); 
-                                  
-                 printf("%c",C);
-                 fflush(stdout);
+        // Valid char.
+        if (C>0)
+        {
+            // [ Enter ]
+            if (C == VK_RETURN)
+            {
+                //printf("%c",'$');
+                //fflush(stdout);
+ 
+                // #bugbug #todo: Compare the string.
+                //shellCompare();
+            }
+
+            // Printable chars.
+            if (C >= 0x20 && C <= 0x7F)
+            {
+
+                // Feed the command line in 'prompt', i guess.
+                input(C);
+
+                // #debug
+                // O terminal vai imprimir errado.
+                // ok funcionou.
+                //printf("%c", (C+1) ); 
+      
+                printf("%c",C);
+                fflush(stdout);
                  
-                 // + precisamos nos certificar que eh o shell
-                 // que esta enviando chars para o terminal
-                 // e nao o kernel
-                 // + precisamos nos certivicar que o shell esta lendo de um arquivo.
-                 // isso eh uma tentativa
-                 if (C == 'q'){
-                     //printf("%c",'9');
-                     //fflush(stdout);
-                 }
-                 
+                // + precisamos nos certificar que eh o shell
+                // que esta enviando chars para o terminal
+                // e nao o kernel
+                // + precisamos nos certivicar que o shell esta lendo de um arquivo.
+                // isso eh uma tentativa
+                if (C == 'q')
+                {
+                    //printf("%c",'9');
+                    //fflush(stdout);
+                    exit(0);   //#test
+                }
              }
         }
-        //rtl_yield(); // relax
     };
 
+    while (1){
+    };
 
-    while(1){}
     return 0;
 }
-
 
 
