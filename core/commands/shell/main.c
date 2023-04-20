@@ -9,41 +9,19 @@
 #include <stdlib.h>
 #include <rtl/gramado.h>
 
+// Internal routines.
 #include "shell.h"
 
-
-//================
-
-//
-// VGA TEST
-//
-
+// ================
+// Testing (VGA embedded ring3 driver).
 // libio
 //#include <libio.h>
 #include "vga_test.h"
 //================
 
 
-
-#define MSG_KEYDOWN       20
-#define MSG_KEYUP         21
-#define MSG_SYSKEYDOWN    22
-#define MSG_SYSKEYUP      23
-
-#define VK_F1    0x3B  //59    // No DOS é 0x170.  
-#define VK_F2    0x3C  //60 
-#define VK_F3    0x3D  //61 
-#define VK_F4    0x3E  //62 
-
-
-#define VK_RETURN    0x1C
-#define VK_TAB       0x0F
-
-#define COLOR_BLACK    0x000000
-#define COLOR_GRAY     0x808080 
-
-unsigned long device_width;
-unsigned long device_height;
+unsigned long device_width=0;
+unsigned long device_height=0;
 
 
 //======================================
@@ -70,7 +48,6 @@ __shell_refresh_rectangle (
         0 );
 }
 
-
 void 
 __shell_draw_rectangle ( 
     unsigned long x, 
@@ -94,41 +71,43 @@ __shell_draw_rectangle (
         0 );
 }
 
-
-
 /*
  * shellPrompt:
- *     Inicializa o prompt.
- *     Na inicializa��o de stdio, 
- *    prompt foi definido como stdin->_base.
+ * Inicializa o prompt.
+ * Na inicialização de stdio, 
+ * prompt foi definido como stdin->_base.
  */
 
 void shellPrompt (void)
 {
-    int i=0;
+    register int i=0;
 
-    // Clean prompt buffer.
-    
-    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){ prompt[i] = (char) '\0'; };
-    
+// Clean prompt buffer   
+    for ( i=0; i<PROMPT_MAX_DEFAULT; i++ ){
+        prompt[i] = (char) '\0';
+    };
+
+// First char
     prompt[0] = (char) '\0';
-    prompt_pos    = 0;
-    prompt_status = 0;
-    prompt_max    = PROMPT_MAX_DEFAULT;  
 
-    // Prompt
+// Variables
+    prompt_pos = 0;
+    prompt_status = 0;
+    prompt_max = PROMPT_MAX_DEFAULT;
+
+// Draw prompt.
+
     //printf("\n");
     putc('$',stdout);
     putc(' ',stdout);
     fflush(stdout);
 }
 
-
 // local
 unsigned long shellCompare (void)
 {
     unsigned long ret_value=0;
-    char *c;
+    char *p;
 
 // The first char.
 // $(NULL)
@@ -136,9 +115,11 @@ unsigned long shellCompare (void)
 // Se alguem pressiona [ENTER] com prompt vazio d� page fault ?
 // Isso cancela caso o buffer esteja vazio.
 
-    c = prompt;
+// Local pointer,
+    p = prompt;
 
-    if ( *c == '\0' )
+// Null string.
+    if ( *p == '\0' )
     {
         //shellInsertLF();
         goto exit_cmp;
@@ -148,7 +129,6 @@ unsigned long shellCompare (void)
 // Compare
 //
 
-
 // Compare strings.
 // Let's start at the next line.
 
@@ -156,7 +136,6 @@ do_compare:
 
     //shellInsertLF();
     printf("\n");
-
 
     // cls
     if ( strncmp(prompt,"cls",3) == 0 )
@@ -190,11 +169,10 @@ do_compare:
         goto exit_cmp;
     }
  
-
     // about
     if ( strncmp ( prompt, "about", 5 ) == 0 )
     {
-        printf ("Gramado Operating System");
+        printf ("Gramado Operating System ");
         fflush(stdout);
         goto exit_cmp;
     }
@@ -235,7 +213,6 @@ do_compare:
         goto exit_cmp; 
     }
 
-
     // process-info
     if ( strncmp ( prompt, "process-info", 12 ) == 0 )
     {
@@ -244,13 +221,11 @@ do_compare:
         goto exit_cmp; 
     }
 
-
     if ( strncmp( prompt, "exit", 4 ) == 0 )
     {
         exit(0);
         goto exit_cmp;
     }
-
 
     // malloc
     void *hBuffer;
@@ -278,8 +253,6 @@ do_compare:
         goto exit_cmp;
     }
 
-
-    
     // tty3
     if ( strncmp ( prompt, "tty3", 4 ) == 0 )
     {
@@ -294,15 +267,14 @@ do_compare:
         //}
         goto exit_cmp;
     }
-    
-
-
 
 launch_app:
 
     //rtl_clone_and_execute(prompt);
 
-    printf ("Command not found\n");
+    //printf ("Command not found\n");
+    printf("SHELL.BIN: Command not found ");
+    fflush(stdout);
 
 exit_cmp:
     ret_value = 0;
@@ -390,7 +362,6 @@ shellProcedure (
 done:
     return 0;
 }
-
 
 void shell_clear_screen(void)
 {
@@ -578,7 +549,7 @@ int main ( int argc, char *argv[] )
                 //fflush(stdout);
  
                 // #bugbug #todo: Compare the string.
-                //shellCompare();
+                shellCompare();
             }
 
             // Printable chars.
