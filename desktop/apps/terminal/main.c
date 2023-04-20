@@ -37,7 +37,7 @@
 //#include <ctype.h>
 // #todo:
 // We need to change the name of this document??
-#include "noraterm.h"
+#include "include/terminal.h"
 // #test:
 // Testing ioctl()
 #include <termios.h>
@@ -69,7 +69,133 @@ static int main_window=0;
 static int terminal_window=0;
 // #todo: #maybe:
 // Fazer estrutura para gerenciar a sequencia.
-static int __sequence_status = 0;
+static int __sequence_status=0;
+
+// ---------------------------------------
+
+// CSI - Control Sequence Introducer.
+// see: term0.h
+char CSI_BUFFER[CSI_BUFFER_SIZE];
+int __csi_buffer_tail=0;
+int __csi_buffer_head=0;
+
+// ---------------------------------------
+// see: term0.h
+static Term  term;
+//static CSIEscape  csiescseq;
+//static STREscape  strescseq;
+
+// ---------------------------------------
+unsigned long __tmp_x=0;
+unsigned long __tmp_y=0;
+
+// ---------------------------------------
+// see: term0.h
+struct terminal_line  LINES[32];
+// Conterá ponteiros para estruturas de linha.
+unsigned long lineList[LINE_COUNT_MAX];
+// Conterá ponteiros para estruturas de linha.
+unsigned long screenbufferList[8];
+
+// ---------------------------------------
+// see: term0.h
+
+// Marcador do cursor.
+unsigned long screen_buffer_pos=0;    //(offset) 
+unsigned long screen_buffer_x=0;      //current col 
+unsigned long screen_buffer_y=0;      //current row
+static unsigned long screen_buffer_saved_x=0;
+static unsigned long screen_buffer_saved_y=0;
+
+// ---------------------------------------
+
+//
+// System Metrics
+//
+
+int smScreenWidth=0;                   //1 
+int smScreenHeight=0;                  //2
+unsigned long smCursorWidth=0;         //3
+unsigned long smCursorHeight=0;        //4
+unsigned long smMousePointerWidth=0;   //5
+unsigned long smMousePointerHeight=0;  //6
+unsigned long smCharWidth=0;           //7
+unsigned long smCharHeight=0;          //8
+//...
+
+//
+// Window limits
+//
+
+// Full screen support
+unsigned long wlFullScreenLeft=0;
+unsigned long wlFullScreenTop=0;
+unsigned long wlFullScreenWidth=0;
+unsigned long wlFullScreenHeight=0;
+
+// Limite de tamanho da janela.
+unsigned long wlMinWindowWidth=0;
+unsigned long wlMinWindowHeight=0;
+unsigned long wlMaxWindowWidth=0;
+unsigned long wlMaxWindowHeight=0;
+
+
+//
+// Linhas
+//
+
+// Quantidade de linhas e colunas na área de cliente.
+int wlMinColumns=0;
+int wlMinRows=0;
+int __wlMaxColumns=0;
+int __wlMaxRows=0;
+
+//
+//  ## Window size ##
+//
+
+unsigned long wsWindowWidth=0;
+unsigned long wsWindowHeight=0;
+//...
+
+//
+//  ## Window position ##
+//
+
+unsigned long wpWindowLeft=0;
+unsigned long wpWindowTop=0;
+//..
+
+
+//#importante:
+//Linhas visíveis.
+//número da linha
+//isso será atualizado na hora do scroll.
+int textTopRow=0;  //Top nem sempre será '0'.
+int textBottomRow=0;
+
+int textSavedRow=0;
+int textSavedCol=0;
+
+int textWheelDelta=0;     //delta para rolagem do texto.
+int textMinWheelDelta=0;  //mínimo que se pode rolar o texto
+int textMaxWheelDelta=0;  //máximo que se pode rolar o texto
+//...
+
+//
+// Bg window
+// 
+ 
+unsigned long __bgleft=0;
+unsigned long __bgtop=0;
+unsigned long __bgwidth=0;
+unsigned long __bgheight=0;
+ 
+unsigned long __barleft=0;
+unsigned long __bartop=0;
+unsigned long __barwidth=0;
+unsigned long __barheight=0;
+
 
 //
 // == Private functions: Prototypes ==============
@@ -214,7 +340,6 @@ static void __winmax(int fd)
 {
     int wid        = (int) Terminal.main_window_id;
     int client_wid = (int) Terminal.client_window_id;
-
     unsigned long w=rtl_get_system_metrics(1);
     unsigned long h=rtl_get_system_metrics(2);
                   // #bugbug
@@ -432,7 +557,7 @@ static void __test_winfo(int fd, int wid)
     if(wid<0){ return; }
 
     Info = (void*) malloc( sizeof( struct gws_window_info_d ) );
-    if( (void*) Info == NULL ){
+    if ((void*) Info == NULL){
         return;
     }
 // Get window info:
@@ -489,12 +614,11 @@ static inline void do_cli(void)
 // try execute the filename in the prompt.
 static void __try_execute(int fd)
 {
-    if(fd<0){
+    if (fd<0){
         return;
     }
-
 // Empty buffer
-   if( *prompt == 0 ){
+   if (*prompt == 0){
        goto fail;
    }
 
@@ -2872,19 +2996,21 @@ int main ( int argc, char *argv[] )
     addr_in.sin_addr.s_addr = IP(127,0,0,1);    //ok
     //addr_in.sin_addr.s_addr = IP(127,0,0,9);  //fail
 
+    unsigned long w=0;
+    unsigned long h=0;
+
     debug_print ("terminal: Initializing\n");
 
     Terminal.initialized = FALSE;
 
-// Device info
-// #todo: Check for 'zero'.
-    unsigned long w = gws_get_system_metrics(1);
-    unsigned long h = gws_get_system_metrics(2);
-
-// Process info
     Terminal.pid = getpid();
     Terminal.uid = getuid();
     Terminal.gid = getgid();
+
+// Device info
+// #todo: Check for 'zero'.
+    w = gws_get_system_metrics(1);
+    h = gws_get_system_metrics(2);
 
 // Cursor
     cursor_x = 0;
@@ -2962,7 +3088,7 @@ int main ( int argc, char *argv[] )
     //unsigned long mwLeft   = 0; //( ( w - mwWidth ) >> 1 );
     //unsigned long mwTop    = 0; // ( ( h - mwHeight) >> 1 );
 
-    unsigned int mwColor   = COLOR_WINDOW;
+    unsigned int mwColor = COLOR_WINDOW;
 
 // --------------------------------------
 // Client area window
@@ -2983,9 +3109,7 @@ int main ( int argc, char *argv[] )
         (unsigned long) mwHeight );
 
 // ===================================================
-
 // main window
-
 // style: 
 // 0x0001=maximized | 0x0002=minimized | 0x0004=fullscreen
 
@@ -2999,12 +3123,11 @@ int main ( int argc, char *argv[] )
                   mwColor, 
                   mwColor );
 
-    Terminal.main_window_id = main_window;
-
     if (main_window<0){
         printf("terminal: fail on main_window\n");
         while(1){}
     }
+    Terminal.main_window_id = main_window;
 
 // ===================================================
 // Client area window
@@ -3090,8 +3213,6 @@ int main ( int argc, char *argv[] )
         printf("terminal: fail on terminal_window\n");
         while(1){}
     }
-
-// Saving the window id.
     Terminal.client_window_id = terminal_window;
 
 // #bugbug
@@ -3199,9 +3320,8 @@ int main ( int argc, char *argv[] )
     clear_terminal_client_window(client_fd);
     doPrompt(client_fd);
 
+// Set active window
 
-
-// set active window.
     //gws_async_command(
     //     client_fd,
     //     15, 

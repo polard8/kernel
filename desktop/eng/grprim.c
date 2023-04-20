@@ -1730,6 +1730,7 @@ fillTriangle(
 
 // #
 // Trasformation for Cavalier Oblique Drawings.
+// (Buz z is always 0).
 // It uses full depth.
 
     libgr_transform_from_viewspace_to_screespace( 
@@ -1782,12 +1783,10 @@ plotTriangleF(
 
 // Number of changed pixels.
     int npixels=0;
-
 // The projected trinagle.
 // Engine triangle structure.
 // Using 'int',
 // because this is what we're gonna paint into a 2D screen.
-    //struct gr_triangle_d final_triangle;
     struct gr_triangle_d  triProjected;
 
     if (CurrentProjectionF.initialized != TRUE){
@@ -1824,21 +1823,27 @@ plotTriangleF(
  
     if (CurrentProjectionF.initialized == TRUE)
     {
+        // ----------------
+        // :: near and far
+        // Simply get the near and far values.
         znear = (float) CurrentProjectionF.znear;
         zfar  = (float) CurrentProjectionF.zfar;
 
-        window_width  = (unsigned long) CurrentProjectionF.width;
-        window_height = (unsigned long) CurrentProjectionF.height;
-        if (window_width == 0){
-            printf ("Invalid aspect ratio\n");
-            exit(1);
-        }
+        // ----------------
+        // ::ar
         // 600/800 = 0.75
         // 480/640 = 0.75
         // 200/320 = 0.625
+        window_width  = (unsigned long) CurrentProjectionF.width;
+        window_height = (unsigned long) CurrentProjectionF.height;
+        if (window_width == 0){
+            printf ("Invalid ar\n");
+            exit(1);
+        }
         ar = 
             (float)((float) window_height / (float) window_width );
         
+        // ----------------
         // scale factor
         // 0.5f
         // #todo: hotspot
@@ -1864,18 +1869,33 @@ plotTriangleF(
 // It's something like 2:2:1000
 // No z normalization
 
+// #??
+// Estamos desistindo do triangulo inteiro porque
+// um de seus vetores está fora do frustum no eixo z?
+// Nesse caso o triangulo só aparece se todos seus vetores
+// estiverem dentro dos limites do frustum no eixo z.
+
+// ------------
 // Clipping in z
 
+    // Near limit
     if (t->p[0].z < znear){ return 0; }
     if (t->p[1].z < znear){ return 0; }
     if (t->p[2].z < znear){ return 0; }
-    
+
+    // Far limit
     if (t->p[0].z > zfar){ return 0; }
     if (t->p[1].z > zfar){ return 0; }
     if (t->p[2].z > zfar){ return 0; }
 
-// #test
+
+// ------------
+// Zoom
+
 // Ficando menor conforme z aumenta.
+// Quanto maior for o z, mais próximo do centro da tela
+// o vetor ficará. Ou seja, quanto mais longe estão os objetos,
+// mais objetos cabem na tela.
 
     if (t->p[0].z != 0.0f)
     {
@@ -1892,6 +1912,9 @@ plotTriangleF(
         t->p[2].x = (float) (t->p[2].x/t->p[2].z);
         t->p[2].y = (float) (t->p[2].y/t->p[2].z);
     }
+
+// -------------------
+// Zoom (test)
 
 /*
  //#wrong?
@@ -1912,7 +1935,10 @@ plotTriangleF(
     }
 */
 
-// scale
+
+// ------------------
+// Scaling.
+
 // Ajustando à tela.
 // x=afx  y=fx
 // So, we're using the 0.5f for scale factor,
@@ -1944,8 +1970,11 @@ plotTriangleF(
     //scale_factor = 0.01f;  // very small.
     //scale_factor = 2.0f;
 
-// #tmp
-// Scale factor limits
+// -----------------------
+// Scaling
+// Apply the limit for the scale factor.
+// We can scale, but not too few, but not too much.
+
     if ( (float) scale_factor < 0.01f ){
         scale_factor = (float) 0.01f;
     }
@@ -1953,10 +1982,13 @@ plotTriangleF(
         scale_factor = (float) 2.00f;
     }
 
-// Scale nto view.
+// --------------------------------
+// Scale into view.
+// original value * ar * scale factor * width.
+// original value * ar * scale factor * height.
+// Ex: (0.5 * 0.75 * 0.5 * 800) = 150
+// Ex: (0.5 * 0.75 * 0.5 * 600) = 112.5
 
-    // Ex: (0.5 * 0.75 * 0.5 * 800) = 150
-    // Ex: (0.5 * 0.75 * 0.5 * 600) = 112.5
     long x0 = (long) (t->p[0].x *ar * scale_factor * (float) window_width);
     long y0 = (long) (t->p[0].y     * scale_factor * (float) window_height);
     long x1 = (long) (t->p[1].x *ar * scale_factor * (float) window_width);
@@ -1964,27 +1996,30 @@ plotTriangleF(
     long x2 = (long) (t->p[2].x *ar * scale_factor * (float) window_width);
     long y2 = (long) (t->p[2].y     * scale_factor * (float) window_height);
 
+//
+// The projected trinagle.
+//
 
 // ----------------------------------------
 // The projected triangle. (for 2D screen).
 // Final rectangle. Using 'int'.
-// Considerando o hotspot no centro,
+// Considerando o hotspot no centro da tela,
 // o valor tem que ser menor que 800/2 
 // ou menor que 600/2.
 
-    triProjected.p[0].x = (int) ( x0 & 0xFFFFFFFF);
-    triProjected.p[0].y = (int) ( y0 & 0xFFFFFFFF);
-    triProjected.p[0].z = (int) 0;
+    triProjected.p[0].x = (int) (x0 & 0xFFFFFFFF);
+    triProjected.p[0].y = (int) (y0 & 0xFFFFFFFF);
+    triProjected.p[0].z = (int) 0;  // No z.
     triProjected.p[0].color = t->p[0].color; //COLOR_WHITE;
     
-    triProjected.p[1].x = (int) ( x1 & 0xFFFFFFFF);
-    triProjected.p[1].y = (int) ( y1 & 0xFFFFFFFF);
-    triProjected.p[1].z = (int) 0;
+    triProjected.p[1].x = (int) (x1 & 0xFFFFFFFF);
+    triProjected.p[1].y = (int) (y1 & 0xFFFFFFFF);
+    triProjected.p[1].z = (int) 0;  // No z.
     triProjected.p[1].color = t->p[1].color; // COLOR_WHITE;
     
-    triProjected.p[2].x = (int) ( x2 & 0xFFFFFFFF);
-    triProjected.p[2].y = (int) ( y2 & 0xFFFFFFFF);
-    triProjected.p[2].z = (int) 0;
+    triProjected.p[2].x = (int) (x2 & 0xFFFFFFFF);
+    triProjected.p[2].y = (int) (y2 & 0xFFFFFFFF);
+    triProjected.p[2].z = (int) 0;  // No z.
     triProjected.p[2].color = t->p[2].color; // COLOR_WHITE;
 
     triProjected.used = TRUE;
