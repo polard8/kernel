@@ -1800,7 +1800,7 @@ plotTriangleF(
     //unsigned long window_width = gws_get_device_width();
     //unsigned long window_height = gws_get_device_height();
 
-// Check the 'projected triangle'.
+// Check the pointer for the given triangle structure.
     if ((void*)t == NULL){
         return (int) npixels;
     }
@@ -1897,18 +1897,31 @@ plotTriangleF(
 // o vetor ficará. Ou seja, quanto mais longe estão os objetos,
 // mais objetos cabem na tela.
 
+// #test
+// Testing z factor.
+
+// Bigger z, smaller objects, closer from the center,
+    //float factor = 2.0f; 
+// Normal
+    float factor = 1.0f;
+// Smaller z, bigger objects, less closer from the center.
+    //float factor = 0.5f;
+
     if (t->p[0].z != 0.0f)
     {
+        t->p[0].z = (float) (t->p[0].z * factor);
         t->p[0].x = (float) (t->p[0].x/t->p[0].z);
         t->p[0].y = (float) (t->p[0].y/t->p[0].z);
     }
     if (t->p[1].z != 0.0f)
     {
+        t->p[1].z = (float) (t->p[1].z * factor);
         t->p[1].x = (float) (t->p[1].x/t->p[1].z);
         t->p[1].y = (float) (t->p[1].y/t->p[1].z);
     }
     if (t->p[2].z != 0.0f)
     {
+        t->p[2].z = (float) (t->p[2].z * factor);
         t->p[2].x = (float) (t->p[2].x/t->p[2].z);
         t->p[2].y = (float) (t->p[2].y/t->p[2].z);
     }
