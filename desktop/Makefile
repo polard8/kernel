@@ -38,11 +38,13 @@ all:
 	make -C ventana/apps/docv
 
 # ----------------
-# Graphics engine. (game1)
-	make -C eng/
+# demos/
+
+# Graphics engine. (3D demos)
+	make -C demos/eng/
 
 clean-all:
-	-rm -f eng/bin/*.BIN
+	-rm -f demos/eng/bin/*.BIN
 	-rm -f ventana/gramland/bin/*.BIN
 	-rm -f ventana/apps/bin/*.BIN
 	-rm -f ventana/libs/libgws/obj/*.o

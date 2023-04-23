@@ -194,7 +194,7 @@ copy-extras:
 	@echo ":: Copying Window server and clients."
 
 # Graphics engine
-	-sudo cp ../desktop/eng/bin/ENG.BIN   os/disk/
+	-sudo cp ../desktop/demos/eng/bin/ENG.BIN   os/disk/
 # Window server
 	-sudo cp ../desktop/ventana/gramland/bin/GRAMLAND.BIN   os/disk/
 
