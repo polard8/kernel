@@ -37,10 +37,7 @@ LIBCOBJ   = ../../libs/rtl/obj
 LIBGWS    = ../../libs/libgws/include/
 LIBGWSOBJ = ../../libs/libgws/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o ioctl.o \
 socket.o \
@@ -48,15 +45,12 @@ gws.o connect.o events.o rw.o gr.o \
 math.o    
 
 
-
 .PHONY: all all-c hello-link finalize clean
 
 all: main.o all-c hello-link finalize clean
 	@echo "Ok?"
-
 main.o:
 	gcc  -c  main.c  $(CFLAGS) -I $(LIBC) -I $(LIBGWS) -o main.o
-
 all-c:
 
 	cp $(LIBCOBJ)/crt0.o   .
@@ -90,5 +84,4 @@ finalize:
 clean:
 	-rm *.o
 	-rm CMDLINE.BIN 
-	
 	

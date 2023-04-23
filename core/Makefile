@@ -196,7 +196,7 @@ copy-extras:
 # Graphics engine
 	-sudo cp ../desktop/eng/bin/ENG.BIN   os/disk/
 # Window server
-	-sudo cp ../desktop/gramland/bin/GRAMLAND.BIN   os/disk/
+	-sudo cp ../desktop/ventana/gramland/bin/GRAMLAND.BIN   os/disk/
 
 #
 # Shell
@@ -205,17 +205,17 @@ copy-extras:
 # apps, apps and apps: (Students)
 
 # apps: Unit 3
-	-sudo cp ../desktop/apps/bin/GWS.BIN   os/disk/
-	-sudo cp ../desktop/apps/bin/GDM.BIN   os/disk/
-	-sudo cp ../desktop/apps/bin/GDM2.BIN  os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/GWS.BIN   os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/GDM.BIN   os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/GDM2.BIN  os/disk/
 # apps: Unit 2
-	-sudo cp ../desktop/apps/bin/TERMINAL.BIN  os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/TERMINAL.BIN  os/disk/
 # apps: Unit 1
-	-sudo cp ../desktop/apps/bin/EDITOR.BIN   os/disk/
-	-sudo cp ../desktop/apps/bin/FILEMAN.BIN  os/disk/
-	-sudo cp ../desktop/apps/bin/CMDLINE.BIN  os/disk/PROGRAMS/
-	-sudo cp ../desktop/apps/bin/BROWSER.BIN  os/disk/
-	-sudo cp ../desktop/apps/bin/DOCV.BIN     os/disk/PROGRAMS/
+	-sudo cp ../desktop/ventana/apps/bin/EDITOR.BIN   os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/FILEMAN.BIN  os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/CMDLINE.BIN  os/disk/PROGRAMS/
+	-sudo cp ../desktop/ventana/apps/bin/BROWSER.BIN  os/disk/
+	-sudo cp ../desktop/ventana/apps/bin/DOCV.BIN     os/disk/PROGRAMS/
 
 	@echo "~ copy-extras"
 

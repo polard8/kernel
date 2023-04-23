@@ -13,7 +13,7 @@ linkTarget = ENG.BIN
 # -M --print-map:   Print a link map to the standard output.
 # Usermode
 linkFlags = -m elf_x86_64 \
--s -x -static -T ../link.ld
+-s -x -static -T ./link.ld
 
 
 VERSION = 0
@@ -77,14 +77,14 @@ user_ccflags += -fno-optimize-sibling-calls
 #todo
 #path longo. vamos mudar  as libs de lugar para gramado/libs.
 
-LIBC       = ../libs/rtl/include/
-LIBCOBJ    = ../libs/rtl/obj
-LIBDISP    = ../libs/libdisp/include/
-LIBDISPOBJ = ../libs/libdisp/obj
-LIBGR      = ../libs/libgr/include/
-LIBGROBJ   = ../libs/libgr/obj
-LIBGR3D    = ../libs/libgr3d/include/
-LIBGR3DOBJ = ../libs/libgr3d/obj
+LIBC       = ../ventana/libs/rtl/include/
+LIBCOBJ    = ../ventana/libs/rtl/obj
+LIBDISP    = ../ventana/libs/libdisp/include/
+LIBDISPOBJ = ../ventana/libs/libdisp/obj
+LIBGR      = ../ventana/libs/libgr/include/
+LIBGROBJ   = ../ventana/libs/libgr/obj
+LIBGR3D    = ../ventana/libs/libgr3d/include/
+LIBGR3DOBJ = ../ventana/libs/libgr3d/obj
 
 CINCLUDES  = -I $(LIBC)  
 CINCLUDES += -I $(LIBDISP)
