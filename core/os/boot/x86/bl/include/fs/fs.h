@@ -36,15 +36,15 @@
 #define FAT_STATUS_3 0xffff3
 #define FAT_STATUS_4 0xffff2
 
-// #importante:
-// Status de carregamento.
-// Se o diret�rio raiz j� est� carregado na mem�ria.
-// Se a FAT j� est� carregada na mem�ria.
+// #important:
+// Loading status.
+// The root dir is already in the memory.
+// The FAT is already in the memory.
 extern int g_fat16_root_status;
 extern int g_fat16_fat_status;
+
 // Tipo de sistema de arquivos. (Ex: FAT16, EXT2 ...). 
 extern int g_file_system_type;
-
 
 // Lista de clusters em um arquivo.
 //#define MAX_CLUSTERS  1024
@@ -115,7 +115,6 @@ fsLoadFile (
 // Esse é o endereço do arquivo, 
 // que é o último nível do path.
 int load_path ( unsigned char *path, unsigned long address );
-
 int path_count(const char *path);
 
 unsigned long fsSearchFile(unsigned char *name);
@@ -135,7 +134,6 @@ fsSaveFileName (
     unsigned long initial_cluster);
 
 
-
 //int fs_search_file(unsigned char *file_name);
 
 //
@@ -151,10 +149,10 @@ unsigned long fs_get_fat_entry(unsigned long n);
 void fs_set_fat_entry(unsigned long n, unsigned long value);
 void fs_put_list_on_fat();
 
-//@todo: FAT ou ROOT DIR ?  
+// #todo: 
+// FAT ou ROOT DIR?  
 unsigned long fs_find_not_empty_entry();
 unsigned short fs_find_empty_entry();
-
 
 //
 // Root Dir support.
@@ -181,7 +179,11 @@ void fs_save_dir(unsigned long id);
 unsigned long fs_check_cluster(unsigned long id); 
 void fs_show_entry(unsigned long id, unsigned long eid);
 unsigned long fs_get_entry_status(unsigned long id, unsigned long eid);
-void fs_set_entry_status(unsigned long id, unsigned long eid, unsigned long status);
+void 
+fs_set_entry_status(
+    unsigned long id, 
+    unsigned long eid, 
+    unsigned long status );
 
 void 
 fs_create_entry ( 
@@ -194,17 +196,10 @@ fs_create_entry (
 void fs_delete_entry(unsigned long id, unsigned long eid);
 
 //
-// Boot support.
+// Boot support
 //
 
-unsigned long fs_makeboot();
 void fs_init_bootfile_struct();
-
-//
-// Install support.
-//
-
-void fs_install();
 
 //
 // Configuration support.
@@ -212,14 +207,10 @@ void fs_install();
 
 void fs_set_structures();
 void fs_save_structure();
-void fs_format();
 
 #endif    
 
-
 //
-// End.
+// End
 //
-
-
 

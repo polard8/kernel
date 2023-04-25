@@ -253,118 +253,102 @@ wcLoop:
  *     Compara comandos.
  *     Obs: O mini-shell do Boot Loader NÃO deve oferece muitos comandos.
  */
- 
-unsigned long shellCompare ()
+unsigned long shellCompare(void)
 {
     unsigned long ret_value=0;
 
 // Espera o comando terminar.
     shellWaitCmd();
 
-palavra_reservada:
+//
+// Reserved words.
+//
 
-    //Cls.
+// cls
     if ( strncmp( prompt, "cls", 3 ) == 0 )
-	{ 
-	    bl_clear(0);    
-        goto exit_cmp;
-	}
-
-	//Help.
-    if( strncmp( prompt, "help", 4 ) == 0 ){
-		//printf(help_string);
-		shellHelp();
-		goto exit_cmp;
-    }
-
-	//Format.
-	if( strncmp( prompt, "format", 6 ) == 0 ){
-	    printf("~format\n");
-		fs_format(); 
+    { 
+        bl_clear(0);    
         goto exit_cmp;
     }
 
-	//Dir.
-	if( strncmp( prompt, "dir", 3 ) == 0 ){
-	    printf("~dir\n");
-		fs_show_dir(0); 
+// Help
+    if ( strncmp( prompt, "help", 4 ) == 0 )
+    {
+        //printf(help_string);
+        shellHelp();
         goto exit_cmp;
     }
 
-	//cria arquivos e diretorios principais..
-	if( strncmp( prompt, "makeboot", 8 ) == 0 )
-	{
-	    printf("~makeboot\n");
-		
-		ret_value = fs_makeboot();
-		if(ret_value != 0){
-		    printf("shell: makeboot fail");
-		};
+// Dir
+    if ( strncmp( prompt, "dir", 3 ) == 0 )
+    {
+        printf("~dir\n");
+        fs_show_dir(0); 
         goto exit_cmp;
     }
 
-	if( strncmp( prompt, "debug", 5 ) == 0 ){
-	    printf("~debug\n");
-		debug();
+    if ( strncmp( prompt, "debug", 5 ) == 0 )
+    {
+        printf("~debug\n");
+        debug();
         goto exit_cmp;
     }
 
-// testa mbr
-    if( strncmp( prompt, "mbr", 3 ) == 0 ){
-	    printf("~mbr\n");
-		testa_mbr();
-		goto exit_cmp;
-    }
-
-// testa /root
-    if( strncmp( prompt, "root", 4 ) == 0 ){
-	    printf("~/root\n");
-		testa_root();
-		goto exit_cmp;
-    }
-
-    if( strncmp( prompt, "start", 5 ) == 0 ){
-	    printf("~start\n");
-		goto exit_cmp;
-    }
-
-    if( strncmp( prompt, "hd", 2 ) == 0 ){
-	    printf("~hd\n");
+// Test MBR.
+    if ( strncmp( prompt, "mbr", 3 ) == 0 )
+    {
+        printf("~mbr\n");
+        // testa_mbr(); //#todo: Use english.
         goto exit_cmp;
     }
 
-
-	if( strncmp( prompt, "save", 4 ) == 0 ){
-	    printf("~save root\n");
-        goto exit_cmp;
-    };
-	
-	//muda um arquivo da area de transferencia para 
-	//o sistema de arquivos...
-	if( strncmp( prompt, "install", 7 ) == 0 ){
-	    printf("~install\n");
-		fs_install();
+// Test /root.
+    if ( strncmp( prompt, "root", 4 ) == 0 )
+    {
+        printf("~/root\n");
+        //testa_root(); //#todo: Use english.
         goto exit_cmp;
     }
 
-	//boot - inicia o sistema carregado
-	if( strncmp( prompt, "boot", 4 ) == 0 ){
-	    printf("~boot\n");
-		boot();
+    if ( strncmp( prompt, "start", 5 ) == 0 )
+    {
+        printf("~start\n");
         goto exit_cmp;
     }
 
-	//Exit.
-    if( strncmp( prompt, "exit", 4 ) == 0 ){
+    if( strncmp( prompt, "hd", 2 ) == 0 )
+    {
+        printf("~hd\n");
+        goto exit_cmp;
+    }
+
+    if ( strncmp( prompt, "save", 4 ) == 0 )
+    {
+        printf("~save root\n");
+        goto exit_cmp;
+    }
+
+// boot - Inicia o sistema carregado.
+    if ( strncmp( prompt, "boot", 4 ) == 0 )
+    {
+        printf("~boot\n");
+        boot();
+        goto exit_cmp;
+    }
+
+// Exit
+    if ( strncmp( prompt, "exit", 4 ) == 0 )
+    {
         printf("~exit\n");
-		shell_status = 0;
-		goto exit_cmp;
+        shell_status = 0;
+        goto exit_cmp;
     }
 
-	//Reboot.
-    if( strncmp( prompt, "reboot", 6 ) == 0 ){
-	    printf("~reboot\n");
-		reboot();
+// Reboot
+    if ( strncmp( prompt, "reboot", 6 ) == 0 )
+    {
+        printf("~reboot\n");
+        reboot();
         goto exit_cmp;
     }
 
@@ -373,20 +357,18 @@ palavra_reservada:
 //
 
 palavra_nao_reservada:
-	return 1;
+    return 1;
 exit_cmp: 
     return 0;
 }
 
-
-void shellHelp ()
+void shellHelp(void)
 {
     printf("\n help, format, install, makeboot, reboot\n");
 }
 
 
-/* boot: Realiza o boot do sistema. */
-
+// Realiza o boot do sistema.
 void boot ()
 {
 // #todo: 
@@ -397,14 +379,12 @@ void boot ()
 /*
  * debug: 
  *    Uma rotina de debug do bootloader.
- *
  * Objetivo:
  *    Checar a consistencia dos elementos de inicializaçao.
  *    Efetuar correções possíveis no processo de inicialização.
  *    Por exemplo, se há uma falha no mbr, no bootmanager, ou no sistema
  *    de arquivos, a falha pode ser reportada ou corrigida.
  */
- 
 void debug ()
 {
 
@@ -424,53 +404,42 @@ void debug ()
 }
 
 
-void testa_mbr ()
+void testa_mbr()
 {
     my_read_hd_sector ( MBR_ADDRESS, MBR_LBA, 0, 0 );
-	
     printf ("%s", MBR_ADDRESS );
 }
 
-
-// Mudar nome.
-void testa_root (){
-	
+// Mudar nome
+void testa_root()
+{
     my_read_hd_sector ( FAT16_ROOTDIR_ADDRESS, FAT16_ROOTDIR_LBA, 0, 0 );
-	
     printf ("%s", FAT16_ROOTDIR_ADDRESS );
 }
 
-
-void reboot ()
+void reboot()
 {
 // #bugbug
 // Devemos chamar asm_reboot()
     asm_shut_down();
 }
 
-
-/* 
- * init_shell: 
- *     Inicializa o shell do Boot Loader. 
- */
+// shellInit:
+// Inicializa o shell do Boot Loader.
 // Called by init() in init.c
-void shellInit()
+void shellInit(void)
 {
-
 // #todo
 // Checa quem esta tentando inicializar o shell.
 
 // Prompt
     prompt[0] = (char) '\0';
     prompt_pos = 0;
-
 //cursor
     //g_cursor_y = 0;
     //g_cursor_x = 0;
-
     ShellInitialized = TRUE;
 }
-
 
 // rescue shell
 // Called bu BlMain().

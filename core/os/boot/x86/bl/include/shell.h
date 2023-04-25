@@ -27,27 +27,26 @@ extern unsigned long g_cmd_status;
 
 
 //
-// Shell.
+// Shell
 //
 
 
-// prototypes ========================
+// Prototypes ========================
 
 //Main.
 int blShellMain ( int argc, char *argv[] );
 
-//Initialization.
-void shellInit();
+// Initialization
+void shellInit(void);
 int shellInitializePrompt();
 //...
 
 void shellWaitCmd();
-unsigned long shellCompare();
-void shellHelp();
+unsigned long shellCompare(void);
+void shellHelp(void);
 //...
 
 int rescueShell(void);
-
 
 #endif    
 
