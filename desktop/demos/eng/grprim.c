@@ -1732,24 +1732,41 @@ fillTriangle(
 // Trasformation for Cavalier Oblique Drawings.
 // (Buz z is always 0).
 // It uses full depth.
+// See: libgr.c
 
-    libgr_transform_from_viewspace_to_screespace( 
+// #test
+// Testing a new routine without z parameter and hand orientation.
+
+    //libgr_transform_from_viewspace_to_screespace( 
+    //    (int *) &X0, (int *) &Y0, 
+    //    triangle->p[0].x, triangle->p[0].y, triangle->p[0].z,
+    //    TRUE, //UseLeftHand,
+    //    hotspotx, hotspoty ); 
+    libgr_transform_to_screespace( 
         (int *) &X0, (int *) &Y0, 
-        triangle->p[0].x, triangle->p[0].y, triangle->p[0].z,
-        TRUE, //UseLeftHand,
+        triangle->p[0].x, triangle->p[0].y,
         hotspotx, hotspoty ); 
 
-    libgr_transform_from_viewspace_to_screespace( 
+    //libgr_transform_from_viewspace_to_screespace( 
+    //    (int *) &X1, (int *) &Y1, 
+    //    triangle->p[1].x, triangle->p[1].y, triangle->p[1].z,
+    //    TRUE, //UseLeftHand,
+    //    hotspotx, hotspoty ); 
+    libgr_transform_to_screespace( 
         (int *) &X1, (int *) &Y1, 
-        triangle->p[1].x, triangle->p[1].y, triangle->p[1].z,
-        TRUE, //UseLeftHand,
+        triangle->p[1].x, triangle->p[1].y,
         hotspotx, hotspoty ); 
 
-    libgr_transform_from_viewspace_to_screespace( 
+    //libgr_transform_from_viewspace_to_screespace( 
+    //    (int *) &X2, (int *) &Y2, 
+    //    triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
+    //    TRUE, //UseLeftHand,
+    //    hotspotx, hotspoty ); 
+    libgr_transform_to_screespace( 
         (int *) &X2, (int *) &Y2, 
-        triangle->p[2].x, triangle->p[2].y, triangle->p[2].z,
-        TRUE, //UseLeftHand,
+        triangle->p[2].x, triangle->p[2].y,
         hotspotx, hotspoty ); 
+
 
 // Color
     unsigned int color = (unsigned int) triangle->p[0].color;

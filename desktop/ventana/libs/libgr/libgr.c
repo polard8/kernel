@@ -7,6 +7,76 @@ int coisolibgr=0;
 
 // -------------------------------------------------------
 
+int 
+libgr_transform_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, 
+    int _hotspotx, int _hotspoty )
+{
+// #
+// The viewspace is the view considering 
+// the camera's point of view.
+
+// 3d
+// save parameters. (++)
+    int x  = (int) _x;  //1
+    int y  = (int) _y;  //2
+
+// The given hotspot.
+// The center os our surface.
+    int hotspotx = (int) (_hotspotx & 0xFFFFFFFF);
+    int hotspoty = (int) (_hotspoty & 0xFFFFFFFF);
+
+// 2d:
+// final result.
+    int X=0;
+    int Y=0;
+
+    // Register z value into the z buffer.
+    //int RegisterZValue=FALSE;
+
+// --------------------
+
+    // x positivo, para direita.
+    if (x >= 0 ){
+        X = (int) ( hotspotx + x );
+    }
+    // x negativo, para esquerda.
+    if (x < 0 ){ x = abs(x);   
+        X = (int) ( hotspotx - x );
+    }
+
+//    goto done;
+// --------------------------------------
+//done:
+
+// ===================================================
+// Y::
+    // y positivo, para cima.
+    if ( y >= 0 ){
+        Y = (int) ( hotspoty - y );
+    }
+    // y negativo, para baixo
+    if ( y < 0 ){ y = abs(y);
+        Y = (int) ( hotspoty + y );
+    }
+
+// ===================================================
+// Return values:
+
+    // fail
+    if ( (void*) res_x == NULL ){ return (int) -1; }
+    if ( (void*) res_y == NULL ){ return (int) -1; }
+
+    *res_x = (int) X;
+    *res_y = (int) Y;
+
+    // ok
+    return 0;
+
+}
+
+
 // Transforme from the (x,y,z) coordinates of the 'view space'
 // to the (x,y) coordinates of the 2d screen space.
 // Hand-made. No matrix.

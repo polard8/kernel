@@ -25,6 +25,13 @@ static int projection4x4[4][4] = {
 
 // Alternative.
 int 
+libgr_transform_to_screespace(
+    int *res_x, int *res_y,
+    int _x, int _y, 
+    int _hotspotx, int _hotspoty );
+
+// Alternative.
+int 
 libgr_transform_from_viewspace_to_screespace(
     int *res_x, int *res_y,
     int _x, int _y, int _z,
