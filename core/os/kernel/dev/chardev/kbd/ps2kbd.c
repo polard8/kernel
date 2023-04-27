@@ -8,11 +8,8 @@
 
 // see: ps2kbd.h
 struct ps2_keyboard_d  PS2Keyboard;
-
 static int __prefix=0;
-
 unsigned char ps2kbd_led_status=0;
-
 
 //
 // == private functions: prototypes ================
@@ -45,10 +42,8 @@ static void keyboard_init_modifier_keys(void)
 
 // Alternate Graphic.
     //altgr_status = 0; //@todo
-
-	// Function.
+// Function.
 	//fn_status = 0;  //@todo
-
 	//...
 }
 
@@ -69,7 +64,7 @@ void ps2kbd_initialize_device (void)
 // create file.
     file *fp;
     fp = (file *) kmalloc( sizeof(file) );
-    if ( (void *) fp == NULL ){
+    if ((void *) fp == NULL){
         panic ("kbd: fp\n");
     }
     fp->used = TRUE;
@@ -188,7 +183,7 @@ void DeviceInterface_PS2Keyboard(void)
 
 //sc_again:
 
-    PS2Keyboard.last_jiffy = jiffies;
+    PS2Keyboard.last_jiffy = (unsigned long) jiffies;
 
 //===========================================
 // #test
@@ -238,7 +233,6 @@ void DeviceInterface_PS2Keyboard(void)
     case 0xFA:
         //#test
         //printf ("DeviceInterface_PS2Keyboard: ack\n");
-        //refresh_screen();
         goto done;
         break;
     
@@ -246,7 +240,6 @@ void DeviceInterface_PS2Keyboard(void)
     case 0xFE:
         //#test
         //printf ("DeviceInterface_PS2Keyboard: resend\n");
-        //refresh_screen();
         goto done;
         break;
 
@@ -355,21 +348,20 @@ void keyboard_set_leds(unsigned char flags)
 {
 // Wait for bit 1 of status reg to be zero.
 // Send code for setting the flag.
-    while ( ( in8 (0x64) & 2) != 0 )
+    while ( (in8 (0x64) & 2) != 0 )
     {
     };
-    out8 (0x60,KEYBOARD_SET_LEDS); 
-    pit_sleep (100);
+    out8(0x60,KEYBOARD_SET_LEDS); 
+    pit_sleep(100);
 
 // Wait for bit 1 of status reg to be zero.
 // Send flag. 
-    while ( ( in8 (0x64) & 2) != 0 )
+    while ( (in8(0x64) & 2) != 0 )
     {
     };
-    out8 (0x60,flags);
-    pit_sleep (100);
+    out8(0x60,flags);
+    pit_sleep(100);
 }
-
 
 // keyboardGetKeyState:
 // Pega o status das teclas de modificação.

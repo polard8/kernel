@@ -317,6 +317,7 @@ wmKeyEvent(
 // Called by the keyboard handler.
 
     int Prefix = (int) (prefix & 0xFF);
+    int fBreak = FALSE;
 
 // Step 0 
 // Declarações de variáveis.
@@ -437,8 +438,6 @@ wmKeyEvent(
 
 // ================================================
 // Make or Break?
-
-    int fBreak = FALSE;
 
     // Released: Yes, it's a break.
     if ( (Keyboard_RawByte & BREAK_MASK) != 0 ){
@@ -855,7 +854,7 @@ int wmTimerEvent(int signature)
 {
 // Called by the timer handler.
 
-    if (signature!=1234)
+    if (signature != 1234)
         return -1;
 
 //--------------------
