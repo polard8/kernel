@@ -225,13 +225,21 @@ wmMouseEvent(
     {
         if (long1 < 1){ long1=1; }
         if (long2 < 1){ long2=1; }
-        if ( long1 >= deviceWidth ) { long1 = (deviceWidth-1);  }
-        if ( long2 >= deviceHeight ){ long2 = (deviceHeight-1); }
+        if (long1 >= deviceWidth) { long1 = (deviceWidth-1);  }
+        if (long2 >= deviceHeight){ long2 = (deviceHeight-1); }
+
+        // #test
+        // No caso de MSG_MOUSEMOVE, podemos checar se
+        // a última mensagem na fila é também um MSG_MOUSEMOVE.
+        // Nesse caso podemos apenas alterar os valores 
+        // na mensagem ja postada, ao invés de postar uma nova.
+        // O window server ficaria apenas com a posição atual.
 
         post_message_to_ws(
             event_id, 
             (unsigned long) long1, 
             (unsigned long) long2 );
+
         return 0;
     }
 

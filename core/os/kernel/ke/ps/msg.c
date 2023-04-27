@@ -1,5 +1,6 @@
 
 // msg.c
+// Post message and get message.
 
 #include <kernel.h>
 
@@ -136,8 +137,8 @@ post_message_to_tid (
 
 // Message code.
     MessageCode = (int) (msg & 0xFFFFFFFF);
-    if (MessageCode<0){
-        return -1;
+    if (MessageCode <= 0){
+        return (int) (-1);
     }
 
 // tid
@@ -147,8 +148,8 @@ post_message_to_tid (
     }
 // structure
     t = (struct thread_d *) threadList[dst_tid];
-    if ( (void *) t == NULL ){
-        panic ("post_message_to_tid: t \n");
+    if ((void *) t == NULL){
+        panic ("post_message_to_tid: t\n");
     }
     if ( t->used != TRUE || t->magic != 1234 ){
         panic ("post_message_to_tid: t validation \n");
@@ -158,23 +159,17 @@ post_message_to_tid (
         panic("post_message_to_tid: dst_tid != t->tid\n");
     }
 
-
-//
 // This thread needs a timeout.
-//
-
 // Let's tell to ts.c that this thread needs a timeout.
-// So this way the ts ca break the round and give to this thread
-// the opportunity to run immediately.
+// So this way the ts can break the round and 
+// give to this thread the opportunity to run immediately.
 
     timeout_thread = (struct thread_d *) t;
     timeout_thread->waiting_for_timeout = TRUE;
 
-
 //
 // The message
 //
-
 
 // ==========================================================
 // Vamos colocar essa mensagem na outra fila de mensagens.
@@ -182,7 +177,7 @@ post_message_to_tid (
 
 // Get the pointer for the next entry.
     m = (struct msg_d *) t->MsgQueue[ t->MsgQueueTail ];
-    if ( (void*) m == NULL ){
+    if ((void*) m == NULL){
         panic ("post_message_to_tid: m\n");
     }
     if ( m->used != TRUE || m->magic != 1234 ){

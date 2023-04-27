@@ -280,12 +280,12 @@ static void __ps2mouse_parse_data_packet(void)
     // ? = = buffer_mouse[3];  //extra
 
 // Check signal
-    if(mouse_packet_data & 0x10){ x_sign=TRUE; }
-    if(mouse_packet_data & 0x20){ y_sign=TRUE; }
+    if (mouse_packet_data & 0x10){ x_sign=TRUE; }
+    if (mouse_packet_data & 0x20){ y_sign=TRUE; }
 
-// check overflow
-    if(mouse_packet_data & 0x40){ x_overflow=TRUE; }
-    if(mouse_packet_data & 0x80){ y_overflow=TRUE; }
+// Check overflow
+    if (mouse_packet_data & 0x40){ x_overflow=TRUE; }
+    if (mouse_packet_data & 0x80){ y_overflow=TRUE; }
 
 // Signal changes
     if (mouse_packet_x && x_sign)
@@ -362,7 +362,7 @@ static void __ps2mouse_parse_data_packet(void)
 // 1 (left)
 // The button 0 changed the state.
 // O botao 0, eh na verdade o botao 1. (left)
-    if( button0_changed == TRUE )
+    if (button0_changed == TRUE)
     {
         // Presssed
         if( mbuttons_current_state[0] == TRUE ){
@@ -378,7 +378,7 @@ static void __ps2mouse_parse_data_packet(void)
 // 2 (right)
 // The button 1 changed the state.
 // O botao 1, eh na verdade o botao 2. (right)
-    if( button1_changed == TRUE )
+    if (button1_changed == TRUE)
     {
         // Pressed
         if( mbuttons_current_state[1] == TRUE ){
@@ -394,7 +394,7 @@ static void __ps2mouse_parse_data_packet(void)
 // 3 (middle)
 // The button 2 changed the state.
 // O botao 2, eh na verdade o botao 3. (middle)
-    if( button2_changed == TRUE )
+    if (button2_changed == TRUE)
     {
         // Pressed
         if( mbuttons_current_state[2] == TRUE ){
@@ -797,8 +797,8 @@ void DeviceInterface_PS2Mouse(void)
 //#todo: deletar isso.
     //debug_print ("DeviceInterface_PS2Mouse:\n");
 
-// Not initialized.
-    if ( PS2.mouse_initialized != TRUE ){
+// Not initialized
+    if (PS2.mouse_initialized != TRUE){
         debug_print ("DeviceInterface_PS2Mouse: Not initialized yet\n");
         return;
     }
@@ -843,11 +843,11 @@ void DeviceInterface_PS2Mouse(void)
         ((status & I8042_WHICH_BUFFER) == I8042_MOUSE_BUFFER) 
         ? TRUE 
         : FALSE;
-    if ( is_mouse_device == FALSE )
+    if (is_mouse_device == FALSE)
         return;
 // =============================================
 
-    PS2Mouse.last_jiffy = jiffies;
+    PS2Mouse.last_jiffy = (unsigned long) jiffies;
 
 // Get the byte
     _byte = (unsigned char) in8(0x60);
@@ -860,7 +860,7 @@ void DeviceInterface_PS2Mouse(void)
 /*
     // O ACK não é enviado se estivermos
     // no modo streaming.
-    if ( _byte == 0xFA ){
+    if (_byte == 0xFA){
         //debug_print ("[0xFA]: ACK\n");
         mouse_stage = 0;
         return;
@@ -870,7 +870,7 @@ void DeviceInterface_PS2Mouse(void)
 /*
 // RESEND: 
 // ??? Resend é comando e não estatus.
-    if ( _byte == 0xFE ){
+    if (_byte == 0xFE){
         //debug_print ("[0xFE]: RESEND\n");
         printf ("DeviceInterface_PS2Mouse: resend\n");
         refresh_screen();
@@ -879,7 +879,7 @@ void DeviceInterface_PS2Mouse(void)
     }
 */
 
-// first byte
+// First byte.
 // Y overflow, X overflow, Y sign bit, X sign bit
 // Always 1, Middle Btn, Right Btn, Left Btn
 
@@ -900,7 +900,7 @@ void DeviceInterface_PS2Mouse(void)
         mouse_stage++;
         break;
     case 2:
-        if( PS2Mouse.has_wheel == TRUE )
+        if (PS2Mouse.has_wheel == TRUE)
         {
             mouse_stage++;
             break;
@@ -925,8 +925,4 @@ void DeviceInterface_PS2Mouse(void)
 // o window server poderá ler depois.
    //write_packet(mousefp,...)
 }
-
-
-
-
 
