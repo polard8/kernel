@@ -1,10 +1,7 @@
-/*
- * File: stdlib.h 
- *
- * Descrição:
- *     Parte da libC C99 para usermode 32bit.
- * Versão: 1.0, 2016 - Created.
- */
+
+// stdlib.h
+// The stdlib header for 64bit usermode in Gramado OS.
+// 2016 - Created by Fred Nora.
 
  
 /*
@@ -47,22 +44,24 @@
 */   
 
 
-#ifndef _STDLIB_H
-#define _STDLIB_H 1
+#ifndef __RTL_STDLIB_H
+#define __RTL_STDLIB_H    1
 
+//
+// Includes
+//
 
 #include <stddef.h>
 
 
-
-#ifdef	_BSD_SIZE_T_
-typedef	_BSD_SIZE_T_	size_t;
-#undef	_BSD_SIZE_T_
+#ifdef _BSD_SIZE_T_
+typedef _BSD_SIZE_T_  size_t;
+#undef _BSD_SIZE_T_
 #endif
 
 #if defined(_BSD_WCHAR_T_) && !defined(__cplusplus)
-typedef	_BSD_WCHAR_T_	wchar_t;
-#undef	_BSD_WCHAR_T_
+typedef _BSD_WCHAR_T_ wchar_t;
+#undef _BSD_WCHAR_T_
 #endif
 
 typedef struct {
@@ -101,20 +100,17 @@ typedef struct {
 #endif
 
 
-#define	EXIT_FAILURE	1
-#define	EXIT_SUCCESS	0
+#define EXIT_FAILURE  1
+#define EXIT_SUCCESS  0
 
-
-//bsd-like
-//#define	RAND_MAX	0x7fffffff
-
+// bsd-like
+// #todo rand max for 64 bit?
+// #define	RAND_MAX	0x7fffffff
 #define RAND_MAX  32767 
-
 
 //bsd stuff
 //extern size_t __mb_cur_max;
 //#define	MB_CUR_MAX	__mb_cur_max
-
 
 void *stdlib_system_call ( 
     unsigned long ax, 
@@ -122,11 +118,8 @@ void *stdlib_system_call (
     unsigned long cx, 
     unsigned long dx );
 
-
-const char	*getprogname(void);
+const char *getprogname(void);
 void setprogname(const char *progname);
-
-
 
 // pseudo-terminal support.
 int posix_openpt (int flags);
@@ -145,49 +138,34 @@ char *ptsname (int fd);
 // argument specifies the number of bytes available in buf.
 int ptsname_r (int fd, char *buf, size_t buflen);
 
-
-
 int mkostemps(char *template, int suffixlen, int flags);
-
 int mkstemps(char *template, int suffixlen);
-
 int mkostemp(char *template, int flags);
-
 int mkstemp(char *template);
 
 long labs (long j);
 
-
 int atoi (const char *str);
-
 void itoa (int n, char s[]);
-
-
-
 
 // unix v7 - like.
 char *nvmatch ( char *s1, char *s2 );
 char *v7_getenv ( char *name );
 
 
-
 //
 // environ
 //
-
 
 char *getenv (const char *name);
 int setenv (const char *name, const char *value, int overwrite);
 int unsetenv (const char *name);
 
 
-
-
-
 // mktemp - make a unique temporary filename
-//4.3BSD, POSIX.1-2001.  POSIX.1-2008 removes the specification of mktemp().
+// 4.3BSD, POSIX.1-2001. 
+// POSIX.1-2008 removes the specification of mktemp().
 char *mktemp (char *template);
-
 
 //
 // alloc
@@ -206,6 +184,16 @@ void *realloc ( void *start, size_t newsize );
 void *rtl_malloc ( size_t size );
 void *rtl_calloc (size_t count, size_t size);
 
+void free (void *ptr);
+
+// Returns a pseudo-random number in the range of 0 to RAND_MAX.
+int rand (void);
+//Alimenta a função rand.
+void srand (unsigned int seed);
+
+// #todo
+int system (const char *command);
+
 //
 // failure routines
 //
@@ -213,50 +201,21 @@ void *rtl_calloc (size_t count, size_t size);
 void abort(void);
 void stdlib_die (char *str);
 
+//=================================
 
-
+long strtol(const char *nptr, char **endptr, int base);
+unsigned long strtoul( const char *nptr, char **endptr, int base);
 
 
 /*
- * free:
- *     Libera a memória alocada por malloc. */
-
-void free (void *ptr);
-
-//Returns a pseudo-random number in the range of 0 to RAND_MAX.
-int rand (void);
-
-//Alimenta a função rand.
-void srand (unsigned int seed);
-
-
-//@todo: talvez essa função esteja declara erradamente em systemcall.
-//Obs: Essa rotina existe na API e funciona. Se ela faz parte da lib C
-// então ela deve sair de lá vir pra cá.
-int system (const char *command);
-
-
+double strtod(const char *nptr, char **endptr);
+float strtof(const char *str, char **endptr);
+double atof(const char *str);
+*/
 
 //=================================
 
-
-long
-strtol(const char *nptr, char **endptr, int base);
-	
-unsigned long
-strtoul( const char *nptr, char **endptr, int base);
-
-
-//double strtod (const char *str, char **endptr);
-//float strtof(const char *str, char **endptr);
-//long double strtold(const char *str, char **endptr);
-//double atof(const char *str);
-
-
-//=================================
-
-void *
-bsearch ( 
+void *bsearch ( 
     const void *key, 
     const void *base, 
     size_t nmemb,
@@ -281,12 +240,9 @@ qsort_r (
     void *arg 
     );
 
-
 int putenv(char *string);
 
-
 int abs( int j);
-
 
 //rt support
 //pegando informações sobre o heap usado pela biblioteca C99 em user mode.
@@ -308,8 +264,8 @@ unsigned long rtGetAvailableHeap(void);
 int libcInitRT(void);
 
 
-#endif  /*stdlib.h*/
+#endif    
 
 //
-// End.
+// End
 //

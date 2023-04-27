@@ -19,39 +19,6 @@ TARGETOS ?= gramado
 # Gramado!
 ifeq ($(TARGETOS),gramado)
 
-CFLAGS_OLD = -m64 \
-	-std=gnu89 \
-	-nodefaultlibs \
-	-nostdinc \
-	-nostdlib \
-	-static \
-	-fgnu89-inline \
-	-ffreestanding \
-	-fno-builtin \
-	-fno-pie \
-	-fleading-underscore \
-	-fno-stack-protector \
-	-s \
-	-Werror=strict-prototypes \
-	-mno-red-zone \
-	-mno-mmx -mno-sse -mno-sse2   
-
-
-CFLAGS_OLD2 = -m64 \
-	-std=gnu89 \
-	-nodefaultlibs \
-	-nostdinc \
-	-nostdlib \
-	-static \
-	-fgnu89-inline \
-	-ffreestanding \
-	-fno-builtin \
-	-fno-pie \
-	-fleading-underscore \
-	-fno-stack-protector \
-	-s \
-	-Werror=strict-prototypes    
-
 CFLAGS := \
 	-Wall \
 	-Wundef \
@@ -86,6 +53,7 @@ CFLAGS := \
 	-fno-optimize-sibling-calls \
 	-mno-red-zone \
 	#-mno-mmx -mno-sse -mno-sse2   
+
 endif
 
 .PHONY: all libc-header libc-content libc-footer link install clean
