@@ -37,16 +37,11 @@ LIBCOBJ   = ../../libs/rtl/obj
 LIBGWS    = ../../libs/libgws/include/
 LIBGWSOBJ = ../../libs/libgws/obj
 
-#
 # Objects
-#
-
 myObjects = crt0.o main.o rtl.o \
 ctype.o stdio.o fcntl.o stdlib.o string.o unistd.o termios.o ioctl.o \
 socket.o \
 gws.o connect.o events.o rw.o    
-
-
 
 
 .PHONY: all all-c hello-link finalize clean
@@ -59,24 +54,24 @@ main.o:
 
 all-c:
 
-	cp $(LIBCOBJ)/crt0.o   .
+	cp $(LIBCOBJ)/crt0.o  .
 	cp $(LIBCOBJ)/rtl.o  .
 
-	cp $(LIBCOBJ)/ctype.o   .
-	cp $(LIBCOBJ)/stdio.o .
-	cp $(LIBCOBJ)/fcntl.o .
-	cp $(LIBCOBJ)/stdlib.o .
-	cp $(LIBCOBJ)/string.o .
+	cp $(LIBCOBJ)/ctype.o  .
+	cp $(LIBCOBJ)/stdio.o  .
+	cp $(LIBCOBJ)/fcntl.o  .
+	cp $(LIBCOBJ)/stdlib.o  .
+	cp $(LIBCOBJ)/string.o  .
 	cp $(LIBCOBJ)/unistd.o  .
 
 	cp $(LIBCOBJ)/termios.o  .
 	cp $(LIBCOBJ)/ioctl.o  .
 	cp $(LIBCOBJ)/socket.o  .
 
-	cp $(LIBGWSOBJ)/connect.o .
-	cp $(LIBGWSOBJ)/events.o .
-	cp $(LIBGWSOBJ)/gws.o .
-	cp $(LIBGWSOBJ)/rw.o .
+	cp $(LIBGWSOBJ)/connect.o  .
+	cp $(LIBGWSOBJ)/events.o  .
+	cp $(LIBGWSOBJ)/gws.o  .
+	cp $(LIBGWSOBJ)/rw.o  .
 	
 hello-link:
 	ld -m elf_x86_64 -T ../../link.ld -o GWS.BIN $(myObjects)    

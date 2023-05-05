@@ -184,7 +184,7 @@ static int __init_heap(void)
         (unsigned long) (heap_end - heap_start);
 
 // Counter. '1'?
-    heapCount = 0;
+    heapCount=0;
 
 // ================================
 
