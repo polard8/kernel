@@ -265,7 +265,7 @@ int main ( int argc, char *argv[] )
     //while(1){}
 
     fp = fopen((char *) argv[2], "rb");
-    if ( fp == NULL ){
+    if (fp == NULL){
         printf("gramcnf: Couldn't open the input file\n");
         usage(argv);
         exit(1);
@@ -296,10 +296,9 @@ int main ( int argc, char *argv[] )
 // + Initialize the lexer.
 // + Parse the tokens.
 // + Return a pointer to the output file.
+// IN: dump output file?
 
-    // IN: dump output file?
-    ____O = (FILE *) compiler(fDumpOutput);   
-
+    ____O = (FILE *) compiler(fDumpOutput);
     //if ( (void*) ____O == NULL ){
        //
     //}

@@ -21,32 +21,24 @@ FILE *compiler (int dump_output)
     int lexer_return = -1;
     int parser_return = -1;
 
-
-//
+// --------------
+// Lexer:
 // Initialize lexer and parser.
-//
-
 // Just initializing the lexer.
-    //printf ("compiler: calling lexer ...\n");
     lexer_return = (int) lexer_initialize();
     //analizar retorno
 
+// --------------
+// Parser:
 // The parser will call the yylex() a lot of times.
-    //printf ("compiler: calling parser ...\n");
     int status = (int) parser_initialize();
     //analizar retorno
-
-//
-// Parse
-//
-
-    // IN: dump output file?
+// IN: dump output file?
     parser_return = (int) parse(dump_output);
+
 
 // Nesse momento ja temos um arquivo de output.
 // more ...
-
-    //printf ("compiler: Done\n");
 
 // Returning the output.
     return (FILE *) stdout;

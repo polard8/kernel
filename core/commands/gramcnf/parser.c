@@ -9,7 +9,6 @@
 // Getting the string from "asm()" and saving here
 // as a structured data.
 
-
 static int meta_index=0;
 size_t string_size=0;
 int meta_stage=0;
@@ -1694,7 +1693,8 @@ int parse(int dump_output)
     int i=0;
 
 // Se estamos esperando um identificador para um tipo.
-    static int waiting_id_for_a_metatype = FALSE;
+    int waiting_identifier_after_type = FALSE;
+
 // Se entramos em um desses corpos.
     int braces_inside = 0;
     int parentheses_inside = 0;
@@ -1706,6 +1706,8 @@ int parse(int dump_output)
     int State=1;
 // size?
     size_t size=0;
+
+    meta_index=0;
 
 // #bugbug
 // Tentando encontrar o tamanho do arquivo via fseek/ftell.
@@ -1779,12 +1781,13 @@ int parse(int dump_output)
                     // >>> peekSymbol=symbol  significa declaração de variável ou função.
                     case TK_TYPE:
                         id[ID_TYPE] = type_found;
-                        if (type_found == TMETA){
+                        if (type_found == TMETA)
+                        {
                             printf ("meta: Line %d\n",lineno);
-                            waiting_id_for_a_metatype = TRUE;
+                            waiting_identifier_after_type = TRUE;
                         }
                         // Depois de um type vem um identificador.
-                        State = 2;
+                        State=2;
                         break;
 
                     // #bugbug
@@ -1795,7 +1798,7 @@ int parse(int dump_output)
                         // ( função
                         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
-                            // printf ("[PAR] line %d\n", lineno ); 
+                            printf("[PAR] line %d\n", lineno);
                             parentheses_inside++;
                             //#test
                             //peekChar = c;
@@ -1807,7 +1810,7 @@ int parse(int dump_output)
                             strcat( outfile,":\n");
                             //recomeçar a lista. 
                             //#bugbug desconsiderando o modificador.
-                            State = 1;
+                            State=1;
                             break;
                         }
 
@@ -1922,14 +1925,11 @@ int parse(int dump_output)
 					// peekChar = , //estamos listando variáveis.
                     
                     case TK_IDENTIFIER:
-
-                        //#ifdef PARSER_VERBOSE
-                        //    printf("State2: TK_IDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
-                        //#endif 
-
+                        
+                        printf("State2: TK_IDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+                        
                         id[ID_TOKEN] = TK_IDENTIFIER;
                         id[ID_STACK_OFFSET] = stack_index;
-
                         // Salva o símbolo. #isso funciona.
                         sprintf ( save_symbol, real_token_buffer );
                         
@@ -1940,24 +1940,24 @@ int parse(int dump_output)
                         // If we are waiting an id for a type.
                         // We are waiting the tag name.
                         // waiting_tagname
-                        if (waiting_id_for_a_metatype == TRUE){
-                        waiting_id_for_a_metatype = FALSE;
-                        
-                        memset(metadata[meta_index].meta_tag, 0,64);
-                        string_size = (size_t) strlen(real_token_buffer);
-                        if (string_size <= 0){
-                            printf("ERROR: tag size min\n");
-                            exit(1);
-                        }
-                        if (string_size >= 64){
-                            printf("ERROR: tag size max\n");
-                            exit(1);
-                        }
-                        strncpy(
-                            metadata[meta_index].meta_tag,
-                            real_token_buffer,
-                            string_size );
-                        metadata[meta_index].tag_size = (size_t) string_size;
+                        if (waiting_identifier_after_type == TRUE)
+                        {
+                            waiting_identifier_after_type = FALSE;
+                            memset(metadata[meta_index].meta_tag, 0,64);
+                            string_size = (size_t) strlen(real_token_buffer);
+                            if (string_size <= 0){
+                                printf("ERROR: tag size min\n");
+                                exit(1);
+                            }
+                            if (string_size >= 64){
+                                printf("ERROR: tag size max\n");
+                                exit(1);
+                            }
+                            strncpy(
+                                metadata[meta_index].meta_tag,
+                                real_token_buffer,
+                                string_size );
+                            metadata[meta_index].tag_size = (size_t) string_size;
                         }
                         //----------------------------------------------------
                         
@@ -1973,7 +1973,10 @@ int parse(int dump_output)
                         // Não sabemos se real_token_buffer é 
                         // código ou dados ?? 
 
-                        // O que vem depois do symbol ?
+                        //#debug
+                        //printf("[token]\n");
+
+                        // O que vem depois do symbol?
                         token = yylex();
 
                        // printf("test={%s} line %d\n", real_token_buffer, lineno ); 
@@ -1989,11 +1992,13 @@ int parse(int dump_output)
  
                         if (token == TK_SEPARATOR)
                         {
+                            printf("Separator after a symbol\n");
+
                             // ':' O separador é uma label.
                             if ( strncmp ( (char *) real_token_buffer, ":", 1 ) == 0 )
                             {
-                                emit_label ();     
-                                State = 1;
+                                emit_label();     
+                                State=1;
                                 break;
                             }
 
@@ -2003,8 +2008,8 @@ int parse(int dump_output)
                             if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                             {
                                 parentheses_inside++;
-                                emit_function ();
-                                State = 1;
+                                emit_function();
+                                State=1;
                                 break;
                             }
 
@@ -2388,13 +2393,15 @@ static int __parserInit(void)
 {
     register int i=0;
 
-    infile_size = 0;
-    outfile_size = 0;
+    infile_size=0;
+    outfile_size=0;
 
 // Stack support
     stack_flag = 0;
     stack_count = 0;
     stack_index = 0;
+
+    meta_index=0;
 
     for ( i=0; i<ID_MAX; i++ )       { id[i] = 0;          };
     for ( i=0; i<CONSTANT_MAX; i++ ) { constant[i] = 0;    };
