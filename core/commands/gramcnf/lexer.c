@@ -380,7 +380,7 @@ again:
         case 0:
             //printf ("yylex: 0 or EOF\n");
             eofno++; 
-            value = TOKENEOF;
+            value = TK_EOF;
             lexer_lastline = lineno;  // Last line?
             lexer_number_of_lines = lexer_lastline;
             return (int) (value);
@@ -446,7 +446,7 @@ again:
             // O identificador pode ser um nome de função ou uma variável.
             // Mas vamos comparar com palavras reservadas.
             // Caso seja uma das palavras reservadas, então deixamos de ser um identificador.
-            value = TOKENIDENTIFIER;
+            value = TK_IDENTIFIER;
 
             // Reserved?
             // Determinamos que era um identificador,
@@ -459,31 +459,31 @@ again:
             if ( strncmp( real_token_buffer, "signed", 6 ) == 0 )
             {
                 keyword_found  = KWSIGNED;
-                value          = TOKENMODIFIER;
+                value          = TK_MODIFIER;
                 modifier_found = MSIGNED;
             }
             if ( strncmp( real_token_buffer, "unsigned", 8 ) == 0 )
             {
                 keyword_found  = KWUNSIGNED;
-                value          = TOKENMODIFIER;
+                value          = TK_MODIFIER;
                 modifier_found = MUNSIGNED;
             }
             if ( strncmp( real_token_buffer, "inline", 6 ) == 0 )
             {
                 keyword_found  = KWINLINE;
-                value          = TOKENMODIFIER;
+                value          = TK_MODIFIER;
                 modifier_found = MINLINE;
             }
             if ( strncmp( real_token_buffer, "static", 6 ) == 0 )
             {
                 keyword_found  = KWSTATIC;
-                value          = TOKENMODIFIER;
+                value          = TK_MODIFIER;
                 modifier_found = MSTATIC;
             }
             if ( strncmp( real_token_buffer, "volatile", 8 ) == 0  )
             {
                 keyword_found  = KWVOLATILE;
-                value          = TOKENMODIFIER;
+                value          = TK_MODIFIER;
                 modifier_found = MVOLATILE;
             }
 
@@ -492,55 +492,55 @@ again:
             if ( strncmp( real_token_buffer, "void", 4 ) == 0 )
             {
                 keyword_found = KWVOID;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TVOID;
             }
             if ( strncmp( real_token_buffer, "char", 4 ) == 0 )
             {
                 keyword_found = KWCHAR;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TCHAR;
             }
             if ( strncmp( real_token_buffer, "short", 5 ) == 0 )
             {
                 keyword_found = KWSHORT;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TSHORT;
             }
             if ( strncmp( real_token_buffer, "int", 3 ) == 0 )
             {
                 keyword_found = KWINT;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TINT;
             }
             if ( strncmp( real_token_buffer, "long", 4 ) == 0 )
             {
                 keyword_found = KWLONG;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TLONG;
             }
             if ( strncmp( real_token_buffer, "meta", 4 ) == 0 )
             {
                 keyword_found = KWMETA;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TMETA;
             }
             if ( strncmp( real_token_buffer, "def", 3 ) == 0 )
             {
                 keyword_found = KWDEF;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TDEF;
             }
             if ( strncmp( real_token_buffer, "var", 3 ) == 0  )
             {
                 keyword_found = KWVAR;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TVAR;
             }
             if ( strncmp( real_token_buffer, "let", 3 ) == 0  )
             {
                 keyword_found = KWLET;
-                value         = TOKENTYPE;
+                value         = TK_TYPE;
                 type_found    = TLET;
             }
 
@@ -549,87 +549,87 @@ again:
             if ( strncmp( real_token_buffer, "name", 4 ) == 0 )
             {
                 keyword_found = KWNAME;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "content", 7 ) == 0 )
             {
                 keyword_found = KWCONTENT;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "goto", 4 ) == 0 )
             {
                 keyword_found = KWGOTO;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "return", 6 ) == 0 )
             {
                 keyword_found = KWRETURN;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "switch", 6 ) == 0 )
             {
                 keyword_found = KWSWITCH;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "case", 4 ) == 0 )
             {
                 keyword_found = KWCASE;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "default", 7 ) == 0 )
             {
                 keyword_found = KWDEFAULT;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "for", 3 ) == 0 )
             {
                 keyword_found = KWFOR;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "continue", 8 ) == 0 )
             {
                 keyword_found = KWCONTINUE;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "do", 2 ) == 0 )
             {
                 keyword_found = KWDO;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "while", 5 ) == 0 )
             {
                 keyword_found = KWWHILE;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "if", 2 ) == 0 )
             {
                 keyword_found = KWIF;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "else", 4 ) == 0 )
             {
                 keyword_found = KWELSE;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "union", 5 ) == 0 )
             {
                 keyword_found = KWUNION;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "struct", 6 ) == 0 )
             {
                 keyword_found = KWSTRUCT;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "enum", 4 ) == 0 )
             {
                 keyword_found = KWENUM;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
             if ( strncmp( real_token_buffer, "sizeof", 6 ) == 0 )
             {
                 keyword_found = KWSIZEOF;
-                value         = TOKENKEYWORD;
+                value         = TK_KEYWORD;
             }
 
             //...
@@ -668,7 +668,7 @@ again:
                             *p = 0;
                              ungetc ( c, finput );
                             //fim
-                            value = TOKENCONSTANT;
+                            value = TK_CONSTANT;
                             //constant_type_found = //#todo tem que contar. 
                             constant_base_found = CONSTANT_BASE_HEX;
                             goto constant_done;
@@ -700,7 +700,7 @@ again:
 						//fim
 						*p = 0;
 						ungetc(c, finput);
-						value = TOKENCONSTANT;
+						value = TK_CONSTANT;
 						//constant_type_found = //#todo tem que contar. 
 						constant_base_found = CONSTANT_BASE_DEC;
                         goto constant_done;
@@ -751,7 +751,7 @@ again:
 
             // Avisa que é uma string
             // Ela vai estar no token_buffer.
-            value = TOKENSTRING;
+            value = TK_STRING;
             break;
         };
 
@@ -767,7 +767,7 @@ again:
             p = token_buffer;
             *p++ = c;
             *p++ = 0;
-            value = TOKENSEPARATOR;
+            value = TK_SEPARATOR;
             break;
 
         //usadas em expressões matemáticas, 
@@ -798,8 +798,8 @@ again:
                 case '^':  lexer_code = BIT_XOR_EXPR;     break;
 
                 // ?
-                case LSHIFT:  lexer_code = LSHIFT_EXPR;  break;
-                case RSHIFT:  lexer_code = RSHIFT_EXPR;  break;
+                case TK_LSHIFT:  lexer_code = LSHIFT_EXPR;  break;
+                case TK_RSHIFT:  lexer_code = RSHIFT_EXPR;  break;
 
                 case '<':  lexer_code = LT_EXPR;  break;
                 case '>':  lexer_code = GT_EXPR;  break;
@@ -812,49 +812,49 @@ again:
                 switch (c)
                 {
                     case '<':
-                        value = ARITHCOMPARE;  //?
+                        value = TK_ARITHCOMPARE;  //?
                         lexer_code = LE_EXPR; 
                         goto done;
                     case '>':
-                        value = ARITHCOMPARE;  //?
+                        value = TK_ARITHCOMPARE;  //?
                         lexer_code = GE_EXPR; 
                         goto done;
                     case '!':
-                        value = EQCOMPARE;  //?
+                        value = TK_EQCOMPARE;  //?
                         lexer_code = NE_EXPR; 
                         goto done;
                     case '=':
-                        value = EQCOMPARE;  //?
+                        value = TK_EQCOMPARE;  //?
                         lexer_code = EQ_EXPR; 
                         goto done;
                 };
 
                 // ?
-                value = ASSIGN; 
+                value = TK_ASSIGN; 
                 goto done;
 
             }else if (c == c1){
 
                 switch (c)
                 {
-                    case '+':  value = PLUSPLUS;    goto done;
-                    case '-':  value = MINUSMINUS;  goto done;
-                    case '&':  value = ANDAND;      goto done;
-                    case '|':  value = OROR;        goto done;
+                    case '+':  value = TK_PLUSPLUS;    goto done;
+                    case '-':  value = TK_MINUSMINUS;  goto done;
+                    case '&':  value = TK_ANDAND;      goto done;
+                    case '|':  value = TK_OROR;        goto done;
                     
-                    case '<':  c = LSHIFT;  goto combine;
-                    case '>':  c = RSHIFT;  goto combine;
+                    case '<':  c = TK_LSHIFT;  goto combine;
+                    case '>':  c = TK_RSHIFT;  goto combine;
                 };
 
             }else if ((c == '-') && (c1 == '>')) {
-                value = POINTSAT; 
+                value = TK_POINTSAT; 
                 goto done; 
             };
 
             ungetc (c1, finput);
 
             if ((c == '<') || (c == '>'))
-                value = ARITHCOMPARE;
+                value = TK_ARITHCOMPARE;
             else value = c;
                 goto done;
         };

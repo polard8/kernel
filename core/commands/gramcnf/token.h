@@ -47,28 +47,31 @@ typedef enum {
 // value = token type.
 // Enumeração dos tipos de tokens.
 typedef enum {
-    TOKENNULL,
-    TOKENEOF,
-    TOKENKEYWORD,     // Reserved words.
-    TOKENIDENTIFIER,  // Function name, variable name.
-    TOKENCONSTANT,    // 10 20 0x1234 ... (literals?)
-    TOKENSTRING,      // "This is a string"
-    TOKENOPERATOR,    // math: + - * / % | & ^ =
-    TOKENSEPARATOR,   // Separators (){}[],.;:? ...
-    TOKENSPECIAL,     // O resto: $ # & <= >= -= += ! && || ++ -- \" \' ...
-    TOKENQUALIFIER,   // static volatile ... ? #todo?
-    TOKENMODIFIER,    // signed, unsigned ...
-    TOKENTYPE,
-    ARITHCOMPARE,
-    EQCOMPARE,
-    ASSIGN,           // =
-    PLUSPLUS,
-    MINUSMINUS,
-    ANDAND,
-    OROR,
-    LSHIFT,
-    RSHIFT,
-    POINTSAT
+
+// Token index.
+
+    TK_NULL,
+    TK_EOF,
+    TK_KEYWORD, // Reserved words.
+    TK_IDENTIFIER, // Function name, variable name.
+    TK_CONSTANT, // 10 20 0x1234 ... (literals?)
+    TK_STRING, // "This is a string"
+    TK_OPERATOR,  // math: + - * / % | & ^ =
+    TK_SEPARATOR, // Separators (){}[],.;:? ...
+    TK_SPECIAL, // O resto: $ # & <= >= -= += ! && || ++ -- \" \' ...
+    TK_QUALIFIER,  // static volatile ... ? #todo?
+    TK_MODIFIER, // signed, unsigned ...
+    TK_TYPE,
+    TK_ARITHCOMPARE,
+    TK_EQCOMPARE,
+    TK_ASSIGN,           // =
+    TK_PLUSPLUS,
+    TK_MINUSMINUS,
+    TK_ANDAND,
+    TK_OROR,
+    TK_LSHIFT,
+    TK_RSHIFT,
+    TK_POINTSAT
 }token_t;
 
 // ----------------------------------

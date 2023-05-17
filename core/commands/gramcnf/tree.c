@@ -466,14 +466,14 @@ unsigned long tree_eval(void)
     c = yylex();
 
     // EOF was found
-    if (c == TOKENEOF){
+    if (c == TK_EOF){
         printf ("tree_eval: #error EOF in line %d\n", lineno);
         exit(1);
     }
 
     // ';' was found. 
     // End of statement.
-    if (c == TOKENSEPARATOR)
+    if (c == TK_SEPARATOR)
     {
         if ( strncmp ( (char *) real_token_buffer, ";", 1 ) == 0  )
         {
@@ -489,7 +489,7 @@ unsigned long tree_eval(void)
         switch (c){
 
         // Constants: Números ou separadores.
-        case TOKENCONSTANT:
+        case TK_CONSTANT:
             exp_buffer[exp_offset] = (int) atoi(real_token_buffer);
             exp_offset++;
             // Depois de um número espera-se 
@@ -499,7 +499,7 @@ unsigned long tree_eval(void)
 
         // ';' separador no caso de return void.
         // para quando a expressão é depois do return.
-        case TOKENSEPARATOR:
+        case TK_SEPARATOR:
             if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
             {
                 goto done;
@@ -538,7 +538,7 @@ unsigned long tree_eval(void)
         // Separators
         // ')' provisório para terminar a expressão,
         // daí incluimos o finalizador provisório '?'
-        case TOKENSEPARATOR:
+        case TK_SEPARATOR:
             // ')'
             if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0  )
             {

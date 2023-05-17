@@ -120,18 +120,18 @@ static int parse_function(int token)
 //#endif
 
 // Se entramos errado.
-    if (token != TOKENIDENTIFIER){
+    if (token != TK_IDENTIFIER){
         printf ("parse_function: Can't initialize function statement\n");
         exit(1);
     }
 
 // #bugbug: We don't need this IF statemente here.
-    if (token == TOKENIDENTIFIER)
+    if (token == TK_IDENTIFIER)
     {
-        id[ID_TOKEN] = TOKENIDENTIFIER;
+        id[ID_TOKEN] = TK_IDENTIFIER;
         id[ID_STACK_OFFSET] = stack_index;
 
-	    //	printf ("parse_function: TOKENIDENTIFIER={%s} in line %d\n", 
+	    //	printf ("parse_function: TK_IDENTIFIER={%s} in line %d\n", 
 	    //	    real_token_buffer, lineno );
     }
 
@@ -147,10 +147,10 @@ static int parse_function(int token)
             case 1:
                 switch (c)
                 {
-                    case TOKENSEPARATOR:
+                    case TK_SEPARATOR:
                         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
-                            // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+                            // printf ("parse_function: TK_SEPARATOR={%s} in line %d\n", 
 	                        //     real_token_buffer, lineno );
                             State=2;
                         }
@@ -171,10 +171,10 @@ static int parse_function(int token)
                 switch (c)
                 {
                     // ')'
-                    case TOKENSEPARATOR:
+                    case TK_SEPARATOR:
                         if ( strncmp( (char *) real_token_buffer, ")", 1 ) == 0 )
                         {
-	                        // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+	                        // printf ("parse_function: TK_SEPARATOR={%s} in line %d\n", 
 	                        //    real_token_buffer, lineno ); 
                             State=3;
                         }
@@ -201,12 +201,12 @@ static int parse_function(int token)
                 {
                     // ';'
                     // Terminamos o statement function.
-                    case TOKENSEPARATOR:
+                    case TK_SEPARATOR:
                         if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
                         {
-	                        // printf ("parse_function: TOKENSEPARATOR={%s} in line %d\n", 
+	                        // printf ("parse_function: TK_SEPARATOR={%s} in line %d\n", 
 	                        //     real_token_buffer, lineno ); 
-                            return (int) TOKENSEPARATOR;
+                            return (int) TK_SEPARATOR;
                         }
                         break;
 
@@ -244,11 +244,11 @@ static int parse_name(int token)
     //printf("parse_asm: Initializing ...\n");
 
 // Se entramos errado.
-    if (token != TOKENKEYWORD){
+    if (token != TK_KEYWORD){
         printf ("parse_name: token error\n");  exit(1);
     }
-    if (token == TOKENKEYWORD){
-        // printf("parse_name: TOKENKEYWORD={%s} in line %d\n", 
+    if (token == TK_KEYWORD){
+        // printf("parse_name: TK_KEYWORD={%s} in line %d\n", 
         //     real_token_buffer, lineno );
     }
 
@@ -257,13 +257,13 @@ static int parse_name(int token)
 //
 
     c = yylex ();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf("parse_name: expected (\n");  exit(1);
     }
-    if (c == TOKENSEPARATOR){
+    if (c == TK_SEPARATOR){
         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
         {
-            // printf("parse_name: TOKENKEYWORD={%s} in line %d\n", 
+            // printf("parse_name: TK_KEYWORD={%s} in line %d\n", 
             //     real_token_buffer, lineno ); 
             //ok
             inside = 1;
@@ -276,10 +276,10 @@ static int parse_name(int token)
 //
 
     c = yylex();
-    if (c != TOKENSTRING){
+    if (c != TK_STRING){
         printf("parse_name: expected string in name("")\n");  exit(1);
     }
-    if (c == TOKENSTRING)
+    if (c == TK_STRING)
     {
         //if ( strncmp( (char *) real_token_buffer, "\"", 1 ) == 0 ){
             //ok
@@ -366,11 +366,11 @@ static int parse_content(int token)
     //printf("parse_asm: Initializing ...\n");
 
 // Se entramos errado.
-    if (token != TOKENKEYWORD){
+    if (token != TK_KEYWORD){
         printf ("parse_content: token error\n");  exit(1);
     }
-    if (token == TOKENKEYWORD){
-        // printf("parse_content: TOKENKEYWORD={%s} in line %d\n", 
+    if (token == TK_KEYWORD){
+        // printf("parse_content: TK_KEYWORD={%s} in line %d\n", 
         //     real_token_buffer, lineno );
     }
 
@@ -379,13 +379,13 @@ static int parse_content(int token)
 //
 
     c = yylex ();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf("parse_content: expected (\n");  exit(1);
     }
-    if (c == TOKENSEPARATOR){
+    if (c == TK_SEPARATOR){
         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
         {
-            // printf("parse_content: TOKENKEYWORD={%s} in line %d\n", 
+            // printf("parse_content: TK_KEYWORD={%s} in line %d\n", 
             //     real_token_buffer, lineno ); 
             //ok
             inside = 1;
@@ -398,10 +398,10 @@ static int parse_content(int token)
 //
 
     c = yylex();
-    if (c != TOKENSTRING){
+    if (c != TK_STRING){
         printf("parse_content: expected string in content("")\n");  exit(1);
     }
-    if (c == TOKENSTRING)
+    if (c == TK_STRING)
     {
         //if ( strncmp( (char *) real_token_buffer, "\"", 1 ) == 0 ){
             //ok
@@ -517,7 +517,7 @@ static int parse_if(int token)
 // Pega o próximo que deve ser um (.
 
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_if separator missed\n");  exit(1);
     }
 
@@ -537,17 +537,17 @@ static int parse_if(int token)
 
 // '{'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_if separator { missed\n");  exit(1);
     }
 // '}'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_if separator } missed\n");  exit(1);
     }
 // ';'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_if separator ; missed\n");  exit(1);
     }
 
@@ -675,7 +675,7 @@ static int parse_return(int token)
     printf ("parse_return: Initializing...\n");
 
 // Se entramos errado.
-    if ( token != TOKENKEYWORD || 
+    if ( token != TK_KEYWORD || 
          keyword_found != KWRETURN )
     {
         printf ("parse_return: Can't initialize return statement\n");
@@ -713,7 +713,7 @@ static int parse_return(int token)
     if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0 )
     {
         printf("parse_return: ';' found\n");
-        c = TOKENSEPARATOR;
+        c = TK_SEPARATOR;
         return c;
     }
 
@@ -742,14 +742,14 @@ static int parse_return(int token)
 			    switch(c)
 				{
 					//se encontramos a constante, o que segue é o separador ';' ou o separador ')'
-					case TOKENCONSTANT:
+					case TK_CONSTANT:
 #ifdef PARSER_VERBOSE
 						//ok;
-						printf ("parse_return: State1 TOKENCONSTANT={%s} line %d\n", 
+						printf ("parse_return: State1 TK_CONSTANT={%s} line %d\n", 
 						    real_token_buffer, lineno );
 #endif
 
-					    constant[CONSTANT_TOKEN] = TOKENCONSTANT;
+					    constant[CONSTANT_TOKEN] = TK_CONSTANT;
 						constant[CONSTANT_TYPE] = constant_type_found;
 						constant[CONSTANT_BASE] = constant_base_found;
 
@@ -777,11 +777,9 @@ static int parse_return(int token)
 						//encontramos uma constante dentro do parêntese,
 						//indicando que estamos um uma expressão.
 						break;
-					
-					
-                     
-					case TOKENSEPARATOR:
-	                    
+
+					case TK_SEPARATOR:
+
 						//iniciamos uma expressão ou condicional.
 						//uma árvore.
 						if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
@@ -816,14 +814,14 @@ static int parse_return(int token)
 							if (open == 0)
                             {
 								strcat( outfile,"\n  ret \n\n");
-								return (int) TOKENSEPARATOR;
-                            }								
+								return (int) TK_SEPARATOR;
+                            }
 						}
 						break;
-					
+
 				    //case identificador. (símbolo)
 					//significa que o return foi seguido de uma função.
-					case TOKENIDENTIFIER:
+					case TK_IDENTIFIER:
 					    //#todo Nesse momento podemos chamar a rotian qu trata uma função 
 						//function statement. function_parser
 						
@@ -834,7 +832,7 @@ static int parse_return(int token)
 						if ( open == 0 )
 						{
                             //vamos analizar uma chamada de função dentro de um statement de return.							
-						    return (int) parse_function ( TOKENIDENTIFIER );
+						    return (int) parse_function ( TK_IDENTIFIER );
 						}
 						
 						//#importante
@@ -860,17 +858,17 @@ static int parse_return(int token)
 			case 2:
 			    switch(c)
 				{
-					case TOKENSEPARATOR:
+					case TK_SEPARATOR:
 	                    if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
                         {
-#ifdef PARSER_RETURN_VERBOSE							
+#ifdef PARSER_RETURN_VERBOSE
 			                //deu certo.
-			                printf ("parse_return: State2 do_separator TOKENSEPARATOR={%s} line %d \n", 
+			                printf ("parse_return: State2 do_separator TK_SEPARATOR={%s} line %d \n", 
 							    real_token_buffer, lineno );
 #endif		                    
 							//Se encontramos o separador que finaliza o statement
 							//então podemos retornar.
-							return (int) TOKENSEPARATOR;
+							return (int) TK_SEPARATOR;
 		                }	
 					    break;
 						
@@ -898,16 +896,16 @@ do_constant:
 	c = yylex ();
 	
 
-	if ( c == TOKENCONSTANT)
+	if (c == TK_CONSTANT)
 	{
 		
 #ifdef PARSER_RETURN_VERBOSE		
-	    printf ("parse_return: do_constant TOKENCONSTANT={%s} line %d\n", 
+	    printf ("parse_return: do_constant TK_CONSTANT={%s} line %d\n", 
 		    real_token_buffer, lineno );	
 #endif
-		constant[CONSTANT_TOKEN] = TOKENCONSTANT;
+		constant[CONSTANT_TOKEN] = TK_CONSTANT;
 		constant[CONSTANT_TYPE] = constant_type_found;
-		constant[CONSTANT_BASE] = constant_base_found;	
+		constant[CONSTANT_BASE] = constant_base_found;
 	
 	} else {
 			//falhou.
@@ -924,14 +922,14 @@ do_separator:
     
 	//separador ';'
 	//isso finaliza o statement.
-	if( c == TOKENSEPARATOR )
+	if (c == TK_SEPARATOR)
     {
 	    if( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  )
         {
 
 #ifdef PARSER_RETURN_VERBOSE
 			//deu certo.
-			printf("parse_return: do_separator TOKENSEPARATOR={%s} line %d \n", 
+			printf("parse_return: do_separator TK_SEPARATOR={%s} line %d \n", 
 			    real_token_buffer, lineno );
 #endif		  
 		  
@@ -964,7 +962,7 @@ static unsigned long parse_sizeof(int token)
     int State = 1;
     int running = 1;
 
-    if (c != TOKENKEYWORD){
+    if (c != TK_KEYWORD){
         printf("parse_sizeof: fail");  exit(1);
     }
  
@@ -979,7 +977,7 @@ static unsigned long parse_sizeof(int token)
             // (
             case 1:
                 printf("parse_sizeof: State 1\n");
-                if (c == TOKENSEPARATOR){
+                if (c == TK_SEPARATOR){
                     State=2;  break;
                 }
                 printf("parse_sizeof: State 1 fail");
@@ -993,7 +991,7 @@ static unsigned long parse_sizeof(int token)
 				printf("parse_sizeof: State 2\n");
 				//#todo modifier 
 				//if ...
-			    if (c == TOKENTYPE)
+			    if (c == TK_TYPE)
 				{
 					switch (type_found)
 					{
@@ -1022,7 +1020,7 @@ static unsigned long parse_sizeof(int token)
             // )
             case 3:
                 printf("parse_sizeof: State 3\n");
-                if (c == TOKENSEPARATOR)
+                if (c == TK_SEPARATOR)
                 {
 					goto done;
 					//State = 2;
@@ -1058,7 +1056,7 @@ static int parse_while(int token)
 
 // Pega o próximo que deve ser um (
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_while separator missed\n");
         exit(1);
     }
@@ -1070,17 +1068,17 @@ static int parse_while(int token)
 
 // '{'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_while separator { missed\n");  exit(1);
     }
 // '}'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_while separator } missed\n");  exit(1);
     }
 // ';'
     c = yylex();
-    if (c != TOKENSEPARATOR){
+    if (c != TK_SEPARATOR){
         printf ("parse_while separator ; missed\n");  exit(1);
     }
 
@@ -1119,10 +1117,10 @@ static unsigned long parse_expression(int token)
     switch (c)
     {
         // (
-        case TOKENSEPARATOR:
+        case TK_SEPARATOR:
             if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
             {
-                // printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+                // printf("parse_expression: TK_SEPARATOR={%s} in line %d\n", 
                 //     real_token_buffer, lineno ); 
                 //State = 2;
             }
@@ -1155,8 +1153,7 @@ static unsigned long parse_expression(int token)
 		//voltando sem pegar.
 		again:
 		
-		
-		if( c == TOKENEOF )
+		if (c == TK_EOF)
 		{
             printf("parse_expression: #error EOF \n");
             exit(1);			
@@ -1174,11 +1171,11 @@ static unsigned long parse_expression(int token)
 			    switch(c)
 				{
 					
-					case TOKENSEPARATOR:
+					case TK_SEPARATOR:
 	                    if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
 						{
 #ifdef PARSER_EXPRESSION_VERBOSE
-						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+						    printf("parse_expression: TK_SEPARATOR={%s} in line %d\n", 
 							    real_token_buffer, lineno ); 
 #endif							
 							//State = 1;	
@@ -1188,7 +1185,7 @@ static unsigned long parse_expression(int token)
 						{
 							
 #ifdef PARSER_EXPRESSION_VERBOSE
-						    printf("parse_expression: TOKENSEPARATOR={%s} in line %d\n", 
+						    printf("parse_expression: TK_SEPARATOR={%s} in line %d\n", 
 							    real_token_buffer, lineno );
 #endif								
 							//State = 1;
@@ -1199,10 +1196,10 @@ static unsigned long parse_expression(int token)
 						}
 					    break;
 
-					case TOKENCONSTANT:
+					case TK_CONSTANT:
 						//ok;
 #ifdef PARSER_EXPRESSION_VERBOSE
-						printf ("parse_expression: State1 TOKENCONSTANT={%s} line %d\n", 
+						printf ("parse_expression: State1 TK_CONSTANT={%s} line %d\n", 
 						    real_token_buffer, lineno );
 #endif
 
@@ -1235,7 +1232,7 @@ static unsigned long parse_expression(int token)
 							case 1:
 #ifdef PARSER_EXPRESSION_VERBOSE
 						        printf("eCount-case-1:\n");
-								printf ("parse_expression: State1 error unexpected operator element TOKENCONSTANT={%s} line %d\n", 
+								printf ("parse_expression: State1 error unexpected operator element TK_CONSTANT={%s} line %d\n", 
 						            real_token_buffer, lineno );
 #endif                                
 								exit(1); 
@@ -1323,7 +1320,7 @@ static unsigned long parse_expression(int token)
 								
 								//Ok temos um sepador
 								//vamos tratá-lo
-								if ( c == TOKENSEPARATOR )
+								if (c == TK_SEPARATOR)
 								{
 									State = 1;
 								    goto again;
@@ -1339,22 +1336,22 @@ static unsigned long parse_expression(int token)
 							    break;
 								
 							default:
-						        printf ("parse_expression: State1 error #default TOKENCONSTANT={%s} line %d\n", 
+						        printf ("parse_expression: State1 error #default TK_CONSTANT={%s} line %d\n", 
 						            real_token_buffer, lineno );
 								exit(1);
 							    break;
 						};
 						break;
 						
-					case TOKENIDENTIFIER:
-						printf ("parse_expression: State1 #todo TOKENIDENTIFIER={%s} line %d\n", 
+					case TK_IDENTIFIER:
+						printf ("parse_expression: State1 #todo TK_IDENTIFIER={%s} line %d\n", 
 						    real_token_buffer, lineno );
 					    //State = 2;
 						exit(1);
 						break;
 						
 					//sizeof	
-					case TOKENKEYWORD:
+					case TK_KEYWORD:
 					    if (keyword_found == KWSIZEOF)
 						{
 							
@@ -1363,20 +1360,20 @@ static unsigned long parse_expression(int token)
 #endif						   
 						    //#bugbug
 							//não sabemos se é a primeira ou a segunda constante.
-							sizeof_constant = (unsigned long) parse_sizeof (TOKENKEYWORD);
+							sizeof_constant = (unsigned long) parse_sizeof (TK_KEYWORD);
 							sizeof_flag = 1;
 							
 #ifdef PARSER_EXPRESSION_VERBOSE
 							printf("SIZEOF={%d}\n", sizeof_constant );
 #endif 
 							
-							c = TOKENCONSTANT; //transformamos a keyword em constant.
+							c = TK_CONSTANT; //transformamos a keyword em constant.
 							State = 1;
 							goto again;
 							//eCount++;
 							
 							//c = yylex();
-							//if ( c == TOKENSEPARATOR )
+							//if (c == TK_SEPARATOR)
 							//{
 							//	State = 1;
 							//    goto again;
@@ -1495,10 +1492,10 @@ static unsigned long parse_expression(int token)
 						State = 1;
 						break;
 
-					case ARITHCOMPARE:
+					case TK_ARITHCOMPARE:
 					
 #ifdef PARSER_EXPRESSION_VERBOSE	
-					    printf("parse_expression: State 2 ARITHCOMPARE{%s} lexer_code=%d \n", 
+					    printf("parse_expression: State 2 TK_ARITHCOMPARE{%s} lexer_code=%d \n", 
 						    real_token_buffer, lexer_code );
 #endif					    
 						if ( eCount != 1 )
@@ -1532,7 +1529,7 @@ static unsigned long parse_expression(int token)
 							///...	
 								
 							default:
-							    printf("parse_expression: State 2 error ARITHCOMPARE default lexer_code=%d in line %d \n", 
+							    printf("parse_expression: State 2 error TK_ARITHCOMPARE default lexer_code=%d in line %d \n", 
 								    lexer_code, lineno );
 							    exit(1); //die();
 								//State = 1;
@@ -1542,9 +1539,9 @@ static unsigned long parse_expression(int token)
 						break;
 					   
 				    
-					case EQCOMPARE:
+					case TK_EQCOMPARE:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					    printf("parse_expression: State 2 EQCOMPARE{%s} lexer_code=%d \n", 
+					    printf("parse_expression: State 2 TK_EQCOMPARE{%s} lexer_code=%d \n", 
 						    real_token_buffer, lexer_code );
 #endif						
 						switch (lexer_code)
@@ -1565,7 +1562,7 @@ static unsigned long parse_expression(int token)
 								break;							
 							
 							default:
-							    printf("parse_expression: State 2 error EQCOMPARE default lexer_code=%d in line %d \n", 
+							    printf("parse_expression: State 2 error TK_EQCOMPARE default lexer_code=%d in line %d \n", 
 								    lexer_code, lineno );
 							    //exit(1); //die();
 								State = 1;
@@ -1574,67 +1571,65 @@ static unsigned long parse_expression(int token)
                         };						
 					    break;
 					   
-					case ASSIGN:
+					case TK_ASSIGN:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-                        printf("parse_expression: State 2 ASSIGN{%s} lexer_code=%d \n",  
+                        printf("parse_expression: State 2 TK_ASSIGN{%s} lexer_code=%d \n",  
 						    real_token_buffer, lexer_code );
 #endif						
 						State = 1;
 						break;					
 					   
-					case PLUSPLUS:
+					case TK_PLUSPLUS:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 PLUSPLUS{%s} lexer_code=%d \n",  
+					   printf("parse_expression: State 2 TK_PLUSPLUS{%s} lexer_code=%d \n",  
 					       real_token_buffer, lexer_code );
 #endif					   
 					   State = 1;
 					   break;
 					   
-					case MINUSMINUS:
+					case TK_MINUSMINUS:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 MINUSMINUS{%s} lexer_code=%d \n", 
+					   printf("parse_expression: State 2 TK_MINUSMINUS{%s} lexer_code=%d \n", 
 					       real_token_buffer, lexer_code );
 #endif					   
 					   State = 1;
 					   break;
-					   
-					case ANDAND:
+
+					case TK_ANDAND:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 ANDAND{%s} lexer_code=%d \n",  
+					   printf("parse_expression: State 2 TK_ANDAND{%s} lexer_code=%d \n",  
 					       real_token_buffer, lexer_code );
 #endif					   
 					   State = 1;
 					   break;
-					   
-					case OROR:
+
+					case TK_OROR:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 OROR{%s} lexer_code=%d \n",  
+					   printf("parse_expression: State 2 TK_OROR{%s} lexer_code=%d \n",  
 					       real_token_buffer, lexer_code );
 #endif					   
 					   State = 1;
 					   break;
-					   
-					   
-					case POINTSAT:
-#ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 POINTSAT{%s} lexer_code=%d \n", 
+
+					case TK_POINTSAT:
+#ifdef PARSER_EXPRESSION_VERBOSE
+					   printf("parse_expression: State 2 TK_POINTSAT{%s} lexer_code=%d \n", 
 					       real_token_buffer, lexer_code );
 #endif
 					   State = 1;
 					   break;
 					   
-					case LSHIFT:
+					case TK_LSHIFT:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf("parse_expression: State 2 LSHIFT{%s} lexer_code=%d \n", 
+					   printf("parse_expression: State 2 TK_LSHIFT{%s} lexer_code=%d \n", 
 					       real_token_buffer, lexer_code );
 #endif
 					   State = 1;
 					   break;
-					   
-					   
-					case RSHIFT:
+
+					case TK_RSHIFT:
 #ifdef PARSER_EXPRESSION_VERBOSE						
-					   printf ("parse_expression: State 2 RSHIFT{%s} lexer_code=%d \n", 
+					   printf ("parse_expression: State 2 TK_RSHIFT{%s} lexer_code=%d \n", 
 					       real_token_buffer, lexer_code );
 #endif					   
 					   State = 1;
@@ -1742,7 +1737,7 @@ int parse(int dump_output)
     while (running == 1){
         // Get a token from lexer.
         token = yylex();
-        if (token == TOKENEOF){ running=0; break; }
+        if (token == TK_EOF){ running=0; break; }
 
         again:
 
@@ -1768,11 +1763,11 @@ int parse(int dump_output)
             case 1:
                 switch (token)
                 {
-                    case TOKENMODIFIER:
+                    case TK_MODIFIER:
                         //#ifdef PARSER_VERBOSE
                         //continua pois precisamos pegar um tipo.
                         //#bugbug ??mas e se o modificar vir seguido de um simbolo ???
-                        //printf("State1: TOKENMODIFIER={%s} line %d\n", 
+                        //printf("State1: TK_MODIFIER={%s} line %d\n", 
                         //   real_token_buffer, lineno );
                         //#endif
                         State = 1;
@@ -1782,7 +1777,7 @@ int parse(int dump_output)
                     // TYPE
                     // >>> peekChar=) significa marcação de tipagem.
                     // >>> peekSymbol=symbol  significa declaração de variável ou função.
-                    case TOKENTYPE:
+                    case TK_TYPE:
                         id[ID_TYPE] = type_found;
                         if (type_found == TMETA){
                             printf ("meta: Line %d\n",lineno);
@@ -1795,8 +1790,8 @@ int parse(int dump_output)
                     // #bugbug
                     // e se o arquivo começar com um separador, 
                     // então teremos problema.
-                    case TOKENSEPARATOR:
-                        //printf("State1: TOKENSEPARATOR={%s} line %d\n", real_token_buffer, lineno );
+                    case TK_SEPARATOR:
+                        //printf("State1: TK_SEPARATOR={%s} line %d\n", real_token_buffer, lineno );
                         // ( função
                         if ( strncmp( (char *) real_token_buffer, "(", 1 ) == 0  )
                         {
@@ -1899,7 +1894,7 @@ int parse(int dump_output)
 							goto debug_output;
 						}
                         // EOF 
-                        if (token == TOKENEOF){
+                        if (token == TK_EOF){
                             printf ("State1: eof\n");
                             goto debug_output; 
                         }
@@ -1926,13 +1921,13 @@ int parse(int dump_output)
 					// peekChar = ; //estamos finalizando um goto ou um return.
 					// peekChar = , //estamos listando variáveis.
                     
-                    case TOKENIDENTIFIER:
+                    case TK_IDENTIFIER:
 
                         //#ifdef PARSER_VERBOSE
-                        //    printf("State2: TOKENIDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
+                        //    printf("State2: TK_IDENTIFIER={%s} line %d\n", real_token_buffer, lineno );    
                         //#endif 
 
-                        id[ID_TOKEN] = TOKENIDENTIFIER;
+                        id[ID_TOKEN] = TK_IDENTIFIER;
                         id[ID_STACK_OFFSET] = stack_index;
 
                         // Salva o símbolo. #isso funciona.
@@ -1992,9 +1987,8 @@ int parse(int dump_output)
                         // valor numérico.
                         // ... 
  
-                        if ( token == TOKENSEPARATOR )
+                        if (token == TK_SEPARATOR)
                         {
-
                             // ':' O separador é uma label.
                             if ( strncmp ( (char *) real_token_buffer, ":", 1 ) == 0 )
                             {
@@ -2119,7 +2113,7 @@ int parse(int dump_output)
 							
                         } // Fim o IF token==separator.
 
-                        printf ("state2: TOKENIDENTIFIER fail\n");
+                        printf ("state2: TK_IDENTIFIER fail\n");
                         exit(1);
 
 						//tentando mandar alguma coisa para o arquivo de output 
@@ -2168,7 +2162,7 @@ int parse(int dump_output)
                     //peekChar=: depois do default.(obrigatório)
                     //peekChar=( depois do switch, if, while ...
  
-                    case TOKENKEYWORD:
+                    case TK_KEYWORD:
                     
                         // Hub para qualquer stmt.
                         //parse_stmt ();
@@ -2180,14 +2174,14 @@ int parse(int dump_output)
                         if ( keyword_found == KWRETURN )
                         {
                             // #debug.
-                            // printf ("State3: TOKENKEYWORD={%s} KWRETURN, line %d \n", 
+                            // printf ("State3: TK_KEYWORD={%s} KWRETURN, line %d \n", 
                                 //real_token_buffer, lineno );
 
-                            token = parse_return (TOKENKEYWORD);
+                            token = parse_return(TK_KEYWORD);
                             // EXpected: ';'
-                            if ( token != TOKENSEPARATOR )
+                            if (token != TK_SEPARATOR)
                             {
-                                printf ("State3: TOKENKEYWORD TOKENSEPARATOR fail\n");
+                                printf ("State3: TK_KEYWORD TK_SEPARATOR fail\n");
                                 exit (1);
                             }
                             State = 1;
@@ -2209,10 +2203,10 @@ int parse(int dump_output)
                         // STMT: if
                         if (keyword_found == KWIF)
                         {
-                            //printf ("State3: TOKENKEYWORD={%s} KWIF in line %d \n", 
+                            //printf ("State3: TK_KEYWORD={%s} KWIF in line %d \n", 
                                 //real_token_buffer, lineno );
                                 
-                            If_Result = (int) parse_if(TOKENKEYWORD);
+                            If_Result = (int) parse_if(TK_KEYWORD);
                          
                             // printf("IF-RESULT={%d}\n",If_Result);
                             State = 1;
@@ -2222,7 +2216,7 @@ int parse(int dump_output)
                         // STMT: while 
                         if (keyword_found == KWWHILE)
                         {
-                            While_Result = (int) parse_while (TOKENKEYWORD);
+                            While_Result = (int) parse_while(TK_KEYWORD);
                             //  printf("WHILE-RESULT={%d}\n",While_Result);
                             State = 1;
                             break;
@@ -2232,9 +2226,9 @@ int parse(int dump_output)
                         // STMT: 'name'
                         if (keyword_found == KWNAME)
                         {
-                            //printf ("State3: TOKENKEYWORD={%s} KWNAME in line %d \n", 
+                            //printf ("State3: TK_KEYWORD={%s} KWNAME in line %d \n", 
                             //    real_token_buffer, lineno );
-                            parse_name(TOKENKEYWORD);
+                            parse_name(TK_KEYWORD);
                             //recomeçamos
                             State = 1;
                             break;
@@ -2244,9 +2238,9 @@ int parse(int dump_output)
                         // STMT: 'content'
                         if (keyword_found == KWCONTENT)
                         {
-                            //printf ("State3: TOKENKEYWORD={%s} KWCONTENT in line %d \n", 
+                            //printf ("State3: TK_KEYWORD={%s} KWCONTENT in line %d \n", 
                             //    real_token_buffer, lineno );
-                            parse_content(TOKENKEYWORD);
+                            parse_content(TK_KEYWORD);
                             //recomeçamos
                             State = 1;
                             break;
@@ -2290,7 +2284,7 @@ int parse(int dump_output)
             case 4:
                 switch (token)
                 {
-                    case TOKENSEPARATOR:
+                    case TK_SEPARATOR:
                         // ';'
                         if ( strncmp( (char *) real_token_buffer, ";", 1 ) == 0  ){
                             //ok #todo
