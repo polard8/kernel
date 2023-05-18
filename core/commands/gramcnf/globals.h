@@ -8,8 +8,8 @@
 // a single structure.
 struct metadata_d
 {
-    int initialized;
     int id;
+    int initialized;
 
     char meta_tag[64];
     size_t tag_size;

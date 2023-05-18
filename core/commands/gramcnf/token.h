@@ -101,12 +101,10 @@ typedef enum {
 
 // Enumeração dos qualificadores.
 typedef enum {
-
     QNULL,
     QVOLATILE,
     QSTATIC
     //...
-
 }qualifiers_t;
  
 // String s passadas para o parser.
@@ -124,19 +122,21 @@ typedef enum {
 // -- Lists --------
 // 
 
+
+// See:
+// globals.c
+//#define TOKENLIST_MAX_DEFAULT  80
 #define TLIMIT  80
-
 // Uma pilha para todos os tokens.
-char *TOKENLIST[TLIMIT];
-
+extern char *TOKENLIST[TLIMIT];
 //Essas listas são pilhas para diferentes tipos de tokens. 
-char *KEYWORDLIST[TLIMIT]; 
-char *IDENTIFIERLIST[TLIMIT]; 
-char *CONSTANTLIST[TLIMIT]; 
-char *STRINGLIST[TLIMIT]; 
-char *SEPARATORLIST[TLIMIT]; 
-char *SPECIALLIST[TLIMIT]; 
- 
+extern char *KEYWORDLIST[TLIMIT]; 
+extern char *IDENTIFIERLIST[TLIMIT]; 
+extern char *CONSTANTLIST[TLIMIT]; 
+extern char *STRINGLIST[TLIMIT]; 
+extern char *SEPARATORLIST[TLIMIT]; 
+extern char *SPECIALLIST[TLIMIT]; 
+
 
 /* 
  all identifiers that are not reserved words

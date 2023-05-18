@@ -110,8 +110,18 @@ static int gramcnf_initialize(void)
     program.function_list = NULL;
     //...
 
-// #test
-// initializing the 
+
+// Initializing the metadata structure.
+// See: globals.h and globals.c
+
+    for (i=0; i<32; i++)
+    {
+        metadata[i].id = 0;
+        metadata[i].initialized = FALSE;
+        metadata[i].tag_size = 0;
+        metadata[i].name_size = 0;
+        metadata[i].content_size = 0;
+    };
 
     return (int) Status;
 }
@@ -149,7 +159,7 @@ static void debugShowStat(void)
         if (metadata[i].initialized == TRUE)
         {
             printf("\n");
-            printf ("id{%d}: tag{%s} name{%s} content{%s}\n",
+            printf("id{%d}: tag{%s} name{%s} content{%s}\n",
                 metadata[i].id,
                 metadata[i].meta_tag,
                 metadata[i].name,

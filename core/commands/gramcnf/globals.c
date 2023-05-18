@@ -3,9 +3,7 @@
 
 #include "gramcnf.h"
 
-
 struct metadata_d  metadata[32];
-
 
 // -- Counters --------
 // Contador para não estourar a lista. 
@@ -70,5 +68,18 @@ int temp_filename_length=0;
 char *temp_filename;
 
 struct temp_file *temp_file_queue;
+
+//-----------
+
+
+// Uma pilha para todos os tokens.
+char *TOKENLIST[TLIMIT];
+//Essas listas são pilhas para diferentes tipos de tokens. 
+char *KEYWORDLIST[TLIMIT]; 
+char *IDENTIFIERLIST[TLIMIT]; 
+char *CONSTANTLIST[TLIMIT]; 
+char *STRINGLIST[TLIMIT]; 
+char *SEPARATORLIST[TLIMIT]; 
+char *SPECIALLIST[TLIMIT]; 
 
 

@@ -4,12 +4,8 @@
 #ifndef __GDEF_H
 #define __GDEF_H    1
 
-
-
 #define LSH_TOK_DELIM  " \t\r\n\a" 
 #define SPACE  " "
-
-#define TOKENLIST_MAX_DEFAULT  80
 
 // ## ARQUIVOS PARA TESTE ##
 #define  STRING_CFILE  "int main(){\n"        \
@@ -18,7 +14,6 @@
 "    // this is a comment ...            \n"  \
 "    /* This is another comment ...  */  \n"  \
 "\t \n \n                                \n"
-
 
 //criar um simbolo
 //ele pode ser de uma variável ou uma função...
@@ -35,8 +30,5 @@
 //#define file_c "int main(){ return 1234; }\t"
 //...
 
-
-
 #endif    
-
 
