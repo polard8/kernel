@@ -1,0 +1,24 @@
+
+    Kernel Executive
+    Process, threads, Wrappers for major system routines
+    that can be used by all the other kernel subsystems.
+
+    Architectures:
+
+----------------------------------
+X86-64:
+    x86-64 (also known as x64, x86_64, AMD64, and Intel 64)
+    is a 64-bit version of the x86 instruction set, 
+    first released in 1999. It introduced two new modes of operation, 
+    64-bit mode and compatibility mode, along with a new 
+    4-level paging mode.
+see:
+https://en.wikipedia.org/wiki/X86-64
+
+----------------------------------
+IA-64:
+    IA-64 (Intel Itanium architecture) is the instruction set 
+    architecture (ISA) of the Itanium family 
+    of 64-bit Intel microprocessors. 
+see:
+https://en.wikipedia.org/wiki/IA-64

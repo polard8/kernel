@@ -1,0 +1,9 @@
+	
+	folders:
+
+	base/ Will be copied into the disk.
+	ge/ game engine.
+	setup/ setup the system.
+	games/ games.
+
+	

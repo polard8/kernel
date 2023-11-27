@@ -1,0 +1,31 @@
+
+// Set baud rate.
+// Baud Rate
+// The serial controller (UART) has an internal clock 
+// which runs at 115200 ticks per second and a clock divisor 
+// which is used to control the baud rate. 
+// This is exactly the same type of system used by 
+// the Programmable Interrupt Timer (PIT).
+// In order to set the speed of the port, 
+// calculate the divisor required for the given baud rate and 
+// program that in to the divisor register. 
+// For example, a divisor of 1 will give 115200 baud, 
+// a divisor of 2 will give 57600 baud, 3 will give 38400 baud, etc.
+// Do not be tempted to use a divisor of 0.
+// =============
+// To set the divisor to the controller:
+// > Set the most significant bit of the Line Control Register. 
+//   This is the DLAB bit, 
+//   and allows access to the divisor registers.
+// > Send the least significant byte of the divisor value to [PORT + 0].
+// > Send the most significant byte of the divisor value to [PORT + 1].
+// > Clear the most significant bit of the Line Control Register. 
+// #define LCR  3
+// See: serial.h
+// credits: https://wiki.osdev.org/Serial_Ports
+
+// In the next command we will clear the msb of the LCR.
+// Line Protocol
+// These days you could consider 
+// 8N1 (8 bits, no parity, one stop bit) pretty much the default. 
+// 8 bits, no parity, one stop bit

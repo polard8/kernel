@@ -1,0 +1,42 @@
+
+	Kernel-mode callable interfaces.
+	These functions are wrappers for the kernel-mode service
+implementation.
+	These are the prefixes used for now.
+	#todo: We need a better standard for that.
+-------------
+sys_xxxxx:
+	These routines are called by the syscalls 0x80 and 0x82.
+	See: 
+	sys.c 
+	zcall/sys/sci0.h 
+	zcall/sys/sci1.h 
+	zcall/sys/sci2.h
+	zcall/sys/syscalls.h 
+------------
+zero_xxxxx:
+	These routines are called during the kernel initialization.
+	Maybe we need a better name for this prefix. zi_xxxx maybe.
+	see: 
+	zero.c 
+	zcall/zero/zero.h
+------------
+newos_xxxx:
+	These are callable kernel0mode interface.
+	These routines are used by the kernel, but maybe 
+	they can be used by the ring0 modules.
+	see: 
+	zcall/newos/newos.h 
+	sci.c
+
+-----------------
+#todo
+    Each one of these prefixes needs 
+    to have its own folder, where we're gonna
+    put the files where we have the apis.
+    
+
+
+
+	
+	

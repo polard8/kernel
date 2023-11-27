@@ -1,0 +1,8 @@
+
+	Creating a thread object:
+
+	We need a two routines and a wrapper ...
+	The first routine will create the objet itself and
+	setup all the machine independent elements.
+	The second one will setup all the machine dependent elements.
+

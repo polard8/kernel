@@ -1,0 +1,18 @@
+// Copia para a tty que estamos conectados.
+// Entao dependendo de quem esteja conectado com 
+// a tty de input, saberemos em que tty slave enviar os dados.
+// a tty de input podera se conectar com procesos diferentes.
+// A tty da thread em foreground tem que receber o input.
+// >>> o input vai para o terminal ativo,
+//     o terminal ativo tem uma tty que esta conectada
+//     com a tty slave ...
+//     Os dados vao para a tty slave ... pois o master eh um
+//     terminal.
+//     se a tty master for um terminal, entao os dados sao
+//     enviados para a tty slave.
+//     Se o tty for console, entao ela pode ou nao estar
+// conectada com um slave ... se estiver ... entao 
+// os dados vao para a tty slave ...
+// >>> diferentes processo podem se conectar com a tty de um console.
+//     entao a tty do console estara conectada com a tty do process.
+// 

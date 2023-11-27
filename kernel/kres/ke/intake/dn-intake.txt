@@ -1,0 +1,5 @@
+
+	Intake process
+
+    Receiving and dispatching the students right after a preemption.
+

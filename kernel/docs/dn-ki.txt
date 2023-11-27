@@ -1,0 +1,8 @@
+A sequencia de inicializaçao do kernel:
+Uma coisa que ninguem fala e' que depois de construida a 
+rotina de inicializaçao do kernel, fica bem dificil reorganizar a rotina ... 
+pois quando voce muda uma funçao da rotina para outro lugar na sequencia,
+ entao essa funcao pode nao ter disponivel todos os dados que ela usava 
+ quando estava na posiçao antiga na sequencia de inicializaçao. 
+Basicamente, os sistemas operacionais mantem a ordem da 
+sequencia de inicializaçao, eternamente.

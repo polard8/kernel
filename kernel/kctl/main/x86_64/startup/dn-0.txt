@@ -1,0 +1,28 @@
+
+-------------------------------------------------------
+	entrance - kernel initialization.
+
+	É no módulo entrance/ que o kernel inicializa.
+	Mas além disso é também nesse módulo que o kernel
+	presta os serciços requisitados através de syscalls.
+
+---------------------------------------------------------
+	sci - syscalls and permissions.
+
+	sci contém procedimentos que prestam serviços do kernel.
+	Normalmente quem solicita esses serviços são processos em ring3
+	através de syscalls.
+	O trabalho da sci é redistribuir essas chamadas ao kernel.
+
+	Antes de atender o serviço é preciso validar a syscall,
+	checando as permissões.
+	Cada chamada contém permissões específicas. Algumas
+	são pouco exigentes.
+
+	#test
+	Poderíamos criar rotinas de validação aqui mesmo no
+	modulo entrence/. Pois na entrada é um bom momento
+	pra checar se tem permissão pra entrar.
+	O nome poderia ser per.c. Checador de permissões.
+
+

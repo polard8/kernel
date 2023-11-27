@@ -1,0 +1,18 @@
+
+pt-br
+Volume label: (Nome da partiçao)
+
+Num arquivo em Assembly eu crio um disco virtual 
+usando os recursos da linguagem ... 
+o disco inteiro, de 32MB com 
+mbr, vbr, hidden sectors, fat 1, fat 2, root dir, data area ... 
+e footer no final do disco. 
+O disco tem 4 partiçoes. 
+Mas so a primeira e' utilizada 
+como se pode ver na partition table do mbr.
+
+Entao o kernel carrega na memoria, 
+o diretorio raiz da primeira partiçao e 
+lendo a primeira entrada ele encontra informaçoes sobre o volume. 
+Pois a primeira entrada esta sinalizada como volume label.
+

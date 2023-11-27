@@ -1,0 +1,25 @@
+#!/bin/sh
+# Running Gramado OS on qemu/kvm.
+
+# Common
+GRAMADO_CPUS="2"
+GRAMADO_RAM_SIZE="512"
+GRAMADO_DISK_IMAGE="GRAMHV.VHD"
+
+QEMU="qemu-system-x86_64"
+
+# Hello
+	echo "~~~~>"
+
+# Launch qemu application.
+# Order: CPU, RAM, DISK, DEVICES.
+	$QEMU \
+	-smp $GRAMADO_CPUS \
+	-m   $GRAMADO_RAM_SIZE \
+	-drive file=$GRAMADO_DISK_IMAGE,format=raw,bus=0 \
+	-device ich9-intel-hda -device hda-duplex \
+	-accel kvm \
+	-serial stdio \
+	-netdev type=user,id=net1 -device e1000,netdev=net1
+
+

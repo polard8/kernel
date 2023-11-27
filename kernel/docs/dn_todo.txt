@@ -1,0 +1,9 @@
+
+Old associations.
+
+	mm = 0mem
+	ke = 1pump
+	fs = 2io
+
+
+

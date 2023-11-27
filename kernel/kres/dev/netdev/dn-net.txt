@@ -1,0 +1,8 @@
+
+   How to test the network support.
+   
+   + Use Oracle virtualbox.
+   + Set the flag USE_E1000 in config/superv/config.h.
+   + Type "net-on" or "net-off" on terminal.bin.
+   
+   

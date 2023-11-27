@@ -1,0 +1,9 @@
+Informações sobre memória.
+Pra tomar decisões sobre a implementação de alguns recursos 
+é preciso saber exatamente quais as partes da memória física 
+que estão em uso. Estou tentando registrar isso. 
+Na medida que encontrar espaços vagos na memória física, 
+então eu posso mapear para alguma finalidade como heap, cache etc.
+Acredito que alguns sistemas indexam a memória física inteira e 
+depois pegam os frames sem se importar com a localização do frame.
+Eu prefiro ter a memória fisica separada em blocos.

@@ -1,0 +1,15 @@
+
+Redirecionador do output do console virtual no Linux 1.0.
+
+A ideia eh redirecionar o output do console, 
+que e' uma tty, para o child do terminal virtual, que e' uma pty.
+Para o shell por exemplo.
+Tanto terminal quando o child pode chamar essa funçao.
+A funçao ioctl() com o comando TIOCCONS, 
+atualiza o redirecionador de tty.
+    + Entao, havendo um ponteiro valido de redirecionador, 
+      o output vai para o child do terminal virtual, 
+      que e' o ponteiro ao qual o redirecionador se refere.
+    + Se nao houver um ponteiro valido de redirecionador, 
+      entao o output vai para o console virtual em foreground.
+      

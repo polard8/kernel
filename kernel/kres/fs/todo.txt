@@ -1,0 +1,7 @@
+
+
+
+	Maybe we can create a file for Read and another file for Right
+	into the file system.
+
+

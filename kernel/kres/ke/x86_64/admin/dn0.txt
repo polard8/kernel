@@ -1,0 +1,10 @@
+
+
+	Kernel initialization for x86_64 architecture.
+
+	startup/ is the place for the entry point for the kernel.
+	It runs some code in Assembly and passes the command to 
+	the initialization code in x64init/.
+
+
+	

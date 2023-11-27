@@ -1,0 +1,9 @@
+
+
+	Frame table:
+
+	In pages.c we initialize a frame table to handle a lot
+	of frames that will be used by the system.
+	These frames are physical mememory chunks, 512 bytes long each one.
+	That table depends on the size of the physical memory.
+

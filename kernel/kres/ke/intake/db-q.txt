@@ -1,0 +1,15 @@
+
+    Escalonamento. 
+
+    Existem politicas de escalonamento. A politica usada pelo Gramado 
+ate agora e' a round robin. Mas estou começando a implementar 
+uma segunda politica, que usara filas de prioridade.
+    O Gramado tem apenas seis prioridades, em duas classes, 
+tres prioridades normais e tres de sistema.
+    O task switcher junto com o dispacher vao consumir 
+as filas construidas pelo scheduler, seguindo a ordem 
+da prioridade mais alta para a prioridade mais baixa ... 
+    Esse esquema e' tradicional, nao ha novidades aqui, 
+o desafio sera lidar com starvation ... que costuma ocorrer 
+em threads de baixa prioridade.
+

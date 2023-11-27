@@ -1,0 +1,8 @@
+
+  Networking - LAN
+
+  Primeiro a gente realiza o dialogo dhcp pra obter 
+nosso IP oferecido pelo servidor. Depois a gente responte 
+aos ARPs usando o IP oferecido pelo dhcp ... 
+dessa forma os dispositivos terao as informaçoes corretas 
+sobre o nosso sistema.

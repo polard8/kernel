@@ -1,0 +1,12 @@
+
+    Sending IPIs
+    
+    IPIs are sent through the BSP's LAPIC. 
+Find the LAPIC base address from the MP tables or ACPI tables, 
+then you can write 32-bit words to base + 0x300 and base + 0x310 to send IPIs. 
+For a init IPI or startup IPI, you must first write 
+the target LAPIC ID into bits 24-27 of base + 0x310. 
+Then, for an init IPI, write 0x00004500 to base + 0x300. 
+For a SIPI, write 0x00004600, ored with the page number at which 
+you want to AP to start executing, to base + 0x300. 
+

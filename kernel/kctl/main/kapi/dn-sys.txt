@@ -1,0 +1,4 @@
+
+	sys.c provides the routines called by the syscalls.
+	The prefix sys_xxx means that it is a syscall implementation.
+

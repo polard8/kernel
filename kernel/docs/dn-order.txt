@@ -1,0 +1,20 @@
+
+
+	Order:
+	Gravity.
+	Everything is a file.
+
+	fs, ke, (mm)
+
+
+	Groups of calls:
+
+	group1: 
+	We will always call functions with user addresses or 'fd' as an argument.
+	Some prefixes are used in this case. (sys_, k_, ...)
+
+	group2: 
+	We have another set of calls that will not use user addresses or 'fd'.
+	Some prefixes are used in this case. (?_ ...)
+
+

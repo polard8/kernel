@@ -1,0 +1,19 @@
+
+    init/ folder:
+    This is a place for 'init processes'.
+
+---------------------------
+init/   
+    This is the main init process for Gramado OS.
+    It's a ring 3 process.
+    It has an embedded command interpreter and you can type
+commands like 'wsq' or 'eng'. See the function __CompareString()
+in main.c for more commands.
+    After launching one program, the init processes enters in a loop, 
+receiving system messages just like a server.
+
+---------------------------
+init2/
+    ?
+
+    

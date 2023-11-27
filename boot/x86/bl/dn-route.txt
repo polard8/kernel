@@ -1,0 +1,8 @@
+
+   Main route for the BL.BIN initialization:
+
+_START       head.s
+StartLoader  head.s
+bl_main      main.c
+SetUpPaging  pages.c
+_BlTransferToKernel  transfer.inc

@@ -1,0 +1,24 @@
+
+  Estabelecendo conexoes.
+
+  + servidor interno com cliente interno
+  + servidor interno com cliente externo.
+
+Naquela fase em que preciso associar o frame que esta chegando 
+do dispositivo NIC com o processo que esta associado ao protocolo do frame.
+
+Na minha implementaçao todo processo tem um estrutura de socket. 
+process->priv, Um socket privado.
+
+Quando um processo cliente que esta dentro da maquina 
+tenta se conectar com um servidor dentro da maquina, 
+entao e' so' conectar o socket do cliente com o socket do servidor.  
+server_sock->link = (struct socket_d *) client_sock.
+
+O problema e' quando o cliente esta fora da maquina, ... 
+entao nesse caso, acho que vou precisar criar um socket para o cliente, 
+pra poder estabelecer a conexao ... hahah
+
+Dai o servidor escreve os 'responses' nesse socket 
+criado para o cliente externo.
+
