@@ -4,10 +4,6 @@
 #ifndef __NET_NETWORK_H
 #define __NET_NETWORK_H    1
 
-
-#define ONLINE  TRUE
-#define OFFLINE FALSE
-
 // 8192
 #define NETWORK_DEFAULT_BUFFER_SIZE  \
     E1000_DEFAULT_BUFFER_SIZE
@@ -18,8 +14,6 @@
 
 // packet format
 // Ethernet IPv4 TCP/UDP DATA FCS
-
-
 
 /*
 // Device
@@ -44,6 +38,7 @@ struct network_buffer_d
 // Receive
     int receive_tail;
     int receive_head;
+//  pointers.
     unsigned long buffers[32];
 // O status de cada buffer, se ele está vazio ou não.
     int is_full[32];
@@ -79,7 +74,7 @@ struct network_info_d
 
 // Values
     unsigned short version_major;
-    unsigned short version_minor; 
+    unsigned short version_minor;
     unsigned short version_revision;
 
 //adaptador de rede.
@@ -89,7 +84,7 @@ struct network_info_d
     struct host_info_d *host_info;
     //..
 
-// Gateway support.
+// Gateway support
     uint8_t gateway_ipv4[4];
     uint8_t gateway_mac[6];
     int gateway_initialized;
@@ -110,16 +105,41 @@ extern struct network_info_d *CurrentNetwork;
 extern int ____network_late_flag;
 
 
+#define NETWORK_INITIALIZED  TRUE
+#define NETWORK_NOT_INITIALIZED  FALSE
+
+// Online?
+#define NETWORK_ONLINE   TRUE
+#define NETWORK_OFFLINE  FALSE
+#define ONLINE   NETWORK_ONLINE
+#define OFFLINE  NETWORK_OFFLINE
+
+
+struct network_initialization_d
+{
+
+// Status do driver de network
+// 0 - uninitialized
+// 1 - initialized
+    int initialized;
+
+// Are we online?
+// Do we already have an valid IP?
+    int is_online;
+
+// ...
+
+};
+
+
 //
 // == Prototypes ====================
 //
-
 
 int 
 network_register_ring3_display_server(
     struct zing_hook_d *zh,
     pid_t caller_pid );
-
 
 
 void 
@@ -163,7 +183,6 @@ int
 network_on_sending ( 
     const unsigned char *frame, 
     ssize_t frame_size );
-
 
 
 // Push and Pop data.

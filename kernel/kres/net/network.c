@@ -5,14 +5,18 @@
 
 #include <kernel.h>
 
+
+// Local
+static struct network_initialization_d  NetworkInitialization;
+
 // Status do driver de network
 // 0 - uninitialized
 // 1 - initialized
-static int network_status=FALSE; 
+//static int __network_is_initialized = FALSE;
 
 // Are we online?
 // Do we already have an valid IP?
-static int __is_online = FALSE;
+//static int __network_is_online = FALSE;
 
 // Essa flag poderia ir para dentro da estrutura acima,
 int ____network_late_flag=0;
@@ -412,7 +416,7 @@ network_on_receiving (
 
 // Drop it!
 // Set this flag using the command "net-on" on terminal.bin.
-    if (network_status != TRUE)
+    if (NetworkInitialization.initialized != TRUE)
     {
         //#debug
         //printf("Packet: Network is OFF\n");
@@ -526,7 +530,7 @@ network_on_sending (
     const unsigned char *frame, 
     ssize_t frame_size )
 {
-    if (network_status != TRUE){
+    if (NetworkInitialization.initialized != TRUE){
         return -1;
     }
 
@@ -734,27 +738,24 @@ void networkSetStatus (int status)
     if ( status < 0 || status > 1 ){
         return;
     }
-    network_status = (int) status;
+    NetworkInitialization.initialized = (int) status;
 }
 
 int networkGetStatus (void)
 {
-    return (int) network_status;
+    return (int) NetworkInitialization.initialized;
 }
-
-
 
 void networkSetOnlineStatus(int status)
 {
     if (status != TRUE && status != FALSE)
         return;
-    __is_online = (int) status;
+    NetworkInitialization.is_online = (int) status;
 }
-
 
 int networkGetOnlineStatus(void)
 {
-    return (int) __is_online;
+    return (int) NetworkInitialization.is_online;
 }
 
 
@@ -791,18 +792,27 @@ void networkUpdateCounter(int the_counter)
 // #fixme
 // Provavelmente esse alocador ainda nao funciona.
 
-int networkInit (void)
+int networkInit(void)
 {
+// Initializing the network infrastructure.
+// The purpose here is initialize all the components that is possible
+// without aborting the kernel initialization.
+// Maybe we can survice some failures here and re-initialize it later.
+
     register int i=0;
     void *tmp_buffer_address;
 
     PROGRESS("networkInit:\n");
 
-// The network is disabled.
-    networkSetStatus(FALSE);
+//======================================
+// Network initialization structure.
 
-// We're offline.
-    networkSetOnlineStatus(OFFLINE);
+
+// Not initialized yet.
+// The network is disabled
+    networkSetStatus(NETWORK_NOT_INITIALIZED);
+// We're offline
+    networkSetOnlineStatus(NETWORK_OFFLINE);
 
 // =====================================================
 // #importante
@@ -815,14 +825,16 @@ int networkInit (void)
 
 
 //======================================
+// Network info structure
 
     struct network_info_d *ni;
-    ni = (void*) kmalloc( sizeof( struct network_info_d ) );
-    if ( (void*) ni == NULL ){
-        panic("networkInit: ni\n");
+    ni = (void*) kmalloc( sizeof(struct network_info_d) );
+    if ((void*) ni == NULL){
+        printf("on ni\n");
+        goto fail;
     }
-    // Clear the structure,
-    memset( ni, 0, sizeof (struct network_info_d) );
+    // Clear the structure
+    memset( ni, 0, sizeof(struct network_info_d) );
     ni->initialized = FALSE;
     ni->id = 0;
     ni->version_major = 0x0000;
@@ -875,8 +887,10 @@ int networkInit (void)
     for (i=0; i<32; i++)
     {
         tmp_buffer_address = (void*) mmAllocPage();
-        if ((void *)tmp_buffer_address == NULL){
-            panic("networkInit: [FAIL] receive tmp_buffer_address\n");
+        if ((void *)tmp_buffer_address == NULL)
+        {
+            printf("on tmp_buffer_address\n");
+            goto fail;
         }
         NETWORK_BUFFER.buffers[i] = (unsigned long) tmp_buffer_address;
         NETWORK_BUFFER.is_full[i] = FALSE;  //EMPTY
@@ -890,25 +904,29 @@ int networkInit (void)
 // =====================================
 // Host info struct. 
 // See: host.h
-    //debug_print ("networkInit: HostInfo \n");
+    //debug_print ("networkInit: HostInfo\n");
 
     HostInfo = 
-        (struct host_info_d *) kmalloc( sizeof( struct host_info_d ) ); 
-    if ( (void *) HostInfo == NULL ){
-        panic("networkInit: HostInfo\n");
+        (struct host_info_d *) kmalloc( sizeof(struct host_info_d) ); 
+    if ((void *) HostInfo == NULL){
+        printf("on HostInfo\n");
+        goto fail;
     }
 
-//
-// hostname
-//
+// #todo
+// We need to grab the hostname from another place.
+// Maybe from a configuration file.
+// UTS_NODENAME ?
 
     //HostInfo->__hostname[0] = 'h';
     //HostInfo->hostName_len = (size_t) HOST_NAME_MAX;
 
     sprintf(HostInfo->__hostname,"gramado");
     HostInfo->hostName_len = (size_t) strlen("gramado");
-    if ( HostInfo->hostName_len >= HOST_NAME_MAX ){
-        panic("networkInit: hostname\n");
+    if ( HostInfo->hostName_len >= HOST_NAME_MAX )
+    {
+        printf("on hostname\n");
+        goto fail;
     }
 
 // Version
@@ -918,7 +936,7 @@ int networkInit (void)
 // Maybe the init process needs to setup these values.
 // It's because these values are found in files.
     HostInfo->hostVersionMajor    = 0;
-    HostInfo->hostVersionMinor    = 0; 
+    HostInfo->hostVersionMinor    = 0;
     HostInfo->hostVersionRevision = 0;
 // #todo
 // Where is this information?
@@ -935,9 +953,11 @@ int networkInit (void)
 
     //debug_print ("networkInit: LocalHostHTTPSocket\n");
 
-    LocalHostHTTPSocket = (struct socket_d *) create_socket_object();  
-    if ( (void *) LocalHostHTTPSocket == NULL ){
-        panic ("networkInit: Couldn't create LocalHostHTTPSocket\n");
+    LocalHostHTTPSocket = (struct socket_d *) create_socket_object();
+    if ((void *) LocalHostHTTPSocket == NULL)
+    {
+        printf("on LocalHostHTTPSocket\n");
+        goto fail;
     }
     CurrentSocket = (struct socket_d *) LocalHostHTTPSocket;
 
@@ -954,6 +974,9 @@ int networkInit (void)
 
     //networkSetStatus(TRUE);
 
+// =====================================
+// domain
+
 //
 // Create the domain structure.
 //
@@ -962,13 +985,27 @@ int networkInit (void)
 
     struct domain_d *my_domain;
     my_domain = (void *) domain_create_domain(UTS_DOMAINNAME);
-    if ((void*) my_domain == NULL){
-        panic("networkInit: my_domain\n");
+    if ((void*) my_domain == NULL)
+    {
+        printf("on my_domain\n");
+        goto fail;
     }
 
-// Initialize the ARP table.
+// =====================================
+// arp cache
+
+// Initialize the ARP table
     arp_initialize_arp_table();
 
+// ...
+
+// done
     return 0;
+
+fail:
+    // #debug
+    // For now we cant's fail on the network initialization.
+    panic("networkInit: Fail\n");
+    return (int) -1;
 }
 
