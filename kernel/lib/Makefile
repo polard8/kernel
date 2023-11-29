@@ -1,10 +1,9 @@
 
-# mod/
-# Compile all the files and create ar_mod.o
+# lib/
+# Compile all the files and create ar_crt.o
+# Makefile for the libc support.
 
-# Makefile for loadable ring0 kernel module suport.
-
-INCLUDE = ../../include
+INCLUDE = ../include
 
 AS	= as
 LD	= ld
@@ -14,14 +13,13 @@ MAKE	= make
 NASM	= nasm
 OBJCOPY	= objcopy
 OBJDUMP	= objdump
-#LEX	= flex
-#YACC	= bison
+LEX	= flex
+YACC	= bison
 PERL	= perl
 PYTHON	= python
 PYTHON2	= python2
 PYTHON3	= python3
 RUBY	= ruby
-
 
 # test: gramado 64bit
 # See: https://gcc.gnu.org/onlinedocs/gcc/Code-Gen-Options.html
@@ -58,6 +56,7 @@ CFLAGS := \
 	-fno-omit-frame-pointer \
 	-fno-optimize-sibling-calls    
 
+
 # Internal files
 # Used to build the kernel.
 KERNEL_INCLUDE := -I $(INCLUDE)
@@ -69,17 +68,24 @@ KERNEL_INCLUDE := -I $(INCLUDE)
 # LDFLAGS := -m elf_x86_64 -static
 LDFLAGS := -m elf_x86_64 -s -x -static  
 
-
-OBJS = mod.o    
+# Everything is a file.
+OBJS = kctype.o kstdio.o ksignal.o kstdlib.o kstring.o kunistd.o    
 
 all:
-	$(CC) -c mod.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
+	$(CC) -c kctype.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kctype.o
+	$(CC) -c kstdio.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kstdio.o
+	$(CC) -c ksignal.c $(KERNEL_INCLUDE) $(CFLAGS) -o ksignal.o
+	$(CC) -c kstdlib.c $(KERNEL_INCLUDE) $(CFLAGS) -o kstdlib.o
+	$(CC) -c kstring.c $(KERNEL_INCLUDE) $(CFLAGS) -o kstring.o
+	$(CC) -c kunistd.c $(KERNEL_INCLUDE) $(CFLAGS) -o kunistd.o
 
 # link
-	$(LD) -r -o ar_mod.o $(OBJS)
-	cp ar_mod.o ../../
+	$(LD) -r -o ar_crt.o $(OBJS)
+	cp ar_crt.o ../
 	rm *.o
-
+	
 clean:
-	rm *.o
-
+	rm *.o    
+	
+	
+	

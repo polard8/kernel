@@ -5,18 +5,9 @@
 
 #include <kernel.h>
 
-
 // Local
 static struct network_initialization_d  NetworkInitialization;
 
-// Status do driver de network
-// 0 - uninitialized
-// 1 - initialized
-//static int __network_is_initialized = FALSE;
-
-// Are we online?
-// Do we already have an valid IP?
-//static int __network_is_online = FALSE;
 
 // Essa flag poderia ir para dentro da estrutura acima,
 int ____network_late_flag=0;
@@ -36,18 +27,19 @@ struct network_buffer_d  NETWORK_BUFFER;
 struct host_info_d *HostInfo;
 struct network_info_d *CurrentNetwork;
 
+// #todo: Use 'const char*'
 char *default_network_name_string = "default-network-name";
 char *default_network_version_string = "0.0.0";
 
 // Target MAC.
 unsigned char __saved_gateway_mac[6];
 
+// ====================================================
 
 static void __initialize_ws_info(pid_t pid);
 static void __maximize_ws_priority(pid_t pid);
 
 // ====================================================
-
 
 // Setup WindowServerInfo global structure.
 static void __initialize_ws_info(pid_t pid)
@@ -154,21 +146,19 @@ static void __maximize_ws_priority(pid_t pid)
         return;
 
     p->type = ProcessType;
-
     p->base_priority = ProcessBasePriority;
     p->priority      = ProcessPriority;
 
 // thread
     t = (struct thread_d *) p->control;
-    if ( (void*) t == NULL ){ return; }
-    if ( t->magic != 1234 ) { return; }
+    if ((void*) t == NULL){ return; }
+    if (t->magic != 1234) { return; }
 
     t->type = ThreadType;
-
     t->base_priority = ThreadBasePriority;
     t->priority      = ThreadPriority;
 
-// see: ps/sched.h
+// see: sched.h
     t->quantum = QUANTUM_MAX;
 }
 
@@ -246,10 +236,6 @@ fail:
     return (int) -1;
 }
 
-
-
-
-
 void 
 network_fill_mac(
     unsigned char *to, 
@@ -257,9 +243,9 @@ network_fill_mac(
 {
     register long i=0;
 
-    if ( (void*) to == NULL )
+    if ((void*) to == NULL)
         return;
-    if ( (void*) from == NULL )
+    if ((void*) from == NULL)
         return;
 
     for (i=0; i<6; i++)
@@ -268,7 +254,6 @@ network_fill_mac(
     };
 }
 
-
 void 
 network_fill_ipv4(
     unsigned char *to,
@@ -276,9 +261,9 @@ network_fill_ipv4(
 {
     register long i=0;
 
-    if ( (void*) to == NULL )
+    if ((void*) to == NULL)
         return;
-    if ( (void*) from == NULL )
+    if ((void*) from == NULL)
         return;
 
     for (i=0; i < 4; i++)
@@ -294,9 +279,9 @@ network_fill_ipv6(
 {
     register long i=0;
 
-    if ( (void*) to == NULL )
+    if ((void*) to == NULL)
         return;
-    if ( (void*) from == NULL )
+    if ((void*) from == NULL)
         return;
 
     for (i=0; i < 6; i++)
@@ -304,9 +289,6 @@ network_fill_ipv6(
         to[i] = from[i];
     };
 }
-
-
-
 
 // Credits: Sirius OS.
 unsigned short 
@@ -397,7 +379,6 @@ network_send_raw_packet (
 // For now we only support the structure for intel devices.
     e1000_send( nic_intel, frame_len, frame_address );
 }
-
 
 // IN:
 // + frame base address

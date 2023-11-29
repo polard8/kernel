@@ -1,2 +1,3 @@
-This is the business logic layer.
-Wrappers for the resources.
+
+  arch - Kernel entrypoint and early initialization.
+  core - Main function and top level routines.

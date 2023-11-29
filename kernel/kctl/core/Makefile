@@ -87,6 +87,7 @@ cali.o \
 zero.o \
 sys.o \
 sci.o \
+mod.o \
 kmain.o    
 
 
@@ -113,9 +114,12 @@ $(KERNEL_INCLUDE)  $(CFLAGS)  -o sci.o
 
 	$(CC) -c hv.c  $(KERNEL_INCLUDE) $(CFLAGS) -o hv.o
 
+
+	$(CC) -c mod.c  $(KERNEL_INCLUDE) $(CFLAGS) -o mod.o
+
 # ----------------------------------------------
 # kmain
-	$(CC) -c kmain.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
+	$(CC) -c kmain.c  $(KERNEL_INCLUDE) $(CFLAGS) -o kmain.o
 
 # ----------------------------------------------
 # link
@@ -124,12 +128,12 @@ $(KERNEL_INCLUDE)  $(CFLAGS)  -o sci.o
 
 # ----------------------------------------------
 # startup
-	$(NASM) x86_64/startup/head_64.asm \
-	$(KERNEL_INCLUDE) \
-	$(STARTUP_INCLUDE) \
-	-f elf64 -o head_64.o    
+#	$(NASM) x86_64/startup/head_64.asm \
+#	$(KERNEL_INCLUDE) \
+#	$(STARTUP_INCLUDE) \
+#	-f elf64 -o head_64.o    
 
-	cp head_64.o ../../
+#	cp head_64.o ../../
 
 # ----------------------------------------------
 	rm *.o

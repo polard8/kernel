@@ -112,28 +112,28 @@ all:
 	$(CC) -c intake/sched/schedq.c  $(KERNEL_INCLUDE)  $(CFLAGS) -o schedq.o  
 
 # ---------------------
-# x86_64/
+# arch/x86_64/
 
-	$(CC) -c x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
+	$(CC) -c arch/x86_64/detect.c  $(KERNEL_INCLUDE) $(CFLAGS) -o detect.o
 
 # SMP support
-	$(CC) -c x86_64/smp/apic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
-	$(CC) -c x86_64/smp/apictim.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apictim.o
-	$(CC) -c x86_64/smp/ioapic.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
-	$(CC) -c x86_64/smp/x64smp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64smp.o
+	$(CC) -c arch/x86_64/smp/apic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o apic.o
+	$(CC) -c arch/x86_64/smp/apictim.c  $(KERNEL_INCLUDE) $(CFLAGS) -o apictim.o
+	$(CC) -c arch/x86_64/smp/ioapic.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ioapic.o
+	$(CC) -c arch/x86_64/smp/x64smp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64smp.o
 
 # Legacy low level stuff
-	$(CC) -c x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
-	#$(CC) -c x86_64/pic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
-	$(CC) -c x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
-	$(CC) -c x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
+	$(CC) -c arch/x86_64/ports64.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ports64.o
+	#$(CC) -c arch/x86_64/pic.c     $(KERNEL_INCLUDE) $(CFLAGS) -o pic.o
+	$(CC) -c arch/x86_64/pit.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pit.o
+	$(CC) -c arch/x86_64/rtc.c      $(KERNEL_INCLUDE) $(CFLAGS) -o rtc.o
 
 # Overview
-	$(CC) -c x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
-	$(CC) -c x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
-	$(CC) -c x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
-	$(CC) -c x86_64/x64mi.c    $(KERNEL_INCLUDE) $(CFLAGS) -o x64mi.o
-	$(CC) -c x86_64/x64nmi.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64nmi.o
+	$(CC) -c arch/x86_64/x64.c      $(KERNEL_INCLUDE) $(CFLAGS) -o x64.o
+	$(CC) -c arch/x86_64/x64info.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64info.o
+	$(CC) -c arch/x86_64/x64init.c  $(KERNEL_INCLUDE) $(CFLAGS) -o x64init.o
+	$(CC) -c arch/x86_64/x64mi.c    $(KERNEL_INCLUDE) $(CFLAGS) -o x64mi.o
+	$(CC) -c arch/x86_64/x64nmi.c   $(KERNEL_INCLUDE) $(CFLAGS) -o x64nmi.o
 
 #--------
 

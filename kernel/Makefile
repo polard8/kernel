@@ -1,10 +1,8 @@
 
 # Makefile for the Gramado kernel.
 
-
 # Tools
-include build/x86_64/makefile
-
+include kctl/arch/x86_64/makeinc
 
 linkTarget = KERNEL.BIN
 
@@ -18,7 +16,7 @@ linkFlags := -m elf_x86_64 \
 -s \
 -x \
 -static \
--T build/x86_64/link.ld   
+-T kctl/arch/x86_64/link.ld   
 
 #
 # Config
@@ -87,7 +85,7 @@ CFLAGS := \
 # :: kctl - Resource controllers.
 objects-y := head_64.o 
 objects-y += ar_crt.o  
-objects-y += ar_mod.o  
+#objects-y += ar_mod.o  
 objects-y += ar_zcall.o
 
 # ========================
@@ -110,15 +108,17 @@ clean
 #----------------
 # Resource controllers.
 k1:
-	@echo "Compiling: Compiling k1/"
-	$(MAKE) -C kctl/crt/
-	$(MAKE) -C kctl/main/
-	$(MAKE) -C kctl/mod/
-	
+	@echo "Compiling: Compiling k1"
+# Kernel arch - Entrypoint and early initialization.
+	$(MAKE) -C kctl/arch/x86_64/
+# Kernel core - Top level routines.
+	$(MAKE) -C kctl/core/
+
 #----------------
 # Kernel resources
 k2:
-	@echo "Compiling: Compiling k2/"
+	@echo "Compiling: Compiling k2"
+	$(MAKE) -C lib/
 	$(MAKE) -C kres/dev/
 	$(MAKE) -C kres/fs/
 	$(MAKE) -C kres/gramk/

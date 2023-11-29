@@ -39,7 +39,7 @@
 // ==================================
 // virt/
 // system
-#include "../kctl/main/system.h"
+#include "../kctl/core/system.h"
 
 // ==================================
 // ke/
@@ -63,9 +63,9 @@
 
 // ===============================
 // virt/
-#include "../kctl/main/info.h"
-#include "../kctl/main/request.h"
-#include "../kctl/main/debug.h"
+#include "../kctl/core/info.h"
+#include "../kctl/core/request.h"
+#include "../kctl/core/debug.h"
 
 // ==================================
 // ke/
@@ -80,31 +80,31 @@
 // ==================================
 // crt/
 // Libc support.
-#include "../kctl/crt/ktypes.h"
-#include "../kctl/crt/ktypes2.h"
+#include "../lib/ktypes.h"
+#include "../lib/ktypes2.h"
 
 // ke/
 #include "../kres/ke/kobject.h"
 
-// crt/
+// lib/
 // Legacy stuff.
-#include "../kctl/crt/kstdarg.h"
-#include "../kctl/crt/kerrno.h"
-#include "../kctl/crt/kcdefs.h"
-#include "../kctl/crt/kstddef.h"
-#include "../kctl/crt/klimits.h"
-#include "../kctl/crt/kstdio.h"
-#include "../kctl/crt/kstdlib.h"
-#include "../kctl/crt/kstring.h"
-#include "../kctl/crt/kctype.h"
-#include "../kctl/crt/kiso646.h"
-#include "../kctl/crt/ksignal.h"
-#include "../kctl/crt/kunistd.h"
-#include "../kctl/crt/kfcntl.h"
-#include "../kctl/crt/kioctl.h"
-#include "../kctl/crt/kioctls.h"
-#include "../kctl/crt/ktermios.h"
-#include "../kctl/crt/kttydef.h"
+#include "../lib/kstdarg.h"
+#include "../lib/kerrno.h"
+#include "../lib/kcdefs.h"
+#include "../lib/kstddef.h"
+#include "../lib/klimits.h"
+#include "../lib/kstdio.h"
+#include "../lib/kstdlib.h"
+#include "../lib/kstring.h"
+#include "../lib/kctype.h"
+#include "../lib/kiso646.h"
+#include "../lib/ksignal.h"
+#include "../lib/kunistd.h"
+#include "../lib/kfcntl.h"
+#include "../lib/kioctl.h"
+#include "../lib/kioctls.h"
+#include "../lib/ktermios.h"
+#include "../lib/kttydef.h"
 
 // ==================================
 // ke/
@@ -135,26 +135,26 @@
 // hal
 #include "../kres/ke/ports64.h"
 #include "../kres/ke/cpu.h"
-#include "../kres/ke/x86_64/tss.h"
-#include "../kres/ke/x86_64/x64gdt.h"
-#include "../kres/ke/x86_64/x64.h"
+#include "../kres/ke/arch/x86_64/tss.h"
+#include "../kres/ke/arch/x86_64/x64gdt.h"
+#include "../kres/ke/arch/x86_64/x64.h"
 #include "../kres/ke/detect.h"
 // ==================================
 // ke/
 // hv
-#include "../kctl/main/hv.h"
+#include "../kctl/core/hv.h"
 // hal cpu
-#include "../kres/ke/x86_64/cpuid.h"
+#include "../kres/ke/arch/x86_64/cpuid.h"
 #include "../kres/ke/up.h"
 
-#include "../kres/ke/x86_64/smp/mp.h"
+#include "../kres/ke/arch/x86_64/smp/mp.h"
 
 // hal pic/apic/ioapic
-#include "../kres/ke/x86_64/pic.h"
+#include "../kres/ke/arch/x86_64/pic.h"
 
-#include "../kres/ke/x86_64/smp/apic.h"
-#include "../kres/ke/x86_64/smp/apictim.h"
-#include "../kres/ke/x86_64/smp/ioapic.h"
+#include "../kres/ke/arch/x86_64/smp/apic.h"
+#include "../kres/ke/arch/x86_64/smp/apictim.h"
+#include "../kres/ke/arch/x86_64/smp/ioapic.h"
 
 #include "../kres/ke/breaker.h"
 // hal timers.
@@ -316,16 +316,15 @@
 #include "../kres/ke/ke.h"
 
 // ==================================
-// virt/
-#include "../kctl/main/user.h"
+#include "../kctl/core/user.h"
 
 // ==================================
 // ke/
-#include "../kres/ke/reboot.h"
+#include "../kres/ke/system/reboot.h"
 
 // ==================================
 // mod/
-#include "../kctl/mod/mod.h"
+#include "../kctl/core/mod.h"
 
 // ==================================
 // ke/
@@ -337,19 +336,19 @@
 // virt/
 // Syscalls. 
 // (Called by the interrups 0x80, 0x81, 0x82, 0x83).
-#include "../kctl/main/syscalls.h"
+#include "../kctl/core/syscalls.h"
 // zero. (Used during the kernel initialization)
-#include "../kctl/main/zero.h"
+#include "../kctl/core/zero.h"
 
 // ==================================
 // ke/
 // Maskable interrupts
-#include "../kres/ke/x86_64/x64mi.h"
+#include "../kres/ke/arch/x86_64/x64mi.h"
 
 // ==================================
 // virt/
 // Project California
-#include "../kctl/main/cali/cali.h"
+#include "../kctl/core/cali/cali.h"
 
 // Main kernel controller header.
 #include "../kctl/kctl.h"
