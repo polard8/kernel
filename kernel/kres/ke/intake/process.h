@@ -239,6 +239,23 @@ struct process_d
     unsigned int read_counter;
     unsigned int write_counter;
 
+// ---------------------------
+// #test
+// Controlling the acccess to the main folders
+// of the system disk.
+// List of root chars
+// 0 = '/' - Regular root dir.
+// 1 = '@' - Access to /GRAMADO/ root dir.
+// 2 = '#' - Access to /PROGRAMS/ root dir
+// TRUE = Can access
+// FALSE = Can't access
+    //int root_access[3]; (#todo: put this into the structure)
+    //struct fs_access_d  fs_access;
+    // ex: p->fs_access.root_access[0] = TRUE;
+    // ex: p->fs_access.root_access[1] = FALSE;
+// ---------------------------
+
+
 // Open files.
 // #todo:
 // Check this.

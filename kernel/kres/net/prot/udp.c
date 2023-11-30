@@ -308,9 +308,10 @@ network_send_udp (
 
 //==============================================
 
+// #todo
 // NIC Intel device structure.
     if ((void *) currentNIC == NULL){
-        printf ("network_send_udp: currentNIC fail\n");
+        printf("network_send_udp: currentNIC\n");
         goto fail;
     }
 
@@ -612,9 +613,13 @@ network_send_udp (
 // Send
 //
 
-// Send frame via NIC.
-    e1000_send( currentNIC, FRAME_SIZE, frame );
 
+    // Send frame via NIC.
+    //e1000_send( currentNIC, FRAME_SIZE, frame );
+    // #test
+    // Creating a sender for ethernet packet.
+    ethernet_send( currentNIC, FRAME_SIZE, frame );
+    
 // #debug
 // Send frame to myself.
     //network_on_receiving(frame,FRAME_SIZE);

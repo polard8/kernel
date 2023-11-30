@@ -99,6 +99,14 @@ struct ether_header
 } __attribute__ ((packed));
 
 
+//---------------------
+
+int 
+ethernet_send(
+    struct intel_nic_info_d *dev, 
+    size_t len, 
+    const char *data );
+
 #endif    
 
 

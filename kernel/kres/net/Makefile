@@ -1,7 +1,6 @@
 
 # net/
 # Compile all the files and create ar_net.o
-
 # Makefile for the kernel networking.
 
 INCLUDE = ../../include
@@ -73,7 +72,7 @@ LDFLAGS := -m elf_x86_64 -s -x -static
 
 OBJS = network.o domain.o inet.o \
 socket.o sockint.o \
-arp.o ipv4.o tcp.o udp.o dhcp.o    
+ethernet.o arp.o ipv4.o tcp.o udp.o dhcp.o    
 
 all:
 
@@ -87,6 +86,7 @@ all:
 	$(CC) -c sockint.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sockint.o
 
 # protocols
+	$(CC) -c prot/ethernet.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ethernet.o
 	$(CC) -c prot/arp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o arp.o
 	$(CC) -c prot/ipv4.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ipv4.o
 	$(CC) -c prot/tcp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o tcp.o

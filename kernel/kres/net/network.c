@@ -377,7 +377,10 @@ network_send_raw_packet (
 
 // #bugbug
 // For now we only support the structure for intel devices.
-    e1000_send( nic_intel, frame_len, frame_address );
+    //e1000_send( nic_intel, frame_len, frame_address );
+    // #test
+    // Creating a sender for ethernet packet.
+    ethernet_send( nic_intel, frame_len, frame_address );
 }
 
 // IN:
