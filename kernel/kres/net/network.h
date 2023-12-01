@@ -4,6 +4,7 @@
 #ifndef __NET_NETWORK_H
 #define __NET_NETWORK_H    1
 
+
 // 8192
 #define NETWORK_DEFAULT_BUFFER_SIZE  \
     E1000_DEFAULT_BUFFER_SIZE
@@ -172,12 +173,14 @@ network_send_raw_packet (
     const char *frame_address );
 
 
-// Handle package.
+//
+// Handling packets
+//
+
 int 
 network_on_receiving ( 
     const unsigned char *frame, 
     ssize_t frame_size );
-
 
 int 
 network_on_sending ( 

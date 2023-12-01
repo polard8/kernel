@@ -1118,12 +1118,27 @@ static int I_x64CreateTID0(void)
 }
 
 // ==============================
-// I_init:
+// I_initKernelComponents:
 // ::(5)(3)
 // Phases 1.
 // Called in the initialization phase 0.
-// Called by x64main in x64init.c
+// Called by I_x64_initialize() in x64init.c
 // OUT: TRUE if it is ok.
+// + Initialize globals.
+// + Initialize device manager.
+// + Initialize storage manager.
+// + Initialize disk and volume support.
+// + Initialize filesystem support.
+// + Initialize hal components.
+// + Initialize mm, ipc, ps components.
+// + Initialize pci, rtc and ata.
+// + Set the number of sectors in the boot disk.
+// + MBR info
+// + FAT support and main directories.
+// + Create the processor structure.
+// + Get processor information.
+// + Initialize fpu/see support.
+// + Detect the hypervisor.
 
 static int I_initKernelComponents(void)
 {
@@ -1131,10 +1146,6 @@ static int I_initKernelComponents(void)
     unsigned char ProcessorType=0;
 
     //PROGRESS("I_initKernelComponents:\n");
-
-// #debug
-    //debug_print ("I_init:\n");
-    //printf      ("I_init:\n");
 
 // ==================
 // Check kernel phase.
@@ -1151,6 +1162,8 @@ static int I_initKernelComponents(void)
 
 // ===============================
 // Initialize device manager.
+// At this moment we didn't initialize any device,
+// maybe only the 'serial port' used in the basic debug.
 // see: dev/devmgr.c
     devmgr_initialize();
 
@@ -1219,13 +1232,12 @@ static int I_initKernelComponents(void)
     }
     //PROGRESS("storage_set_total_lba_for_boot_disk ok\n"); 
 
-
+// mbr info
 // It depends on the total lba value for boot disk.
 // Its because we're gonna rad the disk to get the partition tables.
     disk_initialize_mbr_info();
 
-
-// FAT support.
+// FAT support
     initialize_FAT_and_main_directories();
 
 // =========================================
@@ -1288,11 +1300,10 @@ static int I_initKernelComponents(void)
     // INTEL:
     // + Get processor information.
     // + Initialize fpu/see support.
-    // + Initialize smp support via MP Floating point structure. (kinda).
-    case Processor_INTEL:  
+    case Processor_INTEL:
     case Processor_AMD:
         // Get processor information.
-        x64_init_intel();   
+        x64_init_intel();
         //init_amd(); 
         //Initialize fpu/see support.
         fpu_status = (int) x64_init_fpu_support();
@@ -1429,14 +1440,27 @@ int I_x64_initialize(void)
     //PROGRESS(":: Call\n"); 
     Initialization.current_phase = 1;
 
+// -------------------------------
 // Initialize a lot of kernel components
-// + globals
-// + storage and fs.
-// + network
-// ...
+// + Initialize globals.
+// + Initialize device manager.
+// + Initialize storage manager.
+// + Initialize disk and volume support.
+// + Initialize filesystem support.
+// + Initialize hal components.
+// + Initialize mm, ipc, ps components.
+// + Initialize pci, rtc and ata.
+// + Set the number of sectors in the boot disk.
+// + MBR info
+// + FAT support and main directories.
+// + Create the processor structure.
+// + Get processor information.
+// + Initialize fpu/see support.
+// + Detect the hypervisor.
+
     Status = (int) I_initKernelComponents(); 
-    if ( Status != TRUE ){
-        printf ("I_x64_initialize: I_init2 fail\n");
+    if (Status != TRUE){
+        printf("I_x64_initialize: on I_initKernelComponents\n");
         return FALSE;
     }
 

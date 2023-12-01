@@ -5,6 +5,12 @@
 #ifndef __DEV_DEVMGR_H
 #define __DEV_DEVMGR_H    1
 
+
+// #todo
+// In order to use this list,
+// we need a structure for generic NIC devices,
+// not for a specific manufacturer.
+
 extern unsigned long nicList[8]; 
 
 

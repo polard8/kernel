@@ -5,6 +5,7 @@
 
 #include <kernel.h>
 
+
 // Local
 static struct network_initialization_d  NetworkInitialization;
 

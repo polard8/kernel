@@ -26,7 +26,7 @@ ethernet_send(
     return 0;
 
 fail:
-    return -1;
+    return (int) -1;
 }
 
 

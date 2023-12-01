@@ -345,8 +345,18 @@ devmgr_register_device (
 // Inicializa a lista de dispositivos.
 void devmgr_initialize(void)
 {
+    register int i=0;
+
     debug_print("devmgr_initialize:\n");
+
+// Initialize the list of devices.
     __devmgr_init_device_list();
+
+// Initialize the list of NIC devices.
+    for (i=0; i<8; i++)
+    {
+        nicList[i] = 0;
+    };
     // ...
 }
 

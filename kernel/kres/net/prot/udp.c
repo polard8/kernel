@@ -303,14 +303,15 @@ network_send_udp (
 
     register int i=0;
     int j=0;
-
     char *data = (char *) data_buffer;  // UDP payload.
 
 //==============================================
 
 // #todo
 // NIC Intel device structure.
-    if ((void *) currentNIC == NULL){
+
+    if ((void *) currentNIC == NULL)
+    {
         printf("network_send_udp: currentNIC\n");
         goto fail;
     }
