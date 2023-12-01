@@ -85,10 +85,15 @@ all:
 	$(CC) -c socket.c   $(KERNEL_INCLUDE) $(CFLAGS) -o socket.o
 	$(CC) -c sockint.c  $(KERNEL_INCLUDE) $(CFLAGS) -o sockint.o
 
+# core protocols
+	$(CC) -c prot/core/ethernet.c  \
+$(KERNEL_INCLUDE) $(CFLAGS) -o ethernet.o
+	$(CC) -c prot/core/arp.c  \
+$(KERNEL_INCLUDE) $(CFLAGS) -o arp.o
+	$(CC) -c prot/core/ipv4.c  \
+$(KERNEL_INCLUDE) $(CFLAGS) -o ipv4.o
+
 # protocols
-	$(CC) -c prot/ethernet.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ethernet.o
-	$(CC) -c prot/arp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o arp.o
-	$(CC) -c prot/ipv4.c  $(KERNEL_INCLUDE) $(CFLAGS) -o ipv4.o
 	$(CC) -c prot/tcp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o tcp.o
 	$(CC) -c prot/udp.c   $(KERNEL_INCLUDE) $(CFLAGS) -o udp.o
 	$(CC) -c prot/dhcp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o dhcp.o

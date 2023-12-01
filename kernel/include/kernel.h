@@ -249,13 +249,19 @@
 #include "../kres/net/in.h"
 #include "../kres/net/un.h"
 
+//
 // Protocols
-#include "../kres/net/prot/ethernet.h"
-#include "../kres/net/prot/arp.h"
-#include "../kres/net/prot/ip.h"
+//
+
+// Core protocols
+#include "../kres/net/prot/core/ethernet.h"
+#include "../kres/net/prot/core/arp.h"
+#include "../kres/net/prot/core/ip.h"
+// Commom protocols
 #include "../kres/net/prot/tcp.h"
 #include "../kres/net/prot/udp.h"
 #include "../kres/net/prot/dhcp.h" 
+// Extra protocols
 #include "../kres/net/prot/icmp.h" 
 
 // Network
