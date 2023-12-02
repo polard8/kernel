@@ -1,0 +1,5 @@
+
+see:
+PIXX3 - https://en.wikipedia.org/wiki/PIIX
+ICH9  - https://en.wikipedia.org/wiki/I/O_Controller_Hub
+...

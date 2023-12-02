@@ -1,6 +1,4 @@
 
-
-
 Virtualbox log:
 E1000#0: 
 Chip=82540EM 
