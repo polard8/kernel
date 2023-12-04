@@ -156,9 +156,9 @@ build-gramado-os:
 # Copy the init process.
 # We can't survive without this one. (Only this one).
 	make -C userland/
-	cp userland/bin/INIT.BIN    $(BASE)/
-	cp userland/bin/HVNETD.BIN  $(BASE)/
-	cp userland/bin/HVNET.BIN   $(BASE)/
+	cp userland/bin/INIT.BIN  $(BASE)/
+	cp userland/bin/NETD.BIN  $(BASE)/
+	cp userland/bin/NET.BIN   $(BASE)/
 
 # Install BMPs from cali assets.
 # Copy the cali assets/

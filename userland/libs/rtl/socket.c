@@ -1,5 +1,7 @@
 
 // socket.c
+// Created by Fred Nora.
+
 // See: 
 // http://man7.org/linux/man-pages/man2/socket.2.html
 
@@ -14,9 +16,17 @@
 
 static int __socket_pipe( int pipefd[2] );
 
-
 // -----------------
 
+// Local worker
+static int __socket_pipe( int pipefd[2] )
+{
+    return (int) gramado_system_call ( 
+                     247, 
+                     (unsigned long) pipefd, 
+                     (unsigned long) pipefd, 
+                     (unsigned long) pipefd );
+}
 
 // socket:
 // Create an endpoint for communication.
@@ -41,17 +51,6 @@ int socket( int domain, int type, int protocol )
     return (int) value;
 }
 
-// Local worker.
-static int __socket_pipe( int pipefd[2] )
-{
-    return (int) gramado_system_call ( 
-                     247, 
-                     (unsigned long) pipefd, 
-                     (unsigned long) pipefd, 
-                     (unsigned long) pipefd );
-}
-
-
 int socketpair(int domain, int type, int protocol, int sv[2])
 {
     int fd = -1;
@@ -62,19 +61,19 @@ int socketpair(int domain, int type, int protocol, int sv[2])
 
     if ( domain == AF_UNSPEC || domain == AF_UNIX )
     {
-        if ( protocol != 0 ){
-            return (int) (-1);
+        if (protocol != 0){
+            goto fail;
         }
 
         //if ( type != SOCK_STREAM )
-            //return (int) (-1);
+            //goto fail;
 
         // Podemos colocar sv diretamente.
-        fd = (int) __socket_pipe (pipefd);
+        fd = (int) __socket_pipe(pipefd);
 
         if ( fd  == -1 ) { 
-            printf ("socketpair: fail\n");
-            return (int) (-1);
+            printf("socketpair: fail\n");
+            goto fail;
         }else{
             sv[0] = pipefd[1];
             sv[1] = pipefd[1];
@@ -82,6 +81,7 @@ int socketpair(int domain, int type, int protocol, int sv[2])
         };
     }
 
+fail:
     return (int) (-1);
 }
 
@@ -362,28 +362,27 @@ int pselect(int nfds, fd_set *readfds, fd_set *writefds,
 { return -1; }
 */             
 
-
-// send:
-
 ssize_t 
-send ( 
+send( 
     int sockfd, 
     const void *buf, 
     size_t len, 
     int flags )
 {
-    if(sockfd<0)
+    if (sockfd<0)
     {
         errno = EBADF;
         return (ssize_t) -1;
     }
 
-    //#todo: Usar esse.
+    return (ssize_t) write( sockfd, (const void *) buf, len );
+
+// #todo:
+// Use this one instead. #maybe
+
     //return (ssize_t) sendto ( (int) sockfd, 
         //(const void *) buf, (size_t) len, (int) flags,
         //(const struct sockaddr *) dest_addr, (socklen_t) addrlen );
-
-    return (ssize_t) write ( sockfd, (const void *) buf, len );
 }
 
 
@@ -422,16 +421,13 @@ ssize_t sendmsg (int sockfd, const struct msghdr *msg, int flags)
     return -1;
 }
 
-
-// recv:
 ssize_t 
-recv ( 
+recv( 
     int sockfd, 
     void *buf, 
     size_t len, 
     int flags )
 {
-
     if (sockfd<0){
         errno = EBADF;
         return (ssize_t) (-1);
@@ -439,12 +435,13 @@ recv (
 
    return (ssize_t) read( sockfd, (const void *) buf, len );
 
-    // #todo: Usar esse.
+// #todo:
+// Use this one instead. #maybe
+
     //return (ssize_t) recvfrom ( (int) sockfd, 
         //(void *) buf, (size_t) len, (int) flags,
         //(struct sockaddr *) src_addr, (socklen_t *) addrlen );
 }
-
 
 ssize_t 
 recvfrom ( 

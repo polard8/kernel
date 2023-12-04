@@ -1,5 +1,5 @@
-
 // msgloop.c
+// Created by Fred Nora.
 
 #include "init.h"
 
@@ -362,10 +362,12 @@ int run_server(void)
     //rtl_focus_on_this_thread();
     IdleLoopStatus = (int) __idlethread_loop();
     if (IdleLoopStatus < 0){
-        printf ("run_server: Loop failed\n");
-        return -1;
+        printf("run_server: Loop failed\n");
+        goto fail;
     }
     return 0;
+fail:
+    return -1;
 }
 
 // #todo
@@ -414,6 +416,7 @@ int initialize_headless_mode(void)
     }
     return (int) Status;
 fail:
-    return -1;
+    return (int) -1;
+    //return (int) Status;
 }
 

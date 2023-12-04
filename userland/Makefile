@@ -1,23 +1,26 @@
 all:
 
+# The libs for ring3
 	make -C libs/
-
 # The init process
 	make -C init/
 
-# The Gramado Network Server
-	make -C hvnetd/server/
-# First client for GNS.
-	make -C hvnetd/client/ 
-	
+#	make -C drivers/
+#	make -C servers/
+
+# The Gramado Network Server and the first client
+	make -C netd/server/
+	make -C netd/client/ 
+
+
 clean:
 	-rm -f libs/libgns/obj/*.o
 	-rm -f libs/rtl/obj/*.o
 
 	-rm -f init/*.o
 
-	-rm -f hvnetd/server/*.o
-	-rm -f hvnetd/client/*.o
+	-rm -f netd/server/*.o
+	-rm -f netd/client/*.o
 
 	-rm -f bin/*.BIN
 

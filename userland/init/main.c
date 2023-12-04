@@ -1,10 +1,10 @@
-
 // Init process. INIT.BIN.
 // This is the first ring3 process.
 // This is also has an embedded shell. 
 // This way we can use it to launch the window server.
 // After that the applications goes to a loop
 // receving messages from the kernel.
+// Created by Fred Nora.
 
 /*
 #include <types.h>
@@ -34,9 +34,9 @@ static isTimeToQuit = FALSE;
 
 static const char *app1_name = "gramland.bin";   // #c1
 //static const char *app1_name = "nicctld.bin";  // #c2
-static const char *app2_name = "nicctl.bin";
-static const char *app3_name = "hvnetd.bin";    // #c3
-static const char *app4_name = "hvnet.bin";
+//static const char *app2_name = "nicctl.bin";
+static const char *app3_name = "netd.bin";    // #c3
+static const char *app4_name = "net.bin";
 
 // ------------------------------------------
 // Command line for the display server.
@@ -390,7 +390,7 @@ static int __CompareString(void)
 // Initialize the network server.
     if ( strncmp(prompt,"ns",2) == 0 ){
         //printf ("~NS\n");
-        // #c3 NICCTLD.BIN
+        // #c3 NETD.BIN
         //rtl_clone_and_execute(app3_name);
         goto exit_cmp;
     }
@@ -398,7 +398,7 @@ static int __CompareString(void)
     if( strncmp(prompt,"nsq",3) == 0 ){
         printf ("~NSQ\n");
         do_clear_console();
-        // #c3 NICCTLD.BIN
+        // #c3 NETD.BIN
         rtl_clone_and_execute(app3_name);
         isTimeToQuit = TRUE;
         goto exit_cmp;

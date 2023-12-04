@@ -1,5 +1,4 @@
-
-# HVNET.BIN
+# NET.BIN
 # NET Control (Client-side)
 
 VERSION = 0
@@ -73,10 +72,10 @@ all-c:
 	cp $(LIBGNSOBJ)/gns.o .
 
 hello-link:
-	ld -m elf_x86_64 -T ../../link.ld -o HVNET.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../../link.ld -o NET.BIN $(myObjects)    
 finalize:
-	cp HVNET.BIN  ../../bin
+	cp NET.BIN  ../../bin
 clean:
 	-rm *.o
-	-rm HVNET.BIN 
+	-rm NET.BIN 
 	

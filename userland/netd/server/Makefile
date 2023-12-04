@@ -1,12 +1,11 @@
-
-# HVNETD.BIN
+# NETD.BIN
 # NET Control (Server-side)
 
 VERSION = 0
 PATCHLEVEL = 1
 SUBLEVEL = 0
 EXTRAVERSION = 
-#NAME = GWSSRV
+#NAME = 
 
 CFLAGS = -m64 \
 	-std=gnu89 \
@@ -70,10 +69,10 @@ all-c:
 	cp $(LIBCOBJ)/fcntl.o .
 
 gws-link:
-	ld -m elf_x86_64 -T ../../link.ld -o HVNETD.BIN $(myObjects)    
+	ld -m elf_x86_64 -T ../../link.ld -o NETD.BIN $(myObjects)    
 finalize:
-	cp HVNETD.BIN ../../bin
+	cp NETD.BIN ../../bin
 clean:
 	-rm *.o
-	-rm HVNETD.BIN 
+	-rm NETD.BIN 
 	
