@@ -34,8 +34,6 @@ static unsigned long flush_fps=30;
 //unsigned long shift_charmap_address;
 //unsigned long control_charmap_address;
 
-
-
 // ==========================
 
 //
@@ -137,11 +135,11 @@ int windowLoadGramadoIcons(void)
     icon_cache.size_in_bytes = (size_t) tmp_size;
 
 // See: window.h
-    icon_cache.app          = (void *) allocPages(4);
-    icon_cache.file           = (void *) allocPages(4);
-    icon_cache.folder      = (void *) allocPages(4);
-    icon_cache.terminal  = (void *) allocPages(4);
-    icon_cache.cursor      = (void *) allocPages(4);
+    icon_cache.app      = (void *) allocPages(4);
+    icon_cache.file     = (void *) allocPages(4);
+    icon_cache.folder   = (void *) allocPages(4);
+    icon_cache.terminal = (void *) allocPages(4);
+    icon_cache.cursor   = (void *) allocPages(4);
     // ...
 
     if ( (void *) icon_cache.app == NULL ){
@@ -250,7 +248,6 @@ fail:
     return -1;
 }
 
-
 // ============================
 // Get a shared buffer to a system icon.
 // it is gonna be used by the window server.
@@ -291,7 +288,6 @@ unsigned long get_update_screen_frequency(void)
     return (unsigned long) flush_fps;
 }
 
-
 void set_update_screen_frequency(unsigned long fps)
 {
     if (fps==0)   { fps=1; };
@@ -302,8 +298,6 @@ void set_update_screen_frequency(unsigned long fps)
     presence_level = (unsigned long) (1000/flush_fps);
     presence_level = (unsigned long) (presence_level & 0xFFFF);
 }
-
-
 
 unsigned long get_presence_level(void)
 {
@@ -368,10 +362,9 @@ void schedulerUpdateScreen(void)
 //=========================
 */
 
-
 // Flush a list of dirty surfaces.
 
-    for ( i=0; i < THREAD_COUNT_MAX; ++i )
+    for (i=0; i<THREAD_COUNT_MAX; ++i)
     {
         TmpThread = (void *) threadList[i];
 
@@ -392,7 +385,7 @@ void schedulerUpdateScreen(void)
                         // Como fizemos refresh da tela toda,
                         // então precisamos validar todos os retângulos.
                         
-                        if ( validate_all == TRUE )
+                        if (validate_all == TRUE)
                             TmpThread->surface_rect->dirty = FALSE;
 
                         // dirty rectangle
@@ -420,7 +413,7 @@ void schedulerUpdateScreen(void)
 // Chamamos o 3d demo do kernel.
 // See: kgws.c
 
-    if (DemoFlag==TRUE)
+    if (DemoFlag == TRUE)
     {
         //demo0();
         DemoFlag=FALSE;
@@ -429,8 +422,6 @@ void schedulerUpdateScreen(void)
 // Atualizado pelo timer.
     UpdateScreenFlag = FALSE;
 }
-
-
 
 // see: bldisp.c
 void keRefreshScreen(void)
@@ -482,6 +473,14 @@ static void __check_refresh_support(void)
 // #bugbug
 // Para os outros casos o pitch será '0'.
 
+    /*
+    if ( xBootBlock.bpp != 24 &&  
+         xBootBlock.bpp != 32 )
+    {
+        //panic
+    }
+    */
+
     if ( xBootBlock.bpp == 24 || 
          xBootBlock.bpp == 32 )
     {
@@ -506,7 +505,7 @@ static void __check_refresh_support(void)
 // Remember: For now we only have 2048KB mapped for LFB.
 // Quantos KB vamos precisar para uma tela nessa resoluçao?
     screen_size_in_kb = 
-        (unsigned long) (( pitch * xBootBlock.deviceHeight )/ 1024 );
+        (unsigned long) ( (pitch * xBootBlock.deviceHeight)/1024 );
 
     // #debug
     //printf ("Screen size: %d KB\n", screen_size_in_kb);
@@ -569,7 +568,7 @@ static void __check_refresh_support(void)
     if (refresh_screen_enabled != TRUE)
     {
         // Enough for 320x200x32bpp
-        fake_screen_size_in_kb = (( 320*4*200 )/1024);
+        fake_screen_size_in_kb = ( (320*4*200)/1024 );
         g_use_fake_screen_size = TRUE;
         refresh_screen_enabled = TRUE;
     }
@@ -794,7 +793,7 @@ int psInitializeMKComponents(void)
 // see: dispatch.c
 
     DispatchCountBlock = 
-        (void *) kmalloc ( sizeof( struct dispatch_count_d ) );
+        (void *) kmalloc( sizeof(struct dispatch_count_d) );
 
     if ( (void *) DispatchCountBlock == NULL ){
         printf ("init_microkernel: DispatchCountBlock\n");
@@ -865,7 +864,9 @@ int keInitialize(int phase)
         Initialization.is_console_log_initialized = TRUE;
 
         // Show banner!
+        // See: zero.c
         zero_show_banner();
+
         // Print resolution info
         __print_resolution_info();
         // Check gramado mode
@@ -963,7 +964,10 @@ int keInitialize(int phase)
         //PROGRESS("networkInit ok\n"); 
 
         goto InitializeEnd;
-    }
+    } else {
+        // Wrong phase number.
+        // goto fail;
+    };
 
 InitializeEnd:
     return TRUE;

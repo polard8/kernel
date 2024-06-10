@@ -1,10 +1,16 @@
 
-INCLUDE = ../../../include
-# Internal files
-# Used to build the kernel.
-KERNEL_INCLUDE := -I $(INCLUDE)   
+# Build the kernel header, for 64bit kernel.
+# The final object is head_64.o  
 
-STARTUP_INCLUDE := -I startup/  
+objTARGET := head_64.o    
+
+# (KERNEL_INCLUDE) Used to build the kernel.
+KERNEL_INCLUDE   := -I ../../../include
+STARTUP_INCLUDE  := -I startup/    
+ENTRY_INCLUDE    := -I entry/    
+INCLUDES := $(KERNEL_INCLUDE) $(STARTUP_INCLUDE) $(ENTRY_INCLUDE)    
+
+DESTINATION_FOLDER := ../../../
 
 AS	= as
 LD	= ld
@@ -24,25 +30,13 @@ RUBY	= ruby
 
 all:
 
-# ----------------------------------------------
-# startup
-	$(NASM) startup/head_64.asm \
-	$(KERNEL_INCLUDE) \
-	$(STARTUP_INCLUDE) \
-	-f elf64 -o head_64.o    
+# Startup code and entry code.
+	$(NASM) head_64.asm $(INCLUDES) \
+	-f elf64 -o $(objTARGET)    
 
-	cp head_64.o ../../../
+# Copy to destination folder.
+	cp $(objTARGET) $(DESTINATION_FOLDER)    
 
-	rm *.o
-	
-
-
-
-
-
-
-
-
-
-
+# Clean unused objects,
+	rm *.o    
 

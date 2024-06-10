@@ -101,6 +101,7 @@ off_t sys_lseek(int fd, off_t offset, int whence)
 {
     file *f;
     struct process_d *p;
+    pid_t current_process = -1;
 
     // #debug
     // debug_print("sys_lseek: [WORK IN PROGRESS]\n");
@@ -118,7 +119,7 @@ off_t sys_lseek(int fd, off_t offset, int whence)
     }
 
 // pid
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if (current_process<0 || current_process >= PROCESS_COUNT_MAX){
         goto fail;
     }
@@ -129,7 +130,7 @@ off_t sys_lseek(int fd, off_t offset, int whence)
         debug_print("sys_lseek: p\n");
         goto fail;
     }
-    if (p->magic!=1234){
+    if (p->magic != 1234){
         goto fail;
     }
 

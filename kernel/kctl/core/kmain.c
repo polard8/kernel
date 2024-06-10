@@ -117,24 +117,22 @@ unsigned long saved_bootblock_base=0;
 #define BootBlockVA    0x0000000000090000
 // --------------------------------------
 // Indexes into the boot block.
-// EAch entry has 64bit.
+// Each entry has 64bit.
 #define bbOffsetLFB_PA  0  // offset 0
 #define bbOffsetX       1  // offset 8
 #define bbOffsetY       2  // offset 16
 #define bbOffsetBPP     3  // offset 24
 #define bbLastValidPA   4  // offset 32  // Last valid physical address.
 #define bbGramadoMode   5  // offset 40  // jail, p1, home ...
+//#test
+#define bb_idePortNumber  6  // offset 48.
 // ...
-
 
 // See:
 // xxxhead.asm
 extern void x84_64_initialize_machine(void);
 
-
-
 // ================================
-
 
 //
 // == Private functions: Prototypes ========
@@ -147,16 +145,11 @@ static void preinit_Globals(int arch_type);
 static void preinit_OutputSupport(void);
 static void preinit_Serial(void);
 
-
 static void kernel_final_messages(void);
 
 // System initialization routines.
 
 static void __enter_debug_mode(void);
-
-
-
-
 
 
 static void __enter_debug_mode(void)
@@ -184,16 +177,15 @@ static void __enter_debug_mode(void)
         die();
     }
 
-// #panic
-// Oh God.
-// Die. No refresh. No message.
+// Die. 
+// No refresh and no message.
     die();
 }
 
 // ==========================
 static void preinit_Globals(int arch_type)
 {
-// We dont have any print support for now.
+// We don't have any print support for now.
 
 // Scheduler policies
 // Early initialization.
@@ -209,8 +201,8 @@ static void preinit_Globals(int arch_type)
     IOControl.useTTY = FALSE;        // Model not implemented yet.
     IOControl.useEventQueue = TRUE;  // The current model.
     IOControl.initialized = TRUE;    // IO system initialized.
-
     // ...
+
 //
 // Presence level
 //
@@ -247,7 +239,7 @@ static void preinit_Serial(void)
 
     int Status=FALSE;
     Status = serial_init();
-    if(Status!=TRUE){
+    if (Status!=TRUE){
         //#bugbug
         //Oh boy!, We can't use the serial debug.
     }
@@ -486,6 +478,9 @@ static int preinit_SetupBootblock(void)
 // Save global variable.
     current_mode = (unsigned long) xBootBlock.gramado_mode;
 
+// 48
+    xBootBlock.ide_port_number  = (unsigned long) xxxxBootBlock[bb_idePortNumber];
+
 // ---------------------
 // #note
 // Well, we do not have information about the disk.
@@ -562,7 +557,6 @@ static int preinit(void)
     return 0;
 }
 
-
 // == Idle thread in ring 0  ===============
 // #test
 
@@ -624,9 +618,7 @@ void I_kmain(int arch_type)
 // see: heauty/product.h
     g_product_type = PRODUCT_TYPE;
 
-
     __failing_kernel_subsystem = KERNEL_SUBSYSTEM_INVALID;
-
 
 // Setup debug mode.
 // Enable the usage of the serial debug.
@@ -638,13 +630,12 @@ void I_kmain(int arch_type)
     }
 
     // #hack
-    //current_arch = (int) arch_type;
     current_arch = CURRENT_ARCH_X86_64;
+    //current_arch = (int) arch_type;
 
 //
 // Pre-init
 //
-
 
 // Preinit
 // We don't have any print support yet.
@@ -673,6 +664,7 @@ void I_kmain(int arch_type)
     //PROGRESS(":: Initialize mm subsystem\n");
 
 // Initialize mm phase 0.
+// See: mm.c
 // + Initialize video support.
 // + Inittialize heap support.
 // + Inittialize stack support. 
@@ -716,6 +708,7 @@ void I_kmain(int arch_type)
     //PROGRESS(":: Initialize ke subsystem\n");
 
 // Initialize ke phase 0.
+// See: ke.c
 // + kernel font.
 // + background.
 // + refresh support.
@@ -726,8 +719,7 @@ void I_kmain(int arch_type)
     Status = (int) keInitialize(0);
     if (Status != TRUE)
     {
-        __failing_kernel_subsystem = 
-            KERNEL_SUBSYSTEM_KE;
+        __failing_kernel_subsystem = KERNEL_SUBSYSTEM_KE;
         goto fail;
     }
     Initialization.ke_phase0 = TRUE;
@@ -746,7 +738,6 @@ void I_kmain(int arch_type)
 //----------
 //--
 */
-
 
 // Initialize ke phase 1.
 // + Calling I_x64main to 
@@ -796,7 +787,6 @@ void I_kmain(int arch_type)
         userList[u] = 0;
     };
 
-
 // #test
 // At this point we already have almost all we need to 
 // pass the control to the init process.
@@ -809,6 +799,8 @@ void I_kmain(int arch_type)
 
 // ----------------------------------
 // Last thing
+// + Probing for processor type.
+// + Initializing smp for x64 machines.
 
     int smp_status = FALSE;
     int processor_type = -1;
@@ -868,7 +860,7 @@ void I_kmain(int arch_type)
 // Runlevel switch:
 //
 
-// Enter into the debug console instead of jumpinp 
+// Enter into the debug console instead of jumping 
 // into the init thread.
 // ::: Initialization on debug mode
 // Initialize the default kernel virtual console.
@@ -910,6 +902,7 @@ StartSystemEnd:
     sprintf( kernel_utsname.nodename, UTS_NODENAME );
     sprintf( kernel_utsname.domainname, UTS_DOMAINNAME );
 
+// Execute the first ring3 process.
 // ireq to init thread.
 // See: x64init.c
 
@@ -944,13 +937,4 @@ fail:
 //
 // End
 //
-
-
-
-
-
-
-
-
-
 

@@ -50,14 +50,17 @@ _BlTransferToKernel:
     mov ds, ax
     mov es, ax
 
+    ;mov fs, ax
+    ;mov gs, ax
+
 ;
 ; Go!
 ;
 
 ; IN:
 ; Temos um bootblock em 0x00090000.
-; Temos também outro boot block em [] 
-; que não foi devidamente observado.
+; We filled the bootblock during the bl initialization,
+; see the file head.s in this project.
 ; #todo: 
 ; Vamos precisa passar o 'Gramado mode',
 ; muita coisa no sistema depende disso.

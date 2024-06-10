@@ -71,9 +71,9 @@ static void ServerInitialization(int value)
 
 int main(int argc, char *argv[])
 {
+    printf("webd.bin: Initializing ...\n");
     ServerInitialization(0);
 
-    printf("webd.bin: Initializing ...\n");
     return (int) EXIT_SUCCESS;
 }
 

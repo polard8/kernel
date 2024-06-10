@@ -1,5 +1,6 @@
 
 // keyboard.c
+// This is the ps2/keyboard driver, embedded into the kernel base.
 // ps/2 keyboard support.
 // See:
 // https://www.gnu.org/software/libc/manual/html_node/Canonical-or-Not.html

@@ -151,7 +151,6 @@ void ata_show_device_list_info(void)
     };
 }
 
-
 void ata_show_ata_info_for_boot_disk(void)
 {
     struct disk_d *disk;
@@ -186,12 +185,11 @@ void ata_show_ata_info_for_boot_disk(void)
     }
 
 // --------------------------------
- // Show the number of blocks.
-    printf("Number rof blocks: %d\n",
+    // Show the number of blocks.
+    printf("Number of blocks: %d\n",
         ata_device->dev_total_num_sector );
 
-//done
+// done
     refresh_screen();
 }
-
 

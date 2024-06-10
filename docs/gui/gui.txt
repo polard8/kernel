@@ -1,5 +1,0 @@
-
-
-	The zing/ directory is the place for the display server.
-
- 

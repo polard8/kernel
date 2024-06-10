@@ -19,11 +19,12 @@ int g_product_type = PRODUCT_TYPE;
 
 // #bugbug
 // We are using another structure.
-// see: init.c
+// see: kmain.c
 // see: gdef.h
-struct boot_block_d  BootBlock;
+//struct boot_block_d  BootBlock;
+
 // This is the write structure for this.
-//see: display.h, init.c, bldisp.c
+// see: display.h, init.c, bldisp.c
 struct x_boot_block_d  xBootBlock;
 
 

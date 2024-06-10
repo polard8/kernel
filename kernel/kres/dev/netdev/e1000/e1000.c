@@ -1111,6 +1111,9 @@ fail:
     return;
 }
 
+// We receive an interrupt telling us that
+// the transmission is completed. So, here we simply
+// update the counters.
 static void __e1000_on_transmit(void)
 {
     // printf ("__e1000_on_transmit: Transmit completed\n");
@@ -1129,9 +1132,15 @@ static void __e1000_on_receive(void)
 {
 // Frame
     unsigned char *frame;
-    uint16_t frame_lenght=0x0000;
+    uint16_t frame_lenght = 0x0000;
 // Descriptor index.
-    uint16_t old=0;
+    uint16_t old = 0;
+
+// The current NIC.
+// (Intel structure?)
+// #bugbug:
+// We still don't have a pointer for the current device.
+// and this structure represents only an Intel device.
 
     if ((void*) currentNIC == NULL){
         return;
@@ -1166,14 +1175,8 @@ static void __e1000_on_receive(void)
             panic ("__e1000_on_receive: frame\n");
         }
         if (frame_lenght > E1000_DEFAULT_BUFFER_SIZE){
-             panic ("__e1000_on_receive: frame_lenght\n");
+            panic ("__e1000_on_receive: frame_lenght\n");
         }
-
-        //#bugbug: Não mais chamaremos a rotina de tratamento nesse momento.
-        //chamaremos logo adiante, usando o buffer que pegamos acima.
-
-        // Our Net layer should handle it
-        // NetHandlePacket(currentNIC->ndev, len, (PUInt8)currentNIC->rx_buffers_virt[old]);
 
         // Somente apagar o primeiro bit
         currentNIC->legacy_rx_descs[old].status &= ~1;
@@ -1222,6 +1225,10 @@ static void DeviceInterface_e1000(void)
 
 // The current NIC.
 // (Intel structure?)
+// #bugbug:
+// We still don't have a pointer for the current device.
+// and this structure represents only an Intel device.
+
     if ((void*) currentNIC == NULL)
         panic("DeviceInterface_e1000: currentNIC\n");
     if (currentNIC->magic != 1234)

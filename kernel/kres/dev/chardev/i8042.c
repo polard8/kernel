@@ -1,5 +1,6 @@
 
 // i8042.c
+// Intel 8042 keyboard/mouse controller.
 // Created by Fred Nora.
 
 #include <kernel.h>  

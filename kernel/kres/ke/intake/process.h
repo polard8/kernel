@@ -44,7 +44,7 @@ typedef enum {
 // -----------------------------
 
 // This process was made to Gramado OS.
-#define PERSONALITY_GRAMADO_AMAZING  1000
+#define PERSONALITY_GRAMADO  1000
 // ...
 
 // Processes:

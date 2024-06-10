@@ -1,9 +1,0 @@
-
-
-	The games/ directory is a place for the 3D and 2D games.
-
-	game1/ and game2/ are 'games' using an embedded 3D library.
-	These programs are running in ring 3 and using 
-	the float point support.
-
-	libs/rtl is the libc for these projects.

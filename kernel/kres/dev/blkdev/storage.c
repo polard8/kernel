@@ -8,13 +8,11 @@
 // See: storage_set_total_lba_for_boot_disk().
 unsigned long gNumberOfSectorsInBootDisk=0;
 
-
 const char* sda_string = "sda";
 const char* sdb_string = "sdb";
 const char* sdc_string = "sdc";
 const char* sdd_string = "sdd";
 const char* sdfail_string = "sd?";
-
 
 // #test
 // see: disk.h
@@ -24,6 +22,59 @@ struct partition_table_d *system_disk_pt2;
 struct partition_table_d *system_disk_pt3;
 //struct partition_table_d *boot_partition; 
 //struct partition_table_d *system_partition; 
+
+// MBR structure for the system disk.
+// See: disk.h
+struct mbr_d  *mbr; 
+
+// VBR structure for the boot partition.
+// See: volume.h
+struct vbr_d  *vbr; 
+
+//
+// Disks ---------------------------
+//
+
+// Disks
+// Structure for the system disk.
+// See: disk.c
+struct disk_d  *____boot____disk;
+// ...
+
+
+// Disk list.
+// Essa lista é preenchida pelo driver de IDE.
+// See: disk.h
+unsigned long diskList[DISK_COUNT_MAX];
+
+//
+// Volumes ---------------------------
+//
+
+
+char *current_volume_string;
+// volume atual ??
+// Tipo de sistema de arquivos, fat16, ext2 ...
+int g_currentvolume_filesystem_type=0;   //use this one.
+// volume atual do tipo fat???
+// Se é fat32, 16, 12.
+int g_currentvolume_fatbits=0;
+
+
+// #importante:
+// Esses são os três volumes básicos do sistema 
+// mesmo que o disco só tenha um volume, essas 
+// estruturas vão existir.
+// See: volume.h
+struct volume_d  *volume_vfs;             // volume 0
+struct volume_d  *volume_bootpartition;   // volume 1
+struct volume_d  *volume_systempartition; // volume 2
+// ...
+
+
+// Volume list
+// See: storage.c
+unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
 //
@@ -35,6 +86,7 @@ static int __create_system_partition(void);
 static int __create_vfs_partition(void);
 
 static int __ShowDiskInfo(int index);
+static int __ShowVolumeInfo(int index);
 
 // =================================================
 
@@ -67,22 +119,19 @@ static int __ShowDiskInfo(int index)
         goto fail;
     }
 
-// Show data.
-    printf("Disk {%d} | Name {%s}\n", 
-        d->id, d->name );
-    printf("Bootdisk {%d}\n",
-        d->boot_disk_number);
-    printf("Type {%d}\n", 
-        d->diskType );
-// Capacity
-    printf("Number of blocks {%d}\n", 
-        d->number_of_blocks );
-    printf("Byte per sector{%d}\n", 
-        d->bytes_per_sector );
-    printf("Size in bytes{%d}\n", 
-        d->size_in_bytes );
-    // ...
+// Show data
 
+    printf("Disk (%d): Name {%s}\n", 
+        d->id, d->name );
+// Basics
+    printf("Bootdisk {%d}\n", d->boot_disk_number );
+    printf("Type     {%d}\n", d->diskType );
+    // ...
+// Capacity
+    printf("Number of blocks {%d}\n", d->number_of_blocks );
+    printf("Byte per sector  {%d}\n", d->bytes_per_sector );
+    printf("Size in bytes    {%d}\n", d->size_in_bytes );
+    // ...
     printf("Done\n");
     return 0;
 fail:
@@ -733,43 +782,46 @@ int volume_init (void)
     return 0;
 }
 
-
-int volumeShowVolumeInfo ( int descriptor )
+static int __ShowVolumeInfo(int index)
 {
     struct volume_d *v;
 
-    //printf ("volumeShowVolumeInfo:\n");
-    printf ("\n");
+    printf("\n");
+    printf("\n");
 
-    if ( descriptor < 0 || 
-         descriptor >= VOLUME_COUNT_MAX )
+    //printf ("__ShowVolumeInfo:\n");
+
+
+    if ( index < 0 || 
+         index >= VOLUME_COUNT_MAX )
     {
-        printf("descriptor fail\n");
+        printf("index fail\n");
         goto fail;
     }
 
-
-    v = (struct volume_d *) volumeList[descriptor];
-
-    if( (void *) v == NULL ){
+// Structure validation
+    v = (struct volume_d *) volumeList[index];
+    if ( (void *) v == NULL ){
         printf ("struct fail\n");
         goto fail;
     }
-
     if ( v->used != 1 || v->magic != 1234 )
     {
         printf("flags fail\n");
         goto fail;
     }
 
-    printf ("volume %d - %s \n", v->id, v->name );
-    printf ("volumeType = {%d}\n", v->volumeType);
+// Show data
 
-    printf ("VBR_lba  {%d}\n", v->VBR_lba  );
-    printf ("FAT2_lba {%d}\n", v->FAT1_lba );
-    printf ("FAT2_lba {%d}\n", v->FAT2_lba );
-    printf ("ROOT_lba {%d}\n", v->ROOT_lba );
-    printf ("DATA_lba {%d}\n", v->DATA_lba );
+    printf ("Volume (%d): Name {%s}\n", v->id, v->name);
+// Basics
+    printf ("Type     {%d}\n", v->volumeType);
+// LBAs
+    printf ("VBR_lba  {%d}\n", v->VBR_lba );
+    printf ("FAT2_lba {%d}\n", v->FAT1_lba);
+    printf ("FAT2_lba {%d}\n", v->FAT2_lba);
+    printf ("ROOT_lba {%d}\n", v->ROOT_lba);
+    printf ("DATA_lba {%d}\n", v->DATA_lba);
     // ...
 
 //done
@@ -778,6 +830,11 @@ int volumeShowVolumeInfo ( int descriptor )
 fail:
     printf("Fail\n");
     return (int) -1;
+}
+
+int volumeShowVolumeInfo (int descriptor)
+{
+    return (int) __ShowVolumeInfo(descriptor);
 }
 
 void volumeShowCurrentVolumeInfo(void)
@@ -794,8 +851,8 @@ void volumeShowCurrentVolumeInfo(void)
 // Show info for all volumes in the list.
 void volume_show_info (void)
 {
-    int i=0;
     struct volume_d *volume;
+    register int i=0;
 
     for (i=0; i<VOLUME_COUNT_MAX; i++)
     {
@@ -867,8 +924,8 @@ int storage_set_total_lba_for_boot_disk(void)
     }
 
 // --------------------------------
- // Show the number of blocks.
-    printf("Number rof blocks: %d\n",
+    // Show the number of blocks.
+    printf("Number of blocks: %d\n",
         ata_device->dev_total_num_sector );
 
 // Set global variable.

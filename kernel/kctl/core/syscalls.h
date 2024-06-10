@@ -73,14 +73,14 @@ void *sys_create_thread (
     char *name );
 
 /* zero/sys/sys.c */
-int sys_exit_thread (tid_t tid);
+int sys_exit_thread(tid_t tid);
 int sys_fork(void);
 pid_t sys_getpid(void);
 pid_t sys_getppid(void);
 int sys_initialize_component(int n);
-int sys_serial_debug_printk ( char *s );
-void sys_show_system_info ( int n );
-int sys_uname (struct utsname *ubuf);
+int sys_serial_debug_printk(char *s);
+void sys_show_system_info(int n);
+int sys_uname(struct utsname *ubuf);
 void sys_vsync(void);
 
 /* zero/sys/sys.c */

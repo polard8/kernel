@@ -71,9 +71,9 @@ static void ServerInitialization(int value)
 
 int main(int argc, char *argv[])
 {
+    printf("telnetd.bin: Initializing ...\n");
     ServerInitialization(0);
 
-    printf("telnetd.bin: Initializing ...\n");
     return (int) EXIT_SUCCESS;
 }
 

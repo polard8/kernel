@@ -70,18 +70,25 @@ mmain (
         case 1002:
             fn_table = (unsigned long *) param4;
             printf("fn_table {%x}\n", fn_table);
+            return (unsigned long) 0;
             //while(1){}
             break;
 
         // The syscall entrypoint exported by the kernel.
+        // This way we can call routines inside the kernel.
         case 1003:
             printf("mod_sci: {%x}\n", param4);
             sci_entry = param4;
+            
             // Calling the kernel service.
             // see: kal.c
-            ReturnValue = (unsigned long) ke_sci(0,0,0,0);
-            printf("RETURN: {%d} :) #breakpoint\n", ReturnValue);
-            while(1){}
+            // ok, it is working!
+            //ReturnValue = (unsigned long) ke_sci(0,0,0,0);
+            //printf("mmain.c: ReturnValue={%d} \n", ReturnValue);
+            
+            //printf("mmain.c: #breakpoint :)\n");
+            //while (1){};
+            return (unsigned long) 0;
             break;
 
         // :: Step1

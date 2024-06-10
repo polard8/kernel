@@ -134,8 +134,6 @@ static int __setup_stdin_cmdline(void)
     return 0;
 }
 
-
-
 // Local worker.
 // The virtual address for the base of the image.
 // ps: We are using the kernel page directories now,
@@ -194,7 +192,6 @@ static int __load_initbin_image(void)
 //    1 = fail 
 //    0 = ok
 
-
     Status = 
         (unsigned long) fsLoadFile( 
                             VOLUME1_FAT_ADDRESS, 
@@ -237,7 +234,7 @@ static int I_x64CreateInitialProcess(void)
 
     InitialProcessInitialized = FALSE;
 
-    if ( system_state != SYSTEM_BOOTING ){
+    if (system_state != SYSTEM_BOOTING){
         printf ("I_x64CreateInitialProcess: system_state\n");
         return FALSE;
     }
@@ -256,8 +253,7 @@ static int I_x64CreateInitialProcess(void)
 
     int ret0 = -1;
     ret0 = (int) __load_initbin_image();
-    if (ret0 != 0)
-    {
+    if (ret0 != 0){
         printf("I_x64CreateInitialProcess: Coldn't load INIT.BIN\n");
         return FALSE;
     }
@@ -300,6 +296,9 @@ static int I_x64CreateInitialProcess(void)
 // Create init process
 //
 
+// #todo
+// Comment about the properties of this process.
+
     unsigned long BasePriority = PRIORITY_SYSTEM_THRESHOLD;
     unsigned long Priority     = PRIORITY_SYSTEM_THRESHOLD;
 
@@ -314,7 +313,7 @@ static int I_x64CreateInitialProcess(void)
                      (unsigned long) init_pml4_va,
                      (unsigned long) kernel_mm_data.pdpt0_va,
                      (unsigned long) kernel_mm_data.pd0_va,
-                     PERSONALITY_GRAMADO_AMAZING );
+                     PERSONALITY_GRAMADO );
 
 // validation
     if ((void *) InitProcess == NULL){
@@ -354,7 +353,7 @@ static int I_x64CreateInitialProcess(void)
     InitProcess->priority = Priority;
 
 // see: layer.h
-    InitProcess->_layer = LAYER_AMA_INIT;
+    InitProcess->_layer = LAYER_INIT;
 
 // The init process. This is part og the gramland subsystem.
     InitProcess->env_subsystem = GramadoSubsystem;
@@ -798,7 +797,6 @@ void I_x64ExecuteInitialProcess(void)
     panic("I_x64ExecuteInitialProcess: Unexpeted error\n");
 }
 
-
 // Local worker
 // #todo
 // Check the information in the elf header.
@@ -811,20 +809,17 @@ static int __load_mod_image(void)
 // #warning
 // This is a static address. Why not?
 // Hack me!
-    unsigned long ImageAddress =
-        (unsigned long) 0x30A00000;
+    unsigned long ImageAddress = (unsigned long) 0x30A00000;
 // #bugbug
 // We have a limit for the image size.
     unsigned long BUGBUG_IMAGE_SIZE_LIMIT = (512 * 4096);
 
     unsigned long fileret=1;
 
-
 // Check the validation of the name.
     if ((void*) mod_image_name == NULL){
         panic("__load_mod_image: init_image_name\n");
     }
-
 
 // ---------------------
 // It loads a file into the memory.
@@ -839,7 +834,6 @@ static int __load_mod_image(void)
 // OUT: 
 //    1 = fail 
 //    0 = ok
-
 
     fileret = 
         (unsigned long) fsLoadFile( 
@@ -885,24 +879,16 @@ static int I_x64CreateKernelProcess(void)
     //debug_print ("I_x64CreateKernelProcess:\n");
 
 //
-// Load module image.
+// Kernel process
 //
 
 // #todo
-// Check the information in the elf header.
-// Save some of this information in the process structure. 
-// see: exec_elf.h and process.h
-
-    __load_mod_image();
-
-//
-// Kernel process
-//
+// Comment about the properties of this process.
 
 // IN: 
 // Desktop, Window
 // base address, priority, ppid, name, iopl, page directory address.
-// See: ps/action/process.c
+// See: process.c
 // KERNELIMAGE_VA
  
     KernelProcess = 
@@ -916,7 +902,7 @@ static int I_x64CreateKernelProcess(void)
                      (unsigned long ) gKernelPML4Address,
                      (unsigned long ) kernel_mm_data.pdpt0_va,
                      (unsigned long ) kernel_mm_data.pd0_va,
-                     PERSONALITY_GRAMADO_AMAZING );
+                     PERSONALITY_GRAMADO );
 
 // Struct and struct validation.
     if ((void *) KernelProcess == NULL){
@@ -954,7 +940,7 @@ static int I_x64CreateKernelProcess(void)
     KernelProcess->priority = Priority;
 
 // see: layer.h
-    KernelProcess->_layer = LAYER_AMA_KERNEL;
+    KernelProcess->_layer = LAYER_KERNEL;
 
 // This is the kernel process.
     KernelProcess->env_subsystem = CaliSubsystem;
@@ -996,11 +982,22 @@ static int I_x64CreateKernelProcess(void)
     }
     */
 
+//
+// the first Kernel module
+//
+
 // ====================
 // Initialize the kernel module list.
     for (i=0; i<KMODULE_MAX; i++){
         kmList[i] = 0;
     };
+
+// Load the kernel module image.
+// #todo
+// Check the information in the elf header.
+// Save some of this information in the process structure. 
+// see: exec_elf.h and process.h
+    __load_mod_image();
 
 // ====================
 // Setup the first kernel module.
@@ -1018,8 +1015,7 @@ static int I_x64CreateKernelProcess(void)
     return TRUE;
 }
 
-
-
+// #suspended
 // Create a ring0 thread for the window server image.
 // It belongs to the kernel process.
 static int I_x64CreateTID0(void)
@@ -1492,7 +1488,7 @@ int I_x64_initialize(void)
     x64_init_gdt();
 
 // ================================
-// Creating kernel process.
+// [KERNEL PROCESS] :: Creating kernel process.
 // Local
 // It loads the window server's image and create
 // a process structure to handle the kernel base and the
@@ -1506,7 +1502,7 @@ int I_x64_initialize(void)
     }
 
 // ================================
-// Create the first ring3 process.
+// [INIT PROCESS] :: Create the first ring3 process.
 // INIT.BIN.
 
     PROGRESS(":: Create init process\n"); 
@@ -1544,7 +1540,4 @@ void I_x64InitializeKernel(int arch_type)
     I_kmain(arch_type);
 }
 */
-
-
-
 

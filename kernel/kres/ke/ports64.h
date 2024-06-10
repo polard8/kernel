@@ -1,8 +1,8 @@
 
 // ports64.h
 
-#ifndef __PORTS64_H
-#define __PORTS64_H    1
+#ifndef __KE_PORTS64_H
+#define __KE_PORTS64_H    1
 
 // I/O ports.
 #define IO_MEMORY_BEGIN  0x0000

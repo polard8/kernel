@@ -16,6 +16,10 @@ struct x_boot_block_d
     unsigned long last_valid_pa;  // Last valid physical address.
     unsigned long gramado_mode;   // system mode.
     // ...
+
+    // #test
+    // The IDE port number given by the 32bit boot loader.
+    unsigned long ide_port_number;
 };
 
 // see: globals.c, init.c, bldisp.c

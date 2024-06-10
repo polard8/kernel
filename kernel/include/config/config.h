@@ -5,11 +5,21 @@
 #ifndef ____KERNEL_CONFIG_H
 #define ____KERNEL_CONFIG_H    1
 
+// Target machine
+#define __TARGET_MACHINE_BAREMETAL     0
+#define __TARGET_MACHINE_QEMU          1
+#define __TARGET_MACHINE_VIRTUALBOX    2
+// ...
+#define CONFIG_TARGET_MACHINE  __TARGET_MACHINE_BAREMETAL 
+// ...
 
-// Flags:
+// ------------------------------------------------------
+// Device flags:
 #define USE_SERIALDEBUG    0
-#define USE_E1000          1
+#define USE_E1000          0 
+// ...
 
+// ------------------------------------------------------
 // lapic/ioapic debug.
 // see: kmain.c, apic.c, ioapic.c.
 #define USE_SMP        1
@@ -17,13 +27,19 @@
 #define ENABLE_IOAPIC  0
 // ...
 
-//#bugbug
+
+// ------------------------------------------------------
+
+// #bugbug
 // see: process.c
+// #todo: We really need to fix up this limits.
+
 //#define IMAGESIZE_LIMIT_IN_KB  400
 #define IMAGESIZE_LIMIT_IN_KB  405
+//...
 
 
-// ----------------------------------------------------------------
+// ------------------------------------------------------
 // Disk configuration:
 // ## IMPORTANTE ##
 // TEM QUE CONFIGURAR O BL TAMBÉM
@@ -34,27 +50,24 @@
 // o controlador de ata. ide. em ata.c ata_initialize.
 // USE PRIMARY MASTER!!
 // Portas bases encontradas nas BARs.
-// BAR0 = base port 1F0  (channel 0 primary master) (channel 0 primary slave) 
-// BAR1 = base port 3F6  channel ??
-// BAR2 = base port 170  (channel 1 secondary master) (channel 1 secondary slave)
-// BAR3 = base port 376  channel ??
+// BAR0 = base port 1F0 
+// BAR1 = base port 3F6 
+// BAR2 = base port 170 
+// BAR3 = base port 376 
 // #importante
 // master e slave é coisa do PATA
 // então 3f6 pode ser canal 2 e 376 pode ser canal 3.
 
-#define __BAR0  0
-#define __BAR1  1
-#define __BAR2  2
-#define __BAR3  3
-#define __CHANNEL0  __BAR0 
-#define __CHANNEL1  __BAR2
-#define __CHANNEL2  __BAR1
-#define __CHANNEL3  __BAR3
+#define __BAR0  0   // Primary, master   (Channel 0)
+#define __BAR1  1   // Secondary, master (Channel 1)
+#define __BAR2  2   // Primary, slave    (Channel 0)
+#define __BAR3  3   // Secondary, slave  (Channel 1)
+
 // See: 
 // ata_initialize in ata.c
-#define __IDE_PORT    __CHANNEL0
+#define __IDE_PORT    __BAR0   // Primary   (Channel 0)
 
-// ----------------------------------------------------------------
+// ------------------------------------------------------
 // virtualbox Info:
 // PIIX3 ATA: LUN#0: disk, PCHS=963/4/17, total number of sectors 65536
 #define FRED_VHD_32MB
@@ -65,7 +78,7 @@
 #else 
 #error "must define vhd"
 #endif
-// ----------------------------------------------------------------
+// ------------------------------------------------------
 
 // #bugbug
 // Ouve uma falha..
@@ -110,13 +123,13 @@ fifth..     ide4, usually PCI, probed
 sixth..     ide5, usually PCI, probed
 */
 
-// ----------------------------------------------------------------
+// ------------------------------------------------------
 // PIT configuration:
 
 #define DEFAULT_JIFFY_FREQ    1000
 
-// ----------------------------------------------------------------
-// Runlevels
+// ------------------------------------------------------
+// Setup runlevel preference
 // Where are the types defines?
 // See:
 // core/init.c
@@ -172,6 +185,10 @@ sixth..     ide5, usually PCI, probed
 
 #define ENTRY_DEBUG_CHECK_VALIDATIONS  1
 
+
+// ------------------------------------------------------
+// Setup verbose preferences.
+
 //
 // Set up what kind of debug message we wanna see.
 //
@@ -198,7 +215,7 @@ sixth..     ide5, usually PCI, probed
 
 // Permite que várias mensagens secundárias 
 // sejam enviadas para a porta serial.
-#define SERIAL_DEBUG_VERBOSE  1
+// #define SERIAL_DEBUG_VERBOSE  1
 
 //
 // ## breack points ##
@@ -239,10 +256,18 @@ sixth..     ide5, usually PCI, probed
 //#define DEFAULT_FONT_SIZE FONT8X16
 //...
 
-// See: ps/quantum.h
-#define CONFIG_QUANTUM_MULTIPLIER    1
-//#define CONFIG_QUANTUM_MULTIPLIER    2
-//#define CONFIG_QUANTUM_MULTIPLIER    3
+// ------------------------------------------------------
+// The quantum multiplier.
+// See: quantum.h
+
+#define __QUANTUM_MULTIPLIER    1
+//#define __QUANTUM_MULTIPLIER    2
+//#define __QUANTUM_MULTIPLIER    3
+// ...
+
+#define CONFIG_QUANTUM_MULTIPLIER  __QUANTUM_MULTIPLIER  
+
+
 
 #endif 
 

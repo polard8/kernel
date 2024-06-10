@@ -1,9 +1,11 @@
 
-// microkernel
+// mk.h
+// This is an enbedded module that represents
+// the microkernel components
+// This kernel actually is not a microkernel.
 
-#ifndef  __MK_H
-#define __MK_H    1
-
+#ifndef __KE_MK_H
+#define __KE_MK_H    1
 
 /*
  * Segments @todo: Include this constants.
@@ -15,13 +17,11 @@
 #define GDT_UDATA   (0x20 | 3)
 */
 
-
 //
 // == prototypes =========================
 //
 
 int psInitializeMKComponents (void);
-
 
 #endif   
 

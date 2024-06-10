@@ -1,8 +1,8 @@
 
 // rtc.h
 
-#ifndef ____RTC_H
-#define ____RTC_H    1
+#ifndef __KE_RTC_H
+#define __KE_RTC_H    1
 
 // #todo:
 // Podemos criar uma lista para todos os dispositivos em pic.h

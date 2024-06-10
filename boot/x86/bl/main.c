@@ -541,6 +541,15 @@ void bl_main(void)
         // #todo
     }
 
+    /*
+    // #debug
+    // #test
+    // Always 0x80 for only one disk.
+    printf("Disk number: %x\n",BootBlock.disk_number);
+    refresh_screen();
+    while(1){}
+    */
+
 
 // -- #bugbug -----------------------------------------------------
 

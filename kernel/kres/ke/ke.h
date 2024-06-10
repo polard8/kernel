@@ -1,8 +1,8 @@
 
 // ke.h
 
-#ifndef __KE_H
-#define __KE_H    1
+#ifndef __KE_KE_H
+#define __KE_KE_H    1
 
 
 int sys_signal(void);
@@ -26,5 +26,4 @@ void ke_x64ExecuteInitialProcess(void);
 int keInitialize(int phase);
 
 #endif  
-
 

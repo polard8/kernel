@@ -75,8 +75,8 @@ static void InitializeGlobals(void)
 
 static void ShutdownApplication(int socket_fd)
 {
-    debug_print("gns.bin: ShutdownApplication\n"); 
-    printf     ("gns.bin: ShutdownApplication\n");
+    debug_print("net.bin: ShutdownApplication\n"); 
+    printf     ("net.bin: ShutdownApplication\n");
 // Close the given socket.
     close(socket_fd);
 }
@@ -100,14 +100,14 @@ int main(int argc, char *argv[])
 
     int client_fd = -1;
 
-    debug_print ("gns.bin: Initializing ...\n");
+    debug_print ("net.bin: Initializing ...\n");
     InitializeGlobals();
 
 // Socket
     client_fd = (int) socket( AF_INET, SOCK_STREAM, 0 );
     if (client_fd < 0){
        //gws_debug_print ("gnst: Couldn't create socket\n");
-       printf ("gns.bin: [FAIL] Couldn't create socket\n");
+       printf ("net.bin: [FAIL] Couldn't create socket\n");
        exit(1);
     }
 
@@ -119,14 +119,14 @@ int main(int argc, char *argv[])
         if (connect (client_fd, (void *) &server_address, addrlen ) < 0)
         { 
             //gws_debug_print ("gnst: Connection Failed\n");
-            printf ("gns.bin: Connection Failed \n"); 
+            printf ("net.bin: Connection Failed \n"); 
             //close(client_fd);
             //exit(1);
         }else{ break; }; 
     };
 
     if (client_fd<0){
-        printf("gns.bin: fd fail\n");
+        printf("net.bin: fd fail\n");
         exit(1);
     }
 
@@ -135,11 +135,11 @@ int main(int argc, char *argv[])
 // Send request and wait for response.
 // Ok. Its working :)
 
-    printf("NETCTL.BIN: Sending hello!\n");
+    printf("NET.BIN: Sending hello!\n");
 
     int hello_status = (int) gns_hello(client_fd);
     if (hello_status <= 0){
-        printf("gns.bin: Service failed\n");
+        printf("net.bin: Service failed\n");
     }
 
 // Loop
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
         {
            //#debug
            // We got data from kernel.
-           printf("gns.bin: Data={%s}\n",buffer);
+           printf("net.bin: Data={%s}\n",buffer);
            //exit(0);
         }
 
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
         // Ok. Its working :)
         //service_status = (int) gns_hello(client_fd);
         //if (service_status <= 0){
-        //    printf("gns.bin: Service failed\n");
+        //    printf("net.bin: Service failed\n");
         //}
 
         // Sleep

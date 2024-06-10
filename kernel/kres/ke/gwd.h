@@ -1,10 +1,10 @@
 
+// gwd.h
 // Incrementamos de tempos em tempos pra saber se
 // esses eventos não estão ocorrendo.
 
-
-#ifndef ____GWD_H
-#define ____GWD_H 1
+#ifndef __KE_GWD_H
+#define __KE_GWD_H  1
     
     // #importante
     // Essas variáveis são inicializadas pelo timer.
@@ -15,10 +15,9 @@
     // incrementados pelo timer.
     // A condição crítica é alcançar um limite, um timeout. 
 
-    int ____whatchdog_ps2_keyboard;
-    int ____whatchdog_ps2_mouse;
-    //...
+int ____whatchdog_ps2_keyboard;
+int ____whatchdog_ps2_mouse;
+//...
     
 #endif    
-
 

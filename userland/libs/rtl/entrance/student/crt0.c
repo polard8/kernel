@@ -168,6 +168,17 @@ void crt0(unsigned long rdi)
     //gramado_system_call(65,'1',0,0); 
 
 
+// ---------------------------------------------------------
+// #debug
+// Probably this is the first message in the serial debug 
+// when a new process is initializing. Let's make it 
+// friendly visable.
+
+    debug_print ("+\n");
+    debug_print ("++ crt0.c: Initializing (userland/) process\n");
+    debug_print ("+\n");
+
+
 // Initialize heap support.
 // See: 
 // stdlib/stdlib.c

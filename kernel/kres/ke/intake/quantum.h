@@ -4,11 +4,10 @@
 #ifndef __QUANTUM_H
 #define __QUANTUM_H    1
 
-
 // ===============================================
 
 // Credits in ms.
-// See: config/kernel/config.h
+// See: config/config.h
 
 // Class 1: Priority Normal
 #define QUANTUM_Q1  (CONFIG_QUANTUM_MULTIPLIER * 1)

@@ -90,8 +90,8 @@ static void __initialize_ws_info(pid_t pid)
 
 // ----------------
 // Process Personality
-    p->personality = (int) PERSONALITY_GRAMADO_AMAZING;
-    WindowServerInfo.pid_personality = (int) PERSONALITY_GRAMADO_AMAZING;
+    p->personality = (int) PERSONALITY_GRAMADO;
+    WindowServerInfo.pid_personality = (int) PERSONALITY_GRAMADO;
 
 // ----------------
 // The environment.
@@ -172,6 +172,8 @@ network_register_ring3_display_server(
 // Syscall implementation.
 
     struct process_d *p;
+    struct thread_d *t;
+
     pid_t current_process = (pid_t) get_current_process();
 
 // parameter:
@@ -218,10 +220,9 @@ network_register_ring3_display_server(
     console_set_current_virtual_console(CONSOLE1);
 
 // Setup the new layer for this process.
-    p->_layer = (int) LAYER_ZING_DISPLAY_SERVER;
+    p->_layer = (int) LAYER_DISPLAY_SERVER;
 
 // #test
-    struct thread_d *t;
     t = p->control;
     if ((void*) t == NULL)
         goto fail;

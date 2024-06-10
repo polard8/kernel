@@ -178,7 +178,7 @@ void *sys_create_process (
 
 // Process personality
     ProcessPersonality = (int) CurrentProcess->personality;
-    if (ProcessPersonality != PERSONALITY_GRAMADO_AMAZING){
+    if (ProcessPersonality != PERSONALITY_GRAMADO){
         panic("sys_create_process: ProcessPersonality\n");
     }
 

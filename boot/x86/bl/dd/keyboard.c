@@ -1,7 +1,9 @@
 /*
  * File: keyboard.c  
- *  Descrição:
+ * Descrição:
  *     Driver básico de teclado para o Boot Loader.
+ * Environment:
+ *     32bit bootloader.
  * Obs:
  * O padrão de teclado usado precisa ser revisto.
  * Pelo jeito estamos usando o padrão americano. Mas 
@@ -29,10 +31,6 @@ char keyboard_queue[8];
 
 //avisa que uma tecla foi digitada.
 int keyboard_flag=0;
-
-
-
-
 
 //
 // Variáveis internas.
@@ -241,10 +239,12 @@ CPS|L,     0,     0,     0,     0,     0,     0,     0,		/* scan 64-71 */
 };
 
 
-
 // irq handler.
 void keyboardHandler(void)
 {
+// #bugbug 
+// This routine has support for 'textmode'.
+// We need a flag to handle the modes.
 
 // Step 0: 
 // Declarações.
@@ -420,7 +420,7 @@ void keyboardHandler(void)
 // put into the queue.
     keyboard_queue[keyboard_queue_tail] = ch;
     keyboard_queue_tail++;
-    if( keyboard_queue_tail > 8 ){
+    if (keyboard_queue_tail > 8){
         keyboard_queue_tail = 0;
     }
 
@@ -432,7 +432,6 @@ void keyboardHandler(void)
     out8(0x20,0x20);     
 }
 
-
 char keyboad_get_char(void)
 {
     char ch=0;
@@ -440,26 +439,24 @@ char keyboad_get_char(void)
     ch = keyboard_queue[keyboard_queue_head];
 
     keyboard_queue_head++;
-    if( keyboard_queue_head > 8 ){
+    if (keyboard_queue_head > 8){
         keyboard_queue_head = 0;
     }
 
     keyboard_flag = FALSE;
 }
 
-
 char keyboard_wait_key(void)
 {
     while(keyboard_flag != TRUE)
     {
-         //nothing
+        // Nothing
     };
     
     return keyboad_get_char();
 }
 
-
 //
-// End.
+// End
 //
 

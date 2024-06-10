@@ -370,9 +370,8 @@ sys_getsockname (
     socklen_t *addrlen );
 
 int sys_listen (int sockfd, int backlog);
-int sys_socket ( int family, int type, int protocol );
+int sys_socket (int family, int type, int protocol);
 int sys_socket_shutdown (int socket, int how);
-
 
 #endif    
 

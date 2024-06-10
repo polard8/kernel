@@ -2,10 +2,8 @@
 // queue.h
 // This routines are suspended.
 
-#ifndef __QUEUE_H
-#define __QUEUE_H    1
-
-
+#ifndef __KE_QUEUE_H
+#define __KE_QUEUE_H    1
 
 // Ordenação das listas de filas.
 #define QUEUE_NULL     0

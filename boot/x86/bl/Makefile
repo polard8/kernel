@@ -49,7 +49,7 @@ CFLAGS = -m32 \
 myObjects = head.o main.o globals.o \
 loader.o init.o ports.o x86.o \
 stdio.o stdlib.o string.o \
-keyboard.o pci.o hdd.o ide.o timer.o \
+keyboard.o pci.o hdd.o ide.o storage.o timer.o \
 pages.o \
 heap.o \
 procedure.o \
@@ -99,6 +99,7 @@ bl-x86:
 	$(CC) -c dd/timer.c     -I include/ $(CFLAGS)  -o timer.o
 	$(CC) -c dd/hdd.c       -I include/ $(CFLAGS)  -o hdd.o
 	$(CC) -c dd/ide.c       -I include/ $(CFLAGS)  -o ide.o
+	$(CC) -c dd/storage.c   -I include/ $(CFLAGS)  -o storage.o
 
 link-x86:
 #todo:

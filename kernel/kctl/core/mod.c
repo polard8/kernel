@@ -12,13 +12,12 @@ struct kernel_module_d  *kernel_mod0;
 unsigned long kmList[KMODULE_MAX];
 
 
-
 // Called by I_x64CreateKernelProcess() in x64init.c
 int mod_initialize_first_module(void)
 {
 // Setup the first kernel module.
 // It is not a dynlinked module.
-// This is just a loadable ring0 thread with shared symbols.
+// This is just a loadable ring0 code with shared symbols.
 
     struct kernel_module_d *m;
     int module_id = KMODULE_MOD0;
@@ -93,6 +92,8 @@ int mod_initialize_first_module(void)
 
 void test_mod0(void)
 {
+// Called by input.c
+
     unsigned long return_value=0;
     unsigned long fn_table_base=0;
     unsigned long mod_sci=0;
@@ -126,7 +127,9 @@ void test_mod0(void)
                 0xFF,
                 1001,1234,0,0);    
         printf ("RETURN: %d\n",return_value);
-        
+
+        // --------------------
+        // Reason 1002:
         // Exporting the pointer for the function table.
         fn_table_base = 
             (unsigned long) &kernel_mod0->fn_table[0];
@@ -136,8 +139,10 @@ void test_mod0(void)
                 1002, 1234, fn_table_base, fn_table_base );    
         printf ("RETURN: %d\n",return_value);
 
-
+        // --------------------
+        // Reason 1003:
         // Exporting the pointer for the module sci.
+        // This way the module can call routines inside the kernel.
         mod_sci = (unsigned long) &ring0_module_sci;
         return_value = 
             (unsigned long) kernel_mod0->entry_point(
@@ -145,6 +150,8 @@ void test_mod0(void)
                 1003, 1234, mod_sci, mod_sci );    
         printf ("RETURN: %d\n",return_value);
     }
+
+    printf ("test_mod0: Done :)\n");
 }
 
 void xp_putchar_in_fgconsole(unsigned long _char)

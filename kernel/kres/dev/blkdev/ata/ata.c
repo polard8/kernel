@@ -1,5 +1,6 @@
 
 // ata.c
+// This is the ata controller driver, embedded into the kernel base.
 // ata handshake.
 // write command and read status.
 // Created by Nelson Cole.
@@ -1498,8 +1499,17 @@ static int __ata_initialize(int ataflag)
 // de acessarmos outros discos.
 // See: config.h
 
+
     unsigned int boottime_ideport_index = __IDE_PORT;
     unsigned int current_ideport_index = __IDE_PORT;
+
+/*
+    //#debug
+    printf ("kernel CONFIG:     IDE port: %d\n",boottime_ideport_index);   // from config.h
+    printf ("kernel xBootBlock: IDE port: %d\n",xBootBlock.ide_port_number);  // from bootblock, from bl.bin
+    refresh_screen();
+    while(1){}
+*/
 
     ata_set_boottime_ide_port_index(boottime_ideport_index);
     ata_set_current_ide_port_index(current_ideport_index);

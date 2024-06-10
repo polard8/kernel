@@ -7,9 +7,14 @@
 BASE    = base
 DEP_B1  = ../de/commands
 DEP_B2  = ../de/ui
-DEP_B3  = ../3ddemo
+DEP_B3  = ../de/user3d
 #DEP_B10 = ../guest0
 #DEP_B11 = ../guest1
+# ...
+
+#ASSETS = usernet/assets 
+#DOCS   = usernet/docs  
+#...
 
 # Make variables (CC, etc...)
 AS      = as
@@ -161,54 +166,69 @@ build-gramado-os:
 	cp userland/bin/NET.BIN   $(BASE)/
 
 # Install BMPs from cali assets.
-# Copy the cali assets/
+# Copy the assets/
 # We can't survive without this one.
-	cp assets/themes/theme01/*.BMP  $(BASE)/
+	cp usernet/assets/themes/theme01/*.BMP  $(BASE)/
 
 	@echo "~build-gramado-os end?"
 
 # --------------------------------------
+# Let's add a bit of shame in the project.
 PHONY := copy-extras
 copy-extras:
 
 	@echo "copy-extras"
 
-#-----------------------------
-# b1 -  survival kit
+# -----------------------------
+# Survival kit.
+# Commands and apps in root directory.
+
+	# Commands
+	-cp $(DEP_B1)/bin/CAT.BIN       $(BASE)/
 	-cp $(DEP_B1)/bin/REBOOT.BIN    $(BASE)/
 	-cp $(DEP_B1)/bin/SHUTDOWN.BIN  $(BASE)/
 	-cp $(DEP_B1)/bin/UNAME.BIN     $(BASE)/
-	-cp $(DEP_B1)/bin/CAT.BIN       $(BASE)/
-# b1
-	-cp $(DEP_B1)/bin/SHELL.BIN     $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/PUBSH.BIN     $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/CMP.BIN       $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/FALSE.BIN     $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/SHOWFUN.BIN   $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/SUM.BIN       $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/TASCII.BIN    $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/TPRINTF.BIN   $(BASE)/GRAMADO/
-	-cp $(DEP_B1)/bin/TRUE.BIN      $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/bin/N9.BIN   $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/bin/N10.BIN  $(BASE)/GRAMADO/
-#	-cp $(DEP_B1)/bin/N11.BIN  $(BASE)/GRAMADO/
-
-#-----------------------------
-# b2 -  survival kit
+	# Apps
 	-cp $(DEP_B2)/core/server/bin/GRAMLAND.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TASKBAR.BIN   $(BASE)/
 	-cp $(DEP_B2)/shell/bin/TERMINAL.BIN  $(BASE)/
-	-cp $(DEP_B2)/shell/bin/PUBTERM.BIN   $(BASE)/
+	-cp $(DEP_B2)/shell/bin/GDM.BIN       $(BASE)/
 	-cp $(DEP_B2)/shell/bin/EDITOR.BIN    $(BASE)/
-# b2- extra
-	-cp $(DEP_B2)/shell/bin/GDM.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_B2)/shell/bin/BROWSER.BIN  $(BASE)/GRAMADO/
-	#-cp $(DEP_B2)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
-	-cp $(DEP_B2)/shell/bin/DOC.BIN     $(BASE)/GRAMADO/
+	# Gramado OS 3D demos.
+	-cp $(DEP_B3)/bin/ENG.BIN  $(BASE)/
+	#-cp $(DEP_B3)/bin/ENG2.BIN  $(BASE)/
+	#...
 
-# Gramado OS 3D demo.
-	-cp $(DEP_B3)/core/eng/bin/ENG.BIN  $(BASE)/
+# -----------------------------
+# Commands and apps in GRAMADO/ folder.
+# Gotta use '@' before the command.
+
+	# Commands
+	-cp $(DEP_B1)/bin/SHELL.BIN     $(BASE)/GRAMADO/
+	-cp $(DEP_B1)/bin/PUBSH.BIN     $(BASE)/GRAMADO/
+	-cp $(DEP_B1)/bin/GRAMCNF.BIN   $(BASE)/GRAMADO/
+	# Apps
+	#-cp $(DEP_B2)/shell/bin/GWS.BIN      $(BASE)/GRAMADO/
+	
+# -----------------------------
+# Commands and apps in PROGRAMS/ folder.
+# Gotta use '#' before the command.
+
+	# Commands
+	-cp $(DEP_B1)/bin/FALSE.BIN     $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/TRUE.BIN      $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/TASCII.BIN    $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/TPRINTF.BIN   $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/CMP.BIN       $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/SHOWFUN.BIN   $(BASE)/PROGRAMS/
+	-cp $(DEP_B1)/bin/SUM.BIN       $(BASE)/PROGRAMS/
+	#	-cp $(DEP_B1)/bin/N9.BIN   $(BASE)/PROGRAMS/
+	#	-cp $(DEP_B1)/bin/N10.BIN  $(BASE)/PROGRAMS/
+	#	-cp $(DEP_B1)/bin/N11.BIN  $(BASE)/PROGRAMS/
+	# Apps
+	-cp $(DEP_B2)/shell/bin/PUBTERM.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_B2)/shell/bin/BROWSER.BIN  $(BASE)/PROGRAMS/
+	-cp $(DEP_B2)/shell/bin/DOC.BIN      $(BASE)/PROGRAMS/
 
 	@echo "~ copy-extras"
 

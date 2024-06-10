@@ -28,28 +28,28 @@ unsigned long info_get_boot_info(int index)
 // We are using xBootBlock in init.c
 
     //#todo
-    if (BootBlock.initialized != TRUE){
+    if (xBootBlock.initialized != TRUE){
         panic("info.c: BootBlock.initialized #todo\n");
     }
 
     switch (index){
     case 1:
-       return (unsigned long) BootBlock.last_valid_address;
+       //return (unsigned long) xBootBlock.last_valid_address;
        break;
     case 2:
-       return (unsigned long) BootBlock.metafile_address;
+       //return (unsigned long) xBootBlock.metafile_address;
        break;
     case 3:
-       return (unsigned long) BootBlock.disk_number;
+       //return (unsigned long) xBootBlock.disk_number;
        break;
     case 4:
-       return (unsigned long) BootBlock.heads;
+       //return (unsigned long) xBootBlock.heads;
        break;
     case 5:
-       return (unsigned long) BootBlock.spt;
+       //return (unsigned long) xBootBlock.spt;
        break;
     case 6:
-       return (unsigned long) BootBlock.cylinders;
+       //return (unsigned long) xBootBlock.cylinders;
        break;
     case 7:
        //return (unsigned long) 

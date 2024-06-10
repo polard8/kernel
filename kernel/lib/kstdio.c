@@ -83,7 +83,6 @@ int kstdio_feed_stdin(int ch)
 // Extended ASCII Codes (0x80~0xFF)
 
     char Data = (char) (ch & 0xFF);
-
     char ch_buffer[2];
 
     if ((void*) stdin == NULL){
@@ -137,20 +136,21 @@ fail:
 // OUT: TRUE or FALSE.
 int sys_setup_stdin(int stdin_fd)
 {
-    struct process_d *p;
     file *f;
+    struct process_d *p;
+    pid_t current_process = -1;
 
     if (stdin_fd < 0 || stdin_fd >= 32){
         return FALSE;
     }
 
 // pid
-    pid_t current_process = (pid_t) get_current_process();
+    current_process = (pid_t) get_current_process();
     if ( current_process < 0 || current_process >= PROCESS_COUNT_MAX )
         return FALSE;
-// structure
+// Process structure
     p = (struct process_d *) processList[current_process];
-    if ( (void*)p==NULL ){
+    if ( (void*)p == NULL ){
         return FALSE;
     }
     if (p->used != TRUE){
@@ -160,7 +160,7 @@ int sys_setup_stdin(int stdin_fd)
         return FALSE;
     }
 
-// structure
+// File structure
     f = (file *) p->Objects[stdin_fd];
     if ((void*) f == NULL){
         return FALSE;

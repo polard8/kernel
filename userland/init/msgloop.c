@@ -1,11 +1,14 @@
 // msgloop.c
 // Created by Fred Nora.
 
-#include "init.h"
+#include "inc/init.h"
 
 #define __MSG_CLOSE     7
 #define __MSG_COMMAND  40
 
+static int isTimeToQuitServer = FALSE;
+
+static int NoReply = TRUE;
 static char __filename_local_buffer[64];
 
 // The tid of the caller.
@@ -14,10 +17,8 @@ struct endpoint_d  Caller;
 
 struct next_msg_d
 {
-
-// tid
+// TID
     int target_tid;
-
 // Message
     int msg_code;
     unsigned long long1;
@@ -25,7 +26,7 @@ struct next_msg_d
 };
 struct next_msg_d  NextMessage;
 
-static int NoReply = TRUE;
+
 
 //-----------------------------------------
 
@@ -47,7 +48,6 @@ processEvent (
 static void do_net_on(void);
 static void do_net_off(void);
 static void do_dhcp_dialog(void);
-
 
 // ===========================
 
@@ -77,10 +77,6 @@ static void do_dhcp_dialog(void)
     sc82( 22003, 3, 0, 0 );
 }
 
-
-
-
-// #test Hello.
 // Responding the hello.
 // Hey init, are you up?
 static void do_hello(int src_tid)
@@ -91,11 +87,10 @@ static void do_hello(int src_tid)
     //    RTLEventBuffer[8],   //sender (the caller)
     //    RTLEventBuffer[9] ); //receiver
 
-    printf("init.bin: [44888] Hello received from %d\n", 
-        src_tid );
-
-    if (dst_tid<0)
+    printf("init.bin: [44888] Hello received from %d\n", src_tid );
+    if (dst_tid < 0){
         return;
+    }
 
 //
 // Reply
@@ -128,22 +123,18 @@ static void do_hello(int src_tid)
 
 static void do_reboot(int src_tid)
 {
-
-// Invalid tid
-    if (src_tid < 0)
+// Invalid TID
+    if (src_tid < 0){
         return;
-
-// Not the kernel.
-    if (src_tid != 99)
+    }
+// Not the kernel
+    if (src_tid != 99){
         return;
-
-    printf("init.bin: [55888] reboot request from %d\n", 
-        src_tid );
+    }
+    printf("init.bin: [55888] reboot request from %d\n", src_tid );
     rtl_reboot();
 }
 
-// local
-// #todo: change this name.
 static int 
 processEvent ( 
     void *window, 
@@ -154,16 +145,17 @@ processEvent (
 {
 // Processing requests.
 
-// Invalid message code.
-    if (msg<0){
-        return -1;
+// Invalid message code
+    if (msg < 0){
+        goto fail;
     }
 
 // Invalid caller.
 // #todo: 
 // End if the kernel is sending us a system message?
+
     //if (caller_tid)
-        //return -1;
+        //goto fail;
 
     switch (msg){
 
@@ -171,8 +163,9 @@ processEvent (
     // From udp, port 11888.
     case 77888:
         // Only message from the kernel.
-        if (caller_tid != 99)
-            return;
+        if (caller_tid != 99){
+            goto fail;
+        }
         printf("init.bin: [77888] Motification\n");
         break;
 
@@ -237,7 +230,7 @@ processEvent (
         };
         break;
 
-// 'Hello' received. Let's respond.
+// 'Hello' received. Let's respond it.
     case 44888:
         do_hello(caller_tid);
         break;
@@ -247,8 +240,9 @@ processEvent (
 // Who can send us this message?
     case 55888:
         // Not the kernel
-        if (caller_tid != 99)
+        if (caller_tid != 99){
             break;
+        }
         do_reboot(caller_tid);
         break;
 
@@ -258,8 +252,9 @@ processEvent (
 
     case __MSG_CLOSE:
         // Not the kernel
-        if (caller_tid != 99)
+        if (caller_tid != 99){
             break;
+        }
         printf("#debug: Sorry, can't close init.bin\n");
         break;
 
@@ -270,31 +265,29 @@ processEvent (
     };
     
     return 0;
+fail:
+    return (int) -1;
 }
-
 
 static void __send_response(void)
 {
-    if (NoReply == TRUE)
+    if (NoReply == TRUE){
         return;
-
-// Post next response.
-
+    }
+// Post next response
     RTLEventBuffer[0] = 0;
     RTLEventBuffer[1] = (unsigned long) (NextMessage.msg_code & 0xFFFFFFFF);
     RTLEventBuffer[2] = (unsigned long) NextMessage.long1;
     RTLEventBuffer[3] = (unsigned long) NextMessage.long2;
-
     rtl_post_system_message( 
         (int) NextMessage.target_tid,
         (unsigned long) RTLEventBuffer );
-
 // Clear message
     NextMessage.target_tid = 0;
     NextMessage.msg_code = 0;
     NextMessage.long1 = 0;
     NextMessage.long2 = 0;
-    NoReply = TRUE;   // No more responses.
+    NoReply = TRUE;   // No more responses
 }
 
 static int __idlethread_loop(void)
@@ -312,8 +305,9 @@ static int __idlethread_loop(void)
 // Nessa hora ja não nos preocupamos mais com essa thread.
 // Ele receberá algumas mensagens eventualmente.
     while (TRUE){
-        //if( isTimeToQuit == TRUE )
-            //break;
+		if (isTimeToQuitServer == TRUE){
+			break;
+		}
         if ( rtl_get_event() == TRUE )
         {
             // Get caller's tid.
@@ -325,9 +319,9 @@ static int __idlethread_loop(void)
                 RTLEventBuffer[2], 
                 RTLEventBuffer[3],
                 Caller.tid );
-            //#test
+            // #test
             //rtl_yield();
-            Caller.tid = -1;
+            //Caller.tid = -1;
         }
 
         if (NoReply == FALSE){
@@ -338,11 +332,16 @@ static int __idlethread_loop(void)
     return 0;
 }
 
-// We're not using the unix-sockets
+// This is a loop where we get messages from the threads queue.
+// Any process can send messages and the kernel can also 
+// send us messages.
+// We're NOT using the unix-sockets
 // just like in a regular Gramado server. 
 // We're just getting messages in the threads message queue.
 int run_server(void)
 {
+// Called by main() in main.c
+
     int IdleLoopStatus = -1;
 
 /*
@@ -365,9 +364,10 @@ int run_server(void)
         printf("run_server: Loop failed\n");
         goto fail;
     }
+    // It's time o quit the init process.
     return 0;
 fail:
-    return -1;
+    return (int) -1;
 }
 
 // #todo

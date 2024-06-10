@@ -390,7 +390,10 @@ int mmInitialize(int phase)
 
         // End of phase 1.
         goto InitializeEnd;
-    }
+    } else {
+        // Wrong phase number.
+        // goto fail;
+    };
 
 InitializeEnd:
     //#debug

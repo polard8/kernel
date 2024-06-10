@@ -273,7 +273,7 @@ void *sci0 (
     layer = p->_layer;
 
 // Feito pra rodar no Gramado OS.
-    if (p->personality != PERSONALITY_GRAMADO_AMAZING){
+    if (p->personality != PERSONALITY_GRAMADO){
         panic("sci0: Personality\n");
     }
 
@@ -1954,7 +1954,7 @@ void *sci2 (
 
 // Personality
 // Feito pra rodar no Gramado OS.
-    if (p->personality != PERSONALITY_GRAMADO_AMAZING){
+    if (p->personality != PERSONALITY_GRAMADO){
         panic("sci2: Personality\n");
     }
 

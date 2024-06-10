@@ -4,8 +4,8 @@
 // A lot of structures are using these indexes
 // to describe the onject handled by the structure.
 
-#ifndef __KOBJECT_H
-#define __KOBJECT_H    1
+#ifndef __KE_KOBJECT_H
+#define __KE_KOBJECT_H    1
 
 // Object types.
 // This list is used in the element file->____object,
@@ -25,7 +25,6 @@ typedef enum {
     // metafile just like GRAMADO or BRAMADO.
     // or even a hidden lba with no entry in the directory
     ObjectTypeMetafile,
-
 
     //ObjectTypeSerialPort,    //COM ports.
     

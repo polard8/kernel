@@ -1,10 +1,8 @@
 /*
  * File: config.h 
- * 
- * 
+ * Configuration file for the 32bit boot loader.
  * Created by Fred Nora.
  */
-
 
 
 //
@@ -13,32 +11,67 @@
 
 //#define BL_VERBOSE 1  
 
-
-
 //
 // ## IMPORNTANTE ##
 //
 
-//TEM QUE CONFIGURAR O BL TAMBÉM
-
+// ------------------------------------------------------
+// Disk configuration:
+// ## IMPORTANTE ##
+// TEM QUE CONFIGURAR O BL TAMBÉM
+// Usaremos essa configuraçao provisoriamente
+// ate que tenhamos a condiçao de selecionarmos corretamente
+// o canal e o dispositivo.
+// Inicializaremos essas variaveis ao inicializarmos
+// o controlador de ata. ide. em ata.c ata_initialize.
 // USE PRIMARY MASTER!!
-
 // Portas bases encontradas nas BARs.
-//BAR0 = base port 1F0   ( channel 0 primary master) (channel 0 primary slave) 
-//BAR1 = base port 3F6   channel ??
-//BAR2 = base port 170   (channel 1 secondary master) (channel 1 secondary slave)
-//BAR3 = base port 376   channel ??
+// BAR0 = base port 1F0 
+// BAR1 = base port 3F6 
+// BAR2 = base port 170 
+// BAR3 = base port 376 
+// #importante
+// master e slave é coisa do PATA
+// então 3f6 pode ser canal 2 e 376 pode ser canal 3.
 
-#define __BAR0  0
-#define __BAR1  1
-#define __BAR2  2
-#define __BAR3  3
+// #bugbug
+// Nesse momento estamos determinando que o driver do
+// controlador ide deve usar o canal 0 e que ele é master.
+// primary/master.
+// Então essas definições aqui são encontradas no driver do controlador.
+// Mas não deve ser assim. Devemos usar uma variável para isso.
+// Talvez algum arquivo de configuração devesse nos dizer 
+// qual canal devemos usar.
+// Ou ainda o número do driver de boot nos de alguma dica.
 
-#define __CHANNEL0  __BAR0  // BAR 0 primary ide channel. master and slave
-#define __CHANNEL1  __BAR2  // BAR 2 secondary ide channel. master and slave
-#define __CHANNEL2  __BAR1  // BAR 1 extra (sata emulating ide)
-#define __CHANNEL3  __BAR3  // BAR 3 extra (sata emulating ide)
+// #todo
+// Lembre-se que estamos fazendo a mesma coisa 
+// no arquivo de configuraçao do kernel.
+// See:
+// https://wiki.osdev.org/PCI_IDE_Controller
 
+// IDE Interface:
+// Primary Master Drive.
+// Primary Slave Drive.
+// Secondary Master Drive.
+// Secondary Slave Drive.
+
+// Serial IDE
+// Primary Master,   also called SATA1.
+// Primary Slave,    also called SATA2.
+// Secondary Master, also called SATA3.
+// Secondary Slave,  also called SATA4.
+
+#define __BAR0  0  // 0x1F0
+#define __BAR1  1  // 0x3F6
+#define __BAR2  2  // 0x170
+#define __BAR3  3  // 0x376
+
+// See: diskATAInitialize in ide.c
+#define __CONFIG_IDE_PORT    __BAR0    // Primary, master
+//#define __CONFIG_IDE_PORT    __BAR1
+//#define __CONFIG_IDE_PORT    __BAR2
+//#define __CONFIG_IDE_PORT    __BAR3
 
 // #importante
 // Esses valores são usados pelo driver.
@@ -55,24 +88,6 @@
 
 // Partições:
 // sda1, sda2, sda3, sda4 ...
-
-// #bugbug
-// Nesse momento estamos determinando que o driver do
-// controlador ide deve usar o canal 0 e que ele é master.
-// primary/master.
-// Então essas definições aqui são encontradas no driver do controlador.
-// Mas não deve ser assim. Devemos usar uma variável para isso.
-// Talvez algum arquivo de configuração devesse nos dizer 
-// qual canal devemos usar.
-// Ou ainda o número do driver de boot nos de alguma dica.
-// See: diskATAInitialize in ide.c
-
-
-#define __IDE_PORT    __CHANNEL0    // primary
-#define __IDE_SLAVE   0             // 0=master 1=slave
-
-
-
 
 
 

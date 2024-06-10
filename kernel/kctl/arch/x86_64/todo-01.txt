@@ -1,0 +1,12 @@
+
+ FRED support.
+ (Flexible Return and Event Delivery)
+ 
+ In order to support the FRED technology we gotta do some code in Assembly 
+handling the reentry to ring 0 called by a process in ring 3 via FRED. 
+ It sounds kinda like the SYSCALL function, but it needs to handle stacks 
+and kinds of stacks, jusk like ghost stacks i guess.
+
+See:
+https://www.intel.com/content/www/us/en/content-details/779982/flexible-return-and-event-delivery-fred-specification.html
+

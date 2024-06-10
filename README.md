@@ -1,8 +1,9 @@
-# The kernel for Gramado OS.
+# kernel - GramadoKernel
 
 ```
-    gramadoOS
+   The kernel for Gramado OS.
 ```
+
 ```
 Building an operating system is a good way to understand how systems work and
 the software stack needed to run your favorite application. But remember It's not
@@ -11,8 +12,6 @@ go to the high demand area, which is probably the top layer of the stack,
 which It is the place where web applications are made,
 it includes front-end and back-end layers.
 ```
-
-
 
 ## Here are some screenshots of Gramado Operating System.
 
@@ -33,7 +32,7 @@ not all the features needed by a commercial operating system.
 
 > * hw - cpu: Intel and AMD. 64bit only.
 > * hw - mm: Paging. Chunck of 2MB, using 4KB pages.
-> * hw - blk device: IDE PATA.
+> * hw - blk device: IDE. (Primary master only).
 > * hw - char device: ps/2 keyboard. 
 > * hw - char device: ps/2 mouse works fine only on qemu.
 > * hw - char device: Serial port. (COM). Used for debug. 
@@ -69,11 +68,15 @@ not all the features needed by a commercial operating system.
 
 ## The source code.
 
-You can find the source code on Github in the internet, 
-where you can clone the repository, contribute to the project or
-download the code. The address is https://github.com/gramado/kernel.
-We ned to import some dependencies to get the posix commands, the display server 
-and the client-side GUI applications.
+```
+  You can find the source code on Github on the internet, 
+  where you can clone the repository, contribute to the project or
+  download the code. The address is https://github.com/gramado/kernel.
+
+  We need to import some dependencies to get the posix commands, 
+  the display server and client-side GUI applications. 
+  The address is https://github.com/gramado/de.
+```
 
 ## A description of the directories in the Gramado source code.
 
@@ -106,6 +109,14 @@ $ make clean-all
 
 For now the system has been compiled on Ubuntu operating system,
 LTS releases. 
+
+```
+    Host machine: Windows 10, wsl2 with Ubuntu.
+    Linux kernel: 5.15.146.1-microsoft-standard-WSL2
+    gcc (Ubuntu) 11.4.0 
+    GNU ld (GNU Binutils for Ubuntu) 2.38
+    NASM version 2.15.05
+```
 
 ```
     Host machine: Ubuntu 20.04.5 LTS
@@ -172,18 +183,30 @@ Please make some comments on Github or send messages to Fred Nora.
 
 ## Author
 
-* **Fred Nora** - [Fred Nora's Twitter account](https://twitter.com/frednora)
+* **Fred Nora** - [Fred Nora's X account](https://x.com/frednora)
 * **Fred Nora** - [Fred Nora's Facebook account](https://facebook.com/frednora)
 
 ## Contributors
 
-* **Fred Nora** - [Fred Nora's Facebook account](https://facebook.com/frednora)
+* **Fred Nora** - [Fred Nora's X account](https://x.com/frednora)
 * **Fred Nora 2** - [Fred Nora's Facebook account](https://facebook.com/frednora)
 
 
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/docs/2-developer/build.md)
+> See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/usernat/docs/build/build.md)
+
+
+# Folders
+
+```
+  * base/      - Files to install into the virtual disk.
+  * boot/      - Gramado boot loader.
+  * kernel/    - The core kernel.
+  * mods/      - Kernel modules.
+  * userland/  - Init process and ring3 services.
+  * usernet/   - Documentation and network stuff.
+```
 
 
 # Warning
@@ -196,7 +219,7 @@ You're reaching the boring area of this document!
 The project has a folder for documentation and design notes. 
 The folder is docs/.
 
-> See the [docs](https://github.com/gramado/kernel/tree/main/docs).
+> See the [docs](https://github.com/gramado/kernel/tree/main/usernet/docs).
 
 The project is looking for some people to create a better documentation, for free, 
 as a contribuition to the open source community. To create this new documentation 

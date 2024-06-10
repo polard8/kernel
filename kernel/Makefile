@@ -109,7 +109,7 @@ clean
 # Resource controllers.
 k1:
 	@echo "Compiling: Compiling k1"
-# Kernel arch - Entrypoint and early initialization.
+# Kernel arch - Startup and entry code.
 	$(MAKE) -C kctl/arch/x86_64/
 # Kernel core - Top level routines.
 	$(MAKE) -C kctl/core/

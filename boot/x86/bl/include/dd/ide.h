@@ -8,9 +8,15 @@
 #ifndef __DD_IDE_H
 #define __DD_IDE_H    1
 
-// IDE ports.
+//
+// IDE support 
+//
+
+// Channel and device number
 extern int g_current_ide_channel;
 extern int g_current_ide_device;
+// Port number.
+extern int g_current_ide_port;
 
 
 // 0 primary master 

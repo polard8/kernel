@@ -1061,7 +1061,7 @@ struct process_d *create_process (
     if (ppid < 0){
         panic ("create_process: [ERROR] ppid\n");
     }
-    if ( (void*) name == NULL ){
+    if ((void*) name == NULL){
         panic ("create_process: [ERROR] name\n");
     }
     if ( *name == 0 ){
@@ -1070,20 +1070,18 @@ struct process_d *create_process (
 
 //===============================
 
-    if( pml4_va == 0 ){
+    if (pml4_va == 0){
         panic ("create_process: [ERROR] pml4_va\n");
     }
-
-    if( pdpt0_va == 0 ){
+    if (pdpt0_va == 0){
         panic ("create_process: [ERROR] pdpt0_va\n");
     }
-
-    if( pd0_va == 0 ){
+    if (pd0_va == 0){
         panic ("create_process: [ERROR] pd0_va\n");
     }
-
     // ...
-    //=================================
+
+//=================================
 
 // @todo:
 // Melhorar esse esquema de numeraçao e 
@@ -1127,12 +1125,11 @@ struct process_d *create_process (
         PID = (int) getNewPID();
         if ( PID < GRAMADO_PID_BASE || PID >= PROCESS_COUNT_MAX )
         {
-            debug_print ("create_process: [FAIL] getNewPID \n");
-            printf      ("create_process: [FAIL] getNewPID %d \n", PID);
+            debug_print ("create_process: [FAIL] getNewPID\n");
+            printf      ("create_process: [FAIL] getNewPID %d\n", PID);
             goto fail;
         }
         EmptyEntry = (void *) processList[PID];
- 
         if ((void *) EmptyEntry == NULL){ 
             break;
         }
@@ -1142,14 +1139,15 @@ struct process_d *create_process (
 // Worker
 // Initializing the elements common for 
 // all types of processes.
-    ps_initialize_process_common_elements( (struct process_d *) Process );
+    ps_initialize_process_common_elements((struct process_d *) Process);
+
     //Process->objectType  = ObjectTypeProcess;
     //Process->objectClass = ObjectClassKernelObjects;
 
 // cpl
     Process->cpl = (unsigned int) cpl;
 
-    if (cpl!=RING0 && cpl!=RING3)
+    if (cpl != RING0 && cpl != RING3)
         panic("create_process: cpl\n");
 
 // iopl
@@ -1248,7 +1246,6 @@ struct process_d *create_process (
         debug_print("create_process: [FAIL] pml4_va\n");
         printf     ("create_process: [FAIL] pml4_va\n");
         goto fail;
-        //return NULL;
     }
 
 // pml4
@@ -1499,7 +1496,7 @@ struct process_d *create_process (
 
     // ok
     return (void *) Process;
-// Fail
+
 fail:
     //Process = NULL;
     //refresh_screen();
@@ -1566,13 +1563,12 @@ fail:
     return (unsigned long) 0;
 }
 
-
 void 
 SetProcessPML4_VA ( 
     struct process_d *process, 
     unsigned long va )
 {
-    if ( (void *) process != NULL ){
+    if ((void *) process != NULL){
         process->pml4_VA = (unsigned long) va;  
     }
 }
@@ -2050,7 +2046,7 @@ struct process_d *create_and_initialize_process_object(void)
     }
 
 // Default personality
-    new_process->personality = PERSONALITY_GRAMADO_AMAZING;
+    new_process->personality = PERSONALITY_GRAMADO;
 
 // see: layer.h
     new_process->_layer = LAYER_UNDEFINED;

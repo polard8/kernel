@@ -538,10 +538,11 @@ ataReadSector (
     unsigned long reserved2 )
 {
     int Status=0;
-
+    static int Operation = 0x20;  // Read
 // #bugbug
 // This is the port index, not the channel index.
-    unsigned int CurrentPortIndex = 
+// >>> We have 4 valid ports, but only 2 channels.
+    unsigned int idePort = 
         (unsigned int) ata_get_current_ide_port_index();
 
 /*
@@ -591,8 +592,8 @@ ataReadSector (
         (int) pio_rw_sector ( 
                   (unsigned long) buffer, 
                   (unsigned long) lba, 
-                  (int) 0x20,
-                  (unsigned int) CurrentPortIndex ); 
+                  (int) Operation,
+                  (unsigned int) idePort ); 
 
     return (int) Status;
 }
@@ -615,6 +616,12 @@ ataWriteSector (
     unsigned long reserved2 )
 {
     int Status=0;
+    static int Operation = 0x30;  // Write
+// #bugbug
+// This is the port index, not the channel index.
+// >>> We have 4 valid ports, but only 2 channels.
+    unsigned int idePort = 
+       (unsigned int) ata_get_current_ide_port_index();
 
 // ================ ATENÇAO ==============================
 // #IMPORTANTE:
@@ -636,12 +643,6 @@ ataWriteSector (
     }
 
 
-// #bugbug
-// This is the port index, not the channel index.
-
-    unsigned int port_index = 
-       (unsigned int) ata_get_current_ide_port_index();
-
 // IN:
 // (buffer, lba, rw flag, port number, master )
 
@@ -649,8 +650,8 @@ ataWriteSector (
         (int) pio_rw_sector ( 
         (unsigned long) buffer, 
         (unsigned long) lba, 
-        (int) 0x30, 
-        (unsigned int) port_index ); 
+        (int) Operation, 
+        (unsigned int) idePort ); 
 
     return (int) Status;
 }

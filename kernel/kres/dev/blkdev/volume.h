@@ -52,16 +52,13 @@
 // ==================================================================
 
 
-char *current_volume_string;
-
+extern char *current_volume_string;
 // volume atual ??
 // Tipo de sistema de arquivos, fat16, ext2 ...
-int g_currentvolume_filesystem_type;   //use this one.
-
-
+extern int g_currentvolume_filesystem_type;   //use this one.
 // volume atual do tipo fat???
 // Se é fat32, 16, 12.
-int g_currentvolume_fatbits;
+extern int g_currentvolume_fatbits;
 
 /*
  * volume_type_t:
@@ -98,25 +95,23 @@ typedef enum {
 
 // #todo
 typedef enum {
-
     VOLUME_CLASS_NULL,
     VOLUME_CLASS_2,
     VOLUME_CLASS_3
-
 }volume_class_t;
-
 
 
 /*
  * vbr_d:
  *     Structure for VBR parameters.
  */  
-
 struct vbr_d
 {
 	//copiar mbr, é parecido;
 }; 
-struct vbr_d *vbr; 
+// VBR structure for the boot partition.
+// See: storage.c
+extern struct vbr_d  *vbr; 
  
 
 /*
@@ -159,12 +154,9 @@ struct volume_d
     pid_t pid;
     gid_t gid;
 
-
-
-
-    // areas.
-    // maybe we can find these in the superblock.
-    // well, this is the fast access.
+    // Areas:
+    // Maybe we can find these in the superblock.
+    // Well, this is the fast access.
     unsigned long VBR_lba;
     unsigned long FAT1_lba;
     unsigned long FAT2_lba;
@@ -173,33 +165,28 @@ struct volume_d
     
     struct superblock_d super;
 
-
     // Ponteiro para um buffer se o tipo permitir.
     void *priv_buffer;
     unsigned long buffer_size_in_sectors;
     unsigned long sector_size;
 
-/*
+
 //
 // Capacity
 //
 
-// Number of sectors.
+// First and last lba.
+    unsigned long __first_lba;
+    unsigned long __last_lba;
+// Number of sectors in the partition.
+// last - first.
     unsigned long number_of_blocks;
 // 512 or 4096?
     unsigned long bytes_per_sector;
 // How many bytes in the whole disk.
     unsigned long size_in_bytes;
-*/
-
-
-// First and last lba.
-
-    unsigned long __first_lba;
-    unsigned long __last_lba;
 
     //filesystem_type_t filesystemType;
-
 
     //#todo
     // se está funcionando ... se está inicializado ...
@@ -231,15 +218,15 @@ struct volume_d
 // Esses são os três volumes básicos do sistema 
 // mesmo que o disco só tenha um volume, essas 
 // estruturas vão existir.
-
-struct volume_d  *volume_vfs;             // volume 0
-struct volume_d  *volume_bootpartition;   // volume 1
-struct volume_d  *volume_systempartition; // volume 2
+// See: storage.c
+extern struct volume_d  *volume_vfs;             // volume 0
+extern struct volume_d  *volume_bootpartition;   // volume 1
+extern struct volume_d  *volume_systempartition; // volume 2
 // ...
 
 // Volume list
-
-unsigned long volumeList[VOLUME_COUNT_MAX];
+// See: storage.c
+extern unsigned long volumeList[VOLUME_COUNT_MAX];
 
 
 //

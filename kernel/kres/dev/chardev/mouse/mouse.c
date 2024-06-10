@@ -1,5 +1,6 @@
 
 // mouse.c
+// This is the ps2/mouse driver, embedded into the kernel base.
 // ps/2 mouse support.
 // ring 0, kernel base.
 // Created by Fred Nora.

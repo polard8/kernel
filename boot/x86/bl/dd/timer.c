@@ -1,7 +1,9 @@
 /*
- * File: dd/timer.c 
+ * File: timer.c 
  * Descrição:
  *     Handler da irq0 para o Boot Loader.
+ * Environment:
+ *     32bit bootloader.
  * ATENÇÃO:
  *    O timer no Boot Loader não faz task switch.
  *    O timer será usado principalmente para timeout de driver.

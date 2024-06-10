@@ -169,6 +169,7 @@ typedef enum {
 }disk_class_t;
 
 
+/*
 // bios parameter block
 struct bpb_d
 {
@@ -178,7 +179,7 @@ struct bpb_d
     //...
     struct bpb_d  *next;
 };
-
+*/
 
 /*
  * partition_table_d:
@@ -241,7 +242,10 @@ struct mbr_d
     struct partition_table_d p[4];
     unsigned short signature;
 }; 
-struct mbr_d *mbr; 
+
+// MBR structure for the system disk.
+// See: storage.c
+extern struct mbr_d  *mbr; 
 
 
 /*
@@ -328,14 +332,15 @@ struct disk_d
 };
 
 // Disks
-
-struct disk_d  *____boot____disk;
+// Structure for the system disk.
+// See: storage.c
+extern struct disk_d  *____boot____disk;
 // ...
 
 // Disk list.
 // Essa lista é preenchida pelo driver de IDE.
-
-unsigned long diskList[DISK_COUNT_MAX];
+// See: storage.c
+extern unsigned long diskList[DISK_COUNT_MAX];
 
 
 //

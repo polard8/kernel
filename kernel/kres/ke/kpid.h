@@ -2,8 +2,8 @@
 // kpid.h
 // Managing the helper processes.
 
-#ifndef __KPID_H
-#define __KPID_H    1
+#ifndef __KE_KPID_H
+#define __KE_KPID_H    1
 
 //
 // Main processes

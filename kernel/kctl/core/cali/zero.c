@@ -55,6 +55,8 @@ void zero_initialize_default_kernel_font(void)
 // see: tty/console.c
 void zero_show_banner(void)
 {
+// Called by keInitialize() in ke.c.
+
     char product_string[256];
     char build_string[256];
     size_t size=0;

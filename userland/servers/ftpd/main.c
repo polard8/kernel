@@ -71,9 +71,9 @@ static void ServerInitialization(int value)
 
 int main(int argc, char *argv[])
 {
+    printf("ftpd.bin: Initializing ...\n");
     ServerInitialization(0);
 
-    printf("ftpd.bin: Initializing ...\n");
     return (int) EXIT_SUCCESS;
 }
 

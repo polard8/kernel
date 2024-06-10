@@ -581,6 +581,7 @@ LOOP_next_entry:
 // Ler um setor. 
 // (data_area_base + next_cluster - 2)
 // 512 bytes por cluster.
+// See: hdd.c
 
     read_lba ( 
         file_address, 

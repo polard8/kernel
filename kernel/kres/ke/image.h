@@ -4,9 +4,8 @@
 // coisas como tamanho do arquivo, endereço base de carregamento,
 // quantidade de páginas usadas pela imagem etc ...
 
-
-#ifndef __IMAGE_H  
-#define __IMAGE_H    1
+#ifndef __KE_IMAGE_H  
+#define __KE_IMAGE_H    1
 
 
 struct image_info_d

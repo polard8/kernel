@@ -1,6 +1,8 @@
 /*
  * File: hdd.c 
  * Low level routines to read and write a sector into/from the disk.
+ * Environment:
+ *     32bit bootloader.
  * Two functions are used in this document.
  * >> my_read_hd_sector() is called by read_lba().
  * >> my_write_hd_sector() is called by write_lba().
@@ -130,13 +132,16 @@ int hdd_ata_wait_no_drq (int p)
  *   //out8 ( int port, int data )
  *   (IDE PIO)
  */
+// IN:
+// port = We have 4 valid ports.
+// slave = slave or not.
 int 
 pio_rw_sector ( 
     unsigned long buffer, 
     unsigned long lba, 
     int rw, 
-    int port,
-    int slave )
+    int port,     
+    int slave )  
 {
     unsigned long tmplba = (unsigned long) lba;
 
@@ -316,6 +321,18 @@ my_read_hd_sector (
     unsigned long cx, 
     unsigned long dx )
 {
+    static int Operation = 0x20;  // Read
+
+    // Channel and device number
+    int ideChannel = g_current_ide_channel;
+    int isSlave = g_current_ide_device;
+	
+// #bugbug 
+// We have 4 valid ports.
+// We do not have the IDE port, so, we are using the ide channel.
+	int idePort = g_current_ide_port;
+	
+
 
 //====================== WARNING ==============================
 // #IMPORTANTE:
@@ -327,11 +344,11 @@ my_read_hd_sector (
 // (buffer, lba, rw flag, port number, master )
 
     pio_rw_sector ( 
-        (unsigned long) ax, 
-        (unsigned long) bx, 
-        (int) 0x20, 
-        (int) g_current_ide_channel,     // 0
-        (int) g_current_ide_device );    // 1
+        (unsigned long) ax,  // Buffer
+        (unsigned long) bx,  // LBA
+        (int) Operation, 
+        (int) idePort,    // We have 4 valid ports.
+        (int) isSlave );  // Slave or not.
 
 /*
 //antigo.
@@ -364,6 +381,17 @@ my_write_hd_sector (
     unsigned long cx, 
     unsigned long dx )
 {
+    static int Operation = 0x30;  // Read
+
+    // Channel and device number
+    int ideChannel = g_current_ide_channel;
+    int isSlave = g_current_ide_device;
+	
+// #bugbug 
+// We have 4 valid ports.
+// We do not have the IDE port, so, we are using the ide channel.
+	int idePort = g_current_ide_port;
+	
 
 // =========================== WARNING ==============================
 // #IMPORTANTE:
@@ -379,11 +407,11 @@ my_write_hd_sector (
     // pio_rw_sector ( (unsigned long) ax, (unsigned long) bx, (int) 0x30, (int) 0 );
 
     pio_rw_sector ( 
-        (unsigned long) ax, 
-        (unsigned long) bx, 
-        (int) 0x30, 
-        (int) g_current_ide_channel,   //0 
-        (int) g_current_ide_device );  //1
+        (unsigned long) ax,  // Buffer
+        (unsigned long) bx,  // LBA
+        (int) Operation, 
+        (int) idePort,    // We have 4 valid ports.
+        (int) isSlave );  // Slave or not.
 
 /*
 // Antigo.

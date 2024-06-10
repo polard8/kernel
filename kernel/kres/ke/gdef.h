@@ -1,9 +1,8 @@
 /*
   * File: gdef.h
-  * Descrição:
-  *     Definições globais. 
-  *     Será utilizado por todos os módulos. Deve ficar no início.
-  *     Quando uma definição deve ser acessada por todos os módulos
+  *     Definiï¿½ï¿½es globais. 
+  *     Serï¿½ utilizado por todos os mï¿½dulos. Deve ficar no inï¿½cio.
+  *     Quando uma definiï¿½ï¿½o deve ser acessada por todos os mï¿½dulos
   *     do kernel base ela deve ficar aqui.
   */
 
@@ -13,38 +12,35 @@
 Tipos de contas:
     aspace e dspace, pessoais e conjuntas.
 aspace:
-    Um Address Space é uma conta de banco de dados em memória. Uma conta 
+    Um Address Space ï¿½ uma conta de banco de dados em memï¿½ria. Uma conta 
 pode ser do tipo conjunta(Shared) ou  pessoal(Personal). 
 dspace:
-    Um Disk Space é uma conta de banco de dados em disco. Uma conta pode 
+    Um Disk Space ï¿½ uma conta de banco de dados em disco. Uma conta pode 
 ser do tipo conjunta(Shared) ou  pessoal(Personal). 
 Donos das contas:
-    Os processos são os clientes dos bancos de dados e são os donos das 
+    Os processos sï¿½o os clientes dos bancos de dados e sï¿½o os donos das 
 contas de bancos de dados.
 Tipos de bancos:
     Kernel Data Base, Global Data Base e Local Data Base.
 KDB:
-    Banco de dados do tipo kernel. É o banco de maior privilégio, poucos
-processos poderão usar esse banco e as contas presentes nele.
+    Banco de dados do tipo kernel. ï¿½ o banco de maior privilï¿½gio, poucos
+processos poderï¿½o usar esse banco e as contas presentes nele.
 GDB:
-    Bancos de dados do tipo global. É o banco das contas conjuntas, para
+    Bancos de dados do tipo global. ï¿½ o banco das contas conjuntas, para
 que os processos possam compartilhar as contas e os dados que elas acessam.
 LDB:
-    Bancos de dados do tipo pessoal. É o banco das contas pessoais. Um 
+    Bancos de dados do tipo pessoal. ï¿½ o banco das contas pessoais. Um 
 processo pode ser dono de uma conta dessas para proteger seus dados
-e revogar qualquer tipo de acesso e somente ele terá acesso aos dados
+e revogar qualquer tipo de acesso e somente ele terï¿½ acesso aos dados
 dessa conta.
 */
 
-
-#ifndef ____GDEF_H
-#define ____GDEF_H    1
-
+#ifndef __KE_GDEF_H
+#define __KE_GDEF_H    1
 
 //using gui flags.
 #define GUI_ON   1
 #define GUI_OFF  0
-
 
 //layers
 #define KERNEL      0
@@ -52,7 +48,6 @@ dessa conta.
 #define EXECUTIVE   2   //2
 #define MICROKERNEL 3   //3
 #define HAL         4   //4
-
 
 // IOPL constants.
 // Intel/AMD
@@ -82,12 +77,12 @@ extern int abnt2;
 /*
  * Os Type:
  *     O sistema operacional pode ser usado como servidor.
- * Radando em uma máquina real e acessado por um terminal
+ * Radando em uma mï¿½quina real e acessado por um terminal
  * via rede LAN, ou porta serial. TTY.
- *     Qualquer sistema operacional em uma máquina cliente pode
+ *     Qualquer sistema operacional em uma mï¿½quina cliente pode
  * acessar o sistema operacional na maquina servidora. Pra isso
- * tem que ter um programa na máquina cliente que envie comandos 
- * para a máquina servidora através da placa de rede ou da porta 
+ * tem que ter um programa na mï¿½quina cliente que envie comandos 
+ * para a mï¿½quina servidora atravï¿½s da placa de rede ou da porta 
  * serial.
  *     O sistema pode atuar como cliente.
  */
@@ -104,8 +99,9 @@ typedef enum {
 // The boot block structure.
 //
 
+/*
 // #todo
-// Actually the init.c is using another structure for this purpose.
+// Actually the kmain.c is using another structure for this purpose.
 struct boot_block_d
 {
     unsigned long bootblock_address;  //pa ?? va ??
@@ -118,17 +114,23 @@ struct boot_block_d
     unsigned long physical_memory_in_kb;
 
     unsigned long metafile_address;
-    unsigned long disk_number;
+    unsigned long disk_number;  // Gigen by the BIOS.
     unsigned long heads; 
     unsigned long spt; 
     unsigned long cylinders; 
     unsigned long boot_mode; 
     unsigned long gramado_mode;
     //...
+
+    // #test
+    // The IDE port number given by the 32bit boot loader.
+    unsigned long ide_port_number;
+
     int initialized;
 };
 // see: globals.c
 extern struct boot_block_d  BootBlock;
+*/
 
 
 // Regions
@@ -151,8 +153,8 @@ extern unsigned long g_frontbuffer_pa;
 extern unsigned long g_backbuffer_pa;
 
 
-// Endereço virtual do pool de heaps.
-// os heaps nessa área serão dados para os processos.
+// Endereï¿½o virtual do pool de heaps.
+// os heaps nessa ï¿½rea serï¿½o dados para os processos.
 // see: globals.c
 extern int g_heap_count;
 extern int g_heap_count_max;

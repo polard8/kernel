@@ -279,16 +279,22 @@ extern void refresh_screen();
 #include "fs/fs.h"
 #include "pci.h"
 
-// Device drivers.
+//
+// Device drivers
+//
+
 #include "dd/display.h"
 #include "dd/r_render.h"  // Graphics
 #include "dd/keyboard.h"  // irq 1.
+
+// Storage support
 #include "dd/ata.h"
 #include "dd/ide.h"
+#include "dd/hdd.h"
+#include "dd/storage.h"
+
 //#include "timer.h"  // irq 0.
 
-// #test
-#include "dd/hdd.h"
 
 // Embedded mini-shell
 #include "shell.h"

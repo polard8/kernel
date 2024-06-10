@@ -1,8 +1,8 @@
 
 // pit.h
 
-#ifndef ____PIT_H
-#define ____PIT_H    1
+#ifndef __KE_PIT_H
+#define __KE_PIT_H    1
 
 // Seconds      (s)  1
 // Milliseconds (ms) 1.000

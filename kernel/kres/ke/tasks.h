@@ -3,9 +3,8 @@
 // #todo
 // Some deprecated data here.
 
-#ifndef __TASKS_H
-#define __TASKS_H    1
-
+#ifndef __KE_TASKS_H
+#define __KE_TASKS_H    1
 
 //new task variables.
 unsigned long start_new_task_status;

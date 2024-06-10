@@ -1,12 +1,12 @@
 /*
- * File: init.h
+ * File: kinit.h
  *     Initialization support.
  * History:
  *     2015 - Created by Fred Nora.
  */
 
-#ifndef __INIT_H
-#define __INIT_H    1
+#ifndef __KE_INIT_H
+#define __KE_INIT_H    1
 
 
 // Initialization support.

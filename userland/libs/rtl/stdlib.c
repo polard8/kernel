@@ -776,6 +776,7 @@ unsigned long FreeHeap (unsigned long size)
 }
 
 /*
+ * ---------------------------------------------------------
  * libcInitRT:
  *     Inicializa o gerenciamento em user mode de memória virtual
  * para a biblioteca libC99.
@@ -788,8 +789,9 @@ unsigned long FreeHeap (unsigned long size)
 int libcInitRT (void)
 {
     int Status = -1;
-    // #debug
+
     debug_print ("libcInitRT:\n");
+
     Status = (int) __init_mm();
     if (Status != 0){
         debug_print ("libcInitRT: [FAIL] __init_mm\n");

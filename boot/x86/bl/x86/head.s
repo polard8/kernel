@@ -214,7 +214,21 @@ StartLoader:
     xor eax, eax
     mov eax, dword [_SavedGramadoMode]  ;jail, p1, home ... 
     mov dword [0x90000 + 40], eax
-    mov dword [0x90000 + 48], 0
+    mov dword [0x90000 + 44], 0
+
+; ----------------------------
+; #test: 
+; IDE channel and device number.
+; In the case we're booting from IDE device, we can tell 
+; to the kernel what is the port we booted from.
+; The IDE driver needs to fill this field.
+; 0x00090000 + 48
+    xor eax, eax
+    ;mov eax, dword [?]   
+    mov dword [0x90000 + 48], eax
+    mov dword [0x90000 + 52], 0
+
+
 ; ===============================================
 ;--
 

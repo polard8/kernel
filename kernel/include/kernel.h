@@ -211,8 +211,10 @@
 
 // ==================================
 // dev/
+
 // Serial port. (COM).
 #include "../kres/dev/chardev/serial.h"
+
 // ps2 - i8042
 #include "../kres/dev/chardev/vk.h"
 #include "../kres/dev/chardev/kbdabnt2.h"
@@ -221,8 +223,8 @@
 #include "../kres/dev/chardev/ps2kbd.h"
 #include "../kres/dev/chardev/mouse.h"
 #include "../kres/dev/chardev/ps2mouse.h"
+
 #include "../kres/dev/chardev/i8042.h"
-#include "../kres/dev/chardev/ps2.h"
 
 // Block devices
 // ata, sata

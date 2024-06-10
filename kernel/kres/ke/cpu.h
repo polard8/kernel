@@ -1,8 +1,8 @@
 
 // cpu.h
 
-#ifndef __HAL_CPU_H
-#define __HAL_CPU_H    1
+#ifndef __KE_CPU_H
+#define __KE_CPU_H    1
 
 // Supported brands.
 #define Processor_NULL   0 

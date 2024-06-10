@@ -15,10 +15,10 @@
 #include <rtl/gramado.h>
 */
 
-#include "init.h"
+#include "inc/init.h"
 
 // Used when processing the control keys.
-#include "ascii.h"
+#include "inc/ascii.h"
 
 //Used by creat()
 //#include <fcntl.h>
@@ -29,7 +29,7 @@
 #define __VK_RETURN    0x1C
 #define __VK_TAB       0x0F
 
-static isTimeToQuit = FALSE;
+static int isTimeToQuitCmdLine = FALSE;
 
 
 static const char *app1_name = "gramland.bin";   // #c1
@@ -84,23 +84,25 @@ static void do_help(void)
 // Launch the DE, Desktop Environment.
 // See: gramland/
     printf ("'wsq': Launch the GUI\n");
-    printf("[control + f9] to open the kernel console\n");
+    printf ("[control + f9] to open the kernel console\n");
 }
 
 static void do_launch_list(void)
 {
 // Raw and ugly set of programs.
+
     rtl_clone_and_execute("gramland.bin");
+    rtl_clone_and_execute("taskbar.bin");
     rtl_clone_and_execute("terminal.bin");
-    rtl_clone_and_execute("editor.bin");
-    rtl_clone_and_execute("browser.bin");
-    rtl_clone_and_execute("fileman.bin");
+    //rtl_clone_and_execute("editor.bin");
+    //rtl_clone_and_execute("browser.bin");
+    //rtl_clone_and_execute("fileman.bin");
 
 // #
 // Quit the command line.
 // It's too much faster if we do not quit.
 // But we need to quit and start listening for messages.
-    isTimeToQuit = TRUE;
+    isTimeToQuitCmdLine = TRUE;
 }
 
 static void do_launch_de(void)
@@ -139,7 +141,7 @@ static void do_launch_de(void)
 // #warning: 
 // Quit the command line. Not the process.
 // #todo: This name is not good.
-    isTimeToQuit = TRUE;
+    isTimeToQuitCmdLine = TRUE;
 }
 
 static void do_launch_de2(void)
@@ -168,7 +170,7 @@ static void do_launch_de2(void)
     //sc82( 266, 8000, 8000, 8000 );
     //printf("pid=%d\n",ret_val);
 // Quit the command line.
-    isTimeToQuit = TRUE;
+    isTimeToQuitCmdLine = TRUE;
 }
 
 static void initPrompt(void)
@@ -304,7 +306,7 @@ static int __CompareString(void)
     }
 
     if ( strncmp(prompt,"quit",4) == 0 ){
-        isTimeToQuit=TRUE;
+        isTimeToQuitCmdLine=TRUE;
         goto exit_cmp;
     }
 
@@ -400,7 +402,7 @@ static int __CompareString(void)
         do_clear_console();
         // #c3 NETD.BIN
         rtl_clone_and_execute(app3_name);
-        isTimeToQuit = TRUE;
+        isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
 
@@ -414,31 +416,46 @@ static int __CompareString(void)
 // We need a pointer instead.
 // see: meta/
 
+/*
     // GMC - Gramado Meta Compositor.
     if ( strncmp(prompt,"comp",4) == 0 ){
         printf ("~ Comp:\n");
         do_clear_console();
         rtl_clone_and_execute("comp.bin");
-        isTimeToQuit = TRUE;
+        isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
+*/
+
+//
+// Testing 3D demos.
+//
+
     // eng.bin
     if ( strncmp(prompt,"eng",3) == 0 ){
-        printf ("~ Game engine:\n");
+        printf ("Launch eng.bin\n");
         do_clear_console();
         rtl_clone_and_execute("eng.bin");
-        isTimeToQuit = TRUE;
+        isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
-    // Game 1.
-    if ( strncmp(prompt,"game1",5) == 0 ){
-        printf ("~ Game 1:\n");
+    // eng2.bin
+    if ( strncmp(prompt,"eng2",4) == 0 ){
+        printf ("launch eng2.bin\n");
         do_clear_console();
-        rtl_clone_and_execute("eng.bin");
-        isTimeToQuit = TRUE;
+        rtl_clone_and_execute("eng2.bin");
+        isTimeToQuitCmdLine = TRUE;
         goto exit_cmp;
     }
-
+    // eng3.bin
+    if ( strncmp(prompt,"eng3",4) == 0 ){
+        printf ("launch eng3.bin\n");
+        do_clear_console();
+        rtl_clone_and_execute("eng3.bin");
+        isTimeToQuitCmdLine = TRUE;
+        goto exit_cmp;
+    }
+    // ...
 // ----------------------------------------
 
     printf ("Command not found, type 'help' for more commands\n");
@@ -463,7 +480,7 @@ static int __CompareString(void)
 */
 
 exit_cmp:
-    if (isTimeToQuit==TRUE){
+    if (isTimeToQuitCmdLine==TRUE){
         return 0;
     }
     initPrompt();
@@ -500,7 +517,7 @@ static int __coolmenu_loop(void)
 
     while (1)
     {
-        if (isTimeToQuit == TRUE){
+        if (isTimeToQuitCmdLine == TRUE){
             break;
         }
 
@@ -636,7 +653,7 @@ static int __stdin_loop(void)
 
     while (1)
     {
-        if (isTimeToQuit == TRUE){
+        if (isTimeToQuitCmdLine == TRUE){
             break;
         }
         C = (int) fgetc(stdin);
@@ -662,11 +679,14 @@ static int __stdin_loop(void)
 //================================
 }
 
+// This is the main function for the init process.
 int main( int argc, char **argv)
 {
 
 // #todo
 // Get the runlevel value.
+
+    register int i=0;
 
     //int fHeadlessMode = TRUE;
     int fHeadlessMode = FALSE;
@@ -674,12 +694,10 @@ int main( int argc, char **argv)
 // Run the command line. 
 // Getting input from stdin.
     int fRunCommandLine = FALSE;
-
 // Run the event loop. 
 // Getting input from the message queue in the control thread.
 // When the command line exit or fail.
     int fRunEventLoop = FALSE;
-
 // Was it launched by the kernel?
     int InvalidLauncher = FALSE;
 
@@ -705,7 +723,6 @@ int main( int argc, char **argv)
 // These parameters are created by the kernel
 // in x64init.c
 
-    register int i=0;
     if (argc >= 2)
     {
         for (i=1; i < argc; i++)
@@ -731,7 +748,6 @@ int main( int argc, char **argv)
     //printf("int.bin: breakpoint\n");
     //while(1){}
 
-
 //testando se esse codigo esta mesmo em ring3. 
 //#bugbug: this proces is running in ring0.
     //asm ("cli");
@@ -747,13 +763,15 @@ int main( int argc, char **argv)
  
     // asm volatile ("int $199 \n");
 
-// interrupts
-// Unlock the taskswitching support.
-// Unlock the scheduler embedded into the base kernel.
+// ----------------------------------------
+// Interrupts
 // Only the init process is able to do this.
+// + Unlock the taskswitching support.
+// + Unlock the scheduler embedded into the base kernel.
 
     //gws_debug_print ("gws.bin: Unlock taskswitching and scheduler \n");
     //printf          ("gws.bin: Unlock taskswitching and scheduler \n");
+
     gramado_system_call (641,0,0,0);
     Init.taskswitching_unlocked = TRUE;
     gramado_system_call (643,0,0,0);
@@ -777,7 +795,7 @@ int main( int argc, char **argv)
 
     while(1)
     {
-        if( isTimeToQuit == TRUE ){
+        if( isTimeToQuitCmdLine == TRUE ){
             break;
         }
         C = (int) fgetc(stdin);
@@ -818,23 +836,29 @@ int main( int argc, char **argv)
 // Loop
 //
 
-
-//================================
+// =[Loop 1]===============================
 // Get input from stdin.
-
+// Local function.
     int cmdline_status = -1;
     if (fRunCommandLine == TRUE){
         cmdline_status = (int) __stdin_loop();
     }
 
-//================================
+    // Fall through :)
+
+// =[Loop 2]===============================
 // Get input from idle thread.
 // Idle thread loop.
 // Now the init process enters in 'server mode'.
 // Getting system messages from it's queue in the control thread.
+// See: msgloop.c
     int eventloop_status = -1;
     if (fRunEventLoop == TRUE){
         eventloop_status = (int) run_server();
+    }
+    // Is it time to quit the init process?
+    if (eventloop_status == 0){
+        return EXIT_SUCCESS;
     }
 
 // ----------------------------------
@@ -844,22 +868,19 @@ int main( int argc, char **argv)
 // The worst case scenario is the reboot.
 // It depends on the runlevel.
 unexpected_exit:
-
     printf("init.bin: Unexpected exit()\n");
     while (1){
         asm ("pause"); 
     };
-
 // Not reached!
     return 0;
 
 fail:
     if (InvalidLauncher == TRUE){
-        printf ("init.bin: Not launched by the kernel\n");
+        printf("init.bin: Not launched by the kernel\n");
     }
+    // #hack
     exit(0);
-    return 0;
+    return EXIT_FAILURE;
 }
-
-
 

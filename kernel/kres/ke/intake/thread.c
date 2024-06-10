@@ -845,6 +845,9 @@ struct thread_d *create_thread (
     unsigned int cpl )
 {
 // Create a thread.
+// #todo:
+// Explain what is a 'zing hook'.
+// Change this name. Maybe this is the old 'desktop' structure.
 
     struct process_d *Process;
     struct thread_d  *Thread;
@@ -911,7 +914,7 @@ struct thread_d *create_thread (
     {
         debug_print ("create_thread: current_thread fail\n");
         printf      ("create_thread: current_thread fail\n");
-        return NULL;
+        goto fail;
     }
 
 // #todo
@@ -1254,6 +1257,8 @@ try_next_slot:
 
 // Return the pointer.
     return (void *) Thread;
+fail:
+    return NULL;
 }
 
 /*
