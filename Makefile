@@ -38,8 +38,10 @@ ifndef CONFIG_USE_VERBOSE
 endif
 
 ifeq ($(CONFIG_USE_VERBOSE),1)
+# Not silent. It prints the commands.
 	Q =
 else
+# silent
 	Q = @
 endif
 

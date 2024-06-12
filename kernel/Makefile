@@ -22,16 +22,15 @@ linkFlags := -m elf_x86_64 \
 # Config
 #
 
-# Quit mode?
 ifndef CONFIG_USE_VERBOSE
-	CONFIG_USE_VERBOSE = 0
+	CONFIG_USE_VERBOSE = 1
 endif
 
-# ' ' = Print
-# '@' = Do not print.
 ifeq ($(CONFIG_USE_VERBOSE),1)
+# Not silent. It prints the commands.
 	Q =
 else
+# silent
 	Q = @
 endif
 
@@ -110,21 +109,21 @@ clean
 k1:
 	@echo "Compiling: Compiling k1"
 # Kernel arch - Startup and entry code.
-	$(MAKE) -C kctl/arch/x86_64/
+	$(Q)$(MAKE) -C kctl/arch/x86_64/
 # Kernel core - Top level routines.
-	$(MAKE) -C kctl/core/
+	$(Q)$(MAKE) -C kctl/core/
 
 #----------------
 # Kernel resources
 k2:
 	@echo "Compiling: Compiling k2"
-	$(MAKE) -C lib/
-	$(MAKE) -C kres/dev/
-	$(MAKE) -C kres/fs/
-	$(MAKE) -C kres/gramk/
-	$(MAKE) -C kres/ke/
-	$(MAKE) -C kres/mm/
-	$(MAKE) -C kres/net/
+	$(Q)$(MAKE) -C lib/
+	$(Q)$(MAKE) -C kres/dev/
+	$(Q)$(MAKE) -C kres/fs/
+	$(Q)$(MAKE) -C kres/gramk/
+	$(Q)$(MAKE) -C kres/ke/
+	$(Q)$(MAKE) -C kres/mm/
+	$(Q)$(MAKE) -C kres/net/
 
 #----------------
 link-kernel:
@@ -137,7 +136,4 @@ clean-all:
 	rm -rf *.o   
 	rm -rf *.BIN   
 	@echo "~clean-all"
-
-
-
 

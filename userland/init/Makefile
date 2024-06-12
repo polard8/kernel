@@ -11,6 +11,8 @@ SUBLEVEL = 0
 EXTRAVERSION =
 #NAME = 
 
+Q = @ 
+
 #todo:
 #We need to simplify these flags
 
@@ -48,19 +50,19 @@ main.o:
 	gcc  -c msgloop.c  $(CFLAGS) -I $(LIBC) -o msgloop.o
 all-c:
 
-	cp $(LIBCOBJ)/crt0.o   .
-	cp $(LIBCOBJ)/rtl.o  .
+	$(Q)cp $(LIBCOBJ)/crt0.o   .
+	$(Q)cp $(LIBCOBJ)/rtl.o  .
 
-	cp $(LIBCOBJ)/ctype.o   .
-	cp $(LIBCOBJ)/stdio.o .
-	cp $(LIBCOBJ)/fcntl.o .
-	cp $(LIBCOBJ)/stdlib.o .
-	cp $(LIBCOBJ)/string.o .
-	cp $(LIBCOBJ)/unistd.o  .
+	$(Q)cp $(LIBCOBJ)/ctype.o   .
+	$(Q)cp $(LIBCOBJ)/stdio.o .
+	$(Q)cp $(LIBCOBJ)/fcntl.o .
+	$(Q)cp $(LIBCOBJ)/stdlib.o .
+	$(Q)cp $(LIBCOBJ)/string.o .
+	$(Q)cp $(LIBCOBJ)/unistd.o  .
 
-	cp $(LIBCOBJ)/termios.o  .
-	cp $(LIBCOBJ)/ioctl.o  .
-	cp $(LIBCOBJ)/socket.o  .
+	$(Q)cp $(LIBCOBJ)/termios.o  .
+	$(Q)cp $(LIBCOBJ)/ioctl.o  .
+	$(Q)cp $(LIBCOBJ)/socket.o  .
 
 hello-link:
 	ld -m elf_x86_64 -T ../link.ld -o INIT.BIN $(myObjects)    
