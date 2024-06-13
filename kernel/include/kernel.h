@@ -229,7 +229,7 @@
 
 // Block devices
 // ata, sata
-#include "../kres/dev/blkdev/ata.h"
+#include "../kres/dev/blkdev/ata/ata.h"
 // storage
 #include "../kres/dev/blkdev/superblk.h"
 // storage

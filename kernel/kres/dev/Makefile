@@ -92,12 +92,11 @@ all:
 	$(CC) -c blkdev/ata/atainfo.c $(KERNEL_INCLUDE) $(CFLAGS) -o atainfo.o 
 	$(CC) -c blkdev/ata/atairq.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atairq.o 
 	$(CC) -c blkdev/ata/atapci.c  $(KERNEL_INCLUDE) $(CFLAGS) -o atapci.o 
+	$(CC) -c blkdev/ata/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
+	$(CC) -c blkdev/ata/disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
 
 # storage
-	$(CC) -c blkdev/disk_r.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_r.o
-	$(CC) -c blkdev/disk_w.c  $(KERNEL_INCLUDE) $(CFLAGS) -o disk_w.o
 	$(CC) -c blkdev/storage.c $(KERNEL_INCLUDE) $(CFLAGS) -o storage.o 
-
 
 # bl display device
 	$(CC) -c chardev/display/bldisp/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
