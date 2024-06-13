@@ -230,14 +230,12 @@
 // Block devices
 // ata, sata
 #include "../kres/dev/blkdev/ata/ata.h"
-// storage
+// Storage manager.
 #include "../kres/dev/blkdev/superblk.h"
-// storage
 #include "../kres/dev/blkdev/volume.h"
 #include "../kres/dev/blkdev/disk.h"
-// storage
 #include "../kres/dev/blkdev/storage.h"
-// Network
+
 // Network devices
 // primeiro controladoras depois protocolos
 // e1000 - nic intel
