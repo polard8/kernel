@@ -102,22 +102,22 @@ all:
 # bl display device
 	$(CC) -c chardev/display/bldisp/bldisp.c  $(KERNEL_INCLUDE) $(CFLAGS) -o bldisp.o
 
-# kbd
-	$(CC) -c chardev/kbd/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
-	$(CC) -c chardev/kbd/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
-	$(CC) -c chardev/kbd/ps2kbd.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ps2kbd.o
-# mouse
-	$(CC) -c chardev/mouse/mouse.c    $(KERNEL_INCLUDE) $(CFLAGS) -o mouse.o
-	$(CC) -c chardev/mouse/ps2mouse.c $(KERNEL_INCLUDE) $(CFLAGS) -o ps2mouse.o
+# Keyboard map.
+	$(CC) -c chardev/kbdmap.c   $(KERNEL_INCLUDE) $(CFLAGS) -o kbdmap.o
+
+# i8042 (PS/2)
+	$(CC) -c chardev/i8042/i8042.c    $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
+	$(CC) -c chardev/i8042/keyboard.c $(KERNEL_INCLUDE) $(CFLAGS) -o keyboard.o
+	$(CC) -c chardev/i8042/mouse.c    $(KERNEL_INCLUDE) $(CFLAGS) -o mouse.o
+	$(CC) -c chardev/i8042/ps2kbd.c   $(KERNEL_INCLUDE) $(CFLAGS) -o ps2kbd.o
+	$(CC) -c chardev/i8042/ps2mouse.c $(KERNEL_INCLUDE) $(CFLAGS) -o ps2mouse.o
+
 # serial
 	$(CC) -c chardev/serial/serial.c  $(KERNEL_INCLUDE) $(CFLAGS) -o serial.o
 # tty
 	$(CC) -c chardev/tty/tty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o tty.o
 	$(CC) -c chardev/tty/console.c  $(KERNEL_INCLUDE) $(CFLAGS) -o console.o 
 	$(CC) -c chardev/tty/pty.c      $(KERNEL_INCLUDE) $(CFLAGS) -o pty.o
-# ps2
-	$(CC) -c chardev/i8042.c   $(KERNEL_INCLUDE) $(CFLAGS) -o i8042.o
-
 
 # e1000
 	$(CC) -c netdev/e1000/e1000.c  $(KERNEL_INCLUDE) $(CFLAGS) -o e1000.o 

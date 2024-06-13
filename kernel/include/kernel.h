@@ -178,16 +178,17 @@
 // Devices
 // primeiro char, depois block, depois network.
 // tty
-#include "../kres/dev/chardev/ttyldisc.h"
-#include "../kres/dev/chardev/ttydrv.h"
-#include "../kres/dev/chardev/tty.h"
-#include "../kres/dev/chardev/pty.h"
-#include "../kres/dev/chardev/console.h"
+#include "../kres/dev/chardev/tty/ttyldisc.h"
+#include "../kres/dev/chardev/tty/ttydrv.h"
+#include "../kres/dev/chardev/tty/tty.h"
+#include "../kres/dev/chardev/tty/pty.h"
+#include "../kres/dev/chardev/tty/console.h"
+
 // hw stuff - display device
 // display device support.
-#include "../kres/dev/chardev/display.h"
+#include "../kres/dev/chardev/display/display.h"
 // bootloader display device
-#include "../kres/dev/chardev/bldisp.h"
+#include "../kres/dev/chardev/display/bldisp/bldisp.h"
 
 // ==================================
 // gramk/
@@ -213,18 +214,18 @@
 // dev/
 
 // Serial port. (COM).
-#include "../kres/dev/chardev/serial.h"
+#include "../kres/dev/chardev/serial/serial.h"
 
-// ps2 - i8042
 #include "../kres/dev/chardev/vk.h"
 #include "../kres/dev/chardev/kbdabnt2.h"
 #include "../kres/dev/chardev/kbdmap.h"
-#include "../kres/dev/chardev/keyboard.h"
-#include "../kres/dev/chardev/ps2kbd.h"
-#include "../kres/dev/chardev/mouse.h"
-#include "../kres/dev/chardev/ps2mouse.h"
 
-#include "../kres/dev/chardev/i8042.h"
+// i8042 (PS/2)
+#include "../kres/dev/chardev/i8042/keyboard.h"
+#include "../kres/dev/chardev/i8042/ps2kbd.h"
+#include "../kres/dev/chardev/i8042/mouse.h"
+#include "../kres/dev/chardev/i8042/ps2mouse.h"
+#include "../kres/dev/chardev/i8042/i8042.h"
 
 // Block devices
 // ata, sata
