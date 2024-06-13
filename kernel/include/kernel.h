@@ -204,10 +204,11 @@
 
 // ==================================
 // gramk/
+
 #include "../kres/gramk/ws2.h"
 #include "../kres/gramk/gre/gre.h"
 #include "../kres/gramk/ws.h"
-#include "../kres/gramk/input.h"
+#include "../kres/gramk/user/input.h"
 #include "../kres/gramk/callback.h"
 
 // ==================================

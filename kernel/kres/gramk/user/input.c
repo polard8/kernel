@@ -650,7 +650,7 @@ wmMouseEvent(
 // Called by __ps2mouse_parse_data_packet() in ps2mouse.c.
 // Right after the ps2 mouse interrupt handler.
 
-    int Status=-1;
+    int Status = -1;
     //static long old_x=0;
     //static long old_y=0;
 
@@ -875,10 +875,10 @@ wmKeyEvent(
 
 
     //if ( Keyboard_RawByte == 0 )
-        //return -1;
+        //goto fail;
 
     if (Keyboard_RawByte == 0xFF){
-        return -1;
+        goto fail;
     }
 
 // #todo
@@ -1261,10 +1261,11 @@ done:
     Event_LongRawByte = 
         (unsigned long) (Keyboard_RawByte & 0x000000FF);
 
+// ??
 // 0 is null in the ascii table.
 // 0x00 ~ 0x7F
     if (Event_LongASCIICode == 0){
-        return -1;
+        goto fail;
     }
 
 // ------------------------------------
@@ -1397,6 +1398,8 @@ done:
                   (unsigned long) Event_LongRawByte );
 
     return (int) Status;
+fail:
+    return (int) -1;
 }
 
 int wmTimerEvent(int signature)
@@ -1404,18 +1407,15 @@ int wmTimerEvent(int signature)
 // Called by DeviceInterface_PIT() in pit.c.
 // Right after the the timer interrupt handler.
 
-    if (signature != 1234)
-        return -1;
+    if (signature != 1234){
+        goto fail;
+    }
 
-
+// #test
 // Master timer.
 // After 1 Sec.
-    if ( (jiffies % (JIFFY_FREQ) ) == 0 )
-    {
-        post_message_to_ws( 
-            MSG_TIMER, 
-            1234, 
-            jiffies );
+    if ( (jiffies % JIFFY_FREQ) == 0 ){
+        post_message_to_ws( MSG_TIMER, 1234, jiffies );
     }
 
     //return 0;
@@ -1477,8 +1477,9 @@ int wmTimerEvent(int signature)
 */
 
     return 0;
+fail:
+    return (int) -1;
 }
-
 
 /*
  * keProcessInput:
@@ -1513,7 +1514,7 @@ keProcessInput (
     unsigned long long1, 
     unsigned long long2 )
 {
-// Called by wmKeyEvent() in grinput.c
+// Called by wmKeyEvent().
 
     int Status = -1;
     int UseSTDIN=TRUE;  // Input model
@@ -1538,7 +1539,7 @@ keProcessInput (
 //
 
     if (msg<0){
-        debug_print("wmProcedure: Invalid msg\n");
+        debug_print("keProcessInput: Invalid msg\n");
         return -1;
     }
 
@@ -1966,7 +1967,7 @@ keProcessInput (
     return -1;
 
 fail:
-    debug_print("wmProcedure: fail\n");
+    debug_print("keProcessInput: fail\n");
     return -1;
 }
 
