@@ -109,12 +109,13 @@ build-gramado-os:
 # (1) boot/
 
 # Create the virtual disk 0.
-	$(Q)$(NASM) boot/vd/fat/main.asm \
-	-I boot/vd/fat/ \
+	$(Q)$(NASM) boot/x86/vd/fat/main.asm \
+	-I boot/x86/vd/fat/ \
 	-o GRAMHV.VHD 
+
 # Create backup for MBR 0.
-	$(Q)$(NASM) boot/vd/fat/stage1.asm \
-	-I boot/vd/fat/ \
+	$(Q)$(NASM) boot/x86/vd/fat/stage1.asm \
+	-I boot/x86/vd/fat/ \
 	-o MBR0.BIN
 	cp MBR0.BIN  $(BASE)/
 
