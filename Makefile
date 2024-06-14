@@ -4,17 +4,15 @@
 # Compiling on gcc 11.4.0
 # Linking on ld 2.38
 
-BASE    = base
+BASE    = your/base
+
 DEP_B1  = ../de/commands
 DEP_B2  = ../de/ui
 DEP_B3  = ../de/user3d
+
 #DEP_B10 = ../guest0
 #DEP_B11 = ../guest1
 # ...
-
-#ASSETS = usernet/assets 
-#DOCS   = usernet/docs  
-#...
 
 # Make variables (CC, etc...)
 AS      = as
@@ -171,7 +169,7 @@ build-gramado-os:
 # Install BMPs from cali assets.
 # Copy the assets/
 # We can't survive without this one.
-	cp usernet/assets/themes/theme01/*.BMP  $(BASE)/
+	cp your/assets/themes/theme01/*.BMP  $(BASE)/
 
 	@echo "~build-gramado-os end?"
 
