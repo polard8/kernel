@@ -194,7 +194,7 @@ Please make some comments on Github or send messages to Fred Nora.
 
 ## How to Build?
 
-> See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/usernat/docs/build/build.md)
+> See the [Gramado OS build instructions](https://github.com/gramado/kernel/blob/main/your/docs/build/build.md)
 
 
 # Folders
@@ -219,7 +219,7 @@ You're reaching the boring area of this document!
 The project has a folder for documentation and design notes. 
 The folder is docs/.
 
-> See the [docs](https://github.com/gramado/kernel/tree/main/usernet/docs).
+> See the [docs](https://github.com/gramado/kernel/tree/main/your/docs).
 
 The project is looking for some people to create a better documentation, for free, 
 as a contribuition to the open source community. To create this new documentation 
