@@ -1,5 +1,6 @@
 
 // storage.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -205,7 +206,7 @@ static int __create_boot_partition(void)
 // Name
 
     //volume_bootpartition->name = "VOLUME 1 - BOOT";  
-    sprintf ( (char *) name_buffer, "VOLUME-%d",volume_bootpartition->id);
+    ksprintf ( (char *) name_buffer, "VOLUME-%d",volume_bootpartition->id);
     volume_bootpartition->name = (char *) strdup ( (const char *) name_buffer);  
 
     //#todo
@@ -297,7 +298,7 @@ static int __create_system_partition(void)
 // Name
 
     //volume_systempartition->name = "VOLUME 2";  
-    sprintf ( (char *) name_buffer, "VOLUME-%d",volume_systempartition->id);
+    ksprintf ( (char *) name_buffer, "VOLUME-%d",volume_systempartition->id);
     volume_systempartition->name = (char *) strdup ( (const char *) name_buffer);  
 
     //#todo 
@@ -404,7 +405,7 @@ static int __create_vfs_partition(void)
 // Name
 
     //volume_vfs->name = "VOLUME 0"; 
-    sprintf ( (char *) name_buffer, "VOLUME-%d",volume_vfs->id);
+    ksprintf ( (char *) name_buffer, "VOLUME-%d",volume_vfs->id);
     volume_vfs->name = (char *) strdup ( (const char *) name_buffer);  
 
 // #todo

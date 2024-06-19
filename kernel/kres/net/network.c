@@ -2,6 +2,7 @@
 // network.c
 // Network layer. (IP)
 // Transport layer. (TCP/UDP/...)
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -907,7 +908,7 @@ int networkInit(void)
     //HostInfo->__hostname[0] = 'h';
     //HostInfo->hostName_len = (size_t) HOST_NAME_MAX;
 
-    sprintf(HostInfo->__hostname,"gramado");
+    ksprintf(HostInfo->__hostname,"gramado");
     HostInfo->hostName_len = (size_t) strlen("gramado");
     if ( HostInfo->hostName_len >= HOST_NAME_MAX )
     {

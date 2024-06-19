@@ -1,4 +1,3 @@
-
 // tty.c
 // Created by Fred Nora.
 
@@ -796,7 +795,7 @@ struct tty_d *tty_create(short type, short subtype)
     int Index = (int) (__tty->index & 0xFFFF);
 // clear buffer
     memset( __tmpname, 0, 64 );
-    sprintf( __tmpname, "TTY%d", Index );
+    ksprintf( __tmpname, "TTY%d", Index );
 
     //size_t NameSize = (size_t) strlen(__tmpname);
 // ----
@@ -844,7 +843,7 @@ struct tty_d *tty_create(short type, short subtype)
 
     //Todo: create the file name.
     //__file->_tmpfname = "TTYX    TTY";
-    //sprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
+    //ksprintf( (char *) __file->_tmpfname, "TTY%d", ?? );
     //strcpy (?,__file->_tmpfname);
 
 // #todo

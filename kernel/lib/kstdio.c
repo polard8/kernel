@@ -1,5 +1,6 @@
 
 // kstdio.c
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -937,7 +938,7 @@ int kputs(const char *str)
 /*
  * sprintf_old:
  *     @field 2
- *     int sprintf ( char * str, const char * format, ... );
+ *     int ksprintf ( char * str, const char * format, ... );
  *     Composes a string with the same text that would be 
  * printed if format was used on printk, 
  * but instead of being printed, the content is stored 
@@ -954,8 +955,8 @@ int sprintf_old ( char *str, const char *format, ... )
     return (int) print (&str, varg);
 }    
 
-// mysprintf: (sprintf)
-// Variable parameter form to achieve sprintf.
+// mysprintf: (ksprintf)
+// Variable parameter form to achieve ksprintf.
 int mysprintf(char *buf, const char *fmt, ...)
 {
     register int n=0;
@@ -1301,7 +1302,7 @@ int k_fputc( int ch, file *f )
     if ( f->_cnt > 0 && ch != '\n' )
     {
         // Write it into the buffer.
-        sprintf ( f->_p, "%c", ch);
+        ksprintf ( f->_p, "%c", ch);
         // Update the pointer.
         f->_p++;
         // Update the offset for the writer.
@@ -1420,7 +1421,7 @@ int k_fputs(const char *str, file *f)
 // Update _cnt.
     f->_cnt = (int) (f->_cnt - StringSize);
 // Put
-    sprintf( f->_p, str );
+    ksprintf( f->_p, str );
 // Update _p.
     f->_p = (f->_p + StringSize);
 // OK

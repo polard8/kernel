@@ -3,7 +3,8 @@
 // This is the ata controller driver, embedded into the kernel base.
 // ata handshake.
 // write command and read status.
-// Created by Nelson Cole.
+// Document created by Fred Nora.
+// Original version Created by Nelson Cole, Sirius OS, BSD license.
 // A lot of changes by Fred Nora.
 // Suporte à controladora IDE.
 
@@ -690,7 +691,7 @@ static int __ide_identify_device(uint8_t nport)
  
             // name = "sd?"
             //disk->name = "PATA-TEST";
-            sprintf ( (char *) name_buffer, "PATA-TEST-%d",nport);
+            ksprintf ( (char *) name_buffer, "PATA-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
 
             // Security
@@ -765,7 +766,7 @@ static int __ide_identify_device(uint8_t nport)
             // name
 
             //disk->name = "SATA-TEST";
-            sprintf( (char *) name_buffer, "SATA-TEST-%d",nport);
+            ksprintf( (char *) name_buffer, "SATA-TEST-%d",nport);
             disk->name = (char *) strdup((const char *) name_buffer);  
 
             // Security
@@ -829,7 +830,7 @@ static int __ide_identify_device(uint8_t nport)
             // name
             
             //disk->name = "PATAPI-TEST";
-            sprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
+            ksprintf ( (char *) name_buffer, "PATAPI-TEST-%d",nport);
             disk->name = (char *) strdup ( (const char *) name_buffer);  
 
             disk->channel = ata_port[nport].channel;  // Primary or secondary.
@@ -886,7 +887,7 @@ static int __ide_identify_device(uint8_t nport)
             // name
             
             //disk->name = "SATAPI-TEST";
-            sprintf((char *) name_buffer, "SATAPI-TEST-%d",nport);
+            ksprintf((char *) name_buffer, "SATAPI-TEST-%d",nport);
             disk->name = (char *) strdup((const char *) name_buffer);  
 
             disk->channel = ata_port[nport].channel;  // Primary or secondary.

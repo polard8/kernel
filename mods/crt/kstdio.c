@@ -1,4 +1,3 @@
-
 // kstdio.c
 // Created by Fred Nora.
 
@@ -382,8 +381,8 @@ int kinguio_printf(const char *fmt, ...)
 }
 // ===================================
 
-// mysprintf: (sprintf)
-// Variable parameter form to achieve sprintf.
+// mysprintf: (ksprintf)
+// Variable parameter form to achieve ksprintf.
 int mysprintf(char *buf, const char *fmt, ...)
 {
     int i=0;

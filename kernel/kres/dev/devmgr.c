@@ -304,7 +304,7 @@ devmgr_register_device (
 // Se um nome não foi indicado.
     if ((void*) name == NULL)
     {
-        sprintf( buf, "/DEV/%d", id );
+        ksprintf( buf, "/DEV/%d", id );
         strcpy( new_mount_point, buf );
     }
 // ----------------------
@@ -316,10 +316,10 @@ devmgr_register_device (
         {
             panic("devmgr_register_device: NameSize\n");
         }
-        //sprintf( buf, name );
+        //ksprintf( buf, name );
         // #todo: Copy n bytes using strncpy.
         //strcpy( new_mount_point, buf );
-        sprintf( buf, "/DEV/%s", name );
+        ksprintf( buf, "/DEV/%s", name );
         strcpy( new_mount_point, buf );
     }
 

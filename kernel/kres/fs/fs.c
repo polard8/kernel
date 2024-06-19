@@ -1,6 +1,7 @@
 
 // fs.c
 // File system support.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -2517,7 +2518,7 @@ static void __do_initialize_sdROOT(void)
 
 // Copy the name
     memset(sdROOT.name, 0, 64);
-    sprintf( sdROOT.name, root_name );
+    ksprintf( sdROOT.name, root_name );
 
 // Set the flag as initialized.
     sdROOT.initialized = TRUE;
@@ -2577,7 +2578,7 @@ static void __do_initialize_sdGRAMADO(void)
     if (name_size <= 0 || name_size >= 64)
         x_panic("DirectoryName");
     sdGRAMADO.name_size = (size_t) name_size; 
-    sprintf( sdGRAMADO.name, DirectoryName );
+    ksprintf( sdGRAMADO.name, DirectoryName );
 
 // Set the flags as initialized.
     sdGRAMADO.initialized = TRUE;
@@ -2640,7 +2641,7 @@ static void __do_initialize_sdPROGRAMS(void)
     if (name_size <= 0 || name_size >= 64)
         x_panic("DirectoryName");
     sdPROGRAMS.name_size = (size_t) name_size; 
-    sprintf( sdPROGRAMS.name, DirectoryName );
+    ksprintf( sdPROGRAMS.name, DirectoryName );
 
 // Set the flags as initialized.
     sdPROGRAMS.initialized = TRUE;
@@ -3175,7 +3176,7 @@ void fsInitializeWorkingDiretoryString (void)
 	//  ## volume list ##
 	//primeiro colocamos a string que indica a lista de volumes. 
 
-    sprintf ( CWD.path, FS_ROOT_STRING ); 
+    ksprintf ( CWD.path, FS_ROOT_STRING ); 
 
 	//'/'
 	// ## separador ##
@@ -3236,7 +3237,7 @@ void fsInitializeWorkingDiretoryString (void)
         }
         
         // copy the string. limit 32 bytes.
-        sprintf ( v->path_string, current_volume_string );
+        ksprintf ( v->path_string, current_volume_string );
         
         // finalize.
         v->path_string[31] = 0;
@@ -5031,7 +5032,7 @@ do_read_file_from_disk (
                 goto fail;
             }
             memset(buff,0,BUFSIZ);
-            sprintf(buff,"This is a new file.");
+            ksprintf(buff,"This is a new file.");
 
             //++
             // See: 
@@ -5601,7 +5602,7 @@ int sys_create_empty_file(char *file_name)
 // #test
 // Not empty file.
     memset(buffer,0,BUFSIZ);
-    sprintf(buffer,"This is a new file.");
+    ksprintf(buffer,"This is a new file.");
 
 // 0x20 = file.
 // See: write.c

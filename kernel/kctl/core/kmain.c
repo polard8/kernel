@@ -1,6 +1,7 @@
 
 // kmain.c
 // This is the first C file, called after the assembly routines.
+// Created by Fred Nora.
 
 // This file contains the kernel_main function,
 // called by START in 
@@ -883,7 +884,6 @@ StartSystemEnd:
         };
     }
 
-
 //
 // utsname
 //
@@ -895,12 +895,12 @@ StartSystemEnd:
 // see: sys_uname() in sys.c
 
     memset( &kernel_utsname, 0, sizeof(struct utsname) );
-    sprintf( kernel_utsname.sysname, UTS_SYSNAME );
-    sprintf( kernel_utsname.version, VERSION_NAME );
-    sprintf( kernel_utsname.release, RELEASE_NAME );
-    sprintf( kernel_utsname.machine, MACHINE_NAME );
-    sprintf( kernel_utsname.nodename, UTS_NODENAME );
-    sprintf( kernel_utsname.domainname, UTS_DOMAINNAME );
+    ksprintf( kernel_utsname.sysname, UTS_SYSNAME );
+    ksprintf( kernel_utsname.version, VERSION_NAME );
+    ksprintf( kernel_utsname.release, RELEASE_NAME );
+    ksprintf( kernel_utsname.machine, MACHINE_NAME );
+    ksprintf( kernel_utsname.nodename, UTS_NODENAME );
+    ksprintf( kernel_utsname.domainname, UTS_DOMAINNAME );
 
 // Execute the first ring3 process.
 // ireq to init thread.

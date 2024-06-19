@@ -1,8 +1,8 @@
 
 // udp.c
+// Created by Fred Nora.
 
 #include <kernel.h>
-
 
 /*
 #define __UDP_PACKET_SIZE  ETHERNET_HEADER_LENGHT +\
@@ -182,7 +182,7 @@ network_handle_udp(
             /*
             if (dhcp_info.initialized == TRUE)
             {
-                sprintf(udp_payload,"This is a response");
+                ksprintf(udp_payload,"This is a response");
                 network_send_udp(  
                     dhcp_info.your_ipv4,  // scr ip
                     __dhcp_target_ipv4,  // dst ip
@@ -221,7 +221,7 @@ void network_test_udp(void)
 
     char message[512];
     memset(message,0,sizeof(message));
-    sprintf(message,"Hello from Gramado to Linux\n");
+    ksprintf(message,"Hello from Gramado to Linux\n");
 
     if (networkGetStatus() != TRUE)
        return;
@@ -247,7 +247,7 @@ network_test_udp0(
 {
     char message[512];
     memset(message,0,sizeof(message));
-    sprintf(message,"Hello from Gramado to Linux\n");
+    ksprintf(message,"Hello from Gramado to Linux\n");
 
     network_send_udp( 
         __udp_gramado_default_ipv4,   // scr ip

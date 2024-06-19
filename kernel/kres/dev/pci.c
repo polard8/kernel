@@ -890,7 +890,7 @@ pciHandleDevice (
     // Clear local buffer for tmp name.
     memset( __tmpname, 0, SizeOfTmpNameBuffer );
     // Save the tmp name into the local buffer.
-    sprintf( 
+    ksprintf( 
         (char *) __tmpname, 
         "DEV_%x_%x", 
         D->Vendor, 

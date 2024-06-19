@@ -1,6 +1,7 @@
 
 // gramk/user/input.c - Input.
 // mouse/kdb/timer
+// Created by Fred Nora.
 
 // This is an in-kernel input event handler.
 // PS2 keyboard, PS2 mouse and pit timer events goes here.
@@ -1521,7 +1522,7 @@ keProcessInput (
     unsigned long tmp_value=0;
 
     //debug_print("wmProcedure:\n");
-    sprintf (buffer,"My \x1b[8C string!\n"); 
+    ksprintf (buffer,"My \x1b[8C string!\n"); 
 
 // ===================================
 // Control:

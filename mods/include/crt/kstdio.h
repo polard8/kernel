@@ -1,5 +1,6 @@
 
 // kstdio.h
+// Created by Fred Nora.
 
 #ifndef __CRT_KSTDIO_H
 #define __CRT_KSTDIO_H    1
@@ -38,7 +39,7 @@ int mysprintf(char *buf, const char *fmt, ...);
 // --------------------
 // Aliases
 #define printk   kinguio_printf
-#define sprintf  mysprintf
+#define ksprintf  mysprintf
 
 #endif   
 

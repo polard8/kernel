@@ -1,6 +1,7 @@
 
 // ke.c (Kernel Executive)
 // ke subsystem.
+// Created by Fred Nora.
 
 #include <kernel.h>
 
@@ -352,7 +353,7 @@ void schedulerUpdateScreen(void)
     char data[32];
     backbuffer_draw_rectangle( 
         0, 0, deviceWidth, 24, COLOR_KERNEL_BACKGROUND, 0 );
-    sprintf(data,"  FPS %d       ",fps);
+    ksprintf(data,"  FPS %d       ",fps);
     data[12]=0;
     keDrawString(0,8,COLOR_YELLOW,data);
     refresh_rectangle ( 0, 0, deviceWidth, 24 );
